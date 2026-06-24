@@ -9,40 +9,42 @@
     -   该头文件中需要包含模板头文件ascendc/host\_api/tiling/template\_argument.h。
     -   定义模板参数ASCENDC\_TPL\_ARGS\_DECL和模板参数组合ASCENDC\_TPL\_ARGS\_SEL（即可使用的模板）。具体API参考见[模板参数定义](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/Tiling模板编程/模板参数定义.md)。
 
-    ```
+    ```cpp
     #include "ascendc/host_api/tiling/template_argument.h"
 
     // 模板参数
-    ASCENDC_TPL_ARGS_DECL(AddCustomTemplate, // 算子OpType
-    ASCENDC_TPL_DATATYPE_DECL(D_T_X, C_DT_FLOAT16, C_DT_FLOAT),  // DataType类型的模板参数定义：输入参数x的数据类型，取值范围为float16/float32
-    ASCENDC_TPL_DATATYPE_DECL(D_T_Y, C_DT_FLOAT16, C_DT_FLOAT),  // DataType类型的模板参数定义：输入参数y的数据类型，取值范围为float16/float32
-    ASCENDC_TPL_DATATYPE_DECL(D_T_Z, C_DT_FLOAT16, C_DT_FLOAT),  // DataType类型的模板参数定义：输出参数z的数据类型，取值范围为float16/float32
-    ASCENDC_TPL_UINT_DECL(TILE_NUM, ASCENDC_TPL_8_BW, ASCENDC_TPL_UI_MIX, 2, 0, 2, 3, 5, 10, 12, 13, 9, 8),// 自定义UINT类型（无符号整形）的模板参数定义：模板参数为切分的块数，编码位宽为ASCENDC_TPL_8_BW即8比特，表示该模板参数的个数不超过8比特能表达的范围；ASCENDC_TPL_UI_MIX表示通过混合模式表达取值范围，有2组的数据{0-2}、{3-5}和穷举值10、12、13、9、8，最后结果为{0, 1, 2, 3, 4, 5, 10, 12, 13, 9, 8}
-    ASCENDC_TPL_BOOL_DECL(IS_SPLIT, 0, 1), // 自定义bool类型的模板参数定义：模板参数为是否切分标志位，取值范围为0和1，1表示切分，0表示不切分
+    ASCENDC_TPL_ARGS_DECL(
+        AddCustomTemplate, // 算子OpType
+        ASCENDC_TPL_DATATYPE_DECL(
+            D_T_X, C_DT_FLOAT16, C_DT_FLOAT), // DataType类型的模板参数定义：输入参数x的数据类型，取值范围为float16/float32
+        ASCENDC_TPL_DATATYPE_DECL(
+            D_T_Y, C_DT_FLOAT16, C_DT_FLOAT), // DataType类型的模板参数定义：输入参数y的数据类型，取值范围为float16/float32
+        ASCENDC_TPL_DATATYPE_DECL(
+            D_T_Z, C_DT_FLOAT16, C_DT_FLOAT), // DataType类型的模板参数定义：输出参数z的数据类型，取值范围为float16/float32
+        ASCENDC_TPL_UINT_DECL(
+            TILE_NUM, ASCENDC_TPL_8_BW, ASCENDC_TPL_UI_MIX, 2, 0, 2, 3, 5, 10, 12, 13, 9,
+            8), // 自定义UINT类型（无符号整形）的模板参数定义：模板参数为切分的块数，编码位宽为ASCENDC_TPL_8_BW即8比特，表示该模板参数的个数不超过8比特能表达的范围；ASCENDC_TPL_UI_MIX表示通过混合模式表达取值范围，有2组的数据{0-2}、{3-5}和穷举值10、12、13、9、8，最后结果为{0,
+                // 1, 2, 3, 4, 5, 10, 12, 13, 9, 8}
+        ASCENDC_TPL_BOOL_DECL(
+            IS_SPLIT, 0,
+            1), // 自定义bool类型的模板参数定义：模板参数为是否切分标志位，取值范围为0和1，1表示切分，0表示不切分
     );
 
     // 模板参数组合
     ASCENDC_TPL_SEL(
         ASCENDC_TPL_ARGS_SEL(
-        ASCENDC_TPL_DATATYPE_SEL(D_T_X, C_DT_FLOAT16),
-        ASCENDC_TPL_DATATYPE_SEL(D_T_Y, C_DT_FLOAT16),
-        ASCENDC_TPL_DATATYPE_SEL(D_T_Z, C_DT_FLOAT16),
-        ASCENDC_TPL_UINT_SEL(TILE_NUM, ASCENDC_TPL_UI_LIST, 1, 8),
-        ASCENDC_TPL_BOOL_SEL(IS_SPLIT, 0, 1)
-        ),
+            ASCENDC_TPL_DATATYPE_SEL(D_T_X, C_DT_FLOAT16), ASCENDC_TPL_DATATYPE_SEL(D_T_Y, C_DT_FLOAT16),
+            ASCENDC_TPL_DATATYPE_SEL(D_T_Z, C_DT_FLOAT16), ASCENDC_TPL_UINT_SEL(TILE_NUM, ASCENDC_TPL_UI_LIST, 1, 8),
+            ASCENDC_TPL_BOOL_SEL(IS_SPLIT, 0, 1)),
         ASCENDC_TPL_ARGS_SEL(
-        ASCENDC_TPL_DATATYPE_SEL(D_T_X, C_DT_FLOAT),
-        ASCENDC_TPL_DATATYPE_SEL(D_T_Y, C_DT_FLOAT),
-        ASCENDC_TPL_DATATYPE_SEL(D_T_Z, C_DT_FLOAT),
-        ASCENDC_TPL_UINT_SEL(TILE_NUM, ASCENDC_TPL_UI_LIST, 1, 8),
-        ASCENDC_TPL_BOOL_SEL(IS_SPLIT, 0, 1)
-        ),
-    );
+            ASCENDC_TPL_DATATYPE_SEL(D_T_X, C_DT_FLOAT), ASCENDC_TPL_DATATYPE_SEL(D_T_Y, C_DT_FLOAT),
+            ASCENDC_TPL_DATATYPE_SEL(D_T_Z, C_DT_FLOAT), ASCENDC_TPL_UINT_SEL(TILE_NUM, ASCENDC_TPL_UI_LIST, 1, 8),
+            ASCENDC_TPL_BOOL_SEL(IS_SPLIT, 0, 1)), );
     ```
 
     当不同模板参数组合需要使用不同的Tiling结构体时，可以在对应的ASCENDC_TPL_ARGS_SEL中增加ASCENDC_TPL_TILING_STRUCT_SEL接口。例如：
 
-    ```
+    ```text
     ASCENDC_TPL_SEL(
         ASCENDC_TPL_ARGS_SEL(
         ASCENDC_TPL_DATATYPE_SEL(D_T_X, C_DT_FLOAT16),
@@ -70,7 +72,7 @@
     -   通过GetTilingData获取Tiling结构体指针，并对其成员变量进行赋值。
     -   调用ASCENDC\_TPL\_SEL\_PARAM接口自动生成并配置TilingKey，ASCENDC\_TPL\_SEL\_PARAM输入参数为模板参数的具体值，传入时需要与模板参数声明处的顺序保持一致。
 
-    ```
+    ```cpp
     #include "../../op_kernel/add_custom_template/add_custom_template_tiling.h"
     #include "../../op_kernel/add_custom_template/tiling_key_add_custom_template.h"
 
@@ -79,7 +81,7 @@
     const uint32_t DEFAULT_TILE_NUM = 8;
     constexpr uint32_t MIN_LENGTH_FOR_SPLIT = 2048;
 
-    static ge::graphStatus TilingFunc(gert::TilingContext *context)
+    static ge::graphStatus TilingFunc(gert::TilingContext* context)
     {
         uint32_t totalLength = context->GetInputShape(0)->GetOriginShape().GetShapeSize();
         ge::DataType dtype_x = context->GetInputDesc(0)->GetDataType();
@@ -99,15 +101,15 @@
         }
         context->SetBlockDim(NUM_BLOCKS);
         // 获取Tiling结构体指针并赋值
-        TilingDataTemplate *tiling = context->GetTilingData<TilingDataTemplate>();
+        TilingDataTemplate* tiling = context->GetTilingData<TilingDataTemplate>();
         tiling->totalLength = totalLength;
         // 模板参数tilingkey配置
         ASCENDC_TPL_SEL_PARAM(context, D_T_X, D_T_Y, D_T_Z, TILE_NUM, IS_SPLIT);
-        size_t *currentWorkspace = context->GetWorkspaceSizes(1);
+        size_t* currentWorkspace = context->GetWorkspaceSizes(1);
         currentWorkspace[0] = 0;
         return ge::GRAPH_SUCCESS;
     }
-    }  // namespace optiling
+    } // namespace optiling
     ```
 
 3.  kernel侧实现
@@ -117,16 +119,17 @@
     -   通过REGISTER\_TILING\_DEFAULT注册Tiling结构体，通过GET\_TILING\_DATA\_WITH\_STRUCT解析Tiling数据。
     -   通过对模板参数的分支判断，选择不同的kernel侧实现。
 
-    ```
+    ```cpp
     #include "kernel_operator.h"
     #include "add_custom_template_tiling.h"
     #include "tiling_key_add_custom_template.h"
     ...
-    // KernelAdd模板类实现
-    ...
+        // KernelAdd模板类实现
+        ...
 
-    template <typename D_T_X, typename D_T_Y, typename D_T_Z, int TILE_NUM, int IS_SPLIT>
-     __global__ __aicore__ void add_custom_template(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
+        template <typename D_T_X, typename D_T_Y, typename D_T_Z, int TILE_NUM, int IS_SPLIT>
+        __global__ __aicore__ void add_custom_template(
+            __gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
     {
         REGISTER_TILING_DEFAULT(TilingDataTemplate);
         GET_TILING_DATA_WITH_STRUCT(TilingDataTemplate, tiling_data, tiling);

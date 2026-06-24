@@ -53,7 +53,7 @@
 
 ```cpp
 namespace AscendC {
-template<class T>
+template <class T>
 struct Complex {
     T real;
     T imag;

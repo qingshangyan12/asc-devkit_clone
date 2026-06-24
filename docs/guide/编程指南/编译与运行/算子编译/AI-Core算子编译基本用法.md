@@ -47,10 +47,11 @@ AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成
 
   // ------- example.asc -------
   extern __gm__ int dev_var;
-  __aicore__  int device_function();
-  __global__  __vector__ void kernel(int *var) {
-    dev_var = 0;
-    *var = device_function();
+  __aicore__ int device_function();
+  __global__ __vector__ void kernel(int* var)
+  {
+      dev_var = 0;
+      *var = device_function();
   }
   ```
 

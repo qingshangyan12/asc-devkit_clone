@@ -7,11 +7,7 @@
 `enableRelu`默认值为`false`，表示不使能随路Relu。设置为`true`时，搬出过程中对输出数据执行Normal Relu激活。
 
 ```cpp
-constexpr CopyL0C2GMTrait l0c2gmTrait = {
-    RoundMode::DEFAULT,
-    true,
-    false
-};
+constexpr CopyL0C2GMTrait l0c2gmTrait = {RoundMode::DEFAULT, true, false};
 
 struct CopyL0C2GMTraitCustom {
     using TraitType = CopyL0C2GMTrait;
@@ -26,12 +22,7 @@ Copy(atom, gm, l0c);
 L0C Buffer到Unified Buffer搬运同样通过`CopyL0C2UBTrait::enableRelu`控制：
 
 ```cpp
-constexpr CopyL0C2UBTrait l0c2ubTrait = {
-    RoundMode::DEFAULT,
-    true,
-    false,
-    DUAL_DST_DISABLE
-};
+constexpr CopyL0C2UBTrait l0c2ubTrait = {RoundMode::DEFAULT, true, false, DUAL_DST_DISABLE};
 
 struct CopyL0C2UBTraitCustom {
     using TraitType = CopyL0C2UBTrait;

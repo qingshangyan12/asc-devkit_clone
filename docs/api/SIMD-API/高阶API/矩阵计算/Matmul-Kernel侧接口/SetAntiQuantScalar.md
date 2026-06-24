@@ -24,7 +24,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetAntiQuantScalar(const SrcT offsetScalar, const SrcT scaleScalar)
 ```
 

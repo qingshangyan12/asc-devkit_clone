@@ -16,9 +16,9 @@ make\_tuple是一个实用的函数模板，其作用在于便捷地创建tuple�
 
 ## 函数原型
 
-```
-template <typename ...Tps>
-__aicore__ inline constexpr tuple<unwrap_decay_t<Tps>...> make_tuple(Tps&& ...args)
+```cpp
+template <typename... Tps>
+__aicore__ inline constexpr tuple<unwrap_decay_t<Tps>...> make_tuple(Tps&&... args)
 ```
 
 ## 参数说明
@@ -43,7 +43,7 @@ __aicore__ inline constexpr tuple<unwrap_decay_t<Tps>...> make_tuple(Tps&& ...ar
 
 ## 调用示例
 
-```
+```cpp
 AscendC::Std::tuple<uint32_t, float, bool> test = AscendC::Std::make_tuple(22, 3.3, true);
 ```
 

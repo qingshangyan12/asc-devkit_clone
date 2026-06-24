@@ -14,7 +14,7 @@ This example uses the Sigmoid high-level API to perform element-wise logistic Si
 
 ## Directory Structure
 
-```
+```text
 ├── sigmoid
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

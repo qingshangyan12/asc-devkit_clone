@@ -109,11 +109,15 @@ using PrimType = PrimT&lt;T&gt;;</pre>
 ## 调用示例<a name="section17531157161314"></a>
 
 ```cpp
-uint64_t dataSize = 256; //设置input_global的大小为256
+uint64_t dataSize = 256; // 设置input_global的大小为256
 
 AscendC::GlobalTensor<int32_t> inputGlobal; // 类型为int32_t
-inputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ int32_t *>(src_gm), dataSize); // 设置源操作数在Global Memory上的起始地址为src_gm，所占外部存储的大小为256个int32_t
+inputGlobal.SetGlobalBuffer(
+    reinterpret_cast<__gm__ int32_t*>(src_gm),
+    dataSize); // 设置源操作数在Global
+               // Memory上的起始地址为src_gm，所占外部存储的大小为256个int32_t
 
-AscendC::LocalTensor<int32_t> inputLocal = inQueueX.AllocTensor<int32_t>();    
-AscendC::DataCopy(inputLocal, inputGlobal, dataSize); // 将Global Memory上的inputGlobal拷贝到Local Memory的inputLocal上
+AscendC::LocalTensor<int32_t> inputLocal = inQueueX.AllocTensor<int32_t>();
+AscendC::DataCopy(inputLocal, inputGlobal,
+                  dataSize); // 将Global Memory上的inputGlobal拷贝到Local Memory的inputLocal上
 ```

@@ -21,12 +21,12 @@
 ```cpp
 // 数据写入索引为偶数的位置，非饱和模式
 __simd_callee__ inline void asc_uint322int16(vector_int16_t& dst, vector_uint32_t src, vector_bool mask)
-// 数据写入索引为偶数的位置，饱和模式
-__simd_callee__ inline void asc_uint322int16_sat(vector_int16_t& dst, vector_uint32_t src, vector_bool mask)
-// 数据写入索引为奇数的位置，非饱和模式
-__simd_callee__ inline void asc_uint322int16_v2(vector_int16_t& dst, vector_uint32_t src, vector_bool mask)
-// 数据写入索引为奇数的位置，饱和模式
-__simd_callee__ inline void asc_uint322int16_sat_v2(vector_int16_t& dst, vector_uint32_t src, vector_bool mask)
+    // 数据写入索引为偶数的位置，饱和模式
+    __simd_callee__ inline void asc_uint322int16_sat(vector_int16_t& dst, vector_uint32_t src, vector_bool mask)
+    // 数据写入索引为奇数的位置，非饱和模式
+    __simd_callee__ inline void asc_uint322int16_v2(vector_int16_t& dst, vector_uint32_t src, vector_bool mask)
+    // 数据写入索引为奇数的位置，饱和模式
+    __simd_callee__ inline void asc_uint322int16_sat_v2(vector_int16_t& dst, vector_uint32_t src, vector_bool mask)
 ```
 
 ## 参数说明

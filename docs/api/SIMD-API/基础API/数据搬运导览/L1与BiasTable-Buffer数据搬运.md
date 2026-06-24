@@ -37,12 +37,14 @@ src和dst分别为源操作数和目的操作数；repeatParams为搬运参数�
 
     ```cpp
     template <typename T>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
+    __aicore__ inline void DataCopy(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
     ```
 
 - 连续或非连续搬运场景，支持源操作数和目的操作数数据类型不一致
 
     ```cpp
     template <typename T, typename U>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyParams& repeatParams)
+    __aicore__ inline void DataCopy(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyParams& repeatParams)
     ```

@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001526206862_section1630753514297"></a>
 
-```
+```cpp
 GET_TILING_DATA(tiling_data, tiling_arg)
 ```
 
@@ -92,10 +92,11 @@ GET_TILING_DATA(tiling_data, tiling_arg)
 
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 
-```
-extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8_t *y, __gm__ uint8_t *z, __gm__ uint8_t *tiling)
+```cpp
+extern "C" __global__ __aicore__ void add_custom(
+    __gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* tiling)
 {
-    GET_TILING_DATA(tilingData, tiling);// 反序列化SaveToBuffer生成的数据，并填入注册的TilingData结构体中
+    GET_TILING_DATA(tilingData, tiling); // 反序列化SaveToBuffer生成的数据，并填入注册的TilingData结构体中
     KernelAdd op;
     op.Init(x, y, z, tilingData.numBlocks, tilingData.totalSize, tilingData.splitTile);
     op.Process();
@@ -104,13 +105,12 @@ extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8
 
 配套的host侧Tiling函数示例：
 
-```
+```cpp
 ge::graphStatus TilingFunc(gert::TilingContext* context)
 {
     // 其他代码逻辑
-    ...
-    TilingData tiling;  // 与算子host实现中定义TilingData结构体的对应
-    tiling.set_blkDim(numBlocks);  // 与算子host实现中定义TilingData结构体中的成员的对应
+    ... TilingData tiling;        // 与算子host实现中定义TilingData结构体的对应
+    tiling.set_blkDim(numBlocks); // 与算子host实现中定义TilingData结构体中的成员的对应
     tiling.set_totalSize(totalSize);
     tiling.set_splitTile(splitTile);
     tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());

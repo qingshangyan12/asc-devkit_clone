@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```text
 inline float2 __half22float2(const half2 x)
 ```
 
@@ -52,7 +52,7 @@ inline float2 __half22float2(const half2 x)
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     // 使用短向量可提升数据搬运效率
     __aicore__ void simt_half22float2(half2* input, float2* output, uint32_t input_total_length)
     {
@@ -72,9 +72,10 @@ inline float2 __half22float2(const half2 x)
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     // 使用短向量可提升数据搬运效率
-    __simt_vf__ __launch_bounds__(1024) inline void simt_half22float2(__gm__ half2* input, __gm__ float2* output, uint32_t input_total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void simt_half22float2(
+        __gm__ half2* input, __gm__ float2* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= input_total_length / 2的线程不处理数据

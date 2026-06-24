@@ -13,15 +13,15 @@
 ## 函数原型
 
 ```c++
-__aicore__ inline void asc_set_ndim_pad_value(int8_t pad_value)
-__aicore__ inline void asc_set_ndim_pad_value(uint8_t pad_value)
-__aicore__ inline void asc_set_ndim_pad_value(int16_t pad_value)
-__aicore__ inline void asc_set_ndim_pad_value(uint16_t pad_value)
-__aicore__ inline void asc_set_ndim_pad_value(half pad_value)
-__aicore__ inline void asc_set_ndim_pad_value(bfloat16_t pad_value)
-__aicore__ inline void asc_set_ndim_pad_value(int32_t pad_value)
-__aicore__ inline void asc_set_ndim_pad_value(uint32_t pad_value)
-__aicore__ inline void asc_set_ndim_pad_value(float pad_value)
+__aicore__ inline void asc_set_ndim_pad_value(int8_t pad_value) __aicore__
+    inline void asc_set_ndim_pad_value(uint8_t pad_value) __aicore__
+    inline void asc_set_ndim_pad_value(int16_t pad_value) __aicore__
+    inline void asc_set_ndim_pad_value(uint16_t pad_value) __aicore__
+    inline void asc_set_ndim_pad_value(half pad_value) __aicore__
+    inline void asc_set_ndim_pad_value(bfloat16_t pad_value) __aicore__
+    inline void asc_set_ndim_pad_value(int32_t pad_value) __aicore__
+    inline void asc_set_ndim_pad_value(uint32_t pad_value) __aicore__
+    inline void asc_set_ndim_pad_value(float pad_value)
 ```
 
 ## 参数说明
@@ -46,5 +46,5 @@ PIPE_S
 
 ```c++
 half pad_value = 2.0;
-asc_set_ndim_pad_value(pad_value); 
+asc_set_ndim_pad_value(pad_value);
 ```

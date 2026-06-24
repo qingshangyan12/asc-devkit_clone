@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetStartPosition(uint32_t hoStartIdx)
 ```
 
@@ -48,7 +48,7 @@ __aicore__ inline void SetStartPosition(uint32_t hoStartIdx)
 
 ## 调用示例
 
-```
+```text
 ...
 gradWeight_.SetSingleShape(singleShapeM, singleShapeN, singleShapeK);
 gradWeight_.SetStartPosition(hoStartIdx); // 设置单核上GradOutput载入的起始位置

@@ -53,8 +53,8 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
-aclError aclrtcDestroyProg(aclrtcProg *prog)
+```cpp
+aclError aclrtcDestroyProg(aclrtcProg* prog)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -90,7 +90,7 @@ aclError为int类型变量，详细说明请参考[RTC错误码](RTC错误码.md
 
 ## 调用示例<a name="section837496171220"></a>
 
-```
+```cpp
 aclrtcProg prog;
 aclError result = aclrtcDestroyProg(&prog);
 ```

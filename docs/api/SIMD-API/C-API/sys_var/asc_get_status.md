@@ -52,5 +52,5 @@ PIPE_S
 
 ```cpp
 int64_t status = asc_get_status();
-printf("status is %x", status);// 需用%x将其打印成十六进制的数
+printf("status is %x", status); // 需用%x将其打印成十六进制的数
 ```

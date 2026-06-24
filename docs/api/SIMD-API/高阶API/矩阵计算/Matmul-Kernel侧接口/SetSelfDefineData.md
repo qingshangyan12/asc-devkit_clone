@@ -19,11 +19,11 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetSelfDefineData(const uint64_t dataPtr)
 ```
 
-```
+```cpp
 __aicore__ inline void SetSelfDefineData(T dataPtr)
 ```
 
@@ -55,7 +55,7 @@ Kirin X90产品不支持SetSelfDefineData\(T dataPtr\)接口原型。
 
 ## 调用示例
 
-```
+```cpp
 // 用户自定义回调函数
 void DataCopyOut(
     const __gm__ void* gm, const LocalTensor<int8_t>& co1Local, const void* dataCopyOutParams, const uint64_t tilingPtr,

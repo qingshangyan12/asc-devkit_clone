@@ -86,14 +86,18 @@ $dst_i = \frac{1}{\sqrt{src_i}}$
 
             ```cpp
             template <typename T, bool isSetMask = true, const RsqrtConfig& config = DEFAULT_RSQRT_CONFIG>
-            __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+            __aicore__ inline void Rsqrt(
+                const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[], const uint8_t repeatTime,
+                const UnaryRepeatParams& repeatParams)
             ```
 
         - mask连续模式
 
             ```cpp
             template <typename T, bool isSetMask = true, const RsqrtConfig& config = DEFAULT_RSQRT_CONFIG>
-            __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+            __aicore__ inline void Rsqrt(
+                const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime,
+                const UnaryRepeatParams& repeatParams)
             ```
 
 - 不传入config的原型
@@ -110,14 +114,18 @@ $dst_i = \frac{1}{\sqrt{src_i}}$
 
             ```cpp
             template <typename T, bool isSetMask = true>
-            __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+            __aicore__ inline void Rsqrt(
+                const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[], const uint8_t repeatTime,
+                const UnaryRepeatParams& repeatParams)
             ```
 
         - mask连续模式
 
             ```cpp
             template <typename T, bool isSetMask = true>
-            __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+            __aicore__ inline void Rsqrt(
+                const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime,
+                const UnaryRepeatParams& repeatParams)
             ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -176,17 +184,17 @@ T支持的数据类型为：half、float。
     // repeatTime = 4, 128 elements one repeat, 512 elements total.
     // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat.
     // dstRepStride, srcRepStride = 8, no gap between repeats.
-    AscendC::Rsqrt(dstLocal, srcLocal, mask, 4, { 1, 1, 8, 8 });
+    AscendC::Rsqrt(dstLocal, srcLocal, mask, 4, {1, 1, 8, 8});
     ```
 
 - tensor高维切分计算样例-mask逐bit模式
 
     ```cpp
-    uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
+    uint64_t mask[2] = {UINT64_MAX, UINT64_MAX};
     // repeatTime = 4, 128 elements one repeat, 512 elements total.
     // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat.
     // dstRepStride, srcRepStride = 8, no gap between repeats.
-    AscendC::Rsqrt(dstLocal, srcLocal, mask, 4, { 1, 1, 8, 8 });
+    AscendC::Rsqrt(dstLocal, srcLocal, mask, 4, {1, 1, 8, 8});
     ```
 
 - tensor前n个数据计算接口样例
@@ -200,7 +208,7 @@ T支持的数据类型为：half、float。
 以下示例仅支持Ascend 950PR/Ascend 950DT
 
     ```cpp
-    static constexpr RsqrtConfig config = { RsqrtAlgo::FAST_INVERSE };
+    static constexpr RsqrtConfig config = {RsqrtAlgo::FAST_INVERSE};
     AscendC::Rsqrt<T, config>(dstLocal, srcLocal, 512);
     ```
 <!-- end id23 -->

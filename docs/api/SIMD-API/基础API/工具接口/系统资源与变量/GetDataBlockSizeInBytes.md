@@ -46,11 +46,12 @@ __aicore__ inline constexpr int16_t GetDataBlockSizeInBytes()
 
 ```cpp
 int16_t dataBlockSize = AscendC::GetDataBlockSizeInBytes();
-// 每个repeat有8个DataBlock,可计算8 * dataBlockSize / sizeof(half)个数，mask配置为迭代内所有元素均参与计算
+// 每个repeat有8个DataBlock,可计算8 * dataBlockSize /
+// sizeof(half)个数，mask配置为迭代内所有元素均参与计算
 uint64_t mask = 8 * dataBlockSize / sizeof(half);
 // 共计算512个数，除以每个repeat参与计算的元素个数，得到repeatTime
 uint8_t repeatTime = 512 / mask;
 // dstBlkStride, src0BlkStride, src1BlkStride = 1,单次迭代内数据连续读取和写入
 // dstRepStride, src0RepStride, src1RepStride = 8,相邻迭代间数据连续读取和写入
-AscendC::Add(dstLocal, src0Local, src1Local, mask, repeatTime, { 1, 1, 1, 8, 8, 8 });
+AscendC::Add(dstLocal, src0Local, src1Local, mask, repeatTime, {1, 1, 1, 8, 8, 8});
 ```

@@ -30,7 +30,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <const BitwiseNotConfig& config = DEFAULT_BITWISE_NOT_CONFIG, typename T>
 __aicore__ inline void BitwiseNot(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
 ```
@@ -44,7 +44,7 @@ __aicore__ inline void BitwiseNot(const LocalTensor<T>& dst, const LocalTensor<T
 | config | BitwiseNot算法的相关配置。此参数可选配，BitwiseNotConfig类型，具体定义如下方代码所示，其中参数的含义为：<br><br>isReuseSource：该参数预留，传入默认值false即可。 |
 | T | 源操作数、目的操作数数据类型。支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。 |
 
-```
+```cpp
 struct BitwiseNotConfig {
     bool isReuseSource;
 };
@@ -69,7 +69,7 @@ struct BitwiseNotConfig {
 
 ## 调用示例
 
-```
+```cpp
 AscendC::LocalTensor<uint32_t> dst, src;
 uint32_t count = 512; // 参与计算的元素个数
 AscendC::BitwiseNot(dst, src, count);
@@ -77,7 +77,7 @@ AscendC::BitwiseNot(dst, src, count);
 
 结果示例如下：
 
-```
+```text
 输入数据（src）:
 [ 91, 48, -71, 112, 64, -107, 74, -121, -103, -50, 112, -23, 15, ... -74]
 输出数据（dst）:

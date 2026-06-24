@@ -65,16 +65,18 @@
 
 -   适用于连续和不连续的数据暂存：
 
-    ```
+    ```cpp
     template <typename T>
-    __aicore__ inline void WriteSpmBuffer(const LocalTensor<T>& writeBuffer, const DataCopyParams& copyParams, int32_t writeOffset = 0)
+    __aicore__ inline void WriteSpmBuffer(
+        const LocalTensor<T>& writeBuffer, const DataCopyParams& copyParams, int32_t writeOffset = 0)
     ```
 
 -   适用于连续的数据暂存：
 
-    ```
+    ```cpp
     template <typename T>
-    __aicore__ inline void WriteSpmBuffer(const LocalTensor<T>& writeBuffer, const int32_t writeSize, int32_t writeOffset = 0)
+    __aicore__ inline void WriteSpmBuffer(
+        const LocalTensor<T>& writeBuffer, const int32_t writeSize, int32_t writeOffset = 0)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -166,30 +168,31 @@
 
 -   使用DataCopyParams搬运
 
-    ```
+    ```cpp
     AscendC::TPipe pipe;
     int dataSize = 32; // 假设T为half类型，从ub上申请一块内存32 * sizeof(half)字节
-    int offset = 32; // 拷贝到spmBuffer时偏移32字节
-    AscendC::DataCopyParams copyParams{1, 2, 0, 0}; // 从ub上搬运一个连续传输数据块，一个数据块的长度为2个datablock，一个datablock为32bytes
+    int offset = 32;   // 拷贝到spmBuffer时偏移32字节
+    AscendC::DataCopyParams copyParams{
+        1, 2, 0, 0}; // 从ub上搬运一个连续传输数据块，一个数据块的长度为2个datablock，一个datablock为32bytes
     // writeLocal为SPM Buffer上的half类型的LocalTensor
     pipe.WriteSpmBuffer(writeLocal, copyParams, offset); // 将ub上的连续传输数据块搬运到SPM Buffer
-    pipe.ReadSpmBuffer(writeLocal, copyParams, offset); // 将暂存在SPM Buffer的数据读回到local数据
+    pipe.ReadSpmBuffer(writeLocal, copyParams, offset);  // 将暂存在SPM Buffer的数据读回到local数据
     ...
-    // 当ub内存足够时，将暂存在SPM Buffer的数据块搬运回GM上，dstGlobal为half类型的GlobalTensor
-    AscendC::DataCopy(dstGlobal, writeLocal, copyParams);
+        // 当ub内存足够时，将暂存在SPM Buffer的数据块搬运回GM上，dstGlobal为half类型的GlobalTensor
+        AscendC::DataCopy(dstGlobal, writeLocal, copyParams);
     ```
 
 -   使用writeSize连续搬运
 
-    ```
+    ```cpp
     AscendC::TPipe pipe;
     int dataSize = 32; // 假设T为half类型，从ub上申请一块内存32 * sizeof(half)字节
-    int offset = 32; // 拷贝到spmBuffer时偏移32字节
+    int offset = 32;   // 拷贝到spmBuffer时偏移32字节
     ;
     // writeLocal为SPM Buffer上的half类型的LocalTensor
     pipe.WriteSpmBuffer(writeLocal, dataSize, offset); // 将ub上的连续传输数据块搬运到SPM Buffer
-    pipe.ReadSpmBuffer(writeLocal, dataSize, offset); // 将暂存在SPM Buffer的数据读回到local数据
+    pipe.ReadSpmBuffer(writeLocal, dataSize, offset);  // 将暂存在SPM Buffer的数据读回到local数据
     ...
-    // 当ub内存足够时，将暂存在SPM Buffer的数据块搬运回GM上，dstGlobal为half类型的GlobalTensor
-    AscendC::DataCopy(dstGlobal, writeLocal, dataSize);
+        // 当ub内存足够时，将暂存在SPM Buffer的数据块搬运回GM上，dstGlobal为half类型的GlobalTensor
+        AscendC::DataCopy(dstGlobal, writeLocal, dataSize);
     ```

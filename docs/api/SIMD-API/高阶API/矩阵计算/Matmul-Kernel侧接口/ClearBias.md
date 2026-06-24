@@ -21,7 +21,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void ClearBias()
 ```
 
@@ -39,7 +39,7 @@ __aicore__ inline void ClearBias()
 
 ## 调用示例
 
-```
+```text
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
 mm.SetTensorA(gm_a);
 mm.SetTensorB(gm_b);

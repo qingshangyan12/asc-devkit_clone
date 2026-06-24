@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetInput(const AscendC::GlobalTensor<InputT>& input)
 ```
 
@@ -48,7 +48,7 @@ __aicore__ inline void SetInput(const AscendC::GlobalTensor<InputT>& input)
 
 ## 调用示例
 
-```
+```cpp
 GlobalTensor<half> inputGm;
 inputGm.SetGlobalBuffer(reinterpret_cast<__gm__ half*>(input));
 conv3dApi.SetInput(inputGm);

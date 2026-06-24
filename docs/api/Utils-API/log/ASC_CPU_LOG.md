@@ -19,7 +19,7 @@
 -   非Tiling下沉场景，日志输出到plog中。比如，debug级别的日志输出到/root/ascend/log/debug/plog中，日志级别通过环境变量ASCEND_GLOBAL_LOG_LEVEL控制。会打印日志级别、时间戳、日志所在代码行和日志所在函数名。
 -   Tiling下沉场景，日志不会输出到plog中，而是需要落盘并进行解析。算子运行之前需要开启Dump功能，使得日志Dump功能生效。如何开启Dump功能依赖于具体的网络运行方式。以TorchAir图模式为例，需要配置enable\_dump、dump\_path、dump\_mode等Dump参数。详细说明可参考[《Ascend Extension for PyTorch》](https://www.hiascend.com/document/redirect/pytorchuserguide)中的“《Pytorch图模式使用(TorchAir)》 >GE图模式 \> GE图模式功能 \> 算子data dump功能”章节。示例如下：
 
-    ```
+    ```text
     import torch_npu, torchair
     config = torchair.CompilerConfig()
     # data dump开关：[必选]
@@ -35,13 +35,13 @@
 
 ## 需要包含的头文件<a name="section12341115212912"></a>
 
-```
+```cpp
 #include "utils/log/asc_cpu_log.h"
 ```
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```text
 #define ASC_CPU_LOG_ERROR(format, ...)
 #define ASC_CPU_LOG_INFO(format, ...)
 #define ASC_CPU_LOG_WARNING(format, ...)
@@ -67,16 +67,15 @@ Tiling下沉场景下，若使用旧版本CANN包（不支持ASC\_CPU\_LOG接口
 
 ## 调用示例<a name="section837496171220"></a>
 
-```
+```cpp
 #include "utils/log/asc_cpu_log.h"
 
 namespace optiling {
-static ge::graphStatus TilingFunc(gert::TilingContext *context)
+static ge::graphStatus TilingFunc(gert::TilingContext* context)
 {
     TilingData tiling;
     uint32_t totalLength = context->GetInputShape(0)->GetOriginShape().GetShapeSize();
-    ...
-    ASC_CPU_LOG_ERROR("I am ERROR log: %d\n", 0x123);
+    ... ASC_CPU_LOG_ERROR("I am ERROR log: %d\n", 0x123);
     ASC_CPU_LOG_INFO("I am INFO log: %d\n", 0x123);
     ASC_CPU_LOG_WARNING("I am WARNING log: %d\n", 0x123);
     ASC_CPU_LOG_DEBUG("I am DEBUG log: %d\n", 0x123);
@@ -87,7 +86,7 @@ static ge::graphStatus TilingFunc(gert::TilingContext *context)
 
 非Tiling下沉场景，打印会输出至xxxxxxx\_2025xxxxxxxxxxxxx.log中，结果示例如下：
 
-```
+```text
 [ERROR] ASCENDCKERNEL(xxx,execute_add_op):2025-xx-xx-xx:xx:xx.xxx.xxx [/xxx/xxx.cpp:xx][TilingFunc] I am ERROR log: 291
 [INFO] ASCENDCKERNEL(xxx,execute_add_op):2025-xx-xx-xx:xx:xx.xxx.xxx [/xxx/xxx.cpp:xx][TilingFunc] I am INFO log: 291
 [WARNING] ASCENDCKERNEL(xxx,execute_add_op):2025-xx-xx-xx:xx:xx.xxx.xxx [/xxx/xxx.cpp:xx][TilingFunc] I am WARNING log: 291

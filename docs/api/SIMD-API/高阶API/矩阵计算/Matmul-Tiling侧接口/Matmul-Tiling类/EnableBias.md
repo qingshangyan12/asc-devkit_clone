@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 int32_t EnableBias(bool isBiasIn = false)
 ```
 
@@ -28,7 +28,7 @@ int32_t EnableBias(bool isBiasIn = false)
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MatmulApiTiling tiling(ascendcPlatform);
 

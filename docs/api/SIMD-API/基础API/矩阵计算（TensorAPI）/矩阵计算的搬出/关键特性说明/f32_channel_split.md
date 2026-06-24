@@ -20,11 +20,7 @@ using namespace AscendC::Te;
 auto l0c = MakeTensor(MakeMemPtr(l0cAddr), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
 auto gm = MakeTensor(MakeMemPtr(gmAddr), MakeFrameLayout<NZLayoutPtn, float>(m, n));
 
-constexpr CopyL0C2GMTrait l0c2gmTrait = {
-    RoundMode::DEFAULT,
-    false,
-    true
-};
+constexpr CopyL0C2GMTrait l0c2gmTrait = {RoundMode::DEFAULT, false, true};
 
 struct CopyL0C2GMTraitCustom {
     using TraitType = CopyL0C2GMTrait;

@@ -78,8 +78,8 @@ LocalTensor构造函数。
 -   适用于[静态Tensor编程](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/SIMD编程/静态Tensor编程.md)，根据指定的逻辑位置/地址/长度，返回Tensor对象。
 
     ```cpp
-    __aicore__ inline LocalTensor<T>(TPosition pos, uint32_t addr, uint32_t tileSize)
-    __aicore__ inline LocalTensor<T>(uint32_t addr)
+    __aicore__ inline LocalTensor<T>(TPosition pos, uint32_t addr, uint32_t tileSize) __aicore__
+        inline LocalTensor<T>(uint32_t addr)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -207,7 +207,8 @@ AscendC::TTagType tag2 = tensor2.GetUserTag();
 AscendC::LocalTensor<half> tensor3 = que3.AllocTensor<half>();
 /* 使用Tag控制条件语句执行*/
 if ((tag1 <= 10) && (tag2 >= 9)) {
-    AscendC::Add(tensor3, tensor1, tensor2, TILE_LENGTH); // 当tag1小于等于10，tag2大于等于9的时候，才能进行相加操作。
+    AscendC::Add(tensor3, tensor1, tensor2,
+                 TILE_LENGTH); // 当tag1小于等于10，tag2大于等于9的时候，才能进行相加操作。
 }
 // 示例9
 // input_local为int32_t类型，包含16个元素(64字节)
@@ -219,13 +220,15 @@ for (int32_t i = 0; i < 16; ++i) {
 AscendC::LocalTensor<int16_t> interpreTensor = inputLocal.ReinterpretCast<int16_t>();
 // 示例9结果如下，二者数据完全一致，在物理内存上也是同一地址，仅根据不同类型进行了重解释
 // inputLocal:0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
-// interpreTensor:0 0 1 0 2 0 3 0 4 0 5 0 6 0 7 0 8 0 9 0 10 0 11 0 12 0 13 0 14 0 15 0
+// interpreTensor:0 0 1 0 2 0 3 0 4 0 5 0 6 0 7 0 8 0 9 0 10 0 11 0 12 0 13 0 14
+// 0 15 0
 
 // 示例10
 // 调用GetPhyAddr()返回LocalTensor地址，CPU上返回的是指针类型(T*)，NPU上返回的是物理存储的地址(uint64_t)
 #ifdef ASCENDC_CPU_DEBUG
-float *inputLocalCpuPtr = inputLocal.GetPhyAddr();
-uint64_t realAddr = (uint64_t)inputLocalCpuPtr - (uint64_t)(GetTPipePtr()->GetBaseAddr(static_cast<int8_t>(AscendC::TPosition::VECCALC)));
+float* inputLocalCpuPtr = inputLocal.GetPhyAddr();
+uint64_t realAddr = (uint64_t)inputLocalCpuPtr -
+                    (uint64_t)(GetTPipePtr()->GetBaseAddr(static_cast<int8_t>(AscendC::TPosition::VECCALC)));
 #else
 uint64_t realAddr = inputLocal.GetPhyAddr();
 #endif
@@ -259,7 +262,8 @@ uint32_t orgShape2 = maxShapeInfo.originalShape[2];
 uint32_t orgShape3 = maxShapeInfo.originalShape[3];
 uint32_t shape2 = maxShapeInfo.shape[2];
 
-// 示例15 SetAddrWithOffset，用于快速获取定义一个Tensor，同时指定新Tensor相对于旧Tensor首地址的偏移
+// 示例15
+// SetAddrWithOffset，用于快速获取定义一个Tensor，同时指定新Tensor相对于旧Tensor首地址的偏移
 // 需要注意，偏移的长度为旧Tensor的元素个数
 AscendC::LocalTensor<float> tmpBuffer1 = tempBmm2Queue.AllocTensor<float>();
 AscendC::LocalTensor<half> tmpHalfBuffer;
@@ -296,8 +300,7 @@ AscendC::LocalTensor<float> tensor1 = AscendC::LocalTensor<float>(AscendC::TPosi
 // 其逻辑位置为VECIN，数据类型为float，Tensor元素个数为16*16*16
 template <uint32_t v>
 using UIntImm = Std::integral_constant<uint32_t, v>;
-...
-auto shape = AscendC::MakeShape(UIntImm<16>{}, UIntImm<16>{}, UIntImm<16>{});
+... auto shape = AscendC::MakeShape(UIntImm<16>{}, UIntImm<16>{}, UIntImm<16>{});
 auto stride = AscendC::MakeStride(UIntImm<0>{}, UIntImm<0>{}, UIntImm<0>{});
 auto layoutMake = AscendC::MakeLayout(shape, stride);
 auto tensorTraitMake = AscendC::MakeTensorTrait<float, AscendC::TPosition::VECIN>(layoutMake);

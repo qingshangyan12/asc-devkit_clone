@@ -73,18 +73,20 @@
 
 1.  配置MDL模板参数，将其中的doMTE2Preload参数设置为2，开启N方向Preload功能。
 
-    ```
-     // preloadMode = 2
-    static constexpr MatmulConfig MM_CFG = GetMDLConfig(false, false, preloadMode); 
+    ```cpp
+    // preloadMode = 2
+    static constexpr MatmulConfig MM_CFG = GetMDLConfig(false, false, preloadMode);
     ```
 
 2.  基于自定义MatmulConfig模板参数，创建Matmul对象。
 
-    ```
-    AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, aType>,
+    ```cpp
+    AscendC::Matmul<
+        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, aType>,
         AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, bType>,
         AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, cType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, biasType>, MM_CFG> matmulObj;
+        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, biasType>, MM_CFG>
+        matmulObj;
     ```
 
 ## 验证优化方案性能收益<a name="section19022397498"></a>

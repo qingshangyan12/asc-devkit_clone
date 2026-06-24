@@ -63,7 +63,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T>
 __aicore__ inline void FreeTensor(LocalTensor<T>& tensor)
 ```
@@ -118,7 +118,7 @@ __aicore__ inline void FreeTensor(LocalTensor<T>& tensor)
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 // 使用FreeTensor释放通过AllocTensor分配的Tensor，注意配对使用
 AscendC::TPipe pipe;
 AscendC::TQue<AscendC::TPosition::VECOUT, 2> que;

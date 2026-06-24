@@ -40,8 +40,10 @@ __aicore__ inline bool IsAligned(uint64_t addr, uint32_t alignment);
 __aicore__ inline uint32_t AlignUp(uint32_t size, uint32_t alignment);
 
 // 类型判断
-template<typename T1, typename T2>
-struct is_same { static constexpr bool value = false; };
+template <typename T1, typename T2>
+struct is_same {
+    static constexpr bool value = false;
+};
 ```
 
 ### 2.2 编译期计算
@@ -71,7 +73,8 @@ if constexpr (std::is_same_v<T, half>) {
 多数工具类 API 采用内联实现：
 
 ```cpp
-__aicore__ inline uint32_t AlignUp(uint32_t size, uint32_t alignment) {
+__aicore__ inline uint32_t AlignUp(uint32_t size, uint32_t alignment)
+{
     return (size + alignment - 1) & ~(alignment - 1);
 }
 ```
@@ -98,7 +101,8 @@ protected:
     void TearDown() {}
 };
 
-TEST_F(TEST_AlignUp, AlignUp_Basic) {
+TEST_F(TEST_AlignUp, AlignUp_Basic)
+{
     // 测试对齐计算
     EXPECT_EQ(AlignUp(30, 32), 32);
     EXPECT_EQ(AlignUp(32, 32), 32);
@@ -106,7 +110,8 @@ TEST_F(TEST_AlignUp, AlignUp_Basic) {
     EXPECT_EQ(AlignUp(0, 32), 0);
 }
 
-TEST_F(TEST_AlignUp, AlignUp_EdgeCases) {
+TEST_F(TEST_AlignUp, AlignUp_EdgeCases)
+{
     // 边界条件测试
     EXPECT_EQ(AlignUp(UINT32_MAX - 1, 32), UINT32_MAX - 31);
 }
@@ -130,7 +135,8 @@ static_assert(aligned == 128, "alignment calculation should be correct");
 
 ```cpp
 // 无需设置特定核心类型
-TEST_F(TEST_Utils, Utils_Basic) {
+TEST_F(TEST_Utils, Utils_Basic)
+{
     // 直接测试
     EXPECT_EQ(UtilFunction(...), expected_value);
 }
@@ -155,7 +161,8 @@ utils API 不是单一形状：`Std::remove_pointer` 这类 trait 主要是编�
 工具类 API 常有边界条件分支：
 
 ```cpp
-TEST_F(TEST_AlignUp, AlignUp_Boundaries) {
+TEST_F(TEST_AlignUp, AlignUp_Boundaries)
+{
     // 零值
     EXPECT_EQ(AlignUp(0, 32), 0);
 
@@ -179,14 +186,11 @@ TEST_F(TEST_AlignUp, AlignUp_Boundaries) {
 测试不同参数组合：
 
 ```cpp
-INSTANTIATE_TEST_CASE_P(TEST_ALIGN, AlignTestsuite,
+INSTANTIATE_TEST_CASE_P(
+    TEST_ALIGN, AlignTestsuite,
     ::testing::Values(
-        AlignTestParams { 30, 16, 32 },
-        AlignTestParams { 30, 32, 32 },
-        AlignTestParams { 30, 64, 64 },
-        AlignTestParams { 100, 16, 112 },
-        AlignTestParams { 100, 32, 128 }
-    ));
+        AlignTestParams{30, 16, 32}, AlignTestParams{30, 32, 32}, AlignTestParams{30, 64, 64},
+        AlignTestParams{100, 16, 112}, AlignTestParams{100, 32, 128}));
 ```
 
 ### 4.3 类型组合
@@ -194,7 +198,8 @@ INSTANTIATE_TEST_CASE_P(TEST_ALIGN, AlignTestsuite,
 对于模板工具函数，测试不同类型：
 
 ```cpp
-TEST_F(TEST_Max, Max_DifferentTypes) {
+TEST_F(TEST_Max, Max_DifferentTypes)
+{
     EXPECT_EQ(Max(1, 2), 2);
     EXPECT_EQ(Max(1.0f, 2.0f), 2.0f);
     EXPECT_EQ(Max(1.0, 2.0), 2.0);
@@ -207,7 +212,8 @@ TEST_F(TEST_Max, Max_DifferentTypes) {
 测试错误输入处理：
 
 ```cpp
-TEST_F(TEST_CheckAlign, CheckAlign_Invalid) {
+TEST_F(TEST_CheckAlign, CheckAlign_Invalid)
+{
     // 非对齐地址
     EXPECT_FALSE(IsAligned(1, 32));
     EXPECT_FALSE(IsAligned(31, 32));
@@ -307,14 +313,14 @@ __aicore__ inline bool IsAligned(uint64_t addr, uint32_t alignment);
 
 ```cpp
 // 最大最小值
-template<typename T>
+template <typename T>
 __aicore__ inline T Max(T a, T b);
 
-template<typename T>
+template <typename T>
 __aicore__ inline T Min(T a, T b);
 
 // 绝对值
-template<typename T>
+template <typename T>
 __aicore__ inline T Abs(T value);
 ```
 
@@ -322,12 +328,12 @@ __aicore__ inline T Abs(T value);
 
 ```cpp
 // 类型相同判断
-template<typename T1, typename T2>
+template <typename T1, typename T2>
 struct is_same {
     static constexpr bool value = false;
 };
 
-template<typename T>
+template <typename T>
 struct is_same<T, T> {
     static constexpr bool value = true;
 };

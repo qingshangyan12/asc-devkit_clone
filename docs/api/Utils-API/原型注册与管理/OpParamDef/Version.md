@@ -6,10 +6,11 @@
 
 新增可选输入时，为了保持原有单算子API\(aclnnxxx\)接口的兼容性，可以通过Version接口配置aclnn接口的版本号，版本号需要从1开始配，且应该连续配置（和[可选属性](../OpAttrDef/OpAttrDef-272.md)统一编号）。配置后，自动生成的aclnn接口会携带版本号。高版本号的接口会包含低版本号接口的所有参数。如下样例所示的原型定义：
 
-```
+```cpp
 class AddCustom : public OpDef {
-   public:
-    explicit AddCustom(const char* name) : OpDef(name) {
+public:
+    explicit AddCustom(const char* name) : OpDef(name)
+    {
         this->Input("x")
             .ParamType(DYNAMIC)
             .DataType({ge::DT_FLOAT16, ge::DT_FLOAT})
@@ -36,48 +37,28 @@ OP_ADD(AddCustom);
 
 会自动生成3个版本的aclnn接口，定义如下：
 
-```
+```cpp
 aclnnStatus aclnnAddCustomGetWorkspaceSize(
-    const aclTensorList *x,
-    const aclTensorList *out,
-    uint64_t *workspaceSize,
-    aclOpExecutor **executor);
-aclnnStatus aclnnAddCustom(
-    void *workspace,
-    uint64_t workspaceSize,
-    aclOpExecutor *executor,
-    const aclrtStream stream);
+    const aclTensorList* x, const aclTensorList* out, uint64_t* workspaceSize, aclOpExecutor** executor);
+aclnnStatus aclnnAddCustom(void* workspace, uint64_t workspaceSize, aclOpExecutor* executor, const aclrtStream stream);
 
 aclnnStatus aclnnAddCustomV1GetWorkspaceSize(
-    const aclTensorList *x,
-    const aclTensor *x1Optional,
-    const aclTensorList *out,
-    uint64_t *workspaceSize,
-    aclOpExecutor **executor);
+    const aclTensorList* x, const aclTensor* x1Optional, const aclTensorList* out, uint64_t* workspaceSize,
+    aclOpExecutor** executor);
 aclnnStatus aclnnAddCustomV1(
-    void *workspace,
-    uint64_t workspaceSize,
-    aclOpExecutor *executor,
-    const aclrtStream stream);
+    void* workspace, uint64_t workspaceSize, aclOpExecutor* executor, const aclrtStream stream);
 
 aclnnStatus aclnnAddCustomV2GetWorkspaceSize(
-    const aclTensorList *x,
-    const aclTensor *x1Optional,
-    const aclTensor *x2Optional,
-    const aclTensorList *out,
-    uint64_t *workspaceSize,
-    aclOpExecutor **executor);
+    const aclTensorList* x, const aclTensor* x1Optional, const aclTensor* x2Optional, const aclTensorList* out,
+    uint64_t* workspaceSize, aclOpExecutor** executor);
 aclnnStatus aclnnAddCustomV2(
-    void *workspace,
-    uint64_t workspaceSize,
-    aclOpExecutor *executor,
-    const aclrtStream stream);
+    void* workspace, uint64_t workspaceSize, aclOpExecutor* executor, const aclrtStream stream);
 ```
 
 ## 函数原型<a name="zh-cn_topic_0000001797014949_zh-cn_topic_0000001526594958_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
-OpParamDef &Version(uint32_t version)
+```cpp
+OpParamDef& Version(uint32_t version)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001797014949_zh-cn_topic_0000001526594958_zh-cn_topic_0000001525424352_section75395119104"></a>

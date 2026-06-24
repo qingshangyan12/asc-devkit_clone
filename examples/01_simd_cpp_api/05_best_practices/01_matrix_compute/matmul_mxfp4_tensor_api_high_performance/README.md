@@ -163,13 +163,20 @@ scale 的搬运粒度由 `scaleFactorK=4` 控制，一次搬入 `scaleFactorK * 
 以 A 矩阵数据搬运为例，`Copy` 一次搬入 `stepK` 个 K 方向 base 块，每个base块为 `baseM * baseK`：
 
 ```cpp
-AscendC::Te::Copy(gm2L1Atom, l1TensorAPing, a.Slice(AscendC::Te::MakeCoord(mBlockIdx * baseM, dataNextKChunkIdx * baseK), AscendC::Te::MakeShape(curM, stepCurK)));
+AscendC::Te::Copy(
+    gm2L1Atom, l1TensorAPing,
+    a.Slice(
+        AscendC::Te::MakeCoord(mBlockIdx* baseM, dataNextKChunkIdx* baseK), AscendC::Te::MakeShape(curM, stepCurK)));
 ```
 
 以 ScaleA 矩阵数据搬运为例。`Copy` 一次搬入 `scaleFactorK * stepK` 个 K 方向 base 块，每个base块为 `baseM * baseSK`（其中 `baseSK = align_even(ceil(baseK / 32))`）：
 
 ```cpp
-AscendC::Te::Copy(gm2L1Atom, l1TensorAsPing, as.Slice(AscendC::Te::MakeCoord(mBlockIdx * baseM, scaleNextKChunkIdx * baseScaleK), AscendC::Te::MakeShape(curM, stepCurScaleK)));
+AscendC::Te::Copy(
+    gm2L1Atom, l1TensorAsPing,
+    as.Slice(
+        AscendC::Te::MakeCoord(mBlockIdx* baseM, scaleNextKChunkIdx* baseScaleK),
+        AscendC::Te::MakeShape(curM, stepCurScaleK)));
 ```
 
 #### 3. L1 到 L0 进入 MX 计算路径
@@ -181,13 +188,18 @@ AscendC::Te::Copy(gm2L1Atom, l1TensorAsPing, as.Slice(AscendC::Te::MakeCoord(mBl
 以 A 矩阵数据搬运为例，`Copy` 一次搬入 1 个`baseM * baseK` 大小的 base 块：
 
 ```cpp
-AscendC::Te::Copy(l12l0AAtom, l0TensorA, l1ReadBufA.Slice(AscendC::Te::MakeCoord(0, kOffsetInDataChunk * baseK), AscendC::Te::MakeShape(curM, curK)));
+AscendC::Te::Copy(
+    l12l0AAtom, l0TensorA,
+    l1ReadBufA.Slice(AscendC::Te::MakeCoord(0, kOffsetInDataChunk* baseK), AscendC::Te::MakeShape(curM, curK)));
 ```
 
 以 ScaleA 矩阵数据搬运为例，`Copy` 一次搬入 1 个`baseM * baseSK` 大小的 base 块：
 
 ```cpp
-AscendC::Te::Copy(l12l0ScaleAAtom, l0TensorAs, l1ReadBufAs.Slice(AscendC::Te::MakeCoord(0, kOffsetInScaleChunk * baseScaleK), AscendC::Te::MakeShape(curM, curScaleK)));
+AscendC::Te::Copy(
+    l12l0ScaleAAtom, l0TensorAs,
+    l1ReadBufAs.Slice(
+        AscendC::Te::MakeCoord(0, kOffsetInScaleChunk* baseScaleK), AscendC::Te::MakeShape(curM, curScaleK)));
 ```
 
 #### 4. L0 双缓冲：让加载和计算交叠
@@ -260,7 +272,9 @@ GM C [M, N]
 
 ```cpp
 AscendC::Te::FixpipeParams fixpipeParams;
-AscendC::Te::Copy(l0c2GmAtom.with(fixpipeParams), c.Slice(AscendC::Te::MakeCoord(mBlockIdx * baseM, nBlockIdx * baseN), AscendC::Te::MakeShape(curM, curN)), l0TensorC);
+AscendC::Te::Copy(
+    l0c2GmAtom.with(fixpipeParams),
+    c.Slice(AscendC::Te::MakeCoord(mBlockIdx* baseM, nBlockIdx* baseN), AscendC::Te::MakeShape(curM, curN)), l0TensorC);
 ```
 
 ### 事件同步：把流水并行起来

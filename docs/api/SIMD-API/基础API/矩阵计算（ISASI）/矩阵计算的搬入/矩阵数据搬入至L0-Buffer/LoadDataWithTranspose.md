@@ -28,7 +28,8 @@ L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer。
 
 ```cpp
 template <typename T>
-__aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2dTransposeParams& loadDataParams)
+__aicore__ inline void LoadDataWithTranspose(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2dTransposeParams& loadDataParams)
 ```
 
 <cann-filter npu-type = "950">
@@ -37,7 +38,8 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 
 ```cpp
 template <typename T>
-__aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2dTransposeParamsV2& loadDataParams)
+__aicore__ inline void LoadDataWithTranspose(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2dTransposeParamsV2& loadDataParams)
 ```
 
 </cann-filter>
@@ -451,7 +453,7 @@ loadDataParams.srcStride = 1;
 loadDataParams.dstGap = 0;
 loadDataParams.dstFracGap = CeilDivision(k, fractalShape[1]) - 1;
 for (int i = 0; i < CeilDivision(m, fractalShape[1]); ++i) {
-  AscendC::LoadDataWithTranspose(a2Local[i * dstOffset], a1Local[i * srcOffset], loadDataParams);
+    AscendC::LoadDataWithTranspose(a2Local[i * dstOffset], a1Local[i * srcOffset], loadDataParams);
 }
 
 // B矩阵LoadDataWithTranspose: Nz -> Zn
@@ -464,7 +466,7 @@ loadDataParamsB.srcStride = CeilDivision(k, fractalShape[0] * fractalNum);
 loadDataParamsB.dstGap = 0;
 loadDataParamsB.dstFracGap = 0;
 for (int i = 0; i < CeilDivision(k, fractalShape[0] * fractalNum); ++i) {
-  AscendC::LoadDataWithTranspose(b2Local[i * dstOffsetB], b1Local[i * srcOffsetB], loadDataParamsB);
+    AscendC::LoadDataWithTranspose(b2Local[i * dstOffsetB], b1Local[i * srcOffsetB], loadDataParamsB);
 }
 ```
 
@@ -488,7 +490,7 @@ loadDataParams.srcStride = CeilDivision(m, fractalShape[1] * fractalNum);
 loadDataParams.dstGap = 1;
 loadDataParams.dstFracGap = 0;
 for (int i = 0; i < CeilDivision(m, fractalShape[1] * fractalNum); ++i) {
-  AscendC::LoadDataWithTranspose(a2Local[i * dstOffset], a1Local[i * srcOffset], loadDataParams);
+    AscendC::LoadDataWithTranspose(a2Local[i * dstOffset], a1Local[i * srcOffset], loadDataParams);
 }
 
 // B矩阵LoadDataWithTranspose: Nz -> Zn
@@ -518,20 +520,20 @@ uint32 k = 128;
 pipe = tpipe;
 TQue<TPosition::B1, 1> qidB1_;
 TQue<TPosition::B2, 1> qidB2_;
-pipe->InitBuffer(qidB1_, 1, n * k * sizeof(int8_t));
-pipe->InitBuffer(qidB2_, 1, n * k * sizeof(int8_t));
+pipe->InitBuffer(qidB1_, 1, n* k * sizeof(int8_t));
+pipe->InitBuffer(qidB2_, 1, n* k * sizeof(int8_t));
 auto rightMatrix = qidB1_.template DeQue<int8_t>();
 LocalTensor<int8_t> b2 = qidB2_.AllocTensor<int8_t>();
 uint16_t fracNum = 2;
 uint16_t kStep = CeilDiv(kLength, 16);
 uint16_t nStep = CeilDiv(nLength, 32);
-for (uint16_t i = 0; i < nStep; i ++) {
+for (uint16_t i = 0; i < nStep; i++) {
     LoadData2dTransposeParamsV2 loadDataParams;
     loadDataParams.startIndex = i * kStep;
     loadDataParams.repeatTimes = kStep / 2;
     loadDataParams.srcStride = 2;
-    loadDataParams.dstGap = nStep*2 - 1;
-    LoadDataWithTranspose(b2[1024*i], rightMatrix, loadDataParams);
+    loadDataParams.dstGap = nStep * 2 - 1;
+    LoadDataWithTranspose(b2[1024 * i], rightMatrix, loadDataParams);
 }
 qidB2_.EnQue(b2);
 qidB1_.FreeTensor(rightMatrix);

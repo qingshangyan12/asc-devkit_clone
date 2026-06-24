@@ -55,14 +55,14 @@
 
 -   支持传入mask参数
 
-    ```
+    ```cpp
     template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::MERGING, typename U>
     __simd_callee__ inline void Move(U& dstReg, U& srcReg, MaskReg mask);
     ```
 
 -   不支持传入mask参数
 
-    ```
+    ```cpp
     template <typename T = DefaultType, typename U>
     __simd_callee__ inline void Move(U& dstReg, U& srcReg);
     ```
@@ -146,10 +146,10 @@
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
-template<typename T>
-__simd_vf__ inline void MoveVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, 
- uint32_t oneRepeatSize, uint16_t repeatTimes)
+```cpp
+template <typename T>
+__simd_vf__ inline void MoveVF(
+    __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> srcReg;
     AscendC::Reg::RegTensor<T> dstReg;

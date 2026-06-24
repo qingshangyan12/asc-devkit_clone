@@ -74,8 +74,10 @@ __simd_callee__ inline void LeakyRelu(S& dstReg, S& srcReg, U scalarValue, MaskR
 ## 调用示例<a name="section232816306478"></a>
 
 ```cpp
-template<typename T>
-__simd_vf__ inline void LeakyReluVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, T scalarValue, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
+template <typename T>
+__simd_vf__ inline void LeakyReluVF(
+    __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, T scalarValue, uint32_t count, uint16_t oneRepeatSize,
+    uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> srcReg;
     AscendC::Reg::RegTensor<T> dstReg;

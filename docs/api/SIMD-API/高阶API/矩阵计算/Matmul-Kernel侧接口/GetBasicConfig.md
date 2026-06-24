@@ -24,8 +24,10 @@
 
 ## 函数原型
 
-```
-__aicore__ constexpr MatmulConfig GetBasicConfig(const uint32_t basicM, const uint32_t basicN, const uint32_t basicK, const bool intrinsicsLimit = false, const bool batchLoop = false, const BatchMode bmmMode = BatchMode::BATCH_LESS_THAN_L1)
+```cpp
+__aicore__ constexpr MatmulConfig GetBasicConfig(
+    const uint32_t basicM, const uint32_t basicN, const uint32_t basicK, const bool intrinsicsLimit = false,
+    const bool batchLoop = false, const BatchMode bmmMode = BatchMode::BATCH_LESS_THAN_L1)
 ```
 
 ## 参数说明
@@ -54,7 +56,7 @@ __aicore__ constexpr MatmulConfig GetBasicConfig(const uint32_t basicM, const ui
 
 ## 调用示例
 
-```
+```cpp
 // 配置BasicBlock模板的参数，获取自定义BasicBlock模板
 constexpr MatmulConfig MM_CFG = GetBasicConfig(
     /* basicM              */ 128,

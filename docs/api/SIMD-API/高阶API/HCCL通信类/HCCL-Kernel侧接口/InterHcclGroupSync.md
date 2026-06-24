@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void InterHcclGroupSync(int8_t srcGroupID, HcclHandle srcHandleID)
 ```
 
@@ -41,7 +41,7 @@ __aicore__ inline void InterHcclGroupSync(int8_t srcGroupID, HcclHandle srcHandl
 
 本示例构造一个通信融合算子，该算子有1个输入xGM，2个输出alltoallGM和allgatherGM。算子内有2个通信域，首先通信域0对输入进行AlltoAll通信，将结果输出至alltoallGM。当结果数据输出到alltoallGM完成后，通信域1将该结果alltoallGM作为AllGather通信的输入，并将通信结果输出至allgatherGM。
 
-```
+```cpp
 extern "C" __global__ __aicore__ void alltoall_allgather_custom(GM_ADDR xGM, GM_ADDR alltoallGM, GM_ADDR allgatherGM)
 {
     REGISTER_TILING_DEFAULT(

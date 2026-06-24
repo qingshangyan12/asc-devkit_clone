@@ -6,8 +6,8 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_section13230182415108"></a>
 
-```
-ContextBuilder &Workspace(gert::ContinuousVector *workspace)
+```cpp
+ContextBuilder& Workspace(gert::ContinuousVector* workspace)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_section75395119104"></a>
@@ -41,13 +41,11 @@ ContextBuilder &Workspace(gert::ContinuousVector *workspace)
 
 ## 调用示例<a name="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_section320753512363"></a>
 
-```
-void AddWorkspaceData(gert::ContinuousVector *ws)
+```cpp
+void AddWorkspaceData(gert::ContinuousVector* ws)
 {
-    ......
-    auto builder = context_ascendc::ContextBuilder()
-                                    .Workspace(ws);
-                                    .BuildTilingContext();
+    ...... auto builder = context_ascendc::ContextBuilder().Workspace(ws);
+    .BuildTilingContext();
     ......
 }
 ```

@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 bool SetWeightShape(int64_t cout, int64_t cin, int64_t d, int64_t h, int64_t w)
 ```
 
@@ -32,7 +32,7 @@ true表示设置成功，false表示设置失败。
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendCManager::GetInstance();
 ConvBackpropApi::Conv3DBpInputTiling con3dBpDxTiling(*ascendcPlatform);
 con3dBpDxTiling.SetWeightShape(cout, cin, d, h, w);

@@ -28,7 +28,7 @@ LayerNormGrad是一个函数，用于计算LayerNorm的反向传播梯度。该�
 
 算法公式为:
 
-```
+```text
 pd_xl(BSH) = data_dy * data_gamma
 pd_var(H) = np.sum(((-0.5) * pd_xl * (data_x - data_mean) * np.power((data_variance + EPSILON), (-1.5))), reduce_axis, keepdims=True)
 pd_mean(BS1) = np.sum(((-1.0) * pd_xl * np.power((data_variance + EPSILON), (-0.5))), reduce_axis, keepdims=True) + pd_var * (1.0 / H) * np.sum(((-2.0) * (data_x - data_mean)), reduce_axis, keepdims=True)
@@ -59,18 +59,26 @@ res_for_gamma(BSH) = (data_x - data_mean) * np.power((data_variance + EPSILON), 
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isReuseSource = false>
-    __aicore__ inline void LayerNormGrad(const LocalTensor<T>& outputPdX, const LocalTensor<T>& resForGamma, const LocalTensor<T>& inputDy, const LocalTensor<T>& inputX, const LocalTensor<T>& inputVariance, const LocalTensor<T>& inputMean, const LocalTensor<T>& inputGamma, LocalTensor<uint8_t>& sharedTmpBuffer, T epsilon, LayerNormGradTiling& tiling, const LayerNormGradShapeInfo& shapeInfo = {})
+    __aicore__ inline void LayerNormGrad(
+        const LocalTensor<T>& outputPdX, const LocalTensor<T>& resForGamma, const LocalTensor<T>& inputDy,
+        const LocalTensor<T>& inputX, const LocalTensor<T>& inputVariance, const LocalTensor<T>& inputMean,
+        const LocalTensor<T>& inputGamma, LocalTensor<uint8_t>& sharedTmpBuffer, T epsilon, LayerNormGradTiling& tiling,
+        const LayerNormGradShapeInfo& shapeInfo = {})
     ```
 
     该方式下开发者需自行申请并管理临时内存空间，并在接口调用完成后，复用该部分内存，内存不会反复申请释放，灵活性较高，内存利用率也较高。
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isReuseSource = false>
-    __aicore__ inline void LayerNormGrad(const LocalTensor<T>& outputPdX, const LocalTensor<T>& resForGamma, const LocalTensor<T>& inputDy, const LocalTensor<T>& inputX, const LocalTensor<T>& inputVariance, const LocalTensor<T>& inputMean, const LocalTensor<T>& inputGamma, T epsilon, LayerNormGradTiling& tiling, const LayerNormGradShapeInfo& shapeInfo = {})
+    __aicore__ inline void LayerNormGrad(
+        const LocalTensor<T>& outputPdX, const LocalTensor<T>& resForGamma, const LocalTensor<T>& inputDy,
+        const LocalTensor<T>& inputX, const LocalTensor<T>& inputVariance, const LocalTensor<T>& inputMean,
+        const LocalTensor<T>& inputGamma, T epsilon, LayerNormGradTiling& tiling,
+        const LayerNormGradShapeInfo& shapeInfo = {})
     ```
 
     该方式下开发者无需申请，但是需要预留临时空间的大小。
@@ -100,7 +108,7 @@ res_for_gamma(BSH) = (data_x - data_mean) * np.power((data_variance + EPSILON), 
 | tiling | 输入 | LayerNormGrad计算所需Tiling信息。 |
 | shapeInfo | 输入 | 表示LayerNormGrad各个输入的数据排布格式Format。默认值表示输入的Format为ND。支持的取值为DataFormat::ND。LayerNormGradShapeInfo类型，具体定义如下方代码所示。 |
 
-```
+```cpp
 struct LayerNormGradShapeInfo {
     DataFormat dataFormat = DataFormat::ND;
 };
@@ -122,7 +130,7 @@ struct LayerNormGradShapeInfo {
 
 本样例中，输入inputX和inputDy的shape为\[2, 32, 16\]，inputVariance和inputMean的shape为\[2, 32\]，inputGamma的shape为\[16\]。输出outputPdX和resForGamma的shape为\[2, 32, 16\]。数据排布均为ND格式，数据类型均为float，不复用源操作数的内存空间。
 
-```
+```cpp
 // outputPdX: 输出对输入X的梯度，即dX，shape为 [B, S, H]
 // resForGamma: 输出用于计算gamma和beta梯度的中间结果（如dy * normalized_x），shape为 [B, S, H]
 // inputDy: 输入的上层梯度dy，shape为 [B, S, H]
@@ -153,7 +161,7 @@ AscendC::LayerNormGrad<float, isReuseSource>(
 
 示例结果如下：
 
-```
+```text
 输入数据(inputDy, shape:[1, 8, 8]):
 [  0.  1.  2.  3.  4.  5.  6.  7.
    8.  9. 10. 11. 12. 13. 14. 15.

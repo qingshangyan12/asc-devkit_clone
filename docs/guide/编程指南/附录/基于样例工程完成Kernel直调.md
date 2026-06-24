@@ -10,7 +10,7 @@
 -   使用Kernel Launch算子工程之前，需要参考[环境准备](../../入门教程/环境准备.md)章节安装驱动固件和CANN软件包，完成开发环境和运行环境的准备。
 -   使用该算子工程要求cmake版本为3.16及以上版本，如不符合要求，请参考如下的命令示例更新cmake版本，如下示例以更新到3.16.0版本为例。
 
-    ```
+    ```bash
     wget https://cmake.org/files/v3.16/cmake-3.16.0.tar.gz 
     tar -zxvf cmake-3.16.0.tar.gz 
     cd cmake-3.16.0
@@ -23,7 +23,7 @@
 
 样例目录结构如下所示：
 
-```
+```text
 AddKernelInvocationNeo
 |-- cmake                                                 // CMake编译文件
 |-- scripts
@@ -58,7 +58,7 @@ AddKernelInvocationNeo
 
 1.  按需包含头文件，通过ASCENDC\_CPU\_DEBUG宏区分CPU/NPU侧需要包含的头文件。需要注意的是，NPU侧需要包含对应的核函数调用接口声明所在的头文件aclrtlaunch\_\{kernel\_name\}.h（该头文件为工程框架自动生成），kernel\_name为算子核函数的名称。
 
-    ```
+    ```cpp
     #include "data_utils.h"
     #ifndef ASCENDC_CPU_DEBUG
     #include "acl/acl.h"
@@ -71,13 +71,13 @@ AddKernelInvocationNeo
 
 2.  应用程序框架编写。该应用程序通过ASCENDC\_CPU\_DEBUG宏区分代码逻辑运行于CPU侧还是NPU侧。
 
-    ```
+    ```cpp
     int32_t main(int32_t argc, char* argv[])
     {
         uint32_t numBlocks = 8;
         size_t inputByteSize = 8 * 2048 * sizeof(uint16_t);
         size_t outputByteSize = 8 * 2048 * sizeof(uint16_t);
-    
+
     #ifdef ASCENDC_CPU_DEBUG
         // 用于CPU调试的调用程序
     #else
@@ -92,24 +92,24 @@ AddKernelInvocationNeo
     **图1**  CPU侧运行验证步骤<a name="fig13576112114442"></a>  
     ![](../../figures/CPU侧运行验证步骤.png "CPU侧运行验证步骤")
 
-    ```
-        // 使用GmAlloc分配共享内存，并进行数据初始化
-        uint8_t* x = (uint8_t*)AscendC::GmAlloc(inputByteSize);
-        uint8_t* y = (uint8_t*)AscendC::GmAlloc(inputByteSize);
-        uint8_t* z = (uint8_t*)AscendC::GmAlloc(outputByteSize);
-    
-        ReadFile("./input/input_x.bin", inputByteSize, x, inputByteSize);
-        ReadFile("./input/input_y.bin", inputByteSize, y, inputByteSize);
-        // 矢量算子需要设置内核模式为AIV模式
-        AscendC::SetKernelMode(KernelMode::AIV_MODE);
-        // 调用ICPU_RUN_KF调测宏，完成核函数CPU侧的调用
-        ICPU_RUN_KF(add_custom, numBlocks, x, y, z);
-        // 输出数据写出
-        WriteFile("./output/output_z.bin", z, outputByteSize);
-        // 调用GmFree释放申请的资源
-        AscendC::GmFree((void *)x);
-        AscendC::GmFree((void *)y);
-        AscendC::GmFree((void *)z);
+    ```cpp
+    // 使用GmAlloc分配共享内存，并进行数据初始化
+    uint8_t* x = (uint8_t*)AscendC::GmAlloc(inputByteSize);
+    uint8_t* y = (uint8_t*)AscendC::GmAlloc(inputByteSize);
+    uint8_t* z = (uint8_t*)AscendC::GmAlloc(outputByteSize);
+
+    ReadFile("./input/input_x.bin", inputByteSize, x, inputByteSize);
+    ReadFile("./input/input_y.bin", inputByteSize, y, inputByteSize);
+    // 矢量算子需要设置内核模式为AIV模式
+    AscendC::SetKernelMode(KernelMode::AIV_MODE);
+    // 调用ICPU_RUN_KF调测宏，完成核函数CPU侧的调用
+    ICPU_RUN_KF(add_custom, numBlocks, x, y, z);
+    // 输出数据写出
+    WriteFile("./output/output_z.bin", z, outputByteSize);
+    // 调用GmFree释放申请的资源
+    AscendC::GmFree((void*)x);
+    AscendC::GmFree((void*)y);
+    AscendC::GmFree((void*)z);
     ```
 
 4.  NPU侧运行验证。完成算子核函数NPU侧运行验证的步骤如下：
@@ -117,50 +117,50 @@ AddKernelInvocationNeo
     **图2**  NPU侧运行验证步骤<a name="fig558132018817"></a>  
     ![](../../figures/NPU侧运行验证步骤.png "NPU侧运行验证步骤")
 
-    ```
-        // 初始化
-        CHECK_ACL(aclInit(nullptr));
-        // 运行管理资源申请
-        int32_t deviceId = 0;
-        CHECK_ACL(aclrtSetDevice(deviceId));
-        aclrtStream stream = nullptr;
-        CHECK_ACL(aclrtCreateStream(&stream));
-        // 分配Host内存
-        uint8_t *xHost, *yHost, *zHost;
-        uint8_t *xDevice, *yDevice, *zDevice;
-    
-        CHECK_ACL(aclrtMallocHost((void**)(&xHost), inputByteSize));
-        CHECK_ACL(aclrtMallocHost((void**)(&yHost), inputByteSize));
-        CHECK_ACL(aclrtMallocHost((void**)(&zHost), outputByteSize));
-        // 分配Device内存
-        CHECK_ACL(aclrtMalloc((void**)&xDevice, inputByteSize, ACL_MEM_MALLOC_HUGE_FIRST));
-        CHECK_ACL(aclrtMalloc((void**)&yDevice, inputByteSize, ACL_MEM_MALLOC_HUGE_FIRST));
-        CHECK_ACL(aclrtMalloc((void**)&zDevice, outputByteSize, ACL_MEM_MALLOC_HUGE_FIRST));
-        // Host内存初始化
-        ReadFile("./input/input_x.bin", inputByteSize, xHost, inputByteSize);
-        ReadFile("./input/input_y.bin", inputByteSize, yHost, inputByteSize);
-        // 将数据从Host上拷贝到Device上
-        CHECK_ACL(aclrtMemcpy(xDevice, inputByteSize, xHost, inputByteSize, ACL_MEMCPY_HOST_TO_DEVICE));
-        CHECK_ACL(aclrtMemcpy(yDevice, inputByteSize, yHost, inputByteSize, ACL_MEMCPY_HOST_TO_DEVICE));
-        // 用内核调用符<<<>>>调用核函数完成指定的运算,add_custom_do中封装了<<<>>>调用
-        add_custom_do(numBlocks, nullptr, stream, xDevice, yDevice, zDevice);
-        // 用ACLRT_LAUNCH_KERNEL接口调用核函数完成指定的运算
-        // ACLRT_LAUNCH_KERNEL(add_custom)(numBlocks, stream, xDevice, yDevice, zDevice);
-        CHECK_ACL(aclrtSynchronizeStream(stream));
-        // 将Device上的运算结果拷贝回Host
-        CHECK_ACL(aclrtMemcpy(zHost, outputByteSize, zDevice, outputByteSize, ACL_MEMCPY_DEVICE_TO_HOST));
-        WriteFile("./output/output_z.bin", zHost, outputByteSize);
-        // 释放申请的资源
-        CHECK_ACL(aclrtFree(xDevice));
-        CHECK_ACL(aclrtFree(yDevice));
-        CHECK_ACL(aclrtFree(zDevice));
-        CHECK_ACL(aclrtFreeHost(xHost));
-        CHECK_ACL(aclrtFreeHost(yHost));
-        CHECK_ACL(aclrtFreeHost(zHost));
-        // 去初始化
-        CHECK_ACL(aclrtDestroyStream(stream));
-        CHECK_ACL(aclrtResetDevice(deviceId));
-        CHECK_ACL(aclFinalize());
+    ```cpp
+    // 初始化
+    CHECK_ACL(aclInit(nullptr));
+    // 运行管理资源申请
+    int32_t deviceId = 0;
+    CHECK_ACL(aclrtSetDevice(deviceId));
+    aclrtStream stream = nullptr;
+    CHECK_ACL(aclrtCreateStream(&stream));
+    // 分配Host内存
+    uint8_t *xHost, *yHost, *zHost;
+    uint8_t *xDevice, *yDevice, *zDevice;
+
+    CHECK_ACL(aclrtMallocHost((void**)(&xHost), inputByteSize));
+    CHECK_ACL(aclrtMallocHost((void**)(&yHost), inputByteSize));
+    CHECK_ACL(aclrtMallocHost((void**)(&zHost), outputByteSize));
+    // 分配Device内存
+    CHECK_ACL(aclrtMalloc((void**)&xDevice, inputByteSize, ACL_MEM_MALLOC_HUGE_FIRST));
+    CHECK_ACL(aclrtMalloc((void**)&yDevice, inputByteSize, ACL_MEM_MALLOC_HUGE_FIRST));
+    CHECK_ACL(aclrtMalloc((void**)&zDevice, outputByteSize, ACL_MEM_MALLOC_HUGE_FIRST));
+    // Host内存初始化
+    ReadFile("./input/input_x.bin", inputByteSize, xHost, inputByteSize);
+    ReadFile("./input/input_y.bin", inputByteSize, yHost, inputByteSize);
+    // 将数据从Host上拷贝到Device上
+    CHECK_ACL(aclrtMemcpy(xDevice, inputByteSize, xHost, inputByteSize, ACL_MEMCPY_HOST_TO_DEVICE));
+    CHECK_ACL(aclrtMemcpy(yDevice, inputByteSize, yHost, inputByteSize, ACL_MEMCPY_HOST_TO_DEVICE));
+    // 用内核调用符<<<>>>调用核函数完成指定的运算,add_custom_do中封装了<<<>>>调用
+    add_custom_do(numBlocks, nullptr, stream, xDevice, yDevice, zDevice);
+    // 用ACLRT_LAUNCH_KERNEL接口调用核函数完成指定的运算
+    // ACLRT_LAUNCH_KERNEL(add_custom)(numBlocks, stream, xDevice, yDevice, zDevice);
+    CHECK_ACL(aclrtSynchronizeStream(stream));
+    // 将Device上的运算结果拷贝回Host
+    CHECK_ACL(aclrtMemcpy(zHost, outputByteSize, zDevice, outputByteSize, ACL_MEMCPY_DEVICE_TO_HOST));
+    WriteFile("./output/output_z.bin", zHost, outputByteSize);
+    // 释放申请的资源
+    CHECK_ACL(aclrtFree(xDevice));
+    CHECK_ACL(aclrtFree(yDevice));
+    CHECK_ACL(aclrtFree(zDevice));
+    CHECK_ACL(aclrtFreeHost(xHost));
+    CHECK_ACL(aclrtFreeHost(yHost));
+    CHECK_ACL(aclrtFreeHost(zHost));
+    // 去初始化
+    CHECK_ACL(aclrtDestroyStream(stream));
+    CHECK_ACL(aclrtResetDevice(deviceId));
+    CHECK_ACL(aclFinalize());
     ```
 
     >[!NOTE]说明 
@@ -299,7 +299,7 @@ AddKernelInvocationNeo
 
 编译安装结束后在CMAKE\_INSTALL\_PREFIX目录下生成的编译产物示例如下；最终的可执行文件会生成在cmake命令的执行目录下。
 
-```
+```text
 out
 ├── lib 
 │   ├── libkernels1.a
@@ -319,7 +319,7 @@ out
 
 以固定shape的add\_custom算子为例，输入数据和真值数据生成的脚本样例如下：根据算子的输入输出编写脚本，生成输入数据和真值数据。
 
-```
+```text
 #!/usr/bin/python3
 # -*- coding:utf-8 -*-
 import numpy as np
@@ -339,30 +339,14 @@ if __name__ == "__main__":
 
 验证输出数据和真值数据是否一致的验证脚本样例如下：当前使用numpy接口计算了输出数据和真值数据的绝对误差和相对误差，误差在容忍偏差范围内，视为精度符合要求，输出"test pass"字样。
 
-```
-import os
-import sys
-import numpy as np
+```cpp
+import os import sys import numpy as np
 
-loss = 1e-3 # 容忍偏差，一般fp16要求绝对误差和相对误差均不超过千分之一
-minimum = 10e-10
+    loss = 1e-3 #容忍偏差，一般fp16要求绝对误差和相对误差均不超过千分之一 minimum = 10e-10
 
-def verify_result(real_result, golden):
-    real_result = np.fromfile(real_result, dtype=np.float16) # 从bin文件读取实际运算结果
-    golden = np.fromfile(golden, dtype=np.float16) # 从bin文件读取预期运算结果
-    result = np.abs(real_result - golden) # 计算运算结果和预期结果偏差
-    deno = np.maximum(np.abs(real_result), np.abs(golden)) # 获取最大值并组成新数组
-    result_atol = np.less_equal(result, loss) # 计算绝对误差
-    result_rtol = np.less_equal(result / np.add(deno, minimum), loss) # 计算相对误差
-    if not result_rtol.all() and not result_atol.all():
-        if np.sum(result_rtol == False) > real_result.size * loss and np.sum(result_atol == False) > real_result.size * loss:
-            print("[ERROR] result error")
-            return False
-    print("test pass")
-    return True
+    def verify_result(real_result, golden) :real_result = np.fromfile(real_result, dtype = np.float16) #从bin文件读取实际运算结果 golden = np.fromfile(golden, dtype = np.float16) #从bin文件读取预期运算结果 result = np.abs(real_result - golden) #计算运算结果和预期结果偏差 deno = np.maximum(np.abs(real_result), np.abs(golden)) #获取最大值并组成新数组 result_atol = np.less_equal(result, loss) #计算绝对误差 result_rtol = np.less_equal(result / np.add(deno, minimum), loss) #计算相对误差 if not result_rtol.all() and not result_atol.all() : if np.sum(result_rtol == False)> real_result.size * loss and np.sum(result_atol == False)> real_result.size * loss:print("[ERROR] result error") return False print("test pass") return True
 
-if __name__ == '__main__':
-    verify_result(sys.argv[1],sys.argv[2])
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                if __name__ == '__main__' :verify_result(sys.argv[1], sys.argv[2])
 ```
 
 ## 修改并执行一键式编译运行脚本<a name="section188001652105215"></a>
@@ -380,7 +364,7 @@ if __name__ == '__main__':
 
 脚本执行方式和脚本参数介绍如下：
 
-```
+```bash
 bash run.sh --run-mode=npu  --soc-version=<soc_version> --install-path=<install_path>  --build-type=Debug  --install-prefix=<install-prefix>
 
 bash run.sh -r npu  -v <soc_version> -i <install_path> -b Debug -p <install-prefix>
@@ -458,7 +442,7 @@ bash run.sh -r npu  -v <soc_version> -i <install_path> -b Debug -p <install-pref
 
 1.  按需包含头文件。
 
-    ```
+    ```cpp
     #include "data_utils.h"
     #include "acl/acl.h"
     #include "aclrtlaunch_add_custom.h"
@@ -466,7 +450,7 @@ bash run.sh -r npu  -v <soc_version> -i <install_path> -b Debug -p <install-pref
 
 2.  应用程序框架编写。
 
-    ```
+    ```cpp
     int32_t main(int32_t argc, char* argv[])
     {
         uint32_t numBlocks = 8;
@@ -479,48 +463,48 @@ bash run.sh -r npu  -v <soc_version> -i <install_path> -b Debug -p <install-pref
 
 3.  运行验证。
 
-    ```
-        // 初始化
-        CHECK_ACL(aclInit(nullptr));
-        // 运行管理资源申请
-        int32_t deviceId = 0;
-        CHECK_ACL(aclrtSetDevice(deviceId));
-        aclrtStream stream = nullptr;
-        CHECK_ACL(aclrtCreateStream(&stream));
-        // 分配Host内存
-        uint8_t *xHost, *yHost, *zHost;
-        uint8_t *xDevice, *yDevice, *zDevice;
-    
-        CHECK_ACL(aclrtMallocHost((void**)(&xHost), inputByteSize));
-        CHECK_ACL(aclrtMallocHost((void**)(&yHost), inputByteSize));
-        CHECK_ACL(aclrtMallocHost((void**)(&zHost), outputByteSize));
-        // 分配Device内存
-        CHECK_ACL(aclrtMalloc((void**)&xDevice, inputByteSize, ACL_MEM_MALLOC_HUGE_FIRST));
-        CHECK_ACL(aclrtMalloc((void**)&yDevice, inputByteSize, ACL_MEM_MALLOC_HUGE_FIRST));
-        CHECK_ACL(aclrtMalloc((void**)&zDevice, outputByteSize, ACL_MEM_MALLOC_HUGE_FIRST));
-        // Host内存初始化
-        ReadFile("./input/input_x.bin", inputByteSize, xHost, inputByteSize);
-        ReadFile("./input/input_y.bin", inputByteSize, yHost, inputByteSize);
-        // 将数据从Host上拷贝到Device上
-        CHECK_ACL(aclrtMemcpy(xDevice, inputByteSize, xHost, inputByteSize, ACL_MEMCPY_HOST_TO_DEVICE));
-        CHECK_ACL(aclrtMemcpy(yDevice, inputByteSize, yHost, inputByteSize, ACL_MEMCPY_HOST_TO_DEVICE));
-        // 用ACLRT_LAUNCH_KERNEL接口调用核函数完成指定的运算
-        ACLRT_LAUNCH_KERNEL(add_custom)(numBlocks, stream, xDevice, yDevice, zDevice);
-        CHECK_ACL(aclrtSynchronizeStream(stream));
-        // 将Device上的运算结果拷贝回Host
-        CHECK_ACL(aclrtMemcpy(zHost, outputByteSize, zDevice, outputByteSize, ACL_MEMCPY_DEVICE_TO_HOST));
-        WriteFile("./output/output_z.bin", zHost, outputByteSize);
-        // 释放申请的资源
-        CHECK_ACL(aclrtFree(xDevice));
-        CHECK_ACL(aclrtFree(yDevice));
-        CHECK_ACL(aclrtFree(zDevice));
-        CHECK_ACL(aclrtFreeHost(xHost));
-        CHECK_ACL(aclrtFreeHost(yHost));
-        CHECK_ACL(aclrtFreeHost(zHost));
-        // 去初始化
-        CHECK_ACL(aclrtDestroyStream(stream));
-        CHECK_ACL(aclrtResetDevice(deviceId));
-        CHECK_ACL(aclFinalize());
+    ```cpp
+    // 初始化
+    CHECK_ACL(aclInit(nullptr));
+    // 运行管理资源申请
+    int32_t deviceId = 0;
+    CHECK_ACL(aclrtSetDevice(deviceId));
+    aclrtStream stream = nullptr;
+    CHECK_ACL(aclrtCreateStream(&stream));
+    // 分配Host内存
+    uint8_t *xHost, *yHost, *zHost;
+    uint8_t *xDevice, *yDevice, *zDevice;
+
+    CHECK_ACL(aclrtMallocHost((void**)(&xHost), inputByteSize));
+    CHECK_ACL(aclrtMallocHost((void**)(&yHost), inputByteSize));
+    CHECK_ACL(aclrtMallocHost((void**)(&zHost), outputByteSize));
+    // 分配Device内存
+    CHECK_ACL(aclrtMalloc((void**)&xDevice, inputByteSize, ACL_MEM_MALLOC_HUGE_FIRST));
+    CHECK_ACL(aclrtMalloc((void**)&yDevice, inputByteSize, ACL_MEM_MALLOC_HUGE_FIRST));
+    CHECK_ACL(aclrtMalloc((void**)&zDevice, outputByteSize, ACL_MEM_MALLOC_HUGE_FIRST));
+    // Host内存初始化
+    ReadFile("./input/input_x.bin", inputByteSize, xHost, inputByteSize);
+    ReadFile("./input/input_y.bin", inputByteSize, yHost, inputByteSize);
+    // 将数据从Host上拷贝到Device上
+    CHECK_ACL(aclrtMemcpy(xDevice, inputByteSize, xHost, inputByteSize, ACL_MEMCPY_HOST_TO_DEVICE));
+    CHECK_ACL(aclrtMemcpy(yDevice, inputByteSize, yHost, inputByteSize, ACL_MEMCPY_HOST_TO_DEVICE));
+    // 用ACLRT_LAUNCH_KERNEL接口调用核函数完成指定的运算
+    ACLRT_LAUNCH_KERNEL(add_custom)(numBlocks, stream, xDevice, yDevice, zDevice);
+    CHECK_ACL(aclrtSynchronizeStream(stream));
+    // 将Device上的运算结果拷贝回Host
+    CHECK_ACL(aclrtMemcpy(zHost, outputByteSize, zDevice, outputByteSize, ACL_MEMCPY_DEVICE_TO_HOST));
+    WriteFile("./output/output_z.bin", zHost, outputByteSize);
+    // 释放申请的资源
+    CHECK_ACL(aclrtFree(xDevice));
+    CHECK_ACL(aclrtFree(yDevice));
+    CHECK_ACL(aclrtFree(zDevice));
+    CHECK_ACL(aclrtFreeHost(xHost));
+    CHECK_ACL(aclrtFreeHost(yHost));
+    CHECK_ACL(aclrtFreeHost(zHost));
+    // 去初始化
+    CHECK_ACL(aclrtDestroyStream(stream));
+    CHECK_ACL(aclrtResetDevice(deviceId));
+    CHECK_ACL(aclFinalize());
     ```
 
 >[!NOTE]说明 

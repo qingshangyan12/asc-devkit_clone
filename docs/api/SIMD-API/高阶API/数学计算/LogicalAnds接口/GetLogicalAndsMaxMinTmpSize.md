@@ -9,8 +9,10 @@ Kernel侧LogicalAnds接口的计算需要开发者预留/申请临时空间，�
 
 ## 函数原型
 
-```
-void GetLogicalAndsMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatform, const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+```cpp
+void GetLogicalAndsMaxMinTmpSize(
+    const platform_ascendc::PlatformAscendC& ascendcPlatform, const ge::Shape& srcShape, const uint32_t typeSize,
+    const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -38,7 +40,7 @@ void GetLogicalAndsMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascend
 
 完整的调用样例请参考[更多样例](../更多样例-83.md)。
 
-```
+```cpp
 // 输入shape信息为1024;算子输入的数据类型为half;不允许修改源操作数
 std::vector<int64_t> shape_vec = {1024};
 ge::Shape shape(shape_vec);

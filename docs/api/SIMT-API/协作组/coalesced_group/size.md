@@ -52,8 +52,8 @@ unsigned long long size() const
     using namespace cooperative_groups;
     __global__ void simt_kernel(...)
     {
-        ...
-        if (threadIdx.x % 2 == 0) {
+        ... if (threadIdx.x % 2 == 0)
+        {
             coalesced_group active = coalesced_threads();
             unsigned long long thread_num = active.size(); // 返回16
         }
@@ -67,8 +67,8 @@ unsigned long long size() const
     using namespace cooperative_groups;
     __simt_vf__ inline void simt_kernel(...)
     {
-        ...
-        if (threadIdx.x % 2 == 0) {
+        ... if (threadIdx.x % 2 == 0)
+        {
             coalesced_group active = coalesced_threads();
             unsigned long long thread_num = active.size(); // 返回16
         }

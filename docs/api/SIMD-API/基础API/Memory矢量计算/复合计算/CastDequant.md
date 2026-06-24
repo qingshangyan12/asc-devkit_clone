@@ -91,14 +91,18 @@
 
     ```cpp
     template <typename T, typename U, bool isSetMask = true, bool isVecDeq = true, bool halfBlock = true>
-    __aicore__ inline void CastDequant(const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint64_t mask[], uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+    __aicore__ inline void CastDequant(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint64_t mask[], uint8_t repeatTime,
+        const UnaryRepeatParams& repeatParams)
     ```
 
   - mask连续模式
 
     ```cpp
     template <typename T, typename U, bool isSetMask = true, bool isVecDeq = true, bool halfBlock = true>
-    __aicore__ inline void CastDequant(const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t mask, uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+    __aicore__ inline void CastDequant(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t mask, uint8_t repeatTime,
+        const UnaryRepeatParams& repeatParams)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -204,17 +208,17 @@
   // repeatTime = 2, 128 elements one repeat, 256 elements total
   // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
   // dstRepStride, srcRepStride = 8, no gap between repeats
-  AscendC::CastDequant<uint8_t, int16_t, true, true, true>(dstLocal, srcLocal, mask, 2, { 1, 1, 8, 8 });
+  AscendC::CastDequant<uint8_t, int16_t, true, true, true>(dstLocal, srcLocal, mask, 2, {1, 1, 8, 8});
   ```
 
 - 高维切分计算接口样例-mask逐bit模式。
 
   ```cpp
-  uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
+  uint64_t mask[2] = {UINT64_MAX, UINT64_MAX};
   // repeatTime = 2, 128 elements one repeat, 256 elements total
   // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
   // dstRepStride, srcRepStride = 8, no gap between repeats
-  AscendC::CastDequant<uint8_t, int16_t, true, true, true>(dstLocal, srcLocal, mask, 2, { 1, 1, 8, 8 });
+  AscendC::CastDequant<uint8_t, int16_t, true, true, true>(dstLocal, srcLocal, mask, 2, {1, 1, 8, 8});
   ```
 
 - 前n个数计算接口样例。

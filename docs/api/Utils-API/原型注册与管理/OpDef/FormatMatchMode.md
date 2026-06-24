@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000002091517061_zh-cn_topic_0000001526111046_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
+```text
 OpDef &FormatMatchMode(FormatCheckOption option)
 ```
 
@@ -44,24 +44,15 @@ OpDef算子定义，OpDef请参考[OpDef](OpDef.md)。
 
 下面示例中，算子AddCustom输入x只支持format为NCHW，输入y只支持format为NHWC，需要配置FormatMatchMode\(FormatCheckOption::STRICT\)，如果不配置aclnn框架会转成ND格式传给算子tiling。
 
-```
+```cpp
 AddCustom(const char* name) : OpDef(name)
 {
-	this->Input("x")
-		.ParamType(REQUIRED)
-		.DataType({ge::DT_FLOAT})
-		.FormatList({ge::FORMAT_NCHW});
-	this->Input("y")
-		.ParamType(REQUIRED)
-		.DataType({ge::DT_FLOAT})
-		.FormatList({ge::FORMAT_NHWC});
-	this->Output("z")
-		.ParamType(REQUIRED)
-		.DataType({ge::DT_FLOAT})
-		.FormatList({ge::FORMAT_ND});
-	this->AICore().SetTiling(optiling::TilingFunc);
-	this->AICore().AddConfig("ascendxxx");
-        this->FormatMatchMode(FormatCheckOption::STRICT);
+    this->Input("x").ParamType(REQUIRED).DataType({ge::DT_FLOAT}).FormatList({ge::FORMAT_NCHW});
+    this->Input("y").ParamType(REQUIRED).DataType({ge::DT_FLOAT}).FormatList({ge::FORMAT_NHWC});
+    this->Output("z").ParamType(REQUIRED).DataType({ge::DT_FLOAT}).FormatList({ge::FORMAT_ND});
+    this->AICore().SetTiling(optiling::TilingFunc);
+    this->AICore().AddConfig("ascendxxx");
+    this->FormatMatchMode(FormatCheckOption::STRICT);
 }
 ```
 

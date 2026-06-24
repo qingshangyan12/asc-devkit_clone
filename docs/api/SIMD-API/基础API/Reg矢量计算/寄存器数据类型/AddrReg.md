@@ -6,22 +6,25 @@ AddrReg即为Address Register（地址寄存器），是用于存储地址偏移
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 // offset = index0 * stride0
 template <typename T>
 __simd_callee__ inline AddrReg CreateAddrReg(uint16_t index0, uint32_t stride0);
- 
+
 // offset = index0 * stride0 + index1 * stride1
 template <typename T>
 __simd_callee__ inline AddrReg CreateAddrReg(uint16_t index0, uint32_t stride0, uint16_t index1, uint32_t stride1);
- 
+
 // offset = index0 * stride0 + index1 * stride1 + index2 * stride2
 template <typename T>
-__simd_callee__ inline AddrReg CreateAddrReg(uint16_t index0, uint32_t stride0, uint16_t index1, uint32_t stride1, uint16_t index2, uint32_t stride2);
+__simd_callee__ inline AddrReg CreateAddrReg(
+    uint16_t index0, uint32_t stride0, uint16_t index1, uint32_t stride1, uint16_t index2, uint32_t stride2);
 
 // offset = index0 * stride0 + index1 * stride1 + index2 * stride2 + index3 * stride3
 template <typename T>
-__simd_callee__ inline AddrReg CreateAddrReg(uint16_t index0, uint32_t stride0, uint16_t index1, uint32_t stride1, uint16_t index2, uint32_t stride2, uint16_t index3, uint32_t stride3);
+__simd_callee__ inline AddrReg CreateAddrReg(
+    uint16_t index0, uint32_t stride0, uint16_t index1, uint32_t stride1, uint16_t index2, uint32_t stride2,
+    uint16_t index3, uint32_t stride3);
 ```
 
 ## 参数说明<a name="section132601254123919"></a>
@@ -92,8 +95,9 @@ Ascend 950PR/Ascend 950DT
 
 ## 调用示例<a name="section633mcpsimp"></a>
 
-```
-__simd_vf__ inline void CreateAddrRegVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t oneRepeatSize, uint16_t repeatTimes)
+```cpp
+__simd_vf__ inline void CreateAddrRegVF(
+    __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
     AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T>();
     AscendC::Reg::AddrReg aReg;

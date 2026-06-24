@@ -8,9 +8,10 @@
 
 fast\_gelu函数的参数workspace等价于用户workspace，且不为空，仍然对workspace进行判空，并且设置SetSysWorkspace和GetUserWorkspace来获取用户Workspace。
 
-```
+```cpp
 template <uint64_t schMode, uint64_t dType>
-__global__ __aicore__ void fast_gelu(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
+__global__ __aicore__ void fast_gelu(
+    __gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
 {
     // 反例，冗余判断
     if (workspace == nullptr) {
@@ -45,9 +46,10 @@ __global__ __aicore__ void fast_gelu(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm_
 
 fast\_gelu函数中删除对workspace参数进行空指针判断，也无需设置SetSysWorkspace和通过GetUserWorkspace来获取Workspace。
 
-```
+```cpp
 template <uint64_t schMode, uint64_t dType>
-__global__ __aicore__ void fast_gelu(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
+__global__ __aicore__ void fast_gelu(
+    __gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
 {
     REGISTER_TILING_DEFAULT(EleBaseTilingDataV2);
     GET_TILING_DATA_WITH_STRUCT(EleBaseTilingDataV2, tilingData, tiling);

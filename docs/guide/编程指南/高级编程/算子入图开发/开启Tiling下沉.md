@@ -14,7 +14,7 @@
 
 Tiling下沉场景下，算子工程的op\_host目录结构如下，Tiling实现文件需单独放在在一个cpp文件中，示例中为add\_custom\_tiling\_sink\_tiling.cpp。
 
-```
+```text
 ├── op_host
 │   ├── add_custom_tiling_sink.cpp // 算子原型定义、InferShape、InferDataType实现
 │   ├── add_custom_tiling_sink_tiling.cpp // Tiling函数实现
@@ -26,12 +26,12 @@ Tiling下沉场景下，算子工程的op\_host目录结构如下，Tiling实现
 
 -   在add\_custom\_tiling\_sink\_tiling.h中进行Tiling实现函数的声明
 
-    ```
+    ```cpp
     #ifndef ADD_CUSTOM_TILING_SINK_TILING_H
     #define ADD_CUSTOM_TILING_SINK_TILING_H
     #include "register/op_def_registry.h"
     namespace optiling {
-        ge::graphStatus AddCustomSinkTilingFunc(gert::TilingContext* context); // Tiling函数声明
+    ge::graphStatus AddCustomSinkTilingFunc(gert::TilingContext* context); // Tiling函数声明
     } // namespace optiling
     #endif // ADD_CUSTOM_TILING_SINK_TILING_H
     ```
@@ -40,34 +40,28 @@ Tiling下沉场景下，算子工程的op\_host目录结构如下，Tiling实现
 
     Tiling下沉仅适用于存在Tiling值依赖（即当InferShape不依赖输入值，仅Tiling计算需要输入值）且算子输入为非Const类型的场景，本示例中的输入y通过ValueDepend配置了非Const类型的Tiling值依赖。
 
-    ```
+    ```cpp
     #include "add_custom_tiling_sink_tiling.h" // 包含头文件
-    
+
     // ...
-    
+
     namespace ops {
     class AddCustomTilingSink : public OpDef {
     public:
-        explicit AddCustomTilingSink(const char *name) : OpDef(name)
+        explicit AddCustomTilingSink(const char* name) : OpDef(name)
         {
-            this->Input("x")
-                .ParamType(REQUIRED)
-                .DataType({ge::DT_FLOAT})
-                .Format({ge::FORMAT_ND});
+            this->Input("x").ParamType(REQUIRED).DataType({ge::DT_FLOAT}).Format({ge::FORMAT_ND});
             this->Input("y")
                 .ParamType(REQUIRED)
                 .DataType({ge::DT_FLOAT})
                 .Format({ge::FORMAT_ND})
                 .ValueDepend(OPTIONAL, DependScope::TILING); // 表示输入y为Tiling值依赖
-            this->Output("z")
-                .ParamType(REQUIRED)
-                .DataType({ge::DT_FLOAT})
-                .Format({ge::FORMAT_ND});
-    
+            this->Output("z").ParamType(REQUIRED).DataType({ge::DT_FLOAT}).Format({ge::FORMAT_ND});
+
             this->SetInferShape(ge::InferShape).SetInferDataType(ge::InferDataType);
-    
+
             this->AICore().SetTiling(optiling::AddCustomSinkTilingFunc); // Tiling函数和算子原型定义的关联
-            
+
             // 请替换为实际的昇腾AI处理器型号
             this->AICore().AddConfig("ascendxxx");
         }
@@ -81,7 +75,7 @@ Tiling下沉场景下，算子工程的op\_host目录结构如下，Tiling实现
     -   Tiling函数中通过判断值依赖InputTensor即输入y的数据指针是否为空指针来确认当前是否处于编译期。Tiling下沉场景，编译期需要为算子分配内存，包括其所需的workspace。为了保证运行时的高效性，编译期应根据算子的执行需求，合理设置所需的workspace最大值，以避免内存不足或浪费。AddCustomTilingSink样例不需要用户workspace，不涉及设置，此处设置为固定值仅作为示例。
     -   完成下沉Tiling函数注册：包含device\_op\_impl\_registry.h头文件，使用宏DEVICE\_IMPL\_OP\_OPTILING进行注册。
 
-    ```
+    ```cpp
     #include "../../op_kernel/add_custom_tiling_sink/add_custom_tiling_sink_tiling_struct.h"
     #include "add_custom_tiling_sink_tiling.h"
     #include "register/device_op_impl_registry.h"
@@ -89,23 +83,28 @@ Tiling下沉场景下，算子工程的op\_host目录结构如下，Tiling实现
     namespace optiling {
     static constexpr uint32_t NUM_BLOCKS = 8;
     static constexpr uint32_t TILE_NUM = 3;
-    static constexpr size_t MAX_WORKSPACE_SIZE = 32; // 算子所需用户workspace空间最大值，AddCustomTilingSink算子本身逻辑无需用户workspace空间，此处设置为固定值仅作为示例
+    static constexpr size_t MAX_WORKSPACE_SIZE =
+        32; // 算子所需用户workspace空间最大值，AddCustomTilingSink算子本身逻辑无需用户workspace空间，此处设置为固定值仅作为示例
     static constexpr size_t DEFAULT_WORKSPACE_SIZE = 0;
-    ge::graphStatus AddCustomSinkTilingFunc(gert::TilingContext *context)
+    ge::graphStatus AddCustomSinkTilingFunc(gert::TilingContext* context)
     {
-        TilingSinkTilingData *tiling = context->GetTilingData<TilingSinkTilingData>();
+        TilingSinkTilingData* tiling = context->GetTilingData<TilingSinkTilingData>();
         uint32_t totalLength = context->GetInputTensor(0)->GetShapeSize();
         context->SetBlockDim(NUM_BLOCKS);
         tiling->totalLength = totalLength;
         tiling->tileNum = TILE_NUM;
-        size_t *currentWorkspace = context->GetWorkspaceSizes(1);
+        size_t* currentWorkspace = context->GetWorkspaceSizes(1);
         auto platform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
         size_t sysWorkspaceSize = platform.GetLibApiWorkSpaceSize();
-        currentWorkspace[0] = sysWorkspaceSize + DEFAULT_WORKSPACE_SIZE; // 设置运行时workspace大小，此处为系统workspace空间 + 用户workspace空间
+        currentWorkspace[0] =
+            sysWorkspaceSize +
+            DEFAULT_WORKSPACE_SIZE; // 设置运行时workspace大小，此处为系统workspace空间 + 用户workspace空间
         if (context->GetInputTensor(1) != nullptr && context->GetInputTensor(1)->GetData<float>() == nullptr) {
             // 通过判断值依赖InputTensor的Data是否为空指针来确认当前是否处于编译期。
             // Tiling下沉场景，编译期需要为算子分配内存，包括其所需的workspace。为了保证运行时的高效性，编译期应根据算子的执行需求，合理设置所需的workspace最大值，以避免内存不足或浪费。
-            currentWorkspace[0] = sysWorkspaceSize + MAX_WORKSPACE_SIZE; // 设置编译期workspace大小，此处为系统workspace空间 + 用户workspace空间最大值
+            currentWorkspace[0] =
+                sysWorkspaceSize +
+                MAX_WORKSPACE_SIZE; // 设置编译期workspace大小，此处为系统workspace空间 + 用户workspace空间最大值
         }
         return ge::GRAPH_SUCCESS;
     }
@@ -117,8 +116,9 @@ Tiling下沉场景下，算子工程的op\_host目录结构如下，Tiling实现
 
     当前Tiling下沉仅支持融合算子，为了模拟融合算子场景，通过[KERNEL\_TASK\_TYPE\_DEFAULT](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Kernel-Tiling/设置Kernel类型.md)接口强制指定算子在AIC、AIV混合场景运行。
 
-    ```
-    extern "C" __global__ __aicore__ void add_custom_tiling_sink(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling)
+    ```cpp
+    extern "C" __global__ __aicore__ void add_custom_tiling_sink(
+        GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling)
     {
         REGISTER_TILING_DEFAULT(TilingSinkTilingData);
         GET_TILING_DATA(tiling_data, tiling);
@@ -134,7 +134,7 @@ Tiling下沉场景下，算子工程的op\_host目录结构如下，Tiling实现
 
 -   修改op\_host目录下的编译脚本CMakeLists.txt，添加Tiling下沉编译命令。具体代码如下所示：
 
-    ```
+    ```text
     npu_op_device_tiling_library(cust_opmaster SHARED  # 任务名称，固定为cust_opmaster
         add_custom_tiling_sink/add_custom_tiling_sink_tiling.cpp  # Tiling函数实现代码源文件
     )

@@ -65,24 +65,35 @@
 
 -   tensor前n个数据计算
 
-    ```
-    template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, const BinaryConfig &config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
-    __aicore__ inline void Select(const T2& dst, const LocalTensor<T1>& selMask, const T3& src0, const T4& src1, SELMODE selMode, uint32_t count)
+    ```cpp
+    template <
+        typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType,
+        const BinaryConfig& config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
+    __aicore__ inline void Select(
+        const T2& dst, const LocalTensor<T1>& selMask, const T3& src0, const T4& src1, SELMODE selMode, uint32_t count)
     ```
 
 -   tensor高维切分计算
     -   mask逐bit模式
 
-        ```
-        template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, bool isSetMask = true, const BinaryConfig &config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
-        __aicore__ inline void Select(const T2& dst, const LocalTensor<T1>& selMask, const T3& src0, const T4& src1, SELMODE selMode, uint64_t mask[], uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+        ```cpp
+        template <
+            typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, bool isSetMask = true,
+            const BinaryConfig& config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
+        __aicore__ inline void Select(
+            const T2& dst, const LocalTensor<T1>& selMask, const T3& src0, const T4& src1, SELMODE selMode, uint64_t mask[],
+            uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
         ```
 
     -   mask连续模式
 
-        ```
-        template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, bool isSetMask = true, const BinaryConfig &config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
-        __aicore__ inline void Select(const T2& dst, const LocalTensor<T1>& selMask, const T3& src0, const T4& src1, SELMODE selMode, uint64_t mask, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+        ```cpp
+        template <
+            typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, bool isSetMask = true,
+            const BinaryConfig& config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
+        __aicore__ inline void Select(
+            const T2& dst, const LocalTensor<T1>& selMask, const T3& src0, const T4& src1, SELMODE selMode, uint64_t mask,
+            uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
         ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -269,12 +280,14 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
 
 -   Select-tensor前n个数据计算样例（模式1）
 
-    ```
+    ```cpp
     // 灵活标量位置，src1Local[0]作为标量
-    static constexpr AscendC::BinaryConfig config = { 1 };
-    AscendC::Select<BinaryDefaultType, uint8_t, config>(dstLocal, maskLocal, src0Local, src1Local[0], AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE, dataSize);
-    
+    static constexpr AscendC::BinaryConfig config = {1};
+    AscendC::Select<BinaryDefaultType, uint8_t, config>(
+        dstLocal, maskLocal, src0Local, src1Local[0], AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE, dataSize);
+
     // 灵活标量位置，src0Local[0]作为标量
-    static constexpr AscendC::BinaryConfig config = { 0 };
-    AscendC::Select<BinaryDefaultType, uint8_t, config>(dstLocal, maskLocal, src0Local[0], src1Local, AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE, dataSize);
+    static constexpr AscendC::BinaryConfig config = {0};
+    AscendC::Select<BinaryDefaultType, uint8_t, config>(
+        dstLocal, maskLocal, src0Local[0], src1Local, AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE, dataSize);
     ```

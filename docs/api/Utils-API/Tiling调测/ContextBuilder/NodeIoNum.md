@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001820650060_zh-cn_topic_0000001389787297_section13230182415108"></a>
 
-```
+```text
 ContextBuilder &NodeIoNum(size_t inputNum, size_t outputNum)
 ```
 
@@ -48,7 +48,7 @@ ContextBuilder &NodeIoNum(size_t inputNum, size_t outputNum)
 
 ## 调用示例<a name="zh-cn_topic_0000001820650060_zh-cn_topic_0000001389787297_section320753512363"></a>
 
-```
+```cpp
 auto builder = ContextBuilder().NodeIoNum(5, 3); // 该算子有5个输入，3个输出
 ```
 

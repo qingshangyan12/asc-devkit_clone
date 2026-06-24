@@ -99,7 +99,9 @@ dst_nchw = np.transpose(src_nhwc, axes=(0,3,1,2))
 
   ```cpp
   template <typename T>
-  __aicore__ inline void Transpose(const LocalTensor<T>& dst, const LocalTensor<T> &src, const LocalTensor<uint8_t> &sharedTmpBuffer, const TransposeParamsExt &transposeParams)
+  __aicore__ inline void Transpose(
+      const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer,
+      const TransposeParamsExt& transposeParams)
   ```
 
 ## 参数说明
@@ -360,6 +362,6 @@ dst_nchw = np.transpose(src_nhwc, axes=(0,3,1,2))
   transposeParams.cSize = C; // C轴长度
   transposeParams.hSize = H; // H轴长度
   transposeParams.wSize = W; // W轴长度
-  transposeParams.transposeType = transposeType; 
+  transposeParams.transposeType = transposeType;
   AscendC::Transpose(dstLocal, srcLocal, stackBuffer, transposeParams);
   ```

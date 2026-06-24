@@ -63,7 +63,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T, TPosition pos>
 __aicore__ inline bool PopStackBuffer(LocalTensor<T>& popLocal)
 ```
@@ -124,7 +124,7 @@ __aicore__ inline bool PopStackBuffer(LocalTensor<T>& popLocal)
 
 ## 调用示例<a name="section837496171220"></a>
 
-```
+```cpp
 AscendC::LocalTensor<int16_t> popBuffer;
 bool ret = AscendC::PopStackBuffer<int16_t, AscendC::TPosition::VECCALC>(popBuffer);
 ```

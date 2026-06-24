@@ -54,16 +54,20 @@ Quantize与[AscendQuant](AscendQuant.md)的功能类似，Quantize在PER\_TENSOR
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <const QuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-    __aicore__ inline void Quantize(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const ScaleT& scale, const OffsetT& offset, const QuantizeParams& params)
+    __aicore__ inline void Quantize(
+        const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+        const ScaleT& scale, const OffsetT& offset, const QuantizeParams& params)
     ```
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <const QuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-    __aicore__ inline void Quantize(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,const ScaleT& scale, const OffsetT& offset, const QuantizeParams& params)
+    __aicore__ inline void Quantize(
+        const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset,
+        const QuantizeParams& params)
     ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -86,7 +90,7 @@ Quantize与[AscendQuant](AscendQuant.md)的功能类似，Quantize在PER\_TENSOR
 | ScaleT | 缩放因子scale的数据类型。接口内根据入参scale自动推导数据类型，开发者无需配置该参数。ScaleT可以为标量数据类型或LocalTensor类型。<br><br>注意：<br>对于PER_TENSOR量化策略，scale为标量，ScaleT只能为标量数据类型。<br>对于PER_CHANNEL、PER_TOKEN、PER_GROUP量化策略，scale为矢量，ScaleT只能为LocalTensor类型。 |
 | OffsetT | offset的数据类型。接口内根据入参offset自动推导数据类型，开发者无需配置该参数。OffsetT可以为标量数据类型或LocalTensor类型。<br><br>注意：<br>对于PER_TENSOR量化策略，offset为标量，OffsetT只能为标量数据类型。<br>对于PER_CHANNEL、PER_TOKEN、PER_GROUP量化策略，offset可以是标量或者矢量，OffsetT可以为标量数据类型，也可以为LocalTensor类型。 |
 
-```
+```cpp
 struct QuantizeConfig {
     QuantizePolicy policy;
     bool hasOffset;
@@ -107,7 +111,7 @@ enum class QuantizePolicy : int32_t { PER_TENSOR, PER_CHANNEL, PER_TOKEN, PER_GR
 | sharedTmpBuffer | 输入 | 临时缓存。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>临时空间大小BufferSize的获取方式请参考[GetQuantizeMaxMinTmpSize](GetQuantizeMaxMinTmpSize.md)。 |
 | params | 输入 | 量化接口的参数，QuantizeParams类型，具体定义如下方代码所示，其中参数的含义如下。<br>m：m方向元素个数。<br>n：n方向元素个数。n值对应的数据大小需满足32字节对齐的要求，即shape最后一维为n的输入或输出均需要满足该维度上32字节对齐的要求。<br>groupSize：PER_GROUP场景有效，表示groupSize行/列数据共用一个scale/offset。groupSize的取值必须大于0且是32的整倍数。 |
 
-```
+```cpp
 struct QuantizeParams {
     uint32_t m;
     uint32_t n;
@@ -171,7 +175,7 @@ struct QuantizeParams {
 
 -   PER\_CHANNEL、PER\_TOKEN、PER\_GROUP模式
 
-    ```
+    ```cpp
     constexpr static QuantizePolicy tokenPolicy = QuantizePolicy::PER_TOKEN;
     constexpr static QuantizePolicy channelPolicy = QuantizePolicy::PER_CHANNEL;
     constexpr static QuantizePolicy groupPolicy = QuantizePolicy::PER_GROUP;
@@ -188,7 +192,7 @@ struct QuantizeParams {
 
 -   PER\_TENSOR模式
 
-    ```
+    ```cpp
     constexpr static QuantizePolicy tensorPolicy = QuantizePolicy::PER_TENSOR;
     // 启用offset，舍入模式为CAST_ROUND
     constexpr static QuantizeConfig config = {tensorPolicy, true, RoundMode::CAST_ROUND, -1};
@@ -203,7 +207,7 @@ struct QuantizeParams {
 
 结果示例如下：
 
-```
+```text
 输入数据（srcLocal）:
 [-4.4, 2.5, -2.9, -3.1, -1.5, -4.8, 1.8, 3.5, 4.5, 1.1, -2.7, 0.5, ... 1.6]
 输入数据（scale矢量）:

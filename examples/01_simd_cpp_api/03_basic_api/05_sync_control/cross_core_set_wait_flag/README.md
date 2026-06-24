@@ -37,7 +37,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── cross_core_set_wait_flag
 │   ├── scripts
 │   │   ├── gen_data.py              // 输入数据和真值数据生成脚本
@@ -266,7 +266,7 @@ $$
 ### 3. 注意事项
 #### 3.1 Cube与Vector融合计算场景
 (1) Cube与Vector融合计算场景中，融合算子(配置__mix__(1,2))中需要通过ASCEND_IS_AIV/ ASCEND_IS_AIC进行AIV和AIC核代码的隔离。
-```
+```text
 KernelMmad op;
 if ASCEND_IS_AIC {
     op.InitAIC(A, B, c);
@@ -284,7 +284,7 @@ if ASCEND_IS_AIV {
 #### 3.2 纯Vector计算场景
 (1) 在使用 CrossCoreSetFlag 与 CrossCoreWaitFlag 核间同步接口时，即使是纯 Vector 计算场景，核函数也不能使用__vector__ 修饰符。
 本样例核函数采用__mix__(1,2) 修饰，但在纯 Vector 场景下，由于仅执行矢量计算，必须通过 ASCEND_IS_AIV 宏确保程序仅在 AIV 核上运行，否则会导致程序卡死。
-```
+```text
 if ASCEND_IS_AIV {
         op.Init(x, z, dataLength);
         op.Process();

@@ -24,8 +24,8 @@ Matmul::GetSubBlockIdx\(\)与基础API接口[AscendC::GetSubBlockIdx\(\)](../../
 
 ## 函数原型
 
-```
-__aicore__  inline uint8_t GetSubBlockIdx()
+```cpp
+__aicore__ inline uint8_t GetSubBlockIdx()
 ```
 
 ## 参数说明
@@ -44,7 +44,7 @@ __aicore__  inline uint8_t GetSubBlockIdx()
 
 ## 调用示例
 
-```
+```cpp
 typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> aType;
 typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> bType;
 typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType;

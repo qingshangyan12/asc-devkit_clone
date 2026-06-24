@@ -50,16 +50,21 @@ Meant<sub>n</sub>的计算过程示意如下图，调用n次本接口后，得�
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
-    template <typename T, typename U,bool isReuseSource = false, const WelfordUpdateConfig& config = WFUPDATE_DEFAULT_CFG>
-    __aicore__ inline void WelfordUpdate(const LocalTensor<U>& outputMean, const LocalTensor<U>& outputVariance, const LocalTensor<U>& inputMean, const LocalTensor<U>& inputVariance, const LocalTensor<T>& inputX, const LocalTensor<uint8_t>& sharedTmpBuffer, const WelfordUpdateParam& para)
+    ```cpp
+    template <typename T, typename U, bool isReuseSource = false, const WelfordUpdateConfig& config = WFUPDATE_DEFAULT_CFG>
+    __aicore__ inline void WelfordUpdate(
+        const LocalTensor<U>& outputMean, const LocalTensor<U>& outputVariance, const LocalTensor<U>& inputMean,
+        const LocalTensor<U>& inputVariance, const LocalTensor<T>& inputX, const LocalTensor<uint8_t>& sharedTmpBuffer,
+        const WelfordUpdateParam& para)
     ```
 
 -   接口框架申请临时空间
 
-    ```
-    template <typename T, typename U,bool isReuseSource = false, const WelfordUpdateConfig& config = WFUPDATE_DEFAULT_CFG>
-    __aicore__ inline void WelfordUpdate(const LocalTensor<U>& outputMean, const LocalTensor<U>& outputVariance, const LocalTensor<U>& inputMean, const LocalTensor<U>& inputVariance, const LocalTensor<T>& inputX, const WelfordUpdateParam& para)
+    ```cpp
+    template <typename T, typename U, bool isReuseSource = false, const WelfordUpdateConfig& config = WFUPDATE_DEFAULT_CFG>
+    __aicore__ inline void WelfordUpdate(
+        const LocalTensor<U>& outputMean, const LocalTensor<U>& outputVariance, const LocalTensor<U>& inputMean,
+        const LocalTensor<U>& inputVariance, const LocalTensor<T>& inputX, const WelfordUpdateParam& para)
     ```
 
 由于该接口的内部实现中涉及复杂的计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -81,7 +86,7 @@ Meant<sub>n</sub>的计算过程示意如下图，调用n次本接口后，得�
 | isReuseSource | 是否允许修改源操作数，默认值为false。如果开发者允许源操作数被改写，可以设置该参数取值为true开启，开启后能够节省部分内存空间。<br><br>设置为true，则本接口内部计算时复用inputX的内存空间，节省内存空间；设置为false，则本接口内部计算时不复用inputX的内存空间。<!-- npu="310p" id7 --><br><br>在Atlas 推理系列产品AI Core中，该参数预留，传入默认值false即可。<!-- end id7 --><br><br>isReuseSource的使用样例请参考[更多样例](../数学计算/更多样例-83.md#section639165323915)。 |
 | config | 配置非指定计算范围内的目的操作数与源操作数的复用关系。WelfordUpdateConfig类型，定义如下方代码所示，其中参数的含义如下。<br>isInplace：[接口参数](#zh-cn_topic_0235751031_table33761356)para中的abComputeLength参数指定了输入数据内层轴的计算长度，在该指定计算长度之外的输出数据具体为何值，通过本参数设置。本参数表示，在指定计算长度之外的目的操作数是否复用源操作数；若复用，对于指定计算长度之外的输出，直接使用对应位置的源操作数代替输出目的操作数；若不复用，则本接口不会输出计算范围外的目的操作数。<br>false：默认值。表示目的操作数不复用源操作数。<br>true：表示目的操作数复用源操作数。outputMean复用inputMean，outputVariance复用inputVariance。<br><br>此参数一般用于配合kernel侧tiling计算的接口使用。 |
 
-```
+```cpp
 struct WelfordUpdateConfig {
     bool isInplace = false; // 目的操作数是否复用源操作数。
 };
@@ -89,7 +94,7 @@ struct WelfordUpdateConfig {
 
 配置示例如下：
 
-```
+```cpp
 constexpr WelfordUpdateConfig WFUPDATE_DEFAULT_CFG = {false};
 ```
 
@@ -105,7 +110,7 @@ constexpr WelfordUpdateConfig WFUPDATE_DEFAULT_CFG = {false};
 | sharedTmpBuffer | 输入 | 临时空间。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>接口内部复杂计算时用于存储中间变量，由开发者提供。<br><br>临时空间大小BufferSize的获取方式请参考[WelfordUpdate Tiling](WelfordUpdate-Tiling.md)。 |
 | para | 输入 | 计算所需的参数信息。WelfordUpdateParam类型，定义如下方代码所示，其中参数的含义如下。<br>rnLength：预留参数，固定设置为1。<br>abLength：Reduce轴拆分的大小。<br>abComputeLength：从输入的起始地址开始的Reduce轴实际计算长度。<br>nRec：取值为1/i，i为当前调用本接口的累积次数。i的取值范围为[1, n]，n为对输入数据inputX的Reduce轴切分的块数。<br><br>各目的操作数和源操作数的shape均为[rnLength, abLength]。 |
 
-```
+```cpp
 struct WelfordUpdateParam {
     uint32_t rnLength;
     uint32_t abLength;
@@ -145,7 +150,7 @@ struct WelfordUpdateParam {
 
 ## 调用示例
 
-```
+```cpp
 // outputMean: 输出更新后的均值Meant，shape为 [1, abLength]
 // outputVariance: 输出更新后的方差中间结果Mi，shape为 [1, abLength]
 // inputMean: 上一时刻的均值Meant-1，作为输入
@@ -169,7 +174,7 @@ AscendC::WelfordUpdate<T, U, false, WELFORD_UPDATE_ENABLE_INPLACE_CFG>(
 
 示例结果如下：
 
-```
+```text
 输入数据(inputX, shape:[1, 64]):
 [1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.
  1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.

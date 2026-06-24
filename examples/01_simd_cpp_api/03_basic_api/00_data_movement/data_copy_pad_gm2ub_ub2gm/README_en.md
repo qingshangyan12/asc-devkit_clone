@@ -16,7 +16,7 @@ The data transfer process includes: Global Memory (GM) -> Unified Buffer (UB) (u
 
 ## Directory Structure
 
-```
+```text
 ├── data_copy_pad_gm2ub_ub2gm
 │   ├── scripts
 │   │   ├── gen_data.py         // Input data and ground truth generation script

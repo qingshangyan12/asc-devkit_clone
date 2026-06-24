@@ -57,24 +57,30 @@
 
 -   tensor前n个数据计算
 
-    ```
+    ```cpp
     template <typename T>
-    __aicore__ inline void Scatter(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& dstOffset, const uint32_t dstBaseAddr, const uint32_t count)
+    __aicore__ inline void Scatter(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& dstOffset,
+        const uint32_t dstBaseAddr, const uint32_t count)
     ```
 
 -   tensor高维切分计算
     -   mask逐bit模式
 
-        ```
+        ```cpp
         template <typename T>
-        __aicore__ inline void Scatter(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& dstOffset, const uint32_t dstBaseAddr, const uint64_t mask[], const uint8_t repeatTime, const uint8_t srcRepStride)
+        __aicore__ inline void Scatter(
+            const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& dstOffset,
+            const uint32_t dstBaseAddr, const uint64_t mask[], const uint8_t repeatTime, const uint8_t srcRepStride)
         ```
 
     -   mask连续模式
 
-        ```
+        ```cpp
         template <typename T>
-        __aicore__ inline void Scatter(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& dstOffset, const uint32_t dstBaseAddr, const uint64_t mask, const uint8_t repeatTime, const uint8_t srcRepStride)
+        __aicore__ inline void Scatter(
+            const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& dstOffset,
+            const uint32_t dstBaseAddr, const uint64_t mask, const uint8_t repeatTime, const uint8_t srcRepStride)
         ```
 
 ## 参数说明<a name="section1619484392111"></a>
@@ -194,14 +200,16 @@
 
 完整使用样例请参见[Scatter兼容性样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/06_compatibility_guide/scatter)。
 
-```
+```cpp
 uint32_t COUNT = 128;
-AscendC::Scatter(dstLocal, srcLocal, dstOffsetLocal, (uint32_t)0, COUNT); // dstOffsetLocal用于存储源操作数的每个元素在dst中对应的地址偏移
+AscendC::Scatter(
+    dstLocal, srcLocal, dstOffsetLocal, (uint32_t)0,
+    COUNT); // dstOffsetLocal用于存储源操作数的每个元素在dst中对应的地址偏移
 ```
 
 结果示例：
 
-```
+```text
 输入数据dstOffsetLocal:
 [254 252 250 ... 4 2 0]
 输入数据srcLocal（128个half类型数据）: 

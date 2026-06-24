@@ -63,8 +63,7 @@ T shfl_up(T var, unsigned int delta) const
     using namespace cooperative_groups;
     __global__ void simt_kernel(...)
     {
-        ...
-        thread_block block = this_thread_block();
+        ... thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
         uint32_t result = tile4.shfl_up(threadIdx.x + 100, 2);
         ...
@@ -77,8 +76,7 @@ T shfl_up(T var, unsigned int delta) const
     using namespace cooperative_groups;
     __simt_vf__ inline void simt_kernel(...)
     {
-        ...
-        thread_block block = this_thread_block();
+        ... thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
         uint32_t result = tile4.shfl_up(threadIdx.x + 100, 2);
         ...

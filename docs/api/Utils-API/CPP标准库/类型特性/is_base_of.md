@@ -16,7 +16,7 @@ is\_base\_of是定义于<type\_traits\>头文件的一个类型特征工具，�
 
 ## 函数原型
 
-```
+```cpp
 template <typename Base, typename Derived>
 struct is_base_of;
 ```
@@ -43,7 +43,7 @@ is\_base\_of的静态常量成员value用于获取返回的布尔值，is\_base\
 
 ## 调用示例
 
-```
+```cpp
 class Base {};
 class Derived : public Base {};
 class Unrelated {};
@@ -69,25 +69,28 @@ template <typename T>
 class DerivedTemplate : public BaseTemplate<T> {};
 
 // 检查Base是否是Derived的基类
-AscendC::PRINTF("Is Base a base of Derived? %d\n" , AscendC::Std::is_base_of<Base, Derived>::value);
+AscendC::PRINTF("Is Base a base of Derived? %d\n", AscendC::Std::is_base_of<Base, Derived>::value);
 
 // 检查Derived是否是Base的基类（应该为false）
-AscendC::PRINTF("Is Derived a base of Base? %d\n" , AscendC::Std::is_base_of<Derived, Base>::value);
+AscendC::PRINTF("Is Derived a base of Base? %d\n", AscendC::Std::is_base_of<Derived, Base>::value);
 
 // 检查Base是否是Unrelated的基类（应该为false）
-AscendC::PRINTF("Is Base a base of Unrelated? %d\n" , AscendC::Std::is_base_of<Base, Unrelated>::value);
+AscendC::PRINTF("Is Base a base of Unrelated? %d\n", AscendC::Std::is_base_of<Base, Unrelated>::value);
 
-AscendC::PRINTF("Is Base a base of Derived (virtual inheritance)? %d\n", AscendC::Std::is_base_of<Base, Derived2>::value);
+AscendC::PRINTF(
+    "Is Base a base of Derived (virtual inheritance)? %d\n", AscendC::Std::is_base_of<Base, Derived2>::value);
 
-AscendC::PRINTF("Is BaseTemplate<int> a base of DerivedTemplate<int>? %d\n", AscendC::Std::is_base_of<BaseTemplate<int>, DerivedTemplate<int>>::value);
+AscendC::PRINTF(
+    "Is BaseTemplate<int> a base of DerivedTemplate<int>? %d\n",
+    AscendC::Std::is_base_of<BaseTemplate<int>, DerivedTemplate<int>>::value);
 
 // 测试Base是否为VirtualDerived的基类（虚继承情况）
-AscendC::PRINTF("Is Base a base of VirtualDerived? %d\n" , AscendC::Std::is_base_of<Base, VirtualDerived>::value);
+AscendC::PRINTF("Is Base a base of VirtualDerived? %d\n", AscendC::Std::is_base_of<Base, VirtualDerived>::value);
 // 测试Base是否为MultiDerived的基类（多重继承情况）
-AscendC::PRINTF("Is Base a base of MultiDerived? %d\n" , AscendC::Std::is_base_of<Base, MultiDerived>::value);
+AscendC::PRINTF("Is Base a base of MultiDerived? %d\n", AscendC::Std::is_base_of<Base, MultiDerived>::value);
 ```
 
-```
+```text
 // 执行结果：
 Is Base a base of Derived? 1
 Is Derived a base of Base? 0

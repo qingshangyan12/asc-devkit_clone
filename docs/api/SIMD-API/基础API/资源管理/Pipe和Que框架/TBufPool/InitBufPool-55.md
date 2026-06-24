@@ -65,14 +65,14 @@
 
 -   非共享模式
 
-    ```
+    ```cpp
     template <class T>
     __aicore__ inline bool InitBufPool(T& bufPool, uint32_t len)
     ```
 
 -   共享模式
 
-    ```
+    ```cpp
     template <class T, class U>
     __aicore__ inline bool InitBufPool(T& bufPool, uint32_t len, U& shareBuf)
     ```
@@ -180,7 +180,7 @@
 
 完整样例链接可以参考[tbufpool\_management样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/04_memory_management/tbufpool_management)。
 
-```
+```cpp
 AscendC::TPipe* pipe;
 AscendC::TBufPool<AscendC::TPosition::VECCALC> tbufPool0, tbufPool1, tbufPool2;
 // srcQue0、srcQue1、srcQue2为VECIN上的TQue，dstQue0、dstQue1为VECOUT上的TQue

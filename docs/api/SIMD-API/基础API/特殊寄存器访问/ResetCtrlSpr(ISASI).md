@@ -48,6 +48,5 @@ __aicore__ static inline void ResetCtrlSpr()
 
 ```cpp
 AscendC::SetCtrlSpr<48, 48>(1);
-...
-AscendC::ResetCtrlSpr<48, 48>();
+... AscendC::ResetCtrlSpr<48, 48>();
 ```

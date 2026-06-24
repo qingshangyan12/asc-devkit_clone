@@ -96,8 +96,10 @@ __simd_callee__ inline void ShiftLefts(S& dstReg, S& srcReg, U scalarValue, Mask
 ## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
-template<typename T, typename U>
-__simd_vf__ inline void ShiftLeftsVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, U scalarValue, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
+template <typename T, typename U>
+__simd_vf__ inline void ShiftLeftsVF(
+    __ubuf__ T* dstAddr, __ubuf__ T* src0Addr, U scalarValue, uint32_t count, uint32_t oneRepeatSize,
+    uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> srcReg;
     AscendC::Reg::RegTensor<T> dstReg;

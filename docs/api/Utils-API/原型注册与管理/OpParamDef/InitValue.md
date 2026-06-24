@@ -10,20 +10,20 @@
 
 -   在算子执行前，对输出参数对应GM空间进行清零。
 
-    ```
-    OpParamDef &InitValue(uint64_t value)
+    ```cpp
+    OpParamDef& InitValue(uint64_t value)
     ```
 
 -   指定输出参数初值的类型和值，输出参数调用该接口，会在算子执行前，对输出参数对应GM空间插入对应类型和值的memset类算子。
 
-    ```
+    ```text
     OpParamDef &InitValue(const ScalarVar &value)
     ```
 
 -   指定输出参数初值类型和值的列表，依次对应输出参数的数据类型和数据格式组合，会在算子执行前，对输出参数对应GM空间插入对应类型和值的memset类算子。
 
-    ```
-    OpParamDef &InitValue(const std::vector<ScalarVar> &value)
+    ```cpp
+    OpParamDef& InitValue(const std::vector<ScalarVar>& value)
     ```
 
 ## 参数说明<a name="zh-cn_topic_0000001960169216_zh-cn_topic_0000001526594958_zh-cn_topic_0000001525424352_section75395119104"></a>
@@ -102,32 +102,35 @@ OpParamDef算子定义，OpParamDef请参考[OpParamDef](OpParamDef.md)。
 
 ## 调用示例<a name="zh-cn_topic_0000001960169216_zh-cn_topic_0000001526594958_zh-cn_topic_0000001575944081_section320753512363"></a>
 
-```
+```cpp
 // OpParamDef &InitValue(uint64_t value)示例
 this->Output("z")
-     .ParamType(REQUIRED)
-     .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT32})
-     .FormatList({ ge::FORMAT_ND})
-     .InitValue(0);
+    .ParamType(REQUIRED)
+    .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT32})
+    .FormatList({ge::FORMAT_ND})
+    .InitValue(0);
 
 // OpParamDef &InitValue(const ScalarVar &value)示例
 this->Output("z")
-     .ParamType(REQUIRED)
-     .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT32})
-     .FormatList({ ge::FORMAT_ND})
-     .InitValue({ScalarType::INT16, 1});
+    .ParamType(REQUIRED)
+    .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT32})
+    .FormatList({ge::FORMAT_ND})
+    .InitValue({ScalarType::INT16, 1});
 
 // OpParamDef &InitValue(const std::vector<ScalarVar> &value)示例
 this->Output("z")
-     .ParamType(REQUIRED)
-     .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT32})
-     .FormatList({ ge::FORMAT_ND})
-     .InitValue({{ScalarType::INT16, 1}, {ScalarType::FLOAT32, 3.2}, {ScalarType::INT64, 7}});
+    .ParamType(REQUIRED)
+    .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT32})
+    .FormatList({ge::FORMAT_ND})
+    .InitValue({{ScalarType::INT16, 1}, {ScalarType::FLOAT32, 3.2}, {ScalarType::INT64, 7}});
 
 this->Output("z")
-     .ParamType(REQUIRED)
-     .DataType({ge::DT_INT32, ge::DT_FLOAT, ge::DT_INT32})  // 第一个和第三个DataType相同
-     .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_NHWC})
-     .InitValue({{ScalarType::INT16, 1}, {ScalarType::FLOAT32, 3.2}, {ScalarType::INT16, 1}}); // InitValue对应的数据类型和数值也需相同
+    .ParamType(REQUIRED)
+    .DataType({ge::DT_INT32, ge::DT_FLOAT, ge::DT_INT32}) // 第一个和第三个DataType相同
+    .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_NHWC})
+    .InitValue(
+        {{ScalarType::INT16, 1},
+         {ScalarType::FLOAT32, 3.2},
+         {ScalarType::INT16, 1}}); // InitValue对应的数据类型和数值也需相同
 ```
 

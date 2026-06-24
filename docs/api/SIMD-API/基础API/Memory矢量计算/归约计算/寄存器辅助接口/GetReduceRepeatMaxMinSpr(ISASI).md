@@ -38,7 +38,7 @@
 
     ```cpp
     template <typename T>
-    __aicore__ inline void GetReduceRepeatMaxMinSpr(T &maxMinValue, T &maxMinIndex)
+    __aicore__ inline void GetReduceRepeatMaxMinSpr(T& maxMinValue, T& maxMinIndex)
     ```
     
 </cann-filter>
@@ -49,7 +49,7 @@
 
     ```cpp
     template <typename T>
-    __aicore__ inline void GetReduceRepeatMaxMinSpr(T &maxMinValue)
+    __aicore__ inline void GetReduceRepeatMaxMinSpr(T& maxMinValue)
     ```
 
 </cann-filter>
@@ -101,8 +101,8 @@
       AscendC::LocalTensor<float> src;
       AscendC::LocalTensor<float> dst;
       int32_t mask = 64;
-      float val = 0;   // 最大值
-      float idx = 0;   // 最大值索引
+      float val = 0; // 最大值
+      float idx = 0; // 最大值索引
       AscendC::ReduceRepeat<AscendC::ReduceType::MAX>(dst, src, mask, 1, 1, 1, 8);
       AscendC::GetReduceRepeatMaxMinSpr<float>(val, idx); // 保证和ReduceRepeat的调用次序，而且要配对调用
       ```
@@ -118,7 +118,7 @@
         AscendC::LocalTensor<float> dst;
         int32_t mask = 64;
         AscendC::ReduceRepeat<AscendC::ReduceType::MAX>(dst, src, mask, 1, 1, 1, 8);
-        float val = 0;   // 最大值
+        float val = 0;                                 // 最大值
         AscendC::GetReduceRepeatMaxMinSpr<float>(val); // 保证和ReduceRepeat的调用次序，而且要配对调用
         ```
 
@@ -137,9 +137,10 @@
       AscendC::LocalTensor<float> work;
       AscendC::LocalTensor<float> dst;
       int32_t mask = 64;
-      AscendC::ReduceMax(dst, src, work, mask, 1, 8, true); // 连续场景，srcRepStride = 8，且calIndex = true
-      float val = 0;   // 最大值
-      float idx = 0;   // 不用于获取ReduceMax对应的准确索引
+      AscendC::ReduceMax(dst, src, work, mask, 1, 8,
+                         true);                           // 连续场景，srcRepStride = 8，且calIndex = true
+      float val = 0;                                      // 最大值
+      float idx = 0;                                      // 不用于获取ReduceMax对应的准确索引
       AscendC::GetReduceRepeatMaxMinSpr<float>(val, idx); // 保证和ReduceMax的调用次序，而且要配对调用
       ```
 
@@ -155,7 +156,7 @@
         AscendC::LocalTensor<float> dst;
         int32_t mask = 64;
         AscendC::ReduceMax(dst, src, work, mask, 1, 8, true);
-        float val = 0;   // 最大值
+        float val = 0;                                 // 最大值
         AscendC::GetReduceRepeatMaxMinSpr<float>(val); // 保证和ReduceMax的调用次序，而且要配对调用
         ```
 

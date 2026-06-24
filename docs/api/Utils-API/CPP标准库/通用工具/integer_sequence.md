@@ -18,13 +18,13 @@ make\_index\_sequence是Ascend C提供的一个模板，通常使用make\_index\
 
 ## 函数原型
 
-```
-template<size_t... Idx>
+```cpp
+template <size_t... Idx>
 using index_sequence = IntegerSequence<size_t, Idx...>;
 ```
 
-```
-template<size_t N>
+```cpp
+template <size_t N>
 using make_index_sequence = MakeIntegerSequence<size_t, N>;
 ```
 
@@ -50,14 +50,15 @@ using make_index_sequence = MakeIntegerSequence<size_t, N>;
 
 生成并打印一个长度为5的整数序列。
 
-```
-template<size_t... Is>
-__aicore__  inline void PrintIndexSequence(AscendC::Std::index_sequence<Is...>) {
-   ((AscendC::printf(" Is:%lu", Is)), ...);
+```cpp
+template <size_t... Is>
+__aicore__ inline void PrintIndexSequence(AscendC::Std::index_sequence<Is...>)
+{
+    ((AscendC::printf(" Is:%lu", Is)), ...);
 }
 __aicore__ inline void Process()
 {
-    PrintIndexSequence(AscendC::Std::make_index_sequence<5>{}); // 打印结果: 0，1，2，3，4
-    PrintIndexSequence(AscendC::Std::index_sequence<0,1,2,10,8000>{}); // 打印结果: 0，1，2，10, 8000
+    PrintIndexSequence(AscendC::Std::make_index_sequence<5>{});            // 打印结果: 0，1，2，3，4
+    PrintIndexSequence(AscendC::Std::index_sequence<0, 1, 2, 10, 8000>{}); // 打印结果: 0，1，2，10, 8000
 }
 ```

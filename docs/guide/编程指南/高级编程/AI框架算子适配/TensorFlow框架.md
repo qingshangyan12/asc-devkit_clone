@@ -14,7 +14,7 @@
     2.  安装框架插件包，请参考[《TensorFlow 1.15模型迁移指南》](https://www.hiascend.com/document/redirect/canncommercial-tfmigr115)或[《TensorFlow 2.6.5模型迁移》](https://www.hiascend.com/document/redirect/canncommercial-tfmigr26)中的环境准备 \> 安装框架插件包章节，获取框架插件包详细的安装步骤。
     3.  <a name="li123241091016"></a>[创建算子工程](../Aclnn算子工程化开发/创建算子工程.md)。使用msOpGen工具创建算子开发工程。TensorFlow框架算子适配场景下，需要通过framework参数指定具体的框架为tf或者tensorflow，工具会自动生成框架适配代码。以自定义CANN算子AddCustom为例，使用msOpGen工具创建算子开发工程的具体命令如下：
 
-        ```
+        ```text
         ${INSTALL_DIR}/python/site-packages/bin/msopgen gen -i $HOME/sample/add_custom.json -f tf -c ai_core-<soc_version> -lan cpp -out $HOME/sample/AddCustom
         ```
 
@@ -31,7 +31,7 @@
 
 完成[算子工程创建](#li123241091016)后，会在算子工程目录下生成framework/tf\_plugin目录，用于存放TensorFlow框架适配插件实现文件。以自定义CANN算子AddCustom为例，算子工程目录如下：
 
-```
+```text
 AddCustom
 ├── build.sh             // 编译入口脚本
 ├── cmake 
@@ -49,24 +49,24 @@ AddCustom
 
 当TensorFlow算子与CANN算子原型定义一致时，TensorFlow框架适配插件实现代码如下：
 
-```
+```cpp
 #include "register/register.h"
 namespace domi {
 REGISTER_CUSTOM_OP("AddCustom")
-    .FrameworkType(TENSORFLOW) 
-    .OriginOpType("AddCustom")   
+    .FrameworkType(TENSORFLOW)
+    .OriginOpType("AddCustom")
     .ParseParamsByOperatorFn(AutoMappingByOpFn);
 }
 ```
 
 当TensorFlow算子与CANN算子原型定义不一致时，TensorFlow框架适配插件实现代码如下：
 
-```
+```cpp
 #include "register/register.h"
 REGISTER_CUSTOM_OP("FlashAttentionScore")
     .FrameworkType(TENSORFLOW)
     .OriginOpType({"FlashAttentionScore"})
-    .ParseParamsByOperatorFn(FlashAttentionScoreMapping)  
+    .ParseParamsByOperatorFn(FlashAttentionScoreMapping)
     .ParseOpToGraphFn(AddOptionalPlaceholderForFA);
 ```
 
@@ -84,12 +84,12 @@ REGISTER_CUSTOM_OP("FlashAttentionScore")
 
 以自定义算子AddCustom为例，将该算子映射到TensorFlow内置算子Add上，需要先修改AddCustom自定义算子目录framework/tf\_plugin下插件代码，完成算子名映射：
 
-```
+```cpp
 #include "register/register.h"
 namespace domi {
-REGISTER_CUSTOM_OP("AddCustom")   // 当前Ascend C自定义算子名
-    .FrameworkType(TENSORFLOW)    // 第三方框架类型TENSORFLOW
-    .OriginOpType("Add")          // 映射到TensorFlow原生算子Add
+REGISTER_CUSTOM_OP("AddCustom") // 当前Ascend C自定义算子名
+    .FrameworkType(TENSORFLOW)  // 第三方框架类型TENSORFLOW
+    .OriginOpType("Add")        // 映射到TensorFlow原生算子Add
     .ParseParamsByOperatorFn(AutoMappingByOpFn);
 }
 ```
@@ -99,7 +99,7 @@ REGISTER_CUSTOM_OP("AddCustom")   // 当前Ascend C自定义算子名
 1.  编写测试用例_“tf\_add_.py”。
 2.  导入python库。
 
-    ```
+    ```python
     import logging            # Python标准库日志模块
     import tensorflow as tf   # 导入TensorFlow开源库
     from npu_bridge.estimator import npu_ops   # 导入TensorFlow开源库中的npu_ops模块
@@ -112,7 +112,7 @@ REGISTER_CUSTOM_OP("AddCustom")   // 当前Ascend C自定义算子名
 
     当“execute\_type“为“cpu“时，代表在Host侧的CPU运行单算子网络，调用的是TensorFlow算子。
 
-    ```
+    ```python
     def config(execute_type):
         if execute_type == 'ai_core':
             session_config = tf.ConfigProto(
@@ -137,7 +137,7 @@ REGISTER_CUSTOM_OP("AddCustom")   // 当前Ascend C自定义算子名
     -   算子输入请根据算子实际输入个数及shape进行构造。
     -   算子输出的计算，请根据算子逻辑调用TensorFlow相关接口进行实现。
 
-    ```
+    ```text
     #设置np.allclose比较函数的公差参数。
     #np.allclose比较函数的相对公差参数
     atol = 0.001
@@ -174,7 +174,7 @@ REGISTER_CUSTOM_OP("AddCustom")   // 当前Ascend C自定义算子名
 
 5.  运行单算子网络。
 
-    ```
+    ```python
     if __name__ == "__main__":
         tf.app.run()
     ```
@@ -183,7 +183,7 @@ REGISTER_CUSTOM_OP("AddCustom")   // 当前Ascend C自定义算子名
 
 1.  适配插件代码开发。以自定义算子AddCustom为例，将该算子映射到TensorFlow自定义算子AddCustom上，需要先修改CANN AddCustom自定义算子工程目录framework/tf\_plugin下插件代码，完成算子名映射：
 
-    ```
+    ```text
     REGISTER_CUSTOM_OP("AddCustom")
       .FrameworkType(TENSORFLOW)      
       .OriginOpType("AddCustom") 
@@ -194,37 +194,43 @@ REGISTER_CUSTOM_OP("AddCustom")   // 当前Ascend C自定义算子名
 
     创建TensorFlow原型注册文件custom\_assign\_add\_custom.cc，内容如下：
 
-    ```
+    ```cpp
     #include "tensorflow/core/framework/op.h"
     #include "tensorflow/core/framework/shape_inference.h"
     #include "tensorflow/core/framework/op_kernel.h"
     #include "tensorflow/core/framework/common_shape_fns.h"
     using namespace tensorflow;
-    
+
     // 通过TensorFlow提供的REGISTER_OP接口完成算子原型的注册
-    REGISTER_OP("AddCustom")        // TensorFlow注册算子名
-        .Input("x: T")              // 算子原型，输入参数x，类型为T
-        .Input("y: T")              // 算子原型，输入参数y，类型为T
-        .Output("z: T")             // 算子原型，输入参数z，类型为T
-        .Attr("T: {half}")          // T类型支持范围
-        .SetShapeFn(shape_inference::BroadcastBinaryOpShapeFn);  // 算子shape信息推导，BroadcastBinaryOpShapeFn为TensorFlow提供的内置函数，输出shape信息由输入shape传播推导，即输入和输出shape保持一致
-    
-    // 实现一个CPU版本的kernel函数，因为Tensorflow的计算图在构建时会检查所有的算子是否有任意设备上的kernel函数（NPU Kernel无法被感知），如果没有将会报错。这里实现一个固定返回错误的CPU kernel函数：
+    REGISTER_OP("AddCustom") // TensorFlow注册算子名
+        .Input("x: T")       // 算子原型，输入参数x，类型为T
+        .Input("y: T")       // 算子原型，输入参数y，类型为T
+        .Output("z: T")      // 算子原型，输入参数z，类型为T
+        .Attr("T: {half}")   // T类型支持范围
+        .SetShapeFn(
+            shape_inference::
+                BroadcastBinaryOpShapeFn); // 算子shape信息推导，BroadcastBinaryOpShapeFn为TensorFlow提供的内置函数，输出shape信息由输入shape传播推导，即输入和输出shape保持一致
+
+    // 实现一个CPU版本的kernel函数，因为Tensorflow的计算图在构建时会检查所有的算子是否有任意设备上的kernel函数（NPU
+    // Kernel无法被感知），如果没有将会报错。这里实现一个固定返回错误的CPU kernel函数：
     class AddCustomOp : public OpKernel {
-     public:
-      explicit AddCustomOp(OpKernelConstruction* context) : OpKernel(context) {}
-    
-      void Compute(OpKernelContext* context) override {
-        OP_REQUIRES_OK(context, errors::Unimplemented("AddCustomOp is not supported on CPU")); 
-      }
+    public:
+        explicit AddCustomOp(OpKernelConstruction* context) : OpKernel(context) {}
+
+        void Compute(OpKernelContext* context) override
+        {
+            OP_REQUIRES_OK(context, errors::Unimplemented("AddCustomOp is not supported on CPU"));
+        }
     };
-    
-    REGISTER_KERNEL_BUILDER(Name("AddCustom").Device(DEVICE_CPU), AddCustomOp);          // 注册AddCustom算子的CPU实现内核，该函数当前仅打印日志提示CPU不支持
+
+    REGISTER_KERNEL_BUILDER(
+        Name("AddCustom").Device(DEVICE_CPU),
+        AddCustomOp); // 注册AddCustom算子的CPU实现内核，该函数当前仅打印日志提示CPU不支持
     ```
 
     使用如下命令对上述代码进行编译，产物为libcustom\_ops.so，后续的算子调用脚本中可通过load\_op\_library接口加载该so为python模块，从而调用自定义算子。
 
-    ```
+    ```text
     TF_CFLAGS=( $(python3 -c 'import tensorflow as tf; print(" ".join(tf.sysconfig.get_compile_flags()))') )     // 获取TensorFlow编译选项
     TF_LFLAGS=( $(python3 -c 'import tensorflow as tf; print(" ".join(tf.sysconfig.get_link_flags()))') )        // 获取TensorFlow链接选项
     SOURCE_FILES=custom_assign_add_custom.cc                                                                     // 包含TensorFlow算子注册和CPU内核实现的cc文件
@@ -234,7 +240,7 @@ REGISTER_CUSTOM_OP("AddCustom")   // 当前Ascend C自定义算子名
 3.  测试脚本中加载上一步骤编译好的动态库，实现自定义算子的调用。
     -   TensorFlow 1.15.0调用代码示例
 
-        ```
+        ```text
         import os
         import tensorflow as tf
         import numpy as np
@@ -279,7 +285,7 @@ REGISTER_CUSTOM_OP("AddCustom")   // 当前Ascend C自定义算子名
 
     -   TensorFlow 2.6.5调用代码
 
-        ```
+        ```text
         import os
         import tensorflow as tf
         import numpy as np
@@ -338,222 +344,222 @@ TensorFlow的原型定义中不支持可选输入，对于包含可选输入的�
 
     需要**注意**：在ParseParamsByOperatorFn的回调函数中，需要将TensorFlow算子名称设置到中间算子的original\_type属性中，用于后续ParseOpToGraphFn回调函数的触发。示例代码如下：
 
-    ```
+    ```cpp
     #include <string>
     #include <vector>
     #include "register/register.h"
     #include "graph/operator.h"
     #include "graph/graph.h"
     #include "graph/operator_factory.h"
-    
+
     namespace domi {
     using namespace ge;
-    
-    static Status AddOptionalPlaceholderForFA(const ge::Operator &tf_op, ge::Graph &graph) {
-      // 1. 创建一个FlashAttentionScore算子npu_fa_op
-      ge::AscendString op_name;
-      tf_op.GetName(op_name);
-      auto npu_fa_op = OperatorFactory::CreateOperator(op_name.GetString(), "FlashAttentionScore");
-      // 2. 将TensorFlow算子属性映射到npu_fa_op算子上
-      float scale_value = 1.0;
-      (void)tf_op.GetAttr("scale_value", scale_value);
-      (void)npu_fa_op.SetAttr("scale_value", scale_value);
-    
-      float keep_prob = 1.0;
-      (void)tf_op.GetAttr("keep_prob", keep_prob);
-      (void)npu_fa_op.SetAttr("keep_prob", keep_prob);
-    
-      int32_t pre_tokens = 2147483647;
-      (void)tf_op.GetAttr("pre_tokens", pre_tokens);
-      (void)npu_fa_op.SetAttr("pre_tokens", pre_tokens);
-    
-      int32_t next_tokens = 2147483647;
-      (void)tf_op.GetAttr("next_tokens", next_tokens);
-      (void)npu_fa_op.SetAttr("next_tokens", next_tokens);
-    
-      int32_t head_num = 0;
-      (void)tf_op.GetAttr("head_num", head_num);
-      (void)npu_fa_op.SetAttr("head_num", head_num);
-    
-      std::string input_layout;
-      (void)tf_op.GetAttr("input_layout", input_layout);
-      (void)npu_fa_op.SetAttr("input_layout", input_layout);
-    
-      int32_t inner_precise = 0;
-      (void)tf_op.GetAttr("inner_precise", inner_precise);
-      (void)npu_fa_op.SetAttr("inner_precise", inner_precise);
-    
-      int32_t sparse_mode = 0;
-      (void)tf_op.GetAttr("sparse_mode", sparse_mode);
-      (void)npu_fa_op.SetAttr("sparse_mode", sparse_mode);
-    
-      int32_t pse_type = 1;
-      (void)tf_op.GetAttr("pse_type", pse_type);
-      (void)npu_fa_op.SetAttr("pse_type", pse_type);
-    
-      int32_t seed = 0;
-      (void)tf_op.GetAttr("seed", seed);
-      (void)npu_fa_op.SetAttr("seed", seed);
-      int32_t offset = 0;
-      (void)tf_op.GetAttr("offset", offset);
-      (void)npu_fa_op.SetAttr("offset", offset);
-      int32_t out_dtype = 0;
-      (void)tf_op.GetAttr("out_dtype", out_dtype);
-      (void)npu_fa_op.SetAttr("out_dtype", out_dtype);  
-    
-      // 3. 创建输入Data
-      std::vector<Operator> inputs;
-      for (size_t i = 0UL; i < tf_op.GetInputsSize(); i++) {
-        const std::string data_name = "Data_" + std::to_string(i);
-        Operator data_op = OperatorFactory::CreateOperator(data_name.c_str(), "Data");
-        (void)data_op.SetAttr("index", static_cast<int32_t>(i));
-        inputs.emplace_back(data_op);
-      }
-    
-      size_t index = 0UL;
-      //4. 必选输入直接设置Data到算子输入
-      (void)npu_fa_op.SetInput("query", inputs[index++]);
-      (void)npu_fa_op.SetInput("key", inputs[index++]);
-      (void)npu_fa_op.SetInput("value", inputs[index++]);
-    
-      // 5. 可选输入需要判断type属性的个数是否为0，不为0则表示可选输入已经启用
-      std::vector<DataType> real_shift_type;
-      (void)tf_op.GetAttr("real_shift_type", real_shift_type);
-      if (!real_shift_type.empty()) {
-        (void)npu_fa_op.SetInput("real_shift", inputs[index++]);
-      }
-    
-      std::vector<DataType> drop_mask_type;
-      (void)tf_op.GetAttr("drop_mask_type", drop_mask_type);
-      if (!drop_mask_type.empty()) {
-        (void)npu_fa_op.SetInput("drop_mask", inputs[index++]);
-      }
-    
-      std::vector<DataType> padding_mask_type;
-      (void)tf_op.GetAttr("padding_mask_type", padding_mask_type);
-      if (!padding_mask_type.empty()) {
-        (void)npu_fa_op.SetInput("padding_mask", inputs[index++]);
-      }
-      std::vector<DataType> atten_mask_type;
-      (void)tf_op.GetAttr("atten_mask_type", atten_mask_type);
-      if (!atten_mask_type.empty()) {
-        (void)npu_fa_op.SetInput("atten_mask", inputs[index++]);
-      }
-      std::vector<DataType> prefix_type;
-      (void)tf_op.GetAttr("prefix_type", prefix_type);
-      if (!prefix_type.empty()) {
-        (void)npu_fa_op.SetInput("prefix", inputs[index++]);
-      }
-      std::vector<DataType> actual_seq_qlen_type;
-      (void)tf_op.GetAttr("actual_seq_qlen_type", actual_seq_qlen_type);
-      if (!actual_seq_qlen_type.empty()) {
-        (void)npu_fa_op.SetInput("actual_seq_qlen", inputs[index++]);
-      }
-      std::vector<DataType> actual_seq_kvlen_type;
-      (void)tf_op.GetAttr("actual_seq_kvlen_type", actual_seq_kvlen_type);
-      if (!actual_seq_kvlen_type.empty()) {
-        (void)npu_fa_op.SetInput("actual_seq_kvlen", inputs[index++]);
-      }
-    
-      std::vector<DataType> q_start_idx_type;
-      (void)tf_op.GetAttr("q_start_idx_type", q_start_idx_type);
-      if (!q_start_idx_type.empty()) {
-        (void)npu_fa_op.SetInput("q_start_idx", inputs[index++]);
-      }
-    
-      std::vector<DataType> kv_start_idx_type;
-      (void)tf_op.GetAttr("kv_start_idx_type", kv_start_idx_type);
-      if (!kv_start_idx_type.empty()) {
-        (void)npu_fa_op.SetInput("kv_start_idx", inputs[index++]);
-      }
-      std::vector<DataType> d_scale_q_type;
-      (void)tf_op.GetAttr("d_scale_q_type", d_scale_q_type);
-      if (!d_scale_q_type.empty()) {
-        (void)npu_fa_op.SetInput("d_scale_q", inputs[index++]);
-      }
-      std::vector<DataType> d_scale_k_type;
-      (void)tf_op.GetAttr("d_scale_k_type", d_scale_k_type);
-      if (!d_scale_k_type.empty()) {
-        (void)npu_fa_op.SetInput("d_scale_k", inputs[index++]);
-      }
-      std::vector<DataType> d_scale_v_type;
-      (void)tf_op.GetAttr("d_scale_v_type", d_scale_v_type);
-      if (!d_scale_v_type.empty()) {
-        (void)npu_fa_op.SetInput("d_scale_v", inputs[index++]);
-      }
-      std::vector<DataType> query_rope_type;
-      (void)tf_op.GetAttr("query_rope_type", query_rope_type);
-      if (!query_rope_type.empty()) {
-        (void)npu_fa_op.SetInput("queryRope", inputs[index++]);
-      }
-      
-      std::vector<DataType> key_rope_type;
-      (void)tf_op.GetAttr("key_rope_type", key_rope_type);
-      if (!key_rope_type.empty()) {
-        (void)npu_fa_op.SetInput("keyRope", inputs[index++]);
-      }  
-      // 6. 使用npu_fa_op算子的输出构造图的输出。
-      std::vector<std::pair<Operator, std::vector<size_t>>> output_indexs;
-      std::vector<size_t> node_output_index;
-      for (size_t i = 0UL; i < npu_fa_op.GetOutputsSize(); i++) {
-        node_output_index.emplace_back(i);
-      }
-      (void)output_indexs.emplace_back(std::make_pair(npu_fa_op, node_output_index));
-      (void)graph.SetInputs(inputs).SetOutputs(output_indexs);
-      return SUCCESS;
+
+    static Status AddOptionalPlaceholderForFA(const ge::Operator& tf_op, ge::Graph& graph)
+    {
+        // 1. 创建一个FlashAttentionScore算子npu_fa_op
+        ge::AscendString op_name;
+        tf_op.GetName(op_name);
+        auto npu_fa_op = OperatorFactory::CreateOperator(op_name.GetString(), "FlashAttentionScore");
+        // 2. 将TensorFlow算子属性映射到npu_fa_op算子上
+        float scale_value = 1.0;
+        (void)tf_op.GetAttr("scale_value", scale_value);
+        (void)npu_fa_op.SetAttr("scale_value", scale_value);
+
+        float keep_prob = 1.0;
+        (void)tf_op.GetAttr("keep_prob", keep_prob);
+        (void)npu_fa_op.SetAttr("keep_prob", keep_prob);
+
+        int32_t pre_tokens = 2147483647;
+        (void)tf_op.GetAttr("pre_tokens", pre_tokens);
+        (void)npu_fa_op.SetAttr("pre_tokens", pre_tokens);
+
+        int32_t next_tokens = 2147483647;
+        (void)tf_op.GetAttr("next_tokens", next_tokens);
+        (void)npu_fa_op.SetAttr("next_tokens", next_tokens);
+
+        int32_t head_num = 0;
+        (void)tf_op.GetAttr("head_num", head_num);
+        (void)npu_fa_op.SetAttr("head_num", head_num);
+
+        std::string input_layout;
+        (void)tf_op.GetAttr("input_layout", input_layout);
+        (void)npu_fa_op.SetAttr("input_layout", input_layout);
+
+        int32_t inner_precise = 0;
+        (void)tf_op.GetAttr("inner_precise", inner_precise);
+        (void)npu_fa_op.SetAttr("inner_precise", inner_precise);
+
+        int32_t sparse_mode = 0;
+        (void)tf_op.GetAttr("sparse_mode", sparse_mode);
+        (void)npu_fa_op.SetAttr("sparse_mode", sparse_mode);
+
+        int32_t pse_type = 1;
+        (void)tf_op.GetAttr("pse_type", pse_type);
+        (void)npu_fa_op.SetAttr("pse_type", pse_type);
+
+        int32_t seed = 0;
+        (void)tf_op.GetAttr("seed", seed);
+        (void)npu_fa_op.SetAttr("seed", seed);
+        int32_t offset = 0;
+        (void)tf_op.GetAttr("offset", offset);
+        (void)npu_fa_op.SetAttr("offset", offset);
+        int32_t out_dtype = 0;
+        (void)tf_op.GetAttr("out_dtype", out_dtype);
+        (void)npu_fa_op.SetAttr("out_dtype", out_dtype);
+
+        // 3. 创建输入Data
+        std::vector<Operator> inputs;
+        for (size_t i = 0UL; i < tf_op.GetInputsSize(); i++) {
+            const std::string data_name = "Data_" + std::to_string(i);
+            Operator data_op = OperatorFactory::CreateOperator(data_name.c_str(), "Data");
+            (void)data_op.SetAttr("index", static_cast<int32_t>(i));
+            inputs.emplace_back(data_op);
+        }
+
+        size_t index = 0UL;
+        // 4. 必选输入直接设置Data到算子输入
+        (void)npu_fa_op.SetInput("query", inputs[index++]);
+        (void)npu_fa_op.SetInput("key", inputs[index++]);
+        (void)npu_fa_op.SetInput("value", inputs[index++]);
+
+        // 5. 可选输入需要判断type属性的个数是否为0，不为0则表示可选输入已经启用
+        std::vector<DataType> real_shift_type;
+        (void)tf_op.GetAttr("real_shift_type", real_shift_type);
+        if (!real_shift_type.empty()) {
+            (void)npu_fa_op.SetInput("real_shift", inputs[index++]);
+        }
+
+        std::vector<DataType> drop_mask_type;
+        (void)tf_op.GetAttr("drop_mask_type", drop_mask_type);
+        if (!drop_mask_type.empty()) {
+            (void)npu_fa_op.SetInput("drop_mask", inputs[index++]);
+        }
+
+        std::vector<DataType> padding_mask_type;
+        (void)tf_op.GetAttr("padding_mask_type", padding_mask_type);
+        if (!padding_mask_type.empty()) {
+            (void)npu_fa_op.SetInput("padding_mask", inputs[index++]);
+        }
+        std::vector<DataType> atten_mask_type;
+        (void)tf_op.GetAttr("atten_mask_type", atten_mask_type);
+        if (!atten_mask_type.empty()) {
+            (void)npu_fa_op.SetInput("atten_mask", inputs[index++]);
+        }
+        std::vector<DataType> prefix_type;
+        (void)tf_op.GetAttr("prefix_type", prefix_type);
+        if (!prefix_type.empty()) {
+            (void)npu_fa_op.SetInput("prefix", inputs[index++]);
+        }
+        std::vector<DataType> actual_seq_qlen_type;
+        (void)tf_op.GetAttr("actual_seq_qlen_type", actual_seq_qlen_type);
+        if (!actual_seq_qlen_type.empty()) {
+            (void)npu_fa_op.SetInput("actual_seq_qlen", inputs[index++]);
+        }
+        std::vector<DataType> actual_seq_kvlen_type;
+        (void)tf_op.GetAttr("actual_seq_kvlen_type", actual_seq_kvlen_type);
+        if (!actual_seq_kvlen_type.empty()) {
+            (void)npu_fa_op.SetInput("actual_seq_kvlen", inputs[index++]);
+        }
+
+        std::vector<DataType> q_start_idx_type;
+        (void)tf_op.GetAttr("q_start_idx_type", q_start_idx_type);
+        if (!q_start_idx_type.empty()) {
+            (void)npu_fa_op.SetInput("q_start_idx", inputs[index++]);
+        }
+
+        std::vector<DataType> kv_start_idx_type;
+        (void)tf_op.GetAttr("kv_start_idx_type", kv_start_idx_type);
+        if (!kv_start_idx_type.empty()) {
+            (void)npu_fa_op.SetInput("kv_start_idx", inputs[index++]);
+        }
+        std::vector<DataType> d_scale_q_type;
+        (void)tf_op.GetAttr("d_scale_q_type", d_scale_q_type);
+        if (!d_scale_q_type.empty()) {
+            (void)npu_fa_op.SetInput("d_scale_q", inputs[index++]);
+        }
+        std::vector<DataType> d_scale_k_type;
+        (void)tf_op.GetAttr("d_scale_k_type", d_scale_k_type);
+        if (!d_scale_k_type.empty()) {
+            (void)npu_fa_op.SetInput("d_scale_k", inputs[index++]);
+        }
+        std::vector<DataType> d_scale_v_type;
+        (void)tf_op.GetAttr("d_scale_v_type", d_scale_v_type);
+        if (!d_scale_v_type.empty()) {
+            (void)npu_fa_op.SetInput("d_scale_v", inputs[index++]);
+        }
+        std::vector<DataType> query_rope_type;
+        (void)tf_op.GetAttr("query_rope_type", query_rope_type);
+        if (!query_rope_type.empty()) {
+            (void)npu_fa_op.SetInput("queryRope", inputs[index++]);
+        }
+
+        std::vector<DataType> key_rope_type;
+        (void)tf_op.GetAttr("key_rope_type", key_rope_type);
+        if (!key_rope_type.empty()) {
+            (void)npu_fa_op.SetInput("keyRope", inputs[index++]);
+        }
+        // 6. 使用npu_fa_op算子的输出构造图的输出。
+        std::vector<std::pair<Operator, std::vector<size_t>>> output_indexs;
+        std::vector<size_t> node_output_index;
+        for (size_t i = 0UL; i < npu_fa_op.GetOutputsSize(); i++) {
+            node_output_index.emplace_back(i);
+        }
+        (void)output_indexs.emplace_back(std::make_pair(npu_fa_op, node_output_index));
+        (void)graph.SetInputs(inputs).SetOutputs(output_indexs);
+        return SUCCESS;
     }
-    
-    static Status FlashAttentionScoreMapping(const ge::Operator& op_src, ge::Operator& op_dst) {
-      // 1. 调用默认映射函数即可
-      if (AutoMappingByOpFn(op_src, op_dst) != ge::GRAPH_SUCCESS) {
-        return FAILED;
-      }
-      // 2. 需要将TensorFlow算子名称设置到op_dst的original_type属性中，用于后续ParseOpToGraphFn回调函数的触发
-      op_dst.SetAttr("original_type", "FlashAttentionScore");
-      return SUCCESS;
+
+    static Status FlashAttentionScoreMapping(const ge::Operator& op_src, ge::Operator& op_dst)
+    {
+        // 1. 调用默认映射函数即可
+        if (AutoMappingByOpFn(op_src, op_dst) != ge::GRAPH_SUCCESS) {
+            return FAILED;
+        }
+        // 2. 需要将TensorFlow算子名称设置到op_dst的original_type属性中，用于后续ParseOpToGraphFn回调函数的触发
+        op_dst.SetAttr("original_type", "FlashAttentionScore");
+        return SUCCESS;
     }
-    
+
     REGISTER_CUSTOM_OP("FlashAttentionScore")
         .FrameworkType(TENSORFLOW)
         .OriginOpType({"FlashAttentionScore"})
         .ParseParamsByOperatorFn(FlashAttentionScoreMapping) // 注册此函数用于实现算子本身属性的映射
         .ParseOpToGraphFn(AddOptionalPlaceholderForFA); // 注册此函数用于实现将tf中的输入转化为可选输入，改变连边关系
-    }  // namespace domi
+    } // namespace domi
     ```
 
 2.  在TensorFlow开源框架里注册FlashAttentionScore算子的原型定义，由于TensorFlow不支持可选输入，需要将其可选输入在TensorFlow原型中表示为动态输入，并通过属性来标记动态输入的个数，**这些可选输入需要放置在原型定义的最后**。示例代码（FlashAttentionScore.cc）如下：
 
-    ```
+    ```cpp
     #include <algorithm>
     #include <atomic>
-    #include <map> 
+    #include <map>
     #include "tensorflow/core/framework/common_shape_fns.h"
     #include "tensorflow/core/framework/op.h"
-    #include "tensorflow/core/framework/op_kernel.h" 
+    #include "tensorflow/core/framework/op_kernel.h"
     using namespace tensorflow;
     using shape_inference::InferenceContext;
-    using shape_inference::ShapeHandle; 
+    using shape_inference::ShapeHandle;
     using namespace std;
-    using namespace chrono; 
+    using namespace chrono;
     using OpKernelConstructionPtr = OpKernelConstruction*;
     using OpKernelContextPtr = OpKernelContext*;
-    using InferenceContextPtr = ::tensorflow::shape_inference::InferenceContext*; 
+    using InferenceContextPtr = ::tensorflow::shape_inference::InferenceContext*;
     namespace {
     class CustOps : public OpKernel {
-    public:    
-         explicit CustOps(OpKernelConstructionPtr context) : OpKernel(context) {}
-         void Compute(OpKernelContextPtr context) override
-        {
-            std::cout << "Cust Ops not installed!!" << std::endl;
-        }
-         ~CustOps() override = default;};
-    }  // namespace 
+    public:
+        explicit CustOps(OpKernelConstructionPtr context) : OpKernel(context) {}
+        void Compute(OpKernelContextPtr context) override { std::cout << "Cust Ops not installed!!" << std::endl; }
+        ~CustOps() override = default;
+    };
+    } // namespace
     namespace tensorflow {
     REGISTER_OP("FlashAttentionScore")
         .Input("query: T")
         .Input("key: T")
         .Input("value: T")
-        .Input("real_shift: real_shift_type")  // 可选输入在TensorFlow原型中注册为动态输入
+        .Input("real_shift: real_shift_type") // 可选输入在TensorFlow原型中注册为动态输入
         .Input("drop_mask: drop_mask_type")
         .Input("padding_mask: padding_mask_type")
         .Input("atten_mask: atten_mask_type")
@@ -582,7 +588,7 @@ TensorFlow的原型定义中不支持可选输入，对于包含可选输入的�
         .Attr("pse_type: int = 1")
         .Attr("seed: int = 0")
         .Attr("offset: int = 0")
-        .Attr("out_dtype: int = 0") 
+        .Attr("out_dtype: int = 0")
         .Attr("T: {float16, float32, bfloat16} = DT_FLOAT")
         .Attr("real_shift_type: list({float16, float32, bfloat16}) >= 0") // 通过属性来标记动态输入个数
         .Attr("drop_mask_type: list({uint8}) >= 0")
@@ -598,15 +604,14 @@ TensorFlow的原型定义中不支持可选输入，对于包含可选输入的�
         .Attr("d_scale_v_type: list({float32}) >= 0")
         .Attr("query_rope_type: list({float32}) >= 0")
         .Attr("key_rope_type: list({float32}) >= 0")
-        .SetShapeFn([](InferenceContext *c) {
-          return Status::OK();
-        });
-    REGISTER_KERNEL_BUILDER(Name("FlashAttentionScore").Device(DEVICE_CPU), CustOps)}
+        .SetShapeFn([](InferenceContext* c) { return Status::OK(); });
+    REGISTER_KERNEL_BUILDER(Name("FlashAttentionScore").Device(DEVICE_CPU), CustOps)
+    } // namespace tensorflow
     ```
 
     使用如下命令对上述代码进行编译，产物为libcustom\_ops.so，后续的算子调用脚本中可通过load\_op\_library接口加载该so为python模块，从而调用自定义算子。
 
-    ```
+    ```text
     TF_CFLAGS=( $(python3 -c 'import tensorflow as tf; print(" ".join(tf.sysconfig.get_compile_flags()))') )     // 获取TensorFlow编译选项
     TF_LFLAGS=( $(python3 -c 'import tensorflow as tf; print(" ".join(tf.sysconfig.get_link_flags()))') )        // 获取TensorFlow链接选项
     SOURCE_FILES=FlashAttentionScore.cc                                                                          // 包含TensorFlow算子注册和CPU内核实现的cc文件
@@ -615,7 +620,7 @@ TensorFlow的原型定义中不支持可选输入，对于包含可选输入的�
 
 3.  <a name="li17250141634510"></a>封装一个TensorFlow的算子调用接口，在此接口中处理可选输入。在该脚本需要加载上一步骤编译好的动态库。
 
-    ```
+    ```text
     from tensorflow.python.framework import ops
     import tensorflow as tf
     tfOpLib = tf.load_op_library("../build/tf_ops/libflashattention.so")
@@ -649,7 +654,7 @@ TensorFlow的原型定义中不支持可选输入，对于包含可选输入的�
 
 4.  测试脚本中实现自定义算子的调用。假设[上一步骤](#li17250141634510)中代码文件保存为ops.py，从ops中导入npu\_flash\_attention函数并使用。TensorFlow 2.6.5调用代码如下：
 
-    ```
+    ```python
     import sys
     from ops import npu_flash_attention
     
@@ -696,47 +701,44 @@ TensorFlow的原型定义中不支持可选输入，对于包含可选输入的�
 
 以ParseSingleExample算子为例，插件适配代码如下：
 
-```
+```cpp
 #include "register/register.h"
 namespace domi {
-Status ParseSingleExampleMapping(const ge::Operator& op_src, ge::Operator& op) {
-  std::vector<DynamicInputOutputInfo> value;
-  const std::string dynamic_input_name_dense_defaults = "dense_defaults";
-  const std::string dynamic_input_attr_name_dense_defaults = "Tdense";
-  DynamicInputOutputInfo input(kInput, dynamic_input_name_dense_defaults.c_str(),
-      dynamic_input_name_dense_defaults.size(), dynamic_input_attr_name_dense_defaults.c_str(),
-      dynamic_input_attr_name_dense_defaults.size());
-  value.push_back(input);
-  const std::string dynamic_output_name_sparse_indices = "sparse_indices";
-  const std::string dynamic_output_attr_name_sparse_indices = "num_sparse";
-  DynamicInputOutputInfo output(kOutput, 
-      dynamic_output_name_sparse_indices.c_str(),
-      dynamic_output_name_sparse_indices.size(), dynamic_output_attr_name_sparse_indices.c_str(),
-      dynamic_output_attr_name_sparse_indices.size());
-  value.push_back(output);
-  const std::string dynamic_output_name_sparse_values = "sparse_values";
-  const std::string dynamic_output_attr_name_sparse_values = "sparse_types";
-  DynamicInputOutputInfo output1(kOutput, 
-      dynamic_output_name_sparse_values.c_str(),
-      dynamic_output_name_sparse_values.size(), dynamic_output_attr_name_sparse_values.c_str(),
-      dynamic_output_attr_name_sparse_values.size());
-  value.push_back(output1);
-  const std::string dynamic_output_name_sparse_shapes = "sparse_shapes";
-  const std::string dynamic_output_attr_name_sparse_shapes = "sparse_types";
-  DynamicInputOutputInfo output2(kOutput, 
-      dynamic_output_name_sparse_shapes.c_str(),
-      dynamic_output_name_sparse_shapes.size(), dynamic_output_attr_name_sparse_shapes.c_str(),
-      dynamic_output_attr_name_sparse_shapes.size());
-  value.push_back(output2);
-  const std::string dynamic_output_name_dense_values = "dense_values";
-  const std::string dynamic_output_attr_name_dense_values = "Tdense";
-  DynamicInputOutputInfo output3(kOutput, 
-      dynamic_output_name_dense_values.c_str(),
-      dynamic_output_name_dense_values.size(), dynamic_output_attr_name_dense_values.c_str(),
-      dynamic_output_attr_name_dense_values.size());
-  value.push_back(output3);
-  AutoMappingByOpFnDynamic(op_src, op, value);
-  return SUCCESS;
+Status ParseSingleExampleMapping(const ge::Operator& op_src, ge::Operator& op)
+{
+    std::vector<DynamicInputOutputInfo> value;
+    const std::string dynamic_input_name_dense_defaults = "dense_defaults";
+    const std::string dynamic_input_attr_name_dense_defaults = "Tdense";
+    DynamicInputOutputInfo input(
+        kInput, dynamic_input_name_dense_defaults.c_str(), dynamic_input_name_dense_defaults.size(),
+        dynamic_input_attr_name_dense_defaults.c_str(), dynamic_input_attr_name_dense_defaults.size());
+    value.push_back(input);
+    const std::string dynamic_output_name_sparse_indices = "sparse_indices";
+    const std::string dynamic_output_attr_name_sparse_indices = "num_sparse";
+    DynamicInputOutputInfo output(
+        kOutput, dynamic_output_name_sparse_indices.c_str(), dynamic_output_name_sparse_indices.size(),
+        dynamic_output_attr_name_sparse_indices.c_str(), dynamic_output_attr_name_sparse_indices.size());
+    value.push_back(output);
+    const std::string dynamic_output_name_sparse_values = "sparse_values";
+    const std::string dynamic_output_attr_name_sparse_values = "sparse_types";
+    DynamicInputOutputInfo output1(
+        kOutput, dynamic_output_name_sparse_values.c_str(), dynamic_output_name_sparse_values.size(),
+        dynamic_output_attr_name_sparse_values.c_str(), dynamic_output_attr_name_sparse_values.size());
+    value.push_back(output1);
+    const std::string dynamic_output_name_sparse_shapes = "sparse_shapes";
+    const std::string dynamic_output_attr_name_sparse_shapes = "sparse_types";
+    DynamicInputOutputInfo output2(
+        kOutput, dynamic_output_name_sparse_shapes.c_str(), dynamic_output_name_sparse_shapes.size(),
+        dynamic_output_attr_name_sparse_shapes.c_str(), dynamic_output_attr_name_sparse_shapes.size());
+    value.push_back(output2);
+    const std::string dynamic_output_name_dense_values = "dense_values";
+    const std::string dynamic_output_attr_name_dense_values = "Tdense";
+    DynamicInputOutputInfo output3(
+        kOutput, dynamic_output_name_dense_values.c_str(), dynamic_output_name_dense_values.size(),
+        dynamic_output_attr_name_dense_values.c_str(), dynamic_output_attr_name_dense_values.size());
+    value.push_back(output3);
+    AutoMappingByOpFnDynamic(op_src, op, value);
+    return SUCCESS;
 }
 
 // register ParseSingleExample op to GE
@@ -744,7 +746,7 @@ REGISTER_CUSTOM_OP("ParseSingleExample")
     .FrameworkType(TENSORFLOW)
     .OriginOpType("ParseSingleExample")
     .ParseParamsByOperatorFn(ParseSingleExampleMapping)
-    }
+} // namespace domi
 ```
 
 >[!NOTE]说明 

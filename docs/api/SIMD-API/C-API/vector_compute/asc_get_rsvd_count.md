@@ -14,7 +14,7 @@
 ## 函数原型
 
 ```cpp
-  __aicore__ inline int64_t asc_get_rsvd_count()
+__aicore__ inline int64_t asc_get_rsvd_count()
 ```
 
 ## 参数说明
@@ -45,5 +45,5 @@ __ubuf__ float dst[total_length];
 asc_reduce(dst, src0, src1, total_length);
 asc_sync_notify(PIPE_V, PIPE_S, 0); // 设置等待和同步信号
 asc_sync_wait(PIPE_V, PIPE_S, 0);
-int64_t result = asc_get_rsvd_count();  // 获取结果
+int64_t result = asc_get_rsvd_count(); // 获取结果
 ```

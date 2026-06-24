@@ -54,7 +54,7 @@
 ## 函数原型<a name="zh-cn_topic_0000002078447573_zh-cn_topic_0000001576806829_zh-cn_topic_0000001339187720_section13230182415108"></a>
 
 ```cpp
-__aicore__ inline constexpr decltype(auto) GetShape() {}   
+__aicore__ inline constexpr decltype(auto) GetShape() {}
 __aicore__ inline constexpr decltype(auto) GetShape() const {}
 ```
 
@@ -79,13 +79,13 @@ using Shape = Std::tuple<Shapes...>;
 
 ```cpp
 // 初始化Layout数据结构，获取对应数值
-AscendC::Shape<int,int,int> shape = AscendC::MakeShape(10, 20, 30);
-AscendC::Stride<int,int,int> stride = AscendC::MakeStride(1, 100, 200);
+AscendC::Shape<int, int, int> shape = AscendC::MakeShape(10, 20, 30);
+AscendC::Stride<int, int, int> stride = AscendC::MakeStride(1, 100, 200);
 
 auto layoutMake = AscendC::MakeLayout(shape, stride);
 AscendC::Layout<AscendC::Shape<int, int, int>, AscendC::Stride<int, int, int>> layoutInit(shape, stride);
 
 int value = AscendC::Std::get<0>(layoutMake.GetShape()); // value = 10
-value = AscendC::Std::get<1>(layoutMake.GetShape()); // value = 20
-value = AscendC::Std::get<2>(layoutMake.GetShape()); // value = 30
+value = AscendC::Std::get<1>(layoutMake.GetShape());     // value = 20
+value = AscendC::Std::get<2>(layoutMake.GetShape());     // value = 30
 ```

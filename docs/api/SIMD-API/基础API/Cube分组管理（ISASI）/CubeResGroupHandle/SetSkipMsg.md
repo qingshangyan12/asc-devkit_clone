@@ -56,8 +56,8 @@ AIC跳过指定个数假消息的处理，仅在回调函数中调用。下图�
 
 ## 函数原型<a name="section765814724715"></a>
 
-```
- __aicore__ inline void SetSkipMsg(uint8_t skipCnt)
+```cpp
+__aicore__ inline void SetSkipMsg(uint8_t skipCnt)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001526206862_section129451113125413"></a>
@@ -93,16 +93,18 @@ AIC跳过指定个数假消息的处理，仅在回调函数中调用。下图�
 
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 
-```
- __aicore__ inline static void Call(
-    MatmulApiCfg &mm, __gm__ CubeMsgBody *rcvMsg, CubeResGroupHandle<CubeMsgBody> &handle)
+```cpp
+__aicore__ inline static void Call(
+    MatmulApiCfg& mm, __gm__ CubeMsgBody* rcvMsg, CubeResGroupHandle<CubeMsgBody>& handle)
 {
     //  AIC上计算逻辑，用户自行实现
-    auto skipNum = 3;//(rcvMsg->head).skipCnt，假消息个数可由用户在回调计算结构体中定义，也可以通过自定义消息结构体传递。
-    auto tmpId = handle.FreeMessage(rcvMsg, AscendC::CubeMsgState::VALID);    // 当前消息处理完，调用FreeMessage，代表rcvMsg已处理完
-    for (int i = 1; i < skipNum + 1; i++) {  
-         // 由于后续发了三个假消息，也需要调用FreeMessage，代表假消息处理完毕。                              
-         auto tmpId = handle.FreeMessage(rcvMsg + i, AscendC::CubeMsgState::FAKE);
+    auto skipNum =
+        3; //(rcvMsg->head).skipCnt，假消息个数可由用户在回调计算结构体中定义，也可以通过自定义消息结构体传递。
+    auto tmpId =
+        handle.FreeMessage(rcvMsg, AscendC::CubeMsgState::VALID); // 当前消息处理完，调用FreeMessage，代表rcvMsg已处理完
+    for (int i = 1; i < skipNum + 1; i++) {
+        // 由于后续发了三个假消息，也需要调用FreeMessage，代表假消息处理完毕。
+        auto tmpId = handle.FreeMessage(rcvMsg + i, AscendC::CubeMsgState::FAKE);
     }
     // 当假消息存在，需要调用SetSkipMsg，通知Cube核不去处理后面三个假消息。
     handle.SetSkipMsg(skipNum);

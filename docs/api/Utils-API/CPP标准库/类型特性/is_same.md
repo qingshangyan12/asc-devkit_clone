@@ -16,7 +16,7 @@ is\_same是定义在<type\_traits\>头文件里的一个类型特征工具，它
 
 ## 函数原型
 
-```
+```cpp
 template <typename Tp, typename Up>
 struct is_same;
 ```
@@ -43,7 +43,7 @@ is\_same的静态常量成员value用于获取返回的布尔值，is\_same<Tp, 
 
 ## 调用示例
 
-```
+```cpp
 // 定义两个不同的类
 class ClassA {};
 class ClassB {};
@@ -69,13 +69,17 @@ AscendC::PRINTF("Is ClassA the same as ClassB? %d\n", AscendC::Std::is_same<Clas
 AscendC::PRINTF("Is ClassC the same as ClassC_alias? %d\n", AscendC::Std::is_same<ClassC, ClassC_alias>::value);
 
 // 比较相同模板实例化类型
-AscendC::PRINTF("Is TemplateClass<int> the same as TemplateClass<int>? %d\n", AscendC::Std::is_same<TemplateClass<int>, TemplateClass<int>>::value);
+AscendC::PRINTF(
+    "Is TemplateClass<int> the same as TemplateClass<int>? %d\n",
+    AscendC::Std::is_same<TemplateClass<int>, TemplateClass<int>>::value);
 
 // 比较不同模板实例化类型
-AscendC::PRINTF("Is TemplateClass<int> the same as TemplateClass<double>? %d\n", AscendC::Std::is_same<TemplateClass<int>, TemplateClass<double>>::value);
+AscendC::PRINTF(
+    "Is TemplateClass<int> the same as TemplateClass<double>? %d\n",
+    AscendC::Std::is_same<TemplateClass<int>, TemplateClass<double>>::value);
 ```
 
-```
+```text
 // 执行结果：
 Is int the same as int? 1
 Is int the same as double? 0

@@ -37,14 +37,12 @@ Scalar单元访问UB数据时，该接口需配合[asc_set_ctrl()](../sys_var/as
    // 刷新传入地址所在的单个Cache Line
    __aicore__ inline void asc_dcci_single(__gm__ void* dst)
 
-   // 刷新传入的UB地址空间地址所在的单个Cache Line
-   __aicore__ inline void asc_ub_dcci_single(__ubuf__ void* dst)
+       // 刷新传入的UB地址空间地址所在的单个Cache Line
+       __aicore__ inline void asc_ub_dcci_single(__ubuf__ void* dst)
 
-   // 刷新所有Cache Line
-   __aicore__ inline void asc_dcci_entire_all()
-   __aicore__ inline void asc_dcci_entire_ub()
-   __aicore__ inline void asc_dcci_entire_out()
-   __aicore__ inline void asc_dcci_entire_atomic()
+       // 刷新所有Cache Line
+       __aicore__ inline void asc_dcci_entire_all() __aicore__ inline void asc_dcci_entire_ub() __aicore__
+       inline void asc_dcci_entire_out() __aicore__ inline void asc_dcci_entire_atomic()
    ```
 
 ## 参数说明
@@ -72,8 +70,8 @@ PIPE_S
 // total_length指参与计算的数据长度
 constexpr uint64_t total_length = 32;
 __gm__ int16_t src[total_length];
-for( int i = 0; i < total_length; i++) {
-   src[i] = i;
+for (int i = 0; i < total_length; i++) {
+    src[i] = i;
 }
 // 由于首地址64B对齐，调用asc_dcci指令后，会立刻刷新前32个数
 asc_dcci_single(reinterpret_cast<__gm__ uint64_t*>(src));

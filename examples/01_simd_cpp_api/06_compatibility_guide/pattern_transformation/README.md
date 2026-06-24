@@ -74,10 +74,8 @@ GM到L1的搬运过程，**无需兼容性适配**，使用DataCopy接口将GM�
 ```cpp
 __aicore__ inline void CopyIn(AscendC::LocalTensor<T> a1Local, AscendC::LocalTensor<U> b1Local)
 {
-    ...
-    AscendC::DataCopy(a1Local, aGM, nd2nzA1Params);
-    ...
-    AscendC::DataCopy(b1Local, bGM, nd2nzB1Params);
+    ... AscendC::DataCopy(a1Local, aGM, nd2nzA1Params);
+    ... AscendC::DataCopy(b1Local, bGM, nd2nzB1Params);
 }
 ```
 
@@ -92,8 +90,8 @@ Atlas A2/A3 系列产品中 L0A 数据排布为 Zz 分形，Ascend 950PR/Ascend 
 在 Atlas A2/A3 系列产品中，L1->L0A 需要由 Nz 分形转换成 Zz 分形，通过 Load2D 接口实现，相关代码如下：
 
 ```cpp
-...
-for (uint32_t i = 0; i < mBlocks; ++i) {
+... for (uint32_t i = 0; i < mBlocks; ++i)
+{
     constexpr uint32_t mBlocks = M / CUBE_BLOCK;
     constexpr uint32_t kBlocks = K * sizeof(T) / C0_SIZE;
     int srcOffset = 0;
@@ -146,17 +144,15 @@ $$
 
 ```cpp
 // 搬运上半部分 Nz 分形
-...
-for (uint32_t i = 0; i < kBlocks; ++i) {
-    ...
-    AscendC::LoadData(a2[dstOffset], a1[srcOffset], loadDataParams);
+... for (uint32_t i = 0; i < kBlocks; ++i)
+{
+    ... AscendC::LoadData(a2[dstOffset], a1[srcOffset], loadDataParams);
     ...
 }
 // 搬运下半部分 Nz 分形
-srcOffset = CUBE_BLOCK * CUBE_BLOCK * mBlocks / 2;  // 从下半开始
+srcOffset = CUBE_BLOCK * CUBE_BLOCK * mBlocks / 2; // 从下半开始
 for (uint32_t i = 0; i < kBlocks; ++i) {
-    ...
-    AscendC::LoadData(a2[dstOffset], a1[srcOffset], loadDataParams);
+    ... AscendC::LoadData(a2[dstOffset], a1[srcOffset], loadDataParams);
     ...
 }
 ```
@@ -167,10 +163,7 @@ for (uint32_t i = 0; i < kBlocks; ++i) {
 L1 到 L0B 的搬运，所有产品均使用 Load2D 完成 Nz 格式搬运，**无需兼容性适配**，相关代码如下：
 
 ```cpp
-...
-for (uint32_t i = 0; i < kBlocks; ++i) {
-    AscendC::LoadData(b2[i * dstStride], b1[i * srcStride], loadDataParams);
-}
+... for (uint32_t i = 0; i < kBlocks; ++i) { AscendC::LoadData(b2[i * dstStride], b1[i * srcStride], loadDataParams); }
 ```
 
 ### Compute
@@ -190,13 +183,14 @@ AscendC::Mmad(co1Local, a2, b2, mmadParams);
 - `SCENARIO_NUM=2`（L0A 复用）：将 A 矩阵按 M 轴拆分为上下两半，分别计算 C1=A1×B 和 C2=A2×B。
 
 ```cpp
-mmadParams.m = M / 2;  // M 轴拆分为上下两半，每次计算半个 M
+mmadParams.m = M / 2; // M 轴拆分为上下两半，每次计算半个 M
 mmadParams.n = N;
 mmadParams.k = K;
 mmadParams.cmatrixInitVal = true;
 mmadParams.isBias = false;
 AscendC::Mmad(co1Local, a2, b2, mmadParams);
-AscendC::Mmad(co1Local[M * N / 2], a2[M * K / 2], b2, mmadParams);  // 下半部分 A2[32, 64]
+AscendC::Mmad(co1Local[M * N / 2], a2[M * K / 2], b2,
+              mmadParams); // 下半部分 A2[32, 64]
 ```
 
 ### L0C->GM

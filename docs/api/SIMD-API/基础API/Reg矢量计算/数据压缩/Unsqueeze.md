@@ -51,10 +51,10 @@
 
 将dstReg中数据根据mask进行解压缩。解压缩方式：dstReg中第0个元素置为0，dstReg中的第i个元素等于mask中从第0个到第\(i-1\)个元素中1的数量。mask最高位被忽略不参与统计。以uint8\_t类型为例，算法逻辑表示如下：
 
-```
+```cpp
 dstReg[0] = 0;
-for(int i = 1; i < AscendC::GetVecLen() / sizeof(uint8_t); i++){
-dstReg[i] = mask[i - 1] ? (dstReg[i - 1] + 1) : dstReg[i - 1];
+for (int i = 1; i < AscendC::GetVecLen() / sizeof(uint8_t); i++) {
+    dstReg[i] = mask[i - 1] ? (dstReg[i - 1] + 1) : dstReg[i - 1];
 }
 ```
 
@@ -62,7 +62,7 @@ dstReg[i] = mask[i - 1] ? (dstReg[i - 1] + 1) : dstReg[i - 1];
 
 ## 定义原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T = DefaultType, typename U>
 __simd_callee__ inline void Unsqueeze(U& dstReg, MaskReg& mask)
 ```
@@ -128,8 +128,8 @@ __simd_callee__ inline void Unsqueeze(U& dstReg, MaskReg& mask)
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
-template<typename T>
+```cpp
+template <typename T>
 __simd_vf__ inline void UnsqueezeVF(__ubuf__ T* dstAddr, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> dstReg;

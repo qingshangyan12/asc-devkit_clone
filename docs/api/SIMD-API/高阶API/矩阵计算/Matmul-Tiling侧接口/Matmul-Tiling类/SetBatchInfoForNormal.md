@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 int32_t SetBatchInfoForNormal(int32_t batchA, int32_t batchB, int32_t m, int32_t n, int32_t k)
 ```
 
@@ -32,7 +32,7 @@ Layout类型为NORMAL的场景，调用[IterateBatch](../../Matmul-Kernel侧接�
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MultiCoreMatmulTiling tiling(ascendcPlatform);
 int32_t M = 32;

@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename Tp>
 struct add_cv;
 ```
@@ -39,7 +39,7 @@ add\_cv是一个结构体，其提供一个嵌套类型type，表示添加const�
 
 ## 调用示例
 
-```
+```cpp
 // Test non-const and non-volatile type
 ascendc_assert((AscendC::Std::is_same_v<AscendC::Std::add_cv<int>::type, const volatile int>));
 ascendc_assert((AscendC::Std::is_same_v<AscendC::Std::add_cv<double>::type, const volatile double>));

@@ -14,7 +14,7 @@ This example uses `AddCustom` to demonstrate how to compile, package, and link a
 
 ## Directory Structure
 
-```
+```text
 ├── custom_op_static_lib
 │   ├── CMakeLists.txt            // Top-level build project file
 │   ├── app                       // Links the static library and executes the operator

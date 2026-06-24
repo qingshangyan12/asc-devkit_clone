@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetGradOutput(const AscendC::GlobalTensor<SrcT>& gradOutput)
 ```
 
@@ -50,7 +50,7 @@ __aicore__ inline void SetGradOutput(const AscendC::GlobalTensor<SrcT>& gradOutp
 
 ## 调用示例
 
-```
+```cpp
 ConvBackpropApi::Conv3DBackpropInput<weightDxType, inputSizeDxType, gradOutputDxType, gradInputDxType> gradInput_;
 // 设置GradOutput中GlobalTensor的地址
 GlobalTensor<gradOutputType> gradOutputGm_;

@@ -16,7 +16,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── group_barrier
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── group_barrier.asc       // Ascend C样例实现 & 调用样例

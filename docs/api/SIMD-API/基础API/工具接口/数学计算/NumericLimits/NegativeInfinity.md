@@ -66,5 +66,5 @@
 - 矢量接口：
 
     ```cpp
-    AscendC::NumericLimits<float>::NegativeInfinity(dstLocal, 256);// 返回256个float类型的负无穷大值
+    AscendC::NumericLimits<float>::NegativeInfinity(dstLocal, 256); // 返回256个float类型的负无穷大值
     ```

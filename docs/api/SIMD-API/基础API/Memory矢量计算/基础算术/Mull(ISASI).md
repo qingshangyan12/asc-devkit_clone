@@ -34,9 +34,11 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T>
-__aicore__ inline void Mull(const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const uint32_t count)
+__aicore__ inline void Mull(
+    const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    const uint32_t count)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -111,13 +113,13 @@ __aicore__ inline void Mull(const LocalTensor<T>& dst0, const LocalTensor<T>& ds
 
 更多样例可参考[LINK](更多样例-9.md)。
 
-```
+```cpp
 AscendC::Mull(dst0Local, dst1Local, src0Local, src1Local, 512);
 ```
 
 结果示例如下：
 
-```
+```text
 输入数据src0Local：[-2039520159    95829766 -1522913829 ... ]
 输入数据src1Local：[-1791575569  -291976917 -1973597151 ... ]
 输出数据dst0Local：[-1560359025   212356098  1219226939 ... ]

@@ -6,8 +6,10 @@
 
 ## 函数原型
 
-```
-inline void GetSwishTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+```cpp
+inline void GetSwishTmpSize(
+    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -32,7 +34,7 @@ inline void GetSwishTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, 
 
 ## 调用示例
 
-```
+```cpp
 // 输入shape信息为1024;算子输入的数据类型为half;不允许修改源操作数
 std::vector<int64_t> shape_vec = {1024};
 ge::Shape shape(shape_vec);

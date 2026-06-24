@@ -25,7 +25,9 @@
 
     ```cpp
     template <typename T>
-    __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const Nd2NzParams& nd2nzParams)
+    __aicore__ inline void DataCopyPad(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams,
+        const Nd2NzParams& nd2nzParams)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

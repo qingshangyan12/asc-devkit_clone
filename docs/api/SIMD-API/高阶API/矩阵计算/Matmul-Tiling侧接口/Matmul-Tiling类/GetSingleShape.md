@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 int32_t GetSingleShape(int32_t& shapeM, int32_t& shapeN, int32_t& shapeK)
 ```
 
@@ -30,7 +30,7 @@ int32_t GetSingleShape(int32_t& shapeM, int32_t& shapeN, int32_t& shapeK)
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MultiCoreMatmulTiling tiling(ascendcPlatform);
 tiling.SetDim(1);

@@ -14,7 +14,7 @@ This example uses the Arange high-level API to implement arithmetic sequence gen
 
 ## Directory Structure
 
-```
+```text
 ├── arange
 │   ├── scripts
 │   │   └── gen_data.py         // Script for generating input data and ground truth data

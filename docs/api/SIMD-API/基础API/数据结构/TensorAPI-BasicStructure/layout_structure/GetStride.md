@@ -21,8 +21,8 @@ GetStride用于从Layout中提取Stride部分：
 template <size_t... Is, typename ShapeType, typename StrideType>
 __aicore__ inline constexpr auto GetStride(const Layout<ShapeType, StrideType>& layout)
 
-template <size_t... Is, typename ShapeType, typename StrideType>
-__aicore__ inline constexpr auto GetStride(Layout<ShapeType, StrideType>& layout)
+    template <size_t... Is, typename ShapeType, typename StrideType>
+    __aicore__ inline constexpr auto GetStride(Layout<ShapeType, StrideType>& layout)
 ```
 
 ## 参数说明
@@ -57,11 +57,11 @@ using namespace AscendC::Te;
 auto layout = MakeLayout(MakeShape(10, 20, 30), MakeStride(1, 10, 200));
 
 // 不指定Is... → 返回完整stride元组
-auto fullStride = GetStride(layout);         // (1, 10, 200)
+auto fullStride = GetStride(layout); // (1, 10, 200)
 
 // 指定单个索引 → 返回对应元素
-auto s0 = GetStride<0>(layout);             // 1
+auto s0 = GetStride<0>(layout); // 1
 
 // 指定多个索引 → 组成新tuple
-auto s01 = GetStride<0, 1>(layout);         // (1, 10)
+auto s01 = GetStride<0, 1>(layout); // (1, 10)
 ```

@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001526206862_section1630753514297"></a>
 
-```
+```cpp
 GET_TILING_DATA_MEMBER(struct_name, mem_name, tiling_data, tiling_arg)
 ```
 
@@ -106,18 +106,20 @@ GET_TILING_DATA_MEMBER(struct_name, mem_name, tiling_data, tiling_arg)
 
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 
-```
-extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8_t *y, __gm__ uint8_t *z, __gm__ uint8_t *tiling)
+```cpp
+extern "C" __global__ __aicore__ void add_custom(
+    __gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* tiling)
 {
     KernelAdd op;
     if ASCEND_IS_AIV {
-        GET_TILING_DATA(tilingData, tiling);   // Vector侧使用算子默认注册的完整结构体
-	op.Init(x, y, z, tilingData.totalLength, tilingData.tileNum);
+        GET_TILING_DATA(tilingData, tiling); // Vector侧使用算子默认注册的完整结构体
+        op.Init(x, y, z, tilingData.totalLength, tilingData.tileNum);
         op.Process();
     } else {
-        GET_TILING_DATA_MEMBER(Add_Struct, tCubeTiling, tCubeTilingVar, tiling); // Cube侧仅使用算子注册结构体的成员变量tCubeTiling
-	op.Init(x, y, z, tCubeTilingVar);
-	op.Process();
+        GET_TILING_DATA_MEMBER(
+            Add_Struct, tCubeTiling, tCubeTilingVar, tiling); // Cube侧仅使用算子注册结构体的成员变量tCubeTiling
+        op.Init(x, y, z, tCubeTilingVar);
+        op.Process();
     }
 }
 ```

@@ -45,5 +45,5 @@ PIPE_S
 ```cpp
 int64_t val = 0x000f00ff0ff0ffff;
 int64_t res = 0;
-res = asc_sflbits(val);    // 返回11
+res = asc_sflbits(val); // 返回11
 ```

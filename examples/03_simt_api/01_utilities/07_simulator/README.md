@@ -13,7 +13,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── 07_simulator
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读写辅助函数
@@ -102,7 +102,7 @@ msprof op simulator --soc-version=<soc_version> ./demo
 
 命令完成后，会在当前目录下生成以`OPPROF_{timestamp}_XXX`命名的文件夹，产物结构如下：
 
-```
+```text
 OPPROF_{timestamp}_XXX/
 ├── dump                    // 原始性能数据，用户无需关注
 └── simulator

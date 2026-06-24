@@ -9,8 +9,10 @@ Kernel侧BitwiseOr接口的计算需要开发者预留/申请临时空间，本�
 
 ## 函数原型
 
-```
-void GetBitwiseOrMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatform, const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+```cpp
+void GetBitwiseOrMaxMinTmpSize(
+    const platform_ascendc::PlatformAscendC& ascendcPlatform, const ge::Shape& srcShape, const uint32_t typeSize,
+    const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -38,7 +40,7 @@ void GetBitwiseOrMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcP
 
 完整的调用样例请参考[更多样例](../更多样例-83.md)。
 
-```
+```cpp
 std::vector<int64_t> shape_vec = {1024};
 ge::Shape shape(shape_vec);
 uint32_t maxValue = 0;

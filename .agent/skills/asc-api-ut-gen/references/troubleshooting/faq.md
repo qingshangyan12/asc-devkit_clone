@@ -6,7 +6,7 @@
 
 ### 问题现象
 
-```
+```cpp
 error: no matching constructor for initialization of 'FixpipeParamsV220'
 ```
 
@@ -40,8 +40,8 @@ params.reluEn = reluFlag;
 
 ### 问题现象
 
-```
-segmentation fault (core dumped)
+```cpp
+segmentation fault(core dumped)
 ```
 
 或者 mock 期望不命中、底层指令 stub 运行异常。
@@ -73,12 +73,14 @@ UT 框架中的 mock/stub 函数签名与实际 impl 调用不一致，例如参
 // 确保 Cube 核心 API 在 SetUp 中切换类型
 class TEST_FIXPIPE : public testing::Test {
 protected:
-    void SetUp() {
-        g_coreType = AscendC::AIC_TYPE;  // 必须设置
+    void SetUp()
+    {
+        g_coreType = AscendC::AIC_TYPE; // 必须设置
     }
-    void TearDown() {
-        AscendC::CheckSyncState();       // 检查同步状态
-        g_coreType = AscendC::MIX_TYPE;  // 恢复混合模式
+    void TearDown()
+    {
+        AscendC::CheckSyncState();      // 检查同步状态
+        g_coreType = AscendC::MIX_TYPE; // 恢复混合模式
     }
 };
 ```
@@ -154,7 +156,7 @@ TmpBuffer 和 workspace 大小不是通用 dtype 事实，必须从目标 API �
 
 ### 问题现象
 
-```
+```bash
 undefined reference to 'vadd'
 ```
 
@@ -293,7 +295,9 @@ UT 执行明显变慢，影响本地回归或 CI。
 
 ```cpp
 // 1. 使用类封装，结构清晰
-class KernelFixpipe { ... };
+class KernelFixpipe {
+    ...
+};
 
 // 2. 简单的测试断言
 for (int32_t i = 0; i < size; i++) {

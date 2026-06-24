@@ -6,8 +6,8 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
-OpAICoreDef &OpAICoreDef::LaunchWithZeroEleOutputTensors(bool launchFlag)
+```cpp
+OpAICoreDef& OpAICoreDef::LaunchWithZeroEleOutputTensors(bool launchFlag)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001525424352_section75395119104"></a>
@@ -41,17 +41,14 @@ OpAICoreDef算子定义，OpAICoreDef请参考[OpAICoreDef](OpAICoreDef.md)。
 
 ## 调用示例<a name="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001575944081_section320753512363"></a>
 
-```
+```cpp
 class AddCustom : public OpDef {
 public:
     AddCustom(const char* name) : OpDef(name)
     {
-        this->Input("x")
-            .ParamType(REQUIRED);
-        this->Input("y")
-            .ParamType(REQUIRED);
-        this->Output("z")
-            .ParamType(REQUIRED);
+        this->Input("x").ParamType(REQUIRED);
+        this->Input("y").ParamType(REQUIRED);
+        this->Output("z").ParamType(REQUIRED);
         this->SetInferShape(ge::InferShape);
 
         this->AICore()

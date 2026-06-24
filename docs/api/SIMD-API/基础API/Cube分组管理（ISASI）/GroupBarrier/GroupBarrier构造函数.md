@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="section765814724715"></a>
 
-```
+```cpp
 template <PipeMode pipeMode>
 class GroupBarrier;
 __aicore__ inline GroupBarrier(GM_ADDR groupWorkspace, uint32_t arriveSizeIn, uint32_t waitSizeIn);
@@ -129,7 +129,7 @@ GroupBarrier对象实例。
 
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 
-```
+```cpp
 // 6个AIV等3个AIV Arrive后再开始后续业务，总共需要6*512B地址空间，起始地址为用户指定的startAddr。
 AscendC::GroupBarrier<AscendC::PipeMode::MTE3_MODE> barA(startAddr, 3, 6);
 ```

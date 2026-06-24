@@ -23,7 +23,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <bool commit = false>
 __aicore__ inline HcclHandle BatchWrite(GM_ADDR batchWriteInfo, uint32_t itemNum, uint16_t queueID = 0U)
 ```
@@ -44,7 +44,7 @@ __aicore__ inline HcclHandle BatchWrite(GM_ADDR batchWriteInfo, uint32_t itemNum
 | itemNum | 输入 | 批量任务的个数。该参数取值必须与batchWriteInfo中通信任务信息的组数一致。<br><br>对于Atlas A3 训练系列产品/Atlas A3 推理系列产品，该参数取值不能大于等于2048。 |
 | queueID | 输入 | 指定当前通信所在的队列ID，默认值为0。<br><br>Atlas A2 训练系列产品/Atlas A2 推理系列产品，该参数仅支持取值为0。 |
 
-```
+```cpp
 // Atlas A3 训练系列产品/Atlas A3 推理系列产品
 struct BatchWriteItem {
     uint64_t type;
@@ -85,7 +85,7 @@ struct BatchWriteItem {
 
     在Atlas A2 训练系列产品/Atlas A2 推理系列产品上，假设本卡要将不同的数据分别发送到其它AI Server的2卡、3卡的指定位置，通过调用一次BatchWrite接口，实现批量点对点通信。
 
-    ```
+    ```cpp
     struct BatchWriteItem {
         uint64_t localBuf;     // 本端发送数据的window地址
         uint64_t remoteBuf;    // 对端接收数据的window地址
@@ -142,7 +142,7 @@ struct BatchWriteItem {
 
     当通信数据量较大时，可以在Tiling流程中调用SetAicpuBlockDim接口来设置AI CPU的核数。算子内部将自动在多个AI CPU核中选择最优的核进行通信，以实现更优的性能。建议将可调度的AI CPU核数设置为5。
 
-    ```
+    ```cpp
     static ge::graphStatus BatchWriteTilingFunc(gert::TilingContext* context)
     {
         // 省略无关代码
@@ -166,7 +166,7 @@ struct BatchWriteItem {
 
     在Atlas A3 训练系列产品/Atlas A3 推理系列产品上，假设要将一段数据分别拷贝到两个不同的Global Memory上，可以通过调用一次BatchWrite接口，实现批量点对点通信。
 
-    ```
+    ```cpp
     struct BatchWriteItem {
         uint64_t type;
         uint32_t res1[5];
@@ -237,7 +237,7 @@ struct BatchWriteItem {
 
     在如下示例代码中，参与BatchWrite通信的核数为24，通信队列的数量为2，总的队列数=24\*2，即48；与此同时，服务端AI CPU的核数为4，这样每个AI CPU核只需要负责编排48/4即12个通信队列上的任务即可，提升了通信效率。
 
-    ```
+    ```cpp
     static ge::graphStatus BatchWriteTilingFunc(gert::TilingContext* context)
     {
         // 省略无关代码

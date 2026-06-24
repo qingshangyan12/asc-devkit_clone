@@ -11,7 +11,7 @@ This sample implements the Add operator using C_API interfaces, based on asynchr
 
 ## Directory Structure
 
-```
+```text
 ├── c_api_delicacy_async_add
 │   ├── CMakeLists.txt      // Build project file
 │   ├── README.md           // Documentation
@@ -22,7 +22,7 @@ This sample implements the Add operator using C_API interfaces, based on asynchr
 
 - Operator Function:  
 The Add operator adds two inputs and returns the sum. The corresponding mathematical expression is:  
-  ```
+  ```text
   z = x + y
   ```
 - Operator Specification:

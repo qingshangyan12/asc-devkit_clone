@@ -56,13 +56,8 @@ using namespace AscendC::Te;
 
 // 示例1：构造带NZ布局模式的Layout
 auto layout1 = MakePatternLayout<NZLayoutPtn, LayoutTraitDefault<>>(
-    MakeShape(MakeShape(16, 2), MakeShape(16, 4)),
-    MakeStride(MakeStride(16, 256), MakeStride(1, 512))
-);
+    MakeShape(MakeShape(16, 2), MakeShape(16, 4)), MakeStride(MakeStride(16, 256), MakeStride(1, 512)));
 
 // 示例2：构造带ND布局模式的Layout
-auto layout2 = MakePatternLayout<NDLayoutPtn, LayoutTrait<Std::ignore_t, _1>>(
-    MakeShape(32, 64),
-    MakeStride(64, 1)
-);
+auto layout2 = MakePatternLayout<NDLayoutPtn, LayoutTrait<Std::ignore_t, _1>>(MakeShape(32, 64), MakeStride(64, 1));
 ```

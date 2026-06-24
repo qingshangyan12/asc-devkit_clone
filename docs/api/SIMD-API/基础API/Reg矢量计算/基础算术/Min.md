@@ -73,8 +73,10 @@ __simd_callee__ inline void Min(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 ## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
-template<typename T>
-__simd_vf__ inline void MinVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
+template <typename T>
+__simd_vf__ inline void MinVF(
+    __ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint16_t oneRepeatSize,
+    uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> srcReg0;
     AscendC::Reg::RegTensor<T> srcReg1;
@@ -85,7 +87,8 @@ __simd_vf__ inline void MinVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf_
         AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
         AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);
         // Merging Mode模式
-        // AscendC::Reg::Min<T, MaskMergeMode::MERGING>(dstReg, srcReg0, srcReg1, mask);
+        // AscendC::Reg::Min<T, MaskMergeMode::MERGING>(dstReg, srcReg0, srcReg1,
+        // mask);
         AscendC::Reg::Min(dstReg, srcReg0, srcReg1, mask);
         AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
     }

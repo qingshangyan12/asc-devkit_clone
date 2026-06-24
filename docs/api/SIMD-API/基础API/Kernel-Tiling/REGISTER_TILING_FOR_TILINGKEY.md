@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001526206862_section1630753514297"></a>
 
-```
+```cpp
 REGISTER_TILING_FOR_TILINGKEY(EXPRESSION, TILING_STRUCT)
 ```
 
@@ -95,13 +95,17 @@ REGISTER_TILING_FOR_TILINGKEY(EXPRESSION, TILING_STRUCT)
 
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 
-```
-extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8_t *y, __gm__ uint8_t *z, __gm__ uint8_t *tiling)
+```cpp
+extern "C" __global__ __aicore__ void add_custom(
+    __gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* tiling)
 {
-    REGISTER_TILING_DEFAULT(optiling::TilingData);  // 注册用户默认自定义TilingData结构体
+    REGISTER_TILING_DEFAULT(optiling::TilingData); // 注册用户默认自定义TilingData结构体
     REGISTER_TILING_FOR_TILINGKEY("TILING_KEY_VAR == 1", optiling::TilingDataA); // 注册TilingKey为1的TilingData结构体
-    REGISTER_TILING_FOR_TILINGKEY("(TILING_KEY_VAR >= 10) && (TILING_KEY_VAR <= 15)", optiling::TilingDataB); // 注册TilingKey在[10,15]之间的TilingData结构体
-    REGISTER_TILING_FOR_TILINGKEY("TILING_KEY_VAR & 0xFF", optiling::TilingDataC); // 注册TilingKey低16位为1的TilingData结构体
+    REGISTER_TILING_FOR_TILINGKEY(
+        "(TILING_KEY_VAR >= 10) && (TILING_KEY_VAR <= 15)",
+        optiling::TilingDataB); // 注册TilingKey在[10,15]之间的TilingData结构体
+    REGISTER_TILING_FOR_TILINGKEY(
+        "TILING_KEY_VAR & 0xFF", optiling::TilingDataC); // 注册TilingKey低16位为1的TilingData结构体
     if (TILING_KEY_IS(1)) {
         GET_TILING_DATA_WITH_STRUCT(optiling::TilingDataA, tilingData, tiling);
         ......
@@ -123,16 +127,16 @@ extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8
 
 使用标准C++语法注册tiling结构体：
 
-```
-class TilingDataA{
+```cpp
+class TilingDataA {
 public:
     ...
 };
-class TilingDataB{
+class TilingDataB {
 public:
     ...
 };
-class TilingDataC{
+class TilingDataC {
 public:
     ...
 };
@@ -140,7 +144,7 @@ public:
 
 配套的host侧tiling函数示例：
 
-```
+```cmake
 ge::graphStatus TilingFunc(gert::TilingContext* context)
 {
     // 其他代码逻辑

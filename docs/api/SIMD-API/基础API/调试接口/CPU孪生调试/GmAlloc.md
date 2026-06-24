@@ -66,7 +66,7 @@
 ## 函数原型<a name="zh-cn_topic_0000001963639306_zh-cn_topic_0000001541764188_section2067518173415"></a>
 
 ```cpp
-void *GmAlloc(size_t size)
+void* GmAlloc(size_t size)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001963639306_zh-cn_topic_0000001541764188_section158061867342"></a>
@@ -90,8 +90,8 @@ void *GmAlloc(size_t size)
 ## 调用示例<a name="zh-cn_topic_0000001963639306_zh-cn_topic_0000001541764188_section82241477610"></a>
 
 ```cpp
-uint32_t numBlocks = 8;    // 总核数。
-uint32_t blockLength = 2048;    // 每个核分配的内存大小。
-size_t len = numBlocks * blockLength * sizeof(uint16_t);    // 共享内存大小。
+uint32_t numBlocks = 8;                                  // 总核数。
+uint32_t blockLength = 2048;                             // 每个核分配的内存大小。
+size_t len = numBlocks * blockLength * sizeof(uint16_t); // 共享内存大小。
 uint8_t* x = (uint8_t*)AscendC::GmAlloc(len);
 ```

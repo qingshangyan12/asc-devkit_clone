@@ -37,10 +37,12 @@
 
 ```cpp
 template <typename T>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2DParams& loadDataParams)
+__aicore__ inline void LoadData(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2DParams& loadDataParams)
 
-template <typename T>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams)
+    template <typename T>
+    __aicore__
+    inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams)
 ```
 
 <cann-filter npu-type = "950">
@@ -48,7 +50,8 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 ```cpp
 template <typename T>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2DParams& loadDataParams)
+__aicore__ inline void LoadData(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2DParams& loadDataParams)
 ```
 
 </cann-filter>

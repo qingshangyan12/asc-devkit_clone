@@ -78,7 +78,8 @@ __simd_callee__ inline void Gather(S& dstReg, S& srcReg, V& indexReg)
 ```cpp
 // 根据索引从源向量中收集元素，dstReg[i] = srcReg[indexReg[i]]
 template <typename T, typename U>
-__simd_vf__ inline void GatherVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, __ubuf__ U* indexAddr, uint32_t count, uint16_t oneRepeatSize)
+__simd_vf__ inline void GatherVF(
+    __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, __ubuf__ U* indexAddr, uint32_t count, uint16_t oneRepeatSize)
 {
     AscendC::Reg::RegTensor<T> srcReg, dstReg;
     AscendC::Reg::RegTensor<U> indexReg;

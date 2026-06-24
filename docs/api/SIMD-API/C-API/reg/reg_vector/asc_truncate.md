@@ -22,34 +22,34 @@
 ```cpp
 // RINT舍入模式
 __simd_callee__ inline void asc_rint(vector_half& dst, vector_half src, vector_bool mask)
-// RINT舍入模式
-__simd_callee__ inline void asc_rint(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
-// RINT舍入模式
-__simd_callee__ inline void asc_rint(vector_float& dst, vector_float src, vector_bool mask)
-// ROUND舍入模式
-__simd_callee__ inline void asc_round(vector_half& dst, vector_half src, vector_bool mask)
-// ROUND舍入模式
-__simd_callee__ inline void asc_round(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
-// ROUND舍入模式
-__simd_callee__ inline void asc_round(vector_float& dst, vector_float src, vector_bool mask)
-// FLOOR舍入模式
-__simd_callee__ inline void asc_floor(vector_half& dst, vector_half src, vector_bool mask)
-// FLOOR舍入模式
-__simd_callee__ inline void asc_floor(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
-// FLOOR舍入模式
-__simd_callee__ inline void asc_floor(vector_float& dst, vector_float src, vector_bool mask)
-// CEIL舍入模式
-__simd_callee__ inline void asc_ceil(vector_half& dst, vector_half src, vector_bool mask)
-// CEIL舍入模式
-__simd_callee__ inline void asc_ceil(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
-// CEIL舍入模式
-__simd_callee__ inline void asc_ceil(vector_float& dst, vector_float src, vector_bool mask)
-// TRUNC舍入模式
-__simd_callee__ inline void asc_trunc(vector_half& dst, vector_half src, vector_bool mask)
-// TRUNC舍入模式
-__simd_callee__ inline void asc_trunc(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
-// TRUNC舍入模式
-__simd_callee__ inline void asc_trunc(vector_float& dst, vector_float src, vector_bool mask)
+    // RINT舍入模式
+    __simd_callee__ inline void asc_rint(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // RINT舍入模式
+    __simd_callee__ inline void asc_rint(vector_float& dst, vector_float src, vector_bool mask)
+    // ROUND舍入模式
+    __simd_callee__ inline void asc_round(vector_half& dst, vector_half src, vector_bool mask)
+    // ROUND舍入模式
+    __simd_callee__ inline void asc_round(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // ROUND舍入模式
+    __simd_callee__ inline void asc_round(vector_float& dst, vector_float src, vector_bool mask)
+    // FLOOR舍入模式
+    __simd_callee__ inline void asc_floor(vector_half& dst, vector_half src, vector_bool mask)
+    // FLOOR舍入模式
+    __simd_callee__ inline void asc_floor(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // FLOOR舍入模式
+    __simd_callee__ inline void asc_floor(vector_float& dst, vector_float src, vector_bool mask)
+    // CEIL舍入模式
+    __simd_callee__ inline void asc_ceil(vector_half& dst, vector_half src, vector_bool mask)
+    // CEIL舍入模式
+    __simd_callee__ inline void asc_ceil(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // CEIL舍入模式
+    __simd_callee__ inline void asc_ceil(vector_float& dst, vector_float src, vector_bool mask)
+    // TRUNC舍入模式
+    __simd_callee__ inline void asc_trunc(vector_half& dst, vector_half src, vector_bool mask)
+    // TRUNC舍入模式
+    __simd_callee__ inline void asc_trunc(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // TRUNC舍入模式
+    __simd_callee__ inline void asc_trunc(vector_float& dst, vector_float src, vector_bool mask)
 ```
 
 ## 参数说明

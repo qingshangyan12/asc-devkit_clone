@@ -32,7 +32,7 @@
 
     由Profiling数据看出分核数为4，启动更多的核同时计算，可以提高计算并行度。当前案例使用的AI处理器共20个核，每个核中包含1个Cube Core和2个Vector Core。NPU调用程序中设置numBlocks为实际使用的核数20。
 
-    ```
+    ```cpp
     // 代码片段
     uint32_t numBlocks = 20; // 优化前numBlocks为4
     CHECK_ACL(aclInit(nullptr));
@@ -40,50 +40,41 @@
     CHECK_ACL(aclrtSetDevice(deviceId));
     aclrtStream stream = nullptr;
     CHECK_ACL(aclrtCreateStream(&stream));
-    
-    uint8_t *aHost;
-    uint8_t *aDevice;
-    CHECK_ACL(aclrtMallocHost((void **)(&aHost), aFileSize));
-    CHECK_ACL(
-      aclrtMalloc((void **)&aDevice, aFileSize, ACL_MEM_MALLOC_HUGE_FIRST));
+
+    uint8_t* aHost;
+    uint8_t* aDevice;
+    CHECK_ACL(aclrtMallocHost((void**)(&aHost), aFileSize));
+    CHECK_ACL(aclrtMalloc((void**)&aDevice, aFileSize, ACL_MEM_MALLOC_HUGE_FIRST));
     ReadFile("./input/x1_gm.bin", aFileSize, aHost, aFileSize);
     // PrintData(aHost, 16, printDataType::HALF);
-    CHECK_ACL(aclrtMemcpy(aDevice, aFileSize, aHost, aFileSize,
-    					ACL_MEMCPY_HOST_TO_DEVICE));
-    
-    uint8_t *bHost;
-    uint8_t *bDevice;
-    CHECK_ACL(aclrtMallocHost((void **)(&bHost), bFileSize));
-    CHECK_ACL(
-      aclrtMalloc((void **)&bDevice, bFileSize, ACL_MEM_MALLOC_HUGE_FIRST));
+    CHECK_ACL(aclrtMemcpy(aDevice, aFileSize, aHost, aFileSize, ACL_MEMCPY_HOST_TO_DEVICE));
+
+    uint8_t* bHost;
+    uint8_t* bDevice;
+    CHECK_ACL(aclrtMallocHost((void**)(&bHost), bFileSize));
+    CHECK_ACL(aclrtMalloc((void**)&bDevice, bFileSize, ACL_MEM_MALLOC_HUGE_FIRST));
     ReadFile("./input/x2_gm.bin", bFileSize, bHost, bFileSize);
     // PrintData(bHost, 16, printDataType::HALF);
-    CHECK_ACL(aclrtMemcpy(bDevice, bFileSize, bHost, bFileSize,
-    					ACL_MEMCPY_HOST_TO_DEVICE));
-    
-    uint8_t *workspaceHost;
-    uint8_t *workspaceDevice;
-    CHECK_ACL(aclrtMallocHost((void **)(&workspaceHost), workspaceSize));
-    CHECK_ACL(aclrtMalloc((void **)&workspaceDevice, workspaceSize,
-    					ACL_MEM_MALLOC_HUGE_FIRST));
-    
-    uint8_t *tilingHost;
-    uint8_t *tilingDevice;
-    CHECK_ACL(aclrtMallocHost((void **)(&tilingHost), tilingFileSize));
-    CHECK_ACL(aclrtMalloc((void **)&tilingDevice, tilingFileSize,
-    					ACL_MEM_MALLOC_HUGE_FIRST));
-    CHECK_ACL(aclrtMemcpy(tilingHost, tilingFileSize, GenerateTiling(),
-    					tilingFileSize, ACL_MEMCPY_HOST_TO_HOST));
+    CHECK_ACL(aclrtMemcpy(bDevice, bFileSize, bHost, bFileSize, ACL_MEMCPY_HOST_TO_DEVICE));
+
+    uint8_t* workspaceHost;
+    uint8_t* workspaceDevice;
+    CHECK_ACL(aclrtMallocHost((void**)(&workspaceHost), workspaceSize));
+    CHECK_ACL(aclrtMalloc((void**)&workspaceDevice, workspaceSize, ACL_MEM_MALLOC_HUGE_FIRST));
+
+    uint8_t* tilingHost;
+    uint8_t* tilingDevice;
+    CHECK_ACL(aclrtMallocHost((void**)(&tilingHost), tilingFileSize));
+    CHECK_ACL(aclrtMalloc((void**)&tilingDevice, tilingFileSize, ACL_MEM_MALLOC_HUGE_FIRST));
+    CHECK_ACL(aclrtMemcpy(tilingHost, tilingFileSize, GenerateTiling(), tilingFileSize, ACL_MEMCPY_HOST_TO_HOST));
     // PrintData(tilingHost, 16, printDataType::UINT32_T);
-    CHECK_ACL(aclrtMemcpy(tilingDevice, tilingFileSize, tilingHost,
-    					tilingFileSize, ACL_MEMCPY_HOST_TO_DEVICE));
-    
-    uint8_t *cHost;
-    uint8_t *cDevice;
-    CHECK_ACL(aclrtMallocHost((void **)(&cHost), cFileSize));
-    CHECK_ACL(
-      aclrtMalloc((void **)&cDevice, cFileSize, ACL_MEM_MALLOC_HUGE_FIRST));
-    
+    CHECK_ACL(aclrtMemcpy(tilingDevice, tilingFileSize, tilingHost, tilingFileSize, ACL_MEMCPY_HOST_TO_DEVICE));
+
+    uint8_t* cHost;
+    uint8_t* cDevice;
+    CHECK_ACL(aclrtMallocHost((void**)(&cHost), cFileSize));
+    CHECK_ACL(aclrtMalloc((void**)&cDevice, cFileSize, ACL_MEM_MALLOC_HUGE_FIRST));
+
     // ACLRT_LAUNCH_KERNEL(matmul_custom)
     // (numBlocks, stream, aDevice, bDevice, cDevice, workspaceDevice, tilingDevice);
     matmul_custom_do(numBlocks, stream, aDevice, bDevice, cDevice, workspaceDevice, tilingDevice);
@@ -91,7 +82,7 @@
 
     由于Matmul API都是从Vector侧发起的，当前案例使用的AI处理器中Cube Core和Vector Core的配比为1 : 2，所以在Matmul tiling计算中需要按照2倍的numBlocks数切分，即Vector Core数。NPU调用程序中设置的实际运行核数是20核，所以Tiling代码中设置Tiling API按照40个核进行数据切分，如下代码所示。
 
-    ```
+    ```cpp
     int usedCoreNum = 40; // 优化前usedCoreNum是8
     int runMode = 1;
     int32_t baseM = 64; // 64
@@ -114,10 +105,10 @@
 
     修改Tiling代码，通过SetFixSplit\(\)接口设置baseM和baseN，tiling函数会自动计算出最优baseK，这里得到64。
 
-    ```
+    ```cpp
     int32_t baseM = 128; // 优化前baseM是64
     int32_t baseN = 256; // 优化前baseN是64
-    
+
     optiling::TCubeTiling tilingData;
     MultiCoreMatmulTiling tilingApi;
     tilingApi.SetDim(usedCoreNum);
@@ -125,7 +116,7 @@
     tilingApi.SetBType(rightPos, rightFormat, rightDtype, bool(transposeB));
     tilingApi.SetCType(resPos, resFormat, resDtype);
     tilingApi.SetBiasType(biasPos, biasFormat, biasDtype);
-    
+
     tilingApi.SetOrgShape(M, N, K);
     tilingApi.SetShape(M, N, K);
     tilingApi.SetFixSplit(baseM, baseN, -1);
@@ -140,19 +131,15 @@
 
     当前带宽利用率为：totalSize / mte2Time = totalCnt \* dtype / mte2Time，代入数据计算为2491GB/s。未开启大包搬运的情况下，矩阵从GM搬运到L1一次只搬运1个基本块。通过模板参数开启大包搬运，一次搬运多个基本块，提高MTE2带宽利用率。
 
-    ```
-     // 原始matmul对象定义:
-      Matmul<AscendC::MatmulType<TPosition::GM, CubeFormat::ND, A_T>,
-             AscendC::MatmulType<TPosition::GM, CubeFormat::ND, B_T>,
-             AscendC::MatmulType<TPosition::GM, CubeFormat::ND, C_T>,
-             AscendC::MatmulType<TPosition::GM, CubeFormat::ND, BiasT>>>
-          mm;
-     // 通过在定义matmul对象的模板参数里加上CFG_MDL参数开启大包搬运功能：
-      Matmul<AscendC::MatmulType<TPosition::GM, CubeFormat::ND, A_T>,
-             AscendC::MatmulType<TPosition::GM, CubeFormat::ND, B_T>,
-             AscendC::MatmulType<TPosition::GM, CubeFormat::ND, C_T>,
-             AscendC::MatmulType<TPosition::GM, CubeFormat::ND, BiasT>, CFG_MDL>>
-          mm;
+    ```cpp
+    // 原始matmul对象定义:
+    Matmul < AscendC::MatmulType<TPosition::GM, CubeFormat::ND, A_T>,
+        AscendC::MatmulType<TPosition::GM, CubeFormat::ND, B_T>, AscendC::MatmulType<TPosition::GM, CubeFormat::ND, C_T>,
+        AscendC::MatmulType < TPosition::GM, CubeFormat::ND, BiasT >>> mm;
+    // 通过在定义matmul对象的模板参数里加上CFG_MDL参数开启大包搬运功能：
+    Matmul < AscendC::MatmulType<TPosition::GM, CubeFormat::ND, A_T>,
+        AscendC::MatmulType<TPosition::GM, CubeFormat::ND, B_T>, AscendC::MatmulType<TPosition::GM, CubeFormat::ND, C_T>,
+        AscendC::MatmulType<TPosition::GM, CubeFormat::ND, BiasT>, CFG_MDL >> mm;
     ```
 
     从下图可以看到，开启大包搬运后，MTE2耗时从808us下降到591us，带宽利用率代入数据计算为3406GB/s，利用率提升36%+，Cube利用率达到80%+。

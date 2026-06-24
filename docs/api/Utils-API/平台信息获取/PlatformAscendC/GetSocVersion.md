@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001664705472_zh-cn_topic_0000001442758437_section13230182415108"></a>
 
-```
+```text
 SocVersion GetSocVersion(void) const
 ```
 
@@ -44,8 +44,9 @@ AI处理器的型号请通过如下方式获取：
 
 ## 调用示例<a name="zh-cn_topic_0000001664705472_zh-cn_topic_0000001442758437_section320753512363"></a>
 
-```
-ge::graphStatus TilingXXX(gert::TilingContext* context) {
+```cpp
+ge::graphStatus TilingXXX(gert::TilingContext* context)
+{
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
     auto socVersion = ascendcPlatform.GetSocVersion();
     // 根据所获得的版本型号自行设计Tiling策略

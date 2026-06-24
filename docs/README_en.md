@@ -2,7 +2,7 @@
 
 ## Directory Description
 Key directory structure is as follows:
-```
+```text
 ├── api                            # API documentation directory
 │   ├── context                    # Documentation for each API
 │   └── README.md                  # Ascend C API list

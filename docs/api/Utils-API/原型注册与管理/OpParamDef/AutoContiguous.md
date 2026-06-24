@@ -11,7 +11,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001711819448_zh-cn_topic_0000001526594958_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
+```text
 OpParamDef &AutoContiguous()
 ```
 

@@ -55,8 +55,8 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
-aclError aclrtcAddNameExpr(aclrtcProg prog, const char *const nameExpression)
+```cpp
+aclError aclrtcAddNameExpr(aclrtcProg prog, const char* const nameExpression)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -99,7 +99,7 @@ aclError为int类型变量，详细说明请参考[RTC错误码](RTC错误码.md
 
 ## 调用示例<a name="section837496171220"></a>
 
-```
+```cpp
 aclrtcProg prog;
 const char* kernelNameExpr = "add_custom<float>";
 aclError result = aclrtcAddNameExpr(prog, kernelNameExpr);

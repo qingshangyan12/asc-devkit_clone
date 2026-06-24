@@ -14,7 +14,7 @@ This example implements per-token quantized grouped matrix multiplication (Quant
 
 ## Directory Structure
 
-```
+```text
 ├── quant_group_matmul_high_performance
 │   ├── CMakeLists.txt                     // Build project file
 │   ├── data_utils.h                       // Data read/write functions
@@ -95,7 +95,7 @@ __global__ __mix__(1, 1)
 #else
 __global__ __mix__(1, 2)
 #endif
-void quant_group_matmul_custom(...)
+    void quant_group_matmul_custom(...)
 ```
 
 ### Performance Metric Description
@@ -166,13 +166,14 @@ This example uses `__mix__` kernel function mode, with AIC (Cube core) and AIV (
 
 ```cpp
 // AIC execution path: MMCompute → Iterate loop → SetFlag(SYNC_AIC_TO_AIV)
-// AIV execution path: Skip MMCompute → VectorCompute → WaitFlag(SYNC_AIC_TO_AIV)
+// AIV execution path: Skip MMCompute → VectorCompute →
+// WaitFlag(SYNC_AIC_TO_AIV)
 if ASCEND_IS_AIC {
-    matmulObj.Iterate();    // Cube computation
-    CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_TO_AIV);  // Notify Vector
+    matmulObj.Iterate();                            // Cube computation
+    CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_TO_AIV); // Notify Vector
 }
 if ASCEND_IS_AIV {
-    CrossCoreWaitFlag(SYNC_AIC_TO_AIV);  // Wait for Cube completion
+    CrossCoreWaitFlag(SYNC_AIC_TO_AIV); // Wait for Cube completion
     // Process data...
     CrossCoreSetFlag<2, PIPE_MTE2>(SYNC_AIV_TO_AIC);
 }
@@ -200,7 +201,7 @@ This example enables Matmul UnitFlag optimization through `mmCFG.enUnitFlag = tr
 ```cpp
 static constexpr MatmulShapeParams shapeParams = {SINGLE_M, SINGLE_N, K, BASE_M, BASE_N, BASE_K};
 MatmulConfig mmCFG = GetMMConfig<MatmulConfigMode::CONFIG_MDL>(shapeParams);
-mmCFG.enUnitFlag = true;  // Enable UnitFlag
+mmCFG.enUnitFlag = true; // Enable UnitFlag
 auto constantCFG = AscendC::GetMatmulApiTiling<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>(mmCFG);
 ```
 
@@ -211,10 +212,13 @@ All TQue queues in this example set `BUFFER_NUM=2` to enable double buffer, achi
 ```cpp
 constexpr uint32_t BUFFER_NUM = 2; // UB queue Buffer count, set to 2 to enable double buffer
 
-pipe->InitBuffer(scaleInQueue, BUFFER_NUM, BASE_N * sizeof(float));          // 2 × 1024B
-pipe->InitBuffer(perTokenScaleInQueue, BUFFER_NUM, BASE_M * sizeof(float));   // 2 × 512B
-pipe->InitBuffer(vecInQueue, BUFFER_NUM, UB_CAL_SIZE * sizeof(int32_t));      // 2 × 24,576B
-pipe->InitBuffer(vecOutQueue, BUFFER_NUM, UB_CAL_SIZE * sizeof(half));        // 2 × 12,288B
+pipe->InitBuffer(scaleInQueue, BUFFER_NUM, BASE_N * sizeof(float)); // 2 × 1024B
+pipe->InitBuffer(perTokenScaleInQueue, BUFFER_NUM,
+                 BASE_M * sizeof(float)); // 2 × 512B
+pipe->InitBuffer(vecInQueue, BUFFER_NUM,
+                 UB_CAL_SIZE * sizeof(int32_t)); // 2 × 24,576B
+pipe->InitBuffer(vecOutQueue, BUFFER_NUM,
+                 UB_CAL_SIZE * sizeof(half)); // 2 × 12,288B
 ```
 
 **Performance Data**
@@ -263,7 +267,7 @@ Case 2 increases PIPELINE_DEPTH from 1 to 4 based on Case 1, introducing workspa
 
 workspace is the relay station between Cube and Vector, using ring slot design. The Slot here refers to a continuous space located by `workSpaceOffset = BASE_N × BASE_M × (coreIdx + (cubeTaskIdx % PIPELINE_DEPTH) × CORE_NUM)`, with single Slot size `CORE_NUM×BASE_M×BASE_N×sizeof(int32_t)`. `PIPELINE_DEPTH` Slots are used in rotation. While Cube writes to the current Slot, Vector can process data from previous Slots:
 
-```
+```text
 workspace layout:
 Slot 0: Core0[BASE_M×BASE_N] + Core1[BASE_M×BASE_N] + ... + Core(CORE_NUM-1)[BASE_M×BASE_N]
 Slot 1: Core0[BASE_M×BASE_N] + Core1[BASE_M×BASE_N] + ... + Core(CORE_NUM-1)[BASE_M×BASE_N]
@@ -275,7 +279,7 @@ workSpaceOffset = BASE_N × BASE_M × (coreIdx + (cubeTaskIdx % PIPELINE_DEPTH) 
 
 **4-Stage Pipeline Timing**:
 
-```
+```text
 Time ──────────────────────────────────────────────────────────────>
 Cube:  |─Iter0→Slot0─|─Iter1→Slot1─|─Iter2→Slot2─|─Iter3→Slot3─|─Iter4→Slot0─| ...
                       (Wait)                                     (Wait)

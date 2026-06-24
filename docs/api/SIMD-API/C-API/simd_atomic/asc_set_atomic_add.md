@@ -15,12 +15,9 @@
 ## 函数原型
 
 ```c++
-__aicore__ inline void asc_set_atomic_add_int8()
-__aicore__ inline void asc_set_atomic_add_int16()
-__aicore__ inline void asc_set_atomic_add_int()
-__aicore__ inline void asc_set_atomic_add_bfloat()
-__aicore__ inline void asc_set_atomic_add_float16()
-__aicore__ inline void asc_set_atomic_add_float()
+__aicore__ inline void asc_set_atomic_add_int8() __aicore__ inline void asc_set_atomic_add_int16() __aicore__
+    inline void asc_set_atomic_add_int() __aicore__ inline void asc_set_atomic_add_bfloat() __aicore__
+    inline void asc_set_atomic_add_float16() __aicore__ inline void asc_set_atomic_add_float()
 ```
 
 ## 参数说明
@@ -42,7 +39,7 @@ PIPE_S
 ## 调用示例
 
 ```c++
-//total_length指参与搬运的数据总长度。dst是外部输入的int8_t类型的GM内存。
+// total_length指参与搬运的数据总长度。dst是外部输入的int8_t类型的GM内存。
 constexpr uint32_t total_length = 256;
 __ubuf__ int8_t src0[total_length];
 __ubuf__ int8_t src1[total_length];
@@ -55,7 +52,7 @@ asc_set_atomic_none();
 
 结果示例：
 
-```
+```text
 输入数据src0：[1, 1, 1, ..., 1]  // int8_t类型
 输入数据src1：[2, 2, 2, ..., 2]  // int8_t类型
 输出数据dst：[3, 3, 3, ..., 3]   // int8_t类型

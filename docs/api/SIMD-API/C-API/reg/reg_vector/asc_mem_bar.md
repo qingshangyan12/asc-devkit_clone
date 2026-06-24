@@ -90,5 +90,4 @@ for (uint16_t i = 1; i < repeatTime; i++) {
     asc_add(dst, src0, src1, mask);
     asc_storealign(ub_addr[0], dst, mask);
 }
-
 ```

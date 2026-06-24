@@ -16,7 +16,7 @@
 
 
  ```cpp
-__aicore__ inline void asc_enable_hf32()
+ __aicore__ inline void asc_enable_hf32()
 ```
 
 ## 参数说明

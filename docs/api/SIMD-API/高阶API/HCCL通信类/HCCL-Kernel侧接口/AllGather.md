@@ -18,9 +18,11 @@
 
 ## 函数原型
 
-```
+```cpp
 template <bool commit = false>
-__aicore__ inline HcclHandle AllGather(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t sendCount, HcclDataType dataType, uint64_t strideCount, uint8_t repeat = 1)
+__aicore__ inline HcclHandle AllGather(
+    GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t sendCount, HcclDataType dataType, uint64_t strideCount,
+    uint8_t repeat = 1)
 ```
 
 ## 参数说明
@@ -67,7 +69,7 @@ __aicore__ inline HcclHandle AllGather(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_
     **图2**  非多轮切分场景下4卡AllGather通信  
     ![非多轮切分场景下4卡AllGather通信](../../../../figures/非多轮切分场景下4卡AllGather通信.png)
 
-    ```
+    ```cpp
     extern "C" __global__ __aicore__ void all_gather_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
     {
         auto sendBuf = xGM;                                 // xGM为AllGather的输入GM地址
@@ -107,7 +109,7 @@ __aicore__ inline HcclHandle AllGather(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_
     **图4**  第一轮4卡AllGather示意图  
     ![第一轮4卡AllGather示意图](../../../../figures/第一轮4卡AllGather示意图.png)
 
-    ```
+    ```cpp
     extern "C" __global__ __aicore__ void all_gather_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
     {
         constexpr uint32_t tileNum = 2U;                    // 首块数量

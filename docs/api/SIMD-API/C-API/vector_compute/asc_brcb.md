@@ -16,15 +16,23 @@
 - 高维切分计算
 
     ```cpp
-    __aicore__ inline void asc_brcb(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint16_t dst_block_stride, uint16_t dst_repeat_stride, uint8_t repeat)
-    __aicore__ inline void asc_brcb(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint16_t dst_block_stride, uint16_t dst_repeat_stride, uint8_t repeat)
+    __aicore__ inline void asc_brcb(
+        __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint16_t dst_block_stride, uint16_t dst_repeat_stride,
+        uint8_t repeat) __aicore__
+        inline void asc_brcb(
+            __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint16_t dst_block_stride, uint16_t dst_repeat_stride,
+            uint8_t repeat)
     ```
 
 - 同步高维切分计算
 
     ```cpp
-    __aicore__ inline void asc_brcb_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint16_t dst_block_stride, uint16_t dst_repeat_stride, uint8_t repeat)
-    __aicore__ inline void asc_brcb_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint16_t dst_block_stride, uint16_t dst_repeat_stride, uint8_t repeat)
+    __aicore__ inline void asc_brcb_sync(
+        __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint16_t dst_block_stride, uint16_t dst_repeat_stride,
+        uint8_t repeat) __aicore__
+        inline void asc_brcb_sync(
+            __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint16_t dst_block_stride, uint16_t dst_repeat_stride,
+            uint8_t repeat)
     ```
 
 ## 参数说明
@@ -61,7 +69,7 @@ asc_brcb(dst, src, 1, 8, 2);
 
 结果示例：
 
-```
+```text
 输入数据src：[1 2 3 ... 16]
 输出数据dst：[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 ... 15 15 15 15 15 15 15 15 15 15 15 15 15 15 15 15 16 16 16 16 16 16 16 16 16 16 16 16 16 16 16 16]
 ```

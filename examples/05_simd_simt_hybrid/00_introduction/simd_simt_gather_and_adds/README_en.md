@@ -28,7 +28,7 @@ This sample implements gather and adds computation based on SIMD and SIMT hybrid
 - Sample Function:  
   Calculation Formula:
 
-  ```
+  ```text
   output[i] = input[index[i]] + 1
   ```
 
@@ -54,16 +54,14 @@ This sample implements gather and adds computation based on SIMD and SIMT hybrid
   The implementation flow of the gather & adds sample is mainly divided into 3 steps: simt_gather, simd_adds, and DataCopy.
 
   (1) simt_gather obtains data with specified indexes from GM (Global Memory) input.
-  ```
+  ```cpp
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  ...
-  uint32_t gather_idx = index[idx];
-  ...
-  gather_output[threadIdx.x] = input[gather_idx];
+  ... uint32_t gather_idx = index[idx];
+  ... gather_output[threadIdx.x] = input[gather_idx];
   ```
 
   (2) simd_adds performs the add 1 operation on the data in UB (Unified Buffer). Call Reg::LoadAlign to move data from UB (Unified Buffer) to the register, call Reg::Adds to complete the add 1 operation and output to the destination register, and finally call Reg::StoreAlign to move data from the register to UB. Repeat the above operation to complete the add 1 operation on 1024 data elements.
-  ```
+  ```cpp
   for (uint16_t i = 0; i < repeat_times; i++) {
       AscendC::Reg::LoadAlign(src_reg0, input + i * one_repeat_size);
       AscendC::Reg::Adds(dst_reg0, src_reg0, adds_addend, mask_reg);
@@ -117,6 +115,6 @@ Execute the following steps in the root directory of this sample to compile and 
 
 - Execution Result  
   The execution result is as follows, indicating that the precision comparison is successful.
-  ```
+  ```text
   [Success] Case accuracy is verification passed.
   ```

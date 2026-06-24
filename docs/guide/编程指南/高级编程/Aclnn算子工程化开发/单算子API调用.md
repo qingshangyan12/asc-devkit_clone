@@ -8,9 +8,10 @@
 
 单算子API的形式一般定义为“两段式接口”，形如：
 
-```
-aclnnStatus aclnnXxxGetWorkspaceSize(const aclTensor *src, ..., aclTensor *out, uint64_t *workspaceSize, aclOpExecutor **executor);
-aclnnStatus aclnnXxx(void *workspace, uint64_t workspaceSize, aclOpExecutor *executor, aclrtStream stream);
+```cpp
+aclnnStatus aclnnXxxGetWorkspaceSize(
+    const aclTensor* src, ..., aclTensor* out, uint64_t* workspaceSize, aclOpExecutor** executor);
+aclnnStatus aclnnXxx(void* workspace, uint64_t workspaceSize, aclOpExecutor* executor, aclrtStream stream);
 ```
 
 其中aclnn_Xxx_GetWorkspaceSize/aclnn_Xxx_TensorGetWorkspaceSize为第一段接口，主要用于计算本次API调用过程中需要多少workspace内存，获取到本次计算所需的workspaceSize后，按照workspaceSize申请NPU内存，然后调用第二段接口aclnn_Xxx_执行计算_。Xxx代表[算子原型注册](算子原型定义.md)时传入的算子类型。
@@ -19,42 +20,52 @@ aclnnStatus aclnnXxx(void *workspace, uint64_t workspaceSize, aclOpExecutor *exe
 
 -   可选输入的命名增加Optional后缀。如下样例中，x是可选输入。
 
-    ```
-    aclnnStatus aclnnXxxGetWorkspaceSize(const aclTensor *xOptional, ..., aclTensor *out, uint64_t *workspaceSize, aclOpExecutor **executor);
+    ```cpp
+    aclnnStatus aclnnXxxGetWorkspaceSize(
+        const aclTensor* xOptional, ..., aclTensor* out, uint64_t* workspaceSize, aclOpExecutor** executor);
     ```
 
 -   输入输出同名、使用同一个Tensor承载的情况下，生成的aclnn接口中只保留input参数同时去掉input的const修饰，并以Ref作为后缀。如下样例中，原型定义input、output都定义为x，xRef既作为输入，又作为输出。
 
-    ```
-    aclnnStatus aclnnXxxGetWorkspaceSize(aclTensor *xRef, ..., uint64_t *workspaceSize, aclOpExecutor **executor);
+    ```cpp
+    aclnnStatus aclnnXxxGetWorkspaceSize(aclTensor* xRef, ..., uint64_t* workspaceSize, aclOpExecutor** executor);
     ```
 
 -   如果仅有一个输出，输出参数命名为out；如果存在多个输出，每个输出后面都以Out作为后缀。
 
-    ```
+    ```cpp
     // 仅有一个输出
-    aclnnStatus aclnnXxxGetWorkspaceSize(const aclTensor *src, ..., aclTensor *out, uint64_t *workspaceSize, aclOpExecutor **executor);
+    aclnnStatus aclnnXxxGetWorkspaceSize(
+        const aclTensor* src, ..., aclTensor* out, uint64_t* workspaceSize, aclOpExecutor** executor);
     // 存在多个输出
-    aclnnStatus aclnnXxxGetWorkspaceSize(const aclTensor *src, ..., aclTensor *yOut, aclTensor *y1Out, ..., uint64_t *workspaceSize, aclOpExecutor **executor);
+    aclnnStatus aclnnXxxGetWorkspaceSize(
+        const aclTensor* src, ..., aclTensor* yOut, aclTensor* y1Out, ..., uint64_t* workspaceSize,
+        aclOpExecutor** executor);
     ```
 
 -   如果算子包含属性，则属性参数的位置介于输入输出之间。如下示例中，x是算子输入，negativeSlope是算子属性，out是算子输出。
 
-    ```
-    aclnnStatus aclnnXxxGetWorkspaceSize(const aclTensor *x, double negativeSlope, aclTensor *out, uint64_t *workspaceSize, aclOpExecutor **executor);
+    ```cpp
+    aclnnStatus aclnnXxxGetWorkspaceSize(
+        const aclTensor* x, double negativeSlope, aclTensor* out, uint64_t* workspaceSize, aclOpExecutor** executor);
     ```
 
 当算子原型注册时使用ValueDepend接口标识输入为数据依赖输入时，会额外生成一个API，该API支持值依赖场景输入数据为空的一阶段计算。
 
-```
-aclnnStatus aclnnXxxTensorGetWorkspaceSize(const aclTensor *src, ..., aclTensor *out, uint64_t *workspaceSize, aclOpExecutor **executor);
+```cpp
+aclnnStatus aclnnXxxTensorGetWorkspaceSize(
+    const aclTensor* src, ..., aclTensor* out, uint64_t* workspaceSize, aclOpExecutor** executor);
 ```
 
 **在aclnn_Xxx_TensorGetWorkspaceSize**中，**aclnn_Xxx_GetWorkspaceSize**参数的数据类型（aclIntArray、aclFloatArray和aclBoolArray）将被转换为aclTensor数据类型，其他输入输出参数生成规则与**aclnn_Xxx_GetWorkspaceSize**一致。如下示例中，x0、x1、x2是算子声明为数据依赖的输入，数据类型分别为DT\_INT64、DT\_BOOL、DT\_FLOAT，out是算子输出。
 
-```
-aclnnStatus aclnnXxxGetWorkspaceSize(const aclIntArray *x0, const aclBoolArray *x1, const aclFloatArray *x2, aclTensor *out, uint64_t *workspaceSize, aclOpExecutor **executor);
-aclnnStatus aclnnXxxTensorGetWorkspaceSize(const aclTensor *x0, const aclTensor *x1, const aclTensor *x2, aclTensor *out, uint64_t *workspaceSize, aclOpExecutor **executor);
+```cpp
+aclnnStatus aclnnXxxGetWorkspaceSize(
+    const aclIntArray* x0, const aclBoolArray* x1, const aclFloatArray* x2, aclTensor* out, uint64_t* workspaceSize,
+    aclOpExecutor** executor);
+aclnnStatus aclnnXxxTensorGetWorkspaceSize(
+    const aclTensor* x0, const aclTensor* x1, const aclTensor* x2, aclTensor* out, uint64_t* workspaceSize,
+    aclOpExecutor** executor);
 ```
 
 ## 前置步骤<a name="section29151158429"></a>
@@ -63,7 +74,7 @@ aclnnStatus aclnnXxxTensorGetWorkspaceSize(const aclTensor *x0, const aclTensor 
 -   参考[Kernel侧算子实现](Kernel侧算子实现.md)完成kernel侧实现的相关准备，参考[Host侧Tiling实现](Host侧Tiling实现/基本流程.md)、[算子原型定义](算子原型定义.md)完成host侧实现相关准备。
 -   对于算子包编译场景，参考[算子工程编译](算子包编译/算子工程编译.md)、[算子包部署](算子包编译/算子包部署.md)完成算子的编译部署，编译部署时需要开启算子的二进制编译功能：修改算子工程中的编译配置项文件CMakePresets.json，将ENABLE\_BINARY\_PACKAGE设置为True。编译部署时可将算子的二进制部署到当前环境，便于后续算子的调用。
 
-    ```
+    ```text
     "ENABLE_BINARY_PACKAGE": {
                         "type": "BOOL",
                         "value": "True"
@@ -74,7 +85,7 @@ aclnnStatus aclnnXxxTensorGetWorkspaceSize(const aclTensor *x0, const aclTensor 
 
     以默认安装场景为例，单算子调用的头文件.h和动态库libcust\_opapi.so所在的目录结构，如下所示：
 
-    ```
+    ```text
     ├── opp    //算子库目录
     │   ├── vendors     //自定义算子所在目录
     │       ├── config.ini
@@ -95,7 +106,7 @@ aclnnStatus aclnnXxxTensorGetWorkspaceSize(const aclTensor *x0, const aclTensor 
 
 代码工程目录结构如下，您可以单击[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclnn_invocation)，获取样例工程的完整样例：
 
-```
+```text
 ├── CMakeLists.txt    // 编译规则文件
 ├── main.cpp    // 单算子调用主体流程实现文件
 ```
@@ -117,7 +128,7 @@ aclnnStatus aclnnXxxTensorGetWorkspaceSize(const aclTensor *x0, const aclTensor 
 >#include "aclnn_add_custom.h"
 >```
 
-```
+```cpp
 // 1.初始化
 CHECK_ACL(aclnnInit(nullptr));
 
@@ -166,7 +177,7 @@ CHECK_ACL(aclnnFinalize());
 
 -   在头文件的搜索路径include\_directories中增加单算子调用的头文件目录。以下样例仅为参考，请根据头文件的实际目录位置进行设置。
 
-    ```
+    ```text
     target_include_directories(execute_add_op PRIVATE
         $ENV{ASCEND_HOME_PATH}/include
         $ENV{ASCEND_OPP_PATH}/vendors/customize/op_api/include
@@ -175,7 +186,7 @@ CHECK_ACL(aclnnFinalize());
 
 -   链接cust\_opapi链接库。
 
-    ```
+    ```cmake
     target_link_libraries(execute_add_op PRIVATE
         cust_opapi
         nnopbase
@@ -185,7 +196,7 @@ CHECK_ACL(aclnnFinalize());
 
 -   在库文件的搜索路径link\_directories中增加libcust\_opapi.so所在目录。以下样例仅为参考，请根据库文件的实际目录位置进行设置。
 
-    ```
+    ```text
     target_link_directories(execute_add_op PRIVATE
         $ENV{ASCEND_HOME_PATH}/lib64
         $ENV{ASCEND_OPP_PATH}/vendors/customize/op_api/lib
@@ -196,7 +207,7 @@ CHECK_ACL(aclnnFinalize());
 
 1.  开发环境上，设置环境变量，配置单算子验证程序编译依赖的头文件与库文件路径，如下为设置环境变量的示例。$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。以root用户安装为例，安装后文件默认存储路径为：/usr/local/Ascend/cann。_\{arch-os\}_为运行环境的架构和操作系统，_arch_表示操作系统架构，_os_表示操作系统，例如x86\_64-linux或aarch64-linux。
 
-    ```
+    ```bash
     export DDK_PATH=${INSTALL_DIR}
     export NPU_HOST_LIB=${INSTALL_DIR}/{arch-os}/devlib
     ```
@@ -204,7 +215,7 @@ CHECK_ACL(aclnnFinalize());
 2.  编译样例工程，生成单算子验证可执行文件。
     1.  切换到样例工程根目录，然后在样例工程根目录下执行如下命令创建目录用于存放编译文件，例如，创建的目录为“build“。
 
-        ```
+        ```bash
         mkdir -p build
         ```
 
@@ -212,14 +223,14 @@ CHECK_ACL(aclnnFinalize());
 
         命令示例如下所示：
 
-        ```
+        ```bash
         cd build
         cmake ../src -DCMAKE_SKIP_RPATH=TRUE
         ```
 
     3.  执行如下命令，生成可执行文件。
 
-        ```
+        ```bash
         make
         ```
 
@@ -232,7 +243,7 @@ CHECK_ACL(aclnnFinalize());
 
     2.  在运行环境中，执行**execute\_add\_op**文件：
 
-        ```
+        ```bash
         chmod +x execute_add_op
         ./execute_add_op
         ```

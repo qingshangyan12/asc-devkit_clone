@@ -14,7 +14,7 @@ This example introduces matrix multiplication in GEMV (M=1) mode.
 
 ## Directory Structure
 
-```
+```text
 ├── mmad_gemv
 │   ├── figures                     // Illustration files in this document
 │   ├── scripts

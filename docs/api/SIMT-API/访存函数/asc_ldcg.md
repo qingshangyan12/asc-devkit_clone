@@ -28,151 +28,151 @@
 
 ## 函数原型
 
-```
+```cpp
 inline long int asc_ldcg(long int* address)
 ```
 
-```
+```cpp
 inline unsigned long int asc_ldcg(unsigned long int* address)
 ```
 
-```
+```cpp
 inline long long int asc_ldcg(long long int* address)
 ```
 
-```
+```cpp
 inline unsigned long long int asc_ldcg(unsigned long long int* address)
 ```
 
-```
+```text
 inline long2 asc_ldcg(long2* address)
 ```
 
-```
+```text
 inline ulong2 asc_ldcg(ulong2* address)
 ```
 
-```
+```text
 inline long4 asc_ldcg(long4* address)
 ```
 
-```
+```text
 inline ulong4 asc_ldcg(ulong4* address)
 ```
 
-```
+```text
 inline longlong2 asc_ldcg(longlong2* address)
 ```
 
-```
+```text
 inline ulonglong2 asc_ldcg(ulonglong2* address)
 ```
 
-```
+```text
 inline longlong4 asc_ldcg(longlong4* address)
 ```
 
-```
+```text
 inline ulonglong4 asc_ldcg(ulonglong4* address)
 ```
 
-```
+```text
 inline signed char asc_ldcg(signed char* address)
 ```
 
-```
+```text
 inline unsigned char asc_ldcg(unsigned char* address)
 ```
 
-```
+```text
 inline char2 asc_ldcg(char2* address)
 ```
 
-```
+```text
 inline uchar2 asc_ldcg(uchar2* address)
 ```
 
-```
+```text
 inline char4 asc_ldcg(char4* address)
 ```
 
-```
+```text
 inline uchar4 asc_ldcg(uchar4* address)
 ```
 
-```
+```text
 inline short asc_ldcg(short* address)
 ```
 
-```
+```text
 inline unsigned short asc_ldcg(unsigned short* address)
 ```
 
-```
+```text
 inline short2 asc_ldcg(short2* address)
 ```
 
-```
+```text
 inline ushort2 asc_ldcg(ushort2* address)
 ```
 
-```
+```text
 inline short4 asc_ldcg(short4* address)
 ```
 
-```
+```text
 inline ushort4 asc_ldcg(ushort4* address)
 ```
 
-```
+```cpp
 inline int asc_ldcg(int* address)
 ```
 
-```
+```cpp
 inline unsigned int asc_ldcg(unsigned int* address)
 ```
 
-```
+```text
 inline int2 asc_ldcg(int2* address)
 ```
 
-```
+```text
 inline uint2 asc_ldcg(uint2* address)
 ```
 
-```
+```text
 inline int4 asc_ldcg(int4* address)
 ```
 
-```
+```text
 inline uint4 asc_ldcg(uint4* address)
 ```
 
-```
+```text
 inline float asc_ldcg(float* address)
 ```
 
-```
+```text
 inline float2 asc_ldcg(float2* address)
 ```
 
-```
+```text
 inline float4 asc_ldcg(float4* address)
 ```
 
-```
+```cpp
 inline bfloat16_t asc_ldcg(bfloat16_t* address)
 ```
 
-```
+```text
 inline bfloat16x2_t asc_ldcg(bfloat16x2_t* address)
 ```
 
-```
+```cpp
 inline half asc_ldcg(half* address)
 ```
 
-```
+```text
 inline half2 asc_ldcg(half2* address)
 ```
 
@@ -196,15 +196,15 @@ L2 Cache中的缓存数据或输入的Global Memory地址上的数据。
 
 使用除half、half2、bfloat16\_t、bfloat16x2\_t类型之外的接口需要包含"simt\_api/device\_functions.h"头文件，使用half和half2类型接口需要包含"simt\_api/asc\_fp16.h"头文件，使用bfloat16\_t和bfloat16x2\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
 
-```
+```cpp
 #include "simt_api/device_functions.h"
 ```
 
-```
+```cpp
 #include "simt_api/asc_fp16.h"
 ```
 
-```
+```cpp
 #include "simt_api/asc_bf16.h"
 ```
 
@@ -212,7 +212,7 @@ L2 Cache中的缓存数据或输入的Global Memory地址上的数据。
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     __global__ __launch_bounds__(1024) void kernel_asc_ldcg(float* dst, float* src)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -224,7 +224,7 @@ L2 Cache中的缓存数据或输入的Global Memory地址上的数据。
 
     SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：\_\_gm\_\_表示Global Memory内存空间。
 
-    ```
+    ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void kernel_asc_ldcg(__gm__ float* dst, __gm__ float* src)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

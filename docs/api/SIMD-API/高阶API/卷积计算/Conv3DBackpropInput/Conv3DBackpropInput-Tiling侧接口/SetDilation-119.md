@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 void SetDilation(int64_t dilationD, int64_t dilationH, int64_t dilationW)
 ```
 
@@ -30,7 +30,7 @@ void SetDilation(int64_t dilationD, int64_t dilationH, int64_t dilationW)
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendCManager::GetInstance();
 ConvBackpropApi::Conv3DBpInputTiling conv3DBpDxTiling(*ascendcPlatform);
 conv3DBpDxTiling.SetDilation(dilationD, dilationH, dilationW);

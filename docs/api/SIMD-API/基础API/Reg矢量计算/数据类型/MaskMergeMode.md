@@ -6,11 +6,7 @@
 -   MaskMergeMode::ZEROING，mask未选择的元素在dst中置零；
 -   MaskMergeMode::MERGING，mask未选择的元素对应dst元素中保留dst原值。
 
-```
-enum class MaskMergeMode {
-    UNKNOWN,
-    MERGING,
-    ZEROING
-};
+```cpp
+enum class MaskMergeMode { UNKNOWN, MERGING, ZEROING };
 ```
 

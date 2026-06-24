@@ -14,7 +14,7 @@ This sample demonstrates the basic usage of Ascend C vector addition.
 
 ## Directory Structure
 
-```
+```text
 ├── add
 │   ├── CMakeLists.txt      // Compilation project file
 │   ├── add.asc             // Ascend C sample implementation & invocation sample
@@ -61,7 +61,10 @@ __vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
 
     // Global Tensor: Allocate input/output buffers on GM
     AscendC::GlobalTensor<float> xGm, yGm, zGm;
-    xGm.SetGlobalBuffer(x + block_idx * blockLength, blockLength);  // Each core processes its own data segment by block_idx offset
+    xGm.SetGlobalBuffer(
+        x + block_idx * blockLength,
+        blockLength); // Each core processes its own data segment
+                      // by block_idx offset
     yGm.SetGlobalBuffer(y + block_idx * blockLength, blockLength);
     zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
 
@@ -74,15 +77,15 @@ __vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
     // GM -> UB: Load input data
     AscendC::DataCopy(xLocal, xGm, blockLength);
     AscendC::DataCopy(yLocal, yGm, blockLength);
-    AscendC::PipeBarrier<PIPE_ALL>();  // Ensure load completes before computation
+    AscendC::PipeBarrier<PIPE_ALL>(); // Ensure load completes before computation
 
     // Vector computation: z = x + y
     AscendC::Add(zLocal, xLocal, yLocal, blockLength);
-    AscendC::PipeBarrier<PIPE_ALL>();  // Ensure computation completes before store
+    AscendC::PipeBarrier<PIPE_ALL>(); // Ensure computation completes before store
 
     // UB -> GM: Store computation result
     AscendC::DataCopy(zGm, zLocal, blockLength);
-    AscendC::PipeBarrier<PIPE_ALL>();  // Ensure store completes
+    AscendC::PipeBarrier<PIPE_ALL>(); // Ensure store completes
 }
 ```
 
@@ -135,7 +138,7 @@ For operators developed based on operator projects, this interface can be used t
 
 Call the [DumpTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md) interface at the location in the operator kernel-side implementation code where Tensor data needs to be printed. Example:
 
-```cpp
+```bash
 // Vector computation: z = x + y
 AscendC::Add(zLocal, xLocal, yLocal, blockLength);
 AscendC::DumpTensor(zLocal, 1, 32);
@@ -153,7 +156,7 @@ msprof ./demo   # Analyze performance
 
 A PROF_-prefix folder will be generated in the current directory. The `mindstudio_profiler_output` directory contains aggregated performance data for the Host and each Device. For performance data analysis, it is recommended to view the files in this directory:
 
-```bash
+```text
 PROF_xxxx_XXXXXX
 ├── device_{id}
 └── host

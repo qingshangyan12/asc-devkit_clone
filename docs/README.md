@@ -2,7 +2,7 @@
 
 ## 目录说明
 关键目录结构如下：
-```
+```text
 ├── api                            # API文档目录
 │   ├── context                    # 存放每个API的说明文档
 │   └── README.md                  # 存放Ascend C API列表

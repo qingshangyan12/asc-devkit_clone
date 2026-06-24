@@ -55,7 +55,7 @@
 
 ```cpp
 template <typename S>
-__aicore__ inline void SetAddrWithOffset(LocalTensor<S> &src, uint32_t offset)
+__aicore__ inline void SetAddrWithOffset(LocalTensor<S>& src, uint32_t offset)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

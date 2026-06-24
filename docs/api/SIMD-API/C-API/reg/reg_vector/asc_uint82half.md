@@ -16,9 +16,9 @@
 
 ```cpp
 // 数据读取索引为偶数的位置
-__simd_callee__ inline void asc_uint82half(vector_half& dst, vector_uint8_t src, vector_bool mask)    
-// 数据读取索引为奇数的位置
-__simd_callee__ inline void asc_uint82half_v2(vector_half& dst, vector_uint8_t src, vector_bool mask)
+__simd_callee__ inline void asc_uint82half(vector_half& dst, vector_uint8_t src, vector_bool mask)
+    // 数据读取索引为奇数的位置
+    __simd_callee__ inline void asc_uint82half_v2(vector_half& dst, vector_uint8_t src, vector_bool mask)
 ```
 
 ## 参数说明

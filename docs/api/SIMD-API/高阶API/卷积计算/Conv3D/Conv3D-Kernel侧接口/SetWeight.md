@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetWeight(const AscendC::GlobalTensor<WeightT>& weight)
 ```
 
@@ -48,7 +48,7 @@ __aicore__ inline void SetWeight(const AscendC::GlobalTensor<WeightT>& weight)
 
 ## 调用示例
 
-```
+```cpp
 GlobalTensor<half> weightGm;
 weightGm.SetGlobalBuffer(reinterpret_cast<__gm__ half*>(weight));
 conv3dApi.SetWeight(weightGm);

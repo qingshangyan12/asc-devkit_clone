@@ -18,9 +18,10 @@
 
 ## 函数原型
 
-```
+```cpp
 template <bool commit = false>
-__aicore__ inline HcclHandle AllReduce(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t count, HcclDataType dataType, HcclReduceOp op, uint8_t repeat = 1)
+__aicore__ inline HcclHandle AllReduce(
+    GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t count, HcclDataType dataType, HcclReduceOp op, uint8_t repeat = 1)
 ```
 
 ## 参数说明
@@ -68,7 +69,7 @@ __aicore__ inline HcclHandle AllReduce(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_
 
     ![](../../../../figures/250902140829537_gai.png)
 
-    ```
+    ```cpp
     extern "C" __global__ __aicore__ void all_reduce_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
     {
         auto sendBuf = xGM;       // xGM为AllReduce的输入GM地址
@@ -108,7 +109,7 @@ __aicore__ inline HcclHandle AllReduce(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_
     **图4**  4卡AllReduce示意图  
     ![4卡AllReduce示意图](../../../../figures/4卡AllReduce示意图.png)
 
-    ```
+    ```cpp
     extern "C" __global__ __aicore__ void all_reduce_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
     {
         constexpr uint32_t tileNum = 2U;   // 首块数量

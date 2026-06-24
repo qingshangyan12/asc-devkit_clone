@@ -34,16 +34,19 @@
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <const SinCosConfig& config = DEFAULT_SINCOS_CONFIG, typename T>
-    __aicore__ inline void SinCos(const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t count)
+    __aicore__ inline void SinCos(
+        const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src,
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t count)
     ```
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <const SinCosConfig& config = DEFAULT_SINCOS_CONFIG, typename T>
-    __aicore__ inline void SinCos(const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src, const uint32_t count)
+    __aicore__ inline void SinCos(
+        const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src, const uint32_t count)
     ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者**通过sharedTmpBuffer入参传入**和**接口框架申请**两种方式。
@@ -62,7 +65,7 @@
 | SinCosConfig | SinCos算法的相关配置。此参数可选配，SinCosConfig类型，具体定义如下方代码所示，其中参数的含义为：<br><br>isReuseSource：是否允许修改源操作数。该参数预留，传入默认值false即可。 |
 | T | 操作数的数据类型。支持的数据类型为：half、float。 |
 
-```
+```cpp
 struct SinCosConfig {
     bool isReuseSource;
 };
@@ -91,7 +94,7 @@ struct SinCosConfig {
 
 -   通过sharedTmpBuffer入参传入
 
-    ```
+    ```cpp
     AscendC::TPipe pipe;
     AscendC::TQue<AscendC::TPosition::VECCALC, 1> tmpQue;
     pipe.InitBuffer(tmpQue, 1, bufferSize); // bufferSize通过Host侧tiling参数获取
@@ -104,7 +107,7 @@ struct SinCosConfig {
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     AscendC::TPipe pipe;
     AscendC::TQue<AscendC::TPosition::VECCALC, 1> tmpQue;
     pipe.InitBuffer(tmpQue, 1, bufferSize); // bufferSize通过Host侧tiling参数获取
@@ -116,7 +119,7 @@ struct SinCosConfig {
 
 结果示例如下：
 
-```
+```text
 输入数据(src0):
 [ -360, -270, -180, -90, 0, 90, 180, 270, 360 ]
 输出数据(dst0):

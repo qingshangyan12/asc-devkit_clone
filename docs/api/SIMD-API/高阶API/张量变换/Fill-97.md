@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename T>
 __aicore__ inline void Fill(GlobalTensor<T>& gmWorkspaceAddr, const uint64_t size, const T value)
 ```
@@ -78,7 +78,7 @@ __aicore__ inline void Fill(GlobalTensor<T>& gmWorkspaceAddr, const uint64_t siz
 
 本调用示例使用8个核，每个核用当前blockIdx的值初始化zGm上的65536个数。
 
-```
+```cpp
 // 带初始化的元素个数
 constexpr int32_t INIT_SIZE = 65536;
 
@@ -90,7 +90,7 @@ AscendC::Fill(zGm, INIT_SIZE, (float)(AscendC::GetBlockIdx()));
 
 结果示例如下：
 
-```
+```text
 初始化后zGm数据：
 [0. 0. 0. ... 0. 0. 0.
  1. 1. 1. ... 1. 1. 1.

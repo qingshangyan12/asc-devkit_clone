@@ -82,7 +82,7 @@
 
 根据确定的Tiling参数，使用C++语法定义TilingData结构体，代码如下。
 
-```
+```cpp
 struct AddCustomTilingData {
     uint32_t blockLength;
     uint32_t tileNum;
@@ -93,14 +93,14 @@ struct AddCustomTilingData {
 
 接下来完成Tiling参数的计算。由于每个核内数据被切分为16块，根据使用的核数和核内切分数，计算Tiling参数，并写入到Tiling结构体内。代码示例如下：
 
-```
-constexpr int32_t NUM_BLOCKS = 8;                             // 使用的核数
-constexpr int32_t TILE_NUM = 16;                             // 核内切分数量
+```cpp
+constexpr int32_t NUM_BLOCKS = 8; // 使用的核数
+constexpr int32_t TILE_NUM = 16;  // 核内切分数量
 void GenerateTilingData(uint8_t* tilingBuf, uint32_t numBlocks)
 {
     uint32_t totalLength;
     // 此处省略如何获取数据总长TOTAL_LENGTH，可以根据具体情况实现。本章节仅介绍Tiling相关内容。
-    AddCustomTilingData* tiling = reinterpret_cast<AddCustomTilingData *>(tilingBuf);
+    AddCustomTilingData* tiling = reinterpret_cast<AddCustomTilingData*>(tilingBuf);
     uint32_t blockLength = TOTAL_LENGTH / numBlocks;
     uint32_t tileNum = TILE_NUM;
     uint32_t tileLength = blockLength / tileNum;
@@ -113,17 +113,16 @@ void GenerateTilingData(uint8_t* tilingBuf, uint32_t numBlocks)
 
 最后，在Host侧调用程序中，调用上述Tiling参数计算函数，计算出相关参数，然后传递到Kernel侧核函数。
 
-```
-    constexpr int32_t NUM_BLOCKS = 8;
-    ...
-    uint8_t *tiling = nullptr;
-    size_t tilingSize = sizeof(AddCustomTilingData);
-    GenerateTilingData(tiling, NUM_BLOCKS);  // 调用tiling参数计算函数
-    ....
-    
-    tiling_strategy_custom<<<NUM_BLOCKS, nullptr, stream>>>(xDevice, yDevice, zDevice,
-                                               *reinterpret_cast<AddCustomTilingData*>(tiling));
-    ....
+```cpp
+constexpr int32_t NUM_BLOCKS = 8;
+... uint8_t* tiling = nullptr;
+size_t tilingSize = sizeof(AddCustomTilingData);
+GenerateTilingData(tiling, NUM_BLOCKS); // 调用tiling参数计算函数
+....
+
+    tiling_strategy_custom<<<NUM_BLOCKS, nullptr, stream>>>(
+        xDevice, yDevice, zDevice, *reinterpret_cast<AddCustomTilingData*>(tiling));
+....
 ```
 
 ## 算子类实现<a name="zh-cn_topic_0000002236197677_section849945172010"></a>
@@ -136,8 +135,8 @@ Kernel侧算子实现仍遵循[矢量算子核函数实现流程](../基础矢�
 
     以获取输入x在Global Memory上的内存偏移地址为例，数据整体长度TOTAL\_LENGTH为8 \* 2048，平均分配到8个核上运行，每个核上处理的数据长度blockLength为2048，调用[GetBlockIdx](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/工具接口/系统资源与变量/GetBlockIdx.md)接口获取当前核的index，x + blockLength \* GetBlockIdx\(\)即为单核处理程序中x在Global Memory上的内存偏移地址，获取偏移地址后，使用GlobalTensor类的[SetGlobalBuffer](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/SetGlobalBuffer.md)接口设定该核上Global Memory的起始地址以及长度，具体示意图请参考[图3](#zh-cn_topic_0000002236197677_fig398721711313)。代码如下所示：
 
-    ```
-    xGm.SetGlobalBuffer((__gm__ half *)x + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
+    ```cpp
+    xGm.SetGlobalBuffer((__gm__ half*)x + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
     ```
 
     **图3**  多核并行处理示意图<a name="zh-cn_topic_0000002236197677_fig398721711313"></a>  
@@ -152,23 +151,24 @@ Kernel侧算子实现仍遵循[矢量算子核函数实现流程](../基础矢�
 
     与[基础矢量算子](../基础矢量算子.md)相比，在通过Pipe内存管理对象为输入输出Queue分配内存时，需使用单核内每个数据块的长度tileLength作为分配内存的长度。比如，为输入x的Queue分配内存，可以通过如下代码段实现，Pipe为inQueueX分配了一块大小为tileLength \* sizeof\(half\)个字节的内存块，每个内存块能容纳tileLength（128）个half类型数据。
 
-    ```
+    ```cpp
     pipe->InitBuffer(inQueueX, 1, this->tileLength * sizeof(half))
     ```
 
 具体的初始化函数代码如下：
 
-```
-__aicore__ inline void Init(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, AddCustomTilingData tiling, AscendC::TPipe* pipeIn)
+```cpp
+__aicore__ inline void Init(
+    __gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, AddCustomTilingData tiling, AscendC::TPipe* pipeIn)
 {
     pipe = pipeIn;
     this->blockLength = tiling.blockLength;
     this->tileNum = tiling.tileNum;
     this->tileLength = tiling.tileLength;
     // 计算每个核上的地址偏移
-    xGm.SetGlobalBuffer((__gm__ half *)x + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
-    yGm.SetGlobalBuffer((__gm__ half *)y + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
-    zGm.SetGlobalBuffer((__gm__ half *)z + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
+    xGm.SetGlobalBuffer((__gm__ half*)x + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
+    yGm.SetGlobalBuffer((__gm__ half*)y + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
+    zGm.SetGlobalBuffer((__gm__ half*)z + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
     // pipe alloc memory to queue, the unit is Bytes
     pipe->InitBuffer(inQueueX, 1, this->tileLength * sizeof(half));
     pipe->InitBuffer(inQueueY, 1, this->tileLength * sizeof(half));
@@ -178,7 +178,7 @@ __aicore__ inline void Init(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t
 
 每个核需要对tileNum个数据块分别进行搬入、计算、搬出处理，因此Process函数内将tileNum作为循环上限。
 
-```
+```cpp
 __aicore__ inline void Process()
 {
     int32_t loopCount = this->tileNum;
@@ -195,12 +195,12 @@ __aicore__ inline void Process()
 
 CopyIn函数实现代码如下：
 
-```
+```cpp
 __aicore__ inline void CopyIn(int32_t progress, uint32_t tileLength)
 {
     ...
-    // copy progress_th tile from global tensor to local tensor
-    AscendC::DataCopy(xLocal, xGm[progress * this->tileLength], tileLength);
+        // copy progress_th tile from global tensor to local tensor
+        AscendC::DataCopy(xLocal, xGm[progress * this->tileLength], tileLength);
     AscendC::DataCopy(yLocal, yGm[progress * this->tileLength], tileLength);
     ...
 }
@@ -208,12 +208,12 @@ __aicore__ inline void CopyIn(int32_t progress, uint32_t tileLength)
 
 CopyOut函数实现代码如下：
 
-```
- __aicore__ inline void CopyOut(int32_t progress, uint32_t tileLength)
+```cpp
+__aicore__ inline void CopyOut(int32_t progress, uint32_t tileLength)
 {
     ...
-    // copy progress_th tile from local tensor to global tensor
-    AscendC::DataCopy(zGm[progress * this->tileLength], zLocal, tileLength);
+        // copy progress_th tile from local tensor to global tensor
+        AscendC::DataCopy(zGm[progress * this->tileLength], zLocal, tileLength);
     ...
 }
 ```

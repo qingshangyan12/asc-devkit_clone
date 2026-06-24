@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001575931912_zh-cn_topic_0000001576875005_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
+```text
 OpAICoreConfig &DynamicCompileStaticFlag(bool flag)
 ```
 

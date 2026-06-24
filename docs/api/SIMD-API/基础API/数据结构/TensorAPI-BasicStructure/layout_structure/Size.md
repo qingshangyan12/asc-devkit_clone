@@ -44,7 +44,7 @@ Is...必须为有效范围内的索引。
 ### 示例代码
 
    ```cpp
-  using namespace AscendC::Te;
-  auto layout = MakeLayout(MakeShape(10, 20), MakeStride(1, 100));
-  auto size = Size(layout); //size = 200
+   using namespace AscendC::Te;
+   auto layout = MakeLayout(MakeShape(10, 20), MakeStride(1, 100));
+   auto size = Size(layout); // size = 200
   ```

@@ -6,10 +6,11 @@
 
 在算子工程目录下的“op\_kernel/xxx.cpp”文件中实现算子的核函数。核函数的定义模板已通过msOpGen工具自动生成，样例如下所示。**注意这里参数的顺序按照“输入、输出、workspace、tiling”的顺序排布，开发者不要调整其顺序。**
 
-```
+```cpp
 #include "kernel_operator.h"
-extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling) {
-    GET_TILING_DATA(tiling_data, tiling);// 获取Tiling参数，详见下文介绍
+extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling)
+{
+    GET_TILING_DATA(tiling_data, tiling); // 获取Tiling参数，详见下文介绍
     // TODO: user kernel impl
 }
 ```
@@ -28,7 +29,7 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
 
 核函数中调用[GET\_TILING\_DATA](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Kernel-Tiling/GET_TILING_DATA.md)获取TilingData的样例如下：
 
-```
+```cpp
 extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling)
 {
     GET_TILING_DATA(tilingData, tiling);
@@ -50,8 +51,10 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
 
 样例如下：
 
-```
-template<class T> func() {}
+```cpp
+template <class T>
+func()
+{}
 extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling)
 {
     DTYPE_X temp;
@@ -79,51 +82,55 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
 
 -   如下示例中，算子中有一个输出依赖计算得出，输出tensor的数据类型为uint32\_t，计算完成后，得到输出的shape为（32, 64），出参shape\_out用于存放该shape信息，值为（2, 32, 64）。代码示例如下：
 
-    ```
-    extern "C" __global__ __aicore__ void xxx_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR shape_out, GM_ADDR workspace, GM_ADDR tiling) {
-    ...
-        constexpr uint32_t SHAPEOUT_SIZE = 9;
+    ```cpp
+    extern "C" __global__ __aicore__ void xxx_custom(
+        GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR shape_out, GM_ADDR workspace, GM_ADDR tiling)
+    {
+        ... constexpr uint32_t SHAPEOUT_SIZE = 9;
         // 输出数据为2维([32, 64])，tensor类型为uint32_t
         // shapeoutGlobal_uint32用于存放输出Shape信息，存储格式固定为uint64_t
         GlobalTensor<uint64_t> shapeoutGlobal_uint32;
         shapeoutGlobal_uint32.SetGlobalBuffer((__gm__ uint64_t*)shape_out, SHAPEOUT_SIZE);
-        shapeoutGlobal_uint32.SetValue(0, 2); // 2维tensor
+        shapeoutGlobal_uint32.SetValue(0, 2);  // 2维tensor
         shapeoutGlobal_uint32.SetValue(1, 32); // shape[0]
         shapeoutGlobal_uint32.SetValue(2, 64); // shape[1]
-    ...
+        ...
     }
     ```
 
 -   如下示例中，算子中有一个输出依赖计算得出，输出tensor的数据类型为uint64\_t，计算完成后，得到输出的shape为（1, 64, 128, 128），出参shape\_out用于存放该shape信息，值为（0x0000000080000000 | 4 , 1, 64, 128, 128）。代码示例如下：
 
-    ```
-    extern "C" __global__ __aicore__ void xxx_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR shape_out, GM_ADDR workspace, GM_ADDR tiling) {
-    ...
-        constexpr uint32_t SHAPEOUT_SIZE = 9;
+    ```cpp
+    extern "C" __global__ __aicore__ void xxx_custom(
+        GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR shape_out, GM_ADDR workspace, GM_ADDR tiling)
+    {
+        ... constexpr uint32_t SHAPEOUT_SIZE = 9;
         // 输出数据为4维([1, 64, 128, 128])，tensor类型为uint64_t
         // shapeoutGlobal_uint64用于存放输出Shape信息，存储格式固定为uint64_t
         GlobalTensor<uint64_t> shapeoutGlobal_uint64;
         shapeoutGlobal_uint64.SetGlobalBuffer((__gm__ uint64_t*)shape_out, SHAPEOUT_SIZE);
         shapeoutGlobal_uint64.SetValue(0, 0x0000000080000000 | 4); // dim 高32位至1表示为uint64_t类型的4维tensor
-        shapeoutGlobal_uint64.SetValue(1, 1); // shape[0]
-        shapeoutGlobal_uint64.SetValue(2, 64); // shape[1]
-        shapeoutGlobal_uint64.SetValue(3, 128); // shape[2]
-        shapeoutGlobal_uint64.SetValue(4, 128); // shape[3]
-    ...
+        shapeoutGlobal_uint64.SetValue(1, 1);                      // shape[0]
+        shapeoutGlobal_uint64.SetValue(2, 64);                     // shape[1]
+        shapeoutGlobal_uint64.SetValue(3, 128);                    // shape[2]
+        shapeoutGlobal_uint64.SetValue(4, 128);                    // shape[3]
+        ...
     }
     ```
 
 -   如下示例中，算子中有两个输出依赖计算得出，输出tensor的数据类型为uint64\_t，计算完成后，得到输出的shape为（16, 32）和（1, 16, 16, 32），出参shape\_out用于存放该shape信息。示例如下：
 
-    ```
-    extern "C" __global__ __aicore__ void xxx_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR shape_out, GM_ADDR workspace, GM_ADDR tiling) {
+    ```cpp
+    extern "C" __global__ __aicore__ void xxx_custom(
+        GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR shape_out, GM_ADDR workspace, GM_ADDR tiling)
+    {
         ...
-        // 有两个输出需要刷新shape，一个维度为2维[16, 32]，一个维度为4维[1, 16, 16, 32]
-        // 输出tensor类型为uint64_t
-        constexpr uint32_t SHAPEOUT_SIZE_2 = 18;
+            // 有两个输出需要刷新shape，一个维度为2维[16, 32]，一个维度为4维[1, 16, 16, 32]
+            // 输出tensor类型为uint64_t
+            constexpr uint32_t SHAPEOUT_SIZE_2 = 18;
         // shapeoutGlobal_uint64_2用于存放输出Shape信息，存储格式固定为uint64_t
         GlobalTensor<uint64_t> shapeoutGlobal_uint64_2;
-        shapeoutGlobal_uint64_2.SetGlobalBuffer((__gm__ uint64_t*)shape_out, SHAPEOUT_SIZE_2 );
+        shapeoutGlobal_uint64_2.SetGlobalBuffer((__gm__ uint64_t*)shape_out, SHAPEOUT_SIZE_2);
         shapeoutGlobal_uint64_2.SetValue(0, 0x0000000080000000 | 2); // uint64_t类型的2维tensor
         shapeoutGlobal_uint64_2.SetValue(1, 16);
         shapeoutGlobal_uint64_2.SetValue(2, 32);

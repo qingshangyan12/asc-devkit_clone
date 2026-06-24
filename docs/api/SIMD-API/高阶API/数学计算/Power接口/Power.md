@@ -36,60 +36,72 @@
     -   通过sharedTmpBuffer入参传入临时空间
         -   源操作数Tensor全部/部分参与计算
 
-            ```
+            ```cpp
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
-            __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
+            __aicore__ inline void Power(
+                const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
+                const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
             ```
 
         -   源操作数Tensor全部参与计算
 
-            ```
+            ```cpp
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
-            __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
+            __aicore__ inline void Power(
+                const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
+                const LocalTensor<uint8_t>& sharedTmpBuffer)
             ```
 
     -   接口框架申请临时空间
         -   源操作数Tensor全部/部分参与计算
 
-            ```
+            ```cpp
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
-            __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, uint32_t calCount)
+            __aicore__ inline void Power(
+                const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
+                uint32_t calCount)
             ```
 
         -   源操作数Tensor全部参与计算
 
-            ```
+            ```cpp
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
-            __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor)
+            __aicore__ inline void Power(
+                const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor)
             ```
 
 -   Power\(dstTensor, src0Tensor, src1Scalar\)
     -   通过sharedTmpBuffer入参传入临时空间
         -   源操作数Tensor全部/部分参与计算
 
-            ```
+            ```cpp
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
-            __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar, const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
+            __aicore__ inline void Power(
+                const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar,
+                const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
             ```
 
         -   源操作数Tensor全部参与计算
 
-            ```
+            ```cpp
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
-            __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar, const LocalTensor<uint8_t>& sharedTmpBuffer)
+            __aicore__ inline void Power(
+                const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar,
+                const LocalTensor<uint8_t>& sharedTmpBuffer)
             ```
 
     -   接口框架申请临时空间
         -   源操作数Tensor全部/部分参与计算
 
-            ```
+            ```cpp
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
-            __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar, uint32_t calCount)
+            __aicore__ inline void Power(
+                const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar, uint32_t calCount)
             ```
 
         -   源操作数Tensor全部参与计算
 
-            ```
+            ```cpp
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
             __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar)
             ```
@@ -98,29 +110,34 @@
     -   通过sharedTmpBuffer入参传入临时空间
         -   源操作数Tensor全部/部分参与计算
 
-            ```
+            ```cpp
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
-            __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
+            __aicore__ inline void Power(
+                const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor,
+                const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
             ```
 
         -   源操作数Tensor全部参与计算
 
-            ```
+            ```cpp
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
-            __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
+            __aicore__ inline void Power(
+                const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor,
+                const LocalTensor<uint8_t>& sharedTmpBuffer)
             ```
 
     -   接口框架申请临时空间
         -   源操作数Tensor全部/部分参与计算
 
-            ```
+            ```cpp
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
-            __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor, uint32_t calCount)
+            __aicore__ inline void Power(
+                const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor, uint32_t calCount)
             ```
 
         -   源操作数Tensor全部参与计算
 
-            ```
+            ```cpp
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
             __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor)
             ```
@@ -143,7 +160,7 @@
 | isReuseSource | 是否允许修改源操作数。该参数预留，传入默认值false即可。 |
 | config | <!-- npu="950" id7 -->该参数仅支持Ascend 950PR/Ascend 950DT。<br><br><!-- end id7 -->Power计算的相关配置。此参数可选配，PowerConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：不同的数据类型支持的不同Power算法。该参数支持的取值如下：INTRINSIC：默认值。如果数据类型是整型，INTRINSIC算法使用快速幂算法实现Power计算，支持的数据类型为uint8_t、int8_t、uint16_t、int16_t、uint32_t、int32_t。如果数据类型是浮点数类型，INTRINSIC算法按照公式Power(x, y) = exp(y * ln(x))进行Power计算，支持的数据类型为half、float。DOUBLE_FLOAT_TECH：DOUBLE_FLOAT_TECH算法是高精度浮点数算法，将源操作数的精度提升后，按照公式Power(x, y) = exp(y * ln(x))进行Power计算，减少计算过程中的精度损失，支持的数据类型为bfloat16_t、half、float。 |
 
-```
+```cpp
 enum class PowerAlgo {
     INTRINSIC = 0,
     DOUBLE_FLOAT_TECH,
@@ -195,7 +212,7 @@ struct PowerConfig {
 
 完整的调用样例请参考[Power样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/10_math/power)。
 
-```
+```cpp
 // dstLocal: 存放计算结果的Tensor
 // srcLocalExp: Power计算使用的指数Tensor
 // srcLocalBase: Power计算使用的底数Tensor
@@ -219,7 +236,7 @@ AscendC::Power<T, false>(dstLocal, srcLocalBase, scalarValueExp);
 
 AscendC::Power<T, false\>\(dstLocal, srcLocalBase, srcLocalExp\)示例数据如下：
 
-```
+```text
 输入数据(srcLocalBase): [2 3 4 5 6 7 8 9]
 输入数据(srcLocalExp): [4 3 2 1 4 3 2 1]
 输出数据(dstLocal): [16 27 16 5 1296 343 64 9]
@@ -227,7 +244,7 @@ AscendC::Power<T, false\>\(dstLocal, srcLocalBase, srcLocalExp\)示例数据如�
 
 AscendC::Power<T, false\>\(dstLocal, scalarValueBase, srcLocalExp\)示例数据如下：
 
-```
+```text
 输入数据(scalarValueBase): 2
 输入数据(srcLocalExp): [4 3 2 1 4 3 2 1]
 输出数据(dstLocal): [16 8 4 2 16 8 4 2]
@@ -235,7 +252,7 @@ AscendC::Power<T, false\>\(dstLocal, scalarValueBase, srcLocalExp\)示例数据�
 
 AscendC::Power<T, false\>\(dstLocal, srcLocalBase, scalarValueExp\)示例数据如下：
 
-```
+```text
 输入数据(srcLocalBase): [2 3 4 5 6 7 8 9]
 输入数据(scalarValueExp): 4
 输出数据(dstLocal): [16 81 256 625 1296 2401 4096 6561]

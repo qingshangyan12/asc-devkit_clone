@@ -35,7 +35,7 @@
 
 ![](../../../../figures/zh-cn_formulaimage_0000002188545700.png)
 
-```
+```text
 例如：3^5=6，即0000 0011^0000 0101 = 0000 0110
 ```
 
@@ -44,31 +44,38 @@
 -   通过sharedTmpBuffer入参传入临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void Xor(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+        __aicore__ inline void Xor(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
+            const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void Xor(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
+        __aicore__ inline void Xor(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
+            const LocalTensor<uint8_t>& sharedTmpBuffer)
         ```
 
 -   接口框架申请临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void Xor(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, const uint32_t calCount)
+        __aicore__ inline void Xor(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
+            const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void Xor(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor)
+        __aicore__ inline void Xor(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor)
         ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者**通过sharedTmpBuffer入参传入**和**接口框架申请**两种方式。
@@ -114,7 +121,7 @@
 
 完整的调用样例可参考[Xor样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/10_math/xor)。
 
-```
+```cpp
 // dstLocal: 存放计算结果的Tensor
 // src0Local: 参与计算的输入Tensor
 // src1Local: 参与计算的输入Tensor
@@ -124,7 +131,7 @@ AscendC::Xor(dstLocal, src0Local, src1Local);
 
 结果示例如下：
 
-```
+```text
 输入数据(srcLocal): [ 2  3  5  7 11 13 17 19 ]
 输入数据(srcLocal): [ 1  2  3  4  5  6  7  8 ]
 输出数据(dstLocal): [ 3  1  6  3 14 10 22 27 ]

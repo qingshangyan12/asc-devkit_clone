@@ -31,7 +31,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetLocalWorkspace(const LocalTensor<uint8_t>& tmpBuffer)
 ```
 
@@ -51,9 +51,9 @@ __aicore__ inline void SetLocalWorkspace(const LocalTensor<uint8_t>& tmpBuffer)
 
 ## 调用示例
 
-```
+```cpp
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
-mm.SetLocalWorkspace(mmFormatUb);    //设置临时VECCALC空间
+mm.SetLocalWorkspace(mmFormatUb); // 设置临时VECCALC空间
 mm.SetTensorA(gm_a);
 mm.SetTensorB(gm_b);
 if (tiling.isBias) {

@@ -14,7 +14,7 @@ This example uses the TopK high-level API in a sorting scenario to find the top 
 
 ## Directory Structure
 
-```
+```text
 ├── topk
 │   ├── scripts
 │   │   └── gen_data.py         // Script for generating input data and ground truth data

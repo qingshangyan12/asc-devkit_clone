@@ -28,7 +28,7 @@ Init主要用于对Conv3D对象中的Tiling数据进行初始化，根据Tiling�
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void Init(const void* __restrict cubeTiling)
 ```
 
@@ -47,7 +47,7 @@ __aicore__ inline void Init(const void* __restrict cubeTiling)
 -   调用Init接口前必须先初始化TPipe。
 -   Init接口必须在IterateAll和End接口前调用，且只能调用一次Init接口，调用顺序如下。
 
-    ```
+    ```text
     Init(...);
     ...
     IterateAll(...);
@@ -56,7 +56,7 @@ __aicore__ inline void Init(const void* __restrict cubeTiling)
 
 ## 调用示例
 
-```
+```text
 TPipe pipe;
 conv3dApi.Init(&tiling);
 ```

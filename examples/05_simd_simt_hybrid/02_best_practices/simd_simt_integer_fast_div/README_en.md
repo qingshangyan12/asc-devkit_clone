@@ -21,7 +21,7 @@ This example uses fixed-divisor integer division computation to demonstrate inte
 
 ## Directory Structure
 
-```
+```text
 ├── simd_simt_integer_fast_div
 │   ├── CMakeLists.txt          // Build project file
 │   ├── integer_div.asc         // Integer division example implementation
@@ -34,7 +34,7 @@ This example uses fixed-divisor integer division computation to demonstrate inte
 
 This example implements fixed-divisor uint32 integer division computation and compares the performance differences between two SIMT thread computation methods: standard division and fast division. The computation formula is as follows:
 
-```cpp
+```text
 output[i] = input[i] / divisor
 ```
 
@@ -277,7 +277,7 @@ msprof ./integer_div   # Analyze performance
 
 A PROF_-prefixed folder is generated in the current directory. The `mindstudio_profiler_output` directory contains the performance data summary for the Host and each Device. For performance data analysis, it is recommended to view the files in this directory.
 
-```bash
+```text
 PROF_xxxx_XXXXXX
 ├── device_{id}
 └── host

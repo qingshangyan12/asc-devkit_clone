@@ -10,7 +10,7 @@ HCCL Tiling API获取Tiling参数的流程如下：
 
 1.  创建一个[Mc2CcTilingConfig](HCCL-Tiling构造函数.md)类对象。
 
-    ```
+    ```cpp
     const char* groupName = "testGroup";
     uint32_t opType = HCCL_CMD_REDUCE_SCATTER;
     std::string algConfig = "ReduceScatter=level0:fullmesh";
@@ -20,7 +20,7 @@ HCCL Tiling API获取Tiling参数的流程如下：
 
 2.  通过配置接口设置通信信息（可选）。
 
-    ```
+    ```text
     mc2CcTilingConfig.SetSkipLocalRankCopy(0);
     mc2CcTilingConfig.SetSkipBufferWindowCopy(1);
     ```
@@ -42,7 +42,7 @@ HCCL Tiling API获取Tiling参数的流程如下：
 
 3.  调用[GetTiling](GetTiling-100.md)接口，获取Tiling信息。
 
-    ```
+    ```cpp
     mc2CcTilingConfig.GetTiling(tiling->mc2InitTiling); // tiling为算子组装的TilingData结构体
     mc2CcTilingConfig.GetTiling(tiling->reduceScatterTiling);
     ```

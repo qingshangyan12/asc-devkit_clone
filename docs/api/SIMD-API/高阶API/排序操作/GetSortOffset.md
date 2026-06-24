@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename T>
 __aicore__ inline uint32_t GetSortOffset(const uint32_t elemOffset)
 ```
@@ -35,6 +35,6 @@ Sort数据中的对应偏移量。
 
 ## 调用示例
 
-```
+```cpp
 AscendC::GetSortOffset<half>(128);
 ```

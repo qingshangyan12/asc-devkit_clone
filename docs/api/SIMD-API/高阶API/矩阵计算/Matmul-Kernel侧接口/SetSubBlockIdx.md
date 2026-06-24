@@ -22,7 +22,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetSubBlockIdx(uint8_t subBlockIdx)
 ```
 
@@ -45,7 +45,7 @@ __aicore__ inline void SetSubBlockIdx(uint8_t subBlockIdx)
 
 ## 调用示例
 
-```
+```cpp
 typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> aType;
 typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> bType;
 typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType;

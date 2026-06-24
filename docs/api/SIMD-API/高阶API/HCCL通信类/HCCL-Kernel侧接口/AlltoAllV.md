@@ -20,9 +20,11 @@ AlltoAllV的功能为：通信域内的卡互相发送和接收数据，并且�
 
 ## 函数原型
 
-```
+```cpp
 template <bool commit = false>
-__aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void* sendCounts, void* sdispls, HcclDataType sendType, GM_ADDR recvBuf, void* recvCounts, void* rdispls, HcclDataType recvType, uint8_t repeat = 1)
+__aicore__ inline HcclHandle AlltoAllV(
+    GM_ADDR sendBuf, void* sendCounts, void* sdispls, HcclDataType sendType, GM_ADDR recvBuf, void* recvCounts,
+    void* rdispls, HcclDataType recvType, uint8_t repeat = 1)
 ```
 
 ## 参数说明
@@ -70,7 +72,7 @@ __aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void* sendCounts, void* 
     **图1**  非切分场景下4卡AlltoAllV图示  
     ![](../../../../figures/非切分场景下4卡AlltoAllV图示.png "非切分场景下4卡AlltoAllV图示")
 
-    ```
+    ```cpp
     extern "C" __global__ __aicore__ void alltoallv_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
     {
         constexpr uint32_t rankNum = 4U;
@@ -117,7 +119,7 @@ __aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void* sendCounts, void* 
     **图2**  非切分场景下4卡不均匀收发  
     ![](../../../../figures/非切分场景下4卡不均匀收发.png "非切分场景下4卡不均匀收发")
 
-    ```
+    ```cpp
     extern "C" __global__ __aicore__ void alltoallv_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
     {
         constexpr uint32_t rankNum = 4U;

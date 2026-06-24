@@ -22,7 +22,9 @@
 
 ```cpp
 template <typename T, typename U>
-__aicore__ inline void Conv2D(const LocalTensor<T>& dst, const LocalTensor<U>& featureMap, const LocalTensor<U>& weight, Conv2dParams& conv2dParams, Conv2dTilling& tilling)
+__aicore__ inline void Conv2D(
+    const LocalTensor<T>& dst, const LocalTensor<U>& featureMap, const LocalTensor<U>& weight,
+    Conv2dParams& conv2dParams, Conv2dTilling& tilling)
 ```
 
 入参中的tiling结构需要通过如下切分方案计算接口来获取：

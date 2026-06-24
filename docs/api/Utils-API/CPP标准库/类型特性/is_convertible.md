@@ -16,7 +16,7 @@ is\_convertible是定义于<type\_traits\>头文件的一个类型转换检查�
 
 ## 函数原型
 
-```
+```cpp
 template <typename From, typename To>
 struct is_convertible;
 ```
@@ -43,7 +43,7 @@ is\_convertible的静态常量成员value用于获取返回的布尔值，is\_co
 
 ## 调用示例
 
-```
+```cpp
 class Base {};
 class Derived : public Base {};
 class Unrelated {};
@@ -62,7 +62,7 @@ AscendC::PRINTF("Is Base callable with Derived? %d\n", AscendC::Std::is_converti
 AscendC::PRINTF("Is Derived callable with Unrelated? %d\n", AscendC::Std::is_convertible<Derived, Unrelated>::value);
 ```
 
-```
+```text
 // 执行结果：
 Is int convertible to double? 1
 Is double convertible to int? 1

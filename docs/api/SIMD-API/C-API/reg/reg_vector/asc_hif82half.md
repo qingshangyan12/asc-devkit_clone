@@ -17,8 +17,8 @@
 ```cpp
 // 选取索引0的位置
 __simd_callee__ inline void asc_hif82half(vector_half& dst, vector_hifloat8_t src, vector_bool mask)
-// 选取索引1的位置
-__simd_callee__ inline void asc_hif82half_v2(vector_half& dst, vector_hifloat8_t src, vector_bool mask)
+    // 选取索引1的位置
+    __simd_callee__ inline void asc_hif82half_v2(vector_half& dst, vector_hifloat8_t src, vector_bool mask)
 ```
 
 ## 参数说明

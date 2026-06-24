@@ -12,7 +12,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── matmul_format_column_major
 │   ├── scripts
 │   │   ├── gen_data.py                    // 输入数据和真值数据生成脚本文件
@@ -45,21 +45,24 @@
     - 创建Matmul对象：C矩阵的Format设置为COLUMN_MAJOR。
       ```cpp
       AscendC::Matmul<
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::COLUMN_MAJOR, ATYPE>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::COLUMN_MAJOR, BType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::COLUMN_MAJOR, CType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>> matmulObj;
+          AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::COLUMN_MAJOR, ATYPE>,
+          AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::COLUMN_MAJOR, BType>,
+          AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::COLUMN_MAJOR, CType>,
+          AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>>
+          matmulObj;
       ```
 
   - Tiling关键步骤
     - 设置A、B、C、Bias的参数类型信息，其中A、B、C矩阵的Format设置为COLUMN_MAJOR。
       ```cpp
-      cubeTiling.SetAType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::COLUMN_MAJOR,
-          matmul_tiling::DataType::DT_FLOAT16, isAtrans);
-      cubeTiling.SetBType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::COLUMN_MAJOR,
-          matmul_tiling::DataType::DT_FLOAT16, isBtrans);
-      cubeTiling.SetCType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::COLUMN_MAJOR,
-          matmul_tiling::DataType::DT_FLOAT);
+      cubeTiling.SetAType(
+          matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::COLUMN_MAJOR, matmul_tiling::DataType::DT_FLOAT16,
+          isAtrans);
+      cubeTiling.SetBType(
+          matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::COLUMN_MAJOR, matmul_tiling::DataType::DT_FLOAT16,
+          isBtrans);
+      cubeTiling.SetCType(
+          matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::COLUMN_MAJOR, matmul_tiling::DataType::DT_FLOAT);
       ```
 
   - 调用实现  

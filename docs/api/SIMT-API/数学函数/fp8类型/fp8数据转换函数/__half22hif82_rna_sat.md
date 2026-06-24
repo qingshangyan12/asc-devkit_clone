@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```text
 inline hifloat8x2_t __half22hif82_rna_sat(const half2 x)
 ```
 
@@ -54,7 +54,7 @@ SIMT编程场景当前不支持使用该接口。
 
 使用该接口需要包含"simt\_api/asc\_fp8.h"头文件。
 
-```
+```cpp
 #include "simt_api/asc_fp8.h"
 ```
 
@@ -62,19 +62,21 @@ SIMT编程场景当前不支持使用该接口。
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     // 使用短向量可提升数据搬运效率
-    __simt_vf__ __launch_bounds__(1024) inline void simt_half22hif82_rna_sat(__gm__ half2* input, __gm__ hifloat8x2_t* output, uint32_t input_total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void simt_half22hif82_rna_sat(
+        __gm__ half2* input, __gm__ hifloat8x2_t* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx > input_total_length /2) {
+        if (idx > input_total_length / 2) {
             return;
         }
         output[idx] = __half22hif82_rna_sat(input[idx]);
     }
-    __global__ __vector__ void cast_kernel(__gm__ half* input,  __gm__ uint8_t* output, uint32_t input_total_length)
+    __global__ __vector__ void cast_kernel(__gm__ half* input, __gm__ uint8_t* output, uint32_t input_total_length)
     {
-        asc_vf_call<simt_half22hif82_rna_sat>(dim3(1024), (__gm__ half2*)input, (__gm__ hifloat8x2_t*)output, input_total_length);
+        asc_vf_call<simt_half22hif82_rna_sat>(
+            dim3(1024), (__gm__ half2*)input, (__gm__ hifloat8x2_t*)output, input_total_length);
     }
     ```

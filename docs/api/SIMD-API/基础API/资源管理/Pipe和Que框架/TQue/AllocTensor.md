@@ -65,14 +65,14 @@
 
 -   non-inplace接口：构造新的Tensor作为内存管理的对象
 
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline LocalTensor<T> AllocTensor()
     ```
 
 -   inplace接口：直接使用传入的Tensor作为内存管理的对象，可以减少Tensor反复创建的开销，具体使用指导可参考[Tensor原地操作](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/附录/常用操作/如何使用Tensor原地操作提升算子性能.md)。
 
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline void AllocTensor(LocalTensor<T>& tensor)
     ```
@@ -148,7 +148,7 @@ non-inplace接口返回值为LocalTensor对象，inplace接口没有返回值。
 
 -   示例一
 
-    ```
+    ```cpp
     // 使用AllocTensor分配Tensor
     AscendC::TPipe pipe;
     AscendC::TQue<AscendC::TPosition::VECOUT, 2> que;
@@ -160,7 +160,7 @@ non-inplace接口返回值为LocalTensor对象，inplace接口没有返回值。
 
 -   示例二
 
-    ```
+    ```cpp
     // 连续使用AllocTensor的限制场景举例如下:
     AscendC::TQue<AscendC::TPosition::VECIN, 1> que0;
     AscendC::TQue<AscendC::TPosition::VECIN, 1> que1;
@@ -179,14 +179,14 @@ non-inplace接口返回值为LocalTensor对象，inplace接口没有返回值。
     pipe.InitBuffer(que3, 1, len);
     pipe.InitBuffer(que4, 1, len);
     pipe.InitBuffer(que5, 1, len);
-    
+
     AscendC::LocalTensor<T> local1 = que0.AllocTensor<T>();
     AscendC::LocalTensor<T> local2 = que1.AllocTensor<T>();
     AscendC::LocalTensor<T> local3 = que2.AllocTensor<T>();
     AscendC::LocalTensor<T> local4 = que3.AllocTensor<T>();
     // 第5个AllocTensor会出现资源分配失败，同一个TPosition上同时Alloc出来的Tensor数量超出了4个的限制
     AscendC::LocalTensor<T> local5 = que4.AllocTensor<T>();
-    
+
     // 此时建议通过以下方法解决：
     // 如果确实有多块buffer使用,可以将多个buffer合并到一块buffer,通过偏移使用
     pipe.InitBuffer(que0, 1, len * 3);
@@ -205,7 +205,7 @@ non-inplace接口返回值为LocalTensor对象，inplace接口没有返回值。
 
 -   示例三：inplace接口
 
-    ```
+    ```cpp
     AscendC::TPipe pipe;
     AscendC::TQue<AscendC::TPosition::VECIN, 0> que;
     int num = 2;

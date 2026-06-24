@@ -74,8 +74,10 @@ __simd_callee__ inline void Interleave(U& dstReg0, U& dstReg1, U& srcReg0, U& sr
 ## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
-template<typename T>
-__simd_vf__ inline void InterleaveVF(__ubuf__ T* dst0Addr, __ubuf__ T* dst1Addr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint16_t oneRepeatSize, uint16_t repeatTimes)
+template <typename T>
+__simd_vf__ inline void InterleaveVF(
+    __ubuf__ T* dst0Addr, __ubuf__ T* dst1Addr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint16_t oneRepeatSize,
+    uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> srcReg0;
     AscendC::Reg::RegTensor<T> srcReg1;

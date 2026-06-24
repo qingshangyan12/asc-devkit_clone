@@ -10,7 +10,7 @@ This example implements histogram statistics functionality based on the Reg prog
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── histogram
 │   ├── scripts
 │   │   ├── gen_data.py                // Input data and ground truth generation script

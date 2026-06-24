@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001526206862_section1630753514297"></a>
 
-```
+```cpp
 COPY_TILING_WITH_ARRAY(arr_type, arr_count, src_ptr, dst_ptr)
 ```
 
@@ -108,21 +108,22 @@ COPY_TILING_WITH_ARRAY(arr_type, arr_count, src_ptr, dst_ptr)
 
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 
-```
-extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8_t *y, __gm__ uint8_t *z, __gm__ uint8_t *tiling)
+```cpp
+extern "C" __global__ __aicore__ void add_custom(
+    __gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* tiling)
 {
     KernelAdd op;
 
     GET_TILING_DATA_PTR_WITH_STRUCT(AddCustomTilingData, tilingDataPtr, tiling);
- 
+
     if ASCEND_IS_AIV {
-        COPY_TILING_WITH_ARRAY(uint64_t, 2, tilingDataPtr->vectorTilingArray, vTilingArrayPtr);        
+        COPY_TILING_WITH_ARRAY(uint64_t, 2, tilingDataPtr->vectorTilingArray, vTilingArrayPtr);
         op.Init(x, y, z, (*vTilingArrayPtr)[0], (*vTilingArrayPtr)[1]);
         op.Process();
     } else {
         COPY_TILING_WITH_ARRAY(uint64_t, 2, tilingDataPtr->cubeTilingArray, cTilingArrayPtr);
-	op.Init(x, y, z, (*cTilingArrayPtr)[0], (*cTilingArrayPtr)[1]);
-	op.Process();
+        op.Init(x, y, z, (*cTilingArrayPtr)[0], (*cTilingArrayPtr)[1]);
+        op.Process();
     }
 }
 ```

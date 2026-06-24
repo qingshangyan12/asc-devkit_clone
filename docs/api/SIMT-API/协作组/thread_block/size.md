@@ -52,8 +52,7 @@ static unsigned int size()
     using namespace cooperative_groups;
     __global__ void simt_kernel(...)
     {
-        ...
-        thread_block g = this_thread_block();
+        ... thread_block g = this_thread_block();
         unsigned int thread_num = g.size();
         ...
     }
@@ -65,8 +64,7 @@ static unsigned int size()
     using namespace cooperative_groups;
     __simt_vf__ inline void simt_kernel(...)
     {
-        ...
-        thread_block g = this_thread_block();
+        ... thread_block g = this_thread_block();
         unsigned int thread_num = g.size();
         ...
     }

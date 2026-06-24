@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 uint32_t SetDebugMode(uint8_t debugMode)
 ```
 
@@ -29,7 +29,7 @@ uint32_t SetDebugMode(uint8_t debugMode)
 
 ## 调用示例
 
-```
+```cpp
 const char* groupName = "testGroup";
 uint32_t opType = HCCL_CMD_REDUCE_SCATTER;
 std::string algConfig = "ReduceScatter=level0:fullmesh";

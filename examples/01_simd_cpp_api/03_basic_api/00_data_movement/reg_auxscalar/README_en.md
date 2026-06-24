@@ -10,7 +10,7 @@ This example implements reading multiple scalar data from UB (Unified Buffer) vi
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── reg_auxscalar
 │   ├── scripts
 │   │   ├── gen_data.py                // Input data and ground truth generation script

@@ -17,8 +17,8 @@
 ```cpp
 // 数据读取索引为偶数的位置
 __simd_callee__ inline void asc_int82int16(vector_int16_t& dst, vector_int8_t src, vector_bool mask)
-// 数据读取索引为奇数的位置
-__simd_callee__ inline void asc_int82int16_v2(vector_int16_t& dst, vector_int8_t src, vector_bool mask)
+    // 数据读取索引为奇数的位置
+    __simd_callee__ inline void asc_int82int16_v2(vector_int16_t& dst, vector_int8_t src, vector_bool mask)
 ```
 
 ## 参数说明
@@ -46,9 +46,9 @@ PIPE_V
 ## 调用示例
 
  ```cpp
-vector_int16_t dst;
-vector_int8_t src;
-vector_bool mask = asc_create_mask_b8(PAT_ALL);
-asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
-asc_int82int16(dst, src, mask);
+ vector_int16_t dst;
+ vector_int8_t src;
+ vector_bool mask = asc_create_mask_b8(PAT_ALL);
+ asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
+ asc_int82int16(dst, src, mask);
 ```

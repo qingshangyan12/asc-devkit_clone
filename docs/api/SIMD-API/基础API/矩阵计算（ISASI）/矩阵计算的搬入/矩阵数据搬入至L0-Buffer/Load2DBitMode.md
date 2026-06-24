@@ -24,7 +24,8 @@
 
 ```cpp
 template <TPosition Dst, TPosition Src, typename T>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src,const Load2DBitModeParam& loadDataParams)
+__aicore__ inline void LoadData(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const Load2DBitModeParam& loadDataParams)
 ```
 
 ## 参数说明<a id="section622mcpsimp"></a>
@@ -77,7 +78,7 @@ loadDataParams.srcStride = xxx;
 loadDataParams.dstStride = xxx;
 loadDataParams.sid = 0;
 loadDataParams.ifTranspose = false;
-Load2DBitModeParam params(loadDataParams);  // 直接使用LoadData2DParamsV2结构体类型对象初始化
+Load2DBitModeParam params(loadDataParams); // 直接使用LoadData2DParamsV2结构体类型对象初始化
 ```
 
 也可以使用各参数的Set函数修改参数值，并且由于使用了联合体，还可以对config0和config1直接进行逐bit位修改来修改参数。

@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline uint32_t GetRankDim()
 ```
 

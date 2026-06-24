@@ -14,7 +14,7 @@ This example introduces how to use DataCopy to transfer input data from GM (Glob
 
 ## Directory Structure
 
-```
+```text
 ├── data_copy_gm2l1
 │   ├── figures                        // Illustrations
 │   ├── scripts

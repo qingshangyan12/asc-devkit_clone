@@ -4,7 +4,7 @@
 
 使用工程化算子开发方式，基于自定义算子工程进行算子开发。编译算子时失败，报如下错误：
 
-```
+```text
 [ERROR] [ascendxxxx] PowerCustom_88a695f03edfbc0af76b9eaae9e4556c error: out of jump/jumpc imm range
 ```
 
@@ -16,7 +16,7 @@
 
 1.  在kernel侧的CMakeLists中通过add\_ops\_compile\_options针对报错算子添加编译选项“-mllvm -cce-aicore-jump-expand=true”，示例如下：
 
-    ```
+    ```text
     add_ops_compile_options(PowerCustom OPTIONS -mllvm -cce-aicore-jump-expand=true)
     ```
 

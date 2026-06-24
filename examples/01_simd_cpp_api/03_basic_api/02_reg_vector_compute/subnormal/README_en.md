@@ -12,7 +12,7 @@ This example demonstrates the behavioral differences of the Div operation in Asc
 
 ## Directory Structure
 
-```
+```text
 subnormal
 │   ├── scripts/             // Test script directory
 │   │   └── gen_data.py      // Generate test input and golden data

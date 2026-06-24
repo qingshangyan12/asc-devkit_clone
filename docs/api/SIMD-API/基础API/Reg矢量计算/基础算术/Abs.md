@@ -54,7 +54,9 @@
 - 复数计算
 
     ```cpp
-    template <typename T = DefaultType, typename U = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S, typename V>
+    template <
+        typename T = DefaultType, typename U = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S,
+        typename V>
     __simd_callee__ inline void Abs(S& dstReg, V& srcReg, MaskReg& mask)
     ```
 
@@ -107,8 +109,9 @@
 - 实数计算
 
     ```cpp
-    template<typename T>
-    __simd_vf__ inline void AbsVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
+    template <typename T>
+    __simd_vf__ inline void AbsVF(
+        __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
     {
         AscendC::Reg::RegTensor<T> srcReg;
         AscendC::Reg::RegTensor<T> dstReg;
@@ -125,8 +128,9 @@
 - 复数计算
 
     ```cpp
-    template<typename T, typename U>
-    __simd_vf__ inline void AbsVF(__ubuf__ U* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
+    template <typename T, typename U>
+    __simd_vf__ inline void AbsVF(
+        __ubuf__ U* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
     {
         AscendC::Reg::RegTensor<T> srcReg;
         AscendC::Reg::RegTensor<U> dstReg;

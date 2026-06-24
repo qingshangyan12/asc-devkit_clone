@@ -43,5 +43,5 @@ PIPE_S
 ```cpp
 int64_t prefetch_length = 32;
 int64_t pc = asc_get_program_counter() & 0xFFFFFFFFFFFF;
-asc_icache_preload(reinterpret_cast<void *>(pc), prefetch_length);
+asc_icache_preload(reinterpret_cast<void*>(pc), prefetch_length);
 ```

@@ -4,7 +4,7 @@
 
 本案例对分组Matmul即GroupedMatmul算子的per-token量化场景进行性能分析和优化，GroupedMatmul算子计算过程（通过python代码表达）为：
 
-```
+```text
 offset = 0
 for i in range(g):
     mmOut = x[offset:offset + groupList[i]] * weight[i] + bias[i]
@@ -137,7 +137,7 @@ for i in range(g):
 
 -   将AI Core中的AIC核和AIV核启动比例设置为1:2。每次AIC输出的数据，由两个AIV并行计算对应的反量化和激活函数；在Vector侧代码的循环里，AIV0和AIV1交替进行计算（前提条件，循环次数不为1）。代码示例如下：
 
-    ```
+    ```cpp
     uint32_t vecCount = 0;
     uint32_t taskRation = GetTaskRatio();
     for (uint32_t offsetN = 0; offsetN < curCubeSingleN; offsetN += mnConfig.baseN) {
@@ -150,22 +150,21 @@ for i in range(g):
         uint64_t mmOutOffset = mnConfig.workSpaceOffset + offsetN * mnConfig.baseM;
         CrossCoreWaitFlag(SYNC_AIC_TO_AIV);
         for (uint32_t offsetM = 0; offsetM < curCubeSingleM; offsetM += vecBaseM) {
-             vecCount++;
+            vecCount++;
             if (vecCount % taskRation != subBlockIdx) {
-                continue;  // AIV0和AIV1交替进行计算
+                continue; // AIV0和AIV1交替进行计算
             }
-            if (unlikely(offsetM + vecBaseM >= curCubeSingleM)) { 
-                curVecBaseM = curCubeSingleM - offsetM; 
+            if (unlikely(offsetM + vecBaseM >= curCubeSingleM)) {
+                curVecBaseM = curCubeSingleM - offsetM;
             }
             // 使用AscendDequant接口做perchannel反量化
             LocalTensor<cT::T> mmOutLocal = vecInQueue.AllocTensor<cT::T>();
-            DataCopyPad2D(mmOutLocal, mmOutGm[mmOutOffset + offsetM * curVecBaseN],
-                          curVecBaseM, curVecBaseN, curVecBaseN);
+            DataCopyPad2D(mmOutLocal, mmOutGm[mmOutOffset + offsetM * curVecBaseN], curVecBaseM, curVecBaseN, curVecBaseN);
             vecInQueue.EnQue(mmOutLocal);
             ComputeDequantAndActivate(mnConfig, curVecBaseM, alignBaseN, curVecBaseN, offsetM);
             LocalTensor<DTYPE_Y> yLocal = vecOutQueue.DeQue<DTYPE_Y>();
-            DataCopyPad2D(yGm[outOffset + offsetM * tiling->n + offsetN], yLocal,
-                          curVecBaseM, curVecBaseN, alignBaseN, tiling->n);
+            DataCopyPad2D(
+                yGm[outOffset + offsetM * tiling->n + offsetN], yLocal, curVecBaseM, curVecBaseN, alignBaseN, tiling->n);
             vecOutQueue.FreeTensor(yLocal);
         }
         ...
@@ -174,9 +173,9 @@ for i in range(g):
 
 -   AIC和AIV启动比例设置为1:2后，出现Cube和Vector计算各自都有间隙、相互之间都有等待耗时的情况。分析原因是因为Vector和Cube计算存在使用一份workspace进行数据传递的场景，通过4份workspace的方案进行优化：host按4倍baseM \* baseN申请workspace，Cube侧代码在计算前可以跳过前4轮的等待。
 
-    ```
+    ```cpp
     if ASCEND_IS_AIC {
-        if (cubeCount >= tiling->parallNum) {  // tiling->parallNum设置为4
+        if (cubeCount >= tiling->parallNum) { // tiling->parallNum设置为4
             CrossCoreWaitFlag(SYNC_AIV_TO_AIC);
         }
         mm.SetOrgShape(mnConfig.m, tiling->n, tiling->k);
@@ -199,7 +198,7 @@ for i in range(g):
 
 -   Vector计算开启double buffer，InitBuffer指定分配内存块个数为2。
 
-    ```
+    ```cpp
     pipe->InitBuffer(scaleInQueue, 2, tiling->mmTilingData.baseN * sizeof(DTYPE_SCALE));
     pipe->InitBuffer(perTokenScaleInQueue, 2, tiling->mmTilingData.baseM * sizeof(float));
     pipe->InitBuffer(vecInQueue, 2, tiling->ubCalSize * sizeof(cT::T));

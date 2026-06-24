@@ -9,12 +9,11 @@
 
 【反例】
 
-```
+```cpp
 // 搬运数据存在间隔，从GM上每行16KB中搬运2KB数据,共16行
 LocalTensor<float> tensorIn;
 GlobalTensor<float> tensorGM;
-...
-constexpr int32_t copyWidth = 2 * 1024 / sizeof(float);
+... constexpr int32_t copyWidth = 2 * 1024 / sizeof(float);
 constexpr int32_t imgWidth = 16 * 1024 / sizeof(float);
 constexpr int32_t imgHeight = 16;
 // 使用for循环，每次只能搬运2K，重复16次
@@ -25,18 +24,17 @@ for (int i = 0; i < imgHeight; i++) {
 
 【正例】
 
-```
+```cpp
 LocalTensor<float> tensorIn;
 GlobalTensor<float> tensorGM;
-...
-constexpr int32_t copyWidth = 2 * 1024 / sizeof(float);
+... constexpr int32_t copyWidth = 2 * 1024 / sizeof(float);
 constexpr int32_t imgWidth = 16 * 1024 / sizeof(float);
 constexpr int32_t imgHeight = 16;
 // 通过DataCopy包含DataCopyParams的接口一次搬完
 DataCopyParams copyParams;
 copyParams.blockCount = imgHeight;
 copyParams.blockLen = copyWidth / 8; // 搬运的单位为DataBlock(32Byte)，每个DataBlock内有8个float
-copyParams.srcStride = (imgWidth  - copyWidth) / 8; // 表示两次搬运src之间的间隔，单位为DataBlock
+copyParams.srcStride = (imgWidth - copyWidth) / 8; // 表示两次搬运src之间的间隔，单位为DataBlock
 copyParams.dstStride = 0; // 连续写，两次搬运之间dst的间隔为0，单位为DataBlock
 DataCopy(tensorGM, tensorIn, copyParams);
 ```

@@ -66,5 +66,6 @@
 - 矢量接口：
 
     ```cpp
-    AscendC::NumericLimits<float>::Infinity(dstLocal, 256); // 返回256个float类型的正无穷大值
+    AscendC::NumericLimits<float>::Infinity(dstLocal,
+                                            256); // 返回256个float类型的正无穷大值
     ```

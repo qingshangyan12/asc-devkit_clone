@@ -16,7 +16,7 @@ This example demonstrates the end-to-end implementation of int4 matrix multiplic
 
 ## Directory Structure
 
-```
+```text
 ├── matmul_s4
 │   ├── scripts                   // Data generation script directory
 │   │   ├── gen_data.py           // Input data and ground truth generation script

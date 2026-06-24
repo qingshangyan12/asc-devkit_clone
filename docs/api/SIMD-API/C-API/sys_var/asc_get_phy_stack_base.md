@@ -38,5 +38,5 @@ PIPE_S
 
 ```cpp
 int64_t phy_stack_base = asc_get_phy_stack_base();
-printf("phy stack base is %x", phy_stack_base);// 需用%x将其打印成十六进制的数
+printf("phy stack base is %x", phy_stack_base); // 需用%x将其打印成十六进制的数
 ```

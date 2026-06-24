@@ -13,7 +13,7 @@ The Matmul example splits the input matrix along the M or N direction, dividing 
 | Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
 
 ## Directory Structure
-```
+```text
 ├── matmul_l2cache
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data
@@ -47,11 +47,11 @@ The Matmul example splits the input matrix along the M or N direction, dividing 
       L2CacheOpt l2Opt(shapes, blockNum);
       matmulObj.SetOrgShape(shapes.m, shapes.n, shapes.k);
       for (int64_t tileIdx = curBlockIdx; tileIdx < l2Opt.GetTileNum(); tileIdx += blockNum) {
-          auto blockShape = l2Opt.GetBlockShape(tileIdx);  // Get the L2 split block size for single computation
+          auto blockShape = l2Opt.GetBlockShape(tileIdx); // Get the L2 split block size for single computation
           if (Get<0>(blockShape) <= 0 || Get<1>(blockShape) <= 0) {
               return;
           }
-          auto blockCoord = l2Opt.GetBlockCoord(tileIdx);  // Get the current computation index blockCoord
+          auto blockCoord = l2Opt.GetBlockCoord(tileIdx); // Get the current computation index blockCoord
           matmulObj.SetTail(Get<0>(blockShape), Get<1>(blockShape), Get<2>(blockShape));
           const auto& offsetCoord = CalcOffset(shapes, blockCoord); // Calculate matrix offset based on index
           int64_t offsetA = Get<0>(offsetCoord);
@@ -62,7 +62,7 @@ The Matmul example splits the input matrix along the M or N direction, dividing 
           if (shapes.isBias) {
               matmulObj.SetBias(biasGlobal);
           }
-          matmulObj.IterateAll(cGlobal[offsetC]);  // Compute L2 split block
+          matmulObj.IterateAll(cGlobal[offsetC]); // Compute L2 split block
       }
       matmulObj.End();
       ```
@@ -73,7 +73,8 @@ The Matmul example splits the input matrix along the M or N direction, dividing 
       - Determine whether L2 splitting is needed
         ```cpp
         bool smallDim = mTileNum_ < L1_MIN_UST_DIM && nTileNum_ < L1_MIN_UST_DIM;
-        if (smallDim || (!EnableL2Tile())) { // Check if total computation data is below L2 Cache threshold
+        if (smallDim || (!EnableL2Tile())) { // Check if total computation data is below
+                                             // L2 Cache threshold
             mL2TileNum_ = mTileNum_;
             nL2TileNum_ = nTileNum_;
             mL2BlockNum_ = 1;
@@ -92,7 +93,8 @@ The Matmul example splits the input matrix along the M or N direction, dividing 
                 if (GetTotalSize(j * l1M, i * l1N, k_) <= L2_TILE_THRESHOLD) { // Ensure block is below L2 Cache threshold
                     uint64_t mConflictTmp = AscendC::Ceil(blockNum_, mL2TileNumTailTmp); // Calculate load conflict value
                     uint64_t nConflictTmp = AscendC::Ceil(blockNum_, nL2TileNumTailTmp);
-                    if (mConflict >= mConflictTmp && nConflict >= nConflictTmp) { // If conflict value is smaller, update block count
+                    if (mConflict >= mConflictTmp && nConflict >= nConflictTmp) { // If conflict value is smaller, update
+                                                                                  // block count
                         mConflict = mConflictTmp;
                         nConflict = nConflictTmp;
                         mL2TileNum_ = curMajorDim;

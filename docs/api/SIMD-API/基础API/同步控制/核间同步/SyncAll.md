@@ -102,7 +102,8 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 
     ```cpp
     template <bool isAIVOnly = true>
-    __aicore__ inline void SyncAll(const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, const int32_t usedCores = 0)
+    __aicore__ inline void SyncAll(
+        const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, const int32_t usedCores = 0)
     ```
 
 - 硬同步
@@ -181,9 +182,9 @@ SyncAll硬件同步和软件同步接口的内部实现不同，约束条件也�
 
 ```cpp
 // syncGlobal为用户定义的全局空间，作为所有核共用的缓存，类型为GlobalTensor；workLocal为用户定义的局部空间，每个核单独自用，类型为LocalTensor。
-int srcDataSize = 256; // 参与计算的元素个数。
-int32_t blockNum = AscendC::GetBlockNum(); // 获取核总数。
-int32_t blockIdx = AscendC::GetBlockIdx(); // 获取当前工作的核ID。
+int srcDataSize = 256;                          // 参与计算的元素个数。
+int32_t blockNum = AscendC::GetBlockNum();      // 获取核总数。
+int32_t blockIdx = AscendC::GetBlockIdx();      // 获取当前工作的核ID。
 uint32_t perBlockSize = srcDataSize / blockNum; // 每个核平分处理相同个数。
 // 当前工作核计算后的数据先保存到外部工作空间，workGlobal为GlobalTensor，dstLocal为LocalTensor。
 AscendC::DataCopy(workGlobal[blockIdx * perBlockSize], dstLocal, perBlockSize);

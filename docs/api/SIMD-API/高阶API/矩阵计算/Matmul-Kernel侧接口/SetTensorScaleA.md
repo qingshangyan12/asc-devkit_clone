@@ -22,11 +22,11 @@ MxMatmul场景，设置矩阵乘中左矩阵的量化系数矩阵scaleA。
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetTensorScaleA(const GlobalTensor<ScaleT>& gm, bool isTransposeScaleA = false);
 ```
 
-```
+```cpp
 __aicore__ inline void SetTensorScaleA(const LocalTensor<ScaleT>& leftMatrix, bool isTransposeScaleA = false);
 ```
 
@@ -51,11 +51,11 @@ __aicore__ inline void SetTensorScaleA(const LocalTensor<ScaleT>& leftMatrix, bo
 
 ## 调用示例
 
-```
+```cpp
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
 mm.SetTensorA(gm_a);
 mm.SetTensorB(gm_b);
-mm.SetTensorScaleA(gm_scaleA);    // 设置左矩阵的量化系数矩阵scaleA
+mm.SetTensorScaleA(gm_scaleA); // 设置左矩阵的量化系数矩阵scaleA
 mm.SetTensorScaleB(gm_scaleB);
 if (tiling.isBias) {
     mm.SetBias(gmBias);

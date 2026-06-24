@@ -13,9 +13,8 @@
 ## 函数原型
 
   ```cpp
-  __simd_callee__ inline iter_reg asc_create_iter_reg_b32(uint32_t offset)
-  __simd_callee__ inline iter_reg asc_create_iter_reg_b16(uint32_t offset)
-  __simd_callee__ inline iter_reg asc_create_iter_reg_b8(uint32_t offset)
+  __simd_callee__ inline iter_reg asc_create_iter_reg_b32(uint32_t offset) __simd_callee__ inline iter_reg
+      asc_create_iter_reg_b16(uint32_t offset) __simd_callee__ inline iter_reg asc_create_iter_reg_b8(uint32_t offset)
   ```
 
 ## 参数说明

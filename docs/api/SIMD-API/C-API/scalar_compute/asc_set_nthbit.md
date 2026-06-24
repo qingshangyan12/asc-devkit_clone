@@ -42,5 +42,5 @@ PIPE_S
 ```cpp
 uint64_t bits = 0x0;
 int64_t idx = 0x2;
-uint64_t res = asc_set_nthbit(bits, idx); //结果res = 0x4
+uint64_t res = asc_set_nthbit(bits, idx); // 结果res = 0x4
 ```

@@ -21,7 +21,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <bool sync = true>
 __aicore__ inline int32_t Iterate(HcclHandle handleId, uint16_t* seqSlices, uint16_t seqSliceLen)
 ```
@@ -58,7 +58,7 @@ __aicore__ inline int32_t Iterate(HcclHandle handleId, uint16_t* seqSlices, uint
 
 ## 调用示例
 
-```
+```cpp
 extern "C" __global__ __aicore__ void alltoallv_custom(
     GM_ADDR sendBuf, GM_ADDR recvBuf, GM_ADDR workspaceGM, GM_ADDR tilingGM)
 {

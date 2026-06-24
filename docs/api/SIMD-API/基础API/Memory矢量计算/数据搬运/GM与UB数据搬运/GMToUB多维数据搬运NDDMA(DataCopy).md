@@ -29,7 +29,8 @@
 
     ```cpp
     template <typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const NdDmaParams<T, dim>& params)
+    __aicore__ inline void DataCopy(
+        const LocalTensor<T>& dst, const GlobalTensor<T>& src, const NdDmaParams<T, dim>& params)
     ```
 
 - NDDMA Cache刷新，在使用DataCopy接口进行数据搬运前，需要使用NdDmaDci接口刷新NdDMA Cache缓存保证为最新状态。
@@ -128,21 +129,23 @@ Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。
 - 场景1：2D Padding场景，常数填充方式
 
     ```cpp
-    // xGmShape：[16, 32]，搬运8列2行数据，左Padding 15，上Padding 13，右Padding 17，下Padding 3，xLocalShape：[32, 64]。
+    // xGmShape：[16, 32]，搬运8列2行数据，左Padding 15，上Padding 13，右Padding
+    // 17，下Padding 3，xLocalShape：[32, 64]。
     AscendC::NdDmaLoopInfo<2> loopInfo{{1, 32}, {1, 64}, {32, 16}, {15, 13}, {17, 3}};
     AscendC::NdDmaParams<T, 2> params{loopInfo, 0};  // padding的值为0
-    AscendC::NdDmaDci();  // 刷新cache
-    static constexpr AscendC::NdDmaConfig dmaConfig;  // 使用默认参数，也可以不传。
+    AscendC::NdDmaDci();                             // 刷新cache
+    static constexpr AscendC::NdDmaConfig dmaConfig; // 使用默认参数，也可以不传。
     AscendC::DataCopy<T, 2, dmaConfig>(xLocal, xGm, params);
     ```
 
 - 场景2：2D Padding场景，最近值填充方式
 
     ```cpp
-    // xGmShape：[28, 15]，搬运3列4行数据，左Padding 11，上Padding 3，右Padding 6，下Padding 1，xLocalShape：[32, 32]。
+    // xGmShape：[28, 15]，搬运3列4行数据，左Padding 11，上Padding 3，右Padding
+    // 6，下Padding 1，xLocalShape：[32, 32]。
     AscendC::NdDmaLoopInfo<2> loopInfo{{1, 15}, {1, 32}, {15, 28}, {11, 3}, {6, 1}};
     AscendC::NdDmaParams<T, 2> params{loopInfo, 0};
-    AscendC::NdDmaDci();  // 刷新cache
+    AscendC::NdDmaDci(); // 刷新cache
     // isNearestValueMode = true左右Padding值会选取当前维度最左或最右的值进行填充。
     static constexpr AscendC::NdDmaConfig dmaConfig = {true};
     AscendC::DataCopy<T, 2, dmaConfig>(xLocal, xGm, params);
@@ -154,8 +157,8 @@ Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。
     // xGmShape：[16, 64]，搬运8列4行数据，xLocalShape：[64, 16]。
     AscendC::NdDmaLoopInfo<2> loopInfo{{1, 64}, {16, 1}, {64, 16}, {0, 0}, {0, 0}};
     AscendC::NdDmaParams<T, 2> params{loopInfo, 0};
-    AscendC::NdDmaDci();  // 刷新cache
-    static constexpr AscendC::NdDmaConfig dmaConfig;  // 使用默认参数，也可以不传。
+    AscendC::NdDmaDci();                             // 刷新cache
+    static constexpr AscendC::NdDmaConfig dmaConfig; // 使用默认参数，也可以不传。
     AscendC::DataCopy<T, 2, dmaConfig>(xLocal, xGm, params);
     ```
 
@@ -165,8 +168,8 @@ Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。
     // xGmShape：[1, 16]，搬运16列1行数据并进行广播，xLocalShape：[3, 16]。
     AscendC::NdDmaLoopInfo<2> loopInfo{{1, 0}, {1, 16}, {16, 3}, {0, 0}, {0, 0}};
     AscendC::NdDmaParams<T, 2> params{loopInfo, 0};
-    AscendC::NdDmaDci();  // 刷新cache
-    static constexpr AscendC::NdDmaConfig dmaConfig;  // 使用默认参数，也可以不传。
+    AscendC::NdDmaDci();                             // 刷新cache
+    static constexpr AscendC::NdDmaConfig dmaConfig; // 使用默认参数，也可以不传。
     AscendC::DataCopy<T, 2, dmaConfig>(xLocal, xGm, params);
     ```
 
@@ -176,8 +179,8 @@ Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。
     // xGmShape：[32, 64]，将16*10的矩阵截取为一个5*7的矩阵，xLocalShape：[16, 16]。
     AscendC::NdDmaLoopInfo<2> loopInfo{{1, 64}, {1, 16}, {16, 16}, {0, 0}, {0, 0}};
     AscendC::NdDmaParams<T, 2> params{loopInfo, 0};
-    AscendC::NdDmaDci();  // 刷新cache
-    static constexpr AscendC::NdDmaConfig dmaConfig;  // 使用默认参数，也可以不传。
+    AscendC::NdDmaDci();                             // 刷新cache
+    static constexpr AscendC::NdDmaConfig dmaConfig; // 使用默认参数，也可以不传。
     AscendC::DataCopy<T, 2, dmaConfig>(xLocal, xGm, params);
     ```
 

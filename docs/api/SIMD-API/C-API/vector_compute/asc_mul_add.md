@@ -22,21 +22,28 @@ $$
 
     ```cpp
     __aicore__ inline void asc_mul_add(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
-    __aicore__ inline void asc_mul_add(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
+        __aicore__ inline void asc_mul_add(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
     ```
 
 - 高维切分计算
 
     ```cpp
-    __aicore__ inline void asc_mul_add(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
-    __aicore__ inline void asc_mul_add(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
+    __aicore__ inline void asc_mul_add(
+        __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
+        uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
+        uint8_t src1_repeat_stride) __aicore__
+        inline void asc_mul_add(
+            __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
+            uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
+            uint8_t src1_repeat_stride)
     ```
 
 - 同步计算
 
     ```cpp
     __aicore__ inline void asc_mul_add_sync(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
-    __aicore__ inline void asc_mul_add_sync(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
+        __aicore__
+        inline void asc_mul_add_sync(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count)
     ```
 
 ## 参数说明
@@ -71,11 +78,11 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-constexpr uint64_t total_length = 128;    // total_length指参与计算的数据长度
+constexpr uint64_t total_length = 128; // total_length指参与计算的数据长度
 __ubuf__ half src0[total_length];
 __ubuf__ half src1[total_length];
 __ubuf__ half dst[total_length];
-asc_mul_add(dst, src0, src1, total_length);    // dst = (src0 * dst) + src1
+asc_mul_add(dst, src0, src1, total_length); // dst = (src0 * dst) + src1
 // src0 [1, 2, 3, ..., 128]
 // src1 [1, 1, 1, ..., 1]
 // 计算前dst [2, 2, 2, ..., 2]

@@ -14,8 +14,10 @@
 
 ## 函数原型
 
-```
-void GetPowerTmpBufferFactorSize(const bool baseIsTensor, const bool expIsTensor, const bool typeIsInt, const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuffer)
+```cpp
+void GetPowerTmpBufferFactorSize(
+    const bool baseIsTensor, const bool expIsTensor, const bool typeIsInt, const uint32_t typeSize,
+    uint32_t& maxLiveNodeCount, uint32_t& extraBuffer)
 ```
 
 ## 参数说明
@@ -43,7 +45,7 @@ void GetPowerTmpBufferFactorSize(const bool baseIsTensor, const bool expIsTensor
 
 完整的调用样例请参考[更多样例](../更多样例-83.md)。
 
-```
+```cpp
 uint32_t maxLiveNodeCount = 0;
 uint32_t extraBuf = 0;
 AscendC::GetPowerTmpBufferFactorSize(true, true, true, 4, maxLiveNodeCount, extraBuf);

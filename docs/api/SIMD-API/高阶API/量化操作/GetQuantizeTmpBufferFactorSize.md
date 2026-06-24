@@ -22,7 +22,7 @@
 
 ## 函数原型
 
-```
+```cpp
 void GetQuantizeTmpBufferFactorSize(uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
 ```
 
@@ -45,7 +45,7 @@ void GetQuantizeTmpBufferFactorSize(uint32_t& maxLiveNodeCount, uint32_t& extraB
 
 ## 调用示例
 
-```
+```cpp
 uint32_t maxLiveNodeCount = 0;
 uint32_t extraBuf = 0;
 AscendC::GetQuantizeTmpBufferFactorSize(maxLiveNodeCount, extraBuf);

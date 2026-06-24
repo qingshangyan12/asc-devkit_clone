@@ -6,11 +6,14 @@
 
 ## 函数原型
 
-```
-void SetMatmulConfigParams(int32_t mmConfigTypeIn = 1, bool enableL1CacheUBIn = false, ScheduleType scheduleTypeIn = ScheduleType::INNER_PRODUCT, MatrixTraverse traverseIn = MatrixTraverse::NOSET, bool enVecND2NZIn = false)
+```cpp
+void SetMatmulConfigParams(
+    int32_t mmConfigTypeIn = 1, bool enableL1CacheUBIn = false,
+    ScheduleType scheduleTypeIn = ScheduleType::INNER_PRODUCT, MatrixTraverse traverseIn = MatrixTraverse::NOSET,
+    bool enVecND2NZIn = false)
 ```
 
-```
+```cpp
 void SetMatmulConfigParams(const MatmulConfigParams& configParams)
 ```
 
@@ -28,7 +31,7 @@ void SetMatmulConfigParams(const MatmulConfigParams& configParams)
 | enVecND2NZIn | 输入 | 是否开启ND2NZ。 |
 | configParams | 输入 | config相关参数，类型为MatmulConfigParams，结构体具体定义如下方代码所示。其中的参数说明请参考[表2](#table15780447181917)。 |
 
-```
+```cpp
 struct MatmulConfigParams {
     int32_t mmConfigType;
     bool enableL1CacheUB;
@@ -71,7 +74,7 @@ struct MatmulConfigParams {
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MatmulApiTiling tiling(ascendcPlatform);
 tiling.SetAType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT16);

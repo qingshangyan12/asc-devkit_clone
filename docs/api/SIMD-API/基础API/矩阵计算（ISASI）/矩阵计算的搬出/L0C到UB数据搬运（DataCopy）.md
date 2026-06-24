@@ -25,14 +25,18 @@
 
     ```cpp
     template <typename T>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+    __aicore__ inline void DataCopy(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& intriParams,
+        const DataCopyEnhancedParams& enhancedParams)
     ```
 
 - Local Memory -> Local Memory，支持源操作数和目的操作数类型不一致。
 
     ```cpp
     template <typename T, typename U>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+    __aicore__ inline void DataCopy(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyParams& intriParams,
+        const DataCopyEnhancedParams& enhancedParams)
     ```
 
 >**说明：**
@@ -137,17 +141,17 @@
     // srcLocal、dstLocal为half类型的LocalTensor
     // 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运
     DataCopyParams intriParams;
-    intriParams.blockCount = 1; // 连续数据块个数为1
+    intriParams.blockCount = 1;                     // 连续数据块个数为1
     intriParams.blockLen = 512 * sizeof(half) / 32; // 连续数据块长度，单位为DataBlock，此处长度为512个half元素
-    intriParams.srcGap = 0; // 源操作数做连续搬运
-    intriParams.dstGap = 0; // 目的操作数连续排布
+    intriParams.srcGap = 0;                         // 源操作数做连续搬运
+    intriParams.dstGap = 0;                         // 目的操作数连续排布
     DataCopyEnhancedParams enhancedParams;
     enhancedParams.blockMode = BlockMode::BLOCK_MODE_MATRIX; // 传输单位为16*16的cube分形
-    enhancedParams.deqScale = DeqScale::DEQ_NONE; // 不做量化
+    enhancedParams.deqScale = DeqScale::DEQ_NONE;            // 不做量化
     enhancedParams.deqValue = 0;
     enhancedParams.deqTensorAddr = 0;
-    enhancedParams.sidStoreMode = 0; // 仅deqScale为DEQ8/VDEQ8时生效
-    enhancedParams.isRelu = false; // 不支持ReLU
+    enhancedParams.sidStoreMode = 0;          // 仅deqScale为DEQ8/VDEQ8时生效
+    enhancedParams.isRelu = false;            // 不支持ReLU
     enhancedParams.padMode = pad_t::PAD_NONE; // 预留参数
     // 功能等同基础数据搬运
     AscendC::DataCopy(dstLocal, srcLocal, intriParams, enhancedParams);
@@ -156,21 +160,24 @@
 - Local Memory -\> Local Memory，源操作数与目的操作数类型不一致
 
     ```cpp
-    // 以下示例为L0C Buffer -> UB通路的数据搬运，仅在Atlas 推理系列产品AI Core场景下支持。srcLocal为int32_t类型的L0C Buffer上的LocalTensor，dstLocal为int8_t类型的UB上的LocalTensor
+    // 以下示例为L0C Buffer -> UB通路的数据搬运，仅在Atlas 推理系列产品AI
+    // Core场景下支持。srcLocal为int32_t类型的L0C
+    // Buffer上的LocalTensor，dstLocal为int8_t类型的UB上的LocalTensor
     // 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运
     DataCopyParams intriParams;
-    intriParams.blockCount = 1; // 连续数据块个数为1
+    intriParams.blockCount = 1;                     // 连续数据块个数为1
     intriParams.blockLen = 512 * sizeof(half) / 32; // 连续数据块长度，单位为DataBlock，此处长度为512个half元素
-    intriParams.srcGap = 0; // 源操作数做连续搬运
-    intriParams.dstGap = 0; // 目的操作数连续排布
+    intriParams.srcGap = 0;                         // 源操作数做连续搬运
+    intriParams.dstGap = 0;                         // 目的操作数连续排布
     DataCopyEnhancedParams enhancedParams;
     enhancedParams.blockMode = BlockMode::BLOCK_MODE_MATRIX; // 传输单位为16*16的cube分形
-    enhancedParams.deqScale = DeqScale::DEQ8; // int32_t -> int8_t量化模式，配合deqValues使用
-    enhancedParams.deqValue = 70369809530880; // float 1 = uint64_t 1065353216, when s322s8 use 1065353216 | (1 << 46)
-    enhancedParams.deqTensorAddr = 0; // 仅VDEQ模式下使用
-    enhancedParams.sidStoreMode = 2; // dstLocal的数据存储在完整的DataBlock中
-    enhancedParams.isRelu = false; // 不支持ReLU
-    enhancedParams.padMode = pad_t::PAD_NONE; // 预留参数
+    enhancedParams.deqScale = DeqScale::DEQ8;                // int32_t -> int8_t量化模式，配合deqValues使用
+    enhancedParams.deqValue = 70369809530880;                // float 1 = uint64_t 1065353216, when
+                                                             // s322s8 use 1065353216 | (1 << 46)
+    enhancedParams.deqTensorAddr = 0;                        // 仅VDEQ模式下使用
+    enhancedParams.sidStoreMode = 2;                         // dstLocal的数据存储在完整的DataBlock中
+    enhancedParams.isRelu = false;                           // 不支持ReLU
+    enhancedParams.padMode = pad_t::PAD_NONE;                // 预留参数
     // 此时dstLocal = srcLocal
     AscendC::DataCopy(dstLocal, srcLocal, intriParams, enhancedParams);
     ```

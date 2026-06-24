@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="section520771712327"></a>
 
-```
+```cpp
 template <typename T = DefaultType, IndexOrder order = IndexOrder::INCREASE_ORDER, typename U, typename S>
 __simd_callee__ inline void Arange(S& dstReg, U scalarValue);
 ```
@@ -126,8 +126,8 @@ __simd_callee__ inline void Arange(S& dstReg, U scalarValue);
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
-template<typename T>
+```cpp
+template <typename T>
 __simd_vf__ inline void ArangeVF(__ubuf__ T* dstAddr, T scalarValue, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> dstReg;

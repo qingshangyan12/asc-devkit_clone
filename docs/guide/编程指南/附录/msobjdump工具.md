@@ -30,13 +30,13 @@
 2.  设置环境变量。
     -   root用户安装Ascend-cann-toolkit包时
 
-        ```
+        ```bash
         source /usr/local/Ascend/cann/set_env.sh
         ```
 
     -   非root用户安装Ascend-cann-toolkit包时
 
-        ```
+        ```bash
         source ${HOME}/Ascend/cann/set_env.sh
         ```
 
@@ -44,7 +44,7 @@
 
     执行如下命令，若能正常显示--help或-h信息，则表示工具环境正常，功能可正常使用。
 
-    ```
+    ```text
     msobjdump -h
     ```
 
@@ -52,7 +52,7 @@
 
 -   **解析ELF文件的命令**
 
-    ```
+    ```text
     msobjdump --dump-elf <elf_file> [--verbose]
     ```
 
@@ -65,7 +65,7 @@
 
 -   **解压ELF文件的命令**
 
-    ```
+    ```text
     msobjdump --extract-elf <elf_file> [--out-dir <out_path>]
     ```
 
@@ -78,7 +78,7 @@
 
 -   **获取ELF文件列表的命令**
 
-    ```
+    ```text
     msobjdump --list-elf <elf_file>
     ```
 
@@ -144,13 +144,13 @@
 
     -   简单打印
 
-        ```
+        ```text
         msobjdump --dump-elf ${build_dir}/demo
         ```
 
         执行上述命令，终端打印基础device信息，示例如下：
 
-        ```
+        ```text
         .ascend.meta META INFO
         RUNTIME_IMPLICIT_INFO: L2Cache Hint Flag
         RUNTIME_IMPLICIT_INFO: Hardware Sync Flag
@@ -168,12 +168,12 @@
 
     -   全量打印
 
-        ```
+        ```text
         msobjdump --dump-elf ${build_dir}/demo --verbose
         ```
 
         执行上述命令，除基础device信息外，还会打印提取出的device文件对应的ELF详细信息，示例如下：
-        ```
+        ```text
         ====== [elf header infos] ======
         ELF Header:
           Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00 
@@ -221,19 +221,19 @@
 
 -   **获取融合编译工程产物中的device文件列表**
 
-    ```
+    ```text
     msobjdump --list-elf ${build_dir}/demo
     ```
 
     执行上述命令，终端会打印可提取的device文件名，屏显信息形如：
 
-    ```
+    ```text
     ELF file    0: demo.aicore.o
     ```
 
 -   **解压融合编译工程产物中的device文件并落盘**
 
-    ```
+    ```text
     msobjdump --extract-elf ${build_dir}/demo
     ```
 
@@ -243,7 +243,7 @@
 
 以下面的算子工程为例（仅为示例，具体以实际算子工程为准），假设$\{cmake\_install\_dir\}为算子Cmake编译产物根目录，目录结构如下，类似[算子编译](简易自定义算子工程.md#section1826554118418)。
 
-```
+```text
 ├── op_api
 │   ├── include
 │       ├── aclnn_acos_custom.h
@@ -261,13 +261,13 @@
 
     -   简单打印
 
-        ```
+        ```text
         msobjdump --dump-elf ${cmake_install_dir}/op_api/lib/libcust_opapi.so 
         ```
 
         执行上述命令，终端打印基础device信息，示例如下：
 
-        ```
+        ```text
         .ascend.meta META INFO
         VERSION: 1
         DEBUG: debugBufSize=0, debugOptions=0
@@ -311,13 +311,13 @@
 
     -   全量打印
 
-        ```
+        ```text
         msobjdump --dump-elf ${cmake_install_dir}/op_api/lib/libcust_opapi.so --verbose
         ```
 
         执行上述命令，终端打印基础device信息，示例如下：
 
-        ```
+        ```text
         .ascend.meta META INFO
         VERSION: 1
         DEBUG: debugBufSize=0, debugOptions=0
@@ -359,7 +359,7 @@
         FUNCTION_ENTRY: 3
         ```
 
-        ```
+        ```text
         ....................................
         ===== [elf header infos] in ascendxxx_acos_custom_AcosCustom_da824ede53d7e754f85c14b9446ec2fc.o =====:
         ELF Header:
@@ -409,13 +409,13 @@
 
 -   **解压包含device信息的库文件并落盘**
 
-    ```
+    ```text
     msobjdump --extract-elf ${cmake_install_dir}/op_api/lib/libcust_opapi.so 
     ```
 
     执行上述命令，默认在当前执行路径下保存解压文件，产物目录如下：
 
-    ```
+    ```text
     |-- config                                                               // 算子原型配置文件目录
     |    ├── ${soc_version}   
     |        ├── acos_custom.json                                  
@@ -438,7 +438,7 @@
 
     -   查看算子原型（acos\_custom.json）
 
-        ```
+        ```json
         {
             "binList": [
                 {
@@ -543,13 +543,13 @@
 
     -   解析$\{op\_type\}\_$\{parm\_info\}.o文件获取.ascend.meta段信息。
 
-        ```
+        ```text
         msobjdump --dump-elf ./AcosCustom_da824ede53d7e754f85c14b9446ec2fc.o
         ```
 
         执行上述命令，终端屏显如下，字段与库文件解析类似，参见[表4](#table94384560259)。
 
-        ```
+        ```text
         .ascend.meta. [0]: AcosCustom_da824ede53d7e754f85c14b9446ec2fc_1
         KERNEL_TYPE: AIV
         .ascend.meta. [0]: AcosCustom_da824ede53d7e754f85c14b9446ec2fc_2_mix_aiv
@@ -562,7 +562,7 @@
 
     -   查看$\{op\_type\}\_$\{parm\_info\}.json，直观获取device文件中算子信息。
 
-        ```
+        ```json
         {
             "binFileName": "AcosCustom_da824ede53d7e754f85c14b9446ec2fc",
             "binFileSuffix": ".o",
@@ -649,13 +649,13 @@
 
 -   **获取包含device信息的库文件列表**
 
-    ```
+    ```text
     msobjdump --list-elf ${cmake_install_dir}/op_api/lib/libcust_opapi.so 
     ```
 
     执行上述命令，终端会打印所有文件，屏显信息形如：
 
-    ```
+    ```text
     ELF file    0: ascendxxx_acos_custom_AcosCustom_dad9c8ca8fcbfd789010c8b1c0da8e26.json
     ELF file    1: ascendxxx_acos_custom_AcosCustom_dad9c8ca8fcbfd789010c8b1c0da8e26.o
     ....................
@@ -668,7 +668,7 @@
 
 以MatMulInvocationNeo算子为例（NPU模式），假设$\{cmake\_install\_dir\}为算子Cmake编译产物根目录，目录结构如下（仅为示例，具体以实际算子工程为准），类似[CMake编译配置文件编写](基于样例工程完成Kernel直调.md#section185111259496)。
 
-```
+```text
 out
 ├── lib
 │   ├── libascendc_kernels_npu.so
@@ -687,13 +687,13 @@ out
 
     -   简单打印
 
-        ```
+        ```text
         msobjdump --dump-elf ${cmake_install_dir}/out/libascendc_kernels_npu.so
         ```
 
         执行上述命令，终端打印基础device信息，示例如下：
 
-        ```
+        ```text
         ===========================
         [VERSION]: 1
         [TYPE COUNT]: 1
@@ -706,13 +706,13 @@ out
 
     -   全量打印
 
-        ```
+        ```text
         msobjdump --dump-elf ${cmake_install_dir}/out/libascendc_kernels_npu.so --verbose
         ```
 
         执行上述命令，终端打印所有device信息，示例如下：
 
-        ```
+        ```text
         ===========================
         [VERSION]: 1
         [TYPE COUNT]: 1
@@ -766,7 +766,7 @@ out
 
 -   **解压包含device信息的库文件并落盘**
 
-    ```
+    ```text
     msobjdump --extract-elf ${cmake_install_dir}/out/libascendc_kernels_npu.so
     ```
 
@@ -774,12 +774,12 @@ out
 
 -   **获取包含device信息的库文件列表**
 
-    ```
+    ```text
     msobjdump --list-elf ${cmake_install_dir}/out/libascendc_kernels_npu.so
     ```
 
     执行上述命令，终端会打印所有文件，屏显信息形如：
 
-    ```
+    ```text
     ELF file    0: ascendxxxb1_ascendc_kernels_npu_0_mix.o
     ```

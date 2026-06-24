@@ -36,16 +36,23 @@
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
-    template < typename U, typename T, bool isReuseSource = false, const NormalizeConfig& config = NLCFG_NORM>
-    __aicore__ inline void Normalize(const LocalTensor<T>& output, const LocalTensor<float>& outputRstd, const LocalTensor<float>& inputMean, const LocalTensor<float>& inputVariance, const LocalTensor<T>& inputX, const LocalTensor<U>& gamma, const LocalTensor<U>& beta, const LocalTensor<uint8_t>& sharedTmpBuffer, const float epsilon, const NormalizePara& para)
+    ```cpp
+    template <typename U, typename T, bool isReuseSource = false, const NormalizeConfig& config = NLCFG_NORM>
+    __aicore__ inline void Normalize(
+        const LocalTensor<T>& output, const LocalTensor<float>& outputRstd, const LocalTensor<float>& inputMean,
+        const LocalTensor<float>& inputVariance, const LocalTensor<T>& inputX, const LocalTensor<U>& gamma,
+        const LocalTensor<U>& beta, const LocalTensor<uint8_t>& sharedTmpBuffer, const float epsilon,
+        const NormalizePara& para)
     ```
 
 -   接口框架申请临时空间
 
-    ```
-    template < typename U, typename T, bool isReuseSource = false, const NormalizeConfig& config = NLCFG_NORM>
-    __aicore__ inline void Normalize(const LocalTensor<T>& output, const LocalTensor<float>& outputRstd, const LocalTensor<float>& inputMean, const LocalTensor<float>& inputVariance, const LocalTensor<T>& inputX, const LocalTensor<U>& gamma, const LocalTensor<U>& beta, const float epsilon, const NormalizePara& para)
+    ```cpp
+    template <typename U, typename T, bool isReuseSource = false, const NormalizeConfig& config = NLCFG_NORM>
+    __aicore__ inline void Normalize(
+        const LocalTensor<T>& output, const LocalTensor<float>& outputRstd, const LocalTensor<float>& inputMean,
+        const LocalTensor<float>& inputVariance, const LocalTensor<T>& inputX, const LocalTensor<U>& gamma,
+        const LocalTensor<U>& beta, const float epsilon, const NormalizePara& para)
     ```
 
 由于该接口的内部实现中涉及复杂的计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -67,7 +74,7 @@
 | isReuseSource | 该参数预留，传入默认值false即可。 |
 | config | 配置Normalize接口中输入输出相关信息。NormalizeConfig类型，定义如下方代码所示，其中参数的含义如下。<br><br>reducePattern：当前仅支持ReducePattern::AR模式，表示输入的内轴R轴为reduce计算轴。<br><br>aLength：用于描述输入的A轴大小。支持的取值如下：<br>-1：默认值。取[接口参数](#table2087718184450)para中的aLength作为A轴大小。<!-- npu="950" id7 --><br>1：支持outputRstd数据非对齐搬出，支持inputMean，inputVariance数据非对齐搬入。aLength为其它取值时，不支持上述三个输入输出的非对齐搬入和非对齐搬出。该取值需要与[接口参数](#table2087718184450)para中的aLength数值一致。请注意，仅在Ascend 950PR/Ascend 950DT上支持该取值。<!-- end id7 --><br>其它值：该值需要与[接口参数](#table2087718184450)para中的aLength数值一致。<br><br>isNoBeta：计算时，输入beta是否使用。false：默认值，Normalize计算中使用输入beta。true：Normalize计算中不使用输入beta。此时，公式中与beta相关的计算被省略。<br><br>isNoGamma：可选输入gamma是否使用。false：默认值，Normalize计算中使用可选输入gamma。true：Normalize计算中不使用输入gamma。此时，公式中与gamma相关的计算被省略。<br><br>isOnlyOutput：是否只输出y，不输出标准差的倒数rstd。当前该参数仅支持取值为false，表示y和rstd的结果全部输出。 |
 
-```
+```cpp
 struct NormalizeConfig {
     ReducePattern reducePattern = ReducePattern::AR;
     int32_t aLength = -1;
@@ -93,7 +100,7 @@ struct NormalizeConfig {
 | epsilon | 输入 | 防除零的权重系数。 |
 | para | 输入 | Normalize计算所需的参数信息。NormalizePara类型，定义如下方代码所示，其中参数的含义如下。<br>aLength：指定输入inputX的A轴长度。<br>rLength：指定输入inputX的R轴长度。<br>rLengthWithPadding：指定输入inputX的R轴对齐后的长度，该值是32B对齐的。 |
 
-```
+```cpp
 struct NormalizePara {
     uint32_t aLength;
     uint32_t rLength;
@@ -132,7 +139,7 @@ struct NormalizePara {
 
 ## 调用示例
 
-```
+```cpp
 // yLocal: 输出归一化后的结果y，shape为 [A, R]
 // rstdLocal: 输出标准差的倒数（1 / sqrt(variance + epsilon)），shape为 [A]
 // meanLocal: 输入的均值，shape为 [A]
@@ -167,7 +174,7 @@ AscendC::Normalize<DTYPE_Y, DTYPE_X, false, CONFIG>(
 
 示例结果如下：
 
-```
+```text
 输入数据(srcLocal, shape:[8, 8]):
 [  0.  1.  2.  3.  4.  5.  6.  7.
    8.  9. 10. 11. 12. 13. 14. 15.

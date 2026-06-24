@@ -15,12 +15,12 @@
 ```cpp
 // 数据读取索引为0的位置
 __simd_callee__ inline void asc_int4x22half(vector_half& dst, vector_int4x2_t src, vector_bool mask)
-// 数据读取索引为1的位置
-__simd_callee__ inline void asc_int4x22half_v2(vector_half& dst, vector_int4x2_t src, vector_bool mask)
-// 数据读取索引为2的位置
-__simd_callee__ inline void asc_int4x22half_v3(vector_half& dst, vector_int4x2_t src, vector_bool mask)
-// 数据读取索引为3的位置
-__simd_callee__ inline void asc_int4x22half_v4(vector_half& dst, vector_int4x2_t src, vector_bool mask)
+    // 数据读取索引为1的位置
+    __simd_callee__ inline void asc_int4x22half_v2(vector_half& dst, vector_int4x2_t src, vector_bool mask)
+    // 数据读取索引为2的位置
+    __simd_callee__ inline void asc_int4x22half_v3(vector_half& dst, vector_int4x2_t src, vector_bool mask)
+    // 数据读取索引为3的位置
+    __simd_callee__ inline void asc_int4x22half_v4(vector_half& dst, vector_int4x2_t src, vector_bool mask)
 ```
 
 ## 参数说明
@@ -48,9 +48,9 @@ PIPE_V
 ## 调用示例
 
  ```cpp
-vector_half dst;
-vector_int4x2_t src;
-vector_bool mask = asc_create_mask_b8(PAT_ALL);
-asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
-asc_int4x22half(dst, src, mask);
+ vector_half dst;
+ vector_int4x2_t src;
+ vector_bool mask = asc_create_mask_b8(PAT_ALL);
+ asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
+ asc_int4x22half(dst, src, mask);
 ```

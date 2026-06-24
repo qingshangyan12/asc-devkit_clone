@@ -28,12 +28,12 @@
 
 ## 函数原型
 
-```
-inline uint32_t asc_atomic_dec(uint32_t *address, uint32_t val)
+```cpp
+inline uint32_t asc_atomic_dec(uint32_t* address, uint32_t val)
 ```
 
-```
-inline uint64_t asc_atomic_dec(uint64_t *address, uint64_t val)
+```cpp
+inline uint64_t asc_atomic_dec(uint64_t* address, uint64_t val)
 ```
 
 ## 参数说明
@@ -66,7 +66,7 @@ Unified Buffer或Global Memory上的初始数据。
 
 使用该接口需要包含"simt\_api/device\_atomic\_functions.h"头文件。
 
-```
+```cpp
 #include "simt_api/device_atomic_functions.h"
 ```
 
@@ -86,10 +86,8 @@ Unified Buffer或Global Memory上的初始数据。
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(256) void allocate_reverse_ring_slot(uint32_t *ticket,
-                                                                    uint32_t *slots,
-                                                                    uint32_t capacity,
-                                                                    uint32_t n)
+    __global__ __launch_bounds__(256) void allocate_reverse_ring_slot(
+        uint32_t* ticket, uint32_t* slots, uint32_t capacity, uint32_t n)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= n) {
@@ -106,10 +104,8 @@ Unified Buffer或Global Memory上的初始数据。
     SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：\_\_gm\_\_表示Global Memory内存空间，\_\_ubuf\_\_表示Unified Buffer内存空间。
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void allocate_reverse_ring_slot(__gm__ uint32_t *ticket,
-                                                                             __gm__ uint32_t *slots,
-                                                                             uint32_t capacity,
-                                                                             uint32_t n)
+    __simt_vf__ __launch_bounds__(1024) inline void allocate_reverse_ring_slot(
+        __gm__ uint32_t* ticket, __gm__ uint32_t* slots, uint32_t capacity, uint32_t n)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= n) {
@@ -124,9 +120,7 @@ Unified Buffer或Global Memory上的初始数据。
 输出结果示例如下：
 
 ```cpp
-ticket before: 0
-capacity: 4
-n: 6
-slots: 0, 3, 2, 1, 0, 3 // 顺序由实际原子执行顺序决定
-ticket after: 2
+ticket before : 0 capacity : 4 n : 6 slots : 0, 3, 2, 1, 0,
+    3 // 顺序由实际原子执行顺序决定
+    ticket after : 2
 ```

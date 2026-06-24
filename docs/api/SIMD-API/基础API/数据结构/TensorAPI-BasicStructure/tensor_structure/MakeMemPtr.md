@@ -23,16 +23,14 @@ MakeMemPtr提供三种调用形式：
     - 指定物理位置和数据类型，根据原始地址构造：
 
     ```cpp
-    template <typename Hardware, typename DataType, typename Addr,
-        EnableMakePtrByTrait<Hardware, Addr> Enable>
+    template <typename Hardware, typename DataType, typename Addr, EnableMakePtrByTrait<Hardware, Addr> Enable>
     __aicore__ inline constexpr auto MakeMemPtr(Addr addr)
     ```
 
     - 指定物理位置，从已有迭代器构造：
 
     ```cpp
-    template <typename Hardware, typename Iterator,
-        EnableMakeHardwarePtr<Hardware, Iterator> Enable>
+    template <typename Hardware, typename Iterator, EnableMakeHardwarePtr<Hardware, Iterator> Enable>
     __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
     ```
 

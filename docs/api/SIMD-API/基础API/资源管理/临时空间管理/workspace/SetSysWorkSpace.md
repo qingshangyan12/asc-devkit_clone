@@ -63,25 +63,26 @@
 
 在kernel侧调用该接口前，需要在host侧调用GetLibApiWorkSpaceSize获取系统workspace的大小，并在host侧设置workspacesize大小。样例如下：
 
-```
+```cpp
 // 用户自定义的tiling函数
 static ge::graphStatus TilingFunc(gert::TilingContext* context)
 {
     AddApiTiling tiling;
-    ...
-    size_t usrSize = 256; // 设置用户需要使用的workspace大小。
+    ... size_t usrSize = 256; // 设置用户需要使用的workspace大小。
     // 如需要使用系统workspace需要调用GetLibApiWorkSpaceSize获取系统workspace的大小。
-    auto ascendcPlatform = platform_ascendc:: PlatformAscendC(context->GetPlatformInfo());
+    auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
     uint32_t sysWorkspaceSize = ascendcPlatform.GetLibApiWorkSpaceSize();
-    size_t *currentWorkspace = context->GetWorkspaceSizes(1); // 通过框架获取workspace的指针，GetWorkspaceSizes入参为所需workspace的块数。当前限制使用一块。
-    currentWorkspace[0] = usrSize + sysWorkspaceSize; // 设置总的workspace的数值大小，总的workspace空间由框架来申请并管理。
+    size_t* currentWorkspace = context->GetWorkspaceSizes(
+        1); // 通过框架获取workspace的指针，GetWorkspaceSizes入参为所需workspace的块数。当前限制使用一块。
+    currentWorkspace[0] =
+        usrSize + sysWorkspaceSize; // 设置总的workspace的数值大小，总的workspace空间由框架来申请并管理。
     ...
 }
 ```
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline void SetSysWorkspace(GM_ADDR workspace)
 ```
 
@@ -118,8 +119,8 @@ __aicore__ inline void SetSysWorkspace(GM_ADDR workspace)
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
-template<typename aType, typename bType, typename cType, typename biasType>
+```cpp
+template <typename aType, typename bType, typename cType, typename biasType>
 __aicore__ inline void MatmulLeakyKernel<aType, bType, cType, biasType>::Init(
     GM_ADDR a, GM_ADDR b, GM_ADDR bias, GM_ADDR c, GM_ADDR workspace, const TCubeTiling& tiling, float alpha)
 {

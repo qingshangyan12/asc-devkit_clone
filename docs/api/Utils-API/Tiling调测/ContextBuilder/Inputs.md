@@ -6,8 +6,8 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001820490260_zh-cn_topic_0000001389787297_section13230182415108"></a>
 
-```
-ContextBuilder &Inputs(std::vector<void *> inputs)
+```cpp
+ContextBuilder& Inputs(std::vector<void*> inputs)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001820490260_zh-cn_topic_0000001389787297_section75395119104"></a>
@@ -41,8 +41,8 @@ ContextBuilder &Inputs(std::vector<void *> inputs)
 
 ## 调用示例<a name="zh-cn_topic_0000001820490260_zh-cn_topic_0000001389787297_section320753512363"></a>
 
-```
+```cpp
 PlatformInfo platformInfo;
-auto contextBuilder = context_ascendc::ContextBuilder().Inputs({nullptr, reinterpret_cast<void *>(&platformInfo)});
+auto contextBuilder = context_ascendc::ContextBuilder().Inputs({nullptr, reinterpret_cast<void*>(&platformInfo)});
 ```
 

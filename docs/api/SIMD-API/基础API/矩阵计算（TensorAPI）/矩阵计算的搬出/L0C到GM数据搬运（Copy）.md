@@ -36,10 +36,11 @@ L0C Buffer到Global Memory搬运支持不量化输出、float到half或bfloat16_
 - 执行L0C Buffer到Global Memory的量化搬运。
 
     ```cpp
-    template <typename AtomType, typename DstTensor, typename SrcTensor, typename QuantParam,
+    template <
+        typename AtomType, typename DstTensor, typename SrcTensor, typename QuantParam,
         Std::enable_if_t<IsCopyQuantParamV<QuantParam>, int> Enable>
-    __aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src,
-        const QuantParam& quant)
+    __aicore__ inline void Copy(
+        const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src, const QuantParam& quant)
     ```
 
 - 使用默认trait构造搬运原子对象。
@@ -96,11 +97,7 @@ struct CopyL0C2GMTrait {
 使用自定义trait的示例：
 
 ```cpp
-constexpr CopyL0C2GMTrait l0c2gmTrait = {
-    RoundMode::DEFAULT,
-    false,
-    true
-};
+constexpr CopyL0C2GMTrait l0c2gmTrait = {RoundMode::DEFAULT, false, true};
 
 struct CopyL0C2GMTraitCustom {
     using TraitType = CopyL0C2GMTrait;

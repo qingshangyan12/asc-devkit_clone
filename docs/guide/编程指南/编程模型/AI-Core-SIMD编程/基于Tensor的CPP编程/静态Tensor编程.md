@@ -33,17 +33,17 @@
 
     开发者可以使用LocalTensor构造函数直接指定内存地址，实现内存的完全自主管理（本质上无需申请和释放内存）。使用时，需根据需求合理指定地址（不超过物理存储上限），并在保证功能正确的前提下进行内存复用。如果需要通过规避Bank冲突或者复用内存来获得极致性能时，推荐使用该方式。
 
-```
-    // 方式1：使用LocalMemAllocator进行内存分配
-    AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
-    AscendC::LocalTensor<float> xLocalPing = ubAllocator.Alloc<float, TILE_LENGTH>();
-    AscendC::LocalTensor<float> yLocalPing = ubAllocator.Alloc<float, TILE_LENGTH>();
-    AscendC::LocalTensor<float> zLocalPing = ubAllocator.Alloc<float, TILE_LENGTH>();
+```cpp
+// 方式1：使用LocalMemAllocator进行内存分配
+AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
+AscendC::LocalTensor<float> xLocalPing = ubAllocator.Alloc<float, TILE_LENGTH>();
+AscendC::LocalTensor<float> yLocalPing = ubAllocator.Alloc<float, TILE_LENGTH>();
+AscendC::LocalTensor<float> zLocalPing = ubAllocator.Alloc<float, TILE_LENGTH>();
 
-    // 方式2：直接使用LocalTensor构造函数构造Tensor
-    AscendC::LocalTensor<float> xLocalPing(AscendC::TPosition::VECCALC, xAddrPing, TILE_LENGTH);
-    AscendC::LocalTensor<float> yLocalPing(AscendC::TPosition::VECCALC, yAddrPing, TILE_LENGTH);
-    AscendC::LocalTensor<float> zLocalPing(AscendC::TPosition::VECCALC, zAddrPing, TILE_LENGTH);
+// 方式2：直接使用LocalTensor构造函数构造Tensor
+AscendC::LocalTensor<float> xLocalPing(AscendC::TPosition::VECCALC, xAddrPing, TILE_LENGTH);
+AscendC::LocalTensor<float> yLocalPing(AscendC::TPosition::VECCALC, yAddrPing, TILE_LENGTH);
+AscendC::LocalTensor<float> zLocalPing(AscendC::TPosition::VECCALC, zAddrPing, TILE_LENGTH);
 ```
 
 ## 同步管理<a name="section4338114663610"></a>
@@ -62,106 +62,106 @@
 
 上述的同步逻辑在使用Pipe编程框架时，框架会使用EnQue/DeQue/AllocTensor/FreeTensor进行封装。您可以通过[TPipe-TQue框架编程原理](../基于TPipe-TQue框架编程/TPipe-TQue框架编程原理.md)来了解应该如何在使用静态Tensor编程方式时手动进行同步控制。
 
-```
-    AscendC::LocalTensor<half> xLocal(AscendC::TPosition::VECCALC, xAddr, MAX_DATA_COPY_LEN);
-    AscendC::LocalTensor<half> yLocal(AscendC::TPosition::VECCALC, yAddr, MAX_DATA_COPY_LEN);
-    AscendC::LocalTensor<half> zLocal(AscendC::TPosition::VECCALC, zAddr, MAX_DATA_COPY_LEN);
+```cpp
+AscendC::LocalTensor<half> xLocal(AscendC::TPosition::VECCALC, xAddr, MAX_DATA_COPY_LEN);
+AscendC::LocalTensor<half> yLocal(AscendC::TPosition::VECCALC, yAddr, MAX_DATA_COPY_LEN);
+AscendC::LocalTensor<half> zLocal(AscendC::TPosition::VECCALC, zAddr, MAX_DATA_COPY_LEN);
 
-    uint32_t totalBlocks = GetTotalBlocks();
+uint32_t totalBlocks = GetTotalBlocks();
 
-    for (uint32_t loopIdx = 0; loopIdx < totalBlocks; loopIdx++) {
-        uint32_t startElement = loopIdx * dataCopyLen;
-        uint32_t remainElements = totalElementsPerCore - startElement;
-        uint32_t curLen = remainElements > dataCopyLen ? dataCopyLen : remainElements;
+for (uint32_t loopIdx = 0; loopIdx < totalBlocks; loopIdx++) {
+    uint32_t startElement = loopIdx * dataCopyLen;
+    uint32_t remainElements = totalElementsPerCore - startElement;
+    uint32_t curLen = remainElements > dataCopyLen ? dataCopyLen : remainElements;
 
-        if (loopIdx != 0) {
-            AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
-        }
-
-        AscendC::DataCopy(xLocal, xGm[startElement], curLen);
-        AscendC::DataCopy(yLocal, yGm[startElement], curLen);
-
-        AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
-        AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
-
-        if (loopIdx != 0) {
-            AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
-        }
-
-        AscendC::Add(zLocal, xLocal, yLocal, curLen);
-
-        if (loopIdx != (totalBlocks - 1)) {
-            AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
-        }
-        AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
-        AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
-
-        AscendC::DataCopy(zGm[startElement], zLocal, curLen);
-
-        if (loopIdx != (totalBlocks - 1)) {
-            AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
-        }
+    if (loopIdx != 0) {
+        AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
     }
+
+    AscendC::DataCopy(xLocal, xGm[startElement], curLen);
+    AscendC::DataCopy(yLocal, yGm[startElement], curLen);
+
+    AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+
+    if (loopIdx != 0) {
+        AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
+    }
+
+    AscendC::Add(zLocal, xLocal, yLocal, curLen);
+
+    if (loopIdx != (totalBlocks - 1)) {
+        AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
+    }
+    AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+
+    AscendC::DataCopy(zGm[startElement], zLocal, curLen);
+
+    if (loopIdx != (totalBlocks - 1)) {
+        AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
+    }
+}
 ```
 
 ## 流水优化<a name="section121239188376"></a>
 
 在基于TPipe的编程范式中，开发者只需要在InitBuffer时指定buffer数量为2，即可自动开启Double Buffer。但是静态Tensor编程方式下，开发者需要手动开启Double Buffer，具体示例如下，完整样例请参考[静态Tensor编程样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/05_best_practices/00_vector_compute/add_high_performance)中的Double Buffer示例。
 
-```
-    // ping
-    AscendC::LocalTensor<half> xPing(AscendC::TPosition::VECCALC, xAddrPing, MAX_DATA_COPY_LEN);
-    AscendC::LocalTensor<half> yPing(AscendC::TPosition::VECCALC, yAddrPing, MAX_DATA_COPY_LEN);
-    AscendC::LocalTensor<half> zPing(AscendC::TPosition::VECCALC, zAddrPing, MAX_DATA_COPY_LEN);
-    // pong
-    AscendC::LocalTensor<half> xPong(AscendC::TPosition::VECCALC, xAddrPong, MAX_DATA_COPY_LEN);
-    AscendC::LocalTensor<half> yPong(AscendC::TPosition::VECCALC, yAddrPong, MAX_DATA_COPY_LEN);
-    AscendC::LocalTensor<half> zPong(AscendC::TPosition::VECCALC, zAddrPong, MAX_DATA_COPY_LEN);
+```cpp
+// ping
+AscendC::LocalTensor<half> xPing(AscendC::TPosition::VECCALC, xAddrPing, MAX_DATA_COPY_LEN);
+AscendC::LocalTensor<half> yPing(AscendC::TPosition::VECCALC, yAddrPing, MAX_DATA_COPY_LEN);
+AscendC::LocalTensor<half> zPing(AscendC::TPosition::VECCALC, zAddrPing, MAX_DATA_COPY_LEN);
+// pong
+AscendC::LocalTensor<half> xPong(AscendC::TPosition::VECCALC, xAddrPong, MAX_DATA_COPY_LEN);
+AscendC::LocalTensor<half> yPong(AscendC::TPosition::VECCALC, yAddrPong, MAX_DATA_COPY_LEN);
+AscendC::LocalTensor<half> zPong(AscendC::TPosition::VECCALC, zAddrPong, MAX_DATA_COPY_LEN);
 
-    uint32_t totalBlocks = GetTotalBlocks();
+uint32_t totalBlocks = GetTotalBlocks();
 
-    // double buffer
-    AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
-    AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID1);
-    AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
-    AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID1);
+// double buffer
+AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
+AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID1);
+AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
+AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID1);
 
-    for (uint32_t loopIdx = 0; loopIdx < totalBlocks; loopIdx++) {
-        uint32_t startElement = loopIdx * dataCopyLen;
-        uint32_t remainElements = totalElementsPerCore - startElement;
-        uint32_t curLen = remainElements > dataCopyLen ? dataCopyLen : remainElements;
+for (uint32_t loopIdx = 0; loopIdx < totalBlocks; loopIdx++) {
+    uint32_t startElement = loopIdx * dataCopyLen;
+    uint32_t remainElements = totalElementsPerCore - startElement;
+    uint32_t curLen = remainElements > dataCopyLen ? dataCopyLen : remainElements;
 
-        int32_t eventID = ((loopIdx & 1) == 0 ? EVENT_ID0 : EVENT_ID1);
-        AscendC::LocalTensor<half>& xLocal = ((loopIdx & 1) == 0 ? xPing : xPong);
-        AscendC::LocalTensor<half>& yLocal = ((loopIdx & 1) == 0 ? yPing : yPong);
-        AscendC::LocalTensor<half>& zLocal = ((loopIdx & 1) == 0 ? zPing : zPong);
+    int32_t eventID = ((loopIdx & 1) == 0 ? EVENT_ID0 : EVENT_ID1);
+    AscendC::LocalTensor<half>& xLocal = ((loopIdx & 1) == 0 ? xPing : xPong);
+    AscendC::LocalTensor<half>& yLocal = ((loopIdx & 1) == 0 ? yPing : yPong);
+    AscendC::LocalTensor<half>& zLocal = ((loopIdx & 1) == 0 ? zPing : zPong);
 
-        AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(eventID);
+    AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(eventID);
 
-        AscendC::DataCopy(xLocal, xGm[startElement], curLen);
-        AscendC::DataCopy(yLocal, yGm[startElement], curLen);
+    AscendC::DataCopy(xLocal, xGm[startElement], curLen);
+    AscendC::DataCopy(yLocal, yGm[startElement], curLen);
 
-        AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(eventID);
-        AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(eventID);
+    AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(eventID);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(eventID);
 
-        AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(eventID);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(eventID);
 
-        AscendC::Add(zLocal, xLocal, yLocal, curLen);
+    AscendC::Add(zLocal, xLocal, yLocal, curLen);
 
-        AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(eventID);
+    AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(eventID);
 
-        AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(eventID);
-        AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(eventID);
+    AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(eventID);
+    AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(eventID);
 
-        AscendC::DataCopy(zGm[startElement], zLocal, curLen);
+    AscendC::DataCopy(zGm[startElement], zLocal, curLen);
 
-        AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(eventID);
-    }
+    AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(eventID);
+}
 
-    AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
-    AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID1);
-    AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
-    AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID1);
+AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
+AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID1);
+AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
+AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID1);
 ```
 
 以下为不开启DoubleBuffer和开启DoubleBuffer的流水示意图。多数情况下，采用DoubleBuffer能有效提升Vector的时间利用率，缩减算子执行时间，详细内容可参考[DoubleBuffer](../../../../技术附录/概念原理和术语/性能优化技术原理/DoubleBuffer.md)。

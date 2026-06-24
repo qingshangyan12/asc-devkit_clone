@@ -14,7 +14,7 @@
 
 ## 目录结构
 
-  ```
+  ```text
   ├── aligned_types
   │   ├── aligned_types.asc      // SIMT实现&调用样例
   │   ├── CMakeLists.txt         // cmake编译文件
@@ -32,8 +32,14 @@
   编译期运算符，返回对象的对齐要求，即该对象的起始地址必须是多少字节的倍数。结构体的默认`alignof`等于其所有字段`alignof`的最大值，可通过关键字`alignas`强制加大。例如下面的`struct T`和`struct T2`，`T`的`alignof`是4B，`T2`的`alignof`是8B。
 
   ```cpp
-  struct T { uint8_t a; uint32_t b; };  // alignof = max(1, 4) = 4
-  struct alignas(8) T2 { uint8_t a; uint32_t b; };  // alignof = 8 (alignas 放大)
+  struct T {
+      uint8_t a;
+      uint32_t b;
+  }; // alignof = max(1, 4) = 4
+  struct alignas(8) T2 {
+      uint8_t a;
+      uint32_t b;
+  }; // alignof = 8 (alignas 放大)
   ```
 
   **2、alignas**
@@ -47,8 +53,12 @@
   - **会同步抬升sizeof**：`sizeof`必须是`alignof`的整数倍，所以放大`alignof`时，`sizeof`会向上进位。
 
   ```cpp
-  struct alignas(4) Align3 { unsigned char r, g, b; }; // alignof=4 sizeof=4 (随alignas抬升)
-  struct Misalign3 { unsigned char r, g, b; }; // alignof=1 sizeof=3 (默认)
+  struct alignas(4) Align3 {
+      unsigned char r, g, b;
+  }; // alignof=4 sizeof=4 (随alignas抬升)
+  struct Misalign3 {
+      unsigned char r, g, b;
+  }; // alignof=1 sizeof=3 (默认)
   ```
 
 - 关键参数
@@ -84,7 +94,7 @@
 
     本样例总数据量固定为512MiB，采用单核2048线程完成数据搬运。核函数以模板方式实现，支持不同类型与对齐方式的结构体测试，执行逐元素搬运操作，具体实现如下：
 
-    ```
+    ```cpp
     constexpr uint32_t THREAD_COUNT = 2048;                  // threads per block
     constexpr size_t MEM_BYTES = 512ULL * 1024ULL * 1024ULL; // 总数据量 512 MiB
     uint32_t num_elements = static_cast<uint32_t>(MEM_BYTES / sizeof(TData));
@@ -222,7 +232,7 @@
 
   查看具体的性能分析结果：
 
-  ```
+  ```bash
   # 如查看Task Duration 相关数据
   cat ./OPPROF_*/OpBasicInfo.csv
   ```

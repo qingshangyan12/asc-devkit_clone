@@ -22,7 +22,9 @@
 
 ```cpp
 template <typename T, PaddingMode mode = PaddingMode::Normal>
-__aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
+__aicore__ inline void DataCopyPad(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams,
+    const DataCopyPadExtParams<T>& padParams)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -113,7 +115,7 @@ constexpr uint32_t dstElemCount = 192;
 
 // 源操作数：GM上连续存放3个数据块，每块48B，共144个int8_t。
 AscendC::GlobalTensor<int8_t> srcGm;
-srcGm.SetGlobalBuffer((__gm__ int8_t *)src, srcElemCount);
+srcGm.SetGlobalBuffer((__gm__ int8_t*)src, srcElemCount);
 // 目的操作数：L1 Buffer。Normal模式下每块48B有效数据右侧补16B，3块共192B。
 AscendC::LocalTensor<int8_t> dstLocal(AscendC::TPosition::A1, 0, dstElemCount);
 
@@ -150,9 +152,10 @@ constexpr uint32_t dstElemCount = 160;
 
 // 源操作数：GM上连续存放3个数据块，每块48B，共144个int8_t。
 AscendC::GlobalTensor<int8_t> srcGm;
-srcGm.SetGlobalBuffer((__gm__ int8_t *)src, srcElemCount);
+srcGm.SetGlobalBuffer((__gm__ int8_t*)src, srcElemCount);
 
-// 目的操作数：L1 Buffer的A1位置。Compact模式下3块有效数据共144B，只在最后右侧补16B。
+// 目的操作数：L1
+// Buffer的A1位置。Compact模式下3块有效数据共144B，只在最后右侧补16B。
 AscendC::LocalTensor<int8_t> dstLocal(AscendC::TPosition::A1, 0, dstElemCount);
 
 AscendC::DataCopyExtParams copyParams;

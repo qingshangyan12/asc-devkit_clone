@@ -19,7 +19,7 @@
 
     bisheng编译器在CPU调试模式下会对<<<\>\>\>调用核函数的过程进行转义，实现核函数在CPU域下的调用，相关调用函数定义在"cpu\_debug\_launch.h"中，在使用<<<\>\>\>语法调用核函数的源文件中，请通过以下方式包含必需的头文件：
 
-    ```
+    ```cpp
     #ifdef ASCENDC_CPU_DEBUG
     #include "cpu_debug_launch.h"
     #endif
@@ -27,7 +27,7 @@
 
 2.  通过在CMake配置阶段传入变量CMAKE\_ASC\_RUN\_MODE和CMAKE\_ASC\_ARCHITECTURES即可开启CPU域编译。命令示例如下：
 
-    ```
+    ```bash
     cmake -B build -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201
     ```
 
@@ -86,7 +86,7 @@
 
     gdb启动后，首先设置跟踪子进程，之后再打断点，就会停留在子进程中，但是这种方式只会停留在遇到断点的第一个子进程中，其余子进程和主进程会继续执行直到退出。涉及到核间同步的算子无法使用这种方法进行调试。
 
-    ```
+    ```text
     gdb --args add_custom_cpu  // 启动gdb，add_custom_cpu为算子可执行文件
     (gdb) set follow-fork-mode child
     ```
@@ -97,25 +97,25 @@
 
     在gdb启动后，首先设置调试模式为只调试一个进程，挂起其他进程。设置的命令如下：
 
-    ```
+    ```text
     (gdb) set detach-on-fork off
     ```
 
     查看当前调试模式的命令为：
 
-    ```
+    ```text
     (gdb) show detach-on-fork
     ```
 
     中断gdb程序要使用捕捉事件的方式，即gdb程序捕捉fork这一事件并中断。这样在每一次起子进程时就可以中断gdb程序。设置的命令为：
 
-    ```
+    ```text
     (gdb) catch fork
     ```
 
     当执行r后，可以查看当前的进程信息：
 
-    ```
+    ```text
     (gdb) info inferiors
       Num  Description
     * 1    process 19613
@@ -125,7 +125,7 @@
 
     执行c后，再次查看info inferiors，可以看到此时第一个子进程已经启动。
 
-    ```
+    ```text
     (gdb) info inferiors
       Num  Description 
     * 1    process 19613
@@ -134,7 +134,7 @@
 
     这个时候可以使用切换到第二个进程，也就是第一个子进程，再打上断点进行调试，此时主进程是暂停状态：
 
-    ```
+    ```text
     (gdb) inferior 2
     [Switching to inferior 2 [process 19626] ($HOME/demo)]
     (gdb) info inferiors
@@ -149,7 +149,7 @@
 
 如下是调试一个单独子进程的命令样例：
 
-```
+```text
 gdb --args add_custom_cpu
 set follow-fork-mode child
 break add_custom.cpp:45
@@ -167,7 +167,7 @@ quit
 
 在代码中直接编写printf\(...\)来观察数值的输出。样例代码如下：
 
-```
+```text
 printf("xLocal size: %d\n", xLocal.GetSize()); 
 printf("tileLength: %d\n", tileLength);
 ```

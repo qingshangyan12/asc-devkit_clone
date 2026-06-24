@@ -24,9 +24,11 @@
 
 ## 函数原型
 
-```
+```cpp
 template <bool sync = true, bool waitIterateBatch = false>
-__aicore__ inline void IterateNBatch(const uint32_t batchLoop, uint32_t batchA, uint32_t batchB, bool enSequentialWrite, const uint32_t matrixStrideA = 0, const uint32_t matrixStrideB = 0, const uint32_t matrixStrideC = 0)
+__aicore__ inline void IterateNBatch(
+    const uint32_t batchLoop, uint32_t batchA, uint32_t batchB, bool enSequentialWrite,
+    const uint32_t matrixStrideA = 0, const uint32_t matrixStrideB = 0, const uint32_t matrixStrideC = 0)
 ```
 
 ## 参数说明
@@ -65,7 +67,7 @@ __aicore__ inline void IterateNBatch(const uint32_t batchLoop, uint32_t batchA, 
 
 实例功能：完成aGM、bGM矩阵乘，结果保存到cGm上，其中aGM数据的layout格式为BSNGD，bGM数据的layout格式为BSNGD，cGM的layout格式为BNGS1S2，左矩阵每次计算batchA个SD数据，右矩阵每次计算batchB个SD数据。
 
-```
+```cpp
 // 创建Matmul实例
 AscendC::Matmul<aType, bType, cType, biasType> mm1;
 AscendC::TPipe pipe;

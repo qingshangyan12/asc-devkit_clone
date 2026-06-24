@@ -25,7 +25,7 @@ This example implements unaligned data transfer operations between UB (Unified B
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── reg_load_store_unalign
 │   ├── scripts
 │   │   ├── gen_data.py                // Input data and ground truth generation script

@@ -95,9 +95,9 @@ __aicore__ inline __inout_pipe__(S) PrimType GetValue(const uint64_t offset) con
 // 数据(GlobalTensor): [0 100 200  ... ]
 
 AscendC::GlobalTensor<uint32_t> tiling_global;
-tiling_global.SetGlobalBuffer(reinterpret_cast<__gm__ uint32_t *>(tiling), 16);
+tiling_global.SetGlobalBuffer(reinterpret_cast<__gm__ uint32_t*>(tiling), 16);
 const uint16_t C1 = (uint16_t)tiling_global.GetValue(0);
-const uint16_t H = (uint16_t)tiling_global(1);  
+const uint16_t H = (uint16_t)tiling_global(1);
 // 示例结果如下：
 // C1 = 0，H = 100
 ```

@@ -8,7 +8,7 @@ printf主要用于打印标量和字符串信息，SIMT编程及SIMD编程均支
 
 printf示例如下，printf接口的使用说明和具体约束请参考[printf](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/调测接口/printf-290.md)。
 
-```
+```text
 printf("fmt string %d", 0x123);
 ```
 
@@ -25,13 +25,13 @@ DumpTensor是SIMD编程场景独有的打印功能，用于NPU域上板打印指
 
 如下所示，srcLocal表示待打印的Tensor；5表示用户的自定义附加信息，比如当前的代码行号；dataLen表示元素个数。DumpTensor接口的使用说明和具体约束请参考[DumpTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md)。
 
-```
+```text
 DumpTensor(srcLocal,5, dataLen);
 ```
 
 Dump时，每个block核的dump信息前会增加对应信息头DumpHead（32字节大小），用于记录核号和资源使用信息；每次Dump的Tensor数据前也会添加信息头DumpTensorHead（32字节大小），用于记录Tensor的相关信息。打印结果的样例如下：
 
-```
+```text
 DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
 [19.000000, 4.000000, 38.000000, 50.000000, 39.000000, 67.000000, 84.000000, 98.000000, 21.000000, 36.000000, 18.000000, 46.000000, 10.000000, 92.000000, 26.000000, 38.000000, 39.000000, 9.000000, 82.000000, 37.000000, 35.000000, 65.000000, 97.000000, 59.000000, 89.000000, 63.000000, 70.000000, 57.000000, 35.000000, 3.000000, 16.000000,
 42.000000]

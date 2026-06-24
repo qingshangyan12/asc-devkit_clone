@@ -63,7 +63,7 @@
 
 ## 函数原型<a name="section1449617323189"></a>
 
-```
+```cpp
 template <typename T>
 __aicore__ inline LocalTensor<T> GetWithOffset(uint32_t size, uint32_t bufOffset)
 ```
@@ -127,7 +127,7 @@ bufOffset需满足32字节对齐的要求。
 
 ## 调用示例<a name="section5725818154718"></a>
 
-```
+```cpp
 // 为TBuf初始化分配内存，分配内存长度为1024字节
 AscendC::TPipe pipe;
 AscendC::TBuf<AscendC::TPosition::VECCALC> calcBuf; // 模板参数为TPosition中的VECCALC类型

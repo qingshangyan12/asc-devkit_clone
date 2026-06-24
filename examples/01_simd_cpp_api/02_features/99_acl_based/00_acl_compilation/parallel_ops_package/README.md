@@ -25,7 +25,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── parallel_ops_package
 │   ├── CMakeLists.txt              // 顶层编译工程文件（并行构建多个算子包）
 │   ├── add_custom                  // Add算子工程目录

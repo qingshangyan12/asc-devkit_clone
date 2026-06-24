@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename Tp>
 struct remove_pointer;
 ```
@@ -39,7 +39,7 @@ remove\_pointer是一个结构体，其提供一个嵌套类型type，表示移�
 
 ## 调用示例
 
-```
+```cpp
 // Test non-pointer type
 ascendc_assert((AscendC::Std::is_same_v<AscendC::Std::remove_pointer<int>::type, int>));
 ascendc_assert((AscendC::Std::is_same_v<AscendC::Std::remove_pointer<double>::type, double>));

@@ -6,27 +6,29 @@ LocalMemAllocator仅支持在Ascend C静态Tensor编程方式中使用，不可�
 
 ## 需要包含的头文件<a name="zh-cn_topic_0000002213064918_section78885814919"></a>
 
-```
+```cpp
 #include "kernel_operator.h"
 ```
 
 ## 原型定义<a name="section10580930144614"></a>
 
-```
-template<Hardware hard = Hardware::UB>
+```cpp
+template <Hardware hard = Hardware::UB>
 class LocalMemAllocator {
 public:
     __aicore__ inline LocalMemAllocator();
     __aicore__ inline uint32_t GetCurAddr() const;
-    template <class DataType, uint32_t tileSize> LocalTensor<DataType> __aicore__ inline Alloc();
-    template <TPosition pos, class DataType, uint32_t tileSize> __aicore__ inline LocalTensor<DataType> Alloc();
-    template <class DataType> LocalTensor<DataType> __aicore__ inline Alloc(uint32_t tileSize);    
-    template <TPosition pos, class DataType> LocalTensor<DataType> __aicore__ inline Alloc(uint32_t tileSize);
-    
-    template <class DataType> LocalTensor<DataType> __aicore__ inline Alloc();
-    
-    
-   
+    template <class DataType, uint32_t tileSize>
+    LocalTensor<DataType> __aicore__ inline Alloc();
+    template <TPosition pos, class DataType, uint32_t tileSize>
+    __aicore__ inline LocalTensor<DataType> Alloc();
+    template <class DataType>
+    LocalTensor<DataType> __aicore__ inline Alloc(uint32_t tileSize);
+    template <TPosition pos, class DataType>
+    LocalTensor<DataType> __aicore__ inline Alloc(uint32_t tileSize);
+
+    template <class DataType>
+    LocalTensor<DataType> __aicore__ inline Alloc();
 };
 ```
 

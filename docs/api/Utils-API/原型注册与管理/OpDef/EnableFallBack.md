@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001600267337_zh-cn_topic_0000001526112350_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
+```text
 OpDef &EnableFallBack(void)
 ```
 
@@ -25,15 +25,18 @@ OpDef算子定义，OpDef请参考[OpDef](OpDef.md)。
 
 ## 调用示例<a name="zh-cn_topic_0000001600267337_zh-cn_topic_0000001526112350_zh-cn_topic_0000001575944081_section320753512363"></a>
 
-```
+```cpp
 class AddCustom : public OpDef {
 public:
     AddCustom(const char* name) : OpDef(name)
     {
         this->Input("x").ParamType(REQUIRED).DataType({ge::DT_FLOAT}).Format({ge::FORMAT_ND});
         this->Input("y").ParamType(REQUIRED).DataType({ge::DT_FLOAT}).Format({ge::FORMAT_ND});
-        this->Output("z").ParamType(REQUIRED).DataType({ge::DT_FLOAT}).Format({ge::FORMAT_ND})
-        this->AICore().AddConfig("ascendxxx");
+        this->Output("z")
+            .ParamType(REQUIRED)
+            .DataType({ge::DT_FLOAT})
+            .Format({ge::FORMAT_ND}) this->AICore()
+            .AddConfig("ascendxxx");
         this->SetInferShape(ge::InferShapeFunc);
         this->SetInferDataType(ge::InferDataTypeFunc);
         this->EnableFallBack();

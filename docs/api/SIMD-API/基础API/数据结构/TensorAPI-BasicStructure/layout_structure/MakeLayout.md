@@ -23,8 +23,8 @@ MakeLayout支持以下两种构造方式：
 template <typename T, typename U>
 __aicore__ inline constexpr auto MakeLayout(const T& shape, const U& stride)
 
-template <typename ShapeType>
-__aicore__ inline constexpr auto MakeLayout(const ShapeType& shape)
+    template <typename ShapeType>
+    __aicore__ inline constexpr auto MakeLayout(const ShapeType& shape)
 ```
 
 ## 参数说明

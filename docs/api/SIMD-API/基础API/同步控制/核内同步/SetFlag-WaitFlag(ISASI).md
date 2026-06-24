@@ -73,8 +73,7 @@
 
 ```cpp
 template <HardEvent event>
-__aicore__ inline void SetFlag(int32_t eventID)
-template <HardEvent event>
+__aicore__ inline void SetFlag(int32_t eventID) template <HardEvent event>
 __aicore__ inline void WaitFlag(int32_t eventID)
 ```
 
@@ -122,14 +121,14 @@ __aicore__ inline void WaitFlag(int32_t eventID)
 ## 调用示例<a name="section837496171220"></a>
 
 ```cpp
-    AscendC::DataCopy(src1Local, src1Global[i * tileLength], tileLength);
-    AscendC::DataCopy(src0Local, src0Global[i * tileLength], tileLength);
-    
-    // 循环内依赖：先“DataCopy(PIPE_MTE2)写src0Local”，后“Maxs和Mins（PIPE_V）读src0Local”。
-    // 由于PIPE_V需要等待PIPE_MTE2，所以需要插入以下同步。
-    AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
-    AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+AscendC::DataCopy(src1Local, src1Global[i * tileLength], tileLength);
+AscendC::DataCopy(src0Local, src0Global[i * tileLength], tileLength);
 
-    AscendC::Maxs(tmpTensor1, src0Local, inputVal, tileLength);
-    AscendC::Mins(tmpTensor2, src0Local, inputVal, tileLength);
+// 循环内依赖：先“DataCopy(PIPE_MTE2)写src0Local”，后“Maxs和Mins（PIPE_V）读src0Local”。
+// 由于PIPE_V需要等待PIPE_MTE2，所以需要插入以下同步。
+AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+
+AscendC::Maxs(tmpTensor1, src0Local, inputVal, tileLength);
+AscendC::Mins(tmpTensor2, src0Local, inputVal, tileLength);
 ```

@@ -71,31 +71,40 @@ LayerNorm算法中Reduce轴较大的场景，可以通过切分Reduce轴，联�
 -   通过sharedTmpBuffer入参传入临时空间
     -   不带counts参数场景
 
-        ```
+        ```cpp
         template <bool isReuseSource = false, const WelfordFinalizeConfig& config = WFFINALIZE_DEFAULT_CFG>
-        __aicore__ inline void WelfordFinalize(const LocalTensor<float>& outputMean, const LocalTensor<float>& outputVariance, const LocalTensor<float>& inputMean, const LocalTensor<float>& inputVariance, const LocalTensor<uint8_t>& sharedTmpBuffer, WelfordFinalizePara& para)
+        __aicore__ inline void WelfordFinalize(
+            const LocalTensor<float>& outputMean, const LocalTensor<float>& outputVariance, const LocalTensor<float>& inputMean,
+            const LocalTensor<float>& inputVariance, const LocalTensor<uint8_t>& sharedTmpBuffer, WelfordFinalizePara& para)
         ```
 
     -   带counts参数场景
 
-        ```
+        ```cpp
         template <bool isReuseSource = false, const WelfordFinalizeConfig& config = WFFINALIZE_DEFAULT_CFG>
-        __aicore__ inline void WelfordFinalize(const LocalTensor<float>& outputMean, const LocalTensor<float>& outputVariance, const LocalTensor<float>& inputMean, const LocalTensor<float>& inputVariance, const LocalTensor<int32_t>& counts, const LocalTensor<uint8_t>& sharedTmpBuffer, WelfordFinalizePara& para)
+        __aicore__ inline void WelfordFinalize(
+            const LocalTensor<float>& outputMean, const LocalTensor<float>& outputVariance, const LocalTensor<float>& inputMean,
+            const LocalTensor<float>& inputVariance, const LocalTensor<int32_t>& counts,
+            const LocalTensor<uint8_t>& sharedTmpBuffer, WelfordFinalizePara& para)
         ```
 
 -   接口框架申请临时空间
     -   不带counts参数场景
 
-        ```
+        ```cpp
         template <bool isReuseSource = false, const WelfordFinalizeConfig& config = WFFINALIZE_DEFAULT_CFG>
-        __aicore__ inline void WelfordFinalize(const LocalTensor<float>& outputMean, const LocalTensor<float>& outputVariance, const LocalTensor<float>& inputMean, const LocalTensor<float>& inputVariance, WelfordFinalizePara& para)
+        __aicore__ inline void WelfordFinalize(
+            const LocalTensor<float>& outputMean, const LocalTensor<float>& outputVariance, const LocalTensor<float>& inputMean,
+            const LocalTensor<float>& inputVariance, WelfordFinalizePara& para)
         ```
 
     -   带counts参数场景
 
-        ```
+        ```cpp
         template <bool isReuseSource = false, const WelfordFinalizeConfig& config = WFFINALIZE_DEFAULT_CFG>
-        __aicore__ inline void WelfordFinalize(const LocalTensor<float>& outputMean, const LocalTensor<float>& outputVariance, const LocalTensor<float>& inputMean, const LocalTensor<float>& inputVariance, const LocalTensor<int32_t>& counts, WelfordFinalizePara& para)
+        __aicore__ inline void WelfordFinalize(
+            const LocalTensor<float>& outputMean, const LocalTensor<float>& outputVariance, const LocalTensor<float>& inputMean,
+            const LocalTensor<float>& inputVariance, const LocalTensor<int32_t>& counts, WelfordFinalizePara& para)
         ```
 
 由于该接口的内部实现中涉及复杂的计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -115,7 +124,7 @@ LayerNorm算法中Reduce轴较大的场景，可以通过切分Reduce轴，联�
 | isReuseSource | 该参数预留，传入默认值false即可。 |
 | config | <!-- npu="950" id9 -->该参数仅支持Ascend 950PR/Ascend 950DT。<br><br><!-- end id9 -->结构体模板参数，用于配置相关信息，WelfordFinalizeConfig类型，定义如下方代码所示，其中参数的含义如下。<br>isCorrection：计算方差时，是否使用修正系数，取值如下：false：不使用修正系数，即方差系数为rRec。true：使用修正系数rRecWithCorrection。 |
 
-```
+```cpp
 struct WelfordFinalizeConfig {
     bool isCorrection = false;
 }
@@ -123,8 +132,8 @@ struct WelfordFinalizeConfig {
 
 配置示例如下。
 
-```
-constexpr WelfordFinalizeConfig WFFINALIZE_DEFAULT_CFG = { false };
+```cpp
+constexpr WelfordFinalizeConfig WFFINALIZE_DEFAULT_CFG = {false};
 ```
 
 **表2**  接口参数说明
@@ -139,7 +148,7 @@ constexpr WelfordFinalizeConfig WFFINALIZE_DEFAULT_CFG = { false };
 | sharedTmpBuffer | 输入 | 临时空间，数据类型为uint8_t。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>接口内部复杂计算时用于存储中间变量，由开发者提供。<br><br>临时空间大小BufferSize的获取方式请参考[WelfordFinalize Tiling](WelfordFinalize-Tiling.md)。 |
 | para | 输入 | 计算所需的参数信息。WelfordFinalizePara类型，定义如下方代码所示，其中参数的含义如下。<br>rnLength：输入的Reduce轴，按abLength为一次计算的大小，拆分的次数。如果拆分后有尾块，则次数向上取整。<br>abLength：Reduce轴拆分的大小。在不带counts参数的接口中，abLength=headCountLength+tailCountLength。<br>headCount：在不带counts参数的接口中开启该参数，作为公式中非尾块的counts系数，headCount值。<br>headCountLength：在不带counts参数的接口中开启该参数，headCount值对应的长度。<br>tailCount：在不带counts参数的接口中开启该参数，作为公式中尾块的counts系数，tailCount值。<br>tailCountLength：在不带counts参数的接口中开启该参数，tailCount值对应的长度。<br>abRec：abLength的倒数，即为1/abLength的值。<br>rRec：输入的Reduce轴拆分后，若没有尾块，表示1/(rnLength*abLength)的值，若有尾块，表示1/R的值。<!-- npu="950" id10 --><br>rRecWithCorrection：输入的方差修正系数，当模板参数config中的isCorrection为true时生效。该参数仅支持Ascend 950PR/Ascend 950DT。<!-- end id10 --> |
 
-```
+```cpp
 struct WelfordFinalizePara {
     uint32_t rnLength;
     uint32_t abLength;
@@ -177,7 +186,7 @@ struct WelfordFinalizePara {
 
 ## 调用示例
 
-```
+```cpp
 pipe.InitBuffer(sharedTmpBuffer, stackBufferSize);
 AscendC::LocalTensor<uint8_t> tmpLocalTensor = sharedTmpBuffer.Get<uint8_t>();
 struct AscendC::WelfordFinalizePara para = {rnLength, abLength, head, headLength, tail, tailLength, abRec, rRec};
@@ -185,7 +194,7 @@ AscendC::WelfordFinalize<false>(
     meanLocal, varianceLocal, inputMeanLocal, inputVarianceLocal, inputCountsLocal, tmpLocalTensor, para);
 ```
 
-```
+```cpp
 // meanLocal：均值目的操作数
 // varianceLocal：方差目的操作数
 // inmeanLocal：均值源操作数
@@ -195,14 +204,14 @@ AscendC::WelfordFinalize<false>(
 
 // 计算方差时不使用修正系数
 static constexpr AscendC::WelfordFinalizeConfig CONFIG = {false};
-AscendC::WelfordFinalizePara para = {rnLength, abLength, head, headLength, tail,
-                                     tailLength, abRec, rRec, rRecWithCorrection};
+AscendC::WelfordFinalizePara para = {rnLength,   abLength, head, headLength,        tail,
+                                     tailLength, abRec,    rRec, rRecWithCorrection};
 AscendC::WelfordFinalize<false, CONFIG>(meanLocal, varianceLocal, inmeanLocal, invarLocal, inputXLocal, para);
 ```
 
 示例结果如下：
 
-```
+```text
 输入数据(inmeanLocal, shape:[1, 32]):
 [  0.0  1.0  2.0  3.0  4.0  5.0  6.0  7.0  8.0  9.0 10.0 11.0 12.0 13.0 14.0 15.0
   16.0 17.0 18.0 19.0 20.0 21.0 22.0 23.0 24.0 25.0 26.0 27.0 28.0 29.0 30.0 31.0 ]

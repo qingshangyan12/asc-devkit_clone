@@ -28,7 +28,8 @@
 
 ```cpp
 template <typename T>
-__aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const Nz2NdParamsFull& intriParams)
+__aicore__ inline void DataCopy(
+    const GlobalTensor<T>& dst, const LocalTensor<T>& src, const Nz2NdParamsFull& intriParams)
 ```
 
 ## 参数说明<a name="section14983445508"></a>

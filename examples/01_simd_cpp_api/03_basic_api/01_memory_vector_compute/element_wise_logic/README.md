@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── element_wise_logic
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
@@ -63,7 +63,7 @@
 - 实现：
 
     ```cpp
-    static constexpr AscendC::BinaryConfig config = { 0 };
+    static constexpr AscendC::BinaryConfig config = {0};
     AscendC::Ors<AscendC::BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, COUNT);
     ```
 

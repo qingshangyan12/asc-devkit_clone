@@ -17,7 +17,7 @@
 
 
  ```cpp
-__aicore__ inline void asc_set_fp32_mode()
+ __aicore__ inline void asc_set_fp32_mode()
 ```
 
 ## 参数说明

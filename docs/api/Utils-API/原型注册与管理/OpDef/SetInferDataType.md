@@ -6,8 +6,8 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001549667388_zh-cn_topic_0000001526432182_zh-cn_topic_0000001575944081_section13230182415108"></a>
 
-```
-OpDef &SetInferDataType(gert::OpImplRegisterV2::InferDataTypeKernelFunc func)
+```cpp
+OpDef& SetInferDataType(gert::OpImplRegisterV2::InferDataTypeKernelFunc func)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001549667388_zh-cn_topic_0000001526432182_zh-cn_topic_0000001575944081_section75395119104"></a>

@@ -16,15 +16,15 @@ CAST\_ODD：向奇数的方向舍入，既当小数点后数值不为0时，如�
 
 CAST\_HYBRID：随机舍入，算子中目前特指输出结果是hif8数据时，会用到的一种随机舍入。
 
-```
+```cpp
 enum class RoundMode {
-    CAST_NONE = 0,  // 在转换有精度损失时表示CAST_RINT模式，不涉及精度损失时表示不舍入
-    CAST_RINT,      // rint，四舍六入五成双舍入
-    CAST_FLOOR,     // floor，向负无穷舍入
-    CAST_CEIL,      // ceil，向正无穷舍入
-    CAST_ROUND,     // round，四舍五入舍入
-    CAST_TRUNC,     // trunc，向零舍入
-    CAST_ODD,       // Von Neumann rounding，最近邻奇数舍入
-    CAST_HYBRID,    // hybrid，目前特指输出结果是hif8数据时，会用到的一种随机舍入 
+    CAST_NONE = 0, // 在转换有精度损失时表示CAST_RINT模式，不涉及精度损失时表示不舍入
+    CAST_RINT,     // rint，四舍六入五成双舍入
+    CAST_FLOOR,    // floor，向负无穷舍入
+    CAST_CEIL,     // ceil，向正无穷舍入
+    CAST_ROUND,    // round，四舍五入舍入
+    CAST_TRUNC,    // trunc，向零舍入
+    CAST_ODD,      // Von Neumann rounding，最近邻奇数舍入
+    CAST_HYBRID,   // hybrid，目前特指输出结果是hif8数据时，会用到的一种随机舍入
 };
 ```

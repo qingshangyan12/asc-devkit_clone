@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```cpp
 bool __hbgex2(half2 x, half2 y)
 ```
 
@@ -56,7 +56,7 @@ bool __hbgex2(half2 x, half2 y)
 
 使用该接口需要包含"simt\_api/asc\_fp16.h"头文件。
 
-```
+```cpp
 #include "simt_api/asc_fp16.h"
 ```
 
@@ -64,7 +64,7 @@ bool __hbgex2(half2 x, half2 y)
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     // 使用短向量可提升数据搬运效率
     __global__ __launch_bounds__(1024) void simt_hbgex2(half* x, half* y, bool* dst, uint32_t input_total_length)
     {
@@ -81,9 +81,10 @@ bool __hbgex2(half2 x, half2 y)
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     // 使用短向量可提升数据搬运效率
-    __simt_vf__ __launch_bounds__(1024) inline void simt_hbgex2(__gm__ half2* x, __gm__ half2* y, __gm__ bool* dst, uint32_t input_total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void simt_hbgex2(
+        __gm__ half2* x, __gm__ half2* y, __gm__ bool* dst, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= input_total_length / 2的线程不处理数据

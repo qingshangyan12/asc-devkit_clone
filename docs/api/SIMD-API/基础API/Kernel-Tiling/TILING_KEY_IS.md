@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001610027821_section1630753514297"></a>
 
-```
+```cpp
 TILING_KEY_IS(key)
 ```
 
@@ -85,8 +85,9 @@ TILING_KEY_IS(key)
 
 ## 调用示例<a name="zh-cn_topic_0000001610027821_section97001499599"></a>
 
-```
-extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8_t *y, __gm__ uint8_t *z, __gm__ uint8_t *workspace, __gm__ uint8_t *tiling)
+```cpp
+extern "C" __global__ __aicore__ void add_custom(
+    __gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
 {
     GET_TILING_DATA(tilingData, tiling);
     if (workspace == nullptr) {
@@ -104,8 +105,9 @@ extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8
     }
     // 其他代码逻辑
     ...
-    // 此处示例当TilingKey为3时，会执行ProcessOther
-    if (TILING_KEY_IS(3)) {
+        // 此处示例当TilingKey为3时，会执行ProcessOther
+        if (TILING_KEY_IS(3))
+    {
         op.ProcessOther();
     }
 }
@@ -113,16 +115,17 @@ extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8
 
 配套的host侧tiling函数示例（伪代码）：
 
-```
+```cpp
 ge::graphStatus TilingFunc(gert::TilingContext* context)
 {
     // 其他代码逻辑
-    ...
-    if (context->GetInputShape(0) > 10) {
-        context->SetTilingKey(1);
-    } else if (some condition) {
+    ... if (context->GetInputShape(0) > 10) { context->SetTilingKey(1); }
+    else if (some condition)
+    {
         context->SetTilingKey(2);
-    } else if (some condition) {
+    }
+    else if (some condition)
+    {
         context->SetTilingKey(3);
     }
 }

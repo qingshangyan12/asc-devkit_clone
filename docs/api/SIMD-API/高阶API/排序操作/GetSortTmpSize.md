@@ -6,8 +6,9 @@
 
 ## 函数原型
 
-```
-uint32_t GetSortTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatform, const uint32_t elemCount, const uint32_t dataTypeSize)
+```cpp
+uint32_t GetSortTmpSize(
+    const platform_ascendc::PlatformAscendC& ascendcPlatform, const uint32_t elemCount, const uint32_t dataTypeSize)
 ```
 
 ## 参数说明
@@ -30,7 +31,7 @@ Sort接口所需的临时空间大小。
 
 ## 调用示例
 
-```
+```cpp
 fe::PlatFormInfos platform_info;
 auto plat = platform_ascendc::PlatformAscendC(&platform_info);
 const uint32_t elemCount = 128;

@@ -15,7 +15,7 @@ BatchNorm Tiling API用于获取BatchNorm kernel计算时所需的Tiling参数�
 
     BatchNorm Tiling结构体的定义如下，开发者无需关注该tiling结构的具体信息，只需要传递到kernel侧，传入BatchNorm高阶API接口，直接进行使用即可。
 
-    ```
+    ```cpp
     struct BatchNormTiling {
         uint32_t originalBLength = 0;
         uint32_t meanVarSize = 0;
@@ -42,16 +42,24 @@ BatchNorm Tiling API用于获取BatchNorm kernel计算时所需的Tiling参数�
 
 ## 函数原型
 
-```
-bool GetBatchNormMaxMinTmpSize(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,uint32_t& minValue, const bool isBasicBlock = false)
-```
-
-```
-bool GetBatchNormNDTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, const bool isReuseSource, optiling::BatchNormTiling& tilling, const bool isBasicBlock = false)
+```cpp
+bool GetBatchNormMaxMinTmpSize(
+    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t typeSize, const bool isReuseSource,
+    uint32_t& maxValue, uint32_t& minValue, const bool isBasicBlock = false)
 ```
 
+```cpp
+bool GetBatchNormNDTilingInfo(
+    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize,
+    const uint32_t typeSize, const bool isReuseSource, optiling::BatchNormTiling& tilling,
+    const bool isBasicBlock = false)
 ```
-bool GetBatchNormNDTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, const bool isReuseSource, AscendC::tiling::BatchNormTiling& tilling, const bool isBasicBlock = false)
+
+```cpp
+bool GetBatchNormNDTilingInfo(
+    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize,
+    const uint32_t typeSize, const bool isReuseSource, AscendC::tiling::BatchNormTiling& tilling,
+    const bool isBasicBlock = false)
 ```
 
 ## 参数说明
@@ -95,14 +103,14 @@ bool GetBatchNormNDTilingInfo(const ge::Shape& srcShape, const ge::Shape& origin
 
 1.  将BatchNormTiling结构体参数增加至TilingData结构体，作为TilingData结构体的一个字段。
 
-    ```
+    ```cpp
     BEGIN_TILING_DATA_DEF(TilingData)                 // 注册一个tiling的类，以tiling的名字作为入参
-        TILING_DATA_FIELD_DEF(uint32_t, tileNum);         // 添加tiling字段，每个核上总计算数据分块个数
-        TILING_DATA_FIELD_DEF(uint32_t, bLength);         // 添加tiling字段，输入shape的b维度长度
-        TILING_DATA_FIELD_DEF(uint32_t, sLength);         // 添加tiling字段，输入shape的s维度长度
-        TILING_DATA_FIELD_DEF(uint32_t, hLength);         // 添加tiling字段，输入shape的h维度长度
-        TILING_DATA_FIELD_DEF(uint32_t, originalBLength); // 添加tiling字段，输入shape原始b维度长度
-        ...                                               // 添加其他tiling字段
+    TILING_DATA_FIELD_DEF(uint32_t, tileNum);         // 添加tiling字段，每个核上总计算数据分块个数
+    TILING_DATA_FIELD_DEF(uint32_t, bLength);         // 添加tiling字段，输入shape的b维度长度
+    TILING_DATA_FIELD_DEF(uint32_t, sLength);         // 添加tiling字段，输入shape的s维度长度
+    TILING_DATA_FIELD_DEF(uint32_t, hLength);         // 添加tiling字段，输入shape的h维度长度
+    TILING_DATA_FIELD_DEF(uint32_t, originalBLength); // 添加tiling字段，输入shape原始b维度长度
+    ...                                               // 添加其他tiling字段
         TILING_DATA_FIELD_DEF_STRUCT(
             BatchNormTiling, batchNormTilingData); // 将BatchNormTiling结构体参数增加至TilingData结构体
     END_TILING_DATA_DEF;
@@ -110,7 +118,7 @@ bool GetBatchNormNDTilingInfo(const ge::Shape& srcShape, const ge::Shape& origin
 
 2.  Tiling实现函数中，首先调用**GetBatchNormMaxMinTmpSize**接口获取BatchNorm接口能完成计算所需最大/最小临时空间大小，根据该范围结合实际的内存使用情况设置合适的空间大小，然后根据输入shape、剩余的可供计算的空间大小等信息获取BatchNorm kernel侧接口所需tiling参数。
 
-    ```
+    ```cpp
     namespace optiling {
     const uint32_t NUM_BLOCKS = 8;
     const uint32_t TILE_NUM = 8;
@@ -121,8 +129,7 @@ bool GetBatchNormNDTilingInfo(const ge::Shape& srcShape, const ge::Shape& origin
         context->SetBlockDim(NUM_BLOCKS);
         tiling.set_tileNum(TILE_NUM);
         // 设置其他Tiling参数
-        ...
-        std::vector<int64_t> shapeVec = {16, 16, 16};   //{b,s,h}
+        ... std::vector<int64_t> shapeVec = {16, 16, 16};   //{b,s,h}
         std::vector<int64_t> originShapeVec = {15, 16, 16}; //{originB,originS,originH}
         ge::Shape srcShape(shapeVec);
         ge::Shape originSrcShape(originShapeVec);
@@ -134,7 +141,7 @@ bool GetBatchNormNDTilingInfo(const ge::Shape& srcShape, const ge::Shape& origin
         AscendC::GetBatchNormNDTilingInfo(
             srcShape, originSrcShape, minSize, sizeof(half), false, tiling.batchNormTilingData, false);
         ... // 其他逻辑
-        tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
+            tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
         context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
         context->SetTilingKey(1);
         return ge::GRAPH_SUCCESS;
@@ -144,7 +151,7 @@ bool GetBatchNormNDTilingInfo(const ge::Shape& srcShape, const ge::Shape& origin
 
 3.  对应的kernel侧通过在核函数中调用GET\_TILING\_DATA获取TilingData，继而将TilingData中的BatchNormTiling信息传入BatchNorm接口参与计算。完整的kernel侧样例请参考[BatchNorm](BatchNorm.md)。
 
-    ```
+    ```cpp
     extern "C" __global__ __aicore__ void func_custom(
         GM_ADDR inputX_gm, GM_ADDR gamm_gm, GM_ADDR beta_gm, GM_ADDR output_gm, GM_ADDR outputMean_gm,
         GM_ADDR outputVariance_gm, GM_ADDR tiling)

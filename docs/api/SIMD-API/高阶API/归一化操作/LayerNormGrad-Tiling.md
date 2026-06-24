@@ -15,7 +15,7 @@ LayerNormGrad Tiling的功能如下：
 
     LayerNormGrad Tiling结构体的定义如下，开发者无需关注该Tiling结构的具体信息，只需要传递到kernel侧，传入LayerNormGrad高阶API接口，直接进行使用即可。
 
-    ```
+    ```cpp
     struct LayerNormGradTiling {
         uint32_t stackBufferSize = 0;
         uint32_t bLength = 0;
@@ -52,16 +52,22 @@ LayerNormGrad Tiling的功能如下：
 
 ## 函数原型
 
-```
-void GetLayerNormGradMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
-```
-
-```
-void GetLayerNormGradNDTilingInfo(const ge::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, optiling::LayerNormGradTiling& tiling)
+```cpp
+void GetLayerNormGradMaxMinTmpSize(
+    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    uint32_t& minValue)
 ```
 
+```cpp
+void GetLayerNormGradNDTilingInfo(
+    const ge::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
+    optiling::LayerNormGradTiling& tiling)
 ```
-void GetLayerNormGradNDTilingInfo(const ge::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, AscendC::tiling::LayerNormGradTiling& tiling)
+
+```cpp
+void GetLayerNormGradNDTilingInfo(
+    const ge::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
+    AscendC::tiling::LayerNormGradTiling& tiling)
 ```
 
 ## 参数说明
@@ -100,11 +106,11 @@ void GetLayerNormGradNDTilingInfo(const ge::Shape srcShape, const uint32_t stack
 
 1.  将LayerNormGradTiling结构体参数增加至TilingData结构体，作为TilingData结构体的一个字段。
 
-    ```
+    ```cpp
     BEGIN_TILING_DATA_DEF(TilingData)             // 注册一个tiling的类，以tiling的名字作为入参
-        TILING_DATA_FIELD_DEF(uint32_t, totalLength); // 添加tiling字段，总计算数据量
-        TILING_DATA_FIELD_DEF(uint32_t, tileNum);     // 添加tiling字段，每个核上总计算数据分块个数
-        ...                                           // 添加其他tiling字段
+    TILING_DATA_FIELD_DEF(uint32_t, totalLength); // 添加tiling字段，总计算数据量
+    TILING_DATA_FIELD_DEF(uint32_t, tileNum);     // 添加tiling字段，每个核上总计算数据分块个数
+    ...                                           // 添加其他tiling字段
         TILING_DATA_FIELD_DEF_STRUCT(
             LayerNormGradTiling, layernormGradTilingData); // 将LayerNormGradTiling结构体参数增加至TilingData结构体
     END_TILING_DATA_DEF;
@@ -112,7 +118,7 @@ void GetLayerNormGradNDTilingInfo(const ge::Shape srcShape, const uint32_t stack
 
 2.  Tiling实现函数中，首先调用GetLayerNormGradMaxMinTmpSize接口获取LayerNormGrad接口能完成计算所需最大/最小临时空间大小，根据该范围结合实际的内存使用情况设置合适的空间大小，然后调用GetLayerNormGradNDTilingInfo接口根据输入shape、剩余的可供计算的空间大小等信息获取LayerNormGradBeta kernel侧接口所需tiling参数。
 
-    ```
+    ```cpp
     namespace optiling {
     const uint32_t NUM_BLOCKS = 8;
     const uint32_t TILE_NUM = 8;
@@ -125,8 +131,9 @@ void GetLayerNormGradNDTilingInfo(const ge::Shape srcShape, const uint32_t stack
         tiling.set_tileNum(TILE_NUM);
         // 设置其他Tiling参数
         ...
-        // {B, S, storageHLength, originHLength}
-        std::vector<int64_t> shapeVec = {2, 16, 64, 64};
+            // {B, S, storageHLength, originHLength}
+            std::vector<int64_t>
+                shapeVec = {2, 16, 64, 64};
         ge::Shape srcShape(shapeVec);
         // 本样例中仅作为样例说明，通过GetLayerNormGradMaxMinTmpSize获取最小值并传入，来保证功能正确，开发者可以根据需要传入合适的空间大小
         uint32_t max;
@@ -135,7 +142,7 @@ void GetLayerNormGradNDTilingInfo(const ge::Shape srcShape, const uint32_t stack
         // 获取LayerNormGrad Tiling参数
         AscendC::GetLayerNormGradNDTilingInfo(srcShape, min, sizeof(half), false, tiling.layernormGradTilingData);
         ... // 其他逻辑
-        tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
+            tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
         context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
         context->SetTilingKey(1);
         return ge::GRAPH_SUCCESS;
@@ -145,7 +152,7 @@ void GetLayerNormGradNDTilingInfo(const ge::Shape srcShape, const uint32_t stack
 
 3.  对应的kernel侧通过在核函数中调用GET\_TILING\_DATA获取TilingData，继而将TilingData中的LayerNormGradTiling信息传入LayerNormGrad接口参与计算。完整的kernel侧样例请参考[调用示例](LayerNormGrad.md#section642mcpsimp)。
 
-    ```
+    ```cpp
     extern "C" __global__ __aicore__ void func_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling)
     {
         GET_TILING_DATA(tilingData, tiling);

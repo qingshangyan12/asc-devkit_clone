@@ -49,7 +49,7 @@ LocalTensor支持的数据类型为：half。
 DataCopy随路量化搬运后，可以逐个元素加/减一个大小为mSize \* nSize的LocalTensor，具体LocalTensor地址相关参数需要调用`SetFixPipeAddr`来设置。
 
 ```cpp
-__aicore__ inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint16_t c0ChStride)
+__aicore__ inline void SetEleSrcPara(const LocalTensor<half>& eleWiseData, uint16_t c0ChStride)
 {
     AscendC::SetFixPipeAddr(eleWiseData, c0ChStride);
 }
@@ -63,11 +63,13 @@ __aicore__ inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint
     #ifdef ASCENDC_CPU_DEBUG
     #include "tikicpulib.h"
     #endif
-    #include "kernel_operator.h"
     #include "../../instrs/common_utils/register_utils.h"
-    template <typename dst_T, typename fmap_T, typename weight_T, typename dstCO1_T> class KernelCubeDataCopy{
+    #include "kernel_operator.h"
+    template <typename dst_T, typename fmap_T, typename weight_T, typename dstCO1_T>
+    class KernelCubeDataCopy {
     public:
-        __aicore__ inline KernelCubeDataCopy(uint16_t CoutIn, uint8_t dilationHIn, uint8_t dilationWIn, QuantMode_t deqModeIn)
+        __aicore__ inline KernelCubeDataCopy(
+            uint16_t CoutIn, uint8_t dilationHIn, uint8_t dilationWIn, QuantMode_t deqModeIn)
         {
             // ceiling of 16
             Cout = CoutIn;
@@ -94,7 +96,9 @@ __aicore__ inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint
             weRepeat = weightB2Size / (16 * C0);
             deqMode = deqModeIn;
         }
-        __aicore__ inline void Init(__gm__ uint8_t* fmGm, __gm__ uint8_t* weGm, __gm__ uint8_t* biasGm, __gm__ uint8_t* deqGm, __gm__ uint8_t* eleWiseGm, __gm__ uint8_t* dstGm)
+        __aicore__ inline void Init(
+            __gm__ uint8_t* fmGm, __gm__ uint8_t* weGm, __gm__ uint8_t* biasGm, __gm__ uint8_t* deqGm,
+            __gm__ uint8_t* eleWiseGm, __gm__ uint8_t* dstGm)
         {
             fmGlobal.SetGlobalBuffer((__gm__ fmap_T*)fmGm);
             weGlobal.SetGlobalBuffer((__gm__ weight_T*)weGm);
@@ -119,15 +123,17 @@ __aicore__ inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint
             Compute();
             CopyOut();
         }
+
     private:
         __aicore__ inline void CopyIn()
         {
             AscendC::LocalTensor<fmap_T> featureMapA1 = inQueueFmA1.AllocTensor<fmap_T>();
             AscendC::LocalTensor<weight_T> weightB1 = inQueueWeB1.AllocTensor<weight_T>();
             AscendC::LocalTensor<dstCO1_T> biasA1 = inQueueBiasA1.AllocTensor<dstCO1_T>();
-            AscendC::DataCopy(featureMapA1, fmGlobal, { 1, static_cast<uint16_t>(featureMapA1Size * sizeof(fmap_T) / 32), 0, 0 });
-            AscendC::DataCopy(weightB1, weGlobal, { 1, static_cast<uint16_t>(weightA1Size * sizeof(weight_T) / 32), 0, 0 });
-            AscendC::DataCopy(biasA1, biasGlobal, { 1, static_cast<uint16_t>(biasSize * sizeof(dstCO1_T) / 32), 0, 0 });
+            AscendC::DataCopy(
+                featureMapA1, fmGlobal, {1, static_cast<uint16_t>(featureMapA1Size * sizeof(fmap_T) / 32), 0, 0});
+            AscendC::DataCopy(weightB1, weGlobal, {1, static_cast<uint16_t>(weightA1Size * sizeof(weight_T) / 32), 0, 0});
+            AscendC::DataCopy(biasA1, biasGlobal, {1, static_cast<uint16_t>(biasSize * sizeof(dstCO1_T) / 32), 0, 0});
             inQueueFmA1.EnQue(featureMapA1);
             inQueueWeB1.EnQue(weightB1);
             inQueueBiasA1.EnQue(biasA1);
@@ -140,9 +146,11 @@ __aicore__ inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint
             AscendC::LocalTensor<weight_T> weightB2 = inQueueWeB2.AllocTensor<weight_T>();
             uint8_t padList[] = {0, 0, 0, 0};
             // load3dv2
-            AscendC::LoadData(featureMapA2, featureMapA1, { padList, H, W, channelSize, k, howoRound, 0, 0, 1, 1, Kw, Kh, dilationW, dilationH, false, false, 0 });
+            AscendC::LoadData(
+                featureMapA2, featureMapA1,
+                {padList, H, W, channelSize, k, howoRound, 0, 0, 1, 1, Kw, Kh, dilationW, dilationH, false, false, 0});
             // load2d
-            AscendC::LoadData(weightB2, weightB1, { 0, weRepeat, 1, 0, 0, false, 0 });
+            AscendC::LoadData(weightB2, weightB1, {0, weRepeat, 1, 0, 0, false, 0});
             inQueueFmA2.EnQue<fmap_T>(featureMapA2);
             inQueueWeB2.EnQue<weight_T>(weightB2);
             inQueueFmA1.FreeTensor(featureMapA1);
@@ -156,7 +164,7 @@ __aicore__ inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint
             AscendC::LocalTensor<dstCO1_T> biasA1 = inQueueBiasA1.DeQue<dstCO1_T>();
             // C = A * B + bias
             // m：左矩阵Height，k：左矩阵Width，n：右矩阵Width
-            AscendC::Mmad(dstCO1, featureMapA2, weightB2, biasA1, { m, n, k, true, 0, false, false, false });
+            AscendC::Mmad(dstCO1, featureMapA2, weightB2, biasA1, {m, n, k, true, 0, false, false, false});
             outQueueCO1.EnQue<dstCO1_T>(dstCO1);
             inQueueFmA2.FreeTensor(featureMapA2);
             inQueueWeB2.FreeTensor(weightB2);
@@ -186,19 +194,21 @@ __aicore__ inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint
             };
             // 不开启ReLU与channelSplit
             AscendC::DataCopyCO12DstParams intriParams(nSize, mSize, dstStride, srcStride, deqMode, 0, false, nz2ndEn);
-           
+
             // mov l0c to gm, deq scalar quant
-            AscendC::SetFixpipePreQuantFlag(deqScalar);  // 设置量化参数
+            AscendC::SetFixpipePreQuantFlag(deqScalar); // 设置量化参数
             AscendC::PipeBarrier<PIPE_FIX>();
             AscendC::DataCopy(dstGlobal, dstCO1, intriParams);
             // // mov l0c to gm, deq tensor quant
             // // 需要额外申请deq tensor的gm空间，将值搬运到workA1
-            // AscendC::LocalTensor<uint64_t> workA1 = inQueueDeqA1.AllocTensor<uint64_t>();
+            // AscendC::LocalTensor<uint64_t> workA1 =
+            // inQueueDeqA1.AllocTensor<uint64_t>();
             // // deq tensor的size
             // uint16_t deqSize = 128;
             // AscendC::DataCopy(workA1, deqGlobal, deqSize);
             // // deq tensor在fix上的地址
-            // AscendC::LocalTensor<uint64_t> deqFB = inQueueDeqFB.AllocTensor<uint64_t>();
+            // AscendC::LocalTensor<uint64_t> deqFB =
+            // inQueueDeqFB.AllocTensor<uint64_t>();
             // // l1->fix, burst_len unit is 128Bytes
             // uint16_t fbufBurstLen = deqSize / 128;
             // AscendC::DataCopyParams dataCopyParams(1, fbufBurstLen, 0, 0);
@@ -207,7 +217,7 @@ __aicore__ inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint
             // AscendC::SetFixPipeConfig(deqFB);
             // AscendC::PipeBarrier<PIPE_FIX>();
             // // mov l0c to gm，量化操作后开启ClipReLU操作
-            // intriParams.clipReluPre = 1; 
+            // intriParams.clipReluPre = 1;
             // // 设置clip ReLU的值到寄存器
             // uint64_t clipReluVal = 0x3c00; // value 1, half
             // SetFixPipeClipRelu(clipReluVal);
@@ -215,17 +225,19 @@ __aicore__ inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint
             // intriParams.eltWiseOp = 1;
             // // 需要额外申请element-wise tensor的gm空间，将值搬到eleWiseTensor
             // AscendC::LocalTensor<half> eleWiseTensor = inQueueC1.AllocTensor<half>();
-            // DataCopy(eleWiseTensor, eleWiseGlobal, { 1, static_cast<uint16_t>(sizeof(half) * dst_size / 32), 0, 0 });
+            // DataCopy(eleWiseTensor, eleWiseGlobal, { 1,
+            // static_cast<uint16_t>(sizeof(half) * dst_size / 32), 0, 0 });
             // AscendC::PipeBarrier<PIPE_ALL>();
             // // 将存放element-wise tensor的地址设置到寄存器里
             // SetFixPipeAddr(eleWiseTensor, 1);
-    
+
             // AscendC::DataCopy(dstGlobal, dstCO1, intriParams);
             // inQueueDeqA1.FreeTensor(workA1);
             // inQueueDeqFB.FreeTensor(deqFB);
             // outQueueCO1.FreeTensor(dstCO1);
             // inQueueC1.FreeTensor(eleWiseTensor);
-         }
+        }
+
     private:
         AscendC::TPipe pipe;
         // feature map queue
@@ -262,17 +274,19 @@ __aicore__ inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint
         uint8_t fmRepeat, weRepeat;
         QuantMode_t deqMode = QuantMode_t::NoQuant;
     };
-    #define KERNEL_CUBE_DATACOPY(dst_type, fmap_type, weight_type, dstCO1_type, CoutIn, dilationHIn, dilationWIn, deqModeIn)  \
-        extern "C" __global__ __aicore__ void cube_datacopy_kernel_##fmap_type(__gm__ uint8_t* fmGm, __gm__ uint8_t* weGm,    \
-            __gm__ uint8_t* biasGm, __gm__ uint8_t* deqGm, __gm__ uint8_t* eleWiseGm, __gm__ uint8_t* dstGm)                                             \
-        {                                                                                                                     \
-            if (g_coreType == AscendC::AIV) {                                                                                 \
-                return;                                                                                                       \
-            }                                                                                                                 \
-            KernelCubeDataCopy<dst_type, fmap_type, weight_type, dstCO1_type> op(CoutIn, dilationHIn, dilationWIn,            \
-                deqModeIn);                                                                                                   \
-            op.Init(fmGm, weGm, biasGm, deqGm, eleWiseGm, dstGm);                                                                        \
-            op.Process();                                                                                                     \
+    #define KERNEL_CUBE_DATACOPY(                                                                      \
+        dst_type, fmap_type, weight_type, dstCO1_type, CoutIn, dilationHIn, dilationWIn, deqModeIn)    \
+        extern "C" __global__ __aicore__ void cube_datacopy_kernel_##fmap_type(                        \
+            __gm__ uint8_t* fmGm, __gm__ uint8_t* weGm, __gm__ uint8_t* biasGm, __gm__ uint8_t* deqGm, \
+            __gm__ uint8_t* eleWiseGm, __gm__ uint8_t* dstGm)                                          \
+        {                                                                                              \
+            if (g_coreType == AscendC::AIV) {                                                          \
+                return;                                                                                \
+            }                                                                                          \
+            KernelCubeDataCopy<dst_type, fmap_type, weight_type, dstCO1_type> op(                      \
+                CoutIn, dilationHIn, dilationWIn, deqModeIn);                                          \
+            op.Init(fmGm, weGm, biasGm, deqGm, eleWiseGm, dstGm);                                      \
+            op.Process();                                                                              \
         }
     KERNEL_CUBE_DATACOPY(half, int8_t, int8_t, int32_t, 128, 1, 1, QuantMode_t::DEQF16);
     ```

@@ -38,16 +38,19 @@
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <class T, class pattern, bool isReuseSource = false>
-    __aicore__ inline void ReduceProd(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t srcShape[], bool srcInnerPad)
+    __aicore__ inline void ReduceProd(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+        const uint32_t srcShape[], bool srcInnerPad)
     ```
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <class T, class pattern, bool isReuseSource = false>
-    __aicore__ inline void ReduceProd(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t srcShape[], bool srcInnerPad)
+    __aicore__ inline void ReduceProd(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t srcShape[], bool srcInnerPad)
     ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者**通过sharedTmpBuffer入参传入**和**接口框架申请**两种方式。
@@ -90,7 +93,7 @@
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal：输出结果
 // srcLocal：输入数据
 // tmp：存储中间结果的临时空间
@@ -104,7 +107,7 @@ AscendC::ReduceProd<float, AscendC::Pattern::Reduce::AR, isReuse>(dstLocal, srcL
 
 结果示例如下：
 
-```
+```text
 输入输出的数据类型为float
 输入数据(src):
 [[ 1, 2, 3, 4, 5, 6, 7, 8],

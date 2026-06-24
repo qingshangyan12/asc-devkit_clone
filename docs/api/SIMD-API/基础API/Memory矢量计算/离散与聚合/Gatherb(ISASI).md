@@ -79,7 +79,9 @@ def Gatherb(dst, src, offset, repeatTime, repeatParams):
 
 ```cpp
 template <typename T>
-__aicore__ inline void Gatherb(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& offset, const uint8_t repeatTime, const GatherRepeatParams& repeatParams)
+__aicore__ inline void Gatherb(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& offset, const uint8_t repeatTime,
+    const GatherRepeatParams& repeatParams)
 ```
 
 ## 参数说明<a name="section1619484392111"></a>
@@ -137,7 +139,9 @@ __aicore__ inline void Gatherb(const LocalTensor<T>& dst, const LocalTensor<T>& 
 uint32_t bufferLen = 128;
 AscendC::GatherRepeatParams params{1, 8};
 uint8_t repeatTime = bufferLen * sizeof(uint16_t) / 256;
-AscendC::Gatherb<uint16_t>(y_buf, x_buf, offset_buf, repeatTime, params); // repeatTime重复迭代次数，每次迭代完成8个datablock的数据收集
+AscendC::Gatherb<uint16_t>(
+    y_buf, x_buf, offset_buf, repeatTime,
+    params); // repeatTime重复迭代次数，每次迭代完成8个datablock的数据收集
 ```
 
 结果示例：

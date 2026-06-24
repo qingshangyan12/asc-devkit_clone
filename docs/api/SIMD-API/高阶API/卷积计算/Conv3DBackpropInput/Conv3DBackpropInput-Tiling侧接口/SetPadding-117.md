@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 void SetPadding(int64_t padFront, int64_t padBack, int64_t padUp, int64_t padDown, int64_t padLeft, int64_t padRight)
 ```
 
@@ -33,7 +33,7 @@ void SetPadding(int64_t padFront, int64_t padBack, int64_t padUp, int64_t padDow
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendCManager::GetInstance();
 ConvBackpropApi::Conv3DBpInputTiling conv3DBpDxTiling(*ascendcPlatform);
 conv3DBpDxTiling.SetPadding(padFront, padBack, padUp, padDown, padLeft, padRight);

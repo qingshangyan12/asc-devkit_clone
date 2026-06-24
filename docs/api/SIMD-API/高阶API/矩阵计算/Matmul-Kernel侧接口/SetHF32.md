@@ -22,7 +22,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetHF32(bool enableHF32 = false, int32_t transMode = 0)
 ```
 
@@ -43,10 +43,10 @@ __aicore__ inline void SetHF32(bool enableHF32 = false, int32_t transMode = 0)
 
 ## 调用示例
 
-```
-//纯Cube模式
+```cpp
+// 纯Cube模式
 #define ASCENDC_CUBE_ONLY
-REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);    //  A/B/C/BIAS类型是float
+REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling); //  A/B/C/BIAS类型是float
 mm.SetTensorA(gm_a);
 mm.SetTensorB(gm_b);
 if (tiling.isBias) {

@@ -10,64 +10,60 @@
 
 代码中TPipe对象由KernelExample类内部创建并初始化，影响编译器Scalar折叠优化，在NPU侧导致Scalar不必要的增加。
 
-```
-template <typename ComputeT> class KernelExample {
- public:
-     __aicore__ inline KernelExample() {}
+```cpp
+template <typename ComputeT>
+class KernelExample {
+public:
+    __aicore__ inline KernelExample() {}
 
-     __aicore__ inline void Init(...)
-     {
-         ...
-         pipe.InitBuffer(xxxBuf, BUFFER_NUM, xxxSize);
-         ...
-     }
+    __aicore__ inline void Init(...)
+    {
+        ... pipe.InitBuffer(xxxBuf, BUFFER_NUM, xxxSize);
+        ...
+    }
 
- private:
-     ...
-     TPipe pipe;
-     ...
- };
+private:
+    ... TPipe pipe;
+    ...
+};
 
- extern "C" __global__ __aicore__ void example_kernel(...)
- {
-     ...
-     KernelExample<float> op;
-     op.Init(...);
-     ...
- }
+extern "C" __global__ __aicore__ void example_kernel(...)
+{
+    ... KernelExample<float> op;
+    op.Init(...);
+    ...
+}
 ```
 
 【正例】
 
 改为由Kernel入口函数创建TPipe对象，在KernelExample类中保存TPipe指针使用。
 
-```
-template <typename ComputeT> class KernelExample {
- public:
-     __aicore__ inline KernelExample() {}
+```cpp
+template <typename ComputeT>
+class KernelExample {
+public:
+    __aicore__ inline KernelExample() {}
 
-     __aicore__ inline void Init(..., TPipe* pipeIn)
-     {
-         ...
-         pipe = pipeIn;
-         pipe->InitBuffer(xxxBuf, BUFFER_NUM, xxxSize);
-         ...
-     }
+    __aicore__ inline void Init(..., TPipe* pipeIn)
+    {
+        ... pipe = pipeIn;
+        pipe->InitBuffer(xxxBuf, BUFFER_NUM, xxxSize);
+        ...
+    }
 
- private:
-     ...
-     TPipe* pipe;
-     ...
- };
+private:
+    ... TPipe* pipe;
+    ...
+};
 
- extern "C" __global__ __aicore__ void example_kernel(...)
- {
-     ...
-     TPipe pipe;
-     KernelExample<float> op;
-     op.Init(..., &pipe);
-     ...
- }
+extern "C" __global__ __aicore__ void example_kernel(...)
+{
+    ... TPipe pipe;
+    KernelExample<float> op;
+    op.Init(..., &pipe);
+    ...
+}
 ```
 
 【性能对比】

@@ -8,7 +8,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001600307121_zh-cn_topic_0000001576870453_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
+```text
 OP_ADD(opType)
 ```
 

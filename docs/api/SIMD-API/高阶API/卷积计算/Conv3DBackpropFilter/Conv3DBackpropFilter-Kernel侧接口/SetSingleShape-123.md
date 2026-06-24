@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetSingleShape(uint64_t singleCoreM, uint64_t singleCoreN, uint64_t singleCoreK)
 ```
 
@@ -52,14 +52,13 @@ __aicore__ inline void SetSingleShape(uint64_t singleCoreM, uint64_t singleCoreN
 
 ## 调用示例
 
-```
+```cpp
 const Conv3DBackpropFilterTilingData* tilingData;
 // ...初始化tilingData
-ConvBackpropApi::Conv3DBackpropFilter <inputType, weightSizeType, gradOutputType, gradWeightType > gradWeight_;
-....
-gradWeight_.Init(&(tilingData->dwTiling));
+ConvBackpropApi::Conv3DBackpropFilter<inputType, weightSizeType, gradOutputType, gradWeightType> gradWeight_;
+....gradWeight_.Init(&(tilingData->dwTiling));
 gradWeight_.SetInput(inputGm_[offsetB_]);
 gradWeight_.SetGradOutput(gradOutputGm_[offsetA_]);
-gradWeight_.SetSingleShape(singleCoreM, singleCoreN, singleCoreK);// 设置单核计算量
+gradWeight_.SetSingleShape(singleCoreM, singleCoreN, singleCoreK); // 设置单核计算量
 ....
 ```

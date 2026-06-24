@@ -154,7 +154,8 @@ enableSmallC0开启模式下的ND2NZ转换示意图如下：
 intriParams参数解析请参考[图1](#fig128961542184620)。
 
 ```cpp
-// srcLocal为half类型的L1 Buffer空间上的LocalTensor，srcGlobal为half类型的GlobalTensor。
+// srcLocal为half类型的L1
+// Buffer空间上的LocalTensor，srcGlobal为half类型的GlobalTensor。
 AscendC::Nd2NzParams intriParams{1, 32, 32, 0, 32, 32, 1, 0};
 // Global Memory -> Local Memory
 AscendC::DataCopy(srcLocal, srcGlobal, intriParams);

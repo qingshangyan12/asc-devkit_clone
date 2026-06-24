@@ -130,7 +130,8 @@ __aicore__ static inline void SetCtrlSpr(int64_t value)
     ```cpp
     AscendC::SetCtrlSpr<6, 8>(2);
     AscendC::SetAtomicAdd<half>();
-    AscendC::DataCacheCleanAndInvalid<half, AscendC::CacheLine::ENTIRE_DATA_CACHE, AscendC::DcciDst::CACHELINE_ATOMIC>(dstTensor);
+    AscendC::DataCacheCleanAndInvalid<half, AscendC::CacheLine::ENTIRE_DATA_CACHE, AscendC::DcciDst::CACHELINE_ATOMIC>(
+        dstTensor);
     AscendC::SetCtrlSpr<48, 48>(1);
     ...
     ```

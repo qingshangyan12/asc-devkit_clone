@@ -10,7 +10,7 @@ This example implements data broadcast transfer based on BroadCastVecToMM, broad
 | Atlas Inference Series Products AI Core | >= CANN 9.0.0 |
 
 ## Directory Structure
-```
+```text
 ├── broadcast_ub2l0c
 │   ├── scripts
 │   │   ├── gen_data.py               // Input data and ground truth generation script

@@ -12,7 +12,7 @@ This example introduces how to use Fixpipe to transfer matrix multiplication res
 
 ## Directory Structure
 
-```
+```text
 ├── fixpipe_l0c2ub
 │   ├── scripts
 │   │   ├── gen_data.py                // Script for generating input data and ground truth data

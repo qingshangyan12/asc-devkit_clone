@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename Tp>
 struct remove_cv;
 ```
@@ -39,7 +39,7 @@ remove\_cv是一个结构体，其提供一个嵌套类型type，表示移除con
 
 ## 调用示例
 
-```
+```cpp
 // Test non-const and non-volatile type
 ascendc_assert((AscendC::Std::is_same_v<AscendC::Std::remove_cv<int>::type, int>));
 ascendc_assert((AscendC::Std::is_same_v<AscendC::Std::remove_cv<double>::type, double>));

@@ -209,26 +209,48 @@ TopK提供了两种不同的排序算法，MERGE\_SORT算法和RADIX\_SELECT算�
 
 -   API内部申请临时空间
 
-    ```
-    template <typename T, bool isInitIndex = false, bool isHasfinish = false, bool isReuseSrc = false, enum TopKMode topkMode = TopKMode::TOPK_NORMAL>
-    __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& srcLocal, const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal, const int32_t k, const TopkTiling& tilling, const TopKInfo& topKInfo, const bool isLargest = true)
+    ```cpp
+    template <
+        typename T, bool isInitIndex = false, bool isHasfinish = false, bool isReuseSrc = false,
+        enum TopKMode topkMode = TopKMode::TOPK_NORMAL>
+    __aicore__ inline void TopK(
+        const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& srcLocal,
+        const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal, const int32_t k,
+        const TopkTiling& tilling, const TopKInfo& topKInfo, const bool isLargest = true)
     ```
 
-    ```
-    template <typename T, bool isInitIndex = false, bool isHasfinish = false, bool isReuseSrc = false, enum TopKMode topkMode = TopKMode::TOPK_NORMAL, const TopKConfig& config = defaultTopKConfig>
-    __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& srcLocal, const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal, const int32_t k, const TopkTiling& tilling, const TopKInfo& topKInfo, const bool isLargest = true)
+    ```cpp
+    template <
+        typename T, bool isInitIndex = false, bool isHasfinish = false, bool isReuseSrc = false,
+        enum TopKMode topkMode = TopKMode::TOPK_NORMAL, const TopKConfig& config = defaultTopKConfig>
+    __aicore__ inline void TopK(
+        const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& srcLocal,
+        const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal, const int32_t k,
+        const TopkTiling& tilling, const TopKInfo& topKInfo, const bool isLargest = true)
     ```
 
 -   通过tmpLocal入参传入临时空间
 
-    ```
-    template <typename T, bool isInitIndex = false, bool isHasfinish = false, bool isReuseSrc = false, enum TopKMode topkMode = TopKMode::TOPK_NORMAL>
-    __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& srcLocal, const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal, const LocalTensor<uint8_t>& tmpLocal, const int32_t k, const TopkTiling& tilling, const TopKInfo& topKInfo, const bool isLargest = true)
+    ```cpp
+    template <
+        typename T, bool isInitIndex = false, bool isHasfinish = false, bool isReuseSrc = false,
+        enum TopKMode topkMode = TopKMode::TOPK_NORMAL>
+    __aicore__ inline void TopK(
+        const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& srcLocal,
+        const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal,
+        const LocalTensor<uint8_t>& tmpLocal, const int32_t k, const TopkTiling& tilling, const TopKInfo& topKInfo,
+        const bool isLargest = true)
     ```
 
-    ```
-    template <typename T, bool isInitIndex = false, bool isHasfinish = false, bool isReuseSrc = false, enum TopKMode topkMode = TopKMode::TOPK_NORMAL, const TopKConfig& config = defaultTopKConfig>
-    __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& srcLocal, const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal, const LocalTensor<uint8_t>& tmpLocal, const int32_t k, const TopkTiling& tilling, const TopKInfo& topKInfo, const bool isLargest = true)
+    ```cpp
+    template <
+        typename T, bool isInitIndex = false, bool isHasfinish = false, bool isReuseSrc = false,
+        enum TopKMode topkMode = TopKMode::TOPK_NORMAL, const TopKConfig& config = defaultTopKConfig>
+    __aicore__ inline void TopK(
+        const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& srcLocal,
+        const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal,
+        const LocalTensor<uint8_t>& tmpLocal, const int32_t k, const TopkTiling& tilling, const TopKInfo& topKInfo,
+        const bool isLargest = true)
     ```
 
 由于该接口的内部实现中涉及复杂的逻辑计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**API接口申请**和开发者**通过tmpLocal入参传入**两种方式。
@@ -250,7 +272,7 @@ TopK提供了两种不同的排序算法，MERGE\_SORT算法和RADIX\_SELECT算�
 | topkMode | Topk的模式选择，取值如下：<br>TopKMode::TOPK_NORMAL：Normal模式。<br>TopKMode::TOPK_NSMALL：Small模式。 |
 | config | <!-- npu="950" id24 -->该参数仅支持Ascend 950PR/Ascend 950DT。<br><br><!-- end id24 -->TopK计算的相关配置，包括算法选择、取最大值或最小值、是否对结果排序。此参数可选配，TopKConfig类型，具体定义如下方代码所示：<br>algo：选择的排序算法。默认为MERGE_SORT算法，当前仅支持RADIX_SELECT算法，用户需要显式指定algo为TopKAlgo::RADIX_SELECT。<br>order：表示获取前k个最大值或者获取前k个最小值，取值如下：UNSET：默认值，按照函数参数isLargest的配置实现。isLargest为true时，取前k个最大值及其对应的索引，isLargest为false，取前k个最小值及其对应的索引。LARGEST：表示取前k个最大值及其对应的索引。取值为LARGEST时，函数参数isLargest的配置不生效。SMALLEST：表示取前k个最小值及其对应的索引。取值为SMALLEST时，函数参数isLargest的配置不生效。<br>sorted：表示是否对输出结果进行排序。取值为true，对输出结果进行排序；取值为false，不对输出结果进行排序。<br><br>该参数的默认值defaultTopKConfig的取值为：TopKAlgo::MERGE_SORT、TopKOrder::UNSET、true。 |
 
-```
+```cpp
 struct TopKConfig {
     TopKAlgo algo = TopKAlgo::MERGE_SORT;
     TopKOrder order = TopKOrder::UNSET;
@@ -275,7 +297,7 @@ enum class TopKOrder { UNSET, LARGEST, SMALLEST };
 | topKInfo | 输入 | srcLocal的shape信息。TopKInfo类型，具体定义如下方代码所示，其中参数的含义为：<br>outter：表示输入待排序数据的外轴长度。<br>inner：表示输入待排序数据的内轴长度，inner必须是32的整数倍。<br>n：表示输入待排序数据的内轴的实际长度。<br>请注意：<br>topKInfo.inner必须是32的整数倍。<br>topKInfo.inner是topKInfo.n进行32的整数倍向上补齐的值，因此topKInfo.n的大小应该满足：1 <= topKInfo.n <= topKInfo.inner。<br>Small模式下，topKInfo.inner必须设置为32。<br>Normal模式下，topKInfo.inner最大值为4096。 |
 | isLargest | 输入 | 类型为bool。取值为true时默认降序排列，获取前k个最大值；取值为false时进行升序排列，获取前k个最小值。 |
 
-```
+```cpp
 struct TopKInfo {
     int32_t outter = 1;
     int32_t inner;
@@ -331,7 +353,7 @@ struct TopKInfo {
 
 本样例实现了Normal模式代码逻辑。
 
-```
+```cpp
 // dstLocalValue：保存已排序出的k个值
 // dstLocalIndex：保存已排序出的k个值对应的索引
 // srcLocal：保存待排序的值
@@ -352,7 +374,7 @@ AscendC::TopK<T, isInitIndex, isHasfinish, isReuseSrc, AscendC::TopKMode::TOPK_N
     dstLocalValue, dstLocalIndex, srcLocalValue, srcLocalIndex, srcLocalFinish, k, topKTilingData, topKInfo, isLargest);
 ```
 
-```
+```cpp
 // dstLocalValue：保存已排序出的k个值
 // dstLocalIndex：保存已排序出的k个值对应的索引
 // srcLocal：保存待排序的值
@@ -383,7 +405,7 @@ AscendC::TopK<T, isInitIndex, isHasfinish, isReuseSrc, AscendC::TopKMode::TOPK_N
 
 本样例实现了Small模式的代码逻辑。
 
-```
+```cpp
 // dstLocalValue：保存已排序出的k个值
 // dstLocalIndex：保存已排序出的k个值对应的索引
 // srcLocal：保存待排序的值
@@ -404,7 +426,7 @@ AscendC::TopK<T, isInitIndex, isHasfinish, isReuseSrc, AscendC::TopKMode::TOPK_N
     dstLocalValue, dstLocalIndex, srcLocalValue, srcLocalIndex, srcLocalFinish, k, topKTilingData, topKInfo, isLargest);
 ```
 
-```
+```cpp
 // dstLocalValue：保存已排序出的k个值
 // dstLocalIndex：保存已排序出的k个值对应的索引
 // srcLocal：保存待排序的值

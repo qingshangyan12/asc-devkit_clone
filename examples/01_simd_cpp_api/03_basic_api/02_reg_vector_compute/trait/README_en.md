@@ -12,7 +12,7 @@ This example demonstrates the usage of the register data type RegTensor and Mask
 
 ## Directory Structure
 
-```
+```text
 ├── trait
 │   ├── scripts/             // Test script directory
 │   │   └── gen_data.py      // Generate test input and golden data

@@ -68,7 +68,8 @@ src1固定为uint32\_t类型，无论src0是float还是half类型，dst中的（
 
 ```cpp
 template <typename T>
-__aicore__ inline void Sort32(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<uint32_t>& src1, const int32_t repeatTime)
+__aicore__ inline void Sort32(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<uint32_t>& src1, const int32_t repeatTime)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

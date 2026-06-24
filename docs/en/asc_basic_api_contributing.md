@@ -57,12 +57,11 @@ Basic API is the instruction-level API layer in the Ascend C programming framewo
 ```cpp
 // Requires manual setting of mask and repeat parameters
 template <typename T, bool isSetMask = true>
-__aicore__ inline void Add(const LocalTensor<T>& dst,
-                           const LocalTensor<T>& src0,
-                           const LocalTensor<T>& src1,
-                           uint64_t mask[],           // mask array
-                           const uint8_t repeatTime,  // repeat count
-                           const BinaryRepeatParams& repeatParams);  // stride parameters
+__aicore__ inline void Add(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    uint64_t mask[],                         // mask array
+    const uint8_t repeatTime,                // repeat count
+    const BinaryRepeatParams& repeatParams); // stride parameters
 ```
 
 **Applicable Scenarios:**
@@ -76,10 +75,9 @@ __aicore__ inline void Add(const LocalTensor<T>& dst,
 ```cpp
 // Automatically handles mask and repeat
 template <typename T>
-__aicore__ inline void Add(const LocalTensor<T>& dst,
-                           const LocalTensor<T>& src0,
-                           const LocalTensor<T>& src1,
-                           const int32_t& count);  // only element count needed
+__aicore__ inline void Add(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    const int32_t& count); // only element count needed
 ```
 
 **Applicable Scenarios:**
@@ -171,28 +169,23 @@ asc-devkit/
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_BINARY_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_VEC_BINARY_INTERFACE_H
 
-#include "kernel_tensor.h"
 #include "kernel_struct_binary.h"
+#include "kernel_tensor.h"
 
 namespace AscendC {
 
 // Add - High-dimensional tiling computation
 template <typename T, bool isSetMask = true>
-__aicore__ inline void Add(const LocalTensor<T>& dst,
-                           const LocalTensor<T>& src0,
-                           const LocalTensor<T>& src1,
-                           uint64_t mask[],
-                           const uint8_t repeatTime,
-                           const BinaryRepeatParams& repeatParams);
+__aicore__ inline void Add(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint64_t mask[],
+    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 // Add - First-n elements computation
 template <typename T>
-__aicore__ inline void Add(const LocalTensor<T>& dst,
-                           const LocalTensor<T>& src0,
-                           const LocalTensor<T>& src1,
-                           const int32_t& count);
+__aicore__ inline void Add(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const int32_t& count);
 
-}  // namespace AscendC
+} // namespace AscendC
 
 #include "impl/basic_api/kernel_operator_vec_binary_intf_impl.h"
 #endif
@@ -209,17 +202,17 @@ namespace AscendC {
 
 // Add implementation - First-n elements computation
 template <typename T>
-__aicore__ inline void AddImpl(__ubuf__ T* dst, __ubuf__ T* src0,
-                               __ubuf__ T* src1, const int32_t& count) {
+__aicore__ inline void AddImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const int32_t& count)
+{
     if ASCEND_IS_AIV {
         // 1. Set mask
         set_mask_count();
         set_vector_mask(0, count);
 
         // 2. Call underlying instruction
-        vadd(dst, src0, src1, 1,
-             DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE,
-             DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE);
+        vadd(
+            dst, src0, src1, 1, DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE, DEFAULT_REPEAT_STRIDE,
+            DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE);
 
         // 3. Restore mask
         set_mask_norm();
@@ -229,10 +222,10 @@ __aicore__ inline void AddImpl(__ubuf__ T* dst, __ubuf__ T* src0,
 
 // Add implementation - High-dimensional tiling computation
 template <typename T, bool isSetMask = true>
-__aicore__ inline void AddImpl(__ubuf__ T* dst, __ubuf__ T* src0,
-                               __ubuf__ T* src1, const uint64_t mask[],
-                               const uint8_t repeatTime,
-                               const BinaryRepeatParams& repeatParams) {
+__aicore__ inline void AddImpl(
+    __ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams& repeatParams)
+{
     if ASCEND_IS_AIV {
         // Set mask (if needed)
         if (isSetMask) {
@@ -240,13 +233,14 @@ __aicore__ inline void AddImpl(__ubuf__ T* dst, __ubuf__ T* src0,
         }
 
         // Call underlying instruction
-        vadd(dst, src0, src1, repeatTime,
-             repeatParams.dstBlkStride, repeatParams.src0BlkStride, repeatParams.src1BlkStride,
-             repeatParams.dstRepStride, repeatParams.src0RepStride, repeatParams.src1RepStride);
+        vadd(
+            dst, src0, src1, repeatTime, repeatParams.dstBlkStride, repeatParams.src0BlkStride,
+            repeatParams.src1BlkStride, repeatParams.dstRepStride, repeatParams.src0RepStride,
+            repeatParams.src1RepStride);
     }
 }
 
-}  // namespace AscendC
+} // namespace AscendC
 
 #endif
 ```
@@ -259,26 +253,22 @@ namespace AscendC {
 
 // First-n elements computation interface wrapper
 template <typename T>
-__aicore__ inline void Add(const LocalTensor<T>& dst,
-                           const LocalTensor<T>& src0,
-                           const LocalTensor<T>& src1,
-                           const int32_t& count) {
+__aicore__ inline void Add(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const int32_t& count)
+{
     AddImpl<T>(dst.GetPtr(), src0.GetPtr(), src1.GetPtr(), count);
 }
 
 // High-dimensional tiling computation interface wrapper
 template <typename T, bool isSetMask = true>
-__aicore__ inline void Add(const LocalTensor<T>& dst,
-                           const LocalTensor<T>& src0,
-                           const LocalTensor<T>& src1,
-                           uint64_t mask[],
-                           const uint8_t repeatTime,
-                           const BinaryRepeatParams& repeatParams) {
-    AddImpl<T, isSetMask>(dst.GetPtr(), src0.GetPtr(), src1.GetPtr(),
-                          mask, repeatTime, repeatParams);
+__aicore__ inline void Add(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint64_t mask[],
+    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+{
+    AddImpl<T, isSetMask>(dst.GetPtr(), src0.GetPtr(), src1.GetPtr(), mask, repeatTime, repeatParams);
 }
 
-}  // namespace AscendC
+} // namespace AscendC
 ```
 
 ### Architecture Adaptation
@@ -304,10 +294,8 @@ Basic API uses `LocalTensor<T>` as parameters. The first-n elements computation 
 ```cpp
 // Reference existing Add interface
 template <typename T>
-__aicore__ inline void Add(const LocalTensor<T>& dst,
-                           const LocalTensor<T>& src0,
-                           const LocalTensor<T>& src1,
-                           const int32_t& count);
+__aicore__ inline void Add(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const int32_t& count);
 ```
 
 ### Interface Design
@@ -317,7 +305,8 @@ Add in `include/basic_api/kernel_operator_vec_binary_intf.h`:
 ```cpp
 /* **************************************************************************************************
  * Axpy                                             *
- * ************************************************************************************************* */
+ * *************************************************************************************************
+ */
 /*
  * @ingroup Axpy
  * @brief dst = dst + src * scalar
@@ -327,10 +316,7 @@ Add in `include/basic_api/kernel_operator_vec_binary_intf.h`:
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T, typename U>
-__aicore__ inline void Axpy(const LocalTensor<T>& dst,
-                           const LocalTensor<U>& src,
-                           const U scalar,
-                           const int32_t& count);
+__aicore__ inline void Axpy(const LocalTensor<T>& dst, const LocalTensor<U>& src, const U scalar, const int32_t& count);
 ```
 
 ### Implementation Code
@@ -343,10 +329,8 @@ Add in `impl/basic_api/kernel_operator_vec_binary_intf_impl.h`:
 
 ```cpp
 template <typename T, typename U>
-__aicore__ inline void Axpy(const LocalTensor<T>& dst,
-                           const LocalTensor<U>& src,
-                           const U scalar,
-                           const int32_t& count) {
+__aicore__ inline void Axpy(const LocalTensor<T>& dst, const LocalTensor<U>& src, const U scalar, const int32_t& count)
+{
     AxpyImpl<T, U>(dst.GetPtr(), src.GetPtr(), scalar, count);
 }
 ```
@@ -366,7 +350,8 @@ Verify API computation correctness.
 ### Boundary Testing
 
 ```cpp
-TEST_F(TestAxpy, BoundaryTest) {
+TEST_F(TestAxpy, BoundaryTest)
+{
     // Test boundary values: count=0, 1, 256, 257
     // Test different data type combinations
     // Test special values (NaN, Inf)
@@ -376,13 +361,11 @@ TEST_F(TestAxpy, BoundaryTest) {
 ### Data Type Testing
 
 ```cpp
-INSTANTIATE_TEST_CASE_P(TEST_AXPY_TYPES, AxpyTestsuite,
+INSTANTIATE_TEST_CASE_P(
+    TEST_AXPY_TYPES, AxpyTestsuite,
     ::testing::Values(
-        BinaryTestParams { 256, 2, 2, main_axpy<half, half> },
-        BinaryTestParams { 256, 4, 2, main_axpy<float, half> },
-        BinaryTestParams { 256, 4, 4, main_axpy<float, float> }
-    )
-);
+        BinaryTestParams{256, 2, 2, main_axpy<half, half>}, BinaryTestParams{256, 4, 2, main_axpy<float, half>},
+        BinaryTestParams{256, 4, 4, main_axpy<float, float>}));
 ```
 
 ---
@@ -425,10 +408,9 @@ class LocalTensor;
  * @param count Element count
  */
 template <typename T>
-__aicore__ inline void Add(const LocalTensor<T>& dst,
-                           const LocalTensor<T>& src0,
-                           const LocalTensor<T>& src1,
-                           const int32_t& count) {
+__aicore__ inline void Add(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const int32_t& count)
+{
     // Parameter validation
     ASCENDC_ASSERT(count > 0, "count must be positive");
 
@@ -446,12 +428,11 @@ ASCENDC_ASSERT(dst != nullptr, "dst cannot be nullptr");
 ASCENDC_ASSERT(src != nullptr, "src cannot be nullptr");
 
 // 2. Type checking
-static_assert(SupportType<T, half, float, int16_t, int32_t>(),
-              "Unsupported data type");
+static_assert(SupportType<T, half, float, int16_t, int32_t>(), "Unsupported data type");
 
 // 3. Architecture checking
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 2201 && __NPU_ARCH__ != 3510)
-    #error "Unsupported NPU architecture"
+#error "Unsupported NPU architecture"
 #endif
 ```
 

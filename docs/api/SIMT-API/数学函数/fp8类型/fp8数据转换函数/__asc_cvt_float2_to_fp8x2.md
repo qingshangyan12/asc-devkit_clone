@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```text
 inline __asc_fp8x2_storage_t __asc_cvt_float2_to_fp8x2(const float2 x, const __asc_saturation_t saturate, const __asc_fp8_interpretation_t fp8_interpretation)
 ```
 
@@ -60,7 +60,7 @@ SIMT编程场景当前不支持使用该接口。
 
 使用该接口需要包含"simt\_api/asc\_fp8.h"头文件。
 
-```
+```cpp
 #include "simt_api/asc_fp8.h"
 ```
 
@@ -68,9 +68,10 @@ SIMT编程场景当前不支持使用该接口。
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     // 使用短向量可提升数据搬运效率
-    __simt_vf__ __launch_bounds__(1024) inline void simt_asc_cvt_float2_to_fp8x2(__gm__ float2* input, __gm__ uint16_t* output, uint32_t input_total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void simt_asc_cvt_float2_to_fp8x2(
+        __gm__ float2* input, __gm__ uint16_t* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         // 每个线程处理1个float2类型的数据，即2个float类型的数据，因此idx >= input_total_length / 2的线程不处理数据

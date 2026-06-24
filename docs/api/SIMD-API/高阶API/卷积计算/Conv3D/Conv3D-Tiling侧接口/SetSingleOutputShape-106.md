@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 void SetSingleOutputShape(int64_t singleCo, int64_t singleDo, int64_t singleM)
 ```
 
@@ -28,7 +28,7 @@ void SetSingleOutputShape(int64_t singleCo, int64_t singleDo, int64_t singleM)
 
 ## 调用示例
 
-```
+```cpp
 // 实例化Conv3D Api
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 Conv3dTilingApi::Conv3dTiling conv3dApiTiling(ascendcPlatform);

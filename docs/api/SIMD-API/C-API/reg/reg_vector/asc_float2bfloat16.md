@@ -35,29 +35,34 @@
 ```cpp
 // FLOOR舍入模式
 __simd_callee__ inline void asc_float2bfloat16_rd(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-__simd_callee__ inline void asc_float2bfloat16_rd_sat(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-__simd_callee__ inline void asc_float2bfloat16_rd_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-__simd_callee__ inline void asc_float2bfloat16_rd_sat_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// RINT舍入模式
-__simd_callee__ inline void asc_float2bfloat16_rn(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-__simd_callee__ inline void asc_float2bfloat16_rn_sat(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-__simd_callee__ inline void asc_float2bfloat16_rn_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-__simd_callee__ inline void asc_float2bfloat16_rn_sat_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// ROUND舍入模式
-__simd_callee__ inline void asc_float2bfloat16_rna(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-__simd_callee__ inline void asc_float2bfloat16_rna_sat(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-__simd_callee__ inline void asc_float2bfloat16_rna_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-__simd_callee__ inline void asc_float2bfloat16_rna_sat_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// CEIL舍入模式
-__simd_callee__ inline void asc_float2bfloat16_ru(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-__simd_callee__ inline void asc_float2bfloat16_ru_sat(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-__simd_callee__ inline void asc_float2bfloat16_ru_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-__simd_callee__ inline void asc_float2bfloat16_ru_sat_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// TRUNC舍入模式
-__simd_callee__ inline void asc_float2bfloat16_rz(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-__simd_callee__ inline void asc_float2bfloat16_rz_sat(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-__simd_callee__ inline void asc_float2bfloat16_rz_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-__simd_callee__ inline void asc_float2bfloat16_rz_sat_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
+    __simd_callee__
+    inline void asc_float2bfloat16_rd_sat(vector_bfloat16_t& dst, vector_float src, vector_bool mask) __simd_callee__
+    inline void asc_float2bfloat16_rd_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask) __simd_callee__
+    inline void asc_float2bfloat16_rd_sat_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
+    // RINT舍入模式
+    __simd_callee__
+    inline void asc_float2bfloat16_rn(vector_bfloat16_t& dst, vector_float src, vector_bool mask) __simd_callee__
+    inline void asc_float2bfloat16_rn_sat(vector_bfloat16_t& dst, vector_float src, vector_bool mask) __simd_callee__
+    inline void asc_float2bfloat16_rn_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask) __simd_callee__
+    inline void asc_float2bfloat16_rn_sat_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
+    // ROUND舍入模式
+    __simd_callee__
+    inline void asc_float2bfloat16_rna(vector_bfloat16_t& dst, vector_float src, vector_bool mask) __simd_callee__
+    inline void asc_float2bfloat16_rna_sat(vector_bfloat16_t& dst, vector_float src, vector_bool mask) __simd_callee__
+    inline void asc_float2bfloat16_rna_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask) __simd_callee__
+    inline void asc_float2bfloat16_rna_sat_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
+    // CEIL舍入模式
+    __simd_callee__
+    inline void asc_float2bfloat16_ru(vector_bfloat16_t& dst, vector_float src, vector_bool mask) __simd_callee__
+    inline void asc_float2bfloat16_ru_sat(vector_bfloat16_t& dst, vector_float src, vector_bool mask) __simd_callee__
+    inline void asc_float2bfloat16_ru_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask) __simd_callee__
+    inline void asc_float2bfloat16_ru_sat_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
+    // TRUNC舍入模式
+    __simd_callee__
+    inline void asc_float2bfloat16_rz(vector_bfloat16_t& dst, vector_float src, vector_bool mask) __simd_callee__
+    inline void asc_float2bfloat16_rz_sat(vector_bfloat16_t& dst, vector_float src, vector_bool mask) __simd_callee__
+    inline void asc_float2bfloat16_rz_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask) __simd_callee__
+    inline void asc_float2bfloat16_rz_sat_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
 ```
 
 ## 参数说明
@@ -88,8 +93,14 @@ PIPE_V
 vector_bfloat16_t dst;
 vector_float src;
 vector_bool mask;
-asc_float2bfloat16_rd(dst, src, mask);    // FLOOR舍入模式，不饱和模式，将src转换成vector_bfloat16_t类型并写入dst上半部分
-asc_float2bfloat16_rd_sat(dst, src, mask);    // FLOOR舍入模式，饱和模式，将src转换成vector_bfloat16_t类型并写入dst上半部分
-asc_float2bfloat16_rd_v2(dst, src, mask);    // FLOOR舍入模式，不饱和模式，将src转换成vector_bfloat16_t类型并写入dst下半部分
-asc_float2bfloat16_rd_sat_v2(dst, src, mask);    // FLOOR舍入模式，饱和模式，将src转换成vector_bfloat16_t类型并写入dst下半部分
+asc_float2bfloat16_rd(dst, src,
+                      mask); // FLOOR舍入模式，不饱和模式，将src转换成vector_bfloat16_t类型并写入dst上半部分
+asc_float2bfloat16_rd_sat(dst, src,
+                          mask); // FLOOR舍入模式，饱和模式，将src转换成vector_bfloat16_t类型并写入dst上半部分
+asc_float2bfloat16_rd_v2(
+    dst, src,
+    mask); // FLOOR舍入模式，不饱和模式，将src转换成vector_bfloat16_t类型并写入dst下半部分
+asc_float2bfloat16_rd_sat_v2(
+    dst, src,
+    mask); // FLOOR舍入模式，饱和模式，将src转换成vector_bfloat16_t类型并写入dst下半部分
 ```

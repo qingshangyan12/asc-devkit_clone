@@ -80,35 +80,35 @@ mask用于控制每次迭代内参与计算的元素。可通过连续模式和�
 
     具体样例如下：
 
-    ```
+    ```cpp
     // int16_t数据类型单次迭代能处理的元素个数最大值为256/sizeof(int16_t) = 128，mask = 64，mask∈[1, 128]，所以是合法输入
     // repeatTime = 1,共128个元素，单次迭代能处理128个元素，故repeatTime = 1
     // dstBlkStride, src0BlkStride, src1BlkStride = 1,单次迭代内连续读取和写入数据
     // dstRepStride, src0RepStride, src1RepStride = 8,迭代间的数据连续读取和写入
     uint64_t mask = 64;
-    AscendC::Add(dstLocal, src0Local, src1Local, mask, 1, { 1, 1, 1, 8, 8, 8 });
+    AscendC::Add(dstLocal, src0Local, src1Local, mask, 1, {1, 1, 1, 8, 8, 8});
     ```
 
     结果示例如下：
 
-    ```
+    ```text
     输入数据(src0Local): [1 2 3 ... 64 ...128]
     输入数据(src1Local): [1 2 3 ... 64 ...128]
     输出数据(dstLocal): [2 4 6 ... 128 undefined...undefined]
     ```
 
-    ```
+    ```cpp
     // int32_t数据类型单次迭代能处理的元素个数最大值为256/sizeof(int32_t) = 64，mask = 64，mask∈[1, 64]，所以是合法输入
     // repeatTime = 1,共64个元素，单次迭代能处理64个元素，故repeatTime = 1
     // dstBlkStride, src0BlkStride, src1BlkStride = 1,单次迭代内连续读取和写入数据
     // dstRepStride, src0RepStride, src1RepStride = 8,迭代间的数据连续读取和写入
     uint64_t mask = 64;
-    AscendC::Add(dstLocal, src0Local, src1Local, mask, 1, { 1, 1, 1, 8, 8, 8 });
+    AscendC::Add(dstLocal, src0Local, src1Local, mask, 1, {1, 1, 1, 8, 8, 8});
     ```
 
     结果示例如下：
 
-    ```
+    ```text
     输入数据(src0Local): [1 2 3 ... 64]
     输入数据(src1Local): [1 2 3 ... 64]
     输出数据(dstLocal): [2 4 6 ... 128]
@@ -120,18 +120,18 @@ mask用于控制每次迭代内参与计算的元素。可通过连续模式和�
 
     具体样例如下:
 
-    ```
+    ```cpp
     // 数据类型为int16_t
     uint64_t mask[2] = {6148914691236517205, 6148914691236517205};
     // repeatTime = 1,共128个元素，单次迭代能处理128个元素，故repeatTime = 1。
     // dstBlkStride, src0BlkStride, src1BlkStride = 1,单次迭代内连续读取和写入数据。
     // dstRepStride, src0RepStride, src1RepStride = 8,迭代间的数据连续读取和写入。
-    AscendC::Add(dstLocal, src0Local, src1Local, mask, 1, { 1, 1, 1, 8, 8, 8 });
+    AscendC::Add(dstLocal, src0Local, src1Local, mask, 1, {1, 1, 1, 8, 8, 8});
     ```
 
     结果示例如下：
 
-    ```
+    ```text
     输入数据(src0Local): [1 2 3 ... 64 ...127 128]
     输入数据(src1Local): [1 2 3 ... 64 ...127 128]
     输出数据(dstLocal): [2 undefined 6 ... undefined ...254 undefined]
@@ -143,18 +143,18 @@ mask用于控制每次迭代内参与计算的元素。可通过连续模式和�
 
     ![](../../../../figures/mask.png)
 
-    ```
+    ```cpp
     // 数据类型为int32_t
     uint64_t mask[1] = {6148914691236517205};
     // repeatTime = 1,共64个元素，单次迭代能处理64个元素，故repeatTime = 1。
     // dstBlkStride, src0BlkStride, src1BlkStride = 1,单次迭代内连续读取和写入数据。
     // dstRepStride, src0RepStride, src1RepStride = 8,迭代间的数据连续读取和写入。
-    AscendC::Add(dstLocal, src0Local, src1Local, mask, 1, { 1, 1, 1, 8, 8, 8 });
+    AscendC::Add(dstLocal, src0Local, src1Local, mask, 1, {1, 1, 1, 8, 8, 8});
     ```
 
     结果示例如下：
 
-    ```
+    ```text
     输入数据(src0Local): [1 2 3 ... 63 64]
     输入数据(src1Local): [1 2 3 ... 63 64]
     输出数据(dstLocal): [2 undefined 6 ... 126 undefined]

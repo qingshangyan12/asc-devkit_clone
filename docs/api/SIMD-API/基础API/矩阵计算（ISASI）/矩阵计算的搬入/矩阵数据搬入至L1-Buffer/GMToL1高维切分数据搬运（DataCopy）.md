@@ -28,7 +28,8 @@
 
 ```cpp
 template <typename T>
-__aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& repeatParams)
+__aicore__ inline void DataCopy(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& repeatParams)
 ```
 
 注：对于连续搬运场景，推荐使用[GMToL1连续数据搬运（DataCopy）](GMToL1连续数据搬运（DataCopy）.md)。
@@ -189,7 +190,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 constexpr uint32_t copyCount = 128;
 // 源操作数：GM上连续存放128个half。
 AscendC::GlobalTensor<half> srcGm;
-srcGm.SetGlobalBuffer((__gm__ half *)src, copyCount);
+srcGm.SetGlobalBuffer((__gm__ half*)src, copyCount);
 // 目的操作数：L1 Buffer。
 AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::A1, 0, copyCount);
 
@@ -209,7 +210,7 @@ constexpr uint32_t srcCount = 112;
 constexpr uint32_t dstCount = 128;
 // 源操作数：GM上有112个half，按“48个有效元素+16个跳过元素+48个有效元素”排布。
 AscendC::GlobalTensor<half> srcGm;
-srcGm.SetGlobalBuffer((__gm__ half *)src, srcCount);
+srcGm.SetGlobalBuffer((__gm__ half*)src, srcCount);
 
 // 目的操作数：L1 Buffer，两个数据块之间预留32个half的间隔。
 AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::A1, 0, dstCount);

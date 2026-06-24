@@ -132,8 +132,7 @@ __aicore__ inline void Compute()
 {
     AscendC::LocalTensor<T> dst = ubAllocator.Alloc<T, TILE_LENGTH>();
     // 参数计算等
-    ......
-    asc_vf_call<AddVF<T>>(dst, src0, src1, oneRepeatSize, repeatTimes);
+    ...... asc_vf_call<AddVF<T>>(dst, src0, src1, oneRepeatSize, repeatTimes);
     // 尾处理
     ......
 }
@@ -165,10 +164,10 @@ AscendC::Reg::MaskReg mask = AscendC::Reg::UpdateMask<T>(remainCount);
 
 ```cpp
 AscendC::Reg::AddrReg aReg;
-for(uint16_t i = 0;i < extent1; i++){
-    for(uint16_t j = 0;j < extent2; j++){
-        for(uint16_t k = 0;k < extent3; k++){
-            for(uint16_t m = 0;m < extent4; m++){
+for (uint16_t i = 0; i < extent1; i++) {
+    for (uint16_t j = 0; j < extent2; j++) {
+        for (uint16_t k = 0; k < extent3; k++) {
+            for (uint16_t m = 0; m < extent4; m++) {
                 aReg = AscendC::Reg::CreateAddrReg(i, const1, j, const2, k, const3, m, const4);
                 AscendC::Reg::LoadAlign(srcReg, srcAddr, aReg);
             }
@@ -212,8 +211,7 @@ AscendC::Reg::LoadUnAlignPre(loadUreg, srcAddr);
 for (uint16_t i = 0; i < repeatTimes; ++i) {
     AscendC::Reg::LoadUnAlign(srcReg, loadUreg, srcAddr, postUpdateStride);
     // Reg计算
-    ...
-    AscendC::Reg::StoreUnAlign(dstAddr, dstReg, storeUreg, postUpdateStride);
+    ... AscendC::Reg::StoreUnAlign(dstAddr, dstReg, storeUreg, postUpdateStride);
 }
 AscendC::Reg::StoreUnAlignPost(dstAddr, storeUreg, 0);
 ```
@@ -251,8 +249,7 @@ AscendC::Reg::Select(dstReg, src0Reg, src1Reg, cmpMaskReg, mask);
 
 ```cpp
 AscendC::Reg::Store(dstAddr, dstReg);
-AscendC::Reg::LocalMemBar<AscendC::Reg::MemType::VEC_STORE,
-                          AscendC::Reg::MemType::VEC_LOAD>();
+AscendC::Reg::LocalMemBar<AscendC::Reg::MemType::VEC_STORE, AscendC::Reg::MemType::VEC_LOAD>();
 AscendC::Reg::Load(srcReg, dstAddr);
 ```
 
@@ -264,17 +261,14 @@ AscendC::Reg::Load(srcReg, dstAddr);
 
 ```cpp
 template <typename T>
-__simd_vf__ inline void AddVFv1(AscendC::LocalTensor<T> dst,
-                              AscendC::LocalTensor<T> src0,
-                              AscendC::LocalTensor<T> src1,
-                              uint32_t oneRepeatSize,
-                              uint16_t repeatTimes)
+__simd_vf__ inline void AddVFv1(
+    AscendC::LocalTensor<T> dst, AscendC::LocalTensor<T> src0, AscendC::LocalTensor<T> src1, uint32_t oneRepeatSize,
+    uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> src0Reg;
     AscendC::Reg::RegTensor<T> src1Reg;
     AscendC::Reg::RegTensor<T> dstReg;
-    AscendC::Reg::MaskReg mask =
-        AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
+    AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
 
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         uint32_t offset = i * oneRepeatSize;
@@ -286,17 +280,14 @@ __simd_vf__ inline void AddVFv1(AscendC::LocalTensor<T> dst,
 }
 
 template <typename T>
-__simd_vf__ inline void AddVFv2(__ubuf__ float* dstAddr,
-                                __ubuf__ float* src0Addr,
-                                __ubuf__ float* src1Addr,
-                                uint32_t oneRepeatSize,
-                                uint16_t repeatTimes)
+__simd_vf__ inline void AddVFv2(
+    __ubuf__ float* dstAddr, __ubuf__ float* src0Addr, __ubuf__ float* src1Addr, uint32_t oneRepeatSize,
+    uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> src0Reg;
     AscendC::Reg::RegTensor<T> src1Reg;
     AscendC::Reg::RegTensor<T> dstReg;
-    AscendC::Reg::MaskReg mask =
-        AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
+    AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
 
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         uint32_t offset = i * oneRepeatSize;
@@ -314,9 +305,9 @@ __aicore__ inline void Compute()
 
     constexpr uint32_t oneRepeatSize = 256 / sizeof(T);
     uint16_t repeatTimes = TILE_LENGTH / oneRepeatSize;
-	// 使用LocalTensor作为参数
+    // 使用LocalTensor作为参数
     asc_vf_call<AddVFv1<T>>(dst, src0, src1, oneRepeatSize, repeatTimes);
-    
+
     __ubuf__ T* dstAddr = (__ubuf__ T*)dst.GetPhyAddr();
     __ubuf__ T* src0Addr = (__ubuf__ T*)src0.GetPhyAddr();
     __ubuf__ T* src1Addr = (__ubuf__ T*)src1.GetPhyAddr();

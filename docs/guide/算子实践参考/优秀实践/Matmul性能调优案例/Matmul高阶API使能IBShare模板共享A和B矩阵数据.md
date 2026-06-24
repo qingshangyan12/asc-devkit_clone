@@ -77,19 +77,22 @@ A矩阵和B矩阵均未开启IBShare时，数据需要根据K轴、M轴或N轴�
 
 通过设置A和B矩阵MatmulType的IBShare均为true，开启该优化，具体代码如下：
 
-```
+```cpp
 constexpr bool isABshare = true;
-template <typename aType, typename bType, typename cType> class MatmulABshareKernel {
+template <typename aType, typename bType, typename cType>
+class MatmulABshareKernel {
 public:
     __aicore__ inline MatmulABshareKernel(){};
-    __aicore__ inline void Init(__gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* c, __gm__ uint8_t* workspace,
-                                const TCubeTiling &tiling, AscendC::TPipe *pipe);
-    __aicore__ inline void Process(AscendC::TPipe *pipe);
-    __aicore__ inline void CalcOffset(int32_t blockIdx, const TCubeTiling &tiling, int32_t &offsetA, int32_t &offsetB,
-                                      int32_t &offsetC);
-    AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, aType, false, LayoutMode::NONE, isABshare>, 
-           AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, bType, false, LayoutMode::NONE, isABshare>,
-           AscendC::MatmulType<AscendC::TPosition::VECIN, CubeFormat::ND, cType>>
+    __aicore__ inline void Init(
+        __gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* c, __gm__ uint8_t* workspace, const TCubeTiling& tiling,
+        AscendC::TPipe* pipe);
+    __aicore__ inline void Process(AscendC::TPipe* pipe);
+    __aicore__ inline void CalcOffset(
+        int32_t blockIdx, const TCubeTiling& tiling, int32_t& offsetA, int32_t& offsetB, int32_t& offsetC);
+    AscendC::Matmul<
+        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, aType, false, LayoutMode::NONE, isABshare>,
+        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, bType, false, LayoutMode::NONE, isABshare>,
+        AscendC::MatmulType<AscendC::TPosition::VECIN, CubeFormat::ND, cType>>
         matmulObj;
     AscendC::GlobalTensor<aType> aGlobal;
     AscendC::GlobalTensor<bType> bGlobal;
@@ -97,13 +100,14 @@ public:
     TCubeTiling tiling;
 };
 template <typename aType, typename bType, typename cType>
-__aicore__ inline void MatmulABshareKernel<aType, bType, cType>::Init(__gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* c, 
-                                                                __gm__ uint8_t* workspace,const TCubeTiling &tiling, AscendC::TPipe *pipe)
+__aicore__ inline void MatmulABshareKernel<aType, bType, cType>::Init(
+    __gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* c, __gm__ uint8_t* workspace, const TCubeTiling& tiling,
+    AscendC::TPipe* pipe)
 {
     this->tiling = tiling;
-    aGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ aType *>(a), tiling.M * tiling.Ka);
-    bGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ bType *>(b), tiling.Kb * tiling.N);
-    cGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ cType *>(c), tiling.M * tiling.N);
+    aGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ aType*>(a), tiling.M * tiling.Ka);
+    bGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ bType*>(b), tiling.Kb * tiling.N);
+    cGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ cType*>(c), tiling.M * tiling.N);
     int32_t offsetA, offsetB, offsetC;
     CalcOffset(AscendC::GetBlockIdx(), tiling, offsetA, offsetB, offsetC); // calculate offset
     aGlobal = aGlobal[offsetA];
@@ -111,9 +115,8 @@ __aicore__ inline void MatmulABshareKernel<aType, bType, cType>::Init(__gm__ uin
     cGlobal = cGlobal[offsetC];
 }
 template <typename aType, typename bType, typename cType>
-__aicore__ inline void
-MatmulABshareKernel<aType, bType, cType>::CalcOffset(int32_t blockIdx, const TCubeTiling &tiling,
-                                                             int32_t &offsetA, int32_t &offsetB, int32_t &offsetC)
+__aicore__ inline void MatmulABshareKernel<aType, bType, cType>::CalcOffset(
+    int32_t blockIdx, const TCubeTiling& tiling, int32_t& offsetA, int32_t& offsetB, int32_t& offsetC)
 {
     offsetA = 0;
     offsetB = 0;

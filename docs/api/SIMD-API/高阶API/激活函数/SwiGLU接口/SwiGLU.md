@@ -31,31 +31,38 @@ SwiGLU是采用Swish作为激活函数的GLU变体。具体计算公式如下：
 -   通过sharedTmpBuffer入参传入临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void SwiGLU(LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1, const float& scalarValue, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+        __aicore__ inline void SwiGLU(
+            LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1,
+            const float& scalarValue, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void SwiGLU(LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1, const float& scalarValue, const LocalTensor<uint8_t>& sharedTmpBuffer)
+        __aicore__ inline void SwiGLU(
+            LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1,
+            const float& scalarValue, const LocalTensor<uint8_t>& sharedTmpBuffer)
         ```
 
 -   接口框架申请临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void SwiGLU(LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1, const float& scalarValue, const uint32_t calCount)
+        __aicore__ inline void SwiGLU(
+            LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1,
+            const float& scalarValue, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void SwiGLU(LocalTensor<T>& dstTensor, LocalTensor<T>& srcTensor0, LocalTensor<T>& srcTensor1, const float& scalarValue)
+        __aicore__ inline void SwiGLU(
+            LocalTensor<T>& dstTensor, LocalTensor<T>& srcTensor0, LocalTensor<T>& srcTensor1, const float& scalarValue)
         ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者**通过sharedTmpBuffer入参传入**和**接口框架申请**两种方式。
@@ -97,7 +104,7 @@ SwiGLU是采用Swish作为激活函数的GLU变体。具体计算公式如下：
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放SwiGLU计算结果的Tensor
 // src0Local：存放SwiGLU计算的输入Tensor
 // src1Local：存放SwiGLU计算的输入Tensor
@@ -119,7 +126,7 @@ AscendC::SwiGLU(dstLocal, src0Local, src1Local, scalarValue, sharedTmpBuffer, 32
 
 结果示例如下：
 
-```
+```text
 输入数据(srcTensor0):
 [-4.         -3.7419355  -3.483871   -3.2258065  -2.967742   -2.7096775  -2.451613   -2.1935484
  -1.9354838  -1.6774193  -1.4193548  -1.1612903  -0.9032258  -0.6451613  -0.38709676 -0.12903225

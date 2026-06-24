@@ -35,29 +35,32 @@
 -   通过sharedTmpBuffer入参传入临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void Asinh(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+        __aicore__ inline void Asinh(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+            const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void Asinh(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
+        __aicore__ inline void Asinh(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
         ```
 
 -   接口框架申请临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
         __aicore__ inline void Asinh(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
         __aicore__ inline void Asinh(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
         ```
@@ -100,7 +103,7 @@
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放计算结果的Tensor
 // srcLocal: 参与计算的输入Tensor
 // sharedTmpBuffer: 临时缓存,内部复杂计算时存储中间变量
@@ -110,7 +113,7 @@ AscendC::Asinh(dstLocal, srcLocal, sharedTmpBuffer, 512);
 
 结果示例如下：
 
-```
+```text
 输入数据srcLocal: [0.000000 0.100000 0.200000 ... 51.000000 51.100002]
 输出数据dstLocal: [0.000000 0.099834 0.198690 ... 4.625069 4.627028]
 ```

@@ -32,14 +32,17 @@ L0C Buffer到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内�
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-    __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsArch3510<config.format>& intriParams)
+    __aicore__ inline void Fixpipe(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsArch3510<config.format>& intriParams)
     ```
 
 - 通路L0C Buffer-\>UB，开启tensor量化功能：
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-    __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<uint64_t>& cbufWorkspace, const FixpipeParamsArch3510<config.format>& intriParams)
+    __aicore__ inline void Fixpipe(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<uint64_t>& cbufWorkspace,
+        const FixpipeParamsArch3510<config.format>& intriParams)
     ```
 
 </cann-filter>
@@ -52,14 +55,19 @@ L0C Buffer到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内�
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-    __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsM300& intriParams)
+    __aicore__ inline void Fixpipe(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsM300& intriParams)
     ```
 
 - 通路L0C Buffer-\>UB，开启tensor量化功能：
 
     ```cpp
-    template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S = uint64_t, typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
-    __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<S>& cbufWorkspace, const FixpipeParamsM300& intriParams)
+    template <
+        typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S = uint64_t,
+        typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
+    __aicore__ inline void Fixpipe(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<S>& cbufWorkspace,
+        const FixpipeParamsM300& intriParams)
     ```
 
 </cann-filter>
@@ -302,7 +310,7 @@ M方向切分：
 
     AscendC::LocalTensor<outputType> cUB;
     cUB = AscendC::LocalTensor<outputType>(AscendC::TPosition::VECOUT, 0, cSingleSize);
-    
+
     AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
     fixpipeParams.mSize = baseM;
     fixpipeParams.nSize = baseN;

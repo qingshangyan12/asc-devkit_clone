@@ -16,7 +16,7 @@ This example introduces how to execute a fixed-shape operator using the aclnn `O
 
 ## Directory Structure
 
-```
+```text
 ├── aclnn_invocation
 │   ├── CMakeLists.txt          // Build project file
 │   ├── main.cpp                // Operator invocation main program

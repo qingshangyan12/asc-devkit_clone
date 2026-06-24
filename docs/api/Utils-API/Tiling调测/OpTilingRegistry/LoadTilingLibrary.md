@@ -10,8 +10,8 @@
 
 ## 函数原型<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section13230182415108"></a>
 
-```
-bool LoadTilingLibrary(const char *tilingSoPath) const
+```cpp
+bool LoadTilingLibrary(const char* tilingSoPath) const
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section75395119104"></a>
@@ -47,12 +47,12 @@ true：Tiling动态库加载成功；false：Tiling动态库加载失败。具�
 
 ## 调用示例<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section320753512363"></a>
 
-```
+```cpp
 context_ascendc::OpTilingRegistry tmpIns;
 bool flag = tmpIns.LoadTilingLibrary("/your/path/to/so_path/liboptiling.so");
 if (flag == false) {
     std::cout << "Load tiling so failed" << std::endl;
-    ...        
+    ...
 }
 // ...
 ```

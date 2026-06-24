@@ -38,16 +38,23 @@ SubLayer\(X\)通常是指在DeepNorm模型中的一个子层（sub-layer），�
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isReuseSrc = false, bool isBasicBlock = false>
-    __aicore__ inline void DeepNorm(const LocalTensor<T>& dstLocal, const LocalTensor<T>& meanLocal, const LocalTensor<T>& rstdLocal, const LocalTensor<T>& srcLocal, const LocalTensor<T>& gxLocal, const LocalTensor<T>& betaLocal, const LocalTensor<T>& gammaLocal, const LocalTensor<uint8_t>& sharedTmpBuffer, const T alpha, const T epsilon, DeepNormTiling& tiling)
+    __aicore__ inline void DeepNorm(
+        const LocalTensor<T>& dstLocal, const LocalTensor<T>& meanLocal, const LocalTensor<T>& rstdLocal,
+        const LocalTensor<T>& srcLocal, const LocalTensor<T>& gxLocal, const LocalTensor<T>& betaLocal,
+        const LocalTensor<T>& gammaLocal, const LocalTensor<uint8_t>& sharedTmpBuffer, const T alpha, const T epsilon,
+        DeepNormTiling& tiling)
     ```
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isReuseSrc = false, bool isBasicBlock = false>
-    __aicore__ inline void DeepNorm(const LocalTensor<T>& dstLocal, const LocalTensor<T>& meanLocal, const LocalTensor<T>& rstdLocal, const LocalTensor<T>& srcLocal, const LocalTensor<T>& gxLocal, const LocalTensor<T>& betaLocal, const LocalTensor<T>& gammaLocal, const T alpha, const T epsilon, DeepNormTiling& tiling)
+    __aicore__ inline void DeepNorm(
+        const LocalTensor<T>& dstLocal, const LocalTensor<T>& meanLocal, const LocalTensor<T>& rstdLocal,
+        const LocalTensor<T>& srcLocal, const LocalTensor<T>& gxLocal, const LocalTensor<T>& betaLocal,
+        const LocalTensor<T>& gammaLocal, const T alpha, const T epsilon, DeepNormTiling& tiling)
     ```
 
 ## 参数说明
@@ -90,7 +97,7 @@ SubLayer\(X\)通常是指在DeepNorm模型中的一个子层（sub-layer），�
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放DeepNorm计算结果的Tensor
 // meanLocal: 输出均值Tensor
 // rstdLocal: 输出方差Tensor
@@ -121,7 +128,7 @@ AscendC::DeepNorm<T, isReuseSrc, isBasicBlock>(
 
 示例结果如下：
 
-```
+```text
 输入数据(srcLocal, shape:[4, 2, 8]):
 [  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
   16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31

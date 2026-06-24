@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section13230182415108"></a>
 
-```
+```cpp
 template <pipe_t pipe>
 static __aicore__ inline void Unlock(MutexID id)
 ```

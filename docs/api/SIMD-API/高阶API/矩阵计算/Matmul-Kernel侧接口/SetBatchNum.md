@@ -19,7 +19,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetBatchNum(int32_t batchA, int32_t batchB)
 ```
 
@@ -43,7 +43,7 @@ __aicore__ inline void SetBatchNum(int32_t batchA, int32_t batchB)
 
 ## 调用示例
 
-```
+```cpp
 //  纯cube模式
 #define ASCENDC_CUBE_ONLY
 typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType, false, LayoutMode::NORMAL> aType;

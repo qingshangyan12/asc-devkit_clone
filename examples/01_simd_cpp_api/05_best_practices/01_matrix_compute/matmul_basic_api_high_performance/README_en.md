@@ -14,7 +14,7 @@ This example is based on the static Tensor programming paradigm, implementing hi
 
 ## Directory Structure
 
-```
+```text
 ├── matmul_basic_api_high_performance
 │   ├── scripts
 │   │   ├── gen_data.py         // Input data and ground truth generation script
@@ -66,7 +66,7 @@ This example is based on the static Tensor programming paradigm, implementing hi
 
 ### Data Flow Path:
 
-```
+```text
 GM ──(MTE2, DataCopy)──> L1 ──(MTE1, LoadData)──> L0A/L0B ──(Cube, Mmad)──> L0C ──(Fixpipe)──> GM
        DataCopyInA/B             DataLoadA/B                   Compute             CopyOut
 ```
@@ -77,7 +77,7 @@ GM ──(MTE2, DataCopy)──> L1 ──(MTE1, LoadData)──> L0A/L0B ──
 
 Both L1 and L0 use Ping-Pong double buffering, forming a three-stage pipeline with DataCopyIn (GM→L1), DataLoad (L1→L0), and Compute stages. Each stage processes data from different buffers without blocking each other.
 
-```
+```text
 Time ──────────────────────────────────────────────────────────────>
 
 MTE2:  |─ A1 Ping ──|─ A1 Pong ──|─ A1 Ping ──| ...
@@ -88,7 +88,7 @@ Fixpipe:                           |─ CopyOut ──|(unitflag)
 
 **L1 Double Buffer Layout**: A1 occupies the first half of L1 (0~256KB), B1 occupies the second half (256~512KB), each further divided into Ping/Pong:
 
-```
+```text
 L1 (512KB):
 ├── A1 Ping: [0, 128KB)
 ├── A1 Pong: [128KB, 256KB)
@@ -98,7 +98,7 @@ L1 (512KB):
 
 **L0 Double Buffer Layout**: A2/B2 each have independent 64KB space, each further divided into Ping/Pong:
 
-```
+```text
 L0A/L0B (64KB):
 ├── A2 Ping: [0, 16KB)
 ├── A2 Pong: [32KB, 48KB)
@@ -129,23 +129,26 @@ Four types of hardware event flags are used to implement precise pipeline synchr
 **Reverse synchronization must be preset**: Since reverse synchronization is "consumer SetFlag → producer WaitFlag", SetFlag must be preset before first use, otherwise the first WaitFlag will deadlock:
 
 ```cpp
-// Initialization: Preset reverse synchronization flags to prevent first WaitFlag deadlock
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID0);  // A1 Ping writable
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID1);  // A1 Pong writable
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID2);  // B1 Ping writable
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID3);  // B1 Pong writable
-AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);     // L0 Ping writable
-AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID1);     // L0 Pong writable
+// Initialization: Preset reverse synchronization flags to prevent first
+// WaitFlag deadlock
+AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID0); // A1 Ping writable
+AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID1); // A1 Pong writable
+AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID2); // B1 Ping writable
+AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID3); // B1 Pong writable
+AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);    // L0 Ping writable
+AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID1);    // L0 Pong writable
 ```
 
 **Large packet granularity forward synchronization**: DataLoad reads data from L1 large packets one base block at a time along K direction, only needing to wait for data readiness when reading the first base block of the large packet. Subsequent base blocks are in the same large packet as the first, no repeated waiting needed:
 
 ```cpp
-// Forward synchronization: Only the first element of the large packet needs to wait for data readiness
+// Forward synchronization: Only the first element of the large packet needs to
+// wait for data readiness
 if (kOffsetInChunkA == 0) {
     AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(a1ReadIdx);
 }
-// Reverse synchronization: Notify DataCopyIn that buffer can be overwritten only after the last element of the large packet is consumed
+// Reverse synchronization: Notify DataCopyIn that buffer can be overwritten
+// only after the last element of the large packet is consumed
 if ((kOffsetInChunkA + 1) == stepKa) {
     AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(a1ReadIdx);
 }
@@ -167,7 +170,7 @@ When `stepKa > stepKb`, B matrix needs to switch to the next L1 buffer (Pong) ev
 
 This example triggers DataCopyIn after Compute, **B first then A**, prioritizing the more urgent B data transfer:
 
-```
+```text
 k=0:  Compute → DataCopyIn(B1 Pong) → DataCopyIn(A1 Pong)
                  ↑ MTE2 transfers B first  ↑ Then transfers A
 k=stepKb:       Needs B1 Pong → Already ready ✓ (B has had stepKb rounds to transfer)
@@ -184,7 +187,7 @@ Through `stepKa`/`stepKb` parameters, multiple basic blocks are packed into one 
 // DataCopyInA: Transfer stepKa baseK blocks at once
 AscendC::Nd2NzParams nd2nzParams;
 nd2nzParams.nValue = curM;
-nd2nzParams.dValue = baseK * stepKa;  // Large packet contains stepKa baseM * baseK blocks
+nd2nzParams.dValue = baseK * stepKa; // Large packet contains stepKa baseM * baseK blocks
 ```
 
 #### 6. LoadData3D Replacing LoadData2D — Reducing Instruction Queue Usage
@@ -227,18 +230,20 @@ This reduces MTE1 instruction count per base slice from multiple `LoadData2D` to
 All Tiling parameters (baseM/baseK/baseN, singleCoreM/K/N, stepKa/stepKb) are determined at compile time through template parameters, requiring no Scalar dynamic computation at runtime, reducing Scalar overhead:
 
 ```cpp
-template <uint32_t M, uint32_t K, uint32_t N, uint32_t baseM, uint32_t baseK, uint32_t baseN,
-          uint32_t singleCoreM, uint32_t singleCoreK, uint32_t singleCoreN,
-          uint32_t stepKa, uint32_t stepKb>
-class KernelMmad { ... };
+template <
+    uint32_t M, uint32_t K, uint32_t N, uint32_t baseM, uint32_t baseK, uint32_t baseN, uint32_t singleCoreM,
+    uint32_t singleCoreK, uint32_t singleCoreN, uint32_t stepKa, uint32_t stepKb>
+class KernelMmad {
+    ...
+};
 ```
 
 #### 8. UnitFlag Optimization
 
 After enabling UnitFlag, MMAD and FIXPIPE achieve fine-grained (512B) pipeline parallelism instead of instruction-level synchronization. Whenever Cube completes computation of one 512B data result, FIXPIPE immediately transfers that data, with Cube computation and result write-back pipeline overlapping:
 
-```cpp
-mmadParams.unitFlag = (kBlockIdx != kLoopCount - 1) ? 2 : 3;  // Enable UnitFlag
+```text
+mmadParams.unitFlag = (kBlockIdx != kLoopCount - 1) ? 2 : 3; // Enable UnitFlag
 ```
 
 - `unitFlag = 2`: Intermediate K block, MMAD computation result is not immediately written back, but waits for the next 512B completion before pipeline transfer
@@ -251,14 +256,16 @@ L2Cache is the shared external cache for AI Cores, with pure read bandwidth appr
 The specific L2Cache splitting implementation is consistent with Case 6 in the [high-level API Matmul example](../matmul_high_performance/README.md), with the core idea being to split the A matrix along the M axis to make the B matrix reside in L2Cache across rounds. This example implements a dual outer loop through the `ProcessL2Cache()` method, scheduling by `outerMIdx` rounds, with 24 cores computing their respective sub-blocks in parallel within each round:
 
 ```cpp
-// ProcessL2Cache: Split by M direction in rounds, each round 24 cores cover mIterPerRound M sub-blocks
+// ProcessL2Cache: Split by M direction in rounds, each round 24 cores cover
+// mIterPerRound M sub-blocks
 constexpr uint32_t mIterPerRound = AscendC::DivCeil(M, singleCoreM * 2);
 constexpr uint32_t outerMLoopCount = AscendC::DivCeil(mIterTotal, mIterPerRound);
 
 for (uint32_t outerMIdx = 0; outerMIdx < outerMLoopCount; outerMIdx++) {
     uint32_t mIterIdx = AscendC::GetBlockIdx() % mIterPerRound + outerMIdx * mIterPerRound;
     uint32_t nIterIdx = AscendC::GetBlockIdx() / mIterPerRound;
-    if (mIterIdx >= mIterTotal || nIterIdx >= nIterTotal) continue;
+    if (mIterIdx >= mIterTotal || nIterIdx >= nIterTotal)
+        continue;
     InitComputeParamsL2Cache(mIterIdx, nIterIdx);
     ProcessLoop(...);
 }
@@ -268,47 +275,59 @@ for (uint32_t outerMIdx = 0; outerMIdx < outerMLoopCount; outerMIdx++) {
 
 Using stepKa=8, stepKb=4 as example, showing the detailed K direction loop execution flow within one (mBlockIdx, nBlockIdx) sub-block:
 
-```
-Preprocessing:
-  SetFlag(MTE1_MTE2, 0/1/2/3)  // Preset reverse sync: L1 Ping/Pong all writable
-  SetFlag(M_MTE1, 0/1)         // Preset reverse sync: L0 Ping/Pong all writable
-  DataCopyIn(A1 Ping, k=0)     // Transfer first A large packet to Ping
-  DataCopyIn(B1 Ping, k=0)     // Transfer first B large packet to Ping
-  SetFlag(MTE2_MTE1, 0/2)      // Notify A1/B1 Ping data ready
+```text
+Preprocessing
+    : SetFlag(MTE1_MTE2,
+              0 / 1 / 2 / 3) // Preset reverse sync: L1 Ping/Pong all writable
+      SetFlag(M_MTE1, 0 / 1) // Preset reverse sync: L0 Ping/Pong all writable
+      DataCopyIn(A1 Ping, k = 0) // Transfer first A large packet to Ping
+      DataCopyIn(B1 Ping, k = 0) // Transfer first B large packet to Ping
+      SetFlag(MTE2_MTE1, 0 / 2)  // Notify A1/B1 Ping data ready
 
-K loop kBlockIdx = 0, 1, ..., kLoopCount-1:
-  ┌─ a1ReadIdx = (kBlockIdx / stepKa) % 2        // Current L1 A Ping/Pong read index
-  │  b1ReadIdx = (kBlockIdx / stepKb) % 2        // Current L1 B Ping/Pong read index
-  │  kOffsetInChunkA = kBlockIdx % stepKa        // Current baseK offset within A large packet
-  │  kOffsetInChunkB = kBlockIdx % stepKb        // Current baseK offset within B large packet
+      K loop kBlockIdx = 0,
+             1, ...,
+             kLoopCount - 1 :
+  ┌─ a1ReadIdx = (kBlockIdx / stepKa) % 2 // Current L1 A Ping/Pong read index
+  │ b1ReadIdx = (kBlockIdx / stepKb) % 2 // Current L1 B Ping/Pong read index
+  │ kOffsetInChunkA = kBlockIdx %
+                       stepKa // Current baseK offset within A large packet
+  │ kOffsetInChunkB = kBlockIdx %
+                       stepKb // Current baseK offset within B large packet
   │
-  │  WaitFlag(M_MTE1, mte1DBFlag)                // Wait for previous Compute to release L0
-  │  if (kOffsetInChunkA == 0)
-  │      WaitFlag(MTE2_MTE1, a1ReadIdx)          // Wait for L1 A large packet data ready (first element only)
-  │  if (kOffsetInChunkB == 0)
-  │      WaitFlag(MTE2_MTE1, b1ReadIdx + 2)      // Wait for L1 B large packet data ready (first element only)
+  │ WaitFlag(M_MTE1, mte1DBFlag) // Wait for previous Compute to release L0
+  │ if (kOffsetInChunkA == 0)
+  │ WaitFlag(MTE2_MTE1, a1ReadIdx)     // Wait for L1 A large packet data ready
+                                    // (first element only)
+  │ if (kOffsetInChunkB == 0)
+  │ WaitFlag(MTE2_MTE1, b1ReadIdx + 2) // Wait for L1 B large packet data ready
+                                        // (first element only)
   │
-  │  DataLoadA(A1 → A2)                          // L1 → L0
-  │  DataLoadB(B1 → B2)                          // L1 → L0
+  │ DataLoadA(A1 → A2) // L1 → L0
+  │ DataLoadB(B1 → B2) // L1 → L0
   │
-  │  if (kOffsetInChunkA + 1 == stepKa)
-  │      SetFlag(MTE1_MTE2, a1ReadIdx)           // A large packet last element: Notify L1 A writable
-  │  if (kOffsetInChunkB + 1 == stepKb)
-  │      SetFlag(MTE1_MTE2, b1ReadIdx + 2)       // B large packet last element: Notify L1 B writable
+  │ if (kOffsetInChunkA + 1 == stepKa)
+  │ SetFlag(MTE1_MTE2, a1ReadIdx) // A large packet last element: Notify L1 A
+                                   // writable
+  │ if (kOffsetInChunkB + 1 == stepKb)
+  │ SetFlag(MTE1_MTE2, b1ReadIdx + 2) // B large packet last element: Notify L1
+                                       // B writable
   │
-  │  Compute(Mmad)                               // Cube computation (M instruction)
-  │  SetFlag(M_MTE1, mte1DBFlag)                 // Notify L0 can be overwritten
-  │  mte1DBFlag ^= 1                             // Switch L0 Ping/Pong
+  │ Compute(Mmad) // Cube computation (M instruction)
+  │ SetFlag(M_MTE1, mte1DBFlag) // Notify L0 can be overwritten
+  │ mte1DBFlag
+             ^= 1 // Switch L0 Ping/Pong
   │
-  │  // DataCopyIn placed after Compute, B first then A
-  │  if (B large packet last element && more B data):
-  │      WaitFlag(MTE1_MTE2, b1WriteIdx + 2)     // Wait for L1 B buffer writable
-  │      DataCopyInB(next B large packet)         // GM → L1 (MTE2 instruction)
-  │      SetFlag(MTE2_MTE1, b1WriteIdx + 2)      // Notify L1 B data ready
-  │  if (A large packet last element && more A data):
-  │      WaitFlag(MTE1_MTE2, a1WriteIdx)         // Wait for L1 A buffer writable
-  │      DataCopyInA(next A large packet)         // GM → L1 (MTE2 instruction)
-  │      SetFlag(MTE2_MTE1, a1WriteIdx)          // Notify L1 A data ready
+  │ // DataCopyIn placed after Compute, B first then A
+  │ if (B large packet last element && more B data)
+    :
+  │ WaitFlag(MTE1_MTE2, b1WriteIdx + 2) // Wait for L1 B buffer writable
+  │ DataCopyInB(next B large packet) // GM → L1 (MTE2 instruction)
+  │ SetFlag(MTE2_MTE1, b1WriteIdx + 2) // Notify L1 B data ready
+  │ if (A large packet last element && more A data)
+    :
+  │ WaitFlag(MTE1_MTE2, a1WriteIdx) // Wait for L1 A buffer writable
+  │ DataCopyInA(next A large packet) // GM → L1 (MTE2 instruction)
+  │ SetFlag(MTE2_MTE1, a1WriteIdx) // Notify L1 A data ready
   └─
 ```
 
@@ -452,7 +471,7 @@ For operators developed based on operator projects, this interface can be used t
 Call the DumpTensor interface in the operator kernel implementation code where Tensor data needs to be printed. Example:
 
 ```cpp
-AscendC::DumpTensor(cLocal, baseM * baseN);
+AscendC::DumpTensor(cLocal, baseM* baseN);
 ```
 
 > **Notice** The DumpTensor interface printing functionality will impact actual operator running performance and is typically used during the debugging phase. Developers can disable printing by setting ASCENDC\_DUMP=0 as needed.
@@ -468,7 +487,7 @@ msprof ./demo   # Analyze example performance
 ```
 
 A PROF_ prefixed folder is generated in the current directory. The `mindstudio_profiler_output` directory stores Host and Device performance data summaries. Performance data analysis is recommended to view files in this directory:
-```bash
+```text
 PROF_xxxx_XXXXXX
 ├── device_{id}
 └── host

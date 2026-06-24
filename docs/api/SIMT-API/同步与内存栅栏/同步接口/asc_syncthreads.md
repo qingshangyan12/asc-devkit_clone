@@ -46,7 +46,7 @@ asc\_syncthreads接口的执行流程示意图如下：
 
 ## 函数原型
 
-```
+```cpp
 inline void asc_syncthreads()
 ```
 
@@ -69,7 +69,7 @@ inline void asc_syncthreads()
 
 使用该接口需要包含"simt\_api/device\_sync\_functions.h"头文件。
 
-```
+```cpp
 #include "simt_api/device_sync_functions.h"
 ```
 
@@ -79,54 +79,54 @@ inline void asc_syncthreads()
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     __global__ __launch_bounds__(1024) void KernelSyncThreads(float* dst, int count)
     {
-         int idx = threadIdx.x;
-         if (idx > 0 && idx < count) {
-             dst[idx] = 1;
-         }
+        int idx = threadIdx.x;
+        if (idx > 0 && idx < count) {
+            dst[idx] = 1;
+        }
 
-         // 等待block内所有thread都执行到当前代码
-         asc_syncthreads();
+        // 等待block内所有thread都执行到当前代码
+        asc_syncthreads();
 
-         if (idx == 0) {
-             dst[0] = 0;
-             for(int i = 1023; i > 0; i--) {
-                 dst[0] += dst[i];
-             }
-         }
+        if (idx == 0) {
+            dst[0] = 0;
+            for (int i = 1023; i > 0; i--) {
+                dst[0] += dst[i];
+            }
+        }
     }
     ```
 
-    ```
+    ```text
     输出结果:
     [1023, 1, 1, 1 …]
     ```
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void KernelSyncThreads(__gm__ float* dst, int count)
     {
-         int idx = threadIdx.x;
-         if (idx > 0 && idx < count) {
-             dst[idx] = 1;
-         }
+        int idx = threadIdx.x;
+        if (idx > 0 && idx < count) {
+            dst[idx] = 1;
+        }
 
-         // 等待block内所有thread都执行到当前代码
-         asc_syncthreads();
+        // 等待block内所有thread都执行到当前代码
+        asc_syncthreads();
 
-         if (idx == 0) {
-             dst[0] = 0;
-             for(int i = 1023; i > 0; i--) {
-                 dst[0] += dst[i];
-             }
-         }
+        if (idx == 0) {
+            dst[0] = 0;
+            for (int i = 1023; i > 0; i--) {
+                dst[0] += dst[i];
+            }
+        }
     }
     ```
 
-    ```
+    ```text
     输出结果:
     [1023, 1, 1, 1 …]
     ```

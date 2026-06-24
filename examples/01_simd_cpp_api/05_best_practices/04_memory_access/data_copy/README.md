@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── data_copy
 │   ├── scripts
 │   │   └── gen_data.py        // 输入数据生成脚本
@@ -443,14 +443,14 @@ for (uint32_t mBlockIdx = 0; mBlockIdx < fullMBlockCount; mBlockIdx++) {
 
   使用 `msprof` 工具获取详细性能数据：
 
-  ```bash
+  ```text
   msprof ./demo
   msprof --ai-core=on --aic-metrics=L2Cache ./demo    # L2Cache 相关场景使用
   ```
 
   采集后会在当前目录生成 `PROF_` 前缀目录，性能汇总文件位于 `mindstudio_profiler_output` 目录下。
 
-  ```txt
+  ```text
   PROF_xxxx_XXXXXX
   ├── device_{id}
   ├── host

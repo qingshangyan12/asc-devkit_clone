@@ -53,9 +53,9 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T>
-__aicore__ inline T AtomicCas(__gm__ T *address, T value1, T value2)
+__aicore__ inline T AtomicCas(__gm__ T* address, T value1, T value2)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -118,14 +118,14 @@ GM地址上做原子操作前的数据。
 
 更多样例请参见[ScalarAtomicOperations样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/06_atomic/scalar_atomic_operations)。
 
-```
+```cpp
 // 传入全局数据地址，初始化dstGlobal与dstLocal
-dstGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T *>(dstGm), dataSize);
+dstGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(dstGm), dataSize);
 
 LocalTensor<T> dstLocal = inQueueX.AllocTensor<T>();
 uint32_t value1 = 1;
 uint32_t value2 = 2;
-uint32_t a = AscendC::AtomicCas(reinterpret_cast<__gm__ uint32_t *>(dstGm), value1, value2);
+uint32_t a = AscendC::AtomicCas(reinterpret_cast<__gm__ uint32_t*>(dstGm), value1, value2);
 // 先执行完原子操作之后才能进行搬运操作，有数据依赖
 event_t eventIdSToMte2 = static_cast<event_t>(GetTPipePtr()->AllocEventID<HardEvent::S_MTE2>());
 // 手动插入MTE2等待Scalar的同步
@@ -137,7 +137,7 @@ DataCopy(dstLocal, dstGlobal, dataSize);
 
 假设上述函数在3个核上执行，核1、核2、核3依次调度，结果示例如下：
 
-```
+```text
 原GM数据dst: [1,1,1,1,1,...,1] 
 核1：
 原子计算后GM数据dst: [2,1,1,1,1,...,1] 

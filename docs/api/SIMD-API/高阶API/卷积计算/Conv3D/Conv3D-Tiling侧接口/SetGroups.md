@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 void SetGroups(int64_t groups)
 ```
 
@@ -26,7 +26,7 @@ void SetGroups(int64_t groups)
 
 ## 调用示例
 
-```
+```cpp
 // 实例化Conv3D Api
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 Conv3dTilingApi::Conv3dTiling conv3dApiTiling(ascendcPlatform);

@@ -22,15 +22,15 @@
 
 ## 函数原型
 
-```
+```cpp
 void GetLogTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
 ```
 
-```
+```cpp
 void GetLog2TmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
 ```
 
-```
+```cpp
 void GetLog10TmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
 ```
 
@@ -57,7 +57,7 @@ void GetLog10TmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeC
 
 完整的调用样例请参考[更多样例](../更多样例-83.md)。
 
-```
+```cpp
 uint32_t maxLiveNodeCount = 0;
 uint32_t extraBuf = 0;
 uint32_t typeSize = sizeof(half);

@@ -19,7 +19,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void DisableBias()
 ```
 
@@ -37,7 +37,7 @@ __aicore__ inline void DisableBias()
 
 ## 调用示例
 
-```
+```text
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
 mm.SetTensorA(gm_a);
 mm.SetTensorB(gm_b);

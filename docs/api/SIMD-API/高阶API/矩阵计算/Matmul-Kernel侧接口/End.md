@@ -22,7 +22,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void End()
 ```
 
@@ -40,7 +40,7 @@ __aicore__ inline void End()
 
 ## 调用示例
 
-```
+```text
 mm1.IterateAll(gm_c1);
 mm1.End();
 mm2.IterateAll(gm_c2);

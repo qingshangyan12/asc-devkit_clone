@@ -20,9 +20,10 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename T, bool isReuseSource = false>
-__aicore__ inline void Swish(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, uint32_t dataSize, const T scalarValue)
+__aicore__ inline void Swish(
+    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, uint32_t dataSize, const T scalarValue)
 ```
 
 ## 参数说明
@@ -55,7 +56,7 @@ __aicore__ inline void Swish(const LocalTensor<T>& dstLocal, const LocalTensor<T
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放Swish计算结果的Tensor
 // srcLocal：存放Swish计算的输入Tensor
 // scalarValue: 激活函数中的β参数
@@ -66,7 +67,7 @@ AscendC::Swish(dstLocal, srcLocal, 32, -1.702);
 
 结果示例如下：
 
-```
+```text
 输入数据(srcLocal):
 [-4.         -3.7419355  -3.483871   -3.2258065  -2.967742   -2.7096775  -2.451613   -2.1935484
  -1.9354838  -1.6774193  -1.4193548  -1.1612903  -0.9032258  -0.6451613  -0.38709676 -0.12903225

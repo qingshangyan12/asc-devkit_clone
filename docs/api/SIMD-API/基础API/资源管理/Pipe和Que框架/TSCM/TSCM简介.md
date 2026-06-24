@@ -2,7 +2,7 @@
 
 Vector和Cube之间通过队列（Queue）完成任务间通信和同步。TSCM是数据通路的目的地在TSCM Position时，用来管理执行队列相关操作、相关资源的数据结构。TSCM与TQueBind，TQue属于相同类型结构。TSCM定义如下：
 
-```
+```cpp
 template <TPosition pos, int32_t depth, auto mask = 0>
 using TSCM = TQueBind<pos, TPosition::TSCM, depth, mask>;
 ```
@@ -73,12 +73,12 @@ que.FreeTensor(a2);</pre>
 
 如下是一个简单的使用示例：
 
-```
+```cpp
 TSCM<TPosition::VECIN, 1> tscm;
 for () {
     auto scmTensor = tscm.AllocTensor<float>(); // 在搬运数据从UB->TSCM前分配Buffer
-    DataCopy(scmTensor, ubLocal, 1024); // 将UB数据搬运至TSCM，准备用于Matmul计算
-    tscm.EnQue(scmTensor); //搬运完成在Matmul计算前，EnQue/DeQue
+    DataCopy(scmTensor, ubLocal, 1024);         // 将UB数据搬运至TSCM，准备用于Matmul计算
+    tscm.EnQue(scmTensor);                      // 搬运完成在Matmul计算前，EnQue/DeQue
     LocalTensor<float> scmLocal = tscm.DeQue<float>();
     mm.SetTensorA(scmLocal);
     mm.SetTensorB(gm_b);
@@ -89,7 +89,7 @@ for () {
 
 与高阶API Matmul配合使用，调用示例如下：
 
-```
+```json
 {
     typedef matmul::MatmulType<AscendC::TPosition::TSCM, CubeFormat::NZ, half, true, LayoutMode::NONE, false, AscendC::TPosition::VECIN> A_TYPE;
     typedef matmul::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> B_TYPE;

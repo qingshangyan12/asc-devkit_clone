@@ -14,29 +14,39 @@
 
 - 前n个数据搬运
     ```cpp
-    __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint32_t size)
-    __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ bfloat16_t* src, uint32_t size)
-    __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ half* src, uint32_t size)
-    __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ float* src, uint32_t size)
-    __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ int32_t* src, uint32_t size)
+    __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint32_t size) __aicore__
+        inline void asc_copy_l12bt(uint64_t dst, __cbuf__ bfloat16_t* src, uint32_t size) __aicore__
+        inline void asc_copy_l12bt(uint64_t dst, __cbuf__ half* src, uint32_t size) __aicore__
+        inline void asc_copy_l12bt(uint64_t dst, __cbuf__ float* src, uint32_t size) __aicore__
+        inline void asc_copy_l12bt(uint64_t dst, __cbuf__ int32_t* src, uint32_t size)
     ```
 
 - 高维切分搬运
     ```cpp
-    __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap)
-    __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ bfloat16_t* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap)
-    __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ half* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap)
-    __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ float* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap)
-    __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ int32_t* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap)
+    __aicore__ inline void asc_copy_l12bt(
+        uint64_t dst, __cbuf__ void* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst, uint16_t source_gap,
+        uint16_t dst_gap) __aicore__
+        inline void asc_copy_l12bt(
+            uint64_t dst, __cbuf__ bfloat16_t* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst,
+            uint16_t source_gap, uint16_t dst_gap) __aicore__
+        inline void asc_copy_l12bt(
+            uint64_t dst, __cbuf__ half* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst,
+            uint16_t source_gap, uint16_t dst_gap) __aicore__
+        inline void asc_copy_l12bt(
+            uint64_t dst, __cbuf__ float* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst,
+            uint16_t source_gap, uint16_t dst_gap) __aicore__
+        inline void asc_copy_l12bt(
+            uint64_t dst, __cbuf__ int32_t* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst,
+            uint16_t source_gap, uint16_t dst_gap)
     ```
 
 - 同步搬运
     ```cpp
-    __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void* src, uint32_t size)
-    __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ bfloat16_t* src, uint32_t size)
-    __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ half* src, uint32_t size)
-    __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ float* src, uint32_t size)
-    __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ int32_t* src, uint32_t size)
+    __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void* src, uint32_t size) __aicore__
+        inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ bfloat16_t* src, uint32_t size) __aicore__
+        inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ half* src, uint32_t size) __aicore__
+        inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ float* src, uint32_t size) __aicore__
+        inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ int32_t* src, uint32_t size)
     ```
 
 ## 参数说明

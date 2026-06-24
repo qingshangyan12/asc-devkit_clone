@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T>
 __aicore__ inline LocalTensor<T> DeQue()
 ```

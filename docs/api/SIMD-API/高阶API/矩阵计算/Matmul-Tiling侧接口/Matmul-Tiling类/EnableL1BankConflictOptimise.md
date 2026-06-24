@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 bool EnableL1BankConflictOptimise()
 ```
 
@@ -25,7 +25,7 @@ bool EnableL1BankConflictOptimise()
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MatmulApiTiling tiling(ascendcPlatform);
 tiling.SetAType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT16);

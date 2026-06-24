@@ -6,8 +6,8 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001626209309_zh-cn_topic_0000001526442954_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
-OpAICoreDef &SetOpSpecInfo(optiling::OP_CHECK_FUNC func)
+```cpp
+OpAICoreDef& SetOpSpecInfo(optiling::OP_CHECK_FUNC func)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001626209309_zh-cn_topic_0000001526442954_zh-cn_topic_0000001525424352_section75395119104"></a>

@@ -128,8 +128,11 @@ TQueBind&lt;TPosition::VECOUT, TPosition::C1, 1&gt;</pre>
 
 ## 模板参数<a name="section64347108319"></a>
 
-```
-template <TPosition src, TPosition dst, int32_t depth, auto mask = 0> class TQueBind {...};
+```cpp
+template <TPosition src, TPosition dst, int32_t depth, auto mask = 0>
+class TQueBind {
+    ...
+};
 ```
 
 **表2**  模板参数说明

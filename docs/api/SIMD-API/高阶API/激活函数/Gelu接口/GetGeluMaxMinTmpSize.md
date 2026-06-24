@@ -11,19 +11,19 @@ kernel侧Gelu、FasterGelu、FasterGeluV2接口的计算需要开发者预留/�
 
 -   获取Kernel接口计算所需最大临时空间大小的接口
 
-    ```
+    ```cpp
     uint32_t GetGeluMaxTmpSize(const ge::Shape& srcShape, const uint32_t typeSize)
     ```
 
 -   获取Kernel接口计算所需最小临时空间大小
 
-    ```
+    ```cpp
     uint32_t GetGeluMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize)
     ```
 
 -   获取Kernel接口计算所需最大/最小临时空间的接口
 
-    ```
+    ```cpp
     void GetGeluMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue)
     ```
 
@@ -52,7 +52,7 @@ kernel侧Gelu、FasterGelu、FasterGeluV2接口的计算需要开发者预留/�
 
 ## 调用示例
 
-```
+```cpp
 // 输入shape信息为1024;算子输入的数据类型为half;
 std::vector<int64_t> shape_vec = {1024};
 ge::Shape srcShape(shape_vec);

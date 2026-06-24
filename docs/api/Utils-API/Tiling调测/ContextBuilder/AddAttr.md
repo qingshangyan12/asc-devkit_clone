@@ -6,16 +6,17 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001820490268_zh-cn_topic_0000001389787297_section13230182415108"></a>
 
-```
-ContextBuilder &AddAttr(const std::string& attrName, int64_t attrValue)
-ContextBuilder &AddAttr(const std::string& attrName, bool attrValue)
-ContextBuilder &AddAttr(const std::string& attrName, const std::string& attrValue)
-ContextBuilder &AddAttr(const std::string& attrName, float attrValue)
-ContextBuilder &AddAttr(const std::string& attrName, const std::vector<float>& attrValue)
-ContextBuilder &AddAttr(const std::string& attrName, const std::vector<bool>& attrValue)
-ContextBuilder &AddAttr(const std::string& attrName, const std::vector<int64_t>& attrValue)
-ContextBuilder &AddAttr(const std::string& attrName, const std::vector<std::string>& attrValue)
-ContextBuilder &AddAttr(const std::string& attrName, const std::vector<std::vector<int64_t>>& attrValue)
+```cpp
+ContextBuilder& AddAttr(const std::string& attrName, int64_t attrValue) ContextBuilder& AddAttr(
+    const std::string& attrName,
+    bool attrValue) ContextBuilder& AddAttr(const std::string& attrName, const std::string& attrValue)
+    ContextBuilder& AddAttr(const std::string& attrName, float attrValue)
+        ContextBuilder& AddAttr(const std::string& attrName, const std::vector<float>& attrValue)
+            ContextBuilder& AddAttr(const std::string& attrName, const std::vector<bool>& attrValue)
+                ContextBuilder& AddAttr(const std::string& attrName, const std::vector<int64_t>& attrValue)
+                    ContextBuilder& AddAttr(const std::string& attrName, const std::vector<std::string>& attrValue)
+                        ContextBuilder& AddAttr(
+                            const std::string& attrName, const std::vector<std::vector<int64_t>>& attrValue)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001820490268_zh-cn_topic_0000001389787297_section75395119104"></a>
@@ -57,10 +58,9 @@ AddAttr不支持重复添加同名的属性
 
 ## 调用示例<a name="zh-cn_topic_0000001820490268_zh-cn_topic_0000001389787297_section320753512363"></a>
 
-```
+```cpp
 context_ascendc::ContextBuilder builder;
-auto builder
-    .NodeIoNum(1,1)
+auto builder.NodeIoNum(1, 1)
     .IrInstanceNum({1})
     .AddAttr("attr_1", 1)
     .AddAttr("attr_2", true)

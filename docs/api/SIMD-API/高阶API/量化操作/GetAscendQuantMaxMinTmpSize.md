@@ -9,8 +9,9 @@ kernel侧AscendQuant接口的计算需要开发者预留/申请临时空间，�
 
 ## 函数原型
 
-```
-void GetAscendQuantMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue)
+```cpp
+void GetAscendQuantMaxMinTmpSize(
+    const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -34,7 +35,7 @@ void GetAscendQuantMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeS
 
 ## 调用示例
 
-```
+```cpp
 // 输入shape信息为1024;算子输入的数据类型为half;
 std::vector<int64_t> shape_vec = {1024};
 ge::Shape srcShape(shape_vec);

@@ -65,18 +65,18 @@
 
 -   为TQue等队列分配内存
 
-    ```
+    ```cpp
     template <class T>
     __aicore__ inline bool InitBuffer(T& que, uint8_t num, uint32_t len)
-    
-    // 为TQue等队列分配内存，且开发者可以自定义内存的地址信息，地址信息包含起始地址和长度。
-    template <class T, class U, class V, class... Addrs>
-    __aicore__ inline bool InitBuffer(T& que, const Std::tuple<U, V>& addr0, const Addrs&... addrs)
+
+        // 为TQue等队列分配内存，且开发者可以自定义内存的地址信息，地址信息包含起始地址和长度。
+        template <class T, class U, class V, class... Addrs>
+        __aicore__ inline bool InitBuffer(T& que, const Std::tuple<U, V>& addr0, const Addrs&... addrs)
     ```
 
 -   为TBuf分配内存
 
-    ```
+    ```cpp
     template <TPosition bufPos>
     __aicore__ inline bool InitBuffer(TBuf<bufPos>& buf, uint32_t len)
     ```
@@ -260,16 +260,16 @@
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 // 为TQue分配内存，分配内存块数为2，每块大小为128字节
-AscendC::TPipe pipe; // Pipe内存管理对象
+AscendC::TPipe pipe;                              // Pipe内存管理对象
 AscendC::TQue<AscendC::TPosition::VECOUT, 2> que; // 输出数据队列管理对象，TPosition为VECOUT
 uint8_t num = 2;
 uint32_t len = 128;
 pipe.InitBuffer(que, num, len);
 
 // 为TQue分配内存，开发者自定义内存的地址信息，分别为[0, 1024], [2048, 4096], [8192, 12288]
-AscendC::TPipe pipe; // Pipe内存管理对象
+AscendC::TPipe pipe;                              // Pipe内存管理对象
 AscendC::TQue<AscendC::TPosition::VECOUT, 1> que; // 输出数据队列管理对象，TPosition为VECOUT
 auto addr0 = Std::make_tuple(0, 1024);
 auto addr1 = Std::make_tuple(2048, 2048);

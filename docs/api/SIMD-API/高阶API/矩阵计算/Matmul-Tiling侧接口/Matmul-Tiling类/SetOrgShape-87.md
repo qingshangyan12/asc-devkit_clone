@@ -6,11 +6,11 @@
 
 ## 函数原型
 
-```
+```cpp
 int32_t SetOrgShape(int32_t orgMIn, int32_t orgNIn, int32_t orgKIn)
 ```
 
-```
+```cpp
 int32_t SetOrgShape(int32_t orgMIn, int32_t orgNIn, int32_t orgKaIn, int32_t orgKbIn)
 ```
 
@@ -36,7 +36,7 @@ int32_t SetOrgShape(int32_t orgMIn, int32_t orgNIn, int32_t orgKaIn, int32_t org
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MatmulApiTiling tiling(ascendcPlatform);
 

@@ -6,22 +6,22 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001872423361_zh-cn_topic_0000001441184464_section620mcpsimp"></a>
 
-```
+```cpp
 struct KernelRunContextHolder {
     KernelRunContextHolder();
     ~KernelRunContextHolder();
-    template<typename T>
-    T *GetContext() const
+    template <typename T>
+    T* GetContext() const
     {
         return reinterpret_cast<T*>(context);
     }
-    gert::ComputeNodeInfo *MutableComputeNodeInfo()
+    gert::ComputeNodeInfo* MutableComputeNodeInfo()
     {
-        return reinterpret_cast<gert::ComputeNodeInfo *>(computeNodeExtendHolder.get());
+        return reinterpret_cast<gert::ComputeNodeInfo*>(computeNodeExtendHolder.get());
     }
     std::unique_ptr<ValueHolderImpl> valueHolder;
     std::unique_ptr<uint8_t[]> computeNodeExtendHolder;
-    KernelRunContext *context {nullptr};
+    KernelRunContext* context{nullptr};
 };
 ```
 
@@ -88,7 +88,7 @@ struct KernelRunContextHolder {
 
 ## 调用示例<a name="zh-cn_topic_0000001872423361_zh-cn_topic_0000001441184464_section642mcpsimp"></a>
 
-```
+```cpp
 auto holder = context_ascendc::ContextBuilder().Inputs().Outputs().BuildKernelRunContext();
 if (holder != nullptr) {
     gert::KernelContext* tilingParseContext = holder->GetContext<gert::KernelContext>();

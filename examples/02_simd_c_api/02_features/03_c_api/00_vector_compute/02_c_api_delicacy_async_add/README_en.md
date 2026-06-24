@@ -7,7 +7,7 @@ This example demonstrates the Add operator using C_API interfaces, implemented b
 - Atlas A2 Training Series Products/Atlas A2 Inference Series Products
 
 ## Directory Structure
-```
+```text
 ├── 02_c_api_delicacy_async_add
 │   ├── CMakeLists.txt      // Build project file
 │   ├── README.md           // Documentation
@@ -17,7 +17,7 @@ This example demonstrates the Add operator using C_API interfaces, implemented b
 ## Operator Description
 - Operator Function:  
   The Add operator adds two data inputs and returns the sum. The corresponding mathematical expression is:  
-  ```
+  ```text
   z = x + y
   ```
 - Operator Specifications:

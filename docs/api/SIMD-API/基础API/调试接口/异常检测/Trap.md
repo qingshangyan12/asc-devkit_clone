@@ -87,8 +87,8 @@ __aicore__ inline void Trap()
 AscendC::LocalTensor<half> src0Local;
 AscendC::LocalTensor<half> src1Local;
 AscendC::LocalTensor<half> dstLocal;
-constexpr int32_t count = 512;    // 参与计算的元素个数。
-if (src1Local[0] == 0) {    // 如果src1Local[0]为0，则程序终止。
+constexpr int32_t count = 512; // 参与计算的元素个数。
+if (src1Local[0] == 0) {       // 如果src1Local[0]为0，则程序终止。
     AscendC::Trap();
 } else {
     AscendC::Divs(dstLocal, src0Local, src1Local[0], count);

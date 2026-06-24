@@ -9,8 +9,9 @@ kernel侧AscendDequant接口的计算需要开发者预留/申请临时空间，
 
 ## 函数原型
 
-```
-void GetAscendDequantMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue)
+```cpp
+void GetAscendDequantMaxMinTmpSize(
+    const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -34,7 +35,7 @@ void GetAscendDequantMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typ
 
 ## 调用示例
 
-```
+```cpp
 // 输入shape信息为(2,1024)
 // AscendDequant接口中传入的dequantParams中m = 2, n = 1024;算子输入的数据类型为int32_t
 std::vector<int64_t> shape_vec = {2, 1024};

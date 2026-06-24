@@ -22,7 +22,7 @@
 
 ## 函数原型
 
-```
+```cpp
 void GetSinhTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
 ```
 
@@ -48,7 +48,7 @@ void GetSinhTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCo
 
 完整的调用样例请参考[更多样例](../更多样例-83.md)。
 
-```
+```cpp
 uint32_t maxLiveNodeCount = 0;
 uint32_t extraBuf = 0;
 AscendC::GetSinhTmpBufferFactorSize(typeSize, maxLiveNodeCount, extraBuf);

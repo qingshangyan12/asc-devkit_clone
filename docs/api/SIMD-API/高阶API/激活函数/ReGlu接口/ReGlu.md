@@ -30,16 +30,20 @@ ReGlu是一种GLU变体，使用Relu作为激活函数，计算公式如下：
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isReuseSource = false>
-    __aicore__ inline void ReGlu(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+    __aicore__ inline void ReGlu(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1,
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
     ```
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isReuseSource = false>
-    __aicore__ inline void ReGlu(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1, const uint32_t calCount)
+    __aicore__ inline void ReGlu(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1,
+        const uint32_t calCount)
     ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者**通过sharedTmpBuffer入参传入**和**接口框架申请**两种方式。
@@ -98,7 +102,7 @@ ReGlu是一种GLU变体，使用Relu作为激活函数，计算公式如下：
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放ReGlu计算结果的Tensor
 // src0Local: 存放ReGlu计算输入的Tensor
 // src1Local: 存放ReGlu计算输入的Tensor
@@ -113,7 +117,7 @@ AscendC::ReGlu(dstLocal, srcLocal, sharedTmpBuffer, 30);
 
 结果示例如下：
 
-```
+```text
 输入数据(srcLocal0):
 [2. 2. 2. 2. 2. 2. 2. 2. 2. 2. 2. 2. 2. 2. 2. 2.
  2. 2. 2. 2. 2. 2. 2. 2. 2. 2. 2. 2. 2. 2. 2. 2.]

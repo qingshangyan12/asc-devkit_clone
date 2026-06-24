@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001664705472_zh-cn_topic_0000001442758437_section13230182415108"></a>
 
-```
+```cpp
 uint32_t GetVecRegLen(void) const
 ```
 
@@ -25,14 +25,13 @@ uint32_t GetVecRegLen(void) const
 
 ## 调用示例<a name="zh-cn_topic_0000001664705472_zh-cn_topic_0000001442758437_section320753512363"></a>
 
-```
+```cpp
 void GetLayerNormMaxMinTmpSize(...)
 {
-       platform_ascendc::PlatformAscendC* platform = platform_ascendc::PlatformAscendCManager::GetInstance();
-        ...
-        const uint32_t vecLenB32 = platform->GetVecRegLen() / LAYERNORM_SIZEOF_FLOAT;
-        const uint32_t vecLenB16 = platform->GetVecRegLen() / LAYERNORM_SIZEOF_HALF;
-        ...
+    platform_ascendc::PlatformAscendC* platform = platform_ascendc::PlatformAscendCManager::GetInstance();
+    ... const uint32_t vecLenB32 = platform->GetVecRegLen() / LAYERNORM_SIZEOF_FLOAT;
+    const uint32_t vecLenB16 = platform->GetVecRegLen() / LAYERNORM_SIZEOF_HALF;
+    ...
 }
 ```
 

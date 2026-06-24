@@ -30,9 +30,10 @@
 
 ## 函数原型
 
-```
+```cpp
 template <const BitwiseAndConfig& config = DEFAULT_BITWISE_AND_CONFIG, typename T>
-__aicore__ inline void BitwiseAnd(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const uint32_t count)
+__aicore__ inline void BitwiseAnd(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const uint32_t count)
 ```
 
 ## 参数说明
@@ -44,7 +45,7 @@ __aicore__ inline void BitwiseAnd(const LocalTensor<T>& dst, const LocalTensor<T
 | config | BitwiseAnd算法的相关配置。此参数可选配，BitwiseAndConfig类型，具体定义如下方代码所示，其中参数的含义为：<br><br>isReuseSource：该参数预留，传入默认值false即可。 |
 | T | 操作数的数据类型。支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。 |
 
-```
+```cpp
 struct BitwiseAndConfig {
     bool isReuseSource;
 };
@@ -69,7 +70,7 @@ struct BitwiseAndConfig {
 
 ## 调用示例
 
-```
+```cpp
 AscendC::LocalTensor<uint16_t> dst, src0, src1;
 uint32_t count = 512; // 参与计算的元素个数
 AscendC::BitwiseAnd(dst, src0, src1, count);
@@ -77,7 +78,7 @@ AscendC::BitwiseAnd(dst, src0, src1, count);
 
 结果示例如下：
 
-```
+```text
 输入数据（src0）:
 [93, 87, 99, 1, 87, 58, 6, 16, 85, 66, 56, 65, 24, 98, 96, 50, 18, 37, 0, ... 66]
 输入数据（src1):

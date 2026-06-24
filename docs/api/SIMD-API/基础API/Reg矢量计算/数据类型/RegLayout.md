@@ -1,13 +1,7 @@
 # RegLayout<a name="ZH-CN_TOPIC_0000002523863827"></a>
 
-```
-enum class RegLayout {
-    UNKNOWN = -1,
-    ZERO,
-    ONE,
-    TWO,
-    THREE
-};
+```cpp
+enum class RegLayout { UNKNOWN = -1, ZERO, ONE, TWO, THREE };
 ```
 
 源操作数与目的操作数类型位宽不同时，可以分为四种情况，用户可以根据实际场景选择对应的RegLayout，其中，mask的有效情况均以输入数据位宽为准。

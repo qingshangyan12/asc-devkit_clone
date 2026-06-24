@@ -6,8 +6,8 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001549507404_zh-cn_topic_0000001576872201_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
-OpDef &SetInferShapeRange(gert::OpImplRegisterV2::InferShapeRangeKernelFunc func)
+```cpp
+OpDef& SetInferShapeRange(gert::OpImplRegisterV2::InferShapeRangeKernelFunc func)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001549507404_zh-cn_topic_0000001576872201_zh-cn_topic_0000001525424352_section75395119104"></a>

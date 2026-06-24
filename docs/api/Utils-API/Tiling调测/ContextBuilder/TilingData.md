@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001820650068_zh-cn_topic_0000001389787297_section13230182415108"></a>
 
-```
+```text
 ContextBuilder &TilingData(void *tilingData)
 ```
 
@@ -41,13 +41,10 @@ ContextBuilder &TilingData(void *tilingData)
 
 ## 调用示例<a name="zh-cn_topic_0000001820650068_zh-cn_topic_0000001389787297_section320753512363"></a>
 
-```
-void AddTilingData(void *tilingData)
+```cpp
+void AddTilingData(void* tilingData)
 {
-    ......
-    auto kernelContextHolder = context_ascendc::ContextBuilder()
-                                    .TilingData(tilingData)
-                                    .BuildTilingContext();
+    ...... auto kernelContextHolder = context_ascendc::ContextBuilder().TilingData(tilingData).BuildTilingContext();
     ......
 }
 ```

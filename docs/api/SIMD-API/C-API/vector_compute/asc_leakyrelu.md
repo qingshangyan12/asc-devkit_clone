@@ -23,22 +23,26 @@ $$
 - 前n个数据计算
 
     ```c++
-    __aicore__ inline void asc_leakyrelu(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
-    __aicore__ inline void asc_leakyrelu(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
+    __aicore__ inline void asc_leakyrelu(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count) __aicore__
+        inline void asc_leakyrelu(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
     ```
 
 - 高维切分计算
 
     ```cpp
-    __aicore__ inline void asc_leakyrelu(__ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-    __aicore__ inline void asc_leakyrelu(__ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride) 
+    __aicore__ inline void asc_leakyrelu(
+        __ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride,
+        uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride) __aicore__
+        inline void asc_leakyrelu(
+            __ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride,
+            uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
 - 同步计算
 
     ```cpp
-    __aicore__ inline void asc_leakyrelu_sync(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
-    __aicore__ inline void asc_leakyrelu_sync(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
+    __aicore__ inline void asc_leakyrelu_sync(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count) __aicore__
+        inline void asc_leakyrelu_sync(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
     ```
 
 ## 参数说明
@@ -73,7 +77,7 @@ PIPE_V
 ## 调用示例
 
 ```c++
-//total_length指参与计算的数据长度
+// total_length指参与计算的数据长度
 constexpr uint64_t total_length = 64;
 half alpha = 0.1;
 __ubuf__ half src[total_length];

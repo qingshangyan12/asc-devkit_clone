@@ -30,7 +30,7 @@
 
 ## 函数原型
 
-```
+```text
 inline float cyl_bessel_i0f(float x)
 ```
 
@@ -60,7 +60,7 @@ inline float cyl_bessel_i0f(float x)
 
 使用该接口需要包含"simt\_api/math\_functions.h"头文件。
 
-```
+```cpp
 #include "simt_api/math_functions.h"
 ```
 
@@ -68,8 +68,8 @@ inline float cyl_bessel_i0f(float x)
 
 - SIMT编程场景：
 
-    ```
-    __global__ __launch_bounds__(256) void compute_cyl_bessel_i0f(float *result, const float *x, uint32_t count)
+    ```cpp
+    __global__ __launch_bounds__(256) void compute_cyl_bessel_i0f(float* result, const float* x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= count) {
@@ -81,8 +81,9 @@ inline float cyl_bessel_i0f(float x)
 
 - SIMD与SIMT混合编程场景：
 
-    ```
-    __simt_vf__ __launch_bounds__(256) inline void compute_cyl_bessel_i0f_vf(__gm__ float *result, __gm__ const float *x, uint32_t count)
+    ```cpp
+    __simt_vf__ __launch_bounds__(256) inline void compute_cyl_bessel_i0f_vf(
+        __gm__ float* result, __gm__ const float* x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= count) {
@@ -91,7 +92,7 @@ inline float cyl_bessel_i0f(float x)
         result[idx] = cyl_bessel_i0f(x[idx]);
     }
 
-    __global__ __vector__ void run_cyl_bessel_i0f(__gm__ float *result, __gm__ const float *x, uint32_t count)
+    __global__ __vector__ void run_cyl_bessel_i0f(__gm__ float* result, __gm__ const float* x, uint32_t count)
     {
         asc_vf_call<compute_cyl_bessel_i0f_vf>(dim3(256), result, x, count);
     }
@@ -99,7 +100,7 @@ inline float cyl_bessel_i0f(float x)
 
 输入输出示例如下：
 
-```
+```text
 x：0.25, 0.75, 1.25, 1.75
 result: 1.015686 1.145647 1.430469 1.925252
 ```

@@ -6,8 +6,11 @@
 
 ## 模板参数<a name="section18341144185913"></a>
 
-```
-template <TPosition pos, int32_t depth, auto mask = 0> class TQue{...};
+```cpp
+template <TPosition pos, int32_t depth, auto mask = 0>
+class TQue {
+    ...
+};
 ```
 
 **表1**  TQue模板参数介绍
@@ -92,8 +95,10 @@ QUE的Buffer数量最大也分别为8个或4个，即能插入的同步事件的
 
 -   不开启double buffer
 
-    ```
-    // 能申请的VECIN position上的buffer数量最大为8。如果超出该限制，在后续使用AllocTensor/FreeTensor可能会出现分配资源失败。故当不开启double buffer时，此时最多能申请8个TQue。
+    ```cpp
+    // 能申请的VECIN
+    // position上的buffer数量最大为8。如果超出该限制，在后续使用AllocTensor/FreeTensor可能会出现分配资源失败。故当不开启double
+    // buffer时，此时最多能申请8个TQue。
     AscendC::TPipe pipe;
     int len = 1024;
     AscendC::TQue<AscendC::TPosition::VECIN, 1> que0;
@@ -104,7 +109,7 @@ QUE的Buffer数量最大也分别为8个或4个，即能插入的同步事件的
     AscendC::TQue<AscendC::TPosition::VECIN, 1> que5;
     AscendC::TQue<AscendC::TPosition::VECIN, 1> que6;
     AscendC::TQue<AscendC::TPosition::VECIN, 1> que7;
-     
+
     pipe.InitBuffer(que0, 1, len);
     pipe.InitBuffer(que1, 1, len);
     pipe.InitBuffer(que2, 1, len);
@@ -117,7 +122,7 @@ QUE的Buffer数量最大也分别为8个或4个，即能插入的同步事件的
 
 -   开启double buffer
 
-    ```
+    ```cpp
     // 如果开启double buffer，此时每一个TQue分配的内存块个数为2，故最多只能申请4个TQue。
     AscendC::TPipe pipe;
     int len = 1024;
@@ -125,7 +130,7 @@ QUE的Buffer数量最大也分别为8个或4个，即能插入的同步事件的
     AscendC::TQue<AscendC::TPosition::VECIN, 1> que1;
     AscendC::TQue<AscendC::TPosition::VECIN, 1> que2;
     AscendC::TQue<AscendC::TPosition::VECIN, 1> que3;
-     
+
     pipe.InitBuffer(que0, 2, len);
     pipe.InitBuffer(que1, 2, len);
     pipe.InitBuffer(que2, 2, len);
@@ -134,7 +139,7 @@ QUE的Buffer数量最大也分别为8个或4个，即能插入的同步事件的
 
 -   多次申请TQue
 
-    ```
+    ```cpp
     // 如果TQue个数已达最大值，可以调用FreeAllEvent接口来继续申请TQue。
     AscendC::TPipe pipe;
     int len = 1024;
@@ -153,10 +158,11 @@ QUE的Buffer数量最大也分别为8个或4个，即能插入的同步事件的
 
 以下用例通过传入TQueConfig开启bufferNumber的编译期计算。vector算子不涉及数据格式的转换，所以nd2nz和nz2nd是false。
 
-```
+```cpp
 // 用户自定义的构造TQueConfig的元函数
-__aicore__ constexpr AscendC::TQueConfig GetMyTQueConfig(bool nd2nzIn, bool nz2ndIn, bool scmBlockGroupIn,
-    uint32_t bufferLenIn, uint32_t bufferNumberIn, uint32_t consumerSizeIn, const AscendC::TPosition consumerIn[])
+__aicore__ constexpr AscendC::TQueConfig GetMyTQueConfig(
+    bool nd2nzIn, bool nz2ndIn, bool scmBlockGroupIn, uint32_t bufferLenIn, uint32_t bufferNumberIn,
+    uint32_t consumerSizeIn, const AscendC::TPosition consumerIn[])
 {
     return {
         .nd2nz = nd2nzIn,
@@ -165,15 +171,15 @@ __aicore__ constexpr AscendC::TQueConfig GetMyTQueConfig(bool nd2nzIn, bool nz2n
         .bufferLen = bufferLenIn,
         .bufferNumber = bufferNumberIn,
         .consumerSize = consumerSizeIn,
-        .consumer = {consumerIn[0], consumerIn[1], consumerIn[2], consumerIn[3],
-            consumerIn[4], consumerIn[5], consumerIn[6], consumerIn[7]}
-    };
+        .consumer = {
+            consumerIn[0], consumerIn[1], consumerIn[2], consumerIn[3], consumerIn[4], consumerIn[5], consumerIn[6],
+            consumerIn[7]}};
 }
-static constexpr AscendC::TPosition tp[8] = {AscendC::TPosition::MAX, AscendC::TPosition::MAX, AscendC::TPosition::MAX, AscendC::TPosition::MAX,
-            AscendC::TPosition::MAX, AscendC::TPosition::MAX, AscendC::TPosition::MAX, AscendC::TPosition::MAX};
+static constexpr AscendC::TPosition tp[8] = {AscendC::TPosition::MAX, AscendC::TPosition::MAX, AscendC::TPosition::MAX,
+                                             AscendC::TPosition::MAX, AscendC::TPosition::MAX, AscendC::TPosition::MAX,
+                                             AscendC::TPosition::MAX, AscendC::TPosition::MAX};
 static constexpr AscendC::TQueConfig conf = GetMyTQueConfig(false, false, false, 0, 1, 0, tp);
-...
-AscendC::TPipe pipe;
+... AscendC::TPipe pipe;
 AscendC::TQue<AscendC::TPosition::VECIN, 1, &conf> inQueueX;
 AscendC::TQue<AscendC::TPosition::VECOUT, 1, &conf> outQueue;
 pipe.InitBuffer(inQueueX, 1, dataSize * sizeof(srcType));

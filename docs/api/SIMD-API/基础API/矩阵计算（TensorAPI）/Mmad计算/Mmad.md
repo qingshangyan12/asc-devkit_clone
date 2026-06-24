@@ -43,7 +43,8 @@ Mmad的矩阵乘加关系可参考下图：
 - 执行传入bias的矩阵计算。
 
     ```cpp
-    template <typename AtomType, typename DstTensor, typename FmTensor, typename FilterTensor, typename BiasTensor,
+    template <
+        typename AtomType, typename DstTensor, typename FmTensor, typename FilterTensor, typename BiasTensor,
         Std::enable_if_t<IsAttrTensorV<BiasTensor>, int> Enable>
     __aicore__ inline void Mmad(
         const MmadAtom<AtomType>& atomMmad, const DstTensor& dst, const FmTensor& fm, const FilterTensor& filter,
@@ -61,8 +62,7 @@ Mmad的矩阵乘加关系可参考下图：
 
     ```cpp
     template <typename MmadOperationType, typename MmadTraitType>
-    __aicore__ inline constexpr auto MakeMmad(
-        const MmadOperationType& mmadOperation, const MmadTraitType& mmadTrait)
+    __aicore__ inline constexpr auto MakeMmad(const MmadOperationType& mmadOperation, const MmadTraitType& mmadTrait)
     ```
 
 ## 参数说明

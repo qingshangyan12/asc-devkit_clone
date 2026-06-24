@@ -17,8 +17,8 @@ $$
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_ln(vector_half& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_ln(vector_float& dst, vector_float src, vector_bool mask)
+__simd_callee__ inline void asc_ln(vector_half& dst, vector_half src, vector_bool mask) __simd_callee__
+    inline void asc_ln(vector_float& dst, vector_float src, vector_bool mask)
 ```
 
 ## 参数说明

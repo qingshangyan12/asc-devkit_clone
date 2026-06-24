@@ -34,7 +34,7 @@
 
 ## 函数原型
 
-```
+```text
 inline float nextafterf(float x, float y)
 ```
 
@@ -63,7 +63,7 @@ inline float nextafterf(float x, float y)
 
 使用该接口需要包含"simt\_api/math\_functions.h"头文件。
 
-```
+```cpp
 #include "simt_api/math_functions.h"
 ```
 
@@ -71,8 +71,8 @@ inline float nextafterf(float x, float y)
 
 - SIMT编程场景：
 
-    ```
-    __global__ __launch_bounds__(256) void compute_nextafterf(float *result, const float *x, const float *y, uint32_t count)
+    ```cpp
+    __global__ __launch_bounds__(256) void compute_nextafterf(float* result, const float* x, const float* y, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= count) {
@@ -84,8 +84,9 @@ inline float nextafterf(float x, float y)
 
 - SIMD与SIMT混合编程场景：
 
-    ```
-    __simt_vf__ __launch_bounds__(256) inline void compute_nextafterf_vf(__gm__ float *result, __gm__ const float *x, __gm__ const float *y, uint32_t count)
+    ```cpp
+    __simt_vf__ __launch_bounds__(256) inline void compute_nextafterf_vf(
+        __gm__ float* result, __gm__ const float* x, __gm__ const float* y, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= count) {
@@ -94,7 +95,8 @@ inline float nextafterf(float x, float y)
         result[idx] = nextafterf(x[idx], y[idx]);
     }
 
-    __global__ __vector__ void run_nextafterf(__gm__ float *result, __gm__ const float *x, __gm__ const float *y, uint32_t count)
+    __global__ __vector__ void run_nextafterf(
+        __gm__ float* result, __gm__ const float* x, __gm__ const float* y, uint32_t count)
     {
         asc_vf_call<compute_nextafterf_vf>(dim3(256), result, x, y, count);
     }
@@ -102,7 +104,7 @@ inline float nextafterf(float x, float y)
 
 输入输出示例如下：
 
-```
+```text
 x：0.25, 0.75, 1.25, 1.75
 y：1.5, 2.5, 3.5, 4.5
 result: 0.25 0.7500001 1.25 1.75

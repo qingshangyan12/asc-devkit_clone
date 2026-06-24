@@ -28,31 +28,31 @@
 
 ## 函数原型
 
-```
+```text
 inline float asc_atomic_cas(float *address, float compare, float val)
 ```
 
-```
-inline int32_t asc_atomic_cas(int32_t *address, int32_t compare, int32_t val)
-```
-
-```
-inline uint32_t asc_atomic_cas(uint32_t *address, uint32_t compare, uint32_t val)
+```cpp
+inline int32_t asc_atomic_cas(int32_t* address, int32_t compare, int32_t val)
 ```
 
-```
-inline int64_t asc_atomic_cas(int64_t *address, int64_t compare, int64_t val)
-```
-
-```
-inline uint64_t asc_atomic_cas(uint64_t *address, uint64_t compare, uint64_t val)
+```cpp
+inline uint32_t asc_atomic_cas(uint32_t* address, uint32_t compare, uint32_t val)
 ```
 
+```cpp
+inline int64_t asc_atomic_cas(int64_t* address, int64_t compare, int64_t val)
 ```
+
+```cpp
+inline uint64_t asc_atomic_cas(uint64_t* address, uint64_t compare, uint64_t val)
+```
+
+```text
 inline half2 asc_atomic_cas(half2 *address, half2 compare, half2 val)
 ```
 
-```
+```text
 inline bfloat16x2_t asc_atomic_cas(bfloat16x2_t *address, bfloat16x2_t compare, bfloat16x2_t val)
 ```
 
@@ -87,15 +87,15 @@ Unified Buffer或Global Memory上的初始数据。
 
 使用除half2、bfloat16x2\_t类型之外的接口需要包含"simt\_api/device\_atomic\_functions.h"头文件，使用half2类型接口需要包含"simt\_api/asc\_fp16.h"头文件，使用bfloat16x2\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
 
-```
+```cpp
 #include "simt_api/device_atomic_functions.h"
 ```
 
-```
+```cpp
 #include "simt_api/asc_fp16.h"
 ```
 
-```
+```cpp
 #include "simt_api/asc_bf16.h"
 ```
 
@@ -117,10 +117,8 @@ Unified Buffer或Global Memory上的初始数据。
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(256) void claim_task(uint32_t *owner,
-                                                      uint32_t *claim_result,
-                                                      uint32_t *worker_ids,
-                                                      uint32_t n)
+    __global__ __launch_bounds__(256) void claim_task(
+        uint32_t* owner, uint32_t* claim_result, uint32_t* worker_ids, uint32_t n)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= n) {
@@ -137,10 +135,8 @@ Unified Buffer或Global Memory上的初始数据。
     SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：\_\_gm\_\_表示Global Memory内存空间，\_\_ubuf\_\_表示Unified Buffer内存空间。
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void claim_task(__gm__ uint32_t *owner,
-                                                               __gm__ uint32_t *claim_result,
-                                                               __gm__ uint32_t *worker_ids,
-                                                               uint32_t n)
+    __simt_vf__ __launch_bounds__(1024) inline void claim_task(
+        __gm__ uint32_t* owner, __gm__ uint32_t* claim_result, __gm__ uint32_t* worker_ids, uint32_t n)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= n) {
@@ -155,8 +151,8 @@ Unified Buffer或Global Memory上的初始数据。
 输出结果示例如下：
 
 ```cpp
-worker_ids: 101, 102, 103
-owner before: 0
-owner after: 101/102/103中的一个 // 表明只有一个线程抢占成功
-claim_result: 仅一个元素为1
+worker_ids : 101, 102,
+    103 owner before : 0 owner after : 101 / 102 /
+        103中的一个 // 表明只有一个线程抢占成功
+        claim_result : 仅一个元素为1
 ```

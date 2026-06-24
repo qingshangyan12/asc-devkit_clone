@@ -36,7 +36,7 @@ PIPE_S
 ## 调用示例
 
 ```c++
-//total_length指参与搬运的数据总长度。dst是外部输入的int16_t类型的GM内存。
+// total_length指参与搬运的数据总长度。dst是外部输入的int16_t类型的GM内存。
 constexpr uint32_t total_length = 256;
 __ubuf__ int16_t src0[total_length];
 __ubuf__ int16_t src1[total_length];
@@ -48,7 +48,7 @@ asc_set_atomic_none();
 
 结果示例：
 
-```
+```text
 输入数据src0：[1, 1, 1, ..., 1]  // int16_t类型
 输入数据src1：[2, 2, 2, ..., 2]  // int16_t类型
 输出数据dst：[3, 3, 3, ..., 3]   // int16_t类型

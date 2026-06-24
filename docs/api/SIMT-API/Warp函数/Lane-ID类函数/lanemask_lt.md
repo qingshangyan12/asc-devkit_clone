@@ -36,7 +36,7 @@
 
 ## 函数原型
 
-```
+```cpp
 int32_t lanemask_lt()
 ```
 
@@ -56,15 +56,15 @@ int32_t lanemask_lt()
 
 使用该接口需要包含"simt\_api/device\_functions.h"头文件。 
 
-``` 
-#include "simt_api/device_functions.h" 
+``` cpp
+#include "simt_api/device_functions.h"
 ```
 
 ## 调用示例
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     __global__ __launch_bounds__(1024) void kernel_lanemask_lt(int32_t* dst)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -75,7 +75,7 @@ int32_t lanemask_lt()
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     __simt_vf__ __launch_bounds__(1024) void kernel_lanemask_lt(__gm__ int32_t* dst)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

@@ -24,7 +24,7 @@ This example implements data relayout functionality based on the Reg programming
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── data_relayout
 │   ├── scripts
 │   │   ├── gen_data.py                // Input data and ground truth generation script

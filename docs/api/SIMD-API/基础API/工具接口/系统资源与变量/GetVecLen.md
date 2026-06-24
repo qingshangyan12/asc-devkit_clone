@@ -44,8 +44,8 @@ Vector Length的大小，单位为Byte。
 
 ```cpp
 template <typename T>
-__aicore__ inline void AddCustomImpl(__local_mem__ T *dst, __local_mem__ T *src0, __local_mem__ T *src1,
-    uint32_t calCount)
+__aicore__ inline void AddCustomImpl(
+    __local_mem__ T* dst, __local_mem__ T* src0, __local_mem__ T* src1, uint32_t calCount)
 {
     AscendC::Reg::RegTensor<T> reg0;
     AscendC::Reg::RegTensor<T> reg1;

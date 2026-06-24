@@ -100,7 +100,8 @@
     #include "acl/acl.h"
     #else
     #include "tikicpulib.h"
-    extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z); // 核函数声明。
+    extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y,
+                                                     GM_ADDR z); // 核函数声明。
     #endif
     ```
 
@@ -115,12 +116,12 @@
         uint32_t numBlocks = 8;
         size_t inputByteSize = 8 * 2048 * sizeof(uint16_t);
         size_t outputByteSize = 8 * 2048 * sizeof(uint16_t);
-    
-       // 使用GmAlloc分配共享内存，并进行数据初始化。
+
+        // 使用GmAlloc分配共享内存，并进行数据初始化。
         uint8_t* x = (uint8_t*)AscendC::GmAlloc(inputByteSize);
         uint8_t* y = (uint8_t*)AscendC::GmAlloc(inputByteSize);
         uint8_t* z = (uint8_t*)AscendC::GmAlloc(outputByteSize);
-    
+
         ReadFile("./input/input_x.bin", inputByteSize, x, inputByteSize);
         ReadFile("./input/input_y.bin", inputByteSize, y, inputByteSize);
         // 矢量算子需要设置内核模式为AIV模式。
@@ -130,9 +131,9 @@
         // 输出数据写出。
         WriteFile("./output/output_z.bin", z, outputByteSize);
         // 调用GmFree释放申请的资源。
-        AscendC::GmFree((void *)x);
-        AscendC::GmFree((void *)y);
-        AscendC::GmFree((void *)z);
+        AscendC::GmFree((void*)x);
+        AscendC::GmFree((void*)y);
+        AscendC::GmFree((void*)z);
         return 0;
     }
     ```

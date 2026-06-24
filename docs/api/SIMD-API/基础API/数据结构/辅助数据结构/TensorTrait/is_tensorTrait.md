@@ -54,7 +54,8 @@
 ## 函数原型<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section13230182415108"></a>
 
 ```cpp
-template <typename T> struct is_tensorTrait
+template <typename T>
+struct is_tensorTrait
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section75395119104"></a>
@@ -87,10 +88,10 @@ template <typename T> struct is_tensorTrait
 ```cpp
 // 以下示例为基于googletest的UT示例
 
-AscendC::Shape<int,int,int> shape = AscendC::MakeShape(10, 20, 30);
-AscendC::Stride<int,int,int> stride = AscendC::MakeStride(1, 100, 200);
+AscendC::Shape<int, int, int> shape = AscendC::MakeShape(10, 20, 30);
+AscendC::Stride<int, int, int> stride = AscendC::MakeStride(1, 100, 200);
 
-auto layoutMake = AscendC::MakeLayout(shape, stride);    
+auto layoutMake = AscendC::MakeLayout(shape, stride);
 auto tensorTraitMake = AscendC::MakeTensorTrait<float, AscendC::TPosition::VECIN>(layoutMake);
 
 EXPECT_EQ(AscendC::is_tensorTrait<decltype(shape)>::value, false);

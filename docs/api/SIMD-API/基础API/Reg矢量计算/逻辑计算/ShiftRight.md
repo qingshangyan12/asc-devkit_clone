@@ -44,7 +44,9 @@ $$
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename T = DefaultType, typename U = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S, typename V>
+template <
+    typename T = DefaultType, typename U = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S,
+    typename V>
 __simd_callee__ inline void ShiftRight(S& dstReg, S& srcReg0, V& srcReg1, MaskReg& mask)
 ```
 
@@ -97,8 +99,10 @@ __simd_callee__ inline void ShiftRight(S& dstReg, S& srcReg0, V& srcReg1, MaskRe
 ## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
-template<typename T, typename U>
-__simd_vf__ inline void ShiftRightVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ U* src1Addr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
+template <typename T, typename U>
+__simd_vf__ inline void ShiftRightVF(
+    __ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ U* src1Addr, uint32_t count, uint32_t oneRepeatSize,
+    uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> srcReg0;
     AscendC::Reg::RegTensor<U> srcReg1;

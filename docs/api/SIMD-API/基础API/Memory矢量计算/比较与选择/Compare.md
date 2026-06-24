@@ -100,7 +100,8 @@
 
     ```cpp
     template <typename T, typename U>
-    __aicore__ inline void Compare(const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode, uint32_t count)
+    __aicore__ inline void Compare(
+        const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode, uint32_t count)
     ```
 
 - Tensor高维切分计算
@@ -108,14 +109,18 @@
 
         ```cpp
         template <typename T, typename U, bool isSetMask = true>
-        __aicore__ inline void Compare(const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode, const uint64_t mask[], uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+        __aicore__ inline void Compare(
+            const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode,
+            const uint64_t mask[], uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
         ```
 
     - mask连续模式
 
         ```cpp
         template <typename T, typename U, bool isSetMask = true>
-        __aicore__ inline void Compare(const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+        __aicore__ inline void Compare(
+            const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode,
+            const uint64_t mask, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
         ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -304,7 +309,7 @@
 
     结果示例如下：
 
-    ```
+    ```text
     LT：小于
     输入数据src0Local：[ 2  2  2  2  2  2  2  2  3  3  3  3  3  3  3  3  5  5  5  5  5  5  5  5  7  7  7  7  7  7  7  7
                         11 11 11 11 11 11 11 11 13 13 13 13 13 13 13 13 17 17 17 17 17 17 17 17 19 19 19 19 19 19 19 19 ]
@@ -344,20 +349,22 @@
     ```cpp
     // masks数组控制每次迭代参与计算的元素，两个uint64_t的值一共128bit，每个bit可以控制一个元素，为1则参与计算，为0则不参与计算
     // masks[0]可以控制前64个元素，低bit位控制索引小的元素；masks[1]同理，可以控制后64个元素
-    // 例如，对float类型数据，每次迭代处理256B / sizeof(float) = 64个元素，因此只需要通过masks[0]即可进行控制
+    // 例如，对float类型数据，每次迭代处理256B / sizeof(float) =
+    // 64个元素，因此只需要通过masks[0]即可进行控制
     uint64_t masks[2] = {858993459, 0}; // 858993459(0x33333333)
-    // repeat: 1, dstBlkStride: 1, src0BlkStride: 1, src1BlkStride: 1, dstRepStride: 1, src0RepStride: 8, src1RepStride: 8
-    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::LT, masks, 1, { 1, 1, 1, 1, 8, 8 });
-    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::GT, masks, 1, { 1, 1, 1, 1, 8, 8 });
-    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::LE, masks, 1, { 1, 1, 1, 1, 8, 8 });
-    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::GE, masks, 1, { 1, 1, 1, 1, 8, 8 });
-    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::EQ, masks, 1, { 1, 1, 1, 1, 8, 8 });
-    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::NE, masks, 1, { 1, 1, 1, 1, 8, 8 });
+    // repeat: 1, dstBlkStride: 1, src0BlkStride: 1, src1BlkStride: 1, dstRepStride:
+    // 1, src0RepStride: 8, src1RepStride: 8
+    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::LT, masks, 1, {1, 1, 1, 1, 8, 8});
+    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::GT, masks, 1, {1, 1, 1, 1, 8, 8});
+    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::LE, masks, 1, {1, 1, 1, 1, 8, 8});
+    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::GE, masks, 1, {1, 1, 1, 1, 8, 8});
+    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::EQ, masks, 1, {1, 1, 1, 1, 8, 8});
+    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::NE, masks, 1, {1, 1, 1, 1, 8, 8});
     ```
 
     结果示例如下：
 
-    ```
+    ```text
     LE：小于等于
     输入数据src0Local：[ 2  2  2  2  2  2  2  2  3  3  3  3  3  3  3  3  5  5  5  5  5  5  5  5  7  7  7  7  7  7  7  7
                         11 11 11 11 11 11 11 11 13 13 13 13 13 13 13 13 17 17 17 17 17 17 17 17 19 19 19 19 19 19 19 19 ]
@@ -371,20 +378,22 @@
 
     ```cpp
     // mask控制每次迭代参与计算的连续元素个数
-    // 例如，对float类型数据，每次迭代处理256B / sizeof(float) = 64个元素，因此mask可取值1至64
+    // 例如，对float类型数据，每次迭代处理256B / sizeof(float) =
+    // 64个元素，因此mask可取值1至64
     uint64_t mask = 28;
-    // repeat: 1, dstBlkStride: 1, src0BlkStride: 1, src1BlkStride: 1, dstRepStride: 1, src0RepStride: 8, src1RepStride: 8
-    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::LT, mask, 1, { 1, 1, 1, 1, 8, 8 });
-    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::GT, mask, 1, { 1, 1, 1, 1, 8, 8 });
-    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::LE, mask, 1, { 1, 1, 1, 1, 8, 8 });
-    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::GE, mask, 1, { 1, 1, 1, 1, 8, 8 });
-    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::EQ, mask, 1, { 1, 1, 1, 1, 8, 8 });
-    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::NE, mask, 1, { 1, 1, 1, 1, 8, 8 });
+    // repeat: 1, dstBlkStride: 1, src0BlkStride: 1, src1BlkStride: 1, dstRepStride:
+    // 1, src0RepStride: 8, src1RepStride: 8
+    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::LT, mask, 1, {1, 1, 1, 1, 8, 8});
+    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::GT, mask, 1, {1, 1, 1, 1, 8, 8});
+    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::LE, mask, 1, {1, 1, 1, 1, 8, 8});
+    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::GE, mask, 1, {1, 1, 1, 1, 8, 8});
+    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::EQ, mask, 1, {1, 1, 1, 1, 8, 8});
+    AscendC::Compare(dstLocal, src0Local, src1Local, AscendC::CMPMODE::NE, mask, 1, {1, 1, 1, 1, 8, 8});
     ```
 
     结果示例如下：
 
-    ```
+    ```text
     LE：小于等于
     输入数据src0Local：[ 2  2  2  2  2  2  2  2  3  3  3  3  3  3  3  3  5  5  5  5  5  5  5  5  7  7  7  7  7  7  7  7
                         11 11 11 11 11 11 11 11 13 13 13 13 13 13 13 13 17 17 17 17 17 17 17 17 19 19 19 19 19 19 19 19 ]

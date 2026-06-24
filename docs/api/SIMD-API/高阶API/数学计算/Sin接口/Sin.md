@@ -45,30 +45,33 @@ Sin\(x\)的泰勒展开式为：
 -   通过sharedTmpBuffer入参传入临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
-        template<typename T, bool isReuseSource = false, const SinConfig& config = defaultSinConfig>
-        __aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+        ```cpp
+        template <typename T, bool isReuseSource = false, const SinConfig& config = defaultSinConfig>
+        __aicore__ inline void Sin(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+            const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
-        template<typename T, bool isReuseSource = false, const SinConfig& config = defaultSinConfig>
-        __aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
+        ```cpp
+        template <typename T, bool isReuseSource = false, const SinConfig& config = defaultSinConfig>
+        __aicore__ inline void Sin(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
         ```
 
 -   接口框架申请临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
-        template<typename T, bool isReuseSource = false, const SinConfig& config = defaultSinConfig>
+        ```cpp
+        template <typename T, bool isReuseSource = false, const SinConfig& config = defaultSinConfig>
         __aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
-        template<typename T, bool isReuseSource = false, const SinConfig& config = defaultSinConfig>
+        ```cpp
+        template <typename T, bool isReuseSource = false, const SinConfig& config = defaultSinConfig>
         __aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
         ```
 
@@ -90,7 +93,7 @@ Sin\(x\)的泰勒展开式为：
 | isReuseSource | 是否允许修改源操作数，默认值为false。该参数仅在输入的数据类型为float时生效。<br>true：开发者允许源操作数被改写，可以设置该参数取值为true开启，开启后本接口内部计算时复用srcTensor的内存空间，节省部分内存空间；false：本接口内部计算时不复用srcTensor的内存空间。 |
 | config | <!-- npu="950" id10 -->该参数仅支持Ascend 950PR/Ascend 950DT。<br><br><!-- end id10 -->Sin算法的相关配置。此参数可选配，SinConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：Sin内部实现使用的算法。SinAlgo类型，支持的取值如下：POLYNOMIAL_APPROXIMATION：默认值。该算法通过简单的多项式逼近实现Sin接口，支持的输入值域范围为[-65504.0, 65504.0]，支持的数据类型为half、float。RADIAN_REDUCTION：该算法通过完整的周期约减实现Sin接口，支持输入全值域，支持的数据类型为half、float。 |
 
-```
+```cpp
 struct SinConfig {
     SinAlgo algo = SinAlgo::POLYNOMIAL_APPROXIMATION;
 };
@@ -132,7 +135,7 @@ enum class SinAlgo { POLYNOMIAL_APPROXIMATION = 0, RADIAN_REDUCTION };
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放Sin计算结果的Tensor
 // srcLocal: 存放Sin计算输入的Tensor
 // sharedTmpBuffer: 存放Sin计算过程中临时缓存的Tensor
@@ -153,7 +156,7 @@ AscendC::Sin<half, false, config>(dstLocal, srcLocal, sharedTmpBuffer, 512);
 
 结果示例如下：
 
-```
+```text
 输入数据(srcLocal):
 [-2.56 -2.55 -2.54 ... 0. ... 2.53  2.54  2.55]
 输出数据(dstLocal):

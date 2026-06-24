@@ -21,7 +21,7 @@ description: |
 - [ ] 中文与英文单词之间、中文与数字之间不能有空格
 
 检测正则表达式（用于匹配空格和英文标点问题）：
-```
+```text
 [\u4e00-\u9fff] [A-Za-z]|[A-Za-z] [\u4e00-\u9fff]|[\u4e00-\u9fff] [0-9]|[0-9] [\u4e00-\u9fff]|[\u4e00-\u9fffA-Za-z0-9][,.:;!?()"]|[\u4e00-\u9fffA-Za-z] [/]|\)|\(| /|/
 ```
 
@@ -71,12 +71,12 @@ description: |
 - [ ] 所有图片的文件名必须是英文小写加下划线（如：atomic_operation_pipelined_data_movement_diagram.png、atomic_operation_3.png）
 - [ ] 如果有图注（没有图注的话就忽略），图注（如"图 1"、"图 2"）必须写在图片上方，格式为 `**图 n**  图片标题`（注意 `**图 n**` 和标题之间是两个空格）
   **正确示例（在 `docs/api/SIMD-API/基础API/原子操作/原子操作概述.md` 中引用）：**
-  ```
+  ```text
   **图 1**  数据搬运随路原子累加效果示意图
   ![](../../../figures/atomic_operation_pipelined_data_movement_diagram.png)
   ```
   **错误示例：**
-  ```
+  ```text
   ❌ 路径使用了反斜杠
   ![](..\..\..\figures\atomic_operation_pipelined_data_movement_diagram.png)
   ```
@@ -86,7 +86,7 @@ description: |
 - [ ] 同一个文档中不同章节共享同一个图/表编号序列，不按章节重新编号
 
   **正确示例（依次出现时编号连续）：**
-  ```
+  ```text
   **图 1**  xxx
   ![](../figures/xxx.png)
 
@@ -98,7 +98,7 @@ description: |
   ```
 
   **错误示例：**
-  ```
+  ```text
   **图 1**  xxx        ← 正确
   **图 3**  xxx        ← ❌ 跳过了图2
   ```
@@ -136,7 +136,7 @@ description: |
   | 9030 | `Kirin 9030` |
 
   **错误示例**（标签值与描述不匹配）：
-  ```
+  ```text
   <cann-filter npu-type="310b">
   Atlas 推理系列产品    ← ❌ 310b 对应的应是 "Atlas 200I/500 A2 推理产品"
   </cann-filter>
@@ -145,7 +145,7 @@ description: |
 - [ ] 产品支持情况表格中，芯片的排列顺序应按照 950 → A3 → 910b → 310b → 310p → 910 的顺序排列（即支持的产品优先排列，不支持的产品排列在最后，同类产品中位宽越大越靠前）。当存在多个 `<cann-filter>` 块罗列时，块之间的顺序也应遵循此规则。
 
   **正确示例（芯片顺序）：**
-  ```
+  ```text
   | 产品 | 是否支持 |
   |------|----------|
   | <cann-filter npu-type="950">... | √</cann-filter> |
@@ -157,7 +157,7 @@ description: |
   ```
 
   **错误示例（芯片顺序混乱）：**
-  ```
+  ```text
   | 产品 | 是否支持 |
   |------|----------|
   | <cann-filter npu-type="910b">... | √</cann-filter> |   ← ❌ 应为950在前
@@ -248,7 +248,7 @@ description: |
 1. **读取文件**：使用 `read_file` 工具读取用户指定的 Markdown 文件
 2. **逐项检查**：按照上述检查清单逐项核对文档内容
 3. **输出报告**：列出所有发现的问题，格式如下：
-   ```
+   ```text
    ## 文档检查报告
 
    文件：xxx.md

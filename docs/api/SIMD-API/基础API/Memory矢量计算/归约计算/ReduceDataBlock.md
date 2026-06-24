@@ -32,14 +32,18 @@
 
     ```cpp
     template <ReduceType reduceType, typename T, typename U, bool isSetMask = true>
-    __aicore__ inline void ReduceDataBlock(const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
+    __aicore__ inline void ReduceDataBlock(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint64_t mask[], const int32_t repeatTime,
+        const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
     ```
 
 - `mask`连续模式：
 
     ```cpp
     template <ReduceType reduceType, typename T, typename U, bool isSetMask = true>
-    __aicore__ inline void ReduceDataBlock(const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
+    __aicore__ inline void ReduceDataBlock(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t mask, const int32_t repeatTime,
+        const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
     ```
 
 ## 参数说明
@@ -142,7 +146,7 @@
 
     ```cpp
     // 设定mask为最多的128个全部元素参与计算
-    int32_t mask = 256/sizeof(half);
+    int32_t mask = 256 / sizeof(half);
     // 每个repeat128个元素，一共128个元素。
     int repeat = 1;
     // dstLocal: 目的操作数tensor
@@ -172,7 +176,7 @@
 
     ```cpp
     // 设定mask为最多的128个全部元素参与计算
-    uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
+    uint64_t mask[2] = {UINT64_MAX, UINT64_MAX};
     // 每个repeat128个元素，一共128个元素。
     int repeat = 1;
     // dstLocal: 目的操作数tensor
@@ -201,7 +205,7 @@
 
     ```cpp
     // 设定mask为最多的128个全部元素参与计算
-    uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
+    uint64_t mask[2] = {UINT64_MAX, UINT64_MAX};
     // 每个repeat128个元素，一共128个元素。
     int repeat = 1;
     // dstLocal: 目的操作数tensor
@@ -231,7 +235,7 @@
 
     ```cpp
     // 设定mask为最多的128个全部元素参与计算
-    uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
+    uint64_t mask[2] = {UINT64_MAX, UINT64_MAX};
     // 每个repeat128个元素，一共128个元素。
     int repeat = 1;
     // dstLocal: 目的操作数tensor

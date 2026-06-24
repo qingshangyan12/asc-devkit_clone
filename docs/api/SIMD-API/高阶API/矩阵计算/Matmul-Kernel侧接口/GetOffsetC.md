@@ -8,7 +8,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline MatrixOffset GetOffsetC()
 ```
 
@@ -20,7 +20,7 @@ __aicore__ inline MatrixOffset GetOffsetC()
 
 MatrixOffset结构体如下：
 
-```
+```cpp
 struct MatrixOffset {
     int32_t offset;
     int32_t row, col;

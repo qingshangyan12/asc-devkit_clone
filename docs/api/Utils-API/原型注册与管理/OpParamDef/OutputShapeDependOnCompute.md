@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000002009944386_zh-cn_topic_0000001526594958_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
+```text
 OpParamDef &OutputShapeDependOnCompute()
 ```
 
@@ -25,15 +25,9 @@ OpParamDef算子定义，OpParamDef请参考[OpParamDef](OpParamDef.md)。
 
 ## 调用示例<a name="zh-cn_topic_0000002009944386_zh-cn_topic_0000001526594958_zh-cn_topic_0000001575944081_section320753512363"></a>
 
-```
-this->Input("x1")
-    .ParamType(REQUIRED)
-    .DataType({ge::DT_FLOAT, ge::DT_FLOAT})
-    .Format({ge::FORMAT_ND, ge::FORMAT_ND});
-this->Input("x2")
-    .ParamType(REQUIRED)
-    .DataType({ge::DT_FLOAT, ge::DT_FLOAT})
-    .Format({ge::FORMAT_ND, ge::FORMAT_ND});
+```cpp
+this->Input("x1").ParamType(REQUIRED).DataType({ge::DT_FLOAT, ge::DT_FLOAT}).Format({ge::FORMAT_ND, ge::FORMAT_ND});
+this->Input("x2").ParamType(REQUIRED).DataType({ge::DT_FLOAT, ge::DT_FLOAT}).Format({ge::FORMAT_ND, ge::FORMAT_ND});
 this->Output("y1")
     .ParamType(REQUIRED)
     .DataType({ge::DT_FLOAT, ge::DT_FLOAT})

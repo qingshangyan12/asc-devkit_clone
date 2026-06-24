@@ -27,14 +27,15 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001796358754_section7979556121414"></a>
 
-```
+```cpp
 class PlatformAscendCManager {
 public:
     static PlatformAscendC* GetInstance();
     // 在仅有CPU环境、无对应的NPU硬件环境时，需要传入customSocVersion来指定对应的AI处理器型号。注意：因为GetInstance实现属于单例模式，仅在第一次调用时传入的customSocVersion生效。
-    static PlatformAscendC* GetInstance(const char *customSocVersion);
+    static PlatformAscendC* GetInstance(const char* customSocVersion);
+
 private:
-...
+    ...
 }
 ```
 
@@ -76,12 +77,11 @@ private:
 
 ## 调用示例<a name="zh-cn_topic_0000001796358754_zh-cn_topic_0000001442758437_section320753512363"></a>
 
-```
-GetInfoFun() {
-    ...
-    auto coreNum = platform_ascendc::PlatformAscendCManager::GetInstance()->GetCoreNum();
-    ...
-    return;
+```cpp
+GetInfoFun()
+{
+    ... auto coreNum = platform_ascendc::PlatformAscendCManager::GetInstance()->GetCoreNum();
+    ... return;
 }
 ```
 

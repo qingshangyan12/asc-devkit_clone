@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename T>
 struct is_floating_point;
 ```
@@ -42,9 +42,9 @@ is\_floating\_point的静态常量成员value用于获取返回的布尔值，is
 
 ## 调用示例
 
-```
+```cpp
 // 自定义测试类型
-struct MyStruct{};
+struct MyStruct {};
 
 // 返回值为浮点的函数类型
 using FuncType = double(int);
@@ -69,19 +69,12 @@ AscendC::printf("AscendC::Std::is_floating_point::value:%d\n", AscendC::Std::is_
 AscendC::printf("AscendC::Std::is_floating_point::value:%d\n", AscendC::Std::is_floating_point<void>::value);
 ```
 
-```
+```cpp
 // 执行结果：
-AscendC::Std::is_floating_point::value:1
-AscendC::Std::is_floating_point::value:1
-AscendC::Std::is_floating_point::value:1
-AscendC::Std::is_floating_point::value:1
-AscendC::Std::is_floating_point::value:1
-AscendC::Std::is_floating_point::value:0
-AscendC::Std::is_floating_point::value:0
-AscendC::Std::is_floating_point::value:0
-AscendC::Std::is_floating_point::value:0
-AscendC::Std::is_floating_point::value:0
-AscendC::Std::is_floating_point::value:0
-AscendC::Std::is_floating_point::value:0
-AscendC::Std::is_floating_point::value:0
+AscendC::Std::is_floating_point::value : 1 AscendC::Std::is_floating_point::value : 1 AscendC::Std::is_floating_point::
+    value : 1 AscendC::Std::is_floating_point::value : 1 AscendC::Std::is_floating_point::value : 1 AscendC::Std::
+        is_floating_point::value : 0 AscendC::Std::is_floating_point::value : 0 AscendC::Std::is_floating_point::
+            value : 0 AscendC::Std::is_floating_point::value : 0 AscendC::Std::is_floating_point::value : 0 AscendC::
+                Std::is_floating_point::value : 0 AscendC::Std::is_floating_point::value : 0 AscendC::Std::
+                    is_floating_point::value : 0
 ```

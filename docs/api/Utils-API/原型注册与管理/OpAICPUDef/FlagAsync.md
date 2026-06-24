@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001626409757_zh-cn_topic_0000001526442954_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
+```text
 OpAICPUDef &FlagAsync(bool flag)
 ```
 

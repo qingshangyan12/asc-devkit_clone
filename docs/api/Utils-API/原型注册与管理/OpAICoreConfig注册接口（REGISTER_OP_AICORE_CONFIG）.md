@@ -6,13 +6,13 @@
 
 使用该注册宏需要包含以下头文件：
 
-```
+```cpp
 #include "register/op_config_registry.h"
 ```
 
 ## 函数原型<a name="zh-cn_topic_0000001600307121_zh-cn_topic_0000001576870453_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
+```text
 REGISTER_OP_AICORE_CONFIG(opType, socVersion, opFunc)
 ```
 
@@ -64,44 +64,43 @@ REGISTER_OP_AICORE_CONFIG(opType, socVersion, opFunc)
 
 假设，已有原型注册文件op\_host/add\_custom.cpp实现如下，配置了算子支持的AI处理器型号ascendxxx1及算子输入输出原型信息：
 
-```
-...
-namespace ops {
-class AddCustom : public OpDef {
-public:
-    AddCustom(const char* name) : OpDef(name)
-    {
-        this->Input("x")
-            .ParamType(REQUIRED)
-            .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT32})
-            .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND});
-        this->Input("y")
-            .ParamType(REQUIRED)
-            .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT32})
-            .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND});
-        this->Output("z")
-            .ParamType(REQUIRED)
-            .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT32})
-            .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND});
-        this->AICore()
-            .SetTiling(optiling::TilingFunc);
-        // 请替换为实际的AI处理器型号
-        this->AICore().AddConfig("ascendxxx1");
-    }
-};
-OP_ADD(AddCustom);
+```cpp
+... namespace ops
+{
+    class AddCustom : public OpDef {
+    public:
+        AddCustom(const char* name) : OpDef(name)
+        {
+            this->Input("x")
+                .ParamType(REQUIRED)
+                .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT32})
+                .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND});
+            this->Input("y")
+                .ParamType(REQUIRED)
+                .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT32})
+                .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND});
+            this->Output("z")
+                .ParamType(REQUIRED)
+                .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT32})
+                .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND});
+            this->AICore().SetTiling(optiling::TilingFunc);
+            // 请替换为实际的AI处理器型号
+            this->AICore().AddConfig("ascendxxx1");
+        }
+    };
+    OP_ADD(AddCustom);
 } // namespace ops
 ```
 
 可新增文件op\_host/add\_custom\_xxx.cpp，使用REGISTER\_OP\_AICORE\_CONFIG单独注册算子支持的AI处理器型号ascendxxx2，示例如下：
 
-```
+```cpp
 #include "register/op_config_registry.h"
 namespace ops {
 REGISTER_OP_AICORE_CONFIG(AddCustom, ascendxxx2, []() {
     ops::OpAICoreConfig config("ascendxxx2");
     return config;
 });
-}
+} // namespace ops
 ```
 

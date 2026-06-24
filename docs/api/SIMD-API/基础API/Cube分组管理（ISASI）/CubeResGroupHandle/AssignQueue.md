@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="section765814724715"></a>
 
-```
+```cpp
 __aicore__ inline void AssignQueue(uint8_t queueIdIn)
 ```
 
@@ -91,12 +91,13 @@ __aicore__ inline void AssignQueue(uint8_t queueIdIn)
 
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 
-```
+```cpp
 AscendC::KfcWorkspace desc(workspaceGM); // 用户自行管理的workspace指针。
 uint8_t blockStart = 0;
 uint8_t blockSize = 12;
 uint8_t msgQueueSize = 48;
-auto handle = AscendC::CreateCubeResGroup<GROUPID, MatmulApiType, MyCallbackFunc, CubeMsgBody> (desc, blockStart, blockSize, msgQueueSize, tilingGM);
+auto handle = AscendC::CreateCubeResGroup<GROUPID, MatmulApiType, MyCallbackFunc, CubeMsgBody>(
+    desc, blockStart, blockSize, msgQueueSize, tilingGM);
 // 当前总计有48个Block，每个Block的视角下，都与handle里的msgQueue进行了绑定，msgQueue每个Queue都被绑定，且没有重复绑定的情况。
 auto queIdx = AscendC::GetBlockIdx();
 handle.AssignQueue(queIdx);

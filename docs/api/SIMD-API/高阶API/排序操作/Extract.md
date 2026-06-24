@@ -28,9 +28,11 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename T>
-__aicore__ inline void Extract(const LocalTensor<T>& dstValue, const LocalTensor<uint32_t>& dstIndex, const LocalTensor<T>& sorted, const int32_t repeatTime)
+__aicore__ inline void Extract(
+    const LocalTensor<T>& dstValue, const LocalTensor<uint32_t>& dstIndex, const LocalTensor<T>& sorted,
+    const int32_t repeatTime)
 ```
 
 ## 参数说明

@@ -52,8 +52,7 @@ static void sync()
     using namespace cooperative_groups;
     __global__ void simt_kernel(...)
     {
-        ...
-        thread_block g = this_thread_block();
+        ... thread_block g = this_thread_block();
         g.sync(); // 同步线程块内所有线程
         ...
     }
@@ -65,8 +64,7 @@ static void sync()
     using namespace cooperative_groups;
     __simt_vf__ inline void simt_kernel(...)
     {
-        ...
-        thread_block g = this_thread_block();
+        ... thread_block g = this_thread_block();
         g.sync(); // 同步线程块内所有线程
         ...
     }

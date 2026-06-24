@@ -20,38 +20,42 @@ $$
 
     ```c++
     // 比较结果存入寄存器
-    __aicore__ inline void asc_ge(__ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
-        uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
-        uint8_t src1_repeat_stride);
-    __aicore__ inline void asc_ge(__ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
-        uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
-        uint8_t src1_repeat_stride);
+    __aicore__ inline void asc_ge(
+        __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
+        uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
+    __aicore__ inline void asc_ge(
+        __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
+        uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
     // 比较结果存入dst
-    __aicore__ inline void asc_ge(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, 
-        uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, 
-        uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
-    __aicore__ inline void asc_ge(__ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, 
-        uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, 
-        uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
+    __aicore__ inline void asc_ge(
+        __ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
+        uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
+        uint8_t src1_repeat_stride);
+    __aicore__ inline void asc_ge(
+        __ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
+        uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
+        uint8_t src1_repeat_stride);
     ```
 
 - 同步计算
 
     ```c++
     // 比较结果存入寄存器
-    __aicore__ inline void asc_ge_sync(__ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, 
-        uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, 
-        uint8_t src1_repeat_stride);
-    __aicore__ inline void asc_ge_sync(__ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, 
-        uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, 
-        uint8_t src1_repeat_stride);
+    __aicore__ inline void asc_ge_sync(
+        __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
+        uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
+    __aicore__ inline void asc_ge_sync(
+        __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
+        uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
     // 比较结果存入dst
-    __aicore__ inline void asc_ge_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, 
-        uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, 
-        uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
-    __aicore__ inline void asc_ge_sync(__ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, 
-        uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, 
-        uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
+    __aicore__ inline void asc_ge_sync(
+        __ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
+        uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
+        uint8_t src1_repeat_stride);
+    __aicore__ inline void asc_ge_sync(
+        __ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
+        uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
+        uint8_t src1_repeat_stride);
     ```
 
 ## 参数说明
@@ -102,7 +106,11 @@ uint8_t dst_repeat_stride = 8;
 uint8_t src0_repeat_stride = 8;
 uint8_t src1_repeat_stride = 8;
 // 结果存入寄存器，通过寄存器获取比较结果
-asc_ge(src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
+asc_ge(
+    src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride,
+    src1_repeat_stride);
 // 结果输出到目标地址中
-asc_ge(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
+asc_ge(
+    dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride,
+    src0_repeat_stride, src1_repeat_stride);
 ```

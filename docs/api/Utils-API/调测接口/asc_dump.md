@@ -22,58 +22,58 @@
 
 ## 函数原型
 
-```
+```cpp
 // GM内存上的数据打印
-template<typename T>
+template <typename T>
 __aicore__ inline void asc_dump_gm(__gm__ T* input, uint32_t desc, uint32_t dump_size)
 
-// UB内存上的数据打印
-template<typename T>
-__aicore__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dump_size)
+    // UB内存上的数据打印
+    template <typename T>
+    __aicore__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dump_size)
 
-// L1内存上的数据打印
-template<typename T>
-__aicore__ inline void asc_dump_l1buf(__cbuf__ T* input, uint32_t desc, uint32_t dump_size)
+    // L1内存上的数据打印
+    template <typename T>
+    __aicore__ inline void asc_dump_l1buf(__cbuf__ T* input, uint32_t desc, uint32_t dump_size)
 
-// L0C内存上的数据打印
-template<typename T>
-__aicore__ inline void asc_dump_cbuf(__cc__ T* input, uint32_t desc, uint32_t dump_size)
+    // L0C内存上的数据打印
+    template <typename T>
+    __aicore__ inline void asc_dump_cbuf(__cc__ T* input, uint32_t desc, uint32_t dump_size)
 
-// GM内存上的数据打印
-template<typename T>
-__aicore__ inline void asc_dump(__gm__ T* input, uint32_t desc, uint32_t dump_size)
+    // GM内存上的数据打印
+    template <typename T>
+    __aicore__ inline void asc_dump(__gm__ T* input, uint32_t desc, uint32_t dump_size)
 
-// UB内存上的数据打印
-template<typename T>
-__aicore__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t dump_size)
+    // UB内存上的数据打印
+    template <typename T>
+    __aicore__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t dump_size)
 
-// L1内存上的数据打印
-template<typename T>
-__aicore__ inline void asc_dump(__cbuf__ T* input, uint32_t desc, uint32_t dump_size)
+    // L1内存上的数据打印
+    template <typename T>
+    __aicore__ inline void asc_dump(__cbuf__ T* input, uint32_t desc, uint32_t dump_size)
 
-// L0C内存上的数据打印
-template<typename T>
-__aicore__ inline void asc_dump(__cc__ T* input, uint32_t desc, uint32_t dump_size)
+    // L0C内存上的数据打印
+    template <typename T>
+    __aicore__ inline void asc_dump(__cc__ T* input, uint32_t desc, uint32_t dump_size)
 ```
 
 以下接口为simd\_vf中所使用的asc\_dump接口，仅支持Ascend 950PR/Ascend 950DT。
 
-```
+```cpp
 // 寄存器上的数据打印
 template <typename T, typename U>
 __simd_callee__ inline void asc_dump_reg(U& input, uint32_t desc, uint32_t dump_size)
 
-// 寄存器上的数据打印
-template <typename T, typename U>
-__simd_callee__ inline void asc_dump(U& input, uint32_t desc, uint32_t dump_size)
+    // 寄存器上的数据打印
+    template <typename T, typename U>
+    __simd_callee__ inline void asc_dump(U& input, uint32_t desc, uint32_t dump_size)
 
-// UB内存上的数据打印
-template <typename T>
-__simd_callee__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dump_size)
+    // UB内存上的数据打印
+    template <typename T>
+    __simd_callee__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dump_size)
 
-// UB内存上的数据打印
-template <typename T>
-__simd_callee__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t dump_size)
+    // UB内存上的数据打印
+    template <typename T>
+    __simd_callee__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t dump_size)
 ```
 
 ## 参数说明
@@ -99,7 +99,7 @@ __simd_callee__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t 
 
 ## 调用示例
 
-```
+```cpp
 __gm__ half* src;
 uint32_t desc = 1;
 uint32_t dump_size = 32;
@@ -108,7 +108,7 @@ asc_dump_gm<half>(src, desc, dump_size);
 
 SIMD VF调用示例：
 
-```
+```cpp
 __simd_vf__ inline void SimdVfDumpReg()
 {
     AscendC::Reg::RegTensor<float> src_reg;

@@ -15,8 +15,8 @@
 ```cpp
 // 数据读取索引为偶数的位置
 __simd_callee__ inline void asc_half2float(vector_float& dst, vector_half src, vector_bool mask)
-// 数据读取索引为奇数的位置
-__simd_callee__ inline void asc_half2float_v2(vector_float& dst, vector_half src, vector_bool mask)
+    // 数据读取索引为奇数的位置
+    __simd_callee__ inline void asc_half2float_v2(vector_float& dst, vector_half src, vector_bool mask)
 ```
 
 ## 参数说明
@@ -44,9 +44,9 @@ PIPE_V
 ## 调用示例
 
  ```cpp
-vector_float dst;
-vector_half src;
-vector_bool mask = asc_create_mask_b16(PAT_ALL);
-asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
-asc_half2float(dst, src, mask);
+ vector_float dst;
+ vector_half src;
+ vector_bool mask = asc_create_mask_b16(PAT_ALL);
+ asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
+ asc_half2float(dst, src, mask);
 ```

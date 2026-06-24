@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T>
 __aicore__ inline LocalTensor<T> AllocTensor()
 ```
@@ -72,7 +72,7 @@ LocalTensor对象。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 AscendC::TPipe pipe;
 AscendC::TSCM<AscendC::TPosition::VECIN, 1> tscm;
 int num = 4;

@@ -31,16 +31,16 @@ Matmul计算中N方向非32字节对齐，输出C矩阵的N方向要求32字节�
 
     调用SetCType接口，设置C矩阵的数据格式为CubeFormat::ND\_ALIGN，其它Tiling实现与[基础场景](../算子实现.md#zh-cn_topic_0000001622514006_li19113114819525)相同。
 
-    ```
+    ```cpp
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
-    matmul_tiling::MatmulApiTiling tiling(ascendcPlatform); 
-    tiling.SetAType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT16); 
-    tiling.SetBType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT16);  
+    matmul_tiling::MatmulApiTiling tiling(ascendcPlatform);
+    tiling.SetAType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT16);
+    tiling.SetBType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT16);
     // 设置C矩阵，buffer位置为GM，数据格式为ND_ALIGN
     tiling.SetCType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND_ALIGN, matmul_tiling::DataType::DT_FLOAT);
     tiling.SetBiasType(AscendC::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT);
     ... // 其他实现内容
-    optiling::TCubeTiling tilingData;   
+        optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
     ```
 
@@ -48,13 +48,13 @@ Matmul计算中N方向非32字节对齐，输出C矩阵的N方向要求32字节�
 
     相较于[基础场景](../算子实现.md#zh-cn_topic_0000001622514006_li1032116474330)，ND\_ALIGN输出功能要求在创建Matmul对象时，设置模板参数cType的数据格式为CubeFormat::ND\_ALIGN。
 
-    ```
+    ```cpp
     #include "lib/matmul_intf.h"
-    
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> aType; 
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> bType; 
+
+    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> aType;
+    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> bType;
     // 设置模板参数cType的数据格式为ND_ALIGN
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND_ALIGN, float> cType; 
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType; 
-    AscendC::Matmul<aType, bType, cType, biasType> mm; 
+    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND_ALIGN, float> cType;
+    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
+    AscendC::Matmul<aType, bType, cType, biasType> mm;
     ```

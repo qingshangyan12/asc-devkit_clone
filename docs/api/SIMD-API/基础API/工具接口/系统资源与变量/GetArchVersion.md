@@ -45,5 +45,6 @@ __aicore__ inline void GetArchVersion(uint32_t& coreVersion)
 ```cpp
 uint32_t coreVersion = 0;
 AscendC::GetArchVersion(coreVersion);
-AscendC::printf("core version is %x", coreVersion); //需用%x将其打印成十六进制数
+AscendC::printf("core version is %x",
+                coreVersion); // 需用%x将其打印成十六进制数
 ```

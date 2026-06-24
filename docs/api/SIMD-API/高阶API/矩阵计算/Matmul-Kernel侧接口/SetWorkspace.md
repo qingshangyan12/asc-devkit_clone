@@ -23,12 +23,14 @@
 
 建议用户使用GlobalTensor类型传入：
 
-```
-template <class T> __aicore__ inline void SetWorkspace(GlobalTensor<T>& addr)
+```cpp
+template <class T>
+__aicore__ inline void SetWorkspace(GlobalTensor<T>& addr)
 ```
 
-```
-template <class T> __aicore__ inline void SetWorkspace(__gm__ const T* addr, int size)
+```cpp
+template <class T>
+__aicore__ inline void SetWorkspace(__gm__ const T* addr, int size)
 ```
 
 ## 参数说明
@@ -49,16 +51,16 @@ template <class T> __aicore__ inline void SetWorkspace(__gm__ const T* addr, int
 
 ## 调用示例
 
-```
+```cpp
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
-mm.SetWorkspace(workspaceGM);    //设置异步时使用的临时空间
+mm.SetWorkspace(workspaceGM); // 设置异步时使用的临时空间
 mm.SetTensorA(gm_a);
 mm.SetTensorB(gm_b);
 if (tiling.isBias) {
     mm.SetBias(biasGlobal);
 }
 mm.template Iterate<false>();
-for (int i = 0; i < singleCoreM/baseM * singleCoreN/baseN; ++i) {
+for (int i = 0; i < singleCoreM / baseM * singleCoreN / baseN; ++i) {
     mm.template GetTensorC<false>(ub_c);
 }
 ```

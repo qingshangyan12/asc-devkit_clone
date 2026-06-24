@@ -18,14 +18,15 @@
 
 ## 函数原型
 
-```
+```cpp
 template <bool sync = true>
 __aicore__ inline GlobalTensor<DstT> GetBatchC(uint32_t batchA, uint32_t batchB, bool enSequentialWrite = false)
 ```
 
-```
+```cpp
 template <bool sync = true>
-__aicore__ inline void GetBatchC(const LocalTensor<DstT>& c, uint32_t batchA, uint32_t batchB, bool enSequentialWrite = false)
+__aicore__ inline void GetBatchC(
+    const LocalTensor<DstT>& c, uint32_t batchA, uint32_t batchB, bool enSequentialWrite = false)
 ```
 
 ## 参数说明
@@ -55,7 +56,7 @@ GlobalTensor<DstT\>，返回计算的矩阵分片。
 
 ## 调用示例
 
-```
+```cpp
 // 计算需要多Batch计算循环次数
 int g_lay = tiling.ALayoutInfoG > tiling.BLayoutInfoG ? tiling.ALayoutInfoG : tiling.BLayoutInfoG;
 int for_exent = tiling.ALayoutInfoB * tiling.ALayoutInfoN * g_lay / tiling.BatchNum;
@@ -67,7 +68,7 @@ if (tiling.isBias) {
 // 多batch Matmul计算
 mm1.template IterateNBatch<false>(for_exent, batchA, batchB, false);
 // ...other compute
-for (int i = 0; i < for_exent ; ++i) {
+for (int i = 0; i < for_exent; ++i) {
     mm1.template GetBatchC<false>(ubCmatrix, batchA, batchB);
     // ...other compute
 }

@@ -8,7 +8,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001760150049_zh-cn_topic_0000001576870901_zh-cn_topic_0000001575944081_section13230182415108"></a>
 
-```
+```text
 OpParamDef &Output(const char *name)
 ```
 
@@ -43,23 +43,17 @@ OpParamDef &Output(const char *name)
 
 ## 调用示例<a name="zh-cn_topic_0000001760150049_zh-cn_topic_0000001576870901_zh-cn_topic_0000001575944081_section320753512363"></a>
 
-```
+```cpp
 class AddCustom : public OpDef {
 public:
     AddCustom(const char* name) : OpDef(name)
     {
-        this->Input("x").DataType({ ge::DT_FLOAT16 }).ParamType(OPTIONAL);
-        this->Output("y").DataType({ ge::DT_FLOAT16 });
+        this->Input("x").DataType({ge::DT_FLOAT16}).ParamType(OPTIONAL);
+        this->Output("y").DataType({ge::DT_FLOAT16});
         OpAICoreConfig aicConfig1;
         OpAICoreConfig aicConfig2;
-        aicConfig1.Output("y")
-            .ParamType(OPTIONAL)
-            .DataType({ ge::DT_FLOAT })
-            .Format({ ge::FORMAT_ND });
-        aicConfig2.Output("y")
-            .ParamType(REQUIRED)
-            .DataType({ ge::DT_INT32 })
-            .Format({ ge::FORMAT_ND });
+        aicConfig1.Output("y").ParamType(OPTIONAL).DataType({ge::DT_FLOAT}).Format({ge::FORMAT_ND});
+        aicConfig2.Output("y").ParamType(REQUIRED).DataType({ge::DT_INT32}).Format({ge::FORMAT_ND});
         this->AICore().AddConfig("ascendxxx1", aicConfig1);
         this->AICore().AddConfig("ascendxxx2", aicConfig2);
     }

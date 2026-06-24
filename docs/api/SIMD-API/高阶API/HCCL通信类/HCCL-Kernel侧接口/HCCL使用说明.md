@@ -24,7 +24,7 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
 
 1.  创建HCCL对象，并调用初始化接口[InitV2](InitV2.md)。
 
-    ```
+    ```cpp
     // 传initTiling地址的调用方式，推荐使用该方式
     GET_TILING_DATA_WITH_STRUCT(
         AllGatherCustomTilingData, tilingData, tilingGM); // AllGatherCustomTilingData为对应算子头文件定义的结构体
@@ -41,7 +41,7 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
 
     通过[SetCcTilingV2](SetCcTilingV2.md)接口设置对应通信算法的Tiling地址，调用Commit接口后，该地址被发送到服务端由服务端解析。[SetCcTilingV2](SetCcTilingV2.md)接口必须与[InitV2](InitV2.md)接口配合使用。示例如下。
 
-    ```
+    ```cpp
     // 传initTiling地址的调用方式
     GET_TILING_DATA_WITH_STRUCT(AllGatherCustomTilingData, tilingData, tilingGM);
 
@@ -56,7 +56,7 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
 
 3.  用户通过对应的Prepare接口异步下发对应类型的通信任务，并获取到该任务的标识handleId，服务端接收到后开始通信任务的展开和下发，示例如下。
 
-    ```
+    ```cpp
     auto handleId =
         hccl.ReduceScatter<false>(aGM, cGM, recvCount, AscendC::HCCL_DATA_TYPE_FP16, HCCL_REDUCE_SUM, strideCount, 1);
     // 对于Prepare接口，在调试时可增加异常值校验和PRINTF打印
@@ -75,7 +75,7 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
     | --- | --- |
     | HcclDataType | HCCL任务的数据类型。HcclDataType为枚举类型，定义如下代码所示。<br>    HCCL_DATA_TYPE_INT8：int8 <br>    HCCL_DATA_TYPE_INT16：int16 <br>    HCCL_DATA_TYPE_INT32：int32 <br>    HCCL_DATA_TYPE_FP16： half或float16 <br>    HCCL_DATA_TYPE_FP32： float <br>    HCCL_DATA_TYPE_INT64：int64 <br>    HCCL_DATA_TYPE_UINT64：uint64 <br>    HCCL_DATA_TYPE_UINT8：uint8 <br>    HCCL_DATA_TYPE_UINT16：uint16 <br>    HCCL_DATA_TYPE_UINT32：uint32 <br>    HCCL_DATA_TYPE_FP64：float64 <br>    HCCL_DATA_TYPE_BFP16：bfloat16 <br>    HCCL_DATA_TYPE_INT128：int128，预留类型，暂不支持 <br>    HCCL_DATA_TYPE_HIF8：hif8 <br>    HCCL_DATA_TYPE_FP8E4M3：fp8e4m3 <br>    HCCL_DATA_TYPE_FP8E5M2：fp8e5m2 <br>    HCCL_DATA_TYPE_FP8E8M0：fp8e8m0 <br>    HCCL_DATA_TYPE_RESERVED：暂不支持使用  |
 
-    ```
+    ```cpp
     enum HcclDataType {
         HCCL_DATA_TYPE_INT8 = 0,     /* int8 */
         HCCL_DATA_TYPE_INT16 = 1,    /* int16 */
@@ -105,7 +105,7 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
     | --- | --- |
     | HcclReduceOp | Reduce操作类型。HcclReduceOp为枚举类型，定义如下代码所示。<br> HCCL_REDUCE_SUM：sum <br>    HCCL_REDUCE_PROD：prod <br>    HCCL_REDUCE_MAX：max <br>    HCCL_REDUCE_MIN：min <br>    HCCL_REDUCE_RESERVED：暂不支持使用 |
 
-    ```
+    ```cpp
     enum HcclReduceOp {
         HCCL_REDUCE_SUM = 0,  /* sum */
         HCCL_REDUCE_PROD = 1, /* prod */
@@ -117,14 +117,14 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
 
 4.  用户调用[Commit](Commit.md)接口通知服务端执行handleId对应的通信任务。
 
-    ```
+    ```text
     // 等待通信任务执行时机成熟，调用Commit接口通知服务端执行
     hccl.Commit(handleId);
     ```
 
 5.  用户调用[Wait](Wait-98.md)阻塞接口，等待服务端执行完对应的通信任务。
 
-    ```
+    ```cpp
     auto ret = hccl.Wait(handleId);
     // 对于Wait和Query接口，在调试时可增加异常值校验和PRINTF打印
     // if (ret == HCCL_FAILED) {
@@ -138,17 +138,17 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
 
 6.  用户调用[Finalize](Finalize.md)接口，通知服务端后续无通信任务，执行结束后退出；客户端检测并等待最后一个通信任务执行结束。
 
-    ```
+    ```text
     hccl.Finalize();
     ```
 
 注意：若HCCL对象的模板参数未指定下发通信任务的核，则Prepare接口仅能在AIC或AIV之一上运行，调用步骤2到步骤5的接口前，必须指定接口代码运行在AIC或AIV核上，实现时如下代码所示。
 
-```
+```cpp
 // 通过内置常量g_coreType来判断AIC核或者AIV核
 if (g_coreType == AIV) {
-// if (g_coreType == AIC) {
-        调用HCCL接口
+    // if (g_coreType == AIC) {
+    调用HCCL接口
 }
 ```
 
@@ -156,7 +156,7 @@ if (g_coreType == AIV) {
 
 这种场景下，可以调用3次repeat参数为1的ReduceScatter接口，下发3个通信任务，同时更新每个ReduceScatter任务的收发地址，得到3个任务的handleId，每个handleId任务调用1次Commit和Wait接口，对应代码片段如下。
 
-```
+```cpp
 extern "C" __global__ __aicore__ void reduce_scatter_custom(
     GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
 {
@@ -199,7 +199,7 @@ extern "C" __global__ __aicore__ void reduce_scatter_custom(
 
 由于每张卡上3份数据的源地址SendBuf是连续的，且每张卡中目的地址recvBuf用来存储3份通信结果数据的内存也是连续的，因此以上代码可以优化，将ReduceScatter接口中的repeat参数设置为3，从而调用1次ReduceScatter接口，达到下发3个通信任务的效果。此时，只有1个handleId的任务，但是需要调用3次Commit和Wait接口，对应代码片段如下。
 
-```
+```cpp
 extern "C" __global__ __aicore__ void reduce_scatter_custom(
     GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
 {

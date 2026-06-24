@@ -6,8 +6,10 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001820650064_zh-cn_topic_0000001389787297_section13230182415108"></a>
 
-```
-ContextBuilder &AddOutputTd(int32_t index, ge::DataType dtype, ge::Format originFormat, ge::Format storageFormat, gert::StorageShape storageShape)
+```cpp
+ContextBuilder& AddOutputTd(
+    int32_t index, ge::DataType dtype, ge::Format originFormat, ge::Format storageFormat,
+    gert::StorageShape storageShape)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001820650064_zh-cn_topic_0000001389787297_section75395119104"></a>
@@ -69,12 +71,11 @@ ContextBuilder &AddOutputTd(int32_t index, ge::DataType dtype, ge::Format origin
 
 ## 调用示例<a name="zh-cn_topic_0000001820650064_zh-cn_topic_0000001389787297_section320753512363"></a>
 
-```
+```cpp
 gert::StorageShape x_shape = {{1024, 5120}, {1024, 5120}};
 gert::StorageShape output_shape = {{1024, 5210}, {1024, 5210}};
 context_ascendc::ContextBuilder builder;
-(void)builder
-    .NodeIoNum(1, 1)
+(void)builder.NodeIoNum(1, 1)
     .IrInstanceNum({1})
     .SetOpNameType("tmpName", "tmpType")
     .AddInputTd(0, ge::DT_FLOAT16, ge::FORMAT_ND, ge::FORMAT_ND, x_shape)

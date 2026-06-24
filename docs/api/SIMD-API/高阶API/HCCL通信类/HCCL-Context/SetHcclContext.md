@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <uint32_t index>
 __aicore__ inline void SetHcclContext(__gm__ uint8_t* context)
 ```
@@ -40,7 +40,7 @@ __aicore__ inline void SetHcclContext(__gm__ uint8_t* context)
 
 ## 调用示例
 
-```
+```cpp
 // 给GROUP_0设置消息区地址
 AscendC::SetHcclContext<0>(contextGM);
 ```

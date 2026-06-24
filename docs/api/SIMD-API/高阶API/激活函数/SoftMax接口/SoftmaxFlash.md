@@ -26,7 +26,7 @@ Softmax增强版本，除了可以对输入tensor做SoftmaxFlash计算，还可�
 
 为方便理解，通过Python脚本实现的方式，表达其计算公式如下，其中src、inmax、 insum、update为输入，dst、x\_sum、x\_max、exp\_max为输出。
 
-```
+```python
 def softmax_flash(src, inmax=None, insum=None, update=None):
     if update == None:
         #基于last轴进行rowmax(按行取最大值)处理
@@ -54,26 +54,42 @@ def softmax_flash(src, inmax=None, insum=None, update=None):
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isReuseSource = false, bool isBasicBlock = false>
-    __aicore__ inline void SoftmaxFlash(const LocalTensor<T>& dstTensor, const LocalTensor<T>& sumTensor, const LocalTensor<T>& maxTensor, const LocalTensor<T>& srcTensor, const LocalTensor<T>& expMaxTensor, const LocalTensor<T>& inSumTensor, const LocalTensor<T>& inMaxTensor, const SoftMaxTiling& tiling, bool isUpdate = false, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+    __aicore__ inline void SoftmaxFlash(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& sumTensor, const LocalTensor<T>& maxTensor,
+        const LocalTensor<T>& srcTensor, const LocalTensor<T>& expMaxTensor, const LocalTensor<T>& inSumTensor,
+        const LocalTensor<T>& inMaxTensor, const SoftMaxTiling& tiling, bool isUpdate = false,
+        const SoftMaxShapeInfo& softmaxShapeInfo = {})
     ```
 
-    ```
+    ```cpp
     template <typename T, bool isReuseSource = false, bool isBasicBlock = false>
-    __aicore__ inline void SoftmaxFlash(const LocalTensor<half>& dstTensor, const LocalTensor<float>& sumTensor, const LocalTensor<float>& maxTensor, const LocalTensor<half>& srcTensor, const LocalTensor<half>& expMaxTensor, const LocalTensor<float>& inSumTensor, const LocalTensor<float>& inMaxTensor, const SoftMaxTiling& tiling, bool isUpdate = false, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+    __aicore__ inline void SoftmaxFlash(
+        const LocalTensor<half>& dstTensor, const LocalTensor<float>& sumTensor, const LocalTensor<float>& maxTensor,
+        const LocalTensor<half>& srcTensor, const LocalTensor<half>& expMaxTensor, const LocalTensor<float>& inSumTensor,
+        const LocalTensor<float>& inMaxTensor, const SoftMaxTiling& tiling, bool isUpdate = false,
+        const SoftMaxShapeInfo& softmaxShapeInfo = {})
     ```
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isReuseSource = false, bool isBasicBlock = false>
-    __aicore__ inline void SoftmaxFlash(const LocalTensor<T>& dstTensor, const LocalTensor<T>& sumTensor, const LocalTensor<T>& maxTensor, const LocalTensor<T>& srcTensor, const LocalTensor<T>& expMaxTensor, const LocalTensor<T>& inSumTensor, const LocalTensor<T>& inMaxTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling, bool isUpdate = false, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+    __aicore__ inline void SoftmaxFlash(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& sumTensor, const LocalTensor<T>& maxTensor,
+        const LocalTensor<T>& srcTensor, const LocalTensor<T>& expMaxTensor, const LocalTensor<T>& inSumTensor,
+        const LocalTensor<T>& inMaxTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling,
+        bool isUpdate = false, const SoftMaxShapeInfo& softmaxShapeInfo = {})
     ```
 
-    ```
+    ```cpp
     template <typename T, bool isReuseSource = false, bool isBasicBlock = false>
-    __aicore__ inline void SoftmaxFlash(const LocalTensor<half>& dstTensor, const LocalTensor<float>& sumTensor, const LocalTensor<float>& maxTensor, const LocalTensor<half>& srcTensor, const LocalTensor<half>& expMaxTensor, const LocalTensor<float>& inSumTensor, const LocalTensor<float>& inMaxTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling, bool isUpdate = false, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+    __aicore__ inline void SoftmaxFlash(
+        const LocalTensor<half>& dstTensor, const LocalTensor<float>& sumTensor, const LocalTensor<float>& maxTensor,
+        const LocalTensor<half>& srcTensor, const LocalTensor<half>& expMaxTensor, const LocalTensor<float>& inSumTensor,
+        const LocalTensor<float>& inMaxTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling,
+        bool isUpdate = false, const SoftMaxShapeInfo& softmaxShapeInfo = {})
     ```
 
 由于该接口的内部实现中涉及复杂的计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -110,7 +126,7 @@ def softmax_flash(src, inmax=None, insum=None, update=None):
 | isUpdate | 输入 | 是否开启update算法。 |
 | softmaxShapeInfo | 输入 | srcTensor的shape信息。SoftMaxShapeInfo类型，具体定义如下方代码所示，其中参数的含义为：<br>srcM：非尾轴长度的乘积。<br>srcK：尾轴长度，必须32Byte对齐。<br>oriSrcM：原始非尾轴长度的乘积。<br>oriSrcK：原始尾轴长度。 |
 
-```
+```cpp
 struct SoftMaxShapeInfo {
     uint32_t srcM;
     uint32_t srcK;
@@ -134,7 +150,7 @@ struct SoftMaxShapeInfo {
 
 本样例输入src的Shape大小为\[80,144\]，输出Shape大小dst=\[80,144\]，输入inExpSumTensor=\[80,16\]，输入inMaxTensor=\[80,16\]，输出expMaxTensor=\[80,16\]，数据类型均为half，update为false。
 
-```
+```cpp
 #include "kernel_operator.h"
 
 template <typename T>

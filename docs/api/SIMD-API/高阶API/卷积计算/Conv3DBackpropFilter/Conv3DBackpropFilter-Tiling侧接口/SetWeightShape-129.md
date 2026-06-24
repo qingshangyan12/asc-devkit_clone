@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 void SetWeightShape(int64_t cout, int64_t cin, int64_t d, int64_t h, int64_t w)
 ```
 
@@ -32,7 +32,7 @@ void SetWeightShape(int64_t cout, int64_t cin, int64_t d, int64_t h, int64_t w)
 
 ## 调用示例
 
-```
+```cpp
 optiling::Conv3DBackpropFilterTilingData tilingData;
 auto ascendcPlatform = platform_ascendc::PlatformAscendCManager::GetInstance();
 ConvBackpropApi::Conv3dBpFilterTiling conv3dBpDwTiling(*ascendcPlatform);

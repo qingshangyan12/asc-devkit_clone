@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── torch_library_report_tensor
 │   ├── CMakeLists.txt           // 编译工程文件
 │   ├── torch_library_report_tensor.py   // PyTorch调用脚本
@@ -28,7 +28,7 @@
 
   样例注册名为`ascendc_ops::ascendc_add`的PyTorch自定义算子。Python脚本输入两个`[8, 2048]`、`float16`、`ND`格式的NPU Tensor，调用自定义算子完成Add计算，并通过CPU结果校验精度。计算公式为：
 
-  ```
+  ```text
   z = x + y
   ```
 

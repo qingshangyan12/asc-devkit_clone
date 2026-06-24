@@ -22,7 +22,7 @@
 
 ## 函数原型
 
-```
+```cpp
 void GetXorTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuffer)
 ```
 
@@ -48,7 +48,7 @@ void GetXorTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCou
 
 完整的调用样例请参考[更多样例](../更多样例-83.md)。
 
-```
+```cpp
 uint32_t maxLiveNodeCount = 0;
 uint32_t extraBuf = 0;
 AscendC::GetXorTmpBufferFactorSize(typeSize, maxLiveNodeCount, extraBuf);

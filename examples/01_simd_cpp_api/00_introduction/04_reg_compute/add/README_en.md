@@ -10,7 +10,7 @@ This example implements vector self-addition based on the RegBase programming pa
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── add
 │   ├── scripts
 │   │   ├── gen_data.py                // Input data and ground truth data generation script

@@ -87,8 +87,9 @@ __simd_callee__ inline void Squeeze(U& dstReg, U& srcReg, MaskReg& mask)
 以下示例展示了`Squeeze`与`StoreUnAlign`的典型配合方式（`Squeeze`的STORE_REG模式，`StoreUnAlign`使用AR寄存器中的有效元素字节数作为偏移量）：
 
 ```cpp
-template<typename T>
-__simd_vf__ inline void SqueezeVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t oneRepeatSize, uint16_t repeatTimes)
+template <typename T>
+__simd_vf__ inline void SqueezeVF(
+    __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> srcReg0;
     AscendC::Reg::RegTensor<T> srcReg1;
@@ -98,7 +99,7 @@ __simd_vf__ inline void SqueezeVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint
         AscendC::Reg::LoadAlign<T, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(srcReg0, srcAddr, oneRepeatSize);
         AscendC::Reg::Squeeze<T, AscendC::Reg::GatherMaskMode::STORE_REG>(srcReg1, srcReg0, sqzMask);
         AscendC::Reg::StoreUnAlign<T, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(dstAddr, srcReg1, ureg);
-     }
-     AscendC::Reg::StoreUnAlignPost(dstAddr, ureg);
+    }
+    AscendC::Reg::StoreUnAlignPost(dstAddr, ureg);
 }
 ```

@@ -63,7 +63,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline void DestroyWithoutPipeAll()
 ```
 
@@ -79,9 +79,9 @@ __aicore__ inline void DestroyWithoutPipeAll()
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
-AscendC::TPipe pipe; // Pipe内存管理对象
-AscendC::TQue<AscendC::TPosition::VECOUT, 2> que; //输出数据Queue队列管理对象，TPosition为VECOUT
+```cpp
+AscendC::TPipe pipe;                              // Pipe内存管理对象
+AscendC::TQue<AscendC::TPosition::VECOUT, 2> que; // 输出数据Queue队列管理对象，TPosition为VECOUT
 uint8_t num = 2;
 uint32_t len = 128;
 pipe.InitBuffer(que, num, len);

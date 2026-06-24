@@ -11,7 +11,7 @@ This sample implements an Add operator using C_API interfaces, based on asynchro
 
 ## Directory Structure
 
-```
+```text
 ├── c_api_async_add
 │   ├── CMakeLists.txt      // Build project file
 │   ├── c_api_add.asc       // Ascend C operator implementation & invocation sample
@@ -22,7 +22,7 @@ This sample implements an Add operator using C_API interfaces, based on asynchro
 
 - Operator Function:
   The Add operator implements the function of adding two data elements and returning the result. The corresponding mathematical expression is:
-  ```
+  ```text
   z = x + y
   ```
 

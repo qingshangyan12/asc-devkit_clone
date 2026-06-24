@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <uint32_t index>
 __aicore__ inline __gm__ uint8_t* __gm__ GetHcclContext(void)
 ```
@@ -39,6 +39,6 @@ __aicore__ inline __gm__ uint8_t* __gm__ GetHcclContext(void)
 
 ## 调用示例
 
-```
+```cpp
 GM_ADDR contextGM = AscendC::GetHcclContext<0>();
 ```

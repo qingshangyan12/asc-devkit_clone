@@ -28,24 +28,24 @@ Ascend 950PR/Ascend 950DT对应的架构中，Vector Function（VF）是实现�
 
      本示例展示了尾块处理场景，当尾块大小不为0时，hasTail为1，通过for(1)来代替if(hasTail)的判断，提高了Loop的性能。
 
-    ```
-    //【反例】使用if语句
+    ```cpp
+    // 【反例】使用if语句
     uint16_t tailK = srcK % floatRepSize;
     uint16_t hasTail = 0;
     // 通过!!tailK ，对是否产生尾块进行判断，如果srcK % floatRepSize余数为0，则hasTail对应bool值为0（false）,否则为1（true）
     hasTail = !!tailK;
-    if(hasTail){
-      // 尾块处理内容
+    if (hasTail) {
+        // 尾块处理内容
     }
     ```
 
-    ```
-    //【正例】使用for(1)来替代if判断语句
+    ```cpp
+    // 【正例】使用for(1)来替代if判断语句
     uint16_t tailK = srcK % floatRepSize;
     uint16_t hasTail = 0;
     hasTail = !!tailK;
     for (uint16_t i = 0; i < hasTail; i++) {
-      // 尾块处理内容
+        // 尾块处理内容
     }
     ```
 
@@ -54,30 +54,30 @@ Ascend 950PR/Ascend 950DT对应的架构中，Vector Function（VF）是实现�
 
 下文示例展示了编译器识别并处理为Hardware Loop和Software Loop的两种场景：
 
-```
-//【正例】被编译器优化为Hardware Loop
-// 嵌套循环
-for (uint16_t i = 0; i < LoopBound; i++) {            
-    for (uint16_t j = 0; j < LoopBound; j++) {   
-        for (uint16_t k = 0; k < LoopBound; k++) {   
-            for (uint16_t m = 0; m < LoopBound; m++) {  
-              // ...
+```cpp
+// 【正例】被编译器优化为Hardware Loop
+//  嵌套循环
+for (uint16_t i = 0; i < LoopBound; i++) {
+    for (uint16_t j = 0; j < LoopBound; j++) {
+        for (uint16_t k = 0; k < LoopBound; k++) {
+            for (uint16_t m = 0; m < LoopBound; m++) {
+                // ...
             }
-         }
-     }
+        }
+    }
 }
 ```
 
-```
-//【反例】无法被编译器优化，构成Software Loop
-for (uint16_t i = 0; i < LoopBound; i++) {     // Software Loop，循环内包含了if判断
-    if(cond){
+```cpp
+// 【反例】无法被编译器优化，构成Software Loop
+for (uint16_t i = 0; i < LoopBound; i++) { // Software Loop，循环内包含了if判断
+    if (cond) {
         ...
     }
 }
- 
-for (uint16_t i = 2; i < LoopBound*3; i+=2){  // Software Loop，循环起始值不为0，循环步长不为1
-...
+
+for (uint16_t i = 2; i < LoopBound * 3; i += 2) { // Software Loop，循环起始值不为0，循环步长不为1
+    ...
 }
 ```
 
@@ -85,21 +85,24 @@ for (uint16_t i = 2; i < LoopBound*3; i+=2){  // Software Loop，循环起始值
 
 在一个VF内，不推荐直接访问结构体或类对象的成员变量。直接访问结构体或类对象的成员变量相当于从栈上把内容搬运到Tensor寄存器中，之后通过地址访问Tensor上的内容，该操作将导致VF融合失效，建议通过局部变量临时传参解决，示例如下：
 
-```
-//【反例】直接读取结构体或类对象的成员变量
-__aicore__ inline void SoftMaxGenericNDImpVF(__ubuf__ float* dstAddr, __ubuf__ float* sumAddr, __ubuf__ float* maxAddr,
-    __ubuf__ float* srcAddr, __ubuf__ float* workAddr, const LastAxisShapeND originalSrcShape, const SoftMaxTiling tiling)
+```cpp
+// 【反例】直接读取结构体或类对象的成员变量
+__aicore__ inline void SoftMaxGenericNDImpVF(
+    __ubuf__ float* dstAddr, __ubuf__ float* sumAddr, __ubuf__ float* maxAddr, __ubuf__ float* srcAddr,
+    __ubuf__ float* workAddr, const LastAxisShapeND originalSrcShape, const SoftMaxTiling tiling)
 {
     for (uint16_t i = 0; i < (uint16_t)tiling.srcM; i++) {
-        AscendC::ReduceMax(maxAddr + i * FLOAT_NUM_PER_BLK, srcAddr + i * tiling.srcK, workAddr, (uint16_t)originalSrcShape.k);
+        AscendC::ReduceMax(
+            maxAddr + i * FLOAT_NUM_PER_BLK, srcAddr + i * tiling.srcK, workAddr, (uint16_t)originalSrcShape.k);
     }
 }
 ```
 
-```
-//【正例】通过局部变量传递VF内访问的结构体或类对象成员变量
-__aicore__ inline void SoftMaxGenericNDImpVF(__ubuf__ float* dstAddr, __ubuf__ float* sumAddr, __ubuf__ float* maxAddr,
-    __ubuf__ float* srcAddr, __ubuf__ float* workAddr, const LastAxisShapeND originalSrcShape, const SoftMaxTiling tiling)
+```cpp
+// 【正例】通过局部变量传递VF内访问的结构体或类对象成员变量
+__aicore__ inline void SoftMaxGenericNDImpVF(
+    __ubuf__ float* dstAddr, __ubuf__ float* sumAddr, __ubuf__ float* maxAddr, __ubuf__ float* srcAddr,
+    __ubuf__ float* workAddr, const LastAxisShapeND originalSrcShape, const SoftMaxTiling tiling)
 {
     uint16_t srcK = tiling.srcK;
     uint16_t srcM = tiling.srcM;
@@ -115,13 +118,13 @@ __aicore__ inline void SoftMaxGenericNDImpVF(__ubuf__ float* dstAddr, __ubuf__ f
 
 减少Loop循环内非索引相关语句。for循环中存在与索引无关的语句可以提出for循环外来减少指令数。
 
-```
-//【反例】Duplicate语句放在for循环中，每次循环都会执行一次
-template<typename T>
+```cpp
+// 【反例】Duplicate语句放在for循环中，每次循环都会执行一次
+template <typename T>
 __simd_vf__ inline void DuplicateVF(__ubuf__ T* dstAddr, T scalarValue, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> dstReg;
-    AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T>();  
+    AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T>();
     for (uint16_t i = 0; i < repeatTimes; i++) {
         AscendC::Reg::Duplicate(dstReg, scalarValue);
         AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
@@ -129,13 +132,13 @@ __simd_vf__ inline void DuplicateVF(__ubuf__ T* dstAddr, T scalarValue, uint32_t
 }
 ```
 
-```
-//【正例】Duplicate放在for循环外，仅执行一次，有效减少指令数
-template<typename T>
+```cpp
+// 【正例】Duplicate放在for循环外，仅执行一次，有效减少指令数
+template <typename T>
 __simd_vf__ inline void DuplicateVF(__ubuf__ T* dstAddr, T scalarValue, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> dstReg;
-    AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T>();  
+    AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T>();
     AscendC::Reg::Duplicate(dstReg, scalarValue);
     for (uint16_t i = 0; i < repeatTimes; i++) {
         AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
@@ -153,12 +156,12 @@ __simd_vf__ inline void DuplicateVF(__ubuf__ T* dstAddr, T scalarValue, uint32_t
 
 如下是一个满足地址寄存器生成模式的代码示例，源操作数地址按照上图的方式进行最多四维的寻址：
 
-```
-for(uint16_t i = 0;i < extent1; i++){
-    for(uint16_t j = 0;j < extent2; j++){
-        for(uint16_t k = 0;k < extent3; k++){
-            for(uint16_t m = 0;m < extent4; m++){
-               AscendC::Reg::LoadAlign(srcReg, srcAddr + i * const1 + j * const2 + k * const3 + m * const4);
+```cpp
+for (uint16_t i = 0; i < extent1; i++) {
+    for (uint16_t j = 0; j < extent2; j++) {
+        for (uint16_t k = 0; k < extent3; k++) {
+            for (uint16_t m = 0; m < extent4; m++) {
+                AscendC::Reg::LoadAlign(srcReg, srcAddr + i * const1 + j * const2 + k * const3 + m * const4);
             }
         }
     }
@@ -167,12 +170,12 @@ for(uint16_t i = 0;i < extent1; i++){
 
 编译器会将以上模式优化为使用AddrReg进行地址管理，优化为以下模式：
 
-```
+```cpp
 AscendC::Reg::AddrReg aReg;
-for(uint16_t i = 0;i < extent1; i++){
-    for(uint16_t j = 0;j < extent2; j++){
-        for(uint16_t k = 0;k < extent3; k++){
-            for(uint16_t m = 0;m < extent4; m++){
+for (uint16_t i = 0; i < extent1; i++) {
+    for (uint16_t j = 0; j < extent2; j++) {
+        for (uint16_t k = 0; k < extent3; k++) {
+            for (uint16_t m = 0; m < extent4; m++) {
                 aReg = AscendC::Reg::CreateAddrReg<T>(i, const1, j, const2, k, const3, m, const4);
                 AscendC::Reg::LoadAlign(srcReg, srcAddr, aReg);
             }
@@ -185,9 +188,10 @@ for(uint16_t i = 0;i < extent1; i++){
 
 特别地，当四层循环构成连续访问场景时，地址管理可被简化为一维模式，从而实现更高效的搬运优化，进一步提升数据访问的局部性和执行效率。
 
-```
+```cpp
 // 开启向量地址生成指令优化
-__simd_vf__ inline void ComputeModeVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t oneRepeatSize, uint16_t repeatTimes)
+__simd_vf__ inline void ComputeModeVF(
+    __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> dstReg;
     AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T>();

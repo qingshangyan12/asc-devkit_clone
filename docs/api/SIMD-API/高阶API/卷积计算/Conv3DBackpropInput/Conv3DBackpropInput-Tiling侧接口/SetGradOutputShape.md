@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 bool SetGradOutputShape(int64_t n, int64_t c, int64_t d, int64_t h, int64_t w)
 ```
 
@@ -32,7 +32,7 @@ true表示设置成功，false表示设置失败。
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendCManager::GetInstance();
 ConvBackpropApi::Conv3DBpInputTiling conv3DBpDxTiling(*ascendcPlatform);
 conv3DBpDxTiling.SetGradOutputShape(n, c, d, h, w);

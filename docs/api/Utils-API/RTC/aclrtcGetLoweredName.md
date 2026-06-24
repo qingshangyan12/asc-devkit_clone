@@ -53,8 +53,8 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
-aclError aclrtcGetLoweredName(aclrtcProg prog, const char *nameExpression, const char **loweredName)
+```cpp
+aclError aclrtcGetLoweredName(aclrtcProg prog, const char* nameExpression, const char** loweredName)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -104,7 +104,7 @@ aclError为int类型变量，详细说明请参考[RTC错误码](RTC错误码.md
 
 ## 调用示例<a name="section837496171220"></a>
 
-```
+```text
 aclrtcProg prog;
 aclrtcCreateProg(&prog, src, "add_custom", 0, nullptr, nullptr);
 

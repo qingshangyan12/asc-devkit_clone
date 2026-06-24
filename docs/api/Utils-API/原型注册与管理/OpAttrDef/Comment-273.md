@@ -10,7 +10,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000002055278364_zh-cn_topic_0000001526111046_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
+```text
 OpAttrDef &Comment(const char *comment)
 ```
 
@@ -45,7 +45,7 @@ OpAttrDef &Comment(const char *comment)
 
 ## 调用示例<a name="zh-cn_topic_0000002055278364_zh-cn_topic_0000001526111046_zh-cn_topic_0000001575944081_section320753512363"></a>
 
-```
+```cpp
 this->Attr("attrname").Comment("Attr cmt 1");
 ```
 

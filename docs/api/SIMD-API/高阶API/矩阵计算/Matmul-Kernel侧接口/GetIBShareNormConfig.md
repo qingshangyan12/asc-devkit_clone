@@ -22,8 +22,11 @@
 
 ## 函数原型
 
-```
-__aicore__ constexpr MatmulConfig GetIBShareNormConfig(const bool intrinsicsLimit = false, const bool batchLoop = false, const bool isVecND2NZ = false, const BatchMode bmmMode = BatchMode::BATCH_LESS_THAN_L1, const bool isDoubleCache = false, const bool enUnitFlag = true)
+```cpp
+__aicore__ constexpr MatmulConfig GetIBShareNormConfig(
+    const bool intrinsicsLimit = false, const bool batchLoop = false, const bool isVecND2NZ = false,
+    const BatchMode bmmMode = BatchMode::BATCH_LESS_THAN_L1, const bool isDoubleCache = false,
+    const bool enUnitFlag = true)
 ```
 
 ## 参数说明
@@ -51,7 +54,7 @@ IBShare模板当前仅适用于MIX场景，不支持纯CUBE场景。
 
 ## 调用示例
 
-```
+```cpp
 // 配置IBShare模板的参数，获取自定义IBShare模板。
 constexpr MatmulConfig MM_CFG = GetIBShareNormConfig(
     /* intrinsicsLimit      */ false,

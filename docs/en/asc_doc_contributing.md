@@ -133,7 +133,7 @@ The API Reference Manual is the **interface detail authority source**. Each API 
 
 **Sample**:
 
-```
+```text
 ## Product Support Status
 
 - Ascend 950PR/Ascend 950DT：Supported
@@ -154,7 +154,7 @@ The API Reference Manual is the **interface detail authority source**. Each API 
 
 **Sample** (using Mmad as an example):
 
-```
+```text
 ## Function Description
 
 Header file: `#include "basic_api/kernel_operator_mm_intf.h"`
@@ -184,7 +184,7 @@ C = A × B + Bias
 
 **Sample**:
 
-```
+```text
 For Atlas A2/A3 series products:
 | Matrix Computation | Physical Location | Dimensions | I/O Data Format | Data Type |
 |--------------------|-------------------|------------|-----------------|-----------|
@@ -217,29 +217,31 @@ For Ascend 950PR/Ascend 950DT products:
 ```cpp
 // No bias: basic matrix multiply-accumulate prototype
 template <typename T, typename U, typename S>
-__aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
-    const LocalTensor<S>& b, const MmadParams& mmadParams)
+__aicore__ inline void Mmad(
+    const LocalTensor<T>& c, const LocalTensor<U>& a, const LocalTensor<S>& b, const MmadParams& mmadParams)
 ```
 
 ```cpp
 // With bias: matrix multiply-accumulate with bias prototype
 template <typename T, typename U, typename S, typename V>
-__aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
-    const LocalTensor<S>& b, const LocalTensor<V>& bias, const MmadParams& mmadParams)
+__aicore__ inline void Mmad(
+    const LocalTensor<T>& c, const LocalTensor<U>& a, const LocalTensor<S>& b, const LocalTensor<V>& bias,
+    const MmadParams& mmadParams)
 ```
 
 ```cpp
 // No bias (BitMode version): bit-field union parameter prototype
 template <typename T, typename U, typename S>
-__aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
-    const LocalTensor<S>& b, const MmadBitModeParams& mmadParams)
+__aicore__ inline void Mmad(
+    const LocalTensor<T>& c, const LocalTensor<U>& a, const LocalTensor<S>& b, const MmadBitModeParams& mmadParams)
 ```
 
 ```cpp
 // With bias (BitMode version): bit-field union + bias prototype
 template <typename T, typename U, typename S, typename V>
-__aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
-    const LocalTensor<S>& b, const LocalTensor<V>& bias, const MmadBitModeParams& mmadParams)
+__aicore__ inline void Mmad(
+    const LocalTensor<T>& c, const LocalTensor<U>& a, const LocalTensor<S>& b, const LocalTensor<V>& bias,
+    const MmadBitModeParams& mmadParams)
 ```
 
 **Requirements**:
@@ -256,7 +258,7 @@ __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
 
 ##### Main Parameter Table
 
-```
+```text
 | Parameter | I/O | Description |
 |-----------|-----|-------------|
 | c | Output | Destination operand, result matrix c, type LocalTensor, physical storage L0C Buffer(TPosition:CO1). Starting address must be 1024-byte aligned. |
@@ -273,18 +275,22 @@ __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
 
 ##### Nested Struct Parameter Table
 
-```
-### MmadParams Struct Parameter Description
+```cpp
+## #MmadParams Struct Parameter Description
 
-| Parameter | Description |
-|-----------|-------------|
-| m | Left matrix Height, range: m∈[0, 4095]. Default: 0. |
-| n | Right matrix Width, range: n∈[0, 4095]. Default: 0. |
-| k | Left matrix Width / right matrix Height, range: k∈[0, 4095]. Default: 0. |
-| cmatrixInitVal | Whether to enable C matrix default zero initialization. true=init to 0, false=no init (controlled by cmatrixSource). Default: true. |
-| cmatrixSource | Whether C matrix initial value comes from BT Buffer. true=from BT, false=no init. Default: false. **Note**: Ineffective when bias input is present. |
-| unitFlag | Controls fine-grained Mmad/Fixpipe parallelism. 0=disabled, 2=enabled no reset, 3=enabled with reset. See UnitFlag feature description. |
-| disableGemv | Whether to disable GEMV mode when M=1. **Only 950PR/DT**. |
+    | Parameter | Description | | -- -- -- -- -- - | -- -- -- -- -- -- - | | m | Left matrix Height,
+    range : m∈[0, 4095].Default : 0. | | n | Right matrix Width,
+    range : n∈[0, 4095].Default : 0. | | k | Left matrix Width / right matrix Height,
+    range : k∈[0, 4095].Default : 0. | | cmatrixInitVal |
+        Whether to enable C
+            matrix default zero initialization.true = init to 0,
+                                false = no init(controlled by cmatrixSource).Default : true.| | cmatrixSource |
+                                        Whether C matrix initial value comes from BT Buffer.true = from BT,
+                                false = no init.Default : false.**Note ** : Ineffective when bias input is present.| |
+                                        unitFlag | Controls fine - grained Mmad / Fixpipe parallelism .0 = disabled,
+                                2 = enabled no reset,
+                                3 = enabled with reset.See UnitFlag feature description.| | disableGemv |
+                                    Whether to disable GEMV mode when M = 1. * *Only 950PR / DT * *.|
 ```
 
 **Requirements**:
@@ -302,25 +308,18 @@ __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
 
 **Sample**:
 
-```
-For Atlas A2/A3 series products:
+```cpp
+For Atlas A2 / A3 series products :
 
-| Left Matrix A | Right Matrix B | Result Matrix C |
-|--------------|----------------|-----------------|
-| int8_t | int8_t | int32_t |
-| half | half | float |
-| float | float | float |
-| bfloat16_t | bfloat16_t | float |
-| int4b_t | int4b_t | int32_t |
+    | Left Matrix A | Right Matrix B | Result Matrix C | | -- -- -- -- -- -- -- | -- -- -- -- -- -- -- -- |
+    -- -- -- -- -- -- -- -- - | | int8_t | int8_t | int32_t | | half | half | float | | float | float | float | |
+    bfloat16_t | bfloat16_t | float | | int4b_t | int4b_t | int32_t |
 
-| Left Matrix A | Right Matrix B | Bias | Result Matrix C |
-|--------------|----------------|------|-----------------|
-| int8_t | int8_t | int32_t | int32_t |
-| half | half | float | float |
-| ... | ... | ... | ... |
+    | Left Matrix A | Right Matrix B | Bias | Result Matrix C | | -- -- -- -- -- -- -- | -- -- -- -- -- -- -- -- |
+    -- -- -- | -- -- -- -- -- -- -- -- - | | int8_t | int8_t | int32_t | int32_t | | half | half | float | float | |
+    ... | ... | ... | ... |
 
-For Ascend 950PR/DT products:
-(Similar tables, including fp8/hifloat8 and other unique types)
+    For Ascend 950PR / DT products : (Similar tables, including fp8 / hifloat8 and other unique types)
 ```
 
 **Requirements**:
@@ -337,12 +336,12 @@ For Ascend 950PR/DT products:
 
 **Sample**:
 
-```
-## Return Value Description
+```cpp
+##Return Value Description
 
-| Return Type | Description |
-|------------|-------------|
-| LocalTensor<T>& | Returns reference to the destination operand, type matches template parameter T. Supports chained calls. |
+    | Return Type | Description | | -- -- -- -- -- -- | -- -- -- -- -- -- - | | LocalTensor<T>& |
+    Returns reference to the destination operand,
+    type matches template parameter T.Supports chained calls.|
 ```
 
 **Requirements**:
@@ -405,19 +404,21 @@ For Ascend 950PR/DT products:
 
 Use `> **Warning**` block to prominently mark APIs that cannot be used simultaneously.
 
-```
-> **Warning**: The following interfaces are mutually exclusive with the current interface and cannot be used in the same Tiling strategy:
-> - **MmadWithSparse**: Used when structured sparsity (4-out-of-2) is enabled; mutually exclusive with Mmad.
-> - **MXMmad**: Used for MX matrix computation scenarios; mutually exclusive with Mmad.
+```cpp
+> **Warning** : The following interfaces are mutually exclusive with the current interface and cannot be used in the
+                    same Tiling strategy
+    : > -**MmadWithSparse** : Used when structured sparsity(4 - out - of - 2) is enabled; mutually exclusive with Mmad.
+> - **MXMmad**: Used for MX matrix computation scenarios;
+mutually exclusive with Mmad.
 
-> **Note**: Mmad's with-bias and without-bias prototypes are **not mutually exclusive**; either may be freely selected.
+    > **Note** : Mmad's with-bias and without-bias prototypes are **not mutually exclusive**; either may be freely selected.
 ```
 
 ##### Similar API Selection Guide
 
 Use a table to list functionally similar APIs with selection recommendations.
 
-```
+```text
 | Similar API | Difference | Selection Recommendation |
 |------------|-----------|------------------------|
 | [MmadWithSparse](MmadWithSparse.md) | Supports 4-out-of-2 structured sparse matmul | Use when weight matrix has been pruned to sparse format |
@@ -430,7 +431,7 @@ Use a table to list functionally similar APIs with selection recommendations.
 
 ##### Underlying built-in Mapping (Optional, Collapsible)
 
-```
+```cpp
 <details>
 <summary>Underlying built-in interface mapping (click to expand)</summary>
 
@@ -487,7 +488,7 @@ The Cross-generation Migration Guide is the **compatibility authority source**, 
 
 **Migration Mapping Entry Format**:
 
-```markdown
+```text
 ## <Legacy API Name> → <New API Name>
 
 ### Change Description
@@ -531,8 +532,10 @@ The Cross-generation Migration Guide is the **compatibility authority source**, 
 ### Keyword Annotation in Examples
 
 ```cpp
-__aicore__ inline void ExampleKernel(__gm__ uint8_t* x) {  // __aicore__=kernel function modifier, __gm__=Global Memory address space
-    // ...
+__aicore__ inline void ExampleKernel(__gm__ uint8_t* x)
+{ // __aicore__=kernel function modifier,
+  // __gm__=Global Memory address space
+  // ...
 }
 ```
 
@@ -542,7 +545,7 @@ __aicore__ inline void ExampleKernel(__gm__ uint8_t* x) {  // __aicore__=kernel 
 
 Refer to existing cases under `算子实践参考/优秀实践/` (e.g., FlashAttention, Matmul series). Recommended structure:
 
-```markdown
+```text
 # <Operator Name> Performance Tuning Case
 
 ## Background
@@ -610,7 +613,7 @@ Before submitting a documentation PR, check each item:
 
 The five documents are connected through cross-references to form a navigation network, following the principle of "whoever mentions content managed by another document adds the link":
 
-```
+```text
 Getting Started Tutorial ──in-depth concepts──→ Programming Guide
                     ──first API mention──→ API Reference Manual
 

@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001626329929_zh-cn_topic_0000001576875005_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
+```text
 OpParamDef &ValueDepend(Option value_depend)
 OpParamDef &ValueDepend(Option value_depend, DependScope scope)
 ```

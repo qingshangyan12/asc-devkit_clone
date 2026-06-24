@@ -5,7 +5,7 @@
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 目录结构介绍
-```
+```text
 ├── 01_async_add
 │   ├── CMakeLists.txt      // 编译工程文件
 │   ├── c_api_add.asc       // Ascend C算子实现 & 调用样例
@@ -15,7 +15,7 @@
 ## 算子描述
 - 算子功能：  
   Add算子实现了两个数据相加，返回相加结果的功能。对应的数学表达式为：  
-  ```
+  ```text
   z = x + y
   ```
 

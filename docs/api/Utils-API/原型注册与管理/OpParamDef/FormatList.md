@@ -6,7 +6,7 @@
 
 使用[Format](Format.md)配置数据格式时，这些数据格式和其他输入输出的数据类型和数据格式是一一对应的，如下的示例中表示：当输入x和y数据格式为FORMAT\_NHWC时，对应的输出z数据格式也为FORMAT\_NHWC，且此时x、y、z的数据类型要求为ge::DT\_FLOAT。
 
-```
+```cpp
 class AddCustom : public OpDef {
 public:
     AddCustom(const char* name) : OpDef(name)
@@ -30,7 +30,7 @@ public:
 
 如果某个输入/输出支持的数据格式支持和其他所有输入/输出支持的数据类型、数据格式组合使用，使用Format接口需要写成如下的格式，表示当输入x为FORMAT\_ND时，支持输入y和输入z的所有数据类型、数据格式组合。
 
-```
+```cpp
 class XxxCustom : public OpDef {
 public:
     XxxCustom(const char* name) : OpDef(name)
@@ -54,15 +54,12 @@ public:
 
 此时可以通过FormatList指定数据类型，无需重复列出，例如：
 
-```
+```cpp
 class XxxCustom : public OpDef {
 public:
     XxxCustom(const char* name) : OpDef(name)
     {
-        this->Input("x")
-            .ParamType(REQUIRED)
-            .DataTypeList({ge::DT_FLOAT16})
-            .FormatList({ge::FORMAT_ND});
+        this->Input("x").ParamType(REQUIRED).DataTypeList({ge::DT_FLOAT16}).FormatList({ge::FORMAT_ND});
         this->Input("y")
             .ParamType(REQUIRED)
             .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT32})
@@ -78,8 +75,8 @@ public:
 
 ## 函数原型<a name="zh-cn_topic_0000001991734609_zh-cn_topic_0000001526275046_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
-OpParamDef &FormatList(std::vector<ge::Format> formats)
+```cpp
+OpParamDef& FormatList(std::vector<ge::Format> formats)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001991734609_zh-cn_topic_0000001526275046_zh-cn_topic_0000001525424352_section75395119104"></a>
@@ -114,7 +111,7 @@ OpParamDef算子定义，OpParamDef请参考[OpParamDef](OpParamDef.md)。
 
 ## 调用示例<a name="zh-cn_topic_0000001991734609_zh-cn_topic_0000001526275046_zh-cn_topic_0000001575944081_section320753512363"></a>
 
-```
+```cpp
 class AddCustom : public OpDef {
 public:
     AddCustom(const char* name) : OpDef(name)
@@ -123,8 +120,7 @@ public:
             .ParamType(REQUIRED)
             .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT32})
             .FormatList({ge::FORMAT_ND});
-        this->Input("x1")
-        ......
+        this->Input("x1")......
     }
 };
 ```

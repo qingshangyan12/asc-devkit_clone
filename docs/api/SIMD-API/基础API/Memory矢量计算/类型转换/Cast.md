@@ -67,7 +67,8 @@
 
   ```cpp
   template <typename T, typename U>
-  __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src, const RoundMode& roundMode, const uint32_t count)
+  __aicore__ inline void Cast(
+      const LocalTensor<T>& dst, const LocalTensor<U>& src, const RoundMode& roundMode, const uint32_t count)
   ```
 
 - tensor高维切分计算。
@@ -75,14 +76,18 @@
 
     ```cpp
     template <typename T, typename U, bool isSetMask = true>
-    __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src, const RoundMode& roundMode, const uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+    __aicore__ inline void Cast(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src, const RoundMode& roundMode, const uint64_t mask[],
+        const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
     ```
 
   - mask连续模式。
 
     ```cpp
     template <typename T, typename U, bool isSetMask = true>
-    __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src, const RoundMode& roundMode, const uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+    __aicore__ inline void Cast(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src, const RoundMode& roundMode, const uint64_t mask,
+        const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -113,14 +118,14 @@
 
 ```cpp
 enum class RoundMode {
-  CAST_NONE = 0,  // 在转换有精度损失时表示CAST_RINT模式，不涉及精度损失时表示不舍入
-  CAST_RINT,      // rint，四舍六入五成双舍入
-  CAST_FLOOR,     // floor，向负无穷舍入
-  CAST_CEIL,      // ceil，向正无穷舍入
-  CAST_ROUND,     // round，四舍五入舍入
-  CAST_TRUNC,     // trunc，向零舍入
-  CAST_ODD,       // Von Neumann rounding，最近邻奇数舍入
-  CAST_HYBRID,    // hybrid，目前特指输出结果是hifloat8_t数据时，会用到的一种随机舍入
+    CAST_NONE = 0, // 在转换有精度损失时表示CAST_RINT模式，不涉及精度损失时表示不舍入
+    CAST_RINT,     // rint，四舍六入五成双舍入
+    CAST_FLOOR,    // floor，向负无穷舍入
+    CAST_CEIL,     // ceil，向正无穷舍入
+    CAST_ROUND,    // round，四舍五入舍入
+    CAST_TRUNC,    // trunc，向零舍入
+    CAST_ODD,      // Von Neumann rounding，最近邻奇数舍入
+    CAST_HYBRID,   // hybrid，目前特指输出结果是hifloat8_t数据时，会用到的一种随机舍入
 };
 ```
 
@@ -401,17 +406,17 @@ enum class RoundMode {
   // repeatTime = 8, 64 elements one repeat, 512 elements total
   // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
   // dstRepStride = 8, srcRepStride = 4, no gap between repeats
-  AscendC::Cast(dstLocal, srcLocal, AscendC::RoundMode::CAST_CEIL, mask, 8, { 1, 1, 8, 4 });
+  AscendC::Cast(dstLocal, srcLocal, AscendC::RoundMode::CAST_CEIL, mask, 8, {1, 1, 8, 4});
   ```
 
 - tensor高维切分计算样例-mask逐bit模式。
 
   ```cpp
-  uint64_t mask[2] = { 0, UINT64_MAX };
+  uint64_t mask[2] = {0, UINT64_MAX};
   // repeatTime = 8, 64 elements one repeat, 512 elements total
   // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
   // dstRepStride = 8, srcRepStride = 4, no gap between repeats
-  AscendC::Cast(dstLocal, srcLocal, AscendC::RoundMode::CAST_CEIL, mask, 8, { 1, 1, 8, 4 });
+  AscendC::Cast(dstLocal, srcLocal, AscendC::RoundMode::CAST_CEIL, mask, 8, {1, 1, 8, 4});
   ```
 
 - tensor前n个数据计算样例。
@@ -473,8 +478,8 @@ enum class RoundMode {
   dstLocal为int8\_t类型，srcLocal为half类型。
 
   ```cpp
-  inBufferSize_ = srcSize;  // src buffer size
-  outBufferSize_ = srcSize / 2;   //dst buffer size
+  inBufferSize_ = srcSize;      // src buffer size
+  outBufferSize_ = srcSize / 2; // dst buffer size
   uint64_t mask = 128;
   AscendC::LocalTensor<half> srcLocal;
   srcLocal.SetSize(inBufferSize_);

@@ -24,7 +24,7 @@ MatmulConfigMode指定了获取并要修改的MatmulConfig模板，各模板介�
 
 ## 函数原型
 
-```
+```cpp
 template <MatmulConfigMode configMode, typename... ArgTypes>
 __aicore__ inline constexpr MatmulConfig GetMMConfig(ArgTypes&&... args)
 ```
@@ -114,7 +114,7 @@ __aicore__ inline constexpr MatmulConfig GetMMConfig(ArgTypes&&... args)
 
 ## 调用示例
 
-```
+```cpp
 // 获取MatmulConfig模板为Norm模板
 constexpr static MatmulConfigMode configMode = MatmulConfigMode::CONFIG_NORM;
 // singleCoreM、singleCoreN、singleCoreK、basicM、basicN、basicK

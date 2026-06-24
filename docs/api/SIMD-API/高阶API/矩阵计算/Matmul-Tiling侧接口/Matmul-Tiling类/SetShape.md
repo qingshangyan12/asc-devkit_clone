@@ -14,7 +14,7 @@
 
 ## 函数原型
 
-```
+```cpp
 int32_t SetShape(int32_t m, int32_t n, int32_t k)
 ```
 
@@ -38,7 +38,7 @@ int32_t SetShape(int32_t m, int32_t n, int32_t k)
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MatmulApiTiling tiling(ascendcPlatform);
 

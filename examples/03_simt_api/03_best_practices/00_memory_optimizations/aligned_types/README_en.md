@@ -14,7 +14,7 @@
 
 ## Directory Structure
 
-  ```
+  ```text
   ├── aligned_types
   │   ├── aligned_types.asc      // SIMT implementation & invocation example
   │   ├── CMakeLists.txt         // CMake build file
@@ -32,8 +32,14 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
   A compile-time operator that returns the alignment requirement of an object, that is, the number of bytes that the starting address of the object must be a multiple of. The default `alignof` of a struct equals the maximum `alignof` of all its fields, and can be forcibly increased using the `alignas` keyword. For example, for `struct T` and `struct T2` below, `T` has `alignof` of 4B, and `T2` has `alignof` of 8B.
 
   ```cpp
-  struct T { uint8_t a; uint32_t b; };  // alignof = max(1, 4) = 4
-  struct alignas(8) T2 { uint8_t a; uint32_t b; };  // alignof = 8 (alignas increases alignment)
+  struct T {
+      uint8_t a;
+      uint32_t b;
+  }; // alignof = max(1, 4) = 4
+  struct alignas(8) T2 {
+      uint8_t a;
+      uint32_t b;
+  }; // alignof = 8 (alignas increases alignment)
   ```
 
   **2. alignas**
@@ -47,8 +53,12 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
   - **Also increases sizeof**: `sizeof` must be a multiple of `alignof`, so when increasing `alignof`, `sizeof` rounds up.
 
   ```cpp
-  struct alignas(4) Align3 { unsigned char r, g, b; }; // alignof=4 sizeof=4 (increased with alignas)
-  struct Misalign3 { unsigned char r, g, b; }; // alignof=1 sizeof=3 (default)
+  struct alignas(4) Align3 {
+      unsigned char r, g, b;
+  }; // alignof=4 sizeof=4 (increased with alignas)
+  struct Misalign3 {
+      unsigned char r, g, b;
+  }; // alignof=1 sizeof=3 (default)
   ```
 
 - Key Parameters
@@ -84,7 +94,7 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
 
     This example has a fixed total data size of 512MiB, using 2048 threads on a single core to perform data transfer. The kernel function is implemented as a template, supporting different types and alignment structs, performing element-wise transfer operations. The specific implementation is as follows:
 
-    ```
+    ```cpp
     constexpr uint32_t THREAD_COUNT = 2048;                  // threads per block
     constexpr size_t MEM_BYTES = 512ULL * 1024ULL * 1024ULL; // total data size 512 MiB
     uint32_t num_elements = static_cast<uint32_t>(MEM_BYTES / sizeof(TData));
@@ -222,7 +232,7 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
 
   View specific performance analysis results:
 
-  ```
-  # For example, view Task Duration related data
-  cat ./OPPROF_*/OpBasicInfo.csv
+  ```cpp
+  #For example, view Task Duration related data
+  cat./ OPPROF_* / OpBasicInfo.csv
   ```

@@ -52,8 +52,7 @@ static dim3 group_dim()
     using namespace cooperative_groups;
     __global__ void simt_kernel(...)
     {
-        ...
-        thread_block g = this_thread_block();
+        ... thread_block g = this_thread_block();
         dim3 block_dim = g.group_dim();
         ...
     }
@@ -65,8 +64,7 @@ static dim3 group_dim()
     using namespace cooperative_groups;
     __simt_vf__ inline void simt_kernel(...)
     {
-        ...
-        thread_block g = this_thread_block();
+        ... thread_block g = this_thread_block();
         dim3 block_dim = g.group_dim();
         ...
     }

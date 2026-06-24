@@ -24,16 +24,19 @@
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <typename T, bool highPrecision = false, bool highPerformance = false>
-    __aicore__ inline void FasterGeluV2(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t dataSize)
+    __aicore__ inline void FasterGeluV2(
+        const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& sharedTmpBuffer,
+        const uint32_t dataSize)
     ```
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <typename T, bool highPrecision = false, bool highPerformance = false>
-    __aicore__ inline void FasterGeluV2(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dataSize)
+    __aicore__ inline void FasterGeluV2(
+        const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dataSize)
     ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者**通过sharedTmpBuffer入参传入**和**接口框架申请**两种方式。
@@ -75,7 +78,7 @@
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal：输出Tensor
 // srcLocal：输入Tensor
 // dataSize：实际参与计算的元素个数
@@ -90,7 +93,7 @@ AscendC::FasterGeluV2<srcType, false, true>(dstLocal, srcLocal, dataSize);
 
 结果示例如下：
 
-```
+```text
 输入数据(srcLocal):
 [-1.251   1.074  -6.137  -9.67   -5.066  -9.44   -3.588  -5.758  -7.484
  -5.35   -9.62   -4.33   -6.66   -3.732   0.0841 -8.59   -6.3    -4.62

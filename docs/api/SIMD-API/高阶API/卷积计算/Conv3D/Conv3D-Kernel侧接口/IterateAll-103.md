@@ -30,7 +30,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void IterateAll(const AscendC::GlobalTensor<OutputT>& output, bool enPartialSum = false)
 ```
 
@@ -49,7 +49,7 @@ __aicore__ inline void IterateAll(const AscendC::GlobalTensor<OutputT>& output, 
 
 -   IterateAll接口仅支持处理单batch数据，在多batch计算场景中，需要通过batch次循环调用IterateAll接口完成计算。
 
-    ```
+    ```cpp
     for (uint64_t batchIter = 0; batchIter < singleCoreBatch; ++batchIter) {
         conv3dApi.SetInput(inputGm[batchIter * inputOneBatchSize]);
         conv3dApi.IterateAll(outputGm[batchIter * outputOneBatchSize]);
@@ -59,7 +59,7 @@ __aicore__ inline void IterateAll(const AscendC::GlobalTensor<OutputT>& output, 
 
 -   IterateAll接口必须在初始化接口及输入输出配置接口之后进行调用，完成Conv3D计算，调用顺序如下。
 
-    ```
+    ```text
     Init(...);
     ... // 输入输出配置
     IterateAll(...);
@@ -68,7 +68,7 @@ __aicore__ inline void IterateAll(const AscendC::GlobalTensor<OutputT>& output, 
 
 ## 调用示例
 
-```
+```cpp
 TPipe pipe;
 conv3dApi.Init(&tiling);
 conv3dApi.SetWeight(weightGm);

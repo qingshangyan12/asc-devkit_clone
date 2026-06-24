@@ -110,6 +110,6 @@ AscendC::GlobalTensor<T> aGlobal;
 T val = 0;
 aGlobal.SetValue(2, val);
 
-//结果如下
-aGlobal数据 [1, 1, 0, 1, 1]
+// 结果如下
+aGlobal数据[1, 1, 0, 1, 1]
 ```

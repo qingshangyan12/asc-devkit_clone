@@ -93,14 +93,18 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename T, bool isInitBitMode = false, uint32_t dropOutMode = 0>
-__aicore__ inline void DropOut(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& maskLocal, const float keepProb, const DropOutShapeInfo& info)
+__aicore__ inline void DropOut(
+    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& maskLocal,
+    const float keepProb, const DropOutShapeInfo& info)
 ```
 
-```
+```cpp
 template <typename T, bool isInitBitMode = false, uint32_t dropOutMode = 0>
-__aicore__ inline void DropOut(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& maskLocal, const LocalTensor<uint8_t>& sharedTmpBuffer, const float keepProb, const DropOutShapeInfo& info)
+__aicore__ inline void DropOut(
+    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& maskLocal,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const float keepProb, const DropOutShapeInfo& info)
 ```
 
 ## 参数说明
@@ -124,7 +128,7 @@ __aicore__ inline void DropOut(const LocalTensor<T>& dstLocal, const LocalTensor
 | keepProb | 输入 | 权重系数，数据类型为float，srcLocal中数据被保留的概率，过滤后的结果会除以权重系数，存放至dstLocal中。<br><br>keepProb∈(0，1) |
 | info | 输入 | DropOutShapeInfo类型，DropOutShapeInfo结构定义如下方代码所示，其中参数的含义为：<br>firstAxis：srcLocal/maskTensor的height轴元素个数。<br>srcLastAxis：srcLocal的width轴元素个数。<br>maskLastAxis：maskTensor的width轴元素个数（如有数据补齐场景，则为带有脏数据的长度，注意，所有模式的元素个数均为对应Tensor类型下的个数，取值需要大于0，如uint8类型Tensor对应Uint8类型元素个数）。|
 
-```
+```cpp
 struct DropOutShapeInfo {
     __aicore__ DropOutShapeInfo() {};
     uint32_t firstAxis = 0;
@@ -169,7 +173,7 @@ struct DropOutShapeInfo {
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 // yLocal：DropOut结果
 // xLocal：输入数据
 // maskLocal：过滤掩码
@@ -186,7 +190,7 @@ AscendC::DropOut(yLocal, xLocal, maskLocal, sharedTmpBuffer, probValue, info);
 
 示例结果如下：
 
-```
+```text
 输入数据(xLocal):
 [  0.  1.  2.  3.  4.  5.  6.  7.  8.  9. 10. 11. 12. 13. 14. 15.
   16. 17. 18. 19. 20. 21. 22. 23. 24. 25. 26. 27. 28. 29. 30. 31. ]

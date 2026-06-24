@@ -32,7 +32,9 @@
 
     ```cpp
     template <typename T>
-    __aicore__ inline void ReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t count, bool calIndex = 0)
+    __aicore__ inline void ReduceMin(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t count,
+        bool calIndex = 0)
     ```
 
 - tensor高维切分计算：
@@ -40,14 +42,18 @@
 
         ```cpp
         template <typename T>
-        __aicore__ inline void ReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime, const int32_t srcRepStride, bool calIndex = 0)
+        __aicore__ inline void ReduceMin(
+            const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const uint64_t mask[],
+            const int32_t repeatTime, const int32_t srcRepStride, bool calIndex = 0)
         ```
 
     - `mask`连续模式：
 
         ```cpp
         template <typename T>
-        __aicore__ inline void ReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t mask, const int32_t repeatTime, const int32_t srcRepStride, bool calIndex = 0)
+        __aicore__ inline void ReduceMin(
+            const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t mask,
+            const int32_t repeatTime, const int32_t srcRepStride, bool calIndex = 0)
         ```
 
 ## 参数说明
@@ -147,7 +153,7 @@
 
     ```cpp
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，需要索引值，使用tensor高维切分计算接口，设定repeatTime为65,mask为全部元素参与计算
-    uint64_t mask[2] = { 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF };
+    uint64_t mask[2] = {0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF};
     AscendC::ReduceMin<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, 65, 8, true);
     ```
 

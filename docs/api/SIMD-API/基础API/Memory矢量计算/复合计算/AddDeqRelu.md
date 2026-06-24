@@ -68,7 +68,9 @@ $$
 - tensor前n个数据计算
 
   ```cpp
-  __aicore__ inline void AddDeqRelu(const LocalTensor<half>& dst, const LocalTensor<int32_t>& src0, const LocalTensor<int32_t>& src1, const int32_t& count)
+  __aicore__ inline void AddDeqRelu(
+      const LocalTensor<half>& dst, const LocalTensor<int32_t>& src0, const LocalTensor<int32_t>& src1,
+      const int32_t& count)
   ```
 
 - tensor高维切分计算
@@ -76,14 +78,18 @@ $$
 
     ```cpp
     template <bool isSetMask = true>
-    __aicore__ inline void AddDeqRelu(const LocalTensor<half>& dst, const LocalTensor<int32_t>& src0, const LocalTensor<int32_t>& src1, uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    __aicore__ inline void AddDeqRelu(
+        const LocalTensor<half>& dst, const LocalTensor<int32_t>& src0, const LocalTensor<int32_t>& src1, uint64_t mask[],
+        const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
     ```
 
   - mask连续模式
 
     ```cpp
     template <bool isSetMask = true>
-    __aicore__ inline void AddDeqRelu(const LocalTensor<half>& dst, const LocalTensor<int32_t>& src0, const LocalTensor<int32_t>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    __aicore__ inline void AddDeqRelu(
+        const LocalTensor<half>& dst, const LocalTensor<int32_t>& src0, const LocalTensor<int32_t>& src1, uint64_t mask,
+        const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
     ```
 
 操作数使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/TensorTrait.md)类型时，LocalTensor需要输入模板参数。提供支持操作数数据类型作为模板参数传入的接口如下：
@@ -92,7 +98,8 @@ $$
 
   ```cpp
   template <typename T, typename U>
-  __aicore__ inline void AddDeqRelu(const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, const int32_t& count)
+  __aicore__ inline void AddDeqRelu(
+      const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, const int32_t& count)
   ```
 
 - tensor高维切分计算
@@ -100,14 +107,18 @@ $$
 
     ```cpp
     template <typename T, typename U, bool isSetMask = true>
-    __aicore__ inline void AddDeqRelu(const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    __aicore__ inline void AddDeqRelu(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, uint64_t mask[],
+        const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
     ```
 
   - mask连续模式
 
     ```cpp
     template <typename T, typename U, bool isSetMask = true>
-    __aicore__ inline void AddDeqRelu(const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    __aicore__ inline void AddDeqRelu(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, uint64_t mask,
+        const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -172,22 +183,24 @@ $$
   uint64_t mask = 256 / sizeof(int32_t); // 64
   // repeatTime = 4，一次迭代计算64个数，共计算256个数
   // dstBlkStride, src0BlkStride, src1BlkStride = 1，单次迭代内数据连续读取和写入
-  // dstRepStride = 4，src0RepStride, src1RepStride = 8，相邻迭代间数据连续读取和写入
+  // dstRepStride = 4，src0RepStride, src1RepStride =
+  // 8，相邻迭代间数据连续读取和写入
   half scale = 0.1;
   AscendC::SetDeqScale(scale);
-  AscendC::AddDeqRelu(dstLocal, src0Local, src1Local, mask, 4, { 1, 1, 1, 4, 8, 8 });
+  AscendC::AddDeqRelu(dstLocal, src0Local, src1Local, mask, 4, {1, 1, 1, 4, 8, 8});
   ```
 
 - tensor高维切分计算样例-mask逐bit模式。
 
   ```cpp
-  uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
+  uint64_t mask[2] = {UINT64_MAX, UINT64_MAX};
   // repeatTime = 4，一次迭代计算64个数，共计算256个数
   // dstBlkStride, src0BlkStride, src1BlkStride = 1，单次迭代内数据连续读取和写入
-  // dstRepStride = 4，src0RepStride, src1RepStride = 8，相邻迭代间数据连续读取和写入
+  // dstRepStride = 4，src0RepStride, src1RepStride =
+  // 8，相邻迭代间数据连续读取和写入
   half scale = 0.1;
   AscendC::SetDeqScale(scale);
-  AscendC::AddDeqRelu(dstLocal, src0Local, src1Local, mask, 4, { 1, 1, 1, 4, 8, 8 });
+  AscendC::AddDeqRelu(dstLocal, src0Local, src1Local, mask, 4, {1, 1, 1, 4, 8, 8});
   ```
 
 - tensor前n个数据计算样例。

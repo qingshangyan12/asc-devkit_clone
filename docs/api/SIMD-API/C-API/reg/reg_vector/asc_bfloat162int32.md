@@ -34,44 +34,49 @@
 ```cpp
 // RINT舍入模式，非饱和模式，选取索引0的位置
 __simd_callee__ inline void asc_bfloat162int32_rn(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
-// RINT舍入模式，饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_bfloat162int32_rn_sat(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
-// RINT舍入模式，非饱和模式，选取索引1的位置
-__simd_callee__ inline void asc_bfloat162int32_rn_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
-// RINT舍入模式，饱和模式，选取索引1的位置
-__simd_callee__ inline void asc_bfloat162int32_rn_sat_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
-// ROUND舍入模式，非饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_bfloat162int32_rna(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
-// ROUND舍入模式，饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_bfloat162int32_rna_sat(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
-// ROUND舍入模式，非饱和模式，选取索引1的位置
-__simd_callee__ inline void asc_bfloat162int32_rna_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
-// ROUND舍入模式，饱和模式，选取索引1的位置
-__simd_callee__ inline void asc_bfloat162int32_rna_sat_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
-// FLOOR舍入模式，非饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_bfloat162int32_rd(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
-// FLOOR舍入模式，饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_bfloat162int32_rd_sat(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
-// FLOOR舍入模式，非饱和模式，选取索引1的位置
-__simd_callee__ inline void asc_bfloat162int32_rd_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
-// FLOOR舍入模式，饱和模式，选取索引1的位置
-__simd_callee__ inline void asc_bfloat162int32_rd_sat_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
-// CEIL舍入模式，非饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_bfloat162int32_ru(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
-// CEIL舍入模式，饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_bfloat162int32_ru_sat(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
-// CEIL舍入模式，非饱和模式，选取索引1的位置
-__simd_callee__ inline void asc_bfloat162int32_ru_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
-// CEIL舍入模式，饱和模式，选取索引1的位置
-__simd_callee__ inline void asc_bfloat162int32_ru_sat_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
-// TRUNC舍入模式，非饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_bfloat162int32_rz(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
-// TRUNC舍入模式，饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_bfloat162int32_rz_sat(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
-// TRUNC舍入模式，非饱和模式，选取索引1的位置
-__simd_callee__ inline void asc_bfloat162int32_rz_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
-// TRUNC舍入模式，饱和模式，选取索引1的位置
-__simd_callee__ inline void asc_bfloat162int32_rz_sat_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // RINT舍入模式，饱和模式，选取索引0的位置
+    __simd_callee__ inline void asc_bfloat162int32_rn_sat(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // RINT舍入模式，非饱和模式，选取索引1的位置
+    __simd_callee__ inline void asc_bfloat162int32_rn_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // RINT舍入模式，饱和模式，选取索引1的位置
+    __simd_callee__
+    inline void asc_bfloat162int32_rn_sat_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // ROUND舍入模式，非饱和模式，选取索引0的位置
+    __simd_callee__ inline void asc_bfloat162int32_rna(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // ROUND舍入模式，饱和模式，选取索引0的位置
+    __simd_callee__ inline void asc_bfloat162int32_rna_sat(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // ROUND舍入模式，非饱和模式，选取索引1的位置
+    __simd_callee__ inline void asc_bfloat162int32_rna_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // ROUND舍入模式，饱和模式，选取索引1的位置
+    __simd_callee__
+    inline void asc_bfloat162int32_rna_sat_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // FLOOR舍入模式，非饱和模式，选取索引0的位置
+    __simd_callee__ inline void asc_bfloat162int32_rd(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // FLOOR舍入模式，饱和模式，选取索引0的位置
+    __simd_callee__ inline void asc_bfloat162int32_rd_sat(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // FLOOR舍入模式，非饱和模式，选取索引1的位置
+    __simd_callee__ inline void asc_bfloat162int32_rd_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // FLOOR舍入模式，饱和模式，选取索引1的位置
+    __simd_callee__
+    inline void asc_bfloat162int32_rd_sat_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // CEIL舍入模式，非饱和模式，选取索引0的位置
+    __simd_callee__ inline void asc_bfloat162int32_ru(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // CEIL舍入模式，饱和模式，选取索引0的位置
+    __simd_callee__ inline void asc_bfloat162int32_ru_sat(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // CEIL舍入模式，非饱和模式，选取索引1的位置
+    __simd_callee__ inline void asc_bfloat162int32_ru_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // CEIL舍入模式，饱和模式，选取索引1的位置
+    __simd_callee__
+    inline void asc_bfloat162int32_ru_sat_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // TRUNC舍入模式，非饱和模式，选取索引0的位置
+    __simd_callee__ inline void asc_bfloat162int32_rz(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // TRUNC舍入模式，饱和模式，选取索引0的位置
+    __simd_callee__ inline void asc_bfloat162int32_rz_sat(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // TRUNC舍入模式，非饱和模式，选取索引1的位置
+    __simd_callee__ inline void asc_bfloat162int32_rz_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
+    // TRUNC舍入模式，饱和模式，选取索引1的位置
+    __simd_callee__
+    inline void asc_bfloat162int32_rz_sat_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
 ```
 
 ## 参数说明

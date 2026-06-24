@@ -8,7 +8,7 @@
 
     Gather算子的数学表达式为：
 
-    ```
+    ```text
     output[i] = input[index[i]]
     ```
 
@@ -58,23 +58,23 @@
         ```cpp
         std::vector<float> gather_1d(std::vector<float>& input, std::vector<int32_t>& index)
         {
-            ...
-            aclrtCreateStream(&stream);
+            ... aclrtCreateStream(&stream);
             // Allocate host and device memory, and copy input data from host to device
-            aclrtMallocHost((void **)(&output_host), output_total_byte_size);
-            aclrtMalloc((void **)&input_device, input_total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
-            aclrtMalloc((void **)&index_device, index_total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
-            aclrtMalloc((void **)&output_device, output_total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
+            aclrtMallocHost((void**)(&output_host), output_total_byte_size);
+            aclrtMalloc((void**)&input_device, input_total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
+            aclrtMalloc((void**)&index_device, index_total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
+            aclrtMalloc((void**)&output_device, output_total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
             aclrtMemcpy(input_device, input_total_byte_size, input_host, input_total_byte_size, ACL_MEMCPY_HOST_TO_DEVICE);
             aclrtMemcpy(index_device, index_total_byte_size, index_host, index_total_byte_size, ACL_MEMCPY_HOST_TO_DEVICE);
 
             // Configure kernel launch parameters.
-            // In this sample, index.size() is 48 * 256, so 48 blocks and 256 threads per block
-            // cover one output element per thread. For general input lengths, use
-            // blocks_per_grid = (index.size() + threads_per_block - 1) / threads_per_block.
-            uint32_t blocks_per_grid = 48; // Number of thread blocks (Grid size)
+            // In this sample, index.size() is 48 * 256, so 48 blocks and 256 threads per
+            // block cover one output element per thread. For general input lengths, use
+            // blocks_per_grid = (index.size() + threads_per_block - 1) /
+            // threads_per_block.
+            uint32_t blocks_per_grid = 48;    // Number of thread blocks (Grid size)
             uint32_t threads_per_block = 256; // Number of threads per block (Block size)
-            uint32_t dyn_ubuf_size = 0;  // No dynamic memory required in this sample
+            uint32_t dyn_ubuf_size = 0;       // No dynamic memory required in this sample
 
             // Launch kernel <<<grid_dim, block_dim, dynamic_memory_size, stream>>>
             gather_1d_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(
@@ -85,7 +85,7 @@
 
             // Copy the result from device memory to host memory
             aclrtMemcpy(output_host, output_total_byte_size, output_device, output_total_byte_size, ACL_MEMCPY_DEVICE_TO_HOST);
-            std::vector<float> output((float *)output_host, (float *)(output_host + output_total_byte_size));
+            std::vector<float> output((float*)output_host, (float*)(output_host + output_total_byte_size));
             ...
         }
         ```
@@ -94,7 +94,7 @@
 
     CMake配置文件示例：
 
-    ```
+    ```text
     cmake_minimum_required(VERSION 3.16)
     # find_package(ASC)是CMake中用于查找和配置Ascend C编译工具链的命令
     find_package(ASC REQUIRED)
@@ -114,7 +114,7 @@
 
     编译并执行：
 
-    ```
+    ```bash
     mkdir -p build && cd build;
     cmake ..;make -j;
     ./demo

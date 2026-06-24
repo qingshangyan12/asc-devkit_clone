@@ -79,9 +79,9 @@
 
     调用GetTiling接口获取TCubeTiling结构体前，开启NBuffer33模式。
 
-    ```
-    matmul_tiling::MatmulConfigParams matmulConfigParams(1, false,
-        matmul_tiling::ScheduleType::N_BUFFER_33, /* NBuffer33模式 */
+    ```cpp
+    matmul_tiling::MatmulConfigParams matmulConfigParams(
+        1, false, matmul_tiling::ScheduleType::N_BUFFER_33, /* NBuffer33模式 */
         matmul_tiling::MatrixTraverse::NOSET, false);
     cubeTiling.SetMatmulConfigParams(matmulConfigParams);
     if (cubeTiling.GetTiling(tilingData) == -1) {
@@ -94,14 +94,14 @@
 
     设置模板参数MatmulPolicy为NBuffer33模板策略，创建Matmul对象。
 
-    ```
+    ```cpp
     AscendC::MatmulImpl<
         AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, aType>,
         AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, bType>,
         AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, cType>,
         AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, biasType>, CFG_MDL,
-        AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>,
-        AscendC::Impl::Detail::NBuffer33MatmulPolicy> matmulObj;
+        AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>, AscendC::Impl::Detail::NBuffer33MatmulPolicy>
+        matmulObj;
     ```
 
 ## 验证优化方案性能收益<a name="section19022397498"></a>

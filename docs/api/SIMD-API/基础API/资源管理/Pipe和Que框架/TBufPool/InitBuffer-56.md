@@ -63,9 +63,10 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
-template <class T> __aicore__ inline bool InitBuffer(T& que, uint8_t num, uint32_t len)
-template <TPosition pos> __aicore__ inline bool InitBuffer(TBuf<pos>& buf, uint32_t len)
+```cpp
+template <class T>
+__aicore__ inline bool InitBuffer(T& que, uint8_t num, uint32_t len) template <TPosition pos>
+__aicore__ inline bool InitBuffer(TBuf<pos>& buf, uint32_t len)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

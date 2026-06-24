@@ -14,8 +14,8 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_get_reduce_max_cnt(half& val, uint32_t& index)
-__aicore__ inline void asc_get_reduce_max_cnt(float& val, uint32_t& index)
+__aicore__ inline void asc_get_reduce_max_cnt(half& val, uint32_t& index) __aicore__
+    inline void asc_get_reduce_max_cnt(float& val, uint32_t& index)
 ```
 
 ## 参数说明
@@ -57,7 +57,7 @@ asc_get_reduce_max_cnt(maxValue, maxIndex);
 
 结果示例：
 
-```
+```text
 输入数据src：[1, 2, 3, ..., 128, 129, ..., 256]
 maxValue: 256.0
 maxIndex: 255

@@ -22,7 +22,7 @@ CubeResGroupHandle用于在分离模式下对AI Core计算资源分组。分组�
 
     用户根据实际需求，自定义AIC所需要的计算对象类型，或者高阶API已提供的Matmul类型。例如，创建Matmul类型如下，其中A\_TYPE、B\_TYPE、 C\_TYPE、BIAS\_TYPE、CFG\_NORM等含义请参考[Matmul模板参数](../../../高阶API/矩阵计算/Matmul-Kernel侧接口/Matmul模板参数.md)。
 
-    ```
+    ```text
     // A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_NORM根据实际需求场景构造
     using MatmulApiType = MatmulImpl<A_TYPE, B_TYPE, C_TYPE, C_TYPE, CFG_NORM>;
     ```
@@ -31,7 +31,7 @@ CubeResGroupHandle用于在分离模式下对AI Core计算资源分组。分组�
 
     使用[KfcWorkspace](../KfcWorkspace/KfcWorkspace.md)管理不同CubeResGrouphandle的消息通信区的划分。
 
-    ```
+    ```text
     // 创建KfcWorkspace对象前，需要对该workspaceGM清零
     KfcWorkspace desc(workspaceGM);
     ```
@@ -101,17 +101,18 @@ CubeResGroupHandle用于在分离模式下对AI Core计算资源分组。分组�
 
 4.  自定义回调计算结构体，根据实际业务场景实现Init函数和Call函数。
 
-    ```
-    template<class MatmulApiCfg, class CubeMsgBody>
+    ```cpp
+    template <class MatmulApiCfg, class CubeMsgBody>
     struct NormalCallbackFuncs {
-        __aicore__ inline static void Call(MatmulApiCfg &mm, __gm__ CubeMsgBody *rcvMsg, CubeResGroupHandle<CubeMsgBody> &handle){
-          // 用户自行实现逻辑
+        __aicore__ inline static void Call(
+            MatmulApiCfg& mm, __gm__ CubeMsgBody* rcvMsg, CubeResGroupHandle<CubeMsgBody>& handle) {
+            // 用户自行实现逻辑
         };
-    
-        __aicore__ inline static void Init(NormalCallbackFuncs<MatmulApiCfg, CubeMsgBody> &foo, MatmulApiCfg &mm, GM_ADDR tilingGM){
-           // 用户自行实现逻辑
+
+        __aicore__ inline static void Init(
+            NormalCallbackFuncs<MatmulApiCfg, CubeMsgBody>& foo, MatmulApiCfg& mm, GM_ADDR tilingGM) {
+            // 用户自行实现逻辑
         };
-       
     };
     ```
 
@@ -141,10 +142,12 @@ CubeResGroupHandle用于在分离模式下对AI Core计算资源分组。分组�
 
     用户自定义回调计算结构体中需要包含固定的Init函数和Call函数，函数原型如下所示。其中，Init函数的参数说明请参考[表4](#zh-cn_topic_0000001526206862_zh-cn_topic_0000001389783361_table111938719446)，Call函数的参数说明请参考[表5](#table9997952179)。
 
-    ```
+    ```cpp
     // 该函数的参数和名称为固定格式，函数实现根据业务逻辑自行实现。
-    __aicore__ inline static void Init(MyCallbackFunc<MatmulApiCfg, CubeMsgBody> &myCallBack, MatmulApiCfg &mm, GM_ADDR tilingGM){
-         // 用户自行实现内部逻辑
+    __aicore__ inline static void Init(
+        MyCallbackFunc<MatmulApiCfg, CubeMsgBody>& myCallBack, MatmulApiCfg& mm, GM_ADDR tilingGM)
+    {
+        // 用户自行实现内部逻辑
     }
     ```
 
@@ -183,10 +186,12 @@ CubeResGroupHandle用于在分离模式下对AI Core计算资源分组。分组�
     </tbody>
     </table>
 
-    ```
+    ```cpp
     // 该函数的参数和名称为固定格式，函数实现根据业务逻辑自行实现。
-    __aicore__ inline static void Call(MatmulApiCfg &mm, __gm__ CubeMsgBody *rcvMsg, CubeResGroupHandle<CubeMsgBody> &handle){
-            // 用户自行实现内部逻辑
+    __aicore__ inline static void Call(
+        MatmulApiCfg& mm, __gm__ CubeMsgBody* rcvMsg, CubeResGroupHandle<CubeMsgBody>& handle)
+    {
+        // 用户自行实现内部逻辑
     }
     ```
 
@@ -227,58 +232,55 @@ CubeResGroupHandle用于在分离模式下对AI Core计算资源分组。分组�
 
     某算子的回调计算结构体的代码示例如下。
 
-    ```
+    ```cpp
     // 用户自定义的回调计算逻辑
-    template<class MatmulApiCfg, typename CubeMsgBody>
-    struct MyCallbackFunc
-    {
-        template<int32_t funcId>
-        __aicore__ inline static typename IsEqual<funcId, 0>::Type CubeGroupCallBack(MatmulApiCfg &mm, __gm__ CubeMsgBody *rcvMsg, CubeResGroupHandle<CubeMsgBody> &handle)
+    template <class MatmulApiCfg, typename CubeMsgBody>
+    struct MyCallbackFunc {
+        template <int32_t funcId>
+        __aicore__ inline static typename IsEqual<funcId, 0>::Type CubeGroupCallBack(
+            MatmulApiCfg& mm, __gm__ CubeMsgBody* rcvMsg, CubeResGroupHandle<CubeMsgBody>& handle)
         {
             GlobalTensor<int64_t> msgGlobal;
-            msgGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ int64_t *> (rcvMsg) + sizeof(int64_t));
-            DataCacheCleanAndInvalid<int64_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT> (msgGlobal);
+            msgGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ int64_t*>(rcvMsg) + sizeof(int64_t));
+            DataCacheCleanAndInvalid<int64_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(msgGlobal);
             using SrcAT = typename MatmulApiCfg::AType::T;
             auto skipNum = 0;
-            for (int i = 0; i < skipNum + 1; ++i)
-            {
+            for (int i = 0; i < skipNum + 1; ++i) {
                 auto tmpId = handle.FreeMessage(rcvMsg + i); // msgPtr process is complete
             }
             handle.SetSkipMsg(skipNum);
         }
-        template<int32_t funcId>
-        __aicore__ inline static typename IsEqual<funcId, 1>::Type CubeGroupCallBack(MatmulApiCfg &mm, __gm__ CubeMsgBody *rcvMsg, CubeResGroupHandle<CubeMsgBody> &handle)
+        template <int32_t funcId>
+        __aicore__ inline static typename IsEqual<funcId, 1>::Type CubeGroupCallBack(
+            MatmulApiCfg& mm, __gm__ CubeMsgBody* rcvMsg, CubeResGroupHandle<CubeMsgBody>& handle)
         {
             GlobalTensor<int64_t> msgGlobal;
-            msgGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ int64_t *> (rcvMsg) + sizeof(int64_t));
-            DataCacheCleanAndInvalid<int64_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT> (msgGlobal);
+            msgGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ int64_t*>(rcvMsg) + sizeof(int64_t));
+            DataCacheCleanAndInvalid<int64_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(msgGlobal);
             using SrcAT = typename MatmulApiCfg::AType::T;
             LocalTensor<SrcAT> tensor_temp;
             auto skipNum = 3;
             auto tmpId = handle.FreeMessage(rcvMsg, CubeMsgState::VALID);
-            for (int i = 1; i < skipNum + 1; ++i)
-            {
+            for (int i = 1; i < skipNum + 1; ++i) {
                 auto tmpId = handle.FreeMessage(rcvMsg + i, CubeMsgState::FAKE);
             }
             handle.SetSkipMsg(skipNum); // notify the cube not to process
         }
-        __aicore__ inline static void Call(MatmulApiCfg &mm, __gm__ CubeMsgBody *rcvMsg, CubeResGroupHandle<CubeMsgBody> &handle)
+        __aicore__ inline static void Call(
+            MatmulApiCfg& mm, __gm__ CubeMsgBody* rcvMsg, CubeResGroupHandle<CubeMsgBody>& handle)
         {
-            if (rcvMsg->funcId == 0)
-            {
-                CubeGroupCallBack<0> (mm, rcvMsg, handle);
-            }
-            else if(rcvMsg->funcId == 1)
-            {
-                CubeGroupCallBack<1> (mm, rcvMsg, handle);
+            if (rcvMsg->funcId == 0) {
+                CubeGroupCallBack<0>(mm, rcvMsg, handle);
+            } else if (rcvMsg->funcId == 1) {
+                CubeGroupCallBack<1>(mm, rcvMsg, handle);
             }
         }
-        __aicore__ inline static void Init(MyCallbackFunc<MatmulApiCfg, CubeMsgBody> &foo, MatmulApiCfg &mm, GM_ADDR tilingGM)
+        __aicore__ inline static void Init(
+            MyCallbackFunc<MatmulApiCfg, CubeMsgBody>& foo, MatmulApiCfg& mm, GM_ADDR tilingGM)
         {
             auto tempTilingGM = (__gm__ uint32_t*)tilingGM;
             auto tempTiling = (uint32_t*)&(foo.tiling);
-            for (int i = 0; i < sizeof(TCubeTiling) / sizeof(int32_t); ++i, ++tempTilingGM, ++tempTiling)
-            {
+            for (int i = 0; i < sizeof(TCubeTiling) / sizeof(int32_t); ++i, ++tempTilingGM, ++tempTiling) {
                 *tempTiling = *tempTilingGM;
             }
             mm.SetSubBlockIdx(0);
@@ -292,23 +294,24 @@ CubeResGroupHandle用于在分离模式下对AI Core计算资源分组。分组�
 
     用户使用[CreateCubeResGroup](CreateCubeResGroup.md)接口创建一个或多个CubeResGroupHandle。
 
-    ```
-    /* 
+    ```cpp
+    /*
      * groupID为用户自定义的CreateCubeResGroup的groupID
      * MatmulApiType为定义好的AIC上计算对象的类型
      * MyCallbackFunc为定义好的自定义回调计算结构体
      * CubeMsgBody为自定义消息结构体
      * desc为用户初始化好的通信区域描述
      * groupID为1，blockStart为0，blockSize为12，msgQueueSize为48，tilingGm为指针，存储了用户在AIC上所需要的tiling信息
-    */
-    auto handle =  AscendC::CreateCubeResGroup<groupID, MatmulApiType, MyCallbackFunc, CubeMsgBody>(desc, 0, 12, 48, tilingGM);
+     */
+    auto handle =
+        AscendC::CreateCubeResGroup<groupID, MatmulApiType, MyCallbackFunc, CubeMsgBody>(desc, 0, 12, 48, tilingGM);
     ```
 
 6.  绑定AIV到CubeResGroupHandle。
 
     绑定AIV和消息队列序号。注意：消息队列序号queIdx小于该CubeGroupHandle的消息队列总数，每个AIV需要传入不同的queIdx。handle为[步骤5](#li355132105919)中CreateCubeResGroup创建的CubeResGroupHandle对象。
 
-    ```
+    ```text
     handle.AssignQueue(queIdx);
     ```
 
@@ -316,28 +319,23 @@ CubeResGroupHandle用于在分离模式下对AI Core计算资源分组。分组�
 
     用户调用[AllocMessage](AllocMessage.md),  [PostMessage](PostMessage.md)等接口进行消息的收发。其中，调用AllocMessage获取消息结构体指针，通过PostMessage发送消息，在消息合并场景调用[PostFakeMessage](PostFakeMsg.md)发送假消息，示例如下。
 
-    ```
+    ```cpp
     CubeGroupMsgHead head = {CubeMsgState::VALID, (uint8_t)queIdx};
-    CubeMsgBody aCubeMsgBody {head, 0, 0, 0, false, false, false, false, 0, 0, 0, 0, 0, 0, 0, 0};
-    CubeMsgBody bCubeMsgBody {head, 1, 0, 0, false, false, false, false, 0, 0, 0, 0, 0, 0, 0, 0};
+    CubeMsgBody aCubeMsgBody{head, 0, 0, 0, false, false, false, false, 0, 0, 0, 0, 0, 0, 0, 0};
+    CubeMsgBody bCubeMsgBody{head, 1, 0, 0, false, false, false, false, 0, 0, 0, 0, 0, 0, 0, 0};
     auto offset = 0;
-    if (GetBlockIdx() == 0)
-    {
-        auto msgPtr = handle.template AllocMessage(); // alloc for queue space
+    if (GetBlockIdx() == 0) {
+        auto msgPtr = handle.template AllocMessage();               // alloc for queue space
         offset = handle.template PostMessage(msgPtr, bCubeMsgBody); // post true msgPtr
-        bool waitState = handle.template Wait<true> (offset); // wait until the msgPtr is processed
-    }
-    else if (GetBlockIdx() < 4)
-    {
+        bool waitState = handle.template Wait<true>(offset);        // wait until the msgPtr is processed
+    } else if (GetBlockIdx() < 4) {
         auto msgPtr = handle.AllocMessage();
-        offset = handle.PostFakeMsg(msgPtr); // post fake msgPtr
-        bool waitState = handle.template Wait<true> (offset); // wait until the msgPtr is processed
-    }
-    else
-    {
+        offset = handle.PostFakeMsg(msgPtr);                 // post fake msgPtr
+        bool waitState = handle.template Wait<true>(offset); // wait until the msgPtr is processed
+    } else {
         auto msgPtr = handle.template AllocMessage();
         offset = handle.template PostMessage(msgPtr, aCubeMsgBody);
-        bool waitState = handle.template Wait<true> (offset); // wait until the msgPtr is processed
+        bool waitState = handle.template Wait<true>(offset); // wait until the msgPtr is processed
     }
     ```
 
@@ -345,7 +343,7 @@ CubeResGroupHandle用于在分离模式下对AI Core计算资源分组。分组�
 
     调用AllocMessage获取消息结构体指针后，通过SendQuitMsg发送当前消息队列退出。
 
-    ```
-    auto msgPtr = handle.AllocMessage();        // 获取消息空间指针msgPtr
+    ```cpp
+    auto msgPtr = handle.AllocMessage(); // 获取消息空间指针msgPtr
     handle.SetQuit(msgPtr);              // 发送退出消息
     ```

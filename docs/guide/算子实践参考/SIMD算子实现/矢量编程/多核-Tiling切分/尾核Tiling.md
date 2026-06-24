@@ -9,15 +9,15 @@
 
 -   因为AI处理器在进行数据搬运和Vector计算时，对于搬运的数据长度和Unified Buffer首地址都有必须32字节对齐的要求，**首先待处理数据需要先保证向上对齐到32字节的大小**。该场景下后续搬运和计算的处理细节请参考[非对齐场景](../非对齐场景.md)。如下代码片段展示了将数据对齐到datablock大小的示例：
 
-    ```
+    ```cpp
     constexpr uint32_t SIZE_OF_HALF = 2;
     constexpr uint32_t BLOCK_SIZE = 32;
     constexpr uint32_t NUM_BLOCKS = 8;
     constexpr uint32_t ALIGN_NUM = BLOCK_SIZE / SIZE_OF_HALF;
     // shape需要对齐到的32字节，假设原totalLength为1999，向上满足32字节对齐后为2000
     uint32_t totalLengthAligned = (totalLength % ALIGN_NUM == 0U) ?
-                          static_cast<uint32_t>(totalLength) :
-                          ((static_cast<uint32_t>(totalLength) + ALIGN_NUM - 1) / ALIGN_NUM) * ALIGN_NUM;
+                                      static_cast<uint32_t>(totalLength) :
+                                      ((static_cast<uint32_t>(totalLength) + ALIGN_NUM - 1) / ALIGN_NUM) * ALIGN_NUM;
     ```
 
 -   满足32字节对齐后的数据，应尽可能的均分到每个核上。如果无法均分，那么先将可以均分的部分平均分配，剩余的部分分配给部分核，会有部分核多算一个datablock。为了保证切分后的数据仍是满足32字节对齐的，以ALIGN\_NUM（ALIGN\_NUM个数据为32字节）为粒度，将数据分配到所有核上。在本样例中，数据类型为half，ALIGN\_NUM = BLOCK\_SIZE  /  sizeof\(half\) = 16。将对齐后的数据总量按ALIGN\_NUM为粒度分成x个数据块，x = 2000 / 16 = 125。
@@ -41,28 +41,30 @@
 
 Tiling参数的计算代码如下：
 
-```
+```cpp
 constexpr uint32_t NUM_BLOCKS = 8;
 constexpr uint32_t SIZE_OF_HALF = 2;
 constexpr uint32_t BLOCK_SIZE = 32;
 // shape需要对齐到的最小单位
 constexpr uint32_t ALIGN_NUM = BLOCK_SIZE / SIZE_OF_HALF;
-...
-void GenerateTilingData(uint8_t* tilingBuf, uint32_t numBlocks)
+... void GenerateTilingData(uint8_t* tilingBuf, uint32_t numBlocks)
 {
     // shape需要对齐到的datablock,假设原totalLength为1999，向上满足32字节对齐后为2000
     uint32_t totalLengthAligned = (totalLength % ALIGN_NUM == 0U) ?
-                      static_cast<uint32_t>(totalLength) :
-                      ((static_cast<uint32_t>(totalLength) + ALIGN_NUM - 1) / ALIGN_NUM) * ALIGN_NUM;
+                                      static_cast<uint32_t>(totalLength) :
+                                      ((static_cast<uint32_t>(totalLength) + ALIGN_NUM - 1) / ALIGN_NUM) * ALIGN_NUM;
     // 核心数为8，一个datablock包含16个数，那么：datablock的总数：2000 / 16 = 125
     // 有5个核会分到16个datablock：125 % 8 =5，可以称之为整核
     // 有3个核会分到15个datablock：8 - 5 = 3，可以称之为尾核
-    uint32_t formerNum = (totalLengthAligned / ALIGN_NUM) % numBlocks; 
+    uint32_t formerNum = (totalLengthAligned / ALIGN_NUM) % numBlocks;
     uint32_t tailNum = numBlocks - formerNum;
-    // 整核计算的数据长度：totalLengthAligned / NUM_BLOCKS为每个核上计算的元素个数，formerLength为上述元素个数向上32字节对齐的结果
+    // 整核计算的数据长度：totalLengthAligned /
+    // NUM_BLOCKS为每个核上计算的元素个数，formerLength为上述元素个数向上32字节对齐的结果
     uint32_t formerLength =
-            static_cast<uint32_t>(((totalLengthAligned + numBlocks - 1) / numBlocks + ALIGN_NUM - 1) / ALIGN_NUM) * ALIGN_NUM;
-    // 尾核计算的数据长度：totalLengthAligned / NUM_BLOCKS为每个核上计算的元素个数，tailLength为上述元素个数向下32字节对齐的结果
+        static_cast<uint32_t>(((totalLengthAligned + numBlocks - 1) / numBlocks + ALIGN_NUM - 1) / ALIGN_NUM) *
+        ALIGN_NUM;
+    // 尾核计算的数据长度：totalLengthAligned /
+    // NUM_BLOCKS为每个核上计算的元素个数，tailLength为上述元素个数向下32字节对齐的结果
     uint32_t tailLength = (totalLengthAligned / numBlocks / ALIGN_NUM) * ALIGN_NUM;
     ...
 }
@@ -74,35 +76,37 @@ void GenerateTilingData(uint8_t* tilingBuf, uint32_t numBlocks)
 
 整核上，输入的内存偏移地址计算代码如下：
 
-```
+```cpp
 xGm.SetGlobalBuffer((__gm__ T*)x + formerLength * AscendC::GetBlockIdx(), formerLength);
 ```
 
 尾核上，计算输入的内存偏移地址时，需在全部整核的数据长度基础上加上尾核的偏移量，代码如下：
 
-```
-xGm.SetGlobalBuffer((__gm__ T*)x + formerLength * formerNum + tailLength * (AscendC::GetBlockIdx() - formerNum), tailLength);
+```cpp
+xGm.SetGlobalBuffer(
+    (__gm__ T*)x + formerLength * formerNum + tailLength * (AscendC::GetBlockIdx() - formerNum), tailLength);
 ```
 
 完整的Init函数实现代码如下：
 
-```
-__aicore__ inline void Init(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, AddCustomTilingData tiling, AscendC::TPipe* pipeIn)
+```cpp
+__aicore__ inline void Init(
+    __gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, AddCustomTilingData tiling, AscendC::TPipe* pipeIn)
 {
     pipe = pipeIn;
     if (AscendC::GetBlockIdx() < tiling.formerNum) {
         this->tileLength = tiling.formerLength;
         uint64_t offset = tiling.formerLength * AscendC::GetBlockIdx();
-        xGm.SetGlobalBuffer((__gm__ half *)x + offset, tiling.formerLength);
-        yGm.SetGlobalBuffer((__gm__ half *)y + offset, tiling.formerLength);
-        zGm.SetGlobalBuffer((__gm__ half *)z + offset, tiling.formerLength);
+        xGm.SetGlobalBuffer((__gm__ half*)x + offset, tiling.formerLength);
+        yGm.SetGlobalBuffer((__gm__ half*)y + offset, tiling.formerLength);
+        zGm.SetGlobalBuffer((__gm__ half*)z + offset, tiling.formerLength);
     } else {
         this->tileLength = tiling.tailLength;
-        uint64_t offset = tiling.formerLength * tiling.formerNum
-                          + tiling.tailLength * (AscendC::GetBlockIdx() - tiling.formerNum);
-        xGm.SetGlobalBuffer((__gm__ half *)x +offset, tiling.tailLength);
-        yGm.SetGlobalBuffer((__gm__ half *)y + offset, tiling.tailLength);
-        zGm.SetGlobalBuffer((__gm__ half *)z + offset, tiling.tailLength);
+        uint64_t offset =
+            tiling.formerLength * tiling.formerNum + tiling.tailLength * (AscendC::GetBlockIdx() - tiling.formerNum);
+        xGm.SetGlobalBuffer((__gm__ half*)x + offset, tiling.tailLength);
+        yGm.SetGlobalBuffer((__gm__ half*)y + offset, tiling.tailLength);
+        zGm.SetGlobalBuffer((__gm__ half*)z + offset, tiling.tailLength);
     }
     pipe->InitBuffer(inQueueX, 1, this->tileLength * sizeof(half));
     pipe->InitBuffer(inQueueY, 1, this->tileLength * sizeof(half));

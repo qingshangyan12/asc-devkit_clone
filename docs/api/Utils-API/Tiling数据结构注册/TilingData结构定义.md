@@ -15,31 +15,31 @@
 
 -   定义一个TilingData类
 
-    ```
+    ```text
     BEGIN_TILING_DATA_DEF(class_name)
     ```
 
 -   添加通用数据类型的TilingData字段
 
-    ```
+    ```text
     TILING_DATA_FIELD_DEF(data_type, field_name)
     ```
 
 -   添加数组类型的TilingData字段，数组的元素数据类型为通用数据类型
 
-    ```
+    ```text
     TILING_DATA_FIELD_DEF_ARR(arr_type, arr_size, field_name)
     ```
 
 -   添加结构体类型的TilingData字段
 
-    ```
+    ```text
     TILING_DATA_FIELD_DEF_STRUCT(struct_type, field_name)
     ```
 
 -   定义结束
 
-    ```
+    ```text
     END_TILING_DATA_DEF
     ```
 
@@ -170,43 +170,46 @@
 
 ## 调用示例<a name="zh-cn_topic_0000001576606633_section97001499599"></a>
 
-```
+```cpp
 #include "register/tilingdata_base.h"
 
 // 定义tilingdata类
 namespace optiling {
 BEGIN_TILING_DATA_DEF(Matmul)
-  TILING_DATA_FIELD_DEF(uint16_t, mmVar);
-  TILING_DATA_FIELD_DEF_ARR(uint16_t, 3, mmArr);
+TILING_DATA_FIELD_DEF(uint16_t, mmVar);
+TILING_DATA_FIELD_DEF_ARR(uint16_t, 3, mmArr);
 END_TILING_DATA_DEF;
-//注册中间结构体，第一个参数固定为struct_name#Op，第二个参数即struct_name,如struct_name为Matmul，第一个参数为MatmulOp，第二个参数为Matmul
-REGISTER_TILING_DATA_CLASS(MatmulOp, Matmul)      //注册中间结构体
+// 注册中间结构体，第一个参数固定为struct_name#Op，第二个参数即struct_name,如struct_name为Matmul，第一个参数为MatmulOp，第二个参数为Matmul
+REGISTER_TILING_DATA_CLASS(MatmulOp, Matmul) // 注册中间结构体
 
-BEGIN_TILING_DATA_DEF(AddCustomTilingData)        // 注册一个tiling类，以tiling的名字作为入参
-  TILING_DATA_FIELD_DEF(uint32_t, blkDim);        // 添加tiling变量类型字段，参与计算核数
-  TILING_DATA_FIELD_DEF(uint32_t, totalSize);     // 添加tiling变量类型字段，总计算数据量
-  TILING_DATA_FIELD_DEF(uint32_t, splitTile);     // 添加tiling变量类型字段，每个core处理的数据分块计算
-  TILING_DATA_FIELD_DEF_ARR(uint16_t, 3, arrSample);    // 添加tiling数组类型字段
-  TILING_DATA_FIELD_DEF_STRUCT(Matmul, mm);             // 添加tiling结构体类型字段
-END_TILING_DATA_DEF;                                    // 定义结束
+BEGIN_TILING_DATA_DEF(AddCustomTilingData)  // 注册一个tiling类，以tiling的名字作为入参
+TILING_DATA_FIELD_DEF(uint32_t, blkDim);    // 添加tiling变量类型字段，参与计算核数
+TILING_DATA_FIELD_DEF(uint32_t, totalSize); // 添加tiling变量类型字段，总计算数据量
+TILING_DATA_FIELD_DEF(uint32_t, splitTile); // 添加tiling变量类型字段，每个core处理的数据分块计算
+TILING_DATA_FIELD_DEF_ARR(uint16_t, 3, arrSample); // 添加tiling数组类型字段
+TILING_DATA_FIELD_DEF_STRUCT(Matmul, mm);          // 添加tiling结构体类型字段
+END_TILING_DATA_DEF;                               // 定义结束
 // 注册算子tilingdata类到对应的AddCustom算子
-REGISTER_TILING_DATA_CLASS(AddCustom, AddCustomTilingData) 
-}
+REGISTER_TILING_DATA_CLASS(AddCustom, AddCustomTilingData)
+} // namespace optiling
 
 // host侧设置参数值和使用tiling参数
-static void TilingAddInit(AddCustomTilingData *tiling, uint32_t numBlocks)
+static void TilingAddInit(AddCustomTilingData* tiling, uint32_t numBlocks)
 {
-  // 设置参数值
-  tiling->set_blkDim(numBlocks);                  // 置值通用数据类型变量numBlocks
-  uint16_t arr[] = {10,2,8,2,3,4,5,2,1,2,4,4,5,};
-  tiling->set_arrSample(arr);                    // 置值通用数据类型数组变量arrSample，仅会复制arr数据的前三个数据，与TILING_DATA_FIELD_DEF_ARR中arr_size一致
-  tiling->mm.set_mmVar(1);                       // 置值嵌套结构体通用数据类型变量mmVar
-  tiling->mm.set_mmArr(arr);                     // 置值嵌套结构体通用数据类型数组mmArr
-  
-  // 使用参数值
-  uint32_t useNumBlocks = tiling->get_blkDim();    // 获取通用数据类型变量numBlocks
-  uint32_t* arrPoint = tiling->get_arrSample();   // 获取通用数据类型数组变量arrSample
-  useNumBlocks = tiling->mm.get_mmVar();           // 获取嵌套结构体通用数据类型变量mmVar
-  arrPoint = tiling->mm.get_mmArr();              // 获取嵌套结构体通用数据类型数组mmArr
+    // 设置参数值
+    tiling->set_blkDim(numBlocks); // 置值通用数据类型变量numBlocks
+    uint16_t arr[] = {
+        10, 2, 8, 2, 3, 4, 5, 2, 1, 2, 4, 4, 5,
+    };
+    tiling->set_arrSample(
+        arr); // 置值通用数据类型数组变量arrSample，仅会复制arr数据的前三个数据，与TILING_DATA_FIELD_DEF_ARR中arr_size一致
+    tiling->mm.set_mmVar(1);   // 置值嵌套结构体通用数据类型变量mmVar
+    tiling->mm.set_mmArr(arr); // 置值嵌套结构体通用数据类型数组mmArr
+
+    // 使用参数值
+    uint32_t useNumBlocks = tiling->get_blkDim(); // 获取通用数据类型变量numBlocks
+    uint32_t* arrPoint = tiling->get_arrSample(); // 获取通用数据类型数组变量arrSample
+    useNumBlocks = tiling->mm.get_mmVar();        // 获取嵌套结构体通用数据类型变量mmVar
+    arrPoint = tiling->mm.get_mmArr();            // 获取嵌套结构体通用数据类型数组mmArr
 }
 ```

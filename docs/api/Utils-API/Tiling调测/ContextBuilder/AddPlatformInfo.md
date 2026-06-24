@@ -11,7 +11,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001867409741_zh-cn_topic_0000001389787297_section13230182415108"></a>
 
-```
+```text
 ContextBuilder &AddPlatformInfo(const char* customSocVersion)
 ```
 
@@ -53,13 +53,13 @@ AddPlatformInfo调用后需要通过[BuildTilingContext](BuildTilingContext.md)�
 
 ## 调用示例<a name="zh-cn_topic_0000001867409741_zh-cn_topic_0000001389787297_section320753512363"></a>
 
-```
+```cpp
 void AddPlatformInfoDemo(......)
 {
     auto holder = context_ascendc::ContextBuilder()
-	// ... ... // 增加算子输入输出接口的调用
-	.AddPlatformInfo("Ascendxxxyy")
-	.BuildTilingContext();
+                      // ... ... // 增加算子输入输出接口的调用
+                      .AddPlatformInfo("Ascendxxxyy")
+                      .BuildTilingContext();
     auto tilingContext = holder->GetContext<gert::TilingContext>();
     // ... ...
 }

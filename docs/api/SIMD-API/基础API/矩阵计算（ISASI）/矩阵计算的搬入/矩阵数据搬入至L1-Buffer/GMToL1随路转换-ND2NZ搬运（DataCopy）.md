@@ -210,7 +210,8 @@ enableSmallC0开启模式下的ND2NZ转换示意图如下：
 示例代码片段如下，仅展示样例中的部分代码，完整示例请参考：[DataCopy_GM2L1样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0)。
 
 ```cpp
-// m=40,k=56,fractalShape[0] = 16,fractalShape[1] = 16,fractalSize = 16 * fractalShape[1]
+// m=40,k=56,fractalShape[0] = 16,fractalShape[1] = 16,fractalSize = 16 *
+// fractalShape[1]
 AscendC::Nd2NzParams nd2nzA1Params;
 // 传输ND矩阵的数目
 nd2nzA1Params.ndNum = 1;

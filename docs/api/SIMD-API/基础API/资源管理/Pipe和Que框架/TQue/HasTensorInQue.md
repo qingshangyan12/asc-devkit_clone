@@ -63,7 +63,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline bool HasTensorInQue()
 ```
 
@@ -82,7 +82,7 @@ __aicore__ inline bool HasTensorInQue()
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 // 根据VacantInQue判断当前que中是否有已入队的Tensor，当前que的深度为4，无内存Enque动作，返回为false
 AscendC::TPipe pipe;
 AscendC::TQue<AscendC::TPosition::VECOUT, 4> que;

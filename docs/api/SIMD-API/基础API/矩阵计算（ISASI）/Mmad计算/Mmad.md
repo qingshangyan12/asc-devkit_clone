@@ -88,14 +88,17 @@ $$C = A \times B + C$$
 
     ```cpp
     template <typename T, typename U, typename S>
-    __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const MmadParams& mmadParams)
+    __aicore__ inline void Mmad(
+        const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const MmadParams& mmadParams)
     ```
 
 - 传入bias
 
     ```cpp
     template <typename T, typename U, typename S, typename V>
-    __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias, const MmadParams& mmadParams)
+    __aicore__ inline void Mmad(
+        const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
+        const MmadParams& mmadParams)
     ```
 
 ## 参数说明

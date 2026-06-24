@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001921572893_zh-cn_topic_0000001526594958_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
+```text
 OpAICoreConfig &operator=(const OpAICoreConfig &aicore_config)
 ```
 

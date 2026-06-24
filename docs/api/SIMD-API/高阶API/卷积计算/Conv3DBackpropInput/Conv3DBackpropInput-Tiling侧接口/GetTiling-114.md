@@ -6,11 +6,11 @@
 
 ## 函数原型
 
-```
+```cpp
 int64_t GetTiling(optiling::Conv3DBackpropInputTilingData& tiling)
 ```
 
-```
+```cpp
 int64_t GetTiling(AscendC::tiling::Conv3DBackpropInputTilingData& tiling)
 ```
 
@@ -32,7 +32,7 @@ int64_t GetTiling(AscendC::tiling::Conv3DBackpropInputTilingData& tiling)
 
 ## 调用示例
 
-```
+```cpp
 // 构建Conv3dBackpropInput算子tiling的调用示例
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 ConvBackpropApi::Conv3DBpInputTiling tiling(ascendcPlatform);
@@ -48,7 +48,7 @@ AscendC::tiling::Conv3DBackpropInputTilingData tilingDataNotOp;
 ret = tiling.GetTiling(tilingDataNotOp); // 使用AscendC::tiling::Conv3DBackpropInputTilingData获取Tiling参数
 ```
 
-```
+```cpp
 // 构建Conv3dTranspose算子tiling的调用示例
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 ConvBackpropApi::Conv3DBpInputTiling tiling(ascendcPlatform);

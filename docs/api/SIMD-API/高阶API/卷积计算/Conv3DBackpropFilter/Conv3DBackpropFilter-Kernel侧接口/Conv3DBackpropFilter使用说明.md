@@ -30,7 +30,7 @@ Kernel侧实现Conv3DBackpropFilter求解反向传播误差运算的步骤概括
 
 1.  创建Conv3DBackpropFilter对象。
 
-    ```
+    ```cpp
     #include "lib/conv_backprop/conv3d_bp_filter_api.h"
 
     using inputType =
@@ -45,7 +45,7 @@ Kernel侧实现Conv3DBackpropFilter求解反向传播误差运算的步骤概括
 
     创建对象时需要传入特征矩阵Input、权重矩阵Weight的shape信息WeightSize、GradOutput和GradWeight的参数类型信息，类型信息通过[ConvType](#table19081115275)来定义，包括：内存逻辑位置、数据格式、数据类型。
 
-    ```
+    ```cpp
     template <TPosition POSITION, ConvFormat FORMAT, typename T>
     struct ConvType {
         constexpr static TPosition pos = POSITION;   // Convolution输入或输出的逻辑位置
@@ -56,19 +56,19 @@ Kernel侧实现Conv3DBackpropFilter求解反向传播误差运算的步骤概括
 
     下面简要介绍在创建对象时使用到的相关数据结构，开发者可选择性地了解这些内容。用于创建Conv3DBackpropFilter对象的数据结构定义如下：
 
-    ```
+    ```text
     using Conv3DBackpropFilter = Conv3DBpFilterIntf<
         Conv3DBpFilterCfg<INPUT_TYPE, WEIGHT_TYPE, GRAD_OUTPUT_TYPE, GRAD_WEIGHT_TYPE>, Conv3DBpFilterImpl>;
     ```
 
     其中，Conv3DBpFilterIntf、Conv3DBpFilterCfg数据结构定义如下：
 
-    ```
+    ```cpp
     template <class Config_, template <typename, class> class Impl>
     struct Conv3DBpFilterIntf {}
     ```
 
-    ```
+    ```cpp
     template <class A, class B, class C, class D>
     struct Conv3DBpFilterCfg : public ConvBpContext<A, B, C, D> {}
     ```
@@ -93,13 +93,13 @@ Kernel侧实现Conv3DBackpropFilter求解反向传播误差运算的步骤概括
 
 2.  初始化操作。
 
-    ```
+    ```cpp
     gradWeight_.Init(&(tilingData->dwTiling)); // 初始化gradWeight_相关参数
     ```
 
 3.  设置卷积的特征矩阵Input、卷积的输出反向GradOutput。
 
-    ```
+    ```text
     gradWeight_.SetGradOutput(gradOutputGm_[offsetA_]);    // 设置矩阵gradOutput
     gradWeight_.SetInput(inputGm_[offsetB_]);    // 设置矩阵Input
     gradWeight_.SetSingleShape(singleShapeM, singleShapeN, singleShapeK); // 设置需要计算的形状
@@ -110,7 +110,7 @@ Kernel侧实现Conv3DBackpropFilter求解反向传播误差运算的步骤概括
 
     调用[Iterate](Iterate-125.md)完成单次迭代计算，叠加while循环完成单核全量数据的计算。Iterate方式，可以自行控制迭代次数，完成所需数据量的计算。
 
-    ```
+    ```cpp
     while (gradWeight_.Iterate()) {
         gradWeight_.GetTensorC(gradWeightGm_[offsetC_]);
     }
@@ -118,12 +118,12 @@ Kernel侧实现Conv3DBackpropFilter求解反向传播误差运算的步骤概括
 
 5.  结束卷积反向操作。
 
-    ```
+    ```text
     gradWeight_.End();
     ```
 
 ## 需要包含的头文件
 
-```
+```cpp
 #include "lib/conv_backprop/conv3d_bp_filter_api.h"
 ```

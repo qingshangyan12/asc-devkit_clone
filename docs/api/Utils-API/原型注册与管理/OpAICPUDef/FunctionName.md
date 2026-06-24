@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001575610072_zh-cn_topic_0000001526442954_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
+```text
 OpAICPUDef &FunctionName(const char *value)
 ```
 

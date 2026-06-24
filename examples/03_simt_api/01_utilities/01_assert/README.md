@@ -29,7 +29,7 @@
 
 - 算子实现:
   ```cpp
-  __global__ void  simt_assert(float* input, uint32_t in_shape)
+  __global__ void simt_assert(float* input, uint32_t in_shape)
   {
       // Calculate global thread ID
       int32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -39,7 +39,7 @@
           printf("[SIMT] %s\n", "trap check start 3!");
           assert(in_shape < 1);
           printf("[SIMT] %s\n", "trap check 1!");
-      } else if(threadIdx.x < 5) {
+      } else if (threadIdx.x < 5) {
           printf("[SIMT] %s\n", "trap check 2!");
           assert(in_shape > 1);
           printf("[SIMT] %s\n", "trap check 3!");
@@ -76,7 +76,7 @@
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
 
   执行后有如下打印信息，说明功能正常。
-  ```
+  ```bash
   [SIMT] trap check 2!
   [SIMT] trap check 2!
   [SIMT] trap check 2!

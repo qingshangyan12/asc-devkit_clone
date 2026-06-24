@@ -10,11 +10,9 @@ SIMD与SIMT混合编程使用的函数执行空间限定符与SIMD编程一致�
 
 \_\_simt\_vf\_\_用于标记SIMT VF入口函数，函数无返回值。函数定义示例如下：
 
-```
+```cpp
 __simt_vf__ inline void function_name(
-    __gm__ uint32_t* gm_param,
-    __ubuf__ float* ubuf_param,
-    uint64_t scalar_param, ...);
+    __gm__ uint32_t* gm_param, __ubuf__ float* ubuf_param, uint64_t scalar_param, ...);
 ```
 
 SIMT VF函数定义中的关键修饰符说明如下：
@@ -28,7 +26,7 @@ SIMT VF函数定义中的关键修饰符说明如下：
 
 只支持在核函数或\_\_aicore\_\_函数中调用SIMT VF函数，调用接口为[asc\_vf\_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/SIMD与SIMT混合编程简介/扩展语法/核函数配置-147.md#asc_vf_call调用)，示例如下：
 
-```
+```text
 asc_vf_call<function_name>(dim3(blockDim), arg1, arg2, ...);
 ```
 
@@ -42,13 +40,13 @@ SIMT VF函数有以下约束：
 
 \_\_simt\_callee\_\_子函数是SIMT VF函数内部调用的辅助函数，函数内部可以使用SIMT内置变量。定义示例如下：
 
-```
+```cpp
 __simt_callee__ uint32_t simt_helper(__gm__ uint32_t* gm_param, __ubuf__ float* ubuf_param, uint64_t scalar_param, ...);
 ```
 
 调用示例如下：
 
-```
+```cpp
 uint32_t result = simt_helper(arg1, arg2, ...);
 ```
 
@@ -72,7 +70,7 @@ SIMD与SIMT混合编程使用的地址空间限定符与SIMD编程一致，详�
 
 核函数是SIMD与SIMT混合编程的Device侧入口函数，负责协调整个算子的执行流程，包括VF的调度和调用。vector计算单元的混合编程场景下，函数定义语法为：
 
-```
+```cpp
 __global__ __vector__ void kernel_name(__gm__ type* param1, __gm__ type* param2, ...);
 ```
 
@@ -108,7 +106,7 @@ __global__ __vector__ void kernel_name(__gm__ type* param1, __gm__ type* param2,
 
 核函数的调用是通过<<<...\>\>\>内核调用符在Host侧调用，语法如下：
 
-```
+```text
 kernel_name<<<block_num, dyn_ub_size, stream>>>(args...);
 ```
 
@@ -124,9 +122,9 @@ kernel_name<<<block_num, dyn_ub_size, stream>>>(args...);
 
 在SIMD与SIMT混合编程场景，需使用asc\_vf\_call启动SIMT VF（Vector Function）子任务，通过参数配置，启动指定数目的线程，执行指定的SIMT VF函数。其函数原型如下：
 
-```
+```cpp
 template <auto funcPtr, typename... Args>
-__aicore__ inline void asc_vf_call(dim3 threadNums, Args &&...args)
+__aicore__ inline void asc_vf_call(dim3 threadNums, Args&&... args)
 ```
 
 其中模板参数为指定的SIMT VF函数名以及SIMT VF函数参数，具体描述如下：
@@ -147,10 +145,9 @@ __aicore__ inline void asc_vf_call(dim3 threadNums, Args &&...args)
 
 以下示例展示了SIMD与SIMT混合编程场景下如何使用asc\_vf\_call调用\_\_simt\_vf\_\_函数。
 
-```
+```cpp
 #include "simt_api/common_functions.h"
-__simt_vf__ inline void add_simt(
-    __gm__ float* dst, __gm__ float* src0, __gm__ float* src1)
+__simt_vf__ inline void add_simt(__gm__ float* dst, __gm__ float* src0, __gm__ float* src1)
 {
     // simt代码
     int idx = threadIdx.x + blockIdx.x * blockDim.x;

@@ -16,23 +16,23 @@ get的作用是从tuple容器中提取指定位置的元素。
 
 ## 函数原型
 
-```
-template <size_t N, typename ...Tps>
+```cpp
+template <size_t N, typename... Tps>
 __aicore__ inline typename tuple_element<N, tuple<Tps...> >::type& get(tuple<Tps...>& t) noexcept
 ```
 
-```
-template <size_t N, typename ...Tps>
+```cpp
+template <size_t N, typename... Tps>
 __aicore__ inline const typename tuple_element<N, tuple<Tps...> >::type& get(const tuple<Tps...>& t) noexcept
 ```
 
-```
-template <size_t N, typename ...Tps>
+```cpp
+template <size_t N, typename... Tps>
 __aicore__ inline typename tuple_element<N, tuple<Tps...> >::type&& get(tuple<Tps...>&& t) noexcept
 ```
 
-```
-template <size_t N, typename ...Tps>
+```cpp
+template <size_t N, typename... Tps>
 __aicore__ inline const typename tuple_element<N, tuple<Tps...> >::type&& get(const tuple<Tps...>&& t) noexcept
 ```
 
@@ -56,7 +56,7 @@ tuple对象中对应位置的元素。
 
 ## 调用示例
 
-```
+```cpp
 AscendC::Std::tuple<uint32_t, float, bool> test{11, 2.2, true};
 uint32_t const_uint32_t = AscendC::Std::get<0>(test);
 ```

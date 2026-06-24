@@ -55,24 +55,27 @@
 
 -   原型1：tileSize为模板参数
 
-    ```
+    ```cpp
     // 当tileSize为常量时，建议使用此接口，以获得更优的性能
-    template <class DataType, uint32_t tileSize> LocalTensor<DataType> __aicore__ inline Alloc()
-    template <TPosition pos, class DataType, uint32_t tileSize> __aicore__ inline LocalTensor<DataType> Alloc()
+    template <class DataType, uint32_t tileSize>
+    LocalTensor<DataType> __aicore__ inline Alloc() template <TPosition pos, class DataType, uint32_t tileSize>
+    __aicore__ inline LocalTensor<DataType> Alloc()
     ```
 
 -   原型2：tileSize为接口入参
 
-    ```
+    ```cpp
     // 当tileSize为动态参数时使用此接口
-    template <class DataType> LocalTensor<DataType> __aicore__ inline Alloc(uint32_t tileSize)
-    template <TPosition pos, class DataType> LocalTensor<DataType> __aicore__ inline Alloc(uint32_t tileSize)
+    template <class DataType>
+    LocalTensor<DataType> __aicore__ inline Alloc(uint32_t tileSize) template <TPosition pos, class DataType>
+    LocalTensor<DataType> __aicore__ inline Alloc(uint32_t tileSize)
     ```
 
 -   原型3：使用TensorTrait时使用此接口
 
-    ```
-    template <class DataType> LocalTensor<DataType> __aicore__ inline Alloc()
+    ```cpp
+    template <class DataType>
+    LocalTensor<DataType> __aicore__ inline Alloc()
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -153,11 +156,10 @@
 
 ## 调用示例<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section320753512363"></a>
 
-```
+```cpp
 template <uint32_t v>
 using UIntImm = Std::integral_constant<uint32_t, v>;
-...
-AscendC::LocalMemAllocator allocator;
+... AscendC::LocalMemAllocator allocator;
 // 原型1：float类型，Tensor中有1024个元素，用户可以指定逻辑位置(或者不指定，由Alloc函数根据物理位置给出默认值，不影响功能)
 auto tensor1 = allocator.Alloc<AscendC::TPosition::VECIN, float, 1024>();
 auto tensor1 = allocator.Alloc<float, 1024>();

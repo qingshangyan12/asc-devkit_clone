@@ -22,8 +22,13 @@
 
 ## 函数原型
 
-```
-__aicore__ constexpr MatmulConfig GetMDLConfig(const bool intrinsicsLimit = false, const bool batchLoop = false, const uint32_t doMTE2Preload = 0, const bool isVecND2NZ = false, bool isPerTensor = false, bool hasAntiQuantOffset = false, const bool enUnitFlag = false, const bool isMsgReuse = true, const bool enableUBReuse = true, const bool enableL1CacheUB = false, const bool enableMixDualMaster = false, const bool enableKdimReorderLoad = false)
+```cpp
+__aicore__ constexpr MatmulConfig GetMDLConfig(
+    const bool intrinsicsLimit = false, const bool batchLoop = false, const uint32_t doMTE2Preload = 0,
+    const bool isVecND2NZ = false, bool isPerTensor = false, bool hasAntiQuantOffset = false,
+    const bool enUnitFlag = false, const bool isMsgReuse = true, const bool enableUBReuse = true,
+    const bool enableL1CacheUB = false, const bool enableMixDualMaster = false,
+    const bool enableKdimReorderLoad = false)
 ```
 
 ## 参数说明
@@ -57,7 +62,7 @@ __aicore__ constexpr MatmulConfig GetMDLConfig(const bool intrinsicsLimit = fals
 
 ## 调用示例
 
-```
+```cpp
 // 配置MDL模板的参数，获取自定义MDL模板
 constexpr MatmulConfig MM_CFG = GetMDLConfig(
     /* intrinsicsLimit      */ false,

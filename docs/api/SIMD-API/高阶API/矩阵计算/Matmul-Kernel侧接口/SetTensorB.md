@@ -22,15 +22,15 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetTensorB(const GlobalTensor<SrcBT>& gm, bool isTransposeB = false)
 ```
 
-```
+```cpp
 __aicore__ inline void SetTensorB(const LocalTensor<SrcBT>& rightMatrix, bool isTransposeB = false)
 ```
 
-```
+```cpp
 __aicore__ inline void SetTensorB(SrcBT bScalar)
 ```
 
@@ -104,7 +104,7 @@ Atlas 200I/500 A2 推理产品，不支持SetTensorB\(SrcBT bScalar\)接口原�
 
 ## 调用示例
 
-```
+```cpp
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
 mm.SetTensorA(gm_a);
 // 示例一：右矩阵在Global Memory

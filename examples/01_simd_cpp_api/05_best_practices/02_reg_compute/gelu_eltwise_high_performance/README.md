@@ -20,7 +20,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── gelu_eltwise_high_performance
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
@@ -98,8 +98,8 @@ __simd_vf__ inline static void GeluEltwiseBasic(
     AscendC::Reg::RegTensor<float> xReg, yReg;
 
     for (uint16_t i = 0; i < loopNum; ++i) {
-        // Case 0（scenarioNum == 0）固定使用 VL32 掩码（32 个 float、128 bytes 并行度）；
-        // 非 Case 0 才使用 UpdateMask<float>(n) 按剩余元素数更新掩码
+        // Case 0（scenarioNum == 0）固定使用 VL32 掩码（32 个 float、128 bytes
+        // 并行度）； 非 Case 0 才使用 UpdateMask<float>(n) 按剩余元素数更新掩码
         mask = AscendC::Reg::CreateMask<float, AscendC::Reg::MaskPattern::VL32>();
         // Gelu计算
         AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
@@ -265,13 +265,13 @@ __simd_vf__ inline static void GeluEltwiseLoopSplit(
     AscendC::Reg::RegTensor<float> xReg, yReg;
     uint32_t n2 = n;
 
-    #pragma unroll 6
+#pragma unroll 6
     // Loop 1: Gelu计算
     for (uint16_t i = 0; i < loopNum; ++i) {
         // ...
     }
 
-    #pragma unroll 6
+#pragma unroll 6
     // Loop 2: Element-wise计算
     for (uint16_t i = 0; i < loopNum; ++i) {
         // ...
@@ -600,7 +600,7 @@ msprof ./demo   # 分析性能
 
 当前目录下会生成PROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件
 
-```bash
+```text
 PROF_xxxx_XXXXXX
 ├── device_{id}
 └── host

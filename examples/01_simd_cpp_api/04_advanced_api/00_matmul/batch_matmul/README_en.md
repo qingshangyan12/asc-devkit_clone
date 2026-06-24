@@ -16,7 +16,7 @@ By transferring multiple Matmul input data in a single transfer, the number of t
 
 ## Directory Structure
 
-```
+```text
 ├── batch_matmul
 │   ├── scripts
 │   │   ├── gen_data.py              // Script for generating input data and ground truth data

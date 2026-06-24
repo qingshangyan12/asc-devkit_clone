@@ -8,8 +8,8 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001600467085_zh-cn_topic_0000001526442954_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
-OpAICoreDef &SetCheckSupport(optiling::OP_CHECK_FUNC func)
+```cpp
+OpAICoreDef& SetCheckSupport(optiling::OP_CHECK_FUNC func)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001600467085_zh-cn_topic_0000001526442954_zh-cn_topic_0000001525424352_section75395119104"></a>
@@ -51,8 +51,8 @@ OpAICoreDef请参考[OpAICoreDef](OpAICoreDef.md)。
 
 -   参数校验函数实现如下：对第一个输入参数的shape进行校验，仅支持输入x shape的第一个维度为8，否则不支持。
 
-    ```
-    static ge::graphStatus CheckSupported(const ge::Operator &op, ge::AscendString &result)
+    ```cpp
+    static ge::graphStatus CheckSupported(const ge::Operator& op, ge::AscendString& result)
     {
         std::string resultJsonStr;
         // 仅支持第一个输入参数shape的第一个维度为8，其他shape不支持
@@ -69,25 +69,22 @@ OpAICoreDef请参考[OpAICoreDef](OpAICoreDef.md)。
 
 -   参数校验函数注册的样例如下：
 
-    ```
+    ```cpp
     class AddCustom : public OpDef {
     public:
         AddCustom(const char* name) : OpDef(name)
         {
-            this->Input("x")
-                .ParamType(REQUIRED);
-            this->Input("y")
-                .ParamType(REQUIRED);
-            this->Output("z")
-                .ParamType(REQUIRED);
+            this->Input("x").ParamType(REQUIRED);
+            this->Input("y").ParamType(REQUIRED);
+            this->Output("z").ParamType(REQUIRED);
             this->SetInferShape(ge::InferShape);
-    
+
             this->AICore()
                 .SetTiling(optiling::TilingFunc)
                 .SetTilingParse(optiling::TilingPrepare)
                 .SetOpSelectFormat(optiling::OpSelectFormat)
                 .SetCheckSupport(optiling::CheckSupported);
-    
+
             OpAICoreConfig aicConfig;
             aicConfig.DynamicCompileStaticFlag(true)
                 .DynamicFormatFlag(true)

@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <SpecialPurposeReg spr>
 __simd_callee__ inline void ClearSpr()
 ```
@@ -89,9 +89,11 @@ __simd_callee__ inline void ClearSpr()
 
 如下示例中Gather Reg矢量计算API会存储有效元素的总字节数到AR寄存器中，在宏函数内for循环开始前通过ClearSpr对AR寄存器进行清零。
 
-```
-template<typename T, typename U>
-__simd_vf__ inline void VFDemo(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ U* src1Addr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
+```cpp
+template <typename T, typename U>
+__simd_vf__ inline void VFDemo(
+    __ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ U* src1Addr, uint32_t count, uint32_t oneRepeatSize,
+    uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> srcReg0, dstReg;
     AscendC::Reg::RegTensor<U> srcReg1;

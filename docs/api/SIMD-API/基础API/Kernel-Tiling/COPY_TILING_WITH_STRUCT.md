@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001526206862_section1630753514297"></a>
 
-```
+```cpp
 COPY_TILING_WITH_STRUCT(tiling_struct, src_ptr, dst_ptr)
 ```
 
@@ -101,19 +101,22 @@ COPY_TILING_WITH_STRUCT(tiling_struct, src_ptr, dst_ptr)
 
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 
-```
-extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8_t *y, __gm__ uint8_t *z, __gm__ uint8_t *tiling)
+```cpp
+extern "C" __global__ __aicore__ void add_custom(
+    __gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* tiling)
 {
     KernelAdd op;
     GET_TILING_DATA_PTR_WITH_STRUCT(AddCustomTilingData, tilingDataPtr, tiling);
 
     if ASCEND_IS_AIV {
-        COPY_TILING_WITH_STRUCT(VectorTilingStruct, tilingDataPtr->vectorTiling, vTilingStructPtr);   // Vector侧使用VectorTilingStruct
+        COPY_TILING_WITH_STRUCT(
+            VectorTilingStruct, tilingDataPtr->vectorTiling, vTilingStructPtr); // Vector侧使用VectorTilingStruct
         op.Init(x, y, z, vTilingStructPtr->totalLength, vTilingStructPtr->tileNum);
         op.Process();
     } else {
-        COPY_TILING_WITH_STRUCT(CubeTilingStruct, tilingDataPtr->cubeTiling, cTilingStructPtr); // Cube侧使用CubeTilingStruct
-	op.Init(x, y, z, *cTilingStructPtr);
+        COPY_TILING_WITH_STRUCT(
+            CubeTilingStruct, tilingDataPtr->cubeTiling, cTilingStructPtr); // Cube侧使用CubeTilingStruct
+        op.Init(x, y, z, *cTilingStructPtr);
         op.Process();
     }
 }

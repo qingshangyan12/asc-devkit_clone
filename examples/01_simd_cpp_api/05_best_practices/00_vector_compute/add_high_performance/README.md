@@ -23,7 +23,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── add_high_performance
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
@@ -80,10 +80,10 @@ $$
 **关键代码**：
 ```cpp
 for (uint32_t i = 0; i < curLen; i++) {
-      float xVal = (float)xLocal.GetValue(i);
-      float yVal = (float)yLocal.GetValue(i);
-      zLocal.SetValue(i, (half)(xVal + yVal));
-    }
+    float xVal = (float)xLocal.GetValue(i);
+    float yVal = (float)yLocal.GetValue(i);
+    zLocal.SetValue(i, (half)(xVal + yVal));
+}
 ```
 
 **样例配置**：
@@ -183,7 +183,7 @@ AscendC::Add(zLocal, xLocal, yLocal, curLen);
 uint32_t baseCoreM = totalM / splitM;
 uint32_t remainderM = totalM % splitM;
 if (blockIdxM < remainderM) {
-    actualCoreM = baseCoreM + 1;  // 均匀分配余数
+    actualCoreM = baseCoreM + 1; // 均匀分配余数
     startM = blockIdxM * actualCoreM;
 } else {
     actualCoreM = baseCoreM;
@@ -285,7 +285,7 @@ static constexpr uint32_t zAddrPong = yAddrPong + MAX_DATA_COPY_LEN * sizeof(hal
 // 双缓冲流水线：交替使用两个事件ID和两组缓冲区
 for (uint32_t loopIdx = 0; loopIdx < totalBlocks; loopIdx++) {
     int32_t eventID = (loopIdx % 2 == 0 ? EVENT_ID0 : EVENT_ID1);
-    AscendC::LocalTensor<half> &xLocal = (loopIdx % 2 == 0 ? xPing : xPong);
+    AscendC::LocalTensor<half>& xLocal = (loopIdx % 2 == 0 ? xPing : xPong);
     // ... 数据搬运和计算，使用对应的eventID同步
     AscendC::Add(zLocal, xLocal, yLocal, curLen);
 }
@@ -300,7 +300,7 @@ for (uint32_t loopIdx = 0; loopIdx < totalBlocks; loopIdx++) {
 
 **内存布局**：
 
-```
+```text
 UB内存分配（双缓冲）：
 ┌──────────────┐
 │  xPing       │  0x00000
@@ -362,8 +362,8 @@ UB内存分配（双缓冲）：
 
 **关键代码**：
 ```cpp
-  xGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
-  yGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
+xGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
+yGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
 ```
 
 **样例配置**：
@@ -421,7 +421,8 @@ yGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
 
 // 优化后的地址布局（避免Bank Conflict）
 static constexpr uint32_t xAddrPingBC = 0;
-static constexpr uint32_t yAddrPingBC = BANK_CONFLICT_DATA_COPY_LEN * sizeof(half);  // 错开256B；注意：sizeof(half)=2B，float场景需调整为sizeof(float)
+static constexpr uint32_t yAddrPingBC =
+    BANK_CONFLICT_DATA_COPY_LEN * sizeof(half); // 错开256B；注意：sizeof(half)=2B，float场景需调整为sizeof(float)
 static constexpr uint32_t xAddrPongBC = MAX_DATA_COPY_LEN * sizeof(half) * 2;
 static constexpr uint32_t yAddrPongBC = xAddrPongBC + BANK_CONFLICT_DATA_COPY_LEN * sizeof(half);
 static constexpr uint32_t zAddrPingBC = MAX_DATA_COPY_LEN * sizeof(half) * 4;
@@ -672,7 +673,7 @@ AscendC::printf("add blockIdx=%d\n", AscendC::GetBlockIdx());
 
 在算子kernel侧实现代码中需要打印Tensor数据的地方调用[DumpTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md)接口打印相关内容。样例如下：
 
-```cpp
+```bash
 // 向量计算: z = x + y
 AscendC::Add(zLocal, xLocal, yLocal, blockLength);
 AscendC::DumpTensor(zLocal, 1, 32);
@@ -690,7 +691,7 @@ msprof ./demo   # 分析性能
 
 当前目录下会生成PROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件
 
-```bash
+```text
 PROF_xxxx_XXXXXX
 ├── device_{id}
 └── host
@@ -701,7 +702,7 @@ PROF_xxxx_XXXXXX
     └── README.txt
 ```
 查看具体的性能分析结果：
-```
+```bash
 # 查看Task Duration 以及各项数据
 cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
 ```

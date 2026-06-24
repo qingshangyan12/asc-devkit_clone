@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename Tp>
 struct is_const;
 ```
@@ -42,9 +42,11 @@ is\_const的静态常量成员value用于获取返回的布尔值，is\_const<Tp
 
 ## 调用示例
 
-```
+```cpp
 // 自定义测试类型
-struct MyStruct{int val;};
+struct MyStruct {
+    int val;
+};
 
 // Mismatch scenario
 AscendC::printf("AscendC::Std::is_const::value:%d\n", AscendC::Std::is_const<int>::value);
@@ -66,21 +68,11 @@ AscendC::printf("AscendC::Std::is_const::value:%d\n", AscendC::Std::is_const<con
 AscendC::printf("AscendC::Std::is_const::value:%d\n", AscendC::Std::is_const<const MyStruct>::value);
 ```
 
-```
+```cpp
 // 执行结果：
-AscendC::Std::is_const::value:0
-AscendC::Std::is_const::value:0
-AscendC::Std::is_const::value:0
-AscendC::Std::is_const::value:0
-AscendC::Std::is_const::value:0
-AscendC::Std::is_const::value:0
-AscendC::Std::is_const::value:0
-AscendC::Std::is_const::value:0
-AscendC::Std::is_const::value:0
-AscendC::Std::is_const::value:1
-AscendC::Std::is_const::value:1
-AscendC::Std::is_const::value:1
-AscendC::Std::is_const::value:1
-AscendC::Std::is_const::value:1
-AscendC::Std::is_const::value:1
+AscendC::Std::is_const::value : 0 AscendC::Std::is_const::value : 0 AscendC::Std::is_const::value : 0 AscendC::Std::
+    is_const::value : 0 AscendC::Std::is_const::value : 0 AscendC::Std::is_const::value : 0 AscendC::Std::is_const::
+        value : 0 AscendC::Std::is_const::value : 0 AscendC::Std::is_const::value : 0 AscendC::Std::is_const::
+            value : 1 AscendC::Std::is_const::value : 1 AscendC::Std::is_const::value : 1 AscendC::Std::is_const::
+                value : 1 AscendC::Std::is_const::value : 1 AscendC::Std::is_const::value : 1
 ```

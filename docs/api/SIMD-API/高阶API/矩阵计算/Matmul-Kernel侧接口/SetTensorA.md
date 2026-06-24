@@ -22,15 +22,15 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetTensorA(const GlobalTensor<SrcAT>& gm, bool isTransposeA = false)
 ```
 
-```
+```cpp
 __aicore__ inline void SetTensorA(const LocalTensor<SrcAT>& leftMatrix, bool isTransposeA = false)
 ```
 
-```
+```cpp
 __aicore__ inline void SetTensorA(SrcAT aScalar)
 ```
 
@@ -98,7 +98,7 @@ Atlas 200I/500 A2 推理产品，不支持SetTensorA\(SrcAT aScalar\)接口原�
 
 ## 调用示例
 
-```
+```cpp
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
 // 示例一：左矩阵在Global Memory
 mm.SetTensorA(gm_a, isTransposeA);

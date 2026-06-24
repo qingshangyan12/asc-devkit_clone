@@ -166,6 +166,6 @@ Run the following steps in the root directory of this example to build and execu
   | `SCENARIO_NUM` | `1`, `2` | Scenario number: 1 indicates small shape reduction scenario, 2 indicates large shape reduction scenario |
 
   The following output indicates that the accuracy verification is successful.
-  ```
+  ```text
   [Success] Case accuracy is verification passed.
   ```

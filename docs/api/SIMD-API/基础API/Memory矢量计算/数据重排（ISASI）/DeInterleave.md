@@ -57,16 +57,19 @@
 
 -   两个输入
 
-    ```
+    ```cpp
     template <typename T>
-    __aicore__ inline void DeInterleave(const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const int32_t count)
+    __aicore__ inline void DeInterleave(
+        const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+        const int32_t count)
     ```
 
 -   一个输入
 
-    ```
+    ```cpp
     template <typename T>
-    __aicore__ inline void DeInterleave(const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src, const int32_t srcCount)
+    __aicore__ inline void DeInterleave(
+        const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src, const int32_t srcCount)
     ```
 
 ## 参数说明<a name="section176711403104"></a>
@@ -151,13 +154,13 @@
 
 -   两个输入
 
-    ```
+    ```cpp
     AscendC::DeInterleave(dst0Local, dst1Local, src0Local, src1Local, 512);
     ```
 
     结果示例如下：
 
-    ```
+    ```text
     输入数据src0Local: [1 2 3 ... 512]
     输入数据src1Local: [513 514 515 ... 1024]
     输出数据dst0Local: [1 3 5 ... 1023]
@@ -166,13 +169,13 @@
 
 -   一个输入
 
-    ```
+    ```cpp
     AscendC::DeInterleave(dst0Local, dst1Local, srcLocal, 512);
     ```
 
     结果示例如下：
 
-    ```
+    ```text
     输入数据srcLocal: [1 2 3 ... 512]
     输出数据dst0Local: [1 3 5 ... 511]
     输出数据dst1Local: [2 4 6 ... 512]

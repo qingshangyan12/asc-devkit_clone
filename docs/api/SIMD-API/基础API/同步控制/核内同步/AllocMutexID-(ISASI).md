@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline MutexID AllocMutexID()
 ```
 
@@ -65,7 +65,7 @@ __aicore__ inline MutexID AllocMutexID()
 
 返回MutexID，其类型定义如下，每个ID表示一个Mutex锁。
 
-```
+```cpp
 using MutexID = uint8_t;
 ```
 
@@ -75,7 +75,7 @@ MutexID有数量限制，使用结束应该立刻调用ReleaseMutexID释放，�
 
 ## 调用示例<a name="section837496171220"></a>
 
-```
+```cpp
 MutexID id = AllocMutexID();
 Mutex::Lock<PIPE_MTE2>(id);
 DataCopy(local, gm, 1024);

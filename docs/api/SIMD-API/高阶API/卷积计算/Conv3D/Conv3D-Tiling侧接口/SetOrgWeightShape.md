@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 void SetOrgWeightShape(int64_t orgCo, int64_t orgKd, int64_t orgKh, int64_t orgKw)
 ```
 
@@ -29,7 +29,7 @@ void SetOrgWeightShape(int64_t orgCo, int64_t orgKd, int64_t orgKh, int64_t orgK
 
 ## 调用示例
 
-```
+```cpp
 // 实例化Conv3D Api
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 Conv3dTilingApi::Conv3dTiling conv3dApiTiling(ascendcPlatform);

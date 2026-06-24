@@ -40,14 +40,16 @@ Rint\(3.5\) = 4
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <const RintConfing& config = DEFAULT_RINT_CONFIG, typename T>
-    __aicore__ inline void Rint(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t count)
+    __aicore__ inline void Rint(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer,
+        const uint32_t count)
     ```
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <const RintConfing& config = DEFAULT_RINT_CONFIG, typename T>
     __aicore__ inline void Rint(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
     ```
@@ -68,7 +70,7 @@ Rint\(3.5\) = 4
 | RintConfig | Rint算法的相关配置。此参数可选配，RintConfig类型，具体定义如下方代码所示，其中参数的含义为：<br><br>isReuseSource：是否允许修改源操作数。该参数预留，传入默认值false即可。 |
 | T | 操作数的数据类型。支持的数据类型为：half、float。 |
 
-```
+```cpp
 struct RintConfig {
     bool isReuseSource;
 };
@@ -99,7 +101,7 @@ struct RintConfig {
 
 -   通过sharedTmpBuffer入参传入
 
-    ```
+    ```cpp
     AscendC::TPipe pipe;
     AscendC::TQue<AscendC::TPosition::VECCALC, 1> tmpQue;
     pipe.InitBuffer(tmpQue, 1, bufferSize); // bufferSize通过Host侧tiling参数获取
@@ -112,7 +114,7 @@ struct RintConfig {
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     AscendC::TPipe pipe;
     AscendC::TQue<AscendC::TPosition::VECCALC, 1> tmpQue;
     pipe.InitBuffer(tmpQue, 1, bufferSize); // bufferSize通过Host侧tiling参数获取
@@ -124,7 +126,7 @@ struct RintConfig {
 
 结果示例如下：
 
-```
+```text
 输入数据(src): [-1.5, -1.3, -0.9, -0.5, 0.5, 0.9, 1.1, 1.5, 2.2, 2.5, 2.8, 3.2]
 输出数据(dst): [-2, -1, -1, 0, 0, 1, 1, 2, 2, 2, 3, 3]
 ```

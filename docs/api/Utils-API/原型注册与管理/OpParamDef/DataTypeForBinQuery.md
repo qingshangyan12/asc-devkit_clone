@@ -8,7 +8,7 @@
 
 例如，如果一个算子的输入支持多种数据类型（ge::DT\_INT16和ge::DT\_INT32），并且使用ge::DT\_INT16输入时可以复用ge::DT\_INT32 的二进制文件而不影响最终结果，那么可以采用如下配置：
 
-```
+```cpp
 this->Input("x")
     .ParamType(REQUIRED)
     .DataType({ge::DT_INT16, ge::DT_INT32})
@@ -20,8 +20,8 @@ this->Input("x")
 
 ## 函数原型<a name="zh-cn_topic_0000001600172389_zh-cn_topic_0000001526115138_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
-OpParamDef &DataTypeForBinQuery(std::vector<ge::DataType> types)
+```cpp
+OpParamDef& DataTypeForBinQuery(std::vector<ge::DataType> types)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001600172389_zh-cn_topic_0000001526115138_zh-cn_topic_0000001525424352_section75395119104"></a>
@@ -83,16 +83,16 @@ OpParamDef算子定义，OpParamDef请参考[OpParamDef](OpParamDef.md)。
 
 -   <a name="li26512368417"></a>示例一
 
-    ```
-            this->Input("x")
-                .ParamType(REQUIRED)
-                .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT16, ge::DT_INT32})
-                .DataTypeForBinQuery({ge::DT_INT16, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_INT16})
-                .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND});
-            this->Output("y")
-                .ParamType(REQUIRED)
-                .DataType({ge::DT_INT16, ge::DT_INT16, ge::DT_INT16, ge::DT_INT16})
-                .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_NC});
+    ```cpp
+    this->Input("x")
+        .ParamType(REQUIRED)
+        .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT16, ge::DT_INT32})
+        .DataTypeForBinQuery({ge::DT_INT16, ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_INT16})
+        .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND});
+    this->Output("y")
+        .ParamType(REQUIRED)
+        .DataType({ge::DT_INT16, ge::DT_INT16, ge::DT_INT16, ge::DT_INT16})
+        .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_NC});
     ```
 
     如下图所示，没有设置DataTypeForBinQuery之前，会生成4个二进制。通过上述代码设置DataTypeForBinQuery后：
@@ -104,36 +104,36 @@ OpParamDef算子定义，OpParamDef请参考[OpParamDef](OpParamDef.md)。
 
 -   示例二
 
-    ```
+    ```cpp
     // 简单用例，此时会有两对复用，1、2列->1列，3、4列->4列。总共生成1、4两个二进制。所有支持的DataType会传入这两个二进制运行。
-            this->Input("x")
-                .ParamType(REQUIRED)
-                .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT16, ge::DT_INT32})
-                .DataTypeForBinQuery({ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_INT32, ge::DT_INT32})
-                .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND});
-            this->Output("y")
-                .ParamType(REQUIRED)
-                .DataType({ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT})
-                .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND});
+    this->Input("x")
+        .ParamType(REQUIRED)
+        .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT16, ge::DT_INT32})
+        .DataTypeForBinQuery({ge::DT_FLOAT16, ge::DT_FLOAT16, ge::DT_INT32, ge::DT_INT32})
+        .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND});
+    this->Output("y")
+        .ParamType(REQUIRED)
+        .DataType({ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT})
+        .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND});
     ```
 
 -   示例三
 
-    ```
+    ```cpp
     // 复杂用例，可以多个Input/Output同时使用DataTypeForBinQuery，此时也会产生两对复用。1、2列->2列，3、4列->1列。总共生成1、2两个二进制。所有支持的DataType会传入这两个二进制运行。
-            this->Input("x")
-                .ParamType(REQUIRED)
-                .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT16, ge::DT_INT32})
-                .DataTypeForBinQuery({ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT16, ge::DT_FLOAT16})
-                .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND});
-            this->Input("y")
-                .ParamType(REQUIRED)
-                .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT32, ge::DT_INT16})
-                .DataTypeForBinQuery({ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT16, ge::DT_FLOAT16})
-                .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND});
-            this->Output("z")
-                .ParamType(REQUIRED)
-                .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT32, ge::DT_INT16})
-                .DataTypeForBinQuery({ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT16, ge::DT_FLOAT16})
-                .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND});
+    this->Input("x")
+        .ParamType(REQUIRED)
+        .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT16, ge::DT_INT32})
+        .DataTypeForBinQuery({ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT16, ge::DT_FLOAT16})
+        .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND});
+    this->Input("y")
+        .ParamType(REQUIRED)
+        .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT32, ge::DT_INT16})
+        .DataTypeForBinQuery({ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT16, ge::DT_FLOAT16})
+        .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND});
+    this->Output("z")
+        .ParamType(REQUIRED)
+        .DataType({ge::DT_FLOAT16, ge::DT_FLOAT, ge::DT_INT32, ge::DT_INT16})
+        .DataTypeForBinQuery({ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT16, ge::DT_FLOAT16})
+        .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND});
     ```

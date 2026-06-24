@@ -37,43 +37,39 @@ Layout包含两个核心组成部分：
 
 ```cpp
 template <typename T, typename U, typename Info = Std::ignore_t>
-struct Layout : private Std::tuple<T, U>
-{
+struct Layout : private Std::tuple<T, U> {
     static constexpr auto depth = NestingDepthV<T>;
     static constexpr auto rank = Std::tuple_size_v<T>;
 
-    __aicore__ inline constexpr Layout(const T& shape  = {}, const U& stride = {})
+    __aicore__ inline constexpr Layout(const T& shape = {}, const U& stride = {})
         : Std::tuple<T, U>(shape, stride)
 
-    template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Capacity() const
+              template <size_t... I>
+              __aicore__ inline constexpr decltype(auto) Capacity() const
 
-    __aicore__ inline constexpr decltype(auto) layout()
-    __aicore__ inline constexpr decltype(auto) layout() const
+          __aicore__ inline constexpr decltype(auto) layout() __aicore__ inline constexpr decltype(auto) layout() const
 
-    template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Shape()
-    template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Shape() const
+          template <size_t... I>
+          __aicore__ inline constexpr decltype(auto) Shape() template <size_t... I>
+          __aicore__ inline constexpr decltype(auto) Shape() const
 
-    template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Stride()
-    template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Stride() const
+          template <size_t... I>
+          __aicore__ inline constexpr decltype(auto) Stride() template <size_t... I>
+          __aicore__ inline constexpr decltype(auto) Stride() const
 
-    template <typename S>
-    __aicore__ inline constexpr auto operator()(const S& coord) const
+          template <typename S>
+          __aicore__ inline constexpr auto
+          operator()(const S& coord) const
 
-    template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Rank() const
+          template <size_t... I>
+          __aicore__ inline constexpr decltype(auto) Rank() const
 
-    template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Size() const
+          template <size_t... I>
+          __aicore__ inline constexpr decltype(auto) Size() const
 
-    template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Get()
-    template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Get() const
+          template <size_t... I>
+          __aicore__ inline constexpr decltype(auto) Get() template <size_t... I>
+          __aicore__ inline constexpr decltype(auto) Get() const
 };
 ```
 
@@ -95,7 +91,7 @@ struct Layout : private Std::tuple<T, U>
 
 - 函数原型
 ```cpp
-  __aicore__ inline constexpr Layout(const T& shape = {}, const U& stride = {})
+__aicore__ inline constexpr Layout(const T& shape = {}, const U& stride = {})
 ```
 
 - 参数说明
@@ -139,8 +135,7 @@ struct Layout : private Std::tuple<T, U>
 
 - 函数原型
   ```cpp
-  __aicore__ inline constexpr decltype(auto) layout()
-  __aicore__ inline constexpr decltype(auto) layout() const
+  __aicore__ inline constexpr decltype(auto) layout() __aicore__ inline constexpr decltype(auto) layout() const
   ```
 
 - 返回值说明
@@ -162,8 +157,8 @@ struct Layout : private Std::tuple<T, U>
   template <size_t... I>
   __aicore__ inline constexpr decltype(auto) Shape()
 
-  template <size_t... I>
-  __aicore__ inline constexpr decltype(auto) Shape() const
+      template <size_t... I>
+      __aicore__ inline constexpr decltype(auto) Shape() const
   ```
 
 - 返回值说明
@@ -185,8 +180,8 @@ struct Layout : private Std::tuple<T, U>
   template <size_t... I>
   __aicore__ inline constexpr decltype(auto) Stride()
 
-  template <size_t... I>
-  __aicore__ inline constexpr decltype(auto) Stride() const
+      template <size_t... I>
+      __aicore__ inline constexpr decltype(auto) Stride() const
   ```
 
 - 返回值说明
@@ -274,8 +269,8 @@ struct Layout : private Std::tuple<T, U>
   template <size_t... I>
   __aicore__ inline constexpr decltype(auto) Get()
 
-  template <size_t... I>
-  __aicore__ inline constexpr decltype(auto) Get() const
+      template <size_t... I>
+      __aicore__ inline constexpr decltype(auto) Get() const
   ```
 
 - 返回值说明

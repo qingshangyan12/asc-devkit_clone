@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline uint16_t GetQueueNum()
 ```
 

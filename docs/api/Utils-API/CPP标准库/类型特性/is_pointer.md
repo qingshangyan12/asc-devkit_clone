@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename Tp>
 struct is_pointer;
 ```
@@ -42,9 +42,11 @@ is\_pointer的静态常量成员value用于获取返回的布尔值，is\_pointe
 
 ## 调用示例
 
-```
+```cpp
 // 自定义测试类型
-struct MyStruct{int val;};
+struct MyStruct {
+    int val;
+};
 // 函数类型
 using FuncType = void(int);
 
@@ -53,8 +55,8 @@ AscendC::printf("AscendC::Std::is_pointer::value:%d\n", AscendC::Std::is_pointer
 AscendC::printf("AscendC::Std::is_pointer::value:%d\n", AscendC::Std::is_pointer<char**>::value);
 AscendC::printf("AscendC::Std::is_pointer::value:%d\n", AscendC::Std::is_pointer<void*>::value);
 AscendC::printf("AscendC::Std::is_pointer::value:%d\n", AscendC::Std::is_pointer<MyStruct*>::value);
-AscendC::printf("AscendC::Std::is_pointer::value:%d\n", AscendC::Std::is_pointer<int(*)[5]>::value);
-AscendC::printf("AscendC::Std::is_pointer::value:%d\n", AscendC::Std::is_pointer<void(*)(int)>::value);
+AscendC::printf("AscendC::Std::is_pointer::value:%d\n", AscendC::Std::is_pointer<int (*)[5]>::value);
+AscendC::printf("AscendC::Std::is_pointer::value:%d\n", AscendC::Std::is_pointer<void (*)(int)>::value);
 
 // Pointer types limited by CV
 AscendC::printf("AscendC::Std::is_pointer::value:%d\n", AscendC::Std::is_pointer<const int*>::value);
@@ -71,22 +73,12 @@ AscendC::printf("AscendC::Std::is_pointer::value:%d\n", AscendC::Std::is_pointer
 AscendC::printf("AscendC::Std::is_pointer::value:%d\n", AscendC::Std::is_pointer<void>::value);
 ```
 
-```
+```cpp
 // 执行结果：
-AscendC::Std::is_pointer::value:1
-AscendC::Std::is_pointer::value:1
-AscendC::Std::is_pointer::value:1
-AscendC::Std::is_pointer::value:1
-AscendC::Std::is_pointer::value:1
-AscendC::Std::is_pointer::value:1
-AscendC::Std::is_pointer::value:1
-AscendC::Std::is_pointer::value:1
-AscendC::Std::is_pointer::value:1
-AscendC::Std::is_pointer::value:0
-AscendC::Std::is_pointer::value:0
-AscendC::Std::is_pointer::value:0
-AscendC::Std::is_pointer::value:0
-AscendC::Std::is_pointer::value:0
-AscendC::Std::is_pointer::value:0
-AscendC::Std::is_pointer::value:0
+AscendC::Std::is_pointer::value : 1 AscendC::Std::is_pointer::value : 1 AscendC::Std::is_pointer::value : 1 AscendC::
+    Std::is_pointer::value : 1 AscendC::Std::is_pointer::value : 1 AscendC::Std::is_pointer::value : 1 AscendC::Std::
+        is_pointer::value : 1 AscendC::Std::is_pointer::value : 1 AscendC::Std::is_pointer::value : 1 AscendC::Std::
+            is_pointer::value : 0 AscendC::Std::is_pointer::value : 0 AscendC::Std::is_pointer::value : 0 AscendC::Std::
+                is_pointer::value : 0 AscendC::Std::is_pointer::value : 0 AscendC::Std::is_pointer::value : 0 AscendC::
+                    Std::is_pointer::value : 0
 ```

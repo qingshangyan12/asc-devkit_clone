@@ -20,7 +20,7 @@
 
 为方便理解，通过Python脚本实现的方式表达计算公式如下，其中src是源操作数（输入），dst、sum、max为目的操作数（输出）。
 
-```
+```python
 def log_softmax(src):
     #基于last轴进行rowmax(按行取最大值)处理
     max = np.max(src, axis=-1, keepdims=True)
@@ -53,9 +53,12 @@ def log_softmax(src):
 
 ## 函数原型
 
-```
+```cpp
 template <typename T, bool isReuseSource = false, bool isDataFormatNZ = false>
-__aicore__ inline void LogSoftMax(const LocalTensor<T>& dst, const LocalTensor<T>& sum, const LocalTensor<T>& max, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer, const LogSoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+__aicore__ inline void LogSoftMax(
+    const LocalTensor<T>& dst, const LocalTensor<T>& sum, const LocalTensor<T>& max, const LocalTensor<T>& src,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const LogSoftMaxTiling& tiling,
+    const SoftMaxShapeInfo& softmaxShapeInfo = {})
 ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者通过sharedTmpBuffer入参传入。临时空间大小BufferSize的获取方式如下：通过[LogSoftMax Tiling](LogSoftMax-Tiling.md)中提供的接口获取空间范围的大小。
@@ -82,7 +85,7 @@ __aicore__ inline void LogSoftMax(const LocalTensor<T>& dst, const LocalTensor<T
 | tiling | 输入 | LogSoftMax计算所需Tiling信息，Tiling信息的获取请参考[LogSoftMax Tiling](LogSoftMax-Tiling.md)。 |
 | softmaxShapeInfo | 输入 | src的shape信息。SoftMaxShapeInfo类型，具体定义如下方代码所示，其中参数的含义为：<br>srcM：非尾轴长度的乘积。<br>srcK：尾轴长度，必须32Byte对齐。<br>oriSrcM：原始非尾轴长度的乘积。<br>oriSrcK：原始尾轴长度。<br><br>注意，当输入输出的数据格式为NZ（FRACTAL_NZ）格式时，尾轴长度为reduce轴长度，即[图2](../SoftMax接口/SoftMax.md#fig0172155842215)中的W0\*W1，非尾轴为H0\*H1。 |
 
-```
+```cpp
 struct SoftMaxShapeInfo {
     uint32_t srcM;
     uint32_t srcK;
@@ -105,7 +108,7 @@ struct SoftMaxShapeInfo {
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放LogSoftMax计算结果的Tensor
 // sumLocal：存放LogSoftMax计算过程中reducesum结果的Tensor
 // maxLocal：存放LogSoftMax计算过程中reduceMax结果的Tensor
@@ -124,7 +127,7 @@ AscendC::LogSoftMax<DTYPE_X, false>(
 
 结果示例如下：
 
-```
+```text
 输入数据(srcLocal):
 [[-100.     -80.     -60.     -50.     -30.     -20.     -15.     -10.   ]
  [  -9.      -8.      -7.      -6.      -5.      -4.      -3.      -2.   ]

@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 void SetDilation(int64_t dilationD, int64_t dilationH, int64_t dilationW)
 ```
 
@@ -28,7 +28,7 @@ void SetDilation(int64_t dilationD, int64_t dilationH, int64_t dilationW)
 
 ## 调用示例
 
-```
+```cpp
 // 实例化Conv3D Api
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 Conv3dTilingApi::Conv3dTiling conv3dApiTiling(ascendcPlatform);

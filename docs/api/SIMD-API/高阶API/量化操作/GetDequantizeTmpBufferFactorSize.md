@@ -22,7 +22,7 @@
 
 ## 函数原型
 
-```
+```cpp
 void GetDequantizeTmpBufferFactorSize(const ge::Shape& srcShape, uint32_t& maxLiveNodeCnt, uint32_t& extraBuf)
 ```
 
@@ -46,7 +46,7 @@ void GetDequantizeTmpBufferFactorSize(const ge::Shape& srcShape, uint32_t& maxLi
 
 ## 调用示例
 
-```
+```cpp
 std::vector<int64_t> shapeVec = {2, 1024};
 ge::Shape srcShape(shapeVec);
 uint32_t maxLiveNodeCount = 0;

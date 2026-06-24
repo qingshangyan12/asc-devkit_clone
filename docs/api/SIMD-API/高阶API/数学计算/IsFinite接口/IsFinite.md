@@ -40,8 +40,8 @@
 
 ## 函数原型
 
-```
-template<typename T, typename U>
+```cpp
+template <typename T, typename U>
 __aicore__ inline void IsFinite(const LocalTensor<U>& dst, const LocalTensor<T>& src, uint32_t calCount)
 ```
 
@@ -86,7 +86,7 @@ __aicore__ inline void IsFinite(const LocalTensor<U>& dst, const LocalTensor<T>&
 
 完整算子样例请参考[isfinite算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/10_math/isfinite)。
 
-```
+```cpp
 // dstLocal: 存放IsFinite计算结果的Tensor
 // srcLocal：存放IsFinite计算的输入Tensor
 // 需要参与计算的元素个数为8
@@ -95,7 +95,7 @@ AscendC::IsFinite(dstLocal, srcLocal, 8);
 
 结果示例如下：
 
-```
+```text
 输入的数据类型为float，输出的数据类型为bool
 输入数据(src):
 [1.0,+inf,3.0,4.0,nan,6.0,-inf,8.0]

@@ -14,7 +14,7 @@ This example introduces matrix multiplication with ND format input, covering B4 
 
 ## Directory Structure
 
-```
+```text
 ├── mmad
 │   ├── figures                     // Illustrations
 │   ├── scripts

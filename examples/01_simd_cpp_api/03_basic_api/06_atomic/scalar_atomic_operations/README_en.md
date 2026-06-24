@@ -14,7 +14,7 @@ This example introduces the implementation flow of scalar atomic addition and sc
 
 ## Directory Structure
 
-```
+```text
 ├── scalar_atomic_operations
 │   ├── scripts
 │   │   ├── gen_data.py               // Input data and ground truth generation script

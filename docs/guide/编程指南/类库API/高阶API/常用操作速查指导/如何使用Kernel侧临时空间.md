@@ -12,9 +12,9 @@ Kernel侧接口的内部实现一般涉及复杂的数学计算，需要额外�
 
 以Asin接口为例：
 
-```
+```cpp
 // 算子输入的数据类型T为half，isReuseSource传入默认值false
-auto shape_input = context->GetInputTensor(0)->GetOriginShape();    
+auto shape_input = context->GetInputTensor(0)->GetOriginShape();
 std::vector<int64_t> srcDims = {shape_input.GetDim(0), shape_input.GetDim(1)};
 uint32_t srcSize = 1;
 for (auto dim : srcDims) {
@@ -29,7 +29,9 @@ AscendC::GetAsinMaxMinTmpSize(shape, typeSize, false, maxValue, minValue);
 auto platformInfo = context->GetPlatformInfo();
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(platformInfo);
 uint64_t tailSize = 0; // UB剩余空间大小
-ascendcPlatform.GetCoreMemSize(platform_ascendc::CoreMemType::UB, tailSize); // 本样例中使用完整的ub空间，实际情况下tailSize需要减掉用户已使用的UB空间
+ascendcPlatform.GetCoreMemSize(
+    platform_ascendc::CoreMemType::UB,
+    tailSize); // 本样例中使用完整的ub空间，实际情况下tailSize需要减掉用户已使用的UB空间
 auto tmpSize = tailSize >= maxValue ? maxValue : tailSize;
 
 AsinCustomTilingData tiling;
@@ -56,10 +58,10 @@ tiling.set_tmpBufferSize(tmpSize); // 将临时空间大小设置为Tiling参数
 
 以算子中需要同时调用Asin、Acos接口为例：
 
-```
+```cpp
 // 算子输入的数据类型T为half
 auto shape_input = context->GetInputTensor(0)->GetOriginShape();
-std::vector<int64_t> srcDims = { shape_input.GetDim(0), shape_input.GetDim(1) };
+std::vector<int64_t> srcDims = {shape_input.GetDim(0), shape_input.GetDim(1)};
 uint32_t srcSize = 1;
 uint32_t srcCurSize = 1;
 for (auto dim : srcDims) {
@@ -93,7 +95,7 @@ if (asinMaxLiveNodeCount != 0) {
 }
 // 计算Acos算子单次最大计算元素数量
 if (acosMaxLiveNodeCount != 0) {
-    srcAcosCurSize = (tmpSize - acosExtraBuf) / acosMaxLiveNodeCount / typeSize; 
+    srcAcosCurSize = (tmpSize - acosExtraBuf) / acosMaxLiveNodeCount / typeSize;
 } else {
     srcAcosCurSize = srcSize;
 }

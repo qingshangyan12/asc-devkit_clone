@@ -39,7 +39,8 @@ Cast用于数据类型精度转换，将源操作数数据类型转换成目的�
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename T = DefaultType, typename U = DefaultType, const CastTrait& trait = castTrait, typename S, typename V>
+template <
+    typename T = DefaultType, typename U = DefaultType, const CastTrait& trait = castTrait, typename S, typename V>
 __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask);
 ```
 
@@ -231,99 +232,69 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask);
 
 ### float转hifloat8_t转换规则
 
-```
-tmp2[31 : 0] = f32_src_data[i][31 : 0];
-Ev = tmp2[30 : 23] - 8'b01111111, thr = tmp2[13 : 0];
-if (Ev == 128 && tmp2[22 : 0] != 23'b0) then
-    tmp3[7 : 0] = HiF8NAN(8'b10000000);
-else if ((Ev == 128 && tmp2[22 : 0] == 23'b0) || (Ev > 15)) then
-    tmp3[7 : 0] = (tmp2[31] == 1'b0) ? HiF8+INF(8'b01101111) : HiF8-INF(8'b11101111);
-else if (Ev < -23) then
-    tmp3[7 : 0] = HiF8ZERO (8'b00000000);
-else if (Ev == -23) then
-    if ((Half To Away Round) || (Hybrid Round && {1’b1, tmp2[22 : 10]} >= thr)) then
-        tmp3[7 : 0] = (tmp2[31] == 1'b0) ? 8'b00000001 : 8'b10000001; // min subnormal
-    else
-        tmp3[7 : 0] = HiF8ZERO(8'b00000000);
-    end if
+```cpp
+tmp2 [31:0] = f32_src_data[i] [31:0];
+Ev = tmp2 [30:23] - 8'b01111111, thr = tmp2 [13:0];
+if (Ev == 128 && tmp2 [22:0] != 23'b0)
+    then tmp3 [7:0] = HiF8NAN(8'b10000000);
+else if ((Ev == 128 && tmp2 [22:0] == 23'b0) || (Ev > 15))
+    then tmp3 [7:0] = (tmp2[31] == 1'b0) ? HiF8 + INF(8'b01101111) : HiF8 - INF(8'b11101111);
+else if (Ev < -23)
+    then tmp3 [7:0] = HiF8ZERO(8'b00000000);
+else if (Ev == -23)
+    then if ((Half To Away Round) || (Hybrid Round && {1’b1, tmp2 [22:10]} >= thr)) then tmp3 [7:0] =
+        (tmp2[31] == 1'b0) ? 8'b00000001 : 8'b10000001; // min subnormal
 else
-    if (Ev == 0) then
-        M = tmp2[22 : 20], T A_bit = tmp2[19], frac = tmp2[19 : 6];
-    else if (Ev == ±1) then
-        M = tmp2[22 : 20], T A_bit = tmp2[19], frac = tmp2[19 : 6];
-    else if (Ev == ±[2, 3]) then
-        M = tmp2[22 : 20], T A_bit = tmp2[19], frac = tmp2[19:6];
-    else if (Ev == ±[4, 7]) then
-        M = tmp2[22 : 21], T A_bit = tmp2[20], frac = tmp2[20 : 7];
-    else if (Ev == ±[8, 15]) then
-        M = tmp2[22], T A_bit = tmp2[21], frac = tmp2[21 : 8];
-    else if (Ev == [-16, -22]) then
-        M = Ev + 23, T A_bit = tmp2[22], frac = tmp2[22 : 9]; // subnormal
-    end if
-    if (Ev == ±[0, 3]) then
-        if (T A_bit == 1’b1) then
-            M_tmp = M + 1, Ev = Ev + carry of M_tmp, M = (carry of M_tmp) ? 0 : M_tmp;
-        end if
-    else if (Ev == ±[4, 15]) then
-        if (HALF To Away Round && T A_bit == 1’b1) || (Hybrid Round && frac >= thr) then
-            M_tmp = M + 1, Ev = Ev + carry of M_tmp, M = (carry of M_tmp) ? 0 : M_tmp;
-        end if
-    else if (Ev == [-16, -22]) then
-        if ((Half To Away Round) && T A_bit == 1'b1) || (Hybrid Round && frac >= thr) then
-            M_tmp = Ev + 23, Ev = Ev + 1, M = (Ev == -15) ? 0 : M_tmp;
-        end if
-    end if
-    encode {tmp3[31], Ev, M} to tmp3[7 : 0] following HiF encoding rule;
-end if
-result[i][7 :0] = saturation(tmp[7 : 0]) according to control bit;
+    tmp3 [7:0] = HiF8ZERO(8'b00000000);
+end if else if (Ev == 0) then M = tmp2 [22:20], T A_bit = tmp2[19], frac = tmp2 [19:6];
+else if (Ev == ±1) then M = tmp2 [22:20], T A_bit = tmp2[19], frac = tmp2 [19:6];
+else if (Ev == ±[2, 3]) then M = tmp2 [22:20], T A_bit = tmp2[19], frac = tmp2 [19:6];
+else if (Ev == ±[4, 7]) then M = tmp2 [22:21], T A_bit = tmp2[20], frac = tmp2 [20:7];
+else if (Ev == ±[8, 15]) then M = tmp2[22], T A_bit = tmp2[21], frac = tmp2 [21:8];
+else if (Ev == [ -16, -22 ]) then M = Ev + 23, T A_bit = tmp2[22], frac = tmp2 [22:9]; // subnormal
+end if if (Ev == ±[0, 3]) then if (T A_bit == 1’b1) then M_tmp = M + 1, Ev = Ev + carry of M_tmp,
+                                                         M = (carry of M_tmp) ? 0 : M_tmp;
+end if else if (Ev == ±[4, 15]) then if (HALF To Away Round && T A_bit == 1’b1) ||
+    (Hybrid Round && frac >= thr) then M_tmp = M + 1,
+                                       Ev = Ev + carry of M_tmp, M = (carry of M_tmp) ? 0 : M_tmp;
+end if else if (Ev == [ -16, -22 ]) then if ((Half To Away Round) && T A_bit == 1'b1) ||
+    (Hybrid Round && frac >= thr) then M_tmp = Ev + 23,
+                                       Ev = Ev + 1, M = (Ev == -15) ? 0 : M_tmp;
+end if end if encode{tmp3[31], Ev, M} to tmp3 [7:0] following HiF encoding rule;
+end if result[i] [7:0] = saturation(tmp [7:0]) according to control bit;
 ```
 
 ### half转hifloat8_t转换规则
-```
-tmp2[15 : 0] = f16_src_data[i][15 : 0];
-Ev = tmp2[14 : 10] - 5'b01111, thr = {tmp2[0], 1’b1};
-if (Ev == 16 && tmp2[9 : 0] != 10'b0) then
-    tmp3[7 : 0] = HiF8NAN(8'b10000000);
-else if (Ev == 16 && tmp2[9:0] == 10'b0) && (Ev > 15) then
-    tmp3[7 : 0] = (tmp2[31] == 1'b0) ? HiF8+INF(8'b01101111) : HiF8-INF(8'b11101111);
-else if (Ev < -23) then
-    tmp3[7 : 0] = HiF8ZERO(8'b00000000);
-else if (Ev == -23) then
-    if ((Half To Away Round) || (Hybrid Round && {1’b1, tmp2[9]} >= thr)) then
-        tmp3[7 : 0] = (tmp2[31] == 1'b0) ? 8'b00000001 : 8'b10000001; // min subnormal
-    else
-        tmp3[7 : 0] = HiF8ZERO(8'b00000000);
-    end if
+```cpp
+tmp2 [15:0] = f16_src_data[i] [15:0];
+Ev = tmp2 [14:10] - 5'b01111, thr = {tmp2[0], 1’b1};
+if (Ev == 16 && tmp2 [9:0] != 10'b0)
+    then tmp3 [7:0] = HiF8NAN(8'b10000000);
+else if (Ev == 16 && tmp2 [9:0] == 10'b0)
+    &&(Ev > 15) then tmp3 [7:0] = (tmp2[31] == 1'b0) ? HiF8 + INF(8'b01101111) : HiF8 - INF(8'b11101111);
+else if (Ev < -23)
+    then tmp3 [7:0] = HiF8ZERO(8'b00000000);
+else if (Ev == -23)
+    then if ((Half To Away Round) || (Hybrid Round && {1’b1, tmp2[9]} >= thr)) then tmp3 [7:0] =
+        (tmp2[31] == 1'b0) ? 8'b00000001 : 8'b10000001; // min subnormal
 else
-    if (Ev == 0) then
-        M = tmp2[9 : 7], T A_bit = tmp2[6], frac = tmp2[6 : 5];
-    else if (Ev == ±1) then
-        M = tmp2[9 : 7], T A_bit = tmp2[6], frac = tmp2[6 : 5];
-    else if (Ev == ±[2, 3]) then
-        M = tmp2[9 : 7], T A_bit = tmp2[6], frac = tmp2[6 : 5];
-    else if (Ev == ±[4, 7]) then
-        M = tmp2[9 : 8], T A_bit = tmp2[7], frac = tmp2[7 : 6];
-    else if (Ev == ±[8, 15]) then
-        M = tmp2[9], T A_bit = tmp2[8], frac = tmp2[8 : 7];
-    else if (Ev == [-16, -22]) then
-        M = Ev + 23, T A_bit = tmp2[9], frac = tmp2[9 : 8]; // subnormal
-    end if
-    if (Ev == ±[0, 3]) then
-        if (T A_bit == 1’b1) then
-            M_tmp = M + 1, Ev = Ev + carry of M_tmp, M = (carry of M_tmp) ? 0 : M_tmp;
-        end if
-    else if (Ev == ±[4, 15]) then
-        if (HALF To Away Round && T A_bit == 1’b1) || (Hybrid Round && frac >= thr) then
-            M_tmp = M + 1, Ev = Ev + carry of M_tmp, M = (carry of M_tmp) ? 0 : M_tmp;
-        end if
-    else if (Ev == [-16, -22]) then
-        if ((Half To Away Round) && T A_bit == 1'b1) || (Hybrid Round && frac >= thr) then
-            M_tmp = Ev + 23, Ev = Ev + 1, M = (Ev == -15) ? 0 : M_tmp;
-        end if
-    end if
-    encode {tmp3[31], Ev, M} to tmp3[7 : 0] following HiF encoding rule;
-end if
-result[i][7 : 0] = saturation(tmp3[7 : 0]) according to control bit; 
+    tmp3 [7:0] = HiF8ZERO(8'b00000000);
+end if else if (Ev == 0) then M = tmp2 [9:7], T A_bit = tmp2[6], frac = tmp2 [6:5];
+else if (Ev == ±1) then M = tmp2 [9:7], T A_bit = tmp2[6], frac = tmp2 [6:5];
+else if (Ev == ±[2, 3]) then M = tmp2 [9:7], T A_bit = tmp2[6], frac = tmp2 [6:5];
+else if (Ev == ±[4, 7]) then M = tmp2 [9:8], T A_bit = tmp2[7], frac = tmp2 [7:6];
+else if (Ev == ±[8, 15]) then M = tmp2[9], T A_bit = tmp2[8], frac = tmp2 [8:7];
+else if (Ev == [ -16, -22 ]) then M = Ev + 23, T A_bit = tmp2[9], frac = tmp2 [9:8]; // subnormal
+end if if (Ev == ±[0, 3]) then if (T A_bit == 1’b1) then M_tmp = M + 1, Ev = Ev + carry of M_tmp,
+                                                         M = (carry of M_tmp) ? 0 : M_tmp;
+end if else if (Ev == ±[4, 15]) then if (HALF To Away Round && T A_bit == 1’b1) ||
+    (Hybrid Round && frac >= thr) then M_tmp = M + 1,
+                                       Ev = Ev + carry of M_tmp, M = (carry of M_tmp) ? 0 : M_tmp;
+end if else if (Ev == [ -16, -22 ]) then if ((Half To Away Round) && T A_bit == 1'b1) ||
+    (Hybrid Round && frac >= thr) then M_tmp = Ev + 23,
+                                       Ev = Ev + 1, M = (Ev == -15) ? 0 : M_tmp;
+end if end if encode{tmp3[31], Ev, M} to tmp3 [7:0] following HiF encoding rule;
+end if result[i] [7:0] = saturation(tmp3 [7:0]) according to control bit;
 ```
 
 ## 调用示例<a name="section642mcpsimp"></a>
@@ -331,21 +302,19 @@ result[i][7 : 0] = saturation(tmp3[7 : 0]) according to control bit;
 -   场景1：位宽小转大，以half→int32_t为例
 
     ```cpp
-    __simd_vf__ inline void CastVFF162S32(__ubuf__ half* xAddr, __ubuf__ int32_t* yAddr,
-        uint32_t repeatTimes, uint16_t oneRepeatSize)
+    __simd_vf__ inline void CastVFF162S32(
+        __ubuf__ half* xAddr, __ubuf__ int32_t* yAddr, uint32_t repeatTimes, uint16_t oneRepeatSize)
     {
         AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<int32_t, AscendC::Reg::MaskPattern::ALL>();
         AscendC::Reg::RegTensor<half> xReg;
         AscendC::Reg::RegTensor<int32_t> yReg;
         static constexpr AscendC::Reg::CastTrait castTrait = {
-            AscendC::Reg::RegLayout::ZERO,
-            AscendC::Reg::SatMode::UNKNOWN,
-            AscendC::Reg::MaskMergeMode::ZEROING,
-            AscendC::RoundMode::CAST_FLOOR
-        };
+            AscendC::Reg::RegLayout::ZERO, AscendC::Reg::SatMode::UNKNOWN, AscendC::Reg::MaskMergeMode::ZEROING,
+            AscendC::RoundMode::CAST_FLOOR};
         for (uint16_t i = 0; i < repeatTimes; ++i) {
-            AscendC::Reg::LoadAlign<half, AscendC::Reg::PostLiteral::POST_MODE_UPDATE,
-                AscendC::Reg::LoadDist::DIST_UNPACK_B16>(xReg, xAddr, oneRepeatSize);
+            AscendC::Reg::LoadAlign<
+                half, AscendC::Reg::PostLiteral::POST_MODE_UPDATE, AscendC::Reg::LoadDist::DIST_UNPACK_B16>(
+                xReg, xAddr, oneRepeatSize);
             AscendC::Reg::Cast<int32_t, half, castTrait>(yReg, xReg, mask);
             AscendC::Reg::StoreAlign<int32_t, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(
                 yAddr, yReg, oneRepeatSize, mask);
@@ -356,23 +325,21 @@ result[i][7 : 0] = saturation(tmp3[7 : 0]) according to control bit;
 -   场景2：位宽大转小，以float→int16_t为例
 
     ```cpp
-    __simd_vf__ inline void CastVFF322S16(__ubuf__ float* xAddr, __ubuf__ int16_t* yAddr,
-        uint32_t repeatTimes, uint16_t oneRepeatSize)
+    __simd_vf__ inline void CastVFF322S16(
+        __ubuf__ float* xAddr, __ubuf__ int16_t* yAddr, uint32_t repeatTimes, uint16_t oneRepeatSize)
     {
         AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<float, AscendC::Reg::MaskPattern::ALL>();
         AscendC::Reg::RegTensor<float> xReg;
         AscendC::Reg::RegTensor<int16_t> yReg;
         static constexpr AscendC::Reg::CastTrait castTrait = {
-            AscendC::Reg::RegLayout::ZERO,
-            AscendC::Reg::SatMode::SAT,
-            AscendC::Reg::MaskMergeMode::ZEROING,
-            AscendC::RoundMode::CAST_ROUND
-        };
+            AscendC::Reg::RegLayout::ZERO, AscendC::Reg::SatMode::SAT, AscendC::Reg::MaskMergeMode::ZEROING,
+            AscendC::RoundMode::CAST_ROUND};
         for (uint16_t i = 0; i < repeatTimes; ++i) {
             AscendC::Reg::LoadAlign<float, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(xReg, xAddr, oneRepeatSize);
             AscendC::Reg::Cast<int16_t, float, castTrait>(yReg, xReg, mask);
-            AscendC::Reg::StoreAlign<int16_t, AscendC::Reg::PostLiteral::POST_MODE_UPDATE,
-                AscendC::Reg::StoreDist::DIST_PACK_B32>(yAddr, yReg, oneRepeatSize, mask);
+            AscendC::Reg::StoreAlign<
+                int16_t, AscendC::Reg::PostLiteral::POST_MODE_UPDATE, AscendC::Reg::StoreDist::DIST_PACK_B32>(
+                yAddr, yReg, oneRepeatSize, mask);
         }
     }
     ```

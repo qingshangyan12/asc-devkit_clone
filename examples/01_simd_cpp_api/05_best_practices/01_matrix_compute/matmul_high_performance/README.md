@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── matmul_high_performance
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
@@ -217,10 +217,11 @@ SetL1(tilingData);
 
 **关键代码**：
 ```cpp
-AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
-                AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
-                AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
-                AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>, CFG_MDL>
+AscendC::Matmul<
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>, CFG_MDL>
     matmulObj;
 // MDL模板自动优化，启用大包搬运功能
 ```
@@ -260,12 +261,13 @@ AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, ATyp
 
 **关键代码**：
 ```cpp
-AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
-                AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
-                AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
-                AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>, CFG_MDL>
+AscendC::Matmul<
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>, CFG_MDL>
     matmulObj;
-tilingData.set_depthA1(16);  // 增大depthA1，增加L1缓存中A矩阵的块数
+tilingData.set_depthA1(16); // 增大depthA1，增加L1缓存中A矩阵的块数
 tilingData.set_stepKa(8);
 ```
 
@@ -324,7 +326,7 @@ for (int i = 0; i < 2; i++) {
 
 <img src="figures/L2Cache.png">
 
-```
+```bash
 计算过程：
 Step 1: C1 = A1 × B  (A1从GM加载到L2Cache，B从GM加载到L2Cache并驻留)
 Step 2: C2 = A2 × B  (A2从GM加载到L2Cache，B已在L2Cache中，无需重新加载)
@@ -577,7 +579,7 @@ msprof ./demo   # 分析case 的性能
 ```
 
 当前目录下会生成PROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件
-```bash
+```text
 PROF_xxxx_XXXXXX
 ├── device_{id}
 └── host

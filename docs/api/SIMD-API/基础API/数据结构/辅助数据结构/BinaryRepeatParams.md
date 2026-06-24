@@ -13,9 +13,9 @@ const uint8_t DEFAULT_REPEAT_STRIDE = 8;
 
 struct BinaryRepeatParams {
     __aicore__ BinaryRepeatParams() {}
-    __aicore__ BinaryRepeatParams(const uint8_t dstBlkStrideIn, const uint8_t src0BlkStrideIn,
-        const uint8_t src1BlkStrideIn, const uint8_t dstRepStrideIn, const uint8_t src0RepStrideIn,
-        const uint8_t src1RepStrideIn)
+    __aicore__ BinaryRepeatParams(
+        const uint8_t dstBlkStrideIn, const uint8_t src0BlkStrideIn, const uint8_t src1BlkStrideIn,
+        const uint8_t dstRepStrideIn, const uint8_t src0RepStrideIn, const uint8_t src1RepStrideIn)
         : dstBlkStride(dstBlkStrideIn),
           src0BlkStride(src0BlkStrideIn),
           src1BlkStride(src1BlkStrideIn),

@@ -34,16 +34,19 @@
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isReuseSource = false>
-    __aicore__ inline void ClampMin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const T scalar, const uint32_t calCount)
+    __aicore__ inline void ClampMin(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+        const T scalar, const uint32_t calCount)
     ```
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isReuseSource = false>
-    __aicore__ inline void ClampMin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const T scalar, const uint32_t calCount)
+    __aicore__ inline void ClampMin(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const T scalar, const uint32_t calCount)
     ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者**通过sharedTmpBuffer入参传入**和**接口框架申请**两种方式。
@@ -84,7 +87,7 @@
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放计算结果的Tensor
 // srcLocal: 参与计算的输入Tensor
 // sharedTmpBuffer: 临时缓存,内部复杂计算时存储中间变量
@@ -94,7 +97,7 @@ AscendC::ClampMin<half>(dstLocal, srcLocal, sharedTmpBuffer, static_cast<half>(2
 
 结果示例如下：
 
-```
+```text
 输入数据(srcLocal): [0 1 2 ...  126 127]
 输出数据(dstLocal): [2 2 2  ... 126 127]
 ```

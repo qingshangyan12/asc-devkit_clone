@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetBias(const AscendC::GlobalTensor<BiasT>& bias)
 ```
 
@@ -48,7 +48,7 @@ __aicore__ inline void SetBias(const AscendC::GlobalTensor<BiasT>& bias)
 
 ## 调用示例
 
-```
+```cpp
 GlobalTensor<float> biasGm;
 biasGm.SetGlobalBuffer(reinterpret_cast<__gm__ half*>(bias));
 if (biasFlag) {

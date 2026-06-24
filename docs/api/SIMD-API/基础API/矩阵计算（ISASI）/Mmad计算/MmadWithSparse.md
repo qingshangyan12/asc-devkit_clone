@@ -78,8 +78,12 @@ $$
 ## 函数原型
 
 ```cpp
-template <typename T = int32_t, typename U = int8_t, typename Std::enable_if<Std::is_same<PrimT<T>, int32_t>::value, bool>::type = true, typename Std::enable_if<Std::is_same<PrimT<U>, int8_t>::value, bool>::type = true>
-__aicore__ inline void MmadWithSparse(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<U>& filter, const MmadParams& mmadParams)
+template <
+    typename T = int32_t, typename U = int8_t,
+    typename Std::enable_if<Std::is_same<PrimT<T>, int32_t>::value, bool>::type = true,
+    typename Std::enable_if<Std::is_same<PrimT<U>, int8_t>::value, bool>::type = true>
+__aicore__ inline void MmadWithSparse(
+    const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<U>& filter, const MmadParams& mmadParams)
 ```
 
 ## 参数说明
@@ -158,7 +162,8 @@ CopyIn(a1Local, b1Local, idxB1Local);
 AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE1>(EVENT_ID0);
 AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(EVENT_ID0);
 
-// L1 Buffer->L0A Buffer/L0B Buffer，将原始矩阵a，稠密化矩阵b与对应idx矩阵搬运至L0A Buffer/L0B Buffer
+// L1 Buffer->L0A Buffer/L0B
+// Buffer，将原始矩阵a，稠密化矩阵b与对应idx矩阵搬运至L0A Buffer/L0B Buffer
 SplitA(a1Local, a2Local);
 SplitB(b2Local, b1Local, idxB1Local);
 AscendC::SetFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
@@ -168,5 +173,5 @@ AscendC::WaitFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
 uint32 m = 128;
 uint32 k = 64;
 uint32 n = 128;
-AscendC::MmadWithSparse(c1Local, a2Local, b2Local, { m, n, k, false, 0, false, false, false });
+AscendC::MmadWithSparse(c1Local, a2Local, b2Local, {m, n, k, false, 0, false, false, false});
 ```

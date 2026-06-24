@@ -15,10 +15,9 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_set_l13d_padding(uint64_t config)
-__aicore__ inline void asc_set_l13d_padding(half config)
-__aicore__ inline void asc_set_l13d_padding(int16_t config)
-__aicore__ inline void asc_set_l13d_padding(uint16_t config)
+__aicore__ inline void asc_set_l13d_padding(uint64_t config) __aicore__
+    inline void asc_set_l13d_padding(half config) __aicore__ inline void asc_set_l13d_padding(int16_t config) __aicore__
+    inline void asc_set_l13d_padding(uint16_t config)
 ```
 
 ## 参数说明

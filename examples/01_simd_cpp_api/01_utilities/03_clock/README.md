@@ -12,7 +12,7 @@
 
 ## 目录结构
 
-```
+```text
 ├── 03_clock
 │   ├── CMakeLists.txt              // 编译工程文件
 │   ├── clock.asc                   // Ascend C样例实现 & 调用样例

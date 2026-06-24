@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 uint32_t SetQueueNum(uint16_t num)
 ```
 
@@ -29,7 +29,7 @@ uint32_t SetQueueNum(uint16_t num)
 
 ## 调用示例
 
-```
+```cpp
 const char* groupName = "testGroup";
 uint32_t opType = HCCL_CMD_BATCH_WRITE;
 std::string algConfig = "BatchWrite=level0:fullmesh";

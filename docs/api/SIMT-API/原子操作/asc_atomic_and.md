@@ -28,20 +28,20 @@
 
 ## 函数原型
 
-```
-inline int32_t asc_atomic_and(int32_t *address, int32_t val)
-```
-
-```
-inline uint32_t asc_atomic_and(uint32_t *address, uint32_t val)
+```cpp
+inline int32_t asc_atomic_and(int32_t* address, int32_t val)
 ```
 
-```
-inline int64_t asc_atomic_and(int64_t *address, int64_t val)
+```cpp
+inline uint32_t asc_atomic_and(uint32_t* address, uint32_t val)
 ```
 
+```cpp
+inline int64_t asc_atomic_and(int64_t* address, int64_t val)
 ```
-inline uint64_t asc_atomic_and(uint64_t *address, uint64_t val)
+
+```cpp
+inline uint64_t asc_atomic_and(uint64_t* address, uint64_t val)
 ```
 
 ## 参数说明
@@ -74,7 +74,7 @@ Unified Buffer或Global Memory上的初始数据。
 
 使用该接口需要包含"simt\_api/device\_atomic\_functions.h"头文件。
 
-```
+```cpp
 #include "simt_api/device_atomic_functions.h"
 ```
 
@@ -93,9 +93,7 @@ Unified Buffer或Global Memory上的初始数据。
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(256) void clear_status_bits(uint32_t *flags,
-                                                            uint32_t *clear_bits,
-                                                            uint32_t n)
+    __global__ __launch_bounds__(256) void clear_status_bits(uint32_t* flags, uint32_t* clear_bits, uint32_t n)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= n) {
@@ -112,9 +110,8 @@ Unified Buffer或Global Memory上的初始数据。
     SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：\_\_gm\_\_表示Global Memory内存空间，\_\_ubuf\_\_表示Unified Buffer内存空间。
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void clear_status_bits(__gm__ uint32_t *flags,
-                                                                     __gm__ uint32_t *clear_bits,
-                                                                     uint32_t n)
+    __simt_vf__ __launch_bounds__(1024) inline void clear_status_bits(
+        __gm__ uint32_t* flags, __gm__ uint32_t* clear_bits, uint32_t n)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= n) {
@@ -129,7 +126,6 @@ Unified Buffer或Global Memory上的初始数据。
 输出结果示例如下：
 
 ```cpp
-flags before: 0xF
-clear_bits: 0x2, 0x4
-flags after: 0x9 // 表明bit1和bit2被并发清除
+flags before : 0xF clear_bits : 0x2,
+    0x4 flags after : 0x9 // 表明bit1和bit2被并发清除
 ```

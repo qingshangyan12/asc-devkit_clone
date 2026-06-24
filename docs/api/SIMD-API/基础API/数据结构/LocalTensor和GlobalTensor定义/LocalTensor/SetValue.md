@@ -56,8 +56,8 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename T1> __aicore__ inline __inout_pipe__(S)
-void SetValue(const uint32_t index, const T1 value) const
+template <typename T1>
+__aicore__ inline __inout_pipe__(S) void SetValue(const uint32_t index, const T1 value) const
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -108,7 +108,6 @@ for (int32_t i = 0; i < srcLen; ++i) {
 }
 // 示例1结果如下：
 // 数据(inputLocal): [100 100 100  ... 100]
-
 
 // srcLen = 256, num = 99, M=50
 // 示例2

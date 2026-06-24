@@ -46,13 +46,13 @@ Init主要用于对Matmul对象中的Tiling数据进行初始化，根据Tiling�
 
 -   Tiling参数传入栈地址
 
-    ```
+    ```cpp
     __aicore__ inline void Init(const TCubeTiling* __restrict cubeTiling, TPipe* tpipe = nullptr)
     ```
 
 -   Tiling参数传入GM地址
 
-    ```
+    ```cpp
     __aicore__ inline void Init(const __gm__ TCubeTiling* gmCubeTiling, TPipe* tpipe = nullptr)
     ```
 
@@ -90,7 +90,7 @@ Init主要用于对Matmul对象中的Tiling数据进行初始化，根据Tiling�
 
 -   Tiling参数传入栈地址
 
-    ```
+    ```cpp
     GET_TILING_DATA(tilingData, tiling);
     // ...
     REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm);
@@ -100,7 +100,7 @@ Init主要用于对Matmul对象中的Tiling数据进行初始化，根据Tiling�
 -   Tiling参数传入GM地址
     -   纯Cube模式
 
-        ```
+        ```cpp
         #define ASCENDC_CUBE_ONLY
 
         GET_TILING_DATA_PTR_WITH_STRUCT(MatmulCustomTilingData, tilingDataPtr, tiling);
@@ -112,7 +112,7 @@ Init主要用于对Matmul对象中的Tiling数据进行初始化，根据Tiling�
 
     -   MIX模式
 
-        ```
+        ```cpp
         GET_TILING_DATA_PTR_WITH_STRUCT(MatmulCustomTilingData, tilingDataPtr, tiling);
         KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_MIX_AIC_1_2);
         // ...

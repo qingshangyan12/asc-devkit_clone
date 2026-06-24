@@ -60,9 +60,11 @@ Atlas 推理系列产品AI Core采用方式二。
 
 ## 函数原型
 
-```
+```cpp
 template <typename T, bool isExhaustedSuspension = false>
-__aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T>& sortList, const uint16_t elementCountList[4], uint32_t sortedNum[4], uint16_t validBit, const int32_t repeatTime)
+__aicore__ inline void MrgSort(
+    const LocalTensor<T>& dst, const MrgSortSrcList<T>& sortList, const uint16_t elementCountList[4],
+    uint32_t sortedNum[4], uint16_t validBit, const int32_t repeatTime)
 ```
 
 ## 参数说明
@@ -85,7 +87,7 @@ __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T
 | validBit | 输入 | 有效队列个数，取值如下：<br>0b11：前两条队列有效<br>0b111：前三条队列有效<br>0b1111：四条队列全部有效 |
 | repeatTime | 输入 | 迭代次数，每一次源操作数和目的操作数跳过四个队列总长度。取值范围：repeatTime∈[1,255]。<br>repeatTime参数生效是有条件的，需要同时满足以下四个条件：<br>srcLocal包含四条队列并且validBit=15。<br>四个源队列的长度一致。<br>四个源队列连续存储。<br>isExhaustedSuspension为false。 |
 
-```
+```cpp
 template <typename T>
 struct MrgSortSrcList {
     LocalTensor<T> src1;
@@ -132,7 +134,7 @@ struct MrgSortSrcList {
     Atlas A3 训练系列产品/Atlas A3 推理系列产品
     <!-- end id13 -->
 
-    ```
+    ```cpp
     uint32_t elementCount = 128;                // 元素个数
     uint32_t calcBufferSize = elementCount * 8; // 每个元素占据8字节
     uint32_t tmpBufferSize = elementCount * 8;
@@ -146,14 +148,14 @@ struct MrgSortSrcList {
     // sortList：待合并的有序队列列表
     AscendC::MrgSortSrcList sortList = AscendC::MrgSortSrcList(
         sortedLocal[0], sortedLocal[baseOffset], sortedLocal[2 * baseOffset], sortedLocal[3 * baseOffset]);
-    uint16_t singleDataSize = elementCount / 4; // 队列长度
+    uint16_t singleDataSize = elementCount / 4;                                                            // 队列长度
     const uint16_t elementCountList[4] = {singleDataSize, singleDataSize, singleDataSize, singleDataSize}; // 4个队列的长度
     uint32_t sortedNum[4];
     // 合并sortList中的4条队列
     AscendC::MrgSort<half, false>(sortTmpLocal, sortList, elementCountList, sortedNum, 0b1111, 1);
     ```
 
-    ```
+    ```text
     示例结果
     输入数据(srcValueGm): 128个half类型数据
     [31 30 29 ... 2 1 0
@@ -179,7 +181,7 @@ struct MrgSortSrcList {
     Atlas 推理系列产品AI Core
     <!-- end id14 -->
 
-    ```
+    ```cpp
     uint32_t elementCount = 64; // 元素个数
     // 单条队列元素个数
     uint32_t singleMergeTmpElementCount = elementCount / 4;
@@ -187,14 +189,14 @@ struct MrgSortSrcList {
     // sortList：待合并的有序队列列表
     AscendC::MrgSortSrcList sortList = AscendC::MrgSortSrcList(
         sortedLocal[0], sortedLocal[baseOffset], sortedLocal[2 * baseOffset], sortedLocal[3 * baseOffset]);
-    uint16_t singleDataSize = elementCount / 4; // 队列长度
+    uint16_t singleDataSize = elementCount / 4;                                                            // 队列长度
     const uint16_t elementCountList[4] = {singleDataSize, singleDataSize, singleDataSize, singleDataSize}; // 4个队列的长度
     uint32_t sortedNum[4];
     // 合并sortList中的4条队列
     AscendC::MrgSort<half, false>(sortTmpLocal, sortList, elementCountList, sortedNum, 0b1111, 1);
     ```
 
-    ```
+    ```text
     示例结果
     输入数据(srcValueGm): 64个half类型数据
     [15 14 13 ... 2 1 0

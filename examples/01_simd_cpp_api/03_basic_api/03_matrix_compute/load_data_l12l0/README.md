@@ -15,7 +15,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── load_data_l12l0
 │   ├── figures                     // 图示
 │   ├── scripts
@@ -349,7 +349,8 @@ A / B矩阵在不同存储单元的数据排布格式见[表1](#表1)。其中L1
 - `CeilAlign`：向上对齐操作。例如`m = 30`时，`CeilAlign(30, 16) = 32`，表示将m轴向16对齐，对齐后m轴长度为32。
 
   ```cpp
-  __aicore__ inline uint16_t CeilAlign(uint16_t size, uint16_t alignValue) {
+  __aicore__ inline uint16_t CeilAlign(uint16_t size, uint16_t alignValue)
+  {
       return (size + alignValue - 1) / alignValue * alignValue;
   }
   ```
@@ -549,7 +550,7 @@ nd2nzA1Params.dstNzNStride = 1;
 nd2nzA1Params.dstNzMatrixStride = 0;
 // 以下这个参数取A矩阵在L1上，row方向的对齐后的长度
 if constexpr (AscendC::IsSameType<T, float>::value) {
-  nd2nzA1Params.dstNzC0Stride = CeilAlign(k, fractalShape[0]);
+    nd2nzA1Params.dstNzC0Stride = CeilAlign(k, fractalShape[0]);
 }
 ```
 
@@ -737,8 +738,10 @@ loadDataParams.l1H = 1;
 // 源操作数width
 loadDataParams.l1W = CeilAlign(m, fractalShape[0]);
 // 源操作数的通道数，
-// img2col的结果矩阵高度为ho * wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：ho * wo = loadDataParams.l1H * loadDataParams.l1w
-// img2col的结果矩阵宽度为ci * kh * kw，代入kh=1，kw=1，可知结果矩阵的宽度为ci=loadDataParams.channelSize = m
+// img2col的结果矩阵高度为ho *
+// wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：ho
+// * wo = loadDataParams.l1H * loadDataParams.l1w img2col的结果矩阵宽度为ci * kh
+// * kw，代入kh=1，kw=1，可知结果矩阵的宽度为ci=loadDataParams.channelSize = m
 loadDataParams.channelSize = CeilAlign(k, fractalShape[1]);
 // 该指令在目的操作数width维度的传输长度，如果不覆盖最右侧的分形，对于half类型，应为16的倍数，对于int8_t/uint8_t应为32的倍数；覆盖的情况则无倍数要求。
 loadDataParams.kExtension = CeilAlign(k, fractalShape[1]);
@@ -886,8 +889,10 @@ loadDataParams.l1H = 1;
 // 源操作数width
 loadDataParams.l1W = CeilAlign(k, fractalShape[0]);
 // 源操作数的通道数，
-// img2col的结果矩阵高度为ho * wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：ho * wo = loadDataParams.l1H * loadDataParams.l1w
-// img2col的结果矩阵宽度为ci * kh * kw，代入kh=1，kw=1，可知结果矩阵的宽度为ci=loadDataParams.channelSize = m
+// img2col的结果矩阵高度为ho *
+// wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：ho
+// * wo = loadDataParams.l1H * loadDataParams.l1w img2col的结果矩阵宽度为ci * kh
+// * kw，代入kh=1，kw=1，可知结果矩阵的宽度为ci=loadDataParams.channelSize = m
 loadDataParams.channelSize = CeilAlign(m, fractalShape[1]);
 // 该指令在目的操作数width维度的传输长度，如果不覆盖最右侧的分形，对于half类型，应为16的倍数，对于int8_t/uint8_t应为32的倍数；覆盖的情况则无倍数要求。
 loadDataParams.kExtension = CeilAlign(m, fractalShape[1]);
@@ -936,8 +941,10 @@ loadDataParams.l1H = 1;
 // 源操作数width
 loadDataParams.l1W = CeilAlign(k, fractalShape[0]);
 // 源操作数的通道数，
-// img2col的结果矩阵高度为ho * wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：ho * wo = loadDataParams.l1H * loadDataParams.l1w
-// img2col的结果矩阵宽度为ci * kh * kw，代入kh=1，kw=1，可知结果矩阵的宽度为ci=loadDataParams.channelSize = m
+// img2col的结果矩阵高度为ho *
+// wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：ho
+// * wo = loadDataParams.l1H * loadDataParams.l1w img2col的结果矩阵宽度为ci * kh
+// * kw，代入kh=1，kw=1，可知结果矩阵的宽度为ci=loadDataParams.channelSize = m
 loadDataParams.channelSize = CeilAlign(m, fractalShape[1]);
 // 该指令在目的操作数width维度的传输长度，如果不覆盖最右侧的分形，对于half类型，应为16的倍数，对于int8_t/uint8_t应为32的倍数；覆盖的情况则无倍数要求。
 loadDataParams.kExtension = CeilAlign(m, fractalShape[1]);
@@ -1201,7 +1208,8 @@ loadDataParams.fMatrixCtrl = false;
 配置`LoadData2dTransposeParams`结构体时，需要特别注意的是，由于转置时连续两个分形合并为一个方块，因此loadDataParams.repeatTimes=CeilDivision(n, fractalShape[1] * fractalNum)。另外，由于在目的操作数中同属一个方块矩阵的两个分形地址不再连续，此时参数loadDataParams.dstFracGap = CeilDivision(n, fractalShape[0]) - 1。
 
 ```cpp
-// B矩阵在L0B上shape为[k, n]、Zn排布，因此dstoffset要根据B矩阵在N轴方向的对齐来求解
+// B矩阵在L0B上shape为[k,
+// n]、Zn排布，因此dstoffset要根据B矩阵在N轴方向的对齐来求解
 uint32_t dstOffset = CeilDivision(n, fractalShape[0]) * fractalSize * fractalNum;
 // B矩阵在L1上shape为[K,N]、ZZ排布，因此srcoffset要根据B矩阵在N轴方向的对齐来求解
 uint32_t srcOffset = CeilDivision(n, fractalShape[1] * fractalNum) * fractalSize * fractalNum;
@@ -1262,8 +1270,10 @@ mmadParams.m = m;
 mmadParams.n = n;
 if constexpr (AscendC::IsSameType<T, int8_t>::value && AscendC::IsSameType<U, int32_t>::value) {
     if constexpr (!isBtranspose) {
-        // mmad默认n轴向16对齐，但是由于b转置过程n轴向2 * 16对齐，填充了一个全部由无效数据的32 * 16的分形，
-        // 如果仍然设置mmadParams.n = n，cube单元会多读入无效数据的分形同时有效数据的分形也未被读入。
+        // mmad默认n轴向16对齐，但是由于b转置过程n轴向2 *
+        // 16对齐，填充了一个全部由无效数据的32 * 16的分形，
+        // 如果仍然设置mmadParams.n =
+        // n，cube单元会多读入无效数据的分形同时有效数据的分形也未被读入。
         // 此时可以通过设置n向32对齐，让此分形参与计算，搬出时跳过无效分形参与计算的得到的分形即可
         mmadParams.n = CeilAlign(n, fractalShape[0] * fractalNum);
     }

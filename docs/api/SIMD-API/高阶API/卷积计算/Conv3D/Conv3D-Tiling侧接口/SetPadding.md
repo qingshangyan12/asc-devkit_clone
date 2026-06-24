@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 void SetPadding(int64_t padHead, int64_t padTail, int64_t padUp, int64_t padDown, int64_t padLeft, int64_t padRight)
 ```
 
@@ -31,7 +31,7 @@ void SetPadding(int64_t padHead, int64_t padTail, int64_t padUp, int64_t padDown
 
 ## 调用示例
 
-```
+```cpp
 // 实例化Conv3D Api
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 Conv3dTilingApi::Conv3dTiling conv3dApiTiling(ascendcPlatform);

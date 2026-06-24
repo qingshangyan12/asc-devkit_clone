@@ -93,8 +93,10 @@ $$dstReg_i = srcReg0_i - srcReg1_i$$
 - 计算结果不保留进位
 
     ```cpp
-    template<typename T>
-    __simd_vf__ inline void SubVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
+    template <typename T>
+    __simd_vf__ inline void SubVF(
+        __ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint16_t oneRepeatSize,
+        uint16_t repeatTimes)
     {
         AscendC::Reg::RegTensor<T> srcReg0;
         AscendC::Reg::RegTensor<T> srcReg1;
@@ -114,7 +116,10 @@ $$dstReg_i = srcReg0_i - srcReg1_i$$
 
     ```cpp
     template <typename T>
-    __simd_vf__ inline void SubVF(__ubuf__ T* dst0Addr, __ubuf__ T* dst1Addr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint32_t repeatTimes, uint16_t oneRepeatSize){
+    __simd_vf__ inline void SubVF(
+        __ubuf__ T* dst0Addr, __ubuf__ T* dst1Addr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count,
+        uint32_t repeatTimes, uint16_t oneRepeatSize)
+    {
         AscendC::Reg::RegTensor<T> srcReg0;
         AscendC::Reg::RegTensor<T> srcReg1;
         AscendC::Reg::RegTensor<T> dstReg0;
@@ -126,7 +131,8 @@ $$dstReg_i = srcReg0_i - srcReg1_i$$
             AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);
             AscendC::Reg::Sub(carry, dstReg0, srcReg0, srcReg1, mask);
             // 8*4B=32B align
-            AscendC::Reg::StoreAlign<uint32_t, AscendC::Reg::MaskDist::DIST_NORM>((__ubuf__ uint32_t*)dst1Addr + i * 8, carry);
+            AscendC::Reg::StoreAlign<uint32_t, AscendC::Reg::MaskDist::DIST_NORM>(
+                (__ubuf__ uint32_t*)dst1Addr + i * 8, carry);
             AscendC::Reg::StoreAlign(dst0Addr + i * oneRepeatSize, dstReg0, mask);
         }
     }

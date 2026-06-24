@@ -34,9 +34,10 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T>
-__aicore__ inline void Prelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const uint32_t count)
+__aicore__ inline void Prelu(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const uint32_t count)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -111,13 +112,13 @@ __aicore__ inline void Prelu(const LocalTensor<T>& dst, const LocalTensor<T>& sr
 
 更多样例可参考[LINK](更多样例-9.md)。
 
-```
+```cpp
 AscendC::Prelu(dstLocal, src0Local, src1Local, 512);
 ```
 
 结果示例如下：
 
-```
+```text
 输入数据src0Local：[1 -2 -3 ... -512]
 输入数据src1Local：[513 -514 515 ... 1]
 输出数据dstLocal：[1 1024 -1045 ... -512]

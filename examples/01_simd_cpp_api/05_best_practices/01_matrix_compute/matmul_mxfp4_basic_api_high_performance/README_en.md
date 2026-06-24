@@ -208,11 +208,7 @@ The key code is `LoadData` receiving both matrix LocalTensor and scale LocalTens
 uint32_t srcAddr = kOffsetInChunkA * baseK * baseM;
 uint32_t scaleSrcAddr = (kOffsetInScaleChunkA * baseK / SCALE_CEIL_NUMBER) * CUBE_BLOCK;
 
-AscendC::LoadData(a2Local,
-                  a1Local[srcAddr],
-                  as1Local[scaleSrcAddr],
-                  loadDataParams,
-                  loadMxDataParams);
+AscendC::LoadData(a2Local, a1Local[srcAddr], as1Local[scaleSrcAddr], loadDataParams, loadMxDataParams);
 ```
 
 #### 4. L0 Double Buffering: Overlapping Loading and Computation

@@ -22,8 +22,10 @@
 
 ## 函数原型
 
-```
-void GetLogicalOrsTmpBufferFactorSize(const platform_ascendc::PlatformAscendC& ascendcPlatform, const uint32_t typeSize, uint32_t& maxLivedNodeCount, uint32_t& extraBuf)
+```cpp
+void GetLogicalOrsTmpBufferFactorSize(
+    const platform_ascendc::PlatformAscendC& ascendcPlatform, const uint32_t typeSize, uint32_t& maxLivedNodeCount,
+    uint32_t& extraBuf)
 ```
 
 ## 参数说明
@@ -49,7 +51,7 @@ void GetLogicalOrsTmpBufferFactorSize(const platform_ascendc::PlatformAscendC& a
 
 完整的调用样例请参考[更多样例](../更多样例-83.md)。
 
-```
+```cpp
 uint32_t maxLivedNodeCount = 0;
 uint32_t extraBuf = 0;
 auto plat = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());

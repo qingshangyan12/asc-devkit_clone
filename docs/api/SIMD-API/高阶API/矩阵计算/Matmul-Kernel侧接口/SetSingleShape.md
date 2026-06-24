@@ -19,7 +19,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetSingleShape(int singleM, int singleN, int singleK)
 ```
 
@@ -43,7 +43,7 @@ __aicore__ inline void SetSingleShape(int singleM, int singleN, int singleK)
 
 ## 调用示例
 
-```
+```cpp
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
 
 // tailM：M方向上剩余元素个数，tailN：N方向上剩余元素个数，tailK：K方向上剩余元素个数

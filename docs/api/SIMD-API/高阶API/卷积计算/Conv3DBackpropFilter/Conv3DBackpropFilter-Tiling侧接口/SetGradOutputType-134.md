@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 void SetGradOutputType(ConvCommonApi::TPosition pos, ConvCommonApi::ConvFormat format, ConvCommonApi::ConvDtype dtype)
 ```
 
@@ -30,7 +30,7 @@ void SetGradOutputType(ConvCommonApi::TPosition pos, ConvCommonApi::ConvFormat f
 
 ## 调用示例
 
-```
+```cpp
 optiling::Conv3DBackpropFilterTilingData tilingData;
 auto ascendcPlatform = platform_ascendc::PlatformAscendCManager::GetInstance();
 ConvBackpropApi::Conv3dBpFilterTiling conv3dBpDwTiling(*ascendcPlatform);

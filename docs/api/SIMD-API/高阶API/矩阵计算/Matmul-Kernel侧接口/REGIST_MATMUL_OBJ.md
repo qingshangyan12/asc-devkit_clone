@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```text
 REGIST_MATMUL_OBJ(tpipe, workspace, ...)
 ```
 
@@ -37,7 +37,7 @@ REGIST_MATMUL_OBJ(tpipe, workspace, ...)
 
 ## 调用示例
 
-```
+```text
 Tpipe pipe;
 // 推荐：初始化单个matmul对象，传入tiling参数
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);

@@ -11,7 +11,7 @@ This example implements data slice transfer based on DataCopy, extracting subset
 | Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
 
 ## Directory Structure
-```
+```text
 ├── data_copy_gm2ub_slice
 │   ├── scripts
 │   │   ├── gen_data.py         // Input data and ground truth generation script

@@ -4,7 +4,7 @@ RTC是Ascend C运行时编译库，通过aclrtc接口，在程序运行时，将
 
 使用aclrtc接口前需要包含如下头文件：
 
-```
+```cpp
 #include "acl/acl_rt_compile.h"
 ```
 

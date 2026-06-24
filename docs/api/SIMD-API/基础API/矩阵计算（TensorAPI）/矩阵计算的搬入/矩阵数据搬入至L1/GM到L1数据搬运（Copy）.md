@@ -26,8 +26,7 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
     ```cpp
     template <typename AtomType, typename DstTensor, typename SrcTensor>
-    __aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy,
-        const DstTensor& dst, const SrcTensor& src)
+    __aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src)
     ```
 
 - 使用默认trait构造搬运原子对象。
@@ -41,8 +40,7 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
     ```cpp
     template <typename CopyOperationType, typename CopyTraitType>
-    __aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copyOperation,
-        const CopyTraitType& copyTrait)
+    __aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copyOperation, const CopyTraitType& copyTrait)
     ```
 
 Global Memory到L1 Buffer通路使用`CopyGM2L1{}`作为`copyOperation`，使用`CopyGM2L1TraitDefault{}`作为默认trait对象。

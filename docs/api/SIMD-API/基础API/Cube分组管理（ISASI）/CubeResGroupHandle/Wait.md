@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="section765814724715"></a>
 
-```
+```cpp
 template <bool sync = true>
 __aicore__ inline bool Wait(uint16_t offset)
 ```
@@ -110,12 +110,12 @@ __aicore__ inline bool Wait(uint16_t offset)
 
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 
-```
-auto msgPtr = handle.AllocMessage();        // 在msgPtr指针这个位置，可以发送一个新消息
+```cpp
+auto msgPtr = handle.AllocMessage(); // 在msgPtr指针这个位置，可以发送一个新消息
 AscendC::CubeGroupMsgHead headA = {AscendC::CubeMsgState::VALID, 0};
 AscendC::CubeMsgBody msgA = {headA, 1, 0, 0, false, false, false, false, 0, 0, 0, 0, 0, 0, 0, 0};
-auto offset = handle.PostMessage(msgPtr, msgA);           // 在msgPtr指针位置，填充用户自定义的消息结构体，并发送
-bool waitState = handle.template Wait<true>(offset);      // 等待AIC处理完msgA
+auto offset = handle.PostMessage(msgPtr, msgA); // 在msgPtr指针位置，填充用户自定义的消息结构体，并发送
+bool waitState = handle.template Wait<true>(offset); // 等待AIC处理完msgA
 // 假消息场景
 auto msgFakePtr = handle.AllocMessage();
 offset = handle.PostFakeMsg(msgFakePtr);

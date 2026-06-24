@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline GM_ADDR GetWindowsOutAddr(uint32_t rankId)
 ```
 

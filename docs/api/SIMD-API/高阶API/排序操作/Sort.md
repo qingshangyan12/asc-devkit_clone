@@ -74,7 +74,7 @@
 
     输入输出数据均为Region Proposal，一次迭代可以完成16个region proposal的排序。每个Region Proposal占用连续8个half/float类型的元素，约定其格式：
 
-    ```
+    ```json
     [x1, y1, x2, y2, score, label, reserved_0, reserved_1]
     ```
 
@@ -110,9 +110,11 @@
 
 -   不带SortConfig
 
-    ```
+    ```cpp
     template <typename T, bool isFullSort>
-    __aicore__ inline void Sort(const LocalTensor<T>& dst, const LocalTensor<T>& concat, const LocalTensor<uint32_t>& index, LocalTensor<T>& tmp, const int32_t repeatTime)
+    __aicore__ inline void Sort(
+        const LocalTensor<T>& dst, const LocalTensor<T>& concat, const LocalTensor<uint32_t>& index, LocalTensor<T>& tmp,
+        const int32_t repeatTime)
     ```
 
 -   带SortConfig
@@ -124,45 +126,55 @@
     -   接口框架申请临时空间
         -   不带srcIndexTensor和dstIndexTensor参数
 
-            ```
+            ```cpp
             template <typename T, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
             __aicore__ inline void Sort(LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
             ```
 
         -   不带srcIndexTensor参数，带有dstIndexTensor参数
 
-            ```
+            ```cpp
             template <typename T, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
-            __aicore__ inline void Sort(LocalTensor<T>& dstTensor, LocalTensor<uint32_t>& dstIndexTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
+            __aicore__ inline void Sort(
+                LocalTensor<T>& dstTensor, LocalTensor<uint32_t>& dstIndexTensor, const LocalTensor<T>& srcTensor,
+                const uint32_t calCount)
             ```
 
         -   带有srcIndexTensor和dstIndexTensor参数
 
-            ```
+            ```cpp
             template <typename T, typename U, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
-            __aicore__ inline void Sort(const LocalTensor<T>& dstTensor, const LocalTensor<U>& dstIndexTensor, const LocalTensor<T>& srcTensor, const LocalTensor<U>& srcIndexTensor, const uint32_t calCount)
+            __aicore__ inline void Sort(
+                const LocalTensor<T>& dstTensor, const LocalTensor<U>& dstIndexTensor, const LocalTensor<T>& srcTensor,
+                const LocalTensor<U>& srcIndexTensor, const uint32_t calCount)
             ```
 
     -   通过sharedTmpBuffer入参传入临时空间
         -   不带srcIndexTensor和dstIndexTensor参数
 
-            ```
+            ```cpp
             template <typename T, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
-            __aicore__ inline void Sort(LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+            __aicore__ inline void Sort(
+                LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+                const uint32_t calCount)
             ```
 
         -   不带srcIndexTensor参数，带有dstIndexTensor参数
 
-            ```
+            ```cpp
             template <typename T, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
-            __aicore__ inline void Sort(LocalTensor<T>& dstTensor, LocalTensor<uint32_t>& dstIndexTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+            __aicore__ inline void Sort(
+                LocalTensor<T>& dstTensor, LocalTensor<uint32_t>& dstIndexTensor, const LocalTensor<T>& srcTensor,
+                const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
             ```
 
         -   带有srcIndexTensor和dstIndexTensor参数
 
-            ```
+            ```cpp
             template <typename T, typename U, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
-            __aicore__ inline void Sort(LocalTensor<T>& dstTensor, LocalTensor<U>& dstIndexTensor, const LocalTensor<T>& srcTensor, const LocalTensor<U>& srcIndexTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+            __aicore__ inline void Sort(
+                LocalTensor<T>& dstTensor, LocalTensor<U>& dstIndexTensor, const LocalTensor<T>& srcTensor,
+                const LocalTensor<U>& srcIndexTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
             ```
 
     由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者**通过sharedTmpBuffer入参传入**和**接口框架申请**两种方式。
@@ -204,7 +216,7 @@
     | isReuseSource | 可选参数。是否可以复用输入的Tensor空间。 |
     | config | 可选参数。Sort接口的相应配置：选择的排序算法，排序结果的升降序。数据类型SortConfig，定义如下方代码所示。<br>    <br>Sort提供了两种不同的排序算法，MERGE_SORT归并排序算法和RADIX_SORT基排序算法。两种算法在执行速度、时间复杂度和算法稳定性上表现不同。<br>    MERGE_SORT是一种稳定的排序算法，在所有情况下算法的时间复杂度都是O(nlogn)。<br>RADIX_SORT算法的时间复杂度是O(n)，在处理大量数据时，如果最大数字的位数较少，该算法的效率很高，可以接近线性时间复杂度。但是如果最大数字的位数很大，时间复杂度会接近O(n^2)。<br>    <br>config的默认值DEFAULT_SORT_CONFIG取值如下，使用基排序RADIX_SORT，对排序结果升序排序。<br>    constexpr SortConfig DEFAULT_SORT_CONFIG = {SortType::RADIX_SORT, false}; |
 
-    ```
+    ```cpp
     enum class SortType {
         RADIX_SORT, // 使用基排序算法实现
         MERGE_SORT  // 使用归并排序算法实现
@@ -270,7 +282,7 @@
     Kirin 9030
     <!-- end id10 -->
 
-    ```
+    ```cpp
     // sortedLocal：排序结果
     // concatLocal：待排序数据的预处理结果
     // indexLocal：索引数据
@@ -287,7 +299,7 @@
     AscendC::Extract(dstValueLocal, dstIndexLocal, sortedLocal, m_extractRepeatTimes);
     ```
 
-    ```
+    ```text
     示例结果
     输入数据（srcValueGm）: 128个half类型数据
     [31 30 29 ... 2 1 0
@@ -313,7 +325,7 @@
     Atlas 推理系列产品AI Core
     <!-- end id30 -->
 
-    ```
+    ```cpp
     uint32_t m_elementCount = 64;
     uint32_t m_sortRepeatTimes = m_elementCount / 16;
     uint32_t m_extractRepeatTimes = m_elementCount / 16;
@@ -322,7 +334,7 @@
     AscendC::Extract(dstValueLocal, dstIndexLocal, sortedLocal, m_extractRepeatTimes);
     ```
 
-    ```
+    ```text
     示例结果
     输入数据（srcValueGm）: 64个half类型数据
     [15 14 13 ... 2 1 0
@@ -349,19 +361,13 @@
         Ascend 950PR/Ascend 950DT
         <!-- end id31 -->
 
-        ```
+        ```cpp
         static constexpr AscendC::SortConfig config = {AscendC::SortType::RADIX_SORT, false};
         Sort<T, false, config>(dstLocal, dstIndexLocal, srcLocal, 1024);
         ```
 
-        ```
+        ```cpp
         示例结果
-        输入数据（srcGm）: 1024个half类型数据
-        [1023 1022 ... 2 1 0]
-        输入数据（srcIndexGm）: 1024个uint32_t类型数据
-        [0 1 2 ... 1022 1023]
-        输出数据（dstGm）:
-        [0 1 2 ... 1022 1023]
-        输出数据（dstIndexGm）:
-        [1023 1022 ... 2 1 0]
+        输入数据（srcGm） : 1024个half类型数据 [1023 1022 ... 2 1 0] 输入数据（srcIndexGm） : 1024个uint32_t类型数据
+            [0 1 2 ... 1022 1023] 输出数据（dstGm） : [0 1 2 ... 1022 1023] 输出数据（dstIndexGm） : [1023 1022 ... 2 1 0]
         ```

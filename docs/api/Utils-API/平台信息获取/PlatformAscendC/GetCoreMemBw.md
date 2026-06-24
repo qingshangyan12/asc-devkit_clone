@@ -4,14 +4,14 @@
 
 获取硬件平台存储空间的带宽大小。硬件存储空间类型定义如下：
 
-```
+```cpp
 enum class CoreMemType {
     L0_A = 0, // 预留参数，暂不支持
     L0_B = 1, // 预留参数，暂不支持
     L0_C = 2, // 预留参数，暂不支持
     L1 = 3,   // 预留参数，暂不支持
     L2 = 4,
-    UB = 5,   // 预留参数，暂不支持
+    UB = 5, // 预留参数，暂不支持
     HBM = 6,
     RESERVED
 };
@@ -19,8 +19,8 @@ enum class CoreMemType {
 
 ## 函数原型<a name="zh-cn_topic_0000001597681768_zh-cn_topic_0000001391767420_section13230182415108"></a>
 
-```
-void GetCoreMemBw(const CoreMemType &memType, uint64_t &bwSize) const
+```cpp
+void GetCoreMemBw(const CoreMemType& memType, uint64_t& bwSize) const
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001597681768_zh-cn_topic_0000001391767420_section189014013619"></a>
@@ -61,8 +61,9 @@ void GetCoreMemBw(const CoreMemType &memType, uint64_t &bwSize) const
 
 ## 调用示例<a name="zh-cn_topic_0000001597681768_zh-cn_topic_0000001391767420_section320753512363"></a>
 
-```
-ge::graphStatus TilingXXX(gert::TilingContext* context) {
+```cpp
+ge::graphStatus TilingXXX(gert::TilingContext* context)
+{
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
     uint64_t l2_bw;
     ascendcPlatform.GetCoreMemBw(platform_ascendc::CoreMemType::L2, l2_bw);

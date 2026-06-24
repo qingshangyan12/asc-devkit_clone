@@ -53,8 +53,8 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
-aclError aclrtcCompileProg(aclrtcProg prog, int numOptions, const char **options)
+```cpp
+aclError aclrtcCompileProg(aclrtcProg prog, int numOptions, const char** options)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -105,9 +105,9 @@ aclError为int类型变量，详细说明请参考[RTC错误码](RTC错误码.md
 
 ## 调用示例<a name="section837496171220"></a>
 
-```
+```cpp
 aclrtcProg prog;
-const char *options[] = {"--npu-arch=dav-2201"};
+const char* options[] = {"--npu-arch=dav-2201"};
 int numOptions = sizeof(options) / sizeof(options[0]);
 aclError result = aclrtcCompileProg(prog, numOptions, options);
 ```

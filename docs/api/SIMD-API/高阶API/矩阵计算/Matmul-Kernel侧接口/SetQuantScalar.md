@@ -23,7 +23,7 @@ Matmul量化场景：在Matmul计算时，左、右矩阵的输入为half或bflo
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetQuantScalar(const uint64_t quantScalar)
 ```
 
@@ -63,7 +63,7 @@ __aicore__ inline void SetQuantScalar(const uint64_t quantScalar)
 
 ## 调用示例
 
-```
+```cpp
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
 float tmp = 0.1; // 输出gm时会乘以0.1
 // 将浮点值的量化或反量化系数，转换为uint64_t类型

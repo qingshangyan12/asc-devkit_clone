@@ -6,29 +6,29 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001867289945_zh-cn_topic_0000001389787297_section13230182415108"></a>
 
-```
+```cpp
 namespace optiling {
-using SinkTilingFunc = std::function<ge::graphStatus(gert::TilingContext *context)>;
+using SinkTilingFunc = std::function<ge::graphStatus(gert::TilingContext* context)>;
 
 class DeviceOpImplRegisterImpl;
 // 开发者仅关注Tiling成员函数
 class DeviceOpImplRegister {
 public:
-  DeviceOpImplRegister(const char *opType);
-  ~DeviceOpImplRegister();
-  DeviceOpImplRegister(DeviceOpImplRegister &&other) noexcept;
-  DeviceOpImplRegister(const DeviceOpImplRegister &other);
-  DeviceOpImplRegister &operator=(const DeviceOpImplRegister &) = delete;
-  DeviceOpImplRegister &operator=(DeviceOpImplRegister &&) = delete;
-  DeviceOpImplRegister &Tiling(SinkTilingFunc func);
+    DeviceOpImplRegister(const char* opType);
+    ~DeviceOpImplRegister();
+    DeviceOpImplRegister(DeviceOpImplRegister&& other) noexcept;
+    DeviceOpImplRegister(const DeviceOpImplRegister& other);
+    DeviceOpImplRegister& operator=(const DeviceOpImplRegister&) = delete;
+    DeviceOpImplRegister& operator=(DeviceOpImplRegister&&) = delete;
+    DeviceOpImplRegister& Tiling(SinkTilingFunc func);
 
-// ...
+    // ...
 };
-}  // namespace optiling
+} // namespace optiling
 
-#define DEVICE_IMPL_OP_OPTILING(optype)                                                                      \
-  static optiling::DeviceOpImplRegister VAR_UNUSED g_deviceOpImplRegister##optype =                                    \
-      optiling::DeviceOpImplRegister(#optype)
+#define DEVICE_IMPL_OP_OPTILING(optype)                                               \
+    static optiling::DeviceOpImplRegister VAR_UNUSED g_deviceOpImplRegister##optype = \
+        optiling::DeviceOpImplRegister(#optype)
 #endif
 ```
 
@@ -86,6 +86,6 @@ public:
 
 ## 调用示例<a name="zh-cn_topic_0000001867289945_zh-cn_topic_0000001389787297_section320753512363"></a>
 
-```
+```text
 DEVICE_IMPL_OP_OPTILING(TestOptype).Tiling(TestTilingFunc); // 将Tiling函数以及其OpType注册到Tiling下沉
 ```

@@ -16,7 +16,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── rtc_template_add
 │   ├── CMakeLists.txt                   // 编译工程文件
 │   ├── data_utils.h                     // 数据生成、精度校验工具函数+ASCENDC_CHECK宏
@@ -29,7 +29,7 @@
 - 样例功能：  
   Add计算公式：
 
-  ```
+  ```text
   z = x + y
   ```
 

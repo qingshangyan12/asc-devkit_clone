@@ -30,24 +30,24 @@
 ```cpp
 // RINT舍入模式，非饱和模式
 __simd_callee__ inline void asc_float2int32_rn(vector_int32_t& dst, vector_float src, vector_bool mask)
-// RINT舍入模式，饱和模式
-__simd_callee__ inline void asc_float2int32_rn_sat(vector_int32_t& dst, vector_float src, vector_bool mask)
-// ROUND舍入模式，非饱和模式
-__simd_callee__ inline void asc_float2int32_rna(vector_int32_t& dst, vector_float src, vector_bool mask)
-// ROUND舍入模式，饱和模式
-__simd_callee__ inline void asc_float2int32_rna_sat(vector_int32_t& dst, vector_float src, vector_bool mask)
-// FLOOR舍入模式，非饱和模式
-__simd_callee__ inline void asc_float2int32_rd(vector_int32_t& dst, vector_float src, vector_bool mask)
-// FLOOR舍入模式，饱和模式
-__simd_callee__ inline void asc_float2int32_rd_sat(vector_int32_t& dst, vector_float src, vector_bool mask)
-// CEIL舍入模式，非饱和模式
-__simd_callee__ inline void asc_float2int32_ru(vector_int32_t& dst, vector_float src, vector_bool mask)
-// CEIL舍入模式，饱和模式
-__simd_callee__ inline void asc_float2int32_ru_sat(vector_int32_t& dst, vector_float src, vector_bool mask)
-// TRUNC舍入模式，非饱和模式
-__simd_callee__ inline void asc_float2int32_rz(vector_int32_t& dst, vector_float src, vector_bool mask)
-// TRUNC舍入模式，饱和模式
-__simd_callee__ inline void asc_float2int32_rz_sat(vector_int32_t& dst, vector_float src, vector_bool mask)
+    // RINT舍入模式，饱和模式
+    __simd_callee__ inline void asc_float2int32_rn_sat(vector_int32_t& dst, vector_float src, vector_bool mask)
+    // ROUND舍入模式，非饱和模式
+    __simd_callee__ inline void asc_float2int32_rna(vector_int32_t& dst, vector_float src, vector_bool mask)
+    // ROUND舍入模式，饱和模式
+    __simd_callee__ inline void asc_float2int32_rna_sat(vector_int32_t& dst, vector_float src, vector_bool mask)
+    // FLOOR舍入模式，非饱和模式
+    __simd_callee__ inline void asc_float2int32_rd(vector_int32_t& dst, vector_float src, vector_bool mask)
+    // FLOOR舍入模式，饱和模式
+    __simd_callee__ inline void asc_float2int32_rd_sat(vector_int32_t& dst, vector_float src, vector_bool mask)
+    // CEIL舍入模式，非饱和模式
+    __simd_callee__ inline void asc_float2int32_ru(vector_int32_t& dst, vector_float src, vector_bool mask)
+    // CEIL舍入模式，饱和模式
+    __simd_callee__ inline void asc_float2int32_ru_sat(vector_int32_t& dst, vector_float src, vector_bool mask)
+    // TRUNC舍入模式，非饱和模式
+    __simd_callee__ inline void asc_float2int32_rz(vector_int32_t& dst, vector_float src, vector_bool mask)
+    // TRUNC舍入模式，饱和模式
+    __simd_callee__ inline void asc_float2int32_rz_sat(vector_int32_t& dst, vector_float src, vector_bool mask)
 ```
 
 ## 参数说明

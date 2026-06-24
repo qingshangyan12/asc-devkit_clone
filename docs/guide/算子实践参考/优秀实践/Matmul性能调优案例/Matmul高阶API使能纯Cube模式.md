@@ -79,19 +79,19 @@ Tiling参数如下：
 
 1.  Kernel侧，定义Matmul对象。
 
-    ```
+    ```cpp
     #include "lib/matmul_intf.h"
-    
+
     using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
     using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>;
     using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-    using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+    using BIAS_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
     AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_NORM> matmulObj;
     ```
 
 2.  Host侧，Matmul多核Tiling对象调用SetDim接口设置参与运算的核数。
 
-    ```
+    ```cpp
     auto ascendcPlatform = platform_ascendc::PlatformAscendCManager::GetInstance();
     matmul_tiling::MultiCoreMatmulTiling cubeTiling(*ascendcPlatform);
     int32_t numBlocks = ascendcPlatform->GetCoreNumAiv(); // MIX模式使用GetCoreNumAiv获取AI处理器可用的核数。
@@ -100,8 +100,10 @@ Tiling参数如下：
 
 3.  调用核函数，参考[核函数定义和调用](../../../编程指南/编程模型/AI-Core-SIMD编程/核函数.md#zh-cn_topic_0000001447989210_section1915102519220)，设置核函数的numBlocks参数配置。
 
-    ```
-    matmul_custom_do(ascendcPlatform->GetCoreNumAic(), stream, x1, x2, bias, y, workspaceDevice, tilingDevice); // MIX模式下，启动时，按照AIV和AIC组合启动，numBlocks用于设置启动多少个AI Core。
+    ```cpp
+    matmul_custom_do(
+        ascendcPlatform->GetCoreNumAic(), stream, x1, x2, bias, y, workspaceDevice,
+        tilingDevice); // MIX模式下，启动时，按照AIV和AIC组合启动，numBlocks用于设置启动多少个AI Core。
     ```
 
 在没有矢量计算的算子场景下，可以跳过消息通信框架的机制，开启纯Cube模式完成Matmul计算，减少消息通信的性能开销，提升算子性能。
@@ -113,20 +115,20 @@ Matmul API开启纯Cube模式的完整样例请参考[纯Cube模式的Matmul样�
 
 1.  Kernel侧，在定义Matmul对象的代码中，包含matmul\_intf.h头文件前设置ASCENDC\_CUBE\_ONLY宏。
 
-    ```
+    ```cpp
     #define ASCENDC_CUBE_ONLY // 在#include "lib/matmul_intf.h"前，设置ASCENDC_CUBE_ONLY宏
     #include "lib/matmul_intf.h"
-    
+
     using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
     using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>;
     using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-    using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+    using BIAS_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
     AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_NORM> matmulObj;
     ```
 
 2.  Host侧，Matmul多核Tiling对象调用SetDim接口设置参与运算的核数。
 
-    ```
+    ```cpp
     auto ascendcPlatform = platform_ascendc::PlatformAscendCManager::GetInstance();
     matmul_tiling::MultiCoreMatmulTiling cubeTiling(*ascendcPlatform);
     int32_t numBlocks = ascendcPlatform->GetCoreNumAic(); // 纯Cube模式使用GetCoreNumAic接口获取AI处理器可用的核数。
@@ -135,15 +137,18 @@ Matmul API开启纯Cube模式的完整样例请参考[纯Cube模式的Matmul样�
 
 3.  调用核函数，参考[核函数定义和调用](../../../编程指南/编程模型/AI-Core-SIMD编程/核函数.md#zh-cn_topic_0000001447989210_section1915102519220)，设置核函数的numBlocks参数配置。
 
-    ```
-    matmul_custom_do(ascendcPlatform->GetCoreNumAic(), stream, x1, x2, bias, y, workspaceDevice, tilingDevice); // 仅包含Cube计算的算子，numBlocks用于设置启动多少个AIC。
+    ```cpp
+    matmul_custom_do(
+        ascendcPlatform->GetCoreNumAic(), stream, x1, x2, bias, y, workspaceDevice,
+        tilingDevice); // 仅包含Cube计算的算子，numBlocks用于设置启动多少个AIC。
     ```
 
 4.  Kernel侧，核函数实现中增加AIV侧返回分支。
 
-    ```
-    extern "C" __global__ __aicore__ void matmul_custom(__gm__ uint8_t* a, __gm__ uint8_t* b,
-        __gm__ uint8_t* bias, __gm__ uint8_t* c, __gm__ uint8_t* workspace, __gm__ uint8_t* tilingGm)
+    ```cpp
+    extern "C" __global__ __aicore__ void matmul_custom(
+        __gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* bias, __gm__ uint8_t* c, __gm__ uint8_t* workspace,
+        __gm__ uint8_t* tilingGm)
     {
         if (g_coreType == AscendC::AIV) { // 纯Cube模式，AIV侧直接return
             return;

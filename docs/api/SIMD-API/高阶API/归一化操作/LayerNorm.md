@@ -87,18 +87,24 @@
 -   对shape为\[B，S，H\]的输入数据，输出归一化结果、均值和方差
     -   通过sharedTmpBuffer入参传入临时空间
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void LayerNorm(const LocalTensor<T>& output, const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance, const LocalTensor<T>& inputX, const LocalTensor<T>& gamma, const LocalTensor<T>& beta, const LocalTensor<uint8_t>& sharedTmpBuffer, const T epsilon, LayerNormTiling& tiling)
+        __aicore__ inline void LayerNorm(
+            const LocalTensor<T>& output, const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance,
+            const LocalTensor<T>& inputX, const LocalTensor<T>& gamma, const LocalTensor<T>& beta,
+            const LocalTensor<uint8_t>& sharedTmpBuffer, const T epsilon, LayerNormTiling& tiling)
         ```
 
         该方式下开发者需自行申请并管理临时内存空间，并在接口调用完成后，复用该部分内存，内存不会反复申请释放，灵活性较高，内存利用率也较高。
 
     -   接口框架申请临时空间
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void LayerNorm(const LocalTensor<T>& output, const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance, const LocalTensor<T>& inputX, const LocalTensor<T>& gamma, const LocalTensor<T>& beta, const T epsilon, LayerNormTiling& tiling)
+        __aicore__ inline void LayerNorm(
+            const LocalTensor<T>& output, const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance,
+            const LocalTensor<T>& inputX, const LocalTensor<T>& gamma, const LocalTensor<T>& beta, const T epsilon,
+            LayerNormTiling& tiling)
         ```
 
         该方式下开发者无需申请，但是需要预留临时空间的大小。
@@ -106,18 +112,24 @@
 -   对shape为\[A，R\]的输入数据，输出归一化结果、均值、标准差的倒数或方差
     -   通过sharedTmpBuffer入参传入临时空间
 
-        ```
+        ```cpp
         template <typename U, typename T, bool isReuseSource = false, const LayerNormConfig& config = LNCFG_NORM>
-        __aicore__ inline void LayerNorm(const LocalTensor<T>& output, const LocalTensor<float>& outputMean, const LocalTensor<float>& outputRstd, const LocalTensor<T>& inputX, const LocalTensor<U>& gamma, const LocalTensor<U>& beta, const float epsilon, const LocalTensor<uint8_t>& sharedTmpBuffer, const LayerNormPara& para, const LayerNormSeparateTiling& tiling)
+        __aicore__ inline void LayerNorm(
+            const LocalTensor<T>& output, const LocalTensor<float>& outputMean, const LocalTensor<float>& outputRstd,
+            const LocalTensor<T>& inputX, const LocalTensor<U>& gamma, const LocalTensor<U>& beta, const float epsilon,
+            const LocalTensor<uint8_t>& sharedTmpBuffer, const LayerNormPara& para, const LayerNormSeparateTiling& tiling)
         ```
 
         该方式下开发者需自行申请并管理临时内存空间，并在接口调用完成后，复用该部分内存，内存不会反复申请释放，灵活性较高，内存利用率也较高。
 
     -   接口框架申请临时空间
 
-        ```
+        ```cpp
         template <typename U, typename T, bool isReuseSource = false, const LayerNormConfig& config = LNCFG_NORM>
-        __aicore__ inline void LayerNorm(const LocalTensor<T>& output, const LocalTensor<float>& outputMean, const LocalTensor<float>& outputRstd, const LocalTensor<T>& inputX, const LocalTensor<U>& gamma, const LocalTensor<U>& beta, const float epsilon, const LayerNormPara& para, const LayerNormSeparateTiling& tiling)
+        __aicore__ inline void LayerNorm(
+            const LocalTensor<T>& output, const LocalTensor<float>& outputMean, const LocalTensor<float>& outputRstd,
+            const LocalTensor<T>& inputX, const LocalTensor<U>& gamma, const LocalTensor<U>& beta, const float epsilon,
+            const LayerNormPara& para, const LayerNormSeparateTiling& tiling)
         ```
 
         该方式下开发者无需申请，但是需要预留临时空间的大小。
@@ -158,7 +170,7 @@
     | isReuseSource | 该参数预留，传入默认值false即可。 |
     | config | 配置LayerNorm接口中输入输出相关信息。LayerNormConfig类型，定义如下方代码所示。<br>    isNoBeta：计算时，输入beta是否使用。false：默认值，LayerNorm计算中使用输入beta。true：LayerNorm计算中不使用输入beta。此时，公式中与beta相关的计算被省略。<br>    isNoGamma：可选输入gamma是否使用。false：默认值，LayerNorm计算中使用可选输入gamma。true：LayerNorm计算中不使用输入gamma。此时，公式中与gamma相关的计算被省略。<br>    isOnlyOutput：是否只输出y，不输出均值mean与标准差的倒数rstd。当前该参数仅支持取值为false，表示y、mean和rstd的结果全部输出。<!-- npu="950" id7 --><br>isOutputRstd：选择输出标准差的倒数rstd还是方差。该参数仅支持Ascend 950PR/Ascend 950DT。true：默认值，输出标准差的倒数。false：输出方差。<!-- end id7 --> |
 
-    ```
+    ```cpp
     struct LayerNormConfig {
         bool isNoBeta = false;
         bool isNoGamma = false;
@@ -182,7 +194,7 @@
     | para | 输入 | LayerNorm计算所需的参数信息。LayerNormPara类型，定义如下方代码所示。<br>    aLength：指定输入inputX的A轴长度。<br>rLength：指定输入inputX的R轴实际需要处理的数据长度。<br>rLengthWithPadding：指定输入inputX的R轴对齐后的长度，该值是32B对齐的。 |
     | tiling | 输入 | LayerNorm计算所需的Tiling信息，Tiling信息的获取请参考[LayerNorm Tiling](LayerNorm-Tiling.md)。 |
 
-    ```
+    ```cpp
     struct LayerNormPara {
         uint32_t aLength;
         uint32_t rLength;
@@ -232,7 +244,7 @@
 
 -   输入数据的shape为\[B，S，H\]，输出归一化结果、均值和方差的接口调用示例
 
-    ```
+    ```cpp
     AscendC::LayerNorm<float, false>(
         output,         // [输出] 归一化后的结果y，shape [B, S, H]
         mean,           // [输出] 每个(B, S)位置上H维度的均值，shape [B, S]
@@ -247,7 +259,7 @@
 
     示例结果如下：
 
-    ```
+    ```text
     输入数据(inputX, shape:[1, 8, 8]):
     [  0.  1.  2.  3.  4.  5.  6.  7.
        8.  9. 10. 11. 12. 13. 14. 15.
@@ -278,7 +290,7 @@
 
 -   输入数据的shape为\[A，R\]，输出归一化结果、均值、标准差的倒数或方差的接口调用示例
 
-    ```
+    ```cpp
     // config：编译期常量，定义LayerNorm的行为配置
     constexpr auto config = AscendC::LayerNormConfig{false, false, false, true};
     // para：运行时参数，描述输入张量的维度信息

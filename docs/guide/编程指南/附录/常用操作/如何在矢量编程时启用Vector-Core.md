@@ -6,8 +6,9 @@
 
 1.  完成算子kernel侧开发时，需要通过宏[KERNEL\_TASK\_TYPE\_DEFAULT](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Kernel-Tiling/设置Kernel类型.md)启用Vector Core，算子执行时会同时启动AI Core和Vector Core，此时AI Core会当成Vector Core使用。如下的代码样例展示了启用Vector Core的方法：
 
-    ```
-    extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8_t *y, __gm__ uint8_t *z, __gm__ uint8_t *workspace, __gm__ uint8_t *tiling)
+    ```cpp
+    extern "C" __global__ __aicore__ void add_custom(
+        __gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
     {
         GET_TILING_DATA(tilingData, tiling);
         if (workspace == nullptr) {
@@ -29,29 +30,28 @@
 2.  完成host侧tiling开发时，设置的numBlocks代表的是AI Core和Vector Core的总数，比如用户在host侧设置numBlocks为10，则会启动总数为10的AI Core和Vector Core；为保证启动Vector Core，设置数值应大于AI Core的核数。您可以通过[GetCoreNumAic](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/平台信息获取/PlatformAscendC/GetCoreNumAic.md)接口获取AI Core的核数，[GetCoreNumVector](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/平台信息获取/PlatformAscendC/GetCoreNumVector.md)接口获取Vector Core的核数。如下代码片段，分别为使用kernel直调工程和自定义算子工程时的设置样例，此处设置为AI Core和Vector Core的总和，表示所有AI Core和Vector Core都启动。
     -   kernel直调工程
 
-        ```
+        ```cpp
         auto ascendcPlatform = platform_ascendc::PlatformAscendCManager::GetInstance();
         auto totalCoreNum = ascendcPlatform.GetCoreNumAic();
         // ASCENDXXX请替换为实际的版本型号
         if (ascendcPlatform.GetSocVersion() == platform_ascendc::SocVersion::ASCENDXXX) {
-           totalCoreNum = totalCoreNum + ascendcPlatform.GetCoreNumVector();
+            totalCoreNum = totalCoreNum + ascendcPlatform.GetCoreNumVector();
         }
-        ...
-        kernel_name<<<totalCoreNum , l2ctrl, stream>>>(argument list);
+        ... kernel_name<<<totalCoreNum, l2ctrl, stream>>>(argument list);
         ```
 
     -   自定义算子工程
 
-        ```
+        ```cpp
         // 配套的host侧tiling函数示例：
         ge::graphStatus TilingFunc(gert::TilingContext* context)
-        {	
+        {
             // 启用VectorCore，将numBlocks置为AI Core中vector核数 + Vector Core中的vector核数
             auto ascendcPlatform = platform_ascendc::PlatformAscendC(platformInfo);
             auto totalCoreNum = ascendcPlatform.GetCoreNumAic();
             // ASCENDXXX请替换为实际的版本型号
             if (ascendcPlatform.GetSocVersion() == platform_ascendc::SocVersion::ASCENDXXX) {
-               totalCoreNum = totalCoreNum + ascendcPlatform.GetCoreNumVector();
+                totalCoreNum = totalCoreNum + ascendcPlatform.GetCoreNumVector();
             }
             context->SetBlockDim(totalCoreNum);
         }

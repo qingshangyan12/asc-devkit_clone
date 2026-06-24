@@ -83,8 +83,10 @@ __simd_callee__ inline void SubC(MaskReg& carry, U& dstReg, U& srcReg0, U& srcRe
 
 ```cpp
 template <typename T>
-__simd_vf__ inline void SubC(__ubuf__ T* dst0Addr, __ubuf__ T* dst1Addr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint16_t repeatTimes, uint16_t oneRepeatSize){
-    
+__simd_vf__ inline void SubC(
+    __ubuf__ T* dst0Addr, __ubuf__ T* dst1Addr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count,
+    uint16_t repeatTimes, uint16_t oneRepeatSize)
+{
     AscendC::Reg::RegTensor<T> srcReg0;
     AscendC::Reg::RegTensor<T> srcReg1;
     AscendC::Reg::RegTensor<T> dstReg0;
@@ -97,7 +99,8 @@ __simd_vf__ inline void SubC(__ubuf__ T* dst0Addr, __ubuf__ T* dst1Addr, __ubuf_
         AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);
         AscendC::Reg::SubC(carry, dstReg0, srcReg0, srcReg1, maskZero, mask);
         // 8*4B=32B align
-        AscendC::Reg::StoreAlign<uint32_t, AscendC::Reg::MaskDist::DIST_NORM>((__ubuf__ uint32_t*)dst1Addr + i * 8, carry);
+        AscendC::Reg::StoreAlign<uint32_t, AscendC::Reg::MaskDist::DIST_NORM>(
+            (__ubuf__ uint32_t*)dst1Addr + i * 8, carry);
         AscendC::Reg::StoreAlign(dst0Addr + i * oneRepeatSize, dstReg0, mask);
     }
 }

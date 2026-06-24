@@ -8,7 +8,7 @@ MaskReg用于指示在计算过程中哪些元素参与计算，宽度为[RegTen
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T, MaskPattern mode = MaskPattern::ALL, const RegTrait& regTrait = RegTraitNumOne>
 __simd_callee__ inline MaskReg CreateMask();
 
@@ -94,9 +94,9 @@ Ascend 950PR/Ascend 950DT
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 AscendC::Reg::RegTensor<uint32_t> srcReg;
-AscendC::Reg::MaskReg mask0 = AscendC::Reg::CreateMask<uint32_t,AscendC::Reg:: MaskPattern::ALL >();
+AscendC::Reg::MaskReg mask0 = AscendC::Reg::CreateMask<uint32_t, AscendC::Reg::MaskPattern::ALL>();
 AscendC::Reg::MaskReg mask1;
 uint32_t scalarValue = 127;
 for (uint16_t i = 0; i < 2; i++) {

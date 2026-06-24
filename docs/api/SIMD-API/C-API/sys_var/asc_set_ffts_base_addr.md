@@ -12,7 +12,7 @@
 在[asc_sync_block_wait](../sync/asc_sync_block_wait.md)和[asc_sync_block_arrive](../sync/asc_sync_block_arrive.md)之前使用，设置核间同步寄存器的基地址。需要在Host侧调用接口aclrtGetHardwareSyncAddr获取，并作为参数传入。
 
 ```cpp
-aclError aclrtGetHardwareSyncAddr(void **addr);
+aclError aclrtGetHardwareSyncAddr(void** addr);
 ```
 
 ## 函数原型

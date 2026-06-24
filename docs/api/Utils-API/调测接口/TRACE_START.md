@@ -29,7 +29,7 @@
 
 ## 函数原型
 
-```
+```text
 #define TRACE_START(TraceId apid)
 #define TRACE_START(pipe_t pipe, TraceId apid)
 ```
@@ -56,7 +56,7 @@
 
 在Kernel代码中特定指令位置打上TRACE\_START/TRACE\_STOP：
 
-```
+```text
 TRACE_START(0x2);
 Add(zLocal, xLocal, yLocal, dataSize);
 TRACE_STOP(0x2);

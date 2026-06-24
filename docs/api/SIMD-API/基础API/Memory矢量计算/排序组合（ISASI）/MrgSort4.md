@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T>
 __aicore__ inline void MrgSort4(const LocalTensor<T>& dst, const MrgSortSrcList<T>& src, const MrgSort4Info& params)
 ```
@@ -193,13 +193,14 @@ __aicore__ inline void MrgSort4(const LocalTensor<T>& dst, const MrgSortSrcList<
 
 接口使用样例
 
-```
+```cpp
 // Region Proposals的创建如下所示
 // AscendC::ProposalConcat(vconcatWorkLocal[0], srcLocal[0], repeat, mode);
 // AscendC::RpSort16(vconcatWorkLocal[0], vconcatWorkLocal[0], repeat);
 
 // vconcatWorkLocal为已经创建并且完成排序的4个Region Proposals，每个Region Proposal数目是16个
-// 输入数据先经过ProposalConcat将连续元素合入Region Proposal内对应位置，然后经过RpSort16对Region Proposals中的score域对其进行排序才是各个vconcatWorkLocal。
+// 输入数据先经过ProposalConcat将连续元素合入Region Proposal内对应位置，然后经过RpSort16对Region
+// Proposals中的score域对其进行排序才是各个vconcatWorkLocal。
 
 struct MrgSortSrcList<half> srcList(vconcatWorkLocal[0], vconcatWorkLocal[1], vconcatWorkLocal[2], vconcatWorkLocal[3]);
 // 四个源Region Proposals队列的长度都是16
@@ -209,7 +210,7 @@ struct MrgSort4Info srcInfo(elementLengths, false, 15, 1);
 AscendC::MrgSort4(dstLocal, srcList, srcInfo);
 ```
 
-```
+```text
 示例结果
 输入数据(src_gm):
 [-38.1    82.7   -40.75  -54.62   21.67  -58.53   25.94  -79.5   -61.44

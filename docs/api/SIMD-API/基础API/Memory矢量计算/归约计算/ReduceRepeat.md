@@ -33,14 +33,20 @@
 
     ```cpp
     template <ReduceType reduceType, typename T, typename U, bool isSetMask = true>
-    __aicore__ inline void ReduceRepeat(const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride, ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX)
+    __aicore__ inline void ReduceRepeat(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint64_t mask[], const int32_t repeatTime,
+        const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride,
+        ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX)
     ```
 
 - `mask`连续模式：
 
     ```cpp
     template <ReduceType reduceType, typename T, typename U, bool isSetMask = true>
-    __aicore__ inline void ReduceRepeat(const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride, ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX)
+    __aicore__ inline void ReduceRepeat(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t mask, const int32_t repeatTime,
+        const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride,
+        ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX)
     ```
 
 ## 参数说明
@@ -203,38 +209,46 @@
     ```cpp
     // dstLocal,srcLocal均为half类型，srcLocal的计算数据量为512，连续排布，计算结果也需要连续排布，使用tensor高维切分计算接口，设定mask为最多的128个全部元素参与计算
     // 根据以上信息，推断出repeatTime为4，dstRepStride为1，srcBlkStride为1，srcRepStride为8
-    // 若求最大值及索引，并且需要存储顺序为[value, index]的结果，可以使用默认order，接口示例为：
+    // 若求最大值及索引，并且需要存储顺序为[value,
+    // index]的结果，可以使用默认order，接口示例为：
     AscendC::ReduceRepeat<AscendC::ReduceType::MAX, half>(dstLocal, srcLocal, 128, 4, 1, 1, 8);
 
     // 若求最大值及索引，并且需要存储顺序为[index, value]的结果，接口示例为：
-    AscendC::ReduceRepeat<AscendC::ReduceType::MAX, half>(dstLocal, srcLocal, 128, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_INDEX_VALUE);
+    AscendC::ReduceRepeat<AscendC::ReduceType::MAX, half>(
+        dstLocal, srcLocal, 128, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_INDEX_VALUE);
 
     // 若只求最大值，并且需要存储[value]的结果，接口示例为：
-    AscendC::ReduceRepeat<AscendC::ReduceType::MAX, half>(dstLocal, srcLocal, 128, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_ONLY_VALUE);
+    AscendC::ReduceRepeat<AscendC::ReduceType::MAX, half>(
+        dstLocal, srcLocal, 128, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_ONLY_VALUE);
 
     // 若只求索引，并且需要存储[index]的结果，接口示例为：
-    AscendC::ReduceRepeat<AscendC::ReduceType::MAX, half>(dstLocal, srcLocal, 128, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_ONLY_INDEX);
+    AscendC::ReduceRepeat<AscendC::ReduceType::MAX, half>(
+        dstLocal, srcLocal, 128, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_ONLY_INDEX);
     ```
 
 - `ReduceRepeat<AscendC::ReduceType::MAX>` tensor高维切分计算样例-`mask`逐bit模式：
 
     ```cpp
     // dstLocal,srcLocal均为half类型，srcLocal的计算数据量为512，连续排布，计算结果也需要连续排布，使用tensor高维切分计算接口，设定mask为最多的128个全部元素参与计算
-    uint64_t mask[2] = { 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF };
+    uint64_t mask[2] = {0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF};
 
     // 根据以上信息，推断出repeatTime为4，dstRepStride为1，srcBlkStride为1，srcRepStride为8
 
-    // 若求最大值及索引，并且需要存储顺序为[value, index]的结果，使用默认order，接口示例为：
+    // 若求最大值及索引，并且需要存储顺序为[value,
+    // index]的结果，使用默认order，接口示例为：
     AscendC::ReduceRepeat<AscendC::ReduceType::MAX, half>(dstLocal, srcLocal, mask, 4, 1, 1, 8);
 
     // 若求最大值及索引，并且需要存储顺序为[index, value]的结果，接口示例为：
-    AscendC::ReduceRepeat<AscendC::ReduceType::MAX, half>(dstLocal, srcLocal, mask, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_INDEX_VALUE);
+    AscendC::ReduceRepeat<AscendC::ReduceType::MAX, half>(
+        dstLocal, srcLocal, mask, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_INDEX_VALUE);
 
     // 若只求最大值，并且需要存储[value]的结果，接口示例为：
-    AscendC::ReduceRepeat<AscendC::ReduceType::MAX, half>(dstLocal, srcLocal, mask, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_ONLY_VALUE);
+    AscendC::ReduceRepeat<AscendC::ReduceType::MAX, half>(
+        dstLocal, srcLocal, mask, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_ONLY_VALUE);
 
     // 若只求索引，并且需要存储[index]的结果，接口示例为：
-    AscendC::ReduceRepeat<AscendC::ReduceType::MAX, half>(dstLocal, srcLocal, mask, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_ONLY_INDEX);
+    AscendC::ReduceRepeat<AscendC::ReduceType::MAX, half>(
+        dstLocal, srcLocal, mask, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_ONLY_INDEX);
     ```
 
     示例结果如下：
@@ -265,20 +279,24 @@
 
     ```cpp
     // dstLocal,srcLocal均为half类型，srcLocal的计算数据量为512，连续排布，计算结果也需要连续排布，使用tensor高维切分计算接口，设定mask为最多的128个全部元素参与计算
-    uint64_t mask[2] = { 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF };
-    
+    uint64_t mask[2] = {0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF};
+
     // 根据以上信息，推断出repeatTime为4，dstRepStride为1，srcBlkStride为1，srcRepStride为8
-    // 若求最小值及索引，并且需要存储顺序为[value, index]的结果，使用默认order，接口示例为：
+    // 若求最小值及索引，并且需要存储顺序为[value,
+    // index]的结果，使用默认order，接口示例为：
     AscendC::ReduceRepeat<AscendC::ReduceType::MIN, half>(dstLocal, srcLocal, mask, 4, 1, 1, 8);
-    
+
     // 若求最小值及索引，并且需要存储顺序为[index, value]的结果，接口示例为：
-    AscendC::ReduceRepeat<AscendC::ReduceType::MIN, half>(dstLocal, srcLocal, mask, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_INDEX_VALUE);
-    
+    AscendC::ReduceRepeat<AscendC::ReduceType::MIN, half>(
+        dstLocal, srcLocal, mask, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_INDEX_VALUE);
+
     // 若只求最小值，并且需要存储[value]的结果，接口示例为：
-    AscendC::ReduceRepeat<AscendC::ReduceType::MIN, half>(dstLocal, srcLocal, mask, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_ONLY_VALUE);
-    
+    AscendC::ReduceRepeat<AscendC::ReduceType::MIN, half>(
+        dstLocal, srcLocal, mask, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_ONLY_VALUE);
+
     // 若只求索引，并且需要存储[index]的结果，接口示例为：
-    AscendC::ReduceRepeat<AscendC::ReduceType::MIN, half>(dstLocal, srcLocal, mask, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_ONLY_INDEX);
+    AscendC::ReduceRepeat<AscendC::ReduceType::MIN, half>(
+        dstLocal, srcLocal, mask, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_ONLY_INDEX);
     ```
 
     示例结果如下：
@@ -309,8 +327,8 @@
 
     ```cpp
     // dstLocal,srcLocal均为half类型，srcLocal的计算数据量为512，连续排布，计算结果也需要连续排布，使用tensor高维切分计算接口，设定mask为最多的128个全部元素参与计算
-    uint64_t mask[2] = { 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF };
-    
+    uint64_t mask[2] = {0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF};
+
     // 根据以上信息，推断出repeatTime为4，dstRepStride为1，srcBlkStride为1，srcRepStride为8
     AscendC::ReduceRepeat<AscendC::ReduceType::SUM, half>(dstLocal, srcLocal, mask, 4, 1, 1, 8);
     ```

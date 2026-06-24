@@ -10,7 +10,7 @@ Conv3D Tiling API提供Conv3D单核Tiling接口，用于Conv3D单核计算场景
 
 使用Conv3D Tiling接口获取Tiling参数的样例如下：
 
-```
+```cpp
 // 实例化Conv3D Api
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 Conv3dTilingApi::Conv3dTiling conv3dApiTiling(ascendcPlatform);
@@ -38,7 +38,7 @@ if (conv3dApiTiling.GetTiling(tilingData.conv3dApiTilingData) == -1) {
 
 ## 需要包含的头文件
 
-```
+```cpp
 #include "lib/conv/conv3d/conv3d_tiling.h"
 ```
 

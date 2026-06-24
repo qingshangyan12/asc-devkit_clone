@@ -85,10 +85,10 @@ Tiling参数如下：
 
 1.  创建Matmul对象，使用默认的Norm模板参数CFG\_NORM。
 
-    ```
+    ```cpp
     #define ASCENDC_CUBE_ONLY
     #include "lib/matmul_intf.h"
-    
+
     using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
     using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>;
     using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
@@ -105,10 +105,10 @@ Matmul API开启MDL模板的完整样例请参考[开启UnitFlag功能和MDL模�
 
 1.  创建Matmul对象，使用默认的MDL模板参数CFG\_MDL。
 
-    ```
+    ```cpp
     #define ASCENDC_CUBE_ONLY
     #include "lib/matmul_intf.h"
-    
+
     using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
     using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>;
     using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;

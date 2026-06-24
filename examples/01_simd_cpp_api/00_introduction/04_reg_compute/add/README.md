@@ -10,7 +10,7 @@
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## 目录结构介绍
-```
+```text
 ├── add
 │   ├── scripts
 │   │   ├── gen_data.py                // 输入数据和真值数据生成脚本

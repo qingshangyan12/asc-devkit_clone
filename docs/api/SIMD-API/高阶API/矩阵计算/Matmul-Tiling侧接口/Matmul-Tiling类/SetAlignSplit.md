@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 int32_t SetAlignSplit(int32_t alignM, int32_t alignN, int32_t alignK)
 ```
 
@@ -30,7 +30,7 @@ int32_t SetAlignSplit(int32_t alignM, int32_t alignN, int32_t alignK)
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MultiCoreMatmulTiling tiling(ascendcPlatform);
 tiling.SetDim(1);

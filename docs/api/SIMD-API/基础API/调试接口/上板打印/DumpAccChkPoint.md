@@ -76,9 +76,10 @@ AscendC::DumpAccChkPoint(srcLocal, 5, 32, dataLen);
 
 ```cpp
 template <typename T>
-__aicore__ inline void DumpAccChkPoint(const LocalTensor<T> &tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize)
-template <typename T>
-__aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize)
+__aicore__ inline void DumpAccChkPoint(
+    const LocalTensor<T>& tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize) template <typename T>
+__aicore__
+    inline void DumpAccChkPoint(const GlobalTensor<T>& tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize)
 ```
 
 ## 参数说明<a name="section158061867342"></a>
@@ -132,13 +133,13 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &tensor, uint32_t i
 ## 调用示例<a name="section82241477610"></a>
 
 ```cpp
-constexpr uint32_t totalLength = 256;    // 参与搬运的元素个数
+constexpr uint32_t totalLength = 256; // 参与搬运的元素个数
 AscendC::LocalTensor<half> srcLocal;
 AscendC::GlobalTensor<half> srcGlobal;
 AscendC::DataCopy(srcLocal, srcGlobal, totalLength * sizeof(half));
-uint32_t index = 56;    // 用户自定义附加信息，此处传入DumpAccChkPoint指令的行号
-uint32_t countOff = 32;    // 偏移元素个数，从srcLocal[32]开始打印
-uint32_t dumpSize = 128;    // dump的元素个数，从srcLocal[32]开始打印128个元素个数
+uint32_t index = 56;     // 用户自定义附加信息，此处传入DumpAccChkPoint指令的行号
+uint32_t countOff = 32;  // 偏移元素个数，从srcLocal[32]开始打印
+uint32_t dumpSize = 128; // dump的元素个数，从srcLocal[32]开始打印128个元素个数
 AscendC::DumpAccChkPoint(srcLocal, index, countOff, dumpSize);
 ```
 

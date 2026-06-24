@@ -14,7 +14,7 @@ This example implements data transpose functionality based on the Transpose and 
 
 ## Directory Structure
 
-```
+```text
 ├── transpose
 │   ├── scripts
 │   │   ├── gen_data.py         // Input data and ground truth data generation

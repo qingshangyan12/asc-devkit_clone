@@ -13,12 +13,7 @@ Tensor API通过`CopyL0C2UBTrait::dualDstCtl`控制双目标模式。
 ## 使用示例
 
 ```cpp
-constexpr CopyL0C2UBTrait l0c2ubTrait = {
-    RoundMode::DEFAULT,
-    false,
-    false,
-    DUAL_DST_SPLIT_M
-};
+constexpr CopyL0C2UBTrait l0c2ubTrait = {RoundMode::DEFAULT, false, false, DUAL_DST_SPLIT_M};
 
 struct CopyL0C2UBTraitCustom {
     using TraitType = CopyL0C2UBTrait;

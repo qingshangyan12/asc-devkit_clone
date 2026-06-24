@@ -57,7 +57,7 @@
 
     当前支持在自定义算子工程和Kernel直调工程中使用。
 
-    ```
+    ```text
     KERNEL_TASK_TYPE_DEFAULT(value)
     ```
 
@@ -65,7 +65,7 @@
 
     当前仅支持在自定义算子工程中使用。
 
-    ```
+    ```text
     KERNEL_TASK_TYPE(key, value)
     ```
 
@@ -196,8 +196,9 @@
 -   示例一：启用VectorCore样例
     1.  完成算子kernel侧开发时，需要通过本接口启用Vector Core，算子执行时会同时启动AI Core和Vector Core，此时AI Core会当成Vector Core使用。示例如下：
 
-        ```
-        extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8_t *y, __gm__ uint8_t *z, __gm__ uint8_t *workspace, __gm__ uint8_t *tiling)
+        ```cpp
+        extern "C" __global__ __aicore__ void add_custom(
+            __gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
         {
             GET_TILING_DATA(tilingData, tiling);
             if (workspace == nullptr) {
@@ -217,16 +218,16 @@
 
     2.  完成算子host侧Tiling开发时，设置的numBlocks代表的是AI Core和Vector Core的总数，比如用户在host侧设置numBlocks为10，则会启动总数为10的AI Core和Vector Core；为保证启动Vector Core，设置数值应大于AI Core的核数。您可以通过[GetCoreNumAic](../../../Utils-API/平台信息获取/PlatformAscendC/GetCoreNumAic.md)接口获取AI Core的核数，[GetCoreNumVector](../../../Utils-API/平台信息获取/PlatformAscendC/GetCoreNumVector.md)接口获取Vector Core的核数。如下代码片段，展示了numBlocks的设置方法，此处设置为AI Core和Vector Core的总和，表示所有AI Core和Vector Core都启动。
 
-        ```
+        ```cpp
         // 配套的host侧tiling函数示例：
         ge::graphStatus TilingFunc(gert::TilingContext* context)
-        {	
+        {
             // 启用VectorCore，将numBlocks置为AI Core中vector核数 + Vector Core中的vector核数
             auto ascendcPlatform = platform_ascendc::PlatformAscendC(platformInfo);
             auto totalCoreNum = ascendcPlatform.GetCoreNumAiv();
             // ASCENDXXX请替换为实际的版本型号
             if (ascendcPlatform.GetSocVersion() == platform_ascendc::SocVersion::ASCENDXXX) {
-               totalCoreNum = totalCoreNum + ascendcPlatform.GetCoreNumVector();
+                totalCoreNum = totalCoreNum + ascendcPlatform.GetCoreNumVector();
             }
             context->SetBlockDim(totalCoreNum);
         }
@@ -234,8 +235,9 @@
 
 -   示例二：设置某一个具体的tiling key对应的kernel type。如下代码为伪代码，不可直接运行。
 
-    ```
-    extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8_t *y, __gm__ uint8_t *z, __gm__ uint8_t *workspace, __gm__ uint8_t *tiling)
+    ```cpp
+    extern "C" __global__ __aicore__ void add_custom(
+        __gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
     {
         GET_TILING_DATA(tilingData, tiling);
         if (workspace == nullptr) {
@@ -255,7 +257,7 @@
     }
     // 配套的host侧tiling函数示例：
     ge::graphStatus TilingFunc(gert::TilingContext* context)
-    {	
+    {
         // ...
         if (context->GetInputShape(0) > 10) {
             context->SetTilingKey(1);

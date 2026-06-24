@@ -33,7 +33,7 @@ Conv3D高阶API目前支持M合轴模式的输出方式。在M合轴模式下，
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetSingleOutputShape(uint64_t singleCo, uint64_t singleDo, uint64_t singleM)
 ```
 
@@ -55,6 +55,6 @@ __aicore__ inline void SetSingleOutputShape(uint64_t singleCo, uint64_t singleDo
 
 ## 调用示例
 
-```
+```text
 conv3dApi.SetSingleOutputShape(singleCoreCout, singleCoreDout, singleCoreM);
 ```

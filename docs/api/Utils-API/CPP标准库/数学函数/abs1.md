@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename T>
 __aicore__ inline T abs(const T src)
 ```
@@ -45,7 +45,7 @@ __aicore__ inline T abs(const T src)
 
 ## 调用示例
 
-```
+```cpp
 int64_t src = -2;
 
 int64_t result = AscendC::Std::abs(src);

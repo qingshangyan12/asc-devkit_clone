@@ -43,7 +43,7 @@
           asc_init();
 
           constexpr uint32_t block_length = TOTAL_LENGTH / NUM_BLOCKS;
-          
+
           // Determine the data that each block needs to process
           __gm__ float* x_gm = x + block_idx * block_length;
           __gm__ float* y_gm = y + block_idx * block_length;
@@ -54,7 +54,8 @@
           __ubuf__ float y_local[block_length];
           __ubuf__ float z_local[block_length];
 
-          // Copy input data from Global Memory (i.e., Device Memory) to on-chip UB memory
+          // Copy input data from Global Memory (i.e., Device Memory) to on-chip UB
+          // memory
           asc_copy_gm2ub((__ubuf__ void*)x_local, (__gm__ void*)x_gm, block_length * sizeof(float));
           asc_copy_gm2ub((__ubuf__ void*)y_local, (__gm__ void*)y_gm, block_length * sizeof(float));
           asc_sync();
@@ -81,28 +82,29 @@
       __vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z)
       {
           AscendC::InitSocState();
-          
+
           // Determine the data that each block needs to process
           AscendC::GlobalTensor<float> xGm, yGm, zGm;
           xGm.SetGlobalBuffer(x + block_idx * blockLength, blockLength);
           yGm.SetGlobalBuffer(y + block_idx * blockLength, blockLength);
           zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
-          
+
           // Allocate on-chip UB memory
           AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
           AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, blockLength>();
           AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, blockLength>();
           AscendC::LocalTensor<float> zLocal = ubAllocator.Alloc<float, blockLength>();
-          
-          // Copy input data from Global Memory (i.e., Device Memory) to on-chip UB memory
+
+          // Copy input data from Global Memory (i.e., Device Memory) to on-chip UB
+          // memory
           AscendC::DataCopy(xLocal, xGm, blockLength);
           AscendC::DataCopy(yLocal, yGm, blockLength);
           AscendC::PipeBarrier<PIPE_ALL>();
-          
+
           // Call SIMD API to complete the Add operation
           AscendC::Add(zLocal, xLocal, yLocal, blockLength);
           AscendC::PipeBarrier<PIPE_ALL>();
-          
+
           // Write the result from on-chip UB memory back to Global Memory
           AscendC::DataCopy(zGm, zLocal, blockLength);
           AscendC::PipeBarrier<PIPE_ALL>();
@@ -119,44 +121,45 @@
 
     Host端通过`<<<>>>`语法糖调用Device端核函数，示例代码如下：
     ```cpp
-      int32_t main(int argc, char const *argv[])
-      {
-          ...
-          constexpr uint32_t num_blocks = 8;
-          ...
-          
-          // Allocate host and device memory, and copy input data from host to device
-          aclrtMallocHost((void **)(&z_host), total_byte_size);
-          aclrtMalloc((void **)&x_device, total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
-          aclrtMalloc((void **)&y_device, total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
-          aclrtMalloc((void **)&z_device, total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
-          aclrtMemcpy((uint8_t*)x_device, total_byte_size, x_host, total_byte_size, ACL_MEMCPY_HOST_TO_DEVICE);
-          aclrtMemcpy((uint8_t*)y_device, total_byte_size, y_host, total_byte_size, ACL_MEMCPY_HOST_TO_DEVICE);
+    int32_t main(int argc, char const* argv[])
+    {
+        ... constexpr uint32_t num_blocks = 8;
+        ...
 
-          // Launch kernel <<<numBlocks, dynUBufSize, stream>>>
-          // numBlocks : Number of blocks. Default to 8 in this example.
-          // dynUBufSize : Dynamic unified buffer size. Default to 0 in this example.
-          // nullptr : Runtime stream. Uses default stream in this example.
+            // Allocate host and device memory, and copy input data from host to
+            // device
+            aclrtMallocHost((void**)(&z_host), total_byte_size);
+        aclrtMalloc((void**)&x_device, total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
+        aclrtMalloc((void**)&y_device, total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
+        aclrtMalloc((void**)&z_device, total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
+        aclrtMemcpy((uint8_t*)x_device, total_byte_size, x_host, total_byte_size, ACL_MEMCPY_HOST_TO_DEVICE);
+        aclrtMemcpy((uint8_t*)y_device, total_byte_size, y_host, total_byte_size, ACL_MEMCPY_HOST_TO_DEVICE);
 
-          // Example One：Call add kernel which is implemented by SIMD C API
-          add_custom<<<num_blocks, 0>>>(xDevice, yDevice, zDevice);
+        // Launch kernel <<<numBlocks, dynUBufSize, stream>>>
+        // numBlocks : Number of blocks. Default to 8 in this example.
+        // dynUBufSize : Dynamic unified buffer size. Default to 0 in this example.
+        // nullptr : Runtime stream. Uses default stream in this example.
 
-          // Example Two：Call add kernel which is implemented by SIMD C++ Basic API
-          // add_custom<blockLength><<<numBlocks, 0, stream>>>(xDevice, yDevice, zDevice);
+        // Example One：Call add kernel which is implemented by SIMD C API
+        add_custom<<<num_blocks, 0>>>(xDevice, yDevice, zDevice);
 
-          // Wait for the add_custom kernel to complete
-          aclrtSynchronizeDevice();
+        // Example Two：Call add kernel which is implemented by SIMD C++ Basic API
+        // add_custom<blockLength><<<numBlocks, 0, stream>>>(xDevice, yDevice,
+        // zDevice);
 
-          // Copy the result from device memory to host memory
-          aclrtMemcpy(z_host, total_byte_size, (uint8_t*)z_device, total_byte_size, ACL_MEMCPY_DEVICE_TO_HOST);
-          ...
-      }
+        // Wait for the add_custom kernel to complete
+        aclrtSynchronizeDevice();
+
+        // Copy the result from device memory to host memory
+        aclrtMemcpy(z_host, total_byte_size, (uint8_t*)z_device, total_byte_size, ACL_MEMCPY_DEVICE_TO_HOST);
+        ...
+    }
     ```
 
 - **算子编译与运行**：
 
   CMake配置文件示例：
-  ```
+  ```text
   cmake_minimum_required(VERSION 3.16)
 
   find_package(ASC REQUIRED)
@@ -178,7 +181,7 @@
   )
   ```
   编译与执行示例：
-  ```
+  ```bash
   mkdir -p build && cd build;   # 创建并进入build目录
   cmake ..;make -j;             # 编译工程
   ./c_api_add_example           # 运行样例

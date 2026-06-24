@@ -60,7 +60,7 @@ coalesced_group binary_partition(const thread_block_tile<Size, ParentT>& g, bool
 
     ```c++
     using namespace cooperative_groups;
-    __global__ void simt_kernel(int *inputArr)
+    __global__ void simt_kernel(int* inputArr)
     {
         auto block = this_thread_block();
         auto tile32 = tiled_partition<32>(block);
@@ -79,8 +79,7 @@ coalesced_group binary_partition(const thread_block_tile<Size, ParentT>& g, bool
     using namespace cooperative_groups;
     __simt_vf__ inline void simt_kernel(...)
     {
-        ...
-        auto block = this_thread_block();
+        ... auto block = this_thread_block();
         auto tile32 = tiled_partition<32>(block);
 
         // inputArr中是随机的整数

@@ -18,9 +18,11 @@
 
 ## 函数原型
 
-```
+```cpp
 template <bool commit = false>
-__aicore__ inline HcclHandle ReduceScatter(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t recvCount, HcclDataType dataType, HcclReduceOp op, uint64_t strideCount, uint8_t repeat = 1)
+__aicore__ inline HcclHandle ReduceScatter(
+    GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t recvCount, HcclDataType dataType, HcclReduceOp op, uint64_t strideCount,
+    uint8_t repeat = 1)
 ```
 
 ## 参数说明
@@ -71,7 +73,7 @@ __aicore__ inline HcclHandle ReduceScatter(GM_ADDR sendBuf, GM_ADDR recvBuf, uin
 
     ![](../../../../figures/ReduceScatter_gai.png)
 
-    ```
+    ```cpp
     extern "C" __global__ __aicore__ void reduce_scatter_custom(
         GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
     {
@@ -112,7 +114,7 @@ __aicore__ inline HcclHandle ReduceScatter(GM_ADDR sendBuf, GM_ADDR recvBuf, uin
     **图4**  第一轮4卡ReduceScatter示意图  
     ![第一轮4卡ReduceScatter示意图](../../../../figures/第一轮4卡ReduceScatter示意图.png)
 
-    ```
+    ```cpp
     extern "C" __global__ __aicore__ void reduce_scatter_custom(
         GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
     {

@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline int32_t Query(HcclHandle handleId)
 ```
 
@@ -41,7 +41,7 @@ __aicore__ inline int32_t Query(HcclHandle handleId)
 
 ## 调用示例
 
-```
+```cpp
 REGISTER_TILING_DEFAULT(ReduceScatterCustomTilingData); // ReduceScatterCustomTilingData为对应算子头文件定义的结构体
 GET_TILING_DATA_WITH_STRUCT(ReduceScatterCustomTilingData, tilingData, tilingGM);
 Hccl hccl;
@@ -58,7 +58,7 @@ if (AscendC::g_coreType == AIC) {
     hccl.Commit(handleId); // 通知服务端可以执行上述的ReduceScatter任务
     int32_t finishedCount = hccl.Query(handleId);
     while (hccl.Query(handleId) < repeat) {
-    }                // 等待查询到handleId对应的通信任务执行repeat次
+    } // 等待查询到handleId对应的通信任务执行repeat次
     hccl.Finalize(); // 后续无其他通信任务，通知服务端执行上述ReduceScatter任务之后即可以退出
 }
 ```

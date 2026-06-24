@@ -6,8 +6,9 @@
 
 ## 函数原型
 
-```
-int32_t SetSingleRange(int32_t maxM = -1, int32_t maxN = -1, int32_t maxK = -1, int32_t minM = -1, int32_t minN = -1, int32_t minK = -1)
+```cpp
+int32_t SetSingleRange(
+    int32_t maxM = -1, int32_t maxN = -1, int32_t maxK = -1, int32_t minM = -1, int32_t minN = -1, int32_t minK = -1)
 ```
 
 ## 参数说明
@@ -33,7 +34,7 @@ int32_t SetSingleRange(int32_t maxM = -1, int32_t maxN = -1, int32_t maxK = -1, 
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MultiCoreMatmulTiling tiling(ascendcPlatform);
 tiling.SetDim(1);

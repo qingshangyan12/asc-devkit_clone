@@ -56,7 +56,7 @@
 
 ## 函数原型<a name="section765814724715"></a>
 
-```
+```cpp
 __aicore__ inline void SetQuit(__gm__ CubeMsgType* msg)
 ```
 
@@ -93,8 +93,8 @@ __aicore__ inline void SetQuit(__gm__ CubeMsgType* msg)
 
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 
-```
-handle.AssignQueue(queIdx);  
-auto msgPtr = a.AllocMessage();        // 获取消息空间指针msgPtr
-handle.SetQuit(msgPtr);              // 发送退出消息
+```cpp
+handle.AssignQueue(queIdx);
+auto msgPtr = a.AllocMessage(); // 获取消息空间指针msgPtr
+handle.SetQuit(msgPtr);         // 发送退出消息
 ```
