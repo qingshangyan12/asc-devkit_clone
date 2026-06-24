@@ -208,6 +208,31 @@ namespace {
 
     //全局缓存管理器实例
     thread_local CommDomainCacheManager g_cacheManager;
+
+    HcclResult ReportMc2DeviceOpInfoOnly(const OpParam *param, const AlgResourceCtxSerializable &resCtx)
+    {
+        CHK_PTR_NULL(param);
+        HcomProInfoTmp profInfo = {};
+        const std::string algTypeStr(param->algTypeStr);
+        CHK_PRT_RET(strcpy_s(profInfo.algType, sizeof(profInfo.algType), algTypeStr.c_str()) != EOK,
+            HCCL_ERROR("[MC2_PROF][DeviceOpInfoOnly] copy algType failed, commName[%s].", param->commName),
+            HCCL_E_INTERNAL);
+        CHK_PRT_RET(strcpy_s(profInfo.commName, sizeof(profInfo.commName), param->commName) != EOK,
+            HCCL_ERROR("[MC2_PROF][DeviceOpInfoOnly] copy commName failed, commName[%s].", param->commName),
+            HCCL_E_INTERNAL);
+        profInfo.commNameLen = strlen(param->commName);
+        profInfo.algTypeLen = algTypeStr.length();
+        profInfo.dataCount = param->DataDes.count;
+        profInfo.dataType = static_cast<uint8_t>(param->DataDes.dataType);
+        profInfo.rankSize = resCtx.topoInfo.userRankSize;
+        profInfo.userRank = resCtx.topoInfo.userRank;
+        profInfo.root = param->root;
+        profInfo.slaveThreadNum = resCtx.slaveThreadNum;
+        HCCL_INFO("[MC2_PROF][DeviceOpInfoOnly] report op info only, skip HcommProfilingReportDeviceOp, "
+                  "commName[%s], algType[%s], rankSize[%u], userRank[%u], dataCount[%llu].",
+                  profInfo.commName, profInfo.algType, profInfo.rankSize, profInfo.userRank, profInfo.dataCount);
+        return HcommProfilingReportDeviceHcclOpInfo(profInfo);
+    }
 }
 
 extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKernel(OpParam *param)
@@ -332,8 +357,8 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             return 1;
         }
 
-        if (HcommProfilingReportDeviceOp(param->commName) != HCCL_SUCCESS) {
-            HCCL_ERROR("%s HcommProfilingReportDeviceOp fail, commName[%s]", __func__, param->commName);
+        if (ReportMc2DeviceOpInfoOnly(param, resCtx) != HCCL_SUCCESS) {
+            HCCL_ERROR("%s ReportMc2DeviceOpInfoOnly fail, commName[%s]", __func__, param->commName);
             return 1;
         }
 
