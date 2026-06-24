@@ -48,7 +48,7 @@ inline int __float2int_rn(const float x)
 |---|---|
 | ±0 | 0 |
 | nan | 0 |
-| +inf | 2147483647 |
+| inf | 2147483647 |
 | -inf | -2147483648 |
 | ASCRT_MAX_NORMAL_F | 2147483647 |
 | -ASCRT_MAX_NORMAL_F | -2147483648 |

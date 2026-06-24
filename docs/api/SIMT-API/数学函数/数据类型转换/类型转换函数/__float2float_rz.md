@@ -51,8 +51,8 @@ inline float __float2float_rz(const float x)
 | 1.5 | 1.0 |
 | -1.5 | -1.0 |
 | nan | nan |
-| +inf | inf |
-| -Inf | -inf |
+|  | inf |
+| -inf | -inf |
 | ASCRT_MAX_NORMAL_F | ASCRT_MAX_NORMAL_F |
 | -ASCRT_MAX_NORMAL_F | -ASCRT_MAX_NORMAL_F |
 | ASCRT_MIN_DENORM_F | 0 |

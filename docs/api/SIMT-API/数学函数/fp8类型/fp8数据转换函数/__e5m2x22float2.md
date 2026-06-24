@@ -49,7 +49,7 @@ inline float2 __e5m2x22float2(const float8_e5m2x2_t x)
 | 0 | 0 |
 | -0 | -0 |
 | nan | nan |
-| +inf | inf |
+| inf | inf |
 | -inf | -inf |
 
 ## 约束说明
