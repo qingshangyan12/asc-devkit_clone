@@ -24,8 +24,7 @@
 #include "ain.h"
 #include "../../../impl/adv_api/detail/ain/impl/barrier_impl_def.h"
 
-namespace ain {
-namespace device {
+namespace AscendC {
 
 struct AinBarrierSession : AinBarrierSession_internal{
     AIN_DEVICE AinBarrierSession(Ain& ain, HcclTeam team, HcclAinBarrierHandle handle, uint32_t index);  
@@ -39,8 +38,7 @@ struct AinBarrierSession : AinBarrierSession_internal{
     AIN_DEVICE HcclResult sync(AinMemoryOrder order, uint64_t timeoutCycles);
 };
 
-}  // namespace device
-}  // namespace ain
+}  // namespace AscendC
 
 #include "../../../impl/adv_api/detail/ain/impl/barrier_impl.h"
 #endif // AIN_BARRIER_H

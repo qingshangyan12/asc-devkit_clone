@@ -24,10 +24,13 @@
 #ifndef IMPL_ADV_API_DETAIL_AIN_IMPL_BARRIER_IMPL_DEF_H
 #define IMPL_ADV_API_DETAIL_AIN_IMPL_BARRIER_IMPL_DEF_H
 
-#include "temp_hccl_def.h"  // TODO
+// #include "temp_hccl_def.h"  // TODO
+#include "ain_impl_def.h"
 
-namespace ain {
-namespace device {
+namespace AscendC{
+
+struct HcclTeamTagWorld {};
+struct HcclTeamTagRail {};
 
 struct AinBarrierSession_internal {
     Ain ain;   // TDOO
@@ -42,8 +45,7 @@ struct AinBarrierSession_internal {
     AIN_DEVICE HcclResult syncInternal(AinMemoryOrder order, uint64_t timeoutCycles);
 };
 
-}  // namespace device
-}  // namespace ain
+}  // namespace AscendC
 
 #endif
 

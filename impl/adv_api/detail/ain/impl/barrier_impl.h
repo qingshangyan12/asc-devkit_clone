@@ -26,8 +26,7 @@
 
 #include "barrier_impl_def.h"
 
-namespace ain {
-namespace device {
+namespace AscendC{
 
 AIN_DEVICE AinBarrierSession::AinBarrierSession(
     Ain& ain, HcclTeam team, HcclAinBarrierHandle handle, uint32_t index 
@@ -60,7 +59,7 @@ template<bool EnableTimeout>
 AIN_DEVICE HcclResult AinBarrierSession_internal::syncInternal(AinMemoryOrder order, uint64_t timeoutCycles)
 {
     uint64_t startCycle;
-    HcclResult ret = HCCL_SUCCESS;   // TODO
+    HcclResult ret = HcclResult::HCCL_SUCCESS;   // TODO
 
     int32_t vecId = AscendC::GetBlockIdx();    // vec核ID
     int32_t vecSize = AscendC::GetBlockNum() * AscendC::GetTaskRation();  // AIV核数
@@ -86,14 +85,14 @@ AIN_DEVICE HcclResult AinBarrierSession_internal::syncInternal(AinMemoryOrder or
                 // AinCommitFlags commitFlags = AIN_COMMIT_IMMED  // 是否延后提交WQE doorbell
             );
 
-            uint32_t* shadowPtr = (uint32_t*)this->ain.getSignalShadowPtr(this->signal + peer);
+            __gm__ uint32_t* shadowPtr = (__gm__ uint32_t*)this->ain.getSignalShadowPtr(this->signal + peer);
             uint32_t waitVal = ++(*shadowPtr);
 
             if constexpr (EnableTimeout) {
                 while (true) {
                     uint64_t got = this->ain.readSignal(
                         this->signal + peer,   // signalId
-                        32,   // bits  读取有效位宽
+                        32   // bits  读取有效位宽
                         // AinMemoryOrder order = AIN_MEMORY_ORDER_ACQUIRE // 读取后的本地内存序
                     );
                     if (got >= waitVal) { // TODO：是否替换rollingLessEq
@@ -101,7 +100,7 @@ AIN_DEVICE HcclResult AinBarrierSession_internal::syncInternal(AinMemoryOrder or
                     }
                     uint64_t endCycle = AscendC::GetSystemCycle();
                     if (endCycle - startCycle >= timeoutCycles) {
-                        ret = HCCL_TIMEOUT;
+                        ret = HcclResult::HCCL_E_TIMEOUT;
                         break;
                     }
                 }
@@ -119,8 +118,7 @@ AIN_DEVICE HcclResult AinBarrierSession_internal::syncInternal(AinMemoryOrder or
     return ret;
 }
 
-}  // namespace device
-}  // namespace ain
+}  // namespace AscendC
 
 #endif
 
