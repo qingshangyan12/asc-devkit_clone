@@ -23,7 +23,6 @@
 
 #include "hccl/hccl.h"
 #include "hcomm/hcomm.h"
-
 #include "index/arithprogression.h"
 #include "activation/sigmoid.h"
 #include "activation/softmax.h"
