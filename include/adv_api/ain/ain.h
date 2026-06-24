@@ -54,6 +54,18 @@ public:
         __gm__ void *srcWin, uint64_t srcOffset, uint64_t bytes, const DescriptorUbuf &ubuf = DescriptorUbuf{},
         AinCommitFlags commitFlags = AIN_COMMIT_IMMED);
 
+    template <typename RemoteAction, typename DescriptorUbuf = AinDescriptorUbuf>
+    AIN_DEVICE void signal(HcclTeam team, uint32_t peer, RemoteAction action,
+        const DescriptorUbuf &ubuf = DescriptorUbuf{}, AinCommitFlags commitFlags = AIN_COMMIT_IMMED);
+
+    AIN_DEVICE uint64_t readSignal(HcclAinSignal_t signalId, uint32_t bits,
+        AinMemoryOrder order = AIN_MEMORY_ORDER_ACQUIRE) const;
+
+    AIN_DEVICE void waitSignal(HcclAinSignal_t signalId, uint64_t least, uint32_t bits,
+        AinMemoryOrder order = AIN_MEMORY_ORDER_ACQUIRE) const;
+
+    AIN_DEVICE __gm__ uint64_t *getSignalShadowPtr(HcclAinSignal_t signalId) const;
+
 private:
     static constexpr uint32_t MAX_PENDING_CHANNELS = 64;
 
