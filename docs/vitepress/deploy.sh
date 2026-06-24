@@ -118,32 +118,7 @@ install_nodejs() {
 }
 
 # ============================================================
-# 2. 安装项目依赖
-# ============================================================
-install_deps() {
-    cd "$SCRIPT_DIR"
-
-    if [ ! -f "package.json" ]; then
-        err "未找到 package.json，请在 vitepress 目录下执行本脚本"
-        exit 1
-    fi
-
-    if [ ! -d "node_modules" ]; then
-        log "安装项目依赖..."
-        if command -v pnpm &>/dev/null; then
-            pnpm install 2>&1 | tee -a "$LOG_FILE"
-        else
-            log "pnpm 未安装，使用 npm..."
-            npm install 2>&1 | tee -a "$LOG_FILE"
-        fi
-        log "依赖安装完成"
-    else
-        log "依赖已存在，跳过安装"
-    fi
-}
-
-# ============================================================
-# 3. 安装 mdparser 依赖 (Python)
+# 2. 构建静态站点
 # ============================================================
 install_mdparser_deps() {
     log "检查 Python 依赖 (cmarkgfm, pygments)..."
@@ -181,11 +156,8 @@ build_docs() {
     cd "$SCRIPT_DIR"
 
     log "开始构建 VitePress 站点..."
-    if command -v pnpm &>/dev/null; then
-        pnpm run docs:build 2>&1 | tee -a "$LOG_FILE"
-    else
-        npm run docs:build 2>&1 | tee -a "$LOG_FILE"
-    fi
+    npm run docs:prebuild 2>&1 | tee -a "$LOG_FILE"
+    npx cross-env NODE_OPTIONS=--max-old-space-size=14336 vitepress build docs 2>&1 | tee -a "$LOG_FILE"
 
     DIST_DIR="$SCRIPT_DIR/docs/.vitepress/dist"
     if [ ! -d "$DIST_DIR" ]; then
@@ -336,15 +308,11 @@ case "$MODE" in
             exit 1
         fi
         install_nodejs
-        install_deps
-        install_mdparser_deps
         build_docs
         deploy_nginx
         ;;
     build)
         install_nodejs
-        install_deps
-        install_mdparser_deps
         build_docs
         log "构建完成! 使用以下命令启动服务:"
         log "  sudo $0 --nginx        # Nginx 生产部署"
@@ -354,15 +322,11 @@ case "$MODE" in
         ;;
     preview)
         install_nodejs
-        install_deps
-        install_mdparser_deps
         build_docs
         run_preview
         ;;
     serve)
         install_nodejs
-        install_deps
-        install_mdparser_deps
         build_docs
         run_serve
         ;;
