@@ -8,7 +8,7 @@
 
 ## 函数原型
 
-```
+```cpp
 void SetSplitK(bool flag)
 ```
 
@@ -31,7 +31,7 @@ void SetSplitK(bool flag)
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo())
     matmul_tiling::MultiCoreMatmulTiling tiling(ascendcPlatform);
 tiling.SetDim(useCoreNums);

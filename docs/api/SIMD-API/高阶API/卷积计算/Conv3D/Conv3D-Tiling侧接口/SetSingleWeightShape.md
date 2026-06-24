@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 void SetSingleWeightShape(int64_t singleCi, int64_t singleKd, int64_t singleKh, int64_t singleKw)
 ```
 
@@ -29,7 +29,7 @@ void SetSingleWeightShape(int64_t singleCi, int64_t singleKd, int64_t singleKh, 
 
 ## 调用示例
 
-```
+```cpp
 // 实例化Conv3D Api
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 Conv3dTilingApi::Conv3dTiling conv3dApiTiling(ascendcPlatform);

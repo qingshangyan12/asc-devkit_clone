@@ -53,9 +53,9 @@
 
 ## 函数原型<a name="section765814724715"></a>
 
-```
-__aicore__ inline uint16_t FreeMessage(__gm__ CubeMsgType *msg);     
-__aicore__ inline uint16_t FreeMessage(__gm__ CubeMsgType *msg, CubeMsgState waitState);   
+```cpp
+__aicore__ inline uint16_t FreeMessage(__gm__ CubeMsgType* msg);
+__aicore__ inline uint16_t FreeMessage(__gm__ CubeMsgType* msg, CubeMsgState waitState);
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001526206862_section129451113125413"></a>
@@ -98,12 +98,12 @@ __aicore__ inline uint16_t FreeMessage(__gm__ CubeMsgType *msg, CubeMsgState wai
 
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 
-```
+```cpp
 template <int32_t funcId>
 __aicore__ inline static typename IsEqual<funcId, 1>::Type CubeGroupCallBack(
-    MatmulApiCfg &mm, __gm__ CubeMsgBody *rcvMsg, CubeResGroupHandle<CubeMsgBody> &handle)
+    MatmulApiCfg& mm, __gm__ CubeMsgBody* rcvMsg, CubeResGroupHandle<CubeMsgBody>& handle)
 {
-       // Cube核上计算逻辑，此处用户自行实现，在一切计算完毕后需要调用FreeMessage，代表rcvMsg已处理完。
-       auto tmpId = handle.FreeMessage(rcvMsg);
+    // Cube核上计算逻辑，此处用户自行实现，在一切计算完毕后需要调用FreeMessage，代表rcvMsg已处理完。
+    auto tmpId = handle.FreeMessage(rcvMsg);
 };
 ```

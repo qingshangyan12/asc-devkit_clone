@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline int32_t SetCcTilingV2(uint64_t offset)
 ```
 
@@ -44,7 +44,7 @@ __aicore__ inline int32_t SetCcTilingV2(uint64_t offset)
 
 -   用户自定义TilingData结构体：
 
-    ```
+    ```cpp
     class UserCustomTilingData {
         AscendC::tiling::Mc2InitTiling initTiling;
         AscendC::tiling::Mc2CcTiling allGatherTiling;
@@ -56,7 +56,7 @@ __aicore__ inline int32_t SetCcTilingV2(uint64_t offset)
 
 -   <a name="li71505119260"></a>类型不同、Tiling参数不同的通信
 
-    ```
+    ```cpp
     extern "C" __global__ __aicore__ void userKernel(GM_ADDR aGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
     {
         REGISTER_TILING_DEFAULT(UserCustomTilingData);
@@ -84,7 +84,7 @@ __aicore__ inline int32_t SetCcTilingV2(uint64_t offset)
 
 -   <a name="li1163031215116"></a>类型相同、Tiling参数不同的通信
 
-    ```
+    ```cpp
     extern "C" __global__ __aicore__ void userKernel(GM_ADDR aGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
     {
         REGISTER_TILING_DEFAULT(UserCustomTilingData);

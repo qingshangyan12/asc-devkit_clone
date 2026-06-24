@@ -53,9 +53,9 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T, RoundMode roundMode>
-__aicore__ inline void Truncate(const LocalTensor<T> &dst, const LocalTensor<T> &src, const uint32_t count)
+__aicore__ inline void Truncate(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -134,13 +134,13 @@ __aicore__ inline void Truncate(const LocalTensor<T> &dst, const LocalTensor<T> 
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 AscendC::Truncate<T, RoundMode::CAST_FLOOR>(dstLocal, srcLocal, 512);
 ```
 
 结果示例如下：
 
-```
+```text
 输入数据srcLocal：[-37.063736    64.17277    -33.448692 ... ]
 输出数据dstLocal：[-38  64 -34 ... ]
 ```

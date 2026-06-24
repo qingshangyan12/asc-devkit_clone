@@ -21,10 +21,10 @@
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_e5m22float(vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask)
-__simd_callee__ inline void asc_e5m22float_v2(vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask)
-__simd_callee__ inline void asc_e5m22float_v3(vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask)
-__simd_callee__ inline void asc_e5m22float_v4(vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask)
+__simd_callee__ inline void asc_e5m22float(vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask) __simd_callee__
+    inline void asc_e5m22float_v2(vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask) __simd_callee__
+    inline void asc_e5m22float_v3(vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask) __simd_callee__
+    inline void asc_e5m22float_v4(vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask)
 ```
 
 ## 参数说明
@@ -55,8 +55,12 @@ PIPE_V
 vector_float dst;
 vector_fp8_e5m2_t src;
 vector_bool mask;
-asc_e5m22float(dst, src, mask);    // 将src的第一部分转换成vector_float类型并写入dst
-asc_e5m22float_v2(dst, src, mask);    // 将src的第二部分转换成vector_float类型并写入dst
-asc_e5m22float_v3(dst, src, mask);    // 将src的第三部分转换成vector_float类型并写入dst
-asc_e5m22float_v4(dst, src, mask);    // 将src的第四部分转换成vector_float类型并写入dst
+asc_e5m22float(dst, src,
+               mask); // 将src的第一部分转换成vector_float类型并写入dst
+asc_e5m22float_v2(dst, src,
+                  mask); // 将src的第二部分转换成vector_float类型并写入dst
+asc_e5m22float_v3(dst, src,
+                  mask); // 将src的第三部分转换成vector_float类型并写入dst
+asc_e5m22float_v4(dst, src,
+                  mask); // 将src的第四部分转换成vector_float类型并写入dst
 ```

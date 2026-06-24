@@ -10,7 +10,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000002055436684_zh-cn_topic_0000001526111046_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
+```text
 OpParamDef &Comment(const char *comment)
 ```
 
@@ -45,7 +45,7 @@ OpParamDef &Comment(const char *comment)
 
 ## 调用示例<a name="zh-cn_topic_0000002055436684_zh-cn_topic_0000001526111046_zh-cn_topic_0000001575944081_section320753512363"></a>
 
-```
+```cpp
 class AddCustom : public OpDef {
 public:
     explicit AddCustom(const char* name) : OpDef(name)
@@ -69,10 +69,8 @@ public:
 
         this->SetInferShape(ge::InferShape).SetInferDataType(ge::InferDataType);
 
-        this->AICore()
-            .SetTiling(optiling::TilingFunc);
+        this->AICore().SetTiling(optiling::TilingFunc);
         this->AICore().AddConfig("ascendxxx");
-
     }
 };
 ```

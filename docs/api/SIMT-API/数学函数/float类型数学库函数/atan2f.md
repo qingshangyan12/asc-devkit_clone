@@ -30,7 +30,7 @@
 
 ## 函数原型
 
-```
+```text
 inline float atan2f(float y, float x)
 ```
 
@@ -74,7 +74,7 @@ y/x的反正切值。
 
 使用该接口需要包含"simt\_api/math\_functions.h"头文件。
 
-```
+```cpp
 #include "simt_api/math_functions.h"
 ```
 
@@ -82,8 +82,8 @@ y/x的反正切值。
 
 - SIMT编程场景：
 
-    ```
-    __global__ __launch_bounds__(256) void compute_atan2f(float *result, const float *x, const float *y, uint32_t count)
+    ```cpp
+    __global__ __launch_bounds__(256) void compute_atan2f(float* result, const float* x, const float* y, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= count) {
@@ -95,8 +95,9 @@ y/x的反正切值。
 
 - SIMD与SIMT混合编程场景：
 
-    ```
-    __simt_vf__ __launch_bounds__(256) inline void compute_atan2f_vf(__gm__ float *result, __gm__ const float *x, __gm__ const float *y, uint32_t count)
+    ```cpp
+    __simt_vf__ __launch_bounds__(256) inline void compute_atan2f_vf(
+        __gm__ float* result, __gm__ const float* x, __gm__ const float* y, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= count) {
@@ -105,7 +106,8 @@ y/x的反正切值。
         result[idx] = atan2f(y[idx], x[idx]);
     }
 
-    __global__ __vector__ void run_atan2f(__gm__ float *result, __gm__ const float *x, __gm__ const float *y, uint32_t count)
+    __global__ __vector__ void run_atan2f(
+        __gm__ float* result, __gm__ const float* x, __gm__ const float* y, uint32_t count)
     {
         asc_vf_call<compute_atan2f_vf>(dim3(256), result, x, y, count);
     }
@@ -113,7 +115,7 @@ y/x的反正切值。
 
 输入输出示例如下：
 
-```
+```text
 y：1.5, 2.5, 3.5, 4.5
 x：0.25, 0.75, 1.25, 1.75
 result: 1.405648 1.27934 1.227772 1.199905

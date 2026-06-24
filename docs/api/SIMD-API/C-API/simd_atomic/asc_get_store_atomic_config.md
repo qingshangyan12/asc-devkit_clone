@@ -41,8 +41,8 @@ PIPE_S
 ```c++
 asc_store_atomic_config set_config;
 set_config.atomic_type = 1; // 开启原子操作,进行原子操作的数据类型为float，值为1
-set_config.atomic_op = 0; // 求和操作,值为0
+set_config.atomic_op = 0;   // 求和操作,值为0
 asc_set_store_atomic_config(set_config);
-asc_store_atomic_config get_config;    // 用于获取原子操作启用位和原子操作类型的值
-asc_get_store_atomic_config(get_config);    // get_config.atomic_type = 1; get_config.atomic_op = 0;
+asc_store_atomic_config get_config;      // 用于获取原子操作启用位和原子操作类型的值
+asc_get_store_atomic_config(get_config); // get_config.atomic_type = 1; get_config.atomic_op = 0;
 ```

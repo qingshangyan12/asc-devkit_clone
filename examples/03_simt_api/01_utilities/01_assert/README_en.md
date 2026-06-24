@@ -29,7 +29,7 @@ This example demonstrates how to use the `assert()` interface in SIMT programmin
 
 - Operator Implementation:
   ```cpp
-  __global__ void  simt_assert(float* input, uint32_t in_shape)
+  __global__ void simt_assert(float* input, uint32_t in_shape)
   {
       // Calculate global thread ID
       int32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -39,7 +39,7 @@ This example demonstrates how to use the `assert()` interface in SIMT programmin
           printf("[SIMT] %s\n", "trap check start 3!");
           assert(in_shape < 1);
           printf("[SIMT] %s\n", "trap check 1!");
-      } else if(threadIdx.x < 5) {
+      } else if (threadIdx.x < 5) {
           printf("[SIMT] %s\n", "trap check 2!");
           assert(in_shape > 1);
           printf("[SIMT] %s\n", "trap check 3!");
@@ -76,7 +76,7 @@ Run the following steps in the root directory of this example to build and execu
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
 
   After execution, the following print information is displayed, indicating that the function works correctly.
-  ```
+  ```bash
   [SIMT] trap check 2!
   [SIMT] trap check 2!
   [SIMT] trap check 2!

@@ -16,7 +16,7 @@ This example obtains the global TPipe pointer based on the GetTPipePtr interface
 
 ## Directory Structure
 
-```
+```text
 ├── get_tpipe_ptr
 │   ├── CMakeLists.txt          // Build project file
 │   ├── get_tpipe_ptr.asc       // Ascend C example implementation & invocation example

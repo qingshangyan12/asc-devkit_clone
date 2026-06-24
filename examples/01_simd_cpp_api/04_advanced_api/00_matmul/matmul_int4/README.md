@@ -13,7 +13,7 @@ A、B矩阵为int4b_t数据类型输入的Matmul样例。
 
 ## 目录结构介绍
 
-```
+```text
 ├── matmul_int4
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件

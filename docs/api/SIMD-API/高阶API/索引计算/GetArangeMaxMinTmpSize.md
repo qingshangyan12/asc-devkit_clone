@@ -11,11 +11,11 @@
 > [!NOTE]说明
 >GetArithProgressionMaxMinTmpSize接口废弃，并将在后续版本移除，请不要使用该接口。请使用GetArangeMaxMinTmpSize接口。
 
-```
+```cpp
 void GetArangeMaxMinTmpSize(uint32_t& maxValue, uint32_t& minValue)
 ```
 
-```
+```cpp
 void GetArithProgressionMaxMinTmpSize(uint32_t& maxValue, uint32_t& minValue)
 ```
 
@@ -38,7 +38,7 @@ void GetArithProgressionMaxMinTmpSize(uint32_t& maxValue, uint32_t& minValue)
 
 ## 调用示例
 
-```
+```cpp
 uint32_t maxValue = 0;
 uint32_t minValue = 0;
 AscendC::GetArangeMaxMinTmpSize(maxValue, minValue);

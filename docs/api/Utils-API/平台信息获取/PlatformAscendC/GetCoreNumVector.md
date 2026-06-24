@@ -8,7 +8,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001817714666_zh-cn_topic_0000001442758437_section13230182415108"></a>
 
-```
+```cpp
 uint32_t GetCoreNumVector(void) const
 ```
 
@@ -36,8 +36,9 @@ Ascend 950PR/Ascend 950DT不支持该接口，返回0
 
 ## 调用示例<a name="zh-cn_topic_0000001817714666_zh-cn_topic_0000001442758437_section320753512363"></a>
 
-```
-ge::graphStatus TilingXXX(gert::TilingContext* context) {
+```cpp
+ge::graphStatus TilingXXX(gert::TilingContext* context)
+{
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
     auto aivCoreNum = ascendcPlatform.GetCoreNumAiv();
     auto vectorCoreNum = ascendcPlatform.GetCoreNumVector();

@@ -66,7 +66,7 @@
 ## 函数原型<a name="zh-cn_topic_0000002000199397_zh-cn_topic_0000001592243993_section2067518173415"></a>
 
 ```cpp
-void GmFree(void *ptr)
+void GmFree(void* ptr)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000002000199397_zh-cn_topic_0000001592243993_section158061867342"></a>

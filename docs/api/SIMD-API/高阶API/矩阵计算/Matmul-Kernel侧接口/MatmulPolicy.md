@@ -277,7 +277,8 @@
         mm.SetBias(gmBias);
     }
 
-    // 调用GetTensorC接口后，将Matmul一次Iterate的计算结果一分为二，搬运到两个AIV核的Unified Buffer。
+    // 调用GetTensorC接口后，将Matmul一次Iterate的计算结果一分为二，搬运到两个AIV核的Unified
+    // Buffer。
     pipe.InitBuffer(resultCMatrix, 1, tiling.M* tiling.N * sizeof(C_T));
     mm.template Iterate<false>();
     bufferC = resultCMatrix.AllocTensor<C_T>();
@@ -285,7 +286,8 @@
     uint16_t mIter_ = Ceil(tiling.singleCoreM, tiling.baseM);
     uint16_t mnIter_ = nIter_ * mIter_;
     for (int i = 0; i < mnIter_; i++) {
-        mm.template GetTensorC<false>(bufferC, false, false); // false // kfc vec0 iterate
+        mm.template GetTensorC<false>(bufferC, false,
+                                      false); // false // kfc vec0 iterate
         PipeBarrier<PIPE_ALL>();
     }
     mm.End();
@@ -326,7 +328,8 @@
         mm.SetBias(gmBias);
     }
 
-    // 调用GetTensorC接口后，将Matmul一次Iterate的计算结果一分为二，搬运到两个AIV核的Unified Buffer。
+    // 调用GetTensorC接口后，将Matmul一次Iterate的计算结果一分为二，搬运到两个AIV核的Unified
+    // Buffer。
     pipe.InitBuffer(resultCMatrix, 1, tiling.M* tiling.N * sizeof(C_T));
     mm.template Iterate<false>();
     bufferC = resultCMatrix.AllocTensor<C_T>();
@@ -334,7 +337,8 @@
     uint16_t mIter_ = Ceil(tiling.singleCoreM, tiling.baseM);
     uint16_t mnIter_ = nIter_ * mIter_;
     for (int i = 0; i < mnIter_; i++) {
-        mm.template GetTensorC<false>(bufferC, false, false); // false // kfc vec0 iterate
+        mm.template GetTensorC<false>(bufferC, false,
+                                      false); // false // kfc vec0 iterate
         PipeBarrier<PIPE_ALL>();
     }
     mm.End();

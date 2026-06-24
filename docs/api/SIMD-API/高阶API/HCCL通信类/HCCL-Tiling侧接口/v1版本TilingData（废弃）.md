@@ -65,7 +65,7 @@ AI CPU启动下发通信任务前，需获取固定的通信配置[Mc2Msg](#tabl
 
 以自定义算子AllGatherMatmulCustom为例，如下为该算子的算子原型，"gather\_out"为通信任务AllGather的输出。
 
-```
+```json
 [
     {
         "op": "AllGatherMatmulCustom",
@@ -159,7 +159,7 @@ AI CPU启动下发通信任务前，需获取固定的通信配置[Mc2Msg](#tabl
 
 算子的Tiling Data结构需要按顺序完整包含Mc2Msg参数，如下为算子Tiling Data代码示例。
 
-```
+```cpp
 // 声明Mc2Msg结构
 BEGIN_TILING_DATA_DEF(Mc2Msg)
 TILING_DATA_FIELD_DEF(uint32_t, preparePosition);
@@ -208,7 +208,7 @@ TILING_DATA_FIELD_DEF_STRUCT(Mc2Msg, msg);
 END_TILING_DATA_DEF;
 ```
 
-```
+```text
 // 配置Mc2Msg
 AllGatherMatmulCustomTilingData tiling;
 tiling.msg.set_preparePosition(1);

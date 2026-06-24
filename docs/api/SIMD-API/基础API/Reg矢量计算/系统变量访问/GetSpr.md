@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <SpecialPurposeReg spr>
 __aicore__ inline int64_t GetSpr()
 ```

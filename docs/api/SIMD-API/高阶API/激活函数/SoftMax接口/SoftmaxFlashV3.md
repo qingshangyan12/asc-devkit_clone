@@ -26,7 +26,7 @@ SoftmaxFlash增强版本，对应Softmax PASA算法。将输入tensor\[m<sub>0</
 
 为方便理解，通过Python伪代码实现的方式，表达其计算公式如下。其中，repeatSize为64，elementNumPerBlk/BlkcntPerRepeat为8，splitMeanCnt为8，src、inmean、inmax、 insum、update为输入，dst、x\_mean、x\_sum、x\_max、exp\_max为输出。
 
-```
+```python
 def softmax_flash_3(src, height, width, loopCnt, alpha, baseK, inmax=None, insum=None, inmean=None, update=False):
     scalar = alpha / (1 - alpha)
     #(m,n)->(m,64)
@@ -73,16 +73,28 @@ def softmax_flash_3(src, height, width, loopCnt, alpha, baseK, inmax=None, insum
 
 -   接口框架申请临时空间
 
-    ```
-    template <typename T, typename U, bool isUpdate = false, bool isReuseSource = false, bool isBasicBlock = false, bool isDataFormatNZ = false, const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
-    __aicore__ inline void SoftmaxFlashV3(const LocalTensor<T>& dstTensor, const LocalTensor<U>& meanTensor, const LocalTensor<U>& expSumTensor, const LocalTensor<U>& maxTensor, const LocalTensor<T>& srcTensor, const LocalTensor<T>& expMaxTensor, const LocalTensor<U>& inMeanTensor, const LocalTensor<U>& inExpSumTensor, const LocalTensor<U>& inMaxTensor, const SoftMaxTiling& tiling, const SoftMaxParams& params)
+    ```cpp
+    template <
+        typename T, typename U, bool isUpdate = false, bool isReuseSource = false, bool isBasicBlock = false,
+        bool isDataFormatNZ = false, const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
+    __aicore__ inline void SoftmaxFlashV3(
+        const LocalTensor<T>& dstTensor, const LocalTensor<U>& meanTensor, const LocalTensor<U>& expSumTensor,
+        const LocalTensor<U>& maxTensor, const LocalTensor<T>& srcTensor, const LocalTensor<T>& expMaxTensor,
+        const LocalTensor<U>& inMeanTensor, const LocalTensor<U>& inExpSumTensor, const LocalTensor<U>& inMaxTensor,
+        const SoftMaxTiling& tiling, const SoftMaxParams& params)
     ```
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
-    template <typename T, typename U, bool isUpdate = false, bool isReuseSource = false, bool isBasicBlock = false, bool isDataFormatNZ = false, const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
-    __aicore__ inline void SoftmaxFlashV3(const LocalTensor<T>& dstTensor, const LocalTensor<U>& meanTensor,const LocalTensor<U>& expSumTensor, const LocalTensor<U>& maxTensor, const LocalTensor<T>& srcTensor,const LocalTensor<T>& expMaxTensor, const LocalTensor<U>& inMeanTensor, const LocalTensor<U>& inExpSumTensor, const LocalTensor<U>& inMaxTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling, const SoftMaxParams& params)
+    ```cpp
+    template <
+        typename T, typename U, bool isUpdate = false, bool isReuseSource = false, bool isBasicBlock = false,
+        bool isDataFormatNZ = false, const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
+    __aicore__ inline void SoftmaxFlashV3(
+        const LocalTensor<T>& dstTensor, const LocalTensor<U>& meanTensor, const LocalTensor<U>& expSumTensor,
+        const LocalTensor<U>& maxTensor, const LocalTensor<T>& srcTensor, const LocalTensor<T>& expMaxTensor,
+        const LocalTensor<U>& inMeanTensor, const LocalTensor<U>& inExpSumTensor, const LocalTensor<U>& inMaxTensor,
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling, const SoftMaxParams& params)
     ```
 
 由于该接口的内部实现中涉及复杂的计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -124,7 +136,7 @@ def softmax_flash_3(src, height, width, loopCnt, alpha, baseK, inmax=None, insum
 | tiling | 输入 | SoftmaxFlashV3接口计算所需Tiling信息，Tiling信息的获取请参考[SoftmaxFlashV3 Tiling接口](SoftmaxFlashV3-Tiling接口.md)。 |
 | params | 输入 | srcTensor的shape信息和计算相关参数。SoftMaxParams类型，具体定义如下方代码所示，其中参数的含义为：<br>srcM：非尾轴长度的乘积。<br>srcK：尾轴长度，必须32Byte对齐。<br>oriSrcM：原始非尾轴长度的乘积。<br>oriSrcK：原始尾轴长度。<br>loopCnt：update为true时，公式中的循环次数loopCnt，该参数大于等于1。<br>splitMeanCnt：公式中计算每一行平均值时的分块个数，当前该参数仅支持取值为8。<br>alpha：公式中的计算参数，推荐取值0.9375、0.96889、0.984497。<br><br>注意，当前本接口不支持非对齐场景，因此参数srcM与oriSrcM相等，参数srcK与oriSrcK相等。 |
 
-```
+```cpp
 struct SoftMaxParams {
     uint32_t srcM;
     uint32_t srcK;
@@ -152,7 +164,7 @@ struct SoftMaxParams {
 
 本样例中输入srcTensor和输出dstTensor的shape大小为\[8, 1024\]，输入inMeanTensor、inExpSumTensor、inMaxTensor的shape大小为\[8, 8\]，数据类型为float；输出expMaxTensor的shape大小为\[8, 16\]，数据类型为half；输入和输出的数据排布格式为ND，srcTensor和dstTensor空间不复用，模板参数isUpdate为true。
 
-```
+```cpp
 // dstLocal: 存放SoftMax计算结果的Tensor
 // meanLocal：存放softmax计算过程中平均值的结果
 // expSumLocal：存放softmax计算过程中reducesum的结果
@@ -186,7 +198,7 @@ AscendC::SoftmaxFlashV3<T, U, true>(
 
 结果示例如下：
 
-```
+```text
 输入数据(srcLocal)：
 [[ 0.        0.001221  0.002441 ...  2.496     2.498     2.498   ]
  [ 2.5       2.502     2.502    ...  4.996     4.996     5.      ]

@@ -56,9 +56,10 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T, typename U>
-__aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<U>& src1, const int32_t& count)
+__aicore__ inline void ShiftLeft(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<U>& src1, const int32_t& count)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -147,13 +148,13 @@ __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>
 
 ## 调用示例<a name="section132384819392"></a>
 
-```
+```cpp
 AscendC::ShiftLeft(dstLocal, srcLocal0, srcLocal1, 512);
 ```
 
 结果示例如下：
 
-```
+```text
 输入数据srcLocal0：[1 2 3 ... 512]
 输入数据srcLocal1：[2 2 2 ... 2]
 输出数据dstLocal：[4 8 12 ... 2048]

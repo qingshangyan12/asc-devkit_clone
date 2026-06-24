@@ -54,14 +54,17 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品；
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-    __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsArch3510<config.format>& intriParams)
+    __aicore__ inline void Fixpipe(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsArch3510<config.format>& intriParams)
     ```
 
 - 通路L0C Buffer(CO1)->L1 Buffer(C1)，开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-    __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<uint64_t>& cbufWorkspace, const FixpipeParamsArch3510<config.format>& intriParams)
+    __aicore__ inline void Fixpipe(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<uint64_t>& cbufWorkspace,
+        const FixpipeParamsArch3510<config.format>& intriParams)
     ```
 
 **传入FixpipeParamsV220参数的接口：**
@@ -70,14 +73,19 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品；
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-    __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsV220& intriParams)
+    __aicore__ inline void Fixpipe(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsV220& intriParams)
     ```
 
 - 通路L0C Buffer(CO1)->L1 Buffer(C1)，开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
 
     ```cpp
-    template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S = uint64_t, typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
-    __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<S>& cbufWorkspace, const FixpipeParamsV220& intriParams)
+    template <
+        typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S = uint64_t,
+        typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
+    __aicore__ inline void Fixpipe(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<S>& cbufWorkspace,
+        const FixpipeParamsV220& intriParams)
     ```
 
 ## 参数说明<a id="zh-cn_topic_0000002511188540_section16128134420472"></a>
@@ -246,39 +254,39 @@ Fixpipe完整样例请参考[fixpipe\_l0c2l1样例](https://gitcode.com/cann/asc
 - 示例：通路L0C Buffer->L1 Buffer。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为int8_t，不开启NZ2ND的格式转换，开启scalar量化。
 
     ```cpp
-        AscendC::LocalTensor<outputType> c1Local(AscendC::TPosition::C1, c1Addr, cSizeAlignL1);
-    
+    AscendC::LocalTensor<outputType> c1Local(AscendC::TPosition::C1, c1Addr, cSizeAlignL1);
+
     #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-        uint16_t c0Size = 32;
-        AscendC::FixpipeParamsV220 fixpipeParams;
-        // NZ2NZ场景，FixpipeParamsV220的dstStride单位为datablock（32字节）
-        fixpipeParams.dstStride = baseM * c0Size * sizeof(outputType) / AscendC::ONE_BLK_SIZE;
-        fixpipeParams.mSize = baseM;
-        fixpipeParams.srcStride = CeilAlign(baseM, CUBE_BLOCK);
-        fixpipeParams.nSize = baseN;
-        // scalar quant
-        fixpipeParams.quantPre = QuantMode_t::QF322B8_PRE;
-        uint64_t deqScalar = static_cast<uint64_t>(*reinterpret_cast<int32_t *>(&quantScalar));
-        constexpr bool sign = (AscendC::IsSameType<outputType, int8_t>::value) ? true : false;
-        deqScalar = (deqScalar & ~(static_cast<uint64_t>(1) << 46)) | (static_cast<uint64_t>(sign) << 46);
-        fixpipeParams.deqScalar = deqScalar;
-        AscendC::Fixpipe<outputType, l0cType, AscendC::CFG_NZ>(c1Local, c, fixpipeParams);
-    
+    uint16_t c0Size = 32;
+    AscendC::FixpipeParamsV220 fixpipeParams;
+    // NZ2NZ场景，FixpipeParamsV220的dstStride单位为datablock（32字节）
+    fixpipeParams.dstStride = baseM * c0Size * sizeof(outputType) / AscendC::ONE_BLK_SIZE;
+    fixpipeParams.mSize = baseM;
+    fixpipeParams.srcStride = CeilAlign(baseM, CUBE_BLOCK);
+    fixpipeParams.nSize = baseN;
+    // scalar quant
+    fixpipeParams.quantPre = QuantMode_t::QF322B8_PRE;
+    uint64_t deqScalar = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&quantScalar));
+    constexpr bool sign = (AscendC::IsSameType<outputType, int8_t>::value) ? true : false;
+    deqScalar = (deqScalar & ~(static_cast<uint64_t>(1) << 46)) | (static_cast<uint64_t>(sign) << 46);
+    fixpipeParams.deqScalar = deqScalar;
+    AscendC::Fixpipe<outputType, l0cType, AscendC::CFG_NZ>(c1Local, c, fixpipeParams);
+
     #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-        uint16_t c0Size = 32;
-        AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::NZ> fixpipeParams;
-        // NZ2NZ场景，FixpipeParamsArch3510的dstStride单位为元素个数
-        fixpipeParams.dstStride = baseM * c0Size;
-        fixpipeParams.mSize = baseM;
-        fixpipeParams.srcStride = CeilAlign(baseM, CUBE_BLOCK);
-        fixpipeParams.nSize = baseN;
-        // scalar quant
-        fixpipeParams.quantPre = QuantMode_t::QF322B8_PRE;
-        uint64_t deqScalar = static_cast<uint64_t>(*reinterpret_cast<int32_t *>(&quantScalar));
-        constexpr bool sign = (AscendC::IsSameType<outputType, int8_t>::value) ? true : false;
-        deqScalar = (deqScalar & ~(static_cast<uint64_t>(1) << 46)) | (static_cast<uint64_t>(sign) << 46);
-        fixpipeParams.deqScalar = deqScalar;
-        AscendC::Fixpipe<outputType, l0cType, AscendC::CFG_NZ>(c1Local, c, fixpipeParams);
+    uint16_t c0Size = 32;
+    AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::NZ> fixpipeParams;
+    // NZ2NZ场景，FixpipeParamsArch3510的dstStride单位为元素个数
+    fixpipeParams.dstStride = baseM * c0Size;
+    fixpipeParams.mSize = baseM;
+    fixpipeParams.srcStride = CeilAlign(baseM, CUBE_BLOCK);
+    fixpipeParams.nSize = baseN;
+    // scalar quant
+    fixpipeParams.quantPre = QuantMode_t::QF322B8_PRE;
+    uint64_t deqScalar = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&quantScalar));
+    constexpr bool sign = (AscendC::IsSameType<outputType, int8_t>::value) ? true : false;
+    deqScalar = (deqScalar & ~(static_cast<uint64_t>(1) << 46)) | (static_cast<uint64_t>(sign) << 46);
+    fixpipeParams.deqScalar = deqScalar;
+    AscendC::Fixpipe<outputType, l0cType, AscendC::CFG_NZ>(c1Local, c, fixpipeParams);
     #endif
     ```
 

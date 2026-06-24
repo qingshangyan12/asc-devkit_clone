@@ -6,35 +6,36 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001656780128_section3992421457"></a>
 
-```
+```cpp
 class OpAttrDef {
 public:
-  explicit OpAttrDef(const char *name);
-  OpAttrDef(const OpAttrDef &attr_def);
-  ~OpAttrDef();
-  OpAttrDef &operator=(const OpAttrDef &attr_def);
-  OpAttrDef &AttrType(Option attr_type);
-  OpAttrDef &Bool(void);
-  OpAttrDef &Bool(bool value);
-  OpAttrDef &Float(void);
-  OpAttrDef &Float(float value);
-  OpAttrDef &Int(void);
-  OpAttrDef &Int(int64_t value);
-  OpAttrDef &String(void);
-  OpAttrDef &String(const char *value);
-  OpAttrDef &ListBool(void);
-  OpAttrDef &ListBool(std::vector<bool> value);
-  OpAttrDef &ListFloat(void);
-  OpAttrDef &ListFloat(std::vector<float> value);
-  OpAttrDef &ListInt(void);
-  OpAttrDef &ListInt(std::vector<int64_t> value);
-  OpAttrDef &ListListInt(void);
-  OpAttrDef &ListListInt(std::vector<std::vector<int64_t>> value);
-  OpAttrDef &Version(uint32_t version);
-  ge::AscendString &GetName(void) const;
-  bool IsRequired(void);
+    explicit OpAttrDef(const char* name);
+    OpAttrDef(const OpAttrDef& attr_def);
+    ~OpAttrDef();
+    OpAttrDef& operator=(const OpAttrDef& attr_def);
+    OpAttrDef& AttrType(Option attr_type);
+    OpAttrDef& Bool(void);
+    OpAttrDef& Bool(bool value);
+    OpAttrDef& Float(void);
+    OpAttrDef& Float(float value);
+    OpAttrDef& Int(void);
+    OpAttrDef& Int(int64_t value);
+    OpAttrDef& String(void);
+    OpAttrDef& String(const char* value);
+    OpAttrDef& ListBool(void);
+    OpAttrDef& ListBool(std::vector<bool> value);
+    OpAttrDef& ListFloat(void);
+    OpAttrDef& ListFloat(std::vector<float> value);
+    OpAttrDef& ListInt(void);
+    OpAttrDef& ListInt(std::vector<int64_t> value);
+    OpAttrDef& ListListInt(void);
+    OpAttrDef& ListListInt(std::vector<std::vector<int64_t>> value);
+    OpAttrDef& Version(uint32_t version);
+    ge::AscendString& GetName(void) const;
+    bool IsRequired(void);
+
 private:
-  ...
+    ...
 };
 ```
 

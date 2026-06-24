@@ -12,7 +12,7 @@ This example implements a complete sorting pipeline based on four interfaces: Pr
 
 ## Directory Structure
 
-```
+```text
 ├── region_proposal_sort
 │   ├── scripts
 │   │   ├── gen_data.py                    // Script for generating input data and ground truth data

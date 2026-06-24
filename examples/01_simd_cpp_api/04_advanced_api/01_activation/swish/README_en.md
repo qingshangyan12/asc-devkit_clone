@@ -19,7 +19,7 @@ This example controls the two modes through the compilation macro `USE_SILU_MODE
 
 ## Directory Structure
 
-```
+```text
 ├── swish
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data (supports Swish/Silu modes)

@@ -58,7 +58,7 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template<typename T>
+template <typename T>
 __aicore__ inline void GetCmpMask(const LocalTensor<T>& dst)
 ```
 
@@ -97,12 +97,12 @@ AscendC::LocalTensor<float> src0Local;
 AscendC::LocalTensor<float> src1Local;
 AscendC::LocalTensor<uint8_t> dstLocal;
 uint64_t mask = 256 / sizeof(float); // 256为每个迭代处理的字节数，结果为64
-AscendC::BinaryRepeatParams repeatParams = { 1, 1, 1, 8, 8, 8 };
+AscendC::BinaryRepeatParams repeatParams = {1, 1, 1, 8, 8, 8};
 AscendC::Compare(src0Local, src1Local, AscendC::CMPMODE::LT, mask, repeatParams);
 AscendC::GetCmpMask(dstLocal); // mask为0x40，比较数据类型为float，则每次迭代的32B里只有第7个float数字参与compare
 ```
 
-```
+```text
 输出示例：
 src0Local:   [1, 2, 3, 4, 5, 6, 7, 8, 9, ...256]
 src1Local:   [2, 3, 4, 5, 6, 7, 8, 9, ...257]

@@ -14,7 +14,7 @@ This example demonstrates the usage of the SyncAll inter-core synchronization in
 
 ## Directory Structure
 
-```
+```text
 ├── sync_all
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

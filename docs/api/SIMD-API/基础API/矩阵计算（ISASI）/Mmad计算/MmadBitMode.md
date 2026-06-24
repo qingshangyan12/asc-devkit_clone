@@ -29,7 +29,7 @@ MmadBitModeParams类使用union与bit-field方法，采用bit位表达参数类�
 MmadBitModeParams类可以直接使用MmadBitModeParams结构体类型对象初始化：
 
 ```cpp
-__aicore__ inline MmadBitModeParams(const MmadBitModeParams &mmadParams_);
+__aicore__ inline MmadBitModeParams(const MmadBitModeParams& mmadParams_);
 ```
 
 也可以使用各参数的Set函数修改参数值，并且由于使用了联合体，还可以对config0直接进行逐bit位修改来修改参数。
@@ -40,20 +40,28 @@ __aicore__ inline MmadBitModeParams(const MmadBitModeParams &mmadParams_);
 
   ```cpp
   template <typename T, typename U, typename S>
-  __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const MmadBitModeParams& mmadParams)
+  __aicore__ inline void Mmad(
+      const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
+      const MmadBitModeParams& mmadParams)
 
-  template <typename T, typename U, typename S>
-  __aicore__ inline void MmadMx(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const MmadBitModeParams& mmadParams)
+      template <typename T, typename U, typename S>
+      __aicore__ inline void MmadMx(
+          const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
+          const MmadBitModeParams& mmadParams)
   ```
 
 - 传入bias
 
   ```cpp
   template <typename T, typename U, typename S, typename V>
-  __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias, const MmadBitModeParams& mmadParams)
+  __aicore__ inline void Mmad(
+      const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
+      const MmadBitModeParams& mmadParams)
 
-  template <typename T, typename U, typename S, typename V>
-  __aicore__ inline void MmadMx(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias, const MmadBitModeParams& mmadParams)
+      template <typename T, typename U, typename S, typename V>
+      __aicore__ inline void MmadMx(
+          const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
+          const MmadBitModeParams& mmadParams)
   ```
 
 ## 参数说明

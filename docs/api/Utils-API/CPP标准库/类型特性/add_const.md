@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename Tp>
 struct add_const;
 ```
@@ -39,7 +39,7 @@ add\_const是一个结构体，其提供一个嵌套类型type，表示添加con
 
 ## 调用示例
 
-```
+```cpp
 // Test non-const type
 ascendc_assert((AscendC::Std::is_same_v<AscendC::Std::add_const<int>::type, const int>));
 ascendc_assert((AscendC::Std::is_same_v<AscendC::Std::add_const<double>::type, const double>));

@@ -22,7 +22,7 @@
 
 打印示例如下：
 
-```
+```text
 descId is 11, rsv is 0, timeStamp is 815603975350485, pcPtr is 19792358553124, entry is 815603975328116.
 ```
 
@@ -32,7 +32,7 @@ descId is 11, rsv is 0, timeStamp is 815603975350485, pcPtr is 19792358553124, e
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void asc_time_stamp(uint32_t desc_id)
 ```
 
@@ -55,13 +55,13 @@ __aicore__ inline void asc_time_stamp(uint32_t desc_id)
 
 ## 调用示例
 
-```
+```text
 asc_time_stamp(11);
 ```
 
 打印结果如下（Dump信息头等仅在使用自定义算子工程时才会打印）：
 
-```
+```text
 opType=AddCustom, DumpHead: AIV-0, CoreType=AIV, block dim=8, total_block_num=8, block_remain_len=1047136, block_initial_space=1048576, rsv=0, magic=5aa5bccd
 ...// 一些框架内部的打点信息
 descId is 11, rsv is 0, timeStamp is 815603975350485, pcPtr is 19792358553124, entry is 815603975328116.

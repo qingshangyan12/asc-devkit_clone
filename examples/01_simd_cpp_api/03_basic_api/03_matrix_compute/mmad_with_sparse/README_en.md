@@ -13,7 +13,7 @@ This example introduces the basic API MmadWithSparse invocation example.
 
 ## Directory Structure
 
-```
+```text
 ├── mmad_with_sparse
 │   ├── scripts
 │   │   ├── gen_data.py             // Script for generating input data and ground truth data
@@ -29,7 +29,7 @@ This example introduces the basic API MmadWithSparse invocation example.
 - Example function:
   This example implements a sparse matrix multiplication with [m, n, k] fixed at [128, 128, 64], using the Ascend C basic API MmadWithSparse interface. 2:4 sparseMatmul is a special type of matrix multiplication that requires at most 2 values to be non-zero in each consecutive group of 4 weights or activation values, with the remaining 2 forced to zero. The mathematical expression is:
 
-  ```
+  ```text
   C = A * B
   ```
   where the original B matrix shape is [N, K], with at least 2 zero elements in every 4 elements, compressed to [N, K/2] through a 2:4 densification strategy before input. The B matrix must be stored in transposed form, that is, constructed and compressed as [N, K] input. The A and B matrix data types only support int8_t, and the index matrix data type is uint8_t.

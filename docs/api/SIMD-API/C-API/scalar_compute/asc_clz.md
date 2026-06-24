@@ -40,5 +40,5 @@ PIPE_S
 
 ```c++
 uint64_t value_in = 0x0fffffffffffffff;
-int64_t ans = asc_clz(value_in); //返回ans = 4
+int64_t ans = asc_clz(value_in); // 返回ans = 4
 ```

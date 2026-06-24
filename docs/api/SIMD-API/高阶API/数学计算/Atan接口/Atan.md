@@ -41,29 +41,32 @@
 -   通过sharedTmpBuffer入参传入临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false, const AtanConfig& config = defaultAtanConfig>
-        __aicore__ inline void Atan(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+        __aicore__ inline void Atan(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+            const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false, const AtanConfig& config = defaultAtanConfig>
-        __aicore__ inline void Atan(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
+        __aicore__ inline void Atan(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
         ```
 
 -   接口框架申请临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false, const AtanConfig& config = defaultAtanConfig>
         __aicore__ inline void Atan(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false, const AtanConfig& config = defaultAtanConfig>
         __aicore__ inline void Atan(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
         ```
@@ -85,7 +88,7 @@
 | isReuseSource | 是否允许修改源操作数。该参数预留，传入默认值false即可。 |
 | config | <!-- npu="950" id9 -->该参数仅支持Ascend 950PR/Ascend 950DT。<br><br><!-- end id9 -->Atan算法的相关配置。此参数可选配，AtanConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：Atan内部实现使用的算法。AtanAlgo类型，支持的取值如下：TAYLOR_EXPANSION：默认值。该算法使用6阶泰勒展开实现Atan，支持的数据类型为half、float。POLYNOMIAL_APPROXIMATION：该算法是17次多项式逼近算法，支持的数据类型为float。 |
 
-```
+```cpp
 enum class AtanAlgo {
     TAYLOR_EXPANSION = 0,
     POLYNOMIAL_APPROXIMATION,
@@ -117,7 +120,7 @@ struct AtanConfig {
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放Atan计算结果的Tensor
 // srcLocal: 存放Atan计算输入的Tensor
 // sharedTmpBuffer: 存放Atan计算过程中临时缓存的Tensor
@@ -139,7 +142,7 @@ AscendC::Atan<float, false, atanConfig>(dstLocal, srcLocal, sharedTmpBuffer, 512
 
 示例数据如下：
 
-```
+```text
 输入数据(srcLocal):
 [-2.56 -2.55 -2.54 ... 0. ... 2.53  2.54  2.55]
 输出数据(dstLocal):

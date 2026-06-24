@@ -63,7 +63,8 @@ $$
 
   ```cpp
   template <typename T>
-  __aicore__ inline void AddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const int32_t& count)
+  __aicore__ inline void AddRelu(
+      const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const int32_t& count)
   ```
 
 - tensor高维切分计算
@@ -71,14 +72,18 @@ $$
 
     ```cpp
     template <typename T, bool isSetMask = true>
-    __aicore__ inline void AddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    __aicore__ inline void AddRelu(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint64_t mask[],
+        const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
     ```
 
   - mask连续模式
 
     ```cpp
     template <typename T, bool isSetMask = true>
-    __aicore__ inline void AddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+    __aicore__ inline void AddRelu(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint64_t mask,
+        const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -134,17 +139,17 @@ $$
   // repeatTime = 4，一次迭代计算128个数，共计算512个数
   // dstBlkStride, src0BlkStride, src1BlkStride = 1，单次迭代内数据连续读取和写入
   // dstRepStride, src0RepStride, src1RepStride = 8，相邻迭代间数据连续读取和写入
-  AscendC::AddRelu(dstLocal, src0Local, src1Local, mask, 4, { 1, 1, 1, 8, 8, 8 });
+  AscendC::AddRelu(dstLocal, src0Local, src1Local, mask, 4, {1, 1, 1, 8, 8, 8});
   ```
 
 - tensor高维切分计算样例-mask逐bit模式。
 
   ```cpp
-  uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
+  uint64_t mask[2] = {UINT64_MAX, UINT64_MAX};
   // repeatTime = 4，一次迭代计算128个数，共计算512个数
   // dstBlkStride, src0BlkStride, src1BlkStride = 1，单次迭代内数据连续读取和写入
   // dstRepStride, src0RepStride, src1RepStride = 8，相邻迭代间数据连续读取和写入
-  AscendC::AddRelu(dstLocal, src0Local, src1Local, mask, 4, { 1, 1, 1, 8, 8, 8 });
+  AscendC::AddRelu(dstLocal, src0Local, src1Local, mask, 4, {1, 1, 1, 8, 8, 8});
   ```
 
 - tensor前n个数据计算样例。

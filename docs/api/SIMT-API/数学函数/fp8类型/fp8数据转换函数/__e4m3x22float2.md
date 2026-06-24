@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```text
 inline float2 __e4m3x22float2(const float8_e4m3x2_t x)
 ```
 
@@ -52,7 +52,7 @@ SIMT编程场景当前不支持使用该接口。
 
 使用该接口需要包含"simt\_api/asc\_fp8.h"头文件。
 
-```
+```cpp
 #include "simt_api/asc_fp8.h"
 ```
 
@@ -60,19 +60,22 @@ SIMT编程场景当前不支持使用该接口。
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     // 使用短向量可提升数据搬运效率
-    __simt_vf__ __launch_bounds__(1024) inline void simt_e4m3x22float2(__gm__ float8_e4m3x2_t* input, __gm__ float2* output, uint32_t input_total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void simt_e4m3x22float2(
+        __gm__ float8_e4m3x2_t* input, __gm__ float2* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        // 每个线程处理1个float8_e4m3x2_t类型的数据，即2个fp8_e4m3fn_t类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx > input_total_length /2) {
+        // 每个线程处理1个float8_e4m3x2_t类型的数据，即2个fp8_e4m3fn_t类型的数据，因此idx >= input_total_length /
+        // 2的线程不处理数据
+        if (idx > input_total_length / 2) {
             return;
         }
         output[idx] = __e4m3x22float2(input[idx]);
     }
-    __global__ __vector__ void cast_kernel(__gm__ uint8_t* input,  __gm__ float* output, uint32_t input_total_length)
+    __global__ __vector__ void cast_kernel(__gm__ uint8_t* input, __gm__ float* output, uint32_t input_total_length)
     {
-        asc_vf_call<simt_e4m3x22float2>(dim3(1024), (__gm__ float8_e4m3x2_t*)input, (__gm__ float2*)output, input_total_length);
+        asc_vf_call<simt_e4m3x22float2>(
+            dim3(1024), (__gm__ float8_e4m3x2_t*)input, (__gm__ float2*)output, input_total_length);
     }
     ```

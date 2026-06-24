@@ -37,10 +37,11 @@ PIPE_S
 
 ```cpp
 asc_set_mask_norm();
-asc_set_vector_mask(0xffffffffffffffff, 0xffffffffffffffff);    // 设置每个迭代内所有元素均参与计算。
+asc_set_vector_mask(0xffffffffffffffff,
+                    0xffffffffffffffff); // 设置每个迭代内所有元素均参与计算。
 
 // 进行高维切分计算
-constexpr uint32_t total_length = 128; //total_length指参与计算的数据总长度
+constexpr uint32_t total_length = 128; // total_length指参与计算的数据总长度
 __ubuf__ half src0[total_length];
 __ubuf__ half src1[total_length];
 __ubuf__ half dst[total_length];

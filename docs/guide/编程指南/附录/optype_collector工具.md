@@ -24,19 +24,19 @@ optype_collector工具用于采集内置/自定义算子包中指定AI处理器�
 
     -   root用户安装Ascend-cann-toolkit包时
 
-        ```
+        ```bash
         source /usr/local/Ascend/cann/set_env.sh
         ```
 
     -   非root用户安装Ascend-cann-toolkit包时
 
-        ```
+        ```bash
         source ${HOME}/Ascend/cann/set_env.sh
         ```
 
     多个自定义算子包路径使用系统路径分隔符分隔。
 
-    ```
+    ```bash
     export ASCEND_CUSTOM_OPP_PATH=/home/custom_opp
     ```
 
@@ -44,7 +44,7 @@ optype_collector工具用于采集内置/自定义算子包中指定AI处理器�
 
     执行如下命令，若能正常显示帮助信息，则表示工具环境正常，功能可正常使用。
 
-    ```
+    ```text
     optype_collector -h
     ```
 
@@ -66,7 +66,7 @@ optype_collector工具用于采集内置/自定义算子包中指定AI处理器�
 
 -   **输出内置算子OpType清单的命令**
 
-    ```
+    ```text
     optype_collector {soc_version}
     optype_collector {soc_version} --builtin
     ```
@@ -80,7 +80,7 @@ optype_collector工具用于采集内置/自定义算子包中指定AI处理器�
 
 -   **输出自定义算子OpType清单的命令**
 
-    ```
+    ```text
     optype_collector {soc_version} --custom
     ```
 
@@ -93,7 +93,7 @@ optype_collector工具用于采集内置/自定义算子包中指定AI处理器�
 
 -   **输出内置算子与自定义算子OpType清单的命令**
 
-    ```
+    ```text
     optype_collector {soc_version} --all
     ```
 
@@ -106,7 +106,7 @@ optype_collector工具用于采集内置/自定义算子包中指定AI处理器�
 
 -   **检测OpType重名冲突的命令**
 
-    ```
+    ```text
     optype_collector --detect-conflicts {soc_version}
     ```
 
@@ -146,13 +146,13 @@ optype_collector工具用于采集内置/自定义算子包中指定AI处理器�
 
 -   **查看内置算子OpType清单**
 
-    ```
+    ```text
     optype_collector {soc_version} --builtin
     ```
 
     执行上述命令，终端打印内置算子OpType清单，屏显信息形如：
 
-    ```
+    ```text
     [Scan Info]
       SoC                    : {soc_version}
       ASCEND_HOME_PATH       : /usr/local/Ascend/latest
@@ -177,13 +177,13 @@ optype_collector工具用于采集内置/自定义算子包中指定AI处理器�
 
 -   **查看自定义算子OpType清单**
 
-    ```
+    ```text
     optype_collector {soc_version} --custom
     ```
 
     执行上述命令，终端打印自定义算子OpType清单。若命中多个自定义算子包，工具会按扫描来源分组展示，屏显信息形如：
 
-    ```
+    ```text
     [Scan Info]
       SoC                    : {soc_version}
       ASCEND_HOME_PATH       : /usr/local/Ascend/latest
@@ -219,7 +219,7 @@ optype_collector工具用于采集内置/自定义算子包中指定AI处理器�
 
 -   **查看全部OpType清单**
 
-    ```
+    ```text
     optype_collector {soc_version} --all
     ```
 
@@ -227,13 +227,13 @@ optype_collector工具用于采集内置/自定义算子包中指定AI处理器�
 
 -   **检测OpType重名冲突**
 
-    ```
+    ```text
     optype_collector --detect-conflicts {soc_version}
     ```
 
     执行上述命令，工具会检测自定义算子OpType与内置算子OpType、自定义算子OpType之间是否重名。若发现冲突，返回值为`1`，屏显信息形如：
 
-    ```
+    ```text
     [Conflict Summary]
       SoC                    : {soc_version}
       Built-in OpTypes       : 3
@@ -262,7 +262,7 @@ optype_collector工具用于采集内置/自定义算子包中指定AI处理器�
 
     若未发现冲突，返回值为`0`，屏显信息形如：
 
-    ```
+    ```text
     [Conflict Summary]
       SoC                    : {soc_version}
       Built-in OpTypes       : 3

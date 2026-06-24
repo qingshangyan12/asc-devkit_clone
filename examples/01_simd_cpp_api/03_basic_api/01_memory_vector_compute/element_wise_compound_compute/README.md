@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── element_wise_compound_compute
 │   ├── scripts
 │   │   ├── gen_data.py                      // 输入数据和真值数据生成脚本

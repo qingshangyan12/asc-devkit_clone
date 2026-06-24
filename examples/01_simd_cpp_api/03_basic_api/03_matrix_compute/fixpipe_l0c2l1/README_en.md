@@ -18,7 +18,7 @@ Note:
 
 ## Directory Structure
 
-```
+```text
 ├── fixpipe_l0c2l1
 │   ├── scripts
 │   │   ├── gen_data.py                // Script for generating input data and ground truth data

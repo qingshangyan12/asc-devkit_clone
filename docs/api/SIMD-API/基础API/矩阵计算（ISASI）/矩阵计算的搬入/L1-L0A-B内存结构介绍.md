@@ -13,7 +13,7 @@ L1 Buffer的总容量为512K字节，由16个Bank组成。每个Bank的容量为
 L1 Buffer的内存结构如[图1](#zh-cn_topic_0000002545385271_fig5383229131020)所示，地址编码格式如下：
 
 ```cpp
-L1_ADDR[18:0] = {BANK[0:0], BANK_DEPTH[9:0], BG[2:0], BANK_WIDTH[4:0]}    // bit位顺序为从高位到低位，共19位
+L1_ADDR [18:0] = {BANK [0:0], BANK_DEPTH [9:0], BG [2:0], BANK_WIDTH [4:0]} // bit位顺序为从高位到低位，共19位
 // BANK表示地址所在Bank的编号，占用1位bit位，取值范围为[0, 1]
 // BANK_DEPTH表示地址在Bank中的行数，占用10位bit位，取值范围为[0, 1023]
 // BG表示地址所在Bank Group的编号，占用3位bit位，取值范围为[0, 7]
@@ -30,8 +30,8 @@ L0A Buffer/L0B Buffer的总容量为64K字节，只包含1个Bank，有128行，
 L0A Buffer/L0B Buffer的内存结构如[图2](#zh-cn_topic_0000002545385271_fig2046019020496)所示，L0A Buffer和L0B Buffer采用相同的地址编码格式：
 
 ```cpp
-L0A_ADDR[15:0] = { BANK_DEPTH[6:0], BANK_WIDTH[8:0] }    // bit位顺序为从高位到低位，共16位
-L0B_ADDR[15:0] = { BANK_DEPTH[6:0], BANK_WIDTH[8:0] }
+L0A_ADDR [15:0] = {BANK_DEPTH [6:0], BANK_WIDTH [8:0]} // bit位顺序为从高位到低位，共16位
+L0B_ADDR [15:0] = {BANK_DEPTH [6:0], BANK_WIDTH [8:0]}
 // BANK_DEPTH表示地址在Bank中的行数，占用7位bit位，取值范围为[0, 127]
 // BANK_WIDTH表示地址在Bank一行上的偏移量，占用9位bit位，取值范围为[0, 511]
 ```

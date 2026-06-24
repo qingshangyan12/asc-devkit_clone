@@ -19,11 +19,11 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetOrgShape(int orgM, int orgN, int orgK)
 ```
 
-```
+```cpp
 __aicore__ inline void SetOrgShape(int orgM, int orgN, int orgKa, int orgKb, int orgKc = 0)
 ```
 
@@ -57,7 +57,7 @@ __aicore__ inline void SetOrgShape(int orgM, int orgN, int orgKa, int orgKb, int
 
 -   设置矩阵原始完整的形状
 
-    ```
+    ```text
     REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
     mm.SetTensorA(gm_a);
     mm.SetTensorB(gm_b);
@@ -73,20 +73,20 @@ __aicore__ inline void SetOrgShape(int orgM, int orgN, int orgKa, int orgKb, int
 
 -   对于Ascend 950PR/Ascend 950DT上使用[MDL模板](MatmulConfig.md)的Matmul对象，设置GM或L1上完整的形状
 
-    ```
+    ```cpp
     REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
     for (int m = 0; m < mIter_; m++) {
-         for (int n = 0; n < nIter_; n++) {
-              for (int k = 0; k < kIter_; k++) {
-                   // 复用mm，指定A在L1和B在GM上的shape
-                   mm.SetOrgShape(alignedSingleM, tiling.N, alignedSingleK, tiling.Kb, tiling.N);
-                   mm.SetSingleShape(curBaseM, curBaseN, curBaseK);
-                   mm.SetTensorA(tscm_a[offset_a]); // Set aMatrix tscm input
-                   mm.SetTensorB(gm_b[offset_b]);
-                   mm.SetBias(gm_bias[offset_bias]);
-                   mm.Iterate(k != 0);
-                }
-                matmulObj.GetTensorC(gm_c[offset_c]);
-         }
+        for (int n = 0; n < nIter_; n++) {
+            for (int k = 0; k < kIter_; k++) {
+                // 复用mm，指定A在L1和B在GM上的shape
+                mm.SetOrgShape(alignedSingleM, tiling.N, alignedSingleK, tiling.Kb, tiling.N);
+                mm.SetSingleShape(curBaseM, curBaseN, curBaseK);
+                mm.SetTensorA(tscm_a[offset_a]); // Set aMatrix tscm input
+                mm.SetTensorB(gm_b[offset_b]);
+                mm.SetBias(gm_bias[offset_bias]);
+                mm.Iterate(k != 0);
+            }
+            matmulObj.GetTensorC(gm_c[offset_c]);
+        }
     }
     ```

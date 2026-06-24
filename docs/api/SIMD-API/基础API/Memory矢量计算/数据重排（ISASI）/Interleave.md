@@ -55,9 +55,11 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T>
-__aicore__ inline void Interleave(const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const int32_t count)
+__aicore__ inline void Interleave(
+    const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+    const int32_t count)
 ```
 
 ## 参数说明<a name="section176711403104"></a>
@@ -133,13 +135,13 @@ __aicore__ inline void Interleave(const LocalTensor<T>& dst0, const LocalTensor<
 
 本样例中只展示Compute流程中的部分代码。
 
-```
+```cpp
 AscendC::Interleave(dst0Local, dst1Local, src0Local, src1Local, 512);
 ```
 
 结果示例如下：
 
-```
+```text
 输入数据src0Local：[1 2 3 ... 512]
 输入数据src1Local：[513 514 515 ... 1024]
 输出数据dst0Local：[1 513 2 ... 768]

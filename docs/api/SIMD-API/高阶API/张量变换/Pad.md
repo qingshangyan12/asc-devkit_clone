@@ -42,18 +42,21 @@
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <typename T>
-    __aicore__ inline void Pad(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, PadParams& padParams, const LocalTensor<uint8_t>& sharedTmpBuffer, PadTiling& tiling)
+    __aicore__ inline void Pad(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, PadParams& padParams,
+        const LocalTensor<uint8_t>& sharedTmpBuffer, PadTiling& tiling)
     ```
 
     该方式下开发者需自行申请并管理临时内存空间，并在接口调用完成后，复用该部分内存，内存不会反复申请释放，灵活性较高，内存利用率也较高。
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <typename T>
-    __aicore__ inline void Pad(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, PadParams& padParams, PadTiling& tiling)
+    __aicore__ inline void Pad(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, PadParams& padParams, PadTiling& tiling)
     ```
 
     该方式下开发者无需申请，但是需要预留临时空间的大小。
@@ -76,7 +79,7 @@
 | sharedTmpBuffer | 输入 | 共享缓冲区，用于存放API内部计算产生的临时数据。该方式开发者可以自行管理sharedTmpBuffer内存空间，并在接口调用完成后，复用该部分内存，内存不会反复申请释放，灵活性较高，内存利用率也较高。共享缓冲区大小的获取方式请参考[Pad Tiling](Pad-Tiling.md)。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | tiling | 输入 | 计算所需tiling信息，Tiling信息的获取请参考[Pad Tiling](Pad-Tiling.md)。 |
 
-```
+```cpp
 struct PadParams {
     uint16_t leftPad = 0;
     uint16_t rightPad = 0;
@@ -101,7 +104,7 @@ struct PadParams {
 
 本样例为场景1样例：Tensor的width非32B对齐，以half为例，如16\*15，进行Pad，右边补1列，变成16\*16。输入数据类型均为half。
 
-```
+```cpp
 // dstLocal：输出Tensor
 // srcLocal：输入Tensor
 // padParams：控制填充的参数
@@ -109,7 +112,7 @@ AscendC::PadParams padParams{0, 1, 321}; // 左边填充0列，右边填充1列�
 AscendC::Pad(dstLocal, srcOutLocal, padParams, tilingData.padTilingData);
 ```
 
-```
+```text
 输入数据：
 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14
 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29

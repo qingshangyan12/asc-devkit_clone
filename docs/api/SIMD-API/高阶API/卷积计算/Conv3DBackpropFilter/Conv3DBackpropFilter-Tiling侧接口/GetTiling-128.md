@@ -6,11 +6,11 @@
 
 ## 函数原型
 
-```
+```cpp
 int64_t GetTiling(optiling::Conv3DBackpropFilterTilingData& tiling)
 ```
 
-```
+```cpp
 int64_t GetTiling(AscendC::tiling::Conv3DBackpropFilterTilingData& tiling)
 ```
 
@@ -32,7 +32,7 @@ int64_t GetTiling(AscendC::tiling::Conv3DBackpropFilterTilingData& tiling)
 
 ## 调用示例
 
-```
+```cpp
 #include "tiling/conv_backprop/conv3d_bp_filter_tiling.h"
 
 optiling::Conv3DBackpropFilterTilingData tilingData;

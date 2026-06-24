@@ -21,7 +21,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── 02_dynamic_library_compile
 │   ├── CMakeLists.txt      // 编译工程文件
 │   ├── gather_kernel.asc   // 混合文件（含Kernel定义、<<<>>>内核调用）
@@ -104,6 +104,6 @@ add_library(gather_kernel SHARED
 - 执行结果
 
   执行结果如下，说明精度对比成功。
-  ```
+  ```text
   [Success] Case accuracy is verification passed.
   ```

@@ -53,7 +53,7 @@ Reg矢量计算数据搬运接口，适用于从MaskReg搬出到UB。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 // MaskReg搬出使用AddrReg存储偏移量
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, MaskReg& mask, AddrReg offset);
@@ -278,13 +278,14 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, Un
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 template <typename T>
-__simd_vf__ inline void StoreAlignVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
+__simd_vf__ inline void StoreAlignVF(
+    __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
     AscendC::Reg::MaskReg mask;
     for (uint16_t i = 0; i < repeatTimes; ++i) {
-        mask = AscendC::Reg::UpdateMask<T>(count);        
+        mask = AscendC::Reg::UpdateMask<T>(count);
         AscendC::Reg::AddrReg offset = AscendC::Reg::CreateAddrReg<T>(i, oneRepeatSize);
         AscendC::Reg::LoadAlign(mask, srcAddr, offset);
         AscendC::Reg::StoreAlign(dstAddr, mask, offset);

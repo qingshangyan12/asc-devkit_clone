@@ -66,8 +66,10 @@ class ListTensorDesc {
     ListTensorDesc();
     ListTensorDesc(__gm__ void* data, uint32_t length = 0xffffffff, uint32_t shapeSize = 0xffffffff);
     void Init(__gm__ void* data, uint32_t length = 0xffffffff, uint32_t shapeSize = 0xffffffff);
-    template<class T> void GetDesc(TensorDesc<T>& desc, uint32_t index);
-    template<class T> T* GetDataPtr(uint32_t index);
+    template <class T>
+    void GetDesc(TensorDesc<T>& desc, uint32_t index);
+    template <class T>
+    T* GetDataPtr(uint32_t index);
     uint32_t GetSize();
 }
 ```
@@ -167,10 +169,10 @@ class ListTensorDesc {
 ![](../../../../figures/zh-cn_image_0000001866617737.png)
 
 ```cpp
-AscendC::ListTensorDesc listTensorDesc(reinterpret_cast<__gm__ void *>(srcGm)); // srcGm为待解析的gm地址
-uint32_t size = listTensorDesc.GetSize();                                       // size = 2
-auto dataPtr0 = listTensorDesc.GetDataPtr<int32_t>(0);                          // 获取ptr0
-auto dataPtr1 = listTensorDesc.GetDataPtr<int32_t>(1);                          // 获取ptr1
+AscendC::ListTensorDesc listTensorDesc(reinterpret_cast<__gm__ void*>(srcGm)); // srcGm为待解析的gm地址
+uint32_t size = listTensorDesc.GetSize();                                      // size = 2
+auto dataPtr0 = listTensorDesc.GetDataPtr<int32_t>(0);                         // 获取ptr0
+auto dataPtr1 = listTensorDesc.GetDataPtr<int32_t>(1);                         // 获取ptr1
 
 uint64_t buf[100] = {0}; // 示例中Tensor的dim为3,此处的100表示预留足够大的空间
 AscendC::TensorDesc<int32_t> desc;
@@ -180,8 +182,7 @@ listTensorDesc.GetDesc(desc, 0); // 获取索引0的shape信息
 uint64_t dim = desc.GetDim();   // dim = 3
 uint64_t idx = desc.GetIndex(); // idx = 0
 uint64_t shape[3] = {0};
-for (uint32_t i = 0; i < desc.GetDim(); i++)
-{
+for (uint32_t i = 0; i < desc.GetDim(); i++) {
     shape[i] = desc.GetShape(i); // GetShape(0) = 1, GetShape(1) = 2, GetShape(2) = 3
 }
 auto ptr = desc.GetDataPtr();

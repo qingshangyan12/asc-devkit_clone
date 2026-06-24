@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 int32_t MultiCoreMatmulGetTmpBufSize(optiling::TCubeTiling& tiling, matmul_tiling::SysTilingTempBufSize& bufSize)
 ```
 
@@ -19,7 +19,7 @@ int32_t MultiCoreMatmulGetTmpBufSize(optiling::TCubeTiling& tiling, matmul_tilin
 | tiling | 输入 | Matmul多核Tiling的结构体，即MultiCoreMatmulTiling对象得到的TCubeTiling结构体。 |
 | bufSize | 输出 | 根据TCubeTiling结构体信息获取L1 Buffer/Unified Buffer/L0C Buffer的使用大小。SysTilingTempBufSize结构定义如下方代码所示。 |
 
-```
+```cpp
 struct SysTilingTempBufSize {
     int32_t ubSize = 0;  // Unified Buffer大小
     int32_t l1Size = 0;  // L1 Buffer大小
@@ -37,7 +37,7 @@ struct SysTilingTempBufSize {
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MultiCoreMatmulTiling tiling(ascendcPlatform);
 optiling::TCubeTiling tilingData;

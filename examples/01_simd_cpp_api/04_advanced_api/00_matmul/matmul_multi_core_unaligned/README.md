@@ -12,7 +12,7 @@
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
-```
+```text
 ├── matmul_multi_core_unaligned
 │   ├── scripts
 │   │   ├── gen_data.py                              // 输入数据和真值数据生成脚本文件

@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 uint32_t SetStepSize(uint8_t stepSize)
 ```
 
@@ -29,7 +29,7 @@ uint32_t SetStepSize(uint8_t stepSize)
 
 ## 调用示例
 
-```
+```cpp
 static ge::graphStatus AllToAllVCustomTilingFunc(gert::TilingContext* context)
 {
     AllToAllVCustomV3TilingData* tiling = context->GetTilingData<AllToAllVCustomV3TilingData>();

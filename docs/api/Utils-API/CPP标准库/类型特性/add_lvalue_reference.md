@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename Tp>
 struct add_lvalue_reference;
 ```
@@ -39,7 +39,7 @@ add\_lvalue\_reference是一个结构体，其提供一个嵌套类型type，表
 
 ## 调用示例
 
-```
+```cpp
 // Test basic type
 ascendc_assert((AscendC::Std::is_same_v<AscendC::Std::add_lvalue_reference_t<int>, int&>));
 ascendc_assert((AscendC::Std::is_same_v<AscendC::Std::add_lvalue_reference_t<float>, float&>));

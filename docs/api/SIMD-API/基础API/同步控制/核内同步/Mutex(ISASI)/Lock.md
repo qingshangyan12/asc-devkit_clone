@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section13230182415108"></a>
 
-```
+```cpp
 template <pipe_t pipe>
 static __aicore__ inline void Lock(MutexID id)
 ```
@@ -114,7 +114,7 @@ static __aicore__ inline void Lock(MutexID id)
 
 完整算子样例参考：[Mutex样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/05_sync_control/mutex)。
 
-```
+```cpp
 // 锁定MTE2 流水线互斥锁，确保当前线程独占MTE2 资源进行数据搬运
 AscendC::Mutex::Lock<PIPE_MTE2>(mutexId);
 AscendC::DataCopy(xLocal, src0Global[TILE_LENGTH * progress], TILE_LENGTH);

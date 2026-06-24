@@ -14,7 +14,7 @@ This example demonstrates how to display operator input/output Shape, data type,
 
 ## Directory Structure
 
-```
+```text
 ├── torch_library_report_tensor
 │   ├── CMakeLists.txt           // Build project file
 │   ├── torch_library_report_tensor.py   // PyTorch invocation script
@@ -28,7 +28,7 @@ This example demonstrates how to display operator input/output Shape, data type,
 
   The example registers a PyTorch custom operator named `ascendc_ops::ascendc_add`. The Python script inputs two NPU Tensors with shape `[8, 2048]`, data type `float16`, and format `ND`, calls the custom operator to perform Add computation, and verifies accuracy against CPU results. The computation formula is:
 
-  ```
+  ```text
   z = x + y
   ```
 

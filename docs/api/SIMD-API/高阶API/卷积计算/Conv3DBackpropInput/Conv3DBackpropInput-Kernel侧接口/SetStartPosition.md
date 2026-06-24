@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetStartPosition(uint32_t curDinStartIdx, int32_t curHoStartIdx)
 ```
 
@@ -49,7 +49,7 @@ __aicore__ inline void SetStartPosition(uint32_t curDinStartIdx, int32_t curHoSt
 
 ## 调用示例
 
-```
+```text
 gradInput_.SetStartPosition(dinStartIdx_, curHoStartIdx_); // 设置单核上GradOutput载入的起始位置
 ```
 

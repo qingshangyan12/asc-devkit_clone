@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 int32_t SetBiasType(TPosition pos, CubeFormat type, DataType dataType)
 ```
 
@@ -30,7 +30,7 @@ int32_t SetBiasType(TPosition pos, CubeFormat type, DataType dataType)
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MatmulApiTiling tiling(ascendcPlatform);
 tiling.SetBiasType(

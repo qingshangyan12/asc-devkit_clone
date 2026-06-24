@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetWeight(const AscendC::GlobalTensor<SrcT>& weight)
 ```
 
@@ -50,7 +50,7 @@ __aicore__ inline void SetWeight(const AscendC::GlobalTensor<SrcT>& weight)
 
 ## 调用示例
 
-```
+```cpp
 const Conv3DBackpropInputTilingData* tilingData;
 // ...初始化tilingData
 ConvBackpropApi::Conv3DBackpropInput<weightDxType, inputSizeDxType, gradOutputDxType, gradInputDxType> gradInput_;

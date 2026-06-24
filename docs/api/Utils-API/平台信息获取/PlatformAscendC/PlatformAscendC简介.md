@@ -6,7 +6,7 @@
 
 使用该功能需要包含"tiling/platform/platform\_ascendc.h"头文件。样例如下：
 
-```
+```cpp
 #include "tiling/platform/platform_ascendc.h"
 ```
 

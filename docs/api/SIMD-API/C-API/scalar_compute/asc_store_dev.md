@@ -16,19 +16,19 @@
 ```cpp
 __aicore__ inline void asc_store_dev(__gm__ int8_t* addr, int8_t value)
 
-__aicore__ inline void asc_store_dev(__gm__ uint8_t* addr, uint8_t value)
+    __aicore__ inline void asc_store_dev(__gm__ uint8_t* addr, uint8_t value)
 
-__aicore__ inline void asc_store_dev(__gm__ int16_t* addr, int16_t value)
+        __aicore__ inline void asc_store_dev(__gm__ int16_t* addr, int16_t value)
 
-__aicore__ inline void asc_store_dev(__gm__ uint16_t* addr, uint16_t value)
+            __aicore__ inline void asc_store_dev(__gm__ uint16_t* addr, uint16_t value)
 
-__aicore__ inline void asc_store_dev(__gm__ int32_t* addr, int32_t value)
+                __aicore__ inline void asc_store_dev(__gm__ int32_t* addr, int32_t value)
 
-__aicore__ inline void asc_store_dev(__gm__ uint32_t* addr, uint32_t value)
+                    __aicore__ inline void asc_store_dev(__gm__ uint32_t* addr, uint32_t value)
 
-__aicore__ inline void asc_store_dev(__gm__ int64_t* addr, int64_t value)
+                        __aicore__ inline void asc_store_dev(__gm__ int64_t* addr, int64_t value)
 
-__aicore__ inline void asc_store_dev(__gm__ uint64_t* addr, uint64_t value)
+                            __aicore__ inline void asc_store_dev(__gm__ uint64_t* addr, uint64_t value)
 ```
 
 ## 参数说明

@@ -57,8 +57,7 @@ unsigned long long thread_rank() const
     using namespace cooperative_groups;
     __global__ void simt_kernel(...)
     {
-        ...
-        thread_block block = this_thread_block();
+        ... thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
         unsigned long long rank = tile4.thread_rank();
         ...
@@ -71,8 +70,7 @@ unsigned long long thread_rank() const
     using namespace cooperative_groups;
     __simt_vf__ inline void simt_kernel(...)
     {
-        ...
-        thread_block block = this_thread_block();
+        ... thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
         unsigned long long rank = tile4.thread_rank();
         ...

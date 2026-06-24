@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename Tp>
 struct add_volatile;
 ```
@@ -39,7 +39,7 @@ add\_volatile是一个结构体，其提供一个嵌套类型type，表示添加
 
 ## 调用示例
 
-```
+```cpp
 // Test non-volatile type
 ascendc_assert((AscendC::Std::is_same_v<AscendC::Std::add_volatile<int>::type, volatile int>));
 ascendc_assert((AscendC::Std::is_same_v<AscendC::Std::add_volatile<double>::type, volatile double>));

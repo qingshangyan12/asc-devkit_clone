@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001675181281_zh-cn_topic_0000001442758437_section13230182415108"></a>
 
-```
+```cpp
 uint32_t GetCoreNumAic(void) const
 ```
 
@@ -32,8 +32,9 @@ Ascend 950PR/Ascend 950DT，分离模式，返回Cube Core的核数
 
 ## 调用示例<a name="zh-cn_topic_0000001675181281_zh-cn_topic_0000001442758437_section320753512363"></a>
 
-```
-ge::graphStatus TilingXXX(gert::TilingContext* context) {
+```cpp
+ge::graphStatus TilingXXX(gert::TilingContext* context)
+{
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
     auto aicNum = ascendcPlatform.GetCoreNumAic();
     auto aivNum = ascendcPlatform.GetCoreNumAiv();

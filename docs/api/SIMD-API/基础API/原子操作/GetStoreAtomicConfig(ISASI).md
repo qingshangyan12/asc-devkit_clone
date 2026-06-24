@@ -45,7 +45,7 @@ __aicore__ inline void GetStoreAtomicConfig(uint16_t& atomicType, uint16_t& atom
 
 ```cpp
 AscendC::SetStoreAtomicConfig<AscendC::AtomicDtype::ATOMIC_F16, AscendC::AtomicOp::ATOMIC_SUM>();
-uint16_t type = 0;       // 原子操作开启位
-uint16_t op = 0;         // 原子操作类型
+uint16_t type = 0; // 原子操作开启位
+uint16_t op = 0;   // 原子操作类型
 AscendC::GetStoreAtomicConfig(type, op);
 ```

@@ -37,7 +37,7 @@ This example first introduces the three synchronization modes supported by the i
 
 ## Directory Structure
 
-```
+```text
 ├── cross_core_set_wait_flag
 │   ├── scripts
 │   │   ├── gen_data.py              // Script for generating input data and ground truth data
@@ -266,7 +266,7 @@ Figure 6: Pure AIV scenario, mode 0 computation logic diagram
 ### 3. Notes
 #### 3.1 Cube and Vector Fused Computation Scenario
 (1) In the Cube and Vector fused computation scenario, the fused operator (configured with __mix__(1,2)) requires ASCEND_IS_AIV/ASCEND_IS_AIC for code isolation between AIV and AIC cores.
-```
+```text
 KernelMmad op;
 if ASCEND_IS_AIC {
     op.InitAIC(A, B, c);
@@ -284,7 +284,7 @@ if ASCEND_IS_AIV {
 #### 3.2 Pure Vector Computation Scenario
 (1) When using the CrossCoreSetFlag and CrossCoreWaitFlag inter-core synchronization interfaces, even in pure Vector computation scenarios, the kernel function cannot use the __vector__ modifier.
 The kernel function in this example uses __mix__(1,2) decoration, but in the pure Vector scenario, since only vector computation is performed, the ASCEND_IS_AIV macro must be used to ensure the program runs only on AIV cores, otherwise the program will hang.
-```
+```text
 if ASCEND_IS_AIV {
         op.Init(x, z, dataLength);
         op.Process();

@@ -14,7 +14,7 @@ This example implements vector index creation functionality based on the CreateV
 
 ## Directory Structure
 
-```
+```text
 ├── create_vec_index
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

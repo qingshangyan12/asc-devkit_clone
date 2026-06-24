@@ -14,7 +14,7 @@ This example uses the Select high-level API to implement conditional selection. 
 
 ## Directory Structure
 
-```
+```text
 ├── select
 │   ├── scripts
 │   │   └── gen_data.py         // Script for generating input data and ground truth data

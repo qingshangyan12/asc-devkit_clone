@@ -26,12 +26,13 @@
 
 完整的算子样例请参考[matmul\_channelsplit算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_channelsplit_output)。
 
-```
+```cpp
 // 指定获取和修改的MatmulConfig模板
 constexpr static MatmulConfigMode configMode = MatmulConfigMode::CONFIG_NORM;
 // 修改模板参数isEnableChannelSplit=true，开启该MatmulConfig模板的ChannelSplit功能
 constexpr static MatmulFuncParams funcParamsChannelSplit{
-    false, false, false, false, 0, IterateOrder::ORDER_M, ScheduleType::INNER_PRODUCT, true, false, false, false, true/*isEnableChannelSplit*/
+    false, false, false, false, 0,   IterateOrder::ORDER_M, ScheduleType::INNER_PRODUCT,
+    true,  false, false, false, true /*isEnableChannelSplit*/
 };
 constexpr static MatmulConfig MM_CFG = GetMMConfig<configMode>(funcParamsChannelSplit);
 Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG> mm;

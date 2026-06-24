@@ -36,24 +36,34 @@
 
 -   tensor前n个数据计算
 
-    ```
-    template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG, typename U, typename S, typename V>
+    ```cpp
+    template <
+        typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
+        typename U, typename S, typename V>
     __aicore__ inline void Adds(const U& dst, const S& src0, const V& src1, const int32_t& count)
     ```
 
 -   tensor高维切分计算
     -   mask逐bit模式
 
-        ```
-        template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG, typename U, typename S, typename V>
-        __aicore__ inline void Adds(const U& dst, const S& src0, const V& src1, uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+        ```cpp
+        template <
+            typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
+            typename U, typename S, typename V>
+        __aicore__ inline void Adds(
+            const U& dst, const S& src0, const V& src1, uint64_t mask[], const uint8_t repeatTime,
+            const UnaryRepeatParams& repeatParams)
         ```
 
     -   mask连续模式
 
-        ```
-        template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG, typename U, typename S, typename V>
-        __aicore__ inline void Adds(const U& dst, const S& src0, const V& src1, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+        ```cpp
+        template <
+            typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
+            typename U, typename S, typename V>
+        __aicore__ inline void Adds(
+            const U& dst, const S& src0, const V& src1, uint64_t mask, const uint8_t repeatTime,
+            const UnaryRepeatParams& repeatParams)
         ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -199,48 +209,48 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
 
 -   tensor高维切分计算样例-mask连续模式
 
-    ```
+    ```cpp
     uint64_t mask = 128;
     // repeatTime = 4,单次迭代处理128个数，计算512个数需要迭代4次
     // dstBlkStride, srcBlkStride = 1,每个迭代内src0参与计算的数据地址间隔为1个datablock，表示单次迭代内数据连续读取和写入
     // dstRepStride, srcRepStride = 8,相邻迭代间的地址间隔为8个datablock，表示相邻迭代间数据连续读取和写入
     // 标量在后调用示例
-    AscendC::Adds(dstLocal, src0Local, src1Local[0], mask, 4, { 1, 1, 8, 8 });
-    
+    AscendC::Adds(dstLocal, src0Local, src1Local[0], mask, 4, {1, 1, 8, 8});
+
     // 标量在前调用示例
-    static constexpr AscendC::BinaryConfig config = { 0 };
-    AscendC::Adds<BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, mask, 4, { 1, 1, 8, 8 });
+    static constexpr AscendC::BinaryConfig config = {0};
+    AscendC::Adds<BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, mask, 4, {1, 1, 8, 8});
     ```
 
 -   tensor高维切分计算样例-mask逐bit模式
 
-    ```
-    uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
+    ```cpp
+    uint64_t mask[2] = {UINT64_MAX, UINT64_MAX};
     // repeatTime = 4,单次迭代处理128个数，计算512个数需要迭代4次
     // dstBlkStride, srcBlkStride = 1,每个迭代内src0参与计算的数据地址间隔为1个datablock，表示单次迭代内数据连续读取和写入
     // dstRepStride, srcRepStride = 8,相邻迭代间的地址间隔为8个datablock，表示相邻迭代间数据连续读取和写入
     // 标量在后调用示例
     AscendC::Adds(dstLocal, src0Local, src1Local[0], mask, 4, {1, 1, 8, 8});
-    
+
     // 标量在前调用示例
-    static constexpr AscendC::BinaryConfig config = { 0 };
-    AscendC::Adds<BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, mask, 4, { 1, 1, 8, 8 });
+    static constexpr AscendC::BinaryConfig config = {0};
+    AscendC::Adds<BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, mask, 4, {1, 1, 8, 8});
     ```
 
 -   tensor前n个数据计算样例
 
-    ```
+    ```cpp
     // 标量在后调用示例
     AscendC::Adds(dstLocal, src0Local, src1Local[0], 512);
-    
+
     // 标量在前调用示例
-    static constexpr AscendC::BinaryConfig config = { 0 };
+    static constexpr AscendC::BinaryConfig config = {0};
     AscendC::Adds<BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, 512);
     ```
 
 结果示例如下：
 
-```
+```text
 // src0Local[0]或src1Local[0]作为标量
 输入数据src0Local：[1 2 3 ... 512]
 输入数据src1Local：[1 2 3 ... 512]

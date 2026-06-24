@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001549507408_zh-cn_topic_0000001576923281_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
+```text
 OpHostCPUDef &Engine(const char *value)
 ```
 

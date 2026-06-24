@@ -25,13 +25,13 @@ Matmul量化场景：在Matmul计算时，左、右矩阵的输入为half或bflo
 
 -   量化参数的存储位置为GM
 
-    ```
+    ```cpp
     __aicore__ inline void SetQuantVector(const GlobalTensor<uint64_t>& quantTensor)
     ```
 
 -   量化参数的存储位置为L1 Buffer
 
-    ```
+    ```cpp
     __aicore__ inline void SetQuantVector(const LocalTensor<uint64_t>& quantTensor)
     ```
 
@@ -77,7 +77,7 @@ Matmul量化场景：在Matmul计算时，左、右矩阵的输入为half或bflo
 
 ## 调用示例
 
-```
+```cpp
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
 
 // quantTensor：量化或反量化运算时的Tensor，支持的存储位置为GM和L1

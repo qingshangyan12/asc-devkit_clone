@@ -8,13 +8,13 @@
 
 -   MultiCoreMatmulTiling类
 
-    ```
+    ```cpp
     int32_t GetCoreNum(int32_t& dim, int32_t& mDim, int32_t& nDim)
     ```
 
 -   BatchMatmulTiling类
 
-    ```
+    ```cpp
     int32_t GetCoreNum(int32_t& dim, int32_t& mDim, int32_t& nDim, int32_t& batchCoreM, int32_t& batchCoreN)
     ```
 
@@ -40,7 +40,7 @@
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MultiCoreMatmulTiling tiling(ascendcPlatform);
 tiling.SetDim(1);

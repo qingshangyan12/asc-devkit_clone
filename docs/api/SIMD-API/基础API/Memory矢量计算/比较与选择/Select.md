@@ -138,14 +138,18 @@ Kirin 9030，支持模式0、1、2。
 
         ```cpp
         template <typename T, typename U>
-        __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, T src1, SELMODE selMode, uint32_t count)
+        __aicore__ inline void Select(
+            const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, T src1, SELMODE selMode,
+            uint32_t count)
         ```
 
     - Select模式0和Select模式2
 
         ```cpp
         template <typename T, typename U>
-        __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, const LocalTensor<T>& src1, SELMODE selMode, uint32_t count)
+        __aicore__ inline void Select(
+            const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+            SELMODE selMode, uint32_t count)
         ```
 
 - tensor高维切分计算
@@ -154,21 +158,27 @@ Kirin 9030，支持模式0、1、2。
 
             ```cpp
             template <typename T, typename U, bool isSetMask = true>
-            __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, T src1, SELMODE selMode, uint64_t mask[], uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+            __aicore__ inline void Select(
+                const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, T src1, SELMODE selMode,
+                uint64_t mask[], uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
             ```
 
         - mask连续模式
 
             ```cpp
             template <typename T, typename U, bool isSetMask = true>
-            __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, T src1, SELMODE selMode, uint64_t mask, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+            __aicore__ inline void Select(
+                const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, T src1, SELMODE selMode,
+                uint64_t mask, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
             ```
 
         - 不传入mask参数（需要和[SetVectorMask](../掩码操作/SetVectorMask.md)、[SetCmpMask\(ISASI\)](SetCmpMask(ISASI).md)配合使用）
 
             ```cpp
             template <typename T, typename U>
-            __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+            __aicore__ inline void Select(
+                const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, uint8_t repeatTime,
+                const BinaryRepeatParams& repeatParams)
             ```
 
     - Select模式0和Select模式2
@@ -176,21 +186,27 @@ Kirin 9030，支持模式0、1、2。
 
             ```cpp
             template <typename T, typename U, bool isSetMask = true>
-            __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, const LocalTensor<T>& src1, SELMODE selMode, uint64_t mask[],  uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+            __aicore__ inline void Select(
+                const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+                SELMODE selMode, uint64_t mask[], uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
             ```
 
         - mask连续模式
 
             ```cpp
             template <typename T, typename U, bool isSetMask = true>
-            __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, const LocalTensor<T>& src1, SELMODE selMode, uint64_t mask, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+            __aicore__ inline void Select(
+                const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, const LocalTensor<T>& src1,
+                SELMODE selMode, uint64_t mask, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
             ```
 
         - 不传入mask参数（需要和[SetVectorMask](../掩码操作/SetVectorMask.md)、[SetCmpMask\(ISASI\)](SetCmpMask(ISASI).md)配合使用）
 
             ```cpp
             template <typename T, SELMODE selMode>
-            __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+            __aicore__ inline void Select(
+                const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint8_t repeatTime,
+                const BinaryRepeatParams& repeatParams)
             ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -272,19 +288,21 @@ Kirin 9030，支持模式0、1、2。
 - Select-tensor高维切分计算样例（模式2）
 
     ```cpp
-    uint64_t mask = 256/sizeof(float);
+    uint64_t mask = 256 / sizeof(float);
     int repeat = 4;
-    AscendC::BinaryRepeatParams repeatParams = { 1, 1, 1, 8, 8, 8 };
+    AscendC::BinaryRepeatParams repeatParams = {1, 1, 1, 8, 8, 8};
     // repeat = 4, 64 elements one repeat, 256 elements total
-    // dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one repeat
-    // dstRepStride, src0RepStride, src1RepStride = 8, no gap between repeats
-    AscendC::Select(dstLocal, maskLocal, src0Local, src1Local, AscendC::SELMODE::VSEL_TENSOR_TENSOR_MODE, mask, repeat, repeatParams);
+    // dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one
+    // repeat dstRepStride, src0RepStride, src1RepStride = 8, no gap between repeats
+    AscendC::Select(
+        dstLocal, maskLocal, src0Local, src1Local, AscendC::SELMODE::VSEL_TENSOR_TENSOR_MODE, mask, repeat, repeatParams);
     ```
 
 - Select-tensor前n个数据计算样例（模式1）
 
     ```cpp
-    AscendC::Select(dstLocal, maskLocal, src0Local, static_cast<float>(0), AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE, dataSize);
+    AscendC::Select(
+        dstLocal, maskLocal, src0Local, static_cast<float>(0), AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE, dataSize);
     ```
 
 - Select-tensor前n个数据计算样例（模式0，每轮repeat迭代中，maskLocal只有前64bit生效）
@@ -297,32 +315,34 @@ Kirin 9030，支持模式0、1、2。
 - Select-tensor高维切分计算样例-mask连续模式（模式0，每轮repeat迭代中，maskLocal只有前64bit生效）
 
     ```cpp
-    uint64_t mask = 256/sizeof(float);
+    uint64_t mask = 256 / sizeof(float);
     int repeat = 4;
-    AscendC::BinaryRepeatParams repeatParams = { 1, 1, 1, 8, 8, 8 };
+    AscendC::BinaryRepeatParams repeatParams = {1, 1, 1, 8, 8, 8};
     // repeat = 4, 64 elements one repeat, 256 elements total
-    // dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one repeat
-    // dstRepStride, src0RepStride, src1RepStride = 8, no gap between repeats
-    AscendC::Select(dstLocal, maskLocal, src0Local, src1Local, AscendC::SELMODE::VSEL_CMPMASK_SPR, mask, repeat, repeatParams);
+    // dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one
+    // repeat dstRepStride, src0RepStride, src1RepStride = 8, no gap between repeats
+    AscendC::Select(
+        dstLocal, maskLocal, src0Local, src1Local, AscendC::SELMODE::VSEL_CMPMASK_SPR, mask, repeat, repeatParams);
     ```
 
 - Select-tensor高维切分计算样例-mask逐bit模式（每轮repeat迭代中，maskLocal只有前64bit生效）
 
     ```cpp
-    uint64_t mask[2] = { UINT64_MAX, 0};
+    uint64_t mask[2] = {UINT64_MAX, 0};
     int repeat = 4;
-    AscendC::BinaryRepeatParams repeatParams = { 1, 1, 1, 8, 8, 8 };
+    AscendC::BinaryRepeatParams repeatParams = {1, 1, 1, 8, 8, 8};
     // repeat = 4, 64 elements one repeat, 256 elements total
     // srcBlkStride, = 1, no gap between blocks in one repeat
     // dstRepStride, srcRepStride = 8, no gap between repeats
-    AscendC::Select(dstLocal, maskLocal, src0Local, src1Local, AscendC::SELMODE::VSEL_CMPMASK_SPR, mask, repeat, repeatParams);
+    AscendC::Select(
+        dstLocal, maskLocal, src0Local, src1Local, AscendC::SELMODE::VSEL_CMPMASK_SPR, mask, repeat, repeatParams);
     ```
 
 结果示例如下：
 
 - 模式2示例：
 
-    ```
+    ```text
     输入数据(src0Local):
     [-80.4933, 52.2499, -50.6124, -72.3737, -33.7107, -83.4001, 34.3954, 61.3188, 96.5484, 27.1321, -56.8153, 9.80549, 9.11199, -53.1848, -77.2548, -0.0681466, -69.5783, 6.53722, -22.5986, 37.6655, -25.4146, 89.232, 55.4716, 21.6069, 23.0464, 28.5975, -46.3033, 50.0312, -42.6339, 41.8752, -87.0426, 37.9717, 10.4336, 10.7653, -30.6943, -65.4774, 8.38653, -89.6462, 65.1115, 42.2134, -91.1666, -84.6927, -97.9312, 98.861, 19.8888, -64.0522, -27.1243, 72.7673, -9.9489, 94.274, -72.868, 43.1349, 84.1897, 87.0729, 87.2606, 34.5548, 87.7985, 4.84555, -10.2156, -93.7445, 71.8209, -63.4942, 45.6619, 93.4737, 79.6631, 66.8743, 18.1016, -27.7082, -67.0339, -11.9576, 52.0373, -11.5452, -73.8953, -63.5915, 99.4875, -46.2296, 75.453, -67.2079, 89.8868, -19.9666, 30.5359, 42.1465, -19.8105, 82.3653, -89.2164, -0.959167, -50.0723, -30.3058, 48.1772, -27.7686, 26.1484, 94.8462, -15.5663, -87.346, -84.2826, -58.8268, -42.4957, -23.7061, 67.0375, -83.5848, 64.167, 63.3315, -33.3809, 35.1264, 96.6872, 91.8399, 33.9888, 78.5923, -30.4885, 26.3331, -62.3014, -30.3431, 96.9554, 50.3262, 66.612, -71.5939, -97.0042, 71.4549, 42.3891, 71.308, 72.3209, 59.1608, -4.57918, -81.3639, -37.2619, 28.2445, 16.7995, -46.5868, -88.6893, 82.0504, -39.3391, -33.7141, -88.6628, -94.1271, -74.7738, -80.0798, -67.5639, -69.8237, -37.5219, 11.9601, -30.3912, -30.1169, 22.7411, -85.9541, 19.5141, -37.6203, -49.5693, 5.09318, 11.4884, 18.9713, 21.1073, -84.9266, 11.9436, -22.4703, -58.5243, -24.0218, -63.2767, -2.72752, -87.8947, -91.5162, 33.4207, -85.9841, 18.743, 48.9581, 69.3992, 2.42074, -75.0209, -53.2579, -45.4509, 66.6121, 51.6616, -48.073, 74.2754, -51.1623, -89.9345, 4.15238, -4.47531, 79.6587, -31.1646, 69.4103, -83.5936, -78.7341, 56.8626, 72.8834, -27.0248, -80.3328, 71.7272, -77.979, -76.6814, -14.9994, -94.5054, -75.2802, -96.4931, -17.6781, -5.50804, -83.4637, -56.8385, 51.5406, -60.527, -11.0762, -33.3166, -54.9609, -36.9426, -70.3942, 28.3439, 5.28754, -61.4775, 96.0657, -69.1967, 70.5489, 32.817, -53.5746, 49.2601, -88.5728, -1.94822, -3.16238, 19.083, -81.5139, 87.8383, 90.714, 4.75546, 31.9277, -4.1301, -0.160932, -31.2602, 56.4225, -72.1826, 91.5082, 68.2155, -81.7476, -14.0418, -79.4093, -30.7375, 38.8967, -16.5589, -69.4351, 48.6597, -8.44998, -74.4274, -20.3394, -59.2265, 19.407, 88.1542, -15.4888, 60.9066, 59.5144, -42.6935, 20.3518, 11.7192, -31.3635, 26.0055, -26.9334, 79.3798, 46.4724, 22.984, 67.5759]
     输入数据(src1Local):
@@ -335,7 +355,7 @@ Kirin 9030，支持模式0、1、2。
 
 - 模式1示例：
 
-    ```
+    ```text
     输入数据(src0Local):
     [-80.4933, 52.2499, -50.6124, -72.3737, -33.7107, -83.4001, 34.3954, 61.3188, 96.5484, 27.1321, -56.8153, 9.80549, 9.11199, -53.1848, -77.2548, -0.0681466, -69.5783, 6.53722, -22.5986, 37.6655, -25.4146, 89.232, 55.4716, 21.6069, 23.0464, 28.5975, -46.3033, 50.0312, -42.6339, 41.8752, -87.0426, 37.9717, 10.4336, 10.7653, -30.6943, -65.4774, 8.38653, -89.6462, 65.1115, 42.2134, -91.1666, -84.6927, -97.9312, 98.861, 19.8888, -64.0522, -27.1243, 72.7673, -9.9489, 94.274, -72.868, 43.1349, 84.1897, 87.0729, 87.2606, 34.5548, 87.7985, 4.84555, -10.2156, -93.7445, 71.8209, -63.4942, 45.6619, 93.4737, 79.6631, 66.8743, 18.1016, -27.7082, -67.0339, -11.9576, 52.0373, -11.5452, -73.8953, -63.5915, 99.4875, -46.2296, 75.453, -67.2079, 89.8868, -19.9666, 30.5359, 42.1465, -19.8105, 82.3653, -89.2164, -0.959167, -50.0723, -30.3058, 48.1772, -27.7686, 26.1484, 94.8462, -15.5663, -87.346, -84.2826, -58.8268, -42.4957, -23.7061, 67.0375, -83.5848, 64.167, 63.3315, -33.3809, 35.1264, 96.6872, 91.8399, 33.9888, 78.5923, -30.4885, 26.3331, -62.3014, -30.3431, 96.9554, 50.3262, 66.612, -71.5939, -97.0042, 71.4549, 42.3891, 71.308, 72.3209, 59.1608, -4.57918, -81.3639, -37.2619, 28.2445, 16.7995, -46.5868, -88.6893, 82.0504, -39.3391, -33.7141, -88.6628, -94.1271, -74.7738, -80.0798, -67.5639, -69.8237, -37.5219, 11.9601, -30.3912, -30.1169, 22.7411, -85.9541, 19.5141, -37.6203, -49.5693, 5.09318, 11.4884, 18.9713, 21.1073, -84.9266, 11.9436, -22.4703, -58.5243, -24.0218, -63.2767, -2.72752, -87.8947, -91.5162, 33.4207, -85.9841, 18.743, 48.9581, 69.3992, 2.42074, -75.0209, -53.2579, -45.4509, 66.6121, 51.6616, -48.073, 74.2754, -51.1623, -89.9345, 4.15238, -4.47531, 79.6587, -31.1646, 69.4103, -83.5936, -78.7341, 56.8626, 72.8834, -27.0248, -80.3328, 71.7272, -77.979, -76.6814, -14.9994, -94.5054, -75.2802, -96.4931, -17.6781, -5.50804, -83.4637, -56.8385, 51.5406, -60.527, -11.0762, -33.3166, -54.9609, -36.9426, -70.3942, 28.3439, 5.28754, -61.4775, 96.0657, -69.1967, 70.5489, 32.817, -53.5746, 49.2601, -88.5728, -1.94822, -3.16238, 19.083, -81.5139, 87.8383, 90.714, 4.75546, 31.9277, -4.1301, -0.160932, -31.2602, 56.4225, -72.1826, 91.5082, 68.2155, -81.7476, -14.0418, -79.4093, -30.7375, 38.8967, -16.5589, -69.4351, 48.6597, -8.44998, -74.4274, -20.3394, -59.2265, 19.407, 88.1542, -15.4888, 60.9066, 59.5144, -42.6935, 20.3518, 11.7192, -31.3635, 26.0055, -26.9334, 79.3798, 46.4724, 22.984, 67.5759]
     输入数据(maskLocal):
@@ -346,7 +366,7 @@ Kirin 9030，支持模式0、1、2。
 
 - 模式0示例：
 
-    ```
+    ```text
     输入数据(src0Local):
     [-80.4933, 52.2499, -50.6124, -72.3737, -33.7107, -83.4001, 34.3954, 61.3188, 96.5484, 27.1321, -56.8153, 9.80549, 9.11199, -53.1848, -77.2548, -0.0681466, -69.5783, 6.53722, -22.5986, 37.6655, -25.4146, 89.232, 55.4716, 21.6069, 23.0464, 28.5975, -46.3033, 50.0312, -42.6339, 41.8752, -87.0426, 37.9717, 10.4336, 10.7653, -30.6943, -65.4774, 8.38653, -89.6462, 65.1115, 42.2134, -91.1666, -84.6927, -97.9312, 98.861, 19.8888, -64.0522, -27.1243, 72.7673, -9.9489, 94.274, -72.868, 43.1349, 84.1897, 87.0729, 87.2606, 34.5548, 87.7985, 4.84555, -10.2156, -93.7445, 71.8209, -63.4942, 45.6619, 93.4737, 79.6631, 66.8743, 18.1016, -27.7082, -67.0339, -11.9576, 52.0373, -11.5452, -73.8953, -63.5915, 99.4875, -46.2296, 75.453, -67.2079, 89.8868, -19.9666, 30.5359, 42.1465, -19.8105, 82.3653, -89.2164, -0.959167, -50.0723, -30.3058, 48.1772, -27.7686, 26.1484, 94.8462, -15.5663, -87.346, -84.2826, -58.8268, -42.4957, -23.7061, 67.0375, -83.5848, 64.167, 63.3315, -33.3809, 35.1264, 96.6872, 91.8399, 33.9888, 78.5923, -30.4885, 26.3331, -62.3014, -30.3431, 96.9554, 50.3262, 66.612, -71.5939, -97.0042, 71.4549, 42.3891, 71.308, 72.3209, 59.1608, -4.57918, -81.3639, -37.2619, 28.2445, 16.7995, -46.5868, -88.6893, 82.0504, -39.3391, -33.7141, -88.6628, -94.1271, -74.7738, -80.0798, -67.5639, -69.8237, -37.5219, 11.9601, -30.3912, -30.1169, 22.7411, -85.9541, 19.5141, -37.6203, -49.5693, 5.09318, 11.4884, 18.9713, 21.1073, -84.9266, 11.9436, -22.4703, -58.5243, -24.0218, -63.2767, -2.72752, -87.8947, -91.5162, 33.4207, -85.9841, 18.743, 48.9581, 69.3992, 2.42074, -75.0209, -53.2579, -45.4509, 66.6121, 51.6616, -48.073, 74.2754, -51.1623, -89.9345, 4.15238, -4.47531, 79.6587, -31.1646, 69.4103, -83.5936, -78.7341, 56.8626, 72.8834, -27.0248, -80.3328, 71.7272, -77.979, -76.6814, -14.9994, -94.5054, -75.2802, -96.4931, -17.6781, -5.50804, -83.4637, -56.8385, 51.5406, -60.527, -11.0762, -33.3166, -54.9609, -36.9426, -70.3942, 28.3439, 5.28754, -61.4775, 96.0657, -69.1967, 70.5489, 32.817, -53.5746, 49.2601, -88.5728, -1.94822, -3.16238, 19.083, -81.5139, 87.8383, 90.714, 4.75546, 31.9277, -4.1301, -0.160932, -31.2602, 56.4225, -72.1826, 91.5082, 68.2155, -81.7476, -14.0418, -79.4093, -30.7375, 38.8967, -16.5589, -69.4351, 48.6597, -8.44998, -74.4274, -20.3394, -59.2265, 19.407, 88.1542, -15.4888, 60.9066, 59.5144, -42.6935, 20.3518, 11.7192, -31.3635, 26.0055, -26.9334, 79.3798, 46.4724, 22.984, 67.5759]
     输入数据(src1Local):

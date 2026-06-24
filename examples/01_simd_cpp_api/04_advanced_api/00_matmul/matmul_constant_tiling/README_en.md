@@ -11,7 +11,7 @@ A Matmul example with constant Tiling. Constant Tiling converts some or all Tili
 | Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
 
 ## Directory Structure
-```
+```text
 ├── matmul_constant_tiling
 │   ├── scripts
 │   │   ├── gen_data.py                // Script for generating input data and ground truth data
@@ -47,12 +47,7 @@ A Matmul example with constant Tiling. Constant Tiling converts some or all Tili
         constexpr int32_t BASE_M = 128;  // BASEM * BASE_K * sizeof(typeA) <=L0A size
         constexpr int32_t BASE_N = 256;  // BASEN * BASE_K * sizeof(typeB) <=L0B size
         constexpr int32_t BASE_K = 64;   // BASEM * BASE_N * sizeof(typeC) <=L0C size
-        constexpr MatmulShapeParams shapeParams = { MAX_M,
-                                                      MAX_N,
-                                                      MAX_K,
-                                                      BASE_M,
-                                                      BASE_N,
-                                                      BASE_K };
+        constexpr MatmulShapeParams shapeParams = {MAX_M, MAX_N, MAX_K, BASE_M, BASE_N, BASE_K};
         constexpr MatmulConfig CUSTOM_CFG = GetMMConfig<MatmulConfigMode::CONFIG_MDL>(shapeParams);
         ```
       - Obtain the constant Tiling information through the GetMatmulApiTiling interface.

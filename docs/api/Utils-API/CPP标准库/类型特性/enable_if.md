@@ -18,7 +18,7 @@ enable\_if是一个模板结构体，有两个模板参数：模板参数Bp是�
 
 ## 函数原型
 
-```
+```cpp
 template <bool Bp, typename Tp>
 struct enable_if;
 ```
@@ -45,22 +45,22 @@ enable\_if的静态常量成员type用于获取返回值，enable\_if<Bp,  Tp\>:
 
 ## 调用示例
 
-```
+```cpp
 template <typename T>
 class Calculator {
 public:
     // 当T是整数类型时启用此成员函数
     template <typename U = T>
-    typename AscendC::Std::enable_if<AscendC::Std::is_integral<U>::value, U>::type
-    __aicore__ inline multiply(U a, U b) {
+    typename AscendC::Std::enable_if<AscendC::Std::is_integral<U>::value, U>::type __aicore__ inline multiply(U a, U b)
+    {
         AscendC::PRINTF("Integral type multiplication");
         return a * b;
     }
 
     // 当T不是整数类型时启用此成员函数
     template <typename U = T>
-    typename AscendC::Std::enable_if<!AscendC::Std::is_integral<U>::value, U>::type
-    __aicore__ inline multiply(U a, U b) {
+    typename AscendC::Std::enable_if<!AscendC::Std::is_integral<U>::value, U>::type __aicore__ inline multiply(U a, U b)
+    {
         AscendC::PRINTF("Non-integral type multiplication");
         return a * b;
     }
@@ -70,30 +70,28 @@ public:
 template <typename T, typename Enable = void>
 class Container {
 public:
-    __aicore__ inline Container() {
-        AscendC::PRINTF("Generic container.\n");
-    }
+    __aicore__ inline Container() { AscendC::PRINTF("Generic container.\n"); }
 };
 
 // 特化版本，当T是整数类型时启用
 template <typename T>
 class Container<T, typename AscendC::Std::enable_if<AscendC::Std::is_integral<T>::value>::type> {
 public:
-    __aicore__ inline Container() {
-        AscendC::PRINTF("Integral container.\n");
-    }
+    __aicore__ inline Container() { AscendC::PRINTF("Integral container.\n"); }
 };
 
 // 当T是整数类型时启用该函数
 template <typename T>
-__aicore__ inline typename AscendC::Std::enable_if<AscendC::Std::is_integral<T>::value, T>::type add(T a, T b) {
+__aicore__ inline typename AscendC::Std::enable_if<AscendC::Std::is_integral<T>::value, T>::type add(T a, T b)
+{
     AscendC::PRINTF("Integral type addition.");
     return a + b;
 }
 
 // 当T不是整数类型时启用该函数
 template <typename T>
-__aicore__ inline typename AscendC::Std::enable_if<!AscendC::Std::is_integral<T>::value, T>::type add(T a, T b) {
+__aicore__ inline typename AscendC::Std::enable_if<!AscendC::Std::is_integral<T>::value, T>::type add(T a, T b)
+{
     AscendC::PRINTF("Non-integral type addition.");
     return a + (-b);
 }
@@ -116,7 +114,7 @@ doubleResult = add((float)1.5, (float)2.5);
 AscendC::PRINTF("float result: %f\n", doubleResult);
 ```
 
-```
+```text
 // 执行结果：
 Integral type multiplicationResult of integral multiplication: 6
 Non-integral type multiplicationResult of non-integral multiplication: 8.750000

@@ -34,7 +34,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T>
 __aicore__ inline void Neg(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
 ```
@@ -111,13 +111,13 @@ __aicore__ inline void Neg(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 
 更多样例可参考[LINK](更多样例-9.md)。
 
-```
+```cpp
 AscendC::Neg(dstLocal, srcLocal, 512);
 ```
 
 结果示例如下（srcLocal和dstLocal均为int64\_t类型）：
 
-```
+```text
 输入数据(srcLocal): [1 2 3 4 ...]
 输出数据(dstLocal): [-1 -2 -3 -4 ...]
 ```

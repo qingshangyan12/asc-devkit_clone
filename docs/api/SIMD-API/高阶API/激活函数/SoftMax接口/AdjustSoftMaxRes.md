@@ -22,7 +22,7 @@
 
 为方便理解，通过Python脚本实现的方式，表达其计算公式如下，其中res是输入也是输出，max\\from\\to\\res\_shape都为输入。
 
-```
+```python
 def adjust_softmax_res(res, max, from, to, res_shape):
     for i in range(res_shape[0]):
         if max[i] == from:
@@ -33,9 +33,11 @@ def adjust_softmax_res(res, max, from, to, res_shape):
 
 ## 函数原型
 
-```
+```cpp
 template <typename T1, typename T2, bool isDataFormatNZ = false, uint8_t stepSizeMode = 0>
-__aicore__ inline bool AdjustSoftMaxRes(const LocalTensor<T1>& softMaxRes, const LocalTensor<T2>& maxTensor, const uint32_t from, const T1 to, const SoftMaxShapeInfo& softmaxShapeInfo)
+__aicore__ inline bool AdjustSoftMaxRes(
+    const LocalTensor<T1>& softMaxRes, const LocalTensor<T2>& maxTensor, const uint32_t from, const T1 to,
+    const SoftMaxShapeInfo& softmaxShapeInfo)
 ```
 
 ## 参数说明
@@ -59,7 +61,7 @@ __aicore__ inline bool AdjustSoftMaxRes(const LocalTensor<T1>& softMaxRes, const
 | to | 输入 | 源操作数，类型和softMaxRes的数据类型保持一致。<br><br>需要往softMaxRes中填充的值。 |
 | softmaxShapeInfo | 输入 | softMaxRes的shape信息，具体定义如下方代码所示，其中参数的含义为：<br>srcM：非尾轴长度的乘积。<br>srcK：尾轴长度，必须32Byte对齐。<br>oriSrcM：原始非尾轴长度的乘积。<br>oriSrcK：原始尾轴长度。<br><br>需要注意，目前仅支持ND输入。 |
 
-```
+```cpp
 struct SoftMaxShapeInfo {
     uint32_t srcM;
     uint32_t srcK;
@@ -81,21 +83,21 @@ bool类型，当返回true时，表示maxTensor中存在需要判断的值，若
 
 本样例中需要对SoftMax计算结果做后处理，判断maxTensor中是否存在0xFF7FFFFF，如果存在刷新对应结果为0。本样例中实现的是固定shape为输入x\[32, 8\]，输出y\[32, 32\]的AdjustSoftMaxResCustom算子。输入softMaxRes的shape大小为\[32, 8\]，maxTensor的shape大小为\[32,8\]，数据类型均为float。
 
-```
+```cpp
 // srcLocal：softmax计算结果
 AscendC::SoftMax(srcLocal, ...)
-// maxLocal：softmax中间结果，reducemax的结果
-// FROM：判断maxLocal中是否存在值等于FROM的元素
-// TO：当maxLocal中存在值等于FROM的元素时，srcLocal中对应行的元素将被替换为TO
-// srcShape：描述srcLocal的shape信息
+    // maxLocal：softmax中间结果，reducemax的结果
+    // FROM：判断maxLocal中是否存在值等于FROM的元素
+    // TO：当maxLocal中存在值等于FROM的元素时，srcLocal中对应行的元素将被替换为TO
+    // srcShape：描述srcLocal的shape信息
 
-AscendC::SoftMaxShapeInfo srcShape = {height, width, height, width};
+    AscendC::SoftMaxShapeInfo srcShape = {height, width, height, width};
 AscendC::AdjustSoftMaxRes<float, float>(srcLocal, maxLocal, FROM, TO, srcShape);
 ```
 
 结果示例如下：
 
-```
+```text
 输入数据(srcLocal)：
 [ 0.0005766128 0.001567396 0.004260624 0.011581578 0.031481992 0.08557693 0.23262219 0.63233274
   0.0005766128 0.001567396 0.004260624 0.011581578 0.031481992 0.08557693 0.23262219 0.63233274

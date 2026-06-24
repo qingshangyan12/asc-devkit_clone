@@ -10,7 +10,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000002091517061_zh-cn_topic_0000001526111046_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
+```text
 OpDef &Comment(CommentSection section, const char *comment)
 ```
 
@@ -55,35 +55,26 @@ OpDef算子定义，OpDef请参考[OpDef](OpDef.md)。
 
 ## 调用示例<a name="zh-cn_topic_0000002091517061_zh-cn_topic_0000001526111046_zh-cn_topic_0000001575944081_section320753512363"></a>
 
-```
- AddCustomComment(const char* name) : OpDef(name)
+```cpp
+AddCustomComment(const char* name) : OpDef(name)
 {
-	this->Comment(CommentSection::CATEGORY, "catg"); // 算子分组
-	this->Comment(CommentSection::BRIEF, "Brief cmt") // BRIEF注释
-	        .Comment(CommentSection::CONSTRAINTS, "Constraints cmt1") // CONSTRAINTS注释
-	        .Comment(CommentSection::CONSTRAINTS, "Constraints cmt2");
-	this->Comment(CommentSection::RESTRICTIONS, "Restrictions cmt1") // RESTRICTIONS注释
-		.Comment(CommentSection::RESTRICTIONS, "Restrictions cmt2")
-		.Comment(CommentSection::THIRDPARTYFWKCOMPAT, "Third-party framework compatibility cmt1") // THIRDPARTYFWKCOMPAT注释
-		.Comment(CommentSection::THIRDPARTYFWKCOMPAT, "Third-party framework compatibility cmt2")
-		.Comment(CommentSection::SEE, "See cmt1")// SEE注释
-		.Comment(CommentSection::SEE, "See cmt2");
-	this->Input("x")
-		.ParamType(REQUIRED)
-		.DataType({ge::DT_FLOAT, ge::DT_INT32})
-		.FormatList({ge::FORMAT_ND});
-	this->Input("y")
-		.ParamType(REQUIRED)
-		.DataType({ge::DT_FLOAT, ge::DT_INT32})
-		.FormatList({ge::FORMAT_ND});
+    this->Comment(CommentSection::CATEGORY, "catg");              // 算子分组
+    this->Comment(CommentSection::BRIEF, "Brief cmt")             // BRIEF注释
+        .Comment(CommentSection::CONSTRAINTS, "Constraints cmt1") // CONSTRAINTS注释
+        .Comment(CommentSection::CONSTRAINTS, "Constraints cmt2");
+    this->Comment(CommentSection::RESTRICTIONS, "Restrictions cmt1") // RESTRICTIONS注释
+        .Comment(CommentSection::RESTRICTIONS, "Restrictions cmt2")
+        .Comment(
+            CommentSection::THIRDPARTYFWKCOMPAT, "Third-party framework compatibility cmt1") // THIRDPARTYFWKCOMPAT注释
+        .Comment(CommentSection::THIRDPARTYFWKCOMPAT, "Third-party framework compatibility cmt2")
+        .Comment(CommentSection::SEE, "See cmt1") // SEE注释
+        .Comment(CommentSection::SEE, "See cmt2");
+    this->Input("x").ParamType(REQUIRED).DataType({ge::DT_FLOAT, ge::DT_INT32}).FormatList({ge::FORMAT_ND});
+    this->Input("y").ParamType(REQUIRED).DataType({ge::DT_FLOAT, ge::DT_INT32}).FormatList({ge::FORMAT_ND});
 
-	this->Output("z")
-		.ParamType(REQUIRED)
-		.DataType({ge::DT_FLOAT, ge::DT_INT32})
-		.FormatList({ge::FORMAT_ND});
-	this->AICore()
-		.SetTiling(optiling::TilingFunc);
-	this->AICore().AddConfig("ascendxxx");
+    this->Output("z").ParamType(REQUIRED).DataType({ge::DT_FLOAT, ge::DT_INT32}).FormatList({ge::FORMAT_ND});
+    this->AICore().SetTiling(optiling::TilingFunc);
+    this->AICore().AddConfig("ascendxxx");
 }
 ```
 

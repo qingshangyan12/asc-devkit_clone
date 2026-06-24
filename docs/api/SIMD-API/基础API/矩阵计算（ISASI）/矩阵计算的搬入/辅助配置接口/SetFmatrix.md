@@ -60,12 +60,14 @@ uint16_t C0, C1;
 uint8_t dilationH = 2, dilationW = 2;
 
 uint8_t padList[PAD_SIZE] = {0, 0, 0, 0};
-AscendC::SetFmatrix(H, W, padList, FmatrixMode::FMATRIX_LEFT); // 使能FM内存排布模式，从left寄存器获取信息
+AscendC::SetFmatrix(H, W, padList,
+                    FmatrixMode::FMATRIX_LEFT); // 使能FM内存排布模式，从left寄存器获取信息
 AscendC::SetLoadDataPaddingValue(0);
 AscendC::SetLoadDataRepeat({0, 1, 0});
 AscendC::SetLoadDataBoundary((uint32_t)0);
-static constexpr AscendC::IsResetLoad3dConfig LOAD3D_CONFIG = {false,false};
-AscendC::LoadData<fmap_T, LOAD3D_CONFIG>(featureMapA2, featureMapA1,
-    { padList, H, W, channelSize, k, howoRound, 0, 0, 1, 1, Kw, Kh, dilationW, dilationH, false, false, 0 });
-AscendC::LoadData(weightB2, weightB1, { 0, weRepeat, 1, 0, 0, false, 0 });
+static constexpr AscendC::IsResetLoad3dConfig LOAD3D_CONFIG = {false, false};
+AscendC::LoadData<fmap_T, LOAD3D_CONFIG>(
+    featureMapA2, featureMapA1,
+    {padList, H, W, channelSize, k, howoRound, 0, 0, 1, 1, Kw, Kh, dilationW, dilationH, false, false, 0});
+AscendC::LoadData(weightB2, weightB1, {0, weRepeat, 1, 0, 0, false, 0});
 ```

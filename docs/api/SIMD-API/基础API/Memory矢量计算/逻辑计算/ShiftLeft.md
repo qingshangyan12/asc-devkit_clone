@@ -43,7 +43,8 @@ $dst_i = src_i \ll scalarValue$
 
     ```cpp
     template <typename T, bool isSetMask = true>
-    __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, const int32_t& count)
+    __aicore__ inline void ShiftLeft(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, const int32_t& count)
     ```
 
 - tensor高维切分计算
@@ -51,14 +52,18 @@ $dst_i = src_i \ll scalarValue$
 
         ```cpp
         template <typename T, bool isSetMask = true>
-        __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+        __aicore__ inline void ShiftLeft(
+            const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, uint64_t mask[],
+            const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
         ```
 
     - mask连续模式
 
         ```cpp
         template <typename T, bool isSetMask = true>
-        __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+        __aicore__ inline void ShiftLeft(
+            const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, uint64_t mask, const uint8_t repeatTime,
+            const UnaryRepeatParams& repeatParams)
         ```
 
 dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/TensorTrait.md)类型时，其数据类型TensorTrait和scalarValue的数据类型（对应TensorTrait中的LiteType类型）不一致。因此新增模板类型U表示scalarValue的数据类型，并通过std::enable\_if检查T中萃取出的LiteType和U是否完全一致，一致则接口通过编译，否则编译失败。接口原型定义如下：
@@ -66,23 +71,34 @@ dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/T
 - tensor前n个数据计算
 
     ```cpp
-    template <typename T, typename U, bool isSetMask = true, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
-    __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, const int32_t& count)
+    template <
+        typename T, typename U, bool isSetMask = true,
+        typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+    __aicore__ inline void ShiftLeft(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, const int32_t& count)
     ```
 
 - tensor高维切分计算
     - mask逐bit模式
 
         ```cpp
-        template <typename T, typename U, bool isSetMask = true, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
-        __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+        template <
+            typename T, typename U, bool isSetMask = true,
+            typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+        __aicore__ inline void ShiftLeft(
+            const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, uint64_t mask[],
+            const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
         ```
 
     - mask连续模式
 
         ```cpp
-        template <typename T, typename U, bool isSetMask = true, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
-        __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+        template <
+            typename T, typename U, bool isSetMask = true,
+            typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+        __aicore__ inline void ShiftLeft(
+            const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue, uint64_t mask, const uint8_t repeatTime,
+            const UnaryRepeatParams& repeatParams)
         ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -166,13 +182,13 @@ dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/T
     // repeatTime = 4, 128 elements one repeat, 512 elements total.
     // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat.
     // dstRepStride, srcRepStride = 8, no gap between repeats.
-    AscendC::ShiftLeft(dstLocal, srcLocal, scalar, mask, 4, { 1, 1, 8, 8 });
+    AscendC::ShiftLeft(dstLocal, srcLocal, scalar, mask, 4, {1, 1, 8, 8});
     ```
 
 - tensor高维切分计算样例-mask逐bit模式
 
     ```cpp
-    uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
+    uint64_t mask[2] = {UINT64_MAX, UINT64_MAX};
     int16_t scalar = 2;
     // repeatTime = 4, 128 elements one repeat, 512 elements total.
     // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat.

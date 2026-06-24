@@ -19,12 +19,16 @@
 
 ## 函数原型
 
-```
-template <bool sync = true> __aicore__ inline void IterateAll(const GlobalTensor<DstT>& gm, uint8_t enAtomic = 0, bool enSequentialWrite = false, bool waitIterateAll = false, bool fakeMsg = false)
+```cpp
+template <bool sync = true>
+__aicore__ inline void IterateAll(
+    const GlobalTensor<DstT>& gm, uint8_t enAtomic = 0, bool enSequentialWrite = false, bool waitIterateAll = false,
+    bool fakeMsg = false)
 ```
 
-```
-template <bool sync = true> __aicore__ inline void IterateAll(const LocalTensor<DstT>& ubCmatrix, uint8_t enAtomic = 0)
+```cpp
+template <bool sync = true>
+__aicore__ inline void IterateAll(const LocalTensor<DstT>& ubCmatrix, uint8_t enAtomic = 0)
 ```
 
 ## 参数说明
@@ -73,13 +77,13 @@ template <bool sync = true> __aicore__ inline void IterateAll(const LocalTensor<
 
 IterateAll接口的调用示例如下。
 
-```
+```cpp
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
 mm.SetTensorA(gm_a);
 mm.SetTensorB(gm_b);
 if (tiling.isBias) {
     mm.SetBias(gmBias);
 }
-mm.IterateAll(gm_c);    // 计算
+mm.IterateAll(gm_c); // 计算
 mm.End();
 ```

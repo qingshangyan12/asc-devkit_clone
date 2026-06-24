@@ -34,10 +34,11 @@ L0C Buffer到Unified Buffer搬运支持不量化输出、float到half或bfloat16
 - 执行L0C Buffer到Unified Buffer的量化搬运。
 
     ```cpp
-    template <typename AtomType, typename DstTensor, typename SrcTensor, typename QuantParam,
+    template <
+        typename AtomType, typename DstTensor, typename SrcTensor, typename QuantParam,
         Std::enable_if_t<IsCopyQuantParamV<QuantParam>, int> Enable>
-    __aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src,
-        const QuantParam& quant)
+    __aicore__ inline void Copy(
+        const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src, const QuantParam& quant)
     ```
 
 - 使用默认trait构造搬运原子对象。
@@ -96,12 +97,7 @@ struct CopyL0C2UBTrait {
 使用自定义trait的示例：
 
 ```cpp
-constexpr CopyL0C2UBTrait l0c2ubTrait = {
-    RoundMode::DEFAULT,
-    false,
-    false,
-    DUAL_DST_DISABLE
-};
+constexpr CopyL0C2UBTrait l0c2ubTrait = {RoundMode::DEFAULT, false, false, DUAL_DST_DISABLE};
 
 struct CopyL0C2UBTraitCustom {
     using TraitType = CopyL0C2UBTrait;

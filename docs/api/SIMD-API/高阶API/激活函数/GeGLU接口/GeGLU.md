@@ -41,31 +41,38 @@ GeGLU是采用GELU作为激活函数的GLU变体。具体计算公式如下：
 -   通过sharedTmpBuffer入参传入临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void GeGLU(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1, const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
+        __aicore__ inline void GeGLU(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1,
+            const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void GeGLU(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1, const LocalTensor<uint8_t>& sharedTmpBuffer)
+        __aicore__ inline void GeGLU(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1,
+            const LocalTensor<uint8_t>& sharedTmpBuffer)
         ```
 
 -   接口框架申请临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void GeGLU(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1, uint32_t calCount)
+        __aicore__ inline void GeGLU(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1,
+            uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void GeGLU(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1)
+        __aicore__ inline void GeGLU(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor0, const LocalTensor<T>& srcTensor1)
         ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者**通过sharedTmpBuffer入参传入**和**接口框架申请**两种方式。
@@ -106,7 +113,7 @@ GeGLU是采用GELU作为激活函数的GLU变体。具体计算公式如下：
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放GeGLU计算结果的Tensor
 // src0Local: 存放GeGLU的输入Tensor
 // src1Local: 存放GeGLU的输入Tensor
@@ -125,7 +132,7 @@ AscendC::GeGLU<srcType, false>(dstLocal, src0Local, src1Local, sharedTmpBuffer, 
 
 结果示例如下：
 
-```
+```text
 输入数据(src0Local):
 [-2.56 -2.55 -2.54 ... 2.53  2.54  2.55]
 输入数据(src1Local)：

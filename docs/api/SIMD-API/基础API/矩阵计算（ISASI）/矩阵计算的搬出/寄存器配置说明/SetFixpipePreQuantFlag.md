@@ -21,7 +21,7 @@ DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运（DataCopy）.md)、[L
 ## 函数原型<a name="zh-cn_topic_0000002516049318_section620mcpsimp"></a>
 
 ```cpp
-template<typename T>
+template <typename T>
 __aicore__ inline void SetFixpipePreQuantFlag(uint64_t config)
 ```
 
@@ -52,7 +52,7 @@ __aicore__ inline void SetFixpipePreQuantFlag(uint64_t config)
 ```cpp
 float tmp = (float)0.5;
 // 将float的tmp转换成uint64_t的deqScalar
-uint64_t deqScalar = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&tmp)); 
-AscendC::SetFixpipePreQuantFlag(deqScalar);  // 设置量化参数
+uint64_t deqScalar = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&tmp));
+AscendC::SetFixpipePreQuantFlag(deqScalar); // 设置量化参数
 AscendC::PipeBarrier<PIPE_FIX>();
 ```

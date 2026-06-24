@@ -32,7 +32,7 @@ arcsin\(x\)为反正弦函数的计算。
 
 ## 函数原型
 
-```
+```text
 inline float asinf(float x)
 ```
 
@@ -62,7 +62,7 @@ inline float asinf(float x)
 
 使用该接口需要包含"simt\_api/math\_functions.h"头文件。
 
-```
+```cpp
 #include "simt_api/math_functions.h"
 ```
 
@@ -70,8 +70,8 @@ inline float asinf(float x)
 
 - SIMT编程场景：
 
-    ```
-    __global__ __launch_bounds__(256) void compute_asinf(float *result, const float *x, uint32_t count)
+    ```cpp
+    __global__ __launch_bounds__(256) void compute_asinf(float* result, const float* x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= count) {
@@ -83,8 +83,9 @@ inline float asinf(float x)
 
 - SIMD与SIMT混合编程场景：
 
-    ```
-    __simt_vf__ __launch_bounds__(256) inline void compute_asinf_vf(__gm__ float *result, __gm__ const float *x, uint32_t count)
+    ```cpp
+    __simt_vf__ __launch_bounds__(256) inline void compute_asinf_vf(
+        __gm__ float* result, __gm__ const float* x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= count) {
@@ -93,7 +94,7 @@ inline float asinf(float x)
         result[idx] = asinf(x[idx]);
     }
 
-    __global__ __vector__ void run_asinf(__gm__ float *result, __gm__ const float *x, uint32_t count)
+    __global__ __vector__ void run_asinf(__gm__ float* result, __gm__ const float* x, uint32_t count)
     {
         asc_vf_call<compute_asinf_vf>(dim3(256), result, x, count);
     }
@@ -101,7 +102,7 @@ inline float asinf(float x)
 
 输入输出示例如下：
 
-```
+```text
 x：-0.75, -0.25, 0.25, 0.75
 result: -0.8480784 -0.2526802 0.2526802 0.8480784
 ```

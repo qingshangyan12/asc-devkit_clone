@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename Tp>
 struct is_void;
 ```
@@ -42,9 +42,9 @@ is\_void的静态常量成员value用于获取返回的布尔值，is\_void<Tp\>
 
 ## 调用示例
 
-```
+```cpp
 // 自定义测试类型
-struct MyStruct{};
+struct MyStruct {};
 
 // void类型的函数
 using FuncType = void(int);
@@ -62,14 +62,9 @@ AscendC::printf("AscendC::Std::is_void::value:%d\n", AscendC::Std::is_void<volat
 AscendC::printf("AscendC::Std::is_void::value:%d\n", AscendC::Std::is_void<const volatile void>::value);
 ```
 
-```
+```cpp
 // 执行结果：
-AscendC::Std::is_void::value:0
-AscendC::Std::is_void::value:0
-AscendC::Std::is_void::value:0
-AscendC::Std::is_void::value:0
-AscendC::Std::is_void::value:1
-AscendC::Std::is_void::value:1
-AscendC::Std::is_void::value:1
-AscendC::Std::is_void::value:1
+AscendC::Std::is_void::value : 0 AscendC::Std::is_void::value : 0 AscendC::Std::is_void::value : 0 AscendC::Std::
+    is_void::value : 0 AscendC::Std::is_void::value : 1 AscendC::Std::is_void::value : 1 AscendC::Std::is_void::
+        value : 1 AscendC::Std::is_void::value : 1
 ```

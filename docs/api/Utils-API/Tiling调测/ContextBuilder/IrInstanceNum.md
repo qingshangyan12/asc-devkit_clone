@@ -6,8 +6,8 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001867289933_zh-cn_topic_0000001389787297_section13230182415108"></a>
 
-```
-ContextBuilder &IrInstanceNum(std::vector<uint32_t> instanceNum)
+```cpp
+ContextBuilder& IrInstanceNum(std::vector<uint32_t> instanceNum)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001867289933_zh-cn_topic_0000001389787297_section75395119104"></a>
@@ -41,9 +41,10 @@ ContextBuilder &IrInstanceNum(std::vector<uint32_t> instanceNum)
 
 ## 调用示例<a name="zh-cn_topic_0000001867289933_zh-cn_topic_0000001389787297_section320753512363"></a>
 
-```
+```cpp
 context_ascendc::ContextBuilder builder;
-(void)builder.NodeIoNum(5,3)   // 算子有5种输入，3种输出
-             .IrInstanceNum({1, 1, 3, 1, 1});  // 算子实例化时，index为2的动态类型输入tensor有3个实例
+(void)builder
+    .NodeIoNum(5, 3)                 // 算子有5种输入，3种输出
+    .IrInstanceNum({1, 1, 3, 1, 1}); // 算子实例化时，index为2的动态类型输入tensor有3个实例
 ```
 

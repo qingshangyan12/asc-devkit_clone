@@ -23,13 +23,13 @@ AOT的核心思想是：**将特定Tiling配置以编译期常量的形式固化
   ```cpp
   struct TilingData;
   template <typename T>
-  struct ConstTilingHolder { // 持有特定Tiling的常量结构体
-      static constexpr const uint8_t bytes[] = {0, 1, 2, 3, ...};  // 常量特化Tiling值（数组）
+  struct ConstTilingHolder {                                         // 持有特定Tiling的常量结构体
+      static constexpr const uint8_t bytes[] = {0, 1, 2, 3, ...};    // 常量特化Tiling值（数组）
       static constexpr const T value = convert_from_bytes<T>(bytes); // 编译期转为常量结构体
   };
   template <typename T>
-  struct RuntimeTilingHolder { // 用于区分常量Tiling的运行时桩结构体
-      static constexpr const uint8_t bytes[sizeof(T)] = {};  // 数据桩实现，该值无意义
+  struct RuntimeTilingHolder {                              // 用于区分常量Tiling的运行时桩结构体
+      static constexpr const uint8_t bytes[sizeof(T)] = {}; // 数据桩实现，该值无意义
       static constexpr const T value = convert_from_bytes<T>(bytes);
   };
   ```
@@ -39,12 +39,13 @@ AOT的核心思想是：**将特定Tiling配置以编译期常量的形式固化
   ```cpp
   // 对外提供模板类型，用于Host调用时不同场景给定常量Tiling值或者运行时桩
   template <typename TH>
-  __global__ __vector__ void add(__gm__ uint8_t* x1, __gm__ uint8_t* x2, TilingData tiling) {
-      const TilingData *td;
-      if constexpr(!std::is_same_v<TH, RuntimeTilingHolder<TilingData>>) {
+  __global__ __vector__ void add(__gm__ uint8_t* x1, __gm__ uint8_t* x2, TilingData tiling)
+  {
+      const TilingData* td;
+      if constexpr (!std::is_same_v<TH, RuntimeTilingHolder<TilingData>>) {
           td = &TH::value; // 如果调用给定的是常量Tiling值，则直接获取常量值向下传递
       } else {
-          td = &tiling;  // 如果拿到的是运行时桩，则从参数获取
+          td = &tiling; // 如果拿到的是运行时桩，则从参数获取
       }
   }
   ```

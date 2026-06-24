@@ -41,30 +41,33 @@
 -   通过sharedTmpBuffer入参传入临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false, const TanhConfig& config = DEFAULT_TANH_CONFIG>
-        __aicore__ inline void Tanh(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+        __aicore__ inline void Tanh(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+            const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false, const TanhConfig& config = DEFAULT_TANH_CONFIG>
-        __aicore__ inline void Tanh(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
+        __aicore__ inline void Tanh(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
         ```
 
 -   接口框架申请临时空间
 
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false, const TanhConfig& config = DEFAULT_TANH_CONFIG>
         __aicore__ inline void Tanh(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false, const TanhConfig& config = DEFAULT_TANH_CONFIG>
         __aicore__ inline void Tanh(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
         ```
@@ -86,7 +89,7 @@
 | isReuseSource | 是否允许修改源操作数。该参数预留，传入默认值false即可。 |
 | config | <!-- npu="950" id9 -->该参数仅支持Ascend 950PR/Ascend 950DT。<br><br><!-- end id9 -->Tanh算法的相关配置。此参数可选配，TanhConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：Tanh内部实现使用的算法。TanhAlgo类型，支持的取值如下：INTRINSIC：默认值。该算法直接计算公式y = (e^(2x)-1)/(e^(2x)+1)，性能更好。SUBSECTION_COMPENSATION：该算法通过误差补偿实现Tanh，精度更高。 |
 
-```
+```cpp
 enum class TanhAlgo {
     INTRINSIC = 0,
     SUBSECTION_COMPENSATION,
@@ -117,7 +120,7 @@ struct TanhConfig {
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放Tanh计算结果的Tensor
 // srcLocal: 存放Tanh计算输入的Tensor
 // sharedTmpBuffer: 存放Tanh计算过程中临时缓存的Tensor
@@ -138,7 +141,7 @@ AscendC::Tanh<half, false, config>(dstLocal, srcLocal, sharedTmpBuffer, 512);
 
 结果示例如下：
 
-```
+```text
 输入数据(srcLocal):
 [-2.56 -2.55 -2.54 ... 0. ... 2.53  2.54  2.55]
 输出数据(dstLocal):

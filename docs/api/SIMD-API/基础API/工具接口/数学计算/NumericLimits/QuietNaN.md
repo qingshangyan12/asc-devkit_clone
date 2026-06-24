@@ -66,5 +66,6 @@
 - 矢量接口：
 
     ```cpp
-    AscendC::NumericLimits<float>::QuietNaN(dstLocal, 256); // 返回256个float类型的NaN值
+    AscendC::NumericLimits<float>::QuietNaN(dstLocal,
+                                            256); // 返回256个float类型的NaN值
     ```

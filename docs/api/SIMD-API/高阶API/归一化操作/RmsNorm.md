@@ -40,16 +40,20 @@
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isBasicBlock = false>
-    __aicore__ inline void RmsNorm(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<T>& gammaLocal, const LocalTensor<uint8_t>& sharedTmpBuffer, const T epsilon, const RmsNormTiling& tiling)
+    __aicore__ inline void RmsNorm(
+        const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<T>& gammaLocal,
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const T epsilon, const RmsNormTiling& tiling)
     ```
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isBasicBlock = false>
-    __aicore__ inline void RmsNorm(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<T>& gammaLocal, const T epsilon, const RmsNormTiling& tiling)
+    __aicore__ inline void RmsNorm(
+        const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<T>& gammaLocal, const T epsilon,
+        const RmsNormTiling& tiling)
     ```
 
 由于该接口的内部实现中涉及复杂的计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -93,7 +97,7 @@
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal：存放RmsNorm计算结果的Tensor
 // srcLocal：参与计算的输入Tensor
 // gammaLocal：输入张量，归一化后数据的缩放系数γ
@@ -106,7 +110,7 @@ AscendC::RmsNorm<dataType, isBasicBlock>(dstLocal, srcLocal, gammaLocal, epsilon
 
 示例结果如下：
 
-```
+```text
 输入数据(srcLocal, shape:[1, 1, 16]):
 [ 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 ]
 输入数据(gammaLocal, shape:[16]):

@@ -41,7 +41,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename T>
 __aicore__ inline void Arange(const LocalTensor<T>& dst, const T firstValue, const T diffValue, const int32_t count)
 ```
@@ -89,7 +89,7 @@ __aicore__ inline void Arange(const LocalTensor<T>& dst, const T firstValue, con
 
 完整样例请参考[Arange样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/06_index/arange)。
 
-```
+```cpp
 // dst：输出Tensor
 // firstValue_：等差数列首个元素值
 // diffValue_：等差数列的公差

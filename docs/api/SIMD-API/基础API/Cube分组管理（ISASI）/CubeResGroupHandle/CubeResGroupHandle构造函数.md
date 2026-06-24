@@ -53,11 +53,11 @@
 
 ## 函数原型<a name="section765814724715"></a>
 
-```
+```cpp
 template <typename CubeMsgType>
 class CubeResGroupHandle;
-__aicore__ inline CubeResGroupHandle() = default
-__aicore__ inline CubeResGroupHandle(GM_ADDR workspace, uint8_t blockStart, uint8_t blockSize, uint8_t msgQueueSize, uint8_t evtIDIn)
+__aicore__ inline CubeResGroupHandle() = default __aicore__ inline CubeResGroupHandle(
+    GM_ADDR workspace, uint8_t blockStart, uint8_t blockSize, uint8_t msgQueueSize, uint8_t evtIDIn)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001526206862_section129451113125413"></a>
@@ -127,12 +127,13 @@ __aicore__ inline CubeResGroupHandle(GM_ADDR workspace, uint8_t blockStart, uint
 
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 
-```
+```cpp
 uint8_t blockStart = 4;
 uint8_t blockSize = 4;
 uint8_t msgQueueSize = 10;
-uint8_t evtIDIn = 0; //用户自行管理事件ID
+uint8_t evtIDIn = 0;                   // 用户自行管理事件ID
 AscendC::KfcWorkspace desc(workspace); // 用户自行管理的workspace指针。
 AscendC::CubeResGroupHandle<CubeMsgBody> handle;
-handle = AscendC::CubeResGroupHandle<MatmulApiType, MyCallbackFunc, CubeMsgBody>(desc.GetMsgStart(), blockStart, blockSize, msgQueueSize, evtIDIn); 
+handle = AscendC::CubeResGroupHandle<MatmulApiType, MyCallbackFunc, CubeMsgBody>(
+    desc.GetMsgStart(), blockStart, blockSize, msgQueueSize, evtIDIn);
 ```

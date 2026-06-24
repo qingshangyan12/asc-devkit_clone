@@ -98,15 +98,15 @@ __aicore__ inline constexpr auto MakeLayout(const ShapeType& shape, const Stride
 
 ```cpp
 // 初始化Layout数据结构，获取对应数值
-AscendC::Shape<int,int,int> shape = AscendC::MakeShape(10, 20, 30);
-AscendC::Stride<int,int,int> stride = AscendC::MakeStride(1, 100, 200);
+AscendC::Shape<int, int, int> shape = AscendC::MakeShape(10, 20, 30);
+AscendC::Stride<int, int, int> stride = AscendC::MakeStride(1, 100, 200);
 
 auto layoutMake = AscendC::MakeLayout(shape, stride);
 AscendC::Layout<AscendC::Shape<int, int, int>, AscendC::Stride<int, int, int>> layoutInit(shape, stride);
 
 int value = AscendC::Std::get<0>(layoutMake.GetShape()); // value = 10
-value = AscendC::Std::get<1>(layoutMake.GetShape()); // value = 20
-value = AscendC::Std::get<2>(layoutMake.GetShape()); // value = 30
+value = AscendC::Std::get<1>(layoutMake.GetShape());     // value = 20
+value = AscendC::Std::get<2>(layoutMake.GetShape());     // value = 30
 
 value = AscendC::Std::get<0>(layoutInit.GetStride()); // value = 1
 value = AscendC::Std::get<1>(layoutInit.GetStride()); // value = 100

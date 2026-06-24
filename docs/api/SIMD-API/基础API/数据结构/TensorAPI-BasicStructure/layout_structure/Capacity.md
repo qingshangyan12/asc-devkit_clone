@@ -64,6 +64,6 @@ auto cap2 = Capacity(layout2);
 
 // 示例3：指定子维度
 auto layout3 = MakeLayout(MakeShape(10, 20, 30), MakeStride(1, 10, 200));
-auto cap3All = Capacity(layout3);       // max(10*1, 20*10, 30*200) = max(10, 200, 6000) = 6000
+auto cap3All = Capacity(layout3);        // max(10*1, 20*10, 30*200) = max(10, 200, 6000) = 6000
 auto cap3_0_1 = Capacity<0, 1>(layout3); // max(10*1, 20*10) = max(10, 200) = 200
 ```

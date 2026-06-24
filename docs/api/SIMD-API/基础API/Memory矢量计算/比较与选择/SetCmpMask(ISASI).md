@@ -120,7 +120,7 @@ __aicore__ inline void SetCmpMask(const LocalTensor<T>& src)
     AscendC::LocalTensor<float> src1 = inQueueY.AllocTensor<float>();
     uint8_t repeat = 4;
     uint32_t mask = 64;
-    AscendC::BinaryRepeatParams repeatParams = { 1, 1, 1, 8, 8, 8 };
+    AscendC::BinaryRepeatParams repeatParams = {1, 1, 1, 8, 8, 8};
 
     // selMode为模式0（SELMODE::VSEL_CMPMASK_SPR）
     AscendC::SetCmpMask(sel);
@@ -130,13 +130,15 @@ __aicore__ inline void SetCmpMask(const LocalTensor<T>& src)
 
     // selMode为模式2（SELMODE::VSEL_TENSOR_TENSOR_MODE）
     AscendC::LocalTensor<int32_t> tempBuf;
-    #if defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1)  // cpu调试
-    tempBuf.ReinterpretCast<int64_t>().SetValue(0, reinterpret_cast<int64_t>(reinterpret_cast<__ubuf__ int64_t*>(sel.GetPhyAddr())));
+    #if defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1) // cpu调试
+    tempBuf.ReinterpretCast<int64_t>().SetValue(
+        0, reinterpret_cast<int64_t>(reinterpret_cast<__ubuf__ int64_t*>(sel.GetPhyAddr())));
     event_t eventIdSToV = static_cast<event_t>(AscendC::GetTPipePtr()->FetchEventID(AscendC::HardEvent::S_V));
     AscendC::SetFlag<AscendC::HardEvent::S_V>(eventIdSToV);
     AscendC::WaitFlag<AscendC::HardEvent::S_V>(eventIdSToV);
     #else // npu调试
-    uint32_t selAddr = static_cast<uint32_t>(reinterpret_cast<int64_t>(reinterpret_cast<__ubuf__ int64_t*>(sel.GetPhyAddr())));
+    uint32_t selAddr =
+        static_cast<uint32_t>(reinterpret_cast<int64_t>(reinterpret_cast<__ubuf__ int64_t*>(sel.GetPhyAddr())));
     AscendC::SetVectorMask<uint32_t>(32);
     AscendC::Duplicate<uint32_t, false>(tempBuf.ReinterpretCast<uint32_t>(), selAddr, AscendC::MASK_PLACEHOLDER, 1, 1, 8);
     AscendC::PipeBarrier<PIPE_V>();
@@ -168,7 +170,7 @@ __aicore__ inline void SetCmpMask(const LocalTensor<T>& src)
 
     uint8_t repeat = 4;
     uint32_t mask = 64;
-    AscendC::BinaryRepeatParams repeatParams = { 1, 1, 1, 8, 8, 8 };
+    AscendC::BinaryRepeatParams repeatParams = {1, 1, 1, 8, 8, 8};
 
     // selMode为模式1（SELMODE::VSEL_TENSOR_SCALAR_MODE）
     AscendC::SetVectorMask<uint32_t>(32);

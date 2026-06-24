@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001759419021_zh-cn_topic_0000001526594958_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
+```text
 OpParamDef &Scalar()
 ```
 
@@ -27,8 +27,7 @@ OpParamDef算子定义，OpParamDef请参考[OpParamDef](OpParamDef.md)。
 
 ## 调用示例<a name="zh-cn_topic_0000001759419021_zh-cn_topic_0000001526594958_zh-cn_topic_0000001575944081_section320753512363"></a>
 
-```
-this->Input("x")
-    .Scalar()
+```cpp
+this->Input("x").Scalar()
 ```
 

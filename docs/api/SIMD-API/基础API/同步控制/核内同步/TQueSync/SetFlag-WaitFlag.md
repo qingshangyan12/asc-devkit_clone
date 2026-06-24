@@ -56,9 +56,8 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
-__aicore__ inline void SetFlag(TEventID id)
-__aicore__ inline void WaitFlag(TEventID id)
+```cpp
+__aicore__ inline void SetFlag(TEventID id) __aicore__ inline void WaitFlag(TEventID id)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -102,7 +101,7 @@ SetFlag/WaitFlag必须成对出现。
 
 如DataCopy需要等待SetValue执行完成后才能执行，需要插入PIPE\_S到PIPE\_MTE3的同步。
 
-```
+```cpp
 AscendC::GlobalTensor<half> dstGlobal;
 AscendC::LocalTensor<half> dstLocal;
 dstLocal.SetValue(0, 0);

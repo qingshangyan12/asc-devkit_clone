@@ -71,5 +71,4 @@ struct MmadTraitCustom {
 MmadParams params(1, n, k, 0, true);
 auto atom = MakeMmad(MmadOperation{}, MmadTraitCustom{}).with(params);
 Mmad(atom, l0C, l0A, l0B);
-
 ```

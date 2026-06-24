@@ -40,16 +40,21 @@
 
 - 通过sharedTmpBuffer入参传入临时空间
 
-    ```
-    template <typename T, typename accType = T, bool isReuseSource = false, bool isBasicBlock = false, int32_t reduceDim = -1>
-    __aicore__ inline void Mean(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const MeanParams& meanParams)
+    ```cpp
+    template <
+        typename T, typename accType = T, bool isReuseSource = false, bool isBasicBlock = false, int32_t reduceDim = -1>
+    __aicore__ inline void Mean(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+        const MeanParams& meanParams)
     ```
 
 - 接口框架申请临时空间
 
-    ```
-    template <typename T, typename accType = T, bool isReuseSource = false, bool isBasicBlock = false, int32_t reduceDim = -1>
-    __aicore__ inline void Mean(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const MeanParams& meanParams)
+    ```cpp
+    template <
+        typename T, typename accType = T, bool isReuseSource = false, bool isBasicBlock = false, int32_t reduceDim = -1>
+    __aicore__ inline void Mean(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const MeanParams& meanParams)
     ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者**通过sharedTmpBuffer入参传入**和**接口框架申请**两种方式。
@@ -80,7 +85,7 @@
 | sharedTmpBuffer | 输入 | 临时缓存。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>用于Mean内部复杂计算时存储中间变量，由开发者提供。<br><br>临时空间大小BufferSize的获取方式请参考[GetMeanMaxMinTmpSize](GetMeanMaxMinTmpSize.md)。 |
 | MeanParams | 输入 | srcTensor的shape信息。MeanParams类型，具体定义如下方代码所示，其中参数的含义为：<br>outter：输入数据的外轴长度。<br>inner：输入数据内轴实际元素个数32字节补齐后的元素个数，inner\*sizeof(T)必须是32字节的整数倍。<br>n：输入数据内轴的实际元素个数。<br>请注意：MeanParams.inner是MeanParams.n向上32字节对齐后的值，inner = (n *sizeof(T) + 32 - 1) / 32 * 32 / sizeof(T)，因此MeanParams.n的大小应该满足：1 <= MeanParams.n <= MeanParams.inner。 |
 
-```
+```cpp
 struct MeanParams {
     uint32_t outter = 1;
     uint32_t inner;
@@ -102,7 +107,7 @@ struct MeanParams {
 
 ## 调用示例
 
-```
+```cpp
 #include "kernel_operator.h"
 // 定义srcTensor的shape信息，输入元素类型为half，大小为2*3的二维数据
 AscendC::MeanParams meanParams;
@@ -121,7 +126,7 @@ meanParams.inner = inner;
 
 结果示例如下：
 
-```
+```text
 输入数据(srcLocal): [[1 2 3 0 0 0 0 0 0 0 0 0 0 0 0 0],
                      [4 5 6 0 0 0 0 0 0 0 0 0 0 0 0 0]]
 输出数据(dstLocal): [2 5 0 0 0 0 0 0 0 0 0 0 0 0 0 0]

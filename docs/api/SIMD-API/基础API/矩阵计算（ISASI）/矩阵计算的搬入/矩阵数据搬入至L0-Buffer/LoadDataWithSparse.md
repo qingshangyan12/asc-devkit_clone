@@ -31,8 +31,13 @@
 ## 函数原型<a name="zh-cn_topic_0000002512171654_section82039854412"></a>
 
 ```cpp
-template <typename T = int8_t, typename U = uint8_t, typename Std::enable_if<Std::is_same<PrimT<T>, int8_t>::value, bool>::type = true, typename Std::enable_if<Std::is_same<PrimT<U>, uint8_t>::value, bool>::type = true>
-__aicore__ inline void LoadDataWithSparse(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<U>& idx, const LoadData2dParams& loadDataParam)
+template <
+    typename T = int8_t, typename U = uint8_t,
+    typename Std::enable_if<Std::is_same<PrimT<T>, int8_t>::value, bool>::type = true,
+    typename Std::enable_if<Std::is_same<PrimT<U>, uint8_t>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithSparse(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<U>& idx,
+    const LoadData2dParams& loadDataParam)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000002512171654_section16128134420472"></a>

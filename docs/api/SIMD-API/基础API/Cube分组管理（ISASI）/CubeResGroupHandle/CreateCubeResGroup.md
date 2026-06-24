@@ -53,9 +53,10 @@
 
 ## 函数原型<a name="section765814724715"></a>
 
-```
+```cpp
 template <int groupID, class MatmulApiType, template <class, class> class CallBack, typename CubeMsgType>
-__aicore__ inline CubeResGroupHandle<CubeMsgType> CreateCubeResGroup(KfcWorkspace& desc, uint8_t blockStart, uint8_t blockSize, uint8_t msgQueueSize, GM_ADDR tiling)
+__aicore__ inline CubeResGroupHandle<CubeMsgType> CreateCubeResGroup(
+    KfcWorkspace& desc, uint8_t blockStart, uint8_t blockSize, uint8_t msgQueueSize, GM_ADDR tiling)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001526206862_section129451113125413"></a>
@@ -156,6 +157,7 @@ CubeResGroupHandle对象实例。
 
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 
-```
-auto handle = AscendC::CreateCubeResGroup<GROUPID, MatmulApiType, MyCallbackFunc, CubeMsgBody> (desc, BLOCKSTART, BLOCKSIZE, MSGQUEUESIZE, tilingGM);
+```cpp
+auto handle = AscendC::CreateCubeResGroup<GROUPID, MatmulApiType, MyCallbackFunc, CubeMsgBody>(
+    desc, BLOCKSTART, BLOCKSIZE, MSGQUEUESIZE, tilingGM);
 ```

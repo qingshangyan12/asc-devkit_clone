@@ -33,16 +33,20 @@
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isReuseSource = false>
-    __aicore__ inline void ReduceXorSum(LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+    __aicore__ inline void ReduceXorSum(
+        LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
+        LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
     ```
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isReuseSource = false>
-    __aicore__ inline void ReduceXorSum(LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, const uint32_t calCount);
+    __aicore__ inline void ReduceXorSum(
+        LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
+        const uint32_t calCount);
     ```
 
 由于该接口的内部实现中需要保存异或结果以及进行其他运算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者**通过sharedTmpBuffer入参传入**和**接口框架申请**两种方式。
@@ -89,7 +93,7 @@
 
 ## 调用示例
 
-```
+```cpp
 // 模板参数：操作数的数据类型为int16，false代表不允许修改源操作数
 // dstLocal输出数据的tensor，src0Local源操作数0，src1Local源操作数1
 // sharedTmpBuffer临时缓存，32个元素参与计算
@@ -98,10 +102,11 @@ AscendC::ReduceXorSum<int16_t, false>(dstLocal, src0Local, src1Local, sharedTmpB
 
 结果示例如下：
 
-```
-输入输出的数据类型为int16_t
-输入数据(src0Local): [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
-输入数据(src1Local): [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+```cpp
+输入输出的数据类型为int16_t 输入数据(src0Local)
+    : [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] 输入数据(src1Local)
+    : [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
 
-输出数据(dstLocal): [32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] // 仅32为有效值
+      输出数据(dstLocal)
+    : [32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] // 仅32为有效值
 ```

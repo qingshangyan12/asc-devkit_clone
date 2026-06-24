@@ -18,7 +18,7 @@ conditional有一个嵌套的type成员，它的值取决于Bp的值：如果Bp�
 
 ## 函数原型
 
-```
+```cpp
 template <bool Bp, typename If, typename Then>
 struct conditional;
 ```
@@ -46,30 +46,28 @@ conditional的静态常量成员type用于获取返回值，conditional<Bp, If, 
 
 ## 调用示例
 
-```
+```cpp
 // 定义两个不同的类型
 struct TypeA {
-    __aicore__ inline static void print() {
-        AscendC::PRINTF("This is TypeA..\n");
-    }
+    __aicore__ inline static void print() { AscendC::PRINTF("This is TypeA..\n"); }
 };
 
 struct TypeB {
-    __aicore__ inline static void print() {
-        AscendC::PRINTF("This is TypeB..\n");
-    }
+    __aicore__ inline static void print() { AscendC::PRINTF("This is TypeB..\n"); }
 };
 
 // 根据条件选择类型
 template <bool Condition>
-__aicore__ inline void selectType() {
+__aicore__ inline void selectType()
+{
     using SelectedType = typename AscendC::Std::conditional<Condition, TypeA, TypeB>::type;
     SelectedType::print();
 }
 
 // 定义一个模板函数，根据条件选择不同的类型
 template <bool Condition>
-__aicore__ inline void selectOtherType() {
+__aicore__ inline void selectOtherType()
+{
     using SelectedType = typename std::conditional<Condition, int, float>::type;
     if constexpr (std::is_same_v<SelectedType, int>) {
         AscendC::PRINTF("Selected type is int.\n");
@@ -89,7 +87,7 @@ selectOtherType<true>();
 selectOtherType<false>();
 ```
 
-```
+```text
 // 执行结果：
 This is TypeA..
 This is TypeB..

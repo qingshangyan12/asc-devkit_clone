@@ -33,7 +33,7 @@ Pybind适用于快速将C++函数暴露给Python，实现高效接口绑定。�
 
     需要注意的是，本样例的输入x，y的内存是在外层的Python调用脚本中分配的。
 
-    ```
+    ```cpp
     namespace ascendc_ops {
     at::Tensor ascendc_add(const at::Tensor& x, const at::Tensor& y)
     {
@@ -47,7 +47,9 @@ Pybind适用于快速将C++函数暴露给Python，实现高效接口绑定。�
             totalLength *= size;
         }
         // 用<<<>>>接口调用核函数完成指定的运算
-        add_custom<<<numBlocks, nullptr, aclStream>>>((uint8_t*)(x.mutable_data_ptr()), (uint8_t*)(y.mutable_data_ptr()), (uint8_t*)(z.mutable_data_ptr()), totalLength);
+        add_custom<<<numBlocks, nullptr, aclStream>>>(
+            (uint8_t*)(x.mutable_data_ptr()), (uint8_t*)(y.mutable_data_ptr()), (uint8_t*)(z.mutable_data_ptr()),
+            totalLength);
         // 将Device上的运算结果拷贝回Host并释放申请的资源
         return z;
     }
@@ -58,18 +60,12 @@ Pybind适用于快速将C++函数暴露给Python，实现高效接口绑定。�
 
     PyTorch提供TORCH\_LIBRARY宏作为自定义算子注册的核心接口，用于创建并初始化自定义算子库，注册后在Python侧可以通过torch.ops.namespace.op\_name方式进行调用。TORCH\_LIBRARY\_IMPL用于将算子逻辑绑定到特定的DispatchKey（PyTorch设备调度标识），针对NPU设备，需要将算子实现注册到PrivateUse1这一专属的DispatchKey上。
 
-    ```
+    ```cpp
     // 注册算子到torch.library
-    TORCH_LIBRARY(ascendc_ops, m)
-    {
-        m.def("ascendc_add(Tensor x, Tensor y) -> Tensor");
-    }
-    
+    TORCH_LIBRARY(ascendc_ops, m) { m.def("ascendc_add(Tensor x, Tensor y) -> Tensor"); }
+
     // 注册PrivateUse1实现，NPU设备
-    TORCH_LIBRARY_IMPL(ascendc_ops, PrivateUse1, m)
-    {
-        m.impl("ascendc_add", TORCH_FN(ascendc_ops::ascendc_add));
-    }
+    TORCH_LIBRARY_IMPL(ascendc_ops, PrivateUse1, m) { m.impl("ascendc_add", TORCH_FN(ascendc_ops::ascendc_add)); }
     ```
 
 4.  编译生成算子动态库。
@@ -89,7 +85,7 @@ Pybind适用于快速将C++函数暴露给Python，实现高效接口绑定。�
     -   [安装torch\_npu插件](https://www.hiascend.com/document/detail/zh/Pytorch/60RC3/configandinstg/instg/insg_0006.html)
     -   安装pybind11
 
-        ```
+        ```text
         pip3 install pybind11 expecttest
         ```
 
@@ -99,42 +95,44 @@ Pybind适用于快速将C++函数暴露给Python，实现高效接口绑定。�
 
     需要注意的是，本样例的输入x，y的内存是在Python调用脚本中分配的。
 
-    ```
+    ```cpp
     // Pybind和PyTorch调用所需的头文件
     #include <pybind11/pybind11.h>
     #include <torch/extension.h>
-    
+
     #include "torch_npu/csrc/core/npu/NPUStream.h"
     // Kernel侧实现需要的头文件
-    #include "kernel_operator.h" 
-    ...
-    namespace ascendc_ops {
-    at::Tensor ascendc_add(const at::Tensor& x, const at::Tensor& y)
+    #include "kernel_operator.h"
+    ... namespace ascendc_ops
     {
-        // 运行资源申请，通过c10_npu::getCurrentNPUStream()的函数获取当前NPU上的流
-        auto aclStream = c10_npu::getCurrentNPUStream().stream(false);
-        // 分配Device侧输出内存
-        at::Tensor z = at::empty_like(x);
-        uint32_t numBlocks = 8;
-        uint32_t totalLength = 1;
-        for (uint32_t size : x.sizes()) {
-            totalLength *= size;
+        at::Tensor ascendc_add(const at::Tensor& x, const at::Tensor& y)
+        {
+            // 运行资源申请，通过c10_npu::getCurrentNPUStream()的函数获取当前NPU上的流
+            auto aclStream = c10_npu::getCurrentNPUStream().stream(false);
+            // 分配Device侧输出内存
+            at::Tensor z = at::empty_like(x);
+            uint32_t numBlocks = 8;
+            uint32_t totalLength = 1;
+            for (uint32_t size : x.sizes()) {
+                totalLength *= size;
+            }
+            // 用<<<>>>接口调用核函数完成指定的运算
+            add_custom<<<numBlocks, nullptr, aclStream>>>(
+                (uint8_t*)(x.mutable_data_ptr()), (uint8_t*)(y.mutable_data_ptr()), (uint8_t*)(z.mutable_data_ptr()),
+                totalLength);
+            // 将Device上的运算结果拷贝回Host并释放申请的资源
+            return z;
         }
-        // 用<<<>>>接口调用核函数完成指定的运算
-        add_custom<<<numBlocks, nullptr, aclStream>>>((uint8_t*)(x.mutable_data_ptr()), (uint8_t*)(y.mutable_data_ptr()), (uint8_t*)(z.mutable_data_ptr()), totalLength);
-        // 将Device上的运算结果拷贝回Host并释放申请的资源
-        return z;
-    }
     } // namespace ascendc_ops
     ```
 
 3.  定义Pybind模块，将C++函数封装成Python函数。PYBIND11\_MODULE是Pybind11库中的一个宏，用于定义一个Python模块。它接受两个参数，第一个参数是封装后的模块名，第二个参数是一个Pybind11模块对象，用于定义模块中的函数、类、常量等。通过调用m.def\(\)方法，可以将上一步骤中函数ascendc\_ops::ascendc\_add转成Python函数ascendc\_add，使其可以在Python代码中被调用。
 
-    ```
-    PYBIND11_MODULE(ascendc_ops, m)// 模块名ascendc_ops，模块对象m
+    ```cpp
+    PYBIND11_MODULE(ascendc_ops, m) // 模块名ascendc_ops，模块对象m
     {
-        m.doc() = "add_custom pybind11 interfaces";// optional module docstring
-        m.def("ascendc_add", &ascendc_ops::ascendc_add, "");// 将函数ascendc_add与Pybind模块进行绑定
+        m.doc() = "add_custom pybind11 interfaces";          // optional module docstring
+        m.def("ascendc_add", &ascendc_ops::ascendc_add, ""); // 将函数ascendc_add与Pybind模块进行绑定
     }
     ```
 

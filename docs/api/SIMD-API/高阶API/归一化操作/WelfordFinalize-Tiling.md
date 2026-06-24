@@ -15,8 +15,10 @@ kernel侧WelfordFinalize接口的计算需要开发者预留/申请临时空间�
 
 ## 函数原型
 
-```
-void GetWelfordFinalizeMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+```cpp
+void GetWelfordFinalizeMaxMinTmpSize(
+    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -43,16 +45,16 @@ void GetWelfordFinalizeMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t t
 
 1.  将WelfordFinalizeTiling结构体参数增加至TilingData结构体，作为TilingData结构体的一个字段。
 
-    ```
+    ```cpp
     BEGIN_TILING_DATA_DEF(WelfordFinalizeCustomTilingData) // 注册一个tiling的类，以tiling的名字作为入参
-        TILING_DATA_FIELD_DEF(uint32_t, isCounts);             // 添加tiling字段
-        TILING_DATA_FIELD_DEF(uint32_t, rnLength);
-        TILING_DATA_FIELD_DEF(uint32_t, abLength);
-        TILING_DATA_FIELD_DEF(uint32_t, rLength);
-        TILING_DATA_FIELD_DEF(uint32_t, head);
-        TILING_DATA_FIELD_DEF(uint32_t, headLength);
-        TILING_DATA_FIELD_DEF(uint32_t, tail);
-        TILING_DATA_FIELD_DEF(uint32_t, tailLength);
+    TILING_DATA_FIELD_DEF(uint32_t, isCounts);             // 添加tiling字段
+    TILING_DATA_FIELD_DEF(uint32_t, rnLength);
+    TILING_DATA_FIELD_DEF(uint32_t, abLength);
+    TILING_DATA_FIELD_DEF(uint32_t, rLength);
+    TILING_DATA_FIELD_DEF(uint32_t, head);
+    TILING_DATA_FIELD_DEF(uint32_t, headLength);
+    TILING_DATA_FIELD_DEF(uint32_t, tail);
+    TILING_DATA_FIELD_DEF(uint32_t, tailLength);
     END_TILING_DATA_DEF;
     REGISTER_TILING_DATA_CLASS(
         WelfordFinalizeCustom,
@@ -61,7 +63,7 @@ void GetWelfordFinalizeMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t t
 
 2.  Tiling实现函数中，首先调用**GetWelfordFinalizeMaxMinTmpSize**接口获取WelfordFinalize接口能完成计算所需最大/最小临时空间大小，根据该范围结合实际的内存使用情况设置合适的空间大小，然后根据输入shape、剩余的可供计算的空间大小等信息获取WelfordFinalize kernel侧接口所需tiling参数。
 
-    ```
+    ```cpp
     namespace optiling {
     static ge::graphStatus TilingFunc(gert::TilingContext* context)
     {
@@ -87,7 +89,7 @@ void GetWelfordFinalizeMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t t
         // auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
         // AscendC::GetWelfordFinalizeMaxMinTmpSize(srcShape, 4, false, ascendcPlatform, maxTmpsize, minTmpsize);
         ... // 其他逻辑
-        context->SetTilingKey(1);
+            context->SetTilingKey(1);
         tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
         context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
         size_t* currentWorkspace = context->GetWorkspaceSizes(1);
@@ -99,7 +101,7 @@ void GetWelfordFinalizeMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t t
 
 3.  对应的kernel侧通过在核函数中调用GET\_TILING\_DATA获取TilingData，继而将TilingData中的WelfordFinalize Tiling信息传入WelfordFinalize接口参与计算。完整的kernel侧样例请参考[WelfordFinalize](WelfordFinalize.md)。
 
-    ```
+    ```cpp
     extern "C" __global__ __aicore__ void welford_finalize_custom(
         GM_ADDR inputX_gm, GM_ADDR mean_gm, GM_ADDR var_gm, GM_ADDR outputMean_gm, GM_ADDR outputVariance_gm,
         GM_ADDR workspace, GM_ADDR tiling)

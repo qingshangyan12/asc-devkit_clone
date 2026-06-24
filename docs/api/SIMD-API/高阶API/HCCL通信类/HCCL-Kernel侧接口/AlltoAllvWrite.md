@@ -20,9 +20,10 @@ AlltoAllvWrite的功能为：通信域内的卡互相发送和接收数据，并
 
 ## 函数原型
 
-```
+```cpp
 template <bool commit = false>
-__aicore__ inline HcclHandle AlltoAllvWrite(GM_ADDR usrIn, GM_ADDR sendOffsets, GM_ADDR sendSizes, uint64_t remoteWinOffset, uint64_t localDataSize)
+__aicore__ inline HcclHandle AlltoAllvWrite(
+    GM_ADDR usrIn, GM_ADDR sendOffsets, GM_ADDR sendSizes, uint64_t remoteWinOffset, uint64_t localDataSize)
 ```
 
 ## 参数说明
@@ -56,7 +57,7 @@ __aicore__ inline HcclHandle AlltoAllvWrite(GM_ADDR usrIn, GM_ADDR sendOffsets, 
 
 ## 调用示例
 
-```
+```cpp
 extern "C" __global__ __aicore__ void alltoallvwrite_custom(
     GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
 {
@@ -84,7 +85,7 @@ extern "C" __global__ __aicore__ void alltoallvwrite_custom(
     __gm__ uint64_t* sendSizes = reinterpret_cast<__gm__ uint64_t*>(sendSizeGM_);
     __gm__ uint64_t* sendOffsets = reinterpret_cast<__gm__ uint64_t*>(sendOffsetGM_);
     // 当前ccu通信都是双die，所以sendSize和sendOffset需要等分切成die0和die1的数据
-    for (uint32_t i = 0U; i < rankDim; i++) { 
+    for (uint32_t i = 0U; i < rankDim; i++) {
         sendSizes[i] = perRankDataSize_ / 2;
         sendSizes[i + rankDim] = perRankDataSize_ - perRankDataSize_ / 2;
         sendOffsets[i] = i * perRankDataSize_;

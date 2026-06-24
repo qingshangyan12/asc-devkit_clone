@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```text
 inline float __high2float(const bfloat16x2_t x)
 ```
 
@@ -52,7 +52,7 @@ inline float __high2float(const bfloat16x2_t x)
 
 使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
 
-```
+```cpp
 #include "simt_api/asc_bf16.h"
 ```
 
@@ -60,12 +60,13 @@ inline float __high2float(const bfloat16x2_t x)
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     // 使用短向量可提升数据搬运效率
     __aicore__ void simt_high2float(bfloat16x2_t* input, float* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        // 每个线程处理1个bfloat16x2_t类型的数据，即2个bfloat16_t类型的数据，因此idx >= input_total_length / 2的线程不处理数据
+        // 每个线程处理1个bfloat16x2_t类型的数据，即2个bfloat16_t类型的数据，因此idx >= input_total_length /
+        // 2的线程不处理数据
         if (idx > input_total_length / 2) {
             return;
         }
@@ -79,12 +80,14 @@ inline float __high2float(const bfloat16x2_t x)
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     // 使用短向量可提升数据搬运效率
-    __simt_vf__ __launch_bounds__(1024) inline void simt_high2float(__gm__ bfloat16x2_t* input, __gm__ float* output, uint32_t input_total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void simt_high2float(
+        __gm__ bfloat16x2_t* input, __gm__ float* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        // 每个线程处理1个bfloat16x2_t类型的数据，即2个bfloat16_t类型的数据，因此idx >= input_total_length / 2的线程不处理数据
+        // 每个线程处理1个bfloat16x2_t类型的数据，即2个bfloat16_t类型的数据，因此idx >= input_total_length /
+        // 2的线程不处理数据
         if (idx > input_total_length / 2) {
             return;
         }

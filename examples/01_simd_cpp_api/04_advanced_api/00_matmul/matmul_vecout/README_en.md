@@ -10,7 +10,7 @@ A Matmul example that uses user-defined VECOUT input, allowing developers to man
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── matmul_vecout
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data
@@ -52,7 +52,8 @@ A Matmul example that uses user-defined VECOUT input, allowing developers to man
       AscendC::LocalTensor<AType> vecinLocal = vecin.DeQue<AType>();
 
       AscendC::LocalTensor<AType> vecoutTensor = vecout.AllocTensor<AType>();
-      DataCopy(vecoutTensor, vecinLocal, singleSize); // Copy the entire size for convenience
+      DataCopy(vecoutTensor, vecinLocal,
+               singleSize); // Copy the entire size for convenience
       vecout.EnQue(vecoutTensor);
       AscendC::LocalTensor<AType> vecoutLocal = vecout.DeQue<AType>();
       vecin.FreeTensor(vecinLocal);

@@ -30,7 +30,7 @@
 
 ## 函数原型
 
-```
+```text
 inline float normf(int n, float* a)
 ```
 
@@ -61,7 +61,7 @@ a\[0\]^2 + a\[1\]^2 + ...+ a\[n-1\]^2的平方根。
 
 使用该接口需要包含"simt\_api/math\_functions.h"头文件。
 
-```
+```cpp
 #include "simt_api/math_functions.h"
 ```
 
@@ -69,8 +69,8 @@ a\[0\]^2 + a\[1\]^2 + ...+ a\[n-1\]^2的平方根。
 
 - SIMT编程场景：
 
-    ```
-    __global__ __launch_bounds__(256) void compute_normf(float *result, const int *n, float *vector_data, uint32_t count)
+    ```cpp
+    __global__ __launch_bounds__(256) void compute_normf(float* result, const int* n, float* vector_data, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= count) {
@@ -82,8 +82,9 @@ a\[0\]^2 + a\[1\]^2 + ...+ a\[n-1\]^2的平方根。
 
 - SIMD与SIMT混合编程场景：
 
-    ```
-    __simt_vf__ __launch_bounds__(256) inline void compute_normf_vf(__gm__ float *result, __gm__ const int *n, __gm__ float *vector_data, uint32_t count)
+    ```cpp
+    __simt_vf__ __launch_bounds__(256) inline void compute_normf_vf(
+        __gm__ float* result, __gm__ const int* n, __gm__ float* vector_data, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= count) {
@@ -92,7 +93,8 @@ a\[0\]^2 + a\[1\]^2 + ...+ a\[n-1\]^2的平方根。
         result[idx] = normf(n[idx], vector_data + idx * 4);
     }
 
-    __global__ __vector__ void run_normf(__gm__ float *result, __gm__ const int *n, __gm__ float *vector_data, uint32_t count)
+    __global__ __vector__ void run_normf(
+        __gm__ float* result, __gm__ const int* n, __gm__ float* vector_data, uint32_t count)
     {
         asc_vf_call<compute_normf_vf>(dim3(256), result, n, vector_data, count);
     }
@@ -100,7 +102,7 @@ a\[0\]^2 + a\[1\]^2 + ...+ a\[n-1\]^2的平方根。
 
 输入输出示例如下：
 
-```
+```text
 n：1, 2, 3, 1
 vector_data：[[1, 2, 3, 4], [2, 3, 4, 5], [3, 4, 5, 6], [4, 5, 6, 7]]
 result: 1 3.605551 7.071068 4

@@ -51,29 +51,32 @@ S\(z\) = \(\(\(\(z + S1\) \* z + S2\) \* z + S3\) \* z + S4\) \* z + S5是关于
 -   通过sharedTmpBuffer入参传入临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void Erfc(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+        __aicore__ inline void Erfc(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+            const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void Erfc(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
+        __aicore__ inline void Erfc(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
         ```
 
 -   接口框架申请临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
         __aicore__ inline void Erfc(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
         __aicore__ inline void Erfc(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
         ```
@@ -116,7 +119,7 @@ S\(z\) = \(\(\(\(z + S1\) \* z + S2\) \* z + S3\) \* z + S4\) \* z + S5是关于
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放计算结果的Tensor
 // srcLocal: 参与计算的输入Tensor
 // sharedTmpBuffer: 临时缓存,内部复杂计算时存储中间变量
@@ -126,7 +129,7 @@ AscendC::Erfc(dstLocal, srcLocal, sharedTmpBuffer, 512);
 
 结果示例如下：
 
-```
+```text
 输入数据(srcLocal): [0.0           1.0           2.0            3.0           ...]
 输出数据(dstLocal): [1.0000000e+00 1.5729921e-01 4.6777348e-03  2.2090497e-05 ...]
 ```

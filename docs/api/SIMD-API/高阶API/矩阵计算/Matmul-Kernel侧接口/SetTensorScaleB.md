@@ -22,11 +22,11 @@ MxMatmul场景，设置矩阵乘中右矩阵的量化系数矩阵scaleB。
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetTensorScaleB(const GlobalTensor<ScaleT>& gm, bool isTransposeScaleB = true);
 ```
 
-```
+```cpp
 __aicore__ inline void SetTensorScaleB(const LocalTensor<ScaleT>& rightMatrix, bool isTransposeScaleB = true);
 ```
 
@@ -51,12 +51,12 @@ __aicore__ inline void SetTensorScaleB(const LocalTensor<ScaleT>& rightMatrix, b
 
 ## 调用示例
 
-```
+```cpp
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
 mm.SetTensorA(gm_a);
 mm.SetTensorB(gm_b);
 mm.SetTensorScaleA(gm_scaleA);
-mm.SetTensorScaleB(gm_scaleB);    // 设置右矩阵的量化系数矩阵scaleB
+mm.SetTensorScaleB(gm_scaleB); // 设置右矩阵的量化系数矩阵scaleB
 if (tiling.isBias) {
     mm.SetBias(gmBias);
 }

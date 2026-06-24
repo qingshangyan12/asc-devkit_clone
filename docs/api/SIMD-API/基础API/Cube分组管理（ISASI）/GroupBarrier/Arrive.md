@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="section765814724715"></a>
 
-```
+```cpp
 __aicore__ inline void Arrive(uint32_t arriveIndex)
 ```
 
@@ -90,9 +90,9 @@ __aicore__ inline void Arrive(uint32_t arriveIndex)
 
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 
-```
+```cpp
 if (id >= 0 && id < ARRIVE_NUM) {
-  //各种Vector计算逻辑，用户自行实现
-  barA.Arrive(id);  // Arrive组中有2个AIV，分别为Block0、1，表示它们已完成任务。
+    // 各种Vector计算逻辑，用户自行实现
+    barA.Arrive(id); // Arrive组中有2个AIV，分别为Block0、1，表示它们已完成任务。
 }
 ```

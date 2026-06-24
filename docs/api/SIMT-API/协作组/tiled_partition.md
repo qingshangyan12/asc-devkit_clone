@@ -78,8 +78,7 @@ coalesced_group tiled_partition(const coalesced_group& parent, unsigned int tile
     using namespace cooperative_groups;
     __global__ void simt_kernel(...)
     {
-        ...
-        thread_block block = this_thread_block();
+        ... thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
         ...
     }
@@ -91,8 +90,7 @@ coalesced_group tiled_partition(const coalesced_group& parent, unsigned int tile
     using namespace cooperative_groups;
     __simt_vf__ inline void simt_kernel(...)
     {
-        ...
-        thread_block block = this_thread_block();
+        ... thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
         ...
     }

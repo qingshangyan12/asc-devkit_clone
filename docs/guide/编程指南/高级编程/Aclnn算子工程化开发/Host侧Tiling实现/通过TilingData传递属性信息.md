@@ -4,25 +4,24 @@
 
 1.  ReduceMaxCustom算子TilingData的定义如下：这里我们重点关注reduceAxisLen。参数reduceAxisLen表示获取reduceDim轴的长度，这里也就是最后一维的长度。该参数后续会通过TilingData传递到kernel侧参与计算。
 
-    ```
+    ```cpp
     #ifndef REDUCE_MAX_CUSTOM_TILING_H
     #define REDUCE_MAX_CUSTOM_TILING_H
     #include "register/tilingdata_base.h"
     namespace optiling {
     BEGIN_TILING_DATA_DEF(ReduceMaxTilingData)
-      TILING_DATA_FIELD_DEF(uint32_t, reduceAxisLen); // 添加tiling字段，reduceDim轴的长度
-      //其他TilingData参数的定义
-      ...
-    END_TILING_DATA_DEF;
+    TILING_DATA_FIELD_DEF(uint32_t, reduceAxisLen); // 添加tiling字段，reduceDim轴的长度
+    // 其他TilingData参数的定义
+    ... END_TILING_DATA_DEF;
     // 注册算子tilingdata类到对应的ReduceMaxCustom算子
     REGISTER_TILING_DATA_CLASS(ReduceMaxCustom, ReduceMaxTilingData)
-    }
+    } // namespace optiling
     #endif // REDUCE_MAX_CUSTOM_TILING_H
     ```
 
 2.  ReduceMaxCustom算子的Tiling实现如下。这里我们重点关注属性信息通过TilingData传递的过程：首先通过TilingContext上下文从attr获取reduceDim属性值；然后根据reduceDim属性值获取reduceDim轴的长度并设置到TilingData中。
 
-    ```
+    ```cpp
     namespace optiling {
     static ge::graphStatus TilingFunc(gert::TilingContext* context)
     {
@@ -36,15 +35,15 @@
         const uint32_t reduceAxisLen = xShape.GetDim(*reduceDim);
         // 计算TilingData中除了reduceAxisLen之外其他成员变量的值
         ...
-        // 将reduceAxisLen设置到tiling结构体中，传递到kernel函数使用
-        tiling.set_reduceAxisLen(reduceAxisLen);
+            // 将reduceAxisLen设置到tiling结构体中，传递到kernel函数使用
+            tiling.set_reduceAxisLen(reduceAxisLen);
         // 设置TilingData中除了reduceAxisLen之外其他成员变量的值
         ...
-        // TilingData序列化保存
-        tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
+            // TilingData序列化保存
+            tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
         context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
-        ...
-        return ge::GRAPH_SUCCESS;
-    }} // namespace optiling
+        ... return ge::GRAPH_SUCCESS;
+    }
+    } // namespace optiling
     ```
 

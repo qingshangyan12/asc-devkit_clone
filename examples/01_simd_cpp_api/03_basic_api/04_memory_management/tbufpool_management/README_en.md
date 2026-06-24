@@ -39,7 +39,7 @@ This example implements TBufPool memory resource management based on the TPipe::
 
 ## Directory Structure
 
-```
+```text
 ├── tbufpool_management
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

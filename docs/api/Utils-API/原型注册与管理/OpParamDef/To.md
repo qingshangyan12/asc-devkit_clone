@@ -16,9 +16,8 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001759578869_zh-cn_topic_0000001526594958_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
-OpParamDef &To(const ge::DataType type)
-OpParamDef &To(const char *name)
+```cpp
+OpParamDef& To(const ge::DataType type) OpParamDef& To(const char* name)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001759578869_zh-cn_topic_0000001526594958_zh-cn_topic_0000001525424352_section75395119104"></a>
@@ -59,17 +58,14 @@ OpParamDef算子定义，OpParamDef请参考[OpParamDef](OpParamDef.md)。
 
 ## 调用示例<a name="zh-cn_topic_0000001759578869_zh-cn_topic_0000001526594958_zh-cn_topic_0000001575944081_section320753512363"></a>
 
-```
+```cpp
 this->Input("x")
     .ParamType(REQUIRED)
     .DataType({ge::DT_FLOAT, ge::DT_FLOAT})
     .Format({ge::FORMAT_ND, ge::FORMAT_ND})
     .ScalarList()
     .To(ge::DT_FLOAT);
-this->Input("x1")
-    .ParamType(REQUIRED)
-    .DataType({ge::DT_FLOAT, ge::DT_FLOAT})
-    .Format({ge::FORMAT_ND, ge::FORMAT_ND});
+this->Input("x1").ParamType(REQUIRED).DataType({ge::DT_FLOAT, ge::DT_FLOAT}).Format({ge::FORMAT_ND, ge::FORMAT_ND});
 this->Input("x2")
     .ParamType(REQUIRED)
     .DataType({ge::DT_FLOAT, ge::DT_FLOAT})

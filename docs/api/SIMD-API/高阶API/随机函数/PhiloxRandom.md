@@ -32,16 +32,19 @@ Philox随机数生成的核心算法是一个基于记数的伪随机数生成�
 
 -   连续模式
 
-    ```
+    ```cpp
     template <uint16_t Rounds = 7, typename T>
-    __aicore__ inline void PhiloxRandom(const LocalTensor<T>& dstLocal, const PhiloxKey& philoxKey, const PhiloxCounter& philoxCounter, uint16_t count)
+    __aicore__ inline void PhiloxRandom(
+        const LocalTensor<T>& dstLocal, const PhiloxKey& philoxKey, const PhiloxCounter& philoxCounter, uint16_t count)
     ```
 
 -   stride模式
 
-    ```
+    ```cpp
     template <uint16_t Rounds = 7, typename T>
-    __aicore__ inline void PhiloxRandom(const LocalTensor<T>& dstLocal, const PhiloxKey& philoxKey, const PhiloxCounter& philoxCounter, const PhiloxRandomParams& params)
+    __aicore__ inline void PhiloxRandom(
+        const LocalTensor<T>& dstLocal, const PhiloxKey& philoxKey, const PhiloxCounter& philoxCounter,
+        const PhiloxRandomParams& params)
     ```
 
 ## 参数说明
@@ -63,7 +66,7 @@ Philox随机数生成的核心算法是一个基于记数的伪随机数生成�
 | count | 输入 | 生成目的操作数的元素个数。 |
 | params | 输入 | stride模式计算所需的参数信息。PhiloxRandomParams类型，定义如下方代码所示，其中参数的含义为：<br>stride：两行元素之间的间隔。<br>row：表示生成的行数。<br>column：表示生成的每一行的元素个数。<br>请注意：<br>row * column大于0，不大于LocalTensor的大小。<br>column % 4 == 0，stride % 4 == 0，stride >= column。 |
 
-```
+```cpp
 struct PhiloxRandomParams {
     uint32_t stride;
     uint32_t row;
@@ -91,7 +94,7 @@ struct PhiloxRandomParams {
 
 完整算子样例请参考[philoxrandom样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/09_random/philoxrandom)。
 
-```
+```text
 // dstLocal：存放计算结果的Tensor
 // philoxKey={0,0}, philoxCounter={0,0,0,0}
 
@@ -103,6 +106,6 @@ PhiloxRandom<10>(dstLocal, philoxKey, philoxCounter, 1024);
 
 结果示例如下：
 
-```
+```json
 [0.31179297 0.8263413  0.6849456 ... 0.10521233 0.29894042 0.96700084]
 ```

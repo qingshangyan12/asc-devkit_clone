@@ -14,7 +14,7 @@ This example introduces the usage of the ascendc_assert assertion API. If the as
 
 ## Directory Structure
 
-```
+```text
 ├── 01_assert
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data
@@ -33,7 +33,7 @@ This example introduces the usage of the ascendc_assert assertion API. If the as
 
   The matrix multiplication formula is:
 
-  ```
+  ```text
   C = A * B
   ```
 

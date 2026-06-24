@@ -45,29 +45,32 @@ Tan\(x\)的泰勒展开式为：
 -   通过sharedTmpBuffer入参传入临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void Tan(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+        __aicore__ inline void Tan(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+            const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void Tan(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
+        __aicore__ inline void Tan(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
         ```
 
 -   接口框架申请临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
         __aicore__ inline void Tan(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
         __aicore__ inline void Tan(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
         ```
@@ -112,7 +115,7 @@ Tan\(x\)的泰勒展开式为：
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放Tan计算结果的Tensor
 // srcLocal: 存放Tan计算输入的Tensor
 // sharedTmpBuffer: 存放Tan计算过程中临时缓存的Tensor
@@ -130,7 +133,7 @@ AscendC::Tan(dstLocal, srcLocal, sharedTmpBuffer, 512);
 
 结果示例如下：
 
-```
+```text
 输入数据(srcLocal):
 [-2.56 -2.55 -2.54 ... 0. ... 2.53  2.54  2.55]
 输出数据(dstLocal):

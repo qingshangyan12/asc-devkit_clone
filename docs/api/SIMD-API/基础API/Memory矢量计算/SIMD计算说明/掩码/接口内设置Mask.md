@@ -53,7 +53,7 @@
     ```cpp
     half addsValue = 1.0;
     int8_t repeatTimes = 1;
-    UnaryRepeatParams repeatParams {2, 2, 16, 16};
+    UnaryRepeatParams repeatParams{2, 2, 16, 16};
     uint64_t mask[2] = {0x69A569A569A569A5, 0x69A569A569A569A5};
     AscendC::Adds<half, true>(dstLocal, srcLocal, addsValue, mask, repeatTimes, repeatParams);
     ```

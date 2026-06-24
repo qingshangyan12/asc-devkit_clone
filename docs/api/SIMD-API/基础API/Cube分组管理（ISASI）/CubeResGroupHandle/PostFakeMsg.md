@@ -60,7 +60,7 @@
 
 ## 函数原型<a name="section765814724715"></a>
 
-```
+```cpp
 __aicore__ inline uint16_t PostFakeMsg(__gm__ CubeMsgType* msg)
 ```
 
@@ -97,8 +97,8 @@ __aicore__ inline uint16_t PostFakeMsg(__gm__ CubeMsgType* msg)
 
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 
-```
-hanndle.AssignQueue(queIdx);  
-auto msgPtr = handle.AllocMessage();        // 获取消息空间指针msgPtr
-auto offset = handle.PostFakeMsg(msgPtr);           // 在msgPtr指针位置，发送假消息
+```cpp
+hanndle.AssignQueue(queIdx);
+auto msgPtr = handle.AllocMessage();      // 获取消息空间指针msgPtr
+auto offset = handle.PostFakeMsg(msgPtr); // 在msgPtr指针位置，发送假消息
 ```

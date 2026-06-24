@@ -21,12 +21,12 @@
 ```cpp
 // RINT舍入模式
 __aicore__ inline int32_t asc_float2int32_rn(float value)
-// ROUND舍入模式
-__aicore__ inline int32_t asc_float2int32_rna(float value)
-// FLOOR舍入模式
-__aicore__ inline int32_t asc_float2int32_rd(float value)
-// CEIL舍入模式
-__aicore__ inline int32_t asc_float2int32_ru(float value)
+    // ROUND舍入模式
+    __aicore__ inline int32_t asc_float2int32_rna(float value)
+    // FLOOR舍入模式
+    __aicore__ inline int32_t asc_float2int32_rd(float value)
+    // CEIL舍入模式
+    __aicore__ inline int32_t asc_float2int32_ru(float value)
 ```
 
 ## 参数说明

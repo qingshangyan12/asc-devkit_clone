@@ -6,7 +6,7 @@
 
 使用[DataType](DataType.md)配置数据类型时，算子参数的数据类型和格式必须通过显式组合配置，每个组合包含完整的输入/输出数据类型与数据格式的对应关系。如下的示例中表示：当输入x和y数据类型为DT\_FLOAT16时，对应的输出z数据类型也为DT\_FLOAT16，支持的数据格式要求为FORMAT\_ND。
 
-```
+```cpp
 class AddCustom : public OpDef {
 public:
     AddCustom(const char* name) : OpDef(name)
@@ -30,7 +30,7 @@ public:
 
 如果某个输入/输出支持的数据类型支持和其他所有输入/输出支持的数据类型、数据格式组合使用，使用DataType接口需要写成如下的格式，表示当输入x为DT\_FLOAT16时，支持输入y和输入z的所有数据类型、数据格式组合。
 
-```
+```cpp
 class XxxCustom : public OpDef {
 public:
     XxxCustom(const char* name) : OpDef(name)
@@ -54,7 +54,7 @@ public:
 
 此时可以通过DataTypeList指定数据类型，无需重复列出，例如：
 
-```
+```cpp
 class XxxCustom : public OpDef {
 public:
     XxxCustom(const char* name) : OpDef(name)
@@ -78,8 +78,8 @@ public:
 
 ## 函数原型<a name="zh-cn_topic_0000001991854801_zh-cn_topic_0000001526115138_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
-OpParamDef &DataTypeList(std::vector<ge::DataType> types)
+```cpp
+OpParamDef& DataTypeList(std::vector<ge::DataType> types)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001991854801_zh-cn_topic_0000001526115138_zh-cn_topic_0000001525424352_section75395119104"></a>
@@ -114,17 +114,13 @@ OpParamDef算子定义，OpParamDef请参考[OpParamDef](OpParamDef.md)。
 
 ## 调用示例<a name="zh-cn_topic_0000001991854801_zh-cn_topic_0000001526115138_zh-cn_topic_0000001575944081_section320753512363"></a>
 
-```
+```cpp
 class AddCustom : public OpDef {
 public:
     AddCustom(const char* name) : OpDef(name)
     {
-        this->Input("x")
-            .ParamType(REQUIRED)
-            .DataTypeList({ge::DT_FLOAT})
-            .Format({ge::FORMAT_ND, ge::FORMAT_NCHW});
-        this->Input("x1")
-             ......
+        this->Input("x").ParamType(REQUIRED).DataTypeList({ge::DT_FLOAT}).Format({ge::FORMAT_ND, ge::FORMAT_NCHW});
+        this->Input("x1")......
     }
 };
 ```

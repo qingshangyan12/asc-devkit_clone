@@ -43,7 +43,7 @@ Kernel侧实现Conv3D运算的步骤概括为：
 
 1.  创建Conv3D对象。
 
-    ```
+    ```cpp
     #include "lib/conv/conv3d/conv3d_api.h"
 
     using inputType = ConvApi::ConvType<AscendC::TPosition::GM, ConvFormat::NDC1HWC0, bfloat16_t>;
@@ -56,7 +56,7 @@ Kernel侧实现Conv3D运算的步骤概括为：
 
     创建对象时需要传入Input、Weight和Output参数类型信息；Bias的参数类型为可选参数，不带Bias输入的卷积计算场景，不传入该参数。类型信息通过ConvType来定义，包括：内存逻辑位置、数据格式、数据类型。
 
-    ```
+    ```cpp
     template <TPosition POSITION, ConvFormat FORMAT, typename TYPE>
     struct ConvType {
         constexpr static TPosition pos = POSITION;   // Conv3d输入或输出在内存上的位置
@@ -67,7 +67,7 @@ Kernel侧实现Conv3D运算的步骤概括为：
 
     下面简要介绍在创建对象时使用到的相关数据结构，开发者可选择性地了解这些内容。用于创建Conv3D对象的数据结构定义如下：
 
-    ```
+    ```cpp
     template <
         class INPUT_TYPE, class WEIGHT_TYPE, class OUTPUT_TYPE, class BIAS_TYPE = biasType, class CONV_CFG = Conv3dParam>
     using Conv3D =
@@ -76,7 +76,7 @@ Kernel侧实现Conv3D运算的步骤概括为：
 
     其中，Conv3dIntfExt和Conv3dParam数据结构定义如下：
 
-    ```
+    ```cpp
     template <
         class Conv3dCfg, template <typename, class, bool> class Impl = Conv3dApiImpl,
         template <class, template <typename, class, bool> class> class Intf = Conv3dIntf>
@@ -90,7 +90,7 @@ Kernel侧实现Conv3D运算的步骤概括为：
 
     这里的Conv3dIntf是Conv3dIntfExt的基类，Conv3dCfg是Conv3dIntf模板入参，数据结构定义如下：
 
-    ```
+    ```cpp
     template <class Config, template <typename, class, bool> class Impl>
     struct Conv3dIntf {
         using InputT = typename Config::SrcAT;
@@ -129,18 +129,18 @@ Kernel侧实现Conv3D运算的步骤概括为：
 
 2.  初始化操作。
 
-    ```
+    ```cpp
     Conv3dApi::Conv3D<inputType, weightType, outputType, biasType> conv3dApi;
-    TPipe pipe;                                                        // 初始化TPipe
-    conv3dApi.Init(&tiling);                                           // 初始化conv3dApi
+    TPipe pipe;              // 初始化TPipe
+    conv3dApi.Init(&tiling); // 初始化conv3dApi
     ```
 
 3.  设置3D卷积的输入Input、Weight、Bias和输出Output。
 
-    ```
-    conv3dApi.SetWeight(weightGm);               // 设置当前核的输入weight在gm上的地址
+    ```cpp
+    conv3dApi.SetWeight(weightGm); // 设置当前核的输入weight在gm上的地址
     if (biasFlag) {
-        conv3dApi.SetBias(biasGm);               // 设置当前核的输入bias在gm上的地址
+        conv3dApi.SetBias(biasGm); // 设置当前核的输入bias在gm上的地址
     }
     // 设置input各个维度在当前核的偏移
     conv3dApi.SetInputStartPosition(diStartPos, mStartPos);
@@ -149,7 +149,7 @@ Kernel侧实现Conv3D运算的步骤概括为：
 
     // 当前Conv3D仅支持单batch的卷积计算，多batch场景通过for循环实现，在循环间计算当前batch的地址偏移
     for (uint64_t batchIter = 0; batchIter < singleCoreBatch; ++batchIter) {
-        conv3dApi.SetInput(inputGm[batchIter * inputOneBatchSize]);    // 设置当前核的输入input在gm上的地址
+        conv3dApi.SetInput(inputGm[batchIter * inputOneBatchSize]); // 设置当前核的输入input在gm上的地址
     }
     ```
 
@@ -157,25 +157,23 @@ Kernel侧实现Conv3D运算的步骤概括为：
 
     调用[IterateAll](IterateAll-103.md)完成单核上所有数据的计算。
 
-    ```
+    ```cpp
     for (uint64_t batchIter = 0; batchIter < singleCoreBatch; ++batchIter) {
-        ...
-        conv3dApi.IterateAll(outputGm[batchIter * outputOneBatchSize]);    // 调用IterateAll完成Conv3D计算
+        ... conv3dApi.IterateAll(outputGm[batchIter * outputOneBatchSize]); // 调用IterateAll完成Conv3D计算
         ...
     }
     ```
 
 5.  结束3D卷积操作。
 
-    ```
+    ```cpp
     for (uint64_t batchIter = 0; batchIter < singleCoreBatch; ++batchIter) {
-        ...
-        conv3dApi.End();    //清除EventID和释放内部申请的临时内存
+        ... conv3dApi.End(); // 清除EventID和释放内部申请的临时内存
     }
     ```
 
 ## 需要包含的头文件
 
-```
+```cpp
 #include "lib/conv/conv3d/conv3d_api.h"
 ```

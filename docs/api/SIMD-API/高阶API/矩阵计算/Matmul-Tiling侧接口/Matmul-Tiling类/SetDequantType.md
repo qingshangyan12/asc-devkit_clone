@@ -15,7 +15,7 @@ Matmul量化场景：在Matmul计算时，左、右矩阵的输入为half或bflo
 
 ## 函数原型
 
-```
+```cpp
 int32_t SetDequantType(DequantType dequantType)
 ```
 
@@ -27,7 +27,7 @@ int32_t SetDequantType(DequantType dequantType)
 | --- | --- | --- |
 | dequantType | 输入 | 设置量化或反量化时的模式。DequantType类型，该类型的定义如下方代码所示，其中参数的取值及含义如下：<br>SCALAR：表示同一系数的量化或反量化模式。<br>TENSOR：表示向量的量化或反量化模式。 |
 
-```
+```cpp
 enum class DequantType {
     SCALAR = 0,
     TENSOR = 1,
@@ -44,7 +44,7 @@ enum class DequantType {
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MatmulApiTiling tiling(ascendcPlatform);
 tiling.SetAType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_INT8);

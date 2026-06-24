@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001867289941_zh-cn_topic_0000001389787297_section13230182415108"></a>
 
-```
+```text
 ContextBuilder &CompileInfo(void *compileInfo)
 ```
 
@@ -41,15 +41,13 @@ ContextBuilder &CompileInfo(void *compileInfo)
 
 ## 调用示例<a name="zh-cn_topic_0000001867289941_zh-cn_topic_0000001389787297_section320753512363"></a>
 
-```
-void AddCompileInfo(TilingParseContext *tilingParseContext)
+```cpp
+void AddCompileInfo(TilingParseContext* tilingParseContext)
 {
-    ......
-    void *compilerInfo = *tilingParseContext->GetOutputPointer<void **>(0);
-    auto kernelContextHolder = context_ascendc::ContextBuilder()
-                                    ...... // 增加算子输入输出接口的调用
-                                    .CompileInfo(compileInfo)
-                                    .BuildTilingContext();
+    ...... void* compilerInfo = *tilingParseContext->GetOutputPointer<void**>(0);
+    auto kernelContextHolder = context_ascendc::ContextBuilder()...... // 增加算子输入输出接口的调用
+                                   .CompileInfo(compileInfo)
+                                   .BuildTilingContext();
     ......
 }
 ```

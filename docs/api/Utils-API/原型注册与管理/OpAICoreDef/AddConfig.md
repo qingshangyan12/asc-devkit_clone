@@ -6,9 +6,8 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
-void AddConfig(const char *soc)
-void AddConfig(const char *soc, OpAICoreConfig &aicore_config)
+```cpp
+void AddConfig(const char* soc) void AddConfig(const char* soc, OpAICoreConfig& aicore_config)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001525424352_section75395119104"></a>

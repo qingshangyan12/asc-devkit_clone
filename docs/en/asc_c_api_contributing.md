@@ -54,10 +54,9 @@ C API uses a **pointer-based programming model**:
 ```cpp
 // C API programming example
 constexpr uint32_t count = 64;
-__ubuf__ half dst[count];   // Unified Buffer memory
+__ubuf__ half dst[count]; // Unified Buffer memory
 __ubuf__ half src0[count];
 __ubuf__ half src1[count];
-
 
 // Directly call C API
 asc_add(dst, src0, src1, count);
@@ -80,9 +79,9 @@ asc_add(dst, src0, src1, count);
 Mode 2: High-dimensional tiling computation
 
 ```cpp
-asc_add(dst, src0, src1, repeat,
-        dst_block_stride, src0_block_stride, src1_block_stride,
-        dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
+asc_add(
+    dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride,
+    src0_repeat_stride, src1_repeat_stride);
 ```
 
 - Non-contiguous memory access.
@@ -265,11 +264,13 @@ __aicore__ inline void asc_axpy(__ubuf__ half* dst, __ubuf__ half* src, half sca
 __aicore__ inline void asc_axpy(__ubuf__ float* dst, __ubuf__ float* src, float scalar, uint32_t count);
 
 // Configuration mode
-__aicore__ inline void asc_axpy(__ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+__aicore__ inline void asc_axpy(
+    __ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride,
+    uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
-__aicore__ inline void asc_axpy(__ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+__aicore__ inline void asc_axpy(
+    __ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride,
+    uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
 // Synchronous mode
 __aicore__ inline void asc_axpy_sync(__ubuf__ half* dst, __ubuf__ half* src, half scalar, uint32_t count);
@@ -290,10 +291,10 @@ Reference other interface implementations.
 C API testing uses the **gTest + MockCPP** framework:
 
 ```cpp
+#include "c_api/asc_simd.h"
+#include "c_api/stub/cce_stub.h"
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
-#include "c_api/stub/cce_stub.h"
-#include "c_api/asc_simd.h"
 ```
 
 ### Test Types
@@ -348,8 +349,7 @@ __aicore__ inline void asc_axpy(__ubuf__ half* dst, __ubuf__ half* src, half sca
 {
     // Parameter validation
     ASCENDC_ASSERT(count > 0, "count must be positive");
-    ASCENDC_ASSERT(dst != nullptr && src != nullptr && tmp != nullptr,
-                   "pointers cannot be null");
+    ASCENDC_ASSERT(dst != nullptr && src != nullptr && tmp != nullptr, "pointers cannot be null");
 
     // Computation logic
     uint8_t repeat = (count + 127) / 128;
@@ -378,18 +378,15 @@ ASCENDC_ASSERT(src != nullptr, "src cannot be nullptr");
 ASCENDC_ASSERT(tmp != nullptr, "tmp cannot be nullptr");
 
 // 2. Address alignment check
-ASCENDC_ASSERT((reinterpret_cast<uintptr_t>(dst) % 32) == 0,
-               "dst must be 32-byte aligned");
-ASCENDC_ASSERT((reinterpret_cast<uintptr_t>(src) % 32) == 0,
-               "src must be 32-byte aligned");
+ASCENDC_ASSERT((reinterpret_cast<uintptr_t>(dst) % 32) == 0, "dst must be 32-byte aligned");
+ASCENDC_ASSERT((reinterpret_cast<uintptr_t>(src) % 32) == 0, "src must be 32-byte aligned");
 
 // 3. Range check
-ASCENDC_ASSERT(count <= ASC_CAPI_MAX_COUNT,
-               "count exceeds maximum supported value");
+ASCENDC_ASSERT(count <= ASC_CAPI_MAX_COUNT, "count exceeds maximum supported value");
 
 // 4. Architecture check
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 2201 && __NPU_ARCH__ != 3510)
-    #error "Unsupported NPU architecture"
+#error "Unsupported NPU architecture"
 #endif
 ```
 
@@ -402,9 +399,9 @@ ASCENDC_ASSERT(count <= ASC_CAPI_MAX_COUNT,
 
 // Conditional compilation
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-    // NPU ARCH 2201 architecture specific code
+// NPU ARCH 2201 architecture specific code
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-    // NPU ARCH 3510 architecture specific code
+// NPU ARCH 3510 architecture specific code
 #endif
 
 #endif

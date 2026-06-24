@@ -14,7 +14,7 @@ This example uses the LeakyRelu computation to demonstrate how to invoke a custo
 
 ## Directory Structure
 
-```
+```text
 ├── onnx_plugin
 │   ├── CMakeLists.txt           // Build project file
 │   ├── leaky_relu.py            // Script to generate the LeakyRelu ONNX model

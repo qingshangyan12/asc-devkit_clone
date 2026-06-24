@@ -42,14 +42,16 @@
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <const IsNanConfig& config = DEFAULT_IS_NAN_CONFIG, typename T, typename U>
-    __aicore__ inline void IsNan(const LocalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t count)
+    __aicore__ inline void IsNan(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<uint8_t>& sharedTmpBuffer,
+        const uint32_t count)
     ```
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <const IsNanConfig& config = DEFAULT_IS_NAN_CONFIG, typename T, typename U>
     __aicore__ inline void IsNan(const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint32_t count)
     ```
@@ -71,7 +73,7 @@
 | T | 目的操作数的数据类型。支持的数据类型为：bool、half、float。 |
 | U | 源操作数的数据类型。支持的数据类型为：half、float。 |
 
-```
+```cpp
 struct IsNanConfig {
     bool isReuseSource;
 };
@@ -108,7 +110,7 @@ struct IsNanConfig {
 
 -   通过sharedTmpBuffer入参传入
 
-    ```
+    ```cpp
     AscendC::TPipe pipe;
     AscendC::TQue<AscendC::TPosition::VECCALC, 1> tmpQue;
     pipe.InitBuffer(tmpQue, 1, bufferSize); // bufferSize通过Host侧tiling参数获取
@@ -121,7 +123,7 @@ struct IsNanConfig {
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     AscendC::TPipe pipe;
     AscendC::TQue<AscendC::TPosition::VECCALC, 1> tmpQue;
     pipe.InitBuffer(tmpQue, 1, bufferSize); // bufferSize通过Host侧tiling参数获取
@@ -133,8 +135,7 @@ struct IsNanConfig {
 
 结果示例如下：
 
-```
-输入的数据类型为half，输出的数据类型为bool
-输入数据(src):[1.0 nan 3.0 4.0 nan 6.0 nan 8.0]
-输出数据(dst):[false true false false true false true false]
+```cpp
+输入的数据类型为half，输出的数据类型为bool 输入数据(src)
+    : [1.0 nan 3.0 4.0 nan 6.0 nan 8.0] 输出数据(dst) : [false true false false true false true false]
 ```

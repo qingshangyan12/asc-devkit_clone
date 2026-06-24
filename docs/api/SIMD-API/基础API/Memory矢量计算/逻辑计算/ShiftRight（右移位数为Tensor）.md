@@ -65,9 +65,10 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T, typename U>
-__aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<U>& src1, const int32_t& count)
+__aicore__ inline void ShiftRight(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<U>& src1, const int32_t& count)
 ```
 
 ## 参数说明<a name="section1436019411811"></a>
@@ -156,13 +157,13 @@ __aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 AscendC::ShiftRight(dstLocal, srcLocal0, srcLocal1, 512);
 ```
 
 结果示例如下：
 
-```
+```text
 输入数据(srcLocal0): [1 2 3 ... 512]
 输入数据(srcLocal1): [2 2 2 ... 2]
 输出数据(dstLocal): [0 0 0 1 1 1 1 ... 128]

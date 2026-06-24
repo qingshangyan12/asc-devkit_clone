@@ -66,14 +66,14 @@
 -   无需指定源和目的位置
     -   non-inplace接口：将入队的LocalTensor地址从队列中取出赋值给新创建的Tensor并返回
 
-        ```
+        ```cpp
         template <typename T>
         __aicore__ inline LocalTensor<T> DeQue()
         ```
 
     -   inplace接口：通过出参的方式返回，可以减少Tensor反复创建的开销，具体使用指导可参考[Tensor原地操作](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/附录/常用操作/如何使用Tensor原地操作提升算子性能.md)。
 
-        ```
+        ```cpp
         template <typename T>
         __aicore__ inline void DeQue(LocalTensor<T>& tensor)
         ```
@@ -82,7 +82,7 @@
 
     通过[TQueBind](../TQueBind/TQueBind.md)绑定VECIN和VECOUT可实现VECIN和VECOUT内存复用，如下接口用于存在Vector计算的场景下实现复用，在出队时需要指定源和目的位置；不存在Vector计算的场景下可直接调用LocalTensor<T\> DeQue\(\)出队接口。
 
-    ```
+    ```cpp
     template <TPosition srcUserPos, TPosition dstUserPos, typename T>
     __aicore__ inline LocalTensor<T> DeQue()
     ```
@@ -148,7 +148,7 @@ non-inplace接口和指定源和目的位置的接口返回值为从队列中取
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 // 接口: DeQue Tensor
 AscendC::TPipe pipe;
 AscendC::TQue<AscendC::TPosition::VECOUT, 4> que;
@@ -167,7 +167,7 @@ pipe.InitBuffer(que, num, len);
 AscendC::LocalTensor<half> tensor1 = que.AllocTensor<half>();
 que.EnQue<AscendC::TPosition::GM, AscendC::TPosition::VECIN, half>(tensor1);
 // 将tensor从VECIN的Queue中搬出
-AscendC::LocalTensor<half> tensor2 = que.DeQue<AscendC::TPosition::GM, AscendC::TPosition::VECIN, half>(); 
+AscendC::LocalTensor<half> tensor2 = que.DeQue<AscendC::TPosition::GM, AscendC::TPosition::VECIN, half>();
 // inplace接口
 AscendC::TPipe pipe;
 AscendC::TQue<AscendC::TPosition::VECOUT, 0> que;

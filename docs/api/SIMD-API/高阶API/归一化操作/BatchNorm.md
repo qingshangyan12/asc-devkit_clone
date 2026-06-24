@@ -42,16 +42,22 @@ BatchNorm是对于每一层的输入做规范化处理，使得每一层的分�
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isReuseSource = false, bool isBasicBlock = false>
-    __aicore__ inline void BatchNorm(const LocalTensor<T>& output, const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance, const LocalTensor<T>& inputX, const LocalTensor<T>& gamm, const LocalTensor<T>& beta, const T epsilon, BatchNormTiling& tiling)
+    __aicore__ inline void BatchNorm(
+        const LocalTensor<T>& output, const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance,
+        const LocalTensor<T>& inputX, const LocalTensor<T>& gamm, const LocalTensor<T>& beta, const T epsilon,
+        BatchNormTiling& tiling)
     ```
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isReuseSource = false, bool isBasicBlock = false>
-    __aicore__ inline void BatchNorm(const LocalTensor<T>& output, const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance, const LocalTensor<T>& inputX, const LocalTensor<T>& gamm, const LocalTensor<T>& beta, const LocalTensor<uint8_t>& sharedTmpBuffer, const T epsilon, BatchNormTiling& tiling)
+    __aicore__ inline void BatchNorm(
+        const LocalTensor<T>& output, const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance,
+        const LocalTensor<T>& inputX, const LocalTensor<T>& gamm, const LocalTensor<T>& beta,
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const T epsilon, BatchNormTiling& tiling)
     ```
 
 ## 参数说明
@@ -90,7 +96,7 @@ BatchNorm是对于每一层的输入做规范化处理，使得每一层的分�
 
 ## 调用示例
 
-```
+```cpp
 // outputLocal：存放BatchNorm计算结果的Tensor
 // meanLocal：存放计算结果均值的Tensor
 // varianceLocal：存放计算结果方差的Tensor
@@ -106,7 +112,7 @@ AscendC::BatchNorm<dataType, isReuseSource, isBasicBlock>(
 
 示例结果如下：
 
-```
+```text
 输入数据(inputXLocal, shape:[8, 4, 2]):
 [  0  1  2  3  4  5  6  7
    8  9 10 11 12 13 14 15

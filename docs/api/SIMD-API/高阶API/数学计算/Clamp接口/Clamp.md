@@ -32,9 +32,10 @@
 
 ## 函数原型
 
-```
+```cpp
 template <const ClampConfig& config = DEFAULT_CLAMP_CONFIG, typename T, typename U, typename S>
-__aicore__ inline void Clamp(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& min, const S& max, const uint32_t count)
+__aicore__ inline void Clamp(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& min, const S& max, const uint32_t count)
 ```
 
 ## 参数说明
@@ -48,7 +49,7 @@ __aicore__ inline void Clamp(const LocalTensor<T>& dst, const LocalTensor<T>& sr
 | U | LocalTensor类型或标量类型。根据输入参数min自动推导类型，开发者无需配置该参数，保证min满足数据类型的约束即可。<br><br>支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。 |
 | S | LocalTensor类型或标量类型。根据输入参数max自动推导类型，开发者无需配置该参数，保证max满足数据类型的约束即可。<br><br>支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。 |
 
-```
+```cpp
 struct ClampConfig {
     bool isReuseSource;
 };
@@ -77,7 +78,7 @@ struct ClampConfig {
 
 更多示例请参考[Clamp算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/10_math/clamp)。
 
-```
+```cpp
 AscendC::LocalTensor<half> dst, src;
 uint32_t count = 512;
 half min = 30;
@@ -87,7 +88,7 @@ AscendC::Clamp(dst, src, min, max, count);
 
 结果示例如下：
 
-```
+```text
 输入数据（src）:
 [13, 78, 35, 95, 83,  2,  2, 95, 51, 73, 98,  3, 55, 32, 61,  2, 40, 26, 95, ... 63]
 输入数据（min）:

@@ -30,7 +30,7 @@
 
 ## 函数原型
 
-```
+```text
 inline float norm3df(float a, float b, float c)
 ```
 
@@ -62,7 +62,7 @@ a^2 + b^2 + c^2的平方根。
 
 使用该接口需要包含"simt\_api/math\_functions.h"头文件。
 
-```
+```cpp
 #include "simt_api/math_functions.h"
 ```
 
@@ -70,8 +70,9 @@ a^2 + b^2 + c^2的平方根。
 
 - SIMT编程场景：
 
-    ```
-    __global__ __launch_bounds__(256) void compute_norm3df(float *result, const float *x, const float *y, const float *z, uint32_t count)
+    ```cpp
+    __global__ __launch_bounds__(256) void compute_norm3df(
+        float* result, const float* x, const float* y, const float* z, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= count) {
@@ -83,8 +84,9 @@ a^2 + b^2 + c^2的平方根。
 
 - SIMD与SIMT混合编程场景：
 
-    ```
-    __simt_vf__ __launch_bounds__(256) inline void compute_norm3df_vf(__gm__ float *result, __gm__ const float *x, __gm__ const float *y, __gm__ const float *z, uint32_t count)
+    ```cpp
+    __simt_vf__ __launch_bounds__(256) inline void compute_norm3df_vf(
+        __gm__ float* result, __gm__ const float* x, __gm__ const float* y, __gm__ const float* z, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= count) {
@@ -93,7 +95,8 @@ a^2 + b^2 + c^2的平方根。
         result[idx] = norm3df(x[idx], y[idx], z[idx]);
     }
 
-    __global__ __vector__ void run_norm3df(__gm__ float *result, __gm__ const float *x, __gm__ const float *y, __gm__ const float *z, uint32_t count)
+    __global__ __vector__ void run_norm3df(
+        __gm__ float* result, __gm__ const float* x, __gm__ const float* y, __gm__ const float* z, uint32_t count)
     {
         asc_vf_call<compute_norm3df_vf>(dim3(256), result, x, y, z, count);
     }
@@ -101,7 +104,7 @@ a^2 + b^2 + c^2的平方根。
 
 输入输出示例如下：
 
-```
+```text
 x：0.25, 0.75, 1.25, 1.75
 y：1.5, 2.5, 3.5, 4.5
 z：-0.5, 0.5, 1.5, 2.5

@@ -21,14 +21,14 @@
 ```cpp
 // FLOOR舍入模式
 __simd_callee__ inline void asc_int162half_rd(vector_half& dst, vector_int16_t src, vector_bool mask)
-// RINT舍入模式
-__simd_callee__ inline void asc_int162half_rn(vector_half& dst, vector_int16_t src, vector_bool mask)
-// ROUND舍入模式
-__simd_callee__ inline void asc_int162half_rna(vector_half& dst, vector_int16_t src, vector_bool mask)
-// CEIL舍入模式
-__simd_callee__ inline void asc_int162half_ru(vector_half& dst, vector_int16_t src, vector_bool mask)
-// TRUNC舍入模式
-__simd_callee__ inline void asc_int162half_rz(vector_half& dst, vector_int16_t src, vector_bool mask)
+    // RINT舍入模式
+    __simd_callee__ inline void asc_int162half_rn(vector_half& dst, vector_int16_t src, vector_bool mask)
+    // ROUND舍入模式
+    __simd_callee__ inline void asc_int162half_rna(vector_half& dst, vector_int16_t src, vector_bool mask)
+    // CEIL舍入模式
+    __simd_callee__ inline void asc_int162half_ru(vector_half& dst, vector_int16_t src, vector_bool mask)
+    // TRUNC舍入模式
+    __simd_callee__ inline void asc_int162half_rz(vector_half& dst, vector_int16_t src, vector_bool mask)
 ```
 
 ## 参数说明
@@ -56,9 +56,9 @@ PIPE_V
 ## 调用示例
 
  ```cpp
-vector_half dst;
-vector_int16_t src;
-vector_bool mask = asc_create_mask_b16(PAT_ALL);
-asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
-asc_int162half_rd(dst, src, mask);
+ vector_half dst;
+ vector_int16_t src;
+ vector_bool mask = asc_create_mask_b16(PAT_ALL);
+ asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
+ asc_int162half_rd(dst, src, mask);
 ```

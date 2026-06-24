@@ -6,16 +6,18 @@
 
 ## 函数原型
 
-```
+```cpp
 uint32_t GetDropOutMaxTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource)
 ```
 
-```
+```cpp
 uint32_t GetDropOutMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource)
 ```
 
-```
-void GetDropOutMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+```cpp
+void GetDropOutMaxMinTmpSize(
+    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -46,7 +48,7 @@ GetDropOutMaxMinTmpSize无返回值。
 
 下文呈现了一个host侧调用**GetDropOutMaxMinTmpSize**接口的使用示例，通过该接口获取DropOut计算所需的最大最小临时空间大小，开发者基于此范围选择合适的空间大小作为Tiling参数传递到kernel侧使用。配套的kernel侧使用样例请参考[调用示例](DropOut.md#section642mcpsimp)。
 
-```
+```cpp
 #include <vector>
 
 #include "register/op_def_registry.h"
@@ -56,10 +58,10 @@ GetDropOutMaxMinTmpSize无返回值。
 namespace optiling {
 
 BEGIN_TILING_DATA_DEF(DropoutCustomTilingData)
-    TILING_DATA_FIELD_DEF(uint32_t, firstAxis);
-    TILING_DATA_FIELD_DEF(uint32_t, srcLastAxis);
-    TILING_DATA_FIELD_DEF(uint32_t, maskLastAxis);
-    TILING_DATA_FIELD_DEF(uint32_t, tmpBufferSize);
+TILING_DATA_FIELD_DEF(uint32_t, firstAxis);
+TILING_DATA_FIELD_DEF(uint32_t, srcLastAxis);
+TILING_DATA_FIELD_DEF(uint32_t, maskLastAxis);
+TILING_DATA_FIELD_DEF(uint32_t, tmpBufferSize);
 END_TILING_DATA_DEF;
 
 static ge::graphStatus TilingFunc(gert::TilingContext* context)
@@ -81,8 +83,7 @@ static ge::graphStatus TilingFunc(gert::TilingContext* context)
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(platformInfo);
     uint64_t tailSize = 0; // ub剩余空间大小
     // 本样例中使用完整的ub空间，实际情况下tailSize需要减掉用户已使用的ub空间
-    ascendcPlatform.GetCoreMemSize(
-        platform_ascendc::CoreMemType::UB, tailSize); 
+    ascendcPlatform.GetCoreMemSize(platform_ascendc::CoreMemType::UB, tailSize);
     auto tmpSize = tailSize >= maxValue ? maxValue : tailSize;
 
     DropoutCustomTilingData tiling;

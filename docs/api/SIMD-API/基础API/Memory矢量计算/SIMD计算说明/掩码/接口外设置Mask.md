@@ -28,13 +28,13 @@
     ```cpp
     half addsValue = 1.0;
     int8_t repeatTimes = 1;
-    UnaryRepeatParams repeatParams {2, 2, 16, 16};
+    UnaryRepeatParams repeatParams{2, 2, 16, 16};
     AscendC::SetMaskCount();
     AscendC::SetVectorMask<half, AscendC::MaskMode::COUNTER>(130);
     AscendC::Adds<half, false>(dstLocal, srcLocal, addsValue, AscendC::MASK_PLACEHOLDER, repeatTimes, repeatParams);
     AscendC::SetMaskNorm();
     // ResetMask无需在每次计算接口调用后调用，仅在需显式重置掩码状态时使用
-    AscendC::ResetMask(); 
+    AscendC::ResetMask();
     ```
 
     **图2**  接口外设置Mask，Counter模式连续计算示例  

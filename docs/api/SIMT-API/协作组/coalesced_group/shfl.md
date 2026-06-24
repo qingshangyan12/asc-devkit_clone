@@ -63,8 +63,8 @@ T shfl(T var, int src_rank) const
     using namespace cooperative_groups;
     __global__ void simt_kernel(...)
     {
-        ...
-        if (threadIdx.x % 2 == 0) {
+        ... if (threadIdx.x % 2 == 0)
+        {
             coalesced_group active = coalesced_threads();
             uint32_t result = active.shfl(threadIdx.x + 100, 3);
         }
@@ -78,8 +78,8 @@ T shfl(T var, int src_rank) const
     using namespace cooperative_groups;
     __simt_vf__ inline void simt_kernel(...)
     {
-        ...
-        if (threadIdx.x % 2 == 0) {
+        ... if (threadIdx.x % 2 == 0)
+        {
             coalesced_group active = coalesced_threads();
             uint32_t result = active.shfl(threadIdx.x + 100, 3);
         }

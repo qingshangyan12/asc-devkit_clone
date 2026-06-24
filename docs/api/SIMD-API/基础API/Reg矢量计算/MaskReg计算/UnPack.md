@@ -35,7 +35,7 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <HighLowPart part = HighLowPart::LOWEST> 
+template <HighLowPart part = HighLowPart::LOWEST>
 __simd_callee__ inline void UnPack(MaskReg& dst, MaskReg& src)
 ```
 
@@ -66,7 +66,8 @@ __simd_callee__ inline void UnPack(MaskReg& dst, MaskReg& src)
 
 ```cpp
 template <typename T>
-__simd_vf__ inline void UnpackVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
+__simd_vf__ inline void UnpackVF(
+    __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> srcReg;
     AscendC::Reg::MaskReg maskFull = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();

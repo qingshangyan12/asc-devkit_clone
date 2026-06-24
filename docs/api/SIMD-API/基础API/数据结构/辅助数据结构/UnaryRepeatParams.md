@@ -13,15 +13,17 @@ const uint8_t DEFAULT_REPEAT_STRIDE = 8;
 
 struct UnaryRepeatParams {
     __aicore__ UnaryRepeatParams() {}
-    __aicore__ UnaryRepeatParams(const uint16_t dstBlkStrideIn, const uint16_t srcBlkStrideIn,
-        const uint8_t dstRepStrideIn, const uint8_t srcRepStrideIn)
+    __aicore__ UnaryRepeatParams(
+        const uint16_t dstBlkStrideIn, const uint16_t srcBlkStrideIn, const uint8_t dstRepStrideIn,
+        const uint8_t srcRepStrideIn)
         : dstBlkStride(dstBlkStrideIn),
           srcBlkStride(srcBlkStrideIn),
           dstRepStride(dstRepStrideIn),
           srcRepStride(srcRepStrideIn)
     {}
-    __aicore__ UnaryRepeatParams(const uint16_t dstBlkStrideIn, const uint16_t srcBlkStrideIn,
-        const uint8_t dstRepStrideIn, const uint8_t srcRepStrideIn, const bool halfBlockIn)
+    __aicore__ UnaryRepeatParams(
+        const uint16_t dstBlkStrideIn, const uint16_t srcBlkStrideIn, const uint8_t dstRepStrideIn,
+        const uint8_t srcRepStrideIn, const bool halfBlockIn)
         : dstBlkStride(dstBlkStrideIn),
           srcBlkStride(srcBlkStrideIn),
           dstRepStride(dstRepStrideIn),

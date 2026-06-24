@@ -4,25 +4,25 @@
 
 获取硬件平台存储空间的内存大小，例如L1、L0\_A、L0\_B、L2等，支持的存储空间类型定义如下：
 
-```
+```cpp
 enum class CoreMemType {
-L0_A = 0, // L0A Buffer
-L0_B = 1, // L0B Buffer
-L0_C = 2, // L0C Buffer
-L1 = 3,   // L1 Buffer
-L2 = 4,   // L2 Cache
-UB = 5,   // Unified Buffer
-HBM = 6,  // GM
-FB = 7,   // Fixpipe Buffer
-BT = 8,   // BiasTable Buffer
-RESERVED
+    L0_A = 0, // L0A Buffer
+    L0_B = 1, // L0B Buffer
+    L0_C = 2, // L0C Buffer
+    L1 = 3,   // L1 Buffer
+    L2 = 4,   // L2 Cache
+    UB = 5,   // Unified Buffer
+    HBM = 6,  // GM
+    FB = 7,   // Fixpipe Buffer
+    BT = 8,   // BiasTable Buffer
+    RESERVED
 };
 ```
 
 ## 函数原型<a name="zh-cn_topic_0000001597362348_zh-cn_topic_0000001442486577_section13230182415108"></a>
 
-```
-void GetCoreMemSize(const CoreMemType &memType, uint64_t &size) const
+```cpp
+void GetCoreMemSize(const CoreMemType& memType, uint64_t& size) const
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001597362348_zh-cn_topic_0000001442486577_section189014013619"></a>
@@ -63,8 +63,9 @@ void GetCoreMemSize(const CoreMemType &memType, uint64_t &size) const
 
 ## 调用示例<a name="zh-cn_topic_0000001597362348_zh-cn_topic_0000001442486577_section320753512363"></a>
 
-```
-ge::graphStatus TilingXXX(gert::TilingContext* context) {
+```cpp
+ge::graphStatus TilingXXX(gert::TilingContext* context)
+{
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
     uint64_t ub_size, l1_size;
     ascendcPlatform.GetCoreMemSize(platform_ascendc::CoreMemType::UB, ub_size);

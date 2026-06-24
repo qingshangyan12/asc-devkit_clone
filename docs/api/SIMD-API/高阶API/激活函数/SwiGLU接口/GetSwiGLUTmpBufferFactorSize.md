@@ -18,7 +18,7 @@ kernel侧SwiGLU接口的计算需要开发者预留/申请临时空间，最大�
 
 ## 函数原型
 
-```
+```cpp
 void GetSwiGLUTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuffer)
 ```
 
@@ -42,7 +42,7 @@ void GetSwiGLUTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNode
 
 ## 调用示例
 
-```
+```cpp
 uint32_t typeSize = sizeof(half);
 uint32_t maxLiveNodeCount = 0;
 uint32_t extraBuffer = 0;

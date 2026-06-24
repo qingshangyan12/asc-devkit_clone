@@ -19,7 +19,7 @@ HCCL客户端初始化接口。该接口默认在所有核上工作，用户也�
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void Init(GM_ADDR context, __gm__ void* initTiling = nullptr)
 ```
 

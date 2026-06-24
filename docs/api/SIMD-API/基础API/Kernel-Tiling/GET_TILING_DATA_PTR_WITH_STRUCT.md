@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001526206862_section1630753514297"></a>
 
-```
+```cpp
 GET_TILING_DATA_PTR_WITH_STRUCT(tiling_struct, dst_ptr, tiling_ptr)
 ```
 
@@ -100,8 +100,9 @@ GET_TILING_DATA_PTR_WITH_STRUCT(tiling_struct, dst_ptr, tiling_ptr)
 
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 
-```
-extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8_t *y, __gm__ uint8_t *z, __gm__ uint8_t *tiling)
+```cpp
+extern "C" __global__ __aicore__ void add_custom(
+    __gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* tiling)
 {
     KernelAdd op;
 
@@ -109,24 +110,24 @@ extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8
 
     op.Init(x, y, z, tilingDataPtr->totalLength, tilingDataPtr->tileNum);
     op.Process();
-    
 }
 ```
 
 以下是错误调用的示例：
 
-```
-__aicore__ __tiling_data_ptr__ AddCustomTilingData* foo(__gm__ uint8_t *tiling)
+```cpp
+__aicore__ __tiling_data_ptr__ AddCustomTilingData* foo(__gm__ uint8_t* tiling)
 {
     GET_TILING_DATA_PTR_WITH_STRUCT(AddCustomTilingData, tilingDataPtr, tiling);
     return tilingDataPtr;
 }
 
-extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8_t *y, __gm__ uint8_t *z, __gm__ uint8_t *tiling)
+extern "C" __global__ __aicore__ void add_custom(
+    __gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* tiling)
 {
     KernelAdd op;
 
-    auto tilingDataPtr = foo(tiling);  // 错误，foo函数已经执行完成，非法访问生命周期已经结束的局部变量
+    auto tilingDataPtr = foo(tiling); // 错误，foo函数已经执行完成，非法访问生命周期已经结束的局部变量
 
     op.Init(x, y, z, tilingDataPtr->totalLength, tilingDataPtr->tileNum);
     op.Process();

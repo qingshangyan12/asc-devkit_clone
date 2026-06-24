@@ -71,21 +71,26 @@ TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1H
 
   ```cpp
   template <typename T>
-  __aicore__ inline void TransDataTo5HD(uint64_t dstList[NCHW_CONV_ADDR_LIST_SIZE], uint64_t srcList[NCHW_CONV_ADDR_LIST_SIZE], const TransDataTo5HDParams& nchwconvParams) 
+  __aicore__ inline void TransDataTo5HD(
+      uint64_t dstList[NCHW_CONV_ADDR_LIST_SIZE], uint64_t srcList[NCHW_CONV_ADDR_LIST_SIZE],
+      const TransDataTo5HDParams& nchwconvParams)
   ```
 
 - dst与src类型为uint64\_t的LocalTensor，连续存储对应LocalTensor的地址值。开发者可以通过LocalTensor的GetPhyAddr接口获取该地址值。
 
   ```cpp
   template <typename T>
-  __aicore__ inline void TransDataTo5HD(const LocalTensor<uint64_t>& dst, const LocalTensor<uint64_t>& src, const TransDataTo5HDParams& nchwconvParams) 
+  __aicore__ inline void TransDataTo5HD(
+      const LocalTensor<uint64_t>& dst, const LocalTensor<uint64_t>& src, const TransDataTo5HDParams& nchwconvParams)
   ```
 
 - dstList与srcList类型为LocalTensor的数组。
 
   ```cpp
   template <typename T>
-  __aicore__ inline void TransDataTo5HD(const LocalTensor<T> (&dstList)[NCHW_CONV_ADDR_LIST_SIZE], const LocalTensor<T> (&srcList)[NCHW_CONV_ADDR_LIST_SIZE], const TransDataTo5HDParams& nchwconvParams) 
+  __aicore__ inline void TransDataTo5HD(
+      const LocalTensor<T> (&dstList)[NCHW_CONV_ADDR_LIST_SIZE],
+      const LocalTensor<T> (&srcList)[NCHW_CONV_ADDR_LIST_SIZE], const TransDataTo5HDParams& nchwconvParams)
   ```
 
 ## 参数说明<a name="zh-cn_topic_0000001521260417_section622mcpsimp"></a>
@@ -168,12 +173,12 @@ TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1H
   AscendC::LocalTensor<int8_t> dstLocalList[16];
   int width = 32 / sizeof(int8_t); // 每个DataBlock存储的元素个数，此处为32个
   uint64_t dstLocalList[16];
-  for (int i = 0; i < 16; i++) {   // dstLocal为int8_t类型的LocalTensor
-    dstLocalList[i] = (uint64_t)(dstLocal[width * i].GetPhyAddr());
+  for (int i = 0; i < 16; i++) { // dstLocal为int8_t类型的LocalTensor
+      dstLocalList[i] = (uint64_t)(dstLocal[width * i].GetPhyAddr());
   }
   uint64_t srcLocalList[16];
-  for (int i = 0; i < 16; i++) {   // srcLocal为int8_t类型的LocalTensor
-    srcLocalList[i] = (uint64_t)(srcLocal[width * i].GetPhyAddr());
+  for (int i = 0; i < 16; i++) { // srcLocal为int8_t类型的LocalTensor
+      srcLocalList[i] = (uint64_t)(srcLocal[width * i].GetPhyAddr());
   }
   AscendC::TransDataTo5HD<int8_t>(dstLocalList, srcLocalList, transDataParams);
   ```
@@ -221,7 +226,7 @@ TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1H
   // 总数据量
   constexpr uint32_t totalElements = N * C * H * W; // 16384
   // 外循环次数
-  constexpr uint32_t loopCount = N * C /NCHW_CONV_ADDR_LIST_SIZE; // 4
+  constexpr uint32_t loopCount = N * C / NCHW_CONV_ADDR_LIST_SIZE; // 4
   // 设置转换参数：NCHW → NC1HWC0
   AscendC::TransDataTo5HDParams transParams;
   transParams.repeatTimes = 16;  // hSize * wSize / elems_per_block处理整个HW平面需要的repeat次数
@@ -229,15 +234,15 @@ TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1H
   transParams.srcRepStride = 1;  // 循环间同一HW平面srcList连续
   // 循环处理数据
   for (uint32_t loop = 0; loop < loopCount; loop++) {
-    // 设置地址列表
-    uint64_t srcList[NCHW_CONV_ADDR_LIST_SIZE];
-    uint64_t dstList[NCHW_CONV_ADDR_LIST_SIZE];
-    for (int i = 0; i < NCHW_CONV_ADDR_LIST_SIZE; i++) {
-      srcList[i] = (uint64_t)srcLocal[loop * NCHW_CONV_ADDR_LIST_SIZE * H * W + i * H * W].GetPhyAddr();
-      dstList[i] = (uint64_t)dstLocal[loop * NCHW_CONV_ADDR_LIST_SIZE * H * W + i * C0].GetPhyAddr();
-    }
-    // 执行数据排布转换
-    AscendC::TransDataTo5HD<T>(dstList, srcList, transParams);
+      // 设置地址列表
+      uint64_t srcList[NCHW_CONV_ADDR_LIST_SIZE];
+      uint64_t dstList[NCHW_CONV_ADDR_LIST_SIZE];
+      for (int i = 0; i < NCHW_CONV_ADDR_LIST_SIZE; i++) {
+          srcList[i] = (uint64_t)srcLocal[loop * NCHW_CONV_ADDR_LIST_SIZE * H * W + i * H * W].GetPhyAddr();
+          dstList[i] = (uint64_t)dstLocal[loop * NCHW_CONV_ADDR_LIST_SIZE * H * W + i * C0].GetPhyAddr();
+      }
+      // 执行数据排布转换
+      AscendC::TransDataTo5HD<T>(dstList, srcList, transParams);
   }
   ```
 
@@ -253,12 +258,12 @@ TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1H
   AscendC::TransDataTo5HDParams transDataParams;
   transDataParams.dstHighHalf = true; // 只对int8_t/uint8_t的入参有效，从srcLocalList的高半位读取数据
   transDataParams.srcHighHalf = true; // 只对int8_t/uint8_t的入参有效，写入dstLocalList的高半位
-  transDataParams.repeatTimes = 1; // 重复迭代次数，每次repeat处理16个DataBlock
+  transDataParams.repeatTimes = 1;    // 重复迭代次数，每次repeat处理16个DataBlock
   transDataParams.dstRepStride = 0;
   transDataParams.srcRepStride = 0;
   AscendC::LocalTensor<int8_t> dstLocalList[16];
   int width = 32 / sizeof(int8_t); // 每个DataBlock存储的元素个数，此处为32个
-  for (int i = 0; i < 16; i++) { // dstLocal为int8_t类型的LocalTensor
+  for (int i = 0; i < 16; i++) {   // dstLocal为int8_t类型的LocalTensor
       dstLocalList[i] = dstLocal[width * i];
   }
   AscendC::LocalTensor<int8_t> srcLocalList[16];
@@ -274,7 +279,7 @@ TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1H
   AscendC::TransDataTo5HDParams transDataParams;
   transDataParams.dstHighHalf = true; // 只对int8_t/uint8_t的入参有效，从srcLocalList的高半位读取数据
   transDataParams.srcHighHalf = true; // 只对int8_t/uint8_t的入参有效，写入dstLocalList的高半位
-  transDataParams.repeatTimes = 1; // 重复迭代次数，每次repeat处理16个DataBlock
+  transDataParams.repeatTimes = 1;    // 重复迭代次数，每次repeat处理16个DataBlock
   transDataParams.dstRepStride = 0;
   transDataParams.srcRepStride = 0;
   AscendC::LocalTensor<int8_t> dstLocalList[16];
@@ -296,7 +301,7 @@ TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1H
   AscendC::TransDataTo5HDParams transDataParams;
   transDataParams.dstHighHalf = true; // 只对int8_t/uint8_t的入参有效，从srcLocalList的高半位读取数据
   transDataParams.srcHighHalf = true; // 只对int8_t/uint8_t的入参有效，写入dstLocalList的高半位
-  transDataParams.repeatTimes = 1; // 重复迭代次数，每次repeat处理16个DataBlock
+  transDataParams.repeatTimes = 1;    // 重复迭代次数，每次repeat处理16个DataBlock
   transDataParams.dstRepStride = 0;
   transDataParams.srcRepStride = 0;
   AscendC::LocalTensor<int8_t> dstLocalList[16];

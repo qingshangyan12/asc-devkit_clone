@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename T>
 __aicore__ inline uint32_t GetSortLen(const uint32_t elemCount)
 ```
@@ -35,6 +35,6 @@ sort数据的大小（单位为字节）。
 
 ## 调用示例
 
-```
+```cpp
 AscendC::GetSortLen<half>(128);
 ```

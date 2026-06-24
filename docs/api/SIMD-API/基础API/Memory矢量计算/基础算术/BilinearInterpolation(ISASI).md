@@ -142,20 +142,20 @@ hRepeat = 2；vRepeat = 2；mask = 128；vROffset = 128。
 
     ```cpp
     template <typename T>
-    __aicore__ inline void BilinearInterpolation(const LocalTensor<T> &dst, const LocalTensor<T> &src0,
-        const LocalTensor<uint32_t> &src0Offset, const LocalTensor<T> &src1, uint64_t mask[], uint8_t hRepeat,
-        bool repeatMode, uint16_t dstBlkStride, uint16_t vROffset, uint8_t vRepeat,
-        const LocalTensor<uint8_t> &sharedTmpBuffer);
+    __aicore__ inline void BilinearInterpolation(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<uint32_t>& src0Offset,
+        const LocalTensor<T>& src1, uint64_t mask[], uint8_t hRepeat, bool repeatMode, uint16_t dstBlkStride,
+        uint16_t vROffset, uint8_t vRepeat, const LocalTensor<uint8_t>& sharedTmpBuffer);
     ```
 
 -   mask连续模式：
 
     ```cpp
     template <typename T>
-    __aicore__ inline void BilinearInterpolation(const LocalTensor<T> &dst, const LocalTensor<T> &src0,
-        const LocalTensor<uint32_t> &src0Offset, const LocalTensor<T> &src1, uint64_t mask, uint8_t hRepeat,
-        bool repeatMode, uint16_t dstBlkStride, uint16_t vROffset, uint8_t vRepeat,
-        const LocalTensor<uint8_t> &sharedTmpBuffer);
+    __aicore__ inline void BilinearInterpolation(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<uint32_t>& src0Offset,
+        const LocalTensor<T>& src1, uint64_t mask, uint8_t hRepeat, bool repeatMode, uint16_t dstBlkStride,
+        uint16_t vROffset, uint8_t vRepeat, const LocalTensor<uint8_t>& sharedTmpBuffer);
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -226,18 +226,20 @@ hRepeat = 2；vRepeat = 2；mask = 128；vROffset = 128。
 -   接口样例-mask连续模式
 
     ```cpp
-    AscendC::LocalTensor<half> dstLocal, src0Local, src1Local; // repeatMode = false，src1Local的数据长度为16即可
+    AscendC::LocalTensor<half> dstLocal, src0Local,
+        src1Local; // repeatMode = false，src1Local的数据长度为16即可
     AscendC::LocalTensor<uint32_t> src0OffsetLocal;
     AscendC::LocalTensor<uint8_t> tmpLocal;
-    uint64_t mask = 128;        // mask连续模式
-    uint8_t hRepeat = 2;        // 水平迭代2次
-    bool repeatMode = false;    // 迭代模式
-    uint16_t dstBlkStride = 1;  // 单次迭代内数据连续写入
-    uint16_t vROffset = 128;    // 相邻迭代间数据连续写入
-    uint8_t vRepeat = 2;        // 垂直迭代2次
-    
-    AscendC::BilinearInterpolation(dstLocal, src0Local, src0OffsetLocal, src1Local, mask, hRepeat, repeatMode,
-                dstBlkStride, vROffset, vRepeat, tmpLocal);
+    uint64_t mask = 128;       // mask连续模式
+    uint8_t hRepeat = 2;       // 水平迭代2次
+    bool repeatMode = false;   // 迭代模式
+    uint16_t dstBlkStride = 1; // 单次迭代内数据连续写入
+    uint16_t vROffset = 128;   // 相邻迭代间数据连续写入
+    uint8_t vRepeat = 2;       // 垂直迭代2次
+
+    AscendC::BilinearInterpolation(
+        dstLocal, src0Local, src0OffsetLocal, src1Local, mask, hRepeat, repeatMode, dstBlkStride, vROffset, vRepeat,
+        tmpLocal);
     ```
 
 -   接口样例-mask逐bit模式
@@ -246,15 +248,16 @@ hRepeat = 2；vRepeat = 2；mask = 128；vROffset = 128。
     AscendC::LocalTensor<half> dstLocal, src0Local, src1Local;
     AscendC::LocalTensor<uint32_t> src0OffsetLocal;
     AscendC::LocalTensor<uint8_t> tmpLocal;
-    uint64_t mask[2] = { UINT64_MAX, UINT64_MAX }; // mask逐bit模式
-    uint8_t hRepeat = 2;        // 水平迭代2次
-    bool repeatMode = false;    // 迭代模式
-    uint16_t dstBlkStride = 1;  // 单次迭代内数据连续写入
-    uint16_t vROffset = 128;    // 相邻迭代间数据连续写入
-    uint8_t vRepeat = 2;        // 垂直迭代2次
-    
-    AscendC::BilinearInterpolation(dstLocal, src0Local, src0OffsetLocal, src1Local, mask, hRepeat, repeatMode,
-                dstBlkStride, vROffset, vRepeat, tmpLocal);
+    uint64_t mask[2] = {UINT64_MAX, UINT64_MAX}; // mask逐bit模式
+    uint8_t hRepeat = 2;                         // 水平迭代2次
+    bool repeatMode = false;                     // 迭代模式
+    uint16_t dstBlkStride = 1;                   // 单次迭代内数据连续写入
+    uint16_t vROffset = 128;                     // 相邻迭代间数据连续写入
+    uint8_t vRepeat = 2;                         // 垂直迭代2次
+
+    AscendC::BilinearInterpolation(
+        dstLocal, src0Local, src0OffsetLocal, src1Local, mask, hRepeat, repeatMode, dstBlkStride, vROffset, vRepeat,
+        tmpLocal);
     ```
 
 结果示例如下：

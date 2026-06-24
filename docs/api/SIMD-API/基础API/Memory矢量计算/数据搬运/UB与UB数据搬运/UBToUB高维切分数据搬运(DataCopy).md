@@ -32,7 +32,8 @@
 
 ```cpp
 template <typename T>
-__aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
+__aicore__ inline void DataCopy(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -164,7 +165,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
     // srcLocal、dstLocal为half类型的LocalTensor。
     // 使用传入count参数的搬运接口，完成连续搬运。
     AscendC::DataCopy(dstLocal, srcLocal, 128);
-    
+
     // 使用传入DataCopyParams参数的搬运接口，实现相同的连续搬运效果。
     // blockCount = 1：连续数据块个数为1
     // blockLen = 8：一个数据块长度为8个DataBlock（128个half元素 ÷ (32B/2B) = 8）。

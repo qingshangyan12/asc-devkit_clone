@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```text
 inline half2 h2floor(half2 x)
 ```
 
@@ -56,7 +56,7 @@ inline half2 h2floor(half2 x)
 
 使用half2类型接口需要包含"simt\_api/asc\_fp16.h"头文件。
 
-```
+```cpp
 #include "simt_api/asc_fp16.h"
 ```
 
@@ -64,7 +64,7 @@ inline half2 h2floor(half2 x)
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     __global__ __launch_bounds__(1024) void KernelIsFinite(half2* dst, half2* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -74,7 +74,7 @@ inline half2 h2floor(half2 x)
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void KernelIsFinite(__gm__ half2* dst, __gm__ half2* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

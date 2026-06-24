@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="section765814724715"></a>
 
-```
+```cpp
 __aicore__ inline void Wait(uint32_t waitIndex)
 ```
 
@@ -90,12 +90,12 @@ __aicore__ inline void Wait(uint32_t waitIndex)
 
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 
-```
+```cpp
 if (id >= 0 && id < ARRIVE_NUM) {
-  //各种Vector计算逻辑，用户自行实现
-  barA.Arrive(id);
-} else if(id >= ARRIVE_NUM && id < ARRIVE_NUM + WAIT_NUM){
-  barA.Wait(id - ARRIVE_NUM);  // Wait组的6个AIV中的AIV需要等待Arrive组AIV做完任务
-  // 各种Vector计算逻辑，用户自行实现
+    // 各种Vector计算逻辑，用户自行实现
+    barA.Arrive(id);
+} else if (id >= ARRIVE_NUM && id < ARRIVE_NUM + WAIT_NUM) {
+    barA.Wait(id - ARRIVE_NUM); // Wait组的6个AIV中的AIV需要等待Arrive组AIV做完任务
+                                // 各种Vector计算逻辑，用户自行实现
 }
 ```

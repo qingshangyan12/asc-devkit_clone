@@ -34,7 +34,7 @@ MatmulCallBackFunc中包含3个可由用户自定义的回调函数接口，即�
 | 可自定义左矩阵搬入首地址、搬运块位置、搬运块大小，实现左矩阵从GM搬入L1的功能 | void CopyA1(const LocalTensor<int8_t>& aMatrix, const __gm__ void* gm, int row, int col, int useM, int useK, const uint64_t tilingPtr, const uint64_t dataPtr) | aMatrix: 目标L1Buffer地址。<br><br>gm：左矩阵GM首地址。<br><br>row、col：搬运块在M、K方向的索引，即在M、K方向上搬运块的序号，序号从0开始。<br><br>useM、useK：搬运块M、K方向大小，单位为元素个数。通过row、col和useM、useK计算出该搬运块左上角在左矩阵中的地址偏移。<br><br>tilingPtr: 用户使用[SetUserDefInfo](SetUserDefInfo.md)设置的tiling参数地址。<br><br>dataPtr: 用户使用[SetSelfDefineData](SetSelfDefineData.md)设置的计算数据地址。 |
 | 可自定义右矩阵搬入首地址、搬运块位置、搬运块大小，实现右矩阵从GM搬入L1的功能 | void CopyB1(const LocalTensor<int8_t>& bMatrix, const __gm__ void* gm, int row, int col, int useK, int useN, const uint64_t tilingPtr, const uint64_t dataPtr) | bMatrix: 目标L1Buffer地址。<br><br>gm：右矩阵GM首地址。<br><br>row、col：搬运块在K、N方向的索引，即在K、N方向上搬运块的序号，序号从0开始。<br><br>useK、useN：搬运块K、N方向大小，单位为元素个数。通过row、col和useK、useN计算出该搬运块左上角在右矩阵中的地址偏移。<br><br>tilingPtr: 用户使用[SetUserDefInfo](SetUserDefInfo.md)设置的tiling参数地址。<br><br>dataPtr: 用户使用[SetSelfDefineData](SetSelfDefineData.md)设置的计算数据地址。 |
 
-```
+```cpp
 struct DataCopyOutParams {
     uint16_t cBurstNum;         // 传输数据片段数目
     uint16_t burstLen;          // 连续传输数据片段长度
@@ -53,7 +53,7 @@ struct DataCopyOutParams {
 
 ## 调用示例
 
-```
+```cpp
 // 用户自定义回调函数
 void DataCopyOut(
     const __gm__ void* gm, const LocalTensor<int8_t>& co1Local, const void* dataCopyOutParams, const uint64_t tilingPtr,

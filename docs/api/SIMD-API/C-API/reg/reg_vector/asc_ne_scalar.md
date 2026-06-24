@@ -14,14 +14,15 @@ src中的每个元素逐个与标量value比较大小，如果src_i != value，�
 
 ```cpp
 __simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
-__simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_int8_t src, int8_t value, vector_bool mask)
-__simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_uint16_t src, uint16_t value, vector_bool mask)
-__simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_int16_t src, int16_t value, vector_bool mask)
-__simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_uint32_t src, uint32_t value, vector_bool mask)
-__simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_int32_t src, int32_t value, vector_bool mask)
-__simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_half src, half value, vector_bool mask)
-__simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_float src, float value, vector_bool mask)
-__simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
+    __simd_callee__
+    inline void asc_ne_scalar(vector_bool& dst, vector_int8_t src, int8_t value, vector_bool mask) __simd_callee__
+    inline void asc_ne_scalar(vector_bool& dst, vector_uint16_t src, uint16_t value, vector_bool mask) __simd_callee__
+    inline void asc_ne_scalar(vector_bool& dst, vector_int16_t src, int16_t value, vector_bool mask) __simd_callee__
+    inline void asc_ne_scalar(vector_bool& dst, vector_uint32_t src, uint32_t value, vector_bool mask) __simd_callee__
+    inline void asc_ne_scalar(vector_bool& dst, vector_int32_t src, int32_t value, vector_bool mask) __simd_callee__
+    inline void asc_ne_scalar(vector_bool& dst, vector_half src, half value, vector_bool mask) __simd_callee__
+    inline void asc_ne_scalar(vector_bool& dst, vector_float src, float value, vector_bool mask) __simd_callee__
+    inline void asc_ne_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
 ```
 ## 参数说明
 

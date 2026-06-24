@@ -21,7 +21,7 @@
 
 算子的Tiling结构体定义如下：
 
-```
+```cpp
 struct AddCustomTilingData {
     uint32_t blockLength;
     uint32_t tileNum;
@@ -35,21 +35,22 @@ Host侧Tiling实现的主要内容为计算以上四个成员变量。步骤如�
 
 1.  判断数据总长度totalLength是否满足32字节对齐，如不满足，则计算totalLength向上32字节对齐后的长度totalLengthAligned。
 
-    ```
+    ```cpp
     constexpr uint32_t BLOCK_SIZE = 32;
     // 为方便计算，这里根据数据类型定义变量alignNum作为对齐数
     uint32_t alignNum = BLOCK_SIZE / dataTypeSize;
     // totalLength为数据总量
     totalLengthAligned = (totalLength % alignNum == 0U) ?
-                          static_cast<uint32_t>(totalLength) :
-                          ((static_cast<uint32_t>(totalLength) + alignNum - 1) / alignNum) * alignNum;
+                             static_cast<uint32_t>(totalLength) :
+                             ((static_cast<uint32_t>(totalLength) + alignNum - 1) / alignNum) * alignNum;
     ```
 
 2.  判断totalLengthAligned是否能被使用的核数NumBlocks均分，如果可以，则计算每个核上计算数据长度blockLength。
 
-    ```
+    ```cpp
     constexpr uint32_t NUM_BLOCKS = 8;
-    constexpr uint32_t UB_BLOCK_NUM = 100;  // 此处为方便验证，使用UB_BLOCK_NUM作为Unified Buffer可用的Block数量，因此可得出可用UB空间的大小为UB_BLOCK_NUM * BLOCK_SIZE
+    constexpr uint32_t UB_BLOCK_NUM = 100; // 此处为方便验证，使用UB_BLOCK_NUM作为Unified
+                                           // Buffer可用的Block数量，因此可得出可用UB空间的大小为UB_BLOCK_NUM * BLOCK_SIZE
     uint32_t blockLength, tileNum;
     if ((totalLengthAligned / alignNum) % NUM_BLOCKS == 0U) {
         blockLength = totalLengthAligned / NUM_BLOCKS;
@@ -58,7 +59,7 @@ Host侧Tiling实现的主要内容为计算以上四个成员变量。步骤如�
 
 3.  计算tileNum。为了减少数据搬运开销，应尽量使用核内的Unified Buffer空间。基于每个核上的计算量以及可用Unified Buffer空间的大小，计算tileNum。
 
-    ```
+    ```text
     tileNum = blockLength / (alignNum * UB_BLOCK_NUM);
     ```
 
@@ -66,7 +67,7 @@ Host侧Tiling实现的主要内容为计算以上四个成员变量。步骤如�
 
     如果每个核的计算量能够被当前可用Unified Buffer空间均分，则按照无尾块场景处理。
 
-    ```
+    ```cpp
     if (static_cast<uint32_t>(blockLength / alignNum) % UB_BLOCK_NUM == 0U) {
         // 单核的计算量能被当前可用UB空间均分，仅有主块，无尾块
         tileLength = UB_BLOCK_NUM * alignNum;
@@ -76,7 +77,7 @@ Host侧Tiling实现的主要内容为计算以上四个成员变量。步骤如�
 
     反之，按照尾块场景处理，尾块长度为单核计算数据长度 - tileNum \* tileLength。
 
-    ```
+    ```cpp
     if (tileNum == 0U) {
         // 单核需要计算的长度小于UB可用空间，按照仅有尾块处理
         tileLength = 0U;
@@ -90,17 +91,20 @@ Host侧Tiling实现的主要内容为计算以上四个成员变量。步骤如�
 
 Host侧Tiling实现的代码如下：
 
-```
+```cpp
 constexpr uint32_t BLOCK_SIZE = 32;
 constexpr uint32_t NUM_BLOCKS = 8;
-constexpr uint32_t UB_BLOCK_NUM = 100;  // 此处为方便验证，使用UB_BLOCK_NUM作为UB可用的Block数量，因此可得出可用UB空间的大小为UB_BLOCK_NUM * BLOCK_SIZE
+constexpr uint32_t UB_BLOCK_NUM =
+    100; // 此处为方便验证，使用UB_BLOCK_NUM作为UB可用的Block数量，因此可得出可用UB空间的大小为UB_BLOCK_NUM * BLOCK_SIZE
 ...
 
-uint32_t alignNum = BLOCK_SIZE / dataTypeSize;  // 为方便计算，这里根据数据类型定义变量alignNum作为对齐数，dataTypeSize为运算数据的数据类型对应的字节数
+    uint32_t alignNum =
+        BLOCK_SIZE /
+        dataTypeSize; // 为方便计算，这里根据数据类型定义变量alignNum作为对齐数，dataTypeSize为运算数据的数据类型对应的字节数
 // totalLength为数据总量
 totalLengthAligned = (totalLength % alignNum == 0U) ?
-                             static_cast<uint32_t>(totalLength) :
-                             ((static_cast<uint32_t>(totalLength) + alignNum - 1) / alignNum) * alignNum;
+                         static_cast<uint32_t>(totalLength) :
+                         ((static_cast<uint32_t>(totalLength) + alignNum - 1) / alignNum) * alignNum;
 uint32_t blockLength, tileNum;
 if ((totalLengthAligned / alignNum) % NUM_BLOCKS == 0U) {
     blockLength = totalLengthAligned / NUM_BLOCKS;
@@ -125,12 +129,12 @@ if ((totalLengthAligned / alignNum) % NUM_BLOCKS == 0U) {
 
 \(1，1904\)形状的输入数据计算后，tiling结构体内各个变量的值如下：
 
-```
+```cpp
 struct AddCustomTilingData {
-    uint32_t blockLength = 238;      // 每个核计算238个half，8个核共计算1904个half
-    uint32_t tileNum = 0;            // 可用的UB空间足够，为仅有尾块的场景
-    uint32_t tileLength = 0;         // 没有主块，主块长度为0
-    uint32_t lastTileLength = 240;   // 238个half未32B对齐，对齐到240个half搬运
+    uint32_t blockLength = 238;    // 每个核计算238个half，8个核共计算1904个half
+    uint32_t tileNum = 0;          // 可用的UB空间足够，为仅有尾块的场景
+    uint32_t tileLength = 0;       // 没有主块，主块长度为0
+    uint32_t lastTileLength = 240; // 238个half未32B对齐，对齐到240个half搬运
     ...
 };
 ```
@@ -139,7 +143,7 @@ struct AddCustomTilingData {
 
 与[多核Tiling](多核Tiling.md)相比，在Init函数中通过Pipe内存管理对象为输入输出Queue分配内存时，取tileLength与lastTileLength中的最大值作为分配内存的长度。例如，当单核需要计算的长度小于UB可用空间时，按照仅有尾块处理，此时tileLength为0，而lastTileLength为数据块长度。因此，需要取两者中的较大值来分配内存。
 
-```
+```cpp
 uint32_t initBufferLength = AscendC::Std::max(this->tileLength, this->lastTileLength);
 pipe->InitBuffer(inQueueX, 1, this->initBufferLength * sizeof(dataType));
 ```
@@ -148,7 +152,7 @@ pipe->InitBuffer(inQueueX, 1, this->initBufferLength * sizeof(dataType));
 
 Process函数实现代码如下：
 
-```
+```cpp
 __aicore__ inline void Process()
 {
     // 计算主块数据，对应数据块长度为tileLength
@@ -168,7 +172,7 @@ __aicore__ inline void Process()
 
 CopyIn函数实现代码如下：
 
-```
+```cpp
 __aicore__ inline void CopyIn(int32_t progress, uint32_t tileLength)
 {
     AscendC::LocalTensor<T> xLocal = inQueueX.AllocTensor<T>();
@@ -182,7 +186,7 @@ __aicore__ inline void CopyIn(int32_t progress, uint32_t tileLength)
 
 Compute函数实现代码如下：
 
-```
+```cpp
 __aicore__ inline void Compute(int32_t progress, uint32_t tileLength)
 {
     AscendC::LocalTensor<T> xLocal = inQueueX.DeQue<T>();
@@ -197,7 +201,7 @@ __aicore__ inline void Compute(int32_t progress, uint32_t tileLength)
 
 CopyOut函数实现代码如下：
 
-```
+```cpp
 __aicore__ inline void CopyOut(int32_t progress, uint32_t tileLength)
 {
     AscendC::LocalTensor<T> zLocal = outQueueZ.DeQue<T>();

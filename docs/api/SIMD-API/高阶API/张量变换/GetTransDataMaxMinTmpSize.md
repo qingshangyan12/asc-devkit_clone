@@ -9,8 +9,10 @@ kernel侧TransData接口的计算需要开发者预留/申请临时空间，本�
 
 ## 函数原型
 
-```
-bool GetTransDataMaxMinTmpSize(const platform_ascendc::PlatformAscendC& platform, const ge::Shape& srcShape, const ge::Shape& dstShape,const ge::DataType dataType, const TransDataConfig& config, uint32_t& maxValue, uint32_t& minValue)
+```cpp
+bool GetTransDataMaxMinTmpSize(
+    const platform_ascendc::PlatformAscendC& platform, const ge::Shape& srcShape, const ge::Shape& dstShape,
+    const ge::DataType dataType, const TransDataConfig& config, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -27,7 +29,7 @@ bool GetTransDataMaxMinTmpSize(const platform_ascendc::PlatformAscendC& platform
 | maxValue | 输出 | TransData接口能完成计算所需的最大临时空间大小，超出该值的空间不会被该接口使用。 <br>maxValue仅作为参考值，有可能大于Unified Buffer剩余空间的大小，该场景下，开发者需要根据Unified Buffer剩余空间的大小来选取合适的临时空间大小。 |
 | minValue | 输出 | TransData接口能完成计算所需最小临时空间大小。为保证功能正确，接口计算时预留/申请的临时空间不能小于该数值。 |
 
-```
+```cpp
 struct TransDataConfig {
     DataFormat srcFormat;
     DataFormat dstFormat;
@@ -57,7 +59,7 @@ GetTransDataMaxMinTmpSize返回值为true/false，true表示成功获取TransDat
 
 完整的调用样例请参考[更多样例](../数学计算/更多样例-83.md)。
 
-```
+```cpp
 // 输入shape为(1,16,2,4,4)NCDHW转换为输出shape(1,2,1,4,4,16)NDC1HWC0;算子输入的数据类型为half
 uint32_t maxSize;
 uint32_t minSize;

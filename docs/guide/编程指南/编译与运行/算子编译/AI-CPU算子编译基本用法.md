@@ -8,10 +8,10 @@
 
 hello\_world.aicpu文件内容如下：
 
-```
+```cpp
 #include "aicpu_api.h"
 
-__global__ __aicpu__ uint32_t hello_world(void *args)
+__global__ __aicpu__ uint32_t hello_world(void* args)
 {
     AscendC::printf("Hello World!!!\n");
     return 0;
@@ -20,16 +20,16 @@ __global__ __aicpu__ uint32_t hello_world(void *args)
 
 Host侧使用内核调用符<<<...\>\>\>进行AI CPU算子的调用， main.asc示例代码如下：
 
-```
+```cpp
 #include "acl/acl.h"
 
 struct KernelArgs {
     int mode;
 };
 
-extern __global__ __aicpu__ uint32_t hello_world(void *args);
+extern __global__ __aicpu__ uint32_t hello_world(void* args);
 
-int32_t main(int argc, char const *argv[])
+int32_t main(int argc, char const* argv[])
 {
     aclInit(nullptr);
     int32_t deviceId = 0;
@@ -58,7 +58,7 @@ $\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。以root用�
 
 各产品型号对应的架构版本号请通过[对应关系表](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
 
-```
+```bash
 $bisheng -O2 hello_world.aicpu --cce-aicpu-L${INSTALL_DIR}/lib64/device/lib64 --cce-aicpu-laicpu_api -I${INSTALL_DIR}/include/ascendc/aicpu_api -c -o hello_world.aicpu.o
 $bisheng --npu-arch=dav-2201 main.asc -c -o main.asc.o
 $bisheng hello_world.aicpu.o main.asc.o -o demo
@@ -68,7 +68,7 @@ $bisheng hello_world.aicpu.o main.asc.o -o demo
 
 -   编译生成算子动态库
 
-    ```
+    ```text
     # 编译test_aicpu.cpp生成算子动态库
     # -lxxx表示默认链接库
     # bisheng -shared -x aicpu test_aicpu.cpp -o libtest_aicpu.so -lxxx ...
@@ -76,7 +76,7 @@ $bisheng hello_world.aicpu.o main.asc.o -o demo
 
 -   编译生成算子静态库
 
-    ```
+    ```text
     # 编译test_aicpu.cpp生成算子静态库
     # -lxxx表示默认链接库
     # bisheng -lib -x aicpu test_aicpu.cpp -o libtest_aicpu.a -lxxx ...
@@ -182,7 +182,7 @@ AI CPU算子常用的编译选项说明如下：
 
 仍以[通过bisheng命令行编译](#section153291123460)中介绍的Hello World打印样例为例，除了代码实现文件，还需要在工程目录下准备一个CMakeLists.txt。
 
-```
+```text
 ├── hello_world.aicpu // AI CPU算子核函数定义
 ├── main.asc // AI CPU算子核函数调用
 └── CMakeLists.txt
@@ -190,7 +190,7 @@ AI CPU算子常用的编译选项说明如下：
 
 CMakeLists.txt内容如下：
 
-```
+```text
 cmake_minimum_required(VERSION 3.16)
 # 1、find_package()是CMake中用于查找和配置Ascend C编译工具链的命令
 find_package(ASC REQUIRED) 
@@ -221,7 +221,7 @@ target_compile_options(demo PRIVATE
 
 -   编译.cpp文件生成动态库
 
-    ```
+    ```text
     # 将.cpp文件置为ASC属性，启用Ascend C语言进行编译
     set_source_files_properties(
         add_custom_base.cpp 
@@ -268,7 +268,7 @@ target_compile_options(demo PRIVATE
 
 -   编译.asc文件与.aicpu文件生成静态库
 
-    ```
+    ```text
     # .asc文件会默认启用Ascend C语言进行编译，.aicpu文件会默认启用AICPU语言进行编译，不需要通过set_source_files_properties进行设置
     add_library(kernel_lib STATIC
         add_custom_base.asc 

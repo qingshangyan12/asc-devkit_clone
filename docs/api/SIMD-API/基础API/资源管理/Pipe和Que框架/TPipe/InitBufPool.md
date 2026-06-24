@@ -69,10 +69,9 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <class T>
-__aicore__ inline bool InitBufPool(T& bufPool, uint32_t len)
-template <class T, class U>
+__aicore__ inline bool InitBufPool(T& bufPool, uint32_t len) template <class T, class U>
 __aicore__ inline bool InitBufPool(T& bufPool, uint32_t len, U& shareBuf)
 ```
 
@@ -149,7 +148,7 @@ __aicore__ inline bool InitBufPool(T& bufPool, uint32_t len, U& shareBuf)
 
 由于物理内存的大小有限，在计算过程没有数据依赖的场景或数据依赖串行的场景下，可以通过指定内存复用解决资源不足的问题。完整算子样例参考：[tbufpool\_management样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/04_memory_management/tbufpool_management)。
 
-```
+```cpp
 // 声明一个指向TPipe管道对象的指针
 AscendC::TPipe* pipe;
 // 定义两个子资源池对象tbufPool1和tbufPool2
@@ -164,7 +163,7 @@ tbufPool1.InitBuffer(srcQue0, 1, bufSize);
 tbufPool1.InitBuffer(srcQue1, 1, bufSize);
 tbufPool1.InitBuffer(dstQue0, 1, bufSize);
 CopyIn();
-Compute(); 
+Compute();
 CopyOut();
 tbufPool1.Reset();
 tbufPool2.InitBuffer(srcQue2, 1, bufSize);

@@ -106,44 +106,45 @@ Mask操作的使用方式如下：
 
 -   场景1：Normal模式 + 外部API配置 + 高维切分计算API
 
-    ```
+    ```cpp
     AscendC::LocalTensor<half> dstLocal;
     AscendC::LocalTensor<half> src0Local;
     AscendC::LocalTensor<half> src1Local;
-    
+
     // 1、设置Normal模式
     AscendC::SetMaskNorm();
     // 2、设置Mask
-    AscendC::SetVectorMask<half, AscendC::MaskMode::NORMAL>(0xffffffffffffffff, 0xffffffffffffffff);  // 逐bit模式
+    AscendC::SetVectorMask<half, AscendC::MaskMode::NORMAL>(0xffffffffffffffff, 0xffffffffffffffff); // 逐bit模式
     // SetVectorMask<half, MaskMode::NORMAL>(128);  // 连续模式
-    
-    // 3、多次调用矢量计算API, isSetMask模板参数设置为false，接口入参中的mask值设置为占位符MASK_PLACEHOLDER，用于占位，无实际含义
+
+    // 3、多次调用矢量计算API,
+    // isSetMask模板参数设置为false，接口入参中的mask值设置为占位符MASK_PLACEHOLDER，用于占位，无实际含义
     // 根据使用场景配置repeatTime、dataBlockStride、repeatStride参数
     // dstBlkStride, src0BlkStride, src1BlkStride = 1,单次迭代内数据连续读取和写入
     // dstRepStride, src0RepStride, src1RepStride = 8,相邻迭代间数据连续读取和写入
-    AscendC::Add<half, false>(dstLocal, src0Local, src1Local, AscendC::MASK_PLACEHOLDER, 1, { 2, 2, 2, 8, 8, 8 });
-    AscendC::Sub<half, false>(src0Local, dstLocal, src1Local, AscendC::MASK_PLACEHOLDER, 1, { 2, 2, 2, 8, 8, 8 });
-    AscendC::Mul<half, false>(src1Local, dstLocal, src0Local, AscendC::MASK_PLACEHOLDER, 1, { 2, 2, 2, 8, 8, 8 });
+    AscendC::Add<half, false>(dstLocal, src0Local, src1Local, AscendC::MASK_PLACEHOLDER, 1, {2, 2, 2, 8, 8, 8});
+    AscendC::Sub<half, false>(src0Local, dstLocal, src1Local, AscendC::MASK_PLACEHOLDER, 1, {2, 2, 2, 8, 8, 8});
+    AscendC::Mul<half, false>(src1Local, dstLocal, src0Local, AscendC::MASK_PLACEHOLDER, 1, {2, 2, 2, 8, 8, 8});
     // 4、恢复Mask值为默认值
     AscendC::ResetMask();
     ```
 
 -   场景2：Counter模式 + 外部API配置 + 高维切分计算API
 
-    ```
+    ```cpp
     AscendC::LocalTensor<half> dstLocal;
     AscendC::LocalTensor<half> src0Local;
     AscendC::LocalTensor<half> src1Local;
-    int32_t len = 128;  // 参与计算的元素个数
+    int32_t len = 128; // 参与计算的元素个数
     // 1、设置Counter模式
     AscendC::SetMaskCount();
     // 2、设置Mask
     AscendC::SetVectorMask<half, AscendC::MaskMode::COUNTER>(len);
     // 3、多次调用矢量计算API, isSetMask模板参数设置为false；接口入参中的mask值设置为MASK_PLACEHOLDER，用于占位，无实际含义
     // 根据使用场景正确配置dataBlockStride、repeatStride参数。repeatTime传入固定值即可，建议统一设置为1，该值不生效
-    AscendC::Add<half, false>(dstLocal, src0Local, src1Local, AscendC::MASK_PLACEHOLDER, 1, { 1, 1, 1, 8, 8, 8 });
-    AscendC::Sub<half, false>(src0Local, dstLocal, src1Local, AscendC::MASK_PLACEHOLDER, 1, { 1, 1, 1, 8, 8, 8 });
-    AscendC::Mul<half, false>(src1Local, dstLocal, src0Local, AscendC::MASK_PLACEHOLDER, 1, { 1, 1, 1, 8, 8, 8 });
+    AscendC::Add<half, false>(dstLocal, src0Local, src1Local, AscendC::MASK_PLACEHOLDER, 1, {1, 1, 1, 8, 8, 8});
+    AscendC::Sub<half, false>(src0Local, dstLocal, src1Local, AscendC::MASK_PLACEHOLDER, 1, {1, 1, 1, 8, 8, 8});
+    AscendC::Mul<half, false>(src1Local, dstLocal, src0Local, AscendC::MASK_PLACEHOLDER, 1, {1, 1, 1, 8, 8, 8});
     // 4、恢复工作模式
     AscendC::SetMaskNorm();
     // 5、恢复Mask值为默认值
@@ -152,10 +153,10 @@ Mask操作的使用方式如下：
 
 -   场景3：Counter模式 + 外部API配置 + 前n个数据计算接口配合使用
 
-    ```
+    ```cpp
     AscendC::LocalTensor<half> dstLocal;
     AscendC::LocalTensor<half> src0Local;
-    half num = 2; 
+    half num = 2;
     // 1、设置Mask
     AscendC::SetVectorMask<half, AscendC::MaskMode::COUNTER>(128); // 参与计算的元素个数为128
     // 2、调用前n个数据计算API，isSetMask模板参数设置为false；接口入参中的calCount建议设置成1。

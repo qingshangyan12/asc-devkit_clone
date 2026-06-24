@@ -54,10 +54,7 @@ auto coord1 = AscendC::Std::get<1>(coord); // coord1 = 10
 auto coord2 = AscendC::Std::get<2>(coord); // coord2 = 15
 
 // 使用Std::Int类型创建一个3维张量的坐标
-auto coordInt = AscendC::Te::MakeCoord(
-    AscendC::Std::Int<5>{},
-    AscendC::Std::Int<10>{},
-    AscendC::Std::Int<15>{});
+auto coordInt = AscendC::Te::MakeCoord(AscendC::Std::Int<5>{}, AscendC::Std::Int<10>{}, AscendC::Std::Int<15>{});
 
 // 获取各维度的坐标
 auto coordInt0 = AscendC::Std::get<0>(coordInt); // coordInt0 = 5

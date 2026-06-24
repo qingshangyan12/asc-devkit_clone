@@ -23,16 +23,16 @@
 
 ## 函数原型
 
-```
+```cpp
 template <class... Args>
-__aicore__ inline void printf( const __gm__ char* fmt, Args&&... args)
+__aicore__ inline void printf(const __gm__ char* fmt, Args&&... args)
 ```
 
 以下接口为simd\_vf中所使用的printf接口，仅支持Ascend 950PR/Ascend 950DT。
 
-```
+```cpp
 template <class... Args>
-__simd_callee__ inline void printf( const __ubuf__ char* fmt, Args&&... args)
+__simd_callee__ inline void printf(const __ubuf__ char* fmt, Args&&... args)
 ```
 
 ## 参数说明
@@ -63,13 +63,13 @@ __simd_callee__ inline void printf( const __ubuf__ char* fmt, Args&&... args)
 
         使用show\_kernel\_debug\_data工具将dump二进制文件解析为用户可读内容，命令格式如下。
 
-        ```
+        ```text
         show_kernel_debug_data  bin_file  output_dir
         ```
 
 -   由于在simd vf中不能直接访问gm地址，因此使用simd vf中的printf时，需要先定义一个ubuf的字符串，该字符串即为原来的fmt变量。
 
-    ```
+    ```text
     __ubuf__ const char* fmt = "simd vf: int=%d, uint=%u, float=%f, string=%s\n";
     ```
 
@@ -77,13 +77,13 @@ __simd_callee__ inline void printf( const __ubuf__ char* fmt, Args&&... args)
 
 使用该接口需要包含"utils/debug/asc\_printf.h"头文件。
 
-```
+```cpp
 #include "utils/debug/asc_printf.h"
 ```
 
 ## SIMD调用示例
 
-```
+```cpp
 #include "utils/debug/asc_printf.h"
 
 // SIMD printf
@@ -101,7 +101,7 @@ __global__ __mix__(1, 2) void hello_world()
 
 NPU模式下，程序运行时打印效果如下：
 
-```
+```text
 hello world device
 fmt string int: 291
 fmt string float: 3.140000
@@ -119,7 +119,7 @@ fmt string float: 3.140000
 
 ## SIMD VF调用示例
 
-```
+```cpp
 #include "kernel_operator.h"
 #include "utils/debug/asc_printf.h"
 
@@ -132,7 +132,7 @@ __simd_vf__ inline void SimdVfPrint()
 
 NPU模式下，程序运行时打印效果如下：
 
-```
+```text
 simd vf: int=1, uint=2, float=5.000000, string=AscendC
 simd vf: int=1, uint=2, float=5.000000, string=AscendC
 simd vf: int=1, uint=2, float=5.000000, string=AscendC
@@ -141,7 +141,7 @@ simd vf: int=1, uint=2, float=5.000000, string=AscendC
 
 ## SIMT示例
 
-```
+```cpp
 #include "kernel_operator.h"
 #include "simt_api/asc_simt.h"
 #include "utils/debug/asc_printf.h"
@@ -158,7 +158,7 @@ __simt_vf__ __launch_bounds__(128) inline void SimtCompute()
 
 NPU模式下，程序运行时打印效果如下：
 
-```
+```text
 simt vf: d: (0, 0, 0), f: 3.140000, s: pass
 simt vf: d: (0, 0, 1), f: 3.140000, s: pass
 simt vf: d: (0, 0, 2), f: 3.140000, s: pass

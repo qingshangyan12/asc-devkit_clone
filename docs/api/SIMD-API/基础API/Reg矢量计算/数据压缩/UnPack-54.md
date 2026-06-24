@@ -53,8 +53,9 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
-template <typename T = DefaultType, typename U = DefaultType, HighLowPart part = HighLowPart::LOWEST, typename S, typename V>
+```cpp
+template <
+    typename T = DefaultType, typename U = DefaultType, HighLowPart part = HighLowPart::LOWEST, typename S, typename V>
 __simd_callee__ inline void UnPack(S& dstReg, V& srcReg)
 ```
 
@@ -178,9 +179,10 @@ __simd_callee__ inline void UnPack(S& dstReg, V& srcReg)
 
 ## 调用示例<a name="section932512912207"></a>
 
-```
-template<typename T, typename U, int32_t mode>
-__simd_vf__ inline void UnPackVF(__ubuf__ T* dstAddr, __ubuf__ U* srcAddr, uint32_t oneDstRepSize, uint16_t repeatTimes, uint32_t oneSrcRepSize)
+```cpp
+template <typename T, typename U, int32_t mode>
+__simd_vf__ inline void UnPackVF(
+    __ubuf__ T* dstAddr, __ubuf__ U* srcAddr, uint32_t oneDstRepSize, uint16_t repeatTimes, uint32_t oneSrcRepSize)
 {
     AscendC::Reg::RegTensor<U> srcReg;
     AscendC::Reg::RegTensor<T> dstReg;

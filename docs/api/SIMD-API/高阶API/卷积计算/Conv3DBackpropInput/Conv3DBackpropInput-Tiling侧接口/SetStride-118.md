@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 void SetStride(int64_t strideD, int64_t strideH, int64_t strideW)
 ```
 
@@ -30,7 +30,7 @@ void SetStride(int64_t strideD, int64_t strideH, int64_t strideW)
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendCManager::GetInstance();
 ConvBackpropApi::Conv3DBpInputTiling conv3DBpDxTiling(*ascendcPlatform);
 conv3DBpDxTiling.SetStride(strideD, strideH, strideW);

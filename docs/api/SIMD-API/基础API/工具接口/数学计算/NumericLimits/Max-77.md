@@ -66,5 +66,6 @@
 - 矢量接口：
 
     ```cpp
-    AscendC::NumericLimits<int32_t>::Max(dstLocal, 256); // 返回256个int32_t类型的最大值
+    AscendC::NumericLimits<int32_t>::Max(dstLocal,
+                                         256); // 返回256个int32_t类型的最大值
     ```

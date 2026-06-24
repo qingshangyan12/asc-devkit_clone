@@ -24,7 +24,7 @@ This example demonstrates and verifies data transfer from a RegTensor (the basic
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── reg_move
 │   ├── scripts
 │   │   └── gen_data.py                // Input data and ground truth generation script

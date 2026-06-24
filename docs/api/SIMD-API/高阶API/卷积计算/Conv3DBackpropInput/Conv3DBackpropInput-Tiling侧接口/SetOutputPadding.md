@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 bool SetOutputPadding(int64_t outputPadD, int64_t outputPadH, int64_t outputPadW)
 ```
 
@@ -30,7 +30,7 @@ true表示设置成功，false表示设置失败。
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendCManager::GetInstance();
 ConvBackpropApi::Conv3DBpInputTiling conv3DBpDxTiling(*ascendcPlatform);
 conv3DBpDxTiling.SetOutputPadding(outputPadD, outputPadH, outputPadW);

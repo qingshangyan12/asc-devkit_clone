@@ -12,8 +12,9 @@ ShapeInfo用来存放LocalTensor或GlobalTensor的shape信息。
     struct ShapeInfo {
     public:
         __aicore__ inline ShapeInfo();
-        __aicore__ inline ShapeInfo(const uint8_t inputShapeDim, const uint32_t inputShape[],
-            const uint8_t inputOriginalShapeDim, const uint32_t inputOriginalShape[], const DataFormat inputFormat);
+        __aicore__ inline ShapeInfo(
+            const uint8_t inputShapeDim, const uint32_t inputShape[], const uint8_t inputOriginalShapeDim,
+            const uint32_t inputOriginalShape[], const DataFormat inputFormat);
         __aicore__ inline ShapeInfo(const uint8_t inputShapeDim, const uint32_t inputShape[], const DataFormat inputFormat);
         __aicore__ inline ShapeInfo(const uint8_t inputShapeDim, const uint32_t inputShape[]);
         uint8_t shapeDim;

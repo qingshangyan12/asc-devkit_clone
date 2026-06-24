@@ -55,12 +55,12 @@
 
 ## 函数原型<a name="section054795512320"></a>
 
-```
-template<pipe_t pipe, uint16_t index>
+```cpp
+template <pipe_t pipe, uint16_t index>
 __aicore__ inline void MarkStamp()
 
-template<pipe_t pipe>
-__aicore__ inline void MarkStamp(uint16_t index)
+    template <pipe_t pipe>
+    __aicore__ inline void MarkStamp(uint16_t index)
 ```
 
 ## 参数说明<a name="section2054811551732"></a>
@@ -97,7 +97,7 @@ __aicore__ inline void MarkStamp(uint16_t index)
 
 ## 调用示例<a name="section354885515310"></a>
 
-```
+```bash
 mte2_opt();
 //在算子执行开始处打点
 MarkStamp<PIPE_V, 0>();

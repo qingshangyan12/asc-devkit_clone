@@ -11,9 +11,13 @@
 以传入的value为起始值，生成递增/递减的索引，并将生成的索引保存在dst中。算法逻辑表示如下：
   ```cpp
   // 递增
-  {value, value + 1, value + 2, ... value + VL_T - 2, value + VL_T - 1}
+  {
+      value, value + 1, value + 2, ... value + VL_T - 2, value + VL_T - 1
+  }
   // 递减
-  {value + VL_T - 1, value + VL_T - 2, value + VL_T - 3, ... value + 1, value}
+  {
+      value + VL_T - 1, value + VL_T - 2, value + VL_T - 3, ... value + 1, value
+  }
   ```
 
 以int16_t数据类型，起始值value=10为例：
@@ -23,17 +27,17 @@
 
   ```cpp
   // 递增模式
-  __simd_callee__ inline void asc_arange(vector_int8_t& dst, int8_t value)
-  __simd_callee__ inline void asc_arange(vector_int16_t& dst, int16_t value)
-  __simd_callee__ inline void asc_arange(vector_half& dst, half value)
-  __simd_callee__ inline void asc_arange(vector_int32_t& dst, int32_t value)
-  __simd_callee__ inline void asc_arange(vector_float& dst, float value)
-  // 递减模式
-  __simd_callee__ inline void asc_arange_descend(vector_int8_t& dst, int8_t value)
-  __simd_callee__ inline void asc_arange_descend(vector_int16_t& dst, int16_t value)
-  __simd_callee__ inline void asc_arange_descend(vector_half& dst, half value)
-  __simd_callee__ inline void asc_arange_descend(vector_int32_t& dst, int32_t value)
-  __simd_callee__ inline void asc_arange_descend(vector_float& dst, float value)
+  __simd_callee__ inline void asc_arange(vector_int8_t& dst, int8_t value) __simd_callee__
+      inline void asc_arange(vector_int16_t& dst, int16_t value) __simd_callee__
+      inline void asc_arange(vector_half& dst, half value) __simd_callee__
+      inline void asc_arange(vector_int32_t& dst, int32_t value) __simd_callee__
+      inline void asc_arange(vector_float& dst, float value)
+      // 递减模式
+      __simd_callee__ inline void asc_arange_descend(vector_int8_t& dst, int8_t value) __simd_callee__
+      inline void asc_arange_descend(vector_int16_t& dst, int16_t value) __simd_callee__
+      inline void asc_arange_descend(vector_half& dst, half value) __simd_callee__
+      inline void asc_arange_descend(vector_int32_t& dst, int32_t value) __simd_callee__
+      inline void asc_arange_descend(vector_float& dst, float value)
   ```
 
 ## 参数说明

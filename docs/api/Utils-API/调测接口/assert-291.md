@@ -18,7 +18,7 @@
 
 在算子Kernel侧代码的适当位置使用assert进行断言检查，并格式化输出一些调试信息。示例如下：
 
-```
+```text
 int assertFlag = 10;
 
 assert(assertFlag != 10);
@@ -26,7 +26,7 @@ assert(assertFlag != 10);
 
 打印信息示例如下：
 
-```
+```text
 [ASSERT] /home/.../add_custom.cpp:44: : Assertion `assertFlag != 10' failed.
 ```
 
@@ -34,7 +34,7 @@ assert(assertFlag != 10);
 
 ## 函数原型
 
-```
+```text
 assert(expr)
 ```
 
@@ -57,13 +57,13 @@ assert(expr)
 
 使用该接口需要包含"utils/debug/asc\_assert.h"头文件。
 
-```
+```cpp
 #include "utils/debug/asc_assert.h"
 ```
 
 ## SIMD调用示例
 
-```
+```cpp
 // SIMD
 __global__ __cube__ void simp_test_equal(int a)
 {
@@ -74,14 +74,14 @@ __global__ __cube__ void simp_test_equal(int a)
 
 程序运行时会触发assert，打印效果如下：
 
-```
+```text
 [ASSERT] test_assert.asc:41: : Assertion `a == 6' failed.
 ```
 
 ## SIMT调用示例
 
-```
-//SIMT VF
+```cpp
+// SIMT VF
 __simt_vf__ __launch_bounds__(1024) inline void AddCustom(__gm__ bool* dst, __gm__ float* x)
 {
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -92,7 +92,7 @@ __simt_vf__ __launch_bounds__(1024) inline void AddCustom(__gm__ bool* dst, __gm
 
 程序运行时会触发assert，打印效果如下：
 
-```
+```text
 [ASSERT] /home/.../add_custom.cpp:44: : Assertion `!isnan(x[idx])' failed.
 ```
 

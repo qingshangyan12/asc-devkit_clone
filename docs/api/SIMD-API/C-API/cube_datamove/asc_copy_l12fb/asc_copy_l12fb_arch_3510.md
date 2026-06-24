@@ -19,7 +19,9 @@
 
 - 高维切分搬运
     ```cpp
-    __aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap_size, uint16_t dst_gap_size)
+    __aicore__ inline void asc_copy_l12fb(
+        __fbuf__ void* dst, __cbuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap_size,
+        uint16_t dst_gap_size)
     ```
 
 - 同步搬运

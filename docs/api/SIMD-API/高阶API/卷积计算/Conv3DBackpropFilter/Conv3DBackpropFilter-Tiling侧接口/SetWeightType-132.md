@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 void SetWeightType(ConvCommonApi::TPosition pos, ConvCommonApi::ConvFormat format, ConvCommonApi::ConvDtype dtype)
 ```
 
@@ -30,7 +30,7 @@ void SetWeightType(ConvCommonApi::TPosition pos, ConvCommonApi::ConvFormat forma
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendCManager::GetInstance();
 ConvBackpropApi::Conv3dBpFilterTiling conv3dBpDwTiling(*ascendcPlatform);
 conv3dBpDwTiling.SetWeightType(

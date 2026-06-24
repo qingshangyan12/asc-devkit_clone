@@ -22,12 +22,13 @@
 
 ## 函数原型
 
-```
+```cpp
 void GetSinTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
 ```
 
-```
-void GetSinTmpBufferFactorSize(const SinConfig& config, const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
+```cpp
+void GetSinTmpBufferFactorSize(
+    const SinConfig& config, const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
 ```
 
 ## 参数说明
@@ -53,7 +54,7 @@ void GetSinTmpBufferFactorSize(const SinConfig& config, const uint32_t typeSize,
 
 完整的调用样例请参考[更多样例](../更多样例-83.md)。
 
-```
+```cpp
 uint32_t maxLiveNodeCount = 0;
 uint32_t extraBuf = 0;
 AscendC::GetSinTmpBufferFactorSize(typeSize, maxLiveNodeCount, extraBuf);

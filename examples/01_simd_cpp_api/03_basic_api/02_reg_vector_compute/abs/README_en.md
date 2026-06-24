@@ -11,7 +11,7 @@ This example implements the Abs operation based on the Reg programming interface
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── abs
 │   ├── scripts
 │   │   ├── gen_data.py                // Input data and ground truth generation script

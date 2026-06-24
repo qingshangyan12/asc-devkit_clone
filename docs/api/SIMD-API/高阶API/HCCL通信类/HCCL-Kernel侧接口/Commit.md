@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void Commit(HcclHandle handleId)
 ```
 
@@ -41,7 +41,7 @@ __aicore__ inline void Commit(HcclHandle handleId)
 
 ## 调用示例
 
-```
+```cpp
 REGISTER_TILING_DEFAULT(ReduceScatterCustomTilingData); // ReduceScatterCustomTilingData为对应算子头文件定义的结构体
 GET_TILING_DATA_WITH_STRUCT(ReduceScatterCustomTilingData, tilingData, tilingGM);
 Hccl hccl;

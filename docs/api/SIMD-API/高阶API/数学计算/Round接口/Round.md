@@ -38,14 +38,16 @@ Round\(-3.4\) = -3.0
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isReuseSource = false>
-    __aicore__ inline void Round(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+    __aicore__ inline void Round(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+        const uint32_t calCount)
     ```
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isReuseSource = false>
     __aicore__ inline void Round(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
     ```
@@ -87,7 +89,7 @@ Round\(-3.4\) = -3.0
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放计算结果的Tensor
 // srcLocal: 参与计算的输入Tensor
 // sharedTmpBuffer: 临时缓存,内部复杂计算时存储中间变量
@@ -97,7 +99,7 @@ AscendC::Round(dstLocal, srcLocal, sharedTmpBuffer, 512);
 
 结果示例如下：
 
-```
+```text
 输入数据(srcLocal): [0.80541134 0.8385705 0.49426016 ...  1.30962205 0.28947052]
 输出数据(dstLocal): [1.0 1.0 0.0  ...  1.0 0.0]
 输入数据(srcLocal):

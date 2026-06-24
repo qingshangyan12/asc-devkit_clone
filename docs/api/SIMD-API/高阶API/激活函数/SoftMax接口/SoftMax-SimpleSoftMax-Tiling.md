@@ -8,25 +8,29 @@
 
 -   获取Kernel接口计算所需最大/最小临时空间的接口
 
-    ```
+    ```cpp
     uint32_t GetSoftMaxMaxTmpSize(const ge::Shape& srcShape, const uint32_t dataTypeSize, const bool isReuseSource)
     ```
 
-    ```
+    ```cpp
     uint32_t GetSoftMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t dataTypeSize, const bool isReuseSource)
     ```
 
 -   Tiling计算接口
     -   AscendC::optiling命名空间下的计算接口
 
-        ```
-        void SoftMaxTilingFunc(const ge::Shape& srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize, optiling::SoftMaxTiling& softmaxTiling)
+        ```cpp
+        void SoftMaxTilingFunc(
+            const ge::Shape& srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize,
+            optiling::SoftMaxTiling& softmaxTiling)
         ```
 
     -   AscendC命名空间下的计算接口
 
-        ```
-        void SoftMaxTilingFunc(const ge::Shape& srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize, AscendC::tiling::SoftMaxTiling& softmaxTiling)
+        ```cpp
+        void SoftMaxTilingFunc(
+            const ge::Shape& srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize,
+            AscendC::tiling::SoftMaxTiling& softmaxTiling)
         ```
 
 ## 参数说明

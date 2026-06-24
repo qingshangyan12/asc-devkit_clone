@@ -214,18 +214,21 @@
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <typename T>
-    __aicore__ inline void Transpose(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer, TransposeType transposeType, ConfusionTransposeTiling& tiling)
+    __aicore__ inline void Transpose(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer,
+        TransposeType transposeType, ConfusionTransposeTiling& tiling)
     ```
 
     该方式下开发者需自行申请并管理临时内存空间，并在接口调用完成后，复用该部分内存，内存不会反复申请释放，灵活性较高，内存利用率也较高。
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <typename T>
-    __aicore__ inline void Transpose(const LocalTensor<T>& dst, const LocalTensor<T>& src, TransposeType transposeType, ConfusionTransposeTiling& tiling)
+    __aicore__ inline void Transpose(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src, TransposeType transposeType, ConfusionTransposeTiling& tiling)
     ```
 
     该方式下开发者无需申请，但是需要预留临时空间的大小。
@@ -248,7 +251,7 @@
 | transposeType | 输入 | 数据排布及reshape的类型，类型为TransposeType枚举类，TransposeType的定义如下方代码所示。 |
 | tiling | 输入 | 计算所需tiling信息，Tiling信息的获取请参考[Transpose Tiling](Transpose-Tiling.md)。 |
 
-```
+```cpp
 enum class TransposeType : uint8_t {
     TRANSPOSE_TYPE_NONE,           // default value
     TRANSPOSE_NZ2ND_0213,          // 场景1：NZ2ND，1、2轴互换
@@ -292,7 +295,7 @@ enum class TransposeType : uint8_t {
 
 B=1，N=2, S=64, H/N=32，输入数据类型均为half。更多完整样例请参考[Transpose样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/04_advanced_api/08_transpose/transpose)。
 
-```
+```cpp
 // dst：输入Tensor
 // src：输出Tensor
 // NZ2ND，1、2轴互换

@@ -94,25 +94,20 @@ Matmul API开启Tiling全量常量化的完整样例请参考[Matmul Tiling常�
 
 1.  调用获取MatmulConfig模板的接口GetMMConfig时，使用常数值设置MatmulShapeParams，得到带有常量化参数的自定义MatmulConfig模板CUSTOM\_CFG。
 
-    ```
+    ```cpp
     constexpr int32_t MAX_M = 10000; // custom matmul kernel support max value of M Dim shape
     constexpr int32_t MAX_N = 10000; // custom matmul kernel support max value of N Dim shape
     constexpr int32_t MAX_K = 10000; // custom matmul kernel support max value of K Dim shape
     constexpr int32_t BASE_M = 128;  // BASE_M * BASE_K * sizeof(typeA) <=L0A size
     constexpr int32_t BASE_N = 256;  // BASE_N * BASE_K * sizeof(typeB) <=L0B size
     constexpr int32_t BASE_K = 64;   // BASE_M * BASE_N * sizeof(typeC) <=L0C size
-    constexpr MatmulShapeParams shapeParams = { MAX_M,
-                                                MAX_N,
-                                                MAX_K,
-                                                BASE_M,
-                                                BASE_N,
-                                                BASE_K };
+    constexpr MatmulShapeParams shapeParams = {MAX_M, MAX_N, MAX_K, BASE_M, BASE_N, BASE_K};
     constexpr MatmulConfig CUSTOM_CFG = GetMMConfig<MatmulConfigMode::CONFIG_MDL>(shapeParams);
     ```
 
 2.  创建Matmul对象。首先调用GetMatmulApiTiling接口，将Tiling信息常量化，得到常量化模板参数CONSTANT\_CFG，包括常量化的Matmul Tiling信息和MatmulConfig模板。创建Matmul对象时，使用常量化模板参数CONSTANT\_CFG。
 
-    ```
+    ```cpp
     using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, aType>;
     using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, bType>;
     using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, cType>;
@@ -123,7 +118,7 @@ Matmul API开启Tiling全量常量化的完整样例请参考[Matmul Tiling常�
 
 3.  初始化操作。全量常量化时，可以在REGIST\_MATMUL\_OBJ接口的入参传递Tiling参数的位置，使用空指针替代。部分常量化时，在Kernel侧使用REGIST\_MATMUL\_OBJ接口初始化Matmul对象时，仍需要使用Tiling。
 
-    ```
+    ```text
     // 全量常量化场景，初始化操作示例
     REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), matmulObj, (TCubeTiling*)nullptr);
     

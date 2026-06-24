@@ -48,3 +48,4 @@ __aicore__ inline void DataCachePreload(const GlobalTensor<uint64_t>& src, const
 AscendC::GlobalTensor<uint64_t> srcGlobal;
 int64_t cacheOffset = 0;
 AscendC::DataCachePreload(srcGlobal, cacheOffset);
+```

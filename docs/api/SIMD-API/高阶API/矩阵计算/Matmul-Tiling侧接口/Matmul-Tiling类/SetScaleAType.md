@@ -6,7 +6,7 @@ MxMatmul场景，设置scaleA矩阵的位置、数据格式、是否转置等信
 
 ## 函数原型
 
-```
+```cpp
 int32_t SetScaleAType(TPosition scalePos, CubeFormat scaleType, bool isScaleTrans = false)
 ```
 
@@ -30,7 +30,7 @@ int32_t SetScaleAType(TPosition scalePos, CubeFormat scaleType, bool isScaleTran
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MatmulApiTiling tiling(ascendcPlatform);
 tiling.SetAType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT16);

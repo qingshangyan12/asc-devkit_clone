@@ -14,14 +14,13 @@ SIMT编程模式下提供以下访存函数：
 
 【反例】所有数据使用默认方式加载，输入、输出和sin表数据共同竞争DCache空间。
 
-```
-__global__ void sin_table_lookup_baseline(float* input, float* sin_table, float* output,
-                                            uint32_t input_length, uint32_t table_length)
+```cpp
+__global__ void sin_table_lookup_baseline(
+    float* input, float* sin_table, float* output, uint32_t input_length, uint32_t table_length)
 {
     for (int idx = threadIdx.x; idx < input_length; idx += blockDim.x) {
         float x = input[idx];
-        ...
-        float low_val = sin_table[n];
+        ... float low_val = sin_table[n];
         float high_val = 0.0f;
         if (n + 1 >= table_length) {
             high_val = sin_table[0];
@@ -43,14 +42,13 @@ __global__ void sin_table_lookup_baseline(float* input, float* sin_table, float*
 
 【正例】使用访存函数区分不同数据的缓存策略。
 
-```
-__global__ void sin_table_lookup_optimized(float* input, float* sin_table, float* output,
-                                             uint32_t input_length, uint32_t table_length)
+```cpp
+__global__ void sin_table_lookup_optimized(
+    float* input, float* sin_table, float* output, uint32_t input_length, uint32_t table_length)
 {
     for (int idx = threadIdx.x; idx < input_length; idx += blockDim.x) {
         float x = asc_ldcg(&input[idx]);
-        ...
-        float low_val = asc_ldca(&sin_table[n]);
+        ... float low_val = asc_ldca(&sin_table[n]);
         float high_val = 0.0f;
         if (n + 1 >= table_length) {
             high_val = asc_ldca(&sin_table[0]);

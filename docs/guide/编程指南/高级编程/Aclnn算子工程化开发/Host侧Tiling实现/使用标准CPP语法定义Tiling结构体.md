@@ -11,7 +11,7 @@
 
     用户在使用高阶API的Tiling结构体时，可通过AscendC::tiling命名空间引用"kernel\_tiling/kernel\_tiling.h"中预定义的Tiling结构体。如下代码为一个简单的Tiling结构体定义示例。
 
-    ```
+    ```cpp
     #ifndef ADD_CUSTOM_TILING_H
     #define ADD_CUSTOM_TILING_H
     #include <cstdint>
@@ -28,23 +28,23 @@
     -   需要包含Tiling结构体定义头文件。
     -   通过GetTilingData获取Tiling结构体指针，并对其成员变量进行赋值。
 
-    ```
-    #include "../../op_kernel/add_custom/add_custom_tiling.h"  // 包含Tiling结构体定义头文件
+    ```cpp
+    #include "../../op_kernel/add_custom/add_custom_tiling.h" // 包含Tiling结构体定义头文件
     #include "register/op_def_registry.h"
 
     namespace optiling {
     const uint32_t NUM_BLOCKS = 8;
     const uint32_t TILE_NUM = 8;
-    static ge::graphStatus TilingFunc(gert::TilingContext *context)
+    static ge::graphStatus TilingFunc(gert::TilingContext* context)
     {
         // 获取Tiling结构体指针
-        AddCustomTilingData *tiling = context->GetTilingData<AddCustomTilingData>();
+        AddCustomTilingData* tiling = context->GetTilingData<AddCustomTilingData>();
         uint32_t totalLength = context->GetInputShape(0)->GetOriginShape().GetShapeSize();
         context->SetBlockDim(NUM_BLOCKS);
         // 对tiling的成员变量赋值
         tiling->totalLength = totalLength;
         tiling->tileNum = TILE_NUM;
-        size_t *currentWorkspace = context->GetWorkspaceSizes(1);
+        size_t* currentWorkspace = context->GetWorkspaceSizes(1);
         currentWorkspace[0] = 0;
         return ge::GRAPH_SUCCESS;
     }
@@ -56,14 +56,16 @@
     -   需要包含Tiling结构体定义头文件。
     -   通过[REGISTER\_TILING\_DEFAULT](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Kernel-Tiling/REGISTER_TILING_DEFAULT.md)或者[REGISTER\_TILING\_FOR\_TILINGKEY](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Kernel-Tiling/REGISTER_TILING_FOR_TILINGKEY.md)注册Tiling结构体；通过[GET\_TILING\_DATA](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Kernel-Tiling/GET_TILING_DATA.md)解析Tiling数据至TilingData结构并使用。其中REGISTER\_TILING\_DEFAULT同时也用于标识使用标准C++语法定义TilingData结构体。
 
-    ```
+    ```cpp
     #include "kernel_operator.h"
-    #include "add_custom_tiling.h"  // 包含Tiling结构体定义头文件
+    #include "add_custom_tiling.h" // 包含Tiling结构体定义头文件
     ...
-    // KernelAdd类实现
-    ...
+        // KernelAdd类实现
+        ...
 
-    extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
+        extern "C" __global__ __aicore__ void
+        add_custom(
+            __gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
     {
         REGISTER_TILING_DEFAULT(AddCustomTilingData);
         GET_TILING_DATA(tilingData, tiling);
@@ -79,13 +81,13 @@
 
 -   支持bool类型，支持数组、结构体数组及列表初始化。
 
-    ```
+    ```cpp
     class A {
     public:
         bool xxx;
         uint32_t xxx[2][128] = {0};
     };
-    
+
     class B {
     public:
         bool xxx = false;
@@ -100,7 +102,7 @@
 
     算子A：
 
-    ```
+    ```cpp
     class TilingData {
     public:
         uint32_t length;
@@ -109,7 +111,7 @@
 
     算子B：
 
-    ```
+    ```cpp
     class TilingData {
     public:
         uint32_t length;
@@ -121,7 +123,7 @@
 
     Tiling结构体定义：
 
-    ```
+    ```cpp
     class TilingData {
     public:
         uint32_t xxx1;
@@ -133,30 +135,27 @@
 
     Host侧Tiling函数：
 
-    ```
-    #include "../op_kernel/xxx_custom_tiling.h"  // 包含Tiling结构体定义头文件
+    ```cpp
+    #include "../op_kernel/xxx_custom_tiling.h" // 包含Tiling结构体定义头文件
     ...
-    
-    namespace optiling {
-    static void ComputeTiling(TilingData* tiling, ...)
+
+        namespace optiling
     {
-        // 计算Tiling逻辑
-        ...
-        tiling->xxx1 = xxx;
-        tiling->xxx2 = xxx;
-        tiling->xxx3 = xxx;
-        tiling->bool = xxx;
-    }
-    static ge::graphStatus TilingFunc(gert::TilingContext *context)
-    {    
-        ...
-        TilingData *tiling = context->GetTilingData<TilingData>();
-        ...
-        ComputeTiling(tiling, ...)
-        ...
-    
-        return ge::GRAPH_SUCCESS;
-    }
+        static void ComputeTiling(TilingData * tiling, ...)
+        {
+            // 计算Tiling逻辑
+            ... tiling->xxx1 = xxx;
+            tiling->xxx2 = xxx;
+            tiling->xxx3 = xxx;
+            tiling->bool = xxx;
+        }
+        static ge::graphStatus TilingFunc(gert::TilingContext * context)
+        {
+            ... TilingData* tiling = context->GetTilingData<TilingData>();
+            ... ComputeTiling(tiling, ...)...
+
+                return ge::GRAPH_SUCCESS;
+        }
     } // namespace optiling
     ```
 
@@ -166,35 +165,35 @@
 
 -   Tiling结构体内不支持定义成员函数，因为成员函数存在Device侧和Host侧的差异（Device侧的函数需要\_\_aicore\_\_修饰符），而Tiling结构体Device侧和Host侧共用，所以会在编译或执行时出现问题：
 
-    ```
+    ```cpp
     class TilingData {
     public:
         uint32_t xxx;
-    
-        __aicore__ funcA() { ... }  // 错误，host侧编译时不支持__aicore__修饰符，会出现编译错误
-        void func() { ... }         // 错误，device侧缺少__aicore__修饰符，无法执行
+
+        __aicore__ funcA() { ... } // 错误，host侧编译时不支持__aicore__修饰符，会出现编译错误
+        void func() { ... }        // 错误，device侧缺少__aicore__修饰符，无法执行
     };
     ```
 
 -   Tiling结构体成员变量不支持指针、引用类型，此类数据类型会导致Host侧到Device侧数据解析异常：
 
-    ```
+    ```cpp
     class TilingData {
     public:
         uint32_t* totalLength; // 指针场景不支持，Host无法传递指针到Device
-        uint32_t& tileNum;       // 引用场景不支持，Host无法传递指针到Device
+        uint32_t& tileNum;     // 引用场景不支持，Host无法传递指针到Device
     };
     ```
 
 -   Tiling结构体仅支持POD类型，没有虚函数、虚继承等面向对象特性，也不支持模板类：
 
-    ```
+    ```cpp
     class A {
     public:
         uint32_t totalLength;
         uint32_t tileNum;
     };
-    class B: public A {
+    class B : public A {
     public:
         uint32_t xxx;
         uint32_t xxx;
@@ -202,34 +201,33 @@
     static ge::graphStatus TilingFunc(gert::TilingContext* context)
     {
         // 错误用法
-        B *tiling = context->GetTilingData<A>(); // 不支持，会触发未知问题
+        B* tiling = context->GetTilingData<A>(); // 不支持，会触发未知问题
         // 正确用法
-        B *tiling = context->GetTilingData<B>();
-        ......
-        return ge::GRAPH_SUCCESS;
+        B* tiling = context->GetTilingData<B>();
+        ...... return ge::GRAPH_SUCCESS;
     }
     ```
 
 -   GetTilingData获取的Tiling不包含初值，需显式赋值或在Tiling结构体定义并调用Tiling赋值函数；
 
-    ```
+    ```cpp
     static ge::graphStatus TilingFunc(gert::TilingContext* context)
     {
-        TilingData *tiling = context->GetTilingData<TilingData>(); //获取Tiling结构体，此时totalLength、tileNum为0，并不会带入初始值
+        TilingData* tiling =
+            context->GetTilingData<TilingData>(); // 获取Tiling结构体，此时totalLength、tileNum为0，并不会带入初始值
         ......
-        // 需显式赋值
-        tiling->totalLength = totalLength;  // 赋值Tiling结构体成员变量
-        tiling->tileNum = TILE_NUM;         // 赋值Tiling结构体成员变量
-        ......
-        return ge::GRAPH_SUCCESS;
+            // 需显式赋值
+            tiling->totalLength = totalLength; // 赋值Tiling结构体成员变量
+        tiling->tileNum = TILE_NUM;            // 赋值Tiling结构体成员变量
+        ...... return ge::GRAPH_SUCCESS;
     }
     ```
 
 -   host侧和kernel侧的Tiling结构体支持传入模板参数。由于宏函数中逗号运算符的特殊性，在kernel侧宏函数（REGISTER\_TILING\_DEFAULT或者REGISTER\_TILING\_FOR\_TILINGKEY）使用带逗号的模板类型（如：template<int32\_t sizeA, int32\_t sizeB\>），存在编译异常，因此需要使用别名方式来定义带逗号的模板类型（如：using size = template<int32\_t sizeA, int32\_t sizeB\>）。具体示例如下：
 
-    ```
+    ```cpp
     // 模板参数个数大于1的场景
-    template<int32_t sizeA, int32_t sizeB>
+    template <int32_t sizeA, int32_t sizeB>
     class A {
     public:
         uint32_t totalLength;
@@ -237,32 +235,31 @@
         uint32_t dataArray[sizeA];
     };
     // 模板参数个数等于1的场景
-    template<int32_t sizeA>
+    template <int32_t sizeA>
     class B {
     public:
         uint32_t totalLength;
         uint32_t tileNum;
         uint32_t dataArray[sizeA];
     };
-    
+
     // host侧可以直接传入Tiling结构体以及对应模板参数
     static ge::graphStatus TilingFunc(gert::TilingContext* context)
     {
         // 模板参数个数等于1或者大于等于1的时候都可以直接传入
-        A<3, 5> *tiling = context->GetTilingData<A<3,5>>();
-        B<3> *tiling = context->GetTilingData<B<3>>();
-        ......
-        return ge::GRAPH_SUCCESS;
+        A<3, 5>* tiling = context->GetTilingData<A<3, 5>>();
+        B<3>* tiling = context->GetTilingData<B<3>>();
+        ...... return ge::GRAPH_SUCCESS;
     }
-    
+
     // kernel侧代码
     #include "kernel_operator.h"
-    #include "add_custom_tiling.h"  // 包含Tiling结构体定义头文件
+    #include "add_custom_tiling.h" // 包含Tiling结构体定义头文件
     extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling)
     {
-        using aa = A<3,5>;
-        REGISTER_TILING_DEFAULT(aa);                                // 模板参数个数大于1时，一定要用using来指定
-        REGISTER_TILING_FOR_TILINGKEY("TILING_KEY_VAR == 2", B<3>);  // 模板参数个数等于1时，可以直接写明模板参数
+        using aa = A<3, 5>;
+        REGISTER_TILING_DEFAULT(aa); // 模板参数个数大于1时，一定要用using来指定
+        REGISTER_TILING_FOR_TILINGKEY("TILING_KEY_VAR == 2", B<3>); // 模板参数个数等于1时，可以直接写明模板参数
         ......
     }
     ```
@@ -352,13 +349,15 @@
 
 3.  **最后**，在Kernel函数入口处新增[REGISTER\_TILING\_DEFAULT](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Kernel-Tiling/REGISTER_TILING_DEFAULT.md)调用，用于注册Tiling结构体。该注册操作的作用是：告知框架用户已使用标准C++语法定义Tiling结构体，并明确其类型，以便框架在进行Tiling数据解析时能够正确识别和使用该结构体。
 
-    ```
+    ```cpp
     #include "add_custom_tiling.h"
     ...
 
-    extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
+        extern "C" __global__ __aicore__ void
+        add_custom(
+            __gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
     {
-        REGISTER_TILING_DEFAULT(AddCustomTilingData);  // 新增REGISTER_TILING_DEFAULT调用注册Tiling结构体
+        REGISTER_TILING_DEFAULT(AddCustomTilingData); // 新增REGISTER_TILING_DEFAULT调用注册Tiling结构体
         ...
     }
     ```

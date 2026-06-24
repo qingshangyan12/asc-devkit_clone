@@ -14,7 +14,7 @@ This example demonstrates data transfer practices from Global Memory to UB and f
 
 ## Directory Structure
 
-```
+```text
 ├── data_copy
 │   ├── scripts
 │   │   └── gen_data.py        // Input data generation script
@@ -450,7 +450,7 @@ Run the following steps in the root directory of this example to build and run t
 
   After collection, a `PROF_` prefixed directory is generated in the current directory. Performance summary files are located in the `mindstudio_profiler_output` directory.
 
-  ```txt
+  ```text
   PROF_xxxx_XXXXXX
   ├── device_{id}
   ├── host

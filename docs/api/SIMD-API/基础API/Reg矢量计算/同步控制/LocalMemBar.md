@@ -56,8 +56,8 @@ Reg矢量计算宏函数内不同流水线之间的同步指令。该同步指�
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
-template <MemType src, MemType dst> 
+```cpp
+template <MemType src, MemType dst>
 __simd_callee__ inline void LocalMemBar()
 ```
 
@@ -215,14 +215,16 @@ __simd_callee__ inline void LocalMemBar()
 
 如下示例中dstPtr和src0Ptr为同一个UB地址，for循环的第二次迭代中读UB矢量搬运和第一次迭代中写UB矢量搬运操作了同一块UB地址空间，因此第二次循环中读UB矢量搬运需要等待第一次循环中写UB矢量搬运执行完成后才能执行，需要插入VEC\_LOAD等待VEC\_STORE的同步。
 
-```
-template<typename T>
-__simd_vf__ inline void AddVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
+```cpp
+template <typename T>
+__simd_vf__ inline void AddVF(
+    __ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint32_t oneRepeatSize,
+    uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> srcReg0;
     AscendC::Reg::RegTensor<T> srcReg1;
     AscendC::Reg::RegTensor<T> dstReg;
-    AscendC::Reg::MaskReg mask;   
+    AscendC::Reg::MaskReg mask;
     for (uint16_t i = 0; i < repeatTimes; i++) {
         mask = AscendC::Reg::UpdateMask<T>(count);
         AscendC::Reg::LocalMemBar<AscendC::Reg::MemType::VEC_STORE, AscendC::Reg::MemType::VEC_LOAD>();

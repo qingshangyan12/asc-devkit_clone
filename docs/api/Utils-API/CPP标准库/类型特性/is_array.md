@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename Tp>
 struct is_array;
 ```
@@ -42,9 +42,9 @@ is\_array的静态常量成员value用于获取返回的布尔值，is\_array<Tp
 
 ## 调用示例
 
-```
+```cpp
 // 自定义测试类型
-struct MyStruct{};
+struct MyStruct {};
 using FuncType = int(int);
 
 // Legitimate array types
@@ -65,17 +65,10 @@ AscendC::printf("AscendC::Std::is_array::value:%d\n", AscendC::Std::is_array<Fun
 AscendC::printf("AscendC::Std::is_array::value:%d\n", AscendC::Std::is_array<void>::value);
 ```
 
-```
+```cpp
 // 执行结果：
-AscendC::Std::is_array::value:1
-AscendC::Std::is_array::value:1
-AscendC::Std::is_array::value:1
-AscendC::Std::is_array::value:1
-AscendC::Std::is_array::value:1
-AscendC::Std::is_array::value:0
-AscendC::Std::is_array::value:0
-AscendC::Std::is_array::value:0
-AscendC::Std::is_array::value:0
-AscendC::Std::is_array::value:0
-AscendC::Std::is_array::value:0
+AscendC::Std::is_array::value : 1 AscendC::Std::is_array::value : 1 AscendC::Std::is_array::value : 1 AscendC::Std::
+    is_array::value : 1 AscendC::Std::is_array::value : 1 AscendC::Std::is_array::value : 0 AscendC::Std::is_array::
+        value : 0 AscendC::Std::is_array::value : 0 AscendC::Std::is_array::value : 0 AscendC::Std::is_array::
+            value : 0 AscendC::Std::is_array::value : 0
 ```

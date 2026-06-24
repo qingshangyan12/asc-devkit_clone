@@ -41,31 +41,38 @@ Fmod\(-3.0, 1.1\) = -0.8
 -   通过sharedTmpBuffer入参传入临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false, const FmodConfig& config = DEFAULT_FMOD_CONFIG>
-        __aicore__ inline void Fmod(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+        __aicore__ inline void Fmod(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
+            const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false, const FmodConfig& config = DEFAULT_FMOD_CONFIG>
-        __aicore__ inline void Fmod(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
+        __aicore__ inline void Fmod(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
+            const LocalTensor<uint8_t>& sharedTmpBuffer)
         ```
 
 -   接口框架申请临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false, const FmodConfig& config = DEFAULT_FMOD_CONFIG>
-        __aicore__ inline void Fmod(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, const uint32_t calCount)
+        __aicore__ inline void Fmod(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
+            const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false, const FmodConfig& config = DEFAULT_FMOD_CONFIG>
-        __aicore__ inline void Fmod(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor)
+        __aicore__ inline void Fmod(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor)
         ```
 
 由于该接口的内部实现中涉及精度转换。需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -86,7 +93,7 @@ Fmod\(-3.0, 1.1\) = -0.8
 | isReuseSource | 是否允许修改源操作数。该参数预留，传入默认值false即可。 |
 | config | <!-- npu="950" id9 -->该参数仅支持Ascend 950PR/Ascend 950DT。<br><br><!-- end id9 -->Fmod计算的相关配置。此参数可选配，FmodConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：指定Fmod的算法。该参数支持的取值如下：NORMAL：algo的默认值，使用模拟的普通模式，支持的数据类型为：half、float。ITERATION_COMPENSATION：迭代补偿的高精度模式，支持的数据类型为：float。<br><br>iterationNum：迭代补偿的高精度模式下的迭代补偿轮次，该参数仅在algo为ITERATION_COMPENSATION模式下生效，轮次范围1至11，默认值为11次。迭代轮次越多，结果精度越高，但性能会相应降低。使用时，可根据两个浮点数的指数位差异来选择迭代轮次，float类型共有8位指数位，src0Tensor和src1Tensor之间的指数位差异不应超过24*iterationNum。 |
 
-```
+```cpp
 constexpr uint32_t FMOD_ITERATION_NUM_MAX = 11;
 enum class FmodAlgo {
     NORMAL = 0,
@@ -128,7 +135,7 @@ struct FmodConfig {
 
 完整的调用样例请参考[fmod算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/10_math/fmod)。
 
-```
+```cpp
 // dstLocal: 存放Fmod计算结果的输出Tensor
 // src0Local: 存放Fmod计算除数的输入Tensor
 // src1Local: 存放Fmod计算被除数的输入Tensor
@@ -145,7 +152,7 @@ AscendC::Fmod(dstLocal, src0Local, src1Local, sharedTmpBuffer);
 AscendC::Fmod(dstLocal, src0Local, src1Local, sharedTmpBuffer, 512);
 ```
 
-```
+```cpp
 __aicore__ constexpr AscendC::FmodConfig GetConfig()
 {
     return {.algo = AscendC::FmodAlgo::ITERATION_COMPENSATION, .iterationNum = 11};
@@ -156,7 +163,7 @@ AscendC::Fmod<float, false, config>(dstLocal, src0Local, src1Local, sharedTmpBuf
 
 结果示例如下：
 
-```
+```text
 输入数据(src0Local): [-2.56 -2.55 -2.54 ... -0.01 0. 0.01 ... 2.53  2.54  2.55]
 输入数据(src1Local): [2.    2.    2.    ... 2.    2. 2.   ... 2.    2.    2.]
 输出数据(dstLocal):  [-0.56 -0.55 -0.54 ... -0.01 0. 0.01 ... 0.53  0.54  0.55]

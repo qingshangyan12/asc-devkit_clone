@@ -28,7 +28,7 @@ Init主要用于对Conv3DBackpropFilter对象中的Tiling数据进行初始化�
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void Init(const TConv3DBpFilterTiling* __restrict tiling)
 ```
 
@@ -48,7 +48,7 @@ __aicore__ inline void Init(const TConv3DBpFilterTiling* __restrict tiling)
 
 Init接口必须在Iterate、GetTensorC、End接口前调用，且只能调用一次Init接口，调用顺序如下。
 
-```
+```text
 Init(...);
 ...
 Iterate(...);
@@ -58,9 +58,9 @@ End();
 
 ## 调用示例
 
-```
+```cpp
 const Conv3DBackpropFilterTilingData* tilingData;
 // ...初始化tilingData，创建Conv3DBackpropFilter对象，调用init接口
-ConvBackpropApi::Conv3DBackpropFilter <inputType, weightSizeType, gradOutputType, gradWeightType > gradWeight_;
+ConvBackpropApi::Conv3DBackpropFilter<inputType, weightSizeType, gradOutputType, gradWeightType> gradWeight_;
 gradWeight_.Init(&(tilingData->dwTiling));
 ```

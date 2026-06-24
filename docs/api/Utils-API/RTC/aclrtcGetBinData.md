@@ -53,8 +53,8 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
-aclError aclrtcGetBinData(aclrtcProg prog, char *binData)
+```cpp
+aclError aclrtcGetBinData(aclrtcProg prog, char* binData)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -97,7 +97,7 @@ aclError为int类型变量，详细说明请参考[RTC错误码](RTC错误码.md
 
 ## 调用示例<a name="section837496171220"></a>
 
-```
+```cpp
 aclrtcProg prog;
 char binData[32] = "some bin data ...";
 aclError result = aclrtcGetBinData(prog, binData);

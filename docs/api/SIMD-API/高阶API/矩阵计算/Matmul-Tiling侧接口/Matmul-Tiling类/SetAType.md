@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 int32_t SetAType(TPosition pos, CubeFormat type, DataType dataType, bool isTrans = false)
 ```
 
@@ -31,7 +31,7 @@ int32_t SetAType(TPosition pos, CubeFormat type, DataType dataType, bool isTrans
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MatmulApiTiling tiling(ascendcPlatform);
 // 设置A矩阵，buffer位置为GM，数据格式为ND，数据类型为bfloat16，默认不转置

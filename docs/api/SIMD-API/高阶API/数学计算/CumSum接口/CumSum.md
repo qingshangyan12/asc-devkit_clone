@@ -59,16 +59,20 @@
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <typename T, const CumSumConfig& config = defaultCumSumConfig>
-    __aicore__ inline void CumSum(LocalTensor<T>& dstTensor, LocalTensor<T>& lastRowTensor, const LocalTensor<T>& srcTensor, LocalTensor<uint8_t>& sharedTmpBuffer, const CumSumInfo& cumSumInfo)
+    __aicore__ inline void CumSum(
+        LocalTensor<T>& dstTensor, LocalTensor<T>& lastRowTensor, const LocalTensor<T>& srcTensor,
+        LocalTensor<uint8_t>& sharedTmpBuffer, const CumSumInfo& cumSumInfo)
     ```
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <typename T, const CumSumConfig& config = defaultCumSumConfig>
-    __aicore__ inline void CumSum(LocalTensor<T>& dstTensor, LocalTensor<T>& lastRowTensor, const LocalTensor<T>& srcTensor, const CumSumInfo& cumSumInfo)
+    __aicore__ inline void CumSum(
+        LocalTensor<T>& dstTensor, LocalTensor<T>& lastRowTensor, const LocalTensor<T>& srcTensor,
+        const CumSumInfo& cumSumInfo)
     ```
 
 由于该接口的内部实现中涉及精度转换。需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -88,7 +92,7 @@
 | T | 操作数的数据类型。支持的数据类型为：half、float。 |
 | config | 定义CumSum接口编译时config参数。CumSumConfig类型，具体定义如下方代码所示，其中参数的含义为：<br><br>isLastAxis：取值为true表示计算按last轴处理，取值为false表示计算按first轴处理；<br><br>isReuseSource：是否可以复用srcTensor的内存空间；该参数预留，传入默认值false即可。<br><br>outputLastRow：是否输出最后一行数据。<br>algorithm：CumSum内部实现使用的累加和算法，<!-- npu="950" id8 -->该参数仅支持Ascend 950PR/Ascend 950DT，<!-- end id8 -->支持的取值如下：CumSumAlgorithm::CUMSUM_ALGORITHM_LINEBYLINE：逐行累加算法。CumSumAlgorithm::CUMSUM_ALGORITHM_SKLANSKY：Sklansky二分累加算法。 |
 
-```
+```cpp
 struct CumSumConfig {
     bool isLastAxis{true};
     bool isReuseSource{false};
@@ -108,7 +112,7 @@ enum class CumSumAlgorithm { CUMSUM_ALGORITHM_LINEBYLINE = 0, CUMSUM_ALGORITHM_S
 | sharedTmpBuffer | 输入 | 临时缓存。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>用于CumSum内部复杂计算时存储中间变量，由开发者提供。<br><br>临时空间大小BufferSize的获取方式请参考[GetCumSumMaxMinTmpSize](GetCumSumMaxMinTmpSize.md)。 |
 | cumSumInfo | 输入 | srcTensor的shape信息。CumSumInfo类型，具体定义如下方代码所示，其中参数的含义为：<br><br>outter：表示输入数据的外轴长度。<br><br>inner：表示输入数据的内轴长度。<br><br>请注意：<br><br>cumSumInfo.outter和cumSumInfo.inner都应大于0。<br><br>cumSumInfo.outter * cumSumInfo.inner不能大于dstTensor或srcTensor的大小。<br><br>cumSumInfo.inner * sizeof(T)必须是32字节的整数倍。<br><br>当模板参数config中的outputLastRow取值为true时，cumSumInfo.inner不能大于lastRowTensor输出的最后一行数据的大小。 |
 
-```
+```cpp
 struct CumSumInfo {
     uint32_t outter{0};
     uint32_t inner{0};
@@ -129,7 +133,7 @@ struct CumSumInfo {
 
 完整的调用样例请参考[CumSum样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/10_math/cumsum)。
 
-```
+```cpp
 // dstLocal: 存放计算结果的Tensor
 // lastRowLocal: 存放计算结果最后一行数据的Tensor
 // srcLocal: 参与计算的输入Tensor
@@ -148,7 +152,7 @@ AscendC::CumSum<T, cumSumConfig>(dstLocal, lastRowLocal, srcLocal, cumSumInfo);
 
 cumSumConfig取值\{true, false, true, AscendC::CumSumAlgorithm::CUMSUM\_ALGORITHM\_LINEBYLINE\}时示例数据如下：
 
-```
+```text
 输入数据(srcLocal): [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
 输出数据(dstLocal): [1 2 3 4 5 6 7 8 1 2 3 4 5 6 7 8 1 2 3 4 5 6 7 8 1 2 3 4 5 6 7 8]
 输出数据(lastRowLocal): [8 8 8 8]
@@ -156,7 +160,7 @@ cumSumConfig取值\{true, false, true, AscendC::CumSumAlgorithm::CUMSUM\_ALGORIT
 
 cumSumConfig取值\{false, false, true, AscendC::CumSumAlgorithm::CUMSUM\_ALGORITHM\_LINEBYLINE\}时示例数据如下：
 
-```
+```text
 输入数据(srcLocal): [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
 输出数据(dstLocal): [1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4]
 输出数据(lastRowLocal): [4 4 4 4 4 4 4 4]

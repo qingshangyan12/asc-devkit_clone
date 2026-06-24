@@ -23,13 +23,13 @@
 2.  设置环境变量。
     -   root用户安装Ascend-cann-toolkit包时
 
-        ```
+        ```bash
         source /usr/local/Ascend/cann/set_env.sh
         ```
 
     -   非root用户安装Ascend-cann-toolkit包时
 
-        ```
+        ```bash
         source ${HOME}/Ascend/cann/set_env.sh
         ```
 
@@ -37,7 +37,7 @@
 
     执行如下命令，若能正常显示--help或-h信息，则表示工具环境正常，功能可正常使用。
 
-    ```
+    ```text
     show_kernel_debug_data -h
     ```
 
@@ -45,7 +45,7 @@
 
 -   **命令行方式**
 
-    ```
+    ```text
     show_kernel_debug_data <bin_file_path> [<output_path>]
     ```
 
@@ -58,7 +58,7 @@
 
     获取kernel侧调试信息并解析成可读文件。函数原型如下。
 
-    ```
+    ```python
     def show_kernel_debug_data(bin_file_path: str, output_path: str = './') -> None
     ```
 
@@ -69,7 +69,7 @@
 
     调用示例参考如下代码。
 
-    ```
+    ```python
     from show_kernel_debug_data import show_kernel_debug_data
     show_kernel_debug_data(./input/dump_workspace.bin)
     ```
@@ -78,7 +78,7 @@
 
 工具解析结果文件目录结构如下。其中，dump\_data目录是对DumpTensor、PrintTimeStamp接口解析的结果，index0对应DumpTensor接口中第二个参数desc=0时的打印，loop0表示切分后首个分块的数据打印。
 
-```
+```text
 ├ ${output_path}
 ├── PARSER_${timestamp}                     // ${timestamp}表示时间戳
      ├── dump_data

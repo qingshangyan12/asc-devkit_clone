@@ -86,7 +86,7 @@ constexpr uint32_t dstElemCount = imageWidth * imageHeight * outputChannels;
 
 // 源操作数：GM上一张32x32 YUV420SP图片，前1024B为Y平面，后512B为UV平面。
 AscendC::GlobalTensor<uint8_t> fmGlobal;
-fmGlobal.SetGlobalBuffer((__gm__ uint8_t *)src, inputSize);
+fmGlobal.SetGlobalBuffer((__gm__ uint8_t*)src, inputSize);
 
 // 目的操作数：L1 Buffer。
 AscendC::LocalTensor<int8_t> featureMapA1(AscendC::TPosition::A1, a1Addr, dstElemCount);
@@ -95,13 +95,15 @@ AscendC::LocalTensor<int8_t> featureMapA1(AscendC::TPosition::A1, a1Addr, dstEle
 AscendC::AippInputFormat inputFormat = AscendC::AippInputFormat::YUV420SP_U8;
 
 AscendC::AippParams<int8_t> aippConfig;
-// 本示例不做HW padding、通道交换、单行读取、均值/缩放和色域转换，这些子参数使用结构体默认值。
+// 本示例不做HW
+// padding、通道交换、单行读取、均值/缩放和色域转换，这些子参数使用结构体默认值。
 // 输出U = int8_t时将通道padding到32通道，即每个像素输出32B。
 aippConfig.cPaddingParams.cPaddingMode = 0;
 // 通道padding补0，目的Tensor额外通道写入0。
 aippConfig.cPaddingParams.cPaddingValue = static_cast<int8_t>(0);
 
-// src0为Y平面起始地址；src1为UV平面起始地址，YUV420SP 32x32的UV偏移为32 * 32 = 1024个uint8_t。
+// src0为Y平面起始地址；src1为UV平面起始地址，YUV420SP 32x32的UV偏移为32 * 32 =
+// 1024个uint8_t。
 AscendC::SetAippFunctions(fmGlobal, fmGlobal[yPlaneSize], inputFormat, aippConfig);
 
 AscendC::LoadImageToLocalParams loadParams;

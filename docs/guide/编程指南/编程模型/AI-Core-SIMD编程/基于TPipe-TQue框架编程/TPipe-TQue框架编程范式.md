@@ -39,35 +39,37 @@
 
 ![](../../../../figures/矢量编程Queue队列.png)
 
-```
-AscendC::TPipe pipe;                                // 创建全局资源管理器
-AscendC::TQue<AscendC::TPosition::VecIn, 1> queIn;  // 创建CopyIn阶段队列
-AscendC::TQue<AscendC::TPosition::VecOut, 1> queOut;// 创建CopyOut阶段队列
+```cpp
+AscendC::TPipe pipe;                                 // 创建全局资源管理器
+AscendC::TQue<AscendC::TPosition::VecIn, 1> queIn;   // 创建CopyIn阶段队列
+AscendC::TQue<AscendC::TPosition::VecOut, 1> queOut; // 创建CopyOut阶段队列
 // Init阶段
-pipe.InitBuffer(queIn, 2, 1024);                    // 开启DoubleBuffer，将待处理数据一分为二，实现流水并行
+pipe.InitBuffer(queIn, 2, 1024); // 开启DoubleBuffer，将待处理数据一分为二，实现流水并行
 pipe.InitBuffer(queOut, 2, 1024);
-for-loop {
-    // CopyIn阶段
+for
+    - loop
     {
-        auto tensor = queIn.AllocTensor<half>();   // 从队列申请资源，长度1024
-        AscendC::DataCopy(tensor, gm, 1024);       // 将数据从GM搬运至VECIN
-        queIn.EnQue(tensor);
+        // CopyIn阶段
+        {
+            auto tensor = queIn.AllocTensor<half>(); // 从队列申请资源，长度1024
+            AscendC::DataCopy(tensor, gm, 1024);     // 将数据从GM搬运至VECIN
+            queIn.EnQue(tensor);
+        }
+        // Compute阶段
+        {
+            auto tensor = queIn.DeQue<half>();
+            auto tensorOut = queOut.AllocTensor<half>();
+            AscendC::Abs(tensorOut, tensor, 1024); // 执行计算
+            queIn.FreeTensor(tensor);
+            queOut.EnQue(tensorOut);
+        }
+        // CopyOut阶段
+        {
+            auto tensor = queOut.DeQue<half>();
+            AscendC::DataCopy(gmOut, tensor, 1024); // 将数据从VECOUT搬运至GM
+            queOut.FreeTensor(tensor);              // 释放资源
+        }
     }
-    // Compute阶段
-    {
-        auto tensor = queIn.DeQue<half>();
-        auto tensorOut = queOut.AllocTensor<half>();
-        AscendC::Abs(tensorOut, tensor, 1024);    // 执行计算
-        queIn.FreeTensor(tensor);
-        queOut.EnQue(tensorOut);
-    }
-    // CopyOut阶段
-    {
-        auto tensor = queOut.DeQue<half>();
-        AscendC::DataCopy(gmOut, tensor, 1024);   // 将数据从VECOUT搬运至GM
-        queOut.FreeTensor(tensor);                // 释放资源
-    }
-}
 ```
 
 任务间数据传递所使用的内存、事件等资源，统一由TPipe管理。如下内存管理示意图所示，TPipe通过[InitBuffer](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/Pipe和Que框架/TPipe/InitBuffer.md)接口对外提供队列内存初始化功能，开发者可通过该接口为指定队列分配内存。
@@ -115,7 +117,7 @@ Cube计算流程本质上也可归纳为CopyIn、Compute、CopyOut三个阶段�
 
 如图所示：CopyIn阶段对应[SetTensorA](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/SetTensorA.md)、[SetTensorB](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/SetTensorB.md)、[SetBias](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/SetBias.md)接口；Compute阶段对应[Iterate](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/Iterate.md)接口；CopyOut阶段对应[GetTensorC](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/GetTensorC.md)接口。示例如下：
 
-```
+```cpp
 // 创建Matmul对象，需传入A、B、C、Bias的参数类型信息
 // 类型信息通过MatmulType定义，包括：内存逻辑位置、数据格式、数据类型
 typedef MatmulType<TPosition::GM, CubeFormat::ND, half> aType;
@@ -126,9 +128,9 @@ Matmul<aType, bType, cType, biasType> mm;
 
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling); // 初始化
 // CopyIn阶段：完成从GM到Local Memory的搬运
-mm.SetTensorA(gm_a);    // 设置左矩阵A
-mm.SetTensorB(gm_b);    // 设置右矩阵B
-mm.SetBias(gm_bias);    // 设置Bias
+mm.SetTensorA(gm_a); // 设置左矩阵A
+mm.SetTensorB(gm_b); // 设置右矩阵B
+mm.SetBias(gm_bias); // 设置Bias
 // Compute阶段：执行矩阵乘计算
 while (mm.Iterate()) {
     // CopyOut阶段：完成从Local Memory到GM的搬运
@@ -162,8 +164,8 @@ mm.End();
 
 示例代码如下（伪代码）：
 
-```
-template<typename aType, typename bType, typename cType, typename biasType>
+```cpp
+template <typename aType, typename bType, typename cType, typename biasType>
 __aicore__ inline void MatmulLeakyKernel<aType, bType, cType, biasType>::Process()
 {
     // 步骤1：初始化MatMul对象，将输入数据从Global Memory搬运到Cube核上
@@ -183,8 +185,7 @@ __aicore__ inline void MatmulLeakyKernel<aType, bType, cType, biasType>::Process
         reluOutQueue_.EnQue(reluOutLocal);
         // 步骤5：将输出结果搬运回Global Memory
         reluOutQueue_.DeQue<cType>();
-        ...
-        AscendC::DataCopy(cGlobal[startOffset], reluOutLocal, copyParam);
+        ... AscendC::DataCopy(cGlobal[startOffset], reluOutLocal, copyParam);
         reluOutQueue_.FreeTensor(reluOutLocal);
 
         computeRound++;

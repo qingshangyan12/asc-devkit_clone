@@ -91,8 +91,7 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
 
     ```cpp
     template <typename T>
-    __aicore__ inline void DumpTensor(const LocalTensor<T> &tensor, uint32_t desc, uint32_t dumpSize)
-    template <typename T>
+    __aicore__ inline void DumpTensor(const LocalTensor<T>& tensor, uint32_t desc, uint32_t dumpSize) template <typename T>
     __aicore__ inline void DumpTensor(const GlobalTensor<T>& tensor, uint32_t desc, uint32_t dumpSize)
     ```
 
@@ -100,9 +99,10 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
 
     ```cpp
     template <typename T>
-    __aicore__ inline void DumpTensor(const LocalTensor<T>& tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
-    template <typename T>
-    __aicore__ inline void DumpTensor(const GlobalTensor<T>& tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
+    __aicore__ inline void DumpTensor(
+        const LocalTensor<T>& tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo) template <typename T>
+    __aicore__
+        inline void DumpTensor(const GlobalTensor<T>& tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
     ```
 
 ## 参数说明<a name="section158061867342"></a>
@@ -163,8 +163,8 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
     - Shape等于dumpSize元素个数
         ```cpp
         uint32_t array[] = {static_cast<uint32_t>(8), static_cast<uint32_t>(8)};
-        AscendC::ShapeInfo shapeInfo(2, array);       // dim为2， shape为(8,8)
-        AscendC::DumpTensor(x, 2, 64, shapeInfo);     // dump x的64个元素，且解析按照shapeInfo的(8,8)排列
+        AscendC::ShapeInfo shapeInfo(2, array);   // dim为2， shape为(8,8)
+        AscendC::DumpTensor(x, 2, 64, shapeInfo); // dump x的64个元素，且解析按照shapeInfo的(8,8)排列
         ```
         打印结果如下：
         ```plain
@@ -183,7 +183,9 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
         ```cpp
         uint32_t array1[] = {static_cast<uint32_t>(7), static_cast<uint32_t>(8)};
         AscendC::ShapeInfo shapeInfo1(2, array1); // dim为2， shape为(7,8)
-        AscendC::DumpTensor(x1, 3, 64, shapeInfo1); // 当Shape尺寸小于等于dumpSize元素个数时，按照ShapeInfo打印元素，多出的Dump数据不展示
+        AscendC::DumpTensor(
+            x1, 3, 64,
+            shapeInfo1); // 当Shape尺寸小于等于dumpSize元素个数时，按照ShapeInfo打印元素，多出的Dump数据不展示
         ```
         打印结果如下：
         ```plain
@@ -201,7 +203,9 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
         ```cpp
         uint32_t array2[] = {static_cast<uint32_t>(9), static_cast<uint32_t>(8)};
         AscendC::ShapeInfo shapeInfo2(2, array2); // dim为2， shape为(9,8)
-        AscendC::DumpTensor(x2, 4, 64, shapeInfo2); // 当Shape尺寸大于dumpSize元素个数时，按照ShapeInfo打印元素，不足的Dump数据用"-"展示
+        AscendC::DumpTensor(
+            x2, 4, 64,
+            shapeInfo2); // 当Shape尺寸大于dumpSize元素个数时，按照ShapeInfo打印元素，不足的Dump数据用"-"展示
         ```
         打印结果如下：
         ```plain

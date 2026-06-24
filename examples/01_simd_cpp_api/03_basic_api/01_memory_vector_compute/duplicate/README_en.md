@@ -14,7 +14,7 @@ This example implements data padding functionality based on the Duplicate API, c
 
 ## Directory Structure
 
-```
+```text
 ├── duplicate
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

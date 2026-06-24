@@ -30,7 +30,7 @@ Tensor原地操作（inplace接口）是一种优化技术，全局申请、保�
 
 ## 示例代码<a name="section729517189461"></a>
 
-```
+```cpp
 // ...
 namespace AscendC {
 class MyKernel {
@@ -60,8 +60,8 @@ private:
     {
         srcQue0.AllocTensor<half>(src0Local);
         srcQue1.AllocTensor<half>(src1Local);
-        DataCopy(src0Local, src0Global[i*BLOCK_SIZE], BLOCK_SIZE);
-        DataCopy(src1Local, src1Global[i*BLOCK_SIZE], BLOCK_SIZE);
+        DataCopy(src0Local, src0Global[i * BLOCK_SIZE], BLOCK_SIZE);
+        DataCopy(src1Local, src1Global[i * BLOCK_SIZE], BLOCK_SIZE);
         srcQue0.EnQue(src0Local);
         srcQue1.EnQue(src1Local);
     }
@@ -78,7 +78,7 @@ private:
     __aicore__ inline void CopyOut(int32_t i)
     {
         dstQue0.DeQue<half>(dstLocal);
-        DataCopy(dstGlobal[i*BLOCK_SIZE], dstLocal, BLOCK_SIZE);
+        DataCopy(dstGlobal[i * BLOCK_SIZE], dstLocal, BLOCK_SIZE);
         dstQue0.FreeTensor(dstLocal);
     }
 

@@ -16,12 +16,12 @@
 
 ## 函数原型
 
-```
-template<pipe_t pipe = PIPE_S>
+```cpp
+template <pipe_t pipe = PIPE_S>
 __aicore__ inline void asc_mark_stamp(uint16_t idx)
 
-template<pipe_t pipe = PIPE_S, uint16_t idx>
-__aicore__ inline void asc_mark_stamp()
+    template <pipe_t pipe = PIPE_S, uint16_t idx>
+    __aicore__ inline void asc_mark_stamp()
 ```
 
 ## 参数说明
@@ -43,7 +43,7 @@ __aicore__ inline void asc_mark_stamp()
 
 ## 调用示例
 
-```
+```bash
 mte2_opt();
 //在算子执行开始处打点
 asc_mark_stamp<PIPE_V, 0>();

@@ -58,7 +58,7 @@ uint64_t field_31_13 = 0x000EF;
 uint64_t config = 0;
 
 config = (config & ~MASK_8_0) | (field_8_0 & MASK_8_0);
-config = (config & ~MASK_BIT9) | ((bit_9<<9) & MASK_BIT9);
+config = (config & ~MASK_BIT9) | ((bit_9 << 9) & MASK_BIT9);
 config = (config & ~MASK_31_13) | (field_31_13 & MASK_31_13);
 asc_set_l0c2gm_quant_post(config);
 ```

@@ -23,7 +23,6 @@ public:
     __aicore__ inline const LayoutType& GetLayout() const;
 
     __aicore__ inline void SetLayout(const LayoutType& t);
-
 };
 ```
 
@@ -63,10 +62,8 @@ public:
 ## 成员函数<a name="zh-cn_topic_0000002213064918_section1173524710"></a>
 
 ```cpp
-__aicore__ inline TensorTrait(const LayoutType& t = {})
-__aicore__ inline LayoutType& GetLayout()
-__aicore__ inline const LayoutType& GetLayout() const
-__aicore__ inline void SetLayout(const LayoutType& t)
+__aicore__ inline TensorTrait(const LayoutType& t = {}) __aicore__ inline LayoutType& GetLayout() __aicore__
+    inline const LayoutType& GetLayout() const __aicore__ inline void SetLayout(const LayoutType& t)
 ```
 
 ## 相关接口<a name="section104554349817"></a>
@@ -76,8 +73,9 @@ __aicore__ inline void SetLayout(const LayoutType& t)
 template <typename T, TPosition pos, typename LayoutType>
 __aicore__ inline constexpr auto MakeTensorTrait(const LayoutType& t)
 
-// is_tensorTrait原型定义
-template <typename T> struct is_tensorTrait
+    // is_tensorTrait原型定义
+    template <typename T>
+    struct is_tensorTrait
 ```
 
 ## 约束说明<a name="section1253618294449"></a>

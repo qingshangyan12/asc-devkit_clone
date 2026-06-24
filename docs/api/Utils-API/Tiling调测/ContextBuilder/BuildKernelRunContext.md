@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001867409733_zh-cn_topic_0000001389787297_section13230182415108"></a>
 
-```
+```cpp
 std::shared_ptr<KernelRunContextHolder> BuildKernelRunContext()
 ```
 
@@ -24,7 +24,7 @@ KernelRunContextHolder的共享指针，可通过GetContext<gert::KernelContext\
 
 ## 调用示例<a name="zh-cn_topic_0000001867409733_zh-cn_topic_0000001389787297_section320753512363"></a>
 
-```
+```cpp
 auto kernelContextHolder = context_ascendc::ContextBuilder().Inputs().Outputs().BuildKernelRunContext();
 gert::KernelContext* tilingParseContext = kernelContextHolder->GetContext<gert::KernelContext>();
 ```

@@ -38,9 +38,9 @@ Matmul计算需要计算出多个singleCoreM \* singleCoreN大小的C矩阵，�
 
     使用[SetBatchInfoForNormal](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Tiling侧接口/Matmul-Tiling类/SetBatchInfoForNormal.md)设置A/B/C的M/N/K轴信息和A/B矩阵的BatchNum。
 
-    ```
+    ```cpp
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
-    matmul_tiling::MultiCoreMatmulTiling tiling(ascendcPlatform);   
+    matmul_tiling::MultiCoreMatmulTiling tiling(ascendcPlatform);
     int32_t M = 32;
     int32_t N = 256;
     int32_t K = 64;
@@ -53,11 +53,11 @@ Matmul计算需要计算出多个singleCoreM \* singleCoreN大小的C矩阵，�
     tiling->SetOrgShape(M, N, K);
     tiling->EnableBias(true);
     tiling->SetBufferSpace(-1, -1, -1);
-    
+
     constexpr int32_t BATCH_NUM = 3;
-    tiling->SetBatchInfoForNormal(BATCH_NUM, BATCH_NUM, M, N, K);  // 设置矩阵排布
+    tiling->SetBatchInfoForNormal(BATCH_NUM, BATCH_NUM, M, N, K); // 设置矩阵排布
     tiling->SetBufferSpace(-1, -1, -1);
-    
+
     optiling::TCubeTiling tilingData;
     int ret = tiling.GetTiling(tilingData);
     ```
@@ -67,26 +67,26 @@ Matmul计算需要计算出多个singleCoreM \* singleCoreN大小的C矩阵，�
 
         通过MatmulType设置输入输出的Layout格式为NORMAL。
 
-        ```
+        ```cpp
         #include "lib/matmul_intf.h"
-        
-        typedef AscendC::MatmulType <AscendC::TPosition::GM, CubeFormat::ND, half, false, LayoutMode::NORMAL> aType;
-        typedef AscendC::MatmulType <AscendC::TPosition::GM, CubeFormat::ND, half, true, LayoutMode::NORMAL> bType;
-        typedef AscendC::MatmulType <AscendC::TPosition::GM, CubeFormat::ND, float, false, LayoutMode::NORMAL> cType;
-        typedef AscendC::MatmulType <AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
+
+        typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half, false, LayoutMode::NORMAL> aType;
+        typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half, true, LayoutMode::NORMAL> bType;
+        typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float, false, LayoutMode::NORMAL> cType;
+        typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
         constexpr MatmulConfig MM_CFG = GetNormalConfig(false, false, false, BatchMode::BATCH_LESS_THAN_L1);
-        AscendC::Matmul<aType, bType, cType, biasType, MM_CFG> mm; 
+        AscendC::Matmul<aType, bType, cType, biasType, MM_CFG> mm;
         ```
 
     -   初始化操作。
 
-        ```
+        ```text
         REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling); // 初始化matmul对象
         ```
 
     -   设置左矩阵A、右矩阵B、Bias。
 
-        ```
+        ```text
         mm.SetTensorA(gm_a);    // 设置左矩阵A
         mm.SetTensorB(gm_b);    // 设置右矩阵B
         mm.SetBias(gm_bias);    // 设置Bias
@@ -94,12 +94,12 @@ Matmul计算需要计算出多个singleCoreM \* singleCoreN大小的C矩阵，�
 
     -   完成矩阵乘操作。左矩阵每次计算batchA个MK数据，右矩阵每次计算batchB个KN数据。
 
-        ```
+        ```text
         mm.IterateBatch(gm_c, batchA, batchB, false);
         ```
 
     -   结束矩阵乘操作。
 
-        ```
+        ```text
         mm.End();
         ```

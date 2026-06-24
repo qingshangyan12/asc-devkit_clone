@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 uint32_t SetSkipLocalRankCopy(uint8_t skipLocalRankCopy)
 ```
 

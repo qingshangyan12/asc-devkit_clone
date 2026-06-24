@@ -29,29 +29,33 @@
 -   通过sharedTmpBuffer入参传入临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void Sigmoid(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+        __aicore__ inline void Sigmoid(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+            const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void Sigmoid(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
+        __aicore__ inline void Sigmoid(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
         ```
 
 -   接口框架申请临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void Sigmoid(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
+        __aicore__ inline void Sigmoid(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false>
         __aicore__ inline void Sigmoid(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
         ```
@@ -95,7 +99,7 @@
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放Sigmoid计算结果的Tensor
 // srcLocal: 存放Sigmoid计算输入的Tensor
 // sharedTmpBuffer: 存放Sigmoid计算过程中临时缓存的Tensor
@@ -113,7 +117,7 @@ AscendC::Sigmoid(dstLocal, srcLocal, sharedTmpBuffer, 32);
 
 结果示例如下：
 
-```
+```text
 输入数据(srcLocal):
 [-100.    -50.    -20.    -10.     -5.     -4.     -3.     -2.
    -1.     -0.5    -0.4    -0.3    -0.2    -0.1    -0.01    0.

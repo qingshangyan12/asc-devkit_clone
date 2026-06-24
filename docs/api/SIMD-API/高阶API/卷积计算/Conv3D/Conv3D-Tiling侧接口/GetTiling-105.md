@@ -6,11 +6,11 @@
 
 ## 函数原型
 
-```
+```cpp
 int64_t GetTiling(optiling::TConv3DApiTiling& tiling)
 ```
 
-```
+```cpp
 int64_t GetTiling(AscendC::tiling::TConv3DApiTiling& tiling)
 ```
 
@@ -30,7 +30,7 @@ int64_t GetTiling(AscendC::tiling::TConv3DApiTiling& tiling)
 
 ## 调用示例
 
-```
+```cpp
 // 实例化Conv3d Api
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 Conv3dTilingApi::Conv3dTiling conv3dApiTiling(ascendcPlatform);
@@ -38,6 +38,5 @@ conv3dApiTiling.SetOrgInputShape(orgCi, orgDi, orgHi, orgWi);
 conv3dApiTiling.SetOrgWeightShape(cout, kd, kh, kw);
 conv3dApiTiling.SetSingleWeightShape(singleCi, singleKd, singleKh, singleKw);
 conv3dApiTiling.SetSingleOutputShape(singleCo, singleDo, singleM);
-...
-conv3dApiTiling.GetTiling(tilingData.conv3ApiTilingData);
+... conv3dApiTiling.GetTiling(tilingData.conv3ApiTilingData);
 ```

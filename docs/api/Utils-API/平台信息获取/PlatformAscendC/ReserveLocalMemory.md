@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001647201621_zh-cn_topic_0000001442758437_section13230182415108"></a>
 
-```
+```cpp
 void ReserveLocalMemory(ReservedSize size)
 ```
 
@@ -46,8 +46,9 @@ void ReserveLocalMemory(ReservedSize size)
 
 ## 调用示例<a name="zh-cn_topic_0000001647201621_zh-cn_topic_0000001442758437_section320753512363"></a>
 
-```
-ge::graphStatus TilingXXX(gert::TilingContext* context) {
+```cpp
+ge::graphStatus TilingXXX(gert::TilingContext* context)
+{
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
     uint64_t ub_size, l1_size;
     // 预留8KB的Unified Buffer内存空间

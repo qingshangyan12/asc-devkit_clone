@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 void EnableMultiCoreSplitK(bool flag)
 ```
 
@@ -30,7 +30,7 @@ void EnableMultiCoreSplitK(bool flag)
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MultiCoreMatmulTiling tiling(ascendcPlatform);
 

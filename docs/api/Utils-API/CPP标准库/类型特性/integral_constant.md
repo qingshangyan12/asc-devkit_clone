@@ -30,10 +30,9 @@ integral\_constant提供了多个常用的特化版本，具体如下：
 
 ## 函数原型
 
-```
+```cpp
 template <typename Tp, Tp v>
-struct integral_constant
-{
+struct integral_constant {
     static constexpr const Tp value = v;
     using value_type = Tp;
     using type = integral_constant;
@@ -67,7 +66,7 @@ using Int = integral_constant<size_t, v>;
 
 -   数值类型封装
 
-    ```
+    ```cpp
     // 以下示例为基于googletest的UT示例
     using IntTrue = AscendC::Std::integral_constant<int, 1>;
     using IntFalse = AscendC::Std::integral_constant<int, 0>;
@@ -84,7 +83,7 @@ using Int = integral_constant<size_t, v>;
 
 -   特化类型——bool
 
-    ```
+    ```cpp
     // 以下示例为基于googletest的UT示例
     using TrueType = AscendC::Std::true_type;
     using FalseType = AscendC::Std::false_type;
@@ -102,7 +101,7 @@ using Int = integral_constant<size_t, v>;
 
 -   特化类型——Int
 
-    ```
+    ```cpp
     // 以下示例为基于googletest的UT示例
     using Zero = AscendC::Std::Int<0>;
     using One = AscendC::Std::Int<1>;
@@ -123,7 +122,7 @@ using Int = integral_constant<size_t, v>;
 
 -   Int特化类型的运算
 
-    ```
+    ```cpp
     // 加法
     static_assert((AscendC::Std::Int<5>::value + AscendC::Std::Int<3>::value) == 8, "Addition failed");
     // 乘法

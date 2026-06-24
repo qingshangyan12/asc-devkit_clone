@@ -20,20 +20,20 @@
 ```cpp
 // 非饱和模式，数据写入索引0的位置
 __simd_callee__ inline void asc_int322uint8(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
-// 饱和模式，数据写入索引0的位置
-__simd_callee__ inline void asc_int322uint8_sat(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
-// 非饱和模式，数据写入索引1的位置
-__simd_callee__ inline void asc_int322uint8_v2(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
-// 饱和模式，数据写入索引1的位置
-__simd_callee__ inline void asc_int322uint8_sat_v2(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
-// 非饱和模式，数据写入索引2的位置
-__simd_callee__ inline void asc_int322uint8_v3(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
-// 饱和模式，数据写入索引2的位置
-__simd_callee__ inline void asc_int322uint8_sat_v3(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
-// 非饱和模式，数据写入索引3的位置
-__simd_callee__ inline void asc_int322uint8_v4(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
-// 饱和模式，数据写入索引3的位置
-__simd_callee__ inline void asc_int322uint8_sat_v4(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
+    // 饱和模式，数据写入索引0的位置
+    __simd_callee__ inline void asc_int322uint8_sat(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
+    // 非饱和模式，数据写入索引1的位置
+    __simd_callee__ inline void asc_int322uint8_v2(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
+    // 饱和模式，数据写入索引1的位置
+    __simd_callee__ inline void asc_int322uint8_sat_v2(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
+    // 非饱和模式，数据写入索引2的位置
+    __simd_callee__ inline void asc_int322uint8_v3(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
+    // 饱和模式，数据写入索引2的位置
+    __simd_callee__ inline void asc_int322uint8_sat_v3(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
+    // 非饱和模式，数据写入索引3的位置
+    __simd_callee__ inline void asc_int322uint8_v4(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
+    // 饱和模式，数据写入索引3的位置
+    __simd_callee__ inline void asc_int322uint8_sat_v4(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
 ```
 
 ## 参数说明

@@ -111,7 +111,7 @@ __global__ void simt_kernel(...)
 ```c++
 using namespace cooperative_groups;
 
-__global__ void simt_kernel(int *input_arr)
+__global__ void simt_kernel(int* input_arr)
 {
     thread_block block = this_thread_block();
     auto tile32 = tiled_partition<32>(block);

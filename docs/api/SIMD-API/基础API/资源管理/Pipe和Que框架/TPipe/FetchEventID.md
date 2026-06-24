@@ -63,10 +63,9 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <HardEvent evt>
-__aicore__ inline TEventID FetchEventID()
-__aicore__ inline TEventID FetchEventID(HardEvent evt)
+__aicore__ inline TEventID FetchEventID() __aicore__ inline TEventID FetchEventID(HardEvent evt)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -101,8 +100,9 @@ TEventID
 
 ## 调用示例<a name="section6191129670"></a>
 
-```
-AscendC::TEventID eventIdVToS = GetTPipePtr()->FetchEventID(AscendC::HardEvent::V_S); //需要插scalar等vector的同步，申请对应的HardEvent的ID
+```cpp
+AscendC::TEventID eventIdVToS =
+    GetTPipePtr()->FetchEventID(AscendC::HardEvent::V_S); // 需要插scalar等vector的同步，申请对应的HardEvent的ID
 AscendC::SetFlag<AscendC::HardEvent::V_S>(eventIdVToS);
 AscendC::WaitFlag<AscendC::HardEvent::V_S>(eventIdVToS);
 ```

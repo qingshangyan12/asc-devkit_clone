@@ -8,7 +8,7 @@
 
 ## 函数原型
 
-```
+```cpp
 int32_t SetMadType(MatrixMadType madType)
 ```
 
@@ -20,7 +20,7 @@ int32_t SetMadType(MatrixMadType madType)
 | --- | --- | --- |
 | madType | 输入 | 设置Matmul模式。MatrixMadType类型，定义如下方代码所示，其中参数的含义为：<br><br>MatrixMadType::NORMAL：普通模式，即非HF32模式、非MxMatmul场景。<br><br>MatrixMadType::HF32：开启HF32模式。<br><br>MatrixMadType::MXMODE：开启MxMatmul场景。 |
 
-```
+```cpp
 enum class MatrixMadType : int32_t {
     NORMAL = 0,
     HF32 = 1,
@@ -38,7 +38,7 @@ enum class MatrixMadType : int32_t {
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MatmulApiTiling tiling(ascendcPlatform);
 tiling.SetTraverse(MatrixTraverse::FIRSTM); // 设置遍历方式

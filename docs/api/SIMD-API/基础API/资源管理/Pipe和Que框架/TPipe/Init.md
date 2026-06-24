@@ -63,7 +63,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline void Init()
 ```
 
@@ -79,23 +79,23 @@ __aicore__ inline void Init()
 
 完整算子样例参考：[TPipeReuse](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/07_tpipe_tque/tpipe_reuse)。
 
-```
+```cpp
 // 实例化一个浮点型的自定义算子对象
 KernelTPipeInit<float> op;
 uint32_t srcSize = 128;
 
 // 第一次执行流程：使用pipeIn管道
 AscendC::TPipe pipeIn;
-pipeIn.Init();  // 初始化pipeIn管道资源
+pipeIn.Init(); // 初始化pipeIn管道资源
 op.Init(x, z, srcSize, &pipeIn);
 op.Process();
-pipeIn.Destroy();  // 销毁pipeIn管道资源
+pipeIn.Destroy(); // 销毁pipeIn管道资源
 
 // 第二次执行流程：复用算子对象，但更换为pipeCast管道
 AscendC::TPipe pipeCast;
-pipeCast.Init();  // 初始化pipeCast管道资源
+pipeCast.Init(); // 初始化pipeCast管道资源
 op.Init(x, z, srcSize, &pipeCast);
 op.Process();
-pipeCast.Destroy();  // 销毁pipeCast管道资源
+pipeCast.Destroy(); // 销毁pipeCast管道资源
 ```
 

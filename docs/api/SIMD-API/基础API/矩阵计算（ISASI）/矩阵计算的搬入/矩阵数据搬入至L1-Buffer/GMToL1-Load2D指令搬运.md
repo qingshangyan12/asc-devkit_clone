@@ -24,7 +24,8 @@
 
 ```cpp
 template <typename T>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams)
+__aicore__ inline void LoadData(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams)
 ```
 
 ## 参数说明<a id="zh-cn_topic_0000002567745223_section16128134420472"></a>

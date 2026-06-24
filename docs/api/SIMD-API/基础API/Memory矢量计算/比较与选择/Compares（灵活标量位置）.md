@@ -67,24 +67,34 @@
 
 -   tensor前n个数据计算
 
-    ```
-    template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, bool isSetMask = true, const BinaryConfig &config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
+    ```cpp
+    template <
+        typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, bool isSetMask = true,
+        const BinaryConfig& config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
     __aicore__ inline void Compares(const T2& dst, const T3& src0, const T4& src1, CMPMODE cmpMode, uint32_t count)
     ```
 
 -   tensor高维切分计算
     -   mask逐bit模式
 
-        ```
-        template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, bool isSetMask = true, const BinaryConfig &config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
-        __aicore__ inline void Compares(const T2& dst, const T3& src0, const T4& src1, CMPMODE cmpMode, const uint64_t mask[], uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+        ```cpp
+        template <
+            typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, bool isSetMask = true,
+            const BinaryConfig& config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
+        __aicore__ inline void Compares(
+            const T2& dst, const T3& src0, const T4& src1, CMPMODE cmpMode, const uint64_t mask[], uint8_t repeatTime,
+            const UnaryRepeatParams& repeatParams)
         ```
 
     -   mask连续模式
 
-        ```
-        template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, bool isSetMask = true, const BinaryConfig &config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
-        __aicore__ inline void Compares(const T2& dst, const T3& src0, const T4& src1, CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+        ```cpp
+        template <
+            typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, bool isSetMask = true,
+            const BinaryConfig& config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
+        __aicore__ inline void Compares(
+            const T2& dst, const T3& src0, const T4& src1, CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime,
+            const UnaryRepeatParams& repeatParams)
         ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -245,45 +255,48 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
 
 -   tensor前n个数据计算接口样例
 
-    ```
+    ```cpp
     // 标量在后，src1Local[0]作为标量
     AscendC::Compares(dstLocal, src0Local, src1Local[0], AscendC::CMPMODE::LT, srcDataSize);
-    
+
     // 标量在前，src0Local[0]作为标量
-    static constexpr AscendC::BinaryConfig config = { 0 };
-    AscendC::Compares<BinaryDefaultType, BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, AscendC::CMPMODE::LT, srcDataSize);
+    static constexpr AscendC::BinaryConfig config = {0};
+    AscendC::Compares<BinaryDefaultType, BinaryDefaultType, true, config>(
+        dstLocal, src0Local[0], src1Local, AscendC::CMPMODE::LT, srcDataSize);
     ```
 
 -   tensor高维切分计算-mask连续模式
 
-    ```
+    ```cpp
     uint64_t mask = 256 / sizeof(float); // 256为每个迭代处理的字节数
     int repeat = 4;
-    AscendC::UnaryRepeatParams repeatParams = { 1, 1, 8, 8 };
+    AscendC::UnaryRepeatParams repeatParams = {1, 1, 8, 8};
     // repeat = 4, 64 elements one repeat, 256 elements total
     // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
     // dstRepStride, srcRepStride = 8, no gap between repeats
     // 标量在后，src1Local[0]作为标量
     AscendC::Compares(dstLocal, src0Local, src1Local[0], AscendC::CMPMODE::LT, mask, repeat, repeatParams);
-    
+
     // 标量在前，src0Local[0]作为标量
-    static constexpr AscendC::BinaryConfig config = { 0 };
-    AscendC::Compares<BinaryDefaultType, BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, AscendC::CMPMODE::LT, mask, repeat, repeatParams);
+    static constexpr AscendC::BinaryConfig config = {0};
+    AscendC::Compares<BinaryDefaultType, BinaryDefaultType, true, config>(
+        dstLocal, src0Local[0], src1Local, AscendC::CMPMODE::LT, mask, repeat, repeatParams);
     ```
 
 -   tensor高维切分计算-mask逐bit模式
 
-    ```
-    uint64_t mask[2] = { UINT64_MAX, 0};
+    ```cpp
+    uint64_t mask[2] = {UINT64_MAX, 0};
     int repeat = 4;
-    AscendC::UnaryRepeatParams repeatParams = { 1, 1, 8, 8 };
+    AscendC::UnaryRepeatParams repeatParams = {1, 1, 8, 8};
     // repeat = 4, 64 elements one repeat, 256 elements total
     // srcBlkStride, = 1, no gap between blocks in one repeat
     // dstRepStride, srcRepStride = 8, no gap between repeats
     // 标量在后，src1Local[0]作为标量
     AscendC::Compares(dstLocal, src0Local, src1Local[0], AscendC::CMPMODE::LT, mask, repeat, repeatParams);
-    
+
     // 标量在前，src0Local[0]作为标量
-    static constexpr AscendC::BinaryConfig config = { 0 };
-    AscendC::Compares<BinaryDefaultType, BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, AscendC::CMPMODE::LT, mask, repeat, repeatParams);
+    static constexpr AscendC::BinaryConfig config = {0};
+    AscendC::Compares<BinaryDefaultType, BinaryDefaultType, true, config>(
+        dstLocal, src0Local[0], src1Local, AscendC::CMPMODE::LT, mask, repeat, repeatParams);
     ```

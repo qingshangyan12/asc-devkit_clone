@@ -30,7 +30,7 @@
 
 ## 函数原型
 
-```
+```cpp
 inline float sinpif(float x)
 ```
 
@@ -60,7 +60,7 @@ inline float sinpif(float x)
 
 使用该接口需要包含"simt\_api/math\_functions.h"头文件。
 
-```
+```cpp
 #include "simt_api/math_functions.h"
 ```
 
@@ -68,8 +68,8 @@ inline float sinpif(float x)
 
 - SIMT编程场景：
 
-    ```
-    __global__ __launch_bounds__(256) void compute_sinpif(float *result, const float *x, uint32_t count)
+    ```cpp
+    __global__ __launch_bounds__(256) void compute_sinpif(float* result, const float* x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= count) {
@@ -81,8 +81,9 @@ inline float sinpif(float x)
 
 - SIMD与SIMT混合编程场景：
 
-    ```
-    __simt_vf__ __launch_bounds__(256) inline void compute_sinpif_vf(__gm__ float *result, __gm__ const float *x, uint32_t count)
+    ```cpp
+    __simt_vf__ __launch_bounds__(256) inline void compute_sinpif_vf(
+        __gm__ float* result, __gm__ const float* x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= count) {
@@ -91,7 +92,7 @@ inline float sinpif(float x)
         result[idx] = sinpif(x[idx]);
     }
 
-    __global__ __vector__ void run_sinpif(__gm__ float *result, __gm__ const float *x, uint32_t count)
+    __global__ __vector__ void run_sinpif(__gm__ float* result, __gm__ const float* x, uint32_t count)
     {
         asc_vf_call<compute_sinpif_vf>(dim3(256), result, x, count);
     }
@@ -99,7 +100,7 @@ inline float sinpif(float x)
 
 输入输出示例如下：
 
-```
+```text
 x：0.25, 0.75, 1.25, 1.75
 result: 0.7071068 0.7071068 -0.7071069 -0.7071065
 ```

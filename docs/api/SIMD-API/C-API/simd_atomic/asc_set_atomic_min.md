@@ -15,12 +15,9 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_set_atomic_min_int8()
-__aicore__ inline void asc_set_atomic_min_int16()
-__aicore__ inline void asc_set_atomic_min_bfloat()
-__aicore__ inline void asc_set_atomic_min_float16()
-__aicore__ inline void asc_set_atomic_min_int()
-__aicore__ inline void asc_set_atomic_min_float()
+__aicore__ inline void asc_set_atomic_min_int8() __aicore__ inline void asc_set_atomic_min_int16() __aicore__
+    inline void asc_set_atomic_min_bfloat() __aicore__ inline void asc_set_atomic_min_float16() __aicore__
+    inline void asc_set_atomic_min_int() __aicore__ inline void asc_set_atomic_min_float()
 ```
 
 ## 参数说明
@@ -55,7 +52,7 @@ asc_set_atomic_none();
 
 结果示例：
 
-```
+```text
 输入数据src0：[1, 1, 1, ..., 1]  // int8_t类型
 输入数据src1：[2, 2, 2, ..., 2]  // int8_t类型
 输出数据dst：[1, 1, 1, ..., 1]   // int8_t类型

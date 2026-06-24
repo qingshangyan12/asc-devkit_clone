@@ -2,20 +2,21 @@
 
 1.  首先进行tiling结构定义：
 
-    ```
+    ```cpp
     namespace optiling {
-    BEGIN_TILING_DATA_DEF(MyAddTilingData)  // 声明tiling结构名字
-      TILING_DATA_FIELD_DEF_STRUCT(TCubeTiling, cubeTilingData);   // 引用高阶API的tiling结构体
-      TILING_DATA_FIELD_DEF(uint32_t, field);   // 结构成员的引用结构体
+    BEGIN_TILING_DATA_DEF(MyAddTilingData)                     // 声明tiling结构名字
+    TILING_DATA_FIELD_DEF_STRUCT(TCubeTiling, cubeTilingData); // 引用高阶API的tiling结构体
+    TILING_DATA_FIELD_DEF(uint32_t, field);                    // 结构成员的引用结构体
     END_TILING_DATA_DEF;
-    REGISTER_TILING_DATA_CLASS(MyAdd, MyAddTilingData)  // tiling结构注册给算子
-    }
+    REGISTER_TILING_DATA_CLASS(MyAdd, MyAddTilingData) // tiling结构注册给算子
+    } // namespace optiling
     ```
 
 2.  通过高阶API配套的tiling函数对tiling结构初始化：
 
-    ```
-    static ge::graphStatus TilingFunc(gert::TilingContext* context) {
+    ```cpp
+    static ge::graphStatus TilingFunc(gert::TilingContext* context)
+    {
         int32_t M = 1024;
         int32_t N = 640;
         int32_t K = 256;
@@ -34,7 +35,7 @@
         cubeTiling.SetBias(true);
         cubeTiling.SetBufferSpace(-1, -1, -1);
         MyAddTilingData tiling;
-        if (cubeTiling.GetTiling(tiling.cubeTilingData) == -1){
+        if (cubeTiling.GetTiling(tiling.cubeTilingData) == -1) {
             return ge::GRAPH_FAILED;
         }
         // some code

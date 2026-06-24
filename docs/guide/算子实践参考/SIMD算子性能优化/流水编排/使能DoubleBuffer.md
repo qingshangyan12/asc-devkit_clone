@@ -18,7 +18,7 @@
 
 总体来说，DoubleBuffer是基于MTE指令队列与Vector指令队列的独立性和可并行性，通过将数据搬运与Vector计算并行执行以隐藏大部分的数据搬运时间，并降低Vector指令的等待时间，最终提高Vector单元的利用效率。通过为队列申请内存时设置内存块的个数为2，开启DoubleBuffer，实现数据并行，简单代码示例如下：
 
-```
+```text
 pipe.InitBuffer(inQueueX, 2, 256);
 ```
 
@@ -39,18 +39,18 @@ pipe.InitBuffer(inQueueX, 2, 256);
 
 【反例】
 
-```
+```cpp
 __aicore__ inline void Init(__gm__ uint8_t* src0Gm, __gm__ uint8_t* src1Gm, __gm__ uint8_t* dstGm)
 {
     src0Global.SetGlobalBuffer((__gm__ half*)src0Gm);
     src1Global.SetGlobalBuffer((__gm__ half*)src1Gm);
     dstGlobal.SetGlobalBuffer((__gm__ half*)dstGm);
     // 不开启DoubleBuffer,占用的物理空间是1 * sizeSrc0 * sizeof(half)
-    // 3个InitBuffer执行后总空间为1 * (sizeSrc0 * sizeof(half) + sizeSrc1 * sizeof(half) + sizeDst0 * sizeof(half)) 
+    // 3个InitBuffer执行后总空间为1 * (sizeSrc0 * sizeof(half) + sizeSrc1 * sizeof(half) + sizeDst0 * sizeof(half))
     pipe.InitBuffer(inQueueSrc0, 1, sizeSrc0 * sizeof(half));
     pipe.InitBuffer(inQueueSrc1, 1, sizeSrc1 * sizeof(half));
     pipe.InitBuffer(outQueueDst, 1, sizeDst0 * sizeof(half));
-    }
+}
 __aicore__ inline void Process()
 {
     // 需要round*2次循环才能处理完数据
@@ -64,18 +64,18 @@ __aicore__ inline void Process()
 
 【正例】
 
-```
+```cpp
 __aicore__ inline void Init(__gm__ uint8_t* src0Gm, __gm__ uint8_t* src1Gm, __gm__ uint8_t* dstGm)
 {
     src0Global.SetGlobalBuffer((__gm__ half*)src0Gm);
     src1Global.SetGlobalBuffer((__gm__ half*)src1Gm);
     dstGlobal.SetGlobalBuffer((__gm__ half*)dstGm);
     // InitBuffer中使用2表示开启DoubleBuffer,占用的物理空间是2 * sizeSrc0 * sizeof(half)
-    // 3个InitBuffer执行后总空间为2 * (sizeSrc0 * sizeof(half) + sizeSrc1 * sizeof(half) + sizeDst0 * sizeof(half)) 
+    // 3个InitBuffer执行后总空间为2 * (sizeSrc0 * sizeof(half) + sizeSrc1 * sizeof(half) + sizeDst0 * sizeof(half))
     pipe.InitBuffer(inQueueSrc0, 2, sizeSrc0 * sizeof(half));
     pipe.InitBuffer(inQueueSrc1, 2, sizeSrc1 * sizeof(half));
     pipe.InitBuffer(outQueueDst, 2, sizeDst0 * sizeof(half));
-    }
+}
 __aicore__ inline void Process()
 {
     // 开启DoubleBuffer的前提是循环次数 >= 2

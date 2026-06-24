@@ -20,30 +20,30 @@ workspace是设备侧Global Memory上的一块内存。workspace内存分为两�
 
     在tiling函数中先通过GetWorkspaceSizes接口获取workspace大小的存放位置，再设置workspace的大小，框架侧会为其申请对应大小的设备侧Global Memory，在对应的算子kernel侧实现时可以使用这块workspace内存。在使用[Matmul Kernel侧接口](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/Matmul-Kernel侧接口.md)等需要系统workspace的高阶API时，设置的workspace空间大小为系统workspace和用户workspace之和。
 
-    ```
+    ```cpp
     // 用户自定义的tiling函数
     static ge::graphStatus TilingFunc(gert::TilingContext* context)
     {
         AddApiTiling tiling;
-        ...
-        size_t usrSize = 256; // 设置用户需要使用的workspace大小为256字节。
+        ... size_t usrSize = 256; // 设置用户需要使用的workspace大小为256字节。
         // 如需要使用系统workspace需要调用GetLibApiWorkSpaceSize获取系统workspace的大小。
         auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
         uint32_t sysWorkspaceSize = ascendcPlatform.GetLibApiWorkSpaceSize();
-        size_t *currentWorkspace = context->GetWorkspaceSizes(1); // 通过框架获取workspace的指针，GetWorkspaceSizes入参为所需workspace的块数。当前限制使用一块。
-        currentWorkspace[0] = usrSize + sysWorkspaceSize; // 设置总的workspace的数值大小，总的workspace空间由框架来申请并管理。
+        size_t* currentWorkspace = context->GetWorkspaceSizes(
+            1); // 通过框架获取workspace的指针，GetWorkspaceSizes入参为所需workspace的块数。当前限制使用一块。
+        currentWorkspace[0] =
+            usrSize + sysWorkspaceSize; // 设置总的workspace的数值大小，总的workspace空间由框架来申请并管理。
         ...
     }
     ```
 
     在device侧kernel入口处的workspace为用户的workspace指针：
 
-    ```
+    ```cpp
     // 用户写的Kernel函数，核函数必须包括GM_ADDR workspace入参，位置需要放在tiling之前
     extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling)
     {
         ...
-        
     }
     ```
 

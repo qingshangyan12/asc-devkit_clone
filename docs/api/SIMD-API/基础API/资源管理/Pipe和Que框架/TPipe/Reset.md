@@ -65,7 +65,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline void Reset()
 ```
 
@@ -79,15 +79,15 @@ __aicore__ inline void Reset()
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
-AscendC::TPipe pipe; // Pipe内存管理对象
+```cpp
+AscendC::TPipe pipe;                              // Pipe内存管理对象
 AscendC::TQue<AscendC::TPosition::VECOUT, 1> que; // 输出数据Queue队列管理对象，TPosition为VECOUT
 uint8_t num = 1;
 uint32_t len = 192 * 1024;
 for (int i = 0; i < 2; i++) {
     pipe.InitBuffer(que, num, len);
     ... // process
-    pipe.Reset();
+        pipe.Reset();
 }
 ```
 

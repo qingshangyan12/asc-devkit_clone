@@ -53,7 +53,7 @@ LocalMemAllocator构造函数。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <Hardware hard>
 __aicore__ inline LocalMemAllocator<hard>::LocalMemAllocator()
 ```

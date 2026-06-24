@@ -9,8 +9,10 @@ kernel侧CumSum接口的计算需要开发者预留/申请临时空间，本接�
 
 ## 函数原型
 
-```
-void GetCumSumMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isLastAxis, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+```cpp
+void GetCumSumMaxMinTmpSize(
+    const ge::Shape& srcShape, const uint32_t typeSize, const bool isLastAxis, const bool isReuseSource,
+    uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -37,7 +39,7 @@ void GetCumSumMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, 
 
 ## 调用示例
 
-```
+```cpp
 // 输入shape为32*32的矩阵；算子输入的数据类型为half；isLastAxis传入默认值true，isReuseSource传入默认值false
 uint32_t firstDim = 32;
 uint32_t lastDim = 32;

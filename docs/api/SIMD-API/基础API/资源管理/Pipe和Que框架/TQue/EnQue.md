@@ -65,7 +65,7 @@
 
 -   无需指定源和目的位置
 
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline bool EnQue(const LocalTensor<T>& tensor)
     ```
@@ -74,7 +74,7 @@
 
     通过[TQueBind](../TQueBind/TQueBind.md)绑定VECIN和VECOUT可实现VECIN和VECOUT内存复用，如下接口用于存在Vector计算的场景下实现复用，在入队时需要指定源和目的位置；不存在Vector计算的场景下可直接调用bool EnQue\(LocalTensor<T\>& tensor\)入队接口。
 
-    ```
+    ```cpp
     template <TPosition srcUserPos, TPosition dstUserPos, typename T>
     __aicore__ inline bool EnQue(const LocalTensor<T>& tensor)
     ```
@@ -140,7 +140,7 @@
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 // 接口: EnQue Tensor
 AscendC::TPipe pipe;
 AscendC::TQue<AscendC::TPosition::VECOUT, 4> que;
@@ -148,7 +148,7 @@ int num = 4;
 int len = 1024;
 pipe.InitBuffer(que, num, len);
 AscendC::LocalTensor<half> tensor1 = que.AllocTensor<half>();
-que.EnQue(tensor1);// 将tensor加入VECOUT的Queue中
+que.EnQue(tensor1); // 将tensor加入VECOUT的Queue中
 // 接口：EnQue指定特定的src/dst position，加入相应的队列
 // template <TPosition srcUserPos, TPosition dstUserPos> bool EnQue(LocalTensor<T>& tensor)
 AscendC::TPipe pipe;
@@ -157,5 +157,5 @@ int num = 4;
 int len = 1024;
 pipe.InitBuffer(que, num, len);
 AscendC::LocalTensor<half> tensor1 = que.AllocTensor<half>();
-que.EnQue<AscendC::TPosition::GM, AscendC::TPosition::VECIN, half>(tensor1);// 将tensor加入VECIN的Queue中，实现内存复用
+que.EnQue<AscendC::TPosition::GM, AscendC::TPosition::VECIN, half>(tensor1); // 将tensor加入VECIN的Queue中，实现内存复用
 ```

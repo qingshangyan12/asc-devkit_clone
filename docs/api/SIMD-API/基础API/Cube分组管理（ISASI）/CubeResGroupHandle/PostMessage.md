@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="section765814724715"></a>
 
-```
+```cpp
 template <PipeMode pipeMode = PipeMode::SCALAR_MODE>
 __aicore__ inline uint16_t PostMessage(__gm__ CubeMsgType* msg, CubeMsgType& msgInput)
 ```
@@ -120,10 +120,10 @@ __aicore__ inline uint16_t PostMessage(__gm__ CubeMsgType* msg, CubeMsgType& msg
 
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 
-```
-handle.AssignQueue(queIdx);  
-auto msgPtr = handle.AllocMessage();        // 获取消息空间指针msgPtr
+```cpp
+handle.AssignQueue(queIdx);
+auto msgPtr = handle.AllocMessage(); // 获取消息空间指针msgPtr
 AscendC::CubeGroupMsgHead headA = {AscendC::CubeMsgState::VALID, 0};
 AscendC::CubeMsgBody msgA = {headA, 1, 0, 0, false, false, false, false, 0, 0, 0, 0, 0, 0, 0, 0};
-auto offset = handle.PostMessage(msgPtr, msgA);           // 在msgPtr指针位置，填充用户自定义的消息结构体，并发送
+auto offset = handle.PostMessage(msgPtr, msgA); // 在msgPtr指针位置，填充用户自定义的消息结构体，并发送
 ```

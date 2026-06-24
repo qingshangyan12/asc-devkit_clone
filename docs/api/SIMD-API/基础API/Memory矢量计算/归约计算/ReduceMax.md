@@ -32,7 +32,9 @@
 
     ```cpp
     template <typename T>
-    __aicore__ inline void ReduceMax(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t count, bool calIndex = 0)
+    __aicore__ inline void ReduceMax(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t count,
+        bool calIndex = 0)
     ```
 
 - tensor高维切分计算：
@@ -40,14 +42,18 @@
 
         ```cpp
         template <typename T>
-        __aicore__ inline void ReduceMax(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime, const int32_t srcRepStride, bool calIndex = 0)
+        __aicore__ inline void ReduceMax(
+            const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const uint64_t mask[],
+            const int32_t repeatTime, const int32_t srcRepStride, bool calIndex = 0)
         ```
 
     - `mask`连续模式：
 
         ```cpp
         template <typename T>
-        __aicore__ inline void ReduceMax(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t mask, const int32_t repeatTime, const int32_t srcRepStride, bool calIndex = 0)
+        __aicore__ inline void ReduceMax(
+            const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t mask,
+            const int32_t repeatTime, const int32_t srcRepStride, bool calIndex = 0)
         ```
 
 ## 参数说明
@@ -136,28 +142,38 @@
     - 无需返回最大值索引：
 
         ```cpp
-        int firstMaxRepeat = repeatTime; // 对于tensor高维切分计算接口，firstMaxRepeat就是repeatTime；对于tensor前n个数据计算接口，firstMaxRepeat为count/elementsPerRepeat
-        int iter1OutputCount = firstMaxRepeat * 2; // 第一轮操作产生的元素个数，无论开发者是否需要返回索引，底层指令都会返回索引，所以这里要为索引预留空间，产生的元素个数为repeat次数*2
-        int iter1AlignEnd = DivCeil(iter1OutputCount, elementsPerBlock) * elementsPerBlock; // 第一轮产生的元素个数按照datablock(32字节)向上对齐
-        int finalWorkLocalNeedSize = iter1AlignEnd; // 第一轮计算完成后，后续可能还需要多轮迭代，但是可以复用同一块空间，所以第一轮计算所需的空间就是最终sharedTmpBuffer所需的空间大小
+        int firstMaxRepeat =
+            repeatTime; // 对于tensor高维切分计算接口，firstMaxRepeat就是repeatTime；对于tensor前n个数据计算接口，firstMaxRepeat为count/elementsPerRepeat
+        int iter1OutputCount =
+            firstMaxRepeat *
+            2; // 第一轮操作产生的元素个数，无论开发者是否需要返回索引，底层指令都会返回索引，所以这里要为索引预留空间，产生的元素个数为repeat次数*2
+        int iter1AlignEnd =
+            DivCeil(iter1OutputCount, elementsPerBlock) * elementsPerBlock; // 第一轮产生的元素个数按照datablock(32字节)向上对齐
+        int finalWorkLocalNeedSize =
+            iter1AlignEnd; // 第一轮计算完成后，后续可能还需要多轮迭代，但是可以复用同一块空间，所以第一轮计算所需的空间就是最终sharedTmpBuffer所需的空间大小
         ```
 
     - 需要返回最大值索引：
 
         ```cpp
-        int firstMaxRepeat = repeatTime; 
+        int firstMaxRepeat = repeatTime;
         // 对于tensor高维切分计算接口，firstMaxRepeat就是repeatTime；对于tensor前n个数据计算接口，firstMaxRepeat为count/elementsPerRepeat
-        int iter1OutputCount = firstMaxRepeat * 2;                                            // 第一轮操作产生的元素个数
-        int iter2AlignStart = RoundUp(iter1OutputCount, elementsPerBlock) * elementsPerBlock; // 第二轮操作起始位置偏移，即第一轮产生的元素个数按照datablock(32字节)向上对齐的结果
+        int iter1OutputCount = firstMaxRepeat * 2; // 第一轮操作产生的元素个数
+        int iter2AlignStart =
+            RoundUp(iter1OutputCount, elementsPerBlock) *
+            elementsPerBlock; // 第二轮操作起始位置偏移，即第一轮产生的元素个数按照datablock(32字节)向上对齐的结果
         // 第一轮计算完成后，后续可能还需要多轮迭代，此时不可以复用同一块空间，因为第一轮的中间结果索引还需要再进行使用，所以需要继续准备后续轮次的空间
-        int iter2OutputCount = RoundUp(iter1OutputCount, elementsPerRepeat) * 2;              // 第二轮操作产生的元素个数
-        int iter2AlignEnd = RoundUp(iter2OutputCount, elementsPerBlock) * elementsPerBlock;   // 第二轮产生的元素个数按照datablock(32字节)向上对齐的结果
-        int finalWorkLocalNeedSize = iter2AlignStart + iter2AlignEnd;                         // 第二轮结束即可获取最大值和索引时，最终sharedTmpBuffer所需的空间大小
-        if (iter2OutputCount > 2) {                                                           // 第二轮操作产生的元素个数大于2时，需要继续进行第三轮操作
-            int iter3AlignStart = iter2AlignEnd;                                              // 第三轮操作相对第二轮输出空间的起始位置偏移
-            int iter3OutputCount = RoundUp(iter2OutputCount, elementsPerRepeat) * 2;          // 第三轮操作产生的元素个数
-            int iter3AlignEnd = RoundUp(iter3OutputCount, elementsPerBlock) * elementsPerBlock; // 第三轮产生的元素个数按照datablock(32字节)向上对齐的结果
-            finalWorkLocalNeedSize = iter2AlignStart + iter3AlignStart + iter3AlignEnd;       // 最终sharedTmpBuffer所需的空间大小
+        int iter2OutputCount = RoundUp(iter1OutputCount, elementsPerRepeat) * 2; // 第二轮操作产生的元素个数
+        int iter2AlignEnd = RoundUp(iter2OutputCount, elementsPerBlock) *
+                            elementsPerBlock; // 第二轮产生的元素个数按照datablock(32字节)向上对齐的结果
+        int finalWorkLocalNeedSize =
+            iter2AlignStart + iter2AlignEnd; // 第二轮结束即可获取最大值和索引时，最终sharedTmpBuffer所需的空间大小
+        if (iter2OutputCount > 2) { // 第二轮操作产生的元素个数大于2时，需要继续进行第三轮操作
+            int iter3AlignStart = iter2AlignEnd; // 第三轮操作相对第二轮输出空间的起始位置偏移
+            int iter3OutputCount = RoundUp(iter2OutputCount, elementsPerRepeat) * 2; // 第三轮操作产生的元素个数
+            int iter3AlignEnd = RoundUp(iter3OutputCount, elementsPerBlock) *
+                                elementsPerBlock; // 第三轮产生的元素个数按照datablock(32字节)向上对齐的结果
+            finalWorkLocalNeedSize = iter2AlignStart + iter3AlignStart + iter3AlignEnd; // 最终sharedTmpBuffer所需的空间大小
         }
         ```
 
@@ -182,7 +198,7 @@
 
     ```cpp
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，需要索引值，使用tensor高维切分计算接口，设定repeatTime为65,mask为全部元素参与计算
-    uint64_t mask[2] = { 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF };
+    uint64_t mask[2] = {0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF};
     AscendC::ReduceMax<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, 65, 8, true);
     ```
 
@@ -197,42 +213,46 @@
 
     ```cpp
     // ReduceMax接口sharedTmpBuffer计算示例一：
-    // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,使用tensor高维切分计算接口, repeatTime为65, mask为128,需要索引值
-    // tensor高维切分计算接口调用示例为：
+    // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,使用tensor高维切分计算接口,
+    // repeatTime为65, mask为128,需要索引值 tensor高维切分计算接口调用示例为：
     AscendC::ReduceMax<half>(dstLocal, srcLocal, sharedTmpBuffer, 128, 65, 8, true);
     // 此时sharedTmpBuffer所需的最小空间计算过程为：
-    int RoundUp(int a, int b)
-    {
-        return (a + b - 1) / b;
-    }
+    int RoundUp(int a, int b) { return (a + b - 1) / b; }
     int typeSize = 2;
     int elementsPerBlock = 32 / typeSize = 16;
     int elementsPerRepeat = 256 / typeSize = 128;
     int firstMaxRepeat = repeatTime;
-    int iter1OutputCount = firstMaxRepeat * 2 = 130;                                          // 第一轮操作产生的元素个数
-    int iter2AlignStart = RoundUp(iter1OutputCount, elementsPerBlock)*elementsPerBlock = 144; // 对第一轮操作输出个数向上取整
-    int iter2OutputCount = RoundUp(iter1OutputCount, elementsPerRepeat)*2 = 4;                // 第二轮操作产生的元素个数
-    int iter3AlignStart = RoundUp(iter2OutputCount, elementsPerBlock)*elementsPerBlock = 16;  // 对第二轮操作输出个数向上取整
-    int iter3OutputCount = RoundUp(iter2OutputCount, elementsPerRepeat)*2 = 2;                // 第三轮操作产生的元素个数
-    int iter3AlignEnd = RoundUp(iter3OutputCount, elementsPerBlock) * elementsPerBlock = 16;  // 第三轮产生的元素个数做向上取整
-    // 最终sharedTmpBuffer所需的最小空间为iter2AlignStart + iter3AlignStart + iter3AlignEnd = 144 + 16 + 16 = 176 ,也就是352Bytes
+    int iter1OutputCount = firstMaxRepeat* 2 = 130; // 第一轮操作产生的元素个数
+    int iter2AlignStart = RoundUp(iter1OutputCount, elementsPerBlock)* elementsPerBlock =
+        144; // 对第一轮操作输出个数向上取整
+    int iter2OutputCount = RoundUp(iter1OutputCount, elementsPerRepeat)* 2 = 4; // 第二轮操作产生的元素个数
+    int iter3AlignStart = RoundUp(iter2OutputCount, elementsPerBlock)* elementsPerBlock =
+        16; // 对第二轮操作输出个数向上取整
+    int iter3OutputCount = RoundUp(iter2OutputCount, elementsPerRepeat)* 2 = 2; // 第三轮操作产生的元素个数
+    int iter3AlignEnd = RoundUp(iter3OutputCount, elementsPerBlock)* elementsPerBlock =
+        16; // 第三轮产生的元素个数做向上取整
+    // 最终sharedTmpBuffer所需的最小空间为iter2AlignStart + iter3AlignStart +
+    // iter3AlignEnd = 144 + 16 + 16 = 176 ,也就是352Bytes
     // ReduceMax接口sharedTmpBuffer计算示例二：
-    // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为32640,使用tensor高维切分计算接口,repeatTime为255, mask为128,需要索引值
-    // tensor高维切分计算接口调用示例为：
+    // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为32640,使用tensor高维切分计算接口,repeatTime为255,
+    // mask为128,需要索引值 tensor高维切分计算接口调用示例为：
     AscendC::ReduceMax<half>(dstLocal, srcLocal, sharedTmpBuffer, 128, 255, 8, true);
     // 此时sharedTmpBuffer所需的最小空间计算过程为：
     int typeSize = 2;
     int elementsPerBlock = 32 / typeSize = 16;
     int elementsPerRepeat = 256 / typeSize = 128;
     int firstMaxRepeat = repeatTime;
-    int iter1OutputCount = firstMaxRepeat * 2 = 510;                                          // 第一轮操作产生的元素个数
-    int iter2AlignStart = RoundUp(iter1OutputCount, elementsPerBlock)*elementsPerBlock = 512; // 对第一轮操作输出个数向上取整
-    int iter2OutputCount = RoundUp(iter1OutputCount, elementsPerRepeat)*2 = 8;                // 第二轮操作产生的元素个数
-    int iter3AlignStart = RoundUp(iter2OutputCount, elementsPerBlock)*elementsPerBlock = 16;  // 对第二轮操作输出个数向上取整
-    int iter3OutputCount = RoundUp(iter2OutputCount, elementsPerRepeat)*2 = 2;                // 第三轮操作产生的元素个数
-    int iter3AlignEnd = RoundUp(iter3OutputCount, elementsPerBlock) * elementsPerBlock = 16;  // 第三轮产生的元素个数做向上取整
-    // 需要的空间为iter2AlignStart + iter3AlignStart + iter3AlignEnd = 512 + 16 + 16 = 544 ,也就是1088Bytes
-    // ReduceMax接口sharedTmpBuffer计算示例三：
+    int iter1OutputCount = firstMaxRepeat* 2 = 510; // 第一轮操作产生的元素个数
+    int iter2AlignStart = RoundUp(iter1OutputCount, elementsPerBlock)* elementsPerBlock =
+        512; // 对第一轮操作输出个数向上取整
+    int iter2OutputCount = RoundUp(iter1OutputCount, elementsPerRepeat)* 2 = 8; // 第二轮操作产生的元素个数
+    int iter3AlignStart = RoundUp(iter2OutputCount, elementsPerBlock)* elementsPerBlock =
+        16; // 对第二轮操作输出个数向上取整
+    int iter3OutputCount = RoundUp(iter2OutputCount, elementsPerRepeat)* 2 = 2; // 第三轮操作产生的元素个数
+    int iter3AlignEnd = RoundUp(iter3OutputCount, elementsPerBlock)* elementsPerBlock =
+        16; // 第三轮产生的元素个数做向上取整
+    // 需要的空间为iter2AlignStart + iter3AlignStart + iter3AlignEnd = 512 + 16 + 16
+    // = 544 ,也就是1088Bytes ReduceMax接口sharedTmpBuffer计算示例三：
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为65408,使用tensor前n个数据计算接口,count=65408,需要索引值
     // tensor前n个数据计算接口调用示例为：
     AscendC::ReduceMax<half>(dstLocal, srcLocal, sharedTmpBuffer, 65408, true);
@@ -241,27 +261,32 @@
     int elementsPerBlock = 32 / typeSize = 16;
     int elementsPerRepeat = 256 / typeSize = 128;
     int firstMaxRepeat = count / elementsPerRepeat = 511;
-    int iter1OutputCount = firstMaxRepeat * 2 = 1022;                                          // 第一轮操作产生的元素个数
-    int iter2AlignStart = RoundUp(iter1OutputCount, elementsPerBlock)*elementsPerBlock = 1024; // 对iter1OutputCount输出个数向上取整
-    int iter2OutputCount = RoundUp(iter1OutputCount, elementsPerRepeat)*2 = 16;                // 第二轮操作产生的元素个数
-    int iter3AlignStart = RoundUp(iter2OutputCount, elementsPerBlock)*elementsPerBlock = 16;   // 对iter2OutputCount输出个数向上取整
-    int iter3OutputCount = RoundUp(iter2OutputCount, elementsPerRepeat)*2 = 2;                 // 第三轮操作产生的元素个数
-    int iter3AlignEnd = RoundUp(iter3OutputCount, elementsPerBlock) * elementsPerBlock = 16;   // 第三轮产生的元素个数做向上取整
-    // 需要的空间为iter2AlignStart + iter3AlignStart + iter3AlignEnd = 1024 + 16 + 16 = 1056,也就是2112Bytes
-    // ReduceMax接口sharedTmpBuffer计算示例四：
-    // dstLocal,srcLocal和sharedTmpBuffer均为half类型，srcLocal的的计算数据量为512，使用tensor高维切分计算接口,repeatTime为4, mask为128,需要索引值
-    // tensor高维切分计算接口调用示例为：
+    int iter1OutputCount = firstMaxRepeat* 2 = 1022; // 第一轮操作产生的元素个数
+    int iter2AlignStart = RoundUp(iter1OutputCount, elementsPerBlock)* elementsPerBlock =
+        1024; // 对iter1OutputCount输出个数向上取整
+    int iter2OutputCount = RoundUp(iter1OutputCount, elementsPerRepeat)* 2 = 16; // 第二轮操作产生的元素个数
+    int iter3AlignStart = RoundUp(iter2OutputCount, elementsPerBlock)* elementsPerBlock =
+        16; // 对iter2OutputCount输出个数向上取整
+    int iter3OutputCount = RoundUp(iter2OutputCount, elementsPerRepeat)* 2 = 2; // 第三轮操作产生的元素个数
+    int iter3AlignEnd = RoundUp(iter3OutputCount, elementsPerBlock)* elementsPerBlock =
+        16; // 第三轮产生的元素个数做向上取整
+    // 需要的空间为iter2AlignStart + iter3AlignStart + iter3AlignEnd = 1024 + 16 +
+    // 16 = 1056,也就是2112Bytes ReduceMax接口sharedTmpBuffer计算示例四：
+    // dstLocal,srcLocal和sharedTmpBuffer均为half类型，srcLocal的的计算数据量为512，使用tensor高维切分计算接口,repeatTime为4,
+    // mask为128,需要索引值 tensor高维切分计算接口调用示例为：
     AscendC::ReduceMax<half>(dstLocal, srcLocal, sharedTmpBuffer, 128, 4, 8, true);
     // 此时sharedTmpBuffer所需的最小空间计算过程为：
     int typeSize = 2;
     int elementsPerBlock = 32 / typeSize = 16;
     int elementsPerRepeat = 256 / typeSize = 128;
     int firstMaxRepeat = repeatTime;
-    int iter1OutputCount = firstMaxRepeat * 2 = 8;                                           // 第一轮操作产生的元素个数
-    int iter2AlignStart = RoundUp(iter1OutputCount, elementsPerBlock)*elementsPerBlock = 16; // 对iter1OutputCount输出个数向上取整
-    int iter2OutputCount = RoundUp(iter1OutputCount, elementsPerRepeat)*2 = 2;               // 第二轮操作产生的元素个数
-    // 本用例中，由于第二轮操作产生的元素个数为2，即第二轮结束就可以拿到最大值和其索引值，因此需要的空间为iter2AlignStart + RoundUp(iter2OutputCount, elementsPerBlock) * elementsPerBlock = 16 + 16 = 32，也就是64Bytes
-    // ReduceMax接口sharedTmpBuffer计算示例五：
+    int iter1OutputCount = firstMaxRepeat* 2 = 8; // 第一轮操作产生的元素个数
+    int iter2AlignStart = RoundUp(iter1OutputCount, elementsPerBlock)* elementsPerBlock =
+        16; // 对iter1OutputCount输出个数向上取整
+    int iter2OutputCount = RoundUp(iter1OutputCount, elementsPerRepeat)* 2 = 2; // 第二轮操作产生的元素个数
+    // 本用例中，由于第二轮操作产生的元素个数为2，即第二轮结束就可以拿到最大值和其索引值，因此需要的空间为iter2AlignStart
+    // + RoundUp(iter2OutputCount, elementsPerBlock) * elementsPerBlock = 16 + 16 =
+    // 32，也就是64Bytes ReduceMax接口sharedTmpBuffer计算示例五：
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量count为65408,使用tensor前n个数据计算接口,count=65408，不需要索引值
     // tensor前n个数据计算接口调用示例为：
     AscendC::ReduceMax<half>(dstLocal, srcLocal, sharedTmpBuffer, 65408, false);
@@ -270,25 +295,29 @@
     int elementsPerBlock = 32 / typeSize = 16;
     int elementsPerRepeat = 256 / typeSize = 128;
     int firstMaxRepeat = count / elementsPerRepeat = 511;
-    int iter1OutputCount = firstMaxRepeat * 2 = 1022;                                          // 第一轮操作产生的元素个数
-    int iter1AlignEnd = RoundUp(iter1OutputCount, elementsPerBlock) * elementsPerBlock = 1024; // 第一轮产生的元素个数做向上取整
+    int iter1OutputCount = firstMaxRepeat* 2 = 1022; // 第一轮操作产生的元素个数
+    int iter1AlignEnd = RoundUp(iter1OutputCount, elementsPerBlock)* elementsPerBlock =
+        1024; // 第一轮产生的元素个数做向上取整
     // 由于calIndex为false,因此最终sharedTmpBuffer所需的最小空间大小就是对第一轮产生元素做向上取整后的结果，此处就是1024，也就是2048Bytes
     // ReduceMax接口sharedTmpBuffer计算示例六：
-    // dstLocal,srcLocal和sharedTmpBuffer均为float类型,srcLocal的计算数据量为8320,使用tensor高维切分计算接口, repeatTime为130, mask为64,需要索引值
-    // tensor高维切分计算接口调用示例为：
+    // dstLocal,srcLocal和sharedTmpBuffer均为float类型,srcLocal的计算数据量为8320,使用tensor高维切分计算接口,
+    // repeatTime为130, mask为64,需要索引值 tensor高维切分计算接口调用示例为：
     AscendC::ReduceMax<float>(dstLocal, srcLocal, sharedTmpBuffer, 64, 130, 8, true);
     // 此时sharedTmpBuffer所需的最小空间计算过程为：
     int typeSize = 4;
     int elementsPerBlock = 32 / typeSize = 8;
     int elementsPerRepeat = 256 / typeSize = 64;
     int firstMaxRepeat = repeatTime;
-    int iter1OutputCount = firstMaxRepeat * 2 = 260;                                          // 第一轮操作产生的元素个数
-    int iter2AlignStart = RoundUp(iter1OutputCount, elementsPerBlock)*elementsPerBlock = 264; // 对第一轮操作输出个数向上取整
-    int iter2OutputCount = RoundUp(iter1OutputCount, elementsPerRepeat)*2 = 10;               // 第二轮操作产生的元素个数
-    int iter3AlignStart = RoundUp(iter2OutputCount, elementsPerBlock)*elementsPerBlock = 16;  // 对第二轮操作输出个数向上取整
-    int iter3OutputCount = RoundUp(iter2OutputCount, elementsPerRepeat)*2 = 2;                // 第三轮操作产生的元素个数
-    int iter3AlignEnd = RoundUp(iter3OutputCount, elementsPerBlock) * elementsPerBlock = 8;   // 第三轮产生的元素个数做向上取整
-    // 最终sharedTmpBuffer所需的最小空间就是iter2AlignStart + iter3AlignStart + iter3AlignEnd = 264 + 16 + 8 = 288,也就是1152Bytes
+    int iter1OutputCount = firstMaxRepeat* 2 = 260; // 第一轮操作产生的元素个数
+    int iter2AlignStart = RoundUp(iter1OutputCount, elementsPerBlock)* elementsPerBlock =
+        264; // 对第一轮操作输出个数向上取整
+    int iter2OutputCount = RoundUp(iter1OutputCount, elementsPerRepeat)* 2 = 10; // 第二轮操作产生的元素个数
+    int iter3AlignStart = RoundUp(iter2OutputCount, elementsPerBlock)* elementsPerBlock =
+        16; // 对第二轮操作输出个数向上取整
+    int iter3OutputCount = RoundUp(iter2OutputCount, elementsPerRepeat)* 2 = 2; // 第三轮操作产生的元素个数
+    int iter3AlignEnd = RoundUp(iter3OutputCount, elementsPerBlock)* elementsPerBlock = 8; // 第三轮产生的元素个数做向上取整
+    // 最终sharedTmpBuffer所需的最小空间就是iter2AlignStart + iter3AlignStart +
+    // iter3AlignEnd = 264 + 16 + 8 = 288,也就是1152Bytes
     ```
 
 - <a name="li7962161711114"></a>tensor高维切分计算接口完整示例：

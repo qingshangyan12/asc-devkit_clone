@@ -61,16 +61,20 @@
 
 -   src0为srcTensor（tensor类型），src1为srcScalar（scalar类型）
 
-    ```
+    ```cpp
     template <typename T, typename U, bool isReuseMask = true>
-    __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<T>& src0, T src1, const LocalTensor<U>& mask, const LocalTensor<uint8_t>& sharedTmpBuffer, const SelectWithBytesMaskShapeInfo& info)
+    __aicore__ inline void Select(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src0, T src1, const LocalTensor<U>& mask,
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const SelectWithBytesMaskShapeInfo& info)
     ```
 
 -   src0为srcScalar（scalar类型），src1为srcTensor（tensor类型）
 
-    ```
+    ```cpp
     template <typename T, typename U, bool isReuseMask = true>
-    __aicore__ inline void Select(const LocalTensor<T>& dst, T src0, const LocalTensor<T>& src1, const LocalTensor<U>& mask, const LocalTensor<uint8_t>& sharedTmpBuffer, const SelectWithBytesMaskShapeInfo& info)
+    __aicore__ inline void Select(
+        const LocalTensor<T>& dst, T src0, const LocalTensor<T>& src1, const LocalTensor<U>& mask,
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const SelectWithBytesMaskShapeInfo& info)
     ```
 
 该接口需要额外的临时空间来存储计算过程中的中间变量。临时空间需要开发者**申请并通过sharedTmpBuffer入参传入**。临时空间大小BufferSize的获取方式如下：通过[GetSelectMaxMinTmpSize](GetSelectMaxMinTmpSize.md)中提供的接口获取需要预留空间范围的大小。
@@ -96,7 +100,7 @@
 | sharedTmpBuffer | 输入 | 该API用于计算的临时空间，所需空间大小根据[GetSelectMaxMinTmpSize](GetSelectMaxMinTmpSize.md)获取。 |
 | info | 输入 | 描述SrcTensor和maskTensor的shape信息。SelectWithBytesMaskShapeInfo类型，定义如下方代码所示，其中参数的含义为：<br>firstAxis：srcLocal/maskTensor的前轴元素个数。<br>srcLastAxis：srcLocal的尾轴元素个数。<br>maskLastAxis：maskTensor的尾轴元素个数。<br>注意：<br>需要满足srcTensor和maskTensor的前轴元素个数相同，均为firstAxis。<br>需要满足firstAxis * srcLastAxis = srcTensor.GetSize()；firstAxis * maskLastAxis = maskTensor.GetSize()。<br>maskTensor尾轴的元素个数大于等于srcTensor尾轴的元素个数，计算时会丢弃maskTensor多余部分，不参与计算。 |
 
-```
+```cpp
 struct SelectWithBytesMaskShapeInfo {
     __aicore__ SelectShapeInfo() {};
     uint32_t firstAxis = 0;
@@ -119,7 +123,7 @@ struct SelectWithBytesMaskShapeInfo {
 
 完整示例可以参考[Select样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/04_advanced_api/07_filter/select)。
 
-```
+```cpp
 // dstLocal：结果数据
 // srcLocal1：输入张量
 // scalar：待比较标量
@@ -132,7 +136,7 @@ AscendC::Select(dstLocal, srcLocal1, scalar, maskLocal, tmpBuffer, info);
 
 结果示例如下：
 
-```
+```text
 输入数据srcLocal1:
 [-84.6    -24.38    30.97   -30.25    22.28   -92.56    90.44   -58.72  -86.56     5.74     6.754  -86.3    -96.7    -37.38   -81.9     46.9
  -99.4     94.2    -41.78   -60.3    -14.43    78.6      8.93   -65.2    79.94   -46.88     4.516   20.03   -25.56    24.73     0.3223  21.98

@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename Tp>
 struct is_reference;
 ```
@@ -42,16 +42,18 @@ is\_reference的静态常量成员value用于获取返回的布尔值，is\_refe
 
 ## 调用示例
 
-```
+```cpp
 // 自定义测试类型
-struct MyStruct{int val;};
+struct MyStruct {
+    int val;
+};
 // 函数类型
 using FuncType = void(int);
 
 // Legitimate reference type
 AscendC::printf("AscendC::Std::is_reference::value:%d\n", AscendC::Std::is_reference<int&>::value);
 AscendC::printf("AscendC::Std::is_reference::value:%d\n", AscendC::Std::is_reference<int&&>::value);
-AscendC::printf("AscendC::Std::is_reference::value:%d\n", AscendC::Std::is_reference<int(&)[5]>::value);
+AscendC::printf("AscendC::Std::is_reference::value:%d\n", AscendC::Std::is_reference<int (&)[5]>::value);
 AscendC::printf("AscendC::Std::is_reference::value:%d\n", AscendC::Std::is_reference<int*&>::value);
 AscendC::printf("AscendC::Std::is_reference::value:%d\n", AscendC::Std::is_reference<MyStruct&>::value);
 
@@ -70,21 +72,12 @@ AscendC::printf("AscendC::Std::is_reference::value:%d\n", AscendC::Std::is_refer
 AscendC::printf("AscendC::Std::is_reference::value:%d\n", AscendC::Std::is_reference<void>::value);
 ```
 
-```
+```cpp
 // 执行结果：
-AscendC::Std::is_reference::value:1
-AscendC::Std::is_reference::value:1
-AscendC::Std::is_reference::value:1
-AscendC::Std::is_reference::value:1
-AscendC::Std::is_reference::value:1
-AscendC::Std::is_reference::value:1
-AscendC::Std::is_reference::value:1
-AscendC::Std::is_reference::value:1
-AscendC::Std::is_reference::value:0
-AscendC::Std::is_reference::value:0
-AscendC::Std::is_reference::value:0
-AscendC::Std::is_reference::value:0
-AscendC::Std::is_reference::value:0
-AscendC::Std::is_reference::value:0
-AscendC::Std::is_reference::value:0
+AscendC::Std::is_reference::value : 1 AscendC::Std::is_reference::value : 1 AscendC::Std::is_reference::
+    value : 1 AscendC::Std::is_reference::value : 1 AscendC::Std::is_reference::value : 1 AscendC::Std::is_reference::
+        value : 1 AscendC::Std::is_reference::value : 1 AscendC::Std::is_reference::value : 1 AscendC::Std::
+            is_reference::value : 0 AscendC::Std::is_reference::value : 0 AscendC::Std::is_reference::
+                value : 0 AscendC::Std::is_reference::value : 0 AscendC::Std::is_reference::value : 0 AscendC::Std::
+                    is_reference::value : 0 AscendC::Std::is_reference::value : 0
 ```

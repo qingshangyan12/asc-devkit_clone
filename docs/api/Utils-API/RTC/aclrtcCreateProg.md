@@ -53,8 +53,10 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
-aclError aclrtcCreateProg(aclrtcProg *prog, const char *src, const char *name, int numHeaders, const char **headers, const char **includeNames)
+```cpp
+aclError aclrtcCreateProg(
+    aclrtcProg* prog, const char* src, const char* name, int numHeaders, const char** headers,
+    const char** includeNames)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -127,9 +129,9 @@ aclError为int类型变量，详细说明请参考[RTC错误码](RTC错误码.md
 
 ## 调用示例<a name="section837496171220"></a>
 
-```
+```cpp
 aclrtcProg prog;
-const char *src = R""""(
+const char* src = R""""(
 #include "kernel_operator.h"
 #include "my_const_a.h"
 #include "my_const_b.h"
@@ -156,7 +158,7 @@ const int MY_CONST_B = 50;
 )";
 
 const char* includeNameB = "my_const_b.h";
-const char* headersArray[] = { headerSrcA, headerSrcB };
-const char* includeNameArray[] = { includeNameA, includeNameB };
-aclError result = aclrtcCreateProg(&prog, src, "hello_world", 2,  headersArray,  includeNameArray);
+const char* headersArray[] = {headerSrcA, headerSrcB};
+const char* includeNameArray[] = {includeNameA, includeNameB};
+aclError result = aclrtcCreateProg(&prog, src, "hello_world", 2, headersArray, includeNameArray);
 ```

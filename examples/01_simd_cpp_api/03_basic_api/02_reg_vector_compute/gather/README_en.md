@@ -10,7 +10,7 @@ This example implements the functionality of collecting elements from a RegTenso
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── gather
 │   ├── scripts
 │   │   ├── gen_data.py                // Input data and ground truth generation script

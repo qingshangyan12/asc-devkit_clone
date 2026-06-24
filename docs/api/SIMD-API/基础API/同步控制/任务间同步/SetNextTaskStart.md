@@ -49,7 +49,7 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
     <cann-filter npu-type="9030"> Kirin 9030 </cann-filter>
 
     ```cpp
-    template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX>
+    template <pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX>
     __aicore__ inline void SetNextTaskStart()
     ```
 
@@ -66,7 +66,7 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
     <cann-filter npu-type="910"> Atlas 训练系列产品 </cann-filter>
 
     ```cpp
-    template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_MTE3>
+    template <pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_MTE3>
     __aicore__ inline void SetNextTaskStart()
     ```
 

@@ -133,8 +133,7 @@ __aicore__ inline void compute()
     // ...
 
     // 2. Enter register-level VF function domain via asc_vf_call.
-    asc_vf_call<add_vf>(dst_addr, src0_addr, src1_addr,
-                        one_repeat_size, repeat_times);
+    asc_vf_call<add_vf>(dst_addr, src0_addr, src1_addr, one_repeat_size, repeat_times);
 
     // 3. Finalize work.
     // ...
@@ -232,7 +231,8 @@ asc_add(dst_reg, src0_reg, src1_reg, mask_reg);
 当用作1bit元素参与运算时，支持vector_* 和vector_bool的混合计算以及vector_bool和vector_bool的计算
 
 ```cpp
-// Use vector_bool dst_mask_reg as x computation parameter with vector_* src0_vector_reg
+// Use vector_bool dst_mask_reg as x computation parameter with vector_*
+// src0_vector_reg
 asc_select(dst_mask_reg, src0_vector_reg, src1_vector_reg, mask_reg);
 
 // vector_bool src0_mask_reg, src1_mask_reg, dst_mask_reg作为参数计算
@@ -247,8 +247,8 @@ asc_and(dst_mask_reg, src0_mask_reg, src1_mask_reg, mask_reg);
 // Allocate address iteration register
 iter_reg a_reg;
 // Use as 2D offset accumulation for b32 elements
-for(uint16_t i = 0;i < extent1; i++){
-    for(uint16_t j = 0;j < extent2; j++){
+for (uint16_t i = 0; i < extent1; i++) {
+    for (uint16_t j = 0; j < extent2; j++) {
         a_reg = asc_create_iter_reg_b32(i, stride0, j, stride1);
         asc_loadalign(src_reg, src_addr, a_reg);
     }
@@ -259,7 +259,7 @@ for(uint16_t i = 0;i < extent1; i++){
 
 `vector_load_unalign`用于实现从UB非对齐地址连续搬入到矢量数据寄存器的临时缓存，首先通过`asc_loadunalign_pre`初始化，将包含非对齐的数据载入`vector_load_unalign`，然后调用`asc_loadunalign`搬运数据。具体的使用流程可以参考后续[特性描述](#section_part4)章节中对非对齐搬运的描述。
 
-```
+```text
 // Allocate load unalign register
 vector_load_unalign ureg0;
 
@@ -299,7 +299,8 @@ asc_storeunalign_post(dst_addr, ureg0, 0);
 显式同步通过asc_mem_bar实现：
 
 ```cpp
-// Insert source Store to destination Load synchronization when store and load UB addresses are the same
+// Insert source Store to destination Load synchronization when store and load
+// UB addresses are the same
 asc_store(ub_addr, vreg0);
 asc_mem_bar(VST_LD);
 asc_load(vreg1, ub_addr);
@@ -335,16 +336,14 @@ Reg矢量计算C API（在源码中以`asc_`为前缀，属于语言扩展C API�
 
 ```cpp
 // VF function: complete vector addition in register domain
-__simd_vf__ inline void add_vf(__ubuf__ float* dst_addr,
-                               __ubuf__ float* src0_addr,
-                               __ubuf__ float* src1_addr,
-                               uint32_t one_repeat_size,
-                               uint16_t repeat_times)
+__simd_vf__ inline void add_vf(
+    __ubuf__ float* dst_addr, __ubuf__ float* src0_addr, __ubuf__ float* src1_addr, uint32_t one_repeat_size,
+    uint16_t repeat_times)
 {
     vector_float src0_reg;
     vector_float src1_reg;
     vector_float dst_reg;
-    vector_bool  mask = asc_create_mask_b32(MASK_PATTERN_ALL);
+    vector_bool mask = asc_create_mask_b32(MASK_PATTERN_ALL);
 
     for (uint16_t i = 0; i < repeat_times; ++i) {
         uint32_t offset = i * one_repeat_size;
@@ -356,16 +355,13 @@ __simd_vf__ inline void add_vf(__ubuf__ float* dst_addr,
 }
 
 // Caller: prepare LocalTensor and UB address in __aicore__ domain
-__aicore__ inline void compute(__ubuf__ float* dst_addr,
-                               __ubuf__ float* src0_addr,
-                               __ubuf__ float* src1_addr,
-                               uint32_t count)
+__aicore__ inline void compute(
+    __ubuf__ float* dst_addr, __ubuf__ float* src0_addr, __ubuf__ float* src1_addr, uint32_t count)
 {
-    constexpr uint32_t one_repeat_size = 64;            // VL / sizeof(float) = 256 / 4
+    constexpr uint32_t one_repeat_size = 64; // VL / sizeof(float) = 256 / 4
     uint16_t repeat_times = count / one_repeat_size;
 
-    asc_vf_call<add_vf>(dst_addr, src0_addr, src1_addr,
-                        one_repeat_size, repeat_times);
+    asc_vf_call<add_vf>(dst_addr, src0_addr, src1_addr, one_repeat_size, repeat_times);
 }
 ```
 
@@ -386,13 +382,15 @@ Reg矢量编程的关键特性按用途分为三大类：
 [`asc_load`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_load/asc_load.md) / [`asc_store`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_store/asc_store.md)是不区分UB地址是否对齐的通用搬运接口，用于将连续VL数据在UB与矢量数据寄存器之间搬运，或将不超过一个VL的元素数据从矢量数据寄存器搬出到UB。
 
 ```cpp
-// Transfer 1 VL length data from UB address src_addr to vector data register src_reg
+// Transfer 1 VL length data from UB address src_addr to vector data register
+// src_reg
 asc_load(src_reg, src_addr);
 
 // Transfer 1 VL length data from vector data register to UB address dst_addr
 asc_store(dst_addr, dst_reg);
 
-// Transfer less than 1 VL length data (10 elements) from vector data register to UB address dst_addr
+// Transfer less than 1 VL length data (10 elements) from vector data register
+// to UB address dst_addr
 asc_store(dst_addr, dst_reg, 10);
 ```
 
@@ -409,8 +407,7 @@ for (uint16_t i = 0; i < repeat_times; ++i) {
     uint32_t offset = i * one_repeat_size;
     asc_loadalign(srcReg, src_addr + offset);
     // Computation on RegTensor
-    ...
-    asc_storealign(dst_addr + offset, dstReg, mask);
+    ... asc_storealign(dst_addr + offset, dstReg, mask);
 }
 ```
 
@@ -467,15 +464,14 @@ for (uint16_t i = 0; i < repeat_times; ++i) {
 推荐写法是把初始化和后处理放在循环外，循环体内只保留连续搬运和计算：
 
 ```cpp
-vector_load_unalign  load_ureg;
+vector_load_unalign load_ureg;
 vector_store_unalign store_ureg;
 
 asc_loadunalign_pre(load_ureg, src_addr);
 for (uint16_t i = 0; i < repeat_times; ++i) {
     asc_loadunalign(src_reg, load_ureg, src_addr, stride);
     // Reg vector computation
-    ...
-    asc_storeunalign(dst_addr, dst_reg, store_ureg, stride);
+    ... asc_storeunalign(dst_addr, dst_reg, store_ureg, stride);
 }
 asc_storeunalign_post(dst_addr, store_ureg, 0);
 ```
@@ -589,12 +585,9 @@ asc_select(dst_reg, cmp_mask, src0_reg, src1_reg, SELMODE::SEL, mask);
 当待计算数据总量不是`VL`的整数倍时，最后一轮迭代需要处理不足一个VL的数据。Reg矢量编程通过`asc_update_mask_b*`实现尾块处理：每次调用根据剩余元素数生成当前轮的mask，并在生成后自动减去一个VL对应的元素数。此种写法可以减少循环内通过if判断尾块的操作，避免违反Hardware Loop的约束条件。
 
 ```cpp
-__simd_vf__ inline void add_vf(__ubuf__ float* dst_addr,
-                                  __ubuf__ float* src0_addr,
-                                  __ubuf__ float* src1_addr,
-                                  uint32_t count,
-                                  uint32_t one_repeat_size,
-                                  uint16_t repeat_times)
+__simd_vf__ inline void add_vf(
+    __ubuf__ float* dst_addr, __ubuf__ float* src0_addr, __ubuf__ float* src1_addr, uint32_t count,
+    uint32_t one_repeat_size, uint16_t repeat_times)
 {
     vector_float src0_reg;
     vector_float src1_reg;

@@ -20,7 +20,7 @@ This example uses Gelu+Element-wise computation (introducing a series of Element
 
 ## Directory Structure
 
-```
+```text
 ├── gelu_eltwise_high_performance
 │   ├── scripts
 │   │   ├── gen_data.py         // Input data and ground truth generation script
@@ -263,13 +263,13 @@ __simd_vf__ inline static void GeluEltwiseLoopSplit(
     AscendC::Reg::RegTensor<float> xReg, yReg;
     uint32_t n2 = n;
 
-    #pragma unroll 6
+#pragma unroll 6
     // Loop 1: Gelu computation
     for (uint16_t i = 0; i < loopNum; ++i) {
         // ...
     }
 
-    #pragma unroll 6
+#pragma unroll 6
     // Loop 2: Element-wise computation
     for (uint16_t i = 0; i < loopNum; ++i) {
         // ...
@@ -584,7 +584,7 @@ msprof ./demo   # Analyze performance
 
 A PROF_ prefixed folder is generated in the current directory. The `mindstudio_profiler_output` directory stores Host and Device performance data summaries. Performance data analysis is recommended to view files in this directory.
 
-```bash
+```text
 PROF_xxxx_XXXXXX
 ├── device_{id}
 └── host

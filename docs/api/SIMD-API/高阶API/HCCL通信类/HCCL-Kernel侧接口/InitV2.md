@@ -16,7 +16,7 @@ HCCL客户端初始化接口。该接口默认在所有核上工作，用户也�
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void InitV2(GM_ADDR context, const void* initTiling)
 ```
 
@@ -44,7 +44,7 @@ __aicore__ inline void InitV2(GM_ADDR context, const void* initTiling)
 
 用户自定义TilingData结构体：
 
-```
+```cpp
 class UserCustomTilingData {
     AscendC::tiling::Mc2InitTiling initTiling;
     AscendC::tiling::Mc2CcTiling tiling;
@@ -54,7 +54,7 @@ class UserCustomTilingData {
 
 在所有核上创建HCCL对象，并调用InitV2接口初始化：
 
-```
+```cpp
 extern "C" __global__ __aicore__ void userKernel(GM_ADDR aGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
 {
     REGISTER_TILING_DEFAULT(UserCustomTilingData);

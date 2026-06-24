@@ -30,9 +30,10 @@
 
 ## 函数原型
 
-```
+```cpp
 template <const LogicalXorConfig& config = DEFAULT_LOGICAL_XOR_CONFIG, typename T, typename U>
-__aicore__ inline void LogicalXor(const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, const uint32_t count)
+__aicore__ inline void LogicalXor(
+    const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, const uint32_t count)
 ```
 
 ## 参数说明
@@ -45,7 +46,7 @@ __aicore__ inline void LogicalXor(const LocalTensor<T>& dst, const LocalTensor<U
 | T | 目的操作数的数据类型。支持的数据类型为：bool。 |
 | U | 源操作数的数据类型。支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。 |
 
-```
+```cpp
 struct LogicalXorConfig {
     bool isReuseSource;
 };
@@ -70,7 +71,7 @@ struct LogicalXorConfig {
 
 ## 调用示例
 
-```
+```cpp
 AscendC::LocalTensor<uint32_t> src0, src1;
 AscendC::LocalTensor<bool> dst;
 uint32_t count = 512; // 参与计算的元素个数
@@ -79,7 +80,7 @@ AscendC::LogicalXor(dst, src0, src1, count);
 
 结果示例如下：
 
-```
+```text
 输入数据（src0）:
 [-4, 4, 1, -8, 0, ... 3]
 输入数据（src1）:

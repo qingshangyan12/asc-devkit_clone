@@ -39,7 +39,7 @@ Mask与MaskReg的机制对比，具体请参考[A2/A3与950 Mask机制对比](..
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename T> 
+template <typename T>
 __simd_callee__ inline MaskReg MoveMask()
 ```
 
@@ -68,7 +68,8 @@ __simd_callee__ inline MaskReg MoveMask()
 
 ```cpp
 template <typename T>
-__simd_vf__ inline void MoveMaskVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
+__simd_vf__ inline void MoveMaskVF(
+    __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> srcReg;
     AscendC::Reg::MaskReg addMask = AscendC::Reg::MoveMask<T>();

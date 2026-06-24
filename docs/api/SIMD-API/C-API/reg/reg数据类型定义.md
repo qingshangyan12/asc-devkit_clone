@@ -50,8 +50,9 @@ vector_bool mask = asc_update_mask_b16(length); // 根据矢量计算需要操�
 constexpr uint32_t one_repeat_size = 256 / sizeof(int8_t); // VL / sizeof(T)
 uint32_t total_length = 255;
 uint32_t repeat_time = (total_length + one_repeat_size - 1) / one_repeat_size;
-__simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, uint32_t count,
-    uint32_t one_repeat_size, uint16_t repeat_time)
+__simd_vf__ inline void neg_vf(
+    __ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, uint32_t count, uint32_t one_repeat_size,
+    uint16_t repeat_time)
 {
     vector_int8_t src;
     vector_int8_t dst;
@@ -60,11 +61,16 @@ __simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_a
     vector_bool mask;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         mask = asc_update_mask_b8(count);
-        asc_loadunalign_pre(ureg0, src_addr + i * one_repeat_size); // 非对齐搬入前的初始化
-        asc_loadunalign(src, ureg0, src_addr + i * one_repeat_size); // 配合vector_load_unalign的使用，非对齐搬入源数据
+        asc_loadunalign_pre(ureg0,
+                            src_addr + i * one_repeat_size); // 非对齐搬入前的初始化
+        asc_loadunalign(src, ureg0,
+                        src_addr + i * one_repeat_size); // 配合vector_load_unalign的使用，非对齐搬入源数据
         asc_neg(dst, src, mask);
-        asc_storeunalign(dst_addr + i * one_repeat_size, ureg1, dst, one_repeat_size); // 配合vector_store_unalign的使用，非对齐搬出目的数据
-        asc_storeunalign_post(dst_addr + i * one_repeat_size, ureg1, 0); // 处理非对齐搬出的尾块
+        asc_storeunalign(
+            dst_addr + i * one_repeat_size, ureg1, dst,
+            one_repeat_size); // 配合vector_store_unalign的使用，非对齐搬出目的数据
+        asc_storeunalign_post(dst_addr + i * one_repeat_size, ureg1,
+                              0); // 处理非对齐搬出的尾块
     }
 }
 ```
@@ -79,7 +85,8 @@ __simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_a
 constexpr uint32_t one_repeat_size = 256 / sizeof(int8_t); // VL / sizeof(T)
 uint32_t total_length = 256;
 uint32_t repeat_time = total_length / one_repeat_size;
-__simd_vf__ inline void add_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src0_addr, __ubuf__ int8_t* src1_addr, uint32_t count,
+__simd_vf__ inline void add_vf(
+    __ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src0_addr, __ubuf__ int8_t* src1_addr, uint32_t count,
     uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_int8_t src0;

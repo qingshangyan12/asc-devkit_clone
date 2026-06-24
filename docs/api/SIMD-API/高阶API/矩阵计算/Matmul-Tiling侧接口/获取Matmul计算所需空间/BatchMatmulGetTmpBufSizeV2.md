@@ -6,7 +6,7 @@ BatchMatmul Tiling调用[GetTiling](../Matmul-Tiling类/GetTiling.md)接口获�
 
 ## 函数原型
 
-```
+```cpp
 int32_t BatchMatmulGetTmpBufSizeV2(AscendC::tiling::TCubeTiling& tiling, matmul_tiling::SysTilingTempBufSize& bufSize)
 ```
 
@@ -19,7 +19,7 @@ int32_t BatchMatmulGetTmpBufSizeV2(AscendC::tiling::TCubeTiling& tiling, matmul_
 | tiling | 输入 | BatchMatmul Tiling的结构体，即BatchMatmulTiling对象得到的TCubeTiling结构体。<br><br>TCubeTiling为Kernel侧定义的Matmul TilingData，与入参为带AscendC::tiling命名空间的TCubeTiling结构体的[GetTiling](../Matmul-Tiling类/GetTiling.md)接口配合使用。 |
 | bufSize | 输出 | 根据TCubeTiling结构体信息获取L1 Buffer/Unified Buffer/L0C Buffer的使用大小。<br><br>SysTilingTempBufSize结构定义如下方代码所示。 |
 
-```
+```cpp
 struct SysTilingTempBufSize {
     int32_t ubSize = 0;  // Unified Buffer大小
     int32_t l1Size = 0;  // L1 Buffer大小
@@ -37,7 +37,7 @@ struct SysTilingTempBufSize {
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::BatchMatmulTiling tiling(ascendcPlatform);
 AscendC::tiling::TCubeTiling tilingData;

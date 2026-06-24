@@ -18,7 +18,7 @@ AdjustSoftMaxRes is used for post-processing of SoftMax computation results. Whe
 
 ## Directory Structure
 
-```
+```text
 ├── softmax
 │   ├── scripts
 │   │   └── gen_data.py         // Script for generating input data and ground truth data

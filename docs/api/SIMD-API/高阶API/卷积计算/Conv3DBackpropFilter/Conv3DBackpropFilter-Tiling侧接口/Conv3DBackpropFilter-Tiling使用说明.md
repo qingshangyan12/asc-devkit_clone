@@ -10,7 +10,7 @@ Conv3DBackpropFilter Tiling API提供一个GetTiling接口获取Tiling参数，�
 
 使用Conv3DBackpropFilter Tiling接口获取Tiling参数的样例如下：
 
-```
+```cpp
 #include "tiling/conv_backprop/conv3d_bp_filter_tiling.h"
 
 optiling::Conv3DBackpropFilterTilingData tilingData;
@@ -34,6 +34,6 @@ int ret = conv3dBpDwTiling.GetTiling(tilingData); // 如果ret = -1,获取tiling
 
 ## 需要包含的头文件
 
-```
+```cpp
 #include "lib/conv_backprop/conv3d_bp_filter_tiling.h"
 ```

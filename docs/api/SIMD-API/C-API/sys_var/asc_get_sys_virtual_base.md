@@ -15,7 +15,7 @@
 ## 函数原型
 
 ```cpp
- __aicore__ inline int64_t asc_get_sys_virtual_base()
+__aicore__ inline int64_t asc_get_sys_virtual_base()
 ```
 
 ## 参数说明
@@ -38,5 +38,6 @@ PIPE_S
 
 ```cpp
 int64_t sys_virtual_base = asc_get_sys_virtual_base();
-printf("sys virtual base is %x", sys_virtual_base);// 需用%x将其打印成十六进制的数
+printf("sys virtual base is %x",
+       sys_virtual_base); // 需用%x将其打印成十六进制的数
 ```

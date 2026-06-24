@@ -78,5 +78,5 @@ __aicore__ inline void MetricsProfStart()
 ```cpp
 MetricsProfStart();
 ... // 需要调优的kernel侧代码段。
-MetricsProfStop();
+    MetricsProfStop();
 ```

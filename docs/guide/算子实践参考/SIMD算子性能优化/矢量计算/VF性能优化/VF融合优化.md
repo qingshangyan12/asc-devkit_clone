@@ -24,13 +24,15 @@ VF融合优化可分为三个阶段：VF浅度融合、VF深度融合和VF内自
 
     【正例】VF函数DivVF和AddVF会被编译器融合成一个VF函数，并且能优化多余的Load/Store指令。
 
-    ```
-    template<typename T>
-    __simd_vf__ inline void DivVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t repeatTime, uint32_t oneRepNum){
+    ```cpp
+    template <typename T>
+    __simd_vf__ inline void DivVF(
+        __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t repeatTime, uint32_t oneRepNum)
+    {
         AscendC::Reg::MaskReg mask;
         AscendC::Reg::RegTensor<T> reg0, reg1, reg2;
         constexpr float num = 1.0f;
-        for(uint16_t j = 0; j < repeatTime; ++j){
+        for (uint16_t j = 0; j < repeatTime; ++j) {
             mask = AscendC::Reg::UpdateMask<T>(count);
             AscendC::Reg::LoadAlign(reg0, srcAddr + j * oneRepNum);
             AscendC::Reg::Duplicate(reg1, num, mask);
@@ -38,51 +40,58 @@ VF融合优化可分为三个阶段：VF浅度融合、VF深度融合和VF内自
             AscendC::Reg::StoreAlign(dstAddr + j * oneRepNum, reg2, mask);
         }
     }
-    template<typename T>
-    __simd_vf__ inline void AddVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t repeatTime, uint32_t oneRepNum){
+    template <typename T>
+    __simd_vf__ inline void AddVF(
+        __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t repeatTime, uint32_t oneRepNum)
+    {
         AscendC::Reg::MaskReg mask;
         AscendC::Reg::RegTensor<T> srcReg;
         AscendC::Reg::RegTensor<T> dstReg;
         constexpr float num = 1.0f;
-        for(uint16_t j = 0; j < repeatTime; ++j){
+        for (uint16_t j = 0; j < repeatTime; ++j) {
             mask = AscendC::Reg::UpdateMask<T>(count);
             AscendC::Reg::LoadAlign(srcReg, srcAddr + j * oneRepNum);
             AscendC::Reg::Adds(dstReg, srcReg, num, mask);
             AscendC::Reg::StoreAlign(dstAddr + j * oneRepNum, dstReg, mask);
         }
     }
-    template<typename T>
+    template <typename T>
     class Kernel {
-        public:
+    public:
         __aicore__ inline Kernel() = default;
-        __aicore__ inline void Init(__gm__ uint8_t* x, __gm__ uint8_t* y, uint32_t count, AscendC::TPipe* pipeIn){
-            // ... 
-     
+        __aicore__ inline void Init(__gm__ uint8_t* x, __gm__ uint8_t* y, uint32_t count, AscendC::TPipe* pipeIn)
+        {
+            // ...
         }
-        __aicore__ inline void CopyIn(){
-            // ... 
+        __aicore__ inline void CopyIn()
+        {
+            // ...
         }
-        __aicore__ inline void Compute(){
+        __aicore__ inline void Compute()
+        {
             AscendC::LocalTensor<T> xLocal = inQueueX.DeQue<T>();
             AscendC::LocalTensor<T> yLocal = outQueueY.AllocTensor<T>();
             AscendC::DataCopy(yLocal, xLocal, count);
             __ubuf__ T* srcAddr = reinterpret_cast<__ubuf__ T*>(xLocal.GetPhyAddr());
             __ubuf__ T* dstAddr = reinterpret_cast<__ubuf__ T*>(yLocal.GetPhyAddr());
             constexpr uint32_t oneRepNum = 256 / sizeof(T);
-            uint32_t repeatTime =  count / oneRepNum;
+            uint32_t repeatTime = count / oneRepNum;
             DivVF(dstAddr, srcAddr, count, repeatTime, oneRepNum);
             AddVF(dstAddr, dstAddr, count, repeatTime, oneRepNum);
             outQueueY.EnQue<T>(yLocal);
         }
-        __aicore__ inline void CopyOut(){
-            // ... 
+        __aicore__ inline void CopyOut()
+        {
+            // ...
         }
-        __aicore__ inline void Process(){
+        __aicore__ inline void Process()
+        {
             CopyIn();
             Compute();
             CopyOut();
         }
-        private:
+
+    private:
         AscendC::TPipe* pipe = nullptr;
         uint32_t count;
         AscendC::GlobalTensor<T> xGm;
@@ -101,18 +110,19 @@ VF融合优化可分为三个阶段：VF浅度融合、VF深度融合和VF内自
 
     【反例】使用基础API的高维切分模式编写算子，编译器在分析VF融合时受复杂的计算逻辑影响，无法对Add和Mul接口进行VF融合优化。
 
-    ```
-    template<typename T>
+    ```cpp
+    template <typename T>
     class Kernel {
-        public:
+    public:
         // ...
-        __aicore__ inline void Compute(){
+        __aicore__ inline void Compute()
+        {
             AscendC::LocalTensor<T> xLocal = inQueueX.DeQue<T>();
             AscendC::LocalTensor<T> yLocal = outQueueY.AllocTensor<T>();
             AscendC::DataCopy(yLocal, xLocal, inner * outter);
             uint64_t mask = 128;
-            AscendC::Add(yLocal, xLocal, xLocal, mask, 4, { 1, 1, 1, 8, 8, 8 });
-            AscendC::Mul(yLocal, yLocal, xLocal, mask, 4, { 1, 1, 1, 8, 8, 8 });
+            AscendC::Add(yLocal, xLocal, xLocal, mask, 4, {1, 1, 1, 8, 8, 8});
+            AscendC::Mul(yLocal, yLocal, xLocal, mask, 4, {1, 1, 1, 8, 8, 8});
             outQueueY.EnQue<T>(yLocal);
         }
         // ...
@@ -121,12 +131,13 @@ VF融合优化可分为三个阶段：VF浅度融合、VF深度融合和VF内自
 
     【正例】使用基础API的连续计算模式，编译器分析Add和Mul函数后符合VF融合要求，将Add和Mul融合成一个VF函数。
 
-    ```
-    template<typename T>
+    ```cpp
+    template <typename T>
     class Kernel {
-        public:
+    public:
         // ...
-        __aicore__ inline void Compute(){
+        __aicore__ inline void Compute()
+        {
             AscendC::LocalTensor<T> xLocal = inQueueX.DeQue<T>();
             AscendC::LocalTensor<T> yLocal = outQueueY.AllocTensor<T>();
             AscendC::DataCopy(yLocal, xLocal, inner * outter);

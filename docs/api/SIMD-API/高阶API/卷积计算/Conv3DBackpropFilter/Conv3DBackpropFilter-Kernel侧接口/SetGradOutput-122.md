@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetGradOutput(const AscendC::GlobalTensor<SrcT>& gradOutput)
 ```
 
@@ -50,10 +50,10 @@ __aicore__ inline void SetGradOutput(const AscendC::GlobalTensor<SrcT>& gradOutp
 
 ## 调用示例
 
-```
+```cpp
 const Conv3DBackpropFilterTilingData* tilingData;
 // ...初始化tilingData
-ConvBackpropApi::Conv3DBackpropFilter <inputType, weightSizeType, gradOutputType, gradWeightType> gradWeight_;
+ConvBackpropApi::Conv3DBackpropFilter<inputType, weightSizeType, gradOutputType, gradWeightType> gradWeight_;
 gradWeight_.Init(&(tilingData->dwTiling));
 gradWeight_.SetInput(inputGm_[offsetB_]);
 // 设置gradOutput

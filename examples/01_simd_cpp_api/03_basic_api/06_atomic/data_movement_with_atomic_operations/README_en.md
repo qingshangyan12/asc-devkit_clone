@@ -16,7 +16,7 @@ This example introduces the implementation flow of atomic accumulation and atomi
 
 ## Directory Structure
 
-```
+```text
 ├── data_movement_with_atomic_operations
 │   ├── scripts
 │   │   ├── gen_data.py                           // Input data and ground truth generation script

@@ -21,7 +21,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── simd_simt_integer_fast_div
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── integer_div.asc         // 整数除法样例实现
@@ -34,7 +34,7 @@
 
 样例实现固定除数的uint32整数除法计算，并对比普通除法和快速除法两种SIMT线程内计算方式的性能差异。计算公式如下：
 
-```cpp
+```text
 output[i] = input[i] / divisor
 ```
 
@@ -277,7 +277,7 @@ msprof ./integer_div   # 分析性能
 
 当前目录下会生成PROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件。
 
-```bash
+```text
 PROF_xxxx_XXXXXX
 ├── device_{id}
 └── host

@@ -17,8 +17,8 @@
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_int322int64(vector_int64_t& dst, vector_int32_t src, vector_bool mask)
-__simd_callee__ inline void asc_int322int64_v2(vector_int64_t& dst, vector_int32_t src, vector_bool mask)
+__simd_callee__ inline void asc_int322int64(vector_int64_t& dst, vector_int32_t src, vector_bool mask) __simd_callee__
+    inline void asc_int322int64_v2(vector_int64_t& dst, vector_int32_t src, vector_bool mask)
 ```
 
 ## 参数说明
@@ -49,6 +49,8 @@ PIPE_V
 vector_int64_t dst;
 vector_int32_t src;
 vector_bool mask;
-asc_int322int64(dst, src, mask);    // 将src的上半部分转换成vector_int64_t类型并写入dst
-asc_int322int64_v2(dst, src, mask);    // 将src的下半部分转换成vector_int64_t类型并写入dst
+asc_int322int64(dst, src,
+                mask); // 将src的上半部分转换成vector_int64_t类型并写入dst
+asc_int322int64_v2(dst, src,
+                   mask); // 将src的下半部分转换成vector_int64_t类型并写入dst
 ```

@@ -91,7 +91,7 @@ Matmul API开启UnitFlag功能的完整样例请参考[开启UnitFlag功能和MD
 
 1.  自定义MatmulConfig模板参数，将其中的enUnitFlag参数设置为true，开启UnitFlag功能。
 
-    ```
+    ```cpp
     __aicore__ inline constexpr MatmulConfig GetCustomMDLCFG()
     {
         auto mmCfg = CFG_MDL;
@@ -103,12 +103,12 @@ Matmul API开启UnitFlag功能的完整样例请参考[开启UnitFlag功能和MD
 
 2.  基于自定义的MatmulConfig模板参数，创建Matmul对象。
 
-    ```
+    ```cpp
     using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
     using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>;
     using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-    using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
-    AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CUSTOM_CFG_MDL > matmulObj;
+    using BIAS_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+    AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CUSTOM_CFG_MDL> matmulObj;
     ```
 
 ## 验证优化方案性能收益<a name="section19022397498"></a>

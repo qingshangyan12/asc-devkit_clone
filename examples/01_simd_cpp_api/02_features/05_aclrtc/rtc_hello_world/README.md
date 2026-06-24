@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── rtc_hello_world
 │   ├── CMakeLists.txt           // 编译工程文件
 │   ├── rtc_hello_world.cpp      // Host侧代码（含RTC核函数源码字符串）

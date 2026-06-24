@@ -6,8 +6,9 @@
 
 ## 函数原型
 
-```
-void SetOutputType(const ConvCommonApi::TPosition pos, const ConvCommonApi::ConvFormat format, const ConvCommonApi::ConvDtype dtype)
+```cpp
+void SetOutputType(
+    const ConvCommonApi::TPosition pos, const ConvCommonApi::ConvFormat format, const ConvCommonApi::ConvDtype dtype)
 ```
 
 ## 参数说明
@@ -28,7 +29,7 @@ void SetOutputType(const ConvCommonApi::TPosition pos, const ConvCommonApi::Conv
 
 ## 调用示例
 
-```
+```cpp
 // 实例化Conv3D API
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 Conv3dTilingApi::Conv3dTiling conv3dApiTiling(ascendcPlatform);

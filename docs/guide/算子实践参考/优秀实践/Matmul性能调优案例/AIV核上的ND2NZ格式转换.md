@@ -68,22 +68,23 @@
 
 1.  创建Matmul对象时，定义内轴非256字节对齐的B矩阵的Format为NZ格式。
 
-    ```
+    ```cpp
     using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, ATYPE, true>;
     // 使用CubeFormat::NZ定义矩阵B的类型信息
     using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::NZ, BType, true>;
     using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-    using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+    using BIAS_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
     AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL> matmulObj;
     ```
 
 2.  利用Vector计算单元实现ND2NZ格式转换。如下代码中MatrixBtoNZ为将B矩阵的ND格式转换为NZ格式的函数，该函数的具体实现请参考完整样例代码。
 
-    ```
+    ```cpp
     // Vector ND2NZ
     if ASCEND_IS_AIV {
         pipe->InitBuffer(ubBuf, TOTAL_UB_SIZE);
-        MatrixBtoNZ<typename B_TYPE::T>(tempGM, bGMNZ, tiling, isTransB, ubBuf, tiling.baseK,
+        MatrixBtoNZ<typename B_TYPE::T>(
+            tempGM, bGMNZ, tiling, isTransB, ubBuf, tiling.baseK,
             tiling.baseN); // ND2NZ格式转换函数
         SyncAll();
         // CV SYNC
@@ -97,7 +98,7 @@
 
 3.  设置左矩阵A、右矩阵B、Bias，完成矩阵乘操作。
 
-    ```
+    ```cpp
     matmulObj.SetTail(tailM, tailN, shapes.k);
     matmulObj.SetTensorA(aGlobal, false);
     matmulObj.SetTensorB(bGlobal, false);

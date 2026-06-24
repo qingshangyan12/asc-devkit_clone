@@ -13,7 +13,7 @@ When the ceiling value of K divided by 32 is odd, the value of scaleK needs to b
 
 ## Directory Structure
 
-```
+```text
 ├── matmul_mx
 │   ├── scripts
 │   │   ├── gen_data.py            // Script for generating input data and ground truth data
@@ -47,12 +47,18 @@ When the ceiling value of K divided by 32 is odd, the value of scaleK needs to b
   - Key Kernel Steps
     - Create the Matmul object: use MatmulTypeWithScale to enable scaleA and scaleB.
       ```cpp
-      typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, false> aType;
-      typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, false> bType;
+      typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, false>
+          aType;
+      typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, false>
+          bType;
       typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType;
       typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
-      // When defining the matmul object, pass MatmulWithScalePolicy to enable the MxMatmul template policy
-      AscendC::Matmul<aType, bType, cType, biasType, CFG_MDL, AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>, AscendC::Impl::Detail::MatmulWithScalePolicy> matmulObj;
+      // When defining the matmul object, pass MatmulWithScalePolicy to enable the
+      // MxMatmul template policy
+      AscendC::Matmul<
+          aType, bType, cType, biasType, CFG_MDL, AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>,
+          AscendC::Impl::Detail::MatmulWithScalePolicy>
+          matmulObj;
       ```
     - Set the left matrix A and left quantization scale matrix scaleA, right matrix B and right quantization scale matrix scaleB, and Bias.
       ```cpp

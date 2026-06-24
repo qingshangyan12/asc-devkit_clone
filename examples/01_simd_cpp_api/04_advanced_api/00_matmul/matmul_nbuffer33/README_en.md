@@ -12,7 +12,7 @@ A Matmul example using the NBuffer33 algorithm, achieving balanced load-in and l
 | Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
 
 ## Directory Structure
-```
+```text
 ├── matmul_nbuffer33
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data
@@ -49,20 +49,20 @@ A Matmul example using the NBuffer33 algorithm, achieving balanced load-in and l
     - Specific steps:
       - Create the Matmul object, configure the MDL template and NBuffer33MatmulPolicy.
         ```cpp
-        AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType, IS_TRANS_A>,
-                        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, IS_TRANS_B>,
-                        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
-                        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>, CFG_MDL,
-                        AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>,
-                        AscendC::Impl::Detail::NBuffer33MatmulPolicy>
+        AscendC::Matmul<
+            AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType, IS_TRANS_A>,
+            AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, IS_TRANS_B>,
+            AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
+            AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>, CFG_MDL,
+            AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>, AscendC::Impl::Detail::NBuffer33MatmulPolicy>
             matmulObj;
         ```
 
   - Key Tiling Steps
     - Set the parameter type information for A, B, C, and Bias; M, N, Ka, Kb shape information, and so on. Enable NBuffer33 mode.
       ```cpp
-      matmul_tiling::MatmulConfigParams matmulConfigParams(1, false, matmul_tiling::ScheduleType::N_BUFFER_33,
-                                                            matmul_tiling::MatrixTraverse::NOSET, false);
+      matmul_tiling::MatmulConfigParams matmulConfigParams(
+          1, false, matmul_tiling::ScheduleType::N_BUFFER_33, matmul_tiling::MatrixTraverse::NOSET, false);
       tilingApi.SetMatmulConfigParams(matmulConfigParams);
       ```
 

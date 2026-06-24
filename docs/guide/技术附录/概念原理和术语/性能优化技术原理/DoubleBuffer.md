@@ -15,7 +15,7 @@
 
 总体来说，DoubleBuffer是基于MTE指令队列与Vector指令队列的独立性和可并行性，通过将数据搬运与Vector计算并行执行以隐藏数据搬运时间并降低Vector指令的等待时间，最终提高Vector单元的利用效率，您可以通过为队列申请内存时设置内存块的个数来实现数据并行，简单代码示例如下：
 
-```
+```text
 pipe.InitBuffer(inQueueX, 2, 256);
 ```
 

@@ -14,7 +14,7 @@
 
 ## 函数原型
 
-```
+```cpp
 int32_t SetDim(int32_t dim)
 ```
 
@@ -36,7 +36,7 @@ int32_t SetDim(int32_t dim)
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MultiCoreMatmulTiling tiling(ascendcPlatform);
 tiling.SetDim(1); // 设置参与运算的核数

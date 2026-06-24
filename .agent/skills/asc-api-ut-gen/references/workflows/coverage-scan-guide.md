@@ -91,14 +91,14 @@ flowchart TD
 
 ```cpp
 #if __NPU_ARCH__ == 2201
-    // ascend910b1
+// ascend910b1
 #elif __NPU_ARCH__ == 3510
-    // ascend950pr_9599
+// ascend950pr_9599
 #endif
 
 // 多架构判断
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)
-    // 多架构通用代码
+// 多架构通用代码
 #endif
 ```
 
@@ -118,7 +118,8 @@ flowchart TD
 
 ```cpp
 [[deprecated("Use NewAPI instead")]]
-__aicore__ inline void OldFunction(...) { }
+__aicore__ inline void OldFunction(...)
+{}
 
 // 头文件 deprecated（常见于接口迁移）
 [[deprecated(__FILE__ " is deprecated, please use softmax.h instead!")]]
@@ -126,7 +127,7 @@ typedef void using_deprecated_header_h;
 ```
 
 **检测正则：**
-```python
+```text
 pattern = r'\[\[deprecated(?:\s*\([^)]*\))?\]\]'
 ```
 
@@ -163,8 +164,7 @@ pattern_class = r'template\s*<[^>]*>\s*class\s+(\w+)'
 
 ```cpp
 template <class A_TYPE, class B_TYPE, class C_TYPE, ...>
-class MatmulImpl
-{
+class MatmulImpl {
     // 成员函数...
 };
 // 提取：MatmulImpl
@@ -250,7 +250,7 @@ flowchart TD
 
 **规则 3：双重校验机制**
 
-```bash
+```text
 # 校验 API 存在性
 Grep -n "{API_NAME}" include/c_api/  # 无结果 = API 不存在
 
@@ -282,7 +282,7 @@ ASCENDC_ASSERT((false), "VectorPadding is not supported");
 
 ## 9. 测试目录结构
 
-```
+```text
 tests/api/
 ├── basic_api/                                    # membase基础API 测试
 │   ├── ascendc_case_ascend910b1/
@@ -318,38 +318,42 @@ tests/api/
 
 ### 10.1 API 接口扫描
 
-```
-# Step 1: 扫描高阶API
-Glob: {ASC_DEVKIT_PATH}/include/adv_api/**/*.h
-Grep: pattern="template.*class\s+\w+"
+```cpp
+#Step 1 : 扫描高阶API
+Glob : {ASC_DEVKIT_PATH} / include / adv_api /**/*.h Grep : pattern =
+    "template.*class\s+\w+"
 
-# Step 2: 扫描 membase基础API
-Glob: {ASC_DEVKIT_PATH}/include/basic_api/kernel_operator_*.h
-Grep: pattern="void\s+\w+\s*\("
+#Step 2 : 扫描 membase基础API
+    Glob : {ASC_DEVKIT_PATH} /
+           include / basic_api / kernel_operator_*.h Grep : pattern = "void\s+\w+\s*\("
 
-# Step 3: 扫描 regbase基础API
-Glob: {ASC_DEVKIT_PATH}/include/basic_api/reg_compute/**/*.h
+#Step 3 : 扫描 regbase基础API
+                                                                      Glob : {ASC_DEVKIT_PATH} /
+                                                                             include / basic_api / reg_compute /**/ *
+                                                                                                       .h
 
-# Step 4: 扫描 C API
-Glob: {ASC_DEVKIT_PATH}/include/c_api/**/*.h
-Grep: pattern="void\s+asc_\w+\s*\("
+#Step 4 : 扫描 C API
+                                                                                                           Glob
+    : {ASC_DEVKIT_PATH} / include / c_api /**/*.h Grep : pattern = "void\s+asc_\w+\s*\("
 
-# Step 5: 扫描 SIMT API
-Glob: {ASC_DEVKIT_PATH}/include/simt_api/**/*.h
-Grep: pattern="__device__.*\w+\s*\("
+#Step 5 : 扫描 SIMT API
+                                                                   Glob : {ASC_DEVKIT_PATH} /
+                                                                          include / simt_api /**/*.h Grep : pattern =
+                                                                       "__device__.*\w+\s*\("
 
-# Step 6: 识别架构条件编译
-Grep: pattern="#if.*__NPU_ARCH__|#ifdef.*__DAV_"
+#Step 6 : 识别架构条件编译
+    Grep : pattern = "#if.*__NPU_ARCH__|#ifdef.*__DAV_"
 ```
 
 ### 10.2 UT 文件扫描与跨文件检测
 
-```
-# 扫描现有 UT
-Glob: {ASC_DEVKIT_PATH}/tests/api/**/*.cpp
+```cpp
+#扫描现有 UT
+Glob : {ASC_DEVKIT_PATH} / tests /
+       api /**/*.cpp
 
-# 对于初步判定为"缺失 UT"的 API，执行跨文件检测
-Grep: pattern="{APIName}" path="tests/api/{arch_dir}/"
+#对于初步判定为 "缺失 UT"的 API，执行跨文件检测
+           Grep : pattern = "{APIName}" path = "tests/api/{arch_dir}/"
 ```
 
 ---
@@ -358,7 +362,7 @@ Grep: pattern="{APIName}" path="tests/api/{arch_dir}/"
 
 ### 11.1 Markdown 格式（默认）
 
-```markdown
+```text
 ## 总体覆盖率统计
 
 | API 类型 | 总 API 数 | 已覆盖 | 未覆盖 | 覆盖率 |

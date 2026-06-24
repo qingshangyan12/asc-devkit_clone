@@ -31,7 +31,7 @@ Kernel侧实现Conv3DBackpropInput求解反向传播误差运算的步骤概括�
 
 1.  创建Conv3DBackpropInput对象。
 
-    ```
+    ```cpp
     #include "lib/conv_backprop/conv3d_bp_input_api.h"
 
     using weightDxType =
@@ -46,7 +46,7 @@ Kernel侧实现Conv3DBackpropInput求解反向传播误差运算的步骤概括�
 
     创建对象时需要传入权重矩阵Weight、卷积正向特征矩阵Input的shape信息InputSize、GradOutput和GradInput的参数类型信息，类型信息通过[ConvType](#table19081115275)来定义，包括：内存逻辑位置、数据格式、数据类型。
 
-    ```
+    ```cpp
     template <TPosition POSITION, ConvFormat FORMAT, typename T>
     struct ConvType {
         constexpr static TPosition pos = POSITION;   // Convolution输入或输出的逻辑位置
@@ -57,7 +57,7 @@ Kernel侧实现Conv3DBackpropInput求解反向传播误差运算的步骤概括�
 
     下面简要介绍在创建对象时使用到的相关数据结构，开发者可选择性地了解这些内容。用于创建Conv3DBackpropInput对象的数据结构定义如下：
 
-    ```
+    ```text
     using Conv3DBackpropInput = Conv3DBpInputIntf<
         Conv3DBpInputCfg<WEIGHT_TYPE, INPUT_TYPE, GRAD_OUTPUT_TYPE, GRAD_INPUT_TYPE, CONV3D_CFG_DEFAULT>,
         Conv3DBpInputImpl>;
@@ -65,12 +65,12 @@ Kernel侧实现Conv3DBackpropInput求解反向传播误差运算的步骤概括�
 
     其中，Conv3DBpInputIntf、Conv3DBpInputCfg数据结构定义如下：
 
-    ```
+    ```cpp
     template <class Config_, template <typename, class> class Impl>
     struct Conv3DBpInputIntf {}
     ```
 
-    ```
+    ```cpp
     template <
         class WEIGHT_TYPE, class INPUT_TYPE, class GRAD_OUTPUT_TYPE, class GRAD_INPUT_TYPE,
         const Conv3dConfig& CONV3D_CONFIG = CONV3D_CFG_DEFAULT>
@@ -97,7 +97,7 @@ Kernel侧实现Conv3DBackpropInput求解反向传播误差运算的步骤概括�
 
 2.  初始化操作。
 
-    ```
+    ```cpp
     // 注册后进行初始化
     ConvBackpropApi::Conv3DBackpropInput<weightDxType, inputSizeDxType, gradOutputDxType, gradInputDxType> gradInput_;
     gradInput_.Init(&(tilingData->conv3DDxTiling));
@@ -105,7 +105,7 @@ Kernel侧实现Conv3DBackpropInput求解反向传播误差运算的步骤概括�
 
 3.  设置3D卷积的输出反向GradOutput、3D卷积的输入Weight。
 
-    ```
+    ```text
     gradInput_.SetSingleShape(singleShapeM_, singleShapeK_, singleShapeN_); // 设置单核计算的形状
     gradInput_.SetStartPosition(dinStartIdx_, curHoStartIdx_); // 设置单核上gradOutput载入的起始位置
     gradInput_.SetGradOutput(gradOutputGm_[offsetA_]);
@@ -116,7 +116,7 @@ Kernel侧实现Conv3DBackpropInput求解反向传播误差运算的步骤概括�
 
     调用[Iterate](Iterate-111.md)完成单次迭代计算，叠加while循环完成单核全量数据的计算。Iterate方式，可以自行控制迭代次数，完成所需数据量的计算。
 
-    ```
+    ```cpp
     while (gradInput_.Iterate()) {
         gradInput_.GetTensorC(gradInputGm_[offsetC_]);
     }
@@ -124,12 +124,12 @@ Kernel侧实现Conv3DBackpropInput求解反向传播误差运算的步骤概括�
 
 5.  结束卷积反向操作。
 
-    ```
+    ```text
     gradInput_.End();
     ```
 
 ## 需要包含的头文件
 
-```
+```cpp
 #include "lib/conv_backprop/conv3d_bp_input_api.h"
 ```

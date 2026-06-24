@@ -46,14 +46,16 @@
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <typename T, uint8_t taylorExpandLevel, bool isReuseSource = false>
-    __aicore__ inline void Exp(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+    __aicore__ inline void Exp(
+        const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& sharedTmpBuffer,
+        const uint32_t calCount)
     ```
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <typename T, uint8_t taylorExpandLevel, bool isReuseSource = false>
     __aicore__ inline void Exp(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t calCount)
     ```
@@ -96,7 +98,7 @@
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放计算结果的Tensor
 // srcLocal: 参与计算的输入Tensor
 // sharedTmpBuffer: 临时缓存,内部复杂计算时存储中间变量
@@ -107,7 +109,7 @@ AscendC::Exp<half, 15, false>(dstLocal, srcLocal, sharedTmpBuffer, 512);
 
 结果示例如下：
 
-```
+```text
 输入数据(srcLocal):
 [ 0.0        0.01       0.02       0.03       ...  5.11     ]
 输出数据(dstLocal):

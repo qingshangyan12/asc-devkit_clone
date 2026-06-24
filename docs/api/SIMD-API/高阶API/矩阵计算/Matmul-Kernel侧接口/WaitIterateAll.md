@@ -19,7 +19,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void WaitIterateAll()
 ```
 
@@ -38,7 +38,7 @@ __aicore__ inline void WaitIterateAll()
 
 ## 调用示例
 
-```
+```cpp
 AscendC::Matmul<aType, bType, cType, biasType> mm;
 mm.SetTensorA(gm_a[offsetA]);
 mm.SetTensorB(gm_b[offsetB]);

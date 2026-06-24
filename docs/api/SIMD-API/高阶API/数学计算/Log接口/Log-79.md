@@ -50,15 +50,15 @@
 
     -   源操作数Tensor全部/部分参与计算
 
-    ```
-    template<typename T, bool isReuseSource = false>
+    ```cpp
+    template <typename T, bool isReuseSource = false>
     __aicore__ inline void Log(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, uint32_t calCount)
     ```
 
     -   源操作数Tensor全部参与计算
 
-    ```
-    template<typename T, bool isReuseSource = false>
+    ```cpp
+    template <typename T, bool isReuseSource = false>
     __aicore__ inline void Log(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
     ```
 
@@ -66,29 +66,32 @@
     -   通过sharedTmpBuffer入参传入临时空间
         -   源操作数Tensor全部/部分参与计算
 
-            ```
-            template<typename T, bool isReuseSource = false>
-            __aicore__ inline void Log2(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
+            ```cpp
+            template <typename T, bool isReuseSource = false>
+            __aicore__ inline void Log2(
+                const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+                uint32_t calCount)
             ```
 
         -   源操作数Tensor全部参与计算
 
-            ```
+            ```cpp
             template <typename T, bool isReuseSource = false>
-            __aicore__ inline void Log2(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
+            __aicore__ inline void Log2(
+                const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
             ```
 
     -   接口框架申请临时空间
         -   源操作数Tensor全部/部分参与计算
 
-            ```
-            template<typename T, bool isReuseSource = false>
+            ```cpp
+            template <typename T, bool isReuseSource = false>
             __aicore__ inline void Log2(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, uint32_t calCount)
             ```
 
         -   源操作数Tensor全部参与计算
 
-            ```
+            ```cpp
             template <typename T, bool isReuseSource = false>
             __aicore__ inline void Log2(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
             ```
@@ -96,15 +99,15 @@
 -   以10为底：
     -   源操作数Tensor全部/部分参与计算
 
-        ```
-        template<typename T, bool isReuseSource = false>
+        ```cpp
+        template <typename T, bool isReuseSource = false>
         __aicore__ inline void Log10(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
-        template<typename T, bool isReuseSource = false>
+        ```cpp
+        template <typename T, bool isReuseSource = false>
         __aicore__ inline void Log10(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
         ```
 
@@ -146,7 +149,7 @@
 
 完整的调用样例可参考[Log样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/10_math/log)。
 
-```
+```cpp
 // dstLocal: 存放计算结果的Tensor
 // srcLocal: 参与计算的输入Tensor
 
@@ -160,21 +163,21 @@ AscendC::Log(dstLocal, srcLocal);
 
 Log接口结果示例如下：
 
-```
+```text
 输入数据(srcLocal): [144.22607 9634.764 ... 1835.1245 3145.5125]
 输出数据(dstLocal): [4.971382 9.173133 ... 7.514868 8.053732]
 ```
 
 Log2接口结果示例如下：
 
-```
+```text
 输入数据(srcLocal): [6299.54 338.45963 ... 2.853525 5752.1323]
 输出数据(dstLocal): [12.621031 8.40284 ... 1.5127451 12.4898815]
 ```
 
 Log10接口结果示例如下：
 
-```
+```text
 输入数据(srcLocal): [712.7535 78.36265 ... 3099.0571 9313.082]
 输出数据(dstLocal): [2.8529394 1.8941091 ... 3.4912295 3.9690933]
 ```

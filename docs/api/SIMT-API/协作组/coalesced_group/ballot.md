@@ -56,8 +56,8 @@ unsigned int ballot(int predicate) const
     using namespace cooperative_groups;
     __global__ void simt_kernel(...)
     {
-        ...
-        if (threadIdx.x % 2 == 0) {
+        ... if (threadIdx.x % 2 == 0)
+        {
             coalesced_group active = coalesced_threads();
             uint32_t result = active.ballot(1); // 返回0xFFFF
         }
@@ -71,8 +71,8 @@ unsigned int ballot(int predicate) const
     using namespace cooperative_groups;
     __simt_vf__ inline void simt_kernel(...)
     {
-        ...
-        if (threadIdx.x % 2 == 0) {
+        ... if (threadIdx.x % 2 == 0)
+        {
             coalesced_group active = coalesced_threads();
             uint32_t result = active.ballot(1); // 返回0xFFFF
         }

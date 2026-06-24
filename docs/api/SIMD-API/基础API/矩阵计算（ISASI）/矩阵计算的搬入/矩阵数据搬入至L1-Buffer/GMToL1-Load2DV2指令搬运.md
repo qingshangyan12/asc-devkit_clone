@@ -24,7 +24,8 @@
 
 ```cpp
 template <typename T>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParamsV2& loadDataParam)
+__aicore__ inline void LoadData(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParamsV2& loadDataParam)
 ```
 
 ## 参数说明<a id="section622mcpsimp"></a>
@@ -96,7 +97,7 @@ constexpr uint32_t dstElemCount = 9 * fractalElemCount;
 // 源操作数：GM上按Nz分形排布存放half数据。一个512B分形包含256个half。
 // GM shape为80 * 80，M方向和K方向各有5个小分形，因此预留5 * 5 = 25个512B分形。
 AscendC::GlobalTensor<half> srcGm;
-srcGm.SetGlobalBuffer((__gm__ half *)src, srcElemCount);
+srcGm.SetGlobalBuffer((__gm__ half*)src, srcElemCount);
 
 // 目的操作数：L1 Buffer，目的矩阵为3 * 3个小分形，因此预留9个512B分形。
 AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::A1, 0, dstElemCount);

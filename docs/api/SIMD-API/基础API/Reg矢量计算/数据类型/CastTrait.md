@@ -4,7 +4,7 @@
 
 包括[RegLayout](RegLayout.md)、[SatMode](SatMode.md)、[MaskMergeMode](MaskMergeMode.md)、[RoundMode](RoundMode.md)。
 
-```
+```cpp
 struct CastTrait {
     RegLayout layoutMode = RegLayout::UNKNOWN;
     SatMode satMode = SatMode::UNKNOWN;

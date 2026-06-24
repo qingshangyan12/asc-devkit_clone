@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void asc_prof_stop()
 ```
 
@@ -34,7 +34,7 @@ __aicore__ inline void asc_prof_stop()
 
 ## 调用示例
 
-```
+```text
 asc_prof_stop();
 ```
 

@@ -46,14 +46,16 @@
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <typename T, int32_t reduceDim = -1, bool isReuseSource = false, bool isBasicBlock = false>
-    __aicore__ inline void Sum(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const SumParams& sumParams)
+    __aicore__ inline void Sum(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+        const SumParams& sumParams)
     ```
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <typename T, int32_t reduceDim = -1, bool isReuseSource = false, bool isBasicBlock = false>
     __aicore__ inline void Sum(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const SumParams& sumParams)
     ```
@@ -85,7 +87,7 @@
 | sharedTmpBuffer | 输入 | 临时缓存。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>用于Sum内部复杂计算时存储中间变量，由开发者提供。<br><br>临时空间大小BufferSize的获取方式请参考[GetSumMaxMinTmpSize](GetSumMaxMinTmpSize.md)。 |
 | sumParams | 输入 | srcTensor的shape信息。SumParams类型，具体定义如下方代码所示，其中参数的含义为：<br>outter：输入数据的外轴长度。<br>inner：输入数据内轴实际元素个数32字节补齐后的元素个数，inner\*sizeof(T)必须是32字节的整数倍。<br>n：输入数据内轴的实际元素个数。<br>请注意：sumParams.inner是sumParams.n向上32字节对齐后的值，inner = (n *sizeof(T) + 32 - 1) / 32 * 32 / sizeof(T)，因此sumParams.n的大小应该满足：1 <= sumParams.n <= sumParams.inner。 |
 
-```
+```cpp
 struct SumParams {
     uint32_t outter = 1;
     uint32_t inner;
@@ -115,7 +117,7 @@ struct SumParams {
 
 ## 调用示例
 
-```
+```cpp
 // 定义srcTensor的shape信息，输入元素类型为half，大小为2*3的二维数据
 AscendC::SumParams params;
 // m为2, outter等于m的值
@@ -135,7 +137,7 @@ AscendC::Sum(yLocal, xLocal, sharedTmpBuffer, params);
 
 结果示例如下。
 
-```
+```text
 输入数据srcLocal: [[1 2 3 0 0 0 0 0 0 0 0 0 0 0 0 0],
                      [4 5 6 0 0 0 0 0 0 0 0 0 0 0 0 0]]
 输出数据dstLocal: [6 15 0 0 0 0 0 0 0 0 0 0 0 0 0 0]

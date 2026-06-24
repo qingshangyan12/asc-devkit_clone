@@ -12,7 +12,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── simd_vf_printf
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── simd_vf_printf.asc      // Ascend C样例实现&调用样例

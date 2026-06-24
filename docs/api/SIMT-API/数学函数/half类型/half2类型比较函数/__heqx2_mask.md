@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```cpp
 unsigned int __heqx2_mask(half2 x, half2 y)
 ```
 
@@ -54,7 +54,7 @@ unsigned int __heqx2_mask(half2 x, half2 y)
 
 使用该接口需要包含"simt\_api/asc\_fp16.h"头文件。
 
-```
+```cpp
 #include "simt_api/asc_fp16.h"
 ```
 
@@ -62,9 +62,10 @@ unsigned int __heqx2_mask(half2 x, half2 y)
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     // 使用短向量可提升数据搬运效率
-    __global__ __launch_bounds__(1024) void simt_heqx2_mask(half* x, half* y, unsigned int* dst, uint32_t input_total_length)
+    __global__ __launch_bounds__(1024) void simt_heqx2_mask(
+        half* x, half* y, unsigned int* dst, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= input_total_length / 2的线程不处理数据
@@ -79,9 +80,10 @@ unsigned int __heqx2_mask(half2 x, half2 y)
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     // 使用短向量可提升数据搬运效率
-    __simt_vf__ __launch_bounds__(1024) inline void simt_heqx2_mask(__gm__ half2* x, __gm__ half2* y, __gm__ unsigned int* dst, uint32_t input_total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void simt_heqx2_mask(
+        __gm__ half2* x, __gm__ half2* y, __gm__ unsigned int* dst, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= input_total_length / 2的线程不处理数据
@@ -91,7 +93,8 @@ unsigned int __heqx2_mask(half2 x, half2 y)
         dst[idx] = __heqx2_mask(x[idx], y[idx]);
     }
 
-    __global__ __vector__ void compare_kernel(__gm__ half* x, __gm__ half* y, __gm__ unsigned int* dst, uint32_t input_total_length)
+    __global__ __vector__ void compare_kernel(
+        __gm__ half* x, __gm__ half* y, __gm__ unsigned int* dst, uint32_t input_total_length)
     {
         asc_vf_call<simt_heqx2_mask>(dim3(1024), (__gm__ half2*)x, (__gm__ half2*)y, dst, input_total_length);
     }

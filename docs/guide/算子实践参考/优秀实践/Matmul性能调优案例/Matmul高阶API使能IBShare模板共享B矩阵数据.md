@@ -85,15 +85,17 @@ Matmul API开启IBShare模板共享B矩阵的完整样例请参考[仅B矩阵开
 
 1.  创建Matmul对象。
 
-    ```
+    ```cpp
     #define ASCENDC_CUBE_ONLY
     #include "lib/matmul_intf.h"
-    
+
     using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
-    using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false, LayoutMode::NONE, true>; // 设置B矩阵的IBSHARE参数为true
+    using B_TYPE = AscendC::MatmulType<
+        AscendC::TPosition::GM, CubeFormat::ND, BType, false, LayoutMode::NONE, true>; // 设置B矩阵的IBSHARE参数为true
     using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-    using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
-    AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_IBSHARE_NORM> matmulObj; // 使用默认的IBShare模板参数CFG_IBSHARE_NORM定义Matmul对象
+    using BIAS_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+    AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_IBSHARE_NORM>
+        matmulObj; // 使用默认的IBShare模板参数CFG_IBSHARE_NORM定义Matmul对象
     ```
 
 ## 验证优化方案性能收益<a name="section19022397498"></a>

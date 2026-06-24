@@ -59,9 +59,11 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
-template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, const BinaryConfig &config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
-__aicore__ inline void MulsCast(const T2 &dst, const T3 &src0, const T4 &src1, const uint32_t count)
+```cpp
+template <
+    typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType,
+    const BinaryConfig& config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
+__aicore__ inline void MulsCast(const T2& dst, const T3& src0, const T4& src1, const uint32_t count)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -189,18 +191,18 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 // 标量在后示例
 AscendC::MulsCast(dstLocal, src0Local, src1Local[0], 512);
 
 // 标量在前示例
-static constexpr AscendC::BinaryConfig config = { 0 };
+static constexpr AscendC::BinaryConfig config = {0};
 AscendC::MulsCast<BinaryDefaultType, BinaryDefaultType, config>(dstLocal, src0Local[0], src1Local, 512);
 ```
 
 结果示例如下：
 
-```
+```text
 输入数据src0Local：[6 5 11 ... ]
 输入数据src1Local：2
 输出数据dstLocal：[12 10 22 ... ]

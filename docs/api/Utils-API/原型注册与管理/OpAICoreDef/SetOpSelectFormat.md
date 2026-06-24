@@ -8,8 +8,8 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001626409757_zh-cn_topic_0000001526442954_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
-OpAICoreDef &SetOpSelectFormat(optiling::OP_CHECK_FUNC func)
+```cpp
+OpAICoreDef& SetOpSelectFormat(optiling::OP_CHECK_FUNC func)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001626409757_zh-cn_topic_0000001526442954_zh-cn_topic_0000001525424352_section75395119104"></a>
@@ -52,8 +52,8 @@ OpAICoreDef算子定义，OpAICoreDef请参考[OpAICoreDef](OpAICoreDef.md)。
 
 如下展示了自定义Add算子推导函数实现和注册的样例。
 
-```
-static ge::graphStatus OpSelectFormat(const ge::Operator &op, ge::AscendString &result)
+```cpp
+static ge::graphStatus OpSelectFormat(const ge::Operator& op, ge::AscendString& result)
 {
     std::string resultJsonStr;
     // 如果本次执行第一个输入参数shape的第一个维度<=8，则支持更多的格式，否则仅支持int32
@@ -77,17 +77,14 @@ static ge::graphStatus OpSelectFormat(const ge::Operator &op, ge::AscendString &
 
 推导函数的注册样例如下：
 
-```
+```cpp
 class AddCustom : public OpDef {
 public:
     AddCustom(const char* name) : OpDef(name)
     {
-        this->Input("x")
-            .ParamType(REQUIRED);
-        this->Input("y")
-            .ParamType(REQUIRED);
-        this->Output("z")
-            .ParamType(REQUIRED);
+        this->Input("x").ParamType(REQUIRED);
+        this->Input("y").ParamType(REQUIRED);
+        this->Output("z").ParamType(REQUIRED);
         this->SetInferShape(ge::InferShape);
         this->AICore()
             .SetTiling(optiling::TilingFunc)

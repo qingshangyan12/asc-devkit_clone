@@ -52,14 +52,18 @@ $dst_i = \sim src_i$
 
         ```cpp
         template <typename T, bool isSetMask = true>
-        __aicore__ inline void Not(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+        __aicore__ inline void Not(
+            const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[], const uint8_t repeatTime,
+            const UnaryRepeatParams& repeatParams)
         ```
 
     - mask连续模式
 
         ```cpp
         template <typename T, bool isSetMask = true>
-        __aicore__ inline void Not(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+        __aicore__ inline void Not(
+            const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime,
+            const UnaryRepeatParams& repeatParams)
         ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -137,17 +141,17 @@ $dst_i = \sim src_i$
     // repeatTime = 4, 128 elements one repeat, 512 elements total.
     // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat.
     // dstRepStride, srcRepStride = 8, no gap between repeats.
-    AscendC::Not(dstLocal, srcLocal, mask, 4, { 1, 1, 8, 8 });
+    AscendC::Not(dstLocal, srcLocal, mask, 4, {1, 1, 8, 8});
     ```
 
 - tensor高维切分计算样例-mask逐bit模式
 
     ```cpp
-    uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
+    uint64_t mask[2] = {UINT64_MAX, UINT64_MAX};
     // repeatTime = 4, 128 elements one repeat, 512 elements total.
     // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat.
     // dstRepStride, srcRepStride = 8, no gap between repeats.
-    AscendC::Not(dstLocal, srcLocal, mask, 4, { 1, 1, 8, 8 });
+    AscendC::Not(dstLocal, srcLocal, mask, 4, {1, 1, 8, 8});
     ```
 
 - tensor前n个数据计算接口样例

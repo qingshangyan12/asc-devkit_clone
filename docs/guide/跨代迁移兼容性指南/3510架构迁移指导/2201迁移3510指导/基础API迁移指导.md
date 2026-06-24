@@ -33,11 +33,9 @@
 
     可以参考以下代码片段：
 
-    ```
+    ```cpp
     // 定义模板参数
-    constexpr AscendC::LnConfig CONFIG = {
-        AscendC::LnAlgo::PRECISION_1ULP_FTZ_FALSE
-    };
+    constexpr AscendC::LnConfig CONFIG = {AscendC::LnAlgo::PRECISION_1ULP_FTZ_FALSE};
     constexpr uint32_t DATA_COUNT = 1024;
     constexpr uint32_t xAddr = 0;
     constexpr uint32_t yAddr = xAddr + DATA_COUNT * sizeof(half);
@@ -82,7 +80,7 @@
 
     1.  将矩阵A从GM搬运到L1 Buffer。
 
-        ```
+        ```cpp
         __aicore__ inline void CopyGmToL1A(AscendC::LocalTensor<T> a1Local)
         {
             AscendC::Nd2NzParams intriParams1{1, M, K, 0, K, M, 1, 0};
@@ -92,7 +90,7 @@
 
     2.  将矩阵B（矩阵B为单位矩阵）从GM搬运到L1 Buffer。
 
-        ```
+        ```cpp
         __aicore__ inline void CopyGmToL1B(AscendC::LocalTensor<U> b1Local)
         {
             AscendC::Nd2NzParams intriParams2{1, K, N, 0, N, K, 1, 0};
@@ -102,46 +100,42 @@
 
     3.  将矩阵A从L1 Buffer搬运到L0A Buffer。
 
-        ```
+        ```cpp
         __aicore__ inline void Load2DL1AToL0A(AscendC::LocalTensor<T> a1Local, AscendC::LocalTensor<T> a2Local)
         {
             AscendC::LoadData2DParamsV2 loadDataParams;
-            ...
-            AscendC::LoadData(a2Local, a1Local, loadDataParams);
+            ... AscendC::LoadData(a2Local, a1Local, loadDataParams);
         }
         ```
 
     4.  将矩阵B从L1 Buffer搬运到L0B Buffer。
 
-        ```
+        ```cpp
         __aicore__ inline void Load2DL1BToL0B(AscendC::LocalTensor<U> b1Local, AscendC::LocalTensor<U> b2Local)
         {
             AscendC::LoadData2DParamsV2 loadDataParams;
-            ...
-            AscendC::LoadData(b2Local, b1Local, loadDataParams);
+            ... AscendC::LoadData(b2Local, b1Local, loadDataParams);
         }
         ```
 
     5.  进行Mmad矩阵计算，结果输出到L0C Buffer。
 
-        ```
+        ```cpp
         __aicore__ inline void Compute(
             AscendC::LocalTensor<S> co1Local, AscendC::LocalTensor<T> a2Local, AscendC::LocalTensor<U> b2Local)
         {
             AscendC::MmadParams mmadParams;
-            ...
-            AscendC::Mmad(co1Local, a2Local, b2Local, mmadParams);
+            ... AscendC::Mmad(co1Local, a2Local, b2Local, mmadParams);
         }
         ```
 
     6.  通过FixPipe将矩阵C从L0C Buffer拷贝到GM。
 
-        ```
+        ```cpp
         __aicore__ inline void CopyL0CToGm(AscendC::LocalTensor<S> co1Local)
         {
             AscendC::FixpipeParamsV220 fixpipeParams;
-            ...
-            AscendC::Fixpipe<S, S, AscendC::CFG_ROW_MAJOR>(cGlobal, co1Local, fixpipeParams);
+            ... AscendC::Fixpipe<S, S, AscendC::CFG_ROW_MAJOR>(cGlobal, co1Local, fixpipeParams);
         }
         ```
 
@@ -160,99 +154,93 @@
 
     1.  将矩阵A从GM搬运到L1 Buffer。
 
-        ```
+        ```cpp
         __aicore__ inline void CopyGmToA1Nd2Nz(AscendC::LocalTensor<T>& leftMatrix)
         {
             AscendC::Nd2NzParams nd2nzParams;
-            ...
-            AscendC::DataCopy(leftMatrix, aGlobal, nd2nzParams);
+            ... AscendC::DataCopy(leftMatrix, aGlobal, nd2nzParams);
         }
         ```
 
     2.  将矩阵B从GM搬运到L1 Buffer。
 
-        ```
+        ```cpp
         __aicore__ inline void CopyGmToB1Nd2Nz(AscendC::LocalTensor<U>& rightMatrix)
         {
             AscendC::Nd2NzParams nd2nzParams;
-            ...
-            AscendC::DataCopy(rightMatrix, bGlobal, nd2nzParams);
+            ... AscendC::DataCopy(rightMatrix, bGlobal, nd2nzParams);
         }
         ```
 
     3.  将矩阵A从L1 Buffer搬运到L0A Buffer。
 
-        ```
-            __aicore__ inline void Load3DA1ToL0A(AscendC::LocalTensor<T>& leftMatrix, AscendC::LocalTensor<T>& a2)
-            {
-                AscendC::LoadData3DParamsV2Pro loadData3dParamsPro;
-                ...
+        ```cpp
+        __aicore__ inline void Load3DA1ToL0A(AscendC::LocalTensor<T>& leftMatrix, AscendC::LocalTensor<T>& a2)
+        {
+            AscendC::LoadData3DParamsV2Pro loadData3dParamsPro;
+            ...
         #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-                ...
-                AscendC::SetLoadDataRepeat({0, 1, 0});
-                AscendC::SetLoadDataBoundary(1024);
-                AscendC::LoadData(a2, leftMatrix, loadData3dParamsPro);
+                ... AscendC::SetLoadDataRepeat({0, 1, 0});
+            AscendC::SetLoadDataBoundary(1024);
+            AscendC::LoadData(a2, leftMatrix, loadData3dParamsPro);
         #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
                 uint16_t dstStride = AscendC::DivCeil(M / 2, 16);
-                ...
-                AscendC::SetLoadDataRepeatWithStride({0, 1, 0, dstStride});
-                // 多次调用LoadData进行手动绕回
-                AscendC::LoadData(a2, leftMatrix, loadData3dParamsPro);
-                AscendC::LocalTensor<T> a3 = a2[256];
-                AscendC::LoadData(a3, leftMatrix, loadData3dParamsPro);
-                AscendC::LocalTensor<T> a4 = a2[512];
-                AscendC::LoadData(a4, leftMatrix, loadData3dParamsPro);
-                AscendC::LocalTensor<T> a5 = a2[768];
-                AscendC::LoadData(a5, leftMatrix, loadData3dParamsPro);
+            ... AscendC::SetLoadDataRepeatWithStride({0, 1, 0, dstStride});
+            // 多次调用LoadData进行手动绕回
+            AscendC::LoadData(a2, leftMatrix, loadData3dParamsPro);
+            AscendC::LocalTensor<T> a3 = a2[256];
+            AscendC::LoadData(a3, leftMatrix, loadData3dParamsPro);
+            AscendC::LocalTensor<T> a4 = a2[512];
+            AscendC::LoadData(a4, leftMatrix, loadData3dParamsPro);
+            AscendC::LocalTensor<T> a5 = a2[768];
+            AscendC::LoadData(a5, leftMatrix, loadData3dParamsPro);
         #endif
-            }
+        }
         ```
 
     4.  将矩阵B从L1 Buffer搬运到L0B Buffer。
 
-        ```
-            __aicore__ inline void Load3DB1ToL0B(AscendC::LocalTensor<U>& rightMatrix, AscendC::LocalTensor<U>& b2)
-            {
-                AscendC::LoadData3DParamsV2<U> loadData3dParams;
-                ...
-                uint8_t padList[AscendC::PAD_SIZE] = {0, 0, 0, 0};
-                static constexpr AscendC::IsResetLoad3dConfig LOAD3D_CONFIG = {false, false};
-                AscendC::SetFmatrix(N, 1, padList, AscendC::FmatrixMode::FMATRIX_LEFT);
+        ```cpp
+        __aicore__ inline void Load3DB1ToL0B(AscendC::LocalTensor<U>& rightMatrix, AscendC::LocalTensor<U>& b2)
+        {
+            AscendC::LoadData3DParamsV2<U> loadData3dParams;
+            ... uint8_t padList[AscendC::PAD_SIZE] = {0, 0, 0, 0};
+            static constexpr AscendC::IsResetLoad3dConfig LOAD3D_CONFIG = {false, false};
+            AscendC::SetFmatrix(N, 1, padList, AscendC::FmatrixMode::FMATRIX_LEFT);
         #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-                AscendC::SetLoadDataRepeat({0, 1, 0});
-                AscendC::SetLoadDataBoundary(0);
-                AscendC::SetLoadDataPaddingValue(0);
-                AscendC::LoadData<U, LOAD3D_CONFIG>(b2, rightMatrix, loadData3dParams);
+            AscendC::SetLoadDataRepeat({0, 1, 0});
+            AscendC::SetLoadDataBoundary(0);
+            AscendC::SetLoadDataPaddingValue(0);
+            AscendC::LoadData<U, LOAD3D_CONFIG>(b2, rightMatrix, loadData3dParams);
         #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-                uint16_t dstStride = AscendC::DivCeil(N, 16);
-                AscendC::SetLoadDataRepeatWithStride({0, 1, 0, dstStride});
-                AscendC::SetLoadDataPaddingValue(0);
-                AscendC::LoadDataWithStride<U, LOAD3D_CONFIG>(b2, rightMatrix, loadData3dParams);
+            uint16_t dstStride = AscendC::DivCeil(N, 16);
+            AscendC::SetLoadDataRepeatWithStride({0, 1, 0, dstStride});
+            AscendC::SetLoadDataPaddingValue(0);
+            AscendC::LoadDataWithStride<U, LOAD3D_CONFIG>(b2, rightMatrix, loadData3dParams);
         #endif
-            }
+        }
         ```
 
     5.  矩阵计算。
 
-        ```
-        __aicore__ inline void Compute(AscendC::LocalTensor<T>& a2, AscendC::LocalTensor<U>& b2,
-                                    AscendC::LocalTensor<V>& co1Local)
+        ```cpp
+        __aicore__ inline void Compute(
+            AscendC::LocalTensor<T>& a2, AscendC::LocalTensor<U>& b2, AscendC::LocalTensor<V>& co1Local)
         {
             AscendC::MmadParams mmadParams;
-            ...
-            AscendC::Mmad(co1Local, a2, b2, mmadParams);
+            ... AscendC::Mmad(co1Local, a2, b2, mmadParams);
         }
         ```
 
     6.  将矩阵C从L0C Buffer搬运到GM。
 
-        ```
+        ```cpp
         __aicore__ inline void CopyL0CToGm(AscendC::LocalTensor<V>& co1Local, const AscendC::GlobalTensor<S>& gm)
         {
-            AscendC::FixpipeParamsV220 fixpipeParams(N, static_cast<uint16_t>(M),
-                                            AscendC::DivCeil(M, AscendC::BLOCK_CUBE) * AscendC::BLOCK_CUBE, static_cast<uint16_t>(N), 0);
-            ...
-            AscendC::Fixpipe<S, V, AscendC::CFG_ROW_MAJOR>(gm, co1Local, fixpipeParams);
+            AscendC::FixpipeParamsV220 fixpipeParams(
+                N, static_cast<uint16_t>(M), AscendC::DivCeil(M, AscendC::BLOCK_CUBE) * AscendC::BLOCK_CUBE,
+                static_cast<uint16_t>(N), 0);
+            ... AscendC::Fixpipe<S, V, AscendC::CFG_ROW_MAJOR>(gm, co1Local, fixpipeParams);
         }
         ```
 
@@ -266,9 +254,9 @@
 
     1.  在Vector Core进行int4b\_t到int8\_t的Cast转换，转换后的数据保存到新的GM空间中。
 
-        ```
-        __aicore__ inline void Unzip(AscendC::GlobalTensor<int8_t>& dstGlobalTensor,
-            AscendC::GlobalTensor<int8_t>& srcGlobalTensor, uint32_t count)
+        ```cpp
+        __aicore__ inline void Unzip(
+            AscendC::GlobalTensor<int8_t>& dstGlobalTensor, AscendC::GlobalTensor<int8_t>& srcGlobalTensor, uint32_t count)
         {
             constexpr uint32_t oneBlockBytes = 32;
             uint32_t srcAddr = 0;
@@ -283,8 +271,7 @@
             AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
             AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
-            AscendC::LocalTensor<AscendC::int4b_t> int4SrcLocalTensor =
-                srcLocalTensor.ReinterpretCast<AscendC::int4b_t>();
+            AscendC::LocalTensor<AscendC::int4b_t> int4SrcLocalTensor = srcLocalTensor.ReinterpretCast<AscendC::int4b_t>();
             AscendC::Cast<half, AscendC::int4b_t>(tmpTensor, int4SrcLocalTensor, AscendC::RoundMode::CAST_NONE, count * 2);
             AscendC::PipeBarrier<PIPE_V>();
             AscendC::Cast<int8_t, half>(dstLocalTensor, tmpTensor, AscendC::RoundMode::CAST_CEIL, count * 2);
@@ -297,15 +284,13 @@
 
     2.  进行int8\_t数据类型的矩阵计算。
 
-        ```
+        ```cpp
         __aicore__ inline void RunMatmul()
         {
-            ...
-            int offsetA = 0;
+            ... int offsetA = 0;
             int offsetB = 0;
             int offsetC = 0;
-            ...
-            auto gmA = aGlobal[offsetA];
+            ... auto gmA = aGlobal[offsetA];
             auto gmB = bGlobal[offsetB];
             auto gmC = cGlobal[offsetC];
 
@@ -350,36 +335,36 @@
 
     分形变化带来的变动主要体现在L1 Buffer到L0A Buffer的搬运过程，以下代码片段进行展示：
 
-    ```
-        __aicore__ inline void DataLoadA(AscendC::LocalTensor<T> a1, AscendC::LocalTensor<T> a2)
-        {
+    ```cpp
+    __aicore__ inline void DataLoadA(AscendC::LocalTensor<T> a1, AscendC::LocalTensor<T> a2)
+    {
     #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-            constexpr uint32_t mBlocks = M / CUBE_BLOCK;
-            constexpr uint32_t kBlocks = K * sizeof(T) / C0_SIZE;
-            int srcOffset = 0;
-            int dstOffset = 0;
-            for (uint32_t i = 0; i < mBlocks; ++i) {
-                AscendC::LoadData2DParams loadDataParams;
-                loadDataParams.repeatTimes = kBlocks;
-                loadDataParams.srcStride = mBlocks;
-                loadDataParams.ifTranspose = false;
-                AscendC::LoadData(a2[dstOffset], a1[srcOffset], loadDataParams);
-                srcOffset += CUBE_BLOCK * CUBE_BLOCK;
-                dstOffset += K * CUBE_BLOCK;
-            }
-    #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-            AscendC::LoadData2DParamsV2 loadDataParams;
-            loadDataParams.mStartPosition = 0;
-            loadDataParams.kStartPosition = 0;
-            loadDataParams.mStep = AscendC::DivCeil(M, CUBE_BLOCK);
-            loadDataParams.kStep = AscendC::DivCeil(K * sizeof(T), C0_SIZE);
-            loadDataParams.srcStride = AscendC::DivCeil(M, CUBE_BLOCK);
-            loadDataParams.dstStride = AscendC::DivCeil(M, CUBE_BLOCK);
-            loadDataParams.sid = 0;
+        constexpr uint32_t mBlocks = M / CUBE_BLOCK;
+        constexpr uint32_t kBlocks = K * sizeof(T) / C0_SIZE;
+        int srcOffset = 0;
+        int dstOffset = 0;
+        for (uint32_t i = 0; i < mBlocks; ++i) {
+            AscendC::LoadData2DParams loadDataParams;
+            loadDataParams.repeatTimes = kBlocks;
+            loadDataParams.srcStride = mBlocks;
             loadDataParams.ifTranspose = false;
-            AscendC::LoadData(a2, a1, loadDataParams);
-    #endif
+            AscendC::LoadData(a2[dstOffset], a1[srcOffset], loadDataParams);
+            srcOffset += CUBE_BLOCK * CUBE_BLOCK;
+            dstOffset += K * CUBE_BLOCK;
         }
+    #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+        AscendC::LoadData2DParamsV2 loadDataParams;
+        loadDataParams.mStartPosition = 0;
+        loadDataParams.kStartPosition = 0;
+        loadDataParams.mStep = AscendC::DivCeil(M, CUBE_BLOCK);
+        loadDataParams.kStep = AscendC::DivCeil(K * sizeof(T), C0_SIZE);
+        loadDataParams.srcStride = AscendC::DivCeil(M, CUBE_BLOCK);
+        loadDataParams.dstStride = AscendC::DivCeil(M, CUBE_BLOCK);
+        loadDataParams.sid = 0;
+        loadDataParams.ifTranspose = false;
+        AscendC::LoadData(a2, a1, loadDataParams);
+    #endif
+    }
     ```
 
 -   **3510架构版本硬件架构删除4：2结构化稀疏功能。**<a name="li69092585134"></a>
@@ -398,7 +383,7 @@
 
     1.  将矩阵A从GM搬运到L1 Buffer。
 
-        ```
+        ```cpp
         __aicore__ inline void CopyGmToA1(AscendC::LocalTensor<T>& leftMatrix)
         {
             AscendC::Nd2NzParams intriParams1{1, 64, 128, 0, 128, 64, 1, 0};
@@ -408,12 +393,11 @@
 
     2.  将矩阵A从L1 Buffer搬运到L0A Buffer。
 
-        ```
+        ```cpp
         __aicore__ inline void Load2DA1ToL0A(AscendC::LocalTensor<T>& a1, AscendC::LocalTensor<T>& a2)
         {
             AscendC::LoadData2DParamsV2 loadDataParams;
-            ...
-            AscendC::LoadData(a2, a1, loadDataParams);
+            ... AscendC::LoadData(a2, a1, loadDataParams);
         }
         ```
 
@@ -427,7 +411,7 @@
 
     1.  初始化L1 Buffer。
 
-        ```
+        ```cpp
         __aicore__ inline void InitConstA1(AscendC::LocalTensor<T>& a1Local)
         {
             AscendC::Fill(a1Local, {1, static_cast<uint16_t>(M * K * sizeof(T) / 32), 0, 1});
@@ -436,12 +420,11 @@
 
     2.  调用LoadData接口将L1 Buffer上的数据搬运到L0A Buffer。
 
-        ```
+        ```cpp
         __aicore__ inline void Load2DA1ToA2(AscendC::LocalTensor<T>& a1Local, AscendC::LocalTensor<T>& a2Local)
         {
             AscendC::LoadData2DParamsV2 loadDataParams;
-            ...
-            AscendC::LoadData(a2Local, a1Local, loadDataParams);
+            ... AscendC::LoadData(a2Local, a1Local, loadDataParams);
         }
         ```
 

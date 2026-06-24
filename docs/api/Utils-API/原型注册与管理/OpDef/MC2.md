@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001935420684_zh-cn_topic_0000001526594958_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
+```text
 OpMC2Def &MC2(void)
 ```
 

@@ -18,7 +18,7 @@ Different hardware implementations are isolated through compile-time macros:
 
 ## Directory Structure
 
-```
+```text
 ├── scatter
 │   ├── scripts
 │   │   ├── gen_data.py         // Input data and ground truth generation script

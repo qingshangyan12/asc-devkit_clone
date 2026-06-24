@@ -12,7 +12,7 @@ A Matmul example with A and B matrices as hifloat8, fp8_e4m3fn, or fp8_e5m2 data
 
 ## Directory Structure
 
-```
+```text
 ├── matmul_fp8
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data
@@ -57,10 +57,12 @@ A Matmul example with A and B matrices as hifloat8, fp8_e4m3fn, or fp8_e5m2 data
 
       ...
 
-      AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, aType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, bType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, cType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, biasType>, mmCfg> matmulObj;
+          AscendC::Matmul<
+              AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, aType>,
+              AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, bType>,
+              AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, cType>,
+              AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, biasType>, mmCfg>
+              matmulObj;
       ```
   - Invocation Implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.

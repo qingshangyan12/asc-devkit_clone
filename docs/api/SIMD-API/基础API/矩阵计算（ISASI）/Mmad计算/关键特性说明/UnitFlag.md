@@ -58,7 +58,8 @@ for (auto kIndex = 0; kIndex < kRound; ++kIndex) {
     }
 }
 // Fixpipe一次搬出
-// Fixpipe的unitFlag设置为3，读取后将单元标记位设置为0，保证后续Mmad接口可以顺利写入L0C Buffer数据
+// Fixpipe的unitFlag设置为3，读取后将单元标记位设置为0，保证后续Mmad接口可以顺利写入L0C
+// Buffer数据
 fixpipeParams.unitFlag = 3;
 AscendC::Fixpipe(cGM, c, fixpipeParams);
 ```

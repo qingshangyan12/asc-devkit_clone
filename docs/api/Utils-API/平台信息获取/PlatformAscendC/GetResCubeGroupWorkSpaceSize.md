@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001969965338_zh-cn_topic_0000001391767420_section13230182415108"></a>
 
-```
+```cpp
 uint32_t GetResCubeGroupWorkSpaceSize(void) const
 ```
 
@@ -24,19 +24,21 @@ uint32_t GetResCubeGroupWorkSpaceSize(void) const
 
 ## 调用示例<a name="zh-cn_topic_0000001969965338_zh-cn_topic_0000001391767420_section320753512363"></a>
 
-```
+```cpp
 // 用户自定义的tiling函数
 static ge::graphStatus TilingFunc(gert::TilingContext* context)
 {
     AddApiTiling tiling;
     ...
-    // 如需要使用系统workspace需要调用GetLibApiWorkSpaceSize获取系统workspace的大小。
-    auto ascendcPlatform = platform_ascendc:: PlatformAscendC(context->GetPlatformInfo());
+        // 如需要使用系统workspace需要调用GetLibApiWorkSpaceSize获取系统workspace的大小。
+        auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
     uint32_t sysWorkspaceSize = ascendcPlatform.GetLibApiWorkSpaceSize();
     // 设置用户需要使用的workspace和CreateCubeResGroup需要的大小作为usrWorkspace的总大小。
-    size_t usrSize = 256 + ascendcPlatform.GetResCubeGroupWorkSpaceSize(); 
-    size_t *currentWorkspace = context->GetWorkspaceSizes(1); // 通过框架获取workspace的指针，GetWorkspaceSizes入参为所需workspace的块数。当前限制使用一块。
-    currentWorkspace[0] = usrSize + sysWorkspaceSize; // 设置总的workspace的数值大小，总的workspace空间由框架来申请并管理。
+    size_t usrSize = 256 + ascendcPlatform.GetResCubeGroupWorkSpaceSize();
+    size_t* currentWorkspace = context->GetWorkspaceSizes(
+        1); // 通过框架获取workspace的指针，GetWorkspaceSizes入参为所需workspace的块数。当前限制使用一块。
+    currentWorkspace[0] =
+        usrSize + sysWorkspaceSize; // 设置总的workspace的数值大小，总的workspace空间由框架来申请并管理。
     ...
 }
 ```

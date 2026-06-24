@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetInputStartPosition(int64_t diStartPos, int64_t mStartPos)
 ```
 
@@ -49,7 +49,7 @@ __aicore__ inline void SetInputStartPosition(int64_t diStartPos, int64_t mStartP
 
 ## 调用示例
 
-```
+```text
 conv3dApi.SetInputStartPosition(diIdxStart, mIdxStart);
 ```
 

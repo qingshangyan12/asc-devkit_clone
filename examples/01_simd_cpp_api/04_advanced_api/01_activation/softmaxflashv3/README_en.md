@@ -14,7 +14,7 @@ This example uses the SoftmaxFlashV3 high-level API in a large model training at
 
 ## Directory Structure
 
-```
+```text
 ├── softmaxflashv3
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

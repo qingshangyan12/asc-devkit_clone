@@ -19,7 +19,7 @@ This example uses vector addition to demonstrate performance tuning methods for 
 
 ## Directory Structure
 
-```
+```text
 short_vector_add
 │   ├── scripts/             // Test script directory
 │   │   ├── gen_data.py      // Generate test input and golden data
@@ -76,12 +76,13 @@ The baseline implements addition of two groups of `half`-type input data.
 **Key Code**:
 
 ```cpp
-template<typename T>
+template <typename T>
 __global__ void add(T* x, T* y, T* z, uint64_t size)
 {
     // gridDim.x * blockDim.x total threads (64 * 1024)
     int32_t stride = gridDim.x * blockDim.x;
-    // Each thread starts from its own global idx, incrementing by total threads until all elements are processed
+    // Each thread starts from its own global idx, incrementing by total threads
+    // until all elements are processed
     for (int32_t idx = blockIdx.x * blockDim.x + threadIdx.x; idx < size; idx += stride) {
         z[idx] = x[idx] + y[idx];
     }
@@ -125,7 +126,7 @@ Replace the original `half`-type data with `half2`-type data for two groups of i
 **Key Code**:
 
 ```cpp
-template<typename T, typename U>
+template <typename T, typename U>
 __global__ void add2(T* x, T* y, T* z, uint64_t size)
 {
     // Convert to vector type
@@ -139,7 +140,8 @@ __global__ void add2(T* x, T* y, T* z, uint64_t size)
     for (int32_t idx = blockIdx.x * blockDim.x + threadIdx.x; idx < vectorSize; idx += stride) {
         z2[idx] = x2[idx] + y2[idx];
     }
-    // Handle last odd element (if size is odd, processed by global thread 0 at the end)
+    // Handle last odd element (if size is odd, processed by global thread 0 at
+    // the end)
     if (blockIdx.x == 0 && threadIdx.x == 0 && (size % 2 != 0)) {
         uint64_t lastIdx = size - 1;
         z[lastIdx] = x[lastIdx] + y[lastIdx];
@@ -273,7 +275,7 @@ After the command completes, a folder named "OPPROF_{timestamp}_XXX" is generate
 
 View specific performance analysis results:
 
-```
-# For example, view L2 Cache related data
-cat ./OPPROF_*/L2Cache.csv
+```cpp
+#For example, view L2 Cache related data
+cat./ OPPROF_* / L2Cache.csv
 ```

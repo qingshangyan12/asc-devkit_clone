@@ -29,14 +29,16 @@
 
 -   <a name="li135771283591"></a>接口内部管理CO1
 
-    ```
-    template <bool sync = true> __aicore__ inline bool Iterate(bool enPartialSum = false)
+    ```cpp
+    template <bool sync = true>
+    __aicore__ inline bool Iterate(bool enPartialSum = false)
     ```
 
 -   <a name="li4843165185812"></a>用户自主管理CO1
 
-    ```
-    template <bool sync = true, typename T> __aicore__ inline bool Iterate(bool enPartialSum, const LocalTensor<T>& localCmatrix)
+    ```cpp
+    template <bool sync = true, typename T>
+    __aicore__ inline bool Iterate(bool enPartialSum, const LocalTensor<T>& localCmatrix)
     ```
 
     -   Atlas 推理系列产品AI Core暂不支持用户自主管理CO1。
@@ -79,7 +81,7 @@ true：数据仍在迭代计算中。
 
 同步模式及异步模式的简单调用示例如下。
 
-```
+```cpp
 // 同步模式样例
 while (mm.Iterate()) {
     mm.GetTensorC(ubCmatrix);
@@ -88,7 +90,7 @@ while (mm.Iterate()) {
 // 异步模式样例
 mm.template Iterate<false>();
 // …… ……其它计算
-for (int i = 0; i < singleM/baseM*singleN/baseN; ++i) {
+for (int i = 0; i < singleM / baseM * singleN / baseN; ++i) {
     mm.template GetTensorC<false>(ubCmatrix);
 }
 ```

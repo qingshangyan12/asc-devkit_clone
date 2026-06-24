@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001867409741_zh-cn_topic_0000001389787297_section13230182415108"></a>
 
-```
+```text
 ContextBuilder &PlatformInfo(void *platformInfo)
 ```
 
@@ -41,14 +41,12 @@ ContextBuilder &PlatformInfo(void *platformInfo)
 
 ## 调用示例<a name="zh-cn_topic_0000001867409741_zh-cn_topic_0000001389787297_section320753512363"></a>
 
-```
-void AddPlatformInfo(fe::PlatFormInfos *platformInfo)
+```cpp
+void AddPlatformInfo(fe::PlatFormInfos* platformInfo)
 {
-    ......
-    auto kernelContextHolder = context_ascendc::ContextBuilder()
-                                     ...... // 增加算子输入输出接口的调用
-                                     .PlatformInfo(reinterpret_cast<void*>(platformInfo));
-                                     .BuildTilingContext();
+    ...... auto kernelContextHolder = context_ascendc::ContextBuilder()...... // 增加算子输入输出接口的调用
+                                          .PlatformInfo(reinterpret_cast<void*>(platformInfo));
+    .BuildTilingContext();
 
     ......
 }

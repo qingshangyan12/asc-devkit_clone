@@ -6,11 +6,7 @@
 -   SatMode::NO\_SAT，不饱和模式；
 -   SatMode::SAT，饱和模式。
 
-```
-enum class SatMode {
-    UNKNOWN = -1,
-    NO_SAT,
-    SAT
-};
+```cpp
+enum class SatMode { UNKNOWN = -1, NO_SAT, SAT };
 ```
 

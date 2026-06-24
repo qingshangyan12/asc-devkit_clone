@@ -6,8 +6,8 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001820490264_zh-cn_topic_0000001389787297_section13230182415108"></a>
 
-```
-ContextBuilder &SetOpNameType(const std::string& opName, const std::string& opType)
+```cpp
+ContextBuilder& SetOpNameType(const std::string& opName, const std::string& opType)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001820490264_zh-cn_topic_0000001389787297_section75395119104"></a>
@@ -48,7 +48,7 @@ ContextBuilder &SetOpNameType(const std::string& opName, const std::string& opTy
 
 ## 调用示例<a name="zh-cn_topic_0000001820490264_zh-cn_topic_0000001389787297_section320753512363"></a>
 
-```
+```cpp
 std::string opName = "tmpNode";
 std::string opType = "FlashAttentionScore";
 context_ascendc::ContextBuilder builder;

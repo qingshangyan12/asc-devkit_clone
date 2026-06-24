@@ -111,7 +111,7 @@ AscendC::printf("fmt string %f\n", a);
 
 // 指针打印：
 int b = 0x123;
-int *c = &b;
+int* c = &b;
 AscendC::printf("TEST %p\n", c);
 ```
 

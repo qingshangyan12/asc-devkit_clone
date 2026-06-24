@@ -6,8 +6,9 @@ Reg矢量计算基本单元，RegTensor位宽为VL（Vector Length），具体�
 
 ## 定义原型<a name="section620mcpsimp"></a>
 
-```
-template <typename T, const RegTrait& regTrait = RegTraitNumOne> struct RegTensor;
+```cpp
+template <typename T, const RegTrait& regTrait = RegTraitNumOne>
+struct RegTensor;
 ```
 
 ## 函数说明<a name="section622mcpsimp"></a>
@@ -78,7 +79,7 @@ Ascend 950PR/Ascend 950DT（VL=256B）
 
 -   示例一
 
-    ```
+    ```cpp
     AscendC::Reg::RegTensor<uint32_t> reg;
     AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<uint32_t>();
     AscendC::Reg::LoadAlign(reg, src, 0);
@@ -88,17 +89,19 @@ Ascend 950PR/Ascend 950DT（VL=256B）
 
 -   示例二
 
-    ```
+    ```cpp
     // 针对B64,可以传入RegTraitNumTwo
-    template<typename T, const AscendC::Reg::RegTrait& Trait = AscendC::Reg::RegTraitNumOne>
-    __simd_vf__ inline void AddVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
+    template <typename T, const AscendC::Reg::RegTrait& Trait = AscendC::Reg::RegTraitNumOne>
+    __simd_vf__ inline void AddVF(
+        __ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint32_t oneRepeatSize,
+        uint16_t repeatTimes)
     {
-        AscendC::Reg::RegTensor<T,Trait> srcReg0;
-        AscendC::Reg::RegTensor<T,Trait> srcReg1;
-        AscendC::Reg::RegTensor<T,Trait> dstReg;
+        AscendC::Reg::RegTensor<T, Trait> srcReg0;
+        AscendC::Reg::RegTensor<T, Trait> srcReg1;
+        AscendC::Reg::RegTensor<T, Trait> dstReg;
         AscendC::Reg::MaskReg mask;
         for (uint16_t i = 0; i < repeatTimes; i++) {
-            mask = AscendC::Reg::UpdateMask<T,Trait>(count);
+            mask = AscendC::Reg::UpdateMask<T, Trait>(count);
             AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
             AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);
             AscendC::Reg::Add(dstReg, srcReg0, srcReg1, mask);

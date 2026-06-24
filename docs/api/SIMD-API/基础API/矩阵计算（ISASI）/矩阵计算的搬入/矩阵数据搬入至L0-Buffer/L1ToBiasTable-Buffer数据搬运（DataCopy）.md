@@ -33,14 +33,16 @@ DataCopy数据搬运支持将矩阵计算用到的Bias参数从L1 Buffer移动�
 
     ```cpp
     template <typename T>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
+    __aicore__ inline void DataCopy(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
     ```
 
 - 连续或非连续搬运场景，支持源操作数和目的操作数数据类型不一致。
 
     ```cpp
     template <typename T, typename U>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyParams& repeatParams)
+    __aicore__ inline void DataCopy(
+        const LocalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyParams& repeatParams)
     ```
 
 ## 参数说明<a id="zh-cn_topic_0000002566886667_section16128134420472"></a>
@@ -141,7 +143,8 @@ DataCopy数据搬运支持将矩阵计算用到的Bias参数从L1 Buffer移动�
 L1 Buffer->Bias Table Buffer，搬运Bias参数。
 
 ```cpp
-// c1Addr = 128 * 1024、c2Addr = 0；__NPU_ARCH__ == 3510时c12c2Params = {1, 32, 0, 0}，否则为 {1, 16, 0, 0}。
+// c1Addr = 128 * 1024、c2Addr = 0；__NPU_ARCH__ == 3510时c12c2Params = {1, 32,
+// 0, 0}，否则为 {1, 16, 0, 0}。
 AscendC::LocalTensor<outputType> bias1Local(AscendC::TPosition::C1, c1Addr, biasSizeAlign);
 AscendC::LocalTensor<outputType> bias2Local(AscendC::TPosition::C2, c2Addr, biasSizeAlign);
 
@@ -149,15 +152,13 @@ if constexpr (SCENARIO_NUM == 4) {
     SplitBias(bias1Local, bias2Local);
 }
 
-__aicore__ inline void SplitBias(AscendC::LocalTensor<outputType> bias1Local,
-                                AscendC::LocalTensor<outputType> bias2Local)
+__aicore__ inline void SplitBias(
+    AscendC::LocalTensor<outputType> bias1Local, AscendC::LocalTensor<outputType> bias2Local)
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-    AscendC::DataCopyParams c12c2Params =
-        {1, static_cast<uint16_t>(biasSizeAlign * sizeof(outputType) / 32), 0, 0};
+    AscendC::DataCopyParams c12c2Params = {1, static_cast<uint16_t>(biasSizeAlign * sizeof(outputType) / 32), 0, 0};
 #else
-    AscendC::DataCopyParams c12c2Params =
-        {1, static_cast<uint16_t>(biasSizeAlign * sizeof(outputType) / 64), 0, 0};
+    AscendC::DataCopyParams c12c2Params = {1, static_cast<uint16_t>(biasSizeAlign * sizeof(outputType) / 64), 0, 0};
 #endif
     AscendC::DataCopy(bias2Local, bias1Local, c12c2Params);
 }

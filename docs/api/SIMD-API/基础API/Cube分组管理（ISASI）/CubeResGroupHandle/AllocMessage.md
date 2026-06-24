@@ -56,9 +56,9 @@ AIV从消息队列里申请消息空间，用于存放消息结构体，返回�
 
 ## 函数原型<a name="section765814724715"></a>
 
-```
-template <PipeMode pipeMode = PipeMode::SCALAR_MODE>             
-__aicore__ inline __gm__ CubeMsgType *AllocMessage()
+```cpp
+template <PipeMode pipeMode = PipeMode::SCALAR_MODE>
+__aicore__ inline __gm__ CubeMsgType* AllocMessage()
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001526206862_section129451113125413"></a>
@@ -97,8 +97,8 @@ __aicore__ inline __gm__ CubeMsgType *AllocMessage()
 
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 
-```
+```cpp
 auto queIdx = AscendC::GetBlockIdx();
 handle.AssignQueue(queIdx);
-auto msgPtr = handle.AllocMessage();        // 绑定队列后，从该队列中申请消息空间，消息空间地址为msgPtr。
+auto msgPtr = handle.AllocMessage(); // 绑定队列后，从该队列中申请消息空间，消息空间地址为msgPtr。
 ```

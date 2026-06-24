@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline int32_t GetTensorCountInQue()
 ```
 
@@ -71,7 +71,7 @@ Que中已入队的Tensor数量
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 // 通过GetTensorCountInQue查询que中已入队的Tensor数量，当前通过AllocTensor接口分配了内存，并加入que中，num为1。
 AscendC::TPipe pipe;
 AscendC::TQueBind<AscendC::TPosition::VECOUT, AscendC::TPosition::GM, 4> que;
@@ -79,7 +79,7 @@ int num = 4;
 int len = 1024;
 pipe.InitBuffer(que, num, len);
 AscendC::LocalTensor<half> tensor1 = que.AllocTensor<half>();
-que.EnQue(tensor1);// 将tensor加入VECOUT的Queue中
+que.EnQue(tensor1); // 将tensor加入VECOUT的Queue中
 int32_t numb = que.GetTensorCountInQue();
 ```
 

@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <bool sync = true>
 __aicore__ inline bool Iterate(bool enPartialSum = false)
 ```
@@ -57,10 +57,11 @@ true：数据仍在迭代计算中。
 
 -   Iterate接口必须在初始化接口及输入输出配置接口之后进行调用，完成卷积反向实现，调用顺序如下。
 
-    ```
+    ```cpp
     Init(...);
     ... // 输入输出配置
-    while (Iterate()) {
+        while (Iterate())
+    {
         GetTensorC();
     }
     End();
@@ -70,7 +71,7 @@ true：数据仍在迭代计算中。
 
 ## 调用示例
 
-```
+```cpp
 while (gradWeight_.Iterate()) {
     gradWeight_.GetTensorC(output);
 }

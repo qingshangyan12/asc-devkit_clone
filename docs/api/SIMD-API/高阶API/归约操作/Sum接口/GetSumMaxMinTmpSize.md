@@ -9,8 +9,9 @@ kernel侧Sum接口的计算需要开发者预留/申请临时空间，本接口�
 
 ## 函数原型
 
-```
-inline void GetSumMaxMinTmpSize(const uint32_t n, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxSize, uint32_t& minSize)
+```cpp
+inline void GetSumMaxMinTmpSize(
+    const uint32_t n, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxSize, uint32_t& minSize)
 ```
 
 ## 参数说明
@@ -35,7 +36,7 @@ inline void GetSumMaxMinTmpSize(const uint32_t n, const uint32_t typeSize, const
 
 ## 调用示例
 
-```
+```cpp
 // 输入shape为2*3的矩阵，则n = 3;算子输入的数据类型为half;isReuseSource传入默认值false
 uint32_t n = 3;
 uint32_t maxValue = 0;

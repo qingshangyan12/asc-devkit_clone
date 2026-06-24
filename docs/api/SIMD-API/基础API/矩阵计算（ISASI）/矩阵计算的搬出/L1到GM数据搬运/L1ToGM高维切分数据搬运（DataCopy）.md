@@ -28,7 +28,8 @@
 
 ```cpp
 template <typename T>
-__aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
+__aicore__ inline void DataCopy(
+    const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
 ```
 
 对于连续搬运场景，推荐使用[L1ToGM连续数据搬运（DataCopy）](L1ToGM连续数据搬运（DataCopy）.md)。
@@ -177,7 +178,7 @@ AscendC::LocalTensor<half> srcLocal(AscendC::TPosition::A1, a1Addr, srcElemCount
 
 // 目的操作数：GM上预留128个half，两个有效数据块之间保留32个half间隔。
 AscendC::GlobalTensor<half> dstGm;
-dstGm.SetGlobalBuffer((__gm__ half *)dst, dstElemCount);
+dstGm.SetGlobalBuffer((__gm__ half*)dst, dstElemCount);
 
 AscendC::DataCopyParams repeatParams;
 // 搬运2个连续传输数据块。

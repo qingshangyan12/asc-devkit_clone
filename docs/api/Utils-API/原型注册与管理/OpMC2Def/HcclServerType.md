@@ -6,8 +6,8 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001962490173_zh-cn_topic_0000001339105488_section13230182415108"></a>
 
-```
-void HcclServerType(enum HcclServerType type, const char *soc=nullptr)
+```cpp
+void HcclServerType(enum HcclServerType type, const char* soc = nullptr)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001962490173_zh-cn_topic_0000001339105488_section75395119104"></a>
@@ -56,7 +56,7 @@ enum HcclServerType : uint32_t {
 
 ## 调用示例<a name="zh-cn_topic_0000001962490173_section163549032418"></a>
 
-```
+```cpp
 class MC2Custom : public OpDef {
 public:
     MC2Custom(const char* name) : OpDef(name)
@@ -67,7 +67,7 @@ public:
         this->Attr("group").AttrType(REQUIRED).String();
         this->AICore().AddConfig("ascendxxx1");
         this->AICore().AddConfig("ascendxxx2");
-        this->MC2().HcclGroup("group"); // 配置通信域名称为group
+        this->MC2().HcclGroup("group");                                  // 配置通信域名称为group
         this->MC2().HcclServerType(HcclServerType::AICPU, "ascendxxx1"); // 配置ascendxxx1型号的通信模式为AI CPU
         this->MC2().HcclServerType(HcclServerType::AICORE); // 配置其他型号即ascendxxx2的通信模式为AI Core
     }

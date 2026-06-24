@@ -14,7 +14,7 @@ This sample demonstrates the basic process of running and verifying a kernel fun
 
 ## Directory Structure
 
-```
+```text
 ├── hello_world
 │   ├── CMakeLists.txt      // Build project file
 │   ├── hello_world.asc     // Ascend C sample implementation & sample call

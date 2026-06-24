@@ -67,8 +67,10 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
-template <typename T = DefaultType, typename U = DefaultType, HistogramsBinType mode, HistogramsType type, typename S, typename V>
+```cpp
+template <
+    typename T = DefaultType, typename U = DefaultType, HistogramsBinType mode, HistogramsType type, typename S,
+    typename V>
 __simd_callee__ inline void Histograms(V& dstReg, S& srcReg, MaskReg& mask)
 ```
 
@@ -167,15 +169,17 @@ __simd_callee__ inline void Histograms(V& dstReg, S& srcReg, MaskReg& mask)
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 template <typename T, typename U>
-__simd_vf__ inline void HistogramsVF(__ubuf__ U* dstAddr, __ubuf__ T* srcAddr, uint32_t oneRepeatSize, uint16_t repeatTimes, AscendC::Reg::HistogramsBinType mode, AscendC::Reg::HistogramsType type)
+__simd_vf__ inline void HistogramsVF(
+    __ubuf__ U* dstAddr, __ubuf__ T* srcAddr, uint32_t oneRepeatSize, uint16_t repeatTimes,
+    AscendC::Reg::HistogramsBinType mode, AscendC::Reg::HistogramsType type)
 {
     AscendC::Reg::RegTensor<T> srcReg;
     AscendC::Reg::RegTensor<U> dstReg;
     AscendC::Reg::MaskReg mask0 = AscendC::Reg::CreateMask<T>();
     AscendC::Reg::MaskReg mask1 = AscendC::Reg::CreateMask<T>();
-    for (uint16_t i = 0; i < repeatTimes; ++i){
+    for (uint16_t i = 0; i < repeatTimes; ++i) {
         AscendC::Reg::LoadAlign(srcReg, srcAddr + oneRepeatSize * i);
         AscendC::Reg::Histograms<T, U, mode, type>(dstReg, srcReg, mask0);
         AscendC::Reg::StoreAlign(dstAddr, dstReg, mask1);

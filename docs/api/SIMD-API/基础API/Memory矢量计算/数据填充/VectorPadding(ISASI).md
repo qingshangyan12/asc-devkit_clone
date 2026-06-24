@@ -66,24 +66,30 @@
 
 -   tensor前n个数据计算
 
-    ```
+    ```cpp
     template <typename T>
-    __aicore__ inline void VectorPadding(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint8_t padMode, const bool padSide, const uint32_t count)
+    __aicore__ inline void VectorPadding(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint8_t padMode, const bool padSide,
+        const uint32_t count)
     ```
 
 -   tensor高维切分计算
     -   mask逐bit模式
 
-        ```
+        ```cpp
         template <typename T, bool isSetMask = true>
-        __aicore__ inline void VectorPadding(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint8_t padMode, const bool padSide, const uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+        __aicore__ inline void VectorPadding(
+            const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint8_t padMode, const bool padSide,
+            const uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
         ```
 
     -   mask连续模式
 
-        ```
+        ```cpp
         template <typename T, bool isSetMask = true>
-        __aicore__ inline void VectorPadding(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint8_t padMode, const bool padSide, const uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+        __aicore__ inline void VectorPadding(
+            const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint8_t padMode, const bool padSide,
+            const uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
         ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -214,31 +220,31 @@
 
 -   tensor高维切分计算样例-mask连续模式
 
-    ```
+    ```cpp
     uint64_t mask = 256 / sizeof(half);
     uint8_t padMode = 0;
     bool padSide = false;
     // repeatTime = 4, 128 elements one repeat, 512 elements total
     // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
     // dstRepStride, srcRepStride = 8, no gap between repeats
-    AscendC::VectorPadding(dstLocal, srcLocal, padMode, padSide, mask, 4, { 1, 1, 8, 8 });
+    AscendC::VectorPadding(dstLocal, srcLocal, padMode, padSide, mask, 4, {1, 1, 8, 8});
     ```
 
 -   tensor高维切分计算样例-mask逐bit模式
 
-    ```
-    uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
+    ```cpp
+    uint64_t mask[2] = {UINT64_MAX, UINT64_MAX};
     uint8_t padMode = 0;
     bool padSide = false;
     // repeatTime = 4, 128 elements one repeat, 512 elements total
     // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
     // dstRepStride, srcRepStride = 8, no gap between repeats
-    AscendC::VectorPadding(dstLocal, srcLocal, padMode, padSide, mask, 4, { 1, 1, 8, 8 });
+    AscendC::VectorPadding(dstLocal, srcLocal, padMode, padSide, mask, 4, {1, 1, 8, 8});
     ```
 
 -   tensor前n个数据计算样例
 
-    ```
+    ```cpp
     uint8_t padMode = 0;
     bool padSide = false;
     AscendC::VectorPadding(dstLocal, srcLocal, padMode, padSide, 512);
@@ -246,7 +252,7 @@
 
 结果示例如下：
 
-```
+```text
 // 以srcLocal的一个datablock的值为例，有16个数
 输入数据(srcLocal): [6.938 -8.86 -0.2263 ... 1.971 1.778]
 输出数据(dstLocal): 

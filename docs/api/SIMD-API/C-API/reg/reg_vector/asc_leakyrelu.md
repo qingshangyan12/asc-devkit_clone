@@ -23,7 +23,7 @@ $$
 
 ```cpp
 __simd_callee__ inline void asc_leakyrelu(vector_float& dst, vector_float src, float value, vector_bool mask)
-__simd_callee__ inline void asc_leakyrelu(vector_half& dst, vector_half src, half value, vector_bool mask)
+    __simd_callee__ inline void asc_leakyrelu(vector_half& dst, vector_half src, half value, vector_bool mask)
 ```
 
 ## 参数说明
@@ -52,10 +52,10 @@ PIPE_V
 ## 调用示例
 
  ```cpp
-vector_half dst;
-vector_half src;
-half value = 0.1;
-vector_bool mask = asc_create_mask_b16(PAT_ALL);
-asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
-asc_leakyrelu(dst, src, value, mask);
+ vector_half dst;
+ vector_half src;
+ half value = 0.1;
+ vector_bool mask = asc_create_mask_b16(PAT_ALL);
+ asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
+ asc_leakyrelu(dst, src, value, mask);
 ```

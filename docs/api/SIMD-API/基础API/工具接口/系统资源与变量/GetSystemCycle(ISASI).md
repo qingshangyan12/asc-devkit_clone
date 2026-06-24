@@ -53,9 +53,9 @@ __aicore__ inline int64_t GetSystemCycle()
     {
         int64_t systemCycleBefore = AscendC::GetSystemCycle(); // 调用GetBlockNum指令前的cycle数
         loopSize = totalSize / AscendC::GetBlockNum();
-        int64_t systemCycleAfter = AscendC::GetSystemCycle(); // 调用GetBlockNum指令后的cycle数
+        int64_t systemCycleAfter = AscendC::GetSystemCycle();            // 调用GetBlockNum指令后的cycle数
         int64_t GetBlockNumCycle = systemCycleAfter - systemCycleBefore; // 执行GetBlockNum指令所用的cycle数
-        int64_t CycleToTimeBase = 50; // cycle数转换成时间的基准单位
+        int64_t CycleToTimeBase = 50;                                    // cycle数转换成时间的基准单位
         /* 在Ascend 950PR/Ascend 950DT上为1000
         在Atlas A3 训练系列产品/Atlas A3 推理系列产品上为50
         在Atlas A2 训练系列产品/Atlas A2 推理系列产品上为50 */
@@ -70,9 +70,9 @@ __aicore__ inline int64_t GetSystemCycle()
     int64_t systemCycleBefore = AscendC::GetSystemCycle(); // 调用Add指令前的cycle数
     AscendC::Add(dstLocal, src0Local, src1Local, 512);
     PipeBarrier<PIPE_ALL>();
-    int64_t systemCycleAfter = AscendC::GetSystemCycle(); // 调用Add指令后的cycle数
+    int64_t systemCycleAfter = AscendC::GetSystemCycle();            // 调用Add指令后的cycle数
     int64_t GetBlockNumCycle = systemCycleAfter - systemCycleBefore; // 执行Add指令所用的cycle数
-    int64_t CycleToTimeBase = 50; // cycle数转换成时间的基准单位
+    int64_t CycleToTimeBase = 50;                                    // cycle数转换成时间的基准单位
     /* 在Ascend 950PR/Ascend 950DT上为1000
     在Atlas A3 训练系列产品/Atlas A3 推理系列产品上为50
     在Atlas A2 训练系列产品/Atlas A2 推理系列产品上为50 */

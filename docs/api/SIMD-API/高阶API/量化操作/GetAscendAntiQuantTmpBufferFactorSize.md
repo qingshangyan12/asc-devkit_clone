@@ -22,8 +22,10 @@
 
 ## 函数原型
 
-```
-void GetAscendAntiQuantTmpBufferFactorSize(const ge::Shape& srcShape, const ge::Shape& scaleShape, bool isTranspose, ge::DataType inputDataType, ge::DataType outputDataType, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
+```cpp
+void GetAscendAntiQuantTmpBufferFactorSize(
+    const ge::Shape& srcShape, const ge::Shape& scaleShape, bool isTranspose, ge::DataType inputDataType,
+    ge::DataType outputDataType, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
 ```
 
 ## 参数说明
@@ -50,7 +52,7 @@ void GetAscendAntiQuantTmpBufferFactorSize(const ge::Shape& srcShape, const ge::
 
 ## 调用示例
 
-```
+```cpp
 std::vector<int64_t> srcDims = {64, 512};
 auto srcShape = ge::Shape(srcDims);
 std::vector<int64_t> scaleDims = {1, 512};

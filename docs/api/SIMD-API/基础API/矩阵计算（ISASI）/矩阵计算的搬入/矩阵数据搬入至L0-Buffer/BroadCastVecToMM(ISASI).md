@@ -24,7 +24,9 @@
 
 ```cpp
 template <typename T, typename U>
-__aicore__ inline void BroadCastVecToMM(const LocalTensor<T> &dst, const LocalTensor<U> &src, const int32_t blockCount, const uint8_t blockLen, const uint8_t srcGap, const uint8_t dstGap)
+__aicore__ inline void BroadCastVecToMM(
+    const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t blockCount, const uint8_t blockLen,
+    const uint8_t srcGap, const uint8_t dstGap)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -67,7 +69,8 @@ Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t�
 
 ```cpp
 // brcLocal为TPosition::CO1上的float类型的LocalTensor，srcLocal为TPosition::VECIN上的float类型的LocalTensor
-// blockCount = 1，blockLen = 1，连续广播的数据块个数为1，每个数据块包含16个元素，共输出256个元素
-// srcGap = 0，dstGap = 1，源操作数与目的操作数之间连续
+// blockCount = 1，blockLen =
+// 1，连续广播的数据块个数为1，每个数据块包含16个元素，共输出256个元素 srcGap =
+// 0，dstGap = 1，源操作数与目的操作数之间连续
 AscendC::BroadCastVecToMM(brcLocal, srcLocal, 1, 1, 0, 1)
 ```

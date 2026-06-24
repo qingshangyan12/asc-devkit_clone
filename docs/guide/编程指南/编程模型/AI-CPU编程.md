@@ -17,11 +17,11 @@ AI CPU是位于Device侧ARM64架构的处理器，其具备与AI Core相同的�
 
 如下是一个AI CPU“Hello World”程序的示例，hello\_world.aicpu文件内容如下：
 
-```
+```cpp
 // 调用printf接口需要包含的头文件
 #include "aicpu_api.h"
 
-__global__ __aicpu__ uint32_t hello_world(void *args)
+__global__ __aicpu__ uint32_t hello_world(void* args)
 {
     AscendC::printf("Hello World!!!\n");
     return 0;
@@ -38,7 +38,7 @@ __global__ __aicpu__ uint32_t hello_world(void *args)
 
 AI CPU核函数的调用需要在.asc文件中进行，和AI Core的算子调用类似，同样使用<<<\>\>\>语法。
 
-```
+```text
 hello_world<<<numBlocks, nullptr, stream>>>(&args, sizeof(KernelArgs));
 ```
 
@@ -58,24 +58,24 @@ hello_world<<<numBlocks, nullptr, stream>>>(&args, sizeof(KernelArgs));
 
 若需要使用模板核函数，则需要在.aicpu文件中给出模板核函数的实例化声明，参考如下：
 
-```
-template<typename T, int BUFF_SIZE>
-__global__ __aicpu__ uint32_t hello_world(void *args)
+```cpp
+template <typename T, int BUFF_SIZE>
+__global__ __aicpu__ uint32_t hello_world(void* args)
 {
     AscendC::printf("Hello World!!!\n");
     AscendC::printf("buffer_size is %d\n", BUFF_SIZE);
     return 0;
 }
-template __global__ __aicpu__ uint32_t hello_world<KernelArgs, 4096>(void *args);
+template __global__ __aicpu__ uint32_t hello_world<KernelArgs, 4096>(void* args);
 ```
 
 并在.asc文件中新增模板核函数实例化的extern声明：
 
-```
-template<typename T, int BUFF_SIZE>
-extern __global__ __aicpu__ uint32_t hello_world(void *args);
+```cpp
+template <typename T, int BUFF_SIZE>
+extern __global__ __aicpu__ uint32_t hello_world(void* args);
 
-template extern __global__ __aicpu__ uint32_t hello_world<KernelArgs, 4096>(void *args);
+template extern __global__ __aicpu__ uint32_t hello_world<KernelArgs, 4096>(void* args);
 ```
 
 ## 更多进阶用法<a name="section109268265171"></a>

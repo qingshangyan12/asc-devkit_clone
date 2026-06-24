@@ -52,8 +52,8 @@ coalesced_group coalesced_threads()
     using namespace cooperative_groups;
     __global__ void simt_kernel(...)
     {
-        ...
-        if (threadIdx.x % 2 == 0) {
+        ... if (threadIdx.x % 2 == 0)
+        {
             coalesced_group active = coalesced_threads(); // 该coalesced_group中包含当前warp内所有线程id为偶数的线程
         }
         ...
@@ -66,8 +66,8 @@ coalesced_group coalesced_threads()
     using namespace cooperative_groups;
     __simt_vf__ inline void simt_kernel(...)
     {
-        ...
-        if (threadIdx.x % 2 == 0) {
+        ... if (threadIdx.x % 2 == 0)
+        {
             coalesced_group active = coalesced_threads(); // 该coalesced_group中包含当前warp内所有线程id为偶数的线程
         }
         ...

@@ -32,9 +32,10 @@ Iterate后，获取一块或者两块C矩阵片，可以直接输出到GM tensor
 
 -   获取C矩阵，输出至VECIN
 
-    ```
+    ```cpp
     template <bool sync = true>
-    __aicore__ inline void GetTensorC(const LocalTensor<DstT>& co2Local, uint8_t enAtomic = 0, bool enSequentialWrite = false)
+    __aicore__ inline void GetTensorC(
+        const LocalTensor<DstT>& co2Local, uint8_t enAtomic = 0, bool enSequentialWrite = false)
     ```
 
     -   支持同步模式
@@ -42,7 +43,7 @@ Iterate后，获取一块或者两块C矩阵片，可以直接输出到GM tensor
 
 -   获取C矩阵，输出至GM
 
-    ```
+    ```cpp
     template <bool sync = true>
     __aicore__ inline void GetTensorC(const GlobalTensor<DstT>& gm, uint8_t enAtomic = 0, bool enSequentialWrite = false)
     ```
@@ -52,9 +53,11 @@ Iterate后，获取一块或者两块C矩阵片，可以直接输出到GM tensor
 
 -   获取C矩阵，同时输出至GM和VECIN
 
-    ```
+    ```cpp
     template <bool sync = true>
-    __aicore__ inline void GetTensorC(const GlobalTensor<DstT>& gm, const LocalTensor<DstT>& co2Local, uint8_t enAtomic = 0, bool enSequentialWrite = false)
+    __aicore__ inline void GetTensorC(
+        const GlobalTensor<DstT>& gm, const LocalTensor<DstT>& co2Local, uint8_t enAtomic = 0,
+        bool enSequentialWrite = false)
     ```
 
     -   支持同步模式
@@ -68,7 +71,7 @@ Iterate后，获取一块或者两块C矩阵片，可以直接输出到GM tensor
 
     注意，在初始化时，C矩阵的逻辑位置应设置为TPosition::VECIN，调用该接口获取缓存的C矩阵后，自行拷贝到Unified Buffer。
 
-    ```
+    ```cpp
     template <bool sync = true>
     __aicore__ inline GlobalTensor<DstT> GetTensorC(uint8_t enAtomic = 0, bool enSequentialWrite = false)
     ```
@@ -77,9 +80,11 @@ Iterate后，获取一块或者两块C矩阵片，可以直接输出到GM tensor
 
 以下接口中的doPad、height、width、srcGap、dstGap参数待废弃，使用过程中无需传入，保持默认值即可；上文介绍的输出至VECIN的原型实际为不传入默认值的函数原型。
 
-```
+```cpp
 template <bool sync = true, bool doPad = false>
-__aicore__ inline void GetTensorC(const LocalTensor<DstT>& c, uint8_t enAtomic = 0, bool enSequentialWrite = false, uint32_t height = 0, uint32_t width = 0, uint32_t srcGap = 0, uint32_t dstGap = 0)
+__aicore__ inline void GetTensorC(
+    const LocalTensor<DstT>& c, uint8_t enAtomic = 0, bool enSequentialWrite = false, uint32_t height = 0,
+    uint32_t width = 0, uint32_t srcGap = 0, uint32_t dstGap = 0)
 ```
 
 ## 参数说明
@@ -150,7 +155,7 @@ __aicore__ inline void GetTensorC(const LocalTensor<DstT>& c, uint8_t enAtomic =
 
 -   获取C矩阵，输出至VECIN
 
-    ```
+    ```cpp
     // 同步模式样例
     while (mm.Iterate()) {
         mm.GetTensorC(ubCmatrix);
@@ -167,7 +172,7 @@ __aicore__ inline void GetTensorC(const LocalTensor<DstT>& c, uint8_t enAtomic =
 
 -   获取C矩阵，输出至GM，同步模式样例
 
-    ```
+    ```cpp
     while (mm.Iterate()) {
         mm.GetTensorC(gm);
     }
@@ -175,7 +180,7 @@ __aicore__ inline void GetTensorC(const LocalTensor<DstT>& c, uint8_t enAtomic =
 
 -   获取C矩阵，同时输出至GM和VECIN，同步模式样例
 
-    ```
+    ```cpp
     while (mm.Iterate()) {
         mm.GetTensorC(gm, ubCmatrix);
     }
@@ -183,7 +188,7 @@ __aicore__ inline void GetTensorC(const LocalTensor<DstT>& c, uint8_t enAtomic =
 
 -   获取API接口返回的GM上的C矩阵，手动拷贝至UB，异步模式样例
 
-    ```
+    ```cpp
     // BaseM * BaseN = 128 *256
     mm.SetTensorA(gmA);
     mm.SetTensorB(gmB);

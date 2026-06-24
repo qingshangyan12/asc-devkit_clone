@@ -17,7 +17,7 @@ Ascend C提供DeepNorm Tiling API，方便用户获取DeepNorm kernel计算时�
 
     DeepNormTiling结构体的定义如下，开发者无需关注该tiling结构的具体信息，只需要传递到kernel侧，传入DeepNorm高阶API接口，直接进行使用即可。
 
-    ```
+    ```cpp
     struct DeepNormTiling {
         uint32_t bLength = 0;
         uint32_t sLength = 0;
@@ -50,16 +50,22 @@ Ascend C提供DeepNorm Tiling API，方便用户获取DeepNorm kernel计算时�
 
 ## 函数原型
 
-```
-bool GetDeepNormMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, const bool isBasicBlock, uint32_t& maxValue, uint32_t& minValue)
-```
-
-```
-bool GetDeepNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const bool isBasicBlock, optiling::DeepNormTiling& tiling)
+```cpp
+bool GetDeepNormMaxMinTmpSize(
+    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, const bool isBasicBlock,
+    uint32_t& maxValue, uint32_t& minValue)
 ```
 
+```cpp
+bool GetDeepNormTilingInfo(
+    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferSize, const uint32_t typeSize,
+    const bool isReuseSource, const bool isBasicBlock, optiling::DeepNormTiling& tiling)
 ```
-bool GetDeepNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const bool isBasicBlock, AscendC::tiling::DeepNormTiling& tiling)
+
+```cpp
+bool GetDeepNormTilingInfo(
+    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferSize, const uint32_t typeSize,
+    const bool isReuseSource, const bool isBasicBlock, AscendC::tiling::DeepNormTiling& tiling)
 ```
 
 ## 参数说明
@@ -100,11 +106,11 @@ bool GetDeepNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrc
 
 1.  将DeepNorm Tiling结构体参数增加至TilingData结构体，作为TilingData结构体的一个字段。
 
-    ```
+    ```cpp
     BEGIN_TILING_DATA_DEF(TilingData)             // 注册一个tiling的类，以tiling的名字作为入参
-        TILING_DATA_FIELD_DEF(uint32_t, totalLength); // 添加tiling字段，总计算数据量
-        TILING_DATA_FIELD_DEF(uint32_t, tileNum);     // 添加tiling字段，每个核上总计算数据分块个数
-        ...                                           // 添加其他tiling字段
+    TILING_DATA_FIELD_DEF(uint32_t, totalLength); // 添加tiling字段，总计算数据量
+    TILING_DATA_FIELD_DEF(uint32_t, tileNum);     // 添加tiling字段，每个核上总计算数据分块个数
+    ...                                           // 添加其他tiling字段
         TILING_DATA_FIELD_DEF_STRUCT(
             DeepNormTiling, deepnormTilingData); // 将DeepNormTiling结构体参数增加至TilingData结构体
     END_TILING_DATA_DEF;
@@ -112,7 +118,7 @@ bool GetDeepNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrc
 
 2.  Tiling实现函数中，首先调用**GetDeepNormMaxMinTmpSize**接口获取DeepNorm接口能完成计算所需最大/最小临时空间大小，根据该范围结合实际的内存使用情况设置合适的空间大小，然后根据输入shape、剩余的可供计算的空间大小等信息获取DeepNorm kernel侧接口所需tiling参数。
 
-    ```
+    ```cpp
     namespace optiling {
     const uint32_t NUM_BLOCKS = 8;
     const uint32_t TILE_NUM = 8;
@@ -124,8 +130,7 @@ bool GetDeepNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrc
         tiling.set_totalLength(totalLength);
         tiling.set_tileNum(TILE_NUM);
         // 设置其他Tiling参数
-        ...
-        std::vector<int64_t> shapeVec = {2, 16, 64};
+        ... std::vector<int64_t> shapeVec = {2, 16, 64};
         std::vector<int64_t> oriShapeVec = {2, 16, 64};
         ge::Shape srcShape(shapeVec);
         ge::Shape originSrcShape(oriShapeVec);
@@ -139,7 +144,7 @@ bool GetDeepNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrc
             srcShape, originSrcShape, minValue, sizeof(half), isReuseSrc, isBasicBlock, tiling.deepnormTilingData);
 
         ... // 其他逻辑
-        tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
+            tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
         context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
         context->SetTilingKey(1);
         return ge::GRAPH_SUCCESS;
@@ -149,7 +154,7 @@ bool GetDeepNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrc
 
 3.  对应的kernel侧通过在核函数中调用GET\_TILING\_DATA获取TilingData，继而将TilingData中的DeepNorm Tiling信息传入DeepNorm接口参与计算。完整的kernel侧样例请参考[DeepNorm](DeepNorm.md)。
 
-    ```
+    ```cpp
     extern "C" __global__ __aicore__ void deepnorm_custom(
         GM_ADDR inputX, GM_ADDR inputGx, GM_ADDR beta, GM_ADDR gamma, GM_ADDR output, GM_ADDR outputMean,
         GM_ADDR outputVariance, GM_ADDR tiling)

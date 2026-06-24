@@ -103,7 +103,9 @@
 
   ```cpp
   template <typename T>
-  __simd_vf__ inline void XorVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
+  __simd_vf__ inline void XorVF(
+      __ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint32_t oneRepeatSize,
+      uint16_t repeatTimes)
   {
       AscendC::Reg::RegTensor<T> srcReg0;
       AscendC::Reg::RegTensor<T> srcReg1;
@@ -123,7 +125,8 @@
 
   ```cpp
   template <typename T>
-  __simd_vf__ inline void XorVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
+  __simd_vf__ inline void XorVF(
+      __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
   {
       AscendC::Reg::RegTensor<T> srcReg;
       AscendC::Reg::MaskReg src0 = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALLF>();

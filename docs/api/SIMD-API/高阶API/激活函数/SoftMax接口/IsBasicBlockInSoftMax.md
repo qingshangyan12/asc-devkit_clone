@@ -8,13 +8,13 @@
 
 -   AscendC::optiling命名空间下的计算接口
 
-    ```
+    ```cpp
     bool IsBasicBlockInSoftMax(optiling::SoftMaxTiling& tiling, const uint32_t dataTypeSize = 2)
     ```
 
 -   AscendC命名空间下的计算接口
 
-    ```
+    ```cpp
     bool IsBasicBlockInSoftMax(AscendC::tiling::SoftMaxTiling& tiling, const uint32_t dataTypeSize = 2)
     ```
 

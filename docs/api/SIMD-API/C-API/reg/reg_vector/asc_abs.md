@@ -16,11 +16,11 @@ $$
 ## 函数原型
 
   ```cpp
-  __simd_callee__ inline void asc_abs(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
-  __simd_callee__ inline void asc_abs(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
-  __simd_callee__ inline void asc_abs(vector_half& dst, vector_half src, vector_bool mask)
-  __simd_callee__ inline void asc_abs(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
-  __simd_callee__ inline void asc_abs(vector_float& dst, vector_float src, vector_bool mask)
+  __simd_callee__ inline void asc_abs(vector_int8_t& dst, vector_int8_t src, vector_bool mask) __simd_callee__
+      inline void asc_abs(vector_int16_t& dst, vector_int16_t src, vector_bool mask) __simd_callee__
+      inline void asc_abs(vector_half& dst, vector_half src, vector_bool mask) __simd_callee__
+      inline void asc_abs(vector_int32_t& dst, vector_int32_t src, vector_bool mask) __simd_callee__
+      inline void asc_abs(vector_float& dst, vector_float src, vector_bool mask)
   ```
 
 ## 参数说明

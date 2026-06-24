@@ -6,16 +6,22 @@ Host侧接口，用于获取Log接口能完成计算所需最小的临时空间�
 
 ## 函数原型
 
-```
-void GetLogMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
-```
-
-```
-void GetLog10MaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+```cpp
+void GetLogMaxMinTmpSize(
+    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    uint32_t& minValue)
 ```
 
+```cpp
+void GetLog10MaxMinTmpSize(
+    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    uint32_t& minValue)
 ```
-void GetLog2MaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+
+```cpp
+void GetLog2MaxMinTmpSize(
+    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -44,7 +50,7 @@ void GetLog2MaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, co
 
 -   GetLogMaxMinTmpSize接口样例：
 
-    ```
+    ```cpp
     // 输入shape信息为1024;算子输入的数据类型为half;不允许修改源操作数
     std::vector<int64_t> shape_vec = {1024};
     ge::Shape shape(shape_vec);
@@ -55,7 +61,7 @@ void GetLog2MaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, co
 
 -   GetLog10MaxMinTmpSize接口样例：
 
-    ```
+    ```cpp
     // 输入shape信息为1024;算子输入的数据类型为half;不允许修改源操作数
     std::vector<int64_t> shape_vec = {1024};
     ge::Shape shape(shape_vec);
@@ -66,7 +72,7 @@ void GetLog2MaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, co
 
 -   GetLog2MaxMinTmpSize接口样例：
 
-    ```
+    ```cpp
     // 输入shape信息为1024;算子输入的数据类型为half;不允许修改源操作数
     std::vector<int64_t> shape_vec = {1024};
     ge::Shape shape(shape_vec);

@@ -37,7 +37,9 @@ $$
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename T0 = DefaultType, typename T1 = DefaultType, typename T2, RegLayout layout = RegLayout::ZERO, typename T3, typename T4>
+template <
+    typename T0 = DefaultType, typename T1 = DefaultType, typename T2, RegLayout layout = RegLayout::ZERO, typename T3,
+    typename T4>
 __simd_callee__ inline void MulsCast(T3& dstReg, T4& srcReg, T2 scalarValue, MaskReg& mask)
 ```
 
@@ -85,8 +87,10 @@ __simd_callee__ inline void MulsCast(T3& dstReg, T4& srcReg, T2 scalarValue, Mas
 ## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
-template<typename T>
-__simd_vf__ inline void MulsCastVF(__ubuf__ half* dstAddr, __ubuf__ float* srcAddr, float scalarValue, uint32_t count, uint32_t srcRepeatSize, uint32_t dstRepeatSize, uint16_t repeatTimes)
+template <typename T>
+__simd_vf__ inline void MulsCastVF(
+    __ubuf__ half* dstAddr, __ubuf__ float* srcAddr, float scalarValue, uint32_t count, uint32_t srcRepeatSize,
+    uint32_t dstRepeatSize, uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<float> srcReg0;
     AscendC::Reg::RegTensor<half> dstReg0;

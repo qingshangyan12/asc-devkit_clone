@@ -16,16 +16,16 @@ TSCM表示L1 Buffer空间对应的逻辑内存，L1 Buffer相关内容见[存储
 
 完整的算子样例请参考[自定义数据来源为GM的TSCM输入的Matmul算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_tscm)。
 
-```
+```cpp
 TQue<TPosition::A1, 1> scm; // 队列逻辑位置A1，队列深度为1
-pipe->InitBuffer(scm, 1, tiling.M * tiling.Ka * sizeof(A_T)); 
+pipe->InitBuffer(scm, 1, tiling.M* tiling.Ka * sizeof(A_T));
 // A_TYPE的TPosition为TSCM， B_TYPE的TPosition为GM
 Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE> mm1;
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm1);
 mm1.Init(&tiling);
 // 自定义A矩阵GM到TSCM的搬运
 auto scmTensor = scm.AllocTensor<A_T>();
-DataCopy(scmTensor, gm_a, tiling.M * tiling.Ka);
+DataCopy(scmTensor, gm_a, tiling.M* tiling.Ka);
 scm.EnQue(scmTensor);
 LocalTensor<A_T> scmLocal = scm.DeQue<A_T>();
 // A矩阵设置为TSCM输入，B矩阵为GM输入

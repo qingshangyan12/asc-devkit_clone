@@ -24,7 +24,7 @@ This example implements UB (Unified Buffer) load/store operations for MaskReg (m
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── reg_load_store_mask
 │   ├── scripts
 │   │   └── gen_data.py                // Input data and ground truth generation script

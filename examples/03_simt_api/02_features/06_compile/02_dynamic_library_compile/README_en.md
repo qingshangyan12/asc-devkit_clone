@@ -21,7 +21,7 @@ Figure 1: Code structure and call relationship
 
 ## Directory Structure
 
-```
+```text
 ├── 02_dynamic_library_compile
 │   ├── CMakeLists.txt      // Build project file
 │   ├── gather_kernel.asc   // Mixed file (containing Kernel definition, <<<>>> kernel invocation)
@@ -104,6 +104,6 @@ Run the following steps in the root directory of this example to build and execu
 - Execution Result
 
   The following output indicates that the accuracy verification is successful.
-  ```
+  ```text
   [Success] Case accuracy is verification passed.
   ```

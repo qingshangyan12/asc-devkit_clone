@@ -22,8 +22,10 @@
 
 ## 函数原型
 
-```
-void GetAntiQuantizeTmpBufferFactorSize(const ge::Shape& srcShape, const ge::Shape& scaleShape, ge::DataType inputDataType, ge::DataType outputDataType, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
+```cpp
+void GetAntiQuantizeTmpBufferFactorSize(
+    const ge::Shape& srcShape, const ge::Shape& scaleShape, ge::DataType inputDataType, ge::DataType outputDataType,
+    uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
 ```
 
 ## 参数说明
@@ -49,7 +51,7 @@ void GetAntiQuantizeTmpBufferFactorSize(const ge::Shape& srcShape, const ge::Sha
 
 ## 调用示例
 
-```
+```cpp
 uint32_t maxLiveNodeCount = 0;
 uint32_t extraBuf = 0;
 std::vector<int64_t> srcDims = {64, 512};

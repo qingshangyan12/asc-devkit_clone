@@ -18,9 +18,11 @@
 
 ## 函数原型
 
-```
+```cpp
 template <bool commit = false>
-__aicore__ inline HcclHandle AlltoAll(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t dataCount, HcclDataType dataType, uint64_t strideCount = 0, uint8_t repeat = 1)
+__aicore__ inline HcclHandle AlltoAll(
+    GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t dataCount, HcclDataType dataType, uint64_t strideCount = 0,
+    uint8_t repeat = 1)
 ```
 
 ## 参数说明
@@ -65,7 +67,7 @@ __aicore__ inline HcclHandle AlltoAll(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t
     **图1**  非多轮切分场景下4卡AlltoAll通信  
     ![](../../../../figures/非多轮切分场景下4卡AlltoAll通信.png "非多轮切分场景下4卡AlltoAll通信")
 
-    ```
+    ```cpp
     extern "C" __global__ __aicore__ void alltoall_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
     {
         constexpr uint64_t dataCount = 128U;               // 数据量
@@ -103,7 +105,7 @@ __aicore__ inline HcclHandle AlltoAll(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t
     **图3**  第一轮4卡AlltoAll示意图  
     ![](../../../../figures/第一轮4卡AlltoAll示意图.png "第一轮4卡AlltoAll示意图")
 
-    ```
+    ```cpp
     extern "C" __global__ __aicore__ void alltoall_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
     {
         constexpr uint32_t tileNum = 2U;                   // 首块数量

@@ -18,7 +18,7 @@ kernel侧Acosh接口的计算需要开发者预留/申请临时空间，最大�
 
 ## 函数原型
 
-```
+```cpp
 void GetAcoshTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
 ```
 
@@ -42,7 +42,7 @@ void GetAcoshTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeC
 
 ## 调用示例
 
-```
+```cpp
 // 获取输入类型为half的Acosh操作的maxLiveNodeCount和extraBuffer
 uint32_t typeSize = sizeof(half);
 uint32_t maxLiveNodeCount = 0;

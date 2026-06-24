@@ -9,23 +9,25 @@
 
 1.  创建GroupBarrier。
 
-    ```
+    ```cpp
     constexpr int32_t ARRIVE_NUM = 2; // Arrive组的AIV个数
-    constexpr int32_t WAIT_NUM = 6; // Wait组的AIV个数
+    constexpr int32_t WAIT_NUM = 6;   // Wait组的AIV个数
     // 创建GroupBarrier，用户自行管理并对这部分workspace清零
     AscendC::GroupBarrier<AscendC::PipeMode::MTE3_MODE> barA(workspace, ARRIVE_NUM, WAIT_NUM);
     ```
 
 2.  被等待的AIV调用Arrive，需要等待的AIV调用Wait。
 
-    ```
+    ```cpp
     auto id = AscendC::GetBlockIdx();
     if (id > 0 && id < ARRIVE_NUM) {
-      //各种Vector计算逻辑，用户自行实现
-      barA.Arrive(id);
-    } else(id >= ARRIVE_NUM && id < ARRIVE_NUM + WAIT_NUM){
-      barA.Wait(id - ARRIVE_NUM);
-      // 各种Vector计算逻辑，用户自行实现
-    }
+        // 各种Vector计算逻辑，用户自行实现
+        barA.Arrive(id);
+    } else
+        (id >= ARRIVE_NUM && id < ARRIVE_NUM + WAIT_NUM)
+        {
+            barA.Wait(id - ARRIVE_NUM);
+            // 各种Vector计算逻辑，用户自行实现
+        }
     ```
 

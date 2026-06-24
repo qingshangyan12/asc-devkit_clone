@@ -41,29 +41,32 @@
 -   通过sharedTmpBuffer入参传入临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false, const ErfConfig& config = defaultErfConfig>
-        __aicore__ inline void Erf(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+        __aicore__ inline void Erf(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+            const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false, const ErfConfig& config = defaultErfConfig>
-        __aicore__ inline void Erf( const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
+        __aicore__ inline void Erf(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
         ```
 
 -   接口框架申请临时空间
     -   源操作数Tensor全部/部分参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false, const ErfConfig& config = defaultErfConfig>
         __aicore__ inline void Erf(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
-        ```
+        ```cpp
         template <typename T, bool isReuseSource = false, const ErfConfig& config = defaultErfConfig>
         __aicore__ inline void Erf(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
         ```
@@ -85,7 +88,7 @@
 | isReuseSource | 是否允许修改源操作数。该参数预留，传入默认值false即可。 |
 | config | <!-- npu="950" id9 -->该参数仅支持Ascend 950PR/Ascend 950DT。<br><br><!-- end id9 -->Erf算法的相关配置，此参数可选配，ErfConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：Erf内部实现使用的算法。ErfAlgo类型，支持的取值如下：PADE_APPROXIMATION：默认值，高性能算法。该算法通过帕德近似算法实现Erf接口。SUBSECTION_POLYNOMIAL_APPROXIMATION：高精度算法。该算法通过将数值分段，采用不同的系数对分段的数据进行多项式逼近，以实现Erf接口。 |
 
-```
+```cpp
 enum class ErfAlgo {
     PADE_APPROXIMATION = 0,
     SUBSECTION_POLYNOMIAL_APPROXIMATION,
@@ -119,7 +122,7 @@ struct ErfConfig {
 
 完整的调用样例请参考[Erf样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/10_math/erf)。
 
-```
+```cpp
 // dstLocal: 存放计算结果的Tensor
 // srcLocal: 参与计算的输入Tensor
 AscendC::Erf<srcType, false>(dstLocal, srcLocal);
@@ -131,7 +134,7 @@ AscendC::Erf<srcType, false>(dstLocal, srcLocal);
 
 结果示例如下：
 
-```
+```text
 输入数据(srcLocal): [2.015634   -2.3880906 -0.2151161  ... -2.5       0. 2.5      ]
 输出数据(dstLocal): [0.99563545 -0.999268  -0.23903976 ... -0.9995931 0. 0.9995931]
 ```

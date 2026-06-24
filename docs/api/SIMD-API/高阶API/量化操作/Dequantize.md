@@ -43,16 +43,20 @@ Dequantize与[AscendDequant](AscendDequant.md)的功能类似，本接口在不�
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <const DequantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-    __aicore__ inline void Dequantize(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset, const LocalTensor<uint8_t>& sharedTmpBuffer, const DequantizeParams& params)
+    __aicore__ inline void Dequantize(
+        const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset,
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const DequantizeParams& params)
     ```
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <const DequantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-    __aicore__ inline void Dequantize(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset, const DequantizeParams& params)
+    __aicore__ inline void Dequantize(
+        const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset,
+        const DequantizeParams& params)
     ```
 
     由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -75,7 +79,7 @@ Dequantize与[AscendDequant](AscendDequant.md)的功能类似，本接口在不�
 | ScaleT | scale的数据类型。接口内根据入参scale自动推导数据类型，开发者无需配置该参数。ScaleT可以为标量数据类型或LocalTensor类型。<br><br>注意：<br>对于PER_TENSOR场景，scale为标量，ScaleT只能为标量数据类型。<br>对于PER_CHANNEL、PER_TOKEN、PER_GROUP场景，scale为矢量，ScaleT只能为LocalTensor类型。 |
 | OffsetT | offset的数据类型。接口内根据入参offset自动推导数据类型，开发者无需配置该参数。OffsetT可以为标量数据类型或LocalTensor类型。<br><br>注意：<br>对于PER_TENSOR量化策略，offset为标量，OffsetT只能为标量数据类型。<br>对于PER_CHANNEL、PER_TOKEN、PER_GROUP量化策略，offset为矢量，OffsetT只能为LocalTensor类型。 |
 
-```
+```cpp
 struct DequantizeConfig {
     DequantizePolicy policy;
     bool hasOffset = false;
@@ -95,7 +99,7 @@ enum class DequantizePolicy : int32_t { PER_TENSOR, PER_CHANNEL, PER_TOKEN, PER_
 | sharedTmpBuffer | 输入 | 临时缓存。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>临时空间大小BufferSize的获取方式请参考[GetDequantizeMaxMinTmpSize](GetDequantizeMaxMinTmpSize.md)。 |
 | params | 输入 | 反量化接口的参数，DequantizeParams类型，定义如下方代码所示，其中参数的含义如下。<br>m：m方向元素个数。<br>n：n方向元素个数。n值对应的数据大小需满足32字节对齐的要求，即shape最后一维为n的输入或输出均需要满足该维度上32字节对齐的要求。<br>groupSize：PER_GROUP场景有效，表示groupSize行/列数据共用一个scale。groupSize的取值必须大于0且是32的整倍数。 |
 
-```
+```cpp
 struct DequantizeParams {
     uint32_t m;
     uint32_t n;
@@ -141,7 +145,7 @@ struct DequantizeParams {
 
 -   PER\_CHANNEL、PER\_TOKEN、PER\_GROUP模式
 
-    ```
+    ```cpp
     constexpr static DequantizePolicy tokenPolicy = DequantizePolicy::PER_TOKEN;
     constexpr static DequantizePolicy channelPolicy = DequantizePolicy::PER_CHANNEL;
     constexpr static DequantizePolicy groupPolicy = DequantizePolicy::PER_GROUP;
@@ -158,7 +162,7 @@ struct DequantizeParams {
 
 -   PER\_TENSOR模式
 
-    ```
+    ```cpp
     constexpr static DequantizePolicy tensorPolicy = DequantizePolicy::PER_TENSOR;
     // 不启用offset
     constexpr static DequantizeConfig config = {tensorPolicy, false, -1};
@@ -173,7 +177,7 @@ struct DequantizeParams {
 
 结果示例如下：
 
-```
+```text
 输入数据（srcLocal）:
 [-4, 2, -2, -3, -1, -4, 1, 3, 4, 1, -2, 0, ... 1]
 输入数据（scale矢量）:

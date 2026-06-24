@@ -102,6 +102,7 @@ pipe.InitBuffer(outQueueDst, 1, 512 * sizeof(half));
 AscendC::LocalTensor<half> src0Local = inQueueSrc0.DeQue<half>();
 AscendC::LocalTensor<half> src1Local = inQueueSrc1.DeQue<half>();
 AscendC::LocalTensor<half> dstLocal = outQueueDst.AllocTensor<half>();
-AscendC::CheckLocalMemoryIA({ 0, (uint32_t)(dstLocal.GetPhyAddr() / 32),(uint32_t)((dstLocal.GetPhyAddr() + 512 * sizeof(half)) / 32), false, false, false, true, false, false,
-true });
+AscendC::CheckLocalMemoryIA(
+    {0, (uint32_t)(dstLocal.GetPhyAddr() / 32), (uint32_t)((dstLocal.GetPhyAddr() + 512 * sizeof(half)) / 32), false,
+     false, false, true, false, false, true});
 ```

@@ -11,13 +11,13 @@
 
 1.  判断数据总长度totalLength是否满足32字节对齐，如不满足，则计算totalLength向上32字节对齐后的长度totalLengthAligned。
 
-    ```
+    ```cpp
     constexpr uint32_t BLOCK_SIZE = 32;
     // 为方便计算，这里根据数据类型定义变量alignNum作为对齐数
     uint32_t alignNum = BLOCK_SIZE / dataTypeSize;
     // totalLength为数据总量
-    uint32_t totalLengthAligned = (totalLength % alignNum == 0)?
-            totalLength : ((totalLength + alignNum - 1) / alignNum) * alignNum;
+    uint32_t totalLengthAligned =
+        (totalLength % alignNum == 0) ? totalLength : ((totalLength + alignNum - 1) / alignNum) * alignNum;
     ```
 
 2.  根据totalLengthAligned，计算每个核的计算数据长度blockLength，分核策略可参照[尾核Tiling](多核-Tiling切分/尾核Tiling.md)。
@@ -25,11 +25,11 @@
 
     对当前Unified Buffer可用空间以32字节为粒度，进行切分，计算出数据块个数UB\_BLOCK\_NUM。根据是否开启DoubleBuffer计算出当前可用的最大数据块个数，记作MAX\_AVAILABLE\_UB\_BLOCK\_NUM。最后，以MAX\_AVAILABLE\_UB\_BLOCK\_NUM为粒度，对blockLength进行切分。为方便演示，如下代码直接给出UB\_BLOCK\_NUM，作为当前Unified Buffer可用空间包含的block（32字节）数。
 
-    ```
+    ```cpp
     constexpr uint32_t BUFFER_NUM = 2;
-    constexpr uint32_t UB_BLOCK_NUM = 21;  // UB最大可以使用的block数量
+    constexpr uint32_t UB_BLOCK_NUM = 21; // UB最大可以使用的block数量
     constexpr uint32_t MAX_AVAILABLE_UB_BLOCK_NUM = UB_BLOCK_NUM / BUFFER_NUM * BUFFER_NUM;
-    
+
     tileNum = blockLength / (alignNum * MAX_AVAILABLE_UB_BLOCK_NUM);
     if (tileNum == 0) {
         // 单核需要计算的长度小于UB可用空间，按照仅有尾块处理
@@ -52,7 +52,7 @@
 
 开启DoubleBuffer，参考[InitBuffer接口函数原型](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/Pipe和Que框架/TPipe/InitBuffer.md)，将num参数配置成2，即BUFFER\_NUM。
 
-```
+```cpp
 this->initBufferLength = AscendC::Std::max(this->tileLength, this->lastTileLength);
 pipe.InitBuffer(inQueueX, BUFFER_NUM, this->initBufferLength * sizeof(dataType));
 pipe.InitBuffer(inQueueY, BUFFER_NUM, this->initBufferLength * sizeof(dataType));
@@ -61,19 +61,19 @@ pipe.InitBuffer(outQueueZ, BUFFER_NUM, this->initBufferLength * sizeof(dataType)
 
 同时在计算核内每个数据块的长度时，考虑DoubleBuffer场景，需要将Buffer数量，即BUFFER\_NUM=2带入计算。
 
-```
+```cpp
 this->tileLength = tiling.tileLength / BUFFER_NUM;
 ```
 
 由于无法保证尾块满足DoubleBuffer的条件，因此不对尾块进行切分。
 
-```
+```cpp
 this->lastTileLength = tiling.lastTileLength;
 ```
 
 Init函数实现代码如下：
 
-```
+```cpp
 __aicore__ inline void Init(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, AddCustomTilingData tiling)
 {
     if (tiling.isEvenCore) {
@@ -82,29 +82,38 @@ __aicore__ inline void Init(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t
         this->tileLength = tiling.tileLength / BUFFER_NUM;
         this->lastTileLength = tiling.lastTileLength;
 
-        xGm.SetGlobalBuffer((__gm__ dataType *)x + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
-        yGm.SetGlobalBuffer((__gm__ dataType *)y + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
-        zGm.SetGlobalBuffer((__gm__ dataType *)z + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
+        xGm.SetGlobalBuffer((__gm__ dataType*)x + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
+        yGm.SetGlobalBuffer((__gm__ dataType*)y + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
+        zGm.SetGlobalBuffer((__gm__ dataType*)z + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
     } else {
         if (AscendC::GetBlockIdx() < tiling.formerNum) {
             this->tileNum = tiling.formerTileNum;
             this->tileLength = tiling.formerTileLength / BUFFER_NUM;
             this->lastTileLength = tiling.formerLastTileLength;
 
-            xGm.SetGlobalBuffer((__gm__ dataType *)x + tiling.formerLength * AscendC::GetBlockIdx(), tiling.formerLength);
-            yGm.SetGlobalBuffer((__gm__ dataType *)y + tiling.formerLength * AscendC::GetBlockIdx(), tiling.formerLength);
-            zGm.SetGlobalBuffer((__gm__ dataType *)z + tiling.formerLength * AscendC::GetBlockIdx(), tiling.formerLength);
+            xGm.SetGlobalBuffer(
+                (__gm__ dataType*)x + tiling.formerLength * AscendC::GetBlockIdx(), tiling.formerLength);
+            yGm.SetGlobalBuffer(
+                (__gm__ dataType*)y + tiling.formerLength * AscendC::GetBlockIdx(), tiling.formerLength);
+            zGm.SetGlobalBuffer(
+                (__gm__ dataType*)z + tiling.formerLength * AscendC::GetBlockIdx(), tiling.formerLength);
         } else {
             this->tileNum = tiling.tailTileNum;
             this->tileLength = tiling.tailTileLength / BUFFER_NUM;
             this->lastTileLength = tiling.tailLastTileLength;
 
-            xGm.SetGlobalBuffer((__gm__ dataType *)x + tiling.formerLength * tiling.formerNum +
-                tiling.tailLength * (AscendC::GetBlockIdx() - tiling.formerNum), tiling.tailLength);
-            yGm.SetGlobalBuffer((__gm__ dataType *)y + tiling.formerLength * tiling.formerNum +
-                tiling.tailLength * (AscendC::GetBlockIdx() - tiling.formerNum), tiling.tailLength);
-            zGm.SetGlobalBuffer((__gm__ dataType *)z + tiling.formerLength * tiling.formerNum +
-                tiling.tailLength * (AscendC::GetBlockIdx() - tiling.formerNum), tiling.tailLength);
+            xGm.SetGlobalBuffer(
+                (__gm__ dataType*)x + tiling.formerLength * tiling.formerNum +
+                    tiling.tailLength * (AscendC::GetBlockIdx() - tiling.formerNum),
+                tiling.tailLength);
+            yGm.SetGlobalBuffer(
+                (__gm__ dataType*)y + tiling.formerLength * tiling.formerNum +
+                    tiling.tailLength * (AscendC::GetBlockIdx() - tiling.formerNum),
+                tiling.tailLength);
+            zGm.SetGlobalBuffer(
+                (__gm__ dataType*)z + tiling.formerLength * tiling.formerNum +
+                    tiling.tailLength * (AscendC::GetBlockIdx() - tiling.formerNum),
+                tiling.tailLength);
         }
     }
 
@@ -117,7 +126,7 @@ __aicore__ inline void Init(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t
 
 由于开启DoubleBuffer后，切分后的主块数据块个数翻倍，在Process函数中，需要将BUFFER\_NUM带入计算循环次数；尾块独立计算，不开启DoubleBuffer。后续主尾块在CopyIn、Compute、CopyOut函数中的处理，与[尾块tiling处理](多核-Tiling切分/尾块Tiling.md)相同。
 
-```
+```cpp
 __aicore__ inline void Process()
 {
     // 主块进行DoubleBuffer计算，所以loopCount得乘以2

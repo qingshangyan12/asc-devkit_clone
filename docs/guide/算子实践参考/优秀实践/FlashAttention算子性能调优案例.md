@@ -72,9 +72,9 @@
 
 -   根据优化经验，循环间会存在一些不必要的性能开销，循环越多性能可能越差；满足UB最大空间限制的情况下，UB切分的基本块越大，循环越少。算子中通过InitBuffer接口分配UB buffer大小。
 
-    ```
-    pipe->InitBuffer(ubBuffer, 120 * 1024);  
-    pipe->InitBuffer(tmpBuffer, 30 * 1024);  
+    ```cpp
+    pipe->InitBuffer(ubBuffer, 120 * 1024);
+    pipe->InitBuffer(tmpBuffer, 30 * 1024);
     pipe->InitBuffer(vecClc3, 8 * 1024);
     ```
 
@@ -118,7 +118,7 @@
 
     由于FAG算子中Cube计算比Vector计算快且存在依赖性，同时为了减少CV之间的通信次数，通过缓存机制使matmul提前计算多块，这里的缓存机制指的是将mm一次性计算多个基本块缓存到GM上。如下代码中，SetTail设置的singleCoreM和singleCoreN大小分别为BaseM，BaseN的倍数，即matmul一次发起多个基本块的计算，实现matmul结果的缓存，Vector侧分多次取matmul的结果。
 
-    ```
+    ```text
     mm3.SetTail(s2CvExtend, -1, preS1Extend);  
     mm3.SetTensorA(mulWorkSpaceGm[pingpongIdx * coreNum * cubeBaseMN + cBlockIdx * cubeBaseMN], true); 
     mm3.SetTensorB(queryGm[mm2aTensorOffsetCv]);  
@@ -135,7 +135,7 @@
 
     基于缓存mm1/mm2/mm3的优化后，在本轮Vector计算等Cube流水的间隔，插入下一轮循环的Vector计算，如上图所示，这样使Vector流水与Cube流水之间的并行度更高，反映到流水图中为Vector计算更密集。原计算过程伪代码与在CV间隔中插入下一轮Vector计算的伪代码，分别如以下两段所示。
 
-    ```
+    ```text
     // 原计算过程伪代码 
     // mm1计算;
     dropout();
@@ -146,7 +146,7 @@
     ...
     ```
 
-    ```
+    ```text
     // 在Vector等Cube流水的间隔中，插入下一轮循环的Vector计算伪代码 
     // mm1计算;
     dropout();
@@ -178,21 +178,30 @@
 
     代码实现中使用SetGlobalBuffer接口设置workspace的起始地址，如果起始地址不是按照512B对齐，搬运效率会很低，可以强制[GM地址512Byte对齐](../SIMD算子性能优化/内存访问/GM地址尽量512B对齐.md)来避免这个情况。下面代码中ADDR\_ALIGN\_SIZE即为512。
 
-    ```
-    // init workspace address  
-    syncGlobal.SetGlobalBuffer((__gm__ int32_t*)workspace);  
-    uint64_t workspaceOffsets = SYNC_GLOBAL_WORKSPACE_SIZE;  
-    dqWorkSpaceGm.SetGlobalBuffer((__gm__ float*)workspace + workspaceOffsets / sizeof(T2));  
-    workspaceOffsets = (workspaceOffsets + qPostBlockTotal * sizeof(float) + ADDR_ALIGN_SIZE) / ADDR_ALIGN_SIZE * ADDR_ALIGN_SIZE;  dkWorkSpaceGm.SetGlobalBuffer((__gm__ float*)workspace + workspaceOffsets / sizeof(T2));  
-    workspaceOffsets = (workspaceOffsets + kvPostBlockTotal * sizeof(float) + ADDR_ALIGN_SIZE) / ADDR_ALIGN_SIZE * ADDR_ALIGN_SIZE;  dvWorkSpaceGm.SetGlobalBuffer((__gm__ float*)workspace + workspaceOffsets / sizeof(T2));  
-    workspaceOffsets = (workspaceOffsets + kvPostBlockTotal * sizeof(float) + ADDR_ALIGN_SIZE) / ADDR_ALIGN_SIZE * ADDR_ALIGN_SIZE; 
-    // matmul1 and matmul2 workspace size  
-    matmulWorkspaceSize = cubeBaseMN * sizeof(float); 
-    mm1WorkspaceGm.SetGlobalBuffer((__gm__ T2*)(workspace + workspaceOffsets + cBlockIdx * matmulWorkspaceSize));  mm2WorkspaceGm.SetGlobalBuffer((__gm__ T2*)(workspace + workspaceOffsets + coreNum * matmulWorkspaceSize + cBlockIdx * matmulWorkspaceSize));   // drop workspace offset  
-    workspaceOffsets = (workspaceOffsets + coreNum * cubeBaseMN * sizeof(float) * INPUT_NUMS + ADDR_ALIGN_SIZE) / ADDR_ALIGN_SIZE * ADDR_ALIGN_SIZE;  
-    dropWorkSpaceGm.SetGlobalBuffer((__gm__ T1*)workspace + workspaceOffsets / sizeof(T1));   
-    // mul workspace offset  
-    workspaceOffsets = (workspaceOffsets + coreNum * cubeBaseMN * sizeof(half) * 2 + ADDR_ALIGN_SIZE) / ADDR_ALIGN_SIZE * ADDR_ALIGN_SIZE;  
+    ```cpp
+    // init workspace address
+    syncGlobal.SetGlobalBuffer((__gm__ int32_t*)workspace);
+    uint64_t workspaceOffsets = SYNC_GLOBAL_WORKSPACE_SIZE;
+    dqWorkSpaceGm.SetGlobalBuffer((__gm__ float*)workspace + workspaceOffsets / sizeof(T2));
+    workspaceOffsets =
+        (workspaceOffsets + qPostBlockTotal * sizeof(float) + ADDR_ALIGN_SIZE) / ADDR_ALIGN_SIZE * ADDR_ALIGN_SIZE;
+    dkWorkSpaceGm.SetGlobalBuffer((__gm__ float*)workspace + workspaceOffsets / sizeof(T2));
+    workspaceOffsets =
+        (workspaceOffsets + kvPostBlockTotal * sizeof(float) + ADDR_ALIGN_SIZE) / ADDR_ALIGN_SIZE * ADDR_ALIGN_SIZE;
+    dvWorkSpaceGm.SetGlobalBuffer((__gm__ float*)workspace + workspaceOffsets / sizeof(T2));
+    workspaceOffsets =
+        (workspaceOffsets + kvPostBlockTotal * sizeof(float) + ADDR_ALIGN_SIZE) / ADDR_ALIGN_SIZE * ADDR_ALIGN_SIZE;
+    // matmul1 and matmul2 workspace size
+    matmulWorkspaceSize = cubeBaseMN * sizeof(float);
+    mm1WorkspaceGm.SetGlobalBuffer((__gm__ T2*)(workspace + workspaceOffsets + cBlockIdx * matmulWorkspaceSize));
+    mm2WorkspaceGm.SetGlobalBuffer((__gm__ T2*)(workspace + workspaceOffsets + coreNum * matmulWorkspaceSize +
+                                                cBlockIdx * matmulWorkspaceSize)); // drop workspace offset
+    workspaceOffsets = (workspaceOffsets + coreNum * cubeBaseMN * sizeof(float) * INPUT_NUMS + ADDR_ALIGN_SIZE) /
+                       ADDR_ALIGN_SIZE * ADDR_ALIGN_SIZE;
+    dropWorkSpaceGm.SetGlobalBuffer((__gm__ T1*)workspace + workspaceOffsets / sizeof(T1));
+    // mul workspace offset
+    workspaceOffsets =
+        (workspaceOffsets + coreNum * cubeBaseMN * sizeof(half) * 2 + ADDR_ALIGN_SIZE) / ADDR_ALIGN_SIZE * ADDR_ALIGN_SIZE;
     mulWorkSpaceGm.SetGlobalBuffer((__gm__ T1*)workspace + workspaceOffsets / sizeof(T1));
     ```
 

@@ -80,7 +80,7 @@ MTE2的搬运效率还可以通过查看其带宽利用率进行验证，如下�
 
 1.  配置MDL模板参数，将其中的enableKdimReorderLoad参数设置为true，开启多核K轴错峰访问Device内存。
 
-    ```
+    ```cpp
     constexpr MatmulConfig GetMDLKDimReorderConfig()
     {
         auto CFG = CFG_MDL;
@@ -92,11 +92,13 @@ MTE2的搬运效率还可以通过查看其带宽利用率进行验证，如下�
 
 2.  基于自定义的MatmulConfig模板参数，创建Matmul对象。
 
-    ```
-    AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, aType>,
+    ```cpp
+    AscendC::Matmul<
+        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, aType>,
         AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, bType>,
         AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, cType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, biasType>, MM_CFG> matmulObj;
+        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, biasType>, MM_CFG>
+        matmulObj;
     ```
 
 ## 验证优化方案性能收益<a name="section19022397498"></a>

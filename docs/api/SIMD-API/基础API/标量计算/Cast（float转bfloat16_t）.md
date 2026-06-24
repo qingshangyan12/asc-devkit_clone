@@ -52,5 +52,5 @@ __aicore__ inline bfloat16_t Cast(const float& fVal)
 
 ```cpp
 float m = 3.14159f;
-bfloat16_t n = AscendC::Cast(m);  // n = 3.140625  float到bfloat16_t进行了舍入
+bfloat16_t n = AscendC::Cast(m); // n = 3.140625  float到bfloat16_t进行了舍入
 ```

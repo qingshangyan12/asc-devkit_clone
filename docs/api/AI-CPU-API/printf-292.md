@@ -17,13 +17,13 @@
 
 ## 需要包含的头文件<a name="section78885814919"></a>
 
-```
+```cpp
 #include "aicpu_api.h"
 ```
 
 ## 函数原型<a name="section2067518173415"></a>
 
-```
+```cpp
 void printf(const char* fmt, ...)
 ```
 
@@ -69,7 +69,7 @@ void printf(const char* fmt, ...)
 -   该接口使用Dump功能，所有使用Dump功能的接口在每个核上Dump的数据总量不可超过1M。请开发者自行控制待打印的内容数据量，超出则不会打印。
 -   使用该接口时，若采用bisheng命令行编译，开发者需要手动链接相关的静态库；而使用CMake编译时，框架会自动处理链接问题，无需开发者额外关注。具体编译命令如下：通过--cce-aicpu-laicpu\_api为Device链接libaicpu\_api.a，通过--cce-aicpu-L指定libaicpu\_api.a的库路径。
 
-    ```
+    ```bash
     $bisheng -O2 foo.aicpu --cce-aicpu-L${INSTALL_DIR}/lib64/device/lib64 --cce-aicpu-laicpu_api -I${INSTALL_DIR}/include/ascendc/aicpu_api -c -o foo.aicpu.o
     ```
 
@@ -79,7 +79,7 @@ void printf(const char* fmt, ...)
 
 在算子Kernel侧实现代码中需要输出日志信息的地方调用printf接口打印相关内容。样例如下：
 
-```
+```cpp
 #include "aicpu_api.h"
 
 // 整型打印：
@@ -91,13 +91,13 @@ AscendC::printf("fmt string %f\n", a);
 
 // 指针打印：
 int b = 10;
-int *c = &b;
+int* c = &b;
 AscendC::printf("TEST %p\n", c);
 ```
 
 程序运行时打印效果如下：
 
-```
+```text
 fmt string 291
 fmt string 3.140000
 TEST 0xdfffd6fddd1c

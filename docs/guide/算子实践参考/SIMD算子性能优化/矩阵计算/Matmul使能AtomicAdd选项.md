@@ -8,12 +8,11 @@
 
 将Matmul的结果矩阵C和GM上的矩阵D分别搬到UB上，做完Add操作后，结果再搬出到GM。这样至少要多分配一块UB内存给矩阵D，假设在分离架构的处理器上执行，将多做三次搬运操作（矩阵C从GM搬到UB、矩阵D从GM搬到UB、Add结果从UB搬出到GM）。
 
-```
- template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE>
- __aicore__ inline void MatMulKernel(...)
- {
-    ...
-    AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL> mm;
+```cpp
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE>
+__aicore__ inline void MatMulKernel(...)
+{
+    ... AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL> mm;
     TPipe pipe;
     REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm);
 
@@ -21,7 +20,7 @@
     mm.SetTensorB(gm_b);
     mm.SetBias(gm_bias);
     mm.IterateAll(gm_c);
-    
+
     DataCopy(local_c, gm_c, c_size);
     DataCopy(local_d, gm_d, d_size);
     event_t eventIdMTE2ToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_V));
@@ -30,30 +29,28 @@
     Add(local_d, local_d, local_c, d_size);
     DataCopy(gm_d, local_d, d_size);
     ...
- }
+}
 
- extern "C" __global__ __aicore__ void example_kernel(...)
- {
-     ...
-     typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, half> aType; 
-     typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, half> bType; 
-     typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, float> cType; 
-     typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, float> biasType;
-     MatMulKernel<aType, bType, cType, biasType>(...);
-     ...
- }
+extern "C" __global__ __aicore__ void example_kernel(...)
+{
+    ... typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, half> aType;
+    typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, half> bType;
+    typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, float> cType;
+    typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, float> biasType;
+    MatMulKernel<aType, bType, cType, biasType>(...);
+    ...
+}
 ```
 
 【正例】
 
 计算Matmul结果时，调用IterateAll接口或者GetTensorC接口搬运到矩阵D的GM地址上，同时将接口中enAtomic参数设为1，搬出到GM时，Matmul结果矩阵C会累加到矩阵D上，从而得到两个矩阵Add后的结果。
 
-```
- template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE>
- __aicore__ inline void MatMulKernel(...)
- {
-    ...
-    AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL> mm;
+```cpp
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE>
+__aicore__ inline void MatMulKernel(...)
+{
+    ... AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL> mm;
     TPipe pipe;
     REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm);
 
@@ -63,21 +60,20 @@
 
     mm.IterateAll(gm_d, 1); // IterateAll接口中的enAtomic设为1
     // while (mm. Iterate()) {
-        // mm.GetTensorC(gm_d, 1);     // GetTensorC接口中的enAtomic设为1
+    // mm.GetTensorC(gm_d, 1);     // GetTensorC接口中的enAtomic设为1
     // }
     ...
- }
+}
 
- extern "C" __global__ __aicore__ void example_kernel(...)
- {
-     ...
-     typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, half> aType; 
-     typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, half> bType; 
-     typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, float> cType; 
-     typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, float> biasType;
-     MatMulKernel<aType, bType, cType, biasType>(...);
-     ...
- }
+extern "C" __global__ __aicore__ void example_kernel(...)
+{
+    ... typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, half> aType;
+    typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, half> bType;
+    typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, float> cType;
+    typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, float> biasType;
+    MatMulKernel<aType, bType, cType, biasType>(...);
+    ...
+}
 ```
 
 【性能对比】

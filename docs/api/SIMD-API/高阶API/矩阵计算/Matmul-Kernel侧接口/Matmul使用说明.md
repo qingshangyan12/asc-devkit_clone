@@ -31,7 +31,7 @@ Kernel侧实现Matmul矩阵乘运算的步骤概括为：
     -   默认为MIX模式（包含矩阵计算和矢量计算），该场景下通常不定义ASCENDC\_CUBE\_ONLY宏，如果在程序中使用了ASCENDC\_CUBE\_ONLY宏，则必须使用ASCEND\_IS\_AIC宏和ASCEND\_IS\_AIV宏将Cube计算和Vector计算隔离开。
     -   纯Cube模式（只有矩阵计算）场景下，建议在代码中定义ASCENDC\_CUBE\_ONLY宏，避免额外的性能开销。
 
-    ```
+    ```cpp
     // 纯cube模式（只有矩阵计算）场景下，需要设置该代码宏，并且必须在#include "lib/matmul_intf.h"之前设置
     // #define ASCENDC_CUBE_ONLY
     #include "lib/matmul_intf.h"
@@ -45,7 +45,7 @@ Kernel侧实现Matmul矩阵乘运算的步骤概括为：
 
     创建对象时需要传入A、B、C、Bias的参数类型信息，类型信息通过[MatmulType](#table1188045714378)来定义，包括：内存逻辑位置、数据格式、数据类型、数据来源的内存逻辑位置。
 
-    ```
+    ```cpp
     template <
         AscendC::TPosition POSITION, CubeFormat FORMAT, typename TYPE, bool ISTRANS = false,
         LayoutMode LAYOUT = LayoutMode::NONE, bool IBSHARE = false, TPosition SRCPOS = TPosition::GM>
@@ -101,13 +101,13 @@ Kernel侧实现Matmul矩阵乘运算的步骤概括为：
 
 2.  初始化操作。
 
-    ```
+    ```text
     REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling); // 初始化matmul对象，参数含义请参考REGIST_MATMUL_OBJ章节
     ```
 
 3.  设置左矩阵A、右矩阵B、Bias。
 
-    ```
+    ```text
     mm.SetTensorA(gm_a);    // 设置左矩阵A
     mm.SetTensorB(gm_b);    // 设置右矩阵B
     mm.SetBias(gm_bias);    // 设置Bias
@@ -122,7 +122,7 @@ Kernel侧实现Matmul矩阵乘运算的步骤概括为：
 
     -   调用[Iterate](Iterate.md#li135771283591)完成单次迭代计算，叠加while循环完成单核全量数据的计算。Iterate方式，可以自行控制迭代次数，完成所需数据量的计算，方式比较灵活。
 
-        ```
+        ```cpp
         // API接口内部会进行循环结束条件判断处理
         while (mm.Iterate()) {
             mm.GetTensorC(gm_c);
@@ -131,7 +131,7 @@ Kernel侧实现Matmul矩阵乘运算的步骤概括为：
 
     -   调用[IterateAll](IterateAll.md)完成单核上所有数据的计算。IterateAll方式，无需循环迭代，使用比较简单。
 
-        ```
+        ```text
         mm.IterateAll(gm_c);
         ```
 
@@ -143,7 +143,7 @@ Kernel侧实现Matmul矩阵乘运算的步骤概括为：
         -   Atlas 推理系列产品AI Core暂不支持该方式。
         -   Atlas 200I/500 A2 推理产品暂不支持该方式。
 
-        ```
+        ```cpp
         // 定义C矩阵的类型信息
         typedef AscendC::MatmulType<AscendC::TPosition::CO1, CubeFormat::NZ, float> cType;
         // 创建Matmul对象
@@ -177,7 +177,7 @@ Kernel侧实现Matmul矩阵乘运算的步骤概括为：
 
 5.  结束矩阵乘操作。
 
-    ```
+    ```text
     mm.End();
     ```
 
@@ -198,7 +198,7 @@ Kernel侧实现Matmul矩阵乘运算的步骤概括为：
 
 ## 需要包含的头文件
 
-```
+```cpp
 #include "lib/matmul/matmul_intf.h"
 ```
 

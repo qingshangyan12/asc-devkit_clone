@@ -51,8 +51,11 @@ Atlas 训练系列产品；
 **Load3Dv1接口：**
 
 ```cpp
-template <typename T, const IsResetLoad3dConfig &defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV1<U>& loadDataParams)
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV1<U>& loadDataParams)
 ```
 
 </cann-filter>
@@ -100,8 +103,11 @@ Kirin X90；
 **Load3Dv2接口：**
 
 ```cpp
-template <typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV2<U>& loadDataParams)
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV2<U>& loadDataParams)
 ```
 
 </cann-filter>
@@ -114,7 +120,8 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 ```cpp
 template <typename T>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV2Pro& loadDataParams)
+__aicore__ inline void LoadData(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV2Pro& loadDataParams)
 ```
 
 </cann-filter>
@@ -516,9 +523,9 @@ IsResetLoad3dConfig结构定义如下：
 
 ```cpp
 struct IsResetLoad3dConfig {
-   bool isSetFMatrix = true;
-   bool isSetPadding = true;
-}; 
+    bool isSetFMatrix = true;
+    bool isSetPadding = true;
+};
 ```
 
 isSetFMatrix配置为true，表示在Load3D接口内部设置FeatureMap的属性描述（包括l1H、l1W、padList，参数介绍参考[表4](#zh-cn_topic_0000002512171652_table193501032193419)）；设置为false，表示该接口传入的FeatureMap的属性描述不生效，开发者需要通过SetFmatrix进行手动管理设置。
@@ -580,16 +587,23 @@ repeatMode =1的时候filter窗口中读取数据的位置保持不变，每个r
 示例代码片段如下，仅展示样例中的部分代码，完整示例请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0)。
 
 ```cpp
-// Load3Dv2指令完成img2col的过程，可知img2col后A矩阵高度为ho \* wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：A矩阵的高度为CeilAlign(k, fractalShape[0])；img2col后A矩阵宽度为ci \* kh \* kw，代入kh=1，kw=1，可知A矩阵的宽度为CeilAlign(m, fractalShape[1])。最后，配置loadDataParams.enTranspose = true，将整个A矩阵转置并且将其中每一个分形转置
-// 使用Load3D接口，实现NZ2ZZ
+// Load3Dv2指令完成img2col的过程，可知img2col后A矩阵高度为ho \*
+// wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：A矩阵的高度为CeilAlign(k,
+// fractalShape[0])；img2col后A矩阵宽度为ci \* kh \*
+// kw，代入kh=1，kw=1，可知A矩阵的宽度为CeilAlign(m,
+// fractalShape[1])。最后，配置loadDataParams.enTranspose =
+// true，将整个A矩阵转置并且将其中每一个分形转置 使用Load3D接口，实现NZ2ZZ
 AscendC::LoadData3DParamsV2<T> loadDataParams;
 // 源操作数height
 loadDataParams.l1H = 1;
 // 源操作数width
 loadDataParams.l1W = CeilAlign(k, fractalShape[0]);
 // 源操作数的通道数，
-// img2col的结果矩阵高度为ho \* wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：ho \* wo = loadDataParams.l1H \* loadDataParams.l1W
-// img2col的结果矩阵宽度为ci \* kh \* kw，代入kh=1，kw=1，可知结果矩阵的宽度为ci=loadDataParams.channelSize = m
+// img2col的结果矩阵高度为ho \*
+// wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：ho
+// \* wo = loadDataParams.l1H \* loadDataParams.l1W img2col的结果矩阵宽度为ci \*
+// kh \* kw，代入kh=1，kw=1，可知结果矩阵的宽度为ci=loadDataParams.channelSize =
+// m
 loadDataParams.channelSize = CeilAlign(m, fractalShape[1]);
 // 该指令在目的操作数width维度的传输长度，如果不覆盖最右侧的分形，对于half类型，应为16的倍数，对于int8_t/uint8_t应为32的倍数；覆盖的情况则无倍数要求。
 loadDataParams.kExtension = CeilAlign(m, fractalShape[1]);

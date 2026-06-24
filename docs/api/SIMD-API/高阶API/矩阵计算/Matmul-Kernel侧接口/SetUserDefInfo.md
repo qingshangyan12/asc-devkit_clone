@@ -19,7 +19,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetUserDefInfo(const uint64_t tilingPtr)
 ```
 
@@ -42,7 +42,7 @@ __aicore__ inline void SetUserDefInfo(const uint64_t tilingPtr)
 
 ## 调用示例
 
-```
+```cpp
 // 用户自定义回调函数
 void DataCopyOut(
     const __gm__ void* gm, const LocalTensor<int8_t>& co1Local, const void* dataCopyOutParams, const uint64_t tilingPtr,

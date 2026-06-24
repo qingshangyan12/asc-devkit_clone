@@ -20,7 +20,7 @@
 
 为方便理解，通过Python脚本实现的方式，表达其计算公式如下，其中dx、y是源操作数（输入），d为目的操作数（输出）。
 
-```
+```python
 def softmax_grad_front(dx, y, is_fp16=False):
     dx = dx.astype(np.float32)
     y = y.astype(np.float32)
@@ -48,16 +48,21 @@ def softmax_grad_front(dx, y, is_fp16=False):
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isBasicBlock = false, bool isDataFormatNZ = false>
-    __aicore__ inline void SoftmaxGradFront(const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor, const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+    __aicore__ inline void SoftmaxGradFront(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor,
+        const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
     ```
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isBasicBlock = false, bool isDataFormatNZ = false>
-    __aicore__ inline void SoftmaxGradFront(const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+    __aicore__ inline void SoftmaxGradFront(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor,
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling,
+        const SoftMaxShapeInfo& softmaxShapeInfo = {})
     ```
 
 由于该接口的内部实现中涉及复杂的计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -89,7 +94,7 @@ def softmax_grad_front(dx, y, is_fp16=False):
 | tiling | 输入 | softmaxgradfront计算所需tiling信息，Tiling信息的获取请参考[SoftmaxGrad Tiling接口](SoftmaxGrad-Tiling接口.md)。 |
 | softmaxShapeInfo | 输入 | srcTensor的shape信息。SoftMaxShapeInfo类型，具体定义如下方代码所示，其中参数的含义为：<br>srcM：非尾轴长度的乘积。<br>srcK：尾轴长度，必须32Byte对齐。<br>oriSrcM：原始非尾轴长度的乘积。<br>oriSrcK：原始尾轴长度。<br><br>需要注意，当输入输出的数据格式为NZ格式时，尾轴长度为reduce轴长度即[图2](SoftMax.md#fig0172155842215)中的W0\*W1，非尾轴为H0\*H1。 |
 
-```
+```cpp
 struct SoftMaxShapeInfo {
     uint32_t srcM;
     uint32_t srcK;
@@ -110,7 +115,7 @@ struct SoftMaxShapeInfo {
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放SoftmaxGradFront计算结果的Tensor
 // gradLocal：存放SoftmaxGradFront计算的输入Tensor
 // srcLocal：存放SoftmaxGradFront计算的输入Tensor
@@ -131,7 +136,7 @@ AscendC::SoftmaxGradFront<T>(dstLocal, gradLocal, srcLocal, softmaxTiling, softm
 
 结果示例如下：
 
-```
+```text
 输入数据(gradLocal)：
 [[-100.     -80.     -60.     -50.     -30.     -20.     -15.     -10.   ]
  [  -9.      -8.      -7.      -6.      -5.      -4.      -3.      -2.   ]

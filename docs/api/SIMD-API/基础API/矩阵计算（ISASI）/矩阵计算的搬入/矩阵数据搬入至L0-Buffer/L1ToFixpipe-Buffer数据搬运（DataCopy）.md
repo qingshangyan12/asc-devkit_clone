@@ -31,9 +31,10 @@ DataCopy数据搬运支持将随路量化参数从L1 Buffer移动到Fixpipe Buff
 template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
 
-// 连续或非连续搬运场景（高维切分）
-template <typename T>
-__aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
+    // 连续或非连续搬运场景（高维切分）
+    template <typename T>
+    __aicore__
+    inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
 ```
 
 ## 参数说明<a id="section_param_desc"></a>
@@ -83,7 +84,8 @@ src数据类型支持uint64_t，dst数据类型支持uint64_t。
 L1 Buffer(C1)->Fixpipe Buffer(C2PIPE2GM)，搬运Vector量化参数。
 
 ```cpp
-// c1Addr = 0、fbAddr = 0、N = 256、n = 256；burstLen = CeilAlign(256 * sizeof(uint64_t), 128) / 128 = 16，dataCopyParams = {1, 16, 0, 0}。
+// c1Addr = 0、fbAddr = 0、N = 256、n = 256；burstLen = CeilAlign(256 *
+// sizeof(uint64_t), 128) / 128 = 16，dataCopyParams = {1, 16, 0, 0}。
 AscendC::LocalTensor<uint64_t> quantAlphaTensor(AscendC::TPosition::C1, c1Addr, N);
 
 if constexpr (scenarioNum == 2 || scenarioNum == 4 || scenarioNum == 6) {

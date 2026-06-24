@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001526206862_section1630753514297"></a>
 
-```
+```text
 REGISTER_NONE_TILING
 ```
 
@@ -69,7 +69,7 @@ REGISTER_NONE_TILING
 
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 
-```
+```text
 # Tiling模板库提供方，无法预知用户实例化何种TilingData结构体
 template <class BrcDag>
 struct BroadcastBaseTilingData {
@@ -123,7 +123,7 @@ public:
 };
 ```
 
-```
+```cpp
 #用户通过传入schMode, OpDag模板参数来实例化模板库
 using namespace AscendC;
 template <uint64_t schMode>

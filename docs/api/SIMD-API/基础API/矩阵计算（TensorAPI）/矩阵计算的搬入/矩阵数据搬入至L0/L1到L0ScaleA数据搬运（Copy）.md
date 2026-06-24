@@ -38,8 +38,7 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
     ```cpp
     template <typename CopyOperationType, typename CopyTraitType>
-    __aicore__ inline constexpr auto MakeCopy(
-        const CopyOperationType& copyOperation, const CopyTraitType& copyTrait)
+    __aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copyOperation, const CopyTraitType& copyTrait)
     ```
 
 ## 参数说明
@@ -79,7 +78,7 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 ```cpp
 #include "tensor_api/tensor.h"
 
- using namespace AscendC::Te;
+using namespace AscendC::Te;
 
 __aicore__ inline void CopyL1ToL0ScaleAExample()
 {

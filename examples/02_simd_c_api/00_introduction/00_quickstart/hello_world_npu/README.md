@@ -12,7 +12,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── hello_world_npu
 │   ├── CMakeLists.txt      // 编译工程文件
 │   └── hello_world.asc     // Ascend C算子实现 & 调用样例

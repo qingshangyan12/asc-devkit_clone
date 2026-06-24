@@ -63,7 +63,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline __gm__ uint8_t* __gm__ GetSysWorkSpacePtr()
 ```
 
@@ -81,17 +81,16 @@ __aicore__ inline __gm__ uint8_t* __gm__ GetSysWorkSpacePtr()
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
-...
-REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling); // 初始化，传入系统workspace指针
+```cpp
+... REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling); // 初始化，传入系统workspace指针
 // CopyIn阶段：完成从GM到LocalMemory的搬运
-mm.SetTensorA(gm_a);    // 设置左矩阵A
-mm.SetTensorB(gm_b);    // 设置右矩阵B
-mm.SetBias(gm_bias);    // 设置Bias
+mm.SetTensorA(gm_a); // 设置左矩阵A
+mm.SetTensorB(gm_b); // 设置右矩阵B
+mm.SetBias(gm_bias); // 设置Bias
 // Compute阶段：完成矩阵乘计算
-while (mm.Iterate()) { 
+while (mm.Iterate()) {
     // CopyOut阶段：完成从LocalMemory到GM的搬运
-    mm.GetTensorC(gm_c); 
+    mm.GetTensorC(gm_c);
 }
 // 结束矩阵乘操作
 mm.End();

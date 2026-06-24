@@ -19,8 +19,8 @@ $$
 ```cpp
 // 数据写入索引为偶数的位置
 __simd_callee__ inline void asc_muls(vector_half& dst, vector_float src, float value, vector_bool mask)
-// 数据写入索引为奇数的位置
-__simd_callee__ inline void asc_muls_v2(vector_half& dst, vector_float src, float value, vector_bool mask)
+    // 数据写入索引为奇数的位置
+    __simd_callee__ inline void asc_muls_v2(vector_half& dst, vector_float src, float value, vector_bool mask)
 ```
 
 ## 参数说明
@@ -53,6 +53,6 @@ vector_float src;
 vector_half dst;
 float value = 1.0f;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
-asc_loadalign(src, src_addr);  // src_addr是外部输入的UB内存空间地址
+asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址
 asc_muls(dst, src, value, mask);
 ```

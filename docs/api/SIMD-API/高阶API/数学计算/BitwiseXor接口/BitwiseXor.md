@@ -30,9 +30,10 @@
 
 ## 函数原型
 
-```
+```cpp
 template <const BitwiseXorConfig& config = DEFAULT_BITWISE_XOR_CONFIG, typename T>
-__aicore__ inline void BitwiseXor(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const uint32_t count)
+__aicore__ inline void BitwiseXor(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const uint32_t count)
 ```
 
 ## 参数说明
@@ -44,7 +45,7 @@ __aicore__ inline void BitwiseXor(const LocalTensor<T>& dst, const LocalTensor<T
 | config | BitwiseXor算法的相关配置。此参数可选配，BitwiseXorConfig类型，具体定义如下方代码所示，其中参数的含义为：<br><br>isReuseSource：该参数预留，传入默认值false即可。 |
 | T | 源操作数、目的操作数数据类型。支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。 |
 
-```
+```cpp
 struct BitwiseXorConfig {
     bool isReuseSource;
 };
@@ -69,7 +70,7 @@ struct BitwiseXorConfig {
 
 ## 调用示例
 
-```
+```cpp
 AscendC::LocalTensor<uint32_t> src0, src1;
 AscendC::LocalTensor<uint32_t> dst;
 uint32_t count = 512; // 参与计算的元素个数
@@ -78,7 +79,7 @@ AscendC::BitwiseXor(dst, src0, src1, count);
 
 结果示例如下：
 
-```
+```text
 输入数据（src0）:
 [63, -123, 91, -107, ... -8]
 输入数据（src1）:

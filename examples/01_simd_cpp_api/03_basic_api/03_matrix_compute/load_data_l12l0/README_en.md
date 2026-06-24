@@ -15,7 +15,7 @@ The example covers A / B matrix transposed and non-transposed input combinations
 
 ## Directory Structure
 
-```
+```text
 ├── load_data_l12l0
 │   ├── figures                     // Illustrations
 │   ├── scripts
@@ -349,7 +349,8 @@ The subsequent code and parameter descriptions repeatedly use fractal and alignm
 - `CeilAlign`: Ceiling alignment operation. For example, when `m = 30`, `CeilAlign(30, 16) = 32`, meaning align m axis to 16, resulting in m axis length of 32.
 
   ```cpp
-  __aicore__ inline uint16_t CeilAlign(uint16_t size, uint16_t alignValue) {
+  __aicore__ inline uint16_t CeilAlign(uint16_t size, uint16_t alignValue)
+  {
       return (size + alignValue - 1) / alignValue * alignValue;
   }
   ```

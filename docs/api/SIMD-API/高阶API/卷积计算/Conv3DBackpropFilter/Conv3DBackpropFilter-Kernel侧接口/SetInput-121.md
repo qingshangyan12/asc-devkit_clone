@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetInput(const AscendC::GlobalTensor<SrcT>& input)
 ```
 
@@ -50,10 +50,10 @@ __aicore__ inline void SetInput(const AscendC::GlobalTensor<SrcT>& input)
 
 ## 调用示例
 
-```
+```cpp
 const Conv3DBackpropFilterTilingData* tilingData;
 // ...初始化tilingData
-ConvBackpropApi::Conv3DBackpropFilter <inputType, weightSizeType, gradOutputType, gradWeightType > gradWeight_;
+ConvBackpropApi::Conv3DBackpropFilter<inputType, weightSizeType, gradOutputType, gradWeightType> gradWeight_;
 gradWeight_.Init(&(tilingData->dwTiling));
 // 设置Input
 gradWeight_.SetInput(inputGm_[offsetB_]);

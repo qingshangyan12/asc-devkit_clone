@@ -6,7 +6,7 @@
 
 ## 函数原型
 
-```
+```cpp
 int32_t SetBLayout(int32_t b, int32_t s, int32_t n, int32_t g, int32_t d)
 ```
 
@@ -32,7 +32,7 @@ int32_t SetBLayout(int32_t b, int32_t s, int32_t n, int32_t g, int32_t d)
 
 ## 调用示例
 
-```
+```cpp
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MultiCoreMatmulTiling tiling(ascendcPlatform);
 int32_t M = 32;

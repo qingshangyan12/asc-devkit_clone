@@ -17,7 +17,7 @@ Ascend C提供RmsNorm Tiling API，方便用户获取RmsNorm kernel计算时所�
 
     RmsNorm Tiling结构体的定义如下，开发者无需关注该tiling结构的具体信息，只需要传递到kernel侧，传入RmsNorm高阶API接口，直接进行使用即可。
 
-    ```
+    ```cpp
     struct RmsNormTiling {
         uint32_t bLength = 0;
         uint32_t sLength = 0;
@@ -36,16 +36,22 @@ Ascend C提供RmsNorm Tiling API，方便用户获取RmsNorm kernel计算时所�
 
 ## 函数原型
 
-```
-bool GetRmsNormMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue, const bool isBasicBlock = false)
-```
-
-```
-bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, optiling::RmsNormTiling& tiling, const bool isBasicBlock = false)
+```cpp
+bool GetRmsNormMaxMinTmpSize(
+    const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue,
+    const bool isBasicBlock = false)
 ```
 
+```cpp
+bool GetRmsNormTilingInfo(
+    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize,
+    const uint32_t typeSize, optiling::RmsNormTiling& tiling, const bool isBasicBlock = false)
 ```
-bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, AscendC::tiling::RmsNormTiling& tiling, const bool isBasicBlock = false)
+
+```cpp
+bool GetRmsNormTilingInfo(
+    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize,
+    const uint32_t typeSize, AscendC::tiling::RmsNormTiling& tiling, const bool isBasicBlock = false)
 ```
 
 ## 参数说明
@@ -84,19 +90,19 @@ bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcS
 
 1.  将RmsNorm Tiling结构体参数增加至TilingData结构体，作为TilingData结构体的一个字段。
 
-    ```
+    ```cpp
     BEGIN_TILING_DATA_DEF(RmsnormCustomTilingData) // 注册一个tiling的类，以tiling的名字作为入参
-        TILING_DATA_FIELD_DEF(uint32_t, totalLength);  // 添加tiling字段，总计算数据量
-        TILING_DATA_FIELD_DEF(uint32_t, tileNum);      // 添加tiling字段，每个核上总计算数据分块个数
-        TILING_DATA_FIELD_DEF(uint32_t, tmpBufSize);   // 添加tiling字段，临时空间大小
-        ...                                            // 添加其他tiling字段
+    TILING_DATA_FIELD_DEF(uint32_t, totalLength);  // 添加tiling字段，总计算数据量
+    TILING_DATA_FIELD_DEF(uint32_t, tileNum);      // 添加tiling字段，每个核上总计算数据分块个数
+    TILING_DATA_FIELD_DEF(uint32_t, tmpBufSize);   // 添加tiling字段，临时空间大小
+    ...                                            // 添加其他tiling字段
         TILING_DATA_FIELD_DEF_STRUCT(RmsNormTiling, rmsnormTilingData); // 将RmsNormTiling结构体参数增加至TilingData结构体
     END_TILING_DATA_DEF;
     ```
 
 2.  Tiling实现函数中，首先调用**GetRmsNormMaxMinTmpSize**接口获取RmsNorm接口能完成计算所需最大/最小临时空间大小，根据该范围结合实际的内存使用情况设置合适的空间大小，然后根据输入shape、剩余的可供计算的空间大小等信息获取RmsNorm kernel侧接口所需tiling参数。
 
-    ```
+    ```cpp
     namespace optiling {
     const uint32_t NUM_BLOCKS = 8;
     const uint32_t TILE_NUM = 8;
@@ -108,8 +114,7 @@ bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcS
         tiling.set_totalLength(totalLength);
         tiling.set_tileNum(TILE_NUM);
         // 设置其他Tiling参数
-        ...
-        std::vector<int64_t> shapeVec = {2, 16, 64};
+        ... std::vector<int64_t> shapeVec = {2, 16, 64};
         ge::Shape srcShape(shapeVec);
         std::vector<int64_t> oriShapeVec = {2, 16, 64};
         ge::Shape oriSrcShape(oriShapeVec);
@@ -122,7 +127,7 @@ bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcS
         AscendC::GetRmsNormTilingInfo(srcShape, oriSrcShape, minValue, sizeof(half), tiling.rmsnormTilingData, false);
 
         ... // 其他逻辑
-        tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
+            tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
         context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
         context->SetTilingKey(1);
         return ge::GRAPH_SUCCESS;
@@ -132,7 +137,7 @@ bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcS
 
 3.  对应的kernel侧通过在核函数中调用GET\_TILING\_DATA获取TilingData，继而将TilingData中的RmsNorm Tiling信息传入RmsNorm接口参与计算。完整的kernel侧样例请参考[RmsNorm](RmsNorm.md)。
 
-    ```
+    ```cpp
     extern "C" __global__ __aicore__ void rmsnorm_custom(GM_ADDR inputGm, GM_ADDR gammaGm, GM_ADDR outputGm, GM_ADDR tiling)
     {
         GET_TILING_DATA(tilingData, tiling);

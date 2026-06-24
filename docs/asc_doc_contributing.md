@@ -132,7 +132,7 @@ API参考手册是**接口详情权威源**，每个API页面必须包含以下�
 
 **样板写法**：
 
-```
+```text
 ## 产品支持情况
 
 - Ascend 950PR/Ascend 950DT：支持
@@ -153,7 +153,7 @@ API参考手册是**接口详情权威源**，每个API页面必须包含以下�
 
 **样板写法**（以Mmad为例）：
 
-```
+```text
 ## 功能说明
 
 头文件为: `#include "basic_api/kernel_operator_mm_intf.h"`
@@ -182,7 +182,7 @@ C = A × B + Bias
 
 **样板写法**（以Mmad为例）：
 
-```
+```text
 针对Atlas A2/A3系列产品：
 | 矩阵计算 | 物理位置 | 维度 | 输入/输出数据格式 | 数据类型 |
 |----------|----------|------|------------------|----------|
@@ -215,29 +215,31 @@ C = A × B + Bias
 ```cpp
 // 不支持bias：基础矩阵乘加原型
 template <typename T, typename U, typename S>
-__aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
-    const LocalTensor<S>& b, const MmadParams& mmadParams)
+__aicore__ inline void Mmad(
+    const LocalTensor<T>& c, const LocalTensor<U>& a, const LocalTensor<S>& b, const MmadParams& mmadParams)
 ```
 
 ```cpp
 // 支持bias：带偏置矩阵乘加原型
 template <typename T, typename U, typename S, typename V>
-__aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
-    const LocalTensor<S>& b, const LocalTensor<V>& bias, const MmadParams& mmadParams)
+__aicore__ inline void Mmad(
+    const LocalTensor<T>& c, const LocalTensor<U>& a, const LocalTensor<S>& b, const LocalTensor<V>& bias,
+    const MmadParams& mmadParams)
 ```
 
 ```cpp
 // 不传入bias（BitMode版本）：位域联合体参数原型
 template <typename T, typename U, typename S>
-__aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
-    const LocalTensor<S>& b, const MmadBitModeParams& mmadParams)
+__aicore__ inline void Mmad(
+    const LocalTensor<T>& c, const LocalTensor<U>& a, const LocalTensor<S>& b, const MmadBitModeParams& mmadParams)
 ```
 
 ```cpp
 // 传入bias（BitMode版本）：位域联合体+偏置原型
 template <typename T, typename U, typename S, typename V>
-__aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
-    const LocalTensor<S>& b, const LocalTensor<V>& bias, const MmadBitModeParams& mmadParams)
+__aicore__ inline void Mmad(
+    const LocalTensor<T>& c, const LocalTensor<U>& a, const LocalTensor<S>& b, const LocalTensor<V>& bias,
+    const MmadBitModeParams& mmadParams)
 ```
 
 **编写要求**：
@@ -254,7 +256,7 @@ __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
 
 ##### 主参数表
 
-```
+```text
 | 参数名称 | 输入/输出 | 含义 |
 |----------|----------|------|
 | c | 输出 | 目的操作数，结果矩阵c，类型为LocalTensor，物理存储位置为L0C Buffer(TPosition:CO1)。起始地址需按1024字节对齐。 |
@@ -271,7 +273,7 @@ __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
 
 ##### 嵌套结构体参数表
 
-```
+```text
 ### MmadParams结构体内参数说明
 
 | 参数名称 | 含义 |
@@ -300,7 +302,7 @@ __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
 
 **样板写法**（以Mmad为例）：
 
-```
+```text
 针对Atlas A2/A3系列产品：
 
 | 左矩阵A | 右矩阵B | 结果矩阵C |
@@ -337,7 +339,7 @@ __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
 
 **样板写法**：
 
-```
+```text
 ## 返回值说明
 
 | 返回值类型 | 含义 |
@@ -357,7 +359,7 @@ __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
 
 **样板写法**：
 
-```
+```text
 ## 约束说明
 
 - 结果矩阵C只支持位于CO1(L0C Buffer)，左矩阵A只支持位于A2(L0A Buffer)，右矩阵B只支持位于B2(L0B Buffer)。
@@ -402,7 +404,7 @@ Mmad和Fixpipe的unitFlag需同步开启。前n-1条设为2（维持占用），
 **格式要求**：按特性分小节，每个特性用标题+表格/段落说明。
 **样板写法**（以Mmad为例）：
 
-```
+```text
 ## 关键特性说明
 
 ### HF32模式
@@ -436,7 +438,7 @@ k方向需满足特定的对齐要求，不同数据类型约束不同，详见[
 
 **样板写法**：
 
-```
+```text
 ## 理论性能
 
 本接口的理论性能数据请参考附录：
@@ -456,7 +458,7 @@ k方向需满足特定的对齐要求，不同数据类型约束不同，详见[
 
 **样板写法**：
 
-```
+```text
 ## 调用示例
 
 ### 示例代码
@@ -484,7 +486,7 @@ extern "C" __global__ __aicore__ void mmad_custom(GM_ADDR x, GM_ADDR y, GM_ADDR 
 
 用 `> **警告**` 框醒目标注不能同时使用或功能冲突的API。
 
-```
+```text
 > **警告**：以下接口与当前接口互斥，不能在同一Tiling策略中同时使用：
 > - **MmadWithSparse**：当启用结构化稀疏（4选2）时使用，与Mmad互斥。
 > - **MXMmad**：MX矩阵计算场景使用，与Mmad互斥。
@@ -496,7 +498,7 @@ extern "C" __global__ __aicore__ void mmad_custom(GM_ADDR x, GM_ADDR y, GM_ADDR 
 
 用表格列出功能相近的API，给出选择建议，帮助开发者决策。
 
-```
+```text
 | 相似API | 与当前API区别 | 选择建议 |
 |---------|-------------|---------|
 | [MmadWithSparse](MmadWithSparse.md) | 支持4选2结构化稀疏矩阵乘 | 权重矩阵已剪枝为稀疏格式时选用 |
@@ -511,7 +513,7 @@ extern "C" __global__ __aicore__ void mmad_custom(GM_ADDR x, GM_ADDR y, GM_ADDR 
 
 列出高级API到硬件built-in指令的封装关系，帮助深度调优开发者理解底层参数映射。
 
-```
+```text
 <details>
 <summary>底层built-in接口映射（点击展开）</summary>
 
@@ -612,7 +614,9 @@ void mad(__cc__ float *c, __ca__ half *a, __cb__ half *b,
 ### 示例中的关键字注释
 
 ```cpp
-__aicore__ inline void ExampleKernel(__gm__ uint8_t* x) {  // __aicore__=核函数修饰符, __gm__=Global Memory地址空间
+// __aicore__=核函数修饰符, __gm__=Global Memory地址空间
+__aicore__ inline void ExampleKernel(__gm__ uint8_t* x)
+{
     // ...
 }
 ```
@@ -691,7 +695,7 @@ __aicore__ inline void ExampleKernel(__gm__ uint8_t* x) {  // __aicore__=核函�
 
 五份文档之间通过交叉链接形成导航网络，遵循"谁提到别人负责的内容，谁就加链接"原则：
 
-```
+```text
 入门教程 ──编程概念深入──→ 编程指南
          ──首次引入API──→ API参考手册
 

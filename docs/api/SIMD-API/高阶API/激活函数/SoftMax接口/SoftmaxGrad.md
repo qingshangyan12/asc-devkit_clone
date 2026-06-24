@@ -20,7 +20,7 @@
 
 为方便理解，通过Python脚本实现的方式，表达其计算公式如下，其中src、grad、isFront是源操作数（输入），dst为目的操作数（输出）。
 
-```
+```python
 def softmax_grad(grad, src, isFront = None):
     dst = grad * src
     dst = np.sum(dst, axis=-1, keepdims=True)
@@ -51,16 +51,21 @@ def softmax_grad(grad, src, isFront = None):
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isReuseSource = false, bool isDataFormatNZ = false>
-    __aicore__ inline void SoftmaxGrad(const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor, const SoftMaxTiling& tiling, bool isFront = false, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+    __aicore__ inline void SoftmaxGrad(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor,
+        const SoftMaxTiling& tiling, bool isFront = false, const SoftMaxShapeInfo& softmaxShapeInfo = {})
     ```
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <typename T, bool isReuseSource = false, bool isDataFormatNZ = false>
-    __aicore__ inline void SoftmaxGrad(const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling, bool isFront = false, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+    __aicore__ inline void SoftmaxGrad(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor,
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling, bool isFront = false,
+        const SoftMaxShapeInfo& softmaxShapeInfo = {})
     ```
 
 由于该接口的内部实现中涉及复杂的计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -93,7 +98,7 @@ def softmax_grad(grad, src, isFront = None):
 | tiling | 输入 | softmaxgrad计算所需tiling信息，Tiling信息的获取请参考[SoftmaxGrad Tiling接口](SoftmaxGrad-Tiling接口.md)。 |
 | isFront | 输入 | 是否开启isFront计算，若为True，dstTensor的last轴长度必须固定32Byte。 |
 
-```
+```cpp
 struct SoftMaxShapeInfo {
     uint32_t srcM;
     uint32_t srcK;
@@ -115,7 +120,7 @@ struct SoftMaxShapeInfo {
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放SoftmaxGrad计算结果的Tensor
 // gradLocal：存放SoftmaxGrad计算的输入Tensor
 // srcLocal：存放SoftmaxGrad计算的输入Tensor
@@ -137,7 +142,7 @@ AscendC::SoftmaxGrad<T>(dstLocal, gradLocal, srcLocal, softmaxTiling, isFront, s
 
 结果示例如下：
 
-```
+```text
 输入数据(gradLocal)：
 [[-100.     -80.     -60.     -50.     -30.     -20.     -15.     -10.   ]
  [  -9.      -8.      -7.      -6.      -5.      -4.      -3.      -2.   ]

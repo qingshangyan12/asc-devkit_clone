@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── fixpipe_l0c2gm
 │   ├── figures                        // 图示
 │   ├── scripts

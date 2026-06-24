@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename T>
 __aicore__ inline T sqrt(const T src)
 ```
@@ -47,7 +47,7 @@ __aicore__ inline T sqrt(const T src)
 
 ## 调用示例
 
-```
+```cpp
 int64_t src = 4;
 
 int64_t result = AscendC::Std::sqrt(src);

@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```text
 half2 __hcmadd(const half2 x, const half2 y, const half2 z)
 ```
 
@@ -57,7 +57,7 @@ half2 __hcmadd(const half2 x, const half2 y, const half2 z)
 
 使用该接口需要包含"simt\_api/asc\_fp16.h"头文件。
 
-```
+```cpp
 #include "simt_api/asc_fp16.h"
 ```
 
@@ -65,7 +65,7 @@ half2 __hcmadd(const half2 x, const half2 y, const half2 z)
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     // 使用短向量可提升数据搬运效率
     __global__ __launch_bounds__(1024) void simt_hcmadd(half* x, half* y, half* z, half* dst, uint32_t input_total_length)
     {
@@ -84,9 +84,10 @@ half2 __hcmadd(const half2 x, const half2 y, const half2 z)
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     // 使用短向量可提升数据搬运效率
-    __simt_vf__ __launch_bounds__(1024) inline void simt_hcmadd(__gm__ half2* x, __gm__ half2* y, __gm__ half2* z, __gm__ half2* dst, uint32_t input_total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void simt_hcmadd(
+        __gm__ half2* x, __gm__ half2* y, __gm__ half2* z, __gm__ half2* dst, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= input_total_length / 2的线程不处理数据
@@ -96,8 +97,10 @@ half2 __hcmadd(const half2 x, const half2 y, const half2 z)
         dst[idx] = __hcmadd(x[idx], y[idx], z[idx]);
     }
 
-    __global__ __vector__ void compute_kernel(__gm__ half* x, __gm__ half* y, __gm__ half* z, __gm__ half* dst, uint32_t input_total_length)
+    __global__ __vector__ void compute_kernel(
+        __gm__ half* x, __gm__ half* y, __gm__ half* z, __gm__ half* dst, uint32_t input_total_length)
     {
-        asc_vf_call<simt_hcmadd>(dim3(1024), (__gm__ half2*)x, (__gm__ half2*)y, (__gm__ half2*)z, (__gm__ half2*)dst, input_total_length);
+        asc_vf_call<simt_hcmadd>(
+            dim3(1024), (__gm__ half2*)x, (__gm__ half2*)y, (__gm__ half2*)z, (__gm__ half2*)dst, input_total_length);
     }
     ```

@@ -28,16 +28,18 @@
 
 -   接口框架申请临时空间
 
-    ```
+    ```cpp
     template <typename T, bool highPrecision = false, bool highPerformance = false>
     __aicore__ inline void Gelu(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dataSize)
     ```
 
 -   通过sharedTmpBuffer入参传入临时空间
 
-    ```
+    ```cpp
     template <typename T, bool highPrecision = false, bool highPerformance = false>
-    __aicore__ inline void Gelu(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t dataSize)
+    __aicore__ inline void Gelu(
+        const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& sharedTmpBuffer,
+        const uint32_t dataSize)
     ```
 
 ## 参数说明
@@ -72,7 +74,7 @@
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放Gelu计算结果的Tensor
 // srcLocal: 存放Gelu的输入Tensor
 // sharedTmpBuffer: 存放Gelu计算过程中临时缓存的Tensor
@@ -86,7 +88,7 @@ AscendC::Gelu<srcType, false>(dstLocal, srcLocal, sharedTmpBuffer, 32);
 
 结果示例如下：
 
-```
+```text
 输入数据(srcLocal):
 [-2.56   -2.395  -2.23   -2.066  -1.9    -1.735  -1.571  -1.406
  -1.241  -1.076  -0.9116 -0.7466 -0.582  -0.417  -0.2522 -0.0874

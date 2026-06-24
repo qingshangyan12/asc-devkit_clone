@@ -85,13 +85,15 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 - SetLoopModePara使能loop mode，Normal模式
 
     ```cpp
-    // 场景4：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）。
+    // 场景4：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend
+    // 950PR/Ascend 950DT）。
     // Compact模式：每次内层循环搬运80B后填充16B使其96字节对齐。
     // padding值设为-1。
     AscendC::DataCopyExtParams copyParams{BLOCK_COUNT, BLOCK_LEN, 0, 0, 0};
     AscendC::DataCopyPadExtParams<T> padParams{true, 0, 0, -1};
 
-    AscendC::LoopModeParams loopParam2Ub {LOOP1_SIZE, LOOP2_SIZE, LOOP1_SRC_STRIDE, LOOP1_DST_STRIDE, LOOP2_SRC_STRIDE, LOOP2_DST_STRIDE};
+    AscendC::LoopModeParams loopParam2Ub{LOOP1_SIZE,       LOOP2_SIZE,       LOOP1_SRC_STRIDE,
+                                         LOOP1_DST_STRIDE, LOOP2_SRC_STRIDE, LOOP2_DST_STRIDE};
     AscendC::SetLoopModePara(loopParam2Ub, AscendC::DataCopyMVType::OUT_TO_UB);
     AscendC::DataCopyPad<int8_t, AscendC::PaddingMode::Compact>(srcLocal, srcGlobal, copyParams, padParams);
     AscendC::ResetLoopModePara(AscendC::DataCopyMVType::OUT_TO_UB);
@@ -100,13 +102,14 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 - SetLoopModePara使能loop mode，Compact模式
 
     ```cpp
-    // 场景5：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）。
-    // Normal模式：每个block搬运40B后填充24B使其64字节对齐。
+    // 场景5：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend
+    // 950PR/Ascend 950DT）。 Normal模式：每个block搬运40B后填充24B使其64字节对齐。
     // padding值设为-1。
     AscendC::DataCopyExtParams copyParams{BLOCK_COUNT, BLOCK_LEN, 0, 0, 0};
     AscendC::DataCopyPadExtParams<T> padParams{true, 0, 0, -1};
 
-    AscendC::LoopModeParams loopParam2Ub {LOOP1_SIZE, LOOP2_SIZE, LOOP1_SRC_STRIDE, LOOP1_DST_STRIDE, LOOP2_SRC_STRIDE, LOOP2_DST_STRIDE};
+    AscendC::LoopModeParams loopParam2Ub{LOOP1_SIZE,       LOOP2_SIZE,       LOOP1_SRC_STRIDE,
+                                         LOOP1_DST_STRIDE, LOOP2_SRC_STRIDE, LOOP2_DST_STRIDE};
     AscendC::SetLoopModePara(loopParam2Ub, AscendC::DataCopyMVType::OUT_TO_UB);
     AscendC::DataCopyPad<int8_t>(srcLocal, srcGlobal, copyParams, padParams);
     AscendC::ResetLoopModePara(AscendC::DataCopyMVType::OUT_TO_UB);
@@ -126,27 +129,27 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
     // - loop2SrcStride=3*128*126：第1维stride，每次loop2源地址跳过3*128*126字节
     // - loop2DstStride=2*64*128：每次loop2目的地址跳过2*64*128字节
 
-    AscendC::LoopModeParams loopParam2Ub {
-        2,  // loop1Size=2（第2维搬运2次）
-        2,  // loop2Size=2（第1维搬运2次）
-        128 * 126,  // loop1SrcStride（第2维stride）
-        64 * 128,   // loop1DstStride
-        3 * 128 * 126,  // loop2SrcStride（第1维stride）
-        2 * 64 * 128    // loop2DstStride
+    AscendC::LoopModeParams loopParam2Ub{
+        2,             // loop1Size=2（第2维搬运2次）
+        2,             // loop2Size=2（第1维搬运2次）
+        128 * 126,     // loop1SrcStride（第2维stride）
+        64 * 128,      // loop1DstStride
+        3 * 128 * 126, // loop2SrcStride（第1维stride）
+        2 * 64 * 128   // loop2DstStride
     };
     AscendC::SetLoopModePara(loopParam2Ub, AscendC::DataCopyMVType::OUT_TO_UB);
 
     AscendC::DataCopyExtParams copyParams{
-        64,  // blockCount=64（第3维搬运64次）
-        126,  // blockLen=126（第4维搬运126字节，padding到128）
-        0, 0, 0  // srcStride/dstStride=0
+        64,     // blockCount=64（第3维搬运64次）
+        126,    // blockLen=126（第4维搬运126字节，padding到128）
+        0, 0, 0 // srcStride/dstStride=0
     };
     AscendC::DataCopyPadExtParams<int8_t> padParams{true, 0, 0, 0};
 
     // 第0维for循环搬运2次。
     for (uint32_t dim0 = 0; dim0 < 2; dim0++) {
-        constexpr uint32_t dim0SrcStride = 4 * 3 * 128 * 126;  // 第0维源stride
-        constexpr uint32_t dim0DstStride = 2 * 2 * 64 * 128;   // 第0维目的stride
+        constexpr uint32_t dim0SrcStride = 4 * 3 * 128 * 126; // 第0维源stride
+        constexpr uint32_t dim0DstStride = 2 * 2 * 64 * 128;  // 第0维目的stride
         uint32_t srcOffset = dim0 * dim0SrcStride;
         uint32_t dstOffset = dim0 * dim0DstStride;
 

@@ -6,9 +6,9 @@
 
     这种方式需要引入依赖的头文件如下。所有高阶API的Tiling结构体定义在AscendC::tiling命名空间下，因此需要通过AscendC::tiling访问具体API的Tiling结构体。
 
-    ```
+    ```cpp
     #include "kernel_tiling/kernel_tiling.h"
-    
+
     // ...
     AscendC::tiling::TCubeTiling cubeTilingData;
     ```
@@ -17,9 +17,9 @@
 
     这种方式需要引入依赖的头文件如下。所有高阶API的Tiling结构体和Tiling函数定义在optiling命名空间下。
 
-    ```
+    ```cpp
     #include "tiling/tiling_api.h"
-    
+
     namespace optiling {
     // ...
     }

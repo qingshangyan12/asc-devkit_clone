@@ -40,7 +40,7 @@
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## 目录结构介绍
-```
+```text
 ├── reg_load_store_align
 │   ├── scripts
 │   │   ├── gen_data.py                // 输入数据和真值数据生成脚本
@@ -61,7 +61,7 @@
     - 当outputLength>=128时，mask处理128个元素
     - 当outputLength<128时，mask处理outputLength个元素
     - UpdateMask执行完后，outputLength自减mask处理的元素个数。  
-    ```cpp
+    ```text
     mask = AscendC::Reg::UpdateMask<T>(outputLength);
     ```
 - 样例规格：

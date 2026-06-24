@@ -78,7 +78,7 @@
 
     通过GetTiling接口获取TCubeTiling结构体前，调用EnableMultiCoreSplitK接口且入参为true，开启多核切K。
 
-    ```
+    ```cpp
     cubeTiling.SetOrgShape(M, N, K);
     cubeTiling.SetShape(M, N, K);
     cubeTiling.EnableBias(isBias);
@@ -95,7 +95,7 @@
 
     调用Fill接口，对C矩阵的Global Memory地址清零。
 
-    ```
+    ```text
     cGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ cType*>(c), tiling.M * tiling.N);
     // clear gm
     Fill(cGlobal, tiling.M * tiling.N, (cType)0);
@@ -103,7 +103,7 @@
 
     调用IterateAll接口，开启AtomicAdd累加，完成矩阵乘操作。
 
-    ```
+    ```cpp
     // set AtomicAdd
     uint8_t enAtomic = 1;
     matmulObj.IterateAll(cGlobal, enAtomic);

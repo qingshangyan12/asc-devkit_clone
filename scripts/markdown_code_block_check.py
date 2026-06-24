@@ -26,6 +26,7 @@ from pathlib import Path, PurePosixPath
 
 MARKDOWN_EXTS = (".md", ".markdown", ".mdx")
 FENCE_RE = re.compile(r"^(?P<indent>[ \t]*)(?P<fence>`{3,}|~{3,})(?P<info>.*)$")
+CLOSING_FENCE_RE = re.compile(r"^[ \t]*(?P<fence>`{3,}|~{3,})[ \t]*$")
 FORMAT_LANGS = {
     "c": ".c",
     "cc": ".cc",
@@ -55,6 +56,8 @@ KNOWN_LANGS = FORMAT_LANGS.keys() | TEXT_LANGS | {
     "bash",
     "sh",
     "shell",
+    "powershell",
+    "pwsh",
     "cmake",
     "python",
     "py",
@@ -68,6 +71,7 @@ KNOWN_LANGS = FORMAT_LANGS.keys() | TEXT_LANGS | {
     "html",
     "md",
     "markdown",
+    "mermaid",
     "diff",
     "patch",
     "dot",
@@ -80,7 +84,9 @@ class CodeBlock:
     start_line: int
     body_start: int
     body_end: int
+    indent: str
     lang: str
+    raw_code: str
     code: str
 
 
@@ -127,13 +133,12 @@ def is_markdown(path: str) -> bool:
 
 def tracked_markdown_files(root: Path) -> list[Path]:
     proc = subprocess.run(
-        ["git", "ls-files", "*.md", "*.markdown", "*.mdx"],
+        ["git", "ls-files", "-z", "*.md", "*.markdown", "*.mdx"],
         cwd=root,
         check=True,
         stdout=subprocess.PIPE,
-        text=True,
     )
-    return [root / line for line in proc.stdout.splitlines() if line]
+    return [root / raw.decode("utf-8") for raw in proc.stdout.split(b"\0") if raw]
 
 
 def input_markdown_files(files: list[str], root: Path, full: bool) -> list[Path]:
@@ -170,11 +175,23 @@ def normalize_lang(info: str) -> str:
 
 
 def closing_fence(line: str, opener: str) -> bool:
-    match = FENCE_RE.match(line.rstrip("\n"))
+    match = CLOSING_FENCE_RE.match(line.rstrip("\n"))
     if not match:
         return False
     fence = match.group("fence")
     return fence[0] == opener[0] and len(fence) >= len(opener)
+
+
+def strip_markdown_indent(lines: list[str], indent: str) -> str:
+    if not indent:
+        return "".join(lines)
+    return "".join(line.removeprefix(indent) for line in lines)
+
+
+def add_markdown_indent(text: str, indent: str) -> str:
+    if not indent:
+        return text
+    return "".join(indent + line if line.strip() else line for line in text.splitlines(keepends=True))
 
 
 def iter_code_blocks(path: Path) -> tuple[list[CodeBlock], list[str]]:
@@ -197,21 +214,36 @@ def iter_code_blocks(path: Path) -> tuple[list[CodeBlock], list[str]]:
             continue
 
         opener = match.group("fence")
+        indent = match.group("indent")
         start_line = i + 1
         lang = normalize_lang(match.group("info"))
         body_start = i + 1
         i = body_start
         while i < len(lines) and not closing_fence(lines[i], opener):
             i += 1
+        if i >= len(lines):
+            errors.append(f"{path}:{start_line}: fenced code block is missing closing fence")
+            break
 
-        code = "".join(lines[body_start:i])
+        raw_code_lines = lines[body_start:i]
+        raw_code = "".join(raw_code_lines)
+        code = strip_markdown_indent(raw_code_lines, indent)
         if not lang:
             errors.append(f"{path}:{start_line}: fenced code block must specify a language, use text for plain output")
         elif lang not in KNOWN_LANGS:
             errors.append(f"{path}:{start_line}: unsupported fenced code block language: {lang}")
         else:
             blocks.append(
-                CodeBlock(path=path, start_line=start_line, body_start=body_start, body_end=i, lang=lang, code=code)
+                CodeBlock(
+                    path=path,
+                    start_line=start_line,
+                    body_start=body_start,
+                    body_end=i,
+                    indent=indent,
+                    lang=lang,
+                    raw_code=raw_code,
+                    code=code,
+                )
             )
 
         if i < len(lines):
@@ -243,7 +275,9 @@ def format_code(code: str, lang: str, clang: str, tmp_dir: Path, index: int) -> 
     return code_file.read_text(encoding="utf-8"), None
 
 
-def format_markdown_file(path: Path, blocks: list[CodeBlock], clang: str, start_index: int) -> tuple[bool, list[str], int]:
+def format_markdown_file(
+    path: Path, blocks: list[CodeBlock], clang: str, start_index: int, root: Path
+) -> tuple[bool, list[str], int]:
     try:
         lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
     except OSError as exc:
@@ -252,7 +286,7 @@ def format_markdown_file(path: Path, blocks: list[CodeBlock], clang: str, start_
     replacements: list[Replacement] = []
     errors: list[str] = []
     index = start_index
-    with tempfile.TemporaryDirectory(prefix="markdown-code-block-") as tmp:
+    with tempfile.TemporaryDirectory(prefix=".markdown-code-block-", dir=root) as tmp:
         tmp_dir = Path(tmp)
         for block in blocks:
             formatted, error = format_code(block.code, block.lang, clang, tmp_dir, index)
@@ -261,8 +295,10 @@ def format_markdown_file(path: Path, blocks: list[CodeBlock], clang: str, start_
                 errors.append(f"{block.path}:{block.start_line}: failed to format {block.lang} code block")
                 errors.append(error)
                 continue
-            if formatted is not None and formatted != block.code:
-                replacements.append(Replacement(block.body_start, block.body_end, formatted))
+            if formatted is not None:
+                replacement = add_markdown_indent(formatted, block.indent)
+                if replacement != block.raw_code:
+                    replacements.append(Replacement(block.body_start, block.body_end, replacement))
 
     for replacement in sorted(replacements, key=lambda item: item.body_start, reverse=True):
         lines[replacement.body_start:replacement.body_end] = replacement.text.splitlines(keepends=True)
@@ -272,7 +308,7 @@ def format_markdown_file(path: Path, blocks: list[CodeBlock], clang: str, start_
     return bool(replacements), errors, index
 
 
-def format_blocks(blocks: list[CodeBlock]) -> tuple[list[str], list[Path]]:
+def format_blocks(blocks: list[CodeBlock], root: Path) -> tuple[list[str], list[Path]]:
     targets = [block for block in blocks if block.lang in FORMAT_LANGS]
     if not targets:
         return [], []
@@ -286,7 +322,7 @@ def format_blocks(blocks: list[CodeBlock]) -> tuple[list[str], list[Path]]:
     index = 0
     for path in dict.fromkeys(block.path for block in targets):
         path_blocks = [block for block in targets if block.path == path]
-        changed, file_errors, index = format_markdown_file(path, path_blocks, clang, index)
+        changed, file_errors, index = format_markdown_file(path, path_blocks, clang, index, root)
         errors.extend(file_errors)
         if changed:
             changed_files.append(path)
@@ -306,7 +342,7 @@ def main(argv: list[str] | None = None) -> int:
         file_blocks, file_errors = iter_code_blocks(path)
         blocks.extend(file_blocks)
         errors.extend(file_errors)
-    format_errors, changed_files = format_blocks(blocks)
+    format_errors, changed_files = format_blocks(blocks, root)
     errors.extend(format_errors)
     for path in changed_files:
         errors.append(f"{path}: formatted fenced code blocks")

@@ -4,17 +4,31 @@
 
 通过NPU进行核函数的运行验证时，出现挂死现象；通过CPU进行核函数的运行验证时，出现AllocTensor/FreeTensor失败的报错，日志报错和调用栈打印如下：
 
-```
-[ERROR][Core_0][/usr/local/Ascend/cann/x86_64-linux/tikcpp/tikcfw/interface/kernel_tpipe.h:730][AllocEventID][321678] current size is 4, max buffer number in same queue position is 4
-[ERROR][CORE_0][pid 321674] error happened! =========
-SIGABRT Signal (Abort Signal from abort) catched, backtrace info:
-[#0] 0x000000000001e7c0: handler(int) at /usr/local/Ascend/cann/tools/tikicpulib/lib/include/kern_fwk.h:105
-[#1] 0x0000000000017c4f: signed char AscendC::TPipe::AllocEventID<(AscendC::HardEvent)5>() at /usr/local/Ascend/cann/x86_64-linux/tikcpp/tikcfw/interface/kernel_tpipe.h:733
-[#2] 0x000000000001426d: AscendC::TQueBind<(AscendC::TPosition)0, (AscendC::TPosition)9, 4, 0>::FreeBuffer(unsigned char*) at /usr/local/Ascend/cann/x86_64-linux/tikcpp/tikcfw/interface/kernel_tpipe.h:1217
-[#3] 0x0000000000011058: void AscendC::TQueBind<(AscendC::TPosition)0, (AscendC::TPosition)9, 4, 0>::FreeTensor<float16::Fp16T>(AscendC::LocalTensor<float16::Fp16T>&) at /usr/local/Ascend/cann/x86_64-linux/tikcpp/tikcfw/interface/kernel_tpipe.h:1237
-[#4] 0x000000000000dfde: KernelAdd::Compute(int) at /home/xxxx/xxxx.cpp:59
-[#5] 0x000000000000dd1c: KernelAdd::Process() at /home/xxxx/xxxx.cpp:37 (discriminator 2)
-...
+```cpp
+[ERROR][Core_0] [/ usr / local / Ascend / cann / x86_64 - linux / tikcpp / tikcfw / interface / kernel_tpipe.h:730]
+       [AllocEventID][321678] current size is 4,
+    max buffer number in same queue position is 4 [ERROR][CORE_0][pid 321674] error happened ! == == == ==
+    = SIGABRT Signal(Abort Signal from abort) catched,
+    backtrace info : [#0] 0x000000000001e7c0 : handler(int) at / usr / local / Ascend / cann / tools /
+                                               tikicpulib / lib / include /
+                                               kern_fwk.h : 105 [#1] 0x0000000000017c4f
+    : signed char AscendC::TPipe::AllocEventID<(AscendC::HardEvent)5>()
+          at / usr / local / Ascend / cann / x86_64
+        -
+        linux / tikcpp / tikcfw / interface /
+            kernel_tpipe.h : 733 [#2] 0x000000000001426d
+    : AscendC::TQueBind<(AscendC::TPosition)0, (AscendC::TPosition)9, 4, 0>::FreeBuffer(unsigned char*) at
+            / usr / local / Ascend / cann / x86_64
+        -
+        linux / tikcpp / tikcfw / interface /
+            kernel_tpipe.h : 1217 [#3] 0x0000000000011058
+    : void AscendC::TQueBind<(AscendC::TPosition)0, (AscendC::TPosition)9, 4, 0>::FreeTensor<float16::Fp16T>(
+          AscendC::LocalTensor<float16::Fp16T>&) at
+            / usr / local / Ascend / cann / x86_64
+        -
+        linux / tikcpp / tikcfw / interface / kernel_tpipe.h : 1237 [#4] 0x000000000000dfde : KernelAdd::Compute(int) at
+            / home / xxxx / xxxx.cpp : 59 [#5] 0x000000000000dd1c : KernelAdd::Process() at / home / xxxx
+            / xxxx.cpp : 37(discriminator 2)...
 ```
 
 ## 问题根因<a name="section417961104715"></a>
@@ -37,7 +51,7 @@ Atlas 200I/500 A2 推理产品不超过8个。
 
 不满足该约束，在后续使用AllocTensor/FreeTensor可能会出现分配资源失败。比如：
 
-```
+```cpp
 AscendC::TQue<AscendC::TPosition::VECIN, 1> que0;
 AscendC::TQue<AscendC::TPosition::VECIN, 1> que1;
 AscendC::TQue<AscendC::TPosition::VECIN, 1> que2;
@@ -67,7 +81,7 @@ AscendC::LocalTensor<T> local5 = que4.AllocTensor<T>();
 
 如果确实有多块buffer使用，可以将多个buffer合并到一块buffer，通过偏移使用。样例如下：
 
-```
+```cpp
 // 此时建议通过以下方法解决：
 // 如果确实有多块buffer使用,可以将多个buffer合并到一块buffer,通过偏移使用
 pipe.InitBuffer(que0, 1, len * 3);

@@ -28,7 +28,8 @@ reg数据搬运接口，适用于从UB搬入MaskReg。开启post mode，每调�
 - 下采样搬运
 
     ```cpp
-    __simd_callee__ inline void asc_loadalign_downsample_postupdate(vector_bool& dst, __ubuf__ uint32_t*& src, int32_t offset)
+    __simd_callee__ inline void asc_loadalign_downsample_postupdate(
+        vector_bool& dst, __ubuf__ uint32_t*& src, int32_t offset)
     ```
 
 ## 参数说明
@@ -54,11 +55,11 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-//数据总量为256
+// 数据总量为256
 constexpr uint64_t total_length = 256;
 vector_bool dst = asc_create_mask_b16(PAT_ALL);
 __ubuf__ uint32_t src[total_length];
-//数据搬运的偏移量为64
+// 数据搬运的偏移量为64
 int32_t offset = 64;
 asc_loadalign_postupdate(dst, src, offset);
 ```

@@ -30,7 +30,7 @@
 
 ## 函数原型
 
-```
+```text
 inline float logf(float x)
 ```
 
@@ -58,7 +58,7 @@ inline float logf(float x)
 
 使用该接口需要包含"simt\_api/math\_functions.h"头文件。
 
-```
+```cpp
 #include "simt_api/math_functions.h"
 ```
 
@@ -66,8 +66,8 @@ inline float logf(float x)
 
 - SIMT编程场景：
 
-    ```
-    __global__ __launch_bounds__(256) void compute_logf(float *result, const float *x, uint32_t count)
+    ```cpp
+    __global__ __launch_bounds__(256) void compute_logf(float* result, const float* x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= count) {
@@ -79,8 +79,9 @@ inline float logf(float x)
 
 - SIMD与SIMT混合编程场景：
 
-    ```
-    __simt_vf__ __launch_bounds__(256) inline void compute_logf_vf(__gm__ float *result, __gm__ const float *x, uint32_t count)
+    ```cpp
+    __simt_vf__ __launch_bounds__(256) inline void compute_logf_vf(
+        __gm__ float* result, __gm__ const float* x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= count) {
@@ -89,7 +90,7 @@ inline float logf(float x)
         result[idx] = logf(x[idx]);
     }
 
-    __global__ __vector__ void run_logf(__gm__ float *result, __gm__ const float *x, uint32_t count)
+    __global__ __vector__ void run_logf(__gm__ float* result, __gm__ const float* x, uint32_t count)
     {
         asc_vf_call<compute_logf_vf>(dim3(256), result, x, count);
     }
@@ -97,7 +98,7 @@ inline float logf(float x)
 
 输入输出示例如下：
 
-```
+```text
 x：1, 2, 3, 4
 result: 0 0.6931472 1.098612 1.386294
 ```

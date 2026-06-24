@@ -63,7 +63,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 inline uint8_t* GetBaseAddr(int8_t logicPos)
 ```
 
@@ -98,6 +98,6 @@ NA
 
 ## 调用示例<a name="section6191129670"></a>
 
-```
+```cpp
 auto absAddr = GetTPipePtr()->GetBaseAddr(static_cast<int8_t>(pos));
 ```

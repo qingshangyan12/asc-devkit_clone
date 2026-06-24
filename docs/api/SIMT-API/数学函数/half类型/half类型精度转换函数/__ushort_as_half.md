@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```cpp
 inline half __ushort_as_half(const unsigned short int x)
 ```
 
@@ -52,7 +52,7 @@ unsigned short int的数据按位重新解释为half的值。
 
 使用该接口需要包含"simt\_api/asc\_fp16.h"头文件。
 
-```
+```cpp
 #include "simt_api/asc_fp16.h"
 ```
 
@@ -60,8 +60,8 @@ unsigned short int的数据按位重新解释为half的值。
 
 -   SIMT编程场景：
 
-    ```
-    __global__ __launch_bounds__(1024) void kernel__ushort_as_half(half * dst, unsigned short int* x)
+    ```cpp
+    __global__ __launch_bounds__(1024) void kernel__ushort_as_half(half* dst, unsigned short int* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = __ushort_as_half(x[idx]);
@@ -70,8 +70,8 @@ unsigned short int的数据按位重新解释为half的值。
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__ushort_as_half(__gm__ half * dst, __gm__ unsigned short int* x)
+    ```cpp
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__ushort_as_half(__gm__ half* dst, __gm__ unsigned short int* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = __ushort_as_half(x[idx]);

@@ -27,7 +27,7 @@ sincos_compute/
 
   Use the sincosf function to compute sin and cos results simultaneously
 
-  ```
+  ```text
   sincosf(input[idx], output_sin + idx, output_cos + idx)
   ```
 
@@ -99,11 +99,10 @@ This example demonstrates the effect of `__launch_bounds__` through 2 independen
 **Key Code**:
 
 ```cpp
-__global__ void sincos_thread_1024(float* input, float* output_sin, 
-                                    float* output_cos, uint64_t total_length)
+__global__ void sincos_thread_1024(float* input, float* output_sin, float* output_cos, uint64_t total_length)
 {
     int32_t blk_start_idx = blockIdx.x * THREADS_PER_BLOCK * PER_THREAD_LOOP;
-    
+
     // Each core computes PER_THREAD_LOOP * THREADS_PER_BLOCK operations
     for (int i = 0; i < PER_THREAD_LOOP; i++) {
         int idx = blk_start_idx + i * THREADS_PER_BLOCK + threadIdx.x;
@@ -116,7 +115,7 @@ __global__ void sincos_thread_1024(float* input, float* output_sin,
 
 Use the `--cce-res-usage` compilation option to view register usage:
 
-```
+```text
 [BISHENG] Function properties for _Z18sincos_thread_1024PfS_S_m_simt_entry: Stack size: 32 bytes, Used register number: 32
 ```
 
@@ -151,12 +150,11 @@ Optimization direction: Use `__launch_bounds__` to inform the compiler of the ac
 **Key Code**:
 
 ```cpp
-__global__ __launch_bounds__(512) void sincos_thread_512(float* input, 
-                                    float* output_sin, float* output_cos,
-                                    uint64_t total_length)
+__global__ __launch_bounds__(512) void sincos_thread_512(
+    float* input, float* output_sin, float* output_cos, uint64_t total_length)
 {
     int32_t blk_start_idx = blockIdx.x * THREADS_PER_BLOCK * PER_THREAD_LOOP;
-    
+
     // Each core computes PER_THREAD_LOOP * THREADS_PER_BLOCK operations
     for (int i = 0; i < PER_THREAD_LOOP; i++) {
         int idx = blk_start_idx + i * THREADS_PER_BLOCK + threadIdx.x;
@@ -167,7 +165,7 @@ __global__ __launch_bounds__(512) void sincos_thread_512(float* input,
 
 **Compilation Information**:
 
-```
+```text
 [BISHENG] Function properties for _Z17sincos_thread_512PfS_S_m_simt_entry: Stack size: 0 bytes, Used register number: 48
 ```
 

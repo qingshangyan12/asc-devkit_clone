@@ -11,7 +11,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── batch_matmul_iterate_n_batch
 │   ├── scripts
 │   │   ├── gen_data.py                    // 输入数据和真值数据生成脚本文件
@@ -46,7 +46,7 @@
       ```cpp
       constexpr MatmulConfigMode configMode = MatmulConfigMode::CONFIG_NORM;
       constexpr MatmulBatchParams batchParams = {
-        true, BatchMode::BATCH_LESS_THAN_L1, false /* isNBatch, batchMode, isBiasBatch */
+          true, BatchMode::BATCH_LESS_THAN_L1, false /* isNBatch, batchMode, isBiasBatch */
       };
       constexpr MatmulConfig CFG_MM = GetMMConfig<configMode>(batchParams);
       AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MM> matmulObj;
@@ -65,7 +65,7 @@
     - `IS_SYNCH=false` 时，完成多batch矩阵乘操作，并调用GetBatchTensorC接口获取结果。
       ```cpp
       matmulObj.template IterateNBatch<false>(nNum, batchA, batchB, false);
-      for(int32_t j = 0; j < nNum; ++j){
+      for (int32_t j = 0; j < nNum; ++j) {
           matmulObj.template GetBatchTensorC<false>(batchA, batchB, false);
       }
       ```

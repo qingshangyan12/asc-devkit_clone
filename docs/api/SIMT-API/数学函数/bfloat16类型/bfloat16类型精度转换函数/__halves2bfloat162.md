@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```cpp
 inline bfloat16x2_t __halves2bfloat162(const bfloat16_t x, const bfloat16_t y)
 ```
 
@@ -53,7 +53,7 @@ inline bfloat16x2_t __halves2bfloat162(const bfloat16_t x, const bfloat16_t y)
 
 使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
 
-```
+```cpp
 #include "simt_api/asc_bf16.h"
 ```
 
@@ -61,9 +61,10 @@ inline bfloat16x2_t __halves2bfloat162(const bfloat16_t x, const bfloat16_t y)
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     // 使用短向量可提升数据搬运效率
-    __aicore__ void simt_halves2bfloat162(bfloat16_t* input1, bfloat16_t* input2, bfloat16x2_t* output, uint32_t input_total_length)
+    __aicore__ void simt_halves2bfloat162(
+        bfloat16_t* input1, bfloat16_t* input2, bfloat16x2_t* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx > input_total_length) {
@@ -71,7 +72,8 @@ inline bfloat16x2_t __halves2bfloat162(const bfloat16_t x, const bfloat16_t y)
         }
         output[idx] = __halves2bfloat162(input1[idx], input2[idx]);
     }
-    __global__ __launch_bounds__(1024) void cast_kernel(bfloat16_t* input1,  bfloat16_t* input2, bfloat16_t* output, uint32_t input_total_length)
+    __global__ __launch_bounds__(1024) void cast_kernel(
+        bfloat16_t* input1, bfloat16_t* input2, bfloat16_t* output, uint32_t input_total_length)
     {
         simt_halves2bfloat162(input1, input2, (bfloat16x2_t*)output, input_total_length);
     }
@@ -79,9 +81,10 @@ inline bfloat16x2_t __halves2bfloat162(const bfloat16_t x, const bfloat16_t y)
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     // 使用短向量可提升数据搬运效率
-    __simt_vf__ __launch_bounds__(1024) inline void simt_halves2bfloat162(__gm__ bfloat16_t* input1, __gm__ bfloat16_t* input2, __gm__ bfloat16x2_t* output, uint32_t input_total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void simt_halves2bfloat162(
+        __gm__ bfloat16_t* input1, __gm__ bfloat16_t* input2, __gm__ bfloat16x2_t* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx > input_total_length) {
@@ -89,7 +92,8 @@ inline bfloat16x2_t __halves2bfloat162(const bfloat16_t x, const bfloat16_t y)
         }
         output[idx] = __halves2bfloat162(input1[idx], input2[idx]);
     }
-    __global__ __vector__ void cast_kernel(__gm__ bfloat16_t* input1,  __gm__ bfloat16_t* input2, __gm__ bfloat16_t* output, uint32_t input_total_length)
+    __global__ __vector__ void cast_kernel(
+        __gm__ bfloat16_t* input1, __gm__ bfloat16_t* input2, __gm__ bfloat16_t* output, uint32_t input_total_length)
     {
         asc_vf_call<simt_halves2bfloat162>(dim3(1024), input1, input2, (__gm__ bfloat16x2_t*)output, input_total_length);
     }

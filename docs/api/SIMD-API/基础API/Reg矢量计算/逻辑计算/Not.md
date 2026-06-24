@@ -101,8 +101,8 @@
 
   ```cpp
   template <typename T>
-  __simd_vf__ inline void NotVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, 
-   uint32_t oneRepeatSize, uint16_t repeatTimes)
+  __simd_vf__ inline void NotVF(
+      __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
   {
       AscendC::Reg::RegTensor<T> srcReg;
       AscendC::Reg::RegTensor<T> dstReg;
@@ -120,7 +120,8 @@
 
   ```cpp
   template <typename T>
-  __simd_vf__ inline void NotVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
+  __simd_vf__ inline void NotVF(
+      __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
   {
       AscendC::Reg::RegTensor<T> srcReg;
       AscendC::Reg::MaskReg src = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALLF>();

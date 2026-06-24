@@ -6,8 +6,8 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001600172389_zh-cn_topic_0000001526115138_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
-```
-OpParamDef &DataType(std::vector<ge::DataType> types)
+```cpp
+OpParamDef& DataType(std::vector<ge::DataType> types)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001600172389_zh-cn_topic_0000001526115138_zh-cn_topic_0000001525424352_section75395119104"></a>

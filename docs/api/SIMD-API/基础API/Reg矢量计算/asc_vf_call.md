@@ -53,9 +53,9 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <auto funcPtr, typename... Args>
-__aicore__ inline void asc_vf_call(Args &&...args)
+__aicore__ inline void asc_vf_call(Args&&... args)
 ```
 
 ## 参数说明<a name="section0866173114710"></a>
@@ -116,11 +116,12 @@ __aicore__ inline void asc_vf_call(Args &&...args)
 
 使用SIMD VF函数对UB数据做加法计算。
 
-```
+```cpp
 // SIMD函数
 template <typename T>
 __simd_vf__ inline void AddVF(
-    __ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
+    __ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint32_t oneRepeatSize,
+    uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> src0Reg;
     AscendC::Reg::RegTensor<T> src1Reg;

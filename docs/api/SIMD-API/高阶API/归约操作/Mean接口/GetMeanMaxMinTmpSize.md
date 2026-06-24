@@ -9,8 +9,10 @@ kernel侧Mean接口的计算需要开发者预留/申请临时空间，本接口
 
 ## 函数原型
 
-```
-void GetMeanMaxMinTmpSize(const uint32_t n, const uint32_t srcTypeSize, const uint32_t accTypeSize, const bool isReuseSource, uint32_t& maxSize, uint32_t& minSize)
+```cpp
+void GetMeanMaxMinTmpSize(
+    const uint32_t n, const uint32_t srcTypeSize, const uint32_t accTypeSize, const bool isReuseSource,
+    uint32_t& maxSize, uint32_t& minSize)
 ```
 
 ## 参数说明
@@ -36,7 +38,7 @@ void GetMeanMaxMinTmpSize(const uint32_t n, const uint32_t srcTypeSize, const ui
 
 ## 调用示例
 
-```
+```cpp
 // 算子输入的数据类型T为half，accType为float，isReuseSource传入默认值false
 uint32_t n = 3;
 uint32_t srcTypeSize = 2;

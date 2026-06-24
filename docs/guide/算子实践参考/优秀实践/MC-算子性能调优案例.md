@@ -136,8 +136,8 @@ MC<sup>2</sup>算子收益 = \(融合前算子串行耗时 - 融合后MC<sup>2</
 
     如下代码所示，在算子的Tiling代码中设置制定好的切分策略。按该切分策略测试，融合后该算子的执行时间为1262us，则融合算子的性能收益为\(1874 - 1262\) / 1874 = 32.7%。
 
-    ```
-    MatmulAllReduceCustomTilingData *tiling = context->GetTilingData<MatmulAllReduceCustomTilingData>();
+    ```cpp
+    MatmulAllReduceCustomTilingData* tiling = context->GetTilingData<MatmulAllReduceCustomTilingData>();
     tiling->param.rankDim = 8;
     tiling->param.tileM = 512; // 短块大小
     tiling->param.tileNum = 1; // 短块个数

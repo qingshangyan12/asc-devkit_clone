@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```text
 inline bfloat16x2_t __high2bfloat162(const bfloat16x2_t x)
 ```
 
@@ -52,7 +52,7 @@ inline bfloat16x2_t __high2bfloat162(const bfloat16x2_t x)
 
 使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
 
-```
+```cpp
 #include "simt_api/asc_bf16.h"
 ```
 
@@ -60,12 +60,13 @@ inline bfloat16x2_t __high2bfloat162(const bfloat16x2_t x)
 
 -   SIMT编程场景：
 
-    ```
+    ```cpp
     // 使用短向量可提升数据搬运效率
     __aicore__ void simt_high2bfloat162(bfloat16x2_t* input, bfloat16x2_t* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        // 每个线程处理1个bfloat16x2_t类型的数据，即2个bfloat16_t类型的数据，因此idx >= input_total_length / 2的线程不处理数据
+        // 每个线程处理1个bfloat16x2_t类型的数据，即2个bfloat16_t类型的数据，因此idx >= input_total_length /
+        // 2的线程不处理数据
         if (idx > input_total_length / 2) {
             return;
         }
@@ -79,12 +80,14 @@ inline bfloat16x2_t __high2bfloat162(const bfloat16x2_t x)
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     // 使用短向量可提升数据搬运效率
-    __simt_vf__ __launch_bounds__(1024) inline void simt_high2bfloat162(__gm__ bfloat16x2_t* input, __gm__ bfloat16x2_t* output, uint32_t input_total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void simt_high2bfloat162(
+        __gm__ bfloat16x2_t* input, __gm__ bfloat16x2_t* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        // 每个线程处理1个bfloat16x2_t类型的数据，即2个bfloat16_t类型的数据，因此idx >= input_total_length / 2的线程不处理数据
+        // 每个线程处理1个bfloat16x2_t类型的数据，即2个bfloat16_t类型的数据，因此idx >= input_total_length /
+        // 2的线程不处理数据
         if (idx > input_total_length / 2) {
             return;
         }
@@ -92,6 +95,7 @@ inline bfloat16x2_t __high2bfloat162(const bfloat16x2_t x)
     }
     __global__ __vector__ void cast_kernel(__gm__ bfloat16_t* input, __gm__ bfloat16_t* output, uint32_t input_total_length)
     {
-        asc_vf_call<simt_high2bfloat162>(dim3(1024), (__gm__ bfloat16x2_t*)input, (__gm__ bfloat16x2_t*)output, input_total_length);
+        asc_vf_call<simt_high2bfloat162>(
+            dim3(1024), (__gm__ bfloat16x2_t*)input, (__gm__ bfloat16x2_t*)output, input_total_length);
     }
     ```

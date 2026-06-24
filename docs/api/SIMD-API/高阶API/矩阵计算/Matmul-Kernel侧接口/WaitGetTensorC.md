@@ -16,7 +16,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void WaitGetTensorC()
 ```
 
@@ -34,11 +34,11 @@ __aicore__ inline void WaitGetTensorC()
 
 ## 调用示例
 
-```
+```cpp
 // 异步模式样例
 mm.template Iterate<false>();
 // 其他操作
-for (int i = 0; i < singleCoreM/baseM * singleCoreN/baseN; ++i) {
+for (int i = 0; i < singleCoreM / baseM * singleCoreN / baseN; ++i) {
     mm.template GetTensorC<false>(ubCmatrix);
     mm.WaitGetTensorC();
     // Vector操作

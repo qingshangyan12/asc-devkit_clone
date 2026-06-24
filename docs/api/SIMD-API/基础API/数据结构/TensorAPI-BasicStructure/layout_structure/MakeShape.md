@@ -52,6 +52,6 @@ auto shape = MakeShape(10, 20, 30);
 // 构造层次化Shape
 auto fractalShape = MakeShape(MakeShape(16, 8), MakeShape(32, 4));
 
-auto dim0 = Std::get<0>(shape);                // dim0 = 10
+auto dim0 = Std::get<0>(shape);                         // dim0 = 10
 auto innerRow = Std::get<0>(Std::get<0>(fractalShape)); // innerRow = 16
 ```

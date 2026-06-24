@@ -26,7 +26,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename T, bool isReuseSource = false>
 __aicore__ inline void Silu(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, uint32_t dataSize)
 ```
@@ -60,7 +60,7 @@ __aicore__ inline void Silu(const LocalTensor<T>& dstLocal, const LocalTensor<T>
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放Silu计算结果的Tensor
 // srcLocal: 存放Silu计算输入的Tensor
 
@@ -70,7 +70,7 @@ AscendC::Silu(dstLocal, srcLocal, 512);
 
 结果示例如下：
 
-```
+```text
 输入数据(srcLocal):
 [-100.    -50.    -20.    -10.     -5.     -4.     -3.     -2.
    -1.     -0.5    -0.4    -0.3    -0.2    -0.1    -0.01    0.

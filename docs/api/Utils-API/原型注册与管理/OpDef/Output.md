@@ -6,7 +6,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001549347676_zh-cn_topic_0000001576870901_zh-cn_topic_0000001575944081_section13230182415108"></a>
 
-```
+```text
 OpParamDef &Output(const char *name)
 ```
 

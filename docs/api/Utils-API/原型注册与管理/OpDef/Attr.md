@@ -8,7 +8,7 @@
 
 ## 函数原型<a name="zh-cn_topic_0000001705099477_zh-cn_topic_0000001576870901_zh-cn_topic_0000001575944081_section13230182415108"></a>
 
-```
+```text
 OpAttrDef &Attr(const char *name)
 ```
 

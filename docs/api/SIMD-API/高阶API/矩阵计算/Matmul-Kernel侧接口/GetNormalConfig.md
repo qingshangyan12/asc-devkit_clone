@@ -22,8 +22,13 @@
 
 ## 函数原型
 
-```
-__aicore__ constexpr MatmulConfig GetNormalConfig(const bool intrinsicsLimit = false, const bool batchLoop = false, const bool isVecND2NZ = false, const BatchMode bmmMode = BatchMode::BATCH_LESS_THAN_L1, const bool isMsgReuse = true, const IterateOrder iterateOrder = IterateOrder::UNDEF, const ScheduleType scheduleType = ScheduleType::INNER_PRODUCT, const bool enUnitFlag = true, const bool enableMixDualMaster = false, const BatchOutMode bmmOutMode = BatchOutMode::SINGLE_BATCH)
+```cpp
+__aicore__ constexpr MatmulConfig GetNormalConfig(
+    const bool intrinsicsLimit = false, const bool batchLoop = false, const bool isVecND2NZ = false,
+    const BatchMode bmmMode = BatchMode::BATCH_LESS_THAN_L1, const bool isMsgReuse = true,
+    const IterateOrder iterateOrder = IterateOrder::UNDEF,
+    const ScheduleType scheduleType = ScheduleType::INNER_PRODUCT, const bool enUnitFlag = true,
+    const bool enableMixDualMaster = false, const BatchOutMode bmmOutMode = BatchOutMode::SINGLE_BATCH)
 ```
 
 ## 参数说明
@@ -55,7 +60,7 @@ __aicore__ constexpr MatmulConfig GetNormalConfig(const bool intrinsicsLimit = f
 
 ## 调用示例
 
-```
+```cpp
 // 配置Norm模板的参数，获取自定义Norm模板
 constexpr MatmulConfig MM_CFG = GetNormalConfig(
     /* intrinsicsLimit   */ false,

@@ -28,7 +28,8 @@
 ```cpp
 // 同时支持非连续搬运和连续搬运
 template <typename T>
-__aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
+__aicore__ inline void DataCopy(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
 ```
 
 ## 参数说明
@@ -140,7 +141,8 @@ constexpr uint32_t dstElemCount = (2 * 8 + 1) * dataBlockElemCount;
 // 源操作数：UB，2个数据块在源端紧密排列，每块8个DataBlock，共16个DataBlock。
 AscendC::LocalTensor<half> srcLocal(AscendC::TPosition::VECIN, ubAddr, srcElemCount);
 
-// 目的操作数：L1 Buffer，两个目的数据块之间预留1个DataBlock间隔，总跨度为17个DataBlock。
+// 目的操作数：L1
+// Buffer，两个目的数据块之间预留1个DataBlock间隔，总跨度为17个DataBlock。
 AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::A1, a1Addr, dstElemCount);
 
 AscendC::DataCopyParams repeatParams;

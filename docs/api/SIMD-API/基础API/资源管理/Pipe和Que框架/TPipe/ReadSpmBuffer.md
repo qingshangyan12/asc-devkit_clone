@@ -65,14 +65,15 @@
 
 -   适用于连续和不连续的数据回读：
 
-    ```
+    ```cpp
     template <typename T>
-    __aicore__ inline void ReadSpmBuffer(const LocalTensor<T>& readBuffer, const DataCopyParams& copyParams, int32_t readOffset = 0)
+    __aicore__ inline void ReadSpmBuffer(
+        const LocalTensor<T>& readBuffer, const DataCopyParams& copyParams, int32_t readOffset = 0)
     ```
 
 -   适用于连续的数据回读：
 
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline void ReadSpmBuffer(const LocalTensor<T>& readBuffer, const int32_t readSize, int32_t readOffset = 0)
     ```

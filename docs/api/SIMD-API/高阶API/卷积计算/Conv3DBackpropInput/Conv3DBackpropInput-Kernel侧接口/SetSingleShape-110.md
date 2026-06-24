@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetSingleShape(uint64_t singleShapeM, uint64_t singleShapeK, uint32_t singleShapeN)
 ```
 
@@ -52,7 +52,7 @@ __aicore__ inline void SetSingleShape(uint64_t singleShapeM, uint64_t singleShap
 
 ## 调用示例
 
-```
+```cpp
 const Conv3DBackpropInputTilingData* tilingData;
 // ...初始化tilingData
 ConvBackpropApi::Conv3DBackpropInput<weightDxType, inputSizeDxType, gradOutputDxType, gradInputDxType> gradInput_;

@@ -8,7 +8,7 @@
 
 ## 函数原型
 
-```
+```cpp
 int32_t SetDoubleBuffer(bool a, bool b, bool c, bool bias, bool transND2NZ = true, bool transNZ2ND = true)
 ```
 

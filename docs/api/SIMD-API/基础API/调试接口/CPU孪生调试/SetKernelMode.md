@@ -85,15 +85,13 @@ int32_t main(int32_t argc, char* argv[])
 {
     ...
 #ifdef ASCENDC_CPU_DEBUG
-    ...
-    AscendC::SetKernelMode(KernelMode::AIV_MODE);
+        ... AscendC::SetKernelMode(KernelMode::AIV_MODE);
     ICPU_RUN_KF(add_custom, numBlocks, x, y, z);
-    ...
-    AscendC::GmFree((void *)x);
-    AscendC::GmFree((void *)y);
-    AscendC::GmFree((void *)z);
+    ... AscendC::GmFree((void*)x);
+    AscendC::GmFree((void*)y);
+    AscendC::GmFree((void*)z);
 #else
-    ...
+        ...
 #endif
     return 0;
 }

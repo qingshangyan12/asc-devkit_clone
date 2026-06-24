@@ -54,8 +54,7 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-inline void Print()
-inline void Print(uint32_t len)
+inline void Print() inline void Print(uint32_t len)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

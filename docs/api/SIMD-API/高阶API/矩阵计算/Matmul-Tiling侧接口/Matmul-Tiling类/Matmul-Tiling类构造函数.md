@@ -9,15 +9,15 @@
 -   带参构造函数，需要传入硬件平台信息，推荐使用这类构造函数来获得更好的兼容性。
     -   使用PlatformAscendC类传入信息
 
-        ```
+        ```cpp
         explicit MatmulApiTiling(const platform_ascendc::PlatformAscendC& ascendcPlatform)
         ```
 
-        ```
+        ```cpp
         explicit MultiCoreMatmulTiling(const platform_ascendc::PlatformAscendC& ascendcPlatform)
         ```
 
-        ```
+        ```cpp
         explicit BatchMatmulTiling(const platform_ascendc::PlatformAscendC& ascendcPlatform)
         ```
 
@@ -25,25 +25,25 @@
 
         当platform\_ascendc::PlatformAscendC无法在Tiling运行时获取时，需要用户自行构造PlatformInfo结构体，透传给MatmulApiTiling构造函数。
 
-        ```
+        ```text
         explicit MatmulApiTiling(const PlatformInfo& platform)
         ```
 
-        ```
+        ```text
         explicit MultiCoreMatmulTiling(const PlatformInfo& platform)
         ```
 
 -   无参构造函数
 
-    ```
+    ```text
     MatmulApiTiling()
     ```
 
-    ```
+    ```text
     MultiCoreMatmulTiling()
     ```
 
-    ```
+    ```text
     BatchMatmulTiling()
     ```
 
@@ -57,15 +57,15 @@
 
     MatmulApiTiling、MultiCoreMatmulTiling和BatchMatmulTiling都继承自基类MatmulApiTilingBase，其构造函数如下：
 
-    ```
+    ```text
     MatmulApiTilingBase()
     ```
 
-    ```
+    ```cpp
     explicit MatmulApiTilingBase(const platform_ascendc::PlatformAscendC& ascendcPlatform)
     ```
 
-    ```
+    ```text
     explicit MatmulApiTilingBase(const PlatformInfo& platform)
     ```
 
@@ -78,7 +78,7 @@
 | ascendcPlatform | 输入 | 传入硬件平台的信息，PlatformAscendC定义请参见[构造及析构函数](../../../../../Utils-API/平台信息获取/PlatformAscendC/构造及析构函数.md)。 |
 | platform | 输入 | 传入硬件版本以及AI Core中各个硬件单元提供的内存大小。PlatformInfo构造时通过[构造及析构函数](../../../../../Utils-API/平台信息获取/PlatformAscendC/构造及析构函数.md)获取。<br><br>PlatformInfo结构定义如下代码所示，socVersion通过[GetSocVersion](../../../../../Utils-API/平台信息获取/PlatformAscendC/GetSocVersion.md)获取并透传，各类硬件存储空间大小通过[GetCoreMemSize](../../../../../Utils-API/平台信息获取/PlatformAscendC/GetCoreMemSize.md)获取并透传。<br><br>不推荐通过直接填值构造PlatformInfo的方式调用构造函数，例如PlatformInfo(socVersion, 1024, 1024, ..); |
 
-```
+```cpp
 struct PlatformInfo {
     platform_ascendc::SocVersion socVersion;
     uint64_t l1Size = 0;
@@ -101,7 +101,7 @@ struct PlatformInfo {
 
 -   无参构造函数
 
-    ```
+    ```cpp
     // 单核Tiling
     matmul_tiling::MatmulApiTiling tiling;
     tiling.SetAType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT16);
@@ -117,7 +117,7 @@ struct PlatformInfo {
 
 -   带参构造函数
 
-    ```
+    ```cpp
     // 单核Tiling
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
     matmul_tiling::MatmulApiTiling tiling(ascendcPlatform);

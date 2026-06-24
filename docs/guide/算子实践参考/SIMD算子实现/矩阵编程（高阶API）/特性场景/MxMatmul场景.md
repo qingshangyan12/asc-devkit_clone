@@ -200,9 +200,9 @@ Host侧自动获取Tiling参数的关键步骤介绍如下：
 
 1.  **创建Tiling对象**。
 
-    ```
+    ```cpp
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
-    matmul_tiling::MatmulApiTiling cubeTiling(ascendcPlatform); 
+    matmul_tiling::MatmulApiTiling cubeTiling(ascendcPlatform);
     ```
 
     传入硬件平台信息创建PlatformAscendC对象，然后创建Tiling对象，硬件平台信息可以通过GetPlatformInfo获取。
@@ -211,7 +211,7 @@ Host侧自动获取Tiling参数的关键步骤介绍如下：
 
     调用[SetScaleAType](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Tiling侧接口/Matmul-Tiling类/SetScaleAType.md)、[SetScaleBType](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Tiling侧接口/Matmul-Tiling类/SetScaleBType.md)接口，设置scaleA、scaleB的内存逻辑位置、格式以及是否转置。
 
-    ```
+    ```cpp
     cubeTiling.SetAType(AscendC::TPosition::GM, CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT8_E5M2, false);
     cubeTiling.SetBType(AscendC::TPosition::GM, CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT8_E5M2, true);
     cubeTiling.SetScaleAType(AscendC::TPosition::GM, CubeFormat::ND, false);
@@ -224,13 +224,13 @@ Host侧自动获取Tiling参数的关键步骤介绍如下：
 
     调用[SetMadType](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Tiling侧接口/Matmul-Tiling类/SetMadType.md)接口，设置Tiling计算逻辑为MxMatmul场景。
 
-    ```
+    ```cpp
     cubetiling.SetMadType(MatrixMadType::MXMODE);
     ```
 
 4.  **设置矩阵shape信息。**
 
-    ```
+    ```text
     cubeTiling.SetShape(M, N, K);
     cubeTiling.SetOrgShape(M, N, K); // 设置原始完整的形状M、N、K
     ```
@@ -239,22 +239,22 @@ Host侧自动获取Tiling参数的关键步骤介绍如下：
 
     设置Matmul计算时可用的L1 Buffer/L0C Buffer/Unified Buffer空间大小，-1表示AI处理器对应Buffer的大小。
 
-    ```
+    ```text
     cubeTiling.SetBufferSpace(-1, -1, -1);
     ```
 
 6.  **按需设置其他参数，比如设置bias参与计算。**
 
-    ```
+    ```text
     cubeTiling.EnableBias(true);
     ```
 
 7.  **获取Tiling参数。**
 
-    ```
+    ```cpp
     MatmulCustomTilingData tiling;
-    if (cubeTiling.GetTiling(tiling.cubeTilingData) == -1){ 
-        return ge::GRAPH_FAILED;  
+    if (cubeTiling.GetTiling(tiling.cubeTilingData) == -1) {
+        return ge::GRAPH_FAILED;
     }
     ```
 
@@ -264,21 +264,31 @@ Kernel侧的关键步骤介绍如下：
 
 1.  **创建Matmul对象。**
 
-    ```
+    ```cpp
     // MxMatmul场景通过MatmulTypeWithScale定义A、scaleA、B、scaleB的参数类型信息
-    typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, isTransposeA> aType; 
-    typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, isTransposeB> bType;
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType; 
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType; 
+    typedef AscendC::MatmulTypeWithScale<
+        AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, isTransposeA>
+        aType;
+    typedef AscendC::MatmulTypeWithScale<
+        AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, isTransposeB>
+        bType;
+    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType;
+    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
     // 定义matmul对象时，传入MatmulWithScalePolicy表明开启MxMatmul模板策略
-    AscendC::Matmul<aType, bType, cType, biasType, CFG_MDL, MatmulCallBackFunc<nullptr, nullptr, nullptr>, AscendC::Impl::Detail::MatmulWithScalePolicy> mm; 
+    AscendC::Matmul<
+        aType, bType, cType, biasType, CFG_MDL, MatmulCallBackFunc<nullptr, nullptr, nullptr>,
+        AscendC::Impl::Detail::MatmulWithScalePolicy>
+        mm;
     ```
 
     创建对象时需要传入A、scaleA、B、scaleB、C、Bias的参数类型信息， A、scaleA、B、scaleB类型信息通过[MatmulTypeWithScale](#zh-cn_topic_0000002270097206_table14759942142014)来定义，C、Bias类型信息通过[MatmulType](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/Matmul使用说明.md)来定义，包括：内存逻辑位置、数据格式、数据类型、转置信息。同时，通过模板参数[MatmulPolicy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/MatmulPolicy.md)传入[MatmulWithScalePolicy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/MatmulPolicy.md)表明开启MxMatmul场景。
 
-    ```
-    template <TPosition POSITION, TPosition SCALE_POSITION, CubeFormat FORMAT, typename TYPE, bool ISTRANS = false, TPosition SRCPOS = TPosition::GM, CubeFormat SCALE_FORMAT = FORMAT, bool SCALE_ISTRANS = ISTRANS, TPosition SCALE_SRCPOS = SRCPOS>
-    struct MatmulTypeWithScale: public MatmulType<POSITION, FORMAT, TYPE, ISTRANS> {
+    ```cpp
+    template <
+        TPosition POSITION, TPosition SCALE_POSITION, CubeFormat FORMAT, typename TYPE, bool ISTRANS = false,
+        TPosition SRCPOS = TPosition::GM, CubeFormat SCALE_FORMAT = FORMAT, bool SCALE_ISTRANS = ISTRANS,
+        TPosition SCALE_SRCPOS = SRCPOS>
+    struct MatmulTypeWithScale : public MatmulType<POSITION, FORMAT, TYPE, ISTRANS> {
         constexpr static TPosition scalePosition = SCALE_POSITION;
         constexpr static CubeFormat scaleFormat = SCALE_FORMAT;
         constexpr static bool isScaleTrans = SCALE_ISTRANS;
@@ -288,7 +298,7 @@ Kernel侧的关键步骤介绍如下：
 
 2.  **初始化操作。**
 
-    ```
+    ```text
     REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling); // 初始化
     ```
 
@@ -296,7 +306,7 @@ Kernel侧的关键步骤介绍如下：
 
     通过[SetTensorScaleA](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/SetTensorScaleA.md)、[SetTensorScaleB](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/SetTensorScaleB.md)设置左量化系数矩阵scaleA、右量化系数矩阵scaleB。
 
-    ```
+    ```text
     mm.SetTensorA(gm_a, isTransposeA);    // 设置左矩阵A
     mm.SetTensorB(gm_b, isTransposeB);    // 设置右矩阵B
     mm.SetTensorScaleA(gm_scaleA, isTransposeScaleA);    // 设置左量化系数矩阵scaleA
@@ -307,21 +317,21 @@ Kernel侧的关键步骤介绍如下：
 4.  **完成矩阵乘操作。**
     -   调用[Iterate](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/Iterate.md)完成单次迭代计算，叠加while循环完成单核全量数据的计算。Iterate方式，可以自行控制迭代次数，完成所需数据量的计算，方式比较灵活。
 
-        ```
-        while (mm.Iterate()) {   
-            mm.GetTensorC(gm_c); 
+        ```cpp
+        while (mm.Iterate()) {
+            mm.GetTensorC(gm_c);
         }
         ```
 
     -   调用[IterateAll](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/IterateAll.md)完成单核上所有数据的计算。[IterateAll](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/IterateAll.md)方式，无需循环迭代，使用比较简单。
 
-        ```
+        ```text
         mm.IterateAll(gm_c);
         ```
 
 5.  **结束矩阵乘操作。**
 
-    ```
+    ```text
     mm.End();
     ```
 
@@ -429,7 +439,7 @@ Kernel侧的关键步骤介绍如下：
 -   scaleA矩阵、scaleB矩阵为UB输入时，矩阵的内轴需要向上32字节对齐，例如，scaleA矩阵的形状为\(M, K/32\)时，将K/32对齐到32字节；scaleA矩阵的形状为\(K/32, M\)时，将M对齐到32字节。
 -   当scaleA和scaleB矩阵以ND格式输入时，高阶API在内部实现格式转换时，需要占用UB临时空间。开发者需使用[SetLocalWorkspace](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/SetLocalWorkspace.md)接口配置临时空间，临时空间大小（单位字节）的计算公式如下。
 
-    ```
+    ```cpp
     int32_t scaleATmpBuf = 0;
     int32_t scaleBTmpBuf = 0;
     if constexpr (A_TYPE::scalePosition == TPosition::VECOUT) {

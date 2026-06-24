@@ -19,11 +19,11 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetBias(const GlobalTensor<BiasT>& biasGlobal)
 ```
 
-```
+```cpp
 __aicore__ inline void SetBias(const LocalTensor<BiasT>& inputBias)
 ```
 
@@ -63,12 +63,12 @@ __aicore__ inline void SetBias(const LocalTensor<BiasT>& inputBias)
 
 ## 调用示例
 
-```
+```cpp
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
 mm.SetTensorA(gm_a);
 mm.SetTensorB(gm_b);
 if (tiling.isBias) {
-    mm.SetBias(gmBias);  // 设置Bias
+    mm.SetBias(gmBias); // 设置Bias
 }
 mm.IterateAll(gm_c);
 mm.End();

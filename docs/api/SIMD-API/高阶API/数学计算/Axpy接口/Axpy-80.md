@@ -34,9 +34,11 @@
 
 ## 函数原型
 
-```
+```cpp
 template <typename T, typename U, bool isReuseSource = false>
-__aicore__ inline void Axpy(const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor, const U scalarValue, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+__aicore__ inline void Axpy(
+    const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor, const U scalarValue,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 ```
 
 ## 参数说明
@@ -75,7 +77,7 @@ __aicore__ inline void Axpy(const LocalTensor<T>& dstTensor, const LocalTensor<U
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放Axpy计算结果的Tensor
 // srcLocal: 存放Axpy计算输入的Tensor
 // sharedTmpBuffer: 存放Axpy计算过程中临时缓存的Tensor
@@ -86,7 +88,7 @@ AscendC::Axpy(dstLocal, srcLocal, static_cast<half>(3.0), sharedTmpBuffer, 512);
 
 结果示例如下：
 
-```
+```text
 输入数据(srcLocal):
 [1. 2. 3. 4. 5. 6. ... 512.]
 输入数据(scalarValue): 3.0

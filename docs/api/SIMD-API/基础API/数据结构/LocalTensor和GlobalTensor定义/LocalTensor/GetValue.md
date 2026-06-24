@@ -107,7 +107,6 @@ auto element = inputLocal.GetValue(2); // 获取inputLocal中第i个位置的数
 // 示例1结果如下：
 // element为200
 
-
 // 示例2
 // 数据(inputLocal): [0 100 200  ... ]
 auto element = inputLocal(1); // 获取inputLocal中第i个位置的数值

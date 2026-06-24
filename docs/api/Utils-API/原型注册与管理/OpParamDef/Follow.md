@@ -8,13 +8,13 @@
 
 -   datatype/format/shape全部信息保持一致
 
-    ```
+    ```text
     OpParamDef &Follow(const char *paramName)
     ```
 
 -   datatype/format/shape指定信息保持一致
 
-    ```
+    ```text
     OpParamDef &Follow(const char *paramName, FollowType ftype)
     ```
 
@@ -64,31 +64,16 @@ OpParamDef算子定义，OpParamDef请参考[OpParamDef](OpParamDef.md)。
 
 -   输出“y1”Follow输入“x1”场景，此时“y1”的datatype、format以及shape都将会和“x1”保持一致。
 
-    ```
-    this->Input("x1")
-        .ParamType(REQUIRED)
-        .DataType({ge::DT_FLOAT, ge::DT_FLOAT})
-        .Format({ge::FORMAT_ND, ge::FORMAT_ND});
-    this->Input("x2")
-        .ParamType(REQUIRED)
-        .DataType({ge::DT_FLOAT, ge::DT_FLOAT})
-        .Format({ge::FORMAT_ND, ge::FORMAT_ND});
-    this->Output("y1")
-        .ParamType(REQUIRED)
-        .Follow("x1");
+    ```cpp
+    this->Input("x1").ParamType(REQUIRED).DataType({ge::DT_FLOAT, ge::DT_FLOAT}).Format({ge::FORMAT_ND, ge::FORMAT_ND});
+    this->Input("x2").ParamType(REQUIRED).DataType({ge::DT_FLOAT, ge::DT_FLOAT}).Format({ge::FORMAT_ND, ge::FORMAT_ND});
+    this->Output("y1").ParamType(REQUIRED).Follow("x1");
     ```
 
 -   链式follow场景，y1 -\> x2 -\> x1。此时“y1”的datatype、format以及shape都将会和“x1”保持一致，“x2”的datatype、format和“x1”保持一致。
 
-    ```
-    this->Input("x1")
-        .ParamType(REQUIRED)
-        .DataType({ge::DT_FLOAT, ge::DT_FLOAT})
-        .Format({ge::FORMAT_ND, ge::FORMAT_ND});
-    this->Input("x2")
-        .ParamType(REQUIRED)
-        .Follow("x1");
-    this->Output("y1")
-        .ParamType(REQUIRED)
-        .Follow("x2");
+    ```cpp
+    this->Input("x1").ParamType(REQUIRED).DataType({ge::DT_FLOAT, ge::DT_FLOAT}).Format({ge::FORMAT_ND, ge::FORMAT_ND});
+    this->Input("x2").ParamType(REQUIRED).Follow("x1");
+    this->Output("y1").ParamType(REQUIRED).Follow("x2");
     ```

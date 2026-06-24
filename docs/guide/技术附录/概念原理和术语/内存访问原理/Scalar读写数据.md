@@ -13,9 +13,9 @@ globalTensor1是位于GM上的Tensor：
 -   执行完GetValue\(0\)后，globalTensor1的前8个元素会进入DataCache，后续GetValue\(1\)\~GetValue\(7\)不需要再访问GM，而可以直接从DataCache的Cache Line中读取数据，提高了标量连续访问的效率。
 -   执行完SetValue\(8, val\)后，globalTensor1的index为8\~15的元素会进入DataCache，SetValue只会修改DataCache中的Cache Line数据，同时将Cache Line的状态设置为Dirty，表明Cache Line中的数据与GM中的数据不一致。
 
-```
+```cpp
 AscendC::GlobalTensor<int64_t> globalTensor1;
-globalTensor1.SetGlobalBuffer((__gm__ int64_t *)input);
+globalTensor1.SetGlobalBuffer((__gm__ int64_t*)input);
 // 从0~7共计8个uint64_t类型，DataCache的Cache Line长度为64字节
 // 执行完GetValue(0)后，GetValue(1)~GetValue(7)可以直接从Cache Line中读取，不需要再访问GM
 globalTensor1.GetValue(0);
@@ -42,7 +42,7 @@ globalTensor1.GetValue(8);
 
 Scalar读写Unified Buffer时，可以使用LocalTensor的SetValue和GetValue接口。示例如下：
 
-```
+```cpp
 for (int32_t i = 0; i < 16; ++i) {
     inputLocal.SetValue(i, i); // 对inputLocal中第i个位置进行赋值为i
 }
@@ -58,18 +58,18 @@ Scalar读写Global Memory和Unified Buffer时属于PIPE\_S（Scalar流水）操�
 
 如果用户关闭算子工程的自动同步功能时，则需要手动插入同步事件：
 
-```
+```cpp
 // GetValue为Scalar操作，与后续的Duplicate存在数据依赖
 // 因此Vector流水需要等待Scalar操作结束
 float inputVal = srcLocal.GetValue(0);
 SetFlag<HardEvent::S_V>(eventID1);
 WaitFlag<HardEvent::S_V>(eventID1);
-AscendC::Duplicate(dstLocal, inputVal, srcDataSize); 
+AscendC::Duplicate(dstLocal, inputVal, srcDataSize);
 
 // SetValue为Scalar操作，与后续的数据搬运操作存在数据依赖
 // 因此MTE3流水需要等待Scalar操作结束
 srcLocal.SetValue(0, value);
 SetFlag<HardEvent::S_MTE3>(eventID2);
 WaitFlag<HardEvent::S_MTE3>(eventID2);
-AscendC::DataCopy(dstGlobal, srcLocal, srcDataSize); 
+AscendC::DataCopy(dstGlobal, srcLocal, srcDataSize);
 ```

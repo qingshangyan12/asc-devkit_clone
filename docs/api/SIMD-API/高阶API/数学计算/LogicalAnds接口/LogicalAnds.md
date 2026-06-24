@@ -32,7 +32,7 @@
 
 ## 函数原型
 
-```
+```cpp
 template <const LogicalAndsConfig& config = DEFAULT_LOGICAL_ANDS_CONFIG, typename T, typename U, typename S>
 __aicore__ inline void LogicalAnds(const LocalTensor<T>& dst, const U& src0, const S& src1, const uint32_t count)
 ```
@@ -48,7 +48,7 @@ __aicore__ inline void LogicalAnds(const LocalTensor<T>& dst, const U& src0, con
 | U | LocalTensor类型或标量类型。根据输入参数src0自动推导类型，开发者无需配置该参数，保证src0满足数据类型的约束即可。<br><br>支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。 |
 | S | LocalTensor类型或标量类型。根据输入参数src1自动推导类型，开发者无需配置该参数，保证src1满足数据类型的约束即可。<br><br>支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。 |
 
-```
+```cpp
 struct LogicalAndsConfig {
     bool isReuseSource;
     int8_t scalarTensorIndex;
@@ -77,7 +77,7 @@ struct LogicalAndsConfig {
 
 ## 调用示例
 
-```
+```cpp
 AscendC::LocalTensor<bool> dst;
 AscendC::LocalTensor<half> src0, src1;
 uint32_t count = 512; // 参与计算的元素个数
@@ -90,7 +90,7 @@ AscendC::LogicalAnds<config>(dst, src0, src1, count);
 
 结果示例如下：
 
-```
+```text
 // 标量在后
 输入数据（src0）:
 [1, 2, 0, -1, -2, 0, 3, 4, 0, -3, -4, 0, 5, 6, 0, -5, -6, 0, ... 0]

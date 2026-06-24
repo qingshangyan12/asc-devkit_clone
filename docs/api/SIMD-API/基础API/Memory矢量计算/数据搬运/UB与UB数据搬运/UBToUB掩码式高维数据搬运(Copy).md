@@ -36,14 +36,18 @@
 
     ```cpp
     template <typename T, bool isSetMask = true>
-    __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask[], const uint8_t repeatTime, const CopyRepeatParams& repeatParams)
+    __aicore__ inline void Copy(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask[], const uint8_t repeatTime,
+        const CopyRepeatParams& repeatParams)
     ```
 
 - mask连续模式 
 
     ```cpp
     template <typename T, bool isSetMask = true>
-    __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask, const uint8_t repeatTime, const CopyRepeatParams& repeatParams)
+    __aicore__ inline void Copy(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask, const uint8_t repeatTime,
+        const CopyRepeatParams& repeatParams)
     ```
 
 ## 参数说明<a name="zh-cn_topic_0000002567699435_section16128134420472"></a>
@@ -145,45 +149,46 @@
 ## 调用示例<a name="zh-cn_topic_0000002567699435_section088124295117"></a>
 
 ```cpp
-    if constexpr (scenarioNum == 1) {
-        // 场景1：[1, 512]数据搬运，mask连续模式，源和目的空间一样大。
-        // mask=64表示每次迭代处理64个int32元素。
-        // repeatTime=8表示迭代8次，共处理512个元素。
-        // srcStride=1, dstStride=1：同一迭代内DataBlock无间隙。
-        // srcRepeatSize=8, dstRepeatSize=8：相邻迭代间步长为8个block（每个block 8个int32元素）。
-        uint64_t mask = 64;
-        AscendC::Copy(dstLocal, srcLocal, mask, 8, {1, 1, 8, 8});
-    } else if constexpr (scenarioNum == 2) {
-        // 场景2：从[18, 64]的数据里搬运[18, 8]的数据量。
-        // 源数据shape: [18, 64]，共1152个元素。
-        // 目的数据shape: [18, 8]，共144个元素。
-        // 每次迭代处理一行中的8个元素，共18次迭代。
-        // mask=8：每次迭代处理8个元素。
-        // repeatTime=18：迭代18次（对应18行）。
-        // srcStride=1, dstStride=1：同一迭代内无间隙。
-        // srcRepeatSize=8：源每次迭代后跳过64个元素（跳到下一行起始位置）。
-        // dstRepeatSize=1：目的每次迭代后跳过8个元素（紧凑排列下一行）。
-        uint64_t mask = 8;
-        AscendC::Copy(dstLocal, srcLocal, mask, 18, {1, 1, 1, 8});
-    } else if constexpr (scenarioNum == 3) {
-        // 场景3：从[18, 64]搬运[18, 8]数据，Counter模式。
-        // 源数据shape: [18, 64]，共1152个元素。
-        // 目的数据shape: [18, 8]，共144个元素。
-        // Counter模式下，Mask代表每次Repeat中处理的元素个数。
-        // mask=144：每次迭代处理144个元素。
-        // repeatTime=1：迭代1次（对应18行）。
-        // srcStride=8：源数据两个DataBlock地址步长为8（每次选择每一行的起始DataBlock）。
-        // dstStride=1：目的数据连续存放无间隙。
-        // srcRepeatSize=8, dstRepeatSize=8：repeatTime=1场景下该参数无效。
-        AscendC::SetMaskCount();
-        AscendC::SetVectorMask<int32_t, AscendC::MaskMode::COUNTER>(144);
-        AscendC::Copy<int32_t, false>(dstLocal, srcLocal, AscendC::MASK_PLACEHOLDER, 1, {1, 8, 8, 8});
-        AscendC::SetMaskNorm();
-        AscendC::ResetMask();
-    } else {
-        uint64_t mask = 64;
-        AscendC::Copy(dstLocal, srcLocal, mask, 8, {1, 1, 8, 8});
-    }
+if constexpr (scenarioNum == 1) {
+    // 场景1：[1, 512]数据搬运，mask连续模式，源和目的空间一样大。
+    // mask=64表示每次迭代处理64个int32元素。
+    // repeatTime=8表示迭代8次，共处理512个元素。
+    // srcStride=1, dstStride=1：同一迭代内DataBlock无间隙。
+    // srcRepeatSize=8, dstRepeatSize=8：相邻迭代间步长为8个block（每个block
+    // 8个int32元素）。
+    uint64_t mask = 64;
+    AscendC::Copy(dstLocal, srcLocal, mask, 8, {1, 1, 8, 8});
+} else if constexpr (scenarioNum == 2) {
+    // 场景2：从[18, 64]的数据里搬运[18, 8]的数据量。
+    // 源数据shape: [18, 64]，共1152个元素。
+    // 目的数据shape: [18, 8]，共144个元素。
+    // 每次迭代处理一行中的8个元素，共18次迭代。
+    // mask=8：每次迭代处理8个元素。
+    // repeatTime=18：迭代18次（对应18行）。
+    // srcStride=1, dstStride=1：同一迭代内无间隙。
+    // srcRepeatSize=8：源每次迭代后跳过64个元素（跳到下一行起始位置）。
+    // dstRepeatSize=1：目的每次迭代后跳过8个元素（紧凑排列下一行）。
+    uint64_t mask = 8;
+    AscendC::Copy(dstLocal, srcLocal, mask, 18, {1, 1, 1, 8});
+} else if constexpr (scenarioNum == 3) {
+    // 场景3：从[18, 64]搬运[18, 8]数据，Counter模式。
+    // 源数据shape: [18, 64]，共1152个元素。
+    // 目的数据shape: [18, 8]，共144个元素。
+    // Counter模式下，Mask代表每次Repeat中处理的元素个数。
+    // mask=144：每次迭代处理144个元素。
+    // repeatTime=1：迭代1次（对应18行）。
+    // srcStride=8：源数据两个DataBlock地址步长为8（每次选择每一行的起始DataBlock）。
+    // dstStride=1：目的数据连续存放无间隙。
+    // srcRepeatSize=8, dstRepeatSize=8：repeatTime=1场景下该参数无效。
+    AscendC::SetMaskCount();
+    AscendC::SetVectorMask<int32_t, AscendC::MaskMode::COUNTER>(144);
+    AscendC::Copy<int32_t, false>(dstLocal, srcLocal, AscendC::MASK_PLACEHOLDER, 1, {1, 8, 8, 8});
+    AscendC::SetMaskNorm();
+    AscendC::ResetMask();
+} else {
+    uint64_t mask = 64;
+    AscendC::Copy(dstLocal, srcLocal, mask, 8, {1, 1, 8, 8});
+}
 ```
 
 完整样例请参考[Copy样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/copy_ub2ub)。

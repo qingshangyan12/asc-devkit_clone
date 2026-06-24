@@ -63,9 +63,10 @@ src0与src1相减，将差值作为指数计算自然常数e的幂次，并将�
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T, typename U>
-__aicore__ inline void ExpSub(const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, const uint32_t count)
+__aicore__ inline void ExpSub(
+    const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, const uint32_t count)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -143,13 +144,13 @@ __aicore__ inline void ExpSub(const LocalTensor<T>& dst, const LocalTensor<U>& s
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 AscendC::ExpSub(dstLocal, src0Local, src1Local, 512);
 ```
 
 结果示例如下：
 
-```
+```text
 输入数据src0Local：[1 2 4 ... 510]
 输入数据src1Local：[1 1 2 ... 510]
 输出数据dstLocal：[1 2.71828 7.38905 ... 1]

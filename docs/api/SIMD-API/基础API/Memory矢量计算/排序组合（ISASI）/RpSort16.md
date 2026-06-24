@@ -53,7 +53,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T>
 __aicore__ inline void RpSort16(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t repeatTime)
 ```
@@ -130,14 +130,14 @@ __aicore__ inline void RpSort16(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 -   接口使用样例
 
-    ```
+    ```cpp
     // ProposalConcat将连续元素合入Region Proposal内对应位置
     // repeatTime = 2,对2个Region Proposal进行排序，model=4起始位置为4
     AscendC::ProposalConcat(dstLocal, srcLocal, 2, 4);
     AscendC::RpSort16(dstLocal, dstLocal, 2);
     ```
 
-    ```
+    ```text
     示例结果
     输入数据srcLocal:
     [ -1.624 -42.3   -54.12   91.25  -99.4    36.72   67.44  -66.3   -52.53

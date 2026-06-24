@@ -22,27 +22,25 @@ RTC是Ascend C运行时编译库，通过[aclrtc](https://gitcode.com/cann/asc-d
 
 
 ```c++
-#include <cstdio>
-#include <vector>
 #include "acl/acl.h"
 #include "acl/acl_rt_compile.h" // 使用aclrtc接口需要包含的头文件
+#include <cstdio>
+#include <vector>
 
 #ifndef ACL_RTC_NPU_ARCH
 #define ACL_RTC_NPU_ARCH "dav-2201"
 #endif
 
-#define ASCENDC_CHECK(expr) do {               \
-    aclError ret = (expr);                     \
-    if (ret != ACL_SUCCESS) {                  \
-        fprintf(stderr,                        \
-            "Ascend Error: %s:%d code=%d %s\n",\
-            __FILE__, __LINE__,                \
-            ret, aclGetRecentErrMsg());        \
-        return ret;                            \
-    }                                          \
-} while(0)
+#define ASCENDC_CHECK(expr)                                                                                     \
+    do {                                                                                                        \
+        aclError ret = (expr);                                                                                  \
+        if (ret != ACL_SUCCESS) {                                                                               \
+            fprintf(stderr, "Ascend Error: %s:%d code=%d %s\n", __FILE__, __LINE__, ret, aclGetRecentErrMsg()); \
+            return ret;                                                                                         \
+        }                                                                                                       \
+    } while (0)
 
-const char *src = R""""(
+const char* src = R""""(
 #include "utils/debug/asc_printf.h"
 extern "C" __global__ __vector__ void hello_world()
 {
@@ -50,13 +48,13 @@ extern "C" __global__ __vector__ void hello_world()
 }
 )"""";
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     aclrtcProg prog;
     ASCENDC_CHECK(aclrtcCreateProg(&prog, src, "hello_world.asc", 0, nullptr, nullptr));
 
     // aclrtc流程，传入毕昇编译器的编译选项，调用aclrtcCompileProg进行编译
-    const char *options[] = {
+    const char* options[] = {
         "--npu-arch=" ACL_RTC_NPU_ARCH,
     };
     int numOptions = sizeof(options) / sizeof(options[0]);
@@ -89,12 +87,12 @@ int main(int argc, char *argv[])
     ASCENDC_CHECK(aclrtBinaryLoadFromData(deviceELF.data(), binDataSizeRet, &loadOption, &binHandle));
 
     aclrtFuncHandle funcHandle = nullptr;
-    const char *funcName = "hello_world";
+    const char* funcName = "hello_world";
     ASCENDC_CHECK(aclrtBinaryGetFunction(binHandle, funcName, &funcHandle));
 
     // 核函数执行
     uint32_t numBlocks = 8;
-    void *kernelArgs[] = {};
+    void* kernelArgs[] = {};
     ASCENDC_CHECK(aclrtLaunchKernelWithArgsArray(funcHandle, numBlocks, stream, nullptr, kernelArgs));
     ASCENDC_CHECK(aclrtSynchronizeStream(stream));
 
@@ -110,7 +108,7 @@ int main(int argc, char *argv[])
 
 编译命令如下，编译时需要设置-I\$\{ASCEND_HOME_PATH\}/include，用于找到aclrtc相关头文件，并设置-L\$\{ASCEND_HOME_PATH\}/lib64链接acl_rtc动态库。
 
-```
+```text
 g++ rtc_hello_world.cpp -I${ASCEND_HOME_PATH}/include -L${ASCEND_HOME_PATH}/lib64 -lascendcl -lacl_rtc -o main
 ```
 

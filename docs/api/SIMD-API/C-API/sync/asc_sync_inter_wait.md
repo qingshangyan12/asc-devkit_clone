@@ -15,8 +15,8 @@
 ## 函数原型
 
     ```cpp
-    __aicore__ inline void asc_sync_inter_wait(pipe_t pipe, uint8_t flag_id)
-    __aicore__ inline void asc_sync_inter_wait(pipe_t pipe, int64_t flag_id)
+    __aicore__ inline void asc_sync_inter_wait(pipe_t pipe, uint8_t flag_id) __aicore__
+        inline void asc_sync_inter_wait(pipe_t pipe, int64_t flag_id)
     ```
 
 ## 参数说明
@@ -45,5 +45,5 @@ PIPE_S
 ```cpp
 int64_t flag_id = 1;
 asc_sync_inter_arrive(PIPE_S, flag_id);
-asc_sync_inter_wait(PIPE_S, flag_id);  
+asc_sync_inter_wait(PIPE_S, flag_id);
 ```

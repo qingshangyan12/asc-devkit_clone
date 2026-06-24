@@ -18,8 +18,8 @@ $$
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_sqrt(vector_half& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_sqrt(vector_float& dst, vector_float src, vector_bool mask)
+__simd_callee__ inline void asc_sqrt(vector_half& dst, vector_half src, vector_bool mask) __simd_callee__
+    inline void asc_sqrt(vector_float& dst, vector_float src, vector_bool mask)
 ```
 
 ## 参数说明
@@ -50,6 +50,6 @@ PIPE_V
 vector_half dst;
 vector_half src;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
-asc_loadalign(src, src_addr);  // src_addr是外部输入的UB内存空间地址
+asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址
 asc_sqrt(dst, src, mask);
 ```

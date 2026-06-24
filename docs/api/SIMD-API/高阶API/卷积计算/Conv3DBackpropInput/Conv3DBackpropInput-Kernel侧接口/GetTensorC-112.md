@@ -28,9 +28,10 @@
 
 ## 函数原型
 
-```
+```cpp
 template <bool sync = true>
-__aicore__ inline void GetTensorC(const AscendC::GlobalTensor<DstT>& output, uint8_t enAtomic = 0, bool enSequentialWrite = false)
+__aicore__ inline void GetTensorC(
+    const AscendC::GlobalTensor<DstT>& output, uint8_t enAtomic = 0, bool enSequentialWrite = false)
 ```
 
 ## 参数说明
@@ -57,7 +58,7 @@ __aicore__ inline void GetTensorC(const AscendC::GlobalTensor<DstT>& output, uin
 
 GetTensorC接口必须在Iterate后进行调用，完成卷积反向实现，调用顺序如下。
 
-```
+```cpp
 while (Iterate()) {
     GetTensorC();
 }
@@ -65,7 +66,7 @@ while (Iterate()) {
 
 ## 调用示例
 
-```
+```cpp
 while (gradInput_.Iterate()) {
     gradInput_.GetTensorC(gradInputGm_[offsetC_]);
 }

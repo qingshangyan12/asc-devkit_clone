@@ -14,7 +14,7 @@ This sample implements the Add vector addition operation based on the memory and
 
 ## Directory Structure Introduction
 
-```
+```text
 ├── add_tpipe_tque
 │   ├── scripts
 │   │   ├── gen_data.py             // Input data and ground truth data generation script
@@ -29,7 +29,7 @@ This sample implements the Add vector addition operation based on the memory and
 
 - Sample Function:  
   Calculation formula:
-  ```
+  ```text
   z = x + y
   ```
   This sample performs element-wise addition of two tensors with the same shape and writes the result to the output tensor. The sample inputs are two `float` type tensors `x` and `y`, both with shape `[8, 2048]`, and the output `z` has the same shape as the inputs. The kernel function launches 8 cores for parallel computation, with each core responsible for processing a contiguous segment of data.

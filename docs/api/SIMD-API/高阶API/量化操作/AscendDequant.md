@@ -93,16 +93,20 @@ PER\_TOKEN/PER\_GROUP场景的计算逻辑如下：
 -   反量化参数deqScale为矢量
     -   通过sharedTmpBuffer入参传入临时空间
 
-        ```
+        ```cpp
         template <typename dstT, typename scaleT, DeQuantMode mode = DeQuantMode::DEQUANT_WITH_SINGLE_ROW>
-        __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor, const LocalTensor<scaleT>& deqScale, const LocalTensor<uint8_t>& sharedTmpBuffer, DequantParams params)
+        __aicore__ inline void AscendDequant(
+            const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor, const LocalTensor<scaleT>& deqScale,
+            const LocalTensor<uint8_t>& sharedTmpBuffer, DequantParams params)
         ```
 
     -   接口框架申请临时空间
 
-        ```
+        ```cpp
         template <typename dstT, typename scaleT, DeQuantMode mode = DeQuantMode::DEQUANT_WITH_SINGLE_ROW>
-        __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor, const LocalTensor<scaleT>& deqScale, DequantParams params)
+        __aicore__ inline void AscendDequant(
+            const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor, const LocalTensor<scaleT>& deqScale,
+            DequantParams params)
         ```
 
     -   PER\_TOKEN/PER\_GROUP量化
@@ -111,31 +115,42 @@ PER\_TOKEN/PER\_GROUP场景的计算逻辑如下：
 
         -   通过sharedTmpBuffer入参传入临时空间
 
-            ```
-            template <typename dstT, typename srcT, typename scaleT, const AscendDeQuantConfig& config, const AscendDeQuantPolicy& policy>
-            __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<scaleT>& scaleTensor, const LocalTensor<scaleT>& offsetTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const AscendDeQuantParam& para)
+            ```cpp
+            template <
+                typename dstT, typename srcT, typename scaleT, const AscendDeQuantConfig& config, const AscendDeQuantPolicy& policy>
+            __aicore__ inline void AscendDequant(
+                const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<scaleT>& scaleTensor,
+                const LocalTensor<scaleT>& offsetTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+                const AscendDeQuantParam& para)
             ```
 
         -   接口框架申请临时空间
 
-            ```
-            template <typename dstT, typename srcT, typename scaleT, const AscendDeQuantConfig& config, const AscendDeQuantPolicy& policy>
-            __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<scaleT>& scaleTensor, const LocalTensor<scaleT>& offsetTensor, const AscendDeQuantParam& para)
+            ```cpp
+            template <
+                typename dstT, typename srcT, typename scaleT, const AscendDeQuantConfig& config, const AscendDeQuantPolicy& policy>
+            __aicore__ inline void AscendDequant(
+                const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<scaleT>& scaleTensor,
+                const LocalTensor<scaleT>& offsetTensor, const AscendDeQuantParam& para)
             ```
 
 -   反量化参数deqScale为标量
     -   通过sharedTmpBuffer入参传入临时空间
 
-        ```
+        ```cpp
         template <typename dstT, typename scaleT, DeQuantMode mode = DeQuantMode::DEQUANT_WITH_SINGLE_ROW>
-        __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor, const scaleT deqScale, const LocalTensor<uint8_t>& sharedTmpBuffer, DequantParams params)
+        __aicore__ inline void AscendDequant(
+            const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor, const scaleT deqScale,
+            const LocalTensor<uint8_t>& sharedTmpBuffer, DequantParams params)
         ```
 
     -   接口框架申请临时空间
 
-        ```
+        ```cpp
         template <typename dstT, typename scaleT, DeQuantMode mode = DeQuantMode::DEQUANT_WITH_SINGLE_ROW>
-        __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor, const scaleT deqScale, DequantParams params)
+        __aicore__ inline void AscendDequant(
+            const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor, const scaleT deqScale,
+            DequantParams params)
         ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -148,24 +163,31 @@ PER\_TOKEN/PER\_GROUP场景的计算逻辑如下：
 
 以下接口不推荐使用，新开发内容不要使用如下接口：
 
-```
+```cpp
 template <typename dstT, typename scaleT, DeQuantMode mode = DeQuantMode::DEQUANT_WITH_SINGLE_ROW>
-__aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor, const LocalTensor<scaleT>& deqScale, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+__aicore__ inline void AscendDequant(
+    const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor, const LocalTensor<scaleT>& deqScale,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 ```
 
-```
+```cpp
 template <typename dstT, typename scaleT, DeQuantMode mode = DeQuantMode::DEQUANT_WITH_SINGLE_ROW>
-__aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor, const LocalTensor<scaleT>& deqScale, const LocalTensor<uint8_t>& sharedTmpBuffer)
+__aicore__ inline void AscendDequant(
+    const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor, const LocalTensor<scaleT>& deqScale,
+    const LocalTensor<uint8_t>& sharedTmpBuffer)
 ```
 
-```
+```cpp
 template <typename dstT, typename scaleT, DeQuantMode mode = DeQuantMode::DEQUANT_WITH_SINGLE_ROW>
-__aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor, const LocalTensor<scaleT>& deqScale, const uint32_t calCount)
+__aicore__ inline void AscendDequant(
+    const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor, const LocalTensor<scaleT>& deqScale,
+    const uint32_t calCount)
 ```
 
-```
+```cpp
 template <typename dstT, typename scaleT, DeQuantMode mode = DeQuantMode::DEQUANT_WITH_SINGLE_ROW>
-__aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor, const LocalTensor<scaleT>& deqScale)
+__aicore__ inline void AscendDequant(
+    const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor, const LocalTensor<scaleT>& deqScale)
 ```
 
 ## 参数说明
@@ -186,7 +208,7 @@ __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const L
 | config | 量化接口配置参数，AscendDeQuantConfig类型，定义如下方代码所示，其中参数的含义如下。<br>hasOffset：量化参数offset是否参与计算。True：表示offset参数参与计算。False：表示offset参数不参与计算。<br>kDim：group的计算方向，即k方向。仅在PER_GROUP场景有效，支持的取值如下。0：k轴是第0轴，即m方向为group的计算方向；1：k轴是第1轴，即n方向为group的计算方向。 |
 | policy | 量化策略配置参数，AscendDeQuantPolicy枚举类型，可取值如下：<br>PER_TOKEN：配置为PER_TOKEN模式。<br>PER_GROUP：配置为PER_GROUP模式。<br>PER_CHANNEL_PER_GROUP：预留参数，暂不支持。<br>PER_TOKEN_PER_GROUP：预留参数，暂不支持。 |
 
-```
+```cpp
 struct AscendDeQuantConfig {
     bool hasOffset;
     int32_t kDim = 1;
@@ -203,7 +225,7 @@ struct AscendDeQuantConfig {
 | sharedTmpBuffer | 输入 | 临时缓存。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。支持的数据类型为：uint8_t。<br><br>临时空间大小BufferSize的获取方式请参考[GetAscendDequantMaxMinTmpSize](GetAscendDequantMaxMinTmpSize.md)。 |
 | params | 输入 | srcTensor的shape信息。DequantParams类型，定义如下方代码所示，其中参数的含义如下。<br>m：srcTensor的行数。<br>n：srcTensor的列数。<br>calCount：针对srcTensor每一行，前calCount个数为有效数据，与deqScale的前calCount个数或者deqScale标量进行乘法计算。<br><br>请注意：<br>DequantParams.n * sizeof(T)必须是32字节的整数倍，T为srcTensor中元素的数据类型。<br>因为是每n个数中的前calCount个数进行乘法运算，因此DequantParams.n和calCount需要满足以下关系：1 <= DequantParams.calCount <= DequantParams.n。<br>deqScale为矢量时，DequantParams.calCount <= deqScale的元素个数。 |
 
-```
+```cpp
 struct DequantParams {
     uint32_t m;
     uint32_t n;
@@ -222,7 +244,7 @@ struct DequantParams {
 | offsetTensor | 输入 | 量化参数offset。支持的数据类型和scaleTensor保持一致。预留参数，当前暂不支持。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | para | 输入 | 反量化接口的参数，定义如下方代码所示，其中参数的含义如下。<br>m：m方向元素个数。<br>n：n方向元素个数。n值对应的数据大小需满足32B对齐的要求，即shape最后一维为n的输入输出均需要满足该维度上32B对齐的要求。<br>calCount：参与计算的元素个数。calCount必须是n的整数倍。<br>groupSize ：PER_GROUP场景有效，表示groupSize行/列数据共用一个scale/offset。groupSize的取值必须大于0且是32的整倍数。 |
 
-```
+```cpp
 struct AscendDeQuantParam {
     uint32_t m;
     uint32_t n;
@@ -312,7 +334,7 @@ struct AscendDeQuantParam {
 
 ## 调用示例
 
-```
+```cpp
 // dstLocal: 存放反量化计算的结果Tensor
 // srcLocal: 存放反量化计算的输入Tensor
 // deqScaleLocal: 存放反量化计算量反量化系数的输入Tensor
@@ -336,26 +358,22 @@ AscendC::AscendDequant(dstLocal, srcLocal, static_cast<float>(2.2), {m, n, calCo
 
 结果示例如下：
 
-```
-输入数据(srcLocal) int32_t数据类型:
-[[-16 -15 -14 -13 -12 -11 -10  -9]
- [ -8  -7  -6  -5  -4  -3  -2  -1]
- [  0   1   2   3   4   5   6   7]
- [  8   9  10  11  12  13  14  15]]
+```cpp
+输入数据(srcLocal)
+int32_t数据类型
+    : [[-16 - 15 - 14 - 13 - 12 - 11 - 10 - 9][-8 - 7 - 6 - 5 - 4 - 3 - 2 - 1][0 1 2 3 4 5 6 7][8 9 10 11 12 13 14 15]]
 
-反量化参数deqScaleLocal float数据类型:
-[2.2  -2.2  2.2  -2.2  2.2  -2.2  0.  0.]
+      反量化参数deqScaleLocal float数据类型 : [2.2 - 2.2 2.2 - 2.2 2.2 - 2.2 0. 0.]
 
-输出数据(dstLocal) float数据类型:
-[[-35.2  33.  -30.8  28.6 -26.4  24.2 -10.   -9. ]
- [-17.6  15.4 -13.2  11.   -8.8   6.6  -2.   -1. ]
- [  0.   -2.2   4.4  -6.6   8.8 -11.    6.    7. ]
- [ 17.6 -19.8  22.  -24.2  26.4 -28.6  14.   15. ]]
+                                              输出数据(dstLocal) float数据类型
+    : [[-35.2 33. - 30.8 28.6 - 26.4 24.2 - 10. -
+          9.][-17.6 15.4 - 13.2 11. - 8.8 6.6 - 2. - 1.][0. - 2.2 4.4 - 6.6 8.8 - 11. 6. 7.]
+             [17.6 - 19.8 22. - 24.2 26.4 - 28.6 14. 15.]]
 ```
 
 PER\_TOKEN/PER\_GROUP场景调用示例如下。
 
-```
+```cpp
 // 注意m,n需从外部传入
 constexpr static bool isReuseSource = false;
 constexpr static AscendDeQuantConfig config = {has_offset, -1};

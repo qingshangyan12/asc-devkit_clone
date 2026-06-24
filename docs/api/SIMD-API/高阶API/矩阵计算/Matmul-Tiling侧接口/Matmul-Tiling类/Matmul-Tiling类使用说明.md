@@ -12,7 +12,7 @@ Matmul Tiling API分为Matmul单核Tiling接口、多核Tiling接口和BatchMatm
 
 -   Matmul单核Tiling
 
-    ```
+    ```cpp
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
     matmul_tiling::MatmulApiTiling tiling(ascendcPlatform);
     // 设置A、B、C、Bias矩阵Position、Format、DType信息
@@ -31,7 +31,7 @@ Matmul Tiling API分为Matmul单核Tiling接口、多核Tiling接口和BatchMatm
 
 -   Matmul多核Tiling
 
-    ```
+    ```cpp
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
     matmul_tiling::MultiCoreMatmulTiling tiling(ascendcPlatform);
     tiling.SetDim(1); // 设置参与计算的核数为1
@@ -50,7 +50,7 @@ Matmul Tiling API分为Matmul单核Tiling接口、多核Tiling接口和BatchMatm
 
 -   BatchMatmul Tiling
 
-    ```
+    ```cpp
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
     matmul_tiling::BatchMatmulTiling bmmTiling(ascendcPlatform);
 
@@ -129,18 +129,18 @@ Matmul Tiling API分为Matmul单核Tiling接口、多核Tiling接口和BatchMatm
 
 -   Matmul单核Tiling
 
-    ```
+    ```cpp
     #include "lib/matmul/matmul_tiling.h"
     ```
 
 -   Matmul多核Tiling
 
-    ```
+    ```cpp
     #include "lib/matmul/bmm_tiling.h"
     ```
 
 -   BatchMatmul Tiling
 
-    ```
+    ```cpp
     #include "lib/matmul/bmm_tiling.h"
     ```

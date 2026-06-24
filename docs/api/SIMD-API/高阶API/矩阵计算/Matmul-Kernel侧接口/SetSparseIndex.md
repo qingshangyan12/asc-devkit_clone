@@ -18,7 +18,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __aicore__ inline void SetSparseIndex(const GlobalTensor<uint8_t>& indexGlobal)
 ```
 
@@ -41,7 +41,7 @@ __aicore__ inline void SetSparseIndex(const GlobalTensor<uint8_t>& indexGlobal)
 
 ## 调用示例
 
-```
+```text
 #define ASCENDC_CUBE_ONLY // 开启纯Cube模式(只有矩阵计算)
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
 mm.SetTensorA(gm_a);

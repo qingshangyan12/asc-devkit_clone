@@ -52,7 +52,7 @@ AI CPU启动下发通信任务前，需获取固定的通信配置，如[表1](#
 
 如下为自定义算子AlltoallvDoubleCommCustom的算子原型。该算子有两对输入输出，其中x1、y1是ep通信域的AlltoAllV任务的输入输出，x2、y2是tp通信域的AlltoAllV任务的输入输出。
 
-```
+```cpp
 namespace ops {
 class AlltoallvDoubleCommCustom : public OpDef {
 public:
@@ -96,22 +96,22 @@ OP_ADD(AlltoallvDoubleCommCustom);
 
 该自定义算子Tiling Data的声明中：首先定义version字段，设置为2，表明为v2版本的通信算子Tiling结构体。其次，定义mc2HcommCnt字段，本例AlltoallvDoubleCommCustom算子的kernel实现中，共2个AlltoAllV通信任务，该参数取值为2。然后定义server通用参数配置，Mc2ServerCfg。最后，定义2个Mc2HcommCfg结构体，表示各通信域中的每个通信任务参数配置。
 
-```
+```cpp
 // HCCL TilingData声明
 BEGIN_TILING_DATA_DEF(AlltoallvDoubleCommCustomTilingData)
-    TILING_DATA_FIELD_DEF(uint32_t, version); // HCCL tiling结构体的版本，设为2
-    // 各通信域中的通信算子总个数，当前最多支持3个。AlltoallvDoubleCommCustom算子kernel实现中每个通信域中均用了1个AlltoAllV，因此设为2
-    TILING_DATA_FIELD_DEF(uint32_t, mc2HcommCnt);
-    TILING_DATA_FIELD_DEF_STRUCT(Mc2ServerCfg, serverCfg); // server通用参数配置，融合算子级
-    // 各通信域中的每个通信任务参数配置，算子级，共有mc2HcommCnt个Mc2HcommCfg
-    TILING_DATA_FIELD_DEF_STRUCT(Mc2HcommCfg, hcom1); 
-    TILING_DATA_FIELD_DEF_STRUCT(Mc2HcommCfg, hcom2);
+TILING_DATA_FIELD_DEF(uint32_t, version); // HCCL tiling结构体的版本，设为2
+// 各通信域中的通信算子总个数，当前最多支持3个。AlltoallvDoubleCommCustom算子kernel实现中每个通信域中均用了1个AlltoAllV，因此设为2
+TILING_DATA_FIELD_DEF(uint32_t, mc2HcommCnt);
+TILING_DATA_FIELD_DEF_STRUCT(Mc2ServerCfg, serverCfg); // server通用参数配置，融合算子级
+// 各通信域中的每个通信任务参数配置，算子级，共有mc2HcommCnt个Mc2HcommCfg
+TILING_DATA_FIELD_DEF_STRUCT(Mc2HcommCfg, hcom1);
+TILING_DATA_FIELD_DEF_STRUCT(Mc2HcommCfg, hcom2);
 END_TILING_DATA_DEF;
 
 REGISTER_TILING_DATA_CLASS(AlltoallvDoubleCommCustom, AlltoallvDoubleCommCustomTilingData);
 ```
 
-```
+```cpp
 // HCCL TilingData配置片段
 static ge::graphStatus AlltoAllVDoubleCommCustomTilingFunc(gert::TilingContext* context)
 {

@@ -94,7 +94,9 @@ $$dstReg_i = srcReg0_i + srcReg1_i$$
 
     ```cpp
     template <typename T>
-    __simd_vf__ inline void AddVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
+    __simd_vf__ inline void AddVF(
+        __ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint16_t oneRepeatSize,
+        uint16_t repeatTimes)
     {
         AscendC::Reg::RegTensor<T> srcReg0;
         AscendC::Reg::RegTensor<T> srcReg1;
@@ -114,7 +116,10 @@ $$dstReg_i = srcReg0_i + srcReg1_i$$
 
     ```cpp
     template <typename T>
-    static __simd_vf__ inline void AddVF(__ubuf__ T* dst0Addr, __ubuf__ T* dst1Addr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint16_t repeatTimes, uint16_t oneRepeatSize){
+    static __simd_vf__ inline void AddVF(
+        __ubuf__ T* dst0Addr, __ubuf__ T* dst1Addr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count,
+        uint16_t repeatTimes, uint16_t oneRepeatSize)
+    {
         AscendC::Reg::RegTensor<T> srcReg0;
         AscendC::Reg::RegTensor<T> srcReg1;
         AscendC::Reg::RegTensor<T> dstReg0;

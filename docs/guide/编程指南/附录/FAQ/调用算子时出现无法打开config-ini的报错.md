@@ -4,7 +4,7 @@
 
 自定义算子包安装部署后，在调用已部署的算子时，出现如下json文件获取失败的报错信息：
 
-```
+```text
 [INFO] Start get path and read binary_info_config.json.
 [WARNING] Get jsonfile path for */binary_info_config.json failed, errmsg:No such file or directory.
 [ERROR] Get path and read binary_info_config.json failed, please check if the opp_kernel package is installed!
@@ -12,7 +12,7 @@
 
 通过查询前文的报错信息，上述json文件获取失败的原因是前置流程中无法打开config.ini，提示信息如下：
 
-```
+```text
 [INFO] Start to get opp kernel base path, default custom opp kernel is in ASCEND_OPP_PATH.
 [INFO] The real path of config.ini is */opp/vendors/config.ini.
 [WARNING]  Can not open file: */opp/vendors/config.ini.
@@ -28,6 +28,6 @@
 
 联系自定义算子包安装用户修改config.ini权限为644：
 
-```
+```bash
 chmod 644 config.ini
 ```

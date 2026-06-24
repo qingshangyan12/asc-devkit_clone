@@ -17,16 +17,16 @@
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_pack(vector_uint8_t& dst, vector_uint16_t src)
-__simd_callee__ inline void asc_pack(vector_uint8_t& dst, vector_int16_t src)
-__simd_callee__ inline void asc_pack(vector_uint16_t& dst, vector_uint32_t src)
-__simd_callee__ inline void asc_pack(vector_uint16_t& dst, vector_int32_t src)
-__simd_callee__ inline void asc_pack(vector_bool& dst, vector_bool src)
-__simd_callee__ inline void asc_pack_v2(vector_uint8_t& dst, vector_uint16_t src)
-__simd_callee__ inline void asc_pack_v2(vector_uint8_t& dst, vector_int16_t src)
-__simd_callee__ inline void asc_pack_v2(vector_uint16_t& dst, vector_uint32_t src)
-__simd_callee__ inline void asc_pack_v2(vector_uint16_t& dst, vector_int32_t src)
-__simd_callee__ inline void asc_pack_v2(vector_bool& dst, vector_bool src)
+__simd_callee__ inline void asc_pack(vector_uint8_t& dst, vector_uint16_t src) __simd_callee__
+    inline void asc_pack(vector_uint8_t& dst, vector_int16_t src) __simd_callee__
+    inline void asc_pack(vector_uint16_t& dst, vector_uint32_t src) __simd_callee__
+    inline void asc_pack(vector_uint16_t& dst, vector_int32_t src) __simd_callee__
+    inline void asc_pack(vector_bool& dst, vector_bool src) __simd_callee__
+    inline void asc_pack_v2(vector_uint8_t& dst, vector_uint16_t src) __simd_callee__
+    inline void asc_pack_v2(vector_uint8_t& dst, vector_int16_t src) __simd_callee__
+    inline void asc_pack_v2(vector_uint16_t& dst, vector_uint32_t src) __simd_callee__
+    inline void asc_pack_v2(vector_uint16_t& dst, vector_int32_t src) __simd_callee__
+    inline void asc_pack_v2(vector_bool& dst, vector_bool src)
 ```
 
 ## 参数说明
@@ -56,5 +56,5 @@ PIPE_V
 vector_uint8_t dst;
 vector_uint16_t src;
 asc_pack(dst, src);    // 将src的低8位写入dst的低半部分
-asc_pack_v2(dst, src);    // 将src的低8位写入dst的高半部分
+asc_pack_v2(dst, src); // 将src的低8位写入dst的高半部分
 ```

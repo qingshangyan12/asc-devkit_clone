@@ -57,8 +57,7 @@ SIMT直接访问Global Memory上的x、y和z数据，对应样例中的场景0�
 
 ```cpp
 template <typename T>
-__simt_vf__ inline void floor_mod_simt_gm_contiguous(
-    __gm__ T* x, __gm__ T* y, __gm__ T* z, uint32_t inputTotalLength)
+__simt_vf__ inline void floor_mod_simt_gm_contiguous(__gm__ T* x, __gm__ T* y, __gm__ T* z, uint32_t inputTotalLength)
 {
     for (uint32_t index = static_cast<uint32_t>(threadIdx.x); index < inputTotalLength;
          index += static_cast<uint32_t>(blockDim.x)) {
@@ -76,9 +75,8 @@ __simt_vf__ inline void floor_mod_simt_gm_contiguous(
 __aicore__ inline void ProcessGmSimt()
 {
     asc_vf_call<floor_mod_simt_gm_contiguous<T>>(
-        dim3(THREAD_COUNT), const_cast<__gm__ T*>(xGm.GetPhyAddr()),
-        const_cast<__gm__ T*>(yGm.GetPhyAddr()), const_cast<__gm__ T*>(zGm.GetPhyAddr()),
-        DataLenPerCore);
+        dim3(THREAD_COUNT), const_cast<__gm__ T*>(xGm.GetPhyAddr()), const_cast<__gm__ T*>(yGm.GetPhyAddr()),
+        const_cast<__gm__ T*>(zGm.GetPhyAddr()), DataLenPerCore);
 }
 ```
 
@@ -113,8 +111,7 @@ __simt_vf__ inline void floor_mod_simt_contiguous(
 }
 
 __aicore__ inline void Compute(
-    uint32_t count, AscendC::LocalTensor<T>& xLocal, AscendC::LocalTensor<T>& yLocal,
-    AscendC::LocalTensor<T>& zLocal)
+    uint32_t count, AscendC::LocalTensor<T>& xLocal, AscendC::LocalTensor<T>& yLocal, AscendC::LocalTensor<T>& zLocal)
 {
     __ubuf__ T* xAddr = (__ubuf__ T*)xLocal.GetPhyAddr();
     __ubuf__ T* yAddr = (__ubuf__ T*)yLocal.GetPhyAddr();

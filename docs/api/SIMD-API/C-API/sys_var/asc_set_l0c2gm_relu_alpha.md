@@ -44,8 +44,8 @@ PIPE_S
 ## 调用示例
 
 ```cpp
-uint32_t pre_m2 = (0<<18)|(127<<10)|0;
-uint32_t post_m2 = (0<<18)|(124<<10)|0;
-uint64_t config = ((uint64_t)pre_m2<<13)|((uint64_t)post_m2<<45);
+uint32_t pre_m2 = (0 << 18) | (127 << 10) | 0;
+uint32_t post_m2 = (0 << 18) | (124 << 10) | 0;
+uint64_t config = ((uint64_t)pre_m2 << 13) | ((uint64_t)post_m2 << 45);
 asc_set_l0c2gm_relu_alpha(config);
 ```

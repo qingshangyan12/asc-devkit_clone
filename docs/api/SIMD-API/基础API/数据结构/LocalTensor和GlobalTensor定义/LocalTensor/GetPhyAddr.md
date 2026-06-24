@@ -54,8 +54,7 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline uint64_t GetPhyAddr() const
-__aicore__ inline uint64_t GetPhyAddr(const uint32_t offset) const
+__aicore__ inline uint64_t GetPhyAddr() const __aicore__ inline uint64_t GetPhyAddr(const uint32_t offset) const
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -95,8 +94,9 @@ LocalTensor的地址或指定偏移量后的地址。
 // 示例
 // 调用GetPhyAddr()返回LocalTensor地址，CPU上返回的是指针类型(T*)，NPU上返回的是物理存储的地址(uint64_t)
 #ifdef ASCENDC_CPU_DEBUG
-float *inputLocalCpuPtr = inputLocal.GetPhyAddr();
-uint64_t realAddr = (uint64_t)inputLocalCpuPtr - (uint64_t)(GetTPipePtr()->GetBaseAddr(static_cast<int8_t>(AscendC::TPosition::VECCALC)));
+float* inputLocalCpuPtr = inputLocal.GetPhyAddr();
+uint64_t realAddr = (uint64_t)inputLocalCpuPtr -
+                    (uint64_t)(GetTPipePtr()->GetBaseAddr(static_cast<int8_t>(AscendC::TPosition::VECCALC)));
 #else
 uint64_t realAddr = inputLocal.GetPhyAddr();
 #endif

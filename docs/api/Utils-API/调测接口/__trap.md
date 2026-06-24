@@ -18,7 +18,7 @@
 
 ## 函数原型
 
-```
+```cpp
 __simt_callee__ inline void __trap()
 ```
 
@@ -38,13 +38,13 @@ __simt_callee__ inline void __trap()
 
 使用该接口需要包含"utils/debug/asc\_assert.h"头文件。
 
-```
+```cpp
 #include "utils/debug/asc_assert.h"
 ```
 
 ## 调用示例
 
-```
+```cpp
 __simt_vf__ __launch_bounds__(1024) inline void SimtKernel(__gm__ bool* dst, __gm__ float* x)
 {
     int idx = threadIdx.x + blockIdx.x * blockDim.x;

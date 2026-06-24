@@ -15,8 +15,8 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config)
-__aicore__ inline void asc_set_l0c2gm_lrelu_alpha(float& config)
+__aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config) __aicore__
+    inline void asc_set_l0c2gm_lrelu_alpha(float& config)
 ```
 
 ## 参数说明

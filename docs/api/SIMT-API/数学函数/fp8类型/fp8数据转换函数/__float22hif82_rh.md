@@ -28,7 +28,7 @@
 
 ## 函数原型
 
-```
+```text
 inline hifloat8x2_t __float22hif82_rh(const float2 x)
 ```
 
@@ -52,7 +52,7 @@ SIMT编程场景当前不支持使用该接口。
 
 使用该接口需要包含"simt\_api/asc\_fp8.h"头文件。
 
-```
+```cpp
 #include "simt_api/asc_fp8.h"
 ```
 
@@ -60,19 +60,21 @@ SIMT编程场景当前不支持使用该接口。
 
 -   SIMD与SIMT混合编程场景：
 
-    ```
+    ```cpp
     // 使用短向量可提升数据搬运效率
-    __simt_vf__ __launch_bounds__(1024) inline void simt_float22hif82_rh(__gm__ float2* input, __gm__ hifloat8x2_t* output, uint32_t input_total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void simt_float22hif82_rh(
+        __gm__ float2* input, __gm__ hifloat8x2_t* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         // 每个线程处理1个float2类型的数据，即2个float类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx > input_total_length /2) {
+        if (idx > input_total_length / 2) {
             return;
         }
         output[idx] = __float22hif82_rh(input[idx]);
     }
     __global__ __vector__ void cast_kernel(__gm__ float* input, __gm__ uint8_t* output, uint32_t input_total_length)
     {
-        asc_vf_call<simt_float22hif82_rh>(dim3(1024), (__gm__ float2*)input, (__gm__ hifloat8x2_t*)output, input_total_length);
+        asc_vf_call<simt_float22hif82_rh>(
+            dim3(1024), (__gm__ float2*)input, (__gm__ hifloat8x2_t*)output, input_total_length);
     }
     ```

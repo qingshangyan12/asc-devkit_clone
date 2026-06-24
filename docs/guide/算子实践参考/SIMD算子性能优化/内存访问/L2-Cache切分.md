@@ -11,7 +11,7 @@
 **图1**  未开启L2 Cache切分<a name="fig126831114552"></a>  
 ![](../../../figures/未使能L2-Cache切分.png "未开启L2-Cache切分")
 
-```
+```cpp
 constexpr int32_t TOTAL_LENGTH = InputTotalSize / sizeof(half);
 constexpr int32_t USE_CORE_NUM = 20;
 constexpr int32_t TILE_NUM = 2;
@@ -42,6 +42,7 @@ public:
             }
         }
     }
+
 private:
     __aicore__ inline void CopyIn(int32_t process)
     {
@@ -49,14 +50,14 @@ private:
         // 对于每个核，除了首次读取外，读取第0块数据时，L2 Cache内缓存的是第1块数据；
         // 对于每个核，读取第1块数据时，L2 Cache内缓存的是第0块数据；
         // 每个核需要4次读取GM上的数据
-        DataCopy(xLocal, xGm[process * TILE_LENGTH], TILE_LENGTH );
+        DataCopy(xLocal, xGm[process * TILE_LENGTH], TILE_LENGTH);
         inQueueX.EnQue(xLocal);
     }
     __aicore__ inline void Compute()
     {
         LocalTensor<half> yLocal = inQueueY.AllocTensor<half>();
         LocalTensor<half> xLocal = inQueueX.DeQue<half>();
-        Adds(yLocal, xLocal, 1, TILE_LENGTH);   
+        Adds(yLocal, xLocal, 1, TILE_LENGTH);
         inQueueY.EnQue<half>(yLocal);
         inQueueX.FreeTensor(xLocal);
     }
@@ -66,8 +67,7 @@ private:
         DataCopy(yGm[process * TILE_LENGTH], yLocal, TILE_LENGTH);
         inQueueY.FreeTensor(yLocal);
     }
-}
-...
+}...
 ```
 
 【正例】
@@ -77,7 +77,7 @@ private:
 **图2**  开启L2 Cache切分<a name="fig1623673819553"></a>  
 ![](../../../figures/使能L2-Cache切分.png "开启L2-Cache切分")
 
-```
+```cpp
 constexpr int32_t TOTAL_LENGTH = InputTotalSize / sizeof(half);
 constexpr int32_t TILE_NUM = 2;
 constexpr int32_t USE_CORE_NUM = 20;
@@ -105,20 +105,21 @@ public:
             CopyOut();
         }
     }
+
 private:
     __aicore__ inline void CopyIn()
     {
         LocalTensor<half> xLocal = inQueueX.AllocTensor<half>();
         // 对于每个核，除了首次读取外，第二次读取可以命中L2 Cache；
         // 每个核2次读取GM上的数据，2次访问L2 Cache读数据
-        DataCopy(xLocal, xGm, BLOCK_LENGTH );
+        DataCopy(xLocal, xGm, BLOCK_LENGTH);
         inQueueX.EnQue(xLocal);
     }
     __aicore__ inline void Compute()
     {
         LocalTensor<half> yLocal = inQueueY.AllocTensor<half>();
         LocalTensor<half> xLocal = inQueueX.DeQue<half>();
-        Adds(yLocal, xLocal, 1, BLOCK_LENGTH);   
+        Adds(yLocal, xLocal, 1, BLOCK_LENGTH);
         inQueueY.EnQue<half>(yLocal);
         inQueueX.FreeTensor(xLocal);
     }
@@ -128,10 +129,10 @@ private:
         DataCopy(yGm, yLocal, BLOCK_LENGTH);
         inQueueY.FreeTensor(yLocal);
     }
-}
-...
+}...
 
-extern "C" __global__ __aicore__ void simple_kernel(__gm__ uint8_t* srcGm, __gm__ uint8_t* dstGm)
+    extern "C" __global__ __aicore__ void
+    simple_kernel(__gm__ uint8_t* srcGm, __gm__ uint8_t* dstGm)
 {
     AscendC::KernelSample op;
     // 输入数据均等切分成2份数据进行计算

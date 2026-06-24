@@ -23,10 +23,7 @@ Crd2Idx函数用于将多维坐标（Coordinate）通过布局（Layout）转换
 例如，对于Shape \(3, 4, 5\)，Stride \(20, 5, 1\)和Coordinate \(1, 2, 3\)：
 
 ```cpp
-维度0: c₀ * s₀ = 1 * 20 = 20 
-维度1: c₁ * s₁ = 2 * 5  = 10 
-维度2: c₂ * s₂ = 3 * 1  = 3
-Index = 20 + 10 + 3 = 33
+维度0 : c₀* s₀ = 1 * 20 = 20 维度1 : c₁* s₁ = 2 * 5 = 10 维度2 : c₂* s₂ = 3 * 1 = 3 Index = 20 + 10 + 3 = 33
 ```
 
 当Coordinate维度和Stride维度不相同时，可以采用去线性化（delinearize）的方法，使得Coordinate维度和Stride维度相同，再使用上述公式计算得到最终结果。
@@ -38,11 +35,8 @@ Index = 20 + 10 + 3 = 33
 例如：对于Shape \(\(2, 4\), \(3, 5\)\)，Stride\(\(3, 6\), \(1, 24\)\)，Layout \(\(2, 4\), \(3, 5\)\) : \(\(3, 6\), \(1, 24\)\)，Coordinate（11, 12），按照列优先原则，Crd2Idx的结果为：
 
 ```cpp
-crd2idx = delinearize(11, 12) * stride 
-= ((11 % 2, 11 / 2), (12 % 3, 12 / 3)) *  ((3, 6), (1, 24))
-= ((1, 5), (0, 4)) *  ((3, 6), (1, 24))
-= 1 * 3 + 5 * 6 + 0 * 1 + 4 * 24 
-= 129
+crd2idx = delinearize(11, 12)* stride = ((11 % 2, 11 / 2), (12 % 3, 12 / 3)) * ((3, 6), (1, 24)) =
+                                            ((1, 5), (0, 4)) * ((3, 6), (1, 24)) = 1 * 3 + 5 * 6 + 0 * 1 + 4 * 24 = 129
 ```
 
 总结上述过程，计算公式如下：
@@ -66,9 +60,9 @@ crd2idx = delinearize(11, 12) * stride
 template <typename CoordType, typename ShapeType, typename StrideType>
 __aicore__ inline constexpr auto Crd2Idx(const CoordType& coord, const Layout<ShapeType, StrideType>& layout)
 
-// Shape和Stride输入，Coordinate转换为Index
-template <typename CoordType, typename ShapeType, typename StrideType>
-__aicore__ inline constexpr auto Crd2Idx(const CoordType& coord, const ShapeType& shape, const StrideType& stride)
+    // Shape和Stride输入，Coordinate转换为Index
+    template <typename CoordType, typename ShapeType, typename StrideType>
+    __aicore__ inline constexpr auto Crd2Idx(const CoordType& coord, const ShapeType& shape, const StrideType& stride)
 ```
 
 ## 参数说明
@@ -135,23 +129,28 @@ constexpr int blockM = 13;
 constexpr int blockN = 14;
 
 auto coord = AscendC::MakeCoord(AscendC::Std::Int<20>{}, AscendC::Std::Int<30>{});
-auto shape = AscendC::MakeShape(AscendC::MakeShape(AscendC::Std::Int<blockM>{}, AscendC::Std::Int<M/blockM>{}), AscendC::MakeShape(AscendC::Std::Int<blockN>{}, AscendC::Std::Int<N/blockN>{}));
-auto stride = AscendC::MakeStride(AscendC::MakeStride(AscendC::Std::Int<blockN>{}, AscendC::Std::Int<blockM*blockN>{}),AscendC::MakeStride(AscendC::Std::Int<1>{}, AscendC::Std::Int<M*blockN>{}));
+auto shape = AscendC::MakeShape(
+    AscendC::MakeShape(AscendC::Std::Int<blockM>{}, AscendC::Std::Int<M / blockM>{}),
+    AscendC::MakeShape(AscendC::Std::Int<blockN>{}, AscendC::Std::Int<N / blockN>{}));
+auto stride = AscendC::MakeStride(
+    AscendC::MakeStride(AscendC::Std::Int<blockN>{}, AscendC::Std::Int<blockM * blockN>{}),
+    AscendC::MakeStride(AscendC::Std::Int<1>{}, AscendC::Std::Int<M * blockN>{}));
 
 auto layout = AscendC::MakeLayout(shape, stride);
-auto index = layout(coord); // decltype(index)::value = 590
-index = AscendC::Crd2Idx(coord, layout);  // decltype(index)::value = 590
+auto index = layout(coord);              // decltype(index)::value = 590
+index = AscendC::Crd2Idx(coord, layout); // decltype(index)::value = 590
 
 // Shape和Stride形式入参计算索引值
-auto blockCoordM    = AscendC::Std::Int<11>{};
-auto blockCoordN    = AscendC::Std::Int<12>{};
-auto baseShapeM     = AscendC::Std::Int<13>{};
-auto baseShapeN     = AscendC::Std::Int<14>{};
-auto basestrideM    = AscendC::Std::Int<15>{};
-auto basestrideN    = AscendC::Std::Int<16>{};
+auto blockCoordM = AscendC::Std::Int<11>{};
+auto blockCoordN = AscendC::Std::Int<12>{};
+auto baseShapeM = AscendC::Std::Int<13>{};
+auto baseShapeN = AscendC::Std::Int<14>{};
+auto basestrideM = AscendC::Std::Int<15>{};
+auto basestrideN = AscendC::Std::Int<16>{};
 auto coord = AscendC::MakeCoord(AscendC::Std::Int<0>{}, blockCoordN);
 auto shape = AscendC::MakeShape(AscendC::MakeShape(baseShapeM, baseShapeM), AscendC::MakeShape(baseShapeN, baseShapeN));
-auto stride = AscendC::MakeStride(AscendC::MakeStride(basestrideM, basestrideM),AscendC::MakeStride(basestrideN, basestrideN));
+auto stride =
+    AscendC::MakeStride(AscendC::MakeStride(basestrideM, basestrideM), AscendC::MakeStride(basestrideN, basestrideN));
 
 auto index = AscendC::Crd2Idx(coord, shape, stride); // decltype(index)::value = 192
 ```

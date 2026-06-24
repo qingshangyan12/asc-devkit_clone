@@ -52,18 +52,20 @@
 
     以下为通过\_\_NPU\_ARCH\_\_控制在不同AI处理器上算子输出值舍入模式的示例。
 
-    ```
+    ```cpp
     __aicore__ static inline void CopyOut(uint64_t mulLen)
     {
     #if __NPU_ARCH__ == 2002
-        Cast(dstLocal, srcLocal, RoundMode::CAST_NONE, mulLen); // CAST_NONE表示舍入模式在转换有精度损失时使用CAST_RINT模式，在不涉及精度损失时不进行舍入
+        Cast(
+            dstLocal, srcLocal, RoundMode::CAST_NONE,
+            mulLen); // CAST_NONE表示舍入模式在转换有精度损失时使用CAST_RINT模式，在不涉及精度损失时不进行舍入
     #elif __NPU_ARCH__ == 2201
         Cast(dstLocal, srcLocal, RoundMode::CAST_RINT, mulLen); // CAST_RINT表示舍入模式为四舍六入五成双舍入
     #endif
         event_t eventVToMTE3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
         SetFlag<HardEvent::V_MTE3>(eventVToMTE3);
         WaitFlag<HardEvent::V_MTE3>(eventVToMTE3);
-        CommonCopyOut<float>(dstLocal, mulLen);  // 拷贝LocalTensor至GlobalTensor
+        CommonCopyOut<float>(dstLocal, mulLen); // 拷贝LocalTensor至GlobalTensor
     }
     ```
 
@@ -78,31 +80,27 @@
 
     示例伪码如下：
 
-    ```
+    ```cpp
     template <typename AType, typename BType, typename CType, typename BiasType>
-    __aicore__ inline void MatmulKernel<AType, BType, CType, BiasType>::Process(AscendC::TPipe *pipe)
+    __aicore__ inline void MatmulKernel<AType, BType, CType, BiasType>::Process(AscendC::TPipe* pipe)
     {
         // 利用AIV核的Vector计算单元实现ND2NZ格式转换。如下代码中MatrixBtoNZ为将B矩阵进行ND2NZ格式转换的函数。
         if ASCEND_IS_AIV {
             pipe->InitBuffer(ubBuf, TOTAL_UB_SIZE);
-            MatrixBtoNZ<typename B_TYPE::T>(tempGM,
-                bGMNZ,
-                tiling,
-                isTransB,
-                ubBuf,
-                tiling.baseK,
-                tiling.baseN);  // Vector侧实现的ND2NZ函数
+            MatrixBtoNZ<typename B_TYPE::T>(
+                tempGM, bGMNZ, tiling, isTransB, ubBuf, tiling.baseK,
+                tiling.baseN); // Vector侧实现的ND2NZ函数
             SyncAll();
             // AIC核和AIV核同步
             AscendC::CrossCoreSetFlag<0x2, PIPE_MTE3>(0x4);
             return;
         }
         if ASCEND_IS_AIC {
-            AscendC::CrossCoreWaitFlag(0x4);   // 等待AIV核完成ND2NZ格式转换
+            AscendC::CrossCoreWaitFlag(0x4); // 等待AIV核完成ND2NZ格式转换
         }
-        ... ...
-        // 设置左矩阵A、右矩阵B、Bias。
-        matmulObj.SetTail(tailM, tailN);
+        ......
+            // 设置左矩阵A、右矩阵B、Bias。
+            matmulObj.SetTail(tailM, tailN);
         matmulObj.SetTensorA(aGlobal, false);
         matmulObj.SetTensorB(bGlobal, false);
         if (tiling.isBias) {
@@ -128,14 +126,14 @@
 
     示例伪码如下：
 
-    ```
+    ```cpp
     #define ASCENDC_CUBE_ONLY
     #include "lib/matmul_intf.h"
 
     using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
     using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>;
     using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-    using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+    using BIAS_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
     AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_NORM> matmulObj;
     ```
 
@@ -158,14 +156,15 @@
     -   在Device侧执行
     -   只能被\_\_global\_\_函数，或者其他\_\_aicore\_\_函数调用
 
-    ```
+    ```cpp
     // Only callable from device functions with same kind
     // of execution space
     __aicore__ void bar() {}
 
     // Define a kernel function execute on AI Core device
-    __global__ __aicore__ void foo() {
-      bar(); // OK.
+    __global__ __aicore__ void foo()
+    {
+        bar(); // OK.
     }
     ```
 
@@ -179,16 +178,17 @@
 
     \_\_host\_\_限定符是可选项，无函数执行空间限定符定义的函数，默认是host函数。
 
-    ```
+    ```cpp
     __aicore__ int f() {}
 
     // defines a host side function
     int foo() {}
 
     // defines a host side function
-    __host__ int bar() {
-      f();     // Error.
-      foo();   // OK.
+    __host__ int bar()
+    {
+        f();   // Error.
+        foo(); // OK.
     }
 
     // Error.
@@ -205,19 +205,19 @@
     -   Host侧调用\_\_global\_\_ \_\_aicpu\_\_函数时必须使用<<<\>\>\>异构调用语法，输入的函数入参在入参指针的基础上需要输入从指针中读取的数据大小。
     -   \_\_global\_\_的调用是异步的，意味着函数返回，并不表示kernel函数在Device侧已经执行完成，如果需要同步，需要使用Runtime同步接口显式同步，如**aclrtSynchronizeStream**接口
 
-    ```
+    ```cpp
     // Define a AI CPU kernel function in AI CPU device file
-    __aicpu__ void foo() {} // Error, single __aicpu__ identifier without _global__
-    __global__ void foo() {} // Error, single __global__ identifier without __aicpu__
-    __global__ __aicpu__  void foo() {} // Error, return type is void
-    __global__ __aicpu__  int foo(void *a) {} // OK
-    __global__ __aicpu__  int foo(int a) {} // Error, input param is not pointer
-    __global__ __aicpu__  int foo(void *a, void *b) {} // Error, input param num is not one
+    __aicpu__ void foo() {}                           // Error, single __aicpu__ identifier without _global__
+    __global__ void foo() {}                          // Error, single __global__ identifier without __aicpu__
+    __global__ __aicpu__ void foo() {}                // Error, return type is void
+    __global__ __aicpu__ int foo(void* a) {}          // OK
+    __global__ __aicpu__ int foo(int a) {}            // Error, input param is not pointer
+    __global__ __aicpu__ int foo(void* a, void* b) {} // Error, input param num is not one
     ```
 
-    ```
+    ```cpp
     // Declare a AI CPU kernel function in .asc file
-    extern __global__ __aicpu__ uint32_t hello_world(void *args);// OK
+    extern __global__ __aicpu__ uint32_t hello_world(void* args); // OK
     }
     ```
 
@@ -233,7 +233,7 @@
 
     标识该核函数仅在Cube核执行。针对耦合模式的硬件架构，该修饰符不生效。
 
-    ```
+    ```cpp
     extern "C" __global__ __cube__ void mmad_custom(GM_ADDR a, GM_ADDR b, GM_ADDR c)
     {
         KernelMmad op;
@@ -246,8 +246,8 @@
 
     标识该核函数仅在Vector核执行。针对耦合模式的硬件架构，该修饰符不生效。
 
-    ```
-     __vector__ __global__ __aicore__ void add_custom(){}
+    ```cpp
+    __vector__ __global__ __aicore__ void add_custom() {}
     ```
 
 -   **\_\_mix\_\_\(cube, vec\)**
@@ -266,20 +266,25 @@
 
     在多流并发场景，多算子并行执行时，若执行总核数超过最大物理核数，且多个算子逻辑使用SyncALL等核间同步接口时，建议设置mode为1，防止多个算子之间互相等待空闲核调度，导致死锁。默认值mode为0。
 
-    ```
-     __schedmode__(1) __global__ __mix__(1, 2) void OP1() // OP1使用了SyncAll接口，且存在多流并发的可能，需要设置batch mode（mode 1）
+    ```cpp
+    __schedmode__(1) __global__
+        __mix__(1, 2) void OP1() // OP1使用了SyncAll接口，且存在多流并发的可能，需要设置batch mode（mode 1）
     {
         AscendC::SyncAll();
         ....
     }
-     __schedmode__(1) __global__ __mix__(1, 2) void OP2() // OP2使用了SyncAll接口，且存在多流并发的可能，需要设置batch mode（mode 1）
+    __schedmode__(1) __global__
+        __mix__(1, 2) void OP2() // OP2使用了SyncAll接口，且存在多流并发的可能，需要设置batch mode（mode 1）
     {
         AscendC::SyncAll();
         ....
     }
-    __schedmode__(0) __global__ __vector__ void OP3() {...} // OP3没有使用SyncAll接口，可以设置为normal mode(mode 0)，按照正常规则执行算子。
-    or
-    __global__ __vector__ void OP3() {...} // 不设置__schedmode__，默认为normal mode。
+    __schedmode__(0) __global__ __vector__ void OP3(){...}
+        // OP3没有使用SyncAll接口，可以设置为normal mode(mode 0)，按照正常规则执行算子。
+        or __global__ __vector__ void OP3()
+    {
+        ...
+    } // 不设置__schedmode__，默认为normal mode。
     ```
 
 ## 函数标记宏<a name="section192521344610"></a>
@@ -288,7 +293,7 @@
 
     函数标记宏，用于标记SIMD VF入口函数，函数无返回值。使用[asc\_vf\_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/asc_vf_call.md)调用SIMD VF入口函数，启动VF子任务。
 
-    ```
+    ```cpp
     __simd_vf__ inline void KernelAdd(__ubuf__ float* x, __ubuf__ float* y, __ubuf__ float* z)
     ```
 
@@ -300,9 +305,9 @@
 
         \_\_simd\_vf\_\_使用的示例如下：
 
-        ```
-        __simd_vf__ inline void simd_adds(__ubuf__ float *output, __ubuf__ float *input,
-            uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
+        ```cpp
+        __simd_vf__ inline void simd_adds(
+            __ubuf__ float* output, __ubuf__ float* input, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
         {
             AscendC::Reg::RegTensor<float> srcReg;
             AscendC::Reg::RegTensor<float> dstReg;
@@ -324,7 +329,7 @@
 
     函数标记宏，函数可以有返回值，允许被SIMD VF入口函数或其他非入口函数调用。
 
-    ```
+    ```text
     __simd_callee__ inline float add(float x, float y)
     ```
 
@@ -386,36 +391,36 @@ AI Core具备多级独立片上存储，各个地址空间独立编址，具备�
 
 地址空间限定符可以在变量声明中使用，用于指定对象分配的区域。如果对象的类型被地址空间名称限定，那么该对象将被分配在指定的地址空间中。同样地，对于指针，指向的类型可以通过地址空间进行限定，以指示所指向的对象所在的地址空间。
 
-```
+```cpp
 // declares a pointer p in the __gm__ address space that
 // points to an object(has int type) in the __gm__ address space
-__gm__ int *p;
+__gm__ int* p;
 
 __global__ __aicore__ void foo(...)
 {
-  // declares an array of 4 floats in the private address space.
-  float x[4];
+    // declares an array of 4 floats in the private address space.
+    float x[4];
 }
 ```
 
 地址空间限定符不能用于非指针返回类型，非指针函数参数，函数类型，同一个类型上不允许使用多个地址空间限定符。
 
-```
+```cpp
 // OK.
-__aicore__ int f() {...}
+__aicore__ int f(){...}
 
 // Error. Address space qualifier cannot be used with a non-pointer return type.
-__ubuf__ int f() { ... }
+__ubuf__ int f(){...}
 
 // OK. Address space qualifier can be used with a pointer return type.
-__ubuf__ int *f() { ... }
+__ubuf__ int* f(){...}
 
 // Error. Multiple address spaces specified for a type.
 __ubuf__ __gm__ int i;
 
 // OK. The first address space qualifies the object pointed to and the second
 // qualifies the pointer.
-__ubuf__ int * __gm__ ptr;
+__ubuf__ int* __gm__ ptr;
 ```
 
 >[!NOTE]说明
@@ -425,17 +430,19 @@ __ubuf__ int * __gm__ ptr;
 
     private地址空间是大多数变量的默认地址空间，特别是局部变量。
 
-    ```
+    ```cpp
     // m is in a specific kernel parameter address space,
     // it's physical location is implementation determined.
-    __global__ __vector__ void foo(int m) {
-      // OK. i is an int variable allocated in private address space
-      int i;
+    __global__ __vector__ void foo(int m)
+    {
+        // OK. i is an int variable allocated in private address space
+        int i;
     }
 
-    __aicore__ void bar(int k) { //OK. k is in private address space
-      // OK. i is an int variable allocated in private address space
-      int i;
+    __aicore__ void bar(int k)
+    { // OK. k is in private address space
+        // OK. i is an int variable allocated in private address space
+        int i;
     }
     ```
 
@@ -443,25 +450,26 @@ __ubuf__ int * __gm__ ptr;
 
     \_\_gm\_\_地址空间限定符用来表示分配于设备侧全局内存的对象，全局内存对象可以声明为标量、用户自定义结构体的指针。
 
-    ```
-    __gm__ int *var; // var point to an array of int elements
+    ```cpp
+    __gm__ int* var; // var point to an array of int elements
 
     typedef struct {
         float a[3];
         int b[2];
     } foo_t;
 
-    __gm__ foo_t *info; // info point to an array of foo_t elements
+    __gm__ foo_t* info; // info point to an array of foo_t elements
     ```
 
 -   **\_\_ubuf\_\_地址空间**
 
     \_\_ubuf\_\_地址空间用来描述存储于AI Core核内UB存储空间的变量。
 
-    ```
-    __global__ __aicore__ void foo() {
-      // ptr is in private address space, point to __ubuf__
-      __ubuf__ int *ptr;
+    ```cpp
+    __global__ __aicore__ void foo()
+    {
+        // ptr is in private address space, point to __ubuf__
+        __ubuf__ int* ptr;
     }
     ```
 
@@ -469,21 +477,21 @@ __ubuf__ int * __gm__ ptr;
 
     上述几个地址空间主要用于特定的DMA指令访问，不具备标量直接访问能力。
 
-    ```
-    class ObjTy{
-      ObjTy(){...}
-      void print(){...}
+    ```cpp
+    class ObjTy {
+        ObjTy() { ... }
+        void print() { ... }
 
     private:
-      int a;
-      int b;
+        int a;
+        int b;
     };
 
-    __global__ __aicore__
-    void foo(__ca__ int * ptr) { // Error. Cannot have __ca__
-                                 // qualifier in kernel arguments
-      // OK
-      __ca__ int *ptr;
+    __global__ __aicore__ void foo(__ca__ int* ptr)
+    { // Error. Cannot have __ca__
+      // qualifier in kernel arguments
+        // OK
+        __ca__ int* ptr;
     }
     ```
 
@@ -602,7 +610,7 @@ __ubuf__ int * __gm__ ptr;
 
 在调用\_\_global\_\_限定符修饰的函数时必须指定执行配置。执行配置通过在函数名和带括号的参数列表之间插入如下形式的表达式来指定：
 
-```
+```text
 <<<numBlocks, dynUBufSize, stream>>>
 ```
 
@@ -625,7 +633,7 @@ __ubuf__ int * __gm__ ptr;
 
 以下示例展示了内核函数的声明与调用方式。
 
-```
+```cpp
 // 声明
 __global__ __vector__ void add_custom(float* x, float* y, float* z);
 // 调用

@@ -77,8 +77,7 @@ Demonstrate the fixed task startup overhead under different thread block count c
 **Key Code**:
 
 ```cpp
-__simt_vf__ __launch_bounds__(MAX_THREAD_NUM) inline void simt_empty(...)
-{}
+__simt_vf__ __launch_bounds__(MAX_THREAD_NUM) inline void simt_empty(...) {}
 
 __global__ __vector__ void empty_kernel(...)
 {
@@ -168,19 +167,23 @@ Compare performance differences when executing Gather computation with the same 
 **Key Code**:
 
 ```cpp
-// simt_gather: SIMT VF function -- grid-stride loop, traversing the entire index array with total thread count as stride
+// simt_gather: SIMT VF function -- grid-stride loop, traversing the entire
+// index array with total thread count as stride
 __simt_vf__ __launch_bounds__(MAX_THREAD_NUM) inline void simt_gather(..., uint32_t index_total_length)
 {
     uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
     uint32_t stride = gridDim.x * blockDim.x;
     for (uint32_t i = idx; i < index_total_length; i += stride) {
         uint32_t gather_idx = index[i];
-        if (gather_idx >= input_total_length) { gather_idx = 0; }
+        if (gather_idx >= input_total_length) {
+            gather_idx = 0;
+        }
         output[i] = input[gather_idx];
     }
 }
 
-// gather_kernel: kernel function calls simt_gather, thread count is adaptively allocated by resolve_thread_num
+// gather_kernel: kernel function calls simt_gather, thread count is adaptively
+// allocated by resolve_thread_num
 __global__ __vector__ void gather_kernel(..., uint32_t thread_num)
 {
     asc_vf_call<simt_gather>(dim3(thread_num), ..., index_total_length);
@@ -196,12 +199,12 @@ These logical cores must ultimately be mapped to the actual Vector Cores availab
 - **Logical cores**: The number of thread blocks launched, representing the number of parallel tasks the software side wants to launch
 - **Physical cores**: The actual number of Vector Cores available on the hardware, which must be queried at runtime via [aclrtGetDeviceInfo](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/API/runtimeapi/aclcppdevg_03_1867.html) (64 in this example environment). The code example is as follows:
   ```cpp
-  // Query the number of physical Vector Cores (AIV) at runtime; return AIV_CORE_NUM on query failure
+  // Query the number of physical Vector Cores (AIV) at runtime; return
+  // AIV_CORE_NUM on query failure
   uint32_t query_aiv_core_num(int32_t device_id)
   {
       int64_t core_num = 0;
-      aclError ret = aclrtGetDeviceInfo(
-          static_cast<uint32_t>(device_id), ACL_DEV_ATTR_VECTOR_CORE_NUM, &core_num);
+      aclError ret = aclrtGetDeviceInfo(static_cast<uint32_t>(device_id), ACL_DEV_ATTR_VECTOR_CORE_NUM, &core_num);
       return (ret == ACL_SUCCESS && core_num > 0) ? static_cast<uint32_t>(core_num) : AIV_CORE_NUM;
   }
   ```
