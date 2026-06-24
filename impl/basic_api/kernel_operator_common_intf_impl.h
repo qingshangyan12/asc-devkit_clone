@@ -237,6 +237,13 @@ __aicore__ inline bool GetSaturationFlag()
 }
 #endif
 
+#if (__NPU_ARCH__ == 3510)
+template <RWMode mode, CacheMode cacheMode>
+__aicore__ inline void SetScalarCacheMode(){
+    SetScalarCacheModeImpl<mode, cacheMode>();
+}
+#endif
+
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_COMMON_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_INTF_IMPL_H__)

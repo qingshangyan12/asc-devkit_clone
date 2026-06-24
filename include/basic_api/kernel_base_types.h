@@ -29,6 +29,20 @@ enum class SaturationMode : uint8_t {
     CAST
 };
 
+enum class RWMode : uint8_t {
+    L2_CACHE_CONTROL_FOR_LOAD,
+    L2_CACHE_CONTROL_FOR_STORE
+};
+
+enum class CacheMode : uint8_t {
+    FIRST_VICTIM,
+    LAST_VICTIM,
+    PERSISTENT,
+    KEEP,
+    CLEAN,
+    DROP
+};
+
 } // namespace AscendC
 #endif // ASCENDC_MODULE_BASE_TYPES_H
 

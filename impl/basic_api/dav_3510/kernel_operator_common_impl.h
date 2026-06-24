@@ -139,6 +139,45 @@ __aicore__ static inline void ResetCtrlSprImpl()
     value = value | defaultCtrl;
     set_ctrl(value);
 }
+
+template <RWMode mode, CacheMode cacheMode>
+__aicore__ inline constexpr uint8_t GetCacheModeBits()
+{
+    if constexpr (mode == RWMode::L2_CACHE_CONTROL_FOR_LOAD) {
+        // read mode: CTRL[19:16] bit mapping
+        switch (cacheMode) {
+            case CacheMode::FIRST_VICTIM: return 0x0;  // 4'b0000
+            case CacheMode::LAST_VICTIM:  return 0x1;  // 4'b0001
+            case CacheMode::PERSISTENT:   return 0x2;  // 4'b0010
+            case CacheMode::KEEP:         return 0x4;  // 4'b0100
+            case CacheMode::CLEAN:        return 0x5;  // 4'b0101
+            case CacheMode::DROP:         return 0x6;  // 4'b0110
+            default: return 0x0;
+        }
+    } else {
+        // write mode: CTRL[23:20] bit mapping
+        switch (cacheMode) {
+            case CacheMode::FIRST_VICTIM: return 0x0;  // 4'b0000
+            case CacheMode::LAST_VICTIM:  return 0x1;  // 4'b0001
+            case CacheMode::PERSISTENT:   return 0x2;  // 4'b0010
+            case CacheMode::CLEAN:        return 0x4;  // 4'b0100 (clean-invalid)
+            default: return 0x0;
+        }
+    }
+}
+
+template <RWMode mode, CacheMode cacheMode>
+__aicore__ inline void SetScalarCacheModeImpl()
+{
+    // read mode: CTRL[19:16], write mode: CTRL[23:20]
+    constexpr uint8_t startBit = (mode == RWMode::L2_CACHE_CONTROL_FOR_LOAD) ? 16 : 20;
+    constexpr uint8_t cacheBits = GetCacheModeBits<mode, cacheMode>();
+    uint64_t mask = ~((uint64_t(0xF) << startBit));
+    int64_t ctrlValue = get_ctrl() & mask;
+    ctrlValue |= (static_cast<uint64_t>(cacheBits) << startBit);
+    set_ctrl(ctrlValue);
+}
+
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_IMPL_H__)
