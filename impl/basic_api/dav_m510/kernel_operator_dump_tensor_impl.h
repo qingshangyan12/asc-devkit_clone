@@ -78,7 +78,19 @@ __aicore__ void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t desc, u
 }
 
 template <typename T>
+__aicore__ void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t desc, uint32_t size,
+                                    const uint32_t shapeDim, const uint32_t* shape)
+{
+}
+
+template <typename T>
 __aicore__ void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc, uint32_t size)
+{
+}
+
+template <typename T>
+__aicore__ void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc, uint32_t size,
+                                        const uint32_t shapeDim, const uint32_t* shape)
 {
 }
 

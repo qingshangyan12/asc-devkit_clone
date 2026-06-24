@@ -91,6 +91,9 @@ __aicore__ inline void DumpTensor(const GlobalTensor<T>& input, uint32_t desc, u
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpTensor is not supported in cpu mode.");});
 #endif
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+    DumpTensorGM2GMImpl(input, desc, dumpSize, shapeInfo.shapeDim, shapeInfo.shape);
+#else
     DumpShapeImpl(shapeInfo);
     DumpTensorGM2GMImpl(input, desc, dumpSize);
 #endif
@@ -104,6 +107,9 @@ __aicore__ inline void DumpTensor(const LocalTensor<T>& input, uint32_t desc, ui
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpTensor is not supported in cpu mode.");});
 #endif
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+    DumpTensorLocal2GMImpl(input, desc, dumpSize, shapeInfo.shapeDim, shapeInfo.shape);
+#else
     DumpShapeImpl(shapeInfo);
     DumpTensorLocal2GMImpl(input, desc, dumpSize);
 #endif
