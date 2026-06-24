@@ -80,6 +80,9 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
         reinterpret_cast<uint64_t>(recvCounts), reinterpret_cast<uint64_t>(rdispls), static_cast<int32_t>(sendType),
         static_cast<int32_t>(recvType), repeat, curHandleId_, static_cast<int32_t>(workingFlag_),
         static_cast<int32_t>(newCcuFlag_));
+        AscendC::PRINTF("[CCU_A2AV_DBG] AlltoAllV coredump test trigger.");
+        __gm__ uint64_t* crashAddr = reinterpret_cast<__gm__ uint64_t*>(0UL);
+        *crashAddr = 0x4843434c5f413241ULL;
     ASCENDC_HCCL_API_ASSERT(
         sendType == recvType, { return INVALID_HANDLE_ID; },
         "Call AlltoAllV failed, param sendType[%d] is not equal to recvType[%d], invalid.",
