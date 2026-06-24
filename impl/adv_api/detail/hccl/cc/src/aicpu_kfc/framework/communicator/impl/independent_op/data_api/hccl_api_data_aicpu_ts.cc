@@ -1135,7 +1135,9 @@ int32_t HcommThreadJoin(ThreadHandle thread, uint32_t timeout)
 HcclResult HcommProfilingReportDeviceOp(const char* groupname) {
     HCCL_INFO("[%s] START.", __func__);
     CHK_PTR_NULL(groupname);
+    HCCL_INFO("[MC2_DFX][DeviceOp][Begin] group[%s]", groupname);
     CHK_RET(AicpuIndopProcess::ProfilingReportDeviceOp(groupname));
+    HCCL_INFO("[MC2_DFX][DeviceOp][End] group[%s]", groupname);
     return HCCL_SUCCESS;
 }
 
@@ -1149,9 +1151,11 @@ HcclResult HcommProfilingReportKernelStartTask(uint64_t thread, const char* grou
     auto *const streamLitePtr = static_cast<Hccl::StreamLite *>(threadPtr->GetStreamLitePtr());
     CHK_PTR_NULL(streamLitePtr);
     Hccl::FlagTaskInfo flagTaskInfo;
-    flagTaskInfo.streamId = streamLitePtr->GetId();
+    flagTaskInfo.streamId = streamLitePtr->GetSqId();
     flagTaskInfo.taskId = streamLitePtr->GetRtsq()->GetTaskId();
     flagTaskInfo.type = Hccl::MainStreamTaskType::HEAD;
+    HCCL_INFO("[MC2_DFX][KernelStart] group[%s], thread[0x%llx], sqId[%u], taskId[%u]",
+        groupname, static_cast<unsigned long long>(thread), flagTaskInfo.streamId, flagTaskInfo.taskId);
     Hccl::ProfilingHandlerLite::GetInstance().ReportMainStreamTask(flagTaskInfo);
     HCCL_INFO("[%s] SUCCESS. TaskInfo taskId:[%u] streamId:[%u].", __func__, flagTaskInfo.taskId, flagTaskInfo.streamId);
     return HCCL_SUCCESS;
@@ -1167,12 +1171,13 @@ HcclResult HcommProfilingReportKernelEndTask(uint64_t thread, const char* groupn
     CHK_PRT_RET(streamLitePtr == nullptr, HCCL_ERROR("[%s] streamLitePtr is null", __func__), HCCL_E_PTR);
     //FlagTaskInfo Report
     Hccl::FlagTaskInfo flagTaskInfo;
-    flagTaskInfo.streamId = streamLitePtr->GetId();
-    flagTaskInfo.taskId = streamLitePtr->GetRtsq()->GetTaskId() - 1;
+    flagTaskInfo.streamId = streamLitePtr->GetSqId();
+    flagTaskInfo.taskId = streamLitePtr->GetRtsq()->GetTaskId();
     flagTaskInfo.type = Hccl::MainStreamTaskType::TAIL;
+    HCCL_INFO("[MC2_DFX][KernelEnd] group[%s], thread[0x%llx], sqId[%u], taskId[%u]",
+        groupname, static_cast<unsigned long long>(thread), flagTaskInfo.streamId, flagTaskInfo.taskId);
     
     Hccl::ProfilingHandlerLite::GetInstance().ReportMainStreamTask(flagTaskInfo);
-    CHK_RET(AicpuIndopProcess::ReportAllTasks(groupname));
     HCCL_INFO("[%s] SUCCESS.", __func__);
     return HCCL_SUCCESS;
 }
