@@ -136,6 +136,14 @@ def tracked_markdown_files(root: Path) -> list[Path]:
     return [root / line for line in proc.stdout.splitlines() if line]
 
 
+def markdown_files_under(path: Path) -> list[Path]:
+    if path.is_file():
+        return [path] if is_markdown(path.as_posix()) else []
+    if path.is_dir():
+        return sorted(child for child in path.rglob("*") if child.is_file() and is_markdown(child.as_posix()))
+    return []
+
+
 def input_markdown_files(files: list[str], root: Path, full: bool) -> list[Path]:
     if full or os.environ.get("MARKDOWN_CODE_BLOCK_CHECK_FULL") == "1":
         return tracked_markdown_files(root)
@@ -145,20 +153,17 @@ def input_markdown_files(files: list[str], root: Path, full: bool) -> list[Path]
     for raw in files:
         raw_path = Path(raw)
         if raw_path.is_absolute():
-            if not is_markdown(raw_path.as_posix()):
-                continue
             path = raw_path
         else:
             rel = to_rel_posix(raw, root)
-            if rel is None or not is_markdown(rel):
+            if rel is None:
                 continue
             path = root / rel
-        if not path.exists():
-            continue
-        key = path.as_posix()
-        if key not in seen:
-            paths.append(path)
-            seen.add(key)
+        for markdown_path in markdown_files_under(path):
+            key = markdown_path.as_posix()
+            if key not in seen:
+                paths.append(markdown_path)
+                seen.add(key)
     return paths
 
 
