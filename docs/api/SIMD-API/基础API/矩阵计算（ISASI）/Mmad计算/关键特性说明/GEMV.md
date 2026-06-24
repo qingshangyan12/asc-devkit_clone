@@ -60,7 +60,7 @@ GEMV功能的完整示例：[GEMV样例](https://gitcode.com/cann/asc-devkit/tre
 
 ```cpp
 AscendC::MmadParams mmadParams;
-// 设置m = 1自动使能GEMV能力
+// 设置m = 1自动开启GEMV能力
 mmadParams.m = 1;
 mmadParams.n = n;
 mmadParams.k = k;
@@ -72,7 +72,7 @@ AscendC::Mmad(c, a, b, mmadParams);
 
 ```cpp
 AscendC::MmadParams mmadParams;
-// 设置m = 1自动使能GEMV能力
+// 设置m = 1自动开启GEMV能力
 mmadParams.m = 1;
 mmadParams.n = n;
 mmadParams.k = k;

@@ -6,12 +6,12 @@ unitFlag的核心功能体现为：Mmad和FixPipe接口引入了单元标志（u
 
 Mmad和Fixpipe接口设置unitFlag值为2/3后，系统会启动单元标志位。
 
-当mmadParams.unitFlag == 2（0b10），使能unitFlag功能，在硬件执行完指令后，不改变单元标志位；
+当mmadParams.unitFlag == 2（0b10），开启unitFlag功能，在硬件执行完指令后，不改变单元标志位；
 
 - 对于写操作（Mmad接口），如果单元标志位0，则硬件直接写入L0C Buffer；否则，如果单元标志位为1，则写操作会等待直到单元标志变为0；执行完成后将单元标志位保持为0；
 - 对于读操作（Fixpipe接口），如果单元标志位1，则硬件直接读取L0C Buffer；否则，如果单元标志位为0，则读操作为等待直到单元标志变为1；执行完成后将单元标志位保持为1；
 
-当mmadParams.unitFlag == 3（0b11），使能unitFlag功能，在硬件执行完指令后，改变单元标志位；
+当mmadParams.unitFlag == 3（0b11），开启unitFlag功能，在硬件执行完指令后，改变单元标志位；
 
 - 对于写操作（Mmad接口），如果单元标志位0，则硬件直接写入L0C Buffer；否则，如果单元标志位为1，则写操作会等待直到单元标志变为0；执行完成后将单元标志位设置成1；
 - 对于读操作（Fixpipe接口），如果单元标志位1，则硬件直接读取L0C Buffer；否则，如果单元标志位为0，则读操作为等待直到单元标志变为1；执行完成后将单元标志位设置成0；
@@ -29,7 +29,7 @@ Mmad和Fixpipe接口设置unitFlag值为2/3后，系统会启动单元标志位�
 
 当开启unitFlag后，Mmad和Fixpipe会对同一块分形的L0C Buffer进行读写操作，因此Mmad计算和Fixpipe保持一致的读写顺序，有助于获得更优的性能表现。
 
-在调用Mmad接口时，需要通过**[SetMMColumnMajor/SetMMRowMajor](../寄存器配置说明/SetMMColumnMajor-SetMMRowMajor.md)**接口设置Mmad的计算方向。当Fixpipe使能了NZ2ND或ChannelMerge等layout变换时，需将Mmad的计算方向设置为N方向优先，即调用SetMMRowMajor()；反之，若未使用这些特性，则应将计算方向设置为M方向优先，即调用SetMMColumnMajor()。
+在调用Mmad接口时，需要通过**[SetMMColumnMajor/SetMMRowMajor](../寄存器配置说明/SetMMColumnMajor-SetMMRowMajor.md)**接口设置Mmad的计算方向。当Fixpipe开启了NZ2ND或ChannelMerge等layout变换时，需将Mmad的计算方向设置为N方向优先，即调用SetMMRowMajor()；反之，若未使用这些特性，则应将计算方向设置为M方向优先，即调用SetMMColumnMajor()。
 
 **图1** Mmad和Fixpipe同时沿M方向写/读
 
