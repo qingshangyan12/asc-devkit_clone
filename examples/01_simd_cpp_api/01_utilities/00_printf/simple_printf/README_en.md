@@ -14,7 +14,7 @@ This example introduces the usage of the printf API to print kernel function rel
 
 ## Directory Structure
 
-```
+```text
 ├── simple_printf
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data
@@ -33,7 +33,7 @@ This example introduces the usage of the printf API to print kernel function rel
 
   The matrix multiplication formula is:
 
-  ```
+  ```text
   C = A * B
   ```
 

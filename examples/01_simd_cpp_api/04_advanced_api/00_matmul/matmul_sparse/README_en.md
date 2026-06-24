@@ -13,7 +13,7 @@ In this scenario, the input left matrix A and the right matrix are sparse matric
 | Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
 
 ## Directory Structure
-```
+```text
 ├── matmul_sparse
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data
@@ -48,12 +48,13 @@ In this scenario, the input left matrix A and the right matrix are sparse matric
       // Use SparseMatmulType to define the parameter type information of matrix B
       using B_TYPE = AscendC::SparseMatmulType<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, BType, true>;
       using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-      using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+      using BIAS_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
       AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL> matmulObj;
       ```
     - Set the index matrix.
       ```cpp
-      matmulObj.SetSparseIndex(gm_index); // Set the index matrix gm_index generated during the densification of matrix B
+      matmulObj.SetSparseIndex(gm_index); // Set the index matrix gm_index generated
+                                          // during the densification of matrix B
       ```
 
   - Key Tiling Steps

@@ -13,7 +13,7 @@ Taking the left quantization scale matrix scaleA with K-direction multi-cache an
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── matmul_mx_scale_cache
 │   ├── scripts
 │   │   ├── gen_data.py            // Script for generating input data and ground truth data
@@ -56,12 +56,22 @@ Taking the left quantization scale matrix scaleA with K-direction multi-cache an
   - Key Kernel Steps
       - Create the Matmul object: use MatmulTypeWithScale to define the parameter type information of A, scaleA, B, and scaleB, including memory logical position, data format, data type, and transpose information.
         ```cpp
-        typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, false, AscendC::TPosition::GM, CubeFormat::ND, false> aType;
-        typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, false, AscendC::TPosition::GM, CubeFormat::ND, true> bType;
+        typedef AscendC::MatmulTypeWithScale<
+            AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, false, AscendC::TPosition::GM,
+            CubeFormat::ND, false>
+            aType;
+        typedef AscendC::MatmulTypeWithScale<
+            AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, false, AscendC::TPosition::GM,
+            CubeFormat::ND, true>
+            bType;
         typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType;
         typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
-        // When defining the matmul object, pass MatmulWithScalePolicy to enable the MxMatmul template policy
-        AscendC::Matmul<aType, bType, cType, biasType, CFG_MDL, AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>, AscendC::Impl::Detail::MatmulWithScalePolicy> matmulObj;
+        // When defining the matmul object, pass MatmulWithScalePolicy to enable the
+        // MxMatmul template policy
+        AscendC::Matmul<
+            aType, bType, cType, biasType, CFG_MDL, AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>,
+            AscendC::Impl::Detail::MatmulWithScalePolicy>
+            matmulObj;
         ```
       - Set the left matrix A and left quantization scale matrix scaleA, right matrix B and right quantization scale matrix scaleB, and Bias.
         ```cpp
@@ -85,7 +95,10 @@ Taking the left quantization scale matrix scaleA with K-direction multi-cache an
           std::cout << "Generate tiling failed." << std::endl;
           return {};
       }
-      // Bits 0-6 represent the ratio coefficient of the data load amount between scaleA and matrix A in the K direction, bits 8-14 represent the ratio coefficient between scaleB and matrix B in the K direction. 260 represents binary 0000 0001 0000 0100, using 100 in bits 0-6 to enable 4x cache.
+      // Bits 0-6 represent the ratio coefficient of the data load amount between
+      // scaleA and matrix A in the K direction, bits 8-14 represent the ratio
+      // coefficient between scaleB and matrix B in the K direction. 260 represents
+      // binary 0000 0001 0000 0100, using 100 in bits 0-6 to enable 4x cache.
       tilingData.mxTypePara = 16843012;
       ```
 

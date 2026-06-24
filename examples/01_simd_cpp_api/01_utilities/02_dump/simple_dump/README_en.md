@@ -14,7 +14,7 @@ This example introduces the usage of the asc_dump_xxx series APIs to enable tens
 
 ## Directory Structure
 
-```
+```text
 ├── simple_dump
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data
@@ -34,7 +34,7 @@ This example introduces the usage of the asc_dump_xxx series APIs to enable tens
 
   The matrix multiplication formula is:
 
-  ```
+  ```text
   C = A * B
   ```
 

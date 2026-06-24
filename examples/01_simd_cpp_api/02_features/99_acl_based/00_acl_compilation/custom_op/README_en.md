@@ -18,7 +18,7 @@ This example uses a simple custom operator to demonstrate the process of buildin
 
 ## Directory Structure
 
-```
+```text
 ├── custom_op
 │   ├── CMakeLists.txt               // Top-level build project file
 │   ├── framework                    // Framework adaptation plugin directory
@@ -44,7 +44,7 @@ This example uses a simple custom operator to demonstrate the process of buildin
 
 The Add computation formula is:
 
-```
+```text
 z = x + y
 ```
 

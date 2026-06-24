@@ -14,7 +14,7 @@ This example uses the [AscendQuant](https://gitcode.com/cann/asc-devkit/blob/mas
 
 ## Directory Structure
 
-```
+```text
 ├── quant
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

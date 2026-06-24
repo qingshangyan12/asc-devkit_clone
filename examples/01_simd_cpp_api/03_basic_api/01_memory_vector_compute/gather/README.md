@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── gather
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
@@ -46,7 +46,7 @@
 - 数据类型：uint32_t
 - 实现：
     ```cpp
-    AscendC::GatherMask (dstLocal, src0Local, src1Local, reduceMode, mask, gatherMaskParams, rsvdCnt);
+    AscendC::GatherMask(dstLocal, src0Local, src1Local, reduceMode, mask, gatherMaskParams, rsvdCnt);
     ```
 - 参数：使用用户提供的Tensor进行元素选取，reduceMode=true（Counter模式），mask=70，gatherMaskParams={1, 2, 4, 0}
 

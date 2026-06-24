@@ -14,7 +14,7 @@ A fused programming implementation with separate AIC and AIV cores, mainly intro
 
 ## Directory Structure
 
-```
+```text
 ├── matmul_fused
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── msprof
 │   ├── CMakeLists.txt       // 编译工程文件
 │   ├── msprof.asc           // Ascend C样例实现和Host侧调用样例

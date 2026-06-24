@@ -18,7 +18,7 @@ AdjustSoftMaxRes用于对SoftMax计算结果做后处理，当输入的max中存
 
 ## 目录结构介绍
 
-```
+```text
 ├── softmax
 │   ├── scripts
 │   │   └── gen_data.py         // 输入数据和真值数据生成脚本

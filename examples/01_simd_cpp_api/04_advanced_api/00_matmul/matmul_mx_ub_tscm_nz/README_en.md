@@ -11,7 +11,7 @@ An MxMatmul example that uses user-defined TSCM and VECOUT input in MXFP4/MXFP8 
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── matmul_mx_ub_tscm_nz
 │   ├── scripts
 │   │   ├── gen_data.py                       // Script for generating input data and ground truth data
@@ -44,40 +44,48 @@ An MxMatmul example that uses user-defined TSCM and VECOUT input in MXFP4/MXFP8 
   - Key Kernel Steps
     - Create the Matmul object: use MatmulTypeWithScale to enable scaleA and scaleB, set the memory logical positions of the left and right matrices to VECOUT, set the memory logical positions of the left and right quantization scale matrices to TSCM, set the physical layout format of all input matrix data to NZ, and set the SCALE_ISTRANS parameter of scaleB to true.
       ```cpp
-      using aType = AscendC::MatmulTypeWithScale<AscendC::TPosition::VECOUT, AscendC::TPosition::TSCM, CubeFormat::NZ, fp4x2_e1m2_t, false, AscendC::TPosition::GM, CubeFormat::NZ, false, AscendC::TPosition::GM>;
-      using bType = AscendC::MatmulTypeWithScale<AscendC::TPosition::VECOUT, AscendC::TPosition::TSCM, CubeFormat::NZ, fp4x2_e1m2_t, false, AscendC::TPosition::GM, CubeFormat::NZ, true, AscendC::TPosition::GM>;
+      using aType = AscendC::MatmulTypeWithScale<
+          AscendC::TPosition::VECOUT, AscendC::TPosition::TSCM, CubeFormat::NZ, fp4x2_e1m2_t, false, AscendC::TPosition::GM,
+          CubeFormat::NZ, false, AscendC::TPosition::GM>;
+      using bType = AscendC::MatmulTypeWithScale<
+          AscendC::TPosition::VECOUT, AscendC::TPosition::TSCM, CubeFormat::NZ, fp4x2_e1m2_t, false, AscendC::TPosition::GM,
+          CubeFormat::NZ, true, AscendC::TPosition::GM>;
       using cType = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float>;
       using biasType = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float>;
-      // When defining the matmul object, pass MatmulWithScalePolicy to enable the MxMatmul template policy
-      AscendC::Matmul<aType, bType, cType, biasType, CFG_MDL, AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>, AscendC::Impl::Detail::MatmulWithScalePolicy> matmulObj;
+      // When defining the matmul object, pass MatmulWithScalePolicy to enable the
+      // MxMatmul template policy
+      AscendC::Matmul<
+          aType, bType, cType, biasType, CFG_MDL, AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>,
+          AscendC::Impl::Detail::MatmulWithScalePolicy>
+          matmulObj;
       ```
     - Set the left matrix A and left quantization scale matrix scaleA, right matrix B and right quantization scale matrix scaleB, and Bias.
       ```cpp
       // SetTensorA
-      pipe->InitBuffer(leftMatrixQue, 1, tiling.singleCoreM * tiling.singleCoreK);
+      pipe->InitBuffer(leftMatrixQue, 1, tiling.singleCoreM* tiling.singleCoreK);
       bufferLeft = leftMatrixQue.AllocTensor<fp4x2_e1m2_t>();
-      DataCopy(bufferLeft, aGlobal, tiling.singleCoreM * tiling.singleCoreK);
+      DataCopy(bufferLeft, aGlobal, tiling.singleCoreM* tiling.singleCoreK);
       AscendC::PipeBarrier<PIPE_ALL>();
       matmulObj.SetTensorA(bufferLeft, isTransA);
-      
+
       // SetTensorB
-      pipe->InitBuffer(rightMatrixQue, 1, tiling.singleCoreK * tiling.singleCoreN);
+      pipe->InitBuffer(rightMatrixQue, 1, tiling.singleCoreK* tiling.singleCoreN);
       bufferRight = rightMatrixQue.AllocTensor<fp4x2_e1m2_t>();
-      DataCopy(bufferRight, bGlobal, tiling.singleCoreK * tiling.singleCoreN);
+      DataCopy(bufferRight, bGlobal, tiling.singleCoreK* tiling.singleCoreN);
       AscendC::PipeBarrier<PIPE_ALL>();
       matmulObj.SetTensorB(bufferRight, isTransB);
-      
+
       // SetTensorScaleA
-      pipe->InitBuffer(qidMxA1, 1, alignSingleCoreM * alignSingleCoreK / 32);
+      pipe->InitBuffer(qidMxA1, 1, alignSingleCoreM* alignSingleCoreK / 32);
       bufferLeftScale = qidMxA1.AllocTensor<fp8_e8m0_t>();
-      DataCopy(bufferLeftScale, asGlobal, tiling.singleCoreM * tiling.singleCoreK / 32);
+      DataCopy(bufferLeftScale, asGlobal, tiling.singleCoreM* tiling.singleCoreK / 32);
       AscendC::PipeBarrier<PIPE_ALL>();
       matmulObj.SetTensorScaleA(bufferLeftScale, isTransScaleA);
 
       // SetTensorScaleB
-      pipe->InitBuffer(qidMxB1, 1, alignSingleCoreN * alignSingleCoreK / 32);
+      pipe->InitBuffer(qidMxB1, 1, alignSingleCoreN* alignSingleCoreK / 32);
       bufferRightScale = qidMxB1.AllocTensor<fp8_e8m0_t>();
-      DataCopy(bufferRightScale, bsGlobal, tiling.singleCoreK * tiling.singleCoreN / 32);
+      DataCopy(bufferRightScale, bsGlobal, tiling.singleCoreK* tiling.singleCoreN / 32);
       AscendC::PipeBarrier<PIPE_ALL>();
       matmulObj.SetTensorScaleB(bufferRightScale, isTransScaleB);
 
@@ -89,14 +97,12 @@ An MxMatmul example that uses user-defined TSCM and VECOUT input in MXFP4/MXFP8 
   - Key Tiling Steps
     - Create a Tiling object: use SetMadType to enable the Mx feature, use SetScaleAType to set scaleA information, and use SetScaleBType to set scaleB information.
       ```cpp
-      cubeTiling.SetAType(matmul_tiling::TPosition::VECOUT, matmul_tiling::CubeFormat::NZ,
-          matmul_tiling::DataType::DT_FLOAT8_E5M2, isAtrans);
-      cubeTiling.SetBType(matmul_tiling::TPosition::VECOUT, matmul_tiling::CubeFormat::NZ,
-          matmul_tiling::DataType::DT_FLOAT8_E5M2, isBtrans);
-      cubeTiling.SetCType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND,
-          matmul_tiling::DataType::DT_FLOAT);
-      cubeTiling.SetBiasType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND,
-          matmul_tiling::DataType::DT_FLOAT);
+      cubeTiling.SetAType(
+          matmul_tiling::TPosition::VECOUT, matmul_tiling::CubeFormat::NZ, matmul_tiling::DataType::DT_FLOAT8_E5M2, isAtrans);
+      cubeTiling.SetBType(
+          matmul_tiling::TPosition::VECOUT, matmul_tiling::CubeFormat::NZ, matmul_tiling::DataType::DT_FLOAT8_E5M2, isBtrans);
+      cubeTiling.SetCType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT);
+      cubeTiling.SetBiasType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT);
       cubeTiling.SetScaleAType(matmul_tiling::TPosition::TSCM, matmul_tiling::CubeFormat::NZ, isScaleATrans);
       cubeTiling.SetScaleBType(matmul_tiling::TPosition::TSCM, matmul_tiling::CubeFormat::NZ, isScaleBTrans);
       cubeTiling.SetMadType(matmul_tiling::MatrixMadType::MXMODE);

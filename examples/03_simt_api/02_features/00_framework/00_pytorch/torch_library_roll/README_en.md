@@ -13,7 +13,7 @@ This example uses the Roll operator to demonstrate how to register custom operat
 
 ## Directory Structure
 
-```
+```text
 ├── torch_library_roll
 │   ├── CMakeLists.txt          // Build project file
 │   ├── roll_custom.asc         // Ascend C operator implementation & torch.library registration
@@ -80,18 +80,13 @@ This example uses the Roll operator to demonstrate how to register custom operat
   PyTorch provides the `TORCH_LIBRARY` macro as the core interface for custom operator registration, used to create and initialize the custom operator library. After registration, the operator can be called from the Python side through `torch.ops.namespace.op_name`:
 
   ```c++
-  TORCH_LIBRARY(ascendc_ops, m) {
-      m.def("ascendc_roll(Tensor x, int[] shifts, int[] dims) -> Tensor");
-  }
+  TORCH_LIBRARY(ascendc_ops, m) { m.def("ascendc_roll(Tensor x, int[] shifts, int[] dims) -> Tensor"); }
   ```
 
   `TORCH_LIBRARY_IMPL` is used to bind the operator to a specific `DispatchKey` (PyTorch device scheduling identifier). For NPU devices, the operator implementation must be registered to the `PrivateUse1` dedicated `DispatchKey`:
 
   ```c++
-  TORCH_LIBRARY_IMPL(ascendc_ops, PrivateUse1, m)
-  {
-      m.impl("ascendc_roll", TORCH_FN(ascendc_ops::ascendc_roll));
-  }
+  TORCH_LIBRARY_IMPL(ascendc_ops, PrivateUse1, m) { m.impl("ascendc_roll", TORCH_FN(ascendc_ops::ascendc_roll)); }
   ```
 
   After registration is complete, the custom operator can be called directly from the Python side through `torch.ops.ascendc_ops.ascendc_roll(...)`.

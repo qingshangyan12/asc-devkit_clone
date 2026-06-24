@@ -13,7 +13,7 @@ A Matmul example with A and B matrices as int4b_t data type input.
 
 ## Directory Structure
 
-```
+```text
 ├── matmul_int4
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

@@ -14,7 +14,7 @@ This example implements an AddN example based on the static Tensor programming m
 
 ## Directory Structure
 
-```
+```text
 ├── list_tensor_desc_input
 │   ├── CMakeLists.txt              // Build project file
 │   ├── list_tensor_desc_input.asc  // Ascend C example implementation & invocation example
@@ -49,23 +49,23 @@ This example implements an AddN example based on the static Tensor programming m
     ```cpp
     constexpr uint32_t SHAPE_DIM = 2;
     struct TensorDesc {
-      uint32_t dim{SHAPE_DIM};
-      uint32_t index;
-      uint64_t shape[SHAPE_DIM] = {8, 2048};
+        uint32_t dim{SHAPE_DIM};
+        uint32_t index;
+        uint64_t shape[SHAPE_DIM] = {8, 2048};
     };
 
     constexpr uint32_t TENSOR_DESC_NUM = 2;
     struct ListTensorDesc {
-      uint64_t ptrOffset;
-      TensorDesc tensorDesc[TENSOR_DESC_NUM];
-      uintptr_t dataPtr[TENSOR_DESC_NUM];
+        uint64_t ptrOffset;
+        TensorDesc tensorDesc[TENSOR_DESC_NUM];
+        uintptr_t dataPtr[TENSOR_DESC_NUM];
     } inputDesc;
     ```
     Combine the allocated Tensor parameters into a ListTensorDesc data structure as shown below.
     ```cpp
     inputDesc = {(1 + (1 + SHAPE_DIM) * TENSOR_DESC_NUM) * sizeof(uint64_t),
-                {xDesc, yDesc},
-                {(uintptr_t)xDevice, (uintptr_t)yDevice}};
+                 {xDesc, yDesc},
+                 {(uintptr_t)xDevice, (uintptr_t)yDevice}};
     ``` 
     Parse the corresponding parameters according to the passed data format as shown below.
 

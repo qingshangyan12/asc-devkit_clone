@@ -14,7 +14,7 @@ This example uses the SoftmaxFlashV2 high-level API in a large language model at
 
 ## Directory Structure
 
-```
+```text
 ├── softmaxflashv2
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

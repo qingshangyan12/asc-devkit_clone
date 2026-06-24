@@ -11,7 +11,7 @@ This example implements the Reduce operation based on the Reg programming interf
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── reduce
 │   ├── scripts
 │   │   ├── gen_data.py                // Input data and ground truth generation script

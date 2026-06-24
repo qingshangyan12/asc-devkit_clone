@@ -14,7 +14,7 @@ This example uses high-level APIs to implement fused computation of Matmul and L
 
 ## Directory Structure
 
-```
+```text
 ├── matmul_leakyrelu_advanced_api
 │   ├── CMakeLists.txt          // Build project file
 │   ├── data_utils.h            // Data read and write functions
@@ -31,7 +31,7 @@ This example uses high-level APIs to implement fused computation of Matmul and L
   This example uses the Ascend C Matmul high-level API to implement fused computation of matrix multiplication, Bias addition, and LeakyRelu activation function. The Matmul high-level API encapsulates details such as data movement during matrix computation, Cube computation scheduling, and basic pipeline synchronization. Developers primarily need to complete matrix shape configuration, tiling generation, input Tensor setup, Vector-side fusion computation, and result write-back.
 
   The MatmulLeakyRelu computation formula is as follows:
-  ```
+  ```text
   C = A * B + Bias
   C = C > 0 ? C : C * 0.001
   ```
@@ -110,10 +110,13 @@ This example uses high-level APIs to implement fused computation of Matmul and L
   **`AscendC::DataCopyParams`** — Used by the `DataCopy` interface to describe data movement parameters from Local Memory to Global Memory:
   ```cpp
   struct DataCopyParams {
-      uint16_t blockCount;  // Number of consecutive data blocks to be moved, [1, 4095]
-      uint16_t blockLen;    // Length of each consecutive data block, in DataBlock (32 bytes), [1, 65535]
-      uint16_t srcGap;      // Gap between adjacent consecutive data blocks of source operand, in DataBlock (32 bytes)
-      uint16_t dstGap;      // Gap between adjacent consecutive data blocks of destination operand, in DataBlock (32 bytes)
+      uint16_t blockCount; // Number of consecutive data blocks to be moved, [1, 4095]
+      uint16_t blockLen;   // Length of each consecutive data block, in DataBlock (32
+                           // bytes), [1, 65535]
+      uint16_t srcGap;     // Gap between adjacent consecutive data blocks of source
+                           // operand, in DataBlock (32 bytes)
+      uint16_t dstGap;     // Gap between adjacent consecutive data blocks of
+                           // destination operand, in DataBlock (32 bytes)
   };
   ```
   This example uses `{tiling.baseM, tiling.baseN * sizeof(float) / AscendC::DEFAULT_C0_SIZE, 0, (tiling.N - tiling.baseN) * sizeof(float) / AscendC::DEFAULT_C0_SIZE}` when moving out matrix C blocks. Here, `blockCount` indicates moving `baseM` rows, `blockLen` indicates the amount of data corresponding to `baseN` matrix C elements per row. `dstGap` indicates the element gap between adjacent rows on the destination side, used to write `baseM * baseN` blocks back to the corresponding column range of the complete `M * N` matrix.

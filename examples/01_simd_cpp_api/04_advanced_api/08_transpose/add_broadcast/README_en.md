@@ -14,7 +14,7 @@ This example describes the direct invocation method for the Add operator kernel 
 
 ## Directory Structure
 
-```
+```text
 ├── add_broadcast
 │   ├── scripts
 │   │   ├── gen_data.py          // Script for generating input data and ground truth data
@@ -29,7 +29,7 @@ This example describes the direct invocation method for the Add operator kernel 
 
 - Operator function:  
   The Add operator adds two data inputs and returns the sum. The corresponding mathematical expression is:
-  ```
+  ```text
   z = x + y
   ```
 - Operator specifications:

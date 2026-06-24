@@ -56,18 +56,16 @@ Quantize<config>(dstLocal, srcLocal, sharedTmpBuffer, scale, offset, params);
 
 // 策略模板
 TopK<T, isInitIndex, false, isReuseSrc, topkMode, config>(
-    dstValueLocal, dstIndexLocal, srcValueLocal, srcIndexLocal,
-    finishLocal, tmp, k, tiling, topKInfo, isLargest);
+    dstValueLocal, dstIndexLocal, srcValueLocal, srcIndexLocal, finishLocal, tmp, k, tiling, topKInfo, isLargest);
 
 // 对象生命周期封装
-template <class A_TYPE, class B_TYPE, class C_TYPE,
-          class BIAS_TYPE = half, class C_TYPE_2 = C_TYPE>
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE = half, class C_TYPE_2 = C_TYPE>
 class MatmulImpl {
 public:
     __aicore__ inline MatmulImpl() {}
-    __aicore__ inline void Init(...) { }
-    __aicore__ inline void Iterate(...) { }
-    __aicore__ inline void GetTensorC(...) { }
+    __aicore__ inline void Init(...) {}
+    __aicore__ inline void Iterate(...) {}
+    __aicore__ inline void GetTensorC(...) {}
     // ...
 };
 ```
@@ -109,15 +107,16 @@ UT 要覆盖的是这些合约组合，而不是只验证某个基础 `DataCopy`
 template <typename SrcT, typename DstT, typename ScaleT, bool hasOffset, bool hasWorkspace>
 class KernelQuantizePerTensor {
 public:
-    __aicore__ inline void Init(GM_ADDR srcGm, GM_ADDR dstGm, GM_ADDR scaleGm,
-                                GM_ADDR offsetGm, uint32_t m, uint32_t n) {
+    __aicore__ inline void Init(GM_ADDR srcGm, GM_ADDR dstGm, GM_ADDR scaleGm, GM_ADDR offsetGm, uint32_t m, uint32_t n)
+    {
         srcGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ SrcT*>(srcGm), m * n);
         dstGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ DstT*>(dstGm), m * n);
         pipe.InitBuffer(inQueue, 1, m * n * sizeof(SrcT));
         pipe.InitBuffer(outQueue, 1, m * n * sizeof(DstT));
     }
 
-    __aicore__ inline void Compute() {
+    __aicore__ inline void Compute()
+    {
         constexpr static QuantizeConfig config = {QuantizePolicy::PER_TENSOR, hasOffset};
         QuantizeParams params;
         params.m = m;
@@ -162,7 +161,7 @@ public:
 
 ### 3.6 测试目录结构
 
-```
+```text
 tests/api/adv_api/
 ├── activation/
 ├── filter/
@@ -305,13 +304,24 @@ API 类型判断、workspace 分支覆盖和 UT 执行时间统一查看 [常见
 
 ```cpp
 enum class TPosition : int32_t {
-    GM,           // Global Memory
-    A1, B1, C1,   // L1 缓冲区
-    A2, B2, C2,   // L0 缓冲区
-    CO1, CO2,     // Cube 输出缓冲区
-    VECIN, VECOUT, VECCALC,  // Vector 核心缓冲区
-    LCM, SPM, SHM, TSCM,     // 其他存储区域
-    C2PIPE2GM, C2PIPE2LOCAL,
+    GM, // Global Memory
+    A1,
+    B1,
+    C1, // L1 缓冲区
+    A2,
+    B2,
+    C2, // L0 缓冲区
+    CO1,
+    CO2, // Cube 输出缓冲区
+    VECIN,
+    VECOUT,
+    VECCALC, // Vector 核心缓冲区
+    LCM,
+    SPM,
+    SHM,
+    TSCM, // 其他存储区域
+    C2PIPE2GM,
+    C2PIPE2LOCAL,
     MAX,
 };
 ```
@@ -322,9 +332,9 @@ enum class TPosition : int32_t {
 
 ```cpp
 enum class CubeFormat : int32_t {
-    ND,   // ND 格式
-    NZ,   // NZ 格式
-    // ...
+    ND, // ND 格式
+    NZ, // NZ 格式
+        // ...
 };
 ```
 

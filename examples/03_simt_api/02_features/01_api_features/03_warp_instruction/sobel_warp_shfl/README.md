@@ -68,9 +68,9 @@ strength = |Gx| + |Gy|
 为保证同一个Warp内的32个线程始终处理同一行像素，采用如下坐标映射方式：
 
 ```cpp
-int tiles_x = (width + warpSize - 1) / warpSize;    // 图像宽度方向按Warp分块的块数（每块32列）
-int x = (warp_id % tiles_x) * warpSize + lane_id;   // 像素列号：当前Warp在横向的起始位置 + Warp内偏移，保证同Warp同行
-int y = warp_id / tiles_x;                          // 像素行号：第几行Warp
+int tiles_x = (width + warpSize - 1) / warpSize; // 图像宽度方向按Warp分块的块数（每块32列）
+int x = (warp_id % tiles_x) * warpSize + lane_id; // 像素列号：当前Warp在横向的起始位置 + Warp内偏移，保证同Warp同行
+int y = warp_id / tiles_x;                        // 像素行号：第几行Warp
 ```
 
 <p align="center">
@@ -145,11 +145,7 @@ if (edge_mask & lanemask_eq()) {
     // 统计当前线程之前有多少个边缘线程，得到本Warp内的紧凑写入偏移。
     uint32_t lower_mask = edge_mask & lanemask_lt();
     int local_idx = __popc(lower_mask);
-    edge_list[warp_base + local_idx] = {
-        static_cast<uint16_t>(x),
-        static_cast<uint16_t>(y),
-        strength
-    };
+    edge_list[warp_base + local_idx] = {static_cast<uint16_t>(x), static_cast<uint16_t>(y), strength};
 }
 ```
 
@@ -185,6 +181,6 @@ if (edge_mask & lanemask_eq()) {
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
 
   执行结果如下，说明精度对比成功。
-  ```
+  ```bash
   [Success] Case accuracy verification passed.
   ```

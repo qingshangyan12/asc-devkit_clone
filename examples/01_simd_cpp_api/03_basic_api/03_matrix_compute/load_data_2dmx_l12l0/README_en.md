@@ -18,7 +18,7 @@ The example takes FP4 / FP8 type A / B matrices and fp8_e8m0_t type scaleA / sca
 
 ## Directory Structure
 
-```
+```text
 ├── load_data_2dmx_l12l0
 │   ├── scripts
 │   │   ├── gen_data.py             // Script for generating input data and ground truth data
@@ -36,7 +36,7 @@ The example takes FP4 / FP8 type A / B matrices and fp8_e8m0_t type scaleA / sca
 
 The overall MX matrix multiplication flow is as follows:
 
-```
+```text
 GM(ND) --DataCopy--> L1(Nz/Zz/Nn) --LoadData(LoadData2DParamsV2, LoadData2DMxParams)--> L0A(Nz)/L0B(Zn)/L0A_MX(Zz)/L0B_MX(Nn) --MmadMx--> L0C(Nz) --Fixpipe--> GM(ND)
 ```
 
@@ -322,7 +322,8 @@ The subsequent code and parameter descriptions repeatedly use fractal, alignment
 - `CeilAlign`: Ceiling alignment operation. For example, when `m = 30`, `CeilAlign(30, 16) = 32`.
 
 ```cpp
-__aicore__ inline uint16_t CeilAlign(uint16_t size, uint16_t alignValue) {
+__aicore__ inline uint16_t CeilAlign(uint16_t size, uint16_t alignValue)
+{
     return (size + alignValue - 1) / alignValue * alignValue;
 }
 ```
@@ -456,14 +457,18 @@ The `DataCopy(Nd2NzParams)` notation below refers to calling the `DataCopy` inst
 
 ```cpp
 AscendC::Nd2NzParams nd2nzA1Params;
-nd2nzA1Params.ndNum = 1; // Number of ND matrices
-nd2nzA1Params.nValue = m; // Row count of source ND matrix
-nd2nzA1Params.dValue = packedK; // Column count of source ND matrix configured as B8 view
-nd2nzA1Params.srcNdMatrixStride = 0; // Start address offset between adjacent ND matrices in source operand
-nd2nzA1Params.srcDValue = packedK;  // Start address offset between adjacent rows within the same ND matrix, configured as B8 view
-nd2nzA1Params.dstNzC0Stride = mAlignL1; // After ND -> Nz, start address interval of segments split from the same row, unit 32B
-nd2nzA1Params.dstNzNStride = 1;     // Offset in dst between row x and row x+1 of ND matrix after Nz conversion
-nd2nzA1Params.dstNzMatrixStride = 0; // Offset between adjacent Nz matrix start addresses in destination Nz matrix, meaningless when set to 0
+nd2nzA1Params.ndNum = 1;                // Number of ND matrices
+nd2nzA1Params.nValue = m;               // Row count of source ND matrix
+nd2nzA1Params.dValue = packedK;         // Column count of source ND matrix configured as B8 view
+nd2nzA1Params.srcNdMatrixStride = 0;    // Start address offset between adjacent ND matrices in source operand
+nd2nzA1Params.srcDValue = packedK;      // Start address offset between adjacent rows within the same ND
+                                        // matrix, configured as B8 view
+nd2nzA1Params.dstNzC0Stride = mAlignL1; // After ND -> Nz, start address interval of segments split from
+                                        // the same row, unit 32B
+nd2nzA1Params.dstNzNStride = 1;         // Offset in dst between row x and row x+1 of ND
+                                        // matrix after Nz conversion
+nd2nzA1Params.dstNzMatrixStride = 0;    // Offset between adjacent Nz matrix start addresses in destination Nz
+                                        // matrix, meaningless when set to 0
 AscendC::DataCopy(a1Local, aGM, nd2nzA1Params);
 ```
 
@@ -475,17 +480,22 @@ AscendC::DataCopy(a1Local, aGM, nd2nzA1Params);
 
 ```cpp
 if constexpr (AscendC::IsSameType<TA, fp8_e4m3fn_t>::value || AscendC::IsSameType<TA, fp8_e5m2_t>::value) {
-    // Fill A matrix L1 data as uint16 type with 0; when dst is on A1, Fill blockNum unit is 32B.
+    // Fill A matrix L1 data as uint16 type with 0; when dst is on A1, Fill
+    // blockNum unit is 32B.
     const uint32_t heightAlign = CeilAlign(m, fractalShape[0]);
     auto padTensor = a1Local.template ReinterpretCast<uint16_t>();
     AscendC::InitConstValueParams<uint16_t> initConstValueParams;
-    // repeatTimes represents iteration count; iterate in row direction, covering each row after m aligned to 16.
+    // repeatTimes represents iteration count; iterate in row direction, covering
+    // each row after m aligned to 16.
     initConstValueParams.repeatTimes = heightAlign;
-    // blockNum represents the number of data blocks (32B) initialized per iteration; here only fill 1 32B block at col direction tail.
+    // blockNum represents the number of data blocks (32B) initialized per
+    // iteration; here only fill 1 32B block at col direction tail.
     initConstValueParams.blockNum = 1;
-    // initValue represents initialization value; fill invalid data with 0 to prevent participation in MmadMx computation.
+    // initValue represents initialization value; fill invalid data with 0 to
+    // prevent participation in MmadMx computation.
     initConstValueParams.initValue = 0;
-    // dstOffset locates to the end of currently transferred data in col direction, subsequent Fill fills 1 32B block at the tail row by row.
+    // dstOffset locates to the end of currently transferred data in col
+    // direction, subsequent Fill fills 1 32B block at the tail row by row.
     uint32_t dstOffset = heightAlign * (CeilAlign(packedK, SCALE_CEIL_NUMBER) / 2);
     AscendC::Fill(padTensor[dstOffset], initConstValueParams);
 }
@@ -512,14 +522,19 @@ if constexpr (AscendC::IsSameType<TA, fp8_e4m3fn_t>::value || AscendC::IsSameTyp
 ```cpp
 AscendC::Nd2NzParams nd2nzA1Params;
 uint16_t aColValue = isFP4 ? CeilDivision(m, 2) : m;
-nd2nzA1Params.ndNum = 1; // Number of ND matrices
-nd2nzA1Params.nValue = k; // Row count of source ND matrix
-nd2nzA1Params.dValue = aColValue; // Column count of source ND matrix configured as B8 view, 2 elements correspond to 1 B8 view element for FP4 input
-nd2nzA1Params.srcNdMatrixStride = 0; // Start address offset between adjacent ND matrices in source operand
-nd2nzA1Params.srcDValue = aColValue; // Start address offset between adjacent rows within the same ND matrix, configured as B8 view
-nd2nzA1Params.dstNzC0Stride = alignK; // After ND -> Nz, start address interval of segments split from the same row, unit 32B
-nd2nzA1Params.dstNzNStride = 1;      // Offset in dst between row x and row x+1 of ND matrix after Nz conversion
-nd2nzA1Params.dstNzMatrixStride = 0; // Offset between adjacent Nz matrix start addresses in destination Nz matrix, meaningless when set to 0
+nd2nzA1Params.ndNum = 1;              // Number of ND matrices
+nd2nzA1Params.nValue = k;             // Row count of source ND matrix
+nd2nzA1Params.dValue = aColValue;     // Column count of source ND matrix configured as B8 view, 2
+                                      // elements correspond to 1 B8 view element for FP4 input
+nd2nzA1Params.srcNdMatrixStride = 0;  // Start address offset between adjacent ND matrices in source operand
+nd2nzA1Params.srcDValue = aColValue;  // Start address offset between adjacent rows within the same ND
+                                      // matrix, configured as B8 view
+nd2nzA1Params.dstNzC0Stride = alignK; // After ND -> Nz, start address interval of segments split from the
+                                      // same row, unit 32B
+nd2nzA1Params.dstNzNStride = 1;       // Offset in dst between row x and row x+1 of ND
+                                      // matrix after Nz conversion
+nd2nzA1Params.dstNzMatrixStride = 0;  // Offset between adjacent Nz matrix start addresses in destination Nz
+                                      // matrix, meaningless when set to 0
 AscendC::DataCopy(a1Local, aGM, nd2nzA1Params);
 ```
 
@@ -531,18 +546,23 @@ AscendC::DataCopy(a1Local, aGM, nd2nzA1Params);
 
 ```cpp
 // Pad invalid data in row direction [k, alignK] range.
-// Fill A matrix L1 data as uint16 type with 0; when dst is on A1, Fill blockNum and dstGap unit is 32B.
+// Fill A matrix L1 data as uint16 type with 0; when dst is on A1, Fill blockNum
+// and dstGap unit is 32B.
 auto padTensor = a1Local.template ReinterpretCast<uint16_t>();
 AscendC::InitConstValueParams<uint16_t> initConstValueParams;
 // repeatTimes represents iteration count; iterate in col direction.
 initConstValueParams.repeatTimes = CeilDivision(m, FP8_C0SIZE);
-// blockNum represents the number of data blocks (32B) initialized per iteration; here fill invalid rows at row direction tail.
+// blockNum represents the number of data blocks (32B) initialized per
+// iteration; here fill invalid rows at row direction tail.
 initConstValueParams.blockNum = alignK - k;
-// dstGap represents the distance from the end address of the previous iteration to the start address of the next iteration; skip valid data in row direction.
+// dstGap represents the distance from the end address of the previous iteration
+// to the start address of the next iteration; skip valid data in row direction.
 initConstValueParams.dstGap = k;
-// initValue represents initialization value; fill invalid data with 0 to prevent participation in MmadMx computation.
+// initValue represents initialization value; fill invalid data with 0 to
+// prevent participation in MmadMx computation.
 initConstValueParams.initValue = 0;
-// Start address locates to the first fractal in row direction that needs zero-padding.
+// Start address locates to the first fractal in row direction that needs
+// zero-padding.
 AscendC::Fill(padTensor[k * fractalShape[0]], initConstValueParams);
 ```
 #### 5.2. B Matrix GM -> L1
@@ -569,14 +589,19 @@ AscendC::Fill(padTensor[k * fractalShape[0]], initConstValueParams);
 ```cpp
 AscendC::Nd2NzParams nd2nzB1Params;
 uint16_t bColValue = isFP4 ? CeilDivision(n, 2) : n;
-nd2nzB1Params.ndNum = 1; // Number of ND matrices
-nd2nzB1Params.nValue = k; // Row count of source ND matrix
-nd2nzB1Params.dValue = bColValue; // Column count of source ND matrix configured as B8 view, 2 elements correspond to 1 B8 view element for FP4 input
-nd2nzB1Params.srcNdMatrixStride = 0; // Start address offset between adjacent ND matrices in source operand
-nd2nzB1Params.srcDValue = bColValue; // Start address offset between adjacent rows within the same ND matrix, configured as B8 view
-nd2nzB1Params.dstNzC0Stride = alignK; // After ND -> Nz, start address interval of segments split from the same row, unit 32B
-nd2nzB1Params.dstNzNStride = 1; // Offset in dst between row x and row x+1 of ND matrix after Nz conversion
-nd2nzB1Params.dstNzMatrixStride = 0; // Offset between adjacent Nz matrix start addresses in destination Nz matrix, meaningless when set to 0
+nd2nzB1Params.ndNum = 1;              // Number of ND matrices
+nd2nzB1Params.nValue = k;             // Row count of source ND matrix
+nd2nzB1Params.dValue = bColValue;     // Column count of source ND matrix configured as B8 view, 2
+                                      // elements correspond to 1 B8 view element for FP4 input
+nd2nzB1Params.srcNdMatrixStride = 0;  // Start address offset between adjacent ND matrices in source operand
+nd2nzB1Params.srcDValue = bColValue;  // Start address offset between adjacent rows within the same ND
+                                      // matrix, configured as B8 view
+nd2nzB1Params.dstNzC0Stride = alignK; // After ND -> Nz, start address interval of segments split from the
+                                      // same row, unit 32B
+nd2nzB1Params.dstNzNStride = 1;       // Offset in dst between row x and row x+1 of ND
+                                      // matrix after Nz conversion
+nd2nzB1Params.dstNzMatrixStride = 0;  // Offset between adjacent Nz matrix start addresses in destination Nz
+                                      // matrix, meaningless when set to 0
 AscendC::DataCopy(b1Local, bGM, nd2nzB1Params);
 ```
 
@@ -588,18 +613,23 @@ AscendC::DataCopy(b1Local, bGM, nd2nzB1Params);
 
 ```cpp
 // Pad invalid data in row direction [k, alignK] range.
-// Fill B matrix L1 data as uint16 type with 0; when dst is on B1, Fill blockNum and dstGap unit is 32B.
+// Fill B matrix L1 data as uint16 type with 0; when dst is on B1, Fill blockNum
+// and dstGap unit is 32B.
 auto padTensor = b1Local.template ReinterpretCast<uint16_t>();
 AscendC::InitConstValueParams<uint16_t> initConstValueParams;
 // repeatTimes represents iteration count; iterate in col direction.
 initConstValueParams.repeatTimes = CeilDivision(n, FP8_C0SIZE);
-// blockNum represents the number of data blocks (32B) initialized per iteration; here fill invalid rows at row direction tail.
+// blockNum represents the number of data blocks (32B) initialized per
+// iteration; here fill invalid rows at row direction tail.
 initConstValueParams.blockNum = alignK - k;
-// dstGap represents the distance from the end address of the previous iteration to the start address of the next iteration; skip valid data in row direction.
+// dstGap represents the distance from the end address of the previous iteration
+// to the start address of the next iteration; skip valid data in row direction.
 initConstValueParams.dstGap = k;
-// initValue represents initialization value; fill invalid data with 0 to prevent participation in MmadMx computation.
+// initValue represents initialization value; fill invalid data with 0 to
+// prevent participation in MmadMx computation.
 initConstValueParams.initValue = 0;
-// Start address locates to the first fractal in row direction that needs zero-padding.
+// Start address locates to the first fractal in row direction that needs
+// zero-padding.
 AscendC::Fill(padTensor[k * fractalShape[0]], initConstValueParams);
 ```
 ##### 5.2.2. B Matrix GM Input is [n, k]
@@ -623,14 +653,18 @@ AscendC::Fill(padTensor[k * fractalShape[0]], initConstValueParams);
 
 ```cpp
 AscendC::Nd2NzParams nd2nzB1Params;
-nd2nzB1Params.ndNum = 1; // Number of ND matrices
-nd2nzB1Params.nValue = n; // Row count of source ND matrix
-nd2nzB1Params.dValue = packedK; // Column count of source ND matrix configured as B8 view
-nd2nzB1Params.srcNdMatrixStride = 0; // Start address offset between adjacent ND matrices in source operand
-nd2nzB1Params.srcDValue = packedK; // Start address offset between adjacent rows within the same ND matrix, configured as B8 view
-nd2nzB1Params.dstNzC0Stride = nAlignL1; // After ND -> Nz, start address interval of segments split from the same row, unit 32B
-nd2nzB1Params.dstNzNStride = 1; // Offset in dst between row x and row x+1 of ND matrix after Nz conversion
-nd2nzB1Params.dstNzMatrixStride = 0; // Offset between adjacent Nz matrix start addresses in destination Nz matrix, meaningless when set to 0
+nd2nzB1Params.ndNum = 1;                // Number of ND matrices
+nd2nzB1Params.nValue = n;               // Row count of source ND matrix
+nd2nzB1Params.dValue = packedK;         // Column count of source ND matrix configured as B8 view
+nd2nzB1Params.srcNdMatrixStride = 0;    // Start address offset between adjacent ND matrices in source operand
+nd2nzB1Params.srcDValue = packedK;      // Start address offset between adjacent rows within the same ND
+                                        // matrix, configured as B8 view
+nd2nzB1Params.dstNzC0Stride = nAlignL1; // After ND -> Nz, start address interval of segments split from
+                                        // the same row, unit 32B
+nd2nzB1Params.dstNzNStride = 1;         // Offset in dst between row x and row x+1 of ND
+                                        // matrix after Nz conversion
+nd2nzB1Params.dstNzMatrixStride = 0;    // Offset between adjacent Nz matrix start addresses in destination Nz
+                                        // matrix, meaningless when set to 0
 AscendC::DataCopy(b1Local, bGM, nd2nzB1Params);
 ```
 
@@ -642,17 +676,22 @@ AscendC::DataCopy(b1Local, bGM, nd2nzB1Params);
 
 ```cpp
 if constexpr (AscendC::IsSameType<TB, fp8_e4m3fn_t>::value || AscendC::IsSameType<TB, fp8_e5m2_t>::value) {
-    // Fill B matrix L1 data as uint16 type with 0; when dst is on B1, Fill blockNum unit is 32B.
+    // Fill B matrix L1 data as uint16 type with 0; when dst is on B1, Fill
+    // blockNum unit is 32B.
     const uint32_t heightAlign = CeilAlign(n, fractalShape[0]);
     auto padTensor = b1Local.template ReinterpretCast<uint16_t>();
     AscendC::InitConstValueParams<uint16_t> initConstValueParams;
-    // repeatTimes represents iteration count; iterate in row direction, covering each row after n aligned to 16.
+    // repeatTimes represents iteration count; iterate in row direction, covering
+    // each row after n aligned to 16.
     initConstValueParams.repeatTimes = heightAlign;
-    // blockNum represents the number of data blocks (32B) initialized per iteration; here only fill 1 32B block at col direction tail.
+    // blockNum represents the number of data blocks (32B) initialized per
+    // iteration; here only fill 1 32B block at col direction tail.
     initConstValueParams.blockNum = 1;
-    // initValue represents initialization value; fill invalid data with 0 to prevent participation in MmadMx computation.
+    // initValue represents initialization value; fill invalid data with 0 to
+    // prevent participation in MmadMx computation.
     initConstValueParams.initValue = 0;
-    // dstOffset locates to the end of currently transferred data in col direction, subsequent Fill fills 1 32B block at the tail row by row.
+    // dstOffset locates to the end of currently transferred data in col
+    // direction, subsequent Fill fills 1 32B block at the tail row by row.
     uint32_t dstOffset = heightAlign * (CeilAlign(packedK, SCALE_CEIL_NUMBER) / 2);
     AscendC::Fill(padTensor[dstOffset], initConstValueParams);
 }
@@ -675,18 +714,21 @@ Use `Dn2NzParams` structure parameters (B16 view) for transfer.
 
 ```cpp
 AscendC::GlobalTensor<half> scaleAGMB16;
-scaleAGMB16.SetGlobalBuffer((__gm__ half *)(scaleAGM.GetPhyAddr()), m * scaleK / 2);
+scaleAGMB16.SetGlobalBuffer((__gm__ half*)(scaleAGM.GetPhyAddr()), m* scaleK / 2);
 auto scaleA1LocalB16 = scaleA1Local.ReinterpretCast<half>();
 
 AscendC::Dn2NzParams dn2nzParams;
-dn2nzParams.dnNum = 1; // Number of DN matrices in source operand
-dn2nzParams.dValue = m; // Row count of source DN matrix
-dn2nzParams.nValue = scaleK / 2; // Column count of source DN matrix, 2 fp8_e8m0_t combined into 1 half in B16 view
-dn2nzParams.srcDnMatrixStride = 0; // Start address offset between adjacent DN matrices in source operand
-dn2nzParams.srcDValue = scaleK / 2; // Start address offset between adjacent rows within the same DN matrix
-dn2nzParams.dstNzC0Stride = scaleK / 2; // After DN to Nz, start address interval of segments split from the same row, unit 32B
-dn2nzParams.dstNzNStride = 1; // Offset in dst between row x and row x+1 of DN matrix after Nz conversion
-dn2nzParams.dstNzMatrixStride = 0; // Start address offset between adjacent Nz matrices
+dn2nzParams.dnNum = 1;                  // Number of DN matrices in source operand
+dn2nzParams.dValue = m;                 // Row count of source DN matrix
+dn2nzParams.nValue = scaleK / 2;        // Column count of source DN matrix, 2
+                                        // fp8_e8m0_t combined into 1 half in B16 view
+dn2nzParams.srcDnMatrixStride = 0;      // Start address offset between adjacent DN matrices in source operand
+dn2nzParams.srcDValue = scaleK / 2;     // Start address offset between adjacent rows within the same DN matrix
+dn2nzParams.dstNzC0Stride = scaleK / 2; // After DN to Nz, start address interval of segments split from
+                                        // the same row, unit 32B
+dn2nzParams.dstNzNStride = 1;           // Offset in dst between row x and row x+1 of DN
+                                        // matrix after Nz conversion
+dn2nzParams.dstNzMatrixStride = 0;      // Start address offset between adjacent Nz matrices
 AscendC::DataCopy(scaleA1LocalB16, scaleAGMB16, dn2nzParams);
 ```
 
@@ -704,17 +746,20 @@ Use `Nd2NzParams` structure parameters (B16 view) for transfer.
 
 ```cpp
 AscendC::GlobalTensor<half> scaleAGMB16;
-scaleAGMB16.SetGlobalBuffer((__gm__ half *)(scaleAGM.GetPhyAddr()), m * scaleK / 2);
+scaleAGMB16.SetGlobalBuffer((__gm__ half*)(scaleAGM.GetPhyAddr()), m* scaleK / 2);
 auto scaleA1LocalB16 = scaleA1Local.ReinterpretCast<half>();
 
 AscendC::Nd2NzParams nd2nzParams;
-nd2nzParams.ndNum = 1; // Number of ND matrices in source operand
-nd2nzParams.nValue = scaleK / 2; // Row count of source ND matrix, 2 fp8 scale combined into 1 half in B16 view
-nd2nzParams.dValue = m; // Column count of source ND matrix
-nd2nzParams.srcDValue = m; // Start address offset between adjacent rows within the same ND matrix
-nd2nzParams.dstNzC0Stride = scaleK / 2; // After ND -> Nz, start address interval of segments split from the same row, unit 32B
-nd2nzParams.dstNzNStride = 1; // Offset in dst between row x and row x+1 of ND matrix after Nz conversion
-nd2nzParams.dstNzMatrixStride = 0; // Start address offset between adjacent Nz matrices
+nd2nzParams.ndNum = 1;                  // Number of ND matrices in source operand
+nd2nzParams.nValue = scaleK / 2;        // Row count of source ND matrix, 2 fp8 scale
+                                        // combined into 1 half in B16 view
+nd2nzParams.dValue = m;                 // Column count of source ND matrix
+nd2nzParams.srcDValue = m;              // Start address offset between adjacent rows within the same ND matrix
+nd2nzParams.dstNzC0Stride = scaleK / 2; // After ND -> Nz, start address interval of segments split from
+                                        // the same row, unit 32B
+nd2nzParams.dstNzNStride = 1;           // Offset in dst between row x and row x+1 of ND
+                                        // matrix after Nz conversion
+nd2nzParams.dstNzMatrixStride = 0;      // Start address offset between adjacent Nz matrices
 AscendC::DataCopy(scaleA1LocalB16, scaleAGMB16, nd2nzParams);
 ```
 #### 5.4. scaleB Matrix GM -> L1
@@ -735,17 +780,20 @@ Use `Nd2NzParams` structure parameters (B16 view) for transfer.
 
 ```cpp
 AscendC::GlobalTensor<half> scaleBGMB16;
-scaleBGMB16.SetGlobalBuffer((__gm__ half *)(scaleBGM.GetPhyAddr()), n * scaleK / 2);
+scaleBGMB16.SetGlobalBuffer((__gm__ half*)(scaleBGM.GetPhyAddr()), n* scaleK / 2);
 auto scaleB1LocalB16 = scaleB1Local.ReinterpretCast<half>();
 
 AscendC::Nd2NzParams nd2nzParams;
-nd2nzParams.ndNum = 1; // Number of ND matrices in source operand
-nd2nzParams.nValue = scaleK / 2; // Row count of source ND matrix, 2 fp8 scale combined into 1 half in B16 view
-nd2nzParams.dValue = n; // Column count of source ND matrix
-nd2nzParams.srcDValue = n; // Start address offset between adjacent rows within the same ND matrix
-nd2nzParams.dstNzC0Stride = scaleK / 2; // After ND -> Nz, start address interval of segments split from the same row, unit 32B
-nd2nzParams.dstNzNStride = 1; // Offset in dst between row x and row x+1 of ND matrix after Nz conversion
-nd2nzParams.dstNzMatrixStride = 0; // Start address offset between adjacent Nz matrices
+nd2nzParams.ndNum = 1;                  // Number of ND matrices in source operand
+nd2nzParams.nValue = scaleK / 2;        // Row count of source ND matrix, 2 fp8 scale
+                                        // combined into 1 half in B16 view
+nd2nzParams.dValue = n;                 // Column count of source ND matrix
+nd2nzParams.srcDValue = n;              // Start address offset between adjacent rows within the same ND matrix
+nd2nzParams.dstNzC0Stride = scaleK / 2; // After ND -> Nz, start address interval of segments split from
+                                        // the same row, unit 32B
+nd2nzParams.dstNzNStride = 1;           // Offset in dst between row x and row x+1 of ND
+                                        // matrix after Nz conversion
+nd2nzParams.dstNzMatrixStride = 0;      // Start address offset between adjacent Nz matrices
 AscendC::DataCopy(scaleB1LocalB16, scaleBGMB16, nd2nzParams);
 ```
 
@@ -763,18 +811,21 @@ Use `Dn2NzParams` structure parameters (B16 view) for transfer.
 
 ```cpp
 AscendC::GlobalTensor<half> scaleBGMB16;
-scaleBGMB16.SetGlobalBuffer((__gm__ half *)(scaleBGM.GetPhyAddr()), n * scaleK / 2);
+scaleBGMB16.SetGlobalBuffer((__gm__ half*)(scaleBGM.GetPhyAddr()), n* scaleK / 2);
 auto scaleB1LocalB16 = scaleB1Local.ReinterpretCast<half>();
 
 AscendC::Dn2NzParams dn2nzParams;
-dn2nzParams.dnNum = 1; // Number of DN matrices in source operand
-dn2nzParams.dValue = n; // Row count of source DN matrix
-dn2nzParams.nValue = scaleK / 2; // Column count of source DN matrix, 2 fp8 scale combined into 1 half in B16 view
-dn2nzParams.srcDnMatrixStride = 0; // Start address offset between adjacent DN matrices in source operand
-dn2nzParams.srcDValue = scaleK / 2; // Start address offset between adjacent rows within the same DN matrix
-dn2nzParams.dstNzC0Stride = scaleK / 2; // After DN to Nz, start address interval of segments split from the same row, unit 32B
-dn2nzParams.dstNzNStride = 1; // Offset in dst between row x and row x+1 of DN matrix after Nz conversion
-dn2nzParams.dstNzMatrixStride = 0; // Start address offset between adjacent Nz matrices
+dn2nzParams.dnNum = 1;                  // Number of DN matrices in source operand
+dn2nzParams.dValue = n;                 // Row count of source DN matrix
+dn2nzParams.nValue = scaleK / 2;        // Column count of source DN matrix, 2 fp8
+                                        // scale combined into 1 half in B16 view
+dn2nzParams.srcDnMatrixStride = 0;      // Start address offset between adjacent DN matrices in source operand
+dn2nzParams.srcDValue = scaleK / 2;     // Start address offset between adjacent rows within the same DN matrix
+dn2nzParams.dstNzC0Stride = scaleK / 2; // After DN to Nz, start address interval of segments split from
+                                        // the same row, unit 32B
+dn2nzParams.dstNzNStride = 1;           // Offset in dst between row x and row x+1 of DN
+                                        // matrix after Nz conversion
+dn2nzParams.dstNzMatrixStride = 0;      // Start address offset between adjacent Nz matrices
 AscendC::DataCopy(scaleB1LocalB16, scaleBGMB16, dn2nzParams);
 ```
 
@@ -847,23 +898,28 @@ AscendC::LoadData(b2Local, b1Local, scaleB1Local, loadDataParams, loadMxDataPara
 ```cpp
 AscendC::LoadData2DParamsV2 loadDataParams;
 loadDataParams.sid = 0;
-// Start transfer from row direction fractal 0, col direction 32B block 0 of A matrix L1 source operand
+// Start transfer from row direction fractal 0, col direction 32B block 0 of A
+// matrix L1 source operand
 loadDataParams.mStartPosition = 0;
 loadDataParams.kStartPosition = 0;
 // A matrix non-transposed input [m, k], L1 -> L0A no transpose needed
-// mStep/kStep represent row direction fractal count and col direction 32B block count respectively
+// mStep/kStep represent row direction fractal count and col direction 32B block
+// count respectively
 loadDataParams.mStep = CeilDivision(mAlignL1, fractalShape[0]);
 loadDataParams.kStep = CeilDivision(kaAlignL1, fractalShape[1]);
-// srcStride/dstStride represent source/destination matrix col direction adjacent fractal start address interval, unit 512B
+// srcStride/dstStride represent source/destination matrix col direction
+// adjacent fractal start address interval, unit 512B
 loadDataParams.srcStride = CeilDivision(mAlignL1, fractalShape[0]);
 loadDataParams.dstStride = CeilDivision(mAlignL0, fractalShape[0]);
 loadDataParams.ifTranspose = false;
 
 AscendC::LoadData2DMxParams loadMxDataParams;
-// scaleA synchronously starts transfer from row direction fractal 0, col direction 32B block 0 of L1 source operand
+// scaleA synchronously starts transfer from row direction fractal 0, col
+// direction 32B block 0 of L1 source operand
 loadMxDataParams.xStartPosition = 0;
 loadMxDataParams.yStartPosition = 0;
-// xStep/yStep configure scaleA row/col direction transfer length; stride configured by row direction adjacent fractal interval
+// xStep/yStep configure scaleA row/col direction transfer length; stride
+// configured by row direction adjacent fractal interval
 loadMxDataParams.xStep = CeilDivision(scaleMAlignL1, fractalShape[0]);
 loadMxDataParams.yStep = scaleK / SCALE_EVEN_NUMBER;
 loadMxDataParams.srcStride = scaleK / SCALE_EVEN_NUMBER;
@@ -895,23 +951,29 @@ AscendC::LoadData(a2Local, a1Local, scaleA1Local, loadDataParams, loadMxDataPara
 ```cpp
 AscendC::LoadData2DParamsV2 loadDataParams;
 loadDataParams.sid = 0;
-// Start transfer from row direction fractal 0, col direction 32B block 0 of A matrix L1 source operand
+// Start transfer from row direction fractal 0, col direction 32B block 0 of A
+// matrix L1 source operand
 loadDataParams.mStartPosition = 0;
 loadDataParams.kStartPosition = 0;
 // A matrix transposed input [k, m], L1 -> L0A needs transpose
-// During transpose transfer, A matrix shape on L1 is [kaAlignL1, mAlignL1], row direction corresponds to logical k dimension, col direction corresponds to logical m dimension
+// During transpose transfer, A matrix shape on L1 is [kaAlignL1, mAlignL1], row
+// direction corresponds to logical k dimension, col direction corresponds to
+// logical m dimension
 loadDataParams.mStep = CeilDivision(kaAlignL1, fractalShape[0]);
 loadDataParams.kStep = CeilDivision(mAlignL1, fractalShape[1]);
-// srcStride/dstStride represent source/destination matrix col direction adjacent fractal start address interval, unit 512B
+// srcStride/dstStride represent source/destination matrix col direction
+// adjacent fractal start address interval, unit 512B
 loadDataParams.srcStride = CeilDivision(kaAlignL1, fractalShape[0]);
 loadDataParams.dstStride = CeilDivision(mAlignL0, fractalShape[0]);
 loadDataParams.ifTranspose = true;
 
 AscendC::LoadData2DMxParams loadMxDataParams;
-// scaleA synchronously starts transfer from row direction fractal 0, col direction 32B block 0 of L1 source operand
+// scaleA synchronously starts transfer from row direction fractal 0, col
+// direction 32B block 0 of L1 source operand
 loadMxDataParams.xStartPosition = 0;
 loadMxDataParams.yStartPosition = 0;
-// xStep/yStep configure scaleA row/col direction transfer length; stride configured by row direction adjacent fractal interval
+// xStep/yStep configure scaleA row/col direction transfer length; stride
+// configured by row direction adjacent fractal interval
 loadMxDataParams.xStep = CeilDivision(scaleMAlignL1, fractalShape[0]);
 loadMxDataParams.yStep = scaleK / SCALE_EVEN_NUMBER;
 loadMxDataParams.srcStride = scaleK / SCALE_EVEN_NUMBER;
@@ -950,29 +1012,36 @@ AscendC::LoadData(a2Local, a1Local, scaleA1Local, loadDataParams, loadMxDataPara
 uint16_t mStepAlign = isFP4 ? FP4_M_STEP_ALIGN : FP8_M_STEP_ALIGN;
 AscendC::LoadData2DParamsV2 loadDataParams;
 loadDataParams.sid = 0;
-// kStartPosition is fixed to 0, each loop selects the current fractal in A matrix source row direction via mStartPosition
+// kStartPosition is fixed to 0, each loop selects the current fractal in A
+// matrix source row direction via mStartPosition
 loadDataParams.kStartPosition = 0;
-// Transpose transfer requires mStep aligned by data type: 4 fractals for FP4, 2 fractals for FP8
+// Transpose transfer requires mStep aligned by data type: 4 fractals for FP4, 2
+// fractals for FP8
 loadDataParams.mStep = mStepAlign;
 // kStep corresponds to 32B block count in A matrix source col direction
 loadDataParams.kStep = CeilDivision(mAlignL0, fractalShape[1]);
-// srcStride/dstStride represent source/destination matrix col direction adjacent fractal start address interval, unit 512B
+// srcStride/dstStride represent source/destination matrix col direction
+// adjacent fractal start address interval, unit 512B
 loadDataParams.srcStride = CeilDivision(kaAlignL1, fractalShape[0]);
 loadDataParams.dstStride = CeilDivision(mAlignL0, fractalShape[0]);
 loadDataParams.ifTranspose = true;
 
 AscendC::LoadData2DMxParams loadMxDataParams;
-// scaleA row direction start fractal and col direction start 32B block are fixed to 0
+// scaleA row direction start fractal and col direction start 32B block are
+// fixed to 0
 loadMxDataParams.xStartPosition = 0;
 loadMxDataParams.yStartPosition = 0;
-// srcStride/dstStride represent scaleA source/destination matrix row direction adjacent fractal start address interval, unit 32B
+// srcStride/dstStride represent scaleA source/destination matrix row direction
+// adjacent fractal start address interval, unit 32B
 loadMxDataParams.srcStride = scaleK / SCALE_EVEN_NUMBER;
 loadMxDataParams.dstStride = scaleK / SCALE_EVEN_NUMBER;
 
 uint32_t dstOffset = 0;
 uint16_t L0ALoopNum = CeilDivision(kaAlignL0, fractalShape[0] * fractalNum);
 for (uint16_t loopIdx = 0; loopIdx < L0ALoopNum; ++loopIdx) {
-    // mStartPosition increments, A matrix updates start address along m direction each iteration, scaleA matrix completes full transfer in first for loop, subsequent for loops skip transfer
+    // mStartPosition increments, A matrix updates start address along m direction
+    // each iteration, scaleA matrix completes full transfer in first for loop,
+    // subsequent for loops skip transfer
     loadDataParams.mStartPosition = mStepAlign * loopIdx;
     if (loopIdx != 0) {
         loadMxDataParams.xStep = 0;
@@ -1016,25 +1085,31 @@ The transfer method for B / scaleB matrices is similar to A / scaleA matrices. T
 ```cpp
 AscendC::LoadData2DParamsV2 loadDataParams;
 loadDataParams.sid = 0;
-// Start transfer from row direction fractal 0, col direction 32B block 0 of B matrix L1 source operand
+// Start transfer from row direction fractal 0, col direction 32B block 0 of B
+// matrix L1 source operand
 loadDataParams.mStartPosition = 0;
 loadDataParams.kStartPosition = 0;
 // B matrix transposed input [n, k], L1 -> L0B no transpose needed
-// mStep/kStep represent row direction fractal count and col direction 32B block count respectively
+// mStep/kStep represent row direction fractal count and col direction 32B block
+// count respectively
 loadDataParams.mStep = CeilDivision(nAlignL1, fractalShape[0]);
 loadDataParams.kStep = CeilDivision(kbAlignL1, fractalShape[1]);
-// srcStride/dstStride represent source/destination matrix col direction adjacent fractal start address interval, unit 512B
+// srcStride/dstStride represent source/destination matrix col direction
+// adjacent fractal start address interval, unit 512B
 loadDataParams.srcStride = CeilDivision(nAlignL1, fractalShape[0]);
 loadDataParams.dstStride = CeilDivision(nAlignL0, fractalShape[0]);
 loadDataParams.ifTranspose = false;
 
-// When configuring scaleB L1 -> L0B_MX transfer parameters, treat scaleNAlignL1 direction as row and scaleK direction as col
-// i.e., small fractal 16*2, 16 in row direction, 2 in col direction
+// When configuring scaleB L1 -> L0B_MX transfer parameters, treat scaleNAlignL1
+// direction as row and scaleK direction as col i.e., small fractal 16*2, 16 in
+// row direction, 2 in col direction
 AscendC::LoadData2DMxParams loadMxDataParams;
-// scaleB synchronously starts transfer from row direction fractal 0, col direction 32B block 0 of L1 source operand
+// scaleB synchronously starts transfer from row direction fractal 0, col
+// direction 32B block 0 of L1 source operand
 loadMxDataParams.xStartPosition = 0;
 loadMxDataParams.yStartPosition = 0;
-// xStep/yStep configure scaleB row/col direction transfer length; stride configured by row direction adjacent fractal interval
+// xStep/yStep configure scaleB row/col direction transfer length; stride
+// configured by row direction adjacent fractal interval
 loadMxDataParams.xStep = CeilDivision(scaleNAlignL1, fractalShape[0]);
 loadMxDataParams.yStep = scaleK / SCALE_EVEN_NUMBER;
 loadMxDataParams.srcStride = scaleK / SCALE_EVEN_NUMBER;
@@ -1066,25 +1141,32 @@ AscendC::LoadData(b2Local, b1Local, scaleB1Local, loadDataParams, loadMxDataPara
 ```cpp
 AscendC::LoadData2DParamsV2 loadDataParams;
 loadDataParams.sid = 0;
-// Start transfer from row direction fractal 0, col direction 32B block 0 of B matrix L1 source operand
+// Start transfer from row direction fractal 0, col direction 32B block 0 of B
+// matrix L1 source operand
 loadDataParams.mStartPosition = 0;
 loadDataParams.kStartPosition = 0;
 // B matrix non-transposed input [k, n], L1 -> L0B needs transpose
-// During transpose transfer, B matrix shape on L1 is [kbAlignL1, nAlignL1], row direction corresponds to logical k dimension, col direction corresponds to logical n dimension
+// During transpose transfer, B matrix shape on L1 is [kbAlignL1, nAlignL1], row
+// direction corresponds to logical k dimension, col direction corresponds to
+// logical n dimension
 loadDataParams.mStep = CeilDivision(kbAlignL1, fractalShape[0]);
 loadDataParams.kStep = CeilDivision(nAlignL1, fractalShape[1]);
-// srcStride/dstStride represent source/destination matrix col direction adjacent fractal start address interval, unit 512B
+// srcStride/dstStride represent source/destination matrix col direction
+// adjacent fractal start address interval, unit 512B
 loadDataParams.srcStride = CeilDivision(kbAlignL1, fractalShape[0]);
 loadDataParams.dstStride = CeilDivision(nAlignL0, fractalShape[0]);
 loadDataParams.ifTranspose = true;
 
-// When configuring scaleB L1 -> L0B_MX transfer parameters, treat scaleNAlignL1 direction as row and scaleK direction as col
-// i.e., small fractal 16*2, 16 in row direction, 2 in col direction
+// When configuring scaleB L1 -> L0B_MX transfer parameters, treat scaleNAlignL1
+// direction as row and scaleK direction as col i.e., small fractal 16*2, 16 in
+// row direction, 2 in col direction
 AscendC::LoadData2DMxParams loadMxDataParams;
-// scaleB synchronously starts transfer from row direction fractal 0, col direction 32B block 0 of L1 source operand
+// scaleB synchronously starts transfer from row direction fractal 0, col
+// direction 32B block 0 of L1 source operand
 loadMxDataParams.xStartPosition = 0;
 loadMxDataParams.yStartPosition = 0;
-// xStep/yStep configure scaleB row/col direction transfer length; stride configured by row direction adjacent fractal interval
+// xStep/yStep configure scaleB row/col direction transfer length; stride
+// configured by row direction adjacent fractal interval
 loadMxDataParams.xStep = CeilDivision(scaleNAlignL1, fractalShape[0]);
 loadMxDataParams.yStep = scaleK / SCALE_EVEN_NUMBER;
 loadMxDataParams.srcStride = scaleK / SCALE_EVEN_NUMBER;

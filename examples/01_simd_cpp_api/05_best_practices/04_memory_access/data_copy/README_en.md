@@ -14,7 +14,7 @@ This example demonstrates data transfer practices from Global Memory to UB and f
 
 ## Directory Structure
 
-```
+```text
 ├── data_copy
 │   ├── scripts
 │   │   └── gen_data.py        // Input data generation script

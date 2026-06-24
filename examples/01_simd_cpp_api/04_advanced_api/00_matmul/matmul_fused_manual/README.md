@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── matmul_fused_manual
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
@@ -56,7 +56,7 @@
       - 设置核间同步。
         ```cpp
         if ASCEND_IS_AIC {
-          AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(3);
+            AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(3);
         }
         ```
     - AIV侧具体步骤：
@@ -64,7 +64,7 @@
       - 等待核间同步。
         ```cpp
         if ASCEND_IS_AIV {
-          AscendC::CrossCoreWaitFlag(3);
+            AscendC::CrossCoreWaitFlag(3);
         }
         ```
       - 完成LeakyRelu计算。

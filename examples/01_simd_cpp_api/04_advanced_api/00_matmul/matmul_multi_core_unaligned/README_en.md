@@ -12,7 +12,7 @@ Multi-core unaligned split, that is, a Matmul example where the actual computati
 | Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
 
 ## Directory Structure
-```
+```text
 ├── matmul_multi_core_unaligned
 │   ├── scripts
 │   │   ├── gen_data.py                              // Script for generating input data and ground truth data

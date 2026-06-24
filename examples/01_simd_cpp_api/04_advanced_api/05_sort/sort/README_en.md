@@ -14,7 +14,7 @@ This example uses the Sort high-level API in a sorting scenario to sort the inpu
 
 ## Directory Structure
 
-```
+```text
 ├── sort
 │   ├── scripts
 │   │   └── gen_data.py         // Script for generating input data and ground truth data

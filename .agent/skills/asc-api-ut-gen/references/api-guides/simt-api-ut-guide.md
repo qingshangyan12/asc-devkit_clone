@@ -63,7 +63,8 @@ for (int i = tid; i < n; i += blockDim.x * gridDim.x) {
 SIMT API 通常声明为 `__device__` 函数：
 
 ```cpp
-__device__ inline void simt_function(...) {
+__device__ inline void simt_function(...)
+{
     // 设备端执行代码
 }
 ```
@@ -92,7 +93,7 @@ __device__ inline void simt_function(...) {
 
 ### 3.2 测试目录结构
 
-```
+```text
 tests/api/simt_api/
 └── ascend950pr_9599/
     ├── test_simt_vector_add.cpp
@@ -106,7 +107,8 @@ SIMT API 测试通常需要特殊的 Kernel 声明：
 
 ```cpp
 // Kernel 声明
-extern "C" __global__ __aicore__ void kernel_simt_function(...) {
+extern "C" __global__ __aicore__ void kernel_simt_function(...)
+{
     // Kernel 实现
     // 调用 SIMT API
 }
@@ -150,7 +152,7 @@ SIMT API 仅支持 3510 架构：
 ```cpp
 // impl 文件中
 #if __NPU_ARCH__ == 3510
-    // ascend950pr_9599 SIMT 实现
+// ascend950pr_9599 SIMT 实现
 #endif
 ```
 

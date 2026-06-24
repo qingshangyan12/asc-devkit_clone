@@ -11,7 +11,7 @@ Tiling常量化的Matmul样例。Tiling常量化即在编译期期间将部分�
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构
-```
+```text
 ├── matmul_constant_tiling
 │   ├── scripts
 │   │   ├── gen_data.py                // 输入数据和真值数据生成脚本文件
@@ -47,12 +47,7 @@ Tiling常量化的Matmul样例。Tiling常量化即在编译期期间将部分�
         constexpr int32_t BASE_M = 128;  // BASEM * BASE_K * sizeof(typeA) <=L0A size
         constexpr int32_t BASE_N = 256;  // BASEN * BASE_K * sizeof(typeB) <=L0B size
         constexpr int32_t BASE_K = 64;   // BASEM * BASE_N * sizeof(typeC) <=L0C size
-        constexpr MatmulShapeParams shapeParams = { MAX_M,
-                                                      MAX_N,
-                                                      MAX_K,
-                                                      BASE_M,
-                                                      BASE_N,
-                                                      BASE_K };
+        constexpr MatmulShapeParams shapeParams = {MAX_M, MAX_N, MAX_K, BASE_M, BASE_N, BASE_K};
         constexpr MatmulConfig CUSTOM_CFG = GetMMConfig<MatmulConfigMode::CONFIG_MDL>(shapeParams);
         ```
       - 通过GetMatmulApiTiling接口获取常量化Tiling信息。

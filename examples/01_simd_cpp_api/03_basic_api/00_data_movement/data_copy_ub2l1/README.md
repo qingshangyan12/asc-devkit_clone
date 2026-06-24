@@ -12,7 +12,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── data_copy_ub2l1
 │   ├── scripts
 │   │   ├── gen_data.py                   // 输入数据和真值数据生成脚本

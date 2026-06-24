@@ -16,7 +16,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── 09_log
 │   ├── CMakeLists.txt         // cmake编译文件
 │   ├── log.asc                // SIMT Kernel示例代码
@@ -50,13 +50,13 @@
     Kernel执行后，Host侧通过 `ASCENDC_CHECK` 宏捕获并打印错误信息。`ASCENDC_CHECK` 是用于捕获并打印ACL错误的工具宏，定义如下：
 
     ```c
-    #define ASCENDC_CHECK(expr) do { \
-        aclError ret = (expr); \
-        if (ret != ACL_SUCCESS) { \
-            fprintf(stderr, "Ascend Error: %s:%d code=%d %s\n", \
-                __FILE__, __LINE__, ret, aclGetRecentErrMsg()); \
-        } \
-    } while(0)
+    #define ASCENDC_CHECK(expr)                                                                                     \
+        do {                                                                                                        \
+            aclError ret = (expr);                                                                                  \
+            if (ret != ACL_SUCCESS) {                                                                               \
+                fprintf(stderr, "Ascend Error: %s:%d code=%d %s\n", __FILE__, __LINE__, ret, aclGetRecentErrMsg()); \
+            }                                                                                                       \
+        } while (0)
     ```
 
     将ACL接口调用作为参数传入，宏会自动检查返回值并在失败时打印错误信息。

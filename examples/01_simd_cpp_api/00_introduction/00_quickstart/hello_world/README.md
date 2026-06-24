@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── hello_world
 │   ├── CMakeLists.txt      // 编译工程文件
 │   ├── hello_world.asc     // Ascend C样例实现 & 调用样例

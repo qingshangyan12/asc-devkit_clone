@@ -16,7 +16,7 @@ The example supports switching between different scenarios through compilation p
 
 ## Directory Structure
 
-```
+```text
 ├── compare
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data
@@ -50,9 +50,14 @@ This example switches between different scenarios through the compilation parame
 - Output data type: uint8_t
 - Implementation:
   ```cpp
-    AscendC::Compare(src0Local, src1Local, cmpMode, mask, repeatParams);  // Compare interface has no repeat input, repeat defaults to 1, supporting 256 bytes of data per instruction
-    AscendC::PipeBarrier<PIPE_V>();
-    AscendC::GetCmpMask(dstLocal);  // Obtain saved data from register via GetCmpMask, dstLocal requires at least 128 bytes, but actual result data only occupies 8 bytes
+  AscendC::Compare(
+      src0Local, src1Local, cmpMode, mask,
+      repeatParams); // Compare interface has no repeat input, repeat defaults to
+                     // 1, supporting 256 bytes of data per instruction
+  AscendC::PipeBarrier<PIPE_V>();
+  AscendC::GetCmpMask(dstLocal); // Obtain saved data from register via GetCmpMask, dstLocal
+                                 // requires at least 128 bytes, but actual result data only
+                                 // occupies 8 bytes
   ```
 - Parameters: cmpMode=AscendC::CMPMODE::LT; repeatParams is default value, controlling operand address stride
 
@@ -76,8 +81,10 @@ This example switches between different scenarios through the compilation parame
 - Output data type: uint8_t
 - Implementation:
     ```cpp
-    AscendC::Compares(dstLocal, src0Local, src1Scalar, cmpMode, srcDataSize);  // Scalar at back
-    AscendC::Compares(dstLocal, src1Scalar, src0Local, cmpMode, srcDataSize);  // Scalar at front
+    AscendC::Compares(dstLocal, src0Local, src1Scalar, cmpMode,
+                      srcDataSize); // Scalar at back
+    AscendC::Compares(dstLocal, src1Scalar, src0Local, cmpMode,
+                      srcDataSize); // Scalar at front
     ```
 - Parameters: src1Scalar=src1Local[0], cmpMode=AscendC::CMPMODE::LT, srcDataSize=256
 

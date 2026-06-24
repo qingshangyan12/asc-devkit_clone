@@ -14,7 +14,7 @@ This sample uses the Matmul high-level API to implement matrix multiplication.
 
 ## Directory Structure
 
-```
+```text
 ├── matmul_advanced_api
 │   ├── scripts
 │   │   ├── gen_data.py         // Input data and golden data generation script

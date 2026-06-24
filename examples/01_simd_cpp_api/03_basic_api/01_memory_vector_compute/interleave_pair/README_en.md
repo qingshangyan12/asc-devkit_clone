@@ -12,7 +12,7 @@ This example implements element interleave and de-interleave functionality based
 
 ## Directory Structure
 
-```
+```text
 ├── interleave_pair
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── data_copy_gm2l1
 │   ├── figures                        // 图示
 │   ├── scripts

@@ -10,7 +10,7 @@
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## 目录结构介绍
-```
+```text
 ├── matmul_tscm_src_vecout
 │   ├── scripts
 │   │   ├── gen_data.py                         // 输入数据和真值数据生成脚本文件
@@ -43,16 +43,16 @@
   - Kernel关键步骤
     - 创建Matmul对象。其中左矩阵A的MatmulType中，POSITION为TSCM，SRC_POSITION为VECOUT。
       ```cpp
-      AscendC::MatmulType<AscendC::TPosition::TSCM, CubeFormat::NZ, AType, 
-                          IS_TRANS_A, LayoutMode::NONE, false, AscendC::TPosition::VECOUT>
+      AscendC::MatmulType<
+          AscendC::TPosition::TSCM, CubeFormat::NZ, AType, IS_TRANS_A, LayoutMode::NONE, false, AscendC::TPosition::VECOUT>
       ```
     - 自定义左矩阵A从VECOUT到TSCM的搬运，设置左矩阵A、右矩阵B、Bias，其中左矩阵A为TSCM输入。
       ```cpp
       // Copy aMatrix from vecout to tscm
       AscendC::TSCM<AscendC::TPosition::VECOUT, 1> scm;
-      pipe->InitBuffer(scm, 1, tiling.M * tiling.Ka * sizeof(AType));
+      pipe->InitBuffer(scm, 1, tiling.M* tiling.Ka * sizeof(AType));
       auto scmTensor = scm.AllocTensor<AType>();
-      DataCopy(scmTensor, vecoutLocal, tiling.M * tiling.Ka);
+      DataCopy(scmTensor, vecoutLocal, tiling.M* tiling.Ka);
       scm.EnQue(scmTensor);
       AscendC::LocalTensor<AType> scmLocal = scm.DeQue<AType>();
 

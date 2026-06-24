@@ -21,7 +21,7 @@ Figure 1: Code structure and call relationship
 
 ## Directory Structure
 
-```
+```text
 ├── 01_separate_compile
 │   ├── CMakeLists.txt       // Build project file
 │   ├── gather_compute.asc   // Computation logic function definition
@@ -139,6 +139,6 @@ Run the following steps in the root directory of this example to build and execu
 - Execution Result
 
   The following output indicates that the accuracy verification is successful.
-  ```
+  ```text
   [Success] Case accuracy is verification passed.
   ```

@@ -12,7 +12,7 @@ This example implements the Duplicate operation (scalar fill mode) based on the 
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── duplicate
 │   ├── scripts
 │   │   │   ├── gen_data.py            // Ground truth data generation script

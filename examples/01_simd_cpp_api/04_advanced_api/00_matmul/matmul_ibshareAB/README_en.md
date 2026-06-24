@@ -28,7 +28,7 @@ An example that calls the Matmul high-level API to enable the IBShare feature, r
 
 ## Directory Structure
 
-```
+```text
 ├── matmul_ibshareAB
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data
@@ -76,7 +76,8 @@ An example that calls the Matmul high-level API to enable the IBShare feature, r
         Matmul<
             MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType, false, LayoutMode::NONE, isABshare>,
             MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false, LayoutMode::NONE, isABshare>,
-            MatmulType<AscendC::TPosition::VECIN, CubeFormat::ND, CType>> matmulObj;
+            MatmulType<AscendC::TPosition::VECIN, CubeFormat::ND, CType>>
+            matmulObj;
         ```
 
 

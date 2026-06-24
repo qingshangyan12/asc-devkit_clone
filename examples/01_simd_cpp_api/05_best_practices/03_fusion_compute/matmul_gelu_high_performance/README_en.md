@@ -14,7 +14,7 @@ This example demonstrates Cube-Vector (CV) fusion implementation based on the st
 
 ## Directory Structure
 
-```
+```text
 ├── matmul_gelu_high_performance
 │   ├── scripts
 │   │   ├── gen_data.py         // Input data and ground truth generation script
@@ -85,15 +85,15 @@ This example provides two CV fusion scenarios:
 
 **Scenario 1: CV Fusion-GM Relay (Intermediate Performance Optimization)** (Supported by A2/A3/Ascend 950PR)
 
-```
-GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C ──(Fixpipe)──> GM ──(MTE2)──> UB ──(Gelu)──> UB ──(MTE3)──> GM
+```cpp
+GM ──(MTE2)──> L1 ──(MTE1)──> L0A / L0B ──(Cube)──> L0C ──(Fixpipe)──> GM ──(MTE2)──> UB ──(Gelu)──> UB ──(MTE3)──> GM
 ```
 
 **Scenario 2: CV Fusion-UB Direct (Advanced Extreme Refinement)** (Only Ascend 950PR supported)
 
 Ascend 950PR adds the L0C->UB path, which A2/A3 does not support. With enhanced chip capabilities, in the Ascend 950PR architecture, matrix multiplication results can be output directly to UB for GELU computation without going through GM.
 
-```
+```text
 GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C ──(Fixpipe)──> UB ──(Gelu)──> UB ──(MTE3)──> GM
 ```
 
@@ -124,9 +124,9 @@ The Matmul part of this example uses the same optimization methods as the [Matmu
 __aicore__ inline void GeluMemBaseCompute(
     const AscendC::LocalTensor<float>& xLocal, const AscendC::LocalTensor<float>& yLocal, uint32_t n)
 {
-    AscendC::Mul(yLocal, xLocal, xLocal, n);        // x²
+    AscendC::Mul(yLocal, xLocal, xLocal, n); // x²
     AscendC::PipeBarrier<PIPE_V>();
-    AscendC::Mul(yLocal, yLocal, xLocal, n);        // x³
+    AscendC::Mul(yLocal, yLocal, xLocal, n); // x³
     ……
 }
 ```
@@ -143,9 +143,8 @@ __simd_vf__ inline void GeluVf(__ubuf__ float* xAddr, __ubuf__ float* yAddr, uin
     for (uint16_t i = 0; i < loopNum; ++i) {
         mask = AscendC::Reg::UpdateMask<float>(n);
         AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
-        AscendC::Reg::Mul(yReg, xReg, xReg, mask);       // x²
-        ……
-        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
+        AscendC::Reg::Mul(yReg, xReg, xReg, mask); // x²
+        …… AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
     }
 }
 ```
@@ -157,7 +156,8 @@ The following focuses on the AIC↔AIV CV fusion mechanism.
 This example uses `__global__ __mix__(1, 2)` to declare the kernel function, meaning each logical core consists of 1 AIC and 2 AIVs. The AIC side is responsible for Matmul computation, the AIV side is responsible for GELU vector computation, and both execute in pipeline parallelism within the same AI Core at (baseM × baseN) block granularity.
 
 ```cpp
-__global__ __mix__(1, 2) void mmad_vector_custom(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
+__global__ __mix__(1, 2) void mmad_vector_custom(
+    __gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
 {
     AscendC::InitSocState();
     KernelMmadVector<...> op;
@@ -186,10 +186,10 @@ After the AIC side completes Fixpipe output of one (baseM × baseN) sub-block, i
 
 ```cpp
 // AIC side CopyOutAic():
-AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0x8);  // Notify AIV data ready
+AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0x8); // Notify AIV data ready
 
 // AIV side GeluAndCopyOutAivSeparate() / GeluAndCopyOutAiv():
-AscendC::CrossCoreWaitFlag(0x8);  // Wait for AIC side Fixpipe completion
+AscendC::CrossCoreWaitFlag(0x8); // Wait for AIC side Fixpipe completion
 ```
 
 #### 3. Multi-Core Splitting in `__mix__(1,2)` Mode
@@ -201,7 +201,7 @@ uint32_t logicCoreId;
 if ASCEND_IS_AIC {
     logicCoreId = AscendC::GetBlockIdx();
 } else {
-    logicCoreId = AscendC::GetBlockIdx() / 2;  // __mix__(1,2): Each logical core corresponds to 2 AIVs
+    logicCoreId = AscendC::GetBlockIdx() / 2; // __mix__(1,2): Each logical core corresponds to 2 AIVs
 }
 uint32_t mIterIdx = logicCoreId % mIter;
 uint32_t nIterIdx = logicCoreId / mIter;
@@ -234,8 +234,8 @@ For Matmul and Gelu related advanced extreme refinement methods, please refer to
 The AIC side writes L0C computation results to GM through Fixpipe, the AIV side reads data from GM to UB for GELU computation, then writes results back to GM. This method is supported by all architectures.
 
 Data flow path:
-```
-GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C ──(Fixpipe)──> GM ──(MTE2)──> UB ──(Gelu)──> UB ──(MTE3)──> GM
+```cpp
+GM ──(MTE2)──> L1 ──(MTE1)──> L0A / L0B ──(Cube)──> L0C ──(Fixpipe)──> GM ──(MTE2)──> UB ──(Gelu)──> UB ──(MTE3)──> GM
 ```
 
 **AIC Side Implementation**
@@ -334,7 +334,7 @@ The AIC side writes L0C computation results directly to UB through Fixpipe. The 
 Ascend 950PR adds the L0C->UB path, which A2/A3 does not support. With enhanced chip capabilities, in the Ascend 950PR architecture, matrix multiplication results can be output directly to UB for GELU computation without going through GM.
 
 Data flow path:
-```
+```text
 GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C ──(Fixpipe)──> UB ──(Gelu)──> UB ──(MTE3)──> GM
 ```
 
@@ -348,7 +348,7 @@ fixpipeParams.mSize = AscendC::DivCeil(curM, 2) * 2;
 fixpipeParams.nSize = curN;
 fixpipeParams.srcStride = curMAlign;
 fixpipeParams.dstStride = curN;
-fixpipeParams.dualDstCtl = 0b01;  // Split by M dimension to 2 AIV UBs
+fixpipeParams.dualDstCtl = 0b01; // Split by M dimension to 2 AIV UBs
 AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_UB>(xUB, cLocal, fixpipeParams);
 ```
 
@@ -365,7 +365,8 @@ GeluRegBaseCompute(xUB, geluOutUB, computeLen);
 // DataCopy: geluOutUB → GM
 uint32_t localSubIdx = AscendC::GetSubBlockIdx() % 2;
 uint32_t offset = baseM / 2 * N;
-AscendC::DataCopyPad<float>(cGM[mBlockIdx * baseM * N + nBlockIdx * baseN + localSubIdx * offset], geluOutUB, copyParams);
+AscendC::DataCopyPad<float>(
+    cGM[mBlockIdx * baseM * N + nBlockIdx * baseN + localSubIdx * offset], geluOutUB, copyParams);
 ```
 
 **Performance Data**
@@ -499,7 +500,7 @@ PROF_xxxx_XXXXXX
 ```
 
 View the specific performance analysis results:
-```
+```bash
 # View Task Duration and various data
 cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
 ```

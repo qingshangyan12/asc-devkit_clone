@@ -14,7 +14,7 @@ This example implements data selection functionality across multiple scenario mo
 
 ## Directory Structure
 
-```
+```text
 ├── gather
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data
@@ -46,7 +46,7 @@ This example switches between different mask generation scenarios through the co
 - Data type: uint32_t
 - Implementation:
     ```cpp
-    AscendC::GatherMask (dstLocal, src0Local, src1Local, reduceMode, mask, gatherMaskParams, rsvdCnt);
+    AscendC::GatherMask(dstLocal, src0Local, src1Local, reduceMode, mask, gatherMaskParams, rsvdCnt);
     ```
 - Parameters: Use user-provided Tensor for element selection, reduceMode=true (Counter mode), mask=70, gatherMaskParams={1, 2, 4, 0}
 

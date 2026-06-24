@@ -160,7 +160,7 @@ Under the current Mesh structure, if a Reduce operator exists, false positives m
 
 Except for the above scenario, if the following error appears, it indicates a memory conflict risk in task scheduling:
 
-```
+```cpp
 [1]there is memory use confilict in two SliceMemoryStatus
 [2]one is startAddr is 0, size  is 3200, status is WRITE.
 [3]another is startAddr is 0, size  is 3200, status is WRITE.
@@ -193,15 +193,15 @@ The above error log indicates that two tasks are simultaneously performing write
 
 The algorithm analyzer uses relative addresses to represent memory, composed of three fields: memory type, offset address, and size, represented by the DataSlice struct:
 
-```
+```cpp
 class DataSlice {
 public:
     //  Some method functions
 
 private:
     BufferType type;
-    u64        offset;
-    u64        size;
+    u64 offset;
+    u64 size;
 }
 ```
 
@@ -209,19 +209,19 @@ Memory supports types such as Input, Output, and CCL.
 
 Collective communication algorithms involve complex data transfer and reduction operations during execution. The algorithm analyzer uses **BufferSemantic** to record **data transfer relationships**, which includes a destination memory expression and multiple source memory expressions. The destination memory is represented by member variables startAddr and Size. The source memory is represented by the SrcBufDes struct, defined as follows:
 
-```
+```cpp
 struct BufferSemantic {
-    u64                         startAddr;
-    mutable u64                 size;       // Size, source and destination memory share the same size
-    mutable bool                isReduce;   // Whether reduction is performed, true when srcBufs has multiple entries
-    mutable HcclReduce0p        reduceType; // Type of reduction operation
-    mutable std::set<SrcBufDes> srcBufs;    // Which rank(s) this data comes from
+    u64 startAddr;
+    mutable u64 size;                    // Size, source and destination memory share the same size
+    mutable bool isReduce;               // Whether reduction is performed, true when srcBufs has multiple entries
+    mutable HcclReduce0p reduceType;     // Type of reduction operation
+    mutable std::set<SrcBufDes> srcBufs; // Which rank(s) this data comes from
 };
 
 struct SrcBufDes {
-    RankId      rankId;   // Source rankId
-    BufferType  bufType;   // Source memory type
-    mutable u64 srcAddr;  // Offset address relative to source memory type
+    RankId rankId;       // Source rankId
+    BufferType bufType;  // Source memory type
+    mutable u64 srcAddr; // Offset address relative to source memory type
 };
 ```
 

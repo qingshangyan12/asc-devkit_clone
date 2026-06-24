@@ -147,17 +147,15 @@ bank 冲突主要分为三类：
 
 ```cpp
 AscendC::CopyRepeatParams copyParams;
-copyParams.dstStride     = dstNzC0Stride;    // = 144，相邻 C0 列起始位置的间距
-copyParams.srcStride     = 1;
+copyParams.dstStride = dstNzC0Stride; // = 144，相邻 C0 列起始位置的间距
+copyParams.srcStride = 1;
 copyParams.dstRepeatSize = 1;
 copyParams.srcRepeatSize = tileW / C0_ELEMS;
 
 for (uint32_t k = 0; k < tileW / vecLenHalf; ++k) {
-    AscendC::Copy(nzBuf[k * vecLenDbs * dstNzC0Stride * C0_ELEMS],
-                  ndBuf[k * vecLenHalf],
-                  static_cast<uint64_t>(vecLenHalf),
-                  static_cast<uint8_t>(actualTileH),
-                  copyParams);
+    AscendC::Copy(
+        nzBuf[k * vecLenDbs * dstNzC0Stride * C0_ELEMS], ndBuf[k * vecLenHalf], static_cast<uint64_t>(vecLenHalf),
+        static_cast<uint8_t>(actualTileH), copyParams);
 }
 ```
 

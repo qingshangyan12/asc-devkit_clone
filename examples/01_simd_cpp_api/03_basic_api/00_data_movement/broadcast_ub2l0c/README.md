@@ -10,7 +10,7 @@
 | Atlas 推理系列产品AI Core | >= CANN 9.0.0 |
 
 ## 目录结构介绍
-```
+```text
 ├── broadcast_ub2l0c
 │   ├── scripts
 │   │   ├── gen_data.py               // 输入数据和真值数据生成脚本

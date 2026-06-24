@@ -13,7 +13,7 @@
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## 目录结构介绍
-```
+```text
 ├── matmul_mx_scale_cache
 │   ├── scripts
 │   │   ├── gen_data.py            // 输入数据和真值数据生成脚本文件
@@ -56,12 +56,21 @@
   - Kernel关键步骤
       - 创建Matmul对象：使用MatmulTypeWithScale定义A、scaleA、B、scaleB的参数类型信息，包括：内存逻辑位置、数据格式、数据类型、转置信息。
         ```cpp
-        typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, false, AscendC::TPosition::GM, CubeFormat::ND, false> aType;
-        typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, false, AscendC::TPosition::GM, CubeFormat::ND, true> bType;
+        typedef AscendC::MatmulTypeWithScale<
+            AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, false, AscendC::TPosition::GM,
+            CubeFormat::ND, false>
+            aType;
+        typedef AscendC::MatmulTypeWithScale<
+            AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, false, AscendC::TPosition::GM,
+            CubeFormat::ND, true>
+            bType;
         typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType;
         typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
         // 定义matmul对象时， 传入MatmulWithScalePolicy表明使能MxMatmul模板策略
-        AscendC::Matmul<aType, bType, cType, biasType, CFG_MDL, AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>, AscendC::Impl::Detail::MatmulWithScalePolicy> matmulObj;
+        AscendC::Matmul<
+            aType, bType, cType, biasType, CFG_MDL, AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>,
+            AscendC::Impl::Detail::MatmulWithScalePolicy>
+            matmulObj;
         ```
       - 设置左矩阵A与左量化系数矩阵scaleA、右矩阵B与右量化系数矩阵scaleB、Bias。
         ```cpp
@@ -85,7 +94,8 @@
           std::cout << "Generate tiling failed." << std::endl;
           return {};
       }
-      // 0-6bit表示scaleA与A矩阵在K方向载入数据量的比例系数，8-14bit表示scaleB与B矩阵在K方向载入数据量的比例系数, 260代表二进制0000 0001 0000 0100，0-6bit中使用100，开启4倍缓存。
+      // 0-6bit表示scaleA与A矩阵在K方向载入数据量的比例系数，8-14bit表示scaleB与B矩阵在K方向载入数据量的比例系数,
+      // 260代表二进制0000 0001 0000 0100，0-6bit中使用100，开启4倍缓存。
       tilingData.mxTypePara = 16843012;
       ```
 

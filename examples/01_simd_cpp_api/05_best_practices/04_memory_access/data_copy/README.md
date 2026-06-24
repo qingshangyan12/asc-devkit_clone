@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── data_copy
 │   ├── scripts
 │   │   └── gen_data.py        // 输入数据生成脚本

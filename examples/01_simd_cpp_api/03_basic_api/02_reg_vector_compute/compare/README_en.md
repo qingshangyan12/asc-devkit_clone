@@ -25,7 +25,7 @@ This example supports two comparison scenarios. Select a scenario through the CM
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── compare
 │   ├── scripts
 │   │   ├── gen_data.py                // Input data and ground truth generation script

@@ -28,7 +28,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── matmul_ibshareB
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
@@ -64,7 +64,7 @@
       - 方式一：默认实现，使用默认的IBShare模板CFG_IBSHARE_NORM创建Matmul对象。
         ```cpp
         #include "lib/matmul_intf.h"
-    
+
         using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
         using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false, LayoutMode::NONE, true>;
         using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
@@ -79,7 +79,7 @@
         using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
         using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false, LayoutMode::NONE, true>;
         using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-        using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+        using BIAS_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
         AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_NORM> matmulObj;
         ```
 
@@ -89,10 +89,12 @@
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
     ```cpp
-    matmul_ibshareb_custom<<<tilingData.usedCoreNum / MIX_RATIO, nullptr, stream>>>(x1, x2, bias, y, workspaceDevice,
-                          tilingDevice);       // 方式一：非纯Cube模式，SetDim设置为AIV:AIC组合的核数
-    matmul_ibshareb_custom<<<tilingData.usedCoreNum, nullptr, stream>>>(x1, x2, bias, y, workspaceDevice,
-                          tilingDevice);       // 方式二：纯Cube模式，SetDim设置为AIC的核数                          
+    matmul_ibshareb_custom<<<tilingData.usedCoreNum / MIX_RATIO, nullptr, stream>>>(
+        x1, x2, bias, y, workspaceDevice,
+        tilingDevice); // 方式一：非纯Cube模式，SetDim设置为AIV:AIC组合的核数
+    matmul_ibshareb_custom<<<tilingData.usedCoreNum, nullptr, stream>>>(
+        x1, x2, bias, y, workspaceDevice,
+        tilingDevice); // 方式二：纯Cube模式，SetDim设置为AIC的核数
     ```
 
 ## 编译运行

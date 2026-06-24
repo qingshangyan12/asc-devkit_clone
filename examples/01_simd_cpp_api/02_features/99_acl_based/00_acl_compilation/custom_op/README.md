@@ -18,7 +18,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── custom_op
 │   ├── CMakeLists.txt               // 顶层编译工程文件
 │   ├── framework                    // 框架适配插件目录
@@ -44,7 +44,7 @@
 
 Add计算公式为：
 
-```
+```text
 z = x + y
 ```
 

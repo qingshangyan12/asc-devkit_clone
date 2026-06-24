@@ -12,7 +12,7 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
 
 ## 目录结构介绍
 
-```
+```text
 ├── matmul_fp8
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
@@ -57,10 +57,12 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
 
       ...
 
-      AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, aType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, bType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, cType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, biasType>, mmCfg> matmulObj;
+          AscendC::Matmul<
+              AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, aType>,
+              AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, bType>,
+              AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, cType>,
+              AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, biasType>, mmCfg>
+              matmulObj;
       ```
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

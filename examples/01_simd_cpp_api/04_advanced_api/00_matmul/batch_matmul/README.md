@@ -16,7 +16,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── batch_matmul
 │   ├── scripts
 │   │   ├── gen_data.py              // 输入数据和真值数据生成脚本文件

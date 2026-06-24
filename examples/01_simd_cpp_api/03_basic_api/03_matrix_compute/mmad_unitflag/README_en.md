@@ -14,7 +14,7 @@ This example introduces how to use the unitFlag feature when calling the Mmad in
 
 ## Directory Structure
 
-```
+```text
 ├── mmad_unitflag
 │   ├── scripts
 │   │   ├── gen_data.py             // Script for generating input data and ground truth data

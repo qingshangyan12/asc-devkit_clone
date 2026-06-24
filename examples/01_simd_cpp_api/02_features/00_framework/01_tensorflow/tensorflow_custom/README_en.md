@@ -14,7 +14,7 @@ This example demonstrates how to map the Ascend C custom operator Add computatio
 
 ## Directory Structure
 
-```
+```text
 ├── tensorflow_custom
 │   ├── CMakeLists.txt                // Build project file
 │   ├── custom_assign_add_custom.cc   // TensorFlow custom operator implementation

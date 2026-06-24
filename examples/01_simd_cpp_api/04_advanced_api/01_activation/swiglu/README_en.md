@@ -14,7 +14,7 @@ This example uses the SwiGLU high-level API in large language model and Mixture 
 
 ## Directory Structure
 
-```
+```text
 ├── swiglu
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

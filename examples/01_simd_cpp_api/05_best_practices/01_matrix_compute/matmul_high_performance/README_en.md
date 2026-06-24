@@ -14,7 +14,7 @@ This example implements matrix multiplication based on the Matmul high-level API
 
 ## Directory Structure
 
-```
+```text
 ├── matmul_high_performance
 │   ├── scripts
 │   │   ├── gen_data.py         // Input data and ground truth generation script

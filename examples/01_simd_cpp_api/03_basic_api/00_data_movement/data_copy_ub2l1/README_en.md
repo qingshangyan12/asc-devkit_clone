@@ -12,7 +12,7 @@ This example implements data transfer from UB (Unified Buffer) to L1 (L1 Buffer)
 
 ## Directory Structure
 
-```
+```text
 ├── data_copy_ub2l1
 │   ├── scripts
 │   │   ├── gen_data.py                   // Input data and ground truth generation script

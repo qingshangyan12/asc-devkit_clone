@@ -28,7 +28,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── matmul_ibshareAB
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
@@ -76,7 +76,8 @@
         Matmul<
             MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType, false, LayoutMode::NONE, isABshare>,
             MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false, LayoutMode::NONE, isABshare>,
-            MatmulType<AscendC::TPosition::VECIN, CubeFormat::ND, CType>> matmulObj;
+            MatmulType<AscendC::TPosition::VECIN, CubeFormat::ND, CType>>
+            matmulObj;
         ```
 
 

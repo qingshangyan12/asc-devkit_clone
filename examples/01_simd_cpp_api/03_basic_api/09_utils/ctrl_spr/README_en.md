@@ -19,7 +19,7 @@ This example demonstrates setting, reading, and resetting CTRL[48] and CTRL[60] 
 
 ## Directory Structure
 
-```
+```text
 ├── ctrl_spr
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

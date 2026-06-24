@@ -12,7 +12,7 @@ This example demonstrates the usage of the `clock()` API for timestamp marking i
 
 ## Directory Structure
 
-```
+```text
 ├── 03_clock
 │   ├── CMakeLists.txt              // Build project file
 │   ├── clock.asc                   // Ascend C example implementation & invocation example

@@ -76,16 +76,17 @@ __simd_vf__ inline static void GeluVfMethod2(
     AscendC::Reg::RegTensor<float> tmpReg;
     for (uint32_t i = 0; i < loopNum; ++i) {
         mask = AscendC::Reg::UpdateMask<float>(count);
-        AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);   // UB → 寄存器
-        AscendC::Reg::Mul(yReg, xReg, xReg, mask);                  // x²
-        AscendC::Reg::Mul(yReg, yReg, xReg, mask);                  // x³
-        AscendC::Reg::Muls(yReg, yReg, COEFF_CUBIC, mask);          // -0.071405 * x³
-        AscendC::Reg::Muls(tmpReg, xReg, COEFF_LINEAR, mask);       // -1.595769 * x
-        AscendC::Reg::Add(yReg, tmpReg, yReg, mask);                // -1.595769x - 0.071405x³
-        AscendC::Reg::Exp(yReg, yReg, mask);                        // exp(...)
-        AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);                 // 1 + exp(...)
-        AscendC::Reg::Div(yReg, xReg, yReg, mask);                  // x / (1 + exp(...))
-        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask); // 寄存器 → UB
+        AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize); // UB → 寄存器
+        AscendC::Reg::Mul(yReg, xReg, xReg, mask);                // x²
+        AscendC::Reg::Mul(yReg, yReg, xReg, mask);                // x³
+        AscendC::Reg::Muls(yReg, yReg, COEFF_CUBIC, mask);        // -0.071405 * x³
+        AscendC::Reg::Muls(tmpReg, xReg, COEFF_LINEAR, mask);     // -1.595769 * x
+        AscendC::Reg::Add(yReg, tmpReg, yReg, mask);              // -1.595769x - 0.071405x³
+        AscendC::Reg::Exp(yReg, yReg, mask);                      // exp(...)
+        AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);               // 1 + exp(...)
+        AscendC::Reg::Div(yReg, xReg, yReg, mask);                // x / (1 + exp(...))
+        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg,
+                                 mask); // 寄存器 → UB
     }
 }
 ```
@@ -112,7 +113,9 @@ __global__ __vector__ void gelu_custom(__gm__ uint8_t* x, __gm__ uint8_t* y)
     // Stage 1: GM → UB 搬入
     AscendC::DataCopy(xLocal, xGm[0], singleCoreLength);
     // 同步：等待 GM→UB 搬运完成
-    // EVENT_ID0 是硬件事件通道编号（0-7），每个事件通道独立计数，本样例仅使用一个通道故固定使用 0
+    // EVENT_ID0
+    // 是硬件事件通道编号（0-7），每个事件通道独立计数，本样例仅使用一个通道故固定使用
+    // 0
     AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
     AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
@@ -218,7 +221,7 @@ cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
 
 ## 目录结构介绍
 
-``` 
+```text
 ├── gelu
 │   ├── scripts
 │   │   ├── gen_data.py     // 输入数据和真值数据生成脚本

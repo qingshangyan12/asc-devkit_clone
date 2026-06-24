@@ -11,7 +11,7 @@ This example implements type_traits type traits use cases using the Ascend C pro
 | Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
 
 ## Directory Structure
-```
+```text
 ├── type_traits
 │   ├── CMakeLists.txt          // Build project file
 │   ├── data_utils.h            // Data read/write functions

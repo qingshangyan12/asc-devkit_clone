@@ -25,7 +25,7 @@ This example supports two data type conversion scenarios. Select a scenario thro
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── cast
 │   ├── scripts
 │   │   ├── gen_data.py                // Input data and ground truth generation script

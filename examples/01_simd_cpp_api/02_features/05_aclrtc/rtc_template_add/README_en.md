@@ -16,7 +16,7 @@ Unlike traditional custom operator projects, Aclrtc does not require pre-compili
 
 ## Directory Structure
 
-```
+```text
 ├── rtc_template_add
 │   ├── CMakeLists.txt                   // Build project file
 │   ├── data_utils.h                     // Data generation, precision verification utility functions + ASCENDC_CHECK macro
@@ -29,7 +29,7 @@ Unlike traditional custom operator projects, Aclrtc does not require pre-compili
 - Example functionality:
   Add computation formula:
 
-  ```
+  ```text
   z = x + y
   ```
 

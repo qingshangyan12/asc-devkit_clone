@@ -11,7 +11,7 @@ An example for multiple batch Matmul computations, including both synchronous an
 
 ## Directory Structure
 
-```
+```text
 ├── batch_matmul_iterate_n_batch
 │   ├── scripts
 │   │   ├── gen_data.py                    // Script for generating input data and ground truth data
@@ -46,7 +46,7 @@ An example for multiple batch Matmul computations, including both synchronous an
       ```cpp
       constexpr MatmulConfigMode configMode = MatmulConfigMode::CONFIG_NORM;
       constexpr MatmulBatchParams batchParams = {
-        true, BatchMode::BATCH_LESS_THAN_L1, false /* isNBatch, batchMode, isBiasBatch */
+          true, BatchMode::BATCH_LESS_THAN_L1, false /* isNBatch, batchMode, isBiasBatch */
       };
       constexpr MatmulConfig CFG_MM = GetMMConfig<configMode>(batchParams);
       AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MM> matmulObj;
@@ -65,7 +65,7 @@ An example for multiple batch Matmul computations, including both synchronous an
     - When `IS_SYNCH=false`, complete the multi-batch matrix multiplication operation and call the GetBatchTensorC interface to obtain results.
       ```cpp
       matmulObj.template IterateNBatch<false>(nNum, batchA, batchB, false);
-      for(int32_t j = 0; j < nNum; ++j){
+      for (int32_t j = 0; j < nNum; ++j) {
           matmulObj.template GetBatchTensorC<false>(batchA, batchB, false);
       }
       ```

@@ -16,7 +16,7 @@ This example describes how to call the LayerNorm, LayerNormGrad, and LayerNormGr
 
 ## Directory Structure
 
-```
+```text
 ├── layernorm
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

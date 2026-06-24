@@ -13,7 +13,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── torch_library_roll
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── roll_custom.asc         // Ascend C算子实现 & torch.library注册
@@ -80,18 +80,13 @@
   PyTorch提供`TORCH_LIBRARY`宏作为自定义算子注册的核心接口，用于创建并初始化自定义算子库，注册后在Python侧可以通过`torch.ops.namespace.op_name`方式进行调用：
 
   ```c++
-  TORCH_LIBRARY(ascendc_ops, m) {
-      m.def("ascendc_roll(Tensor x, int[] shifts, int[] dims) -> Tensor");
-  }
+  TORCH_LIBRARY(ascendc_ops, m) { m.def("ascendc_roll(Tensor x, int[] shifts, int[] dims) -> Tensor"); }
   ```
 
   `TORCH_LIBRARY_IMPL`用于将算子绑定到特定的`DispatchKey`（PyTorch设备调度标识）。针对NPU设备，需要将算子实现注册到`PrivateUse1`这一专属的`DispatchKey`上：
 
   ```c++
-  TORCH_LIBRARY_IMPL(ascendc_ops, PrivateUse1, m)
-  {
-      m.impl("ascendc_roll", TORCH_FN(ascendc_ops::ascendc_roll));
-  }
+  TORCH_LIBRARY_IMPL(ascendc_ops, PrivateUse1, m) { m.impl("ascendc_roll", TORCH_FN(ascendc_ops::ascendc_roll)); }
   ```
 
   注册完成后，在Python侧即可通过`torch.ops.ascendc_ops.ascendc_roll(...)`直接调用该自定义算子。

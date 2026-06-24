@@ -21,7 +21,7 @@ This example uses the FloorMod computation to demonstrate performance tuning met
 
 ## Directory Structure
 
-```
+```text
 ├── simd_simt_high_performance
 │   ├── CMakeLists.txt        // Build project file
 │   ├── data_utils.h          // Data read/write functions
@@ -96,13 +96,11 @@ This implementation does not use MTE2/MTE3 for data transfer between GM and UB. 
 __aicore__ inline void ProcessGmSimt()
 {
     asc_vf_call<floor_mod_simt_gm_contiguous<T>>(
-        dim3(THREAD_COUNT), const_cast<__gm__ T*>(xGm.GetPhyAddr()),
-        const_cast<__gm__ T*>(yGm.GetPhyAddr()), const_cast<__gm__ T*>(zGm.GetPhyAddr()),
-        DataLenPerCore);
+        dim3(THREAD_COUNT), const_cast<__gm__ T*>(xGm.GetPhyAddr()), const_cast<__gm__ T*>(yGm.GetPhyAddr()),
+        const_cast<__gm__ T*>(zGm.GetPhyAddr()), DataLenPerCore);
 }
 
-__simt_vf__ inline void floor_mod_simt_gm_contiguous(
-    __gm__ T* x, __gm__ T* y, __gm__ T* z, uint32_t inputTotalLength)
+__simt_vf__ inline void floor_mod_simt_gm_contiguous(__gm__ T* x, __gm__ T* y, __gm__ T* z, uint32_t inputTotalLength)
 {
     for (uint32_t index = static_cast<uint32_t>(threadIdx.x); index < inputTotalLength;
          index += static_cast<uint32_t>(blockDim.x)) {
@@ -153,8 +151,7 @@ __aicore__ inline void CopyIn(
 }
 // SIMD Compute(UB)
 template <typename T>
-__simd_vf__ inline void floor_mod_simd(
-    __ubuf__ T* zAddr, __ubuf__ T* xAddr, __ubuf__ T* yAddr, const uint32_t count)
+__simd_vf__ inline void floor_mod_simd(__ubuf__ T* zAddr, __ubuf__ T* xAddr, __ubuf__ T* yAddr, const uint32_t count)
 {
     constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(T);
     uint16_t loopTimes = AscendC::CeilDivision(count, oneRepeatSize);

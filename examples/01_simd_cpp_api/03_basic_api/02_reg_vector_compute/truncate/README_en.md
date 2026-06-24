@@ -10,7 +10,7 @@ This example implements the Truncate operation based on the Reg programming inte
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── truncate
 │   ├── scripts
 │   │   ├── gen_data.py                // Input data and ground truth generation script

@@ -19,7 +19,7 @@ This example uses Gelu computation to introduce RegBase vector performance tunin
 
 ## Directory Structure
 
-```
+```text
 ├── gelu_high_performance
 │   ├── scripts
 │   │   ├── gen_data.py         // Input data and ground truth generation script
@@ -176,7 +176,7 @@ The baseline program uses Ascend C basic API to implement Gelu computation, incl
 **Key Code**:
 ```cpp
 __aicore__ inline void GeluCompute(
-        const AscendC::LocalTensor<float>& xLocal, const AscendC::LocalTensor<float>& yLocal, uint32_t n)
+    const AscendC::LocalTensor<float>& xLocal, const AscendC::LocalTensor<float>& yLocal, uint32_t n)
 {
     // yLocal = x * x = x²
     AscendC::Mul(yLocal, xLocal, xLocal, n);
@@ -274,17 +274,13 @@ RegBase API provides register-level vector computation interfaces. Combined with
 - Within a VF function, after data is loaded from UB to registers, all intermediate computations are completed within registers, requiring only one [LoadAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬入.md) and one [StoreAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬出.md), eliminating Load/Store overhead for intermediate results
 - Supports VF dual-issue feature, standard computation instruction parallelism can reach 512 bytes/cycle, instruction dispatch efficiency (IPC) is significantly improved
 
-```
-Basic API Mode:                    VF Fusion Mode:
-Load → Mul → Store              LoadAlign → Mul
-Load → Mul → Store                   → Mul
-Load → Muls → Store                   → Muls
-Load → Add → Store                    → Add
-Load → Muls → Store                   → Muls
-Load → Exp → Store                    → Exp
-Load → Adds → Store                   → Adds
-Load → Div → Store                    → Div → StoreAlign
-(8 Load/Store)                     (1 Load/1 Store)
+```cpp
+Basic API Mode : VF Fusion Mode
+    : Load → Mul → Store LoadAlign → Mul Load → Mul → Store                   → Mul
+          Load → Muls → Store                   → Muls Load → Add → Store                    → Add
+              Load → Muls → Store                   → Muls Load → Exp → Store                    → Exp
+                  Load → Adds → Store                   → Adds Load → Div → Store                    → Div → StoreAlign(
+                      8 Load / Store)(1 Load / 1 Store)
 ```
 
 **Code Modification Points**:
@@ -295,7 +291,8 @@ Compared to the introductory Case 0 code, key modifications are:
 - Remove `PipeBarrier<PIPE_V>()` synchronization; no explicit synchronization needed within VF function
 
 ```cpp
-// Case 0: Basic API, each computation requires Load/Store + PipeBarrier synchronization
+// Case 0: Basic API, each computation requires Load/Store + PipeBarrier
+// synchronization
 AscendC::Mul(yLocal, xLocal, xLocal, n);
 AscendC::PipeBarrier<PIPE_V>();
 AscendC::Mul(yLocal, yLocal, xLocal, n);
@@ -311,7 +308,7 @@ __simd_vf__ inline void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr
 
     for (uint16_t i = 0; i < loopNum; ++i) {
         mask = AscendC::Reg::UpdateMask<float>(n);
-        AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);  // Only one Load
+        AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize); // Only one Load
         AscendC::Reg::Mul(yReg, xReg, xReg, mask);
         AscendC::Reg::Mul(yReg, yReg, xReg, mask);
         AscendC::Reg::Muls(yReg, yReg, COEFF_A, mask);
@@ -320,7 +317,8 @@ __simd_vf__ inline void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr
         AscendC::Reg::Exp(yReg, yReg, mask);
         AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);
         AscendC::Reg::Div(yReg, xReg, yReg, mask);
-        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);  // Only one Store
+        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg,
+                                 mask); // Only one Store
     }
 }
 ```
@@ -374,13 +372,11 @@ Based on Case 1 performance data, residual bottlenecks are mainly:
 
 The for loop within the VF function is a simple iteration structure. The compiler generates loop control instructions (compare, jump) sequentially by default, causing scalar overhead between loop iterations. Through `#pragma unroll N`, instruct the compiler to unroll the loop N times, eliminating loop control overhead while allowing VF instructions from multiple iterations to be interleaved, improving instruction-level parallelism (ILP) and enabling more instructions to be dual-issued consecutively.
 
-```
-Unrolled:                         After Unrolling:
-Iter0: Load→Mul→...→Store       Iter0: Load→Mul→...→Store
-  ↓ (loop control overhead)      Iter1: Load→Mul→...→Store
-Iter1: Load→Mul→...→Store       Iter2: Load→Mul→...→Store
-  ↓ (loop control overhead)      Iter3: Load→Mul→...→Store
-Iter2: Load→Mul→...→Store       ...(no loop control overhead, instructions can be interleaved)
+```cpp
+Unrolled : After Unrolling : Iter0 : Load→Mul→...→Store Iter0 : Load→Mul→...→Store
+  ↓ (loop control overhead)Iter1 : Load→Mul→...→Store Iter1 : Load→Mul→...→Store Iter2 : Load→Mul→...→Store
+  ↓ (loop control overhead)Iter3 : Load→Mul→...→Store Iter2
+    : Load→Mul→...→Store...(no loop control overhead, instructions can be interleaved)
 ```
 
 **Optimization Plan**:
@@ -393,7 +389,8 @@ __simd_vf__ inline static void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float
     constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
     AscendC::Reg::MaskReg mask;
     AscendC::Reg::RegTensor<float> xReg, yReg;
-    #pragma unroll 6  // Loop unrolling optimization, improve instruction-level parallelism
+#pragma unroll 6 // Loop unrolling optimization, improve instruction-level
+                 // parallelism
     for (uint16_t i = 0; i < loopNum; ++i) {
         mask = AscendC::Reg::UpdateMask<float>(n);
         AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);

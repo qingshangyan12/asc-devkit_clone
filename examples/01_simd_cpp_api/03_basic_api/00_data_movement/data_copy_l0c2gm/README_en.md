@@ -65,7 +65,7 @@ This example implements inline quantization activation data transfer based on Da
 
 ## Directory Structure
 
-```
+```text
 ├── data_copy_l0c2gm
 │   ├── scripts
 │   │   ├── gen_data.py         // Input data and ground truth generation script

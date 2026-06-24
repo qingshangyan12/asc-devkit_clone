@@ -16,7 +16,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── data_copy_pad_gm2ub_ub2gm
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本

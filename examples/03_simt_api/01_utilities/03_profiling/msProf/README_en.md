@@ -31,7 +31,7 @@ The msProf tool is a single-operator performance analysis tool. It includes two 
     Through on-board performance collection, the operator running time on the Ascend AI Processor can be directly measured. This method is suitable for quickly locating operator performance issues in an on-board environment.
 
     Perform operator tuning through msprof op based on the executable file demo:
-    ```
+    ```bash
     msprof op ./demo
     ```
 
@@ -85,6 +85,6 @@ Run the following steps in the root directory of this example to build and execu
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
 
   The following output indicates that the accuracy verification is successful.
-  ```
+  ```text
   [Success] Case accuracy is verification passed.
   ```
