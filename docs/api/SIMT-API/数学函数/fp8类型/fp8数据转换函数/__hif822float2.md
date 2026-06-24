@@ -49,7 +49,7 @@ inline float2 __hif822float2(const hifloat8x2_t x)
 | 0 | 0 |
 | nan | nan |
 | inf | inf |
-| -Inf | -inf |
+| -inf | -inf |
 
 ## 约束说明
 

@@ -63,8 +63,8 @@ inline __asc_fp8x2_storage_t __asc_cvt_float2_to_fp8x2(const float2 x, const __a
 | ±0 | ±0 | ±0 |
 | nan | nan | +0 |
 | ±inf | ±inf | ±57344 |
-| 超出float8_e5m2_t范围的正值 | nan | 57344 |
-| 超出float8_e5m2_t范围的负值 | nan | -57344 |
+| 超出float8_e5m2_t范围的正值 | inf | 57344 |
+| 超出float8_e5m2_t范围的负值 | -inf | -57344 |
 
 ## 约束说明
 

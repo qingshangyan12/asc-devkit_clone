@@ -48,9 +48,9 @@ inline unsigned long long int __float2ull_ru(const float x)
 |---|---|
 | ±0 | 0 |
 | nan | 0 |
-| inf | 18446744073709551615（ULLONGMAX） |
+| inf | 18446744073709551615（ULLONG_MAX） |
 | -inf | 0 |
-| 超出unsigned long long int范围的正值 | 18446744073709551615（ULLONGMAX） |
+| 超出unsigned long long int范围的正值 | 18446744073709551615（ULLONG_MAX） |
 | 负数 | 0 |
 
 ## 约束说明

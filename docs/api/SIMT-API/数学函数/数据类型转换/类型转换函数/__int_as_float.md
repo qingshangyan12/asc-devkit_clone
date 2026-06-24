@@ -49,7 +49,7 @@ inline float __int_as_float(const int x)
 | 0x00000000 | 0 |
 | 0x80000000 | -0 |
 | 0x7F800000 | inf |
-| 0xFF800000 | -ASCRT_INinfF_F |
+| 0xFF800000 | -inf |
 | 0x7FFFFFFF | nan |
 | 0x7F7FFFFF | ASCRT_MAX_NORMAL_F |
 | 0xFF7FFFFF | -ASCRT_MAX_NORMAL_F |
