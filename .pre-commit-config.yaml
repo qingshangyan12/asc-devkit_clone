@@ -14,7 +14,7 @@ repos:
       - id: clang-format
         types_or: [file]
         files: \.(c|h|cpp|hpp|cc|hh|cxx|hxx|asc)$
-        exclude: ^(tests/python/aclrt_launch_kernel/stub_files/|impl/|include/|tools/)
+        exclude: ^(tests/python/aclrt_launch_kernel/stub_files/|impl/|include/(?!adv_api/)|tools/)
         args:
           - "--style=file"
           - "--verbose"
@@ -42,5 +42,19 @@ repos:
         files: \.(md|markdown|mdx)$
         pass_filenames: true
         always_run: true
+        stages: [pre-commit, manual]
+        verbose: true
+
+  # Markdown 代码片段格式检查
+  - repo: local
+    hooks:
+      - id: markdown-code-block-check
+        name: Markdown code block check
+        entry: python3 scripts/markdown_code_block_check.py
+        language: python
+        additional_dependencies:
+          - clang-format==18.1.8
+        files: \.(md|markdown|mdx)$
+        pass_filenames: true
         stages: [pre-commit, manual]
         verbose: true
