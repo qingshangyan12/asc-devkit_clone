@@ -6,24 +6,46 @@
 | --- | --- |
 | [LocalTensor](数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md) | LocalTensor用于存放AI Core中Local Memory（内部存储）的数据，支持逻辑位置TPosition为VECIN、VECOUT、VECCALC、A1、A2、B1、B2、CO1、CO2。 |
 | [GlobalTensor](数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor.md) | GlobalTensor用来存放Global Memory（外部存储）的全局数据。 |
+| [layout_structure](TensorAPI-BasicStructure/TensorAPI-BasicStructure.md) | Tensor API基础数据结构中Layout相关基础数据结构。 |
+| [tensor_structure](TensorAPI-BasicStructure/TensorAPI-BasicStructure.md) | Tensor API基础数据结构中Tensor相关数据结构。 |
 | [Coordinate](数据结构/辅助数据结构/Coordinate/Coordinate.md) | Coordinate本质上是一个元组（tuple），用于表示张量在不同维度的位置信息，即坐标值。 |
 | [Layout](数据结构/辅助数据结构/Layout/Layout.md) | Layout数据结构是描述多维张量内存布局的基础模板类，通过编译时的形状（Shape）和步长（Stride）信息，实现逻辑坐标空间到一维内存地址空间的映射。 |
 | [TensorTrait](数据结构/辅助数据结构/TensorTrait/TensorTrait.md) | TensorTrait数据结构是描述Tensor相关信息的基础模板类，包含Tensor的数据类型、逻辑位置和Layout内存布局。 |
+| [ShapeInfo](数据结构/辅助数据结构/ShapeInfo.md) | 存放LocalTensor或GlobalTensor的shape信息。 |
+| [ListTensorDesc](数据结构/辅助数据结构/ListTensorDesc.md) | 解析符合指定内存排布格式的数据，在kernel侧根据索引获取存储对应数据的地址及shape信息。 |
+| [TensorDesc](数据结构/辅助数据结构/TensorDesc/TensorDesc.md) | 储存ListTensorDesc.GetDesc()中根据index获取对应的Tensor描述信息。 |
+| [UnaryRepeatParams](数据结构/辅助数据结构/UnaryRepeatParams.md) | 控制单操作数地址步长的数据结构，包含相邻迭代间和同一迭代内DataBlock的地址步长参数。 |
+| [BinaryRepeatParams](数据结构/辅助数据结构/BinaryRepeatParams.md) | 控制双操作数地址步长的数据结构，包含相邻迭代间和同一迭代内DataBlock的地址步长参数。 |
+| [complex32/complex64](数据结构/辅助数据结构/complex32-complex64.md) | 复数类型，complex32实部和虚部都是half类型位宽32位，complex64实部和虚部都是float类型位宽64位。 |
 | [TPosition](数据结构/辅助数据结构/TPosition.md) | 用一种抽象的逻辑位置（TPosition）来表达各级别的存储，代替片上物理存储的概念。主要类型包括：VECIN、VECOUT、VECCALC、A1、A2、B1、B2、CO1、CO2。 |
 
 ## 矩阵计算（ISASI）
+
+### 矩阵数据搬入至L0-Buffer
+
+| 接口名 | 功能描述 |
+| --- | --- |
+| [Load3D](矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/Load3D.md) | Load3D本质上是用于将NC1HWC0格式的Feature Map完成Image to Column展开，然后再从展开后的二维矩阵中选取指定数据块搬入对应内存位置。 |
+| [LoadDataWithTranspose](矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/LoadDataWithTranspose.md) | LoadDataWithTranspose负责完成普通矩阵计算所需的2D格式的数据的搬运，搬运过程中会伴随转置操作，参考特性分形转置。 |
+| [LoadDataWithSparse](矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/LoadDataWithSparse.md) | 用于从L1 Buffer中搬运以512字节为单位存放的稠密权重矩阵到L0B Buffer里，同时搬运以128字节为单位的索引矩阵到内置的专用buffer空间（用于后续MmadWithSparse接口进行读取）。 |
+
+### 矩阵数据搬入至L1-Buffer
+
 | 接口名 | 功能描述 |
 | --- | --- |
 | [GMToL1连续数据搬运（DataCopy）](矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/GMToL1连续数据搬运（DataCopy）.md) | 该接口能够将矩阵从Global Memory连续搬运至L1 Buffer（TPosition为A1/B1），数据搬运时格式和内容保持不变。 |
 | [GMToL1高维切分数据搬运（DataCopy）](矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/GMToL1高维切分数据搬运（DataCopy）.md) | 该接口主要实现将矩阵从Global Memory搬运至L1 Buffer（TPosition为A1/B1），数据搬运时格式和内容保持不变。 |
 | [GMToL1随路转换-ND2NZ搬运（DataCopy）](矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/GMToL1随路转换-ND2NZ搬运（DataCopy）.md) | 该接口主要实现将矩阵从Global Memory搬运至L1 Buffer（TPosition为A1/B1），并支持在数据搬运时进行ND到NZ格式的转换。 |
+| [GMToL1 Load2D指令搬运](矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/GMToL1-Load2D指令搬运.md) | 负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位从Global Memory搬运至L1 Buffer（TPosition为A1/B1）。 |
 | [UBToL1连续数据搬运（DataCopy）](矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/UBToL1连续数据搬运（DataCopy）.md) | 该接口实现将矩阵从Unified Buffer（UB，TPosition为VECIN/VECCALC/VECOUT）搬运至L1 Buffer，搬运方式为连续搬运，数据搬运时格式和内容保持不变。 |
 | [UBToL1高维切分数据搬运（DataCopy）](矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/UBToL1高维切分数据搬运（DataCopy）.md) | 该接口实现将矩阵从Unified Buffer（UB，TPosition为VECIN/VECCALC/VECOUT）搬运至L1 Buffer，支持非连续搬运和连续搬运，数据搬运时格式和内容保持不变。 |
 | [UBToL1非对齐数据搬运（DataCopyPad）](矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/UBToL1非对齐数据搬运（DataCopyPad）.md) | 该接口提供从Unified Buffer到L1 Buffer的数据非对齐搬运功能。 |
 | [UBToL1随路转换-ND2NZ搬运（DataCopy）](矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/UBToL1随路转换-ND2NZ搬运（DataCopy）.md) | 支持在数据搬运时进行ND到NZ格式的转换。数据从Unified Buffer（UB，TPosition为VECIN/VECCALC/VECOUT）搬运至L1 Buffer，搬运过程中完成ND->NZ格式转换。 |
-| [Load3D](矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/Load3D.md) | Load3D本质上是用于将NC1HWC0格式的Feature Map完成Image to Column展开，然后再从展开后的二维矩阵中选取指定数据块搬入对应内存位置。 |
-| [LoadDataWithTranspose](矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/LoadDataWithTranspose.md) | LoadDataWithTranspose负责完成普通矩阵计算所需的2D格式的数据的搬运，搬运过程中会伴随转置操作，参考特性分形转置。 |
-| [LoadDataWithSparse](矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/LoadDataWithSparse.md) | 用于从L1 Buffer中搬运以512字节为单位存放的稠密权重矩阵到L0B Buffer里，同时搬运以128字节为单位的索引矩阵到内置的专用buffer空间（用于后续MmadWithSparse接口进行读取）。 |
+
+### 辅助配置接口
+
+| 接口名 | 功能描述 |
+| --- | --- |
 | [Fill](矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/Fill.md) | 将特定物理存储位置的LocalTensor初始化为某一具体数值。仅支持L1 Buffer/L0A Buffer/L0B Buffer上的LocalTensor初始化。 |
 | [SetFmatrix](矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/SetFmatrix.md) | 用于调用Load3D时设置FeatureMap的属性描述。Load3D的模板参数isSetFMatrix设置为false时，表示Load3D传入的FeatureMap的属性将不生效，开发者需要通过该接口进行设置。 |
 | [SetLoadDataBoundary](矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/SetLoadDataBoundary.md) | 设置Load3D接口所需的L1 Buffer（TPosition: A1/B1）边界值。 |
@@ -33,40 +55,82 @@
 | [LoadImageToLocal](矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/LoadImageToLocal.md) | 将图像数据从Global Memory搬运到Local Memory。搬运过程中可以完成图像预处理操作：包括图像翻转，改变图像尺寸（抠图，裁边，缩放，伸展），以及色域转换，类型转换等。图像预处理的相关参数通过SetAippFunctions进行配置。 |
 | [LoadUnzipIndex](矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/LoadUnzipIndex.md) | 加载GM上的压缩索引表到内部寄存器。 |
 | [SetAippFunctions](矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/SetAippFunctions.md) | 设置图片预处理（AIPP，AI Core pre-process）相关参数。和LoadImageToLocal接口配合使用。设置后，调用LoadImageToLocal接口可在搬运过程中完成图像预处理操作：包括数据填充、通道交换、单行读取、数据类型转换、通道填充、色域转换。调用SetAippFunctions接口时需传入源图片在Global Memory上的矩阵、源图片的图片格式。 |
+
+### Mmad计算
+
+| 接口名 | 功能描述 |
+| --- | --- |
 | [Mmad](矩阵计算（ISASI）/Mmad计算/Mmad.md) | Mmad接口是Ascend C面向昇腾AI芯片的矩阵乘加核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发。 |
 | [MmadMx](矩阵计算（ISASI）/矩阵计算/MmadMx.md) | MmadMx（全称Microscaling Mmad）为带有量化系数的矩阵乘法，即左矩阵和右矩阵均有对应的量化系数矩阵，左量化系数矩阵scaleA和右量化系数矩阵scaleB。MmadMx场景中，左量化系数矩阵与左矩阵乘积，右量化系数矩阵与右矩阵乘积，对两个乘积的结果做矩阵乘法。 |
 | [MmadBitMode](矩阵计算（ISASI）/矩阵计算/MmadBitMode.md) | MmadBitMode对于MmadParams结构体构造进行了优化，本接口适用于scalar流水成为性能优化瓶颈的场景，支持基础Mmad/MmadMx计算功能。本接口与Mmad/MmadMx接口的差异在于参数传入的方式不同，本接口传入的是联合结构体MmadBitModeParams。 |
 | [MmadWithSparse](矩阵计算（ISASI）/矩阵计算/MmadWithSparse.md) | MmadWithSparse接口负责完成特殊稀疏矩阵乘加操作。稀疏矩阵是一种特殊类型的矩阵，即矩阵中包含较多的零元素。4：2结构化稀疏要求一个连续的4个权重或激活值的组（通常是张量中的一行或一列）中，最多只有2个值为非零，其余2个强制为零。 |
+
+### Mmad寄存器配置说明
+
+| 接口名 | 功能描述 |
+| --- | --- |
 | [SetHF32Mode](矩阵计算（ISASI）/Mmad计算/寄存器配置说明/SetHF32Mode.md) | 用于设置Mmad计算是否开启HF32模式，开启该模式后L0A Buffer/L0B Buffer中的FP32数据将在参与Mmad计算之前被舍入为HF32。 |
 | [SetHF32TransMode](矩阵计算（ISASI）/Mmad计算/寄存器配置说明/SetHF32TransMode.md) | 设置HF32模式取整的具体方式，需要先使用SetHF32Mode开启HF32取整模式。 |
+| [SetMMColumnMajor/SetMMRowMajor](矩阵计算（ISASI）/Mmad计算/寄存器配置说明/SetMMColumnMajor-SetMMRowMajor.md) | 控制Mmad/MmadWithSparse优先通过M/N的哪个方向。 |
+
+### 矩阵计算的搬出
+
+| 接口名 | 功能描述 |
+| --- | --- |
 | [L0C到GM数据搬运（DataCopy）](矩阵计算（ISASI）/矩阵计算的搬出/L0C到GM数据搬运（DataCopy）.md) | 矩阵计算的结果存放在L0C Buffer，DataCopy接口用于将结果搬运至Global Memory（GM）中，并且在搬运过程中支持随路格式转换等操作。 |
 | [L0C到GM数据搬运（Fixpipe）](矩阵计算（ISASI）/矩阵计算的搬出/L0C到GM数据搬运（Fixpipe）.md) | 矩阵计算的结果存放在L0C Buffer，Fixpipe接口用于将结果搬运至Global Memory（GM）中，并且在搬运过程中支持随路格式转换等操作。 |
 | [L0C到L1数据搬运（DataCopy）](矩阵计算（ISASI）/矩阵计算的搬出/L0C到L1数据搬运（DataCopy）.md) | 矩阵计算的结果存放在L0C Buffer，DataCopy接口用于将结果搬运至L1 Buffer中，并且在搬运过程中支持随路格式转换等操作。 |
 | [L0C到L1数据搬运（Fixpipe）](矩阵计算（ISASI）/矩阵计算的搬出/L0C到L1数据搬运（Fixpipe）.md) | 矩阵计算的结果存放在L0C Buffer，Fixpipe接口用于将结果搬运至L1 Buffer中，并且在搬运过程中支持随路格式转换等操作。 |
+| [L0C Buffer到UB数据搬运（Fixpipe）](矩阵计算（ISASI）/矩阵计算的搬出/L0C到UB数据搬运（Fixpipe）.md) | 矩阵计算的结果存放在L0C Buffer，Fixpipe接口用于将结果搬运至Unified Buffer（UB）中，并且在搬运过程中支持随路格式转换等操作。 |
+
+### L1到GM数据搬运
+
+| 接口名 | 功能描述 |
+| --- | --- |
 | [L1ToGM连续数据搬运（DataCopy）](矩阵计算（ISASI）/矩阵计算的搬出/L1到GM数据搬运/L1ToGM连续数据搬运（DataCopy）.md) | 该接口能够将矩阵从L1 Buffer连续搬运至Global Memory，数据搬运时格式和内容保持不变。 |
 | [L1ToGM高维切分数据搬运（DataCopy）](矩阵计算（ISASI）/矩阵计算的搬出/L1到GM数据搬运/L1ToGM高维切分数据搬运（DataCopy）.md) | 该接口主要实现将矩阵从L1 Buffer搬运至Global Memory，数据搬运时格式和内容保持不变。 |
+
+### 搬出寄存器配置说明
+
+| 接口名 | 功能描述 |
+| --- | --- |
 | [SetFixPipeConfig](矩阵计算（ISASI）/矩阵计算的搬出/寄存器配置说明/SetFixPipeConfig.md) | DataCopy数据搬运（L0C-\>GM、L0C-\>L1）过程中进行随路量化时，通过调用该接口设置量化的参数。 |
 | [SetFixpipePreQuantFlag](矩阵计算（ISASI）/矩阵计算的搬出/寄存器配置说明/SetFixpipePreQuantFlag.md) | DataCopy数据搬运（L0C-\>GM、L0C-\>L1）过程中进行随路量化时，通过调用该接口设置scalar量化参数。 |
 | [SetFixpipeNz2ndFlag](矩阵计算（ISASI）/矩阵计算的搬出/寄存器配置说明/SetFixpipeNz2ndFlag.md) | DataCopy数据搬运（L0C-\>GM）过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。 |
 | [SetFixPipeClipRelu](矩阵计算（ISASI）/矩阵计算的搬出/寄存器配置说明/SetFixPipeClipRelu.md) | DataCopy数据搬运（L0C-\>GM）过程中进行随路量化后，通过调用该接口设置ClipReLU操作的最大值。 |
 | [SetFixPipeAddr](矩阵计算（ISASI）/矩阵计算的搬出/寄存器配置说明/SetFixPipeAddr.md) | DataCopy数据搬运（L0C-\>GM）过程中进行随路量化后，通过调用该接口设置Elementwise操作时LocalTensor的地址。 |
-| [GMToL1 Load2D指令搬运](矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/GMToL1-Load2D指令搬运.md) | 负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位从Global Memory搬运至L1 Buffer（TPosition为A1/B1）。 |
-| [SetMMColumnMajor/SetMMRowMajor](矩阵计算（ISASI）/Mmad计算/寄存器配置说明/SetMMColumnMajor-SetMMRowMajor.md) | 控制Mmad/MmadWithSparse优先通过M/N的哪个方向。 |
-| [L0C Buffer到UB数据搬运（Fixpipe）](矩阵计算（ISASI）/矩阵计算的搬出/L0C到UB数据搬运（Fixpipe）.md) | 矩阵计算的结果存放在L0C Buffer，Fixpipe接口用于将结果搬运至Unified Buffer（UB）中，并且在搬运过程中支持随路格式转换等操作。 |
 
 ## 矩阵计算（TensorAPI）
+
+### 矩阵数据搬入至L1
+
 | 接口名 | 功能描述 |
 | --- | --- |
-| [Global Memory到L1 Buffer数据搬运](矩阵计算（TensorAPI）/矩阵计算的搬入/矩阵数据搬入至L1/GM到L1数据搬运（Copy）.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将Global Memory中的数据搬运到L1 Buffer。`Copy`接口根据源张量和目的张量的存储位置、数据类型和Layout选择具体搬运实现。搬运块数、搬运长度、源/目的侧步长以及格式转换相关信息由Tensor Layout推导，用户不需要在`Copy`调用中额外传入搬运参数。 |
-| [L1 Buffer到L0A Buffer数据搬运](矩阵计算（TensorAPI）/矩阵计算的搬入/矩阵数据搬入至L0/L1到L0A数据搬运（Copy）.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的左矩阵数据搬运到L0A Buffer。 |
-| [L1 Buffer到L0B Buffer数据搬运](矩阵计算（TensorAPI）/矩阵计算的搬入/矩阵数据搬入至L0/L1到L0B数据搬运（Copy）.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的右矩阵数据搬运到L0B Buffer。 |
-| [L1 Buffer到L0ScaleA Buffer数据搬运](矩阵计算（TensorAPI）/矩阵计算的搬入/矩阵数据搬入至L0/L1到L0ScaleA数据搬运（Copy）.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的左矩阵缩放数据搬运到L0ScaleA Buffer。左矩阵缩放数据在L0ScaleA Buffer上的首地址由左矩阵在L0A Buffer的首地址的1/16推导出来。 |
-| [L1 Buffer到L0ScaleB Buffer数据搬运](矩阵计算（TensorAPI）/矩阵计算的搬入/矩阵数据搬入至L0/L1到L0ScaleB数据搬运（Copy）.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的右矩阵缩放数据搬运到L0ScaleB Buffer。右矩阵缩放数据在L0ScaleB Buffer上的首地址由右矩阵在L0B Buffer的首地址的1/16推导出来。 |
-| [L1 Buffer到BiasTable Buffer数据搬运](矩阵计算（TensorAPI）/矩阵计算的搬入/矩阵数据搬入至L0/L1到BiasTable数据搬运（Copy）.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的bias数据搬运到BiasTable Buffer，作为Mmad计算中的bias输入。 |
-| [L1 Buffer到Fixpipe Buffer数据搬运](矩阵计算（TensorAPI）/矩阵计算的搬入/矩阵数据搬入至L0/L1到Fixpipe数据搬运（Copy）.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的量化数据搬运到Fixpipe Buffer。量化数据可用于L0C输出到GM/UB时做随路量化。 |
+| [Global Memory到L1 Buffer数据搬运（Copy）](矩阵计算（TensorAPI）/矩阵计算的搬入/矩阵数据搬入至L1/GM到L1数据搬运（Copy）.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将Global Memory中的数据搬运到L1 Buffer。`Copy`接口根据源张量和目的张量的存储位置、数据类型和Layout选择具体搬运实现。搬运块数、搬运长度、源/目的侧步长以及格式转换相关信息由Tensor Layout推导，用户不需要在`Copy`调用中额外传入搬运参数。 |
+
+### 矩阵数据搬入至L0
+
+| 接口名 | 功能描述 |
+| --- | --- |
+| [L1 Buffer到L0A Buffer数据搬运（Copy）](矩阵计算（TensorAPI）/矩阵计算的搬入/矩阵数据搬入至L0/L1到L0A数据搬运（Copy）.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的左矩阵数据搬运到L0A Buffer。 |
+| [L1 Buffer到L0B Buffer数据搬运（Copy）](矩阵计算（TensorAPI）/矩阵计算的搬入/矩阵数据搬入至L0/L1到L0B数据搬运（Copy）.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的右矩阵数据搬运到L0B Buffer。 |
+| [L1 Buffer到L0ScaleA Buffer数据搬运（Copy）](矩阵计算（TensorAPI）/矩阵计算的搬入/矩阵数据搬入至L0/L1到L0ScaleA数据搬运（Copy）.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的左矩阵缩放数据搬运到L0ScaleA Buffer。左矩阵缩放数据在L0ScaleA Buffer上的首地址由左矩阵在L0A Buffer的首地址的1/16推导出来。 |
+| [L1 Buffer到L0ScaleB Buffer数据搬运（Copy）](矩阵计算（TensorAPI）/矩阵计算的搬入/矩阵数据搬入至L0/L1到L0ScaleB数据搬运（Copy）.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的右矩阵缩放数据搬运到L0ScaleB Buffer。右矩阵缩放数据在L0ScaleB Buffer上的首地址由右矩阵在L0B Buffer的首地址的1/16推导出来。 |
+| [L1 Buffer到BiasTable Buffer数据搬运（Copy）](矩阵计算（TensorAPI）/矩阵计算的搬入/矩阵数据搬入至L0/L1到BiasTable数据搬运（Copy）.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的bias数据搬运到BiasTable Buffer，作为Mmad计算中的bias输入。 |
+| [L1 Buffer到Fixpipe Buffer数据搬运（Copy）](矩阵计算（TensorAPI）/矩阵计算的搬入/矩阵数据搬入至L0/L1到Fixpipe数据搬运（Copy）.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的量化数据搬运到Fixpipe Buffer。量化数据可用于L0C输出到GM/UB时做随路量化。 |
+
+### Mmad计算
+
+| 接口名 | 功能描述 |
+| --- | --- |
 | [Mmad](矩阵计算（TensorAPI）/Mmad计算/Mmad.md) | `Mmad`接口用于完成L0A Buffer上左矩阵A和L0B Buffer上右矩阵B的矩阵乘加，结果写入L0C Buffer上结果矩阵C。默认模式为普通矩阵计算。 |
-| [L0C Buffer到Global Memory数据搬运](矩阵计算（TensorAPI）/矩阵计算的搬出/L0C到GM数据搬运（Copy）.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L0C Buffer中的矩阵计算结果搬运到Global Memory。L0C Buffer中的数据通常为`Mmad`的输出，数据格式为`NZ`。搬运到Global Memory时，接口会根据目的张量布局自动选择`NZ`到`ND`、`NZ`到`DN`或`NZ`到`NZ`的随路格式转换。 |
-| [L0C Buffer到Unified Buffer数据搬运](矩阵计算（TensorAPI）/矩阵计算的搬出/L0C到UB数据搬运（Copy）.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L0C Buffer中的矩阵计算结果搬运到Unified Buffer。L0C Buffer中的数据通常为`Mmad`的输出，数据格式为`NZ`。搬运到Unified Buffer时，接口会根据目的张量格式自动选择`NZ`到`ND`、`NZ`到`DN`或`NZ`到`NZ`的随路格式转换。 |
+
+### 矩阵计算的搬出
+
+| 接口名 | 功能描述 |
+| --- | --- |
+| [L0C Buffer到Global Memory数据搬运（Copy）](矩阵计算（TensorAPI）/矩阵计算的搬出/L0C到GM数据搬运（Copy）.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L0C Buffer中的矩阵计算结果搬运到Global Memory。L0C Buffer中的数据通常为`Mmad`的输出，数据格式为`NZ`。搬运到Global Memory时，接口会根据目的张量布局自动选择`NZ`到`ND`、`NZ`到`DN`或`NZ`到`NZ`的随路格式转换。 |
+| [L0C Buffer到Unified Buffer数据搬运（Copy）](矩阵计算（TensorAPI）/矩阵计算的搬出/L0C到UB数据搬运（Copy）.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L0C Buffer中的矩阵计算结果搬运到Unified Buffer。L0C Buffer中的数据通常为`Mmad`的输出，数据格式为`NZ`。搬运到Unified Buffer时，接口会根据目的张量格式自动选择`NZ`到`ND`、`NZ`到`DN`或`NZ`到`NZ`的随路格式转换。 |
 
 ## Memory矢量计算
 
@@ -81,7 +145,7 @@
 | [GMToUB多维数据搬运NDDMA(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/GMToUB多维数据搬运NDDMA(DataCopy).md) | 多维数据搬运接口，相比于基础数据搬运接口，可更加自由配置搬入的维度信息以及对应的Stride。 |
 | [GMToUB非对齐数据搬运(DataCopyPad)](Memory矢量计算/数据搬运/GM与UB数据搬运/GMToUB非对齐数据搬运(DataCopyPad).md) | 该接口提供将数据从Global Memory非对齐搬运至Unified Buffer的功能，可以根据开发者的需要自行填充数据。 |
 | [UBToGM非对齐数据搬运(DataCopyPad)](Memory矢量计算/数据搬运/GM与UB数据搬运/UBToGM非对齐数据搬运(DataCopyPad).md) | 该接口提供将数据从Unified Buffer非对齐搬运至Global Memory的功能。 |
-| [SetPadValue(ISASI)](Memory矢量计算/数据搬运/GM与UB数据搬运/寄存器配置说明/SetPadValue(ISASI).md) | DataCopyPad.md从Global Memory将数据非对齐搬运至Unified Buffer时，可根据开发者的需要自行填充数据。SetPadValue用于设置DataCopyPad需要填充的数值。 |
+| [SetPadValue(ISASI)](Memory矢量计算/数据搬运/GM与UB数据搬运/寄存器配置说明/SetPadValue(ISASI).md) | 从Global Memory将数据非对齐搬运至Unified Buffer时，可根据开发者的需要自行填充数据。SetPadValue用于设置DataCopyPad需要填充的数值。 |
 | [SetLoopModePara](Memory矢量计算/数据搬运/GM与UB数据搬运/寄存器配置说明/SetLoopModePara.md) | DataCopy、DataCopyPad过程中通过该接口使能loop mode并且设置loop mode的参数，在数据搬运结束后通过ResetLoopModePara重置loop mode的参数。 |
 | [ResetLoopModePara](Memory矢量计算/数据搬运/GM与UB数据搬运/寄存器配置说明/ResetLoopModePara.md) | 重置loop mode的参数。与SetLoopModePara搭配使用，在使能loop mode并且设置loop mode的参数的数据搬运场景下，数据搬运结束后需要调用该函数来重置loop mode参数。 |
 | [UBToUB连续数据搬运(DataCopy)](Memory矢量计算/数据搬运/UB与UB数据搬运/UBToUB连续数据搬运(DataCopy).md) | 支持Unified Buffer与Unified Buffer之间的连续数据搬运，数据在传输过程中保持原始格式和内容不变。 |
@@ -375,9 +439,9 @@
 | [AllocMutexID (ISASI)](同步控制/核内同步/AllocMutexID-(ISASI).md) | 从框架获取并占用一个MutexID，与ReleaseMutexID配合使用，管理MutexID的获取和释放。获取的MutexID可以传入Mutex接口使用，此时Mutex可以与TQue等其他接口配合使用。 |
 | [DataSyncBarrier(ISASI)](同步控制/核内同步/DataSyncBarrier(ISASI).md) | 阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可通过参数控制）执行结束，用于解决Scalar的内存依赖。 |
 | [PipeBarrier(ISASI)](同步控制/核内同步/PipeBarrier(ISASI).md) | 完成同一流水线内的同步控制，用于在同一流水线内部约束执行顺序。其作用是，保证前序指令中所有数据的读写工作全部完成，后序指令才能执行。 |
-| [ReleaseMutexID (ISASI)](同步控制/核内同步/ReleaseMutexID-(ISASI).md) | 从框架释放一个MutexID，与AllocMutexID.md配合使用。 |
+| [ReleaseMutexID (ISASI)](同步控制/核内同步/ReleaseMutexID-(ISASI).md) | 从框架释放一个MutexID，与AllocMutexID配合使用。 |
 | [SetFlag/WaitFlag(ISASI)](同步控制/核内同步/SetFlag-WaitFlag(ISASI).md) | SetFlag/WaitFlag接口用于核内多流水间的同步。 |
-| [CrossCoreSetFlag(ISASI)](同步控制/核间同步/CrossCoreSetFlag(ISASI).md) | 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag.md接口配对工作，使用时需传入核间同步的标记ID（flagId），每个ID对应一个用于控制同步的计数器。CrossCoreSetFlag接口用于通知调度模块“本核的pipe流水任务已经完成”，CrossCoreWaitFlag接口用于阻塞后续指令下发，直到所有相关核均完成同步后方可解除阻塞。 |
+| [CrossCoreSetFlag(ISASI)](同步控制/核间同步/CrossCoreSetFlag(ISASI).md) | 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，使用时需传入核间同步的标记ID（flagId），每个ID对应一个用于控制同步的计数器。CrossCoreSetFlag接口用于通知调度模块“本核的pipe流水任务已经完成”，CrossCoreWaitFlag接口用于阻塞后续指令下发，直到所有相关核均完成同步后方可解除阻塞。 |
 | [CrossCoreWaitFlag(ISASI)](同步控制/核间同步/CrossCoreWaitFlag(ISASI).md) | 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，具体功能请参考[CrossCoreSetFlag](同步控制/核间同步/CrossCoreSetFlag(ISASI).md)。 |
 
 ### 系统变量访问
