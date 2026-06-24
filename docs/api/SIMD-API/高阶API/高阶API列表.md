@@ -1,6 +1,6 @@
 # 高阶API列表
 
-**表1**  数学计算API列表
+## 数学计算
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -54,7 +54,7 @@
 | [BitwiseXor](数学计算/BitwiseXor接口/BitwiseXor.md) | 逐比特对两个输入进行异或操作。 |
 | [Where](数学计算/Where接口/Where.md) | 根据指定的条件，从两个源操作数中选择元素，生成目标操作数。 |
 
-**表2**  量化操作API列表
+## 量化操作
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -65,7 +65,7 @@
 | [Quantize](量化操作/Quantize.md) | 按元素做量化计算，比如将half/float数据类型量化为int8_t数据类型。 |
 | [AscendQuant](量化操作/AscendQuant.md) | 按元素做量化计算，比如将half/float数据类型量化为int8_t数据类型。 |
 
-**表3**  归一化操作API列表
+##  归一化操作
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -83,7 +83,7 @@
 | [WelfordUpdate](归一化操作/WelfordUpdate.md) | 实现Welford算法的前处理。 |
 | [WelfordFinalize](归一化操作/WelfordFinalize.md) | 实现Welford算法的后处理。 |
 
-**表4**  激活函数API列表
+##  激活函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -106,7 +106,7 @@
 | [SwiGLU](激活函数/SwiGLU接口/SwiGLU.md) | 采用Swish作为激活函数的GLU变体。 |
 | [Swish](激活函数/Swish接口/Swish.md) | 神经网络中的Swish激活函数。 |
 
-**表5**  归约操作API列表
+##  归约操作
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -121,7 +121,7 @@
 | [ReduceAll](归约操作/ReduceAll接口/ReduceAll.md) | 对一个多维向量在指定的维度求逻辑与。 |
 | [ReduceProd](归约操作/ReduceProd接口/ReduceProd.md) | 对一个多维向量在指定的维度求积。 |
 
-**表6**  排序操作API列表
+##  排序操作
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -131,14 +131,14 @@
 | [Sort](排序操作/Sort.md) | 排序函数，按照数值大小进行降序排序。 |
 | [MrgSort](排序操作/MrgSort-93.md) | 将已经排好序的最多4条队列，合并排列成1条队列，结果按照score域由大到小排序。 |
 
-**表7**  数据过滤API列表
+##  数据过滤
 
 | 接口名 | 功能描述 |
 | --- | --- |
 | [Select](数据过滤/Select-95.md) | 给定两个源操作数src0和src1，根据maskTensor相应位置的值（非bit位）选取元素，得到目的操作数dst。 |
 | [DropOut](数据过滤/DropOut.md) | 提供根据MaskTensor对源操作数进行过滤的功能，得到目的操作数。 |
 
-**表8**  张量变换API列表
+##  张量变换
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -149,25 +149,25 @@
 | [UnPad](张量变换/UnPad.md) | 对height * width的二维Tensor在width方向上进行unpad。 |
 | [Fill](张量变换/Fill-97.md) | 将Global Memory上的数据初始化为指定值。 |
 
-**表9**  索引计算API列表
+##  索引计算
 
 | 接口名 | 功能描述 |
 | --- | --- |
 | [Arange](索引计算/Arange-94.md) | 给定起始值，等差值和长度，返回一个等差数列。 |
 
-**表10**  矩阵计算API列表
+##  矩阵计算
 
 | 接口名 | 功能描述 |
 | --- | --- |
 | [Matmul](矩阵计算/Matmul-Kernel侧接口/Matmul-Kernel侧接口.md) | Matmul矩阵乘法的运算。 |
 
-**表11**  HCCL通信类API列表
+##  HCCL通信类
 
 | 接口名 | 功能描述 |
 | --- | --- |
 | [HCCL通信类](HCCL通信类/HCCL通信类.md) | 在AI Core侧编排集合通信任务。 |
 
-**表12**  卷积计算API列表
+##  卷积计算
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -175,7 +175,7 @@
 | [Conv3DBackpropInput](卷积计算/Conv3DBackpropInput/Conv3DBackpropInput.md) | 卷积的反向运算，求解特征矩阵的反向传播误差。 |
 | [Conv3DBackpropFilter](卷积计算/Conv3DBackpropFilter/Conv3DBackpropFilter.md) | 卷积的反向运算，求解权重的反向传播误差。 |
 
-**表13**  随机函数API列表
+##  随机函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
