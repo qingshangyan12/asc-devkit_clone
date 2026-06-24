@@ -24,11 +24,6 @@ set(PRODUCT_TYPE_LIST
     ascend950pr_9599_AIV_MICRO
     ascend950pr_9599_AIV_SIMT
     ascend950pr_9599_AIC
-    mc62cm12aa_AIC
-    mc62cm12aa_BASIC
-    mc62cm12aa_FRAMEWORK
-    mc62cm12aa_MICRO
-    mc62cm12aa_SIMT
 )
 
 file(GLOB ASCENDC_TILING_TEST_SRC_FILES
@@ -67,11 +62,6 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIV_MICRO>:__NPU_ARCH__=3510>
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIV_SIMT>:__NPU_ARCH__=3510>
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:__NPU_ARCH__=3510>
-        $<$<STREQUAL:${product_type},mc62cm12aa_AIC>:__NPU_ARCH__=5102>
-        $<$<STREQUAL:${product_type},mc62cm12aa_BASIC>:__NPU_ARCH__=5102>
-        $<$<STREQUAL:${product_type},mc62cm12aa_FRAMEWORK>:__NPU_ARCH__=5102>
-        $<$<STREQUAL:${product_type},mc62cm12aa_MICRO>:__NPU_ARCH__=5102>
-        $<$<STREQUAL:${product_type},mc62cm12aa_SIMT>:__NPU_ARCH__=5102>
     )
 
     target_include_directories(ascendc_ut_tiling_utils_${product_type} PRIVATE
