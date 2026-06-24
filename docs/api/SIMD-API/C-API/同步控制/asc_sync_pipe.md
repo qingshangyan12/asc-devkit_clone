@@ -10,7 +10,7 @@
 
 ## 功能说明
 
-等待指定流水线操作完成。
+阻塞相同流水，具有数据依赖的相同流水之间需要插入此同步。
 
 ## 函数原型
 
@@ -22,7 +22,7 @@ __aicore__ inline void asc_sync_pipe(pipe_t pipe)
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
-| pipe | 输入 | 指定需要同步的流水线。需传入编译期常量。 |
+| pipe | 输入 | 阻塞的流水类别。如果不关注流水类别，希望阻塞所有流水，可以传入PIPE_ALL。 |
 
 ## 返回值说明
 
@@ -34,27 +34,19 @@ PIPE_S
 
 ## 约束说明
 
-无
+Scalar流水之间的同步由硬件自动保证，调用asc_sync_pipe(PIPE_S)可能引发硬件错误。
 
 ## 调用示例
 
 ```cpp
-// 本例中total_length指参与计算的数据总长度。src0_gm，src1_gm，dst_gm是外部输入的float类型的源操作数、目的操作数，指向GM内存空间。
-constexpr uint32_t total_length = 128;
+// total_length指参与计算的数据总长度。
 __ubuf__ float src0[total_length];
 __ubuf__ float src1[total_length];
-__ubuf__ float dst[total_length];
+__ubuf__ float dst0[total_length];
+__ubuf__ float dst1[total_length];
 
-asc_copy_gm2ub((__ubuf__ void*)src0, (__gm__ void*)src0_gm, total_length * sizeof(float));
-asc_copy_gm2ub((__ubuf__ void*)src1, (__gm__ void*)src1_gm, total_length * sizeof(float));
-
-// 同步操作：数据搬运操作（GM到UB，PIPE_MTE2流水）完成后才能启动后续操作。
-asc_sync_pipe(PIPE_MTE2);
-
-asc_add(dst, src1, src0, total_length);
-
-// 同步操作：计算操作（PIPE_V流水）完成后才能启动后续操作。
+// asc_mul指令的输入dst0是asc_add指令的输出，两个矢量运算指令产生依赖，需要插入asc_sync_pipe保证两条指令的执行顺序。
+asc_add(dst0, src0, src1, total_length);
 asc_sync_pipe(PIPE_V);
-
-asc_copy_ub2gm((__gm__ void*)dst_gm, (__ubuf__ void*)dst, total_length * sizeof(float));
+asc_mul(dst1, dst0, src1, total_length);
 ```
