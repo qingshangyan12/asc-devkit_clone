@@ -1,6 +1,157 @@
-# 样例列表
+# SIMD与SIMT混合编程样例介绍
+
+## 概述
+
+SIMD与SIMT混合编程适用于同一个Kernel中同时需要向量化计算能力和线程级灵活控制的场景。通常可使用SIMD完成规则向量计算，使用SIMT处理离散访存、分支判断、线程映射和细粒度数据搬运等逻辑，从而在保留表达灵活性的同时提升规则计算效率。
+
+SIMD与SIMT混合编程是基于SIMD编程和SIMT编程的高阶编程方式，相关样例主要分布在以下路径：
+
+- `examples/05_simd_simt_hybrid`路径下提供混合编程入门样例，以及使用SIMD和SIMT协同进行性能优化的样例。
+- 由于混合编程的Kernel入口与SIMD编程方式一致，端到端维测相关样例可参考`examples/01_simd_cpp_api`路径下的样例。
+- 混合编程通过启动SIMT VF实现SIMT线程级操作，SIMT VF相关的重点特性、维测和性能优化样例可参考`examples/03_simt_api`路径下的样例。
+
+后文将分别介绍混合编程场景下涉及到introduction、utilities、features和best_practices样例。
+
+## introduction
+
+[00_introduction](./00_introduction)是SIMD与SIMT混合编程场景的入门参考目录，该目录下包含以下样例。并介绍如何将SIMT参考样例转换为SIMD与SIMT混合编程方式的样例。
 
 |  目录名称                                                   |  功能描述                                              |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
-| [00_introduction](./00_introduction) | SIMD与SIMT混合编程示例 |
-| [02_best_practices](./02_best_practices) | SIMD与SIMT混合编程高性能优化样例 |
+| [simd_simt/introduction/gather_and_adds](./00_introduction/simd_simt_gather_and_adds) | 基于SIMD与SIMT混合编程实现Gather和Adds融合计算，展示使用SIMT处理离散访存、使用SIMD处理连续向量计算的基本写法，以及Kernel和VF函数的定义与调用方式。 |
+
+## utilities
+
+基于SIMD与SIMT混合编程开发自定义算子时，可参考以下utilities样例进行调试调优：
+
+|  目录名称                                                   |  功能描述                                              |
+| ------------------------------------------------------------ | ---------------------------------------------------- |
+| [simd/utilities/profiling](../01_simd_cpp_api/01_utilities/04_profiling) | 展示如何使用Profiling采集算子执行数据，并分析混合编程中SIMD计算、SIMT VF调用和数据搬运的耗时占比。 |
+| [simd/utilities/sanitizer](../01_simd_cpp_api/01_utilities/05_sanitizer) | 展示如何使用Sanitizer定位内存越界、非法访问等问题，适用于混合编程调试阶段的问题排查。 |
+| [simd/utilities/simulator](../01_simd_cpp_api/01_utilities/08_simulator) | 展示如何使用Simulator在仿真模式下进行功能调试和基础性能数据采集。 |
+| [simt/utilities/printf](../03_simt_api/01_utilities/00_printf) | SIMT参考样例，展示如何在SIMT VF中打印调试信息，样例转换方法见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
+| [simt/utilities/assert](../03_simt_api/01_utilities/01_assert) | SIMT参考样例，展示如何在SIMT VF中进行断言检查，样例转换方法见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
+| [simt/utilities/simt_vf_clock](../03_simt_api/01_utilities/02_clock) | SIMT参考样例，展示如何在SIMT VF中统计局部执行周期，辅助定位混合编程中的热点路径，样例转换方法见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
+
+## features
+
+基于SIMD与SIMT混合编程开发自定义算子时，可参考以下SIMT重点特性样例。
+
+|  目录名称                                                   |  功能描述                                              |
+| ------------------------------------------------------------ | ---------------------------------------------------- |
+| [simt/features/memory_access](../03_simt_api/02_features/01_api_features/00_memory_access) | SIMT参考样例，展示Global Memory离散访存相关API的使用方法，适用于混合编程中由SIMT处理复杂索引访问的场景，样例转换方法见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
+| [simt/features/sync_instruction](../03_simt_api/02_features/01_api_features/01_sync_instruction) | SIMT参考样例，展示同步与内存栅栏接口的使用方法，适用于混合编程中SIMT线程协作和跨阶段数据可见性控制，样例转换方法见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
+| [simt/features/atomic_operation](../03_simt_api/02_features/01_api_features/02_atomic_operation) | SIMT参考样例，展示原子操作接口的使用方法，适用于混合编程中多线程累加、计数或冲突写入处理，样例转换方法见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
+| [simt/features/warp_instruction](../03_simt_api/02_features/01_api_features/03_warp_instruction) | SIMT参考样例，展示Warp级数据交换能力，可用于了解Warp内线程协作和数据传递方式，样例转换方法见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
+
+
+## best_practices
+
+SIMD与SIMT混合编程场景的常用性能优化路径如下：
+
+- 合理配置最大线程数：最大线程数会影响单线程可用寄存器数量，需根据算子计算复杂度配置线程数，避免寄存器溢出影响性能。
+- 访存优化：通过访存合并、合理利用UB中转、减少离散访问和规避UB Bank冲突等手段提升访存效率。
+    - 访存合并包含GM和UB访问合并，核心思路是让Warp内线程尽量连续访问GM或UB，使底层硬件可以合并内存访问请求，减少请求次数。
+    - 通过合理使用UB中转，可减少离散访问。使用UB时需关注UB Bank冲突，可通过优化内存排布降低冲突概率。
+    - 连续搬运数据的场景可使用MTE搬运数据。通常情况下，MTE搬运效率高于SIMT LD/ST访存效率，并且MTE与SIMT VF属于不同流水，更容易并行执行以掩盖搬运开销。
+
+- 执行配置优化：根据数据规模和单线程工作量配置gridDim、blockDim以及VF函数调用粒度，减少无效线程和调度开销。
+- 计算指令优化：针对固定除数整数除法等场景，使用乘法和移位替代高开销指令。
+
+`02_best_practices`路径下提供了使用SIMD与SIMT混合编程实现的性能优化样例，主要展示如何配合使用SIMD和SIMT提升性能，具体如下：
+
+| 目录名称 | 可参考内容 |
+| ------------------------------------------------------------ | ---------------------------------------------------- |
+| [simd_simt_best_practices_matrix_transpose](./02_best_practices/simd_simt_matrix_transpose) | 以矩阵转置为例介绍UB中转和全局访存合并优化方法。 |
+| [simd_simt_best_practices_high_performance](./02_best_practices/simd_simt_high_performance) | 以FloorMod计算为例，对比SIMT直接访问GM、SIMD RegBase计算、SIMT访问UB以及连续线程映射等实现方式。 |
+| [simd_simt_best_practices_grid_dim_config](./02_best_practices/simd_simt_grid_dim_config) | 以Gather计算为例介绍线程块数量配置和VF函数调用优化思路。 |
+| [simd_simt_best_practices_integer_fast_div](./02_best_practices/simd_simt_integer_fast_div) | 以固定除数整数除法为例，展示使用乘法和移位替代普通除法的优化方式。 |
+
+另外，SIMD与SIMT混合编程场景中的SIMT VF优化手段，可参考`03_simt_api/03_best_practices`路径下的SIMT样例，具体如下：
+
+| 目录名称 | 可参考内容 |
+| ------------------------------------------------------------ | ---------------------------------------------------- |
+| [simt/best_practices_cache_hint](../03_simt_api/03_best_practices/00_memory_optimizations/cache_hint) | SIMT参考样例，展示数据缓存优化方法，可参考为不同数据指定缓存策略、减少Global Memory访问次数的实现思路，样例转换方法见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
+| [simt/best_practices_short_vector_add](../03_simt_api/03_best_practices/00_memory_optimizations/short_vector_add) | SIMT参考样例，展示短向量优化方法，可参考half2等短向量类型提升访存带宽利用率和计算效率的实现思路，样例转换方法见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
+| [simt/best_practices_aligned_types](../03_simt_api/03_best_practices/00_memory_optimizations/aligned_types) | SIMT参考样例，展示类型对齐优化方法，可参考结构体对齐对Global Memory访存吞吐的影响，样例转换方法见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
+| [simt/best_practices_max_thread_config](../03_simt_api/03_best_practices/01_execution_conf_optimizations/max_thread_config) | SIMT参考样例，展示最大线程块配置方法，可参考寄存器使用量、最大线程数和执行性能之间的关系，样例转换方法见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
+
+
+## SIMT参考样例转换说明
+
+`03_simt_api`路径下的SIMT样例主要展示SIMT Kernel直调写法。混合编程场景可以参考其中的线程映射、访存、同步、原子操作和Warp级协作逻辑，但Kernel入口、Host侧调用配置和CMake编译选项存在差异。将SIMT参考样例用于SIMD与SIMT混合编程时，需重点关注以下差异。
+
+### Kernel定义差异
+
+SIMT编程样例通常将线程级逻辑直接写在`__global__` Kernel中，例如：
+
+```cpp
+template <typename type_data, typename type_idx>
+__global__ __launch_bounds__(MAX_THREAD_COUNT) void gather_custom(
+    type_data* input, type_idx* index, type_data* output, uint32_t in_width, uint32_t index_total_length)
+{
+    int32_t out_row = blockIdx.x * blockDim.x + threadIdx.x;
+    ...
+}
+```
+
+混合编程场景的入口Kernel与SIMD编程方式一致，通常定义为`__global__ __vector__`。线程级SIMT逻辑需要拆分到`__simt_vf__`函数中，再由入口Kernel通过`asc_vf_call`调用。例如：
+
+```cpp
+__simt_vf__ __launch_bounds__(thread_count) inline void simt_gather(
+    __gm__ float* input, __gm__ uint32_t* index, __ubuf__ float* gather_output, ...)
+{
+    uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+    ...
+}
+
+__global__ __vector__ void gather_and_adds_kernel(
+    __gm__ float* input, __gm__ uint32_t* index, __gm__ float* output, ...)
+{
+    ...
+    asc_vf_call<simt_gather>(dim3(thread_count), input, index, gather_output, ...);
+    ...
+}
+```
+
+因此，转换SIMT样例时，一般将原SIMT Kernel中的线程索引计算、分支判断、访存和线程协作逻辑迁移到`__simt_vf__`函数中；将数据搬运、UB空间申请、SIMD VF调用以及SIMT VF调用编排放在`__global__ __vector__`入口Kernel中。
+
+### 调用配置差异
+
+SIMT编程样例的Host侧`<<<>>>`通常包含4个参数，用于配置线程块数量、线程数、动态UB和stream：
+
+```cpp
+gather_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(...);
+```
+
+混合编程样例中，Host侧`<<<>>>`启动的是Vector Core入口Kernel，此时：
+
+- `<<<>>>`第一个参数用于配置启动的Vector Core数量或逻辑核数量。
+- `<<<>>>`第二个参数表示动态UB大小，不再表示SIMT线程数。
+- SIMT线程数由入口Kernel内部的`asc_vf_call<simt_func>(dim3(thread_count), ...)`配置。
+
+例如混合编程入门样例中，Host侧启动8个Vector Core，并为Kernel配置动态UB大小：
+
+```cpp
+constexpr uint32_t num_blocks = 8;
+constexpr uint32_t dyn_ub_size = 2048;
+gather_and_adds_kernel<<<num_blocks, dyn_ub_size, stream>>>(...);
+```
+
+SIMT线程数在Kernel内部配置：
+
+```cpp
+asc_vf_call<simt_gather>(dim3(thread_count), input, index, gather_output, ...);
+```
+
+### CMake编译选项差异
+
+SIMT编程样例通过`--enable-simt`显式打开SIMT编译能力，例如：
+
+```cmake
+target_compile_options(${TARGET_NAME} PRIVATE
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt>
+)
+```
+
+将SIMT参考样例用于SIMD与SIMT混合编程时，建议以混合编程样例的CMake结构为基础，根据是否需要NPU仿真、CPU调试、Profiling或Sanitizer能力补充对应选项和链接库。
