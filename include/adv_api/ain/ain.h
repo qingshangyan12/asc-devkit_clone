@@ -56,6 +56,8 @@ public:
      AIN_DEVICE void waitSignal(HcclAinSignal_t signalId, uint64_t least, uint32_t bits,
          AinMemoryOrder order = AIN_MEMORY_ORDER_ACQUIRE) const;
 
+     AIN_DEVICE __gm__ uint64_t *getSignalShadowPtr(HcclAinSignal_t signalId) const;
+
 private:
     static constexpr uint32_t MAX_PENDING_CHANNELS = 64;
 

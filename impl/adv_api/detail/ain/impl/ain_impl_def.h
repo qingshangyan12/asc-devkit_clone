@@ -39,8 +39,6 @@ typedef struct {} AinRemoteNone;
 typedef struct {} AinLocalNone;
 typedef struct {} AinDescriptorUbufNone;
 
-typedef uint32_t HcclAinSignal_t;
-
 typedef struct {
     uint32_t nRanks;
     uint32_t rank;
@@ -52,8 +50,6 @@ typedef struct {
     HcclAinSignal_t signal0;
     uint32_t reserved;
 } HcclAinBarrierHandle;
-
-typedef uint64_t HcclDevComm;
 
 template <typename T, typename U>
 struct AinIsSame {
@@ -136,6 +132,9 @@ typedef struct {
     CommAbiHeader abiHeader;
     ChannelHandle **entity;
     uint32_t *entityNumPerRank;
+    int32_t ainSignalCount;
+    uint64_t *ainSignalShadows;
+    uint64_t *symMemPool;
 } AivResource;
 
 typedef struct {
