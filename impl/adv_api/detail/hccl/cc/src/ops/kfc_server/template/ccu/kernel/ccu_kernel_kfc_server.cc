@@ -146,14 +146,9 @@ void WaitTurnStartSig(const ccu::Variable &hbmSigAddr, ccu::Variable &turnStartS
     // TODO GetDieId()
     const uint32_t getDieId = 1;
     // 单Die场景：等待HBM中的信号
-    // DEBUG: 写 magic 值到 recordAddr 确认 CCU 已进入轮询，再把读到的值 Store 供 AICore 验证
-    ccu::Variable dbgMagic;
-    dbgMagic = 0xDEAD;
-    ccu::Store(dbgMagic, ctx.recordAddr);        // CCU 已进入轮询的标记
     CCU_WHILE(turnStartSig != 1)
     {
         ccu::Load(hbmSigAddr, turnStartSig);     // 循环读HBM对应地址的信号到Xn，直到Xn中的信号值为1
-        ccu::Store(turnStartSig, ctx.recordAddr);  // 把读到的值写到完成信号区供 AICore 读取
     }
     turnStartSig = 0;                       // reset Xn
     ccu::Store(turnStartSig, hbmSigAddr);        // reset HBM

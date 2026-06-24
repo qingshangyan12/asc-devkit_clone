@@ -523,16 +523,11 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     GM_ADDR waitCKEAddr = GetWaitCkeAddr(reqId);
 
 #ifndef ASCENDC_CPU_DEBUG
-    uint32_t dbgPollCnt = 0;
+    // DEBUG: 加超时计数器，轮询 100000 次后强制 break，验证是否卡在此处
+    uint32_t timeoutCnt = 0;
+    constexpr uint32_t TIMEOUT_MAX = 100000U;
     while (true) {
         uint64_t waitCke = ReadHBMData(waitCKEAddr);
-        // DEBUG: 前3次轮询打印 waitCke 值，验证 CCU 是否读到 commit CKE
-        // 0xDEAD = CCU 已进入轮询但读到 commit=0；0x1 = CCU 读到 commit=1 并完成；0 = CCU 未进入轮询
-        if (dbgPollCnt < 3U) {
-            AscendC::PRINTF("dbgPoll[%u] waitCke=0x%llx addr=0x%llx\n",
-                dbgPollCnt, waitCke, reinterpret_cast<uint64_t>(waitCKEAddr));
-            dbgPollCnt++;
-        }
         if (waitCke != 0) {
             if (workingFlag_) {
                 finishNumTemp_++;
@@ -546,6 +541,10 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
             if (finshCnt > finishNum_) {
                 break;
             }
+        }
+        timeoutCnt++;
+        if (timeoutCnt >= TIMEOUT_MAX) {
+            break;  // 超时强制退出
         }
     }
 #endif
