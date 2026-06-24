@@ -32,6 +32,8 @@
 
   对应的数学表达式为：  
   $$
+
+  本样例中$\alpha$取值为0.01。
   out =
   \begin{cases}
   x, & \text{if } x \ge 0 \\
