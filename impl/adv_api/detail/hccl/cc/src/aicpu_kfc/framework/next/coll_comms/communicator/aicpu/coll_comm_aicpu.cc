@@ -115,6 +115,11 @@ HcclResult CollCommAicpu::InitThreads(ThreadMgrAicpuParam *param)
 
 HcclResult CollCommAicpu::RegisterThreadAddDfxTaskInfo(ThreadHandle thread) 
 {
+#ifdef MC2_SERVER_ONLY
+    HCCL_INFO("[MC2_DFX][SkipThreadTaskDetailRegister] thread[0x%llx], skip task detail callback register",
+        static_cast<unsigned long long>(thread));
+    return HCCL_SUCCESS;
+#endif
     int32_t ret = HcommThreadRegisterDfx(thread, dfx_.GetCallback());
     if (ret != 0) {
         HCCL_ERROR("[CollCommAicpu][RegisterThreadAddDfxTaskInfo] HcommThreadRegisterDfx failed, ret[%d]", ret);
@@ -204,6 +209,11 @@ HcclResult CollCommAicpu::ParsePackData(std::vector<char> &data, ChannelHandle &
 }
 
 HcclResult CollCommAicpu::RegisterChannelAddDfxTaskInfo(ChannelHandle channel) {
+#ifdef MC2_SERVER_ONLY
+    HCCL_INFO("[MC2_DFX][SkipChannelTaskDetailRegister] channel[0x%llx], skip task detail callback register",
+        static_cast<unsigned long long>(channel));
+    return HCCL_SUCCESS;
+#endif
     int hert = HcommChannelRegisterDfx(channel, dfx_.GetCallback());
     return static_cast<HcclResult>(hert);
 }
