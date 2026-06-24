@@ -29,23 +29,19 @@
 namespace AscendC{
 
 AIN_DEVICE AinBarrierSession::AinBarrierSession(
-    Ain& ain, HcclTeam team, HcclAinBarrierHandle handle, uint32_t index 
+    Ain* ain, HcclTeam team, HcclAinBarrierHandle handle, uint32_t index 
     ):
     AinBarrierSession_internal{ain, team, handle, (int)index} {
     this->signal = handle.signal0 + index * team.nRanks;
 }
 
-// AIN_DEVICE AinBarrierSession::AinBarrierSession(
-//     Ain& ain, HcclTeamTagWorld, uint32_t index 
-//     ):
-//     AinBarrierSession(ain, HcclTeamWorld(ain.devComm_), ain.devComm_.AivRes->ainWorldBarrier, index) {
-// }
-
-// AIN_DEVICE HcclResult AinBarrierSession::AinBarrierSession(
-//     Ain& ain, HcclTeamTagRail, uint32_t index 
-//     ):
-//     AinBarrierSession(ain, HcclTeamRail(ain.devComm_), ain.devComm_.AivRes->ainRailBarrier, index) {
-// }
+AIN_DEVICE AinBarrierSession::AinBarrierSession(
+    Ain* ain, HcclTeamTagWorld, uint32_t index) 
+{
+    auto devComm = reinterpret_cast<__gm__ HcclDevComm *>(ain->devComm_);
+    auto aivRes = reinterpret_cast<AivRes *>(devComm->AivRes);
+    AinBarrierSession(ain, HcclTeamWorld(devComm), aivRes->ainWorldBarrier, index);
+}
 
 AIN_DEVICE void AinBarrierSession::sync(AinMemoryOrder order) {
     this->template syncInternal<false>(order, 0);
@@ -78,19 +74,19 @@ AIN_DEVICE HcclResult AinBarrierSession_internal::syncInternal(AinMemoryOrder or
                 peer -= this->team.nRanks;
             }
             
-            this->ain.signal(
+            this->ain->signal(
                 this->team, peer, 
                 AinSignalInc{this->signal + this->team.rank} 
                 // DescriptorUb descriptor = AinNoDescriptorUb(),  // 可选临时UB描述符空间
                 // AinCommitFlags commitFlags = AIN_COMMIT_IMMED  // 是否延后提交WQE doorbell
             );
 
-            __gm__ uint32_t* shadowPtr = (__gm__ uint32_t*)this->ain.getSignalShadowPtr(this->signal + peer);
+            __gm__ uint32_t* shadowPtr = (__gm__ uint32_t*)this->ain->getSignalShadowPtr(this->signal + peer);
             uint32_t waitVal = ++(*shadowPtr);
 
             if constexpr (EnableTimeout) {
                 while (true) {
-                    uint64_t got = this->ain.readSignal(
+                    uint64_t got = this->ain->readSignal(
                         this->signal + peer,   // signalId
                         32   // bits  读取有效位宽
                         // AinMemoryOrder order = AIN_MEMORY_ORDER_ACQUIRE // 读取后的本地内存序
@@ -105,7 +101,7 @@ AIN_DEVICE HcclResult AinBarrierSession_internal::syncInternal(AinMemoryOrder or
                     }
                 }
             } else {
-                this->ain.waitSignal(this->signal + peer, waitVal, 32   // bits  读取有效位宽
+                this->ain->waitSignal(this->signal + peer, waitVal, 32   // bits  读取有效位宽
                         // AinMemoryOrder order = AIN_MEMORY_ORDER_ACQUIRE // 读取后的本地内存序 
                 );
             }

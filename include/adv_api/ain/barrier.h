@@ -27,12 +27,11 @@
 namespace AscendC {
 
 struct AinBarrierSession : AinBarrierSession_internal{
-    AIN_DEVICE AinBarrierSession(Ain& ain, HcclTeam team, HcclAinBarrierHandle handle, uint32_t index);  
-    AIN_DEVICE AinBarrierSession(Ain& ain, HcclTeamTagWorld, uint32_t index);
+    AIN_DEVICE AinBarrierSession(Ain* ain, HcclTeam team, HcclAinBarrierHandle handle, uint32_t index);  
+    AIN_DEVICE AinBarrierSession(Ain* ain, HcclTeamTagWorld, uint32_t index);
 
     // AIN_DEVICE AinBarrierSession(Ain& ain, void* team, HcclAinBarrierHandle handle, uint32_t index);  
     
-    // handle不传，从ain的资源里取 -> 怎么区别不同类型的Barrier
     // AIN_DEVICE AinBarrierSession(Ain& ain, HcclTeam team, uint32_t index);
     AIN_DEVICE void sync(AinMemoryOrder order);
     AIN_DEVICE HcclResult sync(AinMemoryOrder order, uint64_t timeoutCycles);

@@ -28,6 +28,8 @@
 
 namespace AscendC {
 
+extern AIN_DEVICE HcclTeam HcclTeamWorld(__gm__ HcclDevComm *devComm);
+
 class Ain {
 public:
     AIN_DEVICE Ain(__gm__ void *devComm, int contextIndex);
@@ -58,6 +60,7 @@ public:
 
      AIN_DEVICE __gm__ uint64_t *getSignalShadowPtr(HcclAinSignal_t signalId) const;
 
+     uint64_t devComm_ = 0;
 private:
     static constexpr uint32_t MAX_PENDING_CHANNELS = 64;
 
@@ -66,7 +69,7 @@ private:
     AIN_DEVICE void RecordChannel(AscendC::ChannelHandle channel);
 
 private:
-    uint64_t devComm_ = 0;
+    
     int contextIndex_ = 0;
     AscendC::Hcomm<AscendC::CommProtocol::COMM_PROTOCOL_UBC_CTP> hcomm_;
     AscendC::ChannelHandle pendingChannels_[MAX_PENDING_CHANNELS] = {};

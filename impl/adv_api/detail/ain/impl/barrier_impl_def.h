@@ -33,7 +33,7 @@ struct HcclTeamTagWorld {};
 struct HcclTeamTagRail {};
 
 struct AinBarrierSession_internal {
-    Ain ain;   // TDOO
+    Ain* ain;   // TDOO
     HcclTeam team;    // barrier 作用域
     // void* team;
     HcclAinBarrierHandle handle;

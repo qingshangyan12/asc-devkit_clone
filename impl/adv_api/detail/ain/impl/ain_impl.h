@@ -28,6 +28,15 @@
 
 namespace AscendC {
 
+AIN_DEVICE HcclTeam HcclTeamWorld(__gm__ HcclDevComm *devComm)
+{
+    HcclTeam team;
+    team.nRanks = devComm->rankSize;
+    team.rank = devComm->rankId;
+    team.stride = 1;
+    return team;
+}
+
 AIN_DEVICE Ain::Ain(__gm__ void *devComm, int contextIndex)
     : devComm_(reinterpret_cast<uint64_t>(devComm)), contextIndex_(contextIndex)
 {
@@ -80,8 +89,9 @@ AIN_DEVICE void Ain::put(void *team, uint32_t peer, __gm__ void *dstWin, uint64_
 
     auto dstSymWin = reinterpret_cast<SymmetricWindow *>(DecodeWindow(dstWin));
     auto srcSymWin = reinterpret_cast<SymmetricWindow *>(DecodeWindow(srcWin));
-    __gm__ HcclDevComm *hcclDevComm = reinterpret_cast<__gm__ HcclDevComm *>(devComm_);
-    ChannelHandle channel = hcclDevComm->AivRes->entity[peer][0];
+    auto hcclDevComm = reinterpret_cast<__gm__ HcclDevComm *>(devComm_);
+    auto aivRes = reinterpret_cast<AivRes *>(hcclDevComm->AivRes);
+    ChannelHandle channel = aivRes->entity[peer][0];
 
     auto remoteAddr = reinterpret_cast<__gm__ uint8_t *>(
         reinterpret_cast<uintptr_t>(dstSymWin->remoteMems[peer].addr) + dstOffset);
@@ -108,8 +118,9 @@ AIN_DEVICE void Ain::get(void *team, uint32_t peer, __gm__ void *dstWin, uint64_
 
     auto dstSymWin = reinterpret_cast<SymmetricWindow *>(DecodeWindow(dstWin));
     auto srcSymWin = reinterpret_cast<SymmetricWindow *>(DecodeWindow(srcWin));
-    __gm__ HcclDevComm *hcclDevComm = reinterpret_cast<__gm__ HcclDevComm *>(devComm_);
-    ChannelHandle channel = hcclDevComm->AivRes->entity[peer][0];
+    auto hcclDevComm = reinterpret_cast<__gm__ HcclDevComm *>(devComm_);
+    auto aivRes = reinterpret_cast<AivRes *>(hcclDevComm->AivRes);
+    ChannelHandle channel = aivRes->entity[peer][0];
 
     auto localAddr = reinterpret_cast<__gm__ uint8_t *>(
         reinterpret_cast<uintptr_t>(dstSymWin->userVa) + dstOffset);
@@ -136,7 +147,7 @@ AIN_DEVICE void Ain::signal(HcclTeam team, uint32_t peer, RemoteAction action, c
     uint64_t signalOpArg = GetSignalOpArg(action);
 
     auto hcclDevComm = reinterpret_cast<__gm__ HcclDevComm *>(devComm_);
-    auto aivRes = hcclDevComm->AivRes;
+    auto aivRes = reinterpret_cast<AivRes *>(hcclDevComm->AivRes);
     ChannelHandle channel = aivRes->entity[peer][0];
     auto remoteSignal = reinterpret_cast<__gm__ uint64_t *>(
         reinterpret_cast<uintptr_t>(aivRes->symMemPool)) + signalDesc.indexedSignal.signalId;
@@ -154,8 +165,9 @@ AIN_DEVICE uint64_t Ain::readSignal(HcclAinSignal_t signalId, uint32_t bits, Ain
 {
     (void)order;
     auto hcclDevComm = reinterpret_cast<__gm__ HcclDevComm *>(devComm_);
+    auto aivRes = reinterpret_cast<AivRes *>(hcclDevComm->AivRes);
     __gm__ uint64_t *ptr = reinterpret_cast<__gm__ uint64_t *>(
-        reinterpret_cast<uintptr_t>(hcclDevComm->AivRes->symMemPool)) + signalId;
+        reinterpret_cast<uintptr_t>(aivRes->symMemPool)) + signalId;
     uint64_t mask = bits >= 64U ? UINT64_MAX : ((1ULL << bits) - 1ULL);
     return mask & (*ptr);
 }
@@ -163,8 +175,9 @@ AIN_DEVICE uint64_t Ain::readSignal(HcclAinSignal_t signalId, uint32_t bits, Ain
 AIN_DEVICE void Ain::waitSignal(HcclAinSignal_t signalId, uint64_t least, uint32_t bits, AinMemoryOrder order) const
 {
     auto hcclDevComm = reinterpret_cast<__gm__ HcclDevComm *>(devComm_);
+    auto aivRes = reinterpret_cast<AivRes *>(hcclDevComm->AivRes);
     __gm__ uint64_t *ptr = reinterpret_cast<__gm__ uint64_t *>(
-        reinterpret_cast<uintptr_t>(hcclDevComm->AivRes->symMemPool)) + signalId;
+        reinterpret_cast<uintptr_t>(aivRes->symMemPool)) + signalId;
     while (true) {
         uint64_t got = *ptr;
         // if (ain::utility::rollingLessEq(least, got, bits)) { // TODO
@@ -177,8 +190,9 @@ AIN_DEVICE void Ain::waitSignal(HcclAinSignal_t signalId, uint64_t least, uint32
 AIN_DEVICE __gm__ uint64_t *Ain::getSignalShadowPtr(HcclAinSignal_t signalId) const
 {
     auto hcclDevComm = reinterpret_cast<__gm__ HcclDevComm *>(devComm_);
+    auto aivRes = reinterpret_cast<AivRes *>(hcclDevComm->AivRes);
     return reinterpret_cast<__gm__ uint64_t *>(
-        reinterpret_cast<uintptr_t>(hcclDevComm->AivRes->ainSignalShadows)) + signalId;
+        reinterpret_cast<uintptr_t>(aivRes->ainSignalShadows)) + signalId;
 }
 
 AIN_DEVICE uint32_t Ain::DecodeWindow(__gm__ void *window) const

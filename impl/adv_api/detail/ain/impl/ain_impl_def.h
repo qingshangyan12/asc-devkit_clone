@@ -26,6 +26,7 @@
 
 #include <cstdint>
 #include "hccl/hccl_res.h"
+#include "hccl/hccl_ain.h"
 
 #ifndef AIN_DEVICE
 #define AIN_DEVICE __attribute__((always_inline)) __aicore__ __inline__
@@ -45,11 +46,6 @@ typedef struct {
     uint32_t stride;
     void* ranks;
 } HcclTeam;
-
-typedef struct {
-    HcclAinSignal_t signal0;
-    uint32_t reserved;
-} HcclAinBarrierHandle;
 
 template <typename T, typename U>
 struct AinIsSame {
@@ -127,22 +123,6 @@ struct SymmetricWindow {
     uint32_t remoteMemNum;
     void* devWin; // device端结构体
 };
-
-typedef struct {
-    CommAbiHeader abiHeader;
-    ChannelHandle **entity;
-    uint32_t *entityNumPerRank;
-    int32_t ainSignalCount;
-    uint64_t *ainSignalShadows;
-    uint64_t *symMemPool;
-} AivResource;
-
-typedef struct {
-    CommAbiHeader abiHeader;
-    uint32_t rankSize;
-    uint32_t rankId;
-    AivResource *AivRes;
-} HcclDevComm;
 
 }  // namespace AscendC
 
