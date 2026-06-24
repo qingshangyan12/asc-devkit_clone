@@ -25,13 +25,13 @@
 #define IMPL_ADV_API_DETAIL_AIN_IMPL_AIN_IMPL_DEF_H
 
 #include <cstdint>
+#include "hccl/hccl_res.h"
 
 #ifndef AIN_DEVICE
 #define AIN_DEVICE __attribute__((always_inline)) __aicore__ __inline__
 #endif
 
-namespace ain {
-namespace device {
+namespace AscendC {
 
 typedef uint32_t HcclAinSignal_t;
 
@@ -110,8 +110,42 @@ enum AinCommitFlags {
     AIN_COMMIT_DELAYED = (1 << 0)
 };
 
-}  // namespace device
-}  // namespace ain
+enum class SymmetricMemoryMode {
+    HCCS = 0,
+    URMA = 1
+};
+
+struct SymmetricWindow {
+    void* userVa;
+    size_t userSize;
+
+    void* baseVa;               // 对应userVa在对称堆上的地址
+    size_t alignedHeapOffset;
+    size_t alignedSize;
+    uint32_t localRank;
+    uint32_t rankSize;
+    size_t stride;
+    aclrtDrvMemHandle paHandle;
+    SymmetricMemoryMode mode;
+    CommMem* remoteMems;
+    uint32_t remoteMemNum;
+    void* devWin; // device端结构体
+};
+
+typedef struct {
+    CommAbiHeader abiHeader;
+    ChannelHandle **entity;
+    uint32_t *entityNumPerRank;
+} AivResource;
+
+typedef struct {
+    CommAbiHeader abiHeader;
+    uint32_t rankSize;
+    uint32_t rankId;
+    AivResource *AivRes;
+} HcclDevComm;
+
+}  // namespace AscendC
 
 #endif  // IMPL_ADV_API_DETAIL_AIN_IMPL_AIN_IMPL_DEF_H
 
