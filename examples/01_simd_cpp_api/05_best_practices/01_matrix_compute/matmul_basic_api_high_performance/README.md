@@ -58,7 +58,7 @@
 | aic_mac_ratio | Cube 计算单元的时间占比，反映计算单元利用率 |
 | aic_mte1_time(μs) | MTE1（L1 到 L0A/L0B 搬运）的执行时间 |
 | aic_mte1_ratio | MTE1 的时间占比，反映 L1 到 L0 的数据搬运压力 |
-| aic_mte2_time(μs) | MTE2（[GM](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)（Global Memory） 到 L1 搬运）的执行时间 |
+| aic_mte2_time(μs) | MTE2（[GM](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)（Global Memory） 到 L1 搬运）的执行时间 |
 | aic_mte2_ratio | MTE2 的时间占比，反映 GM 到 L1 的数据加载压力 |
 | aic_fixpipe_time(μs) | [Fixpipe](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬出/L0C到GM数据搬运（Fixpipe）.md)（L0C 到 GM 搬运）的执行时间 |
 | aic_fixpipe_ratio | [Fixpipe](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬出/L0C到GM数据搬运（Fixpipe）.md) 的时间占比，反映结果写回的访存压力 |
@@ -153,7 +153,7 @@ if ((kOffsetInChunkA + 1) == stepKa) {
 
 #### 3. 多核并行切分
 
-按 M/N 方向均匀切分矩阵到多核并行计算，4×6 切分策略（M 方向 4 块、N 方向 6 块，共 24 核）满足地址 512B 对齐，并减少同地址访问冲突：
+按 M/N 方向均匀切分矩阵到多核并行计算。以 Atlas A2/A3（dav-2201）为例，采用 4×6 切分策略（M 方向 4 块、N 方向 6 块，共 24 核）满足地址 512B 对齐，并减少同地址访问冲突；Ascend 950PR/950DT（dav-3510）下为 32 核切分（参见后文性能数据小节）：
 
 ```cpp
 constexpr uint32_t mIter = AscendC::DivCeil(M, singleCoreM);
@@ -461,7 +461,7 @@ $$MTE2耗时误差 = \frac{1874.267 - 1832.10}{1832.10} = 2.30\%$$
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`、`dav-3510` | NPU硬件架构：dav-2201对应A2/A3，dav-3510对应Ascend 950PR |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`、`dav-3510` | NPU硬件架构：dav-2201对应Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510对应Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `1`、`2` | 场景编号：1=不使能L2Cache切分，2=使能L2Cache切分 |
 
 - 执行结果

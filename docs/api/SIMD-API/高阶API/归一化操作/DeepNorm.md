@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
@@ -94,16 +106,16 @@ SubLayer\(X\)通常是指在DeepNorm模型中的一个子层（sub-layer），�
 // 若尾轴的长度（H）不超过2040且为64的倍数，同时非尾轴长度（B*S）为8的倍数，可设置isBasicBlock = true提升性能
 // 若数据类型T为float且允许修改srcLocal，可设置isReuseSrc = true复用srcLocal内存空间以节省内存
 AscendC::DeepNorm<T, isReuseSrc, isBasicBlock>(
-    dstLocal,     // 输出：归一化后的结果
-    meanLocal,    // 输出：均值mean
-    rstdLocal,    // 输出：倒数标准差rstd
-    srcLocal,     // 输入：原始输入X
-    gxLocal,      // 输入：子层输出SubLayer(X)
-    betaLocal,    // 输入：LayerNorm偏置系数β
-    gammaLocal,   // 输入：LayerNorm缩放系数γ
-    alpha,        // 输入：残差路径缩放系数 α
-    epsilon,      // 输入：防除零系数 ε
-    tiling        // 输入：Tiling信息
+    dstLocal,   // 输出：归一化后的结果
+    meanLocal,  // 输出：均值mean
+    rstdLocal,  // 输出：倒数标准差rstd
+    srcLocal,   // 输入：原始输入X
+    gxLocal,    // 输入：子层输出SubLayer(X)
+    betaLocal,  // 输入：LayerNorm偏置系数β
+    gammaLocal, // 输入：LayerNorm缩放系数γ
+    alpha,      // 输入：残差路径缩放系数 α
+    epsilon,    // 输入：防除零系数 ε
+    tiling      // 输入：Tiling信息
 );
 ```
 
