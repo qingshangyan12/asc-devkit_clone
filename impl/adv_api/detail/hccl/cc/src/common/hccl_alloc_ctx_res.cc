@@ -29,6 +29,26 @@ CommEngine OpExecuteConfigToCommEngine(uint8_t commEngine) {
     return COMM_ENGINE_RESERVED;
 }
 
+namespace {
+CommEngine OpExecuteConfigToCtxEngine(uint8_t commEngine)
+{
+    if (static_cast<OpExecuteConfig>(commEngine) == OpExecuteConfig::CCU_SCHED) {
+        return COMM_ENGINE_AIV;
+    }
+    return OpExecuteConfigToCommEngine(commEngine);
+}
+
+HcclResult ClearDeviceCtx(void *ptr, uint64_t size, const char *tag)
+{
+    aclError aclRet = aclrtMemset(ptr, size, 0, size);
+    CHK_PRT_RET(aclRet != ACL_SUCCESS,
+        HCCL_ERROR("[ClearDeviceCtx] aclrtMemset failed, tag[%s], ptr[%p], size[%llu], ret[%d].",
+            tag, ptr, size, aclRet),
+        HCCL_E_RUNTIME);
+    return HCCL_SUCCESS;
+}
+}
+
 HcclResult CheckInputParam(const HcclComm comm, const void* mc2Tiling, const aclrtStream stream)
 {   
     // 检查comm是否为空指针
@@ -123,6 +143,9 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string &ctxTag,
         comParamBufSize, &comParamPtr));
     CHK_RET(HcclEngineCtxCreate(comm, tagComSync.c_str(), COMM_ENGINE_AIV,
         comSyncBufSize, &comSyncPtr));
+    CHK_RET(ClearDeviceCtx(workspacePtr, Hccl::MC2_WORKSPACE_SIZE, tagWorkspace.c_str()));
+    CHK_RET(ClearDeviceCtx(comParamPtr, comParamBufSize, tagComParam.c_str()));
+    CHK_RET(ClearDeviceCtx(comSyncPtr, comSyncBufSize, tagComSync.c_str()));
 
     opResCtx.workSpace      = reinterpret_cast<uint64_t>(workspacePtr);
     opResCtx.workSpaceSize  = Hccl::MC2_WORKSPACE_SIZE;
@@ -151,11 +174,12 @@ HcclResult HcclAllocOpResCtx(HcclComm comm, const std::string &ctxTag, const std
         std::string tagParam = ctxTag + "_" + std::to_string(i);
         void *opParamPtr = nullptr;
         const Mc2CcTilingInner *ccTiling = static_cast<const Mc2CcTilingInner *>(ccTilingList[i]);
-        if (HcclEngineCtxGet(comm, tagParam.c_str(), OpExecuteConfigToCommEngine(ccTiling->commEngine), &opParamPtr, &opParamSize) == HCCL_SUCCESS) {
+        CommEngine ctxEngine = OpExecuteConfigToCtxEngine(ccTiling->commEngine);
+        if (HcclEngineCtxGet(comm, tagParam.c_str(), ctxEngine, &opParamPtr, &opParamSize) == HCCL_SUCCESS) {
             HCCL_INFO("HcclEngineCtxGet success, tagParam[%s], opParamAddr[%p], opParamSize[%u]", tagParam.c_str(), opParamPtr, opParamSize);
             opParamAddr[i] = reinterpret_cast<uint64_t>(opParamPtr);
         } else {
-            CHK_RET(HcclEngineCtxCreate(comm, tagParam.c_str(), OpExecuteConfigToCommEngine(ccTiling->commEngine), opParamSize, &opParamPtr));
+            CHK_RET(HcclEngineCtxCreate(comm, tagParam.c_str(), ctxEngine, opParamSize, &opParamPtr));
             opParamAddr[i] = reinterpret_cast<uint64_t>(opParamPtr);
         }
         HCCL_INFO("HcclAllocOpResCtx the %dth opParam: opParamAddr[%u], opParamSize[%u]", i, opParamAddr[i], opParamSize);
@@ -176,11 +200,12 @@ HcclResult HcclAllocOpResCtx(HcclComm comm, const std::string &ctxTag, const std
     std::string tagWorkSpace = ctxTag + "_workSpace";
     void *workSpacePtr = nullptr;
     const Mc2CcTilingInner *ccTiling0 = static_cast<const Mc2CcTilingInner *>(ccTilingList[0]);
-    if (HcclEngineCtxGet(comm, tagWorkSpace.c_str(), OpExecuteConfigToCommEngine(ccTiling0->commEngine), &workSpacePtr, &memSize) == HCCL_SUCCESS) {
+    CommEngine ctxEngine0 = OpExecuteConfigToCtxEngine(ccTiling0->commEngine);
+    if (HcclEngineCtxGet(comm, tagWorkSpace.c_str(), ctxEngine0, &workSpacePtr, &memSize) == HCCL_SUCCESS) {
         HCCL_INFO("HcclEngineCtxGet success, tagWorkSpace[%s], workSpaceAddr[%p], workSpaceSize[%u]", tagWorkSpace.c_str(), workSpacePtr, memSize);
         resCtx.workSpace = reinterpret_cast<uint64_t>(workSpacePtr);
     } else {
-        CHK_RET(HcclEngineCtxCreate(comm, tagWorkSpace.c_str(), OpExecuteConfigToCommEngine(ccTiling0->commEngine), memSize, &workSpacePtr));
+        CHK_RET(HcclEngineCtxCreate(comm, tagWorkSpace.c_str(), ctxEngine0, memSize, &workSpacePtr));
         resCtx.workSpace = reinterpret_cast<uint64_t>(workSpacePtr);
     }
     HCCL_INFO("HcclAllocOpResCtx the workSpace: workSpaceAddr[%u], workSpaceSize[%u]", resCtx.workSpace, memSize);
@@ -196,10 +221,10 @@ HcclResult HcclAllocOpResCtx(HcclComm comm, const std::string &ctxTag, const std
     // 4. 申请OpResCtx的内存空间
     std::string tagOpResCtx = ctxTag + "_opResCtx";
     uint64_t opResCtxSize = sizeof(OpResCtx);
-    if (HcclEngineCtxGet(comm, tagOpResCtx.c_str(), OpExecuteConfigToCommEngine(ccTiling0->commEngine), opResCtxPtr, &opResCtxSize) == HCCL_SUCCESS) {
+    if (HcclEngineCtxGet(comm, tagOpResCtx.c_str(), ctxEngine0, opResCtxPtr, &opResCtxSize) == HCCL_SUCCESS) {
         HCCL_INFO("HcclEngineCtxGet success, tagOpResCtx[%s], opResCtxAddr[%p], opResCtxSize[%u]", tagOpResCtx.c_str(), opResCtxPtr, opResCtxSize);
     } else {
-        CHK_RET(HcclEngineCtxCreate(comm, tagOpResCtx.c_str(), OpExecuteConfigToCommEngine(ccTiling0->commEngine), opResCtxSize, opResCtxPtr));
+        CHK_RET(HcclEngineCtxCreate(comm, tagOpResCtx.c_str(), ctxEngine0, opResCtxSize, opResCtxPtr));
     }
 
     HCCL_INFO("HcclAllocOpResCtx the opResCtx: opResCtxAddr[%u], opResCtxSize[%u]", opResCtxPtr, opResCtxSize);
@@ -658,11 +683,11 @@ HcclResult CcuSelectAlg(HcclComm comm, void *stream, const std::string topoTag[]
         std::string tagParam = std::to_string(i) + "_" + std::string(opParam.algTag);
         void *opParamPtr = nullptr;
         uint64_t opParamSize = sizeof(OpParam);
-        if (HcclEngineCtxGet(comm, tagParam.c_str(), COMM_ENGINE_CCU, &opParamPtr, &opParamSize) == HCCL_SUCCESS) {
+        if (HcclEngineCtxGet(comm, tagParam.c_str(), COMM_ENGINE_AIV, &opParamPtr, &opParamSize) == HCCL_SUCCESS) {
             HCCL_INFO("HcclEngineCtxGet success, tagParam[%s], opParamAddr[%p], opParamSize[%llu]",
                 tagParam.c_str(), opParamPtr, opParamSize);
         } else {
-            CHK_RET(HcclEngineCtxCreate(comm, tagParam.c_str(), COMM_ENGINE_CCU, opParamSize, &opParamPtr));
+            CHK_RET(HcclEngineCtxCreate(comm, tagParam.c_str(), COMM_ENGINE_AIV, opParamSize, &opParamPtr));
         }
         aclError aclRet = aclrtMemcpy(opParamPtr, opParamSize, &opParam, opParamSize, ACL_MEMCPY_HOST_TO_DEVICE);
         CHK_RET(aclRet == ACL_ERROR_NONE ? HCCL_SUCCESS : HCCL_E_RUNTIME);
