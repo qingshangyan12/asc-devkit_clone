@@ -12,6 +12,7 @@ repos:
     rev: v18.1.8
     hooks:
       - id: clang-format
+        types_or: [file]
         files: \.(c|h|cpp|hpp|cc|hh|cxx|hxx|asc)$
         exclude: ^(tests/python/aclrt_launch_kernel/stub_files/|impl/|include/|tools/)
         args:
@@ -29,4 +30,17 @@ repos:
         pass_filenames: true
         types: [file]
         stages: [pre-commit]
+        verbose: true
+
+  # Markdown 链接有效性检查
+  - repo: local
+    hooks:
+      - id: markdown-link-check
+        name: Markdown link check
+        entry: env LYCHEE_VERSION=0.23.0 bash scripts/markdown_link_check.sh
+        language: system
+        files: \.(md|markdown|mdx)$
+        pass_filenames: true
+        always_run: true
+        stages: [pre-commit, manual]
         verbose: true

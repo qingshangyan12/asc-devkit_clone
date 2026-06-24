@@ -1,5 +1,6 @@
 .vscode
 .idea/
+.clangd.local
 /build/
 /build_ut/
 build_out
