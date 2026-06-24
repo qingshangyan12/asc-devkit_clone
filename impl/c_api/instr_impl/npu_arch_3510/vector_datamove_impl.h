@@ -1178,74 +1178,74 @@ __simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__ bfloat16_t* d
 }
 
 // storealign_pack
-__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ int16_t* dst_align32b, vector_int16_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ int16_t*& dst_align32b, vector_int16_t src, int32_t offset,
     vector_bool mask)
 {
     asc_storealign_pack_postupdate_impl(dst_align32b, src, offset, mask);
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint16_t* dst_align32b, vector_uint16_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint16_t*& dst_align32b, vector_uint16_t src, int32_t offset,
     vector_bool mask)
 {
     asc_storealign_pack_postupdate_impl(dst_align32b, src, offset, mask);
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ int32_t* dst_align32b, vector_int32_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ int32_t*& dst_align32b, vector_int32_t src, int32_t offset,
     vector_bool mask)
 {
     asc_storealign_pack_postupdate_impl(dst_align32b, src, offset, mask);
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint32_t* dst_align32b, vector_uint32_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint32_t*& dst_align32b, vector_uint32_t src, int32_t offset,
     vector_bool mask)
 {
     asc_storealign_pack_postupdate_impl(dst_align32b, src, offset, mask);
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ int64_t* dst_align32b, vector_int64_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ int64_t*& dst_align32b, vector_int64_t src, int32_t offset,
     vector_bool mask)
 {
     asc_storealign_pack_postupdate_impl(dst_align32b, src, offset, mask);
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint64_t* dst_align32b, vector_uint64_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint64_t*& dst_align32b, vector_uint64_t src, int32_t offset,
     vector_bool mask)
 {
     asc_storealign_pack_postupdate_impl(dst_align32b, src, offset, mask);
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ half* dst_align32b, vector_half src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ half*& dst_align32b, vector_half src, int32_t offset,
     vector_bool mask)
 {
     asc_storealign_pack_postupdate_impl(dst_align32b, src, offset, mask);
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ float* dst_align32b, vector_float src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ float*& dst_align32b, vector_float src, int32_t offset,
     vector_bool mask)
 {
     asc_storealign_pack_postupdate_impl(dst_align32b, src, offset, mask);
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ bfloat16_t* dst_align32b, vector_bfloat16_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ bfloat16_t*& dst_align32b, vector_bfloat16_t src, int32_t offset,
     vector_bool mask)
 {
     asc_storealign_pack_postupdate_impl(dst_align32b, src, offset, mask);
 }
 
 // storealign_pack_v2
-__simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ int32_t* dst_align32b, vector_int32_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ int32_t*& dst_align32b, vector_int32_t src, int32_t offset,
     vector_bool mask)
 {
     asc_storealign_pack_postupdate_v2_impl(dst_align32b, src, offset, mask);
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ uint32_t* dst_align32b, vector_uint32_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ uint32_t*& dst_align32b, vector_uint32_t src, int32_t offset,
     vector_bool mask)
 {
     asc_storealign_pack_postupdate_v2_impl(dst_align32b, src, offset, mask);
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ float* dst_align32b, vector_float src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ float*& dst_align32b, vector_float src, int32_t offset,
     vector_bool mask)
 {
     asc_storealign_pack_postupdate_v2_impl(dst_align32b, src, offset, mask);

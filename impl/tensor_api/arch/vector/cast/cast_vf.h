@@ -28,12 +28,11 @@
 
 namespace AscendC {
 namespace Te {
-
 template<typename CalcFunc, typename TraitType>
 class CastVF {
 public:
     template<typename T, typename U>
-    __simd_vf__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, uint16_t repeat, uint16_t oneRepSize, uint32_t dataSize)
+    __simd_vf__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, int32_t repeat, int32_t oneRepSize, uint32_t dataSize)
     {
         using DstRegType = typename VectorTypeTransform::template Get<T>;
         using SrcRegType = typename VectorTypeTransform::template Get<U>;
@@ -43,13 +42,46 @@ public:
         SrcRegType srcReg;
 
         vector_bool dstMask;
-        vector_bool fullMask = Inst::CreateMask::template Run<uint8_t, decltype(PAT_ALL)>();
+        vector_bool fullMask = Inst::CreateMask::template Run<int32_t, decltype(PAT_ALL)>();
+
+        // ==================== Width relationship detection ====================
+        //   T = dst element type, U = src element type
+        constexpr bool src_eq_dst   = (sizeof(T) == sizeof(U));        // 1:1: float↔int32, half↔int16
+        constexpr bool dst_2x_src   = (sizeof(T) == 2 * sizeof(U));   // 1:2: half→float, int16→int32
+        constexpr bool src_2x_dst   = (sizeof(U) == 2 * sizeof(T));   // 2:1: float→half, float→int16
+        constexpr bool dst_4x_src   = (sizeof(T) == 4 * sizeof(U));   // 1:4: fp8→float, int8→int32
+        constexpr bool src_4x_dst   = (sizeof(U) == 4 * sizeof(T));   // 4:1: float→fp8, int32→uint8
+
+        // Pointer alias for pack-store (treat dst as src-typed pointer for post-update semantics)
+        auto srcCur = reinterpret_cast<__ubuf__ U*>(dst);
 
         for (uint16_t i = 0; i < repeat; i++) {
             dstMask = Inst::UpdateMask::template Run<greaterType>(dataSize);
-            asc_loadalign(srcReg, src + i * oneRepSize);
-            CalcFunc::template Run(dstReg, srcReg, fullMask);
-            asc_storealign(dst + i * oneRepSize, dstReg, dstMask);
+
+            if constexpr (src_eq_dst) {
+                asc_loadalign(srcReg, src + i * oneRepSize);
+                CalcFunc::template Run(dstReg, srcReg, fullMask);
+                asc_storealign(dst + i * oneRepSize, dstReg, dstMask);
+            } else if constexpr (dst_2x_src) {
+                asc_loadalign_unpack_postupdate(srcReg, src, oneRepSize);
+                CalcFunc::template Run(dstReg, srcReg, fullMask);
+                asc_storealign(dst + i * oneRepSize, dstReg, dstMask);
+
+            } else if constexpr (src_2x_dst) {
+                asc_loadalign(srcReg, src + i * oneRepSize);
+                CalcFunc::template Run(dstReg, srcReg, fullMask);
+                asc_storealign_pack_postupdate(srcCur,
+                    reinterpret_cast<SrcRegType>(dstReg), oneRepSize / 2, fullMask);
+            } else if constexpr (dst_4x_src) {
+                asc_loadalign_unpack_postupdate_v2(srcReg, src, oneRepSize);
+                CalcFunc::template Run(dstReg, srcReg, fullMask);
+                asc_storealign(dst + i * oneRepSize, dstReg, dstMask);
+
+            } else if constexpr (src_4x_dst) {
+                asc_loadalign(srcReg, src + i * oneRepSize);
+                CalcFunc::template Run(dstReg, srcReg, fullMask);
+                asc_storealign_pack_postupdate_v2(dst, dstReg, oneRepSize, fullMask);
+            }
         }
     }
 };
@@ -65,11 +97,11 @@ public:
 
         uint32_t dstSize = dst.Size();
 
-        uint16_t VECTOR_REG_WIDTH = asc_get_vf_len();
+        int32_t VECTOR_REG_WIDTH = asc_get_vf_len();
         using greaterType = Std::conditional_t<(sizeof(dstType) > sizeof(srcType)), dstType, srcType>;
-        uint16_t oneRepSize = VECTOR_REG_WIDTH / sizeof(greaterType);
+        int32_t oneRepSize = VECTOR_REG_WIDTH / sizeof(greaterType);
 
-        uint16_t repeat = Std::ceil_division(dstSize, oneRepSize);
+        int32_t repeat = Std::ceil_division(dstSize, oneRepSize);
         
         CastVF<CalcFunc, TraitType>::template Run(dst.Data().Get(), src.Data().Get(), repeat, oneRepSize, dstSize);
     }
