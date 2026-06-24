@@ -1135,7 +1135,9 @@ int32_t HcommThreadJoin(ThreadHandle thread, uint32_t timeout)
 HcclResult HcommProfilingReportDeviceOp(const char* groupname) {
     HCCL_INFO("[%s] START.", __func__);
     CHK_PTR_NULL(groupname);
+    HCCL_INFO("[MC2_DFX][DeviceOp][Begin] group[%s]", groupname);
     CHK_RET(AicpuIndopProcess::ProfilingReportDeviceOp(groupname));
+    HCCL_INFO("[MC2_DFX][DeviceOp][End] group[%s]", groupname);
     return HCCL_SUCCESS;
 }
 
@@ -1152,6 +1154,8 @@ HcclResult HcommProfilingReportKernelStartTask(uint64_t thread, const char* grou
     flagTaskInfo.streamId = streamLitePtr->GetSqId();
     flagTaskInfo.taskId = streamLitePtr->GetRtsq()->GetTaskId();
     flagTaskInfo.type = Hccl::MainStreamTaskType::HEAD;
+    HCCL_INFO("[MC2_DFX][KernelStart] group[%s], thread[0x%llx], sqId[%u], taskId[%u]",
+        groupname, static_cast<unsigned long long>(thread), flagTaskInfo.streamId, flagTaskInfo.taskId);
     Hccl::ProfilingHandlerLite::GetInstance().ReportMainStreamTask(flagTaskInfo);
     HCCL_INFO("[%s] SUCCESS. TaskInfo taskId:[%u] streamId:[%u].", __func__, flagTaskInfo.taskId, flagTaskInfo.streamId);
     return HCCL_SUCCESS;
@@ -1170,6 +1174,8 @@ HcclResult HcommProfilingReportKernelEndTask(uint64_t thread, const char* groupn
     flagTaskInfo.streamId = streamLitePtr->GetSqId();
     flagTaskInfo.taskId = streamLitePtr->GetRtsq()->GetTaskId();
     flagTaskInfo.type = Hccl::MainStreamTaskType::TAIL;
+    HCCL_INFO("[MC2_DFX][KernelEnd] group[%s], thread[0x%llx], sqId[%u], taskId[%u]",
+        groupname, static_cast<unsigned long long>(thread), flagTaskInfo.streamId, flagTaskInfo.taskId);
     
     Hccl::ProfilingHandlerLite::GetInstance().ReportMainStreamTask(flagTaskInfo);
     HCCL_INFO("[%s] SUCCESS.", __func__);

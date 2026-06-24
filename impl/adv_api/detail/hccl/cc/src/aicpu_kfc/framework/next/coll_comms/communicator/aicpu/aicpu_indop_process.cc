@@ -298,7 +298,11 @@ HcclResult AicpuIndopProcess::ProfilingReportDeviceOp(const std::string &group)
     CHK_PTR_NULL(hcclCommDfxLite);
     Hccl::MirrorTaskManagerLite* mirrorTaskMgrLite = hcclCommDfxLite->GetMirrorTaskManagerLite();
     CHK_PTR_NULL(mirrorTaskMgrLite);
+#ifdef MC2_SERVER_ONLY
+    HCCL_INFO("[MC2_DFX][DeviceOpInfoOnly] group[%s], skip ReportAllTasks", group.c_str());
+#else
     CHK_RET(AicpuIndopProcess::ReportAllTasks(group));
+#endif
     EXECEPTION_CATCH(Hccl::ProfilingHandlerLite::GetInstance().ReportHcclOpInfo(*mirrorTaskMgrLite->GetCurrDfxOpInfo()),
         return HCCL_E_INTERNAL);
     return HCCL_SUCCESS;
@@ -306,6 +310,9 @@ HcclResult AicpuIndopProcess::ProfilingReportDeviceOp(const std::string &group)
 
 HcclResult AicpuIndopProcess::ReportAllTasks(const std::string &group)
 {
+#ifndef MC2_SERVER_ONLY
+    HCCL_INFO("[MC2_DFX][ReportAllTasks] group[%s]", group.c_str());
+#endif
     CHK_PTR_NULL(g_hcclComm);
     CollCommAicpu* collCommAicpu = g_hcclComm->GetCollCommAicpu();
     CHK_PTR_NULL(collCommAicpu);
