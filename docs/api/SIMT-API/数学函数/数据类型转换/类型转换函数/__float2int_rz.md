@@ -50,8 +50,8 @@ inline int __float2int_rz(const float x)
 | nan | 0 |
 | inf | 2147483647 |
 | -inf | -2147483648 |
-| 超过INT_MAX范围 | 2147483647 |
-| 低于INT_MIN范围 | -2147483648 |
+| 超过INT_MAX范围的正值 | 2147483647 |
+| 低于INT_MIN范围的负值 | -2147483648 |
 
 ## 约束说明
 

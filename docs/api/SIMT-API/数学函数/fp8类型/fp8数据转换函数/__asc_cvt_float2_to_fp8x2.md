@@ -46,25 +46,25 @@ inline __asc_fp8x2_storage_t __asc_cvt_float2_to_fp8x2(const float2 x, const __a
 
 输入的两个分量遵循CAST\_RINT模式，根据指定的8位浮点数类型和指定的饱和模式，转换成的\_\_asc\_fp8x2\_storage\_t类型数据。本接口受全局饱和模式影响，特殊值如下：
 
--   __ASC_E4M3（fp8_e4m3_t格式，无inf值）：
+-   fp8_interpretation参数为__ASC_E4M3时：
 
-| 各分量输入 | 非饱和模式返回值 | 饱和模式返回值 |
-|---|---|---|
-| ±0 | ±0 | ±0 |
-| nan | nan | +0 |
-| ±inf | nan | ±448 |
-| 超出float8_e4m3_t范围的正值 | nan | 448 |
-| 超出float8_e4m3_t范围的负值 | nan | -448 |
+    | 各分量输入 | 非饱和模式返回值 | 饱和模式返回值 |
+    |---|---|---|
+    | ±0 | ±0 | ±0 |
+    | nan | nan | +0 |
+    | ±inf | nan | ±448 |
+    | 超出float8_e4m3_t范围的正值 | nan | 448 |
+    | 超出float8_e4m3_t范围的负值 | nan | -448 |
 
--   __ASC_E5M2（fp8_e5m2_t格式，有inf值）：
+-   fp8_interpretation的参数为__ASC_E5M2时：
 
-| 各分量输入 | 非饱和模式返回值 | 饱和模式返回值 |
-|---|---|---|
-| ±0 | ±0 | ±0 |
-| nan | nan | +0 |
-| ±inf | ±inf | ±57344 |
-| 超出float8_e5m2_t范围的正值 | nan | 57344 |
-| 超出float8_e5m2_t范围的负值 | nan | -57344 |
+    | 各分量输入 | 非饱和模式返回值 | 饱和模式返回值 |
+    |---|---|---|
+    | ±0 | ±0 | ±0 |
+    | nan | nan | +0 |
+    | ±inf | ±inf | ±57344 |
+    | 超出float8_e5m2_t范围的正值 | inf | 57344 |
+    | 超出float8_e5m2_t范围的负值 | -inf | -57344 |
 
 ## 约束说明
 

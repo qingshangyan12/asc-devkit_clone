@@ -48,7 +48,7 @@ inline unsigned long long int __float2ull_rn(const float x)
 |---|---|
 | ±0 | 0 |
 | nan | 0 |
-| inf | 18446744073709551615（ULLONGMAX） |
+| inf | 18446744073709551615（ULLONG_MAX） |
 | -inf | 0 |
 
 ## 约束说明
