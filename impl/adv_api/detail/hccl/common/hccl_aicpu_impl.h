@@ -358,20 +358,20 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::AlltoAll(GM_ADDR sendB
                                        HCCL_REDUCE_RESERVED, strideCount, repeat });
 }
 
-template<const auto &config>
-template <bool commit>
-__aicore__ inline HcclHandle
-HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::AlltoAllV(GM_ADDR sendBuf, void *sendCounts, void *sdispls,
-        HcclDataType sendType, GM_ADDR recvBuf, void *recvCounts, void *rdispls, HcclDataType recvType, uint8_t repeat)
-{
-    ASCENDC_HCCL_API_ASSERT(sendType == recvType, { return INVALID_HANDLE_ID; },
-                            "Call AlltoAllV failed, param sendType[%d] is not equal to recvType[%d], invalid.",
-                            static_cast<int32_t>(sendType), static_cast<int32_t>(recvType));
-    return CommonPrepareImpl<commit>({ HcclCMDType::HCCL_CMD_ALLTOALLV, sendBuf, recvBuf, 0U, sendType, recvType,
-                                       HCCL_REDUCE_RESERVED, 0U, repeat,
-                                       {static_cast<uint64_t *>(sendCounts), static_cast<uint64_t *>(sdispls),
-                                        static_cast<uint64_t *>(recvCounts), static_cast<uint64_t *>(rdispls)} });
-}
+// template<const auto &config>
+// template <bool commit>
+// __aicore__ inline HcclHandle
+// HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::AlltoAllV(GM_ADDR sendBuf, void *sendCounts, void *sdispls,
+//         HcclDataType sendType, GM_ADDR recvBuf, void *recvCounts, void *rdispls, HcclDataType recvType, uint8_t repeat)
+// {
+//     ASCENDC_HCCL_API_ASSERT(sendType == recvType, { return INVALID_HANDLE_ID; },
+//                             "Call AlltoAllV failed, param sendType[%d] is not equal to recvType[%d], invalid.",
+//                             static_cast<int32_t>(sendType), static_cast<int32_t>(recvType));
+//     return CommonPrepareImpl<commit>({ HcclCMDType::HCCL_CMD_ALLTOALLV, sendBuf, recvBuf, 0U, sendType, recvType,
+//                                        HCCL_REDUCE_RESERVED, 0U, repeat,
+//                                        {static_cast<uint64_t *>(sendCounts), static_cast<uint64_t *>(sdispls),
+//                                         static_cast<uint64_t *>(recvCounts), static_cast<uint64_t *>(rdispls)} });
+// }
 
 template<const auto &config>
 __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::Query(HcclHandle handleId)
