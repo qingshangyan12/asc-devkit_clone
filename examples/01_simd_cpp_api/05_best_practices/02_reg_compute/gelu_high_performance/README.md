@@ -19,7 +19,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── gelu_high_performance
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
@@ -176,7 +176,7 @@ $$
 **关键代码**：
 ```cpp
 __aicore__ inline void GeluCompute(
-        const AscendC::LocalTensor<float>& xLocal, const AscendC::LocalTensor<float>& yLocal, uint32_t n)
+    const AscendC::LocalTensor<float>& xLocal, const AscendC::LocalTensor<float>& yLocal, uint32_t n)
 {
     // yLocal = x * x = x²
     AscendC::Mul(yLocal, xLocal, xLocal, n);
@@ -287,7 +287,7 @@ RegBase API 提供寄存器级别的向量计算接口，配合 [asc_vf_call](ht
 - 在 VF 函数内，数据从 UB 加载到寄存器后，所有中间计算均在寄存器中完成，仅需一次 [LoadAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬入.md) 和一次 [StoreAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬出.md)，消除中间结果的 Load/Store 开销
 - 支持 VF 双发特性，常规计算指令并行度可达 512 bytes/cycle，指令发射效率（IPC）大幅提升
 
-```
+```text
 基础API模式：                    VF融合模式：
 Load → Mul → Store              LoadAlign → Mul
 Load → Mul → Store                   → Mul
@@ -324,7 +324,7 @@ __simd_vf__ inline void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr
 
     for (uint16_t i = 0; i < loopNum; ++i) {
         mask = AscendC::Reg::UpdateMask<float>(n);
-        AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);  // 仅一次Load
+        AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize); // 仅一次Load
         AscendC::Reg::Mul(yReg, xReg, xReg, mask);
         AscendC::Reg::Mul(yReg, yReg, xReg, mask);
         AscendC::Reg::Muls(yReg, yReg, COEFF_A, mask);
@@ -333,7 +333,8 @@ __simd_vf__ inline void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr
         AscendC::Reg::Exp(yReg, yReg, mask);
         AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);
         AscendC::Reg::Div(yReg, xReg, yReg, mask);
-        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);  // 仅一次Store
+        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg,
+                                 mask); // 仅一次Store
     }
 }
 ```
@@ -401,7 +402,7 @@ Case 1 的 IPC 为 1.20，距离 VF 融合理论极限 IPC=2.0 仍有较大差�
 
 VF 函数内的 for 循环为简单迭代结构，编译器默认按序生成循环控制指令（比较、跳转），导致循环迭代之间存在标量开销。通过 `#pragma unroll N` 告诉编译器将循环展开 N 份，消除循环控制开销，同时使多组迭代的 VF 指令可交错排布，提高指令级并行度（ILP），使更多指令能够连续双发射。
 
-```
+```bash
 未展开：                         展开后：
 Iter0: Load→Mul→...→Store       Iter0: Load→Mul→...→Store
   ↓ (循环控制开销)               Iter1: Load→Mul→...→Store
@@ -420,7 +421,7 @@ __simd_vf__ inline static void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float
     constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
     AscendC::Reg::MaskReg mask;
     AscendC::Reg::RegTensor<float> xReg, yReg;
-    #pragma unroll 6  // 循环展开优化，提高指令级并行度
+#pragma unroll 6 // 循环展开优化，提高指令级并行度
     for (uint16_t i = 0; i < loopNum; ++i) {
         mask = AscendC::Reg::UpdateMask<float>(n);
         AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
@@ -695,7 +696,7 @@ msprof ./demo   # 分析性能
 
 当前目录下会生成PROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件
 
-```bash
+```text
 PROF_xxxx_XXXXXX
 ├── device_{id}
 └── host

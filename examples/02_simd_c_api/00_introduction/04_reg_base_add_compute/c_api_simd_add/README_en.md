@@ -10,7 +10,7 @@ This sample implements the Add operator using the C_API interface. It is based o
 
 ## Directory Structure
 
-```
+```text
 ├── c_api_simd_add
 │   ├── CMakeLists.txt          // Build project file
 │   ├── c_api_add.asc          // Ascend C operator implementation and invocation sample
@@ -22,7 +22,7 @@ This sample implements the Add operator using the C_API interface. It is based o
 - Operator Function:
   The Add operator adds two data elements and returns the result. The corresponding mathematical expression is:
 
-  ```
+  ```text
   z = x + y
   ```
 

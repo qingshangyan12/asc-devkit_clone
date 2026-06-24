@@ -16,7 +16,7 @@ The example supports switching between different scenarios through compilation p
 
 ## Directory Structure
 
-```
+```text
 ├── select
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data
@@ -37,7 +37,8 @@ The example supports switching between different scenarios through compilation p
   - Implementation:
     ```cpp
     // cmpMode = AscendC::SELMODE::VSEL_CMPMASK_SPR
-    // Both src0 and src1 are tensors. When selMask bit is 1, select from src0; when bit is 0, select from src1
+    // Both src0 and src1 are tensors. When selMask bit is 1, select from src0; when
+    // bit is 0, select from src1
     AscendC::Select(dstl, selMask, src0, src1, cmpMode, count);
     ```
   
@@ -47,7 +48,8 @@ The example supports switching between different scenarios through compilation p
   - Implementation:
     ```cpp
     // cmpMode = AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE
-    // src0 is tensor, src1 is scalar. When selMask bit is 1, select from src0; when bit is 0, equals src1
+    // src0 is tensor, src1 is scalar. When selMask bit is 1, select from src0; when
+    // bit is 0, equals src1
     AscendC::Select(dst, selMask, src0, src1, cmpMode, count);
     ```
 
@@ -57,7 +59,8 @@ The example supports switching between different scenarios through compilation p
   - Implementation:
     ```cpp
     // cmpMode = AscendC::SELMODE::VSEL_TENSOR_TENSOR_MODE
-    // Both src0 and src1 are tensors. When selMask bit is 1, select from src0; when bit is 0, select from src1
+    // Both src0 and src1 are tensors. When selMask bit is 1, select from src0; when
+    // bit is 0, select from src1
     AscendC::Select(dst, selMask, src0, src1, cmpMode, count);
     ```
 
@@ -67,13 +70,15 @@ The example supports switching between different scenarios through compilation p
   - Implementation:
     ```cpp
     // cmpMode = AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE
-    // Scalar at back. src0 is tensor, src1 is scalar. When selMask bit is 1, select from src0; when bit is 0, equals src1
-    static constexpr AscendC::BinaryConfig config = { 1 };
+    // Scalar at back. src0 is tensor, src1 is scalar. When selMask bit is 1, select
+    // from src0; when bit is 0, equals src1
+    static constexpr AscendC::BinaryConfig config = {1};
     AscendC::Select<AscendC::BinaryDefaultType, uint8_t, config>(dst, selMask, src0, src1, cmpMode, count);
 
-    // Scalar at front. src0 is scalar, src1 is tensor. When selMask bit is 1, equals src0; when bit is 0, select from src1
-    static constexpr AscendC::BinaryConfig config = { 0 };
-    AscendC::Select<AscendC::BinaryDefaultType, uint8_t, config>(dst, selMask, src0, src1, cmpMode, count); 
+    // Scalar at front. src0 is scalar, src1 is tensor. When selMask bit is 1,
+    // equals src0; when bit is 0, select from src1
+    static constexpr AscendC::BinaryConfig config = {0};
+    AscendC::Select<AscendC::BinaryDefaultType, uint8_t, config>(dst, selMask, src0, src1, cmpMode, count);
     ```
 
 - Scenario specifications

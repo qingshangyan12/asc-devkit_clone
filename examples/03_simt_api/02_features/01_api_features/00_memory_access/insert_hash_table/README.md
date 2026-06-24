@@ -53,10 +53,10 @@ SIMT能够通过大量线程的并发执行实现高效处理大批数据，但�
 
 ```C++
 struct Bucket {
-    int64_t key;            // 键
-    uint32_t state;         // key值写入状态标记
-    uint32_t flag;          // 原子操作标志位
-    float value[32];        // 值
+    int64_t key;     // 键
+    uint32_t state;  // key值写入状态标记
+    uint32_t flag;   // 原子操作标志位
+    float value[32]; // 值
 };
 ```
 
@@ -113,6 +113,6 @@ struct Bucket {
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
 
   执行结果如下，说明精度对比成功。
-  ```
+  ```bash
   [Success] find all key-value in hash table.
   ```

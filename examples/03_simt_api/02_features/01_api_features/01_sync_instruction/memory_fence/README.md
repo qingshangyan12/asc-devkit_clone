@@ -166,6 +166,6 @@
   | `SCENARIO_NUM` | `1`、`2` | 场景编号：1表示小shape归约场景，2表示大shape归约场景 |
 
   执行结果如下，说明精度对比成功。
-  ```
+  ```text
   [Success] Case accuracy is verification passed.
   ```

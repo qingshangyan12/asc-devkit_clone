@@ -11,7 +11,7 @@ A Matmul example that calls the Matmul API to implement matrix multiplication. I
 | Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
 
 ## Directory Structure
-```
+```text
 ├── matmul
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

@@ -30,7 +30,7 @@ This example demonstrates the usage of the GetUBSizeInBytes and GetRuntimeUBSize
 
 ## Directory Structure
 
-```
+```text
 ├── get_ub_size
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data
@@ -46,7 +46,7 @@ This example demonstrates the usage of the GetUBSizeInBytes and GetRuntimeUBSize
 - Example function
 
   The example demonstrates functionality based on the Abs absolute value operation. Computation formula:
-  ```
+  ```text
   z = Abs(x)
   ```
 

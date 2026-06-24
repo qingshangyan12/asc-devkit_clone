@@ -17,7 +17,7 @@ This example demonstrates the Sum high-level API, which computes the sum of elem
 
 ## Directory Structure
 
-```
+```text
 ├── sum
 │   ├── scripts
 │   │   └── gen_data.py               // Script for generating input data and ground truth data

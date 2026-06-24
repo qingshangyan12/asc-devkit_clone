@@ -12,7 +12,7 @@ This example introduces the usage of the printf API on the simd_vf side. The ker
 
 ## Directory Structure
 
-```
+```text
 ├── simd_vf_printf
 │   ├── CMakeLists.txt          // Build project file
 │   ├── simd_vf_printf.asc      // Ascend C example implementation & invocation example

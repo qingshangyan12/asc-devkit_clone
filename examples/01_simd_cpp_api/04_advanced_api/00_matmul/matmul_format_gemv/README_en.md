@@ -11,7 +11,7 @@ A Matmul example that implements GEMV (General Matrix-Vector multiplication). In
 | Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
 
 ## Directory Structure
-```
+```text
 ├── matmul_format_gemv
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data
@@ -40,17 +40,18 @@ A Matmul example that implements GEMV (General Matrix-Vector multiplication). In
     - Create the Matmul object: the Format parameter of matrix A is CubeFormat::VECTOR.
       ```cpp
       AscendC::Matmul<
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::VECTOR, ATYPE>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>> matmulObj;
+          AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::VECTOR, ATYPE>,
+          AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
+          AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
+          AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>>
+          matmulObj;
       ```
 
   - Key Tiling Steps
     - Create a Tiling object: the Format parameter of matrix A is CubeFormat::VECTOR.
       ```cpp
-      cubeTiling.SetAType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::VECTOR,
-      matmul_tiling::DataType::DT_FLOAT16, isAtrans);
+      cubeTiling.SetAType(
+          matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::VECTOR, matmul_tiling::DataType::DT_FLOAT16, isAtrans);
       ```
 
 - Invocation Implementation  

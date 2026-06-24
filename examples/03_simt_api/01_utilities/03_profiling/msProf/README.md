@@ -31,7 +31,7 @@ msProf工具是单算子性能分析工具。包含msprof op和msprof op simulat
     通过上板性能采集，可以直接测定算子在昇腾AI处理器上的运行时间。该方式适合在板环境中快速定位算子性能问题。
 
     基于可执行文件demo通过msprof op执行算子调优：
-    ```
+    ```bash
     msprof op ./demo
     ```
 
@@ -85,6 +85,6 @@ msProf工具是单算子性能分析工具。包含msprof op和msprof op simulat
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
 
   执行结果如下，说明精度对比成功。
-  ```
+  ```text
   [Success] Case accuracy is verification passed.
   ```

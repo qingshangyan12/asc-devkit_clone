@@ -83,7 +83,7 @@ Ascend C提供三类接口，均可实现底层的完备编程能力：
 ## 🔍目录结构说明
 本仓主要包含Ascend C编程API和必要的cmake编译脚本，是算子开发所需的核心模块，其目录结构如下：
 
-```
+```text
 ├── cmake                               # Ascend C 构建源代码
 ├── docs                                # 项目文档介绍
 ├── examples                            # Ascend C API样例工程

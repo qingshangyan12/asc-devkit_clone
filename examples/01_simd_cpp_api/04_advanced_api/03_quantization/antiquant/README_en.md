@@ -14,7 +14,7 @@ This example uses the [AscendAntiQuant](https://gitcode.com/cann/asc-devkit/blob
 
 ## Directory Structure
 
-```
+```text
 ├── antiquant
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

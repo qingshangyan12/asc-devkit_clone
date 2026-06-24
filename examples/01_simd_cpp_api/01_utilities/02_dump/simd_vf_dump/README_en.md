@@ -12,7 +12,7 @@ This example introduces the usage of the asc_dump series APIs on the simd_vf sid
 
 ## Directory Structure
 
-```
+```text
 ├── simd_vf_dump
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

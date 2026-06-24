@@ -16,7 +16,7 @@ Atlas A2/A3 Series Products set the L1 Buffer boundary value through the `SetLoa
 
 ## Directory Structure
 
-```
+```text
 ├── set_loaddata_boundary
 │   ├── scripts
 │   │   ├── gen_data.py              // Input data and ground truth generation script

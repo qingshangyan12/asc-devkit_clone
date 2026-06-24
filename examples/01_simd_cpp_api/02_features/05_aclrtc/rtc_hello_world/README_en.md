@@ -14,7 +14,7 @@ This example demonstrates how to use the **Aclrtc (runtime compilation)** mode o
 
 ## Directory Structure
 
-```
+```text
 ├── rtc_hello_world
 │   ├── CMakeLists.txt           // Build project file
 │   ├── rtc_hello_world.cpp      // Host-side code (containing RTC kernel function source string)

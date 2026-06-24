@@ -16,7 +16,7 @@ This example implements correct synchronization between two groups of AIVs with 
 
 ## Directory Structure
 
-```
+```text
 ├── group_barrier
 │   ├── CMakeLists.txt          // Build project file
 │   ├── group_barrier.asc       // Ascend C example implementation & invocation example

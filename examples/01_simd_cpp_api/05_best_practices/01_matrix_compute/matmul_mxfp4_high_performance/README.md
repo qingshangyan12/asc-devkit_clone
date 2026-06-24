@@ -16,7 +16,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── matmul_mxfp4_high_performance
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
@@ -79,9 +79,9 @@ $$
 
 ```cpp
 constexpr static auto CONSTANT_CFG = GetMxConstantCFG<aType, bType, cType, EnableScaleCache>();
-AscendC::Matmul<aType, bType, cType, cType, CONSTANT_CFG,
-                    AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>,
-                    AscendC::Impl::Detail::MatmulWithScalePolicy>
+AscendC::Matmul<
+    aType, bType, cType, cType, CONSTANT_CFG, AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>,
+    AscendC::Impl::Detail::MatmulWithScalePolicy>
     matmulObj;
 REGIST_MATMUL_OBJ(pipe, GetSysWorkSpacePtr(), matmulObj, (TCubeTiling*)nullptr);
 ```
@@ -265,7 +265,7 @@ msprof ./demo   # 分析性能
 
 当前目录下会生成PROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件
 
-```bash
+```text
 PROF_xxxx_XXXXXX
 ├── device_{id}
 └── host
@@ -278,7 +278,7 @@ PROF_xxxx_XXXXXX
 
 查看具体的性能分析结果：
 
-```
+```bash
 # 查看Task Duration 以及各项数据
 cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
 ```

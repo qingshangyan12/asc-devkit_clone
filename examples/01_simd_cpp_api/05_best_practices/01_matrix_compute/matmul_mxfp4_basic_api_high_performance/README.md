@@ -208,11 +208,7 @@ B1 block + scaleB1 block -> L0B MX data
 uint32_t srcAddr = kOffsetInChunkA * baseK * baseM;
 uint32_t scaleSrcAddr = (kOffsetInScaleChunkA * baseK / SCALE_CEIL_NUMBER) * CUBE_BLOCK;
 
-AscendC::LoadData(a2Local,
-                  a1Local[srcAddr],
-                  as1Local[scaleSrcAddr],
-                  loadDataParams,
-                  loadMxDataParams);
+AscendC::LoadData(a2Local, a1Local[srcAddr], as1Local[scaleSrcAddr], loadDataParams, loadMxDataParams);
 ```
 
 #### 4. L0 双缓冲：让加载和计算交叠

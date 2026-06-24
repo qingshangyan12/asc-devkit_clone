@@ -16,7 +16,7 @@ This example implements inter-core synchronization based on IBSet and IBWait, ap
 
 ## Directory Structure
 
-```
+```text
 ├── ib_set_wait
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

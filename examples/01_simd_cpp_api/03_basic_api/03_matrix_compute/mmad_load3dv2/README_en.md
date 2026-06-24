@@ -14,7 +14,7 @@ This example introduces the usage scenarios and methods of the LoadData3DV2 inst
 
 ## Directory Structure
 
-```
+```text
 ├── mmad_load3dv2
 │   ├── scripts
 │   │   ├── gen_data.py                      // Script for generating input data and ground truth data
@@ -32,7 +32,7 @@ The LoadData3DV2 instruction (hereafter referred to as load3dv2) has transpose c
 1. When the destination address is on L0A, supported data types are: uint8_t/int8_t/half/bfloat16_t/uint32_t/int32_t/float/int4b_t;
 
 ```cpp
-When the destination address is on L0B, supported data types are: half/bfloat16_t/uint32_t/int32_t/float.
+When the destination address is on L0B, supported data types are : half / bfloat16_t / uint32_t / int32_t / float.
 ```
 2. When the destination address is on L0A, enTranspose can determine whether to enable the transpose function;
     When the destination address is on L0B, the transpose function is enabled by default (even when enTranspose=false, the transpose function is still enabled).

@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── list_tensor_desc_input
 │   ├── CMakeLists.txt              // 编译工程文件
 │   ├── list_tensor_desc_input.asc  // Ascend C样例实现 & 调用样例
@@ -49,23 +49,23 @@
     ```cpp
     constexpr uint32_t SHAPE_DIM = 2;
     struct TensorDesc {
-      uint32_t dim{SHAPE_DIM};
-      uint32_t index;
-      uint64_t shape[SHAPE_DIM] = {8, 2048};
+        uint32_t dim{SHAPE_DIM};
+        uint32_t index;
+        uint64_t shape[SHAPE_DIM] = {8, 2048};
     };
 
     constexpr uint32_t TENSOR_DESC_NUM = 2;
     struct ListTensorDesc {
-      uint64_t ptrOffset;
-      TensorDesc tensorDesc[TENSOR_DESC_NUM];
-      uintptr_t dataPtr[TENSOR_DESC_NUM];
+        uint64_t ptrOffset;
+        TensorDesc tensorDesc[TENSOR_DESC_NUM];
+        uintptr_t dataPtr[TENSOR_DESC_NUM];
     } inputDesc;
     ```
     将申请分配的Tensor入参组合成ListTensorDesc的数据结构，示例如下。
-    ```cpp
+    ```text
     inputDesc = {(1 + (1 + SHAPE_DIM) * TENSOR_DESC_NUM) * sizeof(uint64_t),
-                {xDesc, yDesc},
-                {(uintptr_t)xDevice, (uintptr_t)yDevice}};
+                 {xDesc, yDesc},
+                 {(uintptr_t)xDevice, (uintptr_t)yDevice}};
     ``` 
     按照传入的数据格式，解析出对应的各入参，示例如下。
 

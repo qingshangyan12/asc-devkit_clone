@@ -16,7 +16,7 @@ This example introduces how to execute a fixed-shape operator using the `aclopEx
 
 ## Directory Structure
 
-```
+```text
 ├── aclop_invocation
 │   ├── add_custom.json         // Single-operator description file (ATC model conversion input)
 │   ├── CMakeLists.txt          // Build project file

@@ -21,7 +21,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── 00_basic_compile
 │   ├── figures             // 图示
 │   ├── add_kernel.asc      // 混合文件（含Kernel定义、<<<>>>内核调用）

@@ -51,7 +51,7 @@ This example implements reduction computation based on ReduceMax/ReduceMin/Reduc
 
 ## Directory Structure
 
-```
+```text
 ├── reduce_computation
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── custom_op_static_lib
 │   ├── CMakeLists.txt            // 顶层编译工程文件
 │   ├── app                       // 链接静态库并执行算子

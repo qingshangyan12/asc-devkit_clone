@@ -18,7 +18,7 @@ This example uses the GeGLU high-level API in a GLU (Gated Linear Unit) gated ac
 
 ## Directory Structure
 
-```
+```text
 ├── geglu
 │   ├── scripts
 │   │   └── gen_data.py         // Script for generating input data and ground truth data

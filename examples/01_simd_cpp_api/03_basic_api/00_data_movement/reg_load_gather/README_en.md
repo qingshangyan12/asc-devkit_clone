@@ -24,7 +24,7 @@ This example implements the functionality of transferring discrete data from UB 
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── reg_load_gather
 │   ├── scripts
 │   │   ├── gen_data.py                // Input data and ground truth generation script

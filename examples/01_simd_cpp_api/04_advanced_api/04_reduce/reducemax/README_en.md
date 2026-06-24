@@ -19,7 +19,7 @@ This example uses the ReduceMax high-level API in a reduction scenario to comput
 
 ## Directory Structure
 
-```
+```text
 ├── reducemax
 │   ├── scripts
 │   │   └── gen_data.py             // Script for generating input data and ground truth data

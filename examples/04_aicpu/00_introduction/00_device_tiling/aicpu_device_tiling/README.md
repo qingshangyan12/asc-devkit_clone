@@ -12,7 +12,7 @@
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
-```
+```text
 ├── aicpu_device_tiling
 │   ├── CMakeLists.txt                     // 编译工程文件
 │   ├── aicore_kernel.asc                  // AI Core算子实现

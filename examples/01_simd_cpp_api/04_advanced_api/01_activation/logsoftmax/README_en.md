@@ -14,7 +14,7 @@ This example uses the LogSoftMax high-level API in a multi-classification task s
 
 ## Directory Structure
 
-```
+```text
 ├── logsoftmax
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

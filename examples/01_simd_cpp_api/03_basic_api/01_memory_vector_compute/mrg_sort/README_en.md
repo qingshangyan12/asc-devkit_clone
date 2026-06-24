@@ -14,7 +14,7 @@ This example implements multi-way merge sort functionality based on Sort32 and M
 
 ## Directory Structure
 
-```
+```text
 ├── mrg_sort
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

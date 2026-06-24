@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── matmul_basic_api_high_performance
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
@@ -66,7 +66,7 @@
 
 ### 数据流路径：
 
-```
+```bash
 GM ──(MTE2, DataCopy)──> L1 ──(MTE1, LoadData)──> L0A/L0B ──(Cube, Mmad)──> L0C ──(Fixpipe)──> GM
        DataCopyInA/B             DataLoadA/B                   Compute             CopyOut
 ```
@@ -77,7 +77,7 @@ GM ──(MTE2, DataCopy)──> L1 ──(MTE1, LoadData)──> L0A/L0B ──
 
 L1 和 L0 均采用 Ping-Pong 双缓冲，使得 DataCopyIn（GM→L1）、DataLoad（L1→L0）与 Compute 三个阶段形成三级流水，每个阶段处理不同缓冲区的数据，互不阻塞。
 
-```
+```text
 时间 ──────────────────────────────────────────────────────────────>
 
 MTE2:  |─ A1 Ping ──|─ A1 Pong ──|─ A1 Ping ──| ...
@@ -88,7 +88,7 @@ Fixpipe:                           |─ CopyOut ──|(unitflag)
 
 **L1 双缓冲布局**：A1 占 L1 前半（0~256KB），B1 占 L1 后半（256~512KB），各自再分为 Ping/Pong 两块：
 
-```
+```text
 L1 (512KB):
 ├── A1 Ping: [0, 128KB)
 ├── A1 Pong: [128KB, 256KB)
@@ -98,7 +98,7 @@ L1 (512KB):
 
 **L0 双缓冲布局**：A2/B2 各自独立64KB空间，各自再分为 Ping/Pong：
 
-```
+```text
 L0A/L0B (64KB):
 ├── A2 Ping: [0, 16KB)
 ├── A2 Pong: [32KB, 48KB)
@@ -130,12 +130,12 @@ AscendC::LocalTensor<half> a2LocalPong(AscendC::TPosition::A2, L0_PINGPONG_BYTES
 
 ```cpp
 // 初始化：预置反向同步 flag，防止首次 WaitFlag 死锁
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID0);  // A1 Ping 可写
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID1);  // A1 Pong 可写
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID2);  // B1 Ping 可写
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID3);  // B1 Pong 可写
-AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);     // L0 Ping 可写
-AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID1);     // L0 Pong 可写
+AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID0); // A1 Ping 可写
+AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID1); // A1 Pong 可写
+AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID2); // B1 Ping 可写
+AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID3); // B1 Pong 可写
+AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);    // L0 Ping 可写
+AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID1);    // L0 Pong 可写
 ```
 
 **大包粒度的正向同步**：DataLoad 从 L1 大包中按K方向逐个base块读取数据，只需在读取大包首个base块时等待数据就绪，后续base块与首个在同一个大包内，无需重复等待：
@@ -167,7 +167,7 @@ uint32_t nIterIdx = AscendC::GetBlockIdx() / mIter;
 
 本样例在 Compute 之后触发 DataCopyIn 时，**先 B 后 A**，优先搬运更紧迫的 B 数据：
 
-```
+```text
 k=0:  Compute → DataCopyIn(B1 Pong) → DataCopyIn(A1 Pong)
                  ↑ MTE2 先搬 B        ↑ 再搬 A
 k=stepKb:       需要 B1 Pong → 已就绪 ✓（B 已有 stepKb 轮时间搬运）
@@ -184,7 +184,7 @@ k=stepKa:       需要 A1 Pong → 已就绪 ✓（A 有 stepKa 轮时间搬运�
 // DataCopyInA: 一次搬入 stepKa 个 baseK 块
 AscendC::Nd2NzParams nd2nzParams;
 nd2nzParams.nValue = curM;
-nd2nzParams.dValue = baseK * stepKa;  // 大包包含 stepKa 个 baseM * baseK
+nd2nzParams.dValue = baseK * stepKa; // 大包包含 stepKa 个 baseM * baseK
 ```
 
 #### 6. LoadData3D 替代 LoadData2D——减少指令队列占用
@@ -227,18 +227,20 @@ AscendC::LoadData(a2Local, a1Local[srcAddr], loadDataParams);
 所有 Tiling 参数（baseM/baseK/baseN、singleCoreM/K/N、stepKa/stepKb）通过模板参数在编译期确定，运行时无需 Scalar 动态计算，减少 Scalar 开销：
 
 ```cpp
-template <uint32_t M, uint32_t K, uint32_t N, uint32_t baseM, uint32_t baseK, uint32_t baseN,
-          uint32_t singleCoreM, uint32_t singleCoreK, uint32_t singleCoreN,
-          uint32_t stepKa, uint32_t stepKb>
-class KernelMmad { ... };
+template <
+    uint32_t M, uint32_t K, uint32_t N, uint32_t baseM, uint32_t baseK, uint32_t baseN, uint32_t singleCoreM,
+    uint32_t singleCoreK, uint32_t singleCoreN, uint32_t stepKa, uint32_t stepKb>
+class KernelMmad {
+    ...
+};
 ```
 
 #### 8. UnitFlag 优化
 
 开启 UnitFlag 后，[MMAD](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/Mmad.md) 和 [FIXPIPE](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬出/L0C到GM数据搬运（Fixpipe）.md) 实现细粒度（512B）流水并行，而非指令级同步。每当 Cube 完成一个 512B 数据结果的计算，FIXPIPE 立即搬出该数据，Cube 计算与结果写回流水重叠：
 
-```cpp
-mmadParams.unitFlag = (kBlockIdx != kLoopCount - 1) ? 2 : 3;  // 开启 UnitFlag
+```text
+mmadParams.unitFlag = (kBlockIdx != kLoopCount - 1) ? 2 : 3; // 开启 UnitFlag
 ```
 
 - `unitFlag = 2`：中间 K 块，MMAD 计算结果不立即写回，而是等待下一个 512B 完成后流水搬出
@@ -258,7 +260,8 @@ constexpr uint32_t outerMLoopCount = AscendC::DivCeil(mIterTotal, mIterPerRound)
 for (uint32_t outerMIdx = 0; outerMIdx < outerMLoopCount; outerMIdx++) {
     uint32_t mIterIdx = AscendC::GetBlockIdx() % mIterPerRound + outerMIdx * mIterPerRound;
     uint32_t nIterIdx = AscendC::GetBlockIdx() / mIterPerRound;
-    if (mIterIdx >= mIterTotal || nIterIdx >= nIterTotal) continue;
+    if (mIterIdx >= mIterTotal || nIterIdx >= nIterTotal)
+        continue;
     InitComputeParamsL2Cache(mIterIdx, nIterIdx);
     ProcessLoop(...);
 }
@@ -268,7 +271,7 @@ for (uint32_t outerMIdx = 0; outerMIdx < outerMLoopCount; outerMIdx++) {
 
 以 stepKa=8、stepKb=4 为例，展示一个完整 (mBlockIdx, nBlockIdx) 子块内 K 方向循环的详细执行流程：
 
-```
+```text
 预处理：
   SetFlag(MTE1_MTE2, 0/1/2/3)  // 预置反向同步：L1 Ping/Pong 均可写
   SetFlag(M_MTE1, 0/1)         // 预置反向同步：L0 Ping/Pong 均可写
@@ -314,20 +317,16 @@ K循环 kBlockIdx = 0, 1, ..., kLoopCount-1:
 
 **时序示意**（stepKa=8, stepKb=4）：
 
-```
-预取: DataCopyIn(A1 Ping) + DataCopyIn(B1 Ping)                     ← K循环前
+```cpp
+预取 : DataCopyIn(A1 Ping) + DataCopyIn(B1 Ping)                     ← K循环前
 
-k=0:  WaitFlag(A1Ping, B1Ping) → DataLoad → Compute → DataCopyIn(B1Pong) → DataCopyIn(A1Pong)
-k=1:  DataLoad → Compute
-k=2:  DataLoad → Compute
-k=3:  DataLoad(释放B1Ping) → Compute → DataCopyIn(搬运B1Ping)
+       k = 0 : WaitFlag(A1Ping, B1Ping) → DataLoad → Compute → DataCopyIn(B1Pong) → DataCopyIn(A1Pong) k = 1
+    : DataLoad → Compute k = 2 : DataLoad → Compute k = 3 : DataLoad(释放B1Ping) → Compute → DataCopyIn(搬运B1Ping)
 
-k=4:  WaitFlag(B1Pong) → DataLoad(B1Pong) → Compute
-k=5:  DataLoad → Compute
-k=6:  DataLoad → Compute
-k=7:  DataLoad(释放A1Ping B1Pong) → Compute → DataCopyIn(B1Pong) → DataCopyIn(A1Ping)
-k=8:  WaitFlag(A1Pong已就绪✓) → WaitFlag(B1Ping已就绪✓) → DataLoad → Compute
-...
+                                                                k = 4
+    : WaitFlag(B1Pong) → DataLoad(B1Pong) → Compute k = 5 : DataLoad → Compute k = 6 : DataLoad → Compute k = 7
+    : DataLoad(释放A1Ping B1Pong) → Compute → DataCopyIn(B1Pong) → DataCopyIn(A1Ping) k = 8
+    : WaitFlag(A1Pong已就绪✓) → WaitFlag(B1Ping已就绪✓) → DataLoad → Compute...
 ```
 
 ### 性能数据分析
@@ -495,7 +494,7 @@ AscendC::printf("matmul blockIdx=%d\n", AscendC::GetBlockIdx());
 在算子kernel侧实现代码中需要打印Tensor数据的地方调用DumpTensor接口打印相关内容。样例如下：
 
 ```cpp
-AscendC::DumpTensor(cLocal, baseM * baseN);
+AscendC::DumpTensor(cLocal, baseM* baseN);
 ```
 
 > [!CAUTION]注意 
@@ -512,7 +511,7 @@ msprof ./demo   # 分析样例性能
 ```
 
 当前目录下会生成 PROF_ 前缀的文件夹，`mindstudio_profiler_output` 目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件：
-```bash
+```text
 PROF_xxxx_XXXXXX
 ├── device_{id}
 └── host

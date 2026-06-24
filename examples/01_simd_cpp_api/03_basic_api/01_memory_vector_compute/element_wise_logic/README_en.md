@@ -14,7 +14,7 @@ This example implements bitwise logic operation functionality based on And, Ors,
 
 ## Directory Structure
 
-```
+```text
 ├── element_wise_logic
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data
@@ -63,7 +63,7 @@ This example switches between different scenarios through the compilation parame
 - Implementation:
 
     ```cpp
-    static constexpr AscendC::BinaryConfig config = { 0 };
+    static constexpr AscendC::BinaryConfig config = {0};
     AscendC::Ors<AscendC::BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, COUNT);
     ```
 

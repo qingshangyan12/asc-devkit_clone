@@ -16,7 +16,7 @@ This example implements inter-core sequential synchronization in deterministic c
 
 ## Directory Structure
 
-```
+```text
 ├── sequential_block_sync
 │   ├── scripts
 │   │   ├── gen_data.py                // Script for generating input data and ground truth data

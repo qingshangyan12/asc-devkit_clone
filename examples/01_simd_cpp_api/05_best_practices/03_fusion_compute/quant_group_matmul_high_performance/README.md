@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── quant_group_matmul_high_performance
 │   ├── CMakeLists.txt                     // 编译工程文件
 │   ├── data_utils.h                       // 数据读入写出函数
@@ -95,7 +95,7 @@ __global__ __mix__(1, 1)
 #else
 __global__ __mix__(1, 2)
 #endif
-void quant_group_matmul_custom(...)
+    void quant_group_matmul_custom(...)
 ```
 
 ### 性能指标说明
@@ -168,11 +168,11 @@ Case 0是本样例中的基础场景，采用`__mix__(1, 1)`模式（1个AIC + 1
 // AIC执行路径: MMCompute → Iterate循环 → SetFlag(SYNC_AIC_TO_AIV)
 // AIV执行路径: 跳过MMCompute → VectorCompute → WaitFlag(SYNC_AIC_TO_AIV)
 if ASCEND_IS_AIC {
-    matmulObj.Iterate();    // Cube计算
-    CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_TO_AIV);  // 通知Vector
+    matmulObj.Iterate();                            // Cube计算
+    CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_TO_AIV); // 通知Vector
 }
 if ASCEND_IS_AIV {
-    CrossCoreWaitFlag(SYNC_AIC_TO_AIV);  // 等待Cube完成
+    CrossCoreWaitFlag(SYNC_AIC_TO_AIV); // 等待Cube完成
     // 处理数据...
     CrossCoreSetFlag<2, PIPE_MTE2>(SYNC_AIV_TO_AIC);
 }
@@ -194,23 +194,23 @@ Process函数采用**跨Group连续轮询**策略分配子块给多个Core。核
 
 ```cpp
 for (groupIdx = 0, preCount = 0; groupIdx < GROUP_NUM; ++groupIdx) {
-    groupM = groupListGlobal.GetValue(groupIdx);          // 本组行数, 本例=1024
-    numBlocksM = Ceil(groupM, SINGLE_M);                   // M方向分块数
-    numBlocksN = Ceil(N, SINGLE_N);                         // N方向分块数, 所有组相同=8
-    curCount = preCount + numBlocksM * numBlocksN;          // 含上组余数的连续编号上界
+    groupM = groupListGlobal.GetValue(groupIdx);   // 本组行数, 本例=1024
+    numBlocksM = Ceil(groupM, SINGLE_M);           // M方向分块数
+    numBlocksN = Ceil(N, SINGLE_N);                // N方向分块数, 所有组相同=8
+    curCount = preCount + numBlocksM * numBlocksN; // 含上组余数的连续编号上界
 
     // 核心分配公式：确定当前Core在本Group中的第一个块编号
     curBlock = coreIdx >= preCount ? coreIdx : coreIdx + CORE_NUM;
 
     while (curBlock < curCount) {
-        mIdx = (curBlock - preCount) / numBlocksN;          // 组内M方向块索引
-        nIdx = (curBlock - preCount) % numBlocksN;          // 组内N方向块索引
-        MMCompute(groupIdx, groupConfig);                    // Cube计算
-        VectorCompute(groupIdx, groupConfig);                // Vector计算
-        curBlock += CORE_NUM;                                // 轮询步进，步长为CORE_NUM
+        mIdx = (curBlock - preCount) / numBlocksN; // 组内M方向块索引
+        nIdx = (curBlock - preCount) % numBlocksN; // 组内N方向块索引
+        MMCompute(groupIdx, groupConfig);          // Cube计算
+        VectorCompute(groupIdx, groupConfig);      // Vector计算
+        curBlock += CORE_NUM;                      // 轮询步进，步长为CORE_NUM
     }
-    preCount = curCount % CORE_NUM;                          // 余数传递给下一组
-    globalRowOffset += groupM;                               // 全局行偏移累积
+    preCount = curCount % CORE_NUM; // 余数传递给下一组
+    globalRowOffset += groupM;      // 全局行偏移累积
 }
 ```
 
@@ -218,7 +218,7 @@ for (groupIdx = 0, preCount = 0; groupIdx < GROUP_NUM; ++groupIdx) {
 
 **Atlas A2样例示例**（CORE_NUM=24，每组64块，64 % 24 = 16）：
 
-```
+```text
 Group 0: preCount=0,  curCount=64  → Core0~15处理3块, Core16~23处理2块 → preCount_out=16
 Group 1: preCount=16, curCount=80  → Core0~7处理3块, Core8~15处理2块, Core16~23处理3块 → preCount_out=8
 Group 2: preCount=8,  curCount=72  → Core0~7处理3块, Core8~23处理2块 → preCount_out=0
@@ -244,7 +244,7 @@ matmul::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CONSTANT_CFG> matmulObj;
 ```cpp
 static constexpr MatmulShapeParams shapeParams = {SINGLE_M, SINGLE_N, K, BASE_M, BASE_N, BASE_K};
 MatmulConfig mmCFG = GetMMConfig<MatmulConfigMode::CONFIG_MDL>(shapeParams);
-mmCFG.enUnitFlag = true;  // 开启UnitFlag
+mmCFG.enUnitFlag = true; // 开启UnitFlag
 auto constantCFG = AscendC::GetMatmulApiTiling<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>(mmCFG);
 ```
 
@@ -257,15 +257,20 @@ auto constantCFG = AscendC::GetMatmulApiTiling<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE
 ```cpp
 constexpr uint32_t BUFFER_NUM = 2; // UB队列Buffer数, 设为2开启double buffer
 
-pipe->InitBuffer(scaleInQueue, BUFFER_NUM, BASE_N * sizeof(float));          // 2 × 1024B
-pipe->InitBuffer(perTokenScaleInQueue, BUFFER_NUM, BASE_M * sizeof(float));   // DAV_2201(BASE_M=128): 2 × 512B；DAV_3510(BASE_M=256): 2 × 1024B
-pipe->InitBuffer(vecInQueue, BUFFER_NUM, UB_CAL_SIZE * sizeof(int32_t));      // 2 × 24,576B
-pipe->InitBuffer(vecOutQueue, BUFFER_NUM, UB_CAL_SIZE * sizeof(half));        // 2 × 12,288B
+pipe->InitBuffer(scaleInQueue, BUFFER_NUM, BASE_N * sizeof(float)); // 2 × 1024B
+pipe->InitBuffer(
+    perTokenScaleInQueue, BUFFER_NUM,
+    BASE_M * sizeof(float)); // DAV_2201(BASE_M=128): 2 ×
+                             // 512B；DAV_3510(BASE_M=256): 2 × 1024B
+pipe->InitBuffer(vecInQueue, BUFFER_NUM,
+                 UB_CAL_SIZE * sizeof(int32_t)); // 2 × 24,576B
+pipe->InitBuffer(vecOutQueue, BUFFER_NUM,
+                 UB_CAL_SIZE * sizeof(half)); // 2 × 12,288B
 ```
 
 double buffer的工作原理是：当Vector在处理Buffer A的数据时，MTE2/MTE3可以同时搬运Buffer B的数据，反之亦然。
 
-```
+```text
 时间 ──────────────────────────────────────────────────────>
 MTE2:  |─ 搬入Buffer0 ──|─ 搬入Buffer1 ──|─ 搬入Buffer0 ──| ...
 VEC:                    |─ 处理Buffer0 ──|─ 处理Buffer1 ──|─ 处理Buffer0 ──| ...
@@ -298,9 +303,9 @@ Case 1在Case 0基础上将核函数模式从`__mix__(1, 1)`升级为`__mix__(1,
 `__mix__(1, 2)`模式下，每个物理核包含1个AIC和2个AIV。两个AIV通过`taskRation`轮询机制分摊Vector侧的offsetM迭代任务：
 
 ```cpp
-uint32_t taskRation = AscendC::GetTaskRation();  // __mix__(1,2)下为2
+uint32_t taskRation = AscendC::GetTaskRation(); // __mix__(1,2)下为2
 if (taskRation != 0 && vecCount % taskRation != subBlockIdx) {
-    continue;  // 跳过不属于当前AIV的任务
+    continue; // 跳过不属于当前AIV的任务
 }
 ```
 
@@ -337,7 +342,7 @@ Case 2在Case 1基础上将PIPELINE_DEPTH从1提升为4，引入workspace环形S
 
 workspace是Cube和Vector之间的中转站，采用环形分槽设计。这里的 Slot 指由 `workSpaceOffset = BASE_N × BASE_M × (coreIdx + (cubeTaskIdx % PIPELINE_DEPTH) × CORE_NUM)` 定位的一段连续空间，单个 core 的 Slot 大小为 `BASE_M×BASE_N×sizeof(int32_t)`，每层 pipeline 的 Slot 总空间为 `CORE_NUM×BASE_M×BASE_N×sizeof(int32_t)`，`PIPELINE_DEPTH` 个 Slot 轮流使用，Cube 写入当前 Slot 的同时，Vector 可以处理之前 Slot 的数据：
 
-```
+```text
 workspace布局:
 Slot 0: Core0[BASE_M×BASE_N] + Core1[BASE_M×BASE_N] + ... + Core(CORE_NUM-1)[BASE_M×BASE_N]
 Slot 1: Core0[BASE_M×BASE_N] + Core1[BASE_M×BASE_N] + ... + Core(CORE_NUM-1)[BASE_M×BASE_N]
@@ -353,7 +358,7 @@ workSpaceOffset = BASE_N × BASE_M × (coreIdx + (cubeTaskIdx % PIPELINE_DEPTH) 
 
 **4级流水时序**：
 
-```
+```text
 时间 ──────────────────────────────────────────────────────────────>
 Cube:  |─Iter0→Slot0─|─Iter1→Slot1─|─Iter2→Slot2─|─Iter3→Slot3─|─Iter4→Slot0─| ...
                       (Wait)                                     (Wait)

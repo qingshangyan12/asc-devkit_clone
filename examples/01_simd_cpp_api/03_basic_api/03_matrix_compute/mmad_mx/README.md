@@ -12,7 +12,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── mmad_mx
 │   ├── figures                     // 图示
 │   ├── scripts

@@ -14,7 +14,7 @@ This example uses Add computation as the carrier to demonstrate the Ascend C CPU
 
 ## Directory Structure
 
-```
+```text
 ├── 06_cpu_debug
 │   ├── CMakeLists.txt          // Build project file
 │   ├── cpu_debug.asc           // Ascend C example implementation & invocation example

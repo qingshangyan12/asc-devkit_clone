@@ -40,7 +40,7 @@ This example implements contiguous and non-contiguous aligned data transfer oper
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── reg_load_store_align
 │   ├── scripts
 │   │   ├── gen_data.py                // Input data and ground truth generation script
@@ -61,7 +61,7 @@ This example implements contiguous and non-contiguous aligned data transfer oper
     - When outputLength>=128, the mask handles 128 elements
     - When outputLength<128, the mask handles outputLength elements
     - After UpdateMask completes, outputLength decrements by the number of elements handled by the mask.
-    ```cpp
+    ```text
     mask = AscendC::Reg::UpdateMask<T>(outputLength);
     ```
 - Example specifications:

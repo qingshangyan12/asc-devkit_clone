@@ -14,7 +14,7 @@ This example demonstrates how to map an Ascend C custom operator to a TensorFlow
 
 ## Directory Structure
 
-```
+```text
 ├── tensorflow_builtin
 │   ├── run_add_custom.py       // TensorFlow invocation script (mapped to the built-in AddV2 operator)
 │   └── README.md               // Example documentation

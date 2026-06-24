@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── torch_library
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── add_custom.asc          // Ascend C算子实现 & torch.library注册
@@ -28,7 +28,7 @@
 
   Add计算公式为：
 
-  ```
+  ```text
   z = x + y
   ```
 
@@ -50,18 +50,13 @@
   PyTorch提供`TORCH_LIBRARY`宏作为自定义算子注册的核心接口，用于创建并初始化自定义算子库，注册后在Python侧可以通过`torch.ops.namespace.op_name`方式进行调用，例如：
 
   ```cpp
-  TORCH_LIBRARY(ascendc_ops, m) {
-      m.def("ascendc_add(Tensor x, Tensor y) -> Tensor");
-  }
+  TORCH_LIBRARY(ascendc_ops, m) { m.def("ascendc_add(Tensor x, Tensor y) -> Tensor"); }
   ```
 
   `TORCH_LIBRARY_IMPL`用于将算子绑定到特定的`DispatchKey`（PyTorch设备调度标识）。针对NPU设备，需要将算子实现注册到`PrivateUse1`这一专属的`DispatchKey`上，例如：
 
   ```cpp
-  TORCH_LIBRARY_IMPL(ascendc_ops, PrivateUse1, m)
-  {
-      m.impl("ascendc_add", TORCH_FN(ascendc_ops::ascendc_add));
-  }
+  TORCH_LIBRARY_IMPL(ascendc_ops, PrivateUse1, m) { m.impl("ascendc_add", TORCH_FN(ascendc_ops::ascendc_add)); }
   ```
 
   在`ascendc_add`函数中通过`c10_npu::getCurrentNPUStream()`函数获取当前NPU上的流，并通过内核调用符`<<<>>>`调用自定义的Kernel函数`add_custom`，在NPU上执行算子。

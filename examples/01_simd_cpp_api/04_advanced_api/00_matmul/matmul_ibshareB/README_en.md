@@ -28,7 +28,7 @@ An example that enables the IBShare feature to reuse the same matrix A or matrix
 
 ## Directory Structure
 
-```
+```text
 ├── matmul_ibshareB
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data
@@ -64,7 +64,7 @@ An example that enables the IBShare feature to reuse the same matrix A or matrix
       - Method 1: Default implementation, use the default IBShare template CFG_IBSHARE_NORM to create the Matmul object.
         ```cpp
         #include "lib/matmul_intf.h"
-    
+
         using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
         using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false, LayoutMode::NONE, true>;
         using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
@@ -79,7 +79,7 @@ An example that enables the IBShare feature to reuse the same matrix A or matrix
         using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
         using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false, LayoutMode::NONE, true>;
         using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-        using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+        using BIAS_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
         AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_NORM> matmulObj;
         ```
 
@@ -89,10 +89,13 @@ An example that enables the IBShare feature to reuse the same matrix A or matrix
   - Invocation Implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
     ```cpp
-    matmul_ibshareb_custom<<<tilingData.usedCoreNum / MIX_RATIO, nullptr, stream>>>(x1, x2, bias, y, workspaceDevice,
-                          tilingDevice);       // Method 1: Non-pure Cube mode, SetDim sets the core count for AIV:AIC combination
-    matmul_ibshareb_custom<<<tilingData.usedCoreNum, nullptr, stream>>>(x1, x2, bias, y, workspaceDevice,
-                          tilingDevice);       // Method 2: Pure Cube mode, SetDim sets the AIC core count                          
+    matmul_ibshareb_custom<<<tilingData.usedCoreNum / MIX_RATIO, nullptr, stream>>>(
+        x1, x2, bias, y, workspaceDevice,
+        tilingDevice); // Method 1: Non-pure Cube mode, SetDim sets the core count
+                       // for AIV:AIC combination
+    matmul_ibshareb_custom<<<tilingData.usedCoreNum, nullptr, stream>>>(
+        x1, x2, bias, y, workspaceDevice,
+        tilingDevice); // Method 2: Pure Cube mode, SetDim sets the AIC core count
     ```
 
 ## Build and Run

@@ -21,7 +21,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── 01_separate_compile
 │   ├── figures              // 图示
 │   ├── add_compute.asc      // 计算逻辑函数定义

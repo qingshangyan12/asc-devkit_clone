@@ -12,7 +12,7 @@ This example introduces four types of matrix multiplication with quantization ca
 
 ## Directory Structure
 
-```
+```text
 ├── mmad_mx
 │   ├── figures                     // Illustrations
 │   ├── scripts

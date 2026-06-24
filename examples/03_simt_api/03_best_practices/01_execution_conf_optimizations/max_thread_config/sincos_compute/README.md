@@ -27,7 +27,7 @@ sincos_compute/
 
   使用sincosf函数同时计算sin和cos结果
 
-  ```
+  ```text
   sincosf(input[idx], output_sin + idx, output_cos + idx)
   ```
 
@@ -99,11 +99,10 @@ sincos_compute/
 **关键代码**：
 
 ```cpp
-__global__ void sincos_thread_1024(float* input, float* output_sin, 
-                                    float* output_cos, uint64_t total_length)
+__global__ void sincos_thread_1024(float* input, float* output_sin, float* output_cos, uint64_t total_length)
 {
     int32_t blk_start_idx = blockIdx.x * THREADS_PER_BLOCK * PER_THREAD_LOOP;
-    
+
     for (int i = 0; i < PER_THREAD_LOOP; i++) {
         int idx = blk_start_idx + i * THREADS_PER_BLOCK + threadIdx.x;
         sincosf(input[idx], output_sin + idx, output_cos + idx);
@@ -115,7 +114,7 @@ __global__ void sincos_thread_1024(float* input, float* output_sin,
 
 使用`--cce-res-usage`编译选项查看寄存器使用情况：
 
-```
+```bash
 [BISHENG] Function properties for _Z18sincos_thread_1024PfS_S_m_simt_entry: Stack size: 32 bytes, Used register number: 32
 ```
 
@@ -150,12 +149,11 @@ __global__ void sincos_thread_1024(float* input, float* output_sin,
 **关键代码**：
 
 ```cpp
-__global__ __launch_bounds__(512) void sincos_thread_512(float* input, 
-                                    float* output_sin, float* output_cos,
-                                    uint64_t total_length)
+__global__ __launch_bounds__(512) void sincos_thread_512(
+    float* input, float* output_sin, float* output_cos, uint64_t total_length)
 {
     int32_t blk_start_idx = blockIdx.x * THREADS_PER_BLOCK * PER_THREAD_LOOP;
-    
+
     for (int i = 0; i < PER_THREAD_LOOP; i++) {
         int idx = blk_start_idx + i * THREADS_PER_BLOCK + threadIdx.x;
         sincosf(input[idx], output_sin + idx, output_cos + idx);
@@ -165,7 +163,7 @@ __global__ __launch_bounds__(512) void sincos_thread_512(float* input,
 
 **编译信息**：
 
-```
+```bash
 [BISHENG] Function properties for _Z17sincos_thread_512PfS_S_m_simt_entry: Stack size: 0 bytes, Used register number: 48
 ```
 

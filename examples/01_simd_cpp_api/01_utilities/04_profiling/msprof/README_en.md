@@ -14,7 +14,7 @@ This example uses Add computation as the carrier to demonstrate how to collect o
 
 ## Directory Structure
 
-```
+```text
 ├── msprof
 │   ├── CMakeLists.txt       // Build project file
 │   ├── msprof.asc           // Ascend C example implementation and host-side invocation example

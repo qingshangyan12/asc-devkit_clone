@@ -59,7 +59,7 @@ pipe.InitBuffer(que, addr0, addr1, addr2);
 ```cpp
 // TBufPool 分配
 // bufIDSize 默认上限为 4，最大为 16
-TBufPool<TPosition::VECIN, 8> bufPool;  // 最多 8 个 Buffer
+TBufPool<TPosition::VECIN, 8> bufPool; // 最多 8 个 Buffer
 bufPool.InitBuffer(que, num, len);
 bufPool.InitBuffer(buf, len);
 ```
@@ -75,9 +75,9 @@ bufPool.InitBuffer(buf, len);
 LocalTensor<T> tensor = que.AllocTensor<T>();
 
 // 使用后释放
-que.EnQue(tensor);  // 先入队
-que.DeQue<T>();     // 再出队使用
-que.FreeTensor(tensor);  // 最后释放
+que.EnQue(tensor);      // 先入队
+que.DeQue<T>();         // 再出队使用
+que.FreeTensor(tensor); // 最后释放
 ```
 
 ### 3.2 从 TBuf 获取
@@ -130,7 +130,7 @@ pipe.InitBuffer(que, 2, len);
     TPipe pipe;
     pipe.InitBuffer(que, num, len);
     // ... 使用 que
-}  // pipe 析构时自动释放内存
+} // pipe 析构时自动释放内存
 ```
 
 ### 5.2 重新分配
@@ -172,7 +172,8 @@ template <typename T>
 class KernelAdd {
 public:
     __aicore__ KernelAdd() {}
-    __aicore__ void Process(GM_ADDR x, GM_ADDR y, GM_ADDR z, uint32_t dataSize) {
+    __aicore__ void Process(GM_ADDR x, GM_ADDR y, GM_ADDR z, uint32_t dataSize)
+    {
         // 初始化内存管理
         pipe.InitBuffer(inQueueX, 1, dataSize * sizeof(T));
         pipe.InitBuffer(inQueueY, 1, dataSize * sizeof(T));
@@ -215,7 +216,8 @@ private:
 
 ```cpp
 template <typename T>
-__aicore__ void ProcessWithTmpBuffer(GM_ADDR x, GM_ADDR y, uint32_t dataSize) {
+__aicore__ void ProcessWithTmpBuffer(GM_ADDR x, GM_ADDR y, uint32_t dataSize)
+{
     TPipe pipe;
 
     // 主数据队列
@@ -228,9 +230,9 @@ __aicore__ void ProcessWithTmpBuffer(GM_ADDR x, GM_ADDR y, uint32_t dataSize) {
     // 根据数据类型确定临时空间大小
     uint32_t tmpSize;
     if constexpr (sizeof(T) == sizeof(half)) {
-        tmpSize = dataSize * 8;  // half 类型需要更大临时空间
+        tmpSize = dataSize * 8; // half 类型需要更大临时空间
     } else {
-        tmpSize = dataSize * 4;  // float 类型
+        tmpSize = dataSize * 4; // float 类型
     }
 
     pipe.InitBuffer(inQueue, 1, dataSize * sizeof(T));

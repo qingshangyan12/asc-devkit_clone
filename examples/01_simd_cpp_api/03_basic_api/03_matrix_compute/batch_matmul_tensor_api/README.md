@@ -67,7 +67,7 @@ C[b] = A[b] * B[b] + Bias[b], b = 0, 1, ..., B - 1
 矩阵A、B、C在Global Memory的格式是`ND`，矩阵A、B在L1 Buffer的格式是`NZ`，矩阵A在L0 Buffer的格式是`NZ`，矩阵B在L0B Buffer的格式是`ZN`，矩阵C在L0C Buffer的格式是`NZ`，Bias在Global Memory、L1 Buffer、L0 Buffer的格式都是`ND`。
 
 ```cpp
-//通过MakeFrameLayout构造Layout，MakeTensor构建Tensor。
+// 通过MakeFrameLayout构造Layout，MakeTensor构建Tensor。
 
 auto gmA = MakeTensor(MakeMemPtr(a), MakeFrameLayout<NDExtLayoutPtn>(B, M, K));
 auto gmB = MakeTensor(MakeMemPtr(b), MakeFrameLayout<NDExtLayoutPtn>(B, K, N));
@@ -90,21 +90,27 @@ auto l0BiasTensor = MakeTensor(MakeMemPtr(l0BiasBuf), MakeFrameLayout<NDExtLayou
 ```cpp
 for (uint32_t l1batchIndex = BIndexStart; l1batchIndex < BIndexEnd; l1batchIndex += L1BatchSize) {
     uint32_t l1BatchSize = min(L1BatchSize, BIndexEnd - l1batchIndex);
-    Copy(copyGM2L1Atom, l1ATensor,
-         gmA.Slice(MakeCoord(l1batchIndex, MakeCoord(0, 0)), MakeShape(l1BatchSize, MakeShape(M, K))));
-    Copy(copyGM2L1Atom, l1BTensor,
-         gmB.Slice(MakeCoord(l1batchIndex, MakeCoord(0, 0)), MakeShape(l1BatchSize, MakeShape(K, N))));
-    Copy(copyGM2L1Atom, l1BiasTensor,
-         gmBias.Slice(MakeCoord(l1batchIndex, MakeCoord(0, 0)), MakeShape(l1BatchSize, MakeShape(1, N))));
+    Copy(
+        copyGM2L1Atom, l1ATensor,
+        gmA.Slice(MakeCoord(l1batchIndex, MakeCoord(0, 0)), MakeShape(l1BatchSize, MakeShape(M, K))));
+    Copy(
+        copyGM2L1Atom, l1BTensor,
+        gmB.Slice(MakeCoord(l1batchIndex, MakeCoord(0, 0)), MakeShape(l1BatchSize, MakeShape(K, N))));
+    Copy(
+        copyGM2L1Atom, l1BiasTensor,
+        gmBias.Slice(MakeCoord(l1batchIndex, MakeCoord(0, 0)), MakeShape(l1BatchSize, MakeShape(1, N))));
 
     for (uint32_t l0BatchIndex = 0; l0BatchIndex < l1BatchSize; l0BatchIndex += L0BatchSize) {
         uint32_t l0BatchSize = min(L0BatchSize, l1BatchSize - l0BatchIndex);
-        Copy(copyL12L0AAtom, l0ATensor,
-             l1ATensor.Slice(MakeCoord(l0BatchIndex, MakeCoord(0, 0)), MakeShape(l0BatchSize, MakeShape(M, K))));
-        Copy(copyL12L0BAtom, l0BTensor,
-             l1BTensor.Slice(MakeCoord(l0BatchIndex, MakeCoord(0, 0)), MakeShape(l0BatchSize, MakeShape(K, N))));
-        Copy(copyL12BTAtom, l0BiasTensor,
-             l1BiasTensor.Slice(MakeCoord(l0BatchIndex, MakeCoord(0, 0)), MakeShape(l0BatchSize, MakeShape(1, N))));
+        Copy(
+            copyL12L0AAtom, l0ATensor,
+            l1ATensor.Slice(MakeCoord(l0BatchIndex, MakeCoord(0, 0)), MakeShape(l0BatchSize, MakeShape(M, K))));
+        Copy(
+            copyL12L0BAtom, l0BTensor,
+            l1BTensor.Slice(MakeCoord(l0BatchIndex, MakeCoord(0, 0)), MakeShape(l0BatchSize, MakeShape(K, N))));
+        Copy(
+            copyL12BTAtom, l0BiasTensor,
+            l1BiasTensor.Slice(MakeCoord(l0BatchIndex, MakeCoord(0, 0)), MakeShape(l0BatchSize, MakeShape(1, N))));
     }
 }
 ```
@@ -115,7 +121,9 @@ for (uint32_t l1batchIndex = BIndexStart; l1batchIndex < BIndexEnd; l1batchIndex
 
 ```cpp
 for (uint32_t l0CBatchIndex = 0; l0CBatchIndex < l0BatchSize; l0CBatchIndex++) {
-    Mmad(mmadAtom.with(MmadParams{static_cast<uint16_t>(M), static_cast<uint16_t>(N), static_cast<uint16_t>(K), 0, true}),
+    Mmad(
+        mmadAtom.with(
+            MmadParams{static_cast<uint16_t>(M), static_cast<uint16_t>(N), static_cast<uint16_t>(K), 0, true}),
         l0CTensor.Slice(MakeCoord(l0CBatchIndex, MakeCoord(0, 0)), MakeShape(1, MakeShape(M, N))),
         l0ATensor.Slice(MakeCoord(l0CBatchIndex, MakeCoord(0, 0)), MakeShape(1, MakeShape(M, K))),
         l0BTensor.Slice(MakeCoord(l0CBatchIndex, MakeCoord(0, 0)), MakeShape(1, MakeShape(K, N))),
@@ -127,10 +135,10 @@ for (uint32_t l0CBatchIndex = 0; l0CBatchIndex < l0BatchSize; l0CBatchIndex++) {
 
 每次完成`L0BatchSize`数量的矩阵乘加计算后，调用Copy接口通过`CopyL0C2GM` `Operation`的数据搬运能力将L0C Buffer上的结果矩阵C搬出到Global Memory。
 ```cpp
-Copy(copyL0C2GMAtom,
-     gmC.Slice(MakeCoord(l1batchIndex + l0BatchIndex, MakeCoord(0, 0)),
-               MakeShape(l0BatchSize, MakeShape(M, N))),
-     l0CTensor);
+Copy(
+    copyL0C2GMAtom,
+    gmC.Slice(MakeCoord(l1batchIndex + l0BatchIndex, MakeCoord(0, 0)), MakeShape(l0BatchSize, MakeShape(M, N))),
+    l0CTensor);
 ```
 
 ## 编译运行

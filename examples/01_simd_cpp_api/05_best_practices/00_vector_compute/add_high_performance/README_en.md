@@ -23,7 +23,7 @@ This example uses addition to introduce performance tuning methods based on stat
 
 ## Directory Structure
 
-```
+```text
 ├── add_high_performance
 │   ├── scripts
 │   │   ├── gen_data.py         // Input data and ground truth generation script
@@ -80,10 +80,10 @@ The baseline program implements addition of two sets of `half` type input data, 
 **Key Code**:
 ```cpp
 for (uint32_t i = 0; i < curLen; i++) {
-      float xVal = (float)xLocal.GetValue(i);
-      float yVal = (float)yLocal.GetValue(i);
-      zLocal.SetValue(i, (half)(xVal + yVal));
-    }
+    float xVal = (float)xLocal.GetValue(i);
+    float yVal = (float)yLocal.GetValue(i);
+    zLocal.SetValue(i, (half)(xVal + yVal));
+}
 ```
 
 **Example Configuration**:
@@ -181,7 +181,7 @@ Enable multi-core parallel computation, splitting the 8192×8192 matrix across m
 uint32_t baseCoreM = totalM / splitM;
 uint32_t remainderM = totalM % splitM;
 if (blockIdxM < remainderM) {
-    actualCoreM = baseCoreM + 1;  // Evenly distribute remainder
+    actualCoreM = baseCoreM + 1; // Evenly distribute remainder
     startM = blockIdxM * actualCoreM;
 } else {
     actualCoreM = baseCoreM;
@@ -283,8 +283,9 @@ static constexpr uint32_t zAddrPong = yAddrPong + MAX_DATA_COPY_LEN * sizeof(hal
 // Double buffer pipeline: Alternate between two event IDs and two buffer groups
 for (uint32_t loopIdx = 0; loopIdx < totalBlocks; loopIdx++) {
     int32_t eventID = (loopIdx % 2 == 0 ? EVENT_ID0 : EVENT_ID1);
-    AscendC::LocalTensor<half> &xLocal = (loopIdx % 2 == 0 ? xPing : xPong);
-    // ... Data transfer and computation, using corresponding eventID for synchronization
+    AscendC::LocalTensor<half>& xLocal = (loopIdx % 2 == 0 ? xPing : xPong);
+    // ... Data transfer and computation, using corresponding eventID for
+    // synchronization
     AscendC::Add(zLocal, xLocal, yLocal, curLen);
 }
 ```
@@ -298,7 +299,7 @@ for (uint32_t loopIdx = 0; loopIdx < totalBlocks; loopIdx++) {
 
 **Memory Layout**:
 
-```
+```text
 UB Memory Allocation (Double Buffer):
 ┌──────────────┐
 │  xPing       │  0x00000
@@ -358,8 +359,8 @@ Building on double buffer, for data that only needs to be loaded once, L2 Cache 
 
 **Key Code**:
 ```cpp
-  xGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
-  yGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
+xGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
+yGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
 ```
 
 **Example Configuration**:
@@ -639,7 +640,7 @@ msprof ./demo   # Analyze performance
 
 A PROF_ prefixed folder is generated in the current directory. The `mindstudio_profiler_output` directory stores Host and Device performance data summaries. Performance data analysis is recommended to view files in this directory.
 
-```bash
+```text
 PROF_xxxx_XXXXXX
 ├── device_{id}
 └── host
@@ -650,7 +651,7 @@ PROF_xxxx_XXXXXX
     └── README.txt
 ```
 View the specific performance analysis results:
-```
+```bash
 # View Task Duration and various data
 cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
 ```

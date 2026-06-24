@@ -18,7 +18,7 @@ This example uses the Gelu high-level API in an activation function scenario to 
 
 ## Directory Structure
 
-```
+```text
 ├── gelu
 │   ├── scripts
 │   │   └── gen_data.py         // Script for generating input data and ground truth data

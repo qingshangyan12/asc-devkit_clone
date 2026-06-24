@@ -160,7 +160,7 @@ bash build.sh
 
 除上述场景以外，出现如下报错则认为task编排中有内存冲突的风险：
 
-```
+```cpp
 [1]there is memory use confilict in two SliceMemoryStatus
 [2]one is startAddr is 0, size  is 3200, status is WRITE.
 [3]another is startAddr is 0, size  is 3200, status is WRITE.
@@ -193,15 +193,15 @@ bash build.sh
 
 算法分析器中内存使用相对地址进行表示，由三个字段组成：内存类型、偏移地址offset、大小size，用结构体DataSlice表示：
 
-```
+```cpp
 class DataSlice {
 public:
     //  一些方法函数
 
 private:
     BufferType type;
-    u64        offset;
-    u64        size;
+    u64 offset;
+    u64 size;
 }
 ```
 
@@ -209,19 +209,19 @@ private:
 
 集合通信算法在运行过程中会涉及复杂的数据搬运、规约操作，算法分析器用**BufferSemantic（语义）**记录**数据搬运关系**，其中有目的内存表达和多个源内存表达。目的内存通过成员变量startAddr和Size表示；源内存用结构体SrcBufDes表示，结构体定义如下：
 
-```
+```cpp
 struct BufferSemantic {
-    u64                         startAddr;
-    mutable u64                 size;       // 大小，源内存和目的内存共享相同的大小
-    mutable bool                isReduce;   // 是否做了reduce操作，srcBufs有多个的时候必定是reduce场景
-    mutable HcclReduce0p        reduceType; // reduce操作的类型
-    mutable std::set<SrcBufDes> srcBufs;    //这块数据来自哪个或哪些rank
+    u64 startAddr;
+    mutable u64 size;                    // 大小，源内存和目的内存共享相同的大小
+    mutable bool isReduce;               // 是否做了reduce操作，srcBufs有多个的时候必定是reduce场景
+    mutable HcclReduce0p reduceType;     // reduce操作的类型
+    mutable std::set<SrcBufDes> srcBufs; // 这块数据来自哪个或哪些rank
 };
 
 struct SrcBufDes {
-    RankId      rankId;   // 数据源的rankId
-    BufferType  bufType;   // 数据源的内存类型
-    mutable u64 srcAddr;  // 相对于数据源内存类型的偏移地址
+    RankId rankId;       // 数据源的rankId
+    BufferType bufType;  // 数据源的内存类型
+    mutable u64 srcAddr; // 相对于数据源内存类型的偏移地址
 };
 ```
 

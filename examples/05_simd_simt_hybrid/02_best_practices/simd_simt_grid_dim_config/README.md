@@ -77,8 +77,7 @@
 **关键代码**：
 
 ```cpp
-__simt_vf__ __launch_bounds__(MAX_THREAD_NUM) inline void simt_empty(...)
-{}
+__simt_vf__ __launch_bounds__(MAX_THREAD_NUM) inline void simt_empty(...) {}
 
 __global__ __vector__ void empty_kernel(...)
 {
@@ -168,14 +167,17 @@ vf调用也存在调度开销，应尽量调用1次vf处理完所有数据
 **关键代码**：
 
 ```cpp
-// simt_gather: SIMT vf函数 —— grid-stride loop，以总线程数为步长遍历整个index数组
+// simt_gather: SIMT vf函数 —— grid-stride
+// loop，以总线程数为步长遍历整个index数组
 __simt_vf__ __launch_bounds__(MAX_THREAD_NUM) inline void simt_gather(..., uint32_t index_total_length)
 {
     uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
     uint32_t stride = gridDim.x * blockDim.x;
     for (uint32_t i = idx; i < index_total_length; i += stride) {
         uint32_t gather_idx = index[i];
-        if (gather_idx >= input_total_length) { gather_idx = 0; }
+        if (gather_idx >= input_total_length) {
+            gather_idx = 0;
+        }
         output[i] = input[gather_idx];
     }
 }
@@ -200,8 +202,7 @@ __global__ __vector__ void gather_kernel(..., uint32_t thread_num)
   uint32_t query_aiv_core_num(int32_t device_id)
   {
       int64_t core_num = 0;
-      aclError ret = aclrtGetDeviceInfo(
-          static_cast<uint32_t>(device_id), ACL_DEV_ATTR_VECTOR_CORE_NUM, &core_num);
+      aclError ret = aclrtGetDeviceInfo(static_cast<uint32_t>(device_id), ACL_DEV_ATTR_VECTOR_CORE_NUM, &core_num);
       return (ret == ACL_SUCCESS && core_num > 0) ? static_cast<uint32_t>(core_num) : AIV_CORE_NUM;
   }
   ```

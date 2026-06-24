@@ -40,10 +40,8 @@ regbase API 直接操作寄存器，提供更细粒度的硬件控制：
 
 ```cpp
 // 基于寄存器的向量操作
-__aicore__ inline void RegAdd(const LocalTensor<T>& dst,
-                               const LocalTensor<T>& src0,
-                               const LocalTensor<T>& src1,
-                               uint32_t count);
+__aicore__ inline void RegAdd(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint32_t count);
 ```
 
 ### 2.2 特定架构优化
@@ -69,7 +67,7 @@ __aicore__ inline void RegAdd(const LocalTensor<T>& dst,
 
 **生成 UT 前必须确认目标架构支持：**
 
-```bash
+```text
 # 确认架构支持
 # 仅以下架构可生成 regbase API UT
 /ascend950pr_9599    # NPU_ARCH=3510
@@ -77,7 +75,7 @@ __aicore__ inline void RegAdd(const LocalTensor<T>& dst,
 
 ### 3.2 测试目录结构
 
-```
+```text
 tests/api/reg_compute_api/
 └── ascendc_case_ascend950pr_9599_reg_compute/
     ├── test_operator_reg_compute_add.cpp
@@ -130,7 +128,7 @@ regbase API 按 register family 的参数、寄存器类型和 mask 语义差异
 ```cpp
 // impl 文件中可能存在的架构分支
 #if __NPU_ARCH__ == 3510
-    // ascend950pr_9599 特定实现
+// ascend950pr_9599 特定实现
 #endif
 ```
 

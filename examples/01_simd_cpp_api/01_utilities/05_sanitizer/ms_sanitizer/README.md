@@ -17,7 +17,7 @@ msSanitizer是基于昇腾AI处理器的异常检测工具，用于检测Ascend 
 
 ## 目录结构介绍
 
-```
+```text
 ├── ms_sanitizer
 │   ├── CMakeLists.txt       // 编译工程文件
 │   ├── ms_sanitizer.asc     // Ascend C样例实现和Host侧调用样例
