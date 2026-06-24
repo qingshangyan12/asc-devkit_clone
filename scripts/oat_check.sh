@@ -2,7 +2,7 @@
 # -----------------------------------------------------------------------------------------------------------
 # Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-# CANN Open Software License Agreement Version 2.0 (the "License").
+# CANN Open Software License Agreement Version 3.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
@@ -447,7 +447,7 @@ _SECTION_COPYRIGHT=$(_extract_section "$REPORT_FILE" "Copyright Header Invalid T
 } > "$RESULT_FILE"
 _register_result
 
-# Clean up full plain report (keep only result.txt)
+# Clean  up full plain report (keep only result.txt)
 rm -f "$REPORT_FILE"
 
 # ---------------------------------------------------------------------------
