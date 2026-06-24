@@ -37,7 +37,7 @@ __aicore__ inline void FlushDataCacheAicpu(GlobalTensor<int64_t>& globalHcclMsgA
     globalHcclMsgArea.SetGlobalBuffer((__gm__ int64_t*)gmAddr);
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     // Throttle A5 AICPU polling reads to avoid too many read requests per unit time causing a bus hang.
-    constexpr uint32_t a5AicpuPollingReadThrottleNopCycles = 1000U;
+    constexpr uint32_t a5AicpuPollingReadThrottleNopCycles = 10000U;
     AscendC::Nop<a5AicpuPollingReadThrottleNopCycles>();
 #else
     __asm__("NOP");
