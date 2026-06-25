@@ -61,10 +61,8 @@ __vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
 
     // Global Tensor: Allocate input/output buffers on GM
     AscendC::GlobalTensor<float> xGm, yGm, zGm;
-    xGm.SetGlobalBuffer(
-        x + block_idx * blockLength,
-        blockLength); // Each core processes its own data segment
-                      // by block_idx offset
+    // Each core processes its own data segment by block_idx offset
+    xGm.SetGlobalBuffer(x + block_idx * blockLength, blockLength);
     yGm.SetGlobalBuffer(y + block_idx * blockLength, blockLength);
     zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
 

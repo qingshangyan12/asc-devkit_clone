@@ -61,8 +61,8 @@ __vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
 
     // Global Tensor：在GM上分配输入/输出缓冲区
     AscendC::GlobalTensor<float> xGm, yGm, zGm;
-    xGm.SetGlobalBuffer(x + block_idx * blockLength,
-                        blockLength); // 每个核按block_idx偏移处理各自的数据段
+    // 每个核按block_idx偏移处理各自的数据段
+    xGm.SetGlobalBuffer(x + block_idx * blockLength, blockLength);
     yGm.SetGlobalBuffer(y + block_idx * blockLength, blockLength);
     zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
 

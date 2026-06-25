@@ -318,42 +318,38 @@ tests/api/
 
 ### 10.1 API 接口扫描
 
-```cpp
-#Step 1 : 扫描高阶API
-Glob : {ASC_DEVKIT_PATH} / include / adv_api /**/*.h Grep : pattern =
-    "template.*class\s+\w+"
+```txt
+# Step 1: 扫描高阶API
+Glob: {ASC_DEVKIT_PATH}/include/adv_api/**/*.h
+Grep: pattern="template.*class\s+\w+"
 
-#Step 2 : 扫描 membase基础API
-    Glob : {ASC_DEVKIT_PATH} /
-           include / basic_api / kernel_operator_*.h Grep : pattern = "void\s+\w+\s*\("
+# Step 2: 扫描 membase基础API
+Glob: {ASC_DEVKIT_PATH}/include/basic_api/kernel_operator_*.h
+Grep: pattern="void\s+\w+\s*\("
 
-#Step 3 : 扫描 regbase基础API
-                                                                      Glob : {ASC_DEVKIT_PATH} /
-                                                                             include / basic_api / reg_compute /**/ *
-                                                                                                       .h
+# Step 3: 扫描 regbase基础API
+Glob: {ASC_DEVKIT_PATH}/include/basic_api/reg_compute/**/*.h
 
-#Step 4 : 扫描 C API
-                                                                                                           Glob
-    : {ASC_DEVKIT_PATH} / include / c_api /**/*.h Grep : pattern = "void\s+asc_\w+\s*\("
+# Step 4: 扫描 C API
+Glob: {ASC_DEVKIT_PATH}/include/c_api/**/*.h
+Grep: pattern="void\s+asc_\w+\s*\("
 
-#Step 5 : 扫描 SIMT API
-                                                                   Glob : {ASC_DEVKIT_PATH} /
-                                                                          include / simt_api /**/*.h Grep : pattern =
-                                                                       "__device__.*\w+\s*\("
+# Step 5: 扫描 SIMT API
+Glob: {ASC_DEVKIT_PATH}/include/simt_api/**/*.h
+Grep: pattern="__device__.*\w+\s*\("
 
-#Step 6 : 识别架构条件编译
-    Grep : pattern = "#if.*__NPU_ARCH__|#ifdef.*__DAV_"
+# Step 6: 识别架构条件编译
+Grep: pattern="#if.*__NPU_ARCH__|#ifdef.*__DAV_"
 ```
 
 ### 10.2 UT 文件扫描与跨文件检测
 
-```cpp
-#扫描现有 UT
-Glob : {ASC_DEVKIT_PATH} / tests /
-       api /**/*.cpp
+```txt
+# 扫描现有 UT
+Glob: {ASC_DEVKIT_PATH}/tests/api/**/*.cpp
 
-#对于初步判定为 "缺失 UT"的 API，执行跨文件检测
-           Grep : pattern = "{APIName}" path = "tests/api/{arch_dir}/"
+# 对于初步判定为"缺失 UT"的 API，执行跨文件检测
+Grep: pattern="{APIName}" path="tests/api/{arch_dir}/"
 ```
 
 ---

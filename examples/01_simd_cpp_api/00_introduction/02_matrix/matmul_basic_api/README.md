@@ -92,11 +92,11 @@
       int32_t dValue;            // ND矩阵的列数，[0, 65535]
       int32_t srcNdMatrixStride; // 相邻ND矩阵起始地址偏移，单位：元素，[0, 65535]
       int32_t srcDValue;         // 同一ND矩阵相邻行偏移，单位：元素，[1, 65535]
-      uint16_t dstNzC0Stride;    // 目的Nz中同源行转换后多行相邻偏移，单位：C0_SIZE(32B)，[1,
-                                 // 16384]
+      // 目的Nz中同源行转换后多行相邻偏移，单位：C0_SIZE(32B)，[1, 16384]
+      uint16_t dstNzC0Stride;
       uint16_t dstNzNStride;     // 目的Nz中Z型矩阵相邻行偏移，单位：C0_SIZE(32B)，[1, 16384]
-      int32_t dstNzMatrixStride; // 目的Nz中相邻Nz矩阵起始地址偏移，单位：元素，[1,
-                                 // 65535]
+      // 目的Nz中相邻Nz矩阵起始地址偏移，单位：元素，[1, 65535]
+      int32_t dstNzMatrixStride;
   };
   ```
   例如搬运A矩阵时`{1, baseM, baseK, 0, K, baseM, 1, 0}`，将baseM×baseK的ND数据转为Nz格式。

@@ -197,8 +197,7 @@
                   AscendC::LocalTensor<half> b2Local = l0bAllocator.Alloc<half>(baseK * baseN);
                   AscendC::LocalTensor<float> cLocal = l0cAllocator.Alloc<float>(baseM * baseN);
 
-                  // ==================== GM → L1: DataCopy + ND→Nz格式转换
-                  // ====================
+                  // ================== GM → L1: DataCopy + ND→Nz格式转换 ==================
                   // DataCopy搬运时同时完成ND到Nz的格式转换（Cube计算单元要求Nz分形排布）
                   AscendC::DataCopy(a1Local, aGM, AscendC::Nd2NzParams{1, baseM, baseK, 0, K, baseM, 1, 0});
                   AscendC::DataCopy(b1Local, bGM, AscendC::Nd2NzParams{1, baseK, baseN, 0, N, baseK, 1, 0});
@@ -241,8 +240,8 @@
                   // cmatrixInitVal=true: 首次计算时初始化L0C累加器为0
                   AscendC::Mmad(cLocal, a2Local, b2Local, AscendC::MmadParams{baseM, baseN, baseK, 0, false, true});
 
-                  // ==================== L0C → GM: Fixpipe搬出 + Nz→ND + fp32→fp16
-                  // ==================== 核内同步：M流水完成后通知FIX流水可以开始Fixpipe
+                  // ================== L0C → GM: Fixpipe搬出 + Nz→ND + fp32→fp16 ==================
+                  // 核内同步：M流水完成后通知FIX流水可以开始Fixpipe
                   AscendC::SetFlag<AscendC::HardEvent::M_FIX>(EVENT_ID0);
                   AscendC::WaitFlag<AscendC::HardEvent::M_FIX>(EVENT_ID0);
                   // Fixpipe将L0C结果搬出到GM，同时完成NZ→ND格式转换和float32→half精度转换
@@ -276,8 +275,8 @@
               // ==================== 核间同步：等待Cube核Fixpipe完成 ====================
               AscendC::CrossCoreWaitFlag(0);
 
-              // ==================== GM → UB: DataCopyPad读取Matmul结果
-              // ==================== 计算当前Vector核在GM中的起始偏移 GetBlockIdx() % 2
+              // ================== GM → UB: DataCopyPad读取Matmul结果 ==================
+              // 计算当前Vector核在GM中的起始偏移 GetBlockIdx() % 2
               // 区分同一逻辑核内的2个AIV，处理不同半块数据
               uint32_t gmOffset = AscendC::GetBlockIdx() % 2 * (baseM / 2 * N);
               uint32_t blockLen = baseN * sizeof(half);
@@ -301,7 +300,6 @@
               AscendC::DataCopyPad<half>(
                   cGM[gmOffset], vecLocal,
                   AscendC::DataCopyExtParams{static_cast<uint16_t>(baseM / 2), blockLen, 0, srcStride, 0});
-          }
           }
           ```
 
@@ -339,11 +337,11 @@
       int32_t dValue;            // ND矩阵的列数，[0, 65535]
       int32_t srcNdMatrixStride; // 相邻ND矩阵起始地址偏移，单位：元素，[0, 65535]
       int32_t srcDValue;         // 同一ND矩阵相邻行偏移，单位：元素，[1, 65535]
-      uint16_t dstNzC0Stride;    // 目的Nz中同源行转换后多行相邻偏移，单位：C0_SIZE(32B)，[1,
-                                 // 16384]
+      uint16_t dstNzC0Stride;    // 目的Nz中同源行转换后多行相邻偏移，单位：C0_SIZE(32B)，
+                                 // [1, 16384]
       uint16_t dstNzNStride;     // 目的Nz中Z型矩阵相邻行偏移，单位：C0_SIZE(32B)，[1, 16384]
-      int32_t dstNzMatrixStride; // 目的Nz中相邻Nz矩阵起始地址偏移，单位：元素，[1,
-                                 // 65535]
+      int32_t dstNzMatrixStride; // 目的Nz中相邻Nz矩阵起始地址偏移，单位：元素，
+                                 // [1, 65535]
   };
   ```
   例如搬运A矩阵时`{1, baseM, baseK, 0, K, baseM, 1, 0}`，将baseM×baseK的ND数据转为Nz格式。

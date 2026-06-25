@@ -85,8 +85,8 @@ __simd_vf__ inline static void GeluVfMethod2(
         AscendC::Reg::Exp(yReg, yReg, mask);                      // exp(...)
         AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);               // 1 + exp(...)
         AscendC::Reg::Div(yReg, xReg, yReg, mask);                // x / (1 + exp(...))
-        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg,
-                                 mask); // 寄存器 → UB
+        // 寄存器 → UB
+        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
     }
 }
 ```
@@ -113,9 +113,8 @@ __global__ __vector__ void gelu_custom(__gm__ uint8_t* x, __gm__ uint8_t* y)
     // Stage 1: GM → UB 搬入
     AscendC::DataCopy(xLocal, xGm[0], singleCoreLength);
     // 同步：等待 GM→UB 搬运完成
-    // EVENT_ID0
-    // 是硬件事件通道编号（0-7），每个事件通道独立计数，本样例仅使用一个通道故固定使用
-    // 0
+    // EVENT_ID0是硬件事件通道编号（0-7），每个事件通道独立计数，
+    // 本样例仅使用一个通道故固定使用0
     AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
     AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 

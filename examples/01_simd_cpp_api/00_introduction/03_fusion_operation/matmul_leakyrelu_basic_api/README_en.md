@@ -203,8 +203,8 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
                   AscendC::LocalTensor<half> b2Local = l0bAllocator.Alloc<half>(baseK * baseN);
                   AscendC::LocalTensor<float> cLocal = l0cAllocator.Alloc<float>(baseM * baseN);
 
-                  // ==================== GM → L1: DataCopy + ND→Nz Format Conversion
-                  // ==================== DataCopy completes ND to Nz format conversion during
+                  // ================== GM → L1: DataCopy + ND→Nz Format Conversion ==================
+                  // DataCopy completes ND to Nz format conversion during
                   // transfer (Cube computation unit requires Nz fractal layout)
                   AscendC::DataCopy(a1Local, aGM, AscendC::Nd2NzParams{1, baseM, baseK, 0, K, baseM, 1, 0});
                   AscendC::DataCopy(b1Local, bGM, AscendC::Nd2NzParams{1, baseK, baseN, 0, N, baseK, 1, 0});
@@ -248,13 +248,13 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
                   AscendC::SetFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
                   AscendC::WaitFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
 
-                  // ==================== L0A/L0B → L0C: Mmad Matrix Multiply-Accumulate
-                  // ==================== cmatrixInitVal=true: Initialize L0C accumulator to 0
+                  // ================== L0A/L0B → L0C: Mmad Matrix Multiply-Accumulate ==================
+                  // cmatrixInitVal=true: Initialize L0C accumulator to 0
                   // for first computation
                   AscendC::Mmad(cLocal, a2Local, b2Local, AscendC::MmadParams{baseM, baseN, baseK, 0, false, true});
 
-                  // ==================== L0C → GM: Fixpipe Transfer Out + Nz→ND + fp32→fp16
-                  // ==================== Intra-core synchronization: notify FIX pipeline that
+                  // ================== L0C → GM: Fixpipe Transfer Out + Nz→ND + fp32→fp16 ==================
+                  // Intra-core synchronization: notify FIX pipeline that
                   // Fixpipe can start after M pipeline completes
                   AscendC::SetFlag<AscendC::HardEvent::M_FIX>(EVENT_ID0);
                   AscendC::WaitFlag<AscendC::HardEvent::M_FIX>(EVENT_ID0);
@@ -264,8 +264,7 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
                       cGM, cLocal,
                       AscendC::FixpipeParamsV220{baseN, baseM, baseM, N, false, QuantMode_t::F322F16, 0, 1, 0, 0, 0});
 
-                  // ==================== Inter-core Synchronization: Notify Vector Cores Data
-                  // is Ready ====================
+                  // ================ Inter-core Synchronization: Notify Vector Cores Data is Ready ================
                   AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0);
               }
               // ... Vector core part see below
@@ -289,12 +288,11 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
               // is split evenly between 2 Vector cores)
               AscendC::LocalTensor<half> vecLocal = ubAllocator.Alloc<half>(baseM / 2 * baseN);
 
-              // ==================== Inter-core Synchronization: Wait for Cube Core Fixpipe
-              // Completion ====================
+              // ============= Inter-core Synchronization: Wait for Cube Core Fixpipe Completion ==============
               AscendC::CrossCoreWaitFlag(0);
 
-              // ==================== GM → UB: DataCopyPad Read Matmul Results
-              // ==================== Calculate the starting offset of current Vector core
+              // ================== GM → UB: DataCopyPad Read Matmul Results ==================
+              // Calculate the starting offset of current Vector core
               // in GM GetBlockIdx() % 2 distinguishes between 2 AIVs within the same
               // logical core, processing different half-block data
               uint32_t gmOffset = AscendC::GetBlockIdx() % 2 * (baseM / 2 * N);
@@ -309,20 +307,18 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
               AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
               AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
-              // ==================== UB Computation: LeakyRelu Activation
-              // ==================== LeakyRelu(x) = x >= 0 ? x : x * 0.001
+              // ================== UB Computation: LeakyRelu Activation ==================
+              // LeakyRelu(x) = x >= 0 ? x : x * 0.001
               AscendC::LeakyRelu(vecLocal, vecLocal, (half)0.001, baseM / 2 * baseN);
               // Intra-core synchronization: notify MTE3 that writeback can start after V
               // pipeline completes
               AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
               AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
 
-              // ==================== UB → GM: DataCopyPad Write Back Results
-              // ====================
+              // ================== UB → GM: DataCopyPad Write Back Results ==================
               AscendC::DataCopyPad<half>(
                   cGM[gmOffset], vecLocal,
                   AscendC::DataCopyExtParams{static_cast<uint16_t>(baseM / 2), blockLen, 0, srcStride, 0});
-          }
           }
           ```
 

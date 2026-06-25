@@ -86,8 +86,8 @@ __simd_vf__ inline static void GeluVfMethod2(
         AscendC::Reg::Exp(yReg, yReg, mask);                      // exp(...)
         AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);               // 1 + exp(...)
         AscendC::Reg::Div(yReg, xReg, yReg, mask);                // x / (1 + exp(...))
-        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg,
-                                 mask); // Register → UB
+        // Register → UB
+        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
     }
 }
 ```
@@ -116,8 +116,7 @@ __global__ __vector__ void gelu_custom(__gm__ uint8_t* x, __gm__ uint8_t* y)
     AscendC::DataCopy(xLocal, xGm[0], singleCoreLength);
     // Synchronization: Wait for GM→UB transfer to complete
     // EVENT_ID0 is the hardware event channel number (0-7), each event channel
-    // counts independently, this example uses only one channel so it is fixed to
-    // 0
+    // counts independently, this example uses only one channel so it is fixed to 0
     AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
     AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
