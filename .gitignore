@@ -30,3 +30,6 @@ build_device/
 .cursor/
 .opencode/
 docs/vitepress/docs/.vitepress/theme/outline-index.json
+backup
+.vscode
+.*
