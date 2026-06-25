@@ -82,7 +82,7 @@ PIPE_V
 ```cpp
 vector_int8_t dst;
 vector_load_unalign src0;
-__ubuf__ int8_t* src1;
+__ubuf__ int8_t* src_ptr = (__ubuf__ int8_t*)asc_get_phy_buf_addr(0);
 uint32_t count;
-asc_loadunalign_postupdate(dst, src0, src1, count);
+asc_loadunalign_postupdate(dst, src0, src_ptr, count);
 ```
