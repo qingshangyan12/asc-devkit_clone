@@ -866,6 +866,8 @@
             -   [设置Kernel类型](SIMD-API/基础API/Kernel-Tiling/设置Kernel类型.md)
         
         -   [特殊寄存器访问](SIMD-API/基础API/特殊寄存器访问/特殊寄存器访问.md)
+            -   [GetSpr](SIMD-API/基础API/特殊寄存器访问/GetSpr.md)
+            -   [ClearSpr](SIMD-API/基础API/特殊寄存器访问/ClearSpr.md)
             -   [SetCtrlSpr\(ISASI\)](SIMD-API/基础API/特殊寄存器访问/SetCtrlSpr(ISASI).md)
             -   [GetCtrlSpr\(ISASI\)](SIMD-API/基础API/特殊寄存器访问/GetCtrlSpr(ISASI).md)
             -   [ResetCtrlSpr\(ISASI\)](SIMD-API/基础API/特殊寄存器访问/ResetCtrlSpr(ISASI).md)
