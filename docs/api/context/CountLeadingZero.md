@@ -39,7 +39,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-计算一个uint64\_t类型数字前导0的个数（二进制从最高位到第一个1一共有多少个0）。
+计算一个uint64\_t类型数字前导0的个数（二进制从最高位到第一个1一共有多少个0；特别的，若输入为0，则返回64）。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -85,4 +85,3 @@ uint64_t valueIn = 0x0fffffffffffffff;
 // 输出数据ans：4， 二进制从最高位到第一个1一共有4个0
 int64_t ans = AscendC::CountLeadingZero(valueIn);
 ```
-
