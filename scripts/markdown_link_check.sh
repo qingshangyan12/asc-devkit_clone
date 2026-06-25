@@ -36,7 +36,6 @@ Set MARKDOWN_LINK_CHECK_FULL=1 or pass --full to scan tracked Markdown files in 
 Set MARKDOWN_LINK_CHECK_DRY_RUN=1 to print the computed scan set only.
 Set MARKDOWN_LINK_CHECK_LYCHEE to use a preinstalled lychee binary.
 Set MARKDOWN_LINK_CHECK_ONLINE=1 to check remote HTTP(S) links; remote links are skipped by default.
-Set MARKDOWN_LINK_CHECK_DIFF_BASE to detect renamed Markdown old paths from a branch diff base.
 Set MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL, MARKDOWN_LINK_CHECK_CARGO_BINSTALL_INSTALLER_URL, or
 MARKDOWN_LINK_CHECK_LYCHEE_PKG_URL to use mirrors.
 EOF
@@ -209,6 +208,7 @@ import posixpath
 import re
 import subprocess
 import sys
+import ast
 from pathlib import Path, PurePosixPath
 from urllib.parse import unquote
 
@@ -223,19 +223,7 @@ full_scan = os.environ.get("FULL_SCAN") == "1"
 full_reason = ""
 
 
-def ci_filelist_inputs():
-    filelist = repo_root / "pr_filelist_precommit.txt"
-    try:
-        return [
-            line.strip()
-            for line in filelist.read_text(encoding="utf-8", errors="ignore").splitlines()
-            if line.strip()
-        ]
-    except OSError:
-        return []
-
-
-input_files = list(dict.fromkeys(input_files + ci_filelist_inputs()))
+ci_mod_filelist_exists = (repo_root / "pr_filelist_mod.txt").is_file()
 
 
 def config_exclude_path_patterns():
@@ -269,6 +257,24 @@ def to_rel(path):
         except ValueError:
             return None
     return PurePosixPath(path).as_posix()
+
+
+def decode_git_path(path):
+    if not path or len(path) < 2 or not path.startswith('"') or not path.endswith('"'):
+        return path
+
+    try:
+        decoded = ast.literal_eval(path)
+    except (SyntaxError, ValueError):
+        return path
+
+    if not isinstance(decoded, str):
+        return path
+
+    try:
+        return decoded.encode("latin-1").decode("utf-8")
+    except UnicodeError:
+        return decoded
 
 
 def is_markdown_path(path):
@@ -312,21 +318,20 @@ def existing_markdown_files():
     return sorted(files)
 
 
-def staged_markdown_changes():
-    try:
-        result = subprocess.run(
-            ["git", "diff", "--cached", "--name-status", "-z", "--diff-filter=ADMR"],
-            cwd=repo_root,
-            check=False,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-        )
-    except OSError:
-        return [], False
+def markdown_reverse_targets(paths):
+    targets = set()
+    for path in paths:
+        targets.add(path)
+        name = PurePosixPath(path).name.lower()
+        if name in ("readme.md", "readme_en.md", "index.md"):
+            targets.add(PurePosixPath(path).parent.as_posix())
+    return targets
 
+
+def parse_name_status_diff(output):
     changed = []
-    needs_full = False
-    fields = result.stdout.split(b"\0")
+    reverse_targets = set()
+    fields = output.split(b"\0")
     index = 0
     while index < len(fields):
         if not fields[index]:
@@ -342,85 +347,154 @@ def staged_markdown_changes():
             raw_paths = fields[index:index + 1]
             index += 1
 
-        paths = [
-            raw_path.decode("utf-8", errors="ignore")
-            for raw_path in raw_paths
-            if raw_path
-        ]
-        markdown_paths = [p for p in paths if is_markdown_path(p)]
-        if not markdown_paths:
-            continue
-        if status.startswith(("D", "R")):
-            needs_full = True
-        for path in markdown_paths:
-            if status.startswith("D"):
+        if status.startswith("R"):
+            if len(raw_paths) != 2:
                 continue
-            changed.append(path)
-    return changed, needs_full
+            old_path = decode_git_path(raw_paths[0].decode("utf-8", errors="ignore")) if raw_paths[0] else None
+            new_path = decode_git_path(raw_paths[1].decode("utf-8", errors="ignore")) if raw_paths[1] else None
+            if is_markdown_path(old_path):
+                reverse_targets.update(markdown_reverse_targets([old_path]))
+            if is_markdown_path(new_path):
+                changed.append(new_path)
+        elif status.startswith("D"):
+            paths = [
+                decode_git_path(raw_path.decode("utf-8", errors="ignore"))
+                for raw_path in raw_paths
+                if raw_path
+            ]
+            markdown_paths = [p for p in paths if is_markdown_path(p)]
+            reverse_targets.update(markdown_reverse_targets(markdown_paths))
+        else:
+            paths = [
+                decode_git_path(raw_path.decode("utf-8", errors="ignore"))
+                for raw_path in raw_paths
+                if raw_path
+            ]
+            markdown_paths = [p for p in paths if is_markdown_path(p)]
+            changed.extend(markdown_paths)
+    return changed, reverse_targets
 
 
-def git_ref_exists(ref):
+def ci_markdown_changes():
+    filelist = repo_root / "pr_filelist_mod.txt"
     try:
-        result = subprocess.run(
-            ["git", "rev-parse", "--verify", "--quiet", ref],
-            cwd=repo_root,
-            check=False,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
+        text = filelist.read_text(encoding="utf-8", errors="ignore")
     except OSError:
+        return [], set()
+
+    changed = []
+    reverse_targets = set()
+    for line in text.splitlines():
+        fields = line.split("\t")
+        if not fields:
+            continue
+        status = fields[0]
+        paths = [decode_git_path(path) for path in fields[1:]]
+
+        if status.startswith("R"):
+            if len(paths) != 2:
+                continue
+            old_path, new_path = paths
+            if is_markdown_path(old_path):
+                reverse_targets.update(markdown_reverse_targets([old_path]))
+            if is_markdown_path(new_path):
+                changed.append(new_path)
+        elif status.startswith("D"):
+            markdown_paths = [p for p in paths if is_markdown_path(p)]
+            reverse_targets.update(markdown_reverse_targets(markdown_paths))
+        else:
+            markdown_paths = [p for p in paths if is_markdown_path(p)]
+            changed.extend(markdown_paths)
+    return changed, reverse_targets
+
+
+def should_skip_ci_chunk(input_paths, ci_changed):
+    if not ci_changed:
         return False
-    return result.returncode == 0
+    input_set = {path for path in input_paths if path}
+    if not input_set:
+        return False
+    return ci_changed[0] not in input_set
 
 
-def rename_old_paths_from_diff(diff_args, input_targets):
+def staged_markdown_changes():
     try:
         result = subprocess.run(
-            ["git", "diff", "--name-status", "-z", "--diff-filter=R", *diff_args],
+            ["git", "diff", "--cached", "--name-status", "-z", "--diff-filter=ADMR"],
             cwd=repo_root,
             check=False,
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
         )
     except OSError:
-        return set()
-    if result.returncode != 0:
-        return set()
+        return [], set()
 
-    old_paths = set()
-    fields = result.stdout.split(b"\0")
-    index = 0
-    while index < len(fields):
-        if not fields[index]:
-            index += 1
+    return parse_name_status_diff(result.stdout)
+
+
+def resolve_base_commit():
+    base_candidates = []
+    configured_base = os.environ.get("MARKDOWN_LINK_CHECK_BASE_REF")
+    if configured_base:
+        base_candidates.append(configured_base)
+
+    for env_name in (
+        "PR_TARGET_BRANCH",
+        "CHANGE_TARGET",
+        "CI_MERGE_REQUEST_TARGET_BRANCH_NAME",
+        "TARGET_BRANCH",
+        "BASE_REF",
+    ):
+        branch = os.environ.get(env_name)
+        if branch:
+            base_candidates.extend([f"origin/{branch}", branch])
+
+    base_candidates.extend(["origin/master", "origin/main", "master", "main"])
+
+    for base_ref in dict.fromkeys(base_candidates):
+        try:
+            verify = subprocess.run(
+                ["git", "rev-parse", "--verify", f"{base_ref}^{{commit}}"],
+                cwd=repo_root,
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+            )
+            if verify.returncode != 0:
+                continue
+            merge_base = subprocess.run(
+                ["git", "merge-base", base_ref, "HEAD"],
+                cwd=repo_root,
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+            )
+            if merge_base.returncode == 0:
+                commit = merge_base.stdout.decode("utf-8", errors="ignore").strip()
+                if commit:
+                    return commit
+        except OSError:
             continue
-        status = fields[index].decode("utf-8", errors="ignore")
-        index += 1
-        if not status.startswith("R"):
-            continue
-        raw_paths = fields[index:index + 2]
-        index += 2
-        if len(raw_paths) != 2 or not raw_paths[0] or not raw_paths[1]:
-            continue
-        old_path = raw_paths[0].decode("utf-8", errors="ignore")
-        new_path = raw_paths[1].decode("utf-8", errors="ignore")
-        if new_path in input_targets and is_markdown_path(old_path):
-            old_paths.add(old_path)
-    return old_paths
+    return None
 
 
-def input_rename_old_paths(input_targets):
-    diff_specs = [("--cached",), tuple()]
-    diff_base = os.environ.get("MARKDOWN_LINK_CHECK_DIFF_BASE")
-    if diff_base:
-        diff_specs.append((f"{diff_base}...HEAD",))
-    elif git_ref_exists("origin/master"):
-        diff_specs.append(("origin/master...HEAD",))
+def base_markdown_changes():
+    base_commit = resolve_base_commit()
+    if not base_commit:
+        return [], set()
 
-    old_paths = set()
-    for diff_args in diff_specs:
-        old_paths.update(rename_old_paths_from_diff(diff_args, input_targets))
-    return old_paths
+    try:
+        result = subprocess.run(
+            ["git", "diff", "--name-status", "-z", "--diff-filter=ADMR", base_commit, "HEAD"],
+            cwd=repo_root,
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+        )
+    except OSError:
+        return [], set()
+
+    return parse_name_status_diff(result.stdout)
 
 
 def markdown_inline_link_targets(text):
@@ -487,44 +561,62 @@ def normalize_target(source_file, target):
     return normalized
 
 
-if not full_scan:
-    staged_changes, needs_full_for_staged = staged_markdown_changes()
-    if needs_full_for_staged:
-        full_scan = True
-        full_reason = "staged Markdown rename/delete"
-
 if full_scan:
     scan_set = existing_markdown_files()
 else:
-    changed = [to_rel(path) for path in input_files]
+    input_paths = [to_rel(decode_git_path(path)) for path in input_files]
+    changed = list(input_paths)
     changed = [path for path in changed if is_markdown_path(path)]
-    if not changed:
-        staged_changes, _ = staged_markdown_changes()
-        changed = staged_changes
 
-    changed_targets = {path for path in changed if path}
-    changed_targets.update(input_rename_old_paths(changed_targets))
-    changed_existing = {
-        path for path in changed_targets
-        if (repo_root / path).is_file()
-    }
+    ci_changes = []
+    ci_reverse_targets = set()
+    skip_scan = False
+    if ci_mod_filelist_exists:
+        ci_changes, ci_reverse_targets = ci_markdown_changes()
+        if should_skip_ci_chunk(input_paths, ci_changes):
+            skip_scan = True
+        else:
+            changed = list(dict.fromkeys(ci_changes))
+            reverse_targets = set(ci_reverse_targets)
+    else:
+        reverse_targets = set()
 
-    all_markdown = existing_markdown_files()
-    scan_set = set(changed_existing)
-    for source in all_markdown:
-        source_path = repo_root / source
-        try:
-            text = source_path.read_text(encoding="utf-8")
-        except UnicodeDecodeError:
-            text = source_path.read_text(encoding="utf-8", errors="ignore")
-        except OSError:
-            continue
+    if skip_scan:
+        scan_set = []
+    else:
+        staged_changes, staged_reverse_targets = staged_markdown_changes()
+        reverse_targets.update(staged_reverse_targets)
+        if not changed:
+            changed = staged_changes
 
-        for target in extract_link_targets(text):
-            normalized = normalize_target(source, target)
-            if normalized in changed_targets:
-                scan_set.add(source)
-                break
+        if ci_mod_filelist_exists and not ci_changes and not ci_reverse_targets:
+            base_changes, base_reverse_targets = base_markdown_changes()
+            changed.extend(path for path in base_changes if path not in changed)
+            reverse_targets.update(base_reverse_targets)
+
+        changed_targets = {path for path in changed if path}
+        changed_targets.update(reverse_targets)
+        changed_existing = {
+            path for path in changed_targets
+            if (repo_root / path).is_file()
+        }
+
+        all_markdown = existing_markdown_files()
+        scan_set = set(changed_existing)
+        for source in all_markdown:
+            source_path = repo_root / source
+            try:
+                text = source_path.read_text(encoding="utf-8")
+            except UnicodeDecodeError:
+                text = source_path.read_text(encoding="utf-8", errors="ignore")
+            except OSError:
+                continue
+
+            for target in extract_link_targets(text):
+                normalized = normalize_target(source, target)
+                if normalized in changed_targets:
+                    scan_set.add(source)
+                    break
 
     scan_set = sorted(scan_set)
 
