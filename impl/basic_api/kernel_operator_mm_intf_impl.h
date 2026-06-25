@@ -29,6 +29,7 @@
 #include "../../include/basic_api/kernel_struct_mm.h"
 
 namespace AscendC {
+__aicore__ inline void PrintTimeStamp(uint32_t descId);
 
 /* **************************************************************************************************
  * LoadData 2d                                             *
@@ -61,6 +62,9 @@ template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams)
 {
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_DATACOPY));
+#endif
     CheckLoadData2dDatatype<T>();
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckLoadData2dGlobal2Local(dst, "LoadData with LoadData2DParams");
@@ -120,6 +124,9 @@ template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParamsV2& loadDataParams)
 {
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_DATACOPY));
+#endif
     CheckLoadData2dDatatype<T>();
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckLoadData2dGlobal2Local(dst, "LoadData with LoadData2DParamsV2");
