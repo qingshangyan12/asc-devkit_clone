@@ -88,7 +88,7 @@ dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/T
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表1**  模板参数说明
+**表1** 模板参数说明
 
 | 参数名 | 描述 |
 |---|---|
@@ -96,7 +96,7 @@ dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/T
 | U | scalarValue的数据类型。 |
 | isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下：<br>&nbsp;&nbsp;&bull; 针对tensor前n个数据计算接口，接口入参中的count不生效，建议设置成1。<br>&nbsp;&nbsp;&bull; 针对tensor高维切分计算接口，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。<br><!-- npu="950,310b" id23 -->针对以下型号，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。<br>&bull; <!-- npu="950" id21 -->Ascend 950PR/Ascend 950DT<!-- end id21 --><br>&bull; <!-- npu="310b" id22 -->Atlas 200I/500 A2 推理产品<!-- end id22 --><!-- end id23 --> |
 
-**表2**  参数说明
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
@@ -110,30 +110,30 @@ dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/T
 
 ## 数据类型
 
-<!-- npu="950" id10 -->
+<!-- npu="950" id13 -->
 - 针对Ascend 950PR/Ascend 950DT，T和U支持的数据类型为：int16_t、half、bfloat16_t、int32_t、float、complex32、int64_t、uint64_t、complex64。数据类型complex32、int64_t、uint64_t、complex64仅支持tensor前n个数据计算接口。
-<!-- end id10 -->
-<!-- npu="A3" id11 -->
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T和U支持的数据类型为：int16_t、half、int32_t、float。
-<!-- end id11 -->
-<!-- npu="910b" id12 -->
-- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，T和U支持的数据类型为：int16_t、half、int32_t、float。
-<!-- end id12 -->
-<!-- npu="310b" id13 -->
-- 针对Atlas 200I/500 A2 推理产品，T和U支持的数据类型为：int16_t、half、int32_t、float。
 <!-- end id13 -->
-<!-- npu="310p" id14 -->
-- 针对Atlas 推理系列产品AI Core，T和U支持的数据类型为：int16_t、half、int32_t、float。
+<!-- npu="A3" id14 -->
+- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T和U支持的数据类型为：int16_t、half、int32_t、float。
 <!-- end id14 -->
-<!-- npu="910" id15 -->
-- 针对Atlas 训练系列产品，T和U支持的数据类型为：half、float。
+<!-- npu="910b" id15 -->
+- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，T和U支持的数据类型为：int16_t、half、int32_t、float。
 <!-- end id15 -->
-<!-- npu="x90" id16 -->
-- 针对Kirin X90，T和U支持的数据类型为：int16_t、half、int32_t、float。
+<!-- npu="310b" id16 -->
+- 针对Atlas 200I/500 A2 推理产品，T和U支持的数据类型为：int16_t、half、int32_t、float。
 <!-- end id16 -->
-<!-- npu="9030" id17 -->
-- 针对Kirin 9030，T和U支持的数据类型为：int16_t、half、int32_t、float。
+<!-- npu="310p" id17 -->
+- 针对Atlas 推理系列产品AI Core，T和U支持的数据类型为：int16_t、half、int32_t、float。
 <!-- end id17 -->
+<!-- npu="910" id18 -->
+- 针对Atlas 训练系列产品，T和U支持的数据类型为：half、float。
+<!-- end id18 -->
+<!-- npu="x90" id19 -->
+- 针对Kirin X90，T和U支持的数据类型为：int16_t、half、int32_t、float。
+<!-- end id19 -->
+<!-- npu="9030" id20 -->
+- 针对Kirin 9030，T和U支持的数据类型为：int16_t、half、int32_t、float。
+<!-- end id20 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -144,15 +144,15 @@ dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/T
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
 
-<!-- npu="A3,910b" id20 -->
-- 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  <!-- npu="A3" id18 -->
+<!-- npu="A3,910b" id21 -->
+- 针对如下型号，该接口通过VF调用Reg矢量计算API(跳转)实现兼容，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+  <!-- npu="A3" id22 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id18 -->
-  <!-- npu="910b" id19 -->
+  <!-- end id22 -->
+  <!-- npu="910b" id23 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id19 -->
-<!-- end id20 -->
+  <!-- end id23 -->
+<!-- end id21 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
