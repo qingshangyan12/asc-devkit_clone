@@ -189,7 +189,7 @@ dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/T
 
 结果示例如下：
 
-```bash
+```plain
 输入数据srcLocal: [1 2 3 ... 512]
 输入数据scalar = 2
 输出数据dstLocal: [4 8 12 ... 2048]
