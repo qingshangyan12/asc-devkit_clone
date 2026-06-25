@@ -34,31 +34,31 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
--   tensor前n个数据计算
+- tensor前n个数据计算
 
-    ```
+    ```cpp
     template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG, typename U, typename S, typename V>
     __aicore__ inline void Adds(const U& dst, const S& src0, const V& src1, const int32_t& count)
     ```
 
--   tensor高维切分计算
-    -   mask逐bit模式
+- tensor高维切分计算
+    - mask逐bit模式
 
-        ```
+        ```cpp
         template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG, typename U, typename S, typename V>
         __aicore__ inline void Adds(const U& dst, const S& src0, const V& src1, uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
         ```
 
-    -   mask连续模式
+    - mask连续模式
 
-        ```
+        ```cpp
         template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG, typename U, typename S, typename V>
         __aicore__ inline void Adds(const U& dst, const S& src0, const V& src1, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
         ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表1**  模板参数说明
+**表1** 模板参数说明
 
 <a name="table4835205712588"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0000001429830437_row118356578583"><th class="cellrowborder" valign="top" width="13.91%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0000001429830437_p48354572582"><a name="zh-cn_topic_0000001429830437_p48354572582"></a><a name="zh-cn_topic_0000001429830437_p48354572582"></a>参数名</p>
@@ -110,7 +110,7 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
 </tbody>
 </table>
 
-**表2**  参数说明
+**表2** 参数说明
 
 <a name="table1549711469155"></a>
 <table><thead align="left"><tr id="row12534194619150"><th class="cellrowborder" valign="top" width="14.510000000000002%" id="mcps1.2.4.1.1"><p id="p115341446121510"><a name="p115341446121510"></a><a name="p115341446121510"></a><strong id="b125344463152"><a name="b125344463152"></a><a name="b125344463152"></a>参数名称</strong></p>
@@ -205,7 +205,7 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
     // dstBlkStride, srcBlkStride = 1,每个迭代内src0参与计算的数据地址间隔为1个datablock，表示单次迭代内数据连续读取和写入
     // dstRepStride, srcRepStride = 8,相邻迭代间的地址间隔为8个datablock，表示相邻迭代间数据连续读取和写入
     // 标量在后调用示例
-    AscendC::Adds(dstLocal, src0Local, src1Local[0], mask, 4, { 1, 1, 8, 8 });
+AscendC::Adds(dstLocal, src0Local, src1Local[0], mask, 4, { 1, 1, 8, 8 });
     
     // 标量在前调用示例
     static constexpr AscendC::BinaryConfig config = { 0 };
@@ -220,7 +220,7 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
     // dstBlkStride, srcBlkStride = 1,每个迭代内src0参与计算的数据地址间隔为1个datablock，表示单次迭代内数据连续读取和写入
     // dstRepStride, srcRepStride = 8,相邻迭代间的地址间隔为8个datablock，表示相邻迭代间数据连续读取和写入
     // 标量在后调用示例
-    AscendC::Adds(dstLocal, src0Local, src1Local[0], mask, 4, {1, 1, 8, 8});
+AscendC::Adds(dstLocal, src0Local, src1Local[0], mask, 4, {1, 1, 8, 8});
     
     // 标量在前调用示例
     static constexpr AscendC::BinaryConfig config = { 0 };
@@ -231,7 +231,7 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
 
     ```
     // 标量在后调用示例
-    AscendC::Adds(dstLocal, src0Local, src1Local[0], 512);
+AscendC::Adds(dstLocal, src0Local, src1Local[0], 512);
     
     // 标量在前调用示例
     static constexpr AscendC::BinaryConfig config = { 0 };

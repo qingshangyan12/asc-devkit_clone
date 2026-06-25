@@ -34,7 +34,7 @@ BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭�
 
 具体计算流程参考下图：
 
-**图 1**  BilinearInterpolation计算流程示意图
+**图1**  BilinearInterpolation计算流程示意图
 
 ![](../../../../figures/bilinearInterpolation_1.png)
 
@@ -61,13 +61,13 @@ hRepeat = 2；vRepeat = 2；mask = 128；vROffset = 128。
 
     该步骤处理过程如下：
 
-    -   总迭代次数：hRepeat \* vRepeat = 2 \* 2 = 4；
-    -   每次迭代处理的src0元素个数：8 \* 32 / sizeof\(half\) = 128（8：DataBlock的数量；32：每个DataBlock的大小为32B）；
-    -   每次迭代收集结果
-        -   迭代0：sharedTmpBuffer\[0:127\] = \[1, 2, ..., 128\]；
-        -   迭代1：sharedTmpBuffer\[128:255\] = \[129, 130, ..., 256\]；
-        -   迭代2：sharedTmpBuffer\[256:383\] = \[257, 258, ..., 384\]；
-        -   迭代3：sharedTmpBuffer\[384:511\] = \[385, 386, ..., 512\]。
+    - 总迭代次数：hRepeat \* vRepeat = 2 \* 2 = 4；
+    - 每次迭代处理的src0元素个数：8 \* 32 / sizeof\(half\) = 128（8：DataBlock的数量；32：每个DataBlock的大小为32B）；
+    - 每次迭代收集结果
+        - 迭代0：sharedTmpBuffer\[0:127\] = \[1, 2, ..., 128\]；
+        - 迭代1：sharedTmpBuffer\[128:255\] = \[129, 130, ..., 256\]；
+        - 迭代2：sharedTmpBuffer\[256:383\] = \[257, 258, ..., 384\]；
+        - 迭代3：sharedTmpBuffer\[384:511\] = \[385, 386, ..., 512\]。
 
 - 步骤2. 将输入的张量src1进行广播填充。
 
@@ -75,9 +75,9 @@ hRepeat = 2；vRepeat = 2；mask = 128；vROffset = 128。
 
     该步骤处理过程如下：
 
-    -   步骤1收集的src0张量占用的空间大小 = 总迭代次数 \* 每次迭代处理的元素个数 = 4 \* 128 = 512。所以广播src1的元素从sharedTmpBuffer\[512\]开始存放；
-    -   Brcb指令迭代次数repeatTime = src1的数据长度 / 8 = 16 / 8 = 2次（Brcb指令每次迭代取8个数）；
-    -   将输入src1张量中的8个数据，填充到sharedTmpBuffer\[512\]位置起的8个DataBlock中去。输入是half数据类型，故每个元素复制32 / sizeof\(half\) = 16次。
+    - 步骤1收集的src0张量占用的空间大小 = 总迭代次数 \* 每次迭代处理的元素个数 = 4 \* 128 = 512。所以广播src1的元素从sharedTmpBuffer\[512\]开始存放；
+    - Brcb指令迭代次数repeatTime = src1的数据长度 / 8 = 16 / 8 = 2次（Brcb指令每次迭代取8个数）；
+    - 将输入src1张量中的8个数据，填充到sharedTmpBuffer\[512\]位置起的8个DataBlock中去。输入是half数据类型，故每个元素复制32 / sizeof\(half\) = 16次。
 
         结果：sharedTmpBuffer\[512:1024\] = \[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, ..., 33, 33\]。
 
@@ -85,47 +85,45 @@ hRepeat = 2；vRepeat = 2；mask = 128；vROffset = 128。
 
     迭代计算次数：hRepeat \* vRepeat = 2 \* 2 = 4。
 
-    支持两种计算方式，由接口输入参数repeatMode控制（配置true或false）。
+    支持两种计算方式，由接口输入参数repeatMode控制（配置true 或false）。
 
-    -   repeatMode=false
+    - repeatMode=false
+每次迭代，src0（数据存放位置为sharedTmpBuffer\[0:511\]）读取8个DataBlock，每个DataBlock的每个值均与src1（数据存放位置为sharedTmpBuffer\[512:1024\]）的单个数值相乘。
 
-        每次迭代，src0（数据存放位置为sharedTmpBuffer\[0:511\]）读取8个DataBlock，每个DataBlock的每个值均与src1（数据存放位置为sharedTmpBuffer\[512:1024\]）的单个数值相乘。
-
-        -   整个处理过程如下：
-            -   迭代0计算过程：第1个DataBlock（sharedTmpBuffer\[0:15\]）到第8个DataBlock（sharedTmpBuffer\[112:127\]），均与src1的2相乘。
+        - 整个处理过程如下：
+            - 迭代0计算过程：第1个DataBlock（sharedTmpBuffer\[0:15\]）到第8个DataBlock（sharedTmpBuffer\[112:127\]），均与src1的2相乘。
 
                 即sharedTmpBuffer\[0:127\] = \[1 \* 2, ..., 128 \* 2\]；
 
-            -   迭代1计算过程：第1个DataBlock（sharedTmpBuffer\[128:143\]）到第8个DataBlock（sharedTmpBuffer\[240:255\]），均与src1的3相乘。
+            - 迭代1计算过程：第1个DataBlock（sharedTmpBuffer\[128:143\]）到第8个DataBlock（sharedTmpBuffer\[240:255\]），均与src1的3相乘。
 
                 即sharedTmpBuffer\[128:255\] = \[129 \* 3, ..., 256 \* 3\]；
 
-            -   迭代2计算过程：第1个DataBlock（sharedTmpBuffer\[256:271\]）到第8个DataBlock（sharedTmpBuffer\[368:383\]），均与src1的4相乘。
+            - 迭代2计算过程：第1个DataBlock（sharedTmpBuffer\[256:271\]）到第8个DataBlock（sharedTmpBuffer\[368:383\]），均与src1的4相乘。
 
                 即sharedTmpBuffer\[256:383\] = \[257 \* 4, ..., 384 \* 4\]；
 
-            -   迭代3计算过程：第1个DataBlock（sharedTmpBuffer\[384:399\]）到第8个DataBlock（sharedTmpBuffer\[496:511\]），均与src1的5相乘。
+            - 迭代3计算过程：第1个DataBlock（sharedTmpBuffer\[384:399\]）到第8个DataBlock（sharedTmpBuffer\[496:511\]），均与src1的5相乘。
 
                 即sharedTmpBuffer\[384:511\] = \[385 \* 5, ..., 512 \* 5\]。
 
-    -   repeatMode=true
+    - repeatMode=true
+每次迭代，src0（数据存放位置为sharedTmpBuffer\[0:511\]）读取8个DataBlock，每个DataBlock分别与src1（存放位置为sharedTmpBuffer\[512:1024\]）的1个数值相乘，即src0的8个DataBlock分别对应src1的8个数值。
 
-        每次迭代，src0（数据存放位置为sharedTmpBuffer\[0:511\]）读取8个DataBlock，每个DataBlock分别与src1（存放位置为sharedTmpBuffer\[512:1024\]）的1个数值相乘，即src0的8个DataBlock分别对应src1的8个数值。
-
-        -   整个处理过程如下：
-            -   迭代0计算过程：第1个DataBlock（sharedTmpBuffer\[0:15\]）与src1的2相乘，第2个DataBlock（sharedTmpBuffer\[16:31\]）与src1的3相乘；...依次类推，第8个DataBlock（sharedTmpBuffer\[112:127\]）与src1的9相乘。
+        - 整个处理过程如下：
+            - 迭代0计算过程：第1个DataBlock（sharedTmpBuffer\[0:15\]）与src1的2相乘，第2个DataBlock（sharedTmpBuffer\[16:31\]）与src1的3相乘；...依次类推，第8个DataBlock（sharedTmpBuffer\[112:127\]）与src1的9相乘。
 
                 即sharedTmpBuffer\[0:127\] = \[1 \* 2, ..., 16 \* 2, 17 \* 3, ..., 128 \* 9\]；
 
-            -   迭代1计算过程：第1个DataBlock（sharedTmpBuffer\[128:143\]）与src1的10相乘，第2个DataBlock（sharedTmpBuffer\[144:159\]）与src1的11相乘；...依次类推，第8个DataBlock（sharedTmpBuffer\[240:255\]）与src1的17相乘。
+            - 迭代1计算过程：第1个DataBlock（sharedTmpBuffer\[128:143\]）与src1的10相乘，第2个DataBlock（sharedTmpBuffer\[144:159\]）与src1的11相乘；...依次类推，第8个DataBlock（sharedTmpBuffer\[240:255\]）与src1的17相乘。
 
                 即sharedTmpBuffer\[128:255\] = \[129 \* 10, ..., 144 \* 10, 145 \* 11, ..., 256 \* 17\]；
 
-            -   迭代2计算过程：第1个DataBlock（sharedTmpBuffer\[256:271\]）与src1的18相乘，第2个DataBlock（sharedTmpBuffer\[272:287\]）与src1的19相乘；...依次类推，第8个DataBlock（sharedTmpBuffer\[368:383\]）与src1的25相乘。
+            - 迭代2计算过程：第1个DataBlock（sharedTmpBuffer\[256:271\]）与src1的18相乘，第2个DataBlock（sharedTmpBuffer\[272:287\]）与src1的19相乘；...依次类推，第8个DataBlock（sharedTmpBuffer\[368:383\]）与src1的25相乘。
 
                 即sharedTmpBuffer\[256:383\] = \[257 \* 18, ..., 272 \* 18, 273 \* 19, ..., 384 \* 25\]；
 
-            -   迭代3计算过程：第1个DataBlock（sharedTmpBuffer\[384:399\]）与src1的26相乘，第2个DataBlock（sharedTmpBuffer\[400:415\]）与src1的27相乘；...依次类推，第8个DataBlock（sharedTmpBuffer\[496:511\]）与src1的33相乘。
+            - 迭代3计算过程：第1个DataBlock（sharedTmpBuffer\[384:399\]）与src1的26相乘，第2个DataBlock（sharedTmpBuffer\[400:415\]）与src1的27相乘；...依次类推，第8个DataBlock（sharedTmpBuffer\[496:511\]）与src1的33相乘。
 
                 即sharedTmpBuffer\[384:511\] = \[385 \* 26, ..., 390 \* 26, 391 \* 27, ..., 512 \* 33\]。
 
@@ -133,12 +131,12 @@ hRepeat = 2；vRepeat = 2；mask = 128；vROffset = 128。
 
     调用[Add](Add.md)接口完成以下处理：
 
-    -   dst\[0:127\] = sharedTmpBuffer\[0:127\] + sharedTmpBuffer\[128:255\]；
-    -   dst\[128:255\] = sharedTmpBuffer\[256:383\] + sharedTmpBuffer\[384:511\]。
+    - dst\[0:127\] = sharedTmpBuffer\[0:127\] + sharedTmpBuffer\[128:255\]；
+    - dst\[128:255\] = sharedTmpBuffer\[256:383\] + sharedTmpBuffer\[384:511\]。
 
 ## 函数原型<a name="zh-cn_topic_0000002560891889_section82039854412"></a>
 
--   mask逐bit模式：
+- mask逐bit模式：
 
     ```cpp
     template <typename T>
@@ -148,7 +146,7 @@ hRepeat = 2；vRepeat = 2；mask = 128；vROffset = 128。
         const LocalTensor<uint8_t> &sharedTmpBuffer);
     ```
 
--   mask连续模式：
+- mask连续模式：
 
     ```cpp
     template <typename T>
@@ -162,13 +160,13 @@ hRepeat = 2；vRepeat = 2；mask = 128；vROffset = 128。
 
 ### 模板参数及接口参数说明
 
-**表 1**  模板参数说明
+**表1** 模板参数说明
 
 | 参数名 | 描述 |
 |---|---|
 | T | 操作数数据类型。 |
 
-**表 2**  参数说明
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
@@ -208,22 +206,22 @@ hRepeat = 2；vRepeat = 2；mask = 128；vROffset = 128。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
--   src0、src1、src0Offset之间不允许地址重叠，且两个垂直repeat的目的地址之间不允许地址重叠。
--   参数vROffset的取值范围为\[128, 65535\)。
--   水平方向迭代次数，取值范围为\[1, 255\]。
--   垂直方向迭代次数，取值范围为\[1, 255\]。
--   输入的临时空间sharedTmpBuffer，空间大小要求请参考[sharedTmpBuffer空间说明](#sharedtmpbuffer空间说明)。
--   参数src0Offset的取值要求如下：
-    -   取值应保证src0元素类型位宽对齐。
-    -   偏移地址后需要32字节对齐。
-    -   偏移地址后不能超出UB大小数据的范围。
-    -   地址偏移的取值范围：不能超出uint32\_t的范围。
--   当参数repeatMode配置为true时，需确保src1的有效数据长度*16 ≥ src0的数据长度。
+- 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
+- src0、src1、src0Offset之间不允许地址重叠，且两个垂直repeat的目的地址之间不允许地址重叠。
+- 参数vROffset的取值范围为\[128, 65535\)。
+- 水平方向迭代次数，取值范围为\[1, 255\]。
+- 垂直方向迭代次数，取值范围为\[1, 255\]。
+- 输入的临时空间sharedTmpBuffer，空间大小要求请参考[sharedTmpBuffer空间说明](#sharedtmpbuffer空间说明)。
+- 参数src0Offset的取值要求如下：
+    - 取值应保证src0元素类型位宽对齐。
+    - 偏移地址后需要32字节对齐。
+    - 偏移地址后不能超出UB大小数据的范围。
+    - 地址偏移的取值范围：不能超出uint32\_t的范围。
+- 当参数repeatMode配置为true 时，需确保src1的有效数据长度*16 ≥ src0的数据长度。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
--   接口样例-mask连续模式
+- 接口样例-mask连续模式
 
     ```cpp
     AscendC::LocalTensor<half> dstLocal, src0Local, src1Local; // repeatMode = false，src1Local的数据长度为16即可
@@ -235,12 +233,11 @@ hRepeat = 2；vRepeat = 2；mask = 128；vROffset = 128。
     uint16_t dstBlkStride = 1;  // 单次迭代内数据连续写入
     uint16_t vROffset = 128;    // 相邻迭代间数据连续写入
     uint8_t vRepeat = 2;        // 垂直迭代2次
-    
     AscendC::BilinearInterpolation(dstLocal, src0Local, src0OffsetLocal, src1Local, mask, hRepeat, repeatMode,
                 dstBlkStride, vROffset, vRepeat, tmpLocal);
     ```
 
--   接口样例-mask逐bit模式
+- 接口样例-mask逐bit模式
 
     ```cpp
     AscendC::LocalTensor<half> dstLocal, src0Local, src1Local;
@@ -252,7 +249,6 @@ hRepeat = 2；vRepeat = 2；mask = 128；vROffset = 128。
     uint16_t dstBlkStride = 1;  // 单次迭代内数据连续写入
     uint16_t vROffset = 128;    // 相邻迭代间数据连续写入
     uint8_t vRepeat = 2;        // 垂直迭代2次
-    
     AscendC::BilinearInterpolation(dstLocal, src0Local, src0OffsetLocal, src1Local, mask, hRepeat, repeatMode,
                 dstBlkStride, vROffset, vRepeat, tmpLocal);
     ```
