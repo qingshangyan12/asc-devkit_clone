@@ -15,10 +15,10 @@
 - Atlas 200I/500 A2 推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas 推理系列产品 AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas 推理系列产品 Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
@@ -41,7 +41,7 @@ __aicore__ inline void Neg(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 
 ## 参数说明<a name="section176711403104"></a>
 
-**表1**  模板参数说明
+**表1** 模板参数说明
 
 <a name="table4835205712588"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0000001429830437_row118356578583"><th class="cellrowborder" valign="top" width="16.34%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0000001429830437_p48354572582"><a name="zh-cn_topic_0000001429830437_p48354572582"></a><a name="zh-cn_topic_0000001429830437_p48354572582"></a>参数名</p>
@@ -59,7 +59,7 @@ __aicore__ inline void Neg(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 </tbody>
 </table>
 
-**表2**  参数说明
+**表2** 参数说明
 
 <a name="table1055216132132"></a>
 <table><thead align="left"><tr id="row105531513121315"><th class="cellrowborder" valign="top" width="16.49%" id="mcps1.2.4.1.1"><p id="p5553171319138"><a name="p5553171319138"></a><a name="p5553171319138"></a>参数名</p>
@@ -75,8 +75,8 @@ __aicore__ inline void Neg(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 <td class="cellrowborder" valign="top" width="11.93%" headers="mcps1.2.4.1.2 "><p id="p755318134134"><a name="p755318134134"></a><a name="p755318134134"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.58%" headers="mcps1.2.4.1.3 "><p id="p1515191511407"><a name="p1515191511407"></a><a name="p1515191511407"></a>目的操作数。</p>
-<p id="p65530137137"><a name="p65530137137"></a><a name="p65530137137"></a><span id="ph173308471594"><a name="ph173308471594"></a><a name="ph173308471594"></a><span id="ph9902231466"><a name="ph9902231466"></a><a name="ph9902231466"></a><span id="ph1782115034816"><a name="ph1782115034816"></a><a name="ph1782115034816"></a>类型为<a href="../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
-<p id="p37511234195317"><a name="p37511234195317"></a><a name="p37511234195317"></a><span id="ph19174141065411"><a name="ph19174141065411"></a><a name="ph19174141065411"></a>LocalTensor的起始地址需要32字节对齐。</span></p>
+<p id="p65530137137"><a name="p65530137137"></a><a name="p65530137137"></a><span id="ph173308471594"><a name="ph173308471594"></a><a name="ph173308471594"></a><span id="ph9902231466"><a name="ph9902231466"></a><a name="ph9902231466"></a><span id="ph1782115034816"><a name="ph1782115034816"></a><a name="ph1782115034816"></a>类型为<a href="../../数据结构/LocalTensor 和 GlobalTensor 定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的 TPosition 为 VECIN/VECCALC/VECOUT。</span></span></span></p>
+<p id="p37511234195317"><a name="p37511234195317"></a><a name="p37511234195317"></a><span id="ph19174141065411"><a name="ph19174141065411"></a><a name="ph19174141065411"></a>LocalTensor 的起始地址需要32 字节对齐。</span></p>
 </td>
 </tr>
 <tr id="row6553613191315"><td class="cellrowborder" valign="top" width="16.49%" headers="mcps1.2.4.1.1 "><p id="p195531113161311"><a name="p195531113161311"></a><a name="p195531113161311"></a>src</p>
@@ -84,8 +84,8 @@ __aicore__ inline void Neg(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 <td class="cellrowborder" valign="top" width="11.93%" headers="mcps1.2.4.1.2 "><p id="p155310135134"><a name="p155310135134"></a><a name="p155310135134"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.58%" headers="mcps1.2.4.1.3 "><p id="p7218122944012"><a name="p7218122944012"></a><a name="p7218122944012"></a>源操作数。</p>
-<p id="p15422163732418"><a name="p15422163732418"></a><a name="p15422163732418"></a><span id="ph97971326111115"><a name="ph97971326111115"></a><a name="ph97971326111115"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
-<p id="p2811183544"><a name="p2811183544"></a><a name="p2811183544"></a><span id="ph1479701815419"><a name="ph1479701815419"></a><a name="ph1479701815419"></a>LocalTensor的起始地址需要32字节对齐。</span></p>
+<p id="p15422163732418"><a name="p15422163732418"></a><a name="p15422163732418"></a><span id="ph97971326111115"><a name="ph97971326111115"></a><a name="ph97971326111115"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../数据结构/LocalTensor 和 GlobalTensor 定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的 TPosition 为 VECIN/VECCALC/VECOUT。</span></span></span></p>
+<p id="p2811183544"><a name="p2811183544"></a><a name="p2811183544"></a><span id="ph1479701815419"><a name="ph1479701815419"></a><a name="ph1479701815419"></a>LocalTensor 的起始地址需要32 字节对齐。</span></p>
 <p id="p2012716431610"><a name="p2012716431610"></a><a name="p2012716431610"></a>源操作数的数据类型需要与目的操作数保持一致。</p>
 </td>
 </tr>
@@ -115,7 +115,7 @@ __aicore__ inline void Neg(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 AscendC::Neg(dstLocal, srcLocal, 512);
 ```
 
-结果示例如下（srcLocal和dstLocal均为int64\_t类型）：
+结果示例如下（srcLocal 和 dstLocal 均为 int64\_t 类型）：
 
 ```
 输入数据(srcLocal): [1 2 3 4 ...]
