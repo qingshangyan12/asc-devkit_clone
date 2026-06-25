@@ -10,4 +10,4 @@
 
 - 开启Normal ReLU（reluPre=1）且同时配置clipReluPre=1并调用SetFixPipeClipRelu接口时，即Normal ReLU + ClipReLU，先执行`y = max(0, x)`，再执行`y = min(clipReluMaxVal, y)`，其中clipReluMaxVal通过SetFixPipeClipRelu接口设置。详见[SetFixPipeClipRelu](../寄存器配置说明/SetFixPipeClipRelu.md)。
 
-与随路量化组合使用的详细信息请参考[随路量化与随路relu场景组合](随路量化与随路ReLU场景组合.md)。
+与随路量化组合使用的详细信息请参考[随路量化与随路ReLU场景组合](随路量化与随路ReLU场景组合.md)。
