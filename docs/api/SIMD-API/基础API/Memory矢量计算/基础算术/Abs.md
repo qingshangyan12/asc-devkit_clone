@@ -140,6 +140,18 @@ $dst_i = |src_i|$
   <!-- end id18 -->
 <!-- end id19 -->
 
+<!-- npu="950" id20 -->
+- 针对Ascend 950PR/Ascend 950DT，如下约束说明：
+    - 当目的操作数和源操作数数据类型不一致时，目的操作数和源操作数不可重叠。
+    - 本接口的complex32、int64\_t、complex64为软仿数据类型。
+    - int8\_t和int64\_t数据类型仅支持tensor前n个数据计算接口。
+    - 整型数据的计算结果如果超出数据类型的表示范围会采取非饱和截断，比如int8\_t类型，srcReg为-128，其绝对值128会被截断成-128。
+    - tensor高维切分计算调用GetTemporaryBufferAddr，占用8KB Unified Buffer。
+    - tensor前n个数据连续计算未调用GetTemporaryBufferAddr，不涉及8KB Unified Buffer。
+    - tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。
+    - 当参数count或repeatTime取值为0时，软仿行为不保证该接口被视为NOP（空操作）。
+<!-- end id20 -->
+
 ## 调用示例<a name="section176061616102911"></a>
 
 - tensor高维切分计算样例-mask连续模式
@@ -189,7 +201,7 @@ $dst_i = |src_i|$
     输出数据dstLocal：[0.0 1.0 2.0 3.0 ...]
     ```
 
-<!-- npu="950" id23 -->
+<!-- npu="950" id21 -->
 针对Ascend 950PR/Ascend 950DT：
 
 - tensor前n个复数计算接口样例
@@ -206,5 +218,6 @@ $dst_i = |src_i|$
     输入数据srcLocal：[1+2j  2-3j ...]
     输出数据dstLocal：[2.236 3.605 ...]
     ```
-<!-- end id23 -->
+<!-- end id21 -->
 
+完整样例请参考[单目矢量计算类API样例](https://gitcode.com/cann/asc-devkit/pull/873)。

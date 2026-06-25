@@ -98,7 +98,7 @@ dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/T
 
 ## 参数说明<a name="section166351181919"></a>
 
-**表1**  模板参数说明
+**表1** 模板参数说明
 
 | 参数名 | 描述 |
 |---|---|
@@ -106,7 +106,7 @@ dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/T
 | U | scalarValue的数据类型。仅在dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/TensorTrait.md)类型时有效。 |
 | isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。<br><!-- npu="950,310b" id15 -->针对以下型号，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。<br>&bull; <!-- npu="950" id13 -->Ascend 950PR/Ascend 950DT<!-- end id13 --><br>&bull; <!-- npu="310b" id14 -->Atlas 200I/500 A2 推理产品<!-- end id14 --><!-- end id15 --> |
 
-**表2**  参数说明
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
