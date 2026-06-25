@@ -92,7 +92,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 | dstAddr | 输入/输出 | 目的操作数，UB起始地址，不需要32字节对齐。 |
 | srcReg | 输入 | 源操作数，类型为[RegTensor](../概述/寄存器数据类型/RegTensor.md)。 |
 | ureg | 输入/输出 | 非对齐寄存器，UnalignRegForStore类型，用于存储非32字节对齐的数据，寄存器大小为32字节。 |
-| postUpdateStride | 输入 | 地址更新步长，uint32_t类型，单位：元素个数。根据postMode的取值有两种情况：<br>&bull; POST_MODE_NORMAL：不支持。<br>&bull; POST_MODE_UPDATE：实际搬运UB起始地址为srcAddr，搬运后执行地址更新srcAddr +=  postUpdateStride。 |
+| postUpdateStride | 输入 | 地址更新步长，uint32_t类型，单位：元素个数。根据postMode的取值有两种情况：<br>&bull; POST_MODE_NORMAL：不支持。<br>&bull; POST_MODE_UPDATE：实际搬运UB起始地址为srcAddr，搬运后执行地址更新srcAddr += postUpdateStride。 |
 | areg | 输入 | 地址偏移寄存器，AddrReg类型，需要在搬运前调用CreateAddrReg设定地址偏移量，实际搬运UB地址为dstAddr+ 寄存器中存储的偏移量。 |
 
 ## 数据类型
