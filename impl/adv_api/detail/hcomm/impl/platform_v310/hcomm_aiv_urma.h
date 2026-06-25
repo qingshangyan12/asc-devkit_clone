@@ -46,10 +46,10 @@ __aicore__ inline void HcommUrmaFillNotifyCtx(__ubuf__ HcommUrmaNotifyCtx* notif
     notifyCtx->notifyDataH = (notifyVal >> 32) & 0xFFFFFFFFU;
 }
 
-template <HcommUrmaOpCode opCode, auto const &config>
+template <HcommUrmaOpCode opCode, auto const &config, typename T>
 __aicore__ inline void HcommUrmaFillSqeCtx(__ubuf__ HcommUrmaSqeCtx* sqeCtx, __gm__ uint8_t* remoteAddr,
     const SqContext& sqCtx, const RegedBufferEntity& remoteMemInfo, uint32_t curHead, GM_ADDR notifyAddr = nullptr,
-    uint64_t value = 0)
+    T value = 0)
 {
     sqeCtx->opcode = static_cast<uint32_t>(opCode);
     sqeCtx->flag = (config.odr & 0x7U) | ((config.fence & 0x1U) << 3U) | ((config.se & 0x1U) << 4U) |
@@ -85,15 +85,20 @@ __aicore__ inline void HcommUrmaFillSqeCtx(__ubuf__ HcommUrmaSqeCtx* sqeCtx, __g
 //     sgeCtx->va = reinterpret_cast<uint64_t>(localAddr);
 // }
 
-template <HcommUrmaOpCode opCode>
+template <HcommUrmaOpCode opCode, typename T>
 __aicore__ inline void HcommUrmaFillSgeCtx(
-    __ubuf__ HcommUrmaSgeCtx* sgeCtx, uint64_t messageLen, __gm__ uint8_t* localAddr, uint64_t value)
+    __ubuf__ HcommUrmaSgeCtx* sgeCtx, uint64_t messageLen, __gm__ uint8_t* localAddr, UdmaParams<T> params)
 {
     sgeCtx->len = static_cast<uint32_t>(messageLen);
     sgeCtx->va = reinterpret_cast<uint64_t>(localAddr);
     if constexpr (opCode == HcommUrmaOpCode::FAA) {
-        __ubuf__ uint64_t* addDataAddr = (__ubuf__ uint64_t*)((__ubuf__ uint8_t*)sgeCtx + sizeof(HcommUrmaSgeCtx));
-        *addDataAddr = value;
+        __ubuf__ T* addDataAddr = (__ubuf__ T*)((__ubuf__ uint8_t*)sgeCtx + sizeof(HcommUrmaSgeCtx));
+        *addDataAddr = params.value;
+    } else if constexpr (opCode == HcommUrmaOpCode::CAS) {
+        __ubuf__ T* swapDataAddr = (__ubuf__ T*)((__ubuf__ uint8_t*)sgeCtx + sizeof(HcommUrmaSgeCtx));
+        *swapDataAddr = params.value;
+        __ubuf__ T* cmpDataAddr = (__ubuf__ T*)((__ubuf__ uint8_t*)swapDataAddr + sizeof(T));
+        *cmpDataAddr = params.cond;
     }
 }
 
@@ -272,9 +277,9 @@ __aicore__ inline void HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCqWhenSqOverflow(
     }
 }
 
-template <bool commit, pipe_t commitPipe, pipe_t reqPipe, HcommUrmaOpCode opCode, auto const &config>
+template <bool commit, pipe_t commitPipe, pipe_t reqPipe, HcommUrmaOpCode opCode, auto const &config, typename T>
 __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
-    ChannelHandle channel, GM_ADDR remoteAddr, GM_ADDR localAddr, uint64_t len, GM_ADDR notifyAddr, uint64_t value)
+    ChannelHandle channel, GM_ADDR remoteAddr, GM_ADDR localAddr, uint64_t len, GM_ADDR notifyAddr, const UdmaParams<T>& params)
 {
     (void)commitPipe;
     (void)reqPipe;
@@ -303,7 +308,7 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
     __ubuf__ HcommUrmaSqeCtx* sqeCtx = (__ubuf__ HcommUrmaSqeCtx*)wqeItem_.GetPhyAddr();
     auto remoteMemInfo = channelEntity->remoteBufferAddr[remoteIdx];
     HcommUrmaFillSqeCtx<opCode, config>(
-        sqeCtx, (__gm__ uint8_t*)remoteAddr, sqCtx, remoteMemInfo, curHead, notifyAddr, value);
+        sqeCtx, (__gm__ uint8_t*)remoteAddr, sqCtx, remoteMemInfo, curHead, notifyAddr, params.value);
 
     // write SGE
     __ubuf__ uint8_t* sgeAddr = (__ubuf__ uint8_t*)sqeCtx + sizeof(HcommUrmaSqeCtx);
@@ -311,25 +316,24 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
         sgeAddr += sizeof(HcommUrmaNotifyCtx);
     }
     __ubuf__ HcommUrmaSgeCtx* sgeCtx = (__ubuf__ HcommUrmaSgeCtx*)sgeAddr;
-    HcommUrmaFillSgeCtx<opCode>(sgeCtx, len, (__gm__ uint8_t*)localAddr, value);
+    HcommUrmaFillSgeCtx<opCode>(sgeCtx, len, (__gm__ uint8_t*)localAddr, params);
 
-    // SQE & SGE cache flush  缓存刷新
+    // SQE & SGE cache flush
     uint64_t sqBaseAddr = sqCtx.contextInfo.ubJfs.sqVa;
     uint32_t wqeSize = sqCtx.contextInfo.ubJfs.wqeSize;
     uint32_t baseBlockCount = sqCtx.contextInfo.ubJfs.sqDepth;
     __gm__ uint8_t* sqeAddr = (__gm__ uint8_t*)(sqBaseAddr + wqeSize * (curHead % baseBlockCount));
     AscendC::GlobalTensor<uint32_t> sqeGlobal;
     sqeGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqeAddr);
-    PipeBarrier<PIPE_ALL>();
-    // constexpr uint32_t wqeBbCnt = opCode == HcommUrmaOpCode::WRITE_WITH_NOTIFY ? 2U : 1U;
     constexpr uint32_t wqeBbCnt = (
         opCode == HcommUrmaOpCode::WRITE_WITH_NOTIFY || 
         opCode == HcommUrmaOpCode::FAA ||
         opCode == HcommUrmaOpCode::CAS
     ) ? 2U : 1U;
+    SyncAction<HardEvent::S_MTE3>();
 
     DataCopy(sqeGlobal, wqeItem_, wqeSize * wqeBbCnt / sizeof(uint32_t));
-    PipeBarrier<PIPE_ALL>();
+    SyncAction<HardEvent::MTE3_S>();
 
     curHead += wqeBbCnt;
     sqPI_.SetValue(0, curHead);
@@ -425,18 +429,38 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::ReadNbi(
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::FetchAdd(
-    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t addVal)
-{
-    return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::FAA, config>(channel, dst, src, 1, nullptr, addVal);
-}
-
-template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
 __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::WriteWithNotifyNbi(
     ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
 {
+    UdmaParams<uint64_t> params{notifyVal, 0};
     return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::WRITE_WITH_NOTIFY, config>(
-        channel, dst, src, len, notifyAddr, notifyVal);
+        channel, dst, src, len, notifyAddr, params);
+}
+
+template <typename T, bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::AtomicFAA(
+    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, T addVal)
+{
+    static_assert(
+        std::is_same<T, int32_t>::value || std::is_same<T, uint32_t>::value || 
+        std::is_same<T, int64_t>::value || std::is_same<T, uint64_t>::value,
+        "AtomicFAA only supports int32_t, uint32_t, int64_t, uint64_t"
+    );
+    UdmaParams<T> params{addVal, 0};
+    return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::FAA, config>(channel, dst, src, sizeof(T), nullptr, params);
+}
+
+template <typename T, bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::AtomicCAS(
+    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, T compareVal, T swapVal)
+{
+    static_assert(
+        std::is_same<T, int32_t>::value || std::is_same<T, uint32_t>::value || 
+        std::is_same<T, int64_t>::value || std::is_same<T, uint64_t>::value,
+        "AtomicFAA only supports int32_t, uint32_t, int64_t, uint64_t"
+    );
+    UdmaParams<T> params{swapVal, compareVal};
+    return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::CAS, config>(channel, dst, src, sizeof(T), nullptr, params);
 }
 
 template <pipe_t pipe>

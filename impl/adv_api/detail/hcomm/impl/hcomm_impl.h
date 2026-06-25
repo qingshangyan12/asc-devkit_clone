@@ -71,11 +71,19 @@ __aicore__ inline int32_t Hcomm<commProtocol>::ReadNbi(
 }
 
 template <CommProtocol commProtocol>
-template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline int32_t Hcomm<commProtocol>::FetchAdd(
-    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t addVal)
+template <typename T, bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
+__aicore__ inline int32_t Hcomm<commProtocol>::AtomicFAA(
+    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, T addVal)
 {
-    return impl_.template FetchAdd<commit, commitPipe, reqPipe, config>(channel, dst, src, addVal);
+    return impl_.template AtomicFAA<T, commit, commitPipe, reqPipe, config>(channel, dst, src, addVal);
+}
+
+template <CommProtocol commProtocol>
+template <typename T, bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
+__aicore__ inline int32_t Hcomm<commProtocol>::AtomicCAS(
+    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, T compareVal, T swapVal)
+{
+    return impl_.template AtomicCAS<T, commit, commitPipe, reqPipe, config>(channel, dst, src, compareVal, swapVal);
 }
 
 template <CommProtocol commProtocol>
