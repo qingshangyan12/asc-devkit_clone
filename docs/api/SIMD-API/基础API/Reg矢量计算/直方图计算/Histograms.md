@@ -106,22 +106,34 @@ __simd_callee__ inline void Histograms(V& dstReg, S& srcReg, MaskReg& mask)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-当mask位数为0时，对应位置的src源操作数的数值被忽略，dst对应位置数值为忽略该位置src后计算得到的值。
+- 当mask位数为0时，对应位置的src源操作数的数值被忽略，dst对应位置数值为忽略该位置src后计算得到的值。
+- dst的数据类型为uint16_t，最大值为65535，使用时需注意累加溢出问题。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
 template <typename T, typename U>
-__simd_vf__ inline void HistogramsVF(__ubuf__ U* dstAddr, __ubuf__ T* srcAddr, uint32_t oneRepeatSize, uint16_t repeatTimes, AscendC::Reg::HistogramsBinType mode, AscendC::Reg::HistogramsType type)
+__simd_vf__ inline void HistogramsVF(__ubuf__ U* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize)
 {
     AscendC::Reg::RegTensor<T> srcReg;
-    AscendC::Reg::RegTensor<U> dstReg;
-    AscendC::Reg::MaskReg mask0 = AscendC::Reg::CreateMask<T>();
-    AscendC::Reg::MaskReg mask1 = AscendC::Reg::CreateMask<T>();
-    for (uint16_t i = 0; i < repeatTimes; ++i){
-        AscendC::Reg::LoadAlign(srcReg, srcAddr + oneRepeatSize * i);
-        AscendC::Reg::Histograms<T, U, mode, type>(dstReg, srcReg, mask0);
-        AscendC::Reg::StoreAlign(dstAddr, dstReg, mask1);
+    AscendC::Reg::RegTensor<U> dst0Reg;
+    AscendC::Reg::RegTensor<U> dst1Reg;
+    AscendC::Reg::MaskReg maskU8 = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
+    AscendC::Reg::MaskReg maskU16 = AscendC::Reg::CreateMask<U, AscendC::Reg::MaskPattern::ALL>();
+    uint16_t repeatTimes = AscendC::CeilDivision(count, oneRepeatSize);
+
+    AscendC::Reg::Duplicate(dst0Reg, (U)0);
+    AscendC::Reg::Duplicate(dst1Reg, (U)0);
+
+    for (uint16_t i = 0; i < repeatTimes; ++i) {
+        AscendC::Reg::LoadAlign<T, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(srcReg, srcAddr, oneRepeatSize);
+        AscendC::Reg::Histograms<T, U, AscendC::Reg::HistogramsBinType::BIN0, AscendC::Reg::HistogramsType::FREQUENCY>(
+            dst0Reg, srcReg, maskU8);
+        AscendC::Reg::Histograms<T, U, AscendC::Reg::HistogramsBinType::BIN1, AscendC::Reg::HistogramsType::FREQUENCY>(
+            dst1Reg, srcReg, maskU8);
     }
+
+    AscendC::Reg::StoreAlign<U, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(dstAddr, dst0Reg, 128, maskU16);
+    AscendC::Reg::StoreAlign<U, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(dstAddr, dst1Reg, 128, maskU16);
 }
 ```
