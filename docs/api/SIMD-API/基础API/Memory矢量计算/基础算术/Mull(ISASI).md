@@ -1,30 +1,28 @@
 # Mull\(ISASI\)<a name="ZH-CN_TOPIC_0000002193851737"></a>
 
-## 产品支持情况
-
-<!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
-<!-- end id1 -->
-<!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
-<!-- end id2 -->
-<!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
-<!-- end id3 -->
-<!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
-<!-- end id4 -->
-<!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
-<!-- end id5 -->
-<!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
-<!-- end id6 -->
-<!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
-<!-- end id7 -->
-
-
+## 产品支持情况	 
+ 
+<!-- npu="950" id1 --> 
+- Ascend 950PR/Ascend 950DT：支持 
+<!-- end id1 --> 
+<!-- npu="A3" id2 --> 
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持 
+<!-- end id2 --> 
+<!-- npu="910b" id3 --> 
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持 
+<!-- end id3 --> 
+<!-- npu="310b" id4 --> 
+- Atlas 200I/500 A2 推理产品：不支持 
+<!-- end id4 --> 
+<!-- npu="310p" id5 --> 
+- Atlas 推理系列产品AI Core：不支持 
+<!-- end id5 --> 
+<!-- npu="310p" id6 --> 
+- Atlas 推理系列产品Vector Core：不支持 
+<!-- end id6 --> 
+<!-- npu="910" id7 --> 
+- Atlas 训练系列产品：不支持 
+<!-- end id7 --> 
 
 ## 功能说明<a name="section1769835112451"></a>
 
@@ -41,7 +39,7 @@ __aicore__ inline void Mull(const LocalTensor<T>& dst0, const LocalTensor<T>& ds
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表1**  模板参数说明
+**表 1**  模板参数说明
 
 <a name="table4835205712588"></a>
 <table><thead align="left"><tr id="row118356578583"><th class="cellrowborder" valign="top" width="18.32%" id="mcps1.2.3.1.1"><p id="p48354572582"><a name="p48354572582"></a><a name="p48354572582"></a>参数名</p>
@@ -59,7 +57,7 @@ __aicore__ inline void Mull(const LocalTensor<T>& dst0, const LocalTensor<T>& ds
 </tbody>
 </table>
 
-**表2**  参数说明
+**表 2**  参数说明
 
 <a name="zh-cn_topic_0235751031_table33761356"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0235751031_row27598891"><th class="cellrowborder" valign="top" width="18.54%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0235751031_p20917673"><a name="zh-cn_topic_0235751031_p20917673"></a><a name="zh-cn_topic_0235751031_p20917673"></a>参数名</p>
