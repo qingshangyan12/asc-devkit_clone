@@ -43,10 +43,21 @@ bool __hequ(half x, half y)
 
 ## 返回值说明
 
-比较输入数据是否相等的结果。
+比较输入数据是否相等的结果。特殊值如下：
 
--   true：输入数据不相等。任一输入为nan时返回true。
--   false：输入数据相等。
+| x值 | y值 | 返回值 |
+| --- | --- | --- |
+| ±0 | ±0 | true |
+| inf | inf | true |
+| -inf | -inf | true |
+| inf | -inf | true |
+| inf | -inf | false |
+| -inf | inf | false |
+| ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 | true |
+| ASCRT\_MAX\_NORMAL\_FP16 | 1 | false |
+| 1 | ASCRT\_MAX\_NORMAL\_FP16 | false |
+| 任一值为nan |  | true |
+
 
 ## 约束说明
 
