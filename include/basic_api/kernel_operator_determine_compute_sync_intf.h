@@ -20,7 +20,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_DETERMINE_COMPUTE_SYNC_INTF_H
 #define ASCENDC_MODULE_OPERATOR_DETERMINE_COMPUTE_SYNC_INTF_H
 
-#include "kernel_macros.h"
+#include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -51,7 +51,9 @@ __aicore__ inline void WaitPreBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTen
 __aicore__ inline void NotifyNextBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace);
 } // namespace AscendC
 
+#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_determine_compute_sync_intf_impl.h"
+#endif
 #endif // ASCENDC_MODULE_OPERATOR_DETERMINE_COMPUTE_SYNC_INTF_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DETERMINE_COMPUTE_SYNC_INTF_H__)

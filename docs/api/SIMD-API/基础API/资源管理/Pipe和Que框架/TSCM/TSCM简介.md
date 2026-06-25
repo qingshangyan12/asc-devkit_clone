@@ -7,7 +7,7 @@ template <TPosition pos, int32_t depth, auto mask = 0>
 using TSCM = TQueBind<pos, TPosition::TSCM, depth, mask>;
 ```
 
-**表 1**  模板参数介绍
+**表1**  模板参数介绍
 
 <a name="table1550165916920"></a>
 <table><thead align="left"><tr id="row115015591391"><th class="cellrowborder" valign="top" width="13.63%" id="mcps1.2.3.1.1"><p id="p12501159099"><a name="p12501159099"></a><a name="p12501159099"></a>参数名称</p>
@@ -18,7 +18,7 @@ using TSCM = TQueBind<pos, TPosition::TSCM, depth, mask>;
 </thead>
 <tbody><tr id="row1550117591914"><td class="cellrowborder" valign="top" width="13.63%" headers="mcps1.2.3.1.1 "><p id="p185019592913"><a name="p185019592913"></a><a name="p185019592913"></a>pos</p>
 </td>
-<td class="cellrowborder" valign="top" width="86.37%" headers="mcps1.2.3.1.2 "><p id="p35011591693"><a name="p35011591693"></a><a name="p35011591693"></a>队列逻辑位置，可以为<span>VECIN、GM</span>。<span>关于TPosition的具体介绍请参考</span><a href="../../../../其他数据类型/TPosition.md">TPosition</a>。</p>
+<td class="cellrowborder" valign="top" width="86.37%" headers="mcps1.2.3.1.2 "><p id="p35011591693"><a name="p35011591693"></a><a name="p35011591693"></a>队列逻辑位置，可以为<span>VECIN、GM</span>。<span>关于TPosition的具体介绍请参考</span><a href="../../../数据结构/辅助数据结构//TPosition.md">TPosition</a>。</p>
 </td>
 </tr>
 <tr id="row12501859799"><td class="cellrowborder" valign="top" width="13.63%" headers="mcps1.2.3.1.1 "><p id="p1650113599915"><a name="p1650113599915"></a><a name="p1650113599915"></a>depth</p>
@@ -129,4 +129,3 @@ for () {
     qIn.FreeTensor(ubLocal);
 }
 ```
-

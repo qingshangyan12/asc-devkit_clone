@@ -21,12 +21,12 @@
 
 #ifndef ASCENDC_MODULE_OPERATOR_MM_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_MM_INTERFACE_IMPL_H
-#include "kernel_tensor.h"
+#include "../../include/basic_api/kernel_tensor.h"
 #include "kernel_check.h"
 #include "kernel_reg.h"
 #include "kernel_npu_debug.h"
 #include "kernel_operator_mm_base_impl.h"
-#include "kernel_struct_mm.h"
+#include "../../include/basic_api/kernel_struct_mm.h"
 
 namespace AscendC {
 
@@ -317,6 +317,8 @@ __aicore__ inline void LoadDataWithTranspose(
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckLoadDataWithTranspose(dst, src, "LoadDataWithTranspose with LoadData2dTransposeParams");
+    ReportNopWarning<uint8_t>(loadDataParams.repeatTimes, "loadDataParams.repeatTimes",
+        "LoadDataWithTranspose with LoadData2dTransposeParams");
 #endif
     LoadDataWithTransposeImpl(dst, src, loadDataParams);
 }
@@ -340,6 +342,8 @@ __aicore__ inline void LoadDataWithTranspose(
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckLoadDataWithTranspose(dst, src, "LoadDataWithTranspose with LoadData2dTransposeParamsV2");
+    ReportNopWarning<uint8_t>(loadDataParams.repeatTimes, "loadDataParams.repeatTimes",
+        "LoadDataWithTranspose with LoadData2dTransposeParamsV2");
 #endif
     LoadDataWithTransposeImpl(dst, src, loadDataParams);
 }

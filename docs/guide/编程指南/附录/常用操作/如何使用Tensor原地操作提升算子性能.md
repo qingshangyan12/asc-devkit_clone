@@ -2,7 +2,7 @@
 
 Tensor原地操作（inplace接口）是一种优化技术，全局申请、保留LocalTensor内存，避免了频繁创建和销毁LocalTensor对象。AllocTensor、FreeTensor、EnQue、DeQue接口不产生新的LocalTensor，而是在该全局LocalTensor上反复申请、释放、入队、出队。其实现原理如下图所示：
 
-**图 1**  Tensor原地操作实现原理<a name="fig1745165317496"></a>  
+**图1**  Tensor原地操作实现原理<a name="fig1745165317496"></a>  
 ![](../../../figures/Tensor原地操作实现原理.png "Tensor原地操作实现原理")
 
 ## Tensor原地操作的优势<a name="section2372753133511"></a>
@@ -25,7 +25,7 @@ Tensor原地操作（inplace接口）是一种优化技术，全局申请、保�
 
 -   **配置TQue对象**：在创建TQue对象时，设置深度（depth）为0，启用inplace操作模式。
 -   **调用原地操作接口**：使用inplace接口直接操作LocalTensor。
-    -   [AllocTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/AllocTensor.md)和[DeQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DeQue.md)区分non-inplace和inplace接口，详情请参考[AllocTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/AllocTensor.md)、[DeQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/DeQue.md)。
+    -   [AllocTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/Pipe和Que框架/TQue/AllocTensor.md)和[DeQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/Pipe和Que框架/TQue/DeQue.md)区分non-inplace和inplace接口，详情请参考[AllocTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/Pipe和Que框架/TQue/AllocTensor.md)、[DeQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/Pipe和Que框架/TQue/DeQue.md)。
     -   FreeTensor和EnQue不区分non-inplace和inplace接口。
 
 ## 示例代码<a name="section729517189461"></a>
@@ -95,4 +95,3 @@ private:
 
 // ...
 ```
-

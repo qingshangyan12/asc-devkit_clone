@@ -19,8 +19,8 @@
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_TERNARY_SCALAR_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_TERNARY_SCALAR_INTERFACE_IMPL_H
-#include "kernel_tensor.h"
-#include "kernel_struct_unary.h"
+#include "../../include/basic_api/kernel_tensor.h"
+#include "../../include/basic_api/kernel_struct_unary.h"
 #include "kernel_npu_debug.h"
 #include "mstx_local_tensor_info.h"
 
@@ -69,7 +69,7 @@ __aicore__ inline void Axpy(const LocalTensor<T>& dst, const LocalTensor<U>& src
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     using MaskCheckType = typename Conditional<(sizeof(PrimT<T>) >= sizeof(PrimT<U>)), PrimT<T>, PrimT<U>>::type;
     CheckVectorTensor("Axpy", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
-    CheckMaskValue<MaskCheckType, isSetMask>(mask, "Axpy");
+    CheckMaskRepeat<MaskCheckType, isSetMask>(mask, repeatTime, "Axpy");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -91,7 +91,7 @@ __aicore__ inline void Axpy(const LocalTensor<T>& dst, const LocalTensor<U>& src
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     using MaskCheckType = typename Conditional<(sizeof(PrimT<T>) >= sizeof(PrimT<U>)), PrimT<T>, PrimT<U>>::type;
     CheckVectorTensor("Axpy", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
-    CheckMaskArray<MaskCheckType, isSetMask>(mask, "Axpy");
+    CheckMaskRepeat<MaskCheckType, isSetMask>(mask, repeatTime, "Axpy");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);

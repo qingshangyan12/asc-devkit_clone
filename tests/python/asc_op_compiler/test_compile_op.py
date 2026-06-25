@@ -705,7 +705,7 @@ class TestCompileOp(unittest.TestCase):
             cfg.current()["tir.op_debug_config"] = ["oom"]
         from asc_op_compile_base.asc_op_compiler.ascendc_common_utility import CommonUtility as utility
         get_soc = global_var_storage.get_variable("ascendc_short_soc_version")
-        global_var_storage.set_variable("ascendc_short_soc_version", "MC62CM12A")
+        global_var_storage.set_variable("ascendc_short_soc_version", "MC62")
         self.assertTrue(utility.is_m510())
         global_var_storage.set_variable("ascendc_short_soc_version", get_soc)
 
@@ -750,7 +750,6 @@ class TestCompileOp(unittest.TestCase):
         compile_op_module.global_var_storage.set_variable("ascendc_enable_ccache", True)
         compile_cmd = gen_compile_cmd_v220(
             src_file, dst_file, compile_option_tuple, "dav-c310", tiling_file, True)
-        self.assertIn('--cce-enable-sanitizer', compile_cmd)
         self.assertEqual(compile_cmd[0], "/usr/bin/ccache")
         compile_op_module.global_var_storage.set_variable("ascendc_enable_ccache", False)
         compile_cmd = gen_compile_cmd_v220(

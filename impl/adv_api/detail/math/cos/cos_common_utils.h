@@ -21,10 +21,9 @@
 #endif
 #ifndef IMPL_MATH_COS_COS_COMMON_UTILS_H
 #define IMPL_MATH_COS_COS_COMMON_UTILS_H
-#include "include/adv_api/math/cos_utils.h"
+#include "../../../../../include/adv_api/math/cos_utils.h"
 
 namespace AscendC {
-constexpr CosConfig defaultCosConfig = {CosAlgo::POLYNOMIAL_APPROXIMATION};
 }
 
 #endif // IMPL_MATH_COS_COS_COMMON_UTILS_H

@@ -27,9 +27,9 @@
 #include "utils/kernel_utils_struct_dma_params.h"
 #include "utils/kernel_utils_struct_norm_sort.h"
 #include "utils/kernel_utils_struct_param.h"
-#include "utils/debug/asc_debug_utils.h"
+#include "../utils/debug/asc_debug_utils.h"
 
-#include "kernel_struct_data_copy.h"
+#include "../../include/basic_api/kernel_struct_data_copy.h"
 #include "kernel_scalar_convert.h"
 #include "kernel_utils_base.h"
 
@@ -41,9 +41,14 @@
 
 inline __gm__ void* g_sysFftsAddr = nullptr;
 namespace AscendC {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 namespace Internal {
 __BLOCK_LOCAL__ __inline__ half g_deqValue;
+}
+#endif
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+namespace Internal {
 __BLOCK_LOCAL__ __inline__ uint64_t g_rptConfig;
 }
 #endif

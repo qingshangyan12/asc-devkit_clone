@@ -51,7 +51,7 @@ struct LayoutTrait {
 template <typename T = uint16_t, typename C0 = Std::Int<C0_ELEMENT<T>>>
 struct LayoutTraitDefault : LayoutTrait<T, C0> {};
 
-struct LayoutTraitScale : LayoutTraitDefault<fp8_e8m0_t, Std::Int<2 / sizeof(fp8_e8m0_t)>> {};
+struct LayoutTraitScale : LayoutTraitDefault<fp8_e8m0_t, Std::Int<MX_SCALE_K0 / sizeof(fp8_e8m0_t)>> {};
 
 struct LayoutTraitFP4 : LayoutTraitDefault<fp4x2_e2m1_t, Std::Int<C0_ELEMENT<fp4x2_e2m1_t>>> {};
 
@@ -117,8 +117,6 @@ public:
 template <typename LayoutPattern, typename TraitType = Std::ignore_t, typename... Args>
 __aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args) {
     using Trait = typename TraitConversion<LayoutPattern, TraitType>::type;
-    static_assert(!(Trait::C0_ELEMENT == 0 || HasZeroIntegralConstant<Args...>::value), 
-                        "MakeFrameLayout does not accept Int<0> arguments.");
     using LayoutMaker = typename LayoutFormatSet::template Get<LayoutPattern>;
     static_assert(!Std::is_same_v<LayoutMaker, Std::ignore_t>, "Unsupported layout pattern.");
     return LayoutMaker::template Make<Trait>(args...);

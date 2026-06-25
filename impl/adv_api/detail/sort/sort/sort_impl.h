@@ -23,21 +23,11 @@
 #ifndef IMPL_SORT_SORT_SORT_IMPL_H
 #define IMPL_SORT_SORT_SORT_IMPL_H
 
-#include "kernel_basic_intf.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
 #include "../sort_common_utils.h"
-#include "include/adv_api/sort/sort_utils_constants.h"
+#include "../../../../../include/adv_api/sort/sort_utils.h"
 
 namespace AscendC {
-#ifndef ASCC_STRUCT_SORTCONFIG
-#define ASCC_STRUCT_SORTCONFIG
-struct SortConfig {
-    SortType type = SortType::RADIX_SORT;
-    bool isDescend = false;
-};
-#endif
-
-constexpr SortConfig DEFAULT_SORT_CONFIG = {SortType::RADIX_SORT, false};
-
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003)
 constexpr auto singleSortElementCount = singleSortElementCountL300;
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)

@@ -20,34 +20,34 @@
 #ifndef ASCENDC_MODULE_TPIPE_IMPL_C310_H
 #define ASCENDC_MODULE_TPIPE_IMPL_C310_H
 
-#include "common_types.h"
-#include "dav_3510/kernel_operator_common_impl.h"
-#include "kernel_check.h"
-#include "kernel_common.h"
-#include "kernel_event.h"
-#include "kernel_log.h"
-#include "kernel_macros.h"
-#include "kernel_operator_block_sync_intf.h"
+#include "../common_types.h"
+#include "kernel_operator_common_impl.h"
+#include "../kernel_check.h"
+#include "../../../include/basic_api/kernel_common.h"
+#include "../kernel_event.h"
+#include "../kernel_log.h"
+#include "../kernel_macros.h"
+#include "../../../include/basic_api/kernel_operator_block_sync_intf.h"
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_H__
 #endif
-#include "kernel_struct_data_copy.h"
-#include "kernel_tensor.h"
-#include "kernel_tensor_base.h"
-#include "kernel_tensor_impl.h"
-#include "kernel_tpipe.h"
+#include "../../../include/basic_api/kernel_struct_data_copy.h"
+#include "../../../include/basic_api/kernel_tensor.h"
+#include "../kernel_tensor_base.h"
+#include "../kernel_tensor_impl.h"
+#include "../../../include/basic_api/kernel_tpipe.h"
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_H__
 #endif
-#include "kernel_tpipe_base.h"
-#include "kernel_utils.h"
-#include "kernel_utils_base.h"
-#include "include/utils/std/tuple.h"
-#include "utils/kernel_utils_ceil_oom_que.h"
-#include "utils/kernel_utils_constants.h"
-#include "utils/kernel_utils_mode_cpu.h"
+#include "../kernel_tpipe_base.h"
+#include "../kernel_utils.h"
+#include "../kernel_utils_base.h"
+#include "../../../include/utils/std/tuple.h"
+#include "../utils/kernel_utils_ceil_oom_que.h"
+#include "../utils/kernel_utils_constants.h"
+#include "../utils/kernel_utils_mode_cpu.h"
 
 #if defined (ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -96,6 +96,11 @@ __aicore__ inline TPipe::~TPipe()
 
 __aicore__ inline void TPipe::Init()
 {
+// disabled on CPU mode for compatiablilty
+#if defined(ASCENDC_DEBUG) && !defined(ASCENDC_CPU_DEBUG)
+    ASCENDC_DEBUG_ASSERT(GetTPipePtr() == nullptr, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "TPipe has already been constructed at %p!\n", (void*)g_lastTpipeInitPos));
+    g_lastTpipeInitPos = get_pc();
+#endif
     ResetPool();
     // for matmul macro, set flag M_MTE1 at the begining of operator, and also wait flag at the end.
     // matmul macro only use M_MTE1 event id 0 1 currently.
@@ -748,6 +753,10 @@ template <TPosition pos> __aicore__ inline uint64_t TPipe::GetQueueEndAddress()
 
 __aicore__ inline void TPipe::DestroyWithoutPipeAll()
 {
+// disabled on CPU mode for compatiablilty
+#if defined(ASCENDC_DEBUG) && !defined(ASCENDC_CPU_DEBUG)
+    Internal::ResetTPipePtr(); // Reset global tpipe ptr to nullptr for next Initialazation.
+#endif
     if ASCEND_IS_AIC {
         g_tpipeImpl.isDestroy = true;
         auto ptr = this->g_tpipeImpl.buf_;

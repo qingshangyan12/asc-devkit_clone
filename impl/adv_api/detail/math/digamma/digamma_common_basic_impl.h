@@ -22,7 +22,7 @@
 #ifndef IMPL_MATH_DIGAMMA_DIGAMMA_COMMON_BASIC_IMPL_H
 #define IMPL_MATH_DIGAMMA_DIGAMMA_COMMON_BASIC_IMPL_H
 #include <cstdint>
-#include "kernel_basic_intf.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "digamma_3510_impl.h"
@@ -150,6 +150,8 @@ __aicore__ inline void DigammaGenNanMask(
 }
 
 // Select the value of src at mask, and accumulate the result onto dst, used tmpScalar
+__ASC_USE_RESERVED_UBUF__(2201,
+    "Digamma is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void DigammaSelect(
     const LocalTensor<float>& dst, const LocalTensor<float>& src, const LocalTensor<uint8_t>& mask,
     const LocalTensor<float>& tmp, DigammaParams& params)

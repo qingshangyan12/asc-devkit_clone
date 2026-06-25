@@ -2,7 +2,7 @@
 
 ## 案例介绍<a name="section1618932742516"></a>
 
-本案例介绍[InsertHashTable算子](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/03_best_practices/00_simt_insert_hash_table)，展示基于SIMT实现的大规模线程并发访问Global Memory内存的算子实践。
+本案例介绍[InsertHashTable算子](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/02_features/01_api_features/00_memory_access/insert_hash_table)，展示基于SIMT实现的大规模线程并发访问Global Memory内存的算子实践。
 
 ## 背景知识<a name="section111061628366"></a>
 
@@ -18,7 +18,7 @@ Hash Table（哈希表，也称散列表）是一种高效的数据结构，它�
 -   将哈希值映射为桶数组的索引index（通常是对哈希表容量取余）
 -   将键值对存储到数组的bucket\[index\]位置
 
-**图 1**  向哈希表中插入元素<a name="fig7419123381911"></a>  
+**图1**  向哈希表中插入元素<a name="fig7419123381911"></a>  
 ![](../../figures/向哈希表中插入元素.png "向哈希表中插入元素")
 
 哈希冲突：由于哈希表容量（桶数组大小）远小于哈希函数的输出范围，不同的键可能会被映射到同一个索引上。
@@ -27,7 +27,7 @@ Hash Table（哈希表，也称散列表）是一种高效的数据结构，它�
 
 以下图为例：根据key计算出的哈希值，得到位置索引为3，当与桶bucket\[3\]中的已有数据发生哈希冲突时，会向后逐个探测，直到找到可用的桶。如果遍历完整个桶数组仍未找到可用的桶，则插入失败。
 
-**图 2**  开放寻址法<a name="fig8305155715170"></a>  
+**图2**  开放寻址法<a name="fig8305155715170"></a>  
 ![](../../figures/开放寻址法.png "开放寻址法")
 
 由于每个键值对的存储位置由计算出的哈希值决定，这些值通常是随机且离散的，加上哈希冲突的存在，导致在实际写入数据前需要进行多个条件判断，因此，哈希表不适合基于SIMD编程模型来实现。相比之下，SIMT编程中每个线程都能独立处理分支判断，并支持离散访存，因此在实现哈希表方面更具优势。
@@ -40,12 +40,12 @@ SIMT能够通过大量线程的并发执行实现高效处理大批数据，但�
 
     在多线程操作同一块内存时，资源冲突问题在所难免。当两个线程插入的key产生哈希冲突时，多个线程会尝试向桶数组的同一位置写入数据，因此需要一种机制确保仅有一个线程能够获得桶的写入权限。在CPU上，通常使用互斥锁来解决这一问题，但在SIMT架构中无法使用锁，故需通过原子操作实现无锁编程。
 
-    例如，图中线程0和线程8处理的key发生了哈希冲突，计算出的位置索引均为3。此时，应确保仅有一个线程能获得桶bucket\[3\]的写入权限，而另一个线程则通过开放寻址法寻找下一个可用的桶。
+    例如，图中线程0和线程256处理的key发生了哈希冲突，计算出的位置索引均为3。此时，应确保仅有一个线程能获得桶bucket\[3\]的写入权限，而另一个线程则通过开放寻址法寻找下一个可用的桶。
 
-    **图 3**  多线程哈希冲突<a name="fig162521813558"></a>  
+    **图3**  多线程哈希冲突<a name="fig162521813558"></a>  
     ![](../../figures/多线程哈希冲突.png "多线程哈希冲突")
 
-    程序实现时，在Bucket结构体中添加一个标记位”flag”，用于标记当前桶的写入权限，线程通过原子指令[asc\_atomic\_cas](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/asc_atomic_cas.md)修改flag来获取桶的写权限。
+    程序实现时，在Bucket结构体中添加一个标记位”flag”，用于标记当前桶的写入权限，线程通过原子指令[asc\_atomic\_cas](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/原子操作/asc_atomic_cas.md)修改flag来获取桶的写权限。
 
     ```
     inline int32_t asc_atomic_cas(int32_t *address, int32_t compare, int32_t val)
@@ -71,7 +71,7 @@ SIMT能够通过大量线程的并发执行实现高效处理大批数据，但�
     int r1 = A;        // load A
     ```
 
-    在弱内存模型下，core 0的store A和store flag可能被重排序，导致其他核先看到flag=1，而A=1的更新尚未到达共享缓存。这时core 1可能会读到r1=0，这与程序的顺序执行逻辑不符。常见的解决方法是使用内存屏障来强制保证屏障两侧的内存操作不被重排序，[asc\_threadfence\(\)](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/asc_threadfence.md)接口用于实现此功能。
+    在弱内存模型下，core 0的store A和store flag可能被重排序，导致其他核先看到flag=1，而A=1的更新尚未到达共享缓存。这时core 1可能会读到r1=0，这与程序的顺序执行逻辑不符。常见的解决方法是使用内存屏障来强制保证屏障两侧的内存操作不被重排序，[asc\_threadfence\(\)](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/同步与内存栅栏/内存栅栏接口/asc_threadfence.md)接口用于实现此功能。
 
     程序实现时，在Bucket结构体中添加一个标记位“state”，用于标识key值的写入状态。写线程中，在写入key后将state标记位置为1，并在二者之间调用asc\_threadfence\(\)接口，确保当state被设置为1时，key的写入操作已经完成。读线程中，通过while循环轮询state值，直到state被设置为1，然后再读取key值，判断当前的key与桶中的key是否一致。
 
@@ -82,19 +82,19 @@ SIMT能够通过大量线程的并发执行实现高效处理大批数据，但�
     bucket->state = 1;
     
     // 读线程
-    while (*reinterpret_cast<volatile int32_t*>(&bucket->state) != 1) {}
+    while (*reinterpret_cast<volatile uint32_t*>(&bucket->state) != 1) {}
     if (key == *reinterpret_cast<volatile int64_t*>(&bucket->key))
     ...
     ```
 
     由于Data Cache与Global Memory之间不保证一致性，核0向Global Memory中写入的数据会更新到L2 Cache，但核1读取数据时，如果Data Cache命中，会直接使用Data Cache中的值，而不是从L2 Cache中获取值。因此，当需要读取其他核写入Global Memory中的数据时，应使用volatile关键字，以确保每次读取的值都是从Global Memory中获取，而不是Data Cache。
 
-    **图 4**  内存模型示意图<a name="fig1946111125181"></a>  
+    **图4**  内存模型示意图<a name="fig1946111125181"></a>  
     ![](../../figures/内存模型示意图.png "内存模型示意图")
 
 ## 算子实现<a name="section665410415400"></a>
 
-本例实现将8\*1024 个键值对插入容量为16\*1024的哈希表中，其中key为int64\_t类型数，value为长度4的float类型的Tensor。
+本例实现将8\*1024个键值对插入容量为16\*1024的哈希表中，其中key为int64\_t类型数，value为长度32的float类型的Tensor。
 
 根据上述分析，桶结构体设计如下：
 
@@ -123,8 +123,8 @@ for (uint32_t i = 0; i < capacity; i++) {
         bucket->value = value;
         bucket->flag = HOLD_FLAG;
     } else {
-        while (*reinterpret_cast<volatile int32_t*>(&bucket->state) != 1) {}    // 通过state标记位保证key值的有效性
-        if (key == *reinterpret_cast<volatile int64_t*>(bucket->key)) {         // 桶中存储的key与要插入的key相同
+        while (*reinterpret_cast<volatile uint32_t*>(&bucket->state) != 1) {}   // 通过state标记位保证key值的有效性
+        if (key == *reinterpret_cast<volatile int64_t*>(&bucket->key)) {        // 桶中存储的key与要插入的key相同
             old_flag = asc_atomic_cas(&bucket->flag, HOLD_FLAG, WRITE_FLAG);    // 获取已有数据的bucket的写权限
             if (old_flag == HOLD_FLAG) {                                        // 成功获取写权限
                 bucket->value = value;                                          // 更新value
@@ -141,17 +141,17 @@ for (uint32_t i = 0; i < capacity; i++) {
 
 线程0和线程256分别计算key\[0\]和key\[8\]的初始位置时出现哈希冲突，初始位置索引都是3。
 
-**图 5**  多线程哈希冲突阶段1<a name="fig13897171319340"></a>  
+**图5**  多线程哈希冲突阶段1<a name="fig13897171319340"></a>  
 ![](../../figures/多线程哈希冲突阶段1.png "多线程哈希冲突阶段1")
 
-线程0和线程256通过asc\_atomic\_cas接口抢占bucket\[3\]的写权限，其中线程0成功获取写权限，将数据写入bucket\[3\]位置，线程8向后线性探测可用的bucket。
+线程0和线程256通过asc\_atomic\_cas接口抢占bucket\[3\]的写权限，其中线程0成功获取写权限，将数据写入bucket\[3\]位置，线程256向后线性探测可用的bucket。
 
-**图 6**  多线程哈希冲突阶段2<a name="fig850521281820"></a>  
+**图6**  多线程哈希冲突阶段2<a name="fig850521281820"></a>  
 ![](../../figures/多线程哈希冲突阶段2.png "多线程哈希冲突阶段2")
 
 线程256查询bucket\[4\]中已有数据，继续向后寻找，最终发现bucket\[5\]可用，获取写入权限后将数据写入。
 
-**图 7**  多线程哈希冲突阶段3<a name="fig36541916161910"></a>  
+**图7**  多线程哈希冲突阶段3<a name="fig36541916161910"></a>  
 ![](../../figures/多线程哈希冲突阶段3.png "多线程哈希冲突阶段3")
 
 ## 总结<a name="section8281219125011"></a>

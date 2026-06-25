@@ -1,4 +1,4 @@
-# SoftMax Tiling使用说明<a name="ZH-CN_TOPIC_0000001624778677"></a>
+# SoftMax Tiling使用说明
 
 Ascend C提供一组SoftMax Tiling API，方便用户获取SoftMax kernel计算时所需的Tiling参数。
 
@@ -40,7 +40,7 @@ Ascend C提供一组SoftMax Tiling API，方便用户获取SoftMax kernel计算�
 
 判断SoftMaxTiling是否为基本块Tiling请参考[IsBasicBlockInSoftMax](IsBasicBlockInSoftMax.md)。
 
-## 调用示例<a name="section94691236101419"></a>
+## 调用示例
 
 如下样例介绍了使用SoftMax高阶API时host侧获取Tiling参数的流程以及该参数如何在kernel侧使用。样例中输入Tensor的shape大小为\[320,64\]，输入的数据类型为half。
 
@@ -69,13 +69,13 @@ Ascend C提供一组SoftMax Tiling API，方便用户获取SoftMax kernel计算�
         tiling.set_totalLength(totalLength);
         tiling.set_tileNum(TILE_NUM);
         // 设置其他Tiling参数
-        ... 
+        ...
         std::vector<int64_t> shapeVec = {320,64};
         ge::Shape srcShape(shapeVec);
         // 本样例中仅作为样例说明，通过GetSoftMaxMinTmpSize获取最小值并传入，来保证功能正确，开发者可以根据需要传入合适的空间大小
         const uint32_t localWorkSpaceSize = AscendC::GetSoftMaxMinTmpSize(srcShape, sizeof(half), false);
         // 获取SoftMax Tiling参数
-        AscendC::SoftMaxTilingFunc(srcShape, sizeof(half), localWorkSpaceSize, tiling.softmaxTilingData); 
+        AscendC::SoftMaxTilingFunc(srcShape, sizeof(half), localWorkSpaceSize, tiling.softmaxTilingData);
          ... // 其他逻辑
         tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
         context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
@@ -98,4 +98,3 @@ Ascend C提供一组SoftMax Tiling API，方便用户获取SoftMax kernel计算�
         }
     }
     ```
-

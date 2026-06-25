@@ -20,7 +20,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_CREATEVECINDEX_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_VEC_CREATEVECINDEX_INTERFACE_H
 
-#include "kernel_macros.h"
+#include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -43,7 +43,9 @@ __aicore__ inline __in_pipe__(S) __out_pipe__(V) void CreateVecIndex(LocalTensor
     uint32_t count);
 } // namespace AscendC
 
+#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_vec_createvecindex_intf_impl.h"
+#endif
 #endif // ASCENDC_MODULE_OPERATOR_VEC_CREATEVECINDEX_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_CREATEVECINDEX_INTF_H__)

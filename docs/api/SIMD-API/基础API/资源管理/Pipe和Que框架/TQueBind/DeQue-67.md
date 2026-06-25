@@ -69,7 +69,7 @@
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table1550165916920"></a>
 <table><thead align="left"><tr id="row115015591391"><th class="cellrowborder" valign="top" width="12.139999999999999%" id="mcps1.2.3.1.1"><p id="p12501159099"><a name="p12501159099"></a><a name="p12501159099"></a>参数名</p>
@@ -86,7 +86,7 @@
 </tbody>
 </table>
 
-**表 2**  参数说明
+**表2**  参数说明
 
 <a name="table181221135162517"></a>
 <table><thead align="left"><tr id="row151221135112520"><th class="cellrowborder" valign="top" width="12.471247124712471%" id="mcps1.2.4.1.1"><p id="p1353754532512"><a name="p1353754532512"></a><a name="p1353754532512"></a>参数名称</p>
@@ -114,7 +114,7 @@
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-non-inplace接口的返回值为从队列中取出的[LocalTensor](../../../../基础数据结构/LocalTensor/LocalTensor.md)；inplace接口没有返回值。
+non-inplace接口的返回值为从队列中取出的[LocalTensor](../../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)；inplace接口没有返回值。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
@@ -145,4 +145,3 @@ non-inplace接口的返回值为从队列中取出的[LocalTensor](../../../../�
     que.DeQue<half>(tensor1); // 将Tensor从VECOUT的Queue中搬出
     que.FreeTensor<half>(tensor1);
     ```
-

@@ -30,6 +30,8 @@ inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
 #include "impl/utils/debug/npu_arch_2201/asc_debug_utils_impl.h"
 #elif __NPU_ARCH__ == 3510
 #include "impl/utils/debug/npu_arch_3510/asc_debug_utils_impl.h"
+#elif __NPU_ARCH__ == 5102
+#include "impl/utils/debug/npu_arch_5102/asc_debug_utils_impl.h"
 #else
 #include "impl/utils/debug/asc_debug_utils_impl_stub.h"
 #endif
@@ -51,8 +53,13 @@ __aicore__ inline void enable_asc_diagnostics()
 __aicore__ inline void enable_asc_assert()
 {
 #if (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0)) || defined(ASCENDC_TIME_STAMP_ON)
+#if (__NPU_ARCH__ == 5102)
+    static const struct AscTlv __asc_assert_meta_section__ __attribute__ ((used, section (".ascend.meta"))) =
+    {4, 4, 1};
+#else
     static const struct AscTlv __asc_assert_meta_section__ __attribute__ ((used, section (".ascend.meta"))) =
     {4, 4, 5};
+#endif
 #endif // defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
 }
 
@@ -187,21 +194,6 @@ __aicore__ inline void update_write_info(__gm__ DebugBlockWriteInfo* writeInfo, 
     asc_entire_dcci((__gm__ uint64_t*)writeInfo);
 }
 
-__aicore__ inline bool ringbuf_read_wait(__gm__ DebugBlockReadInfo* readInfo)
-{
-    constexpr uint32_t maxCounter = 15;
-    uint32_t counter = 0;
-    while (readInfo->bufOffset == 0) {
-        if (counter >= maxCounter) { // max wait 15 * 300ms, rts read gm per 200ms
-            return false;
-        }
-        ringbuf_wait_rts_sync(); // wait 20 * 15 ms
-        ++counter;
-        asc_entire_dcci((__gm__ uint64_t*)readInfo);
-    }
-    return true;
-}
-
 __aicore__ inline void ringbuf_skip_directly(__gm__ DebugBlockWriteInfo* writeInfo)
 {
     writeInfo->bufOffset = 0;
@@ -221,12 +213,21 @@ __aicore__ inline void ringbuf_skip_with_info(
     return;
 }
 
-__aicore__ inline bool ringbuf_overflow_wait(__gm__ DebugBlockReadInfo* readInfo, __gm__ DebugBlockWriteInfo* writeInfo,
-                                             const uint32_t& tlvLen)
+__aicore__ inline void do_overlow_skip(__gm__ DebugBlockWriteInfo* writeInfo, __gm__ uint8_t* ringBufAddr,
+    const uint32_t& ringBufLen, const uint32_t& minTlvLen)
+{
+    if (writeInfo->bufOffset + minTlvLen >= ringBufLen) {
+        ringbuf_skip_directly(writeInfo);
+    }
+    ringbuf_skip_with_info(writeInfo, ringBufAddr, ringBufLen);
+}
+
+__aicore__ inline bool ringbuf_overflow_wait(__gm__ DebugBlockReadInfo* readInfo, __gm__ DebugBlockWriteInfo* writeInfo)
 {
     constexpr uint32_t maxCounter = 15;
     uint32_t counter = 0;
-    while (writeInfo->bufOffset < readInfo->bufOffset && writeInfo->bufOffset + tlvLen >= readInfo->bufOffset) {
+    // notice all state which need to wait in function check_ringbuf_space has (w != r) before wait
+    while (writeInfo->bufOffset != readInfo->bufOffset) {
         if (counter >= maxCounter) { // max wait 15 * 300ms, rts read gm per 200ms
             return false;
         }
@@ -249,22 +250,28 @@ __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo,
 
     if (minTlvLen >= ringBufLen || tlvLen > ringBufLen) {
         return false;
-    } else if (writeInfo->bufOffset + minTlvLen >= ringBufLen) {
-        if (!ringbuf_read_wait(readInfo)) { // check read is begin
+    }
+
+    // 1. Check if wrap-around is needed
+    if (writeInfo->bufOffset + tlvLen > ringBufLen) {
+        // Wrap-around risks overwriting unread data. Wait if RTS is behind or at buffer start.
+        if (readInfo->bufOffset > writeInfo->bufOffset || readInfo->bufOffset == 0) {
+            // Wait ensures RTS consumes pending data since w != r.
+            if (!ringbuf_overflow_wait(readInfo, writeInfo)) {
+                return false;
+            }
+        }
+        // Safe to wrap(set writeInfo->bufOffset=0) after RTS sync.
+        do_overlow_skip(writeInfo, ringBufAddr, ringBufLen, minTlvLen);
+    }
+    // 2. No wrap-around needed, check for overwrite in current position
+    if (writeInfo->bufOffset + tlvLen >= readInfo->bufOffset && readInfo->bufOffset > writeInfo->bufOffset) {
+        // Write would overwrite unread region or stall RTS. Wait for RTS to advance.
+        if (!ringbuf_overflow_wait(readInfo, writeInfo)) {
             return false;
         }
-        ringbuf_skip_directly(writeInfo);
-    } else if (writeInfo->bufOffset + tlvLen > ringBufLen) {
-        if (!ringbuf_read_wait(readInfo)) { // check read is begin
-            return false;
-        }
-        ringbuf_skip_with_info(writeInfo, ringBufAddr, ringBufLen);
     }
-    if (writeInfo->packIdx > 0 &&
-        writeInfo->bufOffset < readInfo->bufOffset &&
-        writeInfo->bufOffset + tlvLen >= readInfo->bufOffset) {
-        return ringbuf_overflow_wait(readInfo, writeInfo, tlvLen);
-    }
+    
     return true;
 }
 
@@ -303,10 +310,14 @@ __aicore__ inline void asc_debug_get_cann_vserion(__gm__ char*& versionStr, uint
 
 __aicore__ static __attribute__((noinline)) void AscVFDebugInitUb()
 {
-#if !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 && !defined(__ASC_DISABLE_RESERVED_UBUF__) && defined(ASCENDC_SIMD_VF_DEBUG)
     if (g_sysPrintFifoSpace != nullptr) {
         constexpr uint32_t RESERVED_UB_SIZE = 8 * 1024;
         uint64_t ascReservedAddr = get_shmem_sz() - RESERVED_UB_SIZE;
+#if defined(__ASC_DISABLE_VF_STACK_RESERVED_UBUF__)
+        constexpr uint32_t RESERVED_ASC_UB_SIZE = 2 * 1024;
+        ascReservedAddr = get_shmem_sz() - RESERVED_ASC_UB_SIZE;
+#endif
         uint16_t blockIdx = asc_debug_get_block_idx();
         get_printf_ubuf_addr_aicore(ascReservedAddr, blockIdx);
     }
@@ -315,7 +326,7 @@ __aicore__ static __attribute__((noinline)) void AscVFDebugInitUb()
 
 __aicore__ static __attribute__((noinline)) void AscVFDebugTransferUb()
 {
-#if !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 && !defined(__ASC_DISABLE_RESERVED_UBUF__) && defined(ASCENDC_SIMD_VF_DEBUG)
     if (g_sysPrintFifoSpace != nullptr) {
         pipe_barrier(PIPE_ALL);
         asc_vf_debug_ub2gm();

@@ -12,17 +12,14 @@
 >    - ELF文件权限错误
 >    - ELF文件存在但不支持解析或解压
 
-## 产品支持情况<a name="section15615918103719"></a>
+## 产品支持情况
 
-<a name="table38301303189"></a>
-| 产品 | 是否支持 |
-| ---- | ---- |
-| Ascend 950PR/Ascend 950DT | √ |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ |
-| Atlas 200I/500 A2 推理产品 | √ |
-| Atlas 推理系列产品 | √ |
-| Atlas 训练系列产品 | √ |
+- Ascend 950PR/Ascend 950DT：支持
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas 200I/500 A2 推理产品：支持
+- Atlas 推理系列产品：支持
+- Atlas 训练系列产品：支持
 
 ## 工具安装<a name="section2423188195113"></a>
 
@@ -59,7 +56,7 @@
     msobjdump --dump-elf <elf_file> [--verbose]
     ```
 
-    **表 1**  参数说明<a name="table167911947163519"></a>
+    **表1**  参数说明<a name="table167911947163519"></a>
 
     | 参数（区分大小写） | 可选/必选 | 说明 |
     | ---- | ---- | ---- |
@@ -72,7 +69,7 @@
     msobjdump --extract-elf <elf_file> [--out-dir <out_path>]
     ```
 
-    **表 2**  参数说明<a name="table131531242133819"></a>
+    **表2**  参数说明<a name="table131531242133819"></a>
 
     | 参数（区分大小写） | 可选/必选 | 说明 |
     | ---- | ---- | ---- |
@@ -85,14 +82,14 @@
     msobjdump --list-elf <elf_file>
     ```
 
-    **表 3**  参数说明
+    **表3**  参数说明
 
     <a name="table121952819427"></a>
     | 参数（区分大小写） | 可选/必选 | 说明 |
     | ---- | ---- | ---- |
     | `--list-elf <elf_file>`，`-l` | 必选 | 获取ELF文件中包含的device信息文件列表，并打印显示。<br>`<elf_file>`表示待打印的ELF文件路径，如`/home/op_api/lib_api.so`。 |
 
-**表 4**  ELF解析字段说明（标准/简易自定义算子工程及融合编译工程）<a name="table94384560259"></a>
+**表4**  ELF解析字段说明（标准/简易自定义算子工程及融合编译工程）<a name="table94384560259"></a>
 
 | 字段名 | 含义 | 是否必选 | 打印说明 |
 | ---- | ---- | ---- | ---- |
@@ -101,7 +98,7 @@
 | `DEBUG` | 调试相关信息，包含如下两部分内容：<br>`debugBufSize`：调试信息需要的内存空间。<br>`debugOptions`：调试开关状态。取值如下：<br>`0`：调试开关关闭。<br>`1`：通过DumpTensor、printf打印进行调试。<br>`2`：通过assert断言进行调试。<br>`4`：通过时间戳打点功能进行调试。<br>`8`：通过内存越界检测进行调试。 | 否 | 不设置`--verbose`，默认打印。 |
 | `DYNAMIC_PARAM` | 算子kernel函数是否启用动态参数。取值分别为：<br>`0`：关闭动态参数模式。<br>`1`：开启动态参数模式。 | 否 | 不设置`--verbose`，默认打印。 |
 | `OPTIONAL_PARAM` | 可选参数信息，包含如下两部分内容：<br>`optionalInputMode`：可选输入在算子kernel函数中是否需要占位。<br>`0`：可选输入不占位。<br>`1`：可选输入占位。<br>`optionalOutputMode`：可选输出在算子kernel函数中是否需要占位。<br>`0`：可选输出不占位。<br>`1`：可选输出占位。 | 否 | 不设置`--verbose`，默认打印。 |
-| `RUNTIME_IMPLICIT_INFO` | 表示运行时隐式资源信息。取值如下：<br>`1`：`SIMD_TRACE_SPACE`，表示SIMD维测空间。<br>`2`：`FFTS_ADDR`，表示FFTS地址。<br>`3`：`DOUBLE_PAGE_TABLE_ADDR`，表示双页表地址。<br>`4`：`SIMT_TRACE_SPACE`，表示SIMT维测空间。<br>`5`：`ASSERT_TRACE_SPACE`，表示assert维测空间。<br>`6`：`DEBUG_BUS_TRACE_SPACE`，表示debug bus维测空间。 | 否 | 不设置`--verbose`，默认打印。 |
+| `RUNTIME_IMPLICIT_INFO` | 表示运行时隐式信息标志。取值如下：<br>`1`：`SIMD Printf Flag`，表示SIMD侧Printf标志。<br>`2`：`Hardware Sync Flag`，表示硬同步标志。<br>`3`：`L2Cache Hint Flag`，表示L2 Cache命中标志。<br>`4`：`SIMT Printf Flag`，表示SIMT侧Printf标志。<br>`5`：`SIMD Assert Flag`，表示SIMD侧Assert标志。<br>其他取值打印原始数值。 | 否 | 不设置`--verbose`，默认打印。 |
 | `KERNEL_TYPE` | 表示kernel函数运行时core类型，取值参见<a href="#table187419221164">表5</a>。 | 否 | 不设置`--verbose`，默认打印。 |
 | `CROSS_CORE_SYNC` | 表示硬同步syncall类型。<br>`USE_SYNC`：使用硬同步。<br>`NO_USE_SYNC`：不使用硬同步。 | 否 | 不设置`--verbose`，默认打印。 |
 | `MIX_TASK_RATION` | 表示kernel函数运行时的Cube核/Vector核占比分配类型。 | 否 | 不设置`--verbose`，默认打印。 |
@@ -110,7 +107,7 @@
 | `FUNCTION_ENTRY` | 算子TilingKey的值。 | 否 | 不设置`--verbose`，默认打印。 |
 | `elf header infos` | 包括ELF Header、Section Headers、Key to Flags、Program Headers、Symbol表等信息。 | 否 | 设置`--verbose`，开启全量打印。 |
 
-**表 5**  kernel type信息
+**表5**  kernel type信息
 
 <a name="table187419221164"></a>
 | KERNEL_TYPE | 说明 |
@@ -124,7 +121,7 @@
 | `AIV_ROLLBACK` | 算子执行时会同时启动AI Core和Vector Core，此时AI Core会当成Vector Core使用。 |
 
 
-**表 6**  ELF解析字段说明（Kernel直调工程）
+**表6**  ELF解析字段说明（Kernel直调工程）
 
 <a name="table217334916136"></a>
 | 字段名 | 含义 | 是否必选 | 打印说明 |
@@ -158,12 +155,12 @@
         RUNTIME_IMPLICIT_INFO: L2Cache Hint Flag
         RUNTIME_IMPLICIT_INFO: Hardware Sync Flag
         VERSION: 1
-        RUNTIME_IMPLICIT_INFO: SIMT Printf Flag
-        .ascend.meta. [0]: matmul_leakyrelu_custom_mix_aic
+        RUNTIME_IMPLICIT_INFO: SIMD Printf Flag
+        .ascend.meta. [0]: _Z23matmul_leakyrelu_customPhS_S_S_S_N7AscendC6tiling11TCubeTilingE_mix_aic
         KERNEL_TYPE: MIX_AIC_MAIN
         CROSS_CORE_SYNC: USE_SYNC
         MIX_TASK_RATION: [1:2]
-        .ascend.meta. [1]: matmul_leakyrelu_custom_mix_aiv
+        .ascend.meta. [1]: _Z23matmul_leakyrelu_customPhS_S_S_S_N7AscendC6tiling11TCubeTilingE_mix_aiv
         KERNEL_TYPE: MIX_AIC_MAIN
         CROSS_CORE_SYNC: USE_SYNC
         MIX_TASK_RATION: [1:2]

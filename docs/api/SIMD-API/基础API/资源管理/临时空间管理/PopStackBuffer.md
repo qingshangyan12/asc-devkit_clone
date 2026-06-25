@@ -70,7 +70,7 @@ __aicore__ inline bool PopStackBuffer(LocalTensor<T>& popLocal)
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="zh-cn_topic_0235751031_table33761356"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0235751031_row27598891"><th class="cellrowborder" valign="top" width="20.61%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0235751031_p20917673"><a name="zh-cn_topic_0235751031_p20917673"></a><a name="zh-cn_topic_0235751031_p20917673"></a>参数名</p>
@@ -86,13 +86,13 @@ __aicore__ inline bool PopStackBuffer(LocalTensor<T>& popLocal)
 </tr>
 <tr id="row860118831216"><td class="cellrowborder" valign="top" width="20.61%" headers="mcps1.2.3.1.1 "><p id="p1860214819121"><a name="p1860214819121"></a><a name="p1860214819121"></a>pos</p>
 </td>
-<td class="cellrowborder" valign="top" width="79.39%" headers="mcps1.2.3.1.2 "><p id="p20602138111212"><a name="p20602138111212"></a><a name="p20602138111212"></a>需要申请临时空间的position，数据类型为<a href="../../../其他数据类型/TPosition.md">TPosition</a>。</p>
+<td class="cellrowborder" valign="top" width="79.39%" headers="mcps1.2.3.1.2 "><p id="p20602138111212"><a name="p20602138111212"></a><a name="p20602138111212"></a>需要申请临时空间的position，数据类型为<a href="../../数据结构/辅助数据结构//TPosition.md">TPosition</a>。</p>
 </td>
 </tr>
 </tbody>
 </table>
 
-**表 2**  参数说明
+**表2**  参数说明
 
 <a name="table628324453115"></a>
 <table><thead align="left"><tr id="row7283174414314"><th class="cellrowborder" valign="top" width="18.54%" id="mcps1.2.4.1.1"><p id="p32831448310"><a name="p32831448310"></a><a name="p32831448310"></a>参数名</p>
@@ -128,4 +128,3 @@ __aicore__ inline bool PopStackBuffer(LocalTensor<T>& popLocal)
 AscendC::LocalTensor<int16_t> popBuffer;
 bool ret = AscendC::PopStackBuffer<int16_t, AscendC::TPosition::VECCALC>(popBuffer);
 ```
-

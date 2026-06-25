@@ -7,10 +7,10 @@
 >[!NOTE]说明 
 >本性能优化手段仅针对Atlas A2 训练系列产品/Atlas A2 推理系列产品生效。
 
-**图 1**  反例数据流图<a name="fig1775910202351"></a>  
+**图1**  反例数据流图<a name="fig1775910202351"></a>  
 ![](../../../figures/反例数据流图-78.png "反例数据流图-78")
 
-**图 2**  正例数据流图<a name="fig14909105811118"></a>  
+**图2**  正例数据流图<a name="fig14909105811118"></a>  
 ![](../../../figures/正例数据流图-79.png "正例数据流图-79")
 
 【反例】
@@ -122,7 +122,7 @@ private:
     __aicore__ inline void CopyOut()
     {
         LocalTensor<float> c1Local = outQueueCO1.DeQue<float>();
-        GM_ADDR usrWorkspace = AscendC::GetUserWorkspace(workspace);
+        __gm__ uint8_t* usrWorkspace = AscendC::GetUserWorkspace(workspace);
         xGm.SetGlobalBuffer((__gm__ float *)(usrWorkspace));
         FixpipeParamsV220 fixpipeParams;
         fixpipeParams.nSize = n;
@@ -322,4 +322,3 @@ private:
     uint16_t aSize, bSize, cSize, QuantSize;
     ...
 ```
-

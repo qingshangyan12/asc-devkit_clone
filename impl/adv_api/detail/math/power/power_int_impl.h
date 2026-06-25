@@ -21,7 +21,7 @@
 #endif
 #ifndef IMPL_MATH_POWER_POWER_INT_IMPL_H
 #define IMPL_MATH_POWER_POWER_INT_IMPL_H
-#include "kernel_basic_intf.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 #include "power_v220_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
@@ -42,6 +42,8 @@ __aicore__ inline void InitFinePowerI(
     CompareZeroPositive(param.mask, param.recordExpNode, unaryParam, repeat);
 }
 
+__ASC_USE_RESERVED_UBUF__(2201,
+    "Power is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void FineProcessPowerI(
     const LocalTensor<int32_t>& dst, const LocalTensor<int32_t>& src0, AscPowerIParams& param,
     const UnaryRepeatParams& unaryParam, const BinaryRepeatParams& binaryParam, const uint8_t& repeat,
@@ -74,6 +76,8 @@ __aicore__ inline void FineProcessPowerI(
     }
 }
 
+__ASC_USE_RESERVED_UBUF__(2201,
+    "Power is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void BulkProcessPowerI(
     const LocalTensor<int32_t>& dst, AscPowerIParams& param, const UnaryRepeatParams& unaryParam,
     const BinaryRepeatParams& binaryParam, const uint8_t& repeat, const uint32_t calCount)
@@ -107,6 +111,8 @@ __aicore__ inline void BulkProcessPowerI(
     }
 }
 
+__ASC_USE_RESERVED_UBUF__(2201,
+    "Power is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void InitBulkPowerI(
     AscPowerIParams& param, const LocalTensor<int32_t>& src0, const LocalTensor<int32_t>& src1,
     const LocalTensor<int32_t>& dst, const UnaryRepeatParams& unaryParam, const BinaryRepeatParams& binaryParam,
@@ -146,6 +152,8 @@ __aicore__ inline void InitBulkPowerI(
     CompareZeroPositive(param.mask, param.expUBIterate, unaryParam, repeat);
 }
 
+__ASC_USE_RESERVED_UBUF__(2201,
+    "Power is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void HandleNegativeExpPowerI(
     const LocalTensor<int32_t>& dst, const LocalTensor<int32_t>& src0, AscPowerIParams& param,
     const UnaryRepeatParams& unaryParam, const BinaryRepeatParams& binaryParam, const uint8_t& repeat,
@@ -173,6 +181,8 @@ __aicore__ inline void HandleNegativeExpPowerI(
         binaryParam, calCount);
 }
 
+__ASC_USE_RESERVED_UBUF__(2201,
+    "Power is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void CommonPowerI(
     const LocalTensor<int32_t>& dstTensor, const LocalTensor<int32_t>& srcTensor0,
     const LocalTensor<int32_t>& srcTensor1, AscPowerIParams& param, const uint32_t calCount)

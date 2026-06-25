@@ -1,8 +1,147 @@
+/**
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
 import { defineConfig } from 'vitepress'
-import { existsSync, readFileSync } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { existsSync, readFileSync, copyFileSync, cpSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { load as cheerioLoad } from 'cheerio'
-import sidebars from './sidebar.mjs'
+import { pagefindPlugin } from 'vitepress-plugin-pagefind'
+
+const docsRoot = resolve(import.meta.dirname, '..')
+
+function removeSelfRefItems(items) {
+  return items.map(item => {
+    const entry = { ...item }
+    if (entry.items && entry.items.length > 0) {
+      const children = removeSelfRefItems(entry.items)
+      if (children.length > 0 && children[0].text === entry.text && children[0].link) {
+        entry.items = children.slice(1)
+      } else {
+        entry.items = children
+      }
+    }
+    return entry
+  })
+}
+
+function addNumbering(items, prefix = '') {
+  return items.map((item, i) => {
+    const num = prefix ? `${prefix}${i + 1}.` : `${i + 1}.`
+    return {
+      ...item,
+      text: `${num} ${item.text}`,
+      ...(item.items ? { items: addNumbering(item.items, num) } : {}),
+    }
+  })
+}
+
+function parseMdSidebar(filePath, urlPrefix) {
+  const content = readFileSync(filePath, 'utf-8')
+  const lines = content.split('\n')
+  const rawEntries = []
+
+  for (const line of lines) {
+    const m = line.match(/^(\s*)-\s+\[(.+?)\]\((.+)\)/)
+    if (!m) continue
+    const indent = m[1].length
+    const text = m[2].replace(/\\([\\`*_{}[\]()#+\-.!|~&<>])/g, '$1')
+    let link = m[3].replace(/^\.\//, '')
+    link = link.replace(/\.md$/, '')
+    rawEntries.push({ indent, text, link })
+  }
+
+  if (rawEntries.length === 0) return []
+
+  const indentValues = [...new Set(rawEntries.filter(e => e.indent > 0).map(e => e.indent))].sort((a, b) => a - b)
+  const indentUnit = indentValues[0] || 4
+
+  const root = { items: [] }
+  const stack = [{ depth: -indentUnit, node: root }]
+
+  for (const entry of rawEntries) {
+    const depth = entry.indent
+    const current = { text: entry.text, link: urlPrefix + entry.link }
+
+    while (stack.length > 1 && stack[stack.length - 1].depth >= depth) {
+      stack.pop()
+    }
+
+    const parent = stack[stack.length - 1].node
+    if (!parent.items) parent.items = []
+    parent.items.push(current)
+
+    stack.push({ depth, node: current })
+  }
+
+  function addCollapsed(items) {
+    return items.map(item => {
+      if (item.items && item.items.length > 0) {
+        const { link, ...rest } = item
+        return { ...rest, collapsed: true, items: addCollapsed(item.items) }
+      }
+      return item
+    })
+  }
+
+  return addCollapsed(root.items)
+}
+
+function filterEmptyPages(items, docsRoot) {
+  return items.reduce((acc, item) => {
+    const entry = { ...item }
+    if (item.items) {
+      entry.items = filterEmptyPages(item.items, docsRoot)
+    }
+    if (item.items && entry.items.length > 0) {
+      acc.push(entry)
+      return acc
+    }
+    if (item.link) {
+      const relPath = item.link.startsWith('/') ? item.link.slice(1) : item.link
+      const headerPath = resolve(docsRoot, relPath + '.md.header')
+      if (!existsSync(headerPath)) {
+        acc.push(entry)
+        return acc
+      }
+      try {
+        const headers = JSON.parse(readFileSync(headerPath, 'utf-8'))
+        if (headers.length === 0) return acc
+      } catch {
+        return acc
+      }
+    }
+    acc.push(entry)
+    return acc
+  }, [])
+}
+
+const repoRoot = resolve(import.meta.dirname, '../../../..')
+
+const sidebarConfigs = [
+  { prefix: '/guide/', sourceFileName: 'index.md' },
+  { prefix: '/api/', sourceFileName: 'README.md' },
+]
+
+const filteredSidebars = {}
+
+for (const { prefix, sourceFileName } of sidebarConfigs) {
+  const sourceDir = prefix === '/api/' ? 'api' : 'guide'
+  const sourcePath = resolve(repoRoot, 'docs', sourceDir, sourceFileName)
+  let items = parseMdSidebar(sourcePath, prefix)
+  items = removeSelfRefItems(items)
+  items = addNumbering(items)
+  if (prefix === '/api/') {
+    items.push({ text: 'README', link: '/api/README' })
+  }
+  filteredSidebars[prefix] = filterEmptyPages(items, docsRoot)
+}
 
 function extractBodyContent(html) {
   const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i)
@@ -10,7 +149,16 @@ function extractBodyContent(html) {
   return html
 }
 
+function escapeCodeAngleBrackets(html) {
+  return html
+    .replace(/`([^`]+)`/g, (_, content) => '`' + content.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '`')
+    .replace(/``([\s\S]*?)``/g, (_, content) => '``' + content.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '``')
+}
+
 function normalizeHtml(html) {
+  html = escapeCodeAngleBrackets(html)
+  html = html.replace(/<!--cann-filter:([\w,]+)-->/g, '<cann-filter npu-type="$1">')
+  html = html.replace(/<!--\/cann-filter-->/g, '</cann-filter>')
   const $ = cheerioLoad(html, {
     xml: {
       xmlMode: false,
@@ -19,7 +167,60 @@ function normalizeHtml(html) {
       withEndIndices: false,
     },
   }, false)
-  return $('body').length ? $('body').html() : $.html()
+  const result = $('body').length ? $('body').html() : $.html()
+  if (result !== null && result !== undefined) {
+    return balanceTags(result)
+  }
+  return ''
+}
+
+function loadRawHtml(htmlPath) {
+  const content = readFileSync(htmlPath, 'utf-8')
+  return '\n<!-- RAW_HTML -->\n' + normalizeHtml(extractBodyContent(content)) + '\n'
+}
+
+function balanceTags(html) {
+  const VOID_TAGS = new Set([
+    'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
+    'link', 'meta', 'param', 'source', 'track', 'wbr'
+  ])
+  const tagRegex = /<\/?([a-zA-Z][a-zA-Z0-9-]*)[^>]*>/g
+  const stack = []
+  const parts = []
+  let lastIdx = 0
+  let match
+  while ((match = tagRegex.exec(html)) !== null) {
+    const full = match[0]
+    const tag = match[1].toLowerCase()
+    const isClose = full.startsWith('</')
+    const isSelfClose = full.endsWith('/>')
+    const pos = match.index
+    if (isClose) {
+      if (stack.length > 0 && stack[stack.length - 1] === tag) {
+        stack.pop()
+      } else if (stack.includes(tag)) {
+        let closeStr = ''
+        while (stack.length > 0 && stack[stack.length - 1] !== tag) {
+          closeStr += '</' + stack.pop() + '>'
+        }
+        stack.pop()
+        parts.push(html.slice(lastIdx, pos))
+        parts.push(closeStr)
+        lastIdx = pos
+      }
+    } else if (!isSelfClose && !VOID_TAGS.has(tag)) {
+      stack.push(tag)
+    }
+  }
+  parts.push(html.slice(lastIdx))
+  if (stack.length > 0) {
+    let closeStr = ''
+    for (let i = stack.length - 1; i >= 0; i--) {
+      closeStr += '</' + stack[i] + '>'
+    }
+    parts.push(closeStr)
+  }
+  return parts.join('')
 }
 
 function htmlAsMdPlugin() {
@@ -47,8 +248,7 @@ function htmlAsMdPlugin() {
       if (id.includes('?rawhtml=1')) {
         const htmlPath = id.split('?')[0]
         this.addWatchFile(htmlPath)
-        const content = readFileSync(htmlPath, 'utf-8')
-        return '\n<!-- RAW_HTML -->\n' + normalizeHtml(extractBodyContent(content)) + '\n'
+        return loadRawHtml(htmlPath)
       }
 
       if (!id.endsWith('.md') || id.includes('?')) return null
@@ -56,8 +256,7 @@ function htmlAsMdPlugin() {
       if (!existsSync(htmlPath)) return null
 
       this.addWatchFile(htmlPath)
-      const content = readFileSync(htmlPath, 'utf-8')
-      return '\n<!-- RAW_HTML -->\n' + normalizeHtml(extractBodyContent(content)) + '\n'
+      return loadRawHtml(htmlPath)
     },
   }
 }
@@ -82,9 +281,41 @@ function placeholderPlugin() {
   }
 }
 
+function replaceCannFilterTags(src, replacer) {
+  const tagRegex = /<(\/?)(cann-filter)((?:\s[^>]*)?)>/gi
+  const stack = []
+  const parts = []
+  let lastIdx = 0
+  let match
+  while ((match = tagRegex.exec(src)) !== null) {
+    const pos = match.index
+    const isClose = match[1] === '/'
+    const attrs = match[3]
+    parts.push(src.slice(lastIdx, pos))
+    lastIdx = pos + match[0].length
+    if (isClose) {
+      if (stack.length > 0) {
+        const opener = stack.pop()
+        parts.push(replacer.end(opener.type, opener.contentStart, lastIdx))
+      }
+    } else {
+      const attrMatch = attrs.match(/npu[_-]type\s*=\s*"([^"]+)"/i)
+      if (attrMatch) {
+        stack.push({ type: attrMatch[1], contentStart: lastIdx })
+        parts.push(replacer.start(attrMatch[1]))
+      }
+    }
+  }
+  const end = src.slice(lastIdx)
+  parts.push(end)
+  return parts.join('')
+}
+
 function fixCannFilterTags(src) {
   if (!/<(cann-filter|term|ph|__gm__|__ubuf__)\b/i.test(src)) return src
+
   return src
+    .replace(/^[ \t]*<\/?cann-filter\b[^>]*>[ \t]*\n/gm, '')
     .replace(/<\/?cann-filter\b[^>]*>/gi, '')
     .replace(/<(term|ph|__gm__|__ubuf__)\b[^>]*>([\s\S]*?)<\/\1>/gis, '$2')
     .replace(/<(term|ph|__gm__|__ubuf__)\b[^>]*>/gi, '')
@@ -216,6 +447,7 @@ function loadHeaderCache(filePath) {
 
 export default defineConfig({
   mpa: false,
+  srcExclude: ['public/api-source/**'],
   title: 'Ascend C',
   description: 'Ascend C 算子开发文档',
   lang: 'zh-CN',
@@ -223,43 +455,147 @@ export default defineConfig({
   lastUpdated: false,
 
   markdown: {
-    html: false,
+    math: true,
     config(md) {
       const originalRender = md.render.bind(md)
-      md.render = function (src, env) {
-        if (src.includes('<!-- RAW_HTML -->')) {
-          const htmlContent = src.replace(/^.*<!-- RAW_HTML -->\s*/s, '').replace(/\s*$/, '')
-          let html = addHeadingAnchors(htmlContent)
-          html = escapeVueInterpolations(html)
-          return `<div v-pre>\n${html}\n</div>`
-        }
-
+      const originalRenderAsync = md.renderAsync ? md.renderAsync.bind(md) : null
+      const processSource = (src) => {
         src = fixCannFilterTags(src)
-
         if (src.startsWith('    >') || src.includes('\n    >')) {
           src = fixIndentedBlockquotes(src)
         }
-
         if (src.includes('<span') && src.includes('|')) {
           src = fixSpanCrossingTableCells(src)
         }
-
         if (src.includes('<table')) {
           src = convertHtmlTablesToMarkdown(src)
         }
-
-        let html = originalRender(src, env)
-
-        if (html.includes('CANNFILTER_DIV_')) {
-          html = html.replace(/<p>\s*CANNFILTER_DIV_(\w+)_OPEN\s*<\/p>/g, '<div data-filter="$1">')
-          html = html.replace(/<p>\s*CANNFILTER_DIV_(\w+)_CLOSE\s*<\/p>/g, '</div>')
-        }
-
+        return src
+      }
+      const processHtml = (html) => {
         if (html.includes('{{')) {
           html = escapeVueInterpolations(html)
         }
+        return html
+      }
+      const renderFn = (src, env) => {
+        if (src.includes('<!-- RAW_HTML -->')) {
+          const htmlContent = src.replace(/^.*<!-- RAW_HTML -->\s*/s, '').replace(/\s*$/, '')
+           let html = addHeadingAnchors(htmlContent)
 
+function balanceDivTags(html) {
+  const parts = []
+  let lastIdx = 0
+  const divRegex = /<div\b[^>]*>|<\/div>/gi
+  const stack = []
+  let m2
+  while ((m2 = divRegex.exec(html)) !== null) {
+    if (m2[0].startsWith('</')) {
+      if (stack.length === 0) {
+        parts.push(html.slice(lastIdx, m2.index))
+        lastIdx = m2.index + m2[0].length
+      } else { stack.pop() }
+    } else { stack.push(true) }
+  }
+  parts.push(html.slice(lastIdx))
+  if (stack.length > 0) parts.push('</div>'.repeat(stack.length))
+  return parts.join('')
+}
+
+          html = replaceCannFilterTags(html, {
+            start(type) { return `<div data-filter="${type}">` },
+            end() { return '</div>' },
+          })
+          html = html.replace(
+            /<tr\b[^>]*>((?:(?!<\/tr>)[\s\S])*?)<\/tr>/gi,
+            (rowMatch) => {
+              const divOpen = rowMatch.match(/<td\b[^>]*>\s*<div\s+data-filter\s*=\s*"([^"]+)">/i)
+              if (!divOpen) return rowMatch
+              const divClose = rowMatch.match(/<\/div>\s*<\/td>/)
+              if (!divClose) return rowMatch
+              const filterVal = divOpen[1]
+              let newRow = rowMatch
+                .replace(/<div\s+data-filter\s*=\s*"[^"]*">\s*/ig, '')
+                .replace(/\s*<\/div>/ig, '')
+              newRow = newRow.replace(
+                /<tr\b([^>]*)>/i,
+                (m, attrs) => {
+                  const existing = m.match(/\sdata-filter\s*=\s*"([^"]*)"/i)
+                  if (existing) {
+                    return m.replace(existing[0], ` data-filter="${existing[1]},${filterVal}"`)
+                  }
+                  return `<tr${attrs} data-filter="${filterVal}">`
+                }
+              )
+              return newRow
+            }
+          )
+          html = html.replace(/<a\s+name\s*=\s*"([^"]+)"\s*><\/a>/gi, '<span id="$1"></span>')
+          html = escapeVueInterpolations(html)
+
+          const renderMathTex = (tex, display) => {
+            const rule = display ? 'math_block' : 'math_inline'
+            if (md.renderer.rules[rule]) {
+              try {
+                return md.renderer.rules[rule]([{ content: tex }], 0)
+              } catch {}
+            }
+            return display ? `$$${tex}$$` : `$${tex}$`
+          }
+
+          const codeBlocks = []
+          html = html.replace(/<(code|pre)\b[^>]*>[\s\S]*?<\/\1>/gi, m => {
+            codeBlocks.push(m); return `\x00CB${codeBlocks.length - 1}\x00`
+          })
+
+          html = html.replace(/\$\$([\s\S]*?)\$\$/g, (match) => {
+            let inside = match.slice(2, -2)
+            inside = inside.replace(/<em>/g, '_').replace(/<\/em>/g, '_')
+            inside = inside.replace(/&(amp|gt|lt);/g, (m, e) => ({ amp: '&', gt: '>', lt: '<' })[e])
+            inside = inside.replace(/\\text\{([^}]*)\}/g, (m, c) => '\\text{' + c.replace(/(?<!\\)_/g, '\\_') + '}')
+            inside = inside.replace(
+              /(<\/[a-z][a-z0-9]*\s*>)\s*(<[a-z][a-z0-9]*\b[^>]*>)/gi,
+              '$$$$\n$1\n$2\n$$$$'
+            )
+            return '$$' + inside.trim() + '$$'
+          })
+          html = html.replace(/\$(?!\{)([^$\n]+?)\$/g, (match) => {
+            let inside = match.slice(1, -1)
+            inside = inside.replace(/<em>/g, '_').replace(/<\/em>/g, '_')
+            inside = inside.replace(/<[^>]+>/g, '')
+            inside = inside.replace(/&(amp|gt|lt);/g, (m, e) => ({ amp: '&', gt: '>', lt: '<' })[e])
+            inside = inside.replace(/\\text\{([^}]*)\}/g, (m, c) => '\\text{' + c.replace(/(?<!\\)_/g, '\\_') + '}')
+            return '$' + inside + '$'
+          })
+
+          html = html.replace(/\$\$([\s\S]*?)\$\$/g, (_, tex) => renderMathTex(tex, true))
+          html = html.replace(/\$(?!\{)([^$\n]+?)\$/g, (_, tex) => renderMathTex(tex, false))
+
+          html = html.replace(/<mjx-assistive-mml[\s\S]*?<\/mjx-assistive-mml>/gi, '')
+
+          html = html.replace(/\x00CB(\d+)\x00/g, (_, i) => codeBlocks[+i])
+
+          html = html.replace(
+            /href="https:\/\/gitcode\.com\/cann\/asc-devkit\/blob\/master\/docs\/(api|guide)\/([^"]+)\.md(#[^"]*)?"/gi,
+            (_, type, path, hash) => `href="/${type}/${path}${hash || ''}"`
+          )
+
+          html = balanceDivTags(html)
+
+          return `<div v-pre>\n${html}\n</div>`
+        }
+        src = processSource(src)
+        let html = originalRender(src, env)
+        html = processHtml(html)
         return `<div v-pre>${html}</div>`
+      }
+      md.render = function (src, env) {
+        return renderFn(src, env)
+      }
+      if (originalRenderAsync) {
+        md.renderAsync = async function (src, env) {
+          return renderFn(src, env)
+        }
       }
     },
   },
@@ -267,27 +603,76 @@ export default defineConfig({
   transformPageData(pageData) {
     const cache = loadHeaderCache(pageData.filePath)
     if (cache && cache.length > 0) {
-      pageData.headers = cache
+      pageData.outlineHeaders = cache
     }
   },
 
+  buildConcurrency: 1,
+
+  transformHtml(code) {
+    code = code.replace(/href="\/\/pagefind/g, 'href="/pagefind')
+    code = code.replace(/<body\b/, '<body data-pagefind-body')
+    return code.replace(
+      /<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<[^>]+>|[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]+/g,
+      m => m.startsWith('<') ? m : m.replace(/(.)(?=.)/g, '$1\u200A')
+    )
+  },
+
   vite: {
+    sourcemap: false,
+    build: {
+      chunkSizeWarningLimit: 2000,
+      rollupOptions: {
+        external: ['/pagefind/pagefind.js'],
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) return 'vendor'
+          },
+        },
+      },
+    },
     resolve: {
       preserveSymlinks: true,
     },
-    plugins: [htmlAsMdPlugin(), placeholderPlugin()],
-  },
-
-  vue: {
-    template: {
-      compilerOptions: {
-        onError: (error) => {
-          if (error.code === 2) return
-          throw error
+    plugins: [htmlAsMdPlugin(), placeholderPlugin(), pagefindPlugin({
+      btnPlaceholder: '搜索',
+      placeholder: '简易搜索，暂不支持多语言和特殊符号',
+      emptyText: '未找到结果',
+      heading: '共: {{searchResult}} 条结果',
+      forceLanguage: 'en',
+    }), {
+      name: 'copy-figures-to-dist',
+      closeBundle() {
+        const dst = resolve(docsRoot, '.vitepress', 'dist', 'figures')
+        for (const sub of ['figures', 'guide/figures', 'api/figures']) {
+          const src = resolve(docsRoot, sub)
+          if (existsSync(src)) cpSync(src, dst, { recursive: true })
+        }
+      },
+    }, {
+      name: 'vitepress-override-search-vue',
+      enforce: 'post',
+      config: () => ({
+        resolve: {
+          alias: {
+            './VPNavBarSearch.vue': resolve(import.meta.dirname, 'theme', 'Search.vue'),
+          },
+        },
+      }),
+    }],
+    vue: {
+      template: {
+        compilerOptions: {
+          onError: (error) => {
+            if ([2, 21, 46].includes(error.code)) return
+            if (error.message && error.message.includes('missing end tag')) return
+          },
         },
       },
     },
   },
+
+  head: [],
 
   themeConfig: {
     nav: [
@@ -296,57 +681,13 @@ export default defineConfig({
       { text: 'Ascend C API', link: '/api/Ascend-C-API列表' },
     ],
 
-    sidebar: sidebars,
-
     search: {
-      provider: 'local',
-      options: {
-        _render(src, env, md) {
-          if (!src || !src.trim()) {
-            const htmlPath = env.path.replace(/\.md$/, '.html')
-            if (existsSync(htmlPath)) {
-              const raw = readFileSync(htmlPath, 'utf-8')
-              const seen = {}
-              const headingRegex = /<h([23456])([^>]*)>(.*?)<\/h\1>/gi
-              return raw.replace(headingRegex, (_, level, attrs, text) => {
-                const clean = text.replace(/<[^>]+>/g, '').trim()
-                let id = clean.replace(/\s+/g, '-')
-                if (seen[id]) id = `${id}-${seen[id]++}`
-                else seen[id] = 1
-                const inner = `<a class="header-anchor" href="#${id}">\u00b6</a>`
-                const existing = text.match(/<a[^>]*>.*?<\/a>/)
-                if (existing) return `<h${level}${attrs}>${text}${inner}</h${level}>`
-                return `<h${level}${attrs}>${clean}${inner}</h${level}>`
-              })
-            }
-            return ''
-          }
-          const html = md.render(src, env)
-          if (!src.includes('<!-- RAW_HTML -->')) return html
-          const seen = {}
-          const headingRegex = /<h([23456])([^>]*)>(.*?)<\/h\1>/gi
-          return html.replace(headingRegex, (_, level, attrs, text) => {
-            if (text.includes('header-anchor')) return `<h${level}${attrs}>${text}</h${level}>`
-            const clean = text.replace(/<[^>]+>/g, '').trim()
-            let id = clean.replace(/\s+/g, '-')
-            if (seen[id]) id = `${id}-${seen[id]++}`
-            else seen[id] = 1
-            const existing = text.match(/<a[^>]*>.*?<\/a>/)
-            if (existing) return `<h${level}${attrs}>${text}<a class="header-anchor" href="#${id}">\u00b6</a></h${level}>`
-            return `<h${level}${attrs}>${clean}<a class="header-anchor" href="#${id}">\u00b6</a></h${level}>`
-          })
-        },
-        translations: {
-          button: { buttonText: '搜索文档' },
-          modal: { noResultsText: '未找到结果', footer: { selectText: '选择', navigateText: '切换' } },
-        },
-      },
+      provider: 'algolia',
     },
 
-    outline: {
-      level: [2, 3],
-      label: '本页内容',
-    },
+    sidebar: filteredSidebars,
+
+    outline: false,
 
     docFooter: {
       prev: '上一页',

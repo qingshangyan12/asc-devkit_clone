@@ -1,8 +1,8 @@
-# Matmul高阶API使能MDL模板<a name="ZH-CN_TOPIC_0000002374905781"></a>
+# Matmul高阶API开启MDL模板<a name="ZH-CN_TOPIC_0000002374905781"></a>
 
 ## 案例介绍<a name="section5590915836"></a>
 
-本案例呈现了在矩阵乘算子场景中，使用Matmul高阶API进行矩阵乘法计算，使能MDL模板对算子性能的提升效果。在MDL模板中，MTE2流水从Global Memory到A1/B1的数据搬运为一次性大包搬运，即一次MTE2能搬入多个Matmul计算的基本块，提升带宽利用率，使后续的MTE1流水尽可能复用A1/B1内基本块的缓存数据，减少MTE2的搬运次数。MDL模板的详细介绍请参考[MatmulConfig](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/MatmulConfig.md)。
+本案例呈现了在矩阵乘算子场景中，使用Matmul高阶API进行矩阵乘法计算，开启MDL模板对算子性能的提升效果。在MDL模板中，MTE2流水从Global Memory到A1/B1的数据搬运为一次性大包搬运，即一次MTE2能搬入多个Matmul计算的基本块，提升带宽利用率，使后续的MTE1流水尽可能复用A1/B1内基本块的缓存数据，减少MTE2的搬运次数。MDL模板的详细介绍请参考[MatmulConfig](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/MatmulConfig.md)。
 
 -   MDL模板的适用场景
 
@@ -10,11 +10,11 @@
 
 -   MDL模板的约束条件
 
-    MDL模板的TCubeTiling结构体需要满足TCubeTiling约束条件和MDL模板补充约束条件，具体请参考[TCubeTiling结构体](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TCubeTiling结构体.md)。
+    MDL模板的TCubeTiling结构体需要满足TCubeTiling约束条件和MDL模板补充约束条件，具体请参考[TCubeTiling结构体](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md)。
 
 本案例的算子规格如下：
 
-**表 1**  算子规格
+**表1**  算子规格
 
 <a name="table9129161439"></a>
 <table><thead align="left"><tr id="row4121116114317"><th class="cellrowborder" valign="top" width="25%" id="mcps1.2.5.1.1"><p id="p1712111610439"><a name="p1712111610439"></a><a name="p1712111610439"></a>输入</p>
@@ -78,7 +78,7 @@ Tiling参数如下：
 
 下图是默认的Norm模板的Matmul计算流水示意图，MTE2分多次从Global Memory搬运基本块到A1或B1，每次只搬运一个基本块。Norm模板的优势为启动开销小，可以提前启动MTE1流水；Norm模板的劣势为在大Shape场景，MTE2搬运次数多，搬运带宽利用率低，整体性能开销大。
 
-**图 1**  默认Norm模板流水示意图<a name="fig108684561130"></a>  
+**图1**  默认Norm模板流水示意图<a name="fig108684561130"></a>  
 ![](../../../figures/默认Norm模板流水示意图.png "默认Norm模板流水示意图")
 
 实现Norm模板的具体步骤如下：
@@ -98,10 +98,10 @@ Tiling参数如下：
 
 下图是MDL模板的Matmul计算流水示意图，MTE2一次性从Global Memory搬运多个基本块到A1或B1，每次搬运stepM \* stepKa个基本块到A1或搬运stepN \* stepKb个基本块到B1。MDL模板的优势为MTE2一次性搬运多个基本块，带宽利用率高，后续的MTE1流水能尽可能复用A1或B1的缓存数据，MTE2重复搬运次数少。MDL模板的劣势为MTE2头开销时间较长，MTE1流水需要等待MTE2流水完成后才启动，MTE1启动时间晚。
 
-**图 2**  MDL模板流水示意图<a name="fig15563371352"></a>  
+**图2**  MDL模板流水示意图<a name="fig15563371352"></a>  
 ![](../../../figures/MDL模板流水示意图.png "MDL模板流水示意图")
 
-Matmul API使能MDL模板的完整样例请参考[使能UnitFlag功能和MDL模板的Mamtul样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_unitflag)。使能MDL模板的主要步骤如下：
+Matmul API开启MDL模板的完整样例请参考[开启UnitFlag功能和MDL模板的Matmul样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_unitflag)。开启MDL模板的主要步骤如下：
 
 1.  创建Matmul对象，使用默认的MDL模板参数CFG\_MDL。
 
@@ -128,4 +128,4 @@ Matmul API使能MDL模板的完整样例请参考[使能UnitFlag功能和MDL模�
 
 ## 总结<a name="section1593812115413"></a>
 
-大Shape输入、MTE2搬运次数多，且MTE1流水等MTE2流水的同步等待耗时较长的场景下，可以使能MDL模板。通过实现MTE2从Global Memory一次性搬入多个基本块到A1或B1，使后续的MTE1流水能尽量复用A1/B1的缓存数据，减少MTE2的搬运次数，从而提升算子性能。
+大Shape输入、MTE2搬运次数多，且MTE1流水等MTE2流水的同步等待耗时较长的场景下，可以开启MDL模板。通过实现MTE2从Global Memory一次性搬入多个基本块到A1或B1，使后续的MTE1流水能尽量复用A1/B1的缓存数据，减少MTE2的搬运次数，从而提升算子性能。

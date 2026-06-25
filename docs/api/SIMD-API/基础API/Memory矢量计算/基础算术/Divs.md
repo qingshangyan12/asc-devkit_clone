@@ -1,51 +1,30 @@
 # Divs<a name="ZH-CN_TOPIC_0000002132391848"></a>
 
-## 产品支持情况<a name="section1550532418810"></a>
+## 产品支持情况
 
-<a name="table38301303189"></a>
-<table><thead align="left"><tr id="row20831180131817"><th class="cellrowborder" valign="top" width="57.99999999999999%" id="mcps1.1.3.1.1"><p id="p1883113061818"><a name="p1883113061818"></a><a name="p1883113061818"></a><span id="ph20833205312295"><a name="ph20833205312295"></a><a name="ph20833205312295"></a>产品</span></p>
-</th>
-<th class="cellrowborder" align="center" valign="top" width="42%" id="mcps1.1.3.1.2"><p id="p783113012187"><a name="p783113012187"></a><a name="p783113012187"></a>是否支持</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row1272474920205"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p12300735171314"><a name="p12300735171314"></a><a name="p12300735171314"></a><span id="ph730011352138"><a name="ph730011352138"></a><a name="ph730011352138"></a>Ascend 950PR/Ascend 950DT</span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p37256491200"><a name="p37256491200"></a><a name="p37256491200"></a>√</p>
-</td>
-</tr>
-<tr id="row220181016240"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p48327011813"><a name="p48327011813"></a><a name="p48327011813"></a><span id="ph583230201815"><a name="ph583230201815"></a><a name="ph583230201815"></a><term id="zh-cn_topic_0000001312391781_term1253731311225"><a name="zh-cn_topic_0000001312391781_term1253731311225"></a><a name="zh-cn_topic_0000001312391781_term1253731311225"></a>Atlas A3 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term131434243115"><a name="zh-cn_topic_0000001312391781_term131434243115"></a><a name="zh-cn_topic_0000001312391781_term131434243115"></a>Atlas A3 推理系列产品</term></span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p7948163910184"><a name="p7948163910184"></a><a name="p7948163910184"></a>x</p>
-</td>
-</tr>
-<tr id="row173226882415"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p14832120181815"><a name="p14832120181815"></a><a name="p14832120181815"></a><span id="ph1483216010188"><a name="ph1483216010188"></a><a name="ph1483216010188"></a><term id="zh-cn_topic_0000001312391781_term11962195213215"><a name="zh-cn_topic_0000001312391781_term11962195213215"></a><a name="zh-cn_topic_0000001312391781_term11962195213215"></a>Atlas A2 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term184716139811"><a name="zh-cn_topic_0000001312391781_term184716139811"></a><a name="zh-cn_topic_0000001312391781_term184716139811"></a>Atlas A2 推理系列产品</term></span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p19948143911820"><a name="p19948143911820"></a><a name="p19948143911820"></a>x</p>
-</td>
-</tr>
-<tr id="row103361763242"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p1983180181813"><a name="p1983180181813"></a><a name="p1983180181813"></a><span id="ph783112021813"><a name="ph783112021813"></a><a name="ph783112021813"></a><term id="zh-cn_topic_0000001312391781_term354143892110"><a name="zh-cn_topic_0000001312391781_term354143892110"></a><a name="zh-cn_topic_0000001312391781_term354143892110"></a>Atlas 200I/500 A2 推理产品</term></span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p1695483941817"><a name="p1695483941817"></a><a name="p1695483941817"></a>x</p>
-</td>
-</tr>
-<tr id="row18403312418"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p78319051815"><a name="p78319051815"></a><a name="p78319051815"></a><span id="ph163561737112019"><a name="ph163561737112019"></a><a name="ph163561737112019"></a><term id="zh-cn_topic_0000001312391781_term1964153212227"><a name="zh-cn_topic_0000001312391781_term1964153212227"></a><a name="zh-cn_topic_0000001312391781_term1964153212227"></a>Atlas 推理系列产品</term>AI Core</span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p1695443971810"><a name="p1695443971810"></a><a name="p1695443971810"></a>x</p>
-</td>
-</tr>
-<tr id="row242332080"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p10519331187"><a name="p10519331187"></a><a name="p10519331187"></a><span id="ph1335623792013"><a name="ph1335623792013"></a><a name="ph1335623792013"></a><term id="zh-cn_topic_0000001312391781_term1463893615224"><a name="zh-cn_topic_0000001312391781_term1463893615224"></a><a name="zh-cn_topic_0000001312391781_term1463893615224"></a>Atlas 推理系列产品</term>Vector Core</span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p1851933589"><a name="p1851933589"></a><a name="p1851933589"></a>x</p>
-</td>
-</tr>
-<tr id="row17253142120252"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p38313021813"><a name="p38313021813"></a><a name="p38313021813"></a><span id="ph58317041819"><a name="ph58317041819"></a><a name="ph58317041819"></a><term id="zh-cn_topic_0000001312391781_term71949488213"><a name="zh-cn_topic_0000001312391781_term71949488213"></a><a name="zh-cn_topic_0000001312391781_term71949488213"></a>Atlas 训练系列产品</term></span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p395243920186"><a name="p395243920186"></a><a name="p395243920186"></a>x</p>
-</td>
-</tr>
-</tbody>
-</table>
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
+
+
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -79,7 +58,7 @@
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table4835205712588"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0000001429830437_row118356578583"><th class="cellrowborder" valign="top" width="13.91%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0000001429830437_p48354572582"><a name="zh-cn_topic_0000001429830437_p48354572582"></a><a name="zh-cn_topic_0000001429830437_p48354572582"></a>参数名</p>
@@ -130,7 +109,7 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
 </tbody>
 </table>
 
-**表 2**  参数说明
+**表2**  参数说明
 
 <a name="table5422161464"></a>
 <table><thead align="left"><tr id="row34231615465"><th class="cellrowborder" valign="top" width="14.510000000000002%" id="mcps1.2.4.1.1"><p id="p342101613466"><a name="p342101613466"></a><a name="p342101613466"></a><strong id="b1942151674616"><a name="b1942151674616"></a><a name="b1942151674616"></a>参数名称</strong></p>
@@ -146,7 +125,7 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
 <td class="cellrowborder" valign="top" width="9.31%" headers="mcps1.2.4.1.2 "><p id="p194315165469"><a name="p194315165469"></a><a name="p194315165469"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="76.18%" headers="mcps1.2.4.1.3 "><p id="p1143101611469"><a name="p1143101611469"></a><a name="p1143101611469"></a>目的操作数。</p>
-<p id="p64341624613"><a name="p64341624613"></a><a name="p64341624613"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
+<p id="p64341624613"><a name="p64341624613"></a><a name="p64341624613"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p24312165461"><a name="p24312165461"></a><a name="p24312165461"></a><span id="ph5430168461"><a name="ph5430168461"></a><a name="ph5430168461"></a>LocalTensor的起始地址需要32字节对齐。</span></p>
 <p id="p4432165467"><a name="p4432165467"></a><a name="p4432165467"></a><span id="ph1943116154619"><a name="ph1943116154619"></a><a name="ph1943116154619"></a>Ascend 950PR/Ascend 950DT</span>，支持的数据类型为：half、float、int64_t、uint64_t、complex32、complex64。</p>
 </td>
@@ -174,7 +153,7 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
 </td>
 <td class="cellrowborder" valign="top" width="9.31%" headers="mcps1.2.4.1.2 "><p id="p344101654616"><a name="p344101654616"></a><a name="p344101654616"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="76.18%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000001530181537_p0554313181312"><a name="zh-cn_topic_0000001530181537_p0554313181312"></a><a name="zh-cn_topic_0000001530181537_p0554313181312"></a><span id="zh-cn_topic_0000001530181537_ph793119540147"><a name="zh-cn_topic_0000001530181537_ph793119540147"></a><a name="zh-cn_topic_0000001530181537_ph793119540147"></a><span id="zh-cn_topic_0000001530181537_ph199431319161515"><a name="zh-cn_topic_0000001530181537_ph199431319161515"></a><a name="zh-cn_topic_0000001530181537_ph199431319161515"></a><a href="https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/C++类库API/基础API/接口分类说明/高维切分API.md" target="_blank" rel="noopener noreferrer">mask</a></span>用于控制每次迭代内参与计算的元素。</span></p>
+<td class="cellrowborder" valign="top" width="76.18%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000001530181537_p0554313181312"><a name="zh-cn_topic_0000001530181537_p0554313181312"></a><a name="zh-cn_topic_0000001530181537_p0554313181312"></a><span id="zh-cn_topic_0000001530181537_ph793119540147"><a name="zh-cn_topic_0000001530181537_ph793119540147"></a><a name="zh-cn_topic_0000001530181537_ph793119540147"></a><span id="zh-cn_topic_0000001530181537_ph199431319161515"><a name="zh-cn_topic_0000001530181537_ph199431319161515"></a><a name="zh-cn_topic_0000001530181537_ph199431319161515"></a><a href="../SIMD计算说明/高维切分.md" target="_blank" rel="noopener noreferrer">mask</a></span>用于控制每次迭代内参与计算的元素。</span></p>
 <a name="zh-cn_topic_0000001530181537_ul1255411133132"></a><a name="zh-cn_topic_0000001530181537_ul1255411133132"></a><ul id="zh-cn_topic_0000001530181537_ul1255411133132"><li>逐bit模式：可以按位控制哪些元素参与计算，bit位的值为1表示参与计算，0表示不参与。<p id="zh-cn_topic_0000001530181537_p121114581013"><a name="zh-cn_topic_0000001530181537_p121114581013"></a><a name="zh-cn_topic_0000001530181537_p121114581013"></a>mask为数组形式，数组长度和数组元素的取值范围和操作数的数据类型有关。当操作数为16位时，数组长度为2，mask[0]、mask[1]∈[0, 2<sup id="zh-cn_topic_0000001530181537_sup1411059101"><a name="zh-cn_topic_0000001530181537_sup1411059101"></a><a name="zh-cn_topic_0000001530181537_sup1411059101"></a>64</sup>-1]并且不同时为0；当操作数为32位时，数组长度为1，mask[0]∈(0, 2<sup id="zh-cn_topic_0000001530181537_sup1711155161017"><a name="zh-cn_topic_0000001530181537_sup1711155161017"></a><a name="zh-cn_topic_0000001530181537_sup1711155161017"></a>64</sup>-1]；当操作数为64位时，数组长度为1，mask[0]∈(0, 2<sup id="zh-cn_topic_0000001530181537_sup181195111019"><a name="zh-cn_topic_0000001530181537_sup181195111019"></a><a name="zh-cn_topic_0000001530181537_sup181195111019"></a>32</sup>-1]。</p>
 <p id="zh-cn_topic_0000001530181537_p711354105"><a name="zh-cn_topic_0000001530181537_p711354105"></a><a name="zh-cn_topic_0000001530181537_p711354105"></a>例如，mask=[8, 0]，8=0b1000，表示仅第4个元素参与计算。</p>
 </li></ul>
@@ -185,15 +164,15 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
 </td>
 <td class="cellrowborder" valign="top" width="9.31%" headers="mcps1.2.4.1.2 "><p id="p14416164461"><a name="p14416164461"></a><a name="p14416164461"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="76.18%" headers="mcps1.2.4.1.3 "><p id="p10444162462"><a name="p10444162462"></a><a name="p10444162462"></a>重复迭代次数。 矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。</p>
-<p id="p19449164465"><a name="p19449164465"></a><a name="p19449164465"></a>关于该参数的具体描述请参考<span id="zh-cn_topic_0000001530181537_ph43961850144019"><a name="zh-cn_topic_0000001530181537_ph43961850144019"></a><a name="zh-cn_topic_0000001530181537_ph43961850144019"></a><a href="https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/C++类库API/基础API/接口分类说明/高维切分API.md" target="_blank" rel="noopener noreferrer">高维切分API</a></span>。</p>
+<td class="cellrowborder" valign="top" width="76.18%" headers="mcps1.2.4.1.3 "><p id="p10444162462"><a name="p10444162462"></a><a name="p10444162462"></a>重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。</p>
+<p id="p19449164465"><a name="p19449164465"></a><a name="p19449164465"></a>关于该参数的具体描述请参考<span id="zh-cn_topic_0000001530181537_ph43961850144019"><a name="zh-cn_topic_0000001530181537_ph43961850144019"></a><a name="zh-cn_topic_0000001530181537_ph43961850144019"></a><a href="../SIMD计算说明/高维切分.md" target="_blank" rel="noopener noreferrer">高维切分API</a></span>。</p>
 </td>
 </tr>
 <tr id="row13442161464"><td class="cellrowborder" valign="top" width="14.510000000000002%" headers="mcps1.2.4.1.1 "><p id="p104461613461"><a name="p104461613461"></a><a name="p104461613461"></a>repeatParams</p>
 </td>
 <td class="cellrowborder" valign="top" width="9.31%" headers="mcps1.2.4.1.2 "><p id="p6442165469"><a name="p6442165469"></a><a name="p6442165469"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="76.18%" headers="mcps1.2.4.1.3 "><p id="p14414161469"><a name="p14414161469"></a><a name="p14414161469"></a>元素操作控制结构信息，具体请参考<a href="../../../其他数据类型/UnaryRepeatParams.md">UnaryRepeatParams</a>。</p>
+<td class="cellrowborder" valign="top" width="76.18%" headers="mcps1.2.4.1.3 "><p id="p14414161469"><a name="p14414161469"></a><a name="p14414161469"></a>元素操作控制结构信息，具体请参考<a href="../../数据结构/辅助数据结构//UnaryRepeatParams.md">UnaryRepeatParams</a>。</p>
 </td>
 </tr>
 </tbody>
@@ -228,9 +207,9 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
     // src1Local：输入Tensor
     
     uint64_t mask = 128;
-    // repeatTime = 4, 单次迭代处理128个数，计算512个数需要迭代4次
-    // dstBlkStride, srcBlkStride = 1, 每个迭代内src0参与计算的数据地址间隔为1个datablock，表示单次迭代内数据连续读取和写入
-    // dstRepStride, srcRepStride = 8, 相邻迭代间的地址间隔为8个datablock，表示相邻迭代间数据连续读取和写入
+    // repeatTime = 4,单次迭代处理128个数，计算512个数需要迭代4次
+    // dstBlkStride, srcBlkStride = 1,每个迭代内src0参与计算的数据地址间隔为1个datablock，表示单次迭代内数据连续读取和写入
+    // dstRepStride, srcRepStride = 8,相邻迭代间的地址间隔为8个datablock，表示相邻迭代间数据连续读取和写入
     // 标量在后示例
     AscendC::Divs(dstLocal, src0Local, src1Local[0], mask, 4, { 1, 1, 8, 8 });
     
@@ -247,9 +226,9 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
     // src1Local：输入Tensor
     
     uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
-    // repeatTime = 4, 单次迭代处理128个数，计算512个数需要迭代4次
-    // dstBlkStride, srcBlkStride = 1, 每个迭代内src0参与计算的数据地址间隔为1个datablock，表示单次迭代内数据连续读取和写入
-    // dstRepStride, srcRepStride = 8, 相邻迭代间的地址间隔为8个datablock，表示相邻迭代间数据连续读取和写入
+    // repeatTime = 4,单次迭代处理128个数，计算512个数需要迭代4次
+    // dstBlkStride, srcBlkStride = 1,每个迭代内src0参与计算的数据地址间隔为1个datablock，表示单次迭代内数据连续读取和写入
+    // dstRepStride, srcRepStride = 8,相邻迭代间的地址间隔为8个datablock，表示相邻迭代间数据连续读取和写入
     // 标量在后示例
     AscendC::Divs(dstLocal, src0Local, src1Local[0], mask, 4, {1, 1, 8, 8});
     
@@ -282,4 +261,3 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
 输入数据src1Local：[2 2 2 ... 2]
 输出数据dstLocal：[512 512 512 ... 512]
 ```
-

@@ -40,6 +40,11 @@
 #include "hccl_rank_graph_dl.h"
 #include "rt.h"
 #include "dlhcomm_function.h"
+#include "cann_host_bridge.h"
+
+#ifndef MC2_CLIENT_ENABLE_CCU
+#define MC2_CLIENT_ENABLE_CCU 0
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -219,6 +224,12 @@ HcclResult SetOpParamFastLaunchTag(OpParam &param)
 
 bool ShouldGoCcuFastLaunch(HcclComm comm, OpParam &param, CcuFastLaunchCtx **ccuFastLaunchCtx)
 {
+#if !MC2_CLIENT_ENABLE_CCU
+    (void)comm;
+    (void)param;
+    (void)ccuFastLaunchCtx;
+    return false;
+#else
     param.hcclComm = comm;
     
     // 1. 是ccu模式
@@ -246,10 +257,18 @@ bool ShouldGoCcuFastLaunch(HcclComm comm, OpParam &param, CcuFastLaunchCtx **ccu
         return true;
     }
     return false;
+#endif
 }
 
 HcclResult HcclExecOpCcuFastLaunch(HcclComm comm, OpParam &param, const CcuFastLaunchCtx *ccuFastLaunchCtx)
 {
+#if !MC2_CLIENT_ENABLE_CCU
+    (void)comm;
+    (void)param;
+    (void)ccuFastLaunchCtx;
+    HCCL_ERROR("[HcclExecOpCcuFastLaunch] CCU fast launch is not supported by mc2_client.");
+    return HCCL_E_NOT_SUPPORT;
+#else
     std::string algName = ccuFastLaunchCtx->algName;
     HCCL_INFO("[asc][AlgoExecute][HcclExecOpCcuFastLaunch] start, opType[%d], algName[%s], "
         "fastLaunchTag[%s], engine[%d], opExecuteConfig[%d].", param.opType, algName.c_str(), param.fastLaunchTag,
@@ -275,6 +294,7 @@ HcclResult HcclExecOpCcuFastLaunch(HcclComm comm, OpParam &param, const CcuFastL
     HCCL_INFO("[asc][AlgoExecute][HcclExecOpCcuFastLaunch] end, opType[%d], algName[%s].", param.opType,
         algName.c_str());
     return HCCL_SUCCESS;
+#endif
 }
 
 HcclResult HcclExecOp(HcclComm comm, OpParam &param,
@@ -295,11 +315,18 @@ HcclResult HcclExecOp(HcclComm comm, OpParam &param,
         return HCCL_E_INTERNAL;
     }
 
-    std::unique_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(param.opType, algName);
-    CHK_PRT_RET(
-        executor.get() == nullptr, HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
-    HCCL_INFO("[asc][AlgoExecute][HcclExecOp] executor resolved, opType[%d], algName[%s], executor[%p].",
-        param.opType, algName.c_str(), executor.get());
+    bool useCannResCtx = UseCannBridge(param);
+
+    std::unique_ptr<InsCollAlgBase> executor = nullptr;
+    if (useCannResCtx) {
+        executor = GetAlgExecViaCann(param.opType, algName);
+    } else {
+        executor = CollAlgExecRegistryV2::Instance().GetAlgExec(param.opType, algName);
+    }
+    CHK_PRT_RET(executor.get() == nullptr,
+        HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
+    HCCL_INFO("[asc][AlgoExecute][HcclExecOp] executor resolved, opType[%d], algName[%s], executor[%p], "
+        "useCannResCtx[%d].", param.opType, algName.c_str(), executor.get(), useCannResCtx);
 
     // 资源结构体
     std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
@@ -1059,6 +1086,18 @@ HcclResult GetAlgResCcu(HcclComm comm, const OpParam& param, AlgResourceRequest&
                         std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, TopoInfoWithNetLayerDetails* topoInfo,
                         AlgHierarchyInfoForAllLevel& algHierarchyInfo, void **resCtxSequence, uint64_t& ctxSize)
 {
+#if !MC2_CLIENT_ENABLE_CCU
+    (void)comm;
+    (void)param;
+    (void)resRequest;
+    (void)resCtxHost;
+    (void)topoInfo;
+    (void)algHierarchyInfo;
+    (void)resCtxSequence;
+    (void)ctxSize;
+    HCCL_ERROR("[GetAlgResCcu] CCU resource is not supported by mc2_client.");
+    return HCCL_E_NOT_SUPPORT;
+#else
     resCtxHost->topoInfo = *topoInfo;
     resCtxHost->algHierarchyInfo = algHierarchyInfo;
 
@@ -1079,11 +1118,20 @@ HcclResult GetAlgResCcu(HcclComm comm, const OpParam& param, AlgResourceRequest&
     ctxSize = size;
     HCCL_INFO("Execute GetAlgResCCU success.");
     return HCCL_SUCCESS;
+#endif
 }
 
 HcclResult HcclAllocAlgResourceCcu(HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
                                    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
 {
+#if !MC2_CLIENT_ENABLE_CCU
+    (void)comm;
+    (void)param;
+    (void)resRequest;
+    (void)resCtxHost;
+    HCCL_ERROR("[HcclAllocAlgResourceCcu] CCU resource is not supported by mc2_client.");
+    return HCCL_E_NOT_SUPPORT;
+#else
     HCCL_INFO("Start to execute AllocAlgResource.");
     void *cclBufferAddr;
     uint64_t cclBufferSize;
@@ -1098,6 +1146,7 @@ HcclResult HcclAllocAlgResourceCcu(HcclComm comm, const OpParam& param, AlgResou
     CHK_RET(HcclGetChannelForCcu(comm, param, resRequest));
     CHK_RET(HcclGetCcuKernel(comm, resRequest, resCtxHost));
     return HCCL_SUCCESS;
+#endif
 }
 
 HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam &param, AlgResourceRequest &resRequest)
@@ -1123,6 +1172,13 @@ HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam &param, AlgResource
 HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
                           std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
 {
+#if !MC2_CLIENT_ENABLE_CCU
+    (void)comm;
+    (void)resRequest;
+    (void)resCtxHost;
+    HCCL_ERROR("[HcclGetCcuKernel] CCU kernel registration is not supported by mc2_client.");
+    return HCCL_E_NOT_SUPPORT;
+#else
     u32 totalKernelNum = 0;
     for (auto t: resRequest.ccuKernelNum) {
         totalKernelNum += t;
@@ -1157,6 +1213,7 @@ HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
     }
     resCtxHost->ccuKernelNum = resRequest.ccuKernelNum;
     return HCCL_SUCCESS;
+#endif
 }
 
 HcclResult GetAlgResDPU(HcclComm comm, const OpParam &param, AlgResourceRequest &resRequest,
@@ -1371,16 +1428,13 @@ HcclResult SetOpParamAlgTag(OpParam &param, const std::string &algName)
 
 HcclResult HcclGetOpExpansionMode(HcclComm comm, OpParam &param)
 {
-    HcclOpExpansionMode finalMode = HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_INVALID;
-    // 第一步：决定使用哪种模式
-    HcclResult ret = DecideHcclOpExpansionMode(comm, finalMode);
-    if (ret != HCCL_SUCCESS) {
-        HCCL_ERROR("DecideHcclOpExpansionMode failed, ret: %d", ret);
-        return ret;
-    }
+    (void)comm;
+    // 第一步：当前只给AICPU使用
+    HcclOpExpansionMode finalMode = HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_AI_CPU;
+    HCCL_DEBUG("[DecideHcclOpExpansionMode] configOpExpansionMode: AI_CPU");
 
     // 第二步：应用选择的模式到param
-    ret = ApplyOpExpansionMode(param, finalMode);
+    HcclResult ret = ApplyOpExpansionMode(param, finalMode);
     if (ret != HCCL_SUCCESS) {
         HCCL_ERROR("ApplyOpExpansionMode failed, ret: %d", ret);
         return ret;

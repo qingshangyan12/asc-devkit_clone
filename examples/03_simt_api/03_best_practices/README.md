@@ -8,5 +8,5 @@
 
 | 目录名称                                               | 功能描述                                                                                        |
 | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| [00_simt_insert_hash_table](./00_simt_insert_hash_table/) | 样例基于Ascend C SIMT编程方式实现InsertHashTable算子，展示SIMT算子处理复杂业务逻辑能力。        |
-| [01_simt_matrix_transpose](./01_simt_matrix_transpose/)   | 样例基于Ascend C SIMT编程方式实现MatrixTranspose算子，展示Ascend C SIMT编程方式的性能调优思路。 |
+| [00_memory_optimizations](./00_memory_optimizations)   | 介绍SIMT编程方式下全局访存合并、片上缓存中转复用、bank冲突规避及短向量调优等访存优化方法。 |
+| [01_execution_conf_optimizations](./01_execution_conf_optimizations)   | 介绍SIMT编程方式下执行配置最大线程束设置的优化方法。 |

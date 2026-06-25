@@ -15,7 +15,8 @@
 #include <vector>
 #include <set>
 #include <cstdint>
-#include "include/adv_api/math/sincos_tiling.h"
+#include "../../../../include/adv_api/math/sincos_tiling.h"
+#include "../../../../include/utils/tiling/platform/platform_ascendc.h"
 #include "../../detail/host_log.h"
 #include "../../detail/api_check/host_apicheck.h"
 #include "graph/tensor.h"

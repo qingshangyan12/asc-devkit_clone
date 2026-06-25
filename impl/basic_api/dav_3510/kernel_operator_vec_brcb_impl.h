@@ -20,7 +20,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_BRCB_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_BRCB_IMPL_H
 
-#include "reg_compute/kernel_reg_compute_intf.h"
+#include "../../../include/basic_api/reg_compute/kernel_reg_compute_intf.h"
 
 namespace AscendC {
 /* **************************************************************************************************
@@ -95,7 +95,7 @@ __simd_vf__ inline void BrcbCommonImpl(
 }
 
 template <typename T>
-__aicore__ inline void BrcbImpl(__ubuf__ T* dst, __ubuf__ T* src0, const uint8_t repeatTime,
+__aicore__ inline void BrcbImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint8_t repeatTime,
     const BrcbRepeatParams& repeatParams)
 {
     static_assert(SupportBytes<T, 1, 2, 4, 8>(), "Failed to check dtype in Brcb, current api support dtype"
@@ -104,11 +104,11 @@ __aicore__ inline void BrcbImpl(__ubuf__ T* dst, __ubuf__ T* src0, const uint8_t
 
     int32_t dstBlkStride = repeatParams.dstBlkStride ? repeatParams.dstBlkStride : 1;
     if constexpr (sizeof(T) == 8) {
-        BrcbB64Impl<T>(dst, src0, repeatTime, repeatParams, dstBlkStride);
+        BrcbB64Impl<T>(dst, src, repeatTime, repeatParams, dstBlkStride);
     } else if constexpr (sizeof(T) == 1) {
-        BrcbB8Impl<T>(dst, src0, repeatTime, repeatParams, dstBlkStride);
+        BrcbB8Impl<T>(dst, src, repeatTime, repeatParams, dstBlkStride);
     } else {
-        BrcbCommonImpl<T>(dst, src0, repeatTime, repeatParams, dstBlkStride);
+        BrcbCommonImpl<T>(dst, src, repeatTime, repeatParams, dstBlkStride);
     }
 }
 } // namespace AscendC

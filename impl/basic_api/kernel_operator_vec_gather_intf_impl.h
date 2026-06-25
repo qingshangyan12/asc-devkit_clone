@@ -19,9 +19,9 @@
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_GATHER_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_GATHER_INTERFACE_IMPL_H
-#include "kernel_tensor.h"
+#include "../../include/basic_api/kernel_tensor.h"
 #include "kernel_check.h"
-#include "kernel_struct_gather.h"
+#include "../../include/basic_api/kernel_struct_gather.h"
 #include "kernel_npu_debug.h"
 
 #if __NPU_ARCH__ == 1001
@@ -98,7 +98,7 @@ __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& s
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Gather", NamedTensor(dst, "dst"), NamedTensor(src, "src"), NamedTensor(srcOffset, "srcOffset"));
-    CheckMaskValue<PrimType>(mask, "Gather");
+    CheckMaskRepeat<PrimType>(mask, repeatTime, "Gather");
     // srcBaseOffset should not exceed the size of src tensor
     CheckValueRange<uint32_t>(srcBaseOffset, 0, src.GetSize() * sizeof(PrimType) - 1, "srcBaseOffset", "Gather");
     // srcBaseOffset should be aligned with src dtype
@@ -135,7 +135,7 @@ __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& s
     using PrimType = PrimT<T>;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Gather", NamedTensor(dst, "dst"), NamedTensor(src, "src"), NamedTensor(srcOffset, "srcOffset"));
-    CheckMaskArray<PrimType>(mask, "Gather");
+    CheckMaskRepeat<PrimType>(mask, repeatTime, "Gather");
     // srcBaseOffset should not exceed the size of src tensor
     CheckValueRange<uint32_t>(srcBaseOffset, 0, src.GetSize() * sizeof(PrimType) - 1, "srcBaseOffset", "Gather");
     // srcBaseOffset should be aligned with src dtype

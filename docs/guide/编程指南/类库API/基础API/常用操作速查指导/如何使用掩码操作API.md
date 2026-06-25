@@ -2,7 +2,7 @@
 
 Mask用于控制矢量计算中参与计算的元素个数，支持以下工作模式及配置方式：
 
-**表 1**  Mask工作模式
+**表1**  Mask工作模式
 
 <a name="zh-cn_topic_0000002267504584_table414483923116"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0000002267504584_row51452039163114"><th class="cellrowborder" valign="top" width="14.14%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0000002267504584_p814513911319"><a name="zh-cn_topic_0000002267504584_p814513911319"></a><a name="zh-cn_topic_0000002267504584_p814513911319"></a>工作模式</p>
@@ -28,7 +28,7 @@ Mask用于控制矢量计算中参与计算的元素个数，支持以下工作�
 </tbody>
 </table>
 
-**表 2**  Mask配置方式
+**表2**  Mask配置方式
 
 <a name="zh-cn_topic_0000002267504584_table642464733119"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0000002267504584_row8425134710316"><th class="cellrowborder" valign="top" width="14.12%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0000002267504584_p194258470311"><a name="zh-cn_topic_0000002267504584_p194258470311"></a><a name="zh-cn_topic_0000002267504584_p194258470311"></a>配置方式</p>
@@ -52,7 +52,7 @@ Mask用于控制矢量计算中参与计算的元素个数，支持以下工作�
 
 Mask操作的使用方式如下：
 
-**表 3**  Mask操作的使用方式
+**表3**  Mask操作的使用方式
 
 <a name="zh-cn_topic_0000002267504584_table1957843418427"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0000002267504584_row657817341420"><th class="cellrowborder" valign="top" width="8.58%" id="mcps1.2.5.1.1"><p id="zh-cn_topic_0000002267504584_p19578634194213"><a name="zh-cn_topic_0000002267504584_p19578634194213"></a><a name="zh-cn_topic_0000002267504584_p19578634194213"></a>配置方式</p>
@@ -119,8 +119,8 @@ Mask操作的使用方式如下：
     
     // 3、多次调用矢量计算API, isSetMask模板参数设置为false，接口入参中的mask值设置为占位符MASK_PLACEHOLDER，用于占位，无实际含义
     // 根据使用场景配置repeatTime、dataBlockStride、repeatStride参数
-    // dstBlkStride, src0BlkStride, src1BlkStride = 1, 单次迭代内数据连续读取和写入
-    // dstRepStride, src0RepStride, src1RepStride = 8, 相邻迭代间数据连续读取和写入
+    // dstBlkStride, src0BlkStride, src1BlkStride = 1,单次迭代内数据连续读取和写入
+    // dstRepStride, src0RepStride, src1RepStride = 8,相邻迭代间数据连续读取和写入
     AscendC::Add<half, false>(dstLocal, src0Local, src1Local, AscendC::MASK_PLACEHOLDER, 1, { 2, 2, 2, 8, 8, 8 });
     AscendC::Sub<half, false>(src0Local, dstLocal, src1Local, AscendC::MASK_PLACEHOLDER, 1, { 2, 2, 2, 8, 8, 8 });
     AscendC::Mul<half, false>(src1Local, dstLocal, src0Local, AscendC::MASK_PLACEHOLDER, 1, { 2, 2, 2, 8, 8, 8 });
@@ -168,8 +168,7 @@ Mask操作的使用方式如下：
     ```
 
 >[!NOTE]说明 
->- 前n个数据计算API接口内部会设置工作模式为Counter模式，所以如果前n个数据计算API配合Counter模式使用时，无需手动调用[SetMaskCount](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetMaskCount.md)设置Counter模式。
->- 所有手动使用Counter模式的场景，使用完毕后，需要调用[SetMaskNorm](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetMaskNorm.md)恢复工作模式。
->- 调用[SetVectorMask](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetVectorMask.md)设置Mask，使用完毕后，需要调用[ResetMask](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/ResetMask.md)恢复Mask值为默认值。
+>- 前n个数据计算API接口内部会设置工作模式为Counter模式，所以如果前n个数据计算API配合Counter模式使用时，无需手动调用[SetMaskCount](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory矢量计算/掩码操作/SetMaskCount.md)设置Counter模式。
+>- 所有手动使用Counter模式的场景，使用完毕后，需要调用[SetMaskNorm](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory矢量计算/掩码操作/SetMaskNorm.md)恢复工作模式。
+>- 调用[SetVectorMask](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory矢量计算/掩码操作/SetVectorMask.md)设置Mask，使用完毕后，需要调用[ResetMask](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory矢量计算/掩码操作/ResetMask.md)恢复Mask值为默认值。
 >- 使用高维切分计算API配套Counter模式使用时，比前n个数据计算API增加了可间隔的计算，支持dataBlockStride、repeatStride参数。
-

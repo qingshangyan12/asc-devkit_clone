@@ -20,7 +20,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_SET_ATOMIC_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_SET_ATOMIC_INTERFACE_H
 
-#include "kernel_macros.h"
+#include "../../impl/basic_api/kernel_macros.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include "stub_def.h"
@@ -45,7 +45,9 @@ template <typename T>
 __aicore__ inline void SetAtomicMin();
 } // namespace AscendC
 
+#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_set_atomic_intf_impl.h"
+#endif
 #endif // ASCENDC_MODULE_OPERATOR_SET_ATOMIC_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SET_ATOMIC_INTF_H__)

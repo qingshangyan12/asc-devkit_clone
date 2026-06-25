@@ -20,22 +20,22 @@
 #ifndef ASCENDC_MODULE_OPERATOR_LIST_TENSOR_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_LIST_TENSOR_INTERFACE_H
 
-#include "kernel_macros.h"
+#include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
 
 #if ASCENDC_CPU_DEBUG
-#include "kernel_check.h"
+#include "../../impl/basic_api/kernel_check.h"
 #endif
 
 #include "../../impl/basic_api/kernel_operator_list_tensor_intf_impl.h"
 
 namespace AscendC {
+class ListTensorDesc;
+template<class T> class TensorDesc {
 #if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||                       \
     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                       \
     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||                       \
     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
-class ListTensorDesc;
-template<class T> class TensorDesc {
 public:
     __aicore__ inline TensorDesc() {}
     __aicore__ inline ~TensorDesc() {}
@@ -69,8 +69,8 @@ public:
     friend class ListTensorDesc;
 private:
     TensorDescImpl<T> tensorDesc;
-};
 #endif
+};
 
 class ListTensorDesc {
 public:

@@ -1,48 +1,78 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #define ASCENDC_DUMP 1
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
 #include <vector>
 #include "kernel_operator.h"
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(ASCENDC_CPU_DEBUG)
+#include "impl/utils/debug/npu_arch_3510/asc_aicore_dump_utils.h"
+#define ASCENDC_TEST_HAS_SIMD_VF_DUMP_POSITION 1
+#endif
+
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+__aicore__ inline uint32_t asc_debug_get_core_idx()
+{
+    if ASCEND_IS_AIV {
+        return AscendC::GetBlockIdxImpl();
+    } else {
+        return AscendC::GetBlockIdxImpl() + AscendC::AIV_CORE_NUM;
+    }
+}
+#endif
+
 // #include "api_check/kernel_cpu_check.h"
 
 using namespace AscendC;
 
 int32_t RaiseStubForDumpTensor(int32_t input);
 
+#if defined(ASCENDC_TEST_HAS_SIMD_VF_DUMP_POSITION)
+namespace {
+constexpr uint16_t TEST_SIMD_VF_BLOCK_IDX = 3;
+constexpr uint32_t TEST_SIMD_VF_DUMP_DESC = 630;
+constexpr uint32_t TEST_SIMD_VF_DUMP_SIZE = 1;
+
+__asc_simd_vf::DumpTensorTlv* GetSimdVfDumpTlv(BlockVFBufInfo& blockInfo)
+{
+    __asc_simd_vf::get_printf_ubuf_addr(reinterpret_cast<uint64_t>(&blockInfo), TEST_SIMD_VF_BLOCK_IDX);
+    return reinterpret_cast<__asc_simd_vf::DumpTensorTlv*>(blockInfo.buffer);
+}
+} // namespace
+#endif
+
 struct TestDumpTensorParams {
     uint32_t dataSize;
     uint32_t typeSize;
     uint32_t dstSize;
     uint64_t dumpSize;
-    void (*CalFunc)(uint8_t *, uint8_t *, uint8_t *, uint32_t, uint32_t, uint64_t);
+    void (*CalFunc)(uint8_t*, uint8_t*, uint8_t*, uint32_t, uint32_t, uint64_t);
 };
 
 class TestDumpTensorSuite : public testing::Test, public testing::WithParamInterface<TestDumpTensorParams> {
 protected:
-    void SetUp()
-    {
-        MOCKER(raise, int32_t (*)(int32_t)).stubs().will(invoke(RaiseStubForDumpTensor));
-    }
-    void TearDown()
-    {
-        GlobalMockObject::verify();
-    }
+    void SetUp() { MOCKER(raise, int32_t(*)(int32_t)).stubs().will(invoke(RaiseStubForDumpTensor)); }
+    void TearDown() { GlobalMockObject::verify(); }
 };
 
 class DumpTensorRuntimeGuard {
 public:
-    DumpTensorRuntimeGuard() :
-        coreType_(g_coreType), blockNum_(block_num), blockIdx_(block_idx), subBlockIdx_(sub_block_idx),
-        taskRation_(g_taskRation), dumpWorkspace_(AscendC::g_dumpWorkspaceReserved), sysWorkspace_(GetSysWorkSpacePtr())
+    DumpTensorRuntimeGuard()
+        : coreType_(g_coreType),
+          blockNum_(block_num),
+          blockIdx_(block_idx),
+          subBlockIdx_(sub_block_idx),
+          taskRation_(g_taskRation),
+          dumpWorkspace_(AscendC::g_dumpWorkspaceReserved),
+          sysWorkspace_(GetSysWorkSpacePtr())
     {}
 
     ~DumpTensorRuntimeGuard()
@@ -76,7 +106,8 @@ void SetAivDumpEnv(uint32_t blockNumValue, uint32_t blockIdxValue, uint32_t subB
 }
 
 template <typename T>
-void DataDumpTensor(__gm__ uint8_t *dstGm, __gm__ uint8_t *srcGm, __gm__ uint8_t *workGm, __gm__ uint32_t dataSize,
+void DataDumpTensor(
+    __gm__ uint8_t* dstGm, __gm__ uint8_t* srcGm, __gm__ uint8_t* workGm, __gm__ uint32_t dataSize,
     __gm__ uint32_t dstSize, __gm__ uint64_t dumpSize)
 {
     TPipe tpipe;
@@ -85,9 +116,9 @@ void DataDumpTensor(__gm__ uint8_t *dstGm, __gm__ uint8_t *srcGm, __gm__ uint8_t
     GlobalTensor<T> dstGlobal;
     GlobalTensor<T> workGlobal;
 
-    srcGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T *>(srcGm), dataSize);
-    dstGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T *>(dstGm), dstSize);
-    workGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T *>(workGm), DUMP_WORKSPACE_SIZE * 2);
+    srcGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(srcGm), dataSize);
+    dstGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(dstGm), dstSize);
+    workGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(workGm), DUMP_WORKSPACE_SIZE * 2);
 
     TBuf<TPosition::VECCALC> tbuf;
     tpipe.InitBuffer(tbuf, dataSize * sizeof(T));
@@ -99,13 +130,11 @@ void DataDumpTensor(__gm__ uint8_t *dstGm, __gm__ uint8_t *srcGm, __gm__ uint8_t
     InitDump(false, workGm, dumpSize);
 }
 
-INSTANTIATE_TEST_CASE_P(TEST_DUMP_TENSOR, TestDumpTensorSuite,
+INSTANTIATE_TEST_CASE_P(
+    TEST_DUMP_TENSOR, TestDumpTensorSuite,
     ::testing::Values(TestDumpTensorParams{64, 4, 96, DUMP_UINTSIZE, DataDumpTensor<uint32_t>}));
 
-int32_t RaiseStubForDumpTensor(int32_t input)
-{
-    return 0;
-}
+int32_t RaiseStubForDumpTensor(int32_t input) { return 0; }
 
 TEST_P(TestDumpTensorSuite, TestDumpTensorCases)
 {
@@ -152,7 +181,7 @@ TEST_F(TestDumpTensorSuite, InitDumpImplSkipsOutOfRangeCore)
 
     std::vector<uint8_t> workGm(DUMP_UINTSIZE, 0);
     AscendC::g_dumpWorkspaceReserved = workGm.data();
-    EXPECT_EQ(GetDumpBlockIdx(), DUMP_CORE_COUNT);
+    EXPECT_EQ(asc_debug_get_core_idx(), DUMP_CORE_COUNT);
 
     InitDumpImpl(false, DUMP_UINTSIZE);
 
@@ -169,3 +198,32 @@ TEST_F(TestDumpTensorSuite, InitDumpNullStartAddrReturns)
 
     EXPECT_EQ(AscendC::g_dumpWorkspaceReserved, nullptr);
 }
+
+#if defined(ASCENDC_TEST_HAS_SIMD_VF_DUMP_POSITION)
+TEST_F(TestDumpTensorSuite, AscDumpUbufWritesUbPosition)
+{
+    BlockVFBufInfo blockInfo;
+    auto* dumpTlv = GetSimdVfDumpTlv(blockInfo);
+    uint32_t input[TEST_SIMD_VF_DUMP_SIZE] = {0};
+
+    __asc_simd_vf::asc_dump_ubuf<uint32_t>(
+        reinterpret_cast<__ubuf__ uint32_t*>(input), TEST_SIMD_VF_DUMP_DESC, TEST_SIMD_VF_DUMP_SIZE);
+
+    EXPECT_EQ(dumpTlv->position, static_cast<uint16_t>(__asc_simd_vf::DumpTensorPosition::UB));
+    EXPECT_EQ(dumpTlv->desc, TEST_SIMD_VF_DUMP_DESC);
+    EXPECT_EQ(dumpTlv->blockIdx, TEST_SIMD_VF_BLOCK_IDX);
+}
+
+TEST_F(TestDumpTensorSuite, AscDumpRegWritesRegPosition)
+{
+    BlockVFBufInfo blockInfo;
+    auto* dumpTlv = GetSimdVfDumpTlv(blockInfo);
+    vector_u32 input = {};
+
+    __asc_simd_vf::asc_dump_reg<uint32_t>(input, TEST_SIMD_VF_DUMP_DESC, TEST_SIMD_VF_DUMP_SIZE);
+
+    EXPECT_EQ(dumpTlv->position, static_cast<uint16_t>(__asc_simd_vf::DumpTensorPosition::REG));
+    EXPECT_EQ(dumpTlv->desc, TEST_SIMD_VF_DUMP_DESC);
+    EXPECT_EQ(dumpTlv->blockIdx, TEST_SIMD_VF_BLOCK_IDX);
+}
+#endif

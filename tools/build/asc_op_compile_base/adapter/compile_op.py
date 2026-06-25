@@ -1323,6 +1323,9 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         compile_info_origin = copy.deepcopy(compile_info)
         compile_option_tuple_origin = copy.deepcopy(compile_option_tuple)
 
+    # dump ktype handle
+    compile_info.raw_tiling_key_kernel_type = copy.deepcopy(compile_info.tiling_key_kernel_type)
+
     # get super kernel option to compile info when enable super kernel
     handle_sk_codegen_options(compile_info, infered_info_from_ifile)
 
@@ -1348,6 +1351,8 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         DFXSectionGenerator().update_is_support(op_info)
         compile_info_origin.dst_file = os.path.join(kernel_meta_dir, op_info.kernel_name + "_norm.o")
 
+        # dump ktype handle
+        compile_info.raw_tiling_key_kernel_type = copy.deepcopy(compile_info_origin.tiling_key_kernel_type)
         handle_sk_codegen_options(compile_info_origin, infered_info_from_ifile)
         workspace_idx = gen_op_stub_kernel_func(compile_info_origin, op_info, compile_option_tuple_origin, tiling_info,
                                                 distinct_tag, kernel_meta_dir)
@@ -2219,12 +2224,15 @@ def _mssanitizer_link(src_file, dst_file, compile_log_path=None):
     short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
     if short_soc_version not in global_var_storage.get_variable("ascendc_asan_obj_path"):
         raise Exception("asan config file not support asan.a path")
+    asan_obj_paths = global_var_storage.get_variable("ascendc_asan_obj_path")[short_soc_version]
+    if asan_obj_paths == []:
+        return
     if not isinstance(src_file, list):
         src_file = [src_file]
     cmd = [CCECInfo.get_exe("ld.lld"), "-m", "aicorelinux", "-r", "-Ttext=0"]
     cmd.extend(src_file)
     cmd.extend(['--dependent-libraries'])
-    cmd.extend(global_var_storage.get_variable("ascendc_asan_obj_path")[short_soc_version])
+    cmd.extend(asan_obj_paths)
     cmd.extend([
         "-r",
         "-o",

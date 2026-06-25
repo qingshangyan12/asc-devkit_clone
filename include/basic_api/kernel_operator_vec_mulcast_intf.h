@@ -20,7 +20,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_MULCAST_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_VEC_MULCAST_INTERFACE_H
 
-#include "kernel_macros.h"
+#include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
 #include "kernel_struct_binary.h"
 
@@ -32,10 +32,12 @@
 #pragma begin_pipe(V)
 namespace AscendC {
 template <typename T, typename U, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "MulCast is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void MulCast(const LocalTensor<T> &dst, const LocalTensor<U> &src0,
     const LocalTensor<U> &src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams &repeatParams);
 
 template <typename T, typename U, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "MulCast is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void MulCast(const LocalTensor<T> &dst, const LocalTensor<U> &src0,
     const LocalTensor<U> &src1, uint64_t mask[], const uint8_t repeatTime,
     const BinaryRepeatParams &repeatParams);
@@ -46,7 +48,9 @@ __aicore__ inline void MulCast(const LocalTensor<T> &dst, const LocalTensor<U> &
 } // namespace AscendC
 #pragma end_pipe
 
+#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_vec_mulcast_intf_impl.h"
+#endif
 #endif // ASCENDC_MODULE_OPERATOR_VEC_MULCAST_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_MULCAST_INTF_H__)

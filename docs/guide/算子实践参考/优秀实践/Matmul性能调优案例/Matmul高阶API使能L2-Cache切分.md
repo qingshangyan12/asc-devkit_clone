@@ -1,18 +1,18 @@
-# Matmul高阶API使能L2 Cache切分<a name="ZH-CN_TOPIC_0000002341067578"></a>
+# Matmul高阶API开启L2 Cache切分<a name="ZH-CN_TOPIC_0000002341067578"></a>
 
 ## 案例介绍<a name="section5590915836"></a>
 
-本案例呈现了在Matmul计算过程中，输入和输出的数据总量超过L2 Cache大小时，通过L2 Cache数据切分对算子性能的提升效果。使能L2 Cache切分的完整样例请参考[L2 Cache切分的算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_l2cache)。
+本案例呈现了在Matmul计算过程中，输入和输出的数据总量超过L2 Cache大小时，通过L2 Cache数据切分对算子性能的提升效果。开启L2 Cache切分的完整样例请参考[L2 Cache切分的算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_l2cache)。
 
 本案例使用的AI处理器的L2 Cache大小为192MB，L2 Cache纯读带宽约为GM的3到4倍，两者之间存在较大差距。在搬入或搬出相同数据量的情况下，访问L2 Cache内的数据比访问GM更快。若数据无法命中L2 Cache，即需要访问的数据不在L2 Cache内，导致需要访问GM进行读写，带宽利用效率较低，最终算子搬入或搬出数据成为算子整个运行过程的性能瓶颈。
 
--   使能L2 Cache切分的适用场景
+-   开启L2 Cache切分的适用场景
 
     输入和输出的数据量超过L2 Cache的大小。
 
 本案例的算子规格如下：
 
-**表 1**  算子规格
+**表1**  算子规格
 
 <a name="table101751125175213"></a>
 <table><thead align="left"><tr id="row8175525185219"><th class="cellrowborder" valign="top" width="25%" id="mcps1.2.5.1.1"><p id="p1417582516529"><a name="p1417582516529"></a><a name="p1417582516529"></a>输入</p>
@@ -52,7 +52,7 @@
 
 ## 分析主要瓶颈点<a name="section10759361232"></a>
 
-当前案例基于Tiling全量常量化进一步优化，Tiling全量常量化请参考[Matmul高阶API使能Tiling全量常量化](Matmul高阶API使能Tiling全量常量化.md)案例。优化前的Profiling数据如下，C列的aic\_time是867us，K列的aic\_mte2\_time是861.9us，MTE2占比为99%，MTE2数据搬运是当前算子性能的瓶颈。
+当前案例基于Tiling全量常量化进一步优化，Tiling全量常量化请参考[Matmul高阶API开启Tiling全量常量化](Matmul高阶API使能Tiling全量常量化.md)案例。优化前的Profiling数据如下，C列的aic\_time是867us，K列的aic\_mte2\_time是861.9us，MTE2占比为99%，MTE2数据搬运是当前算子性能的瓶颈。
 
 ![](../../../figures/zh-cn_image_0000002410305297.png)
 
@@ -63,7 +63,7 @@
     -   优化前，输入数据不进行切分，所有核一次计算全部数据。如下图所示，图中数字表示核id，24个核一次计算A和B矩阵的所有数据。
     -   优化后，输入数据被切分多次，所有核分多次计算，每个核单次计算只依赖切分后的数据量。L2 Cache切分方案确保单次计算的数据都在L2 Cache缓存中，搬运输入数据的效率更高。
 
-    **图 1**  优化点一示意图<a name="fig37871937335"></a>  
+    **图1**  优化点一示意图<a name="fig37871937335"></a>  
     ![](../../../figures/优化点一示意图.png "优化点一示意图")
 
 -   优化点二：选择拖尾较小的L2 Cache切分方案
@@ -72,19 +72,19 @@
 
     在实际场景中，满足切分后的数据量小于L2 Cache大小的前提下，拖尾越小越好。基于这个原则可以确定L2 Cache切分块数。
 
-    **图 2**  优化点二示意图<a name="fig187267372095"></a>  
+    **图2**  优化点二示意图<a name="fig187267372095"></a>  
     ![](../../../figures/优化点二示意图.png "优化点二示意图")
 
 -   优化点三：错位分核，减少左右矩阵同地址冲突问题
 
     同地址冲突：多核并发执行Matmul计算时，如果多核同时访问输入矩阵的相同地址，会导致地址冲突，影响性能。
 
-    在M和N方向，将矩阵数据L2 Cache切分为大数据块， 然后在数据块间错位分核，即将每个数据块依次沿对角线分配给不同的核处理，从而有效减少同地址冲突的问题。比如，在处理同一行的尾块数据0，1，2，3时，如果顺序分配执行的核，多核会同时读同一行左矩阵数据，导致读读冲突。若按照对角线方式分配执行的核，在对角线上的尾块数据被分配给核0，1，2，3计算，多核访问不同行的左矩阵数据，将减少同地址冲突的次数。
+    在M和N方向，将矩阵数据L2 Cache切分为大数据块，然后在数据块间错位分核，即将每个数据块依次沿对角线分配给不同的核处理，从而有效减少同地址冲突的问题。比如，在处理同一行的尾块数据0，1，2，3时，如果顺序分配执行的核，多核会同时读同一行左矩阵数据，导致读读冲突。若按照对角线方式分配执行的核，在对角线上的尾块数据被分配给核0，1，2，3计算，多核访问不同行的左矩阵数据，将减少同地址冲突的次数。
 
-    **图 3**  优化点三示意图<a name="fig12727153717911"></a>  
+    **图3**  优化点三示意图<a name="fig12727153717911"></a>  
     ![](../../../figures/优化点三示意图.png "优化点三示意图")
 
-Matmul API使能L2 Cache切分的完整样例请参考[L2 Cache切分的算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_l2cache)。实现L2 Cache切分的关键步骤如下：
+Matmul API开启L2 Cache切分的完整样例请参考[L2 Cache切分的算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_l2cache)。实现L2 Cache切分的关键步骤如下：
 
 1.  判断是否需要进行L2 Cache切分。如果数据总量超过设定的L2 Cache大小，则计算L2 Cache切分数目。
 
@@ -175,5 +175,4 @@ Matmul API使能L2 Cache切分的完整样例请参考[L2 Cache切分的算子�
 
 ## 总结<a name="section1593812115413"></a>
 
-在Matmul计算数据量超过L2 Cache大小的场景下，可以考虑使能L2 Cache切分，提高L2 Cache命中率，利用L2 Cache高带宽特性提升算子性能。
-
+在Matmul计算数据量超过L2 Cache大小的场景下，可以考虑开启L2 Cache切分，提高L2 Cache命中率，利用L2 Cache高带宽特性提升算子性能。

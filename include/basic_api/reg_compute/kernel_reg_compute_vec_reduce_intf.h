@@ -34,13 +34,21 @@ template <ReduceType type = ReduceType::SUM, typename T = DefaultType,
           MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void ReduceDataBlock(U& dstReg, U srcReg, MaskReg mask);
 
+template <ReduceType type = ReduceType::SUM, typename T = DefaultType,
+          typename U = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING,
+          typename S, typename V>
+__simd_callee__ inline void ReduceDataBlock(S& dstReg, V srcReg, MaskReg mask);
+
 template <PairReduce type = PairReduce::SUM, typename T = DefaultType,
           MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void PairReduceElem(U& dstReg, U srcReg, MaskReg mask);
 } // namespace Reg
 } // namespace AscendC
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || \
+    (__NPU_ARCH__ == 3113)) || defined(__ASC_NPU_HOST__)
 #include "../../impl/basic_api/reg_compute/kernel_reg_compute_vec_reduce_intf_impl.h"
+#endif
 #endif // ASCENDC_MODULE_REG_COMPUTE_VEC_REDUCE_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_VEC_REDUCE_INTF_H__)

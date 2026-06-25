@@ -21,11 +21,11 @@
 #endif
 #ifndef IMPL_MATH_LGAMMA_LGAMMA_COMMON_IMPL_H
 #define IMPL_MATH_LGAMMA_LGAMMA_COMMON_IMPL_H
-#include "kernel_basic_intf.h"
-#include "kernel_tensor.h"
-#include "kernel_pop_stack_buffer.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
+#include "../../../../basic_api/kernel_pop_stack_buffer.h"
 #include "kernel_tiling/kernel_tiling.h"
-#include "include/adv_api/math/sin.h"
+#include "../../../../../include/adv_api/math/sin.h"
 #include "lgamma_common_utils.h"
 #include "lgamma_common_basic_impl.h"
 #include "../../common/check.h"
@@ -258,6 +258,8 @@ __aicore__ inline void LGammaGenGEMaskHalf(
     PipeBarrier<PIPE_V>();
 }
 
+__ASC_USE_RESERVED_UBUF__(2201,
+    "Lgamma is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void LGammaSelectHalf(
     const LocalTensor<float>& dstTensor, const LocalTensor<float>& srcTensor, const LocalTensor<uint8_t>& mask,
     const LocalTensor<float>& tmpTensor, const LocalTensor<float>& tmpScalar)
@@ -271,6 +273,8 @@ __aicore__ inline void LGammaSelectHalf(
     PipeBarrier<PIPE_V>();
 }
 
+__ASC_USE_RESERVED_UBUF__(2201,
+    "Lgamma is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void LGammaSelectINF(
     const LocalTensor<float>& dstTensor, const LocalTensor<float>& srcTensor, const LocalTensor<uint8_t>& mask,
     const LocalTensor<float>& tmpTensor, const LocalTensor<float>& tmpScalar)
@@ -284,6 +288,8 @@ __aicore__ inline void LGammaSelectINF(
     PipeBarrier<PIPE_V>();
 }
 
+__ASC_USE_RESERVED_UBUF__(2201,
+    "Lgamma is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void LgammaComputeImpl(
     const LocalTensor<half>& dstTensor, const LocalTensor<half>& srcTensor, LGammaParams& params,
     const uint32_t splitSize)
@@ -356,6 +362,8 @@ __aicore__ inline void LgammaComputeImpl(
         {1, 1, HALF_DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
 }
 
+__ASC_USE_RESERVED_UBUF__(2201,
+    "Lgamma is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void LgammaComputeImpl(
     const LocalTensor<float>& dst, const LocalTensor<float>& src, LGammaParams& params)
 {
@@ -398,6 +406,8 @@ __aicore__ inline void LgammaComputeImpl(
 }
 
 template <bool isReuseSource = false>
+__ASC_USE_RESERVED_UBUF__(2201,
+    "Lgamma is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void LgammaCompute(
     const LocalTensor<half>& dstTensor, const LocalTensor<half>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const uint32_t calCount)
@@ -438,6 +448,8 @@ __aicore__ inline void LgammaCompute(
 }
 
 template <bool isReuseSource = false>
+__ASC_USE_RESERVED_UBUF__(2201,
+    "Lgamma is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void LgammaCompute(
     const LocalTensor<float>& dst, const LocalTensor<float>& src, const LocalTensor<uint8_t>& tmp,
     const uint32_t calCount)
@@ -475,6 +487,8 @@ __aicore__ inline void LgammaCompute(
 }
 
 template <typename T, bool isReuseSource = false>
+__ASC_USE_RESERVED_UBUF__(2201,
+    "Lgamma is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void LgammaImpl(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& tmp, const uint32_t calCount)
 {

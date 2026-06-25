@@ -19,11 +19,11 @@
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_IMPL_H
-#include "kernel_tensor.h"
+#include "../../include/basic_api/kernel_tensor.h"
 #include "kernel_check.h"
-#include "kernel_struct_binary.h"
-#include "kernel_struct_unary.h"
-#include "kernel_struct_vdeq.h"
+#include "../../include/basic_api/kernel_struct_binary.h"
+#include "../../include/basic_api/kernel_struct_unary.h"
+#include "../../include/basic_api/kernel_struct_vdeq.h"
 #include "kernel_npu_debug.h"
 #include "mstx_local_tensor_info.h"
 
@@ -50,6 +50,13 @@
 #endif
 
 namespace AscendC {
+template <bool castMode>
+__aicore__ inline void SetCastOverflowMode()
+{
+    SetCastOverflowModeImpl<castMode>();
+}
+
+#if defined(__NPU_ARCH__)
 #pragma begin_pipe(V)
 /* **************************************************************************************************
  * Cast                                             *
@@ -79,7 +86,7 @@ __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src
         DstPrimType, SrcPrimType>::type;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Cast", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
-    CheckMaskArray<MaskCheckType>(mask, "Cast");
+    CheckMaskRepeat<MaskCheckType>(mask, repeatTime, "Cast");
 #endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecUnaryCastInfo<T, U, isSetMask>(dst, src, mask[0], mask[1], repeatTime, repeatParams, "Cast");
@@ -114,7 +121,7 @@ __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src
         DstPrimType, SrcPrimType>::type;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Cast", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
-    CheckMaskValue<MaskCheckType>(mask, "Cast");
+    CheckMaskRepeat<MaskCheckType>(mask, repeatTime, "Cast");
 #endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecUnaryCastInfo<T, U, isSetMask>(dst, src, mask, repeatTime, repeatParams, "Cast");
@@ -201,7 +208,7 @@ __aicore__ inline void CastDequant(const LocalTensor<T>& dst, const LocalTensor<
         DstPrimType, SrcPrimType>::type;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("CastDequant", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
-    CheckMaskArray<MaskCheckType, isSetMask>(mask, "CastDequant");
+    CheckMaskRepeat<MaskCheckType, isSetMask>(mask, repeatTime, "CastDequant");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -224,6 +231,7 @@ __aicore__ inline void CastDequant(const LocalTensor<T>& dst, const LocalTensor<
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("CastDequant", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<MaskCheckType, isSetMask>(mask, "CastDequant");
+    CheckRepeatValue(repeatTime, "CastDequant");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -250,7 +258,7 @@ __aicore__ inline void CastDeq(const LocalTensor<T>& dst, const LocalTensor<U>& 
         DstPrimType, SrcPrimType>::type;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("CastDeq", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
-    CheckMaskArray<MaskCheckType, isSetMask>(mask, "CastDeq");
+    CheckMaskRepeat<MaskCheckType, isSetMask>(mask, repeatTime, "CastDeq");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -278,6 +286,7 @@ __aicore__ inline void CastDeq(const LocalTensor<T>& dst, const LocalTensor<U>& 
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("CastDeq", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
     CheckMaskValue<MaskCheckType, isSetMask>(mask, "CastDeq");
+    CheckRepeatValue(repeatTime, "CastDeq");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -377,7 +386,7 @@ __aicore__ inline void AddReluCast(const LocalTensor<T>& dst, const LocalTensor<
 #endif
 #if defined(ASCENDC_CPU_DEBUG) || defined(ASCENDC_DEBUG)
     CheckVectorTensor("AddReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
-    CheckMaskValue<MaskCheckType, isSetMask>(mask, "AddReluCast");
+    CheckMaskRepeat<MaskCheckType, isSetMask>(mask, repeatTime, "AddReluCast");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -407,7 +416,7 @@ __aicore__ inline void AddReluCast(const LocalTensor<T>& dst, const LocalTensor<
 #endif
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("AddReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
-    CheckMaskArray<MaskCheckType, isSetMask>(mask, "AddReluCast");
+    CheckMaskRepeat<MaskCheckType, isSetMask>(mask, repeatTime, "AddReluCast");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -452,7 +461,7 @@ __aicore__ inline void AddReluCast(const LocalTensor<T>& dst, const LocalTensor<
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecBinaryInfo(dst, src0, src1, "AddReluCast", count);
 #endif
-    AddReluCastImpl((__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__ubuf__ PrimT<U>*)src0.GetPhyAddr(),	 
+    AddReluCastImpl((__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__ubuf__ PrimT<U>*)src0.GetPhyAddr(),
          (__ubuf__ PrimT<U>*)src1.GetPhyAddr(), count);
 }
 
@@ -478,7 +487,7 @@ template <typename T, typename U, bool isSetMask>
 __aicore__ inline void SubReluCast(const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1,
     uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
 {
-    using DstPrimType = PrimT<T>; 
+    using DstPrimType = PrimT<T>;
     using SrcPrimType = PrimT<U>;
     using MaskCheckType = typename Conditional<(sizeof(DstPrimType) >= sizeof(SrcPrimType)), DstPrimType, SrcPrimType>::type;
 #if __NPU_ARCH__ == 2201
@@ -488,7 +497,7 @@ __aicore__ inline void SubReluCast(const LocalTensor<T>& dst, const LocalTensor<
 #endif
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("SubReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
-    CheckMaskValue<MaskCheckType, isSetMask>(mask, "SubReluCast");
+    CheckMaskRepeat<MaskCheckType, isSetMask>(mask, repeatTime, "SubReluCast");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -518,7 +527,7 @@ __aicore__ inline void SubReluCast(const LocalTensor<T>& dst, const LocalTensor<
 #endif
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("SubReluCast", NamedTensor(dst, "dst"), NamedTensor(src0, "src0"), NamedTensor(src1, "src1"));
-    CheckMaskArray<MaskCheckType, isSetMask>(mask, "SubReluCast");
+    CheckMaskRepeat<MaskCheckType, isSetMask>(mask, repeatTime, "SubReluCast");
 #endif
 #if ASCENDC_CPU_DEBUG
     MaskSetter::Instance().SetMask(isSetMask);
@@ -546,7 +555,7 @@ template <typename T, typename U>
 __aicore__ inline void SubReluCast(const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1,
     const uint32_t count)
 {
-    using DstPrimType = PrimT<T>; 
+    using DstPrimType = PrimT<T>;
     using SrcPrimType = PrimT<U>;
 #if __NPU_ARCH__ == 2201
     if (g_coreType == AIC) {
@@ -614,12 +623,6 @@ __aicore__ inline void SetDeqScale(const LocalTensor<T>& vdeq, const VdeqInfo& v
     SetDeqScaleImpl<T>(vdeq, vdeqInfo);
 }
 
-template <bool castMode>
-__aicore__ inline void SetCastOverflowMode()
-{
-    SetCastOverflowModeImpl<castMode>();
-}
-
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161)
 /*
  * @ingroup Truncate Level 2
@@ -642,8 +645,10 @@ __aicore__ inline void Truncate(const LocalTensor<T> &dst, const LocalTensor<T> 
     TruncateImpl<PrimType, roundMode>((__ubuf__ PrimType *)dst.GetPhyAddr(),(__ubuf__ PrimType *)src.GetPhyAddr(), count);
 }
 #endif
+#endif // defined(__NPU_ARCH__)
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_IMPL_H
+
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_VCONV_INTF_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_VCONV_INTF_IMPL_H__

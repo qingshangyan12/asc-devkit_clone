@@ -16,7 +16,7 @@
 #ifndef INCLUDE_C_API_REG_COMPUTE_REG_VECTOR_H
 #define INCLUDE_C_API_REG_COMPUTE_REG_VECTOR_H
 
-#include "instr_impl/npu_arch_3510/vector_compute_impl.h"
+#include "../../../impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 
 /*
 *   asc_create_mask_b8(pat_mode);
@@ -76,6 +76,24 @@ __simd_callee__ inline iter_reg asc_create_iter_reg_b32(uint32_t offset);
 __simd_callee__ inline iter_reg asc_create_iter_reg_b16(uint32_t offset);
 
 __simd_callee__ inline iter_reg asc_create_iter_reg_b8(uint32_t offset);
+
+__simd_callee__ inline iter_reg asc_create_iter_reg_b32(uint32_t offset0, uint32_t offset1);
+
+__simd_callee__ inline iter_reg asc_create_iter_reg_b16(uint32_t offset0, uint32_t offset1);
+
+__simd_callee__ inline iter_reg asc_create_iter_reg_b8(uint32_t offset0, uint32_t offset1);
+
+__simd_callee__ inline iter_reg asc_create_iter_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2);
+
+__simd_callee__ inline iter_reg asc_create_iter_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2);
+
+__simd_callee__ inline iter_reg asc_create_iter_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2);
+
+__simd_callee__ inline iter_reg asc_create_iter_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
+
+__simd_callee__ inline iter_reg asc_create_iter_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
+
+__simd_callee__ inline iter_reg asc_create_iter_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
 
 // ==========asc_relu(half/int32_t/float)==========
 __simd_callee__ inline void asc_relu(vector_half& dst, vector_half src, vector_bool mask);
@@ -360,17 +378,17 @@ __simd_callee__ inline void asc_reduce_min(vector_half& dst, vector_half src, ve
 __simd_callee__ inline void asc_reduce_min(vector_float& dst, vector_float src, vector_bool mask);
 
 // ==========asc_reduce_min_datablock(uint16_t/int16_t/half/uint32_t/int32_t/float)==========
-__simd_callee__ inline void asc_reduce_min_datablock_(vector_int16_t& dst, vector_int16_t src, vector_bool mask);
+__simd_callee__ inline void asc_reduce_min_datablock(vector_int16_t& dst, vector_int16_t src, vector_bool mask);
 
-__simd_callee__ inline void asc_reduce_min_datablock_(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
+__simd_callee__ inline void asc_reduce_min_datablock(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
 
-__simd_callee__ inline void asc_reduce_min_datablock_(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask);
+__simd_callee__ inline void asc_reduce_min_datablock(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask);
 
-__simd_callee__ inline void asc_reduce_min_datablock_(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask);
+__simd_callee__ inline void asc_reduce_min_datablock(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask);
 
-__simd_callee__ inline void asc_reduce_min_datablock_(vector_half& dst, vector_half src, vector_bool mask);
+__simd_callee__ inline void asc_reduce_min_datablock(vector_half& dst, vector_half src, vector_bool mask);
 
-__simd_callee__ inline void asc_reduce_min_datablock_(vector_float& dst, vector_float src, vector_bool mask);
+__simd_callee__ inline void asc_reduce_min_datablock(vector_float& dst, vector_float src, vector_bool mask);
 
 // ==========asc_axpy(half/float)==========
 __simd_callee__ inline void asc_axpy(vector_half& dst, vector_half src, half value, vector_bool mask);

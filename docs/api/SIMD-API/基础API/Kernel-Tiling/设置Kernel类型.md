@@ -71,7 +71,7 @@
 
 ## 参数说明<a name="zh-cn_topic_0000001610027821_section129451113125413"></a>
 
-**表 1**  参数说明
+**表1**  参数说明
 
 <a name="table89201718635"></a>
 <table><thead align="left"><tr id="row1992019181938"><th class="cellrowborder" valign="top" width="17.22%" id="mcps1.2.4.1.1"><p id="p109201118735"><a name="p109201118735"></a><a name="p109201118735"></a>参数</p>
@@ -112,7 +112,7 @@
 </tbody>
 </table>
 
-**表 2**  kernel type取值说明
+**表2**  kernel type取值说明
 
 <a name="table76335324910"></a>
 <table><thead align="left"><tr id="row13633133211918"><th class="cellrowborder" valign="top" width="35.8%" id="mcps1.2.3.1.1"><p id="p196346329913"><a name="p196346329913"></a><a name="p196346329913"></a>参数</p>
@@ -169,8 +169,8 @@
 </tr>
 <tr id="row3636193212912"><td class="cellrowborder" valign="top" width="35.8%" headers="mcps1.2.3.1.1 "><p id="p663633211910"><a name="p663633211910"></a><a name="p663633211910"></a><span>KERNEL_TYPE_MIX_VECTOR_CORE</span></p>
 </td>
-<td class="cellrowborder" valign="top" width="64.2%" headers="mcps1.2.3.1.2 "><p id="p1487434912401"><a name="p1487434912401"></a><a name="p1487434912401"></a>基于Ascend C开发的矢量计算相关的算子可以运行在<span id="ph182831320115814"><a name="ph182831320115814"></a><a name="ph182831320115814"></a>Vector Core</span>上，调用本接口传入该参数用于使能<span id="ph12899342131115"><a name="ph12899342131115"></a><a name="ph12899342131115"></a>Vector Core</span>。</p>
-<p id="p14506850174012"><a name="p14506850174012"></a><a name="p14506850174012"></a><span id="ph5667172611155"><a name="ph5667172611155"></a><a name="ph5667172611155"></a>使能<span id="ph19742192610399"><a name="ph19742192610399"></a><a name="ph19742192610399"></a>Vector Core</span>后，算子执行时会同时启动AI Core和Vector Core，用于并行计算。比如用户在host侧设置numBlocks为10，则会启动总数为10的AI Core和Vector Core。</span></p>
+<td class="cellrowborder" valign="top" width="64.2%" headers="mcps1.2.3.1.2 "><p id="p1487434912401"><a name="p1487434912401"></a><a name="p1487434912401"></a>基于Ascend C开发的矢量计算相关的算子可以运行在<span id="ph182831320115814"><a name="ph182831320115814"></a><a name="ph182831320115814"></a>Vector Core</span>上，调用本接口传入该参数用于启用<span id="ph12899342131115"><a name="ph12899342131115"></a><a name="ph12899342131115"></a>Vector Core</span>。</p>
+<p id="p14506850174012"><a name="p14506850174012"></a><a name="p14506850174012"></a><span id="ph5667172611155"><a name="ph5667172611155"></a><a name="ph5667172611155"></a>启用<span id="ph19742192610399"><a name="ph19742192610399"></a><a name="ph19742192610399"></a>Vector Core</span>后，算子执行时会同时启动AI Core和Vector Core，用于并行计算。比如用户在host侧设置numBlocks为10，则会启动总数为10的AI Core和Vector Core。</span></p>
 <p id="p1166792611510"><a name="p1166792611510"></a><a name="p1166792611510"></a>需要注意的是，通过SetBlockDim设置核数时，需要大于AI Core的核数，否则不会启动VectorCore。</p>
 </td>
 </tr>
@@ -187,14 +187,14 @@
 
 -   **KERNEL\_TASK\_TYPE**优先级高于**KERNEL\_TASK\_TYPE\_DEFAULT**，同时设置了全局kernel type和某一个tiling key的kernel type，该tiling key的kernel type以**KERNEL\_TASK\_TYPE**设置的为准。
 -   没有设置全局默认kernel type的情况下，如果开发者只为其中的某几个tiling key设置kernel type，即部分tiling key没有设置kernel type，会导致算子kernel编译报错。
--   当设置具体的kernel task type时，用户的算子实现需要与kernel type相匹配。比如用户设置kernel type为KERNEL\_TYPE\_MIX\_AIC\_1\_2，则算子内部实现应与核配比AIC:AIV为1:2相对应；若用户设置kernel type为KERNEL\_TYPE\_AIC\_ONLY， 则算子内部实现应该为纯cube逻辑，不应该存在vector部分的逻辑。其他的kernel type类似。
+-   当设置具体的kernel task type时，用户的算子实现需要与kernel type相匹配。比如用户设置kernel type为KERNEL\_TYPE\_MIX\_AIC\_1\_2，则算子内部实现应与核配比AIC:AIV为1:2相对应；若用户设置kernel type为KERNEL\_TYPE\_AIC\_ONLY，则算子内部实现应该为纯cube逻辑，不应该存在vector部分的逻辑。其他的kernel type类似。
 -   当纯cube或者纯vec算子强制设定kernel type为MIX类型时，workspace的大小不能设置为0，需要设置一个大于0的值（比如16、32等）。
 -   使用[Tiling模板编程](../../../Utils-API/Tiling模板编程/Tiling模板编程.md)时，需要通过ASCENDC\_TPL\_KERNEL\_TYPE\_SEL设置Kernel类型即可，无需再通过该接口进行设置，本接口不生效。
 
 ## 调用示例<a name="zh-cn_topic_0000001610027821_section97001499599"></a>
 
--   示例一：使能VectorCore样例
-    1.  完成算子kernel侧开发时，需要通过本接口使能Vector Core，算子执行时会同时启动AI Core和Vector Core， 此时AI Core会当成Vector Core使用。示例如下：
+-   示例一：启用VectorCore样例
+    1.  完成算子kernel侧开发时，需要通过本接口启用Vector Core，算子执行时会同时启动AI Core和Vector Core，此时AI Core会当成Vector Core使用。示例如下：
 
         ```
         extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8_t *y, __gm__ uint8_t *z, __gm__ uint8_t *workspace, __gm__ uint8_t *tiling)
@@ -205,7 +205,7 @@
             }
             KernelAdd op;
             op.Init(x, y, z, tilingData.numBlocks, tilingData.totalLength, tilingData.tileNum);
-            KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_MIX_VECTOR_CORE); // 使能VectorCore
+            KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_MIX_VECTOR_CORE); // 启用VectorCore
             if (TILING_KEY_IS(1)) {
                 op.Process1();
             } else if (TILING_KEY_IS(2)) {
@@ -215,13 +215,13 @@
         }
         ```
 
-    2.  完成算子host侧Tiling开发时，设置的numBlocks代表的是AI Core和Vector Core的总数，比如用户在host侧设置numBlocks为10，则会启动总数为10的AI Core和Vector Core；为保证启动Vector Core，设置数值应大于AI Core的核数。您可以通过[GetCoreNumAic](../../../Utils-API/平台信息获取/PlatformAscendC/GetCoreNumAic.md)接口获取AI Core的核数，[GetCoreNumVector](../../../Utils-API/平台信息获取/PlatformAscendC/GetCoreNumVector.md)接口获取Vector Core的核数。 如下代码片段，展示了numBlocks的设置方法，此处设置为AI Core和Vector Core的总和，表示所有AI Core和Vector Core都启动。
+    2.  完成算子host侧Tiling开发时，设置的numBlocks代表的是AI Core和Vector Core的总数，比如用户在host侧设置numBlocks为10，则会启动总数为10的AI Core和Vector Core；为保证启动Vector Core，设置数值应大于AI Core的核数。您可以通过[GetCoreNumAic](../../../Utils-API/平台信息获取/PlatformAscendC/GetCoreNumAic.md)接口获取AI Core的核数，[GetCoreNumVector](../../../Utils-API/平台信息获取/PlatformAscendC/GetCoreNumVector.md)接口获取Vector Core的核数。如下代码片段，展示了numBlocks的设置方法，此处设置为AI Core和Vector Core的总和，表示所有AI Core和Vector Core都启动。
 
         ```
         // 配套的host侧tiling函数示例：
         ge::graphStatus TilingFunc(gert::TilingContext* context)
         {	
-            // 使能VectorCore，将numBlocks置为AI Core中vector核数 + Vector Core中的vector核数
+            // 启用VectorCore，将numBlocks置为AI Core中vector核数 + Vector Core中的vector核数
             auto ascendcPlatform = platform_ascendc::PlatformAscendC(platformInfo);
             auto totalCoreNum = ascendcPlatform.GetCoreNumAiv();
             // ASCENDXXX请替换为实际的版本型号
@@ -232,7 +232,7 @@
         }
         ```
 
--   示例二：设置某一个具体的tiling key对应的kernel type。如下代码为伪代码 ，不可直接运行。
+-   示例二：设置某一个具体的tiling key对应的kernel type。如下代码为伪代码，不可直接运行。
 
     ```
     extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8_t *y, __gm__ uint8_t *z, __gm__ uint8_t *workspace, __gm__ uint8_t *tiling)
@@ -264,4 +264,3 @@
         }
     }
     ```
-

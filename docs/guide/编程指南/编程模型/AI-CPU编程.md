@@ -2,7 +2,7 @@
 
 AI CPU是位于Device侧ARM64架构的处理器，其具备与AI Core相同的内存访问能力，可直接访问Device侧内存资源；也可以与Host侧的CPU一样，进行类似的数据计算，通常作为AI Core的补充，主要承担非矩阵类、逻辑比较复杂的分支密集型计算。AI CPU的运行环境为基础的Linux环境，编程时可使用libc库，C++标准库，STL模板库等。其硬件架构图如下所示：
 
-**图 1**  AI CPU硬件架构图<a name="fig1146075111341"></a>  
+**图1**  AI CPU硬件架构图<a name="fig1146075111341"></a>  
 ![](../../figures/AI-CPU硬件架构图.png "AI-CPU硬件架构图")
 
 本节介绍的AI CPU编程仅支持如下产品型号：
@@ -81,4 +81,4 @@ template extern __global__ __aicpu__ uint32_t hello_world<KernelArgs, 4096>(void
 ## 更多进阶用法<a name="section109268265171"></a>
 
 >[!NOTE]说明 
->更多AI CPU API的使用方法请参考[AI CPU API](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/AI-CPU-API.md)。
+>更多AI CPU API的使用方法请参考[AI CPU API](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/AI-CPU-API/AI-CPU-API.md)。

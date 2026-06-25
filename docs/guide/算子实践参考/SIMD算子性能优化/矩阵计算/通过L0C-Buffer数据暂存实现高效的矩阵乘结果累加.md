@@ -4,10 +4,10 @@
 
 【描述】算子实现中对矩阵乘的结果进行累加时（比如矩阵A1 \* B1 + A2 \* B2...结果的累加），可将前一次矩阵乘的结果暂存在CO1（L0C）上，调用Mmad接口实现矩阵乘结果累加。相比于每次矩阵乘的结果从CO1搬运到GM上，再搬运到UB上进行累加计算，可减少数据搬运的次数，提升内存使用效率。
 
-**图 1**  反例数据流图<a name="fig1739115131882"></a>  
+**图1**  反例数据流图<a name="fig1739115131882"></a>  
 ![](../../../figures/反例数据流图-80.png "反例数据流图-80")
 
-**图 2**  正例数据流图<a name="fig1831565712115"></a>  
+**图2**  正例数据流图<a name="fig1831565712115"></a>  
 ![](../../../figures/正例数据流图-81.png "正例数据流图-81")
 
 【反例】
@@ -123,7 +123,7 @@ private:
     __aicore__ inline void CopyOut()
     {
         LocalTensor<float> c1Local = outQueueCO1.DeQue<float>();
-        GM_ADDR usrWorkspace = AscendC::GetUserWorkspace(workspace);
+        __gm__ uint8_t* usrWorkspace = AscendC::GetUserWorkspace(workspace);
         xGm.SetGlobalBuffer((__gm__ float *)(usrWorkspace));
         FixpipeParamsV220 fixpipeParams;
         fixpipeParams.nSize = n;
@@ -336,4 +336,3 @@ private:
     uint16_t m = 32, k = 32, n = 32;
     uint16_t aSize, bSize, cSize; 
 ```
-

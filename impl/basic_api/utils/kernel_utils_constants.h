@@ -19,9 +19,9 @@
 #endif
 #ifndef ASCENDC_MODULE_UTILS_CONSTANTS_H
 #define ASCENDC_MODULE_UTILS_CONSTANTS_H
-#include "utils/kernel_utils_ceil_oom_que.h"
-#include "utils/kernel_utils_dump_constants.h"
-#include "impl/utils/common_types.h"
+#include "kernel_utils_ceil_oom_que.h"
+#include "kernel_utils_dump_constants.h"
+#include "../../utils/common_types.h"
 
 namespace AscendC {
 const int32_t DEFAULT_BLK_NUM = 8;
@@ -188,6 +188,8 @@ const uint32_t TOTAL_L1_SIZE = 1280 * 1024;
 const uint32_t TOTAL_L0C_SIZE = 0;
 const uint32_t VECTOR_REG_WIDTH = 64;
 const uint32_t ONE_BLOCK_SIZE = 32;
+#else
+const uint32_t VECTOR_REG_WIDTH = 256;
 #endif
 
 #if !defined(__NPU_HOST__) && !defined(__ASCC_HOST__)
@@ -358,9 +360,30 @@ const uint64_t LOAD_STRIDE_H = 8;
 
 namespace Internal {
 constexpr int32_t TSCM_CROSS_SYNC_ID_MAX = 11;
-}
-
 #if (defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1) || defined(ASCENDC_DEBUG)
+// load2d param size
+constexpr int32_t ASC_MAX_LOAD2D_SID = 15;
+
+// load3dv1 param size
+constexpr int32_t ASC_MAX_LOAD3D_L1 = 32767;
+constexpr int32_t ASC_MIN_LOAD3D_C1_IDX = 0;
+constexpr int32_t ASC_MAX_LOAD3D_C1_IDX = 4095;
+constexpr int32_t ASC_MIN_LOAD3D_LEFT_TOP = -255;
+constexpr int32_t ASC_MAX_LOAD3D_LEFT_TOP = 32767;
+constexpr int32_t ASC_MIN_LOAD3D_STRIDE = 1;
+constexpr int32_t ASC_MAX_LOAD3D_STRIDE = 63;
+constexpr int32_t ASC_MAX_LOAD3D_FILTER = 255;
+constexpr int32_t ASC_MIN_LOAD3D_FILTER = 1;
+constexpr int32_t ASC_MIN_LOAD3D_FETCH_FILTER = 0;
+constexpr int32_t ASC_MAX_LOAD3D_FETCH_FILTER = 254;
+constexpr int32_t ASC_MIN_LOAD3D_DILATION_FILTER = 1;
+constexpr int32_t ASC_MAX_LOAD3D_JUMP_STRIDE = 127;
+constexpr int32_t ASC_MIN_LOAD3D_JUMP_STRIDE = 1;
+constexpr int32_t ASC_MIN_LOAD3D_REPEAT_TIMES = 1;
+#endif
+} // namespace Internal
+
+#if (defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1)
 // param check size
 const int32_t MAX_BLOCK_COUNT = 4095;
 const int32_t MIN_BLOCK_COUNT = 1;
@@ -604,7 +627,7 @@ using uint4b_t = IntegerSubType<INT4_BIT_NUM, false>;
 using uint3b_t = IntegerSubType<INT3_BIT_NUM, false>;
 using uint2b_t = IntegerSubType<INT2_BIT_NUM, false>;
 #endif
-#if !(defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)))
+#if !((defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))) || defined(__NPU_HOST__) || defined(__ASC_NPU_HOST__))
 using fp8_e8m0_t = uint8_t;
 #elif !defined(ASCENDC_CPU_DEBUG)
 using fp8_e8m0_t = float8_e8m0_t;
