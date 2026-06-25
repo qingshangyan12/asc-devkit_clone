@@ -42,6 +42,8 @@ constexpr Reg::CastTrait castTraitI8I16 = {
 constexpr Reg::CastTrait castTraitI16I8 = {
     Reg::RegLayout::ZERO, Reg::SatMode::NO_SAT, Reg::MaskMergeMode::ZEROING, RoundMode::CAST_ROUND};
 
+static constexpr Reg::ExpSpecificMode expMode = {Reg::MaskMergeMode::ZEROING, ExpAlgo::PRECISION_1ULP_FTZ_FALSE};
+
 namespace PowF {
 constexpr float LOG2_LOWEST_VALUE = 1.175494351e-38f;
 constexpr float LOG2_LOWEST_VALUE_MULS = 8388608.0f;
@@ -155,13 +157,14 @@ __simd_callee__ inline void GetLogFExtStepOne(
     Reg::MaskReg cmpMask;
     Reg::CompareScalar<float, CMPMODE::LT>(cmpMask, srcReg, LOG2_LOWEST_VALUE, mask);
     Reg::Muls(tmpAReg, srcReg, LOG2_LOWEST_VALUE_MULS, mask);
+    Reg::Select(tmpAReg, tmpAReg, srcReg, cmpMask);
     Reg::Select(tmpIReg, params.fractionReg, params.zeroReg, cmpMask);
     // step 1: e = (__float_as_int (a) - __float_as_int (0.70710678f)) & 0xff800000;
     tmpFloatReg = params.subReg;
-    Reg::Sub(tmpEReg, (Reg::RegTensor<int32_t>&)srcReg, (Reg::RegTensor<int32_t>&)tmpFloatReg, mask);
+    Reg::Sub(tmpEReg, (Reg::RegTensor<int32_t>&)tmpAReg, (Reg::RegTensor<int32_t>&)tmpFloatReg, mask);
     Reg::And(tmpEReg, tmpEReg, params.intReg, mask);
     // step 2: m = __int_as_float (__float_as_int (a) - e);
-    Reg::Sub((Reg::RegTensor<int32_t>&)tmpMReg, (Reg::RegTensor<int32_t>&)srcReg, tmpEReg, mask);
+    Reg::Sub((Reg::RegTensor<int32_t>&)tmpMReg, (Reg::RegTensor<int32_t>&)tmpAReg, tmpEReg, mask);
     // step 3: i = fmaf ((float)e, 1.19209290e-7f, i);
     Reg::Cast<float, int32_t, castTraitF32I32>(tmpFloatReg, tmpEReg, mask);
     Reg::Axpy(tmpIReg, tmpFloatReg, LOG2_REDUCE_FMAF_COEFF1, mask);
@@ -332,7 +335,7 @@ __simd_callee__ inline void GetExpCore(
     Reg::MulAddDst(tmPLOReg, tmpLHIReg, expReg, mask);
     Reg::MulAddDst(tmPLOReg, tmpLLOReg, expReg, mask);
     // step 3: r = exp(phi)
-    Reg::Exp(tmpRReg, tmPHIReg, mask);
+    Reg::Exp<float, &expMode>(tmpRReg, tmPHIReg, mask);
     // step 4: r = plo*r + r
     Reg::MulAddDst(tmpRReg, tmPLOReg, tmpRReg, mask);
     /*
