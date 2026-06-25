@@ -47,7 +47,7 @@ __aicore__ inline int64_t GetSubBlockNum()
 
 在自定义算子工程和Kernel直调工程场景下，不同Kernel类型（通过[设置Kernel类型](../../Kernel-Tiling/设置Kernel类型.md)设置）在AIC和AIV上调用该接口的返回值如下：
 
-**表2** 算子工程和Kernel直调工程场景返回值列表
+**表2** 自定义算子工程和Kernel直调工程场景返回值列表
 
 | Kernel类型 | KERNEL_TYPE_AIV_ONLY | KERNEL_TYPE_AIC_ONLY | KERNEL_TYPE_MIX_AIC_1_2 | KERNEL_TYPE_MIX_AIC_1_1 | KERNEL_TYPE_MIX_AIC_1_0 | KERNEL_TYPE_MIX_AIV_1_0 |
 | --- | --- | --- | --- | --- | --- | --- |
