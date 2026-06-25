@@ -28,11 +28,11 @@
 
 头文件路径为：`"basic_api/kernel_operator_atomic_intf.h"`。
 
-该接口用于在指定GM地址上进行原子取大操作，将GM地址上的旧值与输入的标量值进行比较，将较大值写回GM地址，返回该地址修改前的值。
+该接口用于在指定GM地址上进行原子取大操作，将**address**指向的GM地址上的旧值（**old_value**）与输入的标量值（**value**）进行比较，将较大值（**new_value**）写回GM地址，返回该地址修改前的值（**old_value**）。
 
 计算公式如下：
 
-$$result = Max(old\_value, input\_value)$$
+$$new\_value = Max(old\_value, value)$$
 
 ## 函数原型<a name="section1171112415119"></a>
 

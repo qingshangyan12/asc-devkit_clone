@@ -28,11 +28,11 @@
 
 头文件路径为：`"basic_api/kernel_operator_atomic_intf.h"`。
 
-该接口用于在指定GM地址上进行原子取最小值操作，将地址中的旧值与输入标量值做比较，取最小值写回该地址，返回该地址修改前的值。
+该接口用于在指定GM地址上进行原子取最小值操作，将**address**指向的GM地址上的旧值（**old_value**）与输入标量值（**value**）做比较，将较小值（**new_value**）写回GM地址，返回该地址修改前的值（**old_value**）。
 
 计算公式如下：
 
-$$result = Min(old\_value, input\_value)$$
+$$new\_value = Min(old\_value, value)$$
 
 ## 函数原型<a name="section1171112415119"></a>
 

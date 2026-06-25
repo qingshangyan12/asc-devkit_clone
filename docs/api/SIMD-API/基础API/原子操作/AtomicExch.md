@@ -28,11 +28,11 @@
 
 头文件路径为：`"basic_api/kernel_operator_atomic_intf.h"`。
 
-该接口用于在GM内存中执行原子交换操作，读取指定GM地址上的数据并将新值存储回同一地址，返回该地址修改前的值。
+该接口用于在GM内存中执行原子交换操作，读取**address**指向的GM地址上的旧值（**old_value**），并将输入的标量值（**value**）替换旧值存储回同一地址，返回该地址修改前的值（**old_value**）。
 
 计算公式如下：
 
-$$res = new\_value$$
+$$new\_value = value$$
 
 ## 函数原型<a name="section1171112415119"></a>
 

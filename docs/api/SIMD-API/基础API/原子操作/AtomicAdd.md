@@ -28,11 +28,11 @@
 
 头文件路径为：`"basic_api/kernel_operator_atomic_intf.h"`。
 
-该接口用于在指定GM地址上进行原子加操作，将输入值原子加到address指向的GM地址上，返回该地址修改前的值。
+该接口用于在指定GM地址上进行原子加操作，将**address**指向的GM地址上的旧值（**old_value**）与输入标量值（**value**）求和，将和结果（**new_value**）写回GM地址，返回该地址修改前的值（**old_value**）。
 
 计算公式如下：
 
-$$result = Add(old\_value, input\_value)$$
+$$new\_value = Add(old\_value, value)$$
 
 ## 函数原型<a name="section1171112415119"></a>
 
