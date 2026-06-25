@@ -19,8 +19,16 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fstream>
+#include <iostream>
 
 #define ERROR_LOG(fmt, args...) fprintf(stdout, "[ERROR]  " fmt "\n", ##args)
+#define CHECK_ACL(x)                                                                        \
+    do {                                                                                    \
+        aclError __ret = x;                                                                 \
+        if (__ret != ACL_ERROR_NONE) {                                                      \
+            std::cerr << __FILE__ << ":" << __LINE__ << " aclError:" << __ret << std::endl; \
+        }                                                                                   \
+    } while (0);
 
 bool ReadFile(const std::string& filePath, size_t& fileSize, void* buffer, size_t bufferSize)
 {
