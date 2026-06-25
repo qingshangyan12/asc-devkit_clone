@@ -62,6 +62,7 @@ __aicore__ inline HcclHandle Hccl<serverType, config>::AlltoAllV(
     GM_ADDR sendBuf, void* sendCounts, void* sdispls, HcclDataType sendType, GM_ADDR recvBuf, void* recvCounts,
     void* rdispls, HcclDataType recvType, uint8_t repeat)
 {
+    static_assert(serverType != serverType, "A2AV probe: Hccl<serverType, config>::AlltoAllV is instantiated");
     DFX_MAKE_GUARD(
         HcclApiOperType::ALL_TO_ALL_V_PREPARE, GetRankDim(), repeat, sendBuf, sendCounts, sdispls, sendType, recvBuf,
         recvCounts, rdispls, recvType);
