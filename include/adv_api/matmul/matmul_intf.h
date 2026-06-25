@@ -21,15 +21,15 @@
 #ifndef LIB_MATMUL_MATMUL_INTF_H
 #define LIB_MATMUL_MATMUL_INTF_H
 
-#include "../../impl/adv_api/detail/kfc/kfc_register_obj.h"
+#include "../../../impl/adv_api/detail/kfc/kfc_register_obj.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)
-#include "../../impl/adv_api/detail/kfc/kernel_kfc.h"
+#include "../../../impl/adv_api/detail/kfc/kernel_kfc.h"
 #else
 #include "include/adv_api/matmul/matmul.h"
 #endif
 
 #ifdef ASCENDC_MATMUL_AICORE
-#include "../../impl/adv_api/detail/matmul/kfc/matmul_client_impl_aicore.h"
+#include "../../../impl/adv_api/detail/matmul/kfc/matmul_client_impl_aicore.h"
 #endif
 
 namespace AscendC {
