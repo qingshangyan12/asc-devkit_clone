@@ -15,7 +15,7 @@
 
 ## 功能说明
 
-启用模板参数[MatmulCallBackFunc](Matmul模板参数.md#li865693716209)（自定义回调函数）时，设置需要的计算数据或在GM上存储的数据地址等信息，用于回调函数使用。复用同一个Matmul对象时，可以多次调用本接口重新设置对应数据信息。
+启用模板参数[MatmulCallBackFunc](Matmul模板参数.md#matmul-callback-func)（自定义回调函数）时，设置需要的计算数据或在GM上存储的数据地址等信息，用于回调函数使用。复用同一个Matmul对象时，可以多次调用本接口重新设置对应数据信息。
 
 ## 函数原型
 
@@ -56,10 +56,16 @@ Kirin X90产品不支持SetSelfDefineData\(T dataPtr\)接口原型。
 ## 调用示例
 
 ```
-//用户自定义回调函数
-void DataCopyOut(const __gm__ void *gm, const LocalTensor<int8_t> &co1Local, const void *dataCopyOutParams, const uint64_t tilingPtr, const uint64_t dataPtr);
-void CopyA1(const LocalTensor<int8_t> &aMatrix, const __gm__ void *gm, int row, int col, int useM, int useK, const uint64_t tilingPtr, const uint64_t dataPtr);
-void CopyB1(const LocalTensor<int8_t> &bMatrix, const __gm__ void *gm, int row, int col, int useK, int useN, const uint64_t tilingPtr, const uint64_t dataPtr);
+// 用户自定义回调函数
+void DataCopyOut(
+    const __gm__ void* gm, const LocalTensor<int8_t>& co1Local, const void* dataCopyOutParams, const uint64_t tilingPtr,
+    const uint64_t dataPtr);
+void CopyA1(
+    const LocalTensor<int8_t>& aMatrix, const __gm__ void* gm, int row, int col, int useM, int useK,
+    const uint64_t tilingPtr, const uint64_t dataPtr);
+void CopyB1(
+    const LocalTensor<int8_t>& bMatrix, const __gm__ void* gm, int row, int col, int useK, int useN,
+    const uint64_t tilingPtr, const uint64_t dataPtr);
 
 typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> aType;
 typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> bType;
