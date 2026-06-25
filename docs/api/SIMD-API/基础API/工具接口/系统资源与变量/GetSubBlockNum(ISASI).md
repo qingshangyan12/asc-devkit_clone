@@ -41,6 +41,19 @@ __aicore__ inline int64_t GetSubBlockNum()
 | AIV | 1 | - | 2 | 1 | - | 1 |
 | AIC | - | 1 | 1 | 1 | 1 | - |
 
+在融合编译场景下，不同[算子类型](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#section1074418132518)在AIC和AIV上调用该接口的返回值如下：
+
+**表2** 融合编译场景返回值列表
+
+| 算子类型 | 限定符 | AIC | AIV |
+| --- | --- | --- | --- |
+| Vector算子 | __vector__ | - | 1 |
+| Cube算子 | __cube__ | 1 | - |
+| Mix算子 | __mix__(0, 1) | - | 1 |
+| Mix算子 | __mix__(1, 0) | 1 | - |
+| Mix算子 | __mix__(1, 1) | 1 | 1 |
+| Mix算子 | __mix__(1, 2) | 1 | 2 |
+
 ## 约束说明
 
 无
