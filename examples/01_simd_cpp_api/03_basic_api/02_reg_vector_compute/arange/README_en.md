@@ -12,7 +12,7 @@ This example implements the Arange operation based on the Reg programming interf
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── arange
 │   ├── scripts
 │   │   │   ├── gen_data.py            // Ground truth data generation script

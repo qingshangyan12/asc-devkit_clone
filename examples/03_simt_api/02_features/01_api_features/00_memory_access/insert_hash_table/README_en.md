@@ -53,10 +53,10 @@ When a hash collision occurs, a thread needs to determine whether the key stored
 
 ```C++
 struct Bucket {
-    int64_t key;            // Key
-    uint32_t state;         // Key value write status flag
-    uint32_t flag;          // Atomic operation flag
-    float value[32];        // Value
+    int64_t key;     // Key
+    uint32_t state;  // Key value write status flag
+    uint32_t flag;   // Atomic operation flag
+    float value[32]; // Value
 };
 ```
 
@@ -113,6 +113,6 @@ Run the following steps in the root directory of this example to build and execu
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
 
   The following output indicates that the accuracy verification is successful.
-  ```
+  ```bash
   [Success] find all key-value in hash table.
   ```

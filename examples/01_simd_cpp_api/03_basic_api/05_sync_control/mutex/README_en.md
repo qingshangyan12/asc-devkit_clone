@@ -12,7 +12,7 @@ This example demonstrates the usage of the Mutex::Lock, Mutex::Unlock, AllocMute
 
 ## Directory Structure
 
-```
+```text
 ├── mutex
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

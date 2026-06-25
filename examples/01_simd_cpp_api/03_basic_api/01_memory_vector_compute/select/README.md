@@ -16,7 +16,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── select
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
@@ -68,12 +68,12 @@
     ```cpp
     // cmpMode = AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE
     // 标量在后。src0是tensor，src1是标量。当selMask的比特位是1时，从src0中选取；比特位是0时，等于src1
-    static constexpr AscendC::BinaryConfig config = { 1 };
+    static constexpr AscendC::BinaryConfig config = {1};
     AscendC::Select<AscendC::BinaryDefaultType, uint8_t, config>(dst, selMask, src0, src1, cmpMode, count);
 
     // 标量在前。src0是标量，src1是tensor。当selMask的比特位是1时，等于src0；比特位是0时，从src1中选取
-    static constexpr AscendC::BinaryConfig config = { 0 };
-    AscendC::Select<AscendC::BinaryDefaultType, uint8_t, config>(dst, selMask, src0, src1, cmpMode, count); 
+    static constexpr AscendC::BinaryConfig config = {0};
+    AscendC::Select<AscendC::BinaryDefaultType, uint8_t, config>(dst, selMask, src0, src1, cmpMode, count);
     ```
 
 - 场景规格

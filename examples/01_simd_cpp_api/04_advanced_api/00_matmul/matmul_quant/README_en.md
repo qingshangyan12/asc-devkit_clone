@@ -12,7 +12,7 @@ A Matmul example with output dequantization, supporting both uniform coefficient
 | Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
 
 ## Directory Structure
-```
+```text
 ├── matmul_quant
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data
@@ -46,11 +46,11 @@ A Matmul example with output dequantization, supporting both uniform coefficient
       Based on whether the macro CUSTOM_QUANT_VECTOR is defined, set the corresponding dequantization parameters.
       ```cpp
       #if defined(CUSTOM_QUANT_VECTOR)
-          matmulObj.SetQuantVector(quantGlobal);
+      matmulObj.SetQuantVector(quantGlobal);
       #else
-          float quantFloat = 0.1f;
-          uint64_t quantValue = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&quantFloat));
-          matmulObj.SetQuantScalar(quantValue);
+      float quantFloat = 0.1f;
+      uint64_t quantValue = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&quantFloat));
+      matmulObj.SetQuantScalar(quantValue);
       #endif
       ```
 
@@ -58,9 +58,9 @@ A Matmul example with output dequantization, supporting both uniform coefficient
     - Set the Matmul dequantization mode.
       ``` cpp
       #if defined(CUSTOM_QUANT_VECTOR)
-          tilingApi.SetDequantType(matmul_tiling::DequantType::TENSOR); // set TENSOR quant mode
+      tilingApi.SetDequantType(matmul_tiling::DequantType::TENSOR); // set TENSOR quant mode
       #else
-          tilingApi.SetDequantType(matmul_tiling::DequantType::SCALAR); // set SCALAR quant mode
+      tilingApi.SetDequantType(matmul_tiling::DequantType::SCALAR); // set SCALAR quant mode
       #endif
       ```
 

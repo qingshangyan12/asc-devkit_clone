@@ -12,7 +12,7 @@
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
-```
+```text
 ├── matmul_quant
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
@@ -46,11 +46,11 @@
       根据是否定义宏：CUSTOM_QUANT_VECTOR，设置对应的反量化参数。
       ```cpp
       #if defined(CUSTOM_QUANT_VECTOR)
-          matmulObj.SetQuantVector(quantGlobal);
+      matmulObj.SetQuantVector(quantGlobal);
       #else
-          float quantFloat = 0.1f;
-          uint64_t quantValue = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&quantFloat));
-          matmulObj.SetQuantScalar(quantValue);
+      float quantFloat = 0.1f;
+      uint64_t quantValue = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&quantFloat));
+      matmulObj.SetQuantScalar(quantValue);
       #endif
       ```
 
@@ -58,9 +58,9 @@
     - 设置Matmul反量化模式。
       ``` cpp
       #if defined(CUSTOM_QUANT_VECTOR)
-          tilingApi.SetDequantType(matmul_tiling::DequantType::TENSOR); // set TENSOR quant mode
+      tilingApi.SetDequantType(matmul_tiling::DequantType::TENSOR); // set TENSOR quant mode
       #else
-          tilingApi.SetDequantType(matmul_tiling::DequantType::SCALAR); // set SCALAR quant mode
+      tilingApi.SetDequantType(matmul_tiling::DequantType::SCALAR); // set SCALAR quant mode
       #endif
       ```
 

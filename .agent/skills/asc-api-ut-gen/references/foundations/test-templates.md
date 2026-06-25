@@ -23,7 +23,7 @@
 
 适用于需要 gtest fixture 的 UT。核心类型设置和 include 列表按目标 API 所属 guide 调整。
 
-```cpp
+```cpp no-format
 #include <gtest/gtest.h>
 #include "kernel_operator.h"
 
@@ -54,7 +54,7 @@ TEST_F(TEST_{API_NAME}, Level1_{ApiName}_{Scenario})
 
 参数结构只放目标 API 的真实变量维度。不要把通用 dtype 列表、固定 shape 或固定 count 写进模板。
 
-```cpp
+```cpp no-format
 struct {ApiName}TestParams {
     // 示例字段：shape、count、stride、mode、kernel 函数指针等。
 };

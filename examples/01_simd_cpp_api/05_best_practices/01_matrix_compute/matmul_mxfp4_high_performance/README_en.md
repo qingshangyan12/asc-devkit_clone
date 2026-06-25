@@ -16,17 +16,23 @@ This example uses MxFP4 matrix multiplication to introduce MxMatmul performance 
 
 ## Directory Structure
 
-```
+```text
 ├── matmul_mxfp4_high_performance
 │   ├── scripts
-│   │   ├── gen_data.py         // Input data and ground truth generation script
-│   │   └── verify_result.py    // Ground truth comparison script
-│   ├── CMakeLists.txt          // Build project file
-│   ├── data_utils.h            // Data read/write functions
-│   ├── figures                 // Illustrations
-│   ├── matmul_mx.asc           // Ascend C example implementation (including 2 optimization cases)
-│   ├── matmul_mx.h             // Example header file (static Tiling template and kernel implementation)
-│   └── README.md               // Example documentation
+│   │   ├── gen_data
+    .py // Input data and ground truth generation script
+│   │   └── verify_result
+    .py // Ground truth comparison script
+│   ├── CMakeLists
+    .txt // Build project file
+│   ├── data_utils
+    .h // Data read/write functions
+│   ├── figures // Illustrations
+│   ├── matmul_mx
+    .asc // Ascend C example implementation (including 2 optimization cases)
+│   ├── matmul_mx
+    .h // Example header file (static Tiling template and kernel implementation)
+│   └── README.md // Example documentation
 ```
 
 ## Example Description
@@ -78,9 +84,9 @@ This example unifies tiling parameters to be determined at compile time in `matm
 
 ```cpp
 constexpr static auto CONSTANT_CFG = GetMxConstantCFG<aType, bType, cType, EnableScaleCache>();
-AscendC::Matmul<aType, bType, cType, cType, CONSTANT_CFG,
-                    AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>,
-                    AscendC::Impl::Detail::MatmulWithScalePolicy>
+AscendC::Matmul<
+    aType, bType, cType, cType, CONSTANT_CFG, AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>,
+    AscendC::Impl::Detail::MatmulWithScalePolicy>
     matmulObj;
 REGIST_MATMUL_OBJ(pipe, GetSysWorkSpacePtr(), matmulObj, (TCubeTiling*)nullptr);
 ```
@@ -277,7 +283,7 @@ PROF_xxxx_XXXXXX
 
 View the specific performance analysis results:
 
-```
+```bash
 # View Task Duration and various data
 cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
 ```

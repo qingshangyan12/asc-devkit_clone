@@ -14,7 +14,7 @@ This example demonstrates how to register a custom operator using pybind11, base
 
 ## Directory Structure
 
-```
+```text
 ├── pybind
 │   ├── CMakeLists.txt        // Build project file
 │   ├── add_custom.asc        // Ascend C operator implementation & pybind11 registration
@@ -28,7 +28,7 @@ This example demonstrates how to register a custom operator using pybind11, base
 
   The Add computation formula is:
 
-  ```
+  ```text
   z = x + y
   ```
 
@@ -52,10 +52,9 @@ This example demonstrates how to register a custom operator using pybind11, base
   `add_custom.asc` uses the `pybind11` library to wrap C++ code into a Python module. In `PYBIND11_MODULE(ascendc_ops, m)`, `ascendc_ops` is the exported Python module name and `m` is the pybind11 module object; `m.def` binds the C++ function `ascendc_ops::ascendc_add` as a Python-callable `ascendc_add` function, for example:
 
   ```cpp
-  PYBIND11_MODULE(ascendc_ops, m)
-  {
-      m.doc() = "add_custom pybind11 interfaces";
-      m.def("ascendc_add", &ascendc_ops::ascendc_add, "");
+  PYBIND11_MODULE(ascendc_ops, m) {
+    m.doc() = "add_custom pybind11 interfaces";
+    m.def("ascendc_add", &ascendc_ops::ascendc_add, "");
   }
   ```
 

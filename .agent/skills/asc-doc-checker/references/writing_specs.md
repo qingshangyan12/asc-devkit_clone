@@ -136,7 +136,7 @@
 
 按位宽从小到大、有符号→无符号→浮点排序：
 
-```
+```txt
 bool → int4b_t → int8_t → uint8_t → fp4x2_e2m1_t → fp4x2_e1m2_t → 
 hifloat8_t → fp8_e8m0_t → fp8_e5m2_t → fp8_e4m3fn_t → int16_t → 
 uint16_t → half → bfloat16_t → int32_t → uint32_t → float → 
@@ -176,7 +176,7 @@ template <typename T>
 ## 七、API 文档结构
 
 API 文档的标准章节顺序：
-```
+```text
 产品支持情况
 功能说明
 函数原型

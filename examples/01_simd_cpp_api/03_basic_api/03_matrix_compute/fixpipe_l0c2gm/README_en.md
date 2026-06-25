@@ -14,7 +14,7 @@ This example introduces how to use Fixpipe to transfer matrix multiplication res
 
 ## Directory Structure
 
-```
+```text
 ├── fixpipe_l0c2gm
 │   ├── figures                        // Illustrations
 │   ├── scripts

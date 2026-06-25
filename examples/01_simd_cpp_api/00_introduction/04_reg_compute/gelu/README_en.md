@@ -68,7 +68,8 @@ constexpr float COEFF_CUBIC = -0.071405f;
 __simd_vf__ inline static void GeluVfMethod2(
     __ubuf__ float* xAddr, __ubuf__ float* yAddr, uint32_t count, uint32_t loopNum)
 {
-    // Number of float elements that can be processed in one vector computation repeat (e.g., dav-3510: 256 bytes / 4 bytes = 64 elements)
+    // Number of float elements that can be processed in one vector computation
+    // repeat (e.g., dav-3510: 256 bytes / 4 bytes = 64 elements)
     constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
     AscendC::Reg::MaskReg mask;
     AscendC::Reg::RegTensor<float> xReg;
@@ -76,16 +77,17 @@ __simd_vf__ inline static void GeluVfMethod2(
     AscendC::Reg::RegTensor<float> tmpReg;
     for (uint32_t i = 0; i < loopNum; ++i) {
         mask = AscendC::Reg::UpdateMask<float>(count);
-        AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);   // UB → Register
-        AscendC::Reg::Mul(yReg, xReg, xReg, mask);                  // x²
-        AscendC::Reg::Mul(yReg, yReg, xReg, mask);                  // x³
-        AscendC::Reg::Muls(yReg, yReg, COEFF_CUBIC, mask);          // -0.071405 * x³
-        AscendC::Reg::Muls(tmpReg, xReg, COEFF_LINEAR, mask);       // -1.595769 * x
-        AscendC::Reg::Add(yReg, tmpReg, yReg, mask);                // -1.595769x - 0.071405x³
-        AscendC::Reg::Exp(yReg, yReg, mask);                        // exp(...)
-        AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);                 // 1 + exp(...)
-        AscendC::Reg::Div(yReg, xReg, yReg, mask);                  // x / (1 + exp(...))
-        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask); // Register → UB
+        AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize); // UB → Register
+        AscendC::Reg::Mul(yReg, xReg, xReg, mask);                // x²
+        AscendC::Reg::Mul(yReg, yReg, xReg, mask);                // x³
+        AscendC::Reg::Muls(yReg, yReg, COEFF_CUBIC, mask);        // -0.071405 * x³
+        AscendC::Reg::Muls(tmpReg, xReg, COEFF_LINEAR, mask);     // -1.595769 * x
+        AscendC::Reg::Add(yReg, tmpReg, yReg, mask);              // -1.595769x - 0.071405x³
+        AscendC::Reg::Exp(yReg, yReg, mask);                      // exp(...)
+        AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);               // 1 + exp(...)
+        AscendC::Reg::Div(yReg, xReg, yReg, mask);                // x / (1 + exp(...))
+        // Register → UB
+        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
     }
 }
 ```
@@ -98,7 +100,8 @@ template <uint32_t singleCoreLength>
 __global__ __vector__ void gelu_custom(__gm__ uint8_t* x, __gm__ uint8_t* y)
 {
     AscendC::InitSocState();
-    // Core partitioning: Get current core index through GetBlockIdx, calculate data offset
+    // Core partitioning: Get current core index through GetBlockIdx, calculate
+    // data offset
     AscendC::GlobalTensor<float> xGm;
     AscendC::GlobalTensor<float> yGm;
     xGm.SetGlobalBuffer((__gm__ float*)x + AscendC::GetBlockIdx() * singleCoreLength);
@@ -112,7 +115,8 @@ __global__ __vector__ void gelu_custom(__gm__ uint8_t* x, __gm__ uint8_t* y)
     // Stage 1: GM → UB copy in
     AscendC::DataCopy(xLocal, xGm[0], singleCoreLength);
     // Synchronization: Wait for GM→UB transfer to complete
-    // EVENT_ID0 is the hardware event channel number (0-7), each event channel counts independently, this example uses only one channel so it is fixed to 0
+    // EVENT_ID0 is the hardware event channel number (0-7), each event channel
+    // counts independently, this example uses only one channel so it is fixed to 0
     AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
     AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
@@ -218,7 +222,7 @@ cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
 
 ## Directory Structure
 
-``` 
+```text
 ├── gelu
 │   ├── scripts
 │   │   ├── gen_data.py     // Input data and golden data generation script

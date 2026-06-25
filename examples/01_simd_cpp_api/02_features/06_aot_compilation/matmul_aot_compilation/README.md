@@ -16,7 +16,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── matmul_aot_compilation
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── aot_helper.h            // AOT 框架核心实现（Holder、Registry、Dispatcher）
@@ -36,7 +36,7 @@ AOT编译的核心思想是：**将运行时才确定的Tiling参数提前到编
 
 ### 整体流程
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    编译阶段 (Compile Time)                     │
 ├─────────────────────────────────────────────────────────────┤
@@ -82,9 +82,9 @@ AOT编译的核心思想是：**将运行时才确定的Tiling参数提前到编
 ```cpp
 // Tiling 数据以原始字节数组形式定义为编译期常量
 static constexpr uint8_t AOT_MatmulTiling_512x512x128_Value[] = {
-    0x02, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00,
-    0x80, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, ...
-};
+    0x02, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
+    0x02, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x80, 0x00,
+    0x00, 0x00, 0x00, 0x01, 0x00, 0x00, ...};
 ```
 
 该字节数组对应规格 `M=512, N=512, K=128` 下由 `MultiCoreMatmulTiling::GetTiling()` 生成的 `TCubeTiling` 完整内存布局，包含usedCoreNum、singleCoreM、singleCoreN、singleCoreKa、singleCoreKb等全部tiling字段。
@@ -96,20 +96,18 @@ static constexpr uint8_t AOT_MatmulTiling_512x512x128_Value[] = {
 ```cpp
 using MatmulTilingAOTRegistry = aot::AOTRegistry<
     // 此处可以有多个实例，以逗号分隔的list
-    aot::AOTHolder<AscendC::tiling::TCubeTiling, AOT_MatmulTiling_512x512x128_Value>
->;
+    aot::AOTHolder<AscendC::tiling::TCubeTiling, AOT_MatmulTiling_512x512x128_Value>>;
 ```
 
 当前注册了 `512×512×128` 这一个配置。如需添加更多预编译配置，只需定义新的字节数组常量，并追加到注册表中：
 
 ```cpp
-static constexpr uint8_t AOT_MatmulTiling_1024x1024x256_Value[] = { ... };
-using AOT_MatmulTiling_1024x1024x256 = aot::AOTHolder<AscendC::tiling::TCubeTiling, AOT_MatmulTiling_1024x1024x256_Value>;
+static constexpr uint8_t AOT_MatmulTiling_1024x1024x256_Value[] = {...};
+using AOT_MatmulTiling_1024x1024x256 =
+    aot::AOTHolder<AscendC::tiling::TCubeTiling, AOT_MatmulTiling_1024x1024x256_Value>;
 
 using MatmulTilingAOTRegistry = aot::AOTRegistry<
-    aot::AOTHolder<AscendC::tiling::TCubeTiling, AOT_MatmulTiling_512x512x128_Value>,
-    AOT_MatmulTiling_1024x1024x256
->;
+    aot::AOTHolder<AscendC::tiling::TCubeTiling, AOT_MatmulTiling_512x512x128_Value>, AOT_MatmulTiling_1024x1024x256>;
 ```
 
 无需修改kernel调用逻辑，`AOTDispatcher` 自动处理新增版本。
@@ -117,7 +115,7 @@ using MatmulTilingAOTRegistry = aot::AOTRegistry<
 ### 4. Kernel模板设计
 
 ```cpp
-template <typename TH=aot::RuntimeHolder<AscendC::tiling::TCubeTiling>>
+template <typename TH = aot::RuntimeHolder<AscendC::tiling::TCubeTiling>>
 __global__ __cube__ void matmul_custom(
     __gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* c, __gm__ uint8_t* workspace,
     AscendC::tiling::TCubeTiling tilingInput)
@@ -127,7 +125,7 @@ __global__ __cube__ void matmul_custom(
         static_assert(TH::value.M != 0);
     }
     // 获取 Tiling 数据：AOT 版本返回编译期常量，通用版本返回运行时传入值
-    const auto &tiling = aot::GetHolderDataRef<AscendC::tiling::TCubeTiling, TH>(tilingInput);
+    const auto& tiling = aot::GetHolderDataRef<AscendC::tiling::TCubeTiling, TH>(tilingInput);
     // ... 后续 Matmul 计算逻辑使用 tiling 中的常量/变量 ...
 }
 ```
@@ -142,7 +140,7 @@ __global__ __cube__ void matmul_custom(
 ```cpp
 auto tilPtr = reinterpret_cast<const uint8_t*>(&tiling);
 aot::AOTDispatcher<AscendC::tiling::TCubeTiling, MatmulTilingAOTRegistry>::template dispatch(
-    tilPtr,                             // 运行时 Tiling 字节指针
+    tilPtr, // 运行时 Tiling 字节指针
     [&](auto tiling_holder, AscendC::tiling::TCubeTiling value) {
         using Holder = decltype(tiling_holder);
         matmul_custom<Holder><<<numBlocks, nullptr, stream>>>(aDevice, bDevice, cDevice, workspaceDevice, tiling);
@@ -150,11 +148,11 @@ aot::AOTDispatcher<AscendC::tiling::TCubeTiling, MatmulTilingAOTRegistry>::templ
             printf("##### 使用运行时 Tiling\n");
         } else {
             static_assert(Holder::value.M != 0);
-            printf("##### AOT matched! M=%u, N=%u, Ka=%u, Kb=%u\n",
-                   Holder::value.M, Holder::value.N, Holder::value.Ka, Holder::value.Kb);
+            printf(
+                "##### AOT matched! M=%u, N=%u, Ka=%u, Kb=%u\n", Holder::value.M, Holder::value.N, Holder::value.Ka,
+                Holder::value.Kb);
         }
-    }
-);
+    });
 ```
 
 分发流程：
@@ -193,13 +191,13 @@ aot::AOTDispatcher<AscendC::tiling::TCubeTiling, MatmulTilingAOTRegistry>::templ
 
 运行时输出示例：
 
-```
+```text
 ##### AOT matched! M=512, N=512, Ka=128, Kb=128
 ```
 
 若运行时Tiling参数发生变化（例如修改了K值），则自动回退到通用版本：
 
-```
+```bash
 ##### 使用运行时 Tiling
 ```
 

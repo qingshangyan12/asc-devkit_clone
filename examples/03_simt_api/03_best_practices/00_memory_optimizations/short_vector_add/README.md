@@ -20,7 +20,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 short_vector_add
 │   ├── scripts/             // 测试脚本目录
 │   │   ├── gen_data.py      // 生成测试输入和golden数据
@@ -77,7 +77,7 @@ short_vector_add
 **关键代码**：
 
 ```cpp
-template<typename T>
+template <typename T>
 __global__ void add(T* x, T* y, T* z, uint64_t size)
 {
     // gridDim.x * blockDim.x 线程总数 (64 * 1024)
@@ -126,7 +126,7 @@ __global__ void add(T* x, T* y, T* z, uint64_t size)
 **关键代码**：
 
 ```cpp
-template<typename T, typename U>
+template <typename T, typename U>
 __global__ void add2(T* x, T* y, T* z, uint64_t size)
 {
     // 转为向量类型
@@ -274,7 +274,7 @@ msprof op ./demo   # 分析case的性能
 
 查看具体的性能分析结果：
 
-```
+```bash
 # 如查看L2 Cache相关数据
 cat ./OPPROF_*/L2Cache.csv
 ```

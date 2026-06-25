@@ -17,7 +17,7 @@ This example implements parallel execution of sub-kernels within a Superkernel b
 
 ## Directory Structure
 
-```
+```text
 ├── task_sync
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

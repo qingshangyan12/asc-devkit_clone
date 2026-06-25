@@ -13,7 +13,7 @@ This example is a SIMT programming introductory example. It uses the `<<<>>>` ke
 
 ## Directory Structure
 
-```
+```text
 ├── hello_world_simt
 │   ├── CMakeLists.txt      // Build project file
 │   └── hello_world.asc     // Ascend C SIMT programming example implementation and invocation example

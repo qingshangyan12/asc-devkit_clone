@@ -21,7 +21,7 @@ This example uses fixed-divisor integer division computation to demonstrate inte
 
 ## Directory Structure
 
-```
+```text
 ├── simd_simt_integer_fast_div
 │   ├── CMakeLists.txt          // Build project file
 │   ├── integer_div.asc         // Integer division example implementation

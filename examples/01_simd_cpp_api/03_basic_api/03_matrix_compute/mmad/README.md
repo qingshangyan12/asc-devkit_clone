@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── mmad
 │   ├── figures                     // 图示
 │   ├── scripts

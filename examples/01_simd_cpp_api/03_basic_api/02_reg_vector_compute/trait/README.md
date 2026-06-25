@@ -12,7 +12,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── trait
 │   ├── scripts/             // 测试脚本目录
 │   │   └── gen_data.py      // 生成测试输入和golden数据

@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── matmul_gelu_high_performance
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
@@ -85,7 +85,7 @@ $$
 
 **Scenario 1：CV融合-GM中转（中级性能优化）**（A2/A3/Ascend 950PR均支持）
 
-```
+```text
 GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C ──(Fixpipe)──> GM ──(MTE2)──> UB ──(Gelu)──> UB ──(MTE3)──> GM
 ```
 
@@ -93,7 +93,7 @@ GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C �
 
 Ascend 950PR新增L0C->UB的通路，A2/A3不支持，芯片能力增强，因此在Ascend 950PR架构中可以不经过GM直接将矩阵乘结果输出到UB进行GELU计算
 
-```
+```text
 GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C ──(Fixpipe)──> UB ──(Gelu)──> UB ──(MTE3)──> GM
 ```
 
@@ -124,9 +124,9 @@ GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C �
 __aicore__ inline void GeluMemBaseCompute(
     const AscendC::LocalTensor<float>& xLocal, const AscendC::LocalTensor<float>& yLocal, uint32_t n)
 {
-    AscendC::Mul(yLocal, xLocal, xLocal, n);        // x²
+    AscendC::Mul(yLocal, xLocal, xLocal, n); // x²
     AscendC::PipeBarrier<PIPE_V>();
-    AscendC::Mul(yLocal, yLocal, xLocal, n);        // x³
+    AscendC::Mul(yLocal, yLocal, xLocal, n); // x³
     ……
 }
 ```
@@ -143,9 +143,8 @@ __simd_vf__ inline void GeluVf(__ubuf__ float* xAddr, __ubuf__ float* yAddr, uin
     for (uint16_t i = 0; i < loopNum; ++i) {
         mask = AscendC::Reg::UpdateMask<float>(n);
         AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
-        AscendC::Reg::Mul(yReg, xReg, xReg, mask);       // x²
-        ……
-        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
+        AscendC::Reg::Mul(yReg, xReg, xReg, mask); // x²
+        …… AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
     }
 }
 ```
@@ -157,7 +156,8 @@ __simd_vf__ inline void GeluVf(__ubuf__ float* xAddr, __ubuf__ float* yAddr, uin
 本样例使用 `__global__ __mix__(1, 2)` 声明核函数，表示每个逻辑核由1个AIC和2个AIV组成。AIC侧负责Matmul计算，AIV侧负责GELU向量计算，两者在同一AI Core内按(baseM × baseN)块粒度流水并行。
 
 ```cpp
-__global__ __mix__(1, 2) void mmad_vector_custom(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
+__global__ __mix__(1, 2) void mmad_vector_custom(
+    __gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
 {
     AscendC::InitSocState();
     KernelMmadVector<...> op;
@@ -186,10 +186,10 @@ AIC侧每完成一个 (baseM × baseN)大小子块的Fixpipe输出后，通过 `
 
 ```cpp
 // AIC侧 CopyOutAic():
-AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0x8);  // 通知AIV数据就绪
+AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0x8); // 通知AIV数据就绪
 
 // AIV侧 GeluFromGM() / GeluFromUB():
-AscendC::CrossCoreWaitFlag(0x8);  // 等待AIC侧Fixpipe完成
+AscendC::CrossCoreWaitFlag(0x8); // 等待AIC侧Fixpipe完成
 ```
 
 #### 3. `__mix__(1,2)` 模式下的多核切分
@@ -201,7 +201,7 @@ uint32_t logicCoreId;
 if ASCEND_IS_AIC {
     logicCoreId = AscendC::GetBlockIdx();
 } else {
-    logicCoreId = AscendC::GetBlockIdx() / 2;  // __mix__(1,2): 每个逻辑核对应2个AIV
+    logicCoreId = AscendC::GetBlockIdx() / 2; // __mix__(1,2): 每个逻辑核对应2个AIV
 }
 uint32_t mIterIdx = logicCoreId % mIter;
 uint32_t nIterIdx = logicCoreId / mIter;
@@ -235,7 +235,7 @@ AIC侧通过Fixpipe将L0C计算结果写入GM，AIV侧从GM读取数据到UB后�
 
 数据流路径：
 
-```
+```bash
 GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C ──(Fixpipe)──> GM ──(MTE2)──> UB ──(Gelu)──> UB ──(MTE3)──> GM
 ```
 
@@ -340,7 +340,7 @@ Ascend 950PR新增L0C->UB的通路，A2/A3不支持，芯片能力增强，因�
 
 数据流路径：
 
-```
+```text
 GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C ──(Fixpipe)──> UB ──(Gelu)──> UB ──(MTE3)──> GM
 ```
 
@@ -354,7 +354,7 @@ fixpipeParams.mSize = AscendC::DivCeil(curM, 2) * 2;
 fixpipeParams.nSize = curN;
 fixpipeParams.srcStride = curMAlign;
 fixpipeParams.dstStride = curN;
-fixpipeParams.dualDstCtl = 0b01;  // 按M维度拆分到2个AIV的UB
+fixpipeParams.dualDstCtl = 0b01; // 按M维度拆分到2个AIV的UB
 AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_UB>(xUB, cLocal, fixpipeParams);
 ```
 
@@ -371,7 +371,8 @@ GeluRegBaseCompute(xUB, geluOutUB, computeLen);
 // DataCopy: geluOutUB → GM
 uint32_t localSubIdx = AscendC::GetSubBlockIdx() % 2;
 uint32_t offset = baseM / 2 * N;
-AscendC::DataCopyPad<float>(cGM[mBlockIdx * baseM * N + nBlockIdx * baseN + localSubIdx * offset], geluOutUB, copyParams);
+AscendC::DataCopyPad<float>(
+    cGM[mBlockIdx * baseM * N + nBlockIdx * baseN + localSubIdx * offset], geluOutUB, copyParams);
 ```
 
 **性能数据**
@@ -511,7 +512,7 @@ PROF_xxxx_XXXXXX
 
 查看具体的性能分析结果：
 
-```
+```bash
 # 查看Task Duration 以及各项数据
 cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
 ```

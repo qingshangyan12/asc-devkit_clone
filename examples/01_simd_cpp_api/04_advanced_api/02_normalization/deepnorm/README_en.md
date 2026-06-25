@@ -14,7 +14,7 @@ This example uses the DeepNorm high-level API provided by Ascend C in a deep neu
 
 ## Directory Structure
 
-```
+```text
 ├── deepnorm
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

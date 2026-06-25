@@ -17,7 +17,7 @@ This example demonstrates how to use the Fill interface to initialize the L0A Bu
 
 ## Directory Structure
 
-```
+```text
 ├── fill
 │   ├── scripts
 │   │   ├── gen_data.py         // Input data and ground truth generation script

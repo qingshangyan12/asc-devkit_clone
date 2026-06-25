@@ -14,7 +14,7 @@ This example uses MatmulLeakyRelu fused computation as the carrier to demonstrat
 
 ## Directory Structure
 
-```
+```text
 ├── 08_simulator
 │   ├── CMakeLists.txt          // Build project file
 │   ├── data_utils.h            // Data read/write helper functions
@@ -112,7 +112,7 @@ msprof op simulator --soc-version=<soc_version> ./demo
 
 After the command completes, a folder named `OPPROF_{timestamp}_XXX` is generated in the current directory. The output structure is as follows:
 
-```
+```text
 OPPROF_{timestamp}_XXX/
 ├── dump                    // Raw performance data, no user attention needed
 └── simulator

@@ -13,7 +13,7 @@ Matmul样例M方向或者N方向切分输入的矩阵，将矩阵切分成多块
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
-```
+```text
 ├── matmul_l2cache
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
@@ -47,11 +47,11 @@ Matmul样例M方向或者N方向切分输入的矩阵，将矩阵切分成多块
       L2CacheOpt l2Opt(shapes, blockNum);
       matmulObj.SetOrgShape(shapes.m, shapes.n, shapes.k);
       for (int64_t tileIdx = curBlockIdx; tileIdx < l2Opt.GetTileNum(); tileIdx += blockNum) {
-          auto blockShape = l2Opt.GetBlockShape(tileIdx);  // 获取单次计算L2切分块大小
+          auto blockShape = l2Opt.GetBlockShape(tileIdx); // 获取单次计算L2切分块大小
           if (Get<0>(blockShape) <= 0 || Get<1>(blockShape) <= 0) {
               return;
           }
-          auto blockCoord = l2Opt.GetBlockCoord(tileIdx);  // 获取当前计算下标blockCoord
+          auto blockCoord = l2Opt.GetBlockCoord(tileIdx); // 获取当前计算下标blockCoord
           matmulObj.SetTail(Get<0>(blockShape), Get<1>(blockShape), Get<2>(blockShape));
           const auto& offsetCoord = CalcOffset(shapes, blockCoord); // 基于下标计算矩阵偏移
           int64_t offsetA = Get<0>(offsetCoord);
@@ -62,7 +62,7 @@ Matmul样例M方向或者N方向切分输入的矩阵，将矩阵切分成多块
           if (shapes.isBias) {
               matmulObj.SetBias(biasGlobal);
           }
-          matmulObj.IterateAll(cGlobal[offsetC]);  // 计算L2切分块
+          matmulObj.IterateAll(cGlobal[offsetC]); // 计算L2切分块
       }
       matmulObj.End();
       ```
@@ -89,7 +89,7 @@ Matmul样例M方向或者N方向切分输入的矩阵，将矩阵切分成多块
         constexpr bool isNMajor = l1N > l1M; // 根据shape大小，判断主维度
         for (int64_t i = maxMajor; i >= L1_MIN_UST_DIM; i--) {
             for (int64_t j = maxMinor; j >= minMinor; j--) {
-                if (GetTotalSize(j * l1M, i * l1N, k_) <= L2_TILE_THRESHOLD) { // 确保分块小于L2Cache阈值
+                if (GetTotalSize(j * l1M, i * l1N, k_) <= L2_TILE_THRESHOLD) {           // 确保分块小于L2Cache阈值
                     uint64_t mConflictTmp = AscendC::Ceil(blockNum_, mL2TileNumTailTmp); // 计算负载冲突值
                     uint64_t nConflictTmp = AscendC::Ceil(blockNum_, nL2TileNumTailTmp);
                     if (mConflict >= mConflictTmp && nConflict >= nConflictTmp) { // 若冲突值更小，更新分块数量

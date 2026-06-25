@@ -14,7 +14,7 @@ This example demonstrates how to register a custom operator using the torch.libr
 
 ## Directory Structure
 
-```
+```text
 ├── torch_library
 │   ├── CMakeLists.txt          // Build project file
 │   ├── add_custom.asc          // Ascend C operator implementation & torch.library registration
@@ -28,7 +28,7 @@ This example demonstrates how to register a custom operator using the torch.libr
 
   The Add computation formula is:
 
-  ```
+  ```text
   z = x + y
   ```
 
@@ -50,18 +50,13 @@ This example demonstrates how to register a custom operator using the torch.libr
   PyTorch provides the `TORCH_LIBRARY` macro as the core interface for custom operator registration, which creates and initializes a custom operator library. After registration, the operator can be invoked from Python via `torch.ops.namespace.op_name`, for example:
 
   ```cpp
-  TORCH_LIBRARY(ascendc_ops, m) {
-      m.def("ascendc_add(Tensor x, Tensor y) -> Tensor");
-  }
+  TORCH_LIBRARY(ascendc_ops, m) { m.def("ascendc_add(Tensor x, Tensor y) -> Tensor"); }
   ```
 
   `TORCH_LIBRARY_IMPL` binds the operator to a specific `DispatchKey` (PyTorch device dispatch identifier). For NPU devices, register the operator implementation to the dedicated `PrivateUse1` `DispatchKey`, for example:
 
   ```cpp
-  TORCH_LIBRARY_IMPL(ascendc_ops, PrivateUse1, m)
-  {
-      m.impl("ascendc_add", TORCH_FN(ascendc_ops::ascendc_add));
-  }
+  TORCH_LIBRARY_IMPL(ascendc_ops, PrivateUse1, m) { m.impl("ascendc_add", TORCH_FN(ascendc_ops::ascendc_add)); }
   ```
 
   In the `ascendc_add` function, the current NPU stream is obtained via `c10_npu::getCurrentNPUStream()`, and the custom kernel function `add_custom` is invoked through the kernel invocation notation `<<<>>>` to execute the operator on the NPU.

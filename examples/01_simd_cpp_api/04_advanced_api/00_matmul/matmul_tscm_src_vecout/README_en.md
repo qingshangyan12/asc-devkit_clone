@@ -10,7 +10,7 @@ A Matmul example that uses user-defined TSCM input with data sourced from VECOUT
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── matmul_tscm_src_vecout
 │   ├── scripts
 │   │   ├── gen_data.py                         // Script for generating input data and ground truth data
@@ -43,16 +43,16 @@ A Matmul example that uses user-defined TSCM input with data sourced from VECOUT
   - Key Kernel Steps
     - Create the Matmul object. In the MatmulType of the left matrix A, POSITION is TSCM and SRC_POSITION is VECOUT.
       ```cpp
-      AscendC::MatmulType<AscendC::TPosition::TSCM, CubeFormat::NZ, AType, 
-                          IS_TRANS_A, LayoutMode::NONE, false, AscendC::TPosition::VECOUT>
+      AscendC::MatmulType<
+          AscendC::TPosition::TSCM, CubeFormat::NZ, AType, IS_TRANS_A, LayoutMode::NONE, false, AscendC::TPosition::VECOUT>
       ```
     - Customize the transfer of the left matrix A from VECOUT to TSCM, set the left matrix A, right matrix B, and Bias, where the left matrix A is TSCM input.
       ```cpp
       // Copy aMatrix from vecout to tscm
       AscendC::TSCM<AscendC::TPosition::VECOUT, 1> scm;
-      pipe->InitBuffer(scm, 1, tiling.M * tiling.Ka * sizeof(AType));
+      pipe->InitBuffer(scm, 1, tiling.M* tiling.Ka * sizeof(AType));
       auto scmTensor = scm.AllocTensor<AType>();
-      DataCopy(scmTensor, vecoutLocal, tiling.M * tiling.Ka);
+      DataCopy(scmTensor, vecoutLocal, tiling.M* tiling.Ka);
       scm.EnQue(scmTensor);
       AscendC::LocalTensor<AType> scmLocal = scm.DeQue<AType>();
 

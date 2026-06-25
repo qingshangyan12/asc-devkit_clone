@@ -28,7 +28,7 @@
 - 样例功能：  
   计算公式：
 
-  ```
+  ```text
   output[i] = input[index[i]] + 1
   ```
 
@@ -54,16 +54,14 @@
   gather & adds样例的实现流程主要分为3个步骤：simt_gather，simd_adds和DataCopy。
 
   （1）simt_gather从GM（Global Memory）输入中获取指定索引的数据。
-  ```
+  ```cpp
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  ...
-  uint32_t gather_idx = index[idx];
-  ...
-  gather_output[threadIdx.x] = input[gather_idx];
+  ... uint32_t gather_idx = index[idx];
+  ... gather_output[threadIdx.x] = input[gather_idx];
   ```
 
   （2）simd_adds将UB（Unified Buffer）中数据做加1操作。调用Reg::LoadAlign将数据从UB（Unified Buffer）搬运到寄存器上，调用Reg::Adds完成加1运算并输出到目标寄存器，最后调用Reg::StoreAlign将数据从寄存器搬运到UB。重复上述操作即可完成1024个数据元素的加1运算。
-  ```
+  ```cpp
   for (uint16_t i = 0; i < repeat_times; i++) {
       AscendC::Reg::LoadAlign(src_reg0, input + i * one_repeat_size);
       AscendC::Reg::Adds(dst_reg0, src_reg0, adds_addend, mask_reg);
@@ -117,6 +115,6 @@
 
 - 执行结果  
   执行结果如下，说明精度对比成功。
-  ```
+  ```text
   test pass!
   ```

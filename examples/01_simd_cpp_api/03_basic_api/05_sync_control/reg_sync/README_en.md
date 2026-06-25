@@ -26,7 +26,7 @@ This example implements a synchronization mechanism for UB (Unified Buffer) read
 
 ## Directory Structure
 
-```
+```text
 ├── reg_sync
 │   ├── scripts
 │   │   ├── gen_data.py                // Script for generating input data and ground truth data

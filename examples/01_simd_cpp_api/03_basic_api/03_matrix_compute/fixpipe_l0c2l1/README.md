@@ -18,7 +18,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── fixpipe_l0c2l1
 │   ├── scripts
 │   │   ├── gen_data.py                // 输入数据和真值数据生成脚本

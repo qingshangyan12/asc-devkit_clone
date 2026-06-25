@@ -12,7 +12,7 @@ This example introduces how to use the multi-dimensional data transfer API to im
 
 ## Directory Structure
 
-```
+```text
 ├── data_copy_gm2ub_nddma
 │   ├── scripts
 │   │   ├── gen_data.py                         // Input data and ground truth generation script

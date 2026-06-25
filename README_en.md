@@ -83,7 +83,7 @@ The overall logical architecture diagram is shown below:
 ## 🔍 Directory Structure
 This repository mainly contains Ascend C programming APIs and necessary cmake build scripts, which are the core modules required for operator development. The directory structure is as follows:
 
-```
+```text
 ├── cmake                               # Ascend C build source code
 ├── docs                                # Project documentation
 ├── examples                            # Ascend C API sample projects

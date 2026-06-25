@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── mmad_gemv
 │   ├── figures                     // 本文中的插图文件
 │   ├── scripts

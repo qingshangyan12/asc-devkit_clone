@@ -21,7 +21,7 @@ Relationship between the two APIs: `SoftmaxGradFront` is a subset of `SoftmaxGra
 
 ## Directory Structure
 
-```
+```text
 ├── softmaxgrad
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data (supports both modes)

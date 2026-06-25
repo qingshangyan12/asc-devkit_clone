@@ -16,7 +16,7 @@ When multiple cores operate on GM addresses, if the data cannot be aligned to Ca
 
 ## Directory Structure
 
-```
+```text
 ├── gm_by_pass_dcache
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

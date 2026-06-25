@@ -91,14 +91,14 @@ flowchart TD
 
 ```cpp
 #if __NPU_ARCH__ == 2201
-    // ascend910b1
+// ascend910b1
 #elif __NPU_ARCH__ == 3510
-    // ascend950pr_9599
+// ascend950pr_9599
 #endif
 
 // 多架构判断
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)
-    // 多架构通用代码
+// 多架构通用代码
 #endif
 ```
 
@@ -118,7 +118,8 @@ flowchart TD
 
 ```cpp
 [[deprecated("Use NewAPI instead")]]
-__aicore__ inline void OldFunction(...) { }
+__aicore__ inline void OldFunction(...)
+{}
 
 // 头文件 deprecated（常见于接口迁移）
 [[deprecated(__FILE__ " is deprecated, please use softmax.h instead!")]]
@@ -163,8 +164,7 @@ pattern_class = r'template\s*<[^>]*>\s*class\s+(\w+)'
 
 ```cpp
 template <class A_TYPE, class B_TYPE, class C_TYPE, ...>
-class MatmulImpl
-{
+class MatmulImpl {
     // 成员函数...
 };
 // 提取：MatmulImpl
@@ -282,7 +282,7 @@ ASCENDC_ASSERT((false), "VectorPadding is not supported");
 
 ## 9. 测试目录结构
 
-```
+```text
 tests/api/
 ├── basic_api/                                    # membase基础API 测试
 │   ├── ascendc_case_ascend910b1/
@@ -318,7 +318,7 @@ tests/api/
 
 ### 10.1 API 接口扫描
 
-```
+```txt
 # Step 1: 扫描高阶API
 Glob: {ASC_DEVKIT_PATH}/include/adv_api/**/*.h
 Grep: pattern="template.*class\s+\w+"
@@ -344,7 +344,7 @@ Grep: pattern="#if.*__NPU_ARCH__|#ifdef.*__DAV_"
 
 ### 10.2 UT 文件扫描与跨文件检测
 
-```
+```txt
 # 扫描现有 UT
 Glob: {ASC_DEVKIT_PATH}/tests/api/**/*.cpp
 

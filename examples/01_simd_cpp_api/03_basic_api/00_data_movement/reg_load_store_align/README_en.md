@@ -40,7 +40,7 @@ This example implements contiguous and non-contiguous aligned data transfer oper
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
-```
+```text
 ├── reg_load_store_align
 │   ├── scripts
 │   │   ├── gen_data.py                // Input data and ground truth generation script

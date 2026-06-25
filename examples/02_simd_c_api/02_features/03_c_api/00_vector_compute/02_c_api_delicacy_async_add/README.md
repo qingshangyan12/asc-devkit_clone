@@ -7,7 +7,7 @@
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
-```
+```text
 ├── 02_c_api_delicacy_async_add
 │   ├── CMakeLists.txt      // 编译工程文件
 │   ├── README.md           // 说明文档
@@ -17,7 +17,7 @@
 ## 算子描述
 - 算子功能：  
 Add算子实现了两个数据相加，返回相加结果的功能。对应的数学表达式为：  
-  ```
+  ```text
   z = x + y
   ```
 - 算子规格：

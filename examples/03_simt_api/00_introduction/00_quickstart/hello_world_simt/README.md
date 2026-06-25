@@ -13,7 +13,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── hello_world_simt
 │   ├── CMakeLists.txt      // 编译工程文件
 │   └── hello_world.asc     // Ascend C SIMT编程样例实现 & 调用样例

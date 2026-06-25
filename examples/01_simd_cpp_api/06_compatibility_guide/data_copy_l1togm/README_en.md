@@ -17,7 +17,7 @@ This example demonstrates the end-to-end flow of L1 data transfer to GM, isolati
 
 ## Directory Structure
 
-```
+```text
 ├── data_copy_l1togm
 │   ├── scripts
 │   │   ├── gen_data.py         // Input data and ground truth generation script

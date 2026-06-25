@@ -14,7 +14,7 @@ This sample demonstrates tiling offload computation using AI CPU operators.
 
 ## Directory Structure
 
-```
+```text
 ├── aicpu_device_tiling
 │   ├── CMakeLists.txt                     // Build project file
 │   ├── aicore_kernel.asc                  // AI Core operator implementation

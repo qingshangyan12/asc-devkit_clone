@@ -11,7 +11,7 @@ A Matmul example with M/N-axis pipeline parallelism. This feature applies to sce
 | Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
 
 ## Directory Structure
-```
+```text
 ├── matmul_mn_double_buffer
 │   ├── scripts
 │   │   ├── gen_data.py                     // Script for generating input data and ground truth data
@@ -41,21 +41,22 @@ A Matmul example with M/N-axis pipeline parallelism. This feature applies to sce
     - When creating the Matmul object, customize the MatmulConfig parameters, set MatmulConfigMode to CONFIG_MDL, set the scheduleType parameter to ScheduleType::OUTER_PRODUCT, and set the iterateOrder parameter to IterateOrder::ORDER_M to enable N-direction pipeline parallelism with the MDL template, obtaining a custom Matmul object using the MDL template.
       ```cpp
       constexpr static MatmulConfigMode configModeMDL = MatmulConfigMode::CONFIG_MDL;
-      constexpr static MatmulFuncParams funcParamsOrderM{false, false, false, false, 0, IterateOrder::ORDER_M, ScheduleType::OUTER_PRODUCT, true, true};
+      constexpr static MatmulFuncParams funcParamsOrderM{
+          false, false, false, false, 0, IterateOrder::ORDER_M, ScheduleType::OUTER_PRODUCT, true, true};
       constexpr static MatmulConfig CFG_MDL_OUTER_PRODUCT_ORDER_M = GetMMConfig<configModeMDL>(funcParamsOrderM);
 
       using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, ATYPE, false>;
       using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false>;
       using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-      using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+      using BIAS_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
       AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL_OUTER_PRODUCT_ORDER_M> matmulObj;
       ```
 
   - Key Tiling Steps
     - Set custom MatmulConfig parameters to synchronize Kernel-side configured parameters such as scheduleType to the Tiling side.
       ```cpp
-      matmul_tiling::MatmulConfigParams matmulConfigParams(1, false, matmul_tiling::ScheduleType::OUTER_PRODUCT,
-          matmul_tiling::MatrixTraverse::FIRSTM, false);
+      matmul_tiling::MatmulConfigParams matmulConfigParams(
+          1, false, matmul_tiling::ScheduleType::OUTER_PRODUCT, matmul_tiling::MatrixTraverse::FIRSTM, false);
       cubeTiling.SetMatmulConfigParams(matmulConfigParams);
       ```
 

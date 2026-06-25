@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── load_data_2dv2_l12l0
 │   ├── figures                          // 图示
 │   ├── scripts
@@ -190,7 +190,8 @@ GM(ND) -> L1(Nz) -> L0A(Nz)/L0B(Zn) -> L0C(Nz) -> GM(ND)
 - `CeilAlign`：向上对齐操作。例如`m = 30`时，`CeilAlign(30, 16) = 32`，表示将m轴向16对齐，对齐后m轴长度为32。
 
 ```cpp
-__aicore__ inline uint16_t CeilAlign(uint16_t size, uint16_t alignValue) {
+__aicore__ inline uint16_t CeilAlign(uint16_t size, uint16_t alignValue)
+{
     return (size + alignValue - 1) / alignValue * alignValue;
 }
 ```
@@ -369,15 +370,15 @@ L1 -> L0A不转置时，B8 / B16 / B32三种数据类型的参数配置基本相
 - `ifTranspose = false`，表示只完成L1 Nz到L0A Nz的排布搬运，不做转置。
 
 ```cpp
-mAlignL1 = CeilAlign(m, fractalShape[0]); // 48
+mAlignL1 = CeilAlign(m, fractalShape[0]);  // 48
 kaAlignL1 = CeilAlign(k, fractalShape[1]); // 96
-mAlignL0 = CeilAlign(m, fractalShape[0]); // 48
+mAlignL0 = CeilAlign(m, fractalShape[0]);  // 48
 kaAlignL0 = CeilAlign(k, fractalShape[1]); // 96
 AscendC::LoadData2DParamsV2 loadDataParams;
 loadDataParams.mStartPosition = 0;
 loadDataParams.kStartPosition = 0;
-loadDataParams.mStep = CeilDivision(mAlignL1, fractalShape[0]); // 3
-loadDataParams.kStep = CeilDivision(kaAlignL1, fractalShape[1]); // 3
+loadDataParams.mStep = CeilDivision(mAlignL1, fractalShape[0]);     // 3
+loadDataParams.kStep = CeilDivision(kaAlignL1, fractalShape[1]);    // 3
 loadDataParams.srcStride = CeilDivision(mAlignL1, fractalShape[0]); // 3
 loadDataParams.dstStride = CeilDivision(mAlignL0, fractalShape[0]); // 3
 loadDataParams.ifTranspose = false;
@@ -406,14 +407,14 @@ B8输入数据类型分形为16 * 32，L1 -> L0转置时会按照方型将row方
 
 ```cpp
 kaAlignL1 = CeilAlign(k, fractalShape[0] * fractalNum); // 96
-mAlignL1 = CeilAlign(m, fractalShape[1]); // 64
-mAlignL0 = CeilAlign(m, fractalShape[0] * fractalNum); // 64
-kaAlignL0 = CeilAlign(k, fractalShape[1]); // 96
+mAlignL1 = CeilAlign(m, fractalShape[1]);               // 64
+mAlignL0 = CeilAlign(m, fractalShape[0] * fractalNum);  // 64
+kaAlignL0 = CeilAlign(k, fractalShape[1]);              // 96
 AscendC::LoadData2DParamsV2 loadDataParams;
-loadDataParams.mStep = CeilDivision(kaAlignL1, fractalShape[0]); // 6
-loadDataParams.kStep = CeilDivision(mAlignL1, fractalShape[1]); // 2
+loadDataParams.mStep = CeilDivision(kaAlignL1, fractalShape[0]);     // 6
+loadDataParams.kStep = CeilDivision(mAlignL1, fractalShape[1]);      // 2
 loadDataParams.srcStride = CeilDivision(kaAlignL1, fractalShape[0]); // 6
-loadDataParams.dstStride = CeilDivision(mAlignL0, fractalShape[0]); // 4
+loadDataParams.dstStride = CeilDivision(mAlignL0, fractalShape[0]);  // 4
 loadDataParams.ifTranspose = true;
 loadDataParams.sid = 0;
 AscendC::LoadData(a2Local, a1Local, loadDataParams);
@@ -432,16 +433,16 @@ for循环调用时，沿L1 row方向（A矩阵k轴）分段搬运，每次搬运
 
 ```cpp
 kaAlignL1 = CeilAlign(k, fractalShape[0] * fractalNum); // 96
-mAlignL1 = CeilAlign(m, fractalShape[1]); // 64
-mAlignL0 = CeilAlign(m, fractalShape[0]); // 48
-kaAlignL0 = CeilAlign(k, fractalShape[1]); // 96
+mAlignL1 = CeilAlign(m, fractalShape[1]);               // 64
+mAlignL0 = CeilAlign(m, fractalShape[0]);               // 48
+kaAlignL0 = CeilAlign(k, fractalShape[1]);              // 96
 // 输入为int8类型，A矩阵[k,m]转置输入，L1 -> L0A需要转置
 // for循环调用Load2Dv2，以k轴方向做for循环，每次循环在L1的k方向搬运2个分形，在L0A上跳过m方向尾脏数据分形，m方向多搬运数据不超过1个分形
 uint16_t L0ALoopNum = CeilDivision(kaAlignL0, fractalShape[0] * fractalNum); // 3
-loadDataParams.mStep = INT8_M_STEP_ALIGN; // 2
-loadDataParams.kStep = CeilDivision(mAlignL0, fractalShape[1]); // 2
-loadDataParams.srcStride = CeilDivision(kaAlignL1, fractalShape[0]); // 6
-loadDataParams.dstStride = CeilDivision(mAlignL0, fractalShape[0]); // 3
+loadDataParams.mStep = INT8_M_STEP_ALIGN;                                    // 2
+loadDataParams.kStep = CeilDivision(mAlignL0, fractalShape[1]);              // 2
+loadDataParams.srcStride = CeilDivision(kaAlignL1, fractalShape[0]);         // 6
+loadDataParams.dstStride = CeilDivision(mAlignL0, fractalShape[0]);          // 3
 loadDataParams.ifTranspose = true;
 uint32_t dstOffset = 0;
 for (uint16_t loopIdx = 0; loopIdx < L0ALoopNum; ++loopIdx) {
@@ -468,14 +469,14 @@ B16输入数据类型分形为16 * 16，一个分形即一个方型，L1 -> L0�
 
 ```cpp
 kaAlignL1 = CeilAlign(k, fractalShape[0] * fractalNum); // 80
-mAlignL1 = CeilAlign(m, fractalShape[1]); // 48
-mAlignL0 = CeilAlign(m, fractalShape[0] * fractalNum); // 48
-kaAlignL0 = CeilAlign(k, fractalShape[1]); // 80
+mAlignL1 = CeilAlign(m, fractalShape[1]);               // 48
+mAlignL0 = CeilAlign(m, fractalShape[0] * fractalNum);  // 48
+kaAlignL0 = CeilAlign(k, fractalShape[1]);              // 80
 AscendC::LoadData2DParamsV2 loadDataParams;
-loadDataParams.mStep = CeilDivision(kaAlignL1, fractalShape[0]); // 5
-loadDataParams.kStep = CeilDivision(mAlignL1, fractalShape[1]); // 3
+loadDataParams.mStep = CeilDivision(kaAlignL1, fractalShape[0]);     // 5
+loadDataParams.kStep = CeilDivision(mAlignL1, fractalShape[1]);      // 3
 loadDataParams.srcStride = CeilDivision(kaAlignL1, fractalShape[0]); // 5
-loadDataParams.dstStride = CeilDivision(mAlignL0, fractalShape[0]); // 3
+loadDataParams.dstStride = CeilDivision(mAlignL0, fractalShape[0]);  // 3
 loadDataParams.ifTranspose = true;
 loadDataParams.sid = 0;
 AscendC::LoadData(a2Local, a1Local, loadDataParams);
@@ -493,15 +494,15 @@ B32输入数据类型分形为16 * 8，L1 -> L0转置时会按照方型将col方
 本样例`m = 40`。B32转置搬运时需要将col方向2个分形拼成方型，**`kStep`必须是2的倍数**，因此L1上col方向（m方向）会多读1个无效分形。写入L0A后，k方向尾部会多1个无效分形；由于L0A为Nz排布，`Mmad`配置`mmadParams.k = k`即可只让有效k轴数据参与计算。
 
 ```cpp
-kaAlignL1 = CeilAlign(k, fractalShape[0]); // 80
-mAlignL1 = CeilAlign(m, fractalShape[1] * fractalNum); // 48
-mAlignL0 = CeilAlign(m, fractalShape[0]); // 48
+kaAlignL1 = CeilAlign(k, fractalShape[0]);              // 80
+mAlignL1 = CeilAlign(m, fractalShape[1] * fractalNum);  // 48
+mAlignL0 = CeilAlign(m, fractalShape[0]);               // 48
 kaAlignL0 = CeilAlign(k, fractalShape[1] * fractalNum); // 80
 AscendC::LoadData2DParamsV2 loadDataParams;
-loadDataParams.mStep = CeilDivision(kaAlignL1, fractalShape[0]); // 5
-loadDataParams.kStep = CeilDivision(mAlignL1, fractalShape[1]); // 6
+loadDataParams.mStep = CeilDivision(kaAlignL1, fractalShape[0]);     // 5
+loadDataParams.kStep = CeilDivision(mAlignL1, fractalShape[1]);      // 6
 loadDataParams.srcStride = CeilDivision(kaAlignL1, fractalShape[0]); // 5
-loadDataParams.dstStride = CeilDivision(mAlignL0, fractalShape[0]); // 3
+loadDataParams.dstStride = CeilDivision(mAlignL0, fractalShape[0]);  // 3
 loadDataParams.ifTranspose = true;
 loadDataParams.sid = 0;
 AscendC::LoadData(a2Local, a1Local, loadDataParams);
@@ -523,15 +524,15 @@ L1 -> L0B不转置时，B8 / B16 / B32三种数据类型的参数配置基本相
 - `ifTranspose = false`，表示只完成L1 Nz到L0B Zn的排布搬运，不做转置。
 
 ```cpp
-nAlignL1 = CeilAlign(n, fractalShape[0]); // 64
+nAlignL1 = CeilAlign(n, fractalShape[0]);  // 64
 kbAlignL1 = CeilAlign(k, fractalShape[1]); // 72
 kbAlignL0 = CeilAlign(k, fractalShape[1]); // 72
-nAlignL0 = CeilAlign(n, fractalShape[0]); // 64
+nAlignL0 = CeilAlign(n, fractalShape[0]);  // 64
 AscendC::LoadData2DParamsV2 loadDataParams;
 loadDataParams.mStartPosition = 0;
 loadDataParams.kStartPosition = 0;
-loadDataParams.mStep = CeilDivision(nAlignL1, fractalShape[0]); // 4
-loadDataParams.kStep = CeilDivision(kbAlignL1, fractalShape[1]); // 9
+loadDataParams.mStep = CeilDivision(nAlignL1, fractalShape[0]);     // 4
+loadDataParams.kStep = CeilDivision(kbAlignL1, fractalShape[1]);    // 9
 loadDataParams.srcStride = CeilDivision(nAlignL1, fractalShape[0]); // 4
 loadDataParams.dstStride = CeilDivision(nAlignL0, fractalShape[0]); // 4
 loadDataParams.ifTranspose = false;
@@ -556,14 +557,14 @@ B8输入数据类型分形为16 * 32，L1 -> L0转置时会按照方型将row方
 
 ```cpp
 kbAlignL1 = CeilAlign(k, fractalShape[0] * fractalNum); // 96
-nAlignL1 = CeilAlign(n, fractalShape[1]); // 64
-kbAlignL0 = CeilAlign(k, fractalShape[1]); // 96
-nAlignL0 = CeilAlign(n, fractalShape[0] * fractalNum); // 64
+nAlignL1 = CeilAlign(n, fractalShape[1]);               // 64
+kbAlignL0 = CeilAlign(k, fractalShape[1]);              // 96
+nAlignL0 = CeilAlign(n, fractalShape[0] * fractalNum);  // 64
 AscendC::LoadData2DParamsV2 loadDataParams;
-loadDataParams.mStep = CeilDivision(kbAlignL1, fractalShape[0]); // 6
-loadDataParams.kStep = CeilDivision(nAlignL1, fractalShape[1]); // 2
+loadDataParams.mStep = CeilDivision(kbAlignL1, fractalShape[0]);     // 6
+loadDataParams.kStep = CeilDivision(nAlignL1, fractalShape[1]);      // 2
 loadDataParams.srcStride = CeilDivision(kbAlignL1, fractalShape[0]); // 6
-loadDataParams.dstStride = CeilDivision(nAlignL0, fractalShape[0]); // 4
+loadDataParams.dstStride = CeilDivision(nAlignL0, fractalShape[0]);  // 4
 loadDataParams.ifTranspose = true;
 AscendC::LoadData(b2Local, b1Local, loadDataParams);
 ```
@@ -585,14 +586,14 @@ B16输入数据类型分形为16 * 16，一个分形即一个方型，L1 -> L0�
 
 ```cpp
 kbAlignL1 = CeilAlign(k, fractalShape[0] * fractalNum); // 80
-nAlignL1 = CeilAlign(n, fractalShape[1]); // 64
-kbAlignL0 = CeilAlign(k, fractalShape[1]); // 80
-nAlignL0 = CeilAlign(n, fractalShape[0] * fractalNum); // 64
+nAlignL1 = CeilAlign(n, fractalShape[1]);               // 64
+kbAlignL0 = CeilAlign(k, fractalShape[1]);              // 80
+nAlignL0 = CeilAlign(n, fractalShape[0] * fractalNum);  // 64
 AscendC::LoadData2DParamsV2 loadDataParams;
-loadDataParams.mStep = CeilDivision(kbAlignL1, fractalShape[0]); // 5
-loadDataParams.kStep = CeilDivision(nAlignL1, fractalShape[1]); // 4
+loadDataParams.mStep = CeilDivision(kbAlignL1, fractalShape[0]);     // 5
+loadDataParams.kStep = CeilDivision(nAlignL1, fractalShape[1]);      // 4
 loadDataParams.srcStride = CeilDivision(kbAlignL1, fractalShape[0]); // 5
-loadDataParams.dstStride = CeilDivision(nAlignL0, fractalShape[0]); // 4
+loadDataParams.dstStride = CeilDivision(nAlignL0, fractalShape[0]);  // 4
 loadDataParams.ifTranspose = true;
 AscendC::LoadData(b2Local, b1Local, loadDataParams);
 ```
@@ -609,15 +610,15 @@ B32输入数据类型分形为16 * 8，L1 -> L0转置时会按照方型将col方
 本样例`n = 50`。B32转置搬运时需要将col方向2个分形拼成方型，**`kStep`必须是2的倍数**，因此L1上col方向（n方向）会多读1个无效分形。写入L0B后，k方向尾部会多1个无效分形；由于L0B为Zn排布，`Mmad`配置`mmadParams.k = k`即可只让有效k轴数据参与计算。
 
 ```cpp
-kbAlignL1 = CeilAlign(k, fractalShape[0]); // 80
-nAlignL1 = CeilAlign(n, fractalShape[1] * fractalNum); // 64
+kbAlignL1 = CeilAlign(k, fractalShape[0]);              // 80
+nAlignL1 = CeilAlign(n, fractalShape[1] * fractalNum);  // 64
 kbAlignL0 = CeilAlign(k, fractalShape[1] * fractalNum); // 80
-nAlignL0 = CeilAlign(n, fractalShape[0]); // 64
+nAlignL0 = CeilAlign(n, fractalShape[0]);               // 64
 AscendC::LoadData2DParamsV2 loadDataParams;
-loadDataParams.mStep = CeilDivision(kbAlignL1, fractalShape[0]); // 5
-loadDataParams.kStep = CeilDivision(nAlignL1, fractalShape[1]); // 8
+loadDataParams.mStep = CeilDivision(kbAlignL1, fractalShape[0]);     // 5
+loadDataParams.kStep = CeilDivision(nAlignL1, fractalShape[1]);      // 8
 loadDataParams.srcStride = CeilDivision(kbAlignL1, fractalShape[0]); // 5
-loadDataParams.dstStride = CeilDivision(nAlignL0, fractalShape[0]); // 4
+loadDataParams.dstStride = CeilDivision(nAlignL0, fractalShape[0]);  // 4
 loadDataParams.ifTranspose = true;
 AscendC::LoadData(b2Local, b1Local, loadDataParams);
 ```

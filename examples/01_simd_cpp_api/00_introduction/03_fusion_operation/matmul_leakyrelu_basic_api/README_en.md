@@ -14,7 +14,7 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
 
 ## Directory Structure
 
-```
+```text
 ├── matmul_leakyrelu_basic_api
 │   ├── scripts
 │   │   ├── gen_data.py                 // Input data and golden data generation script
@@ -65,7 +65,7 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
 
   In matrix multiplication C = A × B, M/N/K correspond to different dimensions of the matrices, and core distribution offsets also revolve around these dimensions:
 
-  ```
+  ```text
            K                N
        ┌─────────┐      ┌──────────┐
        │         │      │          │
@@ -102,7 +102,7 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
       **1) Data Flow Path**
 
       Cube side data flow:
-      ```
+      ```text
       GM(A:ND,half) -> L1(A:Nz,half) -> L0A(A:Nz,half) -
                   │                  │                 │
                 DataCopy            LoadData            │
@@ -123,7 +123,7 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
       > - Atlas A2/A3 series products: L0A fractal format is Zz
 
       Inter-core synchronization and Vector side data flow (1 Cube core's result is processed by 2 Vector cores):
-      ```
+      ```text
       Cube core:  Fixpipe -> GM(C:ND,half)
                           │
                           │ CrossCoreSetFlag / CrossCoreWaitFlag
@@ -145,27 +145,30 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
           public:
               __aicore__ inline void Init(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
               {
-                  // Set GlobalTensor start address, pointing to the corresponding input/output matrix in GM
+                  // Set GlobalTensor start address, pointing to the corresponding
+                  // input/output matrix in GM
                   aGM.SetGlobalBuffer((__gm__ half*)xMatrix);
                   bGM.SetGlobalBuffer((__gm__ half*)yMatrix);
                   cGM.SetGlobalBuffer((__gm__ half*)zMatrix);
 
-                  // Cube cores are distributed along M direction, each Cube core is responsible for singleCoreM * N output block
+                  // Cube cores are distributed along M direction, each Cube core is
+                  // responsible for singleCoreM * N output block
                   if ASCEND_IS_AIC {
-                      aGM = aGM[AscendC::GetBlockIdx() * singleCoreM * K];  // Offset to the A matrix row assigned to current core
-                      cGM = cGM[AscendC::GetBlockIdx() * singleCoreM * N];  // Offset to the C matrix row assigned to current core
+                      aGM = aGM[AscendC::GetBlockIdx() * singleCoreM * K]; // Offset to the A matrix row assigned to current core
+                      cGM = cGM[AscendC::GetBlockIdx() * singleCoreM * N]; // Offset to the C matrix row assigned to current core
                   }
-                  // Vector core count is 2x Cube core count, 1 Cube core's result is processed by 2 Vector cores
-                  // GetBlockIdx() / 2 maps Vector core index back to the corresponding Cube core output block start address
+                  // Vector core count is 2x Cube core count, 1 Cube core's result is
+                  // processed by 2 Vector cores GetBlockIdx() / 2 maps Vector core index back
+                  // to the corresponding Cube core output block start address
                   if ASCEND_IS_AIV {
                       cGM = cGM[AscendC::GetBlockIdx() / 2 * singleCoreM * N];
                   }
               }
-          // ...
+              // ...
           private:
-              AscendC::GlobalTensor<half> aGM;  // Left matrix A, [M, K]
-              AscendC::GlobalTensor<half> bGM;  // Right matrix B, [K, N]
-              AscendC::GlobalTensor<half> cGM;  // Output matrix C, [M, N]
+              AscendC::GlobalTensor<half> aGM; // Left matrix A, [M, K]
+              AscendC::GlobalTensor<half> bGM; // Right matrix B, [K, N]
+              AscendC::GlobalTensor<half> cGM; // Output matrix C, [M, N]
           };
           ```
 
@@ -184,68 +187,84 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
           {
               if ASCEND_IS_AIC {
                   // ==================== Local Tensor Allocation ====================
-                  // Use LocalMemAllocator to automatically allocate on-chip memory in application order, avoiding manual address offset maintenance
+                  // Use LocalMemAllocator to automatically allocate on-chip memory in
+                  // application order, avoiding manual address offset maintenance
                   AscendC::LocalMemAllocator<AscendC::Hardware::L1> l1Allocator;
                   AscendC::LocalMemAllocator<AscendC::Hardware::L0A> l0aAllocator;
                   AscendC::LocalMemAllocator<AscendC::Hardware::L0B> l0bAllocator;
                   AscendC::LocalMemAllocator<AscendC::Hardware::L0C> l0cAllocator;
-                  // L1: temporary storage for A/B matrices; L0A/L0B: Cube computation unit input; L0C: Cube computation unit output
-                  // The TPosition template parameter of Alloc can be omitted, the Alloc function will provide default value based on the physical location corresponding to the allocator
+                  // L1: temporary storage for A/B matrices; L0A/L0B: Cube computation unit
+                  // input; L0C: Cube computation unit output The TPosition template parameter
+                  // of Alloc can be omitted, the Alloc function will provide default value
+                  // based on the physical location corresponding to the allocator
                   AscendC::LocalTensor<half> a1Local = l1Allocator.Alloc<half>(baseM * baseK);
                   AscendC::LocalTensor<half> b1Local = l1Allocator.Alloc<half>(baseK * baseN);
                   AscendC::LocalTensor<half> a2Local = l0aAllocator.Alloc<half>(baseM * baseK);
                   AscendC::LocalTensor<half> b2Local = l0bAllocator.Alloc<half>(baseK * baseN);
                   AscendC::LocalTensor<float> cLocal = l0cAllocator.Alloc<float>(baseM * baseN);
 
-                  // ==================== GM → L1: DataCopy + ND→Nz Format Conversion ====================
-                  // DataCopy completes ND to Nz format conversion during transfer (Cube computation unit requires Nz fractal layout)
+                  // ================== GM → L1: DataCopy + ND→Nz Format Conversion ==================
+                  // DataCopy completes ND to Nz format conversion during
+                  // transfer (Cube computation unit requires Nz fractal layout)
                   AscendC::DataCopy(a1Local, aGM, AscendC::Nd2NzParams{1, baseM, baseK, 0, K, baseM, 1, 0});
                   AscendC::DataCopy(b1Local, bGM, AscendC::Nd2NzParams{1, baseK, baseN, 0, N, baseK, 1, 0});
-                  // Intra-core synchronization: notify MTE1 that it can start transfer after MTE2 transfer completes
+                  // Intra-core synchronization: notify MTE1 that it can start transfer after
+                  // MTE2 transfer completes
                   AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE1>(EVENT_ID0);
                   AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(EVENT_ID0);
 
                   // ==================== L1 → L0A/L0B: LoadData ====================
-                  // ⚠️ Architecture constraint: L0A layout format differs across products, LoadData parameters need to be adjusted accordingly
-                  // A2/A3(2201) uses Zz layout requiring block-by-block transfer, 950PR(3510) uses Nz layout allowing one-time completion
-                  // A2/A3 architecture (dav-2201): L0A layout is Zz format, requires block-by-block transfer
+                  // ⚠️ Architecture constraint: L0A layout format differs across products,
+                  // LoadData parameters need to be adjusted accordingly A2/A3(2201) uses Zz
+                  // layout requiring block-by-block transfer, 950PR(3510) uses Nz layout
+                  // allowing one-time completion A2/A3 architecture (dav-2201): L0A layout is
+                  // Zz format, requires block-by-block transfer
           #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
                   for (int i = 0; i < baseM / CUBE_BLOCK; ++i) {
-                      AscendC::LoadData(a2Local[i * baseK * CUBE_BLOCK], a1Local[i * 512 / sizeof(half)],
+                      AscendC::LoadData(
+                          a2Local[i * baseK * CUBE_BLOCK], a1Local[i * 512 / sizeof(half)],
                           AscendC::LoadData2DParams{0, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, 0, 0, false, 0});
                   }
                   // B matrix Nz→Zn transpose transfer
                   for (int i = 0; i < baseK / CUBE_BLOCK; ++i) {
-                      AscendC::LoadData(b2Local[i * baseN * CUBE_BLOCK], b1Local[i * 512 / sizeof(half)],
+                      AscendC::LoadData(
+                          b2Local[i * baseN * CUBE_BLOCK], b1Local[i * 512 / sizeof(half)],
                           AscendC::LoadData2DParams{0, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, 0, 0, true, 0});
                   }
-                  // Ascend 950PR architecture (dav-3510): L0A layout is Nz format, one-time transfer completion
+                  // Ascend 950PR architecture (dav-3510): L0A layout is Nz format, one-time
+                  // transfer completion
           #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-                  AscendC::LoadData(a2Local, a1Local,
-                      AscendC::LoadData2DParamsV2{0, 0, baseM / CUBE_BLOCK, baseK / CUBE_BLOCK,
-                          baseM / CUBE_BLOCK, baseM / CUBE_BLOCK, false, 0});
-                  AscendC::LoadData(b2Local, b1Local,
-                      AscendC::LoadData2DParamsV2{0, 0, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK,
-                          baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, true, 0});
+                  AscendC::LoadData(
+                      a2Local, a1Local,
+                      AscendC::LoadData2DParamsV2{
+                          0, 0, baseM / CUBE_BLOCK, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, baseM / CUBE_BLOCK, false, 0});
+                  AscendC::LoadData(
+                      b2Local, b1Local,
+                      AscendC::LoadData2DParamsV2{
+                          0, 0, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, true, 0});
           #endif
-                  // Intra-core synchronization: notify M pipeline that Mmad computation can start after MTE1 transfer completes
+                  // Intra-core synchronization: notify M pipeline that Mmad computation can
+                  // start after MTE1 transfer completes
                   AscendC::SetFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
                   AscendC::WaitFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
 
-                  // ==================== L0A/L0B → L0C: Mmad Matrix Multiply-Accumulate ====================
-                  // cmatrixInitVal=true: Initialize L0C accumulator to 0 for first computation
-                  AscendC::Mmad(cLocal, a2Local, b2Local,
-                      AscendC::MmadParams{baseM, baseN, baseK, 0, false, true});
+                  // ================== L0A/L0B → L0C: Mmad Matrix Multiply-Accumulate ==================
+                  // cmatrixInitVal=true: Initialize L0C accumulator to 0
+                  // for first computation
+                  AscendC::Mmad(cLocal, a2Local, b2Local, AscendC::MmadParams{baseM, baseN, baseK, 0, false, true});
 
-                  // ==================== L0C → GM: Fixpipe Transfer Out + Nz→ND + fp32→fp16 ====================
-                  // Intra-core synchronization: notify FIX pipeline that Fixpipe can start after M pipeline completes
+                  // ================== L0C → GM: Fixpipe Transfer Out + Nz→ND + fp32→fp16 ==================
+                  // Intra-core synchronization: notify FIX pipeline that
+                  // Fixpipe can start after M pipeline completes
                   AscendC::SetFlag<AscendC::HardEvent::M_FIX>(EVENT_ID0);
                   AscendC::WaitFlag<AscendC::HardEvent::M_FIX>(EVENT_ID0);
-                  // Fixpipe transfers L0C results out to GM, simultaneously completing NZ→ND format conversion and float32→half precision conversion
-                  AscendC::Fixpipe(cGM, cLocal,
+                  // Fixpipe transfers L0C results out to GM, simultaneously completing NZ→ND
+                  // format conversion and float32→half precision conversion
+                  AscendC::Fixpipe(
+                      cGM, cLocal,
                       AscendC::FixpipeParamsV220{baseN, baseM, baseM, N, false, QuantMode_t::F322F16, 0, 1, 0, 0, 0});
 
-                  // ==================== Inter-core Synchronization: Notify Vector Cores Data is Ready ====================
+                  // ================ Inter-core Synchronization: Notify Vector Cores Data is Ready ================
                   AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0);
               }
               // ... Vector core part see below
@@ -262,40 +281,44 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
           Code example:
 
           ```cpp
-              if ASCEND_IS_AIV {
-                  // ==================== UB Local Tensor Allocation ====================
-                  AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
-                  // Each Vector core processes baseM/2 × baseN elements (1 Cube core's result is split evenly between 2 Vector cores)
-                  AscendC::LocalTensor<half> vecLocal = ubAllocator.Alloc<half>(baseM / 2 * baseN);
+          if ASCEND_IS_AIV {
+              // ==================== UB Local Tensor Allocation ====================
+              AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
+              // Each Vector core processes baseM/2 × baseN elements (1 Cube core's result
+              // is split evenly between 2 Vector cores)
+              AscendC::LocalTensor<half> vecLocal = ubAllocator.Alloc<half>(baseM / 2 * baseN);
 
-                  // ==================== Inter-core Synchronization: Wait for Cube Core Fixpipe Completion ====================
-                  AscendC::CrossCoreWaitFlag(0);
+              // ============= Inter-core Synchronization: Wait for Cube Core Fixpipe Completion ==============
+              AscendC::CrossCoreWaitFlag(0);
 
-                  // ==================== GM → UB: DataCopyPad Read Matmul Results ====================
-                  // Calculate the starting offset of current Vector core in GM
-                  // GetBlockIdx() % 2 distinguishes between 2 AIVs within the same logical core, processing different half-block data
-                  uint32_t gmOffset = AscendC::GetBlockIdx() % 2 * (baseM / 2 * N);
-                  uint32_t blockLen = baseN * sizeof(half);
-                  uint32_t srcStride = (N - baseN) * sizeof(half);  // Jump stride between adjacent rows in GM
-                  AscendC::DataCopyPad<half>(
-                      vecLocal, cGM[gmOffset],
-                      AscendC::DataCopyExtParams{static_cast<uint16_t>(baseM / 2), blockLen, srcStride, 0, 0},
-                      AscendC::DataCopyPadExtParams<half>{true, 0, 0, 0});
-                  // Intra-core synchronization: notify V pipeline that computation can start after MTE2 transfer completes
-                  AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
-                  AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+              // ================== GM → UB: DataCopyPad Read Matmul Results ==================
+              // Calculate the starting offset of current Vector core
+              // in GM GetBlockIdx() % 2 distinguishes between 2 AIVs within the same
+              // logical core, processing different half-block data
+              uint32_t gmOffset = AscendC::GetBlockIdx() % 2 * (baseM / 2 * N);
+              uint32_t blockLen = baseN * sizeof(half);
+              uint32_t srcStride = (N - baseN) * sizeof(half); // Jump stride between adjacent rows in GM
+              AscendC::DataCopyPad<half>(
+                  vecLocal, cGM[gmOffset],
+                  AscendC::DataCopyExtParams{static_cast<uint16_t>(baseM / 2), blockLen, srcStride, 0, 0},
+                  AscendC::DataCopyPadExtParams<half>{true, 0, 0, 0});
+              // Intra-core synchronization: notify V pipeline that computation can start
+              // after MTE2 transfer completes
+              AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+              AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
-                  // ==================== UB Computation: LeakyRelu Activation ====================
-                  // LeakyRelu(x) = x >= 0 ? x : x * 0.001
-                  AscendC::LeakyRelu(vecLocal, vecLocal, (half)0.001, baseM / 2 * baseN);
-                  // Intra-core synchronization: notify MTE3 that writeback can start after V pipeline completes
-                  AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
-                  AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+              // ================== UB Computation: LeakyRelu Activation ==================
+              // LeakyRelu(x) = x >= 0 ? x : x * 0.001
+              AscendC::LeakyRelu(vecLocal, vecLocal, (half)0.001, baseM / 2 * baseN);
+              // Intra-core synchronization: notify MTE3 that writeback can start after V
+              // pipeline completes
+              AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+              AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
 
-                  // ==================== UB → GM: DataCopyPad Write Back Results ====================
-                  AscendC::DataCopyPad<half>(cGM[gmOffset], vecLocal,
-                      AscendC::DataCopyExtParams{static_cast<uint16_t>(baseM / 2), blockLen, 0, srcStride, 0});
-              }
+              // ================== UB → GM: DataCopyPad Write Back Results ==================
+              AscendC::DataCopyPad<half>(
+                  cGM[gmOffset], vecLocal,
+                  AscendC::DataCopyExtParams{static_cast<uint16_t>(baseM / 2), blockLen, 0, srcStride, 0});
           }
           ```
 
@@ -310,15 +333,16 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
 
     ```cpp
     // __global__: kernel function declaration modifier
-    // __mix__(1,2): Mixed kernel function, 1 AIC(Cube) + 2 AIV(Vector) form a logical core
+    // __mix__(1,2): Mixed kernel function, 1 AIC(Cube) + 2 AIV(Vector) form a
+    // logical core
     __global__ __mix__(1, 2) void mmad_vec_custom(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
     {
-        AscendC::InitSocState();  // Initialize hardware state
-        KernelMatmul<M, K, N, singleCoreM, singleCoreK, singleCoreN,
-                     baseM, baseK, baseN> op;
-        op.Init(xMatrix, yMatrix, zMatrix);   // GlobalTensor initialization and core distribution offset
-        op.Process();        // AIC side executes Matmul, AIV side executes LeakyRelu
-        AscendC::PipeBarrier<PIPE_ALL>();  // Wait for all pipeline stages to complete
+        AscendC::InitSocState(); // Initialize hardware state
+        KernelMatmul<M, K, N, singleCoreM, singleCoreK, singleCoreN, baseM, baseK, baseN> op;
+        op.Init(xMatrix, yMatrix,
+                zMatrix);                 // GlobalTensor initialization and core distribution offset
+        op.Process();                     // AIC side executes Matmul, AIV side executes LeakyRelu
+        AscendC::PipeBarrier<PIPE_ALL>(); // Wait for all pipeline stages to complete
     }
     ```
 
@@ -329,14 +353,20 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
   **[AscendC::Nd2NzParams](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/GMToL1随路转换-ND2NZ搬运（DataCopy）.md)** — Used by the `DataCopy` interface to describe ND→Nz format conversion parameters:
   ```cpp
   struct Nd2NzParams {
-      int32_t  ndNum;              // Number of ND matrices to transfer, [0, 4095]
-      uint16_t nValue;             // Number of rows in ND matrix, [0, 16384]
-      int32_t  dValue;             // Number of columns in ND matrix, [0, 65535]
-      int32_t  srcNdMatrixStride;  // Offset between starting addresses of adjacent ND matrices, unit: elements, [0, 65535]
-      int32_t  srcDValue;          // Offset between adjacent rows of the same ND matrix, unit: elements, [1, 65535]
-      uint16_t dstNzC0Stride;      // Adjacent offset of multiple rows converted from the same source row in destination Nz, unit: C0_SIZE(32B), [1, 16384]
-      uint16_t dstNzNStride;       // Adjacent row offset of Z-shaped matrix in destination Nz, unit: C0_SIZE(32B), [1, 16384]
-      int32_t  dstNzMatrixStride;  // Starting address offset between adjacent Nz matrices in destination Nz, unit: elements, [1, 65535]
+      int32_t ndNum;             // Number of ND matrices to transfer, [0, 4095]
+      uint16_t nValue;           // Number of rows in ND matrix, [0, 16384]
+      int32_t dValue;            // Number of columns in ND matrix, [0, 65535]
+      int32_t srcNdMatrixStride; // Offset between starting addresses of adjacent ND
+                                 // matrices, unit: elements, [0, 65535]
+      int32_t srcDValue;         // Offset between adjacent rows of the same ND matrix,
+                                 // unit: elements, [1, 65535]
+      uint16_t dstNzC0Stride;    // Adjacent offset of multiple rows converted from the
+                                 // same source row in destination Nz, unit:
+                                 // C0_SIZE(32B), [1, 16384]
+      uint16_t dstNzNStride;     // Adjacent row offset of Z-shaped matrix in
+                                 // destination Nz, unit: C0_SIZE(32B), [1, 16384]
+      int32_t dstNzMatrixStride; // Starting address offset between adjacent Nz matrices
+                                 // in destination Nz, unit: elements, [1, 65535]
   };
   ```
   For example, when transferring matrix A with `{1, baseM, baseK, 0, K, baseM, 1, 0}`, it converts baseM×baseK ND data to Nz format.
@@ -344,13 +374,17 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
   **[AscendC::LoadData2DParams](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/Load2D.md)** — Used by the `LoadData` interface to describe data transfer parameters for matrix A from L1 to L0A and matrix B from L1 to L0B in Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products:
   ```cpp
   struct LoadData2DParams {
-      int32_t startIndex;   // Fractal matrix ID (0 is the first), unit: 512B, [0, 65535]
-      int32_t repeatTimes;  // Number of iterations, each iteration processes 512B, [1, 255]
-      int32_t srcStride;    // Interval between starting addresses of source fractals in adjacent iterations, unit: 512B, [0, 65535]
-      int32_t sid;          // Reserved, set to 0
-      int32_t dstGap;       // Interval between destination fractals in adjacent iterations, unit: 512B, [0, 65535]
-      bool    ifTranspose;  // Whether to transpose each fractal, default false
-      bool    addrMode;     // Address update mode, false=increment, true=decrement, default false
+      int32_t startIndex;  // Fractal matrix ID (0 is the first), unit: 512B, [0, 65535]
+      int32_t repeatTimes; // Number of iterations, each iteration processes 512B,
+                           // [1, 255]
+      int32_t srcStride;   // Interval between starting addresses of source fractals
+                           // in adjacent iterations, unit: 512B, [0, 65535]
+      int32_t sid;         // Reserved, set to 0
+      int32_t dstGap;      // Interval between destination fractals in adjacent
+                           // iterations, unit: 512B, [0, 65535]
+      bool ifTranspose;    // Whether to transpose each fractal, default false
+      bool addrMode;       // Address update mode, false=increment, true=decrement,
+                           // default false
   };
   ```
   For example: In Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, the layout format on L0A is Zz. When transferring matrix A, use `{0, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, 0, 0, false, 0}`;<br>
@@ -359,14 +393,16 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
   **[AscendC::LoadData2DParamsV2](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/Load2DV2.md)** — Used by the `LoadData` interface to describe data transfer parameters for matrix A from L1 to L0A and matrix B from L1 to L0B in Ascend 950PR/Ascend 950DT products:
   ```cpp
   struct LoadData2DParamsV2 {
-      uint32_t mStartPosition;  // Starting position in M direction, unit: 512B
-      uint32_t kStartPosition;  // Starting position in K direction, unit: 512B
-      uint16_t mStep;           // Number of fractals to transfer in M direction
-      uint16_t kStep;           // Number of fractals to transfer in K direction
-      int32_t  srcStride;       // Interval between adjacent K-direction fractals at source, unit: 512B
-      uint16_t dstStride;       // Interval between adjacent K-direction fractals at destination, unit: 512B
-      bool     ifTranspose;     // Whether to transpose each fractal, default false
-      uint8_t  sid;             // Reserved, set to 0
+      uint32_t mStartPosition; // Starting position in M direction, unit: 512B
+      uint32_t kStartPosition; // Starting position in K direction, unit: 512B
+      uint16_t mStep;          // Number of fractals to transfer in M direction
+      uint16_t kStep;          // Number of fractals to transfer in K direction
+      int32_t srcStride;       // Interval between adjacent K-direction fractals at
+                               // source, unit: 512B
+      uint16_t dstStride;      // Interval between adjacent K-direction fractals at
+                               // destination, unit: 512B
+      bool ifTranspose;        // Whether to transpose each fractal, default false
+      uint8_t sid;             // Reserved, set to 0
   };
   ```
   In Ascend 950PR/Ascend 950DT products, the layout format on L0A is Nz. When transferring matrix A, use `{0, 0, baseM / CUBE_BLOCK, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, baseM / CUBE_BLOCK, false, 0}` to complete A matrix Nz to Nz transfer in one step; when transferring matrix B, use `{0, 0, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, true, 0}` to complete B matrix Nz to Zn transfer in one step.
@@ -374,12 +410,14 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
   **[AscendC::MmadParams](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/Mmad.md)** — Used by the `Mmad` interface to describe matrix multiplication parameters:
   ```cpp
   struct MmadParams {
-      uint16_t m;               // Left matrix Height (M dimension), [0, 4095]
-      uint16_t n;               // Right matrix Width (N dimension), [0, 4095]
-      uint16_t k;               // Left matrix Width/Right matrix Height (K dimension), [0, 4095]
-      uint16_t unitFlag;        // Fine-grained parallel control between Mmad and Fixpipe, default 0
-      bool     cmatrixSource;   // C matrix initial value source, false=CO1, true=C2, default false
-      bool     cmatrixInitVal;  // Whether C matrix initial value is 0, default true
+      uint16_t m;          // Left matrix Height (M dimension), [0, 4095]
+      uint16_t n;          // Right matrix Width (N dimension), [0, 4095]
+      uint16_t k;          // Left matrix Width/Right matrix Height (K dimension), [0, 4095]
+      uint16_t unitFlag;   // Fine-grained parallel control between Mmad and Fixpipe,
+                           // default 0
+      bool cmatrixSource;  // C matrix initial value source, false=CO1, true=C2,
+                           // default false
+      bool cmatrixInitVal; // Whether C matrix initial value is 0, default true
   };
   ```
   For example, `{baseM, baseN, baseK, 0, false, true}` computes a baseM×baseN output block and accumulates along the K direction for baseK length.
@@ -387,17 +425,21 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
   **[AscendC::FixpipeParamsV220](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬出/L0C到GM数据搬运（Fixpipe）.md)** — Used by the `Fixpipe` interface to describe data transfer and precision conversion parameters from L0C to GM:
   ```cpp
   struct FixpipeParamsV220 {
-      int32_t     nSize;        // Source Nz matrix N dimension size, [1, 4095]
-      uint16_t    mSize;        // Source Nz matrix M dimension size (for Nz2ND [1, 8192])
-      uint16_t    srcStride;    // Starting offset of adjacent Z layout in source Nz, unit: C0_SIZE, [0, 65535]
-      int32_t     dstStride;    // Number of elements per row in destination ND matrix for Nz2ND, unit: element
-      bool        reluEn;       // Whether to enable ReLU
-      QuantMode_t quantPre;     // Quantization mode, F322F16 indicates float→half
-      uint64_t    deqScalar;    // Scalar quantization parameter, single scale value
-      int32_t     ndNum;        // Number of source Nz matrices, [1, 65535]
-      int32_t     srcNdStride;  // Starting address interval between different Nz matrices, unit: 16×C0_SIZE, [1, 512]
-      int32_t     dstNdStride;  // Offset between adjacent destination ND matrices, unit: element, [1, 65535]
-      int32_t     unitFlag;     // Parallel control between Mmad and Fixpipe
+      int32_t nSize;        // Source Nz matrix N dimension size, [1, 4095]
+      uint16_t mSize;       // Source Nz matrix M dimension size (for Nz2ND [1, 8192])
+      uint16_t srcStride;   // Starting offset of adjacent Z layout in source Nz,
+                            // unit: C0_SIZE, [0, 65535]
+      int32_t dstStride;    // Number of elements per row in destination ND matrix for
+                            // Nz2ND, unit: element
+      bool reluEn;          // Whether to enable ReLU
+      QuantMode_t quantPre; // Quantization mode, F322F16 indicates float→half
+      uint64_t deqScalar;   // Scalar quantization parameter, single scale value
+      int32_t ndNum;        // Number of source Nz matrices, [1, 65535]
+      int32_t srcNdStride;  // Starting address interval between different Nz
+                            // matrices, unit: 16×C0_SIZE, [1, 512]
+      int32_t dstNdStride;  // Offset between adjacent destination ND matrices, unit:
+                            // element, [1, 65535]
+      int32_t unitFlag;     // Parallel control between Mmad and Fixpipe
   };
   ```
   For example, `{baseN, baseM, baseM, N, false, F322F16, 0, 1, 0, 0, 0}` converts the baseM×baseN float32 result in L0C to half and writes it back to GM.
@@ -405,11 +447,12 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
   **[AscendC::DataCopyExtParams](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GMToUB非对齐数据搬运(DataCopyPad).md)** — Used by the `DataCopyPad` interface to describe block transfer parameters between GM and UB:
   ```cpp
   struct DataCopyExtParams {
-      uint16_t blockCount;  // Number of consecutive data blocks to transfer
-      uint32_t blockLen;    // Length of each data block, unit: Byte
-      uint32_t srcStride;   // Interval between adjacent data blocks at source, unit: Byte
-      uint32_t dstStride;   // Interval between adjacent data blocks at destination, unit: Byte
-      uint32_t rsv;         // Reserved field, set to 0
+      uint16_t blockCount; // Number of consecutive data blocks to transfer
+      uint32_t blockLen;   // Length of each data block, unit: Byte
+      uint32_t srcStride;  // Interval between adjacent data blocks at source, unit: Byte
+      uint32_t dstStride;  // Interval between adjacent data blocks at destination,
+                           // unit: Byte
+      uint32_t rsv;        // Reserved field, set to 0
   };
   ```
   For example, when transferring from GM to UB with `{static_cast<uint16_t>(baseM / 2), blockLen, srcStride, 0, 0}`, each Vector core reads baseM/2 rows of results.
@@ -563,7 +606,7 @@ PROF_xxxx_XXXXXX
 ```
 
 View specific performance analysis results:
-```
+```bash
 # View Task Duration and various data
 cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
 ```

@@ -14,7 +14,7 @@ This sample demonstrates the basic usage of Ascend C vector addition.
 
 ## Directory Structure
 
-```
+```text
 ├── add
 │   ├── CMakeLists.txt      // Compilation project file
 │   ├── add.asc             // Ascend C sample implementation & invocation sample
@@ -61,7 +61,8 @@ __vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
 
     // Global Tensor: Allocate input/output buffers on GM
     AscendC::GlobalTensor<float> xGm, yGm, zGm;
-    xGm.SetGlobalBuffer(x + block_idx * blockLength, blockLength);  // Each core processes its own data segment by block_idx offset
+    // Each core processes its own data segment by block_idx offset
+    xGm.SetGlobalBuffer(x + block_idx * blockLength, blockLength);
     yGm.SetGlobalBuffer(y + block_idx * blockLength, blockLength);
     zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
 
@@ -74,15 +75,15 @@ __vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
     // GM -> UB: Load input data
     AscendC::DataCopy(xLocal, xGm, blockLength);
     AscendC::DataCopy(yLocal, yGm, blockLength);
-    AscendC::PipeBarrier<PIPE_ALL>();  // Ensure load completes before computation
+    AscendC::PipeBarrier<PIPE_ALL>(); // Ensure load completes before computation
 
     // Vector computation: z = x + y
     AscendC::Add(zLocal, xLocal, yLocal, blockLength);
-    AscendC::PipeBarrier<PIPE_ALL>();  // Ensure computation completes before store
+    AscendC::PipeBarrier<PIPE_ALL>(); // Ensure computation completes before store
 
     // UB -> GM: Store computation result
     AscendC::DataCopy(zGm, zLocal, blockLength);
-    AscendC::PipeBarrier<PIPE_ALL>();  // Ensure store completes
+    AscendC::PipeBarrier<PIPE_ALL>(); // Ensure store completes
 }
 ```
 

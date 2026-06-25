@@ -14,7 +14,7 @@ This example, based on the kernel direct invocation example project, demonstrate
 
 ## Directory Structure
 
-```
+```text
 ├── rmsnorm
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data

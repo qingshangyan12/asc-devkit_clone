@@ -14,7 +14,7 @@ This example demonstrates the usage of compound computation interfaces. Compound
 
 ## Directory Structure
 
-```
+```text
 ├── element_wise_compound_compute
 │   ├── scripts
 │   │   ├── gen_data.py                      // Script for generating input data and ground truth data

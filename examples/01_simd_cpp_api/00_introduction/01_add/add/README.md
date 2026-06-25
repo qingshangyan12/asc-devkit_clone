@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── add
 │   ├── CMakeLists.txt      // 编译工程文件
 │   ├── add.asc             // Ascend C样例实现 & 调用样例
@@ -61,7 +61,8 @@ __vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
 
     // Global Tensor：在GM上分配输入/输出缓冲区
     AscendC::GlobalTensor<float> xGm, yGm, zGm;
-    xGm.SetGlobalBuffer(x + block_idx * blockLength, blockLength);  // 每个核按block_idx偏移处理各自的数据段
+    // 每个核按block_idx偏移处理各自的数据段
+    xGm.SetGlobalBuffer(x + block_idx * blockLength, blockLength);
     yGm.SetGlobalBuffer(y + block_idx * blockLength, blockLength);
     zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
 
@@ -74,15 +75,15 @@ __vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
     // GM -> UB: 搬入输入数据
     AscendC::DataCopy(xLocal, xGm, blockLength);
     AscendC::DataCopy(yLocal, yGm, blockLength);
-    AscendC::PipeBarrier<PIPE_ALL>();  // 确保搬入完成后才进行计算
+    AscendC::PipeBarrier<PIPE_ALL>(); // 确保搬入完成后才进行计算
 
     // 向量计算: z = x + y
     AscendC::Add(zLocal, xLocal, yLocal, blockLength);
-    AscendC::PipeBarrier<PIPE_ALL>();  // 确保计算完成后才搬出
+    AscendC::PipeBarrier<PIPE_ALL>(); // 确保计算完成后才搬出
 
     // UB -> GM: 搬出计算结果
     AscendC::DataCopy(zGm, zLocal, blockLength);
-    AscendC::PipeBarrier<PIPE_ALL>();  // 确保搬出完成
+    AscendC::PipeBarrier<PIPE_ALL>(); // 确保搬出完成
 }
 ```
 

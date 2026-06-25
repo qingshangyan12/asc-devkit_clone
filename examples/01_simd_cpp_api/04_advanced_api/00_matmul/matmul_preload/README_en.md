@@ -11,7 +11,7 @@ A Matmul example with M/N-direction preload to reduce MTE2 gaps. When the MTE2 p
 | Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
 
 ## Directory Structure
-```
+```text
 ├── matmul_preload
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and ground truth data
@@ -49,13 +49,13 @@ A Matmul example with M/N-direction preload to reduce MTE2 gaps. When the MTE2 p
   - Key Kernel Steps
     - Configure the MatmulConfig template parameter, enable the doMTE2Preload switch with value 1 (M direction) or 2 (N direction), and create the Matmul object.
       ```cpp
-      static constexpr MatmulConfig MM_CFG_PRELOAD = GetMDLConfig(false, false, 2); 
+      static constexpr MatmulConfig MM_CFG_PRELOAD = GetMDLConfig(false, false, 2);
       AscendC::Matmul<
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>,
-        MM_CFG_PRELOAD> matmulObj;
+          AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
+          AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
+          AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
+          AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>, MM_CFG_PRELOAD>
+          matmulObj;
       ```
 
 - Invocation Implementation  

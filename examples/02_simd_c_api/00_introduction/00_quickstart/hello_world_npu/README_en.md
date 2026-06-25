@@ -12,7 +12,7 @@ This sample demonstrates the basic process of verifying operator kernel function
 
 ## Directory Structure
 
-```
+```text
 ├── hello_world_npu
 │   ├── CMakeLists.txt      // Build project file
 │   └── hello_world.asc     // Ascend C operator implementation and call sample

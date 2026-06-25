@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── pybind
 │   ├── CMakeLists.txt        // 编译工程文件
 │   ├── add_custom.asc        // Ascend C算子实现 & pybind11注册
@@ -28,7 +28,7 @@
 
   Add计算公式为：
 
-  ```
+  ```text
   z = x + y
   ```
 
@@ -52,10 +52,9 @@
   `add_custom.asc`使用`pybind11`库将C++代码封装成Python模块。`PYBIND11_MODULE(ascendc_ops, m)`中的`ascendc_ops`是导出的Python模块名，`m`是pybind11模块对象；`m.def`将C++函数`ascendc_ops::ascendc_add`绑定为Python侧可调用的`ascendc_add`函数，例如：
 
   ```cpp
-  PYBIND11_MODULE(ascendc_ops, m)
-  {
-      m.doc() = "add_custom pybind11 interfaces";
-      m.def("ascendc_add", &ascendc_ops::ascendc_add, "");
+  PYBIND11_MODULE(ascendc_ops, m) {
+    m.doc() = "add_custom pybind11 interfaces";
+    m.def("ascendc_add", &ascendc_ops::ascendc_add, "");
   }
   ```
 

@@ -14,7 +14,7 @@ This example implements UB (Unified Buffer) internal data transfer functionality
 
 ## Directory Structure
 
-```
+```text
 ├── copy_ub2ub
 │   ├── scripts
 │   │   ├── gen_data.py             // Input data and ground truth generation script

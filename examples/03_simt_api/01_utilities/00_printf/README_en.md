@@ -29,13 +29,13 @@ This example demonstrates how to use the `printf()` interface in SIMT programmin
 
 - Operator Implementation:
   ```cpp
-  __global__ void  simt_printf(float* input, uint32_t in_shape)
+  __global__ void simt_printf(float* input, uint32_t in_shape)
   {
       // Calculate global thread ID
       int32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
       if (threadIdx.x < 3) {
-      printf("[SIMT %s] thread index[%u], input data shape: %u\n", "print 1", idx, in_shape);
-      printf("[SIMT %s] input addr: %p value[%u]: %f\n", "print 2",  input, idx, input[idx]);
+          printf("[SIMT %s] thread index[%u], input data shape: %u\n", "print 1", idx, in_shape);
+          printf("[SIMT %s] input addr: %p value[%u]: %f\n", "print 2", input, idx, input[idx]);
       }
   }
   ```
@@ -69,7 +69,7 @@ Run the following steps in the root directory of this example to build and execu
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
 
   After execution, the following print information is displayed, indicating that the printing function works correctly.
-  ```
+  ```bash
   [SIMT print 1] thread index[34], input data shape: 128
   [SIMT print 1] thread index[2], input data shape: 128
   [SIMT print 1] thread index[33], input data shape: 128

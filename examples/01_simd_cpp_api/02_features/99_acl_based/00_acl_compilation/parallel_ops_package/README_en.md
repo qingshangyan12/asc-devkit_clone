@@ -24,7 +24,7 @@ Each sub-project independently completes custom operator compilation, packaging,
 
 ## Directory Structure
 
-```
+```text
 ├── parallel_ops_package
 │   ├── CMakeLists.txt              // Top-level build project file (parallel build of multiple operator packages)
 │   ├── add_custom                  // Add operator project directory

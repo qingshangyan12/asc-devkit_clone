@@ -14,7 +14,7 @@ This example, based on a sample custom operator project, introduces how to call 
 
 ## Directory Structure
 
-```
+```text
 ├── tiling_sink_programming
 │   ├── test_add_custom_tiling_sink.py   // Tiling sink invocation test script in PyTorch graph mode
 │   └── README.md                        // Example documentation
