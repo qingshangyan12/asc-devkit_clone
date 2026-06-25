@@ -138,7 +138,7 @@ __aicore__ inline void Brcb(const LocalTensor<T>& dst, const LocalTensor<T>& src
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+- 操作数地址对齐要求请参见[通用地址对齐约束](../../../../通用说明和约束.md#section796754519912)。
 - 不支持源操作数与目的操作数使用同一块内存地址。
 <cann-filter npu-type="A3,910b">
 - repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。该约束适用于以下型号。
@@ -173,7 +173,7 @@ dstRepStride为8：说明相邻迭代间目的操作数中首尾DataBlock地址�
 
 **图1**  目的操作数连续
 
-![目的操作数连续](../../../../figures/Brcb_1.png)
+![目的操作数连续](../../../../../figures/Brcb_1.png)
 
 ### 目的操作数非连续
 
@@ -185,7 +185,7 @@ dstRepStride为16：说明相邻迭代间目的操作数中首尾DataBlock地址
 
 **图2**  目的操作数非连续
 
-![目的操作数非连续](../../../../figures/Brcb_2.png)
+![目的操作数非连续](../../../../../figures/Brcb_2.png)
 
 ## 调用示例<a name="section11276201527"></a>
 

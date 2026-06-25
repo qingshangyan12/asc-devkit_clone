@@ -252,16 +252,16 @@
 ### 数据排布转换
 | 接口名 | 功能描述 |
 | --- | --- |
-| [Transpose](Memory矢量计算/数据排布转换/Transpose.md) | Transpose接口用于实现16*16的二维矩阵数据块转置或者[N,C,H,W]与[N,H,W,C]数据格式互相转换。 |
-| [TransDataTo5HD](Memory矢量计算/数据排布转换/TransDataTo5HD.md) | TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。特别的，也可以用于二维矩阵数据块的转置。完成转置功能时，相比于Transpose接口，Transpose仅支持16\*16大小的矩阵转置；本接口单次repeat内可处理512Byte的数据（16个DataBlock），根据数据类型不同，支持不同shape的矩阵转置，同时还可以支持多次repeat操作。 |
+| [Transpose](Memory矢量计算/数据排布转换/概述/Transpose.md) | Transpose接口用于实现16*16的二维矩阵数据块转置或者[N,C,H,W]与[N,H,W,C]数据格式互相转换。 |
+| [TransDataTo5HD](Memory矢量计算/数据排布转换/概述/TransDataTo5HD.md) | TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。特别的，也可以用于二维矩阵数据块的转置。完成转置功能时，相比于Transpose接口，Transpose仅支持16\*16大小的矩阵转置；本接口单次repeat内可处理512Byte的数据（16个DataBlock），根据数据类型不同，支持不同shape的矩阵转置，同时还可以支持多次repeat操作。 |
 
 ### 数据填充
 | 接口名 | 功能描述 |
 | --- | --- |
-| [Duplicate](Memory矢量计算/数据填充/Duplicate.md) | Duplicate接口将一个变量或立即数复制多次并填充到向量中。 |
-| [Brcb](Memory矢量计算/数据填充/Brcb.md) | Brcb接口对输入数据，每一次取输入张量中的8个数进行填充操作，将每个数填充到结果张量的一个DataBlock（32字节）中。 |
-| [CreateVecIndex](Memory矢量计算/数据填充/CreateVecIndex.md) | CreateVecIndex接口创建指定起始值的向量索引。 |
-| [VectorPadding(ISASI)](Memory矢量计算/数据填充/VectorPadding(ISASI).md) | 根据padMode（pad模式）与padSide（pad方向）对源操作数按照datablock进行填充操作。 |
+| [Duplicate](Memory矢量计算/数据填充/概述/Duplicate.md) | Duplicate接口将一个变量或立即数复制多次并填充到向量中。 |
+| [Brcb](Memory矢量计算/数据填充/概述/Brcb.md) | Brcb接口对输入数据，每一次取输入张量中的8个数进行填充操作，将每个数填充到结果张量的一个DataBlock（32字节）中。 |
+| [CreateVecIndex](Memory矢量计算/数据填充/概述/CreateVecIndex.md) | CreateVecIndex接口创建指定起始值的向量索引。 |
+| [VectorPadding(ISASI)](Memory矢量计算/数据填充/概述/VectorPadding(ISASI).md) | 根据padMode（pad模式）与padSide（pad方向）对源操作数按照datablock进行填充操作。 |
 
 ### 排序组合（ISASI）
 | 接口名 | 功能描述 |

@@ -1,4 +1,4 @@
-# CreateVecIndex<a name="ZH-CN_TOPIC_0000002573904793"></a>
+# Duplicate<a name="ZH-CN_TOPIC_0000002543264872"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -41,7 +41,17 @@
 </tr>
 <tr id="row17253142120252"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p38313021813"><a name="p38313021813"></a><a name="p38313021813"></a><span id="ph58317041819"><a name="ph58317041819"></a><a name="ph58317041819"></a><term id="zh-cn_topic_0000001312391781_term71949488213"><a name="zh-cn_topic_0000001312391781_term71949488213"></a><a name="zh-cn_topic_0000001312391781_term71949488213"></a>Atlas 训练系列产品</term></span></p>
 </td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p760802919819"><a name="p760802919819"></a><a name="p760802919819"></a>x</p>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p395243920186"><a name="p395243920186"></a><a name="p395243920186"></a>√</p>
+</td>
+</tr>
+<tr id="row10560115972716"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p07746191307"><a name="p07746191307"></a><a name="p07746191307"></a><span id="ph880814542020"><a name="ph880814542020"></a><a name="ph880814542020"></a>Kirin X90</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p18774619608"><a name="p18774619608"></a><a name="p18774619608"></a>√</p>
+</td>
+</tr>
+<tr id="row46865597271"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p4336317115"><a name="p4336317115"></a><a name="p4336317115"></a><span id="ph115418716"><a name="ph115418716"></a><a name="ph115418716"></a>Kirin 9030</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p73313312117"><a name="p73313312117"></a><a name="p73313312117"></a>√</p>
 </td>
 </tr>
 </tbody>
@@ -49,80 +59,100 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为：`"basic_api/kernel_operator_vec_createvecindex_intf.h"`。
+头文件路径为：`"basic_api/kernel_operator_vec_duplicate_intf.h"`。
 
-CreateVecIndex接口创建指定起始值的向量索引。
+Duplicate接口将一个变量或立即数复制多次并填充到向量中。
 
 接口支持使用前n个数据计算和高维切分计算的方式，前n个数据计算原理和参考伪代码如下：
 
 ```python
 import numpy as np
 
-def CreateVecIndex(dst, firstValue, count):
-    dst = np.arange(firstValue, firstValue + count, dtype=np.float16)
+def Duplicate(scalarValue, dst, count):
+    for i in range(count):     
+        dst[i] = scalarValue
 ```
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-- tensor前n个数据计算
+- tensor前n个数据计算，源操作数为标量
 
     ```cpp
-    template <typename T> 
-    __aicore__ inline void CreateVecIndex(LocalTensor<T> dst, const T &firstValue, uint32_t count) 
+    template <typename T>
+    __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue, const int32_t& count)
     ```
 
-- tensor高维切分计算
-    - mask逐bit模式
+<cann-filter npu-type="950"> 
 
-        ```cpp
-        template <typename T> 
-        __aicore__ inline void CreateVecIndex(LocalTensor<T> &dst, const T &firstValue, uint64_t mask[], uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)  
-        ```
+- tensor前n个数据计算，源操作数为Tensor
 
-    - mask连续模式
+    ```cpp
+    // 该函数原型，仅支持Ascend 950PR/Ascend 950DT。
+    template <typename T>
+    __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
+    ```
+</cann-filter>
 
-        ```cpp
-        template <typename T> 
-        __aicore__ inline void CreateVecIndex(LocalTensor<T> &dst, const T &firstValue, uint64_t mask, uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride) 
-        ```
+- tensor高维切分计算，mask逐比特模式
+
+    ```cpp
+    template <typename T, bool isSetMask = true>
+    __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue, uint64_t mask[], const uint8_t repeatTime, const uint16_t dstBlockStride, const uint8_t dstRepeatStride)
+    ```
+
+- tensor高维切分计算，mask连续模式
+
+    ```cpp
+    template <typename T, bool isSetMask = true>
+    __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue, uint64_t mask, const uint8_t repeatTime, const uint16_t dstBlockStride, const uint8_t dstRepeatStride)
+    ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
 **表1**  模板参数说明
 
-| 参数名称 | 描述 |
+| 参数说明 | 描述 |
 | ------ | ------ |
 | T | 操作数数据类型。 |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。 |
 
 **表2**  接口参数说明
 | 参数说明 | 输入/输出 | 含义 |
 | ------ | ------ | ------ |
 | dst | 输出 | 目的操作数，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT（存储位置为Unified Buffer）。LocalTensor的起始地址需要按照32字节对齐。|
-| firstValue | 输入 | 索引的第一个数值，数据类型需与dst中元素的数据类型保持一致。|
-| count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。|
-| mask/mask[] | 输入 | mask用于控制每次迭代内参与计算的元素。<br>设置详见[掩码操作](../掩码操作/掩码操作.md)。 |
+| scalarValue | 输入 | 被复制的源操作数，数据类型需与dst中元素的数据类型保持一致。|
+|<cann-filter npu-type="950"> src | 输入| 源操作数，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>数据类型需与dst中元素的数据类型保持一致。<br>当传入该参数时，会将src[0]复制多次并填充到向量中。|
+| count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../../SIMD计算说明/连续计算.md)。|
+| mask/mask[] | 输入 | mask用于控制每次迭代内参与计算的元素。<br>设置详见[掩码操作](../../掩码操作/掩码操作.md)。 |
 | repeatTime | 输入 | 指令迭代次数，每次迭代完成8个DataBlock的数据收集，取值范围：repeatTime∈[0,255]。|
-| dstBlockStride | 输入 | 单次迭代内，矢量目的操作数不同DataBlock间地址步长，单位为DataBlock。 |
-| dstRepStride | 输入 | 相邻迭代间，矢量目的操作数相同DataBlock地址步长，单位为DataBlock。 |
+| dstBlockStride | 输入 | 单次迭代内，矢量目的操作数不同datablock间地址步长，单位为DataBlock。 |
+| dstRepStride | 输入 | 相邻迭代间，矢量目的操作数相同datablock地址步长，单位为DataBlock。 |
 
 ## 数据类型
 
-<cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、int16_t、half、int32_t、float、int64_t。</cann-filter>
+<cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，支持的数据类型为：bool、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、complex64。</cann-filter>
 
-<cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int16_t、half、int32_t、float。</cann-filter>
+<cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。</cann-filter>
 
-<cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int16_t、half、int32_t、float。</cann-filter>
+<cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。</cann-filter>
 
-<cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品，支持的数据类型为：int16_t、half、int32_t、float。</cann-filter>
+<cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。</cann-filter>
 
-## 返回值说明<a name="section640mcpsimp"></a>
+<cann-filter npu-type="310p">Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。</cann-filter>
+
+<cann-filter npu-type="910">Atlas 训练系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。</cann-filter>
+
+<cann-filter npu-type="x90">Kirin X90，支持的数据类型为：half。</cann-filter>
+
+<cann-filter npu-type="9030">Kirin 9030，支持的数据类型为：half。</cann-filter>
+
+## 返回值说明<a name="section640mcpsimp"></a>	 
 
 无
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
-- firstValue需保证不超出dst中元素数据类型对应的大小范围。
+- 操作数地址对齐要求请参见[通用地址对齐约束](../../../../通用说明和约束.md#section796754519912)。
 <cann-filter npu-type="A3,910b">
 - repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。该约束适用于以下型号。
 <cann-filter npu-type="A3">
@@ -139,44 +169,54 @@ def CreateVecIndex(dst, firstValue, count):
 
 <cann-filter npu-type="950">
 
-- 针对Ascend 950PR/Ascend 950DT，int8_t/int64_t数据类型仅支持tensor前n个数据计算接口。
+- 针对Ascend 950PR/Ascend 950DT，bool、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、 complex32、int64_t、uint64_t、complex64数据类型仅支持tensor前n个数据计算接口。
 </cann-filter>
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-本调用示例中只展示完整样例中的接口部分代码。如果您需要运行示例代码，请直接参考完整样例[CreateVecIndex样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/create_vec_index)进行编译执行。
+本调用示例中只展示完整样例中的接口部分代码。如果您需要运行示例代码，请直接参考完整样例[Duplicate样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/duplicate)进行编译执行。
 
-- tensor高维切分计算样例-mask连续模式
+- tensor高维切分计算样例，mask连续模式
 
     ```cpp
-    // repeatTime = 1, mask = 128, 128 elements one repeat, 128 elements total
-    // firstValue数据类型为int16_t，dstLocal数据类型为int16_t
-    // dstBlkStride = 1,单次迭代内数据连续写入
-    // dstRepStride = 8,相邻迭代内数据连续写入
-    AscendC::CreateVecIndex(dstLocal, (int16_t)0, mask, repeatTime, dstBlkStride, dstRepStride);
+    uint64_t mask = 128;
+    half scalar = 18.0;
+    // repeatTime = 2, 128 elements one repeat, 256 elements total
+    // dstBlkStride = 1, no gap between blocks in one repeat
+    // dstRepStride = 8, no gap between repeats
+    AscendC::Duplicate(dstLocal, scalar, mask, 2, 1, 8 );
     ```
 
-- tensor高维切分计算样例-mask逐bit模式
+- tensor高维切分计算样例，mask逐bit模式
 
     ```cpp
     uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
-    // repeatTime = 1, 128 elements one repeat, 128 elements total
-    // firstValue数据类型为int16_t，dstLocal数据类型为int16_t
-    // dstBlkStride = 1,单次迭代内数据连续写入
-    // dstRepStride = 8,相邻迭代内数据连续写入
-    AscendC::CreateVecIndex(dstLocal, (int16_t)0, mask, repeatTime, dstBlkStride, dstRepStride);
+    half scalar = 18.0;
+    // repeatTime = 2, 128 elements one repeat, 256 elements total
+    // dstBlkStride = 1, no gap between blocks in one repeat
+    // dstRepStride = 8, no gap between repeats
+    AscendC::Duplicate(dstLocal, scalar, mask, 2, 1, 8 );
     ```
 
-- tensor前n个数据计算样例
+- tensor前n个数据计算样例，源操作数为标量
 
     ```cpp
-    uint32_t count = 128;    // 参与计算的元素个数
-    AscendC::CreateVecIndex(dstLocal, (int16_t)0, count);
+    half inputVal(18.0);
+    int32_t srcDataSize = 256; // 参与计算的元素个数
+    AscendC::Duplicate<half>(dstLocal, inputVal, srcDataSize);
     ```
 
+<cann-filter npu-type="950"> 
+
+- tensor前n个数据计算样例，源操作数为Tensor
+    ```cpp
+    AscendC::Duplicate<half>(dstLocal, srcLocal, srcDataSize);	 
+    ```
+</cann-filter>
 结果示例如下：
 
 ```plain
-输入数据（firstValue）：0 
-输出数据（dstLocal）：[0 1 2 ... 127]
+scalar: 18.0
+srcLocal: [18.0 1.0 2.0 ... 254.0 255.0]
+dstLocal: [18.0 18.0 18.0 ... 18.0 18.0]
 ```

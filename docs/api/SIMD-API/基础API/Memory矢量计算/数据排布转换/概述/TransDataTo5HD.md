@@ -61,7 +61,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_vec_transpose_intf.h"`。
 
-TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1HWC0格式](../../矩阵计算（ISASI）/矩阵计算分形介绍/关键分形格式详解.md#nc1hwc0格式)。特别的，也可以用于二维矩阵数据块的转置。完成转置功能时，相比于Transpose接口，Transpose仅支持16\*16大小的矩阵转置；本接口单次repeat内可处理512Byte的数据（16个DataBlock），根据数据类型不同，支持不同shape的矩阵转置，同时还可以支持多次repeat操作。
+TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1HWC0格式](../../../矩阵计算（ISASI）/矩阵计算分形介绍/关键分形格式详解.md#nc1hwc0格式)。特别的，也可以用于二维矩阵数据块的转置。完成转置功能时，相比于Transpose接口，Transpose仅支持16\*16大小的矩阵转置；本接口单次repeat内可处理512Byte的数据（16个DataBlock），根据数据类型不同，支持不同shape的矩阵转置，同时还可以支持多次repeat操作。
 
 为方便开发者理解，真值计算请参考：[TransDataTo5HD真值计算](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/transpose/scripts/gen_data.py)。
 
@@ -100,7 +100,7 @@ TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1H
 
 | 参数名称 | 输入/输出 | 含义 |
 | :------- | :-------- | :--- |
-| dstList | 输出 | 目的操作数地址序列。<br><br>NCHW_CONV_ADDR_LIST_SIZE固定长度为16。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)或者LocalTensor的地址值，支持的TPosition为VECIN/VECCALC/VECOUT（存储位置为Unified Buffer）。<br>LocalTensor的起始地址需要按照32字节对齐。 |
+| dstList | 输出 | 目的操作数地址序列。<br><br>NCHW_CONV_ADDR_LIST_SIZE固定长度为16。<br>类型为[LocalTensor](../../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)或者LocalTensor的地址值，支持的TPosition为VECIN/VECCALC/VECOUT（存储位置为Unified Buffer）。<br>LocalTensor的起始地址需要按照32字节对齐。 |
 | srcList | 输入 | 源操作数地址序列。<br><br>NCHW_CONV_ADDR_LIST_SIZE固定长度为16。<br>类型为LocalTensor或者LocalTensor的地址值，支持的TPosition为VECIN/VECCALC/VECOUT（存储位置为Unified Buffer）。<br>LocalTensor的起始地址需要按照32字节对齐。 |
 | dst | 输出 | 目的操作数。<br><br>类型为LocalTensor，连续存储对应LocalTensor的地址值。LocalTensor支持的TPosition为VECIN/VECCALC/VECOUT。LocalTensor的起始地址需要32字节对齐。 |
 | src | 输入 | 源操作数。<br><br>类型为LocalTensor，连续存储对应LocalTensor的地址值。LocalTensor支持的TPosition为VECIN/VECCALC/VECOUT。LocalTensor的起始地址需要32字节对齐。 |
@@ -112,7 +112,7 @@ TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1H
 | :------- | :--- | :--- |
 | dstHighHalf | 输入 | 指定每个dstList地址中的数据存储到Datablock的高半部还是低半部，该配置只支持int8_t、uint8_t的数据类型。<br><br>支持的数据类型为bool，有以下两种取值：<br>•true：表示存储于Datablock的高半部<br>•false：表示存储于Datablock的低半部 |
 | srcHighHalf | 输入 | 指定每个srcList地址中的数据从Datablock的高半部还是低半部读取，该配置只支持int8_t、uint8_t的数据类型。<br><br>支持的数据类型为bool，有以下两种取值：<br>•true：表示从Datablock的高半部读取<br>•false：表示从Datablock的低半部读取 |
-| repeatTimes | 输入 | 重复迭代次数，repeatTimes∈[0,255]。<br><br>关于该参数的具体描述请参考[高维切分](../SIMD计算说明/高维切分.md)。<br><br>注：<br>•repeatTimes=0表示不会执行转换操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。<br>•当repeatTimes为1时，目的操作数/源操作数的有效起始位置为dstList/srcList序列输入的起始位置加上dstRepStride/srcRepStride；repeatTimes为1，如果要让目的操作数/源操作数的有效起始位置为dstList/srcList序列输入的起始位置，需要将dstRepStride/srcRepStride置为0。<br>•当repeatTimes大于1时，第一次repeat中目的操作数/源操作数的有效起始位置为dstList/srcList序列输入的起始位置，第二次需要加上dstRepStride/srcRepStride。以此类推。 |
+| repeatTimes | 输入 | 重复迭代次数，repeatTimes∈[0,255]。<br><br>关于该参数的具体描述请参考[高维切分](../../SIMD计算说明/高维切分.md)。<br><br>注：<br>•repeatTimes=0表示不会执行转换操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。<br>•当repeatTimes为1时，目的操作数/源操作数的有效起始位置为dstList/srcList序列输入的起始位置加上dstRepStride/srcRepStride；repeatTimes为1，如果要让目的操作数/源操作数的有效起始位置为dstList/srcList序列输入的起始位置，需要将dstRepStride/srcRepStride置为0。<br>•当repeatTimes大于1时，第一次repeat中目的操作数/源操作数的有效起始位置为dstList/srcList序列输入的起始位置，第二次需要加上dstRepStride/srcRepStride。以此类推。 |
 | dstRepStride | 输入 | 相邻迭代间，矢量目的操作数相同DataBlock地址步长，单位为DataBlock。 |
 | srcRepStride | 输入 | 相邻迭代间，矢量源操作数相同DataBlock地址步长，单位为DataBlock。 |
 
@@ -136,8 +136,8 @@ TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1H
 
 ## 约束说明<a name="zh-cn_topic_0000001521260417_section633mcpsimp"></a>
 
-- 操作数地址对齐要求请参见[Unified Buffer地址对齐约束](../../../通用说明和约束.md#section796754519912)。
-- 操作数地址重叠约束请参考[Unified Buffer地址重叠约束](../../../通用说明和约束.md#section668772811100)。
+- 操作数地址对齐要求请参见[Unified Buffer地址对齐约束](../../../../通用说明和约束.md#section796754519912)。
+- 操作数地址重叠约束请参考[Unified Buffer地址重叠约束](../../../../通用说明和约束.md#section668772811100)。
 - dst与src中的地址需要连续存放。
 - 单次和多次repeat操作实现转置功能，都只需要配置一次srcList和dstList，后续LocalTensor地址通过nchwconvParams参数自动偏移。
 
@@ -181,22 +181,22 @@ TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1H
 - 当数据类型位宽为8位时，每个DataBlock包含32个数，从指定的16个DataBlock中的对应位置取值，组成半个DataBlock放入目的地址中，读取和存放是在DataBlock的高半部分还是低半部分由参数srcHighHalf和dstHighHalf决定。
 
   **图1** b8类型矩阵转置
-  ![b8](../../../../figures/trans_data_to_5hd_b8.png)
+  ![b8](../../../../../figures/trans_data_to_5hd_b8.png)
 
 - 当数据类型位宽为16位时，每个DataBlock包含16个数，从指定的16个DataBlock中的对应位置取值，组成1个新的DataBlock放入目的地址中。
 
   **图2** b16类型矩阵转置
-  ![b16](../../../../figures/trans_data_to_5hd_b16.png)
+  ![b16](../../../../../figures/trans_data_to_5hd_b16.png)
 
 - 当数据类型位宽为32位时，每个DataBlock包含8个数，从指定的16个DataBlock中的对应位置取值，组成2个新的DataBlock放入目的地址中。
 
   **图3** b32类型矩阵转置
-  ![b32](../../../../figures/trans_data_to_5hd_b32.png)
+  ![b32](../../../../../figures/trans_data_to_5hd_b32.png)
 
 - 16个DataBlock数据可以不连续，推荐通过GetPhyAddr获取LocalTensor的地址值存入地址数组。
 
   **图4**  单次repeat实现16个DataBlock数据转置<a name="zh-cn_topic_0000002557628265_fig12595141012208"></a>
-  ![单次repeat实现16个DataBlock数据转置](../../../../figures/trans_data_to_5hd.png)
+  ![单次repeat实现16个DataBlock数据转置](../../../../../figures/trans_data_to_5hd.png)
 
 ### 将NCHW格式转换成NC1HWC0格式<a name="zh-cn_topic_0000002557628265_section3122131914516"></a>
 
@@ -241,7 +241,7 @@ TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1H
   }
   ```
 
-  ![nchw2nc1hwc0](../../../../figures/trans_data_to_5hd_nchw_nc1hwc0.png)
+  ![nchw2nc1hwc0](../../../../../figures/trans_data_to_5hd_nchw_nc1hwc0.png)
 
 ## 调用示例<a name="zh-cn_topic_0000001521260417_section19372434133520"></a>
 

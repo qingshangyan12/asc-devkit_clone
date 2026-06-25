@@ -71,7 +71,7 @@ hRepeat = 2；vRepeat = 2；mask = 128；vROffset = 128。
 
 - 步骤2. 将输入的张量src1进行广播填充。
 
-    调用[Brcb](../数据填充/Brcb.md)接口，每次迭代从输入张量src1中取8个数，填充到结果张量sharedTmpBuffer的8个DataBlock中（每个DataBlock的大小为32B）。
+    调用[Brcb](../数据填充/概述/Brcb.md)接口，每次迭代从输入张量src1中取8个数，填充到结果张量sharedTmpBuffer的8个DataBlock中（每个DataBlock的大小为32B）。
 
     该步骤处理过程如下：
 

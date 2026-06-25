@@ -317,7 +317,7 @@
                     -   [接口内设置Mask](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/掩码/接口内设置Mask.md)
                     -   [接口外设置Mask](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/掩码/接口外设置Mask.md)
 
-            -   [数据搬运](SIMD-API/基础API/Memory矢量计算/数据搬运/数据搬运.md)
+            -   [数据搬运](SIMD-API/基础API/Memory矢量计算/数据搬运/概述/数据搬运.md)
                 -   [GM与UB数据搬运](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB数据搬运.md)
                     -   [GM与UB连续数据搬运(DataCopy)](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB连续数据搬运(DataCopy).md)
                     -   [GM与UB高维切分数据搬运(DataCopy)](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB高维切分数据搬运(DataCopy).md)
@@ -434,15 +434,15 @@
                     - [GetReduceRepeatSumSpr\(ISASI\)](SIMD-API/基础API/Memory矢量计算/归约计算/寄存器辅助接口/GetReduceRepeatSumSpr(ISASI).md)
                     - [GetReduceRepeatMaxMinSpr\(ISASI\)](SIMD-API/基础API/Memory矢量计算/归约计算/寄存器辅助接口/GetReduceRepeatMaxMinSpr(ISASI).md)
 
-            -   [数据排布转换](SIMD-API/基础API/Memory矢量计算/数据排布转换/数据排布转换.md)
-                -   [Transpose](SIMD-API/基础API/Memory矢量计算/数据排布转换/Transpose.md)
-                -   [TransDataTo5HD](SIMD-API/基础API/Memory矢量计算/数据排布转换/TransDataTo5HD.md)
+            -   [数据排布转换](SIMD-API/基础API/Memory矢量计算/数据排布转换/概述/数据排布转换.md)
+                -   [Transpose](SIMD-API/基础API/Memory矢量计算/数据排布转换/概述/Transpose.md)
+                -   [TransDataTo5HD](SIMD-API/基础API/Memory矢量计算/数据排布转换/概述/TransDataTo5HD.md)
 
-            -   [数据填充](SIMD-API/基础API/Memory矢量计算/数据填充/数据填充.md)
-                -   [Duplicate](SIMD-API/基础API/Memory矢量计算/数据填充/Duplicate.md)
-                -   [Brcb](SIMD-API/基础API/Memory矢量计算/数据填充/Brcb.md)
-                -   [CreateVecIndex](SIMD-API/基础API/Memory矢量计算/数据填充/CreateVecIndex.md)
-                -   [VectorPadding\(ISASI\)](SIMD-API/基础API/Memory矢量计算/数据填充/VectorPadding(ISASI).md)
+            -   [数据填充](SIMD-API/基础API/Memory矢量计算/数据填充/概述/数据填充.md)
+                -   [Duplicate](SIMD-API/基础API/Memory矢量计算/数据填充/概述/Duplicate.md)
+                -   [Brcb](SIMD-API/基础API/Memory矢量计算/数据填充/概述/Brcb.md)
+                -   [CreateVecIndex](SIMD-API/基础API/Memory矢量计算/数据填充/概述/CreateVecIndex.md)
+                -   [VectorPadding\(ISASI\)](SIMD-API/基础API/Memory矢量计算/数据填充/概述/VectorPadding(ISASI).md)
 
             -   [排序组合（ISASI）](SIMD-API/基础API/Memory矢量计算/排序组合（ISASI）/排序组合（ISASI）.md)
                 -   [ProposalConcat](SIMD-API/基础API/Memory矢量计算/排序组合（ISASI）/ProposalConcat.md)
