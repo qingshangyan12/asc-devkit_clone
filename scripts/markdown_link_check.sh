@@ -585,38 +585,41 @@ else:
         scan_set = []
     else:
         staged_changes, staged_reverse_targets = staged_markdown_changes()
-        reverse_targets.update(staged_reverse_targets)
-        if not changed:
-            changed = staged_changes
+        if not ci_mod_filelist_exists and staged_changes and should_skip_ci_chunk(input_paths, staged_changes):
+            scan_set = []
+        else:
+            reverse_targets.update(staged_reverse_targets)
+            if not changed:
+                changed = staged_changes
 
-        if ci_mod_filelist_exists and not ci_changes and not ci_reverse_targets:
-            base_changes, base_reverse_targets = base_markdown_changes()
-            changed.extend(path for path in base_changes if path not in changed)
-            reverse_targets.update(base_reverse_targets)
+            if ci_mod_filelist_exists and not ci_changes and not ci_reverse_targets:
+                base_changes, base_reverse_targets = base_markdown_changes()
+                changed.extend(path for path in base_changes if path not in changed)
+                reverse_targets.update(base_reverse_targets)
 
-        changed_targets = {path for path in changed if path}
-        changed_targets.update(reverse_targets)
-        changed_existing = {
-            path for path in changed_targets
-            if (repo_root / path).is_file()
-        }
+            changed_targets = {path for path in changed if path}
+            changed_targets.update(reverse_targets)
+            changed_existing = {
+                path for path in changed_targets
+                if (repo_root / path).is_file()
+            }
 
-        all_markdown = existing_markdown_files()
-        scan_set = set(changed_existing)
-        for source in all_markdown:
-            source_path = repo_root / source
-            try:
-                text = source_path.read_text(encoding="utf-8")
-            except UnicodeDecodeError:
-                text = source_path.read_text(encoding="utf-8", errors="ignore")
-            except OSError:
-                continue
+            all_markdown = existing_markdown_files()
+            scan_set = set(changed_existing)
+            for source in all_markdown:
+                source_path = repo_root / source
+                try:
+                    text = source_path.read_text(encoding="utf-8")
+                except UnicodeDecodeError:
+                    text = source_path.read_text(encoding="utf-8", errors="ignore")
+                except OSError:
+                    continue
 
-            for target in extract_link_targets(text):
-                normalized = normalize_target(source, target)
-                if normalized in changed_targets:
-                    scan_set.add(source)
-                    break
+                for target in extract_link_targets(text):
+                    normalized = normalize_target(source, target)
+                    if normalized in changed_targets:
+                        scan_set.add(source)
+                        break
 
     scan_set = sorted(scan_set)
 
