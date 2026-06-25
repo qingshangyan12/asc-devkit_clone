@@ -21,6 +21,15 @@
 #include <fstream>
 
 #define ERROR_LOG(fmt, args...) fprintf(stdout, "[ERROR]  " fmt "\n", ##args)
+#define CHECK_ACL(expr)                                                                                          \
+    do {                                                                                                         \
+        aclError ret = (expr);                                                                                   \
+        if (ret != ACL_SUCCESS) {                                                                                \
+            const char* msg = aclGetRecentErrMsg();                                                              \
+            ERROR_LOG("%s failed, ret=%d, msg=%s", #expr, static_cast<int32_t>(ret), msg == nullptr ? "" : msg); \
+            return static_cast<int32_t>(ret);                                                                    \
+        }                                                                                                        \
+    } while (0);
 
 bool ReadFile(const std::string& filePath, size_t& fileSize, void* buffer, size_t bufferSize)
 {
