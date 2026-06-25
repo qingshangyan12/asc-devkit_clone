@@ -5,7 +5,7 @@
 ### 不传入config的原型
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：不支持
+- Ascend 950PR/Ascend 950DT：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
@@ -128,7 +128,7 @@ $dst_i = \frac{1}{src_i}$
 |---|---|
 | T | 操作数数据类型。 |
 | isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。 |
-| <!-- npu="950" id30 -->config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置Subnormal计算模式，ReciprocalConfig类型，定义如下：<br><br>enum&nbsp;class&nbsp;ReciprocalAlgo&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;INTRINSIC&nbsp;=&nbsp;0,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_1ULP_FTZ_TRUE,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_1ULP_FTZ_FALSE,<br>};<br>struct&nbsp;ReciprocalConfig&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;ReciprocalAlgo&nbsp;algo&nbsp;=&nbsp;ReciprocalAlgo::INTRINSIC;<br>};<br>通过ReciprocalConfig结构体的参数algo来配置Subnormal计算模式。algo取值如下：<br>&bull; ReciprocalAlgo::INTRINSIC、ReciprocalAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，所有Subnormal被近似为0。<br>&bull; ReciprocalAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算。<br>该参数的默认值DEFAULT_RECIPROCAL_CONFIG的取值如下：<br><br>constexpr&nbsp;ReciprocalConfig&nbsp;DEFAULT_RECIPROCAL_CONFIG&nbsp;=&nbsp;{&nbsp;ReciprocalAlgo::INTRINSIC&nbsp;};<br><!-- end id30 --> |
+| <!-- npu="950" id19 -->config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置Subnormal计算模式，ReciprocalConfig类型，定义如下：<br><pre>enum&nbsp;class&nbsp;ReciprocalAlgo&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;INTRINSIC&nbsp;=&nbsp;0,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_1ULP_FTZ_TRUE,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_1ULP_FTZ_FALSE,<br>};<br>struct&nbsp;ReciprocalConfig&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;ReciprocalAlgo&nbsp;algo&nbsp;=&nbsp;ReciprocalAlgo::INTRINSIC;<br>};</pre>通过ReciprocalConfig结构体的参数algo来配置Subnormal计算模式。algo取值如下：<br>&bull; ReciprocalAlgo::INTRINSIC、ReciprocalAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，所有Subnormal被近似为0。<br>&bull; ReciprocalAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算。<br>该参数的默认值DEFAULT_RECIPROCAL_CONFIG的取值如下：<br><pre>constexpr&nbsp;ReciprocalConfig&nbsp;DEFAULT_RECIPROCAL_CONFIG&nbsp;=&nbsp;{&nbsp;ReciprocalAlgo::INTRINSIC&nbsp;};</pre><br>调用本原型时若显示传入config参数，则默认使用DEFAULT_RECIPROCAL_CONFIG，此时行为与不传入config参数的原型等价。<!-- end id19 --> |
 
 **表2**  参数说明
 
@@ -143,30 +143,30 @@ $dst_i = \frac{1}{src_i}$
 
 ## 数据类型
 
-<!-- npu="950" id19 -->
+<!-- npu="950" id20 -->
 - 针对Ascend 950PR/Ascend 950DT，T支持的数据类型为：half、float、int64_t、uint64_t。数据类型int64_t、uint64_t仅支持tensor前n个数据计算接口。
-<!-- end id19 -->
-<!-- npu="A3" id20 -->
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T支持的数据类型为：half、float。
 <!-- end id20 -->
-<!-- npu="910b" id21 -->
-- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，T支持的数据类型为：half、float。
+<!-- npu="A3" id21 -->
+- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T支持的数据类型为：half、float。
 <!-- end id21 -->
-<!-- npu="310b" id22 -->
-- 针对Atlas 200I/500 A2 推理产品，T支持的数据类型为：half、float。
+<!-- npu="910b" id22 -->
+- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，T支持的数据类型为：half、float。
 <!-- end id22 -->
-<!-- npu="310p" id23 -->
-- 针对Atlas 推理系列产品AI Core，T支持的数据类型为：half、float。
+<!-- npu="310b" id23 -->
+- 针对Atlas 200I/500 A2 推理产品，T支持的数据类型为：half、float。
 <!-- end id23 -->
-<!-- npu="910" id24 -->
-- 针对Atlas 训练系列产品，T支持的数据类型为：half、float。
+<!-- npu="310p" id24 -->
+- 针对Atlas 推理系列产品AI Core，T支持的数据类型为：half、float。
 <!-- end id24 -->
-<!-- npu="x90" id25 -->
-- 针对Kirin X90，T支持的数据类型为：half、float。
+<!-- npu="910" id25 -->
+- 针对Atlas 训练系列产品，T支持的数据类型为：half、float。
 <!-- end id25 -->
-<!-- npu="9030" id26 -->
-- 针对Kirin 9030，T支持的数据类型为：half、float。
+<!-- npu="x90" id26 -->
+- 针对Kirin X90，T支持的数据类型为：half、float。
 <!-- end id26 -->
+<!-- npu="9030" id27 -->
+- 针对Kirin 9030，T支持的数据类型为：half、float。
+<!-- end id27 -->
 
 ## 返回值说明<a name="section15227195416231"></a>
 
@@ -177,15 +177,18 @@ $dst_i = \frac{1}{src_i}$
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
 
-<!-- npu="A3,910b" id29 -->
-- 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  <!-- npu="A3" id27 -->
+<!-- npu="A3,910b,950" id28 -->
+- 针对如下型号，该接口通过VF调用Reg矢量计算API(跳转)实现兼容，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+  <!-- npu="A3" id29 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id27 -->
-  <!-- npu="910b" id28 -->
+  <!-- end id29 -->
+  <!-- npu="910b" id30 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id28 -->
-<!-- end id29 -->
+  <!-- end id30 -->
+  <!-- npu="950" id31 -->
+  - Ascend 950PR/Ascend 950DT
+  <!-- end id31 -->
+<!-- end id28 -->
 
 - 如果src中的数值为0，可能会产生未知结果。
 - 使用Reciprocal时，half的算子结果对比误差不满足双千分之一的要求，float的算子结果对比误差不满足双万分之一的要求，如果需要高精度，建议使用[Div](Div.md)替代实现。
@@ -219,14 +222,14 @@ $dst_i = \frac{1}{src_i}$
     ```
 
 
-<!-- npu="950" id31 -->
+<!-- npu="950" id32 -->
 以下示例仅支持Ascend 950PR/Ascend 950DT
 
     ```cpp
     static constexpr ReciprocalConfig config = { ReciprocalAlgo::PRECISION_1ULP_FTZ_FALSE };
     AscendC::Reciprocal<T, config>(dstLocal, srcLocal, 512);
     ```
-<!-- end id31 -->
+<!-- end id32 -->
 
 结果示例如下：
 
@@ -234,3 +237,5 @@ $dst_i = \frac{1}{src_i}$
 输入数据srcLocal：[-7.152 -7.24 1.771 ... -1.339 4.473]
 输出数据dstLocal：[-0.1396 -0.1382 0.5645 ... -0.748 0.2231]
 ```
+
+完整样例请参考[单目矢量计算类API样例](https://gitcode.com/cann/asc-devkit/pull/873)。

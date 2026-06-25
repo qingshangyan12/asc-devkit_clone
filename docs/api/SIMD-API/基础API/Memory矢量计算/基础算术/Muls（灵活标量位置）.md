@@ -1,6 +1,6 @@
 # Muls（灵活标量位置）<a name="ZH-CN_TOPIC_0000002170200493"></a>
 
-## 产品支持情况
+## 产品支持情况<a name="section1550532418810"></a>
 
 <!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
@@ -23,8 +23,12 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
-
-
+<!-- npu="x90" id8 -->
+- Kirin X90：不支持
+<!-- end id8 -->
+<!-- npu="9030" id9 -->
+- Kirin 9030：不支持
+<!-- end id9 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -154,18 +158,14 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
 </td>
 <td class="cellrowborder" valign="top" width="9.49%" headers="mcps1.2.4.1.2 "><p id="p10535746191515"><a name="p10535746191515"></a><a name="p10535746191515"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="76%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000001530181537_p0554313181312"><a name="zh-cn_topic_0000001530181537_p0554313181312"></a><a name="zh-cn_topic_0000001530181537_p0554313181312"></a><span id="zh-cn_topic_0000001530181537_ph793119540147"><a name="zh-cn_topic_0000001530181537_ph793119540147"></a><a name="zh-cn_topic_0000001530181537_ph793119540147"></a><span id="zh-cn_topic_0000001530181537_ph199431319161515"><a name="zh-cn_topic_0000001530181537_ph199431319161515"></a><a name="zh-cn_topic_0000001530181537_ph199431319161515"></a><a href="../SIMD计算说明/高维切分.md" target="_blank" rel="noopener noreferrer">mask</a></span>用于控制每次迭代内参与计算的元素。</span></p>
-<a name="zh-cn_topic_0000001530181537_ul1255411133132"></a><a name="zh-cn_topic_0000001530181537_ul1255411133132"></a><ul id="zh-cn_topic_0000001530181537_ul1255411133132"><li>逐bit模式：可以按位控制哪些元素参与计算，bit位的值为1表示参与计算，0表示不参与。<p id="zh-cn_topic_0000001530181537_p121114581013"><a name="zh-cn_topic_0000001530181537_p121114581013"></a><a name="zh-cn_topic_0000001530181537_p121114581013"></a>mask为数组形式，数组长度和数组元素的取值范围和操作数的数据类型有关。当操作数为16位时，数组长度为2，mask[0]、mask[1]∈[0, 2<sup id="zh-cn_topic_0000001530181537_sup1411059101"><a name="zh-cn_topic_0000001530181537_sup1411059101"></a><a name="zh-cn_topic_0000001530181537_sup1411059101"></a>64</sup>-1]并且不同时为0；当操作数为32位时，数组长度为1，mask[0]∈(0, 2<sup id="zh-cn_topic_0000001530181537_sup1711155161017"><a name="zh-cn_topic_0000001530181537_sup1711155161017"></a><a name="zh-cn_topic_0000001530181537_sup1711155161017"></a>64</sup>-1]；当操作数为64位时，数组长度为1，mask[0]∈(0, 2<sup id="zh-cn_topic_0000001530181537_sup181195111019"><a name="zh-cn_topic_0000001530181537_sup181195111019"></a><a name="zh-cn_topic_0000001530181537_sup181195111019"></a>32</sup>-1]。</p>
-<p id="zh-cn_topic_0000001530181537_p711354105"><a name="zh-cn_topic_0000001530181537_p711354105"></a><a name="zh-cn_topic_0000001530181537_p711354105"></a>例如，mask=[8, 0]，8=0b1000，表示仅第4个元素参与计算。</p>
-</li></ul>
-<a name="zh-cn_topic_0000001530181537_ul18554121313135"></a><a name="zh-cn_topic_0000001530181537_ul18554121313135"></a><ul id="zh-cn_topic_0000001530181537_ul18554121313135"><li>连续模式：表示前面连续的多少个元素参与计算。取值范围和操作数的数据类型有关，数据类型不同，每次迭代内能够处理的元素个数最大值不同。当操作数为16位时，mask∈[1, 128]；当操作数为32位时，mask∈[1, 64]；当操作数为64位时，mask∈[1, 32]。</li></ul>
+<td class="cellrowborder" valign="top" width="76%" headers="mcps1.2.4.1.3 "><p>mask用于控制每次迭代内参与计算的元素。详细设置参考<a href="../SIMD计算说明/掩码/掩码.md">掩码</a>。</p>
 </td>
 </tr>
 <tr id="row1953574611513"><td class="cellrowborder" valign="top" width="14.510000000000002%" headers="mcps1.2.4.1.1 "><p id="p3535194615157"><a name="p3535194615157"></a><a name="p3535194615157"></a>repeatTime</p>
 </td>
 <td class="cellrowborder" valign="top" width="9.49%" headers="mcps1.2.4.1.2 "><p id="p0535104621511"><a name="p0535104621511"></a><a name="p0535104621511"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="76%" headers="mcps1.2.4.1.3 "><p id="p28254014265"><a name="p28254014265"></a><a name="p28254014265"></a>重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。</p>
+<td class="cellrowborder" valign="top" width="76%" headers="mcps1.2.4.1.3 "><p id="p28254014265"><a name="p28254014265"></a><a name="p28254014265"></a>重复迭代次数。 矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。</p>
 <p id="p17845145813432"><a name="p17845145813432"></a><a name="p17845145813432"></a>关于该参数的具体描述请参考<span id="zh-cn_topic_0000001530181537_ph43961850144019"><a name="zh-cn_topic_0000001530181537_ph43961850144019"></a><a name="zh-cn_topic_0000001530181537_ph43961850144019"></a><a href="../SIMD计算说明/高维切分.md" target="_blank" rel="noopener noreferrer">高维切分API</a></span>。</p>
 </td>
 </tr>
@@ -200,9 +200,9 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
 
     ```
     uint64_t mask = 128;
-    // repeatTime = 4,单次迭代处理128个数，计算512个数需要迭代4次
-    // dstBlkStride, srcBlkStride = 1,每个迭代内src0参与计算的数据地址间隔为1个datablock，表示单次迭代内数据连续读取和写入
-    // dstRepStride, srcRepStride = 8,相邻迭代间的地址间隔为8个datablock，表示相邻迭代间数据连续读取和写入
+    // repeatTime = 4, 单次迭代处理128个数，计算512个数需要迭代4次
+    // dstBlkStride, srcBlkStride = 1, 每个迭代内src0参与计算的数据地址间隔为1个datablock，表示单次迭代内数据连续读取和写入
+    // dstRepStride, srcRepStride = 8, 相邻迭代间的地址间隔为8个datablock，表示相邻迭代间数据连续读取和写入
     // 标量在后调用示例
     AscendC::Muls(dstLocal, src0Local, src1Local[0], mask, 4, { 1, 1, 8, 8 });
     
@@ -215,9 +215,9 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
 
     ```
     uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
-    // repeatTime = 4,单次迭代处理128个数，计算512个数需要迭代4次
-    // dstBlkStride, srcBlkStride = 1,每个迭代内src0参与计算的数据地址间隔为1个datablock，表示单次迭代内数据连续读取和写入
-    // dstRepStride, srcRepStride = 8,相邻迭代间的地址间隔为8个datablock，表示相邻迭代间数据连续读取和写入
+    // repeatTime = 4, 单次迭代处理128个数，计算512个数需要迭代4次
+    // dstBlkStride, srcBlkStride = 1, 每个迭代内src0参与计算的数据地址间隔为1个datablock，表示单次迭代内数据连续读取和写入
+    // dstRepStride, srcRepStride = 8, 相邻迭代间的地址间隔为8个datablock，表示相邻迭代间数据连续读取和写入
     // 标量在后调用示例
     AscendC::Muls(dstLocal, src0Local, src1Local[0], mask, 4, {1, 1, 8, 8});
     
