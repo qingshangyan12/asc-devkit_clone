@@ -216,3 +216,5 @@ Ascend C提供三类接口，均可实现底层的完备编程能力：
 - [贡献指南](CONTRIBUTING.md)
 - [安全声明](SECURITY.md)
 - [许可证](LICENSE)
+
+<!-- TTFHW CI-timing test, no-op line, closed unmerged -->
