@@ -8,15 +8,15 @@ C++ Tensor编程是Ascend C SIMD编程路径的核心高级接口，基于Tensor
 
 ## 内存层级
 
-AI Core采用分级存储架构，Cube矩阵计算采用「Global Memory → L1/L0系列Buffer」两级层级服务于矩阵计算，Vector矢量计算传统架构为「Global Memory → UB」两级层级，而Ascend 950PR/Ascend 950DT引入寄存器后构建「Global Memory → Unified Buffer → Register」三级层级，其中Global Memory存放输入输出数据、Unified Buffer作为矢量计算中间缓存、Register位于Vector计算单元最内层直接与执行单元交互。
+AI Core采用分级存储架构，Cube矩阵计算采用「Global Memory（以下简称为GM） → L1/L0系列Buffer」两级层级服务于矩阵计算，Vector矢量计算传统架构为「Global Memory → Unified Buffer（以下简称为UB）」两级层级，而NPU架构版本3510引入寄存器后构建「GM → UB → Register」三级层级，其中GM存放输入输出数据、UB作为矢量计算中间缓存、Register位于Vector计算单元最内层直接与执行单元交互。
 
-<img src="../../../../figures/AI%20Core存储层次结构.png" alt="AI Core存储层次结构" width="800" />
+<img src="../../../../figures/AI_Core存储层次结构_c.png" alt="AI Core存储层次结构" width="800" />
 
 ### Tensor内存抽象
 
 Tensor本质是对内存地址的抽象封装，通过数组方式管理内存并执行计算，更匹配SIMD硬件执行模型。其核心思想是将原始内存地址抽象为Tensor对象，实现从"地址操作"到"对象管理"的编程层次提升。
 
-根据芯片分级存储架构，Tensor分为两类：**GlobalTensor**对应Global Memory，存放算子输入/输出数据；**LocalTensor**对应片上内存（UB、L1、L0A/L0B/L0C等缓冲区），承载计算过程数据。Tensor体系持续演进：基础Tensor仅携带数据指针和大小信息，需手动传递操作参数；扩展Tensor引入Layout概念，携带Shape和Stride信息，接口可自动推导搬运长度、计算元素数等参数，大幅降低编程复杂度。
+根据芯片分级存储架构，Tensor分为两类：**GlobalTensor**对应GM，存放算子输入/输出数据；**LocalTensor**对应片上内存（UB、L1、L0A/L0B/L0C等缓冲区），承载计算过程数据。Tensor体系持续演进：基础Tensor仅携带数据指针和大小信息，需手动传递操作参数；扩展Tensor引入Layout概念，携带Shape和Stride信息，接口可自动推导搬运长度、计算元素数等参数，大幅降低编程复杂度。
 
 #### 基础Tensor与扩展Tensor抽象定义
 
@@ -30,7 +30,7 @@ __global__ __vector__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
   yGm.SetGlobalBuffer(y + block_idx * blockLength, blockLength);
   zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
 
-  // Allocate Local Memory (Unified Buffer) through Allocator
+  // Allocate Local Memory (UB) through Allocator
   AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
   AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, blockLength>();
   AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, blockLength>();
@@ -65,7 +65,7 @@ __global__ __cube__ void matmul_custom(__gm__ half* a, __gm__ half* b, __gm__ ha
 
 ### 外部存储
 
-Global Memory是昇腾NPU的设备内存，位于AI Core外部，容量大、带宽高但访问延迟较长。用于存储算子的输入数据、输出结果和中间计算数据。Global Memory具有持久性：其中存储的数据持续保留，直到内存空间被释放或应用程序终止。
+GM是昇腾NPU的设备内存，位于AI Core外部，容量大、带宽高但访问延迟较长。用于存储算子的输入数据、输出结果和中间计算数据。GM具有持久性：其中存储的数据持续保留，直到内存空间被释放或应用程序终止。
 
 用户通过Runtime API管理Device侧全局内存。Host侧使用`aclrtMalloc`分配Device内存，通过`aclrtMemcpy`完成Host与Device间的数据拷贝，通过`<<<>>>`拉起核函数执行，最后使用`aclrtFree`释放内存。有关Runtime API的详细信息，可参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
 
@@ -104,13 +104,13 @@ std::vector<float> kernel_add(std::vector<float> &x, std::vector<float> &y) {
 
 ### 内部存储
 
-AI Core包含三类计算单元：Cube负责矩阵计算、Vector负责矢量计算、Scalar负责标量计算。计算前需将数据从外部存储加载到内部存储，不同存储单元服务不同计算单元：Unified Buffer支撑矢量计算，L1 Buffer和L0 Buffer支撑矩阵计算。
+AI Core包含三类计算单元：Cube负责矩阵计算、Vector负责矢量计算、Scalar负责标量计算。计算前需将数据从外部存储加载到内部存储，不同存储单元服务不同计算单元：UB支撑矢量计算，L1 Buffer和L0 Buffer支撑矩阵计算。
 
-#### AIV内部存储之Unified Buffer
+#### AIV内部存储之UB
 
-Unified Buffer是AI Core内主要用于矢量计算的内部存储单元，位于每个Vector Core（AIV）内部。容量较小但带宽高、延迟低，可视为内核执行期间由用户管理的高速缓存。
+UB是AI Core内主要用于矢量计算的内部存储单元，位于每个Vector Core（AIV）内部。容量较小但带宽高、延迟低，可视为内核执行期间由用户管理的高速缓存。
 
-在C++ Tensor编程中，通过`LocalTensor`对象管理Unified Buffer内存，其中对于**基础Tensor(不带Layout)**而言, 主要通过`LocalMemAllocator`物理存储位置和内存大小来创建对应的Tensor。LocalMemAllocator是一种线性内存分配器，开发者可以调用Alloc方法进行内存分配，地址分配从0开始，根据调用次序依次向后进行线性分配，LocalMemAllocator只是一个简单的线性分配器，并不提供内存释放以及其它内存管理的能力。在不关注Bank冲突场景或者算子初始功能开发时，可以使用LocalMemAllocator简化算子编写，在后续性能优化时切换到使用LocalTensor进行地址分配的方式。
+在C++ Tensor编程中，通过`LocalTensor`对象管理UB内存，其中对于**基础Tensor(不带Layout)**而言, 主要通过`LocalMemAllocator`物理存储位置和内存大小来创建对应的Tensor。LocalMemAllocator是一种线性内存分配器，开发者可以调用Alloc方法进行内存分配，地址分配从0开始，根据调用次序依次向后进行线性分配，LocalMemAllocator只是一个简单的线性分配器，并不提供内存释放以及其它内存管理的能力。
 
 ```cpp
 __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
@@ -121,7 +121,8 @@ __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm
 }
 ```
 
-此外，开发者可通过LocalTensor构造函数直接指定内存地址，实现内存的完全自主管理。使用时需合理规划地址分配，确保不超过物理存储上限，并在保证功能正确的前提下进行内存复用。
+在初始功能开发时，可以使用LocalMemAllocator简化算子编写。如需更精细的内存控制（如规避Bank冲突、内存复用等），可通过LocalTensor直接指定地址进行管理。使用时需合理规划地址分配，确保不超过物理存储上限，并在保证功能正确的前提下进行内存复用。
+
 ```cpp
 __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
 {
@@ -136,28 +137,24 @@ __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm
   AscendC::LocalTensor<float> zLocalPing(AscendC::TPosition::VECCALC, zAddrPing, 256);
 }
 ```
-> 📌 其中AscendC::TPosition::VECCALC为对物理位置的逻辑抽象定义，跟物理位置的映射参考文件[逻辑位置和物理存储的映射](../../../../../api/SIMD-API/通用说明和约束.md)
+> 📌 其中AscendC::TPosition::VECCALC为对物理位置的逻辑抽象定义，与物理位置的映射参考文件[逻辑位置和物理存储的映射](../../../../../api/SIMD-API/通用说明和约束.md)
 
-相比于基础Tensor的定义, 扩展Tensor除了支持开发者自定义内存地址外, 同时支持通过数组的方式构建内存地址, 并通过`MakeTensor`创建Tensor对象, 同时在构建Tensor的时候也传入的Layout的定义, 将Layout信息赋予给LocalTensor对象, 。 
-
-- **扩展Tensor**：通过`MakeTensor`创建，携带Shape和Stride信息
+相比基础Tensor，NPU架构版本3510引入Layout描述并将其作为Tensor的核心属性，开发者可在Tensor创建时直接关联Shape与Stride信息，简化多维数据的布局管理。通过`MakeTensor`，开发者可灵活指定内存地址和Layout布局，更便捷地描述ND、NZ等典型数据排布。 
 
 ```cpp
 // Basic Tensor: allocate through Allocator
-AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
-AscendC::LocalTensor<half> ubTensor = ubAllocator.Alloc<half, 256>();
-
+__ubuf__ half ubBuffer[1024];
+auto ubPointer = AscendC::Te::MakeMemPtr(ubBuffer);
 // Extended Tensor: create through MakeTensor
 auto ubTensor = AscendC::Te::MakeTensor(ubPointer, AscendC::Te::MakeLayout(AscendC::Te::MakeShape(128, 64)));
 ```
-
-> 📌 Unified Buffer地址必须32字节对齐，以匹配硬件总线粒度和SIMD计算单元并行度，非对齐访问将导致运行时错误。
+> 📌 UB地址必须32字节对齐，以匹配硬件总线粒度和SIMD计算单元并行度，非对齐访问将导致运行时错误。
 
 #### Register File
 
-Ascend 950PR/Ascend 950DT引入寄存器可编程能力，Vector计算单元的所有计算均需经「GM → UB → Register」三级数据流转，在寄存器上完成矢量计算。C++ Tensor编程通过定义RegTensor方式进行寄存器编程。详见[Reg矢量计算编程](./Reg矢量计算编程.md)。
+NPU架构版本3510引入寄存器可编程能力，Vector计算单元的所有计算均需经「GM → UB → Register」三级数据流转，在寄存器上完成矢量计算。C++ Tensor编程通过定义RegTensor方式进行寄存器编程。详见[Reg矢量计算编程](./Reg矢量计算编程.md)。
 
-> 📌 寄存器可编程能力从**Ascend 950PR/Ascend 950DT**引入。
+> 📌 寄存器可编程能力从**NPU架构版本3510**引入。
 
 #### L1 Buffer & L0 Buffer
 
@@ -174,11 +171,9 @@ Cube计算单元专用的缓存为：L0A Buffer存储左矩阵，L0B Buffer存�
 | Fixpipe Buffer | 存储量化参数 | `LocalTensor<half> fixpipe_buffer;` |
 | BiasTable Buffer | 存储Bias数据 | `LocalTensor<half> bias_buffer;` |
 
-同Unified Buffer的申请方式, 开发者可以通过
+同UB的申请方式，开发者可通过LocalMemAllocator或直接构造LocalTensor来申请L1/L0 Buffer内存。为提升Cube计算效率，L1 Buffer和L0 Buffer采用分形格式。不同产品型号的分形格式存在差异：
 
-为提升Cube计算效率，L1 Buffer和L0 Buffer采用分形格式。不同产品型号的分形格式存在差异：
-
-| 存储单元 | Atlas A2/A3训练和推理系列产品 | Ascend 950PR/Ascend 950DT |
+| 存储单元 | NPU架构版本2201 | NPU架构版本3510 |
 |---------|----------------------------|---------------------------|
 | L1 Buffer | Nz | Nz |
 | L0A Buffer | Zz | Nz |
@@ -191,7 +186,7 @@ Cube计算单元专用的缓存为：L0A Buffer存储左矩阵，L0B Buffer存�
 
 #### Bank冲突
 
-为了提高数据访问的效率和吞吐量，内部存储采用了bank（大小相等的内存模块）结构设计。以Unified Buffer为例，Ascend 950PR/Ascend 950DT产品上，Unified Buffer总大小为256KB（256 × 1024字节），包含8个bank group，每个bank group包含2个bank。每个bank大小为16KB，由512行组成，每行长度为32B，采用低位地址交织。Atlas A2/A3训练和推理系列产品的UB容量规格请参考相应硬件架构文档。
+为了提高数据访问的效率和吞吐量，内部存储采用了bank（大小相等的内存模块）结构设计。以UB为例，NPU架构版本3510产品上，UB总大小为256KB（256 × 1024字节），包含8个bank group，每个bank group包含2个bank。每个bank大小为16KB，由512行组成，每行长度为32B，采用低位地址交织。NPU架构版本2201的UB容量规格请参考相应硬件架构文档。
 
 <img src="../../../../figures/UB_Bank冲突示意图.png" alt="UB Bank冲突示意图" width="800" />
 
@@ -210,11 +205,9 @@ Cube计算单元专用的缓存为：L0A Buffer存储左矩阵，L0B Buffer存�
 
 ## 同步机制
 
-在编程中，同步是指协调多个执行单元（如线程、进程等）对共享资源的访问顺序和时机来确保程序的正确性。如果没有同步来严格控制执行顺序，则会出现结果不一致、行为不可预测等多种问题。
+前文介绍了AI Core的多级存储与计算单元架构。由于DMA搬运、矢量计算、矩阵计算等单元均为异步并行执行，数据读写、计算操作存在强依赖，因此必须依靠同步机制管控执行时序，保证程序逻辑正确。在编程场景中，同步是指协调多个执行单元（如线程、进程等）对共享资源的访问顺序和时机，以保障程序执行结果的正确性。若未通过同步机制严格控制执行顺序，会导致计算结果不一致、程序行为不可预测等问题。
 
 AI Core的同步主要分为**核内同步**和**核间同步**。
-
----
 
 ### 核内同步
 
@@ -222,9 +215,9 @@ AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以
 
 下图示例描述了一个常见的Vector计算数据流：
 
-1. 通过DMA将数据从Global Memory搬入到Local Memory
+1. 通过DMA将数据从GM搬入到Local Memory
 2. 进行矢量计算
-3. 通过DMA将数据从Local Memory搬出到Global Memory
+3. 通过DMA将数据从Local Memory搬出到GM
 
 <img src="../../../../figures/Vector计算数据流.png" alt="Vector计算数据流" width="800" />
 
@@ -239,7 +232,7 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
 | 流水类型 | 含义 |
 |---------|------|
 | **PIPE_S** | 标量流水线 |
-| **PIPE_V** | 矢量计算流水及部分硬件架构下的L0C Buffer→Unified Buffer数据搬运流水 |
+| **PIPE_V** | 矢量计算流水及部分硬件架构下的L0C Buffer→UB数据搬运流水 |
 | **PIPE_M** | 矩阵计算流水 |
 | **PIPE_MTE1** | L1 Buffer→L0A Buffer、L1 Buffer→L0B Buffer数据搬运流水 |
 | **PIPE_MTE2** | GM→L1 Buffer、GM→UB等数据搬运流水 |
@@ -248,52 +241,12 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
 
 为确保流水线间正确执行，AI Core针对不同应用场景提供了多种同步机制，开发者可根据实际需求灵活选择合适的同步方式来实现算子功能。
 
-<table>
-<thead>
-<tr>
-<th>同步类型</th>
-<th>核心作用及场景说明</th>
-<th>关键接口</th>
-<th>实现代码示例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td rowspan="2"><strong>多流水同步</strong></td>
-<td><p><strong>机制一</strong>: Mutex互斥锁用于核内异步流水指令之间的同步处理，其功能类似于传统CPU中的锁机制。该同步机制为Ascend 950PR/Ascend 950DT新引入机制，相较于SetFlag/WaitFlag方式使用更简便。</p></td>
-<td><code>Mutex::Lock</code> & <code>Mutex::Unlock</code></td>
-<td>
-        <code>AscendC::Mutex::Lock&lt;PIPE_MTE2&gt;(mutexId);</code><br>
-        <code>AscendC::DataCopy(srcLocal, srcGlobal, dataSize);</code><br>
-        <code>AscendC::Mutex::Unlock&lt;PIPE_MTE2&gt;(mutexId);</code><br>
-        <code></code><br>
-        <code>AscendC::Mutex::Lock&lt;PIPE_V&gt;(mutexId);</code><br>
-        <code>AscendC::Add(dstLocal, src0Local, src1Local, dataSize);</code><br>
-        <code>AscendC::Mutex::Unlock&lt;PIPE_V&gt;(mutexId);</code>
-      </td>
-</tr>
-<tr>
-<td><p><strong>机制二</strong>: SetFlag与WaitFlag机制实现两条流水间的同步等待，用于核内异步流水的同步协调。Ascend 950PR/Ascend 950DT引入Mutex机制后，仍保持对该接口的兼容支持，但优先推荐使用Mutex机制进行多流水同步。</p></td>
-<td><code>SetFlag</code> & <code>WaitFlag</code></td>
-<td>
-        <code>AscendC::DataCopy(srcLocal, srcGlobal, dataSize);</code><br>
-        <code>AscendC::SetFlag&lt;HardEvent::MTE2_V&gt;(eventId);</code><br>
-        <code>AscendC::WaitFlag&lt;HardEvent::MTE2_V&gt;(eventId);</code><br>
-        <code>AscendC::Add(dstLocal, src0Local, src1Local, count);</code>
-      </td>
-</tr>
-<tr>
-<td><strong>单流水同步</strong></td>
-<td><p>PipeBarrier等待同一流水内前序指令完成，用于同一流水内存在前后数据依赖。</p></td>
-<td><code>PipeBarrier</code></td>
-<td>
-        <code>AscendC::Add(dstLocal, src0Local, src1Local, count);</code><br>
-        <code>AscendC::PipeBarrier&lt;PIPE_V&gt;();</code><br>
-        <code>AscendC::Sub(dstLocal, dstLocal, src0Local, count);</code>
-      </td>
-</tr>
-</tbody>
-</table>
+| 同步类型 | 核心作用及场景说明 | 关键接口 | 实现代码示例 |
+|---------|-------------------|----------|-------------|
+| **多流水同步（机制一）** | Mutex互斥锁用于核内异步流水间的同步，功能类似传统CPU锁机制。NPU架构版本3510新引入，比SetFlag/WaitFlag更简便。 | `Mutex::Lock` & `Mutex::Unlock` | `AscendC::Mutex::Lock<PIPE_MTE2>(mutexId);`<br>`AscendC::DataCopy(srcLocal, srcGlobal, dataSize);`<br>`AscendC::Mutex::Unlock<PIPE_MTE2>(mutexId);`<br>`AscendC::Mutex::Lock<PIPE_V>(mutexId);`<br>`AscendC::Add(dstLocal, src0Local, src1Local, dataSize);`<br>`AscendC::Mutex::Unlock<PIPE_V>(mutexId);` |
+| **多流水同步（机制二）** | SetFlag与WaitFlag实现两条流水间同步等待。引入Mutex后仍保持兼容，但优先推荐Mutex机制。 | `SetFlag` & `WaitFlag` | `AscendC::DataCopy(srcLocal, srcGlobal, dataSize);`<br>`AscendC::SetFlag<HardEvent::MTE2_V>(eventId);`<br>`AscendC::WaitFlag<HardEvent::MTE2_V>(eventId);`<br>`AscendC::Add(dstLocal, src0Local, src1Local, count);` |
+| **单流水同步** | PipeBarrier等待同一流水内前序指令完成，用于同一流水内的前后数据依赖。 | `PipeBarrier` | `AscendC::Add(dstLocal, src0Local, src1Local, count);`<br>`AscendC::PipeBarrier<PIPE_V>();`<br>`AscendC::Sub(dstLocal, dstLocal, src0Local, count);` |
+| 内存访问顺序控制 | 等待所有前序内存访问完成，用于存在数据依赖或内存依赖的场景。 | `DataSyncBarrier` |`AscendC::DataSyncBarrier<AscendC::MemDsbT::DDR>();` |
 
 ### 核间同步
 
@@ -367,7 +320,7 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
       </td>
     </tr>
     <tr>
-      <td><strong>单个AI Core内AIC与AIV同步(Ascend 950PR/Ascend 950DT新引入)</strong></td>
+      <td><strong>单个AI Core内AIC与AIV同步(NPU架构版本3510新引入)</strong></td>
       <td><p>同步单个AI Core内AIC与AIV核，通常用于Mix算子中Cube与Vector间的交互操作。AIV0与AIV1可单独触发AIC等待。</p></td>
       <td><code>CrossCoreSetFlag</code><br><code>CrossCoreWaitFlag</code></td>
       <td>
@@ -388,15 +341,15 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
 
 ## 算子类型
 
-前序章节抽象硬件架构已阐述，AI Core包含Vector和Cube两类计算单元，分别用于向量计算和矩阵计算。Cube计算单元部署于AIC核，Vector计算单元部署于AIV核，每个核均配备独立的Scalar单元，可独立加载各自的代码段。基于AI Core的硬件能力，开发者可实现Vector矢量算子、Cube矩阵算子及Mix CV融合算子三类算子。
+结合前文介绍的AI Core计算单元、多级内存架构与同步机制，基于硬件能力可开发三类算子：矢量算子、矩阵算子、融合算子。前序章节对硬件架构的介绍中已说明：AI Core包含Vector（矢量计算）和Cube（矩阵计算）两类核心计算单元，分别对应矢量计算和矩阵计算场景。Cube计算单元部署于AIC核，Vector计算单元部署于AIV核，每个核均配备独立的Scalar单元，可独立加载各自的代码段。基于AI Core的硬件能力，开发者可实现Vector矢量算子、Cube矩阵算子及Mix CV融合算子三类算子。
 
 ### Vector矢量计算
 
 Vector矢量计算主要包含基础算术、归约计算、数据类型转换等矢量计算。
 
-在Atlas A2/A3训练和推理系列产品上，Vector矢量计算的数据来自于Unified Buffer（要求32B对齐），C++ Tensor编程在Vector计算单元上提供了通过LocalTensor直接操作计算的接口能力。此类直接操作UB的编程方式称为Memory矢量计算编程。
+在NPU架构版本2201上，Vector矢量计算的数据来自于UB（要求32B对齐），C++ Tensor编程在Vector计算单元上提供了通过LocalTensor直接操作计算的接口能力。此类直接操作UB的编程方式称为Memory矢量计算编程。
 
-以Add计算为例，当开发者需要计算4096长度的向量加法，可以通过`Add(dstTensor, src0Tensor, src1Tensor, count)`的接口直接进行计算。更多内容可参考[MemoryBase矢量计算编程](./MemoryBase矢量计算编程.md)中有关Memory矢量计算编程的描述。
+以Add计算为例，当开发者需要计算4096长度的向量加法，可通过`Add(dstTensor, src0Tensor, src1Tensor, count)`接口直接进行计算。更多内容请参考[Memory矢量计算编程](./Memory矢量计算编程.md)。
 
 ```cpp
 // Define Vector operator, marked with __aicore__ to execute on Device, suitable for operators with only Vector computation
@@ -414,9 +367,9 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 }
 ```
 
-Ascend 950PR/Ascend 950DT新一代架构，引入寄存器可编程能力，在传统UB缓存体系的基础上，开放寄存器（Register）可编程能力，构建出「Global Memory → UB → Register」的三级内存层级。新一代架构下的矢量计算都需要从Unified Buffer加载到Register寄存器后，再利用Register寄存器进行计算操作。可参考[Reg矢量计算编程](./Reg矢量计算编程.md)中有关Reg矢量计算编程的描述。
+NPU架构版本3510新一代架构，引入寄存器可编程能力，在传统UB缓存体系的基础上，开放寄存器（Register）可编程能力，构建出「GM → UB → Register」的三级内存层级。新一代架构下的矢量计算都需要从UB加载到Register寄存器后，再利用Register寄存器进行计算操作。可参考[Reg矢量计算编程](./Reg矢量计算编程.md)中有关Reg矢量计算编程的描述。
 
-> 📌 寄存器可编程能力从**Ascend 950PR/Ascend 950DT**引入。
+> 📌 寄存器可编程能力从**NPU架构版本3510**引入。
 
 ### Cube矩阵计算
 
@@ -482,4 +435,4 @@ __global__ __mix__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 
 ## 总结
 
-本章系统阐述了C++ Tensor编程的核心定位与技术体系。作为SIMD编程的高级接口，C++ Tensor编程基于Tensor对象抽象封装内存地址，提供类型安全、编译期检查的高层次编程能力，帮助开发者提升开发效率、降低编程复杂度。进一步学习可以参考[Cube矩阵计算编程](./Cube矩阵计算编程.md)、[MemoryBase矢量计算编程](./MemoryBase矢量计算编程.md)和[Reg矢量计算编程](./Reg矢量计算编程.md)。
+本章系统阐述了C++ Tensor编程的核心定位与技术体系。作为SIMD编程的高级接口，C++ Tensor编程基于Tensor对象抽象封装内存地址，提供类型安全、编译期检查的高层次编程能力，帮助开发者提升开发效率、降低编程复杂度。进一步学习可以参考[MemoryBase矢量计算编程](./MemoryBase矢量计算编程.md)、[Cube矩阵计算编程](./Cube矩阵计算编程.md)、[Reg矢量计算编程](./Reg矢量计算编程.md)。

@@ -27,7 +27,7 @@
 
 -   通过[LocalMemAllocator](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/LocalMemAllocator.md)指定硬件位置进行Tensor分配。
 
-    LocalMemAllocator是一种线性内存分配器，开发者可以调用Alloc方法进行内存分配，地址分配从0开始，根据调用次序依次向后进行线性分配，不提供内存释放能力。在不关注Bank冲突场景或者算子初始功能开发时，可以使用LocalMemAllocator简化算子编写，在后续性能优化时切换到使用LocalTensor进行地址分配的方式。
+    LocalMemAllocator是一种线性内存分配器，开发者可以调用Alloc方法进行内存分配，地址分配从0开始，根据调用次序依次向后进行线性分配，不提供内存释放能力。在初始功能开发时，可以使用LocalMemAllocator简化算子编写。如需更精细的内存控制（如规避Bank冲突、内存复用等），可通过LocalTensor直接指定地址进行管理。
 
 -   通过[LocalTensor构造函数](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor构造函数.md)创建Tensor，极致性能场景推荐使用此方式。
 

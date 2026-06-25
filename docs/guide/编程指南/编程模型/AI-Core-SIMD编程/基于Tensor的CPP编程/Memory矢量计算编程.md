@@ -1,6 +1,6 @@
 # Memory矢量计算编程<a name="ZH-CN_TOPIC_0000002600000002"></a>
 
-本文介绍如何在Ascend C中使用C++ Tensor编程API编写基于Unified Buffer（以下简称UB）的矢量计算代码，该能力是Ascend C最基础、最通用的矢量编程方式。这种基于UB内存的编程方式称为Memory矢量计算编程。Memory矢量计算在Atlas A2/A3训练和推理系列产品上提供完整的UB直接编程能力；Ascend 950PR/Ascend 950DT虽然支持UB操作，但推荐使用Reg矢量计算编程以获得更高性能。
+本文介绍如何在Ascend C中使用C++ Tensor编程API编写基于Unified Buffer（以下简称UB）的矢量计算代码，该能力是Ascend C最基础、最通用的矢量编程方式。这种基于UB内存的编程方式被称为Memory矢量计算编程。NPU架构版本2201产品支持完整的Memory矢量计算UB直接编程能力；而 NPU架构版本3510 虽也支持UB操作，但推荐使用 Reg 矢量计算编程以获得更高性能。
 
 ## Memory矢量编程的基本步骤
 
@@ -12,7 +12,7 @@ Memory矢量计算的数据流为：数据搬入 → 计算 → 数据搬出。�
 
 ## Memory矢量计算内存管理
 
-Memory矢量编程主要是通过Local Memory(Unified Buffer)进行矢量计算，开发者必须将输入搬入到Unified Buffer并通过Vector计算指令完成计算。其中Unified Buffer通过LocalTensor对象进行管理，开发者可以通过LocalMemAllocator分配器申请Unified Buffer进行矢量计算。
+Memory 矢量编程的核心是基于 Local Memory（UB）完成矢量计算，要求开发者先将输入数据从Global Memory（以下简称GM）搬入UB，再通过Vector计算指令执行运算。UB的管理依赖 LocalTensor对象实现，开发者可通过LocalMemAllocator分配器申请UB空间，为后续矢量计算提供存储载体。
 
 ### 基础Tensor(不带Layout)定义
 
@@ -29,53 +29,22 @@ __global__ __aicore__ void add_custom(...)
 
 ## Memory数据搬运
 
-Global Memory（GM）与Unified Buffer（UB）之间的数据搬运提供了多样化的接口，支持丰富的数据搬运场景。为实现高效的Vector计算，系统支持将数据从GM搬运至UB，供Vector计算单元进行向量计算；计算完成后，再将结果从UB搬回GM，完成数据闭环。
+Global Memory（GM）与UB之间的数据搬运提供了多样化的接口，支持丰富的数据搬运场景。为实现高效的Vector计算，系统支持将数据从GM搬运至UB，供Vector计算单元进行向量计算。计算完成后，再将结果从UB搬回GM，完成数据闭环。
 
 开发者通过灵活配置DataCopyParams参数，精确控制数据块数量、地址长度及间隔等关键属性，实现连续和非连续数据搬运（高维切分数据搬运），充分释放硬件的数据搬运与计算协同能力，提升向量算子的执行效率。
 
-<table>
-<thead>
-<tr><th>数据通路</th><th>搬运模式</th><th>接口</th><th>适用场景</th></tr>
-</thead>
-<tbody>
-<tr>
-<td rowspan="3">Global Memory → UB</td>
-<td>连续搬运</td>
-<td><code>DataCopy(dst, src, count)</code></td>
-<td>连续地址的一维数据搬运</td>
-</tr>
-<tr>
-<td>高维切分搬运</td>
-<td><code>DataCopy(dst, src, datacopyParams)</code></td>
-<td>非连续多块数据搬运，可配置块数和间隔</td>
-</tr>
-<tr>
-<td>非对齐搬运</td>
-<td><code>DataCopy(dst, src, dataCopyExtParams, padParams)</code></td>
-<td>地址非32B对齐，支持自定义填充</td>
-</tr>
-<tr>
-<td rowspan="3">UB → Global Memory</td>
-<td>连续搬运</td>
-<td><code>DataCopy(dst, src, count)</code></td>
-<td>连续地址的一维数据搬运</td>
-</tr>
-<tr>
-<td>高维切分搬运</td>
-<td><code>DataCopy(dst, src, datacopyParams)</code></td>
-<td>非连续多块数据搬运，可配置块数和间隔</td>
-</tr>
-<tr>
-<td>非对齐搬运</td>
-<td><code>DataCopy(dst, src, dataCopyExtParams)</code></td>
-<td>地址非32B对齐，支持自定义填充</td>
-</tr>
-</tbody>
-</table>
+| 数据通路 | 模式 | 接口 | 适用场景 |
+|---|---|---|---|
+| GM→UB | 连续搬运 | `DataCopy(dst, src, count)` | 一维连续数据搬运 |
+| GM→UB | 高维切分 | `DataCopy(dst, src, datacopyParams)` | 多块非连续数据，可配置块数和间隔 |
+| GM→UB | 非对齐搬运 | `DataCopy(dst, src, dataCopyExtParams, padParams)` | 地址非32B对齐，支持自定义填充 |
+| UB→GM | 连续搬运 | `DataCopy(dst, src, count)` | 一维连续数据搬运 |
+| UB→GM | 高维切分 | `DataCopy(dst, src, datacopyParams)` | 多块非连续数据，可配置块数和间隔 |
+| UB→GM | 非对齐搬运 | `DataCopy(dst, src, dataCopyExtParams)` | 地址非32B对齐，支持自定义填充 |
 
 根据上述矢量搬运能力的描述，开发者可以根据不同的场景选择合适的接口进行处理。
 
-**连续搬运**: 如果开发者需要将一块连续的`Global Memory`搬运到`Unified Buffer`时，只需指定搬运数据元素个数即可。例如srcGlobal数据(shape(256)，数据类型为half)，需搬入到`Unified Buffer`中，通过`DataCopy`直接调用：
+**连续搬运**: 如果开发者需要将一块连续的`Global Memory`搬运到UB时，只需指定搬运数据元素个数即可。例如srcGlobal数据(shape(256)，数据类型为half)，需搬入到UB中，通过`DataCopy`直接调用：
 
 <img src="../../../../figures/连续数据搬运.png" alt="连续数据搬运" width="800" />
 
@@ -83,12 +52,12 @@ Global Memory（GM）与Unified Buffer（UB）之间的数据搬运提供了多�
 AscendC::DataCopy(dstLocal, srcGlobal, 256);
 ```
 
-**高维切分搬运**: 当用户需要将多块非连续的`Global Memory`搬入到一块`Unified Buffer`时，可通过高维切分模式配置搬运数据块的个数、单个数据块的长度、每个数据块之间的间隔。以src_gm数据(shape(256)，数据类型为half)为例，进行如下图数据搬运时, 可通过C++ Tensor接口直接进行搬运操作：
+**高维切分搬运**: 当需要将多块非连续的Global Memory数据搬入单个UB时，可通过高维切分模式配置搬运数据块的数量、单个数据块长度及块间间隔。以 srcGlobal 数据（shape 为 256、数据类型为 half）为例，如下场景的数据搬运可直接通过 C++ Tensor 接口实现：
 
 <img src="../../../../figures/非连续搬运.png" alt="非连续搬运" width="800" />
 
 ```c
-// Number of consecutive data blocks: 16 rows of data, transfer every alternate row to UB, need to transfer 8 rows
+// Number of consecutive data blocks: 16 rows of data, transfer every alternate row to UB, needing to transfer 8 rows
 uint16_t blockCount = 2;
 // Length of single data block (in 32B units): value is 8
 uint16_t blockLen = 8;
@@ -105,40 +74,40 @@ AscendC::DataCopy(dstLocal, srcGlobal, copyParams);
 
 <img src="../../../../figures/非对齐搬入能力.png" alt="非对齐搬入能力" width="800" />
 
-在上图中, 将两个数据块从GM搬运至UB，每个blockLen为54B，源操作数相邻数据块之间的间隔为1B，目的操作数相邻数据块之间的间隔为32B。
-在blockLen左侧和右侧分别填充2个和3个half类型元素，此时blockLen + leftPadding + rightPadding = 54B + 2 * 2B + 3 * 2B = 64B，满足32B对齐。
+在上图所示场景中，需将两个数据块从GM搬运至UB：每个数据块的blockLen为54B，源操作数中相邻数据块的间隔为1B，目的操作数中相邻数据块的间隔为32B。为满足32B对齐要求，需在blockLen左侧填充2个half类型元素、右侧填充3个half类型元素；此时总长度为blockLen + leftPadding × 2B + rightPadding × 2B = 54B + 2 × 2B + 3 × 2B = 64B，符合32B对齐约束。
+
 ```c
 // Number of consecutive data blocks: transfer two consecutive data blocks
-uint16_t burstCount = 2;
+uint16_t blockCount = 2;
 // Length of single data block (in bytes): value is 54
-uint32_t burstLen = 54;
+uint32_t blockLen = 54;
 // Stride from previous block to next block in source data: source data stride unit is 1B
 uint32_t srcStride = 1;
 // Stride from previous block to next block in destination data: UB operation constraint address must be 32B aligned, value is 32 / 32
 uint32_t dstStride = 32 / 32;
 // Whether to fill with user-defined data, false means no custom fill value, random values will be filled by default
-bool enableFillPadValue = true;
+bool isPad = true;
 // Left padding of transfer result (element count): value is 4 / sizeof(half) = 2
-uint8_t leftPaddingNum = 2;
+uint8_t leftPadding = 2;
 // Right padding of transfer result (element count): value is 6 / sizeof(half) = 3
-uint8_t rightPaddingNum = 3;
+uint8_t rightPadding = 3;
 
-AscendC::DataCopyExtParams copyParams {burst_count, burst_len, src_stride, dst_stride, 0}; 
-AscendC::DataCopyPadExtParams<half> padParams {enableFillPadValue, leftPaddingNum, rightPaddingNum, 0};
+AscendC::DataCopyExtParams copyParams {blockCount, blockLen, srcStride, dstStride, 0}; 
+AscendC::DataCopyPadExtParams<half> padParams {isPad, leftPadding, rightPadding, 0};
 
 AscendC::DataCopyPad(dstLocal, srcGlobal, copyParams, padParams);
 ```
 
-> 📌 该接口主要为了提升用户数据搬运的易用性，由软件层面提供，底层通过高维切分接口实现。
+> 📌 该接口主要用于提升用户数据搬运的易用性，由软件层实现，底层基于高维切分接口封装。
 
-如上就完成了从`Global Memory`到`Unified Buffer`的搬入动作，反之从`Unified Buffer`搬出到`Global Memory`中也采用同样的能力进行处理。
+如上完成了GM到UB的搬入，UB搬出到GM采用同样的接口处理。
 
-更多的搬运能力可参考API手册。
+更多搬运接口请参考API手册。
 
 ## Memory数据计算
 
 Memory矢量计算提供连续计算和高维切分两种计算模式，并可通过掩码实现数据选择性参与计算。
-以Add接口为例，两种计算模式的调用方式示意图如下。其中，连续计算简单直观，适合一维Tensor连续数据处理；高维切分计算灵活可控，支持迭代执行和地址间隔配置。开发者可根据实际业务需求选择合适的计算方式。
+以Add接口为例，两种计算模式的调用方式示意图如下。其中连续计算简单直观，适合一维Tensor连续数据处理；高维切分计算灵活可控，支持迭代执行和地址间隔配置。开发者可根据实际业务需求选择合适的计算方式。
 
 <img src="../../../../figures/Memory矢量计算模式示意图.png" alt="Memory矢量计算模式示意图" width="800" />
 
@@ -148,19 +117,23 @@ Memory矢量计算提供连续计算和高维切分两种计算模式，并可�
 
 #### 迭代控制
 
-Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock数据块内部地址连续，长度为32Byte）进行计算，并写入对应的8个DataBlock中。
+Vector计算单元每个迭代会从UB中取出8个 DataBlock（每个DataBlock内部地址连续，长度为 32Byte）进行计算，并将结果写入对应的8个DataBlock 中。
 
 <img src="../../../../figures/DataBlock迭代示意图.png" alt="DataBlock迭代示意图" width="800" />
 
-矢量计算API支持开发者通过repeatTime来配置迭代次数，从而控制指令的多次迭代执行。假设repeatTime设置为2，矢量计算单元会进行2个迭代的计算，可计算出2 × 8（每个迭代8个DataBlock） × 32Byte = 512Byte的结果。如果数据类型为half，则计算了256个元素。下图展示了2次迭代Exp计算的示意图。**由于硬件限制，repeatTime取值范围为[1, 255]，该限制适用于所有支持Memory矢量计算的产品型号（Atlas A2/A3训练和推理系列产品、Ascend 950PR/Ascend 950DT）。**
+矢量计算 API 支持通过配置repeatTime 参数控制指令的迭代执行次数。若将repeatTime 设为2，矢量计算单元会执行2次迭代计算，可处理的数据量为 2 × 8（单次迭代8个 DataBlock） × 32Byte = 512Byte；若数据类型为 half（2B / 元素），则对应计算256个元素。下图为2次迭代 Exp 计算的示意图。
+注意：受硬件限制，repeatTime 的取值范围为 [1, 255]，该约束适用于所有支持Memory矢量计算的产品（NPU架构版本2201、NPU架构版本3510）。
 
 <img src="../../../../figures/2次迭代Exp计算.png" alt="2次迭代Exp计算" width="800" />
 
 #### 地址间隔配置
 
-矢量计算单元还支持带间隔的向量计算，通过`dataBlockStride`（单次迭代内不同`dataBlock`间地址步长）和`repeatStride`（相邻迭代间相同`dataBlock`的地址步长）来进行配置。`dataBlockStride`是指单次迭代内不同`dataBlock`间地址步长。其取值不能超过UB大小限制。
-连续计算，`dataBlockStride`设置为1，对同一迭代内的8个`dataBlock`数据连续进行处理。
-非连续计算，`dataBlockStride`值大于1（如取2），同一迭代内不同`dataBlock`之间在读取数据时出现一个`dataBlock`的间隔，如下图所示。
+矢量计算单元还支持带地址间隔的向量计算能力，可通过dataBlockStride和repeatStride两个参数精准配置：
+• dataBlockStride：单次迭代内不同DataBlock间的地址步长，取值不得超过UB的空间大小限制；
+• repeatStride：相邻迭代间相同DataBlock的地址步长（下文详细说明）。
+
+连续计算，`dataBlockStride`设置为1，对同一迭代内的8个DataBlock数据连续进行处理。
+非连续计算，`dataBlockStride`值大于1（如取2），同一迭代内不同DataBlock之间在读取数据时出现一个DataBlock的间隔，如下图所示。
 
 <img src="../../../../figures/dataBlockStride示例.png" alt="dataBlockStride示例" width="800" />
 
@@ -170,16 +143,16 @@ Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock�
 
 <img src="../../../../figures/单次迭代内源和目的操作数读写示例.png" alt="单次迭代内源和目的操作数读写示例" width="800" />
 
-其中**repeatStride**是指相邻迭代间相同`dataBlock`的地址步长，可通过设置`repeatStride`来灵活控制不同的场景。
+其中**repeatStride**是指相邻迭代间相同DataBlock的地址步长，可通过设置`repeatStride`来灵活控制不同的场景。
 
 | 场景 | repeatStride取值 | 数据读取特点 | 适用场景 |
 |------|------------------|-------------|--------|
-| 连续计算 | 8 | 每轮迭代读取连续8个dataBlock，完成所有输入数据的计算 | <img src="../../../../figures/repeatStride连续计算场景.png" alt="repeatStride连续计算场景" width="600" /> |
-| 非连续计算 | >8 (如10) | 相邻迭代间存在dataBlock间隔，地址不连续 | <img src="../../../../figures/repeatStride非连续计算场景.png" alt="repeatStride非连续计算场景" width="600" /> |
-| 反复计算 | 0 | 对首个连续8个dataBlock反复读取和计算 | <img src="../../../../figures/repeatStride反复计算场景.png" alt="repeatStride反复计算场景" width="600" /> |
-| 部分重复计算 | (0, 8) | 相邻迭代间部分数据重复读取，一般场景不涉及 | <img src="../../../../figures/repeatStride部分重复计算.png" alt="repeatStride部分重复计算" width="600" /> |
+| 连续计算 | 8 | 每轮迭代读取连续8个dataBlock，完成所有输入数据的计算 | <img src="../../../../figures/repeat_stride连续计算场景.png" alt="repeatStride连续计算场景" width="600" /> |
+| 非连续计算 | >8 (如10) | 相邻迭代间存在dataBlock间隔，地址不连续 | <img src="../../../../figures/repeat_stride非连续计算场景.png" alt="repeatStride非连续计算场景" width="600" /> |
+| 反复计算 | 0 | 对首个连续8个dataBlock反复读取和计算 | <img src="../../../../figures/repeat_stride反复计算场景.png" alt="repeatStride反复计算场景" width="600" /> |
+| 部分重复计算 | (0, 8) | 相邻迭代间部分数据重复读取，一般场景不涉及 | <img src="../../../../figures/repeat_stride部分重复计算.png" alt="repeatStride部分重复计算" width="600" /> |
 
-当 `repeatTime`>1 时，通过多次迭代完成计算。`repeatStride` 表示相邻迭代间相同位置`dataBlock`的起始地址间隔（以 `dataBlock` 为单位）。例如 `repeatStride` = 9 时，第一迭代的第1个 `dataBlock` 与第二迭代的第1个 `dataBlock` 间隔9个 `dataBlock`。
+当 `repeatTime`>1 时，通过多次迭代完成计算。repeatStride 表示相邻迭代间相同位置DataBlock的起始地址间隔（以DataBlock为单位）。例如 `repeatStride` = 9 时，第一迭代的第1个DataBlock与第二迭代的第1个DataBlock间隔9个 DataBlock。
 
 ![多次迭代非连续场景示意图](../../../../figures/多次迭代非连续场景示意图.png)
 
@@ -211,7 +184,7 @@ AscendC::Add(zTensor, xTensor, yTensor, mask, repeatTime, { dstBlockStride, src0
 掩码设置提供了两种模式：**Counter模式**和**Normal模式**。
 
 Counter模式用于计算连续N个元素。该模式下，Mask寄存器仅低64bit有效，表示参与计算的元素数量；repeatTime参数被忽略，系统根据元素数量自动计算迭代次数。
-例如计算200个half类型元素时，受Unified Buffer的32B对齐约束，需申请256个元素空间。此时使用Counter模式，可精确处理实际元素数量，避免多余计算。
+例如需计算 200 个 half 类型元素时，因UB需满足 32B 对齐约束（half 占 2B，32B 对应 16 个元素，256 个元素为 16×16，是 32B 对齐的最小单位），需申请256 个元素的UB空间。此时使用 Counter 模式，可仅针对 200 个有效元素执行计算，忽略剩余 56 个元素的无效空间，避免多余计算。
 
 <img src="../../../../figures/Count模式计算.png" alt="Count模式计算" width="600" />
 
@@ -295,9 +268,9 @@ AscendC::Add(dstLocal, src0Local, src1Local, 4096);
 
 ## Memory矢量计算同步控制
 
-AI Core内部执行单元（如MTE2搬运单元、Vector计算单元等）以异步并行方式运行，读写同一存储资源时可能存在数据依赖关系。因此，Memory矢量计算需通过流水同步接口确保正确执行。Memory矢量计算流程较Cube矩阵计算更为简洁，主要包含三步：数据搬入（Global Memory → Unified Buffer）、计算（Unified Buffer）、数据搬出（Unified Buffer → Global Memory）。三个步骤分别对应PIPE_MTE2、PIPE_V、PIPE_MTE3流水线，需通过核内同步接口协调执行顺序，确保各步骤按序完成。
+AI Core 内部执行单元（如MTE2搬运单元、Vector计算单元等）采用异步并行方式运行，当不同单元读写同一存储资源时，易产生数据依赖问题。因此，Memory矢量计算需通过流水同步接口协调执行顺序，确保计算流程正确。Memory矢量计算流程较Cube矩阵计算更为简洁，主要包含三步：数据搬入（Global Memory → UB）、计算（UB）、数据搬出（UB → Global Memory）。三个步骤分别对应PIPE_MTE2、PIPE_V、PIPE_MTE3流水线，需通过核内同步接口协调执行顺序，确保各步骤按序完成。
 
-当开发者进行一个矢量加法计算时（Ascend 950PR/Ascend 950DT产品），开发者可以通过`Mutex::Lock`&`Mutex::Unlock`的方式完成对这三个步骤的同步。
+当开发者进行一个矢量加法计算时（NPU架构版本3510产品），开发者可以通过`Mutex::Lock`&`Mutex::Unlock`的方式完成对这三个步骤的同步。
 
 ```cpp
 __global__ __aicore__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ float* z)
@@ -334,4 +307,4 @@ __global__ __aicore__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 
 ## Memory矢量计算示例
 
-结合上述Memory矢量搬运与计算能力，开发者可基于C++ Tensor实现Memory矢量计算算子。具体开发实践可参考[cpp_api_add样例](../../../../../../examples/02_simd_cpp_api/00_introduction/01_add/cpp_api_add/)，使用C++ Tensor编程接口完成Memory矢量算子的开发。
+结合上文介绍的Memory矢量数据搬运与计算能力，开发者可基于 C++ Tensor 编程接口实现完整的Memory矢量计算算子。具体开发流程与代码示例可参考[cpp_api_add样例](../../../../../../examples/01_simd_cpp_api/00_introduction/01_add/add/)，该样例完整展示了矢量加法算子的开发、编译与验证流程。
