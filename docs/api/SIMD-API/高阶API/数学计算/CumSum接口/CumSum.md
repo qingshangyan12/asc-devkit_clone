@@ -136,9 +136,9 @@ struct CumSumInfo {
 
 // 按last轴处理（按列累加），输出最后一列数据，采用逐行累加算法
 constexpr AscendC::CumSumConfig cumSumConfig{true, false, true, AscendC::CumSumAlgorithm::CUMSUM_ALGORITHM_LINEBYLINE};
-// outer: 外轴长度
+// outter: 外轴长度
 // inner: 内轴长度
-const AscendC::CumSumInfo cumSumInfo{outer, inner};
+const AscendC::CumSumInfo cumSumInfo{outter, inner};
 AscendC::CumSum<T, cumSumConfig>(dstLocal, lastRowLocal, srcLocal, cumSumInfo);
 
 // 按first轴处理（按行累加），输出最后一行数据，采用逐行累加算法
