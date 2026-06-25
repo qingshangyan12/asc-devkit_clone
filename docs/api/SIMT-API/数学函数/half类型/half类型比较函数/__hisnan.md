@@ -42,8 +42,12 @@ inline bool __hisnan(half x)
 
 ## 返回值说明
 
--   false：输入非nan。
--   true：输入为nan。
+返回是否为nan的结果。特殊值如下：
+
+| x值 | 返回值 |
+| --- | --- |
+| 非nan | false |
+| nan | true |
 
 ## 约束说明
 

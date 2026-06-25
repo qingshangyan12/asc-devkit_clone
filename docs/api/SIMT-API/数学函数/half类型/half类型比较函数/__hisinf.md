@@ -42,8 +42,12 @@ inline bool __hisinf(half x)
 
 ## 返回值说明
 
--   false：输入不是无穷。
--   true：输入为inf、-inf。
+返回是否为无穷的结果。特殊值如下：
+
+| x值 | 返回值 |
+| --- | --- |
+| 非无穷 | false |
+| ±inf | true |
 
 ## 约束说明
 
