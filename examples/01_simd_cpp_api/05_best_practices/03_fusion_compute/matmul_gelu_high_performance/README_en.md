@@ -344,7 +344,7 @@ Fixpipe L0C → UB (Enable dual destination mode through `dualDstCtl=0b01`, spli
 
 ```cpp
 AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
-fixpipeParams.mSize = AscendC::DivCeil(curM, 2) * 2;
+fixpipeParams.mSize = DivCeil(curM, 2) * 2;
 fixpipeParams.nSize = curN;
 fixpipeParams.srcStride = curMAlign;
 fixpipeParams.dstStride = curN;
@@ -477,7 +477,7 @@ AscendC::DumpTensor(yLocal, 1, 16);
 
 > **Notice:** The DumpTensor interface printing functionality will impact actual operator running performance and is typically used during the debugging phase. Developers can disable printing by setting ASCENDC_DUMP=0 as needed.
 
-### Performance Debugging
+## Performance Debugging
 
 Use the `msprof` tool to obtain detailed performance data:
 

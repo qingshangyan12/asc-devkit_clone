@@ -34,7 +34,7 @@
 
 ![Squeeze计算示意图](../../../../figures/reg_squeeze.png)
 
-特别地，当模板参数store取值为`GatherMaskMode::STORE_REG`时，`Squeeze`会将有效元素的总字节数存入AR特殊寄存器。此时配合使用[连续非对齐搬出](../Reg数据搬运/连续非对齐搬出.md)的场景3接口（无需显式传入偏移量），`StoreUnAlign`会自动从AR寄存器读取有效字节数作为地址偏移，参考[调用示例](#调用示例)。
+特别地，当模板参数store取值为`GatherMaskMode::STORE_REG`时，`Squeeze`会将有效元素的总字节数存入AR特殊寄存器。此时配合使用[连续非对齐搬出](../Reg数据搬出/连续非对齐搬出（StoreUnAlign）.md)的场景3接口（无需显式传入偏移量），`StoreUnAlign`会自动从AR寄存器读取有效字节数作为地址偏移，参考[调用示例](#调用示例)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -57,8 +57,8 @@ __simd_callee__ inline void Squeeze(U& dstReg, U& srcReg, MaskReg& mask)
 
 | 参数名 | 输入/输出 | 描述 |
 | :----- | :-------- | :--- |
-| dstReg | 输出 | 目的操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
-| srcReg | 输入 | 源操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
+| dstReg | 输出 | 目的操作数。<br>类型为[RegTensor](../概述/寄存器数据类型/RegTensor.md)。 |
+| srcReg | 输入 | 源操作数。<br>类型为[RegTensor](../概述/寄存器数据类型/RegTensor.md)。 |
 | mask | 输入 | mask用于控制每次迭代内参与计算的元素。 |
 
 ## 返回值说明
