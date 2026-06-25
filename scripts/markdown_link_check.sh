@@ -36,6 +36,7 @@ Set MARKDOWN_LINK_CHECK_FULL=1 or pass --full to scan tracked Markdown files in 
 Set MARKDOWN_LINK_CHECK_DRY_RUN=1 to print the computed scan set only.
 Set MARKDOWN_LINK_CHECK_LYCHEE to use a preinstalled lychee binary.
 Set MARKDOWN_LINK_CHECK_ONLINE=1 to check remote HTTP(S) links; remote links are skipped by default.
+Set MARKDOWN_LINK_CHECK_DIFF_BASE to detect renamed Markdown old paths from a branch diff base.
 Set MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL, MARKDOWN_LINK_CHECK_CARGO_BINSTALL_INSTALLER_URL, or
 MARKDOWN_LINK_CHECK_LYCHEE_PKG_URL to use mirrors.
 EOF
@@ -358,6 +359,70 @@ def staged_markdown_changes():
     return changed, needs_full
 
 
+def git_ref_exists(ref):
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--verify", "--quiet", ref],
+            cwd=repo_root,
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except OSError:
+        return False
+    return result.returncode == 0
+
+
+def rename_old_paths_from_diff(diff_args, input_targets):
+    try:
+        result = subprocess.run(
+            ["git", "diff", "--name-status", "-z", "--diff-filter=R", *diff_args],
+            cwd=repo_root,
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+        )
+    except OSError:
+        return set()
+    if result.returncode != 0:
+        return set()
+
+    old_paths = set()
+    fields = result.stdout.split(b"\0")
+    index = 0
+    while index < len(fields):
+        if not fields[index]:
+            index += 1
+            continue
+        status = fields[index].decode("utf-8", errors="ignore")
+        index += 1
+        if not status.startswith("R"):
+            continue
+        raw_paths = fields[index:index + 2]
+        index += 2
+        if len(raw_paths) != 2 or not raw_paths[0] or not raw_paths[1]:
+            continue
+        old_path = raw_paths[0].decode("utf-8", errors="ignore")
+        new_path = raw_paths[1].decode("utf-8", errors="ignore")
+        if new_path in input_targets and is_markdown_path(old_path):
+            old_paths.add(old_path)
+    return old_paths
+
+
+def input_rename_old_paths(input_targets):
+    diff_specs = [("--cached",), tuple()]
+    diff_base = os.environ.get("MARKDOWN_LINK_CHECK_DIFF_BASE")
+    if diff_base:
+        diff_specs.append((f"{diff_base}...HEAD",))
+    elif git_ref_exists("origin/master"):
+        diff_specs.append(("origin/master...HEAD",))
+
+    old_paths = set()
+    for diff_args in diff_specs:
+        old_paths.update(rename_old_paths_from_diff(diff_args, input_targets))
+    return old_paths
+
+
 def markdown_inline_link_targets(text):
     index = 0
     while index < len(text):
@@ -438,6 +503,7 @@ else:
         changed = staged_changes
 
     changed_targets = {path for path in changed if path}
+    changed_targets.update(input_rename_old_paths(changed_targets))
     changed_existing = {
         path for path in changed_targets
         if (repo_root / path).is_file()
