@@ -189,7 +189,7 @@ $dst_i = src0_i \& src1_i$
 
 结果示例如下：
 
-```bash
+```plain
 输入数据src0Local：[1 2 3 ... 512]
 输入数据src1Local：[513 512 511 ... 2]
 输出数据dstLocal：[1 0 3 ... 0]
