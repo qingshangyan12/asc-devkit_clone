@@ -113,15 +113,14 @@ public:
         vector_bool dstMask;
         vector_bool fullMask = Inst::CreateMask::template Run<int32_t, decltype(PAT_ALL)>();
 
-        // Pointer alias for pack-store (treat dst as src-typed pointer for post-update semantics)
-        auto srcCur = reinterpret_cast<__ubuf__ U*>(dst);
+        auto dstCur = reinterpret_cast<__ubuf__ U*>(dst);
 
         for (uint16_t i = 0; i < repeat; i++) {
             dstMask = Inst::UpdateMask::template Run<greaterType>(dataSize);
 
             asc_loadalign(srcReg, src + i * oneRepSize);
             CalcFunc::template Run(dstReg, srcReg, fullMask);
-            asc_storealign_pack_postupdate(srcCur,
+            asc_storealign_pack_postupdate(dstCur,
                 reinterpret_cast<SrcRegType>(dstReg), oneRepSize / 2, fullMask);
         }
     }
@@ -172,13 +171,14 @@ public:
 
         vector_bool dstMask;
         vector_bool fullMask = Inst::CreateMask::template Run<int32_t, decltype(PAT_ALL)>();
+        auto dstCur = reinterpret_cast<__ubuf__ U*>(dst);
 
         for (uint16_t i = 0; i < repeat; i++) {
             dstMask = Inst::UpdateMask::template Run<greaterType>(dataSize);
 
             asc_loadalign(srcReg, src + i * oneRepSize);
             CalcFunc::template Run(dstReg, srcReg, fullMask);
-            asc_storealign_pack_postupdate_v2(dst, dstReg, oneRepSize, fullMask);
+            asc_storealign_pack_postupdate_v2(dstCur, reinterpret_cast<SrcRegType>(dstReg), oneRepSize/4, fullMask);
         }
     }
 };
