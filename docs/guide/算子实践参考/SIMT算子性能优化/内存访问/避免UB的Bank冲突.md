@@ -54,7 +54,7 @@ __global__ void transpose_coalesced_kernel(float *output, const float *input, in
 
 在1024 x 1024矩阵转置样例中，该实现的性能数据如下：
 
-| Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
+| Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
 |      31.926      |    1.606    |     2650.112     |      1.442      |     0.900     |        0.152        |      0.092      |
 
@@ -88,10 +88,10 @@ __global__ void transpose_avoid_bank_conflicts_kernel(float *output, const float
 
 在1024 x 1024矩阵转置样例中，该实现的性能数据如下：
 
-| Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
+| Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
 |      23.483      |    1.055    |     1740.038     |      0.883      |     0.847     |        0.151        |      0.138      |
 
-从Task Duration看，增加padding后的执行耗时为23.483us，相比未加padding的UB中转版本31.926us，下降约26.4%。这说明在GM读写已经连续的前提下，UB内部的bank冲突仍会影响算子端到端耗时；通过将UB tile从32 x 32调整为32 x 34，列方向访问被分散到各个bank group的不同subbank上，避免了上述读读冲突，因此算子的整体运行时间进一步下降。
+从Task Duration看，增加padding后的执行耗时为23.483μs，相比未加padding的UB中转版本31.926μs，下降约26.4%。这说明在GM读写已经连续的前提下，UB内部的bank冲突仍会影响算子端到端耗时；通过将UB tile从32 x 32调整为32 x 34，列方向访问被分散到各个bank group的不同subbank上，避免了上述读读冲突，因此算子的整体运行时间进一步下降。
 
 【总结】当SIMT算子已经通过UB中转解决GM非连续访问后，应继续分析UB访问是否会产生bank冲突。若同一个Warp沿列方向访问二维UB数组，且行跨度容易让访问集中到相同bank资源，可以通过增加padding、调整行跨度或重新排布数据来避免bank冲突。

@@ -255,9 +255,9 @@ SIMT场景下，同一个Warp内的多个线程可能在同一条UB访问指令�
 
 <img src="./figures/bank内存排布示意图.png">
 
-SIMT编程方式下bank冲突主要有以下几种：
+SIMT编程方式下subbank冲突主要有以下几种：
 
-- **写写冲突**：多个写操作同时尝试访问同一个bank group的相同编号的subbank
+- **写写冲突**：多个写操作同时尝试访问同一个bank group的相同编号的subbank。
 - **读读冲突**：多个读操作同时尝试访问同一个bank group的相同编号的subbank。
 
 Case 2中UB的tile数组前10行元素按照行优先存储的排布图如下，按照地址低位交织的规则，tile数组的第一行row 1刚好覆盖bank 0～bank 3，row 2覆盖bank 4～bank 7，row 3则覆盖bank 8～bank 11，为了展示方便这里只展示前10行元素排布，其余行依次类推。每行32个float数据会恰好跨越4个bank存储，其中每行第一个元素用了蓝色标记。在Case 2中，一个Warp的线程会读取tile的一列元素写回到GM输出；访问UB时，32个线程会集中访问两个bank group的subbank 0，属于读读冲突场景。
