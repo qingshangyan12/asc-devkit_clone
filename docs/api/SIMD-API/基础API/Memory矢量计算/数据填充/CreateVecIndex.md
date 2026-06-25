@@ -102,7 +102,7 @@ def CreateVecIndex(dst, firstValue, count):
 | count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。|
 | mask/mask[] | 输入 | mask用于控制每次迭代内参与计算的元素。<br>设置详见[掩码操作](../掩码操作/掩码操作.md)。 |
 | repeatTime | 输入 | 指令迭代次数，每次迭代完成8个DataBlock的数据收集，取值范围：repeatTime∈[0,255]。|
-| dstBlockStride | 输入 | 单次迭代内，矢量目的操作数不同DataBlock间地址步长，单位为DataBlock |
+| dstBlockStride | 输入 | 单次迭代内，矢量目的操作数不同DataBlock间地址步长，单位为DataBlock。 |
 | dstRepStride | 输入 | 相邻迭代间，矢量目的操作数相同DataBlock地址步长，单位为DataBlock。 |
 
 ## 数据类型
@@ -144,7 +144,7 @@ def CreateVecIndex(dst, firstValue, count):
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-本样例中只展示Compute流程中的部分代码。如果您需要运行样例代码，请将该代码段拷贝并替换[CreateVecIndex样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/create_vec_index)中Compute函数相关代码片段即可。
+本调用示例中只展示完整样例中的接口部分代码。如果您需要运行示例代码，请直接参考完整样例[CreateVecIndex样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/create_vec_index)进行编译执行。
 
 - tensor高维切分计算样例-mask连续模式
 

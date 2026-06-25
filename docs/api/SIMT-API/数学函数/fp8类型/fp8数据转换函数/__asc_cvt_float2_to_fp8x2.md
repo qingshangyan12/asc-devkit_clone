@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
@@ -40,7 +52,7 @@ inline __asc_fp8x2_storage_t __asc_cvt_float2_to_fp8x2(const float2 x, const __a
 
 ## 约束说明
 
-使用此接口前需将CTRL\[60\]寄存器设置为0，否则饱和行为控制不生效。设置方式请参见[控制饱和行为的方式](../../数据类型转换/概述-258.md#section1194916101549)。
+使用此接口前需将CTRL\[60\]寄存器设置为0，否则饱和模式不生效。设置方式请参见[控制饱和行为的方式](../../数据类型转换/概述-258.md#section1194916101549)。
 
 SIMT编程场景当前不支持使用该接口。
 

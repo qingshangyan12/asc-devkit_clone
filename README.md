@@ -27,7 +27,7 @@
 ### 📖 资料文档
 - 新增90+ [Reg编程接口API](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg矢量计算.md)资料，Reg矢量计算API是面向RegBase架构开发的API，用户可通过该API直接对芯片中涉及Vector计算的寄存器进行操作，实现更大的灵活性和更好的性能。
 - 新增SIMT[快速入门](docs/guide/入门教程/快速入门/基于SIMT编程/Gather算子快速入门.md)、[编程模型](docs/guide/编程指南/编程模型/AI-Core-SIMT编程/抽象硬件架构.md)和[算子实现](docs/guide/算子实践参考/SIMT算子实现/基础知识.md)介绍。
-- 新增SIMD与SIMT[混合编程模型](docs/guide/编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程.md)、[算子实现](docs/guide/算子实践参考/SIMD与SIMT混合算子实现/基础知识.md)、[性能优化](docs/guide/算子实践参考/SIMD与SIMT混合算子性能优化/内存访问/使用Unified-Buffer提升内存访问效率.md)介绍。
+- 新增SIMD与SIMT[混合编程模型](docs/guide/编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/概述.md)、[算子实现](docs/guide/算子实践参考/SIMD与SIMT混合算子实现/基础知识.md)、[性能优化](docs/guide/算子实践参考/SIMD与SIMT混合算子性能优化/内存访问/使用Unified-Buffer提升内存访问效率.md)介绍。
 - 新增[SIMT API](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/SIMT-API.md)资料章节。
 - 新增[兼容性迁移指南](docs/guide/跨代迁移兼容性指南/Ascend-C-API兼容策略.md)（220x架构版本迁移到351x架构版本）。
 - 昇腾社区中，Ascend C算子开发新增[可视化专区](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/opdevg/Ascendcopdevg/atlas_ascendc_map_10_0017.html)，通过视频呈现Cube和Vector算子的执行过程。
@@ -121,6 +121,7 @@ Ascend C提供三类接口，均可实现底层的完备编程能力：
 
   ```bash
   sudo apt install -y clangd-15
+  sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-15 100
   ```
 
 - 配置本地VSCode的`settings.json`（示例）
@@ -136,7 +137,16 @@ Ascend C提供三类接口，均可实现底层的完备编程能力：
   }
   ```
 
-- 在项目根目录下配置 `.clangd`（示例）完整 `.clangd`文件在本目录下给出，其中涉及 CANN 头文件目录需自行替换实际安装位置，`.clangd`中默认为`/usr/local/Ascend`.
+- 在项目根目录下配置 `.clangd`（示例）完整 `.clangd`文件在本目录下给出，其中涉及 CANN 头文件目录需对应实际安装位置，`.clangd`中默认为`/usr/local/Ascend`.
+
+  如果 CANN 安装在非默认路径，或需要切换 NPU 架构宏，可先 source CANN `set_env.sh`，再通过脚本基于 `.clangd.in` 生成本地配置：
+
+  ```bash
+  source /path/to/cann/set_env.sh
+  python3 scripts/setup_clangd.py --npu-arch 2201 --output .clangd.local
+  ```
+
+  `ASCEND_HOME_PATH` 由 `set_env.sh` 设置，脚本会使用该环境变量生成真实 CANN 路径；如果未设置，脚本会提示 source `set_env.sh` 后重试。生成文件默认为 `.clangd.local`，不会覆盖仓库内置 `.clangd`；如需让项目级 clangd 配置生效，可按需复制为 `.clangd` 后重启 clangd。
 
   ```yaml
   CompileFlags:
@@ -159,8 +169,8 @@ Ascend C提供三类接口，均可实现底层的完备编程能力：
     Suppress:
       - "attributes_not_allowed"
       - "decomp_decl_template"
-      - "ignored_attributes"
-      - "unknown_type_name"
+      - "ignored-attributes"
+      - "unknown_typename"
       - "undeclared_var_use"
       - "invalid_token_after_toplevel_declarator"
       - "missing_type_specifier"
