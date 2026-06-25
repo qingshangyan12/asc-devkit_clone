@@ -39,7 +39,7 @@ int32_t main(int argc, char const *argv[])
 
     struct KernelArgs args = {0};
     constexpr uint32_t numBlocks = 1;
-    hello_world<<<numBlocks, nullptr, stream>>>(&args, sizeof(KernelArgs));
+    hello_world<<<numBlocks, 0, stream>>>(&args, sizeof(KernelArgs));
     aclrtSynchronizeStream(stream);
 
     aclrtDestroyStream(stream);
