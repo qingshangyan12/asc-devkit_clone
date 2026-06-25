@@ -195,7 +195,7 @@ public:
             mmadParams.cmatrixInitVal, mmadParams.cmatrixSource, mmadParams.isBias, mmadParams.k, mmadParams.n,
             mmadParams.m);
         AscendC::Mmad<typename Intf::L0cT, typename Intf::InputT, typename Intf::WeightT>(
-            self_->ctx.cl0, self_->ctx.al0, self_->ctx.bl0, mmadParams);
+            self_->ctx.cl0, self_->ctx.fmapL0, self_->ctx.bl0, mmadParams);
     }
 
 private:

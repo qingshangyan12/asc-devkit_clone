@@ -16,11 +16,11 @@
 #ifndef API_CONV_COMMON_H
 #define API_CONV_COMMON_H
 
-#include "../../../../../include/adv_api/matmul/matmul_tiling_base.h"
-#include "../../../../../include/adv_api/conv/common/conv_common.h"
+// #include "../../../../../include/adv_api/matmul/matmul_tiling_base.h" // [zj]TODO
+#include "../../../include/conv/common/conv_common.h" // #include "../../../../../include/adv_api/conv/common/conv_common.h" // [zj]TODO
 
 namespace ConvCommonApi {
-using matmul_tiling::TPosition;
+// using matmul_tiling::TPosition;
 
 enum class ConvDtype : uint32_t { FLOAT16 = 0, FLOAT32, BF16, INT4, INT8, UINT8, INT32, INT64, UINT64, CONVDTYPEMAX };
 } // namespace ConvCommonApi
