@@ -5,7 +5,7 @@
 ### 不传入config的原型
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：不支持
+- Ascend 950PR/Ascend 950DT：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
@@ -128,7 +128,7 @@ $dst_i = \ln(src_i)$
 |---|---|
 | T | 操作数数据类型。 |
 | isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。 |
-| <!-- npu="950" id22 -->config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置Subnormal计算模式，LnConfig类型，定义如下：<br><br>enum&nbsp;class&nbsp;LnAlgo&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;INTRINSIC&nbsp;=&nbsp;0,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_1ULP_FTZ_TRUE,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_1ULP_FTZ_FALSE,<br>};<br>struct&nbsp;LnConfig&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;LnAlgo&nbsp;algo&nbsp;=&nbsp;LnAlgo::INTRINSIC;<br>};<br>通过LnConfig结构体的参数algo来配置Subnormal计算模式。algo取值如下：<br>&bull; LnAlgo::INTRINSIC、LnAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，所有Subnormal被近似为0。<br>&bull; LnAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算。<br>该参数的默认值DEFAULT_LN_CONFIG的取值如下：<br><br>constexpr&nbsp;LnConfig&nbsp;DEFAULT_LN_CONFIG&nbsp;=&nbsp;{&nbsp;LnAlgo::INTRINSIC&nbsp;};<br><!-- end id22 --> |
+| <!-- npu="950" id19 -->config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置Subnormal计算模式，LnConfig类型，定义如下：<br><pre>enum&nbsp;class&nbsp;LnAlgo&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;INTRINSIC&nbsp;=&nbsp;0,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_1ULP_FTZ_TRUE,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_1ULP_FTZ_FALSE,<br>};<br>struct&nbsp;LnConfig&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;LnAlgo&nbsp;algo&nbsp;=&nbsp;LnAlgo::INTRINSIC;<br>};</pre>通过LnConfig结构体的参数algo来配置Subnormal计算模式。algo取值如下：<br>&bull; LnAlgo::INTRINSIC、LnAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，所有Subnormal被近似为0。<br>&bull; LnAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算。<br>该参数的默认值DEFAULT_LN_CONFIG的取值如下：<br><pre>constexpr&nbsp;LnConfig&nbsp;DEFAULT_LN_CONFIG&nbsp;=&nbsp;{&nbsp;LnAlgo::INTRINSIC&nbsp;};</pre><br>调用本原型时若显示传入config参数，则默认使用DEFAULT_LN_CONFIG，此时行为与不传入config参数的原型等价。<!-- end id19 --> |
 
 **表2**  参数说明
 
@@ -156,15 +156,42 @@ T支持的数据类型为：half、float。
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
 
-<!-- npu="A3,910b" id21 -->
+<!-- npu="A3,910b" id20 -->
 - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  <!-- npu="A3" id19 -->
+  <!-- npu="A3" id21 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id19 -->
-  <!-- npu="910b" id20 -->
+  <!-- end id21 -->
+  <!-- npu="910b" id22 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id20 -->
-<!-- end id21 -->
+  <!-- end id22 -->
+<!-- end id20 -->
+
+<!-- npu="950" id23 -->
+- 针对Ascend 950PR/Ascend 950DT，如下约束说明：
+  - tensor高维切分计算调用GetTemporaryBufferAddr，占用8KB Unified Buffer。
+  - tensor前n个数据连续计算未调用GetTemporaryBufferAddr，不涉及8KB Unified Buffer。
+  - tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。
+  - 当参数count或repeatTime取值为0时，软仿行为不保证该接口被视为NOP（空操作）。
+<!-- end id23 -->
+
+## 关键特性<a name="section18972943153217"></a>
+
+<!-- npu="950" id24 -->
+针对Ascend 950PR/Ascend 950DT，有如下关键特性：
+
+**最大精度误差**：
+
+- ExpAlgo::INTRINSIC、ExpAlgo::PRECISION\_1ULP\_FTZ\_TRUE，最大精度误差为1ulp。
+- ExpAlgo::PRECISION\_1ULP\_FTZ\_FALSE，软仿实现，最大精度误差为1ulp。
+
+**配置Subnormal模式**：
+
+FTZ（Flush To Zero）：一种浮点运算模式，当结果为[Subnormal](内置数据类型.md#p7381131713310)时，将其直接清零（近似为0），而非保留其精确的微小数值。
+
+只有将algo设置为LnAlgo::PRECISION\_1ULP\_FTZ\_false时，Ln接口才会保留并正确输出Subnormal结果；其他模式下Subnormal均被FTZ。
+
+由于Subnormal的计算行为是通过软件仿真算法实现，一般场景推荐使用性能更好的LnAlgo::INTRINSIC、LnAlgo::PRECISION\_1ULP\_FTZ\_TRUE；需要精确Subnormal输出的场景（如特定数据精度要求的算法、避免除零错误）使用LnAlgo::PRECISION\_1ULP\_FTZ\_FALSE。
+<!-- end id24 -->
 
 ## 调用示例<a name="section176061616102911"></a>
 
@@ -195,14 +222,14 @@ T支持的数据类型为：half、float。
     ```
 
 
-<!-- npu="950" id23 -->
+<!-- npu="950" id25 -->
 以下示例仅支持Ascend 950PR/Ascend 950DT
 
     ```cpp
     static constexpr LnConfig config = { LnAlgo::PRECISION_1ULP_FTZ_FALSE };
     AscendC::Ln<T, config>(dstLocal, srcLocal, 512);
     ```
-<!-- end id23 -->
+<!-- end id25 -->
 
 结果示例如下：
 
@@ -210,3 +237,5 @@ T支持的数据类型为：half、float。
 输入数据srcLocal：[1 2 3 4 ...]
 输出数据dstLocal：[0 0.6931 1.0986 1.3863 ...]
 ```
+
+完整样例请参考[单目矢量计算类API样例](https://gitcode.com/cann/asc-devkit/pull/873)。
