@@ -223,21 +223,6 @@ full_scan = os.environ.get("FULL_SCAN") == "1"
 full_reason = ""
 
 
-def ci_filelist_inputs():
-    filelist = repo_root / "pr_filelist_precommit.txt"
-    try:
-        return [
-            line.strip()
-            for line in filelist.read_text(encoding="utf-8", errors="ignore").splitlines()
-            if line.strip()
-        ]
-    except OSError:
-        return []
-
-
-input_files = list(dict.fromkeys(input_files + ci_filelist_inputs()))
-
-
 def config_exclude_path_patterns():
     try:
         text = config_file.read_text(encoding="utf-8")
@@ -409,6 +394,24 @@ def rename_old_paths_from_diff(diff_args, input_targets):
     return old_paths
 
 
+def ci_rename_old_paths(input_targets):
+    filelist = repo_root / "pr_filelist_mod.txt"
+    try:
+        lines = filelist.read_text(encoding="utf-8", errors="ignore").splitlines()
+    except OSError:
+        return set()
+
+    old_paths = set()
+    for line in lines:
+        fields = line.split("\t")
+        if len(fields) != 3 or not fields[0].startswith("R"):
+            continue
+        old_path, new_path = fields[1], fields[2]
+        if new_path in input_targets and is_markdown_path(old_path):
+            old_paths.add(old_path)
+    return old_paths
+
+
 def input_rename_old_paths(input_targets):
     diff_specs = [("--cached",), tuple()]
     diff_base = os.environ.get("MARKDOWN_LINK_CHECK_DIFF_BASE")
@@ -417,7 +420,7 @@ def input_rename_old_paths(input_targets):
     elif git_ref_exists("origin/master"):
         diff_specs.append(("origin/master...HEAD",))
 
-    old_paths = set()
+    old_paths = ci_rename_old_paths(input_targets)
     for diff_args in diff_specs:
         old_paths.update(rename_old_paths_from_diff(diff_args, input_targets))
     return old_paths
