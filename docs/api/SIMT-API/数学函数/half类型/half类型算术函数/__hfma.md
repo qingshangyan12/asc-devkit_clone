@@ -46,17 +46,17 @@ inline half __hfma(half x, half y, half z)
 
 ## 返回值说明
 
-x \* y+ z的值。本接口受全局饱和模式影响，特殊值如下：
+x \* y + z的值。本接口受全局饱和模式影响，特殊值如下：
 
 | x值 | y值 | z值 | 非饱和模式返回值 | 饱和模式返回值 |
 | --- | --- | --- | --- | --- |
 | ±inf | ±0 | — | nan | 0 |
 | ±0 | ±inf | — | nan | 0 |
-| x*y = inf | x*y = inf |-inf | nan | 0 |
-| x*y = -inf | x*y = -inf | inf | nan | 0 |
-| x*y+z超出ASCRT_MAX_NORMAL_FP16 | - | - | inf | ASCRT_MAX_NORMAL_FP16 |
-| x*y+z小于ASCRT_MIN_NORMAL_FP16 | - | - | -inf | -ASCRT_MIN_NORMAL_FP16 |
-| x、y、z任意一个为nan | x、y、z任意一个为nan | x、y、z任意一个为nan |nan | 0 |
+| x*y = inf | |-inf | nan | 0 |
+| x*y = -inf | | inf | nan | 0 |
+| x*y+z超出ASCRT_MAX_NORMAL_FP16 | | | inf | ASCRT_MAX_NORMAL_FP16 |
+| x*y+z小于ASCRT_MIN_NORMAL_FP16 | | | -inf | -ASCRT_MIN_NORMAL_FP16 |
+| x、y、z任意一个为nan | | |nan | 0 |
 
 ## 约束说明
 

@@ -43,10 +43,19 @@ bool __hbleux2(half2 x, half2 y)
 
 ## 返回值说明
 
-比较输入各分量是否均满足第一个数小于或等于第二个数的结果。
+比较输入各分量是否均满足第一个数小于或等于第二个数的结果。特殊值如下：
 
--   true：各分量均满足第一个数小于或等于第二个数。任一输入的分量为nan，该分量的比较结果为true。
--   false：任一分量不满足第一个数小于或等于第二个数。
+| x值 | y值 | 返回值 |
+| --- | --- | --- |
+| x、y的某分量含nan，其余分量均满足x≤y | | true |
+| 各分量均为nan | | true |
+| x、y的分量不含nan且不满足x≤y | | false |
+| x、y某分量含nan但另一对应分量不满足x≤y | | false |
+| ±0 | ±0 | true |
+| (-inf, -inf) | (inf, inf) | true |
+| (inf, inf) | (-inf, -inf) | false |
+| (±inf, ±inf) | (-inf, -inf) | false |
+| (±inf, ±inf) | (±inf, ±inf) | true |
 
 ## 约束说明
 

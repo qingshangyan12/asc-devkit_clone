@@ -42,7 +42,18 @@ inline half __low2half(const half2 x)
 
 ## 返回值说明
 
-输入数据的低16位。
+输入数据的低16位。特殊值如下：
+
+| x值 | 返回值 |
+| --- | --- |
+| 0 | 0 |
+| -0 | -0 |
+| nan | nan |
+| inf | inf |
+| -inf | -inf |
+| ASCRT_MAX_NORMAL_FP16 | ASCRT_MAX_NORMAL_FP16 |
+| -ASCRT_MAX_NORMAL_FP16 | -ASCRT_MAX_NORMAL_FP16 |
+| ASCRT_MIN_DENORM_FP16 | ASCRT_MIN_DENORM_FP16 |
 
 ## 约束说明
 

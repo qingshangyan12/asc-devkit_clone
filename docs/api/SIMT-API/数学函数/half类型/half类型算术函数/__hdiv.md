@@ -56,7 +56,7 @@ half __hdiv(const half x, const half y)
     | ±inf | 有限值 | 返回值符号由x和y的符号异或决定，值为inf | 返回值符号由x和y的符号异或决定，值为ASCRT_MAX_NORMAL_FP16 |
     | 不为0 | ±0 | 返回值符号由x和y的符号异或决定，值为inf | 返回值符号由x和y的符号异或决定，值为ASCRT_MAX_NORMAL_FP16 |
     | ±0 | 不为0 | 返回值符号由x和y的符号异或决定，值为0 | 返回值符号由x和y的符号异或决定，值为0 |
-    | x，y任意一个为nan | x，y任意一个为nan | nan | 0 |
+    | x，y任意一个为nan | | nan | 0 |
 
 ## 约束说明
 

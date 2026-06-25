@@ -43,10 +43,23 @@ bool __hbgeux2(half2 x, half2 y)
 
 ## 返回值说明
 
-比较输入各分量是否均满足第一个数大于或等于第二个数的结果。
+比较输入各分量是否均满足第一个数大于或等于第二个数的结果。特殊值如下：
 
--   true：各分量均满足第一个数大于或等于第二个数。任一输入的分量为nan，该分量的比较结果为true。
--   false：任一分量不满足第一个数大于或等于第二个数。
+| x分量 | y分量 | 返回值（该分量） |
+| --- | --- | --- |
+| x或y为nan | | true |
+| x、y均为nan | | true |
+| inf | 有限值 | true |
+| 有限值 | inf | false |
+| -inf | 正有限值 | false |
+| 正有限值 | -inf | true |
+| inf | -inf | true |
+| -inf | inf | false |
+| 0 | -0 | true |
+| -0 | 0 | true |
+| ASCRT_MAX_NORMAL_FP16 | 有限值 | true |
+| 较小有限值 | ASCRT_MAX_NORMAL_FP16 | false |
+
 
 ## 约束说明
 

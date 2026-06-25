@@ -55,7 +55,7 @@ half __hmul(const half x, const half y)
     | ±0 | ±inf | nan | 0 |
     | ±0 | 有限值 | 返回值符号由x和y的符号异或决定，值为0 | 返回值符号由x和y的符号异或决定，值为0 |
     | ±inf | ∓inf | ±inf | ±ASCRT_MAX_NORMAL_FP16 |
-    | x，y任意一个为nan |  x，y任意一个为nan |nan | 0 |
+    | x，y任意一个为nan | |nan | 0 |
 
 ## 约束说明
 

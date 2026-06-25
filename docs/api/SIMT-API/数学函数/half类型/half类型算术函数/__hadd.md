@@ -55,7 +55,7 @@ half __hadd(const half x, const half y)
     | ±inf | ∓inf | nan | 0 |
     | ±0 | ±0 | ±0 | ±0 |
     | 有限值（包括±0） | -x | +0 | +0 |
-    | x，y任意一个为nan | x，y任意一个为nan | nan | 0 |
+    | x，y任意一个为nan | | nan | 0 |
 
 ## 约束说明
 

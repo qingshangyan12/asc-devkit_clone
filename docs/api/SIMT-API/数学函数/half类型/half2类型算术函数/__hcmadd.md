@@ -44,10 +44,11 @@ half2 __hcmadd(const half2 x, const half2 y, const half2 z)
 
 ## 返回值说明
 
-输入数据视为复数，执行复数乘加运算的结果。对于输入a、b、c：
+输入数据视为复数，执行复数乘加运算的结果。对于输入x、y、z的结果如下：
 
--   实部的结果为：\_\_hfma\(-a.y, b.y, \_\_hfma\(a.x, b.x, c.x\)\)。
--   虚部的结果为：\_\_hfma\( a.y, b.x, \_\_hfma\(a.x, b.y, c.y\)\)。
+| 实部结果 | 虚部结果 |
+| --- | --- |
+| __hfma(-a.y, b.y, __hfma(a.x, b.x, c.x)) | __hfma(a.y, b.x, __hfma(a.x, b.y, c.y)) |
 
 ## 约束说明
 

@@ -44,12 +44,14 @@ inline half hexp2(half x)
 
 ## 返回值说明
 
-2的x次方。
+2的x次方。本接口受全局饱和寄存器的影响，特殊值如下：
 
--   当x为inf时，返回值为inf。
--   当x为-inf时，返回值为0。
--   当x为nan时，返回值为nan。
--   当结果超出float的最大范围时，返回值为inf。
+| x值 | 非饱和模式返回值 |
+| --- | --- |
+| inf | inf |
+| -inf | 0 |
+| nan | nan |
+| x>ASCRT_MAX_NORMAL_F | inf |
 
 ## 约束说明
 
