@@ -68,7 +68,7 @@ Ascend C提供一组类库API，开发者使用标准C++语法和类库API进行
 </tr>
 <tr id="row5390935132010"><td class="cellrowborder" valign="top" width="40.37%" headers="mcps1.2.3.1.1 "><p id="p9743558403"><a name="p9743558403"></a><a name="p9743558403"></a><a href="context\CountLeadingZero.md">CountLeadingZero</a></p>
 </td>
-<td class="cellrowborder" valign="top" width="59.63%" headers="mcps1.2.3.1.2 "><p id="p739014352201"><a name="p739014352201"></a><a name="p739014352201"></a>计算一个uint64_t类型数字前导0的个数（二进制从最高位到第一个1一共有多少个0）。</p>
+<td class="cellrowborder" valign="top" width="59.63%" headers="mcps1.2.3.1.2 "><p id="p739014352201"><a name="p739014352201"></a><a name="p739014352201"></a>计算一个uint64_t类型数字前导0的个数（二进制从最高位到第一个1一共有多少个0；特别的，若输入为0，则返回64）。</p>
 </td>
 </tr>
 <tr id="row187241145152620"><td class="cellrowborder" valign="top" width="40.37%" headers="mcps1.2.3.1.1 "><p id="p19725445132613"><a name="p19725445132613"></a><a name="p19725445132613"></a><a href="context\Cast（float转half-int32_t）.md">Cast（float转half、int32_t）</a></p>
@@ -4245,4 +4245,3 @@ Ascend C提供一组类库API，开发者使用标准C++语法和类库API进行
 ## C API
 
 [C API列表](context/c_api/README.md)
-
