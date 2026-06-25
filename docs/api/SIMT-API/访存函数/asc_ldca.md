@@ -12,7 +12,12 @@
 
 ## 功能说明
 
-首先从Data Cache加载缓存数据，若未命中，则尝试从L2 Cache加载。L2 Cache与Global Memory之间的数据一致性由硬件保证。如果Data Cache和L2 Cache中均未找到所需数据，则从Global Memory中读取数据，然后将其缓存到L2 Cache和Data Cache中。
+首先从Data Cache加载缓存数据，若未命中，则尝试从L2 Cache加载。L2 Cache与Global Memory之间的数据一致性由硬件保证。如果Data Cache和L2 Cache中均未找到所需数据，则从Global Memory中读取数据，然后将其缓存到L2 Cache和Data Cache中。但Data Cache和Global Memory之间的数据一致性并不能保证。  
+默认访存的底层实现与本接口一致，例如：
+```
+dst[idx] = src[idx]； 
+等价于 
+dst[idx] = asc_ldca(src + idx);
 
 ## 函数原型
 
@@ -219,4 +224,3 @@ Data Cache或L2 Cache中的缓存数据，或输入的Global Memory地址上的�
         dst[idx] = asc_ldca(src + idx);
     }
     ```
-
