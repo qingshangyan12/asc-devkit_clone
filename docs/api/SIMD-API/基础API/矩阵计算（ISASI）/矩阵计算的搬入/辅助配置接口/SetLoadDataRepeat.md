@@ -77,7 +77,7 @@ __aicore__ inline void SetLoadDataRepeat(const LoadDataRepeatParam& repeatParams
 ## 约束说明
 
 - 迭代沿height方向时，repeatStride的单位为16个元素，迭代沿width方向时，repeatStride的单位为32/sizeof\(data\_type\)个元素。
-- repeatTimes=0表示Load3D不执行搬运，Load3D接口将被视为NOP（空操作）。
+- repeatTime=0表示Load3D不执行搬运，Load3D接口将被视为NOP（空操作）。
 
 <cann-filter npu-type = "950">
 
