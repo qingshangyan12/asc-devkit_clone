@@ -26,10 +26,10 @@
 #define ADV_API_CONV_COMMON_CONV_FORWARD_CONFIG_H
 
 #include <climits>
-#include "../../../../impl/basic_api/kernel_utils.h"
+#include "../../../../tikcfw/impl/kernel_utils.h" // #include "../../../../impl/basic_api/kernel_utils.h" // [zj]TODO
 #include "conv_common.h"
-#include "../../../../impl/adv_api/detail/conv/common/conv_forward_framework_util.h"
-#include "../../../../impl/adv_api/detail/conv/common/conv_forward_util.h"
+#include "../../../impl/conv/common/conv_forward_framework_util.h" // #include "../../../../impl/adv_api/detail/conv/common/conv_forward_framework_util.h" // [zj]TODO
+#include "../../../impl/conv/common/conv_forward_util.h" // #include "../../../../impl/adv_api/detail/conv/common/conv_forward_util.h"  // [zj]TODO
 
 namespace ConvApi {
 
@@ -42,6 +42,7 @@ struct ConvParam {
     constexpr static int8_t bl1bypass = -1;
     constexpr static int8_t groupConvType = -1;
 };
+
 
 CONV_DECLARE_DEFINE_MEMBER(ConvParam, outputOrder, int8_t, INT8_MAX)
 CONV_DECLARE_DEFINE_MEMBER(ConvParam, l0pingpong, int8_t, INT8_MAX)
@@ -60,7 +61,11 @@ struct GetDstType<float> {
 
 template <>
 struct GetDstType<half> {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
+    using Type = int32_t;
+#else
     using Type = float;
+#endif
 };
 
 template <>
@@ -71,6 +76,20 @@ struct GetDstType<bfloat16_t> {
 template <>
 struct GetDstType<int8_t> {
     using Type = int32_t;
+};
+
+template <>
+struct GetDstType<int16_t> {
+    using Type = int32_t;
+};
+
+template <>
+struct GetDstType<fp8_e4m3fn_t> {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
+    using Type = int32_t;
+#else
+    using Type = float;
+#endif
 };
 
 template <AscendC::TPosition POSITION, ConvCommonApi::ConvFormat FORMAT, typename TYPE>

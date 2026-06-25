@@ -16,7 +16,7 @@
 #ifndef API_CONV2D_FRAMEWORK_H
 #define API_CONV2D_FRAMEWORK_H
 
-#include "../../../../basic_api/kernel_utils.h"
+#include "../../../../tikcfw/impl/kernel_utils.h" // #include "../../../../basic_api/kernel_utils.h" // [zj]TODO
 
 #define CONV_DECLARE_REG_IMPL(MEMBER, args...)                                                           \
     namespace __AuxCheckImpl {                                                                           \

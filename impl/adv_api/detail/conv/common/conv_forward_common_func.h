@@ -60,14 +60,14 @@ struct End {
     static __aicore__ inline void call(Intf* self)
     {
         if (self->ctx.freeAL1TensorFlag) {
-            self->ctx.queueAL1.FreeTensor(self->ctx.al1);
+            self->ctx.queueFmapL1.FreeTensor(self->ctx.al1);
             self->ctx.freeAL1TensorFlag = false;
         }
         if (self->ctx.freeBL1TensorFlag) {
             self->ctx.queueBL1.FreeTensor(self->ctx.bl1);
             self->ctx.freeBL1TensorFlag = false;
         }
-        self->ctx.queueAL1.FreeAllEvent();
+        self->ctx.queueFmapL1.FreeAllEvent();
         self->ctx.queueBL1.FreeAllEvent();
         self->ctx.queueBiasL1.FreeAllEvent();
         if constexpr (Intf::formatType != ConvCommonApi::ConvFormat::NCDHW) {
