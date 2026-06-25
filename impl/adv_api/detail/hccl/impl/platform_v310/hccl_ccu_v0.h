@@ -66,40 +66,40 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
          strideCount, repeat});
 }
 
-// template <const auto& config>
-// template <bool commit>
-// __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::AlltoAllV(
-//     GM_ADDR sendBuf, void* sendCounts, void* sdispls, HcclDataType sendType, GM_ADDR recvBuf, void* recvCounts,
-//     void* rdispls, HcclDataType recvType, uint8_t repeat)
-// {
-//     AscendC::PRINTF("[CCU_A2AV_DBG] AlltoAllV enter commit:%d sendBuf:0x%llx recvBuf:0x%llx sendCounts:0x%llx "
-//         "sdispls:0x%llx recvCounts:0x%llx rdispls:0x%llx sendType:%d recvType:%d repeat:%u curHandleId:%u "
-//         "workingFlag:%d newCcuFlag:%d",
-//         static_cast<int32_t>(commit), reinterpret_cast<uint64_t>(sendBuf), reinterpret_cast<uint64_t>(recvBuf),
-//         reinterpret_cast<uint64_t>(sendCounts), reinterpret_cast<uint64_t>(sdispls),
-//         reinterpret_cast<uint64_t>(recvCounts), reinterpret_cast<uint64_t>(rdispls), static_cast<int32_t>(sendType),
-//         static_cast<int32_t>(recvType), repeat, curHandleId_, static_cast<int32_t>(workingFlag_),
-//         static_cast<int32_t>(newCcuFlag_));
-//         AscendC::PRINTF("[CCU_A2AV_DBG] AlltoAllV coredump test trigger.");
-//         __gm__ uint64_t* crashAddr = reinterpret_cast<__gm__ uint64_t*>(0UL);
-//         *crashAddr = 0x4843434c5f413241ULL;
-//     ASCENDC_HCCL_API_ASSERT(
-//         sendType == recvType, { return INVALID_HANDLE_ID; },
-//         "Call AlltoAllV failed, param sendType[%d] is not equal to recvType[%d], invalid.",
-//         static_cast<int32_t>(sendType), static_cast<int32_t>(recvType));
-//     return CommonPrepareImpl<commit>(
-//         {HcclCMDType::HCCL_CMD_ALLTOALLV,
-//          sendBuf,
-//          recvBuf,
-//          0U,
-//          sendType,
-//          recvType,
-//          HCCL_REDUCE_RESERVED,
-//          0U,
-//          repeat,
-//          {static_cast<uint64_t*>(sendCounts), static_cast<uint64_t*>(sdispls), static_cast<uint64_t*>(recvCounts),
-//           static_cast<uint64_t*>(rdispls)}});
-// }
+template <const auto& config>
+template <bool commit>
+__aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::AlltoAllV(
+    GM_ADDR sendBuf, void* sendCounts, void* sdispls, HcclDataType sendType, GM_ADDR recvBuf, void* recvCounts,
+    void* rdispls, HcclDataType recvType, uint8_t repeat)
+{
+    AscendC::PRINTF("[CCU_A2AV_DBG] AlltoAllV enter commit:%d sendBuf:0x%llx recvBuf:0x%llx sendCounts:0x%llx "
+        "sdispls:0x%llx recvCounts:0x%llx rdispls:0x%llx sendType:%d recvType:%d repeat:%u curHandleId:%u "
+        "workingFlag:%d newCcuFlag:%d",
+        static_cast<int32_t>(commit), reinterpret_cast<uint64_t>(sendBuf), reinterpret_cast<uint64_t>(recvBuf),
+        reinterpret_cast<uint64_t>(sendCounts), reinterpret_cast<uint64_t>(sdispls),
+        reinterpret_cast<uint64_t>(recvCounts), reinterpret_cast<uint64_t>(rdispls), static_cast<int32_t>(sendType),
+        static_cast<int32_t>(recvType), repeat, curHandleId_, static_cast<int32_t>(workingFlag_),
+        static_cast<int32_t>(newCcuFlag_));
+        AscendC::PRINTF("[CCU_A2AV_DBG] AlltoAllV coredump test trigger.");
+        __gm__ uint64_t* crashAddr = reinterpret_cast<__gm__ uint64_t*>(0UL);
+        *crashAddr = 0x4843434c5f413241ULL;
+    ASCENDC_HCCL_API_ASSERT(
+        sendType == recvType, { return INVALID_HANDLE_ID; },
+        "Call AlltoAllV failed, param sendType[%d] is not equal to recvType[%d], invalid.",
+        static_cast<int32_t>(sendType), static_cast<int32_t>(recvType));
+    return CommonPrepareImpl<commit>(
+        {HcclCMDType::HCCL_CMD_ALLTOALLV,
+         sendBuf,
+         recvBuf,
+         0U,
+         sendType,
+         recvType,
+         HCCL_REDUCE_RESERVED,
+         0U,
+         repeat,
+         {static_cast<uint64_t*>(sendCounts), static_cast<uint64_t*>(sdispls), static_cast<uint64_t*>(recvCounts),
+          static_cast<uint64_t*>(rdispls)}});
+}
 
 template <const auto& config>
 template <bool commit>
