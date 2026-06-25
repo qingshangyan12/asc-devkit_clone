@@ -60,8 +60,8 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_int4x2_t& dst, vec
 | src0 | 输入 | 源操作数（矢量数据寄存器）。 |
 | src1 | 输入/输出 | 源操作数（矢量）的起始地址。当使用不含iter_reg参数的接口时，搬运完成后该地址会被自动更新。 |
 | offset | 输入/输出 | 存储地址的偏移量。当使用含iter_reg参数的接口时，搬运完成后该偏移量会被自动更新。 |
-| count | 输入 | 搬运元素个数。仅不含iter_reg参数的接口有此参数。 |
-| inc | 输入 | 保留暂不使用，传入0即可。仅含iter_reg参数的接口有此参数。 |
+| count | 输入 | 搬运元素个数。 |
+| inc | 输入 | 搬运完成后offset在自增前被更新为offset + inc，一般传入0即可。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)。
 
