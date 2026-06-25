@@ -39,9 +39,9 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 | RegTensor模板参数regTrait | 普通搬运接口 | PostUpdate扩展搬运接口 | 使用AddrReg寄存器存储偏移量接口 |
 |-----|-----|-----|-----|
-| RegTraitNumOne（单搬出） | 完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。 | &bull; POST_MODE_NORMAL模式：完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。<br>&bull; POST_MODE_UPDATE模式：完成一次搬运后，UB地址会自动更新，每次迭代不需要手动更新地址。 | 在每次迭代中，需要先调用CreateAddrReg手动设定地址偏移量，再调用搬运指令。 |
+| RegTraitNumOne（单搬出） | 完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。 | &bull; POST_MODE_NORMAL模式：不支持。<br>&bull; POST_MODE_UPDATE模式：完成一次搬运后，UB地址会自动更新，每次迭代不需要手动更新地址。 | 在每次迭代中，需要先调用CreateAddrReg手动设定地址偏移量，再调用搬运指令。 |
 | RegTraitNumOne（双搬出） | 完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。 | 不支持 | 在每次迭代中，需要先调用CreateAddrReg手动设定地址偏移量，再调用搬运指令。 |
-| RegTraitNumTwo（单搬出） | 完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。 | &bull; POST_MODE_NORMAL模式：完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。<br>&bull; POST_MODE_UPDATE模式：完成一次搬运后，UB地址会自动更新，每次迭代不需要手动更新地址。 | 不支持 |
+| RegTraitNumTwo（单搬出） | 完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。 | &bull; POST_MODE_NORMAL模式：不支持。<br>&bull; POST_MODE_UPDATE模式：完成一次搬运后，UB地址会自动更新，每次迭代不需要手动更新地址。 | 不支持 |
 | RegTraitNumTwo（双搬出） | 不支持 | 不支持 | 不支持 |
 
 数据搬出时，可以通过模板参数配置搬运的数据分布模式，能够实现压缩、只搬出第一个元素等功能，分布模式具体介绍请参考[表3 StoreDist参数说明（单搬出模式）](#表3-StoreDist参数说明（单搬出模式）)、[表6 StoreDist参数说明（双搬出模式）](#表6-StoreDist参数说明（双搬出模式）)。[图1](#fig-storealign-dist)展示了DIST_NORM、DIST_FIRST_ELEMENT_B16、DIST_PACK_B32分布模式。
@@ -105,8 +105,8 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 | 参数名 | 输入/输出 | 描述 |
 |-----|-----|-----|
 | dstAddr | 输入/输出 | 目的操作数，UB起始地址，需要32B对齐。 |
-| srcReg | 输入 | 源操作数，类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
-| postUpdateStride | 输入 | 地址更新步长，int32_t类型，单位：元素个数。postUpdateStride * sizeof(T)的对齐约束请参考[表3 StoreDist参数说明（单搬出模式）](#表3-StoreDist参数说明（单搬出模式）)。根据postMode的取值有两种情况：<br>&bull; POST_MODE_NORMAL：实际搬运UB起始地址为srcAddr + postUpdateStride，搬运后地址不会更新。<br>&bull; POST_MODE_UPDATE：实际搬运UB起始地址为srcAddr，搬运后执行地址更新 srcAddr +=  postUpdateStride。 |
+| srcReg | 输入 | 源操作数，类型为[RegTensor](../概述/寄存器数据类型/RegTensor.md)。 |
+| postUpdateStride | 输入 | 地址更新步长，int32_t类型，单位：元素个数。postUpdateStride * sizeof(T)的对齐约束请参考[表3 StoreDist参数说明（单搬出模式）](#表3-StoreDist参数说明（单搬出模式）)。根据postMode的取值有两种情况：<br>&bull; POST_MODE_NORMAL：不支持。<br>&bull; POST_MODE_UPDATE：实际搬运UB起始地址为srcAddr，搬运后执行地址更新 srcAddr += postUpdateStride。 |
 | offset | 输入 | 地址偏移寄存器，AddrReg类型。需要在搬运前调用CreateAddrReg设定地址偏移量，实际搬运UB地址为srcAddr + 寄存器中存储的偏移量。AddrReg寄存器中存储的偏移量 * sizeof(T)的对齐约束请参考[表3 StoreDist参数说明（单搬出模式）](#表3-StoreDist参数说明（单搬出模式）)。|
 | mask | 输入 | 源操作数元素操作的有效指示，详细说明请参考[MaskReg](../寄存器数据类型/MaskReg.md)。 |
 
@@ -168,7 +168,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 - 位于Unified Buffer的地址约束、postUpdateStride * sizeof(T)的对齐约束、AddrReg寄存器中存储的偏移量 \* sizeof(T)的对齐约束与分布模式StoreDist有关，具体地址约束请参考[表3 StoreDist参数说明（单搬出模式）](#表3-StoreDist参数说明（单搬出模式）)、[表6 StoreDist参数说明（双搬出模式）](#表6-StoreDist参数说明（双搬出模式）)。
 
-- 单搬出模式：b64数据类型只支持StoreDist中的DIST\_NORM和DIST\_PACK\_B64模式。
+- 单搬出模式：b64数据类型只支持StoreDist中的DIST_NORM和DIST_PACK_B64模式。
 - 当RegTensor模板参数RegTrait为RegTraitNumOne和RegTraitNumTwo时，支持情况如下：
     | RegTensor模板参数RegTrait取值 | 支持的接口 | 支持的数据类型 |
     |-----|-----|-----|
