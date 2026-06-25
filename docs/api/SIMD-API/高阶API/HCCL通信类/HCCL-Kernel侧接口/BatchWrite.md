@@ -56,10 +56,11 @@ __aicore__ inline HcclHandle BatchWrite(GM_ADDR batchWriteInfo, uint32_t itemNum
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| batchWriteInfo | 输入 | 通信任务信息的Global Memory地址。一组通信数据的相关信息必须按指定的格式保存，在执行通信任务时，可以同时指定多组通信任务信息，执行通信任务时批量发送数据。结构体定义如下代码所示。<br><br><!-- npu="A3" id9 -->对于Atlas A3 训练系列产品/Atlas A3 推理系列产品：<br>type：预留参数，取值为0。<br>res1[5]：预留参数，无需填写该值。<br>length：待拷贝数据的长度。<br>srcAddrLow：待拷贝数据的源地址低32位。<br>srcAddrHigh：待拷贝数据的源地址高32位。<br>dstAddrLow：待拷贝数据的目的地址低32位。<br>dstAddrHigh：待拷贝数据的目的地址高32位。<br>res2[4]：预留参数，无需填写该值。<!-- end id9 --><br><br><!-- npu="910b" id10 -->对于Atlas A2 训练系列产品/Atlas A2 推理系列产品：<br>localBuf：本端发送数据的window地址。<br>remoteBuf：对端接收数据的window地址。<br>count：该通信任务发送的数据个数。<br>dataType：该通信任务发送的数据类型，支持的类型可参考[HcclDataType参数说明](HCCL使用说明.md#table116710585514)。<br>remoteRankId：该通信任务发送数据的目的卡卡号。<!-- end id10 --> |
-| itemNum | 输入 | 批量任务的个数。该参数取值必须与batchWriteInfo中通信任务信息的组数一致。<br><br><!-- npu="A3" id11 -->对于Atlas A3 训练系列产品/Atlas A3 推理系列产品，该参数取值不能大于等于2048。<!-- end id11 --> |
-| queueID | 输入 | 指定当前通信所在的队列ID，默认值为0。<br><br><!-- npu="910b" id12 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品，该参数仅支持取值为0。<!-- end id12 --> |
+| batchWriteInfo | 输入 | 通信任务信息的Global Memory地址。一组通信数据的相关信息必须按指定的格式保存，在执行通信任务时，可以同时指定多组通信任务信息，执行通信任务时批量发送数据。结构体定义如下代码所示。<!-- npu="A3" id9 --><br><br>对于Atlas A3 训练系列产品/Atlas A3 推理系列产品：<br>type：预留参数，取值为0。<br>res1[5]：预留参数，无需填写该值。<br>length：待拷贝数据的长度。<br>srcAddrLow：待拷贝数据的源地址低32位。<br>srcAddrHigh：待拷贝数据的源地址高32位。<br>dstAddrLow：待拷贝数据的目的地址低32位。<br>dstAddrHigh：待拷贝数据的目的地址高32位。<br>res2[4]：预留参数，无需填写该值。<!-- end id9 --><!-- npu="910b" id10 --><br><br>对于Atlas A2 训练系列产品/Atlas A2 推理系列产品：<br>localBuf：本端发送数据的window地址。<br>remoteBuf：对端接收数据的window地址。<br>count：该通信任务发送的数据个数。<br>dataType：该通信任务发送的数据类型，支持的类型可参考[HcclDataType参数说明](HCCL使用说明.md#table116710585514)。<br>remoteRankId：该通信任务发送数据的目的卡卡号。<!-- end id10 --> |
+| itemNum | 输入 | 批量任务的个数。该参数取值必须与batchWriteInfo中通信任务信息的组数一致。<!-- npu="A3" id11 --><br><br>对于Atlas A3 训练系列产品/Atlas A3 推理系列产品，该参数取值不能大于等于2048。<!-- end id11 --> |
+| queueID | 输入 | 指定当前通信所在的队列ID，默认值为0。<!-- npu="910b" id12 --><br><br>Atlas A2 训练系列产品/Atlas A2 推理系列产品，该参数仅支持取值为0。<!-- end id12 --> |
 
+<!-- npu="A3" id14 -->
 ```
 // Atlas A3 训练系列产品/Atlas A3 推理系列产品
 struct BatchWriteItem {
@@ -72,7 +73,11 @@ struct BatchWriteItem {
     uint32_t dstAddrHigh;
     uint32_t res2[4];
 };
+```
+<!-- end id14 -->
 
+<!-- npu="910b" id15 -->
+```
 // Atlas A2 训练系列产品/Atlas A2 推理系列产品
 struct BatchWriteItem {
     uint64_t localBuf;
@@ -82,6 +87,7 @@ struct BatchWriteItem {
     uint32_t remoteRankId;
 };
 ```
+<!-- end id15 -->
 
 ## 返回值说明
 
@@ -92,13 +98,14 @@ struct BatchWriteItem {
 -   调用本接口前确保已调用过[InitV2](InitV2.md)和[SetCcTilingV2](SetCcTilingV2.md)接口。
 -   若HCCL对象的[config模板参数](HCCL模板参数.md#table884518212555)未指定下发通信任务的核，该接口只能在AIC核或者AIV核两者之一上调用。若HCCL对象的[config模板参数](HCCL模板参数.md#table884518212555)中指定了下发通信任务的核，则该接口可以在AIC核和AIV核上同时调用，接口内部会根据指定的核的类型，只在AIC核、AIV核二者之一下发该通信任务。
 -   一个通信域内，所有Prepare接口和InterHcclGroupSync接口的总调用次数不能超过63。
-     <!-- npu="910b" id13 -->
-   -   对于Atlas A2 训练系列产品/Atlas A2 推理系列产品，当前接口仅支持不同AI Server间的通信，同时通信任务信息中指定的目的卡号不能是本卡号。
-     <!-- end id13 -->
+<!-- npu="910b" id13 -->
+-   对于Atlas A2 训练系列产品/Atlas A2 推理系列产品，当前接口仅支持不同AI Server间的通信，同时通信任务信息中指定的目的卡号不能是本卡号。
+<!-- end id13 -->
 -   通信任务信息写入batchWriteInfo前，必须通过调用[DataCacheCleanAndInvalid](../../../基础API/缓存控制/DataCacheCleanAndInvalid.md)接口，保证预期的数据成功刷新到Global Memory上。
 
 ## 调用示例
 
+<!-- npu="910b" id16 -->
 -   不同AI Server之间的点对点通信
 
     在Atlas A2 训练系列产品/Atlas A2 推理系列产品上，假设本卡要将不同的数据分别发送到其它AI Server的2卡、3卡的指定位置，通过调用一次BatchWrite接口，实现批量点对点通信。
@@ -179,7 +186,9 @@ struct BatchWriteItem {
         return ge::GRAPH_SUCCESS;
     }
     ```
+<!-- end id16 -->
 
+<!-- npu="A3" id17 -->
 -   多个队列的点对点通信
 
     在Atlas A3 训练系列产品/Atlas A3 推理系列产品上，假设要将一段数据分别拷贝到两个不同的Global Memory上，可以通过调用一次BatchWrite接口，实现批量点对点通信。
@@ -276,3 +285,4 @@ struct BatchWriteItem {
         return ge::GRAPH_SUCCESS;
     }
     ```
+<!-- end id17 -->
