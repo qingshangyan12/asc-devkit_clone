@@ -336,27 +336,29 @@ __simd_vf__ inline void ReduceRALessThanVLVFImpl(
     Reg::RegTensor<T, Trait> vreg15;
 
     // Process main folds
+    uint16_t offsetR = dimA;
     for (uint16_t loopMain = 0; loopMain < mainTimes; loopMain++) {
         loopRNum = loopRNum >> avgFolds;
+        offsetR = loopRNum * dimA;
         auto tmpSrcAddr = addr;
         for (uint16_t loopR = 0; loopR < loopRNum; loopR++) {
             // L0
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg0, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg1, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg2, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg3, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg4, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg5, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg6, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg7, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg8, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg9, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg10, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg11, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg12, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg13, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg14, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg15, tmpSrcAddr, dimA);
+            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg0, tmpSrcAddr, offsetR);
+            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg1, tmpSrcAddr, offsetR);
+            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg2, tmpSrcAddr, offsetR);
+            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg3, tmpSrcAddr, offsetR);
+            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg4, tmpSrcAddr, offsetR);
+            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg5, tmpSrcAddr, offsetR);
+            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg6, tmpSrcAddr, offsetR);
+            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg7, tmpSrcAddr, offsetR);
+            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg8, tmpSrcAddr, offsetR);
+            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg9, tmpSrcAddr, offsetR);
+            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg10, tmpSrcAddr, offsetR);
+            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg11, tmpSrcAddr, offsetR);
+            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg12, tmpSrcAddr, offsetR);
+            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg13, tmpSrcAddr, offsetR);
+            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg14, tmpSrcAddr, offsetR);
+            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg15, tmpSrcAddr, offsetR);
             // L1
             Binaryfunc(vreg0, vreg0, vreg8, mask);
             Binaryfunc(vreg1, vreg1, vreg9, mask);
@@ -376,7 +378,7 @@ __simd_vf__ inline void ReduceRALessThanVLVFImpl(
             Binaryfunc(vreg1, vreg1, vreg3, mask);
             // L4
             Binaryfunc(vreg0, vreg0, vreg1, mask);
-            Reg::StoreAlign(addr + loopR * dimA, vreg0, mask);
+            Reg::StoreAlign(addr + loopR * offsetR, vreg0, mask);
         }
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
     }
@@ -384,8 +386,8 @@ __simd_vf__ inline void ReduceRALessThanVLVFImpl(
     // Process tail folds
     for (uint16_t i = 0; i < foldOne; i++) {
         // L0
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg0, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg1, addr, dimA);
+        Reg::LoadAlign(vreg0, addr);
+        Reg::LoadAlign(vreg1, addr + offsetR);
         // L1
         Binaryfunc(vreg0, vreg0, vreg1, mask);
         Reg::StoreAlign(dstAddr, vreg0, mask);
@@ -393,10 +395,10 @@ __simd_vf__ inline void ReduceRALessThanVLVFImpl(
 
     for (uint16_t i = 0; i < foldTwo; i++) {
         // L0
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg0, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg1, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg2, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg3, addr, dimA);
+        Reg::LoadAlign(vreg0, addr);
+        Reg::LoadAlign(vreg1, addr + offsetR);
+        Reg::LoadAlign(vreg2, addr + 2 * offsetR);
+        Reg::LoadAlign(vreg3, addr + 3 * offsetR);
         // L1
         Binaryfunc(vreg0, vreg0, vreg2, mask);
         Binaryfunc(vreg1, vreg1, vreg3, mask);
@@ -407,14 +409,14 @@ __simd_vf__ inline void ReduceRALessThanVLVFImpl(
 
     for (uint16_t i = 0; i < foldThree; i++) {
         // L0
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg0, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg1, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg2, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg3, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg4, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg5, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg6, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg7, addr, dimA);
+        Reg::LoadAlign(vreg0, addr);
+        Reg::LoadAlign(vreg1, addr + offsetR);
+        Reg::LoadAlign(vreg2, addr + 2 * offsetR);
+        Reg::LoadAlign(vreg3, addr + 3 * offsetR);
+        Reg::LoadAlign(vreg4, addr + 4 * offsetR);
+        Reg::LoadAlign(vreg5, addr + 5 * offsetR);
+        Reg::LoadAlign(vreg6, addr + 6 * offsetR);
+        Reg::LoadAlign(vreg7, addr + 7 * offsetR);
         // L1
         Binaryfunc(vreg0, vreg0, vreg4, mask);
         Binaryfunc(vreg1, vreg1, vreg5, mask);
