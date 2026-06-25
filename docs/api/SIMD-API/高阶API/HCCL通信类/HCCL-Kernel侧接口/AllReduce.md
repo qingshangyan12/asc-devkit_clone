@@ -71,12 +71,10 @@ __aicore__ inline HcclHandle AllReduce(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_
      <!-- npu="A3" id8 -->
    -   对于Atlas A3 训练系列产品/Atlas A3 推理系列产品，一个通信域内，所有Prepare接口和InterHcclGroupSync接口的总调用次数不能超过63。
      <!-- end id8 -->
-     <!-- npu="950" id9 -->
-   -   对于Ascend 950PR/Ascend 950DT，一个通信域内，所有Prepare接口的总调用次数不能超过63。
-     <!-- end id9 -->
-     <!-- npu="950" id10 -->
-   -   对于Ascend 950PR/Ascend 950DT，通信服务端为CCU时，单次最大通信数据量不能超过256M。
-     <!-- end id10 -->
+      <!-- npu="950" id9 -->
+    -   对于Ascend 950PR/Ascend 950DT，一个通信域内，所有Prepare接口的总调用次数不能超过63。
+    -   对于Ascend 950PR/Ascend 950DT，通信服务端为CCU时，单次最大通信数据量不能超过256M。
+      <!-- end id9 -->
 
 ## 调用示例
 
