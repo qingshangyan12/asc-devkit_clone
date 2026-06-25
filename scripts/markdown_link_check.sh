@@ -314,10 +314,9 @@ def existing_markdown_files():
 def staged_markdown_changes():
     try:
         result = subprocess.run(
-            ["git", "diff", "--cached", "--name-status", "--diff-filter=ADMR"],
+            ["git", "diff", "--cached", "--name-status", "-z", "--diff-filter=ADMR"],
             cwd=repo_root,
             check=False,
-            text=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
         )
@@ -326,12 +325,27 @@ def staged_markdown_changes():
 
     changed = []
     needs_full = False
-    for line in result.stdout.splitlines():
-        parts = line.split("\t")
-        if not parts:
+    fields = result.stdout.split(b"\0")
+    index = 0
+    while index < len(fields):
+        if not fields[index]:
+            index += 1
             continue
-        status = parts[0]
-        paths = parts[1:]
+        status = fields[index].decode("utf-8", errors="ignore")
+        index += 1
+
+        if status.startswith(("R", "C")):
+            raw_paths = fields[index:index + 2]
+            index += 2
+        else:
+            raw_paths = fields[index:index + 1]
+            index += 1
+
+        paths = [
+            raw_path.decode("utf-8", errors="ignore")
+            for raw_path in raw_paths
+            if raw_path
+        ]
         markdown_paths = [p for p in paths if is_markdown_path(p)]
         if not markdown_paths:
             continue
