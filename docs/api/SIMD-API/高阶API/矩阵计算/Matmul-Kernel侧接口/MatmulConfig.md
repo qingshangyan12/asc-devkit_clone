@@ -11,8 +11,8 @@
 <a name="table6981133810309"></a>
 | 模板 | 实现 | 优点 | 推荐使用场景 |
 | --- | --- | --- | --- |
-| Norm | 支持L1缓存多个基本块，MTE2分多次从GM搬运基本块到L1，每次搬运一份基本块，已搬的基本块不清空。（举例说明：Tiling结构体中的[depthA1](../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md#p490012584566)=6，代表搬入6份A矩阵基本块到L1，1次搬运一份基本块，MTE2进行6次搬运）。 | 可以提前启动MTE1流水（因为搬1份基本块就可以做MTE1后面的运算）。 | 默认开启Norm模板。 |
-| MDL，SpecialMDL | 支持L1缓存多个基本块，MTE2从GM到L1的搬运为一次性“大包”搬运。（举例说明：Tiling结构体中的[depthA1](../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md#p490012584566)=6，代表一次性搬入6份A矩阵基本块到L1，MTE2进行1次搬运）。<a name="li661233281512"></a>MDL模板与SpecialMDL模板的差异见[表2](#table1761013213153)。 | 对于一般的大shape场景，可以减少MTE2的循环搬运，提升性能。 | 大shape场景。 |
+| Norm | 支持L1缓存多个基本块，MTE2分多次从GM搬运基本块到L1，每次搬运一份基本块，已搬的基本块不清空。（举例说明：Tiling结构体中的[depthA1](../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md#deptha1)=6，代表搬入6份A矩阵基本块到L1，1次搬运一份基本块，MTE2进行6次搬运）。 | 可以提前启动MTE1流水（因为搬1份基本块就可以做MTE1后面的运算）。 | 默认开启Norm模板。 |
+| MDL，SpecialMDL | 支持L1缓存多个基本块，MTE2从GM到L1的搬运为一次性“大包”搬运。（举例说明：Tiling结构体中的[depthA1](../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md#deptha1)=6，代表一次性搬入6份A矩阵基本块到L1，MTE2进行1次搬运）。<a id="mdl-template"></a>MDL模板与SpecialMDL模板的差异见[表2](#table1761013213153)。 | 对于一般的大shape场景，可以减少MTE2的循环搬运，提升性能。 | 大shape场景。 |
 | IBShare | MIX场景下，A矩阵或B矩阵GM地址相同的时候，通过共享L1 Buffer，减少MTE2搬运。 | 减少MTE2搬运，提升性能。 | MIX场景多个AIV的A矩阵或B矩阵GM地址相同。<br><br>注意：IBShare模板要求多个AIV复用的A/B矩阵必须在L1 Buffer上全载。 |
 | BasicBlock | 在无尾块的场景，基本块大小确定的情况下，通过[GetBasicConfig](GetBasicConfig.md)接口配置输入的基本块大小，固定MTE1每次搬运的矩阵大小及每次矩阵乘计算的矩阵大小，减少参数计算量。 | 减少MTE1矩阵搬运和矩阵乘计算过程中的参数计算开销。 | 无尾块，基本块（baseM,baseN）大小确定。 |
 | SpecialBasicBlock | 在无尾块的场景，基本块和单核内shape大小确定的情况下，通过配置MatmulConfig参数，在BasicBlock模板的基础上进一步消除头开销Scalar计算。 | 减少MTE1矩阵搬运和矩阵乘计算过程中的参数计算开销，并进一步消除头开销Scalar计算。 | 无尾块，基本块（baseM,baseN）和单核内shape（singleCoreM,singleCoreN）大小确定。<br><br>注意：相同场景下，推荐使用[常量化](GetMatmulApiTiling.md)来获得更好的性能收益。 |
