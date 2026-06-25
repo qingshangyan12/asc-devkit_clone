@@ -16,7 +16,9 @@
 
 头文件路径为：`"basic_api/kernel_operator_common_intf.h"`。
 
-重置CTRL寄存器（控制寄存器）的特定比特位。
+对CTRL寄存器（控制寄存器）的特定比特位做重置。由模板参数\[startBit, endBit\]指定的比特位重置为默认值，默认值参考[表 常用CTRL寄存器比特位说明](SetCtrlSpr(ISASI).md#table1660715170215)。
+
+![](../../../figures/zh-cn_formulaimage_0000002606627883.png)
 
 ## 函数原型
 
@@ -27,12 +29,16 @@ __aicore__ static inline void ResetCtrlSpr()
 
 ## 参数说明
 
-**表1**  模板参数说明
+**表1** 模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
 | startBit | 起始比特位索引。 |
 | endBit | 终止比特位索引。 |
+
+## 数据类型
+
+本接口为寄存器访问接口，不涉及张量数据类型操作。
 
 ## 返回值说明
 
@@ -51,3 +57,5 @@ AscendC::SetCtrlSpr<48, 48>(1);
 ...
 AscendC::ResetCtrlSpr<48, 48>();
 ```
+
+更多示例请参考[CtrlSpr样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/09_utils/ctrl_spr)。
