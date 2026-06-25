@@ -568,6 +568,7 @@ __attribute__((visibility("default"))) uint32_t RunAicpuRpcSrvGroupLaunch(void *
 
 __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void *args[])
 {
+    HCCL_INFO("[Mc2ServerKernel]Start Mc2ServerKernel.");
     if (args == nullptr) {
         HCCL_ERROR("args is null.");
         return HCCL_E_PARA;
@@ -577,6 +578,7 @@ __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void *args[])
     uint64_t *desc_addr = &desc_value;
     CommKfcParamDesc *desc = reinterpret_cast<CommKfcParamDesc*>(desc_addr);
     AicpuKfcUtils::PrintHcclCommParamDesc(*desc);
+    HCCL_INFO("[Mc2ServerKernel]Finish Mc2ServerKernel.");
     return CommKfcDispatcher::Run(&(args[1]), desc->itemNum);
 }
 
