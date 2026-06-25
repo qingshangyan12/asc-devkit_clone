@@ -2050,11 +2050,11 @@
 
         -   [Lane ID类函数](SIMT-API/Warp函数/Lane-ID类函数/Lane-ID类函数.md)
             -   [laneid](SIMT-API/Warp函数/Lane-ID类函数/laneid.md)
-            -   [lanemask_eq](SIMT-API/Warp函数/Lane-ID类函数/lanemask_eq.md)
-            -   [lanemask_le](SIMT-API/Warp函数/Lane-ID类函数/lanemask_le.md)
-            -   [lanemask_lt](SIMT-API/Warp函数/Lane-ID类函数/lanemask_lt.md)
-            -   [lanemask_ge](SIMT-API/Warp函数/Lane-ID类函数/lanemask_ge.md)
-            -   [lanemask_gt](SIMT-API/Warp函数/Lane-ID类函数/lanemask_gt.md)
+            -   [lanemask\_eq](SIMT-API/Warp函数/Lane-ID类函数/lanemask_eq.md)
+            -   [lanemask\_le](SIMT-API/Warp函数/Lane-ID类函数/lanemask_le.md)
+            -   [lanemask\_lt](SIMT-API/Warp函数/Lane-ID类函数/lanemask_lt.md)
+            -   [lanemask\_ge](SIMT-API/Warp函数/Lane-ID类函数/lanemask_ge.md)
+            -   [lanemask\_gt](SIMT-API/Warp函数/Lane-ID类函数/lanemask_gt.md)
 
     -   [数学函数](SIMT-API/数学函数/数学函数.md)
         -   [fp8类型](SIMT-API/数学函数/fp8类型/fp8类型.md)
