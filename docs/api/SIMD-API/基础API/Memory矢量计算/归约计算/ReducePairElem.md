@@ -49,7 +49,7 @@
 | reduceType | 归约操作类型。<br>类型为`ReduceType`枚举类型，支持：<br>&bull; `ReduceType::SUM`：求和。 |
 | T | 目的操作数数据类型。 |
 | U | 源操作数数据类型。 |
-| isSetMask | 是否在接口内部设置`mask`，默认为`true`。<br>&bull; `true`，表示在接口内部设置`mask`。<br>&bull; `false`，表示在接口外部设置`mask`，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置`mask`值。这种模式下，本接口入参中的`mask`值必须设置为占位符`MASK_PLACEHOLDER`。 |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。 |
 
 **表2**  参数说明
 
@@ -59,7 +59,7 @@
 | src | 输入 | 源操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
 | mask[]/mask | 输入 | `mask`用于控制每次迭代内参与计算的源操作数。详细设置参考[掩码概述](../SIMD计算说明/掩码/概述.md)。 |
 | repeatTime | 输入 | 迭代次数。取值范围为[0, 255]。 |
-| dstRepStride | 输入 | 目的操作数相邻迭代间的地址步长，以一个repeatTime归约后的长度为单位，即128字节。取值范围为[0, $2^{16}-1$]。<cann-filter npu-type = "910"><br>**注意，此参数值Atlas 训练系列产品不支持配置0。**</cann-filter> |
+| dstRepStride | 输入 | 目的操作数相邻迭代间的地址步长，以一个repeatTime归约后的长度为单位，即128字节。取值范围为[0, $2^{16}-1$]。<cann-filter npu-type = "910"><br>**注意，Atlas 训练系列产品不支持此参数值配为0。**</cann-filter> |
 | srcBlkStride | 输入 | 单次迭代内DataBlock的地址步长，单位为32字节。取值范围为[0, $2^{16}-1$]。 |
 | srcRepStride | 输入 | 源操作数相邻迭代间的地址步长，即源操作数每次迭代跳过的DataBlock数目。取值范围为[0, $2^{16}-1$]。 |
 
@@ -96,14 +96,11 @@
 
 </cann-filter>
 
-<cann-filter npu-type = "A3,910b,310b,310p,910">
+<cann-filter npu-type = "A3,910b">
 
   - 针对如下型号，当一对相邻元素的掩码均为0，对应的目的元素将跳过写入，保持不变。
     - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
     - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
-    - <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品</cann-filter>
-    - <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core</cann-filter>
-    - <cann-filter npu-type = "910">Atlas 训练系列产品</cann-filter>
 
 </cann-filter>
 

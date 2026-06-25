@@ -19,9 +19,9 @@
 #endif
 #ifndef ASCENDC_MODULE_UTILS_CONSTANTS_H
 #define ASCENDC_MODULE_UTILS_CONSTANTS_H
-#include "utils/kernel_utils_ceil_oom_que.h"
-#include "utils/kernel_utils_dump_constants.h"
-#include "impl/utils/common_types.h"
+#include "kernel_utils_ceil_oom_que.h"
+#include "kernel_utils_dump_constants.h"
+#include "../../utils/common_types.h"
 
 namespace AscendC {
 const int32_t DEFAULT_BLK_NUM = 8;
@@ -617,7 +617,7 @@ using uint4b_t = IntegerSubType<INT4_BIT_NUM, false>;
 using uint3b_t = IntegerSubType<INT3_BIT_NUM, false>;
 using uint2b_t = IntegerSubType<INT2_BIT_NUM, false>;
 #endif
-#if !(defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)))
+#if !((defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))) || defined(__NPU_HOST__) || defined(__ASC_NPU_HOST__))
 using fp8_e8m0_t = uint8_t;
 #elif !defined(ASCENDC_CPU_DEBUG)
 using fp8_e8m0_t = float8_e8m0_t;

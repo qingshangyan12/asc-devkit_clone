@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# coding=utf-8
+
 # ----------------------------------------------------------------------------------------------------------
 # Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
@@ -207,7 +210,7 @@ class GenerateCaseRunnersTest(unittest.TestCase):
 
     def test_tiling_sink_runner_validates_sink_task_generation_log(self) -> None:
         script = render_runner_from_parts(
-            "04_aicpu/02_features/00_framwork/00_pytorch/tiling_sink_programming",
+            "04_aicpu/02_features/00_framework/00_pytorch/tiling_sink_programming",
             [],
             [Command("python3 test_add_custom_tiling_sink.py", "run")],
             [],
@@ -267,7 +270,7 @@ class GenerateCaseRunnersTest(unittest.TestCase):
             "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin",
             "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom",
             "01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin",
-            "04_aicpu/02_features/00_framwork/00_pytorch/tiling_sink_programming",
+            "04_aicpu/02_features/00_framework/00_pytorch/tiling_sink_programming",
         ]:
             self.assertEqual(ARCH_OVERRIDES[rel_path], expected)
 
@@ -302,6 +305,20 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         self.assertNotIn('CASE_DIR="$(presmoke_case_root "$CASE_REL")"', script)
         self.assertNotIn('ACTION="${1:-all}"', script)
         self.assertNotIn('case "$ACTION" in', script)
+
+    def test_rtc_template_add_runner_uses_cmake_target_name(self) -> None:
+        project_root = Path(__file__).resolve().parents[3]
+        runner = (
+            project_root
+            / "scripts/presmoke/cases/01_simd_cpp_api/02_features/05_aclrtc/rtc_template_add/run.sh"
+        )
+        manifest = json.loads((project_root / "scripts/presmoke/reports/case_runner_manifest.json").read_text())
+        item = next(entry for entry in manifest if entry["case"].endswith("05_aclrtc/rtc_template_add"))
+
+        self.assertIn("bash -lc ./demo", runner.read_text(encoding="utf-8"))
+        self.assertNotIn("bash -lc ./main", runner.read_text(encoding="utf-8"))
+        self.assertIn("./demo", item["commands"])
+        self.assertNotIn("./main", item["commands"])
 
     def test_skip_runner_clean_still_removes_build_directory(self) -> None:
         project_root = Path(__file__).resolve().parents[3]
