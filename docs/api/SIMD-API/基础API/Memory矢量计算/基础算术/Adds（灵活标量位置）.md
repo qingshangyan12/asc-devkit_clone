@@ -6,22 +6,22 @@
 - Ascend 950PR/Ascend 950DT：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3训练系列产品/Atlas A3推理系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2训练系列产品/Atlas A2推理系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 
@@ -34,31 +34,31 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
--   tensor前n个数据计算
+- tensor前n个数据计算
 
-    ```
+    ```cpp
     template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG, typename U, typename S, typename V>
     __aicore__ inline void Adds(const U& dst, const S& src0, const V& src1, const int32_t& count)
     ```
 
--   tensor高维切分计算
-    -   mask逐bit模式
+- tensor高维切分计算
+    - mask逐bit模式
 
-        ```
+        ```cpp
         template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG, typename U, typename S, typename V>
         __aicore__ inline void Adds(const U& dst, const S& src0, const V& src1, uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
         ```
 
-    -   mask连续模式
+    - mask连续模式
 
-        ```
+        ```cpp
         template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG, typename U, typename S, typename V>
         __aicore__ inline void Adds(const U& dst, const S& src0, const V& src1, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
         ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表1**  模板参数说明
+**表1** 模板参数说明
 
 <a name="table4835205712588"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0000001429830437_row118356578583"><th class="cellrowborder" valign="top" width="13.91%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0000001429830437_p48354572582"><a name="zh-cn_topic_0000001429830437_p48354572582"></a><a name="zh-cn_topic_0000001429830437_p48354572582"></a>参数名</p>
@@ -80,7 +80,7 @@
 </li><li>false，表示在接口外部设置。<a name="zh-cn_topic_0000001379841780_ul687683044913"></a><a name="zh-cn_topic_0000001379841780_ul687683044913"></a><ul id="zh-cn_topic_0000001379841780_ul687683044913"><li>针对tensor高维切分计算接口，对性能要求较高的部分场景下，开发者需要使用<a href="../掩码操作/SetMaskNorm.md">SetMaskNorm</a>/<a href="../掩码操作/SetMaskCount.md">SetMaskCount</a>设置mask模式，并通过<a href="../掩码操作/SetVectorMask.md">SetVectorMask</a>接口设置mask值。接口入参中的mask值设置为占位符MASK_PLACEHOLDER，用于占位，无实际含义。</li><li>针对tensor前n个数据计算接口，对性能要求较高的部分场景下，开发者需要使用<a href="../掩码操作/SetMaskCount.md">SetMaskCount</a>设置mask模式为Counter模式，并通过<a href="../掩码操作/SetVectorMask.md">SetVectorMask</a>接口设置mask值。本接口入参中的count不生效，建议设置成1。</li></ul>
 </li></ul>
 <p id="zh-cn_topic_0000001379841780_p56771501927"><a name="zh-cn_topic_0000001379841780_p56771501927"></a><a name="zh-cn_topic_0000001379841780_p56771501927"></a>针对以下型号，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。</p>
-<a name="zh-cn_topic_0000001379841780_ul197761202315"></a><a name="zh-cn_topic_0000001379841780_ul197761202315"></a><ul id="zh-cn_topic_0000001379841780_ul197761202315"><li>针对<span id="zh-cn_topic_0000001379841780_ph0483189202"><a name="zh-cn_topic_0000001379841780_ph0483189202"></a><a name="zh-cn_topic_0000001379841780_ph0483189202"></a>Ascend 950PR/Ascend 950DT</span></li><li><span id="zh-cn_topic_0000001379841780_ph15381182520216"><a name="zh-cn_topic_0000001379841780_ph15381182520216"></a><a name="zh-cn_topic_0000001379841780_ph15381182520216"></a><term id="zh-cn_topic_0000001379841780_zh-cn_topic_0000001312391781_term354143892110"><a name="zh-cn_topic_0000001379841780_zh-cn_topic_0000001312391781_term354143892110"></a><a name="zh-cn_topic_0000001379841780_zh-cn_topic_0000001312391781_term354143892110"></a>Atlas 200I/500 A2 推理产品</term></span></li></ul>
+<a name="zh-cn_topic_0000001379841780_ul197761202315"></a><a name="zh-cn_topic_0000001379841780_ul197761202315"></a><ul id="zh-cn_topic_0000001379841780_ul197761202315"><li>针对<span id="zh-cn_topic_0000001379841780_ph0483189202"><a name="zh-cn_topic_0000001379841780_ph0483189202"></a><a name="zh-cn_topic_0000001379841780_ph0483189202"></a>Ascend 950PR/Ascend 950DT</span></li><li><span id="zh-cn_topic_0000001379841780_ph15381182520216"><a name="zh-cn_topic_0000001379841780_ph15381182520216"></a><a name="zh-cn_topic_0000001379841780_ph15381182520216"></a><term id="zh-cn_topic_0000001379841780_zh-cn_topic_0000001312391781_term354143892110"><a name="zh-cn_topic_0000001379841780_zh-cn_topic_0000001312391781_term354143892110"></a><a name="zh-cn_topic_0000001379841780_zh-cn_topic_0000001312391781_term354143892110"></a>Atlas 200I/500 A2推理产品</term></span></li></ul>
 </td>
 </tr>
 <tr id="row29961053183620"><td class="cellrowborder" valign="top" width="13.91%" headers="mcps1.2.3.1.1 "><p id="p4208135520361"><a name="p4208135520361"></a><a name="p4208135520361"></a>config</p>
@@ -110,7 +110,7 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
 </tbody>
 </table>
 
-**表2**  参数说明
+**表2** 参数说明
 
 <a name="table1549711469155"></a>
 <table><thead align="left"><tr id="row12534194619150"><th class="cellrowborder" valign="top" width="14.510000000000002%" id="mcps1.2.4.1.1"><p id="p115341446121510"><a name="p115341446121510"></a><a name="p115341446121510"></a><strong id="b125344463152"><a name="b125344463152"></a><a name="b125344463152"></a>参数名称</strong></p>
