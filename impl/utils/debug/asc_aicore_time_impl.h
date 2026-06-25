@@ -22,6 +22,7 @@
 namespace __asc_aicore {
 __aicore__ inline void asc_time_stamp_impl(uint32_t desc_id)
 {
+    const uint64_t time = asc_debug_get_system_cycle();
     __gm__ DebugBlockHeadInfo* block_info = get_block_info();
     if (block_info == nullptr) {
         return;
@@ -37,7 +38,7 @@ __aicore__ inline void asc_time_stamp_impl(uint32_t desc_id)
     time_stamp_tlv->descId = desc_id;
     time_stamp_tlv->blockIdx = static_cast<uint16_t>(asc_debug_get_block_idx());
     time_stamp_tlv->resv = static_cast<uint16_t>(0U);
-    time_stamp_tlv->cycle = asc_debug_get_system_cycle();
+    time_stamp_tlv->cycle = time;
     time_stamp_tlv->pc = static_cast<uint64_t>(asc_debug_get_program_counter());
     time_stamp_tlv->entry = static_cast<uint64_t>(__get_entry_sys_cnt()); 
     time_stamp_tlv->resvMem[0] = static_cast<uint32_t>(0U);
