@@ -68,14 +68,14 @@ $dst_i = \max(0, src_i)$
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表1**  模板参数说明
+**表1** 模板参数说明
 
 | 参数名 | 描述 |
 |---|---|
 | T | 操作数数据类型。 |
 | isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。 |
 
-**表2**  参数说明
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
@@ -132,6 +132,15 @@ $dst_i = \max(0, src_i)$
   <!-- end id19 -->
 <!-- end id20 -->
 
+<!-- npu="950" id22 -->
+- 针对Ascend 950PR/Ascend 950DT，如下约束说明：
+  - int64\_t数据类型仅支持tensor前n个数据计算接口。
+  - tensor高维切分计算调用GetTemporaryBufferAddr，占用8KB Unified Buffer。
+  - tensor前n个数据连续计算未调用GetTemporaryBufferAddr，不涉及8KB Unified Buffer。
+  - tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。
+  - 当参数count或repeatTime取值为0时，软仿行为不保证该接口被视为NOP（空操作）。
+<!-- end id22 -->
+
 ## 调用示例<a name="section642mcpsimp"></a>
 
 - tensor高维切分计算样例-mask连续模式
@@ -166,3 +175,5 @@ $dst_i = \max(0, src_i)$
 输入数据srcLocal: [6.938 -8.86 -0.2263 ... 1.971 1.778]
 输出数据dstLocal: [6.938 0 0 ... 1.971 1.778]
 ```
+
+完整样例请参考[单目矢量计算类API样例](https://gitcode.com/cann/asc-devkit/pull/873)。
