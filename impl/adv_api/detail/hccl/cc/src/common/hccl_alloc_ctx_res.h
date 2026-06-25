@@ -147,8 +147,8 @@ HcclResult CheckIsReduce(const Mc2CcTilingInner* ccTiling, bool* isReduce)
 HcclResult CheckCommEngine(const void* ccTilingList[], uint32_t tilingNum)
 {
     for (uint32_t i = 0U; i < tilingNum; ++i) {
-        const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
-        if (ccTiling->commEngine != static_cast<uint8_t>(COMM_ENGINE_AICPU)) {
+        const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner *>(ccTilingList[i]);
+        if (ccTiling->commEngine != static_cast<uint8_t>(COMM_ENGINE_AICPU) && ccTiling->commEngine != static_cast<uint8_t>(COMM_ENGINE_CPU)) {
             HCCL_ERROR("Invalid commEngine %u.", ccTiling->commEngine);
             return HCCL_E_NOT_SUPPORT;
         }
