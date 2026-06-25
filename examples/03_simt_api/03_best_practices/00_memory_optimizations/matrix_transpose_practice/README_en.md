@@ -98,12 +98,12 @@ Substituting into the 1D address formula:
 
 | Metric                | Description                                                                              |
 | --------------------- | ---------------------------------------------------------------------------------------- |
-| Task Duration(us)     | Total task duration, including scheduling time to the accelerator, execution time on the accelerator, and response completion time |
-| aiv_time(us)          | Theoretical execution time of the task on the AI Vector Core, in microseconds            |
+| Task Duration(μs)     | Total task duration, including scheduling time to the accelerator, execution time on the accelerator, and response completion time |
+| aiv_time(μs)          | Theoretical execution time of the task on the AI Vector Core, in microseconds            |
 | aiv_total_cycles      | Total execution cycles on each AI Vector Core compute unit after the task is assigned    |
-| aiv_vec_time(us)      | Duration of vec-type instructions (vector computation instructions), in microseconds      |
+| aiv_vec_time(μs)      | Duration of vec-type instructions (vector computation instructions), in microseconds      |
 | aiv_vec_ratio         | Ratio of vec-type instruction cycles to total cycles                                     |
-| aiv_scalar_time(us)   | Duration of scalar-type instructions (scalar computation instructions), in microseconds   |
+| aiv_scalar_time(μs)   | Duration of scalar-type instructions (scalar computation instructions), in microseconds   |
 | aiv_scalar_ratio      | Ratio of scalar-type instruction cycles to total cycles                                  |
 
 Except for Task Duration, all other metrics in this example show the average values across all blocks.
@@ -133,13 +133,13 @@ output[index] = input[index];
 
 **Performance Data**:
 
-| Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
+| Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
 |      21.751      |    0.919    |     1515.731     |      0.743      |     0.817     |        0.164        |      0.169      |
 
 **Analysis**:
 
-- The Task Duration of Case 0 is 21.751us, serving as the latency baseline for contiguous GM read/write scenarios
+- The Task Duration of Case 0 is 21.751μs, serving as the latency baseline for contiguous GM read/write scenarios
 - Subsequent transpose versions need to complete coordinate swapping while staying as close to this baseline as possible
 
 ---
@@ -170,13 +170,13 @@ output[index_out] = input[index_in];
 
 **Performance Data**:
 
-| Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
+| Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
 |      61.508      |    3.609    |     5954.297     |      3.441      |     0.954     |        0.156        |      0.043      |
 
 **Analysis**:
 
-- Compared to the Case 0 copy baseline, Task Duration increases from 21.751us to 61.508us, approximately 2.83x the copy version
+- Compared to the Case 0 copy baseline, Task Duration increases from 21.751μs to 61.508μs, approximately 2.83x the copy version
 - The computation in direct-index transpose is minimal, but the transposed GM write-back becomes cross-row, non-contiguous access, so the end-to-end latency is significantly higher than the copy baseline
 - GM reads in this version remain contiguous, but GM write-back addresses are non-contiguous, making it difficult to efficiently merge write requests from the same Warp, which is the main cause of the increased Task Duration
 
@@ -220,13 +220,13 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 
 **Performance Data**:
 
-| Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
+| Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
 |      31.926      |    1.606    |     2650.112     |      1.442      |     0.900     |        0.152        |      0.092      |
 
 **Analysis**:
 
-- Compared to the naive transpose in Case 1, Task Duration decreases from 61.508us to 31.926us, a reduction of approximately 48.1%, with overall performance improvement of approximately 1.93x
+- Compared to the naive transpose in Case 1, Task Duration decreases from 61.508μs to 31.926μs, a reduction of approximately 48.1%, with overall performance improvement of approximately 1.93x
 - Case 2 transfers the non-contiguous GM writes in Case 1 to UB-side access through UB staging, making both GM read and write more contiguous, so Task Duration decreases significantly
 - Compared to the Case 0 copy baseline, Case 2 Task Duration is still approximately 46.8% higher. Case 2 introduces additional UB read/write, synchronization, and transpose-direction UB access overhead compared with the copy version
 
@@ -255,9 +255,9 @@ In SIMT scenarios, multiple threads in the same Warp may access UB concurrently 
 
 <img src="./figures/bank内存排布示意图.png">
 
-The main bank conflict types in SIMT programming are as follows:
+The main subbank conflict types in SIMT programming are as follows:
 
-- **Write-Write Conflict**: Multiple write operations simultaneously attempt to access subbanks with the same index in the same bank group
+- **Write-Write Conflict**: Multiple write operations simultaneously attempt to access subbanks with the same index in the same bank group.
 - **Read-Read Conflict**: Multiple read operations simultaneously attempt to access subbanks with the same index in the same bank group.
 
 In Case 2, the first 10 rows of the UB tile array are stored in row-major order as shown below. According to the low-bit address interleaving rule, row 1 of the tile array covers bank 0 through bank 3, row 2 covers bank 4 through bank 7, row 3 covers bank 8 through bank 11, and the remaining rows follow the same pattern. For illustration purposes, only the first 10 rows are shown. Each row of 32 float elements spans exactly 4 banks, with the first element of each row marked in blue. In Case 2, one Warp reads one column of the tile and writes it back to GM output. When accessing UB, the 32 threads concentrate on subbank 0 in two bank groups, which is a read-read conflict scenario.
@@ -290,13 +290,13 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 
 **Performance Data**:
 
-| Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
+| Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
 |      23.483      |    1.055    |     1740.038     |      0.883      |     0.847     |        0.151        |      0.138      |
 
 **Analysis**:
 
-- Compared to the transpose_coalesced_kernel in Case 2, Task Duration decreases from 31.926us to 23.483us, a reduction of approximately 26.4%, with overall performance improvement of approximately 1.36x
+- Compared to the transpose_coalesced_kernel in Case 2, Task Duration decreases from 31.926μs to 23.483μs, a reduction of approximately 26.4%, with overall performance improvement of approximately 1.36x
 - Case 3 builds on Case 2 by avoiding UB bank conflicts during the transpose read phase through padding, so the end-to-end Task Duration continues to decrease
 - Compared to the naive transpose in Case 1, Case 3 Task Duration decreases by approximately 61.8%, with overall performance improvement of approximately 2.62x, demonstrating that "GM memory coalescing + UB bank conflict avoidance" optimizations stack effectively on end-to-end latency
 - Compared to the Case 0 copy baseline, Case 3 Task Duration is only approximately 8.0% higher, already close to the contiguous GM read/write baseline. Compared with the copy version, Case 3 still needs UB staging, synchronization, and UB transpose reads. The summary metrics alone do not further break down the remaining gap.
@@ -309,10 +309,10 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 
 **Overall Optimization Effect**:
 
-- From Case 1 direct-index transpose to Case 3 fully optimized version, Task Duration decreases from 61.508us to 23.483us, a reduction of approximately 61.8%, with overall performance improvement of approximately 2.62x
+- From Case 1 direct-index transpose to Case 3 fully optimized version, Task Duration decreases from 61.508μs to 23.483μs, a reduction of approximately 61.8%, with overall performance improvement of approximately 2.62x
 - Case 3 is only approximately 8.0% higher than the Case 0 copy baseline, indicating that through GM memory coalescing and UB bank conflict avoidance, matrix transpose is already close to the contiguous GM read/write baseline
 
-| Case version | Task Duration(us) | Task Duration Relative to Case 0 | Optimization Points                          |
+| Case version | Task Duration(μs) | Task Duration Relative to Case 0 | Optimization Points                          |
 | ------------ | ----------------- | -------------------------------- | -------------------------------------------- |
 | Case 0       | 21.751            | **1x**                     | Matrix copy baseline, contiguous GM read/write |
 | Case 1       | 61.508            | **2.83x latency**           | Direct-index transpose, contiguous GM read, non-contiguous write |
