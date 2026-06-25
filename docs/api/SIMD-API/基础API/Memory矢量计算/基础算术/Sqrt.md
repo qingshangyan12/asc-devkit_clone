@@ -5,7 +5,7 @@
 ### 不传入config的原型
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：不支持
+- Ascend 950PR/Ascend 950DT：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
@@ -122,15 +122,15 @@ $dst_i = \sqrt{src_i}$
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表1**  模板参数说明
+**表1** 模板参数说明
 
 | 参数名 | 描述 |
 |---|---|
 | T | 操作数数据类型。 |
 | isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。 |
-| <!-- npu="950" id22 -->config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置精度计算模式，SqrtConfig类型，定义如下：<br><br>enum&nbsp;class&nbsp;SqrtAlgo&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;INTRINSIC&nbsp;=&nbsp;0,<br>&nbsp;&nbsp;&nbsp;&nbsp;FAST_INVERSE,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_1ULP_FTZ_TRUE,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_0ULP_FTZ_FALSE,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_1ULP_FTZ_FALSE,<br>};<br>struct&nbsp;SqrtConfig&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;SqrtAlgo&nbsp;algo&nbsp;=&nbsp;SqrtAlgo::INTRINSIC;<br>};<br>通过SqrtConfig结构体的参数algo来配置精度计算模式。algo取值如下：<br>&bull; SqrtAlgo::INTRINSIC、SqrtAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，最大精度误差为1 ulp。<br>&bull; SqrtAlgo::FAST_INVERSE、SqrtAlgo::PRECISION_0ULP_FTZ_FALSE，使用快速求逆算法得出结果。适用于输入值在[0, 85070596800837026223494223584045301760]范围内的计算。在该范围内，算法保证输出的最大精度误差为0 ulp；当输入值大于85070596800837026223494223584045301760时，输出为0。目前，该算法仅支持float数据类型，并在该模式下支持Subnormal数据计算。<br>&bull; SqrtAlgo::PRECISION_1ULP_FTZ_FALSE，仅支持half类型的Subnormal数据计算，此时最大精度误差为1 ulp。<br>该参数的默认值DEFAULT_SQRT_CONFIG的取值如下：<br><br>constexpr&nbsp;SqrtConfig&nbsp;DEFAULT_SQRT_CONFIG&nbsp;=&nbsp;{&nbsp;SqrtAlgo::INTRINSIC&nbsp;};<br><!-- end id22 --> |
+| <!-- npu="950" id22 -->config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置精度计算模式，SqrtConfig类型，定义如下：<br><pre>enum&nbsp;class&nbsp;SqrtAlgo&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;INTRINSIC&nbsp;=&nbsp;0,<br>&nbsp;&nbsp;&nbsp;&nbsp;FAST_INVERSE,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_1ULP_FTZ_TRUE,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_0ULP_FTZ_FALSE,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_1ULP_FTZ_FALSE,<br>};<br>struct&nbsp;SqrtConfig&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;SqrtAlgo&nbsp;algo&nbsp;=&nbsp;SqrtAlgo::INTRINSIC;<br>};</pre>通过SqrtConfig结构体的参数algo来配置精度计算模式。algo取值如下：<br>&bull; SqrtAlgo::INTRINSIC、SqrtAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，最大精度误差为1ulp。<br>&bull; SqrtAlgo::FAST_INVERSE、SqrtAlgo::PRECISION_0ULP_FTZ_FALSE，使用快速求逆算法得出结果。适用于输入值在[0, 85070596800837026223494223584045301760]范围内的计算。在该范围内，算法保证输出的最大精度误差为0ulp；当输入值大于85070596800837026223494223584045301760时，输出为0。目前，该算法仅支持float数据类型，并在该模式下支持Subnormal数据计算。<br>&bull; SqrtAlgo::PRECISION_1ULP_FTZ_FALSE，仅支持half类型的Subnormal数据计算，此时最大精度误差为1ulp。<br>该参数的默认值DEFAULT_SQRT_CONFIG的取值如下：<br><pre>constexpr&nbsp;SqrtConfig&nbsp;DEFAULT_SQRT_CONFIG&nbsp;=&nbsp;{&nbsp;SqrtAlgo::INTRINSIC&nbsp;};</pre><br>调用本原型时若显示传入config参数，则默认使用DEFAULT_SQRT_CONFIG，此时行为与不传入config参数的原型等价。<!-- end id22 --> |
 
-**表2**  参数说明
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
@@ -155,7 +155,7 @@ T支持的数据类型为：half、float。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
 
 <!-- npu="A3,910b" id21 -->
-- 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+- 针对如下型号，该接口通过VF调用Reg矢量计算API(跳转)实现兼容，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
   <!-- npu="A3" id19 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
   <!-- end id19 -->
@@ -165,6 +165,35 @@ T支持的数据类型为：half、float。
 <!-- end id21 -->
 
 - 如果src中的数值为非正数，可能会产生未知结果。
+
+<!-- npu="950" id23 -->
+- 针对Ascend 950PR/Ascend 950DT，如下约束说明：
+  - SqrtAlgo::FAST\_INVERSE、SqrtAlgo::PRECISION\_0ULP\_FTZ\_FALSE，使用快速求逆算法得出结果。适用于输入值在\[0, 85070596800837026223494223584045301760\]范围内的计算。在该范围内，算法保证输出的最大精度误差为0ulp；当输入值大于85070596800837026223494223584045301760时，输出为0。目前，该算法仅支持float数据类型，并在该模式下支持Subnormal数据计算。
+  - tensor高维切分计算调用GetTemporaryBufferAddr，占用8KB Unified Buffer。
+  - tensor前n个数据连续计算未调用GetTemporaryBufferAddr，不涉及8KB Unified Buffer。
+  - tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。
+  - 该接口通过VF调用Reg矢量计算API(跳转)实现兼容，当参数count或repeatTime取值为0时，软仿行为不保证该接口被视为NOP（空操作）。
+<!-- end id23 -->
+
+## 关键特性<a name="section18972943153217"></a>
+
+<!-- npu="950" id24 -->
+针对Ascend 950PR/Ascend 950DT，有如下关键特性：
+
+**最大精度误差**：
+
+- SqrtAlgo::INTRINSIC、SqrtAlgo::PRECISION\_1ULP\_FTZ\_TRUE，最大精度误差为1ulp。
+- SqrtAlgo::PRECISION\_1ULP\_FTZ\_FALSE，软仿实现，最大精度误差为1ulp。
+- SqrtAlgo::FAST\_INVERSE、SqrtAlgo::PRECISION\_0ULP\_FTZ\_FALSE，软仿实现，最大精度误差为0ulp。
+
+**配置Subnormal模式**：
+
+FTZ（Flush To Zero）：一种浮点运算模式，当结果为[Subnormal](../../数据结构/内置数据类型.md#p7381131713310)时，将其直接清零（近似为0），而非保留其精确的微小数值。
+
+只有将algo设置为SqrtAlgo::FAST\_INVERSE、SqrtAlgo::PRECISION\_0ULP\_FTZ\_FALSE、SqrtAlgo::PRECISION\_1ULP\_FTZ\_false时，Sqrt接口才会保留并正确输出Subnormal结果；其他模式下Subnormal均被FTZ。
+
+由于Subnormal的计算行为是通过软件仿真算法实现，一般场景推荐使用性能更好的SqrtAlgo::INTRINSIC、SqrtAlgo::PRECISION\_1ULP\_FTZ\_TRUE；需要精确Subnormal输出的场景（如特定数据精度要求的算法、避免除零错误）使用SqrtAlgo::FAST\_INVERSE、SqrtAlgo::PRECISION\_0ULP\_FTZ\_FALSE、SqrtAlgo::PRECISION\_1ULP\_FTZ\_FALSE。
+<!-- end id24 -->
 
 ## 调用示例<a name="section176061616102911"></a>
 
@@ -194,15 +223,14 @@ T支持的数据类型为：half、float。
     AscendC::Sqrt(dstLocal, srcLocal, 512);
     ```
 
-
-<!-- npu="950" id23 -->
+<!-- npu="950" id25 -->
 以下示例仅支持Ascend 950PR/Ascend 950DT
 
     ```cpp
     static constexpr SqrtConfig config = { SqrtAlgo::PRECISION_1ULP_FTZ_FALSE };
     AscendC::Sqrt<T, config>(dstLocal, srcLocal, 512);
     ```
-<!-- end id23 -->
+<!-- end id25 -->
 
 结果示例如下：
 
@@ -210,3 +238,5 @@ T支持的数据类型为：half、float。
 输入数据srcLocal：[1.0 2.0 3.0 4.0 ...]
 输出数据dstLocal：[1.0 1.414 1.732 2.0 ...]
 ```
+
+完整样例请参考[单目矢量计算类API样例](https://gitcode.com/cann/asc-devkit/pull/873)。
