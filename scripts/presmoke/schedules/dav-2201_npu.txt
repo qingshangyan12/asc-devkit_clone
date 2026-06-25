@@ -22,6 +22,7 @@
 01_simd_cpp_api/06_compatibility_guide/fill
 01_simd_cpp_api/06_compatibility_guide/scatter
 01_simd_cpp_api/03_basic_api/09_utils/gm_by_pass_dcache
+01_simd_cpp_api/03_basic_api/09_utils/gm_by_dcache
 01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_unitflag
 01_simd_cpp_api/03_basic_api/05_sync_control/task_sync
 01_simd_cpp_api/06_compatibility_guide/data_copy_l1togm
@@ -56,6 +57,7 @@
 01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_gemv
 01_simd_cpp_api/06_compatibility_guide/set_loaddata_boundary
 01_simd_cpp_api/03_basic_api/04_memory_management/tmp_buffer
+01_simd_cpp_api/03_basic_api/04_memory_management/tensor_allocation
 01_simd_cpp_api/00_introduction/01_add/add_tpipe_tque
 01_simd_cpp_api/03_basic_api/01_memory_vector_compute/compare
 01_simd_cpp_api/03_basic_api/01_memory_vector_compute/create_vec_index

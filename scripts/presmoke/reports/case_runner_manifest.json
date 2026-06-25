@@ -2897,6 +2897,32 @@
     ]
   },
   {
+    "case": "01_simd_cpp_api/03_basic_api/04_memory_management/tensor_allocation",
+    "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_basic_api/04_memory_management/tensor_allocation/run.sh",
+    "source": "readme",
+    "confidence": "low",
+    "supported_archs": [
+      "dav-2201",
+      "dav-3510"
+    ],
+    "supported_modes": [
+      "cpu",
+      "npu",
+      "sim"
+    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [
+      "shell_variable_reference"
+    ],
+    "commands": [
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "make -j",
+      "./demo"
+    ]
+  },
+  {
     "case": "01_simd_cpp_api/03_basic_api/04_memory_management/tmp_buffer",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_basic_api/04_memory_management/tmp_buffer/run.sh",
     "source": "readme",
@@ -3340,6 +3366,30 @@
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo",
       "python3 ../scripts/verify_result.py output/output.bin output/golden.bin"
+    ]
+  },
+  {
+    "case": "01_simd_cpp_api/03_basic_api/09_utils/gm_by_dcache",
+    "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_basic_api/09_utils/gm_by_dcache/run.sh",
+    "source": "readme",
+    "confidence": "high",
+    "supported_archs": [
+      "dav-2201",
+      "dav-3510"
+    ],
+    "supported_modes": [
+      "cpu",
+      "npu",
+      "sim"
+    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
+    "commands": [
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "make -j",
+      "./demo"
     ]
   },
   {
@@ -7048,6 +7098,30 @@
       "make -j",
       "./sincos_compute 1024",
       "./sincos_compute 512"
+    ]
+  },
+  {
+    "case": "03_simt_api/03_best_practices/02_control_flow/warp_divergence",
+    "runner": "scripts/presmoke/cases/03_simt_api/03_best_practices/02_control_flow/warp_divergence/run.sh",
+    "source": "readme",
+    "confidence": "low",
+    "supported_archs": [
+      "dav-3510"
+    ],
+    "supported_modes": [
+      "npu"
+    ],
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [
+      "shell_variable_reference",
+      "unsupported_on_target_arch_or_mode"
+    ],
+    "commands": [
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "make -j",
+      "./demo"
     ]
   },
   {
