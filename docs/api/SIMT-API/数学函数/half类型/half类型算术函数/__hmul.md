@@ -51,11 +51,11 @@ half __hmul(const half x, const half y)
 
     | x值 | y值 | 非饱和模式返回值 | 饱和模式返回值 |
     | --- | --- | --- | --- |
-    | 非0值 | ±inf | 符号由x和y的符号异或决定，值为inf | 符号由x和y的符号异或决定，值为ASCRT_MAX_NORMAL_FP16 |
+    | 非0值 | ±inf | 符号由x和y的符号异或决定，值为inf | 符号由x和y的符号异或决定，值为ASCRT\_MAX\_NORMAL\_FP16 |
     | ±0 | ±inf | nan | 0 |
     | ±0 | 有限值 | 返回值符号由x和y的符号异或决定，值为0 | 返回值符号由x和y的符号异或决定，值为0 |
-    | ±inf | ∓inf | ±inf | ±ASCRT_MAX_NORMAL_FP16 |
-    | x，y任意一个为nan |  x，y任意一个为nan |nan | 0 |
+    | ±inf | ∓inf | ±inf | ±ASCRT\_MAX\_NORMAL\_FP16 |
+    | x，y任意一个为nan | |nan | 0 |
 
 ## 约束说明
 

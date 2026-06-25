@@ -45,8 +45,17 @@ bool __hbgex2(half2 x, half2 y)
 
 比较输入各分量是否均满足第一个数大于或等于第二个数的结果。
 
--   true：各分量均满足第一个数大于或等于第二个数。
--   false：任一分量不满足第一个数大于或等于第二个数。任一输入的分量为nan，该分量的比较结果为false。
+| x值 | y值 | 返回值 |
+| --- | --- | --- |
+| 任一分量为nan | | false |
+| (±0, ±0) | (±0, ±0) | true |
+| (inf, inf) | (正常值, 正常值) | true |
+| (-inf, -inf) | (正常值, 正常值) | false |
+| (正常值, 正常值) | (inf, inf) | false |
+| (正常值, 正常值) | (-inf, -inf) | true |
+| (inf, inf) | (inf, inf) | true |
+| (inf, inf) | (-inf, -inf) | true |
+| (-inf, -inf) | (-inf, -inf) | true |
 
 ## 约束说明
 
