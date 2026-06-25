@@ -15,12 +15,16 @@
 | 搬运出 | MakeCopy(CopyUB2GM{}) -> Copy(atom, yGm, yUb) |
 | 内存分配 | 计算offset + MakeMemPtr<Location::UB, T>(offset) |
 
-**支持两种场景：**
+**支持六种场景：**
 
-| SCENARIO_NUM | 转换 | RoundMode | SatMode |
-|---|---|---|---|
-| 1 | half -> int32_t | RD (floor) | NoSat |
-| 2 | float -> int16_t | RN (round) | Sat |
+| SCENARIO_NUM | 转换 | RoundMode | SatMode | IndexPos |
+|---|---|---|---|---|
+| 1 | half -> int32_t | RD (floor) | NoSat | - |
+| 2 | float -> int16_t | RN (round) | Sat | - |
+| 3 | int8_t -> int32_t | RD (floor) | NoSat | PartP0 |
+| 4 | int32_t -> uint8_t | RD (floor) | Sat | PartP0 |
+| 5 | bfloat16_t -> float | - | - | Even |
+| 6 | float -> bfloat16_t | RN (round) | NoSat | Even |
 
 ## 编译运行
 

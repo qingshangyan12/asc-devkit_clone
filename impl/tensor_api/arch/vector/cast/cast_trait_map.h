@@ -441,7 +441,7 @@ using CastRoundingMap = TupleMap<
 >;
 
 #if !defined(ASCENDC_CPU_DEBUG)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || defined(__ASC_NPU_HOST__)
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)) || defined(__ASC_NPU_HOST__)
 
 using CastSub_float_to_hifloat8_t = TupleMap<
     Std::tuple<Std::tuple<CastRoundMode::RH, Std::ignore_t, Std::ignore_t>, Inst::Float2Hif8RHNoSatP0>,
@@ -706,7 +706,7 @@ ASCENDC_CAST_SUB_MAP(uint8_t, uint16_t)
 ASCENDC_CAST_SUB_MAP(uint8_t, uint32_t)
 
 #if !defined(ASCENDC_CPU_DEBUG)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || defined(__ASC_NPU_HOST__)
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)) || defined(__ASC_NPU_HOST__)
 ASCENDC_CAST_SUB_MAP(bfloat16_t, fp4x2_e1m2_t)
 ASCENDC_CAST_SUB_MAP(bfloat16_t, fp4x2_e2m1_t)
 ASCENDC_CAST_SUB_MAP(float, fp8_e4m3fn_t)
