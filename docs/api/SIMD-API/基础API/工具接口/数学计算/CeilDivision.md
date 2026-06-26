@@ -56,11 +56,11 @@ __aicore__ inline void AddCustomImpl(__local_mem__ T *dst, __local_mem__ T *src0
     constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(T);
     uint16_t repeatTime = AscendC::CeilDivision(count, oneRepeatSize);
     for (uint16_t i = 0; i < repeatTime; ++i) {
-        mask = AscendC::Reg::UpdateMask<T>(calCount);
+        mask = AscendC::Reg::UpdateMask<T>(count);
         AscendC::Reg::LoadAlign(srcReg0, src0 + i * oneRepeatSize );
         AscendC::Reg::LoadAlign(srcReg1, src1 + i * oneRepeatSize );
         AscendC::Reg::Add(dstReg, srcReg0, srcReg1, mask);
-        AscendC::Reg::StoreAlign(dst + i * repeatElm, reg2, mask);
+        AscendC::Reg::StoreAlign(dst + i * oneRepeatSize, dstReg, mask);
     }
 }
 ```
