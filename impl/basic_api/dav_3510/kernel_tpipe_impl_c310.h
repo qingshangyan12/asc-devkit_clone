@@ -911,7 +911,7 @@ __aicore__ inline void TPipe::ResetPool()
         buf[static_cast<int32_t>(Hardware::L1)].maxAddr = 0;
     } else {
         for (int32_t i = 0; i < static_cast<int32_t>(Hardware::MAX); i++, buf++) {
-            buf->maxAddr = 0
+            buf->maxAddr = 0;
         }
     }
 #endif
