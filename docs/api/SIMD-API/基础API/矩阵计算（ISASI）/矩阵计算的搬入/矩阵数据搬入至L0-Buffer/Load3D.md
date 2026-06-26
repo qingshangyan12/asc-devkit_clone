@@ -258,8 +258,8 @@ Kirin X90；
 | filterSizeW | 是否在filterW的基础上将卷积核width增加256个元素。true，增加；false，不增加。 |
 | filterSizeH | 是否在filterH的基础上将卷积核height增加256个元素。true，增加；false，不增加。 |
 | fMatrixCtrl | 表示LoadData3DV2指令从左矩阵还是右矩阵获取FeatureMap的属性描述，与SetFmatrix配合使用，当前只支持设置为false，默认值为false。<br>&nbsp;&nbsp;&bull; true：从右矩阵中获取FeatureMap的属性描述；<br>&nbsp;&nbsp;&bull; false：从左矩阵中获取FeatureMap的属性描述。 |
-| extConfig | 组合参数(uint64_t类型)，默认值为0；<br><pre>extConfig= ((uint64_t)mStartPt << 48) \ | ((uint64_t)kStartPt << 32) \ | ((uint64_t)mExtension << 16) \ | (uint64_t)kExtension;</pre> |
-| filterConfig | 组合参数(uint64_t类型)，默认值为0X10101010101；<br><pre>filterConfig= ((uint64_t)dilationFilterH << 40) \ | ((uint64_t)dilationFilterW << 32) \ | ((uint64_t)filterH << 24) \ | ((uint64_t)filterW << 16) \ | ((uint64_t)strideH << 8) \ | (uint64_t)strideW;</pre> |
+| extConfig | 组合参数(uint64_t类型)，默认值为0；<br><pre>extConfig= ((uint64_t)mStartPt << 48) \| ((uint64_t)kStartPt << 32) \| ((uint64_t)mExtension << 16) \| (uint64_t)kExtension;</pre> |
+| filterConfig | 组合参数(uint64_t类型)，默认值为0X10101010101；<br><pre>filterConfig= ((uint64_t)dilationFilterH << 40) \| ((uint64_t)dilationFilterW << 32) \| ((uint64_t)filterH << 24) \| ((uint64_t)filterW << 16) \| ((uint64_t)strideH << 8) \| (uint64_t)strideW;</pre> |
 
 </cann-filter>
 

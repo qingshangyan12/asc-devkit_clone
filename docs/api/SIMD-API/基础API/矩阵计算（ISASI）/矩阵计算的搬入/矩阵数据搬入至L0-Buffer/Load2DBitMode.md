@@ -71,10 +71,10 @@ Load2DBitModeParam类可以直接使用LoadData2DParamsV2结构体类型对象�
 LoadData2DParamsV2 loadDataParams;
 loadDataParams.mStartPosition = 0;
 loadDataParams.kStartPosition = 0;
-loadDataParams.mStep = xxx;
-loadDataParams.kStep = xxx;
-loadDataParams.srcStride = xxx;
-loadDataParams.dstStride = xxx;
+loadDataParams.mStep = 2;
+loadDataParams.kStep = 2;
+loadDataParams.srcStride = 2;
+loadDataParams.dstStride = 2;
 loadDataParams.sid = 0;
 loadDataParams.ifTranspose = false;
 Load2DBitModeParam params(loadDataParams);  // 直接使用LoadData2DParamsV2结构体类型对象初始化
