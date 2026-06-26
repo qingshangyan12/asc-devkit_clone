@@ -1285,7 +1285,7 @@
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p318519518103"><a name="p318519518103"></a><a name="p318519518103"></a>获取当前系统cycle数，若换算成时间需要按照50MHz的频率，时间单位为us，换算公式为：time = (cycle数/50) us 。</p>
 </td>
 </tr>
-<tr id="row23644391720"><td class="cellrowborder" rowspan="3" valign="top" width="12.379999999999999%" headers="mcps1.2.4.1.1 "><p id="p13856134291819"><a name="p13856134291819"></a><a name="p13856134291819"></a>系统变量访问</p>
+<tr id="row23644391720"><td class="cellrowborder" rowspan="7" valign="top" width="12.379999999999999%" headers="mcps1.2.4.1.1 "><p id="p13856134291819"><a name="p13856134291819"></a><a name="p13856134291819"></a>系统变量访问</p>
 </td>
 <td class="cellrowborder" valign="top" width="27.63%" headers="mcps1.2.4.1.2 "><p id="p236104361711"><a name="p236104361711"></a><a name="p236104361711"></a><a href="基础API/特殊寄存器访问/SetCtrlSpr(ISASI).md">SetCtrlSpr</a></p>
 </td>
@@ -1300,6 +1300,26 @@
 <tr id="row28763469172"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p876017348182"><a name="p876017348182"></a><a name="p876017348182"></a><a href="基础API/特殊寄存器访问/ResetCtrlSpr(ISASI).md">ResetCtrlSpr</a></p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p5876194619170"><a name="p5876194619170"></a><a name="p5876194619170"></a><span id="ph818454202"><a name="ph818454202"></a><a name="ph818454202"></a>对CTRL寄存器（控制寄存器）的特定比特位做重置。</span></p>
+</td>
+</tr>
+<tr><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p><a href="基础API/特殊寄存器访问/GetSaturationFlag(ISASI).md">GetSaturationFlag</a></p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p>获取计算/精度转换时饱和模式的开启状态。</p>
+</td>
+</tr>
+<tr><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p><a href="基础API/特殊寄存器访问/SetSaturationFlag(ISASI).md">SetSaturationFlag</a></p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p>设置饱和开关的标志位，以控制计算/精度转换时饱和模式的开启与关闭。</p>
+</td>
+</tr>
+<tr><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p><a href="基础API/特殊寄存器访问/GetGlobalSaturationFlag(ISASI).md">GetGlobalSaturationFlag</a></p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p>读取饱和模式的全局生效标志位CTRL[60]。</p>
+</td>
+</tr>
+<tr><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p><a href="基础API/特殊寄存器访问/SetGlobalSaturationFlag(ISASI).md">SetGlobalSaturationFlag</a></p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p>设置饱和模式的全局生效标志位CTRL[60]。</p>
 </td>
 </tr>
 <tr id="row20229161014506"><td class="cellrowborder" rowspan="4" valign="top" width="12.379999999999999%" headers="mcps1.2.4.1.1 "><p id="p649691414505"><a name="p649691414505"></a><a name="p649691414505"></a>原子操作</p>
