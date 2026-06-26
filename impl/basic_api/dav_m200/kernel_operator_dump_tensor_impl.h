@@ -457,7 +457,7 @@ __aicore__ inline void WriteRingBufTlvHead(const Tensor<T>& src, __gm__ DumpTens
 __aicore__ inline void WriteRingBufTlvShape(__gm__ DumpTensorTlvInfoHead* dumpTensorTlv,
     const uint32_t shapeDim, const uint32_t* shape)
 {
-    if (shapeDim <= 0 || shapeDim >= K_MAX_SHAPE_DIM || shapeDim == nullptr) {
+    if (shapeDim <= 0 || shapeDim >= K_MAX_SHAPE_DIM || shape == nullptr) {
         return;
     }
     dumpTensorTlv->dim = static_cast<uint32_t>(shapeDim);
