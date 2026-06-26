@@ -292,8 +292,8 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
                                               param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11]);
             HCCL_INFO("[KfcServerGenCircularQueue] CcuAlltoAllMesh1DKernel finished.");
             */
-        } 
-        break;
+        }
+        repeatCond += one;
         /*
         MissionPostSync(ctx);
         HCCL_INFO("[KfcServerGenCircularQueue] MissionPostSync finished.");
