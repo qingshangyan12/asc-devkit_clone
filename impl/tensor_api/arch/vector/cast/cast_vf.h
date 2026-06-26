@@ -89,7 +89,7 @@ public:
             asc_loadalign(srcReg, src + i * oneRepSize);
             CalcFunc::template Run(dstReg, srcReg, fullMask);
             asc_storealign_pack_postupdate(dstCur, *reinterpret_cast<SrcRegType*>(&dstReg), oneRepSize / 2,
-                fullMask);
+                dstMask);
         }
     }
 };
@@ -127,7 +127,7 @@ public:
             asc_loadalign(srcReg, src + i * oneRepSize);
             CalcFunc::template Run(dstReg, srcReg, fullMask);
             asc_storealign_pack_postupdate_v2(dstCur, *reinterpret_cast<SrcRegType*>(&dstReg), oneRepSize / 4,
-                fullMask);
+                dstMask);
         }
     }
 };
