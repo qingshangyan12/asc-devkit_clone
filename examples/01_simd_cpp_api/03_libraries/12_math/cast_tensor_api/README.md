@@ -2,8 +2,7 @@
 
 ## 概述
 
-本样例基于 **Tensor API** 的 `Transform<Inst::Cast, Trait>` 接口实现数据类型转换，
-是原 [cast](../../03_basic_api/02_reg_vector_compute/cast/) 样例的 Tensor API 改造版。
+本样例基于 **Tensor API** 的Transform<Inst::Cast, Trait>接口实现数据类型转换。
 
 **主要改动：**
 
