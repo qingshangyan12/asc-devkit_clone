@@ -272,8 +272,10 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
         LoadFuncParamFromMemory(paramAddr, param, ctx);
         HCCL_INFO("[KfcServerGenCircularQueue] LoadFuncParamFromMemory finished.");
 
+        /*
         MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
         HCCL_INFO("[KfcServerGenCircularQueue] MissionPreSync finished.");
+        */
 
         ccu::Variable opType;
         opType = param[HBM_PARAM_IDX_0];
@@ -291,15 +293,14 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
             HCCL_INFO("[KfcServerGenCircularQueue] CcuAlltoAllMesh1DKernel finished.");
             */
         } 
-
+        break;
+        /*
         MissionPostSync(ctx);
         HCCL_INFO("[KfcServerGenCircularQueue] MissionPostSync finished.");
 
         // Set本轮完成信号
         SetTurnEndSig(recordAddr, turnEndSig, ctx);
         HCCL_INFO("[KfcServerGenCircularQueue] SetTurnEndSig finished.");
-
-        repeatCond = one;
 
         waitAddr += ckeSize;
         recordAddr += ckeSize;
@@ -311,6 +312,7 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
             paramAddr = paramStartAddr;
             queueIdx = 0;
         }
+        */
     }
 }
 
