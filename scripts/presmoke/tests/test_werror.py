@@ -19,7 +19,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from presmoke.case_runners import build_case_runner_cells_with_skips
+from presmoke.case_runners import CaseRunnerOptions, build_case_runner_cells_with_skips
 
 
 class WerrorTest(unittest.TestCase):
@@ -28,11 +28,13 @@ class WerrorTest(unittest.TestCase):
 
         cells, _, _ = build_case_runner_cells_with_skips(
             project_root,
-            "dav-2201",
-            ["npu"],
-            ["01_simd_cpp_api/00_introduction/00_quickstart/hello_world"],
-            [],
-            werror=True,
+            CaseRunnerOptions(
+                arch="dav-2201",
+                modes=["npu"],
+                includes=["01_simd_cpp_api/00_introduction/00_quickstart/hello_world"],
+                excludes=[],
+                werror=True,
+            ),
         )
 
         self.assertEqual(len(cells), 1)

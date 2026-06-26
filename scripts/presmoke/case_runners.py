@@ -23,6 +23,15 @@ from .model import Cell, Command, ExampleSpec, RunResult, Suggestion
 
 
 @dataclass
+class CaseRunnerOptions:
+    arch: str
+    modes: Iterable[str]
+    includes: Iterable[str]
+    excludes: Iterable[str]
+    werror: bool = False
+
+
+@dataclass
 class CaseRunnerContext:
     project_root: Path
     runners_root: Path
@@ -47,23 +56,19 @@ class RunnerInfo:
 
 def build_case_runner_cells_with_skips(
     project_root: Path,
-    arch: str,
-    modes: Iterable[str],
-    includes: Iterable[str],
-    excludes: Iterable[str],
-    werror: bool = False,
+    options: CaseRunnerOptions,
 ) -> tuple[List[Cell], List[Suggestion], List[RunResult]]:
     runners_root = project_root / "scripts" / "presmoke" / "cases"
     manifest = load_manifest(project_root)
     runner_dirs = sorted(path.parent for path in runners_root.rglob("run.sh"))
-    runner_dirs = filter_examples(runner_dirs, includes, excludes)
-    modes_list = list(modes)
+    runner_dirs = filter_examples(runner_dirs, options.includes, options.excludes)
+    modes_list = list(options.modes)
     context = CaseRunnerContext(
         project_root=project_root,
         runners_root=runners_root,
-        arch=arch,
+        arch=options.arch,
         modes=modes_list,
-        werror=werror,
+        werror=options.werror,
         cells=[],
         suggestions=[],
         skipped=[],

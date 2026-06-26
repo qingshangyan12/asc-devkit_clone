@@ -27,7 +27,7 @@ from pathlib import Path
 from typing import Iterator, List
 
 from .arch import detect_arch
-from .case_runners import build_case_runner_cells_with_skips
+from .case_runners import CaseRunnerOptions, build_case_runner_cells_with_skips
 from .discover import discover_examples, filter_examples
 from .model import RunReport, RunResult, Suggestion
 from .planner import build_cells_with_skips
@@ -135,11 +135,13 @@ def collect_cases(args: argparse.Namespace, config: RuntimeConfig) -> CaseSelect
     if args.runner_mode == "case-runner":
         cells, runner_suggestions, skipped_results = build_case_runner_cells_with_skips(
             config.project_root,
-            config.host_arch,
-            config.modes,
-            args.filter,
-            args.exclude,
-            werror=args.werror,
+            CaseRunnerOptions(
+                arch=config.host_arch,
+                modes=config.modes,
+                includes=args.filter,
+                excludes=args.exclude,
+                werror=args.werror,
+            ),
         )
         suggestions.extend(runner_suggestions)
     else:
