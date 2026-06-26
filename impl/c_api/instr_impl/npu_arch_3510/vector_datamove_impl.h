@@ -1992,12 +1992,6 @@ __simd_callee__ inline void asc_gather_datablock(vector_int64_t& dst, __ubuf__  
     asc_gather_datablock_impl(dst, src, index);
 }
 
-__simd_callee__ inline void asc_gather_datablock(vector_uint64_t& dst, __ubuf__  uint64_t* src,
-    vector_uint32_t index)
-{
-    asc_gather_datablock_impl(dst, src, index);
-}
-
 __simd_callee__ inline void asc_gather_datablock(vector_half& dst, __ubuf__  half* src,
     vector_uint32_t index)
 {
@@ -2877,11 +2871,6 @@ __simd_callee__ inline void asc_loadalign(vector_int64_t& dst, __ubuf__ int64_t*
 }
 
 __simd_callee__ inline void asc_loadalign(vector_uint64_t& dst, __ubuf__ uint64_t* src, iter_reg offset)
-{
-    asc_loadalign_impl(dst, src, offset);
-}
-
-__simd_callee__ inline void asc_loadalign(vector_half& dst, __ubuf__ half* src, iter_reg offset)
 {
     asc_loadalign_impl(dst, src, offset);
 }
@@ -6288,7 +6277,7 @@ __simd_callee__ inline void asc_scatter(vector_uint32_t& dst, __ubuf__ uint32_t*
     asc_scatter_impl(dst, src, index, mask);
 }
 
-__simd_callee__ inline void asc_scatter(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint16_t index, vector_bool mask)
+__simd_callee__ inline void asc_scatter(vector_bf16& dst, __ubuf__ bfloat16_t* src, vector_uint16_t index, vector_bool mask)
 {
     asc_scatter_impl(dst, src, index, mask);
 }
@@ -6580,8 +6569,8 @@ __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst, __ubuf__ void* src, ui
 }
 
 __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst, __ubuf__ void* src,
-            uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap) {
-    asc_copy_ub2l1_impl(dst, src, n_burst, len_burst, src_gap, dst_gap);
+            uint16_t burst_num, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap) {
+    asc_copy_ub2l1_impl(dst, src, burst_num, burst_len, src_gap, dst_gap);
 }
 
 __aicore__ inline void asc_copy_ub2l1_sync(__cbuf__ void* dst, __ubuf__ void* src, uint32_t size) {
@@ -6593,8 +6582,8 @@ __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src, ui
 }
 
 __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src,
-                                      uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap) {
-    asc_copy_ub2ub_impl(dst, src, n_burst, len_burst, src_gap, dst_gap);
+                                      uint16_t burst_num, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap) {
+    asc_copy_ub2ub_impl(dst, src, burst_num, burst_len, src_gap, dst_gap);
 }
 
 __aicore__ inline void asc_copy_ub2ub_sync(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size) {

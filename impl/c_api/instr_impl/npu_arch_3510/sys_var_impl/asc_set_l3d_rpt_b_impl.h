@@ -22,9 +22,7 @@
 
 __aicore__ inline void asc_set_l3d_rpt_b_impl(uint64_t config)
 {
-    if ASC_IS_AIC {
-        set_l3d_rpt_b(config);
-    }
+    set_l3d_rpt_b(config);
 }
 #endif
 

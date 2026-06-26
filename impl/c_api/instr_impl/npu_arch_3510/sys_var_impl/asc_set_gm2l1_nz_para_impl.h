@@ -22,9 +22,7 @@
 
 __aicore__ inline void asc_set_gm2l1_nz_para_impl(uint64_t config)
 {
-    if ASC_IS_AIC {
-        set_mte2_nz_para(config);
-    }
+    set_mte2_nz_para(config);
 }
 
 #endif
