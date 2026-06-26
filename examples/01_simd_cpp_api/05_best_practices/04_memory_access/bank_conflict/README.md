@@ -408,7 +408,7 @@ UB 18 位地址编码遵循如下规则：
   cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DCASE_NUM=$CASE_NUM;make -j;  # 编译工程
   python3 ../scripts/gen_data.py --case $CASE_NUM          # 生成测试输入数据
   ./demo                                                   # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output_z.bin output/golden.bin input/input_x.bin input/input_y.bin  # 验证输出结果是否正确
+  python3 ../scripts/verify_result.py output/output_z.bin output/golden.bin  # 验证输出结果是否正确
   ```
 
 - 编译选项说明
