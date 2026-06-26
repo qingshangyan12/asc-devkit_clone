@@ -592,7 +592,7 @@ function balanceDivTags(html) {
             )
             return '$$' + inside.trim() + '$$'
           })
-          html = html.replace(/\$(?!\{)([^$\n]+?)\$/g, (match) => {
+          html = html.replace(/\$(?!\{[\w]+\})([^$\n]+?)\$/g, (match) => {
             let inside = match.slice(1, -1)
             inside = inside.replace(/<em>/g, '_').replace(/<\/em>/g, '_')
             inside = inside.replace(/<[^>]+>/g, '')
@@ -602,7 +602,7 @@ function balanceDivTags(html) {
           })
 
           html = html.replace(/\$\$([\s\S]*?)\$\$/g, (_, tex) => renderMathTex(tex, true))
-          html = html.replace(/\$(?!\{)([^$\n]+?)\$/g, (_, tex) => renderMathTex(tex, false))
+          html = html.replace(/\$(?!\{[\w]+\})([^$\n]+?)\$/g, (_, tex) => renderMathTex(tex, false))
 
           html = html.replace(/<mjx-assistive-mml[\s\S]*?<\/mjx-assistive-mml>/gi, '')
 
