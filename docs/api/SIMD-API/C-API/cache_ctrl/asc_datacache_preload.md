@@ -40,8 +40,8 @@ PIPE_S
 ## 调用示例
 
 ```cpp
-// 假设x为外部传入的地址，通过asc_get_block_idx()计算偏移实现多核间数据隔离
-__gm__ float* x_gm = x + asc_get_block_idx() * 16;
+// 假设x为外部传入的地址，每个核计算16个数据，block_idx为内置变量，通过block_idx计算偏移实现多核间数据隔离
+__gm__ float* x_gm = x + block_idx * 16;
 int64_t cacheOffset = 0;
 asc_datacache_preload(reinterpret_cast<__gm__ uint64_t*>(x_gm), cacheOffset);
 ```

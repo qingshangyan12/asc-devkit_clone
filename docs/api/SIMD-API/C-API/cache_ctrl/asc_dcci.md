@@ -69,10 +69,10 @@ PIPE_S
 
 ```cpp
 // 示例1：SINGLE_CACHE_LINE模式（64B对齐场景）
-// 假设x为外部传入的地址，通过asc_get_block_idx()计算偏移实现多核间数据隔离
-__gm__ float* x_gm = x + asc_get_block_idx() * 16;
+// 假设x为外部传入的地址，每个核计算16个数据，block_idx为内置变量，通过block_idx计算偏移实现多核间数据隔离
+__gm__ float* x_gm = x + block_idx() * 16;
 for (int i = 0; i < 16; i++) {
-    x_gm[i] = static_cast<float>(i + asc_get_block_idx());
+    x_gm[i] = static_cast<float>(i + block_idx());
 }
 // 由于首地址64B对齐，调用asc_dcci_single指令后，数据会立刻刷新到Global Memory
 asc_dcci_single(reinterpret_cast<__gm__ uint64_t*>(x_gm));
