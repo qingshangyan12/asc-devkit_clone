@@ -78,6 +78,9 @@ __simd_callee__ __ubuf__ inline BlockVFBufInfo* get_printf_ubuf_addr(uint64_t ad
         bufInfo->writeLen = 0;
         bufInfo->pidx = 0;
         bufInfo->blockIdx = blockIdx;
+        bufInfo->finish = 0;
+        bufInfo->assert = 0;
+        bufInfo->readLen = 0;
     }
     return reinterpret_cast<__ubuf__ BlockVFBufInfo*>(info[0]);
 #else
@@ -239,26 +242,41 @@ __aicore__ inline void update_write_info(
 __aicore__ inline void asc_vf_debug_ub2gm()
 {
     __ubuf__ BlockVFBufInfo* blockInfo = get_printf_ubuf_addr_aicore(0);
-    __ubuf__ uint8_t* tlv = reinterpret_cast<__ubuf__ uint8_t*>(blockInfo->buffer);
+    for (;;) {
+        const uint32_t readLen = blockInfo->readLen;
+        const uint32_t writeLen = blockInfo->writeLen;
+        if (readLen == writeLen) {
+            if (blockInfo->assert == 1) {
+                blockInfo->assert = 2;
+                return;
+            }
+            if (blockInfo->finish == 1) {
+                return;
+            }
+            continue;
+        }
 
-    __gm__ BlockRingBufInfo* blockRingBufInfo = get_block_ring_buf_info();
-    __gm__ uint8_t* dstTlv = reinterpret_cast<__gm__ uint8_t*>(call_get_ring_buf_tlv(blockRingBufInfo));
-    const uint32_t tlvLen = blockInfo->writeLen;
+        const uint32_t tlvLen = writeLen - readLen;
 
-    sync_all_impl();
-    constexpr uint32_t sizeU32 = sizeof(uint32_t);
-    const uint32_t totalWords = (tlvLen + sizeU32 - 1) / sizeU32;
-    auto* dstWords = reinterpret_cast<__gm__ uint32_t*>(dstTlv);
-    auto* srcWords = reinterpret_cast<__ubuf__ uint32_t*>(tlv);
-    for (uint32_t i = 0; i < totalWords; ++i) {
-        dstWords[i] = srcWords[i];
+        // Drain pending TLVs before acknowledging assert or finish.
+        __ubuf__ uint8_t* tlv = reinterpret_cast<__ubuf__ uint8_t*>(blockInfo->buffer) + readLen;
+        __gm__ BlockRingBufInfo* blockRingBufInfo = get_block_ring_buf_info();
+        __gm__ uint8_t* dstTlv = reinterpret_cast<__gm__ uint8_t*>(call_get_ring_buf_tlv(blockRingBufInfo));
+
+        constexpr uint32_t sizeU32 = sizeof(uint32_t);
+        const uint32_t totalWords = (tlvLen + sizeU32 - 1) / sizeU32;
+        auto* dstWords = reinterpret_cast<__gm__ uint32_t*>(dstTlv);
+        auto* srcWords = reinterpret_cast<__ubuf__ uint32_t*>(tlv);
+        for (uint32_t i = 0; i < totalWords; ++i) {
+            dstWords[i] = srcWords[i];
+        }
+
+        asc_entire_dcci_impl(reinterpret_cast<__gm__ uint64_t*>(dstTlv));
+
+        __gm__ RingBufWriteInfo* writeInfo = get_ring_buf_write_info(blockRingBufInfo);
+        update_write_info(writeInfo, tlvLen);
+        blockInfo->readLen = writeLen;
     }
-    sync_all_impl();
-
-    asc_entire_dcci_impl(reinterpret_cast<__gm__ uint64_t*>(dstTlv));
-
-    __gm__ RingBufWriteInfo* writeInfo = get_ring_buf_write_info(blockRingBufInfo);
-    update_write_info(writeInfo, tlvLen, blockInfo->pidx);
 }
 }
 
