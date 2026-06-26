@@ -11,7 +11,7 @@
 ## 功能说明
 
 设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子比较取大操作。数据类型支持int8_t/int16_t/int32_t/bfloat16_t/half/float。
-<!-- npu="950" id2 -->设置对后续的从Unified Buffer/L0C Buffer/到Global Memory的数据传输开启原子比较取大操作。数据类型支持int8_t/int16_t/int32_t/bfloat16_t/half/float。<!-- end id2 -->
+特别地，针对Ascend 950PR/Ascend 950DT，不支持L1 Buffer到Global Memory的通路。
 
 ## 函数原型
 
