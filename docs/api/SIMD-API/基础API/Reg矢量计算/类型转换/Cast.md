@@ -36,6 +36,17 @@ Cast用于数据类型精度转换，将源操作数数据类型转换成目的�
 - [MaskMergeMode](../数据类型/MaskMergeMode.md)：用于指定写入寄存器数据模式，mask未选择的元素在dst中置零或保留dst原值。
 - [RoundMode](../数据类型/RoundMode.md)：用于设置舍入模式。
 
+不同数据类型下元素对应的mask位宽不一致，在cast进行类型转换时，maskReg根据输入的源操作数进行有效元素筛选。
+图[b16到b32类型转换过程](#fig1)和图[b32到b16类型转换过程](#fig2)展示了MaskReg和RegLayout同时作用时b16和b32进行类型转换的过程。
+
+**图1** b16到b32类型转换过程<a id="fig1"></a>  
+
+![](../../../../figures/b16到b32类型转换过程.png)
+
+**图2** b32到b16类型转换过程<a id="fig2"></a>  
+
+![](../../../../figures/b32到b16类型转换过程.png)
+
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
@@ -110,13 +121,13 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask);
 
 - 特别地，int4x2_t/fp4x2_e2m1_t/fp4x2_e1m2_t和b16之间的转换，指令会以每2个元素为一对进行读写，大转小时mask有效位以偶数位为准。
 
-    图1和图2展示了MaskReg和RegLayout同时作用时fp4x2_e2m1_t和bfloat16_t之间的转换。
+    图[fp4x2_e2m1_t到bfloat16_t转换过程](#fig3)和图[bfloat16_t到fp4x2_e2m1_t转换过程](#fig4)展示了MaskReg和RegLayout同时作用时fp4x2_e2m1_t和bfloat16_t之间的转换。
 
-    **图 1**  fp4x2_e2m1_t到bfloat16_t转换过程  
+    **图 3**  fp4x2_e2m1_t到bfloat16_t转换过程<a id="fig3"></a>  
     
     ![](../../../../figures/reg_cast_1.png)
 
-    **图 2**  bfloat16_t到fp4x2_e2m1_t转换过程  
+    **图 4**  bfloat16_t到fp4x2_e2m1_t转换过程<a id="fig4"></a>  
     ![](../../../../figures/reg_cast_2.png)
 
 ## 关键特性说明
