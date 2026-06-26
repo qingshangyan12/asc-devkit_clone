@@ -33,17 +33,17 @@ __aicore__ inline void asc_half2int32_rna_impl(__ubuf__ int32_t* dst, __ubuf__ h
     }
 }
 
-__aicore__ inline void asc_half2int32_rna_impl(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t count)
+__aicore__ inline void asc_half2int32_rna_impl(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_half2int32_rna_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
         ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_HALF_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_half2int32_rna_sync_impl(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t count)
+__aicore__ inline void asc_half2int32_rna_sync_impl(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t repeat)
 {
-    asc_half2int32_rna_impl(dst, src, count);
+    asc_half2int32_rna_impl(dst, src, repeat);
     asc_sync_post_process();
 }
 
@@ -56,17 +56,17 @@ __aicore__ inline void asc_half2int32_ru_impl(__ubuf__ int32_t* dst, __ubuf__ ha
     }
 }
 
-__aicore__ inline void asc_half2int32_ru_impl(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t count)
+__aicore__ inline void asc_half2int32_ru_impl(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_half2int32_ru_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
         ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_HALF_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_half2int32_ru_sync_impl(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t count)
+__aicore__ inline void asc_half2int32_ru_sync_impl(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t repeat)
 {
-    asc_half2int32_ru_impl(dst, src, count);
+    asc_half2int32_ru_impl(dst, src, repeat);
     asc_sync_post_process();
 }
 
@@ -79,17 +79,17 @@ __aicore__ inline void asc_half2int32_rd_impl(__ubuf__ int32_t* dst, __ubuf__ ha
     }
 }
 
-__aicore__ inline void asc_half2int32_rd_impl(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t count)
+__aicore__ inline void asc_half2int32_rd_impl(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_half2int32_rd_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
         ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_HALF_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_half2int32_rd_sync_impl(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t count)
+__aicore__ inline void asc_half2int32_rd_sync_impl(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t repeat)
 {
-    asc_half2int32_rd_impl(dst, src, count);
+    asc_half2int32_rd_impl(dst, src, repeat);
     asc_sync_post_process();
 }
 
@@ -102,17 +102,17 @@ __aicore__ inline void asc_half2int32_rn_impl(__ubuf__ int32_t* dst, __ubuf__ ha
     }
 }
 
-__aicore__ inline void asc_half2int32_rn_impl(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t count)
+__aicore__ inline void asc_half2int32_rn_impl(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_half2int32_rn_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
         ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_HALF_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_half2int32_rn_sync_impl(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t count)
+__aicore__ inline void asc_half2int32_rn_sync_impl(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t repeat)
 {
-    asc_half2int32_rn_impl(dst, src, count);
+    asc_half2int32_rn_impl(dst, src, repeat);
     asc_sync_post_process();
 }
 
@@ -125,17 +125,17 @@ __aicore__ inline void asc_half2int32_rz_impl(__ubuf__ int32_t* dst, __ubuf__ ha
     }
 }
 
-__aicore__ inline void asc_half2int32_rz_impl(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t count)
+__aicore__ inline void asc_half2int32_rz_impl(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_half2int32_rz_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
         ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_HALF_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_half2int32_rz_sync_impl(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t count)
+__aicore__ inline void asc_half2int32_rz_sync_impl(__ubuf__ int32_t* dst, __ubuf__ half* src, uint32_t repeat)
 {
-    asc_half2int32_rz_impl(dst, src, count);
+    asc_half2int32_rz_impl(dst, src, repeat);
     asc_sync_post_process();
 }
 

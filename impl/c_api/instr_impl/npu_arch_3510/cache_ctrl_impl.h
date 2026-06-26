@@ -35,6 +35,11 @@ __aicore__ inline void asc_dcci_single(__gm__ void* dst)
 }
 }
 
+__aicore__ inline void asc_simd_dcci_single(__gm__ void* dst)
+{
+    asc_dcci_single_impl(dst);
+}
+
 __aicore__ inline void asc_ub_dcci_single(__ubuf__ void* dst)
 {
     asc_ub_dcci_single_impl(dst);

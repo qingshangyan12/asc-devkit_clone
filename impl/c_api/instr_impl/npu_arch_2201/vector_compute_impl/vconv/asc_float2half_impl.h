@@ -34,17 +34,17 @@ __aicore__ inline void asc_float2half_impl(__ubuf__ half* dst, __ubuf__ float* s
     }
 }
 
-__aicore__ inline void asc_float2half_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+__aicore__ inline void asc_float2half_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_float2half_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
         ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_HALF_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_float2half_sync_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+__aicore__ inline void asc_float2half_sync_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t repeat)
 {
-    asc_float2half_impl(dst, src, count);
+    asc_float2half_impl(dst, src, repeat);
     asc_sync_post_process();
 }
 
@@ -57,17 +57,17 @@ __aicore__ inline void asc_float2half_rn_impl(__ubuf__ half* dst, __ubuf__ float
     }
 }
 
-__aicore__ inline void asc_float2half_rn_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+__aicore__ inline void asc_float2half_rn_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_float2half_rn_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
         ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_HALF_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_float2half_rn_sync_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+__aicore__ inline void asc_float2half_rn_sync_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t repeat)
 {
-    asc_float2half_rn_impl(dst, src, count);
+    asc_float2half_rn_impl(dst, src, repeat);
     asc_sync_post_process();
 }
 
@@ -80,17 +80,17 @@ __aicore__ inline void asc_float2half_rna_impl(__ubuf__ half* dst, __ubuf__ floa
     }
 }
 
-__aicore__ inline void asc_float2half_rna_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+__aicore__ inline void asc_float2half_rna_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_float2half_rna_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
         ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_HALF_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_float2half_rna_sync_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+__aicore__ inline void asc_float2half_rna_sync_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t repeat)
 {
-    asc_float2half_rna_impl(dst, src, count);
+    asc_float2half_rna_impl(dst, src, repeat);
     asc_sync_post_process();
 }
 
@@ -103,17 +103,17 @@ __aicore__ inline void asc_float2half_rd_impl(__ubuf__ half* dst, __ubuf__ float
     }
 }
 
-__aicore__ inline void asc_float2half_rd_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+__aicore__ inline void asc_float2half_rd_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_float2half_rd_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
         ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_HALF_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_float2half_rd_sync_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+__aicore__ inline void asc_float2half_rd_sync_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t repeat)
 {
-    asc_float2half_rd_impl(dst, src, count);
+    asc_float2half_rd_impl(dst, src, repeat);
     asc_sync_post_process();
 }
 
@@ -126,17 +126,17 @@ __aicore__ inline void asc_float2half_ru_impl(__ubuf__ half* dst, __ubuf__ float
     }
 }
 
-__aicore__ inline void asc_float2half_ru_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+__aicore__ inline void asc_float2half_ru_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_float2half_ru_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
         ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_HALF_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_float2half_ru_sync_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+__aicore__ inline void asc_float2half_ru_sync_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t repeat)
 {
-    asc_float2half_ru_impl(dst, src, count);
+    asc_float2half_ru_impl(dst, src, repeat);
     asc_sync_post_process();
 }
 
@@ -149,17 +149,17 @@ __aicore__ inline void asc_float2half_rz_impl(__ubuf__ half* dst, __ubuf__ float
     }
 }
 
-__aicore__ inline void asc_float2half_rz_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+__aicore__ inline void asc_float2half_rz_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_float2half_rz_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
         ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_HALF_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_float2half_rz_sync_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+__aicore__ inline void asc_float2half_rz_sync_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t repeat)
 {
-    asc_float2half_rz_impl(dst, src, count);
+    asc_float2half_rz_impl(dst, src, repeat);
     asc_sync_post_process();
 }
 
@@ -172,17 +172,17 @@ __aicore__ inline void asc_float2half_ro_impl(__ubuf__ half* dst, __ubuf__ float
     }
 }
 
-__aicore__ inline void asc_float2half_ro_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+__aicore__ inline void asc_float2half_ro_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_float2half_ro_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
         ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_HALF_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_float2half_ro_sync_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t count)
+__aicore__ inline void asc_float2half_ro_sync_impl(__ubuf__ half* dst, __ubuf__ float* src, uint32_t repeat)
 {
-    asc_float2half_ro_impl(dst, src, count);
+    asc_float2half_ro_impl(dst, src, repeat);
     asc_sync_post_process();
 }
 

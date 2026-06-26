@@ -32,9 +32,9 @@ __aicore__ inline void asc_and_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src
 }
 
 __aicore__ inline void asc_and_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1,
-                                    uint32_t count)
+                                    uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_and_impl(dst, src0, src1, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8,
                  ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8,
                  ASC_C_API_DEFAULT_REPEAT_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8,
@@ -43,9 +43,9 @@ __aicore__ inline void asc_and_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src
 }
 
 __aicore__ inline void asc_and_sync_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1,
-                                     uint32_t count)
+                                     uint32_t repeat)
 {
-    asc_and_impl(dst, src0, src1, count);
+    asc_and_impl(dst, src0, src1, repeat);
     asc_sync_post_process();
 }
 
@@ -61,9 +61,9 @@ __aicore__ inline void asc_and_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* s
 }
 
 __aicore__ inline void asc_and_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1,
-                                    uint32_t count)
+                                    uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_and_impl(dst, src0, src1, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8,
                  ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8,
                  ASC_C_API_DEFAULT_REPEAT_STRIDE.U8, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8,
@@ -72,9 +72,9 @@ __aicore__ inline void asc_and_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* s
 }
 
 __aicore__ inline void asc_and_sync_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1,
-                                     uint32_t count)
+                                     uint32_t repeat)
 {
-    asc_and_impl(dst, src0, src1, count);
+    asc_and_impl(dst, src0, src1, repeat);
     asc_sync_post_process();
 }
 #endif

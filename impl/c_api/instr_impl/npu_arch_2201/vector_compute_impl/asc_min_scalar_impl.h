@@ -30,18 +30,18 @@ __aicore__ inline void asc_min_scalar_impl(__ubuf__ half* dst, __ubuf__ half* sr
     }
 }
 
-__aicore__ inline void asc_min_scalar_impl(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
+__aicore__ inline void asc_min_scalar_impl(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_min_scalar_impl(dst, src, value, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
                         ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16,
                         ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_min_scalar_sync_impl(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
+__aicore__ inline void asc_min_scalar_sync_impl(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t repeat)
 {
-    asc_min_scalar_impl(dst, src, value, count);
+    asc_min_scalar_impl(dst, src, value, repeat);
     asc_sync_post_process();
 }
 
@@ -55,18 +55,18 @@ __aicore__ inline void asc_min_scalar_impl(__ubuf__ float* dst, __ubuf__ float* 
     }
 }
 
-__aicore__ inline void asc_min_scalar_impl(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
+__aicore__ inline void asc_min_scalar_impl(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_min_scalar_impl(dst, src, value, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
                         ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16,
                         ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_min_scalar_sync_impl(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
+__aicore__ inline void asc_min_scalar_sync_impl(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t repeat)
 {
-    asc_min_scalar_impl(dst, src, value, count);
+    asc_min_scalar_impl(dst, src, value, repeat);
     asc_sync_post_process();
 }
 
@@ -80,9 +80,9 @@ __aicore__ inline void asc_min_scalar_impl(__ubuf__ int16_t* dst, __ubuf__ int16
     }
 }
 
-__aicore__ inline void asc_min_scalar_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t count)
+__aicore__ inline void asc_min_scalar_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_min_scalar_impl(dst, src, value, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
                         ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16,
                         ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
@@ -90,9 +90,9 @@ __aicore__ inline void asc_min_scalar_impl(__ubuf__ int16_t* dst, __ubuf__ int16
 }
 
 __aicore__ inline void asc_min_scalar_sync_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value,
-                                                uint32_t count)
+                                                uint32_t repeat)
 {
-    asc_min_scalar_impl(dst, src, value, count);
+    asc_min_scalar_impl(dst, src, value, repeat);
     asc_sync_post_process();
 }
 
@@ -106,9 +106,9 @@ __aicore__ inline void asc_min_scalar_impl(__ubuf__ int32_t* dst, __ubuf__ int32
     }
 }
 
-__aicore__ inline void asc_min_scalar_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
+__aicore__ inline void asc_min_scalar_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_min_scalar_impl(dst, src, value, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
                         ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16,
                         ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
@@ -116,9 +116,9 @@ __aicore__ inline void asc_min_scalar_impl(__ubuf__ int32_t* dst, __ubuf__ int32
 }
 
 __aicore__ inline void asc_min_scalar_sync_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value,
-                                                uint32_t count)
+                                                uint32_t repeat)
 {
-    asc_min_scalar_impl(dst, src, value, count);
+    asc_min_scalar_impl(dst, src, value, repeat);
     asc_sync_post_process();
 }
 
