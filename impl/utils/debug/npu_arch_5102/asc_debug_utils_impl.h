@@ -56,7 +56,6 @@ __aicore__ inline uint64_t asc_debug_get_block_idx_impl()
     return get_block_idx();
 }
 
-// LIUXIN ?
 __aicore__ inline void sync_all_impl()
 {
     pipe_barrier(pipe_t::PIPE_ALL);

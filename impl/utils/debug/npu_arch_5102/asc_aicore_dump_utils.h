@@ -34,9 +34,6 @@ constexpr uint32_t ASC_DEBUG_BUS_CHUNK_BYTES = ASC_DEBUG_BUS_CHUNK_WORDS * sizeo
 template<typename T>
 __aicore__ inline uint32_t mem_copy_cbuf_to_gm_impl(__gm__ T* dst, __cc__ T* src, const uint32_t& dumpSize)
 {
-    if ASCEND_IS_NOT_AIC {
-        return 1;
-    }
     constexpr int32_t blockCube = 16;
     constexpr int32_t defaultOneBlockSize = 256;
     constexpr int32_t srcBurstLenSizeEle = 16;
@@ -63,7 +60,6 @@ __aicore__ inline uint32_t mem_copy_l1buf_to_gm_impl(
 template<typename T>
 __aicore__ inline uint32_t mem_copy_ub_to_gm_impl(__gm__ T* dst, __ubuf__ T* src, const uint32_t& len)
 {
-#if defined(__DAV_VEC__)
     constexpr uint8_t byte_32_align = 32;
     constexpr uint32_t blockCount = 1;
     uint32_t blockLen = len;
@@ -77,9 +73,6 @@ __aicore__ inline uint32_t mem_copy_ub_to_gm_impl(__gm__ T* dst, __ubuf__ T* src
     uint64_t dstStride1 = dstStride * unitOfBytes + burstLen;
     copy_ubuf_to_gm_align_v2((__gm__ void*)dst, (__ubuf__ void*)src, 0, blockCount, burstLen, 0, dstStride1, srcStride1);
     return 0;
-#else
-    return 1;
-#endif
 }
 
 template<typename T>
