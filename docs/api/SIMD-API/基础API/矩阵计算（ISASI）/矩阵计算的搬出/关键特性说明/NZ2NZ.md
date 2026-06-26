@@ -86,7 +86,7 @@ Atlas A3 训练系列产品/Atlas A3 推理系列产品
 <!-- npu="910b" id8 -->
 Atlas A2 训练系列产品/Atlas A2 推理系列产品
 <!-- end id8 -->
-**图1** NZ2NZ示意图<a name="zh-cn_topic_0000002515820868_fig199191646174210"></a>  
+**图1** NZ2NZ示意图（[NPU架构版本2201](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a name="zh-cn_topic_0000002515820868_fig199191646174210"></a>  
 
 ![](../../../../../figures/Fixpipe_NZ2NZ.png)
 
@@ -102,7 +102,7 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
 <!-- npu="950" id5 -->
 以Ascend 950PR/Ascend 950DT为例：
 
-**图2** NZ2NZ示意图（Ascend 950PR/Ascend 950DT）<a name="zh-cn_topic_0000002515820868_fig199191646174233"></a>  
+**图2** NZ2NZ示意图（[NPU架构版本3510](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a name="zh-cn_topic_0000002515820868_fig199191646174233"></a>  
 
 ![](../../../../../figures/Fixpipe_NZ2NZ_950.png)
 
