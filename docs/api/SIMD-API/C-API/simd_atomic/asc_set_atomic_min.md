@@ -10,7 +10,8 @@
 
 ## 功能说明
 
-设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的数据与GM中已有数据进行逐元素比较，并将最小值写入GM。数据类型支持int8_t/int16_t/int32_t/bfloat16_t/half/float。
+设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型支持int8_t/int16_t/int32_t/bfloat16_t/half/float。
+<!-- npu="950" id2 -->设置对后续的从Unified Buffer/L0C Buffer/到Global Memory的数据传输开启原子累加。累加的数据类型支持int8_t/int16_t/int32_t/bfloat16_t/half/float。<!-- end id2 -->
 
 ## 函数原型
 
