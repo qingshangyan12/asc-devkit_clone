@@ -1202,7 +1202,7 @@ __simd_callee__ inline void asc_storealign_1st_postupdate_impl(__ubuf__ bfloat16
 }
 
 // storealign_pack
-__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ int16_t*& dst_align32b, vector_int16_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ int16_t* dst_align32b, vector_int16_t src, int32_t offset,
     vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1210,7 +1210,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ int16_t
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ uint16_t*& dst_align32b, vector_uint16_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ uint16_t* dst_align32b, vector_uint16_t src, int32_t offset,
     vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1218,7 +1218,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ uint16_
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ int32_t*& dst_align32b, vector_int32_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ int32_t* dst_align32b, vector_int32_t src, int32_t offset,
     vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1226,7 +1226,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ int32_t
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ uint32_t*& dst_align32b, vector_uint32_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ uint32_t* dst_align32b, vector_uint32_t src, int32_t offset,
     vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1234,7 +1234,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ uint32_
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ int64_t*& dst_align32b, vector_int64_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ int64_t* dst_align32b, vector_int64_t src, int32_t offset,
     vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1242,7 +1242,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ int64_t
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ uint64_t*& dst_align32b, vector_uint64_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ uint64_t* dst_align32b, vector_uint64_t src, int32_t offset,
     vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1250,7 +1250,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ uint64_
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ half*& dst_align32b, vector_half src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ half* dst_align32b, vector_half src, int32_t offset,
     vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1258,7 +1258,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ half*& 
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ float*& dst_align32b, vector_float src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ float* dst_align32b, vector_float src, int32_t offset,
     vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1266,7 +1266,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ float*&
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ bfloat16_t*& dst_align32b, vector_bfloat16_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ bfloat16_t* dst_align32b, vector_bfloat16_t src, int32_t offset,
     vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1275,7 +1275,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ bfloat1
 }
 
 // storealign_pack_v2
-__simd_callee__ inline void asc_storealign_pack_postupdate_v2_impl(__ubuf__ int32_t*& dst_align32b, vector_int32_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate_v2_impl(__ubuf__ int32_t* dst_align32b, vector_int32_t src, int32_t offset,
     vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1283,7 +1283,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate_v2_impl(__ubuf__ int3
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate_v2_impl(__ubuf__ uint32_t*& dst_align32b, vector_uint32_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate_v2_impl(__ubuf__ uint32_t* dst_align32b, vector_uint32_t src, int32_t offset,
     vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1291,7 +1291,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate_v2_impl(__ubuf__ uint
     }
 }
 
-__simd_callee__ inline void asc_storealign_pack_postupdate_v2_impl(__ubuf__ float*& dst_align32b, vector_float src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_postupdate_v2_impl(__ubuf__ float* dst_align32b, vector_float src, int32_t offset,
     vector_bool mask)
 {
     if ASC_IS_AIV {
