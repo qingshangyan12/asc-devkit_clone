@@ -275,9 +275,9 @@ __aicore__ inline void TPipeBase::AuxShareBufStart(uint32_t mode, uint32_t* shar
         this->g_tpipeImpl.bufPool_[hardU8].maxAddr += shareLens[pos] / HALF_FACTOR;  // Reset resource start position.
 // #else
 //         Internal::g_tPipeAddrBufPool[hardU8] += shareLens[pos] / HALF_FACTOR;  // Reset resource start position.
-// #endife
-        Internal::g_tPipeAddrBufPool[hardU8] += shareLens[pos] / HALF_FACTOR;  // Reset resource start position.
-#endif
+// #endif
+//         Internal::g_tPipeAddrBufPool[hardU8] += shareLens[pos] / HALF_FACTOR;  // Reset resource start position.
+// #endif
     }
 
 #if defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1)
