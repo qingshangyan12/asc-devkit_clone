@@ -298,6 +298,9 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
         // Set本轮完成信号
         SetTurnEndSig(recordAddr, turnEndSig, ctx);
         HCCL_INFO("[KfcServerGenCircularQueue] SetTurnEndSig finished.");
+
+        repeatCond = one;
+
         waitAddr += ckeSize;
         recordAddr += ckeSize;
         paramAddr += paramSize;
@@ -308,8 +311,7 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
             paramAddr = paramStartAddr;
             queueIdx = 0;
         }
-    }    
-
+    }
 }
 
 void SlaveKfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
