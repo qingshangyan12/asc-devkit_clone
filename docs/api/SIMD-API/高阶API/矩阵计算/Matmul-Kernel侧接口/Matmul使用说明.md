@@ -46,7 +46,10 @@ Kernel侧实现Matmul矩阵乘运算的步骤概括为：
     创建对象时需要传入A、B、C、Bias的参数类型信息，类型信息通过[MatmulType](#table1188045714378)来定义，包括：内存逻辑位置、数据格式、数据类型、数据来源的内存逻辑位置。
 
     ```
-    template <AscendC::TPosition POSITION, CubeFormat FORMAT, typename TYPE, bool ISTRANS = false, LayoutMode LAYOUT = LayoutMode::NONE, bool IBSHARE = false, TPosition SRCPOS = TPosition::GM> struct MatmulType {
+    template <
+        AscendC::TPosition POSITION, CubeFormat FORMAT, typename TYPE, bool ISTRANS = false,
+        LayoutMode LAYOUT = LayoutMode::NONE, bool IBSHARE = false, TPosition SRCPOS = TPosition::GM>
+    struct MatmulType {
         constexpr static AscendC::TPosition pos = POSITION;
         constexpr static CubeFormat format = FORMAT;
         using T = TYPE;
@@ -132,6 +135,8 @@ Kernel侧实现Matmul矩阵乘运算的步骤概括为：
         mm.IterateAll(gm_c);
         ```
 
+    <a id="user-managed-co1"></a>
+    
     -   用户申请用于存放矩阵乘结果的逻辑位置CO1内存，调用一次或多次[Iterate](Iterate.md#li4843165185812)完成单次或多次迭代计算，在需要搬出计算结果时，调用[Fixpipe](../../../基础API/矩阵计算（ISASI）/矩阵计算的搬出/L0C到GM数据搬运（Fixpipe）.md)接口完成CO1上计算结果的搬运，然后释放申请的CO1内存。该方式下，用户可以灵活控制计算和搬运的节奏，根据实际需要，一次计算对应一次结果的搬出，或者将多次计算结果缓存在CO1内存中，再一次性搬出计算结果。
 
         在此种调用方式下，创建Matmul对象时，必须定义C矩阵的内存逻辑位置为TPosition::CO1、数据排布格式为CubeFormat::NZ、数据类型为float或int32\_t。
@@ -168,7 +173,7 @@ Kernel侧实现Matmul矩阵乘运算的步骤概括为：
         CO1_.template DeQue<L0cT>();
         Fixpipe<cType, L0cT, CFG_ROW_MAJOR>(gm[dstOffset], l0cTensor, params);
 
-        //释放CO1内存
+        // 释放CO1内存
         CO1_.FreeTensor(l0cTensor);
         ```
 
