@@ -73,3 +73,17 @@ extern "C" __global__ __aicore__ void KernelTestGetCtrlSpr1() { int64_t result =
 // __aicore__ static inline void ResetCtrlSpr();
 extern "C" __global__ __aicore__ void KernelTestResetCtrlSpr1() { AscendC::ResetCtrlSpr<6, 7>(); }
 #endif
+
+#if __NPU_ARCH__ == 3510
+// __aicore__ inline void SetGlobalSaturationFlag(bool enableGlobalSat);
+extern "C" __global__ __aicore__ void KernelTestSetGlobalSaturationFlag1()
+{
+    AscendC::SetGlobalSaturationFlag(true);
+}
+
+// __aicore__ inline bool GetGlobalSaturationFlag();
+extern "C" __global__ __aicore__ void KernelTestGetGlobalSaturationFlag1()
+{
+    bool result = AscendC::GetGlobalSaturationFlag();
+}
+#endif

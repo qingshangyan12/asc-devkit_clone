@@ -871,6 +871,8 @@
             -   [ResetCtrlSpr\(ISASI\)](SIMD-API/基础API/特殊寄存器访问/ResetCtrlSpr(ISASI).md)
             -   [GetSaturationFlag\(ISASI\)](SIMD-API/基础API/特殊寄存器访问/GetSaturationFlag(ISASI).md)
             -   [SetSaturationFlag\(ISASI\)](SIMD-API/基础API/特殊寄存器访问/SetSaturationFlag(ISASI).md)
+            -   [GetGlobalSaturationFlag\(ISASI\)](SIMD-API/基础API/特殊寄存器访问/GetGlobalSaturationFlag(ISASI).md)
+            -   [SetGlobalSaturationFlag\(ISASI\)](SIMD-API/基础API/特殊寄存器访问/SetGlobalSaturationFlag(ISASI).md)
 
     -   [C API](SIMD-API/C-API/README.md)
         -   [API列表](SIMD-API/C-API/C-API.md)

@@ -78,6 +78,10 @@ __aicore__ static inline int64_t GetCtrlSpr();
 template <int8_t startBit, int8_t endBit>
 __aicore__ static inline void ResetCtrlSpr();
 
+__aicore__ inline void SetGlobalSaturationFlag(bool enableGlobalSat);
+
+__aicore__ inline bool GetGlobalSaturationFlag();
+
 template <SaturationMode mode>
 __aicore__ inline void SetSaturationFlag(bool enableSat);
 
