@@ -61,9 +61,9 @@ template<typename T, int8_t mode, int8_t len>
 __aicore__ void hello_world_impl(GM_ADDR m)
 {
     if constexpr (std::is_same_v<T, float>) {
-       AscendC::printf("Hello World: float mode %u len %u.\n", mode, len);
+       AscendC::printf("Hello World: float mode %d len %d.\n", mode, len);
     } else if constexpr (std::is_same_v<T, int>) {
-       AscendC::printf("Hello World: int mode %u len %u.\n", mode, len);
+       AscendC::printf("Hello World: int mode %d len %d.\n", mode, len);
     }
 }
 
@@ -110,7 +110,7 @@ extern "C" __global__ __aicpu__ uint32_t MyAicpuKernel(void *arg)
     cfg->ti->mode = 2;
     cfg->ti->len = 4;
     AscendC::DataStoreBarrier(); // 对tilingInfo进行写同步
-    AscendC::printf("MyAicpuKernel inited type %u mode %u len %u end!\n", cfg->ti->type, cfg->ti->mode, cfg->ti->len);
+    AscendC::printf("MyAicpuKernel inited type %d mode %d len %d end!\n", cfg->ti->type, cfg->ti->mode, cfg->ti->len);
     return 0;
 }
 ```
