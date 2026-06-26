@@ -80,15 +80,25 @@ $$
 
 ## 数据类型
 
-<cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，支持的数据类型为：int16_t、half、float、int64_t、uint64_t。</cann-filter>
+<!-- npu="950" id8 -->
+Ascend 950PR/Ascend 950DT，支持的数据类型为：int16_t、half、float、int64_t、uint64_t。
+<!-- end id8 -->
 
-<cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int16_t、half、float。</cann-filter>
+<!-- npu="A3" id9 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int16_t、half、float。
+<!-- end id9 -->
 
-<cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int16_t、half、float。</cann-filter>
+<!-- npu="910b" id10 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int16_t、half、float。
+<!-- end id10 -->
 
-<cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品，支持的数据类型为half、float。</cann-filter>
+<!-- npu="310b" id11 -->
+Atlas 200I/500 A2 推理产品，支持的数据类型为half、float。
+<!-- end id11 -->
 
-<cann-filter npu-type="310p">Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、half、float。</cann-filter>
+<!-- npu="310p" id12 -->
+Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、half、float。
+<!-- end id12 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -100,16 +110,18 @@ $$
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#section668772811100)。
 - 高维切分接口通过GetTemporaryBufferAddr接口预留了8KB Unified Buffer用于内部临时内存管理。
 - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  <!-- npu="A3" id8 -->
+  <!-- npu="A3" id13 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id8 -->
-  <!-- npu="910b" id9 -->
+  <!-- end id13 -->
+  <!-- npu="910b" id14 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id9 -->
-  <!-- npu="950" id10 -->
+  <!-- end id14 -->
+  <!-- npu="950" id15 -->
   - Ascend 950PR/Ascend 950DT
-  <!-- end id10 -->
-- <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，uint64\_t/int64\_t数据类型仅支持tensor前n个数据计算接口。</cann-filter>
+  <!-- end id15 -->
+- <!-- npu="950" id16 -->
+  针对Ascend 950PR/Ascend 950DT，uint64\_t/int64\_t数据类型仅支持tensor前n个数据计算接口。
+  <!-- end id16 -->
 
 ## 调用示例<a name="section837496171220"></a>
 

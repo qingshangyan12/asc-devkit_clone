@@ -103,7 +103,7 @@
 
 ## 数据类型
 
-<cann-filter npu-type="950">
+<!-- npu="950" id8 -->
 
 **表**  Ascend 950PR/Ascend 950DT支持的数据类型组合情况
 
@@ -113,9 +113,9 @@
 | int16_t     | int8_t      |
 | int16_t     | uint8_t     |
 
-</cann-filter>
+<!-- end id8 -->
 
-<cann-filter npu-type="A3">
+<!-- npu="A3" id9 -->
 
 **表**  Atlas A3 训练系列产品/Atlas A3 推理系列产品支持的数据类型组合情况
 
@@ -125,9 +125,9 @@
 | int16_t     | int8_t      |
 | int16_t     | uint8_t     |
 
-</cann-filter>
+<!-- end id9 -->
 
-<cann-filter npu-type="910b">
+<!-- npu="910b" id10 -->
 
 **表**  Atlas A2 训练系列产品/Atlas A2 推理系列产品支持的数据类型组合情况
 
@@ -137,9 +137,9 @@
 | int16_t     | int8_t      |
 | int16_t     | uint8_t     |
 
-</cann-filter>
+<!-- end id10 -->
 
-<cann-filter npu-type="310p">
+<!-- npu="310p" id11 -->
 
 **表**  Atlas 推理系列产品AI Core支持的数据类型组合情况
 
@@ -148,7 +148,7 @@
 | int16_t     | int8_t      |
 | int16_t     | uint8_t     |
 
-</cann-filter>
+<!-- end id11 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -162,15 +162,15 @@
 - halfBlock参数仅在输出数据为b8类型时有效。
 - 高维切分接口通过GetTemporaryBufferAddr接口预留了8KB Unified Buffer用于内部临时内存管理。
 - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  <!-- npu="A3" id8 -->
+  <!-- npu="A3" id12 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id8 -->
-  <!-- npu="910b" id9 -->
+  <!-- end id12 -->
+  <!-- npu="910b" id13 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id9 -->
-  <!-- npu="950" id10 -->
+  <!-- end id13 -->
+  <!-- npu="950" id14 -->
   - Ascend 950PR/Ascend 950DT
-  <!-- end id10 -->
+  <!-- end id14 -->
 - 当输入类型为int16_t，开启向量量化模式时，`SetDeqScale`接口需要传入至少128B大小的UB空间，若空间不足128B，可能导致精度错误。
 - 该接口需要与`SetDeqScale`配合使用，使用关系映射表如下：
 

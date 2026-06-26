@@ -81,7 +81,7 @@ $$
 
 ## 数据类型
 
-<cann-filter npu-type="950">
+<!-- npu="950" id8 -->
 
 **表**  Ascend 950PR/Ascend 950DT数据类型组合情况
 
@@ -93,9 +93,9 @@ $$
 | int64_t            | float       |
 | int64_t            | int32_t     |
 
-</cann-filter>
+<!-- end id8 -->
 
-<cann-filter npu-type="A3">
+<!-- npu="A3" id9 -->
 
 **表**  Atlas A3 训练系列产品/Atlas A3 推理系列产品数据类型组合情况
 
@@ -105,9 +105,9 @@ $$
 | int16_t            | int8_t      |
 | float              | half        |
 
-</cann-filter>
+<!-- end id9 -->
 
-<cann-filter npu-type="910b">
+<!-- npu="910b" id10 -->
 
 **表**  Atlas A2 训练系列产品/Atlas A2 推理系列产品数据类型组合情况
 
@@ -117,9 +117,9 @@ $$
 | int16_t            | int8_t      |
 | float              | half        |
 
-</cann-filter>
+<!-- end id10 -->
 
-<cann-filter npu-type="310b">
+<!-- npu="310b" id11 -->
 
 **表**  Atlas 200I/500 A2 推理产品数据类型组合情况
 
@@ -128,9 +128,9 @@ $$
 | half               | int8_t      |
 | float              | half        |
 
-</cann-filter>
+<!-- end id11 -->
 
-<cann-filter npu-type="310p">
+<!-- npu="310p" id12 -->
 
 **表**  Atlas 推理系列产品AI Core数据类型组合情况
 
@@ -140,7 +140,7 @@ $$
 | int16_t            | int8_t      |
 | float              | half        |
 
-</cann-filter>
+<!-- end id12 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -153,16 +153,18 @@ $$
 - 本指令涉及精度转换，转换规则参考[精度转换规则](../../数据结构/precision_conversion.md)。
 - 高维切分接口通过GetTemporaryBufferAddr接口预留了8KB Unified Buffer用于内部临时内存管理。
 - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  <!-- npu="A3" id8 -->
+  <!-- npu="A3" id13 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id8 -->
-  <!-- npu="910b" id9 -->
+  <!-- end id13 -->
+  <!-- npu="910b" id14 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id9 -->
-  <!-- npu="950" id10 -->
+  <!-- end id14 -->
+  <!-- npu="950" id15 -->
   - Ascend 950PR/Ascend 950DT
-  <!-- end id10 -->
-- <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，int64_t数据类型仅支持tensor前n个数据计算接口。</cann-filter>
+  <!-- end id15 -->
+- <!-- npu="950" id16 -->
+  针对Ascend 950PR/Ascend 950DT，int64_t数据类型仅支持tensor前n个数据计算接口。
+  <!-- end id16 -->
 
 ## 调用示例<a name="section837496171220"></a>
 

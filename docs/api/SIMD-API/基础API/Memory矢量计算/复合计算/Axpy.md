@@ -90,7 +90,7 @@ $$
 
 PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 
-<cann-filter npu-type="950">
+<!-- npu="950" id10 -->
 
 **表**  Ascend 950PR/Ascend 950DT支持的数据类型组合情况
 
@@ -103,9 +103,9 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 | uint64_t    | uint64_t       | uint64_t    | 64  |
 | bfloat16_t  | bfloat16_t     | bfloat16_t  | 128 |
 
-</cann-filter>
+<!-- end id10 -->
 
-<cann-filter npu-type="A3">
+<!-- npu="A3" id11 -->
 
 **表** Atlas A3 训练系列产品/Atlas A3 推理系列产品支持的数据类型组合情况
 
@@ -115,9 +115,9 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 | float       | float          | float       | 64  |
 | half        | half           | float       | 64  |
 
-</cann-filter>
+<!-- end id11 -->
 
-<cann-filter npu-type="910b">
+<!-- npu="910b" id12 -->
 
 **表** Atlas A2 训练系列产品/Atlas A2 推理系列产品支持的数据类型组合情况
 
@@ -127,9 +127,9 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 | float       | float          | float       | 64  |
 | half        | half           | float       | 64  |
 
-</cann-filter>
+<!-- end id12 -->
 
-<cann-filter npu-type="310b">
+<!-- npu="310b" id13 -->
 
 **表** Atlas 200I/500 A2 推理产品支持的数据类型组合情况
 
@@ -139,9 +139,9 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 | float       | float          | float       | 64  |
 | half        | half           | float       | 64  |
 
-</cann-filter>
+<!-- end id13 -->
 
-<cann-filter npu-type="310p">
+<!-- npu="310p" id14 -->
 
 **表** Atlas 推理系列产品AI Core支持的数据类型组合情况
 
@@ -151,9 +151,9 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 | float       | float          | float       | 64  |
 | half        | half           | float       | 64  |
 
-</cann-filter>
+<!-- end id14 -->
 
-<cann-filter npu-type="910">
+<!-- npu="910" id15 -->
 
 **表** Atlas 训练系列产品支持的数据类型组合情况
 
@@ -163,9 +163,9 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 | float       | float          | float       | 64  |
 | half        | half           | float       | 64  |
 
-</cann-filter>
+<!-- end id15 -->
 
-<cann-filter npu-type="x90">
+<!-- npu="x90" id16 -->
 
 **表** Kirin X90支持的数据类型组合情况
 
@@ -175,9 +175,9 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 | float       | float          | float       | 64  |
 | half        | half           | float       | 64  |
 
-</cann-filter>
+<!-- end id16 -->
 
-<cann-filter npu-type="9030">
+<!-- npu="9030" id17 -->
 
 **表** Kirin 9030支持的数据类型组合情况
 
@@ -187,7 +187,7 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 | float       | float          | float       | 64  |
 | half        | half           | float       | 64  |
 
-</cann-filter>
+<!-- end id17 -->
 
 ## 返回值说明<a name="section17124037164714"></a>
 
@@ -201,16 +201,18 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 - 使用tensor高维切分计算接口时，src和scalar的数据类型为half、dst的数据类型为float的情况下，一个迭代处理内最多处理64个输入数据。
 - 高维切分接口通过GetTemporaryBufferAddr接口预留了8KB Unified Buffer用于内部临时内存管理。
 - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  <!-- npu="A3" id8 -->
+  <!-- npu="A3" id18 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id8 -->
-  <!-- npu="910b" id9 -->
+  <!-- end id18 -->
+  <!-- npu="910b" id19 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id9 -->
-  <!-- npu="950" id10 -->
+  <!-- end id19 -->
+  <!-- npu="950" id20 -->
   - Ascend 950PR/Ascend 950DT
-  <!-- end id10 -->
-- <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，int64_t、uint64_t数据类型仅支持tensor前n个数据计算接口。</cann-filter>
+  <!-- end id20 -->
+- <!-- npu="950" id21 -->
+  针对Ascend 950PR/Ascend 950DT，int64_t、uint64_t数据类型仅支持tensor前n个数据计算接口。
+  <!-- end id21 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
