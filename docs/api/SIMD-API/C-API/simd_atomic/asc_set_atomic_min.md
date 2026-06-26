@@ -39,7 +39,7 @@ PIPE_S
 ## 约束说明
 
 - 使用结束后，建议通过[asc_set_atomic_none](./asc_set_atomic_none.md)关闭原子最小操作，以免影响后续相关指令功能。
-- 针对Ascend 950PR/Ascend 950DT，不支持L1 Buffer到Global Memory的通路。
+<!-- npu="950" id2 -->- 针对Ascend 950PR/Ascend 950DT，不支持L1 Buffer到Global Memory的通路。<!-- end id2 -->
 
 ## 调用示例
 
