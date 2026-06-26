@@ -300,31 +300,31 @@
 ### 寄存器数据类型
 | 接口名 | 功能描述 |
 | --- | --- |
-| [RegTensor](Reg矢量计算/概述/寄存器数据类型/RegTensor.md) | Reg矢量计算基本单元，RegTensor位宽为VL（Vector Length），具体值可能因不同AI处理器型号而异。 |
-| [MaskReg](Reg矢量计算/概述/寄存器数据类型/MaskReg.md) | MaskReg用于指示在计算过程中哪些元素参与计算，宽度为RegTensor的八分之一（VL/8）。 |
-| [UnalignRegForLoad & UnalignRegForStore](Reg矢量计算/概述/寄存器数据类型/UnalignRegForLoad-UnalignRegForStore.md) | UnalignRegForLoad、UnalignRegForStore用作缓冲区来优化UB和RegTensor之间连续不对齐地址访问的开销。在读不对齐地址前，UnalignRegForLoad、UnalignRegForStore应该通过LoadUnAlignPre API初始化，然后使用LoadUnAlign API。在写不对齐地址时，先使用StoreUnAlign API， |
-| [AddrReg](Reg矢量计算/概述/寄存器数据类型/AddrReg.md) | AddrReg即为Address Register（地址寄存器），是用于存储地址偏移量的寄存器。AddrReg应该通过CreateAddrReg API初始化，然后在循环中使用AddrReg存储地址偏移量。AddrReg在每层循环中根据所设置的stride进行自增。 |
+| [RegTensor](Reg矢量计算/寄存器数据类型/RegTensor.md) | Reg矢量计算基本单元，RegTensor位宽为VL（Vector Length），具体值可能因不同AI处理器型号而异。 |
+| [MaskReg](Reg矢量计算/寄存器数据类型/MaskReg.md) | MaskReg用于指示在计算过程中哪些元素参与计算，宽度为RegTensor的八分之一（VL/8）。 |
+| [UnalignRegForLoad & UnalignRegForStore](Reg矢量计算/寄存器数据类型/UnalignRegForLoad-UnalignRegForStore.md) | UnalignRegForLoad、UnalignRegForStore用作缓冲区来优化UB和RegTensor之间连续不对齐地址访问的开销。在读不对齐地址前，UnalignRegForLoad、UnalignRegForStore应该通过LoadUnAlignPre API初始化，然后使用LoadUnAlign API。在写不对齐地址时，先使用StoreUnAlign API， |
+| [AddrReg](Reg矢量计算/寄存器数据类型/AddrReg.md) | AddrReg即为Address Register（地址寄存器），是用于存储地址偏移量的寄存器。AddrReg应该通过CreateAddrReg API初始化，然后在循环中使用AddrReg存储地址偏移量。AddrReg在每层循环中根据所设置的stride进行自增。 |
 
 ### Reg数据搬运
 | 接口名 | 功能描述 |
 | --- | --- |
-| [连续对齐搬入](Reg矢量计算/Reg数据搬入/连续对齐搬入（LoadAlign）.md) | Reg矢量计算数据搬运接口，适用于从UB连续对齐搬入RegTensor。单搬入模式下，可以将数据从UB搬运到一个目的寄存器，双搬入模式下，可以将数据从UB搬运到两个目的寄存器。 |
-| [连续对齐搬出](Reg矢量计算/Reg数据搬出/连续对齐搬出（StoreAlign）.md) | Reg矢量计算数据搬运接口，适用于从RegTensor连续对齐搬出到UB。 |
-| [非连续对齐搬入](Reg矢量计算/Reg数据搬入/非连续对齐搬入（LoadAlign）.md) | Reg矢量计算数据搬运接口，适用于从UB非连续对齐搬入RegTensor（以DataBlock为单位）。 |
-| [非连续对齐搬出](Reg矢量计算/Reg数据搬出/非连续对齐搬出（StoreAlign）.md) | Reg矢量计算数据搬运接口，适用于从RegTensor非连续对齐搬出到UB（以DataBlock为单位）。 |
-| [连续非对齐搬入](Reg矢量计算/Reg数据搬入/连续非对齐搬入（LoadUnAlign）.md) | Reg矢量计算数据搬运接口，适用于从UB非32B对齐地址起始连续搬入RegTensor。 |
-| [连续非对齐搬出](Reg矢量计算/Reg数据搬出/连续非对齐搬出（StoreUnAlign）.md) | Reg矢量计算数据搬运接口，适用于从RegTensor连续非对齐搬出到UB。 |
-| [MaskReg搬入](Reg矢量计算/Reg数据搬入/MaskReg搬入（LoadAlign）.md) | Reg矢量计算数据搬运接口，适用于从UB或RegTensor搬入MaskReg。 |
-| [MaskReg搬出](Reg矢量计算/Reg数据搬出/MaskReg搬出（StoreAlign）.md) | Reg矢量计算数据搬运接口，适用于从MaskReg搬出到UB。 |
-| [Move](Reg矢量计算/Reg数据搬入/Move.md) | 对srcReg中的有效元素逐个复制写入dstReg中对应位置处。 |
+| [连续对齐搬入](Reg矢量计算/Reg数据搬运/连续对齐搬入.md) | Reg矢量计算数据搬运接口，适用于从UB连续对齐搬入RegTensor。单搬入模式下，可以将数据从UB搬运到一个目的寄存器，双搬入模式下，可以将数据从UB搬运到两个目的寄存器。 |
+| [连续对齐搬出](Reg矢量计算/Reg数据搬运/连续对齐搬出.md) | Reg矢量计算数据搬运接口，适用于从RegTensor连续对齐搬出到UB。 |
+| [非连续对齐搬入](Reg矢量计算/Reg数据搬运/非连续对齐搬入.md) | Reg矢量计算数据搬运接口，适用于从UB非连续对齐搬入RegTensor（以DataBlock为单位）。 |
+| [非连续对齐搬出](Reg矢量计算/Reg数据搬运/非连续对齐搬出.md) | Reg矢量计算数据搬运接口，适用于从RegTensor非连续对齐搬出到UB（以DataBlock为单位）。 |
+| [连续非对齐搬入](Reg矢量计算/Reg数据搬运/连续非对齐搬入.md) | Reg矢量计算数据搬运接口，适用于从UB非32B对齐地址起始连续搬入RegTensor。 |
+| [连续非对齐搬出](Reg矢量计算/Reg数据搬运/连续非对齐搬出.md) | Reg矢量计算数据搬运接口，适用于从RegTensor连续非对齐搬出到UB。 |
+| [MaskReg搬入](Reg矢量计算/Reg数据搬运/MaskReg搬入.md) | Reg矢量计算数据搬运接口，适用于从UB或RegTensor搬入MaskReg。 |
+| [MaskReg搬出](Reg矢量计算/Reg数据搬运/MaskReg搬出.md) | Reg矢量计算数据搬运接口，适用于从MaskReg搬出到UB。 |
+| [Move](Reg矢量计算/Reg数据搬运/Move.md) | 对srcReg中的有效元素逐个复制写入dstReg中对应位置处。 |
 
 ### MaskReg计算
 | 接口名 | 功能描述 |
 | --- | --- |
-| [Move](Reg矢量计算/MaskReg计算/Move.md) | 将src中的元素复制到dst中的对应位置。如果有输入mask，则仅复制被mask选定的有效元素，无效元素填0。 |
-| [Interleave](Reg矢量计算/MaskReg计算/Interleave.md) | 将源操作数src0和src1中的元素交织存入目的操作数dst0和dst1中。 |
-| [DeInterleave](Reg矢量计算/MaskReg计算/DeInterleave.md) | 将源操作数src0和src1中的元素解交织存入目的操作数dst0和dst1中。 |
-| [Select](Reg矢量计算/MaskReg计算/Select.md) | 给定两个源操作数src0和src1，根据mask的比特位值选取元素，得到目的操作数dst。选择的规则为：当mask的比特位是1时，从src0中选取对应位置的数，比特位是0时从src1选取对应位置的数。 |
+| [Move](Reg矢量计算/MaskReg计算/Move-10.md) | 将src中的元素复制到dst中的对应位置。如果有输入mask，则仅复制被mask选定的有效元素，无效元素填0。 |
+| [Interleave](Reg矢量计算/MaskReg计算/Interleave-11.md) | 将源操作数src0和src1中的元素交织存入目的操作数dst0和dst1中。 |
+| [DeInterleave](Reg矢量计算/MaskReg计算/DeInterleave-12.md) | 将源操作数src0和src1中的元素解交织存入目的操作数dst0和dst1中。 |
+| [Select](Reg矢量计算/MaskReg计算/Select-13.md) | 给定两个源操作数src0和src1，根据mask的比特位值选取元素，得到目的操作数dst。选择的规则为：当mask的比特位是1时，从src0中选取对应位置的数，比特位是0时从src1选取对应位置的数。 |
 | [Pack](Reg矢量计算/MaskReg计算/Pack.md) | 根据所选的低位模式或高位模式，将源操作数src的偶数位bit，提取到目的操作数dst的低半部分或高半部分。 |
 | [UnPack](Reg矢量计算/MaskReg计算/UnPack.md) | 根据所选的低位模式或高位模式，将源操作数src的低半部分或高半部分，展开到目的操作数dst。展开方式为：将每bit展开为2bit，高位置零。 |
 | [MoveMask](Reg矢量计算/MaskReg计算/MoveMask.md) | 从SetVectorMask设置的掩码寄存器{MASK1, MASK0}中读取Mask值，并按模板参数T对应的数据格式转换后写入返回值MaskReg。 |
@@ -332,65 +332,65 @@
 ### 基础算术
 | 接口名 | 功能描述 |
 | --- | --- |
-| [Abs](Reg矢量计算/基础算术/Abs.md) | 对srcReg中的有效元素逐个取绝对值，并将结果写入dstReg对应位置。 |
-| [Relu](Reg矢量计算/基础算术/Relu.md) | 该接口根据mask对输入数据srcReg进行Relu（线性整流）操作，将结果写入dstReg。 |
-| [Exp](Reg矢量计算/基础算术/Exp.md) | 该接口根据mask，对源操作数srcReg进行按元素指数操作，将结果写入目的操作数dstReg。 |
-| [Sqrt](Reg矢量计算/基础算术/Sqrt.md) | 该接口根据mask，对源操作数srcReg逐元素做平方根运算，将结果写入目的操作数dstReg。 |
-| [Ln](Reg矢量计算/基础算术/Ln.md) | 该接口根据mask逐元素对源操作数求自然对数，将结果写入目的操作数。 |
+| [Abs](Reg矢量计算/基础算术/Abs-15.md) | 对srcReg中的有效元素逐个取绝对值，并将结果写入dstReg对应位置。 |
+| [Relu](Reg矢量计算/基础算术/Relu-16.md) | 该接口根据mask对输入数据srcReg进行Relu（线性整流）操作，将结果写入dstReg。 |
+| [Exp](Reg矢量计算/基础算术/Exp-17.md) | 该接口根据mask，对源操作数srcReg进行按元素指数操作，将结果写入目的操作数dstReg。 |
+| [Sqrt](Reg矢量计算/基础算术/Sqrt-18.md) | 该接口根据mask，对源操作数srcReg逐元素做平方根运算，将结果写入目的操作数dstReg。 |
+| [Ln](Reg矢量计算/基础算术/Ln-19.md) | 该接口根据mask逐元素对源操作数求自然对数，将结果写入目的操作数。 |
 | [Log](Reg矢量计算/基础算术/Log.md) | 该接口根据mask逐元素对源操作数求自然对数，将结果写入目的操作数。 |
 | [Log2](Reg矢量计算/基础算术/Log2.md) | 该接口用于根据mask对输入数据srcReg进行求以2为底的对数操作，将结果写入dstReg。 |
 | [Log10](Reg矢量计算/基础算术/Log10.md) | 该接口根据mask逐元素对源操作数求以10为底的对数，将结果写入目的操作数。 |
 | [Neg](Reg矢量计算/基础算术/Neg.md) | 该接口用于根据mask对输入数据srcReg进行取相反数操作，将结果写入dstReg。 |
-| [Add](Reg矢量计算/基础算术/Add.md) | 该接口根据mask，对源操作数srcReg0、srcReg1进行按元素求和操作，将结果写入目的操作数dstReg。 |
-| [Sub](Reg矢量计算/基础算术/Sub.md) | 该接口根据mask，对源操作数srcReg0、srcReg1进行按元素求差操作，将结果写入目的操作数dstReg。 |
-| [Mul](Reg矢量计算/基础算术/Mul.md) | 该接口根据mask对输入数据srcReg0、srcReg1按元素相乘操作，将结果写入dstReg。 |
-| [Div](Reg矢量计算/基础算术/Div.md) | 该接口根据mask，对源操作数srcReg0、srcReg1进行按元素相除操作，将结果写入目的操作数dstReg。 |
-| [Max](Reg矢量计算/基础算术/Max.md) | 该接口根据mask，对源操作数srcReg0、srcReg1进行按元素求最大值操作，将结果写入目的操作数dstReg。 |
-| [Min](Reg矢量计算/基础算术/Min.md) | 该接口根据mask，对源操作数srcReg0、srcReg1进行按元素求最小值操作，将结果写入目的操作数dstReg。 |
+| [Add](Reg矢量计算/基础算术/Add-20.md) | 该接口根据mask，对源操作数srcReg0、srcReg1进行按元素求和操作，将结果写入目的操作数dstReg。 |
+| [Sub](Reg矢量计算/基础算术/Sub-21.md) | 该接口根据mask，对源操作数srcReg0、srcReg1进行按元素求差操作，将结果写入目的操作数dstReg。 |
+| [Mul](Reg矢量计算/基础算术/Mul-22.md) | 该接口根据mask对输入数据srcReg0、srcReg1按元素相乘操作，将结果写入dstReg。 |
+| [Div](Reg矢量计算/基础算术/Div-23.md) | 该接口根据mask，对源操作数srcReg0、srcReg1进行按元素相除操作，将结果写入目的操作数dstReg。 |
+| [Max](Reg矢量计算/基础算术/Max-24.md) | 该接口根据mask，对源操作数srcReg0、srcReg1进行按元素求最大值操作，将结果写入目的操作数dstReg。 |
+| [Min](Reg矢量计算/基础算术/Min-25.md) | 该接口根据mask，对源操作数srcReg0、srcReg1进行按元素求最小值操作，将结果写入目的操作数dstReg。 |
 | [Mull](Reg矢量计算/基础算术/Mull.md) | 该接口根据mask对输入数据srcReg0、srcReg1按元素相乘操作，将乘法结果的低位部分写入dstReg0，溢出（高位）部分写入dstReg1。 |
 | [AddC](Reg矢量计算/基础算术/AddC.md) | 该接口根据mask，对源操作数srcReg0、srcReg1及输入进位carrySrc进行按元素求和操作，将结果写入目的操作数dstReg，同时将每个元素的进位结果写入carry。 |
 | [SubC](Reg矢量计算/基础算术/SubC.md) | 该接口根据mask，对源操作数srcReg0、srcReg1及输入进位carrySrc进行按元素求差操作，将结果写入目的操作数dstReg，同时将每个元素的进位结果写入carry。 |
 | [Prelu](Reg矢量计算/基础算术/Prelu.md) | 该接口用于实现PReLU（Parametric ReLU）激活函数：当源操作数srcReg0中对应元素大于0时，直接将该元素写入目的操作数dstReg；否则将srcReg0与srcReg1对应元素相乘的结果写入dstReg。 |
-| [Adds](Reg矢量计算/基础算术/Adds.md) | 该接口根据mask，对源操作数srcReg按元素与标量scalarValue进行求和操作，将结果写入目的操作数dstReg。 |
-| [Muls](Reg矢量计算/基础算术/Muls.md) | 矢量内每个元素与标量求积。 |
-| [Maxs](Reg矢量计算/基础算术/Maxs.md) | 该接口根据mask，对源操作数srcReg按元素与标量相比，如果比标量大，则取源操作数值；如果比标量小，则取标量值，将结果写入目的操作数dstReg。 |
-| [Mins](Reg矢量计算/基础算术/Mins.md) | 该接口根据mask，对源操作数srcReg按元素与标量相比，如果比标量大，则取标量值，比标量小，则取源操作数值，将结果写入目的操作数dstReg。 |
-| [LeakyRelu](Reg矢量计算/基础算术/LeakyRelu.md) | 该接口用于按元素执行Leaky ReLU(Leaky Rectified Linear Unit)操作：当源操作数中某元素大于0时，直接将该元素写入目的操作数；否则将该元素乘以标量值scalarValue后写入目的操作数。 |
+| [Adds](Reg矢量计算/基础算术/Adds-26.md) | 该接口根据mask，对源操作数srcReg按元素与标量scalarValue进行求和操作，将结果写入目的操作数dstReg。 |
+| [Muls](Reg矢量计算/基础算术/Muls-27.md) | 矢量内每个元素与标量求积。 |
+| [Maxs](Reg矢量计算/基础算术/Maxs-28.md) | 该接口根据mask，对源操作数srcReg按元素与标量相比，如果比标量大，则取源操作数值；如果比标量小，则取标量值，将结果写入目的操作数dstReg。 |
+| [Mins](Reg矢量计算/基础算术/Mins-29.md) | 该接口根据mask，对源操作数srcReg按元素与标量相比，如果比标量大，则取标量值，比标量小，则取源操作数值，将结果写入目的操作数dstReg。 |
+| [LeakyRelu](Reg矢量计算/基础算术/LeakyRelu-30.md) | 该接口用于按元素执行Leaky ReLU(Leaky Rectified Linear Unit)操作：当源操作数中某元素大于0时，直接将该元素写入目的操作数；否则将该元素乘以标量值scalarValue后写入目的操作数。 |
 
 ### 逻辑计算
 | 接口名 | 功能描述 |
 | --- | --- |
-| [Not](Reg矢量计算/逻辑计算/Not.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行有效bit进行取反运算得到结果并保存。 |
-| [And](Reg矢量计算/逻辑计算/And.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行有效bit进行逻辑与运算得到结果并保存。 |
-| [Or](Reg矢量计算/逻辑计算/Or.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行有效bit进行逻辑或运算得到结果并保存。 |
+| (Reg矢量计算/逻辑计算/Not-32.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行有效bit进行取反运算得到结果并保存。 |
+| (Reg矢量计算/逻辑计算/And-33.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行有效bit进行逻辑与运算得到结果并保存。 |
+| (Reg矢量计算/逻辑计算/Or-34.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行有效bit进行逻辑或运算得到结果并保存。 |
 | [Xor](Reg矢量计算/逻辑计算/Xor.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行有效bit进行按位异或运算得到结果并保存。 |
-| [ShiftLeft](Reg矢量计算/逻辑计算/ShiftLeft.md) | 根据mask，对输入数据srcReg0，按照srcReg1对应元素进行左移操作，并将结果写入dstReg。 |
-| [ShiftRight](Reg矢量计算/逻辑计算/ShiftRight.md) | 根据mask，对输入数据srcReg0按照srcReg1对应元素进行右移操作，将结果写入dstReg。 |
+| (Reg矢量计算/逻辑计算/ShiftLeft-35.md) | 根据mask，对输入数据srcReg0，按照srcReg1对应元素进行左移操作，并将结果写入dstReg。 |
+| (Reg矢量计算/逻辑计算/ShiftRight-36.md) | 根据mask，对输入数据srcReg0按照srcReg1对应元素进行右移操作，将结果写入dstReg。 |
 | [ShiftLefts](Reg矢量计算/逻辑计算/ShiftLefts.md) | 源操作数内每个元素做逻辑左移，逻辑左移的位数由输入参数scalarValue决定。 |
 | [ShiftRights](Reg矢量计算/逻辑计算/ShiftRights.md) | 源操作数内每个元素做右移，右移的位数由输入参数scalarValue决定。 |
 
 ### 复合计算
 | 接口名 | 功能描述 |
 | --- | --- |
-| [Axpy](Reg矢量计算/复合计算/Axpy.md) | 根据mask对输入数据dstReg、srcReg、scalarValue按元素做乘加操作，将结果写入dstReg。 |
+| [Axpy](Reg矢量计算/复合计算/Axpy-38.md) | 根据mask对输入数据dstReg、srcReg、scalarValue按元素做乘加操作，将结果写入dstReg。 |
 | [AbsSub](Reg矢量计算/复合计算/AbsSub.md) | srcReg0与srcReg1相减再求绝对值，根据mask将计算结果写入dstReg。 |
 | [ExpSub](Reg矢量计算/复合计算/ExpSub.md) | srcReg0与srcReg1相减，差值作为e的指数计算，根据mask将计算结果写入dstReg。 |
 | [MulDstAdd](Reg矢量计算/复合计算/MulDstAdd.md) | dstReg与srcReg0相乘后与srcReg1相加，根据mask将计算结果写入dstReg。 |
-| [MulAddDst](Reg矢量计算/复合计算/MulAddDst.md) | srcReg0与srcReg1相乘再加上dstReg的值，根据mask将计算结果写入dstReg。 |
+| [MulAddDst](Reg矢量计算/复合计算/MulAddDst-39.md) | srcReg0与srcReg1相乘再加上dstReg的值，根据mask将计算结果写入dstReg。 |
 | [MulsCast](Reg矢量计算/复合计算/MulsCast.md) | src与scalar相乘的结果再按照CAST_ROUND模式转换成half类型，根据mask将计算结果写入dst。 |
 
 ### 比较与选择
 | 接口名 | 功能描述 |
 | --- | --- |
-| [Compare](Reg矢量计算/比较与选择/Compare.md) | 逐元素比较两个RegTensor大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。 |
-| [Compares](Reg矢量计算/比较与选择/Compares.md) | 逐元素比较一个Tensor中的元素和另一个scalar的大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。 |
-| [Select](Reg矢量计算/比较与选择/Select.md) | 给定两个源操作数srcReg0和srcReg1，根据mask的比特位值选取元素，得到目的操作数dstReg。选择的规则为：当mask的比特位是1时，从srcReg0中选取对应位置的数，比特位是0时从srcReg1选取对应位置的数。 |
+| [Compare](Reg矢量计算/比较与选择/Compare-41.md) | 逐元素比较两个RegTensor大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。 |
+| [Compares](Reg矢量计算/比较与选择/Compares-42.md) | 逐元素比较一个Tensor中的元素和另一个scalar的大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。 |
+| [Select](Reg矢量计算/比较与选择/Select-43.md) | 给定两个源操作数srcReg0和srcReg1，根据mask的比特位值选取元素，得到目的操作数dstReg。选择的规则为：当mask的比特位是1时，从srcReg0中选取对应位置的数，比特位是0时从srcReg1选取对应位置的数。 |
 | [Squeeze](Reg矢量计算/比较与选择/Squeeze.md) | 将传入的srcReg中被mask选择的有效元素依次复制到dstReg中，有效元素在dstReg中从低到高连续排列。dstReg中剩余位置元素置为0。 |
 
 ### 类型转换
 | 接口名 | 功能描述 |
 | --- | --- |
-| [Cast](Reg矢量计算/类型转换/Cast.md) | Cast用于数据类型精度转换，将源操作数数据类型转换成目的操作数数据类型，能够实现浮点转整数、浮点转浮点、整数转浮点、整数转整数的数据类型转换。 |
+| [Cast](Reg矢量计算/类型转换/Cast-45.md) | Cast用于数据类型精度转换，将源操作数数据类型转换成目的操作数数据类型，能够实现浮点转整数、浮点转浮点、整数转浮点、整数转整数的数据类型转换。 |
 | [Truncate](Reg矢量计算/类型转换/Truncate.md) | 将源操作数中的浮点数元素截断为整数值（保留原数据类型），并存入目的操作数。 |
 
 ### 归约计算
@@ -403,25 +403,25 @@
 ### 数据填充
 | 接口名 | 功能描述 |
 | --- | --- |
-| [Duplicate](Reg矢量计算/数据填充/Duplicate.md) | 支持Scalar和Tensor两种模式。 |
+| [Duplicate](Reg矢量计算/数据填充/Duplicate-48.md) | 支持Scalar和Tensor两种模式。 |
 
 ### 离散操作
 | 接口名 | 功能描述 |
 | --- | --- |
-| [Gather](Reg矢量计算/离散操作/Gather.md) | 该指令会根据索引值indexReg将源操作数srcReg按元素收集到目的操作数dstReg中。 |
+| [Gather](Reg矢量计算/离散与聚合/Gather-50.md) | 该指令会根据索引值indexReg将源操作数srcReg按元素收集到目的操作数dstReg中。 |
 
 ### 数据重排
 | 接口名 | 功能描述 |
 | --- | --- |
-| [Interleave](Reg矢量计算/数据重排/Interleave.md) | 给定源操作数寄存器srcReg0和srcReg1，将srcReg0和srcReg1中的元素交织存入结果操作数dstReg0和dstReg1中。 |
-| [DeInterleave](Reg矢量计算/数据重排/DeInterleave.md) | 给定源操作数寄存器srcReg0和srcReg1，将srcReg0和srcReg1中的元素解交织存入结果操作数dstReg0和dstReg1中。 |
+| [Interleave](Reg矢量计算/数据重排/Interleave-51.md) | 给定源操作数寄存器srcReg0和srcReg1，将srcReg0和srcReg1中的元素交织存入结果操作数dstReg0和dstReg1中。 |
+| [DeInterleave](Reg矢量计算/数据重排/DeInterleave-52.md) | 给定源操作数寄存器srcReg0和srcReg1，将srcReg0和srcReg1中的元素解交织存入结果操作数dstReg0和dstReg1中。 |
 
 ### 数据压缩
 | 接口名 | 功能描述 |
 | --- | --- |
 | [Unsqueeze](Reg矢量计算/数据压缩/Unsqueeze.md) | 将dstReg中数据根据mask进行解压缩。解压缩方式：dstReg中第0个元素置为0，dstReg中的第i个元素等于mask中从第0个到第\(i-1\)个元素中1的数量。mask最高位被忽略不参与统计。 |
-| [Pack](Reg矢量计算/数据压缩/Pack.md) | 将源操作数srcReg中的元素选取低8位（对于b16类型）、低16位（对于b32类型）、低32位（对于b64类型）写入dstReg的低半部分或高半部分。 |
-| [UnPack](Reg矢量计算/数据压缩/UnPack.md) | 对于无符号整型，将源操作数srcReg中低半部分或高半部分的元素以高位填0扩充位宽的方式写入dstReg。对于有符号整型，将源操作数srcReg中低半部分或高半部分的元素以保持符号位扩充位宽的方式写入dstReg。 |
+| [Pack](Reg矢量计算/数据压缩/Pack-53.md) | 将源操作数srcReg中的元素选取低8位（对于b16类型）、低16位（对于b32类型）、低32位（对于b64类型）写入dstReg的低半部分或高半部分。 |
+| [UnPack](Reg矢量计算/数据压缩/UnPack-54.md) | 对于无符号整型，将源操作数srcReg中低半部分或高半部分的元素以高位填0扩充位宽的方式写入dstReg。对于有符号整型，将源操作数srcReg中低半部分或高半部分的元素以保持符号位扩充位宽的方式写入dstReg。 |
 
 ### 直方图计算
 | 接口名 | 功能描述 |
