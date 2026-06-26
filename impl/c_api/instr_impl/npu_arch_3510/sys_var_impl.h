@@ -11,29 +11,27 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_SYS_VAR_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_SYS_VAR_IMPL_H
 
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_ar_spr_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_program_counter_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_ctrl_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_block_num_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_system_cycle_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_ctrl_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_ffts_base_addr_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_phy_buf_addr_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_vf_len_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_ffts_base_addr_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_gm2l1_nz_para_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_l0c2gm_quant_post_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_l0c2gm_relu_alpha_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_l12l0_padding_val_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_l13d_padding_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_arch_ver_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_core_id_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_l0c2gm_channel_para_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_set_l3d_rpt_b_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_smmu_tag_version_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_phy_stack_base_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_status_impl.h"
-#include "instr_impl/npu_arch_3510/sys_var_impl/asc_get_sys_virtual_base_impl.h"
+#include "sys_var_impl/asc_get_ar_spr_impl.h"
+#include "sys_var_impl/asc_get_program_counter_impl.h"
+#include "sys_var_impl/asc_set_ctrl_impl.h"
+#include "sys_var_impl/asc_get_block_num_impl.h"
+#include "sys_var_impl/asc_get_system_cycle_impl.h"
+#include "sys_var_impl/asc_get_ctrl_impl.h"
+#include "sys_var_impl/asc_get_phy_buf_addr_impl.h"
+#include "sys_var_impl/asc_get_vf_len_impl.h"
+#include "sys_var_impl/asc_set_gm2l1_nz_para_impl.h"
+#include "sys_var_impl/asc_set_l0c2gm_quant_post_impl.h"
+#include "sys_var_impl/asc_set_l0c2gm_relu_alpha_impl.h"
+#include "sys_var_impl/asc_set_l12l0_padding_val_impl.h"
+#include "sys_var_impl/asc_set_l13d_padding_impl.h"
+#include "sys_var_impl/asc_get_arch_ver_impl.h"
+#include "sys_var_impl/asc_get_core_id_impl.h"
+#include "sys_var_impl/asc_set_l0c2gm_channel_para_impl.h"
+#include "sys_var_impl/asc_set_l3d_rpt_b_impl.h"
+#include "sys_var_impl/asc_get_smmu_tag_version_impl.h"
+#include "sys_var_impl/asc_get_phy_stack_base_impl.h"
+#include "sys_var_impl/asc_get_status_impl.h"
+#include "sys_var_impl/asc_get_sys_virtual_base_impl.h"
 
 __aicore__ inline int64_t asc_get_ar_spr()
 {
@@ -70,11 +68,6 @@ __aicore__ inline constexpr int64_t asc_get_vf_len()
     return asc_get_vf_len_impl();
 }
 
-__aicore__ inline int64_t asc_get_ffts_base_addr()
-{
-    return asc_get_ffts_base_addr_impl();
-}
-
 __aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset)
 {
     return asc_get_phy_buf_addr_impl(offset);
@@ -98,11 +91,6 @@ __aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config)
 __aicore__ inline void asc_set_l3d_rpt_b(uint64_t config)
 {
     asc_set_l3d_rpt_b_impl(config);
-}
-
-__aicore__ inline void asc_set_ffts_base_addr(uint64_t config)
-{
-    asc_set_ffts_base_addr_impl(config);
 }
 
 __aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config)

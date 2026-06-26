@@ -22,13 +22,13 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_VECTOR_DATAMOVE_IMPL_ASC_COPY_GM2UB_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_2201_VECTOR_DATAMOVE_IMPL_ASC_COPY_GM2UB_IMPL_H
 
-#include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
+#include "../utils_impl/utils_impl.h"
 
 __aicore__ inline void asc_copy_gm2ub_impl(__ubuf__ void* dst, __gm__ void* src,
-    uint16_t n_burst, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
+    uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
 {
     if ASC_IS_AIV {
-        copy_gm_to_ubuf(dst, src, 0, n_burst, burst_len, src_gap, dst_gap);
+        copy_gm_to_ubuf(dst, src, 0, n_burst, len_burst, src_gap, dst_gap);
     }
 }
 

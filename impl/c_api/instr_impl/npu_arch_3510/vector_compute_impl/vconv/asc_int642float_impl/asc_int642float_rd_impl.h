@@ -23,19 +23,19 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_VECTOR_COMPUTE_IMPL_ASC_INT642FLOAT_RD_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_VECTOR_COMPUTE_IMPL_ASC_INT642FLOAT_RD_IMPL_H
 
-#include "instr_impl/npu_arch_3510/utils_impl.h"
+#include "../../../utils_impl.h"
 
 __simd_callee__ inline void asc_int642float_rd_impl(vector_float& dst, vector_int64_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_R, PART_EVEN, MODE_ZEROING);
+        vcvt(dst, src, mask, ROUND_F, PART_EVEN, MODE_ZEROING);
     }
 }
 
 __simd_callee__ inline void asc_int642float_rd_v2_impl(vector_float& dst, vector_int64_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_R, PART_ODD, MODE_ZEROING);
+        vcvt(dst, src, mask, ROUND_F, PART_ODD, MODE_ZEROING);
     }
 }
 #endif

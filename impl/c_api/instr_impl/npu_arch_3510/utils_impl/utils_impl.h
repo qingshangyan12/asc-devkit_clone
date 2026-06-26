@@ -11,9 +11,7 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_UTILS_IMPL_UTILS_C_API_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_UTILS_IMPL_UTILS_C_API_IMPL_H
 
-#include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
-
-constexpr int64_t VECTOR_REG_WIDTH_3510 = 256;
+#include "../../npu_arch_2201/utils_impl/utils_impl.h"
 
 union asc_gm2l1_loop_size_config {
     uint64_t config;

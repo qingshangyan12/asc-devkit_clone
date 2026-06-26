@@ -18,11 +18,11 @@
 #ifndef IMPL_CAPI_INSTR_IMPL_NPU_ARCH_2201_VECTOR_COMPUTE_IMPL_ASC_LOG_IMPL_H
 #define IMPL_CAPI_INSTR_IMPL_NPU_ARCH_2201_VECTOR_COMPUTE_IMPL_ASC_LOG_IMPL_H
 
-#include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
+#include "../utils_impl/utils_impl.h"
 
 __aicore__ inline void asc_log_impl_half(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat,
                                          uint16_t dst_block_stride, uint16_t src_block_stride,
-                                         uint8_t dst_repeat_stride, uint8_t src_repeat_stride)
+                                         uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {
     if ASC_IS_AIV {
         vln(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
@@ -46,7 +46,7 @@ __aicore__ inline void asc_log_sync_impl_half(__ubuf__ half* dst, __ubuf__ half*
 
 __aicore__ inline void asc_log_impl_float(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat,
                                           uint16_t dst_block_stride, uint16_t src_block_stride,
-                                          uint8_t dst_repeat_stride, uint8_t src_repeat_stride)
+                                          uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
 {
     if ASC_IS_AIV {
         vln(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);

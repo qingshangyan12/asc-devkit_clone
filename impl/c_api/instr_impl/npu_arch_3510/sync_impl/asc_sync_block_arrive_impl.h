@@ -23,13 +23,12 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_SYNC_IMPL_ASC_SYNC_BLOCK_ARRIVE_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_SYNC_IMPL_ASC_SYNC_BLOCK_ARRIVE_IMPL_H
 
-#include "instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
-
-constexpr uint16_t SYNC_MODE_SHIFT_VALUE = 4;
-constexpr uint16_t SYNC_FLAG_SHIFT_VALUE = 8;
+#include "../utils_impl/utils_impl.h"
 
 __aicore__ inline uint16_t GetfftsConfig(uint16_t flag_id)
 {
+    constexpr uint16_t SYNC_MODE_SHIFT_VALUE = 4;
+    constexpr uint16_t SYNC_FLAG_SHIFT_VALUE = 8;
     uint16_t mode = 0x02;
     return (0x1 + ((mode & 0x3) << SYNC_MODE_SHIFT_VALUE) + ((flag_id & 0xf) << SYNC_FLAG_SHIFT_VALUE));
 }

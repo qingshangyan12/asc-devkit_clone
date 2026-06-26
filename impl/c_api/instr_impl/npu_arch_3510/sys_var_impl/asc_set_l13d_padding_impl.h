@@ -18,26 +18,43 @@
 #ifndef IMPL_CAPI_INSTR_IMPL_NPU_ARCH_3510_SYS_VAR_IMPL_ASC_SET_L13D_PADDING_IMPL_H
 #define IMPL_CAPI_INSTR_IMPL_NPU_ARCH_3510_SYS_VAR_IMPL_ASC_SET_L13D_PADDING_IMPL_H
 
-#include "instr_impl/npu_arch_3510/utils_impl.h"
+#include "../utils_impl.h"
 
 __aicore__ inline void asc_set_l13d_padding_impl(uint64_t config)
 {
-    set_padding(config);
+    if ASC_IS_AIC {
+        uint64_t paddingValue = 0;
+        uint64_t padValueShiftBit = 8;
+        paddingValue = (config << padValueShiftBit) | (config & 0xFF);
+        set_padding(paddingValue);
+    }
 }
 
 __aicore__ inline void asc_set_l13d_padding_impl(half config)
 {
-    set_padding(config);
+    if ASC_IS_AIC {
+        asc_scalar_bitcode bitcode;
+        bitcode.input_half = config;
+        set_padding(bitcode.output);
+    }
 }
 
 __aicore__ inline void asc_set_l13d_padding_impl(int16_t config)
 {
-    set_padding(config);
+    if ASC_IS_AIC {
+        asc_scalar_bitcode bitcode;
+        bitcode.input_int16_t = config;
+        set_padding(bitcode.output);
+    }
 }
 
 __aicore__ inline void asc_set_l13d_padding_impl(uint16_t config)
 {
-    set_padding(config);
+    if ASC_IS_AIC {
+        asc_scalar_bitcode bitcode;
+        bitcode.input_uint16_t = config;
+        set_padding(bitcode.output);
+    }
 }
 
 #endif
