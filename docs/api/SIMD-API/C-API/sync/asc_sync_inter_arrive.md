@@ -18,9 +18,9 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品: 支持
 
 ## 函数原型
 
-    ```cpp
+  ```cpp
    __aicore__ inline void asc_sync_inter_arrive(pipe_t pipe, int64_t flag_id)
-    ```
+  ```
 
 ## 参数说明
 
@@ -47,6 +47,12 @@ PIPE_S
 
 ## 调用示例
 
+<!-- npu="A3" id5 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- end id5 -->
+<!-- npu="910b" id6 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品
+<!-- end id6 -->
 ```cpp
 // Host侧调用接口aclrtGetHardwareSyncAddr获取核间同步基地址ffts_addr
 uint64_t config = *(__gm__ uint64_t*)ffts_addr;
@@ -56,13 +62,13 @@ asc_sync_inter_arrive(PIPE_S, flag_id);
 asc_sync_inter_wait(PIPE_S, flag_id);  
 ```
 
-<cann-filter npu_type="950">
 
+<!-- npu="950" id4 -->
+Ascend 950PR/Ascend 950DT
+<!-- end id4 -->
 ```cpp
 // 在Ascend 950PR/Ascend 950DT产品上，无需进行核间同步基地址ffts_addr的设置
 int64_t flag_id = 1;
 asc_sync_inter_arrive(PIPE_S, flag_id);
 asc_sync_inter_wait(PIPE_S, flag_id);  
 ```
-
-</cann-filter>
