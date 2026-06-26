@@ -26,6 +26,8 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
+头文件路径为："basic_api/kernel_operator_vec_binary_intf.h"
+
 src0与src1相减，将差值作为指数计算自然常数e的幂次，并将计算结果写入dst。
 
 源操作数数据类型为float类型时，计算公式如下：

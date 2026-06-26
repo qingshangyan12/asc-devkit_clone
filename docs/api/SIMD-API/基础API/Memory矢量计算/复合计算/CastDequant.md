@@ -156,8 +156,8 @@
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 地址对齐约束参考[地址对齐约束](../../../通用说明和约束.md#section796754519912)。
-- 操作数地址重叠约束请参考[地址重叠约束](../../../通用说明和约束.md#section668772811100)。
+- 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#section668772811100)。
 - 当输出类型为b8时，目的操作数数据类型需要和`SetDeqScale`接口的signMode入参配合，当signMode=true时输出数据类型int8_t；signMode=false时输出数据类型uint8_t。
 - halfBlock参数仅在输出数据为b8类型时有效。
 - 高维切分接口通过GetTemporaryBufferAddr接口预留了8KB Unified Buffer用于内部临时内存管理。

@@ -31,7 +31,7 @@
 按元素求积，并根据源操作数和目的操作数Tensor的数据类型进行精度转换。计算公式如下：
 
 $$
-dst_i = conv(src0_i * src1_i)
+dst_i = Cast(src0_i * src1_i)
 $$
 
 ## 函数原型<a name="section620mcpsimp"></a>
