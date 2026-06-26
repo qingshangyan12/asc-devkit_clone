@@ -1,6 +1,8 @@
 # SIMT接口软仿情况汇总
 
-表格按照 API 文档所在目录分级展示。
+本文按照SIMT API文档所在目录分级汇总各接口的软仿情况，表格中的API名链接到对应接口文档，API是否软仿用于标识该接口的实现方式。
+
+本文中的非软仿接口是指使用单一硬件指令完成操作的接口；软仿接口是指由编译器实现，或由上层接口通过拼接多条硬件指令实现功能的接口。
 
 ## Warp函数
 
@@ -241,6 +243,7 @@
 | --- | --- |
 | [`hceil`](../SIMT-API/数学函数/bfloat16类型/bfloat16类型数学库函数/hceil-190.md) | 否 |
 | [`hcos`](../SIMT-API/数学函数/bfloat16类型/bfloat16类型数学库函数/hcos-183.md) | 是 |
+| [`hexp`](../SIMT-API/数学函数/bfloat16类型/bfloat16类型数学库函数/hexp-177.md) | 是 |
 | [`hexp10`](../SIMT-API/数学函数/bfloat16类型/bfloat16类型数学库函数/hexp10-179.md) | 是 |
 | [`hexp2`](../SIMT-API/数学函数/bfloat16类型/bfloat16类型数学库函数/hexp2-178.md) | 是 |
 | [`hfloor`](../SIMT-API/数学函数/bfloat16类型/bfloat16类型数学库函数/hfloor-189.md) | 否 |
@@ -387,7 +390,7 @@
 
 | API名 | API是否软仿 |
 | --- | --- |
-| [`__fdividef`](../SIMT-API/数学函数/float类型数学库函数/__fdividef.md) | 是 |
+| [`__fdividef`](../SIMT-API/数学函数/float类型数学库函数/__fdividef.md) | 否 |
 | [`__saturatef`](../SIMT-API/数学函数/float类型数学库函数/__saturatef.md) | 是 |
 | [`acosf`](../SIMT-API/数学函数/float类型数学库函数/acosf.md) | 是 |
 | [`acoshf`](../SIMT-API/数学函数/float类型数学库函数/acoshf.md) | 是 |

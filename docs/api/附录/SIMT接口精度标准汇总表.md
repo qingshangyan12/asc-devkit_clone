@@ -1,65 +1,43 @@
 # SIMT接口精度标准汇总表
 
+本文按照数据类型和接口类型对SIMT浮点计算接口进行精度标准的分类汇总。对于非软仿接口，给出对应硬件指令的精度标准；对于软仿接口，由于软仿程度较低且使用到的硬件指令较少，给出其所用硬件指令的综合性精度标准。
+
 ## bf16数据类型计算API精度标准
 
 ### 数学库函数
 
 | 接口 | 硬件指令精度标准 | 软仿精度标准 |
 | --- | --- | --- |
-| hexp | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| htanh | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| hexp2 | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| hexp10 | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| hlog | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| hlog2 | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| hlog10 | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| hcos | - | - |
-| hsin | - | - |
-| hsqrt | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| hrsqrt | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| hrcp | 使用操作符“/”实现倒数计算 | - |
-| hrint | 调用\_\_rintf(bfloat16)完成计算 | - |
-| hfloor | 调用\_\_floorf(bfloat16)完成计算 | - |
-| hceil | 调用\_\_ceilf(bfloat16)完成计算 | - |
-| htrunc | 判断元素是否大于0，如果大于0调用\_\_floorf(bfloat16)完成计算，否则调用\_\_ceilf(bfloat16)完成计算 | - |
-| h2tanh | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| h2exp | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| h2exp2 | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| h2exp10 | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| h2log | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| h2log2 | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| h2log10 | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| h2cos | - | - |
-| h2sin | - | - |
-| h2sqrt | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| h2rsqrt | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| h2rcp | 各个元素使用操作符“/”实现倒数计算 | - |
-| h2rint | 各个元素调用\_\_rintf(bfloat16)完成计算 | - |
-| h2floor | 各个元素调用\_\_floorf(bfloat16)完成计算 | - |
-| h2ceil | 各个元素调用\_\_ceilf(bfloat16)完成计算 | - |
-| h2trunc | 判断各个元素是否大于0，如果大于0调用\_\_floorf(bfloat16)完成计算，否则调用\_\_ceilf(bfloat16)完成计算 | - |
+| [hexp](../SIMT-API/数学函数/bfloat16类型/bfloat16类型数学库函数/hexp-177.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [htanh](../SIMT-API/数学函数/bfloat16类型/bfloat16类型数学库函数/htanh-176.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [hexp2](../SIMT-API/数学函数/bfloat16类型/bfloat16类型数学库函数/hexp2-178.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [hexp10](../SIMT-API/数学函数/bfloat16类型/bfloat16类型数学库函数/hexp10-179.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [hlog](../SIMT-API/数学函数/bfloat16类型/bfloat16类型数学库函数/hlog-180.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [hlog2](../SIMT-API/数学函数/bfloat16类型/bfloat16类型数学库函数/hlog2-181.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [hlog10](../SIMT-API/数学函数/bfloat16类型/bfloat16类型数学库函数/hlog10-182.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [hsqrt](../SIMT-API/数学函数/bfloat16类型/bfloat16类型数学库函数/hsqrt-185.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [hrsqrt](../SIMT-API/数学函数/bfloat16类型/bfloat16类型数学库函数/hrsqrt-186.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [h2tanh](../SIMT-API/数学函数/bfloat16类型/bfloat16x2类型数学库函数/h2tanh-242.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [h2exp](../SIMT-API/数学函数/bfloat16类型/bfloat16x2类型数学库函数/h2exp-243.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [h2exp2](../SIMT-API/数学函数/bfloat16类型/bfloat16x2类型数学库函数/h2exp2-244.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [h2exp10](../SIMT-API/数学函数/bfloat16类型/bfloat16x2类型数学库函数/h2exp10-245.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [h2log](../SIMT-API/数学函数/bfloat16类型/bfloat16x2类型数学库函数/h2log-246.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [h2log2](../SIMT-API/数学函数/bfloat16类型/bfloat16x2类型数学库函数/h2log2-247.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [h2log10](../SIMT-API/数学函数/bfloat16类型/bfloat16x2类型数学库函数/h2log10-248.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [h2sqrt](../SIMT-API/数学函数/bfloat16类型/bfloat16x2类型数学库函数/h2sqrt-251.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [h2rsqrt](../SIMT-API/数学函数/bfloat16类型/bfloat16x2类型数学库函数/h2rsqrt-252.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
 
 ### 算术函数
 
 | 接口 | 硬件指令精度标准 | 软仿精度标准 |
 | --- | --- | --- |
-| \_\_habs | - | IEEE754, Support denormalized numbers |
-| \_\_hfma | - | - |
-| \_\_hadd | IEEE754, Support denormalized numbers | - |
-| \_\_hsub | 直接使用算术运算符“-”实现功能 | - |
-| \_\_hmul | IEEE754, Support denormalized numbers | - |
-| \_\_hdiv | 1-ulp compare to X86，Not Support denormalized numbers | - |
-| \_\_hneg | 路寄存器取反，再配合ADD指令实现的。 | - |
-| \_\_hfma_relu | 调用\_\_hmax_nan(bfloat16)和\_\_fma(bfloat16)实现 | - |
-| \_\_haddx2 | IEEE754, Support denormalized numbers | - |
-| \_\_hsubx2 | 直接使用算术运算符“-”实现功能 | - |
-| \_\_hmulx2 | IEEE754, Support denormalized numbers | - |
-| \_\_hdivx2 | 1-ulp compare to X86，Not Support denormalized numbers | - |
-| \_\_habsx2 | - | - |
-| \_\_hfmax2 | - | - |
-| \_\_hnegx2 | 路寄存器取反，再配合ADD指令实现的 | - |
-| \_\_hfmax2_relu | 调用\_\_hmaxx2(bfloat16)和\_\_hfmax2(bfloat16)实现 | - |
-| \_\_hcmadd | - | - |
+| [\_\_habs](../SIMT-API/数学函数/bfloat16类型/bfloat16类型算术函数/__habs-150.md) | - | IEEE754, Support denormalized numbers |
+| [\_\_hadd](../SIMT-API/数学函数/bfloat16类型/bfloat16类型算术函数/__hadd-152.md) | IEEE754, Support denormalized numbers | - |
+| [\_\_hmul](../SIMT-API/数学函数/bfloat16类型/bfloat16类型算术函数/__hmul-154.md) | IEEE754, Support denormalized numbers | - |
+| [\_\_hdiv](../SIMT-API/数学函数/bfloat16类型/bfloat16类型算术函数/__hdiv-155.md) | 1-ulp compare to X86，Not Support denormalized numbers | - |
+| [\_\_haddx2](../SIMT-API/数学函数/bfloat16类型/bfloat16x2类型算术函数/__haddx2-192.md) | IEEE754, Support denormalized numbers | - |
+| [\_\_hmulx2](../SIMT-API/数学函数/bfloat16类型/bfloat16x2类型算术函数/__hmulx2-194.md) | IEEE754, Support denormalized numbers | - |
+| [\_\_hdivx2](../SIMT-API/数学函数/bfloat16类型/bfloat16x2类型算术函数/__hdivx2-195.md) | 1-ulp compare to X86，Not Support denormalized numbers | - |
 
 ## fp16数据类型计算API精度标准
 
@@ -67,152 +45,55 @@
 
 | 接口 | 硬件指令精度标准 | 软仿精度标准 |
 | --- | --- | --- |
-| htah | \_\_cvt_float(half)、tanhf(float)、\_\_cvt(float)指令串行 | - |
-| hexp | 1-ulp compare to X86 | - |
-| hexp2 | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| hexp10 | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| hlog | 1-ulp compare to X86，Not Support denormalized numbers | - |
-| hlog2 | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| hlog10 | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| hcos | - | - |
-| hsin | - | - |
-| hsqrt | 1-ulp compare to X86，Not Support denormalized numbers | - |
-| hrsqrt | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| hrcp | 使用操作符“/”实现倒数计算 | - |
-| hrint | 调用\_\_rintf(half )完成计算 | - |
-| hfloor | 调用\_\_floorf(half )完成计算 | - |
-| hceil | 调用\_\_ceilf(half )完成计算 | - |
-| htrunc | 判断元素是否大于0，如果大于0调用\_\_floorf(half )完成计算，否则调用\_\_ceilf(half )完成计算 | - |
-| h2tanh | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| h2exp | 1-ulp compare to X86，Not Support denormalized numbers | - |
-| h2exp2 | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| h2exp10 | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| h2log | 1-ulp compare to X86，Not Support denormalized numbers | - |
-| h2log2 | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| h2log10 | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| h2cos | - | - |
-| h2sin | - | - |
-| h2sqrt | 1-ulp compare to X86，Not Support denormalized numbers | - |
-| h2rsqrt | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| h2rcp | 各个元素使用操作符“/”实现倒数计算 | - |
-| h2rint | 各个元素调用\_\_rintf(half )完成计算 | - |
-| h2floor | 各个元素调用\_\_floorf(half )完成计算 | - |
-| h2ceil | 各个元素调用\_\_ceilf(half )完成计算 | - |
-| h2trunc | 各个元素判断元素是否大于0，如果大于0调用\_\_floorf(half )完成计算，否则调用\_\_ceilf(half )完成计算 | - |
+| [hexp](../SIMT-API/数学函数/half类型/half类型数学库函数/hexp.md) | 1-ulp compare to X86 | - |
+| [hexp2](../SIMT-API/数学函数/half类型/half类型数学库函数/hexp2.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [hexp10](../SIMT-API/数学函数/half类型/half类型数学库函数/hexp10.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [hlog](../SIMT-API/数学函数/half类型/half类型数学库函数/hlog.md) | 1-ulp compare to X86，Not Support denormalized numbers | - |
+| [hlog2](../SIMT-API/数学函数/half类型/half类型数学库函数/hlog2.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [hlog10](../SIMT-API/数学函数/half类型/half类型数学库函数/hlog10.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [hsqrt](../SIMT-API/数学函数/half类型/half类型数学库函数/hsqrt.md) | 1-ulp compare to X86，Not Support denormalized numbers | - |
+| [hrsqrt](../SIMT-API/数学函数/half类型/half类型数学库函数/hrsqrt.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [h2tanh](../SIMT-API/数学函数/half类型/half2类型数学库函数/h2tanh.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [h2exp](../SIMT-API/数学函数/half类型/half2类型数学库函数/h2exp.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [h2exp2](../SIMT-API/数学函数/half类型/half2类型数学库函数/h2exp2.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [h2exp10](../SIMT-API/数学函数/half类型/half2类型数学库函数/h2exp10.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [h2log](../SIMT-API/数学函数/half类型/half2类型数学库函数/h2log.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [h2log2](../SIMT-API/数学函数/half类型/half2类型数学库函数/h2log2.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [h2log10](../SIMT-API/数学函数/half类型/half2类型数学库函数/h2log10.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [h2sqrt](../SIMT-API/数学函数/half类型/half2类型数学库函数/h2sqrt.md) | 1-ulp compare to X86，Not Support denormalized numbers | - |
+| [h2rsqrt](../SIMT-API/数学函数/half类型/half2类型数学库函数/h2rsqrt.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
 
 ### 算术函数
 
 | 接口 | 硬件指令精度标准 | 软仿精度标准 |
 | --- | --- | --- |
-| \_\_habs | - | - |
-| \_\_hfma | - | - |
-| \_\_hadd | IEEE754, Support denormalized numbers | - |
-| \_\_hsub | 直接使用算术运算符“-”实现功能 | - |
-| \_\_hmul | IEEE754, Support denormalized numbers | - |
-| \_\_hdiv | 1-ulp compare to X86，Not Support denormalized numbers | - |
-| \_\_hneg | 路寄存器取反，再配合ADD指令实现的 | - |
-| \_\_hfma_relu | 调用\_\_hmax_nan(half)和\_\_fma(half)实现 | - |
-| \_\_haddx2 | IEEE754, Support denormalized numbers | - |
-| \_\_hsubx2 | 直接使用算术运算符“-”实现功能 | - |
-| \_\_hmulx2 | IEEE754, Support denormalized numbers | - |
-| \_\_hdivx2 | 1-ulp compare to X86，Not Support denormalized numbers | - |
-| \_\_habsx2 | - | - |
-| \_\_hfmax2 | - | - |
-| \_\_hnegx2 | 路寄存器取反，再配合ADD指令实现的 | - |
-| \_\_hfmax2_relu | 调用\_\_hmaxx2(half)和\_\_hfmax2half)实现 | - |
-| \_\_hcmadd | - | - |
+| [\_\_hadd](../SIMT-API/数学函数/half类型/half类型算术函数/__hadd.md) | IEEE754, Support denormalized numbers | - |
+| [\_\_hmul](../SIMT-API/数学函数/half类型/half类型算术函数/__hmul.md) | IEEE754, Support denormalized numbers | - |
+| [\_\_hdiv](../SIMT-API/数学函数/half类型/half类型算术函数/__hdiv.md) | 1-ulp compare to X86，Not Support denormalized numbers | - |
+| [\_\_haddx2](../SIMT-API/数学函数/half类型/half2类型算术函数/__haddx2.md) | IEEE754, Support denormalized numbers | - |
+| [\_\_hmulx2](../SIMT-API/数学函数/half类型/half2类型算术函数/__hmulx2.md) | IEEE754, Support denormalized numbers | - |
+| [\_\_hdivx2](../SIMT-API/数学函数/half类型/half2类型算术函数/__hdivx2.md) | 1-ulp compare to X86，Not Support denormalized numbers | - |
 
 ## fp32数据类型计算API精度标准
 
 | 接口 | 硬件指令精度标准 | 软仿精度标准 |
 | --- | --- | --- |
-| expf | 1-ulp compare to X86，Not Support denormalized numbers | - |
-| tanf | - | - |
-| tanhf | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| tanpif | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| atanf | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| atan2f | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| atanhf | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| exp2f | 调用接口powf实现 | - |
-| exp10f | 调用接口powf实现 | - |
-| expm1f | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| logf | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| log2f | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| log10f | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| log1pf | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| logbf | - | - |
-| ilogbf | 调用logbf(float)实现 | - |
-| cosf | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| coshf | 调用fabsf(float)和expf(float)实现 | - |
-| cospif | 调用cosf(float)实现 | - |
-| acosf | 调用asinf(float)实现 | - |
-| acoshf | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| sinf | 调用+、-、\*、fabsf(float)、fmaf(float)实现 | - |
-| sinhf | 调用+、\*、fabsf(float)、expf(float)实现 | - |
-| sinpif | 调用sinf(float)实现 | - |
-| asinf | 调用+、-、\*、fabsf(float)、sqrtf(float)实现 | - |
-| asinhf | 调用+、-、\*、fabsf(float)、logf(float)、sqrtf(float)实现 | - |
-| sincosf | 调用+、-、\*、fabsf(float)、fmaf(float)实现 | - |
-| sincospif | 调用+、-、\*、fabsf(float)、fmaf(float)实现 | - |
-| frexpf | 调用+、-、\*、/、fabsf(float)实现 | - |
-| ldexpf | 调用+、-、\*、/、fabsf(float)实现 | - |
-| sqrtf | 1-ulp compare to X86，Not Support denormalized numbers | - |
-| rsqrtf | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| hypotf | 调用\*、/、fabsf(float)、\_\_fmaxf(float)、\_\_fminf(float)、sqrtf(float)实现 | - |
-| rhypotf | 调用hypotf(float)实现 | - |
-| powf | - | - |
-| norm3df | 调用fabsf(float)、fmaf(float)、sqrtf(float)、\_\_fmaxf(float)实现 | - |
-| rnorm3df | 调用norm3df(float)实现 | - |
-| norm4df | 调用fabsf(float)、fmaf(float)、sqrtf(float)、\_\_fmaxf(float)实现 | - |
-| rnorm4df | 调用norm4df(float)实现 | - |
-| normf | 调用+、-、\*、/、fabsf(float)、fmaf(float)、sqrtf(float)、\_\_fmaxf(float)实现 | - |
-| rnormf | 调用normf(float)实现 | - |
-| cbrtf | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| rcbrtf | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| erff | 调用-、\*、fabsf(float)、fmaf(float)、\_\_powf(float, float)实现 | - |
-| erfcf | 调用+、-、\*、/、fabsf(float)、fmaf(float)、\_\_powf(float, float)实现 | - |
-| erfinvf | 调用-、\*、/、fmaf(float)、log2f(float)、sqrtf(float)实现 | - |
-| erfcinvf | 调用-、\*、/、fmaf(float)、log2f(float)、sqrtf(float)实现 | - |
-| erfcxf | 调用+、-、\*、/、fabsf(float)、fmaf(float)、\_\_fmaxf(float)、\_\_fminf(float)、\_\_powf(float, float)实现 | - |
-| tgammaf | 调用+、-、\*、/、fabsf(float)、fmaf(float)实现 | - |
-| lgammaf | 调用+、-、\*、/、fabsf(float)、fmaf(float)实现 | - |
-| cyl_bessel_i0f | 调用+、-、\*、/、fabsf(float)、fmaf(float)、\_\_expf(float)、sqrtf(float)实现 | - |
-| cyl_bessel_i1f | 调用+、-、\*、/、fabsf(float)、fmaf(float)、\_\_expf(float)、sqrtf(float)实现 | - |
-| normcdff | 调用+、-、\*、/、fabsf(float)、fmaf(float)实现 | - |
-| normcdfinvf | 调用+、-、\*、/、log2f(float)、fmaf(float)实现 | - |
-| j0f | 调用+、-、\*、/、fmaf(float)、sqrtf(float)实现 | - |
-| j1f | 调用+、-、\*、/、fmaf(float)、sqrtf(float)实现 | - |
-| jnf | 调用+、-、\*、/、fmaf(float)、sqrtf(float)实现 | - |
-| y0f | 调用+、-、\*、/、fabsf(float)、fmaf(float)、sqrtf(float)实现 | - |
-| y1f | 调用+、-、\*、/、fabsf(float)、fmaf(float)、sqrtf(float)实现 | - |
-| ynf | 调用+、-、\*、/、fabsf(float)、fmaf(float)、sqrtf(float)实现 | - |
-| fabsf | - | - |
-| fmaf | - | - |
-| fmaxf | - | - |
-| fminf | - | - |
-| fdimf | - | - |
-| remquof | - | 1-ulp compare to X86，Not Support denormalized numbers |
-| fmodf | 调用-、\*、fabsf(float)实现 | - |
-| remainderf | 调用remquof(float)实现 | - |
-| copysignf | 调用fabsf(float)实现 | - |
-| nearbyintf | 调用\_\_rintf(float)实现 | - |
-| nextafterf | - | - |
-| scalbnf | - | - |
-| scalblnf | 调用scalbnf(float，int32_t)实现 | - |
-| modff | - | - |
-| fdividef | 1-ulp compare to X86，Not Support denormalized numbers | - |
-| signbit | 调用signbitf(float)实现 | - |
-| \_\_saturatef | 调用fmaxf(float)和fminf(float)实现 | - |
-| \_\_fdividef | - | - |
-| rintf | 直接调用\_\_rintf(float)实现 | - |
-| lrintf | 调用指令rintf(float)和\_\_cvt_int64_t(float)实现 | - |
-| llrintf | 调用指令rintf(float)和\_\_cvt_int64_t(float)实现 | - |
-| roundf | 直接调用\_\_roundf(float)实现 | - |
-| lroundf | 调用指令roundf(float)和\_\_cvt_int64_t(float)实现 | - |
-| llroundf | 调用指令roundf(float)和\_\_cvt_int64_t(float)实现 | - |
-| floorf | 直接调用\_\_floorf(float)实现 | - |
-| ceilf | 直接调用\_\_ceilf(float)实现 | - |
-| truncf | 判断元素是否大于0，如果大于0调用\_\_floorf(float)完成计算，否则调用\_\_ceilf(float)完成计算 | - |
-| isfinite | 直接调用\_\_isfinite(float)实现 | - |
-| isnan | 直接调用\_\_isnan(float)实现 | - |
-| isinf | 直接调用\_\_isinf(float)实现 | - |
+| [expf](../SIMT-API/数学函数/float类型数学库函数/expf.md) | 1-ulp compare to X86，Not Support denormalized numbers | - |
+| [tanhf](../SIMT-API/数学函数/float类型数学库函数/tanhf.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [tanpif](../SIMT-API/数学函数/float类型数学库函数/tanpif.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [atanf](../SIMT-API/数学函数/float类型数学库函数/atanf.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [atan2f](../SIMT-API/数学函数/float类型数学库函数/atan2f.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [atanhf](../SIMT-API/数学函数/float类型数学库函数/atanhf.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [expm1f](../SIMT-API/数学函数/float类型数学库函数/expm1f.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [logf](../SIMT-API/数学函数/float类型数学库函数/logf.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [log2f](../SIMT-API/数学函数/float类型数学库函数/log2f.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [log10f](../SIMT-API/数学函数/float类型数学库函数/log10f.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [log1pf](../SIMT-API/数学函数/float类型数学库函数/log1pf.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [cosf](../SIMT-API/数学函数/float类型数学库函数/cosf.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [acoshf](../SIMT-API/数学函数/float类型数学库函数/acoshf.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [sqrtf](../SIMT-API/数学函数/float类型数学库函数/sqrtf.md) | 1-ulp compare to X86，Not Support denormalized numbers | - |
+| [rsqrtf](../SIMT-API/数学函数/float类型数学库函数/rsqrtf.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [cbrtf](../SIMT-API/数学函数/float类型数学库函数/cbrtf.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [rcbrtf](../SIMT-API/数学函数/float类型数学库函数/rcbrtf.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [remquof](../SIMT-API/数学函数/float类型数学库函数/remquof.md) | - | 1-ulp compare to X86，Not Support denormalized numbers |
+| [fdividef](../SIMT-API/数学函数/float类型数学库函数/fdividef.md) | 1-ulp compare to X86，Not Support denormalized numbers | - |
