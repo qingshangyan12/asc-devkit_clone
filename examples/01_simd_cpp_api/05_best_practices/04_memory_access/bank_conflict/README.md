@@ -1,4 +1,4 @@
-# UB Bank 冲突及地址重叠场景分析示例
+﻿# UB Bank 冲突及地址重叠场景分析示例
 
 ## 概述
 
@@ -158,7 +158,7 @@ UB 18 位地址编码遵循如下规则：
 #### 分析结论
 
 - 第1次repeat：src0（bank_id=0, bg 0-7）与 src1（bank_id=1, bg 0-7）：repeat 的所有 datablock 位于相同 bank group，后续 repeat 依次类推，**存在读读冲突**。
-- 第1次repeat：src0/src1 读取（bank_id=0/1, bg 0-7）与 dst 写入（bank_id=1, bg 8-15）：repeat 的所有 datablock 位于不同 bank ，后续 repeat 依次类推，**无读写冲突**。
+- 第1次repeat：src0/src1 读取（bank_id=0/1, bg 0-7）与 dst 写入（bank_id=1, bg 8-15）：repeat 的所有 datablock 位于不同 bank，后续 repeat 依次类推，**无读写冲突**。
 
 > **对比 case 2**：case 2 中 src0/src1 在同一 bank（bank_id 和 bank_group_id 均相同），case 3 中在同一 bank group（仅 bank_group_id 相同）。两者均触发读读冲突，性能开销相同（4195 vs 4195），说明读读冲突的判定依据是 bank group 而非 bank。
 
@@ -277,7 +277,7 @@ UB 18 位地址编码遵循如下规则：
 
 | | 第 1 次 repeat | 第 2 次 repeat | 第 3 次 repeat | ... |
 | --- | --- | --- | --- | --- |
-| src0 读 | bank 0-7 (bg 0-7) | bank 0-7 (bg 0-7) | bank 0-7 (bg 0-7) | ... |
+| src0 读 | bank 0-7 (bg 0-7) | bank 8-15 (bg 8-15) | bank 0-7 (bg 0-7) | ... |
 | src1 读 | bank 24-31 (bg 8-15) | bank 16-23 (bg 0-7) | bank 24-31 (bg 8-15) | ... |
 | dst 写 | — | bank 24-31 (bg 8-15) | bank 16-23 (bg 0-7) | ... |
 
@@ -363,7 +363,7 @@ UB 18 位地址编码遵循如下规则：
 
 ### 小结
 
-- 读读冲突：只要两个读操作访问同一 bank group（不论 bank_id 是否相同），即触发读读冲突。（同一个bank group只有1组读口和1组写口，写写冲突类似）
+- 读读冲突：只要两个读操作访问同一 bank group（不论 bank_id 是否相同），即触发读读冲突。
 - 读写冲突：读写操作访问同一 bank，会触发读写冲突（同一个bank一拍只能1读或1写）。例外情况：读操作与写操作repeat首个datablock在同一个bank，后面的7个datablock也分别在同一个bank，硬件可将写入延后 1 个 repeat 以规避读写冲突的情况。
 - blkStride=0的场景：repeat内不会重复读取，只读1次。repStride=0的场景：repeat间不会重复读取，只读1次。
 
@@ -371,9 +371,9 @@ UB 18 位地址编码遵循如下规则：
 
 <table border="2">
 <caption>表1：样例输入输出规格</caption>
-<tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">x</td><td align="center">[1, 4096]</td><td align="center">float</td><td align="center">ND</td></tr>
-<tr><td rowspan="1" align="center"></td><td align="center">y</td><td align="center">[1, 4096]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td align="center">y</td><td align="center">[1, 4096]</td><td align="center">float</td><td align="center">ND</td></tr>
 <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">z</td><td align="center">[1, 4096]</td><td align="center">float</td><td align="center">ND</td></tr>
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom</td></tr>
