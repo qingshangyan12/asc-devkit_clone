@@ -554,7 +554,7 @@ TEST_F(Tensor_Api_Vector_Cast_3510, VECTOR_CastTrait_Float2Int16_RN_Sat)
 // ===================================================================
 
 using CastTraitInt82Int32RDNoSatPartP0 = CastTrait<
-    AscendC::Te::CastRoundMode::RD,
+    AscendC::Std::ignore_t,
     AscendC::Te::CastSatMode::NoSat,
     AscendC::Te::CastIndexPos::PartP0>;
 
