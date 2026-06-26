@@ -336,27 +336,29 @@ __simd_vf__ inline void ReduceRALessThanVLVFImpl(
     Reg::RegTensor<T, Trait> vreg15;
 
     // Process main folds
+    uint16_t offsetR = dimA;
     for (uint16_t loopMain = 0; loopMain < mainTimes; loopMain++) {
         loopRNum = loopRNum >> avgFolds;
-        auto tmpSrcAddr = addr;
+        offsetR = loopRNum * dimA;
         for (uint16_t loopR = 0; loopR < loopRNum; loopR++) {
+            uint32_t baseOffset = loopR * dimA;
             // L0
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg0, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg1, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg2, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg3, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg4, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg5, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg6, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg7, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg8, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg9, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg10, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg11, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg12, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg13, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg14, tmpSrcAddr, dimA);
-            Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg15, tmpSrcAddr, dimA);
+            Reg::LoadAlign(vreg0, addr + baseOffset);
+            Reg::LoadAlign(vreg1, addr + baseOffset + offsetR);
+            Reg::LoadAlign(vreg2, addr + baseOffset + 2 * offsetR);
+            Reg::LoadAlign(vreg3, addr + baseOffset + 3 * offsetR);
+            Reg::LoadAlign(vreg4, addr + baseOffset + 4 * offsetR);
+            Reg::LoadAlign(vreg5, addr + baseOffset + 5 * offsetR);
+            Reg::LoadAlign(vreg6, addr + baseOffset + 6 * offsetR);
+            Reg::LoadAlign(vreg7, addr + baseOffset + 7 * offsetR);
+            Reg::LoadAlign(vreg8, addr + baseOffset + 8 * offsetR);
+            Reg::LoadAlign(vreg9, addr + baseOffset + 9 * offsetR);
+            Reg::LoadAlign(vreg10, addr + baseOffset + 10 * offsetR);
+            Reg::LoadAlign(vreg11, addr + baseOffset + 11 * offsetR);
+            Reg::LoadAlign(vreg12, addr + baseOffset + 12 * offsetR);
+            Reg::LoadAlign(vreg13, addr + baseOffset + 13 * offsetR);
+            Reg::LoadAlign(vreg14, addr + baseOffset + 14 * offsetR);
+            Reg::LoadAlign(vreg15, addr + baseOffset + 15 * offsetR);
             // L1
             Binaryfunc(vreg0, vreg0, vreg8, mask);
             Binaryfunc(vreg1, vreg1, vreg9, mask);
@@ -376,7 +378,7 @@ __simd_vf__ inline void ReduceRALessThanVLVFImpl(
             Binaryfunc(vreg1, vreg1, vreg3, mask);
             // L4
             Binaryfunc(vreg0, vreg0, vreg1, mask);
-            Reg::StoreAlign(addr + loopR * dimA, vreg0, mask);
+            Reg::StoreAlign(addr + baseOffset, vreg0, mask);
         }
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
     }
@@ -384,8 +386,8 @@ __simd_vf__ inline void ReduceRALessThanVLVFImpl(
     // Process tail folds
     for (uint16_t i = 0; i < foldOne; i++) {
         // L0
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg0, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg1, addr, dimA);
+        Reg::LoadAlign(vreg0, addr);
+        Reg::LoadAlign(vreg1, addr + dimA);
         // L1
         Binaryfunc(vreg0, vreg0, vreg1, mask);
         Reg::StoreAlign(dstAddr, vreg0, mask);
@@ -393,10 +395,10 @@ __simd_vf__ inline void ReduceRALessThanVLVFImpl(
 
     for (uint16_t i = 0; i < foldTwo; i++) {
         // L0
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg0, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg1, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg2, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg3, addr, dimA);
+        Reg::LoadAlign(vreg0, addr);
+        Reg::LoadAlign(vreg1, addr + dimA);
+        Reg::LoadAlign(vreg2, addr + 2 * dimA);
+        Reg::LoadAlign(vreg3, addr + 3 * dimA);
         // L1
         Binaryfunc(vreg0, vreg0, vreg2, mask);
         Binaryfunc(vreg1, vreg1, vreg3, mask);
@@ -407,14 +409,14 @@ __simd_vf__ inline void ReduceRALessThanVLVFImpl(
 
     for (uint16_t i = 0; i < foldThree; i++) {
         // L0
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg0, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg1, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg2, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg3, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg4, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg5, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg6, addr, dimA);
-        Reg::LoadAlign<T, Reg::PostLiteral::POST_MODE_UPDATE>(vreg7, addr, dimA);
+        Reg::LoadAlign(vreg0, addr);
+        Reg::LoadAlign(vreg1, addr + dimA);
+        Reg::LoadAlign(vreg2, addr + 2 * dimA);
+        Reg::LoadAlign(vreg3, addr + 3 * dimA);
+        Reg::LoadAlign(vreg4, addr + 4 * dimA);
+        Reg::LoadAlign(vreg5, addr + 5 * dimA);
+        Reg::LoadAlign(vreg6, addr + 6 * dimA);
+        Reg::LoadAlign(vreg7, addr + 7 * dimA);
         // L1
         Binaryfunc(vreg0, vreg0, vreg4, mask);
         Binaryfunc(vreg1, vreg1, vreg5, mask);
