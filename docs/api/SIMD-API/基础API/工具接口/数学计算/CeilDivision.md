@@ -24,7 +24,7 @@ __aicore__ constexpr inline int32_t CeilDivision(int32_t num1, int32_t num2)
 
 ## 参数说明
 
-**表1** 模板参数说明
+**表1** 参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
