@@ -272,47 +272,37 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
         LoadFuncParamFromMemory(paramAddr, param, ctx);
         HCCL_INFO("[KfcServerGenCircularQueue] LoadFuncParamFromMemory finished.");
 
-        /*
-        MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
-        HCCL_INFO("[KfcServerGenCircularQueue] MissionPreSync finished.");
-        */
-
+        // 检测 AICPU 侧 Finalize 写入的退出标记（INVALID_U64）
+        // AICPU Finalize 会向 xnAddr 写 0xffffffffffffffff 并向 commitCKEAddr 写 1，
+        // CCU kernel 读到该标记后置 repeatCond=1 退出循环，履行 finalize 握手协议。
         ccu::Variable opType;
         opType = param[HBM_PARAM_IDX_0];
-        CCU_IF(opType == AlgorithmType::CcuAlltoAllMesh1D) {
-            CcuAlltoAllMesh1DKernel(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
-                                    param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
-                                    param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9],
-                                    param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11], arg);
-            HCCL_INFO("[KfcServerGenCircularQueue] CcuAlltoAllMesh1DKernel finished.");
-            /*
-            ccu::CallFunc<AlltoAllMesh1DFunc>(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
-                                              param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
-                                              param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9],
-                                              param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11]);
-            HCCL_INFO("[KfcServerGenCircularQueue] CcuAlltoAllMesh1DKernel finished.");
-            */
-        }
-        repeatCond += one;
-        /*
-        MissionPostSync(ctx);
-        HCCL_INFO("[KfcServerGenCircularQueue] MissionPostSync finished.");
+        CCU_IF(opType == INVALID_U64) {
+            repeatCond = 1;
+        } CCU_ELSE {
+            CCU_IF(opType == AlgorithmType::CcuAlltoAllMesh1D) {
+                CcuAlltoAllMesh1DKernel(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
+                                        param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
+                                        param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9],
+                                        param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11], arg);
+                HCCL_INFO("[KfcServerGenCircularQueue] CcuAlltoAllMesh1DKernel finished.");
+            }
 
-        // Set本轮完成信号
-        SetTurnEndSig(recordAddr, turnEndSig, ctx);
-        HCCL_INFO("[KfcServerGenCircularQueue] SetTurnEndSig finished.");
+            // Set本轮完成信号
+            SetTurnEndSig(recordAddr, turnEndSig, ctx);
+            HCCL_INFO("[KfcServerGenCircularQueue] SetTurnEndSig finished.");
 
-        waitAddr += ckeSize;
-        recordAddr += ckeSize;
-        paramAddr += paramSize;
-        queueIdx += one;
-        CCU_IF (queueIdx == static_cast<u64>(CCU_TASK_NUM_MAX)) {
-            waitAddr = waitStartAddr;
-            recordAddr = recordStartAddr;
-            paramAddr = paramStartAddr;
-            queueIdx = 0;
+            waitAddr += ckeSize;
+            recordAddr += ckeSize;
+            paramAddr += paramSize;
+            queueIdx += one;
+            CCU_IF (queueIdx == static_cast<u64>(CCU_TASK_NUM_MAX)) {
+                waitAddr = waitStartAddr;
+                recordAddr = recordStartAddr;
+                paramAddr = paramStartAddr;
+                queueIdx = 0;
+            }
         }
-        */
     }
 }
 
@@ -360,16 +350,13 @@ void SlaveKfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
 CcuResult CcuKfcServerKernel(CcuKernelArg arg)
 {
     KfcServerContext ctx;
-    /*
     HCCL_INFO("[CcuKernelKfcServer] KfcServer run");
     CCU_CHK_RET(ParseKernelArg(ctx));
     HCCL_INFO("[CcuKernelKfcServer] ParseKernelArg finish");
     CCU_CHK_RET(InitResource(ctx));
     HCCL_INFO("[CcuKernelKfcServer] InitResource finish");
-    */
     CCU_CHK_RET(LoadArgs(ctx));
     HCCL_INFO("[CcuKernelKfcServer] LoadArgs finish");
-    /*
     CCU_CHK_RET(CompArgs(ctx));
     HCCL_INFO("[CcuKernelKfcServer] CompArgs finish");
     HCCL_INFO("[GenCircularQueue] KfcServer start");
@@ -378,7 +365,6 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
     } CCU_ELSE {
         SlaveKfcServerGenCircularQueue(arg, ctx);
     }
-    */
     HCCL_INFO("[CcuKernelKfcServer] KfcServer end");
     return CCU_SUCCESS;
 }    
