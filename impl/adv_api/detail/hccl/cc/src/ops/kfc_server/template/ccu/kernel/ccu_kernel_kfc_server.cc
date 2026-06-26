@@ -360,11 +360,13 @@ void SlaveKfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
 CcuResult CcuKfcServerKernel(CcuKernelArg arg)
 {
     KfcServerContext ctx;
+    /*
     HCCL_INFO("[CcuKernelKfcServer] KfcServer run");
     CCU_CHK_RET(ParseKernelArg(ctx));
     HCCL_INFO("[CcuKernelKfcServer] ParseKernelArg finish");
     CCU_CHK_RET(InitResource(ctx));
     HCCL_INFO("[CcuKernelKfcServer] InitResource finish");
+    */
     CCU_CHK_RET(LoadArgs(ctx));
     HCCL_INFO("[CcuKernelKfcServer] LoadArgs finish");
     /*
