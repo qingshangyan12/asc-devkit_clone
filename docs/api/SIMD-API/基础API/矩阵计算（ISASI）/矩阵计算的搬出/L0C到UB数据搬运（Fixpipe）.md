@@ -39,7 +39,7 @@
 <!-- npu="950" id10 -->
 以Ascend 950PR/Ascend 950DT为例，下图展示了随路量化、随路ReLU、随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。
 
-**图2** L0C2GM流程图<a id="zh-cn_topic_0000002542828493_fig1828513492547"></a>  
+**图2** L0C2UB流程图<a id="zh-cn_topic_0000002542828493_fig1828513492547"></a>  
 
 ![](../../../../figures/L0C2UB_Function_Combination_950.png)
 <!-- end id10 -->

@@ -63,7 +63,7 @@ for (int h = 0; h < dnNum; h++) {
 
 对于该场景，可以通过配置intriParams结构体参数实现上图的效果：
 
-- dnNum = 2，表示源NZ矩阵的数目为2。
+- dnNum = 2，表示需要做NZ2DN转化的矩阵个数为2。
 - nSize = 32，表示源NZ矩阵在N方向上的大小为32个元素。
 - mSize = 48，表示源NZ矩阵在M方向上的大小为48个元素。
 - srcStride = 80，表示源NZ矩阵中相邻Z排布的起始地址之间的间隔为80 \* C0\_Size\(C0\_Size = 16\*sizeof\(T\)，T为操作数的数据类型\)字节。
