@@ -49,4 +49,3 @@ __simd_callee__ inline void HistogramsImpl(RegU &dstReg, RegT &srcReg, MaskReg &
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_HISTOGRAMS_IMPL__
 #endif
-

@@ -28,4 +28,3 @@ KernelRunContextHolder的共享指针，可通过GetContext<gert::KernelContext\
 auto kernelContextHolder = context_ascendc::ContextBuilder().Inputs().Outputs().BuildKernelRunContext();
 gert::KernelContext* tilingParseContext = kernelContextHolder->GetContext<gert::KernelContext>();
 ```
-

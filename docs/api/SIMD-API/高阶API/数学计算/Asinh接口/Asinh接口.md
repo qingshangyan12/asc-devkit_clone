@@ -5,4 +5,3 @@
 -   **[GetAsinhMaxMinTmpSize](GetAsinhMaxMinTmpSize.md)**
 
 -   **[GetAsinhTmpBufferFactorSize](GetAsinhTmpBufferFactorSize.md)**
-

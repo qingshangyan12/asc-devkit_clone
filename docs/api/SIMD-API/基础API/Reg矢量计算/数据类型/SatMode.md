@@ -13,4 +13,3 @@ enum class SatMode {
     SAT
 };
 ```
-

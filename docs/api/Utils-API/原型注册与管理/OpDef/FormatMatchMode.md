@@ -64,4 +64,3 @@ AddCustom(const char* name) : OpDef(name)
         this->FormatMatchMode(FormatCheckOption::STRICT);
 }
 ```
-

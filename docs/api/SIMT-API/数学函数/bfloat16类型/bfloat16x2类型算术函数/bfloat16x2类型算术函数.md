@@ -17,4 +17,3 @@
 -   **[\_\_hfmax2\_relu](__hfmax2_relu-199.md)**
 
 -   **[\_\_hcmadd](__hcmadd-200.md)**
-

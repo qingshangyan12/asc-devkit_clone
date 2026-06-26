@@ -5,4 +5,3 @@
 -   **[GetXorMaxMinTmpSize](GetXorMaxMinTmpSize.md)**
 
 -   **[GetXorTmpBufferFactorSize](GetXorTmpBufferFactorSize.md)**
-

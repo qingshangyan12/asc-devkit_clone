@@ -42,4 +42,3 @@ OpAICoreConfig类，请参考[OpAICoreConfig](OpAICoreConfig.md)。
 ## 调用示例<a name="zh-cn_topic_0000001575453116_zh-cn_topic_0000001576875005_zh-cn_topic_0000001575944081_section320753512363"></a>
 
 请参考[SetOpSelectFormat](../OpAICoreDef/SetOpSelectFormat.md)节调用示例。
-

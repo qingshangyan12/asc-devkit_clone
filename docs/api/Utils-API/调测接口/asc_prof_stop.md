@@ -37,4 +37,3 @@ __aicore__ inline void asc_prof_stop()
 ```
 asc_prof_stop();
 ```
-

@@ -5,4 +5,3 @@
 -   **[\_\_isUbuf](__isUbuf.md)**
 
 -   **[\_\_isLocal](__isLocal.md)**
-

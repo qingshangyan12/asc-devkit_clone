@@ -94,4 +94,3 @@ __simd_vf__ inline void GatherBVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, __ub
     }
 }
 ```
-

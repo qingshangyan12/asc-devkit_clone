@@ -13,4 +13,3 @@ enum class MaskMergeMode {
     ZEROING
 };
 ```
-

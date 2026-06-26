@@ -68,4 +68,3 @@ GlobalTensor<T> GetDataObj()
 ## 约束说明<a name="zh-cn_topic_0000002078447573_zh-cn_topic_0000001576806829_zh-cn_topic_0000001339187720_section19165124931511"></a>
 
 无
-

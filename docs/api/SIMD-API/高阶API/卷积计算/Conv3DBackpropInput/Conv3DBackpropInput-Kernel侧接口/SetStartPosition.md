@@ -52,4 +52,3 @@ __aicore__ inline void SetStartPosition(uint32_t curDinStartIdx, int32_t curHoSt
 ```
 gradInput_.SetStartPosition(dinStartIdx_, curHoStartIdx_); // 设置单核上GradOutput载入的起始位置
 ```
-

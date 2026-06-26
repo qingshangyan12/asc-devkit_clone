@@ -35,4 +35,3 @@
 -   **[GetAntiQuantizeMaxMinTmpSize](GetAntiQuantizeMaxMinTmpSize.md)**
 
 -   **[GetAntiQuantizeTmpBufferFactorSize](GetAntiQuantizeTmpBufferFactorSize.md)**
-

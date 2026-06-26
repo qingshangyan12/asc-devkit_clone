@@ -16,4 +16,3 @@ namespace hccl {
 }  // hccl
 
 #endif  /* NONUNIFORM_HIERARCHICAL_RING_V1_BASE_H */
-

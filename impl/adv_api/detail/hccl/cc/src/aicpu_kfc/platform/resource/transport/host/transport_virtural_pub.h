@@ -43,4 +43,3 @@ protected:
 };
 }  // namespace hccl
 #endif /* TRANSPORT_VIRTURAL_PUB_H */
-

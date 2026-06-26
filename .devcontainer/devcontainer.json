@@ -6,7 +6,7 @@
     },
     "remoteUser": "root",
 
-    // Explicitly list each davinci compute device and the three control devices.
+    "_comment": "Explicitly list each davinci compute device and the three control devices.",
     "runArgs": [
         "--ipc=host",
         "--net=host",
@@ -30,7 +30,6 @@
         "source=/usr/local/bin/npu-smi,target=/usr/local/bin/npu-smi,type=bind,readonly",
         "source=/usr/local/Ascend/driver,target=/usr/local/Ascend/driver,type=bind,readonly",
         "source=/etc/ascend_install.info,target=/etc/ascend_install.info,type=bind,readonly"
-        // Add your own data directory, e.g.: "source=/data,target=/data,type=bind"
     ],
 
     "customizations": {

@@ -37,4 +37,3 @@ __aicore__ inline void asc_prof_start()
 ```
 asc_prof_start();
 ```
-

@@ -5,4 +5,3 @@
 -   **[GetFracMaxMinTmpSize](GetFracMaxMinTmpSize.md)**
 
 -   **[GetFracTmpBufferFactorSize](GetFracTmpBufferFactorSize.md)**
-

@@ -51,4 +51,3 @@ ContextBuilder &NodeIoNum(size_t inputNum, size_t outputNum)
 ```
 auto builder = ContextBuilder().NodeIoNum(5, 3); // 该算子有5个输入，3个输出
 ```
-

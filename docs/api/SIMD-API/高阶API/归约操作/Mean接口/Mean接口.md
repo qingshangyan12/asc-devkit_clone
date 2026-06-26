@@ -5,4 +5,3 @@
 -   **[GetMeanMaxMinTmpSize](GetMeanMaxMinTmpSize.md)**
 
 -   **[GetMeanTmpBufferFactorSize](GetMeanTmpBufferFactorSize.md)**
-

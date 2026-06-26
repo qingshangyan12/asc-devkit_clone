@@ -35,4 +35,3 @@ enum class RegLayout {
     例如，Cast接口输入数据类型为int32\_t\(b32\)，输出数据类型为uint8\_t\(b8\)，mask每4位有效，RegLayout确定目的操作数中，每4个uint8\_t类型数据有效数据的位置。
 
     ![](../../../../figures/reglayout_4_1.png)
-

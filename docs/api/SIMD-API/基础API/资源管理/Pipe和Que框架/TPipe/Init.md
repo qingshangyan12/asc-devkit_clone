@@ -98,4 +98,3 @@ op.Init(x, z, srcSize, &pipeCast);
 op.Process();
 pipeCast.Destroy();  // 销毁pipeCast管道资源
 ```
-

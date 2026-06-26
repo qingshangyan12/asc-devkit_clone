@@ -5,4 +5,3 @@
 -   **[GetCoshMaxMinTmpSize](GetCoshMaxMinTmpSize.md)**
 
 -   **[GetCoshTmpBufferFactorSize](GetCoshTmpBufferFactorSize.md)**
-

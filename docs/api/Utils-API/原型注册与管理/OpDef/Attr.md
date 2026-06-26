@@ -48,4 +48,3 @@ Attr属性名不能与以下python关键字及内置变量名相同，否则会�
 -   内置变量名
 
     \_\_inputs\_\_、 \_\_outputs\_\_、 \_\_attrs\_\_、 options、 bisheng、 bisheng\_path、 tikcpp\_path、 impl\_mode、 custom\_compile\_options、 custom\_all\_compile\_options、 soc\_version、 soc\_short、 custom\_compile\_options\_soc、 custom\_all\_compile\_options\_soc、 origin\_func\_name、 ascendc\_src\_dir\_ex、 ascendc\_src\_dir、 ascendc\_src\_file、 src、 op\_type、 code\_channel、 op\_info、 compile\_op、 get\_code\_channel、 result、 isinstance、 attr、 get\_current\_build\_config、 \_build\_args、 get\_dtype\_fmt\_options、 shutil、 os、 get\_kernel\_source、ascendc\_api\_version\_header\_path、ascendc\_api\_version\_file、ascendc\_api\_version、re。
-

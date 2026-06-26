@@ -81,4 +81,3 @@
 -   **[\_\_hminx2](__hminx2-240.md)**
 
 -   **[\_\_hminx2\_nan](__hminx2_nan-241.md)**
-

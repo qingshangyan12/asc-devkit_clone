@@ -54,4 +54,3 @@ __simt_vf__ __launch_bounds__(1024) inline void SimtKernel(__gm__ bool* dst, __g
     dst[idx] = x[idx];
 }
 ```
-

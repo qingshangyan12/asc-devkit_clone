@@ -9,4 +9,3 @@
 ```
 #include "tiling/platform/platform_ascendc.h"
 ```
-
