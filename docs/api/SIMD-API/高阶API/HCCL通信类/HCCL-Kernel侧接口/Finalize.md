@@ -37,7 +37,7 @@ __aicore__ inline void Finalize()
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| sync | 输入 | 是否需要等待服务端的通信完成。bool类型，参数取值如下：<br>true：默认值，表示客户端将检测并等待最后一个通信任务完成。<br>false：表示客户端不会等待通信任务完成，而是直接退出。<!-- npu="A3" id7 --><br><br>Atlas A3 训练系列产品/Atlas A3 推理系列产品，该参数支持默认值true，仅在通信任务为[BatchWrite](BatchWrite.md)时，支持取值为false。<!-- end id7 --><!-- npu="910b" id8 --><br><br>Atlas A2 训练系列产品/Atlas A2 推理系列产品，该参数仅支持默认值true。<!-- end id8 --> |
+| sync | 输入 | 是否需要等待服务端的通信完成。bool类型，参数取值如下：<br>true：默认值，表示客户端将检测并等待最后一个通信任务完成。<br>false：表示客户端不会等待通信任务完成，而是直接退出。该取值仅跳过客户端侧的阻塞等待，Finalize通知仍会发送给服务端，服务端会执行完所有已下发的通信任务后再退出。<!-- npu="A3" id7 --><br><br>Atlas A3 训练系列产品/Atlas A3 推理系列产品，该参数支持默认值true，仅在通信任务为[BatchWrite](BatchWrite.md)时，支持取值为false。<!-- end id7 --><!-- npu="910b" id8 --><br><br>Atlas A2 训练系列产品/Atlas A2 推理系列产品，该参数仅支持默认值true。<!-- end id8 --> |
 
 ## 返回值说明
 
@@ -47,6 +47,9 @@ __aicore__ inline void Finalize()
 
 -   调用本接口前确保已调用过[InitV2](InitV2.md)和[SetCcTilingV2](SetCcTilingV2.md)接口。
 -   本接口在AIC核或者AIV核上调用必须与对应的Prepare接口的调用核保持一致。
+-   当sync为false时，不会中断已下发的通信任务：服务端收到Finalize通知后，会执行完所有已通过Commit接口下发的通信任务再退出，已通过[BatchWrite](BatchWrite.md)下发的数据仍会被对端接收。
+-   调用Finalize\<false\>()前，必须确保所有通信任务在服务端已完成，否则客户端直接退出无法保证数据传输完成。多队列[BatchWrite](BatchWrite.md)场景需先对所有队列调用[QueueBarrier](QueueBarrier.md)接口（参见[BatchWrite](BatchWrite.md)的"多个队列的点对点通信"调用示例）；单handle场景需先调用[Wait](Wait-98.md)接口等待对应任务完成。
+-   Finalize为终止接口：无论sync取值为true或false，调用后服务端开始退出，当前Hccl对象不可再次用于通信。如需继续通信，需重新创建Hccl对象并调用[InitV2](InitV2.md)接口初始化。
 
 ## 调用示例
 
@@ -67,3 +70,5 @@ if (AscendC::g_coreType == AIC) {
     hccl.Finalize<true>(); // 后续无其他通信任务，通知服务端执行上述ReduceScatter任务之后即可以退出
 }
 ```
+
+sync取值为false时的使用示例（含QueueBarrier前置同步）请参见[BatchWrite](BatchWrite.md)的"多个队列的点对点通信"调用示例。
