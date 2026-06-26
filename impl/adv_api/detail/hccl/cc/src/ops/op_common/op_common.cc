@@ -231,6 +231,11 @@ bool ShouldGoCcuFastLaunch(HcclComm comm, OpParam &param, CcuFastLaunchCtx **ccu
     return false;
 #else
     param.hcclComm = comm;
+    if (param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV || param.opType == HcclCMDType::HCCL_CMD_ALLTOALLVC) {
+        HCCL_INFO("[ShouldGoCcuFastLaunch] DISABLED for AlltoAllV: fastLaunchTag does not include dataCount, "
+                  "causing cross-size cache reuse");
+        return false;
+    }
     
     // 1. 是ccu模式
     if (GetExternalInputHcclCcuMSMode()) {
