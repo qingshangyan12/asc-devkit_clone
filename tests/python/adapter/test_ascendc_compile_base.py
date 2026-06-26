@@ -478,11 +478,18 @@ const static uint64_t L0A_SIZE = 65536 * get_block_idx();
 
     def test_add_sub_super_kernel_info(self):
         compile_info = CompileInfo()
-        global_var_storage.set_variable("ascendc_enable_super_kernel", True)
-        compile_info.super_kernel_info = {"sp_options" : {"feed-sync-all":SuperKernelFeedSyncAllMode.FeedSyncAllEnable}}
-        js = {}
+        compile_info.super_kernel_info = {"sp_options": {}}
         static_shape_flag = True
+
+        js = {}
+        global_var_storage.set_variable("ascendc_enable_super_kernel", True)
         add_sub_super_kernel_info(js, static_shape_flag, compile_info)
+        self.assertTrue(js["enable_super_kernel"])
+
+        js = {}
+        global_var_storage.set_variable("ascendc_enable_super_kernel", False)
+        add_sub_super_kernel_info(js, static_shape_flag, compile_info)
+        self.assertNotIn("enable_super_kernel", js)
 
 
 if __name__ == "__main__":
