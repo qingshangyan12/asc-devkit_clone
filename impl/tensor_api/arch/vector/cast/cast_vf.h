@@ -35,30 +35,19 @@ struct CastWidthSrc2xDst {};   // 2:1: float->half, float->int16
 struct CastWidthDst4xSrc {};   // 1:4: fp8->float, int8->int32
 struct CastWidthSrc4xDst {};   // 4:1: float->fp8, int32->uint8
 
-// ==================== CastVF primary template declaration ====================
-template<typename CalcFunc, typename TraitType, typename WidthCategory>
-class CastVF;
+template<typename WidthCategory>
+class CastVFLoop;
 
 //   T = dst element type, U = src element type, sizeof(T) == sizeof(U)
-template<typename CalcFunc, typename TraitType>
-class CastVF<CalcFunc, TraitType, CastWidthSrcEqDst> {
+template<>
+class CastVFLoop<CastWidthSrcEqDst> {
 public:
-    template<typename T, typename U>
-    __simd_vf__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, int32_t repeat, int32_t oneRepSize,
-        uint32_t dataSize)
+    template<typename CalcFunc, typename T, typename U, typename DstRegType, typename SrcRegType>
+    __simd_callee__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, int32_t repeat, int32_t oneRepSize,
+        uint32_t dataSize, DstRegType& dstReg, SrcRegType& srcReg, vector_bool& dstMask, vector_bool fullMask)
     {
-        using DstRegType = typename VectorTypeTransform::template Get<T>;
-        using SrcRegType = typename VectorTypeTransform::template Get<U>;
-        using greaterType = Std::conditional_t<(sizeof(T) > sizeof(U)), T, U>;
-
-        DstRegType dstReg;
-        SrcRegType srcReg;
-
-        vector_bool dstMask;
-        vector_bool fullMask = Inst::CreateMask::template Run<int32_t, decltype(PAT_ALL)>();
-
         for (uint16_t i = 0; i < repeat; i++) {
-            dstMask = Inst::UpdateMask::template Run<greaterType>(dataSize);
+            dstMask = Inst::UpdateMask::template Run<U>(dataSize);
 
             asc_loadalign(srcReg, src + i * oneRepSize);
             CalcFunc::template Run(dstReg, srcReg, fullMask);
@@ -68,25 +57,15 @@ public:
 };
 
 //   T = dst element type, U = src element type, sizeof(T) == 2 * sizeof(U)
-template<typename CalcFunc, typename TraitType>
-class CastVF<CalcFunc, TraitType, CastWidthDst2xSrc> {
+template<>
+class CastVFLoop<CastWidthDst2xSrc> {
 public:
-    template<typename T, typename U>
-    __simd_vf__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, int32_t repeat, int32_t oneRepSize,
-        uint32_t dataSize)
+    template<typename CalcFunc, typename T, typename U,  typename DstRegType, typename SrcRegType>
+    __simd_callee__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, int32_t repeat, int32_t oneRepSize,
+        uint32_t dataSize, DstRegType& dstReg, SrcRegType& srcReg, vector_bool& dstMask, vector_bool fullMask)
     {
-        using DstRegType = typename VectorTypeTransform::template Get<T>;
-        using SrcRegType = typename VectorTypeTransform::template Get<U>;
-        using greaterType = Std::conditional_t<(sizeof(T) > sizeof(U)), T, U>;
-
-        DstRegType dstReg;
-        SrcRegType srcReg;
-
-        vector_bool dstMask;
-        vector_bool fullMask = Inst::CreateMask::template Run<int32_t, decltype(PAT_ALL)>();
-
         for (uint16_t i = 0; i < repeat; i++) {
-            dstMask = Inst::UpdateMask::template Run<greaterType>(dataSize);
+            dstMask = Inst::UpdateMask::template Run<T>(dataSize);
 
             asc_loadalign_unpack_postupdate(srcReg, src, oneRepSize);
             CalcFunc::template Run(dstReg, srcReg, fullMask);
@@ -96,56 +75,35 @@ public:
 };
 
 //   T = dst element type, U = src element type, sizeof(U) == 2 * sizeof(T)
-template<typename CalcFunc, typename TraitType>
-class CastVF<CalcFunc, TraitType, CastWidthSrc2xDst> {
+template<>
+class CastVFLoop<CastWidthSrc2xDst> {
 public:
-    template<typename T, typename U>
-    __simd_vf__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, int32_t repeat, int32_t oneRepSize,
-        uint32_t dataSize)
+    template<typename CalcFunc, typename T, typename U,  typename DstRegType, typename SrcRegType>
+    __simd_callee__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, int32_t repeat, int32_t oneRepSize,
+        uint32_t dataSize, DstRegType& dstReg, SrcRegType& srcReg, vector_bool& dstMask, vector_bool fullMask)
     {
-        using DstRegType = typename VectorTypeTransform::template Get<T>;
-        using SrcRegType = typename VectorTypeTransform::template Get<U>;
-        using greaterType = Std::conditional_t<(sizeof(T) > sizeof(U)), T, U>;
-
-        DstRegType dstReg;
-        SrcRegType srcReg;
-
-        vector_bool dstMask;
-        vector_bool fullMask = Inst::CreateMask::template Run<int32_t, decltype(PAT_ALL)>();
-
         auto dstCur = reinterpret_cast<__ubuf__ U*>(dst);
-
         for (uint16_t i = 0; i < repeat; i++) {
-            dstMask = Inst::UpdateMask::template Run<greaterType>(dataSize);
+            dstMask = Inst::UpdateMask::template Run<U>(dataSize);
 
             asc_loadalign(srcReg, src + i * oneRepSize);
             CalcFunc::template Run(dstReg, srcReg, fullMask);
-            asc_storealign_pack_postupdate(dstCur,
-                *reinterpret_cast<SrcRegType*>(&dstReg), oneRepSize / 2, fullMask);
+            asc_storealign_pack_postupdate(dstCur, *reinterpret_cast<SrcRegType*>(&dstReg), oneRepSize / 2,
+                fullMask);
         }
     }
 };
 
 //   T = dst element type, U = src element type, sizeof(T) == 4 * sizeof(U)
-template<typename CalcFunc, typename TraitType>
-class CastVF<CalcFunc, TraitType, CastWidthDst4xSrc> {
+template<>
+class CastVFLoop<CastWidthDst4xSrc> {
 public:
-    template<typename T, typename U>
-    __simd_vf__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, int32_t repeat, int32_t oneRepSize,
-        uint32_t dataSize)
+    template<typename CalcFunc, typename T, typename U, typename DstRegType, typename SrcRegType>
+    __simd_callee__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, int32_t repeat, int32_t oneRepSize,
+        uint32_t dataSize, DstRegType& dstReg, SrcRegType& srcReg, vector_bool& dstMask, vector_bool fullMask)
     {
-        using DstRegType = typename VectorTypeTransform::template Get<T>;
-        using SrcRegType = typename VectorTypeTransform::template Get<U>;
-        using greaterType = Std::conditional_t<(sizeof(T) > sizeof(U)), T, U>;
-
-        DstRegType dstReg;
-        SrcRegType srcReg;
-
-        vector_bool dstMask;
-        vector_bool fullMask = Inst::CreateMask::template Run<int32_t, decltype(PAT_ALL)>();
-
         for (uint16_t i = 0; i < repeat; i++) {
-            dstMask = Inst::UpdateMask::template Run<greaterType>(dataSize);
+            dstMask = Inst::UpdateMask::template Run<T>(dataSize);
 
             asc_loadalign_unpack_postupdate_v2(srcReg, src, oneRepSize);
             CalcFunc::template Run(dstReg, srcReg, fullMask);
@@ -155,8 +113,28 @@ public:
 };
 
 //   T = dst element type, U = src element type, sizeof(U) == 4 * sizeof(T)
-template<typename CalcFunc, typename TraitType>
-class CastVF<CalcFunc, TraitType, CastWidthSrc4xDst> {
+template<>
+class CastVFLoop<CastWidthSrc4xDst> {
+public:
+    template<typename CalcFunc, typename T, typename U, typename DstRegType, typename SrcRegType>
+    __simd_callee__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, int32_t repeat, int32_t oneRepSize,
+        uint32_t dataSize, DstRegType& dstReg, SrcRegType& srcReg, vector_bool& dstMask, vector_bool fullMask)
+    {
+        auto dstCur = reinterpret_cast<__ubuf__ U*>(dst);
+        for (uint16_t i = 0; i < repeat; i++) {
+            dstMask = Inst::UpdateMask::template Run<U>(dataSize);
+
+            asc_loadalign(srcReg, src + i * oneRepSize);
+            CalcFunc::template Run(dstReg, srcReg, fullMask);
+            asc_storealign_pack_postupdate_v2(dstCur, *reinterpret_cast<SrcRegType*>(&dstReg), oneRepSize / 4,
+                fullMask);
+        }
+    }
+};
+
+// ==================== CastVF ====================
+template<typename CalcFunc, typename TraitType, typename WidthCategory>
+class CastVF {
 public:
     template<typename T, typename U>
     __simd_vf__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, int32_t repeat, int32_t oneRepSize,
@@ -164,22 +142,14 @@ public:
     {
         using DstRegType = typename VectorTypeTransform::template Get<T>;
         using SrcRegType = typename VectorTypeTransform::template Get<U>;
-        using greaterType = Std::conditional_t<(sizeof(T) > sizeof(U)), T, U>;
 
         DstRegType dstReg;
         SrcRegType srcReg;
 
         vector_bool dstMask;
         vector_bool fullMask = Inst::CreateMask::template Run<int32_t, decltype(PAT_ALL)>();
-        auto dstCur = reinterpret_cast<__ubuf__ U*>(dst);
-
-        for (uint16_t i = 0; i < repeat; i++) {
-            dstMask = Inst::UpdateMask::template Run<greaterType>(dataSize);
-
-            asc_loadalign(srcReg, src + i * oneRepSize);
-            CalcFunc::template Run(dstReg, srcReg, fullMask);
-            asc_storealign_pack_postupdate_v2(dstCur, *reinterpret_cast<SrcRegType*>(&dstReg), oneRepSize/4, fullMask);
-        }
+        CastVFLoop<WidthCategory>::template Run<CalcFunc, T, U>(
+            dst, src, repeat, oneRepSize, dataSize, dstReg, srcReg, dstMask, fullMask);
     }
 };
 
