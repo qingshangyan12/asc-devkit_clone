@@ -46,7 +46,7 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
 <!-- end id12 -->
 下图展示了随路量化、随路ReLU、随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。
 
-**图1** L0C2L1流程图（Atlas A2/A3）<a id="zh-cn_topic_0000002511188540_fig8956371257"></a>  
+**图1** L0C2L1流程图<a id="zh-cn_topic_0000002511188540_fig8956371257"></a>  
 
 ![](../../../../figures/L0C2L1_Function_Combination.png)
 <!-- end id10 -->
@@ -54,7 +54,7 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
 <!-- npu="950" id13 -->
 以Ascend 950PR/Ascend 950DT为例，下图展示了随路量化、随路ReLU、随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。
 
-**图2** L0C2GM流程图（Ascend 950PR/DT）<a id="zh-cn_topic_0000002542828493_fig1828513492547"></a>  
+**图2** L0C2GM流程图（Ascend 950PR/Ascend 950DT）<a id="zh-cn_topic_0000002542828493_fig1828513492547"></a>  
 
 ![](../../../../figures/L0C2L1_Function_Combination_950.png)
 <!-- end id13 -->
@@ -208,7 +208,7 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
     - 如果用户提供的是标准的IEEE 754 float32输入，API内部会处理成处理器支持的float32格式进行计算，此时如果golden数据生成过程中使用的是标准的IEEE 754 float32数据，则可能引入精度不匹配问题，需要修正golden数据的生成，将量化参数的23bits尾数位的低13bits数据位清零再参与量化计算。
 - 源矩阵NZ格式地址要求64字节对齐，目的矩阵NZ格式地址需要满足32字节对齐。
 - 当搬出的mSize、nSize或者ndNum中的任意一个值为0时，该指令不会被执行。ndNum=0时会报warning。
-- 量化和ReLU参数不能为INF/NAN和非规格化数。
+- 量化和ReLU参数不能为Inf/NaN和非规格化数。
 - 目标数据不能有重叠。如果对目的地址有重叠写入，硬件不会报告任何警告和错误，也不保证重叠数据的写入顺序。
 - unitFlag特性开启需要配合Mmad同时开启。
 <!-- npu="950" id27 -->
@@ -222,10 +222,10 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
     <!-- npu="910b" id30 -->
     Atlas A2 训练系列产品/Atlas A2 推理系列产品
     <!-- end id30 -->
-    对于浮点类型INF/NAN输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式：
+    对于浮点类型Inf/NaN输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式：
 
-    - 非饱和模式：CTRL\[48\]设置成1'b1，INF/NAN保持原输出。
-    - 饱和模式：CTRL\[48\]设置成1'b0，INF输出会被饱和为±MAX，NaN输出会被饱和为0。
+    - 非饱和模式：CTRL\[48\]设置成1'b1，Inf/NaN保持原输出。
+    - 饱和模式：CTRL\[48\]设置成1'b0，Inf输出会被饱和为±MAX，NaN输出会被饱和为0。
 
         ```cpp
         // 设置CTRL[48]为0，开启浮点数饱和模式
@@ -237,12 +237,12 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
 <!-- npu="950" id31 -->
 - Ascend 950PR/Ascend 950DT特殊值/边界值约束说明：
 
-    对于浮点类型INF/NAN输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式；
+    对于浮点类型Inf/NaN输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式；
 
     对于fp8\_e4m3fn\_t类型，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行更精细的设置；
 
-    - 非饱和模式：CTRL\[48\]设置成1'b1，INF/NAN保持原输出。对于fp8\_e4m3fn\_t类型，若结果的绝对值为INF或大于fp8\_e4m3fn\_t的最大规格化值，则输出结果为NaN。
-    - 饱和模式：CTRL\[48\]设置成1'b0，INF输出会被饱和为±MAX， NaN输出会被饱和为0。对于fp8\_e4m3fn\_t类型，当CTRL\[50\]设置成1'b0时，NaN被转换为零，当CTRL\[50\]设置成1'b1时，NaN保持不变，若结果的绝对值为INF或大于fp8\_e4m3fn\_t的最大规格化值，则结果为最大规格化值。
+    - 非饱和模式：CTRL\[48\]设置成1'b1，Inf/NaN保持原输出。对于fp8\_e4m3fn\_t类型，若结果的绝对值为Inf或大于fp8\_e4m3fn\_t的最大规格化值，则输出结果为NaN。
+    - 饱和模式：CTRL\[48\]设置成1'b0，Inf输出会被饱和为±MAX， NaN输出会被饱和为0。对于fp8\_e4m3fn\_t类型，当CTRL\[50\]设置成1'b0时，NaN被转换为零，当CTRL\[50\]设置成1'b1时，NaN保持不变，若结果的绝对值为Inf或大于fp8\_e4m3fn\_t的最大规格化值，则结果为最大规格化值。
 
         ```cpp
         // 设置CTRL[48]为0，开启浮点数饱和模式
@@ -255,7 +255,7 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
 ## 调用示例<a id="zh-cn_topic_0000002511188540_section088124295117"></a>
 
 <!-- npu="950,A3,910b" id32 -->
-Fixpipe完整样例请参考[fixpipe\_l0c2l1样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2l1)；
+Fixpipe完整样例请参考[fixpipe\_l0c2l1样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2l1)。
 
 - 示例：通路L0C Buffer->L1 Buffer。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为int8_t，不开启NZ2ND的格式转换，开启scalar量化。
 

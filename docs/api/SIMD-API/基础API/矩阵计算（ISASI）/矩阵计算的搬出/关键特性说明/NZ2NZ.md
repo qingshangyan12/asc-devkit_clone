@@ -1,6 +1,6 @@
 # NZ2NZ<a name="ZH-CN_TOPIC_0000002538231204"></a>
 
-**特性说明：**
+## 特性说明
 
 矩阵计算的搬出过程中NZ2NZ的核心功能体现为，矩阵计算结果搬出前后保持NZ数据排布不变。
 
@@ -69,14 +69,14 @@ for (j = 0; j < mSize; j++) {
 - dstStride表示目标NZ矩阵中不同Z分形列的间隔，单位为element。
 <!-- end id4 -->
 
-**特性约束：**
+## 特性约束
 
 - 当NZ2NZ与F32 Channel Split特性组合开启时，搬出到GM的NZ分形中的小分形维度为16\*8，确保小z分形的大小为512B。
 - 对于B8数据类型NZ输出时，Channel Merge默认开启，搬出GM/L1 Buffer小分形维度为16\*32，确保小z分形的大小为512B。
 - 对于B4数据类型NZ输出时，Channel Merge默认开启，搬出GM/L1 Buffer小分形维度为16\*64，确保小z分形的大小为512B。
 - 目标操作数地址之间不能重叠。
 
-**使用示例：**
+## 使用示例
 
 <!-- npu="A3,910b" id6 -->
 以如下产品为例：
@@ -86,7 +86,7 @@ Atlas A3 训练系列产品/Atlas A3 推理系列产品
 <!-- npu="910b" id8 -->
 Atlas A2 训练系列产品/Atlas A2 推理系列产品
 <!-- end id8 -->
-**图1** NZ2NZ示意图（Atlas A2/A3）<a name="zh-cn_topic_0000002515820868_fig199191646174210"></a>  
+**图1** NZ2NZ示意图<a name="zh-cn_topic_0000002515820868_fig199191646174210"></a>  
 
 ![](../../../../../figures/Fixpipe_NZ2NZ.png)
 
@@ -102,7 +102,7 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
 <!-- npu="950" id5 -->
 以Ascend 950PR/Ascend 950DT为例：
 
-**图2** NZ2NZ示意图（Ascend 950PR/DT）<a name="zh-cn_topic_0000002515820868_fig199191646174233"></a>  
+**图2** NZ2NZ示意图（Ascend 950PR/Ascend 950DT）<a name="zh-cn_topic_0000002515820868_fig199191646174233"></a>  
 
 ![](../../../../../figures/Fixpipe_NZ2NZ_950.png)
 

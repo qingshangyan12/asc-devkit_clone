@@ -1,6 +1,6 @@
 # 随路ReLU<a name="ZH-CN_TOPIC_0000002538231206"></a>
 
-**特性说明：**
+## 特性说明
 
 矩阵计算的搬出过程中支持随路ReLU能力，当前支持如下随路ReLU能力。**DataCopyCO12DstParams结构体参数**定义中reluPre可设置为1开启Normal ReLU，结合clipReluPre可进一步开启ClipReLU能力。
 

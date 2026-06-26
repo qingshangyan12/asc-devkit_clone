@@ -40,7 +40,7 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
 <!-- end id10 -->
 下图展示了随路量化、随路ReLU、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。
 
-**图1** L0C2GM流程图（Atlas A3/A2）<a id="zh-cn_topic_0000002542828493_fig542810249417"></a>  
+**图1** L0C2GM流程图<a id="zh-cn_topic_0000002542828493_fig542810249417"></a>  
 
 ![](../../../../figures/L0C2GM_Function_Combination.png)
 <!-- end id8 -->
@@ -48,7 +48,7 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
 <!-- npu="950" id11 -->
 以Ascend 950PR/Ascend 950DT为例，下图展示了随路量化、随路ReLU、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。
 
-**图2** L0C2GM流程图（Ascend 950PR/DT）<a id="zh-cn_topic_0000002542828493_fig1828513492475"></a>  
+**图2** L0C2GM流程图（Ascend 950PR/Ascend 950DT）<a id="zh-cn_topic_0000002542828493_fig1828513492475"></a>  
 
 ![](../../../../figures/L0C2GM_Function_Combination_950.png)
 <!-- end id11 -->
@@ -110,7 +110,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 | quantPre | 用于控制量化模式，QuantMode_t类型，具体定义如下：<br>&nbsp;&nbsp;&bull; float/int32_t输出此需配置为QuantMode_t::NoQuant。<br>&nbsp;&nbsp;&bull; half/bfloat16_t输出，此参数需配置为QuantMode_t::F322F16/QuantMode_t::F322BF16。<br>&nbsp;&nbsp;&bull; 配置为scalar量化时，需要调用[SetFixpipePreQuantFlag](./寄存器配置说明/SetFixpipePreQuantFlag.md)接口来设置scalar量化参数。<br>&nbsp;&nbsp;&bull; 配置为tensor量化时，需要调用[SetFixPipeConfig](./寄存器配置说明/SetFixPipeConfig.md)来设置tensor量化参数，其中tensor量化参数需要通过DataCopy从L1 Buffer搬运至Fixpipe Buffer。<br>注：此参数需要用户手动配置，不会自动推导配置对应量化模式。<br><pre>enum QuantMode_t<br>{<br>    NoQuant,      // 不开启量化功能<br>    F322F16,      // Float32_2_Float16：float cast成half，cast mode为CAST_RINT模式<br>    F322BF16,     // Float32_2_BFloat16：float cast成bfloat16_t，cast mode为CAST_RINT模式<br>    DEQF16,       // DeQuant_Float16：int32_t量化成half，scalar量化<br>    VDEQF16,      // Vector_DeQuant_Float16：int32_t量化成half，tensor量化<br>    QF322B8_PRE,  // Quant_Float32_2_B8：float量化成int8_t/uint8_t，scalar量化<br>    VQF322B8_PRE, // Vector_Quant_Float32_2_B8：float量化成int8_t/uint8_t，tensor量化<br>    REQ8,         // ReQuant_int8：int32_t量化成int8_t/uint8_t，scalar量化<br>    VREQ8,        // Vector_ReQuant_int8：int32_t量化成int8_t/uint8_t，tensor量化<br>};</pre> |
 | reluPre | 用于配置ReLU操作的模式，类型为uint8_t，取值如下：<br>&nbsp;&nbsp;&bull; 0：不开启ReLU；<br>&nbsp;&nbsp;&bull; 1：Normal ReLU。 |
 | channelSplit | 类型为bool，配置是否开启通道切分功能，仅在L0C Buffer(CO1) -> GM通路下NZ格式float类型输出时生效。<br>&nbsp;&nbsp;&bull; false：不开启；<br>&nbsp;&nbsp;&bull; true：开启。 |
-| nz2ndEn | 类型为bool，配置是否开启NZ2ND的格式转换，仅在L0C Buffer(CO1) -> GM通路生效。<br>如果要开启NZ2ND的功能需要同步调用[SetFixpipeNz2ndFlag](./寄存器配置说明/SetFixpipeNz2ndFlag.md)来设置格式转换的相关配置信息<br>&nbsp;&nbsp;&bull; false：不开启；<br>&nbsp;&nbsp;&bull; true：开启。 |
+| nz2ndEn | 类型为bool，配置是否开启NZ2ND的格式转换，仅在L0C Buffer(CO1) -> GM通路生效。<br>如果要开启NZ2ND的功能需要同步调用[SetFixpipeNz2ndFlag](./寄存器配置说明/SetFixpipeNz2ndFlag.md)来设置格式转换的相关配置信息。<br>&nbsp;&nbsp;&bull; false：不开启；<br>&nbsp;&nbsp;&bull; true：开启。 |
 
 ## 数据类型<a id="zh-cn_topic_0000002542828493_section4219135304818"></a>
 
@@ -132,7 +132,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
     - 如果用户提供的是标准的IEEE 754 float32输入，API内部会处理成处理器支持的float32格式进行计算，此时如果golden数据生成过程中使用的是标准的IEEE 754 float32数据，则可能引入精度不匹配问题，需要修正golden数据的生成，将量化参数的23bits尾数位的低13bits数据位清零再参与量化计算。
 - 源矩阵NZ格式地址要求64字节对齐，目的矩阵ND格式地址要求满足1字节对齐，NZ格式地址需要满足32字节对齐。
 - 当搬出的mSize或nSize中的任意一个值为0时，该指令不会被执行。
-- 量化和ReLU参数不能为INF/NAN和非规格化数。
+- 量化和ReLU参数不能为Inf/NaN和非规格化数。
 - 目标数据不能有重叠。如果对目的地址有重叠写入，硬件不会报告任何警告和错误，也不保证重叠数据的写入顺序。
 - unitFlag特性开启需要配合Mmad同时开启。
 <!-- npu="A3,910b" id17 -->
@@ -143,10 +143,10 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
     <!-- npu="910b" id19 -->
     Atlas A2 训练系列产品/Atlas A2 推理系列产品
     <!-- end id19 -->
-    对于浮点类型INF/NAN输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式：
+    对于浮点类型Inf/NaN输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式：
 
-    - 非饱和模式：CTRL\[48\]设置成1'b1，INF/NAN保持原输出。
-    - 饱和模式：CTRL\[48\]设置成1'b0，INF输出会被饱和为±MAX，NaN输出会被饱和为0。
+    - 非饱和模式：CTRL\[48\]设置成1'b1，Inf/NaN保持原输出。
+    - 饱和模式：CTRL\[48\]设置成1'b0，Inf输出会被饱和为±MAX，NaN输出会被饱和为0。
 
         ```cpp
         // 设置CTRL[48]为0，开启浮点数饱和模式
@@ -158,12 +158,12 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 <!-- npu="950" id20 -->
 - Ascend 950PR/Ascend 950DT特殊值/边界值约束说明：
 
-    对于浮点类型INF/NAN输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式；
+    对于浮点类型Inf/NaN输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式；
 
     对于fp8\_e4m3fn\_t类型，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行更精细的设置；
 
-    - 非饱和模式：CTRL\[48\]设置成1'b1，INF/NAN保持原输出。对于fp8\_e4m3fn\_t类型，若结果的绝对值为INF或大于fp8\_e4m3fn\_t的最大规格化值，则输出结果为NaN。
-    - 饱和模式：CTRL\[48\]设置成1'b0，INF输出会被饱和为±MAX， NaN输出会被饱和为0。对于fp8\_e4m3fn\_t类型，当CTRL\[50\]设置成1'b0时，NaN被转换为零，当CTRL\[50\]设置成1'b1时，NaN保持不变，若结果的绝对值为INF或大于fp8\_e4m3fn\_t的最大规格化值，则结果为最大规格化值。
+    - 非饱和模式：CTRL\[48\]设置成1'b1，Inf/NaN保持原输出。对于fp8\_e4m3fn\_t类型，若结果的绝对值为Inf或大于fp8\_e4m3fn\_t的最大规格化值，则输出结果为NaN。
+    - 饱和模式：CTRL\[48\]设置成1'b0，Inf输出会被饱和为±MAX， NaN输出会被饱和为0。对于fp8\_e4m3fn\_t类型，当CTRL\[50\]设置成1'b0时，NaN被转换为零，当CTRL\[50\]设置成1'b1时，NaN保持不变，若结果的绝对值为Inf或大于fp8\_e4m3fn\_t的最大规格化值，则结果为最大规格化值。
 
         ```cpp
         // 设置CTRL[48]为0，开启浮点数饱和模式
@@ -176,7 +176,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 ## 调用示例<a id="zh-cn_topic_0000002542828493_section088124295117"></a>
 
 <!-- npu="950,A3,910b" id21 -->
-DataCopy完整样例请参考[data_copy_l0c2gm](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_l0c2gm)；
+DataCopy完整样例请参考[data_copy_l0c2gm](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_l0c2gm)。
 
 - 示例：Mmad含有矩阵乘偏置，左矩阵和右矩阵的数据类型为int8\_t，结果矩阵的数据类型为int32\_t。量化模式DEQF16，Scalar量化参数为2.0，将Mmad计算出的结果由int32\_t量化成half并搬出。
 

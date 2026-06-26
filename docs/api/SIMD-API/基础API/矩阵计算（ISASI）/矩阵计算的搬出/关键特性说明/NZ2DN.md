@@ -1,6 +1,6 @@
 # NZ2DN<a name="ZH-CN_TOPIC_0000002550560514"></a>
-<!-- npu="950" id1 -->
-**特性说明：**
+
+## 特性说明
 
 矩阵计算的搬出过程中NZ2DN的核心功能体现为，将NZ格式矩阵转化为DN格式矩阵。
 
@@ -39,7 +39,7 @@ for (int h = 0; h < dnNum; h++) {
 
 以下参数为NZ2DN用户可配置参数，含义取值范围参见[Fixpipe搬运参数（FixpipeParamsArch3510）](../L0C到GM数据搬运（Fixpipe）.md#参数说明)：
 
-- dnNum表示源NZ矩阵的数目。
+- dnNum表示需要做NZ2DN转化的矩阵个数。
 - mSize与nSize分别表示矩阵m方向和n方向上的维度。
 - srcStride表示源NZ矩阵中相邻Z排布的起始地址之间的间隔，单位为C0\_Size。
 - dstStride表示目的DN矩阵每一行中的元素个数，单位为element。
@@ -47,13 +47,13 @@ for (int h = 0; h < dnNum; h++) {
 - dstDnMatrixStride表示相邻目的DN矩阵起始地址间的间隔，单位为element。
 - srcNzC0Stride表示源矩阵NZ分形相邻行的地址偏移为，单位为C0\_Size。
 
-**特性约束：**
+## 特性约束
 
 - 当开启Channel Split/Channel Merge功能（NZ2NZ）时，此功能不可用。
 - 当L0C Buffer搬运到UB开启双目标模式时，此功能不可用。
 - 目标操作数地址之间不能重叠。
 
-**使用示例：**
+## 使用示例
 
 如下图所示，在L0C Buffer中有两个NZ格式的矩阵，每个矩阵N方向上维度为32，M方向上维度为48，经过NZ2DN转换，将数据格式变为右部分所示排布。
 
@@ -71,4 +71,3 @@ for (int h = 0; h < dnNum; h++) {
 - srcNzMatrixStride = 240，表示不同源NZ矩阵的起始地址的间隔为240 \* C0\_Size。
 - dstDnMatrixStride = 48 \* 80，表示相邻目的DN矩阵起始地址间的间隔为48 \* 80 =3840个元素，40为间隔行数，80为dstStride （每行的元素个数）。
 - srcNzC0Stride = 1：表示源矩阵NZ分形相邻行的地址偏移为1 \* C0\_Size。
-<!-- end id1 -->
