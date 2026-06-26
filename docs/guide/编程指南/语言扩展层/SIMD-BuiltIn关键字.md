@@ -556,7 +556,7 @@ __ubuf__ int * __gm__ ptr;
 <a name="table169229153513"></a>
 <table><thead align="left"><tr id="row769289183515"><th class="cellrowborder" valign="top" width="15.988401159884011%" id="mcps1.1.4.1.1"><p id="p1669269163510"><a name="p1669269163510"></a><a name="p1669269163510"></a>变量名</p>
 </th>
-<th class="cellrowborder" valign="top" width="25.977402259774017%" id="mcps1.1.4.1.2"><p id="p116921597358"><a name="p116921597358"></a><a name="p116921597358"></a>相关API</p>
+<th class="cellrowborder" valign="top" width="25.977402259774017%" id="mcps1.1.4.1.2"><p id="p116921597358"><a name="p116921597358"></a><a name="p116921597358"></a>相关基础API</p>
 </th>
 <th class="cellrowborder" valign="top" width="58.03419658034197%" id="mcps1.1.4.1.3"><p id="p14692294358"><a name="p14692294358"></a><a name="p14692294358"></a>功能</p>
 </th>
@@ -566,21 +566,21 @@ __ubuf__ int * __gm__ ptr;
 </td>
 <td class="cellrowborder" valign="top" width="25.977402259774017%" headers="mcps1.1.4.1.2 "><p id="p369213993514"><a name="p369213993514"></a><a name="p369213993514"></a>GetBlockNum</p>
 </td>
-<td class="cellrowborder" valign="top" width="58.03419658034197%" headers="mcps1.1.4.1.3 "><p id="p969217912357"><a name="p969217912357"></a><a name="p969217912357"></a>当前任务配置的核数，用于代码内部的多核逻辑控制等。<br>内置变量block_num的值与通过相关API GetBlockNum获取的值保持一致。</p>
+<td class="cellrowborder" valign="top" width="58.03419658034197%" headers="mcps1.1.4.1.3 "><p id="p969217912357"><a name="p969217912357"></a><a name="p969217912357"></a>当前任务配置的核数，用于代码内部的多核逻辑控制等。<br>内置变量block_num的值与通过相关基础API GetBlockNum获取的值保持一致。</p>
 </td>
 </tr>
 <tr id="row1669214993515"><td class="cellrowborder" valign="top" width="15.988401159884011%" headers="mcps1.1.4.1.1 "><p id="p1769219913351"><a name="p1769219913351"></a><a name="p1769219913351"></a>block_idx</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.977402259774017%" headers="mcps1.1.4.1.2 "><p id="p116921990355"><a name="p116921990355"></a><a name="p116921990355"></a>GetBlockIdx</p>
 </td>
-<td class="cellrowborder" valign="top" width="58.03419658034197%" headers="mcps1.1.4.1.3 "><p id="p169211933512"><a name="p169211933512"></a><a name="p169211933512"></a>当前核的索引，用于代码内部的多核逻辑控制及多核偏移量计算等。<br>注意，内置变量block_idx的值与通过相关API GetBlockIdx获取的值在部分场景下并不一致，具体说明及场景示例请参考下文描述。</p>
+<td class="cellrowborder" valign="top" width="58.03419658034197%" headers="mcps1.1.4.1.3 "><p id="p169211933512"><a name="p169211933512"></a><a name="p169211933512"></a>当前核的索引，用于代码内部的多核逻辑控制及多核偏移量计算等。<br>注意，内置变量block_idx的值与通过相关基础API GetBlockIdx获取的值在部分场景下并不一致，具体说明及场景示例请参考下文描述。</p>
 </td>
 </tr>
 </tbody>
 </table>
-通常，建议用户使用内置变量对应的API获取所需值，不建议用户直接使用内置变量。因为内置变量反映的是单个硬件资源的配置信息，对于软件栈整合硬件资源、扩展硬件的功能，内置变量的值与实际语义可能不符。
+内置变量反映的是单个硬件资源的配置信息，对于软件栈整合硬件资源、扩展硬件的功能，内置变量的值与实际语义可能不符。
 
-在Mix场景（使用`__mix__`函数执行空间限定符）下，Vector核（AIV）的逻辑位置需要通过block_idx和sub_block_idx共同确定：`logic_idx = block_idx * sub_block_num + sub_block_idx`。其中block_idx标识当前组合在整个grid中的位置，sub_block_idx标识当前AIV在组合内的位置。开发者应使用GetBlockIdx和GetSubBlockIdx API组合获取完整的逻辑位置信息，而非直接使用内置变量。
+在Mix场景（使用`__mix__`函数执行空间限定符）下，Vector核（AIV）的逻辑位置需要通过block_idx和GetSubBlockNum、GetSubBlockIdx基础API获取的值共同确定：`logic_idx = block_idx * GetSubBlockNum() + GetSubBlockIdx()`。其中block_idx标识当前组合在整个grid中的位置，GetSubBlockIdx获取的值标识当前AIV在组合内的位置。
 
 **示例：**
 
