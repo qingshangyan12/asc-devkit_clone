@@ -523,9 +523,6 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     GM_ADDR waitCKEAddr = GetWaitCkeAddr(reqId);
 
 #ifndef ASCENDC_CPU_DEBUG
-    // DEBUG: 加超时计数器，轮询 100000 次后强制 break，验证是否卡在此处
-    uint32_t timeoutCnt = 0;
-    constexpr uint32_t TIMEOUT_MAX = 100000U;
     while (true) {
         uint64_t waitCke = ReadHBMData(waitCKEAddr);
         if (waitCke != 0) {
@@ -541,10 +538,6 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
             if (finshCnt > finishNum_) {
                 break;
             }
-        }
-        timeoutCnt++;
-        if (timeoutCnt >= TIMEOUT_MAX) {
-            break;  // 超时强制退出
         }
     }
 #endif
