@@ -32,7 +32,7 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    tiling_selector.asc
+    vector_tiling_strategy.asc
 )
 
 target_compile_definitions(demo PRIVATE
