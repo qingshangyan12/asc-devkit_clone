@@ -2,9 +2,9 @@
 
 ## Overview
 
-This sample uses two one-dimensional Tensors as inputs for addition. It introduces a multi-core Tiling split strategy for vector computing. The strategy calculates different inter-core and intra-core split parameters based on the input data length. It distributes data across multiple AI Cores as evenly as possible to improve multi-core computing efficiency.
+This sample uses two one-dimensional Tensors as inputs for addition. It introduces a multi-core Tiling split strategy for vector computing. The strategy calculates different inter-core and intra-core split parameters based on the input data volume. It distributes data across multiple AI Cores as evenly as possible to improve multi-core computing efficiency.
 
-The sample uses 8 AI Cores. The main tile length in each core is 3200 `half` elements, which equals 200 DataBlocks. Use the CMake build parameter `SCENARIO_NUM` to select a data volume scenario.
+The sample uses 8 AI Cores. The main tile data volume in each core is 3200 `half` elements, which equals 200 DataBlocks. Use the CMake build parameter `SCENARIO_NUM` to select a data volume scenario.
 
 ## Supported Products and CANN Software Versions
 
@@ -31,21 +31,21 @@ The sample uses 8 AI Cores. The main tile length in each core is 3200 `half` ele
 
 This sample adds two one-dimensional Tensors. The compute logic is `z = x + y`. Use the CMake build parameter `SCENARIO_NUM` to select a data volume scenario. Each scenario maps to a different Tiling split scenario. All scenarios use the ND data format. The input and output data type is `half`. The kernel function name is `add_custom`.
 
-The sample uses 8 AI Cores. The main tile length in each core is 3200 `half` elements. A main tile is the maximum processing length for one operation based on the available Unified Buffer (UB) space. It meets 32-byte alignment.
+The sample uses 8 AI Cores. The main tile data volume is 3200 `half` elements. The main tile (`MAIN_TILE_LENGTH`) is the maximum data volume that one operation can process based on the available Unified Buffer (UB) space. It meets 32-byte alignment.
 
 **Scenario 0: Main Tiles Only**
 
 - Input: `x` and `y` each contain [1, 256000] `half` elements.
 - Output: `z` contains [1, 256000] `half` elements.
 - Tiling split: Each of the 8 cores processes 32000 elements. Each core contains 10 main tiles, and each main tile contains 3200 elements.
-- Description: All cores process the same length. Each core contains only main tiles.
+- Description: All cores process the same data volume. Each core contains only main tiles.
 
 **Scenario 1: Main Tiles and Tail Block**
 
 - Input: `x` and `y` each contain [1, 260096] `half` elements.
 - Output: `z` contains [1, 260096] `half` elements.
 - Tiling split: Each of the 8 cores processes 32512 elements. Each core contains 10 main tiles and a tail block with 512 elements.
-- Description: All cores process the same length. Each core has an equal-length tail block after the main tiles.
+- Description: All cores process the same data volume. Each core has an equal-length tail block after the main tiles.
 
 **Scenario 2: Main Tiles and Tail Core**
 
@@ -105,24 +105,24 @@ The sample uses 8 AI Cores. The main tile length in each core is 3200 `half` ele
 
 ## Host-Side Tiling Calculation Process
 
-The Tiling calculation process of this sample is as follows. The host side receives `totalLength` as the input. It calculates the number of main tiles, tail blocks, and tail cores step by step. The output is the number of elements that each core must process.
+The Tiling calculation process of this sample is as follows. The host side receives `totalLength` as the input. It calculates the number of main tiles, tail blocks, and tail cores step by step. The output is the Tiling split result.
 
-1. Align the total length by DataBlock.
+1. Align the total data volume by DataBlock.
 
    ```cpp
    totalLengthAligned = AlignUp(totalLength, alignNum);
    ```
 
-2. Allocate the same number of main tiles to all cores. Each main tile has a length of `MAIN_TILE_LENGTH`.
+2. Allocate the same number of main tiles, `MAIN_TILE_LENGTH`, to all cores.
 
    ```cpp
    mainTileNum = totalLengthAligned / (numBlocks * MAIN_TILE_LENGTH);
    mainTileRemainder = totalLengthAligned % (numBlocks * MAIN_TILE_LENGTH);
    ```
 
-   At this point, each core processes at least `mainTileNum * MAIN_TILE_LENGTH` elements. `mainTileRemainder` indicates the remaining length after main tile allocation.
+   At this point, each core processes at least `mainTileNum * MAIN_TILE_LENGTH` elements. `mainTileRemainder` indicates the remaining data volume after main tile allocation.
 
-3. Allocate the remaining length after main tile allocation to all cores as equal-length DataBlock tail blocks.
+3. Allocate `mainTileRemainder` to all cores as equal-length DataBlock tail blocks.
 
    ```cpp
    tailBlockNumEachCore = mainTileRemainder / (numBlocks * alignNum);
@@ -130,7 +130,7 @@ The Tiling calculation process of this sample is as follows. The host side recei
    baseLength = mainTileNum * MAIN_TILE_LENGTH + tailBlockNumEachCore * alignNum;
    ```
 
-   `baseLength` indicates the base processing length of each core. `formerCoreRemainder` indicates the remaining length that must be allocated to the first several cores after each core receives equal-length DataBlock tail blocks.
+   `baseLength` indicates the base data volume processed by each core. `formerCoreRemainder` indicates the remaining data volume that must be allocated to the first several cores after each core receives equal-length DataBlock tail blocks.
 
 4. Allocate the remaining DataBlocks to the first several former cores.
 

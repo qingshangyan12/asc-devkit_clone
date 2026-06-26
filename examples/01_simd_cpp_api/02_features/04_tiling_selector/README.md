@@ -2,9 +2,9 @@
 
 ## 概述
 
-本样例以两个一维Tensor相加为例，介绍矢量计算多核Tiling切分策略。该策略根据输入数据长度计算不同的核间和核内切分参数，使数据在多个AI Core之间尽量均衡分配，从而充分利用多核计算能力实现高效计算。
+本样例以两个一维Tensor相加为例，介绍矢量计算多核Tiling切分策略。该策略根据输入数据量计算不同的核间和核内切分参数，使数据在多个AI Core之间尽量均衡分配，从而充分利用多核计算能力实现高效计算。
 
-样例固定使用8个AI Core，核内主块长度为3200个`half`元素（即200个DataBlock），通过CMake编译参数`SCENARIO_NUM`选择不同数据量场景。
+样例固定使用8个AI Core，核内主块数据量为3200个`half`元素（即200个DataBlock），通过CMake编译参数`SCENARIO_NUM`选择不同数据量场景。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -31,21 +31,21 @@
 
 本样例实现两个一维Tensor相加，计算逻辑为`z = x + y`。样例通过CMake编译参数`SCENARIO_NUM`选择不同数据量场景，对应不同的Tiling切分场景，所有场景数据格式为ND，输入输出均为`half`类型，核函数名为`add_custom`。
 
-样例固定使用8个AI Core，单次核内主块长度为3200个`half`元素，其中“主块”是基于UB可用空间确定的单次最大处理长度，满足32字节对齐。
+样例固定使用8个AI Core，主块数据量为3200个`half`元素，其中“主块”（`MAIN_TILE_LENGTH`）是用户基于UB可用空间确定的一次可以处理的最大数据量，且满足32字节对齐。
 
 **场景0：仅主块**
 
 - 输入：`x`、`y`均为[1, 256000]个`half`元素
 - 输出：`z`为[1, 256000]个`half`元素
 - Tiling切分：8个核各处理32000个元素；每个核包含10个主块，每个主块3200个元素
-- 说明：所有核处理长度相同，核内只包含主块
+- 说明：所有核处数据量相同，核内只包含主块
 
 **场景1：主块+尾块**
 
 - 输入：`x`、`y`均为[1, 260096]个`half`元素
 - 输出：`z`为[1, 260096]个`half`元素
 - Tiling切分：8个核各处理32512个元素；每个核包含10个主块和512个元素的尾块
-- 说明：所有核处理长度相同，每个核在主块后都有等长尾块
+- 说明：所有核处理数据量相同，每个核在主块后都有等长尾块
 
 **场景2：主块+尾核**
 
@@ -105,24 +105,24 @@
 
 ## Host侧Tiling计算过程
 
-本样例的Tiling计算过程如下所示，Host侧输入为`totalLength`，逐级计算主块数量、尾块数量、尾核数量，输出为每个核需要处理的元素长度。
+本样例的Tiling计算过程如下所示，Host侧输入为`totalLength`，逐级计算主块数量、尾块数量、尾核数量，输出为Tiling切分结果。
 
-1. 将总长度按DataBlock对齐。
+1. 将总数据量按DataBlock对齐。
 
    ```cpp
    totalLengthAligned = AlignUp(totalLength, alignNum);
    ```
 
-2. 先在所有核上分配相同数量的`MAIN_TILE_LENGTH`整数倍主块。
+2. 先在所有核上分配相同数量的主块`MAIN_TILE_LENGTH`。
 
    ```cpp
    mainTileNum = totalLengthAligned / (numBlocks * MAIN_TILE_LENGTH);
    mainTileRemainder = totalLengthAligned % (numBlocks * MAIN_TILE_LENGTH);
    ```
 
-   此时每个核至少处理`mainTileNum * MAIN_TILE_LENGTH`个元素，`mainTileRemainder`表示完成主块分配后的剩余长度。
+   此时每个核至少处理`mainTileNum * MAIN_TILE_LENGTH`个元素，`mainTileRemainder`表示完成主块分配后的剩余数据量。
 
-3. 主块剩余长度再按DataBlock给所有核补齐等长尾块。
+3. `mainTileRemainder`再按DataBlock给所有核补齐等长尾块。
 
    ```cpp
    tailBlockNumEachCore = mainTileRemainder / (numBlocks * alignNum);
@@ -130,7 +130,7 @@
    baseLength = mainTileNum * MAIN_TILE_LENGTH + tailBlockNumEachCore * alignNum;
    ```
 
-   `baseLength`表示每个核的基础处理长度。`formerCoreRemainder`表示每核补齐等长DataBlock尾块后，剩余需要分给前若干个核的长度。
+   `baseLength`表示每个核处理的基础数据量。`formerCoreRemainder`表示每核补齐等长DataBlock尾块后，剩余需要分给前若干个核的数据量。
 
 4. 最后剩余的DataBlock分给前若干个整核。
 
