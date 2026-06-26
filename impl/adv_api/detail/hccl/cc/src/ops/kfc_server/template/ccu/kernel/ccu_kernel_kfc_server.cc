@@ -367,9 +367,9 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
     HCCL_INFO("[CcuKernelKfcServer] InitResource finish");
     CCU_CHK_RET(LoadArgs(ctx));
     HCCL_INFO("[CcuKernelKfcServer] LoadArgs finish");
+    /*
     CCU_CHK_RET(CompArgs(ctx));
     HCCL_INFO("[CcuKernelKfcServer] CompArgs finish");
-    /*
     HCCL_INFO("[GenCircularQueue] KfcServer start");
     CCU_IF(ctx.missionIndex == 0) {
         KfcServerGenCircularQueue(arg, ctx);
