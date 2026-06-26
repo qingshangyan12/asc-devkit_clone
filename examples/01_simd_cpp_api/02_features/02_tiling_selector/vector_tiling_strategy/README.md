@@ -17,14 +17,14 @@
 ## 目录结构介绍
 
 ```text
-├── 04_tiling_selector
+├── vector_tiling_strategy
 │   ├── scripts
-│   │   ├── gen_data.py          // 输入数据和真值数据生成脚本
-│   │   └── verify_result.py     // 输出结果验证脚本
-│   ├── CMakeLists.txt           // 编译工程文件
-│   ├── tiling_selector.asc      // Ascend C样例实现与调用样例
-│   ├── data_utils.h             // 数据读入写出函数
-│   └── README.md                // 样例说明文档
+│   │   ├── gen_data.py            // 输入数据和真值数据生成脚本
+│   │   └── verify_result.py       // 输出结果验证脚本
+│   ├── CMakeLists.txt             // 编译工程文件
+│   ├── vector_tiling_strategy.asc // Ascend C样例实现与调用样例
+│   ├── data_utils.h               // 数据读入写出函数
+│   └── README.md                  // 样例说明文档
 ```
 
 ## 场景详细说明
