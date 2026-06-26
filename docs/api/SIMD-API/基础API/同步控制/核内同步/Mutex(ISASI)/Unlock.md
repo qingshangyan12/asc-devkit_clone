@@ -43,13 +43,13 @@ static __aicore__ inline void Unlock(MutexID id)
 
 | 参数名 | 描述 |
 | --- | --- |
-| pipe | 模板参数，表示流水类别。<br>支持的流水类型为PIPE_S/PIPE_M/PIPE_V/PIPE_MTE1/PIPE_MTE2/PIPE_MTE3/PIPE_FIX。 |
+| pipe | 模板参数，表示流水类别。支持的流水类型为PIPE_S/PIPE_M/PIPE_V/PIPE_MTE1/PIPE_MTE2/PIPE_MTE3/PIPE_FIX。 |
 
 **表 2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| id | 输入 | 进行流水同步管理的MutexID。<ul><li><a href=\"TPipe-TQue编程实践参考.md\">TPipe和TQue编程实践</a>中，MutexID需要通过<a href=\"zh-cn_topic_0000002534327182.md\">AllocMutexID/ReleaseMutexID</a>进行申请释放。</li><li><a href=\"静态Tensor编程实践参考.md\">静态Tensor编程实践</a>中，此时性能最优，MutexID由开发者自行管理，建议使用0-27，28-31为系统内部规划预留，不建议使用。</li></ul> |
+| id | 输入 | 进行流水同步管理的MutexID。在不同编程范式中，该ID的获取以及释放方式不同，详细情况参考[Lock约束说明](Lock.md#section184751024101111)。 |
 
 ## 约束说明<a name="section184751024101111"></a>
 
