@@ -68,7 +68,7 @@ PIPE_S
 ## 调用示例
 
 ```cpp
-// 示例1：SINGLE_CACHE_LINE模式（64B对齐场景）
+// 示例：SINGLE_CACHE_LINE模式（x_gm 64B对齐场景）
 // 假设x为外部传入的地址，每个核计算16个数据，block_idx为内置变量，通过block_idx计算偏移实现多核间数据隔离
 __gm__ float* x_gm = x + block_idx * 16;
 for (int i = 0; i < 16; i++) {
