@@ -133,6 +133,9 @@ $dst_i = src0_i | src1_i$
   <!-- npu="910b" id20 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
   <!-- end id20 -->
+  <!-- npu="950" id29 -->
+  - Ascend 950PR/Ascend 950DT
+  <!-- end id29 -->
 <!-- end id18 -->
 <!-- npu="A3,910b,310b,310p,910" id21 -->
 - 特别地，针对uint32_t/int32_t类型的Or操作，支持通过ReinterpretCast的方式来实现：使用Local Tensor的ReinterpretCast转换成uint16_t/int16_t后再调用Or进行计算。直接传入uint32_t/int32_t类型的数据，在不同版本型号上表现会有所差异，考虑到算子在各个版本中的兼容性，不建议使用这种直接传入的方式：
@@ -159,6 +162,9 @@ $dst_i = src0_i | src1_i$
       <!-- end id28 -->
     <!-- end id26 -->
 <!-- end id21 -->
+<!-- npu="950" id30 -->
+- 针对Ascend 950PR/Ascend 950DT，uint8\_t/int8\_t/uint64\_t/int64\_t数据类型仅支持tensor前n个数据计算接口。
+<!-- end id30 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
@@ -190,7 +196,7 @@ $dst_i = src0_i | src1_i$
 
 结果示例如下：
 
-```bash
+```plain
 输入数据src0Local：[1 2 3 ... 512]
 输入数据src1Local：[513 512 511 ... 2]
 输出数据dstLocal：[513 514 511 ... 514]

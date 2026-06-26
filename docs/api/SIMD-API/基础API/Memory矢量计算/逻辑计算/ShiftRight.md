@@ -156,7 +156,13 @@ dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/T
   <!-- npu="910b" id20 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
   <!-- end id20 -->
+  <!-- npu="950" id21 -->
+  - Ascend 950PR/Ascend 950DT
+  <!-- end id21 -->
 <!-- end id18 -->
+<!-- npu="950" id22 -->
+- 针对Ascend 950PR/Ascend 950DT，uint8\_t/int8\_t/uint64\_t/int64\_t数据类型仅支持tensor前n个数据计算接口。
+<!-- end id22 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
@@ -191,7 +197,7 @@ dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/T
 
 结果示例如下：
 
-```bash
+```plain
 输入数据srcLocal: [1 2 3 ... 512]
 输入数据scalar = 2
 输出数据dstLocal: [0 0 0 1 1 1 1 ... 128]
