@@ -8,4 +8,4 @@
 
 **图1** ZEROING/MERGING对比<a id="fig1"></a>
 
-![](../../../../../figures/ZEROING和MERGING对比.png "ZEROING/MERGING对比")
+![](../../../../figures/ZEROING和MERGING对比.png "ZEROING/MERGING对比")
