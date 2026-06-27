@@ -45,13 +45,20 @@
                  ? (int)CCU_SUCCESS                                         \
                  : (int)CcuWhileBegin(uid##_ce.var->handle,                 \
                        uid##_ce.imm, uid##_ce.cond, CCU_LABEL(uid)),        \
-             uid##_done = 0;                                                \
+             uid##_done = (_CcuWhileStackPush(                              \
+                 (uid##_dwLbl != nullptr) ? uid##_dwLbl : CCU_LABEL(uid)), 0); \
          uid##_rc == (int)CCU_SUCCESS && !uid##_done;                       \
          uid##_done = 1,                                                    \
              uid##_rc = (uid##_dwLbl != nullptr)                            \
                  ? (int)CcuDoWhileEnd(uid##_ce.var->handle,                 \
                        uid##_ce.imm, uid##_ce.cond, uid##_dwLbl)            \
                  : (int)CcuWhileEnd(CCU_LABEL(uid)))
+
+#define CCU_BREAK                                                          \
+    do {                                                                    \
+        const char *__ccuBrkLbl = _CcuWhileStackPopForBreak();              \
+        (void)CcuWhileBreak(__ccuBrkLbl);                                   \
+    } while (0)
 
 #define CCU_IF(expr)                                                        \
     CCU_IF_EXPAND(expr, CCU_CONCAT(__ccu_if_, __COUNTER__))
