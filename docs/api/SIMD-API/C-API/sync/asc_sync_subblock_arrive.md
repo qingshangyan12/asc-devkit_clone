@@ -52,25 +52,25 @@ PIPE_S
   <!-- npu="910b" id7 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
   <!-- end id7 -->
+  ```cpp
+  // Host侧调用接口aclrtGetHardwareSyncAddr获取核间同步基地址ffts_addr
+  uint64_t config = *(__gm__ uint64_t*)ffts_addr;
+  asc_set_ffts_base_addr(config);
+  int64_t flag_id = 1;
+  asc_sync_subblock_arrive(PIPE_S, flag_id);
+  asc_sync_subblock_wait(PIPE_S, flag_id);  
+  ```
 <!-- end id5 -->
-```cpp
-// Host侧调用接口aclrtGetHardwareSyncAddr获取核间同步基地址ffts_addr
-uint64_t config = *(__gm__ uint64_t*)ffts_addr;
-asc_set_ffts_base_addr(config);
-int64_t flag_id = 1;
-asc_sync_subblock_arrive(PIPE_S, flag_id);
-asc_sync_subblock_wait(PIPE_S, flag_id);  
-```
 
 <!-- npu="950" id4 -->
 - 以下示例支持如下产品型号：
   <!-- npu="950" id8 -->
   - Ascend 950PR/Ascend 950DT
   <!-- end id8 -->
+  ```cpp
+  // 在Ascend 950PR/Ascend 950DT产品上，无需进行核间同步基地址ffts_addr的设置
+  int64_t flag_id = 1;
+  asc_sync_subblock_arrive(PIPE_S, flag_id);
+  asc_sync_subblock_wait(PIPE_S, flag_id);  
+  ```
 <!-- end id4 -->
-```cpp
-// 在Ascend 950PR/Ascend 950DT产品上，无需进行核间同步基地址ffts_addr的设置
-int64_t flag_id = 1;
-asc_sync_subblock_arrive(PIPE_S, flag_id);
-asc_sync_subblock_wait(PIPE_S, flag_id);  
-```
