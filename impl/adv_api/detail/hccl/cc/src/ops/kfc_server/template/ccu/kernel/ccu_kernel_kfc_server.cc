@@ -292,7 +292,9 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
             */
         }
 
-        repeatCond == one;
+        CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) {
+            CCU_BREAK;
+        }
 
         MissionPostSync(ctx);
         HCCL_INFO("[KfcServerGenCircularQueue] MissionPostSync finished.");
