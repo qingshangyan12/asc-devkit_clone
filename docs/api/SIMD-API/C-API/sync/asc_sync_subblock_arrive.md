@@ -39,20 +39,20 @@ PIPE_S
 
 ## 约束说明
 
-- 使用该同步接口时，需要按照如下规则设置Kernel类型：
-  - 在纯Vector/Cube场景下，需设置Kernel类型为KERNEL_TYPE_MIX_AIV_1_0或KERNEL_TYPE_MIX_AIC_1_0。
-  - 对于Vector和Cube混合场景，需根据实际情况灵活配置Kernel类型。
 - 不建议开发者同时使用该接口和Matmul高阶API，否则会有flag_id冲突的风险。
 - 同一flag_id的计数器最多设置15次。
 
 ## 调用示例
 
-<!-- npu="A3" id5 -->
-Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- npu="A3,910b" id5 -->
+- 以下示例支持如下产品型号：
+  <!-- npu="A3" id6 -->
+  Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  <!-- end id6 -->
+  <!-- npu="910b" id7 -->
+  Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  <!-- end id7 -->
 <!-- end id5 -->
-<!-- npu="910b" id6 -->
-Atlas A2 训练系列产品/Atlas A2 推理系列产品
-<!-- end id6 -->
 ```cpp
 // Host侧调用接口aclrtGetHardwareSyncAddr获取核间同步基地址ffts_addr
 uint64_t config = *(__gm__ uint64_t*)ffts_addr;
@@ -63,7 +63,10 @@ asc_sync_subblock_wait(PIPE_S, flag_id);
 ```
 
 <!-- npu="950" id4 -->
-Ascend 950PR/Ascend 950DT
+- 以下示例支持如下产品型号：
+  <!-- npu="950" id8 -->
+  Ascend 950PR/Ascend 950DT
+  <!-- end id8 -->
 <!-- end id4 -->
 ```cpp
 // 在Ascend 950PR/Ascend 950DT产品上，无需进行核间同步基地址ffts_addr的设置
