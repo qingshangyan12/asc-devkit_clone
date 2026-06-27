@@ -131,7 +131,7 @@ L0C Buffer到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内�
 | nSize | 输入 | 源NZ矩阵在N方向上的大小，取值范围为nSize ∈[1, 4095]。<br>&nbsp;&nbsp;&bull;若开启channelSplit功能，nSize必须为8的倍数。<br>&nbsp;&nbsp;&bull;若不开启channelSplit功能，nSize必须为16的倍数。 |
 | mSize | 输入 | 源NZ矩阵在M方向上的大小。<br>&nbsp;&nbsp;&bull;不开启NZ2ND功能，取值范围为mSize∈[1, 65535]。<br>&nbsp;&nbsp;&bull;开启NZ2ND功能，取值范围为mSize∈[1, 8192]。 |
 | srcStride | 输入 | 源NZ矩阵中相邻Z排布的起始地址偏移，取值范围为srcStride∈[0, 65535]，单位为C0_SIZE(16\*sizeof(T)，T为src的数据类型)。 |
-| dstStride | 输入 | &bull;不开启NZ2ND功能，目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0，单位为datablock(32字节)。<br>&bull;开启NZ2ND功能，目的ND矩阵每一行中的元素个数，取值不为0 ，单位为element。 |
+| dstStride | 输入 | &bull;不开启NZ2ND功能，目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0，单位为datablock(32字节)。<br>&bull;开启NZ2ND功能，目的ND矩阵每一行中的元素个数，取值不为0，单位为element。 |
 | quantPre | 输入 | QuantMode_t是一个枚举类型，用于控制量化模式，默认值为QuantMode_t::NoQuant，即不开启量化功能。QuantMode_t取值如下：<br>&nbsp;&nbsp;&bull; NoQuant，不开启量化功能。<br>&nbsp;&nbsp;&bull; F322F16，float cast成half，cast mode为CAST_RINT模式。<br>&nbsp;&nbsp;&bull; F322BF16，float cast成bfloat16_t，cast mode为CAST_RINT模式。<br>&nbsp;&nbsp;&bull; DEQF16，int32_t量化成half，scalar量化。<br>&nbsp;&nbsp;&bull; VDEQF16，int32_t量化成half，tensor量化。<br>&nbsp;&nbsp;&bull; QF322B8_PRE，float量化成uint8_t/int8_t，scalar量化。<br>&nbsp;&nbsp;&bull; VQF322B8_PRE，float量化成uint8_t/int8_t，tensor量化。<br>&nbsp;&nbsp;&bull; REQ8，int32_t量化成uint8_t/int8_t，scalar量化。<br>&nbsp;&nbsp;&bull; VREQ8，int32_t量化成uint8_t/int8_t，tensor量化 |
 | deqScalar | 输入 | scalar量化参数，表示单个scale值，quantPre量化模式为scalar量化时需要设置该参数。支持的数据类型为uint64_t。 |
 | ndNum | 输入 | 源NZ矩阵的数目，也就是传输ND矩阵的数目，取值范围为ndNum∈[1, 65535]。 |
