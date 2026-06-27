@@ -97,15 +97,15 @@ __aicore__ inline void Gatherb(const LocalTensor<T>& dst, const LocalTensor<T>& 
 | dst | 输出 | 目的操作数，<br><br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT(存储位置为Unified Buffer)。<br><br>LocalTensor的起始地址需要按照32字节对齐。 |
 | src | 输入 | 源操作数，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT(存储位置为Unified Buffer)。<br><br>LocalTensor的起始地址需要按照32字节对齐。 |
 | offset | 输入 | 每个DataBlock在源操作数中对应的地址偏移，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT(存储位置为Unified Buffer)。<br><br>LocalTensor的起始地址需要按照32字节对齐。<br><br>该偏移量是相对于src的基地址而言的。每个元素值要大于等于0，单位为字节，取值要求如下：<br>•取值应保证src元素类型位宽对齐。<br>•偏移地址后需要32字节对齐。<br>•偏移地址后不能超出UB大小数据的范围。<br>•地址偏移的取值范围：不能超出uint32_t的范围。 |
-| repeatTime | 输入 | 指令迭代次数，每次迭代完成8个DataBlock的数据收集，取值范围：repeatTime∈[0,255]。<br><br>**注：repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。** |
+| repeatTime | 输入 | 指令迭代次数，每次迭代完成8个DataBlock的数据收集，取值范围：repeatTime∈[0,255]。<br/>关于该参数的具体描述请参考[高维切分](../SIMD计算说明/高维切分.md)。 |
 | repeatParams | 输入 | 用于控制指令迭代的相关参数。<br><br>GatherRepeatParams参数说明请参考[表3](#table3)。 |
 
 **表3**  GatherRepeatParams结构体内参数说明<a id="table3"></a>
 
 | 参数名称 | 含义 |
 | :------- | :--- |
-| dstBlkStride | 单次迭代内，矢量目的操作数不同DataBlock间地址步长，单位为DataBlock。<br><br>**注**：当dstBlkStride值为0时，默认按照1来处理。 |
-| dstRepStride | 相邻迭代间，矢量目的操作数相同DataBlock地址步长，单位为DataBlock。 |
+| dstBlkStride | 单次迭代内，矢量目的操作数不同DataBlock间地址步长，单位为DataBlock。<br/>同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md)。 |
+| dstRepStride | 相邻迭代间，矢量目的操作数相同DataBlock地址步长，单位为DataBlock。<br/>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md)； |
 | blockNumber | **注**：预留的扩展参数，当前因后续架构升级，该参数已废弃，不对其进行业务处理。 |
 | src0BlkStride | **注**：预留的扩展参数，当前因后续架构升级，该参数已废弃，不对其进行业务处理。 |
 | src1BlkStride | **注**：预留的扩展参数，当前因后续架构升级，该参数已废弃，不对其进行业务处理。 |
@@ -128,6 +128,21 @@ __aicore__ inline void Gatherb(const LocalTensor<T>& dst, const LocalTensor<T>& 
 
 - 操作数地址对齐要求请参见[Unified Buffer地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 - 不支持源操作数与目的操作数使用同一块内存地址。
+- offset的取值要求如下：
+  -   取值应保证src元素类型位宽对齐。
+  -   偏移地址后需要32字节对齐。
+  -   偏移地址后不能超出UB大小数据的范围。
+  -   地址偏移的取值范围：不能超出uint32\_t的范围。
+<cann-filter npu-type="A3,910b">
+- 针对以下型号
+  - <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
+  - <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
+
+  repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+
+  当dstBlkStride值为0时，默认按照1来处理。
+  </cann-filter>
+- <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。</cann-filter>
 
 ## 调用示例<a name="section11276201527"></a>
 

@@ -59,6 +59,8 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
+头文件路径为 "basic\_api/kernel\_operator\_vec\_vconv\_intf.h"
+
 根据源操作数和目的操作数tensor的数据类型进行精度转换。
 
 ## 函数原型<a name="section620mcpsimp"></a>
@@ -387,6 +389,16 @@ enum class RoundMode {
 - 当dst或src为int4b\_t时，tensor高维切分计算接口的连续模式的mask与tensor前n个数据计算接口的count必须为偶数；对于tensor高维切分计算接口的逐bit模式，对应同一字节的相邻两个比特位的数值必须一致，即0-1位数值一致，2-3位数值一致，4-5位数值一致，以此类推。
 - int32\_t到half数据类型的转换，设置舍入模式无效，需要与[SetDeqScale](寄存器配置说明/SetDeqScale.md)接口配合使用。
 - <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，complex32/complex64/double数据类型仅支持tensor前n个数据计算接口。</cann-filter>
+  <cann-filter npu-type="A3,910b,950">
+- 针对以下型号
+  - <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
+  - <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
+
+  repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+
+  count = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+  </cann-filter>
+- <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。</cann-filter>
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

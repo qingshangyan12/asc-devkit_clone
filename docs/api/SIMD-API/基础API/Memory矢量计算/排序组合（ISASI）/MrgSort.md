@@ -80,12 +80,12 @@ __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T
 
 **表3**  MrgSort4Info结构体参数定义
 
-| 参数名称 | 含义 |
-|---|---|
-| elementLengths | 长度为4的uint16\_t数组，用于存储4个源队列的长度，单位为8B。取值范围为[0, 4095]。 |
-| ifExhaustedSuspension | 某个队列耗尽时，控制指令是否停止执行。类型为bool，默认值为false。<br>&bull; false：某个队列耗尽时，指令不停止。<br>&bull; true：某个队列耗尽时，指令停止。|
-| validBit | 控制参与计算的队列，有效值为3、7、15。<br>&bull;取值为3（0'b0011），表示前2个队列有效。<br>&bull;取值为7（0'b0111），表示前3个队列有效。<br>&bull;取值为15（0'b1111），表示前4个队列有效。|
-| repeatTimes | 重复迭代次数。每次迭代完成4个队列的归并排序，源操作数和目的操作数跳过4个队列总长度。取值范围：repeatTimes∈[0, 255]。<br> repeatTimes参数生效需要满足4个条件： <br>&bull; src包含4个队列并且长度一致。<br>&bull; 4个队列连续存储。<br>&bull; ifExhaustedSuspension = false。<br>&bull; validBit = 15。<br> **注：repeatTimes = 0表示不执行排序，该接口将被视为NOP（空操作）。**|
+| 参数名称 | 含义                                                                                                                                                                                                                    |
+|---|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| elementLengths | 长度为4的uint16\_t数组，用于存储4个源队列的长度，单位为8B。取值范围为[0, 4095]。                                                                                                                                                                   |
+| ifExhaustedSuspension | 某个队列耗尽时，控制指令是否停止执行。类型为bool，默认值为false。<br>&bull; false：某个队列耗尽时，指令不停止。<br>&bull; true：某个队列耗尽时，指令停止。                                                                                                                     |
+| validBit | 控制参与计算的队列，有效值为3、7、15。<br>&bull;取值为3（0'b0011），表示前2个队列有效。<br>&bull;取值为7（0'b0111），表示前3个队列有效。<br>&bull;取值为15（0'b1111），表示前4个队列有效。                                                                                          |
+| repeatTimes | 重复迭代次数。每次迭代完成4个队列的归并排序，源操作数和目的操作数跳过4个队列总长度。取值范围：repeatTimes∈[0, 255]。<br> repeatTimes参数生效需要满足4个条件： <br>&bull; src包含4个队列并且长度一致。<br>&bull; 4个队列连续存储。<br>&bull; ifExhaustedSuspension = false。<br>&bull; validBit = 15。  |
 
 ## 数据类型
 
@@ -97,6 +97,15 @@ __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T
 - dst的起始地址需要32字节对齐，src中LocalTensor的起始地址需要8字节对齐。
 - 如果存在score\[i\]==score\[j\]并且i\>j，将优先选取score\[j\]排在前面。
 - 每次迭代内的数据会进行排序，不同迭代间的数据不会进行排序。
+  <cann-filter npu-type="A3,910b">
+- 针对以下型号
+    - <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
+    - <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
+
+  repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+  </cann-filter>
+- <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。</cann-filter>
+
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

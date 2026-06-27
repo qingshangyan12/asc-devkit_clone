@@ -73,6 +73,8 @@ def Duplicate(scalarValue, dst, count):
         dst[i] = scalarValue
 ```
 
+针对Ascend 950PR/Ascend 950DT，为方便开发者使用，tensor前n个数据计算接口同时也支持直接传入Tensor，此时会将Tensor的第一个元素复制多次并填充到向量中。
+
 ## 函数原型<a name="section620mcpsimp"></a>
 
 - tensor前n个数据计算，源操作数为标量
@@ -154,18 +156,15 @@ def Duplicate(scalarValue, dst, count):
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 <cann-filter npu-type="A3,910b">
-- repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。该约束适用于以下型号。
-<cann-filter npu-type="A3">
+- 针对以下型号
+  - <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
+  - <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
 
-  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
 
+  count = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
   </cann-filter>
-  <cann-filter npu-type="910b">
-
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-
-  </cann-filter>
-</cann-filter>
+- <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。</cann-filter>
 
 <cann-filter npu-type="950">
 

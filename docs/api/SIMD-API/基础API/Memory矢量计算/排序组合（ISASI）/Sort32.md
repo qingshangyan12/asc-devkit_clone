@@ -81,12 +81,12 @@ __aicore__ inline void Sort32(const LocalTensor<T>& dst, const LocalTensor<T>& s
 
 **表2**  参数说明
 
-| 参数名称 | 输入/输出 | 说明 |
-|---|---|---|
-| dst | 输出 | 目的操作数。<br> 类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT<br> LocalTensor的起始地址需要32字节对齐。 |
-| src0 | 输入 | 源操作数。<br> 类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT<br> LocalTensor的起始地址需要32字节对齐。 |
-| src1 | 输入 | 源操作数。<br> 类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT<br> LocalTensor的起始地址需要32字节对齐。<br> **注：src1的数据类型固定为uint32_t。** |
-| repeatTime | 输入 | 重复迭代次数。每次迭代完成32个元素的排序，下次迭代src0跳过128B空间，src1跳过128B空间，dst跳过256B空间。每次迭代输入src0要求128B对齐，src1要求128B对齐，输出dst要求256B对齐。repeatTime∈[0, 255]。<br> **注：repeatTime = 0表示不执行排序，该接口将被视为NOP（空操作）。** |
+| 参数名称 | 输入/输出 | 说明                                                                                                                                  |
+|---|---|-------------------------------------------------------------------------------------------------------------------------------------|
+| dst | 输出 | 目的操作数。<br> 类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT<br> LocalTensor的起始地址需要32字节对齐。                                           |
+| src0 | 输入 | 源操作数。<br> 类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT<br> LocalTensor的起始地址需要32字节对齐。                                            |
+| src1 | 输入 | 源操作数。<br> 类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT<br> LocalTensor的起始地址需要32字节对齐。<br> **注：src1的数据类型固定为uint32_t。**            |
+| repeatTime | 输入 | 重复迭代次数。每次迭代完成32个元素的排序，下次迭代src0跳过128B空间，src1跳过128B空间，dst跳过256B空间。每次迭代输入src0要求128B对齐，src1要求128B对齐，输出dst要求256B对齐。repeatTime∈[0, 255]。  |
 
 ## 数据类型
 
@@ -100,7 +100,15 @@ __aicore__ inline void Sort32(const LocalTensor<T>& dst, const LocalTensor<T>& s
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - 地址对齐约束参考[通用地址对齐约束](../../../通用说明和约束.md)。
-- repeatTime = 0表示不执行排序，该接口将被视为NOP（空操作）。
+  <cann-filter npu-type="A3,910b">
+- 针对以下型号
+    - <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
+    - <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
+
+  repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+  </cann-filter>
+- <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。</cann-filter>
+
 - 如果存在score\[i\]==score\[j\]并且i\>j，将优先选取score\[j\]排在前面。
 - 每次迭代内的数据会进行排序，不同迭代间的数据不会进行排序。
 - 每次迭代输入src0要求128B\(float\)/64B\(half\)对齐，src1要求128B对齐，输出dst要求256B对齐。

@@ -140,21 +140,15 @@ __aicore__ inline void Brcb(const LocalTensor<T>& dst, const LocalTensor<T>& src
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 - 不支持源操作数与目的操作数使用同一块内存地址。
-<cann-filter npu-type="A3,910b">
-- repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。该约束适用于以下型号。
-<cann-filter npu-type="A3">
+  <cann-filter npu-type="A3,910b">
+- 针对以下型号
+  - <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
+  - <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
 
-  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-
+  repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
   </cann-filter>
-  <cann-filter npu-type="910b">
-
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-
-  </cann-filter>
-</cann-filter>
-
-- BrcbRepeatParams结构体内参数dstBlkStride不支持设置为0，若设置成0可能产生未定义行为。
+- <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。</cann-filter>
+- BrcbRepeatParams结构体内参数dstBlkStride，当dstBlkStride值为0时，默认按照1来处理。
 <cann-filter npu-type="310p"> 
 - 针对Atlas 推理系列产品AI Core，使用时需要预留8KB的Unified Buffer空间，作为接口的临时数据存放区。
 </cann-filter>

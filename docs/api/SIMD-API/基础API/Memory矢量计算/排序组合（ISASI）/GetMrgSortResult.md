@@ -98,7 +98,7 @@ __aicore__ inline void GetMrgSortResult(uint16_t &mrgSortList1, uint16_t &mrgSor
 
 ## 约束说明<a name="section837496171220"></a>
 
-无
+-   需与MrgSort接口配合使用，且MrgSort接口中的ifExhaustedSuspension参数必须设置为true。
 
 ## 调用示例<a name="section837496171220"></a>
 
