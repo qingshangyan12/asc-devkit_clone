@@ -45,7 +45,7 @@ __aicore__ inline void SetOrgShape(int orgM, int orgN, int orgKa, int orgKb, int
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| orgM | 输入 | 设置原始完整的形状M大小，单位为元素。<!-- npu="950" id2 --><!-- npu="950" id3 --><!-- npu="950" id4 --><!-- npu="950" id5 --><!-- npu="950" id6 --><br><br>对于Ascend 950PR/Ascend 950DT，在使用[MDL模板](MatmulConfig.md)创建的Matmul对象调用本接口时<!-- end id6 --><!-- end id5 --><!-- end id4 --><!-- end id3 --><!-- end id2 -->，该参数用于设置GM或L1上完整的形状M大小，单位为元素。 |
+| orgM | 输入 | 设置原始完整的形状M大小，单位为元素。<!-- npu="950" id2 --><br><br><!-- npu="950" id3 --><!-- npu="950" id4 --><!-- npu="950" id5 --><!-- npu="950" id6 --><br><br>对于Ascend 950PR/Ascend 950DT，在使用[MDL模板](MatmulConfig.md)创建的Matmul对象调用本接口时<!-- end id6 --><!-- end id5 --><!-- end id4 --><!-- end id3 --><!-- end id2 -->，该参数用于设置GM或L1上完整的形状M大小，单位为元素。 |
 | orgN | 输入 | 设置原始完整的形状N大小，单位为元素。<!-- npu="950" id10 --><br><br>对于Ascend 950PR/Ascend 950DT，在使用[MDL模板](MatmulConfig.md)创建的Matmul对象调用本接口时<!-- end id10 -->，该参数用于设置GM或L1上完整的形状N大小，单位为元素。 |
 | orgK | 输入 | 设置原始完整的形状K大小，单位为元素。原始完整形状Ka=Kb时可设置。<!-- npu="950" id11 --><br><br>对于Ascend 950PR/Ascend 950DT，在使用[MDL模板](MatmulConfig.md)创建的Matmul对象调用本接口时<!-- end id11 -->，该参数用于设置GM或L1上完整的形状K大小，单位为元素。原始完整形状Ka=Kb时可设置。 |
 | orgKa | 输入 | 设置矩阵A原始完整的形状Ka大小，单位为元素。<!-- npu="950" id12 --><br><br>对于Ascend 950PR/Ascend 950DT，在使用[MDL模板](MatmulConfig.md)创建的Matmul对象调用本接口时<!-- end id12 -->，该参数用于设置GM或L1上完整的形状Ka大小，单位为元素。 |
