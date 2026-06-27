@@ -354,6 +354,7 @@ void SlaveKfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
 // ============================================================================
 CcuResult CcuKfcServerKernel(CcuKernelArg arg)
 {
+    /*
     KfcServerContext ctx;
     HCCL_INFO("[CcuKernelKfcServer] KfcServer run");
     CCU_CHK_RET(ParseKernelArg(ctx));
@@ -371,6 +372,7 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
         SlaveKfcServerGenCircularQueue(arg, ctx);
     }
     HCCL_INFO("[CcuKernelKfcServer] KfcServer end");
+    */
     return CCU_SUCCESS;
 }    
 // new---20260603
