@@ -23,19 +23,19 @@ ACLGraph 可以先捕获指定流上的一组运行时任务，再将这些任�
 │   ├── figures                 // 图示
 │   │   ├── single_stream_capture.png  // 单流捕获流程图
 │   │   └── double_stream_capture.png  // 双流捕获流程图
-│   ├── CMakeLists.txt          // 编译工程：通过SCENARIO_NUM选择单流或双流场景
+│   ├── CMakeLists.txt          // 编译工程
 │   ├── add.asc                 // Ascend C核函数实现和ACLGraph捕获调用样例
 │   └── README.md               // 样例说明文档
 ```
 
 ## 场景详细说明
 
-本样例通过编译参数 `SCENARIO_NUM` 选择不同的ACLGraph捕获场景， SCENARIO_NUM不同取值对应的含义如下表所示。所有场景使用相同的Add算子规格：输入和输出形状均为 `[8, 2048]`，数据类型为 `float`，核函数名为 `add_custom`。
+本样例通过运行参数 `mode` 选择不同的ACLGraph捕获场景，`mode` 不同取值对应的含义如下表所示。所有场景使用相同的Add算子规格：输入和输出形状均为 `[8, 2048]`，数据类型为 `float`，核函数名为 `add_custom`。
 
 <table>
 <caption style="font-weight: normal;">
-         <span style="font-weight: bold; font-size: 1.2em;">📌 表1：SCENARIO_NUM不同取值的含义</span></caption>
-<tr><td rowspan="1" align="center">SCENARIO_NUM</td><td align="center">场景</td><td align="center">任务组织方式</td><td align="center">说明</td></tr>
+         <span style="font-weight: bold; font-size: 1.2em;">📌 表1：mode不同取值的含义</span></caption>
+<tr><td rowspan="1" align="center">mode</td><td align="center">场景</td><td align="center">任务组织方式</td><td align="center">说明</td></tr>
 <tr><td align="center">1</td><td align="center">单流</td><td align="center">全部任务提交到 <code>mainStream</code></td><td align="center">展示最基础的线性任务捕获和重复执行流程</td></tr>
 <tr><td align="center">2</td><td align="center">双流</td><td align="center"><code>mainStream</code> 与 <code>computeStream</code> 通过事件同步</td><td align="center">展示跨流任务和事件同步关系的捕获方式</td></tr>
 </table>
@@ -124,20 +124,24 @@ for (int i = 0; i < 5; ++i) {
   在本样例根目录下执行如下步骤，运行该样例。
 
   ```bash
-  SCENARIO_NUM=1
   mkdir -p build && cd build;
-  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;
-  ./demo
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;
+  ./demo 1
   ```
 
-  将 `SCENARIO_NUM` 设置为2可编译运行双流捕获场景。
+  `./demo 1` 表示运行单流捕获场景，`./demo 2` 表示运行双流捕获场景。不传入运行参数时，默认运行单流捕获场景。
 
 - 编译选项说明
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品 与 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | 1、2 | 场景编号：1表示单流捕获，2表示双流捕获 |
+
+- 运行参数说明
+
+  | 参数 | 可选值 | 说明 |
+  |------|--------|------|
+  | `mode` | 1、2 | 捕获场景编号：1表示单流捕获，2表示双流捕获；不指定时默认为1 |
 
 - 执行结果
 
