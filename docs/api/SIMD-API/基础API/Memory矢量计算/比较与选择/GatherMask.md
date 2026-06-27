@@ -211,7 +211,11 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 - 若调用该接口前为Counter模式，在调用该接口后需要显式设置回Counter模式（接口内部执行结束后会设置为Normal模式）。
 
-- 高维切分接口通过GetTemporaryBufferAddr接口预留了8KB Unified Buffer用于内部临时内存管理。
+- <!-- npu="950" id8 -->
+  针对Ascend 950PR/Ascend 950DT，有如下约束说明：
+  - tensor高维切分计算调用GetTemporaryBufferAddr，占用8KB Unified Buffer。
+  - tensor前n个数据连续计算未调用GetTemporaryBufferAddr，不涉及8KB Unified Buffer。
+  <!-- end id8 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

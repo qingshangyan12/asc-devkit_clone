@@ -212,9 +212,10 @@
 - dst按照小端顺序排序成二进制结果，对应src0中相应位置的数据比较结果。
 
 - **使用tensor前n个数据参与计算的接口，设置count时，需要保证count个元素所占空间256字节对齐。**
-<cann-filter npu-type = "950">
-- 针对Ascend 950PR/Ascend 950DT，int8\_t/uint8\_t/uint64\_t/int64\_t/double数据类型仅支持tensor前n个数据计算接口，double只支持CMPMODE::EQ。
-</cann-filter>
+- <!-- npu="950" id10 -->
+  针对Ascend 950PR/Ascend 950DT，有如下约束说明：
+  - int8\_t/uint8\_t/uint64\_t/int64\_t/double数据类型仅支持tensor前n个数据计算接口，double只支持CMPMODE::EQ。
+  <!-- end id10 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

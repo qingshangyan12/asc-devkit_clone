@@ -222,11 +222,10 @@ Kirin 9030，支持模式0、1、2。
 
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
 
-<cann-filter npu-type = "950">
-
-- 针对Ascend 950PR/Ascend 950DT，int8\_t/uint8\_t/complex32/int64\_t/uint64\_t/complex64数据类型仅支持tensor前n个数据计算接口。
-
-</cann-filter>
+- <!-- npu="950" id10 -->
+  针对Ascend 950PR/Ascend 950DT，有如下约束说明：
+  - int8\_t/uint8\_t/complex32/int64\_t/uint64\_t/complex64数据类型仅支持tensor前n个数据计算接口。
+  <!-- end id10 -->
 
 <cann-filter npu-type = "910b，A3，310p">
   

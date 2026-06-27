@@ -133,38 +133,37 @@ $dst_i = src0_i | src1_i$
   <!-- npu="910b" id20 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
   <!-- end id20 -->
-  <!-- npu="950" id21 -->
-  - Ascend 950PR/Ascend 950DT
-  <!-- end id21 -->
 <!-- end id18 -->
-<!-- npu="A3,910b,310b,310p,910" id22 -->
+<!-- npu="A3,910b,310b,310p,910" id21 -->
 - 特别地，针对uint32_t/int32_t类型的Or操作，支持通过ReinterpretCast的方式来实现：使用Local Tensor的ReinterpretCast转换成uint16_t/int16_t后再调用Or进行计算。直接传入uint32_t/int32_t类型的数据，在不同版本型号上表现会有所差异，考虑到算子在各个版本中的兼容性，不建议使用这种直接传入的方式：
-    <!-- npu="A3,910b" id23 -->
+    <!-- npu="A3,910b" id22 -->
     - 整个tensor参与计算和tensor前n个数据计算接口支持传入uint32_t/int32_t类型，但是tensor前n个数据计算的count需要设置为期望计算个数的2倍才能精度符合预期；tensor高维切分计算接口直接编译报错提示不支持该数据类型。上述说明适用于：
-      <!-- npu="A3" id24 -->
+      <!-- npu="A3" id23 -->
       - Atlas A3 训练系列产品/Atlas A3 推理系列产品。
-      <!-- end id24 -->
-      <!-- npu="910b" id25 -->
+      <!-- end id23 -->
+      <!-- npu="910b" id24 -->
       - Atlas A2 训练系列产品/Atlas A2 推理系列产品。
-      <!-- end id25 -->
-    <!-- end id23 -->
-    <!-- npu="310b" id26 -->
+      <!-- end id24 -->
+    <!-- end id22 -->
+    <!-- npu="310b" id25 -->
     - CPU告警提示不支持该数据类型。上述说明适用于：
       - Atlas 200I/500 A2 推理产品。
-    <!-- end id26 -->
-    <!-- npu="310p,910" id27 -->
+    <!-- end id25 -->
+    <!-- npu="310p,910" id26 -->
     - 编译报错提示不支持该数据类型。上述说明适用于：
-      <!-- npu="310p" id28 -->
+      <!-- npu="310p" id27 -->
       - Atlas 推理系列产品AI Core。
-      <!-- end id28 -->
-      <!-- npu="910" id29 -->
+      <!-- end id27 -->
+      <!-- npu="910" id28 -->
       - Atlas 训练系列产品。
-      <!-- end id29 -->
-    <!-- end id27 -->
-<!-- end id22 -->
-<!-- npu="950" id30 -->
-- 针对Ascend 950PR/Ascend 950DT，uint8\_t/int8\_t/uint64\_t/int64\_t数据类型仅支持tensor前n个数据计算接口。
-<!-- end id30 -->
+      <!-- end id28 -->
+    <!-- end id26 -->
+<!-- end id21 -->
+- <!-- npu="950" id29 -->
+  针对Ascend 950PR/Ascend 950DT，有如下约束说明：
+  - 该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
+  - uint8\_t/int8\_t/uint64\_t/int64\_t数据类型仅支持tensor前n个数据计算接口。
+  <!-- end id29 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
