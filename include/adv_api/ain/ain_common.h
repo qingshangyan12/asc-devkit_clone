@@ -26,6 +26,10 @@
 
 namespace AscendC {
 
+typedef void* HcclTeam;
+typedef void* HcclCommSymWindow;
+typedef void* HcclDevComm;
+
 /*!
  * @brief Placeholder tag for "no remote action" in the put primitive.
  */

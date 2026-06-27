@@ -21,6 +21,8 @@
 
 namespace AscendC {
 
+AIN_DEVICE HcclTeam HcclTeamWorld(__gm__ void *devComm) { return nullptr;}
+
 /*!
  * @class Ain
  * @brief This class provides device-side one-sided communication primitives (put/get) layered on top
@@ -69,8 +71,8 @@ public:
      */
     template <typename RemoteAction = AinRemoteNone, typename LocalAction = AinLocalNone,
               typename DescriptorUbuf = AinDescriptorUbuf>
-    AIN_DEVICE void put(__gm__ void *team, uint32_t peer, __gm__ void *dstWin, uint64_t dstOffset,
-                        __gm__ void *srcWin, uint64_t srcOffset, uint64_t bytes,
+    AIN_DEVICE void put(HcclTeam team, uint32_t peer, HcclCommSymWindow dstWin, uint64_t dstOffset,
+                        HcclCommSymWindow srcWin, uint64_t srcOffset, uint64_t bytes,
                         RemoteAction remoteAction = AinRemoteNone{}, LocalAction localAction = AinLocalNone{},
                         const DescriptorUbuf &ubuf = DescriptorUbuf{}, AinCommitFlags commitFlags = AIN_COMMIT_IMMED);
 
@@ -89,8 +91,8 @@ public:
      * @note Requires a valid DescriptorUbuf; AinDescriptorUbufNone is rejected at compile time.
      */
     template <typename DescriptorUbuf = AinDescriptorUbuf>
-    AIN_DEVICE void get(__gm__ void *team, uint32_t peer, __gm__ void *dstWin, uint64_t dstOffset,
-                        __gm__ void *srcWin, uint64_t srcOffset, uint64_t bytes,
+    AIN_DEVICE void get(HcclTeam team, uint32_t peer, HcclCommSymWindow dstWin, uint64_t dstOffset,
+                        HcclCommSymWindow srcWin, uint64_t srcOffset, uint64_t bytes,
                         const DescriptorUbuf &ubuf = DescriptorUbuf{},
                         AinCommitFlags commitFlags = AIN_COMMIT_IMMED);
 
@@ -101,7 +103,7 @@ private:
     /*!
      * @brief Decode a symmetric-window handle into its window index.
      */
-    AIN_DEVICE uint32_t decode_window(__gm__ void *window) const;
+    AIN_DEVICE uint32_t decode_window(HcclCommSymWindow window) const;
 
     Hcomm<COMM_PROTOCOL_UBC_CTP> hcomm_;
 };
@@ -120,16 +122,9 @@ public:
      * @param [in] team: Team id this session synchronizes over.
      * @param [in] index: Session index within the team.
      */
-    AIN_DEVICE AinBarrierSession(Ain *ain, int32_t team, uint32_t index);
+    AIN_DEVICE AinBarrierSession(Ain *ain, HcclTeam team, uint32_t index);
     AIN_DEVICE ~AinBarrierSession();
     AinBarrierSession(AinBarrierSession const &) = delete; // Sessions are not copyable
-
-    /*!
-     * @brief Clean and invalidate a single cache line at addr, with compiler barriers to prevent the
-     *        dcci from being optimized away.
-     * @param [in] addr: Address of the cache line to flush.
-     */
-    AIN_DEVICE void dcci_cacheline(__gm__ uint8_t *addr);
 
     /*!
      * @brief Perform an all-rank barrier across the team.
@@ -140,8 +135,16 @@ public:
     template <typename DescriptorUbuf = AinDescriptorUbuf>
     AIN_DEVICE void sync(int32_t memOrder, const DescriptorUbuf &ubuf = AinDescriptorUbuf{});
 
+private:
+    /*!
+     * @brief Clean and invalidate a single cache line at addr, with compiler barriers to prevent the
+     *        dcci from being optimized away.
+     * @param [in] addr: Address of the cache line to flush.
+     */
+    AIN_DEVICE void dcci_cacheline(__gm__ uint8_t *addr);
+
     Ain *ain_;
-    int32_t team_;
+    HcclTeam team_;
     uint32_t index_;
 };
 
