@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
@@ -16,7 +28,7 @@
 
 AlltoAllV的功能为：通信域内的卡互相发送和接收数据，并且定制每张卡给其它卡发送的数据量和从其它卡接收的数据量，以及定制发送和接收的数据在内存中的偏移。结合原型中的参数，描述接口功能，具体为：第i张卡发送sendBuf内存中第j块数据到第j张卡，该块数据在sendBuf中偏移为sdispls\[j\]的位置，且数据量为sendCounts\[j\]，第j张卡将该数据存放到本卡recvBuf中偏移为rdispls\[i\]的位置，接收数据量为recvCounts\[i\]，这里的sendCounts\[j\]与recvCounts\[i\]需要相等。注意：这里的偏移和数据量均为数据的个数，单位为sizeof\(sendType\)。
 
-![](../../../../figures/allreduce-61.png)
+![](../../../../figures/AlltoAllV.png)
 
 ## 函数原型
 
@@ -57,9 +69,13 @@ __aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void* sendCounts, void* 
 -   若HCCL对象的[config模板参数](HCCL模板参数.md#table884518212555)未指定下发通信任务的核，该接口只能在AIC核或者AIV核两者之一上调用。若HCCL对象的[config模板参数](HCCL模板参数.md#table884518212555)中指定了下发通信任务的核，则该接口可以在AIC核和AIV核上同时调用，接口内部会根据指定的核的类型，只在AIC核、AIV核二者之一下发该通信任务。
 -   一个通信域内，所有Prepare接口和InterHcclGroupSync接口的总调用次数不能超过63。
 -   每张卡发送给卡rank\_j的数据量sendCounts\[j\]，与rank\_j接收对应卡rank\_i的数据量recvCounts\[i\]，必须相等。
+<!-- npu="A3" id7 -->
 -   对于Atlas A3 训练系列产品/Atlas A3 推理系列产品，一个通信域内，最大支持128卡通信。
+<!-- end id7 -->
+<!-- npu="950" id8 -->
 -   对于Ascend 950PR/Ascend 950DT，一个通信域内，所有Prepare接口的总调用次数不能超过63。
 -   对于Ascend 950PR/Ascend 950DT，通信服务端为CCU时，单次最大通信数据量不能超过256M。
+<!-- end id8 -->
 
 ## 调用示例
 
@@ -147,7 +163,7 @@ __aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void* sendCounts, void* 
                 sendCounts[3] = 3;
                 sDisplacements[1] = 3;
                 sDisplacements[2] = 6;
-                sDisplacements[2] = 9;
+                sDisplacements[3] = 9;
                 recvCounts[0] = 3;
                 recvCounts[1] = 2;
                 recvCounts[2] = 1;
@@ -162,7 +178,7 @@ __aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void* sendCounts, void* 
                 sendCounts[3] = 2;
                 sDisplacements[1] = 2;
                 sDisplacements[2] = 4;
-                sDisplacements[2] = 7;
+                sDisplacements[3] = 7;
                 recvCounts[0] = 3;
                 recvCounts[1] = 2;
                 recvCounts[2] = 4;
@@ -177,7 +193,7 @@ __aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void* sendCounts, void* 
                 sendCounts[3] = 4;
                 sDisplacements[1] = 1;
                 sDisplacements[2] = 5;
-                sDisplacements[2] = 9;
+                sDisplacements[3] = 9;
                 recvCounts[0] = 3;
                 recvCounts[1] = 3;
                 recvCounts[2] = 4;
@@ -192,7 +208,7 @@ __aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void* sendCounts, void* 
                 sendCounts[3] = 3;
                 sDisplacements[1] = 3;
                 sDisplacements[2] = 6;
-                sDisplacements[2] = 9;
+                sDisplacements[3] = 9;
                 recvCounts[0] = 3;
                 recvCounts[1] = 2;
                 recvCounts[2] = 4;
