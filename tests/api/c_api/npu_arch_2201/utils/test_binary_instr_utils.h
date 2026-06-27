@@ -139,10 +139,10 @@
     namespace {                                                                                                                     \
                                                                                                                                     \
     void                                                                                                                            \
-    cce_name##_##dst_data_type##_##src_data_type##_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_bool_Stub(               \
-        __ubuf__ dst_data_type* dst, __ubuf__ src_data_type* src0, __ubuf__ src_data_type* src1, uint8_t repeat,                    \
-        uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,                  \
-        uint8_t src0_repeat_stride, uint8_t src1_repeat_stride, bool h)                                                             \
+        cce_name##_##dst_data_type##_##src_data_type##_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_uint8_t_bool_Stub(           \
+            __ubuf__ dst_data_type* dst, __ubuf__ src_data_type* src0, __ubuf__ src_data_type* src1, uint8_t repeat,                \
+            uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,              \
+            uint8_t src0_repeat_stride, uint8_t src1_repeat_stride, bool h)                                                         \
     {                                                                                                                               \
         EXPECT_EQ(dst, reinterpret_cast<__ubuf__ dst_data_type*>(11));                                                              \
         EXPECT_EQ(src0, reinterpret_cast<__ubuf__ src_data_type*>(22));                                                             \
