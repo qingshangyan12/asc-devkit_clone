@@ -1154,12 +1154,16 @@ void AclnnOpGenerator::AclnnOpGenCodeParamCheck(
     AclnnOpGenCodeIoParamCheck(outputs, opdefName.outputsName, outfile, false);
 }
 
-void AclnnOpGenerator::AclnnGenCodeCommFunDelcare(ofstream& outfile) const
+void AclnnOpGenerator::AclnnGenCodeCommFunDelcare(ofstream& outfile, bool needInvalidArgumentReport) const
 {
     const char* str = "#define ACLNN_SUCCESS  0\n"
                       "#define ACLNN_ERR_PARAM_NULLPTR 161001\n"
-                      "#define ACLNN_ERR_PARAM_INVALID 161002\n\n";
+                      "#define ACLNN_ERR_PARAM_INVALID 161002\n";
     outfile << str;
+    if (needInvalidArgumentReport) {
+        outfile << "#define NNOPBASE_INVALID_ARGUMENT \"EZ1010\"\n";
+    }
+    outfile << "\n";
 }
 
 void AclnnOpGenerator::AclnnOpGenCodeWorkspaceDelcare(
@@ -1600,9 +1604,9 @@ void AclnnOpGenerator::AclnnGenNameSpaceInfo(ofstream& outfile, OpDef& opDef) co
     outfile << "} // namespace\n\n";
 }
 
-void AclnnOpGenerator::AclnnGenCheckInfo(ofstream& outfile) const
+void AclnnOpGenerator::AclnnGenCheckInfo(ofstream& outfile, bool needInvalidArgumentReport) const
 {
-    AclnnGenCodeCommFunDelcare(outfile);
+    AclnnGenCodeCommFunDelcare(outfile, needInvalidArgumentReport);
     const char* str = "#define NNOPBASE_ASSERT_OK_RETVAL(v)                                    \\\n"
                       "    do {                                                                \\\n"
                       "        const aclnnStatus _chk_stutus = (v);                            \\\n"
@@ -1900,8 +1904,6 @@ bool AclnnOpGenerator::ValidateInputContiguousConflict(OpDef& opDef) const
             }
         }
     }
-    // 检查AutoContiguous配置并打印警告
-    CheckAutoContiguousWarning(opDef);
     return true;
 }
 
@@ -1909,7 +1911,6 @@ void AclnnOpGenerator::CheckAutoContiguousWarning(OpDef& opDef) const
 {
     const std::string opType = opDef.GetOpType().GetString();
     std::vector<InputContiguousConfig> contConfigs = GetInputContiguousConfigs(opDef);
-
     // 收集所有SOC版本
     std::set<std::string> allSocs;
     for (const auto& config : contConfigs) {
@@ -1917,7 +1918,6 @@ void AclnnOpGenerator::CheckAutoContiguousWarning(OpDef& opDef) const
             allSocs.insert(pair.first);
         }
     }
-
     // 辅助函数：将输入名称列表拼接为逗号分隔的字符串
     auto joinInputs = [](const std::vector<std::string>& inputs) -> std::string {
         std::string result;
@@ -1928,12 +1928,10 @@ void AclnnOpGenerator::CheckAutoContiguousWarning(OpDef& opDef) const
         }
         return result;
     };
-
     // 遍历每个SOC，检查AutoContiguous配置
     for (const std::string& socVer : allSocs) {
         std::vector<std::string> autoContInputs; // 配置了AutoContiguous的输入
         std::vector<std::string> defaultInputs;  // 既没有AutoContiguous也没有IgnoreContiguous的输入
-
         for (const auto& config : contConfigs) {
             auto it = config.socContiguousType.find(socVer);
             if (it != config.socContiguousType.end()) {
@@ -1944,13 +1942,12 @@ void AclnnOpGenerator::CheckAutoContiguousWarning(OpDef& opDef) const
                 }
             }
         }
-
         // 如果有AutoContiguous输入，且有默认输入，打印WARNING
         if (!autoContInputs.empty() && !defaultInputs.empty()) {
             ASCENDLOGW(
                 "In %s, op %s has inputs [%s] configured with AutoContiguous, "
                 "but inputs [%s] have no AutoContiguous or IgnoreContiguous configured. "
-                "During aclnn execution, these inputs will also transform from non-contiguous to contiguous tensor.\n",
+                "During aclnn execution, these inputs will also transform from non-contiguous to contiguous tensor.",
                 socVer.c_str(), opType.c_str(), joinInputs(autoContInputs).c_str(), joinInputs(defaultInputs).c_str());
         }
     }
@@ -2113,9 +2110,14 @@ void AclnnOpGenerator::AclnnGenMc2Declaration(OpDef& opDef, ofstream& outfile) c
     }
 }
 
-void AclnnOpGenerator::AclnnGenCodeDecImpl(string& declFile, ofstream& outfile) const
+void AclnnOpGenerator::AclnnGenCodeDecImpl(string& declFile, ofstream& outfile, bool needInvalidArgumentReport) const
 {
     outfile << "#include <string.h>\n";
+    if (needInvalidArgumentReport) {
+        outfile << "#include <string>\n";
+        outfile << "#include <vector>\n";
+        outfile << "#include \"base/err_msg.h\"\n";
+    }
     outfile << "#include \"graph/types.h\"\n";
     outfile << "#include \"" << declFile << ".h\"\n";
 }
@@ -2136,7 +2138,12 @@ void AclnnOpGenerator::AclnnGenOutEmptyLaunchDeclaration(OpDef& opDef, ofstream&
 void AclnnOpGenerator::AclnnGenCodeImplStart(
     string& declFile, bool hasOutputShapeDepend, ofstream& outfile, OpDef& opDef) const
 {
-    AclnnGenCodeDecImpl(declFile, outfile);
+    bool allSupport = false;
+    bool noneSupport = false;
+    std::vector<std::string> autoContSocs;
+    AnalyzeSocAutoContiguousSupport(opDef, allSupport, noneSupport, autoContSocs);
+    const bool needInvalidArgumentReport = !noneSupport;
+    AclnnGenCodeDecImpl(declFile, outfile, needInvalidArgumentReport);
     outfile << "\n";
     if (IsSupportProduct(opDef)) {
         const std::string& opType = opDef.GetOpType().GetString();
@@ -2172,7 +2179,7 @@ void AclnnOpGenerator::AclnnGenCodeImplStart(
                "*tensor, const uint32_t index);\n";
     }
     outfile << "\n";
-    AclnnGenCheckInfo(outfile);
+    AclnnGenCheckInfo(outfile, needInvalidArgumentReport);
 }
 
 void AclnnOpGenerator::AclnnGenCodeImplEnd(ofstream& outfile) const
@@ -2388,9 +2395,12 @@ void AclnnOpGenerator::AclopGenCodeCommon(
         uint32_t optionalParamCheckMode = 0U;
         char* endPtr = nullptr;
         unsigned long parsedVal = strtoul(optionalParamCheckEnv, &endPtr, 10);
-        if (*endPtr != '\0' || parsedVal == 0UL || parsedVal > UINT32_MAX) {
-            ASCENDLOGW("Opbuild: ACLNN_OPTIONAL_PARAM_CHECK value '%s' is invalid, expected positive integer, using 0.",
-                       optionalParamCheckEnv);
+        constexpr unsigned long MAX_PARAM_CHECK_ENUM_NUM = 4UL;
+        if (*endPtr != '\0' || parsedVal == 0UL || parsedVal >= MAX_PARAM_CHECK_ENUM_NUM) {
+            ASCENDLOGW(
+                "Opbuild: ACLNN_OPTIONAL_PARAM_CHECK value '%s' is invalid, expected integer between [0, 3], using 0 "
+                "instead.",
+                optionalParamCheckEnv);
             parsedVal = 0U;
         }
         optionalParamCheckMode = static_cast<uint32_t>(parsedVal);
@@ -2659,12 +2669,19 @@ void AclnnOpGenerator::AclnnOpGenCodeRunUnContWithWorkspaceImpl(
         outfile << "    aclOpExecutor *viewcopyExecutor = nullptr;\n"
                 << "    const aclTensorList *viewcopyTensors = nullptr;\n";
     }
-    auto genContiguousCode = [&outfile, &opDefName, &hasRef](const std::string& indent) {
+    auto genContiguousCode = [&outfile, &hasRef](const std::string& indent) {
         outfile << indent << "NnopbaseGetUnContExecutor(executor, &aclInExecutor, &inContWorkspaceSize);\n"
                 << indent << "if (workspaceSize < inContWorkspaceSize) {\n"
+                << indent << "    const std::string value = std::to_string(workspaceSize);\n"
+                << indent << "    const std::string requiredSize = std::to_string(inContWorkspaceSize);\n"
+                << indent << "    const std::string reason = std::string(\"The passed workspace size \") + value +\n"
+                << indent << "        \" does not meet the workspace size \" + requiredSize +\n"
+                << indent << "        \" actually required by the AutoContiguous() function\";\n"
+                << indent << "    const std::vector<const char*> msgKey = {\"value\", \"paraName\", \"reason\"};\n"
                 << indent
-                << "    NnopbaseOpLogE(ACLNN_ERR_PARAM_INVALID, \"input workspaceSize must be larger than "
-                   "contiguous size!\");\n"
+                << "    const std::vector<const char*> msgValue = {value.c_str(), \"workspaceSize\", "
+                   "reason.c_str()};\n"
+                << indent << "    REPORT_PREDEFINED_ERR_MSG(NNOPBASE_INVALID_ARGUMENT, msgKey, msgValue);\n"
                 << indent << "    return ACLNN_ERR_PARAM_INVALID;\n"
                 << indent << "}\n"
                 << indent << "workspaceSize -= inContWorkspaceSize;\n"
@@ -2939,6 +2956,7 @@ opbuild::Status AclnnOpGenerator::GenerateCode(void)
             ASCENDLOGE("%s get config version failed!", op.c_str());
             return opbuild::OPBUILD_FAILED;
         }
+        CheckAutoContiguousWarning(opDef);
 
         if (maxVersion != 0U) {
             opdefName.prefixName = projectName[1] + opdefName.opName + "V" + to_string(maxVersion);
