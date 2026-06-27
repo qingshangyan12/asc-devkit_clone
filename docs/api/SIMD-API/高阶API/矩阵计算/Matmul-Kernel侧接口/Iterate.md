@@ -71,7 +71,7 @@
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| enPartialSum | 输入 | 是否将矩阵乘的结果累加于现有的CO1数据，默认值为false。在L0C累加时，只支持C矩阵规格为singleCoreM==baseM && singleCoreN==baseN。<!-- npu="310b" id11 --><br><br><br><br>针对Atlas 200I/500 A2 推理产品，该参数仅支持配置为false。<!-- end id11 --> |
+| enPartialSum | 输入 | 是否将矩阵乘的结果累加于现有的CO1数据，默认值为false。在L0C累加时，只支持C矩阵规格为singleCoreM==baseM && singleCoreN==baseN。<!-- npu="310b" id11 --><br><br>针对Atlas 200I/500 A2 推理产品，该参数仅支持配置为false。<!-- end id11 --> |
 
 **表3**  用户自主管理CO1的函数参数说明
 
