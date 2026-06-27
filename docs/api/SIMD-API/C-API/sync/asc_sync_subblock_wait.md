@@ -47,6 +47,12 @@ PIPE_S
 
 ## 调用示例
 
+<!-- npu="A3" id1 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- end id1 -->
+<!-- npu="910b" id5 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品
+<!-- end id5 -->
 ```cpp
 // Host侧调用接口aclrtGetHardwareSyncAddr获取核间同步基地址ffts_addr
 uint64_t config = *(__gm__ uint64_t*)ffts_addr;
@@ -56,8 +62,9 @@ asc_sync_subblock_arrive(PIPE_S, flag_id);
 asc_sync_subblock_wait(PIPE_S, flag_id);  
 ```
 
-<cann-filter npu_type="950">
-
+<!-- npu="950" id6 -->
+Ascend 950PR/Ascend 950DT
+<!-- end id6 -->
 ```cpp
 // 在Ascend 950PR/Ascend 950DT产品上，无需进行核间同步基地址ffts_addr的设置
 int64_t flag_id = 1;
