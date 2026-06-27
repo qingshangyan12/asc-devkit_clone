@@ -26,7 +26,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为："basic_api/kernel_operator_vec_binary_scalar_intf.h"
+头文件路径为：`"basic_api/kernel_operator_vec_binary_scalar_intf.h"`
 
 将矢量源操作数前count个数据与标量相乘再按照CAST\_ROUND模式转换成half类型，并将计算结果写入dst，此接口支持标量在前和标量在后两种场景。计算公式如下。
 

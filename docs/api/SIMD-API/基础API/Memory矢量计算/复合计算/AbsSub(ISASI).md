@@ -26,11 +26,13 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为："basic\_api/kernel\_operator\_vec\_binary\_intf.h"
+头文件路径为：`"basic_api/kernel_operator_vec_binary_intf.h"`
 
-将src0Local与src1相减再求绝对值，并将计算结果写入dst。计算公式如下：
+将src0与src1相减再求绝对值，并将计算结果写入dst。计算公式如下：
 
-$dst_i = abs(src0_i - src1_i)$
+$$
+dst_i = |src0_i - src1_i|
+$$
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
