@@ -75,3 +75,4 @@ bfloat16_t __hmin_nan(const bfloat16_t x, const bfloat16_t y)
         dst[idx] = __hmin_nan(x[idx], y[idx]);
     }
     ```
+
