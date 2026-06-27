@@ -21,10 +21,13 @@ set(ENV{GIT_TERMINAL_PROMPT} "0")
 
 # 优先探测本地已存在的 asc-comm 源码：命中任一候选目录即直接使用，不触发任何线上拉取；
 # 仅当所有候选都不存在(ASC_COMM_SOURCE_PATH 为空)时，才用固定账户从线上拉取。
+# 候选路径以本文件所在目录(<devkit>/cmake/third_party)为锚，推导出 devkit 仓根的同级 asc-comm，
+# 不依赖 include 点(CMAKE_CURRENT_SOURCE_DIR)，避免独立 test project include 时算错层级而误触发线上拉取。
 message(STATUS "[ThirdPartyLib][asc-comm] project source dir: ${PROJECT_SOURCE_DIR}")
+get_filename_component(_ASC_COMM_DEVKIT_ROOT "${CMAKE_CURRENT_LIST_DIR}/../.." REALPATH)
 set(ASC_COMM_SOURCE_PATH "")
 set(ASC_COMM_SOURCE_CANDIDATES
-    "${CMAKE_CURRENT_SOURCE_DIR}/../../../asc-comm"
+    "${_ASC_COMM_DEVKIT_ROOT}/../asc-comm"
 )
 if(CANN_3RD_LIB_PATH)
     list(APPEND ASC_COMM_SOURCE_CANDIDATES "${CANN_3RD_LIB_PATH}/asc-comm")
@@ -54,18 +57,17 @@ if(NOT ASC_COMM_SOURCE_PATH)
 endif()
 
 # 对外伞头(kernel_api.h)按删除前布局以 "hcomm/xxx.h" 引用 hcomm 头，但 asc-comm 中它位于
-# include/aicore/hcomm。UT 直接基于源码树编译，不经过打包安装流程，需要一个能解析该前缀的
-# include 搜索根。这里在 build 目录下建立软链(hcomm -> hcomm)，并把该目录缓存为全局变量，
-# 供 tests 下的 UT target 追加到自身 include 路径。软链目标内部的相对 include(detail/...)
-# 也因目录结构原样保留而自洽。
+# include/aicore/hcomm。UT 直接基于源码树编译，不经过打包安装流程，需要把 include/aicore
+# 作为搜索根，供 "hcomm/hcomm.h" 和新版 asc-comm 内部的 "hcomm/detail/..." 引用解析。
+# 这里同时保留 build 目录下的 hcomm 软链，兼容依赖 ASC_COMM_HEADER_LINK_DIR 的脚本。
 set(ASC_COMM_HEADER_LINK_DIR ${CMAKE_BINARY_DIR}/asc_comm_headers)
 file(MAKE_DIRECTORY ${ASC_COMM_HEADER_LINK_DIR})
 if(EXISTS ${ASC_COMM_SOURCE_PATH}/include/aicore/hcomm)
     file(CREATE_LINK ${ASC_COMM_SOURCE_PATH}/include/aicore/hcomm
         ${ASC_COMM_HEADER_LINK_DIR}/hcomm SYMBOLIC)
 endif()
-set(ASC_COMM_HEADER_INCLUDE_DIR ${ASC_COMM_HEADER_LINK_DIR}
-    CACHE PATH "include root exposing asc-comm hcomm headers as hcomm/*" FORCE)
+set(ASC_COMM_HEADER_INCLUDE_DIR ${ASC_COMM_SOURCE_PATH}/include/aicore
+    CACHE PATH "include root exposing asc-comm aicore headers as hcomm/*" FORCE)
 message(STATUS "[ThirdPartyLib][asc-comm] Exposed hcomm headers at: ${ASC_COMM_HEADER_INCLUDE_DIR}")
 
 if(TARGET asc_kernel_headers)
