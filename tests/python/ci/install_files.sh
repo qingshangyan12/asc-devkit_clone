@@ -27,3 +27,12 @@ mkdir -p $DST_PATH
 mkdir -p $DST_PATH/
 cp -rf ${TOP_DIR}/impl ${DST_PATH}/impl
 cp -rf ${TOP_DIR}/include ${DST_PATH}/include
+
+# hcomm 迁出 asc-comm 后，对外伞头 kernel_api.h 仍按 hcomm/* 引用相关头。这些头随 asc-comm
+# 源码发布，由 cmake/third_party/asc-comm.cmake 在 configure 阶段软链到 build/asc_comm_headers
+# (hcomm->hcomm)。这里补齐到 adapter_ut 的 include/adv_api 下，使 python 侧编译用例能解析 hcomm 头。
+ASC_COMM_HEADER_LINK_DIR=${INSTALL_PATH}/asc_comm_headers
+if [ -d "${ASC_COMM_HEADER_LINK_DIR}/hcomm" ]; then
+    mkdir -p ${DST_PATH}/include/adv_api/hcomm
+    cp -rfL ${ASC_COMM_HEADER_LINK_DIR}/hcomm/. ${DST_PATH}/include/adv_api/hcomm/
+fi
