@@ -1,4 +1,4 @@
-# Max
+# Min
 
 ## 产品支持情况
 
@@ -16,25 +16,25 @@
 
 头文件路径为：`"basic_api/kernel_operator_limits_intf.h"`。
 
-返回指定数据类型的最大有限值。
+返回指定数据类型的最小有限值，对于浮点数类型来说，返回其最小规约正数。
 
 ## 函数原型
 
 - 标量接口，返回值为标量：
 
     ```cpp
-    constexpr __aicore__ static inline T Max()
+    constexpr __aicore__ static inline T Min()
     ```
 
-- 矢量接口，为dst前count个元素赋最大有限值：
+- 矢量接口，为dst前count个元素赋最小有限值：
 
     ```cpp
-    __aicore__ static inline void Max(const LocalTensor<T>& dst, uint32_t count)
+    __aicore__ static inline void Min(const LocalTensor<T>& dst, uint32_t count)
     ```
 
 ## 参数说明
 
-**表1** 参数说明
+**表1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -47,24 +47,38 @@
 
 ## 返回值说明
 
-标量接口返回值为对应数据类型的最大有限值。
+标量接口返回值为对应数据类型的最小有限值。
 
 矢量接口无返回值。
 
+**表 2**  Min各数据类型输出
+
+| 数据类型 | 十进制数 | 二进制各bit位 |
+| --- | --- | --- |
+| uint8_t | 0 | 0000 0000 |
+| int8_t | -128 | 1000 0000 |
+| uint16_t | 0 | 0000 0000 0000 0000 |
+| int16_t | -32768 | 1000 0000 0000 0000 |
+| half | 6.1e-5 | 0 00001 0000000000 |
+| bfloat16_t | 1.18e-38 | 0 00000001 0000000 |
+| uint32_t | 0 | 0000 0000 0000 0000 0000 0000 0000 0000 |
+| int32_t | -2147483648 | 1000 0000 0000 0000 0000 0000 0000 0000 |
+| float | 1.18e-38 | 0 00000001 00000000000000000000000 |
+
 ## 约束说明
 
-无。
+标量接口无约束，矢量接口使用[duplicate](../../../Memory矢量计算/数据填充/Duplicate.md)填充前count个元素赋最小有限值，参照Memory矢量计算下的数据填充接口[duplicate](../../../Memory矢量计算/数据填充/Duplicate.md)约束。
 
 ## 调用示例
 
 - 标量接口：
 
     ```cpp
-    int32_t value = AscendC::NumericLimits<int32_t>::Max();
+    int32_t value = AscendC::NumericLimits<int32_t>::Min();
     ```
 
 - 矢量接口：
 
     ```cpp
-    AscendC::NumericLimits<int32_t>::Max(dstLocal, 256); // 返回256个int32_t类型的最大值
+    AscendC::NumericLimits<int32_t>::Min(dstLocal, 256); // 返回256个int32_t类型的最小有限值
     ```

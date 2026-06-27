@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section259105813316"></a>
 
-头文件路径为：`"basic_api/kernel_operator_dump_tensor_intf_impl.h"`。
+头文件路径为：`"basic_api/kernel_operator_dump_tensor_intf.h"`。
 
 提供时间戳打点功能，用于在算子Kernel代码中标记关键执行点。调用后会打印如下信息：
 
@@ -73,7 +73,7 @@ descId is 11, rsv is 0, timeStamp is 815603975350485, pcPtr is 19792358553124, e
 > target_compile_definitions({kernel_target_name} PRIVATE
 >   DASCENDC_TIME_STAMP_ON
 > )
->```
+> ```
 
 ## 函数原型<a name="section2067518173415"></a>
 
@@ -93,7 +93,10 @@ __aicore__ inline void PrintTimeStamp(uint32_t descId)
 
 ## 约束说明<a name="section794123819592"></a>
 
-无
+-   该功能仅用于NPU上板调试。
+-   暂不支持算子入图场景的打印。
+
+-   单次调用本接口打印的数据总量不可超过1MB（还包括少量框架需要的头尾信息，通常可忽略）。使用时应注意，如果超出这个限制，则数据不会被打印。在使用自定义算子工程进行工程化算子开发时，一个算子所有使用Dump功能的接口在每个核上Dump的数据总量不可超过1MB。请开发者自行控制待打印的内容数据量，超出则不会打印。
 
 ## 调用示例<a name="section82241477610"></a>
 
