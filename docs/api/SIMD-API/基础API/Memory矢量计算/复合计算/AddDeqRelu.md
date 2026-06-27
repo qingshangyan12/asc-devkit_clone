@@ -6,22 +6,22 @@
 - Ascend 950PR/Ascend 950DT：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3训练系列产品/Atlas A3推理系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2训练系列产品/Atlas A2推理系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品 AI Core：支持
+- Atlas推理系列产品AI Core：支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品 Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -38,6 +38,12 @@ Deq的计算公式如下，采用RINT舍入方式，scale需要通过[SetDeqScal
 
 $$
 Deq(x) = Cast(x \times scale)
+$$
+
+其中Relu的计算公式如下：
+
+$$
+Relu(x) = max(0, x)
 $$
 
 ## 函数原型<a name="section620mcpsimp"></a>
@@ -153,6 +159,14 @@ $$
     8K, & \text{if } count \gt 2K
   \end{cases}
   $$
+
+## 关键特性
+
+### 溢出保护
+
+该接口在执行int32_t到half数据类型的反量化时，会进行防溢出保护处理：
+$$Deq(x) = Cast(x \times (1/2^{17}) \times scale \times 2^{17}) = Cast(x \times scale)$$
+中间缩小步骤将数值控制在安全范围内，有效避免了浮点溢出。
 
 ## 调用示例<a name="section837496171220"></a>
 

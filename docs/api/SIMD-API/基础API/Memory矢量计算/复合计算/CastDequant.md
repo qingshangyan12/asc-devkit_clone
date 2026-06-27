@@ -117,7 +117,7 @@
 
 <!-- npu="A3" id9 -->
 
-**表**  Atlas A3 训练系列产品/Atlas A3 推理系列产品支持的数据类型组合情况
+**表**  Atlas A3训练系列产品/Atlas A3推理系列产品支持的数据类型组合情况
 
 | src数据类型 | dst数据类型 |
 | :---------- | :---------- |
@@ -129,7 +129,7 @@
 
 <!-- npu="910b" id10 -->
 
-**表**  Atlas A2 训练系列产品/Atlas A2 推理系列产品支持的数据类型组合情况
+**表**  Atlas A2训练系列产品/Atlas A2推理系列产品支持的数据类型组合情况
 
 | src数据类型 | dst数据类型 |
 | :---------- | :---------- |
@@ -141,7 +141,7 @@
 
 <!-- npu="310p" id11 -->
 
-**表**  Atlas 推理系列产品AI Core支持的数据类型组合情况
+**表**  Atlas推理系列产品AI Core支持的数据类型组合情况
 
 | src数据类型 | dst数据类型 |
 | :---------- | :---------- |
@@ -189,6 +189,14 @@
   |输入类型为int16_t，关闭向量量化模式|<pre>\_\_aicore\_\_ inline void SetDeqScale(float scale, int16_t offset, bool signMode)</pre>|
   |输入类型为int16_t，开启向量量化模式|<pre>template &lt;typename T&gt;<br>\_\_aicore\_\_ inline void SetDeqScale(const LocalTensor&lt;T&gt;& vdeq, const VdeqInfo& vdeqInfo)</pre>|
   |输入类型为int32_t，输出数据类型为half类型|<pre>\_\_aicore\_\_ inline void SetDeqScale(half scale)</pre>|
+
+## 关键特性
+
+### 溢出保护
+
+该接口在执行int32_t到half数据类型的反量化时，会进行防溢出保护处理：
+$$dst_i = Cast(src_i / 2^{17} \times scale \times 2^{17}) = Cast(src_i \times scale)$$
+中间缩小步骤将数值控制在安全范围内，有效避免了浮点溢出。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
