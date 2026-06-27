@@ -291,6 +291,9 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
             HCCL_INFO("[KfcServerGenCircularQueue] CcuAlltoAllMesh1DKernel finished.");
             */
         }
+
+        repeatCond == one;
+
         MissionPostSync(ctx);
         HCCL_INFO("[KfcServerGenCircularQueue] MissionPostSync finished.");
 
@@ -354,7 +357,6 @@ void SlaveKfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
 // ============================================================================
 CcuResult CcuKfcServerKernel(CcuKernelArg arg)
 {
-    /*
     KfcServerContext ctx;
     HCCL_INFO("[CcuKernelKfcServer] KfcServer run");
     CCU_CHK_RET(ParseKernelArg(ctx));
@@ -366,13 +368,15 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
     CCU_CHK_RET(CompArgs(ctx));
     HCCL_INFO("[CcuKernelKfcServer] CompArgs finish");
     HCCL_INFO("[GenCircularQueue] KfcServer start");
+    KfcServerGenCircularQueue(arg, ctx);
+    /*
     CCU_IF(ctx.missionIndex == 0) {
         KfcServerGenCircularQueue(arg, ctx);
     } CCU_ELSE {
         SlaveKfcServerGenCircularQueue(arg, ctx);
     }
-    HCCL_INFO("[CcuKernelKfcServer] KfcServer end");
     */
+    HCCL_INFO("[CcuKernelKfcServer] KfcServer end");
     return CCU_SUCCESS;
 }    
 // new---20260603
