@@ -4,6 +4,8 @@
 
 矩阵计算的搬出过程中NZ2DN的核心功能体现为，将NZ格式矩阵转化为DN格式矩阵。
 
+NZ2DN转化过程可以参考以下伪代码：
+
 ```cpp
 for (int h = 0; h < dnNum; h++) {
     src_tmp3_addr = src + h ∗ 16 ∗ sizeof(src_element) ∗ srcNzMatrixStride;

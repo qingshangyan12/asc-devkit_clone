@@ -30,28 +30,21 @@
 
 矩阵计算的结果存放在L0C Buffer，DataCopy接口用于将结果搬运至L1 Buffer中，并且在搬运过程中支持随路格式转换等操作。
 
-<!-- npu="A3,910b" id8 -->
-以如下产品型号为例：
-<!-- npu="A3" id9 -->
-Atlas A3 训练系列产品/Atlas A3 推理系列产品
-<!-- end id9 -->
-<!-- npu="910b" id10 -->
-Atlas A2 训练系列产品/Atlas A2 推理系列产品
-<!-- end id10 -->
+<!-- npu="950,A3,910b" id8 -->
 下图展示了随路量化、随路ReLU、随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。
 
+<!-- npu="A3,910b" id9 -->
 **图1** L0C2L1流程图（[NPU架构版本2201](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="zh-cn_topic_0000002511188540_fig8956371257"></a>  
 
 ![](../../../../figures/L0C2L1_Function_Combination.png)
-<!-- end id8 -->
+<!-- end id9 -->
 
 <!-- npu="950" id11 -->
-以Ascend 950PR/Ascend 950DT为例，下图展示了随路量化、随路ReLU、随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。
-
 **图2** L0C2L1流程图（[NPU架构版本3510](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="zh-cn_topic_0000002542828493_fig1828513492475"></a>  
 
 ![](../../../../figures/L0C2L1_Function_Combination_950.png)
 <!-- end id11 -->
+<!-- end id8 -->
 
 ## 函数原型<a id="zh-cn_topic_0000002511188540_section82039854412"></a>
 
