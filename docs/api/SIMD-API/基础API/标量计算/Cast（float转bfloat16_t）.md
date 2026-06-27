@@ -18,6 +18,8 @@
 
 float类型标量数据转换成bfloat16\_t类型标量数据。
 
+在使用该接口之前，用户需要先了解[内置数据类型](../数据结构/内置数据类型.md)和[精度转换](../数据结构/precision_conversion.md)。
+
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp

@@ -73,7 +73,7 @@ descId is 11, rsv is 0, timeStamp is 815603975350485, pcPtr is 19792358553124, e
 > target_compile_definitions({kernel_target_name} PRIVATE
 >   DASCENDC_TIME_STAMP_ON
 > )
->```
+> ```
 
 ## 函数原型<a name="section2067518173415"></a>
 

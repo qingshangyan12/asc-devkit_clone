@@ -51,6 +51,41 @@
 
 矢量接口无返回值。
 
+**表 2**  DeNormMin各数据类型输出
+
+<a name="table1710811591013"></a>
+<table><thead align="left"><tr id="row910912590010"><th class="cellrowborder" valign="top" width="33.33333333333333%" id="mcps1.2.4.1.1"><p id="p810910595014"><a name="p810910595014"></a><a name="p810910595014"></a>数据类型</p>
+</th>
+<th class="cellrowborder" valign="top" width="33.33333333333333%" id="mcps1.2.4.1.2"><p id="p710965913015"><a name="p710965913015"></a><a name="p710965913015"></a>十进制数</p>
+</th>
+<th class="cellrowborder" valign="top" width="33.33333333333333%" id="mcps1.2.4.1.3"><p id="p111109595016"><a name="p111109595016"></a><a name="p111109595016"></a>二进制各bit位</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row3110115912014"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.1 "><p id="p1911045914017"><a name="p1911045914017"></a><a name="p1911045914017"></a>half</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.2 "><p id="p3110105918015"><a name="p3110105918015"></a><a name="p3110105918015"></a>5.96e-8</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="p36601856131316"><a name="p36601856131316"></a><a name="p36601856131316"></a>0 00000 0000000001</p>
+</td>
+</tr>
+<tr id="row1110185915016"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.1 "><p id="p61101459701"><a name="p61101459701"></a><a name="p61101459701"></a>bfloat16_t</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.2 "><p id="p1711055920018"><a name="p1711055920018"></a><a name="p1711055920018"></a>9.2e-41</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="p11660145614139"><a name="p11660145614139"></a><a name="p11660145614139"></a>0 00000000 0000001</p>
+</td>
+</tr>
+<tr id="row74289115212"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.1 "><p id="p642812112216"><a name="p642812112216"></a><a name="p642812112216"></a>float</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.2 "><p id="p557510543130"><a name="p557510543130"></a><a name="p557510543130"></a>1.4e-45</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="p18659165614139"><a name="p18659165614139"></a><a name="p18659165614139"></a>0 00000000 00000000000000000000001</p>
+</td>
+</tr>
+</tbody>
+</table>
+
 ## 约束说明
 
 无。
