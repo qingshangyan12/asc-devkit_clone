@@ -47,7 +47,7 @@ __simd_callee__ inline void StoreUnAlignPost(__ubuf__ T*& dstAddr, UnalignRegFor
 | 参数名 | 描述 |
 |-----|-----|
 | T | 目的操作数的数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
-| postMode | 用于控制是否使能UB地址会自动更新功能（post update），PostLiteral类型。具体参数说明请参考[PostLiteral](../数据类型/PostLiteral.md)。 |
+| postMode | 用于控制是否使能UB地址会自动更新功能（post update），PostLiteral类型。具体参数说明请参考[PostLiteral](../辅助数据类型/PostLiteral.md)。 |
 
 **表 2**  参数说明
 

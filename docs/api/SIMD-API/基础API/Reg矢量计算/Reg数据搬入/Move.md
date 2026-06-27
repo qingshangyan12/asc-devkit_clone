@@ -53,7 +53,7 @@
 | 参数名 | 描述 |
 | --- | --- |
 | T | 操作数数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
-| mode | [MaskMergeMode](../数据类型/MaskMergeMode.md)枚举类型，选择MERGING模式或ZEROING模式。<br>&bull; ZEROING模式当前不支持。<br>&bull; MERGING模式下，mask未筛选的元素在dstReg中保留dstReg原值。 |
+| mode | [MaskMergeMode](../辅助数据类型/MaskMergeMode.md)枚举类型，选择MERGING模式或ZEROING模式。<br>&bull; ZEROING模式当前不支持。<br>&bull; MERGING模式下，mask未筛选的元素在dstReg中保留dstReg原值。 |
 | U | 目的操作数的RegTensor类型，例如RegTensor\<half>，由编译器自动推导，用户不需要填写。 |
 
 **表2**  参数说明
