@@ -72,10 +72,10 @@ __aicore__ inline void Gatherb(const LocalTensor<T>& dst, const LocalTensor<T>& 
 
 | 参数名称 | 输入/输出 | 含义 |
 | :------- | :-------- | :--- |
-| dst | 输出 | 目的操作数，<br><br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT(存储位置为Unified Buffer)。<br><br>LocalTensor的起始地址需要按照32字节对齐。 |
+| dst | 输出 | 目的操作数，类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT(存储位置为Unified Buffer)。<br><br>LocalTensor的起始地址需要按照32字节对齐。 |
 | src | 输入 | 源操作数，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT(存储位置为Unified Buffer)。<br><br>LocalTensor的起始地址需要按照32字节对齐。 |
-| offset | 输入 | 每个DataBlock在源操作数中对应的地址偏移，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT(存储位置为Unified Buffer)。<br><br>LocalTensor的起始地址需要按照32字节对齐。<br><br>该偏移量是相对于src的基地址而言的。每个元素值要大于等于0，单位为字节，取值要求如下：<br>•取值应保证src元素类型位宽对齐。<br>•偏移地址后需要32字节对齐。<br>•偏移地址后不能超出UB大小数据的范围。<br>•地址偏移的取值范围：不能超出uint32_t的范围。 |
-| repeatTime | 输入 | 指令迭代次数，每次迭代完成8个DataBlock的数据收集，取值范围：repeatTime∈[0,255]。<br><br>**注：repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。** |
+| offset | 输入 | 每个DataBlock在源操作数中对应的地址偏移，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT(存储位置为Unified Buffer)。<br><br>LocalTensor的起始地址需要按照32字节对齐。<br><br>该偏移量是相对于src的基地址而言的。每个元素值要大于等于0，单位为字节。取值要求见[约束说明](#约束说明)。 |
+| repeatTime | 输入 | 指令迭代次数，每次迭代完成8个DataBlock的数据收集，取值范围：repeatTime∈[0,255]。|
 | repeatParams | 输入 | 用于控制指令迭代的相关参数。<br><br>GatherRepeatParams参数说明请参考[表3](#table3)。 |
 
 **表3**  GatherRepeatParams结构体内参数说明<a id="table3"></a>
@@ -94,19 +94,53 @@ __aicore__ inline void Gatherb(const LocalTensor<T>& dst, const LocalTensor<T>& 
 
 ## 数据类型
 
-<cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
+<!-- npu="950" id9 -->
+Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。
+<!-- end id9 -->
 
-<cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：uint16_t、uint32_t。</cann-filter>
+<!-- npu="A3" id10 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：uint16_t、uint32_t。
+<!-- end id10 -->
 
-<cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：uint16_t、uint32_t。</cann-filter>
+<!-- npu="910b" id11 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：uint16_t、uint32_t。
+<!-- end id11 -->
 
-<cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t。</cann-filter>
+<!-- npu="310b" id12 -->
+Atlas 200I/500 A2 推理产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t。
+<!-- end id12 -->
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - 操作数地址对齐要求请参见[Unified Buffer地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 - 不支持源操作数与目的操作数使用同一块内存地址。
-
+- offset的取值要求如下：
+  - 取值应保证src元素类型位宽对齐。
+  - 偏移地址后需要32字节对齐。
+  - 偏移地址后不能超出UB大小数据的范围。
+  - 地址偏移的取值范围：不能超出uint32_t的范围。
+- repeatTime取值范围：repeatTime∈[0,255]。
+<!-- npu="A3,910b" id20 -->
+- 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+  <!-- npu="A3" id18 -->
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  <!-- end id18 -->
+  <!-- npu="910b" id19 -->
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  <!-- end id19 -->
+<!-- end id20 -->
+<!-- npu="950" id23 -->
+- 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算/Reg矢量计算.md)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
+<!-- end id23 -->
+  <!-- npu="A3,910b" id15 -->
+- 针对如下型号，当dstBlkStride取值为0时，默认按照1来处理。
+  <!-- npu="A3" id13 -->
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  <!-- end id13 -->
+  <!-- npu="910b" id14 -->
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  <!-- end id14 -->
+  <!-- end id15 -->
 ## 调用示例<a name="section11276201527"></a>
 
 完整使用样例请参见[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/gather)场景四。
