@@ -50,10 +50,10 @@ PIPE_S
 <!-- npu="A3,910b" id1 -->
 - 以下示例支持如下产品型号：
   <!-- npu="A3" id5 -->
-  Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
   <!-- end id5 -->
   <!-- npu="910b" id7 -->
-  Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
   <!-- end id7 -->
 <!-- end id1 -->
 ```cpp
@@ -68,7 +68,7 @@ asc_sync_subblock_wait(PIPE_S, flag_id);
 <!-- npu="950" id6 -->
 - 以下示例支持如下产品型号：
   <!-- npu="950" id8 -->
-  Ascend 950PR/Ascend 950DT
+  - Ascend 950PR/Ascend 950DT
   <!-- end id8 -->
 <!-- end id6 -->
 ```cpp
