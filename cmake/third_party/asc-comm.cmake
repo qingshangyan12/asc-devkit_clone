@@ -21,10 +21,13 @@ set(ENV{GIT_TERMINAL_PROMPT} "0")
 
 # 优先探测本地已存在的 asc-comm 源码：命中任一候选目录即直接使用，不触发任何线上拉取；
 # 仅当所有候选都不存在(ASC_COMM_SOURCE_PATH 为空)时，才用固定账户从线上拉取。
+# 候选路径以本文件所在目录(<devkit>/cmake/third_party)为锚，推导出 devkit 仓根的同级 asc-comm，
+# 不依赖 include 点(CMAKE_CURRENT_SOURCE_DIR)，避免独立 test project include 时算错层级而误触发线上拉取。
 message(STATUS "[ThirdPartyLib][asc-comm] project source dir: ${PROJECT_SOURCE_DIR}")
+get_filename_component(_ASC_COMM_DEVKIT_ROOT "${CMAKE_CURRENT_LIST_DIR}/../.." REALPATH)
 set(ASC_COMM_SOURCE_PATH "")
 set(ASC_COMM_SOURCE_CANDIDATES
-    "${CMAKE_CURRENT_SOURCE_DIR}/../../../asc-comm"
+    "${_ASC_COMM_DEVKIT_ROOT}/../asc-comm"
 )
 if(CANN_3RD_LIB_PATH)
     list(APPEND ASC_COMM_SOURCE_CANDIDATES "${CANN_3RD_LIB_PATH}/asc-comm")
@@ -53,19 +56,41 @@ if(NOT ASC_COMM_SOURCE_PATH)
     set(ASC_COMM_SOURCE_PATH ${CANN_3RD_LIB_PATH}/asc-comm)
 endif()
 
-# 对外伞头(kernel_api.h)按删除前布局以 "hcomm/xxx.h" 引用 hcomm 头，但 asc-comm 中它位于
-# include/aicore/hcomm。UT 直接基于源码树编译，不经过打包安装流程，需要一个能解析该前缀的
-# include 搜索根。这里在 build 目录下建立软链(hcomm -> hcomm)，并把该目录缓存为全局变量，
-# 供 tests 下的 UT target 追加到自身 include 路径。软链目标内部的相对 include(detail/...)
-# 也因目录结构原样保留而自洽。
+# 对外伞头(kernel_api.h)按删除前布局以 "hcomm/xxx.h" 引用 hcomm 头。asc-comm 中对外头位于
+# include/aicore/hcomm，实现头位于 src/aicore/hcomm/detail。UT 直接基于源码树编译，不经过打包安装流程，
+# 需要在 build 目录合并出一份 hcomm 头布局，供 "hcomm/hcomm.h" 和 "hcomm/detail/..." 统一解析。
 set(ASC_COMM_HEADER_LINK_DIR ${CMAKE_BINARY_DIR}/asc_comm_headers)
-file(MAKE_DIRECTORY ${ASC_COMM_HEADER_LINK_DIR})
-if(EXISTS ${ASC_COMM_SOURCE_PATH}/include/aicore/hcomm)
-    file(CREATE_LINK ${ASC_COMM_SOURCE_PATH}/include/aicore/hcomm
-        ${ASC_COMM_HEADER_LINK_DIR}/hcomm SYMBOLIC)
+set(ASC_COMM_PUBLIC_HEADER_DIR ${ASC_COMM_SOURCE_PATH}/include/aicore/hcomm)
+set(ASC_COMM_DETAIL_HEADER_DIR "")
+foreach(detail_candidate
+    ${ASC_COMM_SOURCE_PATH}/include/aicore/hcomm/detail
+    ${ASC_COMM_SOURCE_PATH}/src/aicore/hcomm/detail
+)
+    if(EXISTS ${detail_candidate})
+        set(ASC_COMM_DETAIL_HEADER_DIR ${detail_candidate})
+        break()
+    endif()
+endforeach()
+file(REMOVE_RECURSE ${ASC_COMM_HEADER_LINK_DIR}/hcomm)
+file(MAKE_DIRECTORY ${ASC_COMM_HEADER_LINK_DIR}/hcomm)
+if(EXISTS ${ASC_COMM_PUBLIC_HEADER_DIR})
+    file(GLOB ASC_COMM_PUBLIC_HEADERS ${ASC_COMM_PUBLIC_HEADER_DIR}/*.h)
+    foreach(public_header IN LISTS ASC_COMM_PUBLIC_HEADERS)
+        get_filename_component(public_header_name ${public_header} NAME)
+        file(CREATE_LINK ${public_header}
+            ${ASC_COMM_HEADER_LINK_DIR}/hcomm/${public_header_name} SYMBOLIC)
+    endforeach()
+else()
+    message(FATAL_ERROR "[ThirdPartyLib][asc-comm] Missing public hcomm headers: ${ASC_COMM_PUBLIC_HEADER_DIR}")
+endif()
+if(ASC_COMM_DETAIL_HEADER_DIR)
+    file(CREATE_LINK ${ASC_COMM_DETAIL_HEADER_DIR}
+        ${ASC_COMM_HEADER_LINK_DIR}/hcomm/detail SYMBOLIC)
+else()
+    message(FATAL_ERROR "[ThirdPartyLib][asc-comm] Missing hcomm detail headers under ${ASC_COMM_SOURCE_PATH}")
 endif()
 set(ASC_COMM_HEADER_INCLUDE_DIR ${ASC_COMM_HEADER_LINK_DIR}
-    CACHE PATH "include root exposing asc-comm hcomm headers as hcomm/*" FORCE)
+    CACHE PATH "include root exposing asc-comm hcomm headers and detail headers" FORCE)
 message(STATUS "[ThirdPartyLib][asc-comm] Exposed hcomm headers at: ${ASC_COMM_HEADER_INCLUDE_DIR}")
 
 if(TARGET asc_kernel_headers)
@@ -79,15 +104,20 @@ endif()
 option(ASC_COMM_SKIP_HOST_BUILD "Skip host-side asc-comm header install (for device-only builds)" OFF)
 
 if(NOT ASC_COMM_SKIP_HOST_BUILD)
-    # asc-comm 的 hcomm 对外头使用同目录相对 include(如 hcomm.h 内 #include "detail/impl/...")，
-    # 因此 detail 必须与对外头同目录安装到 asc/include/adv_api/hcomm，否则编译找不到 detail 头。
-    install(DIRECTORY ${ASC_COMM_SOURCE_PATH}/include/aicore/hcomm/
+    # asc-comm 的 hcomm 对外头使用 "hcomm/detail/..." 引用实现头，因此 detail 必须安装到
+    # asc/include/adv_api/hcomm/detail，否则编译找不到 detail 头。
+    install(DIRECTORY ${ASC_COMM_PUBLIC_HEADER_DIR}/
         DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/hcomm
         COMPONENT asc-devkit
         FILES_MATCHING PATTERN "*.h"
     )
+    install(DIRECTORY ${ASC_COMM_DETAIL_HEADER_DIR}/
+        DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/hcomm/detail
+        COMPONENT asc-devkit
+        FILES_MATCHING PATTERN "*.h"
+    )
     # 同时按删除前的源码布局保留一份 detail 到 asc/impl/adv_api/detail/hcomm，保持包内源码路径一致。
-    install(DIRECTORY ${ASC_COMM_SOURCE_PATH}/include/aicore/hcomm/detail/
+    install(DIRECTORY ${ASC_COMM_DETAIL_HEADER_DIR}/
         DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl/adv_api/detail/hcomm
         COMPONENT asc-devkit
         FILES_MATCHING PATTERN "*.h"
