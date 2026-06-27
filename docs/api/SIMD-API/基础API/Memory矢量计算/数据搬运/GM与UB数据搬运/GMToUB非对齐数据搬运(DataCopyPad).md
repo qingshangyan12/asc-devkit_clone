@@ -191,9 +191,10 @@
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - 结构体DataCopyPadExtParams的参数取值范围需要考虑不要超过UB空间大小。
-- <cann-filter npu-type = "A3,910b">当DataCopyExtParams结构体参数blockCount、blockLen任意一个值为0时，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
+- <cann-filter npu-type = "A3,910b,950">当DataCopyExtParams结构体参数blockCount、blockLen任意一个值为0时，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
   - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
   - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
+  - <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT</cann-filter>
 </cann-filter>
 <cann-filter npu-type="950">
 

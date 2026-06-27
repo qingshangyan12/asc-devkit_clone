@@ -45,6 +45,9 @@ def Duplicate(scalarValue, dst, count):
     for i in range(count):     
         dst[i] = scalarValue
 ```
+<!-- npu="950" id27 -->
+针对Ascend 950PR/Ascend 950DT，为方便开发者使用，tensor前n个数据计算接口同时也支持直接传入Tensor，此时会将Tensor的第一个元素复制多次并填充到向量中。
+<!-- end id27 -->
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -105,6 +108,7 @@ def Duplicate(scalarValue, dst, count):
 
 <!-- npu="950" id12 -->
 - 针对Ascend 950PR/Ascend 950DT，T支持的数据类型为：bool、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、complex64。其中，bool、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、fp8_e8m0_t、complex32、int64_t、uint64_t、complex64数据类型仅支持tensor前n个数据计算接口。
+  - 其中，bool、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、 complex32、int64_t、uint64_t、complex64数据类型仅支持tensor前n个数据计算接口。
 <!-- end id12 -->
 <!-- npu="A3" id13 -->
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
@@ -185,15 +189,14 @@ def Duplicate(scalarValue, dst, count):
     AscendC::Duplicate<half>(dstLocal, inputVal, srcDataSize);
     ```
 
-<!-- npu="950" id25 -->
+<!-- npu="950" id26 -->
 
 - tensor前n个数据计算样例，源操作数为Tensor
     ```cpp
     AscendC::Duplicate<half>(dstLocal, srcLocal, srcDataSize);
     ```
-<!-- end id25 -->
+<!-- end id26 -->
 结果示例如下：
-
 ```plain
 scalar: 18.0
 srcLocal: [18.0 1.0 2.0 ... 254.0 255.0]
