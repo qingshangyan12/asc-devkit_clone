@@ -26,6 +26,9 @@
 
 namespace AscendC {
 
+typedef void* HcclTeam;
+typedef void* HcclDevComm;
+
 /*!
  * @brief Placeholder tag for "no remote action" in the put primitive.
  */
@@ -41,14 +44,6 @@ typedef struct {} AinLocalNone;
  *        Passing this type to put/get is rejected at compile time.
  */
 typedef struct {} AinDescriptorUbufNone;
-
-/*!
- * @brief Compile-time type equality trait, true only when both types are identical.
- */
-template <typename T, typename U>
-struct AinIsSame { static constexpr bool value = false; };
-template <typename T>
-struct AinIsSame<T, T> { static constexpr bool value = true; };
 
 /*!
  * @brief Describes the UB workspace handed to the underlying Hcomm engine.
