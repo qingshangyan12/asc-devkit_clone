@@ -19,10 +19,10 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品: 支持
 
 ## 函数原型
 
-    ```cpp
-    __aicore__ inline void asc_sync_inter_wait(pipe_t pipe, uint8_t flag_id)
-    __aicore__ inline void asc_sync_inter_wait(pipe_t pipe, int64_t flag_id)
-    ```
+```cpp
+__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, uint8_t flag_id)
+__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, int64_t flag_id)
+```
 
 ## 参数说明
 
