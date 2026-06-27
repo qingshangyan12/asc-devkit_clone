@@ -12,6 +12,8 @@
 
 static void test_host_hccl() { using AscendC::Hccl; }
 
+static void test_host_hcomm() { using AscendC::Hcomm; }
+
 static void test_host_reduce_common()
 {
     using AscendC::Pattern::Reduce::AR;
