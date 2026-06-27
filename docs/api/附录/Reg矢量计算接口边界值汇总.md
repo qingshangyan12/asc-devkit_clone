@@ -1391,8 +1391,9 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 | float/half | -0.0 | inf/-inf/nan | nan | 0.0 |
 | float/half | -0.0 | -0.0 | 0.0 | 0.0 |
 | float/half | nan | nan/inf/-inf/0/-0/max/min | nan | 0.0 |
-| float/half | inf | -inf/0/-0/max/min | inf | MAX |
-| float/half | inf | nan/inf | nan | 0.0 |
+| float/half | inf | -inf/min | -inf | MIN |
+| float/half | inf | inf/max | inf | MAX |
+| float/half | inf | 0/-0/nan | nan | 0.0 |
 | float/half | -inf | -inf/MIN | inf | MAX |
 | float/half | -inf | inf/MAX | -inf | MIN |
 | float/half | -inf | 0/-0/nan | nan | 0.0 |
@@ -1963,8 +1964,8 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 | float | MIN | MIN | MIN |
 | int8_t | 127（MAX） | 127（MAX），-128~126 | 127（MAX），-128~126 |
 | int8_t | -128（MIN） | -128（MIN）~127 | -128（MIN）~127 |
-| uint16_t | 32767（MAX） | 32767（MAX），-32768（MIN）~-32642 | 32767（MAX），-32768（MIN）~-32642 |
-| uint16_t | -32768（MIN） | -32768（MIN）~-32641 | -32768（MIN）~-32641 |
+| int16_t | 32767（MAX） | 32767（MAX），-32768（MIN）~-32642 | 32767（MAX），-32768（MIN）~-32642 |
+| int16_t | -32768（MIN） | -32768（MIN）~-32641 | -32768（MIN）~-32641 |
 | int32_t | -2147483648（MIN） | -2147483648（MIN）~-2147483585 | -2147483648（MIN）~-2147483585 |
 | int32_t | 2147483647（MAX） | 2147483647（MAX）,-2147483648（MIN）~-2147483586 | 2147483647（MAX）,-2147483648（MIN）~-2147483586 |
 
