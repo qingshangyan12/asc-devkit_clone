@@ -26,6 +26,8 @@
 
 namespace AscendC {
 
+typedef void* HcclTeam;
+
 /*!
  * @brief Placeholder tag for "no remote action" in the put primitive.
  */
@@ -41,14 +43,6 @@ typedef struct {} AinLocalNone;
  *        Passing this type to put/get is rejected at compile time.
  */
 typedef struct {} AinDescriptorUbufNone;
-
-/*!
- * @brief Compile-time type equality trait, true only when both types are identical.
- */
-template <typename T, typename U>
-struct AinIsSame { static constexpr bool value = false; };
-template <typename T>
-struct AinIsSame<T, T> { static constexpr bool value = true; };
 
 /*!
  * @brief Describes the UB workspace handed to the underlying Hcomm engine.
@@ -67,7 +61,11 @@ typedef struct {
  */
 enum AinCommitFlags {
     AIN_COMMIT_IMMED   = 0,        ///< Default: assemble the WQE and ring the doorbell immediately.
-    AIN_COMMIT_DELAYED = (1 << 0)  ///< Assemble the WQE only; ringing the doorbell is deferred to flush().
+    AIN_COMMIT_DELAYED = (1 << 0)  ///< Assemble the WQE only; ringing the doorbell when commit AIN_COMMIT_IMMED.
+};
+
+enum AinMemoryOrder {
+    AIN_MEMORY_ORDER_DEFAULT
 };
 
 } // namespace AscendC
