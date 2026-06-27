@@ -167,22 +167,13 @@
     -   在使用[GetTiling](../Matmul-Tiling侧接口/Matmul-Tiling类/GetTiling.md)接口生成Tiling参数前，必须通过[SetMatmulConfigParams](../Matmul-Tiling侧接口/Matmul-Tiling类/SetMatmulConfigParams.md)接口将scheduleTypeIn参数设置为ScheduleType::N\_BUFFER\_33，以启用NBuffer33模板策略的Tiling生成逻辑。
 
 -   MatmulWithScalePolicy：
-    <!-- npu="950" id29 -->
-    -   仅在Ascend 950PR/Ascend 950DT上支持。
-    <!-- end id29 -->
     -   当前只支持[Norm模板](MatmulConfig.md#p159827389308)和[MDL模板](MatmulConfig.md#p109823386305)。
 
 -   SplitMMatmulPolicy：
-    <!-- npu="950" id30 -->
-    -   仅在Ascend 950PR/Ascend 950DT上支持。
-    <!-- end id30 -->
     -   只支持C矩阵输出到Unified Buffer。
-    -   A矩阵、B矩阵类型信息MatmulType中的参数[IBSHARE](Matmul使用说明.md#p1613333125414)必须为true。
+    -   A矩阵、B矩阵类型信息MatmulType中的参数[IBSHARE](Matmul使用说明.md#p1613334125414)必须为true。
 
 -   SplitNMatmulPolicy：
-    <!-- npu="950" id31 -->
-    -   仅在Ascend 950PR/Ascend 950DT上支持。
-    <!-- end id31 -->
     -   只支持C矩阵输出到Unified Buffer。
     -   baseN必须满足是16的倍数。
     -   [Tiling参数](../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md#table1563162142915)必须满足：singleCoreM = baseM，singleCoreN = baseN，singleCoreK = baseK。
