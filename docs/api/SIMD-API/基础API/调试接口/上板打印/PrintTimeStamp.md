@@ -73,7 +73,7 @@ descId is 11, rsv is 0, timeStamp is 815603975350485, pcPtr is 19792358553124, e
 > target_compile_definitions({kernel_target_name} PRIVATE
 >   DASCENDC_TIME_STAMP_ON
 > )
->```
+> ```
 
 ## 函数原型<a name="section2067518173415"></a>
 
@@ -93,7 +93,7 @@ __aicore__ inline void PrintTimeStamp(uint32_t descId)
 
 ## 约束说明<a name="section794123819592"></a>
 
-无
+可以参考utils目录SIMD约束下的[asc_time_stamp](../../../../Utils-API/调测接口/asc_time_stamp.md)说明。
 
 ## 调用示例<a name="section82241477610"></a>
 

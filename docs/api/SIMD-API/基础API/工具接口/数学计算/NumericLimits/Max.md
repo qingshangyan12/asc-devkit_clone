@@ -1,4 +1,4 @@
-# Min
+# Max
 
 ## 产品支持情况
 
@@ -16,25 +16,25 @@
 
 头文件路径为：`"basic_api/kernel_operator_limits_intf.h"`。
 
-返回指定数据类型的最小有限值。
+返回指定数据类型的最大有限值。
 
 ## 函数原型
 
 - 标量接口，返回值为标量：
 
     ```cpp
-    constexpr __aicore__ static inline T Min()
+    constexpr __aicore__ static inline T Max()
     ```
 
-- 矢量接口，为dst前count个元素赋最小有限值：
+- 矢量接口，为dst前count个元素赋最大有限值：
 
     ```cpp
-    __aicore__ static inline void Min(const LocalTensor<T>& dst, uint32_t count)
+    __aicore__ static inline void Max(const LocalTensor<T>& dst, uint32_t count)
     ```
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -47,24 +47,37 @@
 
 ## 返回值说明
 
-标量接口返回值为对应数据类型的最小有限值。
+标量接口返回值为对应数据类型的最大有限值。
 
 矢量接口无返回值。
 
+**表 2**  Max各数据类型输出
+
+| 数据类型 | 十进制数 | 二进制各bit位 |
+| --- | --- | --- |
+| uint8_t | 255 | 1111 1111 |
+| int8_t | 127 | 0111 1111 |
+| uint16_t | 65535 | 1111 1111 1111 1111 |
+| int16_t | 32767 | 0111 1111 1111 1111 |
+| half | 65504 | 0 11110 1111111111 |
+| bfloat16_t | 3.4e+38 | 0 11111110 1111111 |
+| uint32_t | 4294967295 | 1111 1111 1111 1111 1111 1111 1111 1111 |
+| int32_t | 2147483647 | 0111 1111 1111 1111 1111 1111 1111 1111 |
+| float | 3.4e+38 | 0 11111110 11111111111111111111111 |
+
 ## 约束说明
 
-无。
-
+标量接口无约束，矢量接口使用[duplicate](../../../Memory矢量计算/数据填充/Duplicate.md)填充前count个元素赋最大有限值，参照[duplicate](../../../Memory矢量计算/数据填充/Duplicate.md)约束。
 ## 调用示例
 
 - 标量接口：
 
     ```cpp
-    int32_t value = AscendC::NumericLimits<int32_t>::Min();
+    int32_t value = AscendC::NumericLimits<int32_t>::Max();
     ```
 
 - 矢量接口：
 
     ```cpp
-    AscendC::NumericLimits<int32_t>::Min(dstLocal, 256); // 返回256个int32_t类型的最小有限值
+    AscendC::NumericLimits<int32_t>::Max(dstLocal, 256); // 返回256个int32_t类型的最大值
     ```
