@@ -42,3 +42,7 @@ set(KERNEL_MODE TRUE)
 add_subdirectory(../../impl/aicpu_api impl/aicpu_api)
 add_subdirectory(../../impl/adv_api/tiling impl/adv_api/tiling)
 add_subdirectory(../../impl/adv_api/detail/hccl/cc impl/adv_api/detail/hccl/cc)
+
+# hcomm 已迁出至 asc-comm：device 构建仅需 asc-comm 暴露 hcomm 头供伞头解析，跳过 host 侧安装。
+set(ASC_COMM_SKIP_HOST_BUILD ON CACHE BOOL "skip host asc-comm build in device project" FORCE)
+include(../../cmake/third_party/asc-comm.cmake)

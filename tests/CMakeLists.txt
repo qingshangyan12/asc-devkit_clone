@@ -18,6 +18,10 @@ if (BUILD_OPEN_PROJECT)
     include(cmake/config.cmake)
     include(cmake/intf.cmake)
     include(cmake/func.cmake)
+    # hcomm 已迁出至 asc-comm，UT 编译期需 asc-comm 暴露 hcomm 头供伞头(kernel_api.h)解析。
+    # 仅设置 ASC_COMM_HEADER_INCLUDE_DIR，跳过 host 安装(由打包流程负责)。
+    set(ASC_COMM_SKIP_HOST_BUILD ON CACHE BOOL "skip host asc-comm install in tests" FORCE)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/third_party/asc-comm.cmake)
 endif()
 
 add_subdirectory(api)
