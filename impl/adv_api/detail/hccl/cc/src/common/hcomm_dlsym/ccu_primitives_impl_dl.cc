@@ -78,6 +78,7 @@ DEFINE_WEAK_FUNC(CcuResult, CcuIfEnd, const char *label);
 DEFINE_WEAK_FUNC(CcuResult, CcuFlushPendingIfs);
 DEFINE_WEAK_FUNC(CcuResult, CcuWhileBegin, CcuVariableHandle var, uint64_t immediate, CcuConditionType condType, const char *label);
 DEFINE_WEAK_FUNC(CcuResult, CcuWhileEnd, const char *label);
+DEFINE_WEAK_FUNC(CcuResult, CcuWhileBreak, const char *label);
 DEFINE_WEAK_FUNC(CcuResult, CcuDoWhileBegin, const char *label);
 DEFINE_WEAK_FUNC(CcuResult, CcuDoWhileEnd, CcuVariableHandle var, uint64_t immediate, CcuConditionType condType, const char *label);
 
@@ -98,6 +99,8 @@ DEFINE_WEAK_FUNC(void, _CcuIfStackMarkBodyDone);
 DEFINE_WEAK_FUNC(const char *, _CcuIfStackPopForElse);
 DEFINE_WEAK_FUNC(void, _CcuDoWhileStackPush, const char *label);
 DEFINE_WEAK_FUNC(const char *, _CcuDoWhileStackPopForWhile);
+DEFINE_WEAK_FUNC(void, _CcuWhileStackPush, const char *label);
+DEFINE_WEAK_FUNC(const char *, _CcuWhileStackPopForBreak);
 
 /*========== 循环操作 ==========*/
 DEFINE_WEAK_FUNC(CcuResult, CcuLoopCreate, CcuLoop *loop);
@@ -161,6 +164,7 @@ void CcuPrimitivesImplDlInit(void* libHcommHandle) {
     INIT_SUPPORT_FLAG(libHcommHandle, CcuFlushPendingIfs);
     INIT_SUPPORT_FLAG(libHcommHandle, CcuWhileBegin);
     INIT_SUPPORT_FLAG(libHcommHandle, CcuWhileEnd);
+    INIT_SUPPORT_FLAG(libHcommHandle, CcuWhileBreak);
     INIT_SUPPORT_FLAG(libHcommHandle, CcuDoWhileBegin);
     INIT_SUPPORT_FLAG(libHcommHandle, CcuDoWhileEnd);
     INIT_SUPPORT_FLAG(libHcommHandle, CcuFuncBlockLookup);
@@ -173,6 +177,8 @@ void CcuPrimitivesImplDlInit(void* libHcommHandle) {
     INIT_SUPPORT_FLAG(libHcommHandle, _CcuIfStackPopForElse);
     INIT_SUPPORT_FLAG(libHcommHandle, _CcuDoWhileStackPush);
     INIT_SUPPORT_FLAG(libHcommHandle, _CcuDoWhileStackPopForWhile);
+    INIT_SUPPORT_FLAG(libHcommHandle, _CcuWhileStackPush);
+    INIT_SUPPORT_FLAG(libHcommHandle, _CcuWhileStackPopForBreak);
     INIT_SUPPORT_FLAG(libHcommHandle, CcuLoopCreate);
     INIT_SUPPORT_FLAG(libHcommHandle, _CcuLoopBodyEnter);
     INIT_SUPPORT_FLAG(libHcommHandle, _CcuLoopBodyExit);
