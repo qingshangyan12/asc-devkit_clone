@@ -213,8 +213,8 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 - <!-- npu="950" id8 -->
   针对Ascend 950PR/Ascend 950DT，有如下约束说明：
-  - tensor高维切分计算调用GetTemporaryBufferAddr，占用8KB Unified Buffer。
-  - tensor前n个数据连续计算未调用GetTemporaryBufferAddr，不涉及8KB Unified Buffer。
+  - 内置固定模式调用GetTemporaryBufferAddr，占用8KB Unified Buffer。
+  - 用户自定义模式未调用GetTemporaryBufferAddr，不涉及8KB Unified Buffer。
   <!-- end id8 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
