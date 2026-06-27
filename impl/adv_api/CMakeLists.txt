@@ -103,6 +103,8 @@ endif()
 
 if (BUILD_OPEN_PROJECT)
     add_subdirectory(detail/hccl/cc)
+    # hcomm 已迁出至 asc-comm，从 asc-comm 安装 hcomm 头(hccl/mc2 仍由本仓 detail/hccl/cc 构建)。
+    include(${PROJECT_SOURCE_DIR}/cmake/third_party/asc-comm.cmake)
 endif()
 
 if(NOT BUILD_OPEN_PROJECT)
