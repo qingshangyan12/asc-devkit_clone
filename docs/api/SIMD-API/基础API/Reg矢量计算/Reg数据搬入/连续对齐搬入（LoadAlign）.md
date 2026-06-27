@@ -28,12 +28,12 @@
 
 头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_datacopy_intf.h"`。
 
-LoadAlign能够实现数据从Unified Buffer（UB）连续搬运至[RegTensor](../概述/寄存器数据类型/RegTensor.md)。支持单搬入模式和双搬入模式：
+LoadAlign能够实现数据从Unified Buffer（UB）连续搬运至[RegTensor](../寄存器数据类型/RegTensor.md)。支持单搬入模式和双搬入模式：
 
 - 单搬入模式：从UB读取VL数据量，搬入到一个RegTensor（VL）中。
 - 双搬入模式：从UB读取2*VL数据量，交错搬运，将偶数索引和奇数索引的元素分别搬入两个RegTensor（2\*VL）中。
 
-连续对齐搬运有三类接口：普通搬运接口、PostUpdate扩展搬运接口、使用[AddrReg](../概述/寄存器数据类型/AddrReg.md)寄存器存储偏移量接口。
+连续对齐搬运有三类接口：普通搬运接口、PostUpdate扩展搬运接口、使用[AddrReg](../寄存器数据类型/AddrReg.md)寄存器存储偏移量接口。
 
 RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体支持情况如下：
 
@@ -69,7 +69,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
     __simd_callee__ inline void LoadAlign(U& dstReg, __ubuf__ T*& srcAddr, int32_t postUpdateStride)
     ```
 
-- 单搬入模式：使用[AddrReg](../概述/寄存器数据类型/AddrReg.md)存储偏移量接口，需要配合[CreateAddrReg](../概述/寄存器数据类型/AddrReg.md)接口使用。
+- 单搬入模式：使用[AddrReg](../寄存器数据类型/AddrReg.md)存储偏移量接口，需要配合[CreateAddrReg](../寄存器数据类型/AddrReg.md)接口使用。
 
     ```cpp
     template <typename T = DefaultType, LoadDist dist = LoadDist::DIST_NORM, typename U>
@@ -90,7 +90,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
     __simd_callee__ inline void LoadAlign(U& dstReg0, U& dstReg1, __ubuf__ T*& srcAddr, int32_t postUpdateStride)
     ```
 
-- 双搬入模式：使用[AddrReg](../概述/寄存器数据类型/AddrReg.md)存储偏移量接口，需要配合[CreateAddrReg](../概述/寄存器数据类型/AddrReg.md)接口使用。
+- 双搬入模式：使用[AddrReg](../寄存器数据类型/AddrReg.md)存储偏移量接口，需要配合[CreateAddrReg](../寄存器数据类型/AddrReg.md)接口使用。
 
     ```cpp
     template <typename T = DefaultType, LoadDist dist, typename U>
@@ -112,7 +112,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 | 参数名 | 输入/输出 | 描述 |
 |-----|-----|-----|
-| dstReg | 输出 | 目的操作数，类型为[RegTensor](../概述/寄存器数据类型/RegTensor.md)。 |
+| dstReg | 输出 | 目的操作数，类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
 | srcAddr | 输入/输出 | 源操作数，UB起始地址。 |
 | postUpdateStride | 输入 | 地址更新步长，int32_t类型，单位：元素个数。postUpdateStride * sizeof(T)的对齐约束请参考[表3 LoadDist参数说明（单搬入模式）](#表3-LoadDist参数说明（单搬入模式）)。根据postMode的取值有两种情况：<br>&bull; POST_MODE_NORMAL：实际搬运UB起始地址为srcAddr + postUpdateStride，搬运后地址不会更新。<br>&bull; POST_MODE_UPDATE：实际搬运UB起始地址为srcAddr，搬运后执行地址更新 srcAddr +=  postUpdateStride。 |
 | offset | 输入 | 地址偏移寄存器，AddrReg类型。需要在搬运前调用CreateAddrReg设定地址偏移量，实际搬运UB地址为srcAddr + 寄存器中存储的偏移量。AddrReg寄存器中存储的偏移量 * sizeof(T)的对齐约束请参考[表3 LoadDist参数说明（单搬入模式）](#表3-LoadDist参数说明（单搬入模式）)。 |
@@ -151,8 +151,8 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 | 参数名 | 输入/输出 | 描述 |
 |-----|-----|-----|
-| dstReg0 | 输出 | 第一个目的操作数，类型为[RegTensor](../概述/寄存器数据类型/RegTensor.md)。 |
-| dstReg1 | 输出 | 第二个目的操作数，类型为[RegTensor](../概述/寄存器数据类型/RegTensor.md)。 |
+| dstReg0 | 输出 | 第一个目的操作数，类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
+| dstReg1 | 输出 | 第二个目的操作数，类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
 | srcAddr | 输入/输出 | 源操作数，UB起始地址。 |
 | postUpdateStride | 输入 | 地址更新步长，int32_t类型，单位：元素个数。postUpdateStride * sizeof(T)需要32字节对齐。<br>根据postMode的取值有两种情况：<br>&bull; POST_MODE_NORMAL：实际搬运UB起始地址为srcAddr + postUpdateStride，搬运后地址不会更新。<br>&bull; POST_MODE_UPDATE：实际搬运UB起始地址为srcAddr，搬运后执行地址更新srcAddr +=  postUpdateStride。 |
 | offset | 输入 | 地址偏移寄存器，AddrReg类型。需要在搬运前调用CreateAddrReg设定地址偏移量，实际搬运UB地址为srcAddr + 寄存器中存储的偏移量。 AddrReg寄存器中存储的偏移量 * sizeof(T)需要32字节对齐。 |
