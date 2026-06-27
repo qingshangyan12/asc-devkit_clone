@@ -46,21 +46,21 @@ TEST_F(TestSetDeqScale, set_deqscale_ubuf_float_int16_t_bool_arr_Succ)
     __ubuf__ uint64_t* tmp = tmp_vec.data();
     float scale_arr[ASC_VDEQ_SIZE] = {0};
     int16_t offset_arr[ASC_VDEQ_SIZE] = {0};
-    bool sign_mode_arr[ASC_VDEQ_SIZE] = {true};
+    bool enable_signed_arr[ASC_VDEQ_SIZE] = {true};
     MOCKER_CPP(set_deqscale, void(uint64_t)).times(1).will(invoke(set_deqscale_ubuf_float_int16_t_bool_arr_Stub));
-    asc_set_deq_scale(tmp, scale_arr, offset_arr, sign_mode_arr);
+    asc_set_deq_scale(tmp, scale_arr, offset_arr, enable_signed_arr);
     GlobalMockObject::verify();
 }
 
 TEST_F(TestSetDeqScale, set_deqscale_float_int16_t_bool_Succ)
 {
     int16_t offset = 1;
-    bool sign_mode = true;
+    bool enable_signed = true;
     float scale = 2.0;
 
     MOCKER_CPP(set_deqscale, void(uint64_t)).times(1).will(invoke(set_deqscale_float_int16_t_bool_Stub));
 
-    asc_set_deq_scale(scale, offset, sign_mode);
+    asc_set_deq_scale(scale, offset, enable_signed);
     GlobalMockObject::verify();
 }
 

@@ -13,6 +13,30 @@
 #include "tests/api/c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 
+#define ASC_UT_CALL_LOADUNALIGN_POSTUPDATE(c_api_name, data_type, dst, src0, src1, count)                         \
+    static_cast<void (*)(vector_##data_type&, vector_load_unalign&, __ubuf__ data_type*&, uint32_t)>(c_api_name)( \
+        dst, src0, src1, count)
+
+#define ASC_UT_CALL_LOADUNALIGN_POSTUPDATE_HIF8(c_api_name, data_type, dst, src0, src1, count)                    \
+    static_cast<void (*)(vector_##data_type&, vector_load_unalign&, __ubuf__ data_type*&, uint32_t)>(c_api_name)( \
+        dst, src0, src1, count)
+
+#define ASC_UT_CALL_LOADUNALIGN_POSTUPDATE_INT4(c_api_name, data_type, dst, src0, src1, count)                 \
+    static_cast<void (*)(vector_int4x2_t&, vector_load_unalign&, __ubuf__ data_type*&, uint32_t)>(c_api_name)( \
+        dst, src0, src1, count)
+
+#define ASC_UT_CALL_LOADUNALIGN_POSTUPDATE_VLDU(c_api_name, data_type, dst, src0, src1, offset, count)          \
+    static_cast<void (*)(vector_##data_type&, vector_load_unalign&, __ubuf__ data_type*, iter_reg&, uint32_t)>( \
+        c_api_name)(dst, src0, src1, offset, count)
+
+#define ASC_UT_CALL_LOADUNALIGN_POSTUPDATE_VLDU_HIF8(c_api_name, data_type, dst, src0, src1, offset, count)     \
+    static_cast<void (*)(vector_##data_type&, vector_load_unalign&, __ubuf__ data_type*, iter_reg&, uint32_t)>( \
+        c_api_name)(dst, src0, src1, offset, count)
+
+#define ASC_UT_CALL_LOADUNALIGN_POSTUPDATE_VLDU_INT4(c_api_name, data_type, dst, src0, src1, offset, count)  \
+    static_cast<void (*)(vector_int4x2_t&, vector_load_unalign&, __ubuf__ data_type*, iter_reg&, uint32_t)>( \
+        c_api_name)(dst, src0, src1, offset, count)
+
 #define TEST_VECTOR_DATAMOVE_LOADUNALIGN_INSTR(class_name, c_api_name, cce_name, data_type)                            \
                                                                                                                        \
     class TestVectorDataMove##class_name##_##data_type##_CApi : public testing::Test {                                 \
@@ -29,7 +53,8 @@
                                                                                                                        \
     TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_type##_Succ)                       \
     {                                                                                                                  \
-        __ubuf__ data_type* src1 = reinterpret_cast<__ubuf__ data_type*>(0);                                           \
+        __ubuf__ data_type* src1_base = reinterpret_cast<__ubuf__ data_type*>(0);                                      \
+        __ubuf__ data_type*& src1 = src1_base;                                                                         \
         vector_load_unalign src0;                                                                                      \
         vector_##data_type dst;                                                                                        \
         uint32_t count;                                                                                                \
@@ -38,7 +63,7 @@
             .times(1)                                                                                                  \
             .will(invoke(cce_name##_##data_type##_Stub));                                                              \
                                                                                                                        \
-        c_api_name(dst, src0, src1, count);                                                                            \
+        ASC_UT_CALL_LOADUNALIGN_POSTUPDATE(c_api_name, data_type, dst, src0, src1, count);                             \
         GlobalMockObject::verify();                                                                                    \
     }
 
@@ -58,7 +83,8 @@
                                                                                                                  \
     TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_type##_Succ)                 \
     {                                                                                                            \
-        __ubuf__ data_type* src1 = reinterpret_cast<__ubuf__ data_type*>(0);                                     \
+        __ubuf__ data_type* src1_base = reinterpret_cast<__ubuf__ data_type*>(0);                                \
+        __ubuf__ data_type*& src1 = src1_base;                                                                   \
         vector_load_unalign src0;                                                                                \
         vector_##data_type dst;                                                                                  \
         uint32_t count;                                                                                          \
@@ -67,7 +93,7 @@
             .times(1)                                                                                            \
             .will(invoke(cce_name##_##data_type##_Stub));                                                        \
                                                                                                                  \
-        c_api_name(dst, src0, src1, count);                                                                      \
+        ASC_UT_CALL_LOADUNALIGN_POSTUPDATE_HIF8(c_api_name, data_type, dst, src0, src1, count);                  \
         GlobalMockObject::verify();                                                                              \
     }
 
@@ -88,7 +114,8 @@
                                                                                                                        \
     TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_type##_Succ)                       \
     {                                                                                                                  \
-        __ubuf__ data_type* src1 = reinterpret_cast<__ubuf__ data_type*>(0);                                           \
+        __ubuf__ data_type* src1_base = reinterpret_cast<__ubuf__ data_type*>(0);                                      \
+        __ubuf__ data_type*& src1 = src1_base;                                                                         \
         vector_load_unalign src0;                                                                                      \
         vector_int4x2_t dst;                                                                                           \
         uint32_t count;                                                                                                \
@@ -98,7 +125,7 @@
             .times(1)                                                                                                  \
             .will(invoke(cce_name##_##data_type##_Stub));                                                              \
                                                                                                                        \
-        c_api_name(dst, src0, src1, count);                                                                            \
+        ASC_UT_CALL_LOADUNALIGN_POSTUPDATE_INT4(c_api_name, data_type, dst, src0, src1, count);                        \
         GlobalMockObject::verify();                                                                                    \
     }
 
@@ -119,7 +146,8 @@
                                                                                                                  \
     TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_type##_Succ)                 \
     {                                                                                                            \
-        __ubuf__ data_type* src1 = reinterpret_cast<__ubuf__ data_type*>(0);                                     \
+        __ubuf__ data_type* src1_base = reinterpret_cast<__ubuf__ data_type*>(0);                                \
+        __ubuf__ data_type*& src1 = src1_base;                                                                   \
         vector_load_unalign src0;                                                                                \
         vector_##data_type dst;                                                                                  \
         uint32_t count;                                                                                          \
@@ -130,7 +158,7 @@
             .times(1)                                                                                            \
             .will(invoke(cce_name##_##data_type##_Stub));                                                        \
                                                                                                                  \
-        c_api_name(dst, src0, src1, offset, count);                                                              \
+        ASC_UT_CALL_LOADUNALIGN_POSTUPDATE_VLDU(c_api_name, data_type, dst, src0, src1, offset, count);          \
         GlobalMockObject::verify();                                                                              \
     }
 
@@ -150,7 +178,8 @@
                                                                                                                   \
     TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_type##_Succ)                  \
     {                                                                                                             \
-        __ubuf__ data_type* src1 = reinterpret_cast<__ubuf__ data_type*>(0);                                      \
+        __ubuf__ data_type* src1_base = reinterpret_cast<__ubuf__ data_type*>(0);                                 \
+        __ubuf__ data_type*& src1 = src1_base;                                                                    \
         vector_load_unalign src0;                                                                                 \
         vector_##data_type dst;                                                                                   \
         uint32_t count;                                                                                           \
@@ -160,7 +189,7 @@
             .times(1)                                                                                             \
             .will(invoke(cce_name##_##data_type##_Stub));                                                         \
                                                                                                                   \
-        c_api_name(dst, src0, src1, offset, count);                                                               \
+        ASC_UT_CALL_LOADUNALIGN_POSTUPDATE_VLDU_HIF8(c_api_name, data_type, dst, src0, src1, offset, count);      \
         GlobalMockObject::verify();                                                                               \
     }
 
@@ -181,7 +210,8 @@
                                                                                                                 \
     TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_type##_Succ)                \
     {                                                                                                           \
-        __ubuf__ data_type* src1 = reinterpret_cast<__ubuf__ data_type*>(0);                                    \
+        __ubuf__ data_type* src1_base = reinterpret_cast<__ubuf__ data_type*>(0);                               \
+        __ubuf__ data_type*& src1 = src1_base;                                                                  \
         vector_load_unalign src0;                                                                               \
         vector_int4x2_t dst;                                                                                    \
         uint32_t count;                                                                                         \
@@ -193,7 +223,7 @@
             .times(1)                                                                                           \
             .will(invoke(cce_name##_##data_type##_Stub));                                                       \
                                                                                                                 \
-        c_api_name(dst, src0, src1, offset, count);                                                             \
+        ASC_UT_CALL_LOADUNALIGN_POSTUPDATE_VLDU_INT4(c_api_name, data_type, dst, src0, src1, offset, count);    \
         GlobalMockObject::verify();                                                                             \
     }
 

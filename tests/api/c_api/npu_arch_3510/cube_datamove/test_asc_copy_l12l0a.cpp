@@ -17,7 +17,7 @@ template <typename DTYPE>
 __aicore__ inline void img2colv2_cbuf_to_ca_stub(
     __ca__ DTYPE* dst, __cbuf__ DTYPE* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
     uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
-    bool filter_h, bool transpose, bool fmatrix_ctrl, uint16_t size_channel)
+    bool filter_h, bool enable_transpose, bool enable_f_matrix_ctrl, uint16_t size_channel)
 {
     EXPECT_EQ(dst, reinterpret_cast<__ca__ DTYPE*>(11));
     EXPECT_EQ(src, reinterpret_cast<__cbuf__ DTYPE*>(22));
@@ -33,8 +33,8 @@ __aicore__ inline void img2colv2_cbuf_to_ca_stub(
     EXPECT_EQ(dilation_h, static_cast<uint8_t>(14));
     EXPECT_EQ(filter_w, static_cast<bool>(true));
     EXPECT_EQ(filter_h, static_cast<bool>(true));
-    EXPECT_EQ(transpose, static_cast<bool>(true));
-    EXPECT_EQ(fmatrix_ctrl, static_cast<bool>(true));
+    EXPECT_EQ(enable_transpose, static_cast<bool>(true));
+    EXPECT_EQ(enable_f_matrix_ctrl, static_cast<bool>(true));
     EXPECT_EQ(size_channel, static_cast<uint16_t>(15));
 }
 
@@ -61,16 +61,16 @@ protected:
         uint8_t filter_h = static_cast<uint8_t>(12);                                                            \
         uint8_t dilation_filter_w = static_cast<uint8_t>(13);                                                   \
         uint8_t dilation_filter_h = static_cast<uint8_t>(14);                                                   \
-        bool filter_size_w = static_cast<bool>(true);                                                           \
-        bool filter_size_h = static_cast<bool>(true);                                                           \
-        bool transpose = static_cast<bool>(true);                                                               \
-        bool fmatrix_ctrl = static_cast<bool>(true);                                                            \
+        bool enable_filter_size_w = static_cast<bool>(true);                                                    \
+        bool enable_filter_size_h = static_cast<bool>(true);                                                    \
+        bool enable_transpose = static_cast<bool>(true);                                                        \
+        bool enable_f_matrix_ctrl = static_cast<bool>(true);                                                    \
         uint16_t channel_size = static_cast<uint16_t>(15);                                                      \
                                                                                                                 \
         asc_copy_l12l0a(                                                                                        \
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h, \
-            dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, fmatrix_ctrl,        \
-            channel_size);                                                                                      \
+            dilation_filter_w, dilation_filter_h, enable_filter_size_w, enable_filter_size_h, enable_transpose, \
+            enable_f_matrix_ctrl, channel_size);                                                                \
         GlobalMockObject::verify();                                                                             \
     }                                                                                                           \
                                                                                                                 \
@@ -89,16 +89,16 @@ protected:
         uint8_t filter_h = static_cast<uint8_t>(12);                                                            \
         uint8_t dilation_filter_w = static_cast<uint8_t>(13);                                                   \
         uint8_t dilation_filter_h = static_cast<uint8_t>(14);                                                   \
-        bool filter_size_w = static_cast<bool>(true);                                                           \
-        bool filter_size_h = static_cast<bool>(true);                                                           \
-        bool transpose = static_cast<bool>(true);                                                               \
-        bool fmatrix_ctrl = static_cast<bool>(true);                                                            \
+        bool enable_filter_size_w = static_cast<bool>(true);                                                    \
+        bool enable_filter_size_h = static_cast<bool>(true);                                                    \
+        bool enable_transpose = static_cast<bool>(true);                                                        \
+        bool enable_f_matrix_ctrl = static_cast<bool>(true);                                                    \
         uint16_t channel_size = static_cast<uint16_t>(15);                                                      \
                                                                                                                 \
         asc_copy_l12l0a_sync(                                                                                   \
             dst, src, k_extension, m_extension, k_start_pt, m_start_pt, stride_w, stride_h, filter_w, filter_h, \
-            dilation_filter_w, dilation_filter_h, filter_size_w, filter_size_h, transpose, fmatrix_ctrl,        \
-            channel_size);                                                                                      \
+            dilation_filter_w, dilation_filter_h, enable_filter_size_w, enable_filter_size_h, enable_transpose, \
+            enable_f_matrix_ctrl, channel_size);                                                                \
         GlobalMockObject::verify();                                                                             \
     }
 

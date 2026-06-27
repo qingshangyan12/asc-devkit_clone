@@ -15,18 +15,18 @@
 
 template <typename DTYPE>
 __aicore__ inline void copy_gm_to_cbuf_multi_dn2nz_stub(
-    __cbuf__ DTYPE* dst, __gm__ DTYPE* src, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
-    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
+    __cbuf__ DTYPE* dst, __gm__ DTYPE* src, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctrl,
+    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool enable_smallc0)
 {
     EXPECT_EQ(dst, reinterpret_cast<__cbuf__ DTYPE*>(11));
     EXPECT_EQ(src, reinterpret_cast<__gm__ DTYPE*>(22));
     EXPECT_EQ(sid, static_cast<uint8_t>(0));
     EXPECT_EQ(loop1_src_stride, static_cast<uint64_t>(33));
-    EXPECT_EQ(l2_cache_ctl, static_cast<uint8_t>(44));
+    EXPECT_EQ(l2_cache_ctrl, static_cast<uint8_t>(44));
     EXPECT_EQ(n_value, static_cast<uint16_t>(55));
     EXPECT_EQ(d_value, static_cast<uint32_t>(66));
     EXPECT_EQ(loop4_src_stride, static_cast<uint64_t>(77));
-    EXPECT_EQ(smallc0_en, static_cast<bool>(true));
+    EXPECT_EQ(enable_smallc0, static_cast<bool>(true));
 }
 
 class TEST_COPY_GM_TO_L1_DN2NZ : public testing::Test {
@@ -49,14 +49,14 @@ protected:
         __gm__ dtype* src = reinterpret_cast<__gm__ dtype*>(22);                                                  \
                                                                                                                   \
         uint64_t loop1_src_stride = static_cast<uint64_t>(33);                                                    \
-        uint8_t l2_cache_ctl = static_cast<uint8_t>(44);                                                          \
+        uint8_t l2_cache_ctrl = static_cast<uint8_t>(44);                                                         \
         uint16_t n_value = static_cast<uint16_t>(55);                                                             \
         uint32_t d_value = static_cast<uint32_t>(66);                                                             \
         uint64_t loop4_src_stride = static_cast<uint64_t>(77);                                                    \
-        bool smallc0_en = static_cast<bool>(true);                                                                \
+        bool enable_smallc0 = static_cast<bool>(true);                                                            \
                                                                                                                   \
         asc_copy_gm2l1_dn2nz(                                                                                     \
-            dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);            \
+            dst, src, loop1_src_stride, l2_cache_ctrl, n_value, d_value, loop4_src_stride, enable_smallc0);       \
         GlobalMockObject::verify();                                                                               \
     }                                                                                                             \
                                                                                                                   \
@@ -72,14 +72,14 @@ protected:
         __gm__ dtype* src = reinterpret_cast<__gm__ dtype*>(22);                                                  \
                                                                                                                   \
         uint64_t loop1_src_stride = static_cast<uint64_t>(33);                                                    \
-        uint8_t l2_cache_ctl = static_cast<uint8_t>(44);                                                          \
+        uint8_t l2_cache_ctrl = static_cast<uint8_t>(44);                                                         \
         uint16_t n_value = static_cast<uint16_t>(55);                                                             \
         uint32_t d_value = static_cast<uint32_t>(66);                                                             \
         uint64_t loop4_src_stride = static_cast<uint64_t>(77);                                                    \
-        bool smallc0_en = static_cast<bool>(true);                                                                \
+        bool enable_smallc0 = static_cast<bool>(true);                                                            \
                                                                                                                   \
         asc_copy_gm2l1_dn2nz_sync(                                                                                \
-            dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);            \
+            dst, src, loop1_src_stride, l2_cache_ctrl, n_value, d_value, loop4_src_stride, enable_smallc0);       \
         GlobalMockObject::verify();                                                                               \
     }
 

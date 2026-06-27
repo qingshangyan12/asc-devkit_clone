@@ -13,76 +13,76 @@
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
 
-#define TEST_CUBE_DMAMOVE_COPY_GM_TO_CBUF(class_name, c_api_name, cce_name)                                        \
-                                                                                                                   \
-    class TestCubeDmamove##class_name##c_api_name : public testing::Test {                                         \
-    protected:                                                                                                     \
-        void SetUp() { g_coreType = C_API_AIC_TYPE; }                                                              \
-        void TearDown() { g_coreType = C_API_AIV_TYPE; }                                                           \
-    };                                                                                                             \
-                                                                                                                   \
-    namespace {                                                                                                    \
-                                                                                                                   \
-    void cce_name##_##c_api_name##_uint64_t_Stub(                                                                  \
-        __cbuf__ void* dst, __gm__ void* src, uint8_t sid, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, \
-        uint16_t dst_gap, pad_t pad_mode)                                                                          \
-    {                                                                                                              \
-        EXPECT_EQ(dst, reinterpret_cast<__cbuf__ void*>(11));                                                      \
-        EXPECT_EQ(src, reinterpret_cast<__gm__ void*>(22));                                                        \
-        EXPECT_EQ(sid, static_cast<uint8_t>(0));                                                                   \
-        EXPECT_EQ(n_burst, static_cast<uint16_t>(1));                                                              \
-        EXPECT_EQ(len_burst, static_cast<uint16_t>(1));                                                            \
-        EXPECT_EQ(src_gap, static_cast<uint16_t>(0));                                                              \
-        EXPECT_EQ(dst_gap, static_cast<uint16_t>(0));                                                              \
-    }                                                                                                              \
-    }                                                                                                              \
-                                                                                                                   \
-    TEST_F(TestCubeDmamove##class_name##c_api_name, c_api_name##_CopyConfig_Succ)                                  \
-    {                                                                                                              \
-        __cbuf__ void* dst = reinterpret_cast<__cbuf__ void*>(11);                                                 \
-        __gm__ void* src = reinterpret_cast<__gm__ void*>(22);                                                     \
-                                                                                                                   \
-        uint16_t n_burst = static_cast<uint16_t>(1);                                                               \
-        uint16_t len_burst = static_cast<uint16_t>(1);                                                             \
-        uint16_t src_gap = static_cast<uint16_t>(0);                                                               \
-        uint16_t dst_gap = static_cast<uint16_t>(0);                                                               \
-                                                                                                                   \
-        MOCKER_CPP(                                                                                                \
-            cce_name, void(__cbuf__ void*, __gm__ void*, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t, pad_t))  \
-            .times(1)                                                                                              \
-            .will(invoke(cce_name##_##c_api_name##_uint64_t_Stub));                                                \
-                                                                                                                   \
-        c_api_name(dst, src, n_burst, len_burst, src_gap, dst_gap);                                                \
-        GlobalMockObject::verify();                                                                                \
-    }                                                                                                              \
-                                                                                                                   \
-    TEST_F(TestCubeDmamove##class_name##c_api_name, c_api_name##_size_Succ)                                        \
-    {                                                                                                              \
-        __cbuf__ void* dst = reinterpret_cast<__cbuf__ void*>(11);                                                 \
-        __gm__ void* src = reinterpret_cast<__gm__ void*>(22);                                                     \
-        uint32_t size = static_cast<uint32_t>(44);                                                                 \
-                                                                                                                   \
-        MOCKER_CPP(                                                                                                \
-            cce_name, void(__cbuf__ void*, __gm__ void*, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t, pad_t))  \
-            .times(1)                                                                                              \
-            .will(invoke(cce_name##_##c_api_name##_uint64_t_Stub));                                                \
-                                                                                                                   \
-        c_api_name(dst, src, size);                                                                                \
-        GlobalMockObject::verify();                                                                                \
-    }                                                                                                              \
-                                                                                                                   \
-    TEST_F(TestCubeDmamove##class_name##c_api_name, c_api_name##_sync_Succ)                                        \
-    {                                                                                                              \
-        __cbuf__ void* dst = reinterpret_cast<__cbuf__ void*>(11);                                                 \
-        __gm__ void* src = reinterpret_cast<__gm__ void*>(22);                                                     \
-        uint32_t size = static_cast<uint32_t>(44);                                                                 \
-                                                                                                                   \
-        MOCKER_CPP(                                                                                                \
-            cce_name, void(__cbuf__ void*, __gm__ void*, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t, pad_t))  \
-            .times(1)                                                                                              \
-            .will(invoke(cce_name##_##c_api_name##_uint64_t_Stub));                                                \
-        c_api_name##_sync(dst, src, size);                                                                         \
-        GlobalMockObject::verify();                                                                                \
+#define TEST_CUBE_DMAMOVE_COPY_GM_TO_CBUF(class_name, c_api_name, cce_name)                                            \
+                                                                                                                       \
+    class TestCubeDmamove##class_name##c_api_name : public testing::Test {                                             \
+    protected:                                                                                                         \
+        void SetUp() { g_coreType = C_API_AIC_TYPE; }                                                                  \
+        void TearDown() { g_coreType = C_API_AIV_TYPE; }                                                               \
+    };                                                                                                                 \
+                                                                                                                       \
+    namespace {                                                                                                        \
+                                                                                                                       \
+    void cce_name##_##c_api_name##_uint64_t_Stub(                                                                      \
+        __cbuf__ void* dst, __gm__ void* src, uint8_t sid, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, \
+        uint16_t dst_gap, pad_t pad_mode)                                                                              \
+    {                                                                                                                  \
+        EXPECT_EQ(dst, reinterpret_cast<__cbuf__ void*>(11));                                                          \
+        EXPECT_EQ(src, reinterpret_cast<__gm__ void*>(22));                                                            \
+        EXPECT_EQ(sid, static_cast<uint8_t>(0));                                                                       \
+        EXPECT_EQ(burst_count, static_cast<uint16_t>(1));                                                              \
+        EXPECT_EQ(burst_len, static_cast<uint16_t>(1));                                                                \
+        EXPECT_EQ(src_gap, static_cast<uint16_t>(0));                                                                  \
+        EXPECT_EQ(dst_gap, static_cast<uint16_t>(0));                                                                  \
+    }                                                                                                                  \
+    }                                                                                                                  \
+                                                                                                                       \
+    TEST_F(TestCubeDmamove##class_name##c_api_name, c_api_name##_CopyConfig_Succ)                                      \
+    {                                                                                                                  \
+        __cbuf__ void* dst = reinterpret_cast<__cbuf__ void*>(11);                                                     \
+        __gm__ void* src = reinterpret_cast<__gm__ void*>(22);                                                         \
+                                                                                                                       \
+        uint16_t burst_count = static_cast<uint16_t>(1);                                                               \
+        uint16_t burst_len = static_cast<uint16_t>(1);                                                                 \
+        uint16_t src_gap = static_cast<uint16_t>(0);                                                                   \
+        uint16_t dst_gap = static_cast<uint16_t>(0);                                                                   \
+                                                                                                                       \
+        MOCKER_CPP(                                                                                                    \
+            cce_name, void(__cbuf__ void*, __gm__ void*, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t, pad_t))      \
+            .times(1)                                                                                                  \
+            .will(invoke(cce_name##_##c_api_name##_uint64_t_Stub));                                                    \
+                                                                                                                       \
+        c_api_name(dst, src, burst_count, burst_len, src_gap, dst_gap);                                                \
+        GlobalMockObject::verify();                                                                                    \
+    }                                                                                                                  \
+                                                                                                                       \
+    TEST_F(TestCubeDmamove##class_name##c_api_name, c_api_name##_size_Succ)                                            \
+    {                                                                                                                  \
+        __cbuf__ void* dst = reinterpret_cast<__cbuf__ void*>(11);                                                     \
+        __gm__ void* src = reinterpret_cast<__gm__ void*>(22);                                                         \
+        uint32_t size = static_cast<uint32_t>(44);                                                                     \
+                                                                                                                       \
+        MOCKER_CPP(                                                                                                    \
+            cce_name, void(__cbuf__ void*, __gm__ void*, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t, pad_t))      \
+            .times(1)                                                                                                  \
+            .will(invoke(cce_name##_##c_api_name##_uint64_t_Stub));                                                    \
+                                                                                                                       \
+        c_api_name(dst, src, size);                                                                                    \
+        GlobalMockObject::verify();                                                                                    \
+    }                                                                                                                  \
+                                                                                                                       \
+    TEST_F(TestCubeDmamove##class_name##c_api_name, c_api_name##_sync_Succ)                                            \
+    {                                                                                                                  \
+        __cbuf__ void* dst = reinterpret_cast<__cbuf__ void*>(11);                                                     \
+        __gm__ void* src = reinterpret_cast<__gm__ void*>(22);                                                         \
+        uint32_t size = static_cast<uint32_t>(44);                                                                     \
+                                                                                                                       \
+        MOCKER_CPP(                                                                                                    \
+            cce_name, void(__cbuf__ void*, __gm__ void*, uint8_t, uint16_t, uint16_t, uint16_t, uint16_t, pad_t))      \
+            .times(1)                                                                                                  \
+            .will(invoke(cce_name##_##c_api_name##_uint64_t_Stub));                                                    \
+        c_api_name##_sync(dst, src, size);                                                                             \
+        GlobalMockObject::verify();                                                                                    \
     }
 
 // ==========asc_copy_gm2l1==========

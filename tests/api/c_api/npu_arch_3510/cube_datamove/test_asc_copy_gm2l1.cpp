@@ -34,7 +34,7 @@ void load_gm_to_cbuf_2dv2_Stub(
     uint16_t k_step = 7;
     uint8_t sid = 0;
     uint8_t decomp_mode = 8;
-    uint8_t l2_cache_ctl = 9;
+    uint8_t l2_cache_ctrl = 9;
 
     EXPECT_EQ(dst, dst_in);
     EXPECT_EQ(src, src_in);
@@ -45,7 +45,7 @@ void load_gm_to_cbuf_2dv2_Stub(
     EXPECT_EQ(k_step, k_step_in);
     EXPECT_EQ(sid, sid_in);
     EXPECT_EQ(decomp_mode, decomp_mode_in);
-    EXPECT_EQ(l2_cache_ctl, l2_cache_ctl_in);
+    EXPECT_EQ(l2_cache_ctrl, l2_cache_ctl_in);
 }
 
 #define TEST_CUBE_DATAMOVE_GM2L1(class_name, c_api_name, cce_name, data_type)                                       \
@@ -59,7 +59,7 @@ void load_gm_to_cbuf_2dv2_Stub(
         uint16_t m_step = 6;                                                                                        \
         uint16_t k_step = 7;                                                                                        \
         uint8_t decomp_mode = 8;                                                                                    \
-        uint8_t l2_cache_ctl = 9;                                                                                   \
+        uint8_t l2_cache_ctrl = 9;                                                                                  \
         MOCKER(                                                                                                     \
             cce_name, void(                                                                                         \
                           __cbuf__ data_type*, __gm__ data_type*, uint32_t, uint32_t, uint16_t, uint16_t, uint16_t, \
@@ -67,7 +67,7 @@ void load_gm_to_cbuf_2dv2_Stub(
             .times(1)                                                                                               \
             .will(invoke(&load_gm_to_cbuf_2dv2_Stub<data_type>));                                                   \
         c_api_name(                                                                                                 \
-            dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, decomp_mode, l2_cache_ctl);   \
+            dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, decomp_mode, l2_cache_ctrl);  \
         GlobalMockObject::verify();                                                                                 \
     }
 
@@ -90,14 +90,14 @@ TEST_CUBE_DATAMOVE_GM2L1(GM2L1, asc_copy_gm2l1, load_gm_to_cbuf_2dv2_s4, float4_
 TEST_CUBE_DATAMOVE_GM2L1(GM2L1, asc_copy_gm2l1, load_gm_to_cbuf_2dv2_s4, void);
 
 __aicore__ inline void copy_gm_to_cbuf_v2_stub(
-    __cbuf__ void* dst, __gm__ void* src, uint8_t sid, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode,
+    __cbuf__ void* dst, __gm__ void* src, uint8_t sid, uint32_t burst_count, uint32_t burst_len, uint8_t pad_func_mode,
     uint64_t src_stride, uint32_t dst_stride)
 {
     EXPECT_EQ(dst, reinterpret_cast<__cbuf__ void*>(11));
     EXPECT_EQ(src, reinterpret_cast<__gm__ void*>(22));
     EXPECT_EQ(sid, static_cast<uint8_t>(0));
-    EXPECT_EQ(n_burst, static_cast<uint32_t>(33));
-    EXPECT_EQ(len_burst, static_cast<uint32_t>(44));
+    EXPECT_EQ(burst_count, static_cast<uint32_t>(33));
+    EXPECT_EQ(burst_len, static_cast<uint32_t>(44));
     EXPECT_EQ(pad_func_mode, static_cast<uint8_t>(55));
     EXPECT_EQ(src_stride, static_cast<uint64_t>(66));
     EXPECT_EQ(dst_stride, static_cast<uint64_t>(77));
@@ -120,13 +120,13 @@ TEST_F(TEST_COPY_GM_TO_L1, TEST_COPY_GM_TO_L1)
     __cbuf__ void* dst = reinterpret_cast<__cbuf__ void*>(11);
     __gm__ void* src = reinterpret_cast<__gm__ void*>(22);
 
-    uint16_t n_burst = static_cast<uint32_t>(33);
-    uint16_t len_burst = static_cast<uint32_t>(44);
+    uint16_t burst_count = static_cast<uint32_t>(33);
+    uint16_t burst_len = static_cast<uint32_t>(44);
     uint16_t pad_func_mode = static_cast<uint8_t>(55);
     uint16_t src_stride = static_cast<uint64_t>(66);
     uint16_t dst_stride = static_cast<uint64_t>(77);
 
-    asc_copy_gm2l1(dst, src, n_burst, len_burst, pad_func_mode, src_stride, dst_stride);
+    asc_copy_gm2l1(dst, src, burst_count, burst_len, pad_func_mode, src_stride, dst_stride);
     GlobalMockObject::verify();
 }
 
@@ -141,12 +141,12 @@ TEST_F(TEST_COPY_GM_TO_L1, TEST_COPY_GM_TO_L1_SYNC)
     __cbuf__ void* dst = reinterpret_cast<__cbuf__ void*>(11);
     __gm__ void* src = reinterpret_cast<__gm__ void*>(22);
 
-    uint16_t n_burst = static_cast<uint32_t>(33);
-    uint16_t len_burst = static_cast<uint32_t>(44);
+    uint16_t burst_count = static_cast<uint32_t>(33);
+    uint16_t burst_len = static_cast<uint32_t>(44);
     uint16_t pad_func_mode = static_cast<uint8_t>(55);
     uint16_t src_stride = static_cast<uint64_t>(66);
     uint16_t dst_stride = static_cast<uint64_t>(77);
 
-    asc_copy_gm2l1_sync(dst, src, n_burst, len_burst, pad_func_mode, src_stride, dst_stride);
+    asc_copy_gm2l1_sync(dst, src, burst_count, burst_len, pad_func_mode, src_stride, dst_stride);
     GlobalMockObject::verify();
 }

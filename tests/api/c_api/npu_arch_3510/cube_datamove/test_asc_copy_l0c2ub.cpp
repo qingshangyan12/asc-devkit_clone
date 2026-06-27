@@ -22,36 +22,36 @@ protected:
     void TearDown() { g_coreType = C_API_AIV_TYPE; }
 };
 
-#define TEST_CUBE_DATAMOVE_L0C2UB(class_name, c_api_name, cce_name, dst_data_type, src_data_type)                      \
-    TEST_F(TestCubeDatamoveCopyL0C2UB, c_api_name##_##dst_data_type##_##src_data_type##_Succ)                          \
-    {                                                                                                                  \
-        __ubuf__ dst_data_type* dst = reinterpret_cast<__ubuf__ dst_data_type*>(1);                                    \
-        __cc__ src_data_type* src = reinterpret_cast<__cc__ src_data_type*>(2);                                        \
-        uint16_t n_size = 3;                                                                                           \
-        uint16_t m_size = 4;                                                                                           \
-        uint32_t loop_dst_stride = 6;                                                                                  \
-        uint16_t loop_src_stride = 7;                                                                                  \
-        uint8_t dual_dst_ctl = 5;                                                                                      \
-        bool sub_blockid = true;                                                                                       \
-        uint8_t clip_relu_pre = 8;                                                                                     \
-        uint8_t unit_flag_ctl = 10;                                                                                    \
-        uint64_t quant_pre = 11;                                                                                       \
-        uint8_t relu_pre = 12;                                                                                         \
-        bool split_en = true;                                                                                          \
-        bool NZ2ND_en = true;                                                                                          \
-        uint64_t quant_post = 13;                                                                                      \
-        uint8_t relu_post = 14;                                                                                        \
-        bool clip_relu_post = true;                                                                                    \
-        uint8_t eltwise_op = 15;                                                                                       \
-        bool eltwise_antq_en = true;                                                                                   \
-        bool C0_pad_en = true;                                                                                         \
-        bool broadcast_en = false;                                                                                     \
-        bool NZ2DN_en = false;                                                                                         \
-        c_api_name(                                                                                                    \
-            dst, src, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,      \
-            unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, eltwise_op, \
-            eltwise_antq_en, C0_pad_en, broadcast_en, NZ2DN_en);                                                       \
-        GlobalMockObject::verify();                                                                                    \
+#define TEST_CUBE_DATAMOVE_L0C2UB(class_name, c_api_name, cce_name, dst_data_type, src_data_type)                     \
+    TEST_F(TestCubeDatamoveCopyL0C2UB, c_api_name##_##dst_data_type##_##src_data_type##_Succ)                         \
+    {                                                                                                                 \
+        __ubuf__ dst_data_type* dst = reinterpret_cast<__ubuf__ dst_data_type*>(1);                                   \
+        __cc__ src_data_type* src = reinterpret_cast<__cc__ src_data_type*>(2);                                       \
+        uint16_t n_size = 3;                                                                                          \
+        uint16_t m_size = 4;                                                                                          \
+        uint32_t dst_stride = 6;                                                                                      \
+        uint16_t src_stride = 7;                                                                                      \
+        uint8_t dual_dst_ctl = 5;                                                                                     \
+        bool sub_blockid = true;                                                                                      \
+        uint8_t clip_relu_pre_mode = 8;                                                                               \
+        uint8_t unit_flag = 10;                                                                                       \
+        uint64_t quant_pre = 11;                                                                                      \
+        uint8_t relu_pre = 12;                                                                                        \
+        bool enable_split = true;                                                                                     \
+        bool enable_nz2nd = true;                                                                                     \
+        uint64_t quant_post_mode = 13;                                                                                \
+        uint8_t relu_post_mode = 14;                                                                                  \
+        bool enable_clip_relu_post_mode = true;                                                                       \
+        uint8_t eltwise_op = 15;                                                                                      \
+        bool enable_antiquant = true;                                                                                 \
+        bool enable_c0_pad = true;                                                                                    \
+        bool enable_broadcast = false;                                                                                \
+        bool enable_nz2dn = false;                                                                                    \
+        c_api_name(                                                                                                   \
+            dst, src, n_size, m_size, dst_stride, src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre_mode,          \
+            unit_flag, quant_pre, relu_pre, enable_split, enable_nz2nd, quant_post_mode, relu_post_mode,              \
+            enable_clip_relu_post_mode, eltwise_op, enable_antiquant, enable_c0_pad, enable_broadcast, enable_nz2dn); \
+        GlobalMockObject::verify();                                                                                   \
     }
 
 #endif

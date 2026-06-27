@@ -37,8 +37,8 @@
 #include "cube_datamove_impl/asc_copy_l12bt_impl.h"
 #include "cube_datamove_impl/asc_copy_l12ub_impl.h"
 #include "cube_datamove_impl/asc_fill_l1_impl.h"
-#include "../sys_var_impl/asc_set_gm2l1_nz_para_impl.h"
-#include "../sys_var_impl/asc_set_l13d_padding_impl.h"
+#include "sys_var_impl/asc_set_gm2l1_nz_para_impl.h"
+#include "sys_var_impl/asc_set_l13d_padding_impl.h"
 
 // ==========asc_copy_l0c2l1===========
 // half  float

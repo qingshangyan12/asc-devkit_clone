@@ -16,6 +16,10 @@
 #include "tests/api/c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 
+#define ASC_UT_CALL_STOREUNALIGN_INT4B(c_api_name, data_type, dst, src0, src1, repeat)                        \
+    static_cast<void (*)(__ubuf__ data_type*, vector_store_unalign&, vector_int4x2_t, uint32_t)>(c_api_name)( \
+        dst, src0, src1, repeat)
+
 #define TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_0(class_name, c_api_name, cce_name, data_type)                         \
                                                                                                                        \
     class TestVectorDataMove##class_name##_##data_type##_CApi : public testing::Test {                                 \
@@ -35,13 +39,13 @@
         __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type*>(0);                                            \
         vector_store_unalign src0;                                                                                     \
         vector_##data_type src1;                                                                                       \
-        uint32_t count;                                                                                                \
+        uint32_t repeat;                                                                                               \
                                                                                                                        \
         MOCKER_CPP(cce_name, void(vector_store_unalign&, uint32_t, vector_##data_type, __ubuf__ data_type*&, Literal)) \
             .times(1)                                                                                                  \
             .will(invoke(cce_name##_##data_type##_Stub));                                                              \
                                                                                                                        \
-        c_api_name(dst, src0, src1, count);                                                                            \
+        c_api_name(dst, src0, src1, repeat);                                                                           \
         GlobalMockObject::verify();                                                                                    \
     }
 
@@ -64,13 +68,13 @@
         __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type*>(0);                                      \
         vector_store_unalign src0;                                                                               \
         vector_##data_type src1;                                                                                 \
-        uint32_t count;                                                                                          \
+        uint32_t repeat;                                                                                         \
                                                                                                                  \
         MOCKER_CPP(cce_name, void(vector_store_unalign&, uint32_t, vector_uint8_t, __ubuf__ uint8_t*&, Literal)) \
             .times(1)                                                                                            \
             .will(invoke(cce_name##_##data_type##_Stub));                                                        \
                                                                                                                  \
-        c_api_name(dst, src0, src1, count);                                                                      \
+        c_api_name(dst, src0, src1, repeat);                                                                     \
         GlobalMockObject::verify();                                                                              \
     }
 
@@ -94,14 +98,14 @@
         __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type*>(0);                                            \
         vector_store_unalign src0;                                                                                     \
         vector_int4x2_t src1;                                                                                          \
-        uint32_t count;                                                                                                \
+        uint32_t repeat;                                                                                               \
                                                                                                                        \
         MOCKER_CPP(                                                                                                    \
             cce_name, void(vector_store_unalign&, uint32_t, vector_fp4x2_e1m2_t, __ubuf__ float4_e1m2x2_t*&, Literal)) \
             .times(1)                                                                                                  \
             .will(invoke(cce_name##_##data_type##_Stub));                                                              \
                                                                                                                        \
-        c_api_name(dst, src0, src1, count);                                                                            \
+        c_api_name(dst, src0, src1, repeat);                                                                           \
         GlobalMockObject::verify();                                                                                    \
     }
 
@@ -213,13 +217,13 @@
         __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type*>(0);                                  \
         vector_store_unalign src0;                                                                           \
         vector_##data_type src1;                                                                             \
-        uint32_t count;                                                                                      \
+        uint32_t repeat;                                                                                     \
                                                                                                              \
         MOCKER_CPP(cce_name, void(vector_store_unalign&, uint32_t, vector_##data_type, __ubuf__ data_type*)) \
             .times(1)                                                                                        \
             .will(invoke(cce_name##_##data_type##_Stub0));                                                   \
                                                                                                              \
-        c_api_name(dst, src0, src1, count);                                                                  \
+        c_api_name(dst, src0, src1, repeat);                                                                 \
         GlobalMockObject::verify();                                                                          \
     }
 
@@ -242,13 +246,13 @@
         __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type*>(0);                            \
         vector_store_unalign src0;                                                                     \
         vector_##data_type src1;                                                                       \
-        uint32_t count;                                                                                \
+        uint32_t repeat;                                                                               \
                                                                                                        \
         MOCKER_CPP(cce_name, void(vector_store_unalign&, uint32_t, vector_uint8_t, __ubuf__ uint8_t*)) \
             .times(1)                                                                                  \
             .will(invoke(cce_name##_##data_type##_Stub0));                                             \
                                                                                                        \
-        c_api_name(dst, src0, src1, count);                                                            \
+        c_api_name(dst, src0, src1, repeat);                                                           \
         GlobalMockObject::verify();                                                                    \
     }
 
@@ -271,13 +275,13 @@
         __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type*>(0);                                         \
         vector_store_unalign src0;                                                                                  \
         vector_int4x2_t src1;                                                                                       \
-        uint32_t count;                                                                                             \
+        uint32_t repeat;                                                                                            \
                                                                                                                     \
         MOCKER_CPP(cce_name, void(vector_store_unalign&, uint32_t, vector_fp4x2_e1m2_t, __ubuf__ float4_e1m2x2_t*)) \
             .times(1)                                                                                               \
             .will(invoke(cce_name##_##data_type##_Stub0));                                                          \
                                                                                                                     \
-        c_api_name(dst, src0, src1, count);                                                                         \
+        ASC_UT_CALL_STOREUNALIGN_INT4B(c_api_name, data_type, dst, src0, src1, repeat);                             \
         GlobalMockObject::verify();                                                                                 \
     }
 

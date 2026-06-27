@@ -26,7 +26,7 @@
     void nddma_out_to_ub_##data_type##_Stub(                                                                           \
         __ubuf__ void* dst, __gm__ void* src, uint8_t sid, uint32_t loop0_size, uint32_t loop1_size,                   \
         uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, \
-        bool padding_mode, uint8_t cache_mode)                                                                         \
+        bool enable_padding, uint8_t cache_mode)                                                                       \
     {                                                                                                                  \
         EXPECT_EQ(dst, reinterpret_cast<__ubuf__ void*>(11));                                                          \
         EXPECT_EQ(src, reinterpret_cast<__gm__ void*>(22));                                                            \
@@ -38,7 +38,7 @@
         EXPECT_EQ(loop4_size, static_cast<uint32_t>(5));                                                               \
         EXPECT_EQ(loop0_lp_count, static_cast<uint8_t>(6));                                                            \
         EXPECT_EQ(loop0_rp_count, static_cast<uint8_t>(7));                                                            \
-        EXPECT_EQ(padding_mode, static_cast<bool>(1));                                                                 \
+        EXPECT_EQ(enable_padding, static_cast<bool>(1));                                                               \
         EXPECT_EQ(cache_mode, static_cast<uint8_t>(8));                                                                \
     }                                                                                                                  \
     }                                                                                                                  \
@@ -55,7 +55,7 @@
         uint32_t loop4_size = static_cast<uint64_t>(5);                                                                \
         uint8_t loop0_lp_count = static_cast<uint64_t>(6);                                                             \
         uint8_t loop0_rp_count = static_cast<uint64_t>(7);                                                             \
-        bool padding_mode = static_cast<uint64_t>(1);                                                                  \
+        bool enable_padding = static_cast<uint64_t>(1);                                                                \
         uint8_t cache_mode = static_cast<uint64_t>(8);                                                                 \
                                                                                                                        \
         MOCKER_CPP(                                                                                                    \
@@ -67,7 +67,7 @@
                                                                                                                        \
         asc_ndim_copy_gm2ub(                                                                                           \
             dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size, loop0_lp_count, loop0_rp_count,      \
-            padding_mode, cache_mode);                                                                                 \
+            enable_padding, cache_mode);                                                                               \
         GlobalMockObject::verify();                                                                                    \
     }
 

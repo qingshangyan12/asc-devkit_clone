@@ -27,15 +27,15 @@ void copy_cbuf_to_bt_Stub(
     uint64_t dst = 1;
     __cbuf__ void* src = reinterpret_cast<__cbuf__ void*>(2);
     uint16_t conv_control = 3;
-    uint16_t n_burst = 4;
-    uint16_t len_burst = 5;
+    uint16_t burst_count = 4;
+    uint16_t burst_len = 5;
     uint16_t source_gap = 6;
     uint16_t dst_gap = 7;
     EXPECT_EQ(dst, dst_in);
     EXPECT_EQ(src, src_in);
     EXPECT_EQ(conv_control, conv_control_in);
-    EXPECT_EQ(n_burst, n_burst_in);
-    EXPECT_EQ(len_burst, len_burst_in);
+    EXPECT_EQ(burst_count, n_burst_in);
+    EXPECT_EQ(burst_len, len_burst_in);
     EXPECT_EQ(source_gap, source_gap_in);
     EXPECT_EQ(dst_gap, dst_gap_in);
 }
@@ -47,8 +47,8 @@ TEST_F(TestCubeDmamoveCopyL12Bt, asc_copy_l12bt_Succ)
     uint64_t dst = 1;
     __cbuf__ void* src = reinterpret_cast<__cbuf__ void*>(2);
     uint16_t conv_control = 3;
-    uint16_t n_burst = 4;
-    uint16_t len_burst = 5;
+    uint16_t burst_count = 4;
+    uint16_t burst_len = 5;
     uint16_t source_gap = 6;
     uint16_t dst_gap = 7;
 
@@ -56,6 +56,6 @@ TEST_F(TestCubeDmamoveCopyL12Bt, asc_copy_l12bt_Succ)
         .times(1)
         .will(invoke(copy_cbuf_to_bt_Stub));
 
-    asc_copy_l12bt(dst, src, conv_control, n_burst, len_burst, source_gap, dst_gap);
+    asc_copy_l12bt(dst, src, conv_control, burst_count, burst_len, source_gap, dst_gap);
     GlobalMockObject::verify();
 }

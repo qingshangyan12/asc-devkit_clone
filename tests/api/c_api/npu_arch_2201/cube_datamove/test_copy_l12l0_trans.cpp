@@ -45,7 +45,7 @@ protected:
         uint16_t dst_gap = 8;                                                                                     \
         uint16_t frac_gap = 8;                                                                                    \
         uint8_t repeat = 1;                                                                                       \
-        bool addrmode = false;                                                                                    \
+        bool enable_addr_decrement = false;                                                                       \
         MOCKER_CPP(asc_sync_post_process).times(sync_time);                                                       \
         MOCKER_CPP(                                                                                               \
             cce_name,                                                                                             \
@@ -53,7 +53,7 @@ protected:
             .times(1)                                                                                             \
             .will(invoke(cce_name##_##data_type##_##sync_time##_stub));                                           \
                                                                                                                   \
-        c_api_name(dst, src, index_id, repeat, src_stride, dst_gap, addrmode, frac_gap);                          \
+        c_api_name(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, frac_gap);             \
         GlobalMockObject::verify();                                                                               \
     }
 
