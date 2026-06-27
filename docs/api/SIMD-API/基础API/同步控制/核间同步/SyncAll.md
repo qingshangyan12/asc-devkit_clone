@@ -119,68 +119,16 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 
 **表 1**  模板参数说明（架构2201）
 
-<a name="table141895562714"></a>
-<table><thead align="left"><tr id="row1418155520273"><th class="cellrowborder" valign="top" width="13.43%" id="mcps1.2.3.1.1"><p id="p541813553277"><a name="p541813553277"></a><a name="p541813553277"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="86.57000000000001%" id="mcps1.2.3.1.2"><p id="p124187554274"><a name="p124187554274"></a><a name="p124187554274"></a>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row1541875514275"><td class="cellrowborder" valign="top" width="13.43%" headers="mcps1.2.3.1.1 "><p id="p17418195562717"><a name="p17418195562717"></a><a name="p17418195562717"></a>isAIVOnly</p>
-</td>
-<td class="cellrowborder" valign="top" width="86.57000000000001%" headers="mcps1.2.3.1.2 "><p id="p141865532714"><a name="p141865532714"></a><a name="p141865532714"></a>控制SyncAll作用于纯Vector算子或Mix（包含Cube和Vector计算）算子。可选值：</p>
-<a name="ul1418185513277"></a><a name="ul1418185513277"></a><ul id="ul1418185513277"><li><strong id="b3418195520278"><a name="b3418195520278"></a><a name="b3418195520278"></a>true</strong>（默认值）：纯Vector算子的全核同步，仅执行Vector核的全核同步。</li><li><strong id="b11418655112718"><a name="b11418655112718"></a><a name="b11418655112718"></a>false</strong>：Mix（包含Cube和Vector计算）算子的全核同步，先分别完成Vector核和Cube核的全核同步，再执行两者之间的同步（软同步接口不支持此功能）。</li></ul>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名 | 描述 |
+| --- | --- |
+| isAIVOnly | 控制SyncAll作用于纯Vector算子或Mix（包含Cube和Vector计算）算子。可选值：<br>&bull; **true**（默认值）：纯Vector算子的全核同步，仅执行Vector核的全核同步。<br>&bull; **false**：Mix（包含Cube和Vector计算）算子的全核同步，先分别完成Vector核和Cube核的全核同步，再执行两者之间的同步（软同步接口不支持此功能）。 |
 
 **表 2**  模板参数说明（架构3510）
 
-<a name="table1596943217411"></a>
-<table><thead align="left"><tr id="row1596916326417"><th class="cellrowborder" valign="top" width="13.43%" id="mcps1.2.3.1.1"><p id="p17970143211417"><a name="p17970143211417"></a><a name="p17970143211417"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="86.57000000000001%" id="mcps1.2.3.1.2"><p id="p8970163210416"><a name="p8970163210416"></a><a name="p8970163210416"></a>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row12970113214410"><td class="cellrowborder" valign="top" width="13.43%" headers="mcps1.2.3.1.1 "><p id="p9970193217417"><a name="p9970193217417"></a><a name="p9970193217417"></a>isAIVOnly</p>
-</td>
-<td class="cellrowborder" valign="top" width="86.57000000000001%" headers="mcps1.2.3.1.2 "><p id="p6912194943411"><a name="p6912194943411"></a><a name="p6912194943411"></a>控制SyncAll作用于纯Vector算子或Mix（包含Cube和Vector计算）算子。可选值：</p>
-<a name="ul261204423513"></a><a name="ul261204423513"></a><ul id="ul261204423513"><li><strong id="b891244983410"><a name="b891244983410"></a><a name="b891244983410"></a>true</strong>（默认值）：纯Vector算子的全核同步，仅执行Vector核的全核同步。</li><li><strong id="b79121249133420"><a name="b79121249133420"></a><a name="b79121249133420"></a>false</strong>：Mix（包含Cube和Vector计算）算子的全核同步，先分别完成Vector核和Cube核的全核同步，再执行两者之间的同步（软同步接口不支持此功能）。</li></ul>
-</td>
-</tr>
-<tr id="row1619622212263"><td class="cellrowborder" valign="top" width="13.43%" headers="mcps1.2.3.1.1 "><p id="p18798194094017"><a name="p18798194094017"></a><a name="p18798194094017"></a>config</p>
-</td>
-<td class="cellrowborder" valign="top" width="86.57000000000001%" headers="mcps1.2.3.1.2 "><p id="p3792155614263"><a name="p3792155614263"></a><a name="p3792155614263"></a><strong id="b1331424032616"><a name="b1331424032616"></a><a name="b1331424032616"></a>该配置仅当isAIVOnly=True时有效。</strong></p>
-<pre class="screen" id="screen11163131818312"><a name="screen11163131818312"></a><a name="screen11163131818312"></a>struct SyncAllConfig {
-    pipe_t triggerPipe;
-    pipe_t waitPipe;
-};
-
-constexpr SyncAllConfig DEFAULT_SYNC_ALL_CONFIG = {PIPE_ALL, PIPE_ALL};</pre>
-<p id="p479815400409"><a name="p479815400409"></a><a name="p479815400409"></a>控制SyncAll函数的行为 ，在多个AI Core之间进行流水线同步时，指定哪些管道（pipe）用于触发和等待。</p>
-<a name="ul047327174317"></a><a name="ul047327174317"></a><ul id="ul047327174317"><li><strong id="b7762111519458"><a name="b7762111519458"></a><a name="b7762111519458"></a>triggerPipe</strong>：指定哪个管道用于“发送触发信号”。仅支持MTE2、MTE3、PIPE_ALL。</li><li><strong id="b1849919164510"><a name="b1849919164510"></a><a name="b1849919164510"></a>waitPipe</strong>：指定哪个管道用于“接收等待信号”。仅支持MTE2、MTE3、PIPE_ALL。</li></ul>
-<pre class="screen" id="screen440110448168"><a name="screen440110448168"></a><a name="screen440110448168"></a>// 多个AIV进行计算
-Compute();
-// 多个AIV将计算结果搬出到GM
-CopyToGM();
-// 等待所有数据拷贝到GM后，进行累加
-constexpr AscendC::SyncAllConfig CustomConfig = {PIPE_MTE3, PIPE_ALL};
-AscendC::SyncAll&lt;true, CustomConfig&gt;();
-for (int i = 0; i &lt; blockNum; i++) {
-    if (i != blockIdx) {
-        CopyFromGm();
-        Accumulate();
-    }
-}
-// 累加后的数据写回
-CopyToGm();</pre>
-<p id="p16336151565418"><a name="p16336151565418"></a><a name="p16336151565418"></a>默认使用全部管道来进行触发和等待行为，与A2/A3兼容。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名 | 描述 |
+| --- | --- |
+| isAIVOnly | 控制SyncAll作用于纯Vector算子或Mix（包含Cube和Vector计算）算子。可选值：<br>&bull; **true**（默认值）：纯Vector算子的全核同步，仅执行Vector核的全核同步。<br>&bull; **false**：Mix（包含Cube和Vector计算）算子的全核同步，先分别完成Vector核和Cube核的全核同步，再执行两者之间的同步（软同步接口不支持此功能）。 |
+| config | **该配置仅当isAIVOnly=True时有效。**<br><pre>struct SyncAllConfig {&#x000A;    pipe_t triggerPipe;&#x000A;    pipe_t waitPipe;&#x000A;};&#x000A;&#x000A;constexpr SyncAllConfig DEFAULT_SYNC_ALL_CONFIG = {PIPE_ALL, PIPE_ALL};</pre><br>控制SyncAll函数的行为，在多个AI Core之间进行流水线同步时，指定哪些管道（pipe）用于触发和等待。<br>&bull; **triggerPipe**：指定哪个管道用于"发送触发信号"。仅支持MTE2、MTE3、PIPE_ALL。<br>&bull; **waitPipe**：指定哪个管道用于"接收等待信号"。仅支持MTE2、MTE3、PIPE_ALL。<br><pre>// 多个AIV进行计算&#x000A;Compute();&#x000A;// 多个AIV将计算结果搬出到GM&#x000A;CopyToGM();&#x000A;// 等待所有数据拷贝到GM后，进行累加&#x000A;constexpr AscendC::SyncAllConfig CustomConfig = {PIPE_MTE3, PIPE_ALL};&#x000A;AscendC::SyncAll&lt;true, CustomConfig&gt;();&#x000A;for (int i = 0; i &lt; blockNum; i++) {&#x000A;    if (i != blockIdx) {&#x000A;        CopyFromGm();&#x000A;        Accumulate();&#x000A;    }&#x000A;}&#x000A;// 累加后的数据写回&#x000A;CopyToGm();</pre><br>默认使用全部管道来进行触发和等待行为，与A2/A3兼容。 |
 
 **表2**  参数说明
 
