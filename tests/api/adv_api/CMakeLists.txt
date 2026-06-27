@@ -36,6 +36,10 @@ set(ASCENDC_TEST_HEADER_FILES
     ${ASCENDC_DIR}/include/basic_api
     ${ASCENDC_DIR}/impl
     ${ASCENDC_DIR}/impl/basic_api
+    # hcomm 迁出 asc-comm 后，对外伞头 kernel_api.h 仍按 hcomm/* 引用相关头，
+    # 这些头随 asc-comm 源码发布。ASC_COMM_HEADER_INCLUDE_DIR 由 cmake/third_party/asc-comm.cmake
+    # 暴露(hcomm->hcomm 软链)，供 UT 编译期解析。
+    ${ASC_COMM_HEADER_INCLUDE_DIR}
 )
 
 # # ================ adv_api kernel ut ================
@@ -188,7 +192,6 @@ file(GLOB ASCENDC_TEST_ascend910B1_AIC_CASE_SRC_FILES
     matmul/test_matmul_shape_info.cpp
     matmul/test_matmul_shape_info_left.cpp
     hccl/test_hccl.cpp
-    hcomm/test_hcomm.cpp
     matmul/copy_cube_in/test_copy_cube_in_norm.cpp
     matmul/copy_cube_in/test_copy_cube_in_mdl.cpp
     matmul/copy_cube_in/test_copy_cube_in_params.cpp
@@ -366,8 +369,6 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     transpose/confusion_transpose/test_operator_confusion_transpose_c310.cpp
     # hccl
     hccl/test_hccl_aicpu_950.cpp
-    hcomm/test_hcomm_roce_950.cpp
-    hcomm/test_hcomm_urma_950.cpp
 )
 
 # ascend310B1 test cases
