@@ -18,6 +18,8 @@
 
 该接口将输入数据转换为float类型。
 
+在使用该接口之前，用户需要先了解[内置数据类型](../数据结构/内置数据类型.md)和[精度转换](../数据结构/precision_conversion.md)。
+
 ## 函数原型<a name="section620mcpsimp"></a>
 
 <cann-filter npu-type = "910b,A3">
