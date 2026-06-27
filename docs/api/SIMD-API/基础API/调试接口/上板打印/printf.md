@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="section259105813316"></a>
 
-头文件路径为：`"basic_api/kernel_operator_dump_tensor_intf.h"`。
+头文件路径为：`"utils/debug/asc_printf.h"`。
 
 该接口提供CPU域/NPU域调试场景下的格式化输出功能。
 

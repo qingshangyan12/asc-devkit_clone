@@ -32,7 +32,7 @@ __aicore__ inline uint32_t GetRuntimeUBSize()
 
 运行时UB空间的大小，单位为Byte。
 
-<cann-filter npu-type="950">Ascend 950PR/Ascend 950DT架构下，SIMD与SIMT混合场景中，获取到的UB大小上限为216KB，非SIMD与SIMT混合场景返回值为固定值248KB。</cann-filter>
+<cann-filter npu-type="950">Ascend 950PR/Ascend 950DT架构下，[SIMD与SIMT混合场景](../../../../SIMT-API/SIMD与SIMT混合编程简介/SIMD与SIMT混合编程简介.md)中，获取到的UB大小上限为216KB，非SIMD与SIMT混合场景返回值为固定值248KB。</cann-filter>
 
 ## 约束说明
 

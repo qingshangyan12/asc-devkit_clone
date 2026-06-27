@@ -79,7 +79,7 @@ __aicore__ inline void Trap()
 
 ## 约束说明<a name="section43265506459"></a>
 
-无。
+无
 
 ## 调用示例<a name="section82241477610"></a>
 
