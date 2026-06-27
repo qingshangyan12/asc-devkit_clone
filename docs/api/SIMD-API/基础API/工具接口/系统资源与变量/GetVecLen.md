@@ -32,7 +32,7 @@ __aicore__ inline constexpr uint32_t GetVecLen()
 
 ## 返回值说明
 
-Vector Length的大小，单位为Byte。
+Vector Length的大小，直接返回常量256，单位为Byte。
 
 ## 约束说明
 

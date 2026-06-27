@@ -16,7 +16,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_limits_intf.h"`。
 
-返回指定数据类型的发信NaN值（浮点尾数最高位为0）。
+返回指定数据类型的[发信NaN值](../../../数据结构/内置数据类型.md)（浮点尾数最高位为0）。
 
 ## 函数原型
 
@@ -50,6 +50,41 @@
 标量接口返回值为对应数据类型的发信NaN值。
 
 矢量接口无返回值。
+
+**表 2**  SignalingNaN各数据类型输出
+
+<a name="table1710811591013"></a>
+<table><thead align="left"><tr id="row910912590010"><th class="cellrowborder" valign="top" width="33.33333333333333%" id="mcps1.2.4.1.1"><p id="p810910595014"><a name="p810910595014"></a><a name="p810910595014"></a>数据类型</p>
+</th>
+<th class="cellrowborder" valign="top" width="33.33333333333333%" id="mcps1.2.4.1.2"><p id="p710965913015"><a name="p710965913015"></a><a name="p710965913015"></a>十进制数</p>
+</th>
+<th class="cellrowborder" valign="top" width="33.33333333333333%" id="mcps1.2.4.1.3"><p id="p111109595016"><a name="p111109595016"></a><a name="p111109595016"></a>二进制各bit位</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row3110115912014"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.1 "><p id="p1911045914017"><a name="p1911045914017"></a><a name="p1911045914017"></a>half</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.2 "><p id="p3110105918015"><a name="p3110105918015"></a><a name="p3110105918015"></a>nan</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="p36601856131316"><a name="p36601856131316"></a><a name="p36601856131316"></a>0 11111 0100000000</p>
+</td>
+</tr>
+<tr id="row1110185915016"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.1 "><p id="p61101459701"><a name="p61101459701"></a><a name="p61101459701"></a>bfloat16_t</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.2 "><p id="p1711055920018"><a name="p1711055920018"></a><a name="p1711055920018"></a>nan</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="p11660145614139"><a name="p11660145614139"></a><a name="p11660145614139"></a>0 11111111 0100000</p>
+</td>
+</tr>
+<tr id="row74289115212"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.1 "><p id="p642812112216"><a name="p642812112216"></a><a name="p642812112216"></a>float</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.2 "><p id="p557510543130"><a name="p557510543130"></a><a name="p557510543130"></a>nan</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="p18659165614139"><a name="p18659165614139"></a><a name="p18659165614139"></a>0 11111111 01000000000000000000000</p>
+</td>
+</tr>
+</tbody>
+</table>
 
 ## 约束说明
 

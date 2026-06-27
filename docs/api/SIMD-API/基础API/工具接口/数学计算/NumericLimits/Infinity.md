@@ -47,9 +47,44 @@
 
 ## 返回值说明
 
-标量接口返回值为对应数据类型的正无穷大值。
+标量接口返回值为对应数据类型的[正无穷大值](../../../数据结构/内置数据类型.md)。
 
 矢量接口无返回值。
+
+**表 2**  Infinity各数据类型输出
+
+<a name="table1710811591013"></a>
+<table><thead align="left"><tr id="row910912590010"><th class="cellrowborder" valign="top" width="33.33333333333333%" id="mcps1.2.4.1.1"><p id="p810910595014"><a name="p810910595014"></a><a name="p810910595014"></a>数据类型</p>
+</th>
+<th class="cellrowborder" valign="top" width="33.33333333333333%" id="mcps1.2.4.1.2"><p id="p710965913015"><a name="p710965913015"></a><a name="p710965913015"></a>十进制数</p>
+</th>
+<th class="cellrowborder" valign="top" width="33.33333333333333%" id="mcps1.2.4.1.3"><p id="p111109595016"><a name="p111109595016"></a><a name="p111109595016"></a>二进制各bit位</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row3110115912014"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.1 "><p id="p1911045914017"><a name="p1911045914017"></a><a name="p1911045914017"></a>half</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.2 "><p id="p3110105918015"><a name="p3110105918015"></a><a name="p3110105918015"></a>inf</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="p36601856131316"><a name="p36601856131316"></a><a name="p36601856131316"></a>0 11111 0000000000</p>
+</td>
+</tr>
+<tr id="row1110185915016"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.1 "><p id="p61101459701"><a name="p61101459701"></a><a name="p61101459701"></a>bfloat16_t</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.2 "><p id="p1711055920018"><a name="p1711055920018"></a><a name="p1711055920018"></a>inf</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="p11660145614139"><a name="p11660145614139"></a><a name="p11660145614139"></a>0 11111111 0000000</p>
+</td>
+</tr>
+<tr id="row74289115212"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.1 "><p id="p642812112216"><a name="p642812112216"></a><a name="p642812112216"></a>float</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.2 "><p id="p557510543130"><a name="p557510543130"></a><a name="p557510543130"></a>inf</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="p997034014332"><a name="p997034014332"></a><a name="p997034014332"></a>0 11111111 00000000000000000000000</p>
+</td>
+</tr>
+</tbody>
+</table>
 
 ## 约束说明
 
