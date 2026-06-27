@@ -420,28 +420,28 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 | src/dst的数据类型 | src0的元素取值 | src1的元素取值 | dst的元素取值<br>（INF/NAN模式） | dst的元素取值<br>（饱和模式） |
 | --- | --- | --- | --- | --- |
 | half | -65504.0（MIN） | -65504.0（MIN） | 0.0 | 0.0 |
-| half | -65504.0（MIN） | 65504.0（MAX） | -inf | -65504 |
-| half | -65504.0（MIN） | 0.0/-0.0 | -65504 | -65504 |
+| half | -65504.0（MIN） | 65504.0（MAX） | -inf | -65504.0 |
+| half | -65504.0（MIN） | 0.0/-0.0 | -65504.0 | -65504.0 |
 | half | -65504.0（MIN） | nan | nan | 0.0 |
-| half | -65504.0（MIN） | inf | -inf | -65504 |
-| half | -65504.0（MIN） | -inf | inf | 65504 |
-| half | 65504.0（MAX） | -65504.0（MIN） | inf | 65504 |
+| half | -65504.0（MIN） | inf | -inf | -65504.0 |
+| half | -65504.0（MIN） | -inf | inf | 65504.0 |
+| half | 65504.0（MAX） | -65504.0（MIN） | inf | 65504.0 |
 | half | 65504.0（MAX） | 65504.0（MAX） | 0.0 | 0.0 |
-| half | 65504.0（MAX） | 0.0/-0.0 | 65504 | 65504 |
+| half | 65504.0（MAX） | 0.0/-0.0 | 65504.0 | 65504.0 |
 | half | 65504.0（MAX） | nan | nan | 0.0 |
-| half | 65504.0（MAX） | inf | -inf | -65504 |
-| half | 65504.0（MAX） | -inf | inf | 65504 |
-| half | 0.0/-0.0 | -65504.0（MIN） | 65504 | 65504 |
-| half | 0.0/-0.0 | 65504.0（MAX） | -65504 | -65504 |
+| half | 65504.0（MAX） | inf | -inf | -65504.0 |
+| half | 65504.0（MAX） | -inf | inf | 65504.0 |
+| half | 0.0/-0.0 | -65504.0（MIN） | 65504.0 | 65504.0 |
+| half | 0.0/-0.0 | 65504.0（MAX） | -65504.0 | -65504.0 |
 | half | 0.0/-0.0 | nan | nan | 0.0 |
-| half | 0.0/-0.0 | inf | -inf | -65504 |
-| half | 0.0/-0.0 | -inf | inf | 65504 |
+| half | 0.0/-0.0 | inf | -inf | -65504.0 |
+| half | 0.0/-0.0 | -inf | inf | 65504.0 |
 | half | 0.0 | -0.0/0.0 | 0.0 | 0.0 |
 | half | -0.0 | -0.0/0.0 | -0.0 | -0.0 |
 | half | nan | -65504.0（MIN）/65504.0（MAX）/0.0/-0.0/nan/inf/-inf | nan | 0.0 |
-| half | inf | -65504.0（MIN）/65504.0（MAX）/0.0/-0.0/-inf | inf | 65504 |
+| half | inf | -65504.0（MIN）/65504.0（MAX）/0.0/-0.0/-inf | inf | 65504.0 |
 | half | inf | nan/inf | nan | 0.0 |
-| half | -inf | -65504.0（MIN）/65504.0（MAX）/0.0/-0.0/inf | -inf | -65504 |
+| half | -inf | -65504.0（MIN）/65504.0（MAX）/0.0/-0.0/inf | -inf | -65504.0 |
 | half | -inf | nan/-inf | nan | 0.0 |
 | float | -3.4028235e+38 (MIN) | -3.4028235e+38（MIN） | 0.0 | 0.0 |
 | float | -3.4028235e+38 (MIN) | 3.4028235e+38（MAX） | -inf | -inf |
@@ -498,28 +498,28 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 
 | src/dst的数据类型 | src0的元素取值 | src1的元素取值 | dst的元素取值<br>（INF/NAN模式） | dst的元素取值<br>（饱和模式） |
 | --- | --- | --- | --- | --- |
-| half | -65504.0（MIN） | -65504.0（MIN） | inf | 65504 |
-| half | -65504.0（MIN） | 65504.0（MAX） | -inf | -65504 |
+| half | -65504.0（MIN） | -65504.0（MIN） | inf | 65504.0 |
+| half | -65504.0（MIN） | 65504.0（MAX） | -inf | -65504.0 |
 | half | -65504.0（MIN） | 0.0 | -0.0 | -0.0 |
 | half | -65504.0（MIN） | -0.0 | 0.0 | 0.0 |
 | half | -65504.0（MIN） | nan | nan | 0.0 |
-| half | -65504.0（MIN） | inf | -inf | -65504 |
-| half | -65504.0（MIN） | -inf | inf | 65504 |
-| half | 65504.0（MAX） | 65504.0（MAX） | inf | 65504 |
+| half | -65504.0（MIN） | inf | -inf | -65504.0 |
+| half | -65504.0（MIN） | -inf | inf | 65504.0 |
+| half | 65504.0（MAX） | 65504.0（MAX） | inf | 65504.0 |
 | half | 65504.0（MAX） | 0.0 | 0.0 | 0.0 |
 | half | 65504.0（MAX） | -0.0 | -0.0 | -0.0 |
 | half | 65504.0（MAX） | nan | nan | 0.0 |
-| half | 65504.0（MAX） | inf | inf | 65504 |
-| half | 65504.0（MAX） | -inf | -inf | -65504 |
+| half | 65504.0（MAX） | inf | inf | 65504.0 |
+| half | 65504.0（MAX） | -inf | -inf | -65504.0 |
 | half | 0.0 | 0.0 | 0.0 | 0.0 |
 | half | 0.0 | -0.0 | -0.0 | -0.0 |
 | half | 0.0 | nan/inf/-inf | nan | 0.0 |
 | half | -0.0 | -0.0 | 0.0 | 0.0 |
 | half | -0.0 | nan/inf/-inf | nan | 0.0 |
 | half | nan | nan/inf/-inf | nan | 0.0 |
-| half | inf | inf | inf | 65504 |
-| half | inf | -inf | -inf | -65504 |
-| half | -inf | -inf | inf | 65504 |
+| half | inf | inf | inf | 65504.0 |
+| half | inf | -inf | -inf | -65504.0 |
+| half | -inf | -inf | inf | 65504.0 |
 | float | -3.4028235e+38 (MIN) | -3.4028235e+38（MIN） | inf | inf |
 | float | -3.4028235e+38 (MIN) | 3.4028235e+38（MAX） | -inf | -inf |
 | float | -3.4028235e+38 (MIN) | 0.0 | -0.0 | -0.0 |
@@ -572,15 +572,15 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 | --- | --- | --- | --- | --- |
 | half | -65504.0（MIN） | -65504.0（MIN） | 1 | 1 |
 | half | -65504.0（MIN） | 65504.0（MAX） | -1 | -1 |
-| half | -65504.0（MIN） | 0.0 | -inf | -65504 |
-| half | -65504.0（MIN） | 0.0 | inf | 65504 |
+| half | -65504.0（MIN） | 0.0 | -inf | -65504.0 |
+| half | -65504.0（MIN） | 0.0 | inf | 65504.0 |
 | half | -65504.0（MIN） | nan | nan | 0.0 |
 | half | -65504.0（MIN） | inf | 0.0 | 0.0 |
 | half | -65504.0（MIN） | -inf | 0.0 | 0.0 |
 | half | 65504.0（MAX） | -65504.0（MIN） | -1 | -1 |
 | half | 65504.0（MAX） | 65504.0（MAX） | 1 | 1 |
-| half | 65504.0（MAX） | 0.0 | inf | 65504 |
-| half | 65504.0（MAX） | 0.0 | -inf | -65504 |
+| half | 65504.0（MAX） | 0.0 | inf | 65504.0 |
+| half | 65504.0（MAX） | 0.0 | -inf | -65504.0 |
 | half | 65504.0（MAX） | nan | nan | 0.0 |
 | half | 65504.0（MAX） | inf | 0.0 | 0.0 |
 | half | 65504.0（MAX） | -inf | 0.0 | 0.0 |
@@ -591,11 +591,11 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 | half | -0.0 | 65504.0（MAX）/inf | 0.0 | 0.0 |
 | half | -0.0 | 0.0/-0.0/nan | nan | 0.0 |
 | half | nan | -65504.0（MIN）/65504.0（MAX）/0.0/-0.0/nan/inf/-inf | nan | 0.0 |
-| half | inf | -65504.0（MIN）/-0.0 | -inf | -65504 |
-| half | inf | 65504.0（MAX）/0.0 | inf | 65504 |
+| half | inf | -65504.0（MIN）/-0.0 | -inf | -65504.0 |
+| half | inf | 65504.0（MAX）/0.0 | inf | 65504.0 |
 | half | inf | nan/inf/-inf | nan | 0.0 |
-| half | -inf | -65504.0（MIN）/-0.0 | inf | 65504 |
-| half | -inf | 65504.0（MAX）/0.0 | -inf | -65504 |
+| half | -inf | -65504.0（MIN）/-0.0 | inf | 65504.0 |
+| half | -inf | 65504.0（MAX）/0.0 | -inf | -65504.0 |
 | half | -inf | nan/inf/-inf | nan | 0.0 |
 | float | -3.4028235e+38 (MIN) | -3.4028235e+38（MIN） | 1 | 1 |
 | float | -3.4028235e+38 (MIN) | 3.4028235e+38（MAX） | -1 | -1 |
@@ -634,24 +634,24 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 
 | src/dst的数据类型 | src0的元素取值 | src1的元素取值 | dst的元素取值<br>（INF/NAN模式） | dst的元素取值<br>（饱和模式） |
 | --- | --- | --- | --- | --- |
-| half | -65504.0（MIN） | -65504.0（MIN）/-inf | -65504 | -65504 |
-| half | -65504.0（MIN） | 65504.0（MAX） | 65504 | 65504 |
+| half | -65504.0（MIN） | -65504.0（MIN）/-inf | -65504.0 | -65504.0 |
+| half | -65504.0（MIN） | 65504.0（MAX） | 65504.0 | 65504.0 |
 | half | -65504.0（MIN） | 0.0 | 0.0 | 0.0 |
 | half | -65504.0（MIN） | 0.0 | 0.0 | 0.0 |
 | half | -65504.0（MIN） | nan | nan | 0.0 |
-| half | -65504.0（MIN） | inf | inf | 65504 |
-| half | 65504.0（MAX） | 65504.0（MAX）/0.0/-0.0/-inf | 65504 | 65504 |
+| half | -65504.0（MIN） | inf | inf | 65504.0 |
+| half | 65504.0（MAX） | 65504.0（MAX）/0.0/-0.0/-inf | 65504.0 | 65504.0 |
 | half | 65504.0（MAX） | nan | nan | 0.0 |
-| half | 65504.0（MAX） | inf | inf | 65504 |
+| half | 65504.0（MAX） | inf | inf | 65504.0 |
 | half | 0.0 | 0.0/-0.0/-inf | 0.0 | 0.0 |
 | half | 0.0 | nan | nan | 0.0 |
-| half | 0.0 | inf | inf | 65504 |
+| half | 0.0 | inf | inf | 65504.0 |
 | half | -0.0 | -0.0/-inf | -0.0 | -0.0 |
 | half | -0.0 | nan | nan | 0.0 |
-| half | -0.0 | inf | inf | 65504 |
+| half | -0.0 | inf | inf | 65504.0 |
 | half | nan | nan/inf/-inf | nan | 0.0 |
-| half | inf | inf/-inf | inf | 65504 |
-| half | -inf | -inf | -inf | -65504 |
+| half | inf | inf/-inf | inf | 65504.0 |
+| half | -inf | -inf | -inf | -65504.0 |
 | float | -3.4028235e+38 (MIN) | -3.4028235e+38（MIN）/-inf | -3.40282E+38 | -3.40282E+38 |
 | float | -3.4028235e+38 (MIN) | 3.4028235e+38（MAX） | 3.40282E+38 | 3.40282E+38 |
 | float | -3.4028235e+38 (MIN) | 0.0 | 0.0 | 0.0 |
@@ -686,25 +686,25 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 
 | src/dst的数据类型 | src0的元素取值 | src1的元素取值 | dst的元素取值<br>（INF/NAN模式） | dst的元素取值<br>（饱和模式） |
 | --- | --- | --- | --- | --- |
-| half | -65504.0（MIN） | -65504.0（MIN）/65504.0（MAX）/0.0/-0.0/inf | -65504 | -65504 |
+| half | -65504.0（MIN） | -65504.0（MIN）/65504.0（MAX）/0.0/-0.0/inf | -65504.0 | -65504.0 |
 | half | -65504.0（MIN） | nan | nan | 0.0 |
-| half | -65504.0（MIN） | -inf | -inf | -65504 |
-| half | 65504.0（MAX） | 65504.0（MAX）/inf | 65504 | 65504 |
+| half | -65504.0（MIN） | -inf | -inf | -65504.0 |
+| half | 65504.0（MAX） | 65504.0（MAX）/inf | 65504.0 | 65504.0 |
 | half | 65504.0（MAX） | 0.0 | 0.0 | 0.0 |
 | half | 65504.0（MAX） | 0.0 | 0.0 | 0.0 |
 | half | 65504.0（MAX） | nan | nan | 0.0 |
-| half | 65504.0（MAX） | -inf | -inf | -65504 |
+| half | 65504.0（MAX） | -inf | -inf | -65504.0 |
 | half | 0.0 | 0.0/inf | 0.0 | 0.0 |
 | half | 0.0 | 0.0 | 0.0 | 0.0 |
 | half | 0.0 | nan | nan | 0.0 |
-| half | 0.0 | -inf | -inf | -65504 |
+| half | 0.0 | -inf | -inf | -65504.0 |
 | half | -0.0 | -0.0/inf | -0.0 | -0.0 |
 | half | -0.0 | nan | nan | 0.0 |
-| half | -0.0 | -inf | -inf | -65504 |
+| half | -0.0 | -inf | -inf | -65504.0 |
 | half | nan | nan/inf/-inf | nan | 0.0 |
-| half | inf | inf | inf | 65504 |
-| half | inf | -inf | -inf | -65504 |
-| half | -inf | -inf | -inf | -65504 |
+| half | inf | inf | inf | 65504.0 |
+| half | inf | -inf | -inf | -65504.0 |
+| half | -inf | -inf | -inf | -65504.0 |
 | float | -3.4028235e+38 (MIN) | -3.4028235e+38（MIN）/3.4028235e+38（MAX）/0.0/-0.0/inf | -3.40282E+38 | -3.40282E+38 |
 | float | -3.4028235e+38 (MIN) | nan | nan | nan |
 | float | -3.4028235e+38 (MIN) | -inf | -inf | -inf |
@@ -738,28 +738,28 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 
 | src/dst的数据类型 | src0的元素取值 | src1的元素取值 | dst的元素取值<br>（INF/NAN模式） | dst的元素取值<br>（饱和模式） |
 | --- | --- | --- | --- | --- |
-| half | -65504.0（MIN） | -65504.0（MIN） | inf | 65504 |
-| half | -65504.0（MIN） | 65504.0（MAX） | -inf | -65504 |
+| half | -65504.0（MIN） | -65504.0（MIN） | inf | 65504.0 |
+| half | -65504.0（MIN） | 65504.0（MAX） | -inf | -65504.0 |
 | half | -65504.0（MIN） | 0.0 | -0.0 | -0.0 |
 | half | -65504.0（MIN） | -0.0 | 0.0 | 0.0 |
 | half | -65504.0（MIN） | nan | nan | 0.0 |
-| half | -65504.0（MIN） | inf | -inf | -65504 |
-| half | -65504.0（MIN） | -inf | inf | 65504 |
-| half | 65504.0（MAX） | 65504.0（MAX） | inf | 65504 |
+| half | -65504.0（MIN） | inf | -inf | -65504.0 |
+| half | -65504.0（MIN） | -inf | inf | 65504.0 |
+| half | 65504.0（MAX） | 65504.0（MAX） | inf | 65504.0 |
 | half | 65504.0（MAX） | 0.0 | 0.0 | 0.0 |
 | half | 65504.0（MAX） | -0.0 | -0.0 | -0.0 |
 | half | 65504.0（MAX） | nan | nan | 0.0 |
-| half | 65504.0（MAX） | inf | inf | 65504 |
-| half | 65504.0（MAX） | -inf | -inf | -65504 |
+| half | 65504.0（MAX） | inf | inf | 65504.0 |
+| half | 65504.0（MAX） | -inf | -inf | -65504.0 |
 | half | 0.0 | 0.0 | 0.0 | 0.0 |
 | half | 0.0 | -0.0 | -0.0 | -0.0 |
 | half | 0.0 | nan/inf/-inf | nan | 0.0 |
 | half | -0.0 | -0.0 | 0.0 | 0.0 |
 | half | -0.0 | nan/inf/-inf | nan | 0.0 |
 | half | nan | nan/inf/-inf | nan | 0.0 |
-| half | inf | inf | inf | 65504 |
-| half | inf | -inf | -inf | -65504 |
-| half | -inf | -inf | inf | 65504 |
+| half | inf | inf | inf | 65504.0 |
+| half | inf | -inf | -inf | -65504.0 |
+| half | -inf | -inf | inf | 65504.0 |
 | float | -3.4028235e+38 (MIN) | -3.4028235e+38（MIN） | inf | inf |
 | float | -3.4028235e+38 (MIN) | 3.4028235e+38（MAX） | -inf | -inf |
 | float | -3.4028235e+38 (MIN) | 0.0 | -0.0 | -0.0 |
@@ -798,24 +798,24 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 
 | src/dst的数据类型 | src0的元素取值 | src1的元素取值 | dst的元素取值<br>（INF/NAN模式） | dst的元素取值<br>（饱和模式） |
 | --- | --- | --- | --- | --- |
-| half | -65504.0（MIN） | -65504.0（MIN）/-inf | -65504 | -65504 |
-| half | -65504.0（MIN） | 65504.0（MAX） | 65504 | 65504 |
+| half | -65504.0（MIN） | -65504.0（MIN）/-inf | -65504.0 | -65504.0 |
+| half | -65504.0（MIN） | 65504.0（MAX） | 65504.0 | 65504.0 |
 | half | -65504.0（MIN） | 0.0 | 0.0 | 0.0 |
 | half | -65504.0（MIN） | 0.0 | 0.0 | 0.0 |
 | half | -65504.0（MIN） | nan | nan | 0.0 |
-| half | -65504.0（MIN） | inf | inf | 65504 |
-| half | 65504.0（MAX） | 65504.0（MAX）/0.0/-0.0/-inf | 65504 | 65504 |
+| half | -65504.0（MIN） | inf | inf | 65504.0 |
+| half | 65504.0（MAX） | 65504.0（MAX）/0.0/-0.0/-inf | 65504.0 | 65504.0 |
 | half | 65504.0（MAX） | nan | nan | 0.0 |
-| half | 65504.0（MAX） | inf | inf | 65504 |
+| half | 65504.0（MAX） | inf | inf | 65504.0 |
 | half | 0.0 | 0.0/-0.0/-inf | 0.0 | 0.0 |
 | half | 0.0 | nan | nan | 0.0 |
-| half | 0.0 | inf | inf | 65504 |
+| half | 0.0 | inf | inf | 65504.0 |
 | half | -0.0 | -0.0/-inf | -0.0 | -0.0 |
 | half | -0.0 | nan | nan | 0.0 |
-| half | -0.0 | inf | inf | 65504 |
+| half | -0.0 | inf | inf | 65504.0 |
 | half | nan | nan/inf/-inf | nan | 0.0 |
-| half | inf | inf/-inf | inf | 65504 |
-| half | -inf | -inf | -inf | -65504 |
+| half | inf | inf/-inf | inf | 65504.0 |
+| half | -inf | -inf | -inf | -65504.0 |
 | float | -3.4028235e+38 (MIN) | -3.4028235e+38（MIN）/-inf | -3.40282E+38 | -3.40282E+38 |
 | float | -3.4028235e+38 (MIN) | 3.4028235e+38（MAX） | 3.40282E+38 | 3.40282E+38 |
 | float | -3.4028235e+38 (MIN) | 0.0 | 0.0 | 0.0 |
@@ -850,25 +850,25 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 
 | src/dst的数据类型 | src0的元素取值 | src1的元素取值 | dst的元素取值<br>（INF/NAN模式） | dst的元素取值<br>（饱和模式） |
 | --- | --- | --- | --- | --- |
-| half | -65504.0（MIN） | -65504.0（MIN）/65504.0（MAX）/0.0/-0.0/inf | -65504 | -65504 |
+| half | -65504.0（MIN） | -65504.0（MIN）/65504.0（MAX）/0.0/-0.0/inf | -65504.0 | -65504.0 |
 | half | -65504.0（MIN） | nan | nan | 0.0 |
-| half | -65504.0（MIN） | -inf | -inf | -65504 |
-| half | 65504.0（MAX） | 65504.0（MAX）/inf | 65504 | 65504 |
+| half | -65504.0（MIN） | -inf | -inf | -65504.0 |
+| half | 65504.0（MAX） | 65504.0（MAX）/inf | 65504.0 | 65504.0 |
 | half | 65504.0（MAX） | 0.0 | 0.0 | 0.0 |
 | half | 65504.0（MAX） | 0.0 | 0.0 | 0.0 |
 | half | 65504.0（MAX） | nan | nan | 0.0 |
-| half | 65504.0（MAX） | -inf | -inf | -65504 |
+| half | 65504.0（MAX） | -inf | -inf | -65504.0 |
 | half | 0.0 | 0.0/inf | 0.0 | 0.0 |
 | half | 0.0 | 0.0 | 0.0 | 0.0 |
 | half | 0.0 | nan | nan | 0.0 |
-| half | 0.0 | -inf | -inf | -65504 |
+| half | 0.0 | -inf | -inf | -65504.0 |
 | half | -0.0 | -0.0/inf | -0.0 | -0.0 |
 | half | -0.0 | nan | nan | 0.0 |
-| half | -0.0 | -inf | -inf | -65504 |
+| half | -0.0 | -inf | -inf | -65504.0 |
 | half | nan | nan/inf/-inf | nan | 0.0 |
-| half | inf | inf | inf | 65504 |
-| half | inf | -inf | -inf | -65504 |
-| half | -inf | -inf | -inf | -65504 |
+| half | inf | inf | inf | 65504.0 |
+| half | inf | -inf | -inf | -65504.0 |
+| half | -inf | -inf | -inf | -65504.0 |
 | float | -3.4028235e+38 (MIN) | -3.4028235e+38（MIN）/3.4028235e+38（MAX）/0.0/-0.0/inf | -3.40282E+38 | -3.40282E+38 |
 | float | -3.4028235e+38 (MIN) | nan | nan | nan |
 | float | -3.4028235e+38 (MIN) | -inf | -inf | -inf |
@@ -902,22 +902,22 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 
 | src/dst的数据类型 | src0的元素取值 | src1的元素取值 | dst的元素取值<br>（INF/NAN模式） | dst的元素取值<br>（饱和模式） |
 | --- | --- | --- | --- | --- |
-| half | -65504.0（MIN） | -65504.0（MIN） | inf | 65504 |
-| half | -65504.0（MIN） | 65504.0（MAX） | -inf | -65504 |
+| half | -65504.0（MIN） | -65504.0（MIN） | inf | 65504.0 |
+| half | -65504.0（MIN） | 65504.0（MAX） | -inf | -65504.0 |
 | half | -65504.0（MIN） | 0.0 | 0.0 | 0.0 |
 | half | -65504.0（MIN） | 0.0 | 0.0 | 0.0 |
 | half | -65504.0（MIN） | nan | nan | 0.0 |
-| half | -65504.0（MIN） | inf | -inf | -65504 |
-| half | -65504.0（MIN） | -inf | inf | 65504 |
-| half | 65504.0（MAX） | -65504.0（MIN）/65504.0（MAX）/0.0/-0.0/nan/inf/-inf | 65504 | 65504 |
+| half | -65504.0（MIN） | inf | -inf | -65504.0 |
+| half | -65504.0（MIN） | -inf | inf | 65504.0 |
+| half | 65504.0（MAX） | -65504.0（MIN）/65504.0（MAX）/0.0/-0.0/nan/inf/-inf | 65504.0 | 65504.0 |
 | half | 0.0 | -65504.0（MIN）/65504.0（MAX）/0.0/-0.0/nan/inf/-inf | 0.0 | 0.0 |
 | half | -0.0 | -65504.0（MIN）/-0.0 | 0.0 | 0.0 |
 | half | -0.0 | 65504.0（MAX）/0.0 | 0.0 | 0.0 |
 | half | -0.0 | nan/inf/-inf | nan | 0.0 |
 | half | nan | -65504.0（MIN）/65504.0（MAX）/0.0/-0.0/nan/inf/-inf | nan | 0.0 |
-| half | inf | -65504.0（MIN）/65504.0（MAX）/0.0/-0.0/nan/inf/-inf | inf | 65504 |
-| half | -inf | -65504.0（MIN）/-inf | inf | 65504 |
-| half | -inf | 65504.0（MAX）/inf | -inf | -65504 |
+| half | inf | -65504.0（MIN）/65504.0（MAX）/0.0/-0.0/nan/inf/-inf | inf | 65504.0 |
+| half | -inf | -65504.0（MIN）/-inf | inf | 65504.0 |
+| half | -inf | 65504.0（MAX）/inf | -inf | -65504.0 |
 | half | -inf | 0.0/-0.0/nan | nan | 0.0 |
 | float | -3.4028235e+38 (MIN) | -3.4028235e+38（MIN） | inf | inf |
 | float | -3.4028235e+38 (MIN) | 3.4028235e+38（MAX） | -inf | -inf |
@@ -1061,23 +1061,23 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 | src/dst的数据类型 | src0的元素取值 | src1的元素取值 | dst的元素取值<br>（INF/NAN模式） | dst的元素取值<br>（饱和模式） |
 | --- | --- | --- | --- | --- |
 | half | -65504.0（MIN） | -65504.0（MIN） | 0.0 | 0.0 |
-| half | -65504.0（MIN） | 65504.0（MAX） | inf | 65504 |
-| half | -65504.0（MIN） | 0.0/-0.0 | 65504 | 65504 |
+| half | -65504.0（MIN） | 65504.0（MAX） | inf | 65504.0 |
+| half | -65504.0（MIN） | 0.0/-0.0 | 65504.0 | 65504.0 |
 | half | -65504.0（MIN） | nan | nan | 0.0 |
-| half | -65504.0（MIN） | inf/-inf | inf | 65504 |
+| half | -65504.0（MIN） | inf/-inf | inf | 65504.0 |
 | half | 65504.0（MAX） | 65504.0（MAX） | 0.0 | 0.0 |
-| half | 65504.0（MAX） | 0.0/-0.0 | 65504 | 65504 |
+| half | 65504.0（MAX） | 0.0/-0.0 | 65504.0 | 65504.0 |
 | half | 65504.0（MAX） | nan | nan | 0.0 |
-| half | 65504.0（MAX） | -inf/inf | inf | 65504 |
+| half | 65504.0（MAX） | -inf/inf | inf | 65504.0 |
 | half | 0.0 | 0.0/-0.0 | 0.0 | 0.0 |
 | half | 0.0 | nan | nan | 0.0 |
-| half | 0.0 | inf/-inf | inf | 65504 |
+| half | 0.0 | inf/-inf | inf | 65504.0 |
 | half | -0.0 | 0.0/-0.0 | 0.0 | 0.0 |
 | half | -0.0 | nan | nan | 0.0 |
-| half | -0.0 | inf/-inf | inf | 65504 |
+| half | -0.0 | inf/-inf | inf | 65504.0 |
 | half | nan | nan/inf/-inf | nan | 0.0 |
 | half | inf | inf | nan | 0.0 |
-| half | inf | -inf | inf | 65504 |
+| half | inf | -inf | inf | 65504.0 |
 | half | -inf | -inf | nan | 0.0 |
 | float | -3.4028235e+38 (MIN) | -3.4028235e+38（MIN） | 0.0 | 0.0 |
 | float | -3.4028235e+38 (MIN) | 3.4028235e+38（MAX） | inf | inf |
@@ -1647,7 +1647,7 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 | int32_t/int16_t | MIN | 0.0 | -32768 |
 | int32_t/int16_t | MAX | -1 | 32767 |
 | int32_t/float | MIN | -2147483648 | -2147483648 |
-| int32_t/float | MAX | 2147483648 | 2147483648 |
+| int32_t/float | MAX | 2147483647 | 2147483647 |
 | int32_t/int64_t | MIN | -2147483648 | -2147483648 |
 | int32_t/int64_t | MAX | 2147483647 | 2147483647 |
 | uint32_t/int16_t | 0.0 | 0.0 | 0.0 |
@@ -1681,10 +1681,10 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 | float/hifloat8_t | -inf | &nbsp;&nbsp; | &nbsp;&nbsp; |
 | float/hifloat8_t | nan | &nbsp;&nbsp; | &nbsp;&nbsp; |
 | float/half | 0.0 | 0.0 | 0.0 |
-| float/half | MIN | -inf | -65504 |
-| float/half | MAX | inf | 65504 |
-| float/half | inf | inf | 65504 |
-| float/half | -inf | -inf | -65504 |
+| float/half | MIN | -inf | -65504.0 |
+| float/half | MAX | inf | 65504.0 |
+| float/half | inf | inf | 65504.0 |
+| float/half | -inf | -inf | -65504.0 |
 | float/half | nan | nan | 0.0 |
 | float/fp8_e4m3_t | 0.0 | 0.0 | 0.0 |
 | float/fp8_e4m3_t | MIN | nan | -448 |
@@ -1729,8 +1729,8 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 | half/hifloat8_t | -inf | &nbsp;&nbsp; | &nbsp;&nbsp; |
 | half/hifloat8_t | nan | &nbsp;&nbsp; | &nbsp;&nbsp; |
 | half/int32_t | 0.0 | 0.0 | 0.0 |
-| half/int32_t | MIN | -65504 | -65504 |
-| half/int32_t | MAX | 65504 | 65504 |
+| half/int32_t | MIN | -65504.0 | -65504 |
+| half/int32_t | MAX | 65504.0 | 65504 |
 | half/int32_t | inf | 2147483647 | 2147483647 |
 | half/int32_t | -inf | -2147483648 | -2147483648 |
 | half/int32_t | nan | 0.0 | 0.0 |
@@ -1741,8 +1741,8 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 | half/int16_t | -inf | -32768 | -32768 |
 | half/int16_t | nan | 0.0 | 0.0 |
 | half/bfloat16_t | 0.0 | 0.0 | 0.0 |
-| half/bfloat16_t | MIN | -65504 | -65504 |
-| half/bfloat16_t | MAX | 65504 | 65504 |
+| half/bfloat16_t | MIN | -65504.0 | -65504.0 |
+| half/bfloat16_t | MAX | 65504.0 | 65504.0 |
 | half/bfloat16_t | inf | inf | inf |
 | half/bfloat16_t | -inf | -inf | -inf |
 | half/bfloat16_t | nan | nan | nan |
@@ -1759,8 +1759,8 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 | half/uint8_t | -inf | 0.0 | 0.0 |
 | half/uint8_t | nan | 0.0 | 0.0 |
 | half/float | 0.0 | 0.0 | 0.0 |
-| half/float | MIN | -65504 | -65504 |
-| half/float | MAX | 65504 | 65504 |
+| half/float | MIN | -65504.0 | -65504.0 |
+| half/float | MAX | 65504.0 | 65504.0 |
 | half/float | inf | inf | inf |
 | half/float | -inf | -inf | -inf |
 | half/float | nan | nan | nan |
@@ -1771,10 +1771,10 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 | bfloat16_t/int32_t | -inf | -2147483648 | -2147483648 |
 | bfloat16_t/int32_t | nan | 0.0 | 0.0 |
 | bfloat16_t/half | 0.0 | 0.0 | 0.0 |
-| bfloat16_t/half | MIN | -inf | -65504 |
-| bfloat16_t/half | MAX | inf | 65504 |
-| bfloat16_t/half | inf | inf | 65504 |
-| bfloat16_t/half | -inf | -inf | -65504 |
+| bfloat16_t/half | MIN | -inf | -65504.0 |
+| bfloat16_t/half | MAX | inf | 65504.0 |
+| bfloat16_t/half | inf | inf | 65504.0 |
+| bfloat16_t/half | -inf | -inf | -65504.0 |
 | bfloat16_t/half | nan | nan | 0.0 |
 | bfloat16_t/float | 0.0 | 0.0 | 0.0 |
 | bfloat16_t/float | MIN | -3.39e+38 | -3.39e+38 |
@@ -1963,8 +1963,8 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 | float | MIN | MIN | MIN |
 | int8_t | 127（MAX） | 127（MAX），-128~126 | 127（MAX），-128~126 |
 | int8_t | -128（MIN） | -128（MIN）~127 | -128（MIN）~127 |
-| uint16_t | 32767（MAX） | 32767（MAX），-32768（MIN）~-32642 | 32767（MAX），-32768（MIN）~-32642 |
-| uint16_t | -32768（MIN） | -32768（MIN）~-32641 | -32768（MIN）~-32641 |
+| int16_t | 32767（MAX） | 32767（MAX），-32768（MIN）~-32642 | 32767（MAX），-32768（MIN）~-32642 |
+| int16_t | -32768（MIN） | -32768（MIN）~-32641 | -32768（MIN）~-32641 |
 | int32_t | -2147483648（MIN） | -2147483648（MIN）~-2147483585 | -2147483648（MIN）~-2147483585 |
 | int32_t | 2147483647（MAX） | 2147483647（MAX）,-2147483648（MIN）~-2147483586 | 2147483647（MAX）,-2147483648（MIN）~-2147483586 |
 
