@@ -87,9 +87,9 @@ __aicore__ inline void MulsCast(const T2 &dst, const T3 &src0, const T4 &src1, c
 
 -   左操作数及右操作数中，必须有一个为矢量；当前不支持左右操作数同时为标量。
 -   本接口传入LocalTensor单点数据作为标量时，idx参数需要传入编译期已知的常量，传入变量时需要声明为constexpr。
-- 针对如下型号，当参数count取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  <!-- npu="950" id9 -->
-  - Ascend 950PR/Ascend 950DT
+- <!-- npu="950" id9 -->
+  针对Ascend 950PR/Ascend 950DT，有如下约束说明：
+  - 该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count取值为0时，不保证该接口将被视为NOP（空操作）。
   <!-- end id9 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>

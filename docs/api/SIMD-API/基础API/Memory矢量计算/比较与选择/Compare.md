@@ -248,14 +248,13 @@
   <!-- npu="910b" id11 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
   <!-- end id11 -->
-  <!-- npu="950" id12 -->
-  - Ascend 950PR/Ascend 950DT
-  <!-- end id12 -->
 
 - **使用整个tensor参与计算的运算符重载功能，src0和src1需满足256字节对齐；使用tensor前n个数据参与计算的接口，设置count时，需要保证count个元素所占空间256字节对齐。**
-<cann-filter npu-type = "950">
-- 针对Ascend 950PR/Ascend 950DT，int8\_t/uint8\_t/int64\_t/uint64\_t/double数据类型仅支持tensor前n个数据计算接口和整个tensor参与计算的运算符重载。
-</cann-filter>
+- <!-- npu="950" id12 -->
+  针对Ascend 950PR/Ascend 950DT，有如下约束说明：
+  - 该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
+  - int8\_t/uint8\_t/int64\_t/uint64\_t/double数据类型仅支持tensor前n个数据计算接口和整个tensor参与计算的运算符重载。
+  <!-- end id12 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
