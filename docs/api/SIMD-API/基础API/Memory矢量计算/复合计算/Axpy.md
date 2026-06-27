@@ -46,7 +46,7 @@ $$
 
   ```cpp
   template <typename T, typename U>
-  __aicore__ inline void Axpy(const LocalTensor<T>& dst, const LocalTensor<U>& src, const U& scalar, const int32_t count)
+  __aicore__ inline void Axpy(const LocalTensor<T>& dst, const LocalTensor<U>& src, const U& scalarValue, const int32_t count)
   ```
 
 - tensor高维切分计算
