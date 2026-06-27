@@ -707,14 +707,14 @@ HcclResult HcclCalcTopoInfo(HcclComm comm, OpParam& param, std::unique_ptr<TopoI
     uint64_t size = 0;
     void* ctx = nullptr;
     // 若获取Context失败，表示对应Context尚未缓存
-    if (HcclEngineCtxGet(comm, param.tag, CommEngine::COMM_ENGINE_CPU_TS, &ctx, &size) != HCCL_SUCCESS) {
+    if (HcclEngineCtxGet(comm, param.tag, CommEngine::COMM_ENGINE_AIV, &ctx, &size) != HCCL_SUCCESS) {
         // 初始化topoInfo
         CHK_RET(InitRankInfo(comm, topoInfo.get()));
         // 序列化
         std::vector<char> seq = topoInfo->Serialize();
         size = seq.size();
         // 创建新的Context保存
-        CHK_RET(HcclEngineCtxCreate(comm, param.tag, CommEngine::COMM_ENGINE_CPU_TS, size, &ctx));
+        CHK_RET(HcclEngineCtxCreate(comm, param.tag, CommEngine::COMM_ENGINE_AIV, size, &ctx));
         CHK_SAFETY_FUNC_RET(memcpy_s(ctx, size, seq.data(), size));
         return HCCL_SUCCESS;
     }
