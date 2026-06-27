@@ -45,6 +45,9 @@ def Duplicate(scalarValue, dst, count):
     for i in range(count):     
         dst[i] = scalarValue
 ```
+<!-- npu="950" id26 -->
+针对Ascend 950PR/Ascend 950DT，为方便开发者使用，tensor前n个数据计算接口同时也支持直接传入Tensor，此时会将Tensor的第一个元素复制多次并填充到向量中。
+<!-- end id26 -->
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
