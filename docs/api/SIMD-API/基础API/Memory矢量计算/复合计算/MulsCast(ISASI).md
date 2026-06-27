@@ -68,7 +68,7 @@ __aicore__ inline void MulsCast(const T2 &dst, const T3 &src0, const T4 &src1, c
 | src0/src1 | 输入 | 源操作数。<br>&bull; 类型为LocalTensor时，支持当作矢量操作数或标量单点元素，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。<br>Ascend 950PR/Ascend 950DT，支持的数据类型为：float<br>&bull; 类型为标量时：<br>Ascend 950PR/Ascend 950DT，支持的数据类型为：float |
 | count | 输入 | 参与计算的元素个数。 |
 
-**表3**  精度转换规则<a id="表3-精度转换规则"></a>
+**表3**  精度转换规则
 
 | src类型 | dst类型 | 类型转换模式介绍 |
 | :----- | :------ | :------------- |
@@ -88,8 +88,7 @@ __aicore__ inline void MulsCast(const T2 &dst, const T3 &src0, const T4 &src1, c
 -   左操作数及右操作数中，必须有一个为矢量；当前不支持左右操作数同时为标量。
 -   本接口传入LocalTensor单点数据作为标量时，idx参数需要传入编译期已知的常量，传入变量时需要声明为constexpr。
 - <!-- npu="950" id9 -->
-  针对Ascend 950PR/Ascend 950DT，有如下约束说明：
-  - 该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count取值为0时，不保证该接口将被视为NOP（空操作）。
+  针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count取值为0时，不保证该接口将被视为NOP（空操作）。
   <!-- end id9 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>

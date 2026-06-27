@@ -132,8 +132,7 @@ $$
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
   <!-- end id9 -->
 - <!-- npu="950" id10 -->
-  针对Ascend 950PR/Ascend 950DT，有如下约束说明：
-  - 该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
+  针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
   <!-- end id10 -->
 - 该接口需要与`SetDeqScale`配合使用，关系映射表如下：
 

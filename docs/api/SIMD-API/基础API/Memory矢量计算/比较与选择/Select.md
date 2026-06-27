@@ -225,6 +225,7 @@ Kirin 9030，支持模式0、1、2。
 - <!-- npu="950" id10 -->
   针对Ascend 950PR/Ascend 950DT，有如下约束说明：
   - int8\_t/uint8\_t/complex32/int64\_t/uint64\_t/complex64数据类型仅支持tensor前n个数据计算接口。
+  - 该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
   <!-- end id10 -->
 
 <cann-filter npu-type = "910b，A3，310p">

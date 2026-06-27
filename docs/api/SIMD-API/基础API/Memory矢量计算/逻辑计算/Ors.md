@@ -97,7 +97,9 @@ $dst_i = scalar_{idx} | src_i$
 
 -   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 
--   针对Ascend 950PR/Ascend 950DT，uint64\_t/int64\_t数据类型仅支持Tensor前n个数据计算接口。
+-   针对Ascend 950PR/Ascend 950DT，有如下约束说明：
+    - uint64\_t/int64\_t数据类型仅支持Tensor前n个数据计算接口。
+    - tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。
 -   左操作数及右操作数中，必须有一个为矢量；当前不支持左右操作数同时为标量。
 -   本接口传入LocalTensor单点数据作为标量时，idx参数需要传入编译期已知的常量，传入变量时需要声明为constexpr。
 

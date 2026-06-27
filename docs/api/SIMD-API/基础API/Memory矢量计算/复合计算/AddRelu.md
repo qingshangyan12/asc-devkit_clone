@@ -97,7 +97,7 @@ Atlas 200I/500 A2 推理产品，支持的数据类型为：half、float。
 <!-- end id11 -->
 
 <!-- npu="310p" id12 -->
-Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、half、float。
+Atlas 推理系列产品 AI Core，支持的数据类型为：int16_t、half、float。
 <!-- end id12 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
