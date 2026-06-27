@@ -45,6 +45,9 @@ def Duplicate(scalarValue, dst, count):
     for i in range(count):     
         dst[i] = scalarValue
 ```
+<!-- npu="950" id27 -->
+针对Ascend 950PR/Ascend 950DT，为方便开发者使用，tensor前n个数据计算接口同时也支持直接传入Tensor，此时会将Tensor的第一个元素复制多次并填充到向量中。
+<!-- end id27 -->
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -94,7 +97,9 @@ def Duplicate(scalarValue, dst, count):
 | ------ | ------ | ------ |
 | dst | 输出 | 目的操作数，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT（存储位置为Unified Buffer）。LocalTensor的起始地址需要按照32字节对齐。|
 | scalarValue | 输入 | 被复制的源操作数，数据类型需与dst中元素的数据类型保持一致。|
-|<!-- npu="950" id11 --> src | 输入| 源操作数，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>数据类型需与dst中元素的数据类型保持一致。<br>当传入该参数时，会将src[0]复制多次并填充到向量中。<!-- end id11 -->|
+<!-- npu="950" id11 --> 
+| src | 输入| 源操作数，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>数据类型需与dst中元素的数据类型保持一致。<br>当传入该参数时，会将src[0]复制多次并填充到向量中。|
+<!-- end id11 -->
 | count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。|
 | mask/mask[] | 输入 | mask用于控制每次迭代内参与计算的元素。<br>设置详见[掩码操作](../掩码操作/掩码操作.md)。 |
 | repeatTime | 输入 | 指令迭代次数，每次迭代完成8个DataBlock的数据收集，取值范围：repeatTime∈[0,255]。|
@@ -185,15 +190,14 @@ def Duplicate(scalarValue, dst, count):
     AscendC::Duplicate<half>(dstLocal, inputVal, srcDataSize);
     ```
 
-<!-- npu="950" id25 -->
+<!-- npu="950" id26 -->
 
 - tensor前n个数据计算样例，源操作数为Tensor
     ```cpp
     AscendC::Duplicate<half>(dstLocal, srcLocal, srcDataSize);
     ```
-<!-- end id25 -->
+<!-- end id26 -->
 结果示例如下：
-
 ```plain
 scalar: 18.0
 srcLocal: [18.0 1.0 2.0 ... 254.0 255.0]

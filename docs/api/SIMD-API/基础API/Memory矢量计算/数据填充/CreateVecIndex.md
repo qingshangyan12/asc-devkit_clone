@@ -120,9 +120,9 @@ def CreateVecIndex(dst, firstValue, count):
   <!-- end id16 -->
 <!-- end id12 -->
 
-- <!-- npu="950" id17 -->
-  针对Ascend 950PR/Ascend 950DT：int8_t/int64_t数据类型仅支持tensor前n个数据计算接口。
-  <!-- end id17 -->
+<!-- npu="950" id17 -->
+- 针对Ascend 950PR/Ascend 950DT：int8_t/int64_t数据类型仅支持tensor前n个数据计算接口。
+<!-- end id17 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
