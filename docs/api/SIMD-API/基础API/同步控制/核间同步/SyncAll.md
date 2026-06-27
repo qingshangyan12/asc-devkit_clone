@@ -32,7 +32,7 @@
 - Kirin 9030：支持
 <!-- end id9 -->
 
-### 硬同步原型
+### 硬同步（不支持config指定流水）原型
 
 <!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
@@ -60,6 +60,36 @@
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
 - Kirin 9030：支持
+<!-- end id9 -->
+
+### 硬同步（支持config指定流水）原型
+
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
+<!-- npu="x90" id8 -->
+- Kirin X90：不支持
+<!-- end id8 -->
+<!-- npu="9030" id9 -->
+- Kirin 9030：不支持
 <!-- end id9 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -91,22 +121,18 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
     ```
 
 - 硬同步
+    - 不支持config指定流水
 
     ```cpp
     template <bool isAIVOnly = true>
     __aicore__ inline void SyncAll()
     ```
 
-    <cann-filter npu-type="950">
-
-    以下函数原型仅支持Ascend 950PR/Ascend 950DT型号。
-
+    - 支持config指定流水
     ```cpp
     template <bool isAIVOnly = true, const SyncAllConfig& config = DEFAULT_SYNC_ALL_CONFIG>
     __aicore__ inline void SyncAll()
     ```
-
-    </cann-filter>
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
@@ -114,21 +140,8 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 
 | 参数名 | 描述 |
 | --- | --- |
-| isAIVOnly | 控制SyncAll作用于纯Vector算子或融合（Cube和Vector融合）算子。可选值：<br>&bull; **true**（默认值）：纯Vector算子的全核同步，仅执行Vector核的全核同步。<br>&bull; **false**：融合算子的全核同步，先分别完成Vector核和Cube核的全核同步，再执行两者之间的同步（软同步接口不支持此功能）。 |
-| <cann-filter npu-type="950"> config | 该参数仅在Ascend 950PR/Ascend 950DT上支持。<br>控制SyncAll函数的行为，在多个AI Core之间进行流水线同步时，指定哪些管道（pipe）用于触发和等待。<br>&bull; **triggerPipe**：指定哪个管道用于”发送触发信号“。<br>&bull; **waitPipe**：指定哪个管道用于”接收等待信号“。<br>默认为SyncAllConfig DEFAULT_SYNC_ALL_CONFIG= {PIPE_ALL, PIPE_ALL}，使用全部管道来进行触发和等待行为。</cann-filter> |
-
-**表 1**  模板参数说明（架构2201）
-
-| 参数名 | 描述 |
-| --- | --- |
 | isAIVOnly | 控制SyncAll作用于纯Vector算子或Mix（包含Cube和Vector计算）算子。可选值：<br>&bull; **true**（默认值）：纯Vector算子的全核同步，仅执行Vector核的全核同步。<br>&bull; **false**：Mix（包含Cube和Vector计算）算子的全核同步，先分别完成Vector核和Cube核的全核同步，再执行两者之间的同步（软同步接口不支持此功能）。 |
-
-**表 2**  模板参数说明（架构3510）
-
-| 参数名 | 描述 |
-| --- | --- |
-| isAIVOnly | 控制SyncAll作用于纯Vector算子或Mix（包含Cube和Vector计算）算子。可选值：<br>&bull; **true**（默认值）：纯Vector算子的全核同步，仅执行Vector核的全核同步。<br>&bull; **false**：Mix（包含Cube和Vector计算）算子的全核同步，先分别完成Vector核和Cube核的全核同步，再执行两者之间的同步（软同步接口不支持此功能）。 |
-| config | **该配置仅当isAIVOnly=True时有效。**<br><pre>struct SyncAllConfig {&#x000A;    pipe_t triggerPipe;&#x000A;    pipe_t waitPipe;&#x000A;};&#x000A;&#x000A;constexpr SyncAllConfig DEFAULT_SYNC_ALL_CONFIG = {PIPE_ALL, PIPE_ALL};</pre><br>控制SyncAll函数的行为，在多个AI Core之间进行流水线同步时，指定哪些管道（pipe）用于触发和等待。<br>&bull; **triggerPipe**：指定哪个管道用于"发送触发信号"。仅支持MTE2、MTE3、PIPE_ALL。<br>&bull; **waitPipe**：指定哪个管道用于"接收等待信号"。仅支持MTE2、MTE3、PIPE_ALL。<br><pre>// 多个AIV进行计算&#x000A;Compute();&#x000A;// 多个AIV将计算结果搬出到GM&#x000A;CopyToGM();&#x000A;// 等待所有数据拷贝到GM后，进行累加&#x000A;constexpr AscendC::SyncAllConfig CustomConfig = {PIPE_MTE3, PIPE_ALL};&#x000A;AscendC::SyncAll&lt;true, CustomConfig&gt;();&#x000A;for (int i = 0; i &lt; blockNum; i++) {&#x000A;    if (i != blockIdx) {&#x000A;        CopyFromGm();&#x000A;        Accumulate();&#x000A;    }&#x000A;}&#x000A;// 累加后的数据写回&#x000A;CopyToGm();</pre><br>默认使用全部管道来进行触发和等待行为，与A2/A3兼容。 |
+| config | **该配置仅当isAIVOnly=True时有效。**<br><pre>struct SyncAllConfig {&#x000A;    pipe_t triggerPipe;&#x000A;    pipe_t waitPipe;&#x000A;};&#x000A;&#x000A;// 默认使用全部流水来进行触发和等待行为。<br>constexpr SyncAllConfig DEFAULT_SYNC_ALL_CONFIG = {PIPE_ALL, PIPE_ALL};</pre><br>控制SyncAll函数的行为，在多个AI Core之间进行流水同步时，指定哪些流水（pipe）用于触发和等待。<br>&bull; **triggerPipe**：指定哪个流水用于"发送触发信号"。仅支持MTE2、MTE3、PIPE_ALL。<br>&bull; **waitPipe**：指定哪个流水用于"接收等待信号"。仅支持MTE2、MTE3、PIPE_ALL。<br><pre>// 多个AIV进行计算&#x000A;Compute();&#x000A;// 多个AIV将计算结果搬出到GM&#x000A;CopyToGM();&#x000A;// 等待所有数据拷贝到GM后，进行累加&#x000A;constexpr AscendC::SyncAllConfig CustomConfig = {PIPE_MTE3, PIPE_ALL};&#x000A;AscendC::SyncAll&lt;true, CustomConfig&gt;();&#x000A;for (int i = 0; i &lt; blockNum; i++) {&#x000A;    if (i != blockIdx) {&#x000A;        CopyFromGm();&#x000A;        Accumulate();&#x000A;    }&#x000A;}&#x000A;// 累加后的数据写回&#x000A;CopyToGm();</pre> |
 
 **表2**  参数说明
 
