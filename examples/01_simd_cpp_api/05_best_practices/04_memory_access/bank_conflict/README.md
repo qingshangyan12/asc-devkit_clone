@@ -58,7 +58,7 @@ UB 18 位地址编码遵循如下规则：
 | BG[3:0] | `0001` | 1 | bank_group_id = 1 |
 | BANK_WIDTH[4:0] | `00000` | 0 | offset = 0 |
 
-结合 [UB 内存结构图](#ubunified-buffer-内存结构)和 bank 编号规则，该地址位于 bank group 1 内 bank_id 为 1 的 bank，即全局 bank 17（`1 + 1 × 16 = 17`），行号为 0。
+结合上述的UB内存结构图和 bank 编号规则，该地址位于 bank group 1 内 bank_id 为 1 的 bank，即全局 bank 17（`1 + 1 × 16 = 17`），行号为 0。
 
 ## bank冲突类型
 
@@ -384,7 +384,7 @@ UB 18 位地址编码遵循如下规则：
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
 
   ```bash
   source ${install_path}/cann/set_env.sh
