@@ -614,7 +614,6 @@ __simd_callee__ inline void asc_loadalign_unpack_impl(vector_float& dst, __ubuf_
 }
 
 // offset = 0, unpack_v2
-[[deprecated("NOTICE: asc_loadalign_unpack_v2_impl is deprecated. Currently asc_loadalign_unpack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_int8_t& dst, __ubuf__ int8_t* src)
 {
     if ASC_IS_AIV {
@@ -622,7 +621,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_int8_t& dst, __u
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2_impl is deprecated. Currently asc_loadalign_unpack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_uint8_t& dst, __ubuf__ uint8_t* src)
 {
     if ASC_IS_AIV {
@@ -630,7 +628,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_uint8_t& dst, __
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2_impl is deprecated. Currently asc_loadalign_unpack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
     if ASC_IS_AIV {
@@ -639,7 +636,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp4x2_e2m1_t& ds
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2_impl is deprecated. Currently asc_loadalign_unpack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src)
 {
     if ASC_IS_AIV {
@@ -648,7 +644,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp4x2_e1m2_t& ds
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2_impl is deprecated. Currently asc_loadalign_unpack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
 {
     if ASC_IS_AIV {
@@ -657,7 +652,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_int4x2_t& dst, _
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2_impl is deprecated. Currently asc_loadalign_unpack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src)
 {
     if ASC_IS_AIV {
@@ -666,7 +660,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp8_e8m0_t& dst,
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2_impl is deprecated. Currently asc_loadalign_unpack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src)
 {
     if ASC_IS_AIV {
@@ -675,7 +668,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp8_e5m2_t& dst,
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2_impl is deprecated. Currently asc_loadalign_unpack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src)
 {
     if ASC_IS_AIV {
@@ -684,7 +676,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp8_e4m3fn_t& ds
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2_impl is deprecated. Currently asc_loadalign_unpack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
 {
     if ASC_IS_AIV {
@@ -693,7 +684,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_hifloat8_t& dst,
 }
 
 // offset = 0, brc_v2
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_int8_t& dst, __ubuf__ int8_t* src)
 {
     if ASC_IS_AIV {
@@ -701,7 +691,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_int8_t& dst, __ubuf
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_uint8_t& dst, __ubuf__ uint8_t* src)
 {
     if ASC_IS_AIV {
@@ -709,7 +698,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_uint8_t& dst, __ubu
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
 {
     if ASC_IS_AIV {
@@ -718,7 +706,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp4x2_e2m1_t& dst, 
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src)
 {
     if ASC_IS_AIV {
@@ -727,7 +714,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp4x2_e1m2_t& dst, 
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
 {
     if ASC_IS_AIV {
@@ -736,7 +722,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_int4x2_t& dst, __ub
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src)
 {
     if ASC_IS_AIV {
@@ -745,7 +730,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp8_e8m0_t& dst, __
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src)
 {
     if ASC_IS_AIV {
@@ -754,7 +738,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp8_e5m2_t& dst, __
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src)
 {
     if ASC_IS_AIV {
@@ -763,7 +746,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp8_e4m3fn_t& dst, 
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
 {
     if ASC_IS_AIV {
@@ -771,7 +753,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_hifloat8_t& dst, __
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
     if ASC_IS_AIV {
@@ -779,7 +760,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_int16_t& dst, __ubu
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_uint16_t& dst, __ubuf__ uint16_t* src)
 {
     if ASC_IS_AIV {
@@ -787,7 +767,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_uint16_t& dst, __ub
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_half& dst, __ubuf__ half* src)
 {
     if ASC_IS_AIV {
@@ -795,7 +774,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_half& dst, __ubuf__
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src)
 {
     if ASC_IS_AIV {
@@ -803,7 +781,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_bfloat16_t& dst, __
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_int32_t& dst, __ubuf__ int32_t* src)
 {
     if ASC_IS_AIV {
@@ -811,7 +788,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_int32_t& dst, __ubu
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_uint32_t& dst, __ubuf__ uint32_t* src)
 {
     if ASC_IS_AIV {
@@ -819,7 +795,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_uint32_t& dst, __ub
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_float& dst, __ubuf__ float* src)
 {
     if ASC_IS_AIV {
@@ -828,7 +803,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_float& dst, __ubuf_
 }
 
 // offset = 0, brc_v3
-[[deprecated("NOTICE: asc_loadalign_brc_v3_impl is deprecated. Currently asc_loadalign_brc_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_int16_t& dst, __ubuf__ int16_t* src)
 {
     if ASC_IS_AIV {
@@ -836,7 +810,6 @@ __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_int16_t& dst, __ubu
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3_impl is deprecated. Currently asc_loadalign_brc_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_uint16_t& dst, __ubuf__ uint16_t* src)
 {
     if ASC_IS_AIV {
@@ -844,7 +817,6 @@ __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_uint16_t& dst, __ub
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3_impl is deprecated. Currently asc_loadalign_brc_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_half& dst, __ubuf__ half* src)
 {
     if ASC_IS_AIV {
@@ -852,7 +824,6 @@ __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_half& dst, __ubuf__
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3_impl is deprecated. Currently asc_loadalign_brc_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src)
 {
     if ASC_IS_AIV {
@@ -860,7 +831,6 @@ __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_bfloat16_t& dst, __
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3_impl is deprecated. Currently asc_loadalign_brc_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_int32_t& dst, __ubuf__ int32_t* src)
 {
     if ASC_IS_AIV {
@@ -868,7 +838,6 @@ __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_int32_t& dst, __ubu
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3_impl is deprecated. Currently asc_loadalign_brc_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_uint32_t& dst, __ubuf__ uint32_t* src)
 {
     if ASC_IS_AIV {
@@ -876,7 +845,6 @@ __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_uint32_t& dst, __ub
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3_impl is deprecated. Currently asc_loadalign_brc_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_float& dst, __ubuf__ float* src)
 {
     if ASC_IS_AIV {
@@ -1594,7 +1562,6 @@ __simd_callee__ inline void asc_loadalign_unpack_impl(vector_float& dst, __ubuf_
 }
 
 // int32_t offset, unpack_v2
-[[deprecated("NOTICE: asc_loadalign_unpack_v2_impl is deprecated. Currently asc_loadalign_unpack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1602,7 +1569,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_int8_t& dst, __u
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2_impl is deprecated. Currently asc_loadalign_unpack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_uint8_t& dst, __ubuf__ uint8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1610,7 +1576,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_uint8_t& dst, __
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2_impl is deprecated. Currently asc_loadalign_unpack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1619,7 +1584,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp4x2_e2m1_t& ds
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2_impl is deprecated. Currently asc_loadalign_unpack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1628,7 +1592,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp4x2_e1m2_t& ds
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2_impl is deprecated. Currently asc_loadalign_unpack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1637,7 +1600,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_int4x2_t& dst, _
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2_impl is deprecated. Currently asc_loadalign_unpack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1646,7 +1608,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp8_e8m0_t& dst,
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2_impl is deprecated. Currently asc_loadalign_unpack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1655,7 +1616,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp8_e5m2_t& dst,
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2_impl is deprecated. Currently asc_loadalign_unpack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1664,7 +1624,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_fp8_e4m3fn_t& ds
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_unpack_v2_impl is deprecated. Currently asc_loadalign_unpack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1673,7 +1632,6 @@ __simd_callee__ inline void asc_loadalign_unpack_v2_impl(vector_hifloat8_t& dst,
 }
 
 // int32_t offset, brc_v2
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1681,7 +1639,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_int8_t& dst, __ubuf
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_uint8_t& dst, __ubuf__ uint8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1689,7 +1646,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_uint8_t& dst, __ubu
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1698,7 +1654,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp4x2_e2m1_t& dst, 
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1707,7 +1662,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp4x2_e1m2_t& dst, 
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1716,7 +1670,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_int4x2_t& dst, __ub
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1725,7 +1678,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp8_e8m0_t& dst, __
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1734,7 +1686,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp8_e5m2_t& dst, __
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1743,7 +1694,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_fp8_e4m3fn_t& dst, 
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1751,7 +1701,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_hifloat8_t& dst, __
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1759,7 +1708,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_int16_t& dst, __ubu
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_uint16_t& dst, __ubuf__ uint16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1767,7 +1715,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_uint16_t& dst, __ub
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_half& dst, __ubuf__ half* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1775,7 +1722,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_half& dst, __ubuf__
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1783,7 +1729,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_bfloat16_t& dst, __
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_int32_t& dst, __ubuf__ int32_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1791,7 +1736,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_int32_t& dst, __ubu
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_uint32_t& dst, __ubuf__ uint32_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1799,7 +1743,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_uint32_t& dst, __ub
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v2_impl is deprecated. Currently asc_loadalign_brc_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_float& dst, __ubuf__ float* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1808,7 +1751,6 @@ __simd_callee__ inline void asc_loadalign_brc_v2_impl(vector_float& dst, __ubuf_
 }
 
 // int32_t offset, brc_v3
-[[deprecated("NOTICE: asc_loadalign_brc_v3_impl is deprecated. Currently asc_loadalign_brc_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1816,7 +1758,6 @@ __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_int16_t& dst, __ubu
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3_impl is deprecated. Currently asc_loadalign_brc_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_uint16_t& dst, __ubuf__ uint16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1824,7 +1765,6 @@ __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_uint16_t& dst, __ub
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3_impl is deprecated. Currently asc_loadalign_brc_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_half& dst, __ubuf__ half* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1832,7 +1772,6 @@ __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_half& dst, __ubuf__
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3_impl is deprecated. Currently asc_loadalign_brc_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1840,7 +1779,6 @@ __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_bfloat16_t& dst, __
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3_impl is deprecated. Currently asc_loadalign_brc_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_int32_t& dst, __ubuf__ int32_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1848,7 +1786,6 @@ __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_int32_t& dst, __ubu
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3_impl is deprecated. Currently asc_loadalign_brc_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_uint32_t& dst, __ubuf__ uint32_t* src, int32_t offset)
 {
     if ASC_IS_AIV {
@@ -1856,7 +1793,6 @@ __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_uint32_t& dst, __ub
     }
 }
 
-[[deprecated("NOTICE: asc_loadalign_brc_v3_impl is deprecated. Currently asc_loadalign_brc_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v3_impl(vector_float& dst, __ubuf__ float* src, int32_t offset)
 {
     if ASC_IS_AIV {

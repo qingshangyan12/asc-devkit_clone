@@ -1,4 +1,4 @@
-# asc_half2uint8
+# asc_half2uint8 (废弃)
 
 ## 产品支持情况
 
