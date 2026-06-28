@@ -93,4 +93,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     case_num = args.case if args.case is not None else int(os.environ.get("CASE_NUM", "1"))
+    if case_num not in STRIDE_CONFIGS:
+        print(f"[ERROR] Invalid case_num={case_num}. Valid range: 1-8")
+        exit(1)
     gen_golden_data(case_num)
