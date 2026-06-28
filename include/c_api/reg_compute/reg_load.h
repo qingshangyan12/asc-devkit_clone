@@ -796,6 +796,7 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate(vector_int32_t& dst, __
 __simd_callee__ inline void asc_loadalign_brc_postupdate(vector_uint32_t& dst, __ubuf__ uint32_t*& src, int32_t offset);
 
 __simd_callee__ inline void asc_loadalign_brc_postupdate(vector_float& dst, __ubuf__ float*& src, int32_t offset);
+__simd_callee__ inline void asc_loadalign_brc_elem_postupdate(vector_float& dst, __ubuf__ float*& src, int32_t offset);
 
 __simd_callee__ inline void asc_loadalign_upsample_postupdate(
     vector_int8_t& dst, __ubuf__ int8_t*& src, int32_t offset);
@@ -943,6 +944,7 @@ __simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t*& src, int32_t offset);
 
 __simd_callee__ inline void asc_loadalign_unpack_postupdate_v2(
+__simd_callee__ inline void asc_loadalign_unpack4_postupdate(
     vector_hifloat8_t& dst, __ubuf__ hifloat8_t*& src, int32_t offset);
 
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_int8_t& dst, __ubuf__ int8_t*& src, int32_t offset);
@@ -989,6 +991,7 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(
     vector_uint32_t& dst, __ubuf__ uint32_t*& src, int32_t offset);
 
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v2(vector_float& dst, __ubuf__ float*& src, int32_t offset);
+__simd_callee__ inline void asc_loadalign_brc_datablock_postupdate(vector_float& dst, __ubuf__ float*& src, int32_t offset);
 
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v3(
     vector_int16_t& dst, __ubuf__ int16_t*& src, int32_t offset);
@@ -1008,6 +1011,7 @@ __simd_callee__ inline void asc_loadalign_brc_postupdate_v3(
     vector_uint32_t& dst, __ubuf__ uint32_t*& src, int32_t offset);
 
 __simd_callee__ inline void asc_loadalign_brc_postupdate_v3(vector_float& dst, __ubuf__ float*& src, int32_t offset);
+__simd_callee__ inline void asc_loadalign_brc_elem2datablock_postupdate(vector_float& dst, __ubuf__ float*& src, int32_t offset);
 
 __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
     vector_int8_t& dst0, vector_int8_t& dst1, __ubuf__ int8_t*& src, int32_t offset);

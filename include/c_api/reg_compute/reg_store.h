@@ -449,6 +449,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ uint32_t*
     vector_bool mask);
 
 __simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ float*& dst_align32b, vector_float src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_quarter_postupdate(__ubuf__ float*& dst_align32b, vector_float src, int32_t offset,
     vector_bool mask);
 
 // ==========通过地址寄存器传入偏移，用户可以选择更新偏移或者更新目的操作数的地址=========
