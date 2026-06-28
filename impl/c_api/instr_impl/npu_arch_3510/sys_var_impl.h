@@ -39,6 +39,11 @@ __aicore__ inline int64_t asc_get_ar_spr()
     return asc_get_ar_spr_impl();
 }
 
+__aicore__ inline int64_t asc_get_squeeze_status()
+{
+    return asc_get_ar_spr_impl();
+}
+
 __aicore__ inline int64_t asc_get_program_counter()
 {
     return asc_get_program_counter_impl();

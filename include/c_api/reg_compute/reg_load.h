@@ -1403,6 +1403,7 @@ __simd_callee__ inline void asc_loadalign_brc(vector_uint32_t& dst, __ubuf__ uin
 __simd_callee__ inline void asc_loadalign_brc(vector_int32_t& dst, __ubuf__ int32_t* src, iter_reg offset);
 
 __simd_callee__ inline void asc_loadalign_brc(vector_float& dst, __ubuf__ float* src, iter_reg offset);
+__simd_callee__ inline void asc_loadalign_brc_elem(vector_float& dst, __ubuf__ float* src, iter_reg offset);
 
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, iter_reg offset);
 
@@ -1537,6 +1538,7 @@ __simd_callee__ inline void asc_loadalign_unpack_v2(vector_hifloat8_t& dst, __ub
 __simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, iter_reg offset);
 
 __simd_callee__ inline void asc_loadalign_unpack_v2(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, iter_reg offset);
+__simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, iter_reg offset);
 
 __simd_callee__ inline void asc_loadalign_brc_v2(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, iter_reg offset);
 
@@ -1569,6 +1571,7 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_uint32_t& dst, __ubuf__ 
 __simd_callee__ inline void asc_loadalign_brc_v2(vector_int32_t& dst, __ubuf__ int32_t* src, iter_reg offset);
 
 __simd_callee__ inline void asc_loadalign_brc_v2(vector_float& dst, __ubuf__ float* src, iter_reg offset);
+__simd_callee__ inline void asc_loadalign_brc_datablock(vector_float& dst, __ubuf__ float* src, iter_reg offset);
 
 /// brc_v3(B16/B32)
 __simd_callee__ inline void asc_loadalign_brc_v3(vector_uint16_t& dst, __ubuf__ uint16_t* src, iter_reg offset);
@@ -1584,6 +1587,7 @@ __simd_callee__ inline void asc_loadalign_brc_v3(vector_uint32_t& dst, __ubuf__ 
 __simd_callee__ inline void asc_loadalign_brc_v3(vector_int32_t& dst, __ubuf__ int32_t* src, iter_reg offset);
 
 __simd_callee__ inline void asc_loadalign_brc_v3(vector_float& dst, __ubuf__ float* src, iter_reg offset);
+__simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_float& dst, __ubuf__ float* src, iter_reg offset);
 
 //==============asc_scatter=============
 __simd_callee__ inline void asc_scatter(vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask);

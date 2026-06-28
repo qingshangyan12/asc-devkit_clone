@@ -996,6 +996,12 @@ __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__ float* dst_align32b,
     asc_storealign_pack_v2_impl(dst_align32b, src, offset, mask);
 }
 
+__simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ float* dst_align32b, vector_float src, int32_t offset,
+    vector_bool mask)
+{
+    asc_storealign_pack_v2_impl(dst_align32b, src, offset, mask);
+}
+
 // storealign_intlv
 __simd_callee__ inline void asc_storealign_intlv(__ubuf__  int8_t* dst_align32b, vector_int8_t src0,
     vector_int8_t src1, int32_t offset)
@@ -3633,6 +3639,11 @@ __simd_callee__ inline void asc_loadalign_brc(vector_float& dst, __ubuf__ float*
     asc_loadalign_brc_impl(dst, src, offset);
 }
 
+__simd_callee__ inline void asc_loadalign_brc_elem(vector_float& dst, __ubuf__ float* src, int32_t offset)
+{
+    asc_loadalign_brc_impl(dst, src, offset);
+}
+
 __simd_callee__ inline void asc_loadalign_upsample(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 {
     asc_loadalign_upsample_impl(dst, src, offset);
@@ -3897,6 +3908,11 @@ __simd_callee__ inline void asc_loadalign_unpack_v2(vector_hifloat8_t& dst, __ub
     asc_loadalign_unpack_v2_impl(dst, src, offset);
 }
 
+__simd_callee__ inline void asc_loadalign_unpack4(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
+{
+    asc_loadalign_unpack_v2_impl(dst, src, offset);
+}
+
 [[deprecated("NOTICE: asc_loadalign_brc_v2 is deprecated. Currently asc_loadalign_brc_v2 is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v2(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 {
@@ -3993,6 +4009,11 @@ __simd_callee__ inline void asc_loadalign_brc_v2(vector_float& dst, __ubuf__ flo
     asc_loadalign_brc_v2_impl(dst, src, offset);
 }
 
+__simd_callee__ inline void asc_loadalign_brc_datablock(vector_float& dst, __ubuf__ float* src, int32_t offset)
+{
+    asc_loadalign_brc_v2_impl(dst, src, offset);
+}
+
 [[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. Currently asc_loadalign_brc_v3 is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v3(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset)
 {
@@ -4031,6 +4052,11 @@ __simd_callee__ inline void asc_loadalign_brc_v3(vector_uint32_t& dst, __ubuf__ 
 
 [[deprecated("NOTICE: asc_loadalign_brc_v3 is deprecated. Currently asc_loadalign_brc_v3 is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_loadalign_brc_v3(vector_float& dst, __ubuf__ float* src, int32_t offset)
+{
+    asc_loadalign_brc_v3_impl(dst, src, offset);
+}
+
+__simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_float& dst, __ubuf__ float* src, int32_t offset)
 {
     asc_loadalign_brc_v3_impl(dst, src, offset);
 }
