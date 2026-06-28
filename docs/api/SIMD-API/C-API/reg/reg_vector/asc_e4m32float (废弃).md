@@ -1,4 +1,4 @@
-# asc_e4m32float
+# asc_e4m32float (废弃)
 
 ## 产品支持情况
 

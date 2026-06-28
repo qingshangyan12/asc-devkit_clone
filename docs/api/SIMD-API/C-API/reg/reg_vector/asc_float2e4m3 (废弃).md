@@ -1,4 +1,4 @@
-# asc_float2e4m3
+# asc_float2e4m3 (废弃)
 
 ## 产品支持情况
 

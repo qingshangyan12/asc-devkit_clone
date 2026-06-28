@@ -1,4 +1,4 @@
-# asc_e1m2x22bfloat16
+# asc_e1m2x22bfloat16 (废弃)
 
 ## 产品支持情况
 

@@ -1,4 +1,4 @@
-# asc_float2hif8
+# asc_float2hif8 (废弃)
 
 ## 产品支持情况
 

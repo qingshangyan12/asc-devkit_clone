@@ -1,4 +1,4 @@
-# asc_int4x22half
+# asc_int4x22half (废弃)
 
 ## 产品支持情况
 
