@@ -74,13 +74,13 @@ UB 18 位地址编码遵循如下规则：
 
 > **性能说明**：下表"打点性能"为 Add 指令连续执行 1000 次的cycle数，数值越低性能越好。
 
-| scenario | 计算公式 | 场景描述 | bank 冲突情况 | src0 首地址 | src1 首地址 | dst 首地址 | 打点性能 | 备注 |
+| 场景（scenario） | 计算公式 | 场景描述 | bank 冲突情况 | src0 首地址 | src1 首地址 | dst 首地址 | 打点性能 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | dst = src0 + src1 | src0/src1/dst 首地址分布在不同 bank group 的不同 bank | 无读读、读写冲突 | 0 | 0x10100 | 0x20000 | 2418 | 基线性能参照（无bank冲突） |
 | 2 | dst = src0 + src1 | src0/src1 首地址在同一个 bank | **有读读冲突** | 0 | 0x4000 | 0x10000 | 4195 | 验证读读冲突（多个读操作访问同一个bank） |
 | 3 | dst = src0 + src1 | src0/src1 首地址在同一个 bank group | **有读读冲突** | 0 | 0x10000 | 0x14100 | 4195 | 验证读读冲突（多个读操作访问同一个bank group） |
 | 4 | dst = src0 + src1 | src0/dst 首地址在同一个 bank | 无读写冲突（硬件优化） | 0 | 0x10100 | 0x4000 | 2501 | 作为 scenario 5 的基线参照 |
-| 5 | dst = src0 + src1 | src0/dst 首地址不在同一个 bank | **有读写冲突** | 0 | 0x10100 | 0x4020 | 3612 | 验证读写冲突（对比scenario4） |
+| 5 | dst = src0 + src1 | src0/dst 首地址不在同一个 bank | **有读写冲突** | 0 | 0x10100 | 0x4020 | 3612 | 验证读写冲突（对比scenario 4） |
 | 6 | dst = src0 + src1 | src1/dst 首地址在同一个 bank，<br>src1/dst 地址完全重叠 | 无读写冲突（硬件优化） | 0 | 0x10100 | 0x10100 | 2501 | 验证src/dst地址重叠（无读写冲突，硬件优化） |
 | 7 | dst = src0 + src1 | src0 每次repeat重复读取同一 datablock（src0BlkStride=0, src0RepStride=1），<br>src1/dst 地址完全重叠 | **有读读冲突** | 0 | 0x10100 | 0x10100 | 3778 | 对比 scenario 6/scenario 8，验证 src0RepStride 配置跟bank冲突的关联 |
 | 8 | dst = src0 + src1 | src0 每次repeat重复读取同一 datablock（src0BlkStride=0, src0RepStride=8），<br>src1/dst 地址完全重叠 | 无读读、读写冲突 | 0 | 0x10100 | 0x10100 | 2501 | 对比 scenario 7，验证 src0RepStride 配置跟bank冲突的关联 |
