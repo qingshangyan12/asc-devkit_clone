@@ -32,6 +32,7 @@ __simd_callee__ inline void asc_e5m22float_impl(vector_float& dst, vector_fp8_e5
     }
 }
 
+[[deprecated("NOTICE: asc_e5m22float_v2_impl is deprecated. Currently asc_e5m22float_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_e5m22float_v2_impl(vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -39,6 +40,7 @@ __simd_callee__ inline void asc_e5m22float_v2_impl(vector_float& dst, vector_fp8
     }
 }
 
+[[deprecated("NOTICE: asc_e5m22float_v3_impl is deprecated. Currently asc_e5m22float_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_e5m22float_v3_impl(vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -46,6 +48,7 @@ __simd_callee__ inline void asc_e5m22float_v3_impl(vector_float& dst, vector_fp8
     }
 }
 
+[[deprecated("NOTICE: asc_e5m22float_v4_impl is deprecated. Currently asc_e5m22float_v4_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_e5m22float_v4_impl(vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask)
 {
     if ASC_IS_AIV {

@@ -20,6 +20,7 @@ __simd_callee__ inline void asc_int82int32_impl(vector_int32_t& dst, vector_int8
     }
 }
 
+[[deprecated("NOTICE: asc_int82int32_v2_impl is deprecated. Currently asc_int82int32_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_int82int32_v2_impl(vector_int32_t& dst, vector_int8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -27,6 +28,7 @@ __simd_callee__ inline void asc_int82int32_v2_impl(vector_int32_t& dst, vector_i
     }
 }
 
+[[deprecated("NOTICE: asc_int82int32_v3_impl is deprecated. Currently asc_int82int32_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_int82int32_v3_impl(vector_int32_t& dst, vector_int8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -34,6 +36,7 @@ __simd_callee__ inline void asc_int82int32_v3_impl(vector_int32_t& dst, vector_i
     }
 }
 
+[[deprecated("NOTICE: asc_int82int32_v4_impl is deprecated. Currently asc_int82int32_v4_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_int82int32_v4_impl(vector_int32_t& dst, vector_int8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {

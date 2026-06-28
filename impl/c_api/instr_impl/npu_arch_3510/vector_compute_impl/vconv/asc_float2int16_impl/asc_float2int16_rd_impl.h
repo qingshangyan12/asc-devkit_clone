@@ -34,6 +34,7 @@ __simd_callee__ inline void asc_float2int16_rd_sat_impl(vector_int16_t& dst, vec
     }
 }
 
+[[deprecated("NOTICE: asc_float2int16_rd_v2_impl is deprecated. Currently asc_float2int16_rd_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_float2int16_rd_v2_impl(vector_int16_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -41,6 +42,7 @@ __simd_callee__ inline void asc_float2int16_rd_v2_impl(vector_int16_t& dst, vect
     }
 }
 
+[[deprecated("NOTICE: asc_float2int16_rd_sat_v2_impl is deprecated. Currently asc_float2int16_rd_sat_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_float2int16_rd_sat_v2_impl(vector_int16_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {

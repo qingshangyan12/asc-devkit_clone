@@ -1,5 +1,5 @@
-
-# asc_loadalign
+ (废弃)
+# asc_loadalign (废弃)
 
 ## 产品支持情况
 

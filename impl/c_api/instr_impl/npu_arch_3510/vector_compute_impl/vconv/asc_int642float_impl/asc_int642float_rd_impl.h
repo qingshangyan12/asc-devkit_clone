@@ -32,6 +32,7 @@ __simd_callee__ inline void asc_int642float_rd_impl(vector_float& dst, vector_in
     }
 }
 
+[[deprecated("NOTICE: asc_int642float_rd_v2_impl is deprecated. Currently asc_int642float_rd_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_int642float_rd_v2_impl(vector_float& dst, vector_int64_t src, vector_bool mask)
 {
     if ASC_IS_AIV {

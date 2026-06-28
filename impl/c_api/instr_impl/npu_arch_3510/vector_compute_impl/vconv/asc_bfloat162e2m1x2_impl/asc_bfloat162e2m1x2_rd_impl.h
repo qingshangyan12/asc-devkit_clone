@@ -27,6 +27,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rd_impl(vector_fp4x2_e2m1_t& dst
     }
 }
 
+[[deprecated("NOTICE: asc_bfloat162e2m1x2_rd_v2_impl is deprecated. Currently asc_bfloat162e2m1x2_rd_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_bfloat162e2m1x2_rd_v2_impl(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -34,6 +35,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rd_v2_impl(vector_fp4x2_e2m1_t& 
     }
 }
 
+[[deprecated("NOTICE: asc_bfloat162e2m1x2_rd_v3_impl is deprecated. Currently asc_bfloat162e2m1x2_rd_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_bfloat162e2m1x2_rd_v3_impl(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -41,6 +43,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rd_v3_impl(vector_fp4x2_e2m1_t& 
     }
 }
 
+[[deprecated("NOTICE: asc_bfloat162e2m1x2_rd_v4_impl is deprecated. Currently asc_bfloat162e2m1x2_rd_v4_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_bfloat162e2m1x2_rd_v4_impl(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {

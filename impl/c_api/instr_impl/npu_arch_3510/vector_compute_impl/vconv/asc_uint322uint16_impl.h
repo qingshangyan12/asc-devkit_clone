@@ -34,6 +34,7 @@ __simd_callee__ inline void asc_uint322uint16_impl(vector_uint16_t& dst, vector_
     }
 }
 
+[[deprecated("NOTICE: asc_uint322uint16_sat_v2_impl is deprecated. Currently asc_uint322uint16_sat_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_uint322uint16_sat_v2_impl(vector_uint16_t& dst, vector_uint32_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -41,6 +42,7 @@ __simd_callee__ inline void asc_uint322uint16_sat_v2_impl(vector_uint16_t& dst, 
     }
 }
 
+[[deprecated("NOTICE: asc_uint322uint16_v2_impl is deprecated. Currently asc_uint322uint16_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_uint322uint16_v2_impl(vector_uint16_t& dst, vector_uint32_t src, vector_bool mask)
 {
     if ASC_IS_AIV {

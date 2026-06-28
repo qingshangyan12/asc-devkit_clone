@@ -32,6 +32,7 @@ __simd_callee__ inline void asc_int4x22half_impl(vector_half& dst, vector_int4x2
     }
 }
 
+[[deprecated("NOTICE: asc_int4x22half_v2_impl is deprecated. Currently asc_int4x22half_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_int4x22half_v2_impl(vector_half& dst, vector_int4x2_t src, vector_bool mask)
 {
     if ASC_IS_AIV{
@@ -39,6 +40,7 @@ __simd_callee__ inline void asc_int4x22half_v2_impl(vector_half& dst, vector_int
     }
 }
 
+[[deprecated("NOTICE: asc_int4x22half_v3_impl is deprecated. Currently asc_int4x22half_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_int4x22half_v3_impl(vector_half& dst, vector_int4x2_t src, vector_bool mask)
 {
     if ASC_IS_AIV{
@@ -46,6 +48,7 @@ __simd_callee__ inline void asc_int4x22half_v3_impl(vector_half& dst, vector_int
     }
 }
 
+[[deprecated("NOTICE: asc_int4x22half_v4_impl is deprecated. Currently asc_int4x22half_v4_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_int4x22half_v4_impl(vector_half& dst, vector_int4x2_t src, vector_bool mask)
 {
     if ASC_IS_AIV{

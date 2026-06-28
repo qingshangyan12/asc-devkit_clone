@@ -32,6 +32,7 @@ __simd_callee__ inline void asc_float2half_rn_sat_impl(vector_half& dst, vector_
     }
 }
 
+[[deprecated("NOTICE: asc_float2half_rn_v2_impl is deprecated. Currently asc_float2half_rn_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_float2half_rn_v2_impl(vector_half& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -39,6 +40,7 @@ __simd_callee__ inline void asc_float2half_rn_v2_impl(vector_half& dst, vector_f
     }
 }
 
+[[deprecated("NOTICE: asc_float2half_rn_sat_v2_impl is deprecated. Currently asc_float2half_rn_sat_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_float2half_rn_sat_v2_impl(vector_half& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {

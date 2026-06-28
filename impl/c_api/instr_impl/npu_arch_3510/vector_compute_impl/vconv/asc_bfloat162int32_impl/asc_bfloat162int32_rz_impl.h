@@ -39,6 +39,7 @@ __simd_callee__ inline void asc_bfloat162int32_rz_sat_impl(vector_int32_t& dst, 
     }
 }
 
+[[deprecated("NOTICE: asc_bfloat162int32_rz_v2_impl is deprecated. Currently asc_bfloat162int32_rz_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_bfloat162int32_rz_v2_impl(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -46,6 +47,7 @@ __simd_callee__ inline void asc_bfloat162int32_rz_v2_impl(vector_int32_t& dst, v
     }
 }
 
+[[deprecated("NOTICE: asc_bfloat162int32_rz_sat_v2_impl is deprecated. Currently asc_bfloat162int32_rz_sat_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_bfloat162int32_rz_sat_v2_impl(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {

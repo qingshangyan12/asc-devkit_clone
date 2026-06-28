@@ -372,6 +372,7 @@ __simd_callee__ inline void asc_storealign_pack_impl(__ubuf__  bfloat16_t* dst_a
 }
 
 // storealign_pack_v2
+[[deprecated("NOTICE: asc_storealign_pack_v2_impl is deprecated. Currently asc_storealign_pack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_storealign_pack_v2_impl(__ubuf__  int32_t* dst_align32b, vector_int32_t src,
     vector_bool mask)
 {
@@ -380,6 +381,7 @@ __simd_callee__ inline void asc_storealign_pack_v2_impl(__ubuf__  int32_t* dst_a
     }
 }
 
+[[deprecated("NOTICE: asc_storealign_pack_v2_impl is deprecated. Currently asc_storealign_pack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_storealign_pack_v2_impl(__ubuf__  uint32_t* dst_align32b, vector_uint32_t src,
     vector_bool mask)
 {
@@ -388,6 +390,7 @@ __simd_callee__ inline void asc_storealign_pack_v2_impl(__ubuf__  uint32_t* dst_
     }
 }
 
+[[deprecated("NOTICE: asc_storealign_pack_v2_impl is deprecated. Currently asc_storealign_pack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_storealign_pack_v2_impl(__ubuf__  float* dst_align32b, vector_float src,
     vector_bool mask)
 {
@@ -887,6 +890,7 @@ __simd_callee__ inline void asc_storealign_pack_impl(__ubuf__ bfloat16_t* dst_al
 }
 
 // storealign_pack_v2
+[[deprecated("NOTICE: asc_storealign_pack_v2_impl is deprecated. Currently asc_storealign_pack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_storealign_pack_v2_impl(__ubuf__ int32_t* dst_align32b, vector_int32_t src, int32_t offset,
     vector_bool mask)
 {
@@ -895,6 +899,7 @@ __simd_callee__ inline void asc_storealign_pack_v2_impl(__ubuf__ int32_t* dst_al
     }
 }
 
+[[deprecated("NOTICE: asc_storealign_pack_v2_impl is deprecated. Currently asc_storealign_pack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_storealign_pack_v2_impl(__ubuf__ uint32_t* dst_align32b, vector_uint32_t src, int32_t offset,
     vector_bool mask)
 {
@@ -903,6 +908,7 @@ __simd_callee__ inline void asc_storealign_pack_v2_impl(__ubuf__ uint32_t* dst_a
     }
 }
 
+[[deprecated("NOTICE: asc_storealign_pack_v2_impl is deprecated. Currently asc_storealign_pack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_storealign_pack_v2_impl(__ubuf__ float* dst_align32b, vector_float src, int32_t offset,
     vector_bool mask)
 {
@@ -1275,6 +1281,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate_impl(__ubuf__ bfloat1
 }
 
 // storealign_pack_v2
+[[deprecated("NOTICE: asc_storealign_pack_postupdate_v2_impl is deprecated. Currently asc_storealign_pack_postupdate_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_storealign_pack_postupdate_v2_impl(__ubuf__ int32_t*& dst_align32b, vector_int32_t src, int32_t offset,
     vector_bool mask)
 {
@@ -1283,6 +1290,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate_v2_impl(__ubuf__ int3
     }
 }
 
+[[deprecated("NOTICE: asc_storealign_pack_postupdate_v2_impl is deprecated. Currently asc_storealign_pack_postupdate_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_storealign_pack_postupdate_v2_impl(__ubuf__ uint32_t*& dst_align32b, vector_uint32_t src, int32_t offset,
     vector_bool mask)
 {
@@ -1291,6 +1299,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate_v2_impl(__ubuf__ uint
     }
 }
 
+[[deprecated("NOTICE: asc_storealign_pack_postupdate_v2_impl is deprecated. Currently asc_storealign_pack_postupdate_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_storealign_pack_postupdate_v2_impl(__ubuf__ float*& dst_align32b, vector_float src, int32_t offset,
     vector_bool mask)
 {
@@ -1646,6 +1655,7 @@ __simd_callee__ inline void asc_storealign_pack_impl(__ubuf__  bfloat16_t* dst_a
 }
 
 // storealign_pack_v2
+[[deprecated("NOTICE: asc_storealign_pack_v2_impl is deprecated. Currently asc_storealign_pack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_storealign_pack_v2_impl(__ubuf__  int32_t* dst_align32b, vector_int32_t src, iter_reg offset,
     vector_bool mask)
 {
@@ -1654,6 +1664,7 @@ __simd_callee__ inline void asc_storealign_pack_v2_impl(__ubuf__  int32_t* dst_a
     }
 }
 
+[[deprecated("NOTICE: asc_storealign_pack_v2_impl is deprecated. Currently asc_storealign_pack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_storealign_pack_v2_impl(__ubuf__  uint32_t* dst_align32b, vector_uint32_t src, iter_reg offset,
     vector_bool mask)
 {
@@ -1662,6 +1673,7 @@ __simd_callee__ inline void asc_storealign_pack_v2_impl(__ubuf__  uint32_t* dst_
     }
 }
 
+[[deprecated("NOTICE: asc_storealign_pack_v2_impl is deprecated. Currently asc_storealign_pack_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_storealign_pack_v2_impl(__ubuf__  float* dst_align32b, vector_float src, iter_reg offset,
     vector_bool mask)
 {

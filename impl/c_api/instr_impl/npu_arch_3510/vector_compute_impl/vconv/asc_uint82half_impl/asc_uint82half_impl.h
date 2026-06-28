@@ -20,6 +20,7 @@ __simd_callee__ inline void asc_uint82half_impl(vector_half& dst, vector_uint8_t
     }
 }
 
+[[deprecated("NOTICE: asc_uint82half_v2_impl is deprecated. Currently asc_uint82half_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_uint82half_v2_impl(vector_half& dst, vector_uint8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {

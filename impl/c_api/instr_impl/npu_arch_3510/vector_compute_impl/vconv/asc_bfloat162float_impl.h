@@ -25,6 +25,7 @@ __simd_callee__ inline void asc_bfloat162float_impl(vector_float& dst, vector_bf
     }
 }
 
+[[deprecated("NOTICE: asc_bfloat162float_v2_impl is deprecated. Currently asc_bfloat162float_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_bfloat162float_v2_impl(vector_float& dst, vector_bfloat16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {

@@ -32,6 +32,7 @@ __simd_callee__ inline void asc_half2int8_rd_sat_impl(vector_int8_t& dst, vector
     }
 }
 
+[[deprecated("NOTICE: asc_half2int8_rd_v2_impl is deprecated. Currently asc_half2int8_rd_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_half2int8_rd_v2_impl(vector_int8_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -39,6 +40,7 @@ __simd_callee__ inline void asc_half2int8_rd_v2_impl(vector_int8_t& dst, vector_
     }
 }
 
+[[deprecated("NOTICE: asc_half2int8_rd_sat_v2_impl is deprecated. Currently asc_half2int8_rd_sat_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_half2int8_rd_sat_v2_impl(vector_int8_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -60,6 +62,7 @@ __simd_callee__ inline void asc_half2int8_ru_sat_impl(vector_int8_t& dst, vector
     }
 }
 
+[[deprecated("NOTICE: asc_half2int8_ru_v2_impl is deprecated. Currently asc_half2int8_ru_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_half2int8_ru_v2_impl(vector_int8_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -67,6 +70,7 @@ __simd_callee__ inline void asc_half2int8_ru_v2_impl(vector_int8_t& dst, vector_
     }
 }
 
+[[deprecated("NOTICE: asc_half2int8_ru_sat_v2_impl is deprecated. Currently asc_half2int8_ru_sat_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_half2int8_ru_sat_v2_impl(vector_int8_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -88,6 +92,7 @@ __simd_callee__ inline void asc_half2int8_rz_sat_impl(vector_int8_t& dst, vector
     }
 }
 
+[[deprecated("NOTICE: asc_half2int8_rz_v2_impl is deprecated. Currently asc_half2int8_rz_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_half2int8_rz_v2_impl(vector_int8_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -95,6 +100,7 @@ __simd_callee__ inline void asc_half2int8_rz_v2_impl(vector_int8_t& dst, vector_
     }
 }
 
+[[deprecated("NOTICE: asc_half2int8_rz_sat_v2_impl is deprecated. Currently asc_half2int8_rz_sat_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_half2int8_rz_sat_v2_impl(vector_int8_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -116,6 +122,7 @@ __simd_callee__ inline void asc_half2int8_rn_sat_impl(vector_int8_t& dst, vector
     }
 }
 
+[[deprecated("NOTICE: asc_half2int8_rn_v2_impl is deprecated. Currently asc_half2int8_rn_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_half2int8_rn_v2_impl(vector_int8_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -123,6 +130,7 @@ __simd_callee__ inline void asc_half2int8_rn_v2_impl(vector_int8_t& dst, vector_
     }
 }
 
+[[deprecated("NOTICE: asc_half2int8_rn_sat_v2_impl is deprecated. Currently asc_half2int8_rn_sat_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_half2int8_rn_sat_v2_impl(vector_int8_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -144,6 +152,7 @@ __simd_callee__ inline void asc_half2int8_rna_sat_impl(vector_int8_t& dst, vecto
     }
 }
 
+[[deprecated("NOTICE: asc_half2int8_rna_v2_impl is deprecated. Currently asc_half2int8_rna_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_half2int8_rna_v2_impl(vector_int8_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -151,6 +160,7 @@ __simd_callee__ inline void asc_half2int8_rna_v2_impl(vector_int8_t& dst, vector
     }
 }
 
+[[deprecated("NOTICE: asc_half2int8_rna_sat_v2_impl is deprecated. Currently asc_half2int8_rna_sat_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_half2int8_rna_sat_v2_impl(vector_int8_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
