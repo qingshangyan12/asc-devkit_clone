@@ -1,4 +1,4 @@
-# asc_bfloat162float
+# asc_bfloat162float (废弃)
 
 ## 产品支持情况
 

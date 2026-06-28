@@ -1,4 +1,4 @@
-# asc_int642float
+# asc_int642float (废弃)
 
 ## 产品支持情况
 
