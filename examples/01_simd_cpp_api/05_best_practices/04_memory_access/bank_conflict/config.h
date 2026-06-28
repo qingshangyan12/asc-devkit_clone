@@ -8,6 +8,11 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+/* !
+ * \file config.h
+ * \brief Config for src and dst address.
+ */
+
 #ifndef BANK_CONFLICT_CONFIG_H
 #define BANK_CONFLICT_CONFIG_H
 
