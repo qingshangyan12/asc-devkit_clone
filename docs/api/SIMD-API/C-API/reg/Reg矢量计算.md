@@ -4,6 +4,10 @@
 
 - **[reg_load](reg_load/reg_load.md)**
 
+- **[reg_load (废弃)](<reg_load (废弃)/reg_load.md>)**
+
 - **[reg_store](reg_store/reg_store.md)**
+
+- **[reg_store (废弃)](<reg_store (废弃)/reg_store.md>)**
 
 - **[reg_vector](reg_vector/reg_vector.md)**
