@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于 Add 指令，通过配置不同的 LocalTensor 地址，验证和分析 UB（Unified Buffer）中的 bank 冲突和地址重叠对性能的影响。样例通过编译参数 `CASE_NUM` 选择不同的地址配置场景，共 8 个 case，覆盖无冲突、读读冲突、读写冲突、地址完全重叠等典型场景。
+本样例基于 Add 指令，通过配置不同的 LocalTensor 地址，验证和分析 UB（Unified Buffer）中的 bank 冲突和地址重叠对性能的影响。样例通过编译参数 `SCENARIO_NUM` 选择不同的地址配置场景，共 8 个 scenario，覆盖无冲突、读读冲突、读写冲突、地址完全重叠等典型场景。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -20,7 +20,7 @@
 │   │   └── verify_result.py               // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── figures                            // UB内存结构图及各场景读写示意图
 │   ├── CMakeLists.txt                     // 编译工程文件
-│   ├── config.h                           // 各CASE_NUM的地址配置
+│   ├── config.h                           // 各SCENARIO_NUM的地址配置
 │   ├── data_utils.h                       // 数据读入写出函数
 │   ├── bank_conflict.asc                  // Ascend C样例实现 & 调用样例
 │   └── README.md                          // 样例说明文档
@@ -70,24 +70,24 @@ UB 18 位地址编码遵循如下规则：
 
 ## 场景详细说明
 
-本样例围绕 bank 冲突和地址重叠两个角度展开验证分析。所有场景的输入数据类型为 `float`，数据长度为 4096，采用连续读写方式（`BlkStride = 1`，`RepStride = 8`，`mask = 64`），特殊配置在对应 case 中单独说明。核函数名为 `add_custom`。
+本样例围绕 bank 冲突和地址重叠两个角度展开验证分析。所有场景的输入数据类型为 `float`，数据长度为 4096，采用连续读写方式（`BlkStride = 1`，`RepStride = 8`，`mask = 64`），特殊配置在对应 scenario 中单独说明。核函数名为 `add_custom`。
 
 > **性能说明**：下表"打点性能"为 Add 指令连续执行 1000 次的cycle数，数值越低性能越好。
 
-| case | 计算公式 | 场景描述 | bank 冲突情况 | src0 首地址 | src1 首地址 | dst 首地址 | 打点性能 | 备注 |
+| scenario | 计算公式 | 场景描述 | bank 冲突情况 | src0 首地址 | src1 首地址 | dst 首地址 | 打点性能 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | dst = src0 + src1 | src0/src1/dst 首地址分布在不同 bank group 的不同 bank | 无读读、读写冲突 | 0 | 0x10100 | 0x20000 | 2418 | 基线性能参照（无bank冲突） |
 | 2 | dst = src0 + src1 | src0/src1 首地址在同一个 bank | **有读读冲突** | 0 | 0x4000 | 0x10000 | 4195 | 验证读读冲突（多个读操作访问同一个bank） |
 | 3 | dst = src0 + src1 | src0/src1 首地址在同一个 bank group | **有读读冲突** | 0 | 0x10000 | 0x14100 | 4195 | 验证读读冲突（多个读操作访问同一个bank group） |
-| 4 | dst = src0 + src1 | src0/dst 首地址在同一个 bank | 无读写冲突（硬件优化） | 0 | 0x10100 | 0x4000 | 2501 | 作为 case 5 的基线参照 |
-| 5 | dst = src0 + src1 | src0/dst 首地址不在同一个 bank | **有读写冲突** | 0 | 0x10100 | 0x4020 | 3612 | 验证读写冲突（对比case4） |
+| 4 | dst = src0 + src1 | src0/dst 首地址在同一个 bank | 无读写冲突（硬件优化） | 0 | 0x10100 | 0x4000 | 2501 | 作为 scenario 5 的基线参照 |
+| 5 | dst = src0 + src1 | src0/dst 首地址不在同一个 bank | **有读写冲突** | 0 | 0x10100 | 0x4020 | 3612 | 验证读写冲突（对比scenario4） |
 | 6 | dst = src0 + src1 | src1/dst 首地址在同一个 bank，<br>src1/dst 地址完全重叠 | 无读写冲突（硬件优化） | 0 | 0x10100 | 0x10100 | 2501 | 验证src/dst地址重叠（无读写冲突，硬件优化） |
-| 7 | dst = src0 + src1 | src0 每次repeat重复读取同一 datablock（src0BlkStride=0, src0RepStride=1），<br>src1/dst 地址完全重叠 | **有读读冲突** | 0 | 0x10100 | 0x10100 | 3778 | 对比 case 6/case 8，验证 src0RepStride 配置跟bank冲突的关联 |
-| 8 | dst = src0 + src1 | src0 每次repeat重复读取同一 datablock（src0BlkStride=0, src0RepStride=8），<br>src1/dst 地址完全重叠 | 无读读、读写冲突 | 0 | 0x10100 | 0x10100 | 2501 | 对比 case 7，验证 src0RepStride 配置跟bank冲突的关联 |
+| 7 | dst = src0 + src1 | src0 每次repeat重复读取同一 datablock（src0BlkStride=0, src0RepStride=1），<br>src1/dst 地址完全重叠 | **有读读冲突** | 0 | 0x10100 | 0x10100 | 3778 | 对比 scenario 6/scenario 8，验证 src0RepStride 配置跟bank冲突的关联 |
+| 8 | dst = src0 + src1 | src0 每次repeat重复读取同一 datablock（src0BlkStride=0, src0RepStride=8），<br>src1/dst 地址完全重叠 | 无读读、读写冲突 | 0 | 0x10100 | 0x10100 | 2501 | 对比 scenario 7，验证 src0RepStride 配置跟bank冲突的关联 |
 
-各 case 的详细分析见下文对应章节。
+各 scenario 的详细分析见下文对应章节。
 
-### Case 1：无读读冲突、无读写冲突
+### Scenario 1：无读读冲突、无读写冲突
 
 #### 地址解码
 
@@ -99,7 +99,7 @@ UB 18 位地址编码遵循如下规则：
 
 #### UB 读写示意
 
-![case1](./figures/case1.png)
+![scenario1](./figures/scenario1.png)
 
 - 每 8 个绿色数据块（32B）代表 src0 每次 repeat 读取的数据（256B）；
 - 每 8 个黄色数据块（32B）代表 src1 每次 repeat 读取的数据（256B）；
@@ -111,7 +111,7 @@ UB 18 位地址编码遵循如下规则：
 - 第1次repeat：src0（bank_id=0, bg 0-7）与 src1（bank_id=1, bg 8-15）：repeat 的所有 datablock 位于不同 bank group，后续 repeat 依次类推，**无读读冲突**。
 - 第1次repeat：src0/src1 读取与 dst 写入（bank_id=2, bg 0-7）：repeat 的所有 datablock 位于不同 bank，后续 repeat 依次类推，**无读写冲突**。
 
-### Case 2：src0/src1 首地址在同一个 bank——读读冲突
+### Scenario 2：src0/src1 首地址在同一个 bank——读读冲突
 
 #### 地址解码
 
@@ -123,7 +123,7 @@ UB 18 位地址编码遵循如下规则：
 
 #### UB 读写示意
 
-![case2](./figures/case2.png)
+![scenario2](./figures/scenario2.png)
 
 - 每 8 个绿色数据块（32B）代表 src0 每次 repeat 读取的数据（256B）；
 - 每 8 个黄色数据块（32B）代表 src1 每次 repeat 读取的数据（256B）；
@@ -135,7 +135,7 @@ UB 18 位地址编码遵循如下规则：
 - 第1次repeat：src0（bank_id=0, bg 0-7）与 src1（bank_id=0, bg 0-7）：repeat 的所有 datablock 位于相同 bank group 且 bank_id 相同，后续 repeat 依次类推，**存在读读冲突**。
 - 第1次repeat：src0/src1 读取（bank_id=0, bg 0-7）与 dst 写入（bank_id=1, bg 0-7）：bank_id 不同，不在相同 bank，后续 repeat 依次类推，**无读写冲突**。
 
-### Case 3：src0/src1 首地址在同一个 bank group——读读冲突
+### Scenario 3：src0/src1 首地址在同一个 bank group——读读冲突
 
 #### 地址解码
 
@@ -147,7 +147,7 @@ UB 18 位地址编码遵循如下规则：
 
 #### UB 读写示意
 
-![case3](./figures/case3.png)
+![scenario3](./figures/scenario3.png)
 
 - 每 8 个绿色数据块（32B）代表 src0 每次 repeat 读取的数据（256B）；
 - 每 8 个黄色数据块（32B）代表 src1 每次 repeat 读取的数据（256B）；
@@ -159,9 +159,9 @@ UB 18 位地址编码遵循如下规则：
 - 第1次repeat：src0（bank_id=0, bg 0-7）与 src1（bank_id=1, bg 0-7）：repeat 的所有 datablock 位于相同 bank group，后续 repeat 依次类推，**存在读读冲突**。
 - 第1次repeat：src0/src1 读取（bank_id=0/1, bg 0-7）与 dst 写入（bank_id=1, bg 8-15）：repeat 的所有 datablock 位于不同 bank，后续 repeat 依次类推，**无读写冲突**。
 
-> **对比 case 2**：case 2 中 src0/src1 在同一 bank（bank_id 和 bank_group_id 均相同），case 3 中在同一 bank group（仅 bank_group_id 相同）。两者均触发读读冲突，性能开销相同（4195 vs 4195），说明读读冲突的判定依据是 bank group 而非 bank。
+> **对比 scenario 2**：scenario 2 中 src0/src1 在同一 bank（bank_id 和 bank_group_id 均相同），scenario 3 中在同一 bank group（仅 bank_group_id 相同）。两者均触发读读冲突，性能开销相同（4195 vs 4195），说明读读冲突的判定依据是 bank group 而非 bank。
 
-### Case 4：src0/dst 首地址在同一个 bank——无读写冲突（硬件优化）
+### Scenario 4：src0/dst 首地址在同一个 bank——无读写冲突（硬件优化）
 
 #### 地址解码
 
@@ -173,7 +173,7 @@ UB 18 位地址编码遵循如下规则：
 
 #### UB 读写示意
 
-![case4](./figures/case4.png)
+![scenario4](./figures/scenario4.png)
 
 - 每 8 个绿色数据块（32B）代表 src0 每次 repeat 读取的数据（256B）；
 - 每 8 个黄色数据块（32B）代表 src1 每次 repeat 读取的数据（256B）；
@@ -205,7 +205,7 @@ UB 18 位地址编码遵循如下规则：
 
 实际结果：硬件将 dst 写入延后 1 个 repeat，与 src0 读取错开，避免读写冲突。
 
-### Case 5：src0/dst 首地址不在同一个 bank——读写冲突
+### Scenario 5：src0/dst 首地址不在同一个 bank——读写冲突
 
 #### 地址解码
 
@@ -217,7 +217,7 @@ UB 18 位地址编码遵循如下规则：
 
 #### UB 读写示意
 
-![case5](./figures/case5.png)
+![scenario5](./figures/scenario5.png)
 
 - 每 8 个绿色数据块（32B）代表 src0 每次 repeat 读取的数据（256B）；
 - 每 8 个黄色数据块（32B）代表 src1 每次 repeat 读取的数据（256B）；
@@ -239,7 +239,7 @@ UB 18 位地址编码遵循如下规则：
 
 分析结果：src0 与 dst 每次 repeat 都会访问到相同的 bank，导致读写冲突。
 
-### Case 6：src1/dst 首地址在同一个 bank，src1/dst 地址重叠——无读写冲突（硬件优化）
+### Scenario 6：src1/dst 首地址在同一个 bank，src1/dst 地址重叠——无读写冲突（硬件优化）
 
 #### 地址解码
 
@@ -251,7 +251,7 @@ UB 18 位地址编码遵循如下规则：
 
 #### UB 读写示意
 
-![case6](./figures/case6.png)
+![scenario6](./figures/scenario6.png)
 
 - 每 8 个绿色数据块（32B）代表 src0 每次 repeat 读取的数据（256B）；
 - 每 8 个黄色数据块代表每次repeat，src1 读取与 dst 写入同一块数据空间（256B），即 src1 和 dst 地址完全重叠；
@@ -282,7 +282,7 @@ UB 18 位地址编码遵循如下规则：
 
 实际结果：硬件将 dst 写入延后 1 个 repeat，与 src1 读取错开，避免读写冲突。
 
-### Case 7：src0 重复读取同一 datablock（src0BlkStride=0, src0RepStride=1），src1/dst 地址重叠——读读冲突
+### Scenario 7：src0 重复读取同一 datablock（src0BlkStride=0, src0RepStride=1），src1/dst 地址重叠——读读冲突
 
 > **特殊配置**：src0 的 `src0BlkStride=0`（单次 repeat 内重复读取同一 datablock），`src0RepStride=1`（每次 repeat 间隔 1 个 datablock，即 32B）。
 
@@ -296,7 +296,7 @@ UB 18 位地址编码遵循如下规则：
 
 #### UB 读写示意
 
-![case7](./figures/case7.png)
+![scenario7](./figures/scenario7.png)
 
 - 每次重复读取同 1 个绿色数据块（32B）共 8 次（src0BlkStride=0）；
 - 每 8 个黄色数据块代表每次repeat，src1 读取与 dst 写入同一块数据空间（256B），即 src1 和 dst 地址完全重叠；
@@ -321,7 +321,7 @@ UB 18 位地址编码遵循如下规则：
 - ...
 - dst 写入延后 1 个 repeat，不与 src1 产生读写冲突。
 
-### Case 8：src0 重复读取同一 datablock（src0BlkStride=0, src0RepStride=8），src1/dst 地址重叠——无冲突
+### Scenario 8：src0 重复读取同一 datablock（src0BlkStride=0, src0RepStride=8），src1/dst 地址重叠——无冲突
 
 > **特殊配置**：src0 的 `src0BlkStride=0`（单次 repeat 内重复读取同一 datablock），`src0RepStride=8`（每次 repeat 间隔 8 个 datablock，即 256B）。
 
@@ -335,7 +335,7 @@ UB 18 位地址编码遵循如下规则：
 
 #### UB 读写示意
 
-![case8](./figures/case8.png)
+![scenario8](./figures/scenario8.png)
 
 - 每次重复读取同 1 个绿色数据块（32B）共 8 次（src0BlkStride=0）；
 - 每 8 个黄色数据块代表每次repeat，src1 读取与 dst 写入同一块数据空间（256B），即 src1 和 dst 地址完全重叠；
@@ -358,7 +358,7 @@ UB 18 位地址编码遵循如下规则：
 - src0（bg 0 或 8）与 src1（bg 0-7 或 8-15）始终不重叠：当 src0 在 bg 0 时，src1 在 bg 8-15；当 src0 在 bg 8 时，src1 在 bg 0-7。因此无读读冲突。
 - dst 写入延后 1 个 repeat，不与 src1 产生读写冲突。
 
-> **对比 Case 7**：Case 7 的 `src0RepStride=1` 导致 src0 按步长 1 递增遍历 bank group（bg 0, 1, 2, 3, ...），与 src1 的 bank group 范围频繁重叠；Case 8 的 `src0RepStride=8` 使 src0 在 bg 0 和 8 之间交替，恰好与 src1 错开。可以有效消除读读冲突。
+> **对比 Scenario 7**：Scenario 7 的 `src0RepStride=1` 导致 src0 按步长 1 递增遍历 bank group（bg 0, 1, 2, 3, ...），与 src1 的 bank group 范围频繁重叠；Scenario 8 的 `src0RepStride=8` 使 src0 在 bg 0 和 8 之间交替，恰好与 src1 错开。可以有效消除读读冲突。
 
 ### 小结
 
@@ -397,16 +397,16 @@ UB 18 位地址编码遵循如下规则：
   在本样例目录下执行如下命令。
 
   ```bash
-  bash test.sh    # 测试 CASE_NUM 1~8 全部场景
+  bash test.sh    # 测试 SCENARIO_NUM 1~8 全部场景
   ```
 
 - 单个场景测试
 
   ```bash
-  CASE_NUM=1    # 设置场景编号
+  SCENARIO_NUM=1    # 设置场景编号
   mkdir -p build && cd build;                              # 创建并进入build目录
-  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DCASE_NUM=$CASE_NUM;make -j;  # 编译工程
-  python3 ../scripts/gen_data.py --case $CASE_NUM          # 生成测试输入数据
+  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j;  # 编译工程
+  python3 ../scripts/gen_data.py --scenario $SCENARIO_NUM          # 生成测试输入数据
   ./demo                                                   # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output_z.bin output/golden.bin  # 验证输出结果是否正确
   ```
@@ -416,7 +416,7 @@ UB 18 位地址编码遵循如下规则：
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品 |
-  | `CASE_NUM` | `1`~`8` | 场景编号：1（无冲突基线）、2（同bank读读冲突）、3（同bank group读读冲突）、4（同bank读写冲突-硬件优化）、5（读写冲突）、6（地址重叠-硬件优化）、7（src0RepStride=1读读冲突）、8（src0RepStride=8无冲突） |
+  | `SCENARIO_NUM` | `1`~`8` | 场景编号：1（无冲突基线）、2（同bank读读冲突）、3（同bank group读读冲突）、4（同bank读写冲突-硬件优化）、5（读写冲突）、6（地址重叠-硬件优化）、7（src0RepStride=1读读冲突）、8（src0RepStride=8无冲突） |
 
 - 执行结果
 

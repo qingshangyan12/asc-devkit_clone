@@ -1,4 +1,4 @@
-﻿# ----------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------
 # Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
@@ -25,16 +25,16 @@ target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
 
-if(NOT DEFINED CASE_NUM)
-    message(FATAL_ERROR "CASE_NUM is not defined. Please specify it via: cmake -DCASE_NUM=<1-8> ..")
+if(NOT DEFINED SCENARIO_NUM)
+    message(FATAL_ERROR "SCENARIO_NUM is not defined. Please specify it via: cmake -DSCENARIO_NUM=<1-8> ..")
 endif()
 
-if(NOT CASE_NUM MATCHES "^[1-8]$")
-    message(FATAL_ERROR "Invalid CASE_NUM=${CASE_NUM}. Valid range: 1-8")
+if(NOT SCENARIO_NUM MATCHES "^[1-8]$")
+    message(FATAL_ERROR "Invalid SCENARIO_NUM=${SCENARIO_NUM}. Valid range: 1-8")
 endif()
 
-message(STATUS "CASE_NUM = ${CASE_NUM}")
+message(STATUS "SCENARIO_NUM = ${SCENARIO_NUM}")
 
 target_compile_definitions(demo PRIVATE
-    CASE_NUM=${CASE_NUM}
+    SCENARIO_NUM=${SCENARIO_NUM}
 )

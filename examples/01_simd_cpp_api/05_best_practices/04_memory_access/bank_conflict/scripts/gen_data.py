@@ -1,4 +1,4 @@
-﻿#!/usr/bin/python3
+#!/usr/bin/python3
 # coding=utf-8
 
 # ----------------------------------------------------------------------------------------------------------
@@ -36,14 +36,14 @@ STRIDE_CONFIGS = {
 }
 
 
-def _build_src0_pattern(x_data, case_num):
+def _build_src0_pattern(x_data, scenario_num):
     """根据 Add 高维切分语义和输入的BinaryRepeatParams，构造一次 Add 调用中 src0 的读取结果。
 
     对 repeat r (0..63)、DataBlock k (0..7)：
       src0 起始地址 = x_off + r * src0RepStride * 8 + k * src0BlkStride * 8
       连续读取 8 个 float 元素
     """
-    _, src0BlkS, _, _, src0RepS, _ = STRIDE_CONFIGS[case_num]
+    _, src0BlkS, _, _, src0RepS, _ = STRIDE_CONFIGS[scenario_num]
     src0 = np.empty(TOTAL_LENGTH, dtype=np.float32)
     for r in range(REPEAT_TIMES):
         for k in range(NUM_BLOCKS_PER_REPEAT):
@@ -57,25 +57,25 @@ def _gen_golden_no_overlap(x_data, y_data):
     return (x_data + y_data).astype(np.float32)
 
 
-def _gen_golden_z_eq_y(x_data, y_data, case_num):
-    src0_pattern = _build_src0_pattern(x_data, case_num)
+def _gen_golden_z_eq_y(x_data, y_data, scenario_num):
+    src0_pattern = _build_src0_pattern(x_data, scenario_num)
     result = y_data.copy()
     for _ in range(REPEAT_TIMES_FOR_INSTR_EXCUTE):
         result += src0_pattern
     return result
 
 
-def gen_golden_data(case_num):
+def gen_golden_data(scenario_num):
     np.random.seed(0)
     input_x = np.random.uniform(1, 100, [TOTAL_LENGTH]).astype(np.float32)
     input_y = np.random.uniform(1, 100, [TOTAL_LENGTH]).astype(np.float32)
 
-    if case_num in (1, 2, 3, 4, 5):
+    if scenario_num in (1, 2, 3, 4, 5):
         # x, y, z无地址重叠
         golden = _gen_golden_no_overlap(input_x, input_y)
     else:
         # y和z地址完全重叠
-        golden = _gen_golden_z_eq_y(input_x, input_y, case_num)
+        golden = _gen_golden_z_eq_y(input_x, input_y, scenario_num)
 
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
@@ -83,17 +83,17 @@ def gen_golden_data(case_num):
     input_y.tofile("./input/input_y.bin")
     golden.tofile("./output/golden.bin")
 
-    print(f"[INFO] CASE_NUM={case_num}, golden generated")
+    print(f"[INFO] SCENARIO_NUM={scenario_num}, golden generated")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate test data for bank_conflict")
-    parser.add_argument("--case", "-c", type=int, default=None,
-                        help="case number (1-8), overrides CASE_NUM env")
+    parser.add_argument("--scenario", "-s", type=int, default=None,
+                        help="scenario number (1-8), overrides SCENARIO_NUM env")
     args = parser.parse_args()
 
-    case_num = args.case if args.case is not None else int(os.environ.get("CASE_NUM", "1"))
-    if case_num not in STRIDE_CONFIGS:
-        print(f"[ERROR] Invalid case_num={case_num}. Valid range: 1-8")
+    scenario_num = args.scenario if args.scenario is not None else int(os.environ.get("SCENARIO_NUM", "1"))
+    if scenario_num not in STRIDE_CONFIGS:
+        print(f"[ERROR] Invalid scenario_num={scenario_num}. Valid range: 1-8")
         exit(1)
-    gen_golden_data(case_num)
+    gen_golden_data(scenario_num)
