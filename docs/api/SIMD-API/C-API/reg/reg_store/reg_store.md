@@ -1,8 +1,8 @@
 # reg_store
 
-- **[asc_storealign_pack_quarter](asc_storealign_pack_quarter.md)**
+- **[asc_storealign_pack_quarter](asc_storealign/asc_storealign_pack_quarter.md)**
 
-- **[asc_storealign_pack_quarter_postupdate](asc_storealign_pack_quarter_postupdate.md)**
+- **[asc_storealign_pack_quarter_postupdate](asc_storealign/asc_storealign_pack_quarter_postupdate.md)**
 
 - **[asc_storealign](asc_storealign/asc_storealign.md)**
 
