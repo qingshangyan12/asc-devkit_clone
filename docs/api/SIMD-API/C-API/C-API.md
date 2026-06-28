@@ -327,25 +327,20 @@ Reg数据搬运类API，单独使用时可以引入reg_load.h，此类API列表�
 
 |   API名称   |   说明   |
 |----------|-----------|
-| [asc_loadalign_brc_elem](reg/reg_load/asc_loadalign_brc_elem.md) | 对齐数据搬运接口，广播搬运模式（elem），搬入一个元素并广播至所有元素位置。 |
-| [asc_loadalign_unpack4](reg/reg_load/asc_loadalign_unpack4.md) | 对齐数据搬运接口，解压缩搬入模式（unpack4），按b8加载VL/4长度数据。 |
-| [asc_loadalign_brc_datablock](reg/reg_load/asc_loadalign_brc_datablock.md) | 对齐数据搬运接口，广播搬运模式（datablock），搬入一个DataBlock并广播到VL。 |
-| [asc_loadalign_brc_elem2datablock](reg/reg_load/asc_loadalign_brc_elem2datablock.md) | 对齐数据搬运接口，广播搬运模式（elem2datablock），加载元素并广播到DataBlock。 |
-| [asc_storealign_pack_quarter](reg/reg_store/asc_storealign_pack_quarter.md) | 对齐数据搬出接口，四分之一粒度压缩搬出模式。 |
-| [asc_load](<reg/reg_load (废弃)/asc_load.md>) | (废弃) reg计算数据搬运接口。 |
-| [asc_loadalign](<reg/reg_load (废弃)/asc_loadalign/asc_loadalign.md>) | (废弃) 对齐数据搬运接口，支持多种搬入模式。 |
-| [asc_loadalign](<reg/reg_load (废弃)/asc_loadalign_deintlv.md>) | (废弃) 对齐数据搬运接口，随路完成deinterleave操作。 |
-| [asc_loadalign](<reg/reg_load (废弃)/asc_loadalign_deintlv_postupdate.md>) | (废弃) 对齐数据搬运接口，随路完成deinterleave操作。 |
-| [asc_loadalign_postupdate](<reg/reg_load (废弃)/asc_loadalign_postupdate.md>) | (废弃) 将数据从UB搬入MaskReg。 |
-| [asc_loadunalign_pre](<reg/reg_load (废弃)/asc_loadunalign_pre.md>) | (废弃) 非对齐数据搬入前的初始化。 |
-| [asc_loadunalign](<reg/reg_load (废弃)/asc_loadunalign.md>) | (废弃) 从UB非32B对齐起始地址搬入矢量数据寄存器。 |
-| [asc_gather](<reg/reg_load (废弃)/asc_gather.md>) | (废弃) 根据索引收集元素到目的操作数。 |
-| [asc_gather_datablock](<reg/reg_load (废弃)/asc_gather_datablock.md>) | (废弃) 按DataBlock收集到目的操作数。 |
-| [asc_get_mask_spr](<reg/reg_load (废弃)/asc_get_mask_spr.md>) | (废弃) 读取mask值。 |
-| [asc_store](<reg/reg_store (废弃)/asc_store.md>) | (废弃) 从矢量数据寄存器搬出到UB。 |
-| [asc_storealign](<reg/reg_store (废弃)/asc_storealign/asc_storealign.md>) | (废弃) 从矢量数据寄存器对齐搬出到UB。 |
-| [asc_storeunalign](<reg/reg_store (废弃)/asc_storeunalign.md>) | (废弃) 从矢量数据寄存器非对齐搬出到UB。 |
-| [asc_storeunalign_postupdate](<reg/reg_store (废弃)/asc_storeunalign_postupdate.md>) | (废弃) 从矢量数据寄存器非对齐搬出到UB。 |
+| [asc_load](reg/reg_load/asc_load.md) | reg计算数据搬运接口，支持从UB非32字节对齐的源地址src搬运至矢量数据寄存器，搬运量为VL。 |
+| [asc_loadalign](reg/reg_load/asc_loadalign/asc_loadalign.md) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式。 |
+| [asc_loadalign](reg/reg_load/asc_loadalign_deintlv.md) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，随路完成deinterleave操作。 |
+| [asc_loadalign](reg/reg_load/asc_loadalign_deintlv_postupdate.md) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，随路完成deinterleave操作，是能postupdate模式，自动更新UB地址参数。 |
+| [asc_loadalign_postupdate](reg/reg_load/asc_loadalign_postupdate.md) | 将数据从UB搬入MaskReg，使能post mod。 |
+| [asc_loadunalign_pre](reg/reg_load/asc_loadunalign_pre.md) | 用于在进行非对齐数据搬入前的初始化，需配合[asc_loadunalign](reg/reg_load/asc_loadunalign.md)接口使用。 |
+| [asc_loadunalign](reg/reg_load/asc_loadunalign.md) | reg计算数据搬运接口，适用于从UB非32B对齐的起始地址连续搬入矢量数据寄存器的场景。 |
+| [asc_gather](reg/reg_load/asc_gather.md) | 根据索引位置index将源操作数src按元素收集到目的操作数dst中。 |
+| [asc_gather_datablock](reg/reg_load/asc_gather_datablock.md) | 给定源操作数在UB中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。 |
+| [asc_get_mask_spr](reg/reg_load/asc_get_mask_spr.md) | 从特殊寄存器SPR{MASK1, MASK0}读取mask值并根据数据类型格式返回对应的mask数据，MASK0、MASK1均为64bit的寄存器。 |
+| [asc_store](reg/reg_store/asc_store.md) | reg计算数据搬运接口，适用于从矢量数据寄存器搬出到UB的场景，不区分是否对齐，在追求极致性能时，应尽量避免使用该接口。 |
+| [asc_storealign](reg/reg_store/asc_storealign/asc_storealign.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，并支持多种搬出模式。 |
+| [asc_storeunalign](reg/reg_store/asc_storeunalign.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。 |
+| [asc_storeunalign_postupdate](reg/reg_store/asc_storeunalign_postupdate.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。 |
 
 ## Reg矢量计算
 
