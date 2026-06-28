@@ -20,9 +20,15 @@
 
 - **[asc_loadalign_upsample](asc_loadalign/asc_loadalign_upsample.md)**
 
+- **[asc_loadalign_upsample_postupdate](asc_loadalign/asc_loadalign_upsample_postupdate.md)**
+
 - **[asc_loadalign_downsample](asc_loadalign/asc_loadalign_downsample.md)**
 
+- **[asc_loadalign_downsample_postupdate](asc_loadalign/asc_loadalign_downsample_postupdate.md)**
+
 - **[asc_loadalign_unpack](asc_loadalign/asc_loadalign_unpack.md)**
+
+- **[asc_loadalign_unpack_postupdate](asc_loadalign/asc_loadalign_unpack_postupdate.md)**
 
 - **[asc_gather](asc_gather.md)**
 

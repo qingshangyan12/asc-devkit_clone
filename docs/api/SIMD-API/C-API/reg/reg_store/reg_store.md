@@ -6,7 +6,11 @@
 
 - **[asc_storealign](asc_storealign/asc_storealign.md)**
 
+- **[asc_storealign_postupdate](asc_storealign/asc_storealign_postupdate.md)**
+
 - **[asc_storealign_pack](asc_storealign/asc_storealign_pack.md)**
+
+- **[asc_storealign_pack_postupdate](asc_storealign/asc_storealign_pack_postupdate.md)**
 
 - **[asc_storealign_intlv](asc_storealign/asc_storealign_intlv.md)**
 
