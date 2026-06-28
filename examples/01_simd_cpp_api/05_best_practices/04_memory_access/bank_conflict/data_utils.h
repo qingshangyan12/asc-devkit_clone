@@ -21,6 +21,7 @@
 
 #include <fstream>
 #include <string>
+#include <vector>
 
 #define ERROR_LOG(fmt, args...) fprintf(stdout, "[ERROR]  " fmt "\n", ##args)
 
