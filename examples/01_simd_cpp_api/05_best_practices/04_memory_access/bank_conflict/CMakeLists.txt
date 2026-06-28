@@ -25,6 +25,14 @@ target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
 
+if(NOT DEFINED CASE_NUM)
+    message(FATAL_ERROR "CASE_NUM is not defined. Please specify it via: cmake -DCASE_NUM=<1-8> ..")
+endif()
+
+if(NOT CASE_NUM MATCHES "^[1-8]$")
+    message(FATAL_ERROR "Invalid CASE_NUM=${CASE_NUM}. Valid range: 1-8")
+endif()
+
 message(STATUS "CASE_NUM = ${CASE_NUM}")
 
 target_compile_definitions(demo PRIVATE
