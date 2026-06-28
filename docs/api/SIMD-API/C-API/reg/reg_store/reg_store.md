@@ -4,6 +4,12 @@
 
 - **[asc_storealign_pack_quarter_postupdate](asc_storealign_pack_quarter_postupdate.md)**
 
+- **[asc_storealign](asc_storealign/asc_storealign.md)**
+
+- **[asc_storealign_pack](asc_storealign/asc_storealign_pack.md)**
+
+- **[asc_storealign_intlv](asc_storealign/asc_storealign_intlv.md)**
+
 - **[asc_store](asc_store.md)**
 
 - **[asc_storeunalign](asc_storeunalign.md)**

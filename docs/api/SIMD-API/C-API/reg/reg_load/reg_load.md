@@ -16,6 +16,14 @@
 
 - **[asc_loadalign_brc_elem2datablock_postupdate](asc_loadalign_brc_elem2datablock_postupdate.md)**
 
+- **[asc_loadalign](asc_loadalign/asc_loadalign.md)**
+
+- **[asc_loadalign_upsample](asc_loadalign/asc_loadalign_upsample.md)**
+
+- **[asc_loadalign_downsample](asc_loadalign/asc_loadalign_downsample.md)**
+
+- **[asc_loadalign_unpack](asc_loadalign/asc_loadalign_unpack.md)**
+
 - **[asc_gather](asc_gather.md)**
 
 - **[asc_gather_datablock](asc_gather_datablock.md)**
