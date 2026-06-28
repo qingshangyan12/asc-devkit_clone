@@ -209,6 +209,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void ring_buffer_wait(__simt_gm__ RingBufR
     while (end_offset >= tmp) {
         tmp = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>(&read_info->bufOffset);
     }
+
 #else
     while (end_offset > *reinterpret_cast<volatile uint64_t*>(&read_info->bufOffset)) {}
 #endif
