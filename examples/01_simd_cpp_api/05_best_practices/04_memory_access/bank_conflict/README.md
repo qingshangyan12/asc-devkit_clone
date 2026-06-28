@@ -1,4 +1,4 @@
-﻿# UB Bank 冲突及地址重叠场景分析示例
+# UB Bank 冲突及地址重叠场景分析示例
 
 ## 概述
 
@@ -28,7 +28,7 @@
 
 ## UB（Unified Buffer）内存结构
 
-![UB 内存结构图](./figures/UB%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84%E5%9B%BE.jpg)
+![UB 内存结构图](./figures/ub_memory_layout.png)
 
 - 在 A2/A3 架构上，UB 空间大小为 192KB；
 - 共有 48 个 **bank**，组成 16 个 **bank group**，每个 bank group 包含 3 个 bank（`bank_id` = 0, 1, 2）；
@@ -99,7 +99,7 @@ UB 18 位地址编码遵循如下规则：
 
 #### UB 读写示意
 
-![case1](./figures/case1.jpg)
+![case1](./figures/case1.png)
 
 - 每 8 个绿色数据块（32B）代表 src0 每次 repeat 读取的数据（256B）；
 - 每 8 个黄色数据块（32B）代表 src1 每次 repeat 读取的数据（256B）；
@@ -123,7 +123,7 @@ UB 18 位地址编码遵循如下规则：
 
 #### UB 读写示意
 
-![case2](./figures/case2.jpg)
+![case2](./figures/case2.png)
 
 - 每 8 个绿色数据块（32B）代表 src0 每次 repeat 读取的数据（256B）；
 - 每 8 个黄色数据块（32B）代表 src1 每次 repeat 读取的数据（256B）；
@@ -147,7 +147,7 @@ UB 18 位地址编码遵循如下规则：
 
 #### UB 读写示意
 
-![case3](./figures/case3.jpg)
+![case3](./figures/case3.png)
 
 - 每 8 个绿色数据块（32B）代表 src0 每次 repeat 读取的数据（256B）；
 - 每 8 个黄色数据块（32B）代表 src1 每次 repeat 读取的数据（256B）；
@@ -173,7 +173,7 @@ UB 18 位地址编码遵循如下规则：
 
 #### UB 读写示意
 
-![case4](./figures/case4.jpg)
+![case4](./figures/case4.png)
 
 - 每 8 个绿色数据块（32B）代表 src0 每次 repeat 读取的数据（256B）；
 - 每 8 个黄色数据块（32B）代表 src1 每次 repeat 读取的数据（256B）；
@@ -217,7 +217,7 @@ UB 18 位地址编码遵循如下规则：
 
 #### UB 读写示意
 
-![case5](./figures/case5.jpg)
+![case5](./figures/case5.png)
 
 - 每 8 个绿色数据块（32B）代表 src0 每次 repeat 读取的数据（256B）；
 - 每 8 个黄色数据块（32B）代表 src1 每次 repeat 读取的数据（256B）；
@@ -251,7 +251,7 @@ UB 18 位地址编码遵循如下规则：
 
 #### UB 读写示意
 
-![case6](./figures/case6.jpg)
+![case6](./figures/case6.png)
 
 - 每 8 个绿色数据块（32B）代表 src0 每次 repeat 读取的数据（256B）；
 - 每 8 个黄色数据块代表每次repeat，src1 读取与 dst 写入同一块数据空间（256B），即 src1 和 dst 地址完全重叠；
@@ -296,7 +296,7 @@ UB 18 位地址编码遵循如下规则：
 
 #### UB 读写示意
 
-![case7](./figures/case7.jpg)
+![case7](./figures/case7.png)
 
 - 每次重复读取同 1 个绿色数据块（32B）共 8 次（src0BlkStride=0）；
 - 每 8 个黄色数据块代表每次repeat，src1 读取与 dst 写入同一块数据空间（256B），即 src1 和 dst 地址完全重叠；
@@ -335,7 +335,7 @@ UB 18 位地址编码遵循如下规则：
 
 #### UB 读写示意
 
-![case8](./figures/case8.jpg)
+![case8](./figures/case8.png)
 
 - 每次重复读取同 1 个绿色数据块（32B）共 8 次（src0BlkStride=0）；
 - 每 8 个黄色数据块代表每次repeat，src1 读取与 dst 写入同一块数据空间（256B），即 src1 和 dst 地址完全重叠；
