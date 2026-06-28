@@ -66,39 +66,46 @@ address、value、返回值的数据类型相同，支持的数据类型为int32
 
 ## 约束说明<a name="section24727811123"></a>
 
-- 原子操作涉及标量计算，如果标量计算单元和搬运单元（MTE2/MTE3）在读写GM时存在数据依赖，开发者需要根据实际情况插入同步。
+- 通常情况下，编译器能够自动在PIPE_MTE2/PIPE_MTE3与PIPE_S之间插入同步（参见[编译器自动同步](../../同步控制/核内同步/关键特性说明.md#tpipe-tque框架编程范式和编译器自动同步支持情况)）。但是，AtomicMin为标量计算，在读写GM时如果与搬运单元（MTE2/MTE3）存在数据依赖，编译器却无法自动插入同步，开发者需要根据实际情况手动插入同步。
 - Scalar原子操作会绕过DCache，需要调用[DataCacheCleanAndInvalid](../缓存控制/DataCacheCleanAndInvalid.md)接口确保GM与DCache的一致性。
 
 ## 调用示例<a name="section191505489122"></a>
 
 ```cpp
-extern "C" __global__ __aicore__ void atomic_simple_kernel(__gm__ uint8_t* dst, uint32_t dataSize)
+extern "C" __global__ __aicore__ void atomic_min_reduction_kernel(__gm__ int32_t* global_min, __gm__ int32_t* input, int32_t dataSize)
 {
-    // ...
-    dst_global.SetGlobalBuffer(reinterpret_cast<__gm__ T *>(dst_gm), dataSize);
-    LocalTensor<T> dstLocal = inQueueX.AllocTensor<T>();
-    int32_t value = 0;
-    int32_t a = AscendC::AtomicMin(reinterpret_cast<__gm__ int32_t *>(dst), value);
-    // 先执行完原子操作之后才能进行搬运操作，有数据依赖，需要手动插入MTE2等待Scalar的同步。
-    event_t eventIdSToMte2 = static_cast<event_t>(GetTPipePtr()->AllocEventID<HardEvent::S_MTE2>());
-    SetFlag<HardEvent::S_MTE2>(eventIdSToMte2);
-    WaitFlag<HardEvent::S_MTE2>(eventIdSToMte2);
-    DataCopy(dstLocal, dst_global, dataSize);
-    // ...
+    // 静态Tensor编程方式下，需手动调用InitSocState初始化全局状态寄存器。
+    AscendC::InitSocState();
+
+    // 使用LocalMemAllocator在UB上分配内存。
+    AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
+    AscendC::LocalTensor<int32_t> srcLocal = ubAllocator.Alloc<int32_t>(dataSize);
+    AscendC::LocalTensor<int32_t> dstLocal = ubAllocator.Alloc<int32_t>(1);
+
+    // 使用GlobalTensor封装GM输入数据。
+    AscendC::GlobalTensor<int32_t> inputGlobal;
+    inputGlobal.SetGlobalBuffer(input, dataSize);
+
+    constexpr uint32_t EVENT_ID0 = 0;
+
+    // 将数据从GM拷贝到UB。
+    AscendC::DataCopy(srcLocal, inputGlobal, dataSize);
+
+    // 等待MTE2搬运完成后再进行矢量计算。
+    AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+
+    // 使用矢量归约接口[ReduceMin](../Memory矢量计算/归约计算/ReduceMin.md)计算局部最小值，不获取索引。
+    // Ascend 950PR/Ascend 950DT无需sharedTmpBuffer，可传入srcLocal。
+    AscendC::ReduceMin<int32_t>(dstLocal, srcLocal, srcLocal, dataSize, false);
+
+    // 等待矢量计算完成后再通过标量读取结果。
+    AscendC::SetFlag<AscendC::HardEvent::V_S>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::V_S>(EVENT_ID0);
+
+    // 使用AtomicMin将局部最小值原子地更新到全局最小值中。
+    AscendC::AtomicMin(global_min, dstLocal.GetValue(0));
 }
 ```
 
-假设上述函数在3个核上执行，核1、核2、核3依次调度，结果示例如下：
-
-```text
-原GM数据dst: [1,1,1,1,1,...,1]
-核1：
-原子计算后GM数据dst: [0,1,1,1,1,...,1]
-返回值 a: 1
-核2：
-原子计算后GM数据dst: [0,1,1,1,1,...,1]
-返回值 a: 0
-核3：
-原子计算后GM数据dst: [0,1,1,1,1,...,1]
-返回值 a: 0
-```
+假设上述函数在多个核上执行，每个核先通过矢量归约接口[ReduceMin](../Memory矢量计算/归约计算/ReduceMin.md)计算各自分片数据的局部最小值，再通过AtomicMin合并到global_min中，最终得到全局最小值。

@@ -49,10 +49,18 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 | pipe | 设置这条指令所在的流水类型。支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX，不支持PIPE_S和PIPE_ALL。不同产品对流水类型的支持情况请参见[pipe支持的流水类型说明](#pipe支持的流水类型说明)。 |
 
   > [!CAUTION]注意
+  <!-- npu="950" id12 -->
   > Ascend 950PR/Ascend 950DT，硬件支持配置核间同步模式和流水类型，模板参数modeId和pipe**生效**，此时CrossCoreWaitFlag会阻塞**指定流水**的后续指令。
+  <!-- end id12 -->
+  <!-- npu="A3,910b" id13 -->
   > 针对如下产品，硬件支持配置核间同步模式和流水类型，模板参数modeId和pipe**不生效**，此时CrossCoreWaitFlag会阻塞**全部流水**的后续指令。
+  <!-- npu="A3" id14 -->
   >    - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  <!-- end id14 -->
+  <!-- npu="910b" id15 -->
   >    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  <!-- end id15 -->
+  <!-- end id13 -->
 
 **表2**  参数说明
 
@@ -63,23 +71,27 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 ### modeId支持的取值说明
 
 不同产品对同步模式的支持情况如下：
-<!-- npu="A3,910b" id10 -->
-- 针对如下产品，支持的同步模式为：模式0、模式1、模式2。
-    - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-<!-- end id10 -->
 <!-- npu="950" id9 -->
 - 针对Ascend 950PR/Ascend 950DT，支持的同步模式为：模式0、模式1、模式2、模式4。
 <!-- end id9 -->
+<!-- npu="A3,910b" id10 -->
+- 针对如下产品，支持的同步模式为：模式0、模式1、模式2。
+    <!-- npu="A3" id11 -->
+    - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+    <!-- end id11 -->
+    <!-- npu="910b" id12 -->
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    <!-- end id12 -->
+<!-- end id10 -->
 
 ### pipe支持的流水类型说明
 
 - 核间同步的模式为模式0、1、2时，
-    - 支持的流水类型为PIPE_V，PIPE_M，PIPE_MTE1，PIPE_MTE2，PIPE_MTE3，PIPE_FIX。
-    - 不支持的流水类型为PIPE_ALL，PIPE_S。
+    - 支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX。
+    - 不支持的流水类型为PIPE_ALL、PIPE_S。
 <!-- npu="950" id8 -->
 - 针对Ascend 950PR/Ascend 950DT，核间同步的模式为模式4时，
-    - 支持的流水类型为PIPE_V，PIPE_M，PIPE_MTE1，PIPE_MTE2，PIPE_MTE3，PIPE_FIX，PIPE_S。
+    - 支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX、PIPE_S。
     - 不支持的流水类型为PIPE_ALL。
 <!-- end id8 -->
 
@@ -100,24 +112,25 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 由于当Kernel类型为KERNEL_TYPE_AIC_ONLY或KERNEL_TYPE_AIV_ONLY时，硬件不会开启调度模块，也就无法正常进行核间同步，因此不同的同步模式配置[Kernel类型](../../Kernel-Tiling/设置Kernel类型.md)或[函数修饰符](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#section1074418132518)的情况如不：
+- 由于当Kernel类型为KERNEL_TYPE_AIC_ONLY或KERNEL_TYPE_AIV_ONLY时，硬件不会开启调度模块，也就无法正常进行核间同步，因此不同的同步模式配置[Kernel类型](../../Kernel-Tiling/设置Kernel类型.md)或[函数修饰符](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#section1074418132518)的情况如下：
     - 在纯Vector/Cube场景下（模式0或模式1），建议设置Kernel类型为KERNEL\_TYPE\_MIX\_AIV\_1\_0或KERNEL\_TYPE\_MIX\_AIC\_1\_0，其它支持的Kernel类型请参考表3。
     - 对于Vector和Cube混合场景（模式2和模式4），需根据AI Core中AIC和AIV的比例灵活配置Kernel类型，不同模式支持的函数修饰符和Kernel类型请参照表3。
 
-        **表3**  模式与支持的Kernel类型配置
+        **表3**  模式与支持的Kernel类型配置<a name="table3"></a>
 
         | 模式 | 支持的函数修饰符 | 支持的Kernel类型配置 |
         | --- | --- | --- |
-        | 0 | \_\_mix\_\_(0, 1)，\_\_mix\_\_(1, 0)，\_\_mix\_\_(1, 1)，\_\_mix\_\_(1, 2) | KERNEL\_TYPE\_MIX\_AIV\_1\_0， KERNEL\_TYPE\_MIX\_AIC\_1\_0，KERNEL\_TYPE\_MIX\_AIC\_1\_1， KERNEL\_TYPE\_MIX\_AIC\_1\_2 |
-        | 1 | \_\_mix\_\_(1, 1)，\_\_mix\_\_(1, 2) | KERNEL\_TYPE\_MIX\_AIC\_1\_1， KERNEL\_TYPE\_MIX\_AIC\_1\_2 |
-        | 2 | \_\_mix\_\_(1, 1)，\_\_mix\_\_(1, 2) | KERNEL\_TYPE\_MIX\_AIC\_1\_1， KERNEL\_TYPE\_MIX\_AIC\_1\_2 |
+        | 0 | \_\_mix\_\_(0, 1)、\_\_mix\_\_(1, 0)、\_\_mix\_\_(1, 1)、\_\_mix\_\_(1, 2) | KERNEL\_TYPE\_MIX\_AIV\_1\_0、KERNEL\_TYPE\_MIX\_AIC\_1\_0、KERNEL\_TYPE\_MIX\_AIC\_1\_1、KERNEL\_TYPE\_MIX\_AIC\_1\_2 |
+        | 1 | \_\_mix\_\_(1, 1)、\_\_mix\_\_(1, 2) | KERNEL\_TYPE\_MIX\_AIC\_1\_1、KERNEL\_TYPE\_MIX\_AIC\_1\_2 |
+        | 2 | \_\_mix\_\_(1, 1)、\_\_mix\_\_(1, 2) | KERNEL\_TYPE\_MIX\_AIC\_1\_1、KERNEL\_TYPE\_MIX\_AIC\_1\_2 |
+        | 4 | \_\_mix\_\_(1, 2) | KERNEL\_TYPE\_MIX\_AIC\_1\_2 |
 
 - CrossCoreWaitFlag必须与[CrossCoreSetFlag](CrossCoreSetFlag(ISASI).md)接口配合使用，避免计算核一直处于阻塞阶段。
 
 - 接口使用模式0、1、2，需要避免flagId使用冲突：
-    - Matmul高阶API内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和Matmul高阶API，否则会有flagId冲突的风险。Matmul高阶API内部占用的flagId范围与定义的Matmul对象数目相关，假设定义了N个Matmul对象数目，Matmul高阶API内部占用的flagId范围为\[0, 2 \* N - 1\]。Matmul最多支持定义4个对象，此时flagId占用范围为\[0,7\]。
+    - Matmul高阶API内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和Matmul高阶API，否则会有flagId冲突的风险。Matmul高阶API内部占用的flagId范围与定义的Matmul对象数目相关，假设定义了N个Matmul对象，Matmul高阶API内部占用的flagId范围为\[0, 2 \* N - 1\]。Matmul最多支持定义4个对象，此时flagId占用范围为\[0,7\]。
 
-    - SyncAll硬件同步接口内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和SyncAll硬件同步接口，否则会有flagID冲突的风险。SyncAll硬件同步接口flagId占用范围为\[11-14\]。
+    - SyncAll硬件同步接口内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和SyncAll硬件同步接口，否则会有flagId冲突的风险。SyncAll硬件同步接口flagId占用范围为\[11-14\]。
 
 - flagId相关的约束：
     - 对于模式0、1、2，每个AIC和每个AIV都各自有16个flagId，支持的取值范围为0-15。如果flagId的值超出该范围，则会取截取最低位4bit为准。
@@ -143,7 +156,7 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 
 ## 调用示例<a name="section837496171220"></a>
 
-**表3**  样例描述
+**表4**  样例描述
 
 | SCENARIO_NUM取值 | 业务场景 | 使用的同步模式 |
 | --- | --- | --- |

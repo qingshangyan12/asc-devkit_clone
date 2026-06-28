@@ -26,9 +26,12 @@
 
 ## 功能说明<a name="section54681522111017"></a>
 
-头文件路径为： "basic\_api/kernel\_common.h"
+头文件路径为：`"basic_api/kernel_common.h"`。
 
 直到前置当前流水指令退出后，根据MutexID释放对应Mutex。
+
+> [!NOTE]说明
+> Unlock接口需与[Lock](Lock.md)接口配合使用，对同一个MutexID，Lock和Unlock必须严格成对出现。详细约束请参考[Lock约束说明](Lock.md#section184751024101111)。
 
 ## 函数原型<a name="section1568410468104"></a>
 
@@ -51,10 +54,14 @@ static __aicore__ inline void Unlock(MutexID id)
 | --- | --- | --- |
 | id | 输入 | 进行流水同步管理的MutexID。在不同编程范式中，该ID的获取以及释放方式不同，详细情况参考[Lock约束说明](Lock.md#section184751024101111)。 |
 
+## 返回值说明<a name="section640mcpsimp"></a>
+
+无
+
 ## 约束说明<a name="section184751024101111"></a>
 
 参考[Lock约束说明](Lock.md#section184751024101111)。
 
 ## 调用示例<a name="section123275308128"></a>
 
-参考[Lock调用示例](Lock.md#section123275308128)。
+Lock与Unlock必须严格配对使用，因此示例请参考[Lock调用示例](Lock.md#section123275308128)。
