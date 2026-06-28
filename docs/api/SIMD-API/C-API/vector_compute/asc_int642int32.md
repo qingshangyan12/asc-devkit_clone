@@ -1,4 +1,4 @@
-# asc_uint82half (废弃)
+# asc_int642int32
 
 ## 产品支持情况
 
@@ -9,26 +9,26 @@
 
 ## 功能说明
 
-将uint8_t类型数据转换为half类型。
+将int64_t类型数据转换为int32_t类型。
 
 ## 函数原型
 
 - 前n个数据计算
 
     ```c++
-    __aicore__ inline void asc_uint82half(__ubuf__ half* dst, __ubuf__ uint8_t* src, uint32_t count)
+    __aicore__ inline void asc_int642int32(__ubuf__ int32_t* dst, __ubuf__ int64_t* src, uint32_t count)
     ```
 
 - 高维切分计算
 
     ```c++
-    __aicore__ inline void asc_uint82half(__ubuf__ half* dst, __ubuf__ uint8_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_int642int32(__ubuf__ int32_t* dst, __ubuf__ int64_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
     ```
 
 - 同步计算
 
     ```c++
-    __aicore__ inline void asc_uint82half_sync(__ubuf__ half* dst, __ubuf__ uint8_t* src, uint32_t count)
+    __aicore__ inline void asc_int642int32_sync(__ubuf__ int32_t* dst, __ubuf__ int64_t* src, uint32_t count)
     ```
 
 ## 参数说明
@@ -61,7 +61,7 @@ PIPE_V
 
 ```cpp
 constexpr uint64_t total_length = 128;    // total_length指参与计算的数据长度
-__ubuf__ uint8_t src[total_length];
-__ubuf__ half dst[total_length];
-asc_uint82half(dst, src, total_length);    // 将src转换为half类型并存放到dst中
+__ubuf__ int64_t src[total_length];
+__ubuf__ int32_t dst[total_length];
+asc_int642int32(dst, src, total_length);    // 将src转换为int32_t类型并存放到dst中
 ```

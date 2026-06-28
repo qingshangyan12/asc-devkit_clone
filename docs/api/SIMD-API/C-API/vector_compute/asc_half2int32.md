@@ -1,4 +1,4 @@
-# asc_half2int32 (废弃)
+# asc_half2int32
 
 ## 产品支持情况
 

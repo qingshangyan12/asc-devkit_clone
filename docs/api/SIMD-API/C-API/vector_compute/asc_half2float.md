@@ -1,4 +1,4 @@
-# asc_half2float (废弃)
+# asc_half2float
 
 ## 产品支持情况
 
