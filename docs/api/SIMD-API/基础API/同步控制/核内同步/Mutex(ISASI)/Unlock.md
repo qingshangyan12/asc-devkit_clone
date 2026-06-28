@@ -64,4 +64,4 @@ static __aicore__ inline void Unlock(MutexID id)
 
 ## 调用示例<a name="section123275308128"></a>
 
-Lock与Unlock必须严格配对使用，因此示例请参考[Lock调用示例](Lock.md#section123275308128)。
+Lock与Unlock必须严格配对使用，详细示例请参考[Lock调用示例](Lock.md#section123275308128)。

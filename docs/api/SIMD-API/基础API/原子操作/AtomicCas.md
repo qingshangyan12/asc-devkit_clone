@@ -29,6 +29,7 @@
 头文件路径为：`"basic_api/kernel_operator_atomic_intf.h"`。
 
 调用该接口后，可在指定GM地址上进行原子比较操作，读取**address**指向的GM地址上的旧值（**old_value**）与输入标量值**value1**进行比较：
+
 - 如果相等，则将输入标量值**value2**写入GM地址；
 - 如果不相等，则GM地址上的值保持不变。
 返回该地址修改前的值（**old_value**）。
@@ -69,7 +70,7 @@ GM地址上做原子操作前的数据。
 
 ## 约束说明<a name="section24727811123"></a>
 
-- 通常情况下，编译器能够自动在PIPE_MTE2/PIPE_MTE3与PIPE_S之间插入同步（参见[编译器自动同步](../../同步控制/核内同步/关键特性说明.md#tpipe-tque框架编程范式和编译器自动同步支持情况)）。但是，AtomicCas为标量计算，在读写GM时如果与搬运单元（MTE2/MTE3）存在数据依赖，编译器却无法自动插入同步，开发者需要根据实际情况手动插入同步。
+- 通常情况下，编译器能够自动在PIPE_MTE2/PIPE_MTE3与PIPE_S之间插入同步（参见[编译器自动同步](../同步控制/核内同步/关键特性说明.md#tpipe-tque框架编程范式和编译器自动同步支持情况)）。但是，AtomicCas为标量计算，在读写GM时如果与搬运单元（MTE2/MTE3）存在数据依赖，编译器却无法自动插入同步，开发者需要根据实际情况手动插入同步。
 - Scalar原子操作会绕过DCache，需要调用[DataCacheCleanAndInvalid](../缓存控制/DataCacheCleanAndInvalid.md)接口确保GM与DCache的一致性。
 
 ## 调用示例<a name="section191505489122"></a>

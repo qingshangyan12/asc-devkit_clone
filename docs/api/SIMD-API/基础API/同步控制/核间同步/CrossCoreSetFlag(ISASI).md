@@ -33,11 +33,12 @@
 - CrossCoreSetFlag：AI Core中的AIC/AIV在完成本核前置位的pipe流水任务后，调用该接口，向调度模块上报本核任务已完成。调度模块收集所有参与核的上报信息，作为全局完成标志。
 - CrossCoreWaitFlag：用于阻塞本核后续指令的下发（已下发指令可正常执行），直至调度模块确认所有应调用CrossCoreSetFlag的核均已上报完成，随即解除阻塞，允许该核继续下发指令。
 
-如[图1](#fig37581010773)所示，同步控制分为以下几种模式：
+如[图1](#fig37581010773)所示（图中block代表AIC，sub_block代表AIV），同步控制分为以下几种模式：
+
 - 模式0：AI Core核间的同步控制。对于AIC场景，同步所有的AIC核，直到所有的AIC核都执行到CrossCoreSetFlag时，CrossCoreWaitFlag后续的指令才会执行；对于AIV场景，同步所有的AIV核，直到所有的AIV核都执行到CrossCoreSetFlag时，CrossCoreWaitFlag后续的指令才会执行。
 - 模式1：AI Core内部，AIV核之间的同步控制。如果两个AIV核都运行了CrossCoreSetFlag，CrossCoreWaitFlag后续的指令才会执行。
-- 模式2：AI Core内部，AIC与AIV之间的同步控制。在AIC核执行CrossCoreSetFlag之后，两个AIV上CrossCoreWaitFlag后续的指令才会继续执行；两个AIV都执行CrossCoreSetFlag后，AIC上CrossCoreWaitFlag后续的指令才能执行。
-- 模式4：AI Core内部，AIC与AIV之间的同步控制。AIV0与AIV1可单独触发AIC等待。比如，在AIC核执行CrossCoreSetFlag之后，AIV0上CrossCoreWaitFlag后续的指令才会继续执行；AIV0执行CrossCoreSetFlag后，AIC上CrossCoreWaitFlag后续的指令才能执行。
+- 模式2：AI Core内部，AIC与所有AIV之间的同步控制。在AIC核执行CrossCoreSetFlag之后，两个AIV上CrossCoreWaitFlag后续的指令才会继续执行；两个AIV都执行CrossCoreSetFlag后，AIC上CrossCoreWaitFlag后续的指令才能执行。
+- 模式4：AI Core内部，AIC与单个AIV之间的同步控制。当在AIC核执行CrossCoreSetFlag之后，AIV0或者AIV1上CrossCoreWaitFlag后续的指令才会继续执行；AIV0或者AIV1执行CrossCoreSetFlag后，AIC上CrossCoreWaitFlag后续的指令才能执行。
 
 > [!NOTE]说明
 > - 不同型号支持的模式不同，具体支持情况请参考[modeId支持的取值说明](#modeId支持的取值说明)。
@@ -73,40 +74,40 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
 ### modeId支持的取值说明
 
 不同产品对同步模式的支持情况如下：
-<!-- npu="950" id9 -->
+<!-- npu="950" id8 -->
 - 针对Ascend 950PR/Ascend 950DT，支持的同步模式为：模式0、模式1、模式2、模式4。
-<!-- end id9 -->
-<!-- npu="A3,910b" id10 -->
+<!-- end id8 -->
+<!-- npu="A3,910b" id9 -->
 - 针对如下产品，支持的同步模式为：模式0、模式1、模式2。
-    <!-- npu="A3" id11 -->
+    <!-- npu="A3" id10 -->
     - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-    <!-- end id11 -->
-    <!-- npu="910b" id12 -->
+    <!-- end id10 -->
+    <!-- npu="910b" id11 -->
     - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-    <!-- end id12 -->
-<!-- end id10 -->
+    <!-- end id11 -->
+<!-- end id9 -->
 
 ### pipe支持的流水类型说明
 
 - 核间同步的模式为模式0、1、2时，
     - 支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX。
     - 不支持的流水类型为PIPE_ALL、PIPE_S。
-<!-- npu="950" id8 -->
+<!-- npu="950" id12 -->
 - 针对Ascend 950PR/Ascend 950DT，核间同步的模式为模式4时，
     - 支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX、PIPE_S。
     - 不支持的流水类型为PIPE_ALL。
-<!-- end id8 -->
+<!-- end id12 -->
 
 ### flagId取值范围说明
 
 - 核间同步的模式为模式0、1、2时，支持的取值范围为0-15。
-<!-- npu="950" id8 -->
+<!-- npu="950" id13 -->
 - 针对Ascend 950PR/Ascend 950DT，核间同步的模式为模式4时，支持的取值范围情况如下：
     - AIV0发起的flagId 0-10的CrossCoreSetFlag操作对应AIC CrossCoreWaitFlag中flagId 0-10的操作。
     - AIV1发起的flagId 0-10的CrossCoreSetFlag操作对应AIC CrossCoreWaitFlag中flagId 16-26的操作。
     - AIC发起的flagId 0-10的CrossCoreSetFlag操作对应AIV0 CrossCoreWaitFlag中flagId 0-10的操作。
     - AIC发起的flagId 16-26的CrossCoreSetFlag操作对应AIV1 CrossCoreWaitFlag中flagId 0-10的操作。
-<!-- end id8 -->
+<!-- end id13 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -131,8 +132,8 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
     - Matmul高阶API内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和Matmul高阶API，否则会有flagId冲突的风险。Matmul高阶API内部占用的flagId范围与定义的Matmul对象数目相关，假设定义了N个Matmul对象，Matmul高阶API内部占用的flagId范围为\[0, 2 \* N - 1\]。Matmul最多支持定义4个对象，此时flagId占用范围为\[0,7\]。
     - SyncAll硬件同步接口内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和SyncAll硬件同步接口，否则会有flagId冲突的风险。SyncAll硬件同步接口flagId占用范围为\[11-14\]。
 - 用户需要确保配套使用CrossCoreSetFlag和CrossCoreWaitFlag，否则会出现未定义行为。
--   核间同步的模式为模式0、1、2时，模板参数pipe不支持设置为PIPE\_ALL，PIPE\_S。
--   针对Ascend 950PR/Ascend 950DT，核间同步的模式为模式4时，模板参数pipe不支持配置为PIPE\_ALL。
+- 核间同步的模式为模式0、1、2时，模板参数pipe不支持设置为PIPE\_ALL，PIPE\_S。
+- 针对Ascend 950PR/Ascend 950DT，核间同步的模式为模式4时，模板参数pipe不支持配置为PIPE\_ALL。
 - 一个核连续发出的CrossCoreSetFlag，硬件不保证执行顺序。例如AIV依次发射CrossCoreSetFlag<0，PIPE\_V\>\(0\)，CrossCoreSetFlag<0，PIPE\_V\>\(1\)，实际的执行顺序可能是flagId=1的先执行。
 - flagId相关的约束：
     - 对于模式0、1、2，每个AIC和每个AIV都各自有16个flagId，支持的取值范围为0-15。如果flagId的值超出该范围，则会取截取最低位4bit为准。

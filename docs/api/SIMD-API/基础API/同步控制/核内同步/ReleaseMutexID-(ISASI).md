@@ -50,7 +50,7 @@ __aicore__ inline void ReleaseMutexID(MutexID id)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-MutexID有数量限制，使用结束应该立刻调用[ReleaseMutexID](ReleaseMutexID-(ISASI).md)释放，防止MutexID耗尽。
+MutexID有数量限制，使用结束后应立即调用[ReleaseMutexID](ReleaseMutexID-(ISASI).md)释放，防止MutexID耗尽。
 
 ## 调用示例<a name="section837496171220"></a>
 
