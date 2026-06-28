@@ -128,12 +128,15 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__  bfloat16_t* dst_align3
 
 // ==========asc_storealign_pack_v2(float/u32/s32)=========
 __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__  int32_t* dst_align32b, vector_int32_t src,
+__simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__  int32_t* dst_align32b, vector_int32_t src,
     vector_bool mask);
 
 __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__  uint32_t* dst_align32b, vector_uint32_t src,
+__simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__  uint32_t* dst_align32b, vector_uint32_t src,
     vector_bool mask);
 
 __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__  float* dst_align32b, vector_float src,
+__simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__  float* dst_align32b, vector_float src,
     vector_bool mask);
 
 __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__  int32_t* dst_align32b, vector_int32_t src,
@@ -303,12 +306,15 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ bfloat16_t* dst_align32
 
 // storealign_pack_v2
 __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__ int32_t* dst_align32b, vector_int32_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ int32_t* dst_align32b, vector_int32_t src, int32_t offset,
     vector_bool mask);
 
 __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__ uint32_t* dst_align32b, vector_uint32_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ uint32_t* dst_align32b, vector_uint32_t src, int32_t offset,
     vector_bool mask);
 
 __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__ float* dst_align32b, vector_float src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ float* dst_align32b, vector_float src, int32_t offset,
     vector_bool mask);
 
 __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ int32_t* dst_align32b, vector_int32_t src, int32_t offset,
@@ -443,12 +449,15 @@ __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ bfloat16_t*&
 
 // storealign_pack_v2
 __simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ int32_t*& dst_align32b, vector_int32_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_quarter_postupdate(__ubuf__ int32_t*& dst_align32b, vector_int32_t src, int32_t offset,
     vector_bool mask);
 
 __simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ uint32_t*& dst_align32b, vector_uint32_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_quarter_postupdate(__ubuf__ uint32_t*& dst_align32b, vector_uint32_t src, int32_t offset,
     vector_bool mask);
 
 __simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ float*& dst_align32b, vector_float src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_quarter_postupdate(__ubuf__ float*& dst_align32b, vector_float src, int32_t offset,
 __simd_callee__ inline void asc_storealign_pack_quarter_postupdate(__ubuf__ float*& dst_align32b, vector_float src, int32_t offset,
     vector_bool mask);
 
@@ -565,12 +574,15 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__  bfloat16_t* dst_align3
 
 // ==========asc_storealign_pack_v2(float/u32/s32)=========
 __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__  int32_t* dst_align32b, vector_int32_t src, iter_reg offset,
+__simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__  int32_t* dst_align32b, vector_int32_t src, iter_reg offset,
     vector_bool mask);
 
 __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__  uint32_t* dst_align32b, vector_uint32_t src, iter_reg offset,
+__simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__  uint32_t* dst_align32b, vector_uint32_t src, iter_reg offset,
     vector_bool mask);
 
 __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__  float* dst_align32b, vector_float src, iter_reg offset,
+__simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__  float* dst_align32b, vector_float src, iter_reg offset,
     vector_bool mask);
 
 __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__  int32_t* dst_align32b, vector_int32_t src, iter_reg offset,
