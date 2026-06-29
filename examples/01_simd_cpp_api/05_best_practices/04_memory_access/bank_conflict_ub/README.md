@@ -22,8 +22,9 @@
 │   ├── CMakeLists.txt                     // 编译工程文件
 │   ├── config.h                           // 各SCENARIO_NUM的地址配置
 │   ├── data_utils.h                       // 数据读入写出函数
-│   ├── bank_conflict_ub.asc                  // Ascend C样例实现 & 调用样例
-│   └── README.md                          // 样例说明文档
+│   ├── bank_conflict_ub.asc               // Ascend C样例实现 & 调用样例
+│   ├── README.md                          // 样例说明文档（中文版）
+│   └── README_en.md                       // 样例说明文档（英文版）
 ```
 
 ## UB（Unified Buffer）内存结构
@@ -33,7 +34,7 @@
 - 在 A2/A3 架构上，UB 空间大小为 192KB；
 - 共有 48 个 **bank**，组成 16 个 **bank group**，每个 bank group 包含 3 个 bank（`bank_id` = 0, 1, 2）；
 - 每个 bank 由 128 行组成（`BANK_DEPTH = 128`），每行长度为 32B（`BANK_WIDTH = 32B`），即每个 bank 大小为 4KB；
-- **bank 全局编码规则**：`bank_number = bank_group_id + bank_id * 16`。
+- **bank 全局编码规则**：`bank_number = bank_group_id + bank_id * 16`；
 - bank_number相同代表是同一个bank；bank_group_id相同代表是同一个bank group。
 
 ## UB 地址编码规则
@@ -58,7 +59,7 @@ UB 18 位地址编码遵循如下规则：
 | BG[3:0] | `0001` | 1 | bank_group_id = 1 |
 | BANK_WIDTH[4:0] | `00000` | 0 | offset = 0 |
 
-结合上述的UB内存结构图和 bank 编号规则，该地址位于 bank group 1 内 bank_id 为 1 的 bank，即全局 bank 17（`1 + 1 × 16 = 17`），行号为 0。
+结合上述的UB内存结构图和 bank 编码规则，该地址位于 bank group 1 内 bank_id 为 1 的 bank，即全局 bank 17（`1 + 1 × 16 = 17`），行号为 0。
 
 ## bank冲突类型
 

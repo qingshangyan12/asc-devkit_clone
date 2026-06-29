@@ -22,8 +22,9 @@ This example is based on the Add instruction. By configuring different LocalTens
 │   ├── CMakeLists.txt                     // Build project file
 │   ├── config.h                           // Address configurations for each SCENARIO_NUM
 │   ├── data_utils.h                       // Data read/write functions
-│   ├── bank_conflict_ub.asc                  // Ascend C example implementation and usage sample
-│   └── README.md                          // Example documentation
+│   ├── bank_conflict_ub.asc               // Ascend C example implementation and usage sample
+│   ├── README.md                          // Example documentation (Chinese)
+│   └── README_en.md                       // Example documentation (English)
 ```
 
 ## UB (Unified Buffer) Memory Structure
@@ -33,7 +34,7 @@ This example is based on the Add instruction. By configuring different LocalTens
 - On the A2/A3 architecture, the UB space size is 192KB;
 - There are 48 **banks** in total, forming 16 **bank groups**, with each bank group containing 3 banks (`bank_id` = 0, 1, 2);
 - Each bank consists of 128 rows (`BANK_DEPTH = 128`), with each row being 32B long (`BANK_WIDTH = 32B`), making each bank 4KB in size;
-- **Bank global numbering rule**: `bank_number = bank_group_id + bank_id * 16`.
+- **Bank global numbering rule**: `bank_number = bank_group_id + bank_id * 16`;
 - The same bank_number indicates the same bank; the same bank_group_id indicates the same bank group.
 
 ## UB Address Encoding Rules
@@ -58,7 +59,7 @@ Convert the address to 18-bit binary, divided by bit fields: `01 0000000 0001 00
 | BG[3:0] | `0001` | 1 | bank_group_id = 1 |
 | BANK_WIDTH[4:0] | `00000` | 0 | offset = 0 |
 
-Based on the UB memory layout diagram and bank numbering rules above, this address is located in the bank with bank_id = 1 within bank group 1, i.e., global bank 17 (`1 + 1 x 16 = 17`), at row 0.
+Based on the UB memory layout diagram and bank encoding rules above, this address is located in the bank with bank_id = 1 within bank group 1, i.e., global bank 17 (`1 + 1 x 16 = 17`), at row 0.
 
 ## Bank Conflict Types
 
@@ -198,6 +199,7 @@ Theoretical result: src0 and dst access the same bank every repeat — read-writ
 **Actual execution timing** (hardware optimized):
 
 | | 1st repeat | 2nd repeat | 3rd repeat | ... |
+| --- | --- | --- | --- | --- |
 | src0 read | bank 0-7 (bg 0-7) | bank 8-15 (bg 8-15) | bank 0-7 (bg 0-7) | ... |
 | src1 read | bank 24-31 (bg 8-15) | bank 16-23 (bg 0-7) | bank 24-31 (bg 8-15) | ... |
 | dst write | — | bank 0-7 (bg 0-7) | bank 8-15 (bg 8-15) | ... |
