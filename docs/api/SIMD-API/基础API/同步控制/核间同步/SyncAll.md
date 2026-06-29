@@ -99,14 +99,11 @@
 SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能：
 
 - 硬件同步接口：
-
     用于多个核之间的同步控制，支持以下同步场景：
-
-    1. 纯Vector算子的全核同步，可参考[CrossCoreSetFlag的模式0](关键特性说明.md#ZH-CN_TOPIC_0000002586300741)。
-    2. 融合算子的全核同步，一次性实现三个核间同步能力（参考[CrossCoreSetFlag的关键特性说明](关键特性说明.md#ZH-CN_TOPIC_0000002586300741)）：首先完成单个AI Core内，AIC与所有AIV同步（AIC等AIV）；接着完成多个AI Core间，所有AIC的同步；最后完成单个AI Core内，所有AIV与AIC同步（AIV等AIC）。
+    - 纯Vector算子的全核同步，可参考[CrossCoreSetFlag的模式0](关键特性说明.md#ZH-CN_TOPIC_0000002586300741)。
+    - 融合算子的全核同步，一次性实现三个核间同步能力（参考[CrossCoreSetFlag的关键特性说明](关键特性说明.md#ZH-CN_TOPIC_0000002586300741)）：首先完成单个AI Core内，AIC与所有AIV同步（AIC等AIV）；接着完成多个AI Core间，所有AIC的同步；最后完成单个AI Core内，所有AIV与AIC同步（AIV等AIC）。
 
 - 软件同步接口：
-
     仅支持纯Vector算子的多核（参与同步的核数可通过入参指定）同步。每一个AIV都向全局内存对应位置写入信号值1，接着每一个AIV都持续轮询全局内存中所有AIV对应的信号值，直到所有AIV核对应的信号值都变为1。
 
 在纯Vector算子场景中，若所有AIV核默认参与同步，推荐采用性能更优的硬件同步接口；若需指定部分AIV核参与同步，则应使用软件同步接口，并通过入参usedCores完成配置。
@@ -142,7 +139,7 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 | 参数名 | 描述 |
 | --- | --- |
 | isAIVOnly | 控制SyncAll作用于纯Vector算子或Mix（包含Cube和Vector计算）算子。可选值：<br>&bull; **true**（默认值）：纯Vector算子的全核同步，仅执行Vector核的全核同步。<br>&bull; **false**：Mix（包含Cube和Vector计算）算子的全核同步，先分别完成Vector核和Cube核的全核同步，再执行两者之间的同步（软同步接口不支持此功能）。 |
-| config | **该配置仅当isAIVOnly=True时有效。**<br><pre>struct SyncAllConfig {&#x000A;    pipe_t triggerPipe;&#x000A;    pipe_t waitPipe;&#x000A;};&#x000A;&#x000A;// 默认使用全部流水来进行触发和等待行为。<br>constexpr SyncAllConfig DEFAULT_SYNC_ALL_CONFIG = {PIPE_ALL, PIPE_ALL};</pre><br>控制SyncAll函数的行为，在多个AI Core之间进行流水同步时，指定哪些流水（pipe）用于触发和等待。<br>&bull; **triggerPipe**：指定哪个流水用于"发送触发信号"。仅支持MTE2、MTE3、PIPE_ALL。<br>&bull; **waitPipe**：指定哪个流水用于"接收等待信号"。仅支持MTE2、MTE3、PIPE_ALL。<br><pre>// 多个AIV进行计算&#x000A;Compute();&#x000A;// 多个AIV将计算结果搬出到GM&#x000A;CopyToGM();&#x000A;// 等待所有数据拷贝到GM后，进行累加&#x000A;constexpr AscendC::SyncAllConfig CustomConfig = {PIPE_MTE3, PIPE_ALL};&#x000A;AscendC::SyncAll&lt;true, CustomConfig&gt;();&#x000A;for (int i = 0; i &lt; blockNum; i++) {&#x000A;    if (i != blockIdx) {&#x000A;        CopyFromGm();&#x000A;        Accumulate();&#x000A;    }&#x000A;}&#x000A;// 累加后的数据写回&#x000A;CopyToGm();</pre> |
+| config | **该配置仅当isAIVOnly=True时有效。**<br><pre>struct SyncAllConfig {&#x000A;    pipe_t triggerPipe;&#x000A;    pipe_t waitPipe;&#x000A;};&#x000A;&#x000A;// 默认使用全部流水来进行触发和等待行为。<br>constexpr SyncAllConfig DEFAULT_SYNC_ALL_CONFIG = {PIPE_ALL, PIPE_ALL};</pre><br>控制SyncAll函数的行为，在多个AI Core之间进行流水同步时，指定哪些流水（pipe）用于触发和等待。<br>&bull; **triggerPipe**：指定哪个流水用于“发送触发信号”。仅支持MTE2、MTE3、PIPE_ALL。<br>&bull; **waitPipe**：指定哪个流水用于“接收等待信号”。仅支持MTE2、MTE3、PIPE_ALL。<br><pre>// 多个AIV进行计算&#x000A;Compute();&#x000A;// 多个AIV将计算结果搬出到GM&#x000A;CopyToGM();&#x000A;// 等待所有数据拷贝到GM后，进行累加&#x000A;constexpr AscendC::SyncAllConfig CustomConfig = {PIPE_MTE3, PIPE_ALL};&#x000A;AscendC::SyncAll&lt;true, CustomConfig&gt;();&#x000A;for (int i = 0; i &lt; blockNum; i++) {&#x000A;    if (i != blockIdx) {&#x000A;        CopyFromGm();&#x000A;        Accumulate();&#x000A;    }&#x000A;}&#x000A;// 累加后的数据写回&#x000A;CopyToGm();</pre> |
 
 **表2**  参数说明
 
