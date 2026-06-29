@@ -126,10 +126,9 @@ $dst_i = \sim src_i$
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
   <!-- end id20 -->
 <!-- end id18 -->
-- <!-- npu="950" id21 -->
-  针对Ascend 950PR/Ascend 950DT，有如下约束说明：
+<!-- npu="950" id21 -->
+- 针对Ascend 950PR/Ascend 950DT，有如下约束说明：
   - 该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
-  - uint8\_t/int8\_t/uint64\_t/int64\_t数据类型仅支持tensor前n个数据计算接口。
   <!-- end id21 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>

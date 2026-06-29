@@ -26,7 +26,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为：`"basic_api/kernel_operator_vec_binary_scalar_intf.h"`
+头文件路径为：`"basic_api/kernel_operator_vec_binary_scalar_intf.h"`。
 
 将矢量源操作数前count个数据与标量相乘再按照CAST\_ROUND模式转换成half类型，并将计算结果写入dst，此接口支持标量在前和标量在后两种场景。
 
@@ -87,8 +87,8 @@ __aicore__ inline void MulsCast(const T2 &dst, const T3 &src0, const T4 &src1, c
 
 -   左操作数及右操作数中，必须有一个为矢量；当前不支持左右操作数同时为标量。
 -   本接口传入LocalTensor单点数据作为标量时，idx参数需要传入编译期已知的常量，传入变量时需要声明为constexpr。
-- <!-- npu="950" id9 -->
-  针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count取值为0时，不保证该接口将被视为NOP（空操作）。
+<!-- npu="950" id9 -->
+- 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count取值为0时，不保证该接口将被视为NOP（空操作）。
   <!-- end id9 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>

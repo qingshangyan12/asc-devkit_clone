@@ -160,19 +160,21 @@
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#section668772811100)。
 - 当输出类型为b8时，目的操作数数据类型需要和`SetDeqScale`接口的signMode入参配合，当signMode=true时输出数据类型int8_t；signMode=false时输出数据类型uint8_t。
 - halfBlock参数仅在输出数据为b8类型时有效。
+<!-- npu="A3,910b" id12 -->
 - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  <!-- npu="A3" id12 -->
+  <!-- npu="A3" id13 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id12 -->
-  <!-- npu="910b" id13 -->
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
   <!-- end id13 -->
-- <!-- npu="950" id14 -->
-  针对Ascend 950PR/Ascend 950DT，有如下约束说明：
-  - tensor高维切分计算调用GetTemporaryBufferAddr，占用8KB Unified Buffer。
-  - tensor前n个数据连续计算未调用GetTemporaryBufferAddr，不涉及8KB Unified Buffer。
-  - 该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
+  <!-- npu="910b" id14 -->
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
   <!-- end id14 -->
+<!-- end id12 -->
+<!-- npu="950" id15 -->
+- 针对Ascend 950PR/Ascend 950DT，有如下约束说明：
+  - tensor高维切分计算接口占用8KB Unified Buffer临时空间。
+  - tensor前n个数据连续计算接口不涉及8KB Unified Buffer临时空间的占用。
+  - 该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
+  <!-- end id15 -->
 - 当输入类型为int16_t，开启向量量化模式时，`SetDeqScale`接口需要传入至少128B大小的UB空间，若空间不足128B，可能导致精度错误。
 - 该接口需要与`SetDeqScale`配合使用，使用关系映射表如下：
 

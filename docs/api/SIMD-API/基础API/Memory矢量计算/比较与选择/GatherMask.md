@@ -211,10 +211,10 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 - 若调用该接口前为Counter模式，在调用该接口后需要显式设置回Counter模式（接口内部执行结束后会设置为Normal模式）。
 
-- <!-- npu="950" id8 -->
-  针对Ascend 950PR/Ascend 950DT，有如下约束说明：
-  - 内置固定模式调用GetTemporaryBufferAddr，占用8KB Unified Buffer。
-  - 用户自定义模式未调用GetTemporaryBufferAddr，不涉及8KB Unified Buffer。
+<!-- npu="950" id8 -->
+- 针对Ascend 950PR/Ascend 950DT，有如下约束说明：
+  - 内置固定模式占用8KB Unified Buffer临时空间。
+  - 用户自定义模式不涉及8KB Unified Buffer临时空间的占用。
   <!-- end id8 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>

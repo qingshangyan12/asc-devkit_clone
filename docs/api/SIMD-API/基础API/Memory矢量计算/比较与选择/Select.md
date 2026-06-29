@@ -194,7 +194,7 @@ Kirin 9030，支持模式0、1、2。
 ## 数据类型
 
 - T支持的数据类型为：
-    - <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t/uint8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float/complex32/int64_t/uint64_t/complex64。</cann-filter>
+    - <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t/uint8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float/complex32/int64_t/uint64_t/complex64。其中，int8\_t/uint8\_t/complex32/int64\_t/uint64\_t/complex64数据类型仅支持tensor前n个数据计算接口。</cann-filter>
     
     - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half/float。</cann-filter>
     
@@ -222,11 +222,10 @@ Kirin 9030，支持模式0、1、2。
 
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
 
-- <!-- npu="950" id10 -->
-  针对Ascend 950PR/Ascend 950DT，有如下约束说明：
-  - int8\_t/uint8\_t/complex32/int64\_t/uint64\_t/complex64数据类型仅支持tensor前n个数据计算接口。
+<!-- npu="950" id10 -->
+- 针对Ascend 950PR/Ascend 950DT，有如下约束说明：
   - 该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
-  - 不传入mask参数的tensor高维切分计算接口调用GetTemporaryBufferAddr，占用8KB Unified Buffer。其他接口未调用GetTemporaryBufferAddr，不涉及8KB Unified Buffer。
+  - 不传入mask参数的tensor高维切分计算接口占用8KB Unified Buffer临时空间。其他接口不涉及8KB Unified Buffer临时空间的占用。
   <!-- end id10 -->
 
 <cann-filter npu-type = "910b，A3，310p">

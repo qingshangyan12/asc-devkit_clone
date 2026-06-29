@@ -80,7 +80,7 @@ $dst_i = scalar_{idx} \& src_i$
 | dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。<br>Ascend 950PR/Ascend 950DT，支持的数据类型为：int16_t/uint16_t/int64_t/uint64_t |
 | src0/src1 | 输入 | 源操作数。<br>- 类型为LocalTensor时，支持当作矢量操作数或标量单点元素，支持的TPosition为VECIN/VECCALC/VECOUT。<br>&nbsp;&nbsp;LocalTensor的起始地址需要32字节对齐。<br>&nbsp;&nbsp;Ascend 950PR/Ascend 950DT，支持的数据类型为：int16_t/uint16_t/int64_t/uint64_t<br>- 类型为标量时：<br>&nbsp;&nbsp;Ascend 950PR/Ascend 950DT，支持的数据类型为：int16_t/uint16_t/int64_t/uint64_t<br>数据类型需要与目的操作数保持一致。 |
 | count | 输入 | 参与计算的元素个数。 |
-| mask[]/mask | 输入 | [mask](../SIMD计算说明/高维切分.md)用于控制每次迭代内参与计算的元素。<br>- 逐bit模式：可以按位控制哪些元素参与计算，bit位的值为1表示参与计算，0表示不参与。<br>&nbsp;&nbsp;mask为数组形式，数组长度和数组元素的取值范围和操作数的数据类型有关。当操作数为16位时，数组长度为2，mask[0]、mask[1]∈[0, 2<sup>64</sup>-1]并且不同时为0；当操作数为32位时，数组长度为1，mask[0]∈(0, 2<sup>64</sup>-1)；当操作数为64位时，数组长度为1，mask[0]∈(0, 2<sup>32</sup>-1)。<br>&nbsp;&nbsp;例如，mask=[8, 0]，8=0b1000，表示仅第4个元素参与计算。<br>- 连续模式：表示前面连续的多少个元素参与计算。取值范围和操作数的数据类型有关，数据类型不同，每次迭代内能够处理的元素个数最大值不同。当操作数为16位时，mask∈[1, 128]；当操作数为32位时，mask∈[1, 64]；当操作数为64位时，mask∈[1, 32]。 |
+| mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](../SIMD计算说明/掩码/掩码.md)。 |
 | repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体描述请参考[高维切分API](../SIMD计算说明/高维切分.md)。 |
 | repeatParams | 输入 | 元素操作控制结构信息，具体请参考[UnaryRepeatParams](../../数据结构/辅助数据结构//UnaryRepeatParams.md)。 |
 

@@ -170,7 +170,7 @@
 <cann-filter npu-type = "950">
 
 - 针对Ascend 950PR/Ascend 950DT
-    - T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。
+    - T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。其中，int8\_t/uint8\_t/int64\_t/uint64\_t/double数据类型仅支持tensor前n个数据计算接口和整个tensor参与计算的运算符重载。
     - U支持的数据类型为：int8_t、uint8_t。
 
 </cann-filter>
@@ -241,20 +241,20 @@
 
 - dst按照小端顺序排序成二进制结果，对应src中相应位置的数据比较结果。
 
+<!-- npu="A3,910b" id10 -->
 - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  <!-- npu="A3" id10 -->
+  <!-- npu="A3" id11 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id10 -->
-  <!-- npu="910b" id11 -->
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
   <!-- end id11 -->
+  <!-- npu="910b" id12 -->
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  <!-- end id12 -->
+<!-- end id10 -->
 
 - **使用整个tensor参与计算的运算符重载功能，src0和src1需满足256字节对齐；使用tensor前n个数据参与计算的接口，设置count时，需要保证count个元素所占空间256字节对齐。**
-- <!-- npu="950" id12 -->
-  针对Ascend 950PR/Ascend 950DT，有如下约束说明：
-  - 该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
-  - int8\_t/uint8\_t/int64\_t/uint64\_t/double数据类型仅支持tensor前n个数据计算接口和整个tensor参与计算的运算符重载。
-  <!-- end id12 -->
+<!-- npu="950" id13 -->
+- 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
+  <!-- end id13 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

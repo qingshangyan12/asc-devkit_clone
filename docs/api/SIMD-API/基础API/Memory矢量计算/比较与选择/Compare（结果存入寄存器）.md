@@ -94,17 +94,19 @@
 
 - 本接口将结果写入128bit的CmpMask寄存器中，可以用[GetCmpMask](GetCmpMask(ISASI).md)接口获取寄存器保存的数据。
 
-- <!-- npu="950" id8 -->
-  针对Ascend 950PR/Ascend 950DT，tensor高维切分计算调用GetTemporaryBufferAddr，占用8KB Unified Buffer。
+<!-- npu="950" id8 -->
+- 针对Ascend 950PR/Ascend 950DT，tensor高维切分计算接口占用8KB Unified Buffer临时空间。
   <!-- end id8 -->
 
+<!-- npu="A3,910b" id9 -->
 - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  <!-- npu="A3" id9 -->
+  <!-- npu="A3" id10 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id9 -->
-  <!-- npu="910b" id10 -->
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
   <!-- end id10 -->
+  <!-- npu="910b" id11 -->
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  <!-- end id11 -->
+<!-- end id9 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
