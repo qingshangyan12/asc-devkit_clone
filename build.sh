@@ -16,6 +16,7 @@ SUPPORTED_LONG_OPTS=(
     "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "adv_test_two" "arm_test" "basic_test_one" "basic_test_two" "basic_test_three" "basic_test_four" "basic_test_five" "build-type" "extra-cmake-args" "changed_file" "enable-sign" "sign-script"
 )
 
+
 CURRENT_DIR=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
 BUILD_DIR=${CURRENT_DIR}/build
 OUTPUT_DIR=${CURRENT_DIR}/build_out
