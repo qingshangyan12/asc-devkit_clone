@@ -211,7 +211,7 @@ import subprocess
 import sys
 import ast
 from pathlib import Path, PurePosixPath
-from urllib.parse import unquote
+from urllib.parse import unquote, urlparse
 
 repo_root = Path(sys.argv[1])
 output_file = Path(sys.argv[2])
@@ -562,6 +562,23 @@ def normalize_target(source_file, target):
     return normalized
 
 
+def normalize_gitcode_self_target(target):
+    parsed = urlparse(target.strip().strip("<>").strip("\"'"))
+    if parsed.scheme not in ("http", "https") or parsed.netloc != "gitcode.com":
+        return None
+
+    parts = [unquote(part) for part in parsed.path.split("/") if part]
+    if len(parts) < 5:
+        return None
+    if parts[0:2] != ["cann", "asc-devkit"] or parts[2] not in ("blob", "tree"):
+        return None
+
+    normalized = posixpath.normpath("/".join(parts[4:]))
+    if normalized.startswith("../") or normalized == ".":
+        return None
+    return normalized
+
+
 if full_scan:
     scan_set = existing_markdown_files()
 else:
@@ -617,6 +634,8 @@ else:
 
                 for target in extract_link_targets(text):
                     normalized = normalize_target(source, target)
+                    if normalized is None:
+                        normalized = normalize_gitcode_self_target(target)
                     if normalized in changed_targets:
                         scan_set.add(source)
                         break
