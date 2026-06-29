@@ -124,6 +124,10 @@
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
 - `dstRepStride`、`srcBlkStride`、`srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
 
+<!-- npu="950" id26 -->
+- 针对Ascend 950PR/Ascend 950DT，tensor高维切分计算占用8KB Unified Buffer。
+<!-- end id26 -->
+
   <!-- npu="A3,910b" id22 -->
 - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
   <!-- npu="A3" id18 -->
