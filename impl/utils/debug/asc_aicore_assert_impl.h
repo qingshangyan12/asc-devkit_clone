@@ -16,7 +16,6 @@
 #ifndef IMPL_UTILS_DEBUG_ASC_AICORE_ASSERT_IMPL_H
 #define IMPL_UTILS_DEBUG_ASC_AICORE_ASSERT_IMPL_H
 
-#ifndef ASCENDC_CPU_DEBUG
 #include "impl/utils/debug/asc_aicore_printf_impl.h"
 
 namespace __asc_aicore {
@@ -33,7 +32,6 @@ inline __aicore__ void __assert_fail_msg(const __gm__ char* __assertion, const _
     trap();
 }
 } // namespace __asc_aicore
-#endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_AICORE_ASSERT_IMPL__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
