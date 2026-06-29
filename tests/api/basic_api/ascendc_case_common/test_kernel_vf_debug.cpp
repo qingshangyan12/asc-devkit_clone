@@ -17,11 +17,23 @@ static int g_testFlag = 0;
 
 __aicore__ static void TestTargetFunc(int x) { g_testFlag = x; }
 
+struct TestSimdVfDebugEnabledTag {};
+
+template <>
+struct SimdVfTraits<TestSimdVfDebugEnabledTag> {
+    static constexpr bool enabled = true;
+};
+
 class TestVFDebug : public testing::Test {
 protected:
     void SetUp() { g_testFlag = 0; }
     void TearDown() { CheckSyncState(); }
 };
+
+TEST_F(TestVFDebug, SimdVfDebugTrait_CanBeEnabledBySpecialization)
+{
+    EXPECT_TRUE(SimdVfTraits<TestSimdVfDebugEnabledTag>::enabled);
+}
 
 TEST_F(TestVFDebug, AscVFDebugInitUb_Callable)
 {
