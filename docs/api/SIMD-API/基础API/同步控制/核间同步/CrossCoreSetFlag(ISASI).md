@@ -71,7 +71,7 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
 | --- | --- | --- |
 | flagId | 输入 | 核间同步的标记。不同产品对flagId的取值范围说明请参见[flagId取值范围说明](#flagId取值范围说明)。 |
 
-### modeId支持的取值说明
+### modeId支持的取值说明<a name="modeId支持的取值说明"></a>
 
 不同产品对同步模式的支持情况如下：
 <!-- npu="950" id8 -->
@@ -87,7 +87,7 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
     <!-- end id11 -->
 <!-- end id9 -->
 
-### pipe支持的流水类型说明
+### pipe支持的流水类型说明<a name="pipe支持的流水类型说明"></a>
 
 - 核间同步的模式为模式0、1、2时，
     - 支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX。
@@ -98,7 +98,7 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
     - 不支持的流水类型为PIPE_ALL。
 <!-- end id12 -->
 
-### flagId取值范围说明
+### flagId取值范围说明<a name="flagId取值范围说明"></a>
 
 - 核间同步的模式为模式0、1、2时，支持的取值范围为0-15。
 <!-- npu="950" id13 -->

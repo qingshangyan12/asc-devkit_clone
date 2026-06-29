@@ -48,19 +48,19 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 | modeId | 核间同步的模式。不同产品对同步模式的支持情况请参见[modeId支持的取值说明](#modeId支持的取值说明)。<br>各个模式支持的对应Kernel类型请参照[表3](#table3)。 |
 | pipe | 设置这条指令所在的流水类型。支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX，不支持PIPE_S和PIPE_ALL。不同产品对流水类型的支持情况请参见[pipe支持的流水类型说明](#pipe支持的流水类型说明)。 |
 
-  > [!CAUTION]注意
-  <!-- npu="950" id8 -->
-  > Ascend 950PR/Ascend 950DT，硬件支持配置核间同步模式和流水类型，模板参数modeId和pipe**生效**，此时CrossCoreWaitFlag会阻塞**指定流水**的后续指令。
-  <!-- end id8 -->
-  <!-- npu="A3,910b" id9 -->
-  > 针对如下产品，硬件支持配置核间同步模式和流水类型，模板参数modeId和pipe**不生效**，此时CrossCoreWaitFlag会阻塞**全部流水**的后续指令。
-  <!-- npu="A3" id10 -->
-  > - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id10 -->
-  <!-- npu="910b" id11 -->
-  > - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id11 -->
-  <!-- end id9 -->
+> [!CAUTION]注意
+<!-- npu="950" id8 -->
+> Ascend 950PR/Ascend 950DT，硬件支持配置核间同步模式和流水类型，模板参数modeId和pipe**生效**，此时CrossCoreWaitFlag会阻塞**指定流水**的后续指令。
+<!-- end id8 -->
+<!-- npu="A3,910b" id9 -->
+> 针对如下产品，硬件支持配置核间同步模式和流水类型，模板参数modeId和pipe**不生效**，此时CrossCoreWaitFlag会阻塞**全部流水**的后续指令。
+<!-- npu="A3" id10 -->
+> - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- end id10 -->
+<!-- npu="910b" id11 -->
+> - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+<!-- end id11 -->
+<!-- end id9 -->
 
 **表2**  参数说明
 
@@ -68,7 +68,7 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 | --- | --- | --- |
 | flagId | 输入 | 核间同步的标记。不同产品对flagId的取值范围说明请参见[flagId取值范围说明](#flagId取值范围说明)。 |
 
-### modeId支持的取值说明
+### modeId支持的取值说明<a name="modeId支持的取值说明"></a>
 
 不同产品对同步模式的支持情况如下：
 <!-- npu="950" id12 -->
@@ -84,7 +84,7 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
     <!-- end id15 -->
 <!-- end id13 -->
 
-### pipe支持的流水类型说明
+### pipe支持的流水类型说明<a name="pipe支持的流水类型说明"></a>
 
 - 核间同步的模式为模式0、1、2时，
     - 支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX。
@@ -95,7 +95,7 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
     - 不支持的流水类型为PIPE_ALL。
 <!-- end id16 -->
 
-### flagId取值范围说明
+### flagId取值范围说明<a name="flagId取值范围说明"></a>
 
 - 核间同步的模式为模式0、1、2时，支持的取值范围为0-15。
 <!-- npu="950" id17 -->
