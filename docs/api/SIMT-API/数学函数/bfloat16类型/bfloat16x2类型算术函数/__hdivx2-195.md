@@ -45,18 +45,71 @@ bfloat16x2_t __hdivx2(const bfloat16x2_t x, const bfloat16x2_t y)
 
 输入数据各分量相除的结果。相除的分量x和y满足：
 
--   当输入和结果都不为nan时，x/y的符号为x和y符号的异或。
--   x为±0，y为±0时，返回值为nan。
--   x为±inf，y为±inf时，返回值为nan。
--   x为有限值，y为±inf时，返回值符号由x和y的符号异或决定，值为0。
--   x为±inf，y为有限值时，返回值符号由x和y的符号异或决定，值为inf。
--   x不为0，y为±0时，返回值符号由x和y的符号异或决定，值为inf。
--   x为±0，y不为0时，返回值符号由x和y的符号异或决定，值为0。
--   x，y任意一个为nan时，返回值为nan。
+<table>
+  <thead>
+    <tr>
+      <th>x分量值</th>
+      <th>y分量值</th>
+      <th>非饱和模式返回值</th>
+      <th>饱和模式返回值</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>±0</td>
+      <td>±0</td>
+      <td>nan</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>有限值</td>
+      <td>±0</td>
+      <td>±inf（符号由x和y的符号异或决定）</td>
+      <td>±ASCRT_MAX_NORMAL_BF16</td>
+    </tr>
+    <tr>
+      <td>±inf</td>
+      <td>±inf</td>
+      <td>nan</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td colspan="2">x，y任意一个为nan</td>
+      <td>nan</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>±inf</td>
+      <td>±0</td>
+      <td>±inf</td>
+      <td>±ASCRT_MAX_NORMAL_BF16</td>
+    </tr>
+    <tr>
+      <td>±inf</td>
+      <td>有限值</td>
+      <td>±inf（符号由x和y的符号异或决定）</td>
+      <td>±ASCRT_MAX_NORMAL_BF16</td>
+    </tr>
+    <tr>
+      <td>有限值</td>
+      <td>±inf</td>
+      <td>±0（符号由x和y的符号异或决定）</td>
+      <td>±0</td>
+    </tr>
+    <tr>
+      <td>ASCRT_MAX_NORMAL_BF16</td>
+      <td>&lt;1.0</td>
+      <td>inf</td>
+      <td>ASCRT_MAX_NORMAL_BF16</td>
+    </tr>
+  </tbody>
+</table>
 
 ## 约束说明
 
-无
+<!-- npu="950" id7 -->
+针对Ascend 950PR/Ascend 950DT，本接口不支持Subnormal场景：处于Subnormal范围内的输入和输出值，都会被刷新为保留符号的0。
+<!-- end id7 -->
 
 ## 需要包含的头文件
 

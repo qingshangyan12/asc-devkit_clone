@@ -65,10 +65,10 @@ Philox随机数生成的核心算法是一个基于记数的伪随机数生成�
 
 ```
 struct PhiloxRandomParams {
-   uint32_t stride; 
-   uint32_t row; 
-   uint32_t column; 
-}
+    uint32_t stride;
+    uint32_t row;
+    uint32_t column;
+};
 ```
 
 **图1**  PhiloxRandom示意图  

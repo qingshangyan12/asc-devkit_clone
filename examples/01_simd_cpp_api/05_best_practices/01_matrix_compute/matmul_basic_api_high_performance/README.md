@@ -58,7 +58,7 @@
 | aic_mac_ratio | Cube 计算单元的时间占比，反映计算单元利用率 |
 | aic_mte1_time(μs) | MTE1（L1 到 L0A/L0B 搬运）的执行时间 |
 | aic_mte1_ratio | MTE1 的时间占比，反映 L1 到 L0 的数据搬运压力 |
-| aic_mte2_time(μs) | MTE2（[GM](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)（Global Memory） 到 L1 搬运）的执行时间 |
+| aic_mte2_time(μs) | MTE2（[GM](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)（Global Memory） 到 L1 搬运）的执行时间 |
 | aic_mte2_ratio | MTE2 的时间占比，反映 GM 到 L1 的数据加载压力 |
 | aic_fixpipe_time(μs) | [Fixpipe](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬出/L0C到GM数据搬运（Fixpipe）.md)（L0C 到 GM 搬运）的执行时间 |
 | aic_fixpipe_ratio | [Fixpipe](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬出/L0C到GM数据搬运（Fixpipe）.md) 的时间占比，反映结果写回的访存压力 |
@@ -156,7 +156,7 @@ if ((kOffsetInChunkA + 1) == stepKa) {
 按 M/N 方向均匀切分矩阵到多核并行计算。以 Atlas A2/A3（dav-2201）为例，采用 4×6 切分策略（M 方向 4 块、N 方向 6 块，共 24 核）满足地址 512B 对齐，并减少同地址访问冲突；Ascend 950PR/950DT（dav-3510）下为 32 核切分（参见后文性能数据小节）：
 
 ```cpp
-constexpr uint32_t mIter = AscendC::DivCeil(M, singleCoreM);
+constexpr uint32_t mIter = DivCeil(M, singleCoreM);
 uint32_t mIterIdx = AscendC::GetBlockIdx() % mIter;
 uint32_t nIterIdx = AscendC::GetBlockIdx() / mIter;
 ```
@@ -199,7 +199,7 @@ nd2nzParams.dValue = baseK * stepKa;  // 大包包含 stepKa 个 baseM * baseK
 
 ```cpp
 AscendC::LoadData2DParams loadDataParams;
-for (int i = 0; i < AscendC::DivCeil(baseK, CUBE_BLOCK); ++i) {
+for (int i = 0; i < DivCeil(baseK, CUBE_BLOCK); ++i) {
     AscendC::LoadData(b2Local[i * dstOffset], b1Local[srcAddr + i * srcOffset], loadDataParams);
 }
 ```
@@ -252,8 +252,8 @@ L2Cache 切分的具体实现与[高阶 API Matmul 样例](../matmul_high_perfor
 
 ```cpp
 // ProcessL2Cache: 按 M 方向分轮，每轮 24 核覆盖 mIterPerRound 份 M 子块
-constexpr uint32_t mIterPerRound = AscendC::DivCeil(M, singleCoreM * 2);
-constexpr uint32_t outerMLoopCount = AscendC::DivCeil(mIterTotal, mIterPerRound);
+constexpr uint32_t mIterPerRound = DivCeil(M, singleCoreM * 2);
+constexpr uint32_t outerMLoopCount = DivCeil(mIterTotal, mIterPerRound);
 
 for (uint32_t outerMIdx = 0; outerMIdx < outerMLoopCount; outerMIdx++) {
     uint32_t mIterIdx = AscendC::GetBlockIdx() % mIterPerRound + outerMIdx * mIterPerRound;

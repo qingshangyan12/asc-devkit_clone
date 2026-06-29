@@ -2,19 +2,31 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
 集合通信AlltoAllvWrite的任务下发接口，返回该任务的标识handleId给用户。
 
-AlltoAllvWrite的功能为：通信域内的卡互相发送和接收数据，并且定制每张卡给其它卡发送的数据量和从其它卡接收的数据量，以及定制发送和接收的数据在内存中的偏移。结合原型中的参数，描述接口功能，具体为：本卡发送地址偏移为sendOffsets\[i\]字节且大小为sendSizes\[i\]字节的数据给第i张卡，remoteWinOffset表示对端卡发送数据的地址偏移，localDataSize表示发送给本卡的数据大小。注意：这里的偏移和数据量均为字节数。
+AlltoAllvWrite的功能为：通信域内的卡互相发送和接收数据，并且定制每张卡给其它卡发送的数据量和从其它卡接收的数据量，以及定制发送和接收的数据在内存中的偏移。结合原型中的参数，描述接口功能，具体为：本卡发送地址偏移为sendOffsets\[i\]字节且大小为sendSizes\[i\]字节的数据给第i张卡，remoteWinOffset表示本卡数据写入对端window的偏移，localDataSize表示各张对端卡写入本卡的数据大小。注意：这里的偏移和数据量均为字节数。
 
 ![](../../../../figures/251208103727744.png)
 
@@ -40,8 +52,8 @@ __aicore__ inline HcclHandle AlltoAllvWrite(GM_ADDR usrIn, GM_ADDR sendOffsets, 
 | usrIn | 输入 | 源数据buffer地址。 |
 | sendOffsets | 输入 | 待发送的每个分片的偏移，以字节为单位。 |
 | sendSizes | 输入 | 待发送的每个分片的数据大小，以字节为单位。 |
-| remoteWinOffset | 输入 | 对端卡发送的数据偏移，以字节为单位。 |
-| localDataSize | 输入 | 发送给本卡的数据大小，以字节为单位。 |
+| remoteWinOffset | 输入 | 本卡数据写入对端window的偏移，以字节为单位。 |
+| localDataSize | 输入 | 各张对端卡写入本卡的数据大小，以字节为单位。 |
 
 ## 返回值说明
 
@@ -52,17 +64,21 @@ __aicore__ inline HcclHandle AlltoAllvWrite(GM_ADDR usrIn, GM_ADDR sendOffsets, 
 -   调用本接口前确保已调用过[InitV2](InitV2.md)和[SetCcTilingV2](SetCcTilingV2.md)接口。
 -   若HCCL对象的[模板参数config](HCCL模板参数.md#p150710476349)未指定下发通信任务的核，则该接口只能在AIC核或者AIV核两者之一上调用。若HCCL对象的[模板参数config](HCCL模板参数.md#p150710476349)指定了下发通信任务的核，则该接口可以在AIC核和AIV核上同时调用，接口内部根据指定的核的类型，在对应的AIC核、AIV核二者之一下发该通信任务。
 -   一个通信域内，所有Prepare接口和InterHcclGroupSync接口的总调用次数不能超过63。
+<!-- npu="950" id7 -->
 -   对于Ascend 950PR/Ascend 950DT，通信服务端为CCU时，单次最大通信数据量不能超过256M。
+<!-- end id7 -->
 
 ## 调用示例
 
 ```
-extern "C" __global__ __aicore__ void alltoallvwrite_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM) {
-
-    REGISTER_TILING_DEFAULT(AllToAllVWriteCustomTilingData); //AllToAllVWriteCustomTilingData为对应算子头文件定义的结构体
+extern "C" __global__ __aicore__ void alltoallvwrite_custom(
+    GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
+{
+    REGISTER_TILING_DEFAULT(
+        AllToAllVWriteCustomTilingData); // AllToAllVWriteCustomTilingData为对应算子头文件定义的结构体
     GET_TILING_DATA_WITH_STRUCT(AllToAllVWriteCustomTilingData, tilingData, tilingGM);
 
-    auto &&cfg       = tilingData.param;
+    auto&& cfg = tilingData.param;
     uint32_t M = cfg.M;
     uint32_t K = cfg.K;
     uint32_t dataType = cfg.dataType;
@@ -79,9 +95,10 @@ extern "C" __global__ __aicore__ void alltoallvwrite_custom(GM_ADDR xGM, GM_ADDR
     uint64_t perRankDataSize_ = M * K * dataTypeSize / rankDim;
     GM_ADDR sendSizeGM_ = workspaceGM;
     GM_ADDR sendOffsetGM_ = sendSizeGM_ + rankDim * sizeof(uint64_t) * 2;
-    __gm__ uint64_t *sendSizes = reinterpret_cast<__gm__ uint64_t *>(sendSizeGM_);
-    __gm__ uint64_t *sendOffsets = reinterpret_cast<__gm__ uint64_t *>(sendOffsetGM_);
-    for (uint32_t i = 0U; i < rankDim; i++) { // 当前ccu通信都是双die，所以sendSize和sendOffset需要等分切成die0和die1的数据
+    __gm__ uint64_t* sendSizes = reinterpret_cast<__gm__ uint64_t*>(sendSizeGM_);
+    __gm__ uint64_t* sendOffsets = reinterpret_cast<__gm__ uint64_t*>(sendOffsetGM_);
+    // 当前ccu通信都是双die，所以sendSize和sendOffset需要等分切成die0和die1的数据
+    for (uint32_t i = 0U; i < rankDim; i++) { 
         sendSizes[i] = perRankDataSize_ / 2;
         sendSizes[i + rankDim] = perRankDataSize_ - perRankDataSize_ / 2;
         sendOffsets[i] = i * perRankDataSize_;
@@ -94,7 +111,7 @@ extern "C" __global__ __aicore__ void alltoallvwrite_custom(GM_ADDR xGM, GM_ADDR
             AscendC::HcclHandle handleId = -1;
             handleId = hccl.AlltoAllvWrite<true>(xGM, sendOffsetGM_, sendSizeGM_, remoteWinOffset, localDataSize);
             hccl.Wait(handleId);
-            AscendC::SyncAll<true>();  // 全AIV核同步，防止0核执行过快，提前调用hccl.Finalize()接口，导致其他核Wait卡死
+            AscendC::SyncAll<true>(); // 全AIV核同步，防止0核执行过快，提前调用hccl.Finalize()接口，导致其他核Wait卡死
             hccl.Finalize();
         }
     }

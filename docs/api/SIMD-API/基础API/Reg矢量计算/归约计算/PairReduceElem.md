@@ -47,7 +47,7 @@ __simd_callee__ inline void PairReduceElem(U& dstReg, U srcReg, MaskReg mask)
 | --- | --- |
 | type | 具体的PairReduce类型，当前仅支持归约求和计算。<br><pre>enum class PairReduce {<br>    SUM = 0,<br>};</pre> |
 | T | 目的操作数和源操作数的数据类型。 |
-| mode | [MaskMergeMode](../数据类型/MaskMergeMode.md)，选择MERGING模式或ZEROING模式。<br>&bull; ZEROING，mask未筛选的元素在dst中置零。目前仅支持该模式。<br>&bull; MERGING，当前不支持。 |
+| mode | [MaskMergeMode](../辅助数据类型/MaskMergeMode.md)，选择MERGING模式或ZEROING模式。<br>&bull; ZEROING，mask未筛选的元素在dst中置零。目前仅支持该模式。<br>&bull; MERGING，当前不支持。 |
 | U | 目的操作数和源操作数的RegTensor类型，由编译器自动推导，用户不需要填写。 |
 
 **表2** 函数参数说明
