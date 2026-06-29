@@ -27,8 +27,6 @@ __aicore__ inline void set_scalar_param_impl(__gm__ uint8_t* paramAddr, uint32_t
 
     if constexpr (is_same_in_list<T, half, float>()) {
         *((__gm__ float *)scalarAddr) = static_cast<float>(scalar);
-    } else if constexpr (is_same_in_list<T, double>()) {
-        *((__gm__ double *)scalarAddr) = static_cast<double>(scalar);
     } else if constexpr (std::is_signed<T>::value) {
         *((__gm__ int64_t *)scalarAddr) = static_cast<int64_t>(scalar);
     } else if constexpr(std::is_unsigned<T>::value) {
