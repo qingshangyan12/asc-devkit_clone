@@ -78,6 +78,8 @@ AscendC::printf("fmt string %d\n", 0x123);
 ```cpp
 template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
+template <class... Args>
+__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args) // 保留接口兼容性，推荐使用printf
 ```
 
 ## 参数说明<a name="section158061867342"></a>
