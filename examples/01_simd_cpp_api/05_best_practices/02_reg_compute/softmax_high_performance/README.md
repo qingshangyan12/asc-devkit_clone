@@ -328,7 +328,7 @@ Case 5同时应用了三个维度上互不冲突的优化手段，形成"1 + 1 +
 | ExpSub融合指令 | 单条指令替代Sub+Exp，减少延迟 | Case 1→Case 2 |
 | 循环融合 | 共享Load/Store，消除冗余搬运和同步 | Case 1→Case 2 |
 | UpdateMask | 自动更新掩码，简洁尾块处理 | Case 2,Case 3 |
-| 主尾块模式 | 主块全Mask无更新开销，尾块独立处理 | Case 4,Case 4 |
+| 主尾块模式 | 主块全Mask无更新开销，尾块独立处理 | Case 4,Case 5 |
 | 外层循环展开 | 多套寄存器组交错执行，提升指令双发 | Case 2→Case 3, Case 4→Case 5 |
 
 ## 编译运行
