@@ -86,7 +86,7 @@
 ## 数据类型
 
 <!-- npu="950" id13 -->
-Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。
+Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。int8\_t、uint8\_t数据类型仅支持tensor前n个数据计算接口。
 <!-- end id13 -->
 
 <!-- npu="310b" id12 -->
@@ -146,9 +146,6 @@ Atlas 推理系列产品AI Core，支持的数据类型为：uint16_t、half、u
   - Atlas 推理系列产品AI Core
   <!-- end id29 -->
   <!-- end id17 -->
-<!-- npu="950" id11 -->
--   针对Ascend 950PR/Ascend 950DT，uint8\_t/int8\_t数据类型仅支持tensor前n个数据计算接口。
-<!-- end id11 -->
 
 ## 调用示例<a name="section11276201527"></a>
 

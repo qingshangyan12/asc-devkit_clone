@@ -90,7 +90,7 @@ def Gather(dst, src, count, srcOffset, srcBaseAddr):
 
 ## 数据类型
 <!-- npu="950" id8 -->
-Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。
+Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。数据类型int8\_t、uint8\_t仅支持tensor前n个数据计算接口。
 <!-- end id8 -->
 
 <!-- npu="A3" id9 -->
@@ -140,19 +140,23 @@ Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t�
   <!-- end id22 -->
 - srcBaseAddr的取值应保证src元素类型位宽对齐，否则会导致非预期行为，程序没有崩溃报错，但数据发生错位，导致结果张量不符合预期。
 - repeatTime取值范围：repeatTime∈[0,255]。
-<!-- npu="A3,910b" id20 -->
-- 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  <!-- npu="A3" id18 -->
-  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id18 -->
-  <!-- npu="910b" id19 -->
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id19 -->
-<!-- end id20 -->
 
-<!-- npu="950" id23 -->
-- 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算/Reg矢量计算.md)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
-<!-- end id23 -->
+  <!-- npu="950,A3,910b" id31 -->
+- 当参数count或repeatTime取值为0时，该接口的行为如下：
+  <!-- npu="A3,910b" id20 -->
+  - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+    <!-- npu="A3" id18 -->
+    - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+    <!-- end id18 -->
+    <!-- npu="910b" id19 -->
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    <!-- end id19 -->
+  <!-- end id20 -->
+
+  <!-- npu="950" id23 -->
+  - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算/Reg矢量计算.md)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
+  <!-- end id23 -->
+  <!-- end id31 -->
 
   <!-- npu="950,310b" id26 -->
 - 针对以下型号，当操作数为**8位**时，每次迭代完成**4个DataBlock**的数据收集；其他情况下，每次迭代完成8个DataBlock的数据收集。
@@ -177,9 +181,6 @@ Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t�
   <!-- end id29 -->
   <!-- end id30 -->
 
-<!-- npu="950" id31 -->
-- 针对Ascend 950PR/Ascend 950DT，int8\_t、uint8\_t数据类型仅支持tensor前n个数据计算接口。
-<!-- end id31 -->
 
 ## 调用示例<a name="section11276201527"></a>
 

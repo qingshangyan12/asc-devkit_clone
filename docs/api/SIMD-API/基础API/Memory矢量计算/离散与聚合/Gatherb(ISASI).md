@@ -120,18 +120,23 @@ Atlas 200I/500 A2 推理产品，支持的数据类型为：int8_t、uint8_t、i
   - 偏移地址后不能超出UB大小数据的范围。
   - 地址偏移的取值范围：不能超出uint32_t的范围。
 - repeatTime取值范围：repeatTime∈[0,255]。
-<!-- npu="A3,910b" id20 -->
-- 针对如下型号，当参数repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  <!-- npu="A3" id18 -->
-  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id18 -->
-  <!-- npu="910b" id19 -->
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id19 -->
-<!-- end id20 -->
-<!-- npu="950" id23 -->
-- 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算/Reg矢量计算.md)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
-<!-- end id23 -->
+
+  <!-- npu="950,A3,910b" id16 -->
+- 当参数count或repeatTime取值为0时，该接口的行为如下：
+  <!-- npu="A3,910b" id20 -->
+  - 针对如下型号，当参数repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+    <!-- npu="A3" id18 -->
+    - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+    <!-- end id18 -->
+    <!-- npu="910b" id19 -->
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    <!-- end id19 -->
+  <!-- end id20 -->
+  <!-- npu="950" id23 -->
+  - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算/Reg矢量计算.md)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
+  <!-- end id23 -->
+  <!-- end id16 -->
+
   <!-- npu="A3,910b" id15 -->
 - 针对如下型号，当dstBlkStride取值为0时，默认按照1来处理。
   <!-- npu="A3" id13 -->

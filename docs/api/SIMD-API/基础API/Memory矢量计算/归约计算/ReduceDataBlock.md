@@ -124,22 +124,27 @@
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
 - `dstRepStride`、`srcBlkStride`、`srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
 
-<!-- npu="950" id26 -->
-- 针对Ascend 950PR/Ascend 950DT，tensor高维切分计算占用8KB Unified Buffer。
-<!-- end id26 -->
-
+  <!-- npu="950,A3,910b" id27 -->
+- 当参数count或repeatTime取值为0时，该接口的行为如下：
   <!-- npu="A3,910b" id22 -->
-- 针对如下型号，当参数mask或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  <!-- npu="A3" id18 -->
-  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id18 -->
-  <!-- npu="910b" id19 -->
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id19 -->
+  - 针对如下型号，当参数mask或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+    <!-- npu="A3" id18 -->
+    - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+    <!-- end id18 -->
+    <!-- npu="910b" id19 -->
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    <!-- end id19 -->
 
-<!-- npu="950" id25 -->
-- 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算/Reg矢量计算.md)API实现兼容，当参数mask或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
-<!-- end id25 -->
+  <!-- npu="950" id25 -->
+  - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算/Reg矢量计算.md)API实现兼容，当参数mask或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
+  <!-- end id25 -->
+  <!-- end id27 -->
+  
+<!-- npu="950" id26 -->
+- 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT：
+  - tensor高维切分计算占用8KB Unified Buffer。
+  - tensor前n个数据连续计算不涉及8KB Unified Buffer的占用。
+<!-- end id26 -->
 
 - 针对如下型号，若配置`mask[]/mask`参数后，存在某个DataBlock里的任何一个元素都不参与计算，不会有值写入对应目的操作数，保留目的操作数原有数据。
   <!-- npu="A3" id20 -->

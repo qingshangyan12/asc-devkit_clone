@@ -92,7 +92,7 @@
 支持的数据类型如下：
 
 <!-- npu="950" id10 -->
-- Ascend 950PR/Ascend 950DT，支持half、float、int64_t、uint64_t。
+- Ascend 950PR/Ascend 950DT，支持half、float、int64_t、uint64_t。数据类型int64_t、uint64_t仅支持tensor前n个数据计算接口。
 <!-- end id10 -->
 <!-- npu="A3" id11 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持half、float。
@@ -126,25 +126,23 @@
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
 - 需要使用`sharedTmpBuffer`的情况下，支持`dst`与`sharedTmpBuffer`地址重叠（通常情况下`dst`比`sharedTmpBuffer`所需的空间要小），此时`sharedTmpBuffer`必须满足所需空间要求，详情请参考[关键特性说明](#关键特性说明)。
 
+  <!-- npu="950,A3,910b" id21 -->
+- 当参数count或repeatTime取值为0时，该接口的行为如下：
   <!-- npu="A3,910b" id20 -->
-
-- 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  <!-- npu="A3" id18 -->
-  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id18 -->
-  <!-- npu="910b" id19 -->
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id19 -->
-
+  - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+    <!-- npu="A3" id18 -->
+    - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+    <!-- end id18 -->
+    <!-- npu="910b" id19 -->
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    <!-- end id19 -->
   <!-- end id20 -->
 
-<!-- npu="950" id30 -->
-- 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算/Reg矢量计算.md)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
-<!-- end id30 -->
+  <!-- npu="950" id30 -->
+  - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算/Reg矢量计算.md)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
+  <!-- end id30 -->
+  <!-- end id21 -->
 
-<!-- npu="950" id21 -->
-- 针对Ascend 950PR/Ascend 950DT，`int64_t`/`uint64_t`数据类型仅支持tensor前n个数据计算接口。
-<!-- end id21 -->
 - `srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
 
   <!-- npu="950,910,310p,310b,x90,9030" id37 -->
