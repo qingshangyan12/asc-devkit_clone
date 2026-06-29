@@ -1,152 +1,81 @@
 # Reg矢量计算接口MergeMode支持情况汇总
 
+不支持MergeMode模板参数的接口，下文不罗列。
+
 <!-- npu="950" id1 -->
 **表1**  数据搬入接口MergeMode支持情况
 
-| 接口                 | 硬件支持模式           | 软件支持模式 |
-| :------------------- | :--------------------- | :----------- |
-| LoadAlign            | -                      | -            |
-| LoadUnAlign          | -                      | -            |
-| MaskGenWithRegTensor | -                      | -            |
-| Gather               | -                      | -            |
-| GatherB              | -                      | -            |
-| Load                 | -                      | -            |
-| Move                 | MaskMergeMode::MERGING | -            |
+| 接口 | 硬件支持的模板参数枚举值 | 软件支持的模板参数枚举值 |
+| :--- | :----------------------- | :----------------------- |
+| Move | MaskMergeMode::MERGING   | 无                       |
 
-**表2**  数据搬出接口MergeMode支持情况
+**表2**  基础算术接口MergeMode支持情况
 
-| 接口         | 硬件支持模式 | 软件支持模式 |
-| :----------- | :----------- | :----------- |
-| StoreAlign   | -            | -            |
-| StoreUnAlign | -            | -            |
-| Scatter      | -            | -            |
-| Store        | -            | -            |
+| 接口      | 硬件支持的模板参数枚举值 | 软件支持的模板参数枚举值 |
+| :-------- | :----------------------- | :----------------------- |
+| Add       | MaskMergeMode::ZEROING   | MaskMergeMode::MERGING   |
+| Sub       | MaskMergeMode::ZEROING   | 无                       |
+| Exp       | MaskMergeMode::ZEROING   | 无                       |
+| Sqrt      | MaskMergeMode::ZEROING   | 无                       |
+| Max       | MaskMergeMode::ZEROING   | MaskMergeMode::MERGING   |
+| Min       | MaskMergeMode::ZEROING   | MaskMergeMode::MERGING   |
+| Mul       | MaskMergeMode::ZEROING   | 无                       |
+| Div       | MaskMergeMode::ZEROING   | 无                       |
+| Adds      | MaskMergeMode::ZEROING   | 无                       |
+| Maxs      | MaskMergeMode::ZEROING   | 无                       |
+| Mins      | MaskMergeMode::ZEROING   | 无                       |
+| Muls      | MaskMergeMode::ZEROING   | 无                       |
+| Abs       | MaskMergeMode::ZEROING   | 无                       |
+| Ln        | MaskMergeMode::ZEROING   | 无                       |
+| Log       | MaskMergeMode::ZEROING   | 无                       |
+| Log2      | 无                       | MaskMergeMode::ZEROING   |
+| Log10     | 无                       | MaskMergeMode::ZEROING   |
+| Neg       | MaskMergeMode::ZEROING   | 无                       |
+| Relu      | MaskMergeMode::ZEROING   | 无                       |
+| Prelu     | MaskMergeMode::ZEROING   | 无                       |
+| LeakyRelu | MaskMergeMode::ZEROING   | 无                       |
 
-**表3**  基础算术接口MergeMode支持情况
+**表3**  逻辑计算接口MergeMode支持情况
 
-| 接口      | 硬件支持模式           | 软件支持模式           |
-| :-------- | :--------------------- | :--------------------- |
-| Add       | MaskMergeMode::ZEROING | -                      |
-| AddC      | -                      | -                      |
-| Sub       | MaskMergeMode::ZEROING | -                      |
-| SubC      | -                      | -                      |
-| Exp       | MaskMergeMode::ZEROING | -                      |
-| Sqrt      | MaskMergeMode::ZEROING | -                      |
-| Max       | MaskMergeMode::ZEROING | MaskMergeMode::MERGING |
-| Min       | MaskMergeMode::ZEROING | MaskMergeMode::MERGING |
-| Mul       | MaskMergeMode::ZEROING | -                      |
-| Mull      | -                      | -                      |
-| Div       | MaskMergeMode::ZEROING | -                      |
-| Adds      | MaskMergeMode::ZEROING | -                      |
-| Maxs      | MaskMergeMode::ZEROING | -                      |
-| Mins      | MaskMergeMode::ZEROING | -                      |
-| Muls      | MaskMergeMode::ZEROING | -                      |
-| Abs       | MaskMergeMode::ZEROING | -                      |
-| Ln        | MaskMergeMode::ZEROING | -                      |
-| Log       | MaskMergeMode::ZEROING | -                      |
-| Log2      | -                      | MaskMergeMode::ZEROING |
-| Log10     | -                      | MaskMergeMode::ZEROING |
-| Neg       | MaskMergeMode::ZEROING | -                      |
-| Relu      | MaskMergeMode::ZEROING | -                      |
-| Prelu     | MaskMergeMode::ZEROING | -                      |
-| LeakyRelu | MaskMergeMode::ZEROING | -                      |
+| 接口                   | 硬件支持的模板参数枚举值 | 软件支持的模板参数枚举值 |
+| :--------------------- | :----------------------- | :----------------------- |
+| Not（对RegTensor操作） | MaskMergeMode::ZEROING   | 无                       |
+| And（对RegTensor操作） | MaskMergeMode::ZEROING   | 无                       |
+| Or（对RegTensor操作）  | MaskMergeMode::ZEROING   | 无                       |
+| Xor（对RegTensor操作） | MaskMergeMode::ZEROING   | 无                       |
+| ShiftRight             | MaskMergeMode::ZEROING   | 无                       |
+| ShiftLefts             | MaskMergeMode::ZEROING   | 无                       |
+| ShiftLeft              | MaskMergeMode::ZEROING   | 无                       |
+| ShiftRights            | MaskMergeMode::ZEROING   | 无                       |
 
-**表4**  逻辑计算接口MergeMode支持情况
+**表4**  复合计算接口MergeMode支持情况
 
-| 接口                   | 硬件支持模式           | 软件支持模式 |
-| :--------------------- | :--------------------- | :----------- |
-| Not（对RegTensor操作） | MaskMergeMode::ZEROING | -            |
-| And（对RegTensor操作） | MaskMergeMode::ZEROING | -            |
-| Or（对RegTensor操作）  | MaskMergeMode::ZEROING | -            |
-| Xor（对RegTensor操作） | MaskMergeMode::ZEROING | -            |
-| ShiftRight             | MaskMergeMode::ZEROING | -            |
-| ShiftLefts             | MaskMergeMode::ZEROING | -            |
-| ShiftLeft              | MaskMergeMode::ZEROING | -            |
-| ShiftRights            | MaskMergeMode::ZEROING | -            |
+| 接口      | 硬件支持的模板参数枚举值 | 软件支持的模板参数枚举值 |
+| :-------- | :----------------------- | :----------------------- |
+| AbsSub    | MaskMergeMode::ZEROING   | 无                       |
+| ExpSub    | MaskMergeMode::ZEROING   | 无                       |
+| Axpy      | MaskMergeMode::ZEROING   | 无                       |
+| MulDstAdd | MaskMergeMode::ZEROING   | 无                       |
+| MulAddDst | MaskMergeMode::ZEROING   | 无                       |
 
-**表5**  复合计算接口MergeMode支持情况
+**表5**  类型转换接口MergeMode支持情况
 
-| 接口      | 硬件支持模式           | 软件支持模式 |
-| :-------- | :--------------------- | :----------- |
-| AbsSub    | MaskMergeMode::ZEROING | -            |
-| ExpSub    | MaskMergeMode::ZEROING | -            |
-| Axpy      | MaskMergeMode::ZEROING | -            |
-| MulDstAdd | MaskMergeMode::ZEROING | -            |
-| MulAddDst | MaskMergeMode::ZEROING | -            |
-| MulsCast  | MaskMergeMode::ZEROING | -            |
+| 接口     | 硬件支持的模板参数枚举值 | 软件支持的模板参数枚举值 |
+| :------- | :----------------------- | :----------------------- |
+| Cast     | MaskMergeMode::ZEROING   | 无                       |
+| Truncate | MaskMergeMode::ZEROING   | 无                       |
 
-**表6**  比较与选择接口MergeMode支持情况
+**表6**  归约计算接口MergeMode支持情况
 
-| 接口     | 硬件支持模式 | 软件支持模式 |
-| :------- | :----------- | :----------- |
-| Compare  | -            | -            |
-| Compares | -            | -            |
-| Select   | -            | -            |
-| Squeeze  | -            | -            |
+| 接口            | 硬件支持的模板参数枚举值 | 软件支持的模板参数枚举值 |
+| :-------------- | :----------------------- | :----------------------- |
+| Reduce          | MaskMergeMode::ZEROING   | 无                       |
+| ReduceDataBlock | MaskMergeMode::ZEROING   | 无                       |
+| PairReduceElem  | MaskMergeMode::ZEROING   | 无                       |
 
-**表7**  类型转换接口MergeMode支持情况
+**表7**  数据填充接口MergeMode支持情况
 
-| 接口     | 硬件支持模式           | 软件支持模式 |
-| :------- | :--------------------- | :----------- |
-| Cast     | MaskMergeMode::ZEROING | -            |
-| Truncate | MaskMergeMode::ZEROING | -            |
-
-**表8**  归约计算接口MergeMode支持情况
-
-| 接口            | 硬件支持模式           | 软件支持模式 |
-| :-------------- | :--------------------- | :----------- |
-| Reduce          | MaskMergeMode::ZEROING | -            |
-| ReduceDataBlock | MaskMergeMode::ZEROING | -            |
-| PairReduceElem  | MaskMergeMode::ZEROING | -            |
-
-**表9**  数据填充接口MergeMode支持情况
-
-| 接口      | 硬件支持模式                                   | 软件支持模式 |
-| :-------- | :--------------------------------------------- | :----------- |
-| Duplicate | MaskMergeMode::ZEROING、MaskMergeMode::MERGING | -            |
-
-**表10**  离散操作接口MergeMode支持情况
-
-| 接口   | 硬件支持模式 | 软件支持模式 |
-| :----- | :----------- | :----------- |
-| Gather | -            | -            |
-
-**表11**  数据重排接口MergeMode支持情况
-
-| 接口         | 硬件支持模式 | 软件支持模式 |
-| :----------- | :----------- | :----------- |
-| Interleave   | -            | -            |
-| DeInterleave | -            | -            |
-
-**表12**  数据压缩接口MergeMode支持情况
-
-| 接口      | 硬件支持模式 | 软件支持模式 |
-| :-------- | :----------- | :----------- |
-| Unsqueeze | -            | -            |
-| Pack      | -            | -            |
-| UnPack    | -            | -            |
-
-**表13**  直方图计算接口MergeMode支持情况
-
-| 接口       | 硬件支持模式 | 软件支持模式 |
-| :--------- | :----------- | :----------- |
-| Histograms | -            | -            |
-
-**表14**  索引操作接口MergeMode支持情况
-
-| 接口   | 硬件支持模式 | 软件支持模式 |
-| :----- | :----------- | :----------- |
-| Arange | -            | -            |
-
-**表15**  同步控制接口MergeMode支持情况
-
-| 接口        | 硬件支持模式 | 软件支持模式 |
-| :---------- | :----------- | :----------- |
-| LocalMemBar | -            | -            |
-
-**表16**  系统变量访问接口MergeMode支持情况
-
-| 接口     | 硬件支持模式 | 软件支持模式 |
-| :------- | :----------- | :----------- |
-| ClearSpr | -            | -            |
+| 接口      | 硬件支持的模板参数枚举值                       | 软件支持的模板参数枚举值 |
+| :-------- | :--------------------------------------------- | :----------------------- |
+| Duplicate | MaskMergeMode::ZEROING、MaskMergeMode::MERGING | 无                       |
 <!-- end id1 -->
