@@ -2,7 +2,7 @@
 
 ## **特性说明：**
 
-Gemv的核心功能体现为：当矩阵A的维度M取值为1时，接口会自动启用Gemv功能，该操作退化为1×K维度的行向量与K×N维度矩阵之间的乘法运算。
+Gemv的核心功能体现为：当矩阵A的维度M取值为1时，接口可以手动启用Gemv功能，该操作退化为1×K维度的行向量与K×N维度矩阵之间的乘法运算。
 
 <cann-filter npu-type="950">
 
@@ -22,7 +22,7 @@ Gemv的核心功能体现为：当矩阵A的维度M取值为1时，接口会自�
 
 **使用优势：**
 
-M=1时自动开启GEMV模式，则矩阵乘法将M方向作为非对齐场景进行处理。GEMV模式相较于非对齐处理方式，搬运数据量更少，性能更好。下面以M=1，K=256，N=32，左右矩阵数据类型为half的矩阵乘示例说明。
+M=1时开启GEMV模式，则矩阵乘法将M方向作为非对齐场景进行处理。GEMV模式相较于非对齐处理方式，搬运数据量更少，性能更好。下面以M=1，K=256，N=32，左右矩阵数据类型为half的矩阵乘示例说明。
 
 - GEMV模式
 
@@ -40,25 +40,21 @@ M=1时自动开启GEMV模式，则矩阵乘法将M方向作为非对齐场景进
 
     ![](../../../../../figures/mmad_nongemv_compare.png)
 
-**表1**  示例配置说明
-
-| 矩阵 | 维度大小 | 数据类型 |
-| --- | --- | --- |
-| A | 1 * 4096 | half |
-| B | 4096 * 256 | half |
-| C | 1 * 256 | float |
-
-A矩阵为1\* 4096的向量，从软件侧可以视为64\*64的（针对Ascend 950PR/Ascend 950DT产品为NZ分型）数据，通过Copy接口搬运到L0A Buffer上。
-
-C矩阵为1\* 256的向量，共可以划分为16个1 \* 16的子向量，占用16 \* 1024B = 16384B\(f162f32\)，其中有效数据仅仅为16 \* 64B = 1024B。
-
-**图4**  GEMV模式矩阵乘示意图
-
-![](../../../../../figures/mmad_gemv_demo.png)
-
 ## **使用示例：**
 
+本GEMV场景示例的规格如下：
+
+| 矩阵 | 维度大小 | 数据类型 | 格式 |
+| --- | --- | --- | --- |
+| A | 1 * 4096 | half | ND |
+| B | 4096 * 256 | half | NZ |
+| C | 1 * 256 | float | ND |
+
+通过`Copy`接口将输入矩阵A从Global Memory搬运到L1 Buffer上并保持ND格式不变，然后在L1 Buffer上将A矩阵转换为NZ格式，再通过`Copy`接口搬运到L0A Buffer，从而以GEMV模式执行矩阵乘。另外注意GEMV模式默认是关闭的，需要自定义`MmadTrait`来开启。
+
 ```cpp
+#include "tensor_api/tensor.h"
+
 using namespace AscendC::Te;
 
 struct MmadTraitCustom {
@@ -67,9 +63,37 @@ struct MmadTraitCustom {
     static constexpr const TraitType value = MmadTrait(0, false, false, false, MmadType::NORMAL);
 };
 
-// Mmad计算代码
-MmadParams params(1, n, k, 0, true);
-auto atom = MakeMmad(MmadOperation{}, MmadTraitCustom{}).with(params);
-Mmad(atom, l0C, l0A, l0B);
+__aicore__ inline void MmadGemvExample(__gm__ half* aGm, __gm__ half* bGm, __gm__ float* cGm)
+{
+    using AType = half;
+    constexpr uint32_t m = 1;
+    constexpr uint32_t k = 4096;
+    constexpr uint32_t n = 256;
+    // 数据类型half的C0_ELEMENT = C0_SIZE(32B) / sizeof(half) = 16，1×K向量按NZ格式重排为(K/C0_ELEMENT)×C0_ELEMENT大小的Tensor。
+    constexpr uint32_t c0 = C0_ELEMENT<AType>;
 
+    __cbuf__ AType l1ABuf[m * k];
+    __ca__ AType l0ABuf[m * k];
+
+    // A矩阵Global Memory->L1 Buffer：ND->ND，1×K行向量按ND连续搬入L1 Buffer。
+    auto gmATensor = MakeTensor(MakeMemPtr(aGm), MakeFrameLayout<NDExtLayoutPtn>(m, k));
+    auto l1ATensor = MakeTensor(MakeMemPtr(l1ABuf), MakeFrameLayout<NDExtLayoutPtn>(m, k));
+    auto copyGm2L1 = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});
+    Copy(copyGm2L1, l1ATensor, gmATensor);
+
+    // 在L1 Buffer上把这块连续数据重新解释为(K/C0_ELEMENT)×C0_ELEMENT大小的NZ分形矩阵（地址不变，仅换Layout）。
+    auto l1ANzTensor = MakeTensor(l1ATensor.Data(), MakeFrameLayout<NZLayoutPtn, AType>(k / c0, c0));
+    // L1->L0A：NZ->NZ非转置搬运，一次完成分形搬运。
+    auto l0ATensor = MakeTensor(MakeMemPtr(l0ABuf), MakeFrameLayout<NZLayoutPtn, AType>(k / c0, c0));
+    auto copyL12L0A = MakeCopy(CopyL12L0A{}, CopyL12L0ATraitDefault{});
+    Copy(copyL12L0A, l0ATensor, l1ANzTensor);
+
+    // B矩阵搬运与基础场景相同（此处省略，假设已得到l0B）。
+    // ...
+
+    // Mmad计算：使用配置GEMV模式的Trait。
+    MmadParams params(m, n, k, 0, true);
+    auto atom = MakeMmad(MmadOperation{}, MmadTraitCustom{}).with(params);
+    Mmad(atom, l0C, l0ATensor, l0B);
+}
 ```
