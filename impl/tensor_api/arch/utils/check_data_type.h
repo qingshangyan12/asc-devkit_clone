@@ -43,6 +43,7 @@ public:
                                        Std::tuple<__cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e1m2_t>,
                                        Std::tuple<__cc__ float, __ca__ fp4x2_e1m2_t, __cb__ fp4x2_e2m1_t>,
                                        Std::tuple<__cc__ float, __ca__ fp4x2_e1m2_t, __cb__ fp4x2_e1m2_t>,
+                                       Std::tuple<__cc__ float, __ca__ hifloat4x2_t, __cb__ hifloat4x2_t>,
                                        Std::tuple<__cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e4m3fn_t>,
                                        Std::tuple<__cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e5m2_t>,
                                        Std::tuple<__cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e4m3fn_t>,
@@ -68,6 +69,7 @@ public:
                                  Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e1m2_t>,
                                  Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp4x2_e1m2_t, __cb__ fp4x2_e2m1_t>,
                                  Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp4x2_e1m2_t, __cb__ fp4x2_e1m2_t>,
+                                 Std::tuple<__biasbuf__ float, __cc__ float, __ca__ hifloat4x2_t, __cb__ hifloat4x2_t>,
                                  Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e4m3fn_t>,
                                  Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e5m2_t>,
                                  Std::tuple<__biasbuf__ float, __cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e4m3fn_t>,
@@ -81,6 +83,7 @@ public:
                                  Std::tuple<__cc__ float, __cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e1m2_t>,
                                  Std::tuple<__cc__ float, __cc__ float, __ca__ fp4x2_e1m2_t, __cb__ fp4x2_e2m1_t>,
                                  Std::tuple<__cc__ float, __cc__ float, __ca__ fp4x2_e1m2_t, __cb__ fp4x2_e1m2_t>,
+                                 Std::tuple<__cc__ float, __cc__ float, __ca__ hifloat4x2_t, __cb__ hifloat4x2_t>,
                                  Std::tuple<__cc__ float, __cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e4m3fn_t>,
                                  Std::tuple<__cc__ float, __cc__ float, __ca__ fp8_e4m3fn_t, __cb__ fp8_e5m2_t>,
                                  Std::tuple<__cc__ float, __cc__ float, __ca__ fp8_e5m2_t, __cb__ fp8_e4m3fn_t>,
@@ -192,6 +195,7 @@ public:
                           Std::tuple<__cbuf__ int32_t, __gm__ int32_t>, Std::tuple<__cbuf__ uint32_t, __gm__ uint32_t>,
                           Std::tuple<__cbuf__ fp4x2_e1m2_t, __gm__ fp4x2_e1m2_t>,
                           Std::tuple<__cbuf__ fp4x2_e2m1_t, __gm__ fp4x2_e2m1_t>,
+                          Std::tuple<__cbuf__ hifloat4x2_t, __gm__ hifloat4x2_t>,
                           Std::tuple<__cbuf__ fp8_e5m2_t, __gm__ fp8_e5m2_t>,
                           Std::tuple<__cbuf__ fp8_e4m3fn_t, __gm__ fp8_e4m3fn_t>,
                           Std::tuple<__cbuf__ hifloat8_t, __gm__ hifloat8_t>
@@ -229,6 +233,7 @@ public:
                           Std::tuple<__cbuf__ int64_t, __gm__ int64_t>, Std::tuple<__cbuf__ uint64_t, __gm__ uint64_t>,
                           Std::tuple<__cbuf__ fp4x2_e1m2_t, __gm__ fp4x2_e1m2_t>,
                           Std::tuple<__cbuf__ fp4x2_e2m1_t, __gm__ fp4x2_e2m1_t>,
+                          Std::tuple<__cbuf__ hifloat4x2_t, __gm__ hifloat4x2_t>,
                           Std::tuple<__cbuf__ fp8_e5m2_t, __gm__ fp8_e5m2_t>,
                           Std::tuple<__cbuf__ fp8_e4m3fn_t, __gm__ fp8_e4m3fn_t>,
                           Std::tuple<__cbuf__ hifloat8_t, __gm__ hifloat8_t>
@@ -332,6 +337,7 @@ public:
                 Std::tuple<__ca__ fp8_e5m2_t, __cbuf__ fp8_e5m2_t>,
                 Std::tuple<__ca__ fp4x2_e2m1_t, __cbuf__ fp4x2_e2m1_t>,
                 Std::tuple<__ca__ fp4x2_e1m2_t, __cbuf__ fp4x2_e1m2_t>,
+                Std::tuple<__ca__ hifloat4x2_t, __cbuf__ hifloat4x2_t>,
                 Std::tuple<__ca__ hifloat8_t, __cbuf__ hifloat8_t>
                 >,
             "The data type is not supported.");
@@ -369,6 +375,7 @@ public:
                 Std::tuple<__cb__ fp8_e5m2_t, __cbuf__ fp8_e5m2_t>,
                 Std::tuple<__cb__ fp4x2_e2m1_t, __cbuf__ fp4x2_e2m1_t>,
                 Std::tuple<__cb__ fp4x2_e1m2_t, __cbuf__ fp4x2_e1m2_t>,
+                Std::tuple<__cb__ hifloat4x2_t, __cbuf__ hifloat4x2_t>,
                 Std::tuple<__cb__ hifloat8_t, __cbuf__ hifloat8_t>
                 >,
             "The data type is not supported.");
