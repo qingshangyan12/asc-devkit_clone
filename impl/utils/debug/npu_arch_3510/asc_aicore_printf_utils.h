@@ -229,8 +229,10 @@ __simd_callee__ inline void scalar_printf_impl(DumpType debug_type, __ubuf__ con
 template <class... Args>
 __simd_callee__ inline void printf_impl(__ubuf__ const char* fmt, Args&&... args)
 {
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     enable_asc_diagnostics();
     scalar_printf_impl(DumpType::DUMP_SCALAR, fmt, args...);
+#endif
 }
 } // namespace __asc_simd_vf
 

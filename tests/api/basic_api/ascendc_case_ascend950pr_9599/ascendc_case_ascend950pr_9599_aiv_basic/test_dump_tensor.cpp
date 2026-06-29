@@ -200,7 +200,7 @@ TEST_F(TestDumpTensorSuite, InitDumpNullStartAddrReturns)
 }
 
 #if defined(ASCENDC_TEST_HAS_SIMD_VF_DUMP_POSITION)
-TEST_F(TestDumpTensorSuite, AscDumpUbufWritesUbPosition)
+TEST_F(TestDumpTensorSuite, AscDumpUbufWritesUbPositionAndAddress)
 {
     BlockVFBufInfo blockInfo;
     auto* dumpTlv = GetSimdVfDumpTlv(blockInfo);
@@ -212,6 +212,7 @@ TEST_F(TestDumpTensorSuite, AscDumpUbufWritesUbPosition)
     EXPECT_EQ(dumpTlv->position, static_cast<uint16_t>(__asc_simd_vf::DumpTensorPosition::UB));
     EXPECT_EQ(dumpTlv->desc, TEST_SIMD_VF_DUMP_DESC);
     EXPECT_EQ(dumpTlv->blockIdx, TEST_SIMD_VF_BLOCK_IDX);
+    EXPECT_EQ(dumpTlv->tensorAddr, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(input)));
 }
 
 TEST_F(TestDumpTensorSuite, AscDumpRegWritesRegPosition)
