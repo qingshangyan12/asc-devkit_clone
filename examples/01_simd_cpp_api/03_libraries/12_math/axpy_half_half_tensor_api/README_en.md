@@ -8,8 +8,7 @@ This sample implements the Axpy operator using Ascend C programming language, an
 
 ## Supported Products
 
-- Atlas A3 Training Series Products / Atlas A3 Inference Series Products
-- Atlas A2 Training Series Products / Atlas A2 Inference Series Products
+- Ascend 950PR/Ascend 950DT
 
 ## Directory Structure
 

@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于Tensor API的Transform<Inst::Exp>接口实现按元素取自然指数（$e^x$）。
+本样例基于Tensor API的 `Transform<Inst::Exp>`接口实现按元素取自然指数（$e^x$）。
 
 本样例使用Tensor API的Transform模板接口进行矢量计算，使用MakeCopy/Copy进行数据搬运，并通过MakeTensor/ MakeMemPtr/MakeFrameLayout构建 Tensor 对象。
 
