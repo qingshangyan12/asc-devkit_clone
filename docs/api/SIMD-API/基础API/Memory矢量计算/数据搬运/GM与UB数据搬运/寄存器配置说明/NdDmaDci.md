@@ -49,7 +49,8 @@ __aicore__ inline void NdDmaDci()
 
 // 2D Padding场景
 // xGmShape：[2, 8]，搬运8列2行数据，左Padding 3，上Padding 1，右Padding 5，下Padding 1，xLocalShape：[4, 16]
-AscendC::NdDmaLoopInfo<2> loopInfo{{1, 8}, {1, 16}, {8, 2}, {3, 1}, {5, 1}}; AscendC::NdDmaParams<T, 2> params{loopInfo, 0}; // padding的值为0
+AscendC::NdDmaLoopInfo<2> loopInfo{{1, 8}, {1, 16}, {8, 2}, {3, 1}, {5, 1}}; 
+AscendC::NdDmaParams<T, 2> params{loopInfo, 0}; // padding的值为0
 AscendC::NdDmaDci(); // 刷新NDDMA DataCache，保证多核场景下数据一致性
 static constexpr AscendC::NdDmaConfig dmaConfig; // 使用默认参数，也可以不传 AscendC::DataCopy<T, 2, dmaConfig>(xLocal, xGm, params);
 ```

@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section17600329101418"></a>
 
-接口头文件定义路径为："basic_api/kernel_operator_vec_scatter_intf.h"。
+头文件路径为："basic_api/kernel_operator_vec_scatter_intf.h"。
 
 给定一个连续的输入张量和一个目的地址偏移张量，Scatter指令根据偏移地址生成新的结果张量后将输入张量分散到结果张量中。
 
