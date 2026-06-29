@@ -1,12 +1,12 @@
 # SIMT接口软仿情况汇总
 
-本文按照SIMT API文档所在目录分级汇总各接口的软仿情况，表格中的API名链接到对应接口文档，API是否软仿用于标识该接口的实现方式。
+本节按照SIMT API文档所在目录分级汇总各接口的软仿情况。
 
-本文中的非软仿接口是指使用单一硬件指令完成操作的接口；软仿接口是指由编译器实现，或由上层接口通过拼接多条硬件指令实现功能的接口。
+非软仿接口是指使用单一硬件指令完成操作的接口；软仿接口是指由编译器实现，或由上层接口通过拼接多条硬件指令实现功能的接口。
 
 ## Warp函数
 
-### Lane-ID类函数
+### LaneID类函数
 
 | API名 | API是否软仿 |
 | --- | --- |
@@ -17,7 +17,7 @@
 | [`lanemask_le`](../SIMT-API/Warp函数/Lane-ID类函数/lanemask_le.md) | 否 |
 | [`lanemask_lt`](../SIMT-API/Warp函数/Lane-ID类函数/lanemask_lt.md) | 否 |
 
-### Warp-Reduce类函数
+### Warp Reduce类函数
 
 | API名 | API是否软仿 |
 | --- | --- |
@@ -25,7 +25,7 @@
 | [`asc_reduce_max`](../SIMT-API/Warp函数/Warp-Reduce类函数/asc_reduce_max.md) | 否 |
 | [`asc_reduce_min`](../SIMT-API/Warp函数/Warp-Reduce类函数/asc_reduce_min.md) | 否 |
 
-### Warp-Shfl类函数
+### Warp Shfl类函数
 
 | API名 | API是否软仿 |
 | --- | --- |
@@ -34,7 +34,7 @@
 | [`asc_shfl_up`](../SIMT-API/Warp函数/Warp-Shfl类函数/asc_shfl_up.md) | 否 |
 | [`asc_shfl_xor`](../SIMT-API/Warp函数/Warp-Shfl类函数/asc_shfl_xor.md) | 否 |
 
-### Warp-Vote类函数
+### Warp Vote类函数
 
 | API名 | API是否软仿 |
 | --- | --- |
@@ -103,7 +103,8 @@
 
 ## 原子操作
 
-以下信息是基于SIMD与SIMT编程场景进行说明的，对于SIMT编程场景，由于接口入参无UB/GM内存空间标识，底层编译器需要先将入参指针转换为UB/GM指针，再实现接口功能。
+下表汇总原子操作接口在SIMD与SIMT编程场景下的软仿情况。SIMT编程场景中，接口形参不携带UB/GM地址空间标识，编译器需先完成入参指针到UB/GM地址空间指针的转换，再完成对应的原子操作实现。
+
 | API名 | 非软仿数据类型 | 软仿数据类型 |
 | --- | --- | --- |
 | [`asc_atomic_add`](../SIMT-API/原子操作/asc_atomic_add.md) | int32_t、uint32_t、int64_t、uint64_t、half、bfloat16_t | float、half2、bfloat16x2_t |
