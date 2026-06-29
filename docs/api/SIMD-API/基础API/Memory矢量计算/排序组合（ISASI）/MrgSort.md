@@ -97,14 +97,14 @@ __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T
 - dst的起始地址需要32字节对齐，src中LocalTensor的起始地址需要8字节对齐。
 - 如果存在score\[i\]==score\[j\]并且i\>j，将优先选取score\[j\]排在前面。
 - 每次迭代内的数据会进行排序，不同迭代间的数据不会进行排序。
-  <cann-filter npu-type="A3,910b">
+  <!-- npu="A3,910b" id3 -->
 - 针对以下型号
-    - <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
-    - <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
+    - <!-- npu="A3" id1 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品<!-- end id1 -->
+    - <!-- npu="910b" id2 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id2 -->
 
   repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  </cann-filter>
-- <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。</cann-filter>
+  <!-- end id3 -->
+- <!-- npu="950" id4 -->针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。<!-- end id4 -->
 
 
 ## 调用示例<a name="section642mcpsimp"></a>

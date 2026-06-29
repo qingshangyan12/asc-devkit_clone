@@ -107,13 +107,21 @@ def CreateVecIndex(dst, firstValue, count):
 
 ## 数据类型
 
-<cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、int16_t、half、int32_t、float、int64_t。</cann-filter>
+<!-- npu="950" id1 -->
+Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、int16_t、half、int32_t、float、int64_t。
+<!-- end id1 -->
 
-<cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int16_t、half、int32_t、float。</cann-filter>
+<!-- npu="A3" id2 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int16_t、half、int32_t、float。
+<!-- end id2 -->
 
-<cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int16_t、half、int32_t、float。</cann-filter>
+<!-- npu="910b" id3 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int16_t、half、int32_t、float。
+<!-- end id3 -->
 
-<cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品，支持的数据类型为：int16_t、half、int32_t、float。</cann-filter>
+<!-- npu="310b" id4 -->
+Atlas 200I/500 A2 推理产品，支持的数据类型为：int16_t、half、int32_t、float。
+<!-- end id4 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -123,19 +131,19 @@ def CreateVecIndex(dst, firstValue, count):
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 - firstValue需保证不超出dst中元素数据类型对应的大小范围。
-  <cann-filter npu-type="A3,910b">
+  <!-- npu="A3,910b" id7 -->
 - 针对以下型号
-  - <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
-  - <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
+  - <!-- npu="A3" id5 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品<!-- end id5 -->
+  - <!-- npu="910b" id6 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id6 -->
 
   repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  </cann-filter>
-- <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。</cann-filter>
+  <!-- end id7 -->
+- <!-- npu="950" id8 -->针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。<!-- end id8 -->
 
-<cann-filter npu-type="950">
+<!-- npu="950" id9 -->
 
 - 针对Ascend 950PR/Ascend 950DT，int8_t/int64_t数据类型仅支持tensor前n个数据计算接口。
-</cann-filter>
+<!-- end id9 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

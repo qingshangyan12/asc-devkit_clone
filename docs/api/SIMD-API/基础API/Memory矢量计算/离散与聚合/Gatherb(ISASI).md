@@ -116,13 +116,21 @@ __aicore__ inline void Gatherb(const LocalTensor<T>& dst, const LocalTensor<T>& 
 
 ## 数据类型
 
-<cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
+<!-- npu="950" id1 -->
+Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。
+<!-- end id1 -->
 
-<cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：uint16_t、uint32_t。</cann-filter>
+<!-- npu="A3" id2 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：uint16_t、uint32_t。
+<!-- end id2 -->
 
-<cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：uint16_t、uint32_t。</cann-filter>
+<!-- npu="910b" id3 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：uint16_t、uint32_t。
+<!-- end id3 -->
 
-<cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t。</cann-filter>
+<!-- npu="310b" id4 -->
+Atlas 200I/500 A2 推理产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t。
+<!-- end id4 -->
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
@@ -133,16 +141,16 @@ __aicore__ inline void Gatherb(const LocalTensor<T>& dst, const LocalTensor<T>& 
   -   偏移地址后需要32字节对齐。
   -   偏移地址后不能超出UB大小数据的范围。
   -   地址偏移的取值范围：不能超出uint32\_t的范围。
-<cann-filter npu-type="A3,910b">
+<!-- npu="A3,910b" id7 -->
 - 针对以下型号
-  - <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
-  - <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
+  - <!-- npu="A3" id5 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品<!-- end id5 -->
+  - <!-- npu="910b" id6 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id6 -->
 
   repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
 
   当dstBlkStride值为0时，默认按照1来处理。
-  </cann-filter>
-- <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。</cann-filter>
+<!-- end id7 -->
+- <!-- npu="950" id8 -->针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。<!-- end id8 -->
 
 ## 调用示例<a name="section11276201527"></a>
 

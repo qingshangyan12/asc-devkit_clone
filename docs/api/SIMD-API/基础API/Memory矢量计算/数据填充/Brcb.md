@@ -120,17 +120,29 @@ __aicore__ inline void Brcb(const LocalTensor<T>& dst, const LocalTensor<T>& src
 
 ## 数据类型
 
-<cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
+<!-- npu="950" id1 -->
+Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。
+<!-- end id1 -->
 
-<cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。</cann-filter>
+<!-- npu="A3" id2 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+<!-- end id2 -->
 
-<cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。</cann-filter>
+<!-- npu="910b" id3 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+<!-- end id3 -->
 
-<cann-filter npu-type="310p">Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。</cann-filter>
+<!-- npu="310p" id4 -->
+Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
+<!-- end id4 -->
 
-<cann-filter npu-type="x90">Kirin X90，支持的数据类型为：uint16_t、half、uint32_t、float。</cann-filter>
+<!-- npu="x90" id5 -->
+Kirin X90，支持的数据类型为：uint16_t、half、uint32_t、float。
+<!-- end id5 -->
 
-<cann-filter npu-type="9030">Kirin 9030，支持的数据类型为：uint16_t、half、uint32_t、float。</cann-filter>
+<!-- npu="9030" id6 -->
+Kirin 9030，支持的数据类型为：uint16_t、half、uint32_t、float。
+<!-- end id6 -->
 
 ## 返回值说明<a name="section459672612511"></a>
 
@@ -140,18 +152,18 @@ __aicore__ inline void Brcb(const LocalTensor<T>& dst, const LocalTensor<T>& src
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 - 不支持源操作数与目的操作数使用同一块内存地址。
-  <cann-filter npu-type="A3,910b">
+  <!-- npu="A3,910b" id9 -->
 - 针对以下型号
-  - <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
-  - <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
+  - <!-- npu="A3" id7 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品<!-- end id7 -->
+  - <!-- npu="910b" id8 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id8 -->
 
   repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  </cann-filter>
-- <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。</cann-filter>
+  <!-- end id9 -->
+- <!-- npu="950" id10 -->针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。<!-- end id10 -->
 - BrcbRepeatParams结构体内参数dstBlkStride，当dstBlkStride值为0时，默认按照1来处理。
-<cann-filter npu-type="310p"> 
+<!-- npu="310p" id11 --> 
 - 针对Atlas 推理系列产品AI Core，使用时需要预留8KB的Unified Buffer空间，作为接口的临时数据存放区。
-</cann-filter>
+<!-- end id11 -->
 
 ## 关键特性说明
 

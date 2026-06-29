@@ -84,7 +84,7 @@ def Duplicate(scalarValue, dst, count):
     __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue, const int32_t& count)
     ```
 
-<cann-filter npu-type="950"> 
+<!-- npu="950" id1 --> 
 
 - tensor前n个数据计算，源操作数为Tensor
 
@@ -93,7 +93,7 @@ def Duplicate(scalarValue, dst, count):
     template <typename T>
     __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
     ```
-</cann-filter>
+<!-- end id1 -->
 
 - tensor高维切分计算，mask逐比特模式
 
@@ -123,7 +123,7 @@ def Duplicate(scalarValue, dst, count):
 | ------ | ------ | ------ |
 | dst | 输出 | 目的操作数，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT（存储位置为Unified Buffer）。LocalTensor的起始地址需要按照32字节对齐。|
 | scalarValue | 输入 | 被复制的源操作数，数据类型需与dst中元素的数据类型保持一致。|
-|<cann-filter npu-type="950"> src | 输入| 源操作数，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>数据类型需与dst中元素的数据类型保持一致。<br>当传入该参数时，会将src[0]复制多次并填充到向量中。|
+|<!-- npu="950" id2 --> src | 输入| 源操作数，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>数据类型需与dst中元素的数据类型保持一致。<br>当传入该参数时，会将src[0]复制多次并填充到向量中。<!-- end id2 -->|
 | count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。|
 | mask/mask[] | 输入 | mask用于控制每次迭代内参与计算的元素。<br>设置详见[掩码操作](../掩码操作/掩码操作.md)。 |
 | repeatTime | 输入 | 指令迭代次数，每次迭代完成8个DataBlock的数据收集，取值范围：repeatTime∈[0,255]。|
@@ -132,21 +132,37 @@ def Duplicate(scalarValue, dst, count):
 
 ## 数据类型
 
-<cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，支持的数据类型为：bool、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、complex64。</cann-filter>
+<!-- npu="950" id3 -->
+Ascend 950PR/Ascend 950DT，支持的数据类型为：bool、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、complex64。
+<!-- end id3 -->
 
-<cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。</cann-filter>
+<!-- npu="A3" id4 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+<!-- end id4 -->
 
-<cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。</cann-filter>
+<!-- npu="910b" id5 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+<!-- end id5 -->
 
-<cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。</cann-filter>
+<!-- npu="310b" id6 -->
+Atlas 200I/500 A2 推理产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+<!-- end id6 -->
 
-<cann-filter npu-type="310p">Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。</cann-filter>
+<!-- npu="310p" id7 -->
+Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+<!-- end id7 -->
 
-<cann-filter npu-type="910">Atlas 训练系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。</cann-filter>
+<!-- npu="910" id8 -->
+Atlas 训练系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+<!-- end id8 -->
 
-<cann-filter npu-type="x90">Kirin X90，支持的数据类型为：half。</cann-filter>
+<!-- npu="x90" id9 -->
+Kirin X90，支持的数据类型为：half。
+<!-- end id9 -->
 
-<cann-filter npu-type="9030">Kirin 9030，支持的数据类型为：half。</cann-filter>
+<!-- npu="9030" id10 -->
+Kirin 9030，支持的数据类型为：half。
+<!-- end id10 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>	 
 
@@ -155,21 +171,21 @@ def Duplicate(scalarValue, dst, count):
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
-<cann-filter npu-type="A3,910b">
+<!-- npu="A3,910b" id13 -->
 - 针对以下型号
-  - <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
-  - <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
+  - <!-- npu="A3" id11 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品<!-- end id11 -->
+  - <!-- npu="910b" id12 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id12 -->
 
   repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
 
   count = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  </cann-filter>
-- <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。</cann-filter>
+<!-- end id13 -->
+- <!-- npu="950" id14 -->针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。<!-- end id14 -->
 
-<cann-filter npu-type="950">
+<!-- npu="950" id15 -->
 
 - 针对Ascend 950PR/Ascend 950DT，bool、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、 complex32、int64_t、uint64_t、complex64数据类型仅支持tensor前n个数据计算接口。
-</cann-filter>
+<!-- end id15 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
@@ -205,13 +221,13 @@ def Duplicate(scalarValue, dst, count):
     AscendC::Duplicate<half>(dstLocal, inputVal, srcDataSize);
     ```
 
-<cann-filter npu-type="950"> 
+<!-- npu="950" id16 --> 
 
 - tensor前n个数据计算样例，源操作数为Tensor
     ```cpp
     AscendC::Duplicate<half>(dstLocal, srcLocal, srcDataSize);	 
     ```
-</cann-filter>
+<!-- end id16 -->
 结果示例如下：
 
 ```plain
