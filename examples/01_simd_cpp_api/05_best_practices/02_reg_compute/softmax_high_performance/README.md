@@ -1,33 +1,29 @@
 # Softmax 性能调优样例
 
-## 概述 TODO: 更新超链接
+## 概述
 
-本样例以单核Softmax为例，展示从MemBase到RegBase、从基础循环到循环融合、循环展开的完整性能调优路径，包含Case 0-6共七个逐步优化的版本。
-
-> **前置阅读**：[Gelu算子入门样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/00_introduction/04_reg_compute/gelu/README.md)，本样例基于入门样例进行性能优化，建议先阅读入门样例了解基础概念。
-> **前置阅读**：开始阅读前，建议对以下背景知识有初步了解，为后续各Case的优化策略提供理论支持：
-
-- **[Reg矢量计算编程](../../../../../docs/)**：
-- **[指令双发优化]()**：
-- **[VF融合优化]()**：
-- **[VF循环优化]()**：
-
+本样例以单核Softmax为例，展示从MemBase到RegBase、从基础循环到使用循环融合、循环展开等优化手段的完整性能调优路径，包含Case 0-5共六个逐步优化的版本。
 
 **优化路径**：
-- Case 0 → Case 1：MemBase（使能VF融合编译选项）
-- Case 1 → Case 2：MemBase → RegBase API（寄存器级计算）
-- Case 2 → Case 3：循环融合 + ExpSub融合指令 + UpdateMask尾块处理
-- Case 3 → Case 4：外层循环展开（UpdateMask模式）
-- Case 3 → Case 5：主尾块模式（main-tail block）
-- Case 5 → Case 6：主尾块模式 + 外层展开 + ExpSub融合指令
+- Case 0 → Case 1：MemBase → RegBase API（寄存器级计算）
+- Case 1 → Case 2：循环融合 + ExpSub融合指令 + UpdateMask尾块处理
+- Case 2 → Case 3：外层循环展开（UpdateMask模式）
+- Case 2 → Case 4：主尾块模式（main-tail block）
+- Case 4 → Case 5：主尾块模式 + 外层循环展开 + ExpSub融合指令
 
-## 本样例支持的产品及CANN软件版本 Done
+**前置阅读**：开始阅读前，建议对以下背景知识有初步了解，为后续各Case的优化策略提供理论支持：
+- **[Reg矢量计算编程](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/Reg矢量计算编程.md)**：
+- **[指令双发优化](../../../../../docs/guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/指令双发优化.md)**：
+- **[VF融合优化](../../../../../docs/guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/VF融合优化.md)**：
+- **[VF循环优化](../../../../../docs/guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/VF循环优化.md)**：
+
+## 本样例支持的产品及CANN软件版本
 
 | 产品 | CANN软件版本 |
 |------|-------------|
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
-## 目录结构介绍 Done 
+## 目录结构介绍
 
 ```
 ├── softmax_high_performance
@@ -36,11 +32,11 @@
 │   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   ├── softmax.asc             // Ascend C样例实现（Case 0-6七个版本）
+│   ├── softmax.asc             // Ascend C样例实现（Case 0-5六个版本）
 │   └── README.md               // 样例说明文档
 ```
 
-## 样例描述 Done
+## 样例描述
 
 **样例功能**：
 
@@ -53,7 +49,7 @@ $$
 $$
 
 - x：输入，形状为[128, 128]，数据类型为float；
-- z：输出，形状为[128, 128]，数据类型为float；
+- y：输出，形状为[128, 128]，数据类型为float；
 
 **样例规格**：
 
@@ -65,33 +61,43 @@ $$
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">softmax_custom</td></tr>
 </table>
 
-## 版本概览 TODO: 更新性能数据
+## 版本概览
 
-| 版本 | API类型 | 特点 | 性能 (折算aiv_vec_cycle) |
+| 版本 | API类型 | 特点 | 性能 (折算后Vector指令开销) |
 |:---:|:---|:---|:---:|
-| **Case 0** | MemBase | 基础版本，单循环内完成所有计算 | 48572 cycles |
-| **Case 1** | MemBase | 使能编译选项VF融合 | 48412 cycles |
-| **Case 2** | RegBase | 首次使用Reg矢量API，未融合，含冗余Load/Store/sync | 31894 cycles |
-| **Case 3** | RegBase | UpdateMask模式 + 循环融合 + ExpSub融合指令 | 3413 cycles |
-| **Case 4** | RegBase | UpdateMask模式 + 外层循环展开，提升指令双发能力 | 2197 cycles |
-| **Case 5** | RegBase | 主尾块模式（main-tail block），替代UpdateMask | 3424 cycles |
-| **Case 6** | RegBase | 主尾块模式 + 外层展开 + ExpSub融合指令（最优） | 1785 cycles |
+| **Case 0** | MemBase | 基础版本，单循环内完成所有计算 | 44113 cycles |
+| **Case 1** | RegBase | 首次使用Reg矢量API，未融合，含冗余Load/Store/sync | 31894 cycles |
+| **Case 2** | RegBase | UpdateMask模式 + 循环融合 + ExpSub融合指令 | 3413 cycles |
+| **Case 3** | RegBase | UpdateMask模式 + 外层循环展开，提升指令双发能力 | 2197 cycles |
+| **Case 4** | RegBase | 主尾块模式（main-tail block），替代UpdateMask | 3424 cycles |
+| **Case 5** | RegBase | 主尾块模式 + 外层循环展开 + ExpSub融合指令（最优） | 1785 cycles |
+
+
+**表2 AI Core 性能指标字段说明表**
+| 字段名 | 字段含义 |
+|:---:|:---|
+| aiv_total_cycle | vector单算子端到端cycle数。 |
+| aiv_vec_raito | vector类型指令在端到端耗时中比率。 |
+
+**说明**：
+1. 本例针对单核Softmax内VF性能优化详解，当前不考虑多核切分、数据搬运、DoubleBuffer等因素影响。
+2. Vector指令开销通过aiv_total_cycles及aiv_vec_ratio相乘折算得到。
 
 ## 优化策略分析
 
-本节详细介绍从Case 0到Case 6的渐进优化策略。
+本节详细介绍从Case 0到Case 5的渐进优化策略。
 
-## 第一阶段：MemBase优化 (Case 0 → Case 1)
+## 第一阶段：MemBase (Case 0)
 
-### Case 0: MemBase基础版本 — 单循环内完成所有计算
+### Case 0: MemBase基础版本
 
 **实现方式**：使用Ascend C基础API Memory矢量计算接口，在128行的for循环内依次完成ReduceMax、Duplicate、Sub、Exp、ReduceSum、Duplicate、Div全部7步操作。
 
-**理论分析 — 为什么MemBase慢**：
+**理论分析 — 为什么MemBase矢量计算接口慢**：
 
 Case 0使用Memory矢量计算API，其计算过程中API通过封装Vector Function调用Reg矢量接口完成计算并实现代际兼容。每条指令的语义是"从UB读源操作数进入寄存器 → 在执行单元计算 → 将寄存器中的数据写回UB目的操作数"的完整流程。这意味着：
 
-1. **每步中间结果必须落地UB**：ReduceMax的结果写入UB后，Duplicate需要从UB重新读出；Duplicate写入UB后，Sub需要从UB重新读出……以此类推。中间结果在UB上反复读写，性能较差。
+1. **每步中间结果必须写回UB**：ReduceMax的结果写入UB后，Duplicate需要从UB重新读出；Duplicate写入UB后，Sub需要从UB重新读出……以此类推。中间结果在UB上反复读写，性能较差。
 2. **冗余的同步及指令**：由于数据会反复搬入搬出寄存器，缺少寄存器级别的数据复用，并且Vector Function间存在数据依赖，无法使能双发等能力。
 3. **UB Bank冲突风险高**：连续的UB读写访问极易触发Bank冲突，导致访问延迟增加。
 
@@ -108,77 +114,29 @@ for (uint32_t i = 0; i < aDim; i++) {
 }
 ```
 
-**性能**：48572 cycles（vector部分）
+**性能**：44113 cycles（vector部分）
 
-### Case 0 → Case 1: 使能VF融合编译选项 TODO
+**说明**：MemBase接口可以通过编译期优化进行接口间的Vector Function融合来减少冗余的搬运开销，由于融合过程不可见，因此灵活性不如RegBase矢量计算接口。
 
-**优化动机**：Case 0中每行7步操作在同一循环中顺序执行，不同操作之间存在数据依赖，限制了编译器优化空间。
 
-**理论分析 — 循环拆分为3个Phase**：
+## 第二阶段：MemBase → RegBase (Case 0 → Case 1)
 
-循环拆分的核心思想是**将异构操作解耦为同构操作的批量执行**，这在理论上带来三个收益：
+### Case 2: Reg矢量API基线写法 — 循环未融合，含冗余操作
 
-1. **消除操作切换开销**：Case 0中每行在ReduceMax→Duplicate→Sub→Exp→ReduceSum→Duplicate→Div之间频繁切换。拆分后Phase 1只做ReduceMax（128行），Phase 2只做Sub+Exp+ReduceSum（128行），Phase 3只做Div（128行）。每Phase内指令序列高度同构，编译器可更有效地优化循环内流水线。
-
-2. **提升缓存/流水线局部性**：相同操作集中执行时，计算单元的流水线状态可以跨行复用，减少流水线stall。例如Phase 1的ReduceMax规约电路可以流水处理连续128行的最大池化。
-
-3. **为后续融合提供基础**：拆分为三个独立Phase后，每个Phase内部的操作类型单一，后续RegBase迁移时更容易识别融合机会（例如Phase 2内部Sub+Exp可融合为ExpSub）。
-
-**优化措施**：将单循环拆分为3个独立的双层循环：
-- Phase 1（所有行）：ReduceMax → 求每行最大值
-- Phase 2（所有行）：Duplicate + Sub + Exp + ReduceSum → 数值稳定计算及求和
-- Phase 3（所有行）：Duplicate + Div → 归一化
-
-**关键代码变化**：
-```cpp
-// Case 0: 单循环，mix all operations
-for (uint32_t i = 0; i < aDim; i++) {
-    ReduceMax(...);
-    Duplicate(...);
-    Sub(...);
-    // ...
-}
-
-// Case 1: 拆分为3个独立Phase
-// Phase 1: ReduceMax (all rows)
-for (uint32_t i = 0; i < aDim; i++) {
-    ReduceMax(...);
-}
-// Phase 2: Duplicate + Sub + Exp + ReduceSum (all rows)
-for (uint32_t i = 0; i < aDim; i++) {
-    Duplicate(...); Sub(...); Exp(...); ReduceSum(...);
-}
-// Phase 3: Duplicate + Div (all rows)
-for (uint32_t i = 0; i < aDim; i++) {
-    Duplicate(...); Div(...);
-}
-```
-
-**效果**：48572 → 48412 cycles。循环拆分使相同操作集中执行，提升缓存利用率和流水线效率。MemBase阶段收益有限（仅0.3%），但拆分后的三阶段结构为后续RegBase改造奠定了基础。
-
----
-
-## 第二阶段：MemBase → RegBase (Case 1 → Case 2)
-
-### Case 2: Reg矢量API初版 — 未融合，含冗余操作
-
-**优化动机**：MemBase API每次向量计算内部隐式执行 Load→Compute→Store，129行 × 7次操作 = 大量UB↔寄存器交互。RegBase API可将数据加载到寄存器后常驻，中间结果暂存寄存器，仅需最终Store回UB。
+**优化动机**：MemBase API每次向量计算内部隐式执行 Load→Compute→Store，每次执行需要启动一次Vector Function。RegBase API可将数据加载到寄存器后常驻，中间结果暂存寄存器，多个计算可以通过一个Vector Function完成，仅需最终Store回UB。
 
 **理论分析 — MemBase → RegBase 的关键收益**：
 
-1. **Register File降低UB带宽压力**：
-   在MemBase中，Softmax每行7步操作的中间结果（max值、scalar max for broadcast、sub结果、exp结果、sum值、scalar sum for broadcast）全部回写UB。Case 1中128行 × 4个中间张量 = 512次冗余UB读写。RegBase引入SIMD Register File后，这些中间值可以保留在矢量数据寄存器中连续消费：
+1. **Register编程减少冗余指令和VF启动开销**：
+   在MemBase中，单个接口对应一个Vector Function。RegBase引入SIMD Register后，多个接口的计算可以通过启动一个Vector Function完成多条指令计算，从而减少VF启动开销：
    ```
    MemBase: UB → Load → Compute → Store → UB → Load → Compute → Store → UB ...
    RegBase: UB → Load → Compute(reg) → Compute(reg) → ... → Store → UB
    ```
-   仅在进入和退出整段计算时各访问一次UB，中间结果全部在寄存器链内部传递。
+   当前RegBase的基础写法仍会写入UB，未进行循环融合。
 
 2. **显式Load/Store控制搬运时机**：
    MemBase中搬运动作由API隐式完成，开发者无法控制。RegBase通过 `LoadAlign` / `StoreAlign`（对齐搬运）或 `LoadUnAlign` / `StoreUnAlign`（非对齐搬运）显式控制搬运粒度与时机，可以精确调度数据流。
-
-3. **Hardware Loop使能**：
-   RegBase计算中循环使用 `uint16_t` 类型、从0开始递增1、无if/else跳转，编译器可将其识别为Hardware Loop，消除软件循环的计数/比较/跳转开销。
 
 **关键变化**：
 
@@ -187,56 +145,56 @@ for (uint32_t i = 0; i < aDim; i++) {
 3. 使用 `UpdateMask` 处理非对齐尾块
 4. 通过 `LocalMemBar` 保证数据一致性
 
-**Case 2存在的问题**：
+**Case 1存在的问题**：
 - 多个循环未融合，存在冗余 Load/Store 指令
 - 每次计算后插入 `LocalMemBar`，引入冗余同步
 - 未使用 ExpSub 融合指令，Sub 和 Exp 分开执行
 
-**性能**：31894 cycles（相比 Case 1 提升 34%）。RegBase带来的寄存器级计算消除了大量UB往返开销。
+**性能**：31894 cycles（相比 Case 0 提升 34%）。RegBase带来的寄存器级计算消除了VF的启动开销，但每次计算通过一个单独的循环完成并写回UB，仍有很大的优化空间。
 
-## 第三阶段：RegBase深度优化 (Case 2 → Case 3)
+## 第三阶段：RegBase深度优化 (Case 1 → Case 2)
 
-### Case 3: 循环融合 + ExpSub融合指令 + UpdateMask尾块处理
+### Case 2: 循环融合 + ExpSub融合指令 + UpdateMask尾块处理
 
 **理论分析 — 三项优化的深层原理**：
 
-**1. VF深融合消除冗余Load/Store/同步**：
+**1. 循环融合消除冗余Load/Store/同步**：
 
-Case 2中ReduceMax循环和ExpSub循环各自独立从UB Load源数据，本质上是两次相同的UB→寄存器搬运。VF深融合将两个循环的Load共享，原理如下：
+Case 1中ReduceMax循环和ExpSub循环各自独立从UB Load源数据，本质上是两次相同的UB→寄存器搬运。循环融合将两个循环的Load共享，从而消除冗余的搬运指令和同步指令，原理如下：
 
 ```
-Case 2 (未融合):
+Case 1 (未融合):
   for i: for j: Load(src) → Max → ReduceMax     // Load src 第1次
-  mem_bar()
+  LocalMemBar()
   for i: for j: Load(src) → Sub+Exp → Store      // Load src 第2次 (冗余!)
-  mem_bar()
+  LocalMemBar()
   for i: for j: Load(exp) → Add → ReduceSum      // Load exp 第1次
-  mem_bar()
+  LocalMemBar()
   for i: for j: Load(exp) → Duplicate+Div → Store // Load exp 第2次 (冗余!)
 
-Case 3 (融合):
+Case 2 (融合):
   for i:
       for j: Load(src) → Max → ReduceMax          // Load src
       for j: Load(src) → ExpSub → Store           // 复用已Load的src (无需重复搬入)
-  mem_bar()
+  LocalMemBar()
   for i:
       for j: Load(exp) → Add → ReduceSum          // Load exp
       for j: Load(exp) → Duplicate+Div → Store    // 复用已Load的exp
 ```
 
-Case 3只需2次Load（src和exp各一次），Case 2需要4次Load，融合后消除2次冗余UB搬运。
+Case 2只需2次Load（src和exp各一次），Case 1需要4次Load，融合后消除2次冗余UB搬运，并且消除了部分同步。
 
-**2. 指令融合减少依赖链长度**：
+**2. 指令融合提升性能**：
 
-Case 2中 `Sub` 与 `Exp` 为两条独立指令：
+Case 1中 `Sub` 与 `Exp` 为两条独立指令：
 ```cpp
-// Case 2: Sub → Exp 顺序执行，Exp必须等待Sub结果写入dstReg
+// Case 1: Sub → Exp 顺序执行，Exp必须等待Sub结果写入dstReg
 AscendC::Reg::Sub(dstReg, srcReg, maxReg, mask);
 AscendC::Reg::Exp(dstReg, dstReg, mask);
 ```
-ExpSub融合后为单条指令，Sub的中间结果直接在硬件内部传递给Exp，消除了一条指令的发射延迟和一条寄存器写入：
+ExpSub融合后为单条指令，消除了一条指令的开销，当Softmax的Shape最后一个维度越大，取得的收益越大：
 ```cpp
-// Case 3: 一步融合，Sub→Exp在硬件内部完成
+// Case 2: 一步融合，Sub→Exp在硬件内部完成
 AscendC::Reg::ExpSub(expReg, srcReg, maxReg, mask);
 ```
 在指令双发的执行队列中，减少一条依赖指令意味着后续独立指令可以更早被发射。
@@ -244,52 +202,6 @@ AscendC::Reg::ExpSub(expReg, srcReg, maxReg, mask);
 **3. UpdateMask vs 主尾块**：
 
 UpdateMask模式在每次内层循环迭代中调用 `UpdateMask` 更新掩码，虽然满足Hardware Loop（无if/else），但每次调用仍产生标量计算开销。主尾块模式将数据切分为"主块（全Mask）"和"尾块（部分Mask）"分别处理，主块循环内无需任何掩码更新操作，完全消除UpdateMask的累加开销。
-
-**优化手段**：
-
-#### 1. 融合指令：ExpSub
-
-Sub + Exp 两步操作融合为单条 ExpSub 指令，减少指令数和执行延迟：
-```cpp
-// Case 2: 两步
-AscendC::Reg::Sub(dstReg, srcReg, maxReg, mask);
-AscendC::Reg::Exp(dstReg, dstReg, mask);
-// Case 3: 一步融合
-AscendC::Reg::ExpSub(expReg, srcReg, maxReg, mask);
-```
-
-#### 2. 循环融合
-
-将ReduceMax的Load与ExpSub的Load共享，将ReduceSum与Div融合：
-
-```cpp
-// Case 2: 未融合 — ReduceMax和ExpSub各独立Load
-for (i) {
-    for (j) { Load(src); Max(max, src); }    // Load #1
-    ReduceMax(max);
-    for (j) { Load(src); Sub+Exp+Store; }      // Load #2 (冗余!)
-}
-for (i) {
-    for (j) { Load(exp); Add(sum, exp); }      // Load #3
-    ReduceSum(sum);
-    for (j) { Load(exp); Div+Store; }          // Load #4 (冗余!)
-}
-
-// Case 3: 融合后 — 共享Load，减少2次冗余搬入
-for (i) {
-    for (j) { Load(src); Max(max, src); }      // Load #1
-    ReduceMax(max);
-    for (j) { Load(src); ExpSub+Store; }       // Load #2 (复用同一个src)
-}
-mem_bar();
-for (i) {
-    for (j) { Load(exp); Add(sum, exp); }      // Load #3
-    ReduceSum(sum);
-    for (j) { Load(exp); Div+Store; }          // Load #4 (复用同一个exp)
-}
-```
-
-#### 3. UpdateMask尾块处理
 
 使用 `UpdateMask` 在每次内层循环中自动更新掩码，代码简洁：
 ```cpp
@@ -303,23 +215,21 @@ for (uint16_t j = 0; j < repeatTimes; j++) {
 
 **效果**：31894 → 3413 cycles（提升 9.3x），融合收益显著。
 
----
+## 第四阶段：循环展开优化、合理运用主尾块模式
 
-## 第四阶段：循环展开优化
+### Case 2 → Case 3: 外层循环展开（UpdateMask模式）
 
-### Case 3 → Case 4: 外层循环展开（UpdateMask模式）
-
-**优化动机**：Case 3中128行依次串行处理，编译器难以跨行调度指令，限制了VF双发效率。
+**优化动机**：Case 2中128行依次串行处理，难以跨行调度指令，限制了VF双发效率。
 
 **理论分析 — 外层展开如何提升指令双发**：
 
-Case 3的执行模式为：行0的Load→Max→ReduceMax→Load→ExpSub→Store 全部执行完，再执行行1。此时执行队列中仅有一行（行i）的指令序列，而行i内部存在明显的依赖链：
+Case 2的执行模式为：行0的Load→Max→ReduceMax→Load→ExpSub→Store 全部执行完，再执行行1。此时执行队列中仅有一行（行i）的指令序列，而行i内部存在明显的依赖链：
 
 ```
 Load(src_i) → Max(max_i, src_i) → ... → ReduceMax(max_i) → ... → Load(src_i) → ExpSub(...) → Store
 ```
 
-依赖链上的指令必须等待前序指令完成，无法与任何其他指令并行发射。这就导致执行队列深度虽然可达64条指令，但由于行i内部所有指令彼此依赖，实际可同时发射的无依赖指令很少。
+依赖链上的指令必须等待前序指令完成，无法与任何其他指令并行发射。内部所有指令彼此依赖，实际可同时发射的无依赖指令很少。
 
 **外层展开（展开因子=2）** 使用双套寄存器组（`*Reg` 和 `*Reg1`），每次处理两行：
 
@@ -328,14 +238,14 @@ Load(src_i) → Max(max_i, src_i) → ... → ReduceMax(max_i) → ... → Load(
 行1:   Load(src1) → Max(max1, src1) → ... → ReduceMax(max1) → Load(src1) → ExpSub(exp1) → Store
 ```
 
-行0与行1之间**无任何数据依赖**，两条流水线可以交叉发射：行0的Load发出后、等待数据返回期间，可以发射行1的Load；行0的Max执行期间可以发射行1的Max。执行队列中同时填充两行无依赖的指令，双发率显著提升。
+行0与行1之间**无任何数据依赖**，两条流水线可以同时发射：执行队列中同时填充两行无依赖的指令，双发率显著提升。
 
 这一机制对应"指令双发优化"中的核心原则：为执行队列提供足够多且无依赖的并发指令。当前shape为128行，每个展开组处理2行，共64组，寄存器使用量为单行模式的约2倍，仍在硬件限制内（展开后约6-8个RegTensor，远未达到32上限）。
 
 **优化措施**：手动展开最外层循环，每次处理两行数据，使用双套寄存器组（`*Reg` 和 `*Reg1`）：
 
 ```cpp
-// Case 3: 串行处理
+// Case 2: 串行处理
 for (uint16_t i = 0; i < aDim; i++) {
     // 单行 ReduceMax → ExpSub
 }
@@ -343,7 +253,7 @@ for (uint16_t i = 0; i < aDim; i++) {
     // 单行 ReduceSum → Div
 }
 
-// Case 4: 外层展开，每次处理两行
+// Case 3: 外层展开，每次处理两行
 uint16_t halfA = aDim >> 1;
 for (uint16_t i = 0; i < halfA; i++) {
     Duplicate(maxReg, ...);  Duplicate(maxReg1, ...);
@@ -362,20 +272,9 @@ for (uint16_t i = 0; i < halfA; i++) {
 
 **效果**：3413 → 2197 cycles（提升 35.6%），外层展开有效提升指令双发能力。
 
-### Case 3 → Case 5: 主尾块模式
+### Case 2/3 → Case 4/5: 主尾块模式
 
-**优化动机**：UpdateMask每次内层循环更新掩码引入标量开销；主尾块切分后主块可全部使用全Mask，消除UpdateMask重复计算。
-
-**理论分析 — 主尾块模式与Hardware Loop**：
-
-Hardware Loop的编码规范明确要求循环体内不允许 `if/else` 等运行时条件跳转。尾块处理是一个"运行时才能知道是否需要尾块"的场景，在Hardware Loop中不能直接使用 `if (hasTail) { ... }`。
-
-主尾块模式的解决方案是：
-1. 编译期计算尾块大小 `tail = rDim % VL_size`（当前shape下tail=0）。
-2. 主块循环次数 `repeatTimesMain = rDim / VL_size`，全部使用编译期创建的 `CreateMask<ALL>()`（全Mask），循环内**无需任何条件判断或掩码更新**。
-3. 尾块用 `for(1)` 模式替代 `if`：`for (uint16_t t = 0; t < hasTail; ++t) { /* 尾块处理 */ }`。`for(1)` 可被识别为Hardware Loop，而 `if` 会被认为分支跳转。
-
-UpdateMask虽然有掩码自动更新特性，但每次调用UpdateMask仍引入标量计算（更新计数值、生成掩码）。主尾块模式下，主块128行的全部内层循环均使用固定全Mask，完全消除UpdateMask的累加开销。当前shape下 `rDim=128`，每个float占4B，`VL=256B` 对应64元素，恰好整除 `128 / 64 = 2`，尾块为0，主尾块模式达到收益上限。
+**优化动机**：UpdateMask虽然有掩码自动更新特性，但每次调用UpdateMask仍引入标量计算（更新计数值、生成掩码）。主尾块模式下，主块128行的全部内层循环全部使用编译期创建的 `CreateMask<ALL>()`（全Mask），完全消除UpdateMask的累加开销，循环内**无需任何条件判断或掩码更新**。当前shape下 `rDim=128`，每个float占4B，`VL=256B` 对应64元素，恰好整除 `128 / 64 = 2`，尾块为0，主尾块模式达到收益上限。
 
 **关键代码变化**：
 ```cpp
@@ -384,7 +283,7 @@ uint16_t tail = rDim % (256 / sizeof(float));
 uint16_t repeatTimesMain = rDim / (256 / sizeof(float));
 uint16_t hasTail = (tail != 0);
 
-// Case 5: 内层循环全部使用全Mask（maskFull），无需UpdateMask
+// Case 4: 内层循环全部使用全Mask（maskFull），无需UpdateMask
 for (uint16_t i = 0; i < aDim; i++) {
     for (uint16_t j = 0; j < repeatTimesMain; j++) {
         LoadWithCastIfNeed(srcAddr, srcReg, maskFull, ...);
@@ -399,22 +298,9 @@ for (uint16_t i = 0; i < aDim; i++) {
 }
 ```
 
-**尾块处理方式性能比对**：
-
-| 模式 | 折算aiv_vec_cycle | 说明 |
-|:---|:---:|:---|
-| UpdateMask模式（Case 4，带展开） | 2197 | 代码简洁，UpdateMask每次更新有开销 |
-| 主尾块模式-带尾块处理 | 4030 | 尾块For(0)依赖Hardware Loop，当前性能不及预期 |
-| 主尾块模式-不带尾块处理（Case 5） | 3424 | 主块全Mask，当前shape尾块=0，actual=3424 |
-| 主尾块+展开+ExpSub（Case 6） | 1785 | 最优组合，展开+全Mask无更新开销 |
-
-> 结论：当前shape下last轴仅128，尾块为0，主尾块模式展开后性能最优（Case 6）。若last轴更大且不可整除，UpdateMask模式代码更简洁，需根据场景权衡。
-
-### Case 5 → Case 6: 最优组合 — 主尾块 + 外层展开 + ExpSub
-
 **理论分析 — 最大化双发效率的最优组合**：
 
-Case 6同时应用了三个维度上互不冲突的优化手段，形成"1 + 1 + 1 > 3"的叠加效果：
+Case 5同时应用了三个维度上互不冲突的优化手段，形成"1 + 1 + 1 > 3"的叠加效果：
 
 | 优化手段 | 核心收益 | 对寄存器的影响 | 是否相互干扰 |
 | --- | --- | --- | --- |
@@ -428,16 +314,9 @@ Case 6同时应用了三个维度上互不冲突的优化手段，形成"1 + 1 +
 
 2. **执行队列深度最大化**：外层展开向执行队列中填充两行无依赖的指令；主尾块确保主块循环内无条件分支（全Mask无UpdateMask调用），指令序列连续无跳转；ExpSub将Sub+Exp的两条有依赖指令合并为单条，使执行队列中指令总数减少、依赖关系更简短。
 
-3. **最终结果**：1785 cycles相比Case 0的48572 cycles达到27.2x提升，比单独应用外层展开（2197 cycles）或单独应用主尾块（3424 cycles）均有显著改善。
-
-**优化措施**：在主尾块模式（Case 5）基础上增加外层循环展开，形成最优组合：
-- 主尾块切分：主块全部使用全Mask，消除UpdateMask开销
-- 外层循环展开：双套寄存器组，每次处理两行，提升双发效率
-- ExpSub融合指令：Sub+Exp单指令执行
-
 **性能**：1785 cycles（相比Case 0提升 27.2x），为本样例最优性能。
 
----
+**结论**：当前shape下last轴仅128，尾块为0，主尾块模式展开后性能最优（Case 5），相应的，代码复杂度上升，UpdateMask模式代码更简洁，需根据场景权衡。
 
 ## 性能对比总结
 
@@ -445,14 +324,14 @@ Case 6同时应用了三个维度上互不冲突的优化手段，形成"1 + 1 +
 
 | 优化手段 | 核心原理 | 适用版本 |
 |:---|:---|:---|
-| MemBase→RegBase | 寄存器级计算减少UB↔寄存器往返 | Case 1→Case 2 |
-| ExpSub融合指令 | 单条指令替代Sub+Exp，减少延迟 | Case 2→Case 3 |
-| 循环融合 | 共享Load/Store，消除冗余搬运和同步 | Case 2→Case 3 |
-| UpdateMask | 自动更新掩码，简洁尾块处理 | Case 3,Case 4 |
-| 主尾块模式 | 主块全Mask无更新开销，尾块独立处理 | Case 5,Case 6 |
-| 外层循环展开 | 多套寄存器组交错执行，提升指令双发 | Case 3→Case 4, Case 5→Case 6 |
+| MemBase→RegBase | 寄存器级计算减少UB↔寄存器往返和VF启动开销 | Case 0→Case 1 |
+| ExpSub融合指令 | 单条指令替代Sub+Exp，减少延迟 | Case 1→Case 2 |
+| 循环融合 | 共享Load/Store，消除冗余搬运和同步 | Case 1→Case 2 |
+| UpdateMask | 自动更新掩码，简洁尾块处理 | Case 2,Case 3 |
+| 主尾块模式 | 主块全Mask无更新开销，尾块独立处理 | Case 4,Case 4 |
+| 外层循环展开 | 多套寄存器组交错执行，提升指令双发 | Case 2→Case 3, Case 4→Case 5 |
 
-## 编译运行 Done
+## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
@@ -463,14 +342,11 @@ Case 6同时应用了三个维度上互不冲突的优化手段，形成"1 + 1 +
   | SCENARIO_NUM | 版本 | 说明 | CMAKE_VF_MODE |
   |:---:|:---:|:---|:---:|
   | 0 | Case 0 | MemBase，单循环 | false |
-  | 1 | Case 1 | MemBase，循环拆分 | false |
-  | 2 | Case 2 | RegBase，未融合 | false |
-  | 3 | Case 3 | RegBase，UpdateMask+ExpSub+融合 | true |
-  | 4 | Case 4 | RegBase，UpdateMask+展开 | true |
-  | 5 | Case 5 | RegBase，主尾块模式 | true |
-  | 6 | Case 6 | RegBase，主尾块+展开+ExpSub | true |
-
-  > **注意：** Case 0-2为MemBase或不使用VF融合，需设置 `CMAKE_VF_MODE=false`。Case 3-6需设置 `CMAKE_VF_MODE=true`。
+  | 1 | Case 1 | RegBase，未融合 | false |
+  | 2 | Case 2 | RegBase，UpdateMask+ExpSub+融合 | false |
+  | 3 | Case 3 | RegBase，UpdateMask+循环展开 | false |
+  | 4 | Case 4 | RegBase，主尾块模式 | false |
+  | 5 | Case 5 | RegBase，主尾块+循环展开+ExpSub | false |
 
 - 配置环境变量
   ```bash
@@ -480,7 +356,7 @@ Case 6同时应用了三个维度上互不冲突的优化手段，形成"1 + 1 +
 - 单版本执行
   ```bash
   mkdir -p build && cd build
-  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=6 -DCMAKE_VF_MODE=true
+  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=5 -DCMAKE_VF_MODE=false
   make -j
   python3 ../scripts/gen_data.py
   ./demo
@@ -500,8 +376,8 @@ Case 6同时应用了三个维度上互不冲突的优化手段，形成"1 + 1 +
   |:---|:---|:---|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构 |
-  | `SCENARIO_NUM` | `0`~`6` | 版本编号 Case 0-6 |
-  | `CMAKE_VF_MODE` | `true`、`false` | VF融合模式：Case 0-2=false，Case 3-6=true |
+  | `SCENARIO_NUM` | `0`~`5` | 版本编号 Case 0-5 |
+  | `CMAKE_VF_MODE` | `true`、`false` | VF融合模式：默认为false |
 
 ### 性能分析
 
