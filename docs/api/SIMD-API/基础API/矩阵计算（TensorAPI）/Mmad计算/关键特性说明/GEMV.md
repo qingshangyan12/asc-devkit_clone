@@ -58,7 +58,11 @@ C矩阵为1\* 256的向量，共可以划分为16个1 \* 16的子向量，占用
 
 ## **使用示例：**
 
+以M=1，K=4096，N=256，左右矩阵为half、C矩阵为float的GEMV场景为例。A矩阵为1×K的行向量，GM到L1按ND→ND直接搬运（K个数据连续存储）；随后在L1上将这块连续数据重新解释为NZ格式的`(K/C0_ELEMENT, C0_ELEMENT)`分形矩阵，再通过Copy搬运到L0A，从而以GEMV模式参与矩阵乘。
+
 ```cpp
+#include "tensor_api/tensor.h"
+
 using namespace AscendC::Te;
 
 struct MmadTraitCustom {
@@ -67,9 +71,37 @@ struct MmadTraitCustom {
     static constexpr const TraitType value = MmadTrait(0, false, false, false, MmadType::NORMAL);
 };
 
-// Mmad计算代码
-MmadParams params(1, n, k, 0, true);
-auto atom = MakeMmad(MmadOperation{}, MmadTraitCustom{}).with(params);
-Mmad(atom, l0C, l0A, l0B);
+__aicore__ inline void MmadGemvExample(__gm__ half* aGm, __gm__ half* bGm, __gm__ float* cGm)
+{
+    using AType = half;
+    constexpr uint32_t m = 1;
+    constexpr uint32_t k = 4096;
+    constexpr uint32_t n = 256;
+    // half的C0_ELEMENT = C0_SIZE(32B) / sizeof(half) = 16，1×K向量按NZ重排为(K/C0_ELEMENT)×C0_ELEMENT。
+    constexpr uint32_t c0 = C0_ELEMENT<AType>;
 
+    __cbuf__ AType l1ABuf[m * k];
+    __ca__ AType l0ABuf[m * k];
+
+    // A矩阵GM->L1：ND->ND，1×K行向量按ND连续搬入L1。
+    auto gmATensor = MakeTensor(MakeMemPtr(aGm), MakeFrameLayout<NDExtLayoutPtn>(m, k));
+    auto l1ATensor = MakeTensor(MakeMemPtr(l1ABuf), MakeFrameLayout<NDExtLayoutPtn>(m, k));
+    auto copyGm2L1 = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});
+    Copy(copyGm2L1, l1ATensor, gmATensor);
+
+    // 在L1上把这块连续数据重新解释为NZ格式的(K/C0_ELEMENT)×C0_ELEMENT分形矩阵（地址不变，仅换Layout）。
+    auto l1ANzTensor = MakeTensor(l1ATensor.Data(), MakeFrameLayout<NZLayoutPtn, AType>(k / c0, c0));
+    // L1->L0A：NZ->NZ非转置搬运，一次完成分形搬运。
+    auto l0ATensor = MakeTensor(MakeMemPtr(l0ABuf), MakeFrameLayout<NZLayoutPtn, AType>(k / c0, c0));
+    auto copyL12L0A = MakeCopy(CopyL12L0A{}, CopyL12L0ATraitDefault{});
+    Copy(copyL12L0A, l0ATensor, l1ANzTensor);
+
+    // B矩阵搬运及L0B构造与基础场景相同（此处省略，假设已得到l0B）。
+    // ...
+
+    // Mmad计算：使用配置GEMV模式的Trait。
+    MmadParams params(m, n, k, 0, true);
+    auto atom = MakeMmad(MmadOperation{}, MmadTraitCustom{}).with(params);
+    Mmad(atom, l0C, l0ATensor, l0B);
+}
 ```
