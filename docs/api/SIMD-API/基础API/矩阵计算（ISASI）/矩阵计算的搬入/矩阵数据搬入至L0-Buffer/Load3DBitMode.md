@@ -141,7 +141,7 @@ uint8_t strideH = 1, strideW = 1;
 uint8_t padList[4] = {padLeft, padRight, padTop, padBottom};
 
 // 使用LoadData3DParamsV2结构体对象初始化Load3DBitModeParam
-// 构造参数顺序：padList, l1H, l1W, channelSize, kExtension, mExtension, kStartPt, mStartPt,
+// 构造参数顺序：padList, l1H, l1W, sizeChannel, kExtension, mExtension, kStartPt, mStartPt,
 //             strideW, strideH, filterW, filterH, dilationFilterW, dilationFilterH,
 //             enTranspose, enSmallK, padValue, filterSizeW, filterSizeH, fMatrixCtrl
 AscendC::LoadData3DParamsV2<half> param = {
