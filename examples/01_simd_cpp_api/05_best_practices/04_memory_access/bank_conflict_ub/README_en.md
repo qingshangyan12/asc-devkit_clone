@@ -1,4 +1,4 @@
-﻿# UB Bank Conflict and Address Overlap Scenario Analysis Example
+# UB Bank Conflict and Address Overlap Scenario Analysis Example
 
 ## Overview
 
@@ -14,7 +14,7 @@ This example is based on the Add instruction. By configuring different LocalTens
 ## Directory Structure
 
 ``` text
-├── bank_conflict
+├── bank_conflict_ub
 │   ├── scripts
 │   │   ├── gen_data.py                    // Input data and ground truth data generation script
 │   │   └── verify_result.py               // Verification script to check if output data matches ground truth
@@ -22,7 +22,7 @@ This example is based on the Add instruction. By configuring different LocalTens
 │   ├── CMakeLists.txt                     // Build project file
 │   ├── config.h                           // Address configurations for each SCENARIO_NUM
 │   ├── data_utils.h                       // Data read/write functions
-│   ├── bank_conflict.asc                  // Ascend C example implementation and usage sample
+│   ├── bank_conflict_ub.asc                  // Ascend C example implementation and usage sample
 │   └── README.md                          // Example documentation
 ```
 

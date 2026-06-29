@@ -15,7 +15,7 @@ import numpy as np
 import os
 import argparse
 
-# ---- kernel 常量 (与 bank_conflict.asc / config.h 对齐) ----
+# ---- kernel 常量 (与 bank_conflict_ub.asc / config.h 对齐) ----
 TOTAL_LENGTH = 4096
 REPEAT_TIMES_FOR_INSTR_EXCUTE = 1000
 ITEMS_PER_ITER = 64                       # 256 bytes / sizeof(float) = 64 elements per repeat
@@ -87,7 +87,7 @@ def gen_golden_data(scenario_num):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate test data for bank_conflict")
+    parser = argparse.ArgumentParser(description="Generate test data for bank_conflict_ub")
     parser.add_argument("--scenario", "-s", type=int, default=None,
                         help="scenario number (1-8), overrides SCENARIO_NUM env")
     args = parser.parse_args()

@@ -13,8 +13,8 @@
  * \brief Config for src and dst address.
  */
 
-#ifndef BANK_CONFLICT_CONFIG_H
-#define BANK_CONFLICT_CONFIG_H
+#ifndef BANK_CONFLICT_UB_CONFIG_H
+#define BANK_CONFLICT_UB_CONFIG_H
 
 #include "kernel_operator.h"
 
@@ -69,4 +69,4 @@ constexpr uint32_t zLocalAddr = 0x10100;
 
 #endif
 
-#endif // BANK_CONFLICT_CONFIG_H
+#endif // BANK_CONFLICT_UB_CONFIG_H

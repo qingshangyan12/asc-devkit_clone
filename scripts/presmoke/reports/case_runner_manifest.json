@@ -1,4 +1,4 @@
-﻿[
+[
   {
     "case": "01_simd_cpp_api/00_introduction/00_quickstart/hello_world",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/00_introduction/00_quickstart/hello_world/run.sh",
@@ -6184,8 +6184,8 @@
     ]
   },
   {
-    "case": "01_simd_cpp_api/05_best_practices/04_memory_access/bank_conflict",
-    "runner": "scripts/presmoke/cases/01_simd_cpp_api/05_best_practices/04_memory_access/bank_conflict/run.sh",
+    "case": "01_simd_cpp_api/05_best_practices/04_memory_access/bank_conflict_ub",
+    "runner": "scripts/presmoke/cases/01_simd_cpp_api/05_best_practices/04_memory_access/bank_conflict_ub/run.sh",
     "source": "readme",
     "confidence": "high",
     "supported_archs": [

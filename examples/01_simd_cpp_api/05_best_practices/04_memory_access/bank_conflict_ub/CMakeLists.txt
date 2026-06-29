@@ -1,4 +1,4 @@
-# ----------------------------------------------------------------------------------------------------------
+﻿# ----------------------------------------------------------------------------------------------------------
 # Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
@@ -18,7 +18,7 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    bank_conflict.asc
+    bank_conflict_ub.asc
 )
 
 target_compile_options(demo PRIVATE
