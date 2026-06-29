@@ -59,7 +59,7 @@ __aicore__ inline void AbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &s
 
 ## 数据类型
 <!-- npu="950" id8 -->
-针对Ascend 950PR/Ascend 950DT，T支持的数据类型为：half、float。
+Ascend 950PR/Ascend 950DT，T支持的数据类型为：half、float。
 <!-- end id8 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
@@ -73,7 +73,7 @@ __aicore__ inline void AbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &s
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#section668772811100)。
 
 <!-- npu="950" id9 -->
-- 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count取值为0时，不保证该接口将被视为NOP（空操作）。
+- 该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count取值为0时，不保证该接口将被视为NOP（空操作）。
   <!-- end id9 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
