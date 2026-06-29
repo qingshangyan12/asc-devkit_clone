@@ -55,8 +55,16 @@ bool ReadFile(const std::string &filePath, size_t &fileSize, void *buffer, size_
         file.close();
         return false;
     }
-    buf->pubseekpos(0, std::ios::in);
-    buf->sgetn(static_cast<char *>(buffer), size);
+    if (buf->pubseekpos(0, std::ios::in) == std::streampos(std::streamoff(-1))) {
+        ERROR_LOG("failed to seek file");
+        file.close();
+        return false;
+    }
+    if (buf->sgetn(static_cast<char *>(buffer), size) != static_cast<std::streamsize>(size)) {
+        ERROR_LOG("failed to read file");
+        file.close();
+        return false;
+    }
     fileSize = size;
     file.close();
     return true;

@@ -1,4 +1,4 @@
-"# Axpy Operator Direct Call Sample (Tensor API)
+# Axpy Operator Direct Call Sample (Tensor API)
 
 ## Overview
 
@@ -92,4 +92,4 @@ Execute the following steps in the root directory of this sample to compile and 
   The following execution result indicates that the accuracy comparison is successful.
   ```bash
   test pass!
-  ```"
+  ```
