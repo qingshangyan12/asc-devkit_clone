@@ -1,18 +1,18 @@
-﻿# Memory 矢量计算编程<a name="ZH-CN_TOPIC_0000002600000002"></a>
+﻿# Memory矢量计算编程<a name="ZH-CN_TOPIC_0000002600000002"></a>
 
-本文介绍如何在Ascend C中使用C++ Tensor编程API编写基于Unified Buffer（以下简称UB）的矢量计算代码，该能力是Ascend C最基础、最通用的矢量编程方式。这种基于UB内存的编程方式被称为Memory 矢量计算编程。NPU架构版本2201产品支持完整的Memory 矢量计算UB直接编程能力；而NPU架构版本3510虽也支持UB操作，但推荐使用Reg 矢量计算编程以获得更高性能。
+本文介绍如何在Ascend C中使用C++ Tensor编程API编写基于Unified Buffer（以下简称UB）的矢量计算代码，该能力是Ascend C最基础、最通用的矢量编程方式。这种基于UB内存的编程方式被称为Memory矢量计算编程。NPU架构版本2201产品支持完整的Memory矢量计算UB直接编程能力；而NPU架构版本3510虽也支持UB操作，但推荐使用Reg矢量计算编程以获得更高性能。
 
-## Memory 矢量编程的基本步骤
+## Memory矢量编程的基本步骤
 
-Memory 矢量计算的数据流为：数据搬入 → 计算 → 数据搬出。当我们描述一个常见的Vector 矢量计算时，需要执行以下三个步骤：
+Memory矢量计算的数据流为：数据搬入 → 计算 → 数据搬出。当我们描述一个常见的Vector矢量计算时，需要执行以下三个步骤：
 
 1. 通过DMA将数据从Global Memory搬入到Local Memory
 2. 进行矢量计算
 3. 通过DMA将数据从Local Memory搬出到Global Memory
 
-## Memory 矢量计算内存管理
+## Memory矢量计算内存管理
 
-Memory 矢量编程的核心是基于Local Memory（UB）完成矢量计算，要求开发者先将输入数据从Global Memory（以下简称GM）搬入UB，再通过Vector 计算指令执行运算。UB的管理依赖LocalTensor对象实现，开发者可通过LocalMemAllocator分配器申请UB空间，为后续矢量计算提供存储载体。
+Memory矢量编程的核心是基于Local Memory（UB）完成矢量计算，要求开发者先将输入数据从Global Memory（以下简称GM）搬入UB，再通过Vector计算指令执行运算。UB的管理依赖LocalTensor对象实现，开发者可通过LocalMemAllocator分配器申请UB空间，为后续矢量计算提供存储载体。
 
 ### 基础Tensor(不带Layout)定义
 
@@ -40,7 +40,7 @@ Global Memory（GM）与UB之间的数据搬运提供了多样化的接口，支
 | GM→UB | 非对齐搬运 | `DataCopyPad(dst, src, dataCopyExtParams, padParams)` | 地址非32B对齐，支持自定义填充 |
 | UB→GM | 连续搬运 | `DataCopy(dst, src, count)` | 一维连续数据搬运 |
 | UB→GM | 高维切分 | `DataCopy(dst, src, dataCopyParams)` | 多块非连续数据，可配置块数和间隔 |
-| UB→GM | 非对齐搬运 | `DataCopy(dst, src, dataCopyExtParams)` | 地址非32B对齐 |
+| UB→GM | 非对齐搬运 | `DataCopyPad(dst, src, dataCopyExtParams)` | 地址非32B对齐 |
 
 根据上述矢量搬运能力的描述，开发者可以根据不同的场景选择合适的接口进行处理。
 
@@ -70,7 +70,7 @@ DataCopyParams copyParams {blockCount, blockLen, srcGap, dstGap};
 AscendC::DataCopy(dstLocal, srcGlobal, copyParams);
 ```
 
-**非对齐搬运**: 高维切分数据搬运提供了用户进行非连续多个数据块搬入的能力，但该接口要求`Global Memory`中搬运的长度和间隔都必须保证是32B对齐的，因此对于一些非对齐场景无法支持。例如需要进行如下图所示的搬运，则无法通过`DataCopy`高维切分接口完成隔行数据的搬运，此时需要突破32B的约束限制。Ascend C根据芯片能力，提供了`DataCopyPad`接口来支持该搬运形式，该接口可以指定以字节为单位的burst_len和stride信息，完成搬运操作。
+**非对齐搬运**: 高维切分数据搬运提供了用户进行非连续多个数据块搬入的能力，但该接口要求`Global Memory`中搬运的长度和间隔都必须保证是32B对齐的，因此对于一些非对齐场景无法支持。例如需要进行如下图所示的搬运，则无法通过`DataCopy`高维切分接口完成隔行数据的搬运，此时需要突破32B的约束限制。Ascend C根据芯片能力，提供了`DataCopyPad`接口来支持该搬运形式，该接口可以指定以字节为单位的blockLen和stride信息，完成搬运操作。
 
 <img src="../../../../figures/非对齐搬入能力.png" alt="非对齐搬入能力" width="800" />
 
@@ -106,10 +106,10 @@ AscendC::DataCopyPad(dstLocal, srcGlobal, copyParams, padParams);
 
 ## Memory数据计算
 
-Memory 矢量计算提供连续计算和高维切分两种计算模式，并可通过掩码实现数据选择性参与计算。
+Memory矢量计算提供连续计算和高维切分两种计算模式，并可通过掩码实现数据选择性参与计算。
 以Add接口为例，两种计算模式的调用方式示意图如下。其中连续计算简单直观，适合一维Tensor连续数据处理；高维切分计算灵活可控，支持迭代执行和地址间隔配置。开发者可根据实际业务需求选择合适的计算方式。
 
-<img src="../../../../figures/Memory 矢量计算模式示意图.png" alt="Memory 矢量计算模式示意图" width="800" />
+<img src="../../../../figures/Memory 矢量计算模式示意图.png" alt="Memory矢量计算模式示意图" width="800" />
 
 ### 高维切分计算
 
@@ -119,12 +119,12 @@ Memory 矢量计算提供连续计算和高维切分两种计算模式，并可�
 
 Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock内部地址连续，长度为32Byte）进行计算，并将结果写入对应的8个DataBlock中。
 
-<img src="../../../../figures/DataBlock迭代示意图.png" alt="DataBlock迭代示意图" width="800" />
+<img src="../../../../figures/DataBlock迭代示意图.png" alt="DataBlock迭代示意图" width="600" />
 
 矢量计算API支持通过配置repeatTime参数控制指令的迭代执行次数。若将repeatTime设为2，矢量计算单元会执行2次迭代计算，可处理的数据量为2 × 8（单次迭代8个DataBlock） × 32Byte = 512Byte；若数据类型为half（2B / 元素），则对应计算256个元素。下图为2次迭代Exp计算的示意图。
-注意：受硬件限制，repeatTime的取值范围为[1, 255]，该约束适用于所有支持Memory 矢量计算的产品（NPU架构版本2201、NPU架构版本3510）。
+注意：受硬件限制，repeatTime的取值范围为[1, 255]，该约束适用于所有支持Memory矢量计算的产品。
 
-<img src="../../../../figures/2次迭代Exp计算.png" alt="2次迭代Exp计算" width="800" />
+<img src="../../../../figures/2次迭代Exp计算.png" alt="2次迭代Exp计算" width="600" />
 
 #### 地址间隔配置
 
@@ -135,7 +135,7 @@ Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock�
 连续计算，`dataBlockStride`设置为1，对同一迭代内的8个DataBlock数据连续进行处理。
 非连续计算，`dataBlockStride`值大于1（如取2），同一迭代内不同DataBlock之间在读取数据时出现一个DataBlock的间隔，如下图所示。
 
-<img src="../../../../figures/dataBlockStride示例.png" alt="dataBlockStride示例" width="800" />
+<img src="../../../../figures/data_block_stride示例_c.png" alt="dataBlockStride示例" width="600" />
 
 > 📌 若dst_block_stride == 0，等同于dst_block_stride = 1；若src_block_stride = 0，则源操作数将始终复用第一个dataBlock。
 
@@ -152,7 +152,7 @@ Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock�
 | 反复计算 | 0 | 对首个连续8个dataBlock反复读取和计算 | <img src="../../../../figures/repeat_stride反复计算场景.png" alt="repeatStride反复计算场景" width="600" /> |
 | 部分重复计算 | (0, 8) | 相邻迭代间部分数据重复读取，一般场景不涉及 | <img src="../../../../figures/repeat_stride部分重复计算.png" alt="repeatStride部分重复计算" width="600" /> |
 
-当 `repeatTime`>1 时，通过多次迭代完成计算。repeatStride 表示相邻迭代间相同位置DataBlock的起始地址间隔（以DataBlock为单位）。例如 `repeatStride` = 9 时，第一次迭代的第1个DataBlock与第二次迭代的第1个DataBlock间隔9个 DataBlock。
+当 `repeatTime`>1 时，通过多次迭代完成计算。repeatStride表示相邻迭代间相同位置DataBlock的起始地址间隔（以DataBlock为单位）。例如 `repeatStride` = 9 时，第一次迭代的第1个DataBlock与第二次迭代的第1个DataBlock间隔9个DataBlock。
 
 ![多次迭代非连续场景示意图](../../../../figures/多次迭代非连续场景示意图.png)
 
@@ -207,7 +207,7 @@ AscendC::SetMaskNormal();
 
 在**Normal计算**模式中，MASK寄存器会作为每个Repeat的掩码使用。只有高维切分支持此模式，在接口上区分为逐bit模式和连续模式。
 
-> 📌 Normal 为默认模式。若未发生模式切换，则无需重复配置该模式。
+> 📌 Normal为默认模式。若未发生模式切换，则无需重复配置该模式。
 
 在Normal计算模式下，mask参数用来控制单次迭代内参与计算的元素个数，可通过`SetVectorMask`来设置mask的值。
 
@@ -239,21 +239,21 @@ AscendC::Adds(dstLocal, src0Local, scalarValue, 2, { 1, 1, 1, 8, 8, 8 });
 
   该模式下，可以指定maskHigh和maskLow的值，来处理各种掩码操作。如需进行交错计算，则mask设置成01010101...或者10101010...模式即可。以src数据（shape为256，数据类型为half）为例，通过设置逐bit的掩码，可在单迭代中选取特定bit位的数值参与计算：
 
-<img src="../../../../figures/单次迭代内逐bit计算.png" alt="单次迭代内逐bit计算" width="600" />
+  <img src="../../../../figures/单次迭代内逐bit计算.png" alt="单次迭代内逐bit计算" width="600" />
 
-```cpp
-AscendC::LocalTensor<half> dstLocal;
-AscendC::LocalTensor<half> src0Local;
-AscendC::LocalTensor<half> src1Local;
+  ```cpp
+  AscendC::LocalTensor<half> dstLocal;
+  AscendC::LocalTensor<half> src0Local;
+  AscendC::LocalTensor<half> src1Local;
 
-// 1. Data transfer (temporarily omitted)
-// 2. Use high-dimensional segmentation API for computation
-// 2.1 Set mask Normal mode
-AscendC::SetMaskNormal();
-// 2.2 Set Mask to bit-wise mode (0101...), implement interleaved computation
-AscendC::SetVectorMask(0x000000000000AAAA, 0x0000000000000000); 
-AscendC::Add(dstLocal, src0Local, src1Local, 2, { 1, 1, 1, 8, 8, 8 });
-```
+  // 1. Data transfer (temporarily omitted)
+  // 2. Use high-dimensional segmentation API for computation
+  // 2.1 Set mask Normal mode
+  AscendC::SetMaskNormal();
+  // 2.2 Set Mask to bit-wise mode (0101...), implement interleaved computation
+  AscendC::SetVectorMask(0x000000000000AAAA, 0x0000000000000000); 
+  AscendC::Add(dstLocal, src0Local, src1Local, 2, { 1, 1, 1, 8, 8, 8 });
+  ```
 
 ### 连续计算
 
@@ -265,9 +265,9 @@ AscendC::Add(dstLocal, src0Local, src1Local, 2, { 1, 1, 1, 8, 8, 8 });
 AscendC::Add(dstLocal, src0Local, src1Local, 4096);
 ```
 
-## Memory 矢量计算同步控制
+## Memory矢量计算同步控制
 
-AI Core内部执行单元（如MTE2搬运单元、Vector计算单元等）采用异步并行方式运行，当不同单元读写同一存储资源时，易产生数据依赖问题。因此，Memory 矢量计算需通过流水同步接口协调执行顺序，确保计算流程正确。Memory 矢量计算流程较Cube矩阵计算更为简洁，主要包含三步：数据搬入（Global Memory → UB）、计算（UB）、数据搬出（UB → Global Memory）。三个步骤分别对应PIPE_MTE2、PIPE_V、PIPE_MTE3流水线，需通过核内同步接口协调执行顺序，确保各步骤按序完成。
+AI Core内部执行单元（如MTE2搬运单元、Vector计算单元等）采用异步并行方式运行，当不同单元读写同一存储资源时，易产生数据依赖问题。因此，Memory矢量计算需通过流水同步接口协调执行顺序，确保计算流程正确。Memory矢量计算流程较Cube矩阵计算更为简洁，主要包含三步：数据搬入（Global Memory → UB）、计算（UB）、数据搬出（UB → Global Memory）。三个步骤分别对应PIPE_MTE2、PIPE_V、PIPE_MTE3流水线，需通过核内同步接口协调执行顺序，确保各步骤按序完成。
 
 当开发者进行一个矢量加法计算时（NPU架构版本3510产品），可通过`Mutex::Lock`&`Mutex::Unlock`的方式完成对这三个步骤的同步。NPU架构版本2201产品可使用`SetFlag`&`WaitFlag`实现相同同步效果，详见[同步机制](../基于Tensor的CPP编程/CPPTensor编程概述.md#同步机制)。
 
@@ -304,6 +304,6 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 }
 ```
 
-## Memory 矢量计算示例
+## Memory矢量计算示例
 
-结合上文介绍的Memory矢量数据搬运与计算能力，开发者可基于C++ Tensor编程接口实现完整的Memory 矢量计算算子。具体开发流程与代码示例可参考[cpp_api_add样例](../../../../../../examples/01_simd_cpp_api/00_introduction/01_add/add/)，该样例完整展示了矢量加法算子的开发、编译与验证流程。
+结合上文介绍的Memory矢量数据搬运与计算能力，开发者可基于C++ Tensor编程接口实现完整的Memory矢量计算算子。具体开发流程与代码示例可参考[cpp_api_add样例](../../../../../../examples/01_simd_cpp_api/00_introduction/01_add/add/)，该样例完整展示了矢量加法算子的开发、编译与验证流程。

@@ -45,7 +45,7 @@ __global__ __cube__ void matmul_custom(...)
 
 ### 矩阵计算内存布局
 
-矩阵计算单元采用分块计算逻辑，其中16×16是矩阵计算单元分形（fractal）的基本粒度（对于half数据类型；int8类型为16×32或32×16；fp32类型分形为16×8），硬件可以并行处理多个fractal。在传统的线性存储布局（如行主序或列主序）中，数据按行或列连续存放。当需要读取一个16×16的矩形数据块时，若直接从内存中获取，则需访问不连续的多个内存地址以逐行“收集”数据，这种非连续访问会导致内存效率显著下降。
+矩阵计算单元采用分块计算逻辑，其中16×16是矩阵计算单元分形的基本粒度（对于half数据类型；int8类型为16×32或32×16；fp32类型分形为16×8），硬件可以并行处理多个矩阵计算单元。在传统的线性存储布局（如行主序或列主序）中，数据按行或列连续存放。当需要读取一个16×16的矩形数据块时，若直接从内存中获取，则需访问不连续的多个内存地址以逐行“收集”数据，这种非连续访问会导致内存效率显著下降。
 为解决上述问题，引入了矩阵分形存储格式。该格式通过软件层对数据进行重排，使每个16×16计算块在物理内存中连续存放。硬件仅需发起一次连续读取，即可将整个数据块加载至片上寄存器，避免了多地址寻址开销，从而大幅提升矩阵计算单元的数据吞吐率。**对于half数据类型，16×16是矩阵计算单元的基本分形粒度，当前支持Cube计算的产品型号包括NPU架构版本2201和NPU架构版本3510。**
 昇腾AI处理器的矩阵计算单元为追求极高的数据吞吐率与计算密度，采用了专有的硬件架构设计。与通用CPU常用的连续线性存储不同，该单元要求输入输出数据必须符合特定的分形存储格式。在使用Ascend C的Mmad类接口进行算子开发时，深入理解这些数据格式对于实现正确的数据搬运、分块及性能优化至关重要。
 为便于理解与记忆，文档采用“大Y小x”的直观命名法：
@@ -56,19 +56,19 @@ __global__ __cube__ void matmul_custom(...)
 
 矩阵分形存储格式是对多维Tensor在内存中数据排布格式的描述。
 为了适配矩阵计算单元的物理读取路径，不同的产品形态有不同的格式要求：
-针对NPU架构版本2201，矩阵乘法 C = A × B 要求：左矩阵 A 使用 Zz 格式，右矩阵 B 使用 Zn 格式，结果矩阵 C 使用 Nz 格式，如下图所示：
+针对NPU架构版本2201，矩阵乘法C = A × B要求：左矩阵A使用Zz格式，右矩阵B使用Zn格式，结果矩阵C使用Nz格式，如下图所示：
 
 <img src="../../../../figures/矩阵乘法场景设计的数据格式.png" alt="矩阵乘法场景设计的数据格式" width="800" />
 
-针对NPU架构版本3510，矩阵乘法 C = A × B 要求：左矩阵 A 使用 Nz 格式，右矩阵 B 使用 Zn 格式，结果矩阵 C 使用 Nz 格式，如下图所示：
+针对NPU架构版本3510，矩阵乘法C = A × B要求：左矩阵A使用Nz格式，右矩阵B使用Zn格式，结果矩阵C使用Nz格式，如下图所示：
 
 <img src="../../../../figures/矩阵乘法场景涉及的数据格式.png" alt="矩阵乘法场景涉及的数据格式" width="800" />
 
-#### ND 格式（N-Dimension）
+#### ND格式（N-Dimension）
 
 ND格式是通用的N维张量格式，数据在内存中连续线性存放，通常存在于GM中。在进行矩阵运算前，通常需要将其转换为Nz格式以适配Cube计算单元。
 
-#### Nz 格式
+#### Nz格式
 
 Nz格式主要用于L1 Buffer和L0C Buffer中存放数据。针对NPU架构版本3510，L0A Buffer也采用Nz分形格式。该格式采用大N（外部列主序）+ 小z（内部行主序）的方式排布。
 
@@ -81,19 +81,19 @@ Nz是Ascend架构的中间格式，介于线性数据(ND)和计算专用数据(Z
 > - **L1 Buffer**: 存储中间数据。分形形状为16×(32B/sizeof(DataType))，大小512字节，便于转换为Zz和Zn格式。
 > - **L0A Buffer（仅NPU架构版本3510）**: 存储左矩阵。
 
-#### Zz 格式
+#### Zz格式
 
 针对NPU架构版本2201，L0A Buffer使用此格式（NPU架构版本3510使用Nz格式）。该格式采用大Z（外部行主序）+ 小z（内部行主序）。
 
-<img src="../../../../figures/Zz格式-以half类型为例.png" alt="Zz 格式(以half类型为例)" width="400" />
+<img src="../../../../figures/Zz格式-以half类型为例.png" alt="Zz格式(以half类型为例)" width="400" />
 
 在矩阵乘法中，A矩阵逐行读取数据。Zz格式的行主序特性使同一行元素物理地址连续，与计算访问模式匹配，便于Cube单元左侧通道通过DMA连续读取，避免跨步访问，提升数据搬运效率。
 
-#### Zn 格式
+#### Zn格式
 
 Zn格式主要用于L0B Buffer中存放数据，如果离线处理好的右矩阵数据直接为Zn格式，则在GM和L1 Buffer上存储该格式。该格式采用大Z(外部行主序) + 小n(内部列主序)。
 
-<img src="../../../../figures/Zn格式-以half类型为例.png" alt="Zn 格式(以half类型为例)" width="400" />
+<img src="../../../../figures/Zn格式-以half类型为例.png" alt="Zn格式(以half类型为例)" width="400" />
 
 矩阵乘法需读取B矩阵列向量。普通行主序存储导致列数据在内存中地址不连续。Zn格式在分形内部按列存储，使列数据在L0B中紧凑排列，便于Cube单元右侧通道线性读取完整列向量，避免跨步访问。
 
@@ -147,7 +147,7 @@ AscendC::GlobalTensor<half> srcGlobal;
 srcGlobal.SetGlobalBuffer((__gm__ half*)src);
 
 // Set parameters for Nd2NzParams
-AscendC::Nd2NzParams intriParams{/*nd_num*/1, /*n_d1*/16, /*d_value*/23, /*dst_d_value*/0, /*dst_d1*/32, /*dst_d2*/32, /*src_stride*/1, /*dst_stride*/0};
+AscendC::Nd2NzParams intriParams{/*ndNum*/1, /*nValue*/16, /*dValue*/23, /*srcNdMatrixStride*/0, /*srcDValue*/32, /*dstNzC0Stride*/32, /*dstNzNStride*/1, /*dstNzMatrixStride*/0};
 
 // Global Memory -> Local Memory with ND2NZ conversion
 AscendC::DataCopy(dst, srcGlobal, intriParams);
@@ -208,21 +208,21 @@ for (int i = 0; i < CeilDivision(m, fractalShape[1]); ++i) {
 
 矩阵搬出接口实现L0C到Global Memory或L1 Buffer的数据传输，支持随路量化、ReLU、格式转换(NZ2ND)、通道拆分合并等操作，开发者通过配置参数控制搬运路径、位置、长度等以充分利用硬件能力，通常在Mmad接口后使用，而针对NPU架构版本3510还支持L0C到UB Buffer的传输、NZ2ND格式转换以及UB双目标模式，矩阵搬出能力如下图所示：
 
-针对NPU架构版本2201：
+NPU架构版本2201下的矩阵搬出流程为：
 
 <img src="../../../../figures/矩阵搬出流程-AtlasA2A3.png" alt="矩阵搬出流程" width="800" />
 
-针对NPU架构版本3510：
+NPU架构版本3510下的矩阵搬出流程为：
 
 <img src="../../../../figures/矩阵搬出流程-Ascend950PR.png" alt="矩阵搬出流程" width="800" />
 
 矩阵搬出接口支持多种随路能力的灵活组合，以L0C到Global Memory的搬运场景为例：矩阵计算结果暂存于L0C Buffer后需搬运至GM，在此过程中可协同执行随路量化、ReLU激活、格式转换及通道拆分合并等操作。下图分别展示了不同NPU架构版本下这些随路能力的有效组合、中间数据类型及完整数据路径。例如，L0C中的F32数据可通过QF322B8_PRE随路量化得到B8数据，可选使能ReLU后经NZ2NZ/NZ2ND格式转换输出至GM。图中F32→F16和F32→BF16为数据类型转换，其余路径为随路scalar/vector量化模式；针对NPU架构版本3510，还额外支持NZ2ND格式转换。
 
-针对NPU架构版本2201：
+NPU架构版本2201下的矩阵搬出能力为：
 
 <img src="../../../../figures/L0C2GM搬运-AtlasA2A3.png" alt="L0C2GM搬运" width="800" />
 
-针对NPU架构版本3510：
+NPU架构版本3510下的矩阵搬出能力为：
 
 <img src="../../../../figures/L0C2GM搬运-Ascend950PR.png" alt="L0C2GM搬运" width="800" />
 
