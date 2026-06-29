@@ -8,6 +8,10 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_CPU_DEBUG)
+using __cce_scalar::get_shmem_sz;
+#endif
+
 #if __NPU_ARCH__ != 5102 && __NPU_ARCH__ != 3102
 #ifndef VERIFY_SINGLE_HEADER
 #include "kernel_operator.h"
