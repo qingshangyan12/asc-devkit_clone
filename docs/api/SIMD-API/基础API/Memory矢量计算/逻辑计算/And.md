@@ -86,7 +86,7 @@ $dst_i = src0_i \& src1_i$
 | count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。 |
 | mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](../SIMD计算说明/掩码/掩码.md)。 |
 | repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体说明请参考[高维切分](../SIMD计算说明/高维切分.md)。 |
-| repeatParams | 输入 | 控制操作数地址步长的参数。[BinaryRepeatParams](../../数据结构/辅助数据结构//BinaryRepeatParams.md)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md)。 |
+| repeatParams | 输入 | 控制操作数地址步长的参数。[BinaryRepeatParams](../../数据结构/辅助数据结构/BinaryRepeatParams.md)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md)。 |
 
 ## 数据类型
 
@@ -124,15 +124,6 @@ $dst_i = src0_i \& src1_i$
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
 - 使用整个tensor参与计算接口符号重载时，运算量为目的LocalTensor的总长度。
-<!-- npu="A3,910b" id18 -->
-- 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  <!-- npu="A3" id19 -->
-  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id19 -->
-  <!-- npu="910b" id20 -->
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id20 -->
-<!-- end id18 -->
 <!-- npu="A3,910b,310b,310p,910" id21 -->
 - 特别地，针对uint32_t/int32_t类型的And操作，支持通过ReinterpretCast的方式来实现：使用Local Tensor的ReinterpretCast转换成uint16_t/int16_t后再调用And进行计算。直接传入uint32_t/int32_t类型的数据，在不同版本型号上表现会有所差异，考虑到算子在各个版本中的兼容性，不建议使用这种直接传入的方式：
     <!-- npu="A3,910b" id22 -->
@@ -158,7 +149,19 @@ $dst_i = src0_i \& src1_i$
       <!-- end id28 -->
     <!-- end id26 -->
 <!-- end id21 -->
-
+<!-- npu="950,A3,910b" id29 -->
+- 当参数count或repeatTime取值为0时，该接口的行为如下：
+  - 针对如下型号，该接口不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+    <!-- npu="A3" id30 -->
+    - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+    <!-- end id30 -->
+    <!-- npu="910b" id31 -->
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    <!-- end id31 -->
+  <!-- npu="950" id32 -->
+  - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
+  <!-- end id32 -->
+<!-- end id29 -->
 ## 调用示例<a name="section642mcpsimp"></a>
 
 - tensor高维切分计算样例-mask连续模式
@@ -189,7 +192,7 @@ $dst_i = src0_i \& src1_i$
 
 结果示例如下：
 
-```bash
+```plain
 输入数据src0Local：[1 2 3 ... 512]
 输入数据src1Local：[513 512 511 ... 2]
 输出数据dstLocal：[1 0 3 ... 0]
