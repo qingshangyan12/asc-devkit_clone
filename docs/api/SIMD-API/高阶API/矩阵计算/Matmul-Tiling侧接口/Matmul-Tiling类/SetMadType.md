@@ -18,7 +18,7 @@ int32_t SetMadType(MatrixMadType madType)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| madType | 输入 | 设置Matmul模式。MatrixMadType类型，定义如下方代码所示，其中参数的含义为：<br><br>MatrixMadType::NORMAL：普通模式，即非HF32模式、非MxMatmul场景。<br><br>MatrixMadType::HF32：开启HF32模式。<br><br>MatrixMadType::MXMODE：开启MxMatmul场景。 |
+| madType | 输入 | 设置Matmul模式。MatrixMadType类型，定义如下方代码所示，其中参数的含义为：MatrixMadType::NORMAL：普通模式，即非HF32模式、非MxMatmul场景。MatrixMadType::HF32：开启HF32模式。MatrixMadType::MXMODE：开启MxMatmul场景。 |
 
 ```
 enum class MatrixMadType : int32_t {

@@ -28,7 +28,7 @@ __aicore__ inline void SetSparseIndex(const GlobalTensor<uint8_t>& indexGlobal)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| indexGlobal | 输入 | 索引矩阵在Global Memory上的首地址，类型为GlobalTensor。<br><br>索引矩阵的数据类型为uint2，需要由用户拼成uint8的数据类型，再传入本接口。索引矩阵的Format格式只支持NZ格式。 |
+| indexGlobal | 输入 | 索引矩阵在Global Memory上的首地址，类型为GlobalTensor。索引矩阵的数据类型为uint2，需要由用户拼成uint8的数据类型，再传入本接口。索引矩阵的Format格式只支持NZ格式。 |
 
 ## 返回值说明
 

@@ -52,16 +52,16 @@
 | 参数名 | 描述 |
 | --- | --- |
 | T | 操作数的数据类型。支持的数据类型为：float。 |
-| pattern | 用于指定ReduceProd计算轴，包括Reduce轴和Normal轴。pattern由与向量维度数量相同的A、R字母组合形成，字母A表示Normal轴，R表示Reduce轴。例如，AR表示对二维向量进行ReduceProd计算：第一维是Normal轴，第二维是Reduce轴，即对第二维数据求积。<br><br>pattern是定义在AscendC::Pattern::Reduce命名空间下的结构体，其成员变量用户无需关注。<br><br>pattern当前只支持取值为AR和RA，当前用户需要显式指定pattern为AscendC::Pattern::Reduce::AR或者AscendC::Pattern::Reduce::RA。 |
-| isReuseSource | 是否允许修改源操作数，默认值为false。如果开发者允许源操作数被改写，可以设置该参数取值为true开启，开启后能够节省部分内存空间。<br><br>设置为true，则本接口内部计算时复用src的内存空间，节省内存空间；设置为false，则本接口内部计算时不复用src的内存空间。<br><br>isReuseSource的使用样例请参考[更多样例](../../数学计算/更多样例-83.md#section639165323915)。 |
+| pattern | 用于指定ReduceProd计算轴，包括Reduce轴和Normal轴。pattern由与向量维度数量相同的A、R字母组合形成，字母A表示Normal轴，R表示Reduce轴。例如，AR表示对二维向量进行ReduceProd计算：第一维是Normal轴，第二维是Reduce轴，即对第二维数据求积。pattern是定义在AscendC::Pattern::Reduce命名空间下的结构体，其成员变量用户无需关注。pattern当前只支持取值为AR和RA，当前用户需要显式指定pattern为AscendC::Pattern::Reduce::AR或者AscendC::Pattern::Reduce::RA。 |
+| isReuseSource | 是否允许修改源操作数，默认值为false。如果开发者允许源操作数被改写，可以设置该参数取值为true开启，开启后能够节省部分内存空间。设置为true，则本接口内部计算时复用src的内存空间，节省内存空间；设置为false，则本接口内部计算时不复用src的内存空间。isReuseSource的使用样例请参考[更多样例](../../数学计算/更多样例-83.md#section639165323915)。 |
 
 **表 2**  接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dstTensor | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| srcTensor | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>源操作数的数据类型需要与目的操作数保持一致。 |
-| sharedTmpBuffer | 输入 | 临时缓存。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>用于ReduceProd内部复杂计算时存储中间变量，由开发者提供。<br><br>临时空间大小BufferSize的获取方式请参考[GetReduceProdMaxMinTmpSize](GetReduceProdMaxMinTmpSize.md)。 |
+| dstTensor | 输出 | 目的操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| srcTensor | 输入 | 源操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。 |
+| sharedTmpBuffer | 输入 | 临时缓存。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于ReduceProd内部复杂计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetReduceProdMaxMinTmpSize](GetReduceProdMaxMinTmpSize.md)。 |
 | srcShape | 输入 | uint32_t类型的数组，表示源操作数的shape信息。该shape的维度必须和模板参数pattern的维度一致，当前只支持二维shape。例如，pattern为AR，该shape维度只能是二维。 |
 | srcInnerPad | 输入 | 表示实际需要计算的最内层轴数据是否32Bytes对齐。当前只支持true。 |
 

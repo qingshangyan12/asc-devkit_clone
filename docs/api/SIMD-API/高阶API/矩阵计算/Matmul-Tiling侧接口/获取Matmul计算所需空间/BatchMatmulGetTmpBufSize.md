@@ -17,7 +17,7 @@ int32_t BatchMatmulGetTmpBufSize(optiling::TCubeTiling &tiling, matmul_tiling::S
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | tiling | 输入 | BatchMatmul Tiling的结构体，即BatchMatmulTiling对象得到的TCubeTiling结构体。 |
-| bufSize | 输出 | 根据TCubeTiling结构体信息获取L1 Buffer/Unified Buffer/L0C Buffer的使用大小。<br><br>SysTilingTempBufSize结构定义如下方代码所示。 |
+| bufSize | 输出 | 根据TCubeTiling结构体信息获取L1 Buffer/Unified Buffer/L0C Buffer的使用大小。SysTilingTempBufSize结构定义如下方代码所示。 |
 
 ```
 struct SysTilingTempBufSize {

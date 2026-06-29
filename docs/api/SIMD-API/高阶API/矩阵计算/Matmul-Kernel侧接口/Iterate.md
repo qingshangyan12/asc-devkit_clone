@@ -9,12 +9,6 @@
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
-<!-- npu="x90" id1 -->
-- Kirin X90：支持
-<!-- end id1 -->
-<!-- npu="9030" id2 -->
-- Kirin 9030：支持
-<!-- end id2 -->
 
 ## 功能说明
 
@@ -55,7 +49,7 @@
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| enPartialSum | 输入 | 是否将矩阵乘的结果累加于现有的CO1数据，默认值为false。在L0C累加时，只支持C矩阵规格为singleCoreM==baseM && singleCoreN==baseN。<br><br>针对Atlas 200I/500 A2 推理产品，该参数仅支持配置为false。 |
+| enPartialSum | 输入 | 是否将矩阵乘的结果累加于现有的CO1数据，默认值为false。在L0C累加时，只支持C矩阵规格为singleCoreM==baseM && singleCoreN==baseN。针对Atlas 200I/500 A2 推理产品，该参数仅支持配置为false。 |
 
 **表 3**  用户自主管理CO1的函数参数说明
 

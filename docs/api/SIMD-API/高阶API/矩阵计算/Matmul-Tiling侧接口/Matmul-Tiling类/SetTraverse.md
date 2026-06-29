@@ -16,7 +16,7 @@ int32_t SetTraverse(MatrixTraverse traverse)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| traverse | 输入 | 设置固定的Matmul计算方向。可选值：MatrixTraverse::FIRSTM/MatrixTraverse::FIRSTN。<br><br>FIRSTM代表先往M轴方向偏移再往N轴方向偏移。<br><br>FIRSTN代表先往N轴方向偏移再往M轴方向偏移。 |
+| traverse | 输入 | 设置固定的Matmul计算方向。可选值：MatrixTraverse::FIRSTM/MatrixTraverse::FIRSTN。FIRSTM代表先往M轴方向偏移再往N轴方向偏移。FIRSTN代表先往N轴方向偏移再往M轴方向偏移。 |
 
 ## 返回值说明
 

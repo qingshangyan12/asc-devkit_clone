@@ -9,12 +9,6 @@
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
-<!-- npu="x90" id1 -->
-- Kirin X90：支持
-<!-- end id1 -->
-<!-- npu="9030" id2 -->
-- Kirin 9030：支持
-<!-- end id2 -->
 
 ## 功能说明
 
@@ -72,7 +66,7 @@
 | --- | --- |
 | T | 操作数的数据类型。支持的数据类型为：half、float。 |
 | isReuseSource | 是否允许修改源操作数。该参数预留，传入默认值false即可。 |
-| config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br><br>Tanh算法的相关配置。此参数可选配，TanhConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：Tanh内部实现使用的算法。TanhAlgo类型，支持的取值如下：INTRINSIC：默认值。该算法直接计算公式y = (e^(2x)-1)/(e^(2x)+1)，性能更好。SUBSECTION_COMPENSATION：该算法通过误差补偿实现Tanh，精度更高。 |
+| config | 该参数仅支持Ascend 950PR/Ascend 950DT。Tanh算法的相关配置。此参数可选配，TanhConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：Tanh内部实现使用的算法。TanhAlgo类型，支持的取值如下：INTRINSIC：默认值。该算法直接计算公式y = (e^(2x)-1)/(e^(2x)+1)，性能更好。SUBSECTION_COMPENSATION：该算法通过误差补偿实现Tanh，精度更高。 |
 
 ```
 enum class TanhAlgo {
@@ -88,9 +82,9 @@ struct TanhConfig {
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dstTensor | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| srcTensor | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>源操作数的数据类型需要与目的操作数保持一致。 |
-| sharedTmpBuffer | 输入 | 临时缓存。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>用于Tanh内部复杂计算时存储中间变量，由开发者提供。<br><br>临时空间大小BufferSize的获取方式请参考[GetTanhMaxMinTmpSize](GetTanhMaxMinTmpSize.md)。 |
+| dstTensor | 输出 | 目的操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| srcTensor | 输入 | 源操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。 |
+| sharedTmpBuffer | 输入 | 临时缓存。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于Tanh内部复杂计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetTanhMaxMinTmpSize](GetTanhMaxMinTmpSize.md)。 |
 | calCount | 输入 | 参与计算的元素个数。 |
 
 ## 返回值说明

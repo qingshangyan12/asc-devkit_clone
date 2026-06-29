@@ -9,12 +9,6 @@
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
-<!-- npu="x90" id1 -->
-- Kirin X90：支持
-<!-- end id1 -->
-<!-- npu="9030" id2 -->
-- Kirin 9030：支持
-<!-- end id2 -->
 
 ## 功能说明
 
@@ -71,7 +65,7 @@
 | --- | --- |
 | T | 操作数的数据类型。支持的数据类型为：half、float。 |
 | isReuseSource | 是否允许修改源操作数。该参数预留，传入默认值false即可。 |
-| config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br><br>Atan算法的相关配置。此参数可选配，AtanConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：Atan内部实现使用的算法。AtanAlgo类型，支持的取值如下：TAYLOR_EXPANSION：默认值。该算法使用6阶泰勒展开实现Atan，支持的数据类型为half、float。POLYNOMIAL_APPROXIMATION：该算法是17次多项式逼近算法，支持的数据类型为float。 |
+| config | 该参数仅支持Ascend 950PR/Ascend 950DT。Atan算法的相关配置。此参数可选配，AtanConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：Atan内部实现使用的算法。AtanAlgo类型，支持的取值如下：TAYLOR_EXPANSION：默认值。该算法使用6阶泰勒展开实现Atan，支持的数据类型为half、float。POLYNOMIAL_APPROXIMATION：该算法是17次多项式逼近算法，支持的数据类型为float。 |
 
 ```
 enum class AtanAlgo {
@@ -88,9 +82,9 @@ struct AtanConfig {
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dstTensor | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| srcTensor | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>源操作数的数据类型需要与目的操作数保持一致。 |
-| sharedTmpBuffer | 输入 | 临时缓存。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>临时空间大小BufferSize的获取方式请参考[GetAtanMaxMinTmpSize](GetAtanMaxMinTmpSize.md)。 |
+| dstTensor | 输出 | 目的操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| srcTensor | 输入 | 源操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。 |
+| sharedTmpBuffer | 输入 | 临时缓存。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。临时空间大小BufferSize的获取方式请参考[GetAtanMaxMinTmpSize](GetAtanMaxMinTmpSize.md)。 |
 | calCount | 输入 | 参与计算的元素个数。 |
 
 ## 返回值说明

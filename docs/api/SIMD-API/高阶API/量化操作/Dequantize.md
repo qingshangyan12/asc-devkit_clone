@@ -72,8 +72,8 @@ Dequantize与[AscendDequant](AscendDequant.md)的功能类似，本接口在不�
 | config | 用于配置反量化相关信息，DequantizeConfig类型，定义如下方代码所示，其中参数的含义如下。<br>policy：用于配置量化策略，枚举类型，具体定义如下方代码所示。<br>hasOffset：预留参数，目前仅支持配置为false。<br>kDim：group的计算方向，即k方向。仅在PER_GROUP场景有效，支持的取值如下。0：k轴是第0轴，即m方向为group的计算方向。1：k轴是第1轴，即n方向为group的计算方向。 |
 | DstT | 目的操作数的数据类型。接口内根据入参dstTensor自动推导数据类型，开发者无需配置该参数，保证dstTensor满足表3中输入输出支持的数据类型组合即可。 |
 | SrcT | 源操作数的数据类型。接口内根据入参srcTensor自动推导数据类型，开发者无需配置该参数，保证srcTensor满足表3中输入输出支持的数据类型组合即可。 |
-| ScaleT | scale的数据类型。接口内根据入参scale自动推导数据类型，开发者无需配置该参数。ScaleT可以为标量数据类型或LocalTensor类型。<br><br>注意：<br>对于PER_TENSOR场景，scale为标量，ScaleT只能为标量数据类型。<br>对于PER_CHANNEL、PER_TOKEN、PER_GROUP场景，scale为矢量，ScaleT只能为LocalTensor类型。 |
-| OffsetT | offset的数据类型。接口内根据入参offset自动推导数据类型，开发者无需配置该参数。OffsetT可以为标量数据类型或LocalTensor类型。<br><br>注意：<br>对于PER_TENSOR量化策略，offset为标量，OffsetT只能为标量数据类型。<br>对于PER_CHANNEL、PER_TOKEN、PER_GROUP量化策略，offset为矢量，OffsetT只能为LocalTensor类型。 |
+| ScaleT | scale的数据类型。接口内根据入参scale自动推导数据类型，开发者无需配置该参数。ScaleT可以为标量数据类型或LocalTensor类型。注意：<br>对于PER_TENSOR场景，scale为标量，ScaleT只能为标量数据类型。<br>对于PER_CHANNEL、PER_TOKEN、PER_GROUP场景，scale为矢量，ScaleT只能为LocalTensor类型。 |
+| OffsetT | offset的数据类型。接口内根据入参offset自动推导数据类型，开发者无需配置该参数。OffsetT可以为标量数据类型或LocalTensor类型。注意：<br>对于PER_TENSOR量化策略，offset为标量，OffsetT只能为标量数据类型。<br>对于PER_CHANNEL、PER_TOKEN、PER_GROUP量化策略，offset为矢量，OffsetT只能为LocalTensor类型。 |
 
 ```
 struct DequantizeConfig {
@@ -94,10 +94,10 @@ enum class DequantizePolicy : int32_t {
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | dstTensor | 输出 | 目的操作数。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| srcTensor | 输入 | 源操作数。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>假设srcTensor的shape为[m, n]，每行数据（即n个输入数据）所占字节数要求32字节对齐。 |
+| srcTensor | 输入 | 源操作数。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。假设srcTensor的shape为[m, n]，每行数据（即n个输入数据）所占字节数要求32字节对齐。 |
 | scale | 输入 | 输入数据反量化时的缩放因子。 |
 | offset | 输入 | 输入数据反量化时的偏移量。当前为预留参数，可配置为0或空Tensor。 |
-| sharedTmpBuffer | 输入 | 临时缓存。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>临时空间大小BufferSize的获取方式请参考[GetDequantizeMaxMinTmpSize](GetDequantizeMaxMinTmpSize.md)。 |
+| sharedTmpBuffer | 输入 | 临时缓存。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。临时空间大小BufferSize的获取方式请参考[GetDequantizeMaxMinTmpSize](GetDequantizeMaxMinTmpSize.md)。 |
 | params | 输入 | 反量化接口的参数，DequantizeParams类型，定义如下方代码所示，其中参数的含义如下。<br>m：m方向元素个数。<br>n：n方向元素个数。n值对应的数据大小需满足32字节对齐的要求，即shape最后一维为n的输入或输出均需要满足该维度上32字节对齐的要求。<br>groupSize：PER_GROUP场景有效，表示groupSize行/列数据共用一个scale。groupSize的取值必须大于0且是32的整倍数。 |
 
 ```
@@ -116,7 +116,7 @@ struct DequantizeParams {
 | PER_TENSOR | bfloat16_t | int32_t | float |
 | PER_TENSOR | float | int32_t | bfloat16_t |
 | PER_TENSOR | float | int32_t | float |
-| PER_CHANNEL | half | int32_t | uint64_t<br><br>注意：当scale的数据类型是uint64_t时，其中的低32位数据是参与计算的float类型数据，高32位本接口不使用。 |
+| PER_CHANNEL | half | int32_t | uint64_t注意：当scale的数据类型是uint64_t时，其中的低32位数据是参与计算的float类型数据，高32位本接口不使用。 |
 | PER_CHANNEL | float | int32_t | float |
 | PER_CHANNEL | float | int32_t | bfloat16_t |
 | PER_CHANNEL | bfloat16_t | int32_t | bfloat16_t |

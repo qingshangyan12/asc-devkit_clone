@@ -72,7 +72,7 @@ Fmod\(-3.0, 1.1\) = -0.8
 | --- | --- |
 | T | 操作数的数据类型。支持的数据类型为：half、float。 |
 | isReuseSource | 是否允许修改源操作数。该参数预留，传入默认值false即可。 |
-| config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br><br>Fmod计算的相关配置。此参数可选配，FmodConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：指定Fmod的算法。该参数支持的取值如下：NORMAL：algo的默认值，使用模拟的普通模式，支持的数据类型为：half、float。ITERATION_COMPENSATION：迭代补偿的高精度模式，支持的数据类型为：float。<br><br>iterationNum：迭代补偿的高精度模式下的迭代补偿轮次，该参数仅在algo为ITERATION_COMPENSATION模式下生效，轮次范围1至11，默认值为11次。迭代轮次越多，结果精度越高，但性能会相应降低。使用时，可根据两个浮点数的指数位差异来选择迭代轮次，float类型共有8位指数位，src0Tensor和src1Tensor之间的指数位差异不应超过24*iterationNum。 |
+| config | 该参数仅支持Ascend 950PR/Ascend 950DT。Fmod计算的相关配置。此参数可选配，FmodConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：指定Fmod的算法。该参数支持的取值如下：NORMAL：algo的默认值，使用模拟的普通模式，支持的数据类型为：half、float。ITERATION_COMPENSATION：迭代补偿的高精度模式，支持的数据类型为：float。iterationNum：迭代补偿的高精度模式下的迭代补偿轮次，该参数仅在algo为ITERATION_COMPENSATION模式下生效，轮次范围1至11，默认值为11次。迭代轮次越多，结果精度越高，但性能会相应降低。使用时，可根据两个浮点数的指数位差异来选择迭代轮次，float类型共有8位指数位，src0Tensor和src1Tensor之间的指数位差异不应超过24*iterationNum。 |
 
 ```
 constexpr uint32_t FMOD_ITERATION_NUM_MAX = 11;
@@ -90,9 +90,9 @@ struct FmodConfig {
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dstTensor | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| src0Tensor、src1Tensor | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>源操作数的数据类型需要与目的操作数保持一致。 |
-| sharedTmpBuffer | 输入 | 临时空间。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>用于Fmod内部复杂计算时存储中间变量，由开发者提供。<br><br>临时空间大小BufferSize的获取方式请参考[GetFmodMaxMinTmpSize](GetFmodMaxMinTmpSize.md)。 |
+| dstTensor | 输出 | 目的操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| src0Tensor、src1Tensor | 输入 | 源操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。 |
+| sharedTmpBuffer | 输入 | 临时空间。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于Fmod内部复杂计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetFmodMaxMinTmpSize](GetFmodMaxMinTmpSize.md)。 |
 | calCount | 输入 | 参与计算的元素个数。 |
 
 ## 返回值说明

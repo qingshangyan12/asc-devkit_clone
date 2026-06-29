@@ -9,9 +9,6 @@
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
-<!-- npu="x90" id1 -->
-- Kirin X90：支持
-<!-- end id1 -->
 
 ## 功能说明
 
@@ -33,11 +30,11 @@ __aicore__ inline void SetOrgShape(int orgM, int orgN, int orgKa, int orgKb, int
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| orgM | 输入 | 设置原始完整的形状M大小，单位为元素。<br><br>对于Ascend 950PR/Ascend 950DT，在使用[MDL模板](MatmulConfig.md)创建的Matmul对象调用本接口时，该参数用于设置GM或L1上完整的形状M大小，单位为元素。 |
-| orgN | 输入 | 设置原始完整的形状N大小，单位为元素。<br><br>对于Ascend 950PR/Ascend 950DT，在使用[MDL模板](MatmulConfig.md)创建的Matmul对象调用本接口时，该参数用于设置GM或L1上完整的形状N大小，单位为元素。 |
-| orgK | 输入 | 设置原始完整的形状K大小，单位为元素。原始完整形状Ka=Kb时可设置。<br><br>对于Ascend 950PR/Ascend 950DT，在使用[MDL模板](MatmulConfig.md)创建的Matmul对象调用本接口时，该参数用于设置GM或L1上完整的形状K大小，单位为元素。原始完整形状Ka=Kb时可设置。 |
-| orgKa | 输入 | 设置矩阵A原始完整的形状Ka大小，单位为元素。<br><br>对于Ascend 950PR/Ascend 950DT，在使用[MDL模板](MatmulConfig.md)创建的Matmul对象调用本接口时，该参数用于设置GM或L1上完整的形状Ka大小，单位为元素。 |
-| orgKb | 输入 | 设置矩阵B原始完整的形状Kb大小，单位为元素。<br><br>对于Ascend 950PR/Ascend 950DT，在使用[MDL模板](MatmulConfig.md)创建的Matmul对象调用本接口时，该参数用于设置GM或L1上完整的形状Kb大小，单位为元素。 |
+| orgM | 输入 | 设置原始完整的形状M大小，单位为元素。对于Ascend 950PR/Ascend 950DT，在使用[MDL模板](MatmulConfig.md)创建的Matmul对象调用本接口时，该参数用于设置GM或L1上完整的形状M大小，单位为元素。 |
+| orgN | 输入 | 设置原始完整的形状N大小，单位为元素。对于Ascend 950PR/Ascend 950DT，在使用[MDL模板](MatmulConfig.md)创建的Matmul对象调用本接口时，该参数用于设置GM或L1上完整的形状N大小，单位为元素。 |
+| orgK | 输入 | 设置原始完整的形状K大小，单位为元素。原始完整形状Ka=Kb时可设置。对于Ascend 950PR/Ascend 950DT，在使用[MDL模板](MatmulConfig.md)创建的Matmul对象调用本接口时，该参数用于设置GM或L1上完整的形状K大小，单位为元素。原始完整形状Ka=Kb时可设置。 |
+| orgKa | 输入 | 设置矩阵A原始完整的形状Ka大小，单位为元素。对于Ascend 950PR/Ascend 950DT，在使用[MDL模板](MatmulConfig.md)创建的Matmul对象调用本接口时，该参数用于设置GM或L1上完整的形状Ka大小，单位为元素。 |
+| orgKb | 输入 | 设置矩阵B原始完整的形状Kb大小，单位为元素。对于Ascend 950PR/Ascend 950DT，在使用[MDL模板](MatmulConfig.md)创建的Matmul对象调用本接口时，该参数用于设置GM或L1上完整的形状Kb大小，单位为元素。 |
 | orgKc | 输入 | 设置输出C矩阵的N，单位为元素。需要输入B矩阵的N和输出C矩阵的N不一样时可设置，默认为0（即使用B矩阵的N，不进行修改）。 |
 
 > [!CAUTION]注意

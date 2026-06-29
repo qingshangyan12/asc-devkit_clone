@@ -37,10 +37,10 @@ __aicore__ inline HcclHandle AlltoAll(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t
 | --- | --- | --- |
 | sendBuf | 输入 | 源数据buffer地址。 |
 | recvBuf | 输出 | 目的数据buffer地址，集合通信结果输出到此buffer中。 |
-| dataCount | 输入 | 本卡向通信域内其它每张卡收发的数据量，单位为sizeof(dataType)。<br><br>例如，通信域内共4张卡，每张卡的sendBuf中均有4个fp16的数据，那么dataCount=1。 |
+| dataCount | 输入 | 本卡向通信域内其它每张卡收发的数据量，单位为sizeof(dataType)。例如，通信域内共4张卡，每张卡的sendBuf中均有4个fp16的数据，那么dataCount=1。 |
 | dataType | 输入 | AlltoAll操作的数据类型，目前支持HcclDataType包含的全部数据类型，HcclDataType详细可参考[表1](HCCL使用说明.md#table116710585514)。 |
-| strideCount | 输入 | 多轮切分场景下，一次AlltoAll任务中，每张卡内参与通信的数据块间的间隔。默认值为0，表示数据块内存连续。<br>strideCount=0，每张卡内参与通信的数据块内存连续。卡rank_j收到来自卡rank_i的sendBuf中第j块数据，且数据块间的偏移数据量为j\*dataCount，并将该数据存放于本卡recvBuf中第i块的位置，且偏移数据量为i\*dataCount。<br>strideCount>0，每张卡内参与通信的相邻数据块的起始地址偏移数据量为strideCount。卡rank_j收到来自卡rank_i的sendBuf中第j块数据，且数据块间的偏移数据量为j\*strideCount，并将该数据存放于本卡recvBuf中第i块的位置，且偏移数据量为i\*strideCount。<br><br>注意：上述的偏移数据量为数据个数，单位为sizeof(dataType)。 |
-| repeat | 输入 | 一次下发的AlltoAll通信任务个数。repeat取值≥1，默认值为1。当repeat>1时，每轮AlltoAll任务的sendBuf和recvBuf地址由服务端更新，每一轮任务i的更新公式如下：<br><br>sendBuf[i] = sendBuf + dataCount * sizeof(datatype) * i, i∈[0, repeat)<br><br>recvBuf[i] = recvBuf + dataCount * sizeof(datatype) * i, i∈[0, repeat)<br><br>注意：当设置repeat>1时，须与strideCount参数配合使用，规划通信数据地址。 |
+| strideCount | 输入 | 多轮切分场景下，一次AlltoAll任务中，每张卡内参与通信的数据块间的间隔。默认值为0，表示数据块内存连续。<br>strideCount=0，每张卡内参与通信的数据块内存连续。卡rank_j收到来自卡rank_i的sendBuf中第j块数据，且数据块间的偏移数据量为j\*dataCount，并将该数据存放于本卡recvBuf中第i块的位置，且偏移数据量为i\*dataCount。<br>strideCount>0，每张卡内参与通信的相邻数据块的起始地址偏移数据量为strideCount。卡rank_j收到来自卡rank_i的sendBuf中第j块数据，且数据块间的偏移数据量为j\*strideCount，并将该数据存放于本卡recvBuf中第i块的位置，且偏移数据量为i\*strideCount。注意：上述的偏移数据量为数据个数，单位为sizeof(dataType)。 |
+| repeat | 输入 | 一次下发的AlltoAll通信任务个数。repeat取值≥1，默认值为1。当repeat>1时，每轮AlltoAll任务的sendBuf和recvBuf地址由服务端更新，每一轮任务i的更新公式如下：sendBuf[i] = sendBuf + dataCount * sizeof(datatype) * i, i∈[0, repeat)recvBuf[i] = recvBuf + dataCount * sizeof(datatype) * i, i∈[0, repeat)注意：当设置repeat>1时，须与strideCount参数配合使用，规划通信数据地址。 |
 
 ## 返回值说明
 

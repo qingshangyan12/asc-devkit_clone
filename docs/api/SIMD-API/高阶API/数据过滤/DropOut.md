@@ -9,12 +9,6 @@
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
-<!-- npu="x90" id1 -->
-- Kirin X90：支持
-<!-- end id1 -->
-<!-- npu="9030" id2 -->
-- Kirin 9030：支持
-<!-- end id2 -->
 
 ## 功能说明
 
@@ -99,17 +93,17 @@ __aicore__ inline void DropOut(const LocalTensor<T>& dstLocal, const LocalTensor
 | --- | --- |
 | T | 操作数的数据类型。不同型号支持的数据类型请参考[支持的数据类型](#li15391852101816)。 |
 | isInitBitMode | 在比特模式下，是否需要在接口内部初始化（默认false）。 |
-| dropOutMode | 选择执行何种输入场景：<br><br>0：默认值，由接口根据输入shape推断运行模式，注意，推断不符合预期的场景，需设置对应模式<br><br>1：执行字节模式，且maskLocal含有脏数据<br><br>2：执行字节模式，且maskLocal不含有脏数据<br><br>3：执行比特模式，且maskLocal不含有脏数据<br><br>4：执行比特模式，且maskLocal含有脏数据 |
+| dropOutMode | 选择执行何种输入场景：0：默认值，由接口根据输入shape推断运行模式，注意，推断不符合预期的场景，需设置对应模式1：执行字节模式，且maskLocal含有脏数据2：执行字节模式，且maskLocal不含有脏数据3：执行比特模式，且maskLocal不含有脏数据4：执行比特模式，且maskLocal含有脏数据 |
 
 **表 2**  接口参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 | --- | --- | --- |
-| dstLocal | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| srcLocal | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>srcLocal的数据类型需要与目的操作数保持一致。 |
-| maskLocal | 输入 | 存放mask的Tensor，数据类型为uint8_t。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| sharedTmpBuffer | 输入 | 共享缓冲区，用于存放API内部计算产生的临时数据。该方式开发者可以自行管理sharedTmpBuffer内存空间，并在接口调用完成后，复用该部分内存。Tensor的大小应符合对应tiling的要求，配合tiling一起使用。共享缓冲区大小BufferSize的获取方式请参考[GetDropOutMaxMinTmpSize](GetDropOutMaxMinTmpSize.md)。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| keepProb | 输入 | 权重系数，数据类型为float，srcLocal中数据被保留的概率，过滤后的结果会除以权重系数，存放至dstLocal中。<br><br>keepProb∈(0，1) |
+| dstLocal | 输出 | 目的操作数。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| srcLocal | 输入 | 源操作数。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。srcLocal的数据类型需要与目的操作数保持一致。 |
+| maskLocal | 输入 | 存放mask的Tensor，数据类型为uint8_t。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| sharedTmpBuffer | 输入 | 共享缓冲区，用于存放API内部计算产生的临时数据。该方式开发者可以自行管理sharedTmpBuffer内存空间，并在接口调用完成后，复用该部分内存。Tensor的大小应符合对应tiling的要求，配合tiling一起使用。共享缓冲区大小BufferSize的获取方式请参考[GetDropOutMaxMinTmpSize](GetDropOutMaxMinTmpSize.md)。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| keepProb | 输入 | 权重系数，数据类型为float，srcLocal中数据被保留的概率，过滤后的结果会除以权重系数，存放至dstLocal中。keepProb∈(0，1) |
 | info | 输入 | DropOutShapeInfo类型，DropOutShapeInfo结构定义如下方代码所示，其中参数的含义为：<br>firstAxis：srcLocal/maskTensor的height轴元素个数。<br>srcLastAxis：srcLocal的width轴元素个数。<br>maskLastAxis：maskTensor的width轴元素个数（如有数据补齐场景，则为带有脏数据的长度，注意，所有模式的元素个数均为对应Tensor类型下的个数，取值需要大于0，如uint8类型Tensor对应Uint8类型元素个数）。|
 
 ```
@@ -141,14 +135,6 @@ struct DropOutShapeInfo {
     Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half、float。
 
     Atlas 推理系列产品AI Core，支持的数据类型为：half、float。
-
-    <!-- npu="x90" id3 -->
-    Kirin X90，支持的数据类型为：half、float。
-    <!-- end id3 -->
-
-    <!-- npu="9030" id4 -->
-    Kirin 9030，支持的数据类型为：half、float。
-    <!-- end id4 -->
 
 ## 调用示例
 

@@ -29,7 +29,7 @@ __aicore__ inline void LogicalOr(const LocalTensor<T>& dst, const LocalTensor<U>
 
 | 参数名 | 描述 |
 | --- | --- |
-| config | LogicalOr算法的相关配置。此参数可选配，LogicalOrConfig类型，具体定义如下方代码所示，其中参数的含义为：<br><br>isReuseSource：该参数预留，传入默认值false即可。 |
+| config | LogicalOr算法的相关配置。此参数可选配，LogicalOrConfig类型，具体定义如下方代码所示，其中参数的含义为：isReuseSource：该参数预留，传入默认值false即可。 |
 | T | 目的操作数的数据类型。支持的数据类型为：bool。 |
 | U | 源操作数的数据类型。支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。 |
 
@@ -43,8 +43,8 @@ struct LogicalOrConfig {
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| src0、src1 | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>源操作数的数据类型与目的操作数保持一致。 |
+| dst | 输出 | 目的操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| src0、src1 | 输入 | 源操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型与目的操作数保持一致。 |
 | count | 输入 | 参与计算的元素个数。 |
 
 ## 返回值说明

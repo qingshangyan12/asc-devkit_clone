@@ -29,7 +29,7 @@ __aicore__ inline void LogicalXor(const LocalTensor<T>& dst, const LocalTensor<U
 
 | 参数名 | 描述 |
 | --- | --- |
-| config | LogicalXor算法的相关配置。此参数可选配，LogicalXorConfig类型，具体定义如下方代码所示，其中参数的含义是：<br><br>isReuseSource：该参数预留，传入默认值false即可。 |
+| config | LogicalXor算法的相关配置。此参数可选配，LogicalXorConfig类型，具体定义如下方代码所示，其中参数的含义是：isReuseSource：该参数预留，传入默认值false即可。 |
 | T | 目的操作数的数据类型。支持的数据类型为：bool。 |
 | U | 源操作数的数据类型。支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。 |
 
@@ -43,8 +43,8 @@ struct LogicalXorConfig {
 
 | 参数名称 | 类型 | 说明 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| src0、src1 | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| dst | 输出 | 目的操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| src0、src1 | 输入 | 源操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | count | 输入 | 参与计算的元素个数。 |
 
 ## 返回值说明

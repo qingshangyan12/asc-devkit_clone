@@ -43,10 +43,10 @@ TConv3DApiTiling结构体包含Conv3D算子规格信息及Tiling切分算法的�
 | kBL1 | uint32_t | L1上Weight K的实际大小，等于Cin1InL1 * KH *  KW * C0，Cin1InL1是KD * Cin1合轴之后Tiling切分的大小。 |
 | nBL1 | uint32_t | L1上Weight载入Cout维度的实际数据大小。 |
 | mAL1 | uint32_t | L1上Input载入M的实际数据大小。 |
-| al1FullLoad | uint8_t | Input数据在L1 Buffer是否全载。<br><br>0：Input数据在L1 Buffer上不全载。<br><br>1：Input数据在L1 Buffer上全载。 |
-| bl1FullLoad | uint8_t | Weight数据在L1 Buffer是否全载。<br><br>0：Weight数据在L1 Buffer上不全载。<br><br>1：Weight数据在L1 Buffer上全载。 |
-| iterateMNOrder | uint8_t | 输出结果矩阵Output时，M轴和N轴的输出顺序。<br><br>0：优先输出M方向。先输出M方向，再输出N方向，请见图2。<br><br>1：优先输出N方向。先输出N方向，再输出M方向，请见图3。<br><br>M由Hout和Wout组成，M方向的输出顺序为，先输出Wout方向，再输出Hout方向。 |
-| biasFullLoadFlag | uint8_t | Bias是否全载进L1 Buffer。<br><br>0：否，单核内单次载入Bias大小等于单次矩阵乘N方向的大小nL0。<br><br>1：是，单核内的Bias一次全载。 |
+| al1FullLoad | uint8_t | Input数据在L1 Buffer是否全载。0：Input数据在L1 Buffer上不全载。1：Input数据在L1 Buffer上全载。 |
+| bl1FullLoad | uint8_t | Weight数据在L1 Buffer是否全载。0：Weight数据在L1 Buffer上不全载。1：Weight数据在L1 Buffer上全载。 |
+| iterateMNOrder | uint8_t | 输出结果矩阵Output时，M轴和N轴的输出顺序。0：优先输出M方向。先输出M方向，再输出N方向，请见图2。1：优先输出N方向。先输出N方向，再输出M方向，请见图3。M由Hout和Wout组成，M方向的输出顺序为，先输出Wout方向，再输出Hout方向。 |
+| biasFullLoadFlag | uint8_t | Bias是否全载进L1 Buffer。0：否，单核内单次载入Bias大小等于单次矩阵乘N方向的大小nL0。1：是，单核内的Bias一次全载。 |
 
 注：上述的M轴为卷积正向操作过程中的输入Input在img2col展开后的纵轴，数值上等于Hout \* Wout；K为输入Input在img2col展开后的横轴，数值上等于KD\*C1\*KH\*KW\*C0；KD/KH/KW为Weight的Depth、Height、Width，即kernelD/kernelH/kernelW的简写；N为Weight的Cout，具体请见图1。
 

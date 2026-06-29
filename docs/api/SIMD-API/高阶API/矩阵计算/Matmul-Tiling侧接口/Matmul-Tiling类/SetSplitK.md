@@ -18,7 +18,7 @@ void SetSplitK(bool flag)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| flag | 输入 | 是否开启切K轴。<br><br>true：开启切K轴<br><br>false：不开启切K轴 |
+| flag | 输入 | 是否开启切K轴。true：开启切K轴false：不开启切K轴 |
 
 ## 返回值说明
 

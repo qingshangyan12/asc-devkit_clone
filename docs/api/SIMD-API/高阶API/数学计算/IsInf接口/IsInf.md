@@ -53,7 +53,7 @@
 
 | 参数名 | 描述 |
 | --- | --- |
-| IsInfConfig | IsInf算法的相关配置。此参数可选配，IsInfConfig类型，具体定义如下方代码所示，其中参数的含义为：<br><br>isReuseSource：是否允许修改源操作数。该参数预留，传入默认值false即可。 |
+| IsInfConfig | IsInf算法的相关配置。此参数可选配，IsInfConfig类型，具体定义如下方代码所示，其中参数的含义为：isReuseSource：是否允许修改源操作数。该参数预留，传入默认值false即可。 |
 | T | 目的操作数的数据类型。支持的数据类型为：bool、half、float。 |
 | U | 源操作数的数据类型。支持的数据类型为：half、float。 |
 
@@ -67,9 +67,9 @@ struct IsInfConfig {
 
 | 参数名称 | 输入/输出 | 含义 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>目的操作数的数据类型和源操作数相同或者为bool类型。当前支持的数据类型组合请见[表3](#table158181847102411)。 |
-| src | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| sharedTmpBuffer | 输入 | 临时缓存。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>用于IsInf内部复杂计算时存储中间变量，由开发者提供。<br><br>临时空间大小BufferSize的获取方式请参考[GetIsInfMaxMinTmpSize](GetIsInfMaxMinTmpSize.md)。 |
+| dst | 输出 | 目的操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。目的操作数的数据类型和源操作数相同或者为bool类型。当前支持的数据类型组合请见[表3](#table158181847102411)。 |
+| src | 输入 | 源操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| sharedTmpBuffer | 输入 | 临时缓存。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于IsInf内部复杂计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetIsInfMaxMinTmpSize](GetIsInfMaxMinTmpSize.md)。 |
 | count | 输入 | 参与计算的元素个数。 |
 
 **表 3**  输入输出支持的数据类型组合

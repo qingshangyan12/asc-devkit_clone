@@ -9,12 +9,6 @@
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
-<!-- npu="x90" id1 -->
-- Kirin X90：不支持
-<!-- end id1 -->
-<!-- npu="9030" id2 -->
-- Kirin 9030：不支持
-<!-- end id2 -->
 
 ## 功能说明
 
@@ -31,7 +25,7 @@ __aicore__ inline void SetHF32(bool enableHF32 = false, int32_t transMode = 0)
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | enableHF32 | 输入 | 配置是否开启HF32模式，默认值false(不开启)。 |
-| transMode | 输入 | 配置在开启HF32模式时，float转换为hf32时所采用的ROUND模式。默认值0。<br><br>0：就近舍入，距离相等时向偶数进位。<br><br>1：就近舍入，距离相等时向远离0方向进位。 |
+| transMode | 输入 | 配置在开启HF32模式时，float转换为hf32时所采用的ROUND模式。默认值0。0：就近舍入，距离相等时向偶数进位。1：就近舍入，距离相等时向远离0方向进位。 |
 
 ## 返回值说明
 

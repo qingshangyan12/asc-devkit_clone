@@ -9,12 +9,6 @@
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：支持
-<!-- npu="x90" id1 -->
-- Kirin X90：支持
-<!-- end id1 -->
-<!-- npu="9030" id2 -->
-- Kirin 9030：支持
-<!-- end id2 -->
 
 ## 功能说明
 
@@ -305,7 +299,7 @@ PER\_TOKEN/PER\_GROUP场景的计算逻辑如下：
 | --- | --- |
 | T | 操作数的数据类型。支持的数据类型为：half、float。 |
 | isReuseSource | 是否允许修改源操作数。该参数预留，传入默认值false即可。 |
-| config | 结构体模板参数，此参数可选配，AscendQuantConfig类型，定义如下方代码所示，其中参数的含义如下。<br>calcCount：实际计算数据元素个数。calcCount∈[0, srcTensor.GetSize()]，在调用带有scaleCount入参的接口时，calcCount若取非零值则必须是scaleCount的整数倍。<br>offsetCount：实际量化参数元素个数。offsetCount∈[0, offsetTensor.GetSize()]，offsetCount与scaleCount的取值必须相等，要求是32的整数倍。若调用的接口不含offsetCount入参，取值为0即可。<br>scaleCount：实际量化参数元素个数。scaleCount∈[0, scaleTensor.GetSize()]，要求是32的整数倍。若调用的接口不含scaleCount入参，取值为0即可。<br>workLocalSize：临时缓存sharedTmpBuffer的大小，sharedTmpBuffer的大小/workLocalSize的获取方式请参考[GetAscendQuantMaxMinTmpSize](GetAscendQuantMaxMinTmpSize.md)。该参数取值不能大于sharedTmpBuffer的大小。若调用的接口不含sharedTmpBuffer入参，取值为0即可。<br><br>当上述参数的取值满足如下任一种场景，将开启参数常量化，即编译过程中使用常量化的相关参数，从而减少Scalar计算。<br>若调用的接口不含scaleCount入参，calcCount和workLocalSize取值为非0时，开启参数常量化。<br>若调用的接口带有scaleCount入参，scaleCount、calcCount和workLocalSize取值为非0时，开启参数常量化。 |
+| config | 结构体模板参数，此参数可选配，AscendQuantConfig类型，定义如下方代码所示，其中参数的含义如下。<br>calcCount：实际计算数据元素个数。calcCount∈[0, srcTensor.GetSize()]，在调用带有scaleCount入参的接口时，calcCount若取非零值则必须是scaleCount的整数倍。<br>offsetCount：实际量化参数元素个数。offsetCount∈[0, offsetTensor.GetSize()]，offsetCount与scaleCount的取值必须相等，要求是32的整数倍。若调用的接口不含offsetCount入参，取值为0即可。<br>scaleCount：实际量化参数元素个数。scaleCount∈[0, scaleTensor.GetSize()]，要求是32的整数倍。若调用的接口不含scaleCount入参，取值为0即可。<br>workLocalSize：临时缓存sharedTmpBuffer的大小，sharedTmpBuffer的大小/workLocalSize的获取方式请参考[GetAscendQuantMaxMinTmpSize](GetAscendQuantMaxMinTmpSize.md)。该参数取值不能大于sharedTmpBuffer的大小。若调用的接口不含sharedTmpBuffer入参，取值为0即可。当上述参数的取值满足如下任一种场景，将开启参数常量化，即编译过程中使用常量化的相关参数，从而减少Scalar计算。<br>若调用的接口不含scaleCount入参，calcCount和workLocalSize取值为非0时，开启参数常量化。<br>若调用的接口带有scaleCount入参，scaleCount、calcCount和workLocalSize取值为非0时，开启参数常量化。 |
 
 ```
 struct AscendQuantConfig{
@@ -365,31 +359,31 @@ struct AscendQuantConfig {
 | float | float | int8_t | CAST_RINT（默认）<br>CAST_ROUND<br>CAST_FLOOR<br>CAST_CEIL<br>CAST_TRUNC |
 | half | float | int8_t | CAST_RINT（默认）<br>CAST_ROUND<br>CAST_FLOOR<br>CAST_CEIL<br>CAST_TRUNC |
 | bfloat16_t | float | int8_t | CAST_RINT（默认）<br>CAST_ROUND<br>CAST_FLOOR<br>CAST_CEIL<br>CAST_TRUNC |
-| half | half | fp4x2_e1m2_t/fp4x2_e2m1_t<br><br>（当前均只支持PER_GROUP场景） | CAST_RINT（默认）<br>CAST_ROUND<br>CAST_FLOOR<br>CAST_CEIL<br>CAST_TRUNC |
-| half | float | fp4x2_e1m2_t/fp4x2_e2m1_t<br><br>（当前均只支持PER_GROUP场景） | CAST_RINT（默认）<br>CAST_ROUND<br>CAST_FLOOR<br>CAST_CEIL<br>CAST_TRUNC |
-| bfloat16_t | bfloat16_t | fp4x2_e1m2_t/fp4x2_e2m1_t<br><br>（当前均只支持PER_GROUP场景） | CAST_RINT（默认）<br>CAST_ROUND<br>CAST_FLOOR<br>CAST_CEIL<br>CAST_TRUNC |
-| bfloat16_t | float | fp4x2_e1m2_t/fp4x2_e2m1_t<br><br>（当前均只支持PER_GROUP场景） | CAST_RINT（默认）<br>CAST_ROUND<br>CAST_FLOOR<br>CAST_CEIL<br>CAST_TRUNC |
+| half | half | fp4x2_e1m2_t/fp4x2_e2m1_t（当前均只支持PER_GROUP场景） | CAST_RINT（默认）<br>CAST_ROUND<br>CAST_FLOOR<br>CAST_CEIL<br>CAST_TRUNC |
+| half | float | fp4x2_e1m2_t/fp4x2_e2m1_t（当前均只支持PER_GROUP场景） | CAST_RINT（默认）<br>CAST_ROUND<br>CAST_FLOOR<br>CAST_CEIL<br>CAST_TRUNC |
+| bfloat16_t | bfloat16_t | fp4x2_e1m2_t/fp4x2_e2m1_t（当前均只支持PER_GROUP场景） | CAST_RINT（默认）<br>CAST_ROUND<br>CAST_FLOOR<br>CAST_CEIL<br>CAST_TRUNC |
+| bfloat16_t | float | fp4x2_e1m2_t/fp4x2_e2m1_t（当前均只支持PER_GROUP场景） | CAST_RINT（默认）<br>CAST_ROUND<br>CAST_FLOOR<br>CAST_CEIL<br>CAST_TRUNC |
 
 **表 5**  PER\_TENSOR接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dstTensor | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| srcTensor | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| sharedTmpBuffer | 输入 | 临时缓存。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>临时空间大小BufferSize的获取方式请参考[GetAscendQuantMaxMinTmpSize](GetAscendQuantMaxMinTmpSize.md)。 |
-| scale | 输入 | 量化参数。<br><br>类型为Scalar，支持的数据类型为float。 |
-| offset | 输入 | 量化参数。<br><br>类型为Scalar，支持的数据类型为float。 |
+| dstTensor | 输出 | 目的操作数。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| srcTensor | 输入 | 源操作数。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| sharedTmpBuffer | 输入 | 临时缓存。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。临时空间大小BufferSize的获取方式请参考[GetAscendQuantMaxMinTmpSize](GetAscendQuantMaxMinTmpSize.md)。 |
+| scale | 输入 | 量化参数。类型为Scalar，支持的数据类型为float。 |
+| offset | 输入 | 量化参数。类型为Scalar，支持的数据类型为float。 |
 | calCount | 输入 | 参与计算的元素个数。 |
 
 **表 6**  PER\_CHANNEL接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dstTensor | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| srcTensor | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| sharedTmpBuffer | 输入 | 临时缓存。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>临时空间大小BufferSize的获取方式请参考[GetAscendQuantMaxMinTmpSize](GetAscendQuantMaxMinTmpSize.md)。 |
-| scaleTensor | 输入 | 量化参数。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| offsetTensor | 输入 | 量化参数。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| dstTensor | 输出 | 目的操作数。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| srcTensor | 输入 | 源操作数。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| sharedTmpBuffer | 输入 | 临时缓存。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。临时空间大小BufferSize的获取方式请参考[GetAscendQuantMaxMinTmpSize](GetAscendQuantMaxMinTmpSize.md)。 |
+| scaleTensor | 输入 | 量化参数。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| offsetTensor | 输入 | 量化参数。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | scaleCount | 输入 | 实际量化参数元素个数，且scaleCount∈[0, min(scaleTensor.GetSize(),dstTensor.GetSize())]，要求是32的整数倍。 |
 | offsetCount | 输入 | 实际量化参数元素个数，且offsetCount∈[0, min(offsetTensor.GetSize(),dstTensor.GetSize())]，并且和scaleCount必须相等，要求是32的整数倍。 |
 | calCount | 输入 | 参与计算的元素个数。calCount必须是scaleCount的整数倍。 |
@@ -398,11 +392,11 @@ struct AscendQuantConfig {
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dstTensor | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| srcTensor | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| sharedTmpBuffer | 输入 | 临时缓存。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>临时空间大小BufferSize的获取方式请参考[GetAscendQuantMaxMinTmpSize](GetAscendQuantMaxMinTmpSize.md)。 |
-| scaleTensor | 输入 | 量化参数scale。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| offsetTensor/offset | 输入 | 量化参数offset。<br>offsetTensor：类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>offset：类型为Scalar。<br><br>数据类型和scaleTensor保持一致。对于float4场景，offsetTensor/offset不生效。 |
+| dstTensor | 输出 | 目的操作数。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| srcTensor | 输入 | 源操作数。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| sharedTmpBuffer | 输入 | 临时缓存。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。临时空间大小BufferSize的获取方式请参考[GetAscendQuantMaxMinTmpSize](GetAscendQuantMaxMinTmpSize.md)。 |
+| scaleTensor | 输入 | 量化参数scale。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| offsetTensor/offset | 输入 | 量化参数offset。<br>offsetTensor：类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>offset：类型为Scalar。数据类型和scaleTensor保持一致。对于float4场景，offsetTensor/offset不生效。 |
 | para | 输入 | 量化接口的参数，AscendQuantParam类型，定义如下方代码所示，其中参数的含义如下。<br>m：m方向元素个数。<br>n：n方向元素个数。n值对应的数据大小需满足32B对齐的要求，即shape最后一维为n的输入输出均需要满足该维度上32B对齐的要求。<br>calCount:参与计算的元素个数。calCount必须是n的整数倍。<br>groupSize：PER_GROUP场景有效，表示groupSize行/列数据共用一个scale/offset。groupSize的取值必须大于0且是32的整倍数。 |
 
 ```

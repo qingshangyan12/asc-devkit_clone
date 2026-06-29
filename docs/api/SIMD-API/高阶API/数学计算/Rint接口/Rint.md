@@ -53,7 +53,7 @@ Rint\(3.5\) = 4
 
 | 参数名 | 描述 |
 | --- | --- |
-| RintConfig | Rint算法的相关配置。此参数可选配，RintConfig类型，具体定义如下方代码所示，其中参数的含义为：<br><br>isReuseSource：是否允许修改源操作数。该参数预留，传入默认值false即可。 |
+| RintConfig | Rint算法的相关配置。此参数可选配，RintConfig类型，具体定义如下方代码所示，其中参数的含义为：isReuseSource：是否允许修改源操作数。该参数预留，传入默认值false即可。 |
 | T | 操作数的数据类型。支持的数据类型为：half、float。 |
 
 ```
@@ -66,9 +66,9 @@ struct RintConfig {
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| src | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>源操作数的数据类型与目的操作数保持一致。 |
-| sharedTmpBuffer | 输入 | 临时缓存。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>用于Rint内部复杂计算时存储中间变量，由开发者提供。<br><br>临时空间大小BufferSize的获取方式请参考[GetRintMaxMinTmpSize](GetRintMaxMinTmpSize.md)。 |
+| dst | 输出 | 目的操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| src | 输入 | 源操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型与目的操作数保持一致。 |
+| sharedTmpBuffer | 输入 | 临时缓存。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于Rint内部复杂计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetRintMaxMinTmpSize](GetRintMaxMinTmpSize.md)。 |
 | count | 输入 | 参与计算的元素个数。 |
 
 ## 返回值说明

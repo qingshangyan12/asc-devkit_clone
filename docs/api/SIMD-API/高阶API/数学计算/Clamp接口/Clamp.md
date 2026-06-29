@@ -31,10 +31,10 @@ __aicore__ inline void Clamp(const LocalTensor<T>& dst, const LocalTensor<T>& sr
 
 | 参数名 | 描述 |
 | --- | --- |
-| config | Clamp算法的相关配置。此参数可选配，ClampConfig类型，具体定义如下方代码所示，其中参数的含义为：<br><br>isReuseSource：该参数预留，传入默认值false即可。 |
+| config | Clamp算法的相关配置。此参数可选配，ClampConfig类型，具体定义如下方代码所示，其中参数的含义为：isReuseSource：该参数预留，传入默认值false即可。 |
 | T | 操作数的数据类型。支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。 |
-| U | LocalTensor类型或标量类型。根据输入参数min自动推导类型，开发者无需配置该参数，保证min满足数据类型的约束即可。<br><br>支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。 |
-| S | LocalTensor类型或标量类型。根据输入参数max自动推导类型，开发者无需配置该参数，保证max满足数据类型的约束即可。<br><br>支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。 |
+| U | LocalTensor类型或标量类型。根据输入参数min自动推导类型，开发者无需配置该参数，保证min满足数据类型的约束即可。支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。 |
+| S | LocalTensor类型或标量类型。根据输入参数max自动推导类型，开发者无需配置该参数，保证max满足数据类型的约束即可。支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。 |
 
 ```
 struct ClampConfig {
@@ -46,10 +46,10 @@ struct ClampConfig {
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| src | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>源操作数的数据类型与目的操作数保持一致。 |
-| min | 输入 | 数据下限。类型为标量或LocalTensor，类型为LocalTensor时，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>数据类型与目的操作数保持一致。 |
-| max | 输入 | 数据上限。类型为标量或LocalTensor，类型为LocalTensor时，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>数据类型与目的操作数保持一致。 |
+| dst | 输出 | 目的操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| src | 输入 | 源操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型与目的操作数保持一致。 |
+| min | 输入 | 数据下限。类型为标量或LocalTensor，类型为LocalTensor时，支持的TPosition为VECIN/VECCALC/VECOUT。数据类型与目的操作数保持一致。 |
+| max | 输入 | 数据上限。类型为标量或LocalTensor，类型为LocalTensor时，支持的TPosition为VECIN/VECCALC/VECOUT。数据类型与目的操作数保持一致。 |
 | count | 输入 | 参与计算的元素个数。 |
 
 ## 返回值说明

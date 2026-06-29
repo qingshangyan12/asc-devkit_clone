@@ -9,12 +9,6 @@
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
-<!-- npu="x90" id1 -->
-- Kirin X90：支持
-<!-- end id1 -->
-<!-- npu="9030" id2 -->
-- Kirin 9030：支持
-<!-- end id2 -->
 
 ## 功能说明
 
@@ -33,10 +27,6 @@
 
     Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
-    <!-- npu="x90" id3 -->
-    Kirin X90
-    <!-- end id3 -->
-
 -   MatmulPolicy信息（可选），用于配置Matmul可拓展模块策略。不配置使用默认模板策略。当前支持如下产品型号：
 
     Ascend 950PR/Ascend 950DT
@@ -48,10 +38,6 @@
     Atlas 200I/500 A2 推理产品
 
     Atlas 推理系列产品AI Core
-
-    <!-- npu="x90" id4 -->
-    Kirin X90
-    <!-- end id4 -->
 
 ## 函数原型
 
@@ -90,7 +76,7 @@ using Matmul = AscendC::MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM
 <a name="table7939847143412"></a>
 | 参数 | 数据类型 | 说明 |
 | --- | --- | --- |
-| M, N, Ka, Kb,<br><br>singleCoreM, singleCoreN, singleCoreK,<br><br>baseM, baseN, baseK,<br><br>depthA1, depthB1,<br><br>stepM， stepN，stepKa，stepKb,<br><br>isBias,<br><br>transLength,<br><br>iterateOrder,<br><br>dbL0A, dbL0B,<br><br>dbL0C,<br><br>shareMode,<br><br>shareL1Size,<br><br>shareL0CSize,<br><br>shareUbSize,<br><br>batchM,<br><br>batchN,<br><br>singleBatchM,<br><br>singleBatchN,<br><br>mxTypePara | int32_t | 与[TCubeTiling](../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md)结构体中各同名参数含义一致。本结构体中的参数是常量化后的常数值。 |
+| M, N, Ka, Kb,singleCoreM, singleCoreN, singleCoreK,baseM, baseN, baseK,depthA1, depthB1,stepM， stepN，stepKa，stepKb,isBias,transLength,iterateOrder,dbL0A, dbL0B,dbL0C,shareMode,shareL1Size,shareL0CSize,shareUbSize,batchM,batchN,singleBatchM,singleBatchN,mxTypePara | int32_t | 与[TCubeTiling](../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md)结构体中各同名参数含义一致。本结构体中的参数是常量化后的常数值。 |
 | cfg | [MatmulConfig](MatmulConfig.md#table1761013213153) | Matmul模板的参数配置。 |
 
 ## 返回值说明

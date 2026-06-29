@@ -16,8 +16,8 @@ int32_t MatmulGetTmpBufSizeV2(AscendC::tiling::TCubeTiling &tiling, matmul_tilin
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| tiling | 输入 | Matmul单核Tiling的结构体，即MatmulTiling对象得到的TCubeTiling结构体。<br><br>TCubeTiling为Kernel侧定义的Matmul TilingData，与入参为带AscendC::tiling命名空间的TCubeTiling结构体的[GetTiling](../Matmul-Tiling类/GetTiling.md)接口配合使用。 |
-| bufSize | 输出 | 根据TCubeTiling结构体信息获取L1 Buffer/Unified Buffer/L0C Buffer的使用大小。<br><br>SysTilingTempBufSize结构定义如下方代码所示。 |
+| tiling | 输入 | Matmul单核Tiling的结构体，即MatmulTiling对象得到的TCubeTiling结构体。TCubeTiling为Kernel侧定义的Matmul TilingData，与入参为带AscendC::tiling命名空间的TCubeTiling结构体的[GetTiling](../Matmul-Tiling类/GetTiling.md)接口配合使用。 |
+| bufSize | 输出 | 根据TCubeTiling结构体信息获取L1 Buffer/Unified Buffer/L0C Buffer的使用大小。SysTilingTempBufSize结构定义如下方代码所示。 |
 
 ```
 struct SysTilingTempBufSize {

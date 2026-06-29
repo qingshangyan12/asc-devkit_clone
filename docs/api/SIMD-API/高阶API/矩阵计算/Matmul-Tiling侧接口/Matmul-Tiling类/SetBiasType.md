@@ -18,7 +18,7 @@ int32_t SetBiasType(TPosition pos, CubeFormat type, DataType dataType)
 | --- | --- | --- |
 | pos | 输入 | Bias矩阵所在的buffer位置，可设置为：TPosition::GM, TPosition::VECOUT, TPosition::TSCM。 |
 | type | 输入 | Bias矩阵的数据格式，可设置为：CubeFormat::ND。 |
-| dataType | 输入 | Bias矩阵的数据类型，可设置为：DataType::DT_FLOAT、DataType::DT_FLOAT16、DataType::DT_INT32、DataType::DT_BFLOAT16。<br><br>其中，仅在A、B的数据类型均为int8_t时，Bias的数据类型可以设置为int32_t。 |
+| dataType | 输入 | Bias矩阵的数据类型，可设置为：DataType::DT_FLOAT、DataType::DT_FLOAT16、DataType::DT_INT32、DataType::DT_BFLOAT16。其中，仅在A、B的数据类型均为int8_t时，Bias的数据类型可以设置为int32_t。 |
 
 ## 返回值说明
 

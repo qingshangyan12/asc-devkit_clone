@@ -45,21 +45,21 @@ SubLayer\(X\)通常是指在DeepNorm模型中的一个子层（sub-layer），�
 | 参数名 | 描述 |
 | --- | --- |
 | T | 操作数的数据类型。支持的数据类型为：half、float。 |
-| isReuseSrc | 是否允许修改源操作数，默认值为false。如果开发者允许源操作数被改写，可以设置该参数取值为true开启，开启后能够节省部分内存空间。<br><br>设置为true，则本接口内部计算时复用srcLocal的内存空间，节省内存空间；设置为false，则本接口内部计算时不复用srcLocal的内存空间。<br><br>对于float数据类型输入支持开启该参数，half数据类型输入不支持开启该参数。<br><br>isReuseSrc的使用样例请参考[更多样例](../数学计算/更多样例-83.md#section639165323915)。 |
+| isReuseSrc | 是否允许修改源操作数，默认值为false。如果开发者允许源操作数被改写，可以设置该参数取值为true开启，开启后能够节省部分内存空间。设置为true，则本接口内部计算时复用srcLocal的内存空间，节省内存空间；设置为false，则本接口内部计算时不复用srcLocal的内存空间。对于float数据类型输入支持开启该参数，half数据类型输入不支持开启该参数。isReuseSrc的使用样例请参考[更多样例](../数学计算/更多样例-83.md#section639165323915)。 |
 | isBasicBlock | srcTensor的shape信息满足基本块要求的情况下，可以设置该参数取值为true，开启该参数，用于提升性能，默认不开启。基本块要求srcTensor的shape需要满足如下条件：<br>尾轴即H的长度为64的倍数，但不超过2040；<br>非尾轴长度（B*S）为8的倍数。 |
 
 **表 2**  接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dstLocal | 输出 | 目的操作数。shape为[B，S，H]。H长度不可超过2040。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| meanLocal | 输出 | 均值，目的操作数。shape为[B，S]。meanLocal的数据类型需要与dstLocal保持一致。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| rstdLocal | 输出 | 方差，目的操作数。shape为[B，S]。rstdLocal的数据类型需要与dstLocal保持一致。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| srcLocal | 输入 | 源操作数，shape为[B，S，H]。srcLocal的数据类型需要与目的操作数保持一致，尾轴长度需要32B对齐。H长度不可超过2040。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| gxLocal | 输入 | 源操作数，shape为[B，S，H]。gxLocal的数据类型需要与目的操作数保持一致，尾轴长度需要32B对齐。H长度不可超过2040。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>该参数对应计算公式中的SubLayer(X)的计算结果。 |
-| betaLocal | 输入 | 源操作数，shape为[H]。betaLocal的数据类型需要与目的操作数保持一致，长度需要32B对齐。H长度不可超过2040。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| gammaLocal | 输入 | 源操作数，shape为[H]。gammaLocal的数据类型需要与目的操作数保持一致，长度需要32B对齐。H长度不可超过2040。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| sharedTmpBuffer | 输入 | 接口内部复杂计算时用于存储中间变量，由开发者提供。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>临时空间大小BufferSize的获取方式请参考[DeepNorm Tiling](DeepNorm-Tiling.md)。 |
+| dstLocal | 输出 | 目的操作数。shape为[B，S，H]。H长度不可超过2040。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| meanLocal | 输出 | 均值，目的操作数。shape为[B，S]。meanLocal的数据类型需要与dstLocal保持一致。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| rstdLocal | 输出 | 方差，目的操作数。shape为[B，S]。rstdLocal的数据类型需要与dstLocal保持一致。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| srcLocal | 输入 | 源操作数，shape为[B，S，H]。srcLocal的数据类型需要与目的操作数保持一致，尾轴长度需要32B对齐。H长度不可超过2040。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| gxLocal | 输入 | 源操作数，shape为[B，S，H]。gxLocal的数据类型需要与目的操作数保持一致，尾轴长度需要32B对齐。H长度不可超过2040。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。该参数对应计算公式中的SubLayer(X)的计算结果。 |
+| betaLocal | 输入 | 源操作数，shape为[H]。betaLocal的数据类型需要与目的操作数保持一致，长度需要32B对齐。H长度不可超过2040。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| gammaLocal | 输入 | 源操作数，shape为[H]。gammaLocal的数据类型需要与目的操作数保持一致，长度需要32B对齐。H长度不可超过2040。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| sharedTmpBuffer | 输入 | 接口内部复杂计算时用于存储中间变量，由开发者提供。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。临时空间大小BufferSize的获取方式请参考[DeepNorm Tiling](DeepNorm-Tiling.md)。 |
 | alpha | 输入 | 权重系数。数据类型需要与目的操作数一致。 |
 | epsilon | 输入 | 权重系数， 用来防止除零错误。数据类型需要与目的操作数一致。 |
 | tiling | 输入 | DeepNorm计算所需Tiling信息，Tiling信息的获取请参考[DeepNorm Tiling](DeepNorm-Tiling.md)。 |

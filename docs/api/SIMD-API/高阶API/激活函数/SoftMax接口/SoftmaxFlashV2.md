@@ -9,12 +9,6 @@
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
-<!-- npu="x90" id1 -->
-- Kirin X90：支持
-<!-- end id1 -->
-<!-- npu="9030" id2 -->
-- Kirin 9030：支持
-<!-- end id2 -->
 
 ## 功能说明
 
@@ -158,9 +152,9 @@ def softmax_flash_2(src, inmax=None, insum=None, update=None):
 | T | 操作数的数据类型。支持的数据类型为：half、float。 |
 | isUpdate | 是否开启update部分中的计算。 |
 | isReuseSource | 该参数预留，传入默认值false即可。 |
-| isBasicBlock | srcTensor和dstTensor的shape信息和Tiling切分策略满足基本块要求的情况下，可以设置为true开启该参数用于提升性能，默认为false表示不开启。是否满足基本块的要求，可以采用如下两种方式之一判断：<br>srcTensor和dstTensor的shape信息[m,n]需要满足如下条件：尾轴长度n小于2048并且大于等于256/sizeof(T)（即half场景下n最小为128，float场景下n最小为64），同时n是64的倍数；非尾轴长度的乘积m为8的倍数。<br><br>在Tiling实现中，通过调用[IsBasicBlockInSoftMax](IsBasicBlockInSoftMax.md)判断Tiling切分策略是否满足基本块的切分要求。<br><br>针对Atlas 200I/500 A2 推理产品，该参数为预留参数，暂未启用，为后续的功能扩展做保留，保持默认值即可。 |
-| isDataFormatNZ | 当前输入输出的数据格式是否为NZ格式，默认数据格式为ND，即默认取值为false。<br><br>针对Atlas 200I/500 A2 推理产品，不支持配置为NZ格式。 |
-| config | 结构体模板参数，此参数可选配，SoftmaxConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>isCheckTiling：是否需要检查shape和tiling的一致性；若不一致，API内会根据shape重新计算所需tiling。默认取值true：API内部会检查一致性。<br>oriSrcM：原始非尾轴长度的乘积。设置该参数后，将shape常量化，编译过程中使用常量化的shape。<br>oriSrcK：原始尾轴长度。设置该参数后，将shape常量化，编译过程中使用常量化的shape。<br>mode：输出shape的处理模式。当输入输出的数据格式为NZ格式时，不支持配置mode参数。SoftmaxMode类型，取值如下：<br>SOFTMAX_NORMAL ：默认值，常规模式，对输出数据做Broadcast，使得输出shape由(m, 1)拓展成(m, 8)（输出为float数据类型）或者(m, 16)（输出为half数据类型）。<br>SOFTMAX_OUTPUT_WITHOUT_BRC ：非拓展模式，不对输出数据做Broadcast，输出shape均为(m, 1)，相应的输入参数（例如inExpSumTensor、inMaxTensor），shape也均为(m, 1) 。<br><br>此参数一般用于配合kernel侧tiling计算的接口使用。<br><br>注意：设置了oriSrcM与oriSrcK后，模板参数isBasicBlock不生效，计算数据是否为基本块由API内部判断并处理。<br><br>针对Ascend 950PR/Ascend 950DT，支持该参数。<br><br>Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持该参数。<br><br>Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持该参数。<br><br>针对Atlas 200I/500 A2 推理产品，该参数为预留参数，暂未启用，保持默认值即可。<br><br>Atlas 推理系列产品AI Core，支持该参数，不支持配置mode。<br><br><!-- npu="x90" id3 -->针对Kirin X90，支持该参数。<!-- end id3 --><br><br><!-- npu="9030" id4 -->针对Kirin 9030，支持该参数。<!-- end id4 --> |
+| isBasicBlock | srcTensor和dstTensor的shape信息和Tiling切分策略满足基本块要求的情况下，可以设置为true开启该参数用于提升性能，默认为false表示不开启。是否满足基本块的要求，可以采用如下两种方式之一判断：<br>srcTensor和dstTensor的shape信息[m,n]需要满足如下条件：尾轴长度n小于2048并且大于等于256/sizeof(T)（即half场景下n最小为128，float场景下n最小为64），同时n是64的倍数；非尾轴长度的乘积m为8的倍数。在Tiling实现中，通过调用[IsBasicBlockInSoftMax](IsBasicBlockInSoftMax.md)判断Tiling切分策略是否满足基本块的切分要求。针对Atlas 200I/500 A2 推理产品，该参数为预留参数，暂未启用，为后续的功能扩展做保留，保持默认值即可。 |
+| isDataFormatNZ | 当前输入输出的数据格式是否为NZ格式，默认数据格式为ND，即默认取值为false。针对Atlas 200I/500 A2 推理产品，不支持配置为NZ格式。 |
+| config | 结构体模板参数，此参数可选配，SoftmaxConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>isCheckTiling：是否需要检查shape和tiling的一致性；若不一致，API内会根据shape重新计算所需tiling。默认取值true：API内部会检查一致性。<br>oriSrcM：原始非尾轴长度的乘积。设置该参数后，将shape常量化，编译过程中使用常量化的shape。<br>oriSrcK：原始尾轴长度。设置该参数后，将shape常量化，编译过程中使用常量化的shape。<br>mode：输出shape的处理模式。当输入输出的数据格式为NZ格式时，不支持配置mode参数。SoftmaxMode类型，取值如下：<br>SOFTMAX_NORMAL ：默认值，常规模式，对输出数据做Broadcast，使得输出shape由(m, 1)拓展成(m, 8)（输出为float数据类型）或者(m, 16)（输出为half数据类型）。<br>SOFTMAX_OUTPUT_WITHOUT_BRC ：非拓展模式，不对输出数据做Broadcast，输出shape均为(m, 1)，相应的输入参数（例如inExpSumTensor、inMaxTensor），shape也均为(m, 1) 。此参数一般用于配合kernel侧tiling计算的接口使用。注意：设置了oriSrcM与oriSrcK后，模板参数isBasicBlock不生效，计算数据是否为基本块由API内部判断并处理。针对Ascend 950PR/Ascend 950DT，支持该参数。Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持该参数。Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持该参数。针对Atlas 200I/500 A2 推理产品，该参数为预留参数，暂未启用，保持默认值即可。Atlas 推理系列产品AI Core，支持该参数，不支持配置mode。|
 
 ```
 struct SoftmaxConfig{
@@ -181,17 +175,17 @@ constexpr SoftmaxConfig SOFTMAX_DEFAULT_CFG = {true, 0, 0, SoftmaxMode::SOFTMAX_
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dstTensor | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>dstTensor的shape和源操作数srcTensor一致。 |
-| outReduceMax | 输出 | 目的操作数。用于保存softmax计算过程中reducemax第一次计算的结果。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>outReduceMax的shape与目的操作数maxTensor一致。<br><br>对于输出该结果的接口：<br>模板参数isUpdate为false时，不输出该结果。<br>仅支持输入输出的数据格式为ND，模板参数isDataFormatNZ为预留参数，传入默认值false即可。<br>模板参数config.isCheckTiling为预留参数，传入默认值false即可。<br>模板参数config.mode仅支持配置为非拓展模式SoftmaxMode::SOFTMAX_OUTPUT_WITHOUT_BRC。 |
-| expSumTensor、outExpSum | 输出 | 目的操作数。用于保存softmax计算过程中reducesum的结果。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>除模板参数config配置为非拓展模式（SoftmaxMode::SOFTMAX_OUTPUT_WITHOUT_BRC）的场景外，expSumTensor的last轴长度固定为32Byte，即一个datablock长度。该datablock中的所有数据为同一个值，比如half数据类型下，该datablock中的16个数均为相同的reducesum的值。<br>非last轴的长度与dstTensor保持一致。 |
-| maxTensor、outMax | 输出 | 目的操作数。用于保存softmax计算过程中reducemax的结果。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>除模板参数config配置为非拓展模式（SoftmaxMode::SOFTMAX_OUTPUT_WITHOUT_BRC）的场景外，maxTensor的last轴长度固定为32Byte，即一个datablock长度。该datablock中的所有数据为同一个值。比如half数据类型下，该datablock中的16个数均为相同的reducemax的值。<br>非last轴的长度与dstTensor保持一致。 |
-| srcTensor | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>last轴长度需要32Byte对齐。 |
-| expMaxTensor、outExpMax | 输出 | 目的操作数。用于保存inmax与reducemax差值的e的指数幂的结果。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>除模板参数config配置为非拓展模式（SoftmaxMode::SOFTMAX_OUTPUT_WITHOUT_BRC）的场景外，expMaxTensor的last轴长度固定为32Byte，即一个datablock长度。该datablock中的所有数据为同一个值，比如half数据类型下，该datablock中的16个数均为相同的值。<br>非last轴的长度需要与dstTensor保持一致。 |
-| inExpSumTensor、inExpSum | 输入 | 源操作数。softmax计算所需要的sum值。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>除模板参数config配置为非拓展模式（SoftmaxMode::SOFTMAX_OUTPUT_WITHOUT_BRC）的场景外，inExpSumTensor的last轴长度固定为32Byte，即一个datablock长度。该datablock中的所有数据为同一个值，比如half数据类型下，该datablock中的16个数均为相同的值。<br>非last轴的长度需要与dstTensor保持一致。 |
-| inMaxTensor、inMax | 输入 | 源操作数。softmax计算所需要的max值。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>除模板参数config配置为非拓展模式（SoftmaxMode::SOFTMAX_OUTPUT_WITHOUT_BRC）的场景外，inMaxTensor的last轴长度固定为32Byte，即一个datablock长度。该datablock中的所有数据为同一个值，比如half数据类型下，该datablock里的16个数均为相同的值。<br>非last轴的长度需要与dstTensor保持一致。 |
-| sharedTmpBuffer | 输入 | 临时空间。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>该操作数的数据类型固定uint8_t。<br><br>接口内部复杂计算时用于存储中间变量，由开发者提供。<br><br>临时空间大小BufferSize的获取方式请参考[SoftmaxFlashV2 Tiling接口](SoftmaxFlashV2-Tiling接口.md)。 |
+| dstTensor | 输出 | 目的操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。dstTensor的shape和源操作数srcTensor一致。 |
+| outReduceMax | 输出 | 目的操作数。用于保存softmax计算过程中reducemax第一次计算的结果。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。outReduceMax的shape与目的操作数maxTensor一致。对于输出该结果的接口：<br>模板参数isUpdate为false时，不输出该结果。<br>仅支持输入输出的数据格式为ND，模板参数isDataFormatNZ为预留参数，传入默认值false即可。<br>模板参数config.isCheckTiling为预留参数，传入默认值false即可。<br>模板参数config.mode仅支持配置为非拓展模式SoftmaxMode::SOFTMAX_OUTPUT_WITHOUT_BRC。 |
+| expSumTensor、outExpSum | 输出 | 目的操作数。用于保存softmax计算过程中reducesum的结果。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>除模板参数config配置为非拓展模式（SoftmaxMode::SOFTMAX_OUTPUT_WITHOUT_BRC）的场景外，expSumTensor的last轴长度固定为32Byte，即一个datablock长度。该datablock中的所有数据为同一个值，比如half数据类型下，该datablock中的16个数均为相同的reducesum的值。<br>非last轴的长度与dstTensor保持一致。 |
+| maxTensor、outMax | 输出 | 目的操作数。用于保存softmax计算过程中reducemax的结果。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>除模板参数config配置为非拓展模式（SoftmaxMode::SOFTMAX_OUTPUT_WITHOUT_BRC）的场景外，maxTensor的last轴长度固定为32Byte，即一个datablock长度。该datablock中的所有数据为同一个值。比如half数据类型下，该datablock中的16个数均为相同的reducemax的值。<br>非last轴的长度与dstTensor保持一致。 |
+| srcTensor | 输入 | 源操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。last轴长度需要32Byte对齐。 |
+| expMaxTensor、outExpMax | 输出 | 目的操作数。用于保存inmax与reducemax差值的e的指数幂的结果。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>除模板参数config配置为非拓展模式（SoftmaxMode::SOFTMAX_OUTPUT_WITHOUT_BRC）的场景外，expMaxTensor的last轴长度固定为32Byte，即一个datablock长度。该datablock中的所有数据为同一个值，比如half数据类型下，该datablock中的16个数均为相同的值。<br>非last轴的长度需要与dstTensor保持一致。 |
+| inExpSumTensor、inExpSum | 输入 | 源操作数。softmax计算所需要的sum值。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>除模板参数config配置为非拓展模式（SoftmaxMode::SOFTMAX_OUTPUT_WITHOUT_BRC）的场景外，inExpSumTensor的last轴长度固定为32Byte，即一个datablock长度。该datablock中的所有数据为同一个值，比如half数据类型下，该datablock中的16个数均为相同的值。<br>非last轴的长度需要与dstTensor保持一致。 |
+| inMaxTensor、inMax | 输入 | 源操作数。softmax计算所需要的max值。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>除模板参数config配置为非拓展模式（SoftmaxMode::SOFTMAX_OUTPUT_WITHOUT_BRC）的场景外，inMaxTensor的last轴长度固定为32Byte，即一个datablock长度。该datablock中的所有数据为同一个值，比如half数据类型下，该datablock里的16个数均为相同的值。<br>非last轴的长度需要与dstTensor保持一致。 |
+| sharedTmpBuffer | 输入 | 临时空间。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。该操作数的数据类型固定uint8_t。接口内部复杂计算时用于存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[SoftmaxFlashV2 Tiling接口](SoftmaxFlashV2-Tiling接口.md)。 |
 | tiling | 输入 | softmaxflashv2接口计算所需tiling信息，Tiling信息的获取请参考[SoftmaxFlashV2 Tiling接口](SoftmaxFlashV2-Tiling接口.md)。 |
-| softmaxShapeInfo | 输入 | srcTensor的shape信息。SoftMaxShapeInfo类型，具体定义如下方代码所示，其中参数的含义为：<br>srcM：非尾轴长度的乘积。<br>srcK：尾轴长度，必须32Byte对齐。<br>oriSrcM：原始非尾轴长度的乘积。<br>oriSrcK：原始尾轴长度。<br><br>需要注意，当输入输出的数据格式为NZ格式时，尾轴长度为reduce轴长度即[图2](SoftMax.md#fig0172155842215)中的W0\*W1，非尾轴为H0\*H1。 |
+| softmaxShapeInfo | 输入 | srcTensor的shape信息。SoftMaxShapeInfo类型，具体定义如下方代码所示，其中参数的含义为：<br>srcM：非尾轴长度的乘积。<br>srcK：尾轴长度，必须32Byte对齐。<br>oriSrcM：原始非尾轴长度的乘积。<br>oriSrcK：原始尾轴长度。需要注意，当输入输出的数据格式为NZ格式时，尾轴长度为reduce轴长度即[图2](SoftMax.md#fig0172155842215)中的W0\*W1，非尾轴为H0\*H1。 |
 
 ```
 struct SoftMaxShapeInfo {

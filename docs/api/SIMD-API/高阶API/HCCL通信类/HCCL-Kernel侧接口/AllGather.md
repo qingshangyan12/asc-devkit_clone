@@ -39,8 +39,8 @@ __aicore__ inline HcclHandle AllGather(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_
 | recvBuf | 输出 | 目的数据buffer地址，集合通信结果输出到此buffer中。 |
 | sendCount | 输入 | 参与AllGather操作的sendBuf的数据个数；recvBuf的数据个数等于sendCount * rank size，即sendCount * 卡数。 |
 | dataType | 输入 | AllGather操作的数据类型，目前支持HcclDataType包含的全部数据类型，HcclDataType详细可参考[表1](HCCL使用说明.md#table116710585514)。 |
-| strideCount | 输入 | strideCount=0，表示多张卡的数据拼接到一张卡的recvBuf时，相邻数据块保持地址连续。卡rank[i]的数据块将被放在recvBuf中，且偏移数据量为i\*sendCount。非多轮切分场景下，推荐用户设置该参数为0。<br>strideCount>0，表示多张卡的数据拼接到一张卡的recvBuf时，相邻数据块在recvBuf中起始地址的偏移数据量为strideCount。卡rank[i]的数据块将被放在recvBuf中，且偏移数据量为i\*strideCount。<br><br>注意：上述的偏移数据量为数据个数，单位为sizeof(dataType)。 |
-| repeat | 输入 | 一次下发的AllGather通信任务个数。repeat取值≥1，默认值为1。当repeat>1时，每个AllGather任务的sendBuf和recvBuf地址由服务端自动算出，计算公式如下：<br><br>sendBuf[i] = sendBuf + sendCount* sizeof(datatype) * i, i∈[0, repeat)<br><br>recvBuf[i] = recvBuf + sendCount* sizeof(datatype) * i, i∈[0, repeat)<br><br>注意：当设置repeat>1时，须与strideCount参数配合使用，规划通信数据地址。 |
+| strideCount | 输入 | strideCount=0，表示多张卡的数据拼接到一张卡的recvBuf时，相邻数据块保持地址连续。卡rank[i]的数据块将被放在recvBuf中，且偏移数据量为i\*sendCount。非多轮切分场景下，推荐用户设置该参数为0。<br>strideCount>0，表示多张卡的数据拼接到一张卡的recvBuf时，相邻数据块在recvBuf中起始地址的偏移数据量为strideCount。卡rank[i]的数据块将被放在recvBuf中，且偏移数据量为i\*strideCount。注意：上述的偏移数据量为数据个数，单位为sizeof(dataType)。 |
+| repeat | 输入 | 一次下发的AllGather通信任务个数。repeat取值≥1，默认值为1。当repeat>1时，每个AllGather任务的sendBuf和recvBuf地址由服务端自动算出，计算公式如下：sendBuf[i] = sendBuf + sendCount* sizeof(datatype) * i, i∈[0, repeat)recvBuf[i] = recvBuf + sendCount* sizeof(datatype) * i, i∈[0, repeat)注意：当设置repeat>1时，须与strideCount参数配合使用，规划通信数据地址。 |
 
 **图 1**  AllGather通信示例  
 ![AllGather通信示例](../../../../figures/AllGather通信示例.png)

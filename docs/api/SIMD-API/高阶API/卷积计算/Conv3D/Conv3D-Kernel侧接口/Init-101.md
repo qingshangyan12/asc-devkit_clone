@@ -24,7 +24,7 @@ __aicore__ inline void Init(const void* __restrict cubeTiling)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| cubeTiling | 输入 | Conv3D对象的Tiling参数，Tiling结构体定义请参见[TConv3DApiTiling结构体](../Conv3D-Tiling侧接口/TConv3DApiTiling结构体.md)。<br><br>Tiling参数可以通过Host侧[GetTiling](../Conv3D-Tiling侧接口/GetTiling-105.md)接口获取，并传递到Kernel侧使用。 |
+| cubeTiling | 输入 | Conv3D对象的Tiling参数，Tiling结构体定义请参见[TConv3DApiTiling结构体](../Conv3D-Tiling侧接口/TConv3DApiTiling结构体.md)。Tiling参数可以通过Host侧[GetTiling](../Conv3D-Tiling侧接口/GetTiling-105.md)接口获取，并传递到Kernel侧使用。 |
 
 ## 返回值说明
 

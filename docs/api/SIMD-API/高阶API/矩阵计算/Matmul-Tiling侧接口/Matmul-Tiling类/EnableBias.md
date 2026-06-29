@@ -16,7 +16,7 @@ int32_t EnableBias(bool isBiasIn = false)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| isBiasIn | 输入 | 设置是否有Bias参与运算。<br><br>true：有Bias参与运算。<br><br>false：无Bias参与运算。 |
+| isBiasIn | 输入 | 设置是否有Bias参与运算。true：有Bias参与运算。false：无Bias参与运算。 |
 
 ## 返回值说明
 

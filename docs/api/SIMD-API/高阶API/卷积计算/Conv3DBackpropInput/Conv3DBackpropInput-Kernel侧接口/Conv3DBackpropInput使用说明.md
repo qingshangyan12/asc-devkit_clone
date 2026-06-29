@@ -79,7 +79,7 @@ Kernel侧实现Conv3DBackpropInput求解反向传播误差运算的步骤概括�
     | --- | --- |
     | POSITION | 内存逻辑位置。<br>    Weight矩阵可设置为TPosition::GM。<br>GradOutput矩阵可设置为TPosition::GM。<br>InputSize可设置为TPosition::GM。<br>GradInput矩阵可设置为TPosition::GM。 |
     | ConvFormat | 数据格式。<br>    Weight矩阵可设置为ConvFormat::FRACTAL_Z_3D。<br>GradOutput矩阵可设置为ConvFormat::NDC1HWC0。<br>InputSize矩阵可设置为ConvFormat::ND。<br>GradInput矩阵可设置为ConvFormat::NDC1HWC0。 |
-    | TYPE | 数据类型。<br>Weight矩阵可设置为half、bfloat16_t。<br>GradOutput矩阵可设置为half、bfloat16_t。<br>InputSize矩阵可设置为int32_t。<br>GradInput矩阵可设置为half、bfloat16_t。<br><br>注意：GradOutput矩阵和Weight矩阵数据类型需要一致，具体数据类型组合关系请参考表2。 |
+    | TYPE | 数据类型。<br>Weight矩阵可设置为half、bfloat16_t。<br>GradOutput矩阵可设置为half、bfloat16_t。<br>InputSize矩阵可设置为int32_t。<br>GradInput矩阵可设置为half、bfloat16_t。注意：GradOutput矩阵和Weight矩阵数据类型需要一致，具体数据类型组合关系请参考表2。 |
 
     **表 2**  Conv3DBackpropInput输入输出数据类型的组合说明
 

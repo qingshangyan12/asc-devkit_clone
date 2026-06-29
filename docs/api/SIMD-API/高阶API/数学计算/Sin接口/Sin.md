@@ -9,12 +9,6 @@
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
-<!-- npu="x90" id1 -->
-- Kirin X90：支持
-<!-- end id1 -->
-<!-- npu="9030" id2 -->
-- Kirin 9030：支持
-<!-- end id2 -->
 
 ## 功能说明
 
@@ -74,7 +68,7 @@ Sin\(x\)的泰勒展开式为：
 | --- | --- |
 | T | 操作数的数据类型。支持的数据类型为：half、float。 |
 | isReuseSource | 是否允许修改源操作数，默认值为false。该参数仅在输入的数据类型为float时生效。<br>true：开发者允许源操作数被改写，可以设置该参数取值为true开启，开启后本接口内部计算时复用srcTensor的内存空间，节省部分内存空间；false：本接口内部计算时不复用srcTensor的内存空间。 |
-| config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br><br>Sin算法的相关配置。此参数可选配，SinConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：Sin内部实现使用的算法。SinAlgo类型，支持的取值如下：POLYNOMIAL_APPROXIMATION：默认值。该算法通过简单的多项式逼近实现Sin接口，支持的输入值域范围为[-65504.0, 65504.0]，支持的数据类型为half、float。RADIAN_REDUCTION：该算法通过完整的周期约减实现Sin接口，支持输入全值域，支持的数据类型为half、float。 |
+| config | 该参数仅支持Ascend 950PR/Ascend 950DT。Sin算法的相关配置。此参数可选配，SinConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：Sin内部实现使用的算法。SinAlgo类型，支持的取值如下：POLYNOMIAL_APPROXIMATION：默认值。该算法通过简单的多项式逼近实现Sin接口，支持的输入值域范围为[-65504.0, 65504.0]，支持的数据类型为half、float。RADIAN_REDUCTION：该算法通过完整的周期约减实现Sin接口，支持输入全值域，支持的数据类型为half、float。 |
 
 ```
 struct SinConfig {
@@ -90,9 +84,9 @@ enum class SinAlgo {
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dstTensor | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| srcTensor | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>源操作数的数据类型需要与目的操作数保持一致。 |
-| sharedTmpBuffer | 输入 | 临时缓存。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>用于Sin内部复杂计算时存储中间变量，由开发者提供。<br><br>临时空间大小BufferSize的获取方式请参考[GetSinMaxMinTmpSize](GetSinMaxMinTmpSize.md)。 |
+| dstTensor | 输出 | 目的操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| srcTensor | 输入 | 源操作数。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。源操作数的数据类型需要与目的操作数保持一致。 |
+| sharedTmpBuffer | 输入 | 临时缓存。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于Sin内部复杂计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetSinMaxMinTmpSize](GetSinMaxMinTmpSize.md)。 |
 | calCount | 输入 | 参与计算的元素个数。 |
 
 ## 返回值说明

@@ -118,7 +118,7 @@ Kernel侧实现Conv3D运算的步骤概括为：
     | --- | --- |
     | TPosition | 内存逻辑位置。<br>    Input矩阵可设置为TPosition::GM。<br>Weight矩阵可设置为TPosition::GM。<br>Bias矩阵可设置为TPosition::GM。<br>Output矩阵可设置为TPosition::GM。 |
     | ConvFormat | 数据格式。<br>    Input矩阵可设置为ConvFormat::NDC1HWC0。<br>Weight矩阵可设置为ConvFormat::FRACTAL_Z_3D。<br>Bias矩阵可设置为ConvFormat::ND。<br>Output矩阵可设置为ConvFormat::NDC1HWC0。 |
-    | TYPE | 数据类型。<br>Input矩阵可设置为half、bfloat16_t。<br>Weight矩阵可设置为half、bfloat16_t。<br>Bias矩阵可设置为half、float。<br>Output矩阵可设置为half、bfloat16_t。<br><br>注意：输入输出的矩阵数据类型需要对应，具体支持的数据类型组合关系请参考表2。 |
+    | TYPE | 数据类型。<br>Input矩阵可设置为half、bfloat16_t。<br>Weight矩阵可设置为half、bfloat16_t。<br>Bias矩阵可设置为half、float。<br>Output矩阵可设置为half、bfloat16_t。注意：输入输出的矩阵数据类型需要对应，具体支持的数据类型组合关系请参考表2。 |
 
     **表 2**  Conv3D输入输出数据类型的组合说明
 

@@ -16,7 +16,7 @@ int32_t SetSparse(bool isSparseIn = false)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| isSparseIn | 输入 | 设置是否为Sparse Matmul稀疏场景。<br><br>true：稀疏场景。<br><br>false：非稀疏场景。 |
+| isSparseIn | 输入 | 设置是否为Sparse Matmul稀疏场景。true：稀疏场景。false：非稀疏场景。 |
 
 ## 返回值说明
 

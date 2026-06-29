@@ -9,9 +9,6 @@
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
-<!-- npu="x90" id1 -->
-- Kirin X90：支持
-<!-- end id1 -->
 
 ## 功能说明
 
@@ -44,7 +41,6 @@
 实例化Matmul时，需要通过MatmulType设置输入输出的Layout格式，当前支持4种Layout类型：BSNGD、SBNGD、BNGS1S2、NORMAL（BMNK的数据排布格式使用NORMAL表示）。
 
 对于BSNGD、SBNGD、BNGS1S2 Layout格式，调用该接口之前需要在host Tiling实现中使用[SetALayout](../Matmul-Tiling侧接口/Matmul-Tiling类/SetALayout.md)、[SetBLayout](../Matmul-Tiling侧接口/Matmul-Tiling类/SetBLayout.md)、[SetCLayout](../Matmul-Tiling侧接口/Matmul-Tiling类/SetCLayout.md)、[SetBatchNum](../Matmul-Tiling侧接口/Matmul-Tiling类/SetBatchNum-88.md)设置A/B/C的Layout轴信息和最大BatchNum数；对于NORMAL  Layout格式则需使用[SetBatchInfoForNormal](../Matmul-Tiling侧接口/Matmul-Tiling类/SetBatchInfoForNormal.md)设置A/B/C的M/N/K轴信息和A/B矩阵的BatchNum数。
-
 
 <a name="row_width"></a>使用ND格式输入时，是否开启MatmulConfig中的intrinsicsCheck，取决于单个BMM内A或B矩阵的源矩阵内轴长度。该内轴可理解为源ND数据中一行的连续跨度，即一次ND2NZ搬运所使用的源行宽。不同Layout下的取值规则如下：NORMAL Layout下，按普通矩阵内轴判断；BNGS1S2 Layout下，按源ND矩阵一行的实际跨度判断；BSNGD Layout下，A和B矩阵源矩阵内轴分别为ALayoutInfoN \* ALayoutInfoG \* ALayoutInfoD、BLayoutInfoN \* BLayoutInfoG \* BLayoutInfoD；SBNGD Layout下，A和B矩阵源矩阵内轴分别为ALayoutInfoB \* ALayoutInfoN \* ALayoutInfoG \* ALayoutInfoD、BLayoutInfoB \* BLayoutInfoN \* BLayoutInfoG \* BLayoutInfoD。
 
@@ -89,8 +85,8 @@
 
 | 参数名 | 描述 |
 | --- | --- |
-| sync | 获取C矩阵过程分为同步和异步两种模式：<br>同步：需要同步等待IterateBatch执行结束。<br>异步：不需要同步等待IterateBatch执行结束。<br><br>通过该参数设置同步或者异步模式：同步模式设置为true；异步模式设置为false。默认为同步模式。异步场景需要配合[WaitIterateBatch](WaitIterateBatch.md)接口使用。 |
-| waitIterateBatch | 是否需要通过[WaitIterateBatch](WaitIterateBatch.md)接口等待IterateBatch执行结束，仅在异步场景下使用。默认为false。<br><br>true：需要通过WaitIterateBatch接口等待IterateBatch执行结束。<br><br>false：不需要通过WaitIterateBatch接口等待IterateBatch执行结束，开发者自行处理等待IterateBatch执行结束的过程。 |
+| sync | 获取C矩阵过程分为同步和异步两种模式：<br>同步：需要同步等待IterateBatch执行结束。<br>异步：不需要同步等待IterateBatch执行结束。通过该参数设置同步或者异步模式：同步模式设置为true；异步模式设置为false。默认为同步模式。异步场景需要配合[WaitIterateBatch](WaitIterateBatch.md)接口使用。 |
+| waitIterateBatch | 是否需要通过[WaitIterateBatch](WaitIterateBatch.md)接口等待IterateBatch执行结束，仅在异步场景下使用。默认为false。true：需要通过WaitIterateBatch接口等待IterateBatch执行结束。false：不需要通过WaitIterateBatch接口等待IterateBatch执行结束，开发者自行处理等待IterateBatch执行结束的过程。 |
 
 **表 2**  接口参数说明
 
@@ -99,13 +95,13 @@
 | gm | 输出 | C矩阵。类型为[GlobalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor.md)。不同型号支持的数据类型请参考[支持的数据类型](#li12616155731722)。 |
 | ubCmatrix | 输出 | C矩阵。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)。不同型号支持的数据类型请参考[支持的数据类型](#li12616155731722)。 |
 | batchA | 输入 | 左矩阵的batch数。 |
-| batchB | 输入 | 右矩阵的batch数。在batchA/batchB不相同的情况下，默认做broadcast操作。<br><br>多batch计算支持在G轴上做输入broadcast和输出reduce，左矩阵、右矩阵G轴维度必须是整数倍的关系。 |
+| batchB | 输入 | 右矩阵的batch数。在batchA/batchB不相同的情况下，默认做broadcast操作。多batch计算支持在G轴上做输入broadcast和输出reduce，左矩阵、右矩阵G轴维度必须是整数倍的关系。 |
 | enSequentialWrite | 输入 | 输出是否[连续存放](GetTensorC.md#fig580415103338)数据，即是否开启连续写模式（连续写，写入[baseM, baseN]；非连续写，写入[singleCoreM, singleCoreN]中对应的位置）。<br>左右矩阵和输出矩阵的存储位置为Unified Buffer，则enSequentialWrite参数应配置为true；<br>输出矩阵的存储位置为GM，则enSequentialWrite参数应配置为false。 |
 | matrixStrideA | 输入 | A矩阵源操作数相邻nd矩阵起始地址间的偏移，单位是元素，默认值是0。 |
 | matrixStrideB | 输入 | B矩阵源操作数相邻nd矩阵起始地址间的偏移，单位是元素，默认值是0。 |
 | matrixStrideC | 输入 | 该参数预留，保持默认值0即可。 |
 | enPartialSum | 输入 | 是否将矩阵乘的结果累加于现有的CO1数据，默认值为false。在L0C累加时，只支持A矩阵和B矩阵相乘的输出C矩阵规格为singleM==baseM &&singleN==baseN。 |
-| enAtomic | 输入 | 是否开启Atomic操作，默认值为0。<br><br>参数取值：<br><br>0：不开启Atomic操作<br><br>1：开启AtomicAdd累加操作<br><br>2：开启AtomicMax求最大值操作<br><br>3：开启AtomicMin求最小值操作 |
+| enAtomic | 输入 | 是否开启Atomic操作，默认值为0。参数取值：0：不开启Atomic操作1：开启AtomicAdd累加操作2：开启AtomicMax求最大值操作3：开启AtomicMin求最小值操作 |
 
 ## 返回值说明
 
@@ -140,10 +136,6 @@
     Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half、bfloat16_t、int32_t、float。
 
     Atlas 推理系列产品AI Core，支持的数据类型为：half、bfloat16_t、int32_t、float。
-
-    <!-- npu="x90" id2 -->
-    Kirin X90，支持的数据类型为：half、int32_t。
-    <!-- end id2 -->
 
 ## 调用示例
 

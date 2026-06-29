@@ -26,7 +26,7 @@ __aicore__ inline void Init(const TConv3DBackpropInputTiling *__restrict tiling)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| tiling | 输入 | Conv3DBackpropInput对象的Tiling参数，TConv3DBackpropInputTiling结构体的定义请参见[TConv3DBackpropInputTiling结构体](../Conv3DBackpropInput-Tiling侧接口/TConv3DBackpropInputTiling结构体.md)。<br><br>Tiling参数可以通过Host侧[GetTiling](../Conv3DBackpropInput-Tiling侧接口/GetTiling-114.md)接口获取，并传递到Kernel侧使用。 |
+| tiling | 输入 | Conv3DBackpropInput对象的Tiling参数，TConv3DBackpropInputTiling结构体的定义请参见[TConv3DBackpropInputTiling结构体](../Conv3DBackpropInput-Tiling侧接口/TConv3DBackpropInputTiling结构体.md)。Tiling参数可以通过Host侧[GetTiling](../Conv3DBackpropInput-Tiling侧接口/GetTiling-114.md)接口获取，并传递到Kernel侧使用。 |
 
 ## 返回值说明
 

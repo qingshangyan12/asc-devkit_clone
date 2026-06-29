@@ -9,12 +9,6 @@
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
-<!-- npu="x90" id1 -->
-- Kirin X90：支持
-<!-- end id1 -->
-<!-- npu="9030" id2 -->
-- Kirin 9030：支持
-<!-- end id2 -->
 
 ## 功能说明
 
@@ -104,28 +98,28 @@
 | --- | --- |
 | T | 操作数的数据类型，目前支持int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。 |
 | constRank | 输入/输出tensor的维度数目。<br>默认值-1为动态shape场景，内部按照GetBroadcastTilingInfo接口中的参数rank计算；<br>constRank大于0时，必须与GetBroadcastTilingInfo接口中的参数rank取值相同。rank当前支持的范围为[1, 9]。 |
-| constDstShape | 输出tensor的shape。uint32_t类型的数组。<br>该数组中任一维度取值为0，表示该维度为动态场景，该维度实际取值由参数dstShape对应维度取值决定。<br>该数组中任一维度取值大于0，表示该维度为静态场景，该维度取值与参数dstShape中对应维度取值相同。<br><br>该参数预留，传入默认值nullptr即可。 |
-| constSrcShape | 输入tensor的shape。uint32_t类型的数组。<br>该数组中任一维度取值为0，表示该维度为动态场景，实际shape由参数srcShape决定。<br>该数组中任一维度取值大于0，表示该维度为静态场景，与参数srcShape中对应维度取值相同。<br><br>该参数预留，传入默认值nullptr即可。 |
-| constSrcInnerPad | 表示输入的最后一维srcShape[rank-1]是否32B对齐，其中rank为输入/输出tensor的维度数目。<br><br>该参数预留，传入默认值false即可。 |
+| constDstShape | 输出tensor的shape。uint32_t类型的数组。<br>该数组中任一维度取值为0，表示该维度为动态场景，该维度实际取值由参数dstShape对应维度取值决定。<br>该数组中任一维度取值大于0，表示该维度为静态场景，该维度取值与参数dstShape中对应维度取值相同。该参数预留，传入默认值nullptr即可。 |
+| constSrcShape | 输入tensor的shape。uint32_t类型的数组。<br>该数组中任一维度取值为0，表示该维度为动态场景，实际shape由参数srcShape决定。<br>该数组中任一维度取值大于0，表示该维度为静态场景，与参数srcShape中对应维度取值相同。该参数预留，传入默认值nullptr即可。 |
+| constSrcInnerPad | 表示输入的最后一维srcShape[rank-1]是否32B对齐，其中rank为输入/输出tensor的维度数目。该参数预留，传入默认值false即可。 |
 
 **表 3**  接口参数说明
 
 | 参数名称 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dstLocal | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| srcLocal | 输入 | 源操作数。<br><br>源操作数的数据类型需要与目的操作数保持一致。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| dstLocal | 输出 | 目的操作数。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| srcLocal | 输入 | 源操作数。源操作数的数据类型需要与目的操作数保持一致。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | dstShape | 输入 | 输出tensor的shape：uint32_t类型的数组，长度为1或者2， 输入/输出的shape维度数目必须一致。 |
 | srcShape | 输入 | 输入tensor的shape：uint32_t类型的数组，长度为1或者2， 输入/输出的shape维度数目必须一致。 |
-| sharedTmpBuffer | 输入 | 临时缓存。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>用于Broadcast内部复杂计算时存储中间变量，由开发者提供。<br><br>临时空间大小BufferSize的获取方式请参考[GetBroadCastMaxMinTmpSize](GetBroadCastMaxMinTmpSize.md)。 |
+| sharedTmpBuffer | 输入 | 临时缓存。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。用于Broadcast内部复杂计算时存储中间变量，由开发者提供。临时空间大小BufferSize的获取方式请参考[GetBroadCastMaxMinTmpSize](GetBroadCastMaxMinTmpSize.md)。 |
 
 **表 4**  支持动态shape接口的参数说明
 
 | 参数名称 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| src | 输入 | 源操作数。<br><br>源操作数的数据类型需要与目的操作数保持一致。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| dst | 输出 | 目的操作数。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| src | 输入 | 源操作数。源操作数的数据类型需要与目的操作数保持一致。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | dstShape | 输入 | 输出tensor的shape：uint32_t类型的数组，长度取值范围为[1, 9]。输入/输出的shape维度数目必须一致，且满足条件dstShape[i] >= srcShape[i]。 |
-| srcShape | 输入 | 输入tensor的shape：uint32_t类型的数组，长度取值范围为[1, 9]。输入/输出的shape维度数目必须一致，且满足条件dstShape[i] >= srcShape[i]。<br><br>当srcShape[i]的值为1，且dstShape[i]不等于srcShape[i]时，表示i轴为广播轴。 |
+| srcShape | 输入 | 输入tensor的shape：uint32_t类型的数组，长度取值范围为[1, 9]。输入/输出的shape维度数目必须一致，且满足条件dstShape[i] >= srcShape[i]。当srcShape[i]的值为1，且dstShape[i]不等于srcShape[i]时，表示i轴为广播轴。 |
 | tiling | 输入 | Broadcast接口所需的Tiling信息。BroadcastTiling*类型，通过调用Kernel侧的tiling计算接口GetBroadcastTilingInfo获取。 |
 
 **表 5**  kernel侧tiling计算接口参数说明
@@ -135,8 +129,8 @@
 | --- | --- | --- |
 | rank | 输入 | 输入/输出tensor的维度数目，目前支持的取值为[1, 9]。 |
 | dstShape | 输入 | 输出tensor的shape：uint32_t类型的数组，长度取值范围为[1, 9]。输入/输出的shape维度数目必须一致，且满足条件dstShape[i] >= srcShape[i]。 |
-| srcShape | 输入 | 输入tensor的shape：uint32_t类型的数组，长度取值范围为[1, 9]。输入/输出的shape维度数目必须一致，且满足条件dstShape[i] >= srcShape[i]。<br><br>当srcShape[i]的值为1，且dstShape[i]不等于srcShape[i]时，表示i轴为广播轴。 |
-| srcInnerPad | 输入 | 表示输入的最后一维srcShape[rank-1]是否32B对齐。<br><br>当前仅支持取值为false。 |
+| srcShape | 输入 | 输入tensor的shape：uint32_t类型的数组，长度取值范围为[1, 9]。输入/输出的shape维度数目必须一致，且满足条件dstShape[i] >= srcShape[i]。当srcShape[i]的值为1，且dstShape[i]不等于srcShape[i]时，表示i轴为广播轴。 |
+| srcInnerPad | 输入 | 表示输入的最后一维srcShape[rank-1]是否32B对齐。当前仅支持取值为false。 |
 | tiling | 输出 | 计算返回的Tiling信息。BroadcastTiling&类型。 |
 
 ## 返回值说明
@@ -161,14 +155,6 @@
     Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int8\_t、uint8\_t、half、float。
 
     Atlas 推理系列产品AI Core，支持的数据类型为：int8\_t、uint8\_t、half、float。
-
-    <!-- npu="x90" id3 -->
-    Kirin X90，支持的数据类型为：int8\_t、uint8\_t、half、float。
-    <!-- end id3 -->
-
-    <!-- npu="9030" id4 -->
-    Kirin 9030，支持的数据类型为：int8\_t、uint8\_t、half、float。
-    <!-- end id4 -->
 
 ## 调用示例
 

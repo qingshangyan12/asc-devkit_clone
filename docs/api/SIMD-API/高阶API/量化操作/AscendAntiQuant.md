@@ -9,12 +9,6 @@
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
-<!-- npu="x90" id1 -->
-- Kirin X90：支持
-<!-- end id1 -->
-<!-- npu="9030" id2 -->
-- Kirin 9030：支持
-<!-- end id2 -->
 
 ## 功能说明
 
@@ -252,20 +246,20 @@ struct AscendAntiQuantConfig {
 | fp8_e5m2_t/fp8_e4m3fn_t | float | float |
 | fp8_e5m2_t/fp8_e4m3fn_t | float | half |
 | fp8_e5m2_t/fp8_e4m3fn_t | float | bfloat16_t |
-| fp4x2_e1m2_t/fp4x2_e2m1_t<br><br>（当前均只支持PER_GROUP场景） | fp8_e8m0_t | half |
-| fp4x2_e1m2_t/fp4x2_e2m1_t<br><br>（当前均只支持PER_GROUP场景） | fp8_e8m0_t | bfloat16_t |
+| fp4x2_e1m2_t/fp4x2_e2m1_t（当前均只支持PER_GROUP场景） | fp8_e8m0_t | half |
+| fp4x2_e1m2_t/fp4x2_e2m1_t（当前均只支持PER_GROUP场景） | fp8_e8m0_t | bfloat16_t |
 
 **表 4**  接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。不同型号支持的数据类型请参考[dst支持的数据类型](#li117871685514)。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| src | 输入 | 源操作数。不同型号支持的数据类型请参考[src支持的数据类型](#li13336025165520)。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| offset | 输入 | 输入数据反量化时的偏移量。不同型号支持的数据类型请参考[offset支持的数据类型](#li5382122225718)。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| scale | 输入 | 输入数据反量化时的缩放因子。不同型号支持的数据类型请参考[scale支持的数据类型](#li103341450906)。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| sharedTmpBuffer | 输入 | 临时缓存。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>临时空间大小BufferSize的获取方式请参考[GetAscendAntiQuantMaxMinTmpSize](GetAscendAntiQuantMaxMinTmpSize.md)。 |
-| k | 输入 | isTranspose为true时，src的shape为[N,K]；isTranspose为false时，src的shape为[K,N]。<br><br>参数k对应其中的K值。 |
-| shapeInfo | 输入 | 设置参数offset和scale的shape信息，仅PER_CHANNEL场景（按通道量化）需要配置。<br><br>可选参数。在PER_CHANNEL场景，如果未传入该参数或者结构体中数据设置为0，将从offset和scale的[ShapeInfo](../../基础API/数据结构/辅助数据结构/ShapeInfo.md)中获取offset和scale的shape信息。<br><br>AntiQuantShapeInfo类型，定义如下方代码所示。 |
+| dst | 输出 | 目的操作数。不同型号支持的数据类型请参考[dst支持的数据类型](#li117871685514)。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| src | 输入 | 源操作数。不同型号支持的数据类型请参考[src支持的数据类型](#li13336025165520)。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| offset | 输入 | 输入数据反量化时的偏移量。不同型号支持的数据类型请参考[offset支持的数据类型](#li5382122225718)。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| scale | 输入 | 输入数据反量化时的缩放因子。不同型号支持的数据类型请参考[scale支持的数据类型](#li103341450906)。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| sharedTmpBuffer | 输入 | 临时缓存。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。临时空间大小BufferSize的获取方式请参考[GetAscendAntiQuantMaxMinTmpSize](GetAscendAntiQuantMaxMinTmpSize.md)。 |
+| k | 输入 | isTranspose为true时，src的shape为[N,K]；isTranspose为false时，src的shape为[K,N]。参数k对应其中的K值。 |
+| shapeInfo | 输入 | 设置参数offset和scale的shape信息，仅PER_CHANNEL场景（按通道量化）需要配置。可选参数。在PER_CHANNEL场景，如果未传入该参数或者结构体中数据设置为0，将从offset和scale的[ShapeInfo](../../基础API/数据结构/辅助数据结构/ShapeInfo.md)中获取offset和scale的shape信息。AntiQuantShapeInfo类型，定义如下方代码所示。 |
 
 ```
 struct AntiQuantShapeInfo {
@@ -280,11 +274,11 @@ struct AntiQuantShapeInfo {
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dstTensor | 输出 | 目的操作数。支持的数据类型为：half、bfloat16_t、float。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| srcTensor | 输入 | 源操作数。支持的数据类型为：int8_t、fp8_e4m3fn_t、fp8_e5m2_t、hifloat8_t、fp4x2_e1m2_t、fp4x2_e2m1_t。注意，对于fp4x2_e1m2_t、fp4x2_e2m1_t数据类型，仅在PER_GROUP场景下支持。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| sharedTmpBuffer | 输入 | 临时缓存。支持的数据类型为：uint8_t。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>临时空间大小BufferSize的获取方式请参考[GetAscendQuantMaxMinTmpSize](GetAscendQuantMaxMinTmpSize.md)。 |
-| scaleTensor | 输入 | 量化参数scale。支持的数据类型为：half、float、bfloat16_t、fp8_e8m0_t。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| offsetTensor | 输入 | 量化参数offset。支持的数据类型和scaleTensor保持一致。对于float4场景，offsetTensor不生效。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| dstTensor | 输出 | 目的操作数。支持的数据类型为：half、bfloat16_t、float。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| srcTensor | 输入 | 源操作数。支持的数据类型为：int8_t、fp8_e4m3fn_t、fp8_e5m2_t、hifloat8_t、fp4x2_e1m2_t、fp4x2_e2m1_t。注意，对于fp4x2_e1m2_t、fp4x2_e2m1_t数据类型，仅在PER_GROUP场景下支持。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| sharedTmpBuffer | 输入 | 临时缓存。支持的数据类型为：uint8_t。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。临时空间大小BufferSize的获取方式请参考[GetAscendQuantMaxMinTmpSize](GetAscendQuantMaxMinTmpSize.md)。 |
+| scaleTensor | 输入 | 量化参数scale。支持的数据类型为：half、float、bfloat16_t、fp8_e8m0_t。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| offsetTensor | 输入 | 量化参数offset。支持的数据类型和scaleTensor保持一致。对于float4场景，offsetTensor不生效。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | para | 输入 | 量化接口的参数，AscendAntiQuantParam类型，具体定义如下方代码所示，其中参数的含义如下。<br>m：m方向元素个数。<br>n：n方向元素个数。n值对应的数据大小需满足32B对齐的要求，即shape最后一维为n的输入输出均需要满足该维度上32B对齐的要求。<br>calCount：参与计算的元素个数。calCount必须是n的整数倍。<br>groupSize：PER_GROUP场景有效，表示groupSize行/列数据共用一个scale/offset。groupSize的取值必须大于0且是32的整倍数。 |
 
 ```
@@ -319,14 +313,6 @@ struct AscendAntiQuantParam {
 
     Atlas 推理系列产品AI Core，支持的数据类型为：half。
 
-    <!-- npu="x90" id3 -->
-    Kirin X90，支持的数据类型为：half。
-    <!-- end id3 -->
-
-    <!-- npu="9030" id4 -->
-    Kirin 9030，支持的数据类型为：half。
-    <!-- end id4 -->
-
 -   非PER\_TOKEN/PER\_GROUP b8/float4场景src支持的数据类型<a id="li13336025165520"></a>
 
     Ascend 950PR/Ascend 950DT，PER\_CHANNEL和PER\_TENSOR场景下支持的数据类型为：int8\_t、fp8\_e4m3fn\_t、fp8\_e5m2\_t、hifloat8\_t，PER\_GROUP float4场景下支持的数据类型为：fp4x2\_e2m1\_t、fp4x2\_e1m2\_t。
@@ -336,14 +322,6 @@ struct AscendAntiQuantParam {
     Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int8\_t、int4b\_t。
 
     Atlas 推理系列产品AI Core，支持的数据类型为：int8\_t。
-
-    <!-- npu="x90" id5 -->
-    Kirin X90，支持的数据类型为：int8\_t。
-    <!-- end id5 -->
-
-    <!-- npu="9030" id6 -->
-    Kirin 9030，支持的数据类型为：int8\_t。
-    <!-- end id6 -->
 
 -   非PER\_TOKEN/PER\_GROUP b8/float4场景offset支持的数据类型<a id="li5382122225718"></a>
 
@@ -355,14 +333,6 @@ struct AscendAntiQuantParam {
 
     Atlas 推理系列产品AI Core，支持的数据类型为：half。
 
-    <!-- npu="x90" id7 -->
-    Kirin X90，支持的数据类型为：half。
-    <!-- end id7 -->
-
-    <!-- npu="9030" id8 -->
-    Kirin 9030，支持的数据类型为：half。
-    <!-- end id8 -->
-
 -   非PER\_TOKEN/PER\_GROUP b8/float4场景scale支持的数据类型<a id="li103341450906"></a>
 
     Ascend 950PR/Ascend 950DT，PER\_CHANNEL和PER\_TENSOR场景下支持的数据类型为：half、bfloat16\_t。PER\_GROUP float4场景下支持的数据类型为：fp8\_e8m0\_t。
@@ -372,14 +342,6 @@ struct AscendAntiQuantParam {
     Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half、bfloat16\_t。
 
     Atlas 推理系列产品AI Core，支持的数据类型为：half。
-
-    <!-- npu="x90" id9 -->
-    Kirin X90，支持的数据类型为：half。
-    <!-- end id9 -->
-
-    <!-- npu="9030" id10 -->
-    Kirin 9030，支持的数据类型为：half。
-    <!-- end id10 -->
 
 ## 调用示例
 
