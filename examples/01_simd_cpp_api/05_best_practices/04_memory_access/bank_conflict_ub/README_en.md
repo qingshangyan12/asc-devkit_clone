@@ -77,14 +77,14 @@ This example conducts verification and analysis from two perspectives: bank conf
 
 | Scenario | Formula | Description | Bank Conflict Status | src0 Base Addr | src1 Base Addr | dst Base Addr | Benchmark Perf | Remarks |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | dst = src0 + src1 | src0/src1/dst base addresses distributed across different banks in different bank groups | No read-read or read-write conflict | 0 | 0x10100 | 0x20000 | 2418 | Baseline performance reference (no bank conflict) |
-| 2 | dst = src0 + src1 | src0/src1 base addresses in the same bank | **Read-read conflict** | 0 | 0x4000 | 0x10000 | 4195 | Verify read-read conflict (multiple reads accessing the same bank) |
-| 3 | dst = src0 + src1 | src0/src1 base addresses in the same bank group | **Read-read conflict** | 0 | 0x10000 | 0x14100 | 4195 | Verify read-read conflict (multiple reads accessing the same bank group) |
-| 4 | dst = src0 + src1 | src0/dst base addresses in the same bank | No read-write conflict (hardware optimization) | 0 | 0x10100 | 0x4000 | 2501 | Baseline reference for scenario 5 |
-| 5 | dst = src0 + src1 | src0/dst base addresses not in the same bank | **Read-write conflict** | 0 | 0x10100 | 0x4020 | 3612 | Verify read-write conflict (compare with scenario 4) |
-| 6 | dst = src0 + src1 | src1/dst base addresses in the same bank,<br>src1/dst addresses completely overlap | No read-write conflict (hardware optimization) | 0 | 0x10100 | 0x10100 | 2501 | Verify src/dst address overlap (no read-write conflict, hardware optimization) |
-| 7 | dst = src0 + src1 | src0 repeatedly reads the same datablock on each repeat (src0BlkStride=0, src0RepStride=1),<br>src1/dst addresses completely overlap | **Read-read conflict** | 0 | 0x10100 | 0x10100 | 3778 | Compare with scenario 6/scenario 8, verify correlation between src0RepStride configuration and bank conflicts |
-| 8 | dst = src0 + src1 | src0 repeatedly reads the same datablock on each repeat (src0BlkStride=0, src0RepStride=8),<br>src1/dst addresses completely overlap | No read-read or read-write conflict | 0 | 0x10100 | 0x10100 | 2501 | Compare with scenario 7, verify correlation between src0RepStride configuration and bank conflicts |
+| 1 | dst = src0 + src1 | src0/src1/dst base addresses distributed across different banks in different bank groups | No read-read or read-write conflict | 0 | 0x10100 | 0x20000 | 2390 | Baseline performance reference (no bank conflict) |
+| 2 | dst = src0 + src1 | src0/src1 base addresses in the same bank | **Read-read conflict** | 0 | 0x4000 | 0x10000 | 4167 | Verify read-read conflict (multiple reads accessing the same bank) |
+| 3 | dst = src0 + src1 | src0/src1 base addresses in the same bank group | **Read-read conflict** | 0 | 0x10000 | 0x14100 | 4167 | Verify read-read conflict (multiple reads accessing the same bank group) |
+| 4 | dst = src0 + src1 | src0/dst base addresses in the same bank | No read-write conflict (hardware optimization) | 0 | 0x10100 | 0x4000 | 2389 | Baseline reference for scenario 5 |
+| 5 | dst = src0 + src1 | src0/dst base addresses not in the same bank | **Read-write conflict** | 0 | 0x10100 | 0x4020 | 3751 | Verify read-write conflict (compare with scenario 4) |
+| 6 | dst = src0 + src1 | src1/dst base addresses in the same bank,<br>src1/dst addresses completely overlap | No read-write conflict (hardware optimization) | 0 | 0x10100 | 0x10100 | 2390 | Verify src/dst address overlap (no read-write conflict, hardware optimization) |
+| 7 | dst = src0 + src1 | src0 repeatedly reads the same datablock on each repeat (src0BlkStride=0, src0RepStride=1),<br>src1/dst addresses completely overlap | **Read-read conflict** | 0 | 0x10100 | 0x10100 | 3584 | Compare with scenario 6/scenario 8, verify correlation between src0RepStride configuration and bank conflicts |
+| 8 | dst = src0 + src1 | src0 repeatedly reads the same datablock on each repeat (src0BlkStride=0, src0RepStride=8),<br>src1/dst addresses completely overlap | No read-read or read-write conflict | 0 | 0x10100 | 0x10100 | 2389 | Compare with scenario 7, verify correlation between src0RepStride configuration and bank conflicts |
 
 Detailed analysis for each scenario is provided in the corresponding sections below.
 
