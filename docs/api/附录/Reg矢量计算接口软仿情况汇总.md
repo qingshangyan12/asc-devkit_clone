@@ -18,8 +18,10 @@
 | Mins | int64_t、uint64_t |
 | Div | int16_t、uint16_t、half（SubNormal）、int32_t、uint32_t、float（SubNormal）、complex32、int64_t、uint64_t、complex64 |
 | Neg | int64_t |
-| Ln/log | half（SubNormal）、float（SubNormal） |
-| Log2/log10 | half、float |
+| Ln | half（SubNormal）、float（SubNormal） |
+| Log | half（SubNormal）、float（SubNormal） |
+| Log2 | half、float |
+| Log10 | half、float |
 | Mul | complex32、int64_t、uint64_t、complex64 |
 | Mull | - |
 | Muls | complex32、int64_t、uint64_t、complex64 |
