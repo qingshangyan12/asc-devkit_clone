@@ -28,7 +28,7 @@
 
 头文件路径为：`"basic_api/kernel_common.h"`。
 
-根据MutexID获取Mutex，若Mutex已被锁定，将阻塞后续指定流水指令队列，直到前序指令中对应MutexID的Mutex被[Unlock](Unlock.md)。
+根据MutexID获取Mutex，若Mutex已被锁定，将阻塞后续指定流水指令队列，直到当前流水的前序指令中对应MutexID的Mutex被[Unlock](Unlock.md)。
 
 > [!NOTE]说明
 > Lock接口需与[Unlock](Unlock.md)接口配合使用，对同一个MutexID，Lock和Unlock必须严格成对出现，否则硬件行为将不可预测。具体约束请参见[约束说明](#约束说明)。
