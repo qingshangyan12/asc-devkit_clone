@@ -1145,11 +1145,11 @@ __aicore__ inline void asc_copy_l12l0b_trans(__cb__ half* dst, __cbuf__ half* sr
     asc_copy_l12l0b_trans_impl(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
 }
 
-__aicore__ inline void asc_copy_l12l0b_trans(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint8_t repeat,
-                                             uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement,
+__aicore__ inline void asc_copy_l12l0b_trans(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id,
+                                             uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement,
                                              uint64_t dst_frac_gap)
 {
-    asc_copy_l12l0b_trans_impl(dst, src, 0, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
+    asc_copy_l12l0b_trans_impl(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
 }
 
 __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id,

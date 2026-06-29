@@ -23,7 +23,7 @@ protected:
     namespace {                                                                                                   \
     void cce_name##_##data_type##_##sync_time##_stub(                                                             \
         mem_pos data_type* dst, __cbuf__ data_type* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,  \
-        uint16_t dst_gap, bool addrmode, uint16_t frac_gap)                                                       \
+        uint16_t dst_gap, bool enable_addr_decrement, uint16_t frac_gap)                                          \
     {                                                                                                             \
         EXPECT_EQ(dst, reinterpret_cast<mem_pos data_type*>(11));                                                 \
         EXPECT_EQ(src, reinterpret_cast<__cbuf__ data_type*>(22));                                                \
@@ -32,7 +32,7 @@ protected:
         EXPECT_EQ(src_stride, static_cast<uint16_t>(1));                                                          \
         EXPECT_EQ(dst_gap, static_cast<uint16_t>(8));                                                             \
         EXPECT_EQ(frac_gap, static_cast<uint16_t>(8));                                                            \
-        EXPECT_EQ(addrmode, false);                                                                               \
+        EXPECT_EQ(enable_addr_decrement, false);                                                                  \
     }                                                                                                             \
     }                                                                                                             \
     TEST_F(TestCubeDatamoveCopyL12l0Trans, c_api_name##_##data_type##_##sync_time##_Succ)                         \
