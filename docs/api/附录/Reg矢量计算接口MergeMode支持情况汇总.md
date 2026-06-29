@@ -87,7 +87,7 @@
 
 | 接口     | 硬件支持模式           | 软件支持模式 |
 | :------- | :--------------------- | :----------- |
-| Cast     | MaskMergeMode::ZEROING | 待补充       |
+| Cast     | MaskMergeMode::ZEROING | -            |
 | Truncate | MaskMergeMode::ZEROING | -            |
 
 **表8**  归约计算接口MergeMode支持情况
