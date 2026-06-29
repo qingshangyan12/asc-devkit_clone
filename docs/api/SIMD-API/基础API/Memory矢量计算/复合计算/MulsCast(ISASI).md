@@ -76,7 +76,7 @@ __aicore__ inline void MulsCast(const T2 &dst, const T3 &src0, const T4 &src1, c
 
 ## 数据类型
 <!-- npu="950" id8 -->
-- 针对Ascend 950PR/Ascend 950DT，src支持的数据类型为：float。dst支持的数据类型为：half。
+针对Ascend 950PR/Ascend 950DT，src支持的数据类型为：float。dst支持的数据类型为：half。
 <!-- end id8 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>

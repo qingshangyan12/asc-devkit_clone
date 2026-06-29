@@ -59,7 +59,7 @@ __aicore__ inline void AbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &s
 
 ## 数据类型
 <!-- npu="950" id8 -->
-- 针对Ascend 950PR/Ascend 950DT，T支持的数据类型为：half、float。
+针对Ascend 950PR/Ascend 950DT，T支持的数据类型为：half、float。
 <!-- end id8 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
