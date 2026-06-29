@@ -9,19 +9,19 @@ UB_ADDR[18:0] = {BANK_DEPTH[8:0], BANK[0], BG[2:0], BANK_WIDTH[4:0]}
 
 **图1**  bank结构示意图（图中箭头方向表示内存排布的顺序）<a name="fig873359165316"></a>  
 
-![](/docs/api/figures/950_UB内存结构图.png "950_UB内存结构图")
+![](../../../../../../docs/api/figures/950_UB内存结构图.png "950_UB内存结构图")
 
 3510架构使用低位编址，地址排布可以看为：
 
 **图2** 低位地址交织排布
 
-![](/docs/guide/figures/低位交织地址排布.png "低位交织地址排布")
+![](../../../../figures/低位交织地址排布.png "低位交织地址排布")
 
 每个bank可分为4个subbank，每个subbank宽度为8B，subnbank仅在gather/scatter场景被感知，连续读写只感知到bank。
 
 **图3** subbank结构
 
-![](/docs/guide/figures/subbank结构.png "subbank结构")
+![](../../../../figures/subbank结构.png "subbank结构")
 
 ## bank冲突的典型场景<a name="section9689957379"></a>
 

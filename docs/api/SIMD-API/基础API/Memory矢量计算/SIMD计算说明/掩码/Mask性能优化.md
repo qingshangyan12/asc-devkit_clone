@@ -14,6 +14,6 @@
 
 **图1** 代码优化
 
-![](/docs/api/figures/代码优化.png "代码优化")
+![](../../../../../figures/代码优化.png "代码优化")
 
 理论分析：SetMaskCount、SetMask、ResetMask、SetMaskNorm四个接口，每个接口调用耗时1cycle，连续调用180次Adds计算接口，共节省4 ×180 = 720cycles。
