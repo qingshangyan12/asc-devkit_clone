@@ -146,27 +146,28 @@
 - 针对Ascend 950PR/Ascend 950DT，`int64_t`/`uint64_t`数据类型仅支持tensor前n个数据计算接口。
 <!-- end id21 -->
 - `srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
-<!-- npu="950,910,310p,310b,x90,9030" id1 -->
+
+  <!-- npu="950,910,310p,310b,x90,9030" id37 -->
 - 针对以下型号，模板参数`isSetMask`参数不生效，保持默认值即可：
-  <!-- npu="950" id2 -->
+  <!-- npu="950" id31 -->
   - Ascend 950PR/Ascend 950DT
-  <!-- end id2 -->
-  <!-- npu="310b" id3 -->
+  <!-- end id31 -->
+  <!-- npu="310b" id32 -->
   - Atlas 200I/500 A2 推理产品
-  <!-- end id3 -->
-  <!-- npu="310p" id4 -->
+  <!-- end id32 -->
+  <!-- npu="310p" id33 -->
   - Atlas 推理系列产品AI Core
-  <!-- end id4 -->
-  <!-- npu="910" id5 -->
+  <!-- end id33 -->
+  <!-- npu="910" id34 -->
   - Atlas 训练系列产品
-  <!-- end id5 -->
-  <!-- npu="x90" id6 -->
+  <!-- end id34 -->
+  <!-- npu="x90" id35 -->
   - Kirin X90
-  <!-- end id6 -->
-  <!-- npu="9030" id7 -->
+  <!-- end id35 -->
+  <!-- npu="9030" id36 -->
   - Kirin 9030
-  <!-- end id7 -->
-  <!-- end id1 -->
+  <!-- end id36 -->
+  <!-- end id37 -->
 
 ## 关键特性说明
 

@@ -23,7 +23,6 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
-<!-- npu="x90" id8 -->
 
 <!-- npu="A3,910b" id9 -->
 >[!NOTE]说明
@@ -33,15 +32,17 @@
 
 ## 功能说明<a name="section17600329101418"></a>
 
+头文件路径为：`"basic_api/kernel_operator_vec_scatter_intf.h"`。
+
 给定一个连续的输入张量和一个目的地址偏移张量，Scatter指令根据偏移地址生成新的结果张量后将输入张量分散到结果张量中。
 
-将源操作数src中的元素按照指定的位置（由dst\_offset和base\_addr共同作用）分散到目的操作数dst中。
+将源操作数src中的元素按照指定的位置（由dstOffset和dstBaseAddr共同作用）分散到目的操作数dst中。
 
 ## 函数原型<a name="section15660625202219"></a>
 
 -   tensor前n个数据计算
 
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline void Scatter(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& dstOffset, const uint32_t dstBaseAddr, const uint32_t count)
     ```
@@ -49,14 +50,14 @@
 -   tensor高维切分计算
     -   mask逐bit模式
 
-        ```
+        ```cpp
         template <typename T>
         __aicore__ inline void Scatter(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& dstOffset, const uint32_t dstBaseAddr, const uint64_t mask[], const uint8_t repeatTime, const uint8_t srcRepStride)
         ```
 
     -   mask连续模式
 
-        ```
+        ```cpp
         template <typename T>
         __aicore__ inline void Scatter(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& dstOffset, const uint32_t dstBaseAddr, const uint64_t mask, const uint8_t repeatTime, const uint8_t srcRepStride)
         ```
@@ -153,14 +154,14 @@ Atlas 推理系列产品AI Core，支持的数据类型为：uint16_t、half、u
 
 完整使用样例请参见[Scatter兼容性样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/06_compatibility_guide/scatter)。
 
-```
+```cpp
 uint32_t COUNT = 128;
 AscendC::Scatter(dstLocal, srcLocal, dstOffsetLocal, (uint32_t)0, COUNT); // dstOffsetLocal用于存储源操作数的每个元素在dst中对应的地址偏移
 ```
 
 结果示例：
 
-```
+```plain
 输入数据dstOffsetLocal:
 [254 252 250 ... 4 2 0]
 输入数据srcLocal（128个half类型数据）: 
