@@ -153,19 +153,28 @@ __aicore__ static inline int64_t GetCtrlSprImpl()
 
 namespace Internal {
 template <SaturationMode mode>
+__aicore__ inline constexpr bool IsSupportedSaturationMode()
+{
+    return mode == SaturationMode::FLOAT || mode == SaturationMode::INT || mode == SaturationMode::CAST;
+}
+
+template <SaturationMode mode>
 __aicore__ inline constexpr int8_t GetSaturationModeBit()
 {
-    // FLOAT => bit 48; FLOAT8 => bit 50; INT => bit 53; CAST => bit 59; SAT_GLOBAL => bit 60
+    static_assert(IsSupportedSaturationMode<mode>(), "SaturationMode is not supported on current platform!");
     if constexpr(mode == SaturationMode::FLOAT) {
         return 48; // 0 => sat, 1 => no sat
     } else if constexpr(mode == SaturationMode::INT) {
-        return 53; // 0 => trunk, 1 => sat (正常)
-    } else if constexpr(mode == SaturationMode::CAST) {
-        return 59; // 0 => sat, 1 => trunk (正常)
+        return 53; // 0 => truncation, 1 => saturation
     } else {
-        // not support
-        
+        return 59; // 0 => saturation, 1 => truncation
     }
+}
+
+template <SaturationMode mode>
+__aicore__ inline constexpr bool IsSaturationEnableBitOne()
+{
+    return mode == SaturationMode::INT;
 }
 
 template <SaturationMode mode>
@@ -173,7 +182,12 @@ __aicore__ static inline void SetSaturationFlagImpl(bool enableSat)
 {
     constexpr int8_t sprBit = GetSaturationModeBit<mode>();
     int64_t ctrlValue = get_ctrl();
-    uint64_t value = enableSat ? (sbitset0(ctrlValue, sprBit)) : sbitset1(ctrlValue, sprBit);  // bit=0 means saturate
+    uint64_t value;
+    if constexpr (IsSaturationEnableBitOne<mode>()) {
+        value = enableSat ? sbitset1(ctrlValue, sprBit) : sbitset0(ctrlValue, sprBit);
+    } else {
+        value = enableSat ? sbitset0(ctrlValue, sprBit) : sbitset1(ctrlValue, sprBit);
+    }
     set_ctrl(value);
 }
 
@@ -181,8 +195,12 @@ template <SaturationMode mode>
 __aicore__ static inline bool GetSaturationFlagImpl()
 {
     constexpr int8_t sprBit = GetSaturationModeBit<mode>();
-    int64_t value = (get_ctrl() >> sprBit) & 1;   // current value is bit value. value=0 means saturate=true
-    return !value;
+    int64_t value = (get_ctrl() >> sprBit) & 1;
+    if constexpr (IsSaturationEnableBitOne<mode>()) {
+        return value != 0;
+    } else {
+        return value == 0;
+    }
 }
 } // namespace Internal
 

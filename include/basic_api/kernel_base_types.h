@@ -25,11 +25,10 @@
 namespace AscendC {
 
 enum class SaturationMode : uint8_t {
-    FLOAT, // 48, A2/A3/A5/
-    FLOAT8, // 50, A5
-    INT, // 53, A2/A3/A5
-    CAST, // 59, A2/A3/A5
-    SAT_GLOBAL // 60, A5
+    FLOAT,  // CTRL[48]
+    FLOAT8, // CTRL[50]
+    INT,    // CTRL[53]
+    CAST,   // CTRL[59]
 };
 
 } // namespace AscendC
