@@ -1970,11 +1970,11 @@ export default {
                     },
                     {
                       "text": "Conv2D（废弃）",
-                      "link": "/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Conv2D（废弃）"
+                      "link": "/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Conv2D_deprecated"
                     },
                     {
                       "text": "Gemm（废弃）",
-                      "link": "/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Gemm（废弃）"
+                      "link": "/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Gemm_deprecated"
                     }
                   ]
                 }
@@ -5942,11 +5942,11 @@ export default {
                     },
                     {
                       "text": "Init（废弃）",
-                      "link": "/api/SIMD-API/高阶API/HCCL通信类/HCCL-Kernel侧接口/Init（废弃）"
+                      "link": "/api/SIMD-API/高阶API/HCCL通信类/HCCL-Kernel侧接口/Init_deprecated"
                     },
                     {
                       "text": "SetCcTiling（废弃）",
-                      "link": "/api/SIMD-API/高阶API/HCCL通信类/HCCL-Kernel侧接口/SetCcTiling（废弃）"
+                      "link": "/api/SIMD-API/高阶API/HCCL通信类/HCCL-Kernel侧接口/SetCcTiling_deprecated"
                     }
                   ]
                 },
@@ -6016,11 +6016,11 @@ export default {
                     },
                     {
                       "text": "v1版本TilingData（废弃）",
-                      "link": "/api/SIMD-API/高阶API/HCCL通信类/HCCL-Tiling侧接口/v1版本TilingData（废弃）"
+                      "link": "/api/SIMD-API/高阶API/HCCL通信类/HCCL-Tiling侧接口/v1版本TilingData_deprecated"
                     },
                     {
                       "text": "v2版本TilingData（废弃）",
-                      "link": "/api/SIMD-API/高阶API/HCCL通信类/HCCL-Tiling侧接口/v2版本TilingData（废弃）"
+                      "link": "/api/SIMD-API/高阶API/HCCL通信类/HCCL-Tiling侧接口/v2版本TilingData_deprecated"
                     }
                   ]
                 },
@@ -9824,7 +9824,7 @@ export default {
                 },
                 {
                   "text": "UnknownShapeFormat（废弃）",
-                  "link": "/api/Utils-API/原型注册与管理/OpParamDef/UnknownShapeFormat（废弃）"
+                  "link": "/api/Utils-API/原型注册与管理/OpParamDef/UnknownShapeFormat_deprecated"
                 },
                 {
                   "text": "ValueDepend",
