@@ -86,7 +86,7 @@ $dst_i = src0_i | src1_i$
 | count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。 |
 | mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](../SIMD计算说明/掩码/掩码.md)。 |
 | repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体说明请参考[高维切分](../SIMD计算说明/高维切分.md)。 |
-| repeatParams | 输入 | 控制操作数地址步长的参数。[BinaryRepeatParams](../../数据结构/辅助数据结构//BinaryRepeatParams.md)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md)。 |
+| repeatParams | 输入 | 控制操作数地址步长的参数。[BinaryRepeatParams](../../数据结构/辅助数据结构/BinaryRepeatParams.md)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md)。 |
 
 ## 数据类型
 
@@ -159,6 +159,10 @@ $dst_i = src0_i | src1_i$
       <!-- end id28 -->
     <!-- end id26 -->
 <!-- end id21 -->
+<!-- npu="950" id29 -->
+- 针对Ascend 950PR/Ascend 950DT，有如下约束说明：
+  - 该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
+  <!-- end id29 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
@@ -190,7 +194,7 @@ $dst_i = src0_i | src1_i$
 
 结果示例如下：
 
-```bash
+```plain
 输入数据src0Local：[1 2 3 ... 512]
 输入数据src1Local：[513 512 511 ... 2]
 输出数据dstLocal：[513 514 511 ... 514]
