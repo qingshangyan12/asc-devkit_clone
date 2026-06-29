@@ -16,7 +16,7 @@ AI CPU启动下发通信任务前，需获取固定的通信配置[Mc2Msg](#tabl
 <a name="table4835205712588"></a>
 | 参数名 | 描述 |
 | --- | --- |
-| preparePosition | 设置服务端组装任务的方式，用户需要在Tiling中显式赋值，uint32_t类型，当前支持的取值如下：<br><br>1：AI CPU与AI Core通过通信任务机制实现消息传递和任务下发；由AI Core侧通过消息通知时设置为1，即算子中使用[HCCL](../HCCL-Kernel侧接口/HCCL-Kernel侧接口.md)时设置为1。 |
+| preparePosition | 设置服务端组装任务的方式，用户需要在Tiling中显式赋值，uint32_t类型，当前支持的取值如下：1：AI CPU与AI Core通过通信任务机制实现消息传递和任务下发；由AI Core侧通过消息通知时设置为1，即算子中使用[HCCL](../HCCL-Kernel侧接口/HCCL-Kernel侧接口.md)时设置为1。 |
 | sendOff | 预留参数，不可配置。 |
 | recvOff | 预留参数，不可配置。 |
 | tailSendOff | 预留参数，不可配置。 |
@@ -44,7 +44,7 @@ AI CPU启动下发通信任务前，需获取固定的通信配置[Mc2Msg](#tabl
 | waitPolicy | 预留参数，不可配置。 |
 | rspPolicy | 预留参数，不可配置。 |
 | exitPolicy | 预留参数，不可配置。 |
-| commAlg | 设置具体通信算法，用户需要在Tiling中显式赋值，uint8_t类型，当前支持的取值如下：<br><br>1：FullMesh算法，即NPU之间的全连接，任意两个NPU之间可以直接进行数据收发。 |
+| commAlg | 设置具体通信算法，用户需要在Tiling中显式赋值，uint8_t类型，当前支持的取值如下：1：FullMesh算法，即NPU之间的全连接，任意两个NPU之间可以直接进行数据收发。 |
 | taskType | 预留参数，不可配置。 |
 | debugMode | 预留参数，不可配置。 |
 | stepSize | 预留参数，不可配置。 |

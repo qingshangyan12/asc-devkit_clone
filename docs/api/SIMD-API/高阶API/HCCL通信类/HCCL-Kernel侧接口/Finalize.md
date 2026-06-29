@@ -25,7 +25,7 @@ __aicore__ inline void Finalize()
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| sync | 输入 | 是否需要等待服务端的通信完成。bool类型，参数取值如下：<br>true：默认值，表示客户端将检测并等待最后一个通信任务完成。<br>false：表示客户端不会等待通信任务完成，而是直接退出。<br><br>Atlas A3 训练系列产品/Atlas A3 推理系列产品，该参数支持默认值true，仅在通信任务为[BatchWrite](BatchWrite.md)时，支持取值为false。<br><br>Atlas A2 训练系列产品/Atlas A2 推理系列产品，该参数仅支持默认值true。 |
+| sync | 输入 | 是否需要等待服务端的通信完成。bool类型，参数取值如下：<br>true：默认值，表示客户端将检测并等待最后一个通信任务完成。<br>false：表示客户端不会等待通信任务完成，而是直接退出。Atlas A3 训练系列产品/Atlas A3 推理系列产品，该参数支持默认值true，仅在通信任务为[BatchWrite](BatchWrite.md)时，支持取值为false。Atlas A2 训练系列产品/Atlas A2 推理系列产品，该参数仅支持默认值true。 |
 
 ## 返回值说明
 

@@ -40,9 +40,9 @@ __aicore__ inline HcclHandle BatchWrite(GM_ADDR batchWriteInfo, uint32_t itemNum
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| batchWriteInfo | 输入 | 通信任务信息的Global Memory地址。一组通信数据的相关信息必须按指定的格式保存，在执行通信任务时，可以同时指定多组通信任务信息，执行通信任务时批量发送数据。结构体定义如下代码所示。<br><br>对于Atlas A3 训练系列产品/Atlas A3 推理系列产品：<br>type：预留参数，取值为0。<br>res1[5]：预留参数，无需填写该值。<br>length：待拷贝数据的长度。<br>srcAddrLow：待拷贝数据的源地址低32位。<br>srcAddrHigh：待拷贝数据的源地址高32位。<br>dstAddrLow：待拷贝数据的目的地址低32位。<br>dstAddrHigh：待拷贝数据的目的地址高32位。<br>res2[4]：预留参数，无需填写该值。<br><br>对于Atlas A2 训练系列产品/Atlas A2 推理系列产品：<br>localBuf：本端发送数据的window地址。<br>remoteBuf：对端接收数据的window地址。<br>count：该通信任务发送的数据个数。<br>dataType：该通信任务发送的数据类型，支持的类型可参考[HcclDataType参数说明](HCCL使用说明.md#table116710585514)。<br>remoteRankId：该通信任务发送数据的目的卡卡号。 |
-| itemNum | 输入 | 批量任务的个数。该参数取值必须与batchWriteInfo中通信任务信息的组数一致。<br><br>对于Atlas A3 训练系列产品/Atlas A3 推理系列产品，该参数取值不能大于等于2048。 |
-| queueID | 输入 | 指定当前通信所在的队列ID，默认值为0。<br><br>Atlas A2 训练系列产品/Atlas A2 推理系列产品，该参数仅支持取值为0。 |
+| batchWriteInfo | 输入 | 通信任务信息的Global Memory地址。一组通信数据的相关信息必须按指定的格式保存，在执行通信任务时，可以同时指定多组通信任务信息，执行通信任务时批量发送数据。结构体定义如下代码所示。对于Atlas A3 训练系列产品/Atlas A3 推理系列产品：<br>type：预留参数，取值为0。<br>res1[5]：预留参数，无需填写该值。<br>length：待拷贝数据的长度。<br>srcAddrLow：待拷贝数据的源地址低32位。<br>srcAddrHigh：待拷贝数据的源地址高32位。<br>dstAddrLow：待拷贝数据的目的地址低32位。<br>dstAddrHigh：待拷贝数据的目的地址高32位。<br>res2[4]：预留参数，无需填写该值。对于Atlas A2 训练系列产品/Atlas A2 推理系列产品：<br>localBuf：本端发送数据的window地址。<br>remoteBuf：对端接收数据的window地址。<br>count：该通信任务发送的数据个数。<br>dataType：该通信任务发送的数据类型，支持的类型可参考[HcclDataType参数说明](HCCL使用说明.md#table116710585514)。<br>remoteRankId：该通信任务发送数据的目的卡卡号。 |
+| itemNum | 输入 | 批量任务的个数。该参数取值必须与batchWriteInfo中通信任务信息的组数一致。对于Atlas A3 训练系列产品/Atlas A3 推理系列产品，该参数取值不能大于等于2048。 |
+| queueID | 输入 | 指定当前通信所在的队列ID，默认值为0。Atlas A2 训练系列产品/Atlas A2 推理系列产品，该参数仅支持取值为0。 |
 
 ```
 // Atlas A3 训练系列产品/Atlas A3 推理系列产品

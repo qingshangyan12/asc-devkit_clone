@@ -38,14 +38,14 @@ __aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void *sendCounts, void *
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | sendBuf | 输入 | 源数据buffer地址。 |
-| sendCounts | 输入 | 本卡向通信域内其它每张卡发送的数据量，sendCounts[i]表示本卡发送到第i张卡rank_i的数据量，单位是sizeof(sendType)。<br><br>sendCounts是一个uint64_t类型的数组，数组长度必须为通信域内总rank数。<br><br>例如：sendBuf内数据的数据类型为fp16，sendCounts[0]=1，sendCounts[1]=2，表示本rank给rank0发送1个fp16数据，给rank1发送2个fp16数据。 |
-| sdispls | 输入 | 本卡向其它卡发送的数据在sendBuf中的偏移，sdispls[i]=n表示本卡发送给rank_i的数据块在sendBuf中的偏移数据量为n。<br><br>sdispls是一个uint64_t类型的数组，数组长度必须为通信域内总rank数。 |
+| sendCounts | 输入 | 本卡向通信域内其它每张卡发送的数据量，sendCounts[i]表示本卡发送到第i张卡rank_i的数据量，单位是sizeof(sendType)。sendCounts是一个uint64_t类型的数组，数组长度必须为通信域内总rank数。例如：sendBuf内数据的数据类型为fp16，sendCounts[0]=1，sendCounts[1]=2，表示本rank给rank0发送1个fp16数据，给rank1发送2个fp16数据。 |
+| sdispls | 输入 | 本卡向其它卡发送的数据在sendBuf中的偏移，sdispls[i]=n表示本卡发送给rank_i的数据块在sendBuf中的偏移数据量为n。sdispls是一个uint64_t类型的数组，数组长度必须为通信域内总rank数。 |
 | sendType | 输入 | sendBuf内数据的数据类型，目前支持HcclDataType包含的全部数据类型，HcclDataType详细可参考[表1](HCCL使用说明.md#table116710585514)。 |
 | recvBuf | 输出 | 目的数据buffer地址，集合通信结果输出到此buffer中。 |
-| recvCounts | 输入 | 本卡从其它卡接收的数据量，recvCounts[i]表示本rank接收到的来自rank_i的数据个数，单位是sizeof(recvType)。<br><br>recvCounts是一个uint64_t类型的数组，数组长度必须为通信域内总rank数。<br><br>例如：recvBuf内数据的数据类型为fp16，recvCounts[0]=1，recvCounts[1]=2，表示本rank接收到rank0的1个fp16数据，接收到rank1的2个fp16数据。 |
-| rdispls | 输入 | 本卡接收的数据存放在recvBuf中的偏移，rdispls[i]=n表示本卡接收到的rank_i的数据块在recvBuf中的偏移数据量为n。<br><br>rdispls是一个uint64_t类型的数组，数组长度必须为通信域内总rank数。 |
-| recvType | 输入 | recvBuf内数据的数据类型，目前支持HcclDataType包含的全部数据类型，HcclDataType详细可参考[表1](HCCL使用说明.md#table116710585514)。<br><br>注意：recvType和sendType必须一致。 |
-| repeat | 输入 | 一次下发的AlltoAllV通信任务个数。repeat取值≥1，默认值为1。当repeat>1时，每个AlltoAllV任务的sendBuf\sendCounts\recvBuf\recvCounts参数不变，sdispls和rdispls由服务端更新，每一轮任务i的更新公式如下：<br><br>sdispls[i] = sdispls[i] + sendCounts[i], i∈[0, sdispls.size())<br><br>rdispls[i] = rdispls[i] + recvCounts[i], i∈[0, rdispls.size())<br><br>注意：当设置repeat>1时，须根据此计算公式，规划通信内存。 |
+| recvCounts | 输入 | 本卡从其它卡接收的数据量，recvCounts[i]表示本rank接收到的来自rank_i的数据个数，单位是sizeof(recvType)。recvCounts是一个uint64_t类型的数组，数组长度必须为通信域内总rank数。例如：recvBuf内数据的数据类型为fp16，recvCounts[0]=1，recvCounts[1]=2，表示本rank接收到rank0的1个fp16数据，接收到rank1的2个fp16数据。 |
+| rdispls | 输入 | 本卡接收的数据存放在recvBuf中的偏移，rdispls[i]=n表示本卡接收到的rank_i的数据块在recvBuf中的偏移数据量为n。rdispls是一个uint64_t类型的数组，数组长度必须为通信域内总rank数。 |
+| recvType | 输入 | recvBuf内数据的数据类型，目前支持HcclDataType包含的全部数据类型，HcclDataType详细可参考[表1](HCCL使用说明.md#table116710585514)。注意：recvType和sendType必须一致。 |
+| repeat | 输入 | 一次下发的AlltoAllV通信任务个数。repeat取值≥1，默认值为1。当repeat>1时，每个AlltoAllV任务的sendBuf\sendCounts\recvBuf\recvCounts参数不变，sdispls和rdispls由服务端更新，每一轮任务i的更新公式如下：sdispls[i] = sdispls[i] + sendCounts[i], i∈[0, sdispls.size())rdispls[i] = rdispls[i] + recvCounts[i], i∈[0, rdispls.size())注意：当设置repeat>1时，须根据此计算公式，规划通信内存。 |
 
 ## 返回值说明
 

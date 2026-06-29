@@ -30,8 +30,8 @@ class Hccl;
 <a name="table884518212555"></a>
 | 参数名称 | 描述 |
 | --- | --- |
-| serverType | 支持的服务端类型。HcclServerType枚举类型，取值如下。<br>HCCL_SERVER_TYPE_AICPU：AI CPU服务端。<br>HCCL_SERVER_TYPE_CCU：CCU服务端。<br>HCCL_SERVER_TYPE_END：预留参数，不支持使用。<br><br>对于Ascend 950PR/Ascend 950DT，当前仅支持HCCL_SERVER_TYPE_CCU。<br><br>对于Atlas A3 训练系列产品/Atlas A3 推理系列产品，当前仅支持HCCL_SERVER_TYPE_AICPU。<br><br>对于Atlas A2 训练系列产品/Atlas A2 推理系列产品，当前仅支持HCCL_SERVER_TYPE_AICPU。 |
-| config | 用于指定向服务端下发任务的核。HcclServerConfig类型，定义如下代码所示，含义如下。<br><br>type：向服务端下发任务的核的类型。CoreType类型，可取值为：<br>DEFAULT：表示不指定AIC核或者AIV核。<br>ON_AIV：表示指定为AIV核。<br>ON_AIC：表示指定为AIC核。<br><br>blockId：向服务端下发任务的核的ID。<br><br>默认值DEFAULT_CFG = {CoreType::DEFAULT, 0}。 |
+| serverType | 支持的服务端类型。HcclServerType枚举类型，取值如下。<br>HCCL_SERVER_TYPE_AICPU：AI CPU服务端。<br>HCCL_SERVER_TYPE_CCU：CCU服务端。<br>HCCL_SERVER_TYPE_END：预留参数，不支持使用。对于Ascend 950PR/Ascend 950DT，当前仅支持HCCL_SERVER_TYPE_CCU。对于Atlas A3 训练系列产品/Atlas A3 推理系列产品，当前仅支持HCCL_SERVER_TYPE_AICPU。对于Atlas A2 训练系列产品/Atlas A2 推理系列产品，当前仅支持HCCL_SERVER_TYPE_AICPU。 |
+| config | 用于指定向服务端下发任务的核。HcclServerConfig类型，定义如下代码所示，含义如下。type：向服务端下发任务的核的类型。CoreType类型，可取值为：<br>DEFAULT：表示不指定AIC核或者AIV核。<br>ON_AIV：表示指定为AIV核。<br>ON_AIC：表示指定为AIC核。blockId：向服务端下发任务的核的ID。默认值DEFAULT_CFG = {CoreType::DEFAULT, 0}。 |
 
 ```
 enum HcclServerType {
