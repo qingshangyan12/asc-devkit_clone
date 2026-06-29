@@ -283,7 +283,7 @@ HcclResult AlignedReduceScatterDoubleRingWithSerialLocalCopy::RunReduceScatter(c
         std::vector<DeviceMem> localDstMemsMain;
         std::vector<DeviceMem> localSrcMemsSub;
         std::vector<DeviceMem> localDstMemsSub;
-        CHK_RET(PreRunStreams(step, rankSize,
+        CHK_RET(PreRunStreams(step, rankSize, 
             txSliceIdxMain, rxSliceIdxMain, subSliceIdxMain,
             txSliceIdxSub, rxSliceIdxSub, subSliceIdxSub,
             txReduceMemsMain, rxReduceMemsMain, txReduceMemsSub, rxReduceMemsSub,

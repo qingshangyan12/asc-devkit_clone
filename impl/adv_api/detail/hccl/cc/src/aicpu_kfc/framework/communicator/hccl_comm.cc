@@ -925,7 +925,7 @@ HcclResult hcclComm::CommCheckErrorCqe(HcclResult &result)
 HcclResult hcclComm::CommCheckOpInconsistentError(HcclResult &result)
 {
     CHK_RET(communicator_->GetOpInconsistentError(result));
-
+ 
     return HCCL_SUCCESS;
 }
 
@@ -1446,14 +1446,14 @@ HcclResult hcclComm::GetRemoteCCLBuf(uint32_t remoteRank, void **addr, uint64_t 
     CHK_RET(communicator_->GetRemoteCCLBuf(remoteRank, addr, size));
     return HCCL_SUCCESS;
 }
-
+ 
 HcclResult hcclComm::SetGroupMode(bool isGroup){
     isGroupMode_ = isGroup;
     CHK_SMART_PTR_NULL(communicator_);
     CHK_RET(communicator_->SetGroupMode(isGroup));
     return HCCL_SUCCESS;
 }
-
+ 
 bool hcclComm::GetGroupMode(){
     return isGroupMode_;
 }

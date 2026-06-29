@@ -121,7 +121,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 **1、非对齐数据搬入原理**
 
-**图 1**  非对齐搬入示例<a id="fig-loadunalign-1"></a>
+**图 1**  非对齐搬入示例<a id="fig-loadunalign-1"></a>  
 ![](../../../../figures/reg_loadunalign.png)
 
 如[图1 非对齐搬入示例](#fig-loadunalign-1)所示，从UB地址srcAddr ~ 304读取数据，并将其搬运至目标寄存器dstReg（256B）。处理流程如下：
@@ -132,7 +132,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 **2、连续非对齐搬入搬出示例**
 
-**图 2**  连续非对齐搬入搬出示例（数据类型uint32_t）<a id="fig-loadunalign-2"></a>
+**图 2**  连续非对齐搬入搬出示例（数据类型uint32_t）<a id="fig-loadunalign-2"></a>  
 ![](../../../../figures/reg_loadstoreunalign.png)
 
 **连续非对齐搬入时，LoadUnAlign会将后续未对齐的数据缓存至ureg，所以下一次搬入不需要再次调用LoadUnAlignPre，只需在迭代开始前调用一次LoadUnAlignPre，从而实现非对齐搬入的性能优化。**

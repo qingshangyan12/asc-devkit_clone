@@ -22,15 +22,15 @@ public:
 
     /* 图模式使用该prepare */
     HcclResult Prepare(AlltoAllVBufferInfo& sendBuffer, AlltoAllVBufferInfo& recvBuffer,
-        bool isAlltoAllZCopyMode, const Stream &stream, HcclWorkflowMode workMode,
-        std::map<u32, std::vector<u64>> &rankSendDisplsMap,
+        bool isAlltoAllZCopyMode, const Stream &stream, HcclWorkflowMode workMode, 
+        std::map<u32, std::vector<u64>> &rankSendDisplsMap, 
         std::map<u32, std::vector<u64>> &rankRecvDisplsMap) override;
 
     /* 单算子使用该prepare */
     HcclResult Prepare(AlltoAllVBufferInfo& sendBuffer, AlltoAllVBufferInfo& recvBuffer,
         DeviceMem& scratchInputMem, DeviceMem& scratchOutputMem,
-        bool isAlltoAllZCopyMode, const Stream &stream, HcclWorkflowMode workMode,
-        std::map<u32, std::vector<u64>> &rankSendDisplsMap,
+        bool isAlltoAllZCopyMode, const Stream &stream, HcclWorkflowMode workMode, 
+        std::map<u32, std::vector<u64>> &rankSendDisplsMap, 
         std::map<u32, std::vector<u64>> &rankRecvDisplsMap) override;
     HcclResult RunAsync(const u32 rank, const u32 rankSize, const std::vector<LINK> &links) override;
     HcclResult GetNslbAdjInfo(const u32 rank, const u32 rankSize,

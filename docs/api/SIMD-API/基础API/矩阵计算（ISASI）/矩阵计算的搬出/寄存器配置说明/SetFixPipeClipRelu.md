@@ -200,7 +200,7 @@ SetFixPipeClipRelu(clipReluMaxVal); // 开启ReLU的情况下，先进行ReLU操
             };
             // 不开启ReLU与channelSplit
             AscendC::DataCopyCO12DstParams intriParams(nSize, mSize, dstStride, srcStride, deqMode, 0, false, nz2ndEn);
-
+           
             // mov l0c to gm, deq scalar quant
             AscendC::SetFixpipePreQuantFlag(deqScalar);  // 设置量化参数
             AscendC::PipeBarrier<PIPE_FIX>();
@@ -221,7 +221,7 @@ SetFixPipeClipRelu(clipReluMaxVal); // 开启ReLU的情况下，先进行ReLU操
             // AscendC::SetFixPipeConfig(deqFB);
             // AscendC::PipeBarrier<PIPE_FIX>();
             // // mov l0c to gm，量化操作后开启ClipReLU操作
-            // intriParams.clipReluPre = 1;
+            // intriParams.clipReluPre = 1; 
             // // 设置clip ReLU的值到寄存器
             // uint64_t clipReluVal = 0x3c00; // value 1, half
             // SetFixPipeClipRelu(clipReluVal);
@@ -233,7 +233,7 @@ SetFixPipeClipRelu(clipReluMaxVal); // 开启ReLU的情况下，先进行ReLU操
             // AscendC::PipeBarrier<PIPE_ALL>();
             // // 将存放element-wise tensor的地址设置到寄存器里
             // SetFixPipeAddr(eleWiseTensor, 1);
-
+    
             // AscendC::DataCopy(dstGlobal, dstCO1, intriParams);
             // inQueueDeqA1.FreeTensor(workA1);
             // inQueueDeqFB.FreeTensor(deqFB);
@@ -290,3 +290,4 @@ SetFixPipeClipRelu(clipReluMaxVal); // 开启ReLU的情况下，先进行ReLU操
         }
     KERNEL_CUBE_DATACOPY(half, int8_t, int8_t, int32_t, 128, 1, 1, QuantMode_t::DEQF16);
     ```
+    

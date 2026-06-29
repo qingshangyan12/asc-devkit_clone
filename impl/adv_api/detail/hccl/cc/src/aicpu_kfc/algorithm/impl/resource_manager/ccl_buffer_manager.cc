@@ -60,7 +60,7 @@ HcclResult CCLBufferManager::CreateCommCCLbuffer(const std::string &bufferName)
     if (winExpBufferSize_ == 0) {
         winExpBufferSize_ = EXP_BUFFER_SIZE;
     }
-
+ 
     if (cclBuffer_.ptr() == nullptr) {
         u64 totalSize = inCCLbufferSize_ + outCCLbufferSize_ + winExpBufferSize_;
         // buffername非空则申请共享cclbuffer
@@ -72,17 +72,17 @@ HcclResult CCLBufferManager::CreateCommCCLbuffer(const std::string &bufferName)
             CHK_RET(hrtMemSet(cclBuffer_.ptr(), totalSize, totalSize));
         }
     }
-
+ 
     if (inCCLbuffer_.ptr() == nullptr) {
         inCCLbuffer_ = DeviceMem::create(cclBuffer_.ptr(), inCCLbufferSize_);
     }
-
+ 
     if (outCCLbuffer_.ptr() == nullptr) {
         outCCLbuffer_ = DeviceMem::create(static_cast<u8 *>(cclBuffer_.ptr()) + inCCLbufferSize_, outCCLbufferSize_);
     }
-
+    
     if (winExpBuffer_.ptr() == nullptr) {
-        winExpBuffer_ = DeviceMem::create(static_cast<u8 *>(cclBuffer_.ptr()) + inCCLbufferSize_ + outCCLbufferSize_,
+        winExpBuffer_ = DeviceMem::create(static_cast<u8 *>(cclBuffer_.ptr()) + inCCLbufferSize_ + outCCLbufferSize_, 
             winExpBufferSize_);
     }
     HCCL_INFO("[CreateCommCCLbuffer] create cclbuffer, inPtr[%p], outPtr[%p], winExpPtr[%p], isSharebuffer[%d]",
@@ -177,19 +177,19 @@ HcclResult CCLBufferManager::ReleaseCommCCLbuffer()
         HCCL_RUN_INFO("[HCCL_TRACE][ReleaseCCLbuffer]CCLBuffer is null, no need to release.");
         return HCCL_SUCCESS;
     }
-
+ 
     if (cclBuffer_.ptr() != nullptr){
         HCCL_RUN_INFO("[HCCL_TRACE][ReleaseCCLbuffer]Release cclBuffer. buffer ptr[%p], size[%llu]",
             cclBuffer_.ptr(), cclBuffer_.size());
         cclBuffer_.free();
     }
-
+ 
     if (inCCLbuffer_.ptr() != nullptr){
         HCCL_RUN_INFO("[HCCL_TRACE][ReleaseCCLbuffer]Release incclBuffer. buffer ptr[%p], size[%llu]",
         inCCLbuffer_.ptr(), inCCLbuffer_.size());
         inCCLbuffer_.free();
     }
-
+ 
     if (outCCLbuffer_.ptr() != nullptr ){
         HCCL_RUN_INFO("[HCCL_TRACE][ReleaseCCLbuffer]Release outcclBuffer. buffer ptr[%p], size[%llu]",
         outCCLbuffer_.ptr(), outCCLbuffer_.size());
@@ -201,7 +201,7 @@ HcclResult CCLBufferManager::ReleaseCommCCLbuffer()
         winExpBuffer_.ptr(), winExpBuffer_.size());
         winExpBuffer_.free();
     }
-
+ 
     if ((cclBuffer_.ptr() == nullptr) && (inCCLbuffer_.ptr() == nullptr) && (outCCLbuffer_.ptr() == nullptr) &&
         (winExpBuffer_.ptr() == nullptr)) {
         HCCL_RUN_INFO("[HCCL_TRACE][ReleaseCCLbuffer]Release CCLbuffer success.");

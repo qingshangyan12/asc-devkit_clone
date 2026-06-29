@@ -23,7 +23,7 @@
 #include "coll_comm_aicpu_destroy_func.h"
 
 constexpr u32 NOTIFY_SIZE_EIGHT = 8;
- HcclResult __attribute__((weak)) HcommChannelRegisterDfx(ChannelHandle channel,
+ HcclResult __attribute__((weak)) HcommChannelRegisterDfx(ChannelHandle channel, 
      std::function<HcclResult(u32, u32, const Hccl::TaskParam&, u64)> callback); // 临时，后续移动至Op.h
 HcclResult CollCommAicpu::InitAicpuIndOp(CommAicpuParam *commAicpuParam)
 {
@@ -38,7 +38,7 @@ HcclResult CollCommAicpu::InitAicpuIndOp(CommAicpuParam *commAicpuParam)
     topoInfo_.deviceType = static_cast<DevType>(commAicpuParam->deviceType);
     identifier_ = std::string(commAicpuParam->hcomId);
     topoInfo_.userRankSize = commAicpuParam->userRankSize;
-    topoInfo_.userRank = commAicpuParam->userRank;
+    topoInfo_.userRank = commAicpuParam->userRank; 
     notifys_.reserve(hccl::HCCL_THREAD_NOTIFY_MAX_NUM);
 
     CHK_RET(hrtSetWorkModeAicpu(true));
@@ -113,7 +113,7 @@ HcclResult CollCommAicpu::InitThreads(ThreadMgrAicpuParam *param)
     return HCCL_SUCCESS;
 }
 
-HcclResult CollCommAicpu::RegisterThreadAddDfxTaskInfo(ThreadHandle thread)
+HcclResult CollCommAicpu::RegisterThreadAddDfxTaskInfo(ThreadHandle thread) 
 {
     int32_t ret = HcommThreadRegisterDfx(thread, dfx_.GetCallback());
     if (ret != 0) {
@@ -121,7 +121,7 @@ HcclResult CollCommAicpu::RegisterThreadAddDfxTaskInfo(ThreadHandle thread)
         return HCCL_E_PTR;
     }
  	return HCCL_SUCCESS;
-}
+} 
 
 HcclResult CollCommAicpu::AllocChannelResource(HcclChannelUrmaRes *commParam)
 {
@@ -170,7 +170,7 @@ HcclResult CollCommAicpu::ProcessUrmaRes(HcclChannelUrmaRes *commParam, bool isI
             }
             CHK_RET(ResumePackData(dataVec[resType].data, channelHandle));
         }
-
+        
         // 打印
         HCCL_INFO("[CollCommAicpu][%s] index[%u], currentSrcAddr[%p], singleUniqueIdSize[%u], channelHandle[0x%llx]",
             __func__, index, currentSrcAddr, commParam->singleUniqueIdSize, channelHandle);
@@ -301,7 +301,7 @@ HcclResult CollCommAicpu::Clean()
         CHK_RET(transPort.second->Clean());
     }
     HCCL_INFO("CollCommAicpu::Clean() finished");
-
+    
     return HCCL_SUCCESS;
 }
 
@@ -324,7 +324,7 @@ HcclResult CollCommAicpu::Resume(HcclChannelUrmaRes *commParam)
     nsRecoveryLitePtr_->ResetErrorReported();
 
     commStatus_ = HcclCommStatus::HCCL_COMM_STATUS_READY;
-
+    
     return HCCL_SUCCESS;
 }
 

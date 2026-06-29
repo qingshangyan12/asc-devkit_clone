@@ -51,5 +51,5 @@ PIPE_S
 uint8_t mutex_id = 1;
 //等待PIPE_S中所有前置指令完成后释放标号为1的缓存
 asc_lock(PIPE_S, mutex_id);
-asc_unlock(PIPE_S, mutex_id);
+asc_unlock(PIPE_S, mutex_id); 
 ```

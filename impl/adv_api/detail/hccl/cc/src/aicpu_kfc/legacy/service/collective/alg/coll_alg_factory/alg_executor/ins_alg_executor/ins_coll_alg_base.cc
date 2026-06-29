@@ -174,7 +174,7 @@ HcclResult InsCollAlgBase::CalcParallelNotifyReq(const u32 primQueueNum, std::ve
 }
 
 HcclResult InsCollAlgBase::CalcLocalRankSize(const RankId myRank,
-                                             const std::vector<std::vector<RankId>> &virtRanks,
+                                             const std::vector<std::vector<RankId>> &virtRanks, 
                                              u32 &rankSizeLevel0, u32 &rankSizeLevel1) const
 {
     constexpr uint64_t virtRanks_2 = 2;
@@ -207,7 +207,7 @@ LinkReq InsCollAlgBase::GetSeqLinksUnion(const LinkReq &linkReq0, const LinkReq 
 }
 
 HcclResult InsCollAlgBase::CalNumBlocks(u32& numBlocks, u64 dataSize, u32 numBlocksLimit)
-{
+{   
     numBlocks = 0;
     (void)dataSize;
     (void)numBlocksLimit;

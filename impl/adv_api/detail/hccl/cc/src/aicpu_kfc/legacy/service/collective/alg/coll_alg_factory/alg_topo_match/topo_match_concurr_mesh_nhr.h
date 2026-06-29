@@ -36,7 +36,7 @@ private:
     std::vector<std::vector<RankId>> rankOnSameSlotVector_;  // ranks vector with same slotIds in rack
     std::vector<u32> numRanksPerBoard_;  // ranks num with same boardIds in rack
 
-    HcclResult GenerateLevel0(const std::set<RankId> &rankSetLevel0, u32 gcdInstSize, RankId rankId,
+    HcclResult GenerateLevel0(const std::set<RankId> &rankSetLevel0, u32 gcdInstSize, RankId rankId, 
                               std::vector<std::vector<std::vector<RankId>>> &vTopo,
                               std::vector<std::vector<RankId>> &virtRanks);
 

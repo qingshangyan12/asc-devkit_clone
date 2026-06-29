@@ -11,7 +11,7 @@
 #define HCCN_RPING_H_
 
 #include <stdint.h>
-
+ 
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
@@ -68,7 +68,7 @@ typedef struct HccnRpingInitAttrDef {
         char *eid;             /* Eid of device */
     };
 } HccnRpingInitAttr;
-
+ 
 typedef struct HccnRpingTargetInfoDef {
     uint32_t srcPort;              /* udp src port, hash lag needed */
     union {
@@ -89,7 +89,7 @@ typedef struct HccnRpingTargetInfoDef {
         char* dstEid;                /* remote(target) eid */
     };
 } HccnRpingTargetInfo;
-
+ 
 typedef struct HccnRpingResultInfoDef {
     uint32_t txPkt;       /* send pkt num */
     uint32_t rxPkt;       /* receive pkt num */
@@ -141,14 +141,14 @@ typedef struct HccnRpingPayloadHeadDef {
  * @return HccnResult
  */
 extern HccnResult HccnRpingInit(uint32_t devLogicId, HccnRpingInitAttr *initAttr, HccnRpingCtx *rpingCtx);
-
+ 
 /**
  * @brief Release rping resource on a device.
  * @param rpingCtx: context of rping resource.
  * @return HccnResult
  */
 extern HccnResult HccnRpingDeinit(HccnRpingCtx rpingCtx);
-
+ 
 /**
  * @brief Add targets to client.
  * @param rpingCtx: context of rping resource.
@@ -179,7 +179,7 @@ extern HccnResult HccnRpingAddTargetV2(HccnRpingCtx rpingCtx, uint32_t targetNum
  */
 extern HccnResult HccnRpingAddTargetWithCfg(HccnRpingCtx rpingCtx, uint32_t targetNum, HccnRpingTargetInfo *target,
     HccnRpingAddTargetConfig *config);
-
+ 
 /**
  * @brief Remove targets from targets.
  * @param rpingCtx: context of rping resource.
@@ -188,7 +188,7 @@ extern HccnResult HccnRpingAddTargetWithCfg(HccnRpingCtx rpingCtx, uint32_t targ
  * @return HccnResult
  */
 extern HccnResult HccnRpingRemoveTarget(HccnRpingCtx rpingCtx, uint32_t targetNum, HccnRpingTargetInfo *target);
-
+ 
 /**
  * @brief Get adding target's state.
  * @param rpingCtx: context of rping resource.
@@ -199,7 +199,7 @@ extern HccnResult HccnRpingRemoveTarget(HccnRpingCtx rpingCtx, uint32_t targetNu
  */
 extern HccnResult HccnRpingGetTarget(HccnRpingCtx rpingCtx, uint32_t targetNum, HccnRpingTargetInfo *target,
                                      HccnRpingAddTargetState *targetState);
-
+ 
 /**
  * @brief Start batch ping task.
  * @param rpingCtx: context of rping resource.
@@ -209,14 +209,14 @@ extern HccnResult HccnRpingGetTarget(HccnRpingCtx rpingCtx, uint32_t targetNum, 
  * @return HccnResult
  */
 extern HccnResult HccnRpingBatchPingStart(HccnRpingCtx rpingCtx, uint32_t pktNum, uint32_t interval, uint32_t timeout);
-
+ 
 /**
  * @brief Stop batch ping task.
  * @param rpingCtx: context of rping resource.
  * @return HccnResult
  */
 extern HccnResult HccnRpingBatchPingStop(HccnRpingCtx rpingCtx);
-
+ 
 /**
  * @brief Get batch ping results.
  * @param rpingCtx: context of rping resource.

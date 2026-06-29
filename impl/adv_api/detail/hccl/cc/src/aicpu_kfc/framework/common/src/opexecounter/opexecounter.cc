@@ -66,7 +66,7 @@ HcclResult OpExeCounter::InitCounter()
         CHK_PTR_NULL(addOneMem_);
         CHK_RET(hrtMemSyncCopy(addOneMem_, memSize_, &addOneVal,
             memSize_, HcclRtMemcpyKind::HCCL_RT_MEMCPY_KIND_HOST_TO_DEVICE));
-
+        
         HCCL_RUN_INFO("alloc counter mem resource.");
     }
     refCount_++;
@@ -138,9 +138,9 @@ HcclResult OpExeCounter::GetCounter(std::pair<int32_t, int32_t> &counter)
 
     CHK_RET(hrtMemSyncCopy(&counter.second, memSize_, tailCountMem_, memSize_,
         HcclRtMemcpyKind::HCCL_RT_MEMCPY_KIND_DEVICE_TO_HOST));
-
+    
     HCCL_DEBUG("head:%d, tail:%d", counter.first, counter.second);
-
+    
     return HCCL_SUCCESS;
 }
 

@@ -65,15 +65,15 @@ void UbTransportLiteImpl::Init(std::vector<char> &uniqueId)
     binaryStream >> notifyNum;
     binaryStream >> bufferNum;
     binaryStream >> connNum;
-
+ 
     std::vector<char> notifyUniqueIds;
     binaryStream >> notifyUniqueIds;
     ParseLocNotifyVec(notifyUniqueIds);
-
+ 
     std::vector<char> rmtNotifyUniqueIds;
     binaryStream >> rmtNotifyUniqueIds;
     ParseRmtBufferVec(rmtNotifyUniqueIds, rmtNotifyVec, RmaUbBufType::NOTIFY);
-
+ 
     std::vector<char> locBufferUniqueIds;
     binaryStream >> locBufferUniqueIds;
     ParseLocBufferVec(locBufferUniqueIds, locBufferVec, RmaUbBufType::BUFFER);
@@ -190,16 +190,16 @@ void UbTransportLiteImpl::ParseLocBufferVec(std::vector<char> &data, LocUbBufLit
     } else {
         num = bufferNum;
     }
-
+ 
     if (num == 0) {
         HCCL_WARNING("UbTransportLiteImpl::ParseLocBufferVec %s num is 0", rmtType.Describe().c_str());
         return;
     }
-
+ 
     u32 rmtBufferSizePerDto = data.size() / num;
     HCCL_INFO("Parse %s num=%u, sizePerDto=%u", rmtType.Describe().c_str(), num, rmtBufferSizePerDto);
     BinaryStream binaryStream(data);
-
+ 
     for (u32 idx = 0; idx < num; idx++) {
         LocUbBufLite ubBufLite;
         binaryStream >> ubBufLite.addr;
@@ -352,7 +352,7 @@ void UbTransportLiteImpl::Post(u32 index, const StreamLite &stream)
     BuildUbDbSendTask(stream, connVec[0]->GetUbJettyLiteId(), connOut.pi);
 
     HCCL_INFO("UbTransportLiteImpl::Post notifyId[0x%llx], pi=%u", rmtBuffSliceLite.GetAddr(), connOut.pi);
-
+ 
     if (callback_ == nullptr && newCallback_ == nullptr)
     {
         HCCL_WARNING("[UbTransportLiteImpl] callback_ is nullptr.");
@@ -380,7 +380,7 @@ void UbTransportLiteImpl::Post(u32 index, const StreamLite &stream)
     if (newCallback_ != nullptr) {
         newCallback_(stream.GetSqId(), taskId, taskParam, reinterpret_cast<u64>(this));
     }
-
+    
 }
 
 void UbTransportLiteImpl::Wait(u32 index, const StreamLite &stream)
@@ -681,7 +681,7 @@ void UbTransportLiteImpl::BatchOneSidedWrite(const vector<RmaBufSliceLite> &loc,
     BuildUbDbSendTask(stream, connVec[0]->GetUbJettyLiteId(), connOut.pi);
 }
 
-
+ 
 Eid UbTransportLiteImpl::GetLocEid() const
 {
     return connVec[0]->GetLocEid();

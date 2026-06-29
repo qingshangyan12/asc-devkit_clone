@@ -27,7 +27,7 @@ void hrtTraceDestroy(TraHandle handle)
         DlTraceFunction::GetInstance().dlAtraceDestroy(handle);
     } else {
         DlTraceFunction::GetInstance().dlUtraceDestroy(handle);
-    }
+    }    
     HCCL_INFO("Call TraceDestroy, Params:handle[%p]", handle);
     return;
 }

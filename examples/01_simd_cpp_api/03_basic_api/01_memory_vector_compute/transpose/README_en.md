@@ -46,7 +46,7 @@ This example implements data transpose functionality based on the Transpose and 
   | 2 | Enhanced Transpose | [3,3,2,8] | [3,2,8,3] | half | NCHW | NHWC | TRANSPOSE_NCHW2NHWC |
   | 3 | 5HD Format Conversion | [2,32,16,16] | [2,2,16,16,16] | half | NCHW | NC1HWC0 | / |
 
-- Data format description:
+- Data format description:  
   Feature maps in convolutional neural networks are typically stored as 4D arrays. The 4D format is explained as follows:
     - N: Batch count.
     - H: Height, feature map height.
@@ -87,7 +87,7 @@ Run the following steps in the root directory of this example to build and run t
   python3 ../scripts/verify_result.py ./output/output.bin ./output/golden.bin  # Verify whether the output result is correct
   ```
   To use CPU debug or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-
+  
   Examples:
   ```bash
   cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # CPU debug mode

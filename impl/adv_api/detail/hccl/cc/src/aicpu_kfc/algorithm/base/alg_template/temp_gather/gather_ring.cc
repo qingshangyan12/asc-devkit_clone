@@ -51,7 +51,7 @@ HcclResult GatherRing::RunGatherOnRootRank()
         dst = outputMem_.range(rcvOffset, rcvSize);
 
         ret = linkLeft_->RxAsync(UserMemType::OUTPUT_MEM, rcvOffset + baseOffset_, dst.ptr(), rcvSize, stream_);
-
+		
         CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[Run][GatherOnRootRank]root rank[%u] rx sync with dstmem[%p] "\
             "failed", interRank_, dst.ptr()), ret);
 

@@ -94,17 +94,17 @@ struct OpResCtx {
 };
 
 HcclResult CheckInputParam(const HcclComm comm, const void* mc2Tiling, const aclrtStream stream)
-{
+{   
     // 检查comm是否为空指针
     RPT_INPUT_ERR(comm == nullptr, "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),\
         std::vector<std::string>({"HcclAllocComResourceByTiling", "nullptr", "comm", "non-null pointer"}));
     CHK_PTR_NULL(comm);
-
+    
     // 检查sendBuf是否为空指针
     RPT_INPUT_ERR(mc2Tiling == nullptr, "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),\
         std::vector<std::string>({"HcclAllocComResourceByTiling", "nullptr", "mc2Tiling", "non-null pointer"}));
     CHK_PTR_NULL(mc2Tiling);
-
+    
     // 检查stream是否为空指针
     RPT_INPUT_ERR(stream == nullptr, "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),\
         std::vector<std::string>({"HcclAllocComResourceByTiling", "nullptr", "stream", "non-null pointer"}));
@@ -305,7 +305,7 @@ HcclResult PrepareParamForAllReduce(HcclComm comm, const std::string &tag, const
     HCCL_INFO("PrepareParamForAllReduce, ccTiling[%p]", ccTiling);
     u32 userRankSize;
     CHK_RET(HcclGetRankSize(comm, &userRankSize));                      // 加上，后面计算outputSize可能使用
-
+   
     HcclResult ret = PrepareOpsCommParam(tag, param);
     if (ret != HCCL_SUCCESS) {
         HCCL_ERROR("failed to fill OpsCommParam");
@@ -331,7 +331,7 @@ HcclResult PrepareParamForReduceScatter(HcclComm comm, const std::string &tag, c
     HCCL_INFO("PrepareParamForReduceScatter, ccTiling[%p]", ccTiling);
     u32 userRankSize;
     CHK_RET(HcclGetRankSize(comm, &userRankSize));                      // 加上，后面计算outputSize可能使用
-
+    
     HcclResult ret = PrepareOpsCommParam(tag, param);
     if (ret != HCCL_SUCCESS) {
         HCCL_ERROR("failed to fill OpsCommParam");
@@ -339,7 +339,7 @@ HcclResult PrepareParamForReduceScatter(HcclComm comm, const std::string &tag, c
 
     param.opType = HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
     param.reduceType = static_cast<HcclReduceOp>(ccTiling->reduceType);
-    param.DataDes.dataType = static_cast<HcclDataType>(ccTiling->srcDataType);
+    param.DataDes.dataType = static_cast<HcclDataType>(ccTiling->srcDataType); 
     param.DataDes.count = 0;
 
     HCCL_INFO("Print PrepareParamForReduceScatter.");
@@ -356,8 +356,8 @@ HcclResult PrepareParamForAlltoAll(HcclComm comm, const std::string &tag, const 
 {
     HCCL_INFO("PrepareParamForAlltoAll, ccTiling[%p]", ccTiling);
     u32 userRankSize;
-    CHK_RET(HcclGetRankSize(comm, &userRankSize));
-
+    CHK_RET(HcclGetRankSize(comm, &userRankSize));                      
+    
     HcclResult ret = PrepareOpsCommParam(tag, param);
     if (ret != HCCL_SUCCESS) {
         HCCL_ERROR("failed to fill OpsCommParam");
@@ -387,8 +387,8 @@ HcclResult PrepareParamForAlltoAllV(HcclComm comm, const std::string &tag, const
 {
     HCCL_INFO("PrepareParamForAlltoAllV, ccTiling[%p]", ccTiling);
     u32 userRankSize;
-    CHK_RET(HcclGetRankSize(comm, &userRankSize));
-
+    CHK_RET(HcclGetRankSize(comm, &userRankSize));                      
+    
     HcclResult ret = PrepareOpsCommParam(tag, param);
     if (ret != HCCL_SUCCESS) {
         HCCL_ERROR("failed to fill OpsCommParam");

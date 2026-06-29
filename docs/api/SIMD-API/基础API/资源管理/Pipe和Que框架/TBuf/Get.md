@@ -144,7 +144,7 @@ AscendC::LocalTensor<int32_t> tempTensor2 = calcBuf.Get<int32_t>(128);
 ```
 AscendC::TPipe pipe;
 // 模板参数为TPosition中的VECCALC类型
-AscendC::TBuf<AscendC::TPosition::VECCALC> calcBuf;
+AscendC::TBuf<AscendC::TPosition::VECCALC> calcBuf; 
 // 分配一个2048字节的连续空间
 uint32_t byteLen = 2048;
 pipe.InitBuffer(calcBuf, byteLen);

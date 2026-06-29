@@ -17,13 +17,13 @@ class ReduceScatterMeshMix : public AlgTemplateBase {
 public:
     explicit ReduceScatterMeshMix(const HcclDispatcher dispatcher);
     ~ReduceScatterMeshMix() override;
-    HcclResult Prepare(DeviceMem &inputMem, DeviceMem &outputMem, DeviceMem &scratchMem,
-        const u64 count, const HcclDataType dataType, const Stream &stream,
-        const HcclReduceOp reductionOp, const u32 root,
-        const std::vector<Slice> &slices, const u64 baseOffset,
-        const u64 reduceAttrBitMap, std::vector<Stream> &meshStreams,
-        const std::vector<std::shared_ptr<LocalNotify>> &meshSignal,
-        const std::vector<std::shared_ptr<LocalNotify>> &meshSignalAux,
+    HcclResult Prepare(DeviceMem &inputMem, DeviceMem &outputMem, DeviceMem &scratchMem, 
+        const u64 count, const HcclDataType dataType, const Stream &stream, 
+        const HcclReduceOp reductionOp, const u32 root, 
+        const std::vector<Slice> &slices, const u64 baseOffset, 
+        const u64 reduceAttrBitMap, std::vector<Stream> &meshStreams, 
+        const std::vector<std::shared_ptr<LocalNotify>> &meshSignal, 
+        const std::vector<std::shared_ptr<LocalNotify>> &meshSignalAux, 
         u32 interRank, u32 interRankSize, HcomCollOpInfo *opInfo) override;
     HcclResult RunAsync(const u32 rank, const u32 rankSize, const std::vector<LINK> &links) override;
 

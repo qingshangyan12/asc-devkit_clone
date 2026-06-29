@@ -37,7 +37,7 @@ public:
 
 private:
     HcclResult InitCommInfo(const RankGraph *rankGraph);
-    HcclResult InitCommInfo(const AlgTopoInfo &topoInfo);
+    HcclResult InitCommInfo(const AlgTopoInfo &topoInfo);   
     HcclResult GetTemplateResRequest(
         const RankGraph *rankGraph, std::shared_ptr<InsAlgTemplate> &algTemplate, AlgTempResReq &tempResReq) const;
     HcclResult CreateTemplates(std::shared_ptr<InsAlgTemplate> &algTemplatePtr);

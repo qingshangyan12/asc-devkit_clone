@@ -40,12 +40,12 @@ private:
     void GetParallelDataSplit(std::vector<float> &splitDataSize) const;
     HcclResult CalcLocalRoot();
     // Host
-    HcclResult PrepareResForTemplate(const RankGraph *rankGraph, InsAlgTemplate0 &tempAlgIntra,
+    HcclResult PrepareResForTemplate(const RankGraph *rankGraph, InsAlgTemplate0 &tempAlgIntra, 
         InsAlgTemplate1 &tempAlgInter);
     // Aicpu
-    HcclResult PrepareResForTemplate(ConnectedLinkMgr *linkMgr, InsAlgTemplate0 &tempAlgIntra,
+    HcclResult PrepareResForTemplate(ConnectedLinkMgr *linkMgr, InsAlgTemplate0 &tempAlgIntra, 
         InsAlgTemplate1 &tempAlgInter);
-    void GenDataParams(const u64 dataOffset, const u64 sliceCount, const u64 scratchOffsetCount,
+    void GenDataParams(const u64 dataOffset, const u64 sliceCount, const u64 scratchOffsetCount, 
         TemplateDataParams &dataParams) const;
     HcclResult GenInsQues(InsAlgTemplate0 &tempAlgIntra, InsAlgTemplate1 &tempAlgInter);
 

@@ -13,7 +13,7 @@ namespace hccl {
 CalcAHCTransportReqBase::CalcAHCTransportReqBase(std::vector<std::vector<u32>> &subCommPlaneVector,
     std::vector<bool> &isBridgeVector, u32 userRank, std::vector<std::vector<std::vector<u32>>> &globalSubGroups,
     std::map<AHCConcOpType, TemplateType> &ahcAlgOption, std::unordered_map<u32, bool>  &isUsedRdmaMap)
-    : CalcTransportReqBase(subCommPlaneVector, isBridgeVector, userRank),
+    : CalcTransportReqBase(subCommPlaneVector, isBridgeVector, userRank), 
       globalSubGroups_(globalSubGroups), ahcAlgOption_(ahcAlgOption),
       isUsedRdmaMap_(isUsedRdmaMap)
 {
@@ -28,7 +28,7 @@ HcclResult CalcAHCTransportReqBase::DisposeSubGroups(u32 rank)
     (void)rank;
     return HCCL_SUCCESS;
 }
-
+ 
 HcclResult CalcAHCTransportReqBase::CalcDstRanks(u32 rank, std::set<u32> &dstRanks, u32 ringIndex)
 {
     (void)rank;
@@ -36,7 +36,7 @@ HcclResult CalcAHCTransportReqBase::CalcDstRanks(u32 rank, std::set<u32> &dstRan
     (void)ringIndex;
     return HCCL_SUCCESS;
 }
-
+    
 HcclResult CalcAHCTransportReqBase::CommAHCInfoInit(std::vector<std::vector<u32>> &subGroups)
 {
     (void) subGroups;
@@ -83,7 +83,7 @@ HcclResult CalcAHCTransportReqBase::CalcTransportRequest(const std::string &tag,
         // 建链
         for (u32 dstRank : dstRanks) {
             CHK_PRT_RET(dstRank >= rankSize,
-                HCCL_ERROR("[CalcAHCTransportReqBase][CalcTransportRequest] dstRank [%u] exceed rankSize [%u]  error",
+                HCCL_ERROR("[CalcAHCTransportReqBase][CalcTransportRequest] dstRank [%u] exceed rankSize [%u]  error", 
                 dstRank, rankSize ), HCCL_E_INTERNAL);
 
             if (dstRank != rank) {

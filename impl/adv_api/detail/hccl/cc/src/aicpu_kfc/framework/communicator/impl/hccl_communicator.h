@@ -459,7 +459,7 @@ public:
 
     HcclResult GetLinks(uint32_t netLayer, uint32_t srcRank, uint32_t dstRank,
         CommLink **linkList, uint32_t *listSize);
-    HcclResult GetHeterogMode(HcclHeterogMode *mode);
+    HcclResult GetHeterogMode(HcclHeterogMode *mode);   
     HcclTopoAttr GetTopoAttr();
     void ForceProf(bool isForce);
     // for Group
@@ -1113,7 +1113,7 @@ private:
     std::function<bool()> getAicpuCommState_; // 获取自定义算子aicpu通信域是否初始化
     bool isInvalidComm_ { false };
     std::function<HcclResult()> releaseChannel_ = nullptr;
-
+    
     u32 hcclQos_ = EnvConfig::HCCL_QOS_DEFAULT;
     std::shared_ptr<SymmetricMemoryAgent> symmetricMemoryAgent_;
     std::unique_ptr<SymmetricMemory> symmetricMemory_;

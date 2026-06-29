@@ -154,7 +154,7 @@ HcclResult CollAllGatherRingFor91093Executor::PrepareSlicesL0(std::vector<std::v
     std::vector<std::vector<Slice>> multRingsSliceZero; // 数据基于该rank上环0的偏移
     bool ARSFlag = topoMatcher_->GetARSFlag();
     bool ARSDoubleRing = (ARSFlag && (level0RankSize > FACTOR_TWO) && topoAttr_.isARSDoubleRing);
-
+ 
     if (ARSDoubleRing) {
         std::vector<u32> mockNicList;
         mockNicList.reserve(level0RankSize);
@@ -288,7 +288,7 @@ HcclResult CollAllGatherRingFor91093Executor::KernelRun(const OpParam &param, Ex
 
      bool isSelectAHC = (algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_AHC ||
         algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_AHC_BROKE);
-
+    
     u32 level1RankSize = logicalLevel1CommInfo_.localRankSize;
 
     SubCommInfo level2CommInfo;

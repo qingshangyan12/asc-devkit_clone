@@ -7,7 +7,7 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#pragma once
+#pragma once 
 #include <string>
 #include <map>
 #include <array>
@@ -62,7 +62,7 @@ public:
 private:
     AlgWrap(){ initialized_ = true; };
     ~AlgWrap(){ initialized_ = false; };
-
+    
     // initialized 是否已初始化，避免析构后访问类成员
     bool initialized_ = false;
     std::mutex aivCallBackMutex_;

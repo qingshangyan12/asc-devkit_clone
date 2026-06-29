@@ -76,7 +76,7 @@ HcclResult CcuKernelReduceScatterMesh1D::Algorithm()
         NotifyRecord(ch, CKE_IDX_0, INPUT_XN_ID, input_[rankId_], 1 << INPUT_XN_ID);
         NotifyRecord(ch, CKE_IDX_0, TOKEN_XN_ID, token_[rankId_], 1 << TOKEN_XN_ID);
     }
-
+    
     uint32_t allBit = 1 << INPUT_XN_ID  | 1 << TOKEN_XN_ID;
     for (auto ch : channels_) {
         NotifyWait(ch, CKE_IDX_0, allBit);
@@ -120,14 +120,14 @@ HcclResult CcuKernelReduceScatterMesh1D::Algorithm()
 std::vector<uint64_t> CcuKernelReduceScatterMesh1D::GeneArgs(const CcuTaskArg &arg)
 {
     const CcuTaskArgReduceScatterMesh1D* taskArg = dynamic_cast<const CcuTaskArgReduceScatterMesh1D*>(&arg);
-
+    
     uint64_t inputAddr  = taskArg->inputAddr_;
     uint64_t outputAddr = taskArg->outputAddr_;
     uint64_t tokenInfo  = taskArg->token_;
     uint64_t offset     = taskArg->offset_;
     uint64_t sliceSize  = taskArg->sliceSize_;
     auto     goSize     = CalGoSize(sliceSize);
-
+    
     HCCL_INFO("[CcuKernelReduceScatterMesh1D] TaskArgs: inputAddr[%llu], outputAddr[%llu], "
                "offset[%llu], sliceSize[%llu]",
                inputAddr, outputAddr, offset, sliceSize);

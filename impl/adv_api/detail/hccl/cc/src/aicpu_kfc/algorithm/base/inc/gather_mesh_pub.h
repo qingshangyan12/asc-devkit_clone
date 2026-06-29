@@ -20,8 +20,8 @@ public:
     ~GatherMesh() override;
 
     // should be called soon after template GatherMesh instance created
-    HcclResult Prepare(std::vector<Stream> &meshStreams, std::vector<std::shared_ptr<LocalNotify>> &meshSignal,
-        std::vector<std::shared_ptr<LocalNotify>> &meshSignalAux, u32 userRank = INVALID_VALUE_RANKID,
+    HcclResult Prepare(std::vector<Stream> &meshStreams, std::vector<std::shared_ptr<LocalNotify>> &meshSignal, 
+        std::vector<std::shared_ptr<LocalNotify>> &meshSignalAux, u32 userRank = INVALID_VALUE_RANKID, 
         HcomCollOpInfo *opInfo = nullptr, u32 interRank = INVALID_VALUE_RANKID, u32 interRankSize = 0) override;
 
     HcclResult RunAsync(const u32 rank, const u32 rankSize,

@@ -30,7 +30,7 @@ public:
     HcclResult Prepare(HcomCollOpInfo *opInfo, u32 userRank, u64 &count, DeviceMem &cclBufferPartOne,
         DeviceMem &cclBufferPartTwo, SubCommInfo &level0CommInfo, SubCommInfo &level1CommInfo,
         Stream &mainStream, std::vector<Stream> &subStream,
-        std::vector<std::shared_ptr<LocalNotify>> &notifyMain,
+        std::vector<std::shared_ptr<LocalNotify>> &notifyMain, 
         std::vector<std::shared_ptr<LocalNotify>> &notifySub) override;
 
     HcclResult RunAsync() override;

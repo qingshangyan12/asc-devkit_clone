@@ -64,20 +64,20 @@
     - 根据场景调用不同的复合计算接口：场景1调用AddRelu实现向量加法与ReLU激活融合、场景2调用Axpy实现标量乘法与向量加法融合
     - 调用DataCopy基础API，将结果从UB（Unified Buffer）搬运至GM（Global Memory）
 
-- 调用实现
+- 调用实现  
   使用内核调用符<<<>>>调用核函数。
 
-## 编译运行
+## 编译运行  
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
-
+    
 - 样例执行
 
   在本样例目录下执行如下命令。

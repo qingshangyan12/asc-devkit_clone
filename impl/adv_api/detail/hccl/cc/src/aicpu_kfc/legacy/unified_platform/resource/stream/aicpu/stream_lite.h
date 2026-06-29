@@ -49,7 +49,7 @@ public:
 private:
     u32 id;
     u32 sqId;
-    u32 devPhyId{0};
+    u32 devPhyId{0};    
     u32 cqId{0};
 
     std::unique_ptr<RtsqBase> rtsq;

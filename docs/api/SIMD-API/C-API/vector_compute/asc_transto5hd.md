@@ -153,13 +153,13 @@ for (int j = 0; j < 4; ++j) {
         src_list[i] = (__ubuf__ half*)(src + OFFSET * j + i * SRC_STEP);
         dst_list[i] = (__ubuf__ half*)(dst + OFFSET * j + i * DST_STEP);
     }
-
+    
     // 每次循环都要设置寄存器并执行转换
     asc_set_va_reg(VA0, dst_list);
     asc_set_va_reg(VA1, dst_list + VA_REG_ARRAY_LEN);
     asc_set_va_reg(VA2, src_list);
     asc_set_va_reg(VA3, src_list + VA_REG_ARRAY_LEN);
-
+    
     asc_transto5hd_b16(VA0, VA2, repeat, dst_stride, src_stride);
 }
 ```

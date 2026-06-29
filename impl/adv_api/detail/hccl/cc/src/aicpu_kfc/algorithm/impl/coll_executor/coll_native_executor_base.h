@@ -117,8 +117,8 @@ protected:
 
     virtual HcclResult CopyAivCommInfoToDevice(const CommPlane levelIndex, const u32 subLevelIndex,
         AlgResourceResponse& algResource);
-
-    HcclResult SetOpCache(const AivOpArgs& opArgs, const AivTopoArgs& topoArgs, const AivResourceArgs& resourceArgs,
+    
+    HcclResult SetOpCache(const AivOpArgs& opArgs, const AivTopoArgs& topoArgs, const AivResourceArgs& resourceArgs, 
         const AivAlgArgs& algArgs, ExtraArgs& extraArgs, AivProfilingInfo& aivProfilingInfo, bool isA3CrossNode);
 
     /* ---------------以下为 protected 成员变量定义领域-------------------------- */

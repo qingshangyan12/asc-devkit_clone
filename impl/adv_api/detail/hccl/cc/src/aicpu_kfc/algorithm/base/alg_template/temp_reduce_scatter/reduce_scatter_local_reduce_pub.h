@@ -19,11 +19,11 @@ explicit ReduceScatterLocalReduce(const HcclDispatcher dispatcher);
 ~ReduceScatterLocalReduce() override;
 
 HcclResult Prepare(DeviceMem &inputMem, DeviceMem &outputMem, DeviceMem &scratchMem, const u64 count,
-    const HcclDataType dataType, const Stream &stream, const HcclReduceOp reductionOp,
-    const u32 root, const std::vector<Slice> &slices, const u64 baseOffset,
-    const u64 reduceAttrBitMap, std::vector<Stream> &meshStreams,
-    std::vector<std::shared_ptr<LocalNotify>> &meshSignal,
-    std::vector<std::shared_ptr<LocalNotify>> &meshSignalAux,
+    const HcclDataType dataType, const Stream &stream, const HcclReduceOp reductionOp, 
+    const u32 root, const std::vector<Slice> &slices, const u64 baseOffset, 
+    const u64 reduceAttrBitMap, std::vector<Stream> &meshStreams, 
+    std::vector<std::shared_ptr<LocalNotify>> &meshSignal, 
+    std::vector<std::shared_ptr<LocalNotify>> &meshSignalAux, 
     u32 userRank, const HcomCollOpInfo *opInfo = nullptr) override;
 HcclResult RunAsync(const u32 rank, const u32 rankSize, const std::vector<LINK> &links) override;
 

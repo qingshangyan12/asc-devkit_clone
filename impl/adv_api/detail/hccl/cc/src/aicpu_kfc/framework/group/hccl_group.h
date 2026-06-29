@@ -25,7 +25,7 @@ HcclResult HcclGroupEnd();
 }
 #endif
 namespace hccl{
-
+  
 #ifdef __cplusplus
 extern "C" {
 #endif

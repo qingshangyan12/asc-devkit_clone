@@ -26,14 +26,14 @@ CcuTempAllGather2DiesMesh1D::CcuTempAllGather2DiesMesh1D(const OpParam& param, c
         mySubCommRank_ = std::distance(subCommRanks[0].begin(), it);
     }
 }
-
+ 
 CcuTempAllGather2DiesMesh1D::~CcuTempAllGather2DiesMesh1D()
 {
 }
 
 HcclResult CcuTempAllGather2DiesMesh1D::CalcRes(HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
                                                       AlgResourceRequest& resourceRequest)
-{
+{   
     //双die，声明一个从流
     resourceRequest.notifyNumOnMainThread = 1;
     resourceRequest.slaveThreadNum = 1;
@@ -67,7 +67,7 @@ HcclResult CcuTempAllGather2DiesMesh1D::CalcRes(HcclComm comm, const OpParam& pa
             rankIdGroup1.push_back(channelDescs[j].remoteRank);
         }
     }
-
+ 
     if ((rankIdGroup0.size() > rankIdGroup1.size() && rankIdGroup1.size() != 0) || rankIdGroup0.size() == 0) {
         if0HandleSelfRank = false;
     }
@@ -89,14 +89,14 @@ HcclResult CcuTempAllGather2DiesMesh1D::CalcRes(HcclComm comm, const OpParam& pa
         resourceRequest.ccuKernelInfos.push_back(kernelInfo0);
     }
     if (rankIdGroup1.size() != 0) {
-        resourceRequest.ccuKernelInfos.push_back(kernelInfo1);
+        resourceRequest.ccuKernelInfos.push_back(kernelInfo1);  
     }
     HCCL_DEBUG("[CcuTempAllGather2DiesMesh1D::CalcRes] channelDescs.size()=%llu, dimsize=%llu, "
                "ccuKernelInfos.size()=%llu",
                channelDescs.size(), subCommRanks_[0].size(), resourceRequest.ccuKernelInfos.size());
     return HcclResult::HCCL_SUCCESS;
 }
-
+ 
 HcclResult CcuTempAllGather2DiesMesh1D::KernelRun(const OpParam& param, const TemplateDataParams& templateDataParams,
                                                         TemplateResource& templateResource)
 {
@@ -114,7 +114,7 @@ HcclResult CcuTempAllGather2DiesMesh1D::KernelRun(const OpParam& param, const Te
     std::vector<ThreadHandle> subThreads(templateResource.threads.begin() + 1, templateResource.threads.end());
     std::vector<u32> notifyIdxMainToSub(1, 0);
     CHK_RET(PreSyncInterThreads(templateResource.threads[0], subThreads, notifyIdxMainToSub));
-
+    
     //双die模式，下发两个kernel
     for (uint64_t i = 0; i < ALL_GATHER_DIE_NUM; i++) {
         std::unique_ptr<hcomm::CcuTaskArg> taskArg = std::make_unique<CcuTaskArgAllGather2DiesMesh1D>(inputAddr, outputAddr,

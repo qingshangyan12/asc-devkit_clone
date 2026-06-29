@@ -169,7 +169,7 @@ u32 BroadcastHD::GetDstRank(u32 rank, u32 step, u32 rankSize)
 {
     u32 logicRank = (rank - root_ + rankSize) % rankSize;
     u32 logicDstRank = logicRank ^ (1 << step);
-    return (logicDstRank + root_) % rankSize;
+    return (logicDstRank + root_) % rankSize; 
 }
 
 HcclResult BroadcastHD::RunSend(u32 rank, u32 step, u32 rankSize, const std::vector<LINK> &links)

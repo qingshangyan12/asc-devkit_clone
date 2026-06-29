@@ -7,7 +7,7 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-
+ 
 #include "broadcast_nb_binary.h"
 #include "device_capacity.h"
 #include "alg_template_register.h"
@@ -69,11 +69,11 @@ HcclResult BroadcastNBBinary::RunBroadcastNBBinary(const u32 rank, const u32 ran
     }
 
     HCCL_DEBUG("root[%u], hasData[%u]", root_, hasData_);
-
+ 
     u64 dataBytes = count_ * DataUnitSize(dataType_); // 总数据量
     u32 nSteps = CalcCeilLog2(rankSize); // 通信步数
     u32 deltaRoot = (rank + rankSize - root_) % rankSize; // 与Root节点的距离
-
+ 
     for (u32 step = 0; step < nSteps; step++) {
         if (deltaRoot < u32(1 << step)) { // 该节点需要发送数据
             if ((step != nSteps - 1 || deltaRoot < (rankSize - (1 << step))) && hasData_) {
@@ -81,20 +81,20 @@ HcclResult BroadcastNBBinary::RunBroadcastNBBinary(const u32 rank, const u32 ran
                 u32 sendTo = (rank + deltaRank) % rankSize;
                 LINK linkRight = links[sendTo];
                 CHK_SMART_PTR_NULL(linkRight);
-
+ 
                 std::vector<Slice> txSlices;
                 txSlices.resize(1);
                 txSlices[0].offset = baseOffset_;
                 txSlices[0].size = dataBytes;
-
+ 
                 CHK_RET(linkRight->RxAck(stream_));
                 ret = Tx(linkRight, txSlices);
                 CHK_PRT_RET(ret != HCCL_SUCCESS,
                     HCCL_ERROR("[Run][Broadcast]rank[%u] step[%u] Right Link tx slices Failed", rank, step), ret);
-
+ 
                 ret = linkRight->TxWaitDone(stream_);
                 CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[Run][Broadcast]TxWaitDone failed"), ret);
-                ret = linkRight->GetLinkType() == LinkType::LINK_HCCS
+                ret = linkRight->GetLinkType() == LinkType::LINK_HCCS 
                     ? linkRight->WaitFin(stream_) : linkRight->WaitFinAck(stream_); // P2P和Roce场景都需要同步
                 CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[Run][Broadcast]WaitFinAck failed"), ret);
             }
@@ -103,20 +103,20 @@ HcclResult BroadcastNBBinary::RunBroadcastNBBinary(const u32 rank, const u32 ran
             u32 recvFrom = (rank + rankSize - deltaRank) % rankSize;
             LINK linkLeft = links[recvFrom];
             CHK_SMART_PTR_NULL(linkLeft);
-
+ 
             std::vector<Slice> rxSlices;
             rxSlices.resize(1);
             rxSlices[0].offset = baseOffset_;
             rxSlices[0].size = dataBytes;
-
+ 
             CHK_RET(linkLeft->TxAck(stream_));
             ret = Rx(linkLeft, rxSlices);
             CHK_PRT_RET(ret != HCCL_SUCCESS,
                 HCCL_ERROR("[Run][Broadcast]rank[%u] step[%u] Right Link rx slices Failed", rank, step), ret);
-
+ 
             ret = linkLeft->RxWaitDone(stream_);
             CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[Run][Broadcast]RxWaitDone failed"), ret);
-            ret = linkLeft->GetLinkType() == LinkType::LINK_HCCS
+            ret = linkLeft->GetLinkType() == LinkType::LINK_HCCS 
                 ? linkLeft->PostFin(stream_) : linkLeft->PostFinAck(stream_); // P2P和Roce场景都需要同步
             CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[Run][Broadcast]PostFinAck failed"), ret);
             hasData_ = true;
@@ -124,7 +124,7 @@ HcclResult BroadcastNBBinary::RunBroadcastNBBinary(const u32 rank, const u32 ran
     }
     return HCCL_SUCCESS;
 }
-
+ 
 HcclResult BroadcastNBBinary::Tx(const LINK &link, const std::vector<Slice> &txSlices)
 {
     std::vector<TxMemoryInfo> txMems;
@@ -134,11 +134,11 @@ HcclResult BroadcastNBBinary::Tx(const LINK &link, const std::vector<Slice> &txS
         txMems.emplace_back(
             TxMemoryInfo { UserMemType::OUTPUT_MEM, txSlice.offset, srcMem.ptr(), txSlice.size });
     }
-
+ 
     CHK_RET(link->TxAsync(txMems, stream_));
     return HCCL_SUCCESS;
 }
-
+ 
 HcclResult BroadcastNBBinary::Rx(const LINK &link, const std::vector<Slice> &rxSlices)
 {
     std::vector<RxMemoryInfo> rxMems;
@@ -148,11 +148,11 @@ HcclResult BroadcastNBBinary::Rx(const LINK &link, const std::vector<Slice> &rxS
         rxMems.emplace_back(
             RxMemoryInfo { UserMemType::OUTPUT_MEM, rxSlice.offset, dstMem.ptr(), rxSlice.size });
     }
-
+ 
     CHK_RET(link->RxAsync(rxMems, stream_));
     return HCCL_SUCCESS;
 }
-
+ 
 bool ShouldUseBinaryBroadcastOfNB(const u64 dataSize, const u32 rankSize, const u32 userRankSize,
     const float deviceNumPerAggregation)
 {
@@ -164,14 +164,14 @@ bool ShouldUseBinaryBroadcastOfNB(const u64 dataSize, const u32 rankSize, const 
     if (rankSize == TWO_RANK_SIZE) {
         return true;
     }
-
+ 
     // 通信步数为log_2(rankSize)向上取整
     u32 nSteps = 0;
     for (u32 tmp = rankSize - 1; tmp != 0; tmp >>= 1, ++nSteps) {}
-
+ 
     float bandWidth; // 网卡出口带宽，用于计算大小包切片策略的阈值
     CHK_RET(GetBandWidthPerNPU(1, userRankSize, static_cast<u32>(deviceNumPerAggregation), bandWidth)); // 单位：GB/s
-
+    
     // (公式解释)：
     // bandwidth_ - 网卡出口带宽，单位GB/s
     // LATENCY - 链路端到端静态时延
@@ -179,7 +179,7 @@ bool ShouldUseBinaryBroadcastOfNB(const u64 dataSize, const u32 rankSize, const 
     const float dataSizeBaseNum = bandWidth * LATENCY * 1000;
     constexpr u32 rankSizeOfSmallScale = 4; // 4以下节点数为小规模
     constexpr u32 dataSizeMultiple = 2;     // 通信数据量倍数为2
-
+ 
     // 计算阈值，用于判断大小包
     float thresholdDataSize;
     if (rankSize <= rankSizeOfSmallScale) {
@@ -188,9 +188,9 @@ bool ShouldUseBinaryBroadcastOfNB(const u64 dataSize, const u32 rankSize, const 
         // 公式：用于计算大包处理的阈值
         thresholdDataSize = (nSteps + nSteps - dataSizeMultiple) / (nSteps - dataSizeMultiple) * dataSizeBaseNum;
     }
-
+ 
     return dataSize < thresholdDataSize; // 小数据量使用Binary broadcast
 }
-
+ 
 REGISTER_TEMPLATE(TemplateType::TEMPLATE_BROADCAST_NB_BINARY, BroadcastNBBinary);
 }  // namespace hccl

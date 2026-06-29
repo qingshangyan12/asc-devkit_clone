@@ -642,8 +642,8 @@ HcclResult hrtMalloc(void **devPtr, u64 size, bool level2Address)
     } else {
         ret = aclrtMallocWithCfg(devPtr, size, static_cast<aclrtMemMallocPolicy>(policy), &cfg);
     }
-    RPT_ENV_ERR(ret == ACL_ERROR_RT_MEMORY_ALLOCATION, "EI0011",
-        std::vector<std::string>({"memory_size"}),
+    RPT_ENV_ERR(ret == ACL_ERROR_RT_MEMORY_ALLOCATION, "EI0011",                                                                             
+        std::vector<std::string>({"memory_size"}),                                                          
         std::vector<std::string>({std::string("size:") + std::to_string(size)}));
 
     CHK_PRT_RET(ret == ACL_ERROR_RT_MEMORY_ALLOCATION, HCCL_ERROR("[Malloc][Mem] rtMalloc failed, "\
@@ -998,7 +998,7 @@ HcclResult hrtGetPairDevicePhyId(u32 localDevPhyId, u32 &pairDevPhyId)
     CHK_PRT_RET(deviceType != DevType::DEV_TYPE_910_93,
         HCCL_ERROR("[hrtGetPairDevicePhyId] is not supported on device type[%d]. Please check device type.", deviceType),
         HCCL_E_NOT_SUPPORT);
-
+ 
     // 奇数die对应的phyid - 1，偶数die对应的phyid + 1
     int offset = static_cast<s32>(localDevPhyId) % 2 == 0 ? 1 : -1;
 
@@ -2162,7 +2162,7 @@ HcclResult hrtGetDeviceInfo(u32 deviceId, HcclRtDeviceModuleType hcclModuleType,
                 HCCL_ERROR("[hrtGetDeviceInfo]Unsupported infoType[%d] for moduleType=SYSTEM.", hcclInfoType),
                 HCCL_E_NOT_SUPPORT);
     aclrtDevAttr attr = it->second;
-
+ 
     aclError ret = aclrtGetDeviceInfo(deviceId, attr, reinterpret_cast<int64_t *>(&val));
     CHK_PRT_RET(ret != ACL_SUCCESS,
         HCCL_ERROR("[hrtGetDeviceInfo]rt get device info failed. ret[%d], attr[%d], val[%ld]", ret, attr, val),

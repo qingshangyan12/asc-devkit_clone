@@ -8,7 +8,7 @@
 
     ```
     #include "kernel_tiling/kernel_tiling.h"
-
+    
     // ...
     AscendC::tiling::TCubeTiling cubeTilingData;
     ```
@@ -19,7 +19,7 @@
 
     ```
     #include "tiling/tiling_api.h"
-
+    
     namespace optiling {
     // ...
     }

@@ -24,7 +24,7 @@ HcclResult AllReduceAHC::DisposeSubGroups(const u32 rank)
     CommAHCBaseInfo::DisposeSubGroups(rank, globalSubGroups_, level0SubGroups_, level1SubGroups_);
     return HCCL_SUCCESS;
 }
-
+ 
 HcclResult AllReduceAHC::CommAHCInfoInit()
 {
     commAHCBaseInfo_.reset(new (std::nothrow) CommAHCAlignInfo(level0SubGroups_));
@@ -33,7 +33,7 @@ HcclResult AllReduceAHC::CommAHCInfoInit()
     return HCCL_SUCCESS;
 }
 
-HcclResult AllReduceAHC::RunInterAllReduce(const u32 rank, const std::vector<LINK> &links,
+HcclResult AllReduceAHC::RunInterAllReduce(const u32 rank, const std::vector<LINK> &links, 
     const std::unique_ptr<CommAHCBaseInfo> &commAHCBaseInfo)
 {
     HCCL_INFO("[AllReduceAHC][RunInterAllReduce] begin inter AllReduce rank[%u]", rank);

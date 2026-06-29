@@ -88,7 +88,7 @@ HcclResult CollExecutorBase::SetRmaInfo(void* rmaInfo)
     return HCCL_SUCCESS;
 }
 
-HcclResult CollExecutorBase::CalcIncreLinkRequest(const OpParam& param, std::set<u32>& ranksLinked,
+HcclResult CollExecutorBase::CalcIncreLinkRequest(const OpParam& param, std::set<u32>& ranksLinked, 
     AlgResourceRequest &resourceRequest, bool& needIncreLink)
 {
     (void) ranksLinked;

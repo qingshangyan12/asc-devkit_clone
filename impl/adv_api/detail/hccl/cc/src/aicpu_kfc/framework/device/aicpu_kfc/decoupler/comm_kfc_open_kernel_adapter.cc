@@ -165,7 +165,7 @@ inline void LocalPrintElseOpParam(uint32_t rankNum, uint32_t repeatIdx, std::vec
     const u64 outputBegin = reinterpret_cast<u64>(param->outputPtr);
     HCCL_INFO("[MC2_OPEN_DIAG][FormatRun] runOpType %u, runAlgName[%s], runInputPtr %p, "
               "runOutputPtr %p, runCount %llu, runDataType %u, outputType %u, runStrideCount %llu, stream %p.",
-              static_cast<u32>(param->opType), param->algName,
+              static_cast<u32>(param->opType), param->algName, 
               param->inputPtr, param->outputPtr, static_cast<unsigned long long>(param->DataDes.count),
               static_cast<u32>(param->DataDes.dataType), static_cast<u32>(param->DataDes.outputType),
               static_cast<unsigned long long>(param->DataDes.strideCount), param->stream);

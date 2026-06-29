@@ -115,7 +115,7 @@ HcclResult HcclCalcAicpuResOffline(ResResponseGraphMode *resResponse)
     return HCCL_SUCCESS;
 }
 
-HcclResult CheckCalcResInputGraphMode(const OpParamGraphMode *opParam, const u64 *opMemSize, const u32 *streamNum,
+HcclResult CheckCalcResInputGraphMode(const OpParamGraphMode *opParam, const u64 *opMemSize, const u32 *streamNum, 
                                       const u32 *taskNum, const u32 *aivCoreNum)
 {
     CHK_PTR_NULL(opParam);

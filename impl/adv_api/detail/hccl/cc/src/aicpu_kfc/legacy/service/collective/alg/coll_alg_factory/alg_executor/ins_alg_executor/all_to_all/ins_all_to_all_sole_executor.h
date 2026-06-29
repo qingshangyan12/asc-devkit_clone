@@ -32,7 +32,7 @@ public:
     HcclResult CalcResOffload(const RankGraph *rankGraph, const u64 &dataSize,
                               CollOffloadOpResReq &resReq) override;
     HcclResult Orchestrate(const RankGraph *rankGraph, const CollAlgOperator &op, const CollAlgParams &params,
-                          InsQuePtr insQue) override;
+                          InsQuePtr insQue) override;   
     HcclResult CalcRes(const RankGraph *rankGraph, CollAlgResReq &algResReq) override;
 
     HcclResult Orchestrate(const AlgTopoInfo &topoInfo, const CollAlgOperator &op, const CollAlgParams &params,

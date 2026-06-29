@@ -23,8 +23,8 @@
 ```
 
 ## 样例描述
-- 样例功能：
-  生成从0开始的递增索引序列，向量shape为[1, 256]，数据类型为float。
+- 样例功能：  
+  生成从0开始的递增索引序列，向量shape为[1, 256]，数据类型为float。  
   Arange以起始值为0生成递增索引：{0, 1, 2, 3, ..., 255}。
 - 样例规格：
   <table>
@@ -33,11 +33,11 @@
   <tr><td align="center">y</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">arange</td></tr>
   </table>
-- 样例实现：
+- 样例实现：  
   ArangeVF函数内调用Arange接口进行索引生成：
   - 使用Arange接口生成递增索引，每次repeat生成oneRepeatSize个索引
   - 每次repeat后更新起始值
-  - 调用实现
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
 ## 注意事项

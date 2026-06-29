@@ -16,21 +16,21 @@
 namespace mc2_ops_hccl {
 class CcuTempAllGather2DiesMeshMem2Mem1D : public CcuAlgTemplateBase {
 public:
-    explicit  CcuTempAllGather2DiesMeshMem2Mem1D(const OpParam& param,
+    explicit  CcuTempAllGather2DiesMeshMem2Mem1D(const OpParam& param, 
                                                 const u32 rankId,
                                                 const std::vector<std::vector<u32>> &subCommRanks);
-
+ 
     ~CcuTempAllGather2DiesMeshMem2Mem1D() override;
-
+ 
     std::string Describe() const override
     {
         return StringFormat("Template of all gather ccu sche mesh 1D Mem2Mem with tempRankSize [%u].",
                             subCommRanks_[0].size());
     }
-
+ 
     HcclResult CalcRes(HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
                        AlgResourceRequest& resourceRequest) override;
-
+ 
     HcclResult KernelRun(const OpParam& param,
                          const TemplateDataParams& templateDataParams,
                          TemplateResource& templateResource) override;

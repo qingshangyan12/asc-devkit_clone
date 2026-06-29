@@ -47,9 +47,9 @@ This sample implements an Add operator using C_API interfaces, based on asynchro
     The implementation process of the Add operator consists of 3 steps:
 
     The first step moves the inputs x and y from Global Memory to Local Memory, storing them in xLocal and yLocal respectively.
-
+    
     The second step performs the addition operation on xLocal and yLocal, storing the computation result in zLocal.
-
+    
     The third step moves the output data from zLocal to the output z in Global Memory.
 
   - Invocation Implementation

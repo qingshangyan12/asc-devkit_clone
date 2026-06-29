@@ -27,14 +27,14 @@ This sample implements multi-core matrix multiplication computation based on the
 
 ## Sample Description
 
-- Sample Functionality:
+- Sample Functionality:  
   This sample uses Ascend C basic API to implement a basic matrix multiplication (Matmul) [kernel function](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/核函数.md). The matrix multiplication formula is as follows:
   $$
   C = A * B
   $$
   Where matrix A has shape `[M, K]`, matrix B has shape `[K, N]`, and output matrix C has shape `[M, N]`. For each element `C[m, n]` in the output matrix C, the product of row `m` of matrix A and column `n` of matrix B along the K axis accumulates. In matrix multiplication, **M direction** refers to the row direction of matrix C, **N direction** refers to the column direction of matrix C, and **K direction** refers to the inner dimension (accumulation dimension) of matrix C multiplication.
 
-- Sample Specifications:
+- Sample Specifications:  
   This sample uses parameters `M = 256, N = 256, K = 64`, with both input and output in `half` type and [`ND`](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/神经网络和算子/数据排布格式.md) format. The sample launches 2 cores to complete the computation, with each core responsible for 128 rows in the M axis direction and all 256 columns in the N axis direction of the output matrix C:
   - Core 0 computes rows `0~127` of matrix C.
   - Core 1 computes rows `128~255` of matrix C.
@@ -77,7 +77,7 @@ This sample implements multi-core matrix multiplication computation based on the
     - Call [`Fixpipe`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬出/L0C到GM数据搬运（Fixpipe）.md) to convert the `float` accumulation result in L0C to `half` and transfer it back to the matrix C output location in GM.
     - Finally, call [`PipeBarrier`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md)`<PIPE_ALL>()` to ensure that related pipeline tasks within the current core complete.
 
-  - Invocation Implementation
+  - Invocation Implementation  
     Use the [kernel invocation operator](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/核函数.md)`<<<>>>` to invoke the [kernel function](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/核函数.md). When invoking, pass matrix specifications, single-core computation amount, and basic tile size as template parameters, and pass Device-side A, B, C matrix addresses as runtime parameters.
 
 - API Parameter Description:
@@ -165,7 +165,7 @@ This sample implements multi-core matrix multiplication computation based on the
 ## Compilation and Execution
 
 Execute the following steps in the root directory of this sample to compile and run the sample.
-- Configure Environment Variables
+- Configure Environment Variables  
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -200,7 +200,7 @@ Execute the following steps in the root directory of this sample to compile and 
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debug, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
 
-- Execution Result
+- Execution Result  
   The execution result is as follows, indicating successful precision comparison.
   ```bash
   test pass!

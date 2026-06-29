@@ -22,7 +22,7 @@ This example implements vector self-addition based on the RegBase programming pa
 ```
 
 ## Example Description
-- Example Function:
+- Example Function:  
   This example implements vector self-addition based on the RegBase programming paradigm. Input `x` is `float` type two-dimensional data, output `y` has the same shape as input, and each output element satisfies `y[i] = x[i] + x[i]`. The example uses 4-core parallel processing with a total input length of `256 * 256` `float` elements. Each core processes `totalLength / 4` consecutive elements, demonstrating the basic flow of GM/UB data movement, VF function calls, RegBase register computation, and pipeline synchronization.
 - Example Specifications:
   <table>
@@ -44,13 +44,13 @@ This example implements vector self-addition based on the RegBase programming pa
     - Use `SetFlag<HardEvent::V_MTE3>` and `WaitFlag<HardEvent::V_MTE3>` to ensure UB results are moved back to GM only after Vector computation completes.
     - Call `DataCopy` to move results from UB to GM.
 
-  - Call Implementation
+  - Call Implementation  
     Use the kernel call operator `<<<>>>` to launch the `vector_add` kernel function.
 
 ## Build and Run
 
 Execute the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables
+- Configure Environment Variables  
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -86,7 +86,7 @@ Execute the following steps in the root directory of this example to build and r
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debugging, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: Ascend 950PR/Ascend 950DT |
 
-- Execution Results
+- Execution Results  
   The execution results are as follows, indicating the precision comparison succeeded.
   ```bash
   test pass!

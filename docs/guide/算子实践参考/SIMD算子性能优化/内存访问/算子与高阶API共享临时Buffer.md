@@ -11,7 +11,7 @@ SoftMax高阶API计算需要临时Buffer空间，算子在进行其他计算时�
 ```
 ...
 constexpr int32_t blockLen = 32 * 1024;
-TBuf<TPosition::VECCALC> tmpSoftmaxBuf;
+TBuf<TPosition::VECCALC> tmpSoftmaxBuf; 
 pipe.InitBuffer(tmpSoftmaxBuf, softmaxBufSize * sizeof(uint8_t));  // 单独分配Softmax的临时Buf 32KB
 TBuf<TPosition::VECCALC> tmpSumBuf;
 pipe.InitBuffer(tmpSumBuf, sumBufSize * sizeof(T)); // 单独分配Add的临时Buf，且softmaxBufSize * sizeof(uint8_t) + sumBufSize * sizeof(T) <= 64KB

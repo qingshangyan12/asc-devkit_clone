@@ -324,9 +324,9 @@ HcclResult TransportDirectNpu::GetQpAttr()
     char stackLogBuffer[LOG_TMPBUF_SIZE];
     s32 ret = snprintf_s(stackLogBuffer, LOG_TMPBUF_SIZE, LOG_TMPBUF_SIZE - 1U,
         "communicator[%s], local rank[%u], ip[%s], remote rank[%u], ip[%s], transporttype[%s]",
-        machinePara_.tag.c_str(), machinePara_.localUserrank, machinePara_.localIpAddr.GetReadableAddress(),
+        machinePara_.tag.c_str(), machinePara_.localUserrank, machinePara_.localIpAddr.GetReadableAddress(), 
         machinePara_.remoteUserrank, machinePara_.remoteIpAddr.GetReadableAddress(), GetLinkTypeEnumStr(GetLinkType()).c_str());
-    CHK_PRT_RET(ret == -1, HCCL_ERROR("[GetQpAttr]errNo[0x%016llx] sal snprintf_s error",
+    CHK_PRT_RET(ret == -1, HCCL_ERROR("[GetQpAttr]errNo[0x%016llx] sal snprintf_s error", 
         HCCL_ERROR_CODE(HCCL_E_INTERNAL)), HCCL_E_INTERNAL);
     std::string logInfo = "create hccl transport:" + std::string(stackLogBuffer);
     for (u32 i = 0; i < qpHandles_.size(); i++){
@@ -896,7 +896,7 @@ HcclResult TransportDirectNpu::TxData(UserMemType dstMemType, u64 dstOffset, con
         apiParam.timeout, apiParam.localFlagAddr, apiParam.remoteFlagAddr, apiParam.lfKey, apiParam.rfKey, apiParam.qpInfo.qpPtr);
 
 #ifndef CCL_KERNEL
-    u16 timeOut = NOTIFY_DEFAULT_WAIT_TIME > std::numeric_limits<uint16_t>::max() ?
+    u16 timeOut = NOTIFY_DEFAULT_WAIT_TIME > std::numeric_limits<uint16_t>::max() ? 
                     std::numeric_limits<uint16_t>::max() : NOTIFY_DEFAULT_WAIT_TIME;
     CHK_PRT(AicpuAclKernelLaunch(stream.ptr(), reinterpret_cast<void *>(&apiParam), sizeof(apiParam),
             binHandle_, kernelName, true, timeOut));
@@ -967,7 +967,7 @@ HcclResult TransportDirectNpu::RxData(UserMemType srcMemType, u64 srcOffset, voi
         apiParam.timeout, apiParam.localFlagAddr, apiParam.remoteFlagAddr, apiParam.lfKey, apiParam.rfKey, apiParam.qpInfo.qpPtr);
 
 #ifndef CCL_KERNEL
-    u16 timeOut = NOTIFY_DEFAULT_WAIT_TIME > std::numeric_limits<uint16_t>::max() ?
+    u16 timeOut = NOTIFY_DEFAULT_WAIT_TIME > std::numeric_limits<uint16_t>::max() ? 
                     std::numeric_limits<uint16_t>::max() : NOTIFY_DEFAULT_WAIT_TIME;
     CHK_PRT(AicpuAclKernelLaunch(stream.ptr(), reinterpret_cast<void *>(&apiParam), sizeof(apiParam),
             binHandle_, kernelName, true, timeOut));

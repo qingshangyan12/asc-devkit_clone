@@ -131,7 +131,7 @@ public:
         family_ = AF_INET6;
         (void)memcpy_s(binaryAddr_.addr6.s6_addr, sizeof(eid_.raw), eid_.raw, sizeof(eid_.raw));
     }
-
+ 
     std::vector<char> GetUniqueId() const // 获取序列化数据
     {
         std::string ipStr = GetIpStr();
@@ -295,11 +295,11 @@ public:
         }
         return eidOut;
     }
-
+ 
     string Describe() const
     {
         string desc = StringFormat("IpAddress[%s, ", eid_.Describe().c_str());
-
+        
         if (family_ == AF_INET) {
             desc += StringFormat("AF=v4, addr=%s]", GetIpStr().c_str());
         } else {
@@ -338,7 +338,7 @@ public:
         binaryStream >> family_ >> scopeID_;
         char        dst[INET6_ADDRSTRLEN]{0};
         binaryStream >> dst;
-        std::string ip = dst;
+        std::string ip = dst; 
         InitBinaryAddr(ip);
         binaryStream >> eid_.raw; // 恢复eid.raw，覆盖eid
     }
@@ -422,7 +422,7 @@ public:
         return Hccl::HashCombine({subnetPrefixHash, interfaceIdHash});
     }
 };
-
+    
 template <> class equal_to<Hccl::IpAddress> {
 public:
     bool operator()(const Hccl::IpAddress &p1, const Hccl::IpAddress &p2) const

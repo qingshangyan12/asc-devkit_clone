@@ -205,7 +205,7 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
     // dstRepStride, srcRepStride = 8,相邻迭代间的地址间隔为8个datablock，表示相邻迭代间数据连续读取和写入
     // 标量在后调用示例
     AscendC::Muls(dstLocal, src0Local, src1Local[0], mask, 4, { 1, 1, 8, 8 });
-
+    
     // 标量在前调用示例
     static constexpr AscendC::BinaryConfig config = { 0 };
     AscendC::Muls<BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, mask, 4, { 1, 1, 8, 8 });
@@ -220,7 +220,7 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
     // dstRepStride, srcRepStride = 8,相邻迭代间的地址间隔为8个datablock，表示相邻迭代间数据连续读取和写入
     // 标量在后调用示例
     AscendC::Muls(dstLocal, src0Local, src1Local[0], mask, 4, {1, 1, 8, 8});
-
+    
     // 标量在前调用示例
     static constexpr AscendC::BinaryConfig config = { 0 };
     AscendC::Muls<BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, mask, 4, { 1, 1, 8, 8 });
@@ -231,7 +231,7 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
     ```
     // 标量在后调用示例
     AscendC::Muls(dstLocal, src0Local, src1Local[0], 512);
-
+    
     // 标量在前调用示例
     static constexpr AscendC::BinaryConfig config = { 0 };
     AscendC::Muls<BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, 512);

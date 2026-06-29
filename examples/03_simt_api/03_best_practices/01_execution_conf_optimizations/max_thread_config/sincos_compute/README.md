@@ -99,11 +99,11 @@ sincos_compute/
 **关键代码**：
 
 ```cpp
-__global__ void sincos_thread_1024(float* input, float* output_sin,
+__global__ void sincos_thread_1024(float* input, float* output_sin, 
                                     float* output_cos, uint64_t total_length)
 {
     int32_t blk_start_idx = blockIdx.x * THREADS_PER_BLOCK * PER_THREAD_LOOP;
-
+    
     for (int i = 0; i < PER_THREAD_LOOP; i++) {
         int idx = blk_start_idx + i * THREADS_PER_BLOCK + threadIdx.x;
         sincosf(input[idx], output_sin + idx, output_cos + idx);
@@ -150,12 +150,12 @@ __global__ void sincos_thread_1024(float* input, float* output_sin,
 **关键代码**：
 
 ```cpp
-__global__ __launch_bounds__(512) void sincos_thread_512(float* input,
+__global__ __launch_bounds__(512) void sincos_thread_512(float* input, 
                                     float* output_sin, float* output_cos,
                                     uint64_t total_length)
 {
     int32_t blk_start_idx = blockIdx.x * THREADS_PER_BLOCK * PER_THREAD_LOOP;
-
+    
     for (int i = 0; i < PER_THREAD_LOOP; i++) {
         int idx = blk_start_idx + i * THREADS_PER_BLOCK + threadIdx.x;
         sincosf(input[idx], output_sin + idx, output_cos + idx);
@@ -225,7 +225,7 @@ __global__ __launch_bounds__(512) void sincos_thread_512(float* input,
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
 
   ```bash

@@ -203,7 +203,7 @@ HcclResult AicpuHcclProcess::AcquireAicpuComm(const std::string &group, HcclComm
 {
     ReadWriteLock rwlock(g_commAicpuInfo.commAicpuMapMutex);
     rwlock.writeLock();
-
+    
     // 查找是否已存在该group的通信实例
     auto iter = g_commAicpuInfo.commMap.find(group);
     if (iter != g_commAicpuInfo.commMap.end()) {
@@ -212,7 +212,7 @@ HcclResult AicpuHcclProcess::AcquireAicpuComm(const std::string &group, HcclComm
         rwlock.writeUnlock();
         return HCCL_SUCCESS;
     }
-
+    
     // 未找到则创建新实例
     std::shared_ptr<HcclCommAicpu> aicpuComm;
     try {
@@ -222,7 +222,7 @@ HcclResult AicpuHcclProcess::AcquireAicpuComm(const std::string &group, HcclComm
         rwlock.writeUnlock();
         return HCCL_E_PTR;
     }
-
+    
     if (UNLIKELY(!aicpuComm)) {
         HCCL_ERROR("[%s]errNo[0x%016llx] aicpuComm is nullptr", __func__, HCCL_ERROR_CODE(HCCL_E_PTR));
         rwlock.writeUnlock();

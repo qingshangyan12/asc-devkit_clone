@@ -30,9 +30,9 @@ This example uses the Log high-level API to implement element-wise logarithmic c
 
 ## Example Description
 
-- Example function:
+- Example function:  
   Perform element-wise logarithmic computation with bases e, 2, and 10.
-- Example specifications:
+- Example specifications:  
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> log </td></tr>
 
@@ -45,24 +45,24 @@ This example uses the Log high-level API to implement element-wise logarithmic c
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">log_custom</td></tr>
   </table>
 
-- Example implementation:
+- Example implementation:  
   This example implements a log_custom example with fixed shapes of input x[8, 2048] and output y[8, 2048]. This example uses base e as an example.
 
   - Kernel implementation
 
     Use the Log high-level API to complete the log computation.
 
-  - Tiling implementation
+  - Tiling implementation  
     Set the tiling parameters totalLength and tileNum based on the input length and the number of cores used.
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run
+## Build and Run  
 
 Run the following steps in the root directory of this example to build and run the operator.
 
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -81,7 +81,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-
+  
   For example:
 
   ```bash

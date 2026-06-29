@@ -235,7 +235,7 @@ HcclResult Reducer::run(const HcclDispatcher dispatcher, const std::shared_ptr<T
 
     bool isSpInlineReduce = link->IsSpInlineReduce();
     HcclResult ret = HCCL_SUCCESS;
-
+    
     if (isSpInlineReduce && static_cast<bool>((INLINE_REDUCE_BITMASK & reduceAttribute_))) {
         CHK_RET(link->Wait(notifyIdx, stream));
         void *remoteMem = nullptr;
@@ -265,7 +265,7 @@ HcclResult Reducer::run(const HcclDispatcher dispatcher, const std::shared_ptr<T
         std::vector<RxWithReduceMemoryInfo> rxWithReduceMems;
         CHK_RET(PrepareRxWithReduceMems(reducerMems, rxWithReduceMems));
         CHK_RET(preSync_());
-
+        
         CHK_RET(link->Wait(notifyIdx, stream));
         for(auto& mem : rxMems){
             CHK_PTR_NULL(mem.dst);
@@ -273,7 +273,7 @@ HcclResult Reducer::run(const HcclDispatcher dispatcher, const std::shared_ptr<T
             CHK_RET(link->GetRemoteMem(mem.srcMemType, &srcMemPtr));
             DeviceMem srcDevMem(static_cast<s8 *>(srcMemPtr) + mem.srcOffset, mem.len);
             DeviceMem dstDevMem(static_cast<s8 *>(mem.dst),mem.len);
-            CHK_RET(HcclD2DMemcpyAsync(dispatcher, dstDevMem, srcDevMem, stream, link->GetRemoteRank(),
+            CHK_RET(HcclD2DMemcpyAsync(dispatcher, dstDevMem, srcDevMem, stream, link->GetRemoteRank(), 
                 link->GetLinkType()));
         }
         CHK_RET(postSync_());

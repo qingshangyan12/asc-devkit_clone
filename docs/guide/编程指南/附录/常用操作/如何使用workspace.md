@@ -43,7 +43,7 @@ workspace是设备侧Global Memory上的一块内存。workspace内存分为两�
     extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling)
     {
         ...
-
+        
     }
     ```
 

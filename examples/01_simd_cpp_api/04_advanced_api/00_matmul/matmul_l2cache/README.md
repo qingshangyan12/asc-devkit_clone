@@ -25,10 +25,10 @@ Matmul样例M方向或者N方向切分输入的矩阵，将矩阵切分成多块
 │   └── README.md               // 样例说明文档
 ```
 ## 样例描述
-- 样例功能：
+- 样例功能：  
   本样例以AI处理器的L2 Cache大小192M为例，根据样例的输入、输出shape，计算样例输入和输出的总数据量为((30720 * 4096) + (4096 * 1024) + (1024) + (30720 * 1024)) * 2 = 322963456字节（约308M），大于L2 Cache（192M），无法保证计算前读取的数据能够命中L2 Cache，而Global Memory带宽低于L2 Cache，且两者之间差距较大，搬运数据成为样例运行的性能瓶颈。因此需要将输入数据切分成多块，使得每个数据块的计算数据量（包含输入和输出），能够命中L2 Cache。本样例提供了L2CacheOptimizer类，其中GetTileNum接口用于自动根据左右矩阵的Shape获取左右矩阵总L2切分份数，GetBlockShape接口获取L2切分后M、N、K轴的长度，GetBlockCoord接口返回对应切块的位置坐标，即M、N、K方向相对矩阵起始位置的偏移。
 
-- 样例规格：
+- 样例规格：  
   本样例中：M = 30720, N = 1024, K = 4096。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
@@ -40,7 +40,7 @@ Matmul样例M方向或者N方向切分输入的矩阵，将矩阵切分成多块
   <td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_l2cache_custom</td></tr>
   </table>
-- 样例实现：
+- 样例实现： 
   - Kernel关键步骤
     - 设置左矩阵A、右矩阵B、Bias。根据L2CacheOptimizer类的GetTileNum接口获取左右矩阵总L2切分份数，循环多次计算。
       ```cpp
@@ -103,12 +103,12 @@ Matmul样例M方向或者N方向切分输入的矩阵，将矩阵切分成多块
         }
         ```
 
-  - 调用实现
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

@@ -110,7 +110,7 @@ HcclResult RankConsistentcyChecker::DelOpPara(const std::string &tag)
 HcclResult RankConsistentcyChecker::RecordVerInfo(const std::string &versionInfo)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    // Only record once, in case of multiple calls while other process is reading CANN version information
+    // Only record once, in case of multiple calls while other process is reading CANN version information 
     // in CompareFrame func and get the intermediate state.
     if (cannVerInfoRecordFlag_) {
         HCCL_INFO("[RankConsistentcyChecker][RecordVerInfo]Cann version information has been recorded.");

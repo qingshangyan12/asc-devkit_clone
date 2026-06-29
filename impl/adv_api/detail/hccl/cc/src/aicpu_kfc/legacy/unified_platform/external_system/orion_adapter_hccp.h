@@ -377,7 +377,7 @@ HrtRaUbRemMemImportedOutParam HrtRaUbRemoteMemImport(RdmaHandle handle, u8 *key,
 void HrtRaUbRemoteMemUnimport(RdmaHandle rdmaHandle, RemMemHandle rmemHandle);
 
 MAKE_ENUM(HrtUbJfcMode, NORMAL, STARS_POLL, CCU_POLL, USER_CTL)
-
+ 	 
 struct CqCreateInfo {
     uint64_t va;
     uint32_t id;
@@ -626,7 +626,7 @@ HcclResult HrtRaDestroyCq(RdmaHandle rdmaHandle, CqInfo& cq);
 HcclResult ConstructQpDefaultAttrs(s32 qpMode, struct qp_ext_attrs &attrs, bool isWorkFlowLib);
 HcclResult HrtRaNormalQpCreate(RdmaHandle rdmaHandle, QpInfo& qp);
 HcclResult HrtRaNormalQpDestroy(QpHandle qpHandle);
-
+  
 MAKE_ENUM(AuxInfoInType, AUX_INFO_IN_TYPE_CQE, AUX_INFO_IN_TYPE_AE, AUX_INFO_IN_TYPE_MAX);
 struct AuxInfoIn {
     AuxInfoInType auxInfoInType;

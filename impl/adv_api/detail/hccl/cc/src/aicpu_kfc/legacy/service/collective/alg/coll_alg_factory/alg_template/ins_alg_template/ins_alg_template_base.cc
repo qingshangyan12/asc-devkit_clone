@@ -331,7 +331,7 @@ HcclResult InsAlgTemplateBase::GetMaxTransPortDataSize(u64 &maxTransPortDataSize
 }
 
 HcclResult InsAlgTemplateBase::CalNumBlocks(u32& numBlocks, u64 dataSize, u32 numBlocksLimit)
-{
+{   
     (void)numBlocks;
     (void)dataSize;
     (void)numBlocksLimit;

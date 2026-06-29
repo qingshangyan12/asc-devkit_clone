@@ -32,7 +32,7 @@ void CollReduceScatterOrderPreservedExecutor::ParseParam(const OpParam& param)
     const bool isSmallData = sizePerRank <= HCCL_SMALL_COUNT_32_KB;
     const bool isSingleModule = topoAttr_.moduleNum == 1;
     const bool isOpBase = workflowMode_ == HcclWorkflowMode::HCCL_WORKFLOW_MODE_OP_BASE;
-    const bool isPowerOfTwoDevices = (topoAttr_.deviceNumPerAggregation == DEVICE_EIGHT)
+    const bool isPowerOfTwoDevices = (topoAttr_.deviceNumPerAggregation == DEVICE_EIGHT) 
         || (topoAttr_.deviceNumPerAggregation == DEVICE_FOUR);
     isUseHDAlg_ = isSmallData && isSingleModule && isOpBase && isPowerOfTwoDevices;
 }
@@ -56,9 +56,9 @@ HcclResult CollReduceScatterOrderPreservedExecutor::CalcStreamNum(u32& streamNum
     // level1主流分给alltoall，从流给LocalReduce使用
     u32 level1StreamNum = CalReduceStreamNum(topoAttr_.moduleNum);
     // 总流数上限：7（alltoall使用，提前的本地拷贝任务不需要并行）+ 4（LocalReduce使用）
-    streamNum = std::min(std::max(level0StreamNum - 1, level1StreamNum),
+    streamNum = std::min(std::max(level0StreamNum - 1, level1StreamNum), 
         DEVICE_EIGHT + DEVICE_EIGHT / FACTOR_NUM_TWO - 1);
-
+    
     HCCL_INFO("[%s]tag[%s] level0StreamNum[%u], level1StreamNum[%u], streamNum[%u]", __func__, tag_.c_str(),
         level0StreamNum, level1StreamNum, streamNum);
     return HCCL_SUCCESS;
@@ -86,7 +86,7 @@ HcclResult CollReduceScatterOrderPreservedExecutor::CalcTransportMemType(Transpo
 
 HcclResult CollReduceScatterOrderPreservedExecutor::CalcLevel0CommInfo(TransportMemType inputType,
     TransportMemType outputType, std::vector<LevelNSubCommTransport>& opTransport)
-{
+{   
     CommParaInfo commParaLevel0(COMM_LEVEL0, CommType::COMM_TAG_MESH);
     CHK_RET(CalcCommPlaneInfo(tag_, commParaLevel0, opTransport[COMM_LEVEL0], inputType, outputType));
     return HCCL_SUCCESS;
@@ -140,7 +140,7 @@ HcclResult CollReduceScatterOrderPreservedExecutor::RunReduceScatterLevel0(const
     if (isUseHDAlg_) {
         CHK_RET(RunReduceScatterLevel0HD(param, execMem, level0CommInfo));
     } else {
-        // 切分数据(ReduceScatter分组，记录每组的起始偏移和大小)
+        // 切分数据(ReduceScatter分组，记录每组的起始偏移和大小) 
         GroupSlicesInfo groupSlicesInfoLevel0;
         u64 size = execMem.count * SIZE_TABLE[param.DataDes.dataType];
         for (u32 groupId = 0; groupId < topoAttr_.moduleNum; groupId++) {
@@ -157,13 +157,13 @@ HcclResult CollReduceScatterOrderPreservedExecutor::RunReduceScatterLevel0(const
             groupSlicesInfoLevel0.push_back(memInfo);
         }
 
-        all2allOffset_ = topoAttr_.moduleNum > 1 ? 1 : 0;  // 多机场景需要偏移1（给L1预留计算位，减少拷贝次数）
+        all2allOffset_ = topoAttr_.moduleNum > 1 ? 1 : 0;  // 多机场景需要偏移1（给L1预留计算位，减少拷贝次数） 
         std::unique_ptr<AlgTemplateBase> level0TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(
             TemplateType::TEMPLATE_REDUCESCATTER_PLANT_LOCAL_REDUCE, dispatcher_);
         CHK_SMART_PTR_NULL(level0TempAlg);
 
         // execMem.scratchMem在单算子模式下为cclout，图模式为scrach，因此output传入scrach即可
-        CHK_RET(level0TempAlg->Prepare(execMem.inputPtr, execMem.inputMem, execMem.scratchMem, param.stream,
+        CHK_RET(level0TempAlg->Prepare(execMem.inputPtr, execMem.inputMem, execMem.scratchMem, param.stream, 
             algResResp_->slaveStreams, algResResp_->notifiesMain, algResResp_->notifiesAux,
             groupSlicesInfoLevel0, param.reduceType, all2allOffset_, param.DataDes.dataType, false));
         CHK_RET(level0TempAlg->RegisterProfiler(
@@ -185,14 +185,14 @@ HcclResult CollReduceScatterOrderPreservedExecutor::RunReduceScatterLevel1(const
     u64 size = execMem.count * SIZE_TABLE[param.DataDes.dataType];
     MemBlockInfo memInfo;
     u32 level0Ranksize = level0CommInfo.localRankSize;
-    u32 inputBaseIndex = (all2allOffset_ + commIndex) % level0Ranksize; // 多机场景需要偏移1（给L1预留计算位，减少拷贝次数）
+    u32 inputBaseIndex = (all2allOffset_ + commIndex) % level0Ranksize; // 多机场景需要偏移1（给L1预留计算位，减少拷贝次数） 
     for (u32 dataId = 0; dataId < level1CommInfo.localRankSize; dataId ++) {
         u64 inputIndex = inputBaseIndex + dataId * level0Ranksize;
         memInfo.inputOffsets.push_back(inputIndex * size);
         u64 outputIndex = commIndex + dataId * level0Ranksize;
         memInfo.outputOffsets.push_back(outputIndex * size);
         memInfo.userInputOffsets.push_back(outputIndex * size);
-        memInfo.size.push_back(size);
+        memInfo.size.push_back(size);  
     }
 
     std::unique_ptr<AlgTemplateBase> level1TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(

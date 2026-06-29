@@ -18,8 +18,8 @@ This example uses C_API interfaces to implement the Add operator example, based 
 
 ## Operator Description
 
-- Operator Function:
-  The Add operator implements the function of adding two data values and returning the addition result. The corresponding mathematical expression is:
+- Operator Function:  
+  The Add operator implements the function of adding two data values and returning the addition result. The corresponding mathematical expression is:  
   ```
   z = x + y
   ```
@@ -40,25 +40,25 @@ This example uses C_API interfaces to implement the Add operator example, based 
 
 - Operator Implementation:
 
-  - Kernel Implementation
+  - Kernel Implementation  
 
     C_API input data needs to be moved to on-chip memory first, then the computation interface is used to complete the addition of two input parameters to obtain the final result, and then moved to external storage.
 
     The implementation flow of the Add operator is divided into 3 steps:
 
     The first step moves the inputs x and y from Global Memory to Local Memory, storing them in xLocal and yLocal respectively.
-
+    
     The second step performs addition on xLocal and yLocal, and the computation result is stored in zLocal.
-
+    
     The third step moves the output data from zLocal to the output z on Global Memory.
 
-  - Invocation Implementation
+  - Invocation Implementation  
     The kernel function is invoked using the kernel call operator <<<>>>.
 
 ## Compilation and Execution
 
 Execute the following steps in the root directory of this example to compile and execute the operator.
-- Configure Environment Variables
+- Configure Environment Variables  
   Please select the corresponding command to configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
   - Default path, CANN software package installed by root user
     ```bash

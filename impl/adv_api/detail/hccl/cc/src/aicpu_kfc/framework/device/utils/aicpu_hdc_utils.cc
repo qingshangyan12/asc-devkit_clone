@@ -104,7 +104,7 @@ HcclResult AicpuHdcUtils::GetKfcCommand(const std::shared_ptr<HDCommunicate> &h2
 {
     if (!h2dTransfer) {
         return HCCL_SUCCESS;
-    }
+    }   
     CHK_RET(h2dTransfer->Get(0, sizeof(KfcCommand), reinterpret_cast<uint8_t *>(&cmd)));
     return HCCL_SUCCESS;
 }

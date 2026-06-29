@@ -232,7 +232,7 @@ void ExecutorTracer::HandleSwitchNic(AicpuComContext *const ctx)
     rwlock.readUnlock();
 }
 
-void ExecutorTracer::HandleResumeChangeLink(AicpuComContext *const ctx)
+void ExecutorTracer::HandleResumeChangeLink(AicpuComContext *const ctx) 
 {
     ReadWriteLockBase &commAicpuMapMutex = AicpuHcclProcess::AicpuGetCommMutex();
     ReadWriteLock rwlock(commAicpuMapMutex);

@@ -27,10 +27,10 @@ This example demonstrates the usage of basic arithmetic interfaces based on Leak
 
 ## Example Description
 
-- Example function:
+- Example function:  
   This example implements element-wise Leaky Relu (Leaky Rectified Linear Unit) operation on the input tensor and returns the computation result.
 
-  The corresponding mathematical expression is:
+  The corresponding mathematical expression is:  
   $$
   out =
   \begin{cases}
@@ -48,21 +48,21 @@ This example demonstrates the usage of basic arithmetic interfaces based on Leak
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">element_wise_arithmetic_kernel</td></tr>
   </table>
 
-- Example implementation:
+- Example implementation:  
   This example implements a LeakyRelu example with a fixed shape of [4, 128].
-  - Kernel implementation
+  - Kernel implementation  
     - Call the DataCopy basic API to transfer data from GM (Global Memory) to UB (Unified Buffer)
     - Call the LeakyRelu interface to perform Leaky Relu operation on the input Tensor
     - Call the DataCopy basic API to transfer computation results from UB (Unified Buffer) to GM (Global Memory)
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -82,7 +82,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debug or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-
+  
   Examples:
 
   ```bash

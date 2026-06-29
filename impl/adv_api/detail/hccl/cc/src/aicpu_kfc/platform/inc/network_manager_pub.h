@@ -90,7 +90,7 @@ public:
 
     HcclResult CreateHostSocketHandle(const HcclIpAddress &ipAddr, SocketHandle &socketHandle);
     HcclResult StopHostSocketHandle(const HcclIpAddress &ipAddr);
-
+    
     // 地址转换
     HcclResult HcclIpAddressConvertHcclAddr(HcclAddress *hccladdr, HcclIpAddress *hcclIP);
     // 创建rdma时 需要获取Mode类型和type类型

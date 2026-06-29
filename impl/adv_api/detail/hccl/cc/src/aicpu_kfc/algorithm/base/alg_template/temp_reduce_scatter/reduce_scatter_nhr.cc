@@ -208,7 +208,7 @@ HcclResult ReduceScatterNHR::InlineReducer(const LINK &linkLeft, const std::vect
     return HCCL_SUCCESS;
 }
 
-HcclResult ReduceScatterNHR::InlineReduceRx(const LINK &linkLeft, std::vector<Slice> &rxSlices,
+HcclResult ReduceScatterNHR::InlineReduceRx(const LINK &linkLeft, std::vector<Slice> &rxSlices, 
     std::vector<Slice> &rxSlicestemp)
 {
     std::vector<ReducerMemoryInfo> rxReduceMems;
@@ -234,7 +234,7 @@ HcclResult ReduceScatterNHR::InlineReduceRxLastStep(const LINK &linkLeft, InterS
         DeviceMem srcMem = inputMem_.range(inputSlices[rxSliceIdx].offset, inputSlices[rxSliceIdx].size);
         DeviceMem tmpMem = scratchMem_.range(outputSlices[rxSliceIdx].offset, outputSlices[rxSliceIdx].size);
         HCCL_DEBUG("[ReduceScatterNHR][RunReduceScatterNHR] final reduce rxSliceIdx[%u] will reduce with "
-            "inputMem_ offset[%llu] to ouput_mem_ offset[%llu] size[%llu]",
+            "inputMem_ offset[%llu] to ouput_mem_ offset[%llu] size[%llu]", 
             rxSliceIdx, inputSlices[rxSliceIdx].offset, outputSlices[rxSliceIdx].offset, outputSlices[rxSliceIdx].size);
 
         rxReduceMems.emplace_back(
@@ -281,7 +281,7 @@ HcclResult ReduceScatterNHR::TbeReduceRxLastStep(const LINK &linkLeft, InterServ
         u32 rxSliceIdx = stepInfo.rxSliceIdxs[i];
         DeviceMem srcMemRemote(static_cast<s8 *>(srcMemPtr) + baseOffset_ + inputSlices[rxSliceIdx].offset, inputSlices[rxSliceIdx].size); // 对端inputMem
         DeviceMem dstMem = outputMem_.range(outputSlices[rxSliceIdx].offset, outputSlices[rxSliceIdx].size); // 本端outputMem
-        DeviceMem srcMem = inputMem_.range(inputSlices[rxSliceIdx].offset, inputSlices[rxSliceIdx].size); // 本端inputMem
+        DeviceMem srcMem = inputMem_.range(inputSlices[rxSliceIdx].offset, inputSlices[rxSliceIdx].size); // 本端inputMem 
         DeviceMem tmpMem = scratchMem_.range(outputSlices[rxSliceIdx].offset, outputSlices[rxSliceIdx].size); // 本端scratchMem
         u64 dataCount = dstMem.size() / SIZE_TABLE[dataType_];
         HCCL_DEBUG("[ReduceScatterNHR][RunReduceScatterNHR] final reduce rxSliceIdx[%u] will reduce with "
@@ -452,13 +452,13 @@ HcclResult ReduceScatterNHR::RunSourceSender(const LINK &link, InterServerAlgoSt
     }
     HCCL_DEBUG("[ReduceScatterNHR][RunSourceSender] txSlices size [%u], txSlices temp size [%u]",
         txSlices.size(), txSlicestemp.size());
-
+        
     // 合并连续slices
     MergeSlices(txSlices);
     MergeSlices(txSlicestemp);
     HCCL_DEBUG("[ReduceScatterNHR][RunSourceSender] merged txSlices size [%u], merged txSlices temp size [%u]",
         txSlices.size(), txSlicestemp.size());
-
+    
     std::vector<SenderMemoryInfo> txMems;
     for (u64 i = 0; i < txSlices.size(); i++) {
         DeviceMem srcMem = inputMem_.range(txSlices[i].offset, txSlices[i].size);

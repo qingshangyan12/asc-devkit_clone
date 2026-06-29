@@ -22,7 +22,7 @@ InsTempReduceScatterAicpuReduceNHR::~InsTempReduceScatterAicpuReduceNHR()
 }
 
 HcclResult InsTempReduceScatterAicpuReduceNHR::CalcRes(HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
-                                            AlgResourceRequest& resourceRequest)
+                                            AlgResourceRequest& resourceRequest) 
 {
     // NHR 需要的 que Num 为 1
     resourceRequest.slaveThreadNum = 0;
@@ -58,7 +58,7 @@ HcclResult InsTempReduceScatterAicpuReduceNHR::KernelRun(const OpParam& param,
     tempAlgParams_       = tempAlgParams;
     channels_            = templateResource.channels;
     dataType_            = param.DataDes.dataType;
-
+    
     for (u32 sliceIdx = 0; sliceIdx < templateRankSize_; ++sliceIdx) {
         // Step 1: 本地拷贝，将本rank的数据拷贝到自己hcclBuffer上相应的位置
         CHK_RET(LocalDataCopy(templateResource.threads, sliceIdx));
@@ -67,7 +67,7 @@ HcclResult InsTempReduceScatterAicpuReduceNHR::KernelRun(const OpParam& param,
         }
         // Step 2: 数据分发，每个rank通过write方式将对端rank需要的数据写到其hcclBuffer对应的槽位
         CHK_RET(RunAllGather(templateResource.threads));
-
+        
         // 必须确保所有通信任务完成，因为接下来的 AICPU Reduce 运行在 CPU 上，不感知任务队列同步
         CHK_RET(static_cast<HcclResult>(HcommBatchModeEnd(param.algTag)));
         CHK_RET(static_cast<HcclResult>(HcommBatchModeStart(param.algTag)));
@@ -80,7 +80,7 @@ HcclResult InsTempReduceScatterAicpuReduceNHR::KernelRun(const OpParam& param,
             CHK_RET(PostLocalReduce(templateResource.threads));
         }
     }
-
+    
     HCCL_INFO("[InsTempReduceScatterAicpuReduceNHR] KernelRun end");
     return HcclResult::HCCL_SUCCESS;
 }
@@ -89,21 +89,21 @@ HcclResult InsTempReduceScatterAicpuReduceNHR::LocalDataCopy(const std::vector<T
 {
     CHK_PRT_RET(threads.empty(),
         HCCL_ERROR("[InsTempReduceScatterAicpuReduceNHR][LocalDataCopy] empty threads"), HcclResult::HCCL_E_INTERNAL);
-
+    
     ThreadHandle q = threads[0];
     const u64 rptNum = std::max<u64>(1, tempAlgParams_.repeatNum);
-
+    
     // 获取本rank在算法中的索引
     u32 myAlgIdx = 0;
     CHK_RET(GetAlgRank(myRank_, subCommRanks_[0], myAlgIdx));
-
+    
     // 把属于自己的slice从input拷贝到hcclBuff的对应位置
     for (u64 rpt = 0; rpt < rptNum; ++rpt) {
         // 计算input上的偏移：使用inputSliceStride计算本rank的数据偏移
         const u64 inBaseOff = tempAlgParams_.buffInfo.inBuffBaseOff +
                               rpt * tempAlgParams_.inputRepeatStride;
         const u64 inOff = inBaseOff + tempAlgParams_.inputSliceStride * sliceIdx;
-
+        
         // 计算hcclBuffer上的偏移
         const u64 scratchBase = tempAlgParams_.buffInfo.hcclBuffBaseOff +
                                 rpt * tempAlgParams_.outputRepeatStride;
@@ -116,7 +116,7 @@ HcclResult InsTempReduceScatterAicpuReduceNHR::LocalDataCopy(const std::vector<T
             rpt, inOff, scOff, tempAlgParams_.sliceSize);
 
         // 如果源地址和目标地址相同，则不需要做拷贝
-        if (tempAlgParams_.buffInfo.inBuffType != tempAlgParams_.buffInfo.hcclBuffType || inOff != scOff) {
+        if (tempAlgParams_.buffInfo.inBuffType != tempAlgParams_.buffInfo.hcclBuffType || inOff != scOff) { 
             CHK_RET(LocalCopy(q, src, dst));
         }
     }
@@ -141,7 +141,7 @@ HcclResult InsTempReduceScatterAicpuReduceNHR::LocalCopyToOutput(const std::vect
         DataSlice dst = DataSlice(tempAlgParams_.buffInfo.outputPtr, outBaseOff, tempAlgParams_.sliceSize, tempAlgParams_.count);
         HCCL_INFO("[InsTempReduceScatterAicpuReduceNHR][LocalCopyToOutput] rpt[%u] inOff[%llu] outBaseOff[%llu] sliceSize[%llu]",
             rpt, inOff, outBaseOff, tempAlgParams_.sliceSize);
-        if (tempAlgParams_.buffInfo.inBuffType != tempAlgParams_.buffInfo.outBuffType || inOff != outBaseOff) {
+        if (tempAlgParams_.buffInfo.inBuffType != tempAlgParams_.buffInfo.outBuffType || inOff != outBaseOff) { 
             CHK_RET(LocalCopy(q, src, dst));
         }
     }

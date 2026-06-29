@@ -47,7 +47,7 @@ public:
         }
 
         ~Iterator() override = default;
-
+        
         reference operator*() const override
         {
             return (this->queue_->elems_[this->index_]);

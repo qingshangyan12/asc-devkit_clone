@@ -154,7 +154,7 @@ HcclResult InsRecvExecutor::Orchestrate(const AlgTopoInfo     &topoInfo,
         return HcclResult::HCCL_SUCCESS;
     }
     HCCL_DEBUG("[InsCollAlgFactory][InsRecvExecutor][Orchestrate] Other send, Self recv.");
-
+ 
     // 从linkMgr里面拿到 linkData
     const vector<LinkData> recvPath = linkMgr->GetLinks(remoteRank);
     CHK_PRT_RET(recvPath.size() == 0,
@@ -166,7 +166,7 @@ HcclResult InsRecvExecutor::Orchestrate(const AlgTopoInfo     &topoInfo,
         dmaMode_ = DmaMode::GET;
     }
     HCCL_DEBUG("[InsCollAlgFactory][InsRecvExecutor][Orchestrate] Total transfer data size [%llu], Max scratch buffer size [%u].", totalDataSize, params.maxTmpMemSize);
-
+ 
     // 初始化循环参数
     u64 resDataSize = totalDataSize;
     u64 currentOffset = 0;
@@ -198,7 +198,7 @@ HcclResult InsRecvExecutor::Orchestrate(const AlgTopoInfo     &topoInfo,
             DataSlice outputBuffer(BufferType::OUTPUT, currentOffset, transferSize);
             DataSlice scratchBuffer(BufferType::SCRATCH, 0, transferSize);
             DataSlice remoteScratchBuffer(BufferType::SCRATCH, 0, transferSize);
-
+ 
             SlicesList recvSlicesList({remoteScratchBuffer}, {scratchBuffer});
             DataInfo recvInfo(recvLinkData, recvSlicesList);
             CHK_RET(Recv(recvInfo, insQue, 0, true, dmaMode_));

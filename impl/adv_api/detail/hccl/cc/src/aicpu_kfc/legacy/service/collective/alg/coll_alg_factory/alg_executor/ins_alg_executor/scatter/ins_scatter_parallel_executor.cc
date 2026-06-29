@@ -98,7 +98,7 @@ HcclResult InsScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTempl
     CHK_RET(CalcLinkInfo(myRank_, rankGraph, resReqInter.links, algResReq.levelRankPairs));
     algResReq.primQueueNum = resReqIntra.streamNum + resReqInter.streamNum;
     CHK_RET(CalcParallelNotifyReq(algResReq.primQueueNum, algResReq.queueNotifys));
-
+    
     HCCL_DEBUG("[InsScatterParallelExecutor] algResReq.primQueueNum %u", algResReq.primQueueNum);
     CHK_RET(CalcResLinks(myRank_, rankGraph, linkPriority_, resReqIntra.links, algResReq.links));
     CHK_RET(CalcResLinks(myRank_, rankGraph, linkPriority_, resReqInter.links, algResReq.links));
@@ -162,7 +162,7 @@ void InsScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>:
     tempAlgParamsInter1.buffInfo.outBuffType = BufferType::SCRATCH;
     tempAlgParamsInter1.buffInfo.scratBuffType = BufferType::SCRATCH;
     tempAlgParamsInter1.buffInfo.inBuffBaseOff = dataOffset;
-    tempAlgParamsInter1.buffInfo.outBuffBaseOff = scratchOffset;
+    tempAlgParamsInter1.buffInfo.outBuffBaseOff = scratchOffset; 
     tempAlgParamsInter1.buffInfo.scratchBuffBaseOff = scratchOffset;
     tempAlgParamsInter1.sliceSize = dataCountPerLoopAixs1 * dataTypeSize_;
 
@@ -244,7 +244,7 @@ HcclResult InsScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTempl
     HCCL_INFO("[InsScatterParallelExecutor] intraLinks_ size[%zu], interLinks_ size[%zu]", intraLinks_.size(), interLinks_.size());
     return HCCL_SUCCESS;
 }
-
+ 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 HcclResult InsScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::PrepareResForTemplate(ConnectedLinkMgr *linkMgr,
                                                                                                                InsAlgTemplate0 &tempAlgIntra,
@@ -260,7 +260,7 @@ HcclResult InsScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTempl
         CHK_RET(tempAlgIntra.CalcRes(resReqIntra));
     }
     CHK_RET(tempAlgInter.CalcRes(resReqInter));
-
+ 
     // 申请算法模板所需资源
     if(!(resReqIntra.queNum > 0 && resReqInter.queNum > 0)) {
         HCCL_ERROR("[InsScatterParallelExecutor]resReqIntra.queNum and resReqInter.queNum must larger than 0.");
@@ -277,13 +277,13 @@ HcclResult InsScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTempl
     }
     syncQueues_.emplace_back(intraQue_[0]);
     syncQueues_.emplace_back(interQue_[0]);
-
+ 
     CHK_RET(PrepResLinks(myRank_, resReqIntra.links, linkMgr, intraLinks_));
     CHK_RET(PrepResLinks(myRank_, resReqInter.links, linkMgr, interLinks_));
     HCCL_INFO("[InsScatterParallelExecutor] intraLinks_ size[%zu], interLinks_ size[%zu]", intraLinks_.size(), interLinks_.size());
     return HCCL_SUCCESS;
 }
-
+ 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 HcclResult InsScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::Orchestrate(
     const AlgTopoInfo &topoInfo, const CollAlgOperator &op, const CollAlgParams &params, ConnectedLinkMgr *linkMgr,
@@ -291,32 +291,32 @@ HcclResult InsScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTempl
 {
     // init and check params
     CHK_RET(Init(op, params, insQue));
-
+ 
     virtRanks_ = topoInfo.virtRanks;
     vTopo_ = topoInfo.vTopo;
     virtRankMap_ = topoInfo.virtRankMap;
     CHK_RET(CalcLocalRankSize(myRank_, virtRanks_, rankSizeLevel0_, rankSizeLevel1_));
     rankIdxLevel0_ = myRank_ % vTopo_[0][0].size();
     rankIdxLevel1_ = myRank_ / vTopo_[0][0].size();
-
+ 
     // 实例化算法模板类
     InsAlgTemplate0 tempAlgIntra(myRank_, rankSizeLevel0_, vTopo_[0], virtRankMap_[0]); //server内算法，比如mesh
     InsAlgTemplate1 tempAlgInter(myRank_, rankSizeLevel1_, vTopo_[1], virtRankMap_[1]);  //server间算法，比如nhr
-
+ 
     // 实例化算法模板类
-
+ 
     tempAlgIntra.SetDmaMode(dmaMode_);
     tempAlgIntra.SetCollOp(op);  // CCU template需要传递op信息
-
+ 
     tempAlgInter.SetDmaMode(dmaMode_);
     tempAlgInter.SetCollOp(op);  // CCU template需要传递op信息
-
+ 
     // 计算算法模板所需资源
     CHK_RET(PrepareResForTemplate(linkMgr, tempAlgIntra, tempAlgInter));
-
+    
     CHK_RET(GenInsQuesHost(tempAlgIntra, tempAlgInter));
     HCCL_INFO("[InsScatterParallelExecutor] Orchestrate success.");
-
+ 
     return HcclResult::HCCL_SUCCESS;
 }
 
@@ -349,7 +349,7 @@ HcclResult InsScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTempl
 
     // 计算算法模板所需资源
     CHK_RET(PrepareResForTemplate(rankGraph, tempAlgIntra, tempAlgInter));
-
+    
     CHK_RET(GenInsQuesHost(tempAlgIntra, tempAlgInter));
     HCCL_INFO("[InsScatterParallelExecutor] Orchestrate success.");
 

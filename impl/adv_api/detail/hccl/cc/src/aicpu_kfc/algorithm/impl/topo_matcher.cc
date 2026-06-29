@@ -292,17 +292,17 @@ u32 TopoMatcher::GetExternalInputInterHccsDisable()
 
 bool TopoMatcher::GetARSFlag()
 {
-    bool isARSTrue = (topoInfo_.deviceType == DevType::DEV_TYPE_910_93) &&
-        static_cast<bool>(topoInfo_.multiModuleDiffDeviceNumMode) &&
+    bool isARSTrue = (topoInfo_.deviceType == DevType::DEV_TYPE_910_93) && 
+        static_cast<bool>(topoInfo_.multiModuleDiffDeviceNumMode) && 
         !static_cast<bool>(topoInfo_.multiSuperPodDiffDeviceNumMode);
     return isARSTrue;
 }
-
+ 
 HcclResult TopoMatcher::EditCommPlaneVector(CommPlane commPlane, std::vector<std::vector<u32>> commVector) {
     CommPlaneVector_[commPlane] = commVector;
     return HCCL_SUCCESS;
 }
-
+ 
 std::vector<std::vector<u32>> TopoMatcher::GetCommPlaneRanks(CommPlane commPlane) {
     return CommPlaneVector_[commPlane];
 }
@@ -544,7 +544,7 @@ u8 TopoMatcher::GetDeterministicConfig() const
 }
 
 HcclResult TopoMatcher::SetOnlyAivModeConfig(const bool isOnlyAiv)
-{
+{   
     if (isOnlyAiv) {
         externalEnable_.aivMode = isOnlyAiv;
         externalEnable_.isOnlyAiv = isOnlyAiv;
@@ -559,7 +559,7 @@ bool TopoMatcher::GetIsOnlyAivConfig() const
 }
 
 HcclResult TopoMatcher::SetAivModeConfig(const bool aivMode)
-{
+{   
     HCCL_INFO("[SetAivMode]AivMode is set to [%d]", aivMode);
     externalEnable_.aivMode = aivMode;
     return HCCL_SUCCESS;
@@ -571,7 +571,7 @@ bool TopoMatcher::GetAivModeConfig() const
 }
 
 HcclResult TopoMatcher::SetAicpuUnfoldConfig(const bool aicpuUnfold)
-{
+{   
     HCCL_INFO("[SetAicpuMode]Aicpu is set to [%d]", aicpuUnfold);
     externalEnable_.aicpuUnfold = aicpuUnfold;
     return HCCL_SUCCESS;
@@ -596,7 +596,7 @@ HcclResult TopoMatcher::SetAlgoConfig(const std::map<HcclCMDType, std::vector<Hc
     }
     return HCCL_SUCCESS;
 }
-
+ 
 s32 TopoMatcher::GetExecTimeOutConfig() const
 {
     return externalEnable_.execTimeOut;

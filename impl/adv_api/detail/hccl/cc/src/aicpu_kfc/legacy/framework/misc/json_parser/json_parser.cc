@@ -75,7 +75,7 @@ void JsonParser::ParseFileToJson(const std::string &filePath, nlohmann::json &pa
     // 校验文件是否存在
     char resolvedPath[PATH_MAX] = {0};
     if (realpath(filePath.c_str(), resolvedPath) == nullptr) {
-        RPT_INPUT_ERR(true, "EI0004", std::vector<std::string>({"error_reason", "ranktable_path"}),
+        RPT_INPUT_ERR(true, "EI0004", std::vector<std::string>({"error_reason", "ranktable_path"}), 
             std::vector<std::string>({filePath, "The rankTable file path is not a valid real path or the permission is insufficient."}));
         THROW<InvalidParamsException>(
             StringFormat("[Get][RanktableRealPath]errNo[0x%016llx] path %s is not a valid real path",

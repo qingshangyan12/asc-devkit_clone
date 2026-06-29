@@ -148,18 +148,18 @@ HcclResult ReduceScatterLocalReduce::RunAsync(const u32 rank, const u32 rankSize
 
 HcclResult ReduceScatterLocalReduce::CalAlign(u64 totalSize, u32 rankSize, u64 &alignSize)
 {
-    auto maxIt = std::max_element(slices_.begin(), slices_.end(),
+    auto maxIt = std::max_element(slices_.begin(), slices_.end(), 
         [](const Slice& slice1, const Slice& slice2) {
             return slice1.offset < slice2.offset;
         });
-
+    
     u64 maxOffset = maxIt->offset;
 
     alignSize = RoundUpWithDivisor(totalSize, HCCL_MIN_SLICE_ALIGN_910B);
     if (alignSize * (rankSize - 1) > (outputMem_.size() - maxOffset)) {
         alignSize = RoundUpWithDivisor(totalSize, HCCL_MIN_SLICE_ALIGN_ONCHIP);
     }
-    if (alignSize * (rankSize - 1) > (outputMem_.size() - maxOffset)) {
+    if (alignSize * (rankSize - 1) > (outputMem_.size() - maxOffset)) { 
         alignSize = totalSize;
     }
     return HCCL_SUCCESS;

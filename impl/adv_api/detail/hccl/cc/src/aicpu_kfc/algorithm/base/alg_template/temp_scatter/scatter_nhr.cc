@@ -89,7 +89,7 @@ HcclResult ScatterNHR::RunAsync(const u32 rank, const u32 rankSize,
     return HCCL_SUCCESS;
 }
 
-HcclResult ScatterNHR::SdmaRx(LINK &linkLeft, LINK &linkRight, InterServerAlgoStep &stepInfo,
+HcclResult ScatterNHR::SdmaRx(LINK &linkLeft, LINK &linkRight, InterServerAlgoStep &stepInfo, 
     const std::vector<LINK> &links)
 {
     if (linkRight != nullptr) {
@@ -120,7 +120,7 @@ HcclResult ScatterNHR::SdmaRx(LINK &linkLeft, LINK &linkRight, InterServerAlgoSt
     return HCCL_SUCCESS;
 }
 
-HcclResult ScatterNHR::RdmaTxRx(LINK &linkLeft, LINK &linkRight, InterServerAlgoStep &stepInfo,
+HcclResult ScatterNHR::RdmaTxRx(LINK &linkLeft, LINK &linkRight, InterServerAlgoStep &stepInfo, 
     const std::vector<LINK> &links)
 {
     HcclResult ret = HCCL_SUCCESS;

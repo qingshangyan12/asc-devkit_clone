@@ -135,20 +135,20 @@
 #include "kernel_operator.h"
 
 // 原普通kernel保留（用于非SuperKernel场景）
-__global__ __vector__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, uint32_t totalLength)
-{
-    KernelAdd op;
-    op.Init(x, y, z, totalLength);
-    op.Process();
-}
+__global__ __vector__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, uint32_t totalLength) 
+{ 
+    KernelAdd op; 
+    op.Init(x, y, z, totalLength); 
+    op.Process(); 
+} 
 
 // 规则3：定义参数结构体（根据原global函数的实际参数定义）
-struct GmmArgs {
-   GM_ADDR x;                      // 对应add_custom的第一个参数
-   GM_ADDR y;                      // 对应add_custom的第二个参数
-   GM_ADDR z;                      // 对应add_custom的第三个参数
+struct GmmArgs { 
+   GM_ADDR x;                      // 对应add_custom的第一个参数 
+   GM_ADDR y;                      // 对应add_custom的第二个参数 
+   GM_ADDR z;                      // 对应add_custom的第三个参数 
    uint32_t totalLength;           // 对应add_custom的第四个参数
-};
+};  
 // 定义一个带模板参数的SK子函数
 // 模板参数仅用于实例化出不同的符号，不影响函数逻辑
 template<uint32_t splitNum>
@@ -156,9 +156,9 @@ __sk__ __vector__ void add_custom_sk(const GmmArgs *args, sk::SkSystemArgs *sysA
 {
     // 从结构体中获取参数
     GM_ADDR x = args->x;
-    GM_ADDR y = args->y;
-    GM_ADDR z = args->z;
-    uint32_t totalLength = args->totalLength;
+    GM_ADDR y = args->y; 
+    GM_ADDR z = args->z; 
+    uint32_t totalLength = args->totalLength; 
     // 规则5：逻辑与global函数一致
     KernelAdd op;
     op.Init(x, y, z, totalLength);

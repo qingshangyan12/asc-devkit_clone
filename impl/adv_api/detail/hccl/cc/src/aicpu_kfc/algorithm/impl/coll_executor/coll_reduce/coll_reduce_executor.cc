@@ -166,7 +166,7 @@ HcclResult CollReduceExecutor::RunLoopInner(OpParam &param, const ReduceType &re
     }
     HCCL_DEBUG("[CollReduceExecutor][RunLoopInner]IsHugeData:[%u]", hugeData);
     u8 deterministic = topoMatcher_->GetExternalInputHcclDeterministic();
-    auto opMeta = HcclOpMetaInfo::GetOneForReduce(isRootRank, param.root, autoSelectedAlgTypeLevel1,
+    auto opMeta = HcclOpMetaInfo::GetOneForReduce(isRootRank, param.root, autoSelectedAlgTypeLevel1, 
         param.DataDes.dataType, reduceType, hugeData, deterministic);
     CHK_RET(InitTask(dispatcher_, param.stream, opMeta.isEnableCache, opMeta.GetCacheKey()));
 

@@ -66,7 +66,7 @@
 - SetFlag：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。SetFlag只是设置硬件中的对应标志位，并不会阻塞源流水中的下一个指令。
 - WaitFlag：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。
 
-**图1**  SetFlag/WaitFlag接口功能示意图<a name="zh-cn_topic_0000002511125384_fig58242463299"></a>
+**图1**  SetFlag/WaitFlag接口功能示意图<a name="zh-cn_topic_0000002511125384_fig58242463299"></a>  
 ![](../../../../figures/setflag_waitflag_multi_pipeline_sync.png "SetFlag_WaitFlag_多流水同步示意图")
 
 ## 函数原型<a name="section620mcpsimp"></a>
@@ -124,7 +124,7 @@ __aicore__ inline void WaitFlag(int32_t eventID)
 ```cpp
     AscendC::DataCopy(src1Local, src1Global[i * tileLength], tileLength);
     AscendC::DataCopy(src0Local, src0Global[i * tileLength], tileLength);
-
+    
     // 循环内依赖：先“DataCopy(PIPE_MTE2)写src0Local”，后“Maxs和Mins（PIPE_V）读src0Local”。
     // 由于PIPE_V需要等待PIPE_MTE2，所以需要插入以下同步。
     AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);

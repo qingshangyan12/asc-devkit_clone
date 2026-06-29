@@ -189,6 +189,6 @@ dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/T
 
 ```bash
 输入数据src0Local：[1 2 3 ... 512]
-输入数据scalar：2
+输入数据scalar：2 
 输出数据dstLocal：[3 4 5 ... 514]
 ```

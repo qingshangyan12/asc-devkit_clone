@@ -12,8 +12,8 @@
 
 namespace hccl {
 
-HcclAicpuHdcHandler::HcclAicpuHdcHandler(const std::shared_ptr<HDCommunicate> &h2dTransfer,
-    const std::shared_ptr<HDCommunicate> &d2hTransfer)
+HcclAicpuHdcHandler::HcclAicpuHdcHandler(const std::shared_ptr<HDCommunicate> &h2dTransfer, 
+    const std::shared_ptr<HDCommunicate> &d2hTransfer) 
     :h2dTransfer_(h2dTransfer), d2hTransfer_(d2hTransfer)
 {
 }

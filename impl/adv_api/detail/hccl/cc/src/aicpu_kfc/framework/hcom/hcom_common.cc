@@ -1348,7 +1348,7 @@ bool HcomGetSecAddrCopyFlag(const char *socVersion)
     DevType devType;
     std::string socVersionStr(socVersion);
     CHK_RET(hrtGetDeviceTypeBySocVersion(socVersionStr, devType));
-
+ 
     return !g_notSupportSecAddrCopyWithOffset && (devType == DevType::DEV_TYPE_910B || devType == DevType::DEV_TYPE_910);
 }
 
@@ -1533,7 +1533,7 @@ HcclResult HcomCreateCommCCLbuffer(const char *group)
     RPT_INPUT_ERR(group == nullptr, "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),\
         std::vector<std::string>({"HcomGetDevType", "nullptr", "group", "non-null pointer"}));
     CHK_PTR_NULL(group);
-
+ 
     HcclResult ret = HcomCheckGroupName(group);
     RPT_INPUT_ERR(ret != HCCL_SUCCESS,
         "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),
@@ -1555,19 +1555,19 @@ HcclResult HcomCreateCommCCLbuffer(const char *group)
 #endif
         return HCCL_SUCCESS;
     }
-
+ 
     std::shared_ptr<hccl::hcclComm> hcclComm;
     CHK_RET(HcomGetCommByGroup(group, hcclComm));
     CHK_RET(hcclComm->CreateCommCCLbuffer());
     return HCCL_SUCCESS;
 }
-
+ 
 HcclResult HcomGetInCCLbuffer(const char *group, void** buffer, u64 *size)
-{
+{   
     RPT_INPUT_ERR(group == nullptr, "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),\
         std::vector<std::string>({"HcomGetInCCLbuffer", "nullptr", "group", "non-null pointer"}));
     CHK_PTR_NULL(group);
-
+ 
     HcclResult ret = HcomCheckGroupName(group);
     RPT_INPUT_ERR(ret != HCCL_SUCCESS,
         "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),
@@ -1588,19 +1588,19 @@ HcclResult HcomGetInCCLbuffer(const char *group, void** buffer, u64 *size)
 #endif
         return HCCL_SUCCESS;
     }
-
+ 
     std::shared_ptr<hccl::hcclComm> hcclComm;
     CHK_RET(HcomGetCommByGroup(group, hcclComm));
     CHK_RET(hcclComm->GetInCCLbuffer(*buffer, *size));
     return HCCL_SUCCESS;
 }
-
+ 
 HcclResult HcomGetOutCCLbuffer(const char *group, void** buffer, u64 *size)
-{
+{   
     RPT_INPUT_ERR(group == nullptr, "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),\
         std::vector<std::string>({"HcomGetOutCCLbuffer", "nullptr", "group", "non-null pointer"}));
     CHK_PTR_NULL(group);
-
+ 
     HcclResult ret = HcomCheckGroupName(group);
     RPT_INPUT_ERR(ret != HCCL_SUCCESS,
         "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),
@@ -1621,19 +1621,19 @@ HcclResult HcomGetOutCCLbuffer(const char *group, void** buffer, u64 *size)
 #endif
         return HCCL_SUCCESS;
     }
-
+ 
     std::shared_ptr<hccl::hcclComm> hcclComm;
     CHK_RET(HcomGetCommByGroup(group, hcclComm));
     CHK_RET(hcclComm->GetOutCCLbuffer(*buffer, *size));
     return HCCL_SUCCESS;
 }
-
+ 
 HcclResult HcomGetAicpuOpStreamNotify(const char *group, HcclRtStream *opStream, u8 aicpuNotifyNum, void** aicpuNotify)
-{
+{   
     RPT_INPUT_ERR(group == nullptr, "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),\
         std::vector<std::string>({"HcomGetDevType", "nullptr", "group", "non-null pointer"}));
     CHK_PTR_NULL(group);
-
+ 
     HcclResult ret = HcomCheckGroupName(group);
     RPT_INPUT_ERR(ret != HCCL_SUCCESS,
         "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),
@@ -1646,15 +1646,15 @@ HcclResult HcomGetAicpuOpStreamNotify(const char *group, HcclRtStream *opStream,
         }));
     CHK_PRT_RET(ret != HCCL_SUCCESS,
         HCCL_ERROR("[Get][HcomGetDevType]errNo[0x%016llx] group name is invalid", HCOM_ERROR_CODE(ret)), ret);
-
+ 
     std::shared_ptr<hccl::hcclComm> hcclComm;
     CHK_RET(HcomGetCommByGroup(group, hcclComm));
     CHK_RET(hcclComm->GetAicpuOpStreamNotify(opStream, aicpuNotifyNum, aicpuNotify));
     return HCCL_SUCCESS;
 }
-
+ 
 HcclResult HcomMc2AiCpuStreamAllocAndGet(const char *group, u32 streamMode, rtStream_t *aiCpuStream)
-{
+{   
     RPT_INPUT_ERR(group == nullptr, "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),\
         std::vector<std::string>({"HcomGetDevType", "nullptr", "group", "non-null pointer"}));
     CHK_PTR_NULL(group);

@@ -45,12 +45,12 @@ public:
         if (IsMTail() || IsKAL1Tail()) {
             // L1 brush zero, align size according to L0B
             AscendC::InitConstValueParams<typename Intf::InputT> initConstValueParams;
-            SetInitConstValueParams(initConstValueParams, 1,
+            SetInitConstValueParams(initConstValueParams, 1, 
                 alignCurrentMAL1 * alignCurrentKAL1 / al1BlockNum);
             AscendC::InitConstValue<typename Intf::InputT>(self_->ctx.al1, initConstValueParams);
             AscendC::PipeBarrier<PIPE_MTE2>();
         }
-
+         
         if constexpr (AscendC::IsSameType<typename Intf::InputT, float>::value) {
             loadAL1ByKAlignTo16();
         } else {
@@ -58,7 +58,7 @@ public:
         }
         KERNEL_LOG(KERNEL_DEBUG, "[LoadAL1WithPointWise] nd2NzParams.nValue %d nd2NzParams.dValue %d "
             "nd2NzParams.srcDValue %d nd2NzParams.dstNzC0Stride %d.\n",
-            nd2NzParams.nValue, nd2NzParams.dValue, nd2NzParams.srcDValue, nd2NzParams.dstNzC0Stride);
+            nd2NzParams.nValue, nd2NzParams.dValue, nd2NzParams.srcDValue, nd2NzParams.dstNzC0Stride);    
     }
 
 private:
@@ -69,7 +69,7 @@ private:
         initConstValueParams.blockNum = blockNum;
         initConstValueParams.dstGap = 0;
         initConstValueParams.initValue = 0;
-        KERNEL_LOG(KERNEL_DEBUG,
+        KERNEL_LOG(KERNEL_DEBUG, 
             "[LoadAL1WithPointWise] initConstValueParams.repeatTimes %d, initConstValueParams.blockNum %d \n",
             initConstValueParams.repeatTimes,
             initConstValueParams.blockNum);
@@ -114,7 +114,7 @@ private:
             currentKAL1 = self_->ctx.conv3dTiling->kAL1;
             alignCurrentKAL1 = currentKAL1; // kAL1 has align to 16 in tiling
         }
-
+        
         aL1GmOffset = self_->ctx.kAL1Iter * self_->ctx.conv3dTiling->kAL1 * dihiwi +
                     self_->ctx.dOutIter * self_->ctx.conv3dTiling->orgHixWi +
                     self_->ctx.mAL1Iter * self_->ctx.conv3dTiling->mAL1;
@@ -165,7 +165,7 @@ private:
                 AscendC::DataCopy<typename Intf::InputT>(self_->ctx.al1[singleDataCopyOffset],
                                         self_->ctx.agm[aL1GmOffset + dihiwi * currentDataCopyLines],
                                         nd2NzParams);
-            }
+            } 
         }
 
         if (tailKAL1) {
@@ -220,12 +220,12 @@ public:
         if (IsNTail() || IsKBL1Tail()) {
             // L1 brush zero
             AscendC::InitConstValueParams<typename Intf::WeightT> initConstValueParams;
-            SetInitConstValueParams(initConstValueParams, 1,
+            SetInitConstValueParams(initConstValueParams, 1, 
                 alignCurrentNBL1 * alignCurrentKBL1 / bl1BlockNum);
             AscendC::InitConstValue<typename Intf::WeightT>(self_->ctx.bl1, initConstValueParams);
             AscendC::PipeBarrier<PIPE_MTE2>();
         }
-
+    
         uint64_t bL1GmOffset = self_->ctx.nBL1Iter * self_->ctx.conv3dTiling->nBL1 * self_->ctx.orgCi +
                                 self_->ctx.kBL1Iter * self_->ctx.conv3dTiling->kBL1;
         KERNEL_LOG(KERNEL_DEBUG, "[LoadBL1WithPointWise] bL1GmOffset %u\n", bL1GmOffset);
@@ -286,7 +286,7 @@ private:
         initConstValueParams.blockNum = blockNum;
         initConstValueParams.dstGap = 0;
         initConstValueParams.initValue = 0;
-        KERNEL_LOG(KERNEL_DEBUG,
+        KERNEL_LOG(KERNEL_DEBUG, 
             "[LoadBL1WithPointWise] initConstValueParams.repeatTimes %d, initConstValueParams.blockNum %d \n",
             initConstValueParams.repeatTimes,
             initConstValueParams.blockNum);

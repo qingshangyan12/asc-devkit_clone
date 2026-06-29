@@ -201,7 +201,7 @@ HcclResult CollBatchSendRecvRetryExecutor::RunLoop(OpParam &param, AlgResourceRe
     // 每隔200个loop launch一次
     while (!sendDataSilces_.empty() || !recvDataSilces_.empty()) {
         if(!sendDataSilces_.empty()) {
-            CHK_RET(ProcessSendDataSlice(algResResp_->slaveStreams[STREAM_INDEX_0], false, true));
+            CHK_RET(ProcessSendDataSlice(algResResp_->slaveStreams[STREAM_INDEX_0], false, true)); 
             sendDataSilces_.pop_front();
         }
         if(!recvDataSilces_.empty()) {

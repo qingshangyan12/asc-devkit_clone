@@ -177,7 +177,7 @@ uint32_t TaskExceptionFunc::GetReporterInfo(const StreamLite *curStream, std::sh
 }
 
 void TaskExceptionFunc::Call()
-{
+{   
     TRY_CATCH_PRINT_ERROR(
         if (!isEnable_) {
             return;

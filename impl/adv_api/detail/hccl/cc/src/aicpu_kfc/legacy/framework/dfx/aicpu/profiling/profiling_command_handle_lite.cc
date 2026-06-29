@@ -11,7 +11,7 @@
 #include "prof_common.h"
 #include "profiling_handler_lite.h"
 #include "profiling_command_handle_lite.h"
-
+ 
 namespace Hccl {
 #ifdef CCL_KERNEL_AICPU
 
@@ -40,5 +40,5 @@ int32_t DeviceCommandHandle(uint32_t profType, void *data, uint32_t len) {
     return PROF_SUCCESS;
 }
 #endif
-
+ 
 }

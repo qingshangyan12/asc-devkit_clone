@@ -155,10 +155,10 @@ HcclResult InsTempReduceScatterMesh1dDpu::DPUKernelRun(const TemplateDataParams&
                 tempAlgParams.buffInfo.hcclBuffBaseOff +  repeatIdx * tempAlgParams.outputRepeatStride +
                 rankIdx * tempAlgParams.outputSliceStride, tempAlgParams.sliceSize, tempAlgParams.count); // 接收目标
 
-            DataSlice txSrcSlice = DataSlice(tempAlgParams.buffInfo.inputPtr,
+            DataSlice txSrcSlice = DataSlice(tempAlgParams.buffInfo.inputPtr, 
                 tempAlgParams.buffInfo.inBuffBaseOff + rankIdx * tempAlgParams.inputSliceStride + repeatIdx * tempAlgParams.inputRepeatStride,
                 tempAlgParams.sliceSize, tempAlgParams.count); // 发送源
-            DataSlice txDstSlice = DataSlice(remoteCclBuffAddr,
+            DataSlice txDstSlice = DataSlice(remoteCclBuffAddr, 
                 tempAlgParams.buffInfo.hcclBuffBaseOff + myAlgRank * tempAlgParams.outputSliceStride + repeatIdx * tempAlgParams.outputRepeatStride,
                 tempAlgParams.sliceSize, tempAlgParams.count);  // 发送目标
 
@@ -173,7 +173,7 @@ HcclResult InsTempReduceScatterMesh1dDpu::DPUKernelRun(const TemplateDataParams&
         CHK_PRT_RET(SendRecvWrite(sendRecvInfo),
                     HCCL_ERROR("[InsTempReduceScatterMesh1dDpu] RunReduceScatter Send failed"),
                     HcclResult::HCCL_E_INTERNAL);
-
+        
     }
 #endif
     return HCCL_SUCCESS;

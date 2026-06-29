@@ -162,7 +162,7 @@ void InsExecutor::ExecuteAllQueues950(const InsQueue &insQueue, StreamLiteMgr *s
     HCCL_INFO("InsExecutor::%s success", __func__);
 }
 
-void InsExecutor::ExecuteSlaveQueue950(list<InsQueue::Iterator> &slaveQueueIters, StreamLiteMgr *streamLiteMgr,
+void InsExecutor::ExecuteSlaveQueue950(list<InsQueue::Iterator> &slaveQueueIters, StreamLiteMgr *streamLiteMgr, 
                                             bool &isLaunchTask, std::set<u32> &slaveStreamIndexSet)
 {
     auto slaveStreamIndexIter = slaveStreamIndexSet.begin();
@@ -210,7 +210,7 @@ void InsExecutor::ExecuteSlaveQueue950(list<InsQueue::Iterator> &slaveQueueIters
     }
 }
 
-void InsExecutor::ExecuteMasterQueue950(InsQueue::Iterator &masterQueueIter, StreamLite *masterStream,
+void InsExecutor::ExecuteMasterQueue950(InsQueue::Iterator &masterQueueIter, StreamLite *masterStream, 
                                             bool &isMasterInsIterEnd, bool &isLaunchTask)
 {
     // 判断rtsq队列中的空间是否充足

@@ -22,7 +22,7 @@ public:
     HcclResult Prepare(PrepareData &param) override;
     HcclResult GetNslbAdjInfo(const u32 rank, const u32 rankSize,
                               const std::vector<LINK> &links, AdjInfo& nslbAdjInfo) override;
-
+    
     // 用于alltoallv类算子的aicpu cache
     // 注意: 如果新增alltoallv的算法实现并且想使用aicpu cache, 需要在更新cache白名单前, 在算法实现中做以下适配:
     // (i) Zero-length recv/send memcpy需要保证调用HcclD2DMemcpyAsync/TxAck/RxAck/TxDataSignal/RxDataSignal

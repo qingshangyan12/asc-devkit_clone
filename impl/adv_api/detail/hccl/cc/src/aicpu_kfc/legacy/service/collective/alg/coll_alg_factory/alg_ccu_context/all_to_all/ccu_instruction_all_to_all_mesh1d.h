@@ -100,9 +100,9 @@ public:
         return std::make_unique<CcuCtxArgAllToAllMesh1D>(dimSize_, rankId_, op_, tempVTopo_, loadFromMem_);
     }
 
-    void SetInstType(CcuInstType instType)
-    {
-        instType_ = instType;
+    void SetInstType(CcuInstType instType) 
+    { 
+        instType_ = instType; 
     }
 
     std::unique_ptr<CcuTaskArg> GetTaskArg() const override

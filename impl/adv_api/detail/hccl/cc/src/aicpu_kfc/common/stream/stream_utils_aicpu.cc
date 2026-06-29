@@ -13,7 +13,7 @@
  #include "rt_external.h"
  #include "workflow_pub.h"
  #include "stream_utils.h"
-
+ 
  HcclResult GetStreamCaptureInfo(rtStream_t stream, rtModel_t &rtModel, bool &isCapture)
  {
      return HCCL_SUCCESS;

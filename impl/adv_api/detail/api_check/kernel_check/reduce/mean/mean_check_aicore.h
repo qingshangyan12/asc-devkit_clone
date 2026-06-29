@@ -21,7 +21,7 @@
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_REDUCE_MEAN_MEAN_CHECK_AICORE_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_REDUCE_MEAN_MEAN_CHECK_AICORE_H_
 
-namespace AscendC {
+namespace AscendC {  
 namespace HighLevelApiCheck {
 template <typename T, typename accType, bool isReuseSource, bool isBasicBlock, int32_t reduceDim>
 class CheckFuncClassMean {

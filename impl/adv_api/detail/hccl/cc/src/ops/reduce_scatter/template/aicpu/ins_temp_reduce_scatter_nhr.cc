@@ -22,7 +22,7 @@ InsTempReduceScatterNHR::~InsTempReduceScatterNHR()
 }
 
 HcclResult InsTempReduceScatterNHR::CalcRes(HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
-                                            AlgResourceRequest& resourceRequest)
+                                            AlgResourceRequest& resourceRequest) 
 {
     // NHR 需要的 que Num 为 1
     resourceRequest.slaveThreadNum = 0;
@@ -89,7 +89,7 @@ HcclResult InsTempReduceScatterNHR::LocalDataCopy(const std::vector<ThreadHandle
                                   rpt * tempAlgParams_.inputRepeatStride;
             const u64 scratchBase = tempAlgParams_.buffInfo.hcclBuffBaseOff +
                                     rpt * tempAlgParams_.outputRepeatStride;
-
+ 
             const u64 inOff = inBaseOff + localRandId * tempAlgParams_.inputSliceStride;
             const u64 scOff = scratchBase + localRandId * tempAlgParams_.sliceSize;
 
@@ -97,7 +97,7 @@ HcclResult InsTempReduceScatterNHR::LocalDataCopy(const std::vector<ThreadHandle
             DataSlice dst = DataSlice(tempAlgParams_.buffInfo.hcclBuff.addr, scOff, sliceSize);
 
             // 如果源地址和目标地址相同，则不需要做拷贝
-            if (tempAlgParams_.buffInfo.inBuffType != tempAlgParams_.buffInfo.hcclBuffType || inOff != scOff) {
+            if (tempAlgParams_.buffInfo.inBuffType != tempAlgParams_.buffInfo.hcclBuffType || inOff != scOff) { 
                 CHK_RET(LocalCopy(q, src, dst));
             }
         }
@@ -180,7 +180,7 @@ HcclResult InsTempReduceScatterNHR::RunNHR(const std::vector<ThreadHandle> &thre
             txSrcSlices.reserve(st.nSlices);
             txDstSlices.reserve(st.nSlices);
             rxSlices.reserve(st.nSlices);
-
+            
             void* remoteCclBuffAddr = linkSend.remoteCclMem.addr;
             // RS：在 SCRATCH 上进行规约交换
             for (u32 i = 0; i < st.nSlices; ++i) {

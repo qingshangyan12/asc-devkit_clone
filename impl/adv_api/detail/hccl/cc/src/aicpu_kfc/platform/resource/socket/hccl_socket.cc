@@ -408,7 +408,7 @@ HcclResult HcclSocket::Accept(const std::string &tag, std::shared_ptr<HcclSocket
         localIp_.GetReadableAddress(), remoteIp_.GetReadableAddress(), nicSocketHandle_, tag.c_str());
 
     s32 acceptTimeOutTmp  = static_cast<s32>(acceptTimeOut);
-    s32 timer = (acceptTimeOutTmp > 0 && acceptTimeOutTmp < GetExternalInputHcclLinkTimeOut()) ?
+    s32 timer = (acceptTimeOutTmp > 0 && acceptTimeOutTmp < GetExternalInputHcclLinkTimeOut()) ? 
                 acceptTimeOutTmp: GetExternalInputHcclLinkTimeOut();
 
     auto startTime = std::chrono::steady_clock::now();

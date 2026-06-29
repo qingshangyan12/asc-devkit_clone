@@ -11,14 +11,14 @@
 #define CALC_AHC_BROKE_TRANSPORT_REQ_H
 
 #include "calc_ahc_transport_req_base.h"
-
+ 
 namespace hccl {
 class CalcAHCBrokeTransportReq : public CalcAHCTransportReqBase {
 public:
     explicit CalcAHCBrokeTransportReq(std::vector<std::vector<u32>> &subCommPlaneVector,
         std::vector<bool> &isBridgeVector, u32 userRank, std::vector<std::vector<std::vector<u32>>> &globalSubGroups,
         std::map<AHCConcOpType, TemplateType> &ahcAlgOption, std::unordered_map<u32, bool>  &isUsedRdmaMap);
-
+ 
     ~CalcAHCBrokeTransportReq() override;
 
     HcclResult CalcDstRanks(u32 rank, std::set<u32> &dstRanks, u32 ringIndex) override;

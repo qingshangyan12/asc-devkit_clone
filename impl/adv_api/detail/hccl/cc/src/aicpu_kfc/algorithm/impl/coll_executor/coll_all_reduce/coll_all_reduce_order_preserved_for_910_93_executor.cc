@@ -31,7 +31,7 @@ void CollAllReduceOrderPreservedFor91093Executor::ParseParam(const OpParam& para
 
     // 是否需要scratch memory（图模式没有cclbuffer，需要额外申请scratchMem）
     u64 inputSize = param.DataDes.count * SIZE_TABLE[param.DataDes.dataType];
-    scratchMemFlag_ = (workflowMode_ != HcclWorkflowMode::HCCL_WORKFLOW_MODE_OP_BASE) &&
+    scratchMemFlag_ = (workflowMode_ != HcclWorkflowMode::HCCL_WORKFLOW_MODE_OP_BASE) && 
         (inputSize < (topoAttr_.userRankSize - 1) * sizePerBlock);
 
     totalSize_ = std::max(sizePerBlock * topoAttr_.userRankSize, inputSize);
@@ -63,7 +63,7 @@ HcclResult CollAllReduceOrderPreservedFor91093Executor::CalcStreamNum(u32& strea
     u32 level2StreamNum = std::min(CalReduceStreamNum(topoAttr_.superPodNum) - 1, DEVICE_FOUR);
     // 总流数上限：7（alltoall使用，提前的本地拷贝任务不需要并行）+ 4（LocalReduce使用）
     streamNum = std::max(all2allStreamNum + reduceStreamNum - 1, level2StreamNum);
-
+    
     HCCL_INFO("[%s]tag[%s] all2allStreamNum[%u], reduceStreamNum[%u], level2StreamNum[%u], streamNum[%u]", __func__, tag_.c_str(),
         all2allStreamNum, reduceStreamNum, level2StreamNum, streamNum);
     return HCCL_SUCCESS;
@@ -83,22 +83,22 @@ HcclResult CollAllReduceOrderPreservedFor91093Executor::CalcTransportMemType(Tra
     TransportMemType &outputType) const
 {
     // 图模式场景使用PARAM_INPUT/OUTPUT -> userInput/userOutPut，不需要scrachMem
-    inputType = workflowMode_ != HcclWorkflowMode::HCCL_WORKFLOW_MODE_OP_BASE ?
+    inputType = workflowMode_ != HcclWorkflowMode::HCCL_WORKFLOW_MODE_OP_BASE ? 
         TransportMemType::PARAM_INPUT : TransportMemType::CCL_INPUT;
-    outputType = workflowMode_ != HcclWorkflowMode::HCCL_WORKFLOW_MODE_OP_BASE ?
+    outputType = workflowMode_ != HcclWorkflowMode::HCCL_WORKFLOW_MODE_OP_BASE ? 
         TransportMemType::PARAM_OUTPUT : TransportMemType::CCL_OUTPUT;
 
     if (scratchMemFlag_) {
         outputType = TransportMemType::SCRATCH;
     }
-
+    
     HCCL_INFO("[%s]tag[%s] inputType[%d], outputType[%d]", __func__, tag_.c_str(), inputType, outputType);
     return HCCL_SUCCESS;
 }
 
 HcclResult CollAllReduceOrderPreservedFor91093Executor::CalcLevel1CommInfo(TransportMemType inputType,
     TransportMemType outputType, std::vector<LevelNSubCommTransport>& opTransport)
-{
+{   
     CommParaInfo commParaLevel1(COMM_COMBINE_L1, CommType::COMM_TAG_MESH);
     CHK_RET(CalcCommPlaneInfo(tag_, commParaLevel1, opTransport[COMM_COMBINE_L1], inputType, outputType));
     return HCCL_SUCCESS;
@@ -131,7 +131,7 @@ void CollAllReduceOrderPreservedFor91093Executor::CalcSizePerBlock(const OpParam
 }
 
 void CollAllReduceOrderPreservedFor91093Executor::CalGroupSlices(const OpParam &param, const ExecMem &execMem)
-{
+{   
     groupSize_.clear();
     u64 sizeRemain = execMem.count * SIZE_TABLE[param.DataDes.dataType];
     for (u32 rankId = 0; rankId < topoAttr_.userRankSize; rankId++) {
@@ -161,13 +161,13 @@ HcclResult CollAllReduceOrderPreservedFor91093Executor::RunReduceScatterLevel1(c
     }
 
     CHK_RET(ActiveSlaveStreams(param.stream));
-    all2allOffset_ = topoAttr_.superPodNum > 1 ? 1 : 0;  // 多机场景需要偏移1（给L1预留计算位，减少拷贝次数）
-
+    all2allOffset_ = topoAttr_.superPodNum > 1 ? 1 : 0;  // 多机场景需要偏移1（给L1预留计算位，减少拷贝次数） 
+    
     std::unique_ptr<AlgTemplateBase> level1TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(
         TemplateType::TEMPLATE_REDUCESCATTER_PLANT_LOCAL_REDUCE, dispatcher_);
     HCCL_CONFIG_INFO(HCCL_ALG, "[%s] Run TEMPLATE_REDUCESCATTER_PLANT_LOCAL_REDUCE in COMM_COMBINE_L1", __func__);
     CHK_SMART_PTR_NULL(level1TempAlg);
-
+    
     DeviceMem outputMem = scratchMemFlag_ ? execMem.scratchMem : execMem.outputMem;
     CHK_RET(level1TempAlg->Prepare(execMem.inputPtr, execMem.inputMem, outputMem, param.stream,
         algResResp_->slaveStreams, algResResp_->notifiesMain, algResResp_->notifiesAux, groupSlicesInfoLevel1,
@@ -190,7 +190,7 @@ HcclResult CollAllReduceOrderPreservedFor91093Executor::RunReduceScatterLevel2(c
 
     // 切分数据，记录每组的起始偏移和大小（仅1组）
     MemBlockInfo memInfo;
-    u32 inputBaseIndex = (all2allOffset_ + commIndex) % level1Ranksize; // 多机场景需要偏移1（给L1预留计算位，减少拷贝次数）
+    u32 inputBaseIndex = (all2allOffset_ + commIndex) % level1Ranksize; // 多机场景需要偏移1（给L1预留计算位，减少拷贝次数） 
     for (u32 dataId = 0; dataId < level2CommInfo.localRankSize; dataId ++) {
         u64 inputIndex = inputBaseIndex + dataId * level1Ranksize;
         memInfo.inputOffsets.push_back(inputIndex * sizePerBlock_);
@@ -210,7 +210,7 @@ HcclResult CollAllReduceOrderPreservedFor91093Executor::RunReduceScatterLevel2(c
     CHK_RET(level2TempAlg->Prepare(execMem.inputMem, outputMem, param.stream, algResResp_->slaveStreams,
         algResResp_->notifiesMain, algResResp_->notifiesAux, memInfo, param.reduceType,
         param.DataDes.dataType, commIndex == level1LastRank - 1, commIndex == level1LastRank, true));
-
+    
     CHK_RET(level2TempAlg->RegisterProfiler((level1Ranksize << PROF_RANKSIZE_OFFSET_OF_PLANEID) +
         level1CommInfo.localRank, PROF_STAGE_2, HCCL_EXEC_STEP_NOT_SET, param.stream));
     CHK_RET(RunTemplate(level2TempAlg, level2CommInfo));
@@ -235,7 +235,7 @@ HcclResult CollAllReduceOrderPreservedFor91093Executor::RunAllGatherLevel1(const
     }
 
     DeviceMem outputMem = scratchMemFlag_ ? execMem.scratchMem : execMem.outputMem;
-
+    
     std::unique_ptr<AlgTemplateBase> level1TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(
         TemplateType::TEMPLATE_ALL_GATHER_NHR, dispatcher_);
     HCCL_CONFIG_INFO(HCCL_ALG, "[%s] Run TEMPLATE_ALL_GATHER_NHR in COMM_COMBINE_L1", __func__);
@@ -296,10 +296,10 @@ HcclResult CollAllReduceOrderPreservedFor91093Executor::RunAllGatherLevel2(const
     }
 
     CHK_SMART_PTR_NULL(level2TempAlg);
-    CHK_RET(level2TempAlg->Prepare(outputMem, outputMem, outputMem, count, param.DataDes.dataType, param.stream,
+    CHK_RET(level2TempAlg->Prepare(outputMem, outputMem, outputMem, count, param.DataDes.dataType, param.stream, 
         HcclReduceOp::HCCL_REDUCE_RESERVED, INVALID_VALUE_RANKID, dataSegsSlice));
-
-    CHK_RET(level2TempAlg->RegisterProfiler((level2CommInfo.localRankSize << PROF_RANKSIZE_OFFSET_OF_PLANEID)
+    
+    CHK_RET(level2TempAlg->RegisterProfiler((level2CommInfo.localRankSize << PROF_RANKSIZE_OFFSET_OF_PLANEID) 
         + level2CommInfo.localRank, PROF_STAGE_2, HCCL_EXEC_STEP_NOT_SET, param.stream));
     CHK_RET(RunTemplate(level2TempAlg, level2CommInfo));
     return HCCL_SUCCESS;
@@ -316,7 +316,7 @@ HcclResult CollAllReduceOrderPreservedFor91093Executor::KernelRun(const OpParam 
     CalGroupSlices(param, execMem);
 
     u64 inputSize = param.DataDes.count * SIZE_TABLE[param.DataDes.dataType];
-    scratchMemFlag_ = (workflowMode_ != HcclWorkflowMode::HCCL_WORKFLOW_MODE_OP_BASE) &&
+    scratchMemFlag_ = (workflowMode_ != HcclWorkflowMode::HCCL_WORKFLOW_MODE_OP_BASE) && 
         (inputSize < (topoAttr_.userRankSize - 1) * sizePerBlock_);
 
     // L1 节点内 reduce scatter
@@ -341,7 +341,7 @@ HcclResult CollAllReduceOrderPreservedFor91093Executor::KernelRun(const OpParam 
         DeviceMem dstMem = DeviceMem::create(execMem.outputPtr, dataSize);
         CHK_RET(HcclD2DMemcpyAsync(dispatcher_, dstMem, srcMem, const_cast<Stream&>(param.stream)));
     }
-
+    
     HCCL_INFO("[%s]order preserved AllReduce run success, tag[%s]", __func__, tag_.c_str());
     return HCCL_SUCCESS;
 }

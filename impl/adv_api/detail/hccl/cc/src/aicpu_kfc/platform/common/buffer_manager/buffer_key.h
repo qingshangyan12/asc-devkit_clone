@@ -52,7 +52,7 @@ public:
     }
 
     // 不含等于情况
-    inline bool IsSubset(const BufferKey& other) const
+    inline bool IsSubset(const BufferKey& other) const 
     {
         // 子集判断：当前 key 的起始地址 >= 其他 key 的起始地址，且结束地址 <= 其他 key 的结束地址
         return *this != other && addr_ >= other.addr_ && (addr_ + size_) <= (other.addr_ + other.size_);
@@ -65,14 +65,14 @@ public:
         return *this != other && addr_ <= other.addr_ && (addr_ + size_) >= (other.addr_ + other.size_);
     }
 
-    inline bool IsIntersect(const BufferKey& other) const
+    inline bool IsIntersect(const BufferKey& other) const 
     {
         // 检查是否有交集：两个区域重叠。
         return (addr_ < other.addr_ + other.size_ && addr_ + size_ > other.addr_) ||
             (other.addr_ < addr_ + size_ && other.addr_ + other.size_ > addr_);
     }
 
-    inline bool IsDisjoint(const BufferKey& other) const
+    inline bool IsDisjoint(const BufferKey& other) const 
     {
         // 检查是否没有交集：一方完全在另一方之前或之后。
         return (addr_ + size_ <= other.addr_) || (addr_ >= other.addr_ + other.size_);

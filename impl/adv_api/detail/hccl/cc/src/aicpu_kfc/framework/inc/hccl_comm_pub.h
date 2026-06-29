@@ -96,7 +96,7 @@ public:
         rtStream_t stream, HcomCollOpInfo *opInfo = nullptr);
     HcclResult AllGatherOutPlace(const std::string &tag, void *inputPtr, void *outputPtr, u64 inputCount,
         HcclDataType dataType, rtStream_t stream);
-    HcclResult AllGatherVOutPlace(const std::string &tag, void *inputPtr, void *outputPtr,
+    HcclResult AllGatherVOutPlace(const std::string &tag, void *inputPtr, void *outputPtr, 
         u64 inputCount, const void *outputCounts, const void *outputDispls, HcclDataType dataType, HcclRtStream stream);
     HcclResult AllGatherV(const std::string &tag, const void *sendBuf, u64 sendCount, const void *recvBuf,
         const void *recvCounts, const void *rdispls, HcclDataType dataType, HcclRtStream stream);
@@ -186,8 +186,8 @@ public:
     HcclResult ReduceScatterV(const std::string &tag, void *inputPtr,
         const void *inputCounts, const void *inputDispls, void *outputPtr, u64 outputCount,
         HcclDataType dataType, HcclReduceOp op, HcclRtStream stream);
-    HcclResult ReduceScatterVOutPlace(const std::string &tag, void *inputPtr, void *outputPtr,
-        const void *inputCounts, const void *inputDispls, u64 outputCount,
+    HcclResult ReduceScatterVOutPlace(const std::string &tag, void *inputPtr, void *outputPtr, 
+        const void *inputCounts, const void *inputDispls, u64 outputCount, 
         HcclDataType dataType, HcclReduceOp op, HcclRtStream stream);
 
     HcclResult BatchSendRecv(const std::string &tag, struct HcclSendRecvItemDef* sendRecvItemsPtr,
@@ -251,9 +251,9 @@ public:
         HcclReduceOp op, int32_t aivCoreLimit, bool &ifAiv, std::string &algName);
     HcclResult HcclCalcNumBlocks(HcclCMDType opType, u64 count, void* counts, HcclDataType dataType, int32_t aivCoreLimit,
         std::string &algName, u32 &numBlocks);
-
+    
     HcclResult HcclGetAlgExecParam(const std::string &tag, u64 count, void *inputPtr, void *outputPtr,
-        HcclCMDType opType, bool clearEnable, HcclDataType dataType, HcclReduceOp op,
+        HcclCMDType opType, bool clearEnable, HcclDataType dataType, HcclReduceOp op, 
         void *&commContext, u64 &len, u32 aivCoreLimit);
 
     HcclResult GetWorkspaceSubStreamNum(u64 count, HcclDataType dataType, HcclReduceOp op, const std::string &algName,
@@ -394,7 +394,7 @@ public:
     HcclResult CommGetNetLayers(uint32_t **netLayers, uint32_t *netLayerNum);
     HcclResult CommGetInstSizeByNetLayer(uint32_t netLayer, uint32_t *rankNum);
     HcclResult CommGetInstTopoTypeByNetLayer(uint32_t netLayer, uint32_t *topoType);
-    //rankgraph interface
+    //rankgraph interface 
     HcclResult GetNetLayers(uint32_t **netLayers, uint32_t *netLayerNum);
     HcclResult GetInstSizeByNetLayer(uint32_t netLayer, uint32_t *rankNum);
     HcclResult GetInstTopoTypeByNetLayer(uint32_t netLayer, CommTopo *topoType);

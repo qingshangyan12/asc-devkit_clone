@@ -28,7 +28,7 @@ extern HcclResult HcommProfilingInit(ThreadHandle *threads, u32 threadNum)
     if (!profL1Open) {
         HCCL_INFO("[%s] L1 is off", __func__);
         return HCCL_SUCCESS;
-    }
+    } 
     for (u32 i = 0; i < threadNum; i++) {
         const SqeRingBuffer &sqeBuffer = GetStream(threads[i])->GetSqeContextPtr()->buffer;
         u16 taskId = sqeBuffer.tailSqeIdx;
@@ -51,7 +51,7 @@ extern HcclResult HcommProfilingReportMainStreamAndFirstTask(ThreadHandle thread
     uint16_t HEAD_TASK = 0;
     u16 taskId = sqeBuffer.tailSqeTaskId;
     HCCL_DEBUG("[%s] thread id = [%u] task id = [%u]", __func__, GetStream(thread)->id(), taskId);
-    return dfx::ProfilingManager::ReportMainStreamTask(*GetStream(thread), taskId, HEAD_TASK);
+    return dfx::ProfilingManager::ReportMainStreamTask(*GetStream(thread), taskId, HEAD_TASK); 
 #else
         HCCL_INFO("[%s] not support, do nothing", __func__);
 #endif
@@ -65,7 +65,7 @@ extern HcclResult HcommProfilingReportMainStreamAndLastTask(ThreadHandle thread)
     uint16_t TAIL_TASK = 1;
     u16 taskId = sqeBuffer.tailSqeTaskId - 1;
     HCCL_DEBUG("[%s] thread id = [%u] task id = [%u]", __func__, GetStream(thread)->id(), taskId);
-    return dfx::ProfilingManager::ReportMainStreamTask(*GetStream(thread), taskId, TAIL_TASK);
+    return dfx::ProfilingManager::ReportMainStreamTask(*GetStream(thread), taskId, TAIL_TASK); 
 #else
     HCCL_INFO("[%s] not support, do nothing", __func__);
 #endif
@@ -88,10 +88,10 @@ extern HcclResult HcommProfilingReportDeviceHcclOpInfo(HcomProInfo profInfo)
     std::string algTypeStr(profInfo.algType);
     hcclOpInfo.streamId = 0; // kfc的流， 目前没有默认为0 AicpuGetStreamId()
     AlgType algType;
-    CHK_PRT_RET(TransferStrToAlgType(algTypeStr, algType) == false,
+    CHK_PRT_RET(TransferStrToAlgType(algTypeStr, algType) == false, 
         HCCL_ERROR("[%s] Fail to transfer [%s] to AlgType", __func__, algTypeStr.c_str()), HCCL_E_PARA);
     algTypeStr = TransferAlgType(algType);
-    HCCL_INFO("[%s] groupName = [%u], commName = [%s], ranksize = [%u], taskId = [%u], streamId = [%u], dataType = [%u], algTypeStr = [%s]",
+    HCCL_INFO("[%s] groupName = [%u], commName = [%s], ranksize = [%u], taskId = [%u], streamId = [%u], dataType = [%u], algTypeStr = [%s]", 
             __func__, hcclOpInfo.groupName, profInfo.commName, hcclOpInfo.ranksize, hcclOpInfo.taskId, hcclOpInfo.streamId,
             hcclOpInfo.dataType, algTypeStr.c_str());
     CHK_RET(dfx::ProfilingManager::ReportHcclOpInfo(hcclOpInfo, algTypeStr));

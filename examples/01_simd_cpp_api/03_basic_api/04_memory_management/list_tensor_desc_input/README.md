@@ -66,7 +66,7 @@
     inputDesc = {(1 + (1 + SHAPE_DIM) * TENSOR_DESC_NUM) * sizeof(uint64_t),
                 {xDesc, yDesc},
                 {(uintptr_t)xDevice, (uintptr_t)yDevice}};
-    ```
+    ``` 
     按照传入的数据格式，解析出对应的各入参，示例如下。
 
     ```cpp
@@ -102,7 +102,7 @@
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
-
+  
   示例如下：
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # cpu调试模式

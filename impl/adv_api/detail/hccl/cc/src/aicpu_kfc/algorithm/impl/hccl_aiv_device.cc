@@ -34,7 +34,7 @@ HcclResult UnRegisterAivKernel()
 
 // KernelLaunch内部接口
 HcclResult ExecuteKernelLaunchInner(const AivOpArgs &opArgs, const AivTopoArgs &topoArgs,
-    const AivResourceArgs &resourceArgs, const AivAlgArgs &algArgs, void* args, u32 argsSize,
+    const AivResourceArgs &resourceArgs, const AivAlgArgs &algArgs, void* args, u32 argsSize, 
     AivProfilingInfo& aivProfilingInfo)
 {
     (void) algArgs;
@@ -61,7 +61,7 @@ HcclResult ExecuteKernelLaunch(const AivOpArgs &opArgs, const AivTopoArgs &topoA
 
 // Kernel单次调用Launch外部接口
 HcclResult ExecuteKernelLaunch(const AivOpArgs &opArgs, const AivTopoArgs &topoArgs,
-    const AivResourceArgs &resourceArgs, const AivAlgArgs &algArgs, const ExtraArgs &extraArgs,
+    const AivResourceArgs &resourceArgs, const AivAlgArgs &algArgs, const ExtraArgs &extraArgs, 
     AivProfilingInfo& aivProfilingInfo)
 {
     (void) algArgs;
@@ -75,7 +75,7 @@ HcclResult ExecuteKernelLaunch(const AivOpArgs &opArgs, const AivTopoArgs &topoA
 
 // Kernel单次调用Launch外部接口
 HcclResult ExecuteKernelLaunch(const AivOpArgs &opArgs, const AivTopoArgs &topoArgs,
-    const AivResourceArgs &resourceArgs, const AivAlgArgs &algArgs, const ExtraArgsV2 &extraArgs,
+    const AivResourceArgs &resourceArgs, const AivAlgArgs &algArgs, const ExtraArgsV2 &extraArgs, 
     AivProfilingInfo& aivProfilingInfo)
 {
     (void) algArgs;

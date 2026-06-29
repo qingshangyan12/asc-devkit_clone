@@ -406,7 +406,7 @@ HcclResult AlltoAllFullMeshSymmetricMemory::RunSDMA(HcclOpMetaInfoDef &opMeta)
 }
 
 HcclResult AlltoAllFullMeshSymmetricMemory::RunAsync()
-{
+{   
     HcclOpMetaInfoDef opMeta = HcclOpMetaInfo::GetOneForAllToAllV(CopyPattern::ZCOPY, userInput_.size(), true);
     CHK_RET(InitTask(dispatcher_, mainStream_, opMeta.isEnableCache, opMeta.GetCacheKey()));
 

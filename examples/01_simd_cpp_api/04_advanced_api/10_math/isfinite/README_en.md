@@ -29,21 +29,21 @@ This example uses the IsFinite high-level API to determine element-wise whether 
 
 ## Example Description
 
-- Example function:
-  Determine element-wise whether input floating-point numbers are neither NAN nor INF. The output result is a floating-point number or a boolean value. For input data that is neither NAN nor INF, when the output is a floating-point type, the result at the corresponding position is 1 of that floating-point type; otherwise it is 0. When the output is a bool type, the result at the corresponding position is true; otherwise false.
-  The computation formulas are as follows:
+- Example function:  
+  Determine element-wise whether input floating-point numbers are neither NAN nor INF. The output result is a floating-point number or a boolean value. For input data that is neither NAN nor INF, when the output is a floating-point type, the result at the corresponding position is 1 of that floating-point type; otherwise it is 0. When the output is a bool type, the result at the corresponding position is true; otherwise false.  
+  The computation formulas are as follows:  
   $$dst_i = IsFinite(src_i)$$
 
-  When the input is a floating-point type:
+  When the input is a floating-point type:  
   $$
-  IsFinite(x) =
+  IsFinite(x) = 
   \begin{cases}
   0.0, & x = \pm\inf \text{ or } x = \text{nan} \\
   1.0, & x \ne \pm\inf \text{ and } x \ne \text{nan}
   \end{cases}
   $$
 
-  When the output is a bool type:
+  When the output is a bool type:  
   $$
   IsFinite(x) =
   \begin{cases}
@@ -51,7 +51,7 @@ This example uses the IsFinite high-level API to determine element-wise whether 
   true, & x \ne \pm\inf \text{ and } x \ne \text{nan}
   \end{cases}
   $$
-- Example specifications:
+- Example specifications:  
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> isfinite </td></tr>
 
@@ -64,20 +64,20 @@ This example uses the IsFinite high-level API to determine element-wise whether 
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">isfinite_custom</td></tr>
   </table>
 
-- Example implementation:
+- Example implementation:  
   This example implements an isfinite_custom example with fixed shapes of input x[1, 1024] and output y[1, 1024].
 
-  - Kernel implementation
+  - Kernel implementation  
     The computation logic is: The vector computation APIs provided by Ascend C operate on LocalTensor elements. Input data must first be transferred to on-chip storage, then the IsFinite high-level API is used to complete the isfinite computation, obtain the final result, and transfer it to external storage.
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run
+## Build and Run  
 
 Run the following steps in the root directory of this example to build and run the operator.
 
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

@@ -74,7 +74,7 @@ private:
     std::vector<std::unique_ptr<LocalNotify>> notifys_;
 
     std::unique_ptr<Stream> streamDevice_; //在把用户的stream生成的thread导出到device时使用
-    DeviceMem sqCqeContext_;
+    DeviceMem sqCqeContext_; 
     std::string uniqueIdStr_;
 };
 

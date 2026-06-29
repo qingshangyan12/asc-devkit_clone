@@ -40,7 +40,7 @@ The example supports switching between different scenarios through compilation p
     // Both src0 and src1 are tensors. When selMask bit is 1, select from src0; when bit is 0, select from src1
     AscendC::Select(dstl, selMask, src0, src1, cmpMode, count);
     ```
-
+  
   **Scenario 2: Select (Scalar)**
 
   - Description: Select elements from 1 tensor and 1 scalar based on selMask, with no valid data limit on selMask. In multi-iteration scenarios, each iteration continuously uses different portions of selMask.
@@ -73,7 +73,7 @@ The example supports switching between different scenarios through compilation p
 
     // Scalar at front. src0 is scalar, src1 is tensor. When selMask bit is 1, equals src0; when bit is 0, select from src1
     static constexpr AscendC::BinaryConfig config = { 0 };
-    AscendC::Select<AscendC::BinaryDefaultType, uint8_t, config>(dst, selMask, src0, src1, cmpMode, count);
+    AscendC::Select<AscendC::BinaryDefaultType, uint8_t, config>(dst, selMask, src0, src1, cmpMode, count); 
     ```
 
 - Scenario specifications
@@ -90,14 +90,14 @@ The example supports switching between different scenarios through compilation p
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
-
+    
 - Run the example
 
   Run the following commands in the example directory.
@@ -116,7 +116,7 @@ Run the following steps in the root directory of this example to build and run t
   cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # CPU debug mode
   cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # NPU simulation mode
   ```
-
+  
   > **Notice:** Clear the cmake cache before switching build modes. Run `rm CMakeCache.txt` in the build directory and then re-run cmake.
 
 - Build option description

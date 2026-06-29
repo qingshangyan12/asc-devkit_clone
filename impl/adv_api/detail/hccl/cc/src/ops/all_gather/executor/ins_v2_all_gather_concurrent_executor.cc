@@ -91,7 +91,7 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
     resourceRequest.notifyNumPerThread.insert(resourceRequest.notifyNumPerThread.end(),
                                               temp1ResReq.notifyNumPerThread.begin(),
                                               temp1ResReq.notifyNumPerThread.end());
-
+    
     if (param.engine == CommEngine::COMM_ENGINE_CCU) {
         resourceRequest.ccuKernelNum.emplace_back(temp0ResReq.ccuKernelNum[0]);
         resourceRequest.ccuKernelNum.emplace_back(temp1ResReq.ccuKernelNum[0]);
@@ -324,7 +324,7 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
 
     // 前同步
     CHK_RET(PreSyncInterThreads(mainThread_, templateMainThreads_, syncNotifyOnTemplates_));
-
+     
     // 交替下发两个template的任务
     for (u32 loopIndex = 0; loopIndex < loopTimesforTemp0 || loopIndex < loopTimesforTemp1; loopIndex++) {
         if (loopIndex < loopTimesforTemp0) {

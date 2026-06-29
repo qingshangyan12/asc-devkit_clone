@@ -248,7 +248,7 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
     ```
     // 标量在后，src1Local[0]作为标量
     AscendC::Compares(dstLocal, src0Local, src1Local[0], AscendC::CMPMODE::LT, srcDataSize);
-
+    
     // 标量在前，src0Local[0]作为标量
     static constexpr AscendC::BinaryConfig config = { 0 };
     AscendC::Compares<BinaryDefaultType, BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, AscendC::CMPMODE::LT, srcDataSize);
@@ -265,7 +265,7 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
     // dstRepStride, srcRepStride = 8, no gap between repeats
     // 标量在后，src1Local[0]作为标量
     AscendC::Compares(dstLocal, src0Local, src1Local[0], AscendC::CMPMODE::LT, mask, repeat, repeatParams);
-
+    
     // 标量在前，src0Local[0]作为标量
     static constexpr AscendC::BinaryConfig config = { 0 };
     AscendC::Compares<BinaryDefaultType, BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, AscendC::CMPMODE::LT, mask, repeat, repeatParams);
@@ -282,7 +282,7 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
     // dstRepStride, srcRepStride = 8, no gap between repeats
     // 标量在后，src1Local[0]作为标量
     AscendC::Compares(dstLocal, src0Local, src1Local[0], AscendC::CMPMODE::LT, mask, repeat, repeatParams);
-
+    
     // 标量在前，src0Local[0]作为标量
     static constexpr AscendC::BinaryConfig config = { 0 };
     AscendC::Compares<BinaryDefaultType, BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, AscendC::CMPMODE::LT, mask, repeat, repeatParams);

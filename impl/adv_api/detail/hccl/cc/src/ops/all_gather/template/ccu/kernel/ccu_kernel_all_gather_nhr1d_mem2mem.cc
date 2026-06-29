@@ -124,7 +124,7 @@ void CcuKernelAllGatherNHR1DMem2Mem::PreSync()
 void CcuKernelAllGatherNHR1DMem2Mem::PostSync()
 {
     for (ChannelHandle channel : channels_) {
-        NotifyRecord(channel, CKE_IDX_0, 1 << POST_SYNC_ID);
+        NotifyRecord(channel, CKE_IDX_0, 1 << POST_SYNC_ID);     
     }
     for (ChannelHandle channel : channels_) {
         NotifyWait(channel, CKE_IDX_0, 1 << POST_SYNC_ID);

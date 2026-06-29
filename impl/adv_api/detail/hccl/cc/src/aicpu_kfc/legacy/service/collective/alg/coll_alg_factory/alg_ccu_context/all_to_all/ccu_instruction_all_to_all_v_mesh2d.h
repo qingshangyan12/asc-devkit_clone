@@ -64,7 +64,7 @@ public:
         const std::vector<std::vector<RankId>> &tempVTopo) :
         CcuInstruction(), op_(op), dimSize_(dimSize), tempVTopo_(tempVTopo) {}
 
-    void Init(uint32_t rankId, uint64_t axisId, uint64_t inputAddr, uint64_t outputAddr, uint64_t scratchAddr, uint64_t token,
+    void Init(uint32_t rankId, uint64_t axisId, uint64_t inputAddr, uint64_t outputAddr, uint64_t scratchAddr, uint64_t token, 
         uint64_t scratchSliceSize, uint64_t scratchSliceBias, const A2ASendRecvInfo& localSendRecvInfo)
     {
         axisId_ = axisId;
@@ -90,9 +90,9 @@ public:
         return StringFormat("CcuInstructionAllToAllVMesh2D rankId [%u], instType[%s]", rankId_, instType_.Describe().c_str());
     }
 
-    void SetInstType(CcuInstType instType)
-    {
-        instType_ = instType;
+    void SetInstType(CcuInstType instType) 
+    { 
+        instType_ = instType; 
     }
 
     std::unique_ptr<CcuCtxArg> GetCtxArg() const override

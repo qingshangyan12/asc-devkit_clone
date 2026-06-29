@@ -33,13 +33,13 @@ This example uses the Ceil high-level API to obtain the smallest integer value g
 
 ## Example Description
 
-- Example function:
-  Obtain the smallest integer value greater than or equal to x, that is, round toward positive infinity. The computation formula is as follows:
+- Example function:  
+  Obtain the smallest integer value greater than or equal to x, that is, round toward positive infinity. The computation formula is as follows:  
   $$
   dstTensor_i = Ceil(srcTensor_i)
   $$
 
-- Example specifications:
+- Example specifications:  
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> ceil </td></tr>
 
@@ -52,25 +52,25 @@ This example uses the Ceil high-level API to obtain the smallest integer value g
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">ceil_custom</td></tr>
   </table>
 
-- Example implementation:
+- Example implementation:  
   This example implements a ceil_custom example with fixed shapes of input src[1, 8] and output dst[1, 8].
 
   - Kernel implementation
 
     Use the Ceil high-level API to complete rounding toward positive infinity.
-
+  
   - Tiling implementation
 
     The host side obtains the maximum and minimum temporary space required by the Ceil API through the GetCeilMaxMinTmpSize API.
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run
+## Build and Run  
 
 Run the following steps in the root directory of this example to build and run the operator.
 
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -89,7 +89,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-
+  
   For example:
 
   ```bash

@@ -85,7 +85,7 @@ HcclResult CcuKernelReduceScatterNHR1DMem2Mem::InitResources()
     output_ = CreateVariable();
     for (uint32_t channelIdx = 0; channelIdx < localSize_; channelIdx++) {
         HCCL_INFO("[CcuKernelReduceScatterNHR1DMem2Mem] mySubCommRankId[%u], channelId[%u]", mySubCommRankId_, channelIdx);
-
+        
         CcuRep::Variable inputVar, tokenVar;
         CHK_RET(CreateVariable(channels_[channelIdx], INPUT_XN_ID, &inputVar));
         input_.push_back(inputVar); // 获取channel中id=0的Var来传递output
@@ -124,7 +124,7 @@ void CcuKernelReduceScatterNHR1DMem2Mem::PreSync()
 void CcuKernelReduceScatterNHR1DMem2Mem::PostSync()
 {
     for (ChannelHandle channel : channels_) {
-        NotifyRecord(channel, CKE_IDX_0, 1 << POST_SYNC_ID);
+        NotifyRecord(channel, CKE_IDX_0, 1 << POST_SYNC_ID);     
     }
     for (ChannelHandle channel : channels_) {
         NotifyWait(channel, CKE_IDX_0, 1 << POST_SYNC_ID);
@@ -179,7 +179,7 @@ void CcuKernelReduceScatterNHR1DMem2Mem::DoRepeatReduceScatterNHR()
         }
         CCU_IF(localSliceSize == 0) {
             RecordEvent(event_);
-        }
+        }  
         WaitEvent(event_);
         isRepeatIter_ = 1;
     }
@@ -195,7 +195,7 @@ void CcuKernelReduceScatterNHR1DMem2Mem::DoRepeatReduceScatterNHRSingleStep(cons
     const std::vector<u32> &sendSliceIdxList = nhrStepInfo.txSliceIdxs;
     remoteDst_.token = token_[toRankIdx];
     localSrc_.token = token_[myRankIdx_];
-
+    
     bool islastSlice = false;
 
     // 通知fromRank，可以写入
@@ -209,7 +209,7 @@ void CcuKernelReduceScatterNHR1DMem2Mem::DoRepeatReduceScatterNHRSingleStep(cons
         remoteDst_.addr += inputSliceOffset[sendSliceIdx];
         localSrc_.addr = input_[myRankIdx_];
         localSrc_.addr += inputSliceOffset[sendSliceIdx];
-
+        
         islastSlice = (sendSliceIdx + 1 == dimSize_);
         DoRepeatWriteReduceSlices(nhrStepInfo.toRank, localSrc_, remoteDst_, islastSlice);
     }
@@ -233,7 +233,7 @@ void CcuKernelReduceScatterNHR1DMem2Mem::DoRepeatWriteReduceSlices(const u32 &to
         CCU_IF(repeatNumVarTemp_ != UINT64_MAX) {
             repeatNumVarTemp_ += repeatNumAdd;
         }
-
+        
         CCU_IF(isRepeatIter_ == 1) {
             src.addr += inputRepeatStride_;
             dst.addr += inputRepeatStride_;
@@ -246,7 +246,7 @@ void CcuKernelReduceScatterNHR1DMem2Mem::DoRepeatWriteReduceSlices(const u32 &to
         }
         sliceSize_ = (axisId_ == 0) ? (islastSlice? die0LastSliceSize_ : die0Size_)
                                     : (islastSlice? die1LastSliceSize_ : die1Size_);
-
+    
         event_.SetMask(1);
         CCU_IF(sliceSize_ != 0) {
             WriteReduceNb(sendChannel, dst, src, sliceSize_, dataType_, reduceOp_, event_);

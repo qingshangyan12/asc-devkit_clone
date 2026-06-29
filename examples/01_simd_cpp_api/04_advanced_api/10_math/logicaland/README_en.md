@@ -32,14 +32,14 @@ This example uses the LogicalAnd high-level API to perform element-wise AND oper
 
 ## Example Description
 
-- Example function:
-  Perform element-wise AND operations. When the input data type is not bool, zero is treated as False and non-zero data is treated as True.
+- Example function:  
+  Perform element-wise AND operations. When the input data type is not bool, zero is treated as False and non-zero data is treated as True.  
   The computation formula is as follows:
   $$
   dst_i = src0_i \&\& src1_i
   $$
 
-- Example specifications:
+- Example specifications:  
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> logicaland </td></tr>
 
@@ -53,21 +53,21 @@ This example uses the LogicalAnd high-level API to perform element-wise AND oper
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">logicaland_custom</td></tr>
   </table>
 
-- Example implementation:
+- Example implementation:  
   This example implements a logicaland_custom example with fixed shapes of input src0[1, 1024], src1[1, 1024], and output dst[1, 1024].
 
   - Kernel implementation
 
     Use the LogicalAnd high-level API to complete element-wise AND operations.
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run
+## Build and Run  
 
 Run the following steps in the root directory of this example to build and run the operator.
 
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

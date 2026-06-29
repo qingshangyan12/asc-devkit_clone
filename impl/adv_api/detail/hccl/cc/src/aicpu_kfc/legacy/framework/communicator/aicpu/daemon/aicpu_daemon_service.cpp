@@ -40,7 +40,7 @@ void AicpuDaemonService::ServiceRun(void *info)
             }
         }
         lock.unlock();
-
+        
         if (needBreak) {
             HCCL_RUN_INFO("Back ground thread needBreak");
             break;

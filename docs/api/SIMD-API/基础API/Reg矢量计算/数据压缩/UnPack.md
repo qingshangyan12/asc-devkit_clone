@@ -87,7 +87,7 @@ __simd_callee__ inline void UnPack(S& dstReg, V& srcReg)
 
 ## 数据类型
 
-**表 3**  源操作数和目的操作数的数据类型对应表<a id="table3"></a>
+**表 3**  源操作数和目的操作数的数据类型对应表<a id="table3"></a> 
 | T数据类型 | U数据类型 |
 | ------ | ------ |
 | int16_t | int8_t |

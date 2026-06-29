@@ -121,7 +121,7 @@ HcclResult CollReceiveExecutor::RunLoop(OpParam &param, AlgResourceResponse &alg
     u64 outputOffset = 0;
     u64 countLeft = param.DataDes.count;
     while (countLeft > 0) {
-        CHK_RET(InitTask(dispatcher_, param.stream, meta.isEnableCache, meta.GetCacheKey()));
+        CHK_RET(InitTask(dispatcher_, param.stream, meta.isEnableCache, meta.GetCacheKey())); 
         curOutputPtr += outputOffset;
         HCCL_DEBUG("RecvOutPlace:outputOffset[%llu]", outputOffset);
         u64 curCount = ((countLeft * unitSize) > commOutputSize) ? (commOutputSize / unitSize) : countLeft;

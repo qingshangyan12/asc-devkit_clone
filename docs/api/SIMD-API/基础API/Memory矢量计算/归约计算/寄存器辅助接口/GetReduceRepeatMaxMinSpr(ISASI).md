@@ -40,7 +40,7 @@
     template <typename T>
     __aicore__ inline void GetReduceRepeatMaxMinSpr(T &maxMinValue, T &maxMinIndex)
     ```
-
+    
 </cann-filter>
 
 <cann-filter npu-type="310p">

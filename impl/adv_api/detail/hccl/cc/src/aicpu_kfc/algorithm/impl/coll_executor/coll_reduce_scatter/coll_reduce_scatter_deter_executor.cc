@@ -112,14 +112,14 @@ u64 CollReduceScatterDeterExecutor::CalcLoopMaxCount(const u32 unitSize)
 {
     u64 maxCountPerLoop;
     bool isLocalReduce91073 = ((((topoAttr_.userRankSize & (topoAttr_.userRankSize - 1)) != 0) ||
-        aicpuUnfoldMode_ || (workflowMode_ == HcclWorkflowMode::HCCL_WORKFLOW_MODE_OPS_KERNEL_INFO_LIB))
+        aicpuUnfoldMode_ || (workflowMode_ == HcclWorkflowMode::HCCL_WORKFLOW_MODE_OPS_KERNEL_INFO_LIB)) 
         && (topoAttr_.deviceType == DevType::DEV_TYPE_910_93)) && (topoAttr_.serverNum == 1);
 
     bool isLocalReduce910B = ((totalSize_ > HCCL_SMALL_COUNT_32_KB) ||
         (workflowMode_ == HcclWorkflowMode::HCCL_WORKFLOW_MODE_OPS_KERNEL_INFO_LIB) ||
         ((topoAttr_.deviceNumPerAggregation != DEVICE_EIGHT) && (topoAttr_.deviceNumPerAggregation != DEVICE_FOUR)))&&
         (topoAttr_.deviceType == DevType::DEV_TYPE_910B);
-    if (isLocalReduce91073 || isLocalReduce910B) {
+    if (isLocalReduce91073 || isLocalReduce910B) { 
         maxCountPerLoop = (inCCLbufferSize_ - HCCL_MIN_SLICE_ALIGN_910B * topoAttr_.deviceNumPerAggregation) /
             unitSize / (topoAttr_.deviceNumPerAggregation - 1);
         maxCountPerLoop = maxCountPerLoop / HCCL_MIN_SLICE_ALIGN_910B;
@@ -170,7 +170,7 @@ HcclResult CollReduceScatterDeterExecutor::KernelRun(const OpParam &param, ExecM
         param.root, param.reduceType};
 
     bool isLocalReduce91073 = ((((topoAttr_.userRankSize & (topoAttr_.userRankSize - 1)) != 0) ||
-        aicpuUnfoldMode_ || (workflowMode_ == HcclWorkflowMode::HCCL_WORKFLOW_MODE_OPS_KERNEL_INFO_LIB))
+        aicpuUnfoldMode_ || (workflowMode_ == HcclWorkflowMode::HCCL_WORKFLOW_MODE_OPS_KERNEL_INFO_LIB)) 
         && (topoAttr_.deviceType == DevType::DEV_TYPE_910_93)) && (topoAttr_.serverNum == 1);
 
     bool isLocalReduce910B = ((param.DataDes.count * unitSize > HCCL_SMALL_COUNT_32_KB) ||

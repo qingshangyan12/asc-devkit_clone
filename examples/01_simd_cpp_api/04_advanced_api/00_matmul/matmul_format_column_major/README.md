@@ -25,10 +25,10 @@
 
 ## 样例描述
 
-- 样例功能：
+- 样例功能：  
   MatmulColumnMajorCustom样例调用Matmul API计算时，将列方向上的元素在内存连续的A、B、C矩阵的Format参数设置为CubeFormat::COLUMN_MAJOR，实现列优先排布的矩阵乘法。样例实现了对输入的A、B矩阵做矩阵乘、加bias偏置的功能。
 
-- 样例规格：
+- 样例规格：  
     本样例中：M = 428, N = 479, K = 528。
     <table>
     <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">MatmulColumnMajor</td></tr>
@@ -40,7 +40,7 @@
     <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmulColumnMajorCustom</td></tr>
     </table>
 
-- 样例实现：
+- 样例实现： 
   - Kernel关键步骤
     - 创建Matmul对象：C矩阵的Format设置为COLUMN_MAJOR。
       ```cpp
@@ -62,13 +62,13 @@
           matmul_tiling::DataType::DT_FLOAT);
       ```
 
-  - 调用实现
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

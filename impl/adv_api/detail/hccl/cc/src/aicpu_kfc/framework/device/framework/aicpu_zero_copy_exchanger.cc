@@ -171,7 +171,7 @@ HcclResult AicpuZeroCopyExchanger::GetRemoteRanks(TagRes &tagRes, OpCommTranspor
     // 先清空已有的数据
     tagRes.remoteRanks.clear();
     tagRes.links.clear();
-
+ 
     for (auto &singleSubCommTransport : opTransportResponse[COMM_LEVEL0]) {
         for (u64 i = 0; i < singleSubCommTransport.links.size(); ++i) {
             LINK link = singleSubCommTransport.links[i];
@@ -184,7 +184,7 @@ HcclResult AicpuZeroCopyExchanger::GetRemoteRanks(TagRes &tagRes, OpCommTranspor
             tagRes.links.emplace_back(link);
         }
     }
-
+ 
     // 校验交换地址的buffer长度是足够，目前是固定使用16个
     u32 maxDeviceNum;
     CHK_RET(GetMaxDevNum(maxDeviceNum));

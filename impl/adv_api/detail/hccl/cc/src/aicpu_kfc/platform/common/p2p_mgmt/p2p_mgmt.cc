@@ -367,7 +367,7 @@ bool P2PMgmt::IsStandardCardFor910B(std::vector<uint32_t>& remoteDevicePhysicIDs
     for (auto remoteDevicePhysicID : remoteDevicePhysicIDs){
         CHK_RET(hrtGetPairDeviceLinkType(localDevicePhysicID, remoteDevicePhysicID, linkType));
         // 两卡之间的链路是HCCS或者SIO时，返回false
-        if (linkType == LinkTypeInServer::HCCS_TYPE
+        if (linkType == LinkTypeInServer::HCCS_TYPE 
             || linkType == LinkTypeInServer::SIO_TYPE
             || linkType == LinkTypeInServer::HCCS_SW_TYPE) {
             return false;

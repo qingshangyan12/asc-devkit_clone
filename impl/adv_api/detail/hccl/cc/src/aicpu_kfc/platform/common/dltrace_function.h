@@ -28,7 +28,7 @@ public:
     std::function<TraHandle(int tracerType, const char *objName, const TraceAttr *attr)> dlAtraceCreateWithAttr{};
     std::function<TraStatus(const TraceGlobalAttr *attr)> dlAtraceSetGlobalAttr{};
     std::function<TraStatus(TracerType tracerType, bool syncFlag)> dlAtraceSave{};
-
+    
     std::function<void(TraHandle handle)> dlUtraceDestroy{};
     std::function<HcclResult(TraHandle handle, const void *buffer, u32 bufSize)> dlUtraceSubmit{};
     std::function<TraHandle(int tracerType, const char *objName, const TraceAttr *attr)> dlUtraceCreateWithAttr{};

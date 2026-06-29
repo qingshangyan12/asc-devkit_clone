@@ -415,7 +415,7 @@ HcclResult CollRunAlltoAllVStaged::KernelRun(const OpParam &param, ExecMem &exec
     }
 
     HCCL_INFO("[hcclImpl][RunAlltoAllVStaged] stage0 run success!");
-
+        
     std::map<u32, std::list<OneSendRecvAddrInfo>> sendAddrInfosInter;
     std::map<u32, std::list<OneSendRecvAddrInfo>> recvAddrInfosInter;
     CalcInterMeshAggregationAlltoAllMemInfo(userRankInfo, allMeshAggregationSendRecvInfo_,sendAddrInfosInter,

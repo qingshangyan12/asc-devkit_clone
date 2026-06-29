@@ -70,7 +70,7 @@ TBufPool类切分的内存块都是连续的，开发者可能有一些自定义
 
 EXTERN\_IMPL\_BUFPOOL宏内部定义的函数Reset、Init、GetBufHandle、SetCurAddr、GetCurAddr、SetCurBufSize、GetCurBufSize接口参见后续章节描述。使用该宏后，即可使用上述接口完成自定义TBufPool功能。
 
-> [!NOTE]说明
+> [!NOTE]说明 
 >自定义TBufPool相关接口为试验接口，在后续版本中可能会调整或改进，不保证后续兼容性。请开发者在使用过程中关注后续版本更新。
 
 ## 函数原型<a name="section620mcpsimp"></a>
@@ -140,14 +140,14 @@ public:
         Init();
     }
 
-    template<class T>
+    template<class T> 
     __aicore__ inline bool InitBuffer(T& que, uint8_t num, uint32_t len) {
     }
 
     template<AscendC::TPosition bufPos>
     __aicore__ inline bool InitBuffer(AscendC::TBuf<bufPos>& buf, uint32_t len) {
     }
-
+    
     // MyBufPool，自定义TBufPool类名。自定义TBufPool逻辑位置选择VECCALC。
     // 自定义TBufPool分配的Buffer块数量为16
     EXTERN_IMPL_BUFPOOL(MyBufPool, AscendC::TPosition::VECCALC, 16);

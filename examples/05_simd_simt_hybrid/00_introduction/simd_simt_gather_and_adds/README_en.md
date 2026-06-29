@@ -25,7 +25,7 @@ This sample implements gather and adds computation based on SIMD and SIMT hybrid
 
 ## Sample Description
 
-- Sample Function:
+- Sample Function:  
   Calculation Formula:
 
   ```
@@ -42,7 +42,7 @@ This sample implements gather and adds computation based on SIMD and SIMT hybrid
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">gather_and_adds_kernel</td></tr>
   </table>
 
-- Sample Implementation:
+- Sample Implementation:  
   The SIMT unit and SIMD unit in the Vector Core share on-chip storage, which can be used to complete SIMT and SIMD hybrid programming. In this sample, the shape of the sample input index is [8192], the number of cores can be set to 8, each core processes 1024 data elements, the number of threads THREAD_COUNT is set to 1024, each thread processes 1 data element, and a single core only needs to call the simt_gather function once to complete the gather operation.
 
   > ⚠️ **Note** When the amount of data processed by a single core is greater than the set number of threads, the data needs to be split into multiple thread blocks. You can use asc_vf_call to call the simt_gather function multiple times to start multiple thread blocks to complete the operation of obtaining specified index data.
@@ -73,13 +73,13 @@ This sample implements gather and adds computation based on SIMD and SIMT hybrid
 
   (3) DataCopy moves the output data from UB (Unified Buffer) to GM (Global Memory).
 
-- Call Implementation:
+- Call Implementation:  
   Use the kernel call operator <<<>>> to call the kernel function.
 
 ## Compilation and Execution
 
 Execute the following steps in the root directory of this sample to compile and execute the sample.
-- Configure Environment Variables
+- Configure Environment Variables  
   Configure environment variables according to the [installation method](../../../../docs/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -115,7 +115,7 @@ Execute the following steps in the root directory of this sample to compile and 
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: Ascend 950PR/Ascend 950DT |
 
-- Execution Result
+- Execution Result  
   The execution result is as follows, indicating that the precision comparison is successful.
   ```
   [Success] Case accuracy is verification passed.

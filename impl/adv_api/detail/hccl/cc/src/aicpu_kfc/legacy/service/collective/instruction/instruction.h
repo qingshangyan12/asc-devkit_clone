@@ -77,10 +77,10 @@ public:
     {
     }
     string Describe() const override;
-
+ 
     const DataBuffer &GetSrcBuffer() const;
     const DataBuffer &GetDstBuffer() const;
-
+ 
 private:
     DataBuffer srcBuffer_;
     DataBuffer dstBuffer_;
@@ -356,12 +356,12 @@ public:
     {
     }
     string Describe() const override;
-
+ 
     RankId           GetRemoteRank() const;
     const LinkData  *GetLink() const override;
     const DataBuffer &GetLocalBuffer() const;
     const DataBuffer &GetRemoteBuffer() const;
-
+ 
 private:
     RankId    remoteRank_;
     LinkData  link_;
@@ -427,14 +427,14 @@ public:
     {
     }
     string Describe() const override;
-
+ 
     RankId           GetRemoteRank() const;
     const LinkData  *GetLink() const override;
     const DataBuffer &GetLocalBuffer() const;
     const DataBuffer &GetRemoteBuffer() const;
     const DataType   GetDataType() const;
     const ReduceOp   GetReduceOp() const;
-
+ 
 private:
     RankId    remoteRank_;
     LinkData  link_;
@@ -473,12 +473,12 @@ public:
     {
     }
     string Describe() const override;
-
+ 
     RankId           GetRemoteRank() const;
     const LinkData  *GetLink() const override;
     const DataBuffer &GetLocalBuffer() const;
     const DataBuffer &GetRemoteBuffer() const;
-
+ 
 private:
     RankId    remoteRank_;
     LinkData  link_;
@@ -544,14 +544,14 @@ public:
     {
     }
     string Describe() const override;
-
+ 
     RankId           GetRemoteRank() const;
     const LinkData  *GetLink() const override;
     const DataBuffer &GetLocalBuffer() const;
     const DataBuffer &GetRemoteBuffer() const;
     const DataType   GetDataType() const;
     const ReduceOp   GetReduceOp() const;
-
+ 
 private:
     RankId    remoteRank_;
     LinkData  link_;
@@ -662,7 +662,7 @@ public:
     {
     }
     string Describe() const override;
-
+ 
     RankId            GetRemoteRank() const;
     const LinkData   *GetLink() const override;
     const DataBuffer     &GetLocalBuffer() const;
@@ -672,7 +672,7 @@ public:
     const NotifyType &GetNotifyType() const;
     const u32        &GetTopicId() const;
     const u32        &GetBitValue() const;
-
+ 
 private:
     RankId     remoteRank_;
     LinkData   link_;

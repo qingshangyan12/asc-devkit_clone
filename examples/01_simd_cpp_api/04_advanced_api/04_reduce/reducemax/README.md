@@ -29,12 +29,12 @@
 │   └── README.md                   // 样例说明文档
 ```
 
-## 样例描述
+## 样例描述  
 
-- 样例功能：
+- 样例功能：  
   本样例的功能是对输入矩阵的每一列求最大值。
 
-- 样例规格：
+- 样例规格：  
 <table>
 <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center"> reducemax </td></tr>
 
@@ -50,16 +50,16 @@
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce_custom</td></tr>
 </table>
 
-- 样例实现：
+- 样例实现：  
   本样例将输入[32, 136]矩阵按列求最大值，输出[1，136]。
 
-  - Kernel实现:
+  - Kernel实现:  
     计算逻辑是：输入数据需要先搬运到片上存储，然后使用ReduceMax高阶API接口完成计算，再将结果搬出。
 
-  - Tiling实现:
+  - Tiling实现:  
     该样例的tiling实现流程如下：使用GetReduceMaxMaxMinTmpSize接口计算所需最大/最小临时空间大小，使用最小临时空间，然后根据输入长度确定所需tiling参数。
 
-  - 调用实现:
+  - 调用实现:  
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行

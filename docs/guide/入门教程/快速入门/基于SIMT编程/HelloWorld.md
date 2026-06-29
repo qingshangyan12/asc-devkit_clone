@@ -5,7 +5,7 @@
 开始前请参考[环境准备](../../环境准备.md)安装所需的CANN软件包，完整样例请参考[hello\_world](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/00_introduction/00_quickstart/hello_world_simt/README.md)。
 
 - **Hello World功能介绍**：
-
+ 
     在NPU上打印`Hello World!`。
 
 - **Device端Kernel实现**：
@@ -41,7 +41,7 @@
 
 - **算子编译与运行**：
     ```bash
-    bisheng hello_world.asc --npu-arch=dav-3510 -o demo --enable-simt
+    bisheng hello_world.asc --npu-arch=dav-3510 -o demo --enable-simt 
     ./demo
     ```
 

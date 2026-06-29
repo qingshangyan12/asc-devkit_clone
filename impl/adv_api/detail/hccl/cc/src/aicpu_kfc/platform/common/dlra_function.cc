@@ -128,7 +128,7 @@ HcclResult DlRaFunction::DlRaFunctionRdmaInit()
     CHK_SMART_PTR_NULL(dlRaDestroyCompChannel);
     dlRaGetCqeErrInfo = (int(*)(unsigned int phyId, struct CqeErrInfo *))HcclDlsym(handle_, "RaGetCqeErrInfo");
     CHK_SMART_PTR_NULL(dlRaGetCqeErrInfo);
-    dlRaGetCqeErrInfoList =
+    dlRaGetCqeErrInfoList = 
             (int (*)(RdmaHandle, struct CqeErrInfo *, u32 *))HcclDlsym(handle_, "RaRdevGetCqeErrInfoList");
     CHK_SMART_PTR_NULL(dlRaGetCqeErrInfoList);
     dlRaGetQpAttr = (int(*)(QpHandle, struct QpAttr *))HcclDlsym(handle_, "RaGetQpAttr");
@@ -357,7 +357,7 @@ HcclResult DlRaFunction::DlRaFunctionSocketInit()
 
     dlRaRestoreSnapShot = (int(*)(struct RaInfo*))HcclDlsym(handle_, "RaRestoreSnapshot");
     CHK_SMART_PTR_NULL(dlRaRestoreSnapShot);
-
+    
     dlRaGetHccnCfg = (int (*)(struct RaInfo*, enum HccnCfgKey, char*, int*))HcclDlsym(handle_, "RaGetHccnCfg");
     if (dlRaGetHccnCfg == nullptr) {
         HCCL_WARNING("dlRaGetHccnCfg is nullptr, can not use RaGetHccnCfg");

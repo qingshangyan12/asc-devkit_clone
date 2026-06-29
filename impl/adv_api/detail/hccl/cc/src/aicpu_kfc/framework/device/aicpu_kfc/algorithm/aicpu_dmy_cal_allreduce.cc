@@ -54,7 +54,7 @@ HcclResult AicpuDmyCalAllreduce::RunAllReduceAL(HcclReduceOp opType, void *sendB
 
     HCCL_INFO("RunDmyCalAllreduceAL:curInputPtr[%p], curOutputPtr[%p], curCount[%llu], curSize[%llu]",
                      curInputPtr, curOutputPtr, curCount, curSize);
-
+    
     for (u32 i = 0; i < ctx_->rankNum; i++) {
         windowSlices[i] = i * curSize;
     }
@@ -113,7 +113,7 @@ HcclResult AicpuDmyCalAllreduce::RunAllReduceRLA(HcclReduceOp opType, void *send
 
         HCCL_INFO("DmyCalAllreduceRLA:loop %u, curInputPtr[%p], curOutputPtr[%p], curCount[%llu], curSize[%llu]",
                          loopIdx++, curInputPtr, curOutputPtr, curCount, curSize);
-
+        
         for (u32 i = 0; i < ctx_->rankNum; i++) {
             windowSlices[i] = i * sliceSize;
         }

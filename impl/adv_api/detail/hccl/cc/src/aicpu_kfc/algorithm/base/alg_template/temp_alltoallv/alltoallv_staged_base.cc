@@ -55,4 +55,4 @@ HcclResult AlltoAllVStagedBase::LocalCopy(u32 rank)
 
     return HCCL_SUCCESS;
 }
-}
+} 

@@ -89,7 +89,7 @@ HcclResult CollAllGatherRingZerocopyExchangeExecutor::KernelRunInterServerPrePro
         recvLink->TxAck(stream);
         sendLink->RxAck(stream);
         u32 remoteLevel1Index = remoteRankSend % (level0RankSize_ * level1RankSize_) / level0RankSize_;
-        u32 remoteLevel2Index = remoteRankSend / level0RankSize_ / level1RankSize_;
+        u32 remoteLevel2Index = remoteRankSend / level0RankSize_ / level1RankSize_;   
         u64 txDstOffset = (remoteLevel1Index * level2RankSize_ + remoteLevel2Index) * inputMemSize;
         HCCL_DEBUG("[%s] remoteLevel1Index:%d, remoteLevel2Index:%d, txDstOffset:%llu", __func__, remoteLevel1Index, remoteLevel2Index, txDstOffset);
         if (IsLevel0Neighbor(remoteRankSend, level0RankSize_)) {

@@ -165,7 +165,7 @@ HcclResult InsV2ScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateLo
     HCCL_INFO("[InsV2ScatterSoleExecutor][OrchestrateOpbase] Start, template[%s]", algTemplate->Describe().c_str());
     u32 dataSizePerVolume = DataTypeSizeGet(dataType_);
     dataSize_ = dataCount_ * dataSizePerVolume;
-    TemplateDataParams tempAlgParams;
+    TemplateDataParams tempAlgParams;    
     tempAlgParams.buffInfo.outBuffType = BufferType::OUTPUT;
     tempAlgParams.buffInfo.scratBuffType = BufferType::SCRATCH;
     tempAlgParams.buffInfo.inBuffType = BufferType::INPUT;
@@ -180,7 +180,7 @@ HcclResult InsV2ScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateLo
     tempFuncs.isBottom = true;
     tempFuncs.opMode = opMode_;
     tempFuncs.enableCounterNotify = IsEnableCounterNotify();
-    tempFuncs.isForepart = true;
+    tempFuncs.isForepart = true;   
 
     u64 maxDataSizePerLoop = 0;
     u64 transportBoundDataSize = UB_MAX_DATA_SIZE;  // algTemplate->CalcLoopMaxCount();

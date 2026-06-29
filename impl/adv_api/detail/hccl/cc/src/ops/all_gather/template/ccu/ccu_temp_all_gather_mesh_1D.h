@@ -17,7 +17,7 @@ namespace mc2_ops_hccl {
 
 class CcuTempAllGatherMesh1D : public CcuAlgTemplateBase {
 public:
-    explicit  CcuTempAllGatherMesh1D(const OpParam& param,
+    explicit  CcuTempAllGatherMesh1D(const OpParam& param, 
                                                 const u32 rankId, // 传通信域的rankId，userRank
                                                 const std::vector<std::vector<u32>> &subCommRanks);
 

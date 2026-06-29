@@ -220,14 +220,14 @@ The Mmad computation includes padded invalid data, which needs to be excluded du
 
 Run the following steps in the root directory of this example to build and run the operator.
 
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
-
+  
 - Run the example
 
   Run the following commands in the example directory.

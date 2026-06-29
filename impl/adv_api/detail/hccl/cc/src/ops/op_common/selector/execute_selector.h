@@ -18,7 +18,7 @@ namespace mc2_ops_hccl {
 class ExecuteSelector {
 public:
     ExecuteSelector();
-
+    
     HcclResult  Run(OpParam &opParam, TopoInfoWithNetLayerDetails* topoInfo, std::string &selectAlgName) const;
 };
 } // namespace Hccl

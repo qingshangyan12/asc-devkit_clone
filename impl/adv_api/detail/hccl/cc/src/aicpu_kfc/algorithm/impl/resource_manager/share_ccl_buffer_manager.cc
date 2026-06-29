@@ -11,7 +11,7 @@
 #include "share_ccl_buffer_manager.h"
 
 namespace hccl {
-
+ 
 ShareCCLbufferMgr& ShareCCLbufferMgr::GetInstance()
 {
     static ShareCCLbufferMgr shareCCLbufferMgr[MAX_MODULE_DEVICE_NUM];
@@ -71,7 +71,7 @@ HcclResult ShareCCLbufferMgr::CreateShareCCLbuffer(const std::string &bufferName
     if (shareBufferSize_ != bufferSize) {
         HCCL_WARNING("[ShareCCLbufferMgr][CreateShareCCLbuffer]: share ccLBuffer size [%d], expect buffsize [%d]", shareBufferSize_, bufferSize);
     }
-
+    
     auto memIter = memRecord_.find(bufferName);
     // 申请inCCL,outCCL buffer
     if (memIter->second.cclBuffer.ptr() == nullptr) {
@@ -106,12 +106,12 @@ HcclResult ShareCCLbufferMgr::FreeShareCCLbuffer(const std::string &bufferName)
 }
 
 // 约束共享buffer的算子下发到同一条流
-HcclResult ShareCCLbufferMgr::CheckCCLbuffConflict(const std::string &bufferName, s32 streamId)
+HcclResult ShareCCLbufferMgr::CheckCCLbuffConflict(const std::string &bufferName, s32 streamId) 
 {
     CHK_PRT_RET(bufferName.empty(), HCCL_INFO("[ShareCCLbufferMgr][CheckCCLbuffConflict]: buffername is empty, no need check CCLbuff conflict"),
         HCCL_SUCCESS);
 
-    std::lock_guard<std::mutex> lock(lock_);
+    std::lock_guard<std::mutex> lock(lock_); 
     auto streamIter = streamIdMap_.find(bufferName);
     if (streamIter == streamIdMap_.end()) {
         // 首次记录该缓冲区的stream ID

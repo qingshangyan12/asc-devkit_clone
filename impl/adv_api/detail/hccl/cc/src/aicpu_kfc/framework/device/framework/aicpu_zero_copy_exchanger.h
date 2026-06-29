@@ -57,7 +57,7 @@ private:
     void MemFence() const
     {
         /* 内存屏障，即阻止编译器重排变量读写，也阻止CPU重排变量读写 */
-        std::atomic_thread_fence(std::memory_order_seq_cst);
+        std::atomic_thread_fence(std::memory_order_seq_cst); 
     }
 
     // 判断是否所有的ipc都是有效的，如果无效则报错

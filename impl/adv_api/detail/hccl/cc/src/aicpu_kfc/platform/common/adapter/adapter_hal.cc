@@ -608,7 +608,7 @@ HcclResult hrtHalStartMC2MaintenanceThread(mc2Funcs f1, void *p1, mc2Funcs f2, v
     CHK_PTR_NULL(p2);
 
     int ret = 0;
-
+    
     if (AicpuCreateCtrlThread != nullptr) {
         HCCL_INFO("[hrtHalStartMC2MaintenanceThread] AicpuCreateCtrlThread");
         ret = AicpuCreateCtrlThread(THREAD_TYPE_HCOM, f1, p1, f2, p2);
@@ -635,7 +635,7 @@ HcclResult hrtHalResourceIdRestore(u32 devId, u32 tsId, drvIdType_t resType, u32
     // 兼容老的12包，找不到符号时不报错，返回HCCL_E_NOT_SUPPORT由上层处理是否报错
     CHK_PRT_RET(halResourceIdRestore == nullptr,
         HCCL_WARNING("hrtHalResourceIdRestore not support, halResourceIdRestore is nullptr"), HCCL_E_NOT_SUPPORT);
-
+    
     drvResIdKey resInfo;
     resInfo.ruDevId = devId;
     resInfo.tsId = tsId;

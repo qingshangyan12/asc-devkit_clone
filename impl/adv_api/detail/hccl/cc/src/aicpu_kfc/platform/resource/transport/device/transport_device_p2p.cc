@@ -63,9 +63,9 @@ HcclResult TransportDeviceP2p::Init()
     HCCL_INFO("[TransportDeviceP2p][Init] take time:%lld us", DURATION_US(endut - startut));
 
     HCCL_USER_CRITICAL_LOG("create hccl transport:communicator[%s], local rank[%u], remote rank[%u], "\
-        "transporttype[%s]", machinePara_.tag.c_str(), machinePara_.localUserrank,
+        "transporttype[%s]", machinePara_.tag.c_str(), machinePara_.localUserrank, 
         machinePara_.remoteUserrank, GetLinkTypeEnumStr(GetLinkType()).c_str());
-
+        
     return HCCL_SUCCESS;
 }
 

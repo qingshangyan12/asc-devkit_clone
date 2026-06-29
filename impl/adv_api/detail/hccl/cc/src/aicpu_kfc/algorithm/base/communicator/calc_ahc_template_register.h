@@ -29,7 +29,7 @@ const std::map<TemplateType, AHCTemplateType> templateToAHCCalcTemplateMap = {
 
     {TemplateType::TEMPLATE_REDUCESCATTER_NHR, AHCTemplateType::AHC_TEMPLATE_NHR},
     {TemplateType::TEMPLATE_ALL_REDUCE_NHR, AHCTemplateType::AHC_TEMPLATE_NHR},
-    {TemplateType::TEMPLATE_ALL_GATHER_NHR, AHCTemplateType::AHC_TEMPLATE_NHR},
+    {TemplateType::TEMPLATE_ALL_GATHER_NHR, AHCTemplateType::AHC_TEMPLATE_NHR},   
 };
 
 //AHC通信关系注册
@@ -42,9 +42,9 @@ public:
     AHCCommCalcFuncPtr GetCommCalcFunction(AHCTemplateType type);
 private:
     std::vector<AHCCommCalcFuncPtr> commCalcFuncCreators_;
-    mutable std::mutex mu_;
+    mutable std::mutex mu_; 
 };
-
+ 
 // 通信域建链方法函数注册
 #define REGISTER_AHC_COMM_CALC_FUNC_HELPER(ctr, type, calcAlgName, calcFunc)         \
         static HcclResult g_func_##calcAlgName##_##ctr                               \

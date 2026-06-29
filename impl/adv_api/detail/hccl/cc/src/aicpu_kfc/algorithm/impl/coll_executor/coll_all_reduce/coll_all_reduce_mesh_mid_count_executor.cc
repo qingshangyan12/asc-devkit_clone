@@ -99,7 +99,7 @@ HcclResult CollAllReduceMeshMidCountExecutor::KernelRun(const OpParam &param, Ex
     std::unique_ptr<AlgTemplateBase> level0TempAlg;
     level0TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_REDUCE_LOCAL_REDUCE, dispatcher_);
     CHK_SMART_PTR_NULL(level0TempAlg);
-    CHK_RET(level0TempAlg->Prepare(reduceAttr, algResResp_->slaveStreams, algResResp_->notifiesMain, algResResp_->notifiesAux,
+    CHK_RET(level0TempAlg->Prepare(reduceAttr, algResResp_->slaveStreams, algResResp_->notifiesMain, algResResp_->notifiesAux, 
         level0CommInfo.localRank, level0CommInfo.localRankSize, topoAttr_.userRank, &opInfo));
 
     CHK_RET(level0TempAlg->Prepare(execMem.outputMem, execMem.outputMem, execMem.outputMem, execMem.count,

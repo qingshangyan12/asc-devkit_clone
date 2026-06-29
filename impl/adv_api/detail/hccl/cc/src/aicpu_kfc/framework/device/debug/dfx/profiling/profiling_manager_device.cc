@@ -116,9 +116,9 @@ HcclResult ProfilingManager::CallMsprofReportAdditionInfo(uint32_t type, uint64_
     reporterData.dataLen = len;
     reporterData.timeStamp = timeStamp;
     s32 sret = memcpy_s(reporterData.data, sizeof(reporterData.data), data, len);
-    CHK_PRT_RET(sret != EOK,
+    CHK_PRT_RET(sret != EOK, 
             HCCL_ERROR("memcpy failed. errorno:[%d] level:[%hu] type:[%u] threadId:[%u] sizeof_data[%zu] len:[%u] timeStamp:[%llu]",
-                sret, reporterData.level, type, reporterData.threadId, sizeof(reporterData.data), len, timeStamp),
+                sret, reporterData.level, type, reporterData.threadId, sizeof(reporterData.data), len, timeStamp), 
             HCCL_E_MEMORY);
     HCCL_DEBUG("CallMsprofReportAdditionInfo, AdditionInfoType[%u]", type);
         if (MsprofReportBatchAdditionalInfo == nullptr) {

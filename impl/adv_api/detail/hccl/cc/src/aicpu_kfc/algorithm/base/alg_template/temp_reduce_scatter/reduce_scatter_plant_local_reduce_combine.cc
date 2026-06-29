@@ -100,7 +100,7 @@ HcclResult ReduceScatterPlantLocalReduceCombine::RunAsync(const u32 rank, const 
     CHK_PTR_NULL(stream_.ptr());
     CHK_PRT_RET(links.size() < rankSize, HCCL_ERROR("[ReduceScatterPlantLocalReduceCombine][RunAsync]rank[%u] "
         "linksize[%llu] is less than rankSize[%u]", rank, links.size(), rankSize), HCCL_E_INTERNAL);
-
+    
     rankSize_ = rankSize;
     localRank_ = rank;
 
@@ -140,7 +140,7 @@ HcclResult ReduceScatterPlantLocalReduceCombine::LocalCopy()
     return HCCL_SUCCESS;
 }
 
-HcclResult ReduceScatterPlantLocalReduceCombine::RunAlltoAllRDMA(u32 round, u64 sliceSize,
+HcclResult ReduceScatterPlantLocalReduceCombine::RunAlltoAllRDMA(u32 round, u64 sliceSize, 
     const std::vector<LINK> &links)
 {
     u64 srcOffset = memBlockInfo_.inputOffsets[round];
@@ -149,13 +149,13 @@ HcclResult ReduceScatterPlantLocalReduceCombine::RunAlltoAllRDMA(u32 round, u64 
         srcOffset = sliceSize == 0 ? 0 : memBlockInfo_.userInputOffsets[round];
         srcPtr = static_cast<u8 *>(inputMem_.ptr()) + srcOffset;
     }
-
+    
     u32 outputIndex = CalcOutputIndex(round);
     u64 dstOffset = memBlockInfo_.outputOffsets[outputIndex];
     if (isNeedSpaceBorrow_ && isLevel0LastRank_ && !isLastRank(round) && isLastBlockData(outputIndex)) {
         // 只有level0最后一组的最后一块数据需要放到对方的input上（且非全局最后一张卡）
         dstOffset = sliceSize == 0 ? 0 : memBlockInfo_.userInputOffsets[round];
-        CHK_RET(links[round]->TxAsync(UserMemType::INPUT_MEM, dstOffset, srcPtr, sliceSize, stream_));
+        CHK_RET(links[round]->TxAsync(UserMemType::INPUT_MEM, dstOffset, srcPtr, sliceSize, stream_));   
     } else {
         CHK_RET(links[round]->TxAsync(UserMemType::OUTPUT_MEM, dstOffset, srcPtr, sliceSize, stream_));
     }
@@ -170,13 +170,13 @@ HcclResult ReduceScatterPlantLocalReduceCombine::RunAlltoAllRDMA(u32 round, u64 
 
     u64 remoteSrcOffset = memBlockInfo_.inputOffsets[round];
     CHK_RET(links[round]->RxAsync(UserMemType::OUTPUT_MEM, remoteSrcOffset, dstPtr, sliceSize, stream_));
-
+    
     CHK_RET(links[round]->PostFinAck(stream_));
     CHK_RET(links[round]->WaitFinAck(stream_));
     return HCCL_SUCCESS;
 }
 
-HcclResult ReduceScatterPlantLocalReduceCombine::RunAlltoAllSDMA(u32 round, u64 sliceSize,
+HcclResult ReduceScatterPlantLocalReduceCombine::RunAlltoAllSDMA(u32 round, u64 sliceSize, 
     const std::vector<LINK> &links)
 {
     if (sliceSize != 0) {
@@ -255,7 +255,7 @@ HcclResult ReduceScatterPlantLocalReduceCombine::RunLocalReduce()
         }
 
         // LocalReduce操作
-        for (u32 offset = 0; offset <= tailIndex - headIndex; offset++) {
+        for (u32 offset = 0; offset <= tailIndex - headIndex; offset++) {   
             u32 inputIndex = CalcOutputIndex(headIndex + offset); // reduce的源数据offset
             u32 outputIndex = CalcOutputIndex(offset);            // reduce的目标offset
 
@@ -265,7 +265,7 @@ HcclResult ReduceScatterPlantLocalReduceCombine::RunLocalReduce()
             if (sliceSize == 0) {
                 continue;
             }
-
+            
             void *srcPtr;
             void *dstPtr;
             if (isNeedSpaceBorrow_ && isLevel0LastRank_ && !isLastRank(localRank_) && isLastBlockData(inputIndex)) {
@@ -299,6 +299,6 @@ HcclResult ReduceScatterPlantLocalReduceCombine::RunLocalReduce()
 
     return HCCL_SUCCESS;
 }
-REGISTER_TEMPLATE(TemplateType::TEMPLATE_REDUCESCATTER_PLANT_LOCAL_REDUCE_COMBINE,
+REGISTER_TEMPLATE(TemplateType::TEMPLATE_REDUCESCATTER_PLANT_LOCAL_REDUCE_COMBINE, 
     ReduceScatterPlantLocalReduceCombine);
 } // namespace hccl

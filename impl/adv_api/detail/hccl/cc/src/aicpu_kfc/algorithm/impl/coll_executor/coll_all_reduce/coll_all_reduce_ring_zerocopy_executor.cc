@@ -95,7 +95,7 @@ HcclResult CollAllReduceRingZerocopyExecutor::DoubleRingReduceScatter(const std:
     u64 reduceAttr = GetReduceAttr(inputMem, outputMem, dataType, reductionOp);
     CHK_RET(CheckCommSize(COMM_LEVEL0, COMM_INDEX_0 + 1));
     SubCommInfo level0RingCommInfo = GetSubCommInfo(COMM_LEVEL0, COMM_INDEX_0);
-
+    
     // 适配AlignedDoubleRing的入参
     u32 ringSize = multRingsSliceZero[0].size();
     std::vector<std::vector<u32>> rankOrders(TWO_RING, std::vector<u32>(ringSize));
@@ -110,8 +110,8 @@ HcclResult CollAllReduceRingZerocopyExecutor::DoubleRingReduceScatter(const std:
     HCCL_CONFIG_INFO(HCCL_ALG, "[%s] Run TEMPLATE_REDUCESCATTER_DB_RING in COMM_LEVEL0", __func__);
     CHK_SMART_PTR_NULL(tempAlg);
     CHK_RET(tempAlg->Prepare(inputMem, inputMem, outputMem, count, dataType, stream,
-        multRingsSliceZero, reductionOp, LEVEL0_BRIDGE_RANK_ID, baseOffset, false,
-        reduceAttr, opInfo, topoAttr_.userRank, algResResp_->slaveStreams, algResResp_->notifiesMain,
+        multRingsSliceZero, reductionOp, LEVEL0_BRIDGE_RANK_ID, baseOffset, false, 
+        reduceAttr, opInfo, topoAttr_.userRank, algResResp_->slaveStreams, algResResp_->notifiesMain, 
         algResResp_->notifiesAux, rankOrders, multRingsUserMemSlice));
     u32 ringIndexOp = COMM_INDEX_0;
     u32 rankSize = level0RingCommInfo.localRankSize;
@@ -125,7 +125,7 @@ HcclResult CollAllReduceRingZerocopyExecutor::DoubleRingReduceScatter(const std:
 
 HcclResult CollAllReduceRingZerocopyExecutor::KernelRunIntraServerPre(const OpParam &param, ExecMem &execMem)
 {
-    HCCL_CONFIG_INFO(HCCL_ALG,
+    HCCL_CONFIG_INFO(HCCL_ALG, 
         "[CollAllReduceRingZerocopyExecutor][Run]The CollAllReduceRingZerocopyExecutor starts");
     bool isAHCAlgo = algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_AHC ||
         algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_AHC_BROKE;
@@ -141,7 +141,7 @@ HcclResult CollAllReduceRingZerocopyExecutor::KernelRunIntraServerPre(const OpPa
     HcomCollOpInfo reduceScatterOpInfo = {
         "", execMem.inputMem.ptr(), nullptr, execMem.count, param.DataDes.dataType, param.root, param.reduceType
     };
-
+    
     if (topoType_ == TopoType::TOPO_TYPE_NP_SINGLE_RING) {
         // 构造slice数据
         level0MultiRingDataSlices_ = {level0Datalices};
@@ -168,14 +168,14 @@ HcclResult CollAllReduceRingZerocopyExecutor::KernelRunIntraServerPre(const OpPa
             param.DataDes.dataType, param.reduceType, level0MultiRingDataSlices_, param.stream, PROF_STAGE_0,
             0, &reduceScatterOpInfo, level0MultiRingDataSlices_));
     }
-
+    
     HCCL_INFO("AllReduce double ring stage0 run success");
     return HCCL_SUCCESS;
 }
 
 
 HcclResult CollAllReduceRingZerocopyExecutor::KernelRunInterServer(const OpParam &param, ExecMem &execMem)
-{
+{   
     u32 perDataSize = 0;
     CHK_RET(SalGetDataTypeSize(param.DataDes.dataType, perDataSize));
     Stream stream = param.stream;
@@ -222,7 +222,7 @@ HcclResult CollAllReduceRingZerocopyExecutor::KernelRunInterServerAllReduceSingl
     u64 level1DataCount = level1DataSize / perDataSize;
     std::unique_ptr<AlgTemplateBase> level1TempAlg;
     if (algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_RING) {
-        level1TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_REDUCE_RING,
+        level1TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_REDUCE_RING, 
             dispatcher_);
         HCCL_CONFIG_INFO(HCCL_ALG, "[%s] Run TEMPLATE_ALL_REDUCE_RING in COMM_LEVEL1", __func__);
         CHK_SMART_PTR_NULL(level1TempAlg);
@@ -242,7 +242,7 @@ HcclResult CollAllReduceRingZerocopyExecutor::KernelRunInterServerAllReduceSingl
         CHK_SMART_PTR_NULL(level1TempAlg);
         CHK_RET(level1TempAlg->Prepare(level1DataCount, globalSubGroups, ahcAlgOption));
     } else if (algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_NB) {
-        level1TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_REDUCE_NB,
+        level1TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_REDUCE_NB, 
             dispatcher_);
         HCCL_CONFIG_INFO(HCCL_ALG, "[%s] Run TEMPLATE_ALL_REDUCE_NB in COMM_LEVEL1", __func__);
         CHK_SMART_PTR_NULL(level1TempAlg);
@@ -304,19 +304,19 @@ HcclResult CollAllReduceRingZerocopyExecutor::KernelRunInterServerAllReduceMulti
         u64 reduceAttr = GetReduceAttr(level1InputMem, level1OutputMem, param.DataDes.dataType, param.reduceType);
         std::unique_ptr<AlgTemplateBase> level1RSTempAlg;
         if (algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_RING) {
-            level1RSTempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_REDUCESCATTER_RING,
+            level1RSTempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_REDUCESCATTER_RING, 
                 dispatcher_);
             CHK_SMART_PTR_NULL(level1RSTempAlg);
             CHK_RET(level1RSTempAlg->Prepare(reduceAttr));
             HCCL_CONFIG_INFO(HCCL_ALG, "[%s] Run TEMPLATE_REDUCESCATTER_RING in COMM_LEVEL1", __func__);
         } else if (algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_NB) {
-            level1RSTempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_REDUCESCATTER_NB,
+            level1RSTempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_REDUCESCATTER_NB, 
                 dispatcher_);
             CHK_SMART_PTR_NULL(level1RSTempAlg);
             CHK_RET(level1RSTempAlg->Prepare(reduceAttr));
             HCCL_CONFIG_INFO(HCCL_ALG, "[%s] Run TEMPLATE_REDUCESCATTER_NB in COMM_LEVEL1", __func__);
         } else if (algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_NHR) {
-            level1RSTempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_REDUCESCATTER_NHR,
+            level1RSTempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_REDUCESCATTER_NHR, 
                 dispatcher_);
             CHK_SMART_PTR_NULL(level1RSTempAlg);
             CHK_RET(level1RSTempAlg->Prepare(reduceAttr, false));
@@ -381,15 +381,15 @@ HcclResult CollAllReduceRingZerocopyExecutor::KernelRunInterServerAllReduceMulti
         // 获取Template
         std::unique_ptr<AlgTemplateBase> level1AGTempAlg;
         if (algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_RING) {
-            level1AGTempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_GATHER_RING,
+            level1AGTempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_GATHER_RING, 
                 dispatcher_);
             HCCL_CONFIG_INFO(HCCL_ALG, "[%s] Run TEMPLATE_ALL_GATHER_RING in COMM_LEVEL1", __func__);
         } else if (algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_NB) {
-            level1AGTempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_GATHER_NB,
+            level1AGTempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_GATHER_NB, 
                 dispatcher_);
             HCCL_CONFIG_INFO(HCCL_ALG, "[%s] Run TEMPLATE_ALL_GATHER_NB in COMM_LEVEL1", __func__);
         } else if (algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_NHR) {
-            level1AGTempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_GATHER_NHR,
+            level1AGTempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_GATHER_NHR, 
                 dispatcher_);
             HCCL_CONFIG_INFO(HCCL_ALG, "[%s] Run TEMPLATE_ALL_GATHER_NHR in COMM_LEVEL1", __func__);
         } else {
@@ -437,7 +437,7 @@ HcclResult CollAllReduceRingZerocopyExecutor::DoubleRingAllGather(
         TemplateType::TEMPLATE_ALIGNED_ALL_GATHER_DOUBLE_RING, dispatcher_);
     HCCL_CONFIG_INFO(HCCL_ALG, "[%s] Run TEMPLATE_ALIGNED_ALL_GATHER_DOUBLE_RING in COMM_LEVEL0", __func__);
     CHK_SMART_PTR_NULL(tempAlg);
-    CHK_RET(tempAlg->Prepare(opInfo, topoAttr_.userRank, algResResp_->slaveStreams,
+    CHK_RET(tempAlg->Prepare(opInfo, topoAttr_.userRank, algResResp_->slaveStreams, 
         algResResp_->notifiesMain, algResResp_->notifiesAux, rankOrders, multRingsUserMemSlice));
     CHK_RET(tempAlg->Prepare(outputMem, outputMem, inputMem, count, dataType, stream, multRingsSliceZero,
         HCCL_REDUCE_RESERVED, LEVEL0_BRIDGE_RANK_ID, baseOffset));

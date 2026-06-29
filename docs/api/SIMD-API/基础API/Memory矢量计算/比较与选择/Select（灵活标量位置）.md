@@ -208,7 +208,7 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
 </td>
 <td class="cellrowborder" valign="top" width="72.37723772377238%" headers="mcps1.2.4.1.3 "><p id="p16706144115550"><a name="p16706144115550"></a><a name="p16706144115550"></a>指令模式，SELMODE类型，取值如下：</p>
 <a name="screen6704150175512"></a><a name="screen6704150175512"></a><pre class="screen" codetype="Cpp" id="screen6704150175512">enum class SELMODE : uint8_t {
-    VSEL_CMPMASK_SPR = 0,
+    VSEL_CMPMASK_SPR = 0, 
     VSEL_TENSOR_SCALAR_MODE,
     VSEL_TENSOR_TENSOR_MODE,
 };</pre>
@@ -273,7 +273,7 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
     // 灵活标量位置，src1Local[0]作为标量
     static constexpr AscendC::BinaryConfig config = { 1 };
     AscendC::Select<BinaryDefaultType, uint8_t, config>(dstLocal, maskLocal, src0Local, src1Local[0], AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE, dataSize);
-
+    
     // 灵活标量位置，src0Local[0]作为标量
     static constexpr AscendC::BinaryConfig config = { 0 };
     AscendC::Select<BinaryDefaultType, uint8_t, config>(dstLocal, maskLocal, src0Local[0], src1Local, AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE, dataSize);

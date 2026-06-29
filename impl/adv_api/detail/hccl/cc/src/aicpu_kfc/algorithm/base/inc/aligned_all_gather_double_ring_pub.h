@@ -55,7 +55,7 @@ private:
     HcclResult MainWaitSub();
 
     LINK leftLink_;
-    LINK rightLink_;
+    LINK rightLink_;                     
 
     HcomCollOpInfo                     *opInfo_{nullptr};
     u32                                 userRank_;

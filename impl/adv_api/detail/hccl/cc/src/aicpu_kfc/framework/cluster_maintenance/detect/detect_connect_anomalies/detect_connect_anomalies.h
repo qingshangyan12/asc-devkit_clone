@@ -52,8 +52,8 @@ struct ErrInfo {
 // 统一处理 IP 插入逻辑
 template <typename ListType>
 HcclResult AddWlistEntry(
-    const HcclIpAddress& ipAddr,
-    const std::string& tag,
+    const HcclIpAddress& ipAddr, 
+    const std::string& tag, 
     ListType& whiteList,
     std::vector<SocketWlistInfo>& wlistVec)
 {
@@ -89,7 +89,7 @@ private:
     HcclResult CreateServers(struct ErrInfo errInfo);
     std::string GetTag(HcclIpAddress &Ip, int i = 0);
     HcclResult AddWhiteList(std::shared_ptr<HcclSocket> socket, NicType nicType, std::string& tag);
-    HcclResult DelWhiteList(HcclIpAddress &localIpAddr,
+    HcclResult DelWhiteList(HcclIpAddress &localIpAddr, 
         std::vector<struct SocketWlistInfo> whiteListInfos, std::shared_ptr<HcclSocket> socket);
     HcclResult GetStatus(struct ErrInfo errInfo, std::shared_ptr<HcclSocket> &clientSocket);
     HcclResult Connect(struct ErrInfo errInfo, std::shared_ptr<HcclSocket> &clientSocket);

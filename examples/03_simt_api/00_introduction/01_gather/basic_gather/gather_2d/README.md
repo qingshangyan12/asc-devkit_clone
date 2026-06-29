@@ -23,14 +23,14 @@
 
 ## 算子描述
 
-- 算子功能：
+- 算子功能：  
   gather_2d算子实现了从shape为[100000,128]的二维向量中获取指定索引的12288行数据的功能。算子输出output第i行数据计算公式为：
-
+  
   ```text
   output[i] = input[index[i]]
   ```
 
-- 算子规格：
+- 算子规格：  
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">gather_2d</td></tr>
   <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
@@ -40,23 +40,23 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">gather_2d_custom</td></tr>
   </table>
 
-- 数据切分：
+- 数据切分：  
   * 核数：48核
   * 每核线程数：256线程
   * 单线程处理：1行（128列）
   * 总处理能力：48×256=12288行（覆盖索引长度）
 
-- 算子实现：
+- 算子实现：  
   gather_2d算子的实现流程为从输入input（Global Memory）中获取指定索引的数据。基于上述数据切分，首先计算线程应处理数据的索引，然后通过赋值操作将一行数据存储到Global Memory上。
 
-- 调用实现：
+- 调用实现：  
   使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行算子。
 
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

@@ -68,7 +68,7 @@ HcclResult PostSyncInterThreads(const ThreadHandle &mainThread, const std::vecto
 
 HcclResult AicpuReduce(const ThreadHandle &thread, const DataSlice &srcSlice, const DataSlice &dstSlice,
                        const HcclDataType dataType, const HcclReduceOp reduceOp);
-
+ 
 template <typename T>
 HcclResult AicpuReduceTemplate(T* dst, u64 dstSize, T* src, u64 srcSize, const HcclReduceOp reduceOp);
 }

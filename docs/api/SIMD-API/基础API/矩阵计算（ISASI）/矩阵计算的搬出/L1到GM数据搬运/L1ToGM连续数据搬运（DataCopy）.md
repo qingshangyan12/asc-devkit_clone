@@ -61,7 +61,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 以half数据类型为例，源操作数的shape为1 \* 128。当count = 128时，[图1](#zh-cn_topic_0000002540198372_fig826614454819)将源操作数中128个元素连续搬运至目的操作数。
 
-**图1** 连续搬运示意图<a id="zh-cn_topic_0000002540198372_fig826614454819"></a>
+**图1** 连续搬运示意图<a id="zh-cn_topic_0000002540198372_fig826614454819"></a>  
 
 ![](../../../../../figures/L12GM_Continuous_Transporting.png)
 

@@ -124,13 +124,13 @@ uint8_t dilationH = 2, dilationW = 2;
 
 uint8_t padList[PAD_SIZE] = {0, 0, 0, 0};
 AscendC::SetFmatrix(H, W, padList, FmatrixMode::FMATRIX_LEFT);
-/*
+/*  
 SetFMatrixBitModeParams param;
 param.SetL1H(H);
 param.SetL1W(W);
 param.SetPadList(padList);
 AscendC::SetFmatrix(param, FmatrixMode::FMATRIX_LEFT);
-*/
+*/ 
 AscendC::SetLoadDataPaddingValue(0);
 AscendC::SetLoadDataRepeat({0, 1, 0});
 AscendC::SetLoadDataBoundary((uint32_t)0);

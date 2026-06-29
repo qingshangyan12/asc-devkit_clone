@@ -112,7 +112,7 @@ enum class InconsistentType{
     ROOT_INCONSISTENT = 4,
     COUNT_INCONSISTENT = 5
 };
-
+ 
 const std::map<InconsistentType, std::string> OP_INCONSISTENT_STR_MAP{
     {InconsistentType::NO_INCONSISTENT, "no exist op inconsistent"},
     {InconsistentType::OPTYPE_INCONSISTENT, "op type inconsistent"},
@@ -121,7 +121,7 @@ const std::map<InconsistentType, std::string> OP_INCONSISTENT_STR_MAP{
     {InconsistentType::ROOT_INCONSISTENT, "op root inconsistent"},
     {InconsistentType::COUNT_INCONSISTENT, "op count inconsistent"}
 };
-
+ 
 inline std::string GetInconsistentTypeStr(InconsistentType status)
 {
     auto iter = OP_INCONSISTENT_STR_MAP.find(status);
@@ -157,7 +157,7 @@ struct OpInfoTagQueue {
     char identifier[ROOTINFO_INDENTIFIER_MAX_LENGTH] = {};
     u32 opInfoNum = 0;
 };
-
+ 
 struct OpInfoTagQueueFrame {
     OpInfoTagQueue opInfoTagQueue[OPINFO_TAG_QUEUE_NUM];
 };
@@ -181,7 +181,7 @@ struct HeartBeatFrame {
     {}
 };
 
-struct HeartBeatFrameWithOpCheck {
+struct HeartBeatFrameWithOpCheck { 
     UIDType src;
     UIDType dst;
     UIDType crimer;
@@ -274,7 +274,7 @@ public:
     void GetIpQueue();
     bool IsPaused() const;
     bool IsResumed() const;
-
+ 
 private:
     Heartbeat() = default;
     ~Heartbeat();

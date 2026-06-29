@@ -109,7 +109,7 @@ for (uint32_t i = 0; i < curLen; i++) {
 
 **Performance Optimization Recommendation**:
 > **Avoid scalar loops, use vector instructions**
->
+> 
 > In Ascend C programming, avoid using `for` loops with `GetValue/SetValue` scalar operations. Using vector instructions such as `AscendC::Add` can bring orders of magnitude performance improvement.
 
 ---
@@ -151,7 +151,7 @@ AscendC::Add(zLocal, xLocal, yLocal, curLen);
 
 **Performance Optimization Recommendation**:
 > **Use vector instructions to replace scalar loops**
->
+> 
 > Using vector APIs such as `AscendC::Add`, `AscendC::Mul` to replace element-by-element scalar loops can fully utilize AI Core vector computation units, achieving over 100x performance improvement.
 
 > **Single-core usage is not recommended**
@@ -211,7 +211,7 @@ if (blockIdxM < remainderM) {
 
 **Performance Optimization Recommendation**:
 > **Fully utilize multi-core parallelism with even splitting strategy**
->
+> 
 > 1. Evenly distribute data across multiple AIV Cores for parallel computation
 > 2. Use even splitting strategy (remainder distributed to first few cores) to ensure load balance
 > 3. Splitting granularity needs to consider: core count, data volume, UB space size
@@ -252,14 +252,14 @@ To fully utilize bandwidth resources, increase the data volume of transfer instr
 
 **Performance Optimization Recommendation**:
 > **Increase single data transfer volume, reduce transfer count**
->
+> 
 > 1. Within UB space limits, maximize `dataCopyLen`
 > 2. Use continuous large block data transfer, avoiding frequent small data block transfers
 > 3. Need to balance UB space usage and transfer efficiency
 
 
 > **Notice: dataCopyLen is not the bigger the better**
->
+> 
 > Building on Case 3, if dataCopyLen is further increased (for example, from 16384 to 16512), end-to-end performance is basically flat (268.5μs vs 267.76μs). It is recommended to consider data total volume, UB space, and alignment requirements comprehensively to determine the optimal dataCopyLen value.
 
 ---
@@ -335,12 +335,12 @@ UB Memory Allocation (Double Buffer):
 **Principle Description**:
 - **Ping-Pong Mechanism**:
   - While Ping buffer is computing, Pong buffer performs data transfer
-  - Alternating execution achieves pipeline parallelism of computation and transfer, as shown below
+  - Alternating execution achieves pipeline parallelism of computation and transfer, as shown below  
     <img src="figures/DoubleBuffer.png" width="50%">
 
 **Performance Optimization Recommendation**:
 > **Use double buffer to achieve transfer and computation parallelism**
->
+> 
 > 1. Double buffer benefits are greatest when computation and transfer times are similar
 > 2. Requires sufficient UB space (approximately 2x single buffer space)
 > 3. Use independent Event IDs to manage synchronization for the two buffer groups
@@ -393,7 +393,7 @@ Building on double buffer, for data that only needs to be loaded once, L2 Cache 
 
 **Performance Optimization Recommendation**:
 > **Reasonably adopt L2 Cache bypass**
->
+> 
 > 1. For input data read only once (such as x, y in this example), set `SetL2CacheHint(CACHE_MODE_DISABLE)`
 > 2. For data requiring repeated access (such as convolution weights), retain L2 Cache
 > 3. Users are recommended to configure optimization based on measured data. In actual model and training scenarios, reasonable configuration considering upstream and downstream is needed
@@ -473,9 +473,9 @@ Since vec instructions read 256B of data per beat (that is, simultaneously readi
 
 **Performance Optimization Recommendation**:
 > **Optimize UB memory layout to avoid Bank Conflict**
->
+> 
 > 1. When `aiv_vec_time` is abnormally high, Bank Conflict may exist
-> 2. By adjusting dataCopyLen or memory layout offset, distribute data across different Bank Groups
+> 2. By adjusting dataCopyLen or memory layout offset, distribute data across different Bank Groups 
 > 3. Bank Conflict optimization provides obvious benefits for vector-bound scenarios
 
 **Final Performance Summary**:
@@ -585,18 +585,18 @@ $$
   - `5`: Double buffer + L2Cache bypass
   - `6`: Double buffer + L2Cache bypass + Bank Conflict avoidance
 
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
-
+    
 - Run the example
 
   Run the following commands in this example directory.
-  ```bash
+  ```bash 
   mkdir -p build && cd build;   # Create and enter the build directory
   cmake -DSCENARIO_NUM=6 -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;  # Build the project, default npu mode
   python3 ../scripts/gen_data.py   # Generate test input data
@@ -613,7 +613,7 @@ $$
   ```
 
   > **Notice:** Clear the cmake cache before switching build modes. Run `rm CMakeCache.txt` in the build directory and then re-run cmake.
-
+  
 
 - Build option description
 
@@ -622,7 +622,7 @@ $$
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debug, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `0` (default), `1`, `2`, `3`, `4`, `5`, `6` | Performance optimization case number |
-
+  
   The following execution result indicates that the accuracy comparison succeeded.
   ```bash
   error ratio: 0.0000, tolerance:0.0001

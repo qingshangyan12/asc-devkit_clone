@@ -136,14 +136,14 @@ void RtsqA5::CopyLocBufToSq()
     if (sqTail_ >= sqHead_) {
         u32 depthLeft = sqDepth_ - sqTail_;
         if (pendingSqeCnt <= depthLeft) { // 没有回绕
-            HCCL_INFO("RtsqA5::%s copy sqe from sqe buffer, sqId_: %u, streamId_: %u, cur head: %u, cur tail: %u, size: %u, depth remain: %u",
+            HCCL_INFO("RtsqA5::%s copy sqe from sqe buffer, sqId_: %u, streamId_: %u, cur head: %u, cur tail: %u, size: %u, depth remain: %u", 
                 __func__, sqId_, streamId_, sqHead_, sqTail_, pendingSqeCnt, depthLeft);
             int ret = memcpy_sp(sqCurrAddr, pendingSqeCnt * AC_SQE_SIZE, locBuf, pendingSqeCnt * rtsqSqeSize);
             if (UNLIKELY(ret != 0)) {
                 THROW<InternalException>(StringFormat("RtsqA5::%s sqe memcpy_sp failed, ret = %d", __func__, ret));
             }
         } else {
-            HCCL_INFO("RtsqA5::%s copy sqe twice, sqId_: %u, streamId_: %u, cur head: %u, cur tail: %u, cnt: %u, depth remain: %u",
+            HCCL_INFO("RtsqA5::%s copy sqe twice, sqId_: %u, streamId_: %u, cur head: %u, cur tail: %u, cnt: %u, depth remain: %u", 
                 __func__, sqId_, streamId_, sqHead_, sqTail_, pendingSqeCnt, depthLeft);
             // 先拷贝rtsq里剩余空间大小
             int ret = memcpy_sp(sqCurrAddr, depthLeft * AC_SQE_SIZE, locBuf, depthLeft * rtsqSqeSize);
@@ -160,7 +160,7 @@ void RtsqA5::CopyLocBufToSq()
             }
         }
     } else {
-        HCCL_INFO("RtsqA5::%s copy sqe from sqe buffer, tail < head, sqId_: %u, streamId_: %u, cur head: %u, cur tail: %u, size: %u",
+        HCCL_INFO("RtsqA5::%s copy sqe from sqe buffer, tail < head, sqId_: %u, streamId_: %u, cur head: %u, cur tail: %u, size: %u", 
                 __func__, sqId_, streamId_, sqHead_, sqTail_, pendingSqeCnt);
         int ret = memcpy_sp(sqCurrAddr, pendingSqeCnt * AC_SQE_SIZE, locBuf, pendingSqeCnt * rtsqSqeSize);
         if (UNLIKELY(ret != 0)) {
@@ -250,7 +250,7 @@ void RtsqA5::RefreshInfo()
     }
     pendingSqeCnt++;
     HCCL_INFO("RtsqA5::%s: Updated: taskId_[%u], pendingSqeCnt[%u]", __func__, taskId_, pendingSqeCnt);
-
+    
 #ifdef CCL_KERNEL_AICPU
     if (launchFlag_ && !IsBatchLaunchMode()) {
         LaunchTask();
@@ -397,13 +397,13 @@ bool RtsqA5::IsRtsqQueueSpaceSufficient()
     return (availableSpace > pendingSqeCnt + 1);
 }
 
-HcclResult RtsqA5::SetPreStreamSyncReady()
+HcclResult RtsqA5::SetPreStreamSyncReady() 
 {
     isPreStreamSync = true;
     return HCCL_SUCCESS;
 }
 
-HcclResult RtsqA5::SetPreStreamSyncFin()
+HcclResult RtsqA5::SetPreStreamSyncFin() 
 {
     isPreStreamSync = false;
     return HCCL_SUCCESS;

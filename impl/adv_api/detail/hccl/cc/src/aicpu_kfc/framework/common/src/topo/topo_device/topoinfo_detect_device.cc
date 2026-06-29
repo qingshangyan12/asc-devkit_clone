@@ -181,7 +181,7 @@ HcclResult TopoInfoDetect::StartRootNetwork( const HcclIpAddress& hostIP, u32 &u
 
 HcclResult TopoInfoDetect::StartGroupLeaderNetwork(const vector<HcclIpAddress> &whitelist, const HcclIpAddress& hostIP,
     u32 &bindPort)
-{
+{    
     return HCCL_E_NOT_SUPPORT;
 }
 

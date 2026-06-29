@@ -149,10 +149,10 @@ __aicore__ inline void ProposalExtract(const LocalTensor<T>& dst, const LocalTen
     ```
 
     ```
-    示例结果
+    示例结果 
     输入数据(src_gm):
     因为moodel=4，第一个元素33.3的起始位置是4。每个Region Proposal占用连续8个half/float类型的元素。这里使用的类型是half。后续被抽取的每个元素间隔8个元素。repeat为2，每次迭代完成16个元素，共计32个元素
-    [ 0.      0.      0.      0.
+    [ 0.      0.      0.      0. 
       33.3    0.      0.      0.      0.      0.      0.      0.
       67.56   0.      0.      0.      0.      0.      0.      0.
       68.5    0.      0.      0.      0.      0.      0.      0.
@@ -184,7 +184,7 @@ __aicore__ inline void ProposalExtract(const LocalTensor<T>& dst, const LocalTen
      -40.88   0.      0.      0.      0.      0.      0.      0.
      60.9     0.      0.      0.      0.      0.      0.      0.
      -73.3    0.      0.      0.      0.      0.      0.      0.
-     38.47    0.      0.      0.
+     38.47    0.      0.      0. 
      ]
     输出数据(dst_gm):
     [ 33.3    67.56   68.5   -11.914  25.19  -72.8    11.79  -49.47   49.44

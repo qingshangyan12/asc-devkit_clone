@@ -63,7 +63,7 @@ public:
     uint64_t                                mySubCommRankId_;
     uint64_t                                axisId_;            // 记录自己在哪个轴
     std::vector<NHRStepInfo>                stepInfoVector_;    // nhr每一步的信息（发送/接受给谁，发/收哪片数据）
-    std::map<u32, u32>                      rank2ChannelIdx_;
+    std::map<u32, u32>                      rank2ChannelIdx_; 
     OpParam                                 opParam_;
     std::vector<std::vector<uint32_t>>      subCommRanks_;
     uint32_t                                axisSize_;          // 同时支持单die和双die

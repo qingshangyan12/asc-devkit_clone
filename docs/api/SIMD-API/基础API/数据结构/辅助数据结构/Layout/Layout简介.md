@@ -128,13 +128,13 @@ struct Layout : private Std::tuple<ShapeType, StrideType> {
 
     __aicore__ inline constexpr decltype(auto) layout() {}
     __aicore__ inline constexpr decltype(auto) layout() const {}
-
-    __aicore__ inline constexpr decltype(auto) GetShape() {}
+    
+    __aicore__ inline constexpr decltype(auto) GetShape() {}   
     __aicore__ inline constexpr decltype(auto) GetShape() const {}
-
-    __aicore__ inline constexpr decltype(auto) GetStride() {}
+    
+    __aicore__ inline constexpr decltype(auto) GetStride() {}    
     __aicore__ inline constexpr decltype(auto) GetStride() const {}
-
+    
     template <typename CoordType>
     __aicore__ inline constexpr auto operator()(const CoordType& coord) const {}
 }

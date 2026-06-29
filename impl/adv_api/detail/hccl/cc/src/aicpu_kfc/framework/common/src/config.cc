@@ -390,7 +390,7 @@ HcclResult CheckRankIpFamily(const std::vector<RankInfo_t> &rankList)
                     LOG_KEYWORDS_INIT_GROUP.c_str(),
                     LOG_KEYWORDS_RANKTABLE_CHECK.c_str(),
                     errormessage.c_str());
-                return HCCL_E_PARA;
+                return HCCL_E_PARA;        
             }
 
             if (hostFamily != 0 && hostFamily != rankList[index].hostIp.GetFamily()) {
@@ -430,7 +430,7 @@ HcclResult CheckRankIpFamily(const std::vector<RankInfo_t> &rankList)
                     LOG_KEYWORDS_INIT_GROUP.c_str(),
                     LOG_KEYWORDS_RANKTABLE_CHECK.c_str(),
                     errormessage.c_str());
-                return HCCL_E_PARA;
+                return HCCL_E_PARA;        
             }
             if (deviceFamily != 0 && deviceFamily != iter.GetFamily()) {
                 RPT_ENV_ERR(true, "EI0001", std::vector<std::string>({"value", "env", "expect"}),

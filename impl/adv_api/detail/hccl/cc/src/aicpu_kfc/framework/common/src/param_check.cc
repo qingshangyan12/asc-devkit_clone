@@ -167,7 +167,7 @@ HcclResult HcomCheckAlltoAllVExternalMem(const void *sendBuf, const void *sendCo
     CHK_PRT_RET(sendBuf != nullptr && recvBuf != nullptr && sendBuf == recvBuf,
         HCCL_ERROR("[HcomCheckAlltoAllVExternalMem] sendBuf and recvBuf cannot be same."),
         HCCL_E_PARA);
-
+    
     u64 *sendCountsPtr = const_cast<u64 *>(static_cast<const u64 *>(sendCounts));
     u64 *recvCountsPtr = const_cast<u64 *>(static_cast<const u64 *>(recvCounts));
     bool hasSend = false;
@@ -227,7 +227,7 @@ HcclResult HcomCheckAlltoAllVCExternalMem(const void *sendBuf, const void *sendC
     CHK_PRT_RET(sendBuf != nullptr && recvBuf != nullptr && sendBuf == recvBuf,
         HCCL_ERROR("[HcomCheckAlltoAllVCExternalMem] sendBuf and recvBuf cannot be same."),
         HCCL_E_PARA);
-
+    
     u64 *sendCountMatrixPtr = const_cast<u64 *>(static_cast<const u64 *>(sendCountMatrix));
     bool hasSend = false;
     bool hasRecv = false;

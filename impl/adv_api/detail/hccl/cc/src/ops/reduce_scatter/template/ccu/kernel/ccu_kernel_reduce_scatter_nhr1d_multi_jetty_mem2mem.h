@@ -87,7 +87,7 @@ public:
     uint64_t outputAddr_; // 输出地址
     uint64_t token_;
     uint64_t sliceSize_;
-    uint64_t inputSliceStride_;
+    uint64_t inputSliceStride_; 
     uint64_t outputSliceStride_;
     uint64_t sliceOneJettySize_;
     uint64_t sliceLastJettySize_;
@@ -126,8 +126,8 @@ private:
     std::map<u32, u32> rank2ChannelIdx_;
     hcomm::CcuRep::Variable repeatNum_;
     std::vector<ChannelHandle> channels_;
-
-    // load
+    
+    // load 
     std::vector<hcomm::CcuRep::Variable> input_;
     hcomm::CcuRep::Variable output_;
     std::vector<hcomm::CcuRep::Variable> token_;

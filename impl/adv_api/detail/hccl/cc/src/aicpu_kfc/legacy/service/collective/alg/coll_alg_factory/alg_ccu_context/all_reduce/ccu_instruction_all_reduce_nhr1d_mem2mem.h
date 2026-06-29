@@ -37,7 +37,7 @@ using NHRStepInfo = struct NHRStepInfoDef {
 // 为AllReduceNHR1D实现的CCUIns、CCUCtxArg与CCUTaskArg
 class CcuCtxArgAllReduceNHR1D : public CcuCtxArg {
 public:
-    explicit CcuCtxArgAllReduceNHR1D(const std::vector<uint64_t> &dimSize, uint32_t rankId, uint32_t axisId,
+    explicit CcuCtxArgAllReduceNHR1D(const std::vector<uint64_t> &dimSize, uint32_t rankId, uint32_t axisId, 
                                      uint32_t axisSize, const std::vector<NHRStepInfo> stepInfoVector,
                                      const std::map<u32, u32> indexMap, const CollAlgOperator &op,
                                      const std::vector<std::vector<RankId>> &tempVTopo)
@@ -141,9 +141,9 @@ public:
                                                          indexMap_, op_, tempVTopo_);
     }
 
-    void SetInstType(CcuInstType instType)
-    {
-        instType_ = instType;
+    void SetInstType(CcuInstType instType) 
+    { 
+        instType_ = instType; 
     }
 
     std::unique_ptr<CcuTaskArg> GetTaskArg() const override

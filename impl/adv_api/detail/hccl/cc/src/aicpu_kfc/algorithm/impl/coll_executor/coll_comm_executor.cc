@@ -185,7 +185,7 @@ HcclResult CollCommExecutor::MultiRingAllGather(const std::string &tag, DeviceMe
     SubCommInfo level0ZeroCommInfo = GetSubCommInfo(leveIndex, COMM_INDEX_0);
     auto nicList = topoAttr_.nicList;
     TopoType topoType = topoType_;
-
+ 
     if (leveIndex == COMM_LEVEL0_LOGICAL) {
         std::vector<u32> mockNicList;
         mockNicList.reserve(level0ZeroCommInfo.localRankSize);
@@ -195,7 +195,7 @@ HcclResult CollCommExecutor::MultiRingAllGather(const std::string &tag, DeviceMe
         nicList = mockNicList;
         u32 ARSRankSize = topoMatcher_->GetCommPlaneRanks(COMM_LEVEL0_LOGICAL)[0].size();
         bool ARSDoubleRing = ((ARSRankSize > FACTOR_TWO) && (ARSRankSize % FACTOR_TWO == 0) && topoAttr_.isARSDoubleRing);
-
+ 
         if (ARSDoubleRing) {
             topoType = TopoType::TOPO_TYPE_NP_DOUBLE_RING;
         } else {
@@ -446,7 +446,7 @@ HcclResult CollCommExecutor::MultiRingAllGatherConcurrent(const std::string &tag
                         TemplateType::TEMPLATE_ALL_GATHER_RING_CONCURRENT_DIRECT, dispatcher_);
                     HCCL_CONFIG_INFO(HCCL_ALG, "[%s] Run TEMPLATE_ALL_GATHER_RING_CONCURRENT_DIRECT in COMM_LEVEL0", __func__);
                     CHK_SMART_PTR_NULL(tempAlg);
-                    CHK_RET(tempAlg->Prepare(const_cast<HcomCollOpInfo *>(opInfo), topoAttr_.userRank,
+                    CHK_RET(tempAlg->Prepare(const_cast<HcomCollOpInfo *>(opInfo), topoAttr_.userRank, 
                         subStreamsInOneRing, mainSignalsInOneRing, subSignalsInOneRing, rankOrder,
                         userMemOutputSlices, isSdma));
                 } else {
@@ -634,7 +634,7 @@ HcclResult CollCommExecutor::Level1AllGatherConcurrent(DeviceMem inputMem, Devic
 u32 CollCommExecutor::CalcOptimalIntraRingsize(u64 count, HcclDataType dataType, HcclCMDType opType)
 {
     if (!topoMatcher_->GetARSFlag()) return 0;
-
+ 
     u32 level0RankSize   = topoMatcher_->GetCommPlaneRanks(COMM_LEVEL0)[0].size();
     u32 rankSizeInSuperPod = topoMatcher_->GetCommPlaneRanks(COMM_ARS)[0].size();
     u32 perDataSize = 0;
@@ -748,7 +748,7 @@ HcclResult CollCommExecutor::MultiRingReduceScatter(const std::string &tag, Devi
     const u64 count, const HcclDataType dataType, const HcclReduceOp reductionOp,
     const std::vector<std::vector<Slice> > multRingsSliceZero, Stream stream, s32 profStage,
     const u64 baseOffset, const HcomCollOpInfo *opInfo,
-    const std::vector<std::vector<Slice>> multRingsUserMemSlice, const CommPlane levelIndex)
+    const std::vector<std::vector<Slice>> multRingsUserMemSlice, const CommPlane levelIndex)    
 {
     HCCL_INFO("[MultiRingReduceScatter] MultiRingReduceScatter starts");
     HcclResult ret = HCCL_SUCCESS;
@@ -762,7 +762,7 @@ HcclResult CollCommExecutor::MultiRingReduceScatter(const std::string &tag, Devi
     auto nicList = topoAttr_.nicList;
 
     TopoType topoType = topoType_;
-
+ 
     if (levelIndex == COMM_LEVEL0_LOGICAL) {
         std::vector<u32> mockNicList;
         mockNicList.reserve(level0ZeroCommInfo.localRankSize);
@@ -770,7 +770,7 @@ HcclResult CollCommExecutor::MultiRingReduceScatter(const std::string &tag, Devi
             mockNicList.push_back(rankIndex);
         }
         nicList = mockNicList;
-        u32 ARSRankSize = topoMatcher_->GetCommPlaneRanks(COMM_LEVEL0_LOGICAL)[0].size();
+        u32 ARSRankSize = topoMatcher_->GetCommPlaneRanks(COMM_LEVEL0_LOGICAL)[0].size();        
         bool ARSDoubleRing = ((ARSRankSize > FACTOR_TWO) && (ARSRankSize % FACTOR_TWO == 0) && topoAttr_.isARSDoubleRing);
         if (ARSDoubleRing) {
             topoType = TopoType::TOPO_TYPE_NP_DOUBLE_RING;
@@ -2413,13 +2413,13 @@ HcclResult CollCommExecutor::GetAdjInfo(AlgResourceResponse& algRes, AdjInfo& ad
 
     adjInfo.dstRankNum = nslbAdjInfo.dstRankNum;
     HCCL_INFO("[nslbdp-GetAdjInfo] adjInfo.dstRankNum[%u].", adjInfo.dstRankNum);
-
+    
     for (size_t i = 0; i < nslbAdjInfo.nsAdjInfo.size(); i++) {
         NslbDpAdjInfo dpAdjInfo = {0};
         dpAdjInfo.dstLocalRankId = nslbAdjInfo.nsAdjInfo[i].dstLocalRankId;
         dpAdjInfo.phaseId = nslbAdjInfo.nsAdjInfo[i].phaseId;
         dpAdjInfo.rev = 0;
-        adjInfo.nsAdjInfo.push_back(dpAdjInfo);
+        adjInfo.nsAdjInfo.push_back(dpAdjInfo); 
         HCCL_INFO("[nslbdp]GetAdjInfo dstLocalRankId[%u], phaseId[%u].",
                    nslbAdjInfo.nsAdjInfo[i].dstLocalRankId, nslbAdjInfo.nsAdjInfo[i].phaseId);
     }

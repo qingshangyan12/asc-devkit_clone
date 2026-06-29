@@ -186,10 +186,10 @@ HcclResult TransportManager::createSubCommLinkThreads(const std::string &tag, co
             inputMem, outputMem, expMem);
         HCCL_DEBUG("transportRequest.inputMemType[%d] transportRequest.outputMemType[%d], isBackup[%d]",
             transportRequest.inputMemType, transportRequest.outputMemType, isBackup);
-
+                
         if (opType == HcclCMDType::HCCL_CMD_BATCH_SEND_RECV && isGroupMode_) { // Group 批量send/recv，切分cclbuffer
             CHK_RET(AllocSliceMem(inputMem, outputMem, transportRequest.remoteUserRank));
-            HCCL_INFO("[AllocSliceMem] inputMem ptr[%p], size[%llu], outputMem ptr[%p], size[%llu], remote[%u]",
+            HCCL_INFO("[AllocSliceMem] inputMem ptr[%p], size[%llu], outputMem ptr[%p], size[%llu], remote[%u]", 
                 inputMem.ptr(), inputMem.size(), outputMem.ptr(), outputMem.size(), transportRequest.remoteUserRank);
         }
 
@@ -216,11 +216,11 @@ HcclResult TransportManager::createSubCommLinkThreads(const std::string &tag, co
         std::string threadStr = (isInterRdma ? "HcclTerL_" : "HcclIntra_") + std::to_string(i);
         subCommLinkPara.linkThreads[i].reset(
             new (std::nothrow) std::thread(&TransportManager::CreateLink,
-                this, tag, hrtErrMGetErrorContextPub(),
-                machineType, rankInfoList_[userRank_].serverId, transportRequest.remoteUserRank,
-                singleSubCommTransport.supportDataReceivedAck, singleSubCommTransport.linkMode,
+                this, tag, hrtErrMGetErrorContextPub(), 
+                machineType, rankInfoList_[userRank_].serverId, transportRequest.remoteUserRank, 
+                singleSubCommTransport.supportDataReceivedAck, singleSubCommTransport.linkMode, 
                 singleSubCommTransport.enableUseOneDoorbell, threadStr,
-                connectSockets, inputMem, outputMem, transportRequest.isUsedRdma,
+                connectSockets, inputMem, outputMem, transportRequest.isUsedRdma, 
                 std::ref(link), isAicpuModeEn, std::ref(subCommLinkPara.linkResult[i]), netDevCtx,
                 transportRequest.notifyNum, chooseBackup, isCapture, expMem, transportRequest.linkType,
                 isIndOp, indOpMem, opType, false));
@@ -277,7 +277,7 @@ HcclResult TransportManager::checkSubCommLinkThreadsStatus(const std::string &ta
             SaluSleep(EXCEPTION_DELAY_US_COUNT);
             (void)notifyPool_->UnregisterOp(tag);
             return HCCL_E_NOT_FOUND;
-        }
+        }   
     }
 
     return HCCL_SUCCESS;
@@ -304,7 +304,7 @@ HcclResult TransportManager::AllocSubCommLinks(const std::string &tag, const Tra
                     rankInfoList_[TemptransportRequest.localUserRank].devicePhyId,
                     rankInfoList_[TemptransportRequest.remoteUserRank].devicePhyId);
                 HcclResult ret = P2PMgmtPub::EnableP2P(enableP2PDevices);
-                CHK_PRT_RET(ret != HCCL_SUCCESS,
+                CHK_PRT_RET(ret != HCCL_SUCCESS, 
                     HCCL_ERROR("[Create][DestSockets]Enable P2P Failed, src devicePhyId[%d], dst devicePhyId[%d], ret[%u]",
                     rankInfoList_[TemptransportRequest.localUserRank].devicePhyId,
                     rankInfoList_[TemptransportRequest.remoteUserRank].devicePhyId, ret), ret);
@@ -348,7 +348,7 @@ HcclResult TransportManager::AllocSubCommLinks(const std::string &tag, const Tra
 
     for (u32 i = 0; i < (rankNum / (FACTOR_NUM_TWO * offset)) + 1; i++) {
         if ((i == rankNum / (FACTOR_NUM_TWO * offset)) && (rankNum % (FACTOR_NUM_TWO * offset)) != 0) {
-            nextSubCommLinkPara.remoteRankIdNum = (rankNum % (FACTOR_NUM_TWO * offset)) / FACTOR_NUM_TWO +
+            nextSubCommLinkPara.remoteRankIdNum = (rankNum % (FACTOR_NUM_TWO * offset)) / FACTOR_NUM_TWO + 
                 ((rankNum % (FACTOR_NUM_TWO * offset)) % FACTOR_NUM_TWO);
             prevSubCommLinkPara.remoteRankIdNum = (rankNum % (FACTOR_NUM_TWO * offset)) / FACTOR_NUM_TWO;
         }
@@ -452,11 +452,11 @@ HcclResult TransportManager::CreateBatchSendRecvLinks(const std::string &tag, co
             MachineType::MACHINE_SERVER_TYPE : MachineType::MACHINE_CLIENT_TYPE;
         std::string threadStr = (isInterRdma ? "HcclTerL_" : "HcclIntra_") + std::to_string(requestIdx);
         HCCL_INFO("[%s]threadStr[%s], poolName[%s]", __func__, threadStr.c_str(), linkPoolPara.poolName.c_str());
-        ret = CreateLink(tag, hrtErrMGetErrorContextPub(),
-                machineType, rankInfoList_[userRank_].serverId, transportRequest.remoteUserRank,
-                singleSubCommTransport.supportDataReceivedAck, singleSubCommTransport.linkMode,
+        ret = CreateLink(tag, hrtErrMGetErrorContextPub(), 
+                machineType, rankInfoList_[userRank_].serverId, transportRequest.remoteUserRank, 
+                singleSubCommTransport.supportDataReceivedAck, singleSubCommTransport.linkMode, 
                 singleSubCommTransport.enableUseOneDoorbell, threadStr,
-                connectSockets, inputMem, outputMem, transportRequest.isUsedRdma,
+                connectSockets, inputMem, outputMem, transportRequest.isUsedRdma, 
                 link, isAicpuModeEn, linkPoolPara.linkResults[currentIdx], netDevCtx,
                 transportRequest.notifyNum, chooseBackup, isCapture, expMem, transportRequest.linkType,
                 isIndOp, indOpMem, opType, false);
@@ -594,7 +594,7 @@ HcclResult TransportManager::AllocBatchSendRecvLinks(HcclSendRecvItem *sendRecvI
     struct LinkPoolPara receiverLinkPoolPara(singleSubCommTransport, "receiver", receiverList);
     for (u32 i = 0; i < senderLinkPoolPara.linkThreads.size(); ++i) {
         senderLinkPoolPara.linkThreads[i].reset(new (std::nothrow) std::thread(
-            &TransportManager::CreateBatchSendRecvLinks, this,
+            &TransportManager::CreateBatchSendRecvLinks, this, 
             tag, std::ref(transMem), std::ref(senderLinkPoolPara),
             isAicpuModeEn, isBackup, subCommIndex, isCapture, opType, isIndOp
         ));
@@ -608,7 +608,7 @@ HcclResult TransportManager::AllocBatchSendRecvLinks(HcclSendRecvItem *sendRecvI
     }
     for (u32 i = 0; i < receiverLinkPoolPara.linkThreads.size(); ++i) {
         receiverLinkPoolPara.linkThreads[i].reset(new (std::nothrow) std::thread(
-            &TransportManager::CreateBatchSendRecvLinks, this,
+            &TransportManager::CreateBatchSendRecvLinks, this, 
             tag, std::ref(transMem), std::ref(receiverLinkPoolPara),
             isAicpuModeEn, isBackup, subCommIndex, isCapture, opType, isIndOp
         ));
@@ -711,18 +711,18 @@ HcclResult TransportManager::Alloc(const std::string &tag, const TransportIOMem 
                     bool tempIsInterRdma = false;
                     UpdateIsInterRdma(transportRequest.remoteUserRank, tempIsInterRdma, transportRequest.isUsedRdma);
                     if ((rankInfoList_[transportRequest.localUserRank].deviceType == DevType::DEV_TYPE_310P3 || isStandardCard_) &&
-                            !tempIsInterRdma && !Is310PDevice()) {
-                        std::vector<u32> enableP2PDevices;
+                            !tempIsInterRdma && !Is310PDevice()) { 
+                        std::vector<u32> enableP2PDevices; 
                         enableP2PDevices.push_back(rankInfoList_[transportRequest.remoteUserRank].devicePhyId);
                         HCCL_INFO("[Alloc]localDevicePhyId[%u] enable p2p with remoteDevicePhyId[%u]",
                             rankInfoList_[transportRequest.localUserRank].devicePhyId,
                             rankInfoList_[transportRequest.remoteUserRank].devicePhyId);
                         HcclResult ret = P2PMgmtPub::EnableP2P(enableP2PDevices);
-                        CHK_PRT_RET(ret != HCCL_SUCCESS,
-                            HCCL_ERROR("[Alloc]Enable P2P Failed, src devicePhyId[%d], dst devicePhyId[%d], ret[%u]",
+                        CHK_PRT_RET(ret != HCCL_SUCCESS, 
+                            HCCL_ERROR("[Alloc]Enable P2P Failed, src devicePhyId[%d], dst devicePhyId[%d], ret[%u]", 
                             rankInfoList_[transportRequest.localUserRank].devicePhyId, rankInfoList_[transportRequest.remoteUserRank].devicePhyId,
-                            ret), ret);
-                        enableP2PDevices_.push_back(rankInfoList_[transportRequest.remoteUserRank].devicePhyId);
+                            ret), ret); 
+                        enableP2PDevices_.push_back(rankInfoList_[transportRequest.remoteUserRank].devicePhyId); 
                     }
                     DeviceMem inputMem;
                     DeviceMem outputMem;
@@ -731,10 +731,10 @@ HcclResult TransportManager::Alloc(const std::string &tag, const TransportIOMem 
                         transportRequest.inputMemType, transportRequest.outputMemType, isBackup);
                     GetIOMem(transMem, transportRequest.inputMemType, transportRequest.outputMemType,
                         inputMem, outputMem, expMem);
-
+                    
                     if (opType == HcclCMDType::HCCL_CMD_BATCH_SEND_RECV && isGroupMode_) {// Group 批量send/recv，切分cclbuffer
                         CHK_RET(AllocSliceMem(inputMem, outputMem, transportRequest.remoteUserRank));
-                        HCCL_INFO("[AllocSliceMem] inputMem ptr[%p], size[%llu], outputMem ptr[%p], size[%llu], remote[%u]",
+                        HCCL_INFO("[AllocSliceMem] inputMem ptr[%p], size[%llu], outputMem ptr[%p], size[%llu], remote[%u]", 
                             inputMem.ptr(), inputMem.size(), outputMem.ptr(), outputMem.size(), transportRequest.remoteUserRank);
                     }
 
@@ -761,7 +761,7 @@ HcclResult TransportManager::Alloc(const std::string &tag, const TransportIOMem 
 
                     if (transportRequest.isUsedRdma) {
                         HCCL_INFO("[%s]: create rdma link, remoteUserRank[%u], userRank[%u], "
-                            "isBackup[%d], chooseBackup[%d], isInterRdma[%d]", __func__, transportRequest.remoteUserRank,
+                            "isBackup[%d], chooseBackup[%d], isInterRdma[%d]", __func__, transportRequest.remoteUserRank, 
                             userRank_, isBackup, chooseBackup, isInterRdma);
                     }
                     bool chooseAivRoceDirect = transportRequest.isUsedRdma ? isNpuDirectRoce : false;
@@ -886,18 +886,18 @@ HcclResult TransportManager::IncreAlloc(const std::string &tag, const TransportI
                     bool tempIsInterRdma = false;
                     UpdateIsInterRdma(transportRequest.remoteUserRank, tempIsInterRdma, transportRequest.isUsedRdma);
                     if ((rankInfoList_[transportRequest.localUserRank].deviceType == DevType::DEV_TYPE_310P3 || isStandardCard_) &&
-                            !tempIsInterRdma && !Is310PDevice()) {
-                        std::vector<u32> enableP2PDevices;
+                            !tempIsInterRdma && !Is310PDevice()) { 
+                        std::vector<u32> enableP2PDevices; 
                         enableP2PDevices.push_back(rankInfoList_[transportRequest.remoteUserRank].devicePhyId);
                         HCCL_INFO("[IncreAlloc]localDevicePhyId[%u] enable p2p with remoteDevicePhyId[%u]",
                             rankInfoList_[transportRequest.localUserRank].devicePhyId,
                             rankInfoList_[transportRequest.remoteUserRank].devicePhyId);
                         HcclResult ret = P2PMgmtPub::EnableP2P(enableP2PDevices);
-                        CHK_PRT_RET(ret != HCCL_SUCCESS,
-                            HCCL_ERROR("[IncreAlloc]Enable P2P Failed, src devicePhyId[%d], dst devicePhyId[%d], ret[%u]",
+                        CHK_PRT_RET(ret != HCCL_SUCCESS, 
+                            HCCL_ERROR("[IncreAlloc]Enable P2P Failed, src devicePhyId[%d], dst devicePhyId[%d], ret[%u]", 
                             rankInfoList_[transportRequest.localUserRank].devicePhyId, rankInfoList_[transportRequest.remoteUserRank].devicePhyId,
-                            ret), ret);
-                        enableP2PDevices_.push_back(rankInfoList_[transportRequest.remoteUserRank].devicePhyId);
+                            ret), ret); 
+                        enableP2PDevices_.push_back(rankInfoList_[transportRequest.remoteUserRank].devicePhyId); 
                     }
                     respSingleSubComm.transportRequests[rankIndex] = transportRequest;
                     DeviceMem inputMem;
@@ -908,10 +908,10 @@ HcclResult TransportManager::IncreAlloc(const std::string &tag, const TransportI
 
                     if (opType == HcclCMDType::HCCL_CMD_BATCH_SEND_RECV && isGroupMode_) {// Group 批量send/recv，切分cclbuffer
                         CHK_RET(AllocSliceMem(inputMem, outputMem, transportRequest.remoteUserRank));
-                        HCCL_INFO("[AllocSliceMem] inputMem ptr[%p], size[%llu], outputMem ptr[%p], size[%llu], remote[%u]",
+                        HCCL_INFO("[AllocSliceMem] inputMem ptr[%p], size[%llu], outputMem ptr[%p], size[%llu], remote[%u]", 
                             inputMem.ptr(), inputMem.size(), outputMem.ptr(), outputMem.size(), transportRequest.remoteUserRank);
                     }
-
+                    
                     std::vector<std::shared_ptr<HcclSocket> > connectSockets;
                     bool isInterRdma;
                     bool chooseBackup = transportRequest.isUsedRdma ? isBackup : false;
@@ -1110,7 +1110,7 @@ HcclResult TransportManager::CreateDestSockets(const std::string &tag, RankId re
         if (isBackup && nicDeployment_ == NICDeployment::NIC_DEPLOYMENT_DEVICE) {
             netDevCtx = netDevCtxMap_[rankInfoList_[userRank_].backupNicIp[0]];
             HCCL_DEBUG("[%s]refresh netDevCtx info. local rank[%u], remote rank[%u], isBackup[%d], port[%u], ip[%s]",
-                __func__, userRank_, remoteRank, isBackup, remoteLinkInfo.port,
+                __func__, userRank_, remoteRank, isBackup, remoteLinkInfo.port, 
                 (rankInfoList_[userRank_].backupNicIp[0]).GetReadableIP());
         }
         ret = socketManager_->CreateSingleLinkSocket(newTag, netDevCtx, remoteLinkInfo, connectSockets, false, false);
@@ -1221,16 +1221,16 @@ HcclResult TransportManager::PrintErrorInfo(NicType nicType)
                              HcclRtDeviceInfoType::HCCL_INFO_TYPE_SUPER_POD_ID, phySuperPodId));
     std::string logicSuperPodId = GetExternalInputLogicSuperPodId();
     if (logicSuperPodId.empty()) {
-        HCCL_ERROR("[TransportManager][%s]local rank information: nicType[%s], logicSuperPodId is not set, phySuperPodId[%lld].",
+        HCCL_ERROR("[TransportManager][%s]local rank information: nicType[%s], logicSuperPodId is not set, phySuperPodId[%lld].", 
             __func__, nicTypeStr.c_str(), phySuperPodId);
     } else {
         HCCL_ERROR("[TransportManager][%s]local rank information: nicType[%s], logicSuperPodId[%s], phySuperPodId[%lld]. Note: Do not "
-            "configure ranks belonging to different physical superpod ID info a single logical superpod ID",
+            "configure ranks belonging to different physical superpod ID info a single logical superpod ID", 
             __func__, nicTypeStr.c_str(), logicSuperPodId.c_str(), phySuperPodId);
     }
     return HCCL_SUCCESS;
 }
-
+    
 HcclResult TransportManager::CreateLink(const std::string &tag, const ErrContextPub &error_context,
     const MachineType machineType, const std::string &serverId, const u32 remoteRank,
     const bool supportDataReceivedAck, const LinkMode linkMode,
@@ -1265,7 +1265,7 @@ HcclResult TransportManager::CreateLink(const std::string &tag, const ErrContext
         HCCL_DEBUG("inputMem[%p],outputMem[%p], inputMem size[%llu], outputMem size[%llu]", inputMem.ptr(), outputMem.ptr(),
             inputMem.size(), outputMem.size());
         if (isIndOp) {
-            HCCL_DEBUG("userHostMem num[%llu], userDeviceMem num[%llu]", indOpMem.userHostMem.size(),
+            HCCL_DEBUG("userHostMem num[%llu], userDeviceMem num[%llu]", indOpMem.userHostMem.size(), 
                 indOpMem.userDeviceMem.size());
         }
         HCCL_INFO("[createLink para]tag[%s], rank[%u]-localUserrank[%u]-localIpAddr[%s], linkMode[%d] "
@@ -1349,7 +1349,7 @@ HcclResult TransportManager::SetMachinePara(const std::string &tag, MachineType 
     const std::string &serverId, u32 dstRank,
     const bool supportDataReceivedAck, const LinkMode linkMode,
     const std::vector<std::shared_ptr<HcclSocket> > &socketList,
-    const DeviceMem &inputMem, const DeviceMem &outputMem, const DeviceMem &expMem, bool isAicpuModeEn,
+    const DeviceMem &inputMem, const DeviceMem &outputMem, const DeviceMem &expMem, bool isAicpuModeEn, 
     bool isBackup, bool isCapture, u32 notifyNum, u32 trafficClass, u32 serviceLevel, MachinePara &machinePara,
     RankInfo &loaclRank, RankInfo &remoteRank, const HcclNetDevCtx &netDevCtx, TransportLinkType linkType,
     const IndOpMem &indOpMem, bool isIndOp, const HcclCMDType &opType, bool isNpuDirectRoce)
@@ -1431,7 +1431,7 @@ HcclResult TransportManager::SetMachinePara(const std::string &tag, MachineType 
         machinePara.deviceLogicId = deviceLogicId_;
         HCCL_DEBUG("[%s]isBackup[%d], machinePara.deviceLogicId[%d].", __func__, isBackup, machinePara.deviceLogicId);
     }
-
+    
     machinePara.srcPorts = std::vector<std::uint16_t>(1, 0); /* 默认填充一个元素，0代表默认不配置 */
     machinePara.isAicpuModeEn = isAicpuModeEn;
     if (linkType == TransportLinkType::RESERVED) {
@@ -1451,7 +1451,7 @@ HcclResult TransportManager::SetMachinePara(const std::string &tag, MachineType 
 
     if (isNpuDirectRoce) {
         // AIV ROCE直驱场景，需要将QPMode更改为NORMAL模式，以避免底层走入stars调度的下发流程
-        machinePara.qpMode = QPMode::NORMAL;
+        machinePara.qpMode = QPMode::NORMAL; 
     }
 
     // reduce相关算子需要使能atomic write能力，用于实现rdma wqe(reduce+record)保序
@@ -1470,7 +1470,7 @@ HcclResult TransportManager::GetTransportType(const u32 dstRank, bool isUsedRdma
     // 判断是否在同一个server
     bool isInterServer = false;
     CHK_PRT(IsInterServer(dstRank, isInterServer));
-
+ 	 
     if (!isInterServer) {
         LinkTypeInServer linkType = LinkTypeInServer::RESERVED_LINK_TYPE;
         CHK_RET(hrtGetPairDeviceLinkType(rankInfoList_[userRank_].devicePhyId, rankInfoList_[dstRank].devicePhyId,

@@ -58,7 +58,7 @@ HcclResult AicpuIndopProcess::AcquireAicpuCommMgr(const std::string &group, Coll
         rwlock.writeUnlock();
         return HCCL_SUCCESS;
     }
-
+    
     // 未找到则创建新实例
     std::shared_ptr<CollCommAicpuMgr> aicpuCommMgr;
     try {

@@ -19,7 +19,7 @@ CollAllGatherMixExecutor::CollAllGatherMixExecutor(const HcclDispatcher dispatch
 
 HcclResult CollAllGatherMixExecutor::CalcStreamNum(u32& streamNum)
 {
-    u32 totalStreamNum = 0;
+    u32 totalStreamNum = 0; 
     if (topoAttr_.deviceType == DevType::DEV_TYPE_910B) { // mesh
         totalStreamNum = topoAttr_.deviceNumPerAggregation;
     } else if (topoAttr_.deviceType == DevType::DEV_TYPE_910_93) { // dbring
@@ -73,7 +73,7 @@ HcclResult CollAllGatherMixExecutor::CalcLevel0CommInfo(TransportMemType inputTy
 {
     if (topoAttr_.deviceType == DevType::DEV_TYPE_910B) {
         CommParaInfo commParaLevel0(COMM_LEVEL0, CommType::COMM_TAG_MESH);
-        commParaLevel0.meshSinglePlane =
+        commParaLevel0.meshSinglePlane = 
             topoMatcher_->GetExternalInputHcclDeterministic() == DETERMINISTIC_DISABLE &&
             (workflowMode_ != HcclWorkflowMode::HCCL_WORKFLOW_MODE_OP_BASE);
         CHK_RET(CalcCommPlaneInfo(tag_, commParaLevel0, opTransport[COMM_LEVEL0], inputType, outputType));

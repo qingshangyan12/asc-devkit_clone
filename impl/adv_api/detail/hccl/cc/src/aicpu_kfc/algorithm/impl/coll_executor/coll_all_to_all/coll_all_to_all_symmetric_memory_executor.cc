@@ -156,7 +156,7 @@ HcclResult CollRunAlltoAllFullMeshSymmetricMemory::GetAlltoAllTmpRankSendRecvInf
     sendRecvInfo_.remoteSendOffset.resize(topoAttr_.userRankSize, 0);
     sendRecvInfo_.localRecvLength.resize(topoAttr_.userRankSize, 0);
     sendRecvInfo_.localRecvOffset.resize(topoAttr_.userRankSize, 0);
-
+    
     if (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL) {
         CHK_RET(GetLocalSendRecvInfoforAlltoall(param));
     } else if (param.opType == HcclCMDType::HCCL_CMD_ALLTOALLVC) {

@@ -20,15 +20,15 @@ public:
     explicit AlignedReduceScatterDoubleRing(const HcclDispatcher dispatcher);
     ~AlignedReduceScatterDoubleRing() override;
 
-    HcclResult Prepare(DeviceMem &inputMem, DeviceMem &outputMem, DeviceMem &scratchMem,
-        const u64 count, const HcclDataType dataType, const Stream &stream,
+    HcclResult Prepare(DeviceMem &inputMem, DeviceMem &outputMem, DeviceMem &scratchMem, 
+        const u64 count, const HcclDataType dataType, const Stream &stream, 
         const std::vector<std::vector<Slice>> &multRingsSlices,
-        const HcclReduceOp reductionOp, const u32 root, const u64 baseOffset,
-        const bool disableDMAReduce, const u64 reduceAttrBitMap,
-        const HcomCollOpInfo *opInfo, const u32 userRank,
+        const HcclReduceOp reductionOp, const u32 root, const u64 baseOffset, 
+        const bool disableDMAReduce, const u64 reduceAttrBitMap, 
+        const HcomCollOpInfo *opInfo, const u32 userRank, 
         std::vector<Stream> &subStreams,
         const std::vector<std::shared_ptr<LocalNotify>> &mainSignals,
-        const std::vector<std::shared_ptr<LocalNotify>> &subSignals,
+        const std::vector<std::shared_ptr<LocalNotify>> &subSignals, 
         const std::vector<std::vector<u32>> &ringsOrders,
         const std::vector<std::vector<Slice>> &userMemInputSlicesOfDoubleRing) override;
 

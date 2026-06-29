@@ -149,7 +149,7 @@ struct Init {
         AscendC::SetHF32Mode(self->ctx.tiling_->hf32Flag);
         CheckTiling<Intf>(self);
         InitParams<Intf>(self);
-        InitTque<Intf>(self);
+        InitTque<Intf>(self);    
     }
 };
 

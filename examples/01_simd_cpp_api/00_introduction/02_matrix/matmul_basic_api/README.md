@@ -27,14 +27,14 @@
 
 ## 样例描述
 
-- 样例功能：
+- 样例功能：  
   本样例使用Ascend C基础API实现一个最基础的矩阵乘法（Matmul）[核函数](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/核函数.md)。矩阵乘法的计算公式如下：
   $$
   C = A * B
   $$
   其中，A矩阵的形状为`[M, K]`，B矩阵的形状为`[K, N]`，输出C矩阵的形状为`[M, N]`。对输出矩阵C中的每一个元素`C[m, n]`，都会累加A矩阵第`m`行和B矩阵第`n`列在K轴上的乘积。在矩阵乘法中，**M方向**指矩阵C的行方向，**N方向**指矩阵C的列方向，**K方向**指矩阵C乘法的内维（累加维度）。
 
-- 样例规格：
+- 样例规格：  
   本样例参数`M = 256, N = 256, K = 64`，输入输出均为`half`类型、[`ND`](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/神经网络和算子/数据排布格式.md)格式。样例启动2个核完成计算，每个核负责输出矩阵C在M轴方向的128行、N轴方向的全部256列：
   - 第0个核计算C矩阵的第`0~127`行。
   - 第1个核计算C矩阵的第`128~255`行。
@@ -77,7 +77,7 @@
     - 调用[`Fixpipe`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬出/L0C到GM数据搬运（Fixpipe）.md)将L0C中的`float`累加结果转换为`half`并搬运回GM中的C矩阵输出位置。
     - 最后调用[`PipeBarrier`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md)`<PIPE_ALL>()`，确保当前核内相关流水任务完成。
 
-  - 调用实现
+  - 调用实现  
     使用[内核调用符](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/核函数.md)`<<<>>>`调用[核函数](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/核函数.md)。调用时模板参数传入矩阵规格、单核计算量和基础Tile大小，运行时参数传入Device侧A、B、C矩阵地址。
 
 - 接口参数说明：
@@ -165,7 +165,7 @@
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -200,7 +200,7 @@
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
-- 执行结果
+- 执行结果  
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!
@@ -220,7 +220,7 @@
 AscendC::printf("matmul blockIdx=%d\n", AscendC::GetBlockIdx());
 ```
 
-> [!CAUTION]注意
+> [!CAUTION]注意 
 >printf（PRINTF）接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC\_DUMP=0的方式关闭打印功能。
 
 ### DumpTensor
@@ -233,7 +233,7 @@ AscendC::printf("matmul blockIdx=%d\n", AscendC::GetBlockIdx());
 AscendC::DumpTensor(cLocal, baseM * baseN);
 ```
 
-> [!CAUTION]注意
+> [!CAUTION]注意 
 >DumpTensor接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC\_DUMP=0来关闭打印功能。
 
 ## 性能调试

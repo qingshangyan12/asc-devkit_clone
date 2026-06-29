@@ -36,7 +36,7 @@ namespace hccl {
         bool isDeviceSide = info == 0 ? true : false;
         HCCL_INFO("[DispatcherCtx][Init] isDeviceSide[%d]", isDeviceSide);
         CtxDispatcherType type = CtxDispatcherType::DISPATCHER_NORMAL;
-        // 如果是host侧
+        // 如果是host侧  
         if (!isDeviceSide) {
             CHK_RET(hrtGetDeviceType(deviceType_));
             if ((deviceType_ == DevType::DEV_TYPE_910B) && GetExternalInputHcclEnableFfts()) {

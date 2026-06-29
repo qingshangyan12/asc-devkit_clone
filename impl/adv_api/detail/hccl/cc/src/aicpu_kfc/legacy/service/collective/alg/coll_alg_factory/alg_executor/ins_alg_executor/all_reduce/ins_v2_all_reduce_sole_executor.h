@@ -22,7 +22,7 @@ public:
     {
         return "Instruction based All Reduce Sole Executor.";
     }
-
+   
     // AICPU 接口
     HcclResult Orchestrate(const AlgTopoInfo &topoInfo, const CollAlgOperator &op, const CollAlgParams &params,
         ConnectedLinkMgr *linkMgr, InsQuePtr insQue) override;

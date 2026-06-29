@@ -26,7 +26,7 @@ This example uses the [AscendDequant](https://gitcode.com/cann/asc-devkit/blob/m
 
 ## Example Description
 
-- Example function:
+- Example function:  
   This example performs element-wise dequantization on the input tensor, converting int32_t data type to float and other data types.
 
 - Example specifications:
@@ -48,29 +48,29 @@ This example uses the [AscendDequant](https://gitcode.com/cann/asc-devkit/blob/m
   <br clear="left" />
 <br />
 
-- Example implementation:
+- Example implementation:  
    This example implements a fixed shape with input inputGm[128, 32], scaleGm[1, 32], and output outputGm[128, 32]. It performs element-wise dequantization, converting int32_t data type to float and other data types.
 
-  - Kernel implementation
+  - Kernel implementation  
     The computation logic is: This example transfers the input data to on-chip storage, then uses the AscendDequant (A2/A3) or Dequantize (950 series) high-level API to complete the dequantization computation, obtain the final result, and transfer it to external storage.
 
-  - Tiling implementation
+  - Tiling implementation  
     The tiling implementation process for the DequantCustom example is as follows: First obtain the maximum/minimum temporary space size required by the AscendDequant or Dequantize API, use the minimum temporary space, and then determine the required tiling parameters based on the input length dataLength.
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run
+## Build and Run  
 
 Run the following steps in the root directory of this example to build and run the example.
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
-
+    
 - Run the example
 
   Run the following commands in the example directory.
@@ -97,8 +97,8 @@ Run the following steps in the root directory of this example to build and run t
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU run, CPU debug, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products; dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
-
-- Execution result
+  
+- Execution result  
   The following execution result indicates that the precision comparison is successful.
   ```bash
   test pass!

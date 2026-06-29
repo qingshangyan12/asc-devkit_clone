@@ -352,7 +352,7 @@ HcclResult CollReduceScatterRingFor91093Executor::GetLevelCommInfo()
     logicalLevel1CommInfo_ = GetSubCommInfo(logicalLevel1plane_, commIndex);
     return HCCL_SUCCESS;
 }
-
+ 
 HcclResult CollReduceScatterRingFor91093Executor::CalLevel2DataSegsSlice(const ExecMem &execMem, const OpParam &param,
     u32 level2RankSize, u32 perDataSize, std::vector<Slice> &level2DataSegsSlice)
 {
@@ -582,7 +582,7 @@ HcclResult CollReduceScatterRingFor91093Executor::KernelRun(const OpParam &param
     bool ARSDoubleRing = (ARSFlag && (level0RankSize > FACTOR_TWO) && topoAttr_.isARSDoubleRing);
     u32 sliceNum = logicalLevel0CommInfo_.localRankSize;
     u32 commIndex = logicalLevel0CommInfo_.localRank;
-
+ 
     if ((topoType_ == TopoType::TOPO_TYPE_NP_DOUBLE_RING && !IsUnifiedMarch(param) && !ARSFlag) || ARSDoubleRing) {
         ringNum = LEVEL0_PLANE_NUM_IN_NPRING_DOUBLE;
     } else {

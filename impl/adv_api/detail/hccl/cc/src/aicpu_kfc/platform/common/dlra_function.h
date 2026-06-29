@@ -128,10 +128,10 @@ public:
     std::function<int(RdmaHandle rdmaHandle,
         struct TypicalQp *localQpInfo, struct TypicalQp *remoteQpInfo)> dlRaTypicalQpModify;
     std::function<int(QpHandle handle, struct SendWr *wr, struct SendWrRsp *opRsp)> dlRaTypicalSendWr;
-
+ 
     std::function<int(RdmaHandle rdmaHandle, struct QpExtAttrs *ext_attrs, struct AiQpInfo *info, \
     QpHandle *qpHandle)> dlRaAiQpCreate;
-
+    
     std::function<int(unsigned int phyId, enum IdType type, unsigned int ids[], unsigned int num, \
     struct IpInfo infos[])>  dlRaGetSocketVnicIpInfos;
     std::function<int(RdmaHandle rdmaHandle, int *supportlite)> dlRaGetRdmaLiteStatus;

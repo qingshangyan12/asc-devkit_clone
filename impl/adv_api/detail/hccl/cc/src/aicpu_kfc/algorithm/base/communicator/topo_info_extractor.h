@@ -78,7 +78,7 @@ public:
     void GetDeviceLinkTypeMap(std::map<s32, LinkTypeInServer> &deviceLinkTypeMap);
 
 private:
-    HcclResult AHCSubGroupInit(CommPlane algLevel, std::vector<std::vector<std::vector<std::vector<u32>>>> &CommPlaneSubGroupVector);
+    HcclResult AHCSubGroupInit(CommPlane algLevel, std::vector<std::vector<std::vector<std::vector<u32>>>> &CommPlaneSubGroupVector);  
 
     const std::string identifier_; // 本节点所在的通信域ID
     const u32 userRank_;        //  本节点的用户原始rank号

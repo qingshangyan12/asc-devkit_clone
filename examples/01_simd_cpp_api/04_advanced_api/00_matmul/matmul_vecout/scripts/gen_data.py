@@ -35,3 +35,4 @@ def gen_golden_data():
 
 if __name__ == "__main__":
     gen_golden_data()
+    

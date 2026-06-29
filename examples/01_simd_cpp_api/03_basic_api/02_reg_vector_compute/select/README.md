@@ -21,7 +21,7 @@
 ```
 
 ## 样例描述
-- 样例功能：
+- 样例功能：  
   对根据maskReg中的比特位，选择对应位置的xReg或yReg向量中的值，当mask的比特位为1时，选取src0中对应的元素；当mask的比特位为0时，选取src1中对应的元素。
 - 样例规格：
   <table>
@@ -33,9 +33,9 @@
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">select</td></tr>
   </table>
-- 样例实现：
+- 样例实现：  
    SelectVF函数内调用Select接口进行计算，结果写回UB
-  - 调用实现
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行

@@ -1344,7 +1344,7 @@ HcclResult NetworkManager::Destroy()
         StopAllDeviceNicSockets();
     }
 
-    /* 停止vnic ra的监听 */
+    /* 停止vnic ra的监听 */ 
     if (raResourceInfo_.vnicSocketMap.size() != 0) {
         StopAllDeviceVnicSockets();
     }
@@ -1597,16 +1597,16 @@ HcclResult NetworkManager::PingMeshRaPingInit(u32 devLogicId, u32 devPhyId, RaIn
     devicePhyId_ = ((static_cast<s32>(devPhyId) == HOST_DEVICE_ID) ? 0 : devPhyId);
     isHostUseDevNic_ = true;
     isRaInitRepeated_ = false;
-
+ 
     // hccp侧初始化ping mesh资源
     CHK_RET(HrtRaInit(config));
     HCCL_INFO("[HCCN][PingMeshRaPingInit]Device[%u] config.hdcType[%d], config.nicPosition[%u], config.phyId[%u].",
         deviceLogicId_, config->hdcType, config->nicPosition, config->phyId);
     deviceNicInitRef_.Ref();
-
+ 
     return HCCL_SUCCESS;
 }
-
+ 
 HcclResult NetworkManager::PingMeshRaPingDeinit()
 {
     // 引用计数
@@ -1736,14 +1736,14 @@ HcclResult NetworkManager::StopHostSocketHandle(const HcclIpAddress &ipAddr)
     std::unique_lock<std::mutex> lock(raLock_);
     CHK_PRT_RET((hostNicInitRef_.Count() == 0),
         HCCL_ERROR("[NetworkManager][StopHostSocketHandle]cannot start nic socket before host nic inited!"), HCCL_E_INTERNAL);
-
+        
     auto sockInfo = raResourceInfo_.hostNetSocketMap.find(ipAddr);
     auto ipIt = IPPortListenRefMapHost_.find(ipAddr);
     CHK_PRT_RET((sockInfo == raResourceInfo_.hostNetSocketMap.end()),
         HCCL_ERROR("[NetworkManager][StopHostSocketHandle]ipAddr is invalid"), HCCL_E_INTERNAL);
-    IpSocket &sock = raResourceInfo_.hostNetSocketMap[ipAddr];
+    IpSocket &sock = raResourceInfo_.hostNetSocketMap[ipAddr];  
     CHK_RET(CheckSocketInfo(sock.nicSocketHandle, ipAddr));
-
+    
     // 停止所有的listen
     if (ipIt != IPPortListenRefMapHost_.end()) {
         for (auto &portIt : ipIt->second) {
@@ -1753,12 +1753,12 @@ HcclResult NetworkManager::StopHostSocketHandle(const HcclIpAddress &ipAddr)
                 HCCL_WARNING("[NetworkManager][StopHostSocketHandle] ip [%s] stop listen port [%u]", ipAddr.GetReadableAddress(), port);
                 raResourceInfo_.hostNetSocketMap[ipAddr].listenedPort.erase(port);
                 IPPortListenRefMapHost_[ipAddr][port].Clear(); // 引用计数归0
-            }
+            } 
         }
     }
     CHK_PRT_RET((raResourceInfo_.hostNetSocketMap[ipAddr].listenedPort.size() != 0),
-        HCCL_ERROR("[NetworkManager][StopHostSocketHandle]IPPortListenRefMapHost_[%s] is unequal to hostNetSocketMap[%s].listenedPort",
-            ipAddr.GetReadableAddress(), ipAddr.GetReadableAddress()),
+        HCCL_ERROR("[NetworkManager][StopHostSocketHandle]IPPortListenRefMapHost_[%s] is unequal to hostNetSocketMap[%s].listenedPort", 
+            ipAddr.GetReadableAddress(), ipAddr.GetReadableAddress()), 
             HCCL_E_INTERNAL);
     // 删除socket 删除IP
     CHK_RET(hrtRaSocketDeInit(sock.nicSocketHandle));

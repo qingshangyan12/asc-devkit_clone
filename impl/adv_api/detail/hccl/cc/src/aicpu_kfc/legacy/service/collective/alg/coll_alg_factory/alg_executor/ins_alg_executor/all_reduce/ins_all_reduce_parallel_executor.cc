@@ -310,7 +310,7 @@ HcclResult InsAllReduceParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTem
     // 实例化算法模板类
     InsAlgTemplate0 tempAlgIntra(myRank_, rankSizeLevel0_, vTopo_[0], virtRankMap_[0]);  // server内算法，比如mesh
     InsAlgTemplate1 tempAlgInter(myRank_, rankSizeLevel1_, vTopo_[1], virtRankMap_[1]);  // server间算法，比如nhr
-
+    
     tempAlgInter.SetDmaMode(dmaMode_);
     tempAlgInter.InitReduceInfo(redOp_, dataType_);
     tempAlgInter.SetCollOp(op);

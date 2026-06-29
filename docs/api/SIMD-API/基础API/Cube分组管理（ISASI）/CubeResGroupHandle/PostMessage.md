@@ -72,10 +72,10 @@ __aicore__ inline uint16_t PostMessage(__gm__ CubeMsgType* msg, CubeMsgType& msg
 <tbody><tr id="row14365116121111"><td class="cellrowborder" valign="top" width="12.82%" headers="mcps1.2.3.1.1 "><p id="p23653641116"><a name="p23653641116"></a><a name="p23653641116"></a>pipeMode</p>
 </td>
 <td class="cellrowborder" valign="top" width="87.18%" headers="mcps1.2.3.1.2 "><p id="p1213214123127"><a name="p1213214123127"></a><a name="p1213214123127"></a>用于配置发送消息的执行单元。PipeMode类型，其定义如下：</p>
-<a name="screen11132212171216"></a><a name="screen11132212171216"></a><pre class="screen" codetype="Cpp" id="screen11132212171216">enum class PipeMode : uint8_t {
+<a name="screen11132212171216"></a><a name="screen11132212171216"></a><pre class="screen" codetype="Cpp" id="screen11132212171216">enum class PipeMode : uint8_t { 
   SCALAR_MODE = 0, // Scalar执行单元往GM上写消息。
   MTE3_MODE = 1, // 使用MTE3单元往GM上写消息。
-  MAX
+  MAX 
 }</pre>
 </td>
 </tr>
@@ -121,7 +121,7 @@ __aicore__ inline uint16_t PostMessage(__gm__ CubeMsgType* msg, CubeMsgType& msg
 ## 调用示例<a name="zh-cn_topic_0000001526206862_section97001499599"></a>
 
 ```
-handle.AssignQueue(queIdx);
+handle.AssignQueue(queIdx);  
 auto msgPtr = handle.AllocMessage();        // 获取消息空间指针msgPtr
 AscendC::CubeGroupMsgHead headA = {AscendC::CubeMsgState::VALID, 0};
 AscendC::CubeMsgBody msgA = {headA, 1, 0, 0, false, false, false, false, 0, 0, 0, 0, 0, 0, 0, 0};

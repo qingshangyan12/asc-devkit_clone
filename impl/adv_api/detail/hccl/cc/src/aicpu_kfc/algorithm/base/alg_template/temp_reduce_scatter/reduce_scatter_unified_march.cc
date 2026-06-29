@@ -82,7 +82,7 @@ HcclResult ReduceScatterUnifiedMarch::NotifySubStreamStart(u32 streamSize)
     CHK_PRT_RET(streamSize > subStreams_.size() || streamSize > meshSignalSubToMain_.size(),
         HCCL_ERROR("[ReduceScatterUnifiedMarch][NotifySubStreamStart] streamSize[%u] is out of range"\
         "subStreams_ size[%zu] or meshSignalSubToMain_ size[%zu]", streamSize, subStreams_.size(),
-        meshSignalSubToMain_.size()), HCCL_E_PARA);
+        meshSignalSubToMain_.size()), HCCL_E_PARA);    
     for (u32 streamIndex = 0; streamIndex < streamSize; streamIndex++) {
         CHK_RET(LocalNotify::Post(mainStream_, dispatcher_, meshSignalSubToMain_[streamIndex], INVALID_VALUE_STAGE));
         CHK_RET(LocalNotify::Wait(subStreams_[streamIndex], dispatcher_, meshSignalSubToMain_[streamIndex],
@@ -121,7 +121,7 @@ HcclResult ReduceScatterUnifiedMarch::NotifyNeighborsStart(LINK& prevIntraLink, 
                 CHK_RET(prevIntraLink->Wait(notifyIdx_, subStreams_[neighborRankId])); // AckWait
             } else if (neighborRankId == 1) {
                 CHK_RET(prevIntraLink->Post(notifyIdx_, subStreams_[neighborRankId])); // AckRecord
-                CHK_RET(nextIntralLink->Wait(notifyIdx_, subStreams_[neighborRankId])); // AckWait
+                CHK_RET(nextIntralLink->Wait(notifyIdx_, subStreams_[neighborRankId])); // AckWait        
             }
         }
         HCCL_DEBUG("[ReduceScatterUnifiedMarch][NotifyNeighborsStart] intraRank[%u] switch on [%u]neigbhbors done",
@@ -161,10 +161,10 @@ HcclResult ReduceScatterUnifiedMarch::NotifyNeighborsEnd(LINK& prevIntraLink, LI
     for (u32 neighborRankId = 0; neighborRankId < neighbors; neighborRankId++) {
         if (neighborRankId == 0) {
             CHK_RET(prevIntraLink->TxDataSignal(subStreams_[neighborRankId])); // DataRecord
-            CHK_RET(nextIntralLink->RxDataSignal(subStreams_[neighborRankId]));
+            CHK_RET(nextIntralLink->RxDataSignal(subStreams_[neighborRankId]));     
         } else if (neighborRankId == 1) {
             CHK_RET(nextIntralLink->TxDataSignal(subStreams_[neighborRankId]));
-            CHK_RET(prevIntraLink->RxDataSignal(subStreams_[neighborRankId]));
+            CHK_RET(prevIntraLink->RxDataSignal(subStreams_[neighborRankId]));   
         }
     }
     HCCL_DEBUG("[ReduceScatterUnifiedMarch][NotifyNeighborsEnd] intraRank[%u] notifys [%u]neigbhbors reduce done",
@@ -209,7 +209,7 @@ HcclResult ReduceScatterUnifiedMarch::DoSerialReduce(void* remDMAMemPtr, void* d
                 dstMem.ptr(), INVALID_VALUE_RANKID, LinkType::LINK_ONCHIP, reduceAttr_));
         }
     }
-    return HCCL_SUCCESS;
+    return HCCL_SUCCESS; 
 }
 
 HcclResult ReduceScatterUnifiedMarch::RunSingleSliceRead(u32 ringPrevRank, u32 ringNextRank, u32 step, u32 totalStep)

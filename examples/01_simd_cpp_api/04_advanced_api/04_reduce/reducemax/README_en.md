@@ -29,12 +29,12 @@ This example uses the ReduceMax high-level API in a reduction scenario to comput
 │   └── README.md                   // Example documentation
 ```
 
-## Example Description
+## Example Description  
 
-- Example function:
+- Example function:  
   This example computes the maximum value of each column in the input matrix.
 
-- Example specifications:
+- Example specifications:  
 <table>
 <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> reducemax </td></tr>
 
@@ -50,16 +50,16 @@ This example uses the ReduceMax high-level API in a reduction scenario to comput
 <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">reduce_custom</td></tr>
 </table>
 
-- Example implementation:
+- Example implementation:  
   This example computes the maximum value of each column in the input [32, 136] matrix, producing output [1, 136].
 
-  - Kernel implementation:
+  - Kernel implementation:  
     The computation logic is: Input data must first be transferred to on-chip storage, then the ReduceMax high-level API is used to complete the computation, and the result is transferred out.
 
-  - Tiling implementation:
+  - Tiling implementation:  
     The tiling implementation process is as follows: Use the GetReduceMaxMaxMinTmpSize API to calculate the required maximum/minimum temporary space size, use the minimum temporary space, and then determine the required tiling parameters based on the input length.
 
-  - Invocation implementation:
+  - Invocation implementation:  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run

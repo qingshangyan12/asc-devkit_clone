@@ -60,7 +60,7 @@ public:
     HcclResult CreateOrUpdateRemoteOpBasedResources(u64 memSize, const std::string &tag);
 
     HcclResult DestroyRemoteOpBasedMem(const std::string &tag);
-
+    
 private:
     std::unique_ptr<WorkspaceResourceImpl> pimpl_;
 };

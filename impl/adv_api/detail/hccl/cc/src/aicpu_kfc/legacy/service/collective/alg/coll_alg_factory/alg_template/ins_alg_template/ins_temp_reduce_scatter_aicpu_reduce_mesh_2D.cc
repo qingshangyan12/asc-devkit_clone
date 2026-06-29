@@ -31,7 +31,7 @@ HcclResult InsTempReduceScatterAicpuReduceMesh2D::CalcRes(AlgTempResReq &tempRes
 }
 
 u32 InsTempReduceScatterAicpuReduceMesh2D::CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) const
-{
+{   
     (void) inBuffType;
     (void) outBuffType;
     const u32 executor2DTemp = 4;
@@ -39,7 +39,7 @@ u32 InsTempReduceScatterAicpuReduceMesh2D::CalcScratchMultiple(BufferType inBuff
 }
 
 HcclResult InsTempReduceScatterAicpuReduceMesh2D::RunAicpuLocalReduce(const TemplateDataParams &templateDataParams, std::vector<InsQuePtr> &tempInsQues)
-{
+{      
     u64 baseOffset = templateDataParams.sliceSize * tempRankSize_;
     DataSlice dataSlice = DataSlice(BufferType::SCRATCH, baseOffset, templateDataParams.sliceSize);
     for (u32 rankId = 1; rankId < tempRankSize_; rankId++) {

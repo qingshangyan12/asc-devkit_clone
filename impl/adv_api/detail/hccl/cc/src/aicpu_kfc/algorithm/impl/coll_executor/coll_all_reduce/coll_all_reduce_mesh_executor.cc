@@ -192,15 +192,15 @@ HcclResult CollAllReduceMeshExecutor::KernelRun(const OpParam &param, ExecMem &e
     /* 外层topo:all_gather */
 
     if (topoAttr_.deviceType == DevType::DEV_TYPE_910B) {
-        level0TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_GATHER_MESH_ATOMIC,
+        level0TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_GATHER_MESH_ATOMIC, 
             dispatcher_);
     } else {
-        level0TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_GATHER_MESH,
+        level0TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_GATHER_MESH, 
             dispatcher_);
     }
 
     CHK_SMART_PTR_NULL(level0TempAlg);
-    CHK_RET(level0TempAlg->Prepare(algResResp_->slaveStreams, algResResp_->notifiesMain, algResResp_->notifiesAux,
+    CHK_RET(level0TempAlg->Prepare(algResResp_->slaveStreams, algResResp_->notifiesMain, algResResp_->notifiesAux, 
         topoAttr_.userRank, nullptr, level0CommInfo.localRank, level0CommInfo.localRankSize));
 
     /* 节点内执行器 stage2 */

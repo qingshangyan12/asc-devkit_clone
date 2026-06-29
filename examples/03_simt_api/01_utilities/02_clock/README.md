@@ -58,15 +58,15 @@
   __global__ void simt_gather(float* input, int32_t* index, float* output, uint64_t index_total_length)
   {
       uint64_t start = clock();
-
+  
       int32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-
+  
       // Maps to the index of output tensor
       if (idx >= index_total_length) {
           return;
       }
       output[idx] = input[index[idx]];
-
+  
       uint64_t end = clock();
       if (blockIdx.x == 0 && threadIdx.x == 0) {
           printf("%s execute cycle : %lu\n", "simt_gather", end - start);
@@ -78,7 +78,7 @@
 
 在本样例根目录下执行如下步骤，编译并执行算子。
 
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

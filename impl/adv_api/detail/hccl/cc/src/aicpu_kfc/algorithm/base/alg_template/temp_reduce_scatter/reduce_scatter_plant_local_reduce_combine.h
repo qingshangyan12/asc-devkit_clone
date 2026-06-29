@@ -20,7 +20,7 @@ public:
 
     HcclResult Prepare(DeviceMem &cclInMem, DeviceMem &outputMem, const Stream &stream, std::vector<Stream> &subStreams,
         std::vector<std::shared_ptr<LocalNotify>> &meshSignal, std::vector<std::shared_ptr<LocalNotify>> &meshSignalAux,
-        MemBlockInfo &memBlockInfo, const HcclReduceOp reductionOp, const HcclDataType dataType,
+        MemBlockInfo &memBlockInfo, const HcclReduceOp reductionOp, const HcclDataType dataType, 
         bool isUseCclIn, bool isLevel0LastRank, bool isNeedSpaceBorrow) override;
     HcclResult RunAsync(const u32 rank, const u32 rankSize, const std::vector<LINK> &links) override;
 

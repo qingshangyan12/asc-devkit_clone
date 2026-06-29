@@ -175,7 +175,7 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     tempAlgParams.buffInfo.inBuffType = BufferType::INPUT;
     tempAlgParams.buffInfo.outBuffType = BufferType::OUTPUT;
     tempAlgParams.buffInfo.scratBuffType = BufferType::SCRATCH;
-    tempAlgParams.repeatNum = 1;  // 不需要重复
+    tempAlgParams.repeatNum = 1;  // 不需要重复 
 
     TempFuncs tempFuncs;
     tempFuncs.isForepart = true;
@@ -241,7 +241,7 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes(
     CHK_RET(GetTemplateResRequest(rankGraph, algTemplate, tempResReq));
 
     CHK_RET(CalcLinkInfo(myRank_, rankGraph, tempResReq.links, algResReq.levelRankPairs));
-    algResReq.topoInfo.UpdateSingleLevelTopo(virtRanks_, virtRankMap_, vTopo_);
+    algResReq.topoInfo.UpdateSingleLevelTopo(virtRanks_, virtRankMap_, vTopo_);   
     algResReq.queueNotifys = tempResReq.queNotifys;
     algResReq.primQueueNum = tempResReq.streamNum;
     algResReq.localWaitGroupCntNotify = tempResReq.localWaitGroupCntNotify;

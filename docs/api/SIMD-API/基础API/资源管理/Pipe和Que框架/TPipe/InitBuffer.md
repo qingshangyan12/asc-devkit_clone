@@ -68,7 +68,7 @@
     ```
     template <class T>
     __aicore__ inline bool InitBuffer(T& que, uint8_t num, uint32_t len)
-
+    
     // 为TQue等队列分配内存，且开发者可以自定义内存的地址信息，地址信息包含起始地址和长度。
     template <class T, class U, class V, class... Addrs>
     __aicore__ inline bool InitBuffer(T& que, const Std::tuple<U, V>& addr0, const Addrs&... addrs)

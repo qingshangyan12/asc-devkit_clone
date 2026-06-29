@@ -36,7 +36,7 @@ void RankLevelInfo::Deserialize(const nlohmann::json &rankLevelInfoJson)
     std::string msgNetinstid    = "error occurs when parser object of propName \"net_instance_id\"";
     TRY_CATCH_THROW(InvalidParamsException, msgNetlayer, netLayer = GetJsonPropertyUInt(rankLevelInfoJson, "net_layer"););
     TRY_CATCH_THROW(InvalidParamsException, msgNetinstid, netInstId = GetJsonProperty(rankLevelInfoJson, "net_instance_id"););
-
+    
     if (netLayer > MAX_VALUE_NETLAYER) {
        THROW<InvalidParamsException>(StringFormat( "netLayer[%u] out of range [%u] to [%u]", netLayer, MIN_VALUE_U32, MAX_VALUE_NETLAYER));
     }
@@ -45,7 +45,7 @@ void RankLevelInfo::Deserialize(const nlohmann::json &rankLevelInfoJson)
     }
 
     netAttr=rankLevelInfoJson.value<std::string>("net_attr", "");
-
+    
     if (rankLevelInfoJson.contains("net_type")){
     string      netTypeStr;
     std::string msgNettype = "error occurs when parser object of propName \"net_type\"";
@@ -97,7 +97,7 @@ RankLevelInfo::RankLevelInfo(BinaryStream &binStream)
         AddressInfo addressInfo(binStream);
         rankAddrs.emplace_back(addressInfo);
     }
-
+    
     for (auto& rankAddr : rankAddrs) {
         IpAddress ipAddress = rankAddr.addr;
         for (auto& port : rankAddr.ports) {

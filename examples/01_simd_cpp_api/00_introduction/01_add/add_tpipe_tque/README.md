@@ -27,7 +27,7 @@
 
 ## 样例描述
 
-- 样例功能：
+- 样例功能：  
   计算公式：
   ```
   z = x + y
@@ -53,7 +53,7 @@
   </table>
 
 - 样例实现：
-  - Kernel实现
+  - Kernel实现  
     `add_tpipe_tque.asc` 中的核函数入口 `add_custom` 接收 `totalLength`，并在核函数内部根据 `GetBlockNum()` 计算每个核要处理的 `blockLength`，再用 `GetBlockIdx()` 计算当前核在 GM 中对应的数据起点。之后，核函数直接完成输入数据搬入 UB 并入队、出队后执行 `Add`、结果写回 GM 的完整流程。
 
   - 核入口实现
@@ -65,7 +65,7 @@
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -100,7 +100,7 @@
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
-- 执行结果
+- 执行结果  
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!

@@ -25,10 +25,10 @@ The Matmul example splits the input matrix along the M or N direction, dividing 
 │   └── README.md               // Example description document
 ```
 ## Example Description
-- Example Function:
+- Example Function:  
   This example uses an AI processor with an L2 Cache size of 192M. Based on the input and output shapes, the total data volume of input and output is calculated as ((30720 * 4096) + (4096 * 1024) + (1024) + (30720 * 1024)) * 2 = 322963456 bytes (approximately 308M), which exceeds the L2 Cache (192M). This means the data read before computation cannot hit the L2 Cache, and since Global Memory bandwidth is lower than L2 Cache bandwidth with a significant gap between them, data transfer becomes a performance bottleneck. Therefore, the input data needs to be split into multiple blocks so that the computation data volume of each block (including input and output) can fit in the L2 Cache. This example provides the L2CacheOptimizer class, where the GetTileNum interface automatically obtains the total L2 split count for the left and right matrices based on their shapes, the GetBlockShape interface obtains the M, N, K axis lengths after L2 splitting, and the GetBlockCoord interface returns the position coordinates of the corresponding block, that is, the offset relative to the matrix start position in the M, N, K directions.
 
-- Example Specifications:
+- Example Specifications:  
   In this example: M = 30720, N = 1024, K = 4096.
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="5" align="center">Matmul</td></tr>
@@ -40,7 +40,7 @@ The Matmul example splits the input matrix along the M or N direction, dividing 
   <td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="5" align="center">matmul_l2cache_custom</td></tr>
   </table>
-- Example Implementation:
+- Example Implementation: 
   - Key Kernel Steps
     - Set the left matrix A, right matrix B, and Bias. Obtain the total L2 split count from the L2CacheOptimizer class GetTileNum interface and loop through multiple computations.
       ```cpp
@@ -103,12 +103,12 @@ The Matmul example splits the input matrix along the M or N direction, dividing 
         }
         ```
 
-  - Invocation Implementation
+  - Invocation Implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables
+- Configure Environment Variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

@@ -167,7 +167,7 @@ pipe.InitBuffer(que, num, len);
 AscendC::LocalTensor<half> tensor1 = que.AllocTensor<half>();
 que.EnQue<AscendC::TPosition::GM, AscendC::TPosition::VECIN, half>(tensor1);
 // 将tensor从VECIN的Queue中搬出
-AscendC::LocalTensor<half> tensor2 = que.DeQue<AscendC::TPosition::GM, AscendC::TPosition::VECIN, half>();
+AscendC::LocalTensor<half> tensor2 = que.DeQue<AscendC::TPosition::GM, AscendC::TPosition::VECIN, half>(); 
 // inplace接口
 AscendC::TPipe pipe;
 AscendC::TQue<AscendC::TPosition::VECOUT, 0> que;

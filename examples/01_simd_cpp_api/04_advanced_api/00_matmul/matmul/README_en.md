@@ -22,10 +22,10 @@ A Matmul example that calls the Matmul API to implement matrix multiplication. I
 │   └── README.md               // Example description
 ```
 ## Example Description
-- Example Function:
+- Example Function:  
   The Matmul example calls the Matmul API to perform matrix multiplication and bias addition on the input A and B matrices, with the computation formula: C = A * B + Bias.
 
-- Example Specifications:
+- Example Specifications:  
   In this example: M = 128, N = 2048, K = 1024.
 <table>
 <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="5" align="center">MatmulCustom</td></tr>
@@ -37,7 +37,7 @@ A Matmul example that calls the Matmul API to implement matrix multiplication. I
 <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="5" align="center">matmul_custom</td></tr>
 </table>
 
-- Example Implementation:
+- Example Implementation: 
   - Key Kernel Steps
     - The specific steps are as follows:
       - Create the Matmul object.
@@ -53,12 +53,12 @@ A Matmul example that calls the Matmul API to implement matrix multiplication. I
         - Set the parameter type information for A, B, C, and Bias; M, N, Ka, Kb shape information, and so on.
         - Call the GetTiling interface to obtain Tiling information.
 
-  - Invocation Implementation
+  - Invocation Implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables
+- Configure Environment Variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

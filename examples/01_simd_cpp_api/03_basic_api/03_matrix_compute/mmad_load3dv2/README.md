@@ -30,10 +30,10 @@
 
 LoadData3DV2指令以下简称load3dv2，该指令对于二维矩阵的转置能力和支持的数据类型都与目的地址所处的存储位置有关，具体来说：
 
-1. 目的地址位于L0A上时，支持数据类型为：uint8_t/int8_t/half/bfloat16_t/uint32_t/int32_t/float/int4b_t；
+1. 目的地址位于L0A上时，支持数据类型为：uint8_t/int8_t/half/bfloat16_t/uint32_t/int32_t/float/int4b_t；  
    目的地址位于L0B上，支持数据类型为：half/bfloat16_t/uint32_t/int32_t/float。
 
-2. 目的地址位于L0A上时，enTranspose能够决定是否启用转置功能；
+2. 目的地址位于L0A上时，enTranspose能够决定是否启用转置功能；  
    目的地址位于L0B上，默认启用转置功能（enTranspose=false时，依然会启用转置功能）。
 
 由于本样例暂不支持输入数据类型为int4b_t，因此本样例展示了以下五种load3dv2在矩阵乘法的使用：
@@ -57,7 +57,7 @@ LoadData3DV2指令以下简称load3dv2，该指令对于二维矩阵的转置能
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

@@ -193,8 +193,8 @@ CMakeLists.txt内容如下：
 ```
 cmake_minimum_required(VERSION 3.16)
 # 1、find_package()是CMake中用于查找和配置Ascend C编译工具链的命令
-find_package(ASC REQUIRED)
-find_package(AICPU REQUIRED)
+find_package(ASC REQUIRED) 
+find_package(AICPU REQUIRED) 
 
 # 2、指定项目支持的语言包括ASC、AICPU和CXX，ASC表示支持使用毕昇编译器对Ascend C编程语言进行编译，AI CPU表示支持使用毕昇编译器对AI CPU算子进行编译
 project(kernel_samples LANGUAGES ASC AICPU CXX)
@@ -224,27 +224,27 @@ target_compile_options(demo PRIVATE
     ```
     # 将.cpp文件置为ASC属性，启用Ascend C语言进行编译
     set_source_files_properties(
-        add_custom_base.cpp
+        add_custom_base.cpp 
         sub_custom_base.cpp
         PROPERTIES LANGUAGE ASC
     )
-
+    
     # 将.cpp文件置为AICPU属性，支持AI CPU算子编译
     set_source_files_properties(
         aicpu_kernel.cpp
         PROPERTIES LANGUAGE AICPU
     )
-
+    
     add_library(kernel_lib SHARED
-        add_custom_base.cpp
+        add_custom_base.cpp 
         sub_custom_base.cpp
         aicpu_kernel.cpp # 支持AI CPU算子与AI Core算子一起打包为动态库
     )
-
+    
     target_compile_options(kernel_lib PRIVATE
         $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
     )
-
+    
     # AI CPU算子编译时，需要手动链接以下依赖库（若指定链接语言为ASC时，不需要手动链接以下库）
     target_link_libraries(kernel_lib PRIVATE
         ascendc_runtime
@@ -257,7 +257,7 @@ target_compile_options(demo PRIVATE
         error_manager
         ascend_dump
     )
-
+    
     add_executable(demo
         main.asc
     )
@@ -271,15 +271,15 @@ target_compile_options(demo PRIVATE
     ```
     # .asc文件会默认启用Ascend C语言进行编译，.aicpu文件会默认启用AICPU语言进行编译，不需要通过set_source_files_properties进行设置
     add_library(kernel_lib STATIC
-        add_custom_base.asc
+        add_custom_base.asc 
         sub_custom_base.asc
         aicpu_kernel.aicpu  # 可支持AI CPU算子与AI Core算子一起打包为静态库
     )
-
+    
     target_compile_options(kernel_lib PRIVATE
         $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
     )
-
+    
     add_executable(demo
         main.asc
     )

@@ -151,7 +151,7 @@ HcclResult SendReceive::BatchSendRunAsync()
             "size[%llu] failed", offset, sizePerRound), ret);
 
         ret = transLink_->TxDone(stream_);
-
+  
         CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[SendReceive][BatchSendRunAsync]TxWaitDone failed"), ret);
     }
     return HCCL_SUCCESS;

@@ -79,7 +79,7 @@ void RankTableInfo::Check()
 
         if (rank.localId != BACKUP_LOCAL_ID && rank.localId != rank.replacedLocalId) {
             RPT_INPUT_ERR(true, "EI0014", std::vector<std::string>({"value", "variable", "expect"}),
-                            std::vector<std::string>({std::to_string(rank.replacedLocalId), "replacedLocalId",
+                            std::vector<std::string>({std::to_string(rank.replacedLocalId), "replacedLocalId", 
                                 "replacedLocalId equal to locaId[" + std::to_string(rank.localId) + "]"}));
             THROW<InvalidParamsException>(StringFormat("[Parse][ClusterInfo][RankTableInfo::Check] "
             "failed with replacedLocalId[%u] not equal to localId[%u].", rank.replacedLocalId, rank.localId));
@@ -154,7 +154,7 @@ void RankTableInfo::Deserialize(const nlohmann::json &rankTableInfoJson, bool is
         rankInfo.Deserialize(rankJson);
         ranks.emplace_back(rankInfo);
     }
-
+   
     // check
     if (isCheck) {
         Check();
@@ -246,7 +246,7 @@ vector<char> RankTableInfo::GetUniqueId(bool isContainLocId) const
     }
 
     binaryStream.Dump(result);
-    return result;
+    return result; 
 }
 
 void RankTableInfo::UpdateRankTable(const RankTableInfo &localRankInfo)
@@ -255,20 +255,20 @@ void RankTableInfo::UpdateRankTable(const RankTableInfo &localRankInfo)
     if (detour) {
         CHK_PRT_THROW(localRankInfo.detour != true,
             HCCL_ERROR("[%s] detour cfg is not same with other ranks.", __func__),
-            InvalidParamsException,
+            InvalidParamsException, 
             "updateRankTableInfo error");
     }
-    detour = localRankInfo.detour;
+    detour = localRankInfo.detour; 
     if (rankCount == 0) {
         version = localRankInfo.version;
     } else {
-        CHK_PRT_THROW(version != localRankInfo.version,
-            HCCL_ERROR("[%s] version[%s] error, local version[%s] .", __func__, version.c_str(), localRankInfo.version.c_str()),
+        CHK_PRT_THROW(version != localRankInfo.version, 
+            HCCL_ERROR("[%s] version[%s] error, local version[%s] .", __func__, version.c_str(), localRankInfo.version.c_str()), 
             InvalidParamsException, "updateRankTableInfo error");
     }
 
     // ranks size
-    CHK_PRT_THROW(localRankInfo.ranks.size() == 0, HCCL_ERROR("[%s] ranks size is zero.", __func__),
+    CHK_PRT_THROW(localRankInfo.ranks.size() == 0, HCCL_ERROR("[%s] ranks size is zero.", __func__), 
             InvalidParamsException, "updateRankTableInfo error");
 
     ranks.insert(ranks.end(), localRankInfo.ranks.begin(), localRankInfo.ranks.end());
@@ -277,7 +277,7 @@ void RankTableInfo::UpdateRankTable(const RankTableInfo &localRankInfo)
     HCCL_INFO("[%s] success, current rankTableInfo[%s]", __func__, Describe().c_str());
 }
 
-std::unordered_map<u32, u32> RankTableInfo::GetRankDeviceListenPortMap()
+std::unordered_map<u32, u32> RankTableInfo::GetRankDeviceListenPortMap() 
 {
     std::unordered_map<u32, u32> rankIdPortMap;
     for (auto &rankinfo : ranks) {

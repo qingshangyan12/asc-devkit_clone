@@ -63,7 +63,7 @@
 
     ```
     #include "register/tilingdata_base.h"
-
+    
     // 定义tilingdata类
     namespace optiling {
     BEGIN_TILING_DATA_DEF(AddCustomTilingData)    // 注册一个tiling的类，以tiling的名字作为入参
@@ -72,7 +72,7 @@
       TILING_DATA_FIELD_DEF(uint32_t, splitTile); // 添加tiling字段，每个core处理的数据分块计算
     END_TILING_DATA_DEF;                          // 定义结束
     // 注册算子tilingdata类到对应的AddCustom算子
-    REGISTER_TILING_DATA_CLASS(AddCustom, AddCustomTilingData)
+    REGISTER_TILING_DATA_CLASS(AddCustom, AddCustomTilingData) 
     }
     ```
 
@@ -91,18 +91,18 @@
 
     ```
     /*REGISTER_TILING_DATA_CLASS中第一个参数为${op_type} + ‘_’ + tiling_key。若tiling_key未注册匹配的tiling结构体，则会使用默认的结构体。如下面两种方式，tiling_key不指定或者非1情况，tiling结构体为AddStruct；tiling_key等于1的时候，tiling结构体为AddStructSample1*/
-
+    
     // 以op_type为Add为例，默认tiling结构体注册如下
-    BEGIN_TILING_DATA_DEF(AddStruct)
-      TILING_DATA_FIELD_DEF(uint16_t, mmVar);
-      TILING_DATA_FIELD_DEF_ARR(uint16_t, 3, mmArr);
-    END_TILING_DATA_DEF;
-    REGISTER_TILING_DATA_CLASS(Add, AddStruct)
-
+    BEGIN_TILING_DATA_DEF(AddStruct)   
+      TILING_DATA_FIELD_DEF(uint16_t, mmVar);   
+      TILING_DATA_FIELD_DEF_ARR(uint16_t, 3, mmArr); 
+    END_TILING_DATA_DEF; 
+    REGISTER_TILING_DATA_CLASS(Add, AddStruct) 
+    
     // TilingKey等于1时注册结构体如下
-    BEGIN_TILING_DATA_DEF(AddStructSample1)
-      TILING_DATA_FIELD_DEF(uint16_t, mmVar);
-      TILING_DATA_FIELD_DEF_ARR(uint16_t, 3, mmArr);
-    END_TILING_DATA_DEF;
-    REGISTER_TILING_DATA_CLASS(Add_1, AddStructSample1)
+    BEGIN_TILING_DATA_DEF(AddStructSample1) 
+      TILING_DATA_FIELD_DEF(uint16_t, mmVar);   
+      TILING_DATA_FIELD_DEF_ARR(uint16_t, 3, mmArr); 
+    END_TILING_DATA_DEF; 
+    REGISTER_TILING_DATA_CLASS(Add_1, AddStructSample1) 
     ```

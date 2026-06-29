@@ -23,7 +23,7 @@ NBuffer33算法的Matmul样例，实现搬入搬出带宽平衡从而提升效�
 │   └── README.md               // 样例说明文档
 ```
 ## 样例描述
-- 样例功能：
+- 样例功能：  
   Matmul样例使用模板参数MatmulPolicy配置为NBuffer33MatmulPolicy。单核计算的A矩阵切分为3x3个基本块，该3x3个A矩阵的基本块全载和保持在L1 Buffer中，每次与3x1个B矩阵的基本块计算矩阵乘，同时DoubleBuffer并行搬入下次计算所需的3x1个B矩阵基本块，直到singleCoreN方向的矩阵乘计算完成。
 
 - 约束条件
@@ -33,7 +33,7 @@ NBuffer33算法的Matmul样例，实现搬入搬出带宽平衡从而提升效�
   - stepM、stepKa、stepKb小于等于3。
   - 用户需要确保A矩阵全载的基本块大小与B矩阵载入的基本块大小之和不超过L1 Buffer大小。
 
-- 样例规格：
+- 样例规格：  
   本样例中：M = 256, N = 512, K = 192。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
@@ -44,7 +44,7 @@ NBuffer33算法的Matmul样例，实现搬入搬出带宽平衡从而提升效�
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_nbuffer33_custom</td></tr>
   </table>
-- 样例实现：
+- 样例实现： 
   - Kernel关键步骤
     - 具体步骤：
       - 创建Matmul对象，配置MDL模板和NBuffer33MatmulPolicy。
@@ -66,12 +66,12 @@ NBuffer33算法的Matmul样例，实现搬入搬出带宽平衡从而提升效�
       tilingApi.SetMatmulConfigParams(matmulConfigParams);
       ```
 
-  - 调用实现
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

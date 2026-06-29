@@ -22,7 +22,7 @@ CollBroadCastMix::CollBroadCastMix(const HcclDispatcher dispatcher, std::unique_
 HcclResult CollBroadCastMix::CalcStreamNum(u32& streamNum)
 {
     u32 totalStreamNum = 0U;
-
+    
     if (topoAttr_.deviceType == DevType::DEV_TYPE_910B) {
         totalStreamNum = topoAttr_.deviceNumPerAggregation;
     } else if (topoAttr_.deviceType == DevType::DEV_TYPE_910_93) {
@@ -75,8 +75,8 @@ HcclResult CollBroadCastMix::KernelRun(const OpParam &param, ExecMem &execMem)
     HCCL_CONFIG_INFO(HCCL_ALG, "[CollBroadCastMix][KernelRun] The CollBroadCastMix starts.");
     u32 perDataSize = 0;
     CHK_RET(SalGetDataTypeSize(param.DataDes.dataType, perDataSize));
-    CHK_PRT_RET(perDataSize == 0,
-        HCCL_ERROR("[CollBroadCastMix][KernelRun]errNo[0x%01611x] datatype[%d] is invalid",
+    CHK_PRT_RET(perDataSize == 0, 
+        HCCL_ERROR("[CollBroadCastMix][KernelRun]errNo[0x%01611x] datatype[%d] is invalid", 
             HCCL_ERROR_CODE(HCCL_E_PARA), param.DataDes.dataType), HCCL_E_PARA);
 
     CHK_RET(CheckCommSize(COMM_LEVEL0, COMM_INDEX_0 + 1));
@@ -110,7 +110,7 @@ HcclResult CollBroadCastMix::KernelRun(const OpParam &param, ExecMem &execMem)
         }
 
         HcomCollOpInfo *scatterOpInfoPtr = nullptr;
-        HcomCollOpInfo scatterOpInfo =
+        HcomCollOpInfo scatterOpInfo = 
             {"", execMem.inputPtr, nullptr, param.DataDes.count, param.DataDes.dataType, param.root};
 
         if (topoType_ == TopoType::TOPO_TYPE_NP_DOUBLE_RING) {
@@ -139,7 +139,7 @@ HcclResult CollBroadCastMix::KernelRun(const OpParam &param, ExecMem &execMem)
         CHK_PRT_RET(ret != HCCL_SUCCESS,
             HCCL_ERROR("[CollBroadCastMix][KernelRun]errNo[0x%016llx]invalid root[%u] to get userrank",
                 HCCL_ERROR_CODE(ret), param.root), ret);
-
+        
         CHK_RET(level0Executor->Prepare(execMem.inputMem, execMem.outputMem, execMem.outputMem, execMem.count,
                 param.DataDes.dataType, param.stream, HCCL_REDUCE_RESERVED, rootRank, dataSegsSlice));
 
@@ -157,7 +157,7 @@ HcclResult CollBroadCastMix::KernelRun(const OpParam &param, ExecMem &execMem)
     u64 level1DataCount = level1DataSize / perDataSize;
     HCCL_DEBUG("[CollBroadCastMix][KernelRun]usrRank[%u] level1 use level1DataCount[%llu]",
         topoAttr_.userRank, level1DataCount);
-
+    
     CHK_RET(CheckCommSize(COMM_LEVEL1, commIndex + 1));
     SubCommInfo level1CommInfo = GetSubCommInfo(COMM_LEVEL1, commIndex);
     HCCL_DEBUG("[CollBroadCastMix][KernelRun]commIdx:%u TagCommInfo[%s].commLevel1.size():%u",
@@ -189,8 +189,8 @@ HcclResult CollBroadCastMix::KernelRun(const OpParam &param, ExecMem &execMem)
 
     u32 planeRoot = 0;
     CHK_RET(GetRankByUserRank(COMM_LEVEL1, commIndex, subUserrankRoot, planeRoot));
-
-    CHK_RET(level1Executor->Prepare(execMem.inputMem, execMem.inputMem, execMem.outputMem, level1DataCount,
+    
+    CHK_RET(level1Executor->Prepare(execMem.inputMem, execMem.inputMem, execMem.outputMem, level1DataCount, 
         param.DataDes.dataType, param.stream, HCCL_REDUCE_RESERVED, planeRoot, std::vector<Slice>(0),
         dataSegsSlice[commIndex].offset));
 
@@ -281,7 +281,7 @@ HcclResult CollBroadCastMix::DoubleRingScatter(const std::string &tag, DeviceMem
     CHK_SMART_PTR_NULL(executor);
 
     CHK_RET(executor ->Prepare(const_cast<HcomCollOpInfo *>(opInfo), topoAttr_.userRank, level0CommInfo1.localRank,
-        algResResp_->slaveStreams, algResResp_->notifiesMain, algResResp_->notifiesAux,
+        algResResp_->slaveStreams, algResResp_->notifiesMain, algResResp_->notifiesAux, 
         doubleRingsOrders, multRingsSliceZero, doubleRingUserMemInputSlices));
 
     u32 rootRank = 0;

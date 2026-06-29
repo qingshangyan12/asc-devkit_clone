@@ -7,13 +7,13 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-
+ 
 #ifndef HCCL_AIV_H
 #define HCCL_AIV_H
-
+ 
 #include <vector>
 #include "string"
-
+ 
 #include "hccl_types.h"
 #include "acl/acl_rt.h"
 #include "hccl_common.h"
@@ -108,22 +108,22 @@ enum class KernelArgsType {
 enum class HcclAiRMAMemType : u32 {
     LOCAL_INPUT = 0,
     REMOTE_INPUT,
-
+ 
     LOCAL_OUTPUT,
     REMOTE_OUTPUT,
-
+ 
     // 可透传更多的内存，可在MAX_NUM之前追加，例如：
     // LOCAL_EXP,
     // REMOTE_EXP,
     MAX_NUM
 };
-
+ 
 constexpr u32 GetAiMemTypeVal(HcclAiRMAMemType value) {
     return static_cast<u32>(value);
 }
-
+ 
 constexpr u32 AiMemMaxNum = GetAiMemTypeVal(HcclAiRMAMemType::MAX_NUM);
-
+ 
 // Transport 内存信息
 struct HcclAiRMAMemInfo {
     uint32_t memMaxNum{0};  // 最大内存数量，等于 HcclAiRMAMemType::MAX_NUM
@@ -131,41 +131,41 @@ struct HcclAiRMAMemInfo {
     uint64_t memDetailPtr{0};  // MemDetails数组首地址, 个数: HcclAiRMAMemType::MAX_NUM
     // 可往后追加字段
 };
-
+ 
 // 全部 Transport QP/Mem 信息
 struct HcclRMAInfo {
     uint32_t curRankId{0};  // 当前rankId
     uint32_t rankNum{0};  // rank数量
     uint32_t qpNum{0};  // 单个Transport的QP数量
-
+ 
     uint32_t sizeOfRMAWQ{0};  // sizeof(HcclAiRMAWQ)
     uint32_t sizeOfRMACQ{0};  // sizeof(HcclAiRMACQ)
     uint32_t sizeOfRMAMem{0};  // sizeof(HcclAiRMAMemInfo)
-
+ 
     // HcclAiRMAWQ二维数组首地址
     // QP个数: rankNum * qpNum
     // 计算偏移获取SQ指针：sqPtr + (dstRankId * qpNum + qpIndex) * sizeOfRMAWQ
     // 0 <= qpIndex < qpNum
     uint64_t sqPtr{0};
-
+ 
     // HcclAiRMACQ二维数组首地址
     // QP个数: rankNum * qpNum
     // 计算偏移获取SCQ指针：scqPtr + (dstRankId * qpNum + qpIndex) * sizeOfRMACQ
     // 0 <= qpIndex < qpNum
     uint64_t scqPtr{0};
-
+ 
     // HcclAiRMAWQ二维数组首地址
     // QP个数: rankNum * qpNum
     // 计算偏移获取RQ指针：rqPtr + (dstRankId * qpNum + qpIndex) * sizeOfRMAWQ
     // 0 <= qpIndex < qpNum
     uint64_t rqPtr{0};
-
+ 
     // HcclAiRMACQ二维数组首地址
     // QP个数: rankNum * qpNum
     // 计算偏移获取RCQ指针: rcqPtr + (dstRankId * qpNum + qpIndex) * sizeOfRMACQ
     // 0 <= qpIndex < qpNum
     uint64_t rcqPtr{0};
-
+ 
     // HcclAivMemInfo一维数组
     // 内存信息个数: rankNum
     // 计算偏移获取内存信息指针: memPtr + rankId * sizeOfRMAMem
@@ -196,14 +196,14 @@ struct ExtraArgsV2 {
 struct AivOpArgs {
     HcclCMDType cmdType;
     const void* input;
-    const void* output;
+    const void* output; 
     u64 count;
     HcclDataType dataType;
     HcclReduceOp op;
     u32 root;
     bool isOpBase;
 };
-
+ 
 // 表示拓扑信息的参数
 struct AivTopoArgs {
     u32 rank;
@@ -213,14 +213,14 @@ struct AivTopoArgs {
     u32 serverNum;
     DevType devType;
     std::string identify;
-
+ 
     AivTopoArgs(u32 rank, u32 rankSize, u32 devId = MAX_RANK_SIZE, u32 serverId = 0, u32 serverNum = 1,
         DevType devType = DevType::DEV_TYPE_910B, std::string identify= "INVALID_COMM")
     : rank(rank), rankSize(rankSize), devId(devId), serverId(serverId), serverNum(serverNum), devType(devType), identify(identify)
     {
     }
 };
-
+ 
 // 表示AIV所需要的资源参数
 struct AivResourceArgs {
     std::string commTag;
@@ -231,7 +231,7 @@ struct AivResourceArgs {
     u32 numBlocks;
     s32 aivTag;
 };
-
+ 
 // 表示AIV算法流程控制的参数
 struct AivAlgArgs {
     s32 step;
@@ -241,9 +241,9 @@ struct AivAlgArgs {
     s32 execTimeOut;
     bool execTimeOutSet; // true表示set by commConfig
     bool isNpuDirectRoce;
-    u64 rmaInfo;
-
-    explicit AivAlgArgs(s32 step = -1, bool isSmallCount = false, u32 deterministic = 0,
+    u64 rmaInfo; 
+ 
+    explicit AivAlgArgs(s32 step = -1, bool isSmallCount = false, u32 deterministic = 0, 
         KernelArgsType argsType = KernelArgsType::ARGS_TYPE_SERVER,
         s32 execTimeOut = static_cast<s32>(AIV_TIMEOUT_DEFAULT), bool execTimeOutSet = false,
         bool isNpuDirectRoce = false, u64 rmaInfo = 0)
@@ -253,7 +253,7 @@ struct AivAlgArgs {
     {
     }
 };
-
+ 
 // 表示AIVProfiling所需要的参数
 struct AivProfilingInfo{
     uint64_t beginTime = 0;
@@ -289,7 +289,7 @@ using AivSuperKernelArgs = struct AivSuperKernelArgsDef {
     s32 tag; // 第几次调用，定时重置成1
     s64 clearEnable;
     u32 devType;
-
+ 
     AivSuperKernelArgsDef(void** buffIn, void** buffOut, u32 rank,
         u32 rankSize, u64 len, u32 dataType, u32 unitSize, u32 reduceOp,u32 numBlocks = 0, s32 tag = 0, bool clearEnable = true, u32 devType = DEV_TYPE_910_93)
         : rank(rank), rankSize(rankSize), len(len), dataType(dataType), unitSize(unitSize), reduceOp(reduceOp), numBlocks(numBlocks),tag(tag), clearEnable(clearEnable), devType(devType)
@@ -309,7 +309,7 @@ enum class KernelLaunchMode {
     LAUNCH_MODE_ARGS_EXTRA_V2,  // Launch模式，基础参数+ExtraArgsV2
     LAUNCH_MODE_ARGS_EXTRA_A3   // Launch模式，A3跨机
 };
-
+ 
 HcclResult ExecuteKernelLaunchImpl(const AivOpArgs &opArgs, const AivTopoArgs &topoArgs,
     const AivResourceArgs &resourceArgs, const AivAlgArgs &algArgs,
     AivProfilingInfo& aivProfilingInfo, KernelLaunchMode launchMode, void* extraArgsPtr = nullptr);
@@ -317,26 +317,26 @@ HcclResult ExecuteKernelLaunchImpl(const AivOpArgs &opArgs, const AivTopoArgs &t
 
 HcclResult RegisterKernel(DevType deviceType);
 HcclResult UnRegisterAivKernel();
-
+    
 HcclResult ClearAivSyncBufForMulServer(const AivResourceArgs &resourceArgs, const AivTopoArgs &topoArgs, void* args,
     u32 argsSize);
 
 inline s32 GetNextAivTag(s32 curTag, s32 tagIncre = 1) { return (curTag + tagIncre - 1) % TAG_RESET_COUNT + 1; }
 
 HcclResult ExecuteKernelLaunchInner(const AivOpArgs &opArgs, const AivTopoArgs &topoArgs,
-    const AivResourceArgs &resourceArgs, const AivAlgArgs &algArgs, void* args, u32 argsSize,
+    const AivResourceArgs &resourceArgs, const AivAlgArgs &algArgs, void* args, u32 argsSize, 
     AivProfilingInfo& aivProfilingInfo);
 
 HcclResult ExecuteKernelLaunch(const AivOpArgs &opArgs, const AivTopoArgs &topoArgs,
-    const AivResourceArgs &resourceArgs, const AivAlgArgs &algArgs,
+    const AivResourceArgs &resourceArgs, const AivAlgArgs &algArgs, 
     AivProfilingInfo& aivProfilingInfo);
 
 HcclResult ExecuteKernelLaunch(const AivOpArgs &opArgs, const AivTopoArgs &topoArgs,
-    const AivResourceArgs &resourceArgs, const AivAlgArgs &algArgs, const ExtraArgs &extraArgs,
+    const AivResourceArgs &resourceArgs, const AivAlgArgs &algArgs, const ExtraArgs &extraArgs, 
     AivProfilingInfo& aivProfilingInfo);
 
 HcclResult ExecuteKernelLaunch(const AivOpArgs &opArgs, const AivTopoArgs &topoArgs,
-    const AivResourceArgs &resourceArgs, const AivAlgArgs &algArgs, const ExtraArgsV2 &extraArgs,
+    const AivResourceArgs &resourceArgs, const AivAlgArgs &algArgs, const ExtraArgsV2 &extraArgs, 
     AivProfilingInfo& aivProfilingInfo);
 
 HcclResult ReadBinFile(const std::string& fileName, std::string& buffer);

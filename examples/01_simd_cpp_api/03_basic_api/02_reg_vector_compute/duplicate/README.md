@@ -24,7 +24,7 @@
 
 ## 样例描述
 - 样例功能：
-  将标量值3.14填充到输出向量的每个位置，向量元素个数为256，数据类型为float。
+  将标量值3.14填充到输出向量的每个位置，向量元素个数为256，数据类型为float。  
 - 样例规格：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
@@ -32,11 +32,11 @@
   <tr><td align="center">y</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">duplicate</td></tr>
   </table>
-- 样例实现：
+- 样例实现：  
   DuplicateScalarVF函数内调用Duplicate接口进行标量填充：
   - 使用Duplicate接口将标量值填充到dstReg的每个元素
   - 使用StoreAlign将结果写回UB
-  - 调用实现
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行

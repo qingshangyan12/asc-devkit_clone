@@ -78,7 +78,7 @@ public:
 
     // 1.查询成功：输入key是表中某一最相近key的子集、全集。 返回true，最相近key的bufferType
     // 2.查询失败：输入key是表中某一个最相近key的空集、交集。返回false，空bufferType
-    std::pair<bool, BufferType> Find(const KeyType& key) const
+    std::pair<bool, BufferType> Find(const KeyType& key) const 
     {
         auto it = intervalTree_.lower_bound(key);
         if (it != intervalTree_.end() && (it->first == key || it->first.IsSuperset(key))) {
@@ -103,7 +103,7 @@ public:
                     key.ToString().c_str(), it->first.ToString().c_str());
             } else {
                 HCCL_WARNING("Key[%s] not found. There is no key in table.",
-                    key.ToString().c_str());
+                    key.ToString().c_str());            
             }
         }
 
@@ -128,7 +128,7 @@ public:
         // 引用计数大于0，不删除
         HCCL_RUN_INFO("Memory reference count is larger than 0, (used by other RemoteRank), do not deregister memory."
              "current memory reference count[%llu], %s.", it->second.ref, key.ToString().c_str());
-        return false;
+        return false; 
     }
 
     ConstIterator End()
@@ -160,7 +160,7 @@ private:
 
             // 情况2：addr_ == it->first.addr_ && size_ < it->first.size_。it->first.IsSubset(key)非必须
             // 情况3：addr_ < it->first.addr_
-            if (it->first.IsSuperset(key) || it->first.IsIntersect(key)) {
+            if (it->first.IsSuperset(key) || it->first.IsIntersect(key)) { 
                 return std::make_pair(it, true);
             }
         }

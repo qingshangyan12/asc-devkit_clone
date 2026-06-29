@@ -33,7 +33,7 @@ void RegisterLaunchTaskCallBack(HcclResult (*p1)(const HcclDispatcher &, hccl::S
 
 HcclResult RegisterLoadTaskCallBack(HcclDispatcher dispatcherPtr, void *userPtr,
     void (*p1)(void *userPtr, void *param, u32 length))
-
+ 
 {
     CHK_PTR_NULL(dispatcherPtr);
     reinterpret_cast<DispatcherPub*>(dispatcherPtr)->RegLoadTaskCallBack(userPtr, p1);

@@ -161,7 +161,7 @@ HcclResult ExecutorBase::Prepare(u32 userRank)
 // AHC 扩展参数
 HcclResult ExecutorBase::Prepare(AHCExtendPreparePara &extendParam)
 {
-    return HCCL_E_PARA;
+    return HCCL_E_PARA;    
 }
 
 /* 2个参数 */
@@ -447,8 +447,8 @@ HcclResult ExecutorBase::Prepare(DeviceMem &inputMem, DeviceMem &outputMem, Devi
 }
 
 // Prepare for AllGatherVPipeline
-HcclResult ExecutorBase::Prepare(HcomCollOpInfo *opInfo, u32 userRank, u64 &count, DeviceMem &cclBufferPartOne,
-    DeviceMem &cclBufferPartTwo, SubCommInfo &level0CommInfo, SubCommInfo &level1CommInfo, Stream &mainStream,
+HcclResult ExecutorBase::Prepare(HcomCollOpInfo *opInfo, u32 userRank, u64 &count, DeviceMem &cclBufferPartOne, 
+    DeviceMem &cclBufferPartTwo, SubCommInfo &level0CommInfo, SubCommInfo &level1CommInfo, Stream &mainStream, 
     std::vector<Stream> &subStream, std::vector<std::shared_ptr<LocalNotify>> &notifyMain,
     std::vector<std::shared_ptr<LocalNotify>> &notifySub, std::vector<Slice>& userOutSlice)
 {
@@ -536,11 +536,11 @@ HcclResult ExecutorBase::Prepare(DeviceMem &inputMem, DeviceMem &outputMem, Devi
 
 //ReduceScatterHccsSio
 HcclResult ExecutorBase::Prepare(DeviceMem &inputMem, DeviceMem &outputMem, DeviceMem &scratchMem, const u64 count,
-        const HcclDataType dataType, const Stream &stream, const HcclReduceOp reductionOp,
-        const u32 root, const u64 baseOffset,
-        const u64 reduceAttrBitMap, std::vector<Stream> &meshStreams,
-        std::vector<std::shared_ptr<LocalNotify>> &meshSignal,
-        std::vector<std::shared_ptr<LocalNotify>> &meshSignalAux,
+        const HcclDataType dataType, const Stream &stream, const HcclReduceOp reductionOp, 
+        const u32 root, const u64 baseOffset, 
+        const u64 reduceAttrBitMap, std::vector<Stream> &meshStreams, 
+        std::vector<std::shared_ptr<LocalNotify>> &meshSignal, 
+        std::vector<std::shared_ptr<LocalNotify>> &meshSignalAux, 
         u32 userRank, SubCommInfo subCommInfoHccs, SubCommInfo subCommInfoSio, HcomCollOpInfo *opInfo)
         {
             return HCCL_E_PARA;

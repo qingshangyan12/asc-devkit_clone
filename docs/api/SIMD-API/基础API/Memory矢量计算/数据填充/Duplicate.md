@@ -69,7 +69,7 @@ Duplicate接口将一个变量或立即数复制多次并填充到向量中。
 import numpy as np
 
 def Duplicate(scalarValue, dst, count):
-    for i in range(count):
+    for i in range(count):     
         dst[i] = scalarValue
 ```
 
@@ -82,7 +82,7 @@ def Duplicate(scalarValue, dst, count):
     __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue, const int32_t& count)
     ```
 
-<cann-filter npu-type="950">
+<cann-filter npu-type="950"> 
 
 - tensor前n个数据计算，源操作数为Tensor
 
@@ -146,7 +146,7 @@ def Duplicate(scalarValue, dst, count):
 
 <cann-filter npu-type="9030">Kirin 9030，支持的数据类型为：half。</cann-filter>
 
-## 返回值说明<a name="section640mcpsimp"></a>
+## 返回值说明<a name="section640mcpsimp"></a>	 
 
 无
 
@@ -206,11 +206,11 @@ def Duplicate(scalarValue, dst, count):
     AscendC::Duplicate<half>(dstLocal, inputVal, srcDataSize);
     ```
 
-<cann-filter npu-type="950">
+<cann-filter npu-type="950"> 
 
 - tensor前n个数据计算样例，源操作数为Tensor
     ```cpp
-    AscendC::Duplicate<half>(dstLocal, srcLocal, srcDataSize);
+    AscendC::Duplicate<half>(dstLocal, srcLocal, srcDataSize);	 
     ```
 </cann-filter>
 结果示例如下：

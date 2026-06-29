@@ -26,9 +26,9 @@
 
 ## 样例描述
 
-- 样例功能：
+- 样例功能：  
   该样例功能是在Normal模式下对输入tensor做TopK计算，用于获取最后一个维度的前k个最大值或最小值及其对应的索引。
-- 样例规格：
+- 样例规格：  
   <table>
   <caption>表1：样例输入输出规格</caption>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center"> topk </td></tr>
@@ -48,16 +48,16 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">topk_custom</td></tr>
   </table>
 
-- 样例实现：
+- 样例实现：  
     本样例中实现的是固定shape为输入数值张量srcLocalValue[2, 32], 索引张量srcLocalIndex[1, 32], 完成标志srcLocalFinish[1, 32], 输出结果数值dstLocalValue[2, 8], 结果索引dstLocalIndex[2, 8]的topk样例。
 
-  - Kernel实现：
+  - Kernel实现：  
     计算逻辑是：输入数据需要先搬运进片上存储，使用TopK高阶API接口完成topk计算，再将结果搬出。
 
-  - Tiling实现：
+  - Tiling实现：  
     该样例的tiling实现流程如下：使用GetTopKMaxMinTmpSize接口计算所需最大/最小临时空间大小，使用最小临时空间，然后根据输入长度确定所需tiling参数。
 
-  - 调用实现
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行

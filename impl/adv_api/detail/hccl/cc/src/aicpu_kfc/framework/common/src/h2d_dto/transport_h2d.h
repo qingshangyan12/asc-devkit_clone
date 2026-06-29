@@ -24,12 +24,12 @@ struct HcclAiRMAInfo {
     // QP个数: rankNum * qpNum
     // 计算偏移获取SQ指针：sqPtr + dstRankId * qpNum * sizeOfAiRMAWQ + qpIndex
     void* sqPtr;
-
+    
     // HcclAiRMACQ二维数组首地址
     // QP个数: rankNum * qpNum
     // 计算偏移获取SCQ指针：scqPtr + dstRankId * qpNum * sizeOfAiRMACQ + qpIndex
     void* scqPtr;
-
+    
     // HcclAiRMAWQ二维数组首地址
     // QP个数: rankNum * qpNum
     // 计算偏移获取RQ指针：rqPtr + dstRankId * qpNum * sizeOfAiRMAWQ + qpIndex

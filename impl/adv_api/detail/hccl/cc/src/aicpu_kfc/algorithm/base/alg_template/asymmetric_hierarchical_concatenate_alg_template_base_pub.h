@@ -7,20 +7,20 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-
+ 
 #ifndef ASYMMETRIC_HIERARCHICAL_CONCATENATE_ALG_TEMPLATE_BASE_PUB_H
-#define ASYMMETRIC_HIERARCHICAL_CONCATENATE_ALG_TEMPLATE_BASE_PUB_H
-
+#define ASYMMETRIC_HIERARCHICAL_CONCATENATE_ALG_TEMPLATE_BASE_PUB_H  
+ 
 #include <cmath>
 #include <algorithm>
 #include "alg_template_base_pub.h"
 #include "asymmetric_hierarchical_concatenate_base_pub.h"
 #include "comm_ahc_base_pub.h"
 #include "device_capacity.h"
-
+ 
 namespace hccl {
-
-constexpr u32 NSLBDP_MAX_PHASE = 255;
+ 
+constexpr u32 NSLBDP_MAX_PHASE = 255; 
 
 class AHCAlgTemplateBase : public AlgTemplateBase {
 public:
@@ -43,14 +43,14 @@ public:
 protected:
     virtual HcclResult CommAHCInfoInit();
     virtual HcclResult DisposeSubGroups(const u32 rank);
-
+ 
     HcclResult PrepareRunAsync(const u32 rank, const u32 rankSize, const std::vector<LINK> &links) override;
     HcclResult PrepareAlgTemplate (std::unique_ptr<AlgTemplateBase> &tempAlg, const std::vector<Slice> &slices,
         AHCOpType opType);
     HcclResult RunInstance(const u32 rank, const std::vector<LINK> &links, std::vector<Slice> &slices,
         std::unique_ptr<AlgTemplateBase> &tempAlg, AHCOpType opType);
     HcclResult MemcpyForSingleOp(const u32 rank, AHCOpType opType);
-
+    
     u32 rankSize_;
     std::unique_ptr<CommAHCBaseInfo> commAHCBaseInfo_;
     std::map<AHCConcOpType, TemplateType> ahcAlgOption_;
@@ -62,12 +62,12 @@ protected:
     AHCExtendPreparePara ahcExtendPreparePara_;
 private:
 };
-
+ 
 class AllGatherAHCBase : public AHCAlgTemplateBase {
 public:
     explicit AllGatherAHCBase(const HcclDispatcher dispatcher);
     ~AllGatherAHCBase() override;
-
+ 
     HcclResult RunAsync(const u32 rank, const u32 rankSize, const std::vector<LINK> &links) override;
     HcclResult GetNslbAdjInfo(const u32 rank, const u32 rankSize,
                               const std::vector<LINK> &links, AdjInfo& nslbAdjInfo) override;
@@ -77,12 +77,12 @@ private:
     virtual HcclResult RunInterAllGather(const u32 rank, const std::vector<LINK> &links,
         const std::unique_ptr<CommAHCBaseInfo> &commAHCBaseInfo) = 0;
 };
-
+ 
 class AllReduceAHCBase : public AHCAlgTemplateBase {
 public:
     explicit AllReduceAHCBase(const HcclDispatcher dispatcher);
     ~AllReduceAHCBase() override;
-
+ 
     HcclResult RunAsync(const u32 rank, const u32 rankSize, const std::vector<LINK> &links) override;
     HcclResult GetNslbAdjInfo(const u32 rank, const u32 rankSize,
                               const std::vector<LINK> &links, AdjInfo& nslbAdjInfo) override;
@@ -94,12 +94,12 @@ private:
     virtual HcclResult RunInterAllReduce(const u32 rank, const std::vector<LINK> &links,
         const std::unique_ptr<CommAHCBaseInfo> &commAHCBaseInfo) = 0;
 };
-
+ 
 class ReduceScatterAHCBase : public AHCAlgTemplateBase {
 public:
     explicit ReduceScatterAHCBase(const HcclDispatcher dispatcher);
     ~ReduceScatterAHCBase() override;
-
+ 
     HcclResult RunAsync(const u32 rank, const u32 rankSize, const std::vector<LINK> &links) override;
     HcclResult GetNslbAdjInfo(const u32 rank, const u32 rankSize,
                               const std::vector<LINK> &links, AdjInfo& nslbAdjInfo) override;

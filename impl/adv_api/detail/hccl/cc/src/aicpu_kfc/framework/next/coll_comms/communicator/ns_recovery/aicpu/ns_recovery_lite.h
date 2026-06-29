@@ -17,11 +17,11 @@
 
 namespace hccl {
 
-class NsRecoveryLite
+class NsRecoveryLite 
 {
 public:
     NsRecoveryLite();
-    void Init(const std::shared_ptr<HDCommunicate>& kfcControlTransferH2D,
+    void Init(const std::shared_ptr<HDCommunicate>& kfcControlTransferH2D, 
         const std::shared_ptr<HDCommunicate>& kfcStatusTransferD2H);
 
     Hccl::KfcCommand BackGroundGetCmd();

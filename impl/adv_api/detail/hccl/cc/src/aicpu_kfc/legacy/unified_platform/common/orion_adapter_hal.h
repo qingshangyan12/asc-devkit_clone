@@ -14,7 +14,7 @@
 
 namespace Hccl
 {
-
+    
 HcclResult HrtHalDrvQueryProcessHostPid(int pid, unsigned int *chipId, unsigned int *vfid,
     unsigned int *hostPid, unsigned int *cpType);
 

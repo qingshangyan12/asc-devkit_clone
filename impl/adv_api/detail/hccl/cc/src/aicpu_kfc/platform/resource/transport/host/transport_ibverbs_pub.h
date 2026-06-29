@@ -39,7 +39,7 @@ inline void CopyAiWQInfo(struct HcclAiRMAWQ& dest, const struct AiDataPlaneWq& s
         dest.wqn, dest.bufAddr, dest.wqeSize, dest.depth, dest.headAddr, dest.tailAddr, dest.dbMode);
     return;
 }
-
+ 
 inline void CopyAiCQInfo(struct HcclAiRMACQ& dest, const AiDataPlaneCq& source, DBMode dbMode)
 {
     dest.cqn = source.cqn;
@@ -171,7 +171,7 @@ public:
     HcclResult DeInit() override;
 
     HcclResult Stop() override;
-
+ 
     HcclResult Resume() override;
 
     HcclResult TxAsync(UserMemType dstMemType, u64 dstOffset, const void *src, u64 len,
@@ -283,7 +283,7 @@ protected:
     virtual HcclResult TxSendNotifyWqe(MemMsg& memMsg, const void *srcMemPtr, u64 srcMemSize, Stream &stream);
     virtual HcclResult RegUserMem(MemType memType, u8*& exchangeDataPtr, u64& exchangeDataBlankSize);
     virtual HcclResult RegCustomUserMem(u8*& exchangeDataPtr, u64& exchangeDataBlankSize);
-    virtual HcclResult RegCustomUserMemWithMsg(void *addr, u64 size, MemMsg &memMsg,
+    virtual HcclResult RegCustomUserMemWithMsg(void *addr, u64 size, MemMsg &memMsg, 
         u8 *&exchangeDataPtr, u64 &exchangeDataBlankSize);
     HcclResult CreateNotifyBuffer(std::shared_ptr<LocalIpcNotify> &localNotify, MemType notifyType,
         u8*& exchangeDataPtr, u64& exchangeDataBlankSize, NotifyLoadType notifyLoadType = NotifyLoadType::HOST_NOTIFY);
@@ -349,7 +349,7 @@ protected:
     std::vector<MemMsg> userHostMemMsg_;
 
     std::vector<MemMsg> remoteUserDeviceMemMsg_;
-    std::vector<MemMsg> remoteUserHostMemMsg_;
+    std::vector<MemMsg> remoteUserHostMemMsg_;   
     std::unique_ptr<HcclMem[]> remoteMemsPtr_;
     u32 remoteMemsNum_;
     std::mutex remoteMemsMutex_;

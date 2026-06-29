@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于ClampMin/ClampMax高阶API实现将Tensor单边截断到scalar的功能。
+本样例基于ClampMin/ClampMax高阶API实现将Tensor单边截断到scalar的功能。  
 ClampMin将输入Tensor中小于scalar的元素替换为scalar，ClampMax将输入Tensor中大于scalar的元素替换为scalar，通过参数配置选择使用ClampMin或ClampMax功能。
 
 ## 本样例支持的产品及CANN软件版本
@@ -27,12 +27,12 @@ ClampMin将输入Tensor中小于scalar的元素替换为scalar，ClampMax将输�
 
 ## 样例描述
 
-- 样例功能：
+- 样例功能：  
   通过参数配置选择使用ClampMin或ClampMax功能：
   - ClampMin：将srcTensor中小于scalar的数替换为scalar，大于等于scalar的数保持不变，作为dstTensor输出
   - ClampMax：将srcTensor中大于scalar的数替换为scalar，小于等于scalar的数保持不变，作为dstTensor输出
 
-  计算公式如下：
+  计算公式如下：  
 
   $$
   ClampMin(srcTensor_i, scalar) =
@@ -50,7 +50,7 @@ ClampMin将输入Tensor中小于scalar的元素替换为scalar，ClampMax将输�
   \end{cases}
   $$
 
-- 样例规格：
+- 样例规格：  
   <table>
   <caption>表1：样例规格</caption>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center"> clampmin/clampmax </td></tr>
@@ -64,7 +64,7 @@ ClampMin将输入Tensor中小于scalar的元素替换为scalar，ClampMax将输�
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">clampmin_clampmax_custom</td></tr>
   </table>
 
-- 样例实现：
+- 样例实现：  
 
   - Kernel实现
 
@@ -74,14 +74,14 @@ ClampMin将输入Tensor中小于scalar的元素替换为scalar，ClampMax将输�
 
     Host侧通过GetClampMaxMinTmpSize接口获取ClampMin/ClampMax接口计算所需的最大和最小临时空间。
 
-  - 调用实现
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
-## 编译运行
+## 编译运行  
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -101,7 +101,7 @@ ClampMin将输入Tensor中小于scalar的元素替换为scalar，ClampMax将输�
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
-
+  
   示例如：
 
   ```bash

@@ -23,7 +23,7 @@ A Matmul example with M/N-direction preload to reduce MTE2 gaps. When the MTE2 p
 ```
 ## Example Description
 
-- Example Function:
+- Example Function:  
   The example implements 2 scenarios: Preload M-direction pipeline parallelism and Preload N-direction pipeline parallelism, controlled by the MatmulConfig doMTE2Preload parameter. When preloadMode is 1 in the code, M-direction pipeline parallelism is used. When preloadMode is 2, N-direction pipeline parallelism is used.
 
 - Constraints
@@ -33,7 +33,7 @@ A Matmul example with M/N-direction preload to reduce MTE2 gaps. When the MTE2 p
   - The condition for M Double buffer is depthA1 = stepM * stepK * 2
   - The condition for N Double buffer is depthB1 = stepN * stepK * 2
 
-- Example Specifications:
+- Example Specifications:  
   In this example: M = 128, N = 24576, K = 512.
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center">Matmul</td></tr>
@@ -49,7 +49,7 @@ A Matmul example with M/N-direction preload to reduce MTE2 gaps. When the MTE2 p
   - Key Kernel Steps
     - Configure the MatmulConfig template parameter, enable the doMTE2Preload switch with value 1 (M direction) or 2 (N direction), and create the Matmul object.
       ```cpp
-      static constexpr MatmulConfig MM_CFG_PRELOAD = GetMDLConfig(false, false, 2);
+      static constexpr MatmulConfig MM_CFG_PRELOAD = GetMDLConfig(false, false, 2); 
       AscendC::Matmul<
         AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
         AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
@@ -58,12 +58,12 @@ A Matmul example with M/N-direction preload to reduce MTE2 gaps. When the MTE2 p
         MM_CFG_PRELOAD> matmulObj;
       ```
 
-- Invocation Implementation
+- Invocation Implementation  
   Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables
+- Configure Environment Variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

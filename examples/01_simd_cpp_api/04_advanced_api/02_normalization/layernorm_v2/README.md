@@ -13,7 +13,7 @@
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
-
+ 
 ```
 ├── layernorm_v2
 │   ├── scripts
@@ -26,7 +26,7 @@
 
 ## 样例描述
 
-- 样例功能：
+- 样例功能：  
   本样例在一个核函数中依次调用LayerNorm和Normalize高阶API，两者配合使用实现完整的归一化计算。LayerNorm计算均值mean和标准差倒数rstd，然后根据rstd计算方差var，公式：
   $$
   var = 1/(rstd*rstd) - \epsilon
@@ -36,7 +36,7 @@
   y_i = \gamma_i \cdot \frac{x_i - \mu}{\sqrt{var + \epsilon}} + \beta_i
   $$
 
-- 样例规格：
+- 样例规格：  
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center"> layernorm_v2 </td></tr>
 
@@ -56,7 +56,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">layernormv2_custom</td></tr>
   </table>
 
-- 样例实现：
+- 样例实现：  
   本样例使用 **AR格式**（shape为[A, R]），在一个核函数中依次调用LayerNorm和Normalize高阶API进行归一化计算。A为批处理轴，R为归一化轴。详细说明请参考 LayerNorm API文档和Normalize API文档。
 
   - Kernel实现
@@ -72,20 +72,20 @@
     1. 分别获取并设置LayerNorm和Normalize接口能完成计算所需的最小临时空间大小。
     2. 根据输入shape、剩余的可供计算的空间大小等信息分别获取两个API kernel侧接口所需tiling参数。
 
-  - 调用实现
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
-## 编译运行
+## 编译运行  
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
-
+    
 - 样例执行
 
   在本样例目录下执行如下命令。

@@ -13,20 +13,20 @@
 #include "types/dev_type.h"
 
 namespace hccl {
-const std::unordered_map<HcclDataType, aclDataType> hccl2rtDataTypeMap = {
-    {HCCL_DATA_TYPE_INT8, ACL_INT8},
-    {HCCL_DATA_TYPE_INT16, ACL_INT16},
-    {HCCL_DATA_TYPE_INT32, ACL_INT32},
-    {HCCL_DATA_TYPE_FP16, ACL_FLOAT16},
-    {HCCL_DATA_TYPE_FP32, ACL_FLOAT},
-    {HCCL_DATA_TYPE_BFP16, ACL_BF16},
-};
-
-
-const std::unordered_map<HcclReduceOp, aclrtReduceKind> hccl2rtReduceOpMap = {
-    {HCCL_REDUCE_SUM, ACL_RT_MEMCPY_SDMA_AUTOMATIC_SUM},
-    {HCCL_REDUCE_MAX, ACL_RT_MEMCPY_SDMA_AUTOMATIC_MAX},
-    {HCCL_REDUCE_MIN, ACL_RT_MEMCPY_SDMA_AUTOMATIC_MIN},
+const std::unordered_map<HcclDataType, aclDataType> hccl2rtDataTypeMap = { 
+    {HCCL_DATA_TYPE_INT8, ACL_INT8}, 
+    {HCCL_DATA_TYPE_INT16, ACL_INT16}, 
+    {HCCL_DATA_TYPE_INT32, ACL_INT32}, 
+    {HCCL_DATA_TYPE_FP16, ACL_FLOAT16}, 
+    {HCCL_DATA_TYPE_FP32, ACL_FLOAT}, 
+    {HCCL_DATA_TYPE_BFP16, ACL_BF16}, 
+}; 
+ 
+ 
+const std::unordered_map<HcclReduceOp, aclrtReduceKind> hccl2rtReduceOpMap = { 
+    {HCCL_REDUCE_SUM, ACL_RT_MEMCPY_SDMA_AUTOMATIC_SUM}, 
+    {HCCL_REDUCE_MAX, ACL_RT_MEMCPY_SDMA_AUTOMATIC_MAX}, 
+    {HCCL_REDUCE_MIN, ACL_RT_MEMCPY_SDMA_AUTOMATIC_MIN}, 
 };
 
 CpuTsThread::CpuTsThread(rtStream_t rtStream, uint32_t notifyNum, const NotifyLoadType notifyLoadType)
@@ -254,7 +254,7 @@ HcclResult CpuTsThread::LocalNotifyWait(uint32_t notifyIdx, uint32_t timeOut) co
     HcclResult ret = notify->Wait(*stream, timeOut);
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[%s]fail, notifyIdx[%u], timeOut[%u].",
         __func__, notifyIdx, timeOut), ret);
-
+    
     HcclSignalInfo signalInfo;
     CHK_RET(notify->GetNotifyData(signalInfo));
     CHK_RET(ReportHostNotifyWaitTask(signalInfo.resId, beginTime, isMaster_));
@@ -278,7 +278,7 @@ HcclResult CpuTsThread::LocalCopy(void *dst, const void *src, uint64_t sizeByte)
     CHK_PTR_NULL(stream);
     CHK_RET(hrtMemAsyncCopy(dst, sizeByte, src, sizeByte,
         HcclRtMemcpyKind::HCCL_RT_MEMCPY_KIND_DEVICE_TO_DEVICE, stream->ptr()));
-
+    
     CHK_RET(ReportHostLocalCopyTask(dst, src, sizeByte, beginTime, isMaster_));
 #endif
     return HCCL_SUCCESS;
@@ -299,7 +299,7 @@ HcclResult CpuTsThread::LocalReduce(
             GetDataTypeEnumStr(static_cast<HcclDataType>(dataType)).c_str());
         return HCCL_E_PARA;
     }
-
+    
     auto reduceOpIt = hccl2rtReduceOpMap.find(static_cast<HcclReduceOp>(reduceOp));
     if (reduceOpIt == hccl2rtReduceOpMap.end()) {
         HCCL_ERROR("[%s]reduceOp[%s] is not supported", __func__,

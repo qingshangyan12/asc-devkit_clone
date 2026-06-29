@@ -117,10 +117,10 @@ __simd_vf__ inline void ReduceVF(__ubuf__ half* dstAddr, __ubuf__ half* srcAddr,
 {
     AscendC::Reg::RegTensor<T> srcReg;
     AscendC::Reg::RegTensor<T> dstReg;
-    AscendC::Reg::MaskReg mask;
+    AscendC::Reg::MaskReg mask;    
     AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
     mask = AscendC::Reg::UpdateMask<T>(count);
-    AscendC::Reg::Reduce<AscendC::Reg::ReduceType::MAX>(dstReg, srcReg, mask);
+    AscendC::Reg::Reduce<AscendC::Reg::ReduceType::MAX>(dstReg, srcReg, mask); 
     AscendC::Reg::StoreAlign(dstAddr, dstReg, mask);
 } // End of Vector Function
 ```
@@ -144,7 +144,7 @@ uint16_t realIndex = *reinterpret_cast<uint16_t*>(&maxIndex);
 2. data01和data02相加得到data001，data03和data04相加得到data002，……，data63和data64相加得到data032；
 3. 以此类推，得到目的操作数为1个half类型的数据sum。
 
-**图1** reg_reduce_index<a name="zh-cn_topic_0000002537812548_fig1630121573314"></a>
+**图1** reg_reduce_index<a name="zh-cn_topic_0000002537812548_fig1630121573314"></a>  
 ![reg_reduce_index](../../../../figures/reg_reduce_index.png "reg_reduce_index")
 
 **mask为空与srcReg异常值处理规则：**<a name="mask为空与srcReg异常值处理规则"></a>
@@ -159,7 +159,7 @@ uint16_t realIndex = *reinterpret_cast<uint16_t*>(&maxIndex);
 MAX/MIN归约产生两个有效结果，需要分别提取。以下示例中dstAddr为32B对齐地址，如果需要写出到非对齐地址，请参考[连续非对齐搬出\(StoreUnAlign\)](../Reg数据搬出/连续非对齐搬出（StoreUnAlign）.md)。
 
 ```cpp
-AscendC::Reg::Reduce<AscendC::Reg::ReduceType::MAX>(dstReg, srcReg, pregFull);
+AscendC::Reg::Reduce<AscendC::Reg::ReduceType::MAX>(dstReg, srcReg, pregFull); 
 ```
 
 方式一：整体存出后按偏移访问（最直接，适用于需要同时使用值和索引的场景）
@@ -167,7 +167,7 @@ AscendC::Reg::Reduce<AscendC::Reg::ReduceType::MAX>(dstReg, srcReg, pregFull);
 ```cpp
 AscendC::Reg::MaskReg pregVL2 = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::VL2>();
 // 后续直接访问// dstAddr[0] -> 最大值// dstAddr[1] -> 最大值索引
-AscendC::Reg::StoreAlign(dstAddr, dstReg, pregVL2);
+AscendC::Reg::StoreAlign(dstAddr, dstReg, pregVL2);  
 ```
 
 方式二：用Mask分离到目标地址
@@ -175,7 +175,7 @@ AscendC::Reg::StoreAlign(dstAddr, dstReg, pregVL2);
 ```cpp
 AscendC::Reg::MaskReg pregVL1 = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::VL1>();
 // 只搬出最大值到目标地址
-AscendC::Reg::StoreAlign(dstAddr, dstReg, pregVL1);
+AscendC::Reg::StoreAlign(dstAddr, dstReg, pregVL1); 
 ```
 
 ## 调用示例<a name="section642mcpsimp"></a>
@@ -184,7 +184,7 @@ AscendC::Reg::StoreAlign(dstAddr, dstReg, pregVL1);
 
     ```cpp
     template<typename T, typename U>
-    __simd_vf__ inline void ReduceVF(__ubuf__ T* dstAddr, __ubuf__ U* srcAddr, uint32_t count,
+    __simd_vf__ inline void ReduceVF(__ubuf__ T* dstAddr, __ubuf__ U* srcAddr, uint32_t count, 
      uint32_t srcRepeatSize, uint32_t dstRepeatSize, uint16_t repeatTimes)
     {
         AscendC::Reg::RegTensor<U> srcReg;

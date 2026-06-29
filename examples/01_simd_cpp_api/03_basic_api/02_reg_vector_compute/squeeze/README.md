@@ -36,7 +36,7 @@
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[1, 64]</td><td align="center">float</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">squeeze</td></tr>
   </table>
-- 样例实现：
+- 样例实现：  
   - 输入向量的shape为[1, 256]，数据类型为float，进行4次迭代，每轮迭代处理64个元素
   - Squeeze：每次调用选择xReg中索引为4的倍数的元素，即xReg[i * 4]依次连续写入yReg[i]中，结果y[0:16]为16个有效元素，剩余的y[16:64]置0，AR特殊寄存器的值置为16
   - StoreUnAlign：根据AR寄存器中的值作为搬运元素个数，搬出yReg中前16个元素至非对齐寄存器ureg或者输出UB地址yAddr

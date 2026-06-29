@@ -224,14 +224,14 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
     // dstLocal：输出Tensor
     // src0Local：输入Tensor
     // src1Local：输入Tensor
-
+    
     uint64_t mask = 128;
     // repeatTime = 4,单次迭代处理128个数，计算512个数需要迭代4次
     // dstBlkStride, srcBlkStride = 1,每个迭代内src0参与计算的数据地址间隔为1个datablock，表示单次迭代内数据连续读取和写入
     // dstRepStride, srcRepStride = 8,相邻迭代间的地址间隔为8个datablock，表示相邻迭代间数据连续读取和写入
     // 标量在后示例
     AscendC::Ors(dstLocal, src0Local, src1Local[0], mask, 4, { 1, 1, 8, 8 });
-
+    
     // 标量在前示例
     static constexpr AscendC::BinaryConfig config = { 0 };
     AscendC::Ors<BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, mask, 4, {1, 1, 8, 8});
@@ -243,14 +243,14 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
     // dstLocal：输出Tensor
     // src0Local：输入Tensor
     // src1Local：输入Tensor
-
+    
     uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
     // repeatTime = 4,单次迭代处理128个数，计算512个数需要迭代4次
     // dstBlkStride, srcBlkStride = 1,每个迭代内src0参与计算的数据地址间隔为1个datablock，表示单次迭代内数据连续读取和写入
     // dstRepStride, srcRepStride = 8,相邻迭代间的地址间隔为8个datablock，表示相邻迭代间数据连续读取和写入
     // 标量在后示例
     AscendC::Ors(dstLocal, src0Local, src1Local[0], mask, 4, {1, 1, 8, 8});
-
+    
     // 标量在前示例
     static constexpr AscendC::BinaryConfig config = { 0 };
     AscendC::Ors<BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, mask, 4, {1, 1, 8, 8});
@@ -261,7 +261,7 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
     ```
     // 标量在后示例
     AscendC::Ors(dstLocal, src0Local, src1Local[0], 512);
-
+    
     // 标量在前示例
     static constexpr AscendC::BinaryConfig config = { 0 };
     AscendC::Ors<BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, 512);
@@ -272,11 +272,11 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
 ```
 // 标量在后，src1Local[0]作为标量
 输入数据src0Local: [1 2 3 ... 512]
-输入数据src1Local: [1]
+输入数据src1Local: [1] 
 输出数据dstLocal: [1 2 3 ... 512]
 
 // 标量在前，src0Local[0]作为标量
 输入数据src0Local: [1]
-输入数据src1Local: [1 2 3 ... 512]
+输入数据src1Local: [1 2 3 ... 512] 
 输出数据dstLocal: [1 2 3 ... 512]
 ```

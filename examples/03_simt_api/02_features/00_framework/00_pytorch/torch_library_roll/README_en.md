@@ -112,7 +112,7 @@ This example uses the Roll operator to demonstrate how to register custom operat
   pip3 install expecttest     # Dependency for torch_npu.testing.testcase
   ```
 
-- Configure Environment Variables
+- Configure Environment Variables  
 
   Configure environment variables based on the [installation method](../../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash

@@ -203,7 +203,7 @@ private:
         initConstValueParams.blockNum = blockNum;
         initConstValueParams.dstGap = 0;
         initConstValueParams.initValue = 0;
-        KERNEL_LOG(KERNEL_DEBUG,
+        KERNEL_LOG(KERNEL_DEBUG, 
             "[LoadAL1] initConstValueParams.repeatTimes %d, initConstValueParams.blockNum %d \n",
             initConstValueParams.repeatTimes,
             initConstValueParams.blockNum);
@@ -449,7 +449,7 @@ private:
                       self_->ctx.nBL1Iter * self_->ctx.conv3dTiling->nBL1 * self_->ctx.cin0;
         currentNBL1 = IsNTail() ? self_->ctx.nBL1TailAlign : self_->ctx.conv3dTiling->nBL1;
         currentKBL1 = IsKBL1Tail() ? self_->ctx.conv3dTiling->kBL1Tail : self_->ctx.conv3dTiling->kBL1;
-
+        
         loadData2dParams.srcStride = 1;
     }
 

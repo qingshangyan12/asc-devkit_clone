@@ -180,7 +180,7 @@ HcclResult HcclCommunicatorAttrs::SetInterModeInSuperPod()
     return HCCL_SUCCESS;
 }
 
-HcclResult HcclCommunicatorAttrs::SethbRankInfo(const std::vector<RankInfo> &rankList,
+HcclResult HcclCommunicatorAttrs::SethbRankInfo(const std::vector<RankInfo> &rankList, 
     WorldGroupInfo &groupCommonData)
 {
     // 记录serverId

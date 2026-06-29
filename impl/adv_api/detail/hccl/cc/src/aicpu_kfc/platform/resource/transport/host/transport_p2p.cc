@@ -102,7 +102,7 @@ HcclResult TransportP2p::Init()
         machinePara_.remoteDeviceId, machinePara_.localUserrank, machinePara_.localWorldRank,
         machinePara_.remoteUserrank, machinePara_.remoteWorldRank, machinePara_.deviceType,
         machinePara_.inputMem.ptr(), machinePara_.outputMem.ptr(), machinePara_.linkAttribute,
-        machinePara_.linkMode, machinePara_.notifyNum, machinePara_.isIndOp,
+        machinePara_.linkMode, machinePara_.notifyNum, machinePara_.isIndOp, 
         machinePara_.exchangeInfo.size(), machinePara_.specifyLink);
     HcclUs startut = TIME_NOW();
 
@@ -154,9 +154,9 @@ HcclResult TransportP2p::Init()
 
     HcclUs endut = TIME_NOW();
     HCCL_INFO("Time:%lld us", DURATION_US(endut - startut));
-
+    
     HCCL_USER_CRITICAL_LOG("create hccl transport:communicator[%s], local rank[%u], remote rank[%u], "\
-        "transporttype[%s]", machinePara_.tag.c_str(), machinePara_.localUserrank,
+        "transporttype[%s]", machinePara_.tag.c_str(), machinePara_.localUserrank, 
         machinePara_.remoteUserrank, GetLinkTypeEnumStr(GetLinkType()).c_str());
 
     return HCCL_SUCCESS;
@@ -291,7 +291,7 @@ HcclResult TransportP2p::FillExchangeDataTotalSize()
         ipcMemDataSize = sizeof(u64) + sizeof(u64); // addr + length
         exchangeInfoSize_.ipcMenSize = ipcMemDataSize * (2 + machinePara_.mem.size()); // 2: input  & output + mem.size()
     }
-
+ 
     // notify 信息
     if (machinePara_.linkMode != LinkMode::LINK_SIMPLEX_MODE ||
         machinePara_.machineType == MachineType::MACHINE_CLIENT_TYPE) {
@@ -317,7 +317,7 @@ HcclResult TransportP2p::FillExchangeDataTotalSize()
 
     exchangeDataTotalSize_ = exchangeInfoSize_.ipcMenSize + exchangeInfoSize_.notifySize + exchangeInfoSize_.exDataSize
         + exchangeInfoSize_.indOpMemSize + sizeof(ExchangeInfoSize);
-    HCCL_INFO("[TransportP2p][FillExchangeDataTotalSize] exchangeDataTotalSize[%llu] memSize[%d]",
+    HCCL_INFO("[TransportP2p][FillExchangeDataTotalSize] exchangeDataTotalSize[%llu] memSize[%d]", 
         exchangeDataTotalSize_, machinePara_.mem.size());
     return HCCL_SUCCESS;
 }
@@ -367,7 +367,7 @@ HcclResult TransportP2p::ConstructExchangeForSend()
     CHK_RET(ConstructExchangeDataForSend(exchangeDataPtr, exchangeDataBlankSize));
     CHK_RET(SumCheckSizeAndConsisten(ExInfoType::EX_EXDATA_SIZE, exchangeInfoSize_.exDataSize,
         blankSizeRecord, exchangeDataBlankSize));
-
+    
     // 独立算子内存资源，无需检查大小
     if (machinePara_.isIndOp) {
         if (sendPid != recvPid_ || recvSdid_ != INVALID_INT) { // 跨进程方式交换
@@ -892,7 +892,7 @@ HcclResult TransportP2p::Wait(u32 notifyIdx, Stream &stream, const u32 timeOut)
         HCCL_ERROR("[TransportP2p][Wait]notifyNum[%u], notifyIdx[%u] out of range[0, %u]", \
         notifyNum_, notifyIdx, notifyNum_-1), HCCL_E_INTERNAL);
 
-    //等待send_done_signal事件
+    //等待send_done_signal事件 
     CHK_RET(dispatcher_->SignalWait(userLocalNotify_[notifyIdx]->ptr(), stream, machinePara_.localUserrank,
         machinePara_.remoteWorldRank, INVALID_VALUE_STAGE, false, userLocalNotify_[notifyIdx]->notifyId_, timeOut));
     return HCCL_SUCCESS;

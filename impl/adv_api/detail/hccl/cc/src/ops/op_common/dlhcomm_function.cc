@@ -19,7 +19,7 @@ DlHcommFunction &DlHcommFunction::GetInstance()
 }
 
 DlHcommFunction::~DlHcommFunction()
-{
+{   
     void* h = nullptr;
     {
         std::lock_guard<std::mutex> lock(handleMutex_);

@@ -22,10 +22,10 @@ A Matmul example that implements GEMV (General Matrix-Vector multiplication). In
 │   └── README.md               // Example description document
 ```
 ## Example Description
-- Example Function:
+- Example Function:  
   When calling the Matmul API for computation, enable GEMV by setting M=1 and the Format parameter of matrix A to CubeFormat::VECTOR.
 
-- Example Specifications:
+- Example Specifications:  
   In this example: M = 1, N = 32, K = 256
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center">Matmul</td></tr>
@@ -53,12 +53,12 @@ A Matmul example that implements GEMV (General Matrix-Vector multiplication). In
       matmul_tiling::DataType::DT_FLOAT16, isAtrans);
       ```
 
-- Invocation Implementation
+- Invocation Implementation  
   Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables
+- Configure Environment Variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

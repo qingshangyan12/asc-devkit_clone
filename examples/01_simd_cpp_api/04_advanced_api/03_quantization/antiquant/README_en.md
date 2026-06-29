@@ -26,8 +26,8 @@ This example uses the [AscendAntiQuant](https://gitcode.com/cann/asc-devkit/blob
 
 ## Example Description
 
-- Example function:
-
+- Example function:  
+  
   Perform element-wise dequantization, for example converting int8_t data type to half data type.
 
 - Example specifications:
@@ -47,18 +47,18 @@ This example uses the [AscendAntiQuant](https://gitcode.com/cann/asc-devkit/blob
   <br clear="left" />
 <br />
 
-- Example implementation:
+- Example implementation:  
   This example implements an antiquant_custom example with fixed shapes of input src[8, 128], offset[1, 128], scale[1, 128], and output dst[8, 128]. It performs element-wise dequantization, converting int8_t type data to half type data.
-  - Kernel implementation
+  - Kernel implementation  
     The computation logic is: This example transfers the input data to on-chip storage, then uses the AscendAntiQuant (A2/A3) or AntiQuantize (950 series) high-level API to complete the dequantization computation, obtain the final result, and transfer it to external storage.
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run
+## Build and Run  
 
 Run the following steps in the root directory of this example to build and run the example.
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -92,8 +92,8 @@ Run the following steps in the root directory of this example to build and run t
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU run, CPU debug, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products; dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
-
-- Execution result
+  
+- Execution result  
   The following execution result indicates that the precision comparison is successful.
   ```bash
   test pass!

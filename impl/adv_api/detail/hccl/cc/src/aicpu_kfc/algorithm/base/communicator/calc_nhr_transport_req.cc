@@ -80,22 +80,22 @@ HcclResult CalcNHRTransportReq::CalcDstRanks(const u32 rank, const std::vector<u
     std::set<u32> &dstRanks)
 {
     CHK_PRT_RET(rank >= commGroups.size(),
-        HCCL_ERROR("[CalcNHRTransportReq][CalcDstRanks] rank [%u] exceed commGroups Size [%u]  error",
+        HCCL_ERROR("[CalcNHRTransportReq][CalcDstRanks] rank [%u] exceed commGroups Size [%u]  error", 
         rank, commGroups.size() ), HCCL_E_INTERNAL);
-
+    
     for (auto i = 0; static_cast<u32>(1 << i) < commGroups.size(); ++i) {
         // 正方向第2^i个节点的rank号
         const u32 targetRankPos = static_cast<u32>(rank + (1 << i)) % commGroups.size();
         dstRanks.insert(commGroups[targetRankPos]);
-
+ 
         // 反方向第2^i个节点的rank号
         const u32 targetRankNeg = static_cast<u32>(rank + commGroups.size() - (1 << i)) % commGroups.size();
 
         HCCL_DEBUG("[CalcNHRTransportReq][CalcDstRanks] local rank[%u], remote rank[%u]", commGroups[rank], commGroups[targetRankNeg]);
-
+    
         dstRanks.insert(commGroups[targetRankNeg]);
     }
-
+ 
     return HCCL_SUCCESS;
 }
 

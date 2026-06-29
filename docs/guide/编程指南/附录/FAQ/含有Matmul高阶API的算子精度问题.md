@@ -27,37 +27,37 @@
             using A_T = half;
             using B_T = half;
             using C_T = float;
-
+         
             AscendC::TPipe pipe;
             TCubeTiling tiling;
             CopyTiling(&tiling, tilingGm);
-
+         
             AscendC::GlobalTensor<A_T> aGlobal;
             AscendC::GlobalTensor<B_T> bGlobal;
             AscendC::GlobalTensor<C_T> cGlobal;
             aGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ A_T *>(a), tiling.M * tiling.Ka);
             bGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ B_T *>(b), tiling.Ka * tiling.N);
             cGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ C_T *>(c), tiling.M * tiling.N);
-
+         
             int offsetA = 0;
             int offsetB = 0;
             int offsetC = 0;
             bool isTransA = false;
             bool isTransB = true;
-
+         
             int tailM = 0;
             int tailN = 0;
             CalcGMOffset(GetBlockIdx(), tiling, offsetA, offsetB, offsetC, tailM, tailN, isTransA, isTransB);
-
+         
             auto gmA = aGlobal[offsetA];
             auto gmB = bGlobal[offsetB];
             auto gmC = cGlobal[offsetC];
-
+         
             AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, A_T>,
                    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, B_T>,
                    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, C_T>> mm;
             REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
-
+        
             mm.SetTensorA(gmA, isTransA);
             mm.SetTensorB(gmB, isTransB);
             mm.SetTail(tailM, tailN);
@@ -152,7 +152,7 @@
         __aicore__ inline void MatmulLeakyKernel<aType, bType, cType, biasType>::Process(AscendC::TPipe *pipe)
         {
             uint32_t computeRound = 0;
-
+        
             matmulObj.SetTensorA(aGlobal);
             matmulObj.SetTensorB(bGlobal);
             matmulObj.SetBias(biasGlobal);
@@ -164,7 +164,7 @@
             }
             matmulObj.End();
         }
-
+         
         template <typename aType, typename bType, typename cType, typename biasType>
         __aicore__ inline void MatmulLeakyKernel<aType, bType, cType, biasType>::MatmulCompute()
         {
@@ -172,14 +172,14 @@
             matmulObj.template GetTensorC<true>(reluOutLocal, false, true);
             reluOutQueue_.EnQue(reluOutLocal); // 将LeakyReluCompute()接口里的reluOutLocal结果输出提前到这里
         }
-
+         
         template <typename aType, typename bType, typename cType, typename biasType>
         __aicore__ inline void MatmulLeakyKernel<aType, bType, cType, biasType>::LeakyReluCompute()
         {
             LeakyRelu(reluOutLocal, reluOutLocal, (cType)0.1, tiling.baseM * tiling.baseN);
             reluOutQueue_.EnQue(reluOutLocal);
         }
-
+         
         template <typename aType, typename bType, typename cType, typename biasType>
         __aicore__ inline void MatmulLeakyKernel<aType, bType, cType, biasType>::CopyOut(uint32_t count)
         {
@@ -201,7 +201,7 @@
             M = 1024
             N = 640
             K = 256
-
+         
             input_a = np.random.randint(-10, 10, [M, K]).astype(np.float16)
             input_b = np.random.randint(-10, 10, [K, N]).astype(np.float16)
             input_bias = np.random.randint(-10, 10, [N]).astype(np.float32)
@@ -246,42 +246,42 @@
             int M = 512;
             int N = 1024;
             int K = 512;
-
+         
             TPosition leftPosition = TPosition::GM;
             CubeFormat leftFormat = CubeFormat::ND;
             DataType leftDtype = DataType::DT_FLOAT16;
             bool isTransA = false;
-
+         
             TPosition rightPosition = TPosition::GM;
             CubeFormat rightFormat = CubeFormat::ND;
             DataType rightDtype = DataType::DT_FLOAT16;
             bool isTransB = false;
-
+         
             TPosition resultPosition = TPosition::GM;
             CubeFormat resultFormat = CubeFormat::ND;
             DataType resultDtype = DataType::DT_FLOAT;
-
+         
             bool isBias = false;
-
+         
             int usedCoreNum = 8;
             int32_t baseM = 128;
             int32_t baseN = 256;
-
+         
             optiling::TCubeTiling tilingData;
             auto ascendcPlatform = platform_ascendc::PlatformAscendCManager::GetInstance(socVersion);
             MultiCoreMatmulTiling tilingApi(*ascendcPlatform);
-
+         
             tilingApi.SetDim(usedCoreNum); // 设置为AIV核数8
             tilingApi.SetAType(leftPosition, leftFormat, leftDtype, isTransA);
             tilingApi.SetBType(rightPosition, rightFormat, rightDtype, isTransB);
             tilingApi.SetCType(resultPosition, resultFormat, resultDtype);
-
+         
             tilingApi.SetOrgShape(M, N, K);
             tilingApi.SetShape(M, N, K);
             tilingApi.SetFixSplit(baseM, baseN, -1);
             tilingApi.SetBias(isBias);
             tilingApi.SetBufferSpace(-1, -1, -1);
-
+         
             int64_t res = tilingApi.GetTiling(tilingData);
             if (res == -1) {
                 std::cout << "gen tiling failed" << std::endl;
@@ -299,7 +299,7 @@
             uint32_t mSingleBlocks = CeilDiv(tiling.M, tiling.singleCoreM);
             uint32_t mCoreIndx = blockIdx % mSingleBlocks;
             uint32_t nCoreIndx = blockIdx / mSingleBlocks;
-
+         
             offsetA = mCoreIndx * tiling.Ka * tiling.singleCoreM;
             if (isTransA) {
                 offsetA = mCoreIndx * tiling.singleCoreM;
@@ -308,52 +308,52 @@
             if (isTransB) {
                 offsetB = nCoreIndx * tiling.Kb * tiling.singleCoreN;
             }
-            offsetC = mCoreIndx * tiling.singleCoreN * tiling.singleCoreM + nCoreIndx * tiling.singleCoreN; //此处的tiling.singleCoreN参数错误，应为tiling.N
-
+            offsetC = mCoreIndx * tiling.singleCoreN * tiling.singleCoreM + nCoreIndx * tiling.singleCoreN; //此处的tiling.singleCoreN参数错误，应为tiling.N 
+         
             tailM = tiling.M - mCoreIndx * tiling.singleCoreM;
             tailM = tailM < tiling.singleCoreM ? tailM : tiling.singleCoreM;
-
+         
             tailN = tiling.N - nCoreIndx * tiling.singleCoreN;
             tailN = tailN < tiling.singleCoreN ? tailN : tiling.singleCoreN;
         }
-
+         
         extern "C" __global__ __aicore__ void matmul_custom(GM_ADDR a, GM_ADDR b, GM_ADDR c, GM_ADDR workspace,
                                                             GM_ADDR tilingGm)
         {
             using A_T = half;
             using B_T = half;
             using C_T = float;
-
+         
             AscendC::TPipe pipe;
             TCubeTiling tiling;
             CopyTiling(&tiling, tilingGm);
-
+         
             AscendC::GlobalTensor<A_T> aGlobal;
             AscendC::GlobalTensor<B_T> bGlobal;
             AscendC::GlobalTensor<C_T> cGlobal;
             aGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ A_T *>(a), tiling.M * tiling.Ka);
             bGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ B_T *>(b), tiling.Ka * tiling.N);
             cGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ C_T *>(c), tiling.M * tiling.N);
-
+         
             int offsetA = 0;
             int offsetB = 0;
             int offsetC = 0;
             bool isTransA = false;
             bool isTransB = false;
-
+         
             int tailM = 0;
             int tailN = 0;
             CalcGMOffset(GetBlockIdx(), tiling, offsetA, offsetB, offsetC, tailM, tailN, isTransA, isTransB);
-
+         
             auto gmA = aGlobal[offsetA];
             auto gmB = bGlobal[offsetB];
             auto gmC = cGlobal[offsetC];
-
+         
             AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, A_T>,
                    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, B_T>,
                    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, C_T>> mm;
             REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
-
+        
             mm.SetTensorA(gmA, isTransA);
             mm.SetTensorB(gmB, isTransB);
             mm.SetTail(tailM, tailN);
@@ -418,32 +418,32 @@
                 using A_T = half;
                 using B_T = half;
                 using C_T = float;
-
+             
                 AscendC::TPipe pipe;
                 TCubeTiling tiling;
                 CopyTiling(&tiling, tilingGm);
-
+             
                 AscendC::GlobalTensor<A_T> aGlobal;
                 AscendC::GlobalTensor<B_T> bGlobal;
                 AscendC::GlobalTensor<C_T> cGlobal;
                 aGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ A_T *>(a), tiling.M * tiling.Ka);
                 bGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ B_T *>(b), tiling.Ka * tiling.N);
                 cGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ C_T *>(c), tiling.M * tiling.N);
-
+             
                 int offsetA = 0;
                 int offsetB = 0;
                 int offsetC = 0;
                 bool isTransA = false;
                 bool isTransB = false;
-
+             
                 int tailM = 0;
                 int tailN = 0;
                 CalcGMOffset(GetBlockIdx(), tiling, offsetA, offsetB, offsetC, tailM, tailN, isTransA, isTransB);
-
+             
                 auto gmA = aGlobal[offsetA];
                 auto gmB = bGlobal[offsetB];
                 auto gmC = cGlobal[offsetC];
-
+             
                 AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, A_T>,
                        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, B_T>,
                        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, C_T>> mm;
@@ -451,7 +451,7 @@
                 if (GetBlockIdx() == 1) {
                     return;
                 }
-
+                 
                 mm.SetTensorA(gmA, isTransA);
                 mm.SetTensorB(gmB, isTransB);
                 mm.SetTail(tailM, tailN);
@@ -498,7 +498,7 @@
             uint32_t mSingleBlocks = CeilDiv(tiling.M, tiling.singleCoreM);
             uint32_t mCoreIndx = blockIdx % mSingleBlocks;
             uint32_t nCoreIndx = blockIdx / mSingleBlocks;
-
+         
             offsetA = mCoreIndx * tiling.Ka * tiling.singleCoreM;
             if (isTransA) {
                 offsetA = mCoreIndx * tiling.singleCoreM;
@@ -508,52 +508,52 @@
                 offsetB = nCoreIndx * tiling.Kb * tiling.singleCoreN;
             }
             offsetC = mCoreIndx * tiling.N * tiling.singleCoreM + nCoreIndx * tiling.singleCoreN;
-
+         
             // 尾核对应的M/N计算，此处为正确的计算方式
             tailM = tiling.M - mCoreIndx * tiling.singleCoreM;
             tailM = tailM < tiling.singleCoreM ? tailM : tiling.singleCoreM;
-
+         
             tailN = tiling.N - nCoreIndx * tiling.singleCoreN;
             tailN = tailN < tiling.singleCoreN ? tailN : tiling.singleCoreN;
         }
-
+         
         extern "C" __global__ __aicore__ void matmul_custom(GM_ADDR a, GM_ADDR b, GM_ADDR c, GM_ADDR workspace,
                                                             GM_ADDR tilingGm)
         {
             using A_T = half;
             using B_T = half;
             using C_T = float;
-
+         
             AscendC::TPipe pipe;
             TCubeTiling tiling;
             CopyTiling(&tiling, tilingGm);
-
+         
             AscendC::GlobalTensor<A_T> aGlobal;
             AscendC::GlobalTensor<B_T> bGlobal;
             AscendC::GlobalTensor<C_T> cGlobal;
             aGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ A_T *>(a), tiling.M * tiling.Ka);
             bGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ B_T *>(b), tiling.Ka * tiling.N);
             cGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ C_T *>(c), tiling.M * tiling.N);
-
+         
             int offsetA = 0;
             int offsetB = 0;
             int offsetC = 0;
             bool isTransA = false;
             bool isTransB = false;
-
+         
             int tailM = 0;
             int tailN = 0;
             CalcGMOffset(GetBlockIdx(), tiling, offsetA, offsetB, offsetC, tailM, tailN, isTransA, isTransB);
-
+         
             auto gmA = aGlobal[offsetA];
             auto gmB = bGlobal[offsetB];
             auto gmC = cGlobal[offsetC];
-
+         
             AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, A_T>,
                    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, B_T>,
                    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, C_T>> mm;
             REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
-
+        
             mm.SetTensorA(gmA, isTransA);
             mm.SetTensorB(gmB, isTransB);
             // mm.SetTail(tailM, tailN);尾核设置接口，若此处未更新尾块会导致单核精度正确，多核失败

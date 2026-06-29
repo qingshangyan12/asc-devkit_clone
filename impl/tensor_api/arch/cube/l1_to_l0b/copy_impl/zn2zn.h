@@ -77,7 +77,7 @@ private:
         auto dstNoBatchLayout = RemoveBatchDim(dstLayout);
         uint16_t mStartPosition = 0;
         uint16_t kStartPosition = 0;
-        auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstNoBatchLayout) *
+        auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstNoBatchLayout) * 
                      GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstNoBatchLayout);
         auto kStep = Get<0>(dstLayout.Shape());
         // Zn -> Zn

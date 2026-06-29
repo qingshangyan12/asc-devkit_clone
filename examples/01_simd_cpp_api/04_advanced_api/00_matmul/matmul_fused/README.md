@@ -27,10 +27,10 @@
 
 ## 样例描述
 
-- 样例功能：
+- 样例功能：  
   本样例创建MIX模式的Matmul对象，在AIC核实现Matmul计算，中间结果输出至VECIN(Unified Buffer)。AIC核计算完成后，通过TQue的EnQue/DeQue接口控制同步，继续在AIV核对Unified Buffer上的中间结果进行LeakyRelu的计算。
 
-- 样例规格：
+- 样例规格：  
   本样例中：M = 1024, N = 640, K = 256
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
@@ -42,10 +42,10 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_fused_custom</td></tr>
   </table>
 
-- 样例实现：
+- 样例实现： 
 
   - Kernel关键步骤
-    - 创建Matmul对象并初始化。
+    - 创建Matmul对象并初始化。  
     - 创建LeakyRelu对象并初始化。
     - 完成Matmul计算。
     - 完成LeakyRelu计算。
@@ -62,7 +62,7 @@
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

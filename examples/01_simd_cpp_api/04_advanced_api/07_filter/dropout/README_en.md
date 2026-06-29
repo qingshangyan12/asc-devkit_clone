@@ -26,9 +26,9 @@ This example uses the DropOut high-level API in a neural network training scenar
 
 ## Example Description
 
-- Example function:
+- Example function:  
   This example filters the input source operand based on the input mask in the byte mode of DropOut to produce the output destination operand.
-- Example specifications:
+- Example specifications:  
   <table>
   <caption>Table 1: Example Input/Output Specifications</caption>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> dropout </td></tr>
@@ -43,29 +43,29 @@ This example uses the DropOut high-level API in a neural network training scenar
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">dropout_custom</td></tr>
   </table>
 
-- Example implementation:
+- Example implementation:  
     This example implements dropout functionality with fixed shapes of input src[4, 256], mask[4, 32], and output dst[4, 256].
 
-  - Kernel implementation:
+  - Kernel implementation:  
     The computation logic is: Input data must first be transferred to on-chip storage, then the DropOut high-level API is used to complete the dropout computation, and the result is transferred out.
 
-  - Tiling implementation:
+  - Tiling implementation:  
     The tiling implementation process is as follows: Use the GetDropOutMaxMinTmpSize API to calculate the required maximum/minimum temporary space size, use the minimum temporary space, and then determine the required tiling parameters based on the input length.
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run
+## Build and Run  
 
 Run the following steps in the root directory of this example to build and run the example.
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
-
+    
 - Run the example (NPU mode)
   ```bash
   mkdir -p build && cd build;   # Create and enter the build directory

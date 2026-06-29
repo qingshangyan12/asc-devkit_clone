@@ -78,37 +78,37 @@ __aicore__ inline void SetAtomicAdd()
 <cann-filter npu-type="950">
 
 - Ascend 950PR/Ascend 950DT，支持的数据通路为UB/L0C Buffer-\>GM。
-
+ 
 </cann-filter>
 
 <cann-filter npu-type="A3">
 
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据通路为UB/L0C Buffer/L1 Buffer-\>GM。
-
+ 
 </cann-filter>
 
 <cann-filter npu-type="910b">
 
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据通路为UB/L0C Buffer/L1 Buffer-\>GM。
-
+ 
 </cann-filter>
 
 <cann-filter npu-type="310b">
 
 - Atlas 200I/500 A2 推理产品，支持的数据通路为UB/L0C Buffer/L1 Buffer-\>GM。
-
+ 
 </cann-filter>
 
 <cann-filter npu-type="310p">
 
 - Atlas 推理系列产品AI Core，支持的数据通路为UB-\>GM。
-
+ 
 </cann-filter>
 
 <cann-filter npu-type="910">
 
 - Atlas 训练系列产品，支持的数据通路为UB-\>GM。
-
+ 
 </cann-filter>
 
 - 累加操作完成后，建议通过[DisableDmaAtomic](DisableDmaAtomic.md)关闭原子累加，以免影响后续相关指令功能。

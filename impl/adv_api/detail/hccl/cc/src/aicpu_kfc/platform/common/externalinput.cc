@@ -547,7 +547,7 @@ HcclResult ParseExecTimeOut()
     CHK_PRT_RET(!isEnvLenValid,
         HCCL_ERROR("[Parse][ExecuteTimeOut]errNo[0x%016llx] Invalid ExecuteTimeOut env len, len is bigger than "\
             "[%u]. errorno[%d]", HCCL_ERROR_CODE(HCCL_E_PARA), MAX_LEN_OF_DIGIT_ENV, HCCL_E_PARA), HCCL_E_PARA);
-
+    
     CHK_RET(SetHccLExecTimeOut(execTimeOutEnv.c_str(), HcclExecTimeoutSet::HCCL_EXEC_TIMEOUT_SET_BY_ENV));
 
     return HCCL_SUCCESS;
@@ -1743,7 +1743,7 @@ HcclResult CollectRetryEnableFromConfig(const std::vector<std::string> &retryEna
         std::string orginalLevel = retryEnableLevel.substr(0, found);
         std::string orginalRetryEnable = retryEnableLevel.substr(found + 1);
         if (orginalLevel == "L0") {
-           HCCL_RUN_WARNING("[CollectRetryEnableFromConfig] L0 config does not take effect");
+           HCCL_RUN_WARNING("[CollectRetryEnableFromConfig] L0 config does not take effect"); 
         }
         // 检查是否存在重复配置level
         auto iterCountRetryLevel = countHcclRetryLevelMap.find(orginalLevel);

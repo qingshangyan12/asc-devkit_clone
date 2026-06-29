@@ -23,7 +23,7 @@ public:
         return "Instruction based All Gather Seq Executor.";
     }
 
-    // HOST 接口
+    // HOST 接口   
     HcclResult CalcResOffload(
         const RankGraph *rankGraph, const u64 &dataSize, CollOffloadOpResReq &resReq) override;
 
@@ -39,14 +39,14 @@ public:
 
 private:
     HcclResult InitCommInfo(const RankGraph *rankGraph);
-    HcclResult InitCommInfo(const AlgTopoInfo &topoInfo);
+    HcclResult InitCommInfo(const AlgTopoInfo &topoInfo);   
     HcclResult GetTemplateResRequest(
         const RankGraph *rankGraph, std::shared_ptr<InsAlgTemplate> &algTemplate, AlgTempResReq &tempResReq) const;
     HcclResult GetTemplateResRequest(
         ConnectedLinkMgr *linkMgr, std::shared_ptr<InsAlgTemplate> &algTemplate, AlgTempResReq &tempResReq) const;
     HcclResult OrchestrateLoop(std::shared_ptr<InsAlgTemplate> algTemplate);
     HcclResult CreateTemplates(std::shared_ptr<InsAlgTemplate> &algTemplatePtr);
-
+    
     std::map<RankId, u32> virtRankMap_;
     std::vector<std::vector<RankId>> vTopo_;
     ResLinks tempResLinks_;

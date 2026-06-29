@@ -22,10 +22,10 @@ static unordered_map<ThreadHandle, ThreadHandle> g_ThreadD2HMap;
 static mutex g_ThreadMapMtx;
 
 HcclResult CreateThread(CommEngine engine, StreamType streamType,
-    uint32_t notifyNum, NotifyLoadType loadType, shared_ptr<Thread>& out_thread)
+    uint32_t notifyNum, NotifyLoadType loadType, shared_ptr<Thread>& out_thread)  
 {
     out_thread = nullptr;  // 初始化出参
-
+ 
     if (engine == COMM_ENGINE_CPU_TS || engine == COMM_ENGINE_CPU
         || engine == COMM_ENGINE_CCU) {
         EXECEPTION_CATCH(out_thread = make_shared<CpuTsThread>(streamType, notifyNum, loadType), return HCCL_E_PTR);
@@ -34,7 +34,7 @@ HcclResult CreateThread(CommEngine engine, StreamType streamType,
     } else {
         return HCCL_E_NOT_SUPPORT;
     }
-
+ 
     return HCCL_SUCCESS;
 }
 
@@ -94,7 +94,7 @@ HcclResult CommEngineToStreamType(CommEngine engine, StreamType &type)
 }
 
 #ifndef CCL_KERNEL_AICPU
-HcclResult ValidateThreadParams(uint32_t threadNum, uint32_t notifyNumPerThread)
+HcclResult ValidateThreadParams(uint32_t threadNum, uint32_t notifyNumPerThread) 
 {
     if (threadNum == 0 || threadNum > HCOMM_THREADNUM_MAX_NUM) {
         HCCL_ERROR("[%s] Validate thread params failed. ThreadNum %u, range (0, %u]",
@@ -130,33 +130,33 @@ HcclResult SaveThreads(const vector<shared_ptr<Thread>> &newThreads) {
 }
 
 HcclResult CreateAndInitThreads(const ThreadCreateParams& params,
-    vector<shared_ptr<Thread>>& outThreads)
+    vector<shared_ptr<Thread>>& outThreads) 
 {
     HCCL_INFO("[%s] Creating threads with params: engine[%d], threadNum[%u], "
               "notifyNumPerThread[%u], notifyLoadType[%u], streamType[%u]",
               __func__, params.engine, params.threadNum, params.notifyNumPerThread,
-              static_cast<int32_t>(params.notifyLoadType),
+              static_cast<int32_t>(params.notifyLoadType), 
               static_cast<int32_t>(params.streamType));
     outThreads.reserve(params.threadNum);
 
     for (uint32_t i = 0; i < params.threadNum; ++i) {
         shared_ptr<Thread> threadPtr;
         // 创建线程
-        HcclResult ret = CreateThread(params.engine, params.streamType,
-                                      params.notifyNumPerThread,
+        HcclResult ret = CreateThread(params.engine, params.streamType, 
+                                      params.notifyNumPerThread, 
                                       params.notifyLoadType, threadPtr);
-        CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[%s] Failed to create thread at index %u, error: %d",
+        CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[%s] Failed to create thread at index %u, error: %d", 
             __func__, i, ret), ret);
 
         // 初始化线程
         ret = threadPtr->Init();
-        CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[%s] Failed to initialize thread at index %u, error: %d",
+        CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[%s] Failed to initialize thread at index %u, error: %d", 
             __func__, i, ret), ret);
 
         // 添加到输出列表
         outThreads.emplace_back(move(threadPtr));
     }
-    HCCL_INFO("[%s] Successfully created and initialized %u threads",
+    HCCL_INFO("[%s] Successfully created and initialized %u threads", 
               __func__, params.threadNum);
     return HCCL_SUCCESS;
 }
@@ -192,7 +192,7 @@ HcclResult StoreThreadHandles(vector<shared_ptr<Thread>>& newThreads,
             newThreads, aicpuHandle, binHandle);
 
         CHK_PRT_RET(ret != HCCL_SUCCESS,
-            HCCL_ERROR("[StoreThreadHandles] AiCpuKernelLaunch failed, engine[%d], return[%d].",
+            HCCL_ERROR("[StoreThreadHandles] AiCpuKernelLaunch failed, engine[%d], return[%d].", 
                       engine, ret), ret);
 
         // 保存并映射AICPU线程句柄
@@ -200,20 +200,20 @@ HcclResult StoreThreadHandles(vector<shared_ptr<Thread>>& newThreads,
             threads[i] = aicpuHandle[i];
             ThreadHandle hostHandle = reinterpret_cast<ThreadHandle>(newThreads[i].get());
             CHK_RET(FillThreadD2HMap(&aicpuHandle[i], &hostHandle, 1));
-            HCCL_INFO("[StoreThreadHandles] AICPU engine[%d] threadArray[%zu] = [%lu]",
+            HCCL_INFO("[StoreThreadHandles] AICPU engine[%d] threadArray[%zu] = [%lu]", 
                       engine, i, threads[i]);
         }
     } else {
         for (size_t i = 0; i < newThreads.size(); ++i) {
             threads[i] = reinterpret_cast<ThreadHandle>(newThreads[i].get());
-            HCCL_INFO("[StoreThreadHandles] Host engine[%d] threadArray[%zu] = [%lu]",
+            HCCL_INFO("[StoreThreadHandles] Host engine[%d] threadArray[%zu] = [%lu]", 
                       engine, i, threads[i]);
         }
     }
     return HCCL_SUCCESS;
 }
 
-static HcclResult FreeThreadHandlesLocked(const ThreadHandle *threads, uint32_t threadNum,
+static HcclResult FreeThreadHandlesLocked(const ThreadHandle *threads, uint32_t threadNum, 
     vector<ThreadHandle>& deviceHandles)
 {
     lock_guard<mutex> lock(g_ThreadMapMtx);
@@ -238,7 +238,7 @@ static HcclResult FreeThreadHandlesLocked(const ThreadHandle *threads, uint32_t 
         }
         if (inHandle != mappedHandle) {
             // handle不相等表示inhandle为deviceHandle
-            deviceHandles.push_back(inHandle);
+            deviceHandles.push_back(inHandle); 
         }
 
         // 3) 先 erase ThreadMap（unique_ptr 释放对象）

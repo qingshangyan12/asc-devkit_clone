@@ -142,7 +142,7 @@ Kirin 9030，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、hal
 - srcGap = 0，源操作数相邻数据块之间的间隔为0。
 - dstGap = 0，目的操作数相邻数据块之间的间隔为0。
 
-**图1** 连续搬运示意图<a id="zh-cn_topic_0000002540558032_fig187115784817"></a>
+**图1** 连续搬运示意图<a id="zh-cn_topic_0000002540558032_fig187115784817"></a>  
 
 ![](../../../../../figures/L12GM_HighDim_Continuous_Transporting.png)
 
@@ -157,7 +157,7 @@ Kirin 9030，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、hal
 - srcGap= 1，源操作数相邻数据块之间的间隔为1。
 - dstGap= 2，目的操作数相邻数据块之间的间隔为2。
 
-**图2** 非连续搬运示意图<a id="zh-cn_topic_0000002540558032_fig123821924175312"></a>
+**图2** 非连续搬运示意图<a id="zh-cn_topic_0000002540558032_fig123821924175312"></a>  
 
 ![](../../../../../figures/L12GM_HighDim_Discontinuous_Transporting.png)
 

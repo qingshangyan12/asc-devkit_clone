@@ -41,7 +41,7 @@ private:
     HcclResult OrchestrateLoop(std::shared_ptr<InsAlgTemplate> algTemplate);
 
     std::vector<RankId> virtRanks_;
-    std::map<RankId, u32> virtRankMap_;
+    std::map<RankId, u32> virtRankMap_;  
     ResLinks tempResLinks_;
     std::vector<std::vector<RankId>> vTopo_;
     std::vector<InsQuePtr> tempInsQue_;

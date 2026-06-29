@@ -78,7 +78,7 @@ inline void II(uint32_t &a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint
 
 void NSLBMD5::init() {
     finalized = false;
-
+    
     // 初始化状态为标准值
     count[0] = count[1] = 0;
     // 初始化MD5缓冲区
@@ -287,7 +287,7 @@ std::string NSLBMD5::hexdigest() const {
         return "";
     std::string result;
     result.reserve(NSLB_MD5_RESERVE);
-
+    
     for (unsigned int i = 0; i < NSLB_MD5_DIGEST; i++) {
         // 手动转换为十六进制字符
         uint8_t byte = digest[i];
@@ -310,16 +310,16 @@ std::string nslb_md5(const std::string str) {
 // 计算NslbDpRankInfo结构体向量的MD5
 void NSLBMD5::calculateRankInfoMd5(const std::vector<NslbDpRankInfo>& rankInfo, uint8_t commMd5Sum[16]) {
     NSLBMD5 md5;
-
+    
     // 遍历向量中的每个结构体元素
     for (const auto& info : rankInfo) {
         // 将结构体转换为字节数组并更新MD5
         md5.update(reinterpret_cast<const unsigned char*>(&info), sizeof(NslbDpRankInfo));
     }
-
+    
     // 完成MD5计算
     md5.finalize();
-
+    
     // 将结果复制到输出数组
     (void)memcpy_s(commMd5Sum, NSLB_MD5_DIGEST, md5.digest, NSLB_MD5_DIGEST);
 }
@@ -327,13 +327,13 @@ void NSLBMD5::calculateRankInfoMd5(const std::vector<NslbDpRankInfo>& rankInfo, 
 // 新增：计算TableFourRankInfo结构体向量的MD5
 void NSLBMD5::calculateTableFourRankInfoMd5(const std::vector<TableFourRankInfo>& rankInfo, uint8_t commMd5Sum[16]) {
     NSLBMD5 md5;
-
+    
     // 遍历向量中的每个结构体元素
     for (const auto& info : rankInfo) {
         // 将结构体转换为字节数组并更新MD5
         md5.update(reinterpret_cast<const uint8_t*>(&info), sizeof(TableFourRankInfo));
     }
-
+    
     // 完成MD5计算
     md5.finalize();
     // 将结果复制到输出数组
@@ -344,14 +344,14 @@ void NSLBMD5::calculateTableFourRankInfoMd5(const std::vector<TableFourRankInfo>
 std::string NSLBMD5::md5ToString(const uint8_t md5[16]) {
     std::string result;
     result.reserve(NSLB_MD5_RESERVE);
-
+    
     for (unsigned int i = 0; i < NSLB_MD5_DIGEST; i++) {
         // 手动转换为十六进制字符
         uint8_t byte = md5[i];
         result.push_back(HEX[(byte >> NSLB_MD5_STATE1) & 0xF]);
         result.push_back(HEX[byte & 0xF]);
     }
-
+    
     return result;
 }
 

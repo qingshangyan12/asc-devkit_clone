@@ -786,7 +786,7 @@ HcclResult HcclCommAicpu::InitTopoInfo(const HcclOpResParam *commParam)
     topoInfo_.isDiffDeviceModule = commParam->topoInfo.isDiffDeviceModule;
     topoInfo_.isDiffDeviceType = commParam->topoInfo.isDiffDeviceType;
     topoInfo_.gcdDeviceNumPerAggregation = commParam->topoInfo.gcdDeviceNumPerAggregation;
-    topoInfo_.moduleNum = commParam->topoInfo.moduleNum;
+    topoInfo_.moduleNum = commParam->topoInfo.moduleNum; 
     topoInfo_.useSuperPodMode = true;
     topoInfo_.isARSDoubleRing = commParam->isARSDoubleRing;
     topoInfo_.multiSuperPodDiffDeviceNumMode = commParam->multiSuperPodDiffDeviceNumMode;
@@ -937,7 +937,7 @@ HcclResult HcclCommAicpu::InitAndVerifySignal(const HcclSignalInfo &signalInfo, 
     return HCCL_SUCCESS;
 }
 
-void HcclCommAicpu::HandleExistTagReAlloc(HccltagLocalResV2* tagRes, const std::string& tag, bool reAllocFlag,
+void HcclCommAicpu::HandleExistTagReAlloc(HccltagLocalResV2* tagRes, const std::string& tag, bool reAllocFlag, 
     ListCommon*& curList, bool& needSkip)
 {
     needSkip = false;
@@ -1916,7 +1916,7 @@ HcclResult HcclCommAicpu::PrepareSymmetricMemory(const OpParam &param, OpCommTra
     CHK_PRT_RET(opTransportResponse.size() == 0,
         HCCL_ERROR("[HcclCommAicpu][PrepareSymmetricMemory] opTransportResponse size is 0"),
         HCCL_E_PARA);
-
+    
     const std::unordered_set<LinkType> supportedLinkTypes = {LinkType::LINK_HCCS, LinkType::LINK_SIO, LinkType::LINK_HCCS_SW};
     for (u32 levelIdx = 0; levelIdx < opTransportResponse.size(); levelIdx ++) {
         for (auto &singleSubCommTransport : opTransportResponse[levelIdx]) {
@@ -1957,8 +1957,8 @@ HcclResult HcclCommAicpu::ExecOp(const std::string &newTag, const std::string &a
             CHK_RET(PrepareSymmetricMemory(opParam, algResResponse->opTransportResponse));
         } else {
             HcclResult ret = PrepareZeroCopyExchanger(newTag, opParam, algResResponse);
-            CHK_PRT_RET(ret != HCCL_SUCCESS,
-                HCCL_ERROR("[HcclCommAicpu][ExecOp] newTag[%s], localRankId[%u]", newTag.c_str(), commParam->localUsrRankId), ret);
+            CHK_PRT_RET(ret != HCCL_SUCCESS, 
+                HCCL_ERROR("[HcclCommAicpu][ExecOp] newTag[%s], localRankId[%u]", newTag.c_str(), commParam->localUsrRankId), ret);            
         }
 
         // 零拷贝场景scratchMem的大小会与用户的输入大小不同，会导致后续算法展开模块计算出错
@@ -4052,14 +4052,14 @@ void HcclCommAicpu::PrintOpDataInfo(u32 sqIdx, SqeRingBuffer *sqeContextBuffer, 
 }
 
 // 打印task序列行
-void HcclCommAicpu::PrintTaskLine(bool isMonitor, u32 lineNum, u32 totalPrinted,
+void HcclCommAicpu::PrintTaskLine(bool isMonitor, u32 lineNum, u32 totalPrinted, 
                                   const std::string& taskLine) const
 {
     if (isMonitor) {
-        HCCL_RUN_INFO("[StreamTaskMonitor]task sequence[%u/%u] is %s",
+        HCCL_RUN_INFO("[StreamTaskMonitor]task sequence[%u/%u] is %s", 
                       lineNum, totalPrinted, taskLine.c_str());
     } else {
-        HCCL_ERROR("[TaskException]task sequence[%u/%u] is %s",
+        HCCL_ERROR("[TaskException]task sequence[%u/%u] is %s", 
                    lineNum, totalPrinted, taskLine.c_str());
     }
 }
@@ -4110,11 +4110,11 @@ void HcclCommAicpu::PrintTaskExceptionTaskQue(u32 sqIdx, SqeRingBuffer *sqeConte
 {
     const u32 sqeNum = 200;
     const u32 maxTasksPerLine = 50;
-
+    
     // 获取初始算子信息
     const AicpuOpInfo *lastOpInfo = GetOpInfoFromSqIdx(sqIdx, sqeContextBuffer);
     CHK_PRT_RET(lastOpInfo == nullptr, HCCL_ERROR("%s fail, opInfo is nullptr", __func__),);
-
+    
     // 初始化状态
     u32 opIndex = lastOpInfo->opIndex;
     std::string opTag = lastOpInfo->tagBuff;
@@ -4122,25 +4122,25 @@ void HcclCommAicpu::PrintTaskExceptionTaskQue(u32 sqIdx, SqeRingBuffer *sqeConte
     u32 printedCount = 0;
     std::vector<std::string> currentOpTasks;
     currentOpTasks.push_back("OP(" + std::to_string(opIndex) + ")");
-
+    
     // 主循环：遍历并打印
     for (u32 i = 0; i < sqeNum; i++) {
         // 计算新索引并获取算子信息
         u32 newSqIdx = (sqIdx - i + HCCL_SQE_MAX_CNT) % HCCL_SQE_MAX_CNT;
         const AicpuOpInfo *newOpInfo = GetOpInfoFromSqIdx(newSqIdx, sqeContextBuffer);
         CHK_PRT_RET(newOpInfo == nullptr, HCCL_ERROR("%s fail, opInfo is nullptr", __func__),);
-
+        
         u32 sizeAfterAdd = currentOpTasks.size() + 1;
         if (sizeAfterAdd >= (maxTasksPerLine + 2) || (i > 0 && (newOpInfo->opIndex != opIndex || newOpInfo->tagBuff != opTag))) {
             // 打印算子信息（仅第一次）
             if (lineCount == 0) {
                 PrintOpDataInfo(sqIdx, sqeContextBuffer, isMonitor);
             }
-
+            
             // 拼接并打印task行
             std::string taskLine = ConcatTaskLine(currentOpTasks);
             PrintTaskLine(isMonitor, lineCount + 1, printedCount, taskLine);
-
+            
             // 更新状态
             if (newOpInfo->opIndex != opIndex || newOpInfo->tagBuff != opTag) {
                 UpdateOpContext(opIndex, opTag, lineCount, currentOpTasks,
@@ -5188,7 +5188,7 @@ HcclResult HcclCommAicpu::InitAicpuIndOp(CommAicpuParam *commAicpuParam)
     topoInfo_.deviceType = static_cast<DevType>(commAicpuParam->deviceType);
     identifier_ = std::string(commAicpuParam->hcomId);
     topoInfo_.userRankSize = commAicpuParam->userRankSize;
-    topoInfo_.userRank = commAicpuParam->userRank;
+    topoInfo_.userRank = commAicpuParam->userRank; 
     notifys_.reserve(hccl::HCCL_THREAD_NOTIFY_MAX_NUM);
     if (topoInfo_.deviceType == DevType::DEV_TYPE_910_93 || topoInfo_.deviceType == DevType::DEV_TYPE_910B) {
         notifySize_ = NOTIFY_SIZE_FOUR;
@@ -5207,7 +5207,7 @@ HcclResult HcclCommAicpu::InitAicpuIndOp(CommAicpuParam *commAicpuParam)
         HCCL_INFO("[HcclCommAicpu][InitAicpuIndOp] InitAicpuIndOpV2 start");
         indOpCommInitialized_ = true;
         return HCCL_SUCCESS;
-    }
+    } 
 
     HCCL_INFO("[HcclCommAicpu][InitAicpuIndOp] InitAicpuIndOp start");
     if (!FindDispatcherByCommId(&dispatcherCtx_, identifier_.c_str())) {
@@ -5233,11 +5233,11 @@ HcclResult HcclCommAicpu::InitAicpuIndOp(CommAicpuParam *commAicpuParam)
     // 在indOpCommInitialized_变为true后拉起背景线程
     AicpuComContext *ctx = AicpuGetComContext();
     AicpuHcclProcess::CallMC2MaintenanceThread(ctx);
-
+    
     HCCL_RUN_INFO("%s group[%s] success!, deviceLogicId[%u], devicePhyId[%u], deviceType[%u], notifySize[%u], "
     "dispatcherCtx[%p]", __func__, identifier_.c_str(), topoInfo_.deviceLogicId, topoInfo_.devicePhyId,
     topoInfo_.deviceType, notifySize_, dispatcherCtx_);
-
+    
     return HCCL_SUCCESS;
 }
 

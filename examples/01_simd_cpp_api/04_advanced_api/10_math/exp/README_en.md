@@ -26,7 +26,7 @@ This example uses the Exp high-level API to implement natural exponential comput
 
 ## Example Description
 
-- Example function:
+- Example function:  
   Compute the natural exponential element-wise. Users can choose whether to use the Taylor expansion formula for computation. The computation formulas are as follows:
 
   $$
@@ -47,7 +47,7 @@ This example uses the Exp high-level API to implement natural exponential comput
 
   $$e^{x B_i} = 1 + xB_i +... + \frac{xB_i^n}{n!}$$
 
-- Example specifications:
+- Example specifications:  
   <table>
   <caption>Table 1: Example Input/Output Specifications</caption>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> exp </td></tr>
@@ -61,7 +61,7 @@ This example uses the Exp high-level API to implement natural exponential comput
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">exp_custom</td></tr>
   </table>
 
-- Example implementation:
+- Example implementation:  
   This example implements an exp_custom example with fixed shapes of input src[1, 8192] and output dst[1, 8192].
 
   - Kernel implementation
@@ -76,11 +76,11 @@ This example uses the Exp high-level API to implement natural exponential comput
 
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run
+## Build and Run  
 
 Run the following steps in the root directory of this example to build and run the operator.
 
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -99,7 +99,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-
+  
   For example:
 
   ```bash

@@ -111,7 +111,7 @@ HcclResult CollNativeExecutorBase::SetCommInfoForARS(u32 ringSize)
     u32 userRank = topoAttr_.userRank;
     u32 userRankSize = topoAttr_.userRankSize;
     HCCL_DEBUG("[SetCommInfoForARS]set topo info for ARS, USERRANK:%u, userRankSize:%u", userRank, userRankSize);
-
+    
     SetCommInfoForIntraARS(intraRingsize, commPlaneVector);
     SetCommInfoForInterARS(intraRingsize, commPlaneVector);
     topoMatcher_->SetRankMap();//一定要刷新RankMap
@@ -121,7 +121,7 @@ HcclResult CollNativeExecutorBase::SetCommInfoForARS(u32 ringSize)
         userRank, topoMatcher_->GetCommPlaneRanks(COMM_LEVEL1_LOGICAL).size());
     return HCCL_SUCCESS;
 }
-
+ 
 HcclResult CollNativeExecutorBase::SetCommInfoForIntraARS(u32 intraRingsize, std::vector<u32> commPlaneVector)
 {
     std::vector<u32> comLevelARSVector = topoMatcher_->GetCommPlaneRanks(COMM_ARS)[0];
@@ -168,7 +168,7 @@ HcclResult CollNativeExecutorBase::SetCommInfoForIntraARS(u32 intraRingsize, std
     topoMatcher_->EditCommPlaneVector(COMM_LEVEL0_LOGICAL, intraRingVec);
     return HCCL_SUCCESS;
 }
-
+ 
 HcclResult CollNativeExecutorBase::SetCommInfoForInterARS(u32 intraRingsize, std::vector<u32> commPlaneVector)
 {
     u32 superPodRankSize = commPlaneVector.size();
@@ -285,7 +285,7 @@ HcclResult CollNativeExecutorBase::CalcLevel2CommInfo(TransportMemType inputType
         HCCL_INFO("[%s] Calc RingCommInfo", __func__);
     }
     CHK_RET(CalcCommPlaneInfo(tag_, commParaLevel2, opTransport[COMM_LEVEL2], inputType, outputType));
-
+    
     return HCCL_SUCCESS;
 }
 
@@ -767,14 +767,14 @@ HcclResult CollNativeExecutorBase::InplaceOpSync(OpParam &param, ExecMem &execMe
     HCCL_INFO("[CollNativeExecutorBase][InplaceOpSync] The op with algOpContext_.opRetryHandler.isInplacePreSync[%d] "
         "or algOpContext_.opRetryHandler.isPostSync[%d] ends.",
         algOpContext_.opRetryHandler.isInplacePreSync, algOpContext_.opRetryHandler.isPostSync);
-
+    
     CHK_RET(LaunchTaskExtend(dispatcher_,
         const_cast<Stream &>(param.stream),
         const_cast<std::vector<Stream> &>(algResResp_->slaveStreams)));
-
+    
     return HCCL_SUCCESS;
 }
-
+ 
 std::vector<std::vector<u32>> GetARSRingsOrder(u32 ranksSize, TopoType topoType, std::vector<u32> &RingList)
 {
     std::vector<std::vector<u32>> ARSmultiRingOrder;
@@ -791,7 +791,7 @@ std::vector<std::vector<u32>> GetARSRingsOrder(u32 ranksSize, TopoType topoType,
     }
     return ARSmultiRingOrder;
 }
-
+ 
 HcclResult CollNativeExecutorBase::CopyAivCommInfoToDevice(const CommPlane levelIndex, const u32 subLevelIndex,
     AlgResourceResponse& algResource)
 {
@@ -837,7 +837,7 @@ HcclResult CollNativeExecutorBase::GetDevNumInlocalPod(u32& devNumInlocalPod)
     return HCCL_SUCCESS;
 }
 
-HcclResult CollNativeExecutorBase::SetOpCache(const AivOpArgs& opArgs, const AivTopoArgs& topoArgs, const AivResourceArgs& resourceArgs,
+HcclResult CollNativeExecutorBase::SetOpCache(const AivOpArgs& opArgs, const AivTopoArgs& topoArgs, const AivResourceArgs& resourceArgs, 
     const AivAlgArgs& algArgs, ExtraArgs& extraArgs, AivProfilingInfo& aivProfilingInfo, bool isA3CrossNode)
 {
     cacheInfo_.opArgs = opArgs;
@@ -859,7 +859,7 @@ HcclResult CollNativeExecutorBase::SetOpCache(const AivOpArgs& opArgs, const Aiv
     }
 
     HCCL_INFO("[CollNativeExecutorBase][SetOpCache] cmdType:%d, count:%llu, dataType:%d, op:%d, " \
-        "rank:%u, rankSize:%u, serverNum:%u, isA3CrossNode:%d, buffersIn:%p, buffersOut:%p", opArgs.cmdType, opArgs.count, opArgs.dataType,
+        "rank:%u, rankSize:%u, serverNum:%u, isA3CrossNode:%d, buffersIn:%p, buffersOut:%p", opArgs.cmdType, opArgs.count, opArgs.dataType, 
         opArgs.op, topoArgs.rank, topoArgs.rankSize, topoArgs.serverNum, isA3CrossNode,
         cacheInfo_.buffersIn, cacheInfo_.buffersOut);
 

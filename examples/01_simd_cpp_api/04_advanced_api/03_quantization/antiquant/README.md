@@ -26,8 +26,8 @@
 
 ## 样例描述
 
-- 样例功能：
-
+- 样例功能：  
+  
   按元素做反量化计算，比如将int8_t数据类型反量化为half数据类型。
 
 - 样例规格：
@@ -47,18 +47,18 @@
   <br clear="left" />
 <br />
 
-- 样例实现：
+- 样例实现：  
   本样例中实现的是固定shape为输入src[8, 128]、offset[1, 128]、scale[1, 128]，输出dst[8, 128]的antiquant_custom样例。按元素做反量化计算，将int8_t类型数据转换为half类型数据。
-  - Kernel实现
+  - Kernel实现  
     计算逻辑是： 本样例将输入数据搬运进片上存储，然后使用AscendAntiQuant（A2/A3）或AntiQuantize（950系列）高阶API接口完成反量化计算，得到最终结果，再搬出外部存储上。
 
-  - 调用实现
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
-## 编译运行
+## 编译运行  
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -92,8 +92,8 @@
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
-
-- 执行结果
+  
+- 执行结果  
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!

@@ -27,10 +27,10 @@ This example implements broadcast copy functionality based on the Brcb API in a 
 
 ## Example Description
 
-- Example function:
+- Example function:  
   This example demonstrates using the Brcb API to implement broadcast copy functionality, taking 8 elements from the input Tensor each time and filling them into 8 DataBlocks (each DataBlock is 32 bytes) of the output Tensor, with each element corresponding to one DataBlock. The Brcb API is applicable to scenarios where a small amount of data needs to be broadcast to many locations, such as constant padding and mask generation. The repeatTime parameter controls the number of iterations, and the dstBlkStride and dstRepStride parameters control the address stride between DataBlocks. For detailed API documentation, refer to [Brcb API Documentation](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/API/ascendcopapi/atlasascendc_api_07_0089.html).
 
-- Example specifications:
+- Example specifications:  
   <table border="2" align="center">
   <caption>Table 1: Example Input/Output Specifications</caption>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center">Brcb</td></tr>
@@ -43,28 +43,28 @@ This example implements broadcast copy functionality based on the Brcb API in a 
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">brcb_custom</td></tr>
   </table>
 
-- Example implementation:
+- Example implementation:  
   This example implements a Brcb broadcast copy example with fixed input shape x[1,16] and output shape y[1,256].
 
-  - Kernel implementation
+  - Kernel implementation  
     - Call the DataCopy basic API to transfer data from GM (Global Memory) to UB (Unified Buffer)
     - Call the Brcb interface to perform broadcast copy operation, copying input Tensor data to fill multiple DataBlocks of the output Tensor
     - Call the DataCopy basic API to transfer data from UB (Unified Buffer) to GM (Global Memory)
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run
+## Build and Run  
 
 Run the following steps in the root directory of this example to build and run the example.
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
-
+    
 - Run the example
 
   Run the following commands in the example directory.
@@ -81,7 +81,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debug or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-
+  
   Examples:
   ```bash
   cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201;make -j; # CPU debug mode

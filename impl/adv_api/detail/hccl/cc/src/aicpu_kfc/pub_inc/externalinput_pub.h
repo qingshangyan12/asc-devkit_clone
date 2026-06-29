@@ -144,7 +144,7 @@ const bool& GetExternalInputInterSuperPodRetryEnable();
 const u32& GetExternalInputRetryMaxCnt();
 
 const bool& GetExternalInputOpCounter(); // deprecated
-
+ 
 const u32& GetExternalInputRetryHoldTime();
 
 const u32& GetExternalInputRetryIntervalTime();

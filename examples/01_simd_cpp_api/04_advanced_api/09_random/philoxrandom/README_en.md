@@ -24,9 +24,9 @@ This example uses the PhiloxRandom high-level API to implement random number gen
 
 ## Example Description
 
-- Example function:
+- Example function:  
   Based on the Philox random number generation algorithm, given a random seed, generate a specified number of random numbers.
-- Example specifications:
+- Example specifications:  
   <table>
   <caption>Table 1: Example Input/Output Specifications</caption>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> philoxrandom </td></tr>
@@ -37,7 +37,7 @@ This example uses the PhiloxRandom high-level API to implement random number gen
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">philoxrandom_custom</td></tr>
   </table>
 
-- Example implementation:
+- Example implementation:  
   This example implements a philoxrandom_custom example with a fixed output shape of dst[1, 1280].
 
   - Kernel implementation
@@ -48,14 +48,14 @@ This example uses the PhiloxRandom high-level API to implement random number gen
     3. Use the PhiloxRandom high-level API to generate random numbers.
     4. Transfer the generated random numbers from Local Memory to Global Memory.
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -74,7 +74,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-
+  
   For example:
 
   ```bash

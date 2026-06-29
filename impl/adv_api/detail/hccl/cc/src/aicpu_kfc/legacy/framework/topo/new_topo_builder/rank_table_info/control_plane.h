@@ -38,7 +38,7 @@ public:
     void EidToAddr(std::string str);
     void IPV4ToAddr(std::string str);
     void IPV6ToAddr(std::string str);
-
+    
     static bool IsStringInAddrType(std::string str)
     {
         return strToAddrType.count(str) > 0;

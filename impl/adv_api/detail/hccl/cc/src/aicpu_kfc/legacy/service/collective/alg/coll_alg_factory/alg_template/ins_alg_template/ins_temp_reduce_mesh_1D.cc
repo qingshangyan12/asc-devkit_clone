@@ -115,7 +115,7 @@ HcclResult InsTempReduceMesh1D::RunReduce(const TemplateDataParams &dataParams,
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult InsTempReduceMesh1D::SendData(const TemplateDataParams &dataParams,
+HcclResult InsTempReduceMesh1D::SendData(const TemplateDataParams &dataParams, 
     const ResLinks &tempLinks, std::vector<InsQuePtr> &tempInsQues)
 {
     DataSlice srcDataSlice(buffInfo_.inBuffType, buffInfo_.inBuffBaseOff, dataParams.sliceSize);
@@ -133,7 +133,7 @@ HcclResult InsTempReduceMesh1D::SendData(const TemplateDataParams &dataParams,
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult InsTempReduceMesh1D::GatherData(const TemplateDataParams &dataParams,
+HcclResult InsTempReduceMesh1D::GatherData(const TemplateDataParams &dataParams, 
     const ResLinks &tempLinks, std::vector<InsQuePtr> &tempInsQues)
 {
     DataSlice srcDataSlice(buffInfo_.inBuffType, buffInfo_.inBuffBaseOff, dataParams.sliceSize);

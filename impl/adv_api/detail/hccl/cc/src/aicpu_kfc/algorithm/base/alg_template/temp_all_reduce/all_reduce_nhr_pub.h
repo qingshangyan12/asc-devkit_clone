@@ -40,7 +40,7 @@ private:
     HcclResult RunAllGather(u32 rank, u32 rankSize, const std::vector<LINK> &links);
 
     HcclResult SimpleCheck(const u32 rank, const u32 rankSize, const std::vector<LINK> &links);
-
+    
     u64 reduceAttr_; /* 0x1:表示data_type + reduce_type支持inlinereduce  */
 };
 }  // namespace hccl

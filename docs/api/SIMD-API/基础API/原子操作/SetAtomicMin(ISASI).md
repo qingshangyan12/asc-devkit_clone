@@ -22,7 +22,7 @@
 
 ```cpp
 template <typename T>
-__aicore__ inline void SetAtomicMin()
+__aicore__ inline void SetAtomicMin() 
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -94,7 +94,7 @@ __aicore__ inline void CopyOut()
 }
 
 /*
-每个核的输入数据为:
+每个核的输入数据为: 
 Src0: [1,1,1,1,1,...,1] // 256个1
 Src1: [2,2,2,2,2,...,2] // 256个2
 最终输出数据: [1,1,1,1,1,...,1] // 256个1

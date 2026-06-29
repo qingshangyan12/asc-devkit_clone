@@ -22,13 +22,13 @@ enum class AHCLevel {
     AHC_LEVEL_1,
     AHC_LEVEL_MAX
 };
-
+ 
 enum class ConcType {
     CONC_INTRA = 0,
     CONC_INTER,
     CONC_RESERVED
 };
-
+ 
 enum class AHCOpType {
     AHC_OP_TYPE_ALLGATHER = 0,
     AHC_OP_TYPE_ALLREDUCE,
@@ -53,7 +53,7 @@ using OXCPreparePara = struct OXCPrepareParaDef {
         netPlaneNum(netPlaneNum)
     {}
 };
-
+ 
 union AHCExtendPreparePara {
     OXCPreparePara  oxcPreparePara;
     AHCExtendPreparePara() {}
@@ -63,23 +63,23 @@ using AHCConcOpType = struct AHCConcOpTypeDef {
     AHCLevel  ahcLevel;
     ConcType  concType;
     AHCOpType ahcOpType;
-
+ 
     AHCConcOpTypeDef()
         : ahcLevel(AHCLevel::AHC_LEVEL_0),
         concType(ConcType::CONC_INTRA),
         ahcOpType(AHCOpType::AHC_OP_TYPE_RESERVED)
     {}
-
+ 
     AHCConcOpTypeDef(AHCLevel ahcLevel, ConcType  concType,AHCOpType ahcOpType)
         : ahcLevel(ahcLevel), concType(concType), ahcOpType(ahcOpType)
     {}
-
+    
     // 重载 == 运算符，用于比较两个 MyKey 对象是否相等
     bool operator==(const AHCConcOpTypeDef& other) const {
-        return ahcLevel == other.ahcLevel && concType == other.concType
+        return ahcLevel == other.ahcLevel && concType == other.concType 
             && ahcOpType == other.ahcOpType;
     }
-
+ 
     // 重载 < 运算符，用于排序
     bool operator<(const AHCConcOpTypeDef& other) const {
         if (ahcLevel != other.ahcLevel) {
@@ -87,7 +87,7 @@ using AHCConcOpType = struct AHCConcOpTypeDef {
         }
         if (concType != other.concType) {
             return concType < other.concType;
-        }
+        }        
         return ahcOpType < other.ahcOpType;
     }
 };
@@ -99,7 +99,7 @@ using AHCAlgSelectParam = struct AHCAlgSelectParamDef {
     u64 dataSize;
     AHCOpType opType;
     float symThreshold;
-
+ 
     AHCAlgSelectParamDef()
         : enableOXC(false),
         enableAlgAutoSelect(true),

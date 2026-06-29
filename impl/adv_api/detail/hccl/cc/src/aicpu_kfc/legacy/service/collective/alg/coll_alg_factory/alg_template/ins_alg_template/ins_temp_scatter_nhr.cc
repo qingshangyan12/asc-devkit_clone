@@ -45,7 +45,7 @@ uint64_t InsTempScatterNHR::GetExpandedMode() const
 }
 
 HcclResult InsTempScatterNHR::PreCopy(TemplateDataParams &templateDataParams, std::vector<InsQuePtr> &tempInsQues)
-{
+{       
     if (u32(myRank_) != root_ || buffInfo_.inBuffType == BufferType::SCRATCH) {
         return HCCL_SUCCESS;
     }
@@ -58,12 +58,12 @@ HcclResult InsTempScatterNHR::PreCopy(TemplateDataParams &templateDataParams, st
             LocalCopy(tempInsQues[0], srcSlice, dstSlice);
         }
     }
-
+   
     return HcclResult::HCCL_SUCCESS;
 }
 
 HcclResult InsTempScatterNHR::PostCopy(TemplateDataParams &templateDataParams, std::vector<InsQuePtr> &tempInsQues)
-{
+{   
     u32 myAlgRank;
     GetAlgRank(myRank_, tempVTopo_[0], myAlgRank);
     for (u32 r = 0; r < templateDataParams.repeatNum; r++) {
@@ -80,7 +80,7 @@ HcclResult InsTempScatterNHR::PostCopy(TemplateDataParams &templateDataParams, s
 }
 
 HcclResult InsTempScatterNHR::RunNHR(TemplateDataParams &templateDataParams, ResLinks &tempLinks, std::vector<InsQuePtr> &tempInsQues) const
-{
+{   
     // nhr主体部分
     u32 nSteps = GetNHRStepNum(tempRankSize_);
     for (u32 r = 0; r < templateDataParams.repeatNum; r++) {
@@ -132,7 +132,7 @@ HcclResult InsTempScatterNHR::GenExtIns(TempFuncs &tempFuncs,TemplateDataParams 
 }
 
 u32 InsTempScatterNHR::CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) const
-{
+{   
     (void) inBuffType;
     (void) outBuffType;
     return tempRankSize_;

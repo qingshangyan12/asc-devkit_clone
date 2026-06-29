@@ -42,7 +42,7 @@ private:
         const std::vector<std::vector<Slice>> &multRingsSlice, const OpParam &param, const SubCommInfo &level2CommInfo,
         const SubCommInfo &level1CommInfo, const SubCommInfo &level0CommInfo, u32 perDataSize, u64 inputMemSize);
     virtual HcclResult GetLevelCommInfo();
-
+    
     virtual HcclResult RunIntraSeverAllGather(const std::string &tag, DeviceMem &inputMem, DeviceMem &outputMem,
         const u64 count, const HcclDataType &dataType,
         const std::vector<std::vector<Slice>> &multRingsSliceZero, const Stream &stream,

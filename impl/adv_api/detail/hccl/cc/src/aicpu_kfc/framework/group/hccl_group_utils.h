@@ -103,7 +103,7 @@ struct hcclTaskP2p {
     HcclComm comm;
     HcclRtStream stream;
 };
-
+ 
 struct hcclKernelPlanner {
     s32 nTasksColl = -1;
     s32 nTasksP2p = -1;//该plan中Coll和P2p task的个数

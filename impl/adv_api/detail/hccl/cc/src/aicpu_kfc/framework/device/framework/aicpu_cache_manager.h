@@ -48,7 +48,7 @@ public:
         const HcclTopoInfo& topoinfo, std::unique_ptr<TopoMatcher>& topoMatcherPtr, const AlgOpContext& algContext,
         std::shared_ptr<AicpuZeroCopyExchanger>& zeroCopyExchangerPtr, const HcclWorkflowMode workflowMode,
         const DeviceMem& tinySendRecvMem, std::function<HcclResult()> setProfStartCallback);
-
+    
     // 针对cache miss的预处理, 包括使能alltoallv executor感知cache
     HcclResult PreProcessForCacheMiss(const OpParam &param, std::unique_ptr<CollExecutorBase> &executor);
     // 针对cache miss的后处理, 包括清理launch context、更新op-unfold cache中后续cache hit需要使用到的相关信息等
@@ -77,22 +77,22 @@ private:
     HcclResult CalcMetadataForFirstAlltoallv(const AlgResourceResponse& algResource,
         const bool isDeviceMode, const HcclTopoInfo& topoinfo,
         std::unique_ptr<TopoMatcher>& topoMatcherPtr, const AlgOpContext& algContext);
-
+    
     // 获得op-unfold key for cache
     HcclResult GetOpUnfoldKey(const OpParam &param, OpUnfoldKey& key, const HcclTopoInfo& topoinfo,
         const AlgOpContext& algContext, const HcclWorkflowMode workflowMode);
     HcclResult IsBigCountForAlltoallv(const OpParam &param, const HcclTopoInfo& topoinfo, bool& isBigCount);
-
+    
     // 准备user input/output memory ranges
     HcclResult PrepareUserMemRanges(const OpParam &param, const AlgResourceResponse &algResource,
         std::vector<OpUnfoldMemRange>& userInputMemRanges, std::vector<OpUnfoldMemRange>& userOutputMemRanges,
         const HcclTopoInfo& topoinfo, std::shared_ptr<AicpuZeroCopyExchanger>& zeroCopyExchangerPtr,
         const HcclWorkflowMode workflowMode, const DeviceMem& tinySendRecvMem);
-
+    
     // 从param中解析相关字段
     HcclResult ParseOpParamForCache(const OpParam &param, HcclDataType& sendType, HcclDataType& recvType,
         uint64_t& inputSize, uint64_t& outputSize, const HcclTopoInfo& topoinfo);
-
+    
     // 为alltoallv算子准备send/recv information用于cache刷新
     HcclResult PrepareAlltoallvSendRecvInfo(const OpParam& param, AlltoallvSendRecvInfo& alltoallvSendRecvInfo,
         const HcclTopoInfo& topoinfo);

@@ -175,9 +175,9 @@ public:
     std::string GetTaskExceptionTaskInfo(u32 sqHead, SqeRingBuffer *sqeContextBuffer, uint8_t &type, uint16_t &taskId, uint32_t &remoteRank);
     HcclResult RegisterProfCallBack();
     // 独立算子专用
-    HcclResult SetChannelP2pNotify(TransportDeviceP2pData &transDevP2pData, u64 &p2pNotifyNum,
+    HcclResult SetChannelP2pNotify(TransportDeviceP2pData &transDevP2pData, u64 &p2pNotifyNum, 
         HcclChannelP2p &channelP2p);
-    HcclResult SetChannelRoceNotify(TransportDeviceIbverbsData &transDevIbverbsData, u64 &roceNotifyNum,
+    HcclResult SetChannelRoceNotify(TransportDeviceIbverbsData &transDevIbverbsData, u64 &roceNotifyNum, 
         HcclChannelRoce &channelRoce);
     HcclResult InitP2pChannel(HcclIndOpChannelRemoteResV3 *commParam, uint32_t channelIndex);
     HcclResult InitRoceChannel(HcclIndOpChannelRemoteResV3 *commParam, uint32_t channelIndex);
@@ -253,14 +253,14 @@ private:
         AlgResourceRequest &resRequest, AlgResourceResponse &algResResponse);
     HcclResult CalcResRequest(const std::string &algName, const OpParam &param,
         std::unique_ptr<CollExecutorBase> &executor, AlgResourceRequest &resourceRequest);
-    HcclResult WaitFinishWhileLoop(Stream &mainStream, std::vector<Stream> &subStreams, std::string &tag,
+    HcclResult WaitFinishWhileLoop(Stream &mainStream, std::vector<Stream> &subStreams, std::string &tag, 
         const uint32_t &beginSqePos, OpParam &param);
     HcclResult CheckOpExecStatusCallback();
     HcclResult CheckOpExecStatus();
     HcclResult UpdateSuspendStatus(const OpParam &param, HcclOpExecFSM &fsmState, KfcError &errorCode, uint32_t retryCnt);
     HcclResult CheckTaskTimeout(const Stream &mainStream, const uint64_t startUsec);
 
-    HcclResult HcclOpExecFsmInitProcess(const std::string &newTag, OpParam &param, AlgResourceResponse &algResource,
+    HcclResult HcclOpExecFsmInitProcess(const std::string &newTag, OpParam &param, AlgResourceResponse &algResource, 
         HcclOpExecFSM &fsmState, KfcError &errorCode);
     bool HcclOpCheckSupportRetry(HcclCMDType opType);
     HcclResult HcclOpExecChangeLinkProcess(const std::string &newTag, HcclOpExecFSM &state, KfcError &errorCode,
@@ -361,13 +361,13 @@ private:
         TransportLinkType linkType = TransportLinkType::RESERVED);
     HcclResult InitLinkRoce(HccltagRemoteResV2 *tagRes, u32 &rankId, const std::string &newTag, u32 notifyNum,
         const bool isBackup = false);
-    HcclResult InitLinkRoce(HccltagRemoteResV2 *tagRes, HcclLinkRoceV2 *linkRoce, u32 &rankId,
+    HcclResult InitLinkRoce(HccltagRemoteResV2 *tagRes, HcclLinkRoceV2 *linkRoce, u32 &rankId, 
         const std::string &newTag, u32 notifyNum, const bool isBackup = false, const bool isSecond = false);
-    HcclResult GetBsrTransportQpn( const HcclSendRecvItem *sendrecvPair, AlgResourceResponse &algResource,
+    HcclResult GetBsrTransportQpn( const HcclSendRecvItem *sendrecvPair, AlgResourceResponse &algResource, 
         u32 &qpn);
     HcclResult ReAllocTransportResource(const std::string &newTag, AlgResourceResponse &algResResponse,
         std::map<u32, bool> &remoteRankPortMap, const HcclOpResParam *commParam, const OpParam &param);
-    HcclResult CleanRoceResource(const std::string &newTag, AlgResourceResponse &algResResponse,
+    HcclResult CleanRoceResource(const std::string &newTag, AlgResourceResponse &algResResponse, 
         const std::map<u32, bool> &remoteRankPortMap, const OpParam &param);
     HcclResult LoadChangeLinkInfo(ChangeLinkInfo &changeLinkInfo);
 
@@ -420,27 +420,27 @@ private:
     HcclResult CalSendRecvInfoForAlltoall(const OpParam &param);
     HcclResult CalSendRecvInfoFor910B(const std::string &algName, const OpParam &param,
         std::unique_ptr<CollExecutorBase> &executor);
-    void HandleExistTagReAlloc(HccltagLocalResV2* tagRes, const std::string& tag, bool reAllocFlag,
+    void HandleExistTagReAlloc(HccltagLocalResV2* tagRes, const std::string& tag, bool reAllocFlag, 
         ListCommon*& curList, bool& needSkip);
 
     // 获取指定索引的算子信息
     const AicpuOpInfo* GetOpInfoFromSqIdx(u32 sqIdx, SqeRingBuffer *sqeContextBuffer);
-
+    
     // 打印算子数据信息
     void PrintOpDataInfo(u32 sqIdx, SqeRingBuffer *sqeContextBuffer, bool isMonitor);
-
+    
     // 打印task序列行
     void PrintTaskLine(bool isMonitor, u32 lineNum, u32 totalPrinted, const std::string& taskLine) const;
-
+    
     // 更新算子上下文
     void UpdateOpContext(u32& opIndex, std::string& opTag, u32& lineCount, std::vector<std::string>& currentOpTasks, u32 newOpIndex, const std::string& newOpTag) const;
-
+    
     // 准备下一行数据
     void PrepareNextLine(u32 opIndex, u32& lineCount, std::vector<std::string>& currentOpTasks) const;
-
+    
     // 拼接task列表为字符串
     std::string ConcatTaskLine(const std::vector<std::string>& tasks) const;
-
+    
     // 打印剩余未满行的tasks
     void PrintRemainingTasks(bool isMonitor, u32 lineCount, u32 printedCount, const std::vector<std::string>& currentOpTasks) const;
 
@@ -478,7 +478,7 @@ private:
     std::unordered_map<u32, std::unordered_map<std::string, std::vector<std::shared_ptr<Transport>>>>
         linkRdmaRes_;  // (主链路) 通信域内的RDMA链路，包括通用和专用
     std::unordered_map<u32, std::unordered_map<std::string, std::vector<std::shared_ptr<Transport>>>>
-        linkRdmaResBackUp_;  // (备链路) 通信域内的RDMA链路，包括通用和专用
+        linkRdmaResBackUp_;  // (备链路) 通信域内的RDMA链路，包括通用和专用 
 
     std::unordered_map<u32, std::unordered_map<std::string, HccltagRemoteResV3>>
         rankTagRemoteRes_;  // 以rankid&tag粒度保存HccltagRemoteResV3

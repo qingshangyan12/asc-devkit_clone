@@ -7,20 +7,20 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-
+ 
 #ifndef HCCL_CCU_KERNEL_REDUCE_SCATTER_MESH_1D_DUO_MEM2MEM_H
 #define HCCL_CCU_KERNEL_REDUCE_SCATTER_MESH_1D_DUO_MEM2MEM_H
-
+ 
 #include <vector>
 #include <ios>
 #include "utils.h"
 #include "ccu_kernel.h"
 #include "ccu_kernel_utils.h"
 #include "ccu_kernel_alg_base.h"
-
+ 
 namespace mc2_ops_hccl {
 using namespace hcomm;
-
+ 
 class CcuKernelArgReduceScatterMeshMem2Mem1D2Die : public CcuKernelArg {
 public:
     explicit CcuKernelArgReduceScatterMeshMem2Mem1D2Die(uint64_t gRankSize,
@@ -55,7 +55,7 @@ public:
     std::vector<uint32_t>                   subRankGroup_;
     std::vector<std::vector<uint32_t>>      subCommRanks_;
 };
-
+ 
 class CcuTaskArgReduceScatterMeshMem2Mem1D2Die : public CcuTaskArg {
 public:
     explicit CcuTaskArgReduceScatterMeshMem2Mem1D2Die(uint64_t inputAddr, uint64_t outputAddr, uint64_t token,
@@ -65,7 +65,7 @@ public:
                                                 uint64_t normalSliceSize, uint64_t lastSliceSize, uint64_t repeatNum)
         : inputAddr_(inputAddr), outputAddr_(outputAddr), token_(token), scratchAddr_(scratchAddr),
         inputSliceStride_(inputSliceStride), inputRepeatStride_(inputRepeatStride), outputRepeatStride_(outputRepeatStride),
-        normalSliceSize_(normalSliceSize), sliceSize_(lastSliceSize), repeatNum_(repeatNum)
+        normalSliceSize_(normalSliceSize), sliceSize_(lastSliceSize), repeatNum_(repeatNum) 
     {
         HCCL_DEBUG("[CcuTaskArgReduceScatterMeshMem2Mem1D2Die] inputAddr: %lu, outputAddr: %lu, scratchAddr: %lu, "
                    "inputSliceStride: %lu, inputRepeatStride: %lu, outputRepeatStride: %lu, normalSliceSize: %lu, "
@@ -73,7 +73,7 @@ public:
                    inputAddr_, outputAddr_, scratchAddr_, inputSliceStride_, inputRepeatStride_,
                    outputRepeatStride_, normalSliceSize_, sliceSize_, repeatNum_);
     }
-
+ 
     uint64_t inputAddr_;
     uint64_t outputAddr_;
     uint64_t token_;
@@ -85,15 +85,15 @@ public:
     uint64_t sliceSize_;
     uint64_t repeatNum_;
 };
-
+ 
 class CcuKernelReduceScatterMesh1D2DieMem2Mem : public CcuKernelAlgBase {
 public:
     CcuKernelReduceScatterMesh1D2DieMem2Mem(const CcuKernelArg &arg);
     ~CcuKernelReduceScatterMesh1D2DieMem2Mem() override {}
-
+ 
     HcclResult Algorithm() override;
     std::vector<uint64_t> GeneArgs(const CcuTaskArg &arg) override;
-
+ 
 private:
     HcclResult InitResource();
     void LoadArgs();
@@ -106,7 +106,7 @@ private:
     void GroupCopy(CcuRep::LocalAddr dst, CcuRep::LocalAddr src);
     void CreateGroupCopy();
     void CreateReduceLoop(uint32_t size);
-
+ 
     uint64_t rankSize_{0};
     uint64_t gRankSize_{0};
     uint32_t rankId_{0};
@@ -136,6 +136,6 @@ private:
     CcuRep::Variable scratchOffset1_;
     uint32_t myRankIdx_{0};
 };
-
+ 
 }// namespace mc2_ops_hccl
 #endif // HCCL_CCU_KERNEL_REDUCE_SCATTER_MESH_1D_DUO_MEM2MEM_H

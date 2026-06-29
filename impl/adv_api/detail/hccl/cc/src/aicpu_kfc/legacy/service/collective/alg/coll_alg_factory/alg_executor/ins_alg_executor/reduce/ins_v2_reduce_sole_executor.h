@@ -36,7 +36,7 @@ public:
         const RankGraph *rankGraph, const u64 &dataSize, CollOffloadOpResReq &resReq) override;
 
 private:
-    HcclResult InitCommInfo(const RankGraph *rankGraph);
+    HcclResult InitCommInfo(const RankGraph *rankGraph);  
     HcclResult CreateTemplates(std::shared_ptr<InsAlgTemplate> &algTemplatePtr);
     HcclResult GetTemplateResRequest(
         const RankGraph *rankGraph, std::shared_ptr<InsAlgTemplate> &algTemplate, AlgTempResReq &tempResReq) const;
@@ -47,7 +47,7 @@ private:
 
     std::vector<std::vector<RankId>> vTopo_;
     std::vector<RankId> virtRanks_;
-    std::map<RankId, u32> virtRankMap_;
+    std::map<RankId, u32> virtRankMap_;  
     ResLinks tempResLinks_;
     std::vector<InsQuePtr> tempInsQue_;
 };

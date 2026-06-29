@@ -37,7 +37,7 @@ void CollBatchSendRecvExecutor::ParseParam(const OpParam& param)
 
 HcclResult CollBatchSendRecvExecutor::CalcIncreLinkRequest(const OpParam& param, std::set<u32>& ranksLinked,
     AlgResourceRequest& resourceRequest, bool& needIncreLink)
-{
+{     
     needIncreLink = false;
     (void)ParseParam(param);
     for (auto& remoteRank : commTargetUserRankSet_) {
@@ -55,7 +55,7 @@ HcclResult CollBatchSendRecvExecutor::CalcIncreLinkRequest(const OpParam& param,
     u32 streamNum = 0U;
     u32 notifyNum = 0U;
     u64 aivBufferRequest = 0U;
-
+ 
     std::vector<LevelNSubCommTransport> opTransport {
         std::vector<LevelNSubCommTransport>(static_cast<u32>(COMM_LEVEL_RESERVED))
     };
@@ -115,7 +115,7 @@ HcclResult CollBatchSendRecvExecutor::GetPairWiseList(HcclSendRecvItem *sendRecv
             recvDeque_.pop_front();
     }
     // 如果自发自收任务没有完全匹配
-    if ((!sendDeque_.empty() && sendDeque_.front()->remoteRank == topoAttr_.userRank) ||
+    if ((!sendDeque_.empty() && sendDeque_.front()->remoteRank == topoAttr_.userRank) || 
         (!recvDeque_.empty() && recvDeque_.front()->remoteRank == topoAttr_.userRank)) {
             HCCL_ERROR("[CollBatchSendRecvExecutor] SendTask and Recv Task to rank itself do not match,"\
             "please check the task list.");
@@ -293,13 +293,13 @@ HcclResult CollBatchSendRecvExecutor::GetAdjInfo(AlgResourceResponse& algRes, Ad
 
     adjInfo.dstRankNum = nslbAdjInfo.dstRankNum;
     HCCL_INFO("[nslbdp] adjInfo.dstRankNum[%u].", adjInfo.dstRankNum);
-
+    
     for (size_t i = 0; i < nslbAdjInfo.nsAdjInfo.size(); i++) {
         NslbDpAdjInfo dpAdjInfo = {0};
         dpAdjInfo.dstLocalRankId = nslbAdjInfo.nsAdjInfo[i].dstLocalRankId;
         dpAdjInfo.phaseId = nslbAdjInfo.nsAdjInfo[i].phaseId;
         dpAdjInfo.rev = 0;
-        adjInfo.nsAdjInfo.push_back(dpAdjInfo);
+        adjInfo.nsAdjInfo.push_back(dpAdjInfo); 
         HCCL_INFO("[nslbdp]GetAdjInfo dstLocalRankId[%u], phaseId[%u].",
                    nslbAdjInfo.nsAdjInfo[i].dstLocalRankId, nslbAdjInfo.nsAdjInfo[i].phaseId);
     }

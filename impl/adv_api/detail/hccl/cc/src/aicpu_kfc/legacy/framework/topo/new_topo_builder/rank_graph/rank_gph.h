@@ -58,7 +58,7 @@ public:
     std::vector<NetInstance::Path>           GetPaths(u32 netLayer, RankId sRankId, RankId dRankId) const;
     u32 GetLayerRanks(const u32 netLayer) const;  // 获取myRank在指定netLayer包含的rank总数
     void GetLocalInstRanks(const u32 netLayer, vector<u32> &rankList, u32 &rankNum) const; // 查询myRank在该netLayer下所在的netInstance中的所有ranks列表及总数
-    u32 GetLocalInstSize(const u32 netLayer) const; // 查询myRank在该netLayer下所在的netInstance中的ranks总数
+    u32 GetLocalInstSize(const u32 netLayer) const; // 查询myRank在该netLayer下所在的netInstance中的ranks总数 
     const NetType GetNetType(const u32 netLayer) const; //  查询netLayer的NetType
     HcclResult  GetNetInstanceList(const u32 netLayer, vector<u32> &instSizeList, u32 &listSize) const; // 给定netLayer，查询RankGraph在该netLayer分为多少NetInstance，以及每个NetInstance的size
     bool IsSymmetric(const u32 netLayer) const; // 给定netLayer，查询RankGraph在该netLayer是否是对称的
@@ -81,11 +81,11 @@ public:
 private:
     RankId2PeerMap   peers_;     // <rankId, Peer>
     Level2Id2NetInst netInsts_; // <netLayer, netInstId, group>
-    std::set<RankId> innerRanks_;
+    std::set<RankId> innerRanks_; 
     RankId           myRank_;
     bool             initFlag_{false};
 
-    void CreateSubNetInstances(const std::vector<RankId> rankIds, Level2Id2NetInst &subNetInsts,
+    void CreateSubNetInstances(const std::vector<RankId> rankIds, Level2Id2NetInst &subNetInsts, 
                              RankId2PeerMap &peers, RankGraph *subRankGraph) const;
     void AddSubPeers(const std::vector<RankId> &rankIds, RankGraph *subRankGraph, RankId2PeerMap &peers) const;
     void AddSubLinks(const std::vector<RankId> &rankIds, RankId2PeerMap &peers, Level2Id2NetInst &subNetInsts) const;

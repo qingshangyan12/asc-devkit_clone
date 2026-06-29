@@ -476,7 +476,7 @@ struct rtCacheMemcpyRecordTaskTag_t {
 
 struct rtStarsPlaceHolderSqe_t {
     rtStarsSqeHeader_t header;
-
+    
     uint32_t res1;
     uint16_t res2;
     uint8_t kernel_credit;
@@ -703,7 +703,7 @@ extern void AddOneWaitStartSqe(uint16_t streamId, uint16_t taskId, u64 waitAddr,
     bool last, rtStarsCcoreWaitStartSqe_t * const sqe, uint8_t *sqeType);
 extern void AddOneWriteValueStartSqe(uint16_t streamId, uint16_t taskId, u64 writeAddr, u64 valueAddr,
                                      rtStarsCcoreWriteValueSqe_t *const sqe, uint8_t *sqeType);
-
+ 
 extern HcclResult QuerySqStatus(uint32_t devId, uint32_t sqId, uint32_t &sqHead, uint32_t &sqTail);
 extern HcclResult QuerySqStatusByType(uint32_t devId, uint32_t sqId, drvSqCqPropType_t type, uint32_t &outVal);
 extern HcclResult ConfigSqStatusByType(uint32_t devId, uint32_t sqId, drvSqCqPropType_t type, uint32_t value);

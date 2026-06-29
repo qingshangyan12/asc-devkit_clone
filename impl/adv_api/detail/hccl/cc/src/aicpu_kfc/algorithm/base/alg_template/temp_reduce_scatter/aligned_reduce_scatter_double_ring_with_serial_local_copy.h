@@ -14,5 +14,5 @@
 
 namespace hccl {
 } // namespace hccl
-
+ 
 #endif

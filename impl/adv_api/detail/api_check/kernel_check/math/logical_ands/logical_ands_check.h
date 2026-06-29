@@ -28,7 +28,7 @@
 namespace AscendC {
 namespace HighLevelApiCheck {
 template <typename T, typename U, typename S, bool isReuseSource>
-__aicore__ inline void CheckFuncLogicalAnds(__gm__ const char* name, const LocalTensor<T>& dst, const U& src0,
+__aicore__ inline void CheckFuncLogicalAnds(__gm__ const char* name, const LocalTensor<T>& dst, const U& src0, 
     const S& src1, const uint32_t count)
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)

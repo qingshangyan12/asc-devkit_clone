@@ -30,17 +30,17 @@ template <TPosition pos, int32_t depth, auto mask = 0> class TQue{...};
 <p id="p7674135716528"><a name="p7674135716528"></a><a name="p7674135716528"></a>注意，这里的队列深度和double buffer无关，队列机制用于实现流水线并行，double buffer在此基础上进一步提高流水线的利用率。即使队列的深度为1，仍可以开启double buffer。</p>
 <p id="p1334591855410"><a name="p1334591855410"></a><a name="p1334591855410"></a>非Tensor原地操作的场景下，队列的深度设置为1时，编译器对这种场景做了特殊优化，性能通常更好，<strong id="b0597122135416"><a name="b0597122135416"></a><a name="b0597122135416"></a>推荐设置为1</strong>。</p>
 <p id="p1167810565476"><a name="p1167810565476"></a><a name="p1167810565476"></a><span id="ph280915815592"><a name="ph280915815592"></a><a name="ph280915815592"></a><a href="https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/附录/常用操作/如何使用Tensor原地操作提升算子性能.md" target="_blank" rel="noopener noreferrer">Tensor原地操作</a></span>的场景下，需要设置为0。</p>
-<a name="ul26757572527"></a><a name="ul26757572527"></a><ul id="ul26757572527"><li>如下样例中队列没有连续入队，队列的深度设置为1。<a name="screen17724335125812"></a><a name="screen17724335125812"></a><pre class="screen" codetype="Cpp" id="screen17724335125812">a1 = que.AllocTensor();
+<a name="ul26757572527"></a><a name="ul26757572527"></a><ul id="ul26757572527"><li>如下样例中队列没有连续入队，队列的深度设置为1。<a name="screen17724335125812"></a><a name="screen17724335125812"></a><pre class="screen" codetype="Cpp" id="screen17724335125812">a1 = que.AllocTensor(); 
 que.EnQue(a1);
 a1 = que.DeQue();
 que.FreeTensor(a1);</pre>
 </li></ul>
-<a name="ul12675135785214"></a><a name="ul12675135785214"></a><ul id="ul12675135785214"><li>如下样例中队列连续2次入队，队列的深度应设置为2，仅在极少数preload场景（比如连续搬入两份数据，计算处理一份，完成后再搬入一份，然后计算处理提前搬入的一份...）可能会使用。其他情况下均不推荐depth &gt;= 2 。<a name="screen11973229582"></a><a name="screen11973229582"></a><pre class="screen" codetype="Cpp" id="screen11973229582">a1 = que.AllocTensor();
+<a name="ul12675135785214"></a><a name="ul12675135785214"></a><ul id="ul12675135785214"><li>如下样例中队列连续2次入队，队列的深度应设置为2，仅在极少数preload场景（比如连续搬入两份数据，计算处理一份，完成后再搬入一份，然后计算处理提前搬入的一份...）可能会使用。其他情况下均不推荐depth &gt;= 2 。<a name="screen11973229582"></a><a name="screen11973229582"></a><pre class="screen" codetype="Cpp" id="screen11973229582">a1 = que.AllocTensor(); 
 a2 = que.AllocTensor();
 que.EnQue(a1);
 que.EnQue(a2);
 a1 = que.DeQue();
-a2 = que.DeQue();
+a2 = que.DeQue(); 
 que.FreeTensor(a1);
 que.FreeTensor(a2);</pre>
 </li></ul>
@@ -104,7 +104,7 @@ QUE的Buffer数量最大也分别为8个或4个，即能插入的同步事件的
     AscendC::TQue<AscendC::TPosition::VECIN, 1> que5;
     AscendC::TQue<AscendC::TPosition::VECIN, 1> que6;
     AscendC::TQue<AscendC::TPosition::VECIN, 1> que7;
-
+     
     pipe.InitBuffer(que0, 1, len);
     pipe.InitBuffer(que1, 1, len);
     pipe.InitBuffer(que2, 1, len);
@@ -125,7 +125,7 @@ QUE的Buffer数量最大也分别为8个或4个，即能插入的同步事件的
     AscendC::TQue<AscendC::TPosition::VECIN, 1> que1;
     AscendC::TQue<AscendC::TPosition::VECIN, 1> que2;
     AscendC::TQue<AscendC::TPosition::VECIN, 1> que3;
-
+     
     pipe.InitBuffer(que0, 2, len);
     pipe.InitBuffer(que1, 2, len);
     pipe.InitBuffer(que2, 2, len);

@@ -70,7 +70,7 @@ HcclResult TransportBase::Stop()
 {
     return HCCL_SUCCESS;
 }
-
+ 
 HcclResult TransportBase::Resume()
 {
     return HCCL_SUCCESS;
@@ -280,7 +280,7 @@ HcclResult TransportBase::RxWithReduce(const std::vector<RxWithReduceMemoryInfo>
     static_cast<void>(reduceAttr);
     return HCCL_SUCCESS;
 }
-
+ 
 bool TransportBase::IsSupportTransportWithReduce()
 {
     return false;
@@ -665,20 +665,20 @@ HcclResult TransportBase::LinkSendNotifyMesg()
         /* 发送IPC notify Ready 信息 */
         CHK_RET(SendNotifyReadyMesg());
     }
-
+ 
     if (machinePara_.linkMode != LinkMode::LINK_SIMPLEX_MODE ||
         machinePara_.machineType == MachineType::MACHINE_SERVER_TYPE) {
         /* 发送IPC notify Done 信息 */
         CHK_RET(SendNotifyDoneMesg());
     }
-
+ 
     if ((machinePara_.linkMode != LinkMode::LINK_SIMPLEX_MODE ||
         machinePara_.machineType == MachineType::MACHINE_CLIENT_TYPE) &&
         machinePara_.isAicpuModeEn == true) {
         /* 发送Device上使用的IPC notify ready信息 */
         CHK_RET(SendDeviceIpcNotifyReadyMesg());
     }
-
+ 
     if ((machinePara_.linkMode != LinkMode::LINK_SIMPLEX_MODE ||
         machinePara_.machineType == MachineType::MACHINE_SERVER_TYPE) &&
         machinePara_.isAicpuModeEn == true) {

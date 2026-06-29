@@ -31,7 +31,7 @@ namespace aicpu {
 MAKE_ENUM (status_t, AICPU_ERROR_NONE = 0, AICPU_ERROR_FAILED = 1)
 status_t __attribute__((weak)) GetTaskAndStreamId(uint64_t &taskId, uint32_t &streamId);
 }
-
+ 
 namespace Hccl {
 MAKE_ENUM(MainStreamTaskType, HEAD = 0, TAIL = 1)
 

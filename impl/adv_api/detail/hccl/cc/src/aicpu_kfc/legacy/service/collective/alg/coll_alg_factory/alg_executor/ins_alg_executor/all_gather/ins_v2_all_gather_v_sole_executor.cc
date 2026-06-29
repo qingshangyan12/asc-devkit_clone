@@ -52,12 +52,12 @@ HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::InitCommIn
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CreateTemplates(
     std::shared_ptr<InsAlgTemplate> &algTemplatePtr)
-{
+{    
     algTemplatePtr = std::make_shared<InsAlgTemplate>(myRank_, rankSize_, vTopo_, virtRankMap_);
     CHK_PTR_NULL(algTemplatePtr);  // 检查是否成功分配内存
     algTemplatePtr->SetCollOp(op_);
     algTemplatePtr->SetDmaMode(dmaMode_);
-    algTemplatePtr->SetDataType(dataType_);
+    algTemplatePtr->SetDataType(dataType_);   
     return HcclResult::HCCL_SUCCESS;
 }
 
@@ -132,7 +132,7 @@ HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrat
     tempAlgParams.repeatNum = 1;  // 不需要重复
     tempAlgParams.inputRepeatStride = 0;
     tempAlgParams.outputRepeatStride = 0;
-    tempAlgParams.buffInfo.inBuffType = BufferType::INPUT;
+    tempAlgParams.buffInfo.inBuffType = BufferType::INPUT; 
     tempAlgParams.buffInfo.scratBuffType = BufferType::SCRATCH;
     tempAlgParams.buffInfo.outBuffType = BufferType::OUTPUT;
 
@@ -215,7 +215,7 @@ HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes(
     }
 
     CHK_RET(CalcLinkInfo(myRank_, rankGraph, tempResReq.links, algResReq.levelRankPairs));
-    algResReq.topoInfo.UpdateSingleLevelTopo(virtRanks_, virtRankMap_, vTopo_);
+    algResReq.topoInfo.UpdateSingleLevelTopo(virtRanks_, virtRankMap_, vTopo_);    
     algResReq.queueNotifys = tempResReq.queNotifys;
     algResReq.localWaitGroupCntNotify = tempResReq.localWaitGroupCntNotify;
     algResReq.localBcastPostCntNotify = tempResReq.localBcastPostCntNotify;

@@ -7,7 +7,7 @@
 ## 函数原型<a name="zh-cn_topic_0000001600884192_zh-cn_topic_0000001576875005_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
 ```
-OpAICoreConfig &OpAICoreConfig::ExtendCfgInfo(const char *key, const char *value)
+OpAICoreConfig &OpAICoreConfig::ExtendCfgInfo(const char *key, const char *value) 
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001600884192_zh-cn_topic_0000001576875005_zh-cn_topic_0000001525424352_section75395119104"></a>

@@ -13,7 +13,7 @@
 using namespace hccl;
 
 std::mutex AicpuChannelProcess::mutex_;
-std::unordered_map<ChannelHandle, std::unique_ptr<Hccl::UbTransportLiteImpl>>
+std::unordered_map<ChannelHandle, std::unique_ptr<Hccl::UbTransportLiteImpl>> 
     AicpuChannelProcess::ubTransportMap_;
 
 HcclResult AicpuChannelProcess::ParsePackData(std::vector<char> &data, ChannelHandle &handle)

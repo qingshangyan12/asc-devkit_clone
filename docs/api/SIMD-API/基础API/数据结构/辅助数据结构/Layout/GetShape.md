@@ -54,7 +54,7 @@
 ## 函数原型<a name="zh-cn_topic_0000002078447573_zh-cn_topic_0000001576806829_zh-cn_topic_0000001339187720_section13230182415108"></a>
 
 ```cpp
-__aicore__ inline constexpr decltype(auto) GetShape() {}
+__aicore__ inline constexpr decltype(auto) GetShape() {}   
 __aicore__ inline constexpr decltype(auto) GetShape() const {}
 ```
 

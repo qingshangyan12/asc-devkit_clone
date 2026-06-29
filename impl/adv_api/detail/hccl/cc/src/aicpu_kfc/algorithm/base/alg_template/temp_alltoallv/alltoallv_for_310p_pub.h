@@ -42,7 +42,7 @@ public:
     HcclResult Prepare(DeviceMem &userInput, DeviceMem &userOutput, DeviceMem &cclInMem, DeviceMem &cclOutMem,
         const std::vector<std::shared_ptr<LocalNotify>> &signalMainToSub,
         const std::vector<std::shared_ptr<LocalNotify>> &signalSubToMain,
-        Stream &mainStream, std::vector<Stream> &subStreams, const std::vector<LINK> &links,
+        Stream &mainStream, std::vector<Stream> &subStreams, const std::vector<LINK> &links, 
         u32 userRank, u32 userRankSize, std::vector<SendRecvInfo> &allMeshAggregationSendRecvInfo) override;
     HcclResult RunAsync() override;
 

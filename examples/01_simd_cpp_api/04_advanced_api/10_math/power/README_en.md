@@ -26,7 +26,7 @@ This example uses the Power high-level API to implement element-wise power opera
 
 ## Example Description
 
-- Example function:
+- Example function:  
   Implement element-wise power operations, supporting three modes: tensor-to-tensor, tensor-to-scalar, and scalar-to-tensor power operations.
 
   The computation formula is as follows:
@@ -41,7 +41,7 @@ This example uses the Power high-level API to implement element-wise power opera
   Scalar-to-tensor, mode = 2: Using a scalar as the fixed base, all tensor elements use the same base for power operations.
   $$dstTensor_i = Power(srcbaseScalar, srcexpTensor_i)$$
 
-- Example specifications:
+- Example specifications:  
   <table>
   <caption>Table 1: Example Input/Output Specifications</caption>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> power </td></tr>
@@ -64,7 +64,7 @@ This example uses the Power high-level API to implement element-wise power opera
   <tr><td align="center">2</td><td align="center">Scalar</td><td align="center">Tensor</td><td align="center">Base is a scalar, exponent is a tensor</td></tr>
   </table>
 
-- Example implementation:
+- Example implementation:  
   This example implements a power_custom example with fixed shapes of input srcbase[1, 16], srcexp[1, 16], and output dst[1, 16]. The example function mode parameter defaults to 0, meaning both exponent and base are tensors.
 
   - Kernel implementation
@@ -75,14 +75,14 @@ This example uses the Power high-level API to implement element-wise power opera
 
     The host side obtains the maximum and minimum temporary space required by the Power API through GetPowerMaxMinTmpSize.
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run
+## Build and Run  
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -102,7 +102,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-
+  
   For example:
 
   ```bash

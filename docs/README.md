@@ -42,7 +42,7 @@
 
 ## 附录
 除了上述系统性介绍的相关开发文档外，您还可以根据实际场景和开发阶段，有选择性地快速了解相应的专题内容。
-- 技术文章
+- 技术文章  
   - 基础入门
     - [Ascend C编程介绍](https://www.hiascend.com/zh/developer/techArticles/20230830-1)
     - [Ascend C快速入门](https://www.hiascend.com/zh/developer/techArticles/20230830-2)
@@ -52,7 +52,7 @@
     - [Ascend C非对齐数据的处理方案](https://www.hiascend.com/zh/developer/techArticles/20250627-1)
     - [深度理解多核并行/流水计算/double buffer技术](https://www.hiascend.com/zh/developer/techArticles/20230807-1)
   - 问题案例
-    - [Ascend C算子开发常见问题案例](https://www.hiascend.com/zh/developer/techArticles/20240106-1)
+    - [Ascend C算子开发常见问题案例](https://www.hiascend.com/zh/developer/techArticles/20240106-1) 
     - [含有Matmul高阶API的算子精度问题定位](https://www.hiascend.com/zh/developer/techArticles/20250107-1)
   - 性能优化
     - [Ascend C算子性能优化实用技巧01——流水优化](https://www.hiascend.com/zh/developer/techArticles/20240819-1)

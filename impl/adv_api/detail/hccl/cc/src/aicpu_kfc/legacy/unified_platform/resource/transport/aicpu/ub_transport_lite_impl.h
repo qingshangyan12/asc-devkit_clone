@@ -64,7 +64,7 @@ public:
 
     void BatchOneSidedRead(const vector<RmaBufSliceLite> &loc, const vector<RmtRmaBufSliceLite>  &rmt,
         const StreamLite &stream) override;
-
+    
     void BatchTransfer(const std::vector<RmaBufferLite> &loc, const std::vector<Buffer> &rmt,
                         const std::vector<TransferOp> &transferOp, const StreamLite &stream) override;
 
@@ -128,7 +128,7 @@ private:
     std::vector<RmaConnLite *> connVec;
 
     std::function<void(u32 streamId, u32 taskId, const TaskParam &taskParam)> callback_{nullptr};
-
+    
     std::function<HcclResult(u32, u32, const TaskParam&, u64)> newCallback_{nullptr};
 
     void ProfilingProcess(const RmaBufSliceLite &loc, const RmtRmaBufSliceLite &rmt, const StreamLite &stream, DmaOp dmaOp,
@@ -140,7 +140,7 @@ private:
     void ParseLocNotifyVec(std::vector<char> &data);
 
     void ParseRmtBufferVec(std::vector<char> &data, RmtUbBufLiteVec &vec, RmaUbBufType rmtType) const;
-
+ 
     void ParseLocBufferVec(std::vector<char> &data, LocUbBufLiteVec &vec, RmaUbBufType rmtType) const;
 
     void ParseConnVec(std::vector<char> &data);

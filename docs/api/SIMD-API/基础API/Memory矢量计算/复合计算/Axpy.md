@@ -238,13 +238,13 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
   // repeatTime = 4, mask = 128, 128 elements one repeat, 512 elements total
   // srcLocal数据类型为half，scalar数据类型为half，dstLocal数据类型为half
   // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
-  // dstRepStride, srcRepStride = 8, no gap between repeats
+  // dstRepStride, srcRepStride = 8, no gap between repeats 
   AscendC::Axpy(dstLocal, srcLocal, (half)2.0, 128, 4,{ 1, 1, 8, 8 });
-
+  
   // srcLocal数据类型为half，scalar数据类型为half，dstLocal数据类型为float
   // repeatTime = 8, mask = 64, 64 elements one repeat, 512 elements total
   // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
-  // dstRepStride = 8, srcRepStride = 4, no gap between repeats
+  // dstRepStride = 8, srcRepStride = 4, no gap between repeats 
   AscendC::Axpy(dstLocal, srcLocal, (half)2.0, 64, 8,{ 1, 1, 8, 4 }); // 每次迭代选取源操作数前4个datablock参与计算
   ```
 

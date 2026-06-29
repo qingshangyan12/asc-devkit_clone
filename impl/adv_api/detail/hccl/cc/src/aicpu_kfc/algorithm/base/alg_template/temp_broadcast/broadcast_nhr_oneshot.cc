@@ -77,7 +77,7 @@ HcclResult BroadcastNHROneshot::SimpleCheck(const u32 rank, const u32 rankSize, 
     return HCCL_SUCCESS;
 }
 
-HcclResult BroadcastNHROneshot::SdmaRx(LINK &linkLeft, LINK &linkRight, InterServerAlgoStep &stepInfo,
+HcclResult BroadcastNHROneshot::SdmaRx(LINK &linkLeft, LINK &linkRight, InterServerAlgoStep &stepInfo, 
     const std::vector<LINK> &links)
 {
     u64 totalSize = count_ * SIZE_TABLE[dataType_];
@@ -101,7 +101,7 @@ HcclResult BroadcastNHROneshot::SdmaRx(LINK &linkLeft, LINK &linkRight, InterSer
     return HCCL_SUCCESS;
 }
 
-HcclResult BroadcastNHROneshot::RdmaTxRx(LINK &linkLeft, LINK &linkRight, InterServerAlgoStep &stepInfo,
+HcclResult BroadcastNHROneshot::RdmaTxRx(LINK &linkLeft, LINK &linkRight, InterServerAlgoStep &stepInfo, 
     const std::vector<LINK> &links)
 {
     u64 totalSize = count_ * SIZE_TABLE[dataType_];
@@ -150,7 +150,7 @@ HcclResult BroadcastNHROneshot::RunBroadcastNHROneshot(u32 rank, u32 rankSize, c
             CHK_SMART_PTR_NULL(linkLeft);
         }
 
-        if ((linkRight != nullptr && linkRight->IsSpInlineReduce()) ||
+        if ((linkRight != nullptr && linkRight->IsSpInlineReduce()) || 
             (linkLeft != nullptr && linkLeft->IsSpInlineReduce())) {
             CHK_RET(SdmaRx(linkLeft, linkRight, stepInfo, links));
         } else {

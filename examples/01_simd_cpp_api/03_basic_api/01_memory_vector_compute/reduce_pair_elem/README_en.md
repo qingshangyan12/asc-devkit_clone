@@ -29,7 +29,7 @@ Note: `ReducePairElem` is the renamed API after CANN 9.1.0. For CANN 9.0.0 and e
 
 ## Example Description
 
-- Example function:
+- Example function:  
   This example calls the `ReducePairElem<SUM>` interface to perform summation on all adjacent element pairs in the input. The example specifications are shown in the table below:
 
   <table border="2">
@@ -45,7 +45,7 @@ Note: `ReducePairElem` is the renamed API after CANN 9.1.0. For CANN 9.0.0 and e
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">reduce_pair_elem_custom</td></tr>
   </table>
 
-- Example implementation:
+- Example implementation:  
   This example implements a `ReducePairElem<SUM>` example with fixed input shape x[1, 128] and output shape y[1, 64].
 
   The Compute task is responsible for summing each pair of adjacent elements (even index and odd index) in srcLocal and storing the results in dstLocal.
@@ -54,7 +54,7 @@ Note: `ReducePairElem` is the renamed API after CANN 9.1.0. For CANN 9.0.0 and e
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
 
   ```bash
@@ -62,11 +62,11 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
-
+    
 - Run the example
 
   Run the following commands in the example directory.
-
+  
   ```bash
   mkdir -p build && cd build;   # Create and enter the build directory
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;             # Build the project, default npu mode
@@ -76,7 +76,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debug or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-
+  
   Examples:
 
   ```bash

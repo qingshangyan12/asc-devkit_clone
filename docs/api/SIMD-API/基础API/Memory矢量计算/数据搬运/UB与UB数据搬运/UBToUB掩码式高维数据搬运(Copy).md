@@ -39,7 +39,7 @@
     __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask[], const uint8_t repeatTime, const CopyRepeatParams& repeatParams)
     ```
 
-- mask连续模式
+- mask连续模式 
 
     ```cpp
     template <typename T, bool isSetMask = true>

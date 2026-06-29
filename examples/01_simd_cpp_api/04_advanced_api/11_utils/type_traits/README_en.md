@@ -22,11 +22,11 @@ This example implements type_traits type traits use cases using the Ascend C pro
 ## Function Description
 - type_traits type traits APIs, including is_void/is_integral/is_floating_point/is_array/is_pointer/is_reference/is_const/remove_const/remove_volatile/remove_cv/remove_reference/remove_pointer/add_const/add_volatile/add_cv/add_pointer/add_lvalue_reference/add_rvalue_reference, can be used for type checking, adding, removing, and converting during program compilation.
 
-- Operator implementation:
-  - Kernel implementation
-    Ascend C calls each API, prints the API return values, and performs ascendc_assert checks.
+- Operator implementation:  
+  - Kernel implementation  
+    Ascend C calls each API, prints the API return values, and performs ascendc_assert checks.   
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run

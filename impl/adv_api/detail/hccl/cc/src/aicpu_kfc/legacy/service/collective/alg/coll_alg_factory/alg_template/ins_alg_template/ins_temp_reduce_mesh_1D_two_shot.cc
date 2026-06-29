@@ -70,11 +70,11 @@ HcclResult InsTempReduceMesh1DTwoShot::CalcSlice(const u64 dataSize, RankSliceIn
     u64 totalElements = dataSize / unitAlignSize;
     u64 baseElements = totalElements / tempRankSize_;
     u64 remainder = totalElements % tempRankSize_;
-
+    
     u64 accumOff = 0;
     for (u32 rankIdx = 0; rankIdx < tempRankSize_; rankIdx++) {
         u64 currSize = 0;
-
+        
         if (rankIdx < remainder) {
             currSize = (baseElements + 1) * unitAlignSize;
         } else {
@@ -149,7 +149,7 @@ HcclResult InsTempReduceMesh1DTwoShot::RunReduceScatter(const RankSliceInfo &sli
 
             const auto &link = tempLinks.at(targetRank)[0];
             TxRxLinks links(link, link);
-
+            
             SlicesList sendSList({sendSrcSlice}, {sendDstSlice});
             SlicesList recvSList({recvSrcSlice}, {recvDstSlice});
             TxRxSlicesList txRxSList(sendSList, recvSList);
@@ -163,7 +163,7 @@ HcclResult InsTempReduceMesh1DTwoShot::RunReduceScatter(const RankSliceInfo &sli
     if (mySliceSize != 0) {
         u64 destOffset = static_cast<u64>(myIdx_) * mySliceSize + scOff;
         DataSlice finalDest(tempAlgParams.buffInfo.scratBuffType, destOffset, mySliceSize);
-
+        
         for (u32 i = 0; i < tempRankSize_; i++) {
             if (i == myIdx_) {
                 continue;
@@ -207,14 +207,14 @@ HcclResult InsTempReduceMesh1DTwoShot::RunGatherToRoot(const RankSliceInfo &slic
 
                 const auto &link = tempLinks.at(targetRank)[0];
                 SlicesList sliceList({rsrc}, {rdest});
-
+                
                 CHK_RET(Recv(DataInfo(link, sliceList), tempInsQues[rankIdx], 1, true, DmaMode::GET));
             }
         }
     } else {
         u32 rankIdx = myIdx_;
         u64 curSize = sliceInfoVec[rankIdx][0].size;
-
+        
         if (curSize != 0) {
             DataSlice ssrc(tempAlgParams.buffInfo.scratBuffType, static_cast<u64>(rankIdx) * curSize + scOff, curSize);
             DataSlice sdest(tempAlgParams.buffInfo.outBuffType, sliceInfoVec[rankIdx][0].offset + outOff, curSize);

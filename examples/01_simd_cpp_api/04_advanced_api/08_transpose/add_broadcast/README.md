@@ -27,7 +27,7 @@
 
 ## 算子描述
 
-- 算子功能：
+- 算子功能：  
   Add算子实现了两个数据相加，返回相加结果的功能。对应的数学表达式为：
   ```
   z = x + y
@@ -43,8 +43,8 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_broadcast_custom</td></tr>
   </table>
 
-- 算子实现：
-
+- 算子实现：  
+  
   计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用计算接口完成两个输入参数相加，得到最终结果，再搬出到外部存储上。
 
     Add算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。
@@ -52,14 +52,14 @@
     Compute任务负责对xLocal、yLocal进行Broadcast并存入临时内存，之后执行加法操作，计算结果存储在zLocal中；
     CopyOut任务负责将输出数据从zLocal搬运至Global Memory上的输出Tensor zGm中。
 
-  - Tiling实现
+  - Tiling实现  
     TilingData参数设计，TilingData参数本质上是和并行数据切分相关的参数。
 
     本样例尝试将输入数据均分在给定数目的核上计算，如不能均分，则计算整核和尾核的个数，整核和尾核分别处理不同数据量的数据。定义UB_BLOCK_NUM为最大可用的UB数据块，对应UB的大小为UB_BLOCK_NUM * 32 Bytes。 并以UB_BLOCK_NUM为粒度进行tiling切分。
 
     本示例算子使用了20个tiling参数： xLen、yLen、dataType为x, y输入数据的总长度和数据类型；coef为需要Broadcast的输入扩维的倍数；axis为输入数据Broadcast的轴；blockLength、tileNum、 tileLength、lastTileLength为核均分场景下每个核上的计算量、tiling切分个数以及整块和尾块长度；former(tail)Num、former(tail)Length、former(tail)TileNum、former(tail)TileLength、former(tail)LastTileLength为核不均分的场景下整核和尾核相关的切分数据，与核均分场景下对应；isEvenCore用来判断当前是否为核均分场景。
 
-  - 调用实现
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行

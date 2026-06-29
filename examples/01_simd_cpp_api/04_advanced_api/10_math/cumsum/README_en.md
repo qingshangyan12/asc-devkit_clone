@@ -26,9 +26,9 @@ This example uses the CumSum high-level API to compute the cumulative sum of a t
 
 ## Example Description
 
-- Example function:
+- Example function:  
   Perform cumulative sum operations on the input tensor along rows or columns. Each element in the output result is the cumulative sum of all elements at and before the corresponding position in the input tensor along rows or columns.
-- Example specifications:
+- Example specifications:  
   <table>
   <caption>Table 1: Example Specifications</caption>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> cumsum </td></tr>
@@ -44,7 +44,7 @@ This example uses the CumSum high-level API to compute the cumulative sum of a t
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">cumsum_custom</td></tr>
   </table>
 
-- Example implementation:
+- Example implementation:  
   This example implements a cumsum_custom example with input shape src[32, 160] and output shapes dst[32, 160] and lastRow[1, 160].
 
   - Kernel implementation
@@ -55,14 +55,14 @@ This example uses the CumSum high-level API to compute the cumulative sum of a t
 
     The host side obtains the maximum and minimum temporary space required by the CumSum API through GetCumSumMaxMinTmpSize.
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run
+## Build and Run  
 
 Run the following steps in the root directory of this example to build and run the operator.
 
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -81,7 +81,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-
+  
   For example:
 
   ```bash

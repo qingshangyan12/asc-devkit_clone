@@ -82,7 +82,7 @@ void DetectConnectionAnomalies::AddIpQueue(RankInfo &localRankInfo, RankInfo &re
     auto ip = ipMap_.find(remoteIp);
     if (ip == ipMap_.end()) {
         ipMap_.insert(std::make_pair(remoteIp, localIp));
-        HCCL_INFO("[Add][IpQueue]localIp[%s], remoteIp[%s], nicType[%d], deviceLogicId[%d]",
+        HCCL_INFO("[Add][IpQueue]localIp[%s], remoteIp[%s], nicType[%d], deviceLogicId[%d]", 
             localIp.GetReadableAddress(), remoteIp.GetReadableAddress(), nicType, deviceLogicId);
         errInfo.localRankInfo = localRankInfo;
         errInfo.remoteRankInfo = remoteRankInfo;
@@ -344,7 +344,7 @@ std::string DetectConnectionAnomalies::GetTag(HcclIpAddress &Ip, int i)
 
 HcclResult DetectConnectionAnomalies::AddWhiteList(
     std::shared_ptr<HcclSocket> socket,
-    NicType nicType,
+    NicType nicType, 
     std::string& tag)
 {
     // 根据 NicType 处理白名单
@@ -377,7 +377,7 @@ HcclResult DetectConnectionAnomalies::AddWhiteList(
     return HCCL_SUCCESS;
 }
 
-HcclResult DetectConnectionAnomalies::DelWhiteList(HcclIpAddress &localIpAddr,
+HcclResult DetectConnectionAnomalies::DelWhiteList(HcclIpAddress &localIpAddr, 
     std::vector<struct SocketWlistInfo> whiteListInfos, std::shared_ptr<HcclSocket> socket)
 {
     if (!threadExit_ || whiteListInfos.size() == 0) {
@@ -552,7 +552,7 @@ HcclResult DetectConnectionAnomalies::CreateClients(struct ErrInfo errInfo, std:
 
 std::string DetectConnectionAnomalies::FormatDetectMessage(const std::string &localServerId, s32 localDeviceId, const DetectInfo &detectInfo)
 {
-    return std::string("This node (server ") +
+    return std::string("This node (server ") + 
         localServerId  + ", device ID " + std::to_string(localDeviceId) +
         ") detects that srcRank (server " + detectInfo.localServerId +
         ", device ID " + std::to_string(detectInfo.localDeviceId) +

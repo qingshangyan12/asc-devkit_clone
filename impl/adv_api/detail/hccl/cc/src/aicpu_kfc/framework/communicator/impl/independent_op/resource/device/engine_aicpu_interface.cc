@@ -61,12 +61,12 @@ __attribute__((visibility("default"))) uint32_t RunAicpuThreadInit(void* args)
     CHK_PTR_NULL(args);
     uint64_t devAddr = *reinterpret_cast<uint64_t*>(args);
     ThreadMgrAicpuParam* param = reinterpret_cast<ThreadMgrAicpuParam*>(devAddr);
-    HCCL_INFO("[RunAicpuThreadInit] threadNum[%u], deviceLogicId[%d], deviceType[%u]",
+    HCCL_INFO("[RunAicpuThreadInit] threadNum[%u], deviceLogicId[%d], deviceType[%u]", 
         param->threadNum, param->deviceLogicId, param->deviceType);
     return AicpuThreadProcess::AicpuThreadInit(param);
 }
 
-__attribute__((visibility("default"))) uint32_t RunAicpuThreadDestroy(void* args)
+__attribute__((visibility("default"))) uint32_t RunAicpuThreadDestroy(void* args) 
 {
     CHK_PTR_NULL(args);
     uint64_t devAddr = *reinterpret_cast<uint64_t*>(args);
@@ -80,7 +80,7 @@ __attribute__((visibility("default"))) uint32_t RunAicpuThreadSupplementNotify(v
     CHK_PTR_NULL(args);
     uint64_t devAddr = *reinterpret_cast<uint64_t*>(args);
     ThreadMgrAicpuParam* param = reinterpret_cast<ThreadMgrAicpuParam*>(devAddr);
-    HCCL_INFO("[RunAicpuThreadSupplementNotify] threadNum[%u], deviceLogicId[%d], deviceType[%u]",
+    HCCL_INFO("[RunAicpuThreadSupplementNotify] threadNum[%u], deviceLogicId[%d], deviceType[%u]", 
         param->threadNum, param->deviceLogicId, param->deviceType);
     return AicpuThreadProcess::AicpuThreadSupplementNotify(param);
 }

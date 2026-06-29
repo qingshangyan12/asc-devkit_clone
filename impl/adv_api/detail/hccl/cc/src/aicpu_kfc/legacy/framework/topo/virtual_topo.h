@@ -38,7 +38,7 @@ public:
         RankId remoteRankId, IpAddress localAddr, IpAddress remoteAddr, u32 reuseIdx = 0)
     : type(portDeploymentType), linkProtocol_(linkProtocol), localRankId_(localRankId), remoteRankId_(remoteRankId),
         localAddr_(localAddr), remoteAddr_(remoteAddr), reuseIdx_(reuseIdx) {};
-
+    
     explicit LinkData(const NetInstance::Path &path)
     {
         if (path.links.size() == 1) {

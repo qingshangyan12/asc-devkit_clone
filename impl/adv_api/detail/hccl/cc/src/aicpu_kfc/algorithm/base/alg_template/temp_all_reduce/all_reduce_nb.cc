@@ -183,12 +183,12 @@ HcclResult AllReduceNB::RunAllGather(u32 rank, u32 rankSize, const std::vector<L
     return tempAlg->RunAsync(rank, rankSize, links);
 }
 
-
+ 
 const u64 GetSliceSizeOfNB(const u64 dataSize, const u32 rankSize)
 {
     const u64 sliceSizeCalculated = (dataSize + (rankSize - 1)) / rankSize;
     u64 sliceSizeAligned = 0;
-
+    
     // 优化小包性能，小于128k不切片
     if (sliceSizeCalculated > NB_ALLREDUCE_SMALL_SIZE) {
         sliceSizeAligned = AlgTemplateBase::RoundUpWithDivisor(sliceSizeCalculated, HCCL_MIN_SLICE_ALIGN);
@@ -197,7 +197,7 @@ const u64 GetSliceSizeOfNB(const u64 dataSize, const u32 rankSize)
     }
     HCCL_INFO("dataSize[%llu], rankSize[%u], sliceSizeCalculated[%llu], sliceSizeAligned[%llu]", dataSize, rankSize,
         sliceSizeCalculated, sliceSizeAligned);
-
+ 
     return sliceSizeAligned;
 }
 

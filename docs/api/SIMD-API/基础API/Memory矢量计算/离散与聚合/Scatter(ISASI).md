@@ -204,7 +204,7 @@ AscendC::Scatter(dstLocal, srcLocal, dstOffsetLocal, (uint32_t)0, COUNT); // dst
 ```
 输入数据dstOffsetLocal:
 [254 252 250 ... 4 2 0]
-输入数据srcLocal（128个half类型数据）:
+输入数据srcLocal（128个half类型数据）: 
 [0 1 2 ... 125 126 127]
 输出数据dstGlobal:
 [127 126 125 ... 2 1 0]

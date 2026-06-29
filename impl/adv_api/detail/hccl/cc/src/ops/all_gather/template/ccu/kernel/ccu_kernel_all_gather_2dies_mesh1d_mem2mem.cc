@@ -35,23 +35,23 @@ CcuKernelAllGather2DiesMeshMem2Mem1D::CcuKernelAllGather2DiesMeshMem2Mem1D(const
 HcclResult CcuKernelAllGather2DiesMeshMem2Mem1D::Algorithm()
 {
     HCCL_INFO("[CcuKernelAllGather2DiesMeshMem2Mem1D] CcuKernelAllGather2DiesMeshMem2Mem1D run");
-
+    
     if (rankIdGroup_.size() == 0) {
         return HcclResult::HCCL_SUCCESS;
     }
 
     CHK_RET(InitResource());
-
+ 
     LoadArgs();
-
+ 
     PreSync();
-
+ 
     DoAllGather();
-
+ 
     PostSync();
-
+ 
     HCCL_INFO("[CcuKernelAllGather2DiesMeshMem2Mem1D] CcuKernelAllGather2DiesMeshMem2Mem1D end");
-
+    
     return HcclResult::HCCL_SUCCESS;
 }
 
@@ -147,7 +147,7 @@ void CcuKernelAllGather2DiesMeshMem2Mem1D::PostSync()
 }
 
 void CcuKernelAllGather2DiesMeshMem2Mem1D::DoAllGather()
-{
+{    
     hcomm::CcuRep::LocalAddr src = CreateLocalAddr();
     src.addr = input_[0];
     src.token = token_[rankId_];
@@ -155,9 +155,9 @@ void CcuKernelAllGather2DiesMeshMem2Mem1D::DoAllGather()
     for (uint64_t rankIdx = 0; rankIdx < rankIdGroup_.size(); rankIdx++) {
         remoteDst.push_back(CreateRemoteAddr());
     }
-    for (uint64_t rankIdx = 0; rankIdx < rankIdGroup_.size(); rankIdx++) {
-        event_.SetMask(1 << rankIdGroup_[rankIdx]);
-        remoteDst[rankIdx].addr = output_[rankIdGroup_[rankIdx]];
+    for (uint64_t rankIdx = 0; rankIdx < rankIdGroup_.size(); rankIdx++) { 
+        event_.SetMask(1 << rankIdGroup_[rankIdx]); 
+        remoteDst[rankIdx].addr = output_[rankIdGroup_[rankIdx]]; 
         remoteDst[rankIdx].addr += offSet_;
         remoteDst[rankIdx].token = token_[rankIdGroup_[rankIdx]];
 

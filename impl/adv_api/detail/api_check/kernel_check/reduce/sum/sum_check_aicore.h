@@ -21,7 +21,7 @@
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_REDUCE_SUM_SUM_CHECK_AICORE_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_REDUCE_SUM_SUM_CHECK_AICORE_H_
 
-namespace AscendC {
+namespace AscendC {  
 namespace HighLevelApiCheck {
 template <typename T, int32_t reduceDim = -1, bool isReuseSource = false, bool isBasicBlock = false>
 class CheckFuncClassSum {

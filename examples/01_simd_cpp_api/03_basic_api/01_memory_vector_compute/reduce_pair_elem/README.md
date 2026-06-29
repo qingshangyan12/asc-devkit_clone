@@ -29,7 +29,7 @@
 
 ## 样例描述
 
-- 样例功能：
+- 样例功能：  
   本样例中调用`ReducePairElem<SUM>`接口，对输入元素中所有的相邻元素对执行求和计算。样例规格如下表所示：
 
   <table border="2">
@@ -45,7 +45,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce_pair_elem_custom</td></tr>
   </table>
 
-- 样例实现：
+- 样例实现：  
   本样例中实现的是固定shape为输入x[1, 128]，输出y[1, 64]的`ReducePairElem<SUM>`样例。
 
   Compute任务负责对srcLocal中每对相邻元素（偶数下标与奇数下标）求和，并将结果存储在dstLocal中。
@@ -54,7 +54,7 @@
 
 在本样例根目录下执行如下步骤，编译并运行样例。
 
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
 
   ```bash
@@ -62,11 +62,11 @@
   ```
 
   > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
-
+    
 - 样例执行
 
   在本样例目录下执行如下命令。
-
+  
   ```bash
   mkdir -p build && cd build;   # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;             # 编译工程，默认npu模式
@@ -76,7 +76,7 @@
   ```
 
   使用CPU调试或NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=cpu`或`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
-
+  
   示例如：
 
   ```bash

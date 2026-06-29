@@ -127,7 +127,7 @@ private:
     std::string DescRecv(const CollOpParams &opParams);
 
     std::string DescReduce(const CollOpParams &opParams);
-
+    
     std::string DescBroadcast(const CollOpParams &opParams);
 
     std::string DescBatchSendRecv(const CollOpParams &opParams);

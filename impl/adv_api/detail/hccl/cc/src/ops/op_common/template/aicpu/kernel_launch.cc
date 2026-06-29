@@ -231,7 +231,7 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             HCCL_ERROR("%s CreateScatter fail", __func__);
             return 1;
         }
-
+        
         if (HcommIsSupportHcommRegOpInfo() &&
             HcommRegOpInfo(param->commName, reinterpret_cast<void *>(&opInfo), sizeof(ScatterOpInfo)) != HCCL_SUCCESS) {
             HCCL_ERROR("%s HcommRegOpInfo fail, commName[%s], algTag[%s], size[%u]",
@@ -348,7 +348,7 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             HCCL_ERROR("%s failed to report MainStream And LastTask, thread %lu, param->commName %s.",  __func__, thread, param->commName);
             return 1;
         }
-
+        
         if (HcommBatchModeEnd(param->algTag) != HCCL_SUCCESS) {
             HCCL_ERROR("failed set eager mode, tag is %s.", param->algTag);
             return 1;
@@ -450,7 +450,7 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
                 HCCL_ERROR("failed set eager mode, tag is %s.", param->algTag);
                 return 1;
             }
-	    }
+	    } 
     }
 
     if (HcommReleaseComm(param->commName) != HCCL_SUCCESS) {

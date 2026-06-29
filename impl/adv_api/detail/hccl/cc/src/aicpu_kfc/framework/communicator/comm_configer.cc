@@ -7,21 +7,21 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-
+ 
 #include "comm_configer.h"
 #include "adapter_rts_common.h"
 #include "externalinput.h"
 #include "alg_env_config.h"
-
+ 
 namespace hccl {
 CommConfiger& CommConfiger::GetInstance()
 {
     static CommConfiger configer;
     return configer;
 }
-
+ 
 CommConfiger::CommConfiger() : initialized_(true) {}
-
+ 
 HcclResult CommConfiger::SetCommConfig(CommConfig config, const std::string& identifier)
 {
     std::lock_guard<std::mutex> lock(lock_);
@@ -37,7 +37,7 @@ HcclResult CommConfiger::SetCommConfig(CommConfig config, const std::string& ide
     HCCL_INFO("[CommConfiger][SetCommConfig]: commConfig of identifier[%s]", identifier.c_str());
     return HCCL_SUCCESS;
 }
-
+ 
 HcclResult CommConfiger::SetCommConfigExecTimeOut(s32 execTimeOut, const std::string& identifier)
 {
     std::lock_guard<std::mutex> lock(lock_);
@@ -53,7 +53,7 @@ HcclResult CommConfiger::SetCommConfigExecTimeOut(s32 execTimeOut, const std::st
     }
     return commConfigMap_[identifier].SetConfigExecTimeOut(execTimeOut);
 }
-
+ 
 s32 CommConfiger::GetCommConfigExecTimeOut(const std::string& identifier)
 {
     std::lock_guard<std::mutex> lock(lock_);
@@ -73,7 +73,7 @@ s32 CommConfiger::GetCommConfigExecTimeOut(const std::string& identifier)
         identifier.c_str(), execTimeOut);
     return execTimeOut;
 }
-
+ 
 bool CommConfiger::GetCommConfigExecTimeOutSet(const std::string& identifier)
 {
     std::lock_guard<std::mutex> lock(lock_);
@@ -93,7 +93,7 @@ bool CommConfiger::GetCommConfigExecTimeOutSet(const std::string& identifier)
         identifier.c_str(), execTimeOutSet);
     return execTimeOutSet;
 }
-
+ 
 std::vector<HcclAlgoType> CommConfiger::GetCommConfigAlgoConfig(const std::string& identifier, HcclCMDType opType)
 {
     std::lock_guard<std::mutex> lock(lock_);
@@ -108,8 +108,8 @@ std::vector<HcclAlgoType> CommConfiger::GetCommConfigAlgoConfig(const std::strin
     }
     return commConfigMap_[identifier].GetConfigHcclAlgo(opType);
 }
-
-
+ 
+ 
 bool CommConfiger::GetCommConfigInterServerRetryEnable(const std::string& identifier)
 {
     std::lock_guard<std::mutex> lock(lock_);
@@ -129,7 +129,7 @@ bool CommConfiger::GetCommConfigInterServerRetryEnable(const std::string& identi
         identifier.c_str(), isRetry);
     return isRetry;
 }
-
+ 
 bool CommConfiger::GetCommConfigInterSuperPodRetryEnable(const std::string& identifier)
 {
     std::lock_guard<std::mutex> lock(lock_);
@@ -149,7 +149,7 @@ bool CommConfiger::GetCommConfigInterSuperPodRetryEnable(const std::string& iden
         identifier.c_str(), isRetry);
     return isRetry;
 }
-
+ 
 u32 CommConfiger::GetCommConfigRetryMaxCnt(const std::string& identifier)
 {
     std::lock_guard<std::mutex> lock(lock_);
@@ -169,7 +169,7 @@ u32 CommConfiger::GetCommConfigRetryMaxCnt(const std::string& identifier)
         identifier.c_str(), retryMaxCnt);
     return retryMaxCnt;
 }
-
+ 
 u32 CommConfiger::GetCommConfigRetryHoldTime(const std::string& identifier)
 {
     std::lock_guard<std::mutex> lock(lock_);
@@ -189,7 +189,7 @@ u32 CommConfiger::GetCommConfigRetryHoldTime(const std::string& identifier)
         identifier.c_str(), retryHoldTime);
     return retryHoldTime;
 }
-
+ 
 u32 CommConfiger::GetCommConfigRetryIntervalTime(const std::string& identifier)
 {
     std::lock_guard<std::mutex> lock(lock_);
@@ -209,7 +209,7 @@ u32 CommConfiger::GetCommConfigRetryIntervalTime(const std::string& identifier)
         identifier.c_str(), retryIntervalTime);
     return retryIntervalTime;
 }
-
+ 
 void CommConfiger::UnRegisterToCommConfiger(const std::string& identifier)
 {
     if (initialized_ == false) {
@@ -228,7 +228,7 @@ void CommConfiger::UnRegisterToCommConfiger(const std::string& identifier)
     }
     commConfigMap_.erase(identifier);
 }
-
+ 
 CommConfiger::~CommConfiger()
 {
     std::lock_guard<std::mutex> lock(lock_);

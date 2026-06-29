@@ -21,7 +21,7 @@ TopoMatchConcurrMeshNHR::~TopoMatchConcurrMeshNHR()
 }
 
 HcclResult TopoMatchConcurrMeshNHR::MatchTopo(std::vector<std::vector<std::vector<RankId>>> &vTopo,
-                                              std::vector<std::vector<RankId>> &virtRanks,
+                                              std::vector<std::vector<RankId>> &virtRanks, 
                                               std::vector<std::map<RankId, u32>> &virtRankMap)
 {
     // 获取并校验当前通信层数
@@ -138,7 +138,7 @@ HcclResult TopoMatchConcurrMeshNHR::MatchTopo(std::vector<std::vector<std::vecto
 }
 
 HcclResult TopoMatchConcurrMeshNHR::GenerateLevel0(
-    const std::set<RankId> &rankSetLevel0, u32 gcdInstSize, RankId rankId,
+    const std::set<RankId> &rankSetLevel0, u32 gcdInstSize, RankId rankId, 
     std::vector<std::vector<std::vector<RankId>>> &vTopo,
     std::vector<std::vector<RankId>> &virtRanks)
 {
@@ -170,7 +170,7 @@ HcclResult TopoMatchConcurrMeshNHR::GenerateLevel0(
         const u32 startOffset = groupId * gcdInstSize;
         const u32 totalSize = rankSetLevel0.size();
         auto startIt = rankSetLevel0.cbegin();
-        std::advance(startIt, startOffset);
+        std::advance(startIt, startOffset); 
 
         const u32 elementsToTake = std::min(gcdInstSize, totalSize - startOffset);
         auto endIt = startIt;
@@ -217,7 +217,7 @@ HcclResult TopoMatchConcurrMeshNHR::FindLevel0Block(const Matrix<RankId>& podTop
                 HcclResult::HCCL_E_PARA);
     const u32 totalRows = podTopo.size();
     const u32 totalCols = podTopo[0].size();
-    CHK_PRT_RET((totalRows % subDim0Size != 0 || totalCols % subDim1Size != 0),
+    CHK_PRT_RET((totalRows % subDim0Size != 0 || totalCols % subDim1Size != 0), 
                 HCCL_ERROR("[CollAlgFactory] [TopoMatchConcurrMeshNHR] Rank [%d], invalid subDim.", myRank_),
                 HcclResult::HCCL_E_PARA);
 
@@ -228,7 +228,7 @@ HcclResult TopoMatchConcurrMeshNHR::FindLevel0Block(const Matrix<RankId>& podTop
     // 计算 podTopo 块信息
     const u32 blockRow = targetRow / subDim0Size;
     const u32 blockCol = targetCol / subDim1Size;
-
+    
     // 计算目标子块编号和起始索引
     const u32 startRow = blockRow * subDim0Size;
     const u32 startCol = blockCol * subDim1Size;
@@ -302,7 +302,7 @@ HcclResult TopoMatchConcurrMeshNHR::ExtractLevel0Block(const Matrix<RankId>& pod
         auto colIt = sourceRow.cbegin() + startCol + targetRelCol;
         targetColVec.push_back(*colIt);
     }
-
+    
     std::sort(targetRowVec.begin(), targetRowVec.end());
     std::sort(targetColVec.begin(), targetColVec.end());
 

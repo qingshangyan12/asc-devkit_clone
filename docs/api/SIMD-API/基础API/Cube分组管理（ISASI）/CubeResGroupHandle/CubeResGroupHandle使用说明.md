@@ -4,7 +4,7 @@ CubeResGroupHandle用于在分离模式下对AI Core计算资源分组。分组�
 
 如下图所示，CubeResGroupHandle1中有2个AIC，10个AIV，AIC为Block0和Block1。其中Block0与Queue0、Queue1、Queue2、Queue3、Queue4进行通信，Block1与Queue 5、Queue 6、Queue 7、Queue 8、Queue9进行通信。每一个消息队列对应一个AIV，消息队列的深度固定为4，即一次性最多可以容纳4个消息。CubeResGroupHandle2的消息队列个数为12，表明有12个AIV。CubeResGroupHandle的消息处理顺序如CubeResGroupHandle2中黑色箭头所示。
 
-**图1**  基于CubeResGroupHandle的AI Core计算资源分组通信示意图<a name="fig1086562617536"></a>
+**图1**  基于CubeResGroupHandle的AI Core计算资源分组通信示意图<a name="fig1086562617536"></a>  
 ![](../../../../figures/基于CubeResGroupHandle的AI-Core计算资源分组通信示意图.png "基于CubeResGroupHandle的AI-Core计算资源分组通信示意图")
 
 基于CubeResGroupHandle实现AI Core计算资源分组步骤如下：
@@ -61,10 +61,10 @@ CubeResGroupHandle用于在分离模式下对AI Core计算资源分组。分组�
        bool isTransA;
        bool isTransB;
        bool isAtomic;
-       bool isLast;
-       int32_t tailM;
+       bool isLast;                 
+       int32_t tailM;              
        int32_t tailN;
-       int32_t tailK;
+       int32_t tailK;               
        uint64_t aAddr;
        uint64_t bAddr;
        uint64_t cAddr;
@@ -107,11 +107,11 @@ CubeResGroupHandle用于在分离模式下对AI Core计算资源分组。分组�
         __aicore__ inline static void Call(MatmulApiCfg &mm, __gm__ CubeMsgBody *rcvMsg, CubeResGroupHandle<CubeMsgBody> &handle){
           // 用户自行实现逻辑
         };
-
+    
         __aicore__ inline static void Init(NormalCallbackFuncs<MatmulApiCfg, CubeMsgBody> &foo, MatmulApiCfg &mm, GM_ADDR tilingGM){
            // 用户自行实现逻辑
         };
-
+       
     };
     ```
 
@@ -293,7 +293,7 @@ CubeResGroupHandle用于在分离模式下对AI Core计算资源分组。分组�
     用户使用[CreateCubeResGroup](CreateCubeResGroup.md)接口创建一个或多个CubeResGroupHandle。
 
     ```
-    /*
+    /* 
      * groupID为用户自定义的CreateCubeResGroup的groupID
      * MatmulApiType为定义好的AIC上计算对象的类型
      * MyCallbackFunc为定义好的自定义回调计算结构体

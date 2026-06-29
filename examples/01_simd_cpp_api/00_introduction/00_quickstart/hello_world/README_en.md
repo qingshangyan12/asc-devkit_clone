@@ -65,7 +65,7 @@ Execute the following steps in the root directory of this sample to build and ru
 - Execution Results
 
   The following execution results indicate successful execution.
-
+  
   ```bash
   [AIV Block 0/8] Hello World!!!
   [AIV Block 1/8] Hello World!!!

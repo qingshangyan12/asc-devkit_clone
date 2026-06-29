@@ -162,7 +162,7 @@ HcclResult InsV2ReduceScatterSequenceExecutor<AlgTopoMatch, InsAlgTemplate0, Ins
 
     // 构建框间template
     std::shared_ptr<InsAlgTemplate1> algTemplateIntra = std::make_shared<InsAlgTemplate1>(param, myRank_, algHierarchyInfo_.infos[1]);
-
+    
     BufferType inBuffType = BufferType::INPUT;
     BufferType outBuffType = BufferType::OUTPUT;
     u32 templateScratchMultiplierInter = algTemplateInter->CalcScratchMultiple(inBuffType, outBuffType);
@@ -206,7 +206,7 @@ HcclResult InsV2ReduceScatterSequenceExecutor<AlgTopoMatch, InsAlgTemplate0, Ins
                                         ? dataSize_
                                         : strideCount_ * dataTypeSize_; // ccl-in按照rank偏移量，每次偏移是单次循环最大数据量
         tempAlgParamsInter.outputSliceStride = currDataCount * dataTypeSize_; // 如果是scratchbuffer，偏移是单次循环处理的最大数据量
-
+        
         HCCL_INFO("[InsV2ReduceScatterSequenceExecutor] loop [%u] tempAlgParamsInter.inputSliceStride [%u],"
             "tempAlgParamsInter.outputSliceStride [%u] tempAlgParamsInter.sliceSize [%u]",
             loop, tempAlgParamsInter.inputSliceStride, tempAlgParamsInter.outputSliceStride, tempAlgParamsInter.sliceSize);
@@ -239,7 +239,7 @@ HcclResult InsV2ReduceScatterSequenceExecutor<AlgTopoMatch, InsAlgTemplate0, Ins
 
         tempAlgParamsIntra.inputSliceStride = templateScratchMultiplierInter * currDataCount * dataTypeSize_; // 框间从ccl-in拿数据，
         tempAlgParamsIntra.outputSliceStride = currDataCount * dataTypeSize_; // 如果是scratchbuffer，偏移是单次循环处理的最大数据量
-
+        
         HCCL_INFO("[InsV2ReduceScatterSequenceExecutor] loop [%u] tempAlgParamsIntra.inputSliceStride [%u],"
             "tempAlgParamsIntra.outputSliceStride [%u] tempAlgParamsIntra.sliceSize [%u]",
             loop, tempAlgParamsIntra.inputSliceStride, tempAlgParamsIntra.outputSliceStride, tempAlgParamsIntra.sliceSize);

@@ -145,7 +145,7 @@ HcclResult ReduceScatterPlantLocalReduce::RunAsync(const u32 rank, const u32 ran
         }
         CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[%s]RunAlltoAll or RunGroupAlltoAll failed, localRank[%u], groupId[%u]",
             __func__, localRank_, groupId), ret);
-
+        
         CHK_RET(LocalNotify::Wait(stream_, dispatcher_, (*meshSignalPtr_)[lRMainStreamId_], profilerInput_.stage));
         CHK_RET(AlgTemplateBase::ExecEmptyTask(inputMem_, outputMem_, stream_, dispatcher_));
         CHK_RET(MainRecordLocalReduceWait(lRMainStreamId_));
@@ -154,7 +154,7 @@ HcclResult ReduceScatterPlantLocalReduce::RunAsync(const u32 rank, const u32 ran
         ret = RunLocalReduce(groupId, memBlockInfo);
         CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[%s]LocalReduce failed, localRank[%u], groupId[%u]",
             __func__, localRank_, groupId), ret);
-
+        
         // LocalReduce主流通知All2All主流执行完成，可以下发下一次LocalReduce操作
         CHK_RET(LocalNotify::Post(subStreams_[lRMainStreamId_], dispatcher_, (*meshSignalPtr_)[lRMainStreamId_],
             profilerInput_.stage));
@@ -173,10 +173,10 @@ HcclResult ReduceScatterPlantLocalReduce::LocalCopy(u32 groupId, const MemBlockI
     if (sliceSize == 0) {
         return HCCL_SUCCESS;
     }
-
-    DeviceMem src = DeviceMem::create(static_cast<u8 *>(inputMemPtr_) +
+    
+    DeviceMem src = DeviceMem::create(static_cast<u8 *>(inputMemPtr_) + 
         memBlockInfo.userInputOffsets[localRank_], sliceSize);
-
+    
     // 当非最后一组最后一卡且outputIndex是最后一块时，Copy至CclIn/UserIn预留位
     DeviceMem dst;
     u32 outputIndex = CalcOutputIndex(localRank_);
@@ -360,9 +360,9 @@ HcclResult ReduceScatterPlantLocalReduce::RunLocalReduce(u32 groupId, const MemB
             CHK_RET(LocalNotify::Wait(subStreams_[streamId], dispatcher_, (*meshSignalAuxPtr_)[streamId],
                 profilerInput_.stage));
         }
-
+        
         // LocalReduce操作
-        for (u32 offset = 0; offset <= tailIndex - headIndex; offset++) {
+        for (u32 offset = 0; offset <= tailIndex - headIndex; offset++) {   
             u32 inputIndex = CalcOutputIndex(headIndex + offset); // reduce的源数据offset
             u32 outputIndex = CalcOutputIndex(offset);            // reduce的目标offset
             u32 streamOffset = offset % (reduceSubStreamNum + 1);

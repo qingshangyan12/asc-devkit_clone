@@ -72,7 +72,7 @@ void CommConfig::InitAlgoConfig()
         algoConfig_[static_cast<HcclCMDType>(opType)] = GetExternalInputHcclAlgoConfig(static_cast<HcclCMDType>(opType));
     }
 }
-
+ 
 void CommConfig::InitRetryEnable()
 {
     retryEnable_[HCCL_RETRY_ENABLE_LEVEL_0] = GetExternalInputIntraServerRetryEnable();
@@ -84,7 +84,7 @@ HcclResult CommConfig::Load(const HcclCommConfig *userConfig)
 {
     // 检查是否为空
     CHK_PTR_NULL(userConfig);
-
+    
     // 读取结构体的size
     size_t configSize = *(reinterpret_cast<const size_t *>(userConfig));
     HCCL_INFO("[Load] config size[%llu]", configSize);
@@ -234,7 +234,7 @@ HcclResult CommConfig::SetConfigBufferSize(const CommConfigHandle &config)
 {
     if (config.bufferSize == HCCL_COMM_BUFFSIZE_CONFIG_NOT_SET) {
         // 默认跟随环境变量配置
-        HCCL_INFO("[SetConfigByVersion] The hcclBufferSize is not configured, use the env config [%u](Bytes) as default.",
+        HCCL_INFO("[SetConfigByVersion] The hcclBufferSize is not configured, use the env config [%u](Bytes) as default.", 
             bufferSize_);
     } else if (config.bufferSize < HCCL_CCL_COMM_BUFFER_MIN) {
         RPT_INPUT_ERR(true,
@@ -336,7 +336,7 @@ HcclResult CommConfig::SetConfigBufferName(const CommConfigHandle &config)
 }
 
 HcclResult CommConfig::SetConfigOpExpansionMode(const CommConfigHandle &config)
-{
+{   
     switch (config.opExpansionMode) {
         case COMM_CONFIG_OPEXPANSION_DEFAULT:
             HCCL_INFO("CommConfig is set to 0(default), aicpuUnfold_ is [%d] and aivMode_ is [%d].", aicpuUnfold_, aivMode_);
@@ -356,7 +356,7 @@ HcclResult CommConfig::SetConfigOpExpansionMode(const CommConfigHandle &config)
                 HCCL_INFO("CommConfig is set to 2(aicpuUnfold_), aicpuUnfold_ is [%d] and aivMode_ is [%d].", aicpuUnfold_, aivMode_);
             } else {
                 HCCL_WARNING("Only A3 and 300I support aicpu unfold, set aicpuUnfold_ to [%d] and aivMode_ to [%d].", aicpuUnfold_, aivMode_);
-            }
+            } 
             break;
         case COMM_CONFIG_OPEXPANSION_AIV:
             aivMode_ = true;
@@ -371,7 +371,7 @@ HcclResult CommConfig::SetConfigOpExpansionMode(const CommConfigHandle &config)
             HCCL_WARNING("Current version not support opExpansionMode[%u], set aicpuUnfold_ to [%d] and aivMode_ to [%d].", config.opExpansionMode, aicpuUnfold_, aivMode_);
             break;
     }
-
+    
     return HCCL_SUCCESS;
 }
 
@@ -382,7 +382,7 @@ HcclResult CommConfig::SetConfigExecTimeout(const CommConfigHandle &config)
         HCCL_INFO("[SetConfigByVersion] The hcclExecTimeOut is not configured, use the env config [%u] as default.", execTimeOut_);
     } else {
         s32 execTimeOut = config.execTimeOut;
-
+ 
         DevType deviceType;
         CHK_RET(hrtGetDeviceType(deviceType)); // 910A和910B/C要分开
         if (deviceType == DevType::DEV_TYPE_910_93 || deviceType == DevType::DEV_TYPE_910B) {
@@ -401,31 +401,31 @@ HcclResult CommConfig::SetConfigExecTimeout(const CommConfigHandle &config)
                 "than or equal to 17340s", execTimeOut);
                 return HCCL_SUCCESS;
             }
-
+ 
             s32 intPart = execTimeOut / HCCL_INTEVAL_EXEC_TIME_OUT_S;
             intPart = (intPart == 0) ? 1 : intPart;
             execTimeOut = intPart * HCCL_INTEVAL_EXEC_TIME_OUT_S;
         }
-
+ 
         double timeout = execTimeOut;
         execTimeOut_ = static_cast<s32>(std::ceil(timeout));
         execTimeOutSetByConfig_ = true;
         HCCL_INFO("[SetConfigByVersion] HCCL_EXEC_TIMEOUT set by config to [%d]s", execTimeOut);
     }
-
+    
     return HCCL_SUCCESS;
 }
-
+ 
 HcclResult CommConfig::SetConfigHcclAlgo(const CommConfigHandle &config)
 {
     if (config.hcclAlgo[0] == '\0') {
         return HCCL_SUCCESS;
     }
-
+ 
     auto hcclAlgoLength = strlen(config.hcclAlgo);
     hcclAlgoLength = hcclAlgoLength < COMM_ALGO_MAX_LENGTH ? hcclAlgoLength : COMM_ALGO_MAX_LENGTH;
     std::string algoConfig = std::string(config.hcclAlgo, hcclAlgoLength);
-
+ 
     algoConfig.erase(std::remove(algoConfig.begin(), algoConfig.end(), ' '), algoConfig.end());
     if (algoConfig.empty()) {
         HCCL_WARNING("[SetConfigHcclAlgo]hccl algo config is empty, HCCL use externalinput algo selection.");
@@ -446,10 +446,10 @@ HcclResult CommConfig::SetConfigHcclAlgo(const CommConfigHandle &config)
         CHK_RET(SetSpecificAlgTypeConfig(algoPerOptype));
     }
     HCCL_RUN_INFO("HCCL_ALGO set by HcclCommConfig to [%s]", algoConfig.c_str());
-
+ 
     return HCCL_SUCCESS;
 }
-
+ 
 HcclResult CommConfig::SetConfigHcclRetryEnable(const CommConfigHandle &config)
 {
     if (config.hcclRetryEnable[0] == '\0') {
@@ -474,7 +474,7 @@ HcclResult CommConfig::SetConfigHcclRetryEnable(const CommConfigHandle &config)
     HCCL_RUN_INFO("HCCL_OP_RETRY_ENABLE set by commconfig to [%s].", retryConfig.c_str());
     return HCCL_SUCCESS;
 }
-
+ 
 HcclResult CommConfig::SplitRetryEnable(const std::string &retryConfig, std::vector<std::string> &retryEnables)
 {
     std::string remainRetryConfig;
@@ -489,7 +489,7 @@ HcclResult CommConfig::SplitRetryEnable(const std::string &retryConfig, std::vec
         remainRetryConfig = "";
     }
     retryEnables.push_back(retryConfig.substr(0, found));
-
+ 
     if (retryEnables.size() > HCCL_RETRY_ENABLE_LEVEL_NUM) {
         HCCL_ERROR("[SplitRetryEnable] retryEnable config is invalid. retryEnable level is more than %u.",
             HCCL_RETRY_ENABLE_LEVEL_NUM);
@@ -500,15 +500,15 @@ HcclResult CommConfig::SplitRetryEnable(const std::string &retryConfig, std::vec
     }
     return HCCL_SUCCESS;
 }
-
+ 
 HcclResult CommConfig::SetConfigRetryEnable(const std::vector<std::string> &retryEnables)
 {
     const std::map<std::string, u32> hcclRetryLevelMap = {
         {"L0", HCCL_RETRY_ENABLE_LEVEL_0}, {"L1", HCCL_RETRY_ENABLE_LEVEL_1}, {"L2", HCCL_RETRY_ENABLE_LEVEL_2}
     };
-
+ 
     std::map<std::string, u32> countHcclRetryLevelMap = {{"L0", 0}, {"L1", 0}, {"L2", 0}};
-
+ 
     const std::map<std::string, bool> hcclRetryEnableMap = {{"0", false}, {"1", true}};
     for (const auto& retryEnableLevel : retryEnables) {
         u32 level = 0;
@@ -555,7 +555,7 @@ HcclResult CommConfig::SetConfigRetryEnable(const std::vector<std::string> &retr
     }
     return HCCL_SUCCESS;
 }
-
+ 
 HcclResult CommConfig::SetConfigHcclRetryParams(const CommConfigHandle &config)
 {
     if (config.hcclRetryParams[0] == '\0') {
@@ -582,13 +582,13 @@ HcclResult CommConfig::SetConfigHcclRetryParams(const CommConfigHandle &config)
     retryMaxCnt_ = maxcnt;
     retryHoldTime_ = holdtime;
     retryIntervalTime_ = intervaltime;
-
+ 
     HCCL_RUN_INFO("[SetConfigHcclRetryParams]HCCL_OP_RETRY_PARAMS is set, " \
         "MaxCnt is [%u], HoldTime is [%u]ms, IntervalTime is [%u]ms.",
         maxcnt, holdtime, intervaltime);
     return HCCL_SUCCESS;
 }
-
+ 
 HcclResult CommConfig::SetSpecificAlgTypeConfig(std::vector<std::string> &algos)
 {
     for (std::string& algConfig : algos) {
@@ -724,12 +724,12 @@ s32 CommConfig::GetConfigExecTimeOut() const
 {
     return execTimeOut_;
 }
-
+ 
 bool CommConfig::GetConfigExecTimeOutSet() const
 {
     return execTimeOutSetByConfig_;
 }
-
+ 
 std::vector<HcclAlgoType> CommConfig::GetConfigHcclAlgo(HcclCMDType opType)
 {
     return algoConfig_[opType];
@@ -739,32 +739,32 @@ const std::map<HcclCMDType, std::vector<HcclAlgoType>>& CommConfig::GetConfigHcc
 {
     return algoConfig_;
 }
-
+ 
 bool CommConfig::GetConfigIntraServerRetryEnable() const
 {
     return retryEnable_[HCCL_RETRY_ENABLE_LEVEL_0];
 }
-
+ 
 bool CommConfig::GetConfigInterServerRetryEnable() const
 {
     return retryEnable_[HCCL_RETRY_ENABLE_LEVEL_1];
 }
-
+ 
 bool CommConfig::GetConfigInterSuperPodRetryEnable() const
 {
     return retryEnable_[HCCL_RETRY_ENABLE_LEVEL_2];
 }
-
+ 
 u32 CommConfig::GetConfigRetryMaxCnt() const
 {
     return retryMaxCnt_;
 }
-
+ 
 u32 CommConfig::GetConfigRetryHoldTime() const
 {
     return retryHoldTime_;
 }
-
+ 
 u32 CommConfig::GetConfigRetryIntervalTime() const
 {
     return retryIntervalTime_;

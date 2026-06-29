@@ -94,7 +94,7 @@ HcclResult LocalNotify::Wait(Stream& stream, HcclDispatcher dispatcherPtr, const
 {
     CHK_PTR_NULL(dispatcherPtr);
     CHK_SMART_PTR_NULL(notify);
-
+    
     return reinterpret_cast<DispatcherPub*>(dispatcherPtr)->SignalWait(
         notify->ptr(), stream, INVALID_VALUE_RANKID, INVALID_VALUE_RANKID, stage, true, notify->notifyId_, timeOut);
 }

@@ -26,21 +26,21 @@ using WorkSpaceMem_t = struct tagWorkSpaceMem {
 class WorkSpaceMem {
 public:
     WorkSpaceMem();
-
+    
     ~WorkSpaceMem();
-
+    
     /* 设置全局资源 */
     HcclResult SetMemResource(const std::string &tag, void *ptr, u64 maxSize);
 
     /* 内存分配 */
     void* AllocMem(const std::string &tag, u64 size);
-
+    
     /* 基于tag销毁资源  */
     HcclResult DestroyMemResource(const std::string &tag);
-
+    
     /* 销毁全局资源 */
     void DestroyMemResource();
-
+    
     bool IsExist(const std::string &tag);
 
     std::map<std::string, WorkSpaceMem_t>  memResMap_;

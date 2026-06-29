@@ -55,7 +55,7 @@ static __aicore__ inline uint32_t CalcHDstDataSkipLine(Intf *self)
 template <class Intf, class src0_T>
 __aicore__ inline void CalcLoadToA1DataCopyParams(Intf *self, AscendC::DataCopyParams &dataCopyParams,
     uint32_t &loadToA1Cout1Loop, uint32_t &loadToA1HLoop, uint64_t &srcDataStride, uint32_t &dstDataStride,
-    uint32_t &padOffset, uint32_t &curHoSize, uint32_t curCout1Idx)
+    uint32_t &padOffset, uint32_t &curHoSize, uint32_t curCout1Idx) 
 {
     uint32_t curCout1Size = 0;
     if constexpr (Intf::conv3dConfig.loadB2Condition == ConvBackpropApi::B2Condition::HKWK_EQ_ONE) {

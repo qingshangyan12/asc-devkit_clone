@@ -38,23 +38,23 @@ CcuKernelAllGather2DiesMesh1D::CcuKernelAllGather2DiesMesh1D(const hcomm::CcuKer
 HcclResult CcuKernelAllGather2DiesMesh1D::Algorithm()
 {
     HCCL_INFO("[CcuKernelAllGather2DiesMesh1D] CcuKernelAllGather2DiesMesh1D run");
-
+    
     if (rankIdGroup_.size() == 0) {
         return HcclResult::HCCL_SUCCESS;
     }
 
     CHK_RET(InitResource());//资源初始化
-
+ 
     LoadArgs();//参数载入
-
+ 
     PreSync();//前同步
-
+ 
     DoAllGather();//AllGather计算
-
+ 
     PostSync();//后同步
-
+ 
     HCCL_INFO("[CcuKernelAllGather2DiesMesh1D] CcuKernelAllGather2DiesMesh1D end");
-
+    
     return HcclResult::HCCL_SUCCESS;
 }
 

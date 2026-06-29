@@ -16,7 +16,7 @@
 #ifndef CCL_KERNEL_AICPU
 #include "aiv_temp_all_to_all_mesh_1D.h"
 #include "ccu_temp_all_to_all_mesh_1D_2Die.h"
-#endif
+#endif  
 
 namespace Hccl {
 constexpr u64 MAX_OFFLOAD_SCRATCH_SIZE = 200 * 1024 * 1024;  // 200M
@@ -184,16 +184,16 @@ HcclResult InsV2AlltoAllSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateL
     std::shared_ptr<InsAlgTemplate> algTemplate)
 {
     u32 dataSizePerVolume = DataTypeSizeGet(dataType_);
-    HCCL_INFO("[InsV2AlltoAllSoleExecutor][Orchestrate] Start, template[%s]", algTemplate->Describe().c_str());
+    HCCL_INFO("[InsV2AlltoAllSoleExecutor][Orchestrate] Start, template[%s]", algTemplate->Describe().c_str());   
     dataSize_ = dataCount_ * dataSizePerVolume;
 
     TemplateDataParams tempAlgParams;
     tempAlgParams.repeatNum = 1;  // 不需要重复
     tempAlgParams.inputRepeatStride = 0;
-    tempAlgParams.outputRepeatStride = 0;
+    tempAlgParams.outputRepeatStride = 0;   
     tempAlgParams.buffInfo.outBuffType = BufferType::OUTPUT;
     tempAlgParams.buffInfo.scratBuffType = BufferType::SCRATCH;
-    tempAlgParams.buffInfo.inBuffType = BufferType::INPUT;
+    tempAlgParams.buffInfo.inBuffType = BufferType::INPUT;   
 
     TempFuncs tempFuncs;
     tempFuncs.opMode = opMode_;
@@ -227,7 +227,7 @@ HcclResult InsV2AlltoAllSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateL
     // 将usrIn数据切块，看每一块大小，这里要保障是能整除的
     u64 dataCountPerRank = dataCount_;
     u64 allToAllProcessedDataCount = 0;
-    u64 loopTimes = dataCountPerRank / scratchDataCountPerLoopPerRank +
+    u64 loopTimes = dataCountPerRank / scratchDataCountPerLoopPerRank + 
             static_cast<u64>(dataCountPerRank % scratchDataCountPerLoopPerRank != 0);
     for (u64 loop = 0; loop < loopTimes; loop++) {
         u64 currDataCount = (loop == loopTimes - 1) ? dataCountPerRank - allToAllProcessedDataCount : scratchDataCountPerLoopPerRank;
@@ -264,10 +264,10 @@ HcclResult InsV2AlltoAllSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes(
     AlgTempResReq tempResReq;
     CHK_RET(GetTemplateResRequest(rankGraph, algTemplate, tempResReq));
 
-    CHK_RET(CalcLinkInfo(myRank_, rankGraph, tempResReq.links, algResReq.levelRankPairs));
+    CHK_RET(CalcLinkInfo(myRank_, rankGraph, tempResReq.links, algResReq.levelRankPairs));   
     algResReq.primQueueNum = tempResReq.streamNum;
     algResReq.queueNotifys = tempResReq.queNotifys;
-    algResReq.topoInfo.UpdateSingleLevelTopo(virtRanks_, virtRankMap_, vTopo_);
+    algResReq.topoInfo.UpdateSingleLevelTopo(virtRanks_, virtRankMap_, vTopo_);   
     algResReq.localBcastPostCntNotify = tempResReq.localBcastPostCntNotify;
     algResReq.localWaitGroupCntNotify = tempResReq.localWaitGroupCntNotify;
     CHK_RET(CalcResLinks(myRank_, rankGraph, linkPriority_, tempResReq.links, algResReq.links));
@@ -296,10 +296,10 @@ HcclResult InsV2AlltoAllSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcResOfflo
 
 INS_REGISTER_IMPL_BY_TEMP(OpType::ALLTOALL, InsAlltoAllMesh2D, InsV2AlltoAllSoleExecutor, TopoMatchConcurrMesh,
                           InsTempAlltoAllMesh2D);
-#ifndef CCL_KERNEL_AICPU
+#ifndef CCL_KERNEL_AICPU   
 INS_REGISTER_IMPL_BY_TEMP(OpType::ALLTOALL, AivAlltoAllMesh1D, InsV2AlltoAllSoleExecutor, TopoMatchMesh,
                           AivTempAlltoAllMesh1D);
 INS_REGISTER_IMPL_BY_TEMP(OpType::ALLTOALL, CcuAlltoAllMesh1D2Die, InsV2AlltoAllSoleExecutor, TopoMatchMesh,
                           CcuTempAllToAllMesh1D2Die);
-#endif
+#endif                           
 }  // namespace Hccl

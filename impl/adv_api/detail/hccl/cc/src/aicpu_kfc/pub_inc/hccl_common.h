@@ -106,9 +106,9 @@ constexpr s32 NOTIFY_MAX_WAIT_TIME_910_93 = 2147483647;   // 910B和910_93场景
 constexpr uint32_t SDMA_QOS_LOW = 2;
 constexpr uint32_t SDMA_QOS_MIDDLE = 4;
 constexpr uint32_t SDMA_QOS_HIGH = 6;
-
+ 	 
 constexpr uint32_t SDMA_QOS_DEFAULT = 6;
-
+ 	 
 constexpr uint32_t HCCL_QOS_MIN = 0;
 constexpr uint32_t HCCL_QOS_LEVEL_1_LIMIT = 2;
 constexpr uint32_t HCCL_QOS_LEVEL_2_LIMIT = 4;
@@ -145,7 +145,7 @@ const std::string LOG_KEYWORDS_TASK_EXEC = "TaskExecStage";               // 算
 const std::string LOG_KEYWORDS_INIT_GROUP = "InitGroupStage";             // 通信域初始化阶段异常
 const std::string LOG_KEYWORDS_INIT_CHANNEL = "InitChannelStage";
 const std::string LOG_KEYWORDS_LINK_INFO = "LinkInfo";
-
+ 
 /* 二级检索关键字 */
 const std::string LOG_KEYWORDS_TIMEOUT = "Timeout";                       // 算子执行阶段超时
 const std::string LOG_KEYWORDS_RUN_FAILED = "RunFailed";                  // 算子执行阶段失败，如SDMA ERROR
@@ -159,14 +159,14 @@ const std::string LOG_KEYWORDS_VERSION_CONFLICT = "VersionConflict";      // HCC
 const std::string LOG_KEYWORDS_INVALID_ARGUMENT= "InvalidArgument";       // 外部入参非法
 const std::string LOG_KEYWORDS_RESOURCE = "Resource";
 const std::string LOG_KEYWORDS_NOT_SUPPORTED = "Not Supported";
-
+ 
 /* 三级检索关键字 */
 const std::string LOG_KEYWORDS_HOST = "HOST";
 const std::string LOG_KEYWORDS_HOST_TS = "HOST_TS";
 const std::string LOG_KEYWORDS_AIV = "AIV";
 const std::string LOG_KEYWORDS_AICPU = "AICPU";
 const std::string LOG_KEYWORDS_CQE_ERROR = "ROCE CQE ERROR";
-
+ 
 /* 通信域及本卡信息关键字 */
 const std::string LOG_KEYWORDS_COMMUNICATOR = "Communicator Key Info";
 const std::string LOG_KEYWORDS_LOCALRANK = "LocalRank Key Info";

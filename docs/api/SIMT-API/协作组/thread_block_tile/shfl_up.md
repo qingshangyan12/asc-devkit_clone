@@ -54,7 +54,7 @@ T shfl_up(T var, unsigned int delta) const
 
 以4个线程为一组划分线程块，获取协作组内当前线程向前偏移`delta`的线程输入的`var`值。
 
-**图1**  shfl_up接口返回结果示意图
+**图1**  shfl_up接口返回结果示意图  
 ![](../../../figures/thread_block_tile_shfl_up.png "thread_block_tile_shfl_up")
 
 - SIMT编程场景：

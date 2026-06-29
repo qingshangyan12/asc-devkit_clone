@@ -104,7 +104,7 @@ using HcclOpMetaInfo = struct HcclOpMetaInfoDef {
         meta.copyPattern = copyPattern;
         meta.algolevel1Type = algolevel1Type;
         meta.hugeData = hugeData;
-        meta.isSmallCount = smallCount;
+        meta.isSmallCount = smallCount; 
         meta.isEnableCache = CheckEnableCache(meta);
         meta.dataSplit = dataSplit;
         meta.isAivMode = isAivMode;
@@ -119,7 +119,7 @@ using HcclOpMetaInfo = struct HcclOpMetaInfoDef {
         meta.copyPattern = copyPattern;
         meta.algolevel1Type = algolevel1Type;
         meta.hugeData = hugeData;
-        meta.isSmallCount = smallCount;
+        meta.isSmallCount = smallCount; 
         meta.isEnableCache = CheckEnableCache(meta);
         meta.dataSplit = dataSplit;
         return meta;

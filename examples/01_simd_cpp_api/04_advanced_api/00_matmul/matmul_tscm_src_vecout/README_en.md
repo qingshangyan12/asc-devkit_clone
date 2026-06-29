@@ -21,13 +21,13 @@ A Matmul example that uses user-defined TSCM input with data sourced from VECOUT
 │   └── README.md                               // Example description document
 ```
 ## Example Description
-- Example Function:
+- Example Function:  
   The Matmul example customizes the data transfer of matrix A from VECOUT to L1, keeping all data of matrix A resident in L1. When calling the Matmul API for computation, matrix A is set as TSCM input and matrix B is set as GM input, performing matrix multiplication and bias addition on the input A and B matrices.
 
 - Constraints
   - The TSCM input matrix must be fully loaded on the L1 Buffer.
 
-- Example Specifications:
+- Example Specifications:  
   In this example: M = 32, N = 256, K = 32.
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="5" align="center">Matmul</td></tr>
@@ -39,11 +39,11 @@ A Matmul example that uses user-defined TSCM input with data sourced from VECOUT
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="5" align="center">matmul_tscm_src_vecout_custom</td></tr>
   </table>
 
-- Example Implementation:
+- Example Implementation: 
   - Key Kernel Steps
     - Create the Matmul object. In the MatmulType of the left matrix A, POSITION is TSCM and SRC_POSITION is VECOUT.
       ```cpp
-      AscendC::MatmulType<AscendC::TPosition::TSCM, CubeFormat::NZ, AType,
+      AscendC::MatmulType<AscendC::TPosition::TSCM, CubeFormat::NZ, AType, 
                           IS_TRANS_A, LayoutMode::NONE, false, AscendC::TPosition::VECOUT>
       ```
     - Customize the transfer of the left matrix A from VECOUT to TSCM, set the left matrix A, right matrix B, and Bias, where the left matrix A is TSCM input.
@@ -63,12 +63,12 @@ A Matmul example that uses user-defined TSCM input with data sourced from VECOUT
       }
       ```
 
-  - Invocation Implementation
+  - Invocation Implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables
+- Configure Environment Variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

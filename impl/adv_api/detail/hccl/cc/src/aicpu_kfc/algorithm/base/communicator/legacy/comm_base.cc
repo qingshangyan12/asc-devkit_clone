@@ -228,7 +228,7 @@ HcclResult CommBase::SetTransportType(const u32 dstRank)
         // Server内判断是否使用rdma
         if (isUsedRdmaLevel0_ || isAlltoAllCommMesh_ ||
             (paraVector_[rank_].deviceType != DevType::DEV_TYPE_310P3 &&
-            (paraVector_[rank_].devicePhyId / HCCL_AISERVER_DEVICE_NUM !=
+            (paraVector_[rank_].devicePhyId / HCCL_AISERVER_DEVICE_NUM != 
             paraVector_[dstRank].devicePhyId / HCCL_AISERVER_DEVICE_NUM))) {
             transportType_[dstRank] = TransportType::TRANS_TYPE_IBV_EXP;
         } else {

@@ -14,12 +14,12 @@
 #include "alg_template_base_pub.h"
 
 namespace hccl {
-
+ 
 class CommAHCBaseInfo {
 public:
     explicit CommAHCBaseInfo(const std::vector<std::vector<u32>> &subGroups);
     virtual ~CommAHCBaseInfo();
-
+ 
     static HcclResult CheckGlobalGroups(std::vector<std::vector<std::vector<u32>>> &globalSubGroups);
     static HcclResult CheckSubGroups(std::vector<std::vector<u32>> &subGroups);
     static HcclResult DisposeSubGroups(const u32 rank, const std::vector<std::vector<std::vector<u32>>> &globalSubGroups,
@@ -28,7 +28,7 @@ public:
         std::vector<std::vector<u32>> &level0SubGroups, std::vector<std::vector<u32>> &level1SubGroups,
         u64 &globalTotalSliceSegment, u32 &rankSizeLevel0);
     static HcclResult InitConcAlgOption(std::map<AHCConcOpType, TemplateType> &ahcAlgOption);
-
+    
     virtual HcclResult Init(AHCOpType opType, std::map<AHCConcOpType, TemplateType> &ahcAlgOption);
     virtual HcclResult SetGlobalTotalSliceSegment(u64 globalTotalSliceSegment);
     HcclResult SetAlgTemplateParam(AHCExtendPreparePara &ahcExtendPreparePara);
@@ -54,7 +54,7 @@ public:
         const std::vector<LINK> &links, std::vector<std::vector<LINK>> &interLinksVector,
         std::vector<std::vector<Slice>> &interSlicesVector, std::vector<u32> &logicCardList);
     virtual bool IsNeedInterProc(const u32 rank);
-
+ 
     u32 GetIntraRank(const u32 rank);
     u32 GetInterRank(const u32 groupIdx, const u32 rank);
     u32 GetCommRank(const u32 rank);
@@ -86,15 +86,15 @@ private:
     HcclResult GetAlgTemplateOpInstance(const AHCOpType opType, std::unique_ptr<AlgTemplateBase> &tempAlg,
         const HcclDispatcher &dispatcher, const u64 reduceAttr, bool extendFlag,
         AHCExtendPreparePara extendPara, AHCLevel ahcLevel, ConcType concType);
-    void GetInterCommGroupIdxList(u32 rank, std::vector<u32> &interCommGroupIdxList);
+    void GetInterCommGroupIdxList(u32 rank, std::vector<u32> &interCommGroupIdxList);        
 };
-
+ 
 class CommBrokeAlignInfo : public CommAHCBaseInfo {
 public:
     explicit CommBrokeAlignInfo(const std::vector<std::vector<u32>> &subGroups);
     ~CommBrokeAlignInfo() override;
     HcclResult Init(AHCOpType opType, std::map<AHCConcOpType, TemplateType> &ahcAlgOption) override;
-
+ 
     bool IsNeedInterProc(const u32 rank) override;
     // Reduce-Scatter 及 All-Gather 组内切片逻辑
     HcclResult CalcIntraSlicesAndLinks(const u32 rank, const u32 dataUnitSize, const u64 count,
@@ -116,18 +116,18 @@ private:
     HcclResult CalcInterSlicesAndLinksForAR(const u32 rank, const u32 dataUnitSize, const u64 count,
         const std::vector<LINK> &links, std::vector<std::vector<LINK>> &interLinksVector,
         std::vector<std::vector<Slice>> &interSlicesVector);
-
+ 
     std::map<u32, std::vector<u32>> completeGroupOrder_;
     std::map<u32, std::vector<u32>> emptyGroupOrder_;
 };
-
+ 
 class CommAHCAlignInfo : public CommAHCBaseInfo {
 public:
     explicit CommAHCAlignInfo(const std::vector<std::vector<u32>> &subGroups);
     ~CommAHCAlignInfo() override;
     HcclResult Init(AHCOpType opType, std::map<AHCConcOpType, TemplateType> &ahcAlgOption) override;
     HcclResult SetGlobalTotalSliceSegment(u64 globalTotalSliceSegment) override;
-
+ 
     // Reduce-Scatter 及 All-Gather 组内切片逻辑
     HcclResult CalcIntraSlicesAndLinks(const u32 rank, const u32 dataUnitSize, const u64 count,
         const std::vector<LINK> &links, std::vector<std::vector<LINK>> &intraLinksVector,
@@ -163,7 +163,7 @@ private:
     HcclResult CalcInterSlicesAndLinksForAR(const u32 rank, const u32 dataUnitSize, const u64 count,
         const std::vector<LINK> &links, std::vector<std::vector<LINK>> &interLinksVector,
         std::vector<std::vector<Slice>> &interSlicesVector, std::vector<u32> &logicCardList);
-
+ 
     std::vector<std::vector<u32>> logicCardGroup_; // 逻辑同号卡并发流分组
     std::vector<u32> logicCardExecuteOffset_; // 逻辑同号卡在并发流分组中的 offset
     std::vector<u32> logicCardSliceSize_; // 逻辑同号卡切片大小

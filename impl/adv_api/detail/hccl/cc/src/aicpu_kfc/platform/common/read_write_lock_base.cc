@@ -57,14 +57,14 @@ void ReadWriteLockBase::writeLock()
         if (!(s & WRITING_BIT) && (s & READER_MASK) == 0) {
             // 尝试原子设置写入标志位 WRITING_BIT 并清除 WAITING_BIT
             uint64_t nextS = (s | WRITING_BIT) & ~WAITING_BIT;
-            if (state_.compare_exchange_weak(s, nextS,
+            if (state_.compare_exchange_weak(s, nextS, 
                     std::memory_order_acquire,
                     std::memory_order_relaxed)) {
                 return;     // 成功获取写入权限
             }
         }
-
-        CPU_PAUSE();    // 避免过度占用CPU资源
+    
+        CPU_PAUSE();    // 避免过度占用CPU资源 
     }
 }
 
@@ -84,7 +84,7 @@ bool ReadWriteLockBase::tryReadLock()
 
     // 尝试原子增加读者计数
     uint64_t newS = s + 1;
-    if (state_.compare_exchange_weak(s, newS,
+    if (state_.compare_exchange_weak(s, newS, 
             std::memory_order_acquire,
             std::memory_order_relaxed)) {
         return true;     // 成功增加读者计数

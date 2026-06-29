@@ -49,9 +49,9 @@ private:
     CfgField<SocketIfName> hcclSocketIfName{"HCCL_SOCKET_IFNAME", SocketIfName({}, false, false), CastSocketIfName};
     CfgField<bool>         whitelistDisable{"HCCL_WHITELIST_DISABLE", true, CastBin2Bool};
     CfgField<std::string>  hcclWhiteListFile{"HCCL_WHITELIST_FILE", "", Str2T<std::string>, CheckFilePath, SetRealPath};
-    CfgField<std::vector<SocketPortRange>> hcclHostSocketPortRange{"HCCL_HOST_SOCKET_PORT_RANGE", {},
+    CfgField<std::vector<SocketPortRange>> hcclHostSocketPortRange{"HCCL_HOST_SOCKET_PORT_RANGE", {}, 
         [] (const std::string &s) -> std::vector<SocketPortRange> { return CastSocketPortRange(s, "HCCL_HOST_SOCKET_PORT_RANGE"); }};
-    CfgField<std::vector<SocketPortRange>> hcclDeviceSocketPortRange{"HCCL_NPU_SOCKET_PORT_RANGE", {},
+    CfgField<std::vector<SocketPortRange>> hcclDeviceSocketPortRange{"HCCL_NPU_SOCKET_PORT_RANGE", {}, 
         [] (const std::string &s) -> std::vector<SocketPortRange> { return CastSocketPortRange(s, "HCCL_NPU_SOCKET_PORT_RANGE"); }};
 };
 
@@ -84,7 +84,7 @@ private:
     static constexpr s32 AIV_TIMEOUT_DEFAULT = 1091;
 
     CfgField<u32> execTimeOut{
-        "HCCL_EXEC_TIMEOUT",
+        "HCCL_EXEC_TIMEOUT", 
         static_cast<u32>(NOTIFY_DEFAULT_WAIT_TIME),
         [](const std::string& s) -> u32 {
             static std::regex validFormat(R"(^\d+(\.\d{1,2})?$)");
@@ -161,7 +161,7 @@ private:
     static constexpr u64 HCCL_CCL_COMM_FIXED_CALC_BUFFER_SIZE = (1 * 1024 * 1024);
 
     CfgField<std::string>               primQueueGenName{"PRIM_QUEUE_GEN_NAME", "", Str2T<std::string>};
-
+    
     CfgField<std::map<OpType, std::vector<HcclAlgoType>>> hcclAlgoConfig{
         "HCCL_ALGO", std::map<OpType, std::vector<HcclAlgoType>> (), SetHcclAlgoConfig};
 

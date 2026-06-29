@@ -26,7 +26,7 @@
 
 ## 样例描述
 
-- 样例功能：
+- 样例功能：  
   SwiGLU是采用Swish作为激活函数的GLU变体。
 
   计算公式如下：
@@ -34,7 +34,7 @@
   其中Swish激活函数的计算公式如下（β为常量）：
   $$Swish(x)=x/(1 + e^{(-\beta x)})$$
 
-- 样例规格：
+- 样例规格：  
   <table border="2" align="left">
   <caption>表1：样例规格表</caption>
   <tr><td align="center" rowspan="1">样例类型</td><td align="center" colspan="4"> swiglu </td></tr>
@@ -49,16 +49,16 @@
   <tr><td align="center" rowspan="1">核函数名</td><td align="center" colspan="4">swiglu_custom</td></tr>
   </table>
 
-- 样例实现：
+- 样例实现：  
   本样例实现的是固定shape的样例，输入元素个数为32。通过Tiling机制将计算参数（dataLength、sharedTmpBufferSize）从Host端传递到Device端，支持灵活配置计算规模。
 
-  - Kernel实现
+  - Kernel实现  
     核心计算步骤：将输入数据从GM搬运到UB后，调用 `AscendC::SwiGLU` 完成SwiGLU计算，再将结果搬回Global Memory。
 
-  - Tiling实现
+  - Tiling实现  
     临时空间处理：通过 `AscendC::GetSwiGLUMaxMinTmpSize` 获取所需临时空间大小，由Tiling传递到Kernel端。当临时空间大于0时，使用开发者提供的buffer；否则由框架自动申请。
 
-  - 调用实现
+  - 调用实现  
     使用内核调用符 `<<<>>>` 调用核函数，传入src0、src1、dst、workspace和tiling参数。
 
 ## 编译运行

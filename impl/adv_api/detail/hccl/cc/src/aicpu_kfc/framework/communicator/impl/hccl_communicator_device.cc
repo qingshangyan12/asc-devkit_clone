@@ -995,7 +995,7 @@ namespace hccl
     {
         return HCCL_SUCCESS;
     }
-
+ 
     HcclResult HcclCommunicator::CopyHostOpResToDeviceParam(const std::string &newTag)
     {
         return HCCL_SUCCESS;
@@ -1406,8 +1406,8 @@ namespace hccl
     {
         return HCCL_SUCCESS;
     }
-
-    u8 HcclCommunicator::GetOrderLaunchMode (bool isCapture)
+    
+    u8 HcclCommunicator::GetOrderLaunchMode (bool isCapture) 
     {
         return 0;
     }
@@ -1423,7 +1423,7 @@ namespace hccl
     {
         return HCCL_SUCCESS;
     }
-
+    
     HcclResult HcclCommunicator::PrepareLinkForSwitchNic(std::unordered_map<u32, bool> &switchRanks,
         ChangeLinkInfo &changeLinkInfo)
     {
@@ -1460,7 +1460,7 @@ namespace hccl
         return;
     }
 
-    HcclResult HcclCommunicator::GetCacheMap(std::unique_ptr<CollAlgOperator>& algOperator , OpParam& opParam,
+    HcclResult HcclCommunicator::GetCacheMap(std::unique_ptr<CollAlgOperator>& algOperator , OpParam& opParam, 
         AlgType& algType, bool selectAivAlg, std::string& newTag)
     {
         return HCCL_SUCCESS;
@@ -1475,7 +1475,7 @@ namespace hccl
     {
         return HCCL_SUCCESS;
     }
-
+ 
     HcclResult HcclCommunicator::GetRemoteCCLBuf(uint32_t remoteRank, void **addr, uint64_t *size)
     {
         return HCCL_SUCCESS;
@@ -1484,12 +1484,12 @@ namespace hccl
     {
         return HCCL_SUCCESS;
     }
-    HcclResult IndOpTransportAlloc(const std::string &tag, OpCommTransport &opCommTransport,
+    HcclResult IndOpTransportAlloc(const std::string &tag, OpCommTransport &opCommTransport, 
         TransportIOMem& transMem, bool isAicpuModeEn)
     {
         return HCCL_SUCCESS;
     }
-    HcclTopoAttr HcclCommunicator::GetTopoAttr()
+    HcclTopoAttr HcclCommunicator::GetTopoAttr() 
     {
         return {};
     }
@@ -1525,7 +1525,7 @@ namespace hccl
     {
         return HCCL_SUCCESS;
     }
-
+    
     HcclResult HcclCommunicator::GetInstSizeByNetLayer(uint32_t netLayer, uint32_t *rankNum)
     {
         return HCCL_SUCCESS;
@@ -1540,7 +1540,7 @@ namespace hccl
     {
         return HCCL_SUCCESS;
     }
-
+    
     HcclResult HcclCommunicator::GetInstSizeListByNetLayer(uint32_t netLayer, uint32_t **instSizeList, uint32_t *listSize)
     {
         return HCCL_SUCCESS;
@@ -1592,7 +1592,7 @@ namespace hccl
         HCCL_INFO("[HcclCommunicator][device][SetHcclQos] hcclQos[%u]", hcclQos);
  	    hcclQos_ = hcclQos;
  	}
-
+ 	 
  	u32 HcclCommunicator::GetHcclQos()
  	{
         HCCL_INFO("[HcclCommunicator][device][GetHcclQos] hcclQos[%u]", hcclQos_);

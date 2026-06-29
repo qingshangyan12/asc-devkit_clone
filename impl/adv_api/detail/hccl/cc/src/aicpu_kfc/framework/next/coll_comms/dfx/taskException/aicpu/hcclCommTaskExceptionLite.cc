@@ -111,7 +111,7 @@ HcclResult HcclCommTaskExceptionLite::GetThreadCqe(hccl::Thread* thread, rtLogic
 
     constexpr u32 reportSize = MAX_REPORT_CNT;
     rtLogicCqReport_t streamReport[reportSize];
-
+    
     CqeQueryInput cqeQueryInput;
     cqeQueryInput.devId = devId_;
     cqeQueryInput.streamId = streamLite->GetId();
@@ -119,7 +119,7 @@ HcclResult HcclCommTaskExceptionLite::GetThreadCqe(hccl::Thread* thread, rtLogic
     cqeQueryInput.cqId = streamLite->GetCqId();
     cqeQueryInput.type = static_cast<uint32_t>(DRV_LOGIC_TYPE);
     cqeQueryInput.cqeAddr = reinterpret_cast<uint8_t *>(streamReport);
-
+    
     cqeStatus = CqReportRecv(cqeQueryInput, cqeException);
     if (cqeStatus == dfx::CqeStatus::kCqeInnerError) {
         HCCL_ERROR("[%s]CqReportRecv fail, CqeQueryInput:%s", __func__, cqeQueryInput.ToString().c_str());

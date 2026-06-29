@@ -32,7 +32,7 @@ void CollAllReduceMixExecutor::ParseParam(const OpParam& param)
 HcclResult CollAllReduceMixExecutor::CalcStreamNum(u32& streamNum)
 {
     u32 totalStreamNum = 0;
-
+    
     if (topoAttr_.deviceType == DevType::DEV_TYPE_910B) {
         totalStreamNum = topoAttr_.deviceNumPerAggregation;
     } else if (topoAttr_.deviceType == DevType::DEV_TYPE_910_93) {
@@ -188,7 +188,7 @@ HcclResult CollAllReduceMixExecutor::KernelRun(const OpParam &param, ExecMem &ex
 
     std::unique_ptr<AlgTemplateBase> level1Executor;
     if (algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_RING) {
-        level1Executor = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_REDUCE_RING,
+        level1Executor = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_REDUCE_RING, 
             dispatcher_);
         HCCL_INFO("[CollAllReduceMixExecutor][KernelRun]AllReduce mix: using ring algo inter-server.");
         CHK_SMART_PTR_NULL(level1Executor);
@@ -245,7 +245,7 @@ HcclResult CollAllReduceMixExecutor::KernelRun(const OpParam &param, ExecMem &ex
         std::unique_ptr<AlgTemplateBase> level0Executor = AlgTemplateRegistry::Instance().GetAlgTemplate(
             TemplateType::TEMPLATE_ALL_GATHER_MESH_ATOMIC, dispatcher_);
         CHK_SMART_PTR_NULL(level0Executor);
-        CHK_RET(level0Executor->Prepare(algResResp_->slaveStreams, algResResp_->notifiesMain, algResResp_->notifiesAux, topoAttr_.userRank,
+        CHK_RET(level0Executor->Prepare(algResResp_->slaveStreams, algResResp_->notifiesMain, algResResp_->notifiesAux, topoAttr_.userRank, 
             nullptr, level0CommInfo.localRank, level0CommInfo.localRankSize));
 
         u32 rankSize = level0CommInfo.localRankSize;

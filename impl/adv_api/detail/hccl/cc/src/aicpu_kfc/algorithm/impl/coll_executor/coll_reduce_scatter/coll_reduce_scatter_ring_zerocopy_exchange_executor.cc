@@ -90,7 +90,7 @@ HcclResult CollReduceScatterRingZerocopyExchangeExecutor::KernelRunInterServerPo
                 recvLink->RxAsync(UserMemType::INPUT_MEM, 0, execMem.outputPtr, outputMemSize, stream);
             } else {
                 u32 remoteLevel1Index = remoteRankRecv % (level0RankSize_ * level1RankSize_) / level0RankSize_;
-                u32 remoteLevel2Index = remoteRankRecv / level0RankSize_ / level1RankSize_;
+                u32 remoteLevel2Index = remoteRankRecv / level0RankSize_ / level1RankSize_;   
                 u64 rxSrcOffset = (remoteLevel1Index * level2RankSize_ + remoteLevel2Index) * outputMemSize;
                 recvLink->RxAsync(UserMemType::INPUT_MEM, rxSrcOffset, execMem.outputMem.ptr(), outputMemSize, stream);
             }

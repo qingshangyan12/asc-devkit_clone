@@ -16,7 +16,7 @@ namespace hccl {
 class SymmetricMemory::SimpleVaAllocator {
     public:
         // 不需要任何成员，只要让编译器觉得它是个完整的类就行
-        SimpleVaAllocator() {}
+        SimpleVaAllocator() {} 
         ~SimpleVaAllocator() {}
 };
 

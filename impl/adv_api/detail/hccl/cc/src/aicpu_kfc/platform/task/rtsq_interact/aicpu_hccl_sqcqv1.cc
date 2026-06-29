@@ -322,7 +322,7 @@ void AddOneEventWaitSqeV1(uint16_t streamId, int32_t eventId, uint16_t taskId, c
 void AddOneFlipPlaceHolderSqeV1(uint16_t streamId, uint16_t flipNum, uint16_t taskId, const uint8_t *sqeIn, uint8_t *sqeType)
 {
     *sqeType = SqeType::FLIP_PLACEHOLDER_SQE;
-    rtStarsPlaceHolderSqe_t * const sqe = (rtStarsPlaceHolderSqe_t * const)sqeIn;
+    rtStarsPlaceHolderSqe_t * const sqe = (rtStarsPlaceHolderSqe_t * const)sqeIn;   
     sqe->header.type = RT_STARS_SQE_TYPE_PLACE_HOLDER;
     sqe->header.ie = 0U;
     sqe->header.preP = 1U;
@@ -357,7 +357,7 @@ void AddOneCacheMemcpyPlaceHolderSqeV1(uint16_t streamId, uint16_t taskId, const
 
     HCCL_INFO("[SQE] cache-memcpy placeholder: streamId=%u, taskId=%u, srcAddr=0x%016llx, dstAddr=0x%016llx, linkType=%u, hcclQos=%u",
         streamId, taskId, src, dst, linkType, hcclQos);
-
+    
     // 适配QoS
     if (linkType == static_cast<uint8_t>(hccl::LinkType::LINK_SIO) || linkType == static_cast<uint8_t>(hccl::LinkType::LINK_ONCHIP)) {
  	    hcclQos = SDMA_QOS_DEFAULT;

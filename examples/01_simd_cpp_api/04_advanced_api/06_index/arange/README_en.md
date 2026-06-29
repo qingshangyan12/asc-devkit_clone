@@ -26,9 +26,9 @@ This example uses the Arange high-level API to implement arithmetic sequence gen
 
 ## Example Description
 
-- Example function:
+- Example function:  
   This example implements arithmetic sequence generation. Given a start value, common difference, and length, it returns an arithmetic sequence.
-- Example specifications:
+- Example specifications:  
   <table>
   <caption>Table 1: Example Input/Output Specifications</caption>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> arange </td></tr>
@@ -44,26 +44,26 @@ This example uses the Arange high-level API to implement arithmetic sequence gen
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">arange_custom</td></tr>
   </table>
 
-- Example implementation:
+- Example implementation:  
   This example implements arithmetic sequence generation with fixed shapes: input firstGm[1, 1], diffGm[1, 1], and output outputGm[128, 1].
 
-  - Kernel implementation:
+  - Kernel implementation:  
     The computation logic is: Use the Arange high-level API to complete arithmetic sequence generation, then transfer the result out.
 
-  - Invocation implementation:
+  - Invocation implementation:  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run
+## Build and Run  
 
 Run the following steps in the root directory of this example to build and run the example.
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
-
+    
 - Run the example (NPU mode)
 
   Run the following commands in the example directory.

@@ -51,7 +51,7 @@ HcclResult HcclGetTaskStatus(void *opHandle, HcclTaskStatus *status)
 }
 
 HcclResult HcclCheckFinishByStream(void *opHandle)
-{
+{    
     if (opHandle == nullptr) {
         HCCL_ERROR("[HcclCheckFinishByStream]Args opHandle is nullptr.");
         return HCCL_E_PTR;

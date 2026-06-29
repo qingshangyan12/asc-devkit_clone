@@ -40,7 +40,7 @@ private:
     HcclResult CreateTemplates(std::shared_ptr<InsAlgTemplate> &algTemplatePtr);
     HcclResult OrchestrateLoop(std::shared_ptr<InsAlgTemplate> algTemplate);
 
-    std::vector<RankId> virtRanks_;
+    std::vector<RankId> virtRanks_;   
     std::vector<std::vector<RankId>> vTopo_;
     ResLinks tempResLinks_;
     std::vector<InsQuePtr> tempInsQue_;

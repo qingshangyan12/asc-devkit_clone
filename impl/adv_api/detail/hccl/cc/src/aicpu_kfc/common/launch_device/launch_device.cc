@@ -44,5 +44,5 @@ HcclResult LoadBinaryFromFile(const char *binPath, aclrtBinaryLoadOptionType opt
 
     return HCCL_SUCCESS;
 }
-
+ 
 }   // ~~ namespace hccl

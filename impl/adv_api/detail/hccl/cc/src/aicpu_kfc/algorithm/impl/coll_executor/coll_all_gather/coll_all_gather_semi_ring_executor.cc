@@ -65,7 +65,7 @@ HcclResult CollAllGatherSemiRingExecutor::DoubleRingMidCountAllGather(
     (void) tag;
     HCCL_CONFIG_INFO(HCCL_ALG,
         "[CollAllGatherSemiRingExecutor][KernelRun]CollAllGatherSemiRingExecutor starts.");
-
+    
     CHK_RET(CheckCommSize(COMM_LEVEL0, COMM_INDEX_0 + 1));
     SubCommInfo level0CommInfo = GetSubCommInfo(COMM_LEVEL0, COMM_INDEX_0);
 

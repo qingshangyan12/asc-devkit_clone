@@ -59,7 +59,7 @@ HcclResult CollAllGatherMeshGraphExecutor::CalcLevel0CommInfo(TransportMemType i
 HcclResult CollAllGatherMeshGraphExecutor::KernelRun(const OpParam &param, ExecMem &execMem)
 {
 	HCCL_CONFIG_INFO(HCCL_ALG, "[CollAllGatherMeshGraphExecutor][KernelRun]AllGather start");
-
+	
 	// 获取子通信域信息
 	u32 perDataSize = SIZE_TABLE[param.DataDes.dataType];
     CHK_RET(CheckCommSize(COMM_LEVEL0, COMM_INDEX_0 + 1));
@@ -88,7 +88,7 @@ HcclResult CollAllGatherMeshGraphExecutor::KernelRun(const OpParam &param, ExecM
     u64 inputDataCount = inputMemSize / perDataSize;
 	u64 level1Offset = commIndex * level1RankSize * inputMemSize;
 	HCCL_INFO("[CollAllGatherMeshGraphExecutor][KernelRun] userRank[%u] commIndex[%u] level1Offset[%llu] level0RankSize[%u] " \
-		"level1RankSize[%u] outputMemSize[%llu] count[%u]", topoAttr_.userRank, commIndex, level1Offset, level0RankSize, level1RankSize,
+		"level1RankSize[%u] outputMemSize[%llu] count[%u]", topoAttr_.userRank, commIndex, level1Offset, level0RankSize, level1RankSize, 
 		execMem.outputMem.size(), execMem.count);
 	DeviceMem level1OutputMem = execMem.outputMem.range(level1Offset, inputMemSize * level1RankSize);
 	CHK_SMART_PTR_NULL(level1OutputMem);
@@ -153,7 +153,7 @@ HcclResult CollAllGatherMeshGraphExecutor::KernelRun(const OpParam &param, ExecM
     HCCL_INFO("[CollAllGatherMeshGraphExecutor][KernelRun] AllGather level0 run success");
 
 	// 第4步 内存重排
-	std::vector<bool> reorderedDone(topoAttr_.userRankSize, false);
+	std::vector<bool> reorderedDone(topoAttr_.userRankSize, false);		
 	for (u32 scratchSliceIndex = 0; scratchSliceIndex < topoAttr_.userRankSize; scratchSliceIndex++) {
 		if (reorderedDone[scratchSliceIndex]) {
 			continue;

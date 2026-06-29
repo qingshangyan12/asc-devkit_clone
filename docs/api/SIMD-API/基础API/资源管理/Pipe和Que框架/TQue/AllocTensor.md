@@ -179,14 +179,14 @@ non-inplace接口返回值为LocalTensor对象，inplace接口没有返回值。
     pipe.InitBuffer(que3, 1, len);
     pipe.InitBuffer(que4, 1, len);
     pipe.InitBuffer(que5, 1, len);
-
+    
     AscendC::LocalTensor<T> local1 = que0.AllocTensor<T>();
     AscendC::LocalTensor<T> local2 = que1.AllocTensor<T>();
     AscendC::LocalTensor<T> local3 = que2.AllocTensor<T>();
     AscendC::LocalTensor<T> local4 = que3.AllocTensor<T>();
     // 第5个AllocTensor会出现资源分配失败，同一个TPosition上同时Alloc出来的Tensor数量超出了4个的限制
     AscendC::LocalTensor<T> local5 = que4.AllocTensor<T>();
-
+    
     // 此时建议通过以下方法解决：
     // 如果确实有多块buffer使用,可以将多个buffer合并到一块buffer,通过偏移使用
     pipe.InitBuffer(que0, 1, len * 3);

@@ -34,7 +34,7 @@ HcclResult initGroupPlanner(HcclComm comm) {
     hcclComm->GetRankSize(rankSize);
     planner->rankSize = rankSize;
     HCCL_DEBUG("[initGroupPlanner] ranksize: %d", rankSize);
-
+    
     planner->nTasksP2p = 0;
     planner->nTasksColl = 0;
     return HCCL_SUCCESS;
@@ -64,7 +64,7 @@ HcclResult taskAppend(HcclComm comm, hcclOpInfo& info) {
             planner->sendRecvMainStream = info.stream;
             HCCL_INFO("[TaskAppend] planner->sendRecvMainStream[%p]", planner->sendRecvMainStream);
         }
-
+        
         planner->nTasksP2p += 1;
     }
     else {
@@ -158,7 +158,7 @@ static HcclResult doLaunches(HcclComm comm)
     hccl::hcclComm* hcclComm = static_cast<hccl::hcclComm *>(comm);
     std::shared_ptr<struct hcclKernelPlanner> planner = hcclComm->planner;
     HcclUs startutime = TIME_NOW();
-    if (planner->nTasksP2p != 0) {
+    if (planner->nTasksP2p != 0) { 
         // 将所有send/recv的任务打包作为一个集合通信算子来执行
         HCCL_INFO("HcclBatchSendRecvGroup, sendRecvInfo.size()[%u]", static_cast<u32>(planner->sendRecvInfo.size()));
         CHK_RET(HcclBatchSendRecvGroup(planner->sendRecvInfo.data(), planner->sendRecvInfo.size(), comm, planner->sendRecvMainStream));
@@ -175,19 +175,19 @@ static HcclResult doLaunches(HcclComm comm)
                                     taskColl.sendType, taskColl.comm, taskColl.stream);
                     break;
                 case HcclCMDType::HCCL_CMD_REDUCE_SCATTER:
-                    HcclReduceScatterInner(const_cast<void *>(taskColl.sendbuff), const_cast<void *>(taskColl.recvbuff), taskColl.recvCount,
+                    HcclReduceScatterInner(const_cast<void *>(taskColl.sendbuff), const_cast<void *>(taskColl.recvbuff), taskColl.recvCount, 
                                 taskColl.recvType, taskColl.op, taskColl.comm, taskColl.stream);
                     break;
                 case HcclCMDType::HCCL_CMD_ALLREDUCE:
-                    HcclAllReduceInner(const_cast<void *>(taskColl.sendbuff), const_cast<void *>(taskColl.recvbuff), taskColl.sendCount, taskColl.sendType,
+                    HcclAllReduceInner(const_cast<void *>(taskColl.sendbuff), const_cast<void *>(taskColl.recvbuff), taskColl.sendCount, taskColl.sendType, 
                                     taskColl.op, taskColl.comm, taskColl.stream);
                     break;
                 case HcclCMDType::HCCL_CMD_BROADCAST:
-                    HcclBroadcastInner(const_cast<void *>(taskColl.sendbuff), taskColl.sendCount, taskColl.sendType, taskColl.root, taskColl.comm,
+                    HcclBroadcastInner(const_cast<void *>(taskColl.sendbuff), taskColl.sendCount, taskColl.sendType, taskColl.root, taskColl.comm, 
                                     taskColl.stream);
                     break;
                 case HcclCMDType::HCCL_CMD_ALLTOALL:
-                    HcclAlltoAllInner(taskColl.sendbuff, taskColl.sendCount, taskColl.sendType, taskColl.recvbuff, taskColl.recvCount, taskColl.recvType,
+                    HcclAlltoAllInner(taskColl.sendbuff, taskColl.sendCount, taskColl.sendType, taskColl.recvbuff, taskColl.recvCount, taskColl.recvType, 
                                     taskColl.comm, taskColl.stream);
                     break;
                 case HcclCMDType::HCCL_CMD_ALLTOALLV:
@@ -196,22 +196,22 @@ static HcclResult doLaunches(HcclComm comm)
                                     taskColl.comm, taskColl.stream);
                     break;
                 case HcclCMDType::HCCL_CMD_ALLTOALLVC:
-                    HcclAlltoAllVCInner(taskColl.sendbuff, taskColl.sendCounts, taskColl.sendType, taskColl.recvbuff, taskColl.recvType,
+                    HcclAlltoAllVCInner(taskColl.sendbuff, taskColl.sendCounts, taskColl.sendType, taskColl.recvbuff, taskColl.recvType, 
                                     taskColl.comm, taskColl.stream);
                     break;
                 case HcclCMDType::HCCL_CMD_REDUCE:
-                    HcclReduceInner(const_cast<void *>(taskColl.sendbuff), const_cast<void *>(taskColl.recvbuff), taskColl.recvCount, taskColl.recvType, taskColl.op, taskColl.root,
+                    HcclReduceInner(const_cast<void *>(taskColl.sendbuff), const_cast<void *>(taskColl.recvbuff), taskColl.recvCount, taskColl.recvType, taskColl.op, taskColl.root, 
                                     taskColl.comm, taskColl.stream);
                     break;
                 case HcclCMDType::HCCL_CMD_SCATTER:
                     HcclScatterInner(const_cast<void *>(taskColl.sendbuff), const_cast<void *>(taskColl.recvbuff), taskColl.recvCount, taskColl.recvType, taskColl.root, taskColl.comm, taskColl.stream);
                     break;
                 case HcclCMDType::HCCL_CMD_ALLGATHER_V:
-                    HcclAllGatherVInner(const_cast<void *>(taskColl.sendbuff), taskColl.sendCount, const_cast<void *>(taskColl.recvbuff), taskColl.recvCounts, taskColl.rdispls,
+                    HcclAllGatherVInner(const_cast<void *>(taskColl.sendbuff), taskColl.sendCount, const_cast<void *>(taskColl.recvbuff), taskColl.recvCounts, taskColl.rdispls, 
                                     taskColl.recvType, taskColl.comm, taskColl.stream);
                     break;
                 case HcclCMDType::HCCL_CMD_REDUCE_SCATTER_V:
-                    HcclReduceScatterVInner(const_cast<void *>(taskColl.sendbuff), taskColl.sendCounts, taskColl.sdispls, const_cast<void *>(taskColl.recvbuff), taskColl.recvCount,
+                    HcclReduceScatterVInner(const_cast<void *>(taskColl.sendbuff), taskColl.sendCounts, taskColl.sdispls, const_cast<void *>(taskColl.recvbuff), taskColl.recvCount, 
                                         taskColl.sendType, taskColl.op, taskColl.comm, taskColl.stream);
                     break;
                 default:

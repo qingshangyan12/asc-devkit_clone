@@ -40,8 +40,8 @@ HcclResult InsCollAlgBase::RestoreChannelMap(const AlgResourceCtxSerializable &r
     }
     return HCCL_SUCCESS;
 }
-
-HcclResult InsCollAlgBase::SetTempFastLaunchAddr(TemplateFastLaunchCtx &tempFastLaunchCtx,
+    
+HcclResult InsCollAlgBase::SetTempFastLaunchAddr(TemplateFastLaunchCtx &tempFastLaunchCtx, 
     void* inputPtr, void* outputPtr, const HcclMem &hcclBuff) const
 {
     tempFastLaunchCtx.buffInfo.inputPtr = inputPtr;

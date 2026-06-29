@@ -200,7 +200,7 @@ public:
                 mmadParams.isBias = false;
             }
         }
-        KERNEL_LOG(KERNEL_DEBUG,
+        KERNEL_LOG(KERNEL_DEBUG, 
             "[Mad] mmadParams.cmatrixInitVal %d, mmadParams.cmatrixSource %d, mmadParams.isBias %d, mmadParams.k %d, "
             "mmadParams.n %d, mmadParams.m %d.\n",
             mmadParams.cmatrixInitVal,

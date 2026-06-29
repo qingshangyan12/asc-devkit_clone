@@ -58,7 +58,7 @@ HcclResult LocalIpcNotify::Init(const HcclSignalInfo &notifyInfo, const NotifyLo
         HCCL_ERROR("[LocalNotify]Init failed, ret[%p]", ret);
         return ret;
     }
-
+    
     CHK_RET(pimpl_->GetNotifyOffset(offset));
     address = notifyInfo.addr;
     notifyId_ = static_cast<u32>(notifyInfo.resId);

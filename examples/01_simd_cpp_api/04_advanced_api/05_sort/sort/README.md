@@ -26,9 +26,9 @@
 
 ## 样例描述
 
-- 样例功能：
+- 样例功能：  
   本样例实现Sort排序功能，对输入数据按照数值大小进行降序排序，同时保留原始索引信息。
-- 样例规格：
+- 样例规格：  
   <table>
   <caption>表1：样例输入输出规格</caption>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center"> sort </td></tr>
@@ -47,16 +47,16 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">sort_custom</td></tr>
   </table>
 
-- 样例实现：
+- 样例实现：  
     本样例中实现的是固定shape为输入srcLocalValue[1, 128]，[1, 128]，输出dstLocalValue[1, 128]，dstLocalIndex[1, 128]的Sort样例。
 
-  - Kernel实现:
+  - Kernel实现:  
     计算逻辑是：输入数据需要先搬运进片上存储，然后使用Sort高阶API接口完成排序计算，再将结果搬出。
 
-  - Tiling实现:
+  - Tiling实现:  
     该样例的tiling实现流程如下：使用GetSortMaxMinTmpSize接口计算所需最大/最小临时空间大小，使用最小临时空间，然后根据输入长度确定所需tiling参数。
 
-  - 调用实现
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数，传入输入输出地址和tiling参数。
 
 ## 编译运行

@@ -101,7 +101,7 @@
 
   ```cpp
   template <typename T>
-  __simd_vf__ inline void NotVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count,
+  __simd_vf__ inline void NotVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, 
    uint32_t oneRepeatSize, uint16_t repeatTimes)
   {
       AscendC::Reg::RegTensor<T> srcReg;

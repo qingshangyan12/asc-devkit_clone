@@ -24,7 +24,7 @@ This example uses the Fma high-level API to compute the result of multiplying tw
 
 ## Example Description
 
-- Example function:
+- Example function:  
   Compute the result of multiplying two inputs and adding a third input element-wise.
 
   The computation formulas are as follows:
@@ -36,7 +36,7 @@ This example uses the Fma high-level API to compute the result of multiplying tw
   Fma(src0_i, src1_i, src2_i) = src0_i * src1_i + src2_i
   $$
 
-- Example specifications:
+- Example specifications:  
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> fma </td></tr>
 
@@ -51,7 +51,7 @@ This example uses the Fma high-level API to compute the result of multiplying tw
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">fma_custom</td></tr>
   </table>
 
-- Example implementation:
+- Example implementation:  
   This example implements an fma_custom example with fixed shapes of input src0[1, 128], src1[1, 128], src2[1, 128], and output dst[1, 128].
 
   - Kernel implementation
@@ -62,14 +62,14 @@ This example uses the Fma high-level API to compute the result of multiplying tw
 
     The host side obtains the maximum and minimum temporary space required by the Fma API through GetFmaMaxMinTmpSize.
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run
+## Build and Run  
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -88,7 +88,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-
+  
   For example:
 
   ```bash

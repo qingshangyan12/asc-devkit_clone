@@ -26,10 +26,10 @@ This example uses the Transpose high-level API to convert the data layout from N
 
 ## Example Description
 
-- Example function:
+- Example function:  
   This example uses the Transpose high-level API to convert the data layout from NZ to ND and swap the 1st and 2nd dimensions of the ND matrix.
 
-- Example specifications:
+- Example specifications:  
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center">transpose</td></tr>
 
@@ -42,7 +42,7 @@ This example uses the Transpose high-level API to convert the data layout from N
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">transpose_custom</td></tr>
   </table>
 
-- Example implementation:
+- Example implementation:  
   This example implements a Transpose example with a fixed shape of input x[1, 2, 2, 4, 16, 16] and output y[1, 64, 2, 32]. For the NZ2ND scenario, it swaps axes 1 and 2.
 
   Input shape: [B, N, H/N/16, S/16, 16, 16] = [1, 2, 2, 4, 16, 16]
@@ -51,20 +51,20 @@ This example uses the Transpose high-level API to convert the data layout from N
 
   Output shape after transposing axes 1 and 2: [B, S, N, H/N] = [1, 64, 2, 32]
 
-  - Kernel implementation
+  - Kernel implementation  
     Use the Transpose high-level API to complete the Transpose computation, obtain the final result, and then transfer it to external storage.
 
-  - Tiling implementation
+  - Tiling implementation  
     Use the GetTransposeTilingInfo API provided by Ascend C to obtain the required tiling parameters, and call the GetTransposeMaxMinTmpSize API to obtain the temporary space size required by the Transpose API.
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run
+## Build and Run  
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -84,7 +84,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-
+  
   For example:
 
   ```bash

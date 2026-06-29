@@ -75,7 +75,7 @@ HcclResult CollBatchSendRecvGroupExecutor::Orchestrate(OpParam& param, AlgResour
 {
     HcclUs startut = TIME_NOW();
     HCCL_CONFIG_INFO(HCCL_ALG, "[CollBatchSendRecvGroupExecutor] groupsendrecv starts.");
-
+    
     sendStreamNum_ = GROUP_MAX_CONCURRENT;
     recvStreamNum_ = GROUP_MAX_CONCURRENT;
     HCCL_INFO("[Orchestrate] sendStreamNum_[%u], recvStreamNum_[%u]", sendStreamNum_, recvStreamNum_);
@@ -316,7 +316,7 @@ HcclResult CollBatchSendRecvGroupExecutor::CalcSendSlices()
 {
     sendDataSilcesBySendStream_.resize(sendStreamNum_);
     for (u32 i = 0; i < sendStreamNum_; i++) { // 一个个stream处理
-        auto sendQueueInner = sendQueueBySendstream_[i];
+        auto sendQueueInner = sendQueueBySendstream_[i]; 
         // 遍历这个stream对应的queue中的所有item，每次取一个slice，然后再重新遍历，直到所有的itemcount减为0
         u32 emptyItem = 0;
         while (emptyItem < sendQueueInner.size()) {
@@ -445,11 +445,11 @@ HcclResult CollBatchSendRecvGroupExecutor::SubNotifyMain(Stream& stream, u32 str
     return HCCL_SUCCESS;
 }
 
-HcclResult CollBatchSendRecvGroupExecutor::ProcessSendStreamDataSlice(Stream& stream, u32 sendStreamId, bool needStreamSync,
+HcclResult CollBatchSendRecvGroupExecutor::ProcessSendStreamDataSlice(Stream& stream, u32 sendStreamId, bool needStreamSync, 
     bool retryEnable)
 {
     SendRecvSlice& slice = sendDataSilcesBySendStream_[sendStreamId].front();
-
+    
     u64 offset = bufferSliceSize_ * (slice.remoteRank % sendStreamNum_);
     DeviceMem inCommMem = algResResp_->cclInputMem.range(offset, slice.size);
     HCCL_INFO("[ProcessSendStreamDataSlice] inCommMem ptr[%p], size[%llu]", inCommMem.ptr(), inCommMem.size());
@@ -468,18 +468,18 @@ HcclResult CollBatchSendRecvGroupExecutor::ProcessSendStreamDataSlice(Stream& st
     return HCCL_SUCCESS;
 }
 
-HcclResult CollBatchSendRecvGroupExecutor::ProcessRecvStreamDataSlice(Stream& stream, u32 recvStreamId, bool needStreamSync,
+HcclResult CollBatchSendRecvGroupExecutor::ProcessRecvStreamDataSlice(Stream& stream, u32 recvStreamId, bool needStreamSync, 
     bool retryEnable)
 {
     SendRecvSlice& slice = recvDataSilcesByRecvStream_[recvStreamId].front();
-
+    
     ExecMem execMem;
     if (needStreamSync) {
         CHK_RET(SubNotifyMain(stream, recvStreamId + sendStreamNum_));
     }
     LINK targetLink;
     CHK_RET(GetRecvTargetLink(slice.remoteRank, targetLink));
-    if (topoAttr_.isDiffDeviceType || topoAttr_.superPodNum > 1 ||
+    if (topoAttr_.isDiffDeviceType || topoAttr_.superPodNum > 1 || 
             (topoAttr_.moduleNum > 1 && static_cast<bool>(topoMatcher_->GetExternalInputInterHccsDisable())) ||
             (topoAttr_.deviceType == DevType::DEV_TYPE_910B && targetLink->GetLinkType() == LinkType::LINK_ROCE)) {
         u64 offset = bufferSliceSize_ * (slice.remoteRank % recvStreamNum_);
@@ -546,7 +546,7 @@ HcclResult CollBatchSendRecvGroupExecutor::MainWaitSubPostSmall(Stream& mainStre
 HcclResult CollBatchSendRecvGroupExecutor::ProcessSendDataSliceSmall(Stream& stream, bool needStreamSync, bool retryEnable)
 {
     SendRecvSlice& slice = sendDataSilces_.front();
-
+    
     DeviceMem inMem(slice.addr, slice.size);
     u32 sendStreamId = slice.remoteRank % sendStreamNum_;
     u64 offset = bufferSliceSize_ * sendStreamId;
@@ -573,14 +573,14 @@ HcclResult CollBatchSendRecvGroupExecutor::ProcessRecvDataSliceSmall(Stream& str
 {
     SendRecvSlice& slice = recvDataSilces_.front();
     u32 recvStreamId = slice.remoteRank % recvStreamNum_;
-
+    
     ExecMem execMem;
     if (needStreamSync) {
         CHK_RET(SubNotifyMain(stream, recvStreamId + sendStreamNum_));
     }
     LINK targetLink;
     CHK_RET(GetRecvTargetLink(slice.remoteRank, targetLink));
-    if (topoAttr_.isDiffDeviceType || topoAttr_.superPodNum > 1 ||
+    if (topoAttr_.isDiffDeviceType || topoAttr_.superPodNum > 1 || 
             (topoAttr_.moduleNum > 1 && static_cast<bool>(topoMatcher_->GetExternalInputInterHccsDisable())) ||
             (topoAttr_.deviceType == DevType::DEV_TYPE_910B && targetLink->GetLinkType() == LinkType::LINK_ROCE)) {
         u64 offset = bufferSliceSize_ * recvStreamId;

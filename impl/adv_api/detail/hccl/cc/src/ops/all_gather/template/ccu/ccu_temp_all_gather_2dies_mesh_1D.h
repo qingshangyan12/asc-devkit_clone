@@ -19,21 +19,21 @@ using RankGroup = std::vector<RankId>;
 
 class CcuTempAllGather2DiesMesh1D : public CcuAlgTemplateBase {
 public:
-    explicit  CcuTempAllGather2DiesMesh1D(const OpParam& param,
+    explicit  CcuTempAllGather2DiesMesh1D(const OpParam& param, 
                                                 const u32 rankId, // 传通信域的rankId，userRank
                                                 const std::vector<std::vector<u32>> &subCommRanks);
-
+ 
     ~CcuTempAllGather2DiesMesh1D() override;
-
+ 
     std::string Describe() const override
     {
         return StringFormat("Template of all gather ccu sche mesh 1D with tempRankSize [%u].",
                             subCommRanks_[0].size());
     }
-
+ 
     HcclResult CalcRes(HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
                        AlgResourceRequest& resourceRequest) override;
-
+ 
     HcclResult KernelRun(const OpParam& param,
                          const TemplateDataParams& templateDataParams,
                          TemplateResource& templateResource) override;

@@ -118,9 +118,9 @@ public:
         return std::make_unique<CcuCtxArgReduceMeshMem2Mem1D>(dimSize_, rankId_, rootId_, op_, tempVTopo_);
     }
 
-    void SetInstType(CcuInstType instType)
-    {
-        instType_ = instType;
+    void SetInstType(CcuInstType instType) 
+    { 
+        instType_ = instType; 
     }
 
     std::string Describe() const override
@@ -157,6 +157,6 @@ private:
     uint64_t                         normalSliceSize_{0};
     uint64_t                         lastSliceSize_{0};
 };
-
+ 
 } // namespace Hccl
 #endif // HCCLV2_CCU_INSTRUCTION_REDUCE_MESH_1D_MEM2MEM_H_

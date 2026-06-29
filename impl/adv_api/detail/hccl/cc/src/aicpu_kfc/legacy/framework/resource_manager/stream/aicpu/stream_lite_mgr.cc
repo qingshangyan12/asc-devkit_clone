@@ -50,7 +50,7 @@ void StreamLiteMgr::ParseLiteData(std::vector<char> &data, u32 num, u32 sizePerD
         std::vector<char> uniqueId(start, end);
         if (idx >= size) {
             HCCL_INFO("Make new Stream Lite idx=%u, size=%u", idx, size);
-            auto stream = std::make_unique<StreamLite>(uniqueId);
+            auto stream = std::make_unique<StreamLite>(uniqueId);            
             TaskExceptionFunc::GetInstance().Register(stream.get());
             streams.push_back(std::move(stream));
         }
