@@ -190,7 +190,7 @@
 <!-- end id44 -->
 
   <!-- npu="A3,910b" id29 -->
-- 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+- 针对如下型号，当参数mask或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
   <!-- npu="A3" id27 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
   <!-- end id27 -->
@@ -200,7 +200,7 @@
   <!-- end id29 -->
 
 <!-- npu="950" id43 -->
-- 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算/Reg矢量计算.md)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
+- 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算/Reg矢量计算.md)API实现兼容，当参数mask或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
 <!-- end id43 -->
 
 - 归约操作类型取MAX或MIN时的约束：
