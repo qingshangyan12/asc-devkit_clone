@@ -47,3 +47,4 @@ BatchWrite通信任务的通信队列数量。
 ## 调用示例
 
 请参见[BatchWrite的调用示例](BatchWrite.md#调用示例)。
+
