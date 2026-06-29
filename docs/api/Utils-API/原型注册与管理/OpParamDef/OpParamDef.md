@@ -16,7 +16,7 @@
 
 -   **[FormatList](FormatList.md)**  
 
--   **[UnknownShapeFormat（废弃）](UnknownShapeFormat_deprecated.md)**  
+-   **[UnknownShapeFormat（废弃）](UnknownShapeFormat（废弃）.md)**  
 
 -   **[ValueDepend](ValueDepend.md)**  
 

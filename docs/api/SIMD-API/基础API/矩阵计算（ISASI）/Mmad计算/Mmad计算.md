@@ -12,6 +12,6 @@
 
 - **[寄存器配置说明](寄存器配置说明/寄存器配置说明.md)**
 
-- **[Conv2D（废弃）](Conv2D_deprecated.md)**
+- **[Conv2D（废弃）](Conv2D（废弃）.md)**
 
-- **[Gemm（废弃）](Gemm_deprecated.md)**
+- **[Gemm（废弃）](Gemm（废弃）.md)**
