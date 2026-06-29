@@ -872,6 +872,7 @@ import posixpath
 import re
 import subprocess
 import sys
+import time
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
@@ -879,6 +880,9 @@ repo_root = Path(sys.argv[1])
 scan_set_file = Path(sys.argv[2])
 output_file = Path(sys.argv[3])
 duration = sys.argv[4]
+external_gitcode_repos = {
+    ("cann", "asc-tools"): "https://gitcode.com/cann/asc-tools.git",
+}
 
 reference_pattern = re.compile(r"(?m)^(\s*\[[^\]]+\]:\s*)(\S+)")
 html_href_pattern = re.compile(r"""(?i)(\bhref\s*=\s*["'])([^"']+)(["'])""")
@@ -945,7 +949,27 @@ def strip_inline_code(line):
     return "".join(stripped)
 
 
-def git_ref_for_branch(branch):
+def git_common_dir():
+    result = subprocess.run(
+        ["git", "rev-parse", "--git-common-dir"],
+        cwd=repo_root,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        check=False,
+    )
+    if result.returncode != 0:
+        return repo_root / ".git"
+    path = Path(result.stdout.strip())
+    if path.is_absolute():
+        return path
+    return repo_root / path
+
+
+cache_root = git_common_dir() / "markdown-link-check" / "gitcode-repos"
+
+
+def git_ref_for_branch(repo_dir, branch):
     candidates = [
         f"origin/{branch}",
         f"refs/remotes/origin/{branch}",
@@ -955,7 +979,7 @@ def git_ref_for_branch(branch):
     for candidate in candidates:
         result = subprocess.run(
             ["git", "rev-parse", "--verify", "--quiet", candidate],
-            cwd=repo_root,
+            cwd=repo_dir,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
             check=False,
@@ -965,10 +989,76 @@ def git_ref_for_branch(branch):
     return None
 
 
-def git_object_type(ref, path):
+def ensure_external_repo(owner, repo, branch):
+    remote_url = external_gitcode_repos.get((owner, repo))
+    if remote_url is None:
+        return None, None
+
+    repo_dir = cache_root / f"{owner}-{repo}.git"
+    lock_dir = cache_root / f"{owner}-{repo}.lock"
+    repo_dir.parent.mkdir(parents=True, exist_ok=True)
+
+    ref = git_ref_for_branch(repo_dir, branch)
+    if ref is not None:
+        return repo_dir, None
+
+    for _ in range(300):
+        try:
+            lock_dir.mkdir()
+            break
+        except FileExistsError:
+            ref = git_ref_for_branch(repo_dir, branch)
+            if ref is not None:
+                return repo_dir, None
+            time.sleep(1)
+    else:
+        return None, f"timed out waiting for GitCode cache lock: {lock_dir}"
+
+    try:
+        if not repo_dir.exists():
+            init = subprocess.run(
+                ["git", "init", "--bare", str(repo_dir)],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=False,
+            )
+            if init.returncode != 0:
+                return None, f"failed to init cache for {owner}/{repo}: {init.stderr.strip()}"
+            subprocess.run(
+                ["git", "remote", "add", "origin", remote_url],
+                cwd=repo_dir,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=False,
+            )
+
+        ref = git_ref_for_branch(repo_dir, branch)
+        if ref is not None:
+            return repo_dir, None
+
+        fetch = subprocess.run(
+            ["git", "fetch", "--depth=1", "origin", f"{branch}:refs/remotes/origin/{branch}"],
+            cwd=repo_dir,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=False,
+        )
+        if fetch.returncode != 0:
+            return None, f"failed to fetch {owner}/{repo}@{branch}: {fetch.stderr.strip()}"
+        return repo_dir, None
+    finally:
+        try:
+            lock_dir.rmdir()
+        except OSError:
+            pass
+
+
+def git_object_type(repo_dir, ref, path):
     result = subprocess.run(
         ["git", "cat-file", "-t", f"{ref}:{path}"],
-        cwd=repo_root,
+        cwd=repo_dir,
         text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL,
@@ -979,7 +1069,7 @@ def git_object_type(ref, path):
     return result.stdout.strip()
 
 
-def asc_devkit_gitcode_target(target):
+def gitcode_target(target):
     parsed = urlparse(target.strip().strip("<>").strip("\"'"))
     if parsed.scheme not in ("http", "https") or parsed.netloc != "gitcode.com":
         return None
@@ -987,16 +1077,17 @@ def asc_devkit_gitcode_target(target):
     parts = [unquote(part) for part in parsed.path.split("/") if part]
     if len(parts) < 5:
         return None
-    if parts[0:2] != ["cann", "asc-devkit"]:
-        return None
     if parts[2] not in ("blob", "tree"):
         return None
+    if parts[0:2] != ["cann", "asc-devkit"] and tuple(parts[0:2]) not in external_gitcode_repos:
+        return None
 
+    owner, repo = parts[0:2]
     branch = parts[3]
     path = posixpath.normpath("/".join(parts[4:]))
     if path.startswith("../") or path == ".":
         return None
-    return branch, path
+    return owner, repo, branch, path
 
 
 scan_files = []
@@ -1008,6 +1099,7 @@ for raw_line in scan_set_file.read_text(encoding="utf-8").splitlines():
 errors = []
 ref_cache = {}
 object_cache = {}
+repo_cache = {}
 for source in scan_files:
     source_path = repo_root / source
     try:
@@ -1026,24 +1118,41 @@ for source in scan_files:
             continue
 
         for target in iter_links(strip_inline_code(line)):
-            parsed = asc_devkit_gitcode_target(target)
+            parsed = gitcode_target(target)
             if parsed is None:
                 continue
 
-            branch, target_path = parsed
-            if branch not in ref_cache:
-                ref_cache[branch] = git_ref_for_branch(branch)
-            ref = ref_cache[branch]
+            owner, repo, branch, target_path = parsed
+            repo_key = (owner, repo, branch)
+            if repo_key not in repo_cache:
+                if (owner, repo) == ("cann", "asc-devkit"):
+                    repo_cache[repo_key] = (repo_root, None)
+                else:
+                    repo_cache[repo_key] = ensure_external_repo(owner, repo, branch)
+            repo_dir, repo_error = repo_cache[repo_key]
+            if repo_error is not None:
+                errors.append(
+                    f"{source}:{line_number}: GitCode link target cannot be checked: "
+                    f"{target} -> {repo_error}"
+                )
+                continue
+            if repo_dir is None:
+                continue
+
+            ref_key = (str(repo_dir), branch)
+            if ref_key not in ref_cache:
+                ref_cache[ref_key] = git_ref_for_branch(repo_dir, branch)
+            ref = ref_cache[ref_key]
             if ref is None:
                 continue
 
-            cache_key = (ref, target_path)
+            cache_key = (str(repo_dir), ref, target_path)
             if cache_key not in object_cache:
-                object_cache[cache_key] = git_object_type(ref, target_path)
+                object_cache[cache_key] = git_object_type(repo_dir, ref, target_path)
             if object_cache[cache_key] is None:
                 errors.append(
                     f"{source}:{line_number}: GitCode link target does not exist in {ref}: "
-                    f"{target} -> {target_path}"
+                    f"{target} -> {owner}/{repo}:{target_path}"
                 )
 
 with output_file.open("w", encoding="utf-8") as handle:
