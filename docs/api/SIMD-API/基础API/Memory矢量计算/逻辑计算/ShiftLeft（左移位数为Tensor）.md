@@ -44,8 +44,8 @@ __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>
 
 | 参数名 | 描述 |
 | :--- | :--- |
-| T | 源/目的操作数数据类型。<br>Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。 |
-| U | 源操作数数据类型。<br>Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、int16_t、int32_t、int64_t。 |
+| T | 源/目的操作数数据类型。 |
+| U | 源操作数数据类型。 |
 
 **表2**  参数说明
 
@@ -55,6 +55,11 @@ __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>
 | src0 | 输入 | 源操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。<br>数据类型需要与目的操作数保持一致。 |
 | src1 | 输入 | 存放左移位数的LocalTensor，数据类型的字节数需要与源src0操作数Tensor中的元素数据类型的字节数相匹配，不支持设置为负数。 |
 | count | 输入 | 参与计算的元素个数。 |
+
+## 数据类型
+<!-- npu="950" id8 -->
+- 针对Ascend 950PR/Ascend 950DT，T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。U支持的数据类型为：int8_t、int16_t、int32_t、int64_t。
+<!-- end id8 -->
 
 ## 返回值说明<a name="section194321251175110"></a>
 
