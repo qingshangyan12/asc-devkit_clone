@@ -23,9 +23,6 @@ CANN_3RD_LIB_PATH=${BUILD_DIR}
 USER_ID=$(id -u)
 CPU_NUM=$(getconf _NPROCESSORS_ONLN 2>/dev/null || nproc 2>/dev/null || echo 1)
 THREAD_NUM=${CPU_NUM}
-if [[ "$THREAD_NUM" -gt 32 ]]; then
-  THREAD_NUM=32
-fi
 BUILD_TYPE="Release"
 ENABLE_BUILD_DEVICE=ON
 USE_CXX11_ABI=0
@@ -53,7 +50,7 @@ usage() {
         echo $dotted_line
         echo "    --pkg                Compile run package"
         echo "    -p, --cann_path      Set the cann package installation directory, eg: /usr/local/Ascend/cann"
-        echo "    -j                   Compile thread nums, default is min(online CPU, 32), eg: -j 8"
+        echo "    -j                   Compile thread nums, default is online CPU, eg: -j 8"
         echo "    --cann_3rd_lib_path  Set the path for third-party library dependencies, eg: ./build"
         echo "    --asan               Enable ASAN (address Sanitizer)"
         echo $dotted_line
@@ -67,7 +64,7 @@ usage() {
         echo $dotted_line
         echo "    -t, --test           Build and run all unit tests"
         echo "    -p, --cann_path      Set the cann package installation directory, eg: /usr/local/Ascend/cann"
-        echo "    -j                   Compile thread nums, default is min(online CPU, 32), eg: -j 8"
+        echo "    -j                   Compile thread nums, default is online CPU, eg: -j 8"
         echo "    --adv_test            Build and run the adv part of unit tests"
         echo "    --adv_test_two        Build and run the adv_test_two part of unit tests"
         echo "    --arm_test            Build and run the arm part of unit tests"
@@ -103,7 +100,7 @@ usage() {
   echo "    The following are all supported arguments:"
   echo $dotted_line
   echo "    -h, --help           Display help information"
-  echo "    -j                   Compile thread nums, default is min(online CPU, 32), eg: -j 8"
+  echo "    -j                   Compile thread nums, default is online CPU, eg: -j 8"
   echo "    -t, --test           Build and run all unit tests"
   echo "    -p, --cann_path      Set the cann package installation directory, eg: /usr/local/Ascend/cann"
   echo "    --adv_test            Build and run the adv part of unit tests"
@@ -492,7 +489,6 @@ set_options() {
       ;;
     --changed_file=*)
       CHANGED_FILES="${1#*=}"
-      require_option_value "${1%%=*}" "${CHANGED_FILES}"
       CI_MODE=TRUE
       shift
       ;;
@@ -636,14 +632,15 @@ function build_test_part() {
 }
 
 set_ci_mode() {
+  if [[ -z "$CHANGED_FILES" ]]; then
+    log "[INFO] CI mode: no changed files, skip all (no compile and test, no package)."
+    exit 200
+  fi
+
   if [[ "$CHANGED_FILES" != /* ]]; then
     CHANGED_FILES=${CURRENT_DIR}/$CHANGED_FILES
   fi
   log "[INFO] CI mode: changed file path is $CHANGED_FILES"
-  if [[ ! -f "$CHANGED_FILES" ]]; then
-    log "[ERROR] CI mode: changed file not found: $CHANGED_FILES"
-    exit 1
-  fi
   log "[INFO] CI mode: context in changed file: "
   cat "$CHANGED_FILES"
 
