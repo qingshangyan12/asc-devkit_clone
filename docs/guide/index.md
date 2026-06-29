@@ -29,7 +29,6 @@
                 -   [Cube矩阵计算编程](编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/Cube矩阵计算编程.md)
             -   [基于Tensor的C++编程](编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/CPPTensor编程概述.md)
                 -   [C++ Tensor编程概述](编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/CPPTensor编程概述.md)
-                -   [静态Tensor编程](编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md)
                 -   [Memory矢量计算编程](编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/Memory矢量计算编程.md)
                 -   [Reg矢量计算编程](编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/Reg矢量计算编程.md)
                 -   [Cube矩阵计算编程](编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/Cube矩阵计算编程.md)
