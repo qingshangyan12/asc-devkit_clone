@@ -71,31 +71,25 @@ __aicore__ inline void InitDumpImpl(bool mixFlag, uint32_t gmLen)
 
 template <template <typename> class Tensor, typename T>
 __aicore__ inline void DumpTensorRingBufImpl(const Tensor<T>& src, uint32_t desc, uint32_t dumpSize,
-                                                const uint32_t shapeDim, const uint32_t* shape);
+                                                const uint32_t* shape, const uint32_t shapeDim);
 
 template <typename T>
-__aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc, uint32_t dumpSize)
+__aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc, uint32_t dumpSize,
+                                                const uint32_t* shape, const uint32_t shapeDim)
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE);
     if (g_sysPrintFifoSpace != nullptr) {
-        DumpTensorRingBufImpl(src, desc, dumpSize, 0, nullptr);
+        DumpTensorRingBufImpl(src, desc, dumpSize, shape, shapeDim);
     }
     set_ctrl(ctrlValue);
 }
 
 template <typename T>
-__aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc, uint32_t dumpSize,
-                                                const uint32_t shapeDim, const uint32_t* shape)
+__aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc, uint32_t dumpSize)
 {
-    uint64_t ctrlValue = get_ctrl();
-    set_atomic_none();
-    dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE);
-    if (g_sysPrintFifoSpace != nullptr) {
-        DumpTensorRingBufImpl(src, desc, dumpSize, shapeDim, shape);
-    }
-    set_ctrl(ctrlValue);
+    DumpTensorLocal2GMImpl(src, desc, dumpSize, nullptr, 0);
 }
 
 /***********************************每个core内存分配示意图*************************************************
@@ -107,28 +101,22 @@ __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_
 **********************************************************************************************************/
 
 template <typename T>
-__aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t desc, uint32_t dumpSize)
+__aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t desc, uint32_t dumpSize,
+                                            const uint32_t* shape, const uint32_t shapeDim)
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE);
     if (g_sysPrintFifoSpace != nullptr) {
-        DumpTensorRingBufImpl(src, desc, dumpSize, 0, nullptr);
+        DumpTensorRingBufImpl(src, desc, dumpSize, shape, shapeDim);
     }
     set_ctrl(ctrlValue);
 }
 
 template <typename T>
-__aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t desc, uint32_t dumpSize,
-                                            const uint32_t shapeDim, const uint32_t* shape)
+__aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t desc, uint32_t dumpSize)
 {
-    uint64_t ctrlValue = get_ctrl();
-    set_atomic_none();
-    dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE);
-    if (g_sysPrintFifoSpace != nullptr) {
-        DumpTensorRingBufImpl(src, desc, dumpSize, shapeDim, shape);
-    }
-    set_ctrl(ctrlValue);
+    DumpTensorGM2GMImpl(src, desc, dumpSize, nullptr, 0);
 }
 
 __aicore__ inline void WriteRingBufShapeInfo(const ShapeInfo &shapeInfo);
@@ -567,7 +555,7 @@ __aicore__ inline void WriteRingBufTlvData(
 
 template <template <typename> class Tensor, typename T>
 __aicore__ inline void DumpTensorRingBufImpl(const Tensor<T>& src, uint32_t desc, uint32_t dumpSize,
-                                                const uint32_t shapeDim, const uint32_t* shape)
+                                                const uint32_t* shape, const uint32_t shapeDim)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     EnablePrintf();
