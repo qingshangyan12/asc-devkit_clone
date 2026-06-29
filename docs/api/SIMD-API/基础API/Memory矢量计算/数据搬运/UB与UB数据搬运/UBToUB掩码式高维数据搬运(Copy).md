@@ -2,17 +2,33 @@
 
 ## 产品支持情况<a name="zh-cn_topic_0000002567699435_section796754519912"></a>
 
-| 产品 | 是否支持 |
-| :--- | :---: |
-|<!-- npu="950" id1 --> Ascend 950PR/Ascend 950DT | √ <!-- end id1 -->|
-|<!-- npu="A3" id2 --> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ <!-- end id2 -->|
-|<!-- npu="910b" id3 --> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ <!-- end id3 -->|
-|<!-- npu="310b" id4 --> Atlas 200I/500 A2 推理产品 | √ <!-- end id4 -->|
-|<!-- npu="310p" id5 --> Atlas 推理系列产品AI Core | x <!-- end id5 -->|
-|<!-- npu="310p" id6 --> Atlas 推理系列产品Vector Core | x <!-- end id6 -->|
-|<!-- npu="910" id7 --> Atlas 训练系列产品 | x <!-- end id7 -->|
-|<!-- npu="x90" id8 --> Kirin X90 | √ <!-- end id8 -->|
-|<!-- npu="9030" id9 --> Kirin 9030 | √ <!-- end id9 -->|
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
+<!-- npu="x90" id8 -->
+- Kirin X90：支持
+<!-- end id8 -->
+<!-- npu="9030" id9 -->
+- Kirin 9030：支持
+<!-- end id9 -->
 
 ## 功能说明<a name="zh-cn_topic_0000002567699435_section106841136114319"></a>
 
@@ -133,11 +149,11 @@
     | dstRepeatSize | [0, 4095] |
     | srcRepeatSize | [0, 4095] |
 
-- <!-- npu="A3,910b" id18 -->repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
+- <!-- npu="A3,910b" id19 -->repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
   - <!-- npu="A3" id16 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品<!-- end id16 -->
   - <!-- npu="910b" id17 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id17 -->
   - <!-- npu="950" id18 -->Ascend 950PR/Ascend 950DT<!-- end id18 -->
-<!-- end id18 -->
+<!-- end id19 -->
 
 - Copy和矢量计算API一样，支持和掩码操作API配合使用。但Counter模式配合高维切分计算API时，和[通用的Counter模式](../../SIMD计算说明/掩码/接口内设置Mask.md)有一定差异。具体差异如下：
     - 通用的Counter模式：Mask代表**整个矢量计算参与计算的元素个数，迭代次数不生效。**

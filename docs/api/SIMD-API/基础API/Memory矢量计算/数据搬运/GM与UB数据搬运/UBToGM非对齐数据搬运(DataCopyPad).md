@@ -2,15 +2,48 @@
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
-| 产品 | 不支持数据搬运模式mode的原型 | 支持数据搬运模式mode的原型 |
-| :--- | :---: | :---: |
-|<!-- npu="950" id1 --> Ascend 950PR/Ascend 950DT | √ | √ <!-- end id1 -->|
-|<!-- npu="A3" id2 --> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ | x <!-- end id2 -->|
-|<!-- npu="910b" id3 --> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ | x <!-- end id3 -->|
-|<!-- npu="310b" id4 --> Atlas 200I/500 A2 推理产品 | √ | x <!-- end id4 -->|
-|<!-- npu="310p" id5 --> Atlas 推理系列产品AI Core | x | x <!-- end id5 -->|
-|<!-- npu="310p" id6 --> Atlas 推理系列产品Vector Core | x | x <!-- end id6 -->|
-|<!-- npu="910" id7 --> Atlas 训练系列产品 | x | x <!-- end id7 -->|
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：不支持数据搬运模式mode的原型：支持
+<!-- end id1 -->
+<!-- npu="950" id2 -->
+- Ascend 950PR/Ascend 950DT：支持数据搬运模式mode的原型：支持
+<!-- end id2 -->
+<!-- npu="A3" id3 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持数据搬运模式mode的原型：支持
+<!-- end id3 -->
+<!-- npu="A3" id4 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持数据搬运模式mode的原型：不支持
+<!-- end id4 -->
+<!-- npu="910b" id5 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持数据搬运模式mode的原型：支持
+<!-- end id5 -->
+<!-- npu="910b" id6 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持数据搬运模式mode的原型：不支持
+<!-- end id6 -->
+<!-- npu="310b" id7 -->
+- Atlas 200I/500 A2 推理产品：不支持数据搬运模式mode的原型：支持
+<!-- end id7 -->
+<!-- npu="310b" id8 -->
+- Atlas 200I/500 A2 推理产品：支持数据搬运模式mode的原型：不支持
+<!-- end id8 -->
+<!-- npu="310p" id9 -->
+- Atlas 推理系列产品AI Core：不支持数据搬运模式mode的原型：不支持
+<!-- end id9 -->
+<!-- npu="310p" id10 -->
+- Atlas 推理系列产品AI Core：支持数据搬运模式mode的原型：不支持
+<!-- end id10 -->
+<!-- npu="310p" id11 -->
+- Atlas 推理系列产品Vector Core：不支持数据搬运模式mode的原型：不支持
+<!-- end id11 -->
+<!-- npu="310p" id12 -->
+- Atlas 推理系列产品Vector Core：支持数据搬运模式mode的原型：不支持
+<!-- end id12 -->
+<!-- npu="910" id13 -->
+- Atlas 训练系列产品：不支持数据搬运模式mode的原型：不支持
+<!-- end id13 -->
+<!-- npu="910" id14 -->
+- Atlas 训练系列产品：支持数据搬运模式mode的原型：不支持
+<!-- end id14 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -36,7 +69,7 @@
     __aicore__ inline void DataCopyPad(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams)
     ```
 
-<!-- npu="950" id8 -->
+<!-- npu="950" id15 -->
 
 - 支持配置设置数据搬运模式mode（仅Ascend 950PR/Ascend 950DT支持）
 
@@ -46,7 +79,7 @@
     __aicore__ inline void DataCopyPad(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams)
     ```
 
-<!-- end id8 -->
+<!-- end id15 -->
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
@@ -99,29 +132,29 @@
 
 ## 数据类型<a name="section4219135304818"></a>
 
-<!-- npu="950" id9 -->
+<!-- npu="950" id16 -->
 
 - Ascend 950PR/Ascend 950DT，支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、double、complex64。
 
-<!-- end id9 -->
+<!-- end id16 -->
 
-<!-- npu="A3" id10 -->
+<!-- npu="A3" id17 -->
 
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。
 
-<!-- end id10 -->
+<!-- end id17 -->
 
-<!-- npu="910b" id11 -->
+<!-- npu="910b" id18 -->
 
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。
 
-<!-- end id11 -->
+<!-- end id18 -->
 
-<!-- npu="310b" id12 -->
+<!-- npu="310b" id19 -->
 
 - Atlas 200I/500 A2 推理产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
 
-<!-- end id12 -->
+<!-- end id19 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -141,20 +174,20 @@
     | srcStride | [0, 2^32 - 1] |
     | dstStride | [0, 2^32 - 1] |
 
-    <!-- npu="950" id13 -->
+    <!-- npu="950" id20 -->
 
     > [!NOTE]说明
     > 特别地，针对Ascend 950PR/Ascend 950DT，srcStride和dstStride的数据类型和取值范围如下：
     > - srcStride：数据类型为int64_t，取值范围为[0, 65535]。
     > - dstStride：数据类型为int64_t，取值范围为[0, 2^40-1]。
 
-    <!-- end id13 -->
+    <!-- end id20 -->
 
-- <!-- npu="A3,910b,950" id17 -->当DataCopyExtParams结构体参数blockCount、blockLen任意一个值为0时，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
-  - <!-- npu="A3" id14 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品<!-- end id14 -->
-  - <!-- npu="910b" id15 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id15 -->
-  - <!-- npu="950" id16 -->Ascend 950PR/Ascend 950DT<!-- end id16 -->
-<!-- end id17 -->
+- <!-- npu="A3,910b,950" id24 -->当DataCopyExtParams结构体参数blockCount、blockLen任意一个值为0时，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
+  - <!-- npu="A3" id21 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品<!-- end id21 -->
+  - <!-- npu="910b" id22 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id22 -->
+  - <!-- npu="950" id23 -->Ascend 950PR/Ascend 950DT<!-- end id23 -->
+<!-- end id24 -->
 
 ## 调用示例<a name="section177231425115410"></a>
 
