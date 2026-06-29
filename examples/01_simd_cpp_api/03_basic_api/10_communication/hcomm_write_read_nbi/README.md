@@ -28,12 +28,12 @@
 
 - 样例实现：  
   - Host侧通信域准备  
-    950上通信域需多进程方式创建：每个进程对应一个rank，通过TCP交换rootInfo后各自调用`HcclCommInitRootInfo`。关键步骤：
+    950上通信域需多进程方式创建：每个进程对应一个rank，通过TCP交换rootInfo后各自调用`HcclCommInitRootInfoConfig`。关键步骤：
     1. rank 0调用`HcclGetRootInfo`获取root信息，通过TCP发送给rank 1。
-    2. 各rank各自调用`HcclCommInitRootInfo`创建通信域。
+    2. 各rank各自调用`HcclCommInitRootInfoConfig`创建通信域。
     3. `HcclCommMemReg`向通信域注册本卡的通信buffer，channel创建时将该内存信息交换给对端。
     4. `HcclRankGraphGetLayers`+`HcclRankGraphGetLinks`获取本rank到对端的链路endpoint信息。
-    5. `HcclChannelAcquire`创建到对端的P2P通道，指定远端rank、协议（`COMM_PROTOCOL_UBC_CTP`对应URMA）、endpoint和待交换内存句柄。
+    5. `HcclChannelAcquire`创建到对端的P2P通道，指定远端rank、协议（`COMM_PROTOCOL_UBC_CTP`对应URMA）、endpoint、通知数量和待交换内存句柄。
     6. `HcclChannelGetRemoteMems`获取对端注册的内存地址，作为kernel侧`WriteNbi`/`ReadNbi`的远端地址。
     7. 将`ChannelHandle`和buffer地址封装到`CommContext`下发到各卡GM。
 
@@ -41,12 +41,16 @@
     // 多进程：rank 0生成rootInfo通过TCP发送，rank 1接收
     HcclGetRootInfo(&rootInfo);  // rank 0
     // 各rank各自创建通信域
-    HcclCommInitRootInfo(nranks, &rootInfo, rank, &comm);
+    HcclCommConfigInit(&config);
+    config.hcclWorldRankID = rank;
+    config.hcclOpExpansionMode = HCCL_OP_EXPANSION_CCU_SCHED;
+    HcclCommInitRootInfoConfig(nranks, &rootInfo, rank, &config, &comm);
     // 注册通信内存
     HcclCommMemReg(comm, "shareBuf", &regMem, &memHandle);
     // 获取链路endpoint
     HcclRankGraphGetLinks(comm, layerId, rank, peerRank, &links, &linkNum);
     // 创建P2P通道
+    channelDesc.notifyNum = 3;
     HcclChannelAcquire(comm, COMM_ENGINE_AIV, &channelDesc, 1, &channel);
     // 获取对端内存地址
     HcclChannelGetRemoteMems(comm, channel, &memNum, &remoteMems, &memTags);
