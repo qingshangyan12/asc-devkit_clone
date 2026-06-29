@@ -43,10 +43,35 @@ bool __hge(half x, half y)
 
 ## 返回值说明
 
-比较输入的第一个数是否大于或等于第二个数的结果。
+比较输入的第一个数是否大于或等于第二个数的结果。特殊值如下：
 
--   true：第一个数大于或等于第二个数。
--   false：第一个数小于第二个数。任一输入为nan时，返回false。
+<table>
+  <tr>
+    <th>x值</th>
+    <th>y值</th>
+    <th>返回值</th>
+  </tr>
+  <tr>
+    <td colspan="2">x&gt;y</td>
+    <td>true</td>
+  </tr>
+  <tr>
+    <td colspan="2">x=y</td>
+    <td>true</td>
+  </tr>
+  <tr>
+    <td colspan="2">x&lt;y</td>
+    <td>false</td>
+  </tr>
+  <tr>
+    <td colspan="2">任一值为nan</td>
+    <td>false</td>
+  </tr>
+  <tr>
+    <td colspan="2">±0</td>
+    <td>true</td>
+  </tr>
+</table>
 
 ## 约束说明
 
