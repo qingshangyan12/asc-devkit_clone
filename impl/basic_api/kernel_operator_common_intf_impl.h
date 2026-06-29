@@ -280,6 +280,25 @@ __aicore__ inline bool GetSaturationFlag()
 }
 #endif
 
+#if (__NPU_ARCH__ == 3510)
+template <OverrideStrategy strategy>
+__aicore__ inline void SetSaturationStrategy()
+{
+    int64_t ctrlValue = get_ctrl();
+    if constexpr (strategy == OverrideStrategy::USE_API) {
+        set_ctrl(sbitset0(ctrlValue, 60));
+    } else {
+        set_ctrl(sbitset1(ctrlValue, 60));
+    }
+}
+
+__aicore__ inline OverrideStrategy GetSaturationStrategy()
+{
+    int64_t value = (get_ctrl() >> 60) & 1;
+    return value == 0 ? OverrideStrategy::USE_API : OverrideStrategy::USE_GLOBAL;
+}
+#endif
+
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_COMMON_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_INTF_IMPL_H__)

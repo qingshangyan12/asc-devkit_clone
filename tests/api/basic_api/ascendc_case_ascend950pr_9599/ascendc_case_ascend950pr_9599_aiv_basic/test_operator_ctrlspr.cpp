@@ -36,6 +36,17 @@ void CtrlSprKernel()
     CheckSaturationFlag<SaturationMode::INT, 53, 1, 0>();
     CheckSaturationFlag<SaturationMode::CAST, 59, 0, 1>();
 
+    SetSaturationStrategy<OverrideStrategy::USE_API>();
+    EXPECT_EQ(GetSaturationStrategy(), OverrideStrategy::USE_API);
+    EXPECT_EQ((GetCtrlSpr<60, 60>()), 0);
+
+    SetSaturationStrategy<OverrideStrategy::USE_GLOBAL>();
+    EXPECT_EQ(GetSaturationStrategy(), OverrideStrategy::USE_GLOBAL);
+    EXPECT_EQ((GetCtrlSpr<60, 60>()), 1);
+
+    SetSaturationStrategy<OverrideStrategy::USE_API>();
+    EXPECT_EQ(GetSaturationStrategy(), OverrideStrategy::USE_API);
+    EXPECT_EQ((GetCtrlSpr<60, 60>()), 0);
 }
 
 struct CtrlSprTestParams {

@@ -31,6 +31,11 @@ enum class SaturationMode : uint8_t {
     CAST
 };
 
+enum class OverrideStrategy : uint8_t {
+    USE_API = 0,
+    USE_GLOBAL = 1
+};
+
 } // namespace AscendC
 #endif // ASCENDC_MODULE_BASE_TYPES_H
 
