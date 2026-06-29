@@ -139,6 +139,32 @@ __aicore__ static inline void ResetCtrlSprImpl()
     value = value | defaultCtrl;
     set_ctrl(value);
 }
+
+template <CacheMode cacheMode>
+__aicore__ inline constexpr uint8_t GetCacheModeBits()
+{
+    switch (cacheMode) {
+        case CacheMode::CACHE_MODE_DISABLE:   return 4;   // 4'b0100
+        case CacheMode::CACHE_MODE_NORMAL:    return 0;   // 4'b0000
+        case CacheMode::CACHE_MODE_LAST:      return 1;   // 4'b0001
+        case CacheMode::CACHE_MODE_PERSISTENT: return 2;  // 4'b0010
+        default: return 0;
+    }
+}
+
+template <CacheRwMode rwMode, CacheMode cacheMode>
+__aicore__ inline void SetScalarCacheModeImpl()
+{
+    // READ mode: CTRL[19:16], WRITE mode: CTRL[23:20]
+    constexpr uint8_t startBit = (rwMode == CacheRwMode::READ) ? 16 : 20;
+    constexpr uint8_t cacheBits = GetCacheModeBits<cacheMode>();
+    
+    uint64_t mask = ~((uint64_t(0xF) << startBit));
+    int64_t ctrlValue = get_ctrl() & mask;
+    ctrlValue |= (static_cast<uint64_t>(cacheBits) << startBit);
+    set_ctrl(ctrlValue);
+}
+
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_IMPL_H__)
