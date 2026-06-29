@@ -127,8 +127,7 @@ $dst_i = \sim src_i$
   <!-- end id20 -->
 <!-- end id18 -->
 <!-- npu="950" id21 -->
-- 针对Ascend 950PR/Ascend 950DT，有如下约束说明：
-  - 该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
+- 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
   <!-- end id21 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>

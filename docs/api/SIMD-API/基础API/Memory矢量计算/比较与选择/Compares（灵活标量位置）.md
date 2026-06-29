@@ -96,6 +96,12 @@ $dst_i = Compares(scalar_{idx}, src_i)$
 | repeatParams | 输入 | 控制操作数地址步长的参数。[UnaryRepeatParams](../../数据结构/辅助数据结构//UnaryRepeatParams.md)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md)。 |
 | count | 输入 | 参与计算的元素个数。**设置count时，需要保证count个元素所占空间256字节对齐。** |
 
+## 数据类型
+
+<!-- npu="950" id8 -->
+Ascend 950PR/Ascend 950DT，目的操作数dst支持的数据类型为：uint8_t。源操作数src支持的数据类型为：int8_t/uint8_t/int16_t/uint16_t/half/bfloat16_t/float/int32_t/uint32_t/int64_t/uint64_t/double。其中，int8\_t/uint8\_t/uint64\_t/int64\_t/double数据类型仅支持tensor前n个数据计算接口，double数据类型只支持CMPMODE::EQ。
+<!-- end id8 -->
+
 ## 返回值说明<a name="section128671456102513"></a>
 
 无
@@ -107,9 +113,6 @@ $dst_i = Compares(scalar_{idx}, src_i)$
 
 -   dst按照小端顺序排序成二进制结果，对应src中相应位置的数据比较结果。
 -   **使用tensor前n个数据参与计算的接口，设置count时，需要保证count个元素所占空间256字节对齐。**
-<!-- npu="950" id8 -->
-- 针对Ascend 950PR/Ascend 950DT，int8\_t/uint8\_t/uint64\_t/int64\_t/double数据类型仅支持tensor前n个数据计算接口，double只支持CMPMODE::EQ。
-  <!-- end id8 -->
 -   左操作数及右操作数中，必须有一个为矢量；当前不支持左右操作数同时为标量。
 -   本接口传入LocalTensor单点数据作为标量时，idx参数需要传入编译期已知的常量，传入变量时需要声明为constexpr。
 

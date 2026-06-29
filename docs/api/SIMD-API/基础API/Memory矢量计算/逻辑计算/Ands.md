@@ -67,7 +67,7 @@ $dst_i = scalar_{idx} \& src_i$
 | 参数名 | 描述 |
 | :--- | :--- |
 | T | 预留参数，暂未启用，为后续的功能扩展做保留，需要指定时，传入默认值BinaryDefaultType即可。 |
-| isSetMask | 是否在接口内部设置mask模式和mask值。<br>- true，表示在接口内部设置。Tensor高维切分计算API/Tensor前n个数据计算API内部使用了mask的[Normal模式/Counter模式](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/类库API/基础API/常用操作速查指导/如何使用掩码操作API.md)，一般情况下保持isSetMask默认值即可，表示在API内部进行根据开发者传入的mask/count参数进行mask模式和mask值的设置。<br>- false，表示在接口外部设置。<br>&nbsp;&nbsp;- 针对Tensor高维切分计算接口，对性能要求较高的部分场景下，开发者需要使用[SetMaskNorm](../掩码操作/SetMaskNorm.md)/[SetMaskCount](../掩码操作/SetMaskCount.md)设置mask模式，并通过[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。接口入参中的mask值设置为占位符MASK_PLACEHOLDER，用于占位，无实际含义。<br>&nbsp;&nbsp;- 针对Tensor前n个数据计算接口，对性能要求较高的部分场景下，开发者需要使用[SetMaskCount](../掩码操作/SetMaskCount.md)设置mask模式为Counter模式，并通过[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。本接口入参中的count不生效，建议设置成1。<br>针对以下型号，Tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。<br>- 针对Ascend 950PR/Ascend 950DT |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下：<br>&nbsp;&nbsp;&bull; 针对tensor前n个数据计算接口，接口入参中的count不生效，建议设置成1。<br>&nbsp;&nbsp;&bull; 针对tensor高维切分计算接口，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。<br><!-- npu="950" id8 -->针对以下型号，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。<br>&bull; <!-- npu="950" id9 -->Ascend 950PR/Ascend 950DT<!-- end id9 --><!-- end id8 -->|
 | config | 类型为BinaryConfig，当标量为LocalTensor单点元素类型时生效，用于指定单点元素操作数位置。默认值DEFAULT_BINARY_CONFIG，表示右操作数为标量。<br>struct BinaryConfig {<br>&nbsp;&nbsp;&nbsp;&nbsp;int8_t scalarTensorIndex = 1; // 用于指定标量为LocalTensor单点元素时标量的位置，0表示左操作数，1表示右操作数<br>};<br>constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1}; |
 | U | LocalTensor类型，根据输入参数dst自动推导相应的数据类型，开发者无需配置该参数，保证dst满足数据类型的约束即可。 |
 | S | LocalTensor类型或标量类型，根据输入参数src0自动推导相应的数据类型，开发者无需配置该参数，保证src0满足数据类型的约束即可。 |
@@ -77,12 +77,18 @@ $dst_i = scalar_{idx} \& src_i$
 
 | **参数名称** | **类型** | **说明** |
 | :--- | :--- | :--- |
-| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。<br>Ascend 950PR/Ascend 950DT，支持的数据类型为：int16_t/uint16_t/int64_t/uint64_t |
-| src0/src1 | 输入 | 源操作数。<br>- 类型为LocalTensor时，支持当作矢量操作数或标量单点元素，支持的TPosition为VECIN/VECCALC/VECOUT。<br>&nbsp;&nbsp;LocalTensor的起始地址需要32字节对齐。<br>&nbsp;&nbsp;Ascend 950PR/Ascend 950DT，支持的数据类型为：int16_t/uint16_t/int64_t/uint64_t<br>- 类型为标量时：<br>&nbsp;&nbsp;Ascend 950PR/Ascend 950DT，支持的数据类型为：int16_t/uint16_t/int64_t/uint64_t<br>数据类型需要与目的操作数保持一致。 |
+| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。|
+| src0/src1 | 输入 | 源操作数。支持类型为LocalTensor或标量。数据类型需要与目的操作数保持一致。<br> 类型为LocalTensor时，支持当作矢量操作数或标量单点元素，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。 |
 | count | 输入 | 参与计算的元素个数。 |
 | mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](../SIMD计算说明/掩码/掩码.md)。 |
 | repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体描述请参考[高维切分API](../SIMD计算说明/高维切分.md)。 |
 | repeatParams | 输入 | 元素操作控制结构信息，具体请参考[UnaryRepeatParams](../../数据结构/辅助数据结构//UnaryRepeatParams.md)。 |
+
+## 数据类型
+
+<!-- npu="950" id10 -->
+- 针对Ascend 950PR/Ascend 950DT，目的操作数dst和源操作数src支持的数据类型为：int16_t、uint16_t、int64_t、uint64_t。数据类型int64_t、uint64_t仅支持tensor前n个数据计算接口。
+<!-- end id10 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -97,9 +103,9 @@ $dst_i = scalar_{idx} \& src_i$
 
 -   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 
--   针对Ascend 950PR/Ascend 950DT，有如下约束说明：
-    - uint64\_t/int64\_t数据类型仅支持Tensor前n个数据计算接口。
-    - tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。
+<!-- npu="950" id11 -->
+-   针对Ascend 950PR/Ascend 950DT，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。
+<!-- end id11 -->
 -   左操作数及右操作数中，必须有一个为矢量；当前不支持左右操作数同时为标量。
 -   本接口传入LocalTensor单点数据作为标量时，idx参数需要传入编译期已知的常量，传入变量时需要声明为constexpr。
 
