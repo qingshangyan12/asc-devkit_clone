@@ -2,17 +2,33 @@
 
 ## 产品支持情况<a id="section1550532418810"></a>
 
-| 产品 | 是否支持 |
-| ---------- | :----------: |
-| <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT | √ </cann-filter> |
-| <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x </cann-filter> |
-| <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x </cann-filter> |
-| <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品 | x </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core | x </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品Vector Core | x </cann-filter> |
-| <cann-filter npu-type = "910">Atlas 训练系列产品 | x </cann-filter> |
-| <cann-filter npu-type = "x90">Kirin X90 | x </cann-filter> |
-| <cann-filter npu-type = "9030">Kirin 9030 | x </cann-filter> |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
+<!-- npu="x90" id8 -->
+- Kirin X90：不支持
+<!-- end id8 -->
+<!-- npu="9030" id9 -->
+- Kirin 9030：不支持
+<!-- end id9 -->
 
 ## 功能说明<a id="section618mcpsimp"></a>
 
@@ -80,7 +96,7 @@ __aicore__ inline Load3DBitModeParam(const LoadData3DParamsV2<T> &loadData3DPara
 | kStep | 该指令在目的操作数width维度的传输长度，如果不覆盖最右侧的分形，对于half类型，应为16的倍数，对于int8_t/uint8_t应为32的倍数；覆盖的情况则无倍数要求。取值范围：kStep∈[1, 65535]。<br>（与[Load3D](Load3D.md)中的kExtension含义相同）。<br>该参数是位域结构体的最低位参数，占用16bit，可以使用Load3DBitModeParam类对象的SetKExtension()函数设置其值，使用GetKExtension()函数获取其值。 |
 | mStep | 该指令在目的操作数height维度的传输长度，如果不覆盖最下侧的分形，对于half/int8_t/uint8_t，应为16的倍数；覆盖的情况则无倍数要求。取值范围：mStep∈[1, 65535]。<br>（与[Load3D](Load3D.md)中的mExtension含义相同）。<br>该参数是位域结构体的第二低位参数，占用16bit，可以使用Load3DBitModeParam类对象的SetMExtension()函数设置其值，使用GetMExtension()函数获取其值。 |
 | kPos | 该指令在目的操作数width维度的起点，对于half类型，应为16的倍数，对于int8_t/uint8_t应为32的倍数。取值范围[0, 65535]。默认为0。<br>（与[Load3D](Load3D.md)中的kStartPt含义相同）。<br>该参数是位域结构体的第三低位参数，占用16bit，可以使用Load3DBitModeParam类对象的SetKStartPt()函数设置其值，使用GetKStartPt()函数获取其值。 |
-| mPos | 该指令在目的操作数height维度的起点，如果不覆盖最下侧的分形，对于half/int8_t/uint8_t，应为16的倍数；覆盖的情况则无倍数要求。取值范围[0, 65535]。默认为0。<br>（与[Load3D](Load3D.md)中的mStartPt含义相同）。<br>该参数是位域结构体的最高位参数，占用16bit，可以使用Load3DBitModeParam类对象的SetMStartPt()函数设置其值，使用GetMStartPt()函数获取其值。 |
+| mPos | 该指令在目的操作数height维度的起点，取值范围[0, 32767]。默认为0。<br>（与[Load3D](Load3D.md)中的mStartPt含义相同）。<br>该参数是位域结构体的最高位参数，占用16bit，可以使用Load3DBitModeParam类对象的SetMStartPt()函数设置其值，使用GetMStartPt()函数获取其值。 |
 
 **表5** Load3DBitModeConfig1结构体参数说明<a name="table87491086815"></a>
 
@@ -96,7 +112,7 @@ __aicore__ inline Load3DBitModeParam(const LoadData3DParamsV2<T> &loadData3DPara
 | filterH | 是否在filterH的基础上将卷积核height增加256个元素。true，增加；false，不增加。<br>（与[Load3D](Load3D.md)中的filterSizeH含义相同）。<br>该参数是位域结构体的第八低位参数，占用1bit，可以使用Load3DBitModeParam类对象的SetFilterSizeH()函数设置其值，使用GetFilterSizeH()函数获取其值。 |
 | transpose | 是否启用转置功能，对整个目标矩阵进行转置，支持数据类型为bool，仅在目的TPosition为A2，且源操作数为half类型时有效。默认为false。<br>&nbsp;&nbsp;&bull; true：启用<br>&nbsp;&nbsp;&bull; false：不启用<br>（与[Load3D](Load3D.md)中的enTranspose含义相同）。<br>该参数是位域结构体的第九低位参数，占用1bit，可以使用Load3DBitModeParam类对象的SetTranspose()函数设置其值，使用GetTranspose()函数获取其值。 |
 | fmatrixCtrl | 表示LoadData3DV2指令从左矩阵还是右矩阵获取FeatureMap的属性描述，与SetFmatrix配合使用，当前只支持设置为false，默认值为false。<br>&nbsp;&nbsp;&bull; true：从右矩阵中获取FeatureMap的属性描述；<br>&nbsp;&nbsp;&bull; false：从左矩阵中获取FeatureMap的属性描述。<br>（与[Load3D](Load3D.md)中的fMatrixCtrl含义相同）。<br>该参数是位域结构体的第十低位参数，占用1bit，可以使用Load3DBitModeParam类对象的SetFmatrixCtrl()函数设置其值，使用GetFmatrixCtrl()函数获取其值。 |
-| sizeChannel | 源操作数的通道数，取值范围：channelSize∈[1, 63]。<br>channelSize的取值要求为：对于uint32_t/int32_t/float，channelSize可取值为4，N\*8，N\*8+4；对于half/bfloat16，channelSize可取值为4，8，N\*16，N\*16+4，N\*16+8；对于int8_t/uint8_t，channelSize可取值为4，8，16，32\*N，N\*32+4，N\*32+8，N\*32+16；对于int4b_t，ChannelSize可取值为8，16，32，N \* 64，N\*64+8，N\*64+16，N\*64+32。N为正整数。<br>（与[Load3D](Load3D.md)中的channelSize含义相同）。<br>该参数是位域结构体的最高位参数，占用16bit，可以使用Load3DBitModeParam类对象的SetChannelSize()函数设置其值，使用GetChannelSize()函数获取其值。 |
+| sizeChannel | 源操作数的通道数，取值范围：sizeChannel∈[1, 63]。<br>sizeChannel的取值要求为：对于uint32_t/int32_t/float，sizeChannel可取值为4，N\*8，N\*8+4；对于half/bfloat16，sizeChannel可取值为4，8，N\*16，N\*16+4，N\*16+8；对于int8_t/uint8_t，sizeChannel可取值为4，8，16，32\*N，N\*32+4，N\*32+8，N\*32+16；对于int4b_t，sizeChannel可取值为8，16，32，N \* 64，N\*64+8，N\*64+16，N\*64+32。N为正整数。<br>（与[Load3D](Load3D.md)中的channelSize含义相同）。<br>该参数是位域结构体的最高位参数，占用16bit，可以使用Load3DBitModeParam类对象的SetChannelSize()函数设置其值，使用GetChannelSize()函数获取其值。 |
 
 ## 数据类型
 
@@ -125,7 +141,7 @@ uint8_t strideH = 1, strideW = 1;
 uint8_t padList[4] = {padLeft, padRight, padTop, padBottom};
 
 // 使用LoadData3DParamsV2结构体对象初始化Load3DBitModeParam
-// 构造参数顺序：padList, l1H, l1W, channelSize, kExtension, mExtension, kStartPt, mStartPt,
+// 构造参数顺序：padList, l1H, l1W, sizeChannel, kExtension, mExtension, kStartPt, mStartPt,
 //             strideW, strideH, filterW, filterH, dilationFilterW, dilationFilterH,
 //             enTranspose, enSmallK, padValue, filterSizeW, filterSizeH, fMatrixCtrl
 AscendC::LoadData3DParamsV2<half> param = {

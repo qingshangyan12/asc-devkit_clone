@@ -155,6 +155,10 @@ __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c, __ca__ int4b_t* a, __cb__ 
 __aicore__ inline void asc_mmad_sparse(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m, uint16_t k,
                                        uint16_t n, uint8_t unit_flag, bool enable_cube_init, bool enable_cube_zero_init);
 
+__aicore__ inline void asc_mmad_sparse_sync(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m,
+                                            uint16_t k, uint16_t n, uint8_t unit_flag, bool enable_cube_init,
+                                            bool enable_cube_zero_init);
+
 /*
  * @ingroup CubeCompute
  * @brief Set MMAD computation direction to M direction
@@ -337,6 +341,28 @@ __aicore__ inline void asc_mmad(__cc__ float* c, __ca__ float* a, __cb__ float* 
 __aicore__ inline void asc_mmad(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b,
                                 uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
                                 bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
+
+__aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ hifloat8_t* a_matrix, __cb__ hifloat8_t* b_matrix,
+                                        uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag,
+                                        bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+        
+__aicore__ inline void asc_mmad_sync(__cc__ float* c_matrix, __ca__ hifloat8_t* a_matrix, __cb__ hifloat8_t* b_matrix,
+                                             uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag,
+                                             bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+
+__aicore__ inline void asc_enable_hf32_trans(uint32_t mode);
+
+__aicore__ inline void asc_enable_hf32();
+
+__aicore__ inline void asc_set_fp32_mode();
+
+__aicore__ inline void asc_enable_hif8();
+
+__aicore__ inline void asc_enable_fp8();
+
+__aicore__ inline void asc_set_mmad_direction_m();
+
+__aicore__ inline void asc_set_mmad_direction_n();
 
 #endif
 

@@ -40,7 +40,7 @@ SPECIAL_PREFIXES = (
 
 CUSTOM_OP_PACKAGE_CASE = "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op"
 PARALLEL_OPS_PACKAGE_CASE = "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/parallel_ops_package"
-TILING_SINK_PROGRAMMING_CASE = "04_aicpu/02_features/00_framwork/00_pytorch/tiling_sink_programming"
+TILING_SINK_PROGRAMMING_CASE = "04_aicpu/02_features/00_framework/00_pytorch/tiling_sink_programming"
 TILING_SINK_GENERATE_TASK_PATTERN = (
     "GenerateTaskForSinkOp:Node [AddCustomTilingSink, AddCustomTilingSink] starts to generate tasks "
     "for the tiling sink, sk_flag [0]."
@@ -81,7 +81,7 @@ ARCH_OVERRIDES = {
     "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin": ["dav-2201", "dav-3510"],
     "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom": ["dav-2201", "dav-3510"],
     "01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin": ["dav-2201", "dav-3510"],
-    "04_aicpu/02_features/00_framwork/00_pytorch/tiling_sink_programming": ["dav-2201", "dav-3510"],
+    "04_aicpu/02_features/00_framework/00_pytorch/tiling_sink_programming": ["dav-2201", "dav-3510"],
     # README "支持的产品" only lists Ascend 950PR/950DT. The option table also
     # mentions dav-2201, but the sample uses FP8/hifloat8 types unavailable on 910B.
     "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_fp8": ["dav-3510"],
@@ -226,6 +226,7 @@ def build_runner_render_spec(cell, confidence: str, reasons: List[str]) -> tuple
     rel = cell.example.rel_path
     build_cmds = build_commands_for_runner(cell.commands)
     run_cmds = run_commands_for_runner(cell.commands, build_cmds)
+    build_cmds, run_cmds = merge_export_commands_into_run(build_cmds, run_cmds)
     verify_cmds = [command for command in cell.commands if command.raw and command.kind == "verify"]
     if not run_cmds:
         run_cmds = [Command(":", "run")]
@@ -286,6 +287,29 @@ def run_commands_for_runner(commands: Iterable[Command], build_cmds: List[Comman
         if command not in build_cmds:
             result.append(command)
     return result
+
+
+def merge_export_commands_into_run(
+    build_cmds: List[Command],
+    run_cmds: List[Command],
+) -> tuple[List[Command], List[Command]]:
+    export_cmds: List[str] = []
+    remaining_build_cmds: List[Command] = []
+    for command in build_cmds:
+        if is_export_command(command.raw):
+            export_cmds.append(command.raw)
+        else:
+            remaining_build_cmds.append(command)
+    if not export_cmds or not run_cmds:
+        return build_cmds, run_cmds
+
+    first_run = run_cmds[0]
+    merged_run = Command("; ".join([*export_cmds, first_run.raw]), first_run.kind, dict(first_run.env))
+    return remaining_build_cmds, [merged_run, *run_cmds[1:]]
+
+
+def is_export_command(command: str) -> bool:
+    return bool(re.match(r"^export\s+[A-Za-z_][A-Za-z0-9_]*=", command.strip()))
 
 
 def classify_confidence(cell) -> tuple[str, List[str]]:
@@ -528,6 +552,8 @@ def command_workdir(command: str, default_cd_build: bool = False) -> str:
 
 
 def command_runs_from_build_dir(command: str, default_cd_build: bool = False) -> bool:
+    if re.match(r"^(export\s+[A-Za-z_][A-Za-z0-9_]*=.*;\s*)+\./", command.strip()):
+        return True
     if command.startswith("python3 ../"):
         return True
     if 'python3 ../' in command and ("--application=" in command or command.startswith("msprof ")):
