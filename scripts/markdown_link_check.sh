@@ -998,6 +998,15 @@ def git_object_type(ref, path):
     return result.stdout.strip()
 
 
+def worktree_object_type(path):
+    target = repo_root / path
+    if target.is_file():
+        return "blob"
+    if target.is_dir():
+        return "tree"
+    return None
+
+
 def asc_devkit_gitcode_target(target):
     parsed = urlparse(target.strip().strip("<>").strip("\"'"))
     if parsed.scheme not in ("http", "https") or parsed.netloc != "gitcode.com":
@@ -1050,15 +1059,21 @@ for source in scan_files:
                 continue
 
             branch, target_path = parsed
-            if branch not in ref_cache:
-                ref_cache[branch] = git_ref_for_branch(branch)
-            ref = ref_cache[branch]
-            if ref is None:
-                continue
+            if branch in ("master", "main"):
+                ref = "working tree"
+                cache_key = (ref, target_path)
+                if cache_key not in object_cache:
+                    object_cache[cache_key] = worktree_object_type(target_path)
+            else:
+                if branch not in ref_cache:
+                    ref_cache[branch] = git_ref_for_branch(branch)
+                ref = ref_cache[branch]
+                if ref is None:
+                    continue
 
-            cache_key = (ref, target_path)
-            if cache_key not in object_cache:
-                object_cache[cache_key] = git_object_type(ref, target_path)
+                cache_key = (ref, target_path)
+                if cache_key not in object_cache:
+                    object_cache[cache_key] = git_object_type(ref, target_path)
             if object_cache[cache_key] is None:
                 errors.append(
                     f"{source}:{line_number}: GitCode link target does not exist in {ref}: "
