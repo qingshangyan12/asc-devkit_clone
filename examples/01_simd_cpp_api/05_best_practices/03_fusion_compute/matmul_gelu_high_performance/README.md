@@ -350,7 +350,7 @@ Fixpipe L0C → UB（通过 `dualDstCtl=0b01` 开启双目标模式，按M维度
 
 ```cpp
 AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
-fixpipeParams.mSize = AscendC::DivCeil(curM, 2) * 2;
+fixpipeParams.mSize = DivCeil(curM, 2) * 2;
 fixpipeParams.nSize = curN;
 fixpipeParams.srcStride = curMAlign;
 fixpipeParams.dstStride = curN;
@@ -488,7 +488,7 @@ AscendC::DumpTensor(yLocal, 1, 16);
 
 > **注意：** [DumpTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md)接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC_DUMP=0来关闭打印功能。
 
-### 性能调试
+## 性能调试
 
 使用 `msprof` 工具获取详细性能数据：
 

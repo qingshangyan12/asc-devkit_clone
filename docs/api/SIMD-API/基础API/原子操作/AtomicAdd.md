@@ -66,39 +66,20 @@ GM地址上做原子操作前的数据。
 
 ## 约束说明<a name="section24727811123"></a>
 
-- 原子操作涉及标量计算，如果标量计算单元和搬运单元\(MTE2/MTE3\)在读写GM时存在数据依赖，开发者需要根据实际情况插入同步。
+- 通常情况下，编译器能够自动在PIPE_MTE2/PIPE_MTE3与PIPE_S之间插入同步（参见[编译器自动同步](../同步控制/核内同步/关键特性说明.md#tpipe-tque框架编程范式和编译器自动同步支持情况)）。但是，AtomicAdd为标量计算，在读写GM时如果与搬运单元（MTE2/MTE3）存在数据依赖，编译器却无法自动插入同步，开发者需要根据实际情况手动插入同步。
 - Scalar原子操作会绕过DCache，需要调用[DataCacheCleanAndInvalid](../缓存控制/DataCacheCleanAndInvalid.md)接口确保GM与DCache的一致性。
 
 ## 调用示例<a name="section191505489122"></a>
 
 ```cpp
-extern "C" __global__ __aicore__ void atomic_simple_kernel(__gm__ uint8_t* dst, uint32_t dataSize)
+extern "C" __global__ __aicore__ void atomic_histogram_kernel(__gm__ uint32_t* hist, __gm__ uint8_t* input, uint32_t dataSize)
 {
-    // ...
-    dst_global.SetGlobalBuffer(reinterpret_cast<__gm__ T *>(dst_gm), dataSize);
-    LocalTensor<T> dstLocal = inQueueX.AllocTensor<T>();
-    int32_t value = 1;
-    int32_t a = AscendC::AtomicAdd(reinterpret_cast<__gm__ int32_t *>(dst), value);
-    // 先执行完原子操作之后才能进行搬运操作，有数据依赖，需要手动插入MTE2等待Scalar的同步。
-    event_t eventIdSToMte2 = static_cast<event_t>(GetTPipePtr()->AllocEventID<HardEvent::S_MTE2>());
-    SetFlag<HardEvent::S_MTE2>(eventIdSToMte2);
-    WaitFlag<HardEvent::S_MTE2>(eventIdSToMte2);
-    DataCopy(dstLocal, dst_global, dataSize);
-    // ...
+    // 每个核遍历输入数据，统计各灰度值出现的频次。
+    for (uint32_t i = blockIdx.x; i < dataSize; i += blockDim.x) {
+        // 使用AtomicAdd将对应bin的计数原子地加1。
+        AscendC::AtomicAdd(&hist[input[i]], 1);
+    }
 }
 ```
 
-假设上述函数在3个核上执行，核1、核2、核3依次调度，结果示例如下：
-
-```text
-原GM数据dst: [1,1,1,1,1,...,1]
-核1：
-原子计算后GM数据dst: [2,1,1,1,1,...,1]
-返回值 a: 1
-核2：
-原子计算后GM数据dst: [3,1,1,1,1,...,1]
-返回值 a: 2
-核3：
-原子计算后GM数据dst: [4,1,1,1,1,...,1]
-返回值 a: 3
-```
+假设上述函数在多个核上执行，每个核处理各自分片数据，通过AtomicAdd原子地累加到直方图数组hist中，最终得到全局直方图统计结果。

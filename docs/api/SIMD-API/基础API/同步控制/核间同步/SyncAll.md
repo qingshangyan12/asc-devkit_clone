@@ -34,63 +34,63 @@
 
 ### 硬同步（不支持config指定流水）原型
 
-<!-- npu="950" id1 -->
+<!-- npu="950" id10 -->
 - Ascend 950PR/Ascend 950DT：支持
-<!-- end id1 -->
-<!-- npu="A3" id2 -->
+<!-- end id10 -->
+<!-- npu="A3" id11 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
-<!-- end id2 -->
-<!-- npu="910b" id3 -->
+<!-- end id11 -->
+<!-- npu="910b" id12 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
-<!-- end id3 -->
-<!-- npu="310b" id4 -->
+<!-- end id12 -->
+<!-- npu="310b" id13 -->
 - Atlas 200I/500 A2 推理产品：不支持
-<!-- end id4 -->
-<!-- npu="310p" id5 -->
+<!-- end id13 -->
+<!-- npu="310p" id14 -->
 - Atlas 推理系列产品AI Core：不支持
-<!-- end id5 -->
-<!-- npu="310p" id6 -->
+<!-- end id14 -->
+<!-- npu="310p" id15 -->
 - Atlas 推理系列产品Vector Core：不支持
-<!-- end id6 -->
-<!-- npu="910" id7 -->
+<!-- end id15 -->
+<!-- npu="910" id16 -->
 - Atlas 训练系列产品：不支持
-<!-- end id7 -->
-<!-- npu="x90" id8 -->
+<!-- end id16 -->
+<!-- npu="x90" id17 -->
 - Kirin X90：支持
-<!-- end id8 -->
-<!-- npu="9030" id9 -->
+<!-- end id17 -->
+<!-- npu="9030" id18 -->
 - Kirin 9030：支持
-<!-- end id9 -->
+<!-- end id18 -->
 
 ### 硬同步（支持config指定流水）原型
 
-<!-- npu="950" id1 -->
+<!-- npu="950" id19 -->
 - Ascend 950PR/Ascend 950DT：支持
-<!-- end id1 -->
-<!-- npu="A3" id2 -->
+<!-- end id19 -->
+<!-- npu="A3" id20 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
-<!-- end id2 -->
-<!-- npu="910b" id3 -->
+<!-- end id20 -->
+<!-- npu="910b" id21 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
-<!-- end id3 -->
-<!-- npu="310b" id4 -->
+<!-- end id21 -->
+<!-- npu="310b" id22 -->
 - Atlas 200I/500 A2 推理产品：不支持
-<!-- end id4 -->
-<!-- npu="310p" id5 -->
+<!-- end id22 -->
+<!-- npu="310p" id23 -->
 - Atlas 推理系列产品AI Core：不支持
-<!-- end id5 -->
-<!-- npu="310p" id6 -->
+<!-- end id23 -->
+<!-- npu="310p" id24 -->
 - Atlas 推理系列产品Vector Core：不支持
-<!-- end id6 -->
-<!-- npu="910" id7 -->
+<!-- end id24 -->
+<!-- npu="910" id25 -->
 - Atlas 训练系列产品：不支持
-<!-- end id7 -->
-<!-- npu="x90" id8 -->
+<!-- end id25 -->
+<!-- npu="x90" id26 -->
 - Kirin X90：不支持
-<!-- end id8 -->
-<!-- npu="9030" id9 -->
+<!-- end id26 -->
+<!-- npu="9030" id27 -->
 - Kirin 9030：不支持
-<!-- end id9 -->
+<!-- end id27 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -129,6 +129,7 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
     ```
 
     - 支持config指定流水
+
     ```cpp
     template <bool isAIVOnly = true, const SyncAllConfig& config = DEFAULT_SYNC_ALL_CONFIG>
     __aicore__ inline void SyncAll()
@@ -148,7 +149,7 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 | 参数名称 | 输入/输出 | 含义 |
 | --- | --- | --- |
 | gmWorkspace | 输入 | gmWorkspace为用户定义的全局空间，作为所有核共用的缓存，用于保存每个核的状态标记，类型为GlobalTensor，支持的数据类型为int32_t。GlobalTensor数据结构的定义请参考[GlobalTensor](../../数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor.md)。<br>所需空间大小和使用注意项参见[约束说明](#section633mcpsimp)。<br>硬同步接口不支持该参数。 |
-| ubWorkspace | 输入 | ubWorkspace为用户定义的局部空间，每个核单独自用，用于标记当前核的状态。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT，支持的数据类型为int32_t。<br>所需空间大小参见[约束说明](#section633mcpsimp)。<br>硬同步接口不支持该参数。 |
+| ubWorkspace | 输入 | ubWorkspace为用户定义的局部空间，每个核单独自用，用于标记当前核的状态。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT，支持的数据类型为int32_t。<br>所需空间大小参见[约束说明](#section633mcpsimp)。<br>硬同步接口不支持该参数。 |
 | usedCores | 输入 | 指定多少个核之间的同步，传入数值不能超过算子调用时指定的逻辑numBlocks。此参数为默认参数，不传此参数表示全核软同步。<br>仅在软同步接口中支持，硬同步接口不支持该参数。 |
 
 ## 返回值说明<a name="section91032023123812"></a>
@@ -166,11 +167,10 @@ SyncAll硬件同步和软件同步接口的内部实现不同，约束条件也�
     - ubWorkspace申请的空间大小要求大于等于GetBlockNum()*32Bytes。
     - 在纯Vector算子场景中，若所有AIV核默认参与同步，推荐采用性能更优的硬件同步接口；若需指定部分AIV核参与同步，则应使用软件同步接口，并通过入参usedCores完成配置。
     - usedCores传入数值不能超过算子调用时指定的逻辑AI Core中AIV的数量：GetBlockNum()*GetTaskRatio()，不传此参数表示全核软同步。
-    - <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，SyncAll软同步接口内部实现中标量单元连续读取相同GM地址时用于进行多核同步，会造成Bus被长期占用，导致其他核无法访问该GM，导致多核读同一GM出现卡死现象。若需要Polling，建议在该使用接口间，增加Nop指令，指令量建议为800个，一般为需要同步的核数 * 200。</cann-filter>
-    
+
 - 硬件同步接口约束：
     - 使用硬同步接口时，需根据场景使用合适的核函数修饰符：
-        - 在纯Vector算子，需使用\_\_mix\_\_\(0, 1\)修饰核函数，而不是使用\_\_vector\_\_，具体原因请参考。
+        - 在纯Vector算子，需使用\_\_mix\_\_\(0, 1\)修饰核函数，而不是使用\_\_vector\_\_，具体原因请参考[CrossCoreSetFlag约束说明](CrossCoreSetFlag(ISASI).md#约束说明)中的Kernel类型配置说明。
         - 对于Mix（包含Cube和Vector计算）算子，需使用\_\_mix\_\_\(1, 1\)或\_\_mix\_\_\(1, 2\)修饰核函数。
     - 对于纯Vector算子，模板参数isAIVOnly必须设置为true，否则会导致程序卡死。
     - 对于Mix（包含Cube和Vector计算）算子，模板参数isAIVOnly设置为true，会导致接口实际只能完成Vector全核同步与预期同步行为不符。
