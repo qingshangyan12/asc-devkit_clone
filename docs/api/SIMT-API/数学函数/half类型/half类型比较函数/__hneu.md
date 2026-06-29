@@ -43,10 +43,23 @@ bool __hneu(half x, half y)
 
 ## 返回值说明
 
-比较输入数据是否不相等的结果。
+比较输入数据是否不相等的结果。特殊值如下：
 
--   true：输入数据不相等。任一输入为nan时返回true。
--   false：输入数据相等。
+<table>
+  <tr>
+    <th>x值</th>
+    <th>y值</th>
+    <th>返回值</th>
+  </tr>
+  <tr>
+    <td colspan="2">x≠y，任一值为nan</td>
+    <td>true</td>
+  </tr>
+  <tr>
+    <td colspan="2">x=y</td>
+    <td>false</td>
+  </tr>
+</table>
 
 ## 约束说明
 
