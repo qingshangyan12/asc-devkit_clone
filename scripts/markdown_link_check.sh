@@ -880,10 +880,6 @@ sys.exit(1 if errors else 0)
 PY
 CROSS_LINK_RC=$?
 set -e
-if [ "$CROSS_LINK_RC" -ne 0 ]; then
-    cat "$CROSS_LINK_OUTPUT_FILE"
-    exit "$CROSS_LINK_RC"
-fi
 
 set +e
 python3 - "$REPO_ROOT" "$SCAN_SET_FILE" "$GITCODE_LINK_OUTPUT_FILE" "$(markdown_check_duration)" <<'PY'
@@ -1093,10 +1089,6 @@ sys.exit(1 if errors else 0)
 PY
 GITCODE_LINK_RC=$?
 set -e
-if [ "$GITCODE_LINK_RC" -ne 0 ]; then
-    cat "$GITCODE_LINK_OUTPUT_FILE"
-    exit "$GITCODE_LINK_RC"
-fi
 
 LYCHEE_BIN=$(find_lychee)
 LYCHEE_ARGS=(--no-progress --config "$CONFIG_FILE")
@@ -1214,10 +1206,32 @@ with filtered_path.open("w", encoding="utf-8") as handle:
             handle.write(f"{line}\n")
 PY
 
+FINAL_RC=0
+if [ "$CROSS_LINK_RC" -ne 0 ]; then
+    cat "$CROSS_LINK_OUTPUT_FILE"
+    FINAL_RC=1
+fi
+if [ "$GITCODE_LINK_RC" -ne 0 ]; then
+    if [ "$FINAL_RC" -ne 0 ]; then
+        printf '\n'
+    fi
+    cat "$GITCODE_LINK_OUTPUT_FILE"
+    FINAL_RC=1
+fi
 if [ -s "$FILTERED_OUTPUT_FILE" ]; then
+    if [ "$FINAL_RC" -ne 0 ]; then
+        printf '\n'
+    fi
     cat "$FILTERED_OUTPUT_FILE"
+    if [ "$LYCHEE_RC" -ne 0 ]; then
+        FINAL_RC=1
+    fi
 elif [ "$LYCHEE_RC" -eq 0 ]; then
-    echo "[Markdown check] PASS: ${#SCAN_FILES[@]} file(s) checked. duration=$(markdown_check_duration)"
+    if [ "$FINAL_RC" -eq 0 ]; then
+        echo "[Markdown check] PASS: ${#SCAN_FILES[@]} file(s) checked. duration=$(markdown_check_duration)"
+    fi
+else
+    FINAL_RC=1
 fi
 
-exit "$LYCHEE_RC"
+exit "$FINAL_RC"
