@@ -63,7 +63,7 @@ HcclResult HcomCalcTaskNumV2(HcomOpParam *hcomOpParam, u32 &taskNum);
 
 HcclResult HcomGetTopoDescV2(const char *group, HcclTopoDescs *topoDescs, uint32_t topoSize);
 
-HcclResult HcomGetCommHandleByGroupV2(const char *group, HcclComm *commHandle); 
+HcclResult HcomGetCommHandleByGroupV2(const char *group, HcclComm *commHandle);
 
 HcclResult HcomCreateCommCclBufV2(const char *group);
 HcclResult HcomGetInCclBufV2(const char *group, void* &commInputPtr, u64 &commInputSize);
@@ -71,16 +71,16 @@ HcclResult HcomGetOutCclBufV2(const char *group, void* &commOutputPtr, u64 &comm
 HcclResult HcomGraphCreateCommCclBufV2(const int64_t &hcomComm);
 HcclResult HcomGraphGetInCclBufV2(const int64_t &hcomComm, void* &commInputPtr, u64 &commInputSize);
 HcclResult HcomGraphGetOutCclBufV2(const int64_t &hcomComm, void* &commOutputPtr, u64 &commOutputSize);
- 
+
 HcclResult HcclCommGraphGetRankIdV2(s64 opBaseHcom, u32 *rankId);
 HcclResult HcclCommGraphGetRankSizeV2(s64 opBaseHcom, u32 *rankSize);
- 
+
 HcclResult HcclCommGraphAllGatherV2(const char *tag, void *inputPtr, void *outputPtr, u64 inputCount,
     HcclDataType dataType, s64 opBaseHcom, rtStream_t stream);
 HcclResult HcomGraphAllReduceV2(const char *tag, void *inputPtr, void *outputPtr, u64 count, HcclDataType dataType,
     HcclReduceOp op, s64 opBaseHcom, rtStream_t stream);
 HcclResult HcomGraphReduceV2(const char *tag, void *inputPtr, void *outputPtr, u64 count, HcclDataType dataType,
-    HcclReduceOp op, u32 root, s64 opBaseHcom, rtStream_t stream);    
+    HcclReduceOp op, u32 root, s64 opBaseHcom, rtStream_t stream);
 HcclResult HcomGraphReduceScatterV2(const char *tag, void *inputPtr, void *outputPtr, u64 count, HcclDataType dataType,
     HcclReduceOp op, s64 opBaseHcom, rtStream_t &stream);
 HcclResult HcomGraphSendV2(const char *tag, void *inputPtr, u64 count, HcclDataType dataType, u32 destRank, u32 srTag,
@@ -89,7 +89,7 @@ HcclResult HcomGraphReceiveV2(const char *tag, void *outputPtr, u64 count, HcclD
     s64 opBaseHcom, rtStream_t &stream);
 HcclResult HcomGraphBroadcastV2(const char *tag, void *ptr, u64 count, HcclDataType dataType,
     u32 root, s64 opBaseHcom, rtStream_t stream);
-    
+
 HcclResult HcomGetIndirectInCclBufV2(const char *group, void *&commInputPtr, u64 &commInputSize);
 HcclResult HcomGetIndirectOutCclBufV2(const char *group, void *&commOutputPtr, u64 &commOutputSize);
 
@@ -116,7 +116,7 @@ HcclResult HcomCalcNumBlocksV2(const char *group, HcclCMDType opType, u64 count,
         std::string &algName, u32 &numBlocks);
 
 HcclResult HcclGetAlgExecParamV2(const std::string &tag, const char *group, u64 count, void *inputPtr, void *outputPtr,
-    HcclCMDType opType, bool clearEnable, HcclDataType dataType, HcclReduceOp op, 
+    HcclCMDType opType, bool clearEnable, HcclDataType dataType, HcclReduceOp op,
     void *&commContext, u64 &len, u32 aivCoreLimit);
 
 HcclResult HcomGetDevIdV2(const char *group, s32 *devId);

@@ -111,7 +111,7 @@ HcclResult hrtGetHccsPortNum(u32 deviceLogicId, s32 &num);
 #endif
 
 HcclResult hrtGetTaskIdAndStreamID(u32 &taskId, u32 &streamId);
- 
+
 #if T_DESC("RtsTaskExceptionHandler", true)
 HcclResult hrtRegTaskFailCallbackByModule(aclrtExceptionInfoCallback callback);
 HcclResult hrtGetStreamAvailableNum(u32 &maxStrCount);

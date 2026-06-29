@@ -30,7 +30,7 @@
 
 该指令会根据索引值index将源操作数按元素收集到目的操作数dstReg中。收集过程如下图1所示：
 
-![图1 Gather功能说明](../../../../figures/reg_gather_ub2reg.png)  
+![图1 Gather功能说明](../../../../figures/reg_gather_ub2reg.png)
 
 
 ## 函数原型<a name="section620mcpsimp"></a>

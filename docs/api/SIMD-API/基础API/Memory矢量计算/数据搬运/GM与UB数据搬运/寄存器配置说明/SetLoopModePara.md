@@ -64,10 +64,10 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 - 再设置SetLoopModePara中LoopModeParams的参数：loop1Size = 2，loop2Size = 2，loop1SrcStride = 96，loop2SrcStride =192，loop1DstStride = 128，loop2DstStride = 288，DataCopyMVType为OUT\_TO\_UB，表明内层循环和外层循环的次数分别为2次，内层循环和外层循环中相邻迭代源操作数的数据块间隔分别为96字节和192字节，内层循环和外层循环中相邻迭代目的操作数的数据块间隔分别为128字节和288字节，通路是从GM搬运到UB；
 - 使用以上配置，调用SetLoopModePara再调用DataCopyPad就可以开启DataCopyPad的loop模式完成数据类型为int8\_t的数据块大小为384的数据搬运。详细图解如下：
 
-**图1**  源操作数搬运场景示例<a name="fig6671114911311"></a>  
+**图1**  源操作数搬运场景示例<a name="fig6671114911311"></a>
 ![](../../../../../../figures/source_operand_transfer_scenario.png "源操作数搬运场景示例")
 
-**图2**  目的操作数搬运场景示例<a name="fig226181311513"></a>  
+**图2**  目的操作数搬运场景示例<a name="fig226181311513"></a>
 ![](../../../../../../figures/destination_operand_transfer_scenario.png "目的操作数搬运场景示例")
 
 ## 返回值说明<a name="section640mcpsimp"></a>

@@ -24,7 +24,7 @@ HcclResult CollReduceScatterFastDoubleRingFor91093Executor::DoubleRingReduceScat
     const std::vector<std::vector<Slice>> multRingsUserMemSlice, const bool disableDMAReduce)
 {
     (void)tag;
-    HCCL_CONFIG_INFO(HCCL_ALG, 
+    HCCL_CONFIG_INFO(HCCL_ALG,
         "[CollReduceScatterFastDoubleRingFor91093Executor][DoubleRingReduceScatter] DoubleRingReduceScatter starts");
     HcclResult ret = HCCL_SUCCESS;
     u32 ringNum = multRingsSliceZero.size();

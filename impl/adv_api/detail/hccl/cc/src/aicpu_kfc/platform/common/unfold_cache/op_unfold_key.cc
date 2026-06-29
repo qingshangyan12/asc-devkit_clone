@@ -38,7 +38,7 @@ namespace hccl {
         CHK_PRT_RET(curWorkflowMode == HcclWorkflowMode::HCCL_WORKFLOW_MODE_RESERVED, HCCL_ERROR("[[OpUnfoldKey][Init]] workflowMode is reserved"), HCCL_E_INTERNAL);
 
         // 注意: 当算子不涉及reduce操作时, reduceType为HcclReduceOp::HCCL_REDUCE_RESERVED
-        
+
         opType = curOpType;
         dataType = curDataType;
         reduceType = curReduceType;

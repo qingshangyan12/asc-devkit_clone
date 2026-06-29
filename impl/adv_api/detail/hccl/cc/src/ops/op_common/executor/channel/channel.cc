@@ -373,7 +373,7 @@ HcclResult CalcChannelRequestMesh2D(HcclComm comm, const OpParam& param, const T
         CHK_RET(CalcMesh2DChannelConnect(myRank, subcommInfo, connectRanks));
     }
     CommProtocol protocol = CommProtocol::COMM_PROTOCOL_UBC_CTP;
-    
+
     for (u32 rank: connectRanks) {
         HcclChannelDesc channelDesc;
         HcclChannelDescInit(&channelDesc, 1);

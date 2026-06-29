@@ -82,6 +82,6 @@ __ubuf__ half src[total_length];
 half value = 3;
 asc_min_scalar(dst, src, value, total_length);
 // src : [1, 2, 3, 4, ... , 32]
-// value : 3 
+// value : 3
 // dst : [1, 2, 3, 3, ... , 3]
 ```

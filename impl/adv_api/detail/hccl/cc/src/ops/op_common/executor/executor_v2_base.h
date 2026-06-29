@@ -40,10 +40,10 @@ public:
 
     // device
     virtual HcclResult Orchestrate(const OpParam &param, const AlgResourceCtxSerializable &resCtx) = 0;
-    
+
     virtual HcclResult FastLaunch(const OpParam &param, const CcuFastLaunchCtx *resCtx);
-    
-    HcclResult SetTempFastLaunchAddr(TemplateFastLaunchCtx &tempFastLaunchCtx, 
+
+    HcclResult SetTempFastLaunchAddr(TemplateFastLaunchCtx &tempFastLaunchCtx,
                             void* inputPtr, void* outputPtr, const HcclMem &hcclBuff) const;
 
     HcclResult RestoreChannelMap(const AlgResourceCtxSerializable &resCtx,

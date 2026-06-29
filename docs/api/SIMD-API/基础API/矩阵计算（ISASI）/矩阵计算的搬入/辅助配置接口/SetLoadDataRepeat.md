@@ -88,7 +88,7 @@ __aicore__ inline void SetLoadDataRepeat(const LoadDataRepeatParam& repeatParams
 <!-- end id12 -->
 
 - 不同芯片型号，repeatStride的单位不同，具体参考如下：
-    
+
     <!-- npu="950" id13 -->
     - Ascend 950PR/Ascend 950DT，repeatStride的单位为32/sizeof(data_type)个元素。
     <!-- end id13 -->

@@ -18,7 +18,7 @@ namespace mc2_ops_hccl {
 class CcuTempReduceScatterNhrMultiJettyMem2Mem1D : public CcuAlgTemplateBase {
 public:
     CcuTempReduceScatterNhrMultiJettyMem2Mem1D() = default;
-    explicit  CcuTempReduceScatterNhrMultiJettyMem2Mem1D(const OpParam& param, 
+    explicit  CcuTempReduceScatterNhrMultiJettyMem2Mem1D(const OpParam& param,
                                                 const u32 rankId, // 传通信域的rankId，userRank
                                                 const std::vector<std::vector<u32>>& subCommRanks);
 
@@ -41,7 +41,7 @@ public:
     u64 GetThreadNum() const override;
     HcclResult GetRes(AlgResourceRequest& resourceRequest) const override;
 
-protected: 
+protected:
     u32 GetNhrStepNum(u32 rankSize) const;
     HcclResult GetStepInfo(u32 step, NHRStepInfo &stepInfo);
     HcclResult GetNhrStepInfo(std::vector<HcclChannelDesc>& channelResort,

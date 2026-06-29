@@ -25,7 +25,7 @@ This example demonstrates how to use the Ascend C SIMT [`asc_atomic_add()`](http
 
 ## Example Description
 
-- Example Function:  
+- Example Function:
   The Histogram example counts the frequency of each byte value (0-255) in a fixed-size input byte stream. The input data shape is [294912].
 
 - Example Specifications:
@@ -71,7 +71,7 @@ The flow diagram is as follows: The figure below uses Block0 as an example. Bloc
 
 ## Build and Run
 Run the following steps in the root directory of this example to build and execute the example.
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
 
   ```bash
@@ -98,7 +98,7 @@ Run the following steps in the root directory of this example to build and execu
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
 
   The following output indicates that the accuracy verification is successful.
-  
+
   ```text
   Running histogram256 on Ascend C SIMT for fixed xxx bytes
   Validation passed

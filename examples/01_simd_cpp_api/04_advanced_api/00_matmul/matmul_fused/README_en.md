@@ -27,10 +27,10 @@ A fused programming implementation with separate AIC and AIV cores, mainly intro
 
 ## Example Description
 
-- Example Function:  
+- Example Function:
   This example creates a MIX mode Matmul object, performs Matmul computation on the AIC core, and outputs the intermediate result to VECIN (Unified Buffer). After the AIC core completes computation, it controls synchronization through the TQue EnQue/DeQue interfaces and continues to perform LeakyRelu computation on the intermediate result in the Unified Buffer on the AIV core.
 
-- Example Specifications:  
+- Example Specifications:
   In this example: M = 1024, N = 640, K = 256
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="5" align="center">Matmul</td></tr>
@@ -42,10 +42,10 @@ A fused programming implementation with separate AIC and AIV cores, mainly intro
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="5" align="center">matmul_fused_custom</td></tr>
   </table>
 
-- Example Implementation: 
+- Example Implementation:
 
   - Key Kernel Steps
-    - Create the Matmul object and initialize.  
+    - Create the Matmul object and initialize.
     - Create the LeakyRelu object and initialize.
     - Complete the Matmul computation.
     - Complete the LeakyRelu computation.
@@ -62,7 +62,7 @@ A fused programming implementation with separate AIC and AIV cores, mainly intro
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

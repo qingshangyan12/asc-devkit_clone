@@ -51,7 +51,7 @@ namespace hccl {
         CHK_PRT_RET(baseAddr + memSize < baseAddr,
             HCCL_ERROR("[OpUnfoldMemRange][InRange] baseAddr[0x%016llx] + memSize[%llu] overflows", baseAddr, memSize),
             HCCL_E_INTERNAL);
-        
+
         endAddr = baseAddr + memSize;
         return HCCL_SUCCESS;
     }
@@ -103,7 +103,7 @@ namespace hccl {
 
         hcclOffsetDstRanksIdxMap.clear();
     }
-    
+
     void AlltoallvMetadata::Clear() {
         sdmaDataBlockSize = 0;
         hcclInputMemRanges.clear();
@@ -154,13 +154,13 @@ namespace hccl {
     HcclResult AlltoallvSendRecvInfo::Check() const {
         CHK_PRT_RET(sendType == HcclDataType::HCCL_DATA_TYPE_RESERVED, HCCL_ERROR("[AlltoallvSendRecvInfo][Check] sendType is reserved"), HCCL_E_INTERNAL);
         CHK_PRT_RET(recvType == HcclDataType::HCCL_DATA_TYPE_RESERVED, HCCL_ERROR("[AlltoallvSendRecvInfo][Check] recvType is reserved"), HCCL_E_INTERNAL);
-        
+
         const uint32_t rankSize = sendCounts.size();
         CHK_PRT_RET(rankSize == 0, HCCL_ERROR("[AlltoallvSendRecvInfo][Check] empty sendCounts"), HCCL_E_INTERNAL);
         CHK_PRT_RET(recvCounts.size() != rankSize, HCCL_ERROR("[AlltoallvSendRecvInfo][Check] recvCounts.size[%u] != rankSize[%u]", recvCounts.size(), rankSize), HCCL_E_INTERNAL);
         CHK_PRT_RET(sendOffsets.size() != rankSize, HCCL_ERROR("[AlltoallvSendRecvInfo][Check] sendOffsets.size[%u] != rankSize[%u]", sendOffsets.size(), rankSize), HCCL_E_INTERNAL);
         CHK_PRT_RET(recvOffsets.size() != rankSize, HCCL_ERROR("[AlltoallvSendRecvInfo][Check] recvOffsets.size[%u] != rankSize[%u]", recvOffsets.size(), rankSize), HCCL_E_INTERNAL);
-        
+
         return HCCL_SUCCESS;
     }
 
@@ -315,7 +315,7 @@ namespace hccl {
                 case SqeType::WRITE_VALUE_SQE:
                 case SqeType::RDMA_DB_SEND_SQE: {
                     const rtStarsWriteValueSqe_t *writeValueSqePtr = reinterpret_cast<const rtStarsWriteValueSqe_t *>(sqePtr);
-                    
+
                     CombineUint32ToUint64(sqeDstAddr, writeValueSqePtr->write_addr_high, writeValueSqePtr->write_addr_low);
                     CHK_RET(CheckAndPrepareRefreshAddrInfo(sqeDstAddr, dstRefreshAddrInfoArray[cacheSqeIdx], false, nullptr)); // 注意: alltoallv算子有WRITE_VALUE_SQE, 但不会存在对于HCCL input buffer的访问, 无需确认HCCL input buffer对应的rank id进行地址刷新
 
@@ -436,7 +436,7 @@ namespace hccl {
         CHK_PRT_RET(curRank >= rankSize,
             HCCL_ERROR("[OpUnfoldCacheEntry][UpdateRefreshAddrInfoForAlltoallv] curRank[%u] >= rankSize[%u]", curRank, rankSize),
             HCCL_E_INTERNAL);
-        
+
         HCCL_RUN_INFO("[OpUnfoldCacheEntry][UpdateRefreshAddrInfoForAlltoallv] curRank[%u] rankSize[%u]", curRank, rankSize);
 
         // 遍历每一段SQE数组
@@ -515,7 +515,7 @@ namespace hccl {
                             HCCL_ERROR("[OpUnfoldCacheEntry][UpdateRefreshAddrInfoForAlltoallv] sqeSrcAddr[0x%016llx]"\
                                 "!= localUserInputEndAddr[0x%016llx]", sqeSrcAddr, localUserInputEndAddr),
                             HCCL_E_INTERNAL);
-                        
+
                         // 更新src memType和rank, 即local user input
                         srcRefreshAddrInfo.memType = RefreshAddrInfo::USER_INPUT_MEMTYPE;
                         srcRefreshAddrInfo.rankId = curRank;
@@ -533,7 +533,7 @@ namespace hccl {
                             HCCL_ERROR("[OpUnfoldCacheEntry][UpdateRefreshAddrInfoForAlltoallv] sqeDstAddr[0x%016llx]"\
                                 "!= localUserOutputEndAddr[0x%016llx]", sqeDstAddr, localUserOutputEndAddr),
                             HCCL_E_INTERNAL);
-                        
+
                         // 更新dst memType和rank, 即local user output
                         dstRefreshAddrInfo.memType = RefreshAddrInfo::USER_OUTPUT_MEMTYPE;
                         dstRefreshAddrInfo.rankId = curRank;
@@ -837,7 +837,7 @@ namespace hccl {
                         HCCL_ERROR("[OpUnfoldCacheEntry][UpdateAndGetSqeArray] cache-notify/write/memcpy-record placeholder"
                             "should be not cached for non-alltoallv op, sqeType[%u] sqeIdx[%u]", sqeType, sqeIdx),
                         HCCL_E_INTERNAL);
-                    
+
                     // 针对alltoallv类算子, 动态刷新CacheNotify/WritePlaceholder SQE / 将CacheNotify/WritePlaceholder SQE生成为Notify/Write SQE
                     CHK_RET(UpdateSyncSqeForAlltoallv(sqePtr, &sqeType, curTaskId, srcRefreshAddrInfo, dstRefreshAddrInfo, alltoallvMetadata, alltoallvSendRecvInfo));
 
@@ -1023,7 +1023,7 @@ namespace hccl {
     HcclResult OpUnfoldCacheEntry::UpdateTransferSqeForAlltoallv(uint8_t *sqePtr, uint8_t *sqeTypePtr, const uint16_t curTaskId, const RefreshAddrInfo& srcRefreshAddrInfo, const RefreshAddrInfo& dstRefreshAddrInfo, const std::vector<OpUnfoldMemRange>& curUserInputMemRanges, const std::vector<OpUnfoldMemRange>& curUserOutputMemRanges, const AlltoallvMetadata& alltoallvMetadata, const AlltoallvSendRecvInfo& alltoallvSendRecvInfo) {
         HCCL_INFO("[OpUnfoldCacheEntry][UpdateTransferSqeForAlltoallv] curTaskId[%u] srcMemType[%u] dstMemType[%u]",
             curTaskId, srcRefreshAddrInfo.memType, dstRefreshAddrInfo.memType);
-        
+
         // 先判断是否需要刷新此memcpy SQE
         if (srcRefreshAddrInfo.memType != RefreshAddrInfo::USER_INPUT_MEMTYPE && dstRefreshAddrInfo.memType != RefreshAddrInfo::USER_OUTPUT_MEMTYPE) {
             // 注意: 由于alltoallv direct fullmesh不会调用InlineReduceAsync和基于memcpy的SignalRecord
@@ -1404,7 +1404,7 @@ namespace hccl {
         const RefreshAddrInfo& srcRefreshAddrInfo, const RefreshAddrInfo& dstRefreshAddrInfo,
         const AlltoallvMetadata& alltoallvMetadata, const AlltoallvSendRecvInfo& alltoallvSendRecvInfo) {
         HCCL_INFO("[OpUnfoldCacheEntry][UpdateSyncSqeForAlltoallv] curTaskId[%u]", curTaskId);
-        
+
         // 校验alltoallv相关参数
         CHK_RET(alltoallvMetadata.Check(true));
         CHK_RET(alltoallvSendRecvInfo.Check());
@@ -1458,7 +1458,7 @@ namespace hccl {
         uint64_t count = 0;
         uint64_t size = 0; // send/recv bytes
         CHK_RET(GetTransferCountForAlltoallv(count, size, sqePtr, sqeTypePtr, alltoallvMetadata, alltoallvSendRecvInfo));
-        
+
         // 更新/生成相应SQE
         if ((*sqeTypePtr) == SqeType::CACHE_NOTIFY_PLACEHOLDER_SQE) {
             CHK_RET(UpdateNotifyPlaceholderSqeForAlltoallv(sqePtr, sqeTypePtr, curTaskId, alltoallvMetadata, alltoallvSendRecvInfo, count, size));
@@ -1584,7 +1584,7 @@ namespace hccl {
 
     HcclResult OpUnfoldCacheEntry::UpdateNotifyPlaceholderSqeForAlltoallv(uint8_t *sqePtr, uint8_t *sqeTypePtr, const uint16_t curTaskId, const AlltoallvMetadata& alltoallvMetadata, const AlltoallvSendRecvInfo& alltoallvSendRecvInfo, const uint64_t count, const uint64_t size) {
         UNUSED_PARAM(size);
-        
+
         rtStarsPlaceHolderSqe_t *placeholderSqePtr = reinterpret_cast<rtStarsPlaceHolderSqe_t *>(sqePtr);
         if (count == 0) { // 只需要更新task id
             placeholderSqePtr->header.taskId = curTaskId;
@@ -1615,7 +1615,7 @@ namespace hccl {
 
     HcclResult OpUnfoldCacheEntry::UpdateWritePlaceholderSqeForAlltoallv(uint8_t *sqePtr, uint8_t *sqeTypePtr, const uint16_t curTaskId, const AlltoallvMetadata& alltoallvMetadata, const AlltoallvSendRecvInfo& alltoallvSendRecvInfo, const uint64_t count, const uint64_t size) {
         UNUSED_PARAM(size);
-        
+
         rtStarsPlaceHolderSqe_t *placeholderSqePtr = reinterpret_cast<rtStarsPlaceHolderSqe_t *>(sqePtr);
         if (count == 0) { // 只需要更新task id
             placeholderSqePtr->header.taskId = curTaskId;
@@ -1748,7 +1748,7 @@ namespace hccl {
 
     HcclResult OpUnfoldCacheEntry::UpdateMemcpyRecordPlaceholderSqeForAlltoallv(uint8_t *sqePtr, uint8_t *sqeTypePtr, const uint16_t curTaskId, const AlltoallvMetadata& alltoallvMetadata, const AlltoallvSendRecvInfo& alltoallvSendRecvInfo, const uint64_t count, const uint64_t size) {
         UNUSED_PARAM(size);
-        
+
         rtStarsPlaceHolderSqe_t *placeholderSqePtr = reinterpret_cast<rtStarsPlaceHolderSqe_t *>(sqePtr);
         if (count == 0) { // 只需要更新task id
             placeholderSqePtr->header.taskId = curTaskId;

@@ -30,10 +30,10 @@
 
 ## 样例描述
 
-- 样例功能：  
-  按元素做误差函数计算（也称为高斯误差函数，error function or Gauss error function）。  
+- 样例功能：
+  按元素做误差函数计算（也称为高斯误差函数，error function or Gauss error function）。
   $$\mathrm{Erf}(x) = \frac{2}{\sqrt{\pi}} \int_x^0 e^{-t^2} dt$$
-- 样例规格：  
+- 样例规格：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center"> erf </td></tr>
 
@@ -46,24 +46,24 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">erf_custom</td></tr>
   </table>
 
-- 样例实现：  
+- 样例实现：
   本样例中实现的是固定shape为输入x[1, 12288]，输出y[1, 12288]的erf_custom样例。
 
   - Kernel实现
 
     使用Erf高阶API接口完成误差函数计算。
 
-  - Tiling实现  
+  - Tiling实现
     根据输入长度和所用核数量设置tiling参数totalLength和tileNum。
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
-## 编译运行  
+## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行算子。
 
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -82,7 +82,7 @@
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
-  
+
   示例如：
 
   ```bash

@@ -316,7 +316,7 @@ __aicore__ inline void Compute()
     uint16_t repeatTimes = TILE_LENGTH / oneRepeatSize;
 	// 使用LocalTensor作为参数
     asc_vf_call<AddVFv1<T>>(dst, src0, src1, oneRepeatSize, repeatTimes);
-    
+
     __ubuf__ T* dstAddr = (__ubuf__ T*)dst.GetPhyAddr();
     __ubuf__ T* src0Addr = (__ubuf__ T*)src0.GetPhyAddr();
     __ubuf__ T* src1Addr = (__ubuf__ T*)src1.GetPhyAddr();

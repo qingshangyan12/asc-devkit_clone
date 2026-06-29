@@ -53,7 +53,7 @@ public:
         HCCL_DEBUG("[CcuTaskArgReduceScatterMeshMem2Mem1D] inputAddr: %lu, outputAddr: %lu, sliceSize: %u, offSet: %u",
                    inputAddr_, outputAddr_, sliceSize_, offSet_);
     }
- 
+
     uint64_t inputAddr_;
     uint64_t outputAddr_;
     uint64_t sliceSize_;
@@ -65,17 +65,17 @@ class CcuKernelAllGather2DiesMesh1D : public CcuKernelAlgBase {
 public:
     CcuKernelAllGather2DiesMesh1D(const hcomm::CcuKernelArg &arg);
     ~CcuKernelAllGather2DiesMesh1D() override {}
- 
+
     HcclResult Algorithm() override;
     std::vector<uint64_t> GeneArgs(const hcomm::CcuTaskArg &arg) override;
- 
+
 private:
     HcclResult InitResource();//资源初始化 check
     void LoadArgs();//参数载入 check
     void PreSync();//前同步 check
     void PostSync();//后同步 check
     void DoAllGather();//AllGather计算
-    
+
     void CreateLocalCopyLoop();//本地复制的工具函数 check?
     void LocalCopyByLoopGroup(CcuRep::LocalAddr dst, CcuRep::LocalAddr src);//本地复制 HBM->ccu ms->HBM check
 

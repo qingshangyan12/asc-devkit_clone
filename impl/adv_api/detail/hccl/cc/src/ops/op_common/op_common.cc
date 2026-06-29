@@ -193,7 +193,7 @@ HcclResult SetOpParamFastLaunchTag(OpParam &param)
     } else {
         tmpDataType = param.DataDes.dataType;
     }
-    
+
     const std::string dataType = HCOM_DATA_TYPE_STR_MAP.at(tmpDataType);
     // 1.通信域tag + 数据类型，得到基础FastLaunchTag
     std::string tagBuilder = std::string(param.tag) + "_" + dataType;
@@ -214,7 +214,7 @@ HcclResult SetOpParamFastLaunchTag(OpParam &param)
         std::string root = std::to_string(param.root);
         tagBuilder += "_r" + root;
     }
-    CHK_PRT_RET((tagBuilder.length() >= sizeof(param.fastLaunchTag)), 
+    CHK_PRT_RET((tagBuilder.length() >= sizeof(param.fastLaunchTag)),
         "failed to fill fastLaunchTag, tag too long", HcclResult::HCCL_E_INTERNAL);
     snprintf_s(param.fastLaunchTag, sizeof(param.fastLaunchTag), sizeof(param.fastLaunchTag), "%s", tagBuilder.c_str());
 
@@ -231,7 +231,7 @@ bool ShouldGoCcuFastLaunch(HcclComm comm, OpParam &param, CcuFastLaunchCtx **ccu
     return false;
 #else
     param.hcclComm = comm;
-    
+
     // 1. 是ccu模式
     if (GetExternalInputHcclCcuMSMode()) {
         HCCL_DEBUG("[HcclExecOp] is ccu ms mode");
@@ -247,7 +247,7 @@ bool ShouldGoCcuFastLaunch(HcclComm comm, OpParam &param, CcuFastLaunchCtx **ccu
     }
 
     CHK_RET(SetOpParamFastLaunchTag(param));
-    
+
     // 2. 查到engineCtx
     uint64_t size = 0;
     void *fastLaunchCtxPtr = nullptr;
@@ -276,21 +276,21 @@ HcclResult HcclExecOpCcuFastLaunch(HcclComm comm, OpParam &param, const CcuFastL
     std::unique_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(param.opType, algName);
     CHK_PRT_RET(
         executor.get() == nullptr, HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
-    
+
     void *cclBufferAddr;
     uint64_t cclBufferSize;
     // 从通信域获取CCL buffer
     CHK_RET(HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize));
     // CCL IN使用所有的CCL Buffer，这个其实就是scratch buffer
     param.hcclBuff = HcclMem{HCCL_MEM_TYPE_DEVICE, cclBufferAddr, cclBufferSize};
-    
+
     HCCL_INFO("[asc][AlgoExecute][HcclExecOpCcuFastLaunch] before FastLaunch, opType[%d], algName[%s], "
         "cclBufferAddr[%p], cclBufferSize[%llu].", param.opType, algName.c_str(), cclBufferAddr, cclBufferSize);
     HcclResult fastLaunchRet = executor->FastLaunch(param, ccuFastLaunchCtx);
     HCCL_INFO("[asc][AlgoExecute][HcclExecOpCcuFastLaunch] after FastLaunch, ret[%d], opType[%d], "
         "algName[%s].", fastLaunchRet, param.opType, algName.c_str());
     CHK_RET(fastLaunchRet);
-    
+
     HCCL_INFO("[asc][AlgoExecute][HcclExecOpCcuFastLaunch] end, opType[%d], algName[%s].", param.opType,
         algName.c_str());
     return HCCL_SUCCESS;

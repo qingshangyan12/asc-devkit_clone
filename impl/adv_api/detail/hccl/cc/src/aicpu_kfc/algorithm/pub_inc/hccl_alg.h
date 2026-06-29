@@ -50,8 +50,8 @@ public:
     HcclResult ClearOpResource(const std::string &tag);
     HcclResult CreateMutiStreamRes(const std::string &tag, Stream &stream, level1StreamInfo_t &streamInfo,
         AlgType algType, bool isAicpuModeEn = false);
-    HcclResult CreateComm(const std::string &tag, DeviceMem &inputMem, DeviceMem &outputMem, 
-        AlgType algType, std::unique_ptr<CommInfo> &commInfo, u32 root = INVALID_VALUE_RANKID, 
+    HcclResult CreateComm(const std::string &tag, DeviceMem &inputMem, DeviceMem &outputMem,
+        AlgType algType, std::unique_ptr<CommInfo> &commInfo, u32 root = INVALID_VALUE_RANKID,
         bool isP2p = false, bool isAicpuModeEn = false);
     HcclResult CreateComm(const std::string &tag, DeviceMem &inputMem, DeviceMem &outputMem, AlgType algType,
         u32 root = INVALID_VALUE_RANKID, bool isP2p = false);

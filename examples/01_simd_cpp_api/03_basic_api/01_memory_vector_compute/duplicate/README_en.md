@@ -27,10 +27,10 @@ This example implements data padding functionality based on the Duplicate API, c
 
 ## Example Description
 
-- Example function:  
+- Example function:
   This example demonstrates using the Duplicate API to implement data padding functionality, copying a scalar value or immediate number multiple times and filling it into a vector. The Duplicate API is applicable to scenarios where constant values need to be filled into a Tensor, such as Tensor initialization, constant padding, and mask generation. The value parameter specifies the scalar value to fill, and the count parameter specifies the number of elements to fill. For detailed API documentation, refer to [Duplicate API Documentation](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/API/ascendcopapi/atlasascendc_api_07_0088.html).
 
-- Example specifications:  
+- Example specifications:
   <table border="2" align="center">
   <caption>Table 1: Example Input/Output Specifications</caption>
   <tr><td rowspan="1" align="center">Example Type</td><td colspan="4" align="center">Duplicate</td></tr>
@@ -39,38 +39,38 @@ This example implements data padding functionality based on the Duplicate API, c
   <tr><td align="center">x</td><td align="center">[1,256]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td rowspan="2" align="center">Example Output</td></tr>
   <tr><td align="center">y</td><td align="center">[1,256]</td><td align="center">half</td><td align="center">ND</td></tr>
-  
+
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">duplicate_custom</td></tr>
   </table>
 
-- Example implementation:  
+- Example implementation:
   This example implements a Duplicate data padding example with fixed input shape x[1,256] and output shape y[1,256].
-  
+
   Duplicate API parameter description:
   - dst: destination operand for storing the padding result
   - value: scalar value or immediate number to fill, in this example a half-type constant value of 18.0
   - count: number of elements to fill, in this example 256
 
-  - Kernel implementation  
+  - Kernel implementation
     - Call the DataCopy basic API to transfer data from GM (Global Memory) to UB (Unified Buffer)
     - Call the Duplicate interface to fill the scalar value into all elements of the output Tensor
     - Call the DataCopy basic API to transfer results from UB (Unified Buffer) to GM (Global Memory)
 
-  - Invocation implementation  
+  - Invocation implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
-    
+
 - Run the example
 
   Run the following commands in the example directory.
@@ -87,7 +87,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debug or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-  
+
   Examples:
   ```bash
   cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201;make -j; # CPU debug mode

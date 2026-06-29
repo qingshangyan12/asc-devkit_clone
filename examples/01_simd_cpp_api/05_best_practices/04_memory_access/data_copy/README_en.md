@@ -414,7 +414,7 @@ Run the following steps in the root directory of this example to build and run t
   SCENARIO_NUM=1 ASC_ARCH=dav-2201
   COPY_DST=UB
   mkdir -p build && cd build
-  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCOPY_DST=$COPY_DST -DCMAKE_ASC_ARCHITECTURES=$ASC_ARCH ..;make -j; 
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCOPY_DST=$COPY_DST -DCMAKE_ASC_ARCHITECTURES=$ASC_ARCH ..;make -j;
   python3 ../scripts/gen_data.py -scenarioNum $SCENARIO_NUM -copyDst $COPY_DST -arch $ASC_ARCH
   ./demo
   ```

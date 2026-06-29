@@ -221,22 +221,22 @@ HcclResult InsTempReduceScatterNHR::LocalDataCopy(std::vector<InsQuePtr> &tempIn
     u64 inBaseOff;
     u64 inOff;
     const u64 rptNum = std::max<u64>(1, tempAlgParams_.repeatNum);
-    for (u32 localRandId = 0; localRandId < tempRankSize_; ++localRandId) { 
-        for (u64 rpt = 0; rpt < rptNum; ++rpt) { 
+    for (u32 localRandId = 0; localRandId < tempRankSize_; ++localRandId) {
+        for (u64 rpt = 0; rpt < rptNum; ++rpt) {
             if (tempFuncs.isBottom) { // 后nhr 前一半数据
                 inBaseOff = tempAlgParams_.buffInfo.inBuffBaseOff +
                                   rpt * tempAlgParams_.inputRepeatStride;
-                inOff = inBaseOff + localRandId * tempAlgParams_.inputSliceStride;                  
+                inOff = inBaseOff + localRandId * tempAlgParams_.inputSliceStride;
             } else { // 前nhr，后一半数据
                 inBaseOff = tempAlgParams_.buffInfo.inBuffBaseOff +
                                   localRandId * tempAlgParams_.inputRepeatStride;
                 inOff = inBaseOff + rpt * tempAlgParams_.inputSliceStride;
             }
             const u64 scratchBase = tempAlgParams_.buffInfo.scratchBuffBaseOff +
-                                    rpt * tempAlgParams_.outputRepeatStride;                     
+                                    rpt * tempAlgParams_.outputRepeatStride;
             const u64 scOff = scratchBase + localRandId * tempAlgParams_.sliceSize;
             // 如果源地址和目标地址相同，则不需要做拷贝
-            if (tempAlgParams_.buffInfo.inBuffType != tempAlgParams_.buffInfo.scratBuffType || inOff != scOff) { 
+            if (tempAlgParams_.buffInfo.inBuffType != tempAlgParams_.buffInfo.scratBuffType || inOff != scOff) {
                 DataSlice src(tempAlgParams_.buffInfo.inBuffType, inOff, tempAlgParams_.sliceSize);
                 DataSlice dst(tempAlgParams_.buffInfo.scratBuffType, scOff, tempAlgParams_.sliceSize);
                 auto ins = std::make_unique<InsLocalCopy>(src, dst);

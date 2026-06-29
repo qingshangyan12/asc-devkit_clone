@@ -599,7 +599,7 @@ __ubuf__ int * __gm__ ptr;
 其中：
 -   numBlocks：规定了核函数将会在几个核上执行。每个执行该核函数的核会被分配一个逻辑ID，即block\_idx，可以在核函数的实现中使用内置变量[block_idx](../语言扩展层/SIMD-BuiltIn关键字.md#内置变量)获取；
 
-    >[!NOTE]说明 
+    >[!NOTE]说明
     >numBlocks是逻辑核的概念，取值范围为\[1,65535\]。为了充分利用硬件资源，一般设置为物理核的核数或其倍数。
     >- 对于耦合模式和分离模式，numBlocks在运行时的意义和设置规则有一些区别，具体说明如下：
     >    - 耦合模式：由于其Vector、Cube单元是集成在一起的，numBlocks用于设置启动多个AI Core核实例执行，不区分Vector、Cube。AI Core的核数可以通过[GetCoreNumAiv](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetCoreNumAiv.md)或者[GetCoreNumAic](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetCoreNumAic.md)获取。

@@ -219,11 +219,11 @@ HcclResult InsAllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateCo
         buffInfo.outBuffType        = BufferType::OUTPUT;
     } else {
         tempFuncs.isForepart          = true; // Usr Buff to CCL Buff required
-        tempFuncs.isBottom            = true; // CCL Buff to Usr Buff required   
+        tempFuncs.isBottom            = true; // CCL Buff to Usr Buff required
         buffInfo.inBuffType         = BufferType::SCRATCH;
-        buffInfo.outBuffType        = BufferType::SCRATCH;        
+        buffInfo.outBuffType        = BufferType::SCRATCH;
     }
-    
+
     u64 outputCount = dataCount_;
     // 计算出一轮中最多能输出多少数据
     u64 maxLoopOutputCount = 0;

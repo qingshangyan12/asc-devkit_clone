@@ -101,7 +101,7 @@ HcclResult CollAllGatherMidCountFor91093Executor::PrepareL2DataSlices(const OpPa
     return HCCL_SUCCESS;
 }
 
-HcclResult CollAllGatherMidCountFor91093Executor::RunLevel2ByNHR(const OpParam &param, ExecMem &execMem, 
+HcclResult CollAllGatherMidCountFor91093Executor::RunLevel2ByNHR(const OpParam &param, ExecMem &execMem,
     SubCommInfo &level1CommInfo, SubCommInfo &level2CommInfo) const
 {
     const u32 level2RankSize = level2CommInfo.localRankSize;
@@ -131,7 +131,7 @@ HcclResult CollAllGatherMidCountFor91093Executor::RunLevel2ByNHR(const OpParam &
     return HCCL_SUCCESS;
 }
 
-HcclResult CollAllGatherMidCountFor91093Executor::PrepareL1DataSlices(const OpParam &param, 
+HcclResult CollAllGatherMidCountFor91093Executor::PrepareL1DataSlices(const OpParam &param,
     const SubCommInfo &level1CommInfo, const SubCommInfo &level2CommInfo,
     u64 inputMemSize, u32 moduleId, std::vector<Slice> &dataSlices) const
 {
@@ -181,10 +181,10 @@ HcclResult CollAllGatherMidCountFor91093Executor::RunLevel1ByNHR(const OpParam &
             level1RankSize << PROF_RANKSIZE_OFFSET_OF_PLANEID) + level2CommInfo.localRank,
             PROF_STAGE_1, HCCL_EXEC_STEP_NOT_SET, param.stream));
 
-        CHK_RET(RunTemplate(level1AGExecutor, level1CommInfo));     
+        CHK_RET(RunTemplate(level1AGExecutor, level1CommInfo));
     }
     HCCL_INFO("MidCountAllGather run success in level1");
-    return HCCL_SUCCESS;  
+    return HCCL_SUCCESS;
 }
 
 HcclResult CollAllGatherMidCountFor91093Executor::KernelRun(const OpParam &param, ExecMem &execMem)
@@ -201,7 +201,7 @@ HcclResult CollAllGatherMidCountFor91093Executor::KernelRun(const OpParam &param
     u32 unitSize = 0;
     const HcclDataType dataType = param.GetDataType();
     CHK_RET(SalGetDataTypeSize(dataType, unitSize));
-    
+
     u64 inputMemSize = execMem.count * unitSize;
     const u32 SINGLE_RANK_FLAG = 1;
 

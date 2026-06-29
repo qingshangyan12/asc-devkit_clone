@@ -50,13 +50,13 @@ This example uses the Sigmoid high-level API to perform element-wise logistic Si
 </table>
 </div>
 
-- Example implementation:  
+- Example implementation:
   This example implements a sigmoid_custom example with fixed shapes of input src[1, 1024] and output dst[1, 1024].
 
-  - Kernel implementation  
+  - Kernel implementation
     Core computation steps: After transferring the input data in, call `AscendC::Sigmoid` to complete the Sigmoid computation, then transfer the result out.
 
-  - Tiling implementation  
+  - Tiling implementation
     This example is a single-core element-wise computation scenario with no complex multi-core logic. The host side obtains the temporary buffer size required by the API through `AscendC::GetSigmoidMaxMinTmpSize` and passes it directly to the kernel.
 
   - Invocation implementation

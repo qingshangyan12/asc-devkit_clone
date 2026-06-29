@@ -115,9 +115,9 @@ dimSize.size[%u], tempVTopo.size[%u]", rankId_, inputAddr_, outputAddr_, scratch
         return std::make_unique<CcuCtxArgAlltoAllMesh2D>(dimSize_, rankId_, axisId_, op_, tempVTopo_);
     }
 
-    void SetInstType(CcuInstType instType) 
-    { 
-        instType_ = instType; 
+    void SetInstType(CcuInstType instType)
+    {
+        instType_ = instType;
     }
 
     std::unique_ptr<CcuTaskArg> GetTaskArg() const override

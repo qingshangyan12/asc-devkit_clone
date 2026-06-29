@@ -126,7 +126,7 @@ HcclResult CcuKernelReduceScatterNhrMutilJettyMem2Mem1D::PreSync()
     const uint16_t signalBitToken = GetSignalMask(CKE_IDX_TOKEN);
     const uint32_t signalIndexInput = GetSignalIndex(CKE_IDX_INPUT);
     const uint32_t signalIndexToken = GetSignalIndex(CKE_IDX_TOKEN);
-    
+
     for (ChannelHandle &channel : channels_) {
         CHK_RET(NotifyRecord(channel, signalIndexInput, CKE_IDX_INPUT, input_[myRankIdx_], signalBitInput));
         CHK_RET(NotifyRecord(channel, signalIndexToken, CKE_IDX_TOKEN, token_[myRankIdx_], signalBitToken));
@@ -231,7 +231,7 @@ HcclResult CcuKernelReduceScatterNhrMutilJettyMem2Mem1D::DoRepeatReduceScatterNH
         // 等待toRank准备好写入数据
         CHK_RET(NotifyWait(sendChannel, signalIdxReady, signalBitReady));
     }
-    
+
     u32 sendSliceIdx = 0;
     // do srs
     for (const u32 &sendSliceIdx : sendSliceIdxList) {
@@ -322,7 +322,7 @@ HcclResult CcuKernelReduceScatterNhrMutilJettyMem2Mem1D::Algorithm()
     CHK_RET(PostSync());
 
     HCCL_INFO("[CcuKernelReduceScatterNhrMutilJettyMem2Mem1D] CcuKernelReduceScatterNhrMutilJettyMem2Mem1D end");
-    
+
     return HcclResult::HCCL_SUCCESS;
 }
 

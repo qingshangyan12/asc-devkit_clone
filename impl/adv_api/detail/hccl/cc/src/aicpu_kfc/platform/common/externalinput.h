@@ -34,7 +34,7 @@ constexpr u32 HCCL_RDMA_TC_DEFAULT = 132;  // 默认的traffic class为132(33*4)
 constexpr u32 HCCL_RDMA_TC_MIN = 0;  // traffic class最小值为0
 constexpr u32 HCCL_RDMA_TC_MAX = 255;  // traffic class最大值为255
 constexpr u32 HCCL_RDMA_TC_BASE = 4;    // RDMATrafficClass需要是4的整数倍
- 
+
 constexpr u32 HCCL_RDMA_SL_DEFAULT = 4;  // 默认的server level为4
 constexpr u32 HCCL_RDMA_SL_MIN = 0;  // server level最小值为0
 constexpr u32 HCCL_RDMA_SL_MAX = 7;  // server level最大值为7
@@ -261,7 +261,7 @@ HcclResult SetEsStreamNum(const u32 streamNum);
 u32 GetEsStreamNum();
 
 const u32& GetExternalInputRdmaTrafficClass();
- 
+
 const u32& GetExternalInputRdmaServerLevel();
 
 const u32& GetExternalInputRdmaTimeOut();

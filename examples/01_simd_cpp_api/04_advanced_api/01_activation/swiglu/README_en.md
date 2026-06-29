@@ -26,7 +26,7 @@ This example uses the SwiGLU high-level API in large language model and Mixture 
 
 ## Example Description
 
-- Example function:  
+- Example function:
   SwiGLU is a GLU variant that uses Swish as the activation function.
 
   The computation formulas are as follows:
@@ -34,7 +34,7 @@ This example uses the SwiGLU high-level API in large language model and Mixture 
   Where the Swish activation function formula is (beta is a constant):
   $$Swish(x)=x/(1 + e^{(-\beta x)})$$
 
-- Example specifications:  
+- Example specifications:
   <table border="2" align="left">
   <caption>Table 1: Example Specifications</caption>
   <tr><td align="center" rowspan="1">Example Type</td><td align="center" colspan="4"> swiglu </td></tr>
@@ -49,16 +49,16 @@ This example uses the SwiGLU high-level API in large language model and Mixture 
   <tr><td align="center" rowspan="1">Kernel Function Name</td><td align="center" colspan="4">swiglu_custom</td></tr>
   </table>
 
-- Example implementation:  
+- Example implementation:
   This example implements a fixed-shape example with 32 input elements. The Tiling mechanism passes computation parameters (dataLength, sharedTmpBufferSize) from the host side to the device side, supporting flexible configuration of computation scale.
 
-  - Kernel implementation  
+  - Kernel implementation
     Core computation steps: After transferring input data from GM to UB, call `AscendC::SwiGLU` to complete the SwiGLU computation, then transfer the result back to Global Memory.
 
-  - Tiling implementation  
+  - Tiling implementation
     Temporary space handling: Obtain the required temporary space size through `AscendC::GetSwiGLUMaxMinTmpSize`, passed from Tiling to the kernel side. When the temporary space is greater than 0, use the buffer provided by the developer; otherwise, the framework automatically allocates it.
 
-  - Invocation implementation  
+  - Invocation implementation
     Use the kernel invocation operator `<<<>>>` to call the kernel function, passing src0, src1, dst, workspace, and tiling parameters.
 
 ## Build and Run

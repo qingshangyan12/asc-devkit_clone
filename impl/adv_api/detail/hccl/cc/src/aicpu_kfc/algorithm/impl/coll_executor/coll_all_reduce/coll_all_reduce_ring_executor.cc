@@ -158,7 +158,7 @@ HcclResult CollAllReduceRingExecutor::KernelRun(const OpParam &param, ExecMem &e
 
         std::unique_ptr<AlgTemplateBase> level1TempAlg;
         if (algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_RING) {
-            level1TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_REDUCE_RING, 
+            level1TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_REDUCE_RING,
                 dispatcher_);
             HCCL_INFO("AllReduce ring: using ring algo inter-server.");
             CHK_SMART_PTR_NULL(level1TempAlg);
@@ -182,7 +182,7 @@ HcclResult CollAllReduceRingExecutor::KernelRun(const OpParam &param, ExecMem &e
             CHK_SMART_PTR_NULL(level1TempAlg);
             CHK_RET(level1TempAlg->Prepare(reduceAttr));
         } else if (algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_NB) {
-            level1TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_REDUCE_NB, 
+            level1TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_REDUCE_NB,
                 dispatcher_);
             HCCL_INFO("AllReduce ring: using nonuniform-bruck algo inter-server.");
             CHK_SMART_PTR_NULL(level1TempAlg);
@@ -246,7 +246,7 @@ HcclResult CollAllReduceRingExecutor::SelectTempAlg(std::unique_ptr<AlgTemplateB
 {
     if (level1RankSize > 1) {
         if (algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_RING) {
-            level1TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_REDUCE_RING, 
+            level1TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_REDUCE_RING,
                 dispatcher_);
             HCCL_INFO("AllReduce ring: using ring algo inter-server.");
         } else if (algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_NHR) {
@@ -263,7 +263,7 @@ HcclResult CollAllReduceRingExecutor::SelectTempAlg(std::unique_ptr<AlgTemplateB
             level1TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_REDUCE_AHC_BROKE, dispatcher_);
             HCCL_INFO("AllReduce ring: using ahc-broke algo inter-server.");
         } else if (algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_NB) {
-            level1TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_REDUCE_NB, 
+            level1TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_REDUCE_NB,
                 dispatcher_);
             HCCL_INFO("AllReduce ring: using nonuniform-bruck algo inter-server.");
         } else {

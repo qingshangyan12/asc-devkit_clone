@@ -73,8 +73,8 @@ def Brcb(src, dst, repeatTime, repeatParams):
     oneDataBlockSize = 32
     if repeatParams.dstBlkStride == 0:
         repeatParams.dstBlkStride = 1
-    
-    for i in range(repeatTime): 
+
+    for i in range(repeatTime):
         for j in range(8):
             srcEleIndex = i * 8 + j
             dstBlockStartIndex = (oneDataBlockSize * i * repeatParams.dstRepStride + oneDataBlockSize * j * repeatParams.dstBlkStride) // outputType.itemsize
@@ -155,7 +155,7 @@ __aicore__ inline void Brcb(const LocalTensor<T>& dst, const LocalTensor<T>& src
 </cann-filter>
 
 - BrcbRepeatParams结构体内参数dstBlkStride不支持设置为0，若设置成0可能产生未定义行为。
-<cann-filter npu-type="310p"> 
+<cann-filter npu-type="310p">
 - 针对Atlas 推理系列产品AI Core，使用时需要预留8KB的Unified Buffer空间，作为接口的临时数据存放区。
 </cann-filter>
 
@@ -169,7 +169,7 @@ __aicore__ inline void Brcb(const LocalTensor<T>& dst, const LocalTensor<T>& src
 
 dstBlkStride为1：说明同一迭代内目的操作数中相邻DataBlock地址连续。
 
-dstRepStride为8：说明相邻迭代间目的操作数中首尾DataBlock地址连续。 
+dstRepStride为8：说明相邻迭代间目的操作数中首尾DataBlock地址连续。
 
 **图1**  目的操作数连续
 
@@ -195,7 +195,7 @@ dstRepStride为16：说明相邻迭代间目的操作数中首尾DataBlock地址
 // repeatTime = 2, 128 elements one repeat, 256 elements total
 // srcLocal数据类型为half，dstLocal数据类型为half
 // dstBlkStride = 1, no gap between blocks in one repeat
-// dstRepStride = 8, no gap between repeats 
+// dstRepStride = 8, no gap between repeats
 AscendC::Brcb(dstLocal, srcLocal, 2, {1, 8});
 ```
 

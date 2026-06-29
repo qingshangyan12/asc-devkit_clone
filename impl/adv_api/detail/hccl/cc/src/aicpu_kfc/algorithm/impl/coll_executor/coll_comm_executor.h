@@ -18,7 +18,7 @@
 #include "alltoallv_staged_calculator_pub.h"
 
 namespace hccl {
-constexpr u32 NSLBDP_MIN_COUNT = 128; 
+constexpr u32 NSLBDP_MIN_COUNT = 128;
 class CollCommExecutor : public CollNativeExecutorBase {
 public:
     CollCommExecutor(const HcclDispatcher dispatcher, std::unique_ptr<TopoMatcher> &topoMatcher);
@@ -39,7 +39,7 @@ public:
         const std::vector<std::vector<u32>> &multiRingsOrder,
         std::vector<std::vector<u32>> &rankOrders);
     u32 CalcOptimalIntraRingsize(u64 count, HcclDataType dataType, HcclCMDType opType);
-    
+
     HcclResult MultiRingReduceScatter(const std::string &tag, DeviceMem inputMem, DeviceMem outputMem, const u64 count,
         const HcclDataType dataType, const HcclReduceOp reductionOp,
         const std::vector<std::vector<Slice>> multRingsSliceZero, Stream stream,

@@ -127,20 +127,20 @@ HcclResult CollReduceMeshExecutor::KernelRun(const OpParam &param, ExecMem &exec
         u64 reduceAttr = GetReduceAttr(reduceInput, reduceOutput, param.DataDes.dataType, param.reduceType);
 
         u32 subUserrankRoot = topoMatcher_->GetSubRootUserRank(topoAttr_.userRank, param.root);
-        
+
         CHK_PRT_RET(subUserrankRoot == INVALID_VALUE_RANKID,
             HCCL_ERROR("[ReduceOperator][ReduceMeshExecutor]subUserrankRoot[%u] is invalid,userRank[%u],root[%u]",
                 subUserrankRoot, topoAttr_.userRank, param.root), HCCL_E_INTERNAL);
-        
+
         u32 planeRoot = 0;
         CHK_RET(GetRankByUserRank(COMM_LEVEL1, commIndex, subUserrankRoot, planeRoot));
 
         std::unique_ptr<AlgTemplateBase> level1TempAlg;
         if (algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_RING) {
-            level1TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_REDUCE_RING, 
+            level1TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_REDUCE_RING,
                 dispatcher_);
         } else {
-            level1TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_REDUCE_RECURSIVE_HALVING_DOUBLING, 
+            level1TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_REDUCE_RECURSIVE_HALVING_DOUBLING,
                 dispatcher_);
         }
         CHK_SMART_PTR_NULL(level1TempAlg);
@@ -169,7 +169,7 @@ HcclResult CollReduceMeshExecutor::KernelRun(const OpParam &param, ExecMem &exec
         level0TransportInfo.userRank2subCommRank.end()) {
         const u32 rootRank = level0TransportInfo.userRank2subCommRank[param.root];
 
-        std::unique_ptr<AlgTemplateBase> level0TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_GATHER_MESH, 
+        std::unique_ptr<AlgTemplateBase> level0TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_GATHER_MESH,
             dispatcher_);
         CHK_SMART_PTR_NULL(level0TempAlg);
         CHK_RET(level0TempAlg->Prepare(algResResp_->slaveStreams,

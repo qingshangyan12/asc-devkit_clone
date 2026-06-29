@@ -55,7 +55,7 @@ struct LinkInfo {
     LinkInfo(const LinkData &linkdata)
         : rankId(linkdata.GetRemoteRankId()), dieId(linkdata.GetLocalDieId()), localAddr(linkdata.GetLocalAddr()),
           remoteAddr(linkdata.GetRemoteAddr()){};
-        
+
     explicit LinkInfo():rankId(0),dieId(0),localAddr(IpAddress("0.0.0.1")),remoteAddr(IpAddress("0.0.0.1")){};
 };
 

@@ -124,7 +124,7 @@ HcclResult AllgatherMeshMix::RunAsync(const u32 rank, const u32 rankSize, const 
     CHK_RET(SubRecordMain());
     CHK_RET(MainWaitSub());
     CHK_RET(AlgTemplateBase::ExecEmptyTask(inputMem_, outputMem_, stream_, dispatcher_));
-    
+
     HCCL_INFO("AllGatherMesh finished: rank[%u]", rank);
     return HCCL_SUCCESS;
 }

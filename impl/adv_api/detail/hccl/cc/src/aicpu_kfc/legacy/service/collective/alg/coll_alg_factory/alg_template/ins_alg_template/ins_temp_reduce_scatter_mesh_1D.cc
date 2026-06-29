@@ -83,24 +83,24 @@ HcclResult InsTempReduceScatterMesh1D::PostCopy(const TemplateDataParams &tempAl
     for (u32 repeatIdx = 0; repeatIdx < tempAlgParams.repeatNum; repeatIdx++) {
         DataSlice myRankSlice = DataSlice(tempAlgParams.buffInfo.inBuffType, tempAlgParams.buffInfo.inBuffBaseOff +
             repeatIdx * tempAlgParams.inputRepeatStride + rankIdx * tempAlgParams.inputSliceStride, processSize_);
-        DataSlice outputSlice = DataSlice(tempAlgParams.buffInfo.outBuffType, tempAlgParams.buffInfo.outBuffBaseOff + 
+        DataSlice outputSlice = DataSlice(tempAlgParams.buffInfo.outBuffType, tempAlgParams.buffInfo.outBuffBaseOff +
             repeatIdx * tempAlgParams.outputRepeatStride, processSize_);
         CHK_RET(LocalCopy(tempInsQues[0], myRankSlice, outputSlice));
         // 把其他卡的数据input累加到output
         for (u32 tmpRank = 0; tmpRank < tempRankSize_; tmpRank++) {
             if (tmpRank != rankIdx) {
-                DataSlice srcDataSlice = DataSlice(tempAlgParams.buffInfo.scratBuffType, tempAlgParams.buffInfo.scratchBuffBaseOff + 
+                DataSlice srcDataSlice = DataSlice(tempAlgParams.buffInfo.scratBuffType, tempAlgParams.buffInfo.scratchBuffBaseOff +
                     repeatIdx * tempAlgParams.outputRepeatStride + tmpRank * tempAlgParams.outputSliceStride, processSize_);
-                DataSlice dstDataSlice = DataSlice(tempAlgParams.buffInfo.outBuffType, tempAlgParams.buffInfo.outBuffBaseOff + 
+                DataSlice dstDataSlice = DataSlice(tempAlgParams.buffInfo.outBuffType, tempAlgParams.buffInfo.outBuffBaseOff +
                     repeatIdx * tempAlgParams.outputRepeatStride, processSize_);
-                CHK_RET(LocalReduce(tempInsQues[0], srcDataSlice, dstDataSlice, dataType_, redOp_));                                    
+                CHK_RET(LocalReduce(tempInsQues[0], srcDataSlice, dstDataSlice, dataType_, redOp_));
             }
         }
     }
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult InsTempReduceScatterMesh1D::RunReduceScatter(const ResLinks &tempLinks, std::vector<InsQuePtr> &tempInsQues, 
+HcclResult InsTempReduceScatterMesh1D::RunReduceScatter(const ResLinks &tempLinks, std::vector<InsQuePtr> &tempInsQues,
                                                         const TemplateDataParams &tempAlgParams)
 {
     u32 myAlgRank;
@@ -121,13 +121,13 @@ HcclResult InsTempReduceScatterMesh1D::RunReduceScatter(const ResLinks &tempLink
         // 在 inBuff 上进行 ReduceScatter 操作
         // 数据从其他卡，传输到本卡，接收数据
         for (u32 repeatIdx = 0; repeatIdx < tempAlgParams.repeatNum; repeatIdx++) {
-            DataSlice rxSrcSlice = DataSlice(tempAlgParams.buffInfo.inBuffType, tempAlgParams.buffInfo.inBuffBaseOff + 
+            DataSlice rxSrcSlice = DataSlice(tempAlgParams.buffInfo.inBuffType, tempAlgParams.buffInfo.inBuffBaseOff +
                 repeatIdx * tempAlgParams.inputRepeatStride + myAlgRank * tempAlgParams.inputSliceStride, processSize_); // 接收源
-            DataSlice rxDstSlice = DataSlice(tempAlgParams.buffInfo.scratBuffType, tempAlgParams.buffInfo.scratchBuffBaseOff + 
+            DataSlice rxDstSlice = DataSlice(tempAlgParams.buffInfo.scratBuffType, tempAlgParams.buffInfo.scratchBuffBaseOff +
                 repeatIdx * tempAlgParams.outputRepeatStride + nextRank * tempAlgParams.outputSliceStride, processSize_); // 接收目标
-            DataSlice txSrcSlice = DataSlice(tempAlgParams.buffInfo.inBuffType, tempAlgParams.buffInfo.inBuffBaseOff + 
+            DataSlice txSrcSlice = DataSlice(tempAlgParams.buffInfo.inBuffType, tempAlgParams.buffInfo.inBuffBaseOff +
                 repeatIdx * tempAlgParams.inputRepeatStride + nextRank * tempAlgParams.inputSliceStride, processSize_); // 发送源
-            DataSlice txDstSlice = DataSlice(tempAlgParams.buffInfo.scratBuffType, tempAlgParams.buffInfo.scratchBuffBaseOff + 
+            DataSlice txDstSlice = DataSlice(tempAlgParams.buffInfo.scratBuffType, tempAlgParams.buffInfo.scratchBuffBaseOff +
                 repeatIdx * tempAlgParams.outputRepeatStride + myAlgRank * tempAlgParams.outputSliceStride, processSize_);  // 发送目标
 
             rxSrcSlices.push_back(rxSrcSlice);

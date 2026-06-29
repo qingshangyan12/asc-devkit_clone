@@ -22,13 +22,13 @@ An example for multiple batch Matmul computations, including both synchronous an
 │   └── README.md                          // Example description document
 ```
 ## Example Description
-- Example Function:  
+- Example Function:
   This example splits the BatchMatmul computation batches into nNum main batches, where each main batch includes BatchNum sub-batches of Matmul computation. By modifying the IS_SYNCH parameter in the batch_matmul_iterate_n_batch.asc code, you can control whether to use the asynchronous computation flow.
 
 - Constraints
   - Computation within a single Batch Matmul follows the IterateBatch constraints;
   - For BSNGD, SBNGD, and BNGS1S2 Layout formats, the total multi-batch data of input A and B matrices should be smaller than the L1 Buffer size;
-- Example Specifications:  
+- Example Specifications:
     In this example: BatchNum = 3, M = 32, N = 256, K = 64.
     <table>
     <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="6" align="center">BatchMatmulCustom</td></tr>
@@ -40,7 +40,7 @@ An example for multiple batch Matmul computations, including both synchronous an
     <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="6" align="center">batch_matmul_iterate_n_batch_custom</td></tr>
     </table>
 
-- Example Implementation: 
+- Example Implementation:
   - Key Kernel Steps
     - When creating the Matmul object, customize the MatmulConfig parameters, set the isNBatch parameter to true to enable multi-batch input and multi-batch output, and set the isBiasBatch parameter to false to enable the Bias reuse feature of BatchMatmul, obtaining a custom Matmul object using the NORM template.
       ```cpp
@@ -81,7 +81,7 @@ An example for multiple batch Matmul computations, including both synchronous an
 
 ## Build and Run
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

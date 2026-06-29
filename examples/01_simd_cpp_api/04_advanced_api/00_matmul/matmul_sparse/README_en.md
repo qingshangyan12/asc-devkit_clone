@@ -1,8 +1,8 @@
 # Sparse Matmul Direct Invocation Example
 
 ## Overview
-A Matmul example for 4:2 sparse matrix multiplication (Sparse Matmul), which reduces memory usage and computation during matrix multiplication. Sparse Matmul skips zero elements in the sparse matrix B and only performs data transfer, storage, and computation on non-zero elements.  
-In this scenario, the input left matrix A and the right matrix are sparse matrices. In the sparse matrix B, at least 2 out of every 4 elements are zero. Before performing Matmul computation, the user must densify matrix B with a 4:2 ratio, that is, filter out 2 zero elements from every 4 elements based on the original sparse matrix B, densifying B into a dense matrix. The Sparse Matmul scenario calls the Matmul API to complete the matrix multiplication of matrix A and the 4:2 densified matrix B.  
+A Matmul example for 4:2 sparse matrix multiplication (Sparse Matmul), which reduces memory usage and computation during matrix multiplication. Sparse Matmul skips zero elements in the sparse matrix B and only performs data transfer, storage, and computation on non-zero elements.
+In this scenario, the input left matrix A and the right matrix are sparse matrices. In the sparse matrix B, at least 2 out of every 4 elements are zero. Before performing Matmul computation, the user must densify matrix B with a 4:2 ratio, that is, filter out 2 zero elements from every 4 elements based on the original sparse matrix B, densifying B into a dense matrix. The Sparse Matmul scenario calls the Matmul API to complete the matrix multiplication of matrix A and the 4:2 densified matrix B.
 > **Note:** 4:2 sparse matrix multiplication (Sparse Matmul) currently only supports transposed matrix B.
 
 ## Supported Products and CANN Versions
@@ -24,11 +24,11 @@ In this scenario, the input left matrix A and the right matrix are sparse matric
 │   └── README.md               // Example description document
 ```
 ## Example Description
-- Example Function:  
-  The Matmul example calls the Matmul high-level API to perform matrix multiplication and add bias on the input left matrix A and the 4:2 densified right matrix B.   
+- Example Function:
+  The Matmul example calls the Matmul high-level API to perform matrix multiplication and add bias on the input left matrix A and the 4:2 densified right matrix B.
   During the data preparation phase before computation, the densification of matrix B is completed through the ground truth data generation script, and the index matrix is obtained. When implementing Matmul computation, call the Matmul high-level API and pass in the 4:2 densified matrix B and the index matrix to complete the matrix multiplication for the Sparse Matmul scenario.
 
-- Example Specifications:  
+- Example Specifications:
   In this example: M = 128, N = 7680, K = 64.
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="5" align="center">Matmul</td></tr>
@@ -40,7 +40,7 @@ In this scenario, the input left matrix A and the right matrix are sparse matric
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="5" align="center">matmul_sparse_custom</td></tr>
   </table>
 
-- Example Implementation: 
+- Example Implementation:
   - Key Kernel Steps
     - When creating the Matmul object, define the parameter type information of matrix B through SparseMatmulType.
       ```cpp
@@ -64,12 +64,12 @@ In this scenario, the input left matrix A and the right matrix are sparse matric
       tiling.SetSparse(true); // Enable the Sparse Matmul sparse matrix computation scenario
       ```
 
-  - Invocation Implementation  
+  - Invocation Implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

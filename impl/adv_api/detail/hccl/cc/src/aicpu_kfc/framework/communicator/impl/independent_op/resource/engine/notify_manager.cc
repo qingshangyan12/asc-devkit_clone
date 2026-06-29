@@ -15,7 +15,7 @@
 
 namespace hccl {
 #ifndef CCL_KERNEL_AICPU
-NotifyManager::NotifyManager(std::string commId, aclrtBinHandle binHandle, const ManagerCallbacks& callbacks) : 
+NotifyManager::NotifyManager(std::string commId, aclrtBinHandle binHandle, const ManagerCallbacks& callbacks) :
     commId_(commId), binHandle_(binHandle), callbacks_(callbacks){}
 #endif
 
@@ -132,7 +132,7 @@ HcclResult NotifyManager::HcclAllocNotify(CommEngine commEngine, ::NotifyType no
     if (isAicpu) {
         if (!callbacks_.getAicpuCommState()) {
             HcclResult ret = callbacks_.kernelLaunchAicpuCommInit();
-            CHK_PRT_RET(ret != HCCL_SUCCESS, 
+            CHK_PRT_RET(ret != HCCL_SUCCESS,
                 HCCL_ERROR("[%s] kernelLaunchAicpuCommInit failed, return [%d].", __func__, ret), ret);
             callbacks_.setAicpuCommState(true);
         }

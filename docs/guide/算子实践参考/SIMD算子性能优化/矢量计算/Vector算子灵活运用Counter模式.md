@@ -32,8 +32,8 @@ AscendC::Add<DTYPE_X, false>(zLocal, xLocal, yLocal, AscendC::MASK_PLACEHOLDER, 
 if (tailEleNum > 0) {
      AscendC::SetVectorMask<DTYPE_X, AscendC::MaskMode::NORMAL>(tailEleNum); // 设置normal模式mask，使每个迭代计算24个数
      // 偏移tensor的起始地址，在xLocal和yLocal的14976个元素处，进行尾块计算
-     AscendC::Add<DTYPE_X, false>(zLocal[mainRepeatTimes * numPerRepeat], xLocal[mainRepeatTimes * numPerRepeat], 
-           yLocal[mainRepeatTimes * numPerRepeat], AscendC::MASK_PLACEHOLDER, 1, binaryParams);  
+     AscendC::Add<DTYPE_X, false>(zLocal[mainRepeatTimes * numPerRepeat], xLocal[mainRepeatTimes * numPerRepeat],
+           yLocal[mainRepeatTimes * numPerRepeat], AscendC::MASK_PLACEHOLDER, 1, binaryParams);
 }
 AscendC::ResetMask();  // 还原mask值
 ```
@@ -55,10 +55,10 @@ AscendC::ResetMask();  // 还原mask值
 
 【性能对比】
 
-**图1**  Normal模式和Counter模式下的Scalar执行时间对比<a name="fig7838115891613"></a>  
+**图1**  Normal模式和Counter模式下的Scalar执行时间对比<a name="fig7838115891613"></a>
 ![](../../../figures/Normal模式和Counter模式下的Scalar执行时间对比.png "Normal模式和Counter模式下的Scalar执行时间对比")
 
-**图2**  Normal模式和Counter模式下的Vector执行时间对比<a name="fig1223382352110"></a>  
+**图2**  Normal模式和Counter模式下的Vector执行时间对比<a name="fig1223382352110"></a>
 ![](../../../figures/Normal模式和Counter模式下的Vector执行时间对比.png "Normal模式和Counter模式下的Vector执行时间对比")
 
 以上性能数据是分别循环运行1000次反例和正例代码得到的Scalar和Vector执行时间。从上述两幅性能对比图和示例代码可以看到，使用Counter模式能够大幅度简化代码，易于维护，同时能够降低Scalar和Vector计算耗时，获得性能提升。

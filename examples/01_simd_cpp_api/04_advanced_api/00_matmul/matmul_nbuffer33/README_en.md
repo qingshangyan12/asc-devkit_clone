@@ -23,7 +23,7 @@ A Matmul example using the NBuffer33 algorithm, achieving balanced load-in and l
 │   └── README.md               // Example description document
 ```
 ## Example Description
-- Example Function:  
+- Example Function:
   The Matmul example uses the template parameter MatmulPolicy configured as NBuffer33MatmulPolicy. The A matrix for single-core computation is split into 3x3 basic blocks. These 3x3 A matrix basic blocks are fully loaded and maintained in the L1 Buffer, and each time they perform matrix multiplication with 3x1 B matrix basic blocks, while DoubleBuffer transfers the next 3x1 B matrix basic blocks needed for computation in parallel, until the matrix multiplication in the singleCoreN direction is complete.
 
 - Constraints
@@ -33,7 +33,7 @@ A Matmul example using the NBuffer33 algorithm, achieving balanced load-in and l
   - stepM, stepKa, and stepKb must be less than or equal to 3.
   - The user must ensure that the sum of the fully loaded basic block size of matrix A and the loaded basic block size of matrix B does not exceed the L1 Buffer size.
 
-- Example Specifications:  
+- Example Specifications:
   In this example: M = 256, N = 512, K = 192.
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="5" align="center">Matmul</td></tr>
@@ -44,7 +44,7 @@ A Matmul example using the NBuffer33 algorithm, achieving balanced load-in and l
   <tr><td rowspan="1" align="center">Example Output</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="5" align="center">matmul_nbuffer33_custom</td></tr>
   </table>
-- Example Implementation: 
+- Example Implementation:
   - Key Kernel Steps
     - Specific steps:
       - Create the Matmul object, configure the MDL template and NBuffer33MatmulPolicy.
@@ -66,12 +66,12 @@ A Matmul example using the NBuffer33 algorithm, achieving balanced load-in and l
       tilingApi.SetMatmulConfigParams(matmulConfigParams);
       ```
 
-  - Invocation Implementation  
+  - Invocation Implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

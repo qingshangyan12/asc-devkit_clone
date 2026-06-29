@@ -230,7 +230,7 @@ __aicore__ inline void GeluCompute(
 
 ## 中级性能优化
 
-### Case 1: 启用RegBase API和VF融合能力 
+### Case 1: 启用RegBase API和VF融合能力
 
 ### 性能瓶颈分析
 

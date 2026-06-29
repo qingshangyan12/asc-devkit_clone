@@ -19,7 +19,7 @@ constexpr int CKE_IDX_0 = 0;
 constexpr int CKE_IDX_1 = 1;
 constexpr uint64_t CCU_MS_SIZE = 4096;
 constexpr uint64_t LOCAL_COPY_MS = 8;
-constexpr int POST_SYNC_ID = 3;  
+constexpr int POST_SYNC_ID = 3;
 
 CcuKernelAllGatherMesh1DMem2Mem::CcuKernelAllGatherMesh1DMem2Mem(const CcuKernelArg &arg)
     : CcuKernelAlgBase(arg)
@@ -225,7 +225,7 @@ std::vector<uint64_t> CcuKernelAllGatherMesh1DMem2Mem::GeneArgs(const CcuTaskArg
     uint64_t inputAddr                   = taskArg->inputAddr_;
     uint64_t outputAddr                  = taskArg->outputAddr_;
     uint64_t token                       = taskArg->token_;
-    
+
     uint64_t currentRankSliceInputOffset  = taskArg->inputSliceStride_ * rankId_;
     uint64_t currentRankSliceOutputOffset = taskArg->outputSliceStride_ * rankId_;
     uint64_t tmpRepeatNum                 = UINT64_MAX - taskArg->repeatNum_;

@@ -16,7 +16,7 @@
 
 ## 分析主要瓶颈点<a name="section788333916369"></a>
 
-**图1**  优化前Profiling数据<a name="fig136871118111317"></a>  
+**图1**  优化前Profiling数据<a name="fig136871118111317"></a>
 ![](../../../figures/优化前Profiling数据.png "优化前Profiling数据")
 
 由以上Profiling数据，可以看出MTE2耗时占比较大，当前性能瓶颈点在于MTE2流水。
@@ -40,7 +40,7 @@
     CHECK_ACL(aclrtSetDevice(deviceId));
     aclrtStream stream = nullptr;
     CHECK_ACL(aclrtCreateStream(&stream));
-    
+
     uint8_t *aHost;
     uint8_t *aDevice;
     CHECK_ACL(aclrtMallocHost((void **)(&aHost), aFileSize));
@@ -50,7 +50,7 @@
     // PrintData(aHost, 16, printDataType::HALF);
     CHECK_ACL(aclrtMemcpy(aDevice, aFileSize, aHost, aFileSize,
     					ACL_MEMCPY_HOST_TO_DEVICE));
-    
+
     uint8_t *bHost;
     uint8_t *bDevice;
     CHECK_ACL(aclrtMallocHost((void **)(&bHost), bFileSize));
@@ -60,13 +60,13 @@
     // PrintData(bHost, 16, printDataType::HALF);
     CHECK_ACL(aclrtMemcpy(bDevice, bFileSize, bHost, bFileSize,
     					ACL_MEMCPY_HOST_TO_DEVICE));
-    
+
     uint8_t *workspaceHost;
     uint8_t *workspaceDevice;
     CHECK_ACL(aclrtMallocHost((void **)(&workspaceHost), workspaceSize));
     CHECK_ACL(aclrtMalloc((void **)&workspaceDevice, workspaceSize,
     					ACL_MEM_MALLOC_HUGE_FIRST));
-    
+
     uint8_t *tilingHost;
     uint8_t *tilingDevice;
     CHECK_ACL(aclrtMallocHost((void **)(&tilingHost), tilingFileSize));
@@ -77,13 +77,13 @@
     // PrintData(tilingHost, 16, printDataType::UINT32_T);
     CHECK_ACL(aclrtMemcpy(tilingDevice, tilingFileSize, tilingHost,
     					tilingFileSize, ACL_MEMCPY_HOST_TO_DEVICE));
-    
+
     uint8_t *cHost;
     uint8_t *cDevice;
     CHECK_ACL(aclrtMallocHost((void **)(&cHost), cFileSize));
     CHECK_ACL(
       aclrtMalloc((void **)&cDevice, cFileSize, ACL_MEM_MALLOC_HUGE_FIRST));
-    
+
     // ACLRT_LAUNCH_KERNEL(matmul_custom)
     // (numBlocks, stream, aDevice, bDevice, cDevice, workspaceDevice, tilingDevice);
     matmul_custom_do(numBlocks, stream, aDevice, bDevice, cDevice, workspaceDevice, tilingDevice);
@@ -101,7 +101,7 @@
     tilingApi.SetDim(usedCoreNum);
     ```
 
-    **图2**  优化分核逻辑后Profiling数据<a name="fig3811154518136"></a>  
+    **图2**  优化分核逻辑后Profiling数据<a name="fig3811154518136"></a>
     ![](../../../figures/优化分核逻辑后Profiling数据.png "优化分核逻辑后Profiling数据")
 
     修改代码后，算子执行时间从12045us下降到2532us，约等于\(20核 / 4核\) = 5倍的性能提升。
@@ -117,7 +117,7 @@
     ```
     int32_t baseM = 128; // 优化前baseM是64
     int32_t baseN = 256; // 优化前baseN是64
-    
+
     optiling::TCubeTiling tilingData;
     MultiCoreMatmulTiling tilingApi;
     tilingApi.SetDim(usedCoreNum);
@@ -125,7 +125,7 @@
     tilingApi.SetBType(rightPos, rightFormat, rightDtype, bool(transposeB));
     tilingApi.SetCType(resPos, resFormat, resDtype);
     tilingApi.SetBiasType(biasPos, biasFormat, biasDtype);
-    
+
     tilingApi.SetOrgShape(M, N, K);
     tilingApi.SetShape(M, N, K);
     tilingApi.SetFixSplit(baseM, baseN, -1);
@@ -133,7 +133,7 @@
 
     使用这组基本块后，MTE2耗时（对应aic\_mte2\_time）从2452us降低到808us，MTE2性能提升3倍。
 
-    **图3**  优化基本块后Profiling数据<a name="fig1012052281415"></a>  
+    **图3**  优化基本块后Profiling数据<a name="fig1012052281415"></a>
     ![](../../../figures/优化基本块后Profiling数据.png "优化基本块后Profiling数据")
 
 -   优化点三：开启大包搬运
@@ -157,7 +157,7 @@
 
     从下图可以看到，开启大包搬运后，MTE2耗时从808us下降到591us，带宽利用率代入数据计算为3406GB/s，利用率提升36%+，Cube利用率达到80%+。
 
-    **图4**  开启大包搬运后Profiling数据<a name="fig13648142015171"></a>  
+    **图4**  开启大包搬运后Profiling数据<a name="fig13648142015171"></a>
     ![](../../../figures/使能大包搬运后Profiling数据.png "开启大包搬运后Profiling数据")
 
 ## 验证优化方案性能收益<a name="section225561133715"></a>

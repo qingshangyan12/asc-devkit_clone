@@ -32,7 +32,7 @@ This example demonstrates setting, reading, and resetting CTRL[48] and CTRL[60] 
 
 ## Example Description
 
-- Example function:  
+- Example function:
   Verify the complete flow and functional effects of CTRL register non-saturation mode operations:
   1. SetCtrlSpr: Set `CTRL[60]=1` to enable global effectiveness, set `CTRL[48]=1` to select non-saturation mode (INF/NaN retain original output)
   2. GetCtrlSpr: Read the value of `CTRL[48]` after setting, store in the first 4 elements of `ctrlLocal`
@@ -48,7 +48,7 @@ This example demonstrates setting, reading, and resetting CTRL[48] and CTRL[60] 
   <tr><td align="center">src</td><td align="center">[1, 256]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td rowspan="2" align="center">Example Output</td><td align="center">output_ctrl</td><td align="center">[1, 8]</td><td align="center">int64_t</td><td align="center">ND</td></tr>
   <tr><td align="center">output_sat</td><td align="center">[1, 256]</td><td align="center">half</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">kernel_ctrl_spr</td></tr>  
+  <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">kernel_ctrl_spr</td></tr>
   </table>
 
 - Output description:
@@ -65,7 +65,7 @@ This example demonstrates setting, reading, and resetting CTRL[48] and CTRL[60] 
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -85,7 +85,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debug or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-  
+
   Examples:
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;   # CPU debug mode

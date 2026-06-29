@@ -88,7 +88,7 @@ HcclResult SqeMgr::Commit(u32 sqId)
         HCCL_ERROR("no available buffer found for sq_id=%u", sqId);
         return HcclResult::HCCL_E_NOT_FOUND;
     }
-    
+
     SqInfo *sqInfo         = sqInfos[sqId].get();
     CHECK_NULLPTR(sqInfo, "[SqeMgr::Commit] sqInfo is nullptr!");
     u32     availableSpace = GetTailToHeadDist(sqId, sqInfo->sqHead, sqInfo->sqTail);
@@ -176,7 +176,7 @@ u64 SqeMgr::QuerySqBaseAddr(u32 sqId)
     HCCL_INFO("SqeMgr::%s begin", __func__);
     drvError_t ret = halSqCqQuery(devPhyId, &queryInfo);
     if (ret != 0) {
-        std::string formatStr = StringFormat("SqeMgr::%s call halSqCqQuery failed, devPhyId %d, ret %d", 
+        std::string formatStr = StringFormat("SqeMgr::%s call halSqCqQuery failed, devPhyId %d, ret %d",
                                             __func__, devPhyId, ret);
         HCCL_ERROR("%s", formatStr.c_str());
         THROW<DrvApiException>(formatStr);
@@ -197,7 +197,7 @@ u32 SqeMgr::QuerySqStatusByType(u32 sqId, drvSqCqPropType_t type) const
     HCCL_INFO("%s::halSqCqQuery begin, type %d sqiId %u", __func__, type, sqId);
     drvError_t ret = halSqCqQuery(devPhyId, &queryInfo);
     if (ret != 0) {
-        std::string formatStr = StringFormat("SqeMgr::%s call halSqCqQuery failed, devPhyId %d, ret %d", 
+        std::string formatStr = StringFormat("SqeMgr::%s call halSqCqQuery failed, devPhyId %d, ret %d",
                                             __func__, devPhyId, ret);
         HCCL_ERROR("%s", formatStr.c_str());
         THROW<DrvApiException>(formatStr);

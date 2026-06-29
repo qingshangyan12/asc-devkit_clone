@@ -22,13 +22,13 @@
 │   └── README.md                          // 样例说明文档
 ```
 ## 样例描述
-- 样例功能：  
+- 样例功能：
   本样例对BatchMatmul计算批次进行拆分，拆分为nNum个主批次，每个主批次包括BatchNum个子批次的Matmul计算。通过修改batch_matmul_iterate_n_batch.asc代码中的IS_SYNCH参数，可以控制是否使用异步计算流程。
 
 - 约束条件
   - 单Batch Matmul内计算遵循IterateBatch的约束条件；
   - 对于BSNGD、SBNGD、BNGS1S2 Layout格式，输入A、B矩阵多Batch数据总和应该小于L1 Buffer的大小；
-- 样例规格：  
+- 样例规格：
     本样例中：BatchNum = 3, M = 32, N = 256, K = 64。
     <table>
     <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="6" align="center">BatchMatmulCustom</td></tr>
@@ -40,7 +40,7 @@
     <tr><td rowspan="1" align="center">核函数名</td><td colspan="6" align="center">batch_matmul_iterate_n_batch_custom</td></tr>
     </table>
 
-- 样例实现： 
+- 样例实现：
   - Kernel关键步骤
     - 创建Matmul对象时，自定义MatmulConfig参数，将其中的isNBatch参数设置为true，使能多Batch输入和多Batch输出；将其中的isBiasBatch参数设置为false，使能BatchMatmul的Bias复用功能，获得自定义的使用NORM模板的Matmul对象。
       ```cpp
@@ -81,7 +81,7 @@
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

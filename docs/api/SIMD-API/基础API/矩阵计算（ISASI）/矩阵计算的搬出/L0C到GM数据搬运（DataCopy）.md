@@ -34,13 +34,13 @@
 下图展示了随路量化、随路ReLU、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。
 
 <!-- npu="A3,910b" id9 -->
-**图1** L0C2GM流程图（[NPU架构版本2201](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="zh-cn_topic_0000002542828493_fig542810249417"></a>  
+**图1** L0C2GM流程图（[NPU架构版本2201](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="zh-cn_topic_0000002542828493_fig542810249417"></a>
 
 ![](../../../../figures/L0C2GM_Function_Combination.png)
 <!-- end id9 -->
 
 <!-- npu="950" id11 -->
-**图2** L0C2GM流程图（[NPU架构版本3510](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="zh-cn_topic_0000002542828493_fig1828513492475"></a>  
+**图2** L0C2GM流程图（[NPU架构版本3510](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="zh-cn_topic_0000002542828493_fig1828513492475"></a>
 
 ![](../../../../figures/L0C2GM_Function_Combination_950.png)
 <!-- end id11 -->
@@ -194,7 +194,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 
     ```cpp
     // CeilAlign定义如下
-    __aicore__ inline uint16_t CeilAlign(uint16_t numerator, uint16_t denominator) 
+    __aicore__ inline uint16_t CeilAlign(uint16_t numerator, uint16_t denominator)
     {
         return (numerator + denominator - 1) / denominator * denominator;
     }
@@ -211,7 +211,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
     AscendC::DataCopy(fbTensor, quantAlphaTensor, dataCopyParams);
     // 将量化参数数据写入寄存器，供后续DataCopy指令使用
     AscendC::SetFixPipeConfig(fbTensor);
-    // 创建DataCopy的参数, 
+    // 创建DataCopy的参数,
     AscendC::DataCopyCO12DstParams intriParams;
     intriParams.nSize = CeilAlign(n, CUBE_BLOCK);
     intriParams.mSize = m;
@@ -353,7 +353,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
             };
             // 不开启ReLU与channelSplit
             AscendC::DataCopyCO12DstParams intriParams(nSize, mSize, dstStride, srcStride, deqMode, 0, false, nz2ndEn);
-           
+
             // mov l0c to gm, deq scalar quant
             AscendC::SetFixpipePreQuantFlag(deqScalar);  // 设置量化参数
             AscendC::PipeBarrier<PIPE_FIX>();
@@ -374,7 +374,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
             // AscendC::SetFixPipeConfig(deqFB);
             // AscendC::PipeBarrier<PIPE_FIX>();
             // // mov l0c to gm，量化操作后开启ClipReLU操作
-            // intriParams.clipReluPre = 1; 
+            // intriParams.clipReluPre = 1;
             // // 设置clip ReLU的值到寄存器
             // uint64_t clipReluVal = 0x3c00; // value 1, half
             // SetFixPipeClipRelu(clipReluVal);
@@ -386,7 +386,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
             // AscendC::PipeBarrier<PIPE_ALL>();
             // // 将存放element-wise tensor的地址设置到寄存器里
             // SetFixPipeAddr(eleWiseTensor, 1);
-    
+
             // AscendC::DataCopy(dstGlobal, dstCO1, intriParams);
             // inQueueDeqA1.FreeTensor(workA1);
             // inQueueDeqFB.FreeTensor(deqFB);

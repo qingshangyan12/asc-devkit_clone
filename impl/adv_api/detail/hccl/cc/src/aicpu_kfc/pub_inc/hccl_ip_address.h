@@ -72,7 +72,7 @@ public:
         readableAddr = readableIP;
     }
     explicit HcclIpAddress(const Eid &eidInput);
- 
+
     explicit HcclIpAddress(u32 address)
     {
         union HcclInAddr ipAddr;

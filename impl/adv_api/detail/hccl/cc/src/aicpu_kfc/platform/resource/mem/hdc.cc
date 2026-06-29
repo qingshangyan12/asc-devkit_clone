@@ -64,7 +64,7 @@ HcclResult HDCommunicate::InitHost()
     tailCntAddr_ = HcclHdcGetControlWordAddr(hostMem_.ptr(), hostMem_.size(), HCCL_HDC_TAIL_POS);
 
     devHeadCntAddr_ = HcclHdcGetControlWordAddr(devMem_.ptr(), devMem_.size(), HCCL_HDC_HEAD_POS);
-    devTailCntAddr_ = HcclHdcGetControlWordAddr(devMem_.ptr(), devMem_.size(), HCCL_HDC_TAIL_POS);   
+    devTailCntAddr_ = HcclHdcGetControlWordAddr(devMem_.ptr(), devMem_.size(), HCCL_HDC_TAIL_POS);
     return HCCL_SUCCESS;
 }
 

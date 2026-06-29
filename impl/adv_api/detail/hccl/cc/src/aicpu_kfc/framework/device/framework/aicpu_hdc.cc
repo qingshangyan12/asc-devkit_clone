@@ -65,7 +65,7 @@ HcclResult AicpuHdc::GetOpExecCtrlTargetOp(std::shared_ptr<HDCommunicate> h2dTra
 
     KfcExecControl ctrlCmd;
     CHK_RET(h2dTransfer->Get(0, sizeof(KfcExecControl), reinterpret_cast<uint8_t *>(&ctrlCmd)));
-        
+
     opId = ctrlCmd.targetOp;
     HCCL_DEBUG("[OpRetry][GetOpExecCtrlTargetOp]tag[%s], index[%u], srcRank[%u], detRank[%u], isSendRecv[%d], "
         "streamid[%u]",

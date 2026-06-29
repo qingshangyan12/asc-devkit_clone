@@ -36,9 +36,9 @@ struct ThreadCreateParams {
     uint32_t notifyNumPerThread;           // 每个线程的通知量数量
     NotifyLoadType notifyLoadType;   // 通知量加载类型
     StreamType streamType;           // 流类型
-    
+
     // 默认构造函数
-    ThreadCreateParams() 
+    ThreadCreateParams()
         : engine(COMM_ENGINE_RESERVED)
         , threadNum(0)
         , notifyNumPerThread(0)
@@ -47,7 +47,7 @@ struct ThreadCreateParams {
     }
 
     // 带参数的构造函数
-    ThreadCreateParams(CommEngine engine, 
+    ThreadCreateParams(CommEngine engine,
                        uint32_t tNum,
                        uint32_t nNum,
                        NotifyLoadType nType,

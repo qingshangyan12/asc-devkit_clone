@@ -94,7 +94,7 @@ HcclResult AicpuAllToAll::RunAllToAll(void *sendBuffer, void *recvBuffer, u64 da
             CHK_RET(TaskOrchestrator::SelfCpySnd2Win(curInputPtr, averageSize, displs[i], winOffsets[i],
                                                     HCCL_REDUCE_RESERVED, dataType));
         }
-             
+
         // 2. 前同步
         CHK_RET(TaskOrchestrator::DoPreSync());
 

@@ -100,7 +100,7 @@ void TransportIbverbs::DeRegMRForQPhandles(MemMsg& memMsg)
             continue;
         }
         (void)DeRegOneMR(combineQpHandles_[j].qpHandle, memMsg);
-    } 
+    }
     for (u32 j = 0; j < multiCombineQpHandles_.size(); j++) {
         if (multiCombineQpHandles_[j].qpHandle == nullptr) {
             continue;
@@ -165,7 +165,7 @@ HcclResult TransportIbverbs::Stop()
     }
     return HCCL_SUCCESS;
 }
- 
+
 HcclResult TransportIbverbs::Resume()
 {
     HcclResult ret = hrtRaQpBatchModify(nicRdmaHandle_, &combineQpHandles_[0].qpHandle, combineQpHandles_.size(),
@@ -177,7 +177,7 @@ HcclResult TransportIbverbs::Resume()
     }
     return HCCL_SUCCESS;
 }
- 
+
 HcclResult TransportIbverbs::Init()
 {
     HCCL_INFO(
@@ -189,7 +189,7 @@ HcclResult TransportIbverbs::Init()
         machinePara_.remoteDeviceId, machinePara_.localUserrank, machinePara_.localWorldRank,
         machinePara_.remoteUserrank, machinePara_.remoteWorldRank,
         machinePara_.deviceType, machinePara_.inputMem.ptr(), machinePara_.outputMem.ptr(),
-        machinePara_.isAicpuModeEn, machinePara_.notifyNum, machinePara_.isIndOp, 
+        machinePara_.isAicpuModeEn, machinePara_.notifyNum, machinePara_.isIndOp,
         machinePara_.exchangeInfo.size());
     HcclUs startut = TIME_NOW();
 
@@ -225,7 +225,7 @@ HcclResult TransportIbverbs::Init()
     CHK_RET(InitQpConnect());
 
     HCCL_INFO("linkexp initialization success,Time:%lld us", DURATION_US(TIME_NOW() - startut));
-    
+
     CHK_RET(GetQpAttr());
     return HCCL_SUCCESS;
 }
@@ -235,9 +235,9 @@ HcclResult TransportIbverbs::GetQpAttr()
     char stackLogBuffer[LOG_TMPBUF_SIZE];
     s32 ret = snprintf_s(stackLogBuffer, LOG_TMPBUF_SIZE, LOG_TMPBUF_SIZE - 1U,
         "communicator[%s], local rank[%u], ip[%s], remote rank[%u], ip[%s], transporttype[%s]",
-        machinePara_.tag.c_str(), machinePara_.localUserrank, machinePara_.localIpAddr.GetReadableAddress(), 
+        machinePara_.tag.c_str(), machinePara_.localUserrank, machinePara_.localIpAddr.GetReadableAddress(),
         machinePara_.remoteUserrank, machinePara_.remoteIpAddr.GetReadableAddress(), GetLinkTypeEnumStr(GetLinkType()).c_str());
-    CHK_PRT_RET(ret == -1, HCCL_ERROR("[GetQpAttr]errNo[0x%016llx] sal snprintf_s error", 
+    CHK_PRT_RET(ret == -1, HCCL_ERROR("[GetQpAttr]errNo[0x%016llx] sal snprintf_s error",
         HCCL_ERROR_CODE(HCCL_E_INTERNAL)), HCCL_E_INTERNAL);
     std::string logInfo = "create hccl transport:" + std::string(stackLogBuffer);
     for (u32 i = 0; i < combineQpHandles_.size(); i++){
@@ -253,7 +253,7 @@ HcclResult TransportIbverbs::GetQpAttr()
             HCCL_USER_CRITICAL_LOG("%s, rdma qpn[%u], rdma qp sport[%u], rdma TC[%u], rdma SL[%u]",
                 logInfo.c_str(), attr.qpn, attr.udpSport, machinePara_.tc, machinePara_.sl);
         }
-    } 
+    }
     return HCCL_SUCCESS;
 }
 
@@ -542,9 +542,9 @@ HcclResult TransportIbverbs::GetNicHandle()
     CHK_RET(NetworkManager::GetInstance(machinePara_.deviceLogicId).GetRaResourceInfo(raResourceInfo));
     std::map<HcclIpAddress, IpSocket> &tmpSocketMap = machinePara_.nicDeploy == NICDeployment::NIC_DEPLOYMENT_DEVICE ?
         raResourceInfo.nicSocketMap : raResourceInfo.hostNetSocketMap;
- 
+
     HcclIpAddress localIpAddr = machinePara_.localIpAddr;
- 
+
     // 获取 nicRdmaHandle
     auto itSocket = tmpSocketMap.find(localIpAddr);
     if (itSocket == tmpSocketMap.end()) {
@@ -552,10 +552,10 @@ HcclResult TransportIbverbs::GetNicHandle()
             "local ip[%s]", tmpSocketMap.size(), localIpAddr.GetReadableAddress());
         return HCCL_E_PARA;
     }
- 
+
     nicRdmaHandle_ = itSocket->second.nicRdmaHandle;
     CHK_PTR_NULL(nicRdmaHandle_);
- 
+
     return HCCL_SUCCESS;
 }
 
@@ -623,7 +623,7 @@ HcclResult TransportIbverbs::CreateOneQp(
         ret = hrtRaQpCreateWithAttrs(nicRdmaHandle_, &attrs, qpHandle);
         qpInfo = qpInfo + std::string(",sendCqDepth:") + std::to_string(attrs.cqAttr.sendCqDepth);
     }
-    
+
     RPT_ENV_ERR(ret != 0 || (qpHandle == nullptr), "EI0007", vector<string>({ "resource_type", "resource_info" }),
         vector<string>({ "qp", qpInfo }));
 
@@ -1026,7 +1026,7 @@ bool TransportIbverbs::IsSupportTransportWithReduce()
     }
 }
 
-// 910A1 不支持write with notify; 
+// 910A1 不支持write with notify;
 // 910A2 由于PCIE through 和 write with notify 冲突，所以不支持write with Notify;
 bool TransportIbverbs::IsSupportRdmaNotify()
 {
@@ -1048,7 +1048,7 @@ HcclResult TransportIbverbs::GetIndOpRemoteMemDetails(MemDetails** remoteMem, ui
 {
     CHK_PRT_RET(remoteMem == nullptr, HCCL_ERROR("[%s] remoteMem is nullptr", __func__), HCCL_E_PARA);
     CHK_PRT_RET(memNum == nullptr, HCCL_ERROR("[%s] memNum is nullptr", __func__), HCCL_E_PARA);
- 
+
     *remoteMem = nullptr;
     *memNum = 0;
     uint32_t memCount;
@@ -1085,7 +1085,7 @@ HcclResult TransportIbverbs::GetIndOpRemoteMemDetails(MemDetails** remoteMem, ui
     }
     *memNum = memCount;
     *remoteMem = remoteMemDetails;
- 
+
     HCCL_DEBUG("[%s] Successfully returned %u remote memory regions", __func__, index);
     return HCCL_SUCCESS;
 }
@@ -1211,7 +1211,7 @@ HcclResult TransportIbverbs::TxSendDataAndNotify(std::vector<WqeInfo> &wqeInfoVe
             maxLength = wqeInfoVec[i].wqeData.memList.len;
         }
     }
-    
+
     u32 actualMultiQpNum = GetActualQpNum(maxLength);
 
     HCCL_DEBUG("[TransportIbverbs][TxSendDataAndNotify] UseMultiQp[%d] MultiQpNum[%u] actualMultiQpNum[%u] maxLength[%u]",
@@ -1937,7 +1937,7 @@ HcclResult TransportIbverbs::RegUserMem(MemType memType, u8*& exchangeDataPtr, u
     return HCCL_SUCCESS;
 }
 
-HcclResult TransportIbverbs::RegCustomUserMemWithMsg(void *addr, u64 size, 
+HcclResult TransportIbverbs::RegCustomUserMemWithMsg(void *addr, u64 size,
     MemMsg &memMsg, u8 *&exchangeDataPtr, u64 &exchangeDataBlankSize)
 {
     struct MrInfoT mrInfo = {nullptr};
@@ -1973,7 +1973,7 @@ HcclResult TransportIbverbs::RegCustomUserMemWithMsg(void *addr, u64 size,
 HcclResult TransportIbverbs::RegCustomUserMem(u8 *&exchangeDataPtr, u64 &exchangeDataBlankSize)
 {
     u32 deviceMemNum = machinePara_.userDeviceMem.size();
-    s32 sRet = memcpy_s(exchangeDataPtr, sizeof(u32), 
+    s32 sRet = memcpy_s(exchangeDataPtr, sizeof(u32),
         reinterpret_cast<void*>(&deviceMemNum), sizeof(u32));
     CHK_PRT_RET(sRet != EOK,
         HCCL_ERROR("[Set][LocalMem]errNo[0x%016llx] memory copy failed. errorno[%d], params:dstMaxSize[%zu],cnt[%zu]",
@@ -1983,13 +1983,13 @@ HcclResult TransportIbverbs::RegCustomUserMem(u8 *&exchangeDataPtr, u64 &exchang
 
     userDeviceMemMsg_.resize(deviceMemNum);
     for (u32 i = 0; i < deviceMemNum; i++) {
-        RegCustomUserMemWithMsg(machinePara_.userDeviceMem[i].ptr(), 
-            machinePara_.userDeviceMem[i].size(), userDeviceMemMsg_[i], 
+        RegCustomUserMemWithMsg(machinePara_.userDeviceMem[i].ptr(),
+            machinePara_.userDeviceMem[i].size(), userDeviceMemMsg_[i],
             exchangeDataPtr, exchangeDataBlankSize);
     }
-    
+
     u32 hostMemNum = machinePara_.userHostMem.size();
-    sRet = memcpy_s(exchangeDataPtr, sizeof(u32), 
+    sRet = memcpy_s(exchangeDataPtr, sizeof(u32),
         reinterpret_cast<void*>(&hostMemNum), sizeof(u32));
     CHK_PRT_RET(sRet != EOK,
         HCCL_ERROR("[Set][LocalMem]errNo[0x%016llx] memory copy failed. errorno[%d], params:dstMaxSize[%zu],cnt[%zu]",
@@ -1999,8 +1999,8 @@ HcclResult TransportIbverbs::RegCustomUserMem(u8 *&exchangeDataPtr, u64 &exchang
 
     userHostMemMsg_.resize(hostMemNum);
     for (u32 i = 0; i < hostMemNum; i++) {
-        RegCustomUserMemWithMsg(machinePara_.userHostMem[i].ptr(), 
-            machinePara_.userHostMem[i].size(), userHostMemMsg_[i], 
+        RegCustomUserMemWithMsg(machinePara_.userHostMem[i].ptr(),
+            machinePara_.userHostMem[i].size(), userHostMemMsg_[i],
             exchangeDataPtr, exchangeDataBlankSize);
     }
 
@@ -2134,11 +2134,11 @@ HcclResult TransportIbverbs::CreateNotifyValueBuffer()
     mrInfo.addr = notifyValueMem_[machinePara_.deviceLogicId].ptr();
     mrInfo.size = notifySize_;
     mrInfo.access = access_;
-    
+
     for (u32 i = 0; i < combineQpHandles_.size(); i++) {
         CHK_RET(HrtRaMrReg(combineQpHandles_[i].qpHandle, &mrInfo));
     }
-    
+
     if (UseMultiQp()) {
         for (u32 i = 0; i < qpsPerConnection_; i++) {
             CHK_RET(HrtRaMrReg(multiCombineQpHandles_[i].qpHandle, &mrInfo));
@@ -2474,7 +2474,7 @@ HcclResult TransportIbverbs::GetAiRMAQueueInfo(std::vector<HcclAiRMAQueueInfo> &
     CopyAiWQInfo(aiRMAQueueInfo[0].rq, combineAiQpInfo_.aiQpInfo.dataPlaneInfo.rq, DBMode::SW_DB, sl);
     CopyAiCQInfo(aiRMAQueueInfo[0].scq, combineAiQpInfo_.aiQpInfo.dataPlaneInfo.scq, DBMode::SW_DB);
     CopyAiCQInfo(aiRMAQueueInfo[0].rcq, combineAiQpInfo_.aiQpInfo.dataPlaneInfo.rcq, DBMode::SW_DB);
- 
+
     // 预留多QP的能力; 当前主要是单QP场景
     for (u32 i = 1, j = 0; i < aiRMAQueueInfo.size(); i++, j++) {
         CopyAiWQInfo(aiRMAQueueInfo[i].sq, combineAiQpInfos_[j].aiQpInfo.dataPlaneInfo.sq, DBMode::HW_DB, sl);
@@ -2512,7 +2512,7 @@ HcclResult TransportIbverbs::WriteCommon(const void *remoteAddr, const void *loc
             maxLength = wqeInfoVec[i].wqeData.memList.len;
         }
     }
-    
+
     u32 actualMultiQpNum = GetActualQpNum(maxLength);
 
     HCCL_DEBUG("[TransportIbverbs][TxSendDataAndNotify] UseMultiQp[%d] MultiQpNum[%u] actualMultiQpNum[%u] maxLength[%u]",

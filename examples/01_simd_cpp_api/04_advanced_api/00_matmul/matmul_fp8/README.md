@@ -25,10 +25,10 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
 
 ## 样例描述
 
-- 样例功能：  
+- 样例功能：
   对输入的A、B矩阵做矩阵乘和加bias偏置，实现hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例。其中，输入数据类型为hifloat8时，A、B数据类型必须一致。
 
-- 样例规格：  
+- 样例规格：
   本样例中：M = 428, N = 479, K = 158。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
@@ -39,7 +39,7 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_fp8_custom</td></tr>
   </table>
-- 样例实现： 
+- 样例实现：
   - Kernel关键步骤
     - 创建Matmul对象，数据类型按照SCENARIO_NUM设置为hifloat8或各种fp8数据类型。
       ```cpp
@@ -62,13 +62,13 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
         AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, cType>,
         AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, biasType>, mmCfg> matmulObj;
       ```
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

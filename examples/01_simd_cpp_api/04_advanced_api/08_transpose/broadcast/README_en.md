@@ -26,7 +26,7 @@ This example uses the Broadcast high-level API to implement data broadcasting, w
 
 ## Example Description
 
-- Example function:  
+- Example function:
   Perform broadcast computation on the input tensor.
 
 - Example specifications:
@@ -104,23 +104,23 @@ This example uses the Broadcast high-level API to implement data broadcasting, w
   <tr><td align="center">1</td><td align="center">[96, 1]</td><td align="center">[96, 96]</td><td align="center">1</td><td align="center">Broadcast along the second dimension, expanding 1 to 96</td></tr>
   </table>
 
-- Example implementation:  
+- Example implementation:
   This example implements two broadcast scenarios: broadcasting from [1, 48] to [96, 48] and from [96, 1] to [96, 96].
 
-  - Kernel implementation  
+  - Kernel implementation
     Use the Broadcast high-level API to complete broadcasting, extending the input tensor along the specified axis to the target shape.
 
-  - Tiling implementation  
+  - Tiling implementation
     The tiling implementation process for the broadcast example is as follows: first obtain the 2D shapes of input and output, then populate TilingData with the broadcast axis and the dimensions of the input/output tensors.
 
-  - Invocation implementation  
+  - Invocation implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run  
+## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -140,7 +140,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-  
+
   For example:
 
   ```bash

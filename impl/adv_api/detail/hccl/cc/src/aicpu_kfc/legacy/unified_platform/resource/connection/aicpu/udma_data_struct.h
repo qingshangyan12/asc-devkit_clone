@@ -9,7 +9,7 @@
 */
 #ifndef HCCLV2_AICPU_WQEMGR_WQE_H
 #define HCCLV2_AICPU_WQEMGR_WQE_H
- 
+
 #include <string>
 #include "string_util.h"
 #include "hccl/base.h"

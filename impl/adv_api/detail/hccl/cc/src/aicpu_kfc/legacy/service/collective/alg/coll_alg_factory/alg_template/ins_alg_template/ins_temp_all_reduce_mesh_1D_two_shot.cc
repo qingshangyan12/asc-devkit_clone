@@ -197,13 +197,13 @@ HcclResult InsTempAllReduceMesh1DTwoShot::RunAllReduceScatter(const RankSliceInf
                 HcclResult::HCCL_E_INTERNAL);
         }
     }
-   
+
     return HcclResult::HCCL_SUCCESS;
 }
 
 /*
  * Desc: 1D Mesh twoshot AllReduce: Allgather
- * param: sliceInfoVec: 每个rank的数据切片信息 
+ * param: sliceInfoVec: 每个rank的数据切片信息
  * param: tempLinks: 当前rank通信链接信息
  * param: tempInsQues: 通信队列
  * param: tempFuncs: 辅助信息包括userIn/OutSlices, opMode等标记信息
@@ -212,7 +212,7 @@ HcclResult InsTempAllReduceMesh1DTwoShot::RunAllReduceScatter(const RankSliceInf
 HcclResult InsTempAllReduceMesh1DTwoShot::RunAllReduceAllgather(const RankSliceInfo &sliceInfoVec, const ResLinks &tempLinks,
     std::vector<InsQuePtr> &tempInsQues, const TemplateDataParams &tempAlgParams)
 {
-    u64 outBuffBaseOff = tempAlgParams.buffInfo.outBuffBaseOff; 
+    u64 outBuffBaseOff = tempAlgParams.buffInfo.outBuffBaseOff;
     // sync:前同步
     PreSyncInterQueues(tempInsQues);
     u32 MyAlgRank = tempVirtRankMap_[myRank_];

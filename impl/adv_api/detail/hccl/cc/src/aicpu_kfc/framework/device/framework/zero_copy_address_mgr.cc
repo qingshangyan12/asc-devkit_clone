@@ -159,7 +159,7 @@ HcclResult ZeroCopyAddressMgr::ActivateCommMemoryAddr(void *startPtr, u64 length
 {
     CHK_PRT_RET((startPtr == nullptr || length == 0),
         HCCL_ERROR("[ZeroCopyAddressMgr][ActivateCommMemoryAddr] Invalid params"), HCCL_E_PARA);
-    
+
     AddressRange range(startPtr, length);
 
     std::lock_guard<std::mutex> guard(lock_);
@@ -167,7 +167,7 @@ HcclResult ZeroCopyAddressMgr::ActivateCommMemoryAddr(void *startPtr, u64 length
     CHK_PRT_RET((it != validAddressRanges_.end()),
         HCCL_ERROR("[ZeroCopyAddressMgr][ActivateCommMemoryAddr] overlap address exist:[0x%lx, 0x%lx) valid:[0x%lx, 0x%lx)",
         it->start, it->end, range.start, range.end), HCCL_E_PARA);
-    
+
     validAddressRanges_.insert(range);
 
     ZeroCopyRingBufferItem item;
@@ -184,7 +184,7 @@ HcclResult ZeroCopyAddressMgr::DeactivateCommMemoryAddr(void *startPtr)
 {
     CHK_PRT_RET((startPtr == nullptr),
         HCCL_ERROR("[ZeroCopyAddressMgr][DeactivateCommMemoryAddr] Invalid params"), HCCL_E_PARA);
-    
+
     // 我们构造一个最小的交叠区间去做比较
     u64 litteLen = 1;
     AddressRange range(startPtr, litteLen);
@@ -193,7 +193,7 @@ HcclResult ZeroCopyAddressMgr::DeactivateCommMemoryAddr(void *startPtr)
     auto it = validAddressRanges_.find(range);
     CHK_PRT_RET((it == validAddressRanges_.end() || it->start != range.start),
         HCCL_ERROR("[ZeroCopyAddressMgr][DeactivateCommMemoryAddr] address %p is not activate", startPtr), HCCL_E_PARA);
-    
+
     HCCL_INFO("[ZeroCopyAddressMgr][DeactivateCommMemoryAddr] deactivate address [0x%lx, 0x%lx) success", it->start, it->end);
     validAddressRanges_.erase(it);
 
@@ -310,7 +310,7 @@ bool ZeroCopyAddressMgr::IsInSetAddressRange(u32 devicePhyId, void *startPtr, u6
         HCCL_INFO("[ZeroCopyAddressMgr][IsInSetAddressRange] exceed reserve range");
         return false;
     }
-    
+
     return true;
 }
 

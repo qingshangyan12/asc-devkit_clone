@@ -30,7 +30,7 @@ public:
     using Iterator = BaseConstIterator<vector, unique_ptr<E>>;
 
     using UnConstIterator = BaseIterator<vector, unique_ptr<E>>;
- 
+
     using UnConstSlaveIterator = BaseIterator<vector, shared_ptr<SubQueue>>;
 
     inline u32 GetId() const
@@ -82,7 +82,7 @@ public:
     {
         return UnConstSlaveIterator(slaves);
     };
- 
+
     UnConstIterator UnConstIter()
     {
         return UnConstIterator(elements);

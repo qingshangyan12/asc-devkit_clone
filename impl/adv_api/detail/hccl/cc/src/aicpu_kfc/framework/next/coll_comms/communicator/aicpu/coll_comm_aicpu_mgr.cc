@@ -20,7 +20,7 @@ HcclResult CollCommAicpuMgr::AcquireCollCommAicpu()
     return HCCL_SUCCESS;
 }
 
-HcclResult CollCommAicpuMgr::InitAicpuIndOp(CommAicpuParam *commAicpuParam) 
+HcclResult CollCommAicpuMgr::InitAicpuIndOp(CommAicpuParam *commAicpuParam)
 {
     CHK_PTR_NULL(collCommAicpu_);
     return collCommAicpu_->InitAicpuIndOp(commAicpuParam);
@@ -63,7 +63,7 @@ bool CollCommAicpuMgr::IsUsed()
     return isUsed_;
 }
 
-void CollCommAicpuMgr::SetUsed(bool used) 
+void CollCommAicpuMgr::SetUsed(bool used)
 {
     ReadWriteLock rwlock(isUsedMutex_);
     rwlock.writeLock();

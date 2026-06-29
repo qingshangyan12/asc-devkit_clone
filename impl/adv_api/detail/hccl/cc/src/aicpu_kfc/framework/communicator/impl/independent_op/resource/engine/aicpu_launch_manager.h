@@ -89,7 +89,7 @@ public:
         std::unique_ptr<ThreadHandle[]> &aicpuHandle, aclrtBinHandle binHandle);
     static HcclResult SupplementNotifyKernelLaunch(std::vector<std::shared_ptr<Thread>> &newThreads,
         const std::string &commId, std::unique_ptr<ThreadHandle[]> &aicpuHandle, aclrtBinHandle binHandle);
-    static HcclResult ThreadKernelLaunchDestroy(ThreadHandle *threadHandles, uint32_t listNum, 
+    static HcclResult ThreadKernelLaunchDestroy(ThreadHandle *threadHandles, uint32_t listNum,
         aclrtBinHandle binHandle);
     static HcclResult NotifyKernelLaunchAlloc(std::vector<std::unique_ptr<LocalNotify>> &newNotifys,
         const std::string &commId, std::unique_ptr<NotifyHandle[]> &hostHandle, aclrtBinHandle binCustomHandle);

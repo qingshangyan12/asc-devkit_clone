@@ -105,7 +105,7 @@ HcclResult HcclTraceInfo::SaveTraceInfo(std::string &logInfo, AtraceOption optio
     if (option == AtraceOption::Opbasekey && hcclTraceType_ == HcclTraceType::HostTraceType) {
         index++;
     }
-    
+
     return HCCL_SUCCESS;
 }
 

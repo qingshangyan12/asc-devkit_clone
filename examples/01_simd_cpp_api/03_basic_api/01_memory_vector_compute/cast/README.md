@@ -27,9 +27,9 @@
 
 ## 样例描述
 
-- 样例功能：  
+- 样例功能：
   CastCustom样例根据源操作数和目的操作数Tensor的数据类型进行精度转换。
-- 样例规格：  
+- 样例规格：
   <table>
   <caption>表1：样例规格</caption>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center"> cast </td></tr>
@@ -43,7 +43,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">cast_custom</td></tr>
   </table>
 
-- 场景说明：  
+- 场景说明：
   <table>
   <caption>表2：SCENARIO_NUM参数说明</caption>
   <tr><td align="center">SCENARIO_NUM</td><td align="center">输入类型</td><td align="center">输出类型</td><td align="center">说明</td></tr>
@@ -51,22 +51,22 @@
   <tr><td align="center">1</td><td align="center">half</td><td align="center">int32_t</td><td align="center">half转int32_t</td></tr>
   </table>
 
-- 样例实现：  
+- 样例实现：
   本样例中实现的是固定shape为输入x[1, 512]，输出y[1, 512]的CastCustom样例，支持half到int32_t和half到int4b_t两种转换场景。
 
-  - Kernel实现  
+  - Kernel实现
     - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer）
     - 调用Cast接口，进行数据类型转换（half转int32_t或half转int4b_t）
     - 调用DataCopy基础API，将结果从UB（Unified Buffer）搬运至GM（Global Memory）
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
-## 编译运行  
+## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -87,7 +87,7 @@
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
-  
+
   示例如：
 
   ```bash

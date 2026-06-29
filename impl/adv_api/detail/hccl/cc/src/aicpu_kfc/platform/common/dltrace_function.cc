@@ -31,10 +31,10 @@ DlTraceFunction::~DlTraceFunction()
     }
 }
 
-HcclResult DlTraceFunction::DlUTraceFunctionInterInit() { 
+HcclResult DlTraceFunction::DlUTraceFunctionInterInit() {
     dlUtraceDestroy = (void(*)(TraHandle handle))HcclDlsym(handle_, "UtraceDestroy");
     CHK_SMART_PTR_NULL(dlUtraceDestroy);
-    dlUtraceSubmit = (HcclResult(*)(TraHandle handle, const void *buffer, u32 bufSize))HcclDlsym(handle_, 
+    dlUtraceSubmit = (HcclResult(*)(TraHandle handle, const void *buffer, u32 bufSize))HcclDlsym(handle_,
         "UtraceSubmit");
     CHK_SMART_PTR_NULL(dlUtraceSubmit);
     dlUtraceCreateWithAttr = (TraHandle(*)(int tracerType, const char *objName, const TraceAttr *attr))HcclDlsym(
@@ -47,7 +47,7 @@ HcclResult DlTraceFunction::DlUTraceFunctionInterInit() {
     CHK_SMART_PTR_NULL(dlUtraceSave);
     return HCCL_SUCCESS;
 }
- 
+
 HcclResult DlTraceFunction::DlATraceFunctionInterInit() {
     dlAtraceDestroy = (void(*)(TraHandle handle))HcclDlsym(handle_, "AtraceDestroy");
     CHK_SMART_PTR_NULL(dlAtraceDestroy);
@@ -73,7 +73,7 @@ HcclResult DlTraceFunction::DlTraceFunctionInit()
         if (handle_ == nullptr) {
             HCCL_WARNING("dlopen [%s] failed, %s", "libascend_trace.so",\
             (errMsg_atrace == nullptr) ? "please check the file exist or permission denied." : errMsg_atrace);
- 
+
             handle_ = HcclDlopen("libutrace.so", RTLD_NOW);
             const char* errMsg_utrace = dlerror();
             CHK_PRT_RET(handle_ == nullptr, HCCL_ERROR("dlopen [%s] failed, %s", "libutrace.so",\

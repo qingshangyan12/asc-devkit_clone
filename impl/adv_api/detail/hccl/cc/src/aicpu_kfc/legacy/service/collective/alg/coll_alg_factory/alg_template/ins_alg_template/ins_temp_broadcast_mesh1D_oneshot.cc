@@ -38,7 +38,7 @@ HcclResult InsTempBroadcastMesh1DOneShot::CalcRes(AlgTempResReq &tempResReq)
 }
 
 u32 InsTempBroadcastMesh1DOneShot::CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType)
-{   
+{
     (void) inBuffType;
     (void) outBuffType;
     if (op_.opMode == OpMode::OPBASE) {
@@ -54,7 +54,7 @@ HcclResult InsTempBroadcastMesh1DOneShot::GenExtIns(const TempFuncs &tempFuncs, 
     if (tempVTopo_[0].size() == 1) {
         return HcclResult::HCCL_SUCCESS;
     }
-    
+
     HCCL_INFO("[InsTempBroadcastMesh1DOneShot][Run] Broadcast1DMesh start: rank[%d] end", myRank_);
     opMode_              = tempFuncs.opMode;
     queNum_ = tempVTopo_[0].size() - 1;

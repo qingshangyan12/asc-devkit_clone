@@ -27,10 +27,10 @@
 
 ## 样例描述
 
-- 样例功能：  
+- 样例功能：
   本样例展示了使用Brcb API实现广播复制功能，每次从输入Tensor中取8个元素，分别填充到输出Tensor的8个DataBlock（每个DataBlock为32字节）中，每个元素对应一个DataBlock。Brcb API适用于需要将少量数据广播到大量位置的场景，例如常量填充、掩码生成等。通过repeatTime参数控制迭代次数，通过dstBlkStride和dstRepStride参数控制DataBlock间的地址步长。所用API详细介绍请参考[Brcb API文档](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/API/ascendcopapi/atlasascendc_api_07_0089.html)。
 
-- 样例规格：  
+- 样例规格：
   <table border="2" align="center">
   <caption>表1：样例输入输出规格</caption>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Brcb</td></tr>
@@ -43,28 +43,28 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">brcb_custom</td></tr>
   </table>
 
-- 样例实现：  
+- 样例实现：
   本样例中实现的是固定shape为输入x[1,16]，输出y[1,256]的Brcb广播复制样例。
 
-  - Kernel实现  
+  - Kernel实现
     - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer）
     - 调用Brcb接口，执行广播复制操作，将输入Tensor的数据复制填充到输出Tensor的多个DataBlock中
     - 调用DataCopy基础API，将数据从UB（Unified Buffer）搬运到GM（Global Memory）
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
-## 编译运行  
+## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
-    
+
 - 样例执行
 
   在本样例目录下执行如下命令。
@@ -81,7 +81,7 @@
   ```
 
   使用CPU调试或NPU仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
-  
+
   示例如下：
   ```bash
   cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201;make -j; # CPU调试模式

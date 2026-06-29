@@ -85,7 +85,7 @@ void UbConnLite::FillCommSqeReduceInfo(UdmaSqeCommon &sqeComm, ReduceOp reduceOp
     } else {
         THROW<InvalidParamsException>(StringFormat("%s reduceOp[%s] or type[%s] is not supported.", __func__, reduceOp.Describe().c_str(), dataType.Describe().c_str()));
     }
-    
+
     // udf字段是否有效
     sqeComm.udfFlag = 1;
 
@@ -118,7 +118,7 @@ void UbConnLite::ProcessSlices(const RmaBufSliceLite &loc, const RmtRmaBufSliceL
                     __func__, sliceIdx, offset, locAddr, rmtAddr, sliceSize);
 
         RmaBufSliceLite locSlice(locAddr, sliceSize, 0, loc.GetTokenId());
-        
+
         RmtRmaBufSliceLite rmtSlice(rmtAddr, sliceSize, 0, rmt.GetTokenId(),
                                     rmt.GetTokenValue());
         // 当前是最后一片，且没有lastSlice时，启用cqe
@@ -233,12 +233,12 @@ void UbConnLite::ProcessOneWqeWithNotify(const RmaBufSliceLite &loc, const RmtRm
     HCCL_INFO("[UbConnLite::%s] start, locSize[%u], opCode[%u]", __func__, loc.GetSize(), opCode);
 
     // sqOffset是用于计算Ubjetty中下wqe位置的偏移，小于sqDepth
-    u32 sqOffset = pi % sqDepth_; 
+    u32 sqOffset = pi % sqDepth_;
     if (sqOffset < sqDepth_ && (sqOffset + PI_NUM_TWO) >= sqDepth_) {
         piDetourCount++;
     }
     // pi维护用于传入DB Send用于Rtsq 敲door bell，要求u16数据结构并且自然增长
-    pi = pi + PI_NUM_TWO; 
+    pi = pi + PI_NUM_TWO;
     // 填充sqe
     sqe->comm.inlineEn = 0;
     FillCommSqe(&(sqe->comm), rmt, cfg, WRITE_WITH_NOTIFY_OPCODE);
@@ -583,7 +583,7 @@ std::string UbConnLite::Describe()
     return StringFormat("UbConnLite[dieId=%u, funcId=%u, jettyId=%u, dbAddr=0x%llx, sqVa=0x%llx, sqDepth=%u, "
                         "jfcPollMode=%u, tpn=%u, dwqeCacheLocked=%d, locEid=%s, rmtEid=%s,jettyPi=%u, jettyCi=%u]",
                         dieId_, funcId_, jettyId_, dbAddr_, sqVa_, sqDepth_, jfcPollMode_, tpn_, dwqeCacheLocked_,
-                        Bytes2hex(locEid_.raw, sizeof(locEid_.raw)).c_str(), Bytes2hex(rmtEid_.raw, sizeof(rmtEid_.raw)).c_str(), 
+                        Bytes2hex(locEid_.raw, sizeof(locEid_.raw)).c_str(), Bytes2hex(rmtEid_.raw, sizeof(rmtEid_.raw)).c_str(),
                         pi, ci);
 }
 
@@ -635,7 +635,7 @@ UbConnLiteParam::UbConnLiteParam(std::vector<char> &uniqueId)
     static auto lastPrintTime = std::chrono::steady_clock::now();
     const auto now = std::chrono::steady_clock::now();
     const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastPrintTime).count();
-    if (UNLIKELY(duration >= MAX_LOG_TIMEOUT_MS)) { 
+    if (UNLIKELY(duration >= MAX_LOG_TIMEOUT_MS)) {
         HCCL_INFO("%s", Describe().c_str());
         lastPrintTime = now;
     }

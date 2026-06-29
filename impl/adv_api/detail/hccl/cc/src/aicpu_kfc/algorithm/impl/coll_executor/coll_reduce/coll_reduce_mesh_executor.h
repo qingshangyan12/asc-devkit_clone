@@ -30,7 +30,7 @@ private:
 
     /* *************** 算法编排 *************** */
     bool meshSinglePlane_ = false;
-    HcclResult KernelRun(const OpParam &param, ExecMem &execMem) override;    
+    HcclResult KernelRun(const OpParam &param, ExecMem &execMem) override;
 };
 
 } // namespace hccl

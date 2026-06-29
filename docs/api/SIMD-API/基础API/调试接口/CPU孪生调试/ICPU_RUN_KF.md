@@ -106,7 +106,7 @@
 
 2.  CPU侧运行验证。完成算子核函数CPU侧运行验证的步骤如下：
 
-    **图1**  CPU侧运行验证步骤<a name="fig13576112114442"></a>  
+    **图1**  CPU侧运行验证步骤<a name="fig13576112114442"></a>
     ![](../../../../figures/CPU侧运行验证步骤.png "CPU侧运行验证步骤")
 
     ```cpp
@@ -115,12 +115,12 @@
         uint32_t numBlocks = 8;
         size_t inputByteSize = 8 * 2048 * sizeof(uint16_t);
         size_t outputByteSize = 8 * 2048 * sizeof(uint16_t);
-    
+
        // 使用GmAlloc分配共享内存，并进行数据初始化。
         uint8_t* x = (uint8_t*)AscendC::GmAlloc(inputByteSize);
         uint8_t* y = (uint8_t*)AscendC::GmAlloc(inputByteSize);
         uint8_t* z = (uint8_t*)AscendC::GmAlloc(outputByteSize);
-    
+
         ReadFile("./input/input_x.bin", inputByteSize, x, inputByteSize);
         ReadFile("./input/input_y.bin", inputByteSize, y, inputByteSize);
         // 矢量算子需要设置内核模式为AIV模式。

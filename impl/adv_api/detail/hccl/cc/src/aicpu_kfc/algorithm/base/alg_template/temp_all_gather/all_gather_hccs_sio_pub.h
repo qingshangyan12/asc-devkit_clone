@@ -7,12 +7,12 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
- 
+
 #ifndef ALL_GATHER_HCCS_SIO_PUB_H
 #define ALL_GATHER_HCCS_SIO_PUB_H
- 
+
 #include "alg_template_base_pub.h"
- 
+
 namespace hccl {
 class AllGatherHccsSio : public AlgTemplateBase {
 public:
@@ -31,7 +31,7 @@ private:
     HcclResult WaitSubStreamFinish();
     HcclResult RunInterDie(const u32 dieRankId, const std::vector<LINK> &links, const u32 srcDMAMemSliceId);
     HcclResult RunInterDieOpBase(const u32 dieRankId, const std::vector<LINK> &links, const u32 srcDMAMemSliceId);
- 
+
     DeviceMem inputMem_;
     DeviceMem outputMem_;
     SubCommInfo outerCommInfoHccs_;
@@ -51,5 +51,5 @@ private:
     u32 notifyIdx_ = 0; // 新增notify资源索引
 };
 } // namespace hccl
- 
+
 #endif /* ALL_GATHER_HCCS_SIO_PUB_H */

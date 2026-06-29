@@ -61,7 +61,7 @@ inline bool operator==(const CommAddr& lhs, const CommAddr& rhs) {
 
         case COMM_ADDR_TYPE_RESERVED:
         default:
-            return true; 
+            return true;
     }
 }
 

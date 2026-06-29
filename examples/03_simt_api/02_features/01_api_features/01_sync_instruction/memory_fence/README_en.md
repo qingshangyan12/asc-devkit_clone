@@ -139,7 +139,7 @@ In the above flow, multiple thread blocks need to read and write the same global
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and execute the operator.
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

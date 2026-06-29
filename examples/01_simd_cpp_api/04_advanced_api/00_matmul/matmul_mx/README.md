@@ -2,7 +2,7 @@
 
 ## 概述
 
-在MXFP4/MXFP8数据格式下的带有量化系数的矩阵乘法，即MxMatmul样例。计算公式为：C = (scaleA ⊗ A) * (scaleB ⊗ B) + Bias。“⊗”表示广播乘法。  
+在MXFP4/MXFP8数据格式下的带有量化系数的矩阵乘法，即MxMatmul样例。计算公式为：C = (scaleA ⊗ A) * (scaleB ⊗ B) + Bias。“⊗”表示广播乘法。
 当K整除32向上取整的值为奇数时，scaleK的取值需要在该值的基础上向上对齐为偶数，scaleA和scaleB矩阵也要做对应的扩展。
 
 ## 本样例支持的产品及CANN软件版本
@@ -26,10 +26,10 @@
 
 ## 样例描述
 
-- 样例功能：  
+- 样例功能：
   MatmulMxNormEvenCustom样例调用Matmul API计算时，左量化系数矩阵与左矩阵乘积，右量化系数矩阵与右矩阵乘积，对两个乘积的结果做矩阵乘法。
 
-- 样例规格：  
+- 样例规格：
   本样例中：M = 32，N = 128，K = 128，scaleK = 4。其中scaleK为K整除32的结果4。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">MatmulMxNormEvenCustom</td></tr>
@@ -43,7 +43,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmulMxNormEvenCustom</td></tr>
   </table>
 
-- 样例实现： 
+- 样例实现：
   - Kernel关键步骤
     - 创建Matmul对象：使用MatmulTypeWithScale使能scaleA、scaleB。
       ```cpp
@@ -74,13 +74,13 @@
         cubeTiling.SetScaleBType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, false);
         ```
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

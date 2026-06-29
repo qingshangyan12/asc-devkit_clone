@@ -160,7 +160,7 @@ public:
         uint8_t loadAL1Flag = true;
         uint8_t loadBL1Flag = true;
         uint8_t loadAL0Flag = true;
-        uint8_t loadBL0Flag = true; 
+        uint8_t loadBL0Flag = true;
         uint8_t kAL1fullload = false;
         uint8_t kBL1fullload = false;
         uint8_t biasFullLoadFlag = false;
@@ -169,7 +169,7 @@ public:
         uint8_t freeAL1TensorFlag = false;
         uint8_t freeBL1TensorFlag = false;
         uint8_t isGroupOptDimTail = false;
-        
+
         uint64_t kAL1Iter = 0;
         uint64_t kBL1Iter = 0;
         uint64_t mAL1Iter = 0;
@@ -177,8 +177,8 @@ public:
         uint64_t dOutIter = 0;
         uint64_t kIter = 0;
         uint64_t kAL0Iter = 0;
-        uint64_t kBL0Iter = 0;  
-        uint64_t mAL0Iter = 0;  
+        uint64_t kBL0Iter = 0;
+        uint64_t mAL0Iter = 0;
         uint64_t nBL0Iter = 0;
         uint64_t groupOptIter = 0;
 

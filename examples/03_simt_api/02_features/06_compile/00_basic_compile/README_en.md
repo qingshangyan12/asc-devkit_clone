@@ -92,7 +92,7 @@ set(CMAKE_ASC_ENABLE_SIMT ON)
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and execute the example.
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
 
   ```bash

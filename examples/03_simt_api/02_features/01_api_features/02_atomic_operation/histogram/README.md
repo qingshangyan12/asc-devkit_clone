@@ -25,7 +25,7 @@
 
 ## 样例描述
 
-- 样例功能：  
+- 样例功能：
   Histogram样例对固定大小的输入字节流进行统计，统计各个字节数值（0-255）出现的频率。输入数据的shape为[294912]。
 
 - 样例规格：
@@ -72,7 +72,7 @@ Warp对局部直方图中每个桶的计数是在UB中通过`asc_atomic_add`进�
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
 
   ```bash
@@ -99,7 +99,7 @@ Warp对局部直方图中每个桶的计数是在UB中通过`asc_atomic_add`进�
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
 
   执行结果如下，说明精度对比成功。
-  
+
   ```text
   Running histogram256 on Ascend C SIMT for fixed xxx bytes
   Validation passed

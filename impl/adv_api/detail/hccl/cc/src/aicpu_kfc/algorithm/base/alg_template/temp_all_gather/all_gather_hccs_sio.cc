@@ -9,11 +9,11 @@
 */
 #include "all_gather_hccs_sio.h"
 #include "alg_template_register.h"
- 
+
 namespace hccl {
 AllGatherHccsSio::AllGatherHccsSio(const HcclDispatcher dispatcher) : AlgTemplateBase(dispatcher) {
 }
- 
+
 AllGatherHccsSio::~AllGatherHccsSio() {}
 
 HcclResult AllGatherHccsSio::Prepare(SubCommInfo &outerCommInfoHccs, SubCommInfo &outerCommInfoSio, DeviceMem &usrInMem,
@@ -37,7 +37,7 @@ HcclResult AllGatherHccsSio::Prepare(SubCommInfo &outerCommInfoHccs, SubCommInfo
     totalDataBytes_ = opInfo->count * SIZE_TABLE[dataType_];
     return HCCL_SUCCESS;
 }
- 
+
 // 主流所有从流
 HcclResult AllGatherHccsSio::NotifySubStreamStart()
 {
@@ -48,7 +48,7 @@ HcclResult AllGatherHccsSio::NotifySubStreamStart()
     }
     return HCCL_SUCCESS;
 }
- 
+
 HcclResult AllGatherHccsSio::WaitSubStreamFinish()
 {
     for (u32 streamIndex = 0; streamIndex < meshStreams_.size(); streamIndex++) {
@@ -151,7 +151,7 @@ HcclResult AllGatherHccsSio::RunAsync(const u32 rank, const u32 rankSize, const 
     u32 dieRankId = (rank + 1) % rankSize;
     //数据切分为2
     static u32 HCCL_ALLGATHER_SPLIT_FACTOR = 2;
-    
+
     // dmaMem0部分userin，dmaMem1部分userout
     DeviceMem dmaMem0 = DeviceMem::create(inputMem_.ptr(), dataBytes_);
     DeviceMem dmaMem1 = DeviceMem::create(outputMem_.ptr(), dataBytes_ * intraRankSize_);
@@ -165,7 +165,7 @@ HcclResult AllGatherHccsSio::RunAsync(const u32 rank, const u32 rankSize, const 
         dataBytes_ * intraRankSize_,
         locDieDst.ptr(),
         dataBytes_);
-        
+
     dmaMem_.push_back(dmaMem0);//userin
     dmaMem_.push_back(dmaMem1);//userout
 
@@ -180,9 +180,9 @@ HcclResult AllGatherHccsSio::RunAsync(const u32 rank, const u32 rankSize, const 
 
     // 主流启动从流
     CHK_RET(NotifySubStreamStart());
- 
+
     // step 1 : die间 && device间并行收发
- 
+
     // 数据搬运及后同步
     u32 srcDMAMemSliceId = 0;
 
@@ -227,9 +227,9 @@ HcclResult AllGatherHccsSio::RunAsync(const u32 rank, const u32 rankSize, const 
     CHK_RET(outerCommInfoHccs_.links[dieRankId]->RxDataSignal(meshStreams_[srcDMAMemSliceId]));     // Datawait
     CHK_RET(outerCommInfoSio_.links[dieRankId]->TxDataSignal(meshStreams_[srcDMAMemSliceId + 1]));  // DataRecord
     CHK_RET(outerCommInfoSio_.links[dieRankId]->RxDataSignal(meshStreams_[srcDMAMemSliceId + 1]));  // Datawait
- 
+
     CHK_RET(WaitSubStreamFinish());
- 
+
     HCCL_INFO("[AllGatherHccsSio][RunAsync]AllGatherHccsSio finished groupRankId[%u] ", userRank_);
     return HCCL_SUCCESS;
 }

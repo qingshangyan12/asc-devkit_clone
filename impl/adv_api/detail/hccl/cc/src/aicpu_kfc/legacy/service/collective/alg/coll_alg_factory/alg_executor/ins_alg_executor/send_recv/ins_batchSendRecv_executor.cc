@@ -144,7 +144,7 @@ HcclResult InsBatchSendRecvExecutor<AlgTopoMatch>::GetPairWiseList(HcclSendRecvI
     std::stable_sort(recvDeque_.begin(), recvDeque_.end(), recvCompare);
 
     // 筛选自收发任务
-    while ((!sendDeque_.empty() && sendDeque_.front()->remoteRank == 
+    while ((!sendDeque_.empty() && sendDeque_.front()->remoteRank ==
         static_cast<uint32_t>(myRank_)) &&
         (!recvDeque_.empty() && recvDeque_.front()->remoteRank == static_cast<uint32_t>(myRank_))) {
             sendToSelfDeque_.push_back(sendDeque_.front());
@@ -357,11 +357,11 @@ HcclResult InsBatchSendRecvExecutor<AlgTopoMatch>::GenRecvSlicesMapRank()
     for (const auto& slice : recvDataSilces_) {
         // 获取 remoteRank
         int remoteRank = slice.remoteRank_;
-        
+
         // 将当前 slice 放入对应的 vector 中
         RecvSliceMapByRemoteRank_[remoteRank].emplace_back(slice);
-    } 
-    return HcclResult::HCCL_SUCCESS;  
+    }
+    return HcclResult::HCCL_SUCCESS;
 }
 
 template <typename AlgTopoMatch>

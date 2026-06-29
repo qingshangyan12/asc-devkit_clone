@@ -37,7 +37,7 @@ public:
     // 基于tag 初始设置资源，包含 Stream 资源 和 内存 资源
     HcclResult SetWorkspaceResource(const std::string &tag, void *memPtr,
         u64 &maxSize, std::vector<rtStream_t> &stream);
-    
+
     // 基于 tag 销毁资源，包含 Stream 资源 和 内存 资源
     void DestroyWorkspaceResource(const std::string &tag);
 
@@ -46,10 +46,10 @@ public:
 
     // 基于 tag 批量分配 Stream 资源
     std::vector<Stream> AllocSlaveStreams(const std::string &tag, u32 num);
-    
+
     // 基于 tag 释放 Stream 资源
     HcclResult DestroyStream(const std::string &tag);
-    
+
     // 基于 tag 分配 DeviceMem 资源
     DeviceMem AllocDeviceMem(const std::string &tag, u64 size);
 

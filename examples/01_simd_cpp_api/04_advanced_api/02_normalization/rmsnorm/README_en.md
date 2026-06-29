@@ -26,15 +26,15 @@ This example, based on the kernel direct invocation example project, demonstrate
 
 ## Example Description
 
-- Example function:  
-  Perform RmsNorm normalization on input data with shape [B, S, H]. The computation formula is:    
+- Example function:
+  Perform RmsNorm normalization on input data with shape [B, S, H]. The computation formula is:
   $$
   y_i = RmsNorm(x_i)\\
   y_i=\frac{x_i}{\sqrt{\frac{1}{N}\sum_{i = 1}^{N}x_i^2+\varepsilon}}\times\gamma
   $$
 
 
-- Example specifications:  
+- Example specifications:
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> rmsnorm </td></tr>
 
@@ -49,12 +49,12 @@ This example, based on the kernel direct invocation example project, demonstrate
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">rmsnorm_custom</td></tr>
   </table>
 
-- Example implementation:  
+- Example implementation:
 
   This example does not use basic block mode (isBasicBlock=false). For detailed information, refer to the RmsNorm API documentation.
 
-  - Kernel implementation  
-    The computation logic is:  
+  - Kernel implementation
+    The computation logic is:
     Input data must first be transferred to on-chip storage, then the RmsNorm high-level API is used to complete the rmsnorm computation, obtain the final result, and transfer it to external storage.
 
   - Tiling implementation
@@ -63,20 +63,20 @@ This example, based on the kernel direct invocation example project, demonstrate
     1. After AscendC::GetRmsNormMaxMinTmpSize obtains the maximum and minimum temporary space sizes required by the RmsNorm API, calculate the usage size stackSize based on the mode, then call AscendC::GetRmsNormTilingInfo to obtain the tiling parameters required by the kernel-side API based on the input shape and workspace size.
     2. Encapsulate the tiling parameters into the RmsNormTilingData struct and pass them to the kernel side.
 
-  - Invocation implementation  
+  - Invocation implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run  
+## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
-    
+
 - Run the example
 
   Run the following commands in the example directory.

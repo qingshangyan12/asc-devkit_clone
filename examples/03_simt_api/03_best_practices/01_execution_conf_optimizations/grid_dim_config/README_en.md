@@ -167,7 +167,7 @@ for (uint32_t i = global_idx; i < index_total_length; i += stride) {
 | Approach | Thread Block Count | Task Duration (us) |
 | :--: | :-----: | :---------------: |
 | Single thread multiple data | 32 | 110.540 |
-| **Single thread multiple data** | **64** | **58.583** | 
+| **Single thread multiple data** | **64** | **58.583** |
 | Single thread single data | 1024 | 78.289 |
 
 The figure below intuitively shows the Task Duration trend with thread block count from the table above:

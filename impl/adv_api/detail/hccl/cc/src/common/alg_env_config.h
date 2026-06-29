@@ -39,7 +39,7 @@ struct AlgEnvConfig {
     bool enableEntryLog;
     u32 intraRoceSwitch;    // server内的通信方式 与intraPcieSwitch组合使用，默认为0
     u8 hcclDeterministic;
-    bool aicpuUnfold; 
+    bool aicpuUnfold;
     uint8_t aicpuCacheEnable;
     bool aivMode;
     bool aivOnlyMode;

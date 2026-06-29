@@ -88,7 +88,7 @@ HcclResult CollAllGatherRingZerocopyExecutor::SemiRingAllGather(
     const u64 count, const HcclDataType &dataType, const std::vector<std::vector<Slice>> &multRingsSliceZero,
     const Stream &stream, s32 profStage, const u64 baseOffset, const HcomCollOpInfo *opInfo,
     const std::vector<std::vector<Slice>> &multRingsUserMemSlice)
-{    
+{
     (void) multRingsSliceZero;
     (void) tag;
     (void) baseOffset;
@@ -120,7 +120,7 @@ HcclResult CollAllGatherRingZerocopyExecutor::KernelRunIntraServerPost(const OpP
 {
     bool isAHCAlgo = algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_AHC || algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_AHC_BROKE;
     CHK_RET(GetCommRankInfoNormal(level0Rank_, level0RankSize_, level1Rank_, level1RankSize_, level2Rank_, level2RankSize_, isAHCAlgo));
-    
+
     // 计算slice信息
     std::vector<Slice> dataSegsSlice;
     CHK_RET(CalcLevel0DataSlices(param, execMem, dataSegsSlice));

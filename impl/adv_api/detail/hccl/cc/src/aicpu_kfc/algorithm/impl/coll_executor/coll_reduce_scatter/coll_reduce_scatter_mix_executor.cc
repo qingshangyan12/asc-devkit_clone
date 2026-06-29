@@ -41,7 +41,7 @@ void CollReduceScatterMixExecutor::ParseParam(const OpParam& param)
     meshSinglePlane_ = (topoAttr_.deviceType == DevType::DEV_TYPE_910B) &&
         topoMatcher_->GetExternalInputHcclDeterministic() == DETERMINISTIC_DISABLE &&
         isInlineReduce && (workflowMode_ != HcclWorkflowMode::HCCL_WORKFLOW_MODE_OP_BASE);
-    
+
     bool isAlsoSupportDMAReduce = topoAttr_.deviceType == DevType::DEV_TYPE_910B && isInlineReduce &&
         workflowMode_ == HcclWorkflowMode::HCCL_WORKFLOW_MODE_OP_BASE &&
         topoMatcher_->GetExternalInputHcclDeterministic() == DETERMINISTIC_DISABLE &&
@@ -69,7 +69,7 @@ HcclResult CollReduceScatterMixExecutor::CalcScratchMemSize(u64& scratchMemSize)
 
 HcclResult CollReduceScatterMixExecutor::CalcStreamNum(u32& streamNum)
 {
-    u32 totalStreamNum = 0; 
+    u32 totalStreamNum = 0;
     if (topoAttr_.deviceType == DevType::DEV_TYPE_910B) { // mesh
         totalStreamNum = topoAttr_.deviceNumPerAggregation;
         HCCL_DEBUG("[CollReduceScatterMixExecutor][CalcStreamNum]totalStreamNum is %u", totalStreamNum);
@@ -242,7 +242,7 @@ HcclResult CollReduceScatterMixExecutor::KernelRun(const OpParam &param, ExecMem
     HcomCollOpInfo opInfo = {"", execMem.inputPtr, execMem.outputPtr, param.DataDes.count, param.DataDes.dataType,
         param.root, param.reduceType};
     HCCL_DEBUG("[CollReduceScatterMixExecutor][KernelRun] execMem.inputPtr[%p], execMem.outputPtr[%p], "
-        "execMem.inputMem[%p], execMem.outputMem[%p]", 
+        "execMem.inputMem[%p], execMem.outputMem[%p]",
         execMem.inputPtr, execMem.outputPtr, execMem.inputMem.ptr(), execMem.outputMem.ptr());
     HcomCollOpInfo *opInfoPtr = nullptr;
     if (DMAReduceFlag_) {
@@ -265,7 +265,7 @@ HcclResult CollReduceScatterMixExecutor::KernelRun(const OpParam &param, ExecMem
         std::vector<std::vector<Slice>> multiStreamSlice; // 每个stream使用的数据基于用户buffer的偏移
 
         CHK_RET(ActiveSlaveStreams(param.stream));
-        
+
         // 计算slice
         std::vector<std::vector<Slice>> level0DataSegsSlice;
         bool useInlineRduce = false;

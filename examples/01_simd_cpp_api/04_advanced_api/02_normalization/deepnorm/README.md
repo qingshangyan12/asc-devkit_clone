@@ -26,13 +26,13 @@
 
 ## 样例描述
 
-- 样例功能：  
+- 样例功能：
   本样例实现了对shape大小为[B, S, H]的输入数据的DeepNorm归一化，计算公式为:
   $$
   DeepNorm(x) = LayerNorm(α * X + SubLayer(X))
   $$
 
-- 样例规格：  
+- 样例规格：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center"> deepnorm </td></tr>
 
@@ -51,33 +51,33 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">deepnorm_custom</td></tr>
   </table>
 
-- 样例实现：  
+- 样例实现：
 
   - Kernel实现
 
-    计算逻辑是：  
+    计算逻辑是：
     使用DeepNorm高阶API接口完成deepnorm计算得到最终结果，再搬出到外部存储上，所用API可详细参考DeepNorm。
-    
+
   - Tiling实现
 
     样例的Tiling实现流程如下：
     1. 调用 AscendC::GetDeepNormMaxMinTmpSize 获取 DeepNorm 接口计算并使用所需的最小临时空间大小。
     2. 调用 AscendC::GetDeepNormTilingInfo 根据输入 shape 和工作空间大小获取 kernel 侧接口所需 Tiling 参数。
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
-## 编译运行  
+## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
-    
+
 - 样例执行
 
   在本样例目录下执行如下命令。

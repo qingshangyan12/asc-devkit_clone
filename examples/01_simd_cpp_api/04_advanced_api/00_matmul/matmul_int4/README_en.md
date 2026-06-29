@@ -25,7 +25,7 @@ A Matmul example with A and B matrices as int4b_t data type input.
 ```
 
 ## Example Description
-- Example Function:  
+- Example Function:
   When the Matmul example calls the Matmul API for computation, it sets the data type parameter of the left matrix A and right matrix B to int4b_t on the Kernel side, and calls the SetAType and SetBType interfaces to set the data type of the left matrix A and right matrix B to DT_INT4 on the Host side, implementing an example with int4 data type input.
 
 - Constraints
@@ -33,7 +33,7 @@ A Matmul example with A and B matrices as int4b_t data type input.
   - When the left matrix A is of int4 data type, transpose is not supported.
   - Matmul objects with int4 data type input only support Norm, MDL, and IBShare templates.
 
-- Example Specifications:  
+- Example Specifications:
   In this example: M = 256, N = 7680, K = 128.
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="5" align="center">Matmul</td></tr>
@@ -44,7 +44,7 @@ A Matmul example with A and B matrices as int4b_t data type input.
   <tr><td rowspan="1" align="center">Example Output</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">int32_t</td><td align="center">ND</td><td align="center">-</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="5" align="center">matmul_int4_custom</td></tr>
   </table>
-- Example Implementation: 
+- Example Implementation:
   - Key Kernel Steps
     - Create the Matmul object with data type int4b_t.
       ```cpp
@@ -54,13 +54,13 @@ A Matmul example with A and B matrices as int4b_t data type input.
       using BIAS_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, int32_t>;
       AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL> matmulObj;
       ```
-  
-  - Invocation Implementation  
+
+  - Invocation Implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

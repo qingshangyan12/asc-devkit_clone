@@ -84,7 +84,7 @@ HcclResult CollReduceScatterSemiRingExecutor::DoubleRingMidCountReduceScatter(
     (void) retryEnable;
     HCCL_CONFIG_INFO(HCCL_ALG,
         "[CollReduceScatterSemiRingExecutor] DoubleRingMidCountReduceScatter starts.");
-    
+
     CHK_RET(CheckCommSize(COMM_LEVEL0, COMM_INDEX_0 + 1));
     SubCommInfo level0CommInfo = GetSubCommInfo(COMM_LEVEL0, COMM_INDEX_0);
 

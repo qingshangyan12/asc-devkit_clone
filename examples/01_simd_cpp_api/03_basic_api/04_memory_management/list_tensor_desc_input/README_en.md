@@ -66,7 +66,7 @@ This example implements an AddN example based on the static Tensor programming m
     inputDesc = {(1 + (1 + SHAPE_DIM) * TENSOR_DESC_NUM) * sizeof(uint64_t),
                 {xDesc, yDesc},
                 {(uintptr_t)xDevice, (uintptr_t)yDevice}};
-    ``` 
+    ```
     Parse the corresponding parameters according to the passed data format as shown below.
 
     ```cpp
@@ -102,7 +102,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debug or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-  
+
   Examples:
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # CPU debug mode

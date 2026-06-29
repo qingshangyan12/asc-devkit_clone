@@ -65,16 +65,16 @@
 </table>
 </div>
 
-- 样例实现：  
+- 样例实现：
   本样例中实现的是固定shape为输入x [960, 960]，输出max[960, 8]、sum[960, 8]的softmaxflashv2样例。
 
-  - Kernel实现  
+  - Kernel实现
     核心计算步骤：将输入数据搬入后，调用 `AscendC::SoftmaxFlashV2(xLocal, sumLocal, maxLocal, xLocal, expmaxLocal, sharedTmpBuffer, softmaxTiling)` 完成 SoftmaxFlashV2 计算，再将结果搬出。
 
-  - Tiling实现  
+  - Tiling实现
     softmaxflashv2样例的tiling实现流程如下：首先对shape按照行数进行分核，使用平均分配法先按照核数向上对齐分配，确定主核的计算行数，再确定尾核计算行数，对主核计算的shape调用SoftmaxFlashV2高阶API的tiling函数获取API所需tiling参数，尾核计算所需的高阶API的tiling由kernel侧自行计算。
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行

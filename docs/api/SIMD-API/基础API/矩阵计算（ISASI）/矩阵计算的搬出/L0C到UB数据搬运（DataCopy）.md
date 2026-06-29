@@ -117,7 +117,7 @@
 | DEQ8、VDEQ8、DEQ16、VDEQ16 | 48~63 | - | 预留 |
 | DEQ、VDEQ | 0 ~ 15 | M | 这16位数被视为half，作为反量化计算需要乘的值。 |
 
-**图1** sidStoreMode配置示意图<a id="fig5416115192414"></a>  
+**图1** sidStoreMode配置示意图<a id="fig5416115192414"></a>
 
 ![](../../../../figures/sidStoreMode配置示意图.png "sidStoreMode配置示意图")
 

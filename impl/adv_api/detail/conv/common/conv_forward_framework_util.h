@@ -10,7 +10,7 @@
 
 /*!
  * \file conv_framework_util.h
- * \brief 
+ * \brief
  */
 
 #ifndef API_CONV2D_FRAMEWORK_H

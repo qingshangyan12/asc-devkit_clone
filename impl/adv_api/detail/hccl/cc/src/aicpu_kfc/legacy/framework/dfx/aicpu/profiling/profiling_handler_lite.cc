@@ -101,7 +101,7 @@ void ProfilingHandlerLite::ReportHcclTaskDetails(const std::vector<TaskInfo> &ta
     }
 }
 
-void ProfilingHandlerLite::GetTaskDetailInfos(const TaskInfo &it, MsprofAicpuHcclTaskInfo &taskDetailsInfos) const 
+void ProfilingHandlerLite::GetTaskDetailInfos(const TaskInfo &it, MsprofAicpuHcclTaskInfo &taskDetailsInfos) const
 {
     HCCL_INFO("ProfilingHandlerLite::GetTaskDetailInfos %s", it.taskParam_.Describe().c_str());
     std::string nameInfo = GetProfTaskOpNameV2(it.taskParam_.taskType);
@@ -269,7 +269,7 @@ bool ProfilingHandlerLite::IsProfOn(uint64_t feature) const
             return enableHcclL0_;
         }
     }
- 
+
     return false;
 }
 
@@ -300,7 +300,7 @@ void ProfilingHandlerLite::SetProL1On(bool val)
     HCCL_INFO("[%s] val = [%d]", __func__, val);
     enableHcclL1_ = val;
 }
- 
+
 void ProfilingHandlerLite::SetProL0On(bool val)
 {
     HCCL_INFO("[%s] val = [%d]", __func__, val);

@@ -22,10 +22,10 @@
 │   └── README.md               // 样例介绍
 ```
 ## 样例描述
-- 样例功能：  
+- 样例功能：
   Matmul样例调用Matmul API对输入的A、B矩阵做矩阵乘和加bias偏置的计算，计算公式为：C = A * B + Bias。
 
-- 样例规格：  
+- 样例规格：
   本样例中：M = 128, N = 2048, K = 1024。
 <table>
 <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">MatmulCustom</td></tr>
@@ -37,7 +37,7 @@
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_custom</td></tr>
 </table>
 
-- 样例实现： 
+- 样例实现：
   - Kernel关键步骤
     - 具体步骤如下：
       - 创建Matmul对象。
@@ -53,12 +53,12 @@
         - 设置A、B、C、Bias的参数类型信息；M、N、Ka、Kb形状信息等。
         - 调用GetTiling接口，获取Tiling信息。
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

@@ -235,7 +235,7 @@ hRepeat = 2；vRepeat = 2；mask = 128；vROffset = 128。
     uint16_t dstBlkStride = 1;  // 单次迭代内数据连续写入
     uint16_t vROffset = 128;    // 相邻迭代间数据连续写入
     uint8_t vRepeat = 2;        // 垂直迭代2次
-    
+
     AscendC::BilinearInterpolation(dstLocal, src0Local, src0OffsetLocal, src1Local, mask, hRepeat, repeatMode,
                 dstBlkStride, vROffset, vRepeat, tmpLocal);
     ```
@@ -252,7 +252,7 @@ hRepeat = 2；vRepeat = 2；mask = 128；vROffset = 128。
     uint16_t dstBlkStride = 1;  // 单次迭代内数据连续写入
     uint16_t vROffset = 128;    // 相邻迭代间数据连续写入
     uint8_t vRepeat = 2;        // 垂直迭代2次
-    
+
     AscendC::BilinearInterpolation(dstLocal, src0Local, src0OffsetLocal, src1Local, mask, hRepeat, repeatMode,
                 dstBlkStride, vROffset, vRepeat, tmpLocal);
     ```

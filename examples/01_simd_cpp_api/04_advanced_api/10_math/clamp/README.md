@@ -3,7 +3,7 @@
 ## 概述
 
 本样例基于Clamp高阶API实现将输入中除nan值以外的数截断到区间[min, max]的功能。
-当min大于max时，将除nan值外所有值替换为max。min和max均可以为标量或张量。  
+当min大于max时，将除nan值外所有值替换为max。min和max均可以为标量或张量。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -25,10 +25,10 @@
 
 ## 样例描述
 
-- 样例功能：  
+- 样例功能：
   将输入中大于max的非NaN值替换为max，小于min的非NaN值替换为min，小于等于max和大于等于min的数保持不变，作为输出。当min大于max时，将所有非NaN值替换为max。min和max可以为标量或张量。
 
-  计算公式如下：  
+  计算公式如下：
 
   $$
   dst_i = Clamp(src_i, min_i, max_i)
@@ -43,7 +43,7 @@
   \end{cases}
   $$
 
-- 样例规格：  
+- 样例规格：
   <table>
   <caption>表1：样例规格</caption>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center"> clamp </td></tr>
@@ -81,11 +81,11 @@
 
     使用内核调用符<<<>>>调用核函数。
 
-## 编译运行  
+## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -104,7 +104,7 @@
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
-  
+
   示例如下：
 
   ```bash

@@ -14,7 +14,7 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
 }
 ```
 
->[!NOTE]说明 
+>[!NOTE]说明
 >算子原型定义中的输入和输出同名的情况下，自动生成的核函数中，输出参数增加ref后缀予以区分。示例如下：
 >```
 >extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR x_ref, GM_ADDR workspace, GM_ADDR tiling) {
@@ -73,7 +73,7 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
 
 ![](../../../figures/流水任务运行示意图-33.png)
 
->[!NOTE]说明 
+>[!NOTE]说明
 >- 输出的顺序和原型定义中输出的顺序保持一致。
 >- 对于uint64\_t的输出数据类型（对于tensor而言），需要将dim的uint32\_t的高位设置为1，表示后续每维Shape会以uint64\_t类型进行解析。对于uint32\_t的输出类型，dim的高32位不需要配置，后续每维Shape会以uint32\_t进行解析。
 

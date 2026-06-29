@@ -216,7 +216,7 @@ namespace hccl {
             // 根据hcclOffset-dstRank mapping更新PrepareIntraData case下dstRefreshInfo中的rank id
             CHK_RET(entryPtr->UpdateRefreshAddrInfoForAlltoallv(topoinfo.userRank, alltoallvMetadata_));
         }
-        
+
         return HCCL_SUCCESS;
     }
 
@@ -789,7 +789,7 @@ namespace hccl {
         CHK_PRT_RET(inputSize == 0 && outputSize == 0,
             HCCL_ERROR("[AicpuCacheManager][PrepareUserMemRanges] inputSize[%llu] outputSize[%llu]", inputSize, outputSize),
             HCCL_E_INTERNAL);
-        
+
         // 当前只有alltoall/alltoallv/alltoallvc才会存在inputSize/outputSize为0的情况
         // 注意: 对于alltoall算子, outputSize一定等于inputSize, 所以不会存在inputSize/outputSize之一为0的情况
         // -> 这里其实只考虑alltoallv/alltoallvc

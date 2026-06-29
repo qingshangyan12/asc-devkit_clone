@@ -398,7 +398,7 @@ HcclResult HcclSocketManager::CreateSockets(const std::string &commTag,
         if (ret != HCCL_SUCCESS) {
             HCCL_ERROR("[Create][Sockets]Wait links establish completed failed, local role is client. ret[%d]", ret);
             TlsStatus tlsStatus = TlsStatus::UNKNOWN;
-            CHK_PRT_CONT(HcclNetDevGetTlsStatus(netDevCtx, &tlsStatus), 
+            CHK_PRT_CONT(HcclNetDevGetTlsStatus(netDevCtx, &tlsStatus),
                 HCCL_WARNING("[HcclNetDevGetTlsStatus] Can not get TlsStatus"));
             PrintErrorConnection(HcclSocketRole::SOCKET_ROLE_CLIENT, clientSocketsMap, clientDstRankToUserRank, tlsStatus);
             return ret;
@@ -409,7 +409,7 @@ HcclResult HcclSocketManager::CreateSockets(const std::string &commTag,
         if (ret != HCCL_SUCCESS) {
             HCCL_ERROR("[Create][Sockets]Wait links establish completed failed, local role is server. ret[%d]", ret);
             TlsStatus tlsStatus = TlsStatus::UNKNOWN;
-            CHK_PRT_CONT(HcclNetDevGetTlsStatus(netDevCtx, &tlsStatus), 
+            CHK_PRT_CONT(HcclNetDevGetTlsStatus(netDevCtx, &tlsStatus),
                 HCCL_WARNING("[HcclNetDevGetTlsStatus] Can not get TlsStatus"));
             PrintErrorConnection(HcclSocketRole::SOCKET_ROLE_SERVER, serverSocketsMap, serverDstRankToUserRank, tlsStatus);
             return ret;
@@ -427,19 +427,19 @@ HcclResult HcclSocketManager::AddWhiteList(const std::string &commTag,
     CHK_RET(HcclNetDevGetNicType(netDevCtx, &socketType));
     HcclIpAddress localIp{0};
     CHK_RET(HcclNetDevGetLocalIp(netDevCtx, localIp));
- 
+
     bool isInterLink{true};
     if (socketType == NicType::VNIC_TYPE) {
         isInterLink = false;
     }
- 
+
     HcclResult ret;
     HcclSocketRole role =
         userRank_ < remoteRankInfo.userRank ? HcclSocketRole::SOCKET_ROLE_SERVER : HcclSocketRole::SOCKET_ROLE_CLIENT;
- 
+
     std::map<u32, HcclRankLinkInfo> remoteMap;
     remoteMap.insert(std::make_pair(remoteRankInfo.userRank, remoteRankInfo));
- 
+
     // 作为服务端时，先填加白名单
     if (role == HcclSocketRole::SOCKET_ROLE_SERVER) {
         ret = AddWhiteList(commTag, isInterLink, socketType, localIp, remoteMap);
@@ -461,25 +461,25 @@ HcclResult HcclSocketManager::CreateSingleLinkSocket(const std::string &commTag,
     CHK_RET(HcclNetDevGetNicType(netDevCtx, &socketType));
     HcclIpAddress localIp{0};
     CHK_RET(HcclNetDevGetLocalIp(netDevCtx, localIp));
- 
+
     bool isInterLink{true};
     if (socketType == NicType::VNIC_TYPE) {
         isInterLink = false;
     }
- 
+
     HcclSocketRole role =
         userRank_ < remoteRankInfo.userRank ? HcclSocketRole::SOCKET_ROLE_SERVER : HcclSocketRole::SOCKET_ROLE_CLIENT;
- 
+
     std::map<u32, HcclRankLinkInfo> remoteMap;
     remoteMap.insert(std::make_pair(remoteRankInfo.userRank, remoteRankInfo));
- 
+
     // 作为服务端时，先填加白名单
     if (role == HcclSocketRole::SOCKET_ROLE_SERVER) {
         ret = AddWhiteList(commTag, isInterLink, socketType, localIp, remoteMap);
         CHK_PRT_RET(ret != HCCL_SUCCESS,
             HCCL_ERROR("[Create][Sockets]Add white list failed. ret[%d]", ret), ret);
     }
- 
+
     std::map<u32, u32> remoteRankToUserRank; // 子平面rank 映射 通信域 rank
     std::map <u32, std::vector<std::shared_ptr<HcclSocket> > > socketsMap;
     ret = CreateSockets(commTag, isInterLink, netDevCtx, socketType, role,
@@ -492,14 +492,14 @@ HcclResult HcclSocketManager::CreateSingleLinkSocket(const std::string &commTag,
         if (ret != HCCL_SUCCESS) {
             HCCL_ERROR("[Create][Sockets]Wait links establish completed failed, local role is client. ret[%d]", ret);
             TlsStatus tlsStatus = TlsStatus::UNKNOWN;
-            CHK_PRT_CONT(HcclNetDevGetTlsStatus(netDevCtx, &tlsStatus), 
+            CHK_PRT_CONT(HcclNetDevGetTlsStatus(netDevCtx, &tlsStatus),
                 HCCL_WARNING("[HcclNetDevGetTlsStatus] Can not get TlsStatus"));
             PrintErrorConnection(role, socketsMap, remoteRankToUserRank, tlsStatus);
             AbortAndDeleteSocket(commTag, role, socketsMap);
             return ret;
         }
     }
- 
+
     connectSockets.clear();
     for (auto iter = socketsMap.begin(); iter != socketsMap.end(); iter++) {
         auto rankSockets = iter->second;
@@ -507,7 +507,7 @@ HcclResult HcclSocketManager::CreateSingleLinkSocket(const std::string &commTag,
             connectSockets.push_back(rankSockets[i]);
         }
     }
- 
+
     return HCCL_SUCCESS;
 }
 
@@ -602,8 +602,8 @@ void HcclSocketManager::PrintErrorConnectionInfo(HcclSocketRole localRole,
             break;
     }
     const std::map<TlsStatus, std::string> tlsStatusMap = {
-        {TlsStatus::ENABLE, "ENABLE"}, 
-        {TlsStatus::DISABLE, "DISABLE"}, 
+        {TlsStatus::ENABLE, "ENABLE"},
+        {TlsStatus::DISABLE, "DISABLE"},
         {TlsStatus::UNKNOWN, "UNKNOWN"}
     };
     std::string sTlsStatus = tlsStatusMap.at(tlsStatus);
@@ -717,7 +717,7 @@ void HcclSocketManager::SaveSockets(const std::string &commTag, u32 remoteRank, 
     // 将 ipSockets 累加到 commSocketsMap_ 中
     HCCL_DEBUG("[Save][Sockets]commTag[%s], remoteRank[%u], remoteIp[%s], localRank[%u], save socket size[%u].",
         commTag.c_str(), remoteRank, remoteIp.GetReadableIP(), userRank_, ipSockets.size());
-    
+
     std::unique_lock<std::mutex> lock(socketsMapMutex_);
     auto it = commSocketsMap_.find(commTag);
     if (it == commSocketsMap_.end()) {
@@ -809,7 +809,7 @@ HcclResult HcclSocketManager::WaitLinkEstablish(std::shared_ptr<HcclSocket> sock
                 HCCL_DEBUG("[Wait][LinkEstablish]socket is connecting ");
             }
             count++;
-            
+
             continue;
         } else if (status == HcclSocketStatus::SOCKET_TIMEOUT) {
             return HCCL_E_TIMEOUT;

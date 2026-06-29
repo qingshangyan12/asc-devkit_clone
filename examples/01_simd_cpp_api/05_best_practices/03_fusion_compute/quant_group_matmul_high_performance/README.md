@@ -28,7 +28,7 @@
 
 ## 样例描述
 
-- 样例功能：  
+- 样例功能：
   样例实现了分组的per-token量化matmul计算，分组轴为m轴，并对结果进行激活函数Gelu计算。
 
   QuantGroupMatmul的计算公式为：
@@ -68,7 +68,7 @@
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">quant_group_matmul_custom</td></tr>
 </table>
 
-- 调用实现  
+- 调用实现
   使用内核调用符<<<>>>调用核函数。
 
 ## 样例实现

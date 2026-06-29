@@ -2,7 +2,7 @@
 
 为了提高数据访问的效率和吞吐量，Unified Buffer采用了bank（大小相等的内存模块）结构设计。Unified Buffer总大小为256K，划分为16个bank。每个bank由512行组成，每行长度为32B。这16个bank进一步组织为8个bank group，每个bank group包含2个bank，例如bank7和bank15组成一个bank group。
 
-**图1**  bank结构示意图（图中箭头方向表示内存排布的顺序）<a name="fig873359165316"></a>  
+**图1**  bank结构示意图（图中箭头方向表示内存排布的顺序）<a name="fig873359165316"></a>
 ![](../../../../figures/bank结构示意图（图中箭头方向表示内存排布的顺序）-71.png "bank结构示意图（图中箭头方向表示内存排布的顺序）-71")
 
 每个bank可以独立地进行数据的读写操作，允许多个数据请求同时进行。然而，当多个读写操作试图同时访问同一个bank，由于硬件资源的限制，这些操作必须排队等待，会导致bank冲突，引起性能下降。
@@ -19,7 +19,7 @@ bank冲突主要可以分为以下三种场景：
 
 下文给出了一些具体的示例，假设，0x10000地址在bank0上，0x10020在bank1上，如下图所示：
 
-**图2**  地址分配示意图<a name="fig1750123073213"></a>  
+**图2**  地址分配示意图<a name="fig1750123073213"></a>
 ![](../../../../figures/地址分配示意图-72.png "地址分配示意图-72")
 
 -   读写冲突示例
@@ -307,7 +307,7 @@ bank冲突主要可以分为以下三种场景：
     </td>
     <td class="cellrowborder" valign="top" width="51.17297770855641%" headers="mcps1.1.4.1.3 "><a name="screen7206858113117"></a><a name="screen7206858113117"></a><pre class="screen" codetype="Cpp" id="screen7206858113117">constexpr int32_t TOTAL_LENGTH = 1024 * 4;
     constexpr int32_t BUFFER_NUM = 1;
-    constexpr int32_t BANKGROUP_SIZE  =  1024 * 128; 
+    constexpr int32_t BANKGROUP_SIZE  =  1024 * 128;
     ...
     pipe.InitBuffer(inQueueX, BUFFER_NUM, TOTAL_LENGTH * sizeof(float));
     pipe.InitBuffer(inQueueY, BUFFER_NUM, BANKGROUP_SIZE - TOTAL_LENGTH * sizeof(float));

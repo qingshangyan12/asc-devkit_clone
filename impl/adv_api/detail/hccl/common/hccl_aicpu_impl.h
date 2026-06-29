@@ -80,7 +80,7 @@ HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::InitInner(uint64_t msg
 {
     ASCENDC_HCCL_API_ASSERT(curVersion_ == HcclTilingVersion::INVALID_TILING_VERSION, { return; },
                             "Init repeatedly is not allowed.");
-    
+
     if (unlikely(msgAddr == 0UL)) {
         return;
     }

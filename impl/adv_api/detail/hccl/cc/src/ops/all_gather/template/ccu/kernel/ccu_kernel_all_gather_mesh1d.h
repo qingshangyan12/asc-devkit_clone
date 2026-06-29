@@ -49,7 +49,7 @@ public:
                                                 uint64_t offset,
                                                 uint64_t sliceSize)
         : inputAddr_(inputAddr), outputAddr_(outputAddr), token_(token), offset_(offset),
-        sliceSize_(sliceSize) 
+        sliceSize_(sliceSize)
     {
         HCCL_DEBUG("[CcuTaskArgAllGatherMesh1D] inputAddr: %lu, outputAddr: %lu, offset: %lu, "
                    "sliceSize: %lu",

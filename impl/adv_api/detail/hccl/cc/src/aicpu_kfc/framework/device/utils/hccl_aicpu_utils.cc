@@ -273,6 +273,6 @@ u32 HcclAicpuUtils::GetBlockIdx() {
         res = AicpuGetBlockIdx();
     } else if (aicpu::GetBlockIdx != nullptr) {
         res =  aicpu::GetBlockIdx();
-    } 
+    }
     return res;
 }

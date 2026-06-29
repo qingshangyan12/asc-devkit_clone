@@ -13,7 +13,7 @@
 #include "ins_alg_template/ins_temp_broadcast_mesh_2D_two_shot.h"
 
 namespace Hccl {
- 
+
 InsTempBroadcastMesh2DTwoShot::InsTempBroadcastMesh2DTwoShot(const RankId virtualRank, const u32 tempRankSize,
                                                              const std::vector<std::vector<RankId>> &tempVTopo,
                                                              const std::map<RankId, u32> &tempVirtRankMap)

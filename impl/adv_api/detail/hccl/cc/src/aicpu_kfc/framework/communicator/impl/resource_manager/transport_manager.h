@@ -123,7 +123,7 @@ struct LinkPoolPara {
     std::vector<std::unique_ptr<std::thread>> linkThreads;
     std::vector<HcclResult> linkResults;
 
-    LinkPoolPara(struct SingleSubCommTransport &transport, 
+    LinkPoolPara(struct SingleSubCommTransport &transport,
         const std::string &name, const std::vector<std::pair<u32, u32>> &tasks)
         : singleSubCommTransport(transport),
         poolName(name),
@@ -176,7 +176,7 @@ namespace hccl {
 // 独立算子内存
 struct IndOpMem {
     std::vector<HostMem> userHostMem;
-    std::vector<DeviceMem> userDeviceMem;  
+    std::vector<DeviceMem> userDeviceMem;
 };
 
 struct TransportIOMem {
@@ -265,7 +265,7 @@ private:
         const std::vector<std::shared_ptr<HcclSocket> > &socketList, const DeviceMem &inputMem,
         const DeviceMem &outputMem, const DeviceMem &expMem, bool isAicpuModeEn, bool isBackup, bool isCapture,
         u32 notifyNum, u32 trafficClass, u32 serviceLevel, MachinePara &machinePara, RankInfo &loaclRank, RankInfo &remoteRank,
-        const HcclNetDevCtx &netDevCtx, TransportLinkType linkType = TransportLinkType::RESERVED, 
+        const HcclNetDevCtx &netDevCtx, TransportLinkType linkType = TransportLinkType::RESERVED,
         const IndOpMem &indOpMem = IndOpMem(), bool isIndOp = false,
 		const HcclCMDType &opType = HcclCMDType::HCCL_CMD_INVALID, bool isNpuDirectRoce = false);
     HcclResult GetTransportType(const u32 dstRank, bool isUsedRdma, TransportType &transportType);

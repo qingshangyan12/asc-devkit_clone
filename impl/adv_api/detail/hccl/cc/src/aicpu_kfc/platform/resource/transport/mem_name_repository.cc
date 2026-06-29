@@ -70,19 +70,19 @@ HcclResult MemNameRepository::SetIpcMem(void *ptr, u64 size, u8 *name, u32 nameL
             HCCL_ERROR_CODE(ret), ipcMemInfo.ptr, ipcMemInfo.size), ret);
 
     offset = reinterpret_cast<u64>(ptr) - reinterpret_cast<u64>(ipcMemInfo.ptr);
- 
+
     return HCCL_SUCCESS;
 }
- 
+
 HcclResult MemNameRepository::SetIpcMem(void *ptr, u64 size, u8 *name, u32 nameLen)
 {
     CHK_PTR_NULL(name);
     CHK_PTR_NULL(ptr);
- 
+
     HcclResult ret;
     std::unique_lock<std::mutex> lock(memMutex_);
     IpcMemInfo ipcMemInfo = {nullptr};
- 
+
     ipcMemInfo.ptr = ptr;
     ipcMemInfo.size = size;
     ipcMemInfo.isSioToHccs = false;
@@ -97,13 +97,13 @@ HcclResult MemNameRepository::SetIpcMem(void *ptr, u64 size, u8 *name, u32 nameL
     return HCCL_SUCCESS;
 }
 
- 
+
 HcclResult MemNameRepository::SetIpcMem(void *ptr, u64 size, u8 *name, u32 nameLen, u64 &offset, s32 pid,
     s32 sdid, bool isSioToHccs)
 {
     HCCL_DEBUG("SetIpcMem para: ptr[%p], size[%llu Byte], name[%d], nameLen[%u], pid[%d], sdid[%016llx], isSioToHccs[%d]",
         ptr, size, name, nameLen, pid, sdid, isSioToHccs);
- 
+
     CHK_RET(SetIpcMem(ptr, size, name, nameLen, offset, isSioToHccs));
 
     /* 不管任何情况，都需设置PID 的白名单 */
@@ -116,7 +116,7 @@ HcclResult MemNameRepository::SetIpcMem(void *ptr, u64 size, u8 *name, u32 nameL
 }
 
 //在SetNameMap中查找MemName,若未找到则插入
-HcclResult MemNameRepository::FindIpcMem(IpcMemInfo &ipcMemInfo, u8 *name, u32 nameLen) 
+HcclResult MemNameRepository::FindIpcMem(IpcMemInfo &ipcMemInfo, u8 *name, u32 nameLen)
 {
     s32 sret;
     HcclResult ret;

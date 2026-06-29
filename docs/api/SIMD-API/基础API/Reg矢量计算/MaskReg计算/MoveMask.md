@@ -39,7 +39,7 @@ Mask与MaskReg的机制对比，具体请参考[A2/A3与950 Mask机制对比](..
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename T> 
+template <typename T>
 __simd_callee__ inline MaskReg MoveMask()
 ```
 

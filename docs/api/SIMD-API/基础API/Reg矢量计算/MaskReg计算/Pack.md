@@ -35,7 +35,7 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <HighLowPart part = HighLowPart::LOWEST> 
+template <HighLowPart part = HighLowPart::LOWEST>
 __simd_callee__ inline void Pack(MaskReg& dst, MaskReg& src)
 ```
 

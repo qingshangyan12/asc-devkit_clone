@@ -120,7 +120,7 @@ void WorkspaceResourceImpl::DestroyWorkspaceResource(const std::string &tag)
     if (ret != HCCL_SUCCESS) {
         HCCL_ERROR("[WorkspaceResourceImpl][DestroyWorkspaceResource]Destroy workspace mem failed. ret[%d]", ret);
     }
-    
+
     // 销毁 work space stream资源
     if (static_cast<s32>(devicePhyId_) != HOST_DEVICE_ID) {
         ret = offloadStreamManager_.ClearSlaves(tag);

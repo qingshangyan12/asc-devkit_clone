@@ -27,20 +27,20 @@ HcclResult CalcAHCTransportReq::DisposeSubGroups(u32 rank)
     CommAHCBaseInfo::DisposeSubGroups(rank, globalSubGroups_, subGroups_, level1SubGroups);
     return HCCL_SUCCESS;
 }
- 
+
 HcclResult CalcAHCTransportReq::CalcDstRanks(u32 rank, std::set<u32> &dstRanks, u32 ringIndex)
 {
     (void)ringIndex;
- 
+
     // 获取 rank 对应分组信息
     DisposeSubGroups(rank);
- 
+
     //commAHCBaseInfo_ 初始化
     CHK_RET(CommAHCInfoInit(subGroups_));
- 
+
     //计算 AHC建链的目的dstRanks
     commAHCBaseInfo_->CalcDstRanks(rank, dstRanks);
- 
+
     return HCCL_SUCCESS;
 }
 

@@ -57,8 +57,8 @@ HcclResult AlltoAllVFor310P::Prepare(DeviceMem &userInput, DeviceMem &userOutput
         }
     }
 
-    CHK_PRT_RET(signalMainToSub.size() != subStream_.size() || signalSubToMain.size() != subStream_.size(), 
-        HCCL_ERROR("[AlltoAllVFor310P][Prepare] Signal size not equal to subStream size, signalMainToSub.size[%llu]," 
+    CHK_PRT_RET(signalMainToSub.size() != subStream_.size() || signalSubToMain.size() != subStream_.size(),
+        HCCL_ERROR("[AlltoAllVFor310P][Prepare] Signal size not equal to subStream size, signalMainToSub.size[%llu],"
         "signalSubToMain.size[%llu], subStream_.size[%llu]", signalMainToSub.size(), signalSubToMain.size(), subStream_.size()),
         HCCL_E_INTERNAL);
 
@@ -351,7 +351,7 @@ HcclResult AlltoAllVFor310P::RunMainStep4(const u32 times, const u64 subStepLen)
     CHK_RET(CalcSendInfo(userRank_, userRank_, times, subStepLen, sendDataLocal));
     RecvMemBlock recvDataLocal;
     CHK_RET(CalcRecvInfo(userRank_, userRank_, times, subStepLen, recvDataLocal));
-    
+
     DeviceMem src0 = userInput_.range(sendDataLocal.userInOffset, sendDataLocal.sendLen);
     DeviceMem dst0 = userOutput_.range(recvDataLocal.userOutOffset, recvDataLocal.recvLen);
     HCCL_DEBUG("[AlltoAllVFor310P] rank[%u] localCopy to userOut, src.Offset [%llu], dst.Offset[%llu], len[%llu]",
@@ -507,7 +507,7 @@ HcclResult AlltoAllVFor310P::RunMinorStep4(const u32 times, const u64 subStepLen
     CHK_RET(CalcSendInfo(userRank_, userRank_, times, subStepLen, sendDataLocal));
     RecvMemBlock recvDataLocal;
     CHK_RET(CalcRecvInfo(userRank_, userRank_, times, subStepLen, recvDataLocal));
-    
+
     DeviceMem src = userInput_.range(sendDataLocal.userInOffset, sendDataLocal.sendLen);
     DeviceMem dst = userOutput_.range(recvDataLocal.userOutOffset, recvDataLocal.recvLen);
     HCCL_DEBUG("[AlltoAllVFor310P] rank[%u] localCopy to userOut, src.Offset [%llu], dst.Offset[%llu], len[%llu]",

@@ -87,14 +87,14 @@ HcclResult CollReduceScatterVMeshOpbaseExecutor::CalcCurCountsAndCurDisplsSingle
     curDispls.resize(displs.size(), 0);
 
     // 先设置本轮的displacements，等于入参displs
-    std::copy(displs.begin(), displs.end(), curDispls.begin());    
+    std::copy(displs.begin(), displs.end(), curDispls.begin());
     // 分配好每个rank的counts
     for (auto i = 0U; i < countsLeft.size(); ++i) {
         const auto curCount = countsLeft[i] < maxTotalCount ? countsLeft[i] : maxTotalCount;
         curCounts[i] = curCount;
         countsLeft[i] -= curCount;
         displs[i] += curCount;
-        
+
         if(countsLeft[i] != 0) {
             finished = false;
         }
@@ -136,7 +136,7 @@ HcclResult CollReduceScatterVMeshOpbaseExecutor::CalcCurCountsAndCurDisplsMultiM
             curCounts[i] += curCount;
             countsLeft[i] -= curCount;
             displs[i] += curCount;
-        } 
+        }
     }
     //特殊情况下，allocatableCount 刚好使用完毕时，不仅如此while循环，导致RunLoop额外循环一次
     const auto nonZeroCount =
@@ -214,11 +214,11 @@ HcclResult CollReduceScatterVMeshOpbaseExecutor::RunReduceScattervLevel0(const O
     u32 level0rankSize = level0CommInfo.localRankSize;
     u32 commIndex = level0CommInfo.localRank; // 找到rank所在的节点间平面
     /* *******************节点内reducescatter ******************************************/
-   
+
     std::vector<Slice> inputSlices;
     const auto counts = static_cast<u64*>(param.VDataDes.counts);
     u64 offset = 0;
-    
+
     for (u32 moduleId = 0; moduleId < topoAttr_.moduleNum; moduleId++) {
         for (u32 rankId = 0; rankId < level0rankSize; ++rankId) {
             if (topoAttr_.userRank / level0rankSize == moduleId) {
@@ -230,7 +230,7 @@ HcclResult CollReduceScatterVMeshOpbaseExecutor::RunReduceScattervLevel0(const O
             offset += counts[rankId + moduleId * level0rankSize];
         }
     }
-    
+
     HcomCollOpInfo *opInfoPtr = nullptr;
     HcomCollOpInfo opInfo = {"", execMem.inputPtr, execMem.outputPtr, 0, dataType,
         param.root, param.reduceType};
@@ -244,7 +244,7 @@ HcclResult CollReduceScatterVMeshOpbaseExecutor::RunReduceScattervLevel0(const O
     CHK_SMART_PTR_NULL(TempAlg);
 
     CHK_RET(TempAlg->Prepare(execMem.inputMem, execMem.inputMem, execMem.scratchMem, execMem.count, dataType,
-        param.stream, param.reduceType, LEVEL0_BRIDGE_RANK_ID, inputSlices, 0, reduceAttr,    
+        param.stream, param.reduceType, LEVEL0_BRIDGE_RANK_ID, inputSlices, 0, reduceAttr,
         algResResp_->slaveStreams, algResResp_->notifiesMain, algResResp_->notifiesAux,
         topoAttr_.userRank, opInfoPtr));
 
@@ -310,8 +310,8 @@ HcclResult CollReduceScatterVMeshOpbaseExecutor::RunReduceScattervLevel1(const O
                 TemplateType::TEMPLATE_REDUCESCATTER_NB, dispatcher_);
         HCCL_INFO("reducescatterv mesh: using nonuniform-bruck algo inter-server.");
         CHK_SMART_PTR_NULL(level1TempAlg);
-        CHK_RET(level1TempAlg->Prepare(reduceAttr)); 
-    } else { 
+        CHK_RET(level1TempAlg->Prepare(reduceAttr));
+    } else {
         level1TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(
             TemplateType::TEMPLATE_REDUCESCATTER_NHR, dispatcher_);
         HCCL_INFO("reducescatterv mesh: using nhr algo inter-server.");
@@ -322,7 +322,7 @@ HcclResult CollReduceScatterVMeshOpbaseExecutor::RunReduceScattervLevel1(const O
 
     std::vector<Slice> slices;
     CalReduceScatterVSliceData(param, level0RankSize, level1RankSize, slices);
-  
+
     CHK_RET(level1TempAlg->Prepare(execMem.inputMem, execMem.inputMem, execMem.scratchMem, 0,
         dataType, param.stream, param.reduceType, LEVEL0_BRIDGE_RANK_ID, slices));
 
@@ -342,9 +342,9 @@ HcclResult CollReduceScatterVMeshOpbaseExecutor::KernelRun(const OpParam &param,
 
     if (topoAttr_.moduleNum > 1) {
         CHK_RET(RunReduceScattervLevel1(param, execMem, level0CommInfo));
-        CHK_RET(RunReduceScattervLevel0(param, execMem, level0CommInfo));    
+        CHK_RET(RunReduceScattervLevel0(param, execMem, level0CommInfo));
     } else {
-        CHK_RET(RunReduceScattervLevel0SingleModule(param, execMem, level0CommInfo));    
+        CHK_RET(RunReduceScattervLevel0SingleModule(param, execMem, level0CommInfo));
     }
     return HCCL_SUCCESS;
 }

@@ -77,7 +77,7 @@ HcclResult CollAllReduceMidCountFor91093Executor::KernelRun(const OpParam &param
 
     u32 unitSize = 0;
     CHK_RET(SalGetDataTypeSize(param.GetDataType(), unitSize));
-    
+
     // 获取 level1 打平级通信域
     CHK_RET(CheckCommSize(COMM_COMBINE_L1, COMM_INDEX_0 + 1));
     SubCommInfo level1CommInfo = GetSubCommInfo(COMM_COMBINE_L1, COMM_INDEX_0);
@@ -85,7 +85,7 @@ HcclResult CollAllReduceMidCountFor91093Executor::KernelRun(const OpParam &param
     // 获取 level2 级通信域
     CHK_RET(CheckCommSize(COMM_LEVEL2, COMM_INDEX_0 + 1));
     SubCommInfo level2CommInfo = GetSubCommInfo(COMM_LEVEL2, COMM_INDEX_0);
-    
+
     const u32 level1RankSize = level1CommInfo.localRankSize;
     const u32 level2RankSize = level2CommInfo.localRankSize;
     u64 inputMemSize = execMem.count * unitSize;
@@ -106,7 +106,7 @@ HcclResult CollAllReduceMidCountFor91093Executor::KernelRun(const OpParam &param
         CHK_SMART_PTR_NULL(level1tempAlg);
         HCCL_CONFIG_INFO(HCCL_ALG, "[%s] Run TEMPLATE_ALL_REDUCE_NHR_ONESHOT in COMM_COMBINE_L1/COMM_LEVEL2", __func__);
         HCCL_INFO("AllReduce mid count: using nhr algo intra-server.");
-        
+
         CHK_RET(level1tempAlg->Prepare(reduceAttr));
         level1tempAlg->CloseBarrier();
 
@@ -119,22 +119,22 @@ HcclResult CollAllReduceMidCountFor91093Executor::KernelRun(const OpParam &param
             level1CommInfo.localRank, PROF_STAGE_0, HCCL_EXEC_STEP_NOT_SET, param.stream));
 
         CHK_RET(RunTemplate(level1tempAlg, level1CommInfo));
-    } 
+    }
 
     // 数据回拷
     if(level1RankSize > SINGLERANK && level2RankSize > SINGLERANK) {
         DeviceMem srcMem = execMem.outputMem.range(0, inputMemSize);
         DeviceMem dstMem = execMem.inputMem.range(0, inputMemSize);
-        CHK_RET(HcclD2DMemcpyAsync(dispatcher_, dstMem, srcMem, const_cast<Stream&>(param.stream)));  
+        CHK_RET(HcclD2DMemcpyAsync(dispatcher_, dstMem, srcMem, const_cast<Stream&>(param.stream)));
     }
-    
+
     //step2:  run nhr ont shot in level2
     if (level2RankSize > SINGLERANK) {
         std::unique_ptr<AlgTemplateBase> level2tempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_REDUCE_NHR_ONESHOT, dispatcher_);
         CHK_SMART_PTR_NULL(level2tempAlg);
         HCCL_CONFIG_INFO(HCCL_ALG, "[%s] Run TEMPLATE_ALL_REDUCE_NHR_ONESHOT in COMM_COMBINE_L1/COMM_LEVEL2", __func__);
         HCCL_INFO("AllReduce mid count: using nhr algo intra-server.");
-        
+
         CHK_RET(level2tempAlg->Prepare(reduceAttr));
         level2tempAlg->CloseBarrier();
 

@@ -44,7 +44,7 @@ HcclResult RemoteNotify::Init(const HcclSignalInfo &notifyInfo, const NotifyLoad
         HCCL_ERROR("[LocalNotify]Init failed, ret[%p]", ret);
         return ret;
     }
- 
+
     notifyPtr = pimpl_->ptr();
     return HCCL_SUCCESS;
 }

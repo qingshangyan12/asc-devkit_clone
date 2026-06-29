@@ -21,7 +21,7 @@ public:
                                 std::chrono::milliseconds timeout,
                                 const TransportDeviceP2pData &transDevP2pData);
     ~TransportDeviceP2p() override;
-    
+
     HcclResult Init() override;
 
     HcclResult UpdateRemoteAddr(void *remoteIn, void *remoteOut) override;

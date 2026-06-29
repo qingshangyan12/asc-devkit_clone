@@ -71,7 +71,7 @@ bool IsSupportDirectFullmeshForAlltoallv(const OpParam& param, DevType deviceTyp
             bool isCapture = false;
             if (isOpbase) { // acl graph模式下获取capture信息，图模式需要规避
                 HcclResult retCapture = GetStreamCaptureInfo(param.stream.ptr(), rtModel, isCapture);
-                CHK_PRT_CONT(retCapture != HCCL_SUCCESS, 
+                CHK_PRT_CONT(retCapture != HCCL_SUCCESS,
                     HCCL_ERROR("Get capture status error. return[%d], capture model", retCapture));
             }
             isHCCS = (userRankSize <= MAX_ALLTOALLV_DIRECT_FULLMESH_RANKSIZE &&
@@ -131,7 +131,7 @@ bool IsConfigAHCAlgo(std::map<HcclCMDType, std::vector<HcclAlgoType>> algoConfig
     const std::set<HcclCMDType> hcclSupportAHCOpSet = {
         HcclCMDType::HCCL_CMD_ALLREDUCE, HcclCMDType::HCCL_CMD_REDUCE_SCATTER, HcclCMDType::HCCL_CMD_ALLGATHER
     };
- 
+
     for (const auto& opType : hcclSupportAHCOpSet) {
         HcclAlgoType algoConfigLevel1 = algoConfigMap[opType][HCCL_ALGO_LEVEL_1];
         bool isConfigAHC =

@@ -37,7 +37,7 @@ const std::map<LinkType, std::string> LINK_TYPE_STR_MAP{
     {LinkType::LINK_STANDARD_ROCE, "STANDARD_ROCE"},
     {LinkType::LINK_RESERVED, "RESERVED"}
 };
- 
+
 inline std::string GetLinkTypeEnumStr(LinkType linkType)
 {
     auto iter = LINK_TYPE_STR_MAP.find(linkType);

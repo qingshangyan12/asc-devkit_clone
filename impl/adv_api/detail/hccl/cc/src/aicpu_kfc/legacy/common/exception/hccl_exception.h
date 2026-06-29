@@ -20,8 +20,8 @@
 namespace Hccl {
 class HcclException : std::exception {
 public:
-    explicit HcclException(const ExceptionType &exceptionType, const std::string &userDefinedMsg) 
-        : exceptionType(exceptionType), userDefinedMsg(userDefinedMsg), 
+    explicit HcclException(const ExceptionType &exceptionType, const std::string &userDefinedMsg)
+        : exceptionType(exceptionType), userDefinedMsg(userDefinedMsg),
         errorMsg(ExceptionInfo::GetErrorMsg(exceptionType) + userDefinedMsg) {
         StoreBackTrace();
     }
@@ -43,13 +43,13 @@ private:
         constexpr int BACKTRACE_DEPTH = 15;
         void  *array[BACKTRACE_DEPTH];
         int    size     = backtrace(array, BACKTRACE_DEPTH);
- 
+
         char **callBackStrings = backtrace_symbols(array, size);
         if (callBackStrings == nullptr) {
             backtraceStrings.emplace_back("Failed to get backtrace symbols");
             return;
         }
- 
+
         for (auto i = 0; i < size; ++i) {
             backtraceStrings.emplace_back(callBackStrings[i]);
         }

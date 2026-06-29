@@ -322,7 +322,7 @@ HcclResult ReduceScatterRecursiveHalvingDoubling::GetNslbAdjInfo(const u32 rank,
         } else {
             std::vector<LINK>::const_iterator niter = std::next(iter, i);
             if (niter != links.end()) {
-                subLinks[i - nslbPart1Size / NSLBDP_REDUCE_SCATTER_MOLD2] = *niter; 
+                subLinks[i - nslbPart1Size / NSLBDP_REDUCE_SCATTER_MOLD2] = *niter;
             }
         }
     }

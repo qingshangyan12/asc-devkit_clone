@@ -81,7 +81,7 @@ struct hash<hccl::OpUnfoldKey> {
         const size_t workflowModeHashValue = hashUint8(static_cast<uint8_t>(key.workflowMode));
 
         const size_t isCaptureHashValue = hashBool(key.isCapture);
-        
+
         // 简单的哈希混合
         size_t hashValue = opTypeHashValue;
         hashValue ^= dataTypeHashValue;

@@ -12,16 +12,16 @@
 
 #include "comm_ahc_base_pub.h"
 #include "calc_transport_req_base.h"
- 
+
 namespace hccl {
 class CalcAHCTransportReqBase : public CalcTransportReqBase {
 public:
     explicit CalcAHCTransportReqBase(std::vector<std::vector<u32>> &subCommPlaneVector,
         std::vector<bool> &isBridgeVector, u32 userRank, std::vector<std::vector<std::vector<u32>>> &globalSubGroups,
         std::map<AHCConcOpType, TemplateType> &ahcAlgOption, std::unordered_map<u32, bool>  &isUsedRdmaMap);
- 
+
     ~CalcAHCTransportReqBase() override;
- 
+
     HcclResult CalcTransportRequest(const std::string &tag, TransportMemType inputMemType,
         TransportMemType outputMemType, const CommParaInfo &commParaInfo,
         std::vector<SingleSubCommTransport> &commTransport, u32 subUserRankRoot = INVALID_VALUE_RANKID) override;

@@ -2,7 +2,7 @@
 
 在静态图模式下，可以通过**整图下沉**优化调度性能。将完整的计算图一次性下发至Device侧，后续执行则无需Host参与，由Device自主完成计算，从而减少Host-Device交互开销，提升执行效率。部分算子的Tiling计算依赖运行时输入的具体数值（**Tiling值依赖**），需在执行时动态计算Tiling参数。针对该场景，可采用**Tiling下沉**优化方案：将Tiling计算下沉至Device侧的AI CPU上执行，从而实现计算全程在Device侧高效完成。
 
->[!NOTE]说明 
+>[!NOTE]说明
 >- 基于新版本CANN包（支持Tiling下沉特性）编译生成的Tiling下沉算子，不兼容旧版CANN（不支持Tiling下沉特性）运行环境。
 >- 当前仅融合算子（矢量计算和矩阵计算融合）支持进行Tiling下沉。
 >- Tiling下沉功能仅支持如下产品型号：
@@ -42,9 +42,9 @@ Tiling下沉场景下，算子工程的op\_host目录结构如下，Tiling实现
 
     ```
     #include "add_custom_tiling_sink_tiling.h" // 包含头文件
-    
+
     // ...
-    
+
     namespace ops {
     class AddCustomTilingSink : public OpDef {
     public:
@@ -63,11 +63,11 @@ Tiling下沉场景下，算子工程的op\_host目录结构如下，Tiling实现
                 .ParamType(REQUIRED)
                 .DataType({ge::DT_FLOAT})
                 .Format({ge::FORMAT_ND});
-    
+
             this->SetInferShape(ge::InferShape).SetInferDataType(ge::InferDataType);
-    
+
             this->AICore().SetTiling(optiling::AddCustomSinkTilingFunc); // Tiling函数和算子原型定义的关联
-            
+
             // 请替换为实际的昇腾AI处理器型号
             this->AICore().AddConfig("ascendxxx");
         }

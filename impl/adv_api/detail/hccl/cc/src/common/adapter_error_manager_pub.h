@@ -12,7 +12,7 @@
 
 #include "log.h"
 #include <string>
-#include <vector> 
+#include <vector>
 
 __attribute__((weak)) void RptInputErr(std::string error_code, std::vector<std::string> key,
     std::vector<std::string> value);

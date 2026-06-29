@@ -242,7 +242,7 @@ struct OpParam {
         switch (opType) {
             //比较数据类型、数据量、通信域、可用核数、确定性、capture场景
             case HcclCMDType::HCCL_CMD_ALLGATHER:
-                return std::tie(opType, DataDes.count, DataDes.dataType, tag, aivCoreLimit, deterministic, isCapture) < 
+                return std::tie(opType, DataDes.count, DataDes.dataType, tag, aivCoreLimit, deterministic, isCapture) <
                     std::tie(other.opType, other.DataDes.count, other.DataDes.dataType, other.tag, other.aivCoreLimit, other.deterministic, other.isCapture);
             case HcclCMDType::HCCL_CMD_ALLTOALL:
                 return std::tie(opType, All2AllDataDes.sendCount, All2AllDataDes.sendType,
@@ -250,11 +250,11 @@ struct OpParam {
                     std::tie(other.opType, other.All2AllDataDes.sendCount, other.All2AllDataDes.sendType,
                     other.All2AllDataDes.recvCount, other.All2AllDataDes.recvType, other.tag, other.aivCoreLimit, other.deterministic, other.isCapture);
             case HcclCMDType::HCCL_CMD_BROADCAST:
-                return std::tie(opType, DataDes.count, DataDes.dataType, root, tag, aivCoreLimit, deterministic, isCapture) < 
+                return std::tie(opType, DataDes.count, DataDes.dataType, root, tag, aivCoreLimit, deterministic, isCapture) <
                     std::tie(other.opType, other.DataDes.count, other.DataDes.dataType, other.root, other.tag, other.aivCoreLimit, other.deterministic, other.isCapture);
             case HcclCMDType::HCCL_CMD_ALLREDUCE:
             case HcclCMDType::HCCL_CMD_REDUCE_SCATTER:
-                return std::tie(opType, DataDes.count, DataDes.dataType, reduceType, tag, aivCoreLimit, deterministic, isCapture) < 
+                return std::tie(opType, DataDes.count, DataDes.dataType, reduceType, tag, aivCoreLimit, deterministic, isCapture) <
                     std::tie(other.opType, other.DataDes.count, other.DataDes.dataType, other.reduceType, other.tag, other.aivCoreLimit, other.deterministic, other.isCapture);
             default:
                 break;

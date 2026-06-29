@@ -18,10 +18,10 @@ public:
     explicit BroadcastStar(const HcclDispatcher dispatcher);
     ~BroadcastStar() override;
 
-    HcclResult Prepare(DeviceMem &inputMem, DeviceMem &outputMem, DeviceMem &scratchMem, 
-        const u64 count, const HcclDataType dataType, const Stream &stream, 
-        const HcclReduceOp reductionOp, const u32 root, 
-        const std::vector<Slice> &slices, const u64 baseOffset, 
+    HcclResult Prepare(DeviceMem &inputMem, DeviceMem &outputMem, DeviceMem &scratchMem,
+        const u64 count, const HcclDataType dataType, const Stream &stream,
+        const HcclReduceOp reductionOp, const u32 root,
+        const std::vector<Slice> &slices, const u64 baseOffset,
         std::vector<u32> nicRankList, u32 userRank) override;
 
     HcclResult RunAsync(const u32 rank, const u32 rankSize,

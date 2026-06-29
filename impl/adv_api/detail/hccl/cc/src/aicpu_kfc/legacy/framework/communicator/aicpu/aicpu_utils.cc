@@ -88,7 +88,7 @@ HcclResult AicpuUtils::GetCommHandle(CommunicatorImplLite *communicatorImplLite,
                     kernelParam_->op.algOperator.opMode.Describe().c_str());
         return HCCL_E_PARA;
     }
-    
+
     *opHandle = reinterpret_cast<void *>(communicatorImplLite);
     return HCCL_SUCCESS;
 }
@@ -422,7 +422,7 @@ HcclResult AicpuUtils::RecoverKernelParam(CommunicatorImplLite *communicatorImpl
     }
     if (kernelParam_->op.algOperator.opType != OP_TYPE_MAP.at(data->opType)) {
         HCCL_ERROR("[%s]Args kernelParam_->op.algOperator.opType %s is not equal to data->opType %s, commId %u.", __func__,
-                   kernelParam_->op.algOperator.opType.Describe().c_str(), OP_TYPE_MAP.at(data->opType).Describe().c_str(), 
+                   kernelParam_->op.algOperator.opType.Describe().c_str(), OP_TYPE_MAP.at(data->opType).Describe().c_str(),
                    communicatorImplLite->GetCommIdIndex());
         return HCCL_E_PARA;
     }

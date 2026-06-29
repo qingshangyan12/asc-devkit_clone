@@ -114,11 +114,11 @@ __aicore__ inline void GetTensorC(const LocalTensor<DstT>& c, uint8_t enAtomic =
 | enSequentialWrite | 输入 | 是否开启连续写模式（连续写，写入[baseM, baseN]；非连续写，写入[singleCoreM, singleCoreN]中对应的位置），默认值false（非连续写模式）。<br><br>注意：非连续写模式，内部会按照迭代顺序算好偏移，开发者不需要关注；如果开发者需要决定排布顺序，可以选择连续写模式，自行按照设定的偏移进行搬运操作。<!-- npu="310b" id27 --><br><br>对于Atlas 200I/500 A2 推理产品，只支持非连续写模式。<!-- end id27 --> |
 
 <a name="fig322951853119"></a>
-**图1**  非连续写模式示意图  
+**图1**  非连续写模式示意图
 ![](../../../../figures/非连续写模式示意图.png "非连续写模式示意图")
 
 <a name="fig580415103338"></a>
-**图2**  连续写模式示意图  
+**图2**  连续写模式示意图
 ![](../../../../figures/连续写模式示意图.png "连续写模式示意图")
 
 ## 返回值说明

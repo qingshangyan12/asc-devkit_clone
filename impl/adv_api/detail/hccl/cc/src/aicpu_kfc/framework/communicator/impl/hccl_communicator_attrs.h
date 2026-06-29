@@ -115,7 +115,7 @@ private:
     HcclResult TransformRankList(const std::vector<RankInfo> &rankListIn,
         std::vector<RankInfo_t> &rankListOut);
     HcclResult InitCommParams(HcclCommParams &params);
-    
+
     virtual bool Is310P3Common();
     bool Check2N(u32 num) const;
     HcclResult SetServerId(const RankTable_t &rankTable);
@@ -187,7 +187,7 @@ private:
     bool isDiffDeviceModule_{false};
     bool isDiffDeviceType_{false};
     u32 gcdDeviceNumPerAggregation_{0};
-    
+
     bool isSupportRdmaLite_{ false };
     bool isSupportHccsAndSio_{false};
     bool isUsedRdmaLevel0_{false};

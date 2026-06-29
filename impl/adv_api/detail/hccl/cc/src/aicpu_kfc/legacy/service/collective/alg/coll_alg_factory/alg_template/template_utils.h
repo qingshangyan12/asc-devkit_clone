@@ -183,7 +183,7 @@ HcclResult CalcSliceInfoAllReduce(const AllignInfo &allignInfo, const u32 rankSi
 HcclResult CalcResLinksMesh(const RankId myRank, const u32 tempRankSize,
                             const std::vector<std::vector<RankId>> &tempVTopo, const u32 linkNumBtwPeers,
                             AlgTempResReq &tempResReq);
-HcclResult CalcResLinksMesh2D(const RankId myRank, const std::vector<std::vector<RankId>> &tempVTopo, 
+HcclResult CalcResLinksMesh2D(const RankId myRank, const std::vector<std::vector<RankId>> &tempVTopo,
                             const u32 linkNumBtwPeers, AlgTempResReq &tempResReq);
 HcclResult CalcResLinksRing(const RankId myRank, const u32 tempRankSize,
                             const std::vector<std::vector<RankId>> &tempVTopo, AlgTempResReq &tempResReq);

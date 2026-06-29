@@ -144,7 +144,7 @@ HcclResult HcclOneSideServiceAicpu::InitOpNotifyObj()
 {
     for (u32 i = 0; i < AICPU_OP_NOTIFY_MAX_NUM; i++) {
         const HcclSignalInfo &signalInfo = commResParaPtr_->aicpuOpNotify[i];
-        CHK_PRT_RET(signalInfo.resId == INVALID_U64, 
+        CHK_PRT_RET(signalInfo.resId == INVALID_U64,
             HCCL_ERROR("[InitOpNotifyObj] resId[%llu] is invalid", signalInfo.resId),
             HCCL_E_PARA);
 
@@ -491,7 +491,7 @@ HcclResult HcclOneSideServiceAicpu::UpdateSqStatus(Stream &stream)
 
     CHK_RET(QuerySqStatusByType(devId_, stream.sqId(), DRV_SQCQ_PROP_SQ_TAIL, head));
     CHK_RET(QuerySqStatusByType(devId_, stream.sqId(), DRV_SQCQ_PROP_SQ_HEAD, tail));
-    HCCL_INFO("Entry HcclOneSideServiceAicpu::UpdateSqStatus, sqid:%u head:%u tail:%u tag[%s]", 
+    HCCL_INFO("Entry HcclOneSideServiceAicpu::UpdateSqStatus, sqid:%u head:%u tail:%u tag[%s]",
         stream.sqId(), head, tail, identifier_.c_str());
     return HCCL_SUCCESS;
 }

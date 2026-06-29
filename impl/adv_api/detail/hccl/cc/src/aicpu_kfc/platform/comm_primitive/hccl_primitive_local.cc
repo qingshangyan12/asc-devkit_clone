@@ -99,7 +99,7 @@ HcclResult HcclLocalInitTask(aclrtStream stream, const bool enableCache, const s
     dispatcherPtr = reinterpret_cast<hccl::DispatcherPub*>(ctx_temp->GetDispatcher());
 
     HCCL_INFO("InitTask enableCache[%d], key[%s], useGraphConstructorV2[%d]", enableCache, key.c_str(), useGraphConstructorV2);
-    
+
     CHK_RET(dispatcherPtr->ResetGraphCtx(enableCache, key, useGraphConstructorV2));
 
     hccl::Stream stream_temp(stream, false);
@@ -121,7 +121,7 @@ HcclResult HcclLocalNotifyRecord(StreamHandle streamHandle, aclrtNotify notify)
     hccl::LocalNotify *localNotify = reinterpret_cast<hccl::LocalNotify *>(notify);
 
     return dispatcherPtr->SignalRecord(localNotify->ptr(), *stream,
-                        INVALID_VALUE_RANKID, INVALID_U64, 
+                        INVALID_VALUE_RANKID, INVALID_U64,
                         INVALID_VALUE_STAGE, true, INVALID_U64, localNotify->notifyId_ );
 }
 

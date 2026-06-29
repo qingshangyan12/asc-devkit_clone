@@ -80,8 +80,8 @@ HcclResult CollAllReduceFor310PDoublingDirectExecutor::CalcLevel0CommInfo(Transp
 
     if (algType_.algoLevel0 == AlgTypeLevel0::ALG_LEVEL0_NP_HD) {
         CommParaInfo commParaInfo(COMM_LEVEL0, CommType::COMM_TAG_HALVING_DOUBLING);
-        CHK_RET(CalcCommPlaneInfo(tag_, commParaInfo, opTransport[COMM_LEVEL0], inputType, outputType)); 
-    } else if (algType_.algoLevel0 == AlgTypeLevel0::ALG_LEVEL0_WHOLE_RING && 
+        CHK_RET(CalcCommPlaneInfo(tag_, commParaInfo, opTransport[COMM_LEVEL0], inputType, outputType));
+    } else if (algType_.algoLevel0 == AlgTypeLevel0::ALG_LEVEL0_WHOLE_RING &&
                algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_WHOLE_RING) {
         CommParaInfo commParaInfo(COMM_LEVEL0, CommType::COMM_TAG_RING_INNER);
         CHK_RET(CalcCommPlaneInfo(tag_, commParaInfo, opTransport[COMM_LEVEL0], inputType, outputType));

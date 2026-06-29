@@ -265,7 +265,7 @@ HcclResult ReduceScatterNB::RunDestReducerNB(  const u32 step, const u32 nSteps,
                         "offset[%llu] size[%llu]",
                         rxIndex, inputSlices[rxIndex].offset, outputSlices[rxIndex].offset,
                         outputSlices[rxIndex].size);
- 
+
                     rxReduceMems.emplace_back(
                         ReducerMemoryInfo{ baseOffset_ + inputSlices[rxIndex].offset, srcMem, dstMem, scratchMem });
                 }

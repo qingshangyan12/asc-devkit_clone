@@ -26,7 +26,7 @@ HcclResult OneSidedComponentLite::Orchestrate(const HcclAicpuOpLite &op, InsQueP
     }
 
     vector<RmaBufSliceLite> usrInSlice;
-    vector<RmtRmaBufSliceLite> usrOutSlice; 
+    vector<RmtRmaBufSliceLite> usrOutSlice;
 
     for (uint32_t i = 0; i < op.batchPutGetDescNum; i++) {
         HcclAicpuLocBufLite *localBuf = static_cast<HcclAicpuLocBufLite *>(op.batchPutGetLocalAddr) + i;

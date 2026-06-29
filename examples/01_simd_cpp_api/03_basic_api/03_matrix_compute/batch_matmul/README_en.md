@@ -147,7 +147,7 @@ fixpipeParams.dstStride = n;
 // Number of source NZ matrices, that is, number of ND matrices to transfer
 fixpipeParams.ndNum = B;
 // Interval between start addresses of different NZ matrices, unit: 1024B
-fixpipeParams.srcNdStride = (CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape[0])) 
+fixpipeParams.srcNdStride = (CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape[0]))
                                 / (cubeShape[0] * cubeShape[0]);
 // Offset between start addresses of adjacent destination ND matrices, unit: elements
 ```
@@ -161,7 +161,7 @@ Users can obtain the memory sizes of L1, L0A, L0B, L0C storage spaces on the har
 
 Run the following steps in the root directory of this example to build and run the operator.
 
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

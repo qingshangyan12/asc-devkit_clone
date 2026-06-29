@@ -104,7 +104,7 @@ BEGIN_TILING_DATA_DEF(AlltoallvDoubleCommCustomTilingData)
     TILING_DATA_FIELD_DEF(uint32_t, mc2HcommCnt);
     TILING_DATA_FIELD_DEF_STRUCT(Mc2ServerCfg, serverCfg); // server通用参数配置，融合算子级
     // 各通信域中的每个通信任务参数配置，算子级，共有mc2HcommCnt个Mc2HcommCfg
-    TILING_DATA_FIELD_DEF_STRUCT(Mc2HcommCfg, hcom1); 
+    TILING_DATA_FIELD_DEF_STRUCT(Mc2HcommCfg, hcom1);
     TILING_DATA_FIELD_DEF_STRUCT(Mc2HcommCfg, hcom2);
 END_TILING_DATA_DEF;
 

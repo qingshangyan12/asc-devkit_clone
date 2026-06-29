@@ -28,10 +28,10 @@
 
 ## 样例描述
 
-- 样例功能：  
+- 样例功能：
   LayerNorm样例，在一个核函数中连续调用LayerNorm、LayerNormGrad、LayerNormGradBeta三个高阶API，完成LayerNorm的完整前向和反向传播计算。该样例在训练场景中可以一次性计算前向输出、输入梯度、参数梯度，提高计算效率。
 
-- 样例规格：  
+- 样例规格：
   <table border="2" align="center">
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center"> layernorm </td></tr>
   <tr><td rowspan="6" align="center">样例输入</td></tr>
@@ -50,7 +50,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">layernorm_custom</td></tr>
   </table>
 
-- 样例实现：  
+- 样例实现：
   本样例实现固定shape(inputX[2, 32, 16]、gamma[1, 16]、beta[1, 16]、dy[2, 32, 16])的融合LayerNorm样例。
 
   - Kernel实现
@@ -66,20 +66,20 @@
     1. 分别获取并设置LayerNorm、LayerNormGrad、LayerNormGradBeta接口能完成计算所需的最小临时空间大小。
     2. 根据输入shape、剩余可供计算的空间大小等信息分别获取三个API kernel侧接口所需tiling参数。
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
-## 编译运行  
+## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
-    
+
 - 样例执行
 
   在本样例目录下执行如下命令。

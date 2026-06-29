@@ -31,20 +31,20 @@ void AddressInfo::Deserialize(const nlohmann::json &addressInfoJson)
     std::string addrTypeStr;
     std::string msgAddrtype = "error occurs when parser object of propName \"addr_type\"";
     TRY_CATCH_THROW(InvalidParamsException, msgAddrtype, addrTypeStr = GetJsonProperty(addressInfoJson, "addr_type"););
-    
+
     if (!IsStringInAddrType(addrTypeStr)) {
         THROW<InvalidParamsException>(StringFormat("[AddressInfo::%s] failed with Invalid addrType. ",
                                                    __func__));
     }
     addrType = strToAddrType.at(addrTypeStr);
-    
+
     std::string address;
     std::string msgAddr = "error occurs when parser object of propName \"addr\"";
     const int MAX_DISPLAY_LEN = 128;
     TRY_CATCH_THROW(InvalidParamsException, msgAddr, address = GetJsonProperty(addressInfoJson, "addr", false););
-   
+
     if (address.length() < MIN_VALUE_ADDR_LENGRH || address.length() > MAX_VALUE_ADDR_LENGRH) {
-        RPT_INPUT_ERR(true, "EI0014", std::vector<std::string>({"value", "variable", "expect"}), 
+        RPT_INPUT_ERR(true, "EI0014", std::vector<std::string>({"value", "variable", "expect"}),
             std::vector<std::string>({address, "addr", "A ip address."}));
         THROW<InvalidParamsException>(StringFormat("addr [%.*s] length is out of range [%u] to [%u]", MAX_DISPLAY_LEN, address.c_str(), MIN_VALUE_ADDR_LENGRH, MAX_VALUE_ADDR_LENGRH));
     }
@@ -154,6 +154,6 @@ void AddressInfo::GetBinStream(BinaryStream &binStream) const
         binStream<<it;
     }
     binStream<<planeId;
-}   
+}
 
 } // namespace Hccl

@@ -26,10 +26,10 @@
 
 ## 样例描述
 
-- 样例功能：  
+- 样例功能：
   本样例在需要预先初始化Global Memory数据的场景下，基于Fill高阶API实现将Global Memory上的数据初始化为指定值，并配合Add接口完成向量加法计算。
 
-- 样例规格：  
+- 样例规格：
   <table>
   <caption>表1：样例输入输出规格</caption>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">fill</td></tr>
@@ -45,26 +45,26 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">fill_custom</td></tr>
   </table>
 
-- 样例实现：  
+- 样例实现：
   本样例中实现的是固定shape为输入input_x[1, 256]，input_y[1, 256]，输出output_z[1, 256]的fill样例，所用API详细介绍请参考[Fill API文档](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/张量变换/Fill-97.md)。
 
-  - Kernel实现  
+  - Kernel实现
     计算逻辑包含以下步骤：
     1. 使用Fill高阶API将输出Global Memory初始化为当前核的blockIdx值
     2. 使用Add接口进行向量加法计算
     3. 使用SetAtomicAdd模式将计算结果累加到输出Global Memory
 
-  - Tiling实现  
+  - Tiling实现
     本样例中，无需tiling实现。
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
-## 编译运行  
+## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -83,7 +83,7 @@
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
-  
+
   示例如：
 
   ```bash

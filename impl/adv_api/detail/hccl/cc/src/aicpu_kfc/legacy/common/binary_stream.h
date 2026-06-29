@@ -51,7 +51,7 @@ public:
     }
 
     // 对string的输入函数
-    BinaryStream &operator<<(const std::string &s) 
+    BinaryStream &operator<<(const std::string &s)
     {
         size_t size = s.size();
         stream.write(reinterpret_cast<const char*>(&size), sizeof(size_t)); // 写入长度
@@ -67,7 +67,7 @@ public:
     }
 
     // 对string的读取函数
-    BinaryStream &operator>>(std::string &s) 
+    BinaryStream &operator>>(std::string &s)
     {
         size_t size;
         stream.read(reinterpret_cast<char *>(&size), sizeof(size));       // 先从流中读取字符串长度
@@ -121,10 +121,10 @@ public:
             HCCL_ERROR("[SplictStream]start[%llu] is bigger than stream length[%llu]", start, temp.length());
             return "";
         }
-    
+
         // 截取子串
         std::string result = temp.substr(start, end - start);
-    
+
         // 返回新的 string
         return result;
     }

@@ -20,8 +20,8 @@ This sample implements the Add operator using C_API interfaces, based on asynchr
 
 ## Operator Description
 
-- Operator Function:  
-The Add operator adds two inputs and returns the sum. The corresponding mathematical expression is:  
+- Operator Function:
+The Add operator adds two inputs and returns the sum. The corresponding mathematical expression is:
   ```
   z = x + y
   ```
@@ -39,25 +39,25 @@ The Add operator adds two inputs and returns the sum. The corresponding mathemat
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">add_custom</td></tr>
   </table>
 
-- Operator Implementation: 
+- Operator Implementation:
 
   C_API input data must first be moved to on-chip memory, then compute interfaces are used to add the two input parameters and obtain the final result, which is then moved to external memory. The computation process uses asc_sync_notify and asc_sync_wait to control synchronization between pipelines.
 
   The Add operator implementation consists of 3 steps:
 
   Step 1: Move inputs x and y from Global Memory to Local Memory, storing them in xLocal and yLocal respectively.
-  
+
   Step 2: Perform the addition operation on xLocal and yLocal, and store the computation result in zLocal.
-  
+
   Step 3: Move the output data from zLocal to output z in Global Memory.
 
-- Invocation Implementation  
+- Invocation Implementation
   Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 
 Execute the following steps in the root directory of this sample to build and run the operator.
-- Configure Environment Variables  
+- Configure Environment Variables
   Select the appropriate environment variable configuration command based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit package on your current environment.
   - Default path, CANN software package installed by root user
     ```bash

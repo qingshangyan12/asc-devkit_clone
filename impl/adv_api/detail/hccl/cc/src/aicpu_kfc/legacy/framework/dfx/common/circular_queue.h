@@ -113,7 +113,7 @@ public:
             THROW<InternalException>(StringFormat("CircularQueue capacity cannot be zero"));
         }
     }
-    
+
     ~CircularQueue() override
     {
         HCCL_INFO("[CircularQueue]Destroy");

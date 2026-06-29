@@ -222,19 +222,19 @@ Kirin 9030，支持模式0、1、2。
 
 - T支持的数据类型为：
     - <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t/uint8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float/complex32/int64_t/uint64_t/complex64。</cann-filter>
-    
+
     - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half/float。</cann-filter>
-    
+
     - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half/float。</cann-filter>
-    
+
     - <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品，支持的数据类型为：half/float。</cann-filter>
-    
+
     - <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core，支持的数据类型为：half/float。</cann-filter>
-    
+
     - <cann-filter npu-type = "910">Atlas 训练系列产品，支持的数据类型为：half/float。</cann-filter>
-    
+
     - <cann-filter npu-type = "x90">Kirin X90，支持的数据类型为：int8_t/uint8_t/int16_t/uint16_t/half/int32_t/uint32_t/float。</cann-filter>
-    
+
     - <cann-filter npu-type = "9030">Kirin 9030，支持的数据类型为：int8_t/uint8_t/int16_t/uint16_t/half/int32_t/uint32_t/float。</cann-filter>
 
 - U支持的数据类型为：uint8_t、uint16_t、uint32_t、uint64_t。
@@ -256,7 +256,7 @@ Kirin 9030，支持模式0、1、2。
 </cann-filter>
 
 <cann-filter npu-type = "910b，A3，310p">
-  
+
 - 针对如下型号，对于模式1和模式2，使用时需要预留8KB的Unified Buffer空间，作为接口的临时数据存放区：
 
     - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>

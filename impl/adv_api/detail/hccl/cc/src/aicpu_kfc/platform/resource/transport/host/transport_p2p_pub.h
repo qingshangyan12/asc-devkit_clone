@@ -106,7 +106,7 @@ protected:
     HcclResult ConstructIpcMemInfoForSend(void *ptr, u64 size, u8*& exchangeDataPtr, u64& exchangeDataBlankSize);
     HcclResult ConstructIntraProcMemInfoForSend(void *ptr, u64 size, u8*& exchangeDataPtr, u64& exchangeDataBlankSize);
     HcclResult ConstructNumInfoForSend(u64 num, u8*& exchangeDataPtr, u64& exchangeDataBlankSize);
-    
+
     HcclResult ConstructNotifyInfoForSend(u8*& exchangeDataPtr, u64& exchangeDataBlankSize);
     HcclResult ConstructNotifyVectorInfoForSend(u8*& exchangeDataPtr, u64& exchangeDataBlankSize);
     HcclResult ConstructDataLenForSend(u8*& exchangeDataPtr, u64& exchangeDataBlankSize);

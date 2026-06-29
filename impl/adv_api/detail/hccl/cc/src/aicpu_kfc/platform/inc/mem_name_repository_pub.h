@@ -86,7 +86,7 @@ private:
     std::map<IpcMemInfo, IpcMemInfo> alignPtrMap_; // 记录根据页表对齐前后的ipc mem对应关系
     std::mutex memMutex_;
     bool unavailable_{false};
-    
+
     // 清空map不加锁
     void ClearMemNameRepositoryImpl();
 };

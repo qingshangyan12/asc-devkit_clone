@@ -92,7 +92,7 @@ OpParamDef算子定义，OpParamDef请参考[OpParamDef](OpParamDef.md)。
                 .ParamType(REQUIRED)
                 .DataType({ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT, ge::DT_FLOAT})
                 .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_ND});
-    
+
     ```
 
 -   示例三

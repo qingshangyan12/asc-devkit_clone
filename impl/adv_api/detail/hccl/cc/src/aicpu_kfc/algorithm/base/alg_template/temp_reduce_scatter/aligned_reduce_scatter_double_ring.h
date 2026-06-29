@@ -14,5 +14,5 @@
 
 namespace hccl {
 } // namespace hccl
- 
+
 #endif /* * REDUCE_SCATTER_RING_CONCURRENT_DIRECT_H */

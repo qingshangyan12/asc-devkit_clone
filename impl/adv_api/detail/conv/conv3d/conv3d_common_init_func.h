@@ -38,7 +38,7 @@ __aicore__ inline void InitKDirectionBaseValue(
     } else {
         self->ctx.singleCoreKL0 = self->ctx.conv3dTiling->kL0;
     }
-    
+
     uint64_t alignCinKhKwKd =
         ConvApi::AlignB(self->ctx.singleCoreCin, ConvApi::GetInputkInOneC0Block<Intf>()) * self->ctx.kernelHxkernelWxkernelD;
     self->ctx.maxKAL1Iter = ConvApi::CeilDIV(alignCinKhKwKd, currentKAL1) - 1;
@@ -61,7 +61,7 @@ __aicore__ inline void InitKDirectionBaseValue(
     } else {
         self->ctx.kL0Tail = alignCinKhKwKd % self->ctx.singleCoreKL0;
     }
-    
+
     self->ctx.kL0Tail = self->ctx.kL0Tail == 0 ? self->ctx.singleCoreKL0 : self->ctx.kL0Tail;
     self->ctx.multiKAL1 = ConvApi::CeilDIV(currentKAL1, self->ctx.singleCoreKL0);
     self->ctx.kAL1fullload = alignCinKhKwKd == currentKAL1;
@@ -250,7 +250,7 @@ struct Init {
         self->ctx.pipe->InitBuffer(self->ctx.queueBiasL1, 1, ConvApi::AlignB(biasl1Spacesize, ConvApi::C0_SIZE));
     }
 
-    static __aicore__ inline void InitHf32Mode(Intf *self) 
+    static __aicore__ inline void InitHf32Mode(Intf *self)
     {
         AscendC::SetHF32Mode(self->ctx.conv3dTiling->hf32Enable);
         AscendC::SetHF32TransMode(false);

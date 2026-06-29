@@ -165,7 +165,7 @@ HcclResult ReduceScatterHccsSio::RunAsync(const u32 rank, const u32 rankSize, co
     u32 unitSize = SIZE_TABLE[dataType_];
     u64 totalCnt = opInfo_->count;
     u32 srcDMAMemSliceId = 0;
-    
+
     DeviceMem src;
     DeviceMem dst;
 

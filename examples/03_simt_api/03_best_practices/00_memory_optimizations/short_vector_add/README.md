@@ -167,11 +167,11 @@ __global__ void add2(T* x, T* y, T* z, uint64_t size)
 - 写Cache命中率：**89.1%**
 - 读写带宽：**14.51(GB/s) | 7.25(GB/s)**
 
-**原理说明**：  
+**原理说明**：
 SIMT编程模式下，L2 Cache是以Cache Line=128字节为单位进行访问。
 
-- Case 1（标量 half）：不满行导致 RMW 写放大  
-  使用标量half（2B）。单个Warp（32线程）同时发射指令时，在空间上连续拼出的总宽度为：  
+- Case 1（标量 half）：不满行导致 RMW 写放大
+  使用标量half（2B）。单个Warp（32线程）同时发射指令时，在空间上连续拼出的总宽度为：
   $$
   32 * 2B = 64B
   $$
@@ -203,7 +203,7 @@ SIMT编程模式下，L2 Cache是以Cache Line=128字节为单位进行访问。
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
 
   ```bash
@@ -242,7 +242,7 @@ SIMT编程模式下，L2 Cache是以Cache Line=128字节为单位进行访问。
   | `CMAKE_ASC_RUN_MODE`      | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真                                 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`      | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
 
-- 执行结果  
+- 执行结果
   执行结果如下，说明精度对比成功。
 
   ```bash

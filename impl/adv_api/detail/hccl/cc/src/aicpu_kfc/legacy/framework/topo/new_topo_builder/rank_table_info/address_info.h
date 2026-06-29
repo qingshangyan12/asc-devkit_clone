@@ -31,7 +31,7 @@ class AddressInfo{
 public:
     AddressInfo() {};
     ~AddressInfo() {};
-    
+
     IpAddress                  addr;
     AddrType                   addrType;
     std::set<std::string>      ports;

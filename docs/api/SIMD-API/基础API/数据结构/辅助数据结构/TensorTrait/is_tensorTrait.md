@@ -90,7 +90,7 @@ template <typename T> struct is_tensorTrait
 AscendC::Shape<int,int,int> shape = AscendC::MakeShape(10, 20, 30);
 AscendC::Stride<int,int,int> stride = AscendC::MakeStride(1, 100, 200);
 
-auto layoutMake = AscendC::MakeLayout(shape, stride);    
+auto layoutMake = AscendC::MakeLayout(shape, stride);
 auto tensorTraitMake = AscendC::MakeTensorTrait<float, AscendC::TPosition::VECIN>(layoutMake);
 
 EXPECT_EQ(AscendC::is_tensorTrait<decltype(shape)>::value, false);

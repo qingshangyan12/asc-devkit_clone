@@ -404,7 +404,7 @@ HcclResult CollBroadCastRingFor91093::DoubleRingScatter(const std::string &tag, 
     HCCL_CONFIG_INFO(HCCL_ALG, "[%s] Run TEMPLATE_SCATTER_DOUBLE_RING_DIRECT in COMM_LEVEL0", __func__);
 
     CHK_RET(tempAlg ->Prepare(const_cast<HcomCollOpInfo *>(opInfo), topoAttr_.userRank, level0CommInfo1.localRank,
-        algResResp_->slaveStreams, algResResp_->notifiesMain, algResResp_->notifiesAux, 
+        algResResp_->slaveStreams, algResResp_->notifiesMain, algResResp_->notifiesAux,
         doubleRingsOrders, multRingsSliceZero, doubleRingUserMemInputSlices));
 
     u32 rootRank = 0;

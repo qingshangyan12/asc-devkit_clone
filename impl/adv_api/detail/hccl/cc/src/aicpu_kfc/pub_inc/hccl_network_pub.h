@@ -34,13 +34,13 @@ enum class TlsStatus {
     ENABLE,      //  使能
 };
 
-HcclResult HcclNetInit(NICDeployment nicDeploy, s32 devicePhyId, s32 deviceLogicId, 
+HcclResult HcclNetInit(NICDeployment nicDeploy, s32 devicePhyId, s32 deviceLogicId,
     bool enableWhitelistFlag, bool hasBackup = false);
 HcclResult HcclNetDeInit(NICDeployment nicDeploy, s32 devicePhyId, s32 deviceLogicId,
     bool hasBackup = false);
 
 HcclResult HcclNetOpenDev(
-    HcclNetDevCtx *netDevCtx, NicType nicType, s32 devicePhyId, s32 deviceLogicId, hccl::HcclIpAddress localIp, 
+    HcclNetDevCtx *netDevCtx, NicType nicType, s32 devicePhyId, s32 deviceLogicId, hccl::HcclIpAddress localIp,
     hccl::HcclIpAddress backupIp = hccl::HcclIpAddress(0));
 void HcclNetCloseDev(HcclNetDevCtx netDevCtx);
 

@@ -28,10 +28,10 @@ This example describes how to call the LayerNorm, LayerNormGrad, and LayerNormGr
 
 ## Example Description
 
-- Example function:  
+- Example function:
   LayerNorm example: Call the LayerNorm, LayerNormGrad, and LayerNormGradBeta high-level APIs consecutively within a single kernel function to complete the full forward and backward propagation computation of LayerNorm. In training scenarios, this example can compute the forward output, input gradient, and parameter gradient in a single pass, improving computation efficiency.
 
-- Example specifications:  
+- Example specifications:
   <table border="2" align="center">
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> layernorm </td></tr>
   <tr><td rowspan="6" align="center">Example Input</td></tr>
@@ -50,7 +50,7 @@ This example describes how to call the LayerNorm, LayerNormGrad, and LayerNormGr
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">layernorm_custom</td></tr>
   </table>
 
-- Example implementation:  
+- Example implementation:
   This example implements a fused LayerNorm example with fixed shapes (inputX[2, 32, 16], gamma[1, 16], beta[1, 16], dy[2, 32, 16]).
 
   - Kernel implementation
@@ -66,20 +66,20 @@ This example describes how to call the LayerNorm, LayerNormGrad, and LayerNormGr
     1. Obtain and set the minimum temporary space size required by the LayerNorm, LayerNormGrad, and LayerNormGradBeta APIs respectively.
     2. Obtain the tiling parameters required by the kernel-side APIs of the three APIs based on the input shape, remaining available computation space, and other information.
 
-  - Invocation implementation  
+  - Invocation implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run  
+## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
-    
+
 - Run the example
 
   Run the following commands in the example directory.

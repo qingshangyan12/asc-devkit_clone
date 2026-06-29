@@ -190,7 +190,7 @@ BEGIN_TILING_DATA_DEF(AddCustomTilingData)        // 注册一个tiling类，以
   TILING_DATA_FIELD_DEF_STRUCT(Matmul, mm);             // 添加tiling结构体类型字段
 END_TILING_DATA_DEF;                                    // 定义结束
 // 注册算子tilingdata类到对应的AddCustom算子
-REGISTER_TILING_DATA_CLASS(AddCustom, AddCustomTilingData) 
+REGISTER_TILING_DATA_CLASS(AddCustom, AddCustomTilingData)
 }
 
 // host侧设置参数值和使用tiling参数
@@ -202,7 +202,7 @@ static void TilingAddInit(AddCustomTilingData *tiling, uint32_t numBlocks)
   tiling->set_arrSample(arr);                    // 置值通用数据类型数组变量arrSample，仅会复制arr数据的前三个数据，与TILING_DATA_FIELD_DEF_ARR中arr_size一致
   tiling->mm.set_mmVar(1);                       // 置值嵌套结构体通用数据类型变量mmVar
   tiling->mm.set_mmArr(arr);                     // 置值嵌套结构体通用数据类型数组mmArr
-  
+
   // 使用参数值
   uint32_t useNumBlocks = tiling->get_blkDim();    // 获取通用数据类型变量numBlocks
   uint32_t* arrPoint = tiling->get_arrSample();   // 获取通用数据类型数组变量arrSample

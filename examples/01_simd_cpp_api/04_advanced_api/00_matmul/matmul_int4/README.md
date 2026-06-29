@@ -25,7 +25,7 @@ A、B矩阵为int4b_t数据类型输入的Matmul样例。
 ```
 
 ## 样例描述
-- 样例功能：  
+- 样例功能：
   Matmul样例调用Matmul API计算时，通过Kernel侧设置左矩阵A、右矩阵B的数据类型参数为int4b_t，Host侧调用SetAType、SetBType接口设置左矩阵A、右矩阵B的数据类型为DT_INT4，实现int4数据类型输入的样例。
 
 - 约束条件
@@ -33,7 +33,7 @@ A、B矩阵为int4b_t数据类型输入的Matmul样例。
   - 左矩阵A为int4数据类型时，不支持转置。
   - int4数据类型输入的Matmul对象仅支持Norm、MDL、IBShare模板。
 
-- 样例规格：  
+- 样例规格：
   本样例中：M = 256, N = 7680, K = 128。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
@@ -44,7 +44,7 @@ A、B矩阵为int4b_t数据类型输入的Matmul样例。
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">int32_t</td><td align="center">ND</td><td align="center">-</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_int4_custom</td></tr>
   </table>
-- 样例实现： 
+- 样例实现：
   - Kernel关键步骤
     - 创建Matmul对象，数据类型为int4b_t。
       ```cpp
@@ -54,13 +54,13 @@ A、B矩阵为int4b_t数据类型输入的Matmul样例。
       using BIAS_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, int32_t>;
       AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL> matmulObj;
       ```
-  
-  - 调用实现  
+
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

@@ -83,7 +83,7 @@ struct AlltoallvMetadata {
     std::vector<OpUnfoldMemRange> hcclInputMemRanges; // 每个rank的HCCL input buffer memory range (给定通信域, 在初始化后即固定)
     std::unordered_map<uint32_t, RankRflag> notifyIdRankRflagMap; // 跨卡通信的notifyId到remote RankRflag的映射 (用于NotifyWait的刷新)
     std::unordered_map<uint64_t, RankRflag> signalAddrRankRflagMap; // 跨卡通信的signalAddr到remote RankRflag的映射 (用于WriteRecord的刷新)
-    
+
     // alltoallv第一次Orchestrate之后初始化
     // 注意: local/remote hccl offset只由local/target rank以及sdmaDataBlockSize决定
     // 注意: 一个hccl offset可能对应多个remote rank, 需要用RanksIdx追踪多个remote ranks以及当前需要使用的remote rank的索引

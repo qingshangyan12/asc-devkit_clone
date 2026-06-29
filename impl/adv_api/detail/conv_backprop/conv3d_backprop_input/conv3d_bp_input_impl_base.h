@@ -54,7 +54,7 @@ public:
         DEFINE_STUCT_TEMPLATE_FIELD(AscendC::TBuf, l0bBuf_, AscendC::TPosition::B2);
         DEFINE_STUCT_FIELD(uint8_t, isFirstIter_);
         DEFINE_STUCT_FIELD(uint8_t, needComputeFlag_);
-        DEFINE_STUCT_FIELD(uint8_t, needComputeKFlag_);        
+        DEFINE_STUCT_FIELD(uint8_t, needComputeKFlag_);
         DEFINE_STUCT_FIELD(uint8_t, l0aPingPongFlag_);
         DEFINE_STUCT_FIELD(uint8_t, useL0PingPong_);
         DEFINE_STUCT_FIELD(uint8_t, usingCacheC1Ping_);

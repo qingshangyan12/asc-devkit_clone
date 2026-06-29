@@ -88,9 +88,9 @@ enum TemplateType {
     TEMPLATE_REDUCESCATTER_RECURSIVE_HD = 33,             // ReduceScatterRecursiveHalvingDoubling
     TEMPLATE_REDUCESCATTER_RING_DIRECT = 34,             // ReduceScatterRingConcurrentDirect
     TEMPLATE_REDUCESCATTER_RING = 35,             // ReduceScatterRing
-    TEMPLATE_ALL_REDUCE_RECURSIVE_HALVING_DOUBLING = 36, 
-    TEMPLATE_ALL_REDUCE_RING = 37, 
-    TEMPLATE_REDUCE_RECURSIVE_HALVING_DOUBLING = 38, 
+    TEMPLATE_ALL_REDUCE_RECURSIVE_HALVING_DOUBLING = 36,
+    TEMPLATE_ALL_REDUCE_RING = 37,
+    TEMPLATE_REDUCE_RECURSIVE_HALVING_DOUBLING = 38,
     TEMPLATE_REDUCE_RING = 39,
     TEMPLATE_REDUCE_NHR_ONE_SHOT = 40,
     TEMPLATE_ALL_REDUCE_CHUNK_MESH = 41,
@@ -151,7 +151,7 @@ enum TemplateType {
 
     TEMPLATE_ALL_GATHER_GRAPH_PIPELINE = 91,        // AllGatherGraphPipeline AG图模式pipeline
     TEMPLATE_REDUCESCATTER_GRAPH_PIPELINE = 92,     // ReduceScatterGraphPipeline AG图模式pipeline
-    
+
     TEMPLATE_ALL_GATHER_SLIM_RING = 93,
     TEMPLATE_REDUCESCATTER_SLIM_RING =94,
 
@@ -264,7 +264,7 @@ public:
                          const std::vector<Slice> &slices = std::vector<Slice>(ZERO_SLICE),
                          const u64 baseOffset = 0, std::vector<u32> nicRankList = {0, 1, 2, 3, 4, 5, 6, 7},
                          const bool disableDMAReduce = false);
-    
+
     /* 11个参数 */
     virtual HcclResult Prepare(DeviceMem &inputMem, DeviceMem &scratchMem, const u64 count,
                          const HcclDataType dataType,
@@ -329,88 +329,88 @@ public:
 
     /* 6个参数 */
     // AlltoAllVStagedPairwise
-    virtual HcclResult Prepare(DeviceMem &sendMem, DeviceMem &recvMem, StageAlltoAllVAddrInfo &sendAddrInfo, 
+    virtual HcclResult Prepare(DeviceMem &sendMem, DeviceMem &recvMem, StageAlltoAllVAddrInfo &sendAddrInfo,
         StageAlltoAllVAddrInfo &recvAddrInfo, bool isAlltoAllZCopyMode, Stream &mainStream);
 
     /* 7个参数 */
-    virtual HcclResult Prepare(u64 reduceAttrBitMap, std::vector<Stream> &meshStreams, 
-        std::vector<std::shared_ptr<LocalNotify>> &meshSignal, std::vector<std::shared_ptr<LocalNotify>> &meshSignalAux, 
+    virtual HcclResult Prepare(u64 reduceAttrBitMap, std::vector<Stream> &meshStreams,
+        std::vector<std::shared_ptr<LocalNotify>> &meshSignal, std::vector<std::shared_ptr<LocalNotify>> &meshSignalAux,
         u32 userRank, HcomCollOpInfo *opInfo, bool aicpu);
 
     // AlltoAllVPairWise
-    virtual HcclResult Prepare(AlltoAllVBufferInfo &sendBuffer, AlltoAllVBufferInfo &recvBuffer, 
-        bool isAlltoAllZCopyMode, const Stream &stream, HcclWorkflowMode workMode, 
+    virtual HcclResult Prepare(AlltoAllVBufferInfo &sendBuffer, AlltoAllVBufferInfo &recvBuffer,
+        bool isAlltoAllZCopyMode, const Stream &stream, HcclWorkflowMode workMode,
         std::map<u32, std::vector<u64>> &rankSendDisplsMap, std::map<u32, std::vector<u64>> &rankRecvDisplsMap);
 
     // AlignedAllGatherDoubleRing
-    virtual HcclResult Prepare(HcomCollOpInfo *opInfo, const u32 userRank, std::vector<Stream> &subStreams, 
-        std::vector<std::shared_ptr<LocalNotify>> &mainSignals, std::vector<std::shared_ptr<LocalNotify>> &subSignals, 
-        const std::vector<std::vector<u32>> &ringsOrders, 
+    virtual HcclResult Prepare(HcomCollOpInfo *opInfo, const u32 userRank, std::vector<Stream> &subStreams,
+        std::vector<std::shared_ptr<LocalNotify>> &mainSignals, std::vector<std::shared_ptr<LocalNotify>> &subSignals,
+        const std::vector<std::vector<u32>> &ringsOrders,
         const std::vector<std::vector<Slice>> &userMemOutputSlicesOfDoubleRing);
 
     // AllGatherMeshAtomic, AllgatherMeshDirect, AllGatherMesh, AllGatherMeshMix, GatherMesh
-    virtual HcclResult Prepare(std::vector<Stream> &meshStreams, std::vector<std::shared_ptr<LocalNotify>> &meshSignal, 
-        std::vector<std::shared_ptr<LocalNotify>> &meshSignalAux, u32 userRank = INVALID_VALUE_RANKID, 
+    virtual HcclResult Prepare(std::vector<Stream> &meshStreams, std::vector<std::shared_ptr<LocalNotify>> &meshSignal,
+        std::vector<std::shared_ptr<LocalNotify>> &meshSignalAux, u32 userRank = INVALID_VALUE_RANKID,
         HcomCollOpInfo *opInfo = nullptr, u32 interRank = INVALID_VALUE_RANKID, u32 interRankSize = 0);
 
     /* 8个参数 */
-    virtual HcclResult Prepare(u64 reduceAttrBitMap, std::vector<Stream> &meshStreams, 
-        std::vector<std::shared_ptr<LocalNotify>> &meshSignal, std::vector<std::shared_ptr<LocalNotify>> &meshSignalAux, 
+    virtual HcclResult Prepare(u64 reduceAttrBitMap, std::vector<Stream> &meshStreams,
+        std::vector<std::shared_ptr<LocalNotify>> &meshSignal, std::vector<std::shared_ptr<LocalNotify>> &meshSignalAux,
         u32 interRank, u32 interRankSize, u32 userRank, HcomCollOpInfo *opInfo);
 
     // AlltoAllVStagedPairwise
-    virtual HcclResult Prepare(DeviceMem &sendMem, DeviceMem &recvMem, DeviceMem &scratchInputMem, 
-        DeviceMem &scratchOutputMem, StageAlltoAllVAddrInfo &sendAddrInfo, StageAlltoAllVAddrInfo &recvAddrInfo, 
+    virtual HcclResult Prepare(DeviceMem &sendMem, DeviceMem &recvMem, DeviceMem &scratchInputMem,
+        DeviceMem &scratchOutputMem, StageAlltoAllVAddrInfo &sendAddrInfo, StageAlltoAllVAddrInfo &recvAddrInfo,
         bool isAlltoAllZCopyMode, Stream &mainStream);
 
     // AllGatherRingConcurrentDirect ScatterRingConcurrentDirect
-    virtual HcclResult Prepare(HcomCollOpInfo *opInfo, const u32 userRank, std::vector<Stream> &subStreams, 
-        const std::vector<std::shared_ptr<LocalNotify>> &mainSignals, 
-        const std::vector<std::shared_ptr<LocalNotify>> &subSignals, const std::vector<u32> &ringsOrder, 
+    virtual HcclResult Prepare(HcomCollOpInfo *opInfo, const u32 userRank, std::vector<Stream> &subStreams,
+        const std::vector<std::shared_ptr<LocalNotify>> &mainSignals,
+        const std::vector<std::shared_ptr<LocalNotify>> &subSignals, const std::vector<u32> &ringsOrder,
         const std::vector<Slice> &userMemSlices, bool isSdma = true);
 
     /* 9个参数 */
     // scatterDoubleRingDirect
-    virtual HcclResult Prepare(HcomCollOpInfo *opInfo, const u32 userRank, const u32 subRingRank, 
-        std::vector<Stream> &subStreams, const std::vector<std::shared_ptr<LocalNotify>> &mainSignals, 
-        const std::vector<std::shared_ptr<LocalNotify>> &subSignals, const std::vector<std::vector<u32>> &ringsOrders, 
-        const std::vector<std::vector<Slice>> &multiRingSlices, 
+    virtual HcclResult Prepare(HcomCollOpInfo *opInfo, const u32 userRank, const u32 subRingRank,
+        std::vector<Stream> &subStreams, const std::vector<std::shared_ptr<LocalNotify>> &mainSignals,
+        const std::vector<std::shared_ptr<LocalNotify>> &subSignals, const std::vector<std::vector<u32>> &ringsOrders,
+        const std::vector<std::vector<Slice>> &multiRingSlices,
         const std::vector<std::vector<Slice>> &userMemInputSlices);
-    
+
     // ReduceScatterRingConcurrentDirect
-    virtual HcclResult Prepare(const u64 reduceAttrBitMap, const HcomCollOpInfo *opInfo, const u32 userRank, 
-        std::vector<Stream> &subStreams, const std::vector<std::shared_ptr<LocalNotify>> &mainSignals, 
-        const std::vector<std::shared_ptr<LocalNotify>> &subSignals, const std::vector<u32> &ringsOrder, 
+    virtual HcclResult Prepare(const u64 reduceAttrBitMap, const HcomCollOpInfo *opInfo, const u32 userRank,
+        std::vector<Stream> &subStreams, const std::vector<std::shared_ptr<LocalNotify>> &mainSignals,
+        const std::vector<std::shared_ptr<LocalNotify>> &subSignals, const std::vector<u32> &ringsOrder,
         const std::vector<Slice> &userMemInputSlices, bool isSdma = true);
 
     // AlltoAllVPairWise
-    virtual HcclResult Prepare(AlltoAllVBufferInfo &sendBuffer, AlltoAllVBufferInfo &recvBuffer, 
-        DeviceMem &scratchInputMem, DeviceMem &scratchOutputMem, bool isAlltoAllZCopyMode, const Stream &stream, 
-        HcclWorkflowMode workMode, std::map<u32, std::vector<u64>> &rankSendDisplsMap, 
+    virtual HcclResult Prepare(AlltoAllVBufferInfo &sendBuffer, AlltoAllVBufferInfo &recvBuffer,
+        DeviceMem &scratchInputMem, DeviceMem &scratchOutputMem, bool isAlltoAllZCopyMode, const Stream &stream,
+        HcclWorkflowMode workMode, std::map<u32, std::vector<u64>> &rankSendDisplsMap,
         std::map<u32, std::vector<u64>> &rankRecvDisplsMap);
-    
+
     /* 10个参数 */
-    virtual HcclResult Prepare(const HcomCollOpInfo *opInfo, DeviceMem &cclBufferA, DeviceMem &cclBufferB, 
-        const u64 count, const SubCommInfo &level1CommInfo, const SubCommInfo &level0CommInfo, Stream &mainStream, 
-        std::vector<Stream> &subStream, std::vector<std::shared_ptr<LocalNotify>> &notifyMain, 
+    virtual HcclResult Prepare(const HcomCollOpInfo *opInfo, DeviceMem &cclBufferA, DeviceMem &cclBufferB,
+        const u64 count, const SubCommInfo &level1CommInfo, const SubCommInfo &level0CommInfo, Stream &mainStream,
+        std::vector<Stream> &subStream, std::vector<std::shared_ptr<LocalNotify>> &notifyMain,
         std::vector<std::shared_ptr<LocalNotify>> &notifySub);
-    
+
     // AlltoAllPipelineMeshPairwiseCCLEnough, AlltoAllPipelineMeshPairwisePingPong
-    virtual HcclResult Prepare(u32 userRank, A2aPipelineMemory A2aPipelineMemory, const SubCommInfo &level0CommInfo, 
+    virtual HcclResult Prepare(u32 userRank, A2aPipelineMemory A2aPipelineMemory, const SubCommInfo &level0CommInfo,
         const SubCommInfo &level1CommInfo, Stream &mainStream, std::vector<Stream> &subStream,
-        std::vector<std::shared_ptr<LocalNotify>> &notifyMain, std::vector<std::shared_ptr<LocalNotify>> &notifySub, 
-        std::vector<SendRecvInfo> &allMeshAggregationSendRecvInfo, 
+        std::vector<std::shared_ptr<LocalNotify>> &notifyMain, std::vector<std::shared_ptr<LocalNotify>> &notifySub,
+        std::vector<SendRecvInfo> &allMeshAggregationSendRecvInfo,
         HcclWorkflowMode workMode = HcclWorkflowMode::HCCL_WORKFLOW_MODE_OP_BASE);
 
     // AlltoAllVSatgedMesh
-    virtual HcclResult Prepare(DeviceMem &sendMem, DeviceMem &recvMem, StageAlltoAllVAddrInfo &sendAddrInfo, 
-        StageAlltoAllVAddrInfo &recvAddrInfo, bool isAlltoAllZCopyMode, u32 userRank, Stream &mainStream, 
-        std::vector<Stream> &subStreams, std::vector<std::shared_ptr<LocalNotify>> &meshSignalMainToSub, 
+    virtual HcclResult Prepare(DeviceMem &sendMem, DeviceMem &recvMem, StageAlltoAllVAddrInfo &sendAddrInfo,
+        StageAlltoAllVAddrInfo &recvAddrInfo, bool isAlltoAllZCopyMode, u32 userRank, Stream &mainStream,
+        std::vector<Stream> &subStreams, std::vector<std::shared_ptr<LocalNotify>> &meshSignalMainToSub,
         std::vector<std::shared_ptr<LocalNotify>> &meshSignalSubToMain);
 
     // ReduceScatterPlantLocalReduce
     virtual HcclResult Prepare(void *inputMemPtr, DeviceMem &cclInMem, DeviceMem &outputMem,
-        const Stream &stream, std::vector<Stream> &subStreams, 
+        const Stream &stream, std::vector<Stream> &subStreams,
         std::vector<std::shared_ptr<LocalNotify>> &meshSignal, std::vector<std::shared_ptr<LocalNotify>> &meshSignalAux,
         GroupSlicesInfo &grouSlicesInfo, const HcclReduceOp reductionOp, u32 all2allOffset, const HcclDataType dataType,
         bool isNeedSpaceBorrow, bool reverseMemUsage = false, bool isA3CrossNode = false);
@@ -420,18 +420,18 @@ public:
         const Stream &stream, std::vector<Stream> &subStreams, std::vector<std::shared_ptr<LocalNotify>> &meshSignal,
         std::vector<std::shared_ptr<LocalNotify>> &meshSignalAux, MemBlockInfo &memBlockInfo,
         const HcclReduceOp reductionOp, const HcclDataType dataType, bool isUseCclIn, bool isLevel0LastRank, bool isNeedSpaceBorrow);
-    
+
     /* 11个参数 */
     // Prepare for AllGatherPipeline
-    virtual HcclResult Prepare(HcomCollOpInfo *opInfo, u32 userRank, u64 &count, DeviceMem &cclBufferPartOne, 
-        DeviceMem &cclBufferPartTwo, SubCommInfo &level0CommInfo, SubCommInfo &level1CommInfo, Stream &mainStream, 
+    virtual HcclResult Prepare(HcomCollOpInfo *opInfo, u32 userRank, u64 &count, DeviceMem &cclBufferPartOne,
+        DeviceMem &cclBufferPartTwo, SubCommInfo &level0CommInfo, SubCommInfo &level1CommInfo, Stream &mainStream,
         std::vector<Stream> &subStream, std::vector<std::shared_ptr<LocalNotify>> &notifyMain,
         std::vector<std::shared_ptr<LocalNotify>> &notifySub);
 
     // Prepare for AllGatherUnifiedMarch
-    virtual HcclResult Prepare(const Stream &mainStream, SubCommInfo &level0CommInfo, DeviceMem &userInput, 
+    virtual HcclResult Prepare(const Stream &mainStream, SubCommInfo &level0CommInfo, DeviceMem &userInput,
         DeviceMem &userOutput, DeviceMem &usrInMem, DeviceMem &usrOutMem, u64 blockDataByte,
-        std::vector<Stream> &subStreams, const std::vector<std::shared_ptr<LocalNotify>> &meshSignalMainToSub, 
+        std::vector<Stream> &subStreams, const std::vector<std::shared_ptr<LocalNotify>> &meshSignalMainToSub,
         const std::vector<std::shared_ptr<LocalNotify>> &meshSignalSubToMain,
         const std::vector<std::vector<Slice>> &multRingsUserMemSlice, const u64 baseOffset = 0);
 
@@ -440,7 +440,7 @@ public:
         DeviceMem &usrOutMem, u64 totalCount, const HcclDataType dataType, const Stream &mainStream,
         std::vector<Stream> &meshStreams, std::vector<std::shared_ptr<LocalNotify>> &meshSignal,
         std::vector<std::shared_ptr<LocalNotify>> &meshSignalAux, u32 userRank, HcomCollOpInfo *opInfo);
-    
+
     // Prepare for AlltoAllvContinuousPipeline
     virtual HcclResult Prepare(const u32 userRank, const A2aPipelineMemory &a2aPipelineMemory,
         const SubCommInfo &level0CommInfo, const SubCommInfo &level1CommInfo,
@@ -453,13 +453,13 @@ public:
     // AlltoAllVFor310P
     virtual HcclResult Prepare(DeviceMem &userInput, DeviceMem &userOutput, DeviceMem &cclInMem, DeviceMem &cclOutMem,
         const std::vector<std::shared_ptr<LocalNotify>> &signalMainToSub,
-        const std::vector<std::shared_ptr<LocalNotify>> &signalSubToMain, Stream &mainStream, 
+        const std::vector<std::shared_ptr<LocalNotify>> &signalSubToMain, Stream &mainStream,
         std::vector<Stream> &subStreams, const std::vector<LINK> &links, u32 userRank, u32 userRankSize,
         std::vector<SendRecvInfo> &allMeshAggregationSendRecvInfo);
 
     // AlltoAllVStagedMesh
-    virtual HcclResult Prepare(DeviceMem &sendMem, DeviceMem &recvMem, DeviceMem &scratchInputMem, 
-        DeviceMem &scratchOutputMem, StageAlltoAllVAddrInfo &sendAddrInfo, StageAlltoAllVAddrInfo &recvAddrInfo, 
+    virtual HcclResult Prepare(DeviceMem &sendMem, DeviceMem &recvMem, DeviceMem &scratchInputMem,
+        DeviceMem &scratchOutputMem, StageAlltoAllVAddrInfo &sendAddrInfo, StageAlltoAllVAddrInfo &recvAddrInfo,
         bool isAlltoAllZCopyMode, u32 userRank, Stream &mainStream, std::vector<Stream> &subStreams,
         std::vector<std::shared_ptr<LocalNotify>> &meshSignalMainToSub,
         std::vector<std::shared_ptr<LocalNotify>> &meshSignalSubToMain);
@@ -467,9 +467,9 @@ public:
     // ReduceScatterPipeline
     virtual HcclResult Prepare(HcomCollOpInfo *opInfo, DeviceMem &cclBuffer, const u64 count, const u64 bufferSize,
         const u64 offset, const SubCommInfo &level0CommInfo, const SubCommInfo &level1CommInfo, Stream &mainStream,
-        std::vector<Stream> &subStream, std::vector<std::shared_ptr<LocalNotify>> &notifyMain, 
+        std::vector<Stream> &subStream, std::vector<std::shared_ptr<LocalNotify>> &notifyMain,
         std::vector<std::shared_ptr<LocalNotify>> &notifySub, u64 reduceAttrBitMap);
-    
+
     // ReduceScatterVPipeline
     virtual HcclResult Prepare(HcomCollOpInfo *opInfo, DeviceMem &cclBuffer, const u64 bufferSize,
         const std::vector<Slice> &slices, const SubCommInfo &level0CommInfo, const SubCommInfo &level1CommInfo,
@@ -480,12 +480,12 @@ public:
 
     // BroadcastStar
     virtual HcclResult Prepare(DeviceMem &inputMem, DeviceMem &outputMem, DeviceMem &scratchMem, const u64 count,
-        const HcclDataType dataType, const Stream &stream, const HcclReduceOp reductionOp, const u32 root, 
+        const HcclDataType dataType, const Stream &stream, const HcclReduceOp reductionOp, const u32 root,
         const std::vector<Slice> &slices, const u64 baseOffset, std::vector<u32> nicRankList, u32 userRank);
 
     // Prepare for AllGatherVPipeline
-    virtual HcclResult Prepare(HcomCollOpInfo *opInfo, u32 userRank, u64 &count, DeviceMem &cclBufferPartOne, 
-        DeviceMem &cclBufferPartTwo, SubCommInfo &level0CommInfo, SubCommInfo &level1CommInfo, Stream &mainStream, 
+    virtual HcclResult Prepare(HcomCollOpInfo *opInfo, u32 userRank, u64 &count, DeviceMem &cclBufferPartOne,
+        DeviceMem &cclBufferPartTwo, SubCommInfo &level0CommInfo, SubCommInfo &level1CommInfo, Stream &mainStream,
         std::vector<Stream> &subStream, std::vector<std::shared_ptr<LocalNotify>> &notifyMain,
         std::vector<std::shared_ptr<LocalNotify>> &notifySub, std::vector<Slice>& userOutSlice);
 
@@ -513,9 +513,9 @@ public:
 
     /* 15个参数 */
     // AlltoAllVMeshReadOnly
-    virtual HcclResult Prepare(DeviceMem &userInput, DeviceMem &userOutput, DeviceMem &scratchPingMem, 
+    virtual HcclResult Prepare(DeviceMem &userInput, DeviceMem &userOutput, DeviceMem &scratchPingMem,
         DeviceMem &scratchPongMem, StageAlltoAllVAddrInfo &sendAddrInfo, StageAlltoAllVAddrInfo &recvAddrInfo,
-        HcclWorkflowMode workMode, Stream &mainStream, std::vector<Stream> &subStreams, 
+        HcclWorkflowMode workMode, Stream &mainStream, std::vector<Stream> &subStreams,
         const std::vector<std::shared_ptr<LocalNotify>> &meshSignalMainToSub,
         const std::vector<std::shared_ptr<LocalNotify>> &meshSignalSubToMain, u32 userRank, u32 intraRankSize,
         const std::vector<LINK> &links, std::vector<SendRecvInfo> &allMeshAggregationSendRecvInfo);
@@ -530,11 +530,11 @@ public:
 
     //ReduceScatterHccsSio
     virtual HcclResult Prepare(DeviceMem &inputMem, DeviceMem &outputMem, DeviceMem &scratchMem, const u64 count,
-        const HcclDataType dataType, const Stream &stream, const HcclReduceOp reductionOp, 
-        const u32 root,  const u64 baseOffset, 
-        const u64 reduceAttrBitMap, std::vector<Stream> &meshStreams, 
-        std::vector<std::shared_ptr<LocalNotify>> &meshSignal, 
-        std::vector<std::shared_ptr<LocalNotify>> &meshSignalAux, 
+        const HcclDataType dataType, const Stream &stream, const HcclReduceOp reductionOp,
+        const u32 root,  const u64 baseOffset,
+        const u64 reduceAttrBitMap, std::vector<Stream> &meshStreams,
+        std::vector<std::shared_ptr<LocalNotify>> &meshSignal,
+        std::vector<std::shared_ptr<LocalNotify>> &meshSignalAux,
         u32 userRank, SubCommInfo subCommInfoHccs, SubCommInfo subCommInfoSio, HcomCollOpInfo *opInfo);
 
     /* 17个参数 */
@@ -622,7 +622,7 @@ protected:
     HcclResult ExecuteBarrier(const std::shared_ptr<Transport> &preLink, const std::shared_ptr<Transport> &aftLink);
     HcclResult ExecuteBarrier(const std::shared_ptr<Transport> &preLink,
         const std::shared_ptr<Transport> &aftLink, Stream &stream);
-    HcclResult ExecuteBarrier(const std::shared_ptr<Transport> &preLink, 
+    HcclResult ExecuteBarrier(const std::shared_ptr<Transport> &preLink,
         const std::shared_ptr<Transport> &aftLink, u32 notifyIdx);
     HcclResult ExecuteBarrier(const std::shared_ptr<Transport> &preLink,
         const std::shared_ptr<Transport> &aftLink, u32 notifyIdx, Stream &stream);

@@ -48,9 +48,9 @@ private:
             const InsQuePtr& queue, const LinkData& link, const RankSliceInfo &sliceInfoVec) const;
     HcclResult RankRecvData(const u64 memOffset, const TemplateDataParams &tempAlgParams,
             const InsQuePtr& queue, const LinkData& link, const RankSliceInfo &sliceInfoVec) const;
-    
+
     HcclResult CalcDataSliceInfo(const u64 dataSize, RankSliceInfo &sliceInfoVec);
-    
+
     BufferType srcBufferType_ = BufferType::INPUT;
     BufferType dstBufferType_ = BufferType::INPUT;
 };

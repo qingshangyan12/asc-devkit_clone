@@ -149,7 +149,7 @@ HcclResult CollAllGatherRingZerocopyPipelineExecutor::RunLoop(OpParam &param)
     CHK_PTR_NULL(curOutputPtr);
 
     u64 maxCountPerLoop = CalcLoopMaxCount(algResResp_->cclInputMem.size(), unitSize_);
-    CHK_PRT_RET(maxCountPerLoop == 0, 
+    CHK_PRT_RET(maxCountPerLoop == 0,
         HCCL_ERROR("[CollAllGatherRingZerocopyPipelineExecutor][RunLoop]tag[%s] userRankSize[%u] maxCountPerLoop[%llu]",
         tag_.c_str(), topoAttr_.userRankSize, maxCountPerLoop), HCCL_E_PARA);
 
@@ -186,7 +186,7 @@ HcclResult CollAllGatherRingZerocopyPipelineExecutor::KernelRunWithLoop(const Op
     DeviceMem srcMem = DeviceMem::create(static_cast<u8 *>(execMem.inputPtr), curSize);
     DeviceMem dstMem = execMem.inputMem.range(0, curSize);
     CHK_RET(HcclD2DMemcpyAsync(dispatcher_, dstMem, srcMem, mainStream_));
-    
+
     memIdx_ = 0;
     blockIdx_ = level2Rank_;
 
@@ -194,7 +194,7 @@ HcclResult CollAllGatherRingZerocopyPipelineExecutor::KernelRunWithLoop(const Op
         // 启动L2 RDMA
         if (step < level2RankSize_ - 1) {
             CHK_RET(NotifyRdmaStreamStart());
-        }        
+        }
 
         // L1 SDMA
         CHK_RET(KernelRunInterServer(param, execMem));
@@ -287,7 +287,7 @@ HcclResult CollAllGatherRingZerocopyPipelineExecutor::SemiRingAllGather(
     const u64 count, const HcclDataType &dataType, const std::vector<std::vector<Slice>> &multRingsSliceZero,
     const Stream &stream, s32 profStage, const u64 baseOffset, const HcomCollOpInfo *opInfo,
     const std::vector<std::vector<Slice>> &multRingsUserMemSlice)
-{    
+{
     (void)tag;
     (void)multRingsSliceZero;
     (void)opInfo;

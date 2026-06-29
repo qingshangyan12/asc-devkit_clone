@@ -12,7 +12,7 @@
 #include "profiling_handler_lite.h"
 #include "mirror_task_manager_lite.h"
 #include "circular_queue.h"
- 
+
 namespace Hccl {
 class ProfilingReporterLite {
 public:
@@ -28,5 +28,5 @@ private:
     std::map<u32, std::shared_ptr<Queue<std::shared_ptr<TaskInfo>>::Iterator>> lastPoses_{};
 };
 } // namespace Hccl
- 
+
 #endif // HCCL_PROFILING_REPORTER_LITE_H

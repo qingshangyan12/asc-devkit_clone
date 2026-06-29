@@ -1,24 +1,24 @@
 # CubeResGroupHandle<a name="ZH-CN_TOPIC_0000001996656313"></a>
 
--   **[CubeResGroupHandle使用说明](CubeResGroupHandle使用说明.md)**  
+-   **[CubeResGroupHandle使用说明](CubeResGroupHandle使用说明.md)**
 
--   **[CubeResGroupHandle构造函数](CubeResGroupHandle构造函数.md)**  
+-   **[CubeResGroupHandle构造函数](CubeResGroupHandle构造函数.md)**
 
--   **[CreateCubeResGroup](CreateCubeResGroup.md)**  
+-   **[CreateCubeResGroup](CreateCubeResGroup.md)**
 
--   **[AssignQueue](AssignQueue.md)**  
+-   **[AssignQueue](AssignQueue.md)**
 
--   **[AllocMessage](AllocMessage.md)**  
+-   **[AllocMessage](AllocMessage.md)**
 
--   **[PostMessage](PostMessage.md)**  
+-   **[PostMessage](PostMessage.md)**
 
--   **[PostFakeMsg](PostFakeMsg.md)**  
+-   **[PostFakeMsg](PostFakeMsg.md)**
 
--   **[SetQuit](SetQuit.md)**  
+-   **[SetQuit](SetQuit.md)**
 
--   **[Wait](Wait.md)**  
+-   **[Wait](Wait.md)**
 
--   **[FreeMessage](FreeMessage.md)**  
+-   **[FreeMessage](FreeMessage.md)**
 
--   **[SetSkipMsg](SetSkipMsg.md)**  
+-   **[SetSkipMsg](SetSkipMsg.md)**
 

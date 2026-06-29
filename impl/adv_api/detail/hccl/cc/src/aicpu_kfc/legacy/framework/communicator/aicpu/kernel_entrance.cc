@@ -89,7 +89,7 @@ uint32_t HcclUpdateCommKernelEntrance(void *args)
     auto *kernelParam = reinterpret_cast<HcclKernelParamLite *>(args);
     u32 commIdIndex = kernelParam->comm.idIndex;
     HCCL_INFO("[NsRecovery] HcclUpdateCommKernelEntrance begin, commIdIndex[%u]", commIdIndex);
- 
+
     Hccl::CommunicatorImplLite *communicatorImplLite = CommunicatorImplLiteMgr::GetInstance().Get(commIdIndex);
     if (communicatorImplLite == nullptr) {
         HCCL_ERROR("HcclUpdateCommKernelEntrance communicatorImplLite is null.");

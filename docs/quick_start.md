@@ -165,7 +165,7 @@ CANN包分为CANN toolkit包和CANN ops包。
     ```
 
 - **检查CANN包安装**：
-  
+
     ```bash
     # 查看CANN Toolkit的version字段提供的版本信息（默认路径安装）。CANNLab场景下，请将/usr/local替换为/home/developer
     cat /usr/local/Ascend/cann/$(uname -m)-linux/ascend_toolkit_install.info

@@ -40,14 +40,14 @@ HcclResult InsTempReduceAicpuReduceMesh2D::CalcRes(AlgTempResReq &tempResReq)
 }
 
 u32 InsTempReduceAicpuReduceMesh2D::CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) const
-{   
+{
     (void) inBuffType;
     (void) outBuffType;
     return tempRankSize_;
 }
 
 HcclResult InsTempReduceAicpuReduceMesh2D::RunAicpuLocalReduce(const TemplateDataParams &templateDataParams, std::vector<InsQuePtr> &tempInsQues)
-{   
+{
     CHK_PRT_RET(tempInsQues.empty(),
         HCCL_ERROR("[InsTempReduceAicpuReduceMesh2D][RunAicpuLocalReduce] empty queue"), HcclResult::HCCL_E_INTERNAL);
     CHK_PTR_NULL(tempInsQues[0]);
@@ -134,7 +134,7 @@ HcclResult InsTempReduceAicpuReduceMesh2D::RunGatherToRootY(const TemplateDataPa
 
 HcclResult InsTempReduceAicpuReduceMesh2D::RunGatherToRootXY(const TemplateDataParams &templateDataParams, const ResLinks &tempLinks,
                         std::vector<InsQuePtr> &tempInsQues)
-{   
+{
     // Step 1
     CHK_RET(PreSyncInterQueues(tempInsQues));
     CHK_RET(RunGatherToRootX(templateDataParams, tempLinks, tempInsQues));
@@ -158,7 +158,7 @@ HcclResult InsTempReduceAicpuReduceMesh2D::RunXGatherToRoot(const TemplateDataPa
                 u32 calcX = (rootX_ + x + 1) % sizeY_;
                 u32 peerRank = calcX * sizeX_ + calcY;
                 DataSlice srcDstSlice(BufferType::SCRATCH, templateDataParams.sliceSize * peerRank + rankOffsetY_, dataSizeY_);
-                srcDstRecvSlices.emplace_back(srcDstSlice);   
+                srcDstRecvSlices.emplace_back(srcDstSlice);
             }
             SlicesList rxSlicesList(srcDstRecvSlices, srcDstRecvSlices);
             DataInfo recvData(linkRecv, rxSlicesList);
@@ -211,7 +211,7 @@ HcclResult InsTempReduceAicpuReduceMesh2D::RunYGatherToRoot(const TemplateDataPa
         for (u32 y = 0; y < sizeX_; y++) {
             u32 peerRank = curX_ * sizeX_ + y;
             DataSlice srcDstSlice(BufferType::SCRATCH, templateDataParams.sliceSize * peerRank, dataSizeX_);
-            srcDstSlicesY.emplace_back(srcDstSlice); 
+            srcDstSlicesY.emplace_back(srcDstSlice);
         }
         SlicesList txSlicesList(srcDstSlicesY, srcDstSlicesY);
         DataInfo sendDataY(linkSendXY, txSlicesList);
@@ -230,7 +230,7 @@ HcclResult InsTempReduceAicpuReduceMesh2D::RunXYGatherToRoot(const TemplateDataP
     CHK_RET(RunYGatherToRoot(templateDataParams, tempLinks, tempInsQues));
     CHK_RET(PostSyncInterQueues(tempInsQues));
     return HCCL_SUCCESS;
-}  
+}
 
 HcclResult InsTempReduceAicpuReduceMesh2D::GenExtIns(const TempFuncs &tempFuncs, const TemplateDataParams &templateDataParams,
                         const ResLinks &tempLinks, std::vector<InsQuePtr> &tempInsQues)
@@ -245,7 +245,7 @@ HcclResult InsTempReduceAicpuReduceMesh2D::GenExtIns(const TempFuncs &tempFuncs,
         HCCL_ERROR("[CollAlgFactory] [InsTempReduceAicpuReduceMesh2D] Rank [%d], requiredQue Error.", myRank_),
         HcclResult::HCCL_E_INTERNAL);
     dataTypeSize_  = DataTypeSizeGet(dataType_);
-    rootX_ = root_ / sizeX_; 
+    rootX_ = root_ / sizeX_;
     rootY_ = root_ % sizeX_;
     const int splitDataXYFactor = 2;
     dataSizeX_ = templateDataParams.sliceSize / dataTypeSize_ / splitDataXYFactor * dataTypeSize_;
