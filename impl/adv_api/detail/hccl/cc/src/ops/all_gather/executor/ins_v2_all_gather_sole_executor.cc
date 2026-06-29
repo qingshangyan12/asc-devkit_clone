@@ -71,6 +71,8 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     myRank_ = resCtx.topoInfo.userRank;
 
     threads_ = resCtx.threads;
+    HCCL_INFO("[MC2_OPEN_DIAG][Orchestrate] algName[%s], infosSize[%zu], channelsSize[%zu]",
+          param.algName, resCtx.algHierarchyInfo.infos.size(), resCtx.channels.size());
     if (param.engine != CommEngine::COMM_ENGINE_AIV && param.engine != CommEngine::COMM_ENGINE_CCU) {
         CHK_RET(RestoreChannelMap(resCtx, remoteRankToChannelInfo_));
     }

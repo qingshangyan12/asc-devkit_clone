@@ -30,6 +30,8 @@ HcclResult InsCollAlgBase::RestoreChannelMap(const AlgResourceCtxSerializable &r
     std::vector<std::map<u32, std::vector<ChannelInfo>>> &rankIdToChannelInfo) const
 {
     const AlgHierarchyInfoForAllLevel& algHierarchyInfo = resCtx.algHierarchyInfo;
+    HCCL_INFO("[MC2_OPEN_DIAG][RestoreChannelMap] enter, infosSize[%zu], channelsSize[%zu]",
+        algHierarchyInfo.infos.size(), resCtx.channels.size());
     rankIdToChannelInfo.resize(algHierarchyInfo.infos.size());
     for (u32 level = 0; level < algHierarchyInfo.infos.size(); level++) {
         for (auto &channel: resCtx.channels[level]) {
@@ -38,6 +40,7 @@ HcclResult InsCollAlgBase::RestoreChannelMap(const AlgResourceCtxSerializable &r
         }
         // 不需要再resize内层的map，因为map会自动管理元素
     }
+    HCCL_INFO("[MC2_OPEN_DIAG][RestoreChannelMap] end");
     return HCCL_SUCCESS;
 }
     
