@@ -88,7 +88,7 @@
 | 接口         | 软仿支持数据类型  |
 | :----------- | :---------------- |
 | Interleave   | int64_t、uint64_t |
-| Deinterleave | int64_t、uint64_t |
+| DeInterleave | int64_t、uint64_t |
 
 **表8**  数据压缩
 
