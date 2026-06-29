@@ -46,7 +46,7 @@ __aicore__ inline uint32_t mem_copy_cbuf_to_gm_impl(__gm__ T* dst, __cc__ T* src
     uint16_t m = (burstLen * ASC_ONE_DATABLOCK_SIZE / b32ByteSize) / blockCube;
     bool nz2ndEn = true;
 
-    copy_matrix_cc_to_gm((__gm__ float*)dst, (__cc__ float*)src, 0, n, m, m * blockCube, m, 0, 0, 0,
+    copy_matrix_cc_to_gm((__gm__ int32_t*)dst, (__cc__ int32_t*)src, 0, n, m, m * blockCube, m, 0, 0, 0,
         static_cast<uint64_t>(QuantMode_t::NoQuant), static_cast<uint8_t>(false), false, false, static_cast<uint64_t>(QuantMode_post::NoConv),
         0, false, false, 0, false, false, true, false, false, false);
     return 0;
