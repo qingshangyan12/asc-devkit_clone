@@ -328,8 +328,8 @@ template <
     typename AType, typename BType, typename CType, typename BiasType, uint32_t singleN, uint32_t baseM,
     uint32_t depthA1Param, uint32_t stepKaParam, bool useUnitFlag>
 __aicore__ inline void MatmulKernelMdlL2CacheConstant<
-    AType, BType, CType, BiasType, singleN, baseM, depthA1Param, stepKaParam, useUnitFlag>::Process(AscendC::TPipe*
-                                                                                                        pipe)
+    AType, BType, CType, BiasType, singleN, baseM, depthA1Param, stepKaParam,
+    useUnitFlag>::Process(AscendC::TPipe* pipe)
 {
     REGIST_MATMUL_OBJ(pipe, GetSysWorkSpacePtr(), matmulObj, (TCubeTiling*)nullptr);
     matmulObj.SetOrgShape(shapes.m, shapes.n, shapes.k);
