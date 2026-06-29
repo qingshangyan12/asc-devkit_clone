@@ -99,9 +99,9 @@ __global__ __launch_bounds__(MAX_THREAD_COUNT) void gather_custom(
     ...
 }
 ```
-SIMD与SIMT混合编程：线程级SIMT逻辑拆分到__simt_vf__函数
+SIMD与SIMT混合编程：线程级SIMT逻辑实现放在__simt_vf__函数内
 ```cpp
-__simt_vf__ __launch_bounds__(thread_count) inline void simt_gather(
+__simt_vf__ __launch_bounds__(MAX_THREAD_COUNT) inline void simt_gather(
     __gm__ float* input, __gm__ uint32_t* index, __ubuf__ float* gather_output, ...)
 {
     uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -109,7 +109,7 @@ __simt_vf__ __launch_bounds__(thread_count) inline void simt_gather(
 }
 
 // SIMD与SIMT混合编程：入口Kernel保持__global__ __vector__定义，并通过asc_vf_call调用SIMT VF
-__global__ __vector__ void gather_and_adds_kernel(
+__global__ __vector__ void gather_custom(
     __gm__ float* input, __gm__ uint32_t* index, __gm__ float* output, ...)
 {
     ...
@@ -128,24 +128,24 @@ __global__ __vector__ void gather_and_adds_kernel(
 
 SIMT编程和SIMD与SIMT混合编程的调用配置位置不同，典型差异如下：
 
+SIMT编程：Host侧通过<<<>>>直接配置SIMT Kernel的线程块数量、线程数、动态UB和stream
 ```cpp
-// SIMT编程：Host侧通过<<<>>>直接配置SIMT Kernel的线程块数量、线程数、动态UB和stream
 gather_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(...);
+```
 
+```cpp
 // SIMD与SIMT混合编程：Host侧通过<<<>>>启动Vector Core入口Kernel
-constexpr uint32_t num_blocks = 8;
-constexpr uint32_t dyn_ub_size = 2048;
-gather_and_adds_kernel<<<num_blocks, dyn_ub_size, stream>>>(...);
+gather_and_adds_kernel<<<blocks_per_grid, dyn_ubuf_size, stream>>>(...);
 
 // SIMD与SIMT混合编程：SIMT线程数在入口Kernel内部通过asc_vf_call配置
-asc_vf_call<simt_gather>(dim3(thread_count), input, index, gather_output, ...);
+asc_vf_call<simt_gather>(dim3(threads_per_block), input, index, gather_output, ...);
 ```
 
 具体差异如下：
 
 - SIMT编程样例中，Host侧`<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>`直接启动SIMT Kernel。第一个参数表示线程块数量，第二个参数表示每个线程块内的线程数，第三个参数表示动态UB大小，第四个参数表示stream。
-- SIMD与SIMT混合编程样例中，Host侧`<<<num_blocks, dyn_ub_size, stream>>>`启动的是`__global__ __vector__`入口Kernel。第一个参数表示启动的Vector Core数量或逻辑核数量，第二个参数表示动态UB大小，第三个参数表示stream。
-- 混合编程中的SIMT线程数不由Host侧`<<<>>>`配置，而是在入口Kernel内部通过`asc_vf_call<simt_func>(dim3(thread_count), ...)`配置。
+- SIMD与SIMT混合编程样例中，Host侧`<<<blocks_per_grid, dyn_ubuf_size, stream>>>`启动的是`__global__ __vector__`入口Kernel。第一个参数表示启动的Vector Core数量或逻辑核数量（等同于线程块数量），第二个参数表示动态UB大小，第三个参数表示stream。
+- 混合编程中的SIMT线程数不由Host侧`<<<>>>`配置，而是在入口Kernel内部通过`asc_vf_call<simt_func>(dim3(threads_per_block), ...)`配置。
 
 
 ### CMake编译选项差异
