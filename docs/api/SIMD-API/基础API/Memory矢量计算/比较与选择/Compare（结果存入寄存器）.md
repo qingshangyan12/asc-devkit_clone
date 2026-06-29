@@ -95,10 +95,7 @@
 - 本接口将结果写入128bit的CmpMask寄存器中，可以用[GetCmpMask](GetCmpMask(ISASI).md)接口获取寄存器保存的数据。
 
 - <!-- npu="950" id8 -->
-  针对Ascend 950PR/Ascend 950DT，有如下约束说明：
-  - tensor高维切分计算调用GetTemporaryBufferAddr，占用8KB Unified Buffer。
-  - tensor前n个数据连续计算未调用GetTemporaryBufferAddr，不涉及8KB Unified Buffer。
-  - 该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
+  针对Ascend 950PR/Ascend 950DT，tensor高维切分计算调用GetTemporaryBufferAddr，占用8KB Unified Buffer。
   <!-- end id8 -->
 
 - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。

@@ -52,7 +52,7 @@ __aicore__ inline void SetMaskCount()
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 本接口推荐配合API中IsSetMask模板参数使用，当isSetMask为false时，支持用户调用本接口手动管理Counter模式并通过[SetVectorMask](SetVectorMask.md)设置Counter模式下参与计算的元素个数。
+- 本接口推荐配合API中IsSetMask模板参数使用，当IsSetMask为false时，支持用户调用本接口手动管理Counter模式并通过[SetVectorMask](SetVectorMask.md)设置Counter模式下参与计算的元素个数。
 
 - 设置为Counter模式的场景，需要在矢量计算使用完之后调用[SetMaskNorm](SetMaskNorm.md)将Mask模式恢复为Normal模式，以避免影响后续计算。
 

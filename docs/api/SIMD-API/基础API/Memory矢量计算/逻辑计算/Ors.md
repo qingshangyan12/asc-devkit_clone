@@ -124,7 +124,7 @@ $dst_i = scalar_{idx} | src_i$
     AscendC::Ors<BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, mask, 4, {1, 1, 8, 8});
     ```
 
--   Tensor高维切分计算样例-mask逐bit模式
+-   Tensor高维切分计算样例-mask逐比特模式
 
     ```cpp
     // dstLocal：输出Tensor
