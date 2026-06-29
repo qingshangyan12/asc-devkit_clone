@@ -278,6 +278,7 @@ __simd_callee__ inline void set_dump_tlv_data_reg(U& src, __ubuf__ DumpTensorTlv
 template <DumpTensorPosition dumpPosition, typename T, typename U>
 __simd_callee__ inline void asc_dump_impl_reg(U& src, uint32_t desc, uint32_t dump_size)
 {
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     __ubuf__ BlockVFBufInfo *block_info = get_printf_ubuf_addr(0);
 
     constexpr uint16_t data_block_size = 32;
@@ -292,11 +293,13 @@ __simd_callee__ inline void asc_dump_impl_reg(U& src, uint32_t desc, uint32_t du
     block_info->magic = ASCENDC_SIMD_VF_MAGIC_NUMBER;
     block_info->writeLen += tlv_len;
     block_info->pidx += 1;
+#endif
 }
 
 template <DumpTensorPosition dumpPosition, typename T, typename U>
 __simd_callee__ inline void asc_dump_impl(U& src, uint32_t desc, uint32_t dump_size)
 {
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     __ubuf__ BlockVFBufInfo *block_info = get_printf_ubuf_addr(0);
 
     constexpr uint16_t data_block_size = 32;
@@ -311,6 +314,7 @@ __simd_callee__ inline void asc_dump_impl(U& src, uint32_t desc, uint32_t dump_s
     block_info->magic = ASCENDC_SIMD_VF_MAGIC_NUMBER;
     block_info->writeLen += tlv_len;
     block_info->pidx += 1;
+#endif
 }
 
 template <typename T, typename U>
