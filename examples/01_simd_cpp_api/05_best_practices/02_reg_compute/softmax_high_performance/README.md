@@ -121,7 +121,7 @@ for (uint32_t i = 0; i < aDim; i++) {
 
 ## 第二阶段：MemBase → RegBase (Case 0 → Case 1)
 
-### Case 2: Reg矢量API基线写法 — 循环未融合，含冗余操作
+### Case 1: Reg矢量API基线写法 — 循环未融合，含冗余操作
 
 **优化动机**：MemBase API每次向量计算内部隐式执行 Load→Compute→Store，每次执行需要启动一次Vector Function。RegBase API可将数据加载到寄存器后常驻，中间结果暂存寄存器，多个计算可以通过一个Vector Function完成，仅需最终Store回UB。
 
@@ -327,8 +327,8 @@ Case 5同时应用了三个维度上互不冲突的优化手段，形成"1 + 1 +
 | MemBase→RegBase | 寄存器级计算减少UB↔寄存器往返和VF启动开销 | Case 0→Case 1 |
 | ExpSub融合指令 | 单条指令替代Sub+Exp，减少延迟 | Case 1→Case 2 |
 | 循环融合 | 共享Load/Store，消除冗余搬运和同步 | Case 1→Case 2 |
-| UpdateMask | 自动更新掩码，简洁尾块处理 | Case 2,Case 3 |
-| 主尾块模式 | 主块全Mask无更新开销，尾块独立处理 | Case 4,Case 5 |
+| UpdateMask | 自动更新掩码，简洁尾块处理 | Case 2, Case 3 |
+| 主尾块模式 | 主块全Mask无更新开销，尾块独立处理 | Case 4, Case 5 |
 | 外层循环展开 | 多套寄存器组交错执行，提升指令双发 | Case 2→Case 3, Case 4→Case 5 |
 
 ## 编译运行
@@ -337,7 +337,7 @@ Case 5同时应用了三个维度上互不冲突的优化手段，形成"1 + 1 +
 
 - 切换版本
 
-  通过 `-DSCENARIO_NUM=N` (N=0~6) 指定要编译的版本：
+  通过 `-DSCENARIO_NUM=N` (N=0~5) 指定要编译的版本：
 
   | SCENARIO_NUM | 版本 | 说明 | CMAKE_VF_MODE |
   |:---:|:---:|:---|:---:|
