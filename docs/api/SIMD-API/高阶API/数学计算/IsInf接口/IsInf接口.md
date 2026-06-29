@@ -5,3 +5,4 @@
 -   **[GetIsInfMaxMinTmpSize](GetIsInfMaxMinTmpSize.md)**
 
 -   **[GetIsInfTmpBufferFactorSize](GetIsInfTmpBufferFactorSize.md)**
+

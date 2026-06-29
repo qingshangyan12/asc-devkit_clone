@@ -31,3 +31,4 @@
 -   **[GetResCubeGroupWorkSpaceSize](GetResCubeGroupWorkSpaceSize.md)**  
 
 -   **[ReserveLocalMemory](ReserveLocalMemory.md)**  
+

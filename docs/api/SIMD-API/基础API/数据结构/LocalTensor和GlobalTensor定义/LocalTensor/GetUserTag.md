@@ -87,3 +87,4 @@ if ((tag1 <= 10) && (tag2 >= 9)) {
     AscendC::Add(tensor3, tensor1, tensor2, TILE_LENGTH); // 当tag1小于等于10，tag2大于等于9的时候，才能进行相加操作。
 }
 ```
+

@@ -94,3 +94,6 @@ asc_get_cmp_mask(dst); // 读取结果
 // 结果输出到目标地址中
 asc_lt(dst, src0, src1, repeat, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
 ```
+
+
+

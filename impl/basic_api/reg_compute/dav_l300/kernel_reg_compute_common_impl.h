@@ -157,3 +157,4 @@ template <typename RegT1, typename RegT2> __simd_callee__ inline void B32TraitTw
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_COMMON_IMPL__
 #endif
+

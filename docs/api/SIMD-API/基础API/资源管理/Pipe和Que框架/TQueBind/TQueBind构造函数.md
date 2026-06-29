@@ -68,3 +68,4 @@ __aicore__ inline TQueBind()
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 无
+

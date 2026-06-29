@@ -45,3 +45,4 @@ ContextBuilder &Inputs(std::vector<void *> inputs)
 PlatformInfo platformInfo;
 auto contextBuilder = context_ascendc::ContextBuilder().Inputs({nullptr, reinterpret_cast<void *>(&platformInfo)});
 ```
+

@@ -305,3 +305,4 @@ HcclResult CommStar::CreateExchangerNetwork()
     return HCCL_SUCCESS;
 }
 }  // namespace hccl
+

@@ -9,3 +9,4 @@
 -   **[GetClampMaxMinTmpSize](GetClampMaxMinTmpSize.md)**
 
 -   **[GetClampTmpBufferFactorSize](GetClampTmpBufferFactorSize.md)**
+

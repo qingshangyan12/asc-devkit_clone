@@ -16,3 +16,4 @@ namespace hccl {
 }  // hccl
 
 #endif  /* RECURSIVE_HALVINGDOUBLING_BASE_H */
+

@@ -13,3 +13,4 @@
 -   **[bfloat16x2类型比较函数](bfloat16x2类型比较函数/bfloat16x2类型比较函数.md)**
 
 -   **[bfloat16x2类型数学库函数](bfloat16x2类型数学库函数/bfloat16x2类型数学库函数.md)**
+

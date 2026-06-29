@@ -75,3 +75,4 @@ workspace地址。
 AscendC::KfcWorkspace desc(workspaceGM);
 GM_ADDR workspace = desc.GetKfcWorkspace();
 ```
+

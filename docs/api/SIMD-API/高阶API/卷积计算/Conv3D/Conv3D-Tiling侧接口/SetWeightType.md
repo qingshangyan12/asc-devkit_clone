@@ -35,3 +35,4 @@ Conv3dTilingApi::Conv3dTiling conv3dApiTiling(ascendcPlatform);
 conv3dApiTiling.SetWeightType(
     ConvCommonApi::TPosition::GM, ConvCommonApi::ConvFormat::FRACTAL_Z_3D, ConvCommonApi::ConvDtype::BF16);
 ```
+

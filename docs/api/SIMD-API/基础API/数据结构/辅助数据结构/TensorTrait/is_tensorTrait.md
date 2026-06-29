@@ -98,3 +98,4 @@ EXPECT_EQ(AscendC::is_tensorTrait<decltype(stride)>::value, false);
 EXPECT_EQ(AscendC::is_tensorTrait<decltype(layoutMake)>::value, false);
 EXPECT_EQ(AscendC::is_tensorTrait<decltype(tensorTraitMake)>::value, true);
 ```
+

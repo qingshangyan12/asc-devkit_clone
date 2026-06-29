@@ -51,3 +51,4 @@ def error(log_msg, *log_paras):
     log_str = '[Error][%s:%d][%s] ' % (co_filename, line_no, funcname)
     log_all_msg = log_str + log_msg % log_paras
     print(log_all_msg)
+

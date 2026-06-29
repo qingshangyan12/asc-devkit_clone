@@ -54,3 +54,4 @@ std::string opType = "FlashAttentionScore";
 context_ascendc::ContextBuilder builder;
 (void)builder.SetOpNameType(opName, opType);
 ```
+

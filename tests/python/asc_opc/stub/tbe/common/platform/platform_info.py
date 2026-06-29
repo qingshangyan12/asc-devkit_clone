@@ -25,3 +25,4 @@ def get_soc_spec(key):
 
 def set_soc_spec(dict):
     return platform_info_dict.update(dict)
+

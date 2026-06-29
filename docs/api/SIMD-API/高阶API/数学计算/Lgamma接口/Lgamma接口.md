@@ -5,3 +5,4 @@
 -   **[GetLgammaMaxMinTmpSize](GetLgammaMaxMinTmpSize.md)**
 
 -   **[GetLgammaTmpBufferFactorSize](GetLgammaTmpBufferFactorSize.md)**
+

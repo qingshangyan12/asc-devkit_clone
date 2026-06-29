@@ -5,3 +5,4 @@
 -   **[GetHypotMaxMinTmpSize](GetHypotMaxMinTmpSize.md)**
 
 -   **[GetHypotTmpBufferFactorSize](GetHypotTmpBufferFactorSize.md)**
+

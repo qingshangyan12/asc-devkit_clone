@@ -92,3 +92,4 @@ extern "C" __global__ __aicore__ void example_kernel(...) {
     ...
 }
 ```
+

@@ -130,3 +130,4 @@ this->Output("z")
      .Format({ge::FORMAT_ND, ge::FORMAT_ND, ge::FORMAT_NHWC})
      .InitValue({{ScalarType::INT16, 1}, {ScalarType::FLOAT32, 3.2}, {ScalarType::INT16, 1}}); // InitValue对应的数据类型和数值也需相同
 ```
+

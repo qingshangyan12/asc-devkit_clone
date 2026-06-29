@@ -106,3 +106,4 @@ AscendC::TEventID eventIdVToS = GetTPipePtr()->FetchEventID(AscendC::HardEvent::
 AscendC::SetFlag<AscendC::HardEvent::V_S>(eventIdVToS);
 AscendC::WaitFlag<AscendC::HardEvent::V_S>(eventIdVToS);
 ```
+

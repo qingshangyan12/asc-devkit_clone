@@ -52,3 +52,4 @@ class CubeClassifyFusion():
                 input_desc_vec.append(output_desc)
 
         self.ins_list = [input_desc_vec]
+

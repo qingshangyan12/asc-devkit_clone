@@ -31,3 +31,4 @@ OpParamDef算子定义，OpParamDef请参考[OpParamDef](OpParamDef.md)。
 this->Input("x")
     .Scalar()
 ```
+

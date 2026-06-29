@@ -35,3 +35,4 @@ Conv3dTilingApi::Conv3dTiling conv3dApiTiling(ascendcPlatform);
 conv3dApiTiling.SetInputType(
     ConvCommonApi::TPosition::GM, ConvCommonApi::ConvFormat::NDC1HWC0, ConvCommonApi::ConvDtype::BF16);
 ```
+

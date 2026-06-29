@@ -5,3 +5,4 @@
 -   **[GetErfMaxMinTmpSize](GetErfMaxMinTmpSize.md)**
 
 -   **[GetErfTmpBufferFactorSize](GetErfTmpBufferFactorSize.md)**
+

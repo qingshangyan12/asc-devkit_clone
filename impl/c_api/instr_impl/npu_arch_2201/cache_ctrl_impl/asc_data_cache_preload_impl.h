@@ -31,3 +31,4 @@ __aicore__ inline void asc_datacache_preload_impl(__gm__ uint64_t* address, int6
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
 #endif  
+

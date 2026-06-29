@@ -16,3 +16,4 @@ namespace hccl {
 }  // hccl
 
 #endif  /* REDUCE_SCATTER_NHR_V1_H */
+

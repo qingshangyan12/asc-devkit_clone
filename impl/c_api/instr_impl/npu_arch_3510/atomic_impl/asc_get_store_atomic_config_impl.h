@@ -38,3 +38,4 @@ __aicore__ inline void asc_get_store_atomic_config_impl(asc_store_atomic_config&
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
+

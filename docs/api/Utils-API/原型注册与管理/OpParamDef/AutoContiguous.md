@@ -26,3 +26,4 @@ OpParamDef算子定义，OpParamDef请参考[OpParamDef](OpParamDef.md)。
 ## 约束说明<a name="zh-cn_topic_0000001711819448_zh-cn_topic_0000001526594958_zh-cn_topic_0000001525424352_section19165124931511"></a>
 
 当一个Input调用了AutoContigous\(\)后，其他未调用IgnoreContiguous\(\)的Input也会在框架中默认进行非连续tensor转连续tensor的处理。
+

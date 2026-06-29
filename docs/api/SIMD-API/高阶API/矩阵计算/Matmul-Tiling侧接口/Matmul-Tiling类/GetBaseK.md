@@ -40,3 +40,4 @@ optiling::TCubeTiling tilingData;
 int ret = tiling.GetTiling(tilingData);
 int baseK = tiling.GetBaseK(); // 获取Tiling计算得到的baseK
 ```
+

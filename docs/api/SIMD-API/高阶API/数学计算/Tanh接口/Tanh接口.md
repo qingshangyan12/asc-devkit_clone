@@ -5,3 +5,4 @@
 -   **[GetTanhMaxMinTmpSize](GetTanhMaxMinTmpSize.md)**
 
 -   **[GetTanhTmpBufferFactorSize](GetTanhTmpBufferFactorSize.md)**
+

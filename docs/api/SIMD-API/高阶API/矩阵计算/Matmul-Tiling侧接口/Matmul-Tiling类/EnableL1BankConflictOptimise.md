@@ -42,3 +42,4 @@ int ret = tiling.GetTiling(tilingData);
 // Kernel侧是否可以开启L1 Bank冲突优化，可与TilingKey机制结合使用
 bool enableL1BankConflictOptimise = tiling.EnableL1BankConflictOptimise();
 ```
+

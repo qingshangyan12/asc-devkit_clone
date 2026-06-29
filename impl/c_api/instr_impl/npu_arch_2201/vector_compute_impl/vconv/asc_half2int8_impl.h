@@ -158,3 +158,4 @@ __aicore__ inline void asc_half2int8_rz_sync_impl(__ubuf__ int8_t* dst, __ubuf__
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
 #endif  
+

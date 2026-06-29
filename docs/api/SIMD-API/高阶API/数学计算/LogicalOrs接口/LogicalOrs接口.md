@@ -5,3 +5,4 @@
 -   **[GetLogicalOrsMaxMinTmpSize](GetLogicalOrsMaxMinTmpSize.md)**
 
 -   **[GetLogicalOrsTmpBufferFactorSize](GetLogicalOrsTmpBufferFactorSize.md)**
+

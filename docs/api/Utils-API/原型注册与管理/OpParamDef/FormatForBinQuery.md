@@ -115,3 +115,4 @@ OpParamDef算子定义，OpParamDef请参考[OpParamDef](OpParamDef.md)。
                 .Format({ge::FORMAT_NC, ge::FORMAT_NCHW, ge::FORMAT_NHWC, ge::FORMAT_ND})
                 .FormatForBinQuery({ge::FORMAT_NC, ge::FORMAT_NC, ge::FORMAT_NHWC, ge::FORMAT_NHWC});
     ```
+

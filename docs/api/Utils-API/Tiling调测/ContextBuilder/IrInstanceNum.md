@@ -46,3 +46,4 @@ context_ascendc::ContextBuilder builder;
 (void)builder.NodeIoNum(5,3)   // 算子有5种输入，3种输出
              .IrInstanceNum({1, 1, 3, 1, 1});  // 算子实例化时，index为2的动态类型输入tensor有3个实例
 ```
+

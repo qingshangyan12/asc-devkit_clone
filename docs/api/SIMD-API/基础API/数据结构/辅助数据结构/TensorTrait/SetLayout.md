@@ -89,3 +89,4 @@ __aicore__ inline void SetLayout(const LayoutType& t)
 ## 调用示例<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section320753512363"></a>
 
 参见[调用示例](TensorTrait构造函数.md#zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section320753512363)。
+

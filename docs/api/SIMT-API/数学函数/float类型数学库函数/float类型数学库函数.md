@@ -179,3 +179,4 @@
 -   **[isnan](isnan1.md)**
 
 -   **[isinf](isinf1.md)**
+

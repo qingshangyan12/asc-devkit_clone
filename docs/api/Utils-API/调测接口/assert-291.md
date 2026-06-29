@@ -123,3 +123,4 @@ __simt_vf__ __launch_bounds__(1024) inline void AddCustom(__gm__ bool* dst, __gm
 ```
 [ASSERT] /home/.../add_custom.cpp:44: : Assertion `!isnan(x[idx])' failed.
 ```
+

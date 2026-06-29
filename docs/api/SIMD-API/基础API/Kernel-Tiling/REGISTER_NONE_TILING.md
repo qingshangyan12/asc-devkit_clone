@@ -142,3 +142,4 @@ __global__ __aicore__ void mul(GM_ADDR x1, GM_ADDR x2, GM_ADDR y, GM_ADDR worksp
     }
 }
 ```
+

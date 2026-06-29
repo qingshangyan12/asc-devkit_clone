@@ -16,3 +16,4 @@ namespace hccl {
 }  // hccl
 
 #endif  /* NONUNIFORM_BRUCK_BASE_H */
+

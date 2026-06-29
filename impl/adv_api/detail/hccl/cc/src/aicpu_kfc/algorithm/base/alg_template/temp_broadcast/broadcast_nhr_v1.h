@@ -16,3 +16,4 @@ namespace hccl {
 }  // hccl
 
 #endif  /* BROADCAST_NHR_V1_H */
+

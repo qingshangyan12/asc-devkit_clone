@@ -203,3 +203,4 @@ HcclResult AllGatherNHRV1::RunAllGatherOnVertical(u32 rank, const std::vector<LI
 }
 REGISTER_TEMPLATE(TemplateType::TEMPLATE_ALL_GATHER_NHRV1, AllGatherNHRV1);
 } // namespace hccl
+

@@ -78,3 +78,4 @@ target_include_directories(intf_device INTERFACE
 target_compile_definitions(intf_device INTERFACE
     ${DEFINITIONS}
 )
+

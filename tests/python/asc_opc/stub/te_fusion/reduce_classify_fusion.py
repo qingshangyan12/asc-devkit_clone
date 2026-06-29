@@ -189,3 +189,5 @@ class ReduceClassifyFusion():
                 ReduceClassifyFusion._handle_input_range(inputs_desc)
                 self.axis_idx = len(inputs_desc) - 1
                 self.ins_list = classify(inputs_desc, self.pattern, extra_params)
+
+

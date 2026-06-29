@@ -5,3 +5,4 @@
 -   **[GetAcoshMaxMinTmpSize](GetAcoshMaxMinTmpSize.md)**
 
 -   **[GetAcoshTmpBufferFactorSize](GetAcoshTmpBufferFactorSize.md)**
+

@@ -5,3 +5,4 @@
 -   **[GetAcosMaxMinTmpSize](GetAcosMaxMinTmpSize.md)**
 
 -   **[GetAcosTmpBufferFactorSize](GetAcosTmpBufferFactorSize.md)**
+

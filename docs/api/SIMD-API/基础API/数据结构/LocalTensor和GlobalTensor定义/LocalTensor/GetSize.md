@@ -79,3 +79,4 @@ auto size = inputLocal.GetSize(); // 获取inputLocal的长度，size大小为in
 // 示例5结果如下：
 // size大小为srcLen，256。
 ```
+

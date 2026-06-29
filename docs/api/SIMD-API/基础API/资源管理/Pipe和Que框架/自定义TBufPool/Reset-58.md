@@ -78,3 +78,4 @@ __aicore__ inline void Reset()
 ## 调用示例<a name="section1234017553610"></a>
 
 请参考[调用示例](EXTERN_IMPL_BUFPOOL宏.md#section1234017553610)。
+

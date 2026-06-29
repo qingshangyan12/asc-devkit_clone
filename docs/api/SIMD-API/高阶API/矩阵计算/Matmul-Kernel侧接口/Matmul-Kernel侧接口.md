@@ -99,3 +99,4 @@
 -   **[GetBatchC](GetBatchC.md)**
 
 -   **[SetSparseIndex](SetSparseIndex.md)**
+

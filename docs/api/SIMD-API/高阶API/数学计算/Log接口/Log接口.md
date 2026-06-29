@@ -5,3 +5,4 @@
 -   **[GetLogMaxMinTmpSize](GetLogMaxMinTmpSize.md)**
 
 -   **[GetLogTmpBufferFactorSize](GetLogTmpBufferFactorSize.md)**
+

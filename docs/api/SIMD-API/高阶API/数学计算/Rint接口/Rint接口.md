@@ -5,3 +5,4 @@
 -   **[GetRintMaxMinTmpSize](GetRintMaxMinTmpSize.md)**
 
 -   **[GetRintTmpBufferFactorSize](GetRintTmpBufferFactorSize.md)**
+

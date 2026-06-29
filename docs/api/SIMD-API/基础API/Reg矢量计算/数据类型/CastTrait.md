@@ -12,3 +12,4 @@ struct CastTrait {
     RoundMode roundMode = RoundMode::UNKNOWN;
 }
 ```
+

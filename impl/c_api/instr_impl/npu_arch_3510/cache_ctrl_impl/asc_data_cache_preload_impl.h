@@ -23,3 +23,4 @@ __aicore__ inline void asc_datacache_preload_impl(__gm__ uint64_t* address, int6
     dc_preload(address, offset);
 }
 #endif  
+

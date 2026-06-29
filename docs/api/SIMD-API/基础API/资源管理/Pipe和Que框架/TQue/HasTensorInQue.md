@@ -91,3 +91,4 @@ int len = 1024;
 pipe.InitBuffer(que, num, len);
 bool ret = que.HasTensorInQue();
 ```
+

@@ -55,3 +55,4 @@ OpParamDef算子定义，OpParamDef请参考[OpParamDef](OpParamDef.md)。
 2. 输入的[参数数据类型](DataType.md)配置全为DT\_BOOL，对应生成的输出类型aclBoolArray（aclnn数据类型）。
 
 3. 输入的[参数数据类型](DataType.md)配置全为整数类型，即DT\_INT64/DT\_UINT64/DT\_INT32/DT\_UINT32/DT\_INT16/DT\_UINT16/DT\_INT8/DT\_UINT8，对应生成的输出类型aclIntArray（aclnn数据类型）。当数据类型配置含有DT\_INT64以外的数据类型时，需要增加一组DT\_INT64对应的输入/输出数据类型组合。
+

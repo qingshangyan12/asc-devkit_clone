@@ -5,3 +5,4 @@
 -   **[GetTruncMaxMinTmpSize](GetTruncMaxMinTmpSize.md)**
 
 -   **[GetTruncTmpBufferFactorSize](GetTruncTmpBufferFactorSize.md)**
+

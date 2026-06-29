@@ -48,3 +48,4 @@
 #endif
 
 #endif  // COMMON_DEBUG_STUB_LOG_H_
+

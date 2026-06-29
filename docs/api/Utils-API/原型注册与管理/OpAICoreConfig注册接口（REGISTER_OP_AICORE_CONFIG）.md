@@ -104,3 +104,4 @@ REGISTER_OP_AICORE_CONFIG(AddCustom, ascendxxx2, []() {
 });
 }
 ```
+

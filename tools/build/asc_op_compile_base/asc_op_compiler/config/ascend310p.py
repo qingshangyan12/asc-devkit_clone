@@ -152,3 +152,4 @@ class ArchRuntimeConfig(RuntimeConfig):
             kernel_compile_config,
             cmd_compiler_config,
         )
+

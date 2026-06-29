@@ -5,3 +5,4 @@
 -   **[GetPowerMaxMinTmpSize](GetPowerMaxMinTmpSize.md)**
 
 -   **[GetPowerTmpBufferFactorSize](GetPowerTmpBufferFactorSize.md)**
+

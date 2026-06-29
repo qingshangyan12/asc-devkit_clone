@@ -135,3 +135,4 @@
     int len = 1024; // 设置spm buffer为1024个类型为T的数据
     pipe.InitSpmBuffer(len * sizeof(T));
     ```
+

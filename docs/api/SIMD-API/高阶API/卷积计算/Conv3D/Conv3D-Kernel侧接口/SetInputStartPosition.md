@@ -52,3 +52,4 @@ __aicore__ inline void SetInputStartPosition(int64_t diStartPos, int64_t mStartP
 ```
 conv3dApi.SetInputStartPosition(diIdxStart, mIdxStart);
 ```
+

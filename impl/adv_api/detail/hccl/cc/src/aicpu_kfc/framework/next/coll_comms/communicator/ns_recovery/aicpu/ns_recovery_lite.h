@@ -43,3 +43,4 @@ using NsRecoveryLitePtr = std::shared_ptr<NsRecoveryLite>;
 }
 
 #endif
+

@@ -86,3 +86,4 @@ OpDef算子定义，OpDef请参考[OpDef](OpDef.md)。
 	this->AICore().AddConfig("ascendxxx");
 }
 ```
+
