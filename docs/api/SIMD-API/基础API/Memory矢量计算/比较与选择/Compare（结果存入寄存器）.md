@@ -95,8 +95,8 @@
 - 本接口将结果写入128bit的CmpMask寄存器中，可以用[GetCmpMask](GetCmpMask(ISASI).md)接口获取寄存器保存的数据。
 
 <!-- npu="950" id8 -->
-- 针对Ascend 950PR/Ascend 950DT，tensor高维切分计算接口占用8KB Unified Buffer临时空间。
-  <!-- end id8 -->
+- 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT，该接口占用8KB Unified Buffer临时空间。
+<!-- end id8 -->
 
 <!-- npu="A3,910b" id9 -->
 - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。

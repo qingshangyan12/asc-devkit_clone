@@ -223,10 +223,13 @@ Kirin 9030，支持模式0、1、2。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
 
 <!-- npu="950" id10 -->
-- 针对Ascend 950PR/Ascend 950DT，有如下约束说明：
-  - 该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
-  - 不传入mask参数的tensor高维切分计算接口占用8KB Unified Buffer临时空间。其他接口不涉及8KB Unified Buffer临时空间的占用。
-  <!-- end id10 -->
+- 当参数count或repeatTime取值为0时，针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，不保证该接口将被视为NOP（空操作）。
+<!-- end id10 -->
+<!-- npu="950" id11 -->
+- 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT：
+  - 不传入mask参数的tensor高维切分计算接口占用8KB Unified Buffer临时空间。
+  - 其他接口不涉及8KB Unified Buffer临时空间的占用。
+<!-- end id11 -->
 
 <cann-filter npu-type = "910b，A3，310p">
   

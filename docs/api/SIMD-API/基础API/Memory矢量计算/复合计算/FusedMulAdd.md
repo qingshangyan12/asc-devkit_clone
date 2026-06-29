@@ -122,24 +122,27 @@ Kirin 9030，支持的数据类型为：half、float。
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#section668772811100)。
-<!-- npu="A3,910b" id17 -->
-- 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  <!-- npu="A3" id18 -->
-  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id18 -->
-  <!-- npu="910b" id19 -->
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id19 -->
+<!-- npu="950,A3,910b" id17 -->
+- 当参数count或repeatTime取值为0时，该接口的行为如下：
+  - 针对如下型号，该接口不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+    <!-- npu="A3" id18 -->
+    - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+    <!-- end id18 -->
+    <!-- npu="910b" id19 -->
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    <!-- end id19 -->
+  <!-- npu="950" id20 -->
+  - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
+  <!-- end id20 -->
 <!-- end id17 -->
 - FusedMulAdd指令实际使用会受到bank冲突影响。
 
     地址不重叠场景下，无法在一拍读取dst、src0、src1三块不同地址下的数据，因此只能达到一半的理论并行度，理论并行度将在原有基础上减半；在地址重叠场景下，则保持原有理论并行度。
-<!-- npu="950" id20 -->
-- 针对Ascend 950PR/Ascend 950DT，有如下约束说明：
+<!-- npu="950" id21 -->
+- 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT：
   - tensor高维切分计算接口占用8KB Unified Buffer临时空间。
   - tensor前n个数据连续计算接口不涉及8KB Unified Buffer临时空间的占用。
-  - 该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
-  <!-- end id20 -->
+<!-- end id21 -->
 
 ## 调用示例<a name="section837496171220"></a>
 
