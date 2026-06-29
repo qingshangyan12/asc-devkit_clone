@@ -36,8 +36,6 @@ $dst_i = e^{(src0_i - src1_i)}$
 
 源操作数数据类型为half类型时，计算公式如下：
 
-针对Ascend 950PR/Ascend 950DT：
-
 $dst_i = e^{(cast\_f16\_to\_f32(src0_i) - cast\_f16\_to\_f32(src1_i))}$
 
 ## 函数原型<a name="section620mcpsimp"></a>
