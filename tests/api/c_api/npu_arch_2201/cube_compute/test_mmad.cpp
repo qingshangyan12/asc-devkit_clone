@@ -66,9 +66,8 @@ TEST_F(TestMmadCAPI, mmad_Succ)
     bool cmatrixInitVal = true;
     MOCKER(
         mad, void(
-                 __cc__ float* c_matrix, __ca__ float* a_matrix, __cb__ float* b_matrix, uint16_t left_height,
-                 uint16_t right_width, uint16_t n_dim, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source,
-                 bool c_matrix_init_val))
+                 __cc__ float* c, __ca__ float* a, __cb__ float* b, uint16_t m, uint16_t k, uint16_t n,
+                 uint8_t unit_flag, bool enable_k_direction_align, bool enable_cube_init, bool enable_cube_zero_init))
         .times(1)
         .will(invoke(mad_Stub));
 
@@ -90,9 +89,8 @@ TEST_F(TestMmadCAPI, mmad_sync_Succ)
     bool cmatrixInitVal = true;
     MOCKER(
         mad, void(
-                 __cc__ float* c_matrix, __ca__ float* a_matrix, __cb__ float* b_matrix, uint16_t left_height,
-                 uint16_t right_width, uint16_t n_dim, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source,
-                 bool c_matrix_init_val))
+                 __cc__ float* c, __ca__ float* a, __cb__ float* b, uint16_t m, uint16_t k, uint16_t n,
+                 uint8_t unit_flag, bool enable_k_direction_align, bool enable_cube_init, bool enable_cube_zero_init))
         .times(1)
         .will(invoke(mad_sync_Stub));
 

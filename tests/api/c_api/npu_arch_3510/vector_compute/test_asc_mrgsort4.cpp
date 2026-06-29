@@ -23,7 +23,7 @@ protected:
     namespace {                                                                                                       \
     void vmrgsort4_##type##_params_Stub(                                                                              \
         __ubuf__ type* dst, __ubuf__ type* src, uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, \
-        uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)        \
+        uint16_t element_length_2, uint16_t element_length_3, bool enable_exhausted_suspension, uint8_t valid_bit)    \
     {                                                                                                                 \
         EXPECT_EQ(dst, reinterpret_cast<__ubuf__ type*>(1));                                                          \
         EXPECT_EQ(src, reinterpret_cast<__ubuf__ type*>(2));                                                          \
@@ -32,7 +32,7 @@ protected:
         EXPECT_EQ(element_length_1, static_cast<uint16_t>(5));                                                        \
         EXPECT_EQ(element_length_2, static_cast<uint16_t>(6));                                                        \
         EXPECT_EQ(element_length_3, static_cast<uint16_t>(7));                                                        \
-        EXPECT_EQ(if_exhausted_suspension, true);                                                                     \
+        EXPECT_EQ(enable_exhausted_suspension, true);                                                                 \
         EXPECT_EQ(valid_bit, static_cast<uint8_t>(8));                                                                \
     }                                                                                                                 \
     }                                                                                                                 \
@@ -46,7 +46,7 @@ protected:
         uint16_t element_length_1 = 5;                                                                                \
         uint16_t element_length_2 = 6;                                                                                \
         uint16_t element_length_3 = 7;                                                                                \
-        bool if_exhausted_suspension = true;                                                                          \
+        bool enable_exhausted_suspension = true;                                                                      \
         uint8_t valid_bit = 8;                                                                                        \
                                                                                                                       \
         MOCKER_CPP(                                                                                                   \
@@ -57,7 +57,7 @@ protected:
                                                                                                                       \
         asc_mrgsort4(                                                                                                 \
             dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,                 \
-            if_exhausted_suspension, valid_bit);                                                                      \
+            enable_exhausted_suspension, valid_bit);                                                                  \
         GlobalMockObject::verify();                                                                                   \
     }                                                                                                                 \
                                                                                                                       \
@@ -70,7 +70,7 @@ protected:
         uint16_t element_length_1 = 5;                                                                                \
         uint16_t element_length_2 = 6;                                                                                \
         uint16_t element_length_3 = 7;                                                                                \
-        bool if_exhausted_suspension = true;                                                                          \
+        bool enable_exhausted_suspension = true;                                                                      \
         uint8_t valid_bit = 8;                                                                                        \
                                                                                                                       \
         MOCKER_CPP(                                                                                                   \
@@ -81,7 +81,7 @@ protected:
                                                                                                                       \
         asc_mrgsort4_sync(                                                                                            \
             dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,                 \
-            if_exhausted_suspension, valid_bit);                                                                      \
+            enable_exhausted_suspension, valid_bit);                                                                  \
         GlobalMockObject::verify();                                                                                   \
     }
 

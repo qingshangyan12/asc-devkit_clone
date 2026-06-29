@@ -30,18 +30,18 @@ __aicore__ inline void asc_copy_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* sr
     vcopy(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
 }
 
-__aicore__ inline void asc_copy_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t count)
+__aicore__ inline void asc_copy_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_copy_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
                  ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16,
                  ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_copy_sync_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t count)
+__aicore__ inline void asc_copy_sync_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t repeat)
 {
-    asc_copy_impl(dst, src, count);
+    asc_copy_impl(dst, src, repeat);
     asc_sync_post_process();
 }
 
@@ -51,18 +51,18 @@ __aicore__ inline void asc_copy_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* 
     vcopy(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
 }
 
-__aicore__ inline void asc_copy_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t count)
+__aicore__ inline void asc_copy_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_copy_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
                  ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16,
                  ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_copy_sync_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t count)
+__aicore__ inline void asc_copy_sync_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t repeat)
 {
-    asc_copy_impl(dst, src, count);
+    asc_copy_impl(dst, src, repeat);
     asc_sync_post_process();
 }
 
@@ -72,18 +72,18 @@ __aicore__ inline void asc_copy_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* sr
     vcopy(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
 }
 
-__aicore__ inline void asc_copy_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint32_t count)
+__aicore__ inline void asc_copy_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_copy_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
                  ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16,
                  ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_copy_sync_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint32_t count)
+__aicore__ inline void asc_copy_sync_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint32_t repeat)
 {
-    asc_copy_impl(dst, src, count);
+    asc_copy_impl(dst, src, repeat);
     asc_sync_post_process();
 }
 
@@ -93,18 +93,18 @@ __aicore__ inline void asc_copy_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* 
     vcopy(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
 }
 
-__aicore__ inline void asc_copy_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t count)
+__aicore__ inline void asc_copy_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_copy_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
                  ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16,
                  ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_copy_sync_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t count)
+__aicore__ inline void asc_copy_sync_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t repeat)
 {
-    asc_copy_impl(dst, src, count);
+    asc_copy_impl(dst, src, repeat);
     asc_sync_post_process();
 }
 

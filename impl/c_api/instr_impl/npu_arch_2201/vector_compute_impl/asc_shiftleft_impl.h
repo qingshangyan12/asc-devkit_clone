@@ -30,9 +30,9 @@ __aicore__ inline void asc_shiftleft_impl(__ubuf__ int16_t* dst, __ubuf__ int16_
 }
 
 __aicore__ inline void asc_shiftleft_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t distance,
-                                          uint32_t count)
+                                          uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_shiftleft_impl(dst, src, distance, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
                        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16,
                        ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
@@ -40,9 +40,9 @@ __aicore__ inline void asc_shiftleft_impl(__ubuf__ int16_t* dst, __ubuf__ int16_
 }
 
 __aicore__ inline void asc_shiftleft_sync_impl(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t distance,
-                                               uint32_t count)
+                                               uint32_t repeat)
 {
-    asc_shiftleft_impl(dst, src, distance, count);
+    asc_shiftleft_impl(dst, src, distance, repeat);
     asc_sync_post_process();
 }
 
@@ -56,9 +56,9 @@ __aicore__ inline void asc_shiftleft_impl(__ubuf__ uint16_t* dst, __ubuf__ uint1
 }
 
 __aicore__ inline void asc_shiftleft_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t distance,
-                                          uint32_t count)
+                                          uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_shiftleft_impl(dst, src, distance, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
                        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16,
                        ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
@@ -66,9 +66,9 @@ __aicore__ inline void asc_shiftleft_impl(__ubuf__ uint16_t* dst, __ubuf__ uint1
 }
 
 __aicore__ inline void asc_shiftleft_sync_impl(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t distance,
-                                               uint32_t count)
+                                               uint32_t repeat)
 {
-    asc_shiftleft_impl(dst, src, distance, count);
+    asc_shiftleft_impl(dst, src, distance, repeat);
     asc_sync_post_process();
 }
 
@@ -82,9 +82,9 @@ __aicore__ inline void asc_shiftleft_impl(__ubuf__ int32_t* dst, __ubuf__ int32_
 }
 
 __aicore__ inline void asc_shiftleft_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint32_t distance,
-                                          uint32_t count)
+                                          uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_shiftleft_impl(dst, src, distance, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
                        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16,
                        ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
@@ -92,9 +92,9 @@ __aicore__ inline void asc_shiftleft_impl(__ubuf__ int32_t* dst, __ubuf__ int32_
 }
 
 __aicore__ inline void asc_shiftleft_sync_impl(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint32_t distance,
-                                               uint32_t count)
+                                               uint32_t repeat)
 {
-    asc_shiftleft_impl(dst, src, distance, count);
+    asc_shiftleft_impl(dst, src, distance, repeat);
     asc_sync_post_process();
 }
 
@@ -108,9 +108,9 @@ __aicore__ inline void asc_shiftleft_impl(__ubuf__ uint32_t* dst, __ubuf__ uint3
 }
 
 __aicore__ inline void asc_shiftleft_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t distance,
-                                          uint32_t count)
+                                          uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_shiftleft_impl(dst, src, distance, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
                        ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16,
                        ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
@@ -118,9 +118,9 @@ __aicore__ inline void asc_shiftleft_impl(__ubuf__ uint32_t* dst, __ubuf__ uint3
 }
 
 __aicore__ inline void asc_shiftleft_sync_impl(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t distance,
-                                               uint32_t count)
+                                               uint32_t repeat)
 {
-    asc_shiftleft_impl(dst, src, distance, count);
+    asc_shiftleft_impl(dst, src, distance, repeat);
     asc_sync_post_process();
 }
 

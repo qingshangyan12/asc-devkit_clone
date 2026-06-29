@@ -19,11 +19,9 @@
 #include "sys_var_impl/asc_get_ctrl_impl.h"
 #include "sys_var_impl/asc_get_phy_buf_addr_impl.h"
 #include "sys_var_impl/asc_get_vf_len_impl.h"
-#include "sys_var_impl/asc_set_gm2l1_nz_para_impl.h"
 #include "sys_var_impl/asc_set_l0c2gm_quant_post_impl.h"
 #include "sys_var_impl/asc_set_l0c2gm_relu_alpha_impl.h"
 #include "sys_var_impl/asc_set_l12l0_padding_val_impl.h"
-#include "sys_var_impl/asc_set_l13d_padding_impl.h"
 #include "sys_var_impl/asc_get_arch_ver_impl.h"
 #include "sys_var_impl/asc_get_core_id_impl.h"
 #include "sys_var_impl/asc_set_l0c2gm_channel_para_impl.h"
@@ -91,31 +89,6 @@ __aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config)
 __aicore__ inline void asc_set_l3d_rpt_b(uint64_t config)
 {
     asc_set_l3d_rpt_b_impl(config);
-}
-
-__aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config)
-{
-    asc_set_gm2l1_nz_para_impl(config);
-}
-
-__aicore__ inline void asc_set_l13d_padding(uint64_t config)
-{
-    asc_set_l13d_padding_impl(config);
-}
-
-__aicore__ inline void asc_set_l13d_padding(half config)
-{
-    asc_set_l13d_padding_impl(config);
-}
-
-__aicore__ inline void asc_set_l13d_padding(int16_t config)
-{
-    asc_set_l13d_padding_impl(config);
-}
-
-__aicore__ inline void asc_set_l13d_padding(uint16_t config)
-{
-    asc_set_l13d_padding_impl(config);
 }
 
 __aicore__ inline void asc_set_l12l0_padding_val(uint64_t config)

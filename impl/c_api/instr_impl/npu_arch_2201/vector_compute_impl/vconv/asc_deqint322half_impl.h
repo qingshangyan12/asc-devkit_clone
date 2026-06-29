@@ -32,18 +32,18 @@ __aicore__ inline void asc_deq_int322half_impl(__ubuf__ half* dst, __ubuf__ int3
     }
 }
 
-__aicore__ inline void asc_deq_int322half_impl(__ubuf__ half* dst, __ubuf__ int32_t* src, uint32_t count)
+__aicore__ inline void asc_deq_int322half_impl(__ubuf__ half* dst, __ubuf__ int32_t* src, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     constexpr uint8_t dst_repeat_stride = static_cast<uint8_t>(ASC_C_API_DEFAULT_REPEAT_STRIDE.U8 / (sizeof(int32_t) / sizeof(half)));
     asc_deq_int322half_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, 
         ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, dst_repeat_stride, ASC_C_API_DEFAULT_REPEAT_STRIDE.U8);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_deq_int322half_sync_impl(__ubuf__ half* dst, __ubuf__ int32_t* src, uint32_t count)
+__aicore__ inline void asc_deq_int322half_sync_impl(__ubuf__ half* dst, __ubuf__ int32_t* src, uint32_t repeat)
 {
-    asc_deq_int322half_impl(dst, src, count);
+    asc_deq_int322half_impl(dst, src, repeat);
     asc_sync_post_process();
 }
 

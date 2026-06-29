@@ -30,17 +30,17 @@ __aicore__ inline void asc_vdeqs162b8l_impl(__ubuf__ int8_t* dst, __ubuf__ int16
     vconv_vdeqs162b8l(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
 }
 
-__aicore__ inline void asc_vdeqs162b8l_impl(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint32_t count)
+__aicore__ inline void asc_vdeqs162b8l_impl(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_vdeqs162b8l_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
         ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_vdeqs162b8l_sync_impl(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint32_t count)
+__aicore__ inline void asc_vdeqs162b8l_sync_impl(__ubuf__ int8_t* dst, __ubuf__ int16_t* src, uint32_t repeat)
 {
-    asc_vdeqs162b8l_impl(dst, src, count);
+    asc_vdeqs162b8l_impl(dst, src, repeat);
     asc_sync_post_process();
 }
 
@@ -50,17 +50,17 @@ __aicore__ inline void asc_vdeqs162b8l_impl(__ubuf__ uint8_t* dst, __ubuf__ int1
     vconv_vdeqs162b8l(dst, src, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
 }
 
-__aicore__ inline void asc_vdeqs162b8l_impl(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint32_t count)
+__aicore__ inline void asc_vdeqs162b8l_impl(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_vdeqs162b8l_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
         ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_vdeqs162b8l_sync_impl(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint32_t count)
+__aicore__ inline void asc_vdeqs162b8l_sync_impl(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint32_t repeat)
 {
-    asc_vdeqs162b8l_impl(dst, src, count);
+    asc_vdeqs162b8l_impl(dst, src, repeat);
     asc_sync_post_process();
 }
 

@@ -16,6 +16,20 @@
 #include "tests/api/c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 
+// Disambiguate vector_datamove_impl (__ubuf__ T*&) from reg_store/reg_load (__ubuf__ T*).
+#define ASC_UT_CALL_DST_PTR_REF_4(c_api_name, data_type, dst, a1, a2, a3) \
+    static_cast<void (*)(__ubuf__ data_type*&, vector_##data_type, int32_t, vector_bool)>(c_api_name)(dst, a1, a2, a3)
+
+#define ASC_UT_CALL_DST_PTR_REF_3(c_api_name, data_type, dst, a1, a2) \
+    static_cast<void (*)(__ubuf__ data_type*&, vector_##data_type, int32_t)>(c_api_name)(dst, a1, a2)
+
+#define ASC_UT_CALL_DST_PTR_REF_4_INTLV(c_api_name, data_type, dst, a1, a2, a3)                               \
+    static_cast<void (*)(__ubuf__ data_type*&, vector_##data_type, vector_##data_type, int32_t)>(c_api_name)( \
+        dst, a1, a2, a3)
+
+#define ASC_UT_CALL_DST_PTR_REF_3_BOOL(c_api_name, data_type, dst, a1, a2) \
+    static_cast<void (*)(__ubuf__ data_type*&, vector_bool, int32_t)>(c_api_name)(dst, a1, a2)
+
 #define TEST_VECTOR_DATAMOVE_STOREALIGN_INSTR(class_name, c_api_name, cce_name, data_type, index)          \
                                                                                                            \
     class TestVectorDataMove##class_name##_##data_type##_CApi : public testing::Test {                     \
@@ -208,7 +222,7 @@
         vector_bool mask;                                                                                              \
         int32_t offset;                                                                                                \
                                                                                                                        \
-        c_api_name(dst, src, offset, mask);                                                                            \
+        ASC_UT_CALL_DST_PTR_REF_4(c_api_name, data_type, dst, src, offset, mask);                                      \
         GlobalMockObject::verify();                                                                                    \
     }
 
@@ -398,7 +412,7 @@
         vector_##data_type src;                                                                                        \
         int32_t offset;                                                                                                \
                                                                                                                        \
-        c_api_name(dst, src, offset);                                                                                  \
+        ASC_UT_CALL_DST_PTR_REF_3(c_api_name, data_type, dst, src, offset);                                            \
         GlobalMockObject::verify();                                                                                    \
     }
 
@@ -606,7 +620,7 @@
         vector_##data_type src1;                                                                             \
         int32_t offset;                                                                                      \
                                                                                                              \
-        c_api_name(dst, src0, src1, offset);                                                                 \
+        ASC_UT_CALL_DST_PTR_REF_4_INTLV(c_api_name, data_type, dst, src0, src1, offset);                     \
         GlobalMockObject::verify();                                                                          \
     }
 
@@ -1029,7 +1043,7 @@
             .times(1)                                                                                                  \
             .will(invoke(Stub_TestVectorDataMoveStorealignInstrPsts_3_Norm_##data_type));                              \
                                                                                                                        \
-        asc_storealign_postupdate(dst, src, 0);                                                                        \
+        ASC_UT_CALL_DST_PTR_REF_3_BOOL(asc_storealign_postupdate, data_type, dst, src, 0);                             \
         GlobalMockObject::verify();                                                                                    \
     }                                                                                                                  \
     TEST_F(TestVectorDataMoveStorealignInstrPsts3##_##data_type, test_pack)                                            \
@@ -1041,7 +1055,7 @@
             .times(1)                                                                                                  \
             .will(invoke(Stub_TestVectorDataMoveStorealignInstrPsts_3_Pack_##data_type));                              \
                                                                                                                        \
-        asc_storealign_pack_postupdate(dst, src, 0);                                                                   \
+        ASC_UT_CALL_DST_PTR_REF_3_BOOL(asc_storealign_pack_postupdate, data_type, dst, src, 0);                        \
         GlobalMockObject::verify();                                                                                    \
     }
 

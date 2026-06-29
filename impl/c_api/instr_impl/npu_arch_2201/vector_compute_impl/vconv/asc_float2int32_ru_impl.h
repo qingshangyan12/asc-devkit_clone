@@ -31,17 +31,17 @@ __aicore__ inline void asc_float2int32_ru_impl(__ubuf__ int32_t* dst, __ubuf__ f
     }
 }
 
-__aicore__ inline void asc_float2int32_ru_count_impl(__ubuf__ int32_t* dst, __ubuf__ float* src, uint32_t count)
+__aicore__ inline void asc_float2int32_ru_count_impl(__ubuf__ int32_t* dst, __ubuf__ float* src, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     asc_float2int32_ru_impl(dst, src, ASC_C_API_DEFAULT_REPEAT.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U16,
         ASC_C_API_DEFAULT_BLOCK_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16, ASC_C_API_DEFAULT_REPEAT_STRIDE.U16);
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_float2int32_ru_sync_impl(__ubuf__ int32_t* dst, __ubuf__ float* src, uint32_t count)
+__aicore__ inline void asc_float2int32_ru_sync_impl(__ubuf__ int32_t* dst, __ubuf__ float* src, uint32_t repeat)
 {
-    asc_float2int32_ru_count_impl(dst, src, count);
+    asc_float2int32_ru_count_impl(dst, src, repeat);
     asc_sync_post_process();
 }
 

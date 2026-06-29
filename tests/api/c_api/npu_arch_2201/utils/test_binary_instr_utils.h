@@ -92,7 +92,7 @@
         __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type*>(11);                                        \
         __ubuf__ data_type* src0 = reinterpret_cast<__ubuf__ data_type*>(22);                                       \
         __ubuf__ data_type* src1 = reinterpret_cast<__ubuf__ data_type*>(33);                                       \
-        uint32_t count = static_cast<uint32_t>(44);                                                                 \
+        uint32_t repeat = static_cast<uint32_t>(44);                                                                \
         MOCKER_CPP(set_vector_mask, void(uint64_t, uint64_t))                                                       \
             .times(1)                                                                                               \
             .will(invoke(cce_name##_##data_type##_set_vector_mask_Stub));                                           \
@@ -104,7 +104,7 @@
             .times(1)                                                                                               \
             .will(invoke(cce_name##_##data_type##_##data_type##_##data_type##_uint64_t_Stub));                      \
                                                                                                                     \
-        c_api_name(dst, src0, src1, count);                                                                         \
+        c_api_name(dst, src0, src1, repeat);                                                                        \
         GlobalMockObject::verify();                                                                                 \
     }                                                                                                               \
                                                                                                                     \
@@ -113,7 +113,7 @@
         __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type*>(11);                                        \
         __ubuf__ data_type* src0 = reinterpret_cast<__ubuf__ data_type*>(22);                                       \
         __ubuf__ data_type* src1 = reinterpret_cast<__ubuf__ data_type*>(33);                                       \
-        uint32_t count = static_cast<uint32_t>(44);                                                                 \
+        uint32_t repeat = static_cast<uint32_t>(44);                                                                \
         MOCKER_CPP(set_vector_mask, void(uint64_t, uint64_t))                                                       \
             .times(1)                                                                                               \
             .will(invoke(cce_name##_##data_type##_set_vector_mask_Stub));                                           \
@@ -124,7 +124,7 @@
                           uint8_t, uint8_t, uint8_t, uint8_t))                                                      \
             .times(1)                                                                                               \
             .will(invoke(cce_name##_##data_type##_##data_type##_##data_type##_uint64_t_Stub));                      \
-        c_api_name##_sync(dst, src0, src1, count);                                                                  \
+        c_api_name##_sync(dst, src0, src1, repeat);                                                                 \
         GlobalMockObject::verify();                                                                                 \
     }
 
@@ -207,7 +207,7 @@
         __ubuf__ dst_data_type* dst = reinterpret_cast<__ubuf__ dst_data_type*>(11);                                                \
         __ubuf__ src_data_type* src0 = reinterpret_cast<__ubuf__ src_data_type*>(22);                                               \
         __ubuf__ src_data_type* src1 = reinterpret_cast<__ubuf__ src_data_type*>(33);                                               \
-        uint32_t count = static_cast<uint32_t>(44);                                                                                 \
+        uint32_t repeat = static_cast<uint32_t>(44);                                                                                \
         MOCKER_CPP(set_vector_mask, void(uint64_t, uint64_t))                                                                       \
             .times(1)                                                                                                               \
             .will(invoke(cce_name##dst_data_type##_##src_data_type##_set_vector_mask_Stub));                                        \
@@ -219,7 +219,7 @@
             .times(1)                                                                                                               \
             .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_uint64_t_bool_Stub));                                       \
                                                                                                                                     \
-        c_api_name(dst, src0, src1, count);                                                                                         \
+        c_api_name(dst, src0, src1, repeat);                                                                                        \
         GlobalMockObject::verify();                                                                                                 \
     }                                                                                                                               \
                                                                                                                                     \
@@ -228,7 +228,7 @@
         __ubuf__ dst_data_type* dst = reinterpret_cast<__ubuf__ dst_data_type*>(11);                                                \
         __ubuf__ src_data_type* src0 = reinterpret_cast<__ubuf__ src_data_type*>(22);                                               \
         __ubuf__ src_data_type* src1 = reinterpret_cast<__ubuf__ src_data_type*>(33);                                               \
-        uint32_t count = static_cast<uint32_t>(44);                                                                                 \
+        uint32_t repeat = static_cast<uint32_t>(44);                                                                                \
         MOCKER_CPP(set_vector_mask, void(uint64_t, uint64_t))                                                                       \
             .times(1)                                                                                                               \
             .will(invoke(cce_name##dst_data_type##_##src_data_type##_set_vector_mask_Stub));                                        \
@@ -239,7 +239,7 @@
                           uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, bool))                                                       \
             .times(1)                                                                                                               \
             .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_uint64_t_bool_Stub));                                       \
-        c_api_name##_sync(dst, src0, src1, count);                                                                                  \
+        c_api_name##_sync(dst, src0, src1, repeat);                                                                                 \
         GlobalMockObject::verify();                                                                                                 \
     }
 

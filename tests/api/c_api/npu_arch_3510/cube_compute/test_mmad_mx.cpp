@@ -13,45 +13,44 @@
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
 
-#define TEST_MMAD_MX_INSTR(class_name, c_api_name, cce_name, dst_type, src0_type, src1_type)                         \
-                                                                                                                     \
-    class TestVectorCompute##class_name##_##src0_type##_##src1_type##_CApi : public testing::Test {                  \
-    protected:                                                                                                       \
-        void SetUp() { g_coreType = C_API_AIC_TYPE; }                                                                \
-        void TearDown() { g_coreType = C_API_AIV_TYPE; }                                                             \
-    };                                                                                                               \
-                                                                                                                     \
-    namespace {                                                                                                      \
-    void cce_name##_##src0_type##_##src1_type##_Stub(                                                                \
-        dst_type* dst, src0_type* src0, src1_type* src1, uint16_t left_height, uint16_t n_dim, uint16_t right_width, \
-        uint8_t unitFlag, bool disableGemv, bool cMatrixSource, bool cMatrixInitVal)                                 \
-    {}                                                                                                               \
-    }                                                                                                                \
-                                                                                                                     \
-    TEST_F(                                                                                                          \
-        TestVectorCompute##class_name##_##src0_type##_##src1_type##_CApi,                                            \
-        c_api_name##_##src0_type##_##src1_type##_Succ)                                                               \
-    {                                                                                                                \
-        dst_type* dst;                                                                                               \
-        src0_type* src0;                                                                                             \
-        src1_type* src1;                                                                                             \
-        uint16_t left_height = 64;                                                                                   \
-        uint16_t right_width = 64;                                                                                   \
-        uint16_t n_dim = 64;                                                                                         \
-        uint8_t unitFlag = 0;                                                                                        \
-        bool disableGemv = true;                                                                                     \
-        bool cMatrixSource = false;                                                                                  \
-        bool cMatrixInitVal = false;                                                                                 \
-                                                                                                                     \
-        MOCKER_CPP(                                                                                                  \
-            cce_name,                                                                                                \
-            void(dst_type*, src0_type*, src1_type*, uint16_t, uint16_t, uint16_t, uint8_t, bool, bool, bool))        \
-            .times(1)                                                                                                \
-            .will(invoke(cce_name##_##src0_type##_##src1_type##_Stub));                                              \
-                                                                                                                     \
-        c_api_name(                                                                                                  \
-            dst, src0, src1, left_height, n_dim, right_width, unitFlag, disableGemv, cMatrixSource, cMatrixInitVal); \
-        GlobalMockObject::verify();                                                                                  \
+#define TEST_MMAD_MX_INSTR(class_name, c_api_name, cce_name, dst_type, src0_type, src1_type)                   \
+                                                                                                               \
+    class TestVectorCompute##class_name##_##src0_type##_##src1_type##_CApi : public testing::Test {            \
+    protected:                                                                                                 \
+        void SetUp() { g_coreType = C_API_AIC_TYPE; }                                                          \
+        void TearDown() { g_coreType = C_API_AIV_TYPE; }                                                       \
+    };                                                                                                         \
+                                                                                                               \
+    namespace {                                                                                                \
+    void cce_name##_##src0_type##_##src1_type##_Stub(                                                          \
+        dst_type* dst, src0_type* src0, src1_type* src1, uint16_t m, uint16_t n, uint16_t k, uint8_t unitFlag, \
+        bool disableGemv, bool cMatrixSource, bool cMatrixInitVal)                                             \
+    {}                                                                                                         \
+    }                                                                                                          \
+                                                                                                               \
+    TEST_F(                                                                                                    \
+        TestVectorCompute##class_name##_##src0_type##_##src1_type##_CApi,                                      \
+        c_api_name##_##src0_type##_##src1_type##_Succ)                                                         \
+    {                                                                                                          \
+        dst_type* dst;                                                                                         \
+        src0_type* src0;                                                                                       \
+        src1_type* src1;                                                                                       \
+        uint16_t m = 64;                                                                                       \
+        uint16_t k = 64;                                                                                       \
+        uint16_t n = 64;                                                                                       \
+        uint8_t unitFlag = 0;                                                                                  \
+        bool disableGemv = true;                                                                               \
+        bool cMatrixSource = false;                                                                            \
+        bool cMatrixInitVal = false;                                                                           \
+                                                                                                               \
+        MOCKER_CPP(                                                                                            \
+            cce_name,                                                                                          \
+            void(dst_type*, src0_type*, src1_type*, uint16_t, uint16_t, uint16_t, uint8_t, bool, bool, bool))  \
+            .times(1)                                                                                          \
+            .will(invoke(cce_name##_##src0_type##_##src1_type##_Stub));                                        \
+                                                                                                               \
+        c_api_name(dst, src0, src1, m, n, k, unitFlag, disableGemv, cMatrixSource, cMatrixInitVal);            \
+        GlobalMockObject::verify();                                                                            \
     }
 
 TEST_MMAD_MX_INSTR(Mmadmx, asc_mmad_mx, mad_mx, float, fp4x2_e1m2_t, fp4x2_e1m2_t)

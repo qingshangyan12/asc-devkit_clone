@@ -23,7 +23,7 @@
                                                                                                                       \
     void mock##c_api_name##cce_name##_##data_type(                                                                    \
         pos data_type* dst, __cbuf__ data_type* src, uint16_t m_start_position, uint16_t k_start_position,            \
-        uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride, bool transpose)                      \
+        uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride, bool enable_transpose)               \
     {                                                                                                                 \
         EXPECT_EQ(dst, reinterpret_cast<data_type*>(11));                                                             \
         EXPECT_EQ(src, reinterpret_cast<data_type*>(22));                                                             \
@@ -46,8 +46,8 @@
         uint8_t k_step = static_cast<uint8_t>(66);                                                                    \
         int16_t src_stride = static_cast<int16_t>(77);                                                                \
         uint16_t dst_stride = static_cast<uint16_t>(88);                                                              \
-        \    
-    MOCKER_CPP(                                                                                                       \
+                                                                                                                      \
+        MOCKER_CPP(                                                                                                   \
             cce_name,                                                                                                 \
             void(pos data_type*, __cbuf__ data_type*, uint16_t, uint16_t, uint8_t, uint8_t, int16_t, uint16_t, bool)) \
             .times(1)                                                                                                 \
@@ -68,8 +68,8 @@ TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a, load_cbuf_to_ca, int8_t, _
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a, load_cbuf_to_ca, uint16_t, __ca__);
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a, load_cbuf_to_ca, uint32_t, __ca__);
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a, load_cbuf_to_ca, uint8_t, __ca__);
-TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a, load_cbuf_to_ca_s4, fp4x2_e2m1_t, __ca__);
-TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a, load_cbuf_to_ca_s4, fp4x2_e1m2_t, __ca__);
+TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a, load_cbuf_to_ca_s4, float4_e2m1x2_t, __ca__);
+TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a, load_cbuf_to_ca_s4, float4_e1m2x2_t, __ca__);
 
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a_transpose, load_cbuf_to_ca, bfloat16_t, __ca__);
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a_transpose, load_cbuf_to_ca, float8_e4m3_t, __ca__);
@@ -83,8 +83,8 @@ TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a_transpose, load_cbuf_to_ca,
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a_transpose, load_cbuf_to_ca, uint16_t, __ca__);
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a_transpose, load_cbuf_to_ca, uint32_t, __ca__);
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a_transpose, load_cbuf_to_ca, uint8_t, __ca__);
-TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a_transpose, load_cbuf_to_ca_s4, fp4x2_e2m1_t, __ca__);
-TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a_transpose, load_cbuf_to_ca_s4, fp4x2_e1m2_t, __ca__);
+TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a_transpose, load_cbuf_to_ca_s4, float4_e2m1x2_t, __ca__);
+TEST_CUBE_DATAMOVE_L12L0(CopyL12L0A, asc_copy_l12l0a_transpose, load_cbuf_to_ca_s4, float4_e1m2x2_t, __ca__);
 
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b, load_cbuf_to_cb, bfloat16_t, __cb__);
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b, load_cbuf_to_cb, float8_e4m3_t, __cb__);
@@ -98,8 +98,8 @@ TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b, load_cbuf_to_cb, int8_t, _
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b, load_cbuf_to_cb, uint16_t, __cb__);
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b, load_cbuf_to_cb, uint32_t, __cb__);
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b, load_cbuf_to_cb, uint8_t, __cb__);
-TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b, load_cbuf_to_cb_s4, fp4x2_e2m1_t, __cb__);
-TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b, load_cbuf_to_cb_s4, fp4x2_e1m2_t, __cb__);
+TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b, load_cbuf_to_cb_s4, float4_e2m1x2_t, __cb__);
+TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b, load_cbuf_to_cb_s4, float4_e1m2x2_t, __cb__);
 
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b_transpose, load_cbuf_to_cb, bfloat16_t, __cb__);
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b_transpose, load_cbuf_to_cb, float8_e4m3_t, __cb__);
@@ -113,5 +113,5 @@ TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b_transpose, load_cbuf_to_cb,
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b_transpose, load_cbuf_to_cb, uint16_t, __cb__);
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b_transpose, load_cbuf_to_cb, uint32_t, __cb__);
 TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b_transpose, load_cbuf_to_cb, uint8_t, __cb__);
-TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b_transpose, load_cbuf_to_cb_s4, fp4x2_e2m1_t, __cb__);
-TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b_transpose, load_cbuf_to_cb_s4, fp4x2_e1m2_t, __cb__);
+TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b_transpose, load_cbuf_to_cb_s4, float4_e2m1x2_t, __cb__);
+TEST_CUBE_DATAMOVE_L12L0(CopyL12L0B, asc_copy_l12l0b_transpose, load_cbuf_to_cb_s4, float4_e1m2x2_t, __cb__);

@@ -35,9 +35,9 @@ __aicore__ inline void asc_mul_cast_half2uint8_impl(__ubuf__ uint8_t* dst, __ubu
     }
 }
 
-__aicore__ inline void asc_mul_cast_half2uint8_impl(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
+__aicore__ inline void asc_mul_cast_half2uint8_impl(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t repeat)
 {
-    asc_set_mask_count_begin(count);
+    asc_set_mask_count_begin(repeat);
     constexpr uint8_t dst_repeat_stride = static_cast<uint8_t>(ASC_C_API_DEFAULT_REPEAT_STRIDE.U8 / (sizeof(half) / sizeof(uint8_t)));
     asc_mul_cast_half2uint8_impl(dst, src0, src1, ASC_C_API_DEFAULT_REPEAT.U8,
         ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8, ASC_C_API_DEFAULT_BLOCK_STRIDE.U8,
@@ -45,9 +45,9 @@ __aicore__ inline void asc_mul_cast_half2uint8_impl(__ubuf__ uint8_t* dst, __ubu
     asc_set_mask_count_end();
 }
 
-__aicore__ inline void asc_mul_cast_half2uint8_sync_impl(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
+__aicore__ inline void asc_mul_cast_half2uint8_sync_impl(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t repeat)
 {
-    asc_mul_cast_half2uint8_impl(dst, src0, src1, count);
+    asc_mul_cast_half2uint8_impl(dst, src0, src1, repeat);
     asc_sync_post_process();
 }
 
