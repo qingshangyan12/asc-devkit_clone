@@ -90,11 +90,12 @@ __aicore__ inline void asc_mark_stamp()
 #endif
 } // namespace __asc_aicore
 #else
-#include "../../basic_api/kernel_log.h"
+#include <cstdio>
 
 namespace __asc_aicore {
 __aicore__ inline void asc_time_stamp(uint32_t desc_id) {
-    ASCENDC_ASSERT((false), "asc_time_stamp is not supported in cpu mode.");
+    std::printf("asc_time_stamp is not supported in cpu mode.");
+    assert(false);
 }
 } // namespace __asc_aicore
 
