@@ -33,6 +33,9 @@
 - SetFlag：当前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。
 - WaitFlag：当执行到该指令时，如果发现对应标志位为0，该队列的后续指令将一直被阻塞；如果发现对应标志位为1，则将对应标志位设置为0，同时后续指令开始执行。
 
+> [!NOTE]说明
+> 此接口与[SetFlag/WaitFlag(ISASI)](../SetFlag-WaitFlag(ISASI).md)接口也能实现相同的功能。二者的区别在于，TQueSync类接口可以保证跨硬件版本兼容，而[SetFlag/WaitFlag(ISASI)](../SetFlag-WaitFlag(ISASI).md)中的接口标注为ISASI类别，不能保证跨硬件版本兼容。
+
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
