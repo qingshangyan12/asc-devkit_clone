@@ -1,4 +1,4 @@
-# asc_e5m22float
+# asc_e5m22float (废弃)
 
 ## 产品支持情况
 

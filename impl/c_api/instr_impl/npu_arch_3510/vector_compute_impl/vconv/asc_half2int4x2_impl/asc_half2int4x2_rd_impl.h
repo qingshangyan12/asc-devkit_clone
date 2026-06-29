@@ -28,7 +28,6 @@ __simd_callee__ inline void asc_half2int4x2_rd_sat_impl(vector_int4x2_t& dst, ve
     }
 }
 
-[[deprecated("NOTICE: asc_half2int4x2_rd_v2_impl is deprecated. Currently asc_half2int4x2_rd_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_half2int4x2_rd_v2_impl(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -36,7 +35,6 @@ __simd_callee__ inline void asc_half2int4x2_rd_v2_impl(vector_int4x2_t& dst, vec
     }
 }
 
-[[deprecated("NOTICE: asc_half2int4x2_rd_sat_v2_impl is deprecated. Currently asc_half2int4x2_rd_sat_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_half2int4x2_rd_sat_v2_impl(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -44,7 +42,6 @@ __simd_callee__ inline void asc_half2int4x2_rd_sat_v2_impl(vector_int4x2_t& dst,
     }
 }
 
-[[deprecated("NOTICE: asc_half2int4x2_rd_v3_impl is deprecated. Currently asc_half2int4x2_rd_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_half2int4x2_rd_v3_impl(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -52,7 +49,6 @@ __simd_callee__ inline void asc_half2int4x2_rd_v3_impl(vector_int4x2_t& dst, vec
     }
 }
 
-[[deprecated("NOTICE: asc_half2int4x2_rd_sat_v3_impl is deprecated. Currently asc_half2int4x2_rd_sat_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_half2int4x2_rd_sat_v3_impl(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -60,7 +56,6 @@ __simd_callee__ inline void asc_half2int4x2_rd_sat_v3_impl(vector_int4x2_t& dst,
     }
 }
 
-[[deprecated("NOTICE: asc_half2int4x2_rd_v4_impl is deprecated. Currently asc_half2int4x2_rd_v4_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_half2int4x2_rd_v4_impl(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -68,7 +63,6 @@ __simd_callee__ inline void asc_half2int4x2_rd_v4_impl(vector_int4x2_t& dst, vec
     }
 }
 
-[[deprecated("NOTICE: asc_half2int4x2_rd_sat_v4_impl is deprecated. Currently asc_half2int4x2_rd_sat_v4_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_half2int4x2_rd_sat_v4_impl(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {

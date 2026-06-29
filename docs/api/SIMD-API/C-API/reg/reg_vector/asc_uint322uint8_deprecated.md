@@ -1,4 +1,4 @@
-# asc_uint322uint8
+# asc_uint322uint8 (废弃)
 
 ## 产品支持情况
 

@@ -32,7 +32,6 @@ __simd_callee__ inline void asc_int642float_rna_impl(vector_float& dst, vector_i
     }
 }
 
-[[deprecated("NOTICE: asc_int642float_rna_v2_impl is deprecated. Currently asc_int642float_rna_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_int642float_rna_v2_impl(vector_float& dst, vector_int64_t src, vector_bool mask)
 {
     if ASC_IS_AIV {

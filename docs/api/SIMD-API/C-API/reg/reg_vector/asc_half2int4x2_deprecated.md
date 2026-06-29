@@ -1,4 +1,4 @@
-# asc_half2int4x2
+# asc_half2int4x2 (废弃)
 
 ## 产品支持情况
 

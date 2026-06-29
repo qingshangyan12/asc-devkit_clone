@@ -1,4 +1,4 @@
-# asc_hif82float
+# asc_hif82float (废弃)
 
 ## 产品支持情况
 

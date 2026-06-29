@@ -34,7 +34,6 @@ __simd_callee__ inline void asc_float2hif8_rna_impl(vector_hifloat8_t& dst, vect
     }
 }
 
-[[deprecated("NOTICE: asc_float2hif8_rna_sat_v2_impl is deprecated. Currently asc_float2hif8_rna_sat_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_float2hif8_rna_sat_v2_impl(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -42,7 +41,6 @@ __simd_callee__ inline void asc_float2hif8_rna_sat_v2_impl(vector_hifloat8_t& ds
     }
 }
 
-[[deprecated("NOTICE: asc_float2hif8_rna_v2_impl is deprecated. Currently asc_float2hif8_rna_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_float2hif8_rna_v2_impl(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -50,7 +48,6 @@ __simd_callee__ inline void asc_float2hif8_rna_v2_impl(vector_hifloat8_t& dst, v
     }
 }
 
-[[deprecated("NOTICE: asc_float2hif8_rna_sat_v3_impl is deprecated. Currently asc_float2hif8_rna_sat_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_float2hif8_rna_sat_v3_impl(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -58,7 +55,6 @@ __simd_callee__ inline void asc_float2hif8_rna_sat_v3_impl(vector_hifloat8_t& ds
     }
 }
 
-[[deprecated("NOTICE: asc_float2hif8_rna_v3_impl is deprecated. Currently asc_float2hif8_rna_v3_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_float2hif8_rna_v3_impl(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -66,7 +62,6 @@ __simd_callee__ inline void asc_float2hif8_rna_v3_impl(vector_hifloat8_t& dst, v
     }
 }
 
-[[deprecated("NOTICE: asc_float2hif8_rna_sat_v4_impl is deprecated. Currently asc_float2hif8_rna_sat_v4_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_float2hif8_rna_sat_v4_impl(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -74,7 +69,6 @@ __simd_callee__ inline void asc_float2hif8_rna_sat_v4_impl(vector_hifloat8_t& ds
     }
 }
 
-[[deprecated("NOTICE: asc_float2hif8_rna_v4_impl is deprecated. Currently asc_float2hif8_rna_v4_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_float2hif8_rna_v4_impl(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {

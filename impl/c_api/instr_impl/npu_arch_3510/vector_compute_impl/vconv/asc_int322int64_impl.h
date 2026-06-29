@@ -32,7 +32,6 @@ __simd_callee__ inline void asc_int322int64_impl(vector_int64_t& dst, vector_int
     }
 }
 
-[[deprecated("NOTICE: asc_int322int64_v2_impl is deprecated. Currently asc_int322int64_v2_impl is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_int322int64_v2_impl(vector_int64_t& dst, vector_int32_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
