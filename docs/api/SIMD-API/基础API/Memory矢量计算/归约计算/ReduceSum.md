@@ -170,6 +170,7 @@
 
 - 方式一：同一repeat内采用二叉树累加，不同repeat的结果按顺序累加。
 - 方式二：同一repeat内采用二叉树累加，不同repeat的结果也按二叉树累加。
+- 方式三：不同repeat间通过向量加法将数据合并为一个repeat，repeat内采用二叉树累加。
 
 `ReduceSum`接口以二叉树累加的方式完成每个repeat内的求和，详情请参考[ReduceDataBlock关键特性说明](./ReduceDataBlock.md#关键特性说明)。
 
@@ -192,7 +193,7 @@
 **不同硬件形态对应的`ReduceSum`相加方式如下：**
 
 <!-- npu="950" id22 -->
-- Ascend 950PR/Ascend 950DT，采用方式二。
+- Ascend 950PR/Ascend 950DT，tensor前n个数据计算接口和tensor高维切分计算接口Counter模式在`oneRepSize < count ≤ 4 * oneRepSize`时采用方式三，否则采用方式二。tensor高维切分计算接口[Normal模式](../SIMD计算说明/掩码/概述.md#mask-mode)采用方式二。
 <!-- end id22 -->
 <!-- npu="A3" id23 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品，tensor前n个数据计算接口采用方式一，tensor高维切分计算接口采用方式二。
