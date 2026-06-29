@@ -231,7 +231,7 @@ HcclResult AllocComResourceByTilingCcu(HcclComm comm, void *stream, void *mc2Til
     CHK_RET(AllocCcuOpResCtx(comm, ctxTag, rankSize, userRank, resCtx));
     HCCL_INFO("[AllocComResourceByTilingCcu]AllocCcuOpResCtx successfully!");
     HCCL_INFO("[AllocComResourceByTilingCcu]allocated: workspace[%p], size[%llu]", 
-    (void*)resCtx.workSpace, resCtx.workSpaceSize);
+        (void*)resCtx.workSpace, resCtx.workSpaceSize);
 
     // 逐算子选择算法 + 资源准备（executor->CalcRes + GetAlgResCcu）
     CHK_RET(CcuSelectAlg(comm, stream, topoTag, ccTilingList, tilingNum, mc2Tiling, resCtx));
@@ -249,13 +249,6 @@ HcclResult AllocComResourceByTilingCcu(HcclComm comm, void *stream, void *mc2Til
     aclError aclRet = aclrtMemcpy(*opResCtx, opResCtxSize, &resCtx, opResCtxSize, ACL_MEMCPY_HOST_TO_DEVICE);
     HCCL_INFO("[CCU_DEBUG] opResCtxPtr=%p, *opResCtx=%p, size=%llu ws=0x%llx wsSize=0x%llx xn=0x%llx cke=0x%llx rankId=%llu rankSize=%llu",
             opResCtx, *opResCtx, opResCtxSize, resCtx.workSpace, resCtx.workSpaceSize, resCtx.xnAddr, resCtx.ckeAddr, resCtx.rankId, resCtx.rankSize);
-    OpResCtx readback{};
-    aclError aclRet2 = aclrtMemcpy(&readback, opResCtxSize,
-                               *opResCtx, opResCtxSize,
-                               ACL_MEMCPY_DEVICE_TO_HOST);
-    HCCL_INFO("[CCU_DEBUG] verify opResCtx@dev[%p]: ws=0x%llx wsSize=0x%llx xn=0x%llx cke=0x%llx rankId=%llu rankSize=%llu",
-        *opResCtx, readback.workSpace, readback.workSpaceSize,
-        readback.xnAddr, readback.ckeAddr, readback.rankId, readback.rankSize);
     CHK_RET(aclRet == ACL_ERROR_NONE ? HCCL_SUCCESS : HCCL_E_RUNTIME);
     HCCL_INFO("[AllocComResourceByTilingCcu]end AllocComResourceByTilingCcu!");
     return HCCL_SUCCESS;
