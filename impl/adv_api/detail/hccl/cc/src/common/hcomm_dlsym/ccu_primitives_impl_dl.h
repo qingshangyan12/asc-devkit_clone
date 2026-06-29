@@ -94,7 +94,6 @@ DECL_WEAK_FUNC(CcuResult, CcuIfEnd, const char *label);
 DECL_WEAK_FUNC(CcuResult, CcuFlushPendingIfs);
 DECL_WEAK_FUNC(CcuResult, CcuWhileBegin, CcuVariableHandle var, uint64_t immediate, CcuConditionType condType, const char *label);
 DECL_WEAK_FUNC(CcuResult, CcuWhileEnd, const char *label);
-DECL_WEAK_FUNC(CcuResult, CcuWhileBreak, const char *label);
 DECL_WEAK_FUNC(CcuResult, CcuDoWhileBegin, const char *label);
 DECL_WEAK_FUNC(CcuResult, CcuDoWhileEnd, CcuVariableHandle var, uint64_t immediate, CcuConditionType condType, const char *label);
 
@@ -115,8 +114,6 @@ DECL_WEAK_FUNC(void, _CcuIfStackMarkBodyDone);
 DECL_WEAK_FUNC(const char *, _CcuIfStackPopForElse);
 DECL_WEAK_FUNC(void, _CcuDoWhileStackPush, const char *label);
 DECL_WEAK_FUNC(const char *, _CcuDoWhileStackPopForWhile);
-DECL_WEAK_FUNC(void, _CcuWhileStackPush, const char *label);
-DECL_WEAK_FUNC(const char *, _CcuWhileStackPopForBreak);
 
 /*========== 循环操作 ==========*/
 DECL_WEAK_FUNC(CcuResult, CcuLoopCreate, CcuLoop *loop);
