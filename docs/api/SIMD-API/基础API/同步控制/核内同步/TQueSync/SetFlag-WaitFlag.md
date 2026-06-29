@@ -46,7 +46,33 @@ __aicore__ inline void WaitFlag(TEventID id)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| id | 输入 | 事件ID，由用户自己指定，推荐通过[AllocEventID](../../../资源管理/Pipe和Que框架/TPipe/AllocEventID.md)或者[FetchEventID](../../../资源管理/Pipe和Que框架/TPipe/FetchEventID.md)来获取。定义如下：<br>`using TEventID = int8_t;`<br>Atlas 训练系列产品，数据范围为：0-3<br>Atlas 推理系列产品AI Core，数据范围为：0-7<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品，数据范围为：0-7<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品，数据范围为：0-7<br>Atlas 200I/500 A2 推理产品，数据范围为：0-7 |
+| id | 输入 | 事件ID，由用户自己指定，推荐通过[AllocEventID](../../../资源管理/Pipe和Que框架/TPipe/AllocEventID.md)或者[FetchEventID](../../../资源管理/Pipe和Que框架/TPipe/FetchEventID.md)来获取。定义如下：<br>`using TEventID = int8_t;`<br>不同产品对id的取值范围说明请参见[id取值范围说明](#id取值范围说明)。 |
+
+### id取值范围说明
+
+<cann-filter npu-type="950">
+Ascend 950PR/Ascend 950DT，取值范围是0-7。
+</cann-filter>
+
+<cann-filter npu-type="A3">
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，取值范围是0-7。
+</cann-filter>
+
+<cann-filter npu-type="910b">
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，取值范围是0-7。
+</cann-filter>
+
+<cann-filter npu-type="310b">
+Atlas 200I/500 A2 推理产品，取值范围是0-7。
+</cann-filter>
+
+<cann-filter npu-type="310p">
+Atlas 推理系列产品AI Core，取值范围是0-7。
+</cann-filter>
+
+<cann-filter npu-type="910">
+Atlas 训练系列产品，取值范围是0-3。
+</cann-filter>
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
