@@ -138,6 +138,10 @@
 
   <!-- end id20 -->
 
+<!-- npu="950" id30 -->
+- 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算/Reg矢量计算.md)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
+<!-- end id30 -->
+
 <!-- npu="950" id21 -->
 - 针对Ascend 950PR/Ascend 950DT，`int64_t`/`uint64_t`数据类型仅支持tensor前n个数据计算接口。
 <!-- end id21 -->
