@@ -47,3 +47,56 @@
 （2）饱和模式下，+inf按照数据类型取对应max，-inf按照数据类型取对应min值参与计算，nan值按照0参与计算。
 
 </cann-filter>
+
+<cann-filter npu-type="950">
+
+- Ascend 950PR/Ascend 950DT
+
+</cann-filter>
+
+**表2**  Mmad特殊值/边界值输入的计算结果说明
+
+<a name="table7822641411"></a>
+| C矩阵的数据类型 | 是否有bias | A矩阵的元素取值 | B矩阵的元素取值 | bias矩阵的元素取值 | dst的元素取值<br>（INF/NAN模式） | 饱和模式输出 |
+| --- | --- | --- | --- | --- | --- | --- |
+| float | 不带bias | +inf | norm(> 0.0)/+inf | \ | +inf | 3.4028235e+38（MAX） |
+| float | 不带bias | +inf | norm(< 0.0)/-inf | \ | -inf | -3.4028235e+38（MIN） |
+| float | 不带bias | -inf | norm(> 0.0)/+inf | \ | -inf | -3.4028235e+38（MIN） |
+| float | 不带bias | -inf | norm(< 0.0)/-inf | \ | +inf | 3.4028235e+38（MAX） |
+| float | 不带bias | +inf/-inf | 0.0 | \ | nan |  0.0 |
+| float | 不带bias | norm(> 0.0) | +inf | \ | +inf | 3.4028235e+38（MAX） |
+| float | 不带bias | norm(> 0.0) | -inf | \ | -inf | -3.4028235e+38（MIN） |
+| float | 不带bias | norm(< 0.0) | +inf | \ | -inf | -3.4028235e+38（MIN） |
+| float | 不带bias | norm(< 0.0) | -inf | \ | +inf | 3.4028235e+38（MAX） |
+| float | 不带bias | 0.0 | +inf/-inf | \ | nan | 0.0 |
+| float | 不带bias | nan | 任意输入 | \ | nan | 0.0 |
+| float | 不带bias | 任意输入 | nan | \ | nan | 0.0 |
+| float | 不带bias | 任意输入 | 任意输入 | \ | 结果溢出情况下，正向溢出为inf，负向溢出为-inf | 结果溢出情况下，正向溢出为3.4028235e+38（MAX），负向溢出为-3.4028235e+38（MIN） |
+| float | 带bias | +inf | norm(> 0.0)/+inf | -inf/nan | nan | 3.4028235e+38（MAX） |
+| float | 带bias | +inf | norm(> 0.0)/+inf | +inf/0.0  | +inf| 3.4028235e+38（MAX） |
+| float | 带bias | +inf | norm(< 0.0)/-inf | -inf/0.0 | -inf | -3.4028235e+38（MIN） |
+| float | 带bias | +inf | norm(< 0.0)/-inf | +inf/nan | nan | -3.4028235e+38（MIN） |
+| float | 带bias | +inf | 0 | 任意输入 | nan | bias矩阵饱和处理后的元素取值 |
+| float | 带bias | -inf | norm(> 0.0)/+inf | +inf/nan | nan | -3.4028235e+38（MIN） |
+| float | 带bias | -inf | norm(> 0.0)/+inf | -inf/0.0 | -inf | -3.4028235e+38（MIN） |
+| float | 带bias | -inf | norm(< 0.0)/-inf | -inf/nan | nan | 3.4028235e+38（MAX） |
+| float | 带bias | -inf | norm(< 0.0)/-inf | +inf/0.0 | +inf | 3.4028235e+38（MAX） |
+| float | 带bias | -inf | 0 | 任意输入 | nan | bias矩阵饱和处理后的元素取值 |
+| float | 带bias | norm(> 0.0) | +inf | -inf/nan | nan | 3.4028235e+38（MAX） |
+| float | 带bias | norm(> 0.0) | +inf | +inf/0.0  | +inf| 3.4028235e+38（MAX） |
+| float | 带bias | norm(> 0.0) | -inf | +inf/nan | nan | -3.4028235e+38（MIN） |
+| float | 带bias | norm(> 0.0) | -inf | -inf/0.0 | -inf | -3.4028235e+38（MIN） |
+| float | 带bias | norm(< 0.0) | +inf | -inf/0.0 | -inf | -3.4028235e+38（MIN） |
+| float | 带bias | norm(< 0.0) | +inf | +inf/nan | nan | -3.4028235e+38（MIN） |
+| float | 带bias | norm(< 0.0) | -inf | -inf/nan | nan | 3.4028235e+38（MAX） |
+| float | 带bias | norm(< 0.0) | -inf | +inf/0.0 | +inf | 3.4028235e+38（MAX） |
+| float | 带bias | nan | 任意输入 | 任意输入 | nan | bias矩阵饱和处理后的元素取值 |
+| float | 带bias | 任意输入 | nan | 任意输入 | nan | bias矩阵饱和处理后的元素取值 |
+
+注：
+
+（1）INF/NAN模式（非饱和模式）下，乘法阶段：inf\*非零值输出inf，inf\*0输出nan，输入包含nan时输出为nan。加法阶段：正负inf相加时输出为nan。
+
+（2）饱和模式下，+inf按照数据类型取对应max，-inf按照数据类型取对应min值参与计算，nan值按照0参与计算。
+
+</cann-filter>
