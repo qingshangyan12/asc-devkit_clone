@@ -53,20 +53,20 @@ using _2048   = Int<2048>;
 using _4096   = Int<4096>;
 
 
-#define STD_INT_BINARY_OP(OP) \
+#define __CANN_ASC_STD_INT_BINARY_OP(OP) \
 template <auto t, auto u> \
 __aicore__ inline constexpr Int<(t OP u)> operator OP (Int<t>, Int<u>) { \
     return {}; \
 }
 
-STD_INT_BINARY_OP(+);
-STD_INT_BINARY_OP(-);
-STD_INT_BINARY_OP(*);
-STD_INT_BINARY_OP(/);
-STD_INT_BINARY_OP(%);
-#undef STD_INT_BINARY_OP
+__CANN_ASC_STD_INT_BINARY_OP(+);
+__CANN_ASC_STD_INT_BINARY_OP(-);
+__CANN_ASC_STD_INT_BINARY_OP(*);
+__CANN_ASC_STD_INT_BINARY_OP(/);
+__CANN_ASC_STD_INT_BINARY_OP(%);
+#undef __CANN_ASC_STD_INT_BINARY_OP
 
-#define STD_INT_NAMED_BINARY_FN(OP, CMP) \
+#define __CANN_ASC_STD_INT_NAMED_BINARY_FN(OP, CMP) \
 template <auto t, auto u> \
 ASCENDC_HOST_AICORE inline constexpr Int<(CMP ? t : u)> OP(Int<t>, Int<u>) { \
     return {}; \
@@ -80,11 +80,11 @@ ASCENDC_HOST_AICORE inline constexpr auto OP(const T& t, Int<u>) { \
     return OP(t, static_cast<size_t>(u)); \
 }
 
-STD_INT_NAMED_BINARY_FN(max, t > u);
-STD_INT_NAMED_BINARY_FN(min, t < u);
-#undef STD_INT_NAMED_BINARY_FN
+__CANN_ASC_STD_INT_NAMED_BINARY_FN(max, t > u);
+__CANN_ASC_STD_INT_NAMED_BINARY_FN(min, t < u);
+#undef __CANN_ASC_STD_INT_NAMED_BINARY_FN
 
-#define STD_INT_BINARY_FN(OP, EXPR) \
+#define __CANN_ASC_STD_INT_BINARY_FN(OP, EXPR) \
 template <auto t, auto u> \
 ASCENDC_HOST_AICORE inline constexpr Int<EXPR> OP(Int<t>, Int<u>) { \
     return {}; \
@@ -98,10 +98,10 @@ ASCENDC_HOST_AICORE inline constexpr auto OP(const T& t, Int<u>) { \
     return OP(t, static_cast<size_t>(u)); \
 }
 
-STD_INT_BINARY_FN(divide, (t / u));
-STD_INT_BINARY_FN(ceil_division, ((t + u - 1) / u));
-STD_INT_BINARY_FN(ceil_align, (((t + u - 1) / u) * u));
-#undef STD_INT_BINARY_FN
+__CANN_ASC_STD_INT_BINARY_FN(divide, (t / u));
+__CANN_ASC_STD_INT_BINARY_FN(ceil_division, ((t + u - 1) / u));
+__CANN_ASC_STD_INT_BINARY_FN(ceil_align, (((t + u - 1) / u) * u));
+#undef __CANN_ASC_STD_INT_BINARY_FN
 }
 }
 #endif
