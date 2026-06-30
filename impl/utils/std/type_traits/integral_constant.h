@@ -13,16 +13,6 @@
  * \brief
  */
 
-#include "enable_if.h" 
-#include "is_const.h" 
-#include "../algorithm/max.h" 
-#include "../algorithm/min.h" 
-#include "../cmath/divide.h" 
-#include "../cmath/ceil_division.h" 
-#include "../cmath/ceil_align.h" 
-#include "../cmath/sqrt.h" 
-#include "is_integral.h"
-
 #ifndef IMPL_STD_ASCENDC_STD_INTEGRAL_CONSTANT_IMPL__H
 #define IMPL_STD_ASCENDC_STD_INTEGRAL_CONSTANT_IMPL__H
 
@@ -70,43 +60,6 @@ STD_INT_BINARY_OP(*);
 STD_INT_BINARY_OP(/);
 STD_INT_BINARY_OP(%);
 #undef STD_INT_BINARY_OP
-
-#define __CANN_ASC_STD_INT_NAMED_BINARY_FN(OP, CMP) \
-template <auto t, auto u> \
-ASCENDC_HOST_AICORE inline constexpr Int<(CMP ? t : u)> OP(Int<t>, Int<u>) { \
-    return {}; \
-} \
-template <auto t, typename U, typename = enable_if_t<is_integral<U>::value>> \
-ASCENDC_HOST_AICORE inline constexpr auto OP(Int<t>, const U& u) { \
-    return OP(static_cast<size_t>(t), u); \
-} \
-template <typename T, auto u, typename = enable_if_t<is_integral<T>::value>> \
-ASCENDC_HOST_AICORE inline constexpr auto OP(const T& t, Int<u>) { \
-    return OP(t, static_cast<size_t>(u)); \
-}
-
-__CANN_ASC_STD_INT_NAMED_BINARY_FN(max, t > u);
-__CANN_ASC_STD_INT_NAMED_BINARY_FN(min, t < u);
-#undef __CANN_ASC_STD_INT_NAMED_BINARY_FN
-
-#define __CANN_ASC_STD_INT_BINARY_FN(OP, EXPR) \
-template <auto t, auto u> \
-ASCENDC_HOST_AICORE inline constexpr Int<EXPR> OP(Int<t>, Int<u>) { \
-    return {}; \
-} \
-template <auto t, typename U, typename = enable_if_t<is_integral<U>::value>> \
-ASCENDC_HOST_AICORE inline constexpr auto OP(Int<t>, const U& u) { \
-    return OP(static_cast<size_t>(t), u); \
-} \
-template <typename T, auto u, typename = enable_if_t<is_integral<T>::value>> \
-ASCENDC_HOST_AICORE inline constexpr auto OP(const T& t, Int<u>) { \
-    return OP(t, static_cast<size_t>(u)); \
-}
-
-__CANN_ASC_STD_INT_BINARY_FN(divide, (t / u));
-__CANN_ASC_STD_INT_BINARY_FN(ceil_division, ((t + u - 1) / u));
-__CANN_ASC_STD_INT_BINARY_FN(ceil_align, (((t + u - 1) / u) * u));
-#undef __CANN_ASC_STD_INT_BINARY_FN
 }
 }
 
