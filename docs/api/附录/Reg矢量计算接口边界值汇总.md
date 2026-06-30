@@ -18,7 +18,7 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 
     通过接口[SetCtrlSpr](../SIMD-API/基础API/特殊寄存器访问/SetCtrlSpr(ISASI).md)进行设置，饱和模式下：inf和-inf会被饱和为MAX和MIN进行输出，nan会被饱和为0进行输出。
 
-> [!NOTE]注：
+> [!NOTE]注：说明
 >
 >- float数据类型输入仅支持INF/NAN模式（即使配置饱和模式，输出结果也与INF/NAN模式输出结果一致）；half、int16_t及int32_t类型输入，默认输出INF/NAN模式的结果。
 >
@@ -1810,7 +1810,7 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 | fp8_e8m0_t/bfloat16_t | nan | nan | nan |
 
 
-注：dst的元素取值（INF/NAN模式）列结果，与IEEE754理论结果一致。
+注：dst的元素取值（INF/NAN模式）列中涉及到浮点类型转换的结果，与IEEE754理论结果一致。
 
 ## 归约计算
 
