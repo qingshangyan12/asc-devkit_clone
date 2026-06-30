@@ -97,6 +97,8 @@ __aicore__ inline void asc_set_l0c2gm_quant_post(uint64_t config);
 
 __aicore__ inline void asc_set_l0c2gm_relu_alpha(uint64_t config);
 
+__aicore__ inline int64_t asc_get_squeeze_status();
+
 #endif
 
 #endif

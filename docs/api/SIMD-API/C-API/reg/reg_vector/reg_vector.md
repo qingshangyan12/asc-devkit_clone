@@ -220,6 +220,8 @@
 
 - **[asc_squeeze（废弃）](asc_squeeze_deprecated.md)**
 
+- **[asc_squeeze_with_status](asc_squeeze_with_status.md)**
+
 - **[asc_sub](asc_sub.md)**
 
 - **[asc_subc](asc_subc.md)**

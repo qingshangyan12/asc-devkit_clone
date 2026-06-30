@@ -1260,6 +1260,7 @@
         -   [系统变量](SIMD-API/C-API/sys_var/系统变量.md)
             -   [asc_get_arch_ver](SIMD-API/C-API/sys_var/asc_get_arch_ver.md)
             -   [asc_get_ar_spr（废弃）](SIMD-API/C-API/sys_var/asc_get_ar_spr_deprecated.md)
+            -   [asc_get_squeeze_status](SIMD-API/C-API/sys_var/asc_get_squeeze_status.md)
             -   [asc_get_block_idx](SIMD-API/C-API/sys_var/asc_get_block_idx.md)
             -   [asc_get_block_num](SIMD-API/C-API/sys_var/asc_get_block_num.md)
             -   [asc_get_core_id](SIMD-API/C-API/sys_var/asc_get_core_id.md)
