@@ -87,6 +87,11 @@ ARCH_OVERRIDES = {
     "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_fp8": ["dav-3510"],
 }
 
+MODE_BLACKLIST = {
+    # 由于l2cache特性需要，输入输出总数据量约308M，数据量过大导致cpu仿真超时（npu正常），所以屏蔽cpu模式
+    "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_l2cache": ["cpu"],
+}
+
 ARCH_ENV_KEYS = {
     "ARCH",
     "ASC_ARCH",
@@ -186,6 +191,9 @@ def apply_case_overrides(specs) -> None:
     for spec in specs:
         if spec.rel_path in ARCH_OVERRIDES:
             spec.archs = ARCH_OVERRIDES[spec.rel_path]
+        if spec.rel_path in MODE_BLACKLIST:
+            blacklisted = set(MODE_BLACKLIST[spec.rel_path])
+            spec.modes = [mode for mode in spec.modes if mode not in blacklisted]
 
 
 def write_runner(project_root: Path, runners_root: Path, cell, runnable_on_target: bool) -> CaseReport:
