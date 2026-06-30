@@ -28,6 +28,28 @@
 namespace AscendC {
 namespace Std {
 
+using _0      = Int<0>;
+using _1      = Int<1>;
+using _2      = Int<2>;
+using _3      = Int<3>;
+using _4      = Int<4>;
+using _5      = Int<5>;
+using _6      = Int<6>;
+using _7      = Int<7>;
+using _8      = Int<8>;
+using _9      = Int<9>;
+using _10     = Int<10>;
+using _16     = Int<16>;
+using _24     = Int<24>;
+using _32     = Int<32>;
+using _64     = Int<64>;
+using _128    = Int<128>;
+using _256    = Int<256>;
+using _512    = Int<512>;
+using _1024   = Int<1024>;
+using _2048   = Int<2048>;
+using _4096   = Int<4096>;
+
 #define STD_INT_NAMED_BINARY_FN(OP, CMP) \
 template <auto t, auto u> \
 ASCENDC_HOST_AICORE inline constexpr Int<(CMP ? t : u)> OP(Int<t>, Int<u>) { \
