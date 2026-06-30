@@ -8,6 +8,7 @@
 [![repo](https://img.shields.io/badge/docs-repo-blue.svg?style=flat)](https://gitcode.com/cann/asc-devkit/tree/master/docs)
 [![examples](https://img.shields.io/badge/examples-repo-orange.svg?style=flat)](https://gitcode.com/cann/asc-devkit/tree/master/examples)
 [![asc-tools](https://img.shields.io/badge/asc--tools-repo-6f42c1.svg?style=flat)](https://gitcode.com/cann/asc-tools)
+[![Ascend C Toolkit](https://img.shields.io/badge/VS%20Code-Ascend%20C%20Toolkit-007ACC.svg?style=flat)](https://marketplace.visualstudio.com/items?itemName=HICANN.ascend-c-toolkit)
 [![license](https://img.shields.io/badge/license-CANN_Open_2.0-lightgrey.svg)](https://gitcode.com/cann/asc-devkit/blob/master/LICENSE)
 [![contributing](https://img.shields.io/badge/CONTRIBUTING-teal)](https://gitcode.com/cann/asc-devkit/blob/master/CONTRIBUTING.md)
 [![SIG](https://img.shields.io/badge/SIG-ascendc-yellow)](https://gitcode.com/cann/community/tree/master/CANN/sigs/ascendc)
@@ -179,6 +180,10 @@ Ascend C提供三类接口，均可实现底层的完备编程能力：
   ```
 
 - 重启clangd（VSCode: Command Palette -> "Clangd: Restart language server"）
+
+- 推荐安装 [Ascend C Toolkit](https://marketplace.visualstudio.com/items?itemName=HICANN.ascend-c-toolkit) VS Code 扩展，在 VS Code 中完成 Ascend C 算子工程的编辑、编译、运行、调试、异常检测与性能调优等流程。打开本仓工作区时，VS Code 会根据 `.vscode/extensions.json` 提示安装推荐扩展。
+
+- Ascend C Toolkit 近期更新重点增强 A5/A3 芯片环境解析、标准自定义算子创建、SOC 设置、仿真分析、NPU 调试、设置迁移与稳定性；完整使用说明和问题反馈请参考 [CANN 讨论区使用指导](https://gitcode.com/org/cann/discussions/54)。
 
 - 💡 关于 ASC 语言语法高亮、代码跳转的支持，如有任何建议或改进意见，欢迎社区开发者积极反馈！
 

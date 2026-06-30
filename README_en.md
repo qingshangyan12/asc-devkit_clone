@@ -8,6 +8,7 @@
 [![repo](https://img.shields.io/badge/docs-repo-blue.svg?style=flat)](https://gitcode.com/cann/asc-devkit/tree/master/docs)
 [![examples](https://img.shields.io/badge/examples-repo-orange.svg?style=flat)](https://gitcode.com/cann/asc-devkit/tree/master/examples)
 [![asc-tools](https://img.shields.io/badge/asc--tools-repo-6f42c1.svg?style=flat)](https://gitcode.com/cann/asc-tools)
+[![Ascend C Toolkit](https://img.shields.io/badge/VS%20Code-Ascend%20C%20Toolkit-007ACC.svg?style=flat)](https://marketplace.visualstudio.com/items?itemName=HICANN.ascend-c-toolkit)
 [![license](https://img.shields.io/badge/license-CANN_Open_2.0-lightgrey.svg)](https://gitcode.com/cann/asc-devkit/blob/master/LICENSE)
 [![contributing](https://img.shields.io/badge/CONTRIBUTING-teal)](https://gitcode.com/cann/asc-devkit/blob/master/CONTRIBUTING_en.md)
 [![SIG](https://img.shields.io/badge/SIG-ascendc-yellow)](https://gitcode.com/cann/community/tree/master/CANN/sigs/ascendc)
@@ -179,6 +180,10 @@ If you want to quickly experience project build and operator sample execution, a
   ```
 
 - Restart clangd (VSCode: Command Palette -> "Clangd: Restart language server")
+
+- We recommend installing the [Ascend C Toolkit](https://marketplace.visualstudio.com/items?itemName=HICANN.ascend-c-toolkit) VS Code extension to edit, build, run, debug, detect exceptions, and tune performance for Ascend C operator projects in VS Code. When this workspace is opened, VS Code prompts users to install the recommended extensions from `.vscode/extensions.json`.
+
+- Recent Ascend C Toolkit updates focus on A5/A3 chip environment parsing, standard custom operator creation, SOC settings, simulation analysis, NPU debugging, settings migration, and stability. For full usage instructions and feedback channels, see the [CANN discussion guide](https://gitcode.com/org/cann/discussions/54).
 
 - 💡 For any suggestions or improvements regarding ASC language syntax highlighting and code navigation support, community developers are welcome to provide feedback!
 
