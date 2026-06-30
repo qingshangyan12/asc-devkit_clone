@@ -51,15 +51,15 @@
     __aicore__ inline void InitSpmBuffer(const int32_t  bufferSize)
     ```
 
-    <!-- npu="950" id1 -->
+    <!-- npu="950" id10 -->
     Ascend 950PR/Ascend 950DT，不支持暂存到L1 Buffer初始化接口。
-    <!-- end id1 -->
-    <!-- npu="A3" id2 -->
+    <!-- end id10 -->
+    <!-- npu="A3" id11 -->
     Atlas A3 训练系列产品/Atlas A3 推理系列产品，不支持暂存到L1 Buffer初始化接口。
-    <!-- end id2 -->
-    <!-- npu="910b" id3 -->
+    <!-- end id11 -->
+    <!-- npu="910b" id12 -->
     Atlas A2 训练系列产品/Atlas A2 推理系列产品，不支持暂存到L1 Buffer初始化接口。
-    <!-- end id3 -->
+    <!-- end id12 -->
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
