@@ -40,7 +40,8 @@ __aicore__ inline void DumpShapeImpl(const ShapeInfo &shapeInfo)
 }
 
 template <typename T>
-__aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc, uint32_t dumpSize)
+__aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc, uint32_t dumpSize,
+                                                const uint32_t* shape, const uint32_t shapeDim)
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
@@ -48,14 +49,14 @@ __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_
     if (g_sysPrintFifoSpace != nullptr) {
         const Hardware position = GetPhyType(static_cast<TPosition>(src.GetPosition()));
         if (position == Hardware::UB) {
-            __asc_aicore::asc_dump_ubuf((__ubuf__ T*)src.GetPhyAddr(), desc, dumpSize);
+            __asc_aicore::asc_dump_ubuf((__ubuf__ T*)src.GetPhyAddr(), desc, dumpSize, shape, shapeDim);
         } else if (position == Hardware::L1) {
             if ASCEND_IS_AIC {
-                __asc_aicore::asc_dump_l1buf((__cbuf__ T*)src.GetPhyAddr(), desc, dumpSize);
+                __asc_aicore::asc_dump_l1buf((__cbuf__ T*)src.GetPhyAddr(), desc, dumpSize, shape, shapeDim);
             }
         } else if (position == Hardware::L0C) {
             if ASCEND_IS_AIC {
-                __asc_aicore::asc_dump_cbuf((__cc__ T*)src.GetPhyAddr(), desc, dumpSize);
+                __asc_aicore::asc_dump_cbuf((__cc__ T*)src.GetPhyAddr(), desc, dumpSize, shape, shapeDim);
             }
         } else {
             ASCENDC_ASSERT((false),
@@ -67,50 +68,26 @@ __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_
 }
 
 template <typename T>
-__aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc, uint32_t dumpSize,
-                                                const uint32_t shapeDim, const uint32_t* shape)
+__aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc,
+                                                                uint32_t dumpSize)
+{
+    DumpTensorLocal2GMImpl(src, desc, dumpSize, nullptr, 0);
+}
+
+template <typename T>
+__aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t desc, uint32_t dumpSize,
+                                            const uint32_t* shape, const uint32_t shapeDim)
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
-    dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
-    if (g_sysPrintFifoSpace != nullptr) {
-        const Hardware position = GetPhyType(static_cast<TPosition>(src.GetPosition()));
-        if (position == Hardware::UB) {
-            __asc_aicore::asc_dump_ubuf((__ubuf__ T*)src.GetPhyAddr(), desc, dumpSize, shapeDim, shape);
-        } else if (position == Hardware::L1) {
-            if ASCEND_IS_AIC {
-                __asc_aicore::asc_dump_l1buf((__cbuf__ T*)src.GetPhyAddr(), desc, dumpSize, shapeDim, shape);
-            }
-        } else if (position == Hardware::L0C) {
-            if ASCEND_IS_AIC {
-                __asc_aicore::asc_dump_cbuf((__cc__ T*)src.GetPhyAddr(), desc, dumpSize, shapeDim, shape);
-            }
-        } else {
-            ASCENDC_ASSERT((false),
-                    { KERNEL_LOG(KERNEL_ERROR, "dump tensor only support dump tensor from local to gm"); });
-            return;
-        }
-    }
+    __asc_aicore::asc_dump_gm((__gm__ T*)src.GetPhyAddr(), desc, dumpSize, shape, shapeDim);
     set_ctrl(ctrlValue);
 }
 
 template <typename T>
 __aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t desc, uint32_t dumpSize)
 {
-    uint64_t ctrlValue = get_ctrl();
-    set_atomic_none();
-    __asc_aicore::asc_dump_gm((__gm__ T*)src.GetPhyAddr(), desc, dumpSize);
-    set_ctrl(ctrlValue);
-}
-
-template <typename T>
-__aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t desc, uint32_t dumpSize,
-                                            const uint32_t shapeDim, const uint32_t* shape)
-{
-    uint64_t ctrlValue = get_ctrl();
-    set_atomic_none();
-    __asc_aicore::asc_dump_gm((__gm__ T*)src.GetPhyAddr(), desc, dumpSize, shapeDim, shape);
-    set_ctrl(ctrlValue);
+    DumpTensorGM2GMImpl(src, desc, dumpSize, nullptr, 0);
 }
 
 __aicore__ inline void DumpTimeStampImpl(uint32_t descId)
