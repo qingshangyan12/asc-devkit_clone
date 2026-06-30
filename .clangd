@@ -7,7 +7,7 @@ CompileFlags:
     # 可选值: 2201(Atlas A2/A3 系列), 3510(Ascend 950PR/Ascend 950DT)
     - "-D__NPU_ARCH__=2201"
 
-    # 注入AscendC头文件路径(自行替换cann包路径)
+    # 注入AscendC头文件路径(自行替换cann包路径) 
     # asc/ 根目录必须在列表中：CANN 头文件内部大量使用 #include "impl/..." 相对路径
     - "-isystem"
     - "/usr/local/Ascend/cann/asc"
