@@ -30,3 +30,16 @@ build_device/
 .cursor/
 .opencode/
 docs/vitepress/docs/.vitepress/theme/outline-index.json
+
+modified_list.txt
+test_modified_samples_v2.py
+test_modified_samples.py
+.gitignore
+.skills
+# OpenCode 配置
+.opencode/
+.agent/
+.claude/
+.arts/
+examples/01_simd_cpp_api/04_best_practices/04_memory_access_practices/data_copy_mmad/
+
