@@ -40,14 +40,14 @@
 
 -   non-inplace接口：构造新的Tensor作为内存管理的对象
 
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline LocalTensor<T> AllocTensor()
     ```
 
 -   inplace接口：直接使用传入的Tensor作为内存管理的对象，可以减少Tensor反复创建的开销，具体使用指导可参考[Tensor原地操作](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/附录/常用操作/如何使用Tensor原地操作提升算子性能.md)。
 
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline void AllocTensor(LocalTensor<T>& tensor)
     ```
@@ -95,23 +95,33 @@
 ## 约束说明<a name="section633mcpsimp"></a>
 
 -   同一个TPosition上的所有Queue，连续调用AllocTensor接口申请的Tensor数量，根据AI处理器型号的不同，有数量约束。申请Buffer时，需要满足该约束。
-
-    Atlas 训练系列产品不超过4个。
-
-    Atlas 推理系列产品AI Core不超过8个。
-
-    Atlas 推理系列产品Vector Core不超过8个。
-
-    Atlas A2 训练系列产品/Atlas A2 推理系列产品不超过8个。
-
+    <!-- npu="950" id10 -->
+    Ascend 950PR/Ascend 950DT不超过8个。
+    <!-- end id10 -->
+    <!-- npu="A3" id11 -->
     Atlas A3 训练系列产品/Atlas A3 推理系列产品不超过8个。
-
+    <!-- end id11 -->
+    <!-- npu="910b" id12 -->
+    Atlas A2 训练系列产品/Atlas A2 推理系列产品不超过8个。
+    <!-- end id12 -->
+    <!-- npu="310b" id13 -->
     Atlas 200I/500 A2 推理产品不超过8个。
-
+    <!-- end id13 -->
+    <!-- npu="310p" id14 -->
+    Atlas 推理系列产品AI Core不超过8个。
+    <!-- end id14 -->
+    <!-- npu="310p" id15 -->
+    Atlas 推理系列产品Vector Core不超过8个。
+    <!-- end id15 -->
+    <!-- npu="910" id16 -->
+    Atlas 训练系列产品不超过4个。
+    <!-- end id16 -->
+    <!-- npu="x90" id17 -->
     Kirin X90不超过8个。
-
+    <!-- end id17 -->
+    <!-- npu="9030" id18 -->
     Kirin 9030不超过8个。
-
+    <!-- end id18 -->    
 -   non-inplace接口分配的Tensor内容可能包含随机值。
 -   non-inplace接口，需要将TQueBind的depth模板参数设置为非零值；inplace接口，需要将TQueBind的depth模板参数设置为0。
 
@@ -123,7 +133,7 @@ non-inplace接口返回值为LocalTensor对象，inplace接口没有返回值。
 
 -   示例一
 
-    ```
+    ```cpp
     // 使用AllocTensor分配Tensor
     AscendC::TPipe pipe;
     AscendC::TQue<AscendC::TPosition::VECOUT, 2> que;
@@ -135,7 +145,7 @@ non-inplace接口返回值为LocalTensor对象，inplace接口没有返回值。
 
 -   示例二
 
-    ```
+    ```cpp
     // 连续使用AllocTensor的限制场景举例如下:
     AscendC::TQue<AscendC::TPosition::VECIN, 1> que0;
     AscendC::TQue<AscendC::TPosition::VECIN, 1> que1;
@@ -180,7 +190,7 @@ non-inplace接口返回值为LocalTensor对象，inplace接口没有返回值。
 
 -   示例三：inplace接口
 
-    ```
+    ```cpp
     AscendC::TPipe pipe;
     AscendC::TQue<AscendC::TPosition::VECIN, 0> que;
     int num = 2;

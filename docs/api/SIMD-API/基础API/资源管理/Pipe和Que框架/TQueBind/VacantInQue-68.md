@@ -32,7 +32,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline bool VacantInQue()
 ```
 
@@ -51,7 +51,7 @@ __aicore__ inline bool VacantInQue()
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 // 根据VacantInQue判断当前que是否已满，设置当前队列深度为4
 AscendC::TPipe pipe;
 AscendC::TQueBind<AscendC::TPosition::VECOUT, AscendC::TPosition::GM, 4> que;

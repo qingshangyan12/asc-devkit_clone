@@ -50,7 +50,7 @@ EXTERN\_IMPL\_BUFPOOL宏内部定义的函数Reset、Init、GetBufHandle、SetCu
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 // 省略宏定义具体内容
 #define EXTERN_IMPL_BUFPOOL(EXT_BUFPOOL, POSITION, BUFID_SIZE) ...
 ```
@@ -106,7 +106,7 @@ EXTERN\_IMPL\_BUFPOOL宏内部定义的函数Reset、Init、GetBufHandle、SetCu
 
 如下示例中，为tbufPool0划分65536 \* 3大小的内存，然后自定义MyBufPool的InitBuffer函数，实现TQue和Tbuf的内存分配。
 
-```
+```cpp
 #include "kernel_operator.h"
 
 class MyBufPool {

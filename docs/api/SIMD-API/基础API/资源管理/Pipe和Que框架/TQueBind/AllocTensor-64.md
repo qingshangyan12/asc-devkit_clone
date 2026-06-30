@@ -34,14 +34,14 @@
 
 -   non-inplace接口：构造新的Tensor作为内存管理的对象
 
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline LocalTensor<T> AllocTensor()
     ```
 
 -   inplace接口：直接使用传入的Tensor作为内存管理的对象，可以减少Tensor反复创建的开销，具体使用指导可参考[Tensor原地操作](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/附录/常用操作/如何使用Tensor原地操作提升算子性能.md)。
 
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline void AllocTensor(LocalTensor<T>& tensor)
     ```
@@ -99,7 +99,7 @@ non-inplace接口返回值为LocalTensor对象，inplace接口没有返回值。
 
 -   non-inplace接口
 
-    ```
+    ```cpp
     AscendC::TPipe pipe;
     AscendC::TQueBind<AscendC::TPosition::VECOUT, AscendC::TPosition::GM, 2> que;
     int num = 4;
@@ -110,7 +110,7 @@ non-inplace接口返回值为LocalTensor对象，inplace接口没有返回值。
 
 -   inplace接口
 
-    ```
+    ```cpp
     AscendC::TPipe pipe;
     AscendC::TQueBind<AscendC::TPosition::VECOUT, AscendC::TPosition::GM, 0> que;
     int num = 2;

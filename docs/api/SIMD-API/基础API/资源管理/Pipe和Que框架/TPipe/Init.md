@@ -38,7 +38,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline void Init()
 ```
 
@@ -54,7 +54,7 @@ __aicore__ inline void Init()
 
 完整算子样例参考：[TPipeReuse](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/07_tpipe_tque/tpipe_reuse)。
 
-```
+```cpp
 // 实例化一个浮点型的自定义算子对象
 KernelTPipeInit<float> op;
 uint32_t srcSize = 128;

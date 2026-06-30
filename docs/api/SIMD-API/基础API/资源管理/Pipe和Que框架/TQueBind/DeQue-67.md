@@ -34,14 +34,14 @@
 
 -   non-inplace接口：将入队的LocalTensor地址从队列中取出赋值给新创建的Tensor并返回
 
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline LocalTensor<T> DeQue()
     ```
 
 -   inplace接口：通过出参的方式返回，可以减少Tensor反复创建的开销，具体使用指导可参考[Tensor原地操作](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/附录/常用操作/如何使用Tensor原地操作提升算子性能.md)。
 
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline void DeQue(LocalTensor<T>& tensor)
     ```
@@ -99,7 +99,7 @@ non-inplace接口的返回值为从队列中取出的[LocalTensor](../../../数�
 
 -   non-inplace接口
 
-    ```
+    ```cpp
     AscendC::TPipe pipe;
     AscendC::TQueBind<AscendC::TPosition::VECOUT, AscendC::TPosition::GM, 4> que;
     int num = 4;
@@ -112,7 +112,7 @@ non-inplace接口的返回值为从队列中取出的[LocalTensor](../../../数�
 
 -   inplace接口
 
-    ```
+    ```cpp
     AscendC::TPipe pipe;
     AscendC::TQueBind<AscendC::TPosition::VECOUT, AscendC::TPosition::GM, 0> que;
     int num = 2;

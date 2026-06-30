@@ -32,7 +32,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline void FreeAllEvent()
 ```
 
@@ -50,7 +50,7 @@ __aicore__ inline void FreeAllEvent()
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 // 接口: DeQue Tensor
 AscendC::TPipe pipe;
 AscendC::TQueBind<AscendC::TPosition::VECOUT, AscendC::TPosition::GM, 4> que;

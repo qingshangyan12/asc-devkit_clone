@@ -32,7 +32,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T>
 __aicore__ inline bool EnQue(const LocalTensor<T>& tensor)
 ```
@@ -88,7 +88,7 @@ __aicore__ inline bool EnQue(const LocalTensor<T>& tensor)
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 // 接口: EnQue Tensor
 AscendC::TPipe pipe;
 AscendC::TQueBind<AscendC::TPosition::VECOUT, AscendC::TPosition::GM, 4> que;

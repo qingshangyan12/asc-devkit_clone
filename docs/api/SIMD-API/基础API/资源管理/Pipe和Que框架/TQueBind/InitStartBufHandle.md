@@ -32,7 +32,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline void InitStartBufHandle(TBufHandle startBufhandle, uint8_t num, uint32_t len)
 ```
 
@@ -88,7 +88,7 @@ __aicore__ inline void InitStartBufHandle(TBufHandle startBufhandle, uint8_t num
 
 完整示例请参考[调用示例](../自定义TBufPool/EXTERN_IMPL_BUFPOOL宏.md#section1234017553610)。
 
-```
+```cpp
 // 假设自定义tbufpool类为MyBufPool
 // 自定义tbufpool类内部对TQue初始化的InitBuffer函数：
 template<class T> 

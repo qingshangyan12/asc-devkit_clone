@@ -32,27 +32,16 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T>
 __aicore__ inline LocalTensor<T> AllocTensor()
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-<a name="table1550165916920"></a>
-<table><thead align="left"><tr id="row115015591391"><th class="cellrowborder" valign="top" width="12.139999999999999%" id="mcps1.2.3.1.1"><p id="p12501159099"><a name="p12501159099"></a><a name="p12501159099"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="87.86%" id="mcps1.2.3.1.2"><p id="p85019592918"><a name="p85019592918"></a><a name="p85019592918"></a>说明</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row1550117591914"><td class="cellrowborder" valign="top" width="12.139999999999999%" headers="mcps1.2.3.1.1 "><p id="p185019592913"><a name="p185019592913"></a><a name="p185019592913"></a>T</p>
-</td>
-<td class="cellrowborder" valign="top" width="87.86%" headers="mcps1.2.3.1.2 "><p id="p12101541625"><a name="p12101541625"></a><a name="p12101541625"></a><span>Tensor的数据类型，支持的类型请见<a href="../../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>相关描述。</span></p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名称 | 说明 |
+| -------- | ---- |
+| T | 待获取Tensor的数据类型，支持的类型请见[LocalTensor](../../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)相关描述。|
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
@@ -64,7 +53,7 @@ LocalTensor对象。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 AscendC::TPipe pipe;
 AscendC::TSCM<AscendC::TPosition::VECIN, 1> tscm;
 int num = 4;

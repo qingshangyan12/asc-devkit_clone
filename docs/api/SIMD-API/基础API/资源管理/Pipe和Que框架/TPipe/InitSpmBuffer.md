@@ -40,39 +40,34 @@
 
 -   暂存到workspace初始化，需要指定GM地址为SPM Buffer：
 
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline void InitSpmBuffer(const GlobalTensor<T>& workspace, const int32_t bufferSize)
     ```
 
 -   暂存到L1 Buffer初始化，不需要指定地址，会默认暂存到L1 Buffer，只需要传入需要的SPM Buffer大小：
 
-    ```
+    ```cpp
     __aicore__ inline void InitSpmBuffer(const int32_t  bufferSize)
     ```
 
-    Atlas A2 训练系列产品/Atlas A2 推理系列产品，不支持暂存到L1 Buffer初始化接口。
-
+    <!-- npu="950" id1 -->
+    Ascend 950PR/Ascend 950DT，不支持暂存到L1 Buffer初始化接口。
+    <!-- end id1 -->
+    <!-- npu="A3" id2 -->
     Atlas A3 训练系列产品/Atlas A3 推理系列产品，不支持暂存到L1 Buffer初始化接口。
+    <!-- end id2 -->
+    <!-- npu="910b" id3 -->
+    Atlas A2 训练系列产品/Atlas A2 推理系列产品，不支持暂存到L1 Buffer初始化接口。
+    <!-- end id3 -->
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
 **表1**  模板参数说明
 
-<a name="table012895562310"></a>
-<table><thead align="left"><tr id="row2128195532318"><th class="cellrowborder" valign="top" width="12.65%" id="mcps1.2.3.1.1"><p id="p1212885512232"><a name="p1212885512232"></a><a name="p1212885512232"></a>参数名称</p>
-</th>
-<th class="cellrowborder" valign="top" width="87.35000000000001%" id="mcps1.2.3.1.2"><p id="p16129155552315"><a name="p16129155552315"></a><a name="p16129155552315"></a>含义</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row6129355182310"><td class="cellrowborder" valign="top" width="12.65%" headers="mcps1.2.3.1.1 "><p id="p81291855102318"><a name="p81291855102318"></a><a name="p81291855102318"></a>T</p>
-</td>
-<td class="cellrowborder" valign="top" width="87.35000000000001%" headers="mcps1.2.3.1.2 "><p id="p14983161812418"><a name="p14983161812418"></a><a name="p14983161812418"></a>待获取Tensor的数据类型，支持的类型请见<a href="../../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>相关描述。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名称 | 含义 |
+| -------- | ---- |
+| T | 待获取Tensor的数据类型，支持的类型请见[LocalTensor](../../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)相关描述。|
 
 **表2**  接口参数说明
 
@@ -114,7 +109,7 @@ SPM Buffer供解决UB空间不足的特殊场景使用，性能较差，一般�
 
 -   暂存到workspace初始化
 
-    ```
+    ```cpp
     AscendC::TPipe pipe;
     int len = 1024; // 设置spm buffer为1024个类型为T的数据
     workspace_gm.SetGlobalBuffer((__gm__ T *)usrWorkspace, len);  // 此处的usrWorkspace为用户自定义的workspace
@@ -124,7 +119,7 @@ SPM Buffer供解决UB空间不足的特殊场景使用，性能较差，一般�
 
 -   暂存到L1 Buffer初始化
 
-    ```
+    ```cpp
     AscendC::TPipe pipe;
     int len = 1024; // 设置spm buffer为1024个类型为T的数据
     pipe.InitSpmBuffer(len * sizeof(T));

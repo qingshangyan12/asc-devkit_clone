@@ -32,7 +32,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <Hardware hard>
 __aicore__ inline uint32_t LocalMemAllocator<hard>::GetCurAddr() const
 ```
@@ -51,7 +51,7 @@ __aicore__ inline uint32_t LocalMemAllocator<hard>::GetCurAddr() const
 
 ## 调用示例<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section320753512363"></a>
 
-```
+```cpp
 LocalMemAllocator allocator;
 // 默认的物理位置为UB，由于从0地址开始分配，下面的打印结果为0
 AscendC::printf("current addr is %u\n", allocator.GetCurAddr());

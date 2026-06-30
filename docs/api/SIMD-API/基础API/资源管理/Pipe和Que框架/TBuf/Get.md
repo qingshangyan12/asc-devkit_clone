@@ -40,14 +40,14 @@
 
 -   获取全部长度的Tensor
 
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline LocalTensor<T> Get()
     ```
 
 -   获取指定长度的Tensor
 
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline LocalTensor<T> Get(uint32_t len)
     ```
@@ -102,7 +102,7 @@ len的数值是Tensor中元素的个数，len\*sizeof\(T\)不能超过TBuf初始
 
 ## 调用示例<a name="section5725818154718"></a>
 
-```
+```cpp
 // 为TBuf初始化分配内存，分配内存长度为1024字节
 AscendC::TPipe pipe;
 AscendC::TBuf<AscendC::TPosition::VECCALC> calcBuf; // 模板参数为TPosition中的VECCALC类型

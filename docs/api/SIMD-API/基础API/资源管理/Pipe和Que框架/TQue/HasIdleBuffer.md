@@ -38,7 +38,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline bool HasIdleBuffer()
 ```
 
@@ -57,7 +57,7 @@ __aicore__ inline bool HasIdleBuffer()
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 // 当前Que中已经分配了4块内存
 AscendC::TPipe pipe;
 AscendC::TQue<AscendC::TPosition::VECOUT, 1> que;

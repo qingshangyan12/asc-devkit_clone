@@ -40,7 +40,7 @@
 
 -   无需指定源和目的位置
 
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline bool EnQue(const LocalTensor<T>& tensor)
     ```
@@ -49,7 +49,7 @@
 
     通过[TQueBind](../TQueBind/TQueBind.md)绑定VECIN和VECOUT可实现VECIN和VECOUT内存复用，如下接口用于存在Vector计算的场景下实现复用，在入队时需要指定源和目的位置；不存在Vector计算的场景下可直接调用bool EnQue\(LocalTensor<T\>& tensor\)入队接口。
 
-    ```
+    ```cpp
     template <TPosition srcUserPos, TPosition dstUserPos, typename T>
     __aicore__ inline bool EnQue(const LocalTensor<T>& tensor)
     ```
@@ -115,7 +115,7 @@
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 // 接口: EnQue Tensor
 AscendC::TPipe pipe;
 AscendC::TQue<AscendC::TPosition::VECOUT, 4> que;

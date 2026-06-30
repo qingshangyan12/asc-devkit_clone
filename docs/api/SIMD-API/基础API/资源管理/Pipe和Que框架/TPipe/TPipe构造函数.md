@@ -32,7 +32,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline TPipe()
 ```
 
@@ -47,7 +47,7 @@ __aicore__ inline TPipe()
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 template <typename ComputeT> class KernelExample {
 public:
     __aicore__ inline KernelExample() {}

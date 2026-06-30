@@ -38,7 +38,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline TBufHandle GetBufHandle(uint8_t offset)
 ```
 

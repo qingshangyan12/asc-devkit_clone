@@ -40,14 +40,14 @@
 
 -   适用于连续和不连续的数据暂存：
 
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline void WriteSpmBuffer(const LocalTensor<T>& writeBuffer, const DataCopyParams& copyParams, int32_t writeOffset = 0)
     ```
 
 -   适用于连续的数据暂存：
 
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline void WriteSpmBuffer(const LocalTensor<T>& writeBuffer, const int32_t writeSize, int32_t writeOffset = 0)
     ```
@@ -158,7 +158,7 @@
 
 -   使用DataCopyParams搬运
 
-    ```
+    ```cpp
     AscendC::TPipe pipe;
     int offset = 32; // 拷贝到SPM Buffer时偏移32字节
     AscendC::DataCopyParams copyParams{2, 2, 1, 1}; // 搬运两个数据块，一个数据块的长度为2个datablock，一个datablock为32字节，源地址和目的地址相邻数据块间均间隔一个数据块
@@ -170,7 +170,7 @@
 
 -   使用writeSize连续搬运
 
-    ```
+    ```cpp
     AscendC::TPipe pipe;
     int dataSize = 32;
     int offset = 32; // 拷贝到spmBuffer时偏移32字节

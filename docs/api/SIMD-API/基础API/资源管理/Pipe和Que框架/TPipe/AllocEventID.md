@@ -38,7 +38,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <HardEvent evt>
 __aicore__ inline TEventID AllocEventID()
 ```
@@ -72,7 +72,7 @@ TEventID
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 AscendC::TEventID eventID = GetTPipePtr()->AllocEventID<AscendC::HardEvent::V_S>(); //需要插入scalar等vector的同步，申请对应的HardEvent的ID
 AscendC::SetFlag<AscendC::HardEvent::V_S>(eventID);
 ......

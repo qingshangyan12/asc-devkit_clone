@@ -34,7 +34,7 @@
 
 -   原型1：tileSize为模板参数
 
-    ```
+    ```cpp
     // 当tileSize为常量时，建议使用此接口，以获得更优的性能
     template <class DataType, uint32_t tileSize> LocalTensor<DataType> __aicore__ inline Alloc()
     template <TPosition pos, class DataType, uint32_t tileSize> __aicore__ inline LocalTensor<DataType> Alloc()
@@ -42,7 +42,7 @@
 
 -   原型2：tileSize为接口入参
 
-    ```
+    ```cpp
     // 当tileSize为动态参数时使用此接口
     template <class DataType> LocalTensor<DataType> __aicore__ inline Alloc(uint32_t tileSize)
     template <TPosition pos, class DataType> LocalTensor<DataType> __aicore__ inline Alloc(uint32_t tileSize)
@@ -50,7 +50,7 @@
 
 -   原型3：使用TensorTrait时使用此接口
 
-    ```
+    ```cpp
     template <class DataType> LocalTensor<DataType> __aicore__ inline Alloc()
     ```
 
@@ -132,7 +132,7 @@
 
 ## 调用示例<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section320753512363"></a>
 
-```
+```cpp
 template <uint32_t v>
 using UIntImm = Std::integral_constant<uint32_t, v>;
 ...

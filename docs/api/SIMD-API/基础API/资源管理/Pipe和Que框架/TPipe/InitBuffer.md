@@ -32,13 +32,15 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
+头文件路径为：`"basic_api/kernel_tpipe.h"`。
+
 用于为TQue等队列和TBuf分配内存。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
 -   为TQue等队列分配内存
 
-    ```
+    ```cpp
     template <class T>
     __aicore__ inline bool InitBuffer(T& que, uint8_t num, uint32_t len)
     
@@ -49,16 +51,14 @@
 
 -   为TBuf分配内存
 
-    ```
+    ```cpp
     template <TPosition bufPos>
     __aicore__ inline bool InitBuffer(TBuf<bufPos>& buf, uint32_t len)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-头文件路径为：`"basic_api/kernel_tpipe.h"`。
-
-**表1**  bool InitBuffer\(T& que, uint8\_t num, uint32\_t len\)原型定义模板参数说明
+**表1**  为TQue等队列分配内存模板参数说明
 
 <a name="table634418773417"></a>
 <table><thead align="left"><tr id="row1934537133415"><th class="cellrowborder" valign="top" width="12.13%" id="mcps1.2.3.1.1"><p id="p1934597103419"><a name="p1934597103419"></a><a name="p1934597103419"></a>参数名称</p>
@@ -75,7 +75,7 @@
 </tbody>
 </table>
 
-**表2**  bool InitBuffer\(T& que, uint8\_t num, uint32\_t len\)原型定义参数说明
+**表2**  为TQue等队列分配内存接口参数说明
 
 <a name="table193329316393"></a>
 <table><thead align="left"><tr id="row123331131153919"><th class="cellrowborder" valign="top" width="11.940000000000001%" id="mcps1.2.4.1.1"><p id="p8333133153913"><a name="p8333133153913"></a><a name="p8333133153913"></a>参数名称</p>
@@ -110,7 +110,7 @@
 </tbody>
 </table>
 
-**表3**  bool InitBuffer\(T& que, const Std::tuple<U, V\>& addr0, const Addrs&... addrs\)原型定义模板参数说明
+**表3**  自定义地址为TQue等队列分配内存模板参数说明
 
 <a name="table115271653105120"></a>
 <table><thead align="left"><tr id="row8527185375112"><th class="cellrowborder" valign="top" width="12.13%" id="mcps1.2.3.1.1"><p id="p10527155312514"><a name="p10527155312514"></a><a name="p10527155312514"></a>参数名称</p>
@@ -142,7 +142,7 @@
 </tbody>
 </table>
 
-**表4**  bool InitBuffer\(T& que, const Std::tuple<U, V\>& addr0, const Addrs&... addrs\)原型定义参数说明
+**表4**  自定义地址为TQue等队列分配内存接口参数说明
 
 <a name="table2527125319516"></a>
 <table><thead align="left"><tr id="row10527553125118"><th class="cellrowborder" valign="top" width="12.36%" id="mcps1.2.4.1.1"><p id="p95271153205115"><a name="p95271153205115"></a><a name="p95271153205115"></a>参数名称</p>
@@ -177,7 +177,7 @@
 </tbody>
 </table>
 
-**表5**  InitBuffer\(TBuf<bufPos\>& buf, uint32\_t len\)原型定义模板参数说明
+**表5**  为TBuf分配内存模板参数说明
 
 <a name="table873615294112"></a>
 <table><thead align="left"><tr id="row473742114115"><th class="cellrowborder" valign="top" width="12.34%" id="mcps1.2.3.1.1"><p id="p1073720204115"><a name="p1073720204115"></a><a name="p1073720204115"></a>参数名称</p>
@@ -194,7 +194,7 @@
 </tbody>
 </table>
 
-**表6**  InitBuffer\(TBuf<bufPos\>& buf, uint32\_t len\)原型定义参数说明
+**表6**  为TBuf分配内存接口参数说明
 
 <a name="table5376122715308"></a>
 <table><thead align="left"><tr id="row1337716275309"><th class="cellrowborder" valign="top" width="12.36%" id="mcps1.2.4.1.1"><p id="p1537762711305"><a name="p1537762711305"></a><a name="p1537762711305"></a>参数名称</p>
@@ -235,7 +235,7 @@
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 // 为TQue分配内存，分配内存块数为2，每块大小为128字节
 AscendC::TPipe pipe; // Pipe内存管理对象
 AscendC::TQue<AscendC::TPosition::VECOUT, 2> que; // 输出数据队列管理对象，TPosition为VECOUT
