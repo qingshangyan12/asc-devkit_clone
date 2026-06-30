@@ -49,11 +49,13 @@ __simd_callee__ inline void LeakyRelu(S& dstReg, S& srcReg, U scalarValue, MaskR
 } // namespace Reg
 } // namespace AscendC
 
-#include "../../impl/basic_api/reg_compute/kernel_reg_compute_vec_binary_scalar_intf_impl.h"
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || \
+    (__NPU_ARCH__ == 3113)) || defined(__ASC_NPU_HOST__)
+#include "../../../impl/basic_api/reg_compute/kernel_reg_compute_vec_binary_scalar_intf_impl.h"
+#endif
 #endif // ASCENDC_MODULE_REG_COMPUTE_VEC_BINARY_SCALAR_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_VEC_BINARY_SCALAR_INTF_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_VEC_BINARY_SCALAR_INTF_H__
 #endif
-
