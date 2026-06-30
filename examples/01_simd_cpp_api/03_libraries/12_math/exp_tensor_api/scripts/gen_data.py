@@ -23,9 +23,6 @@ def gen_golden_data_simple():
     input_dtype = dtype
     cal_count = 8192
     min_num, max_num = input_dtype(-10), input_dtype(10)
-    element_num = 1
-    for a in src_shape:
-        element_num *= a
     src = np.random.uniform(min_num, max_num, src_shape).astype(input_dtype)
     src_exp = src[:cal_count]
     src_ori = np.zeros(src.size - cal_count).astype(src.dtype)
