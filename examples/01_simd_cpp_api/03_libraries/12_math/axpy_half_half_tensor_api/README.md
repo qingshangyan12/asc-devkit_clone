@@ -4,8 +4,7 @@
 本样例通过Ascend C编程语言实现了Axpy算子，使用<<<>>>内核调用符来完成算子核函数在NPU侧运行验证的基础流程，给出了对应的端到端实现。与基础API样例不同，本样例使用Tensor API的`Transform<Inst::Axpy>`接口完成计算。
 
 ## 支持的产品
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+- Ascend 950PR/Ascend 950DT
 
 ## 目录结构介绍
 ```
