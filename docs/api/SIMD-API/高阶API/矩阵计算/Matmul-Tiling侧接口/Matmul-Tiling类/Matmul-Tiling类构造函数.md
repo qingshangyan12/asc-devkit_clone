@@ -18,7 +18,7 @@
         ```
 
         ```
-        explicit BatchMatmulTiling(const platform_ascendc::PlatformAscendC &ascendcPlatform)
+        explicit BatchMatmulTiling(const platform_ascendc::PlatformAscendC& ascendcPlatform)
         ```
 
     -   使用PlatformInfo传入信息
@@ -30,7 +30,7 @@
         ```
 
         ```
-        explicit MultiCoreMatmulTiling(const PlatformInfo &platform)
+        explicit MultiCoreMatmulTiling(const PlatformInfo& platform)
         ```
 
 -   无参构造函数
@@ -49,9 +49,13 @@
 
     无参构造函数只支持如下产品型号：
 
+    <!-- npu="910b" id1 -->
     Atlas A2训练系列产品/Atlas 800I A2推理产品
+    <!-- end id1 -->
 
+    <!-- npu="A3" id2 -->
     Atlas A3 训练系列产品
+    <!-- end id2 -->
 
 -   基类构造函数
 

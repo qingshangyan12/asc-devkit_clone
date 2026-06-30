@@ -26,7 +26,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径：`"basic_api/reg_compute/kernel_reg_compute_vec_vconv_intf_impl.h"`。
+头文件路径：`"basic_api/reg_compute/kernel_reg_compute_vec_vconv_intf.h"`。
 
 将源操作数中的浮点数元素截断为整数值（保留原数据类型），并存入目的操作数。
 
@@ -45,7 +45,7 @@ __simd_callee__ inline void Truncate(S& dstReg, S& srcReg, MaskReg& mask)
 | --- | --- |
 | T | 操作数数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 | roundMode | 舍入模式，取值如下：<br>&bull; RoundMode::CAST_RINT<br>&bull; RoundMode::CAST_ROUND<br>&bull; RoundMode::CAST_FLOOR<br>&bull; RoundMode::CAST_CEIL<br>&bull; RoundMode::CAST_TRUNC |
-| mode | [MaskMergeMode](../数据类型/MaskMergeMode.md)枚举类型，选择MERGING模式或ZEROING模式。<br>&bull; ZEROING模式下，mask未筛选的元素在dstReg中置零。<br>&bull; MERGING模式当前不支持。 |
+| mode | [MaskMergeMode](../辅助数据类型/MaskMergeMode.md)枚举类型，选择MERGING模式或ZEROING模式。<br>&bull; ZEROING模式下，mask未筛选的元素在dstReg中置零。<br>&bull; MERGING模式当前不支持。 |
 | S | srcReg/dstReg类型，例如RegTensor&lt;float&gt;，由编译器自动推导，用户不需要填写。 |
 
 **表2**  参数说明

@@ -50,7 +50,7 @@ __simd_callee__ inline void MulsCast(T3& dstReg, T4& srcReg, T2 scalarValue, Mas
 | T0 | 目的操作数数据类型。 |
 | T1 | 源操作数的数据类型。 |
 | T2 | 标量源操作数的数据类型。 |
-| layout | [RegLayout](../数据类型/RegLayout.md)枚举类型。<br>支持RegLayout::ZERO、RegLayout::ONE。 |
+| layout | [RegLayout](../辅助数据类型/RegLayout.md)枚举类型。<br>支持RegLayout::ZERO、RegLayout::ONE。 |
 | T3 | 目的操作数的`RegTensor`类型，例如`RegTensor<float>`，由编译器自动推导，用户不需要填写。 |
 | T4 | 源操作数的`RegTensor`类型，例如`RegTensor<float>`，由编译器自动推导，用户不需要填写。 |
 
