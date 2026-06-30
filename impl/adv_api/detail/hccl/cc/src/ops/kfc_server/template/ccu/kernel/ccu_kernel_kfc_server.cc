@@ -371,13 +371,11 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
     HCCL_INFO("[CcuKernelKfcServer] CompArgs finish");
     HCCL_INFO("[GenCircularQueue] KfcServer start");
     KfcServerGenCircularQueue(arg, ctx);
-    /*
     CCU_IF(ctx.missionIndex == 0) {
         KfcServerGenCircularQueue(arg, ctx);
     } CCU_ELSE {
         SlaveKfcServerGenCircularQueue(arg, ctx);
     }
-    */
     HCCL_INFO("[CcuKernelKfcServer] KfcServer end");
     return CCU_SUCCESS;
 }    
