@@ -53,29 +53,24 @@ __aicore__ inline void WaitFlag(TEventID id)
 
 ### id取值范围说明
 
-<cann-filter npu-type="950">
-Ascend 950PR/Ascend 950DT，取值范围是0-7。
-</cann-filter>
-
-<cann-filter npu-type="A3">
-Atlas A3 训练系列产品/Atlas A3 推理系列产品，取值范围是0-7。
-</cann-filter>
-
-<cann-filter npu-type="910b">
-Atlas A2 训练系列产品/Atlas A2 推理系列产品，取值范围是0-7。
-</cann-filter>
-
-<cann-filter npu-type="310b">
-Atlas 200I/500 A2 推理产品，取值范围是0-7。
-</cann-filter>
-
-<cann-filter npu-type="310p">
-Atlas 推理系列产品AI Core，取值范围是0-7。
-</cann-filter>
-
-<cann-filter npu-type="910">
-Atlas 训练系列产品，取值范围是0-3。
-</cann-filter>
+<!-- npu="950" id8 -->
+- Ascend 950PR/Ascend 950DT，取值范围是0-7。
+<!-- end id8 -->
+<!-- npu="A3" id9 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品，取值范围是0-7。
+<!-- end id9 -->
+<!-- npu="910b" id10 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品，取值范围是0-7。
+<!-- end id10 -->
+<!-- npu="310b" id11 -->
+- Atlas 200I/500 A2 推理产品，取值范围是0-7。
+<!-- end id11 -->
+<!-- npu="310p" id12 -->
+- Atlas 推理系列产品AI Core，取值范围是0-7。
+<!-- end id12 -->
+<!-- npu="910" id13 -->
+- Atlas 训练系列产品，取值范围是0-3。
+<!-- end id13 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
