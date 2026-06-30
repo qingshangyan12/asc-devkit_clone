@@ -281,7 +281,6 @@ __aicore__ inline bool GetSaturationFlag()
 #endif
 
 #if (__NPU_ARCH__ == 3510)
-<<<<<<< Updated upstream
 template <OverrideStrategy strategy>
 __aicore__ inline void SetSaturationStrategy()
 {
@@ -297,11 +296,16 @@ __aicore__ inline OverrideStrategy GetSaturationStrategy()
 {
     int64_t value = (get_ctrl() >> 60) & 1;
     return value == 0 ? OverrideStrategy::USE_API : OverrideStrategy::USE_GLOBAL;
-=======
+}
+
 template <CacheRwMode rwMode, CacheMode cacheMode>
 __aicore__ inline void SetScalarCacheMode(){
     SetScalarCacheModeImpl<rwMode, cacheMode>();
->>>>>>> Stashed changes
+}
+
+template <CacheRwMode rwMode>
+__aicore__ inline CacheMode GetScalarCacheMode(){
+    return GetScalarCacheModeImpl<rwMode>();
 }
 #endif
 
