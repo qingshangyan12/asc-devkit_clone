@@ -147,7 +147,8 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - 位于Unified Buffer的地址必须32字节对齐。
-- <!-- npu="A3,910b,950" id18 -->当DataCopyParams结构体参数blockCount、blockLen任意一个值为0时，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
+<!-- npu="A3,910b,950" id18 -->
+- 当DataCopyParams结构体参数blockCount、blockLen任意一个值为0时，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
   <!-- npu="A3" id15 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
   <!-- end id15 -->
