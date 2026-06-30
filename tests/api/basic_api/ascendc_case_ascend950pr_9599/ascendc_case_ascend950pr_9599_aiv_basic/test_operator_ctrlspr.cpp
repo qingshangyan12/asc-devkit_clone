@@ -11,6 +11,7 @@
 #include "kernel_operator.h"
 #include "mockcpp/mockcpp.hpp"
 
+<<<<<<< Updated upstream
 using namespace AscendC;
 
 template <SaturationMode mode, int8_t ctrlBit, int64_t enabledValue, int64_t disabledValue>
@@ -47,6 +48,83 @@ void CtrlSprKernel()
     SetSaturationStrategy<OverrideStrategy::USE_API>();
     EXPECT_EQ(GetSaturationStrategy(), OverrideStrategy::USE_API);
     EXPECT_EQ((GetCtrlSpr<60, 60>()), 0);
+=======
+using namespace std;
+using namespace AscendC;
+
+void ScalarCacheModeReadKernel()
+{
+    // test L2Cache read mode: CTRL[19:16]
+    // CACHE_MODE_NORMAL -> 0b0000 (0)
+    SetScalarCacheMode<CacheRwMode::READ, CacheMode::CACHE_MODE_NORMAL>();
+    int64_t value = GetCtrlSpr<16, 19>();
+    EXPECT_EQ(value, 0b0000);
+
+    // CACHE_MODE_LAST -> 0b0001 (1)
+    SetScalarCacheMode<CacheRwMode::READ, CacheMode::CACHE_MODE_LAST>();
+    value = GetCtrlSpr<16, 19>();
+    EXPECT_EQ(value, 0b0001);
+
+    // CACHE_MODE_PERSISTENT -> 0b0010 (2)
+    SetScalarCacheMode<CacheRwMode::READ, CacheMode::CACHE_MODE_PERSISTENT>();
+    value = GetCtrlSpr<16, 19>();
+    EXPECT_EQ(value, 0b0010);
+
+    // CACHE_MODE_DISABLE -> 0b0100 (4)
+    SetScalarCacheMode<CacheRwMode::READ, CacheMode::CACHE_MODE_DISABLE>();
+    value = GetCtrlSpr<16, 19>();
+    EXPECT_EQ(value, 0b0100);
+}
+
+void ScalarCacheModeWriteKernel()
+{
+    // test L2Cache write mode: CTRL[23:20]
+    // CACHE_MODE_NORMAL -> 0b0000 (0)
+    SetScalarCacheMode<CacheRwMode::WRITE, CacheMode::CACHE_MODE_NORMAL>();
+    int64_t value = GetCtrlSpr<20, 23>();
+    EXPECT_EQ(value, 0b0000);
+
+    // CACHE_MODE_LAST -> 0b0001 (1)
+    SetScalarCacheMode<CacheRwMode::WRITE, CacheMode::CACHE_MODE_LAST>();
+    value = GetCtrlSpr<20, 23>();
+    EXPECT_EQ(value, 0b0001);
+
+    // CACHE_MODE_PERSISTENT -> 0b0010 (2)
+    SetScalarCacheMode<CacheRwMode::WRITE, CacheMode::CACHE_MODE_PERSISTENT>();
+    value = GetCtrlSpr<20, 23>();
+    EXPECT_EQ(value, 0b0010);
+
+    // CACHE_MODE_DISABLE -> 0b0100 (4)
+    SetScalarCacheMode<CacheRwMode::WRITE, CacheMode::CACHE_MODE_DISABLE>();
+    value = GetCtrlSpr<20, 23>();
+    EXPECT_EQ(value, 0b0100);
+}
+
+void ScalarCacheModeCombinedKernel()
+{
+    // test read and write mode independence
+    SetScalarCacheMode<CacheRwMode::READ, CacheMode::CACHE_MODE_LAST>();
+    SetScalarCacheMode<CacheRwMode::WRITE, CacheMode::CACHE_MODE_PERSISTENT>();
+
+    int64_t readValue = GetCtrlSpr<16, 19>();
+    int64_t writeValue = GetCtrlSpr<20, 23>();
+    EXPECT_EQ(readValue, 0b0001);
+    EXPECT_EQ(writeValue, 0b0010);
+
+    // change read mode, verify write mode unchanged
+    SetScalarCacheMode<CacheRwMode::READ, CacheMode::CACHE_MODE_DISABLE>();
+    readValue = GetCtrlSpr<16, 19>();
+    writeValue = GetCtrlSpr<20, 23>();
+    EXPECT_EQ(readValue, 0b0100);
+    EXPECT_EQ(writeValue, 0b0010);
+
+    // change write mode, verify read mode unchanged
+    SetScalarCacheMode<CacheRwMode::WRITE, CacheMode::CACHE_MODE_NORMAL>();
+    readValue = GetCtrlSpr<16, 19>();
+    writeValue = GetCtrlSpr<20, 23>();
+    EXPECT_EQ(readValue, 0b0100);
+    EXPECT_EQ(writeValue, 0b0000);
+>>>>>>> Stashed changes
 }
 
 struct CtrlSprTestParams {
@@ -63,10 +141,22 @@ protected:
     }
 };
 
+<<<<<<< Updated upstream
 INSTANTIATE_TEST_CASE_P(TEST_CTRL_SPR, CtrlSprTestsuite, ::testing::Values(CtrlSprTestParams{CtrlSprKernel}));
+=======
+INSTANTIATE_TEST_CASE_P(
+    TEST_CTRL_SPR, CtrlSprTestsuite,
+    ::testing::Values(
+        CtrlSprTestParams{ScalarCacheModeReadKernel}, CtrlSprTestParams{ScalarCacheModeWriteKernel},
+        CtrlSprTestParams{ScalarCacheModeCombinedKernel}));
+>>>>>>> Stashed changes
 
 TEST_P(CtrlSprTestsuite, CtrlSprTestCase)
 {
     auto param = GetParam();
     param.calFunc();
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes
