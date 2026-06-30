@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | [ReduceDataBlock](./ReduceDataBlock.md) | 对每个DataBlock内的数据求和/求最大值/求最小值。 | 1 element / DataBlock |
 | [ReduceRepeat](./ReduceRepeat.md) | 对每个repeat内的数据求和/求最大值/求最小值。<br>其中求最大值或最小值时可选择输出对应的索引。 | 求和：1 element / repeat；<br>求最大值/最小值：1 element (1 index) / repeat。 |
-| [ReducePairElem](./ReducePairElem.md) | 对相邻两个元素进行求和。 | 1 output element/ 2 input element |
+| [ReducePairElem](./ReducePairElem.md) | 对相邻两个元素进行求和。 | 1 element / pair |
 | [ReduceSum](./ReduceSum.md) | 对所有输入数据求和。 | 1 element |
 | [ReduceMax](./ReduceMax.md)/[ReduceMin](./ReduceMin.md) | 对所有输入数据求最大值/最小值。<br>可选择输出对应的索引。 | 1 element (1 index) |
 | [GetReduceRepeatSumSpr(ISASI)](./寄存器辅助接口/GetReduceRepeatSumSpr(ISASI).md) | 获取`ReduceSum`接口的计算结果。 | 1 element |

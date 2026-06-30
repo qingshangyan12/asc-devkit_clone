@@ -186,7 +186,7 @@
 - `dstRepStride`、`srcBlkStride`、`srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
 
 <!-- npu="950,A3,910b" id27 -->
-- 当参数count或repeatTime取值为0时，该接口的行为如下：
+- 当参数mask或repeatTime取值为0时，该接口的行为如下：
   <!-- npu="A3,910b" id28 -->
   - 针对如下型号，当参数mask或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
     <!-- npu="A3" id29 -->
