@@ -29,6 +29,12 @@ source "${ASCEND_HOME_DIR}/set_env.sh"
 # 配置路径
 CODE_PATH="${PROJECT_ROOT}/examples"
 LOG_PATH="${PROJECT_ROOT}/tmplog_devkit"
+MAKE_JOBS="${PRESMOKE_MAKE_JOBS:-32}"
+
+if [[ ! "${MAKE_JOBS}" =~ ^[0-9]+$ || "${MAKE_JOBS}" -lt 1 ]]; then
+    echo "Error: PRESMOKE_MAKE_JOBS only supports positive integers: ${MAKE_JOBS}"
+    exit 1
+fi
 
 # 验证路径
 if [ ! -d "${CODE_PATH}" ]; then
@@ -106,7 +112,7 @@ run_standard() {
     rm -rf build
     mkdir -p build && cd build || return 1
     cmake .. || return 1
-    make -j || return 1
+    make -j "${MAKE_JOBS}" || return 1
 
     if [ -f "../scripts/gen_data.py" ]; then
         python3 ../scripts/gen_data.py || return 1
@@ -128,7 +134,7 @@ run_two_outputs() {
     rm -rf build
     mkdir -p build && cd build || return 1
     cmake .. || return 1
-    make -j || return 1
+    make -j "${MAKE_JOBS}" || return 1
 
     if [ -f "../scripts/gen_data.py" ]; then
         python3 ../scripts/gen_data.py || return 1
@@ -150,7 +156,7 @@ run_cpu_mode() {
     cd "${base_path}/${example_name}/" || return 1
     rm -rf build
     cmake -B build -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 || return 1
-    cmake --build build || return 1
+    cmake --build build -j "${MAKE_JOBS}" || return 1
     ./build/"${executable}" || return 1
 }
 
@@ -167,7 +173,7 @@ run_with_params() {
     rm -rf build
     mkdir -p build && cd build || return 1
     cmake .. ${cmake_params} || return 1
-    make -j || return 1
+    make -j "${MAKE_JOBS}" || return 1
 
     if [ -f "../scripts/gen_data.py" ]; then
         python3 ../scripts/gen_data.py ${gen_data_params} || return 1
@@ -190,7 +196,7 @@ run_with_params_2() {
     rm -rf build
     mkdir -p build && cd build || return 1
     cmake .. ${cmake_params} || return 1
-    make -j || return 1
+    make -j "${MAKE_JOBS}" || return 1
     ./"${executable}" || return 1
 }
 
@@ -203,7 +209,7 @@ run_c_api() {
     rm -rf build
     mkdir -p build && cd build || return 1
     cmake .. || return 1
-    make -j || return 1
+    make -j "${MAKE_JOBS}" || return 1
     ./c_api_add_example || return 1
 }
 
@@ -216,7 +222,7 @@ run_msprof() {
     rm -rf build
     mkdir -p build && cd build || return 1
     cmake .. || return 1
-    make -j || return 1
+    make -j "${MAKE_JOBS}" || return 1
 
     if [ -f "../scripts/gen_data.py" ]; then
         python3 ../scripts/gen_data.py || return 1
