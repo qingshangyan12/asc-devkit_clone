@@ -198,8 +198,8 @@
 <!-- npu="950" id30 -->
 - Ascend 950PR/Ascend 950DT，按场景采用不同的累加方式：
   - int64_t、uint64_t采用方式三。
-  - Counter模式且数据量在256~1024字节之间采用方式三；否则采用方式二。
-  - Normal模式采用方式二。
+  - [Counter模式](../SIMD计算说明/掩码/概述.md#mask-mode)且数据量在256~1024字节之间采用方式三；否则采用方式二。
+  - [Normal模式](../SIMD计算说明/掩码/概述.md#mask-mode)采用方式二。
 <!-- end id30 -->
 <!-- npu="A3" id31 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品，tensor前n个数据计算接口采用方式一，tensor高维切分计算接口采用方式二。

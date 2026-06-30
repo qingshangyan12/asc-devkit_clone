@@ -125,9 +125,9 @@
 - `dstRepStride`、`srcBlkStride`、`srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
 
 <!-- npu="950,A3,910b" id18 -->
-- 当参数count或repeatTime取值为0时，该接口的行为如下：
+- 当参数mask或repeatTime取值为0时，该接口的行为如下：
   <!-- npu="A3,910b" id19 -->
-  - 当参数mask或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+  - 针对如下型号，当参数mask或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
     <!-- npu="A3" id20 -->
     - Atlas A3 训练系列产品/Atlas A3 推理系列产品
     <!-- end id20 -->
@@ -148,7 +148,7 @@
 <!-- end id23 -->
 
 <!-- npu="A3,910b" id24 -->
-- 若配置`mask[]/mask`参数后，存在某个DataBlock里的任何一个元素都不参与计算，不会有值写入对应目的操作数，保留目的操作数原有数据。
+- 针对如下型号，若配置`mask[]/mask`参数后，存在某个DataBlock里的任何一个元素都不参与计算，不会有值写入对应目的操作数，保留目的操作数原有数据。
   <!-- npu="A3" id25 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
   <!-- end id25 -->
@@ -158,14 +158,11 @@
 <!-- end id24 -->
 
 <!-- npu="310b" id27 -->
-- 若配置`mask[]/mask`参数后，存在某个DataBlock里的任何一个元素都不参与计算，则会以默认值填充对应目的操作数，默认值与`reduceType`和数据类型有关：
+- 针对Atlas 200I/500 A2 推理产品，若配置`mask[]/mask`参数后，存在某个DataBlock里的任何一个元素都不参与计算，则会以默认值填充对应目的操作数，默认值与`reduceType`和数据类型有关：
   - `reduceType == ReduceType::SUM`时填充0；
   - `reduceType == ReduceType::MAX`，操作数数据类型为`float`时填充-inf，操作数数据类型为`half`时填充-65504；
   - `reduceType == ReduceType::MIN`，操作数数据类型为`float`时填充inf，操作数数据类型为`half`时填充65504。
   - 比如`float`场景下，当`reduceType == ReduceType::MAX`，`mask=32`，即只计算前4个DataBlock，则后四个DataBlock内的最大值会返回-inf。
-  <!-- npu="310b" id28 -->
-  - Atlas 200I/500 A2 推理产品
-  <!-- end id28 -->
 <!-- end id27 -->
 
 - `float`数据类型只支持寄存器非饱和模式，`half`数据类型默认是寄存器非饱和模式。寄存器的非饱和/饱和模式具体配置方式参考[SetCtrlSpr(ISASI).md](../../特殊寄存器访问/SetCtrlSpr(ISASI).md)。

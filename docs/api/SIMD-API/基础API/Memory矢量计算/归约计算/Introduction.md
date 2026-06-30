@@ -12,7 +12,11 @@
 | [GetReduceRepeatSumSpr(ISASI)](./寄存器辅助接口/GetReduceRepeatSumSpr(ISASI).md) | 获取`ReduceSum`接口的计算结果。 | 1 element |
 | [GetReduceRepeatMaxMinSpr(ISASI)](./寄存器辅助接口/GetReduceRepeatMaxMinSpr(ISASI).md) | 获取调用`ReduceRepeat<MAX/MIN>`时所有repeat内的最值及其索引，或获取调用`ReduceMax`、`ReduceMin`得到的最值。 | 1 element (1 index) |
 
-<!-- npu="A3,910b" id1 -->
+<!-- npu="950" id1 -->
+针对Ascend 950PR/Ascend 950DT，Memory矢量计算的归约计算接口底层均通过VF调用转换为Reg矢量计算指令执行，接口内部存在额外的VF调用开销和UB中转（如sharedTmpBuffer）。因此Memory API不保证极致性能，对性能敏感的场景建议直接使用Reg矢量计算中的[归约计算](../../Reg矢量计算/归约计算/归约计算.md)（Reg::Reduce、Reg::PairReduceElem、Reg::ReduceDataBlock）。
+<!-- end id1 -->
+
+<!-- npu="A3,910b" id2 -->
 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品，在使用归约计算接口时，有如下使用建议。
 
 - `ReduceDataBlock`
@@ -63,4 +67,4 @@
 ![归约接口选择决策树](../../../../figures/reduce_decision_tree.png "归约接口选择决策树")
 
 注：在数据类型为`half`时，`ReduceDataBlock`及`ReduceRepeat`接口并行度不如`ReducePairElem`及基础算术接口[Add](../基础算术/Add.md)，[Max](../基础算术/Max.md)，[Min](../基础算术/Min.md)。在数据量较大，需要多次调用`ReduceDataBlock`及`ReduceRepeat`时，可以考虑使用`ReducePairElem`或基础算术接口对数据进行初步归约后再调用归约计算接口。
-<!-- end id1 -->
+<!-- end id2 -->
