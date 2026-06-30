@@ -361,7 +361,7 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 | [asc_bfloat162float](reg/reg_vector/asc_bfloat162float.md) | 将bfloat16_t类型转换为float类型，无舍入模式。 |
 | [asc_bfloat162half](reg/reg_vector/asc_bfloat162half.md) | 将bfloat16_t类型转换为half类型，并支持多种舍入模式和饱和/非饱和模式。 |
 | [asc_bfloat162int32](reg/reg_vector/asc_bfloat162int32.md) | 将bfloat16_t类型数据转换为int32_t类型，并支持多种舍入模式。 |
-| [asc_clear_ar_spr](reg/reg_vector/asc_clear_ar_spr.md) | 对AR寄存器进行清理，AR寄存器通常由[asc_squeeze（废弃）](reg/reg_vector/asc_squeeze (废弃).md)接口使用。 |
+| [asc_clear_ar_spr](reg/reg_vector/asc_clear_ar_spr.md) | 对AR寄存器进行清理，AR寄存器通常由[asc_squeeze（废弃）](reg/reg_vector/asc_squeeze_deprecated.md)接口使用。 |
 | [asc_copy](reg/reg_vector/asc_copy.md) | 完成数据在寄存器内的搬运。 |
 | [asc_create_iter_reg](reg/reg_vector/asc_create_iter_reg.md) | 地址寄存器通过该接口初始化，然后在循环之中使用地址寄存器存储地址偏移量。 |
 | [asc_create_mask](reg/reg_vector/asc_create_mask.md) | 根据入参生成相应的掩码寄存器。 |
@@ -457,7 +457,7 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 | [asc_shiftright](reg/reg_vector/asc_shiftright.md) | 根据掩码mask对输入数据src0，按照src1对应元素进行右移操作，完成后将结果写入dst中。 |
 | [asc_shiftright_scalar](reg/reg_vector/asc_shiftright_scalar.md) | 根据mask对源操作数src执行右移，右移的位数由输入参数value决定，将结果写入目的操作数dst。 |
 | [asc_sqrt](reg/reg_vector/asc_sqrt.md) | 逐元素计算平方根。 |
-| [asc_squeeze（废弃）](reg/reg_vector/asc_squeeze (废弃).md) | 将src中被mask选择的有效元素依次复制到dst，有效元素在dst上连续排列。 |
+| [asc_squeeze（废弃）](reg/reg_vector/asc_squeeze_deprecated.md) | 将src中被mask选择的有效元素依次复制到dst，有效元素在dst上连续排列。 |
 | [asc_sub](reg/reg_vector/asc_sub.md) | 按元素执行减法运算。 |
 | [asc_subc](reg/reg_vector/asc_subc.md) | 按元素执行带借位的减法运算。 |
 | [asc_truncate](reg/reg_vector/asc_truncate.md) | 将源操作数的浮点数元素截断到整数位，同时源操作数的数据类型保持不变，并支持多种舍入模式。 |

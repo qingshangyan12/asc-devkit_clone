@@ -1154,7 +1154,7 @@
                 -   [asc_shiftright](SIMD-API/C-API/reg/reg_vector/asc_shiftright.md)
                 -   [asc_shiftright_scalar](SIMD-API/C-API/reg/reg_vector/asc_shiftright_scalar.md)
                 -   [asc_sqrt](SIMD-API/C-API/reg/reg_vector/asc_sqrt.md)
-                -   [asc_squeeze（废弃）](SIMD-API/C-API/reg/reg_vector/asc_squeeze (废弃).md)
+                -   [asc_squeeze（废弃）](SIMD-API/C-API/reg/reg_vector/asc_squeeze_deprecated.md)
                 -   [asc_sub](SIMD-API/C-API/reg/reg_vector/asc_sub.md)
                 -   [asc_subc](SIMD-API/C-API/reg/reg_vector/asc_subc.md)
                 -   [asc_truncate](SIMD-API/C-API/reg/reg_vector/asc_truncate.md)
