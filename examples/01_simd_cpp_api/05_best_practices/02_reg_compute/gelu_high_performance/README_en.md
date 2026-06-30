@@ -270,8 +270,8 @@ Use the `msprof` tool to collect performance data for Case 0. Key metrics:
 
 **Principle Analysis**:
 
-RegBase API provides register-level vector computation interfaces. Combined with [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/asc_vf_call.md) to call VF functions, VF fusion can be achieved. Core advantages of VF fusion:
-- Within a VF function, after data is loaded from UB to registers, all intermediate computations are completed within registers, requiring only one [LoadAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬入.md) and one [StoreAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬出.md), eliminating Load/Store overhead for intermediate results
+RegBase API provides register-level vector computation interfaces. Combined with [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) to call VF functions, VF fusion can be achieved. Core advantages of VF fusion:
+- Within a VF function, after data is loaded from UB to registers, all intermediate computations are completed within registers, requiring only one [LoadAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/连续对齐搬入（LoadAlign）.md) and one [StoreAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/连续对齐搬出（StoreAlign）.md), eliminating Load/Store overhead for intermediate results
 - Supports VF dual-issue feature, standard computation instruction parallelism can reach 512 bytes/cycle, instruction dispatch efficiency (IPC) is significantly improved
 
 ```
@@ -323,6 +323,20 @@ __simd_vf__ inline void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr
         AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);  // Only one Store
     }
 }
+```
+
+**VF Function Invocation Context**:
+
+The above VF function defines the GELU computation logic within registers. It is called through `asc_vf_call` in the kernel function. The invocation example is as follows:
+
+```cpp
+// Code snippet for calling VF function in the kernel function
+constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
+uint32_t loopNum = DivCeil(n, oneRepeatSize);
+__ubuf__ float* xAddr = reinterpret_cast<__ubuf__ float*>(xLocal.GetPhyAddr());
+__ubuf__ float* yAddr = reinterpret_cast<__ubuf__ float*>(yLocal.GetPhyAddr());
+// Call VF function through asc_vf_call, passing UB address, element count n, and loop count
+asc_vf_call<GeluVfBasic>(xAddr, yAddr, n, loopNum);
 ```
 
 **Example Configuration**:

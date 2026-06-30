@@ -67,7 +67,7 @@ StoreAlign能够实现数据从[MaskReg](../寄存器数据类型/MaskReg.md)搬
 | 参数名 | 描述 |
 |-----|-----|
 | T | 目的操作数的数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
-| postMode | 用于控制是否使能UB地址会自动更新功能（post update），PostLiteral类型。具体参数说明请参考[PostLiteral](../数据类型/PostLiteral.md)。 |
+| postMode | 用于控制是否使能UB地址会自动更新功能（post update），PostLiteral类型。具体参数说明请参考[PostLiteral](../辅助数据类型/PostLiteral.md)。 |
 | dist | 搬运模式，MaskDist类型。具体参数说明请参考[表3 MaskDist参数说明](#表3-MaskDist参数说明)。 |
 
 **表 2**  参数说明

@@ -182,8 +182,8 @@
 | [Maxs（灵活标量位置）](Memory矢量计算/基础算术/Maxs（灵活标量位置）.md) | 提供灵活标量位置的接口，支持标量在前和标量在后两种场景。其中标量输入支持配置LocalTensor单点元素。 |
 | [Mins](Memory矢量计算/基础算术/Mins.md) | Mins属于双目标量类计算接口，输入为一个矢量tensor和一个标量scalar，Mins负责将矢量tensor内的每个元素与标量进行求最小值。 |
 | [Mins（灵活标量位置）](Memory矢量计算/基础算术/Mins（灵活标量位置）.md) | 提供灵活标量位置的接口，支持标量在前和标量在后两种场景。其中标量输入支持配置LocalTensor单点元素。 |
-| [Subs](Memory矢量计算/基础算术/Subs.md) | 矢量内每个元素和标量间做减法，支持标量在前和标量在后两种场景，其中标量输入支持配置LocalTensor单点元素。 |
-| [Divs](Memory矢量计算/基础算术/Divs.md) | 矢量内每个元素和标量间做除法，支持标量在前和标量在后两种场景，其中标量输入支持配置LocalTensor单点元素。 |
+| [Subs](Memory矢量计算/基础算术/Subs（灵活标量位置）.md) | 矢量内每个元素和标量间做减法，支持标量在前和标量在后两种场景，其中标量输入支持配置LocalTensor单点元素。 |
+| [Divs](Memory矢量计算/基础算术/Divs（灵活标量位置）.md) | 矢量内每个元素和标量间做除法，支持标量在前和标量在后两种场景，其中标量输入支持配置LocalTensor单点元素。 |
 | [LeakyRelu](Memory矢量计算/基础算术/LeakyRelu.md) | LeakyRelu属于双目标量类计算接口，输入为一个矢量tensor和一个标量scalar，LeakyRelu负责将矢量tensor内的每个元素执行Leaky ReLu（Leaky Rectified Linear Unit）操作。 |
 
 ### 逻辑计算
@@ -451,15 +451,14 @@
 | [GetSpr](Reg矢量计算/系统变量访问/GetSpr.md) | 获取指定特殊寄存器的值，当前仅为预留接口。 |
 | [ClearSpr](Reg矢量计算/系统变量访问/ClearSpr.md) | 对指定的特殊寄存器进行清零。 |
 
-### 数据类型
+### 辅助数据类型
 | 接口名 | 功能描述 |
 | --- | --- |
-| [PostLiteral](Reg矢量计算/数据类型/PostLiteral.md) | enum class PostLiteral  |
-| [RegLayout](Reg矢量计算/数据类型/RegLayout.md) | enum class RegLayout  |
-| [CastTrait](Reg矢量计算/数据类型/CastTrait.md) | 包括RegLayout、SatMode、MaskMergeMode、RoundMode。 |
-| [SatMode](Reg矢量计算/数据类型/SatMode.md) | 设置Cast类型转换饱和与不饱和模式。 |
-| [MaskMergeMode](Reg矢量计算/数据类型/MaskMergeMode.md) | 决定mask未选择元素对于dst元素是否置0。 |
-| [RoundMode](Reg矢量计算/数据类型/RoundMode.md) | 控制舍入模式。 |
+| [PostLiteral](Reg矢量计算/辅助数据类型/PostLiteral.md) | enum class PostLiteral  |
+| [RegLayout](Reg矢量计算/辅助数据类型/RegLayout.md) | enum class RegLayout  |
+| [SatMode](Reg矢量计算/辅助数据类型/SatMode.md) | 设置Cast类型转换饱和与不饱和模式。 |
+| [MaskMergeMode](Reg矢量计算/辅助数据类型/MaskMergeMode.md) | 决定mask未选择元素对于dst元素是否置0。 |
+| [RoundMode](Reg矢量计算/辅助数据类型/RoundMode.md) | 控制舍入模式。 |
 
 ## 标量计算
 | 接口名 | 功能描述 |

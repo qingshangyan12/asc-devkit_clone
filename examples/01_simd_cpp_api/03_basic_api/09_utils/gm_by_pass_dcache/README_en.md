@@ -60,18 +60,17 @@ Run the following steps in the root directory of this example to build and run t
   Run the following commands in the example directory.
   ```bash
   mkdir -p build && cd build;                                        # Create and enter the build directory
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;              # Build the project, default npu mode
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;               # Build the project, default npu mode
   python3 ../scripts/gen_data.py                                     # Generate test input data
   ./demo                                                             # Run the compiled executable to execute the example
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin  # Verify whether the output result is correct
   ```
 
-  To use CPU debug or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+  To use CPU debug mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` parameter.
 
   Examples:
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;  # CPU debug mode
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;  # NPU simulation mode
   ```
 
   > **Notice:** Clear the cmake cache before switching build modes. Run `rm CMakeCache.txt` in the build directory and then re-run cmake.
@@ -80,7 +79,7 @@ Run the following steps in the root directory of this example to build and run t
 
   | Option | Values | Description |
   |--------|--------|-------------|
-  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debug, NPU simulation |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu` | Run mode: NPU execution, CPU debug |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products/Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
   
 - Execution result
