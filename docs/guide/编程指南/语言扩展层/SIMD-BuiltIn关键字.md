@@ -247,7 +247,7 @@
     标识该核函数仅在Vector核执行。针对耦合模式的硬件架构，该修饰符不生效。
 
     ```
-     __vector__ __global__ __aicore__ void add_custom(){}
+     __vector__ __global__ void add_custom(){}
     ```
 
 -   **\_\_mix\_\_\(cube, vec\)**
