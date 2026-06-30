@@ -53,7 +53,7 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 - Ascend 950PR/Ascend 950DT，硬件支持配置核间同步模式和流水类型，模板参数modeId和pipe**生效**，此时CrossCoreWaitFlag会阻塞**指定流水**的后续指令。
 <!-- end id8 -->
 <!-- npu="A3,910b" id9 -->
-- 针对如下产品，硬件支持配置核间同步模式和流水类型，模板参数modeId和pipe**不生效**，此时CrossCoreWaitFlag会阻塞**全部流水**的后续指令。
+- 针对如下产品，硬件不支持配置核间同步模式和流水类型，模板参数modeId和pipe**不生效**，此时CrossCoreWaitFlag会阻塞**全部流水**的后续指令。
     <!-- npu="A3" id10 -->
     - Atlas A3 训练系列产品/Atlas A3 推理系列产品
     <!-- end id10 -->
