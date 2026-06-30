@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example demonstrates how to call the `LoadData` interface and configure `LoadData2DParamsV2` structure parameters (abbreviated as `Load2Dv2` interface in this example) to transfer A / B matrices from L1 to L0A / L0B.
+This example demonstrates how to call the `LoadData` interface and configure `LoadData2DParamsV2` structure parameters (abbreviated as `LoadData 2DV2` interface in this example) to transfer A / B matrices from L1 to L0A / L0B.
 
 The example covers three input data types: int8_t, half, and float, as well as A / B matrix transposed and non-transposed input scenarios. L0A data layout is Nz format, L0B data layout is Zn format.
 
@@ -35,13 +35,13 @@ The overall flow of the example is as follows:
 ```text
 GM(ND) -> L1(Nz) -> L0A(Nz)/L0B(Zn) -> L0C(Nz) -> GM(ND)
        │         │                  │          │
-    DataCopy  Load2Dv2            Mmad        Fixpipe
+    DataCopy  LoadData 2DV2            Mmad        Fixpipe
 ```
 
 **Step details**:
 
 1. **GM -> L1**: Use `DataCopy` to implement ND to Nz format conversion.
-2. **L1 -> L0A / L0B**: Use `Load2Dv2` interface with `LoadData2DParamsV2` structure parameters, controlling transpose via `ifTranspose`.
+2. **L1 -> L0A / L0B**: Use `LoadData 2DV2` interface with `LoadData2DParamsV2` structure parameters, controlling transpose via `ifTranspose`.
 3. **Matrix multiplication**: Use `Mmad` interface to perform matrix multiplication.
 4. **L0C -> GM**: Use `Fixpipe` interface to transfer results out.
 
@@ -73,7 +73,7 @@ The input shape, transpose flags, and L1 -> L0 transfer methods for each scenari
     <td>false</td>
     <td>true</td>
     <td>No</td>
-    <td><code>Load2Dv2</code></td>
+    <td><code>LoadData 2DV2</code></td>
   </tr>
   <tr>
     <td><span style="font-weight: bold;">2</span></td>
@@ -81,7 +81,7 @@ The input shape, transpose flags, and L1 -> L0 transfer methods for each scenari
     <td>true</td>
     <td>false</td>
     <td>Yes</td>
-    <td><code>Load2Dv2</code></td>
+    <td><code>LoadData 2DV2</code></td>
   </tr>
   <tr>
     <td><span style="font-weight: bold;">3</span></td>
@@ -91,7 +91,7 @@ The input shape, transpose flags, and L1 -> L0 transfer methods for each scenari
     <td>false</td>
     <td>true</td>
     <td>No</td>
-    <td><code>Load2Dv2</code></td>
+    <td><code>LoadData 2DV2</code></td>
   </tr>
   <tr>
     <td><span style="font-weight: bold;">4</span></td>
@@ -99,7 +99,7 @@ The input shape, transpose flags, and L1 -> L0 transfer methods for each scenari
     <td>true</td>
     <td>false</td>
     <td>No</td>
-    <td><code>Load2Dv2</code></td>
+    <td><code>LoadData 2DV2</code></td>
   </tr>
   <tr>
     <td><span style="font-weight: bold;">5</span></td>
@@ -109,7 +109,7 @@ The input shape, transpose flags, and L1 -> L0 transfer methods for each scenari
     <td>false</td>
     <td>true</td>
     <td>No</td>
-    <td><code>Load2Dv2</code></td>
+    <td><code>LoadData 2DV2</code></td>
   </tr>
   <tr>
     <td><span style="font-weight: bold;">6</span></td>
@@ -117,7 +117,7 @@ The input shape, transpose flags, and L1 -> L0 transfer methods for each scenari
     <td>true</td>
     <td>false</td>
     <td>No</td>
-    <td><code>Load2Dv2</code></td>
+    <td><code>LoadData 2DV2</code></td>
   </tr>
   <tr>
     <td><span style="font-weight: bold;">7</span></td>
@@ -127,27 +127,27 @@ The input shape, transpose flags, and L1 -> L0 transfer methods for each scenari
     <td>true</td>
     <td>false</td>
     <td>No</td>
-    <td>for loop + <code>Load2Dv2</code></td>
+    <td>for loop + <code>LoadData 2DV2</code></td>
   </tr>
 </table>
 
 Key differences by transfer mode:
 
-**`Load2Dv2` non-transpose transfer: Scenarios 1 / 3 / 5**
+**`LoadData 2DV2` non-transpose transfer: Scenarios 1 / 3 / 5**
 
 - A matrix non-transposed input `[m, k]`, B matrix transposed input `[n, k]`.
 - L1 -> L0A / L0B both do not need transpose, `loadDataParams.ifTranspose = false`.
 
-**`Load2Dv2` transpose transfer, single call: Scenarios 2 / 4 / 6**
+**`LoadData 2DV2` transpose transfer, single call: Scenarios 2 / 4 / 6**
 
 - A matrix transposed input `[k, m]`, B matrix non-transposed input `[k, n]`.
 - L1 -> L0A / L0B both need transpose, `loadDataParams.ifTranspose = true`.
 - In scenario 2, int8_t transpose single call causes extra dirty data fractals in m direction; `Fixpipe` transfers out only the valid region via `fixpipeParams.mSize = m`.
 
-**`Load2Dv2` transpose transfer, for loop call: Scenario 7**
+**`LoadData 2DV2` transpose transfer, for loop call: Scenario 7**
 
 - Scenario 7 is also int8_t transposed input, same as scenario 2.
-- A matrix uses for loop to call `Load2Dv2`, skipping dirty data fractals at the tail of m direction when writing to L0A, so no extra dirty data fractals participate in matrix computation.
+- A matrix uses for loop to call `LoadData 2DV2`, skipping dirty data fractals at the tail of m direction when writing to L0A, so no extra dirty data fractals participate in matrix computation.
 
 ### 3. Parameter Description
 
@@ -155,7 +155,7 @@ The subsequent code and parameter descriptions repeatedly use fractal and alignm
 
 - `fractalShape`: Small fractal shape. B8 / B16 / B32 input data types have shape `[16, 32 / sizeof(T)]`, where `T` represents the input data type. Fractal information for data types involved in this example is shown in [Table 2](#table2).
 - `fractalSize`: Number of elements in 1 small fractal, see [Table 2](#table2).
-- `fractalNum`: When L1 -> L0A / L0B requires transpose, `Load2Dv2` transposes by square matrix. When multiple consecutive small fractals need to merge into a square matrix, `fractalNum` represents the number of small fractals in that square matrix, see [Table 2](#table2).
+- `fractalNum`: When L1 -> L0A / L0B requires transpose, `LoadData 2DV2` transposes by square matrix. When multiple consecutive small fractals need to merge into a square matrix, `fractalNum` represents the number of small fractals in that square matrix, see [Table 2](#table2).
 
 <a name="table2"></a>
 <table border="2" align="center">
@@ -201,7 +201,7 @@ The subsequent code and parameter descriptions repeatedly use fractal and alignm
 
 ### 4. Alignment Requirements
 
-A / B matrices have different alignment requirements on each axis on L1 and L0. These values are used when configuring `Load2Dv2`, `Mmad`, and `Fixpipe` parameters. [Table 3](#table3) and [Table 4](#table4) summarize alignment requirements for A / B matrices on L1 and L0 when scenarioNum is 1-6; [Table 5](#table5) and [Table 6](#table6) summarize alignment requirements when scenarioNum is 7.
+A / B matrices have different alignment requirements on each axis on L1 and L0. These values are used when configuring `LoadData 2DV2`, `Mmad`, and `Fixpipe` parameters. [Table 3](#table3) and [Table 4](#table4) summarize alignment requirements for A / B matrices on L1 and L0 when scenarioNum is 1-6; [Table 5](#table5) and [Table 6](#table6) summarize alignment requirements when scenarioNum is 7.
 
 <a name="table3"></a>
 <table border="2" align="center">
@@ -291,7 +291,7 @@ A / B matrices have different alignment requirements on each axis on L1 and L0. 
   </tr>
 </table>
 
-When scenarioNum=7, A matrix uses for loop + `Load2Dv2` for L1 -> L0A transfer, and L0A only writes the region aligned by valid data fractals.
+When scenarioNum=7, A matrix uses for loop + `LoadData 2DV2` for L1 -> L0A transfer, and L0A only writes the region aligned by valid data fractals.
 
 <a name="table5"></a>
 <table border="2" align="center">
@@ -341,9 +341,9 @@ When scenarioNum=7, A matrix uses for loop + `Load2Dv2` for L1 -> L0A transfer, 
   </tr>
 </table>
 
-### 5. `Load2Dv2`
+### 5. `LoadData 2DV2`
 
-A / B matrices on L1 are all in Nz layout, on L0A and L0B they are in Nz and Zn layouts respectively. The L1 -> L0 phase calls the `LoadData` interface with `LoadData2DParamsV2` structure parameters, abbreviated as `Load2Dv2` in this document.
+A / B matrices on L1 are all in Nz layout, on L0A and L0B they are in Nz and Zn layouts respectively. The L1 -> L0 phase calls the `LoadData` interface with `LoadData2DParamsV2` structure parameters, abbreviated as `LoadData 2DV2` in this document.
 
 When reading this section, first determine the scenario from [Table 1](#table1), then select alignment values from [Table 3](#table3)-[Table 6](#table6). Key parameters when configuring `LoadData2DParamsV2`:
 
@@ -358,7 +358,7 @@ When L1 -> L0A does not require transpose, the parameter configurations for B8 /
 
 <div align="center">
   <img src="figures/B8_A_l1_l0A_Load2dv2.png" width="800"><br>
-  Figure 1: int8_t data type, L1 -> L0A non-transpose, Load2Dv2 data layout diagram
+  Figure 1: int8_t data type, L1 -> L0A non-transpose, LoadData 2DV2 data layout diagram
 </div>
 
 Parameter configuration key points:
@@ -386,7 +386,7 @@ AscendC::LoadData(a2Local, a1Local, loadDataParams);
 
 #### 5.2. A Matrix L1 -> L0A Transpose
 
-When L1 -> L0A requires transpose, `loadDataParams.ifTranspose = true`. During transpose, `Load2Dv2` completes small fractal transpose and L0A Nz layout writing via square fractal combinations; different data types have different square fractal combination methods, described below for B8 / B16 / B32.
+When L1 -> L0A requires transpose, `loadDataParams.ifTranspose = true`. During transpose, `LoadData 2DV2` completes small fractal transpose and L0A Nz layout writing via square fractal combinations; different data types have different square fractal combination methods, described below for B8 / B16 / B32.
 
 ##### 5.2.1. B8 Input Data Type
 
@@ -394,14 +394,14 @@ B8 input data type fractal is 16 * 32. During L1 -> L0 transpose, 2 fractals of 
 
 **Single Call**
 
-The following figure shows calling `Load2Dv2` once to complete L1 -> L0A transfer and transpose:
+The following figure shows calling `LoadData 2DV2` once to complete L1 -> L0A transfer and transpose:
 
 <div align="center">
   <img src="figures/B8_A_l1_l0A_trans_load2dv2.png" width="800"><br>
-  Figure 2: int8_t data type, L1 -> L0A transpose, single Load2Dv2 call data layout diagram
+  Figure 2: int8_t data type, L1 -> L0A transpose, single LoadData 2DV2 call data layout diagram
 </div>
 
-In this example `m = 40`. During B8 transpose transfer, `mAlignL1 = CeilAlign(m, fractalShape[1]) = 64`, `mAlignL1 - m = 24 > 16`. When calling `Load2Dv2` once, 1 extra invalid fractal is transferred in the m direction; during `Mmad` computation, `mmadParams.m = CeilAlign(m, fractalShape[0] * fractalNum)` must be set to include that fractal in computation, and finally `Fixpipe` transfers out only the valid region via `fixpipeParams.mSize = m`.
+In this example `m = 40`. During B8 transpose transfer, `mAlignL1 = CeilAlign(m, fractalShape[1]) = 64`, `mAlignL1 - m = 24 > 16`. When calling `LoadData 2DV2` once, 1 extra invalid fractal is transferred in the m direction; during `Mmad` computation, `mmadParams.m = CeilAlign(m, fractalShape[0] * fractalNum)` must be set to include that fractal in computation, and finally `Fixpipe` transfers out only the valid region via `fixpipeParams.mSize = m`.
 
 ```cpp
 kaAlignL1 = CeilAlign(k, fractalShape[0] * fractalNum); // 96
@@ -420,11 +420,11 @@ AscendC::LoadData(a2Local, a1Local, loadDataParams);
 
 **For Loop Call**
 
-The following figure shows calling `Load2Dv2` multiple times in a for loop to complete L1 -> L0A transfer and transpose:
+The following figure shows calling `LoadData 2DV2` multiple times in a for loop to complete L1 -> L0A transfer and transpose:
 
 <div align="center">
   <img src="figures/B8_A_l1_l0A_trans_for_load2dv2.png" width="800"><br>
-  Figure 3: int8_t data type, L1 -> L0A transpose, for loop calling Load2Dv2 multiple times data layout diagram
+  Figure 3: int8_t data type, L1 -> L0A transpose, for loop calling LoadData 2DV2 multiple times data layout diagram
 </div>
 
 When using for loop, transfer is done in segments along the L1 row direction (A matrix k axis), transferring 2 fractals in the k axis direction and `CeilDivision(mAlignL0, fractalShape[1])` fractals in the m axis direction each time. `dstStride` is configured with m direction valid data aligned to `fractalShape[0]`, skipping dirty data fractals at the tail of m direction when writing to L0A due to transpose over-read, so no extra dirty data fractals participate in `Mmad` computation in the m direction.
@@ -435,7 +435,7 @@ mAlignL1 = CeilAlign(m, fractalShape[1]); // 64
 mAlignL0 = CeilAlign(m, fractalShape[0]); // 48
 kaAlignL0 = CeilAlign(k, fractalShape[1]); // 96
 // Input is int8 type, A matrix [k,m] transposed input, L1 -> L0A requires transpose
-// For loop calls Load2Dv2, iterating along k axis, each iteration transfers 2 fractals in k direction on L1, skips dirty data fractals at tail of m direction on L0A, extra transfer in m direction does not exceed 1 fractal
+// For loop calls LoadData 2DV2, iterating along k axis, each iteration transfers 2 fractals in k direction on L1, skips dirty data fractals at tail of m direction on L0A, extra transfer in m direction does not exceed 1 fractal
 uint16_t L0ALoopNum = CeilDivision(kaAlignL0, fractalShape[0] * fractalNum); // 3
 loadDataParams.mStep = INT8_M_STEP_ALIGN; // 2
 loadDataParams.kStep = CeilDivision(mAlignL0, fractalShape[1]); // 2
@@ -452,11 +452,11 @@ for (uint16_t loopIdx = 0; loopIdx < L0ALoopNum; ++loopIdx) {
 
 ##### 5.2.2. B16 Input Data Type
 
-B16 input data type fractal is 16 * 16, one fractal is already a square. During L1 -> L0 transpose, it transposes by small fractal, and a single `Load2Dv2` call completes L1 -> L0A data transfer and transpose. This example uses half as the data type.
+B16 input data type fractal is 16 * 16, one fractal is already a square. During L1 -> L0 transpose, it transposes by small fractal, and a single `LoadData 2DV2` call completes L1 -> L0A data transfer and transpose. This example uses half as the data type.
 
 <div align="center">
   <img src="figures/B16_A_l1_l0A_trans_load2dv2.png" width="800"><br>
-  Figure 4: half data type, L1 -> L0A transpose, single Load2Dv2 call data layout diagram
+  Figure 4: half data type, L1 -> L0A transpose, single LoadData 2DV2 call data layout diagram
 </div>
 
 Parameter configuration key points:
@@ -486,7 +486,7 @@ B32 input data type fractal is 16 * 8. During L1 -> L0 transpose, 2 fractals of 
 
 <div align="center">
   <img src="figures/B32_A_l1_l0A_trans_load2dv2.png" width="800"><br>
-  Figure 5: float data type, L1 -> L0A transpose, single Load2Dv2 call data layout diagram
+  Figure 5: float data type, L1 -> L0A transpose, single LoadData 2DV2 call data layout diagram
 </div>
 
 In this example `m = 40`. B32 transpose transfer requires combining 2 fractals in the col direction into a square, **`kStep` must be a multiple of 2**, so L1 col direction (m direction) reads 1 extra invalid fractal. After writing to L0A, there is 1 extra invalid fractal at the tail of the k direction; since L0A is in Nz layout, configuring `mmadParams.k = k` in `Mmad` ensures only valid k axis data participates in computation.
@@ -512,7 +512,7 @@ When L1 -> L0B does not require transpose, the parameter configurations for B8 /
 
 <div align="center">
   <img src="figures/B32_B_l1_l0B_load2dv2.png" width="1100"><br>
-  Figure 6: float data type, L1 -> L0B non-transpose, single Load2Dv2 call data layout diagram
+  Figure 6: float data type, L1 -> L0B non-transpose, single LoadData 2DV2 call data layout diagram
 </div>
 
 Parameter configuration key points:
@@ -540,7 +540,7 @@ AscendC::LoadData(b2Local, b1Local, loadDataParams);
 
 #### 5.4. B Matrix L1 -> L0B Transpose
 
-When L1 -> L0B requires transpose, `loadDataParams.ifTranspose = true`. During transpose, `Load2Dv2` completes small fractal transpose and L0B Zn layout writing via square fractal combinations; different data types have different square fractal combination methods, described below for B8 / B16 / B32.
+When L1 -> L0B requires transpose, `loadDataParams.ifTranspose = true`. During transpose, `LoadData 2DV2` completes small fractal transpose and L0B Zn layout writing via square fractal combinations; different data types have different square fractal combination methods, described below for B8 / B16 / B32.
 
 ##### 5.4.1. B8 Input Data Type
 
@@ -548,7 +548,7 @@ B8 input data type fractal is 16 * 32. During L1 -> L0 transpose, 2 fractals of 
 
 <div align="center">
   <img src="figures/B8_B_l1_l0B_trans_load2dv2.png" width="1100"><br>
-  Figure 7: int8_t data type, L1 -> L0B transpose, single Load2Dv2 call data layout diagram
+  Figure 7: int8_t data type, L1 -> L0B transpose, single LoadData 2DV2 call data layout diagram
 </div>
 
 In this example `k = 70`. B8 transpose transfer requires combining 2 fractals in the row direction into a square, **`mStep` must be a multiple of 2**, so L1 row direction (k direction) reads 1 extra invalid fractal.
@@ -569,11 +569,11 @@ AscendC::LoadData(b2Local, b1Local, loadDataParams);
 
 ##### 5.4.2. B16 Input Data Type
 
-B16 input data type fractal is 16 * 16, one fractal is already a square. During L1 -> L0 transpose, it transposes by small fractal, and a single `Load2Dv2` call completes L1 -> L0B data transfer and transpose. This example uses half as the data type.
+B16 input data type fractal is 16 * 16, one fractal is already a square. During L1 -> L0 transpose, it transposes by small fractal, and a single `LoadData 2DV2` call completes L1 -> L0B data transfer and transpose. This example uses half as the data type.
 
 <div align="center">
   <img src="figures/B16_B_l1_l0B_trans_load2dv2.png" width="800"><br>
-  Figure 8: half data type, L1 -> L0B transpose, single Load2Dv2 call data layout diagram
+  Figure 8: half data type, L1 -> L0B transpose, single LoadData 2DV2 call data layout diagram
 </div>
 
 Parameter configuration key points:
@@ -602,7 +602,7 @@ B32 input data type fractal is 16 * 8. During L1 -> L0 transpose, 2 fractals of 
 
 <div align="center">
   <img src="figures/B32_B_l1_l0B_trans_load2dv2.png" width="1100"><br>
-  Figure 9: float data type, L1 -> L0B transpose, single Load2Dv2 call data layout diagram
+  Figure 9: float data type, L1 -> L0B transpose, single LoadData 2DV2 call data layout diagram
 </div>
 
 In this example `n = 50`. B32 transpose transfer requires combining 2 fractals in the col direction into a square, **`kStep` must be a multiple of 2**, so L1 col direction (n direction) reads 1 extra invalid fractal. After writing to L0B, there is 1 extra invalid fractal at the tail of the k direction; since L0B is in Zn layout, configuring `mmadParams.k = k` in `Mmad` ensures only valid k axis data participates in computation.

@@ -1,4 +1,4 @@
-﻿# Load2DBitMode<a id="ZH-CN_TOPIC_0000002517418694"></a>
+﻿# LoadData 2DBitMode（BitMode形式的增强2D矩阵数据搬运）<a id="ZH-CN_TOPIC_0000002517418694"></a>
 
 ## 产品支持情况<a id="section1550532418810"></a>
 
@@ -34,7 +34,7 @@
 
 负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位进行搬运，支持的数据通路为：L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer。
 
-本接口与Load2DV2接口的差异在于参数的传入方式不同，本接口传入的是一个联合体结构Load2DBitModeParam。
+本接口与LoadData 2DV2接口的差异在于参数的传入方式不同，本接口传入的是一个联合体结构Load2DBitModeParam。
 
 ## 函数原型<a id="section620mcpsimp"></a>
 
@@ -69,7 +69,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 | config0BitMode | Load2DBitModeConfig0位域（bit-field）结构体类型，参数参考[表4](#table4109172132317)，与config0组成联合体（union）。 |
 | config1 | uint64_t类型，与Load2DBitModeConfig1位域（bit-field）结构体类型参数config1BitMode组成联合体（union），初始化为0，可以使用类对象的GetConfig1()函数获取其值。 |
 | config1BitMode | Load2DBitModeConfig1位域（bit-field）结构体类型，参数参考[表5](#table122891852142311)，与config1组成联合体（union）。 |
-| ifTranspose | 是否启用转置功能，对每个分形矩阵进行转置，默认为false。含义与LoadData2DParamsV2结构体中的同名参数含义相同，具体参考[Load2D](Load2D.md)。<br>&nbsp;&nbsp;&bull; true：启用<br>&nbsp;&nbsp;&bull; false：不启用<br>开启转置功能时，支持的数据类型约束如下：<br>源操作数、目的操作数支持b4、b8、b16、b32数据类型。 |
+| ifTranspose | 是否启用转置功能，对每个分形矩阵进行转置，默认为false。含义与LoadData2DParamsV2结构体中的同名参数含义相同，具体参考[LoadData 2D（2D矩阵数据搬运）](LoadData-2D（2D矩阵数据搬运）.md)。<br>&nbsp;&nbsp;&bull; true：启用<br>&nbsp;&nbsp;&bull; false：不启用<br>开启转置功能时，支持的数据类型约束如下：<br>源操作数、目的操作数支持b4、b8、b16、b32数据类型。 |
 
 Load2DBitModeParam类参数设计思想说明：
 
@@ -79,7 +79,7 @@ Load2DBitModeParam类参数设计思想说明：
 
 Load2DBitModeParam类使用union与bit-field方法，采用bit位表达参数类型，使用bit-field结构体自动处理入参的bit位数，并利用union的特性实现多参数融合传递，仅需传递一个入参即可包含全部所需信息，对应底层接口仅需要接收一个参数。同时，当需要修改参数中某一bit位的值时，仅需要通过循环和位运算即可实现，不需要重新传入参数。
 
-与使用LoadData2DParamsV2结构体的Load2D接口相比，减少了scalar计算，实现性能提升。
+与使用LoadData2DParamsV2结构体的LoadData 2D接口相比，减少了scalar计算，实现性能提升。
 
 Load2DBitModeParam类可以直接使用LoadData2DParamsV2结构体类型对象初始化：
 
@@ -107,7 +107,7 @@ Load2DBitModeParam params(loadDataParams);  // 直接使用LoadData2DParamsV2结
 | mStep | 以M*K矩阵为例，源矩阵M轴方向搬运长度，单位为16个元素。取值范围：mStep∈[0, 255]。<br>通过ifTranspose参数启用转置功能时，mStep除需满足 [0, 255]的取值范围外，还需满足以下额外约束：<br>&nbsp;&nbsp;&bull; 当数据类型为b4时，mStep必须是4的倍数；<br>&nbsp;&nbsp;&bull; 当数据类型为b8时，mStep必须是2的倍数；<br>&nbsp;&nbsp;&bull; 当数据类型为b16时，mStep必须是1的倍数；<br>&nbsp;&nbsp;&bull; 当数据类型为b32时，mStep无额外约束。<br>该参数是位域结构体的第三低位参数，占用8bit，可以使用Load2DBitModeParam类对象的SetMStep()函数设置其值，使用GetMStep()函数获取其值，具体参考[表6](#table1123714295457)。 |
 | kStep | 以M*K矩阵为例，源矩阵K轴方向搬运长度，单位为32字节。取值范围：kStep∈[0, 255]。<br>通过ifTranspose参数启用转置功能时，kStep除需满足[0, 255]的取值范围外，还需满足以下额外约束：<br>&nbsp;&nbsp;&bull; 当数据类型为b4、b8或b16时，kStep没有额外约束；<br>&nbsp;&nbsp;&bull; 当数据类型为b32时，kStep必须是2的倍数。<br>该参数是位域结构体的最高位参数，占用8bit，可以使用Load2DBitModeParam类对象的SetKStep()函数设置其值，使用GetKStep()函数获取其值，具体参考[表6](#table1123714295457)。 |
 
-Load2DBitModeConfig0结构体参数的含义与LoadData2DParamsV2结构体中的同名参数含义相同，具体参考[Load2D](Load2D.md)。
+Load2DBitModeConfig0结构体参数的含义与LoadData2DParamsV2结构体中的同名参数含义相同，具体参考[LoadData 2D（2D矩阵数据搬运）](LoadData-2D（2D矩阵数据搬运）.md)。
 
 **表 5** Load2DBitModeConfig1结构体参数说明<a name="table122891852142311"></a>
 
@@ -116,7 +116,7 @@ Load2DBitModeConfig0结构体参数的含义与LoadData2DParamsV2结构体中的
 | srcStride | 以M*K矩阵为例，源矩阵K方向前一个分形起始地址与后一个分形起始地址的间隔，单位：512字节。<br>该参数是位域结构体的最低位参数，占用16bit，可以使用Load2DBitModeParam类对象的SetSrcStride()函数设置其值，使用GetSrcStride()函数获取其值，具体参考[表6](#table1123714295457)。 |
 | dstStride | 以M*K矩阵为例，目标矩阵K方向前一个分形起始地址与后一个分形起始地址的间隔，单位：512字节。<br>该参数是位域结构体的最高位参数，占用16bit，可以使用Load2DBitModeParam类对象的SetDstStride()函数设置其值，使用GetDstStride()函数获取其值，具体参考[表6](#table1123714295457)。 |
 
-Load2DBitModeConfig1结构体参数的含义与LoadData2DParamsV2结构体中的同名参数含义相同，具体参考[Load2D](Load2D.md)。
+Load2DBitModeConfig1结构体参数的含义与LoadData2DParamsV2结构体中的同名参数含义相同，具体参考[LoadData 2D（2D矩阵数据搬运）](LoadData-2D（2D矩阵数据搬运）.md)。
 
 **表 6** Load2DBitModeParam类成员函数说明<a name="table1123714295457"></a>
 
@@ -152,7 +152,7 @@ Load2DBitModeConfig1结构体参数的含义与LoadData2DParamsV2结构体中的
 
 ## 调用示例<a id="section6461234123118"></a>
 
-完整搬运流程请参考[Load2DV2样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_2dv2_l12l0)。Load2DBitMode的使用可以参考下面的调用示例，L1上为NZ数据排布、shape为[M,K]的A矩阵，调用LoadData指令完成L1 Buffer->L0A Buffer的Nz2Nz搬运。
+完整搬运流程请参考[LoadData 2DV2样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_2dv2_l12l0)。Load2DBitMode的使用可以参考下面的调用示例，L1上为NZ数据排布、shape为[M,K]的A矩阵，调用LoadData指令完成L1 Buffer->L0A Buffer的Nz2Nz搬运。
 
 - 示例一：使用LoadData2DParamsV2构造Load2DBitModeParam
 
