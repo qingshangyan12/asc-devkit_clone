@@ -24,6 +24,7 @@
 
 #include "impl/utils/sys_macros.h"
 #include "simt_api/device_types.h"
+#include "impl/simt_api/device_warp_functions_impl.h"
 
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #define __simt_gm__ __gm__
@@ -231,15 +232,23 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t check_and_wait_ring_buf_space(
     __simt_gm__ RingBufReadInfo* read_info = get_ring_buf_read_info(block_ring_buf_info);
     __simt_gm__ RingBufWriteInfo* write_info = get_ring_buf_write_info(block_ring_buf_info);
 
-#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
-    uint64_t start_offset = atomicAdd(&write_info->bufOffset, tlv_len);
-#else
-    uint64_t start_offset = __atomic_add(&write_info->bufOffset, tlv_len);
-#endif
-    uint64_t end_offset = start_offset + tlv_len;
-    if (end_offset > read_info->bufOffset + block_ring_buf_info->ringBufLen) {
-        ring_buffer_wait(read_info, end_offset - block_ring_buf_info->ringBufLen);
+    uint64_t start_offset = 0;
+    uint32_t active_thread = __activemask();
+    uint64_t total_len = __popc(active_thread) * tlv_len;
+    int32_t lane_id = __ffs(active_thread) - 1;
+    if (laneid() == lane_id) {
+        #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+            start_offset = atomicAdd(&write_info->bufOffset, total_len);
+        #else
+            start_offset = __atomic_add(&write_info->bufOffset, total_len);
+        #endif
+            uint64_t end_offset = start_offset + total_len;
+            if (end_offset > read_info->bufOffset + block_ring_buf_info->ringBufLen) {
+                ring_buffer_wait(read_info, end_offset - block_ring_buf_info->ringBufLen);
+            }
     }
+    uint32_t idx = __popc(active_thread & lanemask_lt());
+    start_offset = asc_shfl(start_offset, lane_id, warpSize) + tlv_len * idx;
     return start_offset;
 }
 
