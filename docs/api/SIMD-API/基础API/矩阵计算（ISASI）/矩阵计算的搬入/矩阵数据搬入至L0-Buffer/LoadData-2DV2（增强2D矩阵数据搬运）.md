@@ -1,4 +1,4 @@
-﻿# Load2DV2
+﻿# LoadData 2DV2（增强2D矩阵数据搬运）
 
 ## 产品支持情况
 
@@ -37,6 +37,8 @@
 负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位进行，支持如下数据通路：
 
 - L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer。
+
+相比LoadData 2D接口，本接口通过配置mStep和kStep完成多个方向的数据块搬运，可以减少重复的指令调用开销。
 
 对于不同的数据类型，每个数据分形对应的矩阵如下：
 
@@ -160,10 +162,10 @@ $$startAddr = srcAddr + (kStartPosition \times \lvert srcStride \rvert + mStartP
 
 ## 调用示例
 
-示例代码片段如下，仅展示样例中的部分代码，完整使用样例请参见[Load2DV2样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_2dv2_l12l0)。
+示例代码片段如下，仅展示样例中的部分代码，完整使用样例请参见[LoadData 2DV2样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_2dv2_l12l0)。
 
 ```cpp
-// Load2DV2: Nz -> Nz
+// LoadData 2DV2: Nz -> Nz
 uint32_t m = 40;
 uint32_t k = 70;
 uint32_t fractalShape[2] = {16, 32 / sizeof(half)};
