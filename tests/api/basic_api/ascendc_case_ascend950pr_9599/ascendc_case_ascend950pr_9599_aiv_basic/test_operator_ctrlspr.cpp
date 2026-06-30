@@ -11,7 +11,6 @@
 #include "kernel_operator.h"
 #include "mockcpp/mockcpp.hpp"
 
-<<<<<<< Updated upstream
 using namespace AscendC;
 
 template <SaturationMode mode, int8_t ctrlBit, int64_t enabledValue, int64_t disabledValue>
@@ -48,9 +47,7 @@ void CtrlSprKernel()
     SetSaturationStrategy<OverrideStrategy::USE_API>();
     EXPECT_EQ(GetSaturationStrategy(), OverrideStrategy::USE_API);
     EXPECT_EQ((GetCtrlSpr<60, 60>()), 0);
-=======
-using namespace std;
-using namespace AscendC;
+}
 
 void ScalarCacheModeReadKernel()
 {
@@ -124,7 +121,6 @@ void ScalarCacheModeCombinedKernel()
     writeValue = GetCtrlSpr<20, 23>();
     EXPECT_EQ(readValue, 0b0100);
     EXPECT_EQ(writeValue, 0b0000);
->>>>>>> Stashed changes
 }
 
 struct CtrlSprTestParams {
@@ -141,22 +137,16 @@ protected:
     }
 };
 
-<<<<<<< Updated upstream
-INSTANTIATE_TEST_CASE_P(TEST_CTRL_SPR, CtrlSprTestsuite, ::testing::Values(CtrlSprTestParams{CtrlSprKernel}));
-=======
 INSTANTIATE_TEST_CASE_P(
     TEST_CTRL_SPR, CtrlSprTestsuite,
     ::testing::Values(
-        CtrlSprTestParams{ScalarCacheModeReadKernel}, CtrlSprTestParams{ScalarCacheModeWriteKernel},
+        CtrlSprTestParams{CtrlSprKernel},
+        CtrlSprTestParams{ScalarCacheModeReadKernel},
+        CtrlSprTestParams{ScalarCacheModeWriteKernel},
         CtrlSprTestParams{ScalarCacheModeCombinedKernel}));
->>>>>>> Stashed changes
 
 TEST_P(CtrlSprTestsuite, CtrlSprTestCase)
 {
     auto param = GetParam();
     param.calFunc();
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

@@ -141,7 +141,6 @@ __aicore__ static inline void ResetCtrlSprImpl()
     set_ctrl(value);
 }
 
-<<<<<<< Updated upstream
 namespace Internal {
 template <SaturationMode mode>
 __aicore__ inline constexpr bool IsSupportedSaturationMode()
@@ -150,7 +149,7 @@ __aicore__ inline constexpr bool IsSupportedSaturationMode()
            mode == SaturationMode::CAST;
 }
 } // namespace Internal
-=======
+
 template <CacheMode cacheMode>
 __aicore__ inline constexpr uint8_t GetCacheModeBits()
 {
@@ -175,7 +174,6 @@ __aicore__ inline void SetScalarCacheModeImpl()
     ctrlValue |= (static_cast<uint64_t>(cacheBits) << startBit);
     set_ctrl(ctrlValue);
 }
->>>>>>> Stashed changes
 
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H
