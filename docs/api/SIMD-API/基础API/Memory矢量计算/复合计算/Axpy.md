@@ -15,10 +15,10 @@
 - Atlas 200I/500 A2 推理产品：支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：支持
+- Atlas 推理系列产品 AI Core：支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas 推理系列产品 Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：支持
@@ -91,6 +91,7 @@ $$
 PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 
 <!-- npu="950" id10 -->
+
 **表**  Ascend 950PR/Ascend 950DT支持的数据类型组合情况
 
 | src数据类型 | scalarValue数据类型 | dst数据类型 | PAR |
@@ -103,7 +104,12 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 | bfloat16_t  | bfloat16_t     | bfloat16_t  | 128 |
 <!-- end id10 -->
 
+针对Ascend 950PR/Ascend 950DT，int64_t、uint64_t数据类型仅支持tensor前n个数据计算接口。
+
+<!-- end id10 -->
+
 <!-- npu="A3" id11 -->
+
 **表** Atlas A3 训练系列产品/Atlas A3 推理系列产品支持的数据类型组合情况
 
 | src数据类型 | scalarValue数据类型 | dst数据类型 | PAR |
@@ -113,7 +119,10 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 | half        | half           | float       | 64  |
 <!-- end id11 -->
 
+<!-- end id11 -->
+
 <!-- npu="910b" id12 -->
+
 **表** Atlas A2 训练系列产品/Atlas A2 推理系列产品支持的数据类型组合情况
 
 | src数据类型 | scalarValue数据类型 | dst数据类型 | PAR |
@@ -123,7 +132,10 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 | half        | half           | float       | 64  |
 <!-- end id12 -->
 
+<!-- end id12 -->
+
 <!-- npu="310b" id13 -->
+
 **表** Atlas 200I/500 A2 推理产品支持的数据类型组合情况
 
 | src数据类型 | scalarValue数据类型 | dst数据类型 | PAR |
@@ -133,7 +145,10 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 | half        | half           | float       | 64  |
 <!-- end id13 -->
 
+<!-- end id13 -->
+
 <!-- npu="310p" id14 -->
+
 **表** Atlas 推理系列产品AI Core支持的数据类型组合情况
 
 | src数据类型 | scalarValue数据类型 | dst数据类型 | PAR |
@@ -143,7 +158,10 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 | half        | half           | float       | 64  |
 <!-- end id14 -->
 
+<!-- end id14 -->
+
 <!-- npu="910" id15 -->
+
 **表** Atlas 训练系列产品支持的数据类型组合情况
 
 | src数据类型 | scalarValue数据类型 | dst数据类型 | PAR |
@@ -153,7 +171,10 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 | half        | half           | float       | 64  |
 <!-- end id15 -->
 
+<!-- end id15 -->
+
 <!-- npu="x90" id16 -->
+
 **表** Kirin X90支持的数据类型组合情况
 
 | src数据类型 | scalarValue数据类型 | dst数据类型 | PAR |
@@ -163,7 +184,10 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 | half        | half           | float       | 64  |
 <!-- end id16 -->
 
+<!-- end id16 -->
+
 <!-- npu="9030" id17 -->
+
 **表** Kirin 9030支持的数据类型组合情况
 
 | src数据类型 | scalarValue数据类型 | dst数据类型 | PAR |
@@ -171,6 +195,7 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 | half        | half           | half        | 128 |
 | float       | float          | float       | 64  |
 | half        | half           | float       | 64  |
+
 <!-- end id17 -->
 
 ## 返回值说明<a name="section17124037164714"></a>
@@ -179,13 +204,30 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 地址对齐约束参考[地址对齐约束](../../../通用说明和约束.md#section796754519912)。
-- 操作数地址重叠约束请参考[地址重叠约束](../../../通用说明和约束.md#section668772811100)。
+- 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#section668772811100)。
 - 源操作数的数据类型为half、目的操作数的数据类型为float的情况下，不支持地址重叠。
 - 使用tensor高维切分计算接口时，src和scalarValue的数据类型为half、dst的数据类型为float的情况下，一个迭代处理内最多处理64个输入数据。
-<!-- npu="950" id18 -->
-- 针对Ascend 950PR/Ascend 950DT，int64_t、uint64_t数据类型仅支持tensor前n个数据计算接口。
+<!-- npu="A3,910b,950" id18 -->
+- 当参数count或repeatTime取值为0时，该接口的行为如下：
+  <!-- npu="A3,910b" id19 -->
+  - 针对如下型号，该接口不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+    <!-- npu="A3" id20 -->
+    - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+    <!-- end id20 -->
+    <!-- npu="910b" id21 -->
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    <!-- end id21 -->
+  <!-- end id19 -->
+  <!-- npu="950" id22 -->
+  - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
+  <!-- end id22 -->
 <!-- end id18 -->
+<!-- npu="950" id23 -->
+- 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT：
+  - tensor高维切分计算接口占用8KB Unified Buffer临时空间。
+  - tensor前n个数据连续计算接口不涉及8KB Unified Buffer临时空间的占用。
+<!-- end id23 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
