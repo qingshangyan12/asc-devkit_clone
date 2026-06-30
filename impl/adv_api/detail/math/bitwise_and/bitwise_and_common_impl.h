@@ -22,6 +22,7 @@
 #ifndef LIB_MATH_BITWISE_AND_IMPL_H
 #define LIB_MATH_BITWISE_AND_IMPL_H
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+
 #include "../../../../../include/basic_api/kernel_tensor.h"
 #include "../../../../../include/basic_api/kernel_basic_intf.h"
 #include "../../../../../include/adv_api/math/bitwise_and_utils.h"
