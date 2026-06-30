@@ -11,7 +11,7 @@
 #include <gtest/gtest.h>
 #include <vector>
 #define private public
-#include "kernel_operator.h"
+#include "hcomm/hcomm.h"
 
 using namespace std;
 using namespace AscendC;
