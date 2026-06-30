@@ -24,6 +24,7 @@
 
 #include "impl/utils/sys_macros.h"
 #include "simt_api/device_types.h"
+#include "impl/simt_api/device_warp_functions_impl.h"
 
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #define __simt_gm__ __gm__
@@ -231,15 +232,24 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t check_and_wait_ring_buf_space(
     __simt_gm__ RingBufReadInfo* read_info = get_ring_buf_read_info(block_ring_buf_info);
     __simt_gm__ RingBufWriteInfo* write_info = get_ring_buf_write_info(block_ring_buf_info);
 
-#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
-    uint64_t start_offset = atomicAdd(&write_info->bufOffset, tlv_len);
-#else
-    uint64_t start_offset = __atomic_add(&write_info->bufOffset, tlv_len);
-#endif
-    uint64_t end_offset = start_offset + tlv_len;
-    if (end_offset > read_info->bufOffset + block_ring_buf_info->ringBufLen) {
-        ring_buffer_wait(read_info, end_offset - block_ring_buf_info->ringBufLen);
+    uint64_t start_offset = 0;
+    uint32_t active_thread = __activemask();
+    uint64_t total_len = __popc(active_thread) * tlv_len;
+    int32_t lane_id = __ffs(static_cast<int32_t>(active_thread)) - 1;
+    if (laneid() == lane_id) {
+        #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+            start_offset = atomicAdd(&write_info->bufOffset, total_len);
+        #else
+            start_offset = __atomic_add(&write_info->bufOffset, total_len);
+        #endif
+            uint64_t end_offset = start_offset + total_len;
+            volatile __simt_gm__ RingBufReadInfo* read_info_v = (volatile __simt_gm__ RingBufReadInfo*)read_info;
+            if (end_offset > read_info_v->bufOffset + block_ring_buf_info->ringBufLen) {
+                ring_buffer_wait(read_info, end_offset - block_ring_buf_info->ringBufLen);
+            }
     }
+    uint32_t idx = __popc(active_thread & lanemask_lt());
+    start_offset = asc_shfl(start_offset, lane_id, warpSize) + tlv_len * idx;
     return start_offset;
 }
 
@@ -409,27 +419,16 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void write_ring_buf_tlv_data(__simt_gm__ B
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void write_finish(__simt_gm__ BlockRingBufInfo* block_ring_buf_info,
     uint64_t write_ptr, DumpType print_type)
 {
-    TypeToByte4 tmp{.value = static_cast<uint32_t>(print_type)};
-
-    if (static_cast<uint32_t>(write_ptr) + sizeof(uint32_t) > block_ring_buf_info->ringBufLen) {
-        __simt_gm__ uint8_t* data_ptr = reinterpret_cast<__simt_gm__ uint8_t*>(block_ring_buf_info->ringBufAddr);
-        uint32_t part1_len = block_ring_buf_info->ringBufLen - static_cast<uint32_t>(write_ptr);
-        for (int32_t index = 0; index < part1_len; index++) {
-            data_ptr[write_ptr + index] = tmp.bytes[index];
-        }
-        uint32_t part2_len = sizeof(uint32_t) - part1_len;
-        for (int32_t index = 0; index < part2_len; index++) {
-            data_ptr[index] = tmp.bytes[part1_len + index];
-        }
-    } else {
-        __simt_gm__ uint32_t* data_ptr = reinterpret_cast<__simt_gm__ uint32_t*>(block_ring_buf_info->ringBufAddr + write_ptr);
-        *data_ptr = tmp.value;
-    }
-
     __simt_gm__ RingBufWriteInfo* write_info = get_ring_buf_write_info(block_ring_buf_info);
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+    atomicExch(
+        reinterpret_cast<__simt_gm__ uint32_t*>(block_ring_buf_info->ringBufAddr + write_ptr),
+        static_cast<uint32_t>(print_type));
     atomicAdd(&write_info->packIdx, 1);
 #else
+    __atomic_exch(
+        reinterpret_cast<__simt_gm__ uint32_t*>(block_ring_buf_info->ringBufAddr + write_ptr),
+        static_cast<uint32_t>(print_type));
     __atomic_add(&write_info->packIdx, 1);
 #endif
 }
