@@ -40,7 +40,7 @@ Transpose capabilities of the load3dv2 instruction for 2D matrices:
 
 Since this example does not currently support int4b_t input data type, it demonstrates the following five load3dv2 usage scenarios in matrix multiplication:
 
-### Load3Dv2 Interface Scenario Table
+### LoadData 3D Interface Scenario Table
 
 | scenarioNum | Input Data Type | A Matrix Transpose | B Matrix Transpose |
 | --- | --- | --- | --- |
