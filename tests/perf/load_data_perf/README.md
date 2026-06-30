@@ -39,12 +39,12 @@
 
 | SCENARIO_NUM | 输入数据类型 | 数据源 | 执行路径 | 说明 | 理论带宽(Byte/cycle) | 带宽延迟(cycle) |
 |--------------|--------------|--------|----------|------|----------------------|-----------------|
-| 1 | bfloat16 | A矩阵 | L1 -> L0A | Load2D 从 L1 加载到 L0A | 256 | 28 |
-| 2 | bfloat16 | B矩阵 | L1 -> L0B | Load2D 从 L1 加载到 L0B | 128 | 28 |
+| 1 | bfloat16 | A矩阵 | L1 -> L0A | LoadData 2D 从 L1 加载到 L0A | 256 | 28 |
+| 2 | bfloat16 | B矩阵 | L1 -> L0B | LoadData 2D 从 L1 加载到 L0B | 128 | 28 |
 | 3 | bfloat16 | A矩阵 | L1 -> L0A（转置） | LoadDataWithTranspose 从 L1 加载到 L0A（转置） | 256 | 28 |
 | 4 | bfloat16 | B矩阵 | L1 -> L0B（转置） | LoadDataWithTranspose 从 L1 加载到 L0B（转置） | 128 | 28 |
-| 5 | bfloat16 | A矩阵 | L1 -> L0A | Load3Dv2 从 L1 加载到 L0A | 32-256 | 50 |
-| 6 | bfloat16 | B矩阵 | L1 -> L0B | Load3Dv2 从 L1 加载到 L0B | 28.4-128 | 50 |
+| 5 | bfloat16 | A矩阵 | L1 -> L0A | LoadData 3D 从 L1 加载到 L0A | 32-256 | 50 |
+| 6 | bfloat16 | B矩阵 | L1 -> L0B | LoadData 3D 从 L1 加载到 L0B | 28.4-128 | 50 |
 | 7 | int8_t | B矩阵 | L1 -> L0B | LoadDataWithSparse 从 L1 加载到 L0B（稀疏加载） | 128 | 30 |
 | 8 | float | Bias | L1 -> BiasTable Buffer | 从 L1 加载到 BiasTable Buffer | 32 | 20 |
 | 9 | uint64_t | FixPipe | L1 -> Fixpipe Buffer | 从 L1 加载到 Fixpipe Buffer | 32 | 20 |
@@ -53,12 +53,12 @@
 
 | SCENARIO_NUM | 输入数据类型 | 数据源 | 执行路径 | 说明 | 理论带宽(Byte/cycle) | 带宽延迟(cycle) |
 |--------------|--------------|--------|----------|------|----------------------|-----------------|
-| 11 | bfloat16 | A矩阵 | L1 -> L0A | Load2Dv2 从 L1 加载到 L0A | 256 | 30 |
-| 12 | bfloat16 | B矩阵 | L1 -> L0B | Load2Dv2 从 L1 加载到 L0B | 256 | 30 |
+| 11 | bfloat16 | A矩阵 | L1 -> L0A | LoadData 2DV2 从 L1 加载到 L0A | 256 | 30 |
+| 12 | bfloat16 | B矩阵 | L1 -> L0B | LoadData 2DV2 从 L1 加载到 L0B | 256 | 30 |
 | 13 | fp8_e4m3fn | A矩阵 + ScaleA | L1 -> L0A + L0A_MX | Load2DMx 从 L1 加载到 L0A 和 L0A_MX（带 scale） | 256/32 | 30 |
 | 14 | fp8_e4m3fn | B矩阵 + ScaleB | L1 -> L0B + L0B_MX | Load2DMx 从 L1 加载到 L0B 和 L0B_MX（带 scale） | 256/32 | 30 |
-| 15 | bfloat16 | A矩阵 | L1 -> L0A | Load3Dv2 从 L1 加载到 L0A | 32-256 | 50 |
-| 16 | bfloat16 | B矩阵 | L1 -> L0B | Load3Dv2 从 L1 加载到 L0B | 32-256 | 50 |
+| 15 | bfloat16 | A矩阵 | L1 -> L0A | LoadData 3D 从 L1 加载到 L0A | 32-256 | 50 |
+| 16 | bfloat16 | B矩阵 | L1 -> L0B | LoadData 3D 从 L1 加载到 L0B | 32-256 | 50 |
 | 17 | bfloat16 | B矩阵 | L1 -> L0B（转置） | LoadDataWithTranspose 从 L1 加载到 L0B（转置） | 256 | 28 |
 | 18 | float | Bias | L1 -> BiasTable Buffer | 从 L1 加载到 BiasTable Buffer | 32 | 20 |
 | 19 | uint64_t | FixPipe | L1 -> Fixpipe Buffer | 从 L1 加载到 Fixpipe Buffer | 32 | 26 |

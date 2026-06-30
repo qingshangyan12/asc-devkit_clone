@@ -16,7 +16,7 @@
 | [fixpipe_l0c2l1](./fixpipe_l0c2l1) |  本样例介绍如何使用Fixpipe将矩阵乘的结果从L0C Buffer搬出到L1（L1 Buffer） | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [fixpipe_l0c2ub](./fixpipe_l0c2ub) |  本样例介绍如何使用Fixpipe将矩阵乘的结果从L0C Buffer搬出到UB（Unified Buffer） | Ascend 950PR/Ascend 950DT |
 | [load_data_2dmx_l12l0](./load_data_2dmx_l12l0) |  本样例展示MX量化矩阵乘法中，如何使用基础API `LoadData` 完成L1到L0的数据搬运 | Ascend 950PR/Ascend 950DT |
-| [load_data_2dv2_l12l0](./load_data_2dv2_l12l0) |  本样例展示如何调用`LoadData`接口并配置`LoadData2DParamsV2`结构体参数（本样例中简称：`Load2Dv2`接口），将A / B矩阵从L1搬运到L0A / L0B | Ascend 950PR/Ascend 950DT |
+| [load_data_2dv2_l12l0](./load_data_2dv2_l12l0) |  本样例展示如何调用`LoadData`接口并配置`LoadData2DParamsV2`结构体参数（本样例中简称：`LoadData 2DV2`接口），将A / B矩阵从L1搬运到L0A / L0B | Ascend 950PR/Ascend 950DT |
 | [load_data_l12l0](./load_data_l12l0) |  本样例展示B4 / B8 / B16 / B32输入数据类型下，A / B矩阵从GM到L1、L1到L0、矩阵乘和结果搬出的完整流程 | Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [load_data_with_stride](./load_data_with_stride) |  本样例介绍LoadDataWithStride指令在矩阵乘法中的使用场景和方法，配合SetLoadDataRepeatWithStride可以将二维的A、B矩阵从L1搬运到L0A/L0B | Ascend 950PR/Ascend 950DT |
 | [mmad](./mmad) |  本样例介绍了输入为ND格式，B4 / B8 / B16 / B32输入数据类型（具体以int4_t / int8_t / bfloat16 / float为例），四种输入数据类型下的矩阵乘法，说明如何通过Mmad指令实现矩阵乘法计算（C = A x B + Bias） | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
