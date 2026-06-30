@@ -11,3 +11,4 @@
 | [03_profiling](./03_profiling) | 本样例展示如何在上板环境使用Profiling工具采集性能数据。 |
 | [07_simulator](./07_simulator) | 本样例展示Ascend C程序在CAmodel仿真模式下的编译、运行、结果校验与性能数据采集流程。 |
 | [09_log](./09_log) | 本样例展示Ascend日志功能的使用方法，包括日志打屏、落盘及级别控制。 |
+| [10_stack_overflow](./10_stack_overflow) | 本样例展示SIMT编程下栈溢出场景及使用全局内存优化的方法。 |
