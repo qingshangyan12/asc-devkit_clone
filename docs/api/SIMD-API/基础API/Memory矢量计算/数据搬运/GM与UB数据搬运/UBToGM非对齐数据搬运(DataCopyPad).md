@@ -184,9 +184,15 @@
     <!-- end id20 -->
 
 - <!-- npu="A3,910b,950" id24 -->当DataCopyExtParams结构体参数blockCount、blockLen任意一个值为0时，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
-  - <!-- npu="A3" id21 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品<!-- end id21 -->
-  - <!-- npu="910b" id22 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id22 -->
-  - <!-- npu="950" id23 -->Ascend 950PR/Ascend 950DT<!-- end id23 -->
+  <!-- npu="A3" id21 -->
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  <!-- end id21 -->
+  <!-- npu="910b" id22 -->
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  <!-- end id22 -->
+  <!-- npu="950" id23 -->
+  - Ascend 950PR/Ascend 950DT
+  <!-- end id23 -->
 <!-- end id24 -->
 
 ## 调用示例<a name="section177231425115410"></a>
