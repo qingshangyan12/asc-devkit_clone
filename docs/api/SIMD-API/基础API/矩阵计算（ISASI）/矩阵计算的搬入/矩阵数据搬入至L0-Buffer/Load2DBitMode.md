@@ -49,9 +49,9 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 | 参数名称 | 含义 |
 | ---------- | ---------- |
-| T | 源操作数和目的操作数的数据类型。<br>Ascend 950PR/Ascend 950DT，仅支持L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer。 |
-| Src | 源操作数存储的逻辑位置（TPosition），仅Load2DBitMode接口使用。 |
-| Dst | 目的操作数存储的逻辑位置（TPosition），仅Load2DBitMode接口使用。 |
+| T | 源操作数和目的操作数的数据类型。 |
+| Src | 源操作数存储的逻辑位置（TPosition），支持的取值为A1和B1，仅Load2DBitMode接口使用。 |
+| Dst | 目的操作数存储的逻辑位置（TPosition），支持的取值为A2和B2，仅Load2DBitMode接口使用。 |
 
 **表 2** 通用参数说明
 
@@ -87,10 +87,10 @@ Load2DBitModeParam类可以直接使用LoadData2DParamsV2结构体类型对象�
 LoadData2DParamsV2 loadDataParams;
 loadDataParams.mStartPosition = 0;
 loadDataParams.kStartPosition = 0;
-loadDataParams.mStep = xxx;
-loadDataParams.kStep = xxx;
-loadDataParams.srcStride = xxx;
-loadDataParams.dstStride = xxx;
+loadDataParams.mStep = 2;
+loadDataParams.kStep = 2;
+loadDataParams.srcStride = 2;
+loadDataParams.dstStride = 2;
 loadDataParams.sid = 0;
 loadDataParams.ifTranspose = false;
 Load2DBitModeParam params(loadDataParams);  // 直接使用LoadData2DParamsV2结构体类型对象初始化
@@ -146,6 +146,9 @@ Load2DBitModeConfig1结构体参数的含义与LoadData2DParamsV2结构体中的
 ## 约束说明<a id="section633mcpsimp"></a>
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../../通用说明和约束.md)。
+<!-- npu="950" id10 -->
+- 针对Ascend 950PR/Ascend 950DT，仅支持L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer数据通路。
+<!-- end id10 -->
 
 ## 调用示例<a id="section6461234123118"></a>
 

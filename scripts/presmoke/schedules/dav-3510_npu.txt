@@ -105,6 +105,7 @@
 01_simd_cpp_api/03_basic_api/01_memory_vector_compute/element_wise_logic
 01_simd_cpp_api/04_advanced_api/02_normalization/rmsnorm
 01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_2dv2_l12l0
+01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_with_stride
 01_simd_cpp_api/03_basic_api/00_data_movement/reg_load_store_align
 01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2l1
 01_simd_cpp_api/03_basic_api/02_reg_vector_compute/duplicate
@@ -143,6 +144,7 @@
 01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclop_invocation
 01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin
 01_simd_cpp_api/02_features/00_framework/03_ge/triple_chevron_notation
+01_simd_cpp_api/02_features/00_framework/04_aclgraph
 01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin
 01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom
 04_aicpu/02_features/00_framework/00_pytorch/tiling_sink_programming

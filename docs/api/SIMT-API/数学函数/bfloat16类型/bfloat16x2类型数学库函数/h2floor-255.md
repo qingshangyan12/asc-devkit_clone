@@ -42,11 +42,15 @@ inline bfloat16x2_t h2floor(bfloat16x2_t x)
 
 ## 返回值说明
 
-小于或等于输入数据各元素的最大整数值。特别场景说明如下：
+小于或等于输入数据各元素的最大整数值。本接口受全局饱和模式影响，特殊值如下：
 
--   当输入元素为nan时，返回值为nan。
--   当输入元素为inf时，返回值为inf。
--   当输入元素为-inf时，返回值为-inf。
+| 输入 | 非饱和模式返回值 | 饱和模式返回值 |
+|---|---|---|
+| 0 | 0 | 0 |
+| -0 | -0 | -0 |
+| nan | nan | 0 |
+| inf | inf | ASCRT_MAX_NORMAL_BF16 |
+| -inf | -inf | -ASCRT_MAX_NORMAL_BF16 |
 
 ## 约束说明
 
@@ -65,7 +69,7 @@ inline bfloat16x2_t h2floor(bfloat16x2_t x)
 -   SIMT编程场景：
 
     ```
-    __global__ __launch_bounds__(1024) void KernelIsFinite(bfloat16x2_t* dst, bfloat16x2_t* x)
+    __global__ __launch_bounds__(1024) void kernel_h2floor(bfloat16x2_t* dst, bfloat16x2_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = h2floor(x[idx]);
@@ -75,7 +79,7 @@ inline bfloat16x2_t h2floor(bfloat16x2_t x)
 -   SIMD与SIMT混合编程场景：
 
     ```
-    __simt_vf__ __launch_bounds__(1024) inline void KernelIsFinite(__gm__ bfloat16x2_t* dst, __gm__ bfloat16x2_t* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_h2floor(__gm__ bfloat16x2_t* dst, __gm__ bfloat16x2_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = h2floor(x[idx]);
