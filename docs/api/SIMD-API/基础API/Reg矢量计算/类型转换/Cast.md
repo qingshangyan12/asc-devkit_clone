@@ -45,6 +45,40 @@ Cast用于数据类型精度转换，将源操作数数据类型转换成目的�
 
 ![](../../../../figures/b32到b16类型转换过程.png)
 
+Cast类型转换伪代码如下：
+```python
+import numpy as np
+
+# MaskReg行为：MaskReg长度为256bit，每4bit最低位为1时选取对应位置的b32元素进行转换。
+def cast_b32_to_b16(src, dst, layout):
+    dst[:] = 0
+    dst[layout:128:2] = src[0:64].astype(np.int16)
+
+# MaskReg行为：MaskReg长度为256bit，每2bit最低位为1时选取对应位置的b16元素进行转换。
+def cast_b16_to_b32(src, dst, layout):
+    dst[0:64] = src[layout:128:2].astype(np.int32)
+
+# MaskReg行为：MaskReg长度为256bit，每4bit最低位为1时选取对应位置的b32元素进行转换。
+def cast_b32_to_b8(src, dst, layout):
+    dst[:] = 0
+    dst[layout:256:4] = src[0:64].astype(np.uint8)
+
+# MaskReg行为：MaskReg长度为256bit，每1bit为1时选取对应位置的b8元素进行转换。
+def cast_b8_to_b32(src, dst, layout):
+    dst[0:64] = src[layout:256:4].astype(np.int32)
+
+# MaskReg行为：MaskReg长度为256bit，每4bit最低位为1时选取对应位置连续的两个b16元素进行转换。
+def cast_b16_to_b4(src, dst, layout):
+    dst[:] = 0
+    dst[2*layout    : 512 : 8] = src[0:128:2].astype(np.uint8)
+    dst[2*layout + 1: 512 : 8] = src[1:128:2].astype(np.uint8)
+
+# MaskReg行为：MaskReg长度为256bit，每1bit为1时选取对应位置连续的两个b4元素进行转换。
+def cast_b4_to_b16(src, dst, layout):
+    dst[0:128:2] = src[2*layout    : 512 : 8].astype(np.int16)
+    dst[1:128:2] = src[2*layout + 1: 512 : 8].astype(np.int16)
+```
+
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
