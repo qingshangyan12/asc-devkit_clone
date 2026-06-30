@@ -434,7 +434,7 @@ HcclResult SelectAlgAndPrepareEngine(HcclComm comm, OpParam &opParam, std::strin
     HCCL_INFO("[SelectAlgAndPrepareEngine]start SelectAlgAndPrepareEngine!");
     opParam.hcclComm = comm;
     CHK_RET(HcclGetOpExpansionMode(comm, opParam));
-    HCCL_INFO("[SelectAlgAndPrepareEngine]HcclGetOpExpansionMode successfully!");
+    HCCL_INFO("[SelectAlgAndPrepareEngine]  successfully!");
     CHK_RET(HcclCalcTopoInfo(comm, opParam, topoInfo));
     HCCL_INFO("[SelectAlgAndPrepareEngine]HcclCalcTopoInfo successfully!");
     CHK_RET(CheckAsymmetricTopoSupport(opParam.opType, topoInfo.get()));
@@ -542,7 +542,7 @@ HcclResult GetCcuOpParamResCtx(HcclComm comm, const std::string &algName, OpPara
 {
     HCCL_INFO("[GetCcuOpParamResCtx]start GetCcuOpParamResCtx!");
     HCCL_INFO("[GetCcuOpParamResCtx]received: workspace[%p], size[%llu]", 
-    (void*)opResCtx.workSpace, opResCtx.workSpaceSize);
+            (void*)opResCtx.workSpace, opResCtx.workSpaceSize);
     std::unique_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(opParam.opType, algName);
     HCCL_INFO("[GetCcuOpParamResCtx]Generate executor successfully!");
     CHK_PRT_RET(executor.get() == nullptr,
