@@ -1,3 +1,7 @@
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/reg/reg_load/asc_loadalign/asc_loadalign_v6 (废弃).md
+ (废弃)
+=======
+>>>>>>> 43ae2a7e4c65eac7031e250b81644c74139850a7:docs/api/SIMD-API/C-API/reg/reg_load/asc_loadalign/asc_loadalign_v6_deprecated.md
 # asc_loadalign (废弃)
 
 ## 产品支持情况
