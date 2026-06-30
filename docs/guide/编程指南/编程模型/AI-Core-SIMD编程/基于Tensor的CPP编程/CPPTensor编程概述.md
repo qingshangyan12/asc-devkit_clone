@@ -10,7 +10,7 @@ C++ Tensor编程是Ascend C SIMD编程路径的基础编程接口，基于Tensor
 
 AI Core采用分级存储架构，Cube矩阵计算采用「Global Memory（以下简称为GM） → L1/L0系列Buffer」两级层级服务于矩阵计算，Vector矢量计算传统架构为「Global Memory → Unified Buffer（以下简称为UB）」两级层级，而[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入寄存器后构建「GM → UB → Register」三级层级，其中GM存放输入输出数据、UB作为矢量计算中间缓存、Register位于Vector计算单元最内层直接与执行单元交互。
 
-![AI Core存储层次结构](../../../../figures/AI_Core存储层次结构_c.png)
+![AI Core存储层次结构](../../../../figures/AI_Core存储层次结构.png)
 
 ### Tensor内存抽象
 
@@ -338,11 +338,11 @@ __global__ __cube__ void matmul_kernel(__gm__ float* x, __gm__ float* y, __gm__ 
     AscendC::LocalMemAllocator<AscendC::Hardware::L0B> l0bAllocator;
     AscendC::LocalMemAllocator<AscendC::Hardware::L0C> l0cAllocator;
     
-    LocalTensor<half> a_l1_buf = l1Allocator.Alloc<half, BLOCK_M * BLOCK_K>();
-    LocalTensor<half> b_l1_buf = l1Allocator.Alloc<half, BLOCK_K * BLOCK_N>();
-    LocalTensor<half> l0a_buf = l0aAllocator.Alloc<half, BLOCK_M * BLOCK_K>();
-    LocalTensor<half> l0b_buf = l0bAllocator.Alloc<half, BLOCK_K * BLOCK_N>();
-    LocalTensor<float> l0c_buf = l0cAllocator.Alloc<float, BLOCK_M * BLOCK_N>();
+    AscendC::LocalTensor<half> a_l1_buf = l1Allocator.Alloc<half, BLOCK_M * BLOCK_K>();
+    AscendC::LocalTensor<half> b_l1_buf = l1Allocator.Alloc<half, BLOCK_K * BLOCK_N>();
+    AscendC::LocalTensor<half> l0a_buf = l0aAllocator.Alloc<half, BLOCK_M * BLOCK_K>();
+    AscendC::LocalTensor<half> l0b_buf = l0bAllocator.Alloc<half, BLOCK_K * BLOCK_N>();
+    AscendC::LocalTensor<float> l0c_buf = l0cAllocator.Alloc<float, BLOCK_M * BLOCK_N>();
 
     // GM2L1 and L12L0 data transfer operations
     // ...

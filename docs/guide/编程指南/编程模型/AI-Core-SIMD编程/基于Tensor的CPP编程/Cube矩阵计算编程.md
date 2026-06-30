@@ -1,4 +1,4 @@
-# Cube矩阵计算编程<a name="ZH-CN_TOPIC_0000002600000002"></a>
+# Cube矩阵计算编程<a name="ZH-CN_TOPIC_0000002600000003"></a>
 
 本文介绍如何在Ascend C中使用C++ Tensor编程API编写基于L1 Buffer、L0A Buffer等片上存储的**矩阵计算代码**。
 

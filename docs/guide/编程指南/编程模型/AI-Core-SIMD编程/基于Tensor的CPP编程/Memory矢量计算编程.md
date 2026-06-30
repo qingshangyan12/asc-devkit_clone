@@ -48,7 +48,7 @@ GM与UB之间的数据搬运提供了多样化的接口，支持丰富的数据�
 
 ![连续数据搬运](../../../../figures/连续数据搬运.png)
 
-```c
+```cpp
 AscendC::DataCopy(dstLocal, srcGlobal, 256);
 ```
 
@@ -56,7 +56,7 @@ AscendC::DataCopy(dstLocal, srcGlobal, 256);
 
 ![非连续搬运](../../../../figures/非连续搬运.png)
 
-```c
+```cpp
 // Number of consecutive data blocks: 16 rows of data, transfer every alternate row to UB, needing to transfer 8 rows
 uint16_t blockCount = 2;
 // Length of single data block (in 32B units): value is 8
@@ -76,7 +76,7 @@ AscendC::DataCopy(dstLocal, srcGlobal, copyParams);
 
 在上图所示场景中，需将两个数据块从GM搬运至UB：每个数据块的blockLen为54B，源操作数中相邻数据块的间隔为1B，目的操作数中相邻数据块的间隔为32B。为满足32B对齐要求，需在blockLen左侧填充2个half类型元素、右侧填充3个half类型元素；此时总长度为blockLen + leftPadding × 2B + rightPadding × 2B = 54B + 2 × 2B + 3 × 2B = 64B，符合32B对齐约束。
 
-```c
+```cpp
 // Number of consecutive data blocks: transfer two consecutive data blocks
 uint16_t blockCount = 2;
 // Length of single data block (in bytes): value is 54
@@ -181,16 +181,18 @@ AscendC::Add(zTensor, xTensor, yTensor, mask, repeatTime, { dstBlockStride, src0
 每一位掩码对应数据中的一个元素的位置，通过有效位和无效位标记，实现对数据操作的精细化开关控制。
 掩码由固定位宽的数值表示：有效位（通常为1）：对应元素正常参与计算。无效位（通常为0）：对应元素被屏蔽，不执行操作。
 
-掩码设置提供了两种模式：**Counter模式**和**Normal模式**。
+掩码设置提供了两种模式：**Counter模式**和**Normal模式**。C++ Tensor矢量计算接口通过模板参数`isSetMask`控制掩码由开发者手动设置还是接口内部自动设置。以如下`Adds`接口为例，默认`isSetMask = true`表示由接口内部设置Counter或Normal模式；若开发者需自行控制两种模式的切换，则将`isSetMask`设为`false`。后续示例均以开发者自行控制切换为例。
+```cpp
+template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG, typename U, typename S, typename V>
+__aicore__ inline void Adds(const U& dst, const S& src0, const V& src1, uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+```
 
 Counter模式用于计算连续N个元素。该模式下，Mask寄存器仅低64bit有效，表示参与计算的元素数量；repeatTime参数被忽略，系统根据元素数量自动计算迭代次数。
-例如需计算200个half类型元素时，因UB需满足32B对齐约束（half占2B，32B对应16个元素，256个元素为16×16，是32B对齐的最小单位），需申请256个元素的UB空间。此时使用Counter模式，可仅针对200个有效元素执行计算，忽略剩余56个元素的无效空间，避免多余计算。
+例如需计算200个half类型元素时，此时使用Counter模式，可仅针对200个有效元素执行计算，忽略剩余56个元素的无效空间，避免多余计算。
 
 ![Count模式计算](../../../../figures/Count模式计算.png)
 
 ```cpp
-AscendC::LocalTensor<half> dstLocal;
-AscendC::LocalTensor<half> src0Local;
 half scalarValue = 1.0;
 
 // 1. Direct transfer processing (temporarily omitted)
@@ -199,7 +201,8 @@ half scalarValue = 1.0;
 AscendC::SetMaskCount();
 // 2.2 Set Mask value to 200, indicating this computation processes 200 elements
 AscendC::SetVectorMask(0, static_cast<uint64_t>(200)); 
-AscendC::Adds(dstLocal, src0Local, scalarValue, 1, { 1, 1, 1, 8, 8, 8 });
+
+AscendC::Adds<half, false>(dstLocal, src0Local, scalarValue, AscendC::MASK_PLACEHOLDER, 1, { 1, 1, 8, 8 });
 
 // 3. Default needs to reset to Normal mode, if subsequent still requires Counter mode then no need to reset to Normal mode
 AscendC::SetMaskNormal();
@@ -227,7 +230,7 @@ half scalarValue = 1.0;
 AscendC::SetMaskNormal();
 // 2.2 Set Mask value to 100, indicating single iteration computes first 100 elements
 AscendC::SetVectorMask(0, static_cast<uint64_t>(100)); 
-AscendC::Adds(dstLocal, src0Local, scalarValue, 2, { 1, 1, 1, 8, 8, 8 });
+AscendC::Adds(dstLocal, src0Local, scalarValue, AscendC::MASK_PLACEHOLDER, 2, { 1, 1, 1, 8, 8, 8 });
 ```
 
 - 单次迭代内逐比特模式：可以按位控制哪些元素参与计算，bit位的值为1表示参与计算，0表示不参与。分为maskHigh（高位mask）和maskLow（低位mask）。参数取值范围和操作数的数据类型有关，数据类型不同，每次迭代内能够处理的元素个数最大值不同。当操作数为16位时，maskLow、maskHigh∈[0, 2^64-1]，并且不同时为0；当操作数为32位时，maskHigh为0，maskLow∈(0, 2^64-1]；当操作数为64位时，maskHigh为0，maskLow∈(0, 2^32-1]。
@@ -247,7 +250,7 @@ AscendC::Adds(dstLocal, src0Local, scalarValue, 2, { 1, 1, 1, 8, 8, 8 });
   AscendC::SetMaskNormal();
   // 2.2 Set Mask to bit-wise mode (0101...), implement interleaved computation
   AscendC::SetVectorMask(0x000000000000AAAA, 0x0000000000000000); 
-  AscendC::Add(dstLocal, src0Local, src1Local, 2, { 1, 1, 1, 8, 8, 8 });
+  AscendC::Add(dstLocal, src0Local, src1Local, AscendC::MASK_PLACEHOLDER, 2, { 1, 1, 1, 8, 8, 8 });
   ```
 
 ### 连续计算
