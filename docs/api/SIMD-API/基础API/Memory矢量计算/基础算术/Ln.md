@@ -241,5 +241,3 @@ FTZ（Flush To Zero）：一种浮点运算模式，当结果为[Subnormal](../.
 输入数据srcLocal：[1 2 3 4 ...]
 输出数据dstLocal：[0 0.6931 1.0986 1.3863 ...]
 ```
-
-完整样例请参考[单目矢量计算类API样例](https://gitcode.com/cann/asc-devkit/pull/873)。
