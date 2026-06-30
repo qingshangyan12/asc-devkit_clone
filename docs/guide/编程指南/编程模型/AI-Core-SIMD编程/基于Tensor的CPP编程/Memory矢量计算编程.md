@@ -1,6 +1,6 @@
 # Memory矢量计算编程<a name="ZH-CN_TOPIC_0000002600000002"></a>
 
-本文介绍如何在Ascend C中使用C++ Tensor编程API编写基于Unified Buffer（以下简称UB）的矢量计算代码，该能力是Ascend C最基础、最通用的矢量编程方式。这种基于UB内存的编程方式被称为Memory矢量计算编程。NPU架构版本2201产品支持完整的Memory矢量计算UB直接编程能力；而NPU架构版本3510虽也支持UB操作，但推荐使用Reg矢量计算编程以获得更高性能。
+本文介绍如何在Ascend C中使用C++ Tensor编程API编写基于Unified Buffer（以下简称UB）的矢量计算代码，该能力是Ascend C最基础、最通用的矢量编程方式。这种基于UB内存的编程方式被称为Memory矢量计算编程。[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品支持完整的Memory矢量计算UB直接编程能力；而[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)虽也支持UB操作，但推荐使用Reg矢量计算编程以获得更高性能。
 
 ## Memory矢量编程的基本步骤
 
@@ -264,7 +264,7 @@ AscendC::Add(dstLocal, src0Local, src1Local, 4096);
 
 AI Core内部执行单元（如MTE2搬运单元、Vector计算单元等）采用异步并行方式运行，当不同单元读写同一存储资源时，易产生数据依赖问题。因此，Memory矢量计算需通过流水同步接口协调执行顺序，确保计算流程正确。Memory矢量计算流程较Cube矩阵计算更为简洁，主要包含三步：数据搬入（Global Memory → UB）、计算（UB）、数据搬出（UB → Global Memory）。三个步骤分别对应PIPE_MTE2、PIPE_V、PIPE_MTE3流水线，需通过核内同步接口协调执行顺序，确保各步骤按序完成。
 
-当开发者进行一个矢量加法计算时（NPU架构版本3510产品），可通过`Mutex::Lock`&`Mutex::Unlock`的方式完成对这三个步骤的同步。NPU架构版本2201产品可使用`SetFlag`&`WaitFlag`实现相同同步效果，详见[同步机制](../基于Tensor的CPP编程/CPPTensor编程概述.md#同步机制)。
+当开发者进行一个矢量加法计算时（[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品），可通过`Mutex::Lock`&`Mutex::Unlock`的方式完成对这三个步骤的同步。[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品可使用`SetFlag`&`WaitFlag`实现相同同步效果，详见[同步机制](../基于Tensor的CPP编程/CPPTensor编程概述.md#同步机制)。
 
 ```cpp
 __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ float* z)
