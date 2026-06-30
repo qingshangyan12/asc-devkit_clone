@@ -2,7 +2,7 @@
 
 <cann-filter npu-type="950,A3,910b">
 
-本节汇总介绍了Mmad计算接口在边界值输入下的输出结果，以下内容针对如下型号生效：
+本节汇总介绍了Mmad计算接口在边界值输入下的输出结果，数据类型见基础API下的[mmad](../SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/Mmad.md)，以下内容针对如下型号生效：
 
 <cann-filter npu-type="950">
 
