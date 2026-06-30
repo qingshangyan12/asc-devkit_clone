@@ -241,18 +241,20 @@
 
 - dst按照小端顺序排序成二进制结果，对应src中相应位置的数据比较结果。
 
-<!-- npu="950,A3,910b" id10 -->
+<!-- npu="A3,910b,950" id10 -->
 - 当参数count或repeatTime取值为0时，该接口的行为如下：
+  <!-- npu="A3,910b" id11 -->
   - 针对如下型号，该接口不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-    <!-- npu="A3" id11 -->
+    <!-- npu="A3" id12 -->
     - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-    <!-- end id11 -->
-    <!-- npu="910b" id12 -->
-    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
     <!-- end id12 -->
-  <!-- npu="950" id13 -->
+    <!-- npu="910b" id13 -->
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    <!-- end id13 -->
+  <!-- end id11 -->
+  <!-- npu="950" id14 -->
   - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
-  <!-- end id13 -->
+  <!-- end id14 -->
 <!-- end id10 -->
 
 - **使用整个tensor参与计算的运算符重载功能，src0和src1需满足256字节对齐；使用tensor前n个数据参与计算的接口，设置count时，需要保证count个元素所占空间256字节对齐。**

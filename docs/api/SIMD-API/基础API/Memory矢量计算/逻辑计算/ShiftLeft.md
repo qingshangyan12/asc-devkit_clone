@@ -146,22 +146,24 @@ dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/T
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
-<!-- npu="950,A3,910b" id19 -->
+<!-- npu="A3,910b,950" id19 -->
 - 当参数count或repeatTime取值为0时，该接口的行为如下：
+  <!-- npu="A3,910b" id20 -->
   - 针对如下型号，该接口不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-    <!-- npu="A3" id20 -->
+    <!-- npu="A3" id21 -->
     - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-    <!-- end id20 -->
-    <!-- npu="910b" id21 -->
-    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
     <!-- end id21 -->
-  <!-- npu="950" id22 -->
+    <!-- npu="910b" id22 -->
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    <!-- end id22 -->
+  <!-- end id20 -->
+  <!-- npu="950" id23 -->
   - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
-  <!-- end id22 -->
+  <!-- end id23 -->
 <!-- end id19 -->
-<!-- npu="950" id23 -->
+<!-- npu="950" id24 -->
 - 针对Ascend 950PR/Ascend 950DT，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。
-<!-- end id23 -->
+<!-- end id24 -->
 
 ## 调用示例<a name="section132384819392"></a>
 

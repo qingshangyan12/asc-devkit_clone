@@ -225,23 +225,25 @@ Kirin 9030，支持模式0、1、2。
 <!-- npu="950" id10 -->
 - 当参数count或repeatTime取值为0时，针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，不保证该接口将被视为NOP（空操作）。
 <!-- end id10 -->
-<!-- npu="950,A3,910b,310p" id11 -->
+<!-- npu="A3,910b,310p,950" id11 -->
 - 对UB空间的占用说明。
+  <!-- npu="A3,910b,310p" id12 -->
   - 针对如下型号，对于模式1和模式2，使用时需要预留8KB的Unified Buffer空间，作为接口的临时数据存放区：
-    <!-- npu="A3" id12 -->
+    <!-- npu="A3" id13 -->
     - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-    <!-- end id12 -->
-    <!-- npu="910b" id13 -->
-    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
     <!-- end id13 -->
-    <!-- npu="310p" id14 -->
-    - Atlas 推理系列产品AI Core
+    <!-- npu="910b" id14 -->
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
     <!-- end id14 -->
-    <!-- npu="950" id15 -->
+    <!-- npu="310p" id15 -->
+    - Atlas 推理系列产品AI Core
+    <!-- end id15 -->
+  <!-- end id12 -->
+    <!-- npu="950" id16 -->
   - 针对Ascend 950PR/Ascend 950DT：
     - 不传入mask参数的tensor高维切分计算接口占用8KB Unified Buffer临时空间。
-    - 其他接口不涉及8KB Unified Buffer临时空间的占用。
-    <!-- end id15 -->
+    - tensor前n个数据计算接口以及传入mask参数的tensor高维切分计算接口不涉及8KB Unified Buffer临时空间的占用。
+    <!-- end id16 -->
 <!-- end id11 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>

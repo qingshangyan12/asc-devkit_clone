@@ -124,44 +124,46 @@ $dst_i = src0_i \& src1_i$
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
 - 使用整个tensor参与计算接口符号重载时，运算量为目的LocalTensor的总长度。
-<!-- npu="A3,910b,310b,310p,910" id21 -->
+<!-- npu="A3,910b,310b,310p,910" id18 -->
 - 特别地，针对uint32_t/int32_t类型的And操作，支持通过ReinterpretCast的方式来实现：使用Local Tensor的ReinterpretCast转换成uint16_t/int16_t后再调用And进行计算。直接传入uint32_t/int32_t类型的数据，在不同版本型号上表现会有所差异，考虑到算子在各个版本中的兼容性，不建议使用这种直接传入的方式：
-    <!-- npu="A3,910b" id22 -->
+    <!-- npu="A3,910b" id19 -->
     - 整个tensor参与计算和tensor前n个数据计算接口支持传入uint32_t/int32_t类型，但是tensor前n个数据计算的count需要设置为期望计算个数的2倍才能精度符合预期；tensor高维切分计算接口直接编译报错提示不支持该数据类型。上述说明适用于：
-      <!-- npu="A3" id23 -->
+      <!-- npu="A3" id20 -->
       - Atlas A3 训练系列产品/Atlas A3 推理系列产品。
-      <!-- end id23 -->
-      <!-- npu="910b" id24 -->
+      <!-- end id20 -->
+      <!-- npu="910b" id21 -->
       - Atlas A2 训练系列产品/Atlas A2 推理系列产品。
-      <!-- end id24 -->
-    <!-- end id22 -->
-    <!-- npu="310b" id25 -->
+      <!-- end id21 -->
+    <!-- end id19 -->
+    <!-- npu="310b" id22 -->
     - CPU报错提示不支持该数据类型。上述说明适用于：
       - Atlas 200I/500 A2 推理产品。
-    <!-- end id25 -->
-    <!-- npu="310p,910" id26 -->
+    <!-- end id22 -->
+    <!-- npu="310p,910" id23 -->
     - 编译报错提示不支持该数据类型。上述说明适用于：
-      <!-- npu="310p" id27 -->
+      <!-- npu="310p" id24 -->
       - Atlas 推理系列产品AI Core。
-      <!-- end id27 -->
-      <!-- npu="910" id28 -->
+      <!-- end id24 -->
+      <!-- npu="910" id25 -->
       - Atlas 训练系列产品。
-      <!-- end id28 -->
-    <!-- end id26 -->
-<!-- end id21 -->
-<!-- npu="950,A3,910b" id29 -->
+      <!-- end id25 -->
+    <!-- end id23 -->
+<!-- end id18 -->
+<!-- npu="A3,910b,950" id26 -->
 - 当参数count或repeatTime取值为0时，该接口的行为如下：
+  <!-- npu="A3,910b" id27 -->
   - 针对如下型号，该接口不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-    <!-- npu="A3" id30 -->
+    <!-- npu="A3" id28 -->
     - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-    <!-- end id30 -->
-    <!-- npu="910b" id31 -->
+    <!-- end id28 -->
+    <!-- npu="910b" id29 -->
     - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-    <!-- end id31 -->
-  <!-- npu="950" id32 -->
+    <!-- end id29 -->
+  <!-- end id27 -->
+  <!-- npu="950" id30 -->
   - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
-  <!-- end id32 -->
-<!-- end id29 -->
+  <!-- end id30 -->
+<!-- end id26 -->
 ## 调用示例<a name="section642mcpsimp"></a>
 
 - tensor高维切分计算样例-mask连续模式
