@@ -1,4 +1,4 @@
-﻿# Cube矩阵计算编程<a name="ZH-CN_TOPIC_0000002600000002"></a>
+# Cube矩阵计算编程<a name="ZH-CN_TOPIC_0000002600000002"></a>
 
 本文介绍如何在Ascend C中使用C++ Tensor编程API编写基于L1 Buffer、L0A Buffer等片上存储的**矩阵计算代码**。
 
@@ -58,11 +58,11 @@ __global__ __cube__ void matmul_custom(...)
 为了适配矩阵计算单元的物理读取路径，不同的产品形态有不同的格式要求：
 针对NPU架构版本2201，矩阵乘法C = A × B要求：左矩阵A使用Zz格式，右矩阵B使用Zn格式，结果矩阵C使用Nz格式，如下图所示：
 
-<img src="../../../../figures/矩阵乘法场景设计的数据格式.png" alt="矩阵乘法场景涉及的数据格式" width="800" />
+![矩阵乘法场景涉及的数据格式](../../../../figures/矩阵乘法场景设计的数据格式.png)
 
 针对NPU架构版本3510，矩阵乘法C = A × B要求：左矩阵A使用Nz格式，右矩阵B使用Zn格式，结果矩阵C使用Nz格式，如下图所示：
 
-<img src="../../../../figures/矩阵乘法场景涉及的数据格式.png" alt="矩阵乘法场景涉及的数据格式" width="800" />
+![矩阵乘法场景涉及的数据格式](../../../../figures/矩阵乘法场景涉及的数据格式.png)
 
 #### ND格式（N-Dimension）
 
@@ -72,7 +72,7 @@ ND格式是通用的N维张量格式，数据在内存中连续线性存放，�
 
 Nz格式主要用于L1 Buffer和L0C Buffer中存放数据。针对NPU架构版本3510，L0A Buffer也采用Nz分形格式。该格式采用大N（外部列主序）+ 小z（内部行主序）的方式排布。
 
-<img src="../../../../figures/Nz数据排布格式.png" alt="Nz数据排布格式" width="400" />
+![Nz数据排布格式](../../../../figures/Nz数据排布格式.png)
 
 Nz是Ascend架构的中间格式，介于线性数据(ND)和计算专用数据(Zz/Zn)之间，便于格式转换。大N排布（列主序Block）的设计通常是为了配合多核并行或后续算子（如Vector向量计算）在处理通道（Channel）维度数据时的便利性。
 
@@ -85,7 +85,7 @@ Nz是Ascend架构的中间格式，介于线性数据(ND)和计算专用数据(Z
 
 针对NPU架构版本2201，L0A Buffer使用此格式（NPU架构版本3510使用Nz格式）。该格式采用大Z（外部行主序）+ 小z（内部行主序）。
 
-<img src="../../../../figures/Zz格式-以half类型为例.png" alt="Zz格式(以half类型为例)" width="400" />
+![Zz格式(以half类型为例)](../../../../figures/Zz格式-以half类型为例.png)
 
 在矩阵乘法中，A矩阵逐行读取数据。Zz格式的行主序特性使同一行元素物理地址连续，与计算访问模式匹配，便于Cube单元左侧通道通过DMA连续读取，避免跨步访问，提升数据搬运效率。
 
@@ -93,7 +93,7 @@ Nz是Ascend架构的中间格式，介于线性数据(ND)和计算专用数据(Z
 
 Zn格式主要用于L0B Buffer中存放数据，如果离线处理好的右矩阵数据直接为Zn格式，则在GM和L1 Buffer上存储该格式。该格式采用大Z(外部行主序) + 小n(内部列主序)。
 
-<img src="../../../../figures/Zn格式-以half类型为例.png" alt="Zn格式(以half类型为例)" width="400" />
+![Zn格式(以half类型为例)](../../../../figures/Zn格式-以half类型为例.png)
 
 矩阵乘法需读取B矩阵列向量。普通行主序存储导致列数据在内存中地址不连续。Zn格式在分形内部按列存储，使列数据在L0B中紧凑排列，便于Cube单元右侧通道线性读取完整列向量，避免跨步访问。
 
@@ -101,7 +101,7 @@ Zn格式主要用于L0B Buffer中存放数据，如果离线处理好的右矩�
 
 根据上述信息，Global Memory采用ND格式，L1 Buffer采用Nz格式，因此需进行ND2NZ格式转换。
 
-<img src="../../../../figures/ND2NZ格式转换.png" alt="ND2NZ格式转换" width="800" />
+![ND2NZ格式转换](../../../../figures/ND2NZ格式转换.png)
 
 以上图为例，图中展示了一个具体的M=40、K=56的矩阵（数据类型为half），在从GM搬运至L1 Buffer并转换为Nz格式时的内存排布变化：
 - 原始数据（ND格式）：左侧GM中存储的是原始矩阵，shape为40×56。数据呈线性连续排布（图中长箭头所示），遵循行主序规则。
@@ -132,7 +132,7 @@ Zn格式主要用于L0B Buffer中存放数据，如果离线处理好的右矩�
 
 该能力通过`DataCopy`接口配合`Nd2NzParams`参数实现，配置`nd_num`、`src_d_value`等参数完成GM2L1搬运和ND2NZ格式转换。
 
-<img src="../../../../figures/GM到L1的ND2NZ搬运示例.png" alt="GM到L1的ND2NZ搬运示例" width="700" />
+![GM到L1的ND2NZ搬运示例](../../../../figures/GM到L1的ND2NZ搬运示例.png)
 
 以上图为例，实现A矩阵(Shape(16, 23)，数据类型为half)从GM搬运到L1的能力，针对NPU架构版本2201，调用接口如下：
 
@@ -157,7 +157,7 @@ AscendC::DataCopy(dst, srcGlobal, intriParams);
 
 该能力主要实现将矩阵从L1 Buffer搬运至L0A/L0B Buffer并支持从Nz分形转换到Zz或Zn格式，C++ Tensor编程提供了`LoadData`接口配合`LoadData2DParamsV2`参数，其中针对NPU架构版本3510的L12L0A搬运可将L1 Buffer中512B大小的矩阵搬运到L0A Buffer，支持2D搬运、转置搬运、3D搬运等模式。
 
-<img src="../../../../figures/L12L0A非转置搬运.png" alt="L12L0A非转置搬运" width="700" />
+![L12L0A非转置搬运](../../../../figures/L12L0A非转置搬运.png)
 
 通过如下方式调用可完成上述的L1 Buffer到L0A Buffer的搬入操作。
 
@@ -187,7 +187,7 @@ AscendC::LoadData(l0a_buffer, l1_buffer, l12l0Params);
 
 当输入A矩阵（GM）是转置排布(K×M)时，搬入到L1 Buffer为(K×M)排布的Nz分形。要使L0A Buffer存放(M×K)的Zz或Nz格式（[[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)](../../../语言扩展层/SIMD-BuiltIn关键字.md)），需要在L12L0A时进行转置，调用带transpose参数的接口。
 
-<img src="../../../../figures/需要转置的处理场景.png" alt="需要转置的处理场景" width="800" />
+![需要转置的处理场景](../../../../figures/需要转置的处理场景.png)
 
 ```cpp
 // A矩阵LoadDataWithTranspose: Nz -> Zz
@@ -210,21 +210,21 @@ for (int i = 0; i < CeilDivision(m, fractalShape[1]); ++i) {
 
 NPU架构版本2201下的矩阵搬出流程为：
 
-<img src="../../../../figures/矩阵搬出流程-AtlasA2A3.png" alt="矩阵搬出流程" width="800" />
+![矩阵搬出流程](../../../../figures/矩阵搬出流程-AtlasA2A3.png)
 
 NPU架构版本3510下的矩阵搬出流程为：
 
-<img src="../../../../figures/矩阵搬出流程-Ascend950PR.png" alt="矩阵搬出流程" width="800" />
+![矩阵搬出流程](../../../../figures/矩阵搬出流程-Ascend950PR.png)
 
 矩阵搬出接口支持多种随路能力的灵活组合，以L0C到Global Memory的搬运场景为例：矩阵计算结果暂存于L0C Buffer后需搬运至GM，在此过程中可协同执行随路量化、ReLU激活、格式转换及通道拆分合并等操作。下图分别展示了不同NPU架构版本下这些随路能力的有效组合、中间数据类型及完整数据路径。例如，L0C中的F32数据可通过QF322B8_PRE随路量化得到B8数据，可选使能ReLU后经NZ2NZ/NZ2ND格式转换输出至GM。图中F32→F16和F32→BF16为数据类型转换，其余路径为随路scalar/vector量化模式；针对NPU架构版本3510，还额外支持NZ2ND格式转换。
 
 NPU架构版本2201下的矩阵搬出能力为：
 
-<img src="../../../../figures/L0C2GM搬运-AtlasA2A3.png" alt="L0C2GM搬运" width="800" />
+![L0C2GM搬运](../../../../figures/L0C2GM搬运-AtlasA2A3.png)
 
 NPU架构版本3510下的矩阵搬出能力为：
 
-<img src="../../../../figures/L0C2GM搬运-Ascend950PR.png" alt="L0C2GM搬运" width="800" />
+![L0C2GM搬运](../../../../figures/L0C2GM搬运-Ascend950PR.png)
 
 C++ Tensor编程提供了`DataCopy`接口配合`DataCopyCO12DstParams`参数来使能发挥芯片的各种随路能力，通过直接传入配置参数可完成随路搬运的操作。
 示例：Mmad含有矩阵乘偏置，左矩阵和右矩阵的数据类型为int8_t，结果矩阵的数据类型为int32_t。量化模式为DEQF16，Scalar量化参数为2.0，将Mmad计算出的结果由int32_t量化成half并搬出。
@@ -423,7 +423,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 
 以Nz分形为例，Nz分形格式的内层分形Shape中，ShapeRow0固定为16行，ShapeColumn0固定为32Byte / sizeof(T)，内层分形的Stride中，StrideRow0固定为32Byte / sizeof(T)，StrideColumn0也固定为1，即内层分形按z字形组织，外层分形按N字形组织。ShapeRow1需满足row方向16对齐，ShapeColumn1需满足column方向32B对齐。
 
-<img src="../../../../figures/Nz数据排布格式.png" alt="Nz数据排布格式" width="400" />
+![Nz数据排布格式](../../../../figures/Nz数据排布格式.png)
 
 下面是一个连续的Nz Layout示例，其中C0_ELEMENT = Std::Int<32>{} / sizeof(T)。
 

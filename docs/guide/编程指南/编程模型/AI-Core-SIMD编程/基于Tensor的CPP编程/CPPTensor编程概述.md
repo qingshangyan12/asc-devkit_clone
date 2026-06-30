@@ -1,4 +1,4 @@
-﻿# C++ Tensor编程概述
+# C++ Tensor编程概述
 
 C++ Tensor编程是Ascend C SIMD编程路径的基础编程接口，基于Tensor对象抽象封装内存地址，提供类型安全、编译期检查的高层次编程能力。开发者通过LocalTensor、GlobalTensor、RegTensor等Tensor对象管理内存，无需直接操作指针地址，搬运计算接口直接操作Tensor对象即可完成数据流转。该路径适用于追求开发效率、类型安全、代码可维护性的算子开发场景，是习惯C++面向对象编程的开发者快速上手NPU算子开发的关键技术路径。本章旨在帮助开发者建立对C++ Tensor编程的系统化认知，理解其Tensor抽象编程范式、核心编程模型与开发方法论。
 
@@ -10,7 +10,7 @@ C++ Tensor编程是Ascend C SIMD编程路径的基础编程接口，基于Tensor
 
 AI Core采用分级存储架构，Cube矩阵计算采用「Global Memory（以下简称为GM） → L1/L0系列Buffer」两级层级服务于矩阵计算，Vector矢量计算传统架构为「Global Memory → Unified Buffer（以下简称为UB）」两级层级，而[[[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)](../../../语言扩展层/SIMD-BuiltIn关键字.md)](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入寄存器后构建「GM → UB → Register」三级层级，其中GM存放输入输出数据、UB作为矢量计算中间缓存、Register位于Vector计算单元最内层直接与执行单元交互。
 
-<img src="../../../../figures/AI_Core存储层次结构_c.png" alt="AI Core存储层次结构" width="800" />
+![AI Core存储层次结构](../../../../figures/AI_Core存储层次结构_c.png)
 
 ### Tensor内存抽象
 
@@ -198,7 +198,7 @@ Cube计算单元专用的缓存为：L0A Buffer存储左矩阵，L0B Buffer存�
 
 为了提高数据访问的效率和吞吐量，内部存储采用了bank（大小相等的内存模块）结构设计。以UB为例，NPU架构版本3510产品上，UB总大小为256KB（256 × 1024字节），包含8个bank group，每个bank group包含2个bank。每个bank大小为16KB，由512行组成，每行长度为32B，采用低位地址交织。NPU架构版本2201的UB容量规格请参考相应硬件架构文档。
 
-<img src="../../../../figures/UB_Bank冲突示意图.png" alt="UB Bank冲突示意图" width="800" />
+![UB Bank冲突示意图](../../../../figures/UB_Bank冲突示意图.png)
 
 该架构地址使用低位编址，地址排布如下图所示，每个bank可以独立地进行数据的读写操作，允许多个数据请求同时进行。然而，当多个读写操作试图同时访问同一个bank时，由于硬件资源的限制，这些操作必须排队等待，会导致bank冲突，引起性能下降。
 
@@ -231,11 +231,11 @@ AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以
 2. 进行矢量计算
 3. 通过DMA将数据从Local Memory搬出到GM
 
-<img src="../../../../figures/Vector计算数据流.png" alt="Vector计算数据流" width="800" />
+![Vector计算数据流](../../../../figures/Vector计算数据流.png)
 
 四个执行单元Scalar、Vector、DMA（MTE2）、DMA(MTE3)并行执行，若访问同一片Local Memory，需要同步机制来控制它们的访问时序：保证先搬入Local Memory后再计算，计算完成后再搬出。
 
-<img src="../../../../figures/同步顺序.png" alt="同步顺序示意图" width="800" />
+![同步顺序示意图](../../../../figures/同步顺序.png)
 
 > 📌 提示：上例描述的是主要路径，当`Scalar`执行单元读写GM或者UB时，也需要考虑`Scalar`流水与其他流水的同步。
 
@@ -266,11 +266,11 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
 
 以下图为例，AIC（AI Cube，主要用于Cube计算）需要依赖于AIV（AI Vector，负责Vector计算）的ReduceSum计算结果。由于整体矢量较大，必须拆分为多个部分，由每个AIV分别完成部分计算。每个AIV将其部分计算结果通过原子累加写入GM。AIC需要读取的必须是所有AIV均完成累加后的最终结果。
 
-<img src="../../../../figures/核间同步业务场景示例.png" alt="核间同步业务场景示例" width="800" />
+![核间同步业务场景示例](../../../../figures/核间同步业务场景示例.png)
 
 从上图可以看到，当前AI Core是由AIC核和AIV核组成，其中AIC核主要用于Cube计算，AIV核负责Vector计算。AIC/AIV按group进行划分。一个group内细分block及subblock，block与subblock比例为1:N（N>=1），block表示多少个“主核”，subblock表示一个“主核”带多少个“从核”。
 
-<img src="../../../../figures/block和subblock之间关系.png" alt="block和subblock之间关系" width="800" />
+![block和subblock之间关系](../../../../figures/block和subblock之间关系.png)
 
 算子按计算特征可划分为三类：Cube算子（矩阵计算）、Vector算子（矢量计算）和CV融合算子（矩阵与矢量混合计算）。算子类型决定了其核间同步方式与group配置模式的选择。针对不同算子场景，C++ Tensor编程通过`CrossCoreSetFlag`和`CrossCoreWaitFlag`两个接口组合实现核间同步，以满足多样化的算子开发需求。
 
