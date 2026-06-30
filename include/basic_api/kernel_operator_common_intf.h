@@ -83,6 +83,14 @@ __aicore__ inline void SetSaturationFlag(bool enableSat);
 
 template <SaturationMode mode>
 __aicore__ inline bool GetSaturationFlag();
+
+#if (__NPU_ARCH__ == 3510)
+template <CacheRwMode rwMode>
+__aicore__ inline CacheMode GetScalarCacheMode();
+
+template <CacheRwMode rwMode, CacheMode cacheMode>
+__aicore__ inline void SetScalarCacheMode();
+#endif
 }  // namespace AscendC
 
 #if defined(__NPU_ARCH__)

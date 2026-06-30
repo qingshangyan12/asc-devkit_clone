@@ -15,32 +15,44 @@
 import numpy as np
 
 
+CTRL_SIZE = 32
+
+
 def verify_ctrl(real_result, golden):
     """
-    验证CTRL寄存器值：
-    - golden_ctrl[0]: READ CACHE_MODE_NORMAL = 0
-    - golden_ctrl[1]: READ CACHE_MODE_LAST = 1
-    - golden_ctrl[2]: READ CACHE_MODE_PERSISTENT = 2
-    - golden_ctrl[3]: READ CACHE_MODE_DISABLE = 4
-    - golden_ctrl[4]: WRITE CACHE_MODE_NORMAL = 0
-    - golden_ctrl[5]: WRITE CACHE_MODE_LAST = 1
-    - golden_ctrl[6]: WRITE CACHE_MODE_PERSISTENT = 2
-    - golden_ctrl[7]: WRITE CACHE_MODE_DISABLE = 4
+    验证GetScalarCacheMode返回值是否与SetScalarCacheMode设置的值一致：
+    
+    输出格式（每个测试用Duplicate填充4个元素，保证32字节对齐）：
+    - output_ctrl[0-3]: READ CACHE_MODE_NORMAL，匹配输出0
+    - output_ctrl[4-7]: READ CACHE_MODE_LAST，匹配输出1
+    - output_ctrl[8-11]: READ CACHE_MODE_PERSISTENT，匹配输出2
+    - output_ctrl[12-15]: READ CACHE_MODE_DISABLE，匹配输出4
+    - output_ctrl[16-19]: WRITE CACHE_MODE_NORMAL，匹配输出0
+    - output_ctrl[20-23]: WRITE CACHE_MODE_LAST，匹配输出1
+    - output_ctrl[24-27]: WRITE CACHE_MODE_PERSISTENT，匹配输出2
+    - output_ctrl[28-31]: WRITE CACHE_MODE_DISABLE，匹配输出4
+    
+    如果匹配失败，输出-1
     """
     real_result = np.fromfile(real_result, dtype=np.int64)
     golden = np.fromfile(golden, dtype=np.int64)
     
-    expected_values = [0, 1, 2, 4, 0, 1, 2, 4]
+    expected_values = [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 4, 4, 4, 4,
+                       0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 4, 4, 4, 4]
     mode_names = [
-        "READ CACHE_MODE_NORMAL", "READ CACHE_MODE_LAST",
-        "READ CACHE_MODE_PERSISTENT", "READ CACHE_MODE_DISABLE",
-        "WRITE CACHE_MODE_NORMAL", "WRITE CACHE_MODE_LAST",
-        "WRITE CACHE_MODE_PERSISTENT", "WRITE CACHE_MODE_DISABLE"
+        "READ CACHE_MODE_NORMAL", "READ CACHE_MODE_NORMAL", "READ CACHE_MODE_NORMAL", "READ CACHE_MODE_NORMAL",
+        "READ CACHE_MODE_LAST", "READ CACHE_MODE_LAST", "READ CACHE_MODE_LAST", "READ CACHE_MODE_LAST",
+        "READ CACHE_MODE_PERSISTENT", "READ CACHE_MODE_PERSISTENT", "READ CACHE_MODE_PERSISTENT", "READ CACHE_MODE_PERSISTENT",
+        "READ CACHE_MODE_DISABLE", "READ CACHE_MODE_DISABLE", "READ CACHE_MODE_DISABLE", "READ CACHE_MODE_DISABLE",
+        "WRITE CACHE_MODE_NORMAL", "WRITE CACHE_MODE_NORMAL", "WRITE CACHE_MODE_NORMAL", "WRITE CACHE_MODE_NORMAL",
+        "WRITE CACHE_MODE_LAST", "WRITE CACHE_MODE_LAST", "WRITE CACHE_MODE_LAST", "WRITE CACHE_MODE_LAST",
+        "WRITE CACHE_MODE_PERSISTENT", "WRITE CACHE_MODE_PERSISTENT", "WRITE CACHE_MODE_PERSISTENT", "WRITE CACHE_MODE_PERSISTENT",
+        "WRITE CACHE_MODE_DISABLE", "WRITE CACHE_MODE_DISABLE", "WRITE CACHE_MODE_DISABLE", "WRITE CACHE_MODE_DISABLE"
     ]
     
     for i in range(len(real_result)):
         if real_result[i] != expected_values[i]:
-            print(f"[ERROR] {mode_names[i]}: expected {expected_values[i]}, got {real_result[i]}")
+            print(f"[ERROR] {mode_names[i]} (index {i}): expected {expected_values[i]}, got {real_result[i]}")
             return False
     
     return True

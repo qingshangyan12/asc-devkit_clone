@@ -139,7 +139,42 @@ __aicore__ static inline void ResetCtrlSprImpl()
     value = value | defaultCtrl;
     set_ctrl(value);
 }
-} // namespace AscendC
+
+template <CacheRwMode rwMode>
+__aicore__ inline CacheMode GetScalarCacheModeImpl()
+{
+    static_assert(rwMode == CacheRwMode::READ || rwMode == CacheRwMode::WRITE,
+        "GetScalarCacheMode only supports READ or WRITE mode");
+    
+    constexpr uint8_t startBit = (rwMode == CacheRwMode::READ) ? 16 : 20;
+    int64_t value = (get_ctrl() >> startBit) & 0xF;
+    
+    switch (value) {
+        case 0:  return CacheMode::CACHE_MODE_NORMAL;
+        case 1:  return CacheMode::CACHE_MODE_LAST;
+        case 2:  return CacheMode::CACHE_MODE_PERSISTENT;
+        case 4:  return CacheMode::CACHE_MODE_DISABLE;
+        default: return CacheMode::CACHE_MODE_NORMAL;
+    }
+}
+
+template <CacheRwMode rwMode, CacheMode cacheMode>
+__aicore__ inline void SetScalarCacheModeImpl()
+{
+    static_assert(rwMode == CacheRwMode::READ || rwMode == CacheRwMode::WRITE,
+        "SetScalarCacheMode only supports READ or WRITE mode");
+    
+    constexpr uint8_t startBit = (rwMode == CacheRwMode::READ) ? 16 : 20;
+    constexpr uint8_t cacheBits = (cacheMode == CacheMode::CACHE_MODE_DISABLE) ? 4 :
+                                  (cacheMode == CacheMode::CACHE_MODE_NORMAL) ? 0 :
+                                  (cacheMode == CacheMode::CACHE_MODE_LAST) ? 1 :
+                                  (cacheMode == CacheMode::CACHE_MODE_PERSISTENT) ? 2 : 0;
+    
+    uint64_t mask = ~(0xF << startBit);
+    int64_t ctrlValue = get_ctrl() & mask;
+    ctrlValue |= (static_cast<uint64_t>(cacheBits) << startBit);
+    set_ctrl(ctrlValue);
+}
 #endif // ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

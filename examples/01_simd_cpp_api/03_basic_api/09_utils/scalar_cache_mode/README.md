@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于 `SetScalarCacheMode` 接口验证 CTRL 寄存器的 L2Cache 读写模式设置功能，通过 `GetCtrlSpr` 接口读取设置的 bit 值进行验证。
+本样例基于 `SetScalarCacheMode` 和 `GetScalarCacheMode` 接口验证 CTRL 寄存器的 L2Cache 读写模式设置和获取功能。
 
 本样例演示了设置和验证 CTRL 寄存器的 L2Cache 模式控制位：
 - **READ mode**: CTRL[19:16] 控制 L2Cache 读取模式
@@ -36,11 +36,12 @@ CacheMode 对应的 4-bit 值：
 ## 样例描述
 
 - 样例功能：  
-  验证 CTRL 寄存器 L2Cache 模式控制位的设置功能：
-  1. SetScalarCacheMode：依次设置 READ/WRITE 模式的四种 CacheMode
-  2. GetCtrlSpr：读取 CTRL[19:16] 和 CTRL[23:20] 的值
-  3. Duplicate：将读取的值存入 ctrlLocal
-  4. DataCopy：输出到 dstCtrlGlobal
+  验证 CTRL 寄存器 L2Cache 模式控制位的设置和获取功能：
+  1. SetScalarCacheMode：设置 READ/WRITE 模式的指定 CacheMode
+  2. GetScalarCacheMode：获取 READ/WRITE 模式的 CacheMode
+  3. 比较获取的 mode 是否与设置的 mode 一致，一致输出对应值，不一致输出 -1
+  4. Duplicate：将结果存入 ctrlLocal（每次填充4个元素，保证32字节对齐）
+  5. DataCopy：输出到 dstCtrlGlobal
 
 - 样例规格：
   <table>
@@ -48,23 +49,25 @@ CacheMode 对应的 4-bit 值：
   <tr><td rowspan="1" align="center">核数</td><td colspan="4" align="center">1</td></tr>
   <tr><td rowspan="1" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">src</td><td align="center">[1, 256]</td><td align="center">half</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">output_ctrl</td><td align="center">[1, 8]</td><td align="center">int64_t</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">output_ctrl</td><td align="center">[1, 32]</td><td align="center">int64_t</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">kernel_scalar_cache_mode</td></tr>  
   </table>
 
 - 输出说明：
-  - output_ctrl.bin：寄存器值验证输出，8个 int64_t 值
-    - [0]: READ CACHE_MODE_NORMAL = 0
-    - [1]: READ CACHE_MODE_LAST = 1
-    - [2]: READ CACHE_MODE_PERSISTENT = 2
-    - [3]: READ CACHE_MODE_DISABLE = 4
-    - [4]: WRITE CACHE_MODE_NORMAL = 0
-    - [5]: WRITE CACHE_MODE_LAST = 1
-    - [6]: WRITE CACHE_MODE_PERSISTENT = 2
-    - [7]: WRITE CACHE_MODE_DISABLE = 4
+  - output_ctrl.bin：寄存器值验证输出，32个 int64_t 值
+    - [0-3]: READ CACHE_MODE_NORMAL = 0
+    - [4-7]: READ CACHE_MODE_LAST = 1
+    - [8-11]: READ CACHE_MODE_PERSISTENT = 2
+    - [12-15]: READ CACHE_MODE_DISABLE = 4
+    - [16-19]: WRITE CACHE_MODE_NORMAL = 0
+    - [20-23]: WRITE CACHE_MODE_LAST = 1
+    - [24-27]: WRITE CACHE_MODE_PERSISTENT = 2
+    - [28-31]: WRITE CACHE_MODE_DISABLE = 4
 
 - 验证逻辑：
-  - 对比输出值与预期 bit 值是否一致
+  - SetScalarCacheMode 设置指定 CacheMode
+  - GetScalarCacheMode 获取当前 CacheMode
+  - 比较获取值与设置值是否一致（rwMode 2种 × cacheMode 4种 = 8种组合）
 
 ## 编译运行
 
