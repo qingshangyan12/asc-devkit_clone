@@ -24,8 +24,6 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
-
-
 ## 功能说明<a name="section1769835112451"></a>
 
 对前count个输入数据src0、src1按元素相乘操作，将结果写入dst0Local，溢出部分写入dst1Local。计算过程如下：
