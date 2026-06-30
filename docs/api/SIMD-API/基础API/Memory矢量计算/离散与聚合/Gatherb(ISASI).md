@@ -79,27 +79,32 @@ __aicore__ inline void Gatherb(const LocalTensor<T>& dst, const LocalTensor<T>& 
 
 **表3**  GatherRepeatParams结构体内参数说明<a id="table3"></a>
 
-| 参数名称 | 含义 |
-| :------- | :--- |
+| 参数名称 | 含义                                                                                                                |
+| :------- |:------------------------------------------------------------------------------------------------------------------|
 | dstBlkStride | 单次迭代内，矢量目的操作数不同DataBlock间地址步长，单位为DataBlock。<br/>同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md)。 |
-| dstRepStride | 相邻迭代间，矢量目的操作数相同DataBlock地址步长，单位为DataBlock。<br/>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md)； |
-| blockNumber | **注**：预留的扩展参数，当前因后续架构升级，该参数已废弃，不对其进行业务处理。 |
-| src0BlkStride | **注**：预留的扩展参数，当前因后续架构升级，该参数已废弃，不对其进行业务处理。 |
-| src1BlkStride | **注**：预留的扩展参数，当前因后续架构升级，该参数已废弃，不对其进行业务处理。 |
-| src0RepStride | **注**：预留的扩展参数，当前因后续架构升级，该参数已废弃，不对其进行业务处理。 |
-| src1RepStride | **注**：预留的扩展参数，当前因后续架构升级，该参数已废弃，不对其进行业务处理。 |
-| repeatStrideMode | **注**：预留的扩展参数，当前因后续架构升级，该参数已废弃，不对其进行业务处理。 |
-| strideSizeMode | **注**：预留的扩展参数，当前因后续架构升级，该参数已废弃，不对其进行业务处理。 |
+| dstRepStride | 相邻迭代间，矢量目的操作数相同DataBlock地址步长，单位为DataBlock。<br/>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md)。              |
+| blockNumber | **注**：预留的扩展参数，当前因后续架构升级，该参数已废弃，不对其进行业务处理。                                                                         |
+| src0BlkStride | **注**：预留的扩展参数，当前因后续架构升级，该参数已废弃，不对其进行业务处理。                                                                         |
+| src1BlkStride | **注**：预留的扩展参数，当前因后续架构升级，该参数已废弃，不对其进行业务处理。                                                                         |
+| src0RepStride | **注**：预留的扩展参数，当前因后续架构升级，该参数已废弃，不对其进行业务处理。                                                                         |
+| src1RepStride | **注**：预留的扩展参数，当前因后续架构升级，该参数已废弃，不对其进行业务处理。                                                                         |
+| repeatStrideMode | **注**：预留的扩展参数，当前因后续架构升级，该参数已废弃，不对其进行业务处理。                                                                         |
+| strideSizeMode | **注**：预留的扩展参数，当前因后续架构升级，该参数已废弃，不对其进行业务处理。                                                                         |
 
 ## 数据类型
 
-<!-- npu="950" id8 -->Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。<!-- end id8 -->
-
-<!-- npu="A3" id9 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：uint16_t、uint32_t。<!-- end id9 -->
-
-<!-- npu="910b" id10 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：uint16_t、uint32_t。<!-- end id10 -->
-
-<!-- npu="310b" id11 -->Atlas 200I/500 A2 推理产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t。<!-- end id11 -->
+<!-- npu="950" id8 -->
+Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。
+<!-- end id8 -->
+<!-- npu="A3" id9 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：uint16_t、uint32_t。
+<!-- end id9 -->
+<!-- npu="910b" id10 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：uint16_t、uint32_t。
+<!-- end id10 -->
+<!-- npu="310b" id11 -->
+Atlas 200I/500 A2 推理产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t。
+<!-- end id11 -->
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
@@ -120,13 +125,20 @@ __aicore__ inline void Gatherb(const LocalTensor<T>& dst, const LocalTensor<T>& 
        <!-- npu="910b" id13 -->
        - Atlas A2 训练系列产品/Atlas A2 推理系列产品
        <!-- end id13 -->
-
-       当dstBlkStride值为0时，默认按照1来处理。
     <!-- end id14 -->
     <!-- npu="950" id15 -->
     - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
     <!-- end id15 -->
 <!-- end id16 -->
+<!-- npu="A3,910b" id19 -->
+- 针对如下型号，当dstBlkStride值为0时，默认按照1来处理。
+   <!-- npu="A3" id17 -->
+   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+   <!-- end id17 -->
+   <!-- npu="910b" id18 -->
+   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+   <!-- end id18 -->
+<!-- end id19 -->
 
 ## 调用示例<a name="section11276201527"></a>
 

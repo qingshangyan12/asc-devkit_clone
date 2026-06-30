@@ -137,16 +137,28 @@ def Gather(dst, src, count, srcOffset, srcBaseAddr):
 
 <!-- npu="950,310b" id27 -->
 - 针对以下型号，当操作数为**8位**时，每次迭代完成**4个DataBlock**的数据收集；其他情况下，每次迭代完成8个DataBlock的数据收集。
-  <!-- npu="950" id25 -->- Ascend 950PR/Ascend 950DT<!-- end id25 -->
-  <!-- npu="310b" id26 -->- Atlas 200I/500 A2 推理产品<!-- end id26 -->
+  <!-- npu="950" id25 -->
+  - Ascend 950PR/Ascend 950DT
+  <!-- end id25 -->
+  <!-- npu="310b" id26 -->
+  - Atlas 200I/500 A2 推理产品
+  <!-- end id26 -->
 <!-- end id27 -->
 <!-- npu="A3,910b,310p" id31 -->
 - 针对以下型号，每次迭代完成8个DataBlock的数据收集。
-  <!-- npu="A3" id28 -->- Atlas A3 训练系列产品/Atlas A3 推理系列产品<!-- end id28 -->
-  <!-- npu="910b" id29 -->- Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id29 -->
-  <!-- npu="310p" id30 -->- Atlas 推理系列产品AI Core<!-- end id30 -->
+  <!-- npu="A3" id28 -->
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  <!-- end id28 -->
+  <!-- npu="910b" id29 -->
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  <!-- end id29 -->
+  <!-- npu="310p" id30 -->
+  - Atlas 推理系列产品AI Core
+  <!-- end id30 -->
 <!-- end id31 -->
-- <!-- npu="950" id32 -->针对Ascend 950PR/Ascend 950DT，int8\_t、uint8\_t数据类型仅支持tensor前n个数据计算接口。<!-- end id32 -->
+<!-- npu="950" id32 -->
+- 针对Ascend 950PR/Ascend 950DT，int8\_t、uint8\_t数据类型仅支持tensor前n个数据计算接口。
+<!-- end id32 -->
 
 ## 调用示例<a name="section11276201527"></a>
 

@@ -168,7 +168,9 @@
 
 -   dstOffset中的偏移地址不能有相同值，如果存在2个或者多个偏移重复的情况，行为是不可预期的，即无法确定谁对这个地址进行了最后写入。
 -   针对Ascend 950PR/Ascend 950DT，uint8\_t/int8\_t数据类型仅支持tensor前n个数据计算接口。
+<!-- npu="950" id8 -->
 -   该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
+<!-- end id8 -->
 
 ## 调用示例<a name="section11276201527"></a>
 
