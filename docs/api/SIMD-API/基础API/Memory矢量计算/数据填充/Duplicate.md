@@ -144,25 +144,26 @@ Kirin 9030，支持的数据类型为：half。
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
-<!-- npu="A3,910b" id22 -->
-- 针对以下型号
-  <!-- npu="A3" id20 -->
-  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id20 -->
-  <!-- npu="910b" id21 -->
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id21 -->
+<!-- npu="A3,910b,950" id24 -->
+- 当参数count或repeatTime取值为0时，该接口的行为如下：
+    <!-- npu="A3,910b" id22 -->
+    - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+       <!-- npu="A3" id20 -->
+       - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+       <!-- end id20 -->
+       <!-- npu="910b" id21 -->
+       - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+       <!-- end id21 -->
+    <!-- end id22 -->
+    <!-- npu="950" id23 -->
+    - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
+    <!-- end id23 -->
+<!-- end id24 -->
 
-  repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-
-  count = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  <!-- end id22 -->
-- <!-- npu="950" id23 -->针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。<!-- end id23 -->
-
-<!-- npu="950" id24 -->
+<!-- npu="950" id25 -->
 
 - 针对Ascend 950PR/Ascend 950DT，bool、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、 complex32、int64_t、uint64_t、complex64数据类型仅支持tensor前n个数据计算接口。
-<!-- end id24 -->
+<!-- end id25 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
@@ -198,13 +199,13 @@ Kirin 9030，支持的数据类型为：half。
     AscendC::Duplicate<half>(dstLocal, inputVal, srcDataSize);
     ```
 
-<!-- npu="950" id25 -->
+<!-- npu="950" id26 -->
 
 - tensor前n个数据计算样例，源操作数为Tensor
     ```cpp
     AscendC::Duplicate<half>(dstLocal, srcLocal, srcDataSize);	 
     ```
-<!-- end id25 -->
+<!-- end id26 -->
 结果示例如下：
 
 ```plain

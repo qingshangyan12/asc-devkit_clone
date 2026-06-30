@@ -74,14 +74,21 @@ __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T
 - dst的起始地址需要32字节对齐，src中LocalTensor的起始地址需要8字节对齐。
 - 如果存在score\[i\]==score\[j\]并且i\>j，将优先选取score\[j\]排在前面。
 - 每次迭代内的数据会进行排序，不同迭代间的数据不会进行排序。
-  <!-- npu="A3,910b" id10 -->
-- 针对以下型号
-    - <!-- npu="A3" id8 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品<!-- end id8 -->
-    - <!-- npu="910b" id9 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id9 -->
-
-  repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  <!-- end id10 -->
-- <!-- npu="950" id11 -->针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。<!-- end id11 -->
+<!-- npu="A3,910b,950" id12 -->
+- 当参数repeatTime取值为0时，该接口的行为如下：
+    <!-- npu="A3,910b" id10 -->
+    - 针对如下型号，当参数repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+       <!-- npu="A3" id8 -->
+       - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+       <!-- end id8 -->
+       <!-- npu="910b" id9 -->
+       - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+       <!-- end id9 -->
+    <!-- end id10 -->
+    <!-- npu="950" id11 -->
+    - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
+    <!-- end id11 -->
+<!-- end id12 -->
 
 
 ## 调用示例<a name="section642mcpsimp"></a>

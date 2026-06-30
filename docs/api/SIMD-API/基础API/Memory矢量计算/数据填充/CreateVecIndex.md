@@ -108,23 +108,26 @@ Atlas 200I/500 A2 推理产品，支持的数据类型为：int16_t、half、int
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 - firstValue需保证不超出dst中元素数据类型对应的大小范围。
-  <!-- npu="A3,910b" id14 -->
-- 针对以下型号
-  <!-- npu="A3" id12 -->
-  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id12 -->
-  <!-- npu="910b" id13 -->
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id13 -->
+<!-- npu="A3,910b,950" id16 -->
+- 当参数repeatTime取值为0时，该接口的行为如下：
+    <!-- npu="A3,910b" id14 -->
+    - 针对如下型号，当参数repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+       <!-- npu="A3" id12 -->
+       - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+       <!-- end id12 -->
+       <!-- npu="910b" id13 -->
+       - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+       <!-- end id13 -->
+    <!-- end id14 -->
+    <!-- npu="950" id15 -->
+    - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
+    <!-- end id15 -->
+<!-- end id16 -->
 
-  repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  <!-- end id14 -->
-- <!-- npu="950" id15 -->针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。<!-- end id15 -->
-
-<!-- npu="950" id16 -->
+<!-- npu="950" id17 -->
 
 - 针对Ascend 950PR/Ascend 950DT，int8_t/int64_t数据类型仅支持tensor前n个数据计算接口。
-<!-- end id16 -->
+<!-- end id17 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

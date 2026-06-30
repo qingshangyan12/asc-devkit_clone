@@ -125,22 +125,25 @@ Kirin 9030，支持的数据类型为：uint16_t、half、uint32_t、float。
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 - 不支持源操作数与目的操作数使用同一块内存地址。
-  <!-- npu="A3,910b" id18 -->
-- 针对以下型号
-  <!-- npu="A3" id16 -->
-  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id16 -->
-  <!-- npu="910b" id17 -->
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id17 -->
-
-  repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-  <!-- end id18 -->
-- <!-- npu="950" id19 -->针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。<!-- end id19 -->
-- BrcbRepeatParams结构体内参数dstBlkStride，当dstBlkStride值为0时，默认按照1来处理。
-<!-- npu="310p" id20 -->
-- 针对Atlas 推理系列产品AI Core，使用时需要预留8KB的Unified Buffer空间，作为接口的临时数据存放区。
+<!-- npu="A3,910b,950" id20 -->
+- 当参数repeatTime取值为0时，该接口的行为如下：
+    <!-- npu="A3,910b" id18 -->
+    - 针对如下型号，当参数repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+       <!-- npu="A3" id16 -->
+       - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+       <!-- end id16 -->
+       <!-- npu="910b" id17 -->
+       - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+       <!-- end id17 -->
+    <!-- end id18 -->
+    <!-- npu="950" id19 -->
+    - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
+    <!-- end id19 -->
 <!-- end id20 -->
+- BrcbRepeatParams结构体内参数dstBlkStride，当dstBlkStride值为0时，默认按照1来处理。
+<!-- npu="310p" id21 -->
+- 针对Atlas 推理系列产品AI Core，使用时需要预留8KB的Unified Buffer空间，作为接口的临时数据存放区。
+<!-- end id21 -->
 
 ## 关键特性说明
 

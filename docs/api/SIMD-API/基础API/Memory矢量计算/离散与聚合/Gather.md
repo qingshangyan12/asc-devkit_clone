@@ -119,29 +119,34 @@ def Gather(dst, src, count, srcOffset, srcBaseAddr):
     <!-- npu="310p" id18 -->- Atlas 推理系列产品AI Core<!-- end id18 -->
 <!-- end id19 -->
 - repeatTime取值范围：repeatTime∈[0,255]。
-<!-- npu="A3,910b" id22 -->
-- 针对以下型号
-  <!-- npu="A3" id20 -->- Atlas A3 训练系列产品/Atlas A3 推理系列产品<!-- end id20 -->
-  <!-- npu="910b" id21 -->- Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id21 -->
+<!-- npu="A3,910b,950" id24 -->
+- 当参数count或repeatTime取值为0时，该接口的行为如下：
+    <!-- npu="A3,910b" id22 -->
+    - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+       <!-- npu="A3" id20 -->
+       - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+       <!-- end id20 -->
+       <!-- npu="910b" id21 -->
+       - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+       <!-- end id21 -->
+    <!-- end id22 -->
+    <!-- npu="950" id23 -->
+    - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
+    <!-- end id23 -->
+<!-- end id24 -->
 
-  repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-
-  count = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-<!-- end id22 -->
-- <!-- npu="950" id23 -->针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。<!-- end id23 -->
-
-<!-- npu="950,310b" id26 -->
+<!-- npu="950,310b" id27 -->
 - 针对以下型号，当操作数为**8位**时，每次迭代完成**4个DataBlock**的数据收集；其他情况下，每次迭代完成8个DataBlock的数据收集。
-  <!-- npu="950" id24 -->- Ascend 950PR/Ascend 950DT<!-- end id24 -->
-  <!-- npu="310b" id25 -->- Atlas 200I/500 A2 推理产品<!-- end id25 -->
-<!-- end id26 -->
-<!-- npu="A3,910b,310p" id30 -->
+  <!-- npu="950" id25 -->- Ascend 950PR/Ascend 950DT<!-- end id25 -->
+  <!-- npu="310b" id26 -->- Atlas 200I/500 A2 推理产品<!-- end id26 -->
+<!-- end id27 -->
+<!-- npu="A3,910b,310p" id31 -->
 - 针对以下型号，每次迭代完成8个DataBlock的数据收集。
-  <!-- npu="A3" id27 -->- Atlas A3 训练系列产品/Atlas A3 推理系列产品<!-- end id27 -->
-  <!-- npu="910b" id28 -->- Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id28 -->
-  <!-- npu="310p" id29 -->- Atlas 推理系列产品AI Core<!-- end id29 -->
-<!-- end id30 -->
-- <!-- npu="950" id31 -->针对Ascend 950PR/Ascend 950DT，int8\_t、uint8\_t数据类型仅支持tensor前n个数据计算接口。<!-- end id31 -->
+  <!-- npu="A3" id28 -->- Atlas A3 训练系列产品/Atlas A3 推理系列产品<!-- end id28 -->
+  <!-- npu="910b" id29 -->- Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id29 -->
+  <!-- npu="310p" id30 -->- Atlas 推理系列产品AI Core<!-- end id30 -->
+<!-- end id31 -->
+- <!-- npu="950" id32 -->针对Ascend 950PR/Ascend 950DT，int8\_t、uint8\_t数据类型仅支持tensor前n个数据计算接口。<!-- end id32 -->
 
 ## 调用示例<a name="section11276201527"></a>
 

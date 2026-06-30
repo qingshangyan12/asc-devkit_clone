@@ -362,16 +362,21 @@ enum class RoundMode {
 - 当dst或src为int4b\_t时，tensor高维切分计算接口的连续模式的mask与tensor前n个数据计算接口的count必须为偶数；对于tensor高维切分计算接口的逐bit模式，对应同一字节的相邻两个比特位的数值必须一致，即0-1位数值一致，2-3位数值一致，4-5位数值一致，以此类推。
 - int32\_t到half数据类型的转换，设置舍入模式无效，需要与[SetDeqScale](寄存器配置说明/SetDeqScale.md)接口配合使用。
 - <!-- npu="950" id18 -->针对Ascend 950PR/Ascend 950DT，complex32/complex64/double数据类型仅支持tensor前n个数据计算接口。<!-- end id18 -->
-  <!-- npu="A3,910b,950" id21 -->
-- 针对以下型号
-  <!-- npu="A3" id19 -->- Atlas A3 训练系列产品/Atlas A3 推理系列产品<!-- end id19 -->
-  <!-- npu="910b" id20 -->- Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id20 -->
-
-  repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-
-  count = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-<!-- end id21 -->
-- <!-- npu="950" id22 -->针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。<!-- end id22 -->
+<!-- npu="A3,910b,950" id23 -->
+- 当参数count或repeatTime取值为0时，该接口的行为如下：
+    <!-- npu="A3,910b" id21 -->
+    - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+       <!-- npu="A3" id19 -->
+       - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+       <!-- end id19 -->
+       <!-- npu="910b" id20 -->
+       - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+       <!-- end id20 -->
+    <!-- end id21 -->
+    <!-- npu="950" id22 -->
+    - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
+    <!-- end id22 -->
+<!-- end id23 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

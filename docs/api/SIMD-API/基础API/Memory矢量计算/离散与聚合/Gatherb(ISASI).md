@@ -110,16 +110,23 @@ __aicore__ inline void Gatherb(const LocalTensor<T>& dst, const LocalTensor<T>& 
   -   偏移地址后需要32字节对齐。
   -   偏移地址后不能超出UB大小数据的范围。
   -   地址偏移的取值范围：不能超出uint32\_t的范围。
-<!-- npu="A3,910b" id14 -->
-- 针对以下型号
-  <!-- npu="A3" id12 -->- Atlas A3 训练系列产品/Atlas A3 推理系列产品<!-- end id12 -->
-  <!-- npu="910b" id13 -->- Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id13 -->
+<!-- npu="A3,910b,950" id16 -->
+- 当参数repeatTime取值为0时，该接口的行为如下：
+    <!-- npu="A3,910b" id14 -->
+    - 针对如下型号，当参数repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+       <!-- npu="A3" id12 -->
+       - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+       <!-- end id12 -->
+       <!-- npu="910b" id13 -->
+       - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+       <!-- end id13 -->
 
-  repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-
-  当dstBlkStride值为0时，默认按照1来处理。
-<!-- end id14 -->
-- <!-- npu="950" id15 -->针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。<!-- end id15 -->
+       当dstBlkStride值为0时，默认按照1来处理。
+    <!-- end id14 -->
+    <!-- npu="950" id15 -->
+    - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
+    <!-- end id15 -->
+<!-- end id16 -->
 
 ## 调用示例<a name="section11276201527"></a>
 
