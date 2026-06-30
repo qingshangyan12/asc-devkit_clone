@@ -24,11 +24,11 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
-<!-- npu="A3,910b" id9 -->
+<!-- npu="A3,910b" id8 -->
 >[!NOTE]说明
 >
 >该API不支持Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品，如果需要在上述AI处理器实现数据离散功能，建议参考[Scatter兼容样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/06_compatibility_guide/scatter)进行适配。
-<!-- end id9 -->
+<!-- end id8 -->
 
 ## 功能说明<a name="section17600329101418"></a>
 
@@ -85,17 +85,17 @@
 
 ## 数据类型
 
-<!-- npu="950" id13 -->
+<!-- npu="950" id9 -->
 Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。int8\_t、uint8\_t数据类型仅支持tensor前n个数据计算接口。
-<!-- end id13 -->
+<!-- end id9 -->
 
-<!-- npu="310b" id12 -->
+<!-- npu="310b" id10 -->
 Atlas 200I/500 A2 推理产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
-<!-- end id12 -->
-
-<!-- npu="310p" id10 -->
-Atlas 推理系列产品AI Core，支持的数据类型为：uint16_t、half、uint32_t、float。
 <!-- end id10 -->
+
+<!-- npu="310p" id11 -->
+Atlas 推理系列产品AI Core，支持的数据类型为：uint16_t、half、uint32_t、float。
+<!-- end id11 -->
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
@@ -106,46 +106,44 @@ Atlas 推理系列产品AI Core，支持的数据类型为：uint16_t、half、u
   - 偏移地址不能有相同值，如果存在2个或者多个偏移重复的情况，行为是不可预期的。 
   - 取值应保证dst元素类型位宽对齐。
   - 偏移地址后不能超出UB大小数据的范围。
-  <!-- npu="950,310b" id15 -->
+  <!-- npu="950,310b" id12 -->
   - 针对以下型号，地址偏移的取值范围：当操作数为8位时，取值范围为[0, 2^16-1]；当操作数为16位时，取值范围为[0, 2^17-1]，当操作数为32位或者64位时，不能超出uint32_t的范围。
-    <!-- npu="950" id31 -->
+    <!-- npu="950" id13 -->
     - Ascend 950PR/Ascend 950DT
-    <!-- end id31 -->
+    <!-- end id13 -->
     <!-- npu="310b" id14 -->
     - Atlas 200I/500 A2 推理产品
     <!-- end id14 -->
-  <!-- end id15 -->
+  <!-- end id12 -->
 
-  <!-- npu="310p" id16 -->
+  <!-- npu="310p" id15 -->
   - 针对以下型号，地址偏移的取值范围：不能超出uint32_t的范围。
-    <!-- npu="310p" id21 -->
+    <!-- npu="310p" id16 -->
     - Atlas 推理系列产品AI Core
-    <!-- end id21 -->
-  <!-- end id16 -->
+    <!-- end id16 -->
+  <!-- end id15 -->
 - dstBaseAddr的取值应保证dst元素类型位宽对齐，否则会导致非预期行为，程序没有崩溃报错，但数据发生错位，导致结果张量不符合预期。
 - repeatTime取值范围：repeatTime∈[0,255]。
-<!-- npu="A3,910b" id20 -->
-
-<!-- npu="950" id23 -->
+<!-- npu="950" id17 -->
 - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算/Reg矢量计算.md)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
-<!-- end id23 -->
+<!-- end id17 -->
 
-  <!-- npu="950,310b" id26 -->
+<!-- npu="950,310b" id18 -->
 - 针对以下型号，当操作数为**8位**时，每次迭代完成**4个DataBlock**的数据收集；其他情况下，每次迭代完成8个DataBlock的数据收集。
-  <!-- npu="950" id24 -->
+  <!-- npu="950" id19 -->
   - Ascend 950PR/Ascend 950DT
-  <!-- end id24 -->
-  <!-- npu="310b" id25 -->
+  <!-- end id19 -->
+  <!-- npu="310b" id20 -->
   - Atlas 200I/500 A2 推理产品
-  <!-- end id25 -->
-  <!-- end id26 -->
+  <!-- end id20 -->
+<!-- end id18 -->
 
-  <!-- npu="310p" id17 -->
+<!-- npu="310p" id21 -->
 - 针对以下型号，每次迭代完成8个DataBlock的数据收集。
-  <!-- npu="310p" id29 -->
+  <!-- npu="310p" id22 -->
   - Atlas 推理系列产品AI Core
-  <!-- end id29 -->
-  <!-- end id17 -->
+  <!-- end id22 -->
+<!-- end id21 -->
 
 ## 调用示例<a name="section11276201527"></a>
 

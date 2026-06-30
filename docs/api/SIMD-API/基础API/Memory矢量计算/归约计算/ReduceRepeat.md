@@ -114,7 +114,7 @@
 - Kirin 9030，支持half、float。
 <!-- end id17 -->
 
-    <!-- npu="950" id18 -->
+<!-- npu="950" id18 -->
 **针对Ascend 950PR/Ascend 950DT：**
 
 - 在`reduceType`取`MAX`或`MIN`时目的操作数与源操作数的数据类型需要保持一致。
@@ -126,33 +126,33 @@
     | `uint32_t` | `uint16_t`，`uint32_t` |
     | `half` | `half` |
     | `float` | `float` |
-    <!-- end id18 -->
+<!-- end id18 -->
 
-<!-- npu="A3,910b,910,310p,310b,x90,9030" id26 -->
+<!-- npu="A3,910b,910,310p,310b,x90,9030" id19 -->
 **针对如下型号，目的操作数与源操作数的数据类型需要保持一致。**
 
-<!-- npu="A3" id19 -->
+<!-- npu="A3" id20 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-<!-- end id19 -->
-<!-- npu="910b" id20 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 <!-- end id20 -->
-<!-- npu="310b" id21 -->
-- Atlas 200I/500 A2 推理产品
+<!-- npu="910b" id21 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
 <!-- end id21 -->
-<!-- npu="310p" id22 -->
-- Atlas 推理系列产品AI Core
+<!-- npu="310b" id22 -->
+- Atlas 200I/500 A2 推理产品
 <!-- end id22 -->
-<!-- npu="910" id23 -->
-- Atlas 训练系列产品
+<!-- npu="310p" id23 -->
+- Atlas 推理系列产品AI Core
 <!-- end id23 -->
-<!-- npu="x90" id24 -->
-- Kirin X90
+<!-- npu="910" id24 -->
+- Atlas 训练系列产品
 <!-- end id24 -->
-<!-- npu="9030" id25 -->
-- Kirin 9030
+<!-- npu="x90" id25 -->
+- Kirin X90
 <!-- end id25 -->
+<!-- npu="9030" id26 -->
+- Kirin 9030
 <!-- end id26 -->
+<!-- end id19 -->
 
 ## 返回值说明
 
@@ -185,57 +185,56 @@
 
 - `dstRepStride`、`srcBlkStride`、`srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
 
-  <!-- npu="950,A3,910b" id45 -->
+<!-- npu="950,A3,910b" id27 -->
 - 当参数count或repeatTime取值为0时，该接口的行为如下：
-  <!-- npu="A3,910b" id29 -->
+  <!-- npu="A3,910b" id28 -->
   - 针对如下型号，当参数mask或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-    <!-- npu="A3" id27 -->
+    <!-- npu="A3" id29 -->
     - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-    <!-- end id27 -->
-    <!-- npu="910b" id28 -->
+    <!-- end id29 -->
+    <!-- npu="910b" id30 -->
     - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-    <!-- end id28 -->
-  <!-- end id29 -->
+    <!-- end id30 -->
+  <!-- end id28 -->
 
-  <!-- npu="950" id43 -->
+  <!-- npu="950" id31 -->
   - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算/Reg矢量计算.md)API实现兼容，当参数mask或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
-  <!-- end id43 -->
-  <!-- end id45 -->
+  <!-- end id31 -->
+<!-- end id27 -->
 
-  <!-- npu="950" id44 -->
+<!-- npu="950" id32 -->
 - 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT：
   - tensor高维切分计算占用8KB Unified Buffer。
   - tensor前n个数据连续计算不涉及8KB Unified Buffer的占用。
-
-  <!-- end id44 -->
+<!-- end id32 -->
 - 归约操作类型取MAX或MIN时的约束：
   - 如果存在多个最值，该指令会将最小索引写入目的操作数。
   - 索引按操作数的数据类型存储，读取索引需要将类型转换到整型，请参考[关键特性说明](#关键特性说明)。
   - 不同芯片支持的`ReduceOrder`如下：
-    <!-- npu="950" id30 -->
+    <!-- npu="950" id33 -->
     - Ascend 950PR/Ascend 950DT，支持`ORDER_VALUE_INDEX`、`ORDER_INDEX_VALUE`、`ORDER_ONLY_VALUE`、`ORDER_ONLY_INDEX`。
-    <!-- end id30 -->
-    <!-- npu="A3" id31 -->
-    - Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持`ORDER_VALUE_INDEX`、`ORDER_INDEX_VALUE`、`ORDER_ONLY_VALUE`、`ORDER_ONLY_INDEX`。
-    <!-- end id31 -->
-    <!-- npu="910b" id32 -->
-    - Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持`ORDER_VALUE_INDEX`、`ORDER_INDEX_VALUE`、`ORDER_ONLY_VALUE`、`ORDER_ONLY_INDEX`。
-    <!-- end id32 -->
-    <!-- npu="310b" id33 -->
-    - Atlas 200I/500 A2 推理产品，支持`ORDER_VALUE_INDEX`、`ORDER_ONLY_VALUE`。
     <!-- end id33 -->
-    <!-- npu="310p" id34 -->
-    - Atlas 推理系列产品AI Core，支持`ORDER_VALUE_INDEX`、`ORDER_INDEX_VALUE`。
+    <!-- npu="A3" id34 -->
+    - Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持`ORDER_VALUE_INDEX`、`ORDER_INDEX_VALUE`、`ORDER_ONLY_VALUE`、`ORDER_ONLY_INDEX`。
     <!-- end id34 -->
-    <!-- npu="910" id35 -->
-    - Atlas 训练系列产品，支持`ORDER_VALUE_INDEX`。
+    <!-- npu="910b" id35 -->
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持`ORDER_VALUE_INDEX`、`ORDER_INDEX_VALUE`、`ORDER_ONLY_VALUE`、`ORDER_ONLY_INDEX`。
     <!-- end id35 -->
-    <!-- npu="x90" id36 -->
-    - Kirin X90，支持`ORDER_VALUE_INDEX`、`ORDER_INDEX_VALUE`。
+    <!-- npu="310b" id36 -->
+    - Atlas 200I/500 A2 推理产品，支持`ORDER_VALUE_INDEX`、`ORDER_ONLY_VALUE`。
     <!-- end id36 -->
-    <!-- npu="9030" id37 -->
-    - Kirin 9030，支持`ORDER_VALUE_INDEX`、`ORDER_INDEX_VALUE`。
+    <!-- npu="310p" id37 -->
+    - Atlas 推理系列产品AI Core，支持`ORDER_VALUE_INDEX`、`ORDER_INDEX_VALUE`。
     <!-- end id37 -->
+    <!-- npu="910" id38 -->
+    - Atlas 训练系列产品，支持`ORDER_VALUE_INDEX`。
+    <!-- end id38 -->
+    <!-- npu="x90" id39 -->
+    - Kirin X90，支持`ORDER_VALUE_INDEX`、`ORDER_INDEX_VALUE`。
+    <!-- end id39 -->
+    <!-- npu="9030" id40 -->
+    - Kirin 9030，支持`ORDER_VALUE_INDEX`、`ORDER_INDEX_VALUE`。
+    <!-- end id40 -->
 
 ## 关键特性说明
 
@@ -250,24 +249,24 @@
     uint16_t realIndex = *reinterpret_cast<uint16_t*>(&maxIndex);
     ```
 
-    <!-- npu="950,A3,910b" id42 -->
+    <!-- npu="950,A3,910b" id41 -->
 
     特别地
-    <!-- npu="950" id38 -->
+    <!-- npu="950" id42 -->
     - 针对Ascend 950PR/Ascend 950DT，`ORDER_ONLY_INDEX`（仅返回最值索引）情况下，当操作数数据类型为`int16_t`，`uint16_t`，`half`时，读取index都需要使用`reinterpret_cast<uint32_t*>`。
-    <!-- end id38 -->
-
-    <!-- npu="A3,910b" id41 -->
-    - 针对如下型号，`ORDER_ONLY_INDEX`（仅返回最值索引）情况下，读取索引值index时都需要使用`reinterpret_cast<uint32_t*>`。
-      <!-- npu="A3" id39 -->
-      - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-      <!-- end id39 -->
-      <!-- npu="910b" id40 -->
-      - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-      <!-- end id40 -->
-    <!-- end id41 -->
-
     <!-- end id42 -->
+
+    <!-- npu="A3,910b" id43 -->
+    - 针对如下型号，`ORDER_ONLY_INDEX`（仅返回最值索引）情况下，读取索引值index时都需要使用`reinterpret_cast<uint32_t*>`。
+      <!-- npu="A3" id44 -->
+      - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+      <!-- end id44 -->
+      <!-- npu="910b" id45 -->
+      - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+      <!-- end id45 -->
+    <!-- end id43 -->
+
+    <!-- end id41 -->
 
 
 - 归约操作类型取`SUM`时接口以二叉树累加的方式完成每个repeat内的求和，详情请参考[ReduceDataBlock关键特性说明](./ReduceDataBlock.md#关键特性说明)。

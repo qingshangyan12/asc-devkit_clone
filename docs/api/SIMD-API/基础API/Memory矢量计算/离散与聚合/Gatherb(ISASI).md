@@ -24,6 +24,7 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
+<!-- end id8 -->
 
 ## 功能说明<a name="section17600329101418"></a>
 
@@ -121,31 +122,31 @@ Atlas 200I/500 A2 推理产品，支持的数据类型为：int8_t、uint8_t、i
   - 地址偏移的取值范围：不能超出uint32_t的范围。
 - repeatTime取值范围：repeatTime∈[0,255]。
 
-  <!-- npu="950,A3,910b" id16 -->
+<!-- npu="950,A3,910b" id13 -->
 - 当参数count或repeatTime取值为0时，该接口的行为如下：
-  <!-- npu="A3,910b" id20 -->
+  <!-- npu="A3,910b" id14 -->
   - 针对如下型号，当参数repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-    <!-- npu="A3" id18 -->
+    <!-- npu="A3" id15 -->
     - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-    <!-- end id18 -->
-    <!-- npu="910b" id19 -->
+    <!-- end id15 -->
+    <!-- npu="910b" id16 -->
     - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-    <!-- end id19 -->
-  <!-- end id20 -->
-  <!-- npu="950" id23 -->
-  - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算/Reg矢量计算.md)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
-  <!-- end id23 -->
-  <!-- end id16 -->
-
-  <!-- npu="A3,910b" id15 -->
-- 针对如下型号，当dstBlkStride取值为0时，默认按照1来处理。
-  <!-- npu="A3" id13 -->
-  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id13 -->
-  <!-- npu="910b" id14 -->
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    <!-- end id16 -->
   <!-- end id14 -->
-  <!-- end id15 -->
+  <!-- npu="950" id17 -->
+  - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算/Reg矢量计算.md)API实现兼容，当参数repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
+  <!-- end id17 -->
+<!-- end id13 -->
+
+<!-- npu="A3,910b" id18 -->
+- 针对如下型号，当dstBlkStride取值为0时，默认按照1来处理。
+  <!-- npu="A3" id19 -->
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  <!-- end id19 -->
+  <!-- npu="910b" id20 -->
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  <!-- end id20 -->
+<!-- end id18 -->
 ## 调用示例<a name="section11276201527"></a>
 
 完整使用样例请参见[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/gather)场景四。

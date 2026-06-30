@@ -128,56 +128,56 @@
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
 - 需要使用`sharedTmpBuffer`的情况下，支持`dst`与`sharedTmpBuffer`地址重叠（通常情况下`dst`比`sharedTmpBuffer`所需的空间要小），此时`sharedTmpBuffer`必须满足所需空间要求，详情请参考[关键特性说明](#关键特性说明)。
 
-  <!-- npu="950,A3,910b" id21 -->
+<!-- npu="950,A3,910b" id18 -->
 - 当参数count或repeatTime取值为0时，该接口的行为如下：
-  <!-- npu="A3,910b" id20 -->
+  <!-- npu="A3,910b" id19 -->
   - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-    <!-- npu="A3" id18 -->
+    <!-- npu="A3" id20 -->
     - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-    <!-- end id18 -->
-    <!-- npu="910b" id19 -->
+    <!-- end id20 -->
+    <!-- npu="910b" id21 -->
     - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-    <!-- end id19 -->
-  <!-- end id20 -->
+    <!-- end id21 -->
+  <!-- end id19 -->
 
-  <!-- npu="950" id23 -->
+  <!-- npu="950" id22 -->
   - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算/Reg矢量计算.md)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
-  <!-- end id23 -->
-  <!-- end id21 -->
+  <!-- end id22 -->
+<!-- end id18 -->
 
 - `srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
 - 如果存在多个最大值，该指令会将最小索引写入目的操作数。
 - `dst`结果存储顺序为最小值，最小值索引，若不需要索引，只会存储最小值。
 - 索引按操作数的数据类型存储，读取索引需要将类型转换到整型。请参考[ReduceRepeat关键特性说明](./ReduceRepeat.md#关键特性说明)。
 - 当输入类型是`half`的时候，只支持获取最大不超过65535（`uint16_t`能表示的最大值）的索引值。
-<!-- npu="950" id22 -->
+<!-- npu="950" id23 -->
 - 对于Ascend 950PR/Ascend 950DT，因接口内部算法实现不同，无需使用`sharedTmpBuffer`，可以直接传入`src`或者任意大小的`sharedTmpBuffer`。
-<!-- end id22 -->
+<!-- end id23 -->
 
-  <!-- npu="A3,910b,910,310p,310b,x90,9030" id31 -->
+<!-- npu="A3,910b,910,310p,310b,x90,9030" id24 -->
 - 针对如下型号，需要使用`sharedTmpBuffer`。
-  <!-- npu="A3" id24 -->
+  <!-- npu="A3" id25 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id24 -->
-  <!-- npu="910b" id25 -->
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
   <!-- end id25 -->
-  <!-- npu="310b" id26 -->
-  - Atlas 200I/500 A2 推理产品
+  <!-- npu="910b" id26 -->
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
   <!-- end id26 -->
-  <!-- npu="310p" id27 -->
-  - Atlas 推理系列产品AI Core
+  <!-- npu="310b" id27 -->
+  - Atlas 200I/500 A2 推理产品
   <!-- end id27 -->
-  <!-- npu="910" id28 -->
-  - Atlas 训练系列产品
+  <!-- npu="310p" id28 -->
+  - Atlas 推理系列产品AI Core
   <!-- end id28 -->
-  <!-- npu="x90" id29 -->
-  - Kirin X90
+  <!-- npu="910" id29 -->
+  - Atlas 训练系列产品
   <!-- end id29 -->
-  <!-- npu="9030" id30 -->
-  - Kirin 9030
+  <!-- npu="x90" id30 -->
+  - Kirin X90
   <!-- end id30 -->
+  <!-- npu="9030" id31 -->
+  - Kirin 9030
   <!-- end id31 -->
+<!-- end id24 -->
 
 ## 关键特性说明
 

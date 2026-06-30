@@ -112,51 +112,51 @@
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
 - `dstRepStride`、`srcBlkStride`、`srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
 
-  <!-- npu="950,A3,910b" id26 -->
+<!-- npu="950,A3,910b" id14 -->
 - 当参数count或repeatTime取值为0时，该接口的行为如下：
-  <!-- npu="A3,910b" id16 -->
+  <!-- npu="A3,910b" id15 -->
   - 针对如下型号，当参数mask或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-    <!-- npu="A3" id14 -->
+    <!-- npu="A3" id16 -->
     - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-    <!-- end id14 -->
-    <!-- npu="910b" id15 -->
+    <!-- end id16 -->
+    <!-- npu="910b" id17 -->
     - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-    <!-- end id15 -->
-  <!-- end id16 -->
+    <!-- end id17 -->
+  <!-- end id15 -->
 
-  <!-- npu="950" id24 -->
+  <!-- npu="950" id18 -->
   - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算/Reg矢量计算.md)API实现兼容，当参数mask或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
-  <!-- end id24 -->
-  <!-- end id26 -->
+  <!-- end id18 -->
+<!-- end id14 -->
 
-  <!-- npu="950" id25 -->
+<!-- npu="950" id19 -->
 - 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT：
   - tensor高维切分计算占用8KB Unified Buffer。
   - tensor前n个数据连续计算不涉及8KB Unified Buffer的占用。
-  <!-- end id25 -->
+<!-- end id19 -->
 
-  <!-- npu="A3,910b,310p" id20 -->
+<!-- npu="A3,910b,310p" id20 -->
 - 针对如下型号，当一对相邻元素的掩码均为0，对应的目的元素将跳过写入，保持不变。
-  <!-- npu="A3" id17 -->
+  <!-- npu="A3" id21 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id17 -->
-  <!-- npu="910b" id18 -->
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id18 -->
-  <!-- npu="310p" id19 -->
-  - Atlas 推理系列产品AI Core
-  <!-- end id19 -->
-  <!-- end id20 -->
-
-  <!-- npu="950,310b" id23 -->
-- 针对如下型号，当一对相邻元素的掩码均为0，对应的目的操作数中的值会置为0。
-  <!-- npu="950" id22 -->
-  - Ascend 950PR/Ascend 950DT
-  <!-- end id22 -->
-  <!-- npu="310b" id21 -->
-  - Atlas 200I/500 A2 推理产品
   <!-- end id21 -->
+  <!-- npu="910b" id22 -->
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  <!-- end id22 -->
+  <!-- npu="310p" id23 -->
+  - Atlas 推理系列产品AI Core
   <!-- end id23 -->
+<!-- end id20 -->
+
+<!-- npu="950,310b" id24 -->
+- 针对如下型号，当一对相邻元素的掩码均为0，对应的目的操作数中的值会置为0。
+  <!-- npu="950" id25 -->
+  - Ascend 950PR/Ascend 950DT
+  <!-- end id25 -->
+  <!-- npu="310b" id26 -->
+  - Atlas 200I/500 A2 推理产品
+  <!-- end id26 -->
+<!-- end id24 -->
 
 ## 调用示例
 

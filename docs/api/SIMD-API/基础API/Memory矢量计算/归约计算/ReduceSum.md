@@ -126,46 +126,46 @@
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
 - 需要使用`sharedTmpBuffer`的情况下，支持`dst`与`sharedTmpBuffer`地址重叠（通常情况下`dst`比`sharedTmpBuffer`所需的空间要小），此时`sharedTmpBuffer`必须满足所需空间要求，详情请参考[关键特性说明](#关键特性说明)。
 
-  <!-- npu="950,A3,910b" id21 -->
+<!-- npu="950,A3,910b" id18 -->
 - 当参数count或repeatTime取值为0时，该接口的行为如下：
-  <!-- npu="A3,910b" id20 -->
+  <!-- npu="A3,910b" id19 -->
   - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-    <!-- npu="A3" id18 -->
+    <!-- npu="A3" id20 -->
     - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-    <!-- end id18 -->
-    <!-- npu="910b" id19 -->
+    <!-- end id20 -->
+    <!-- npu="910b" id21 -->
     - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-    <!-- end id19 -->
-  <!-- end id20 -->
+    <!-- end id21 -->
+  <!-- end id19 -->
 
-  <!-- npu="950" id30 -->
+  <!-- npu="950" id22 -->
   - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算](../../Reg矢量计算/Reg矢量计算.md)API实现兼容，当参数count或repeatTime取值为0时，不保证该接口被视为NOP（空操作）。
-  <!-- end id30 -->
-  <!-- end id21 -->
+  <!-- end id22 -->
+<!-- end id18 -->
 
 - `srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
 
-  <!-- npu="950,910,310p,310b,x90,9030" id37 -->
+<!-- npu="950,910,310p,310b,x90,9030" id23 -->
 - 针对以下型号，模板参数`isSetMask`参数不生效，保持默认值即可：
-  <!-- npu="950" id31 -->
+  <!-- npu="950" id24 -->
   - Ascend 950PR/Ascend 950DT
-  <!-- end id31 -->
-  <!-- npu="310b" id32 -->
+  <!-- end id24 -->
+  <!-- npu="310b" id25 -->
   - Atlas 200I/500 A2 推理产品
-  <!-- end id32 -->
-  <!-- npu="310p" id33 -->
+  <!-- end id25 -->
+  <!-- npu="310p" id26 -->
   - Atlas 推理系列产品AI Core
-  <!-- end id33 -->
-  <!-- npu="910" id34 -->
+  <!-- end id26 -->
+  <!-- npu="910" id27 -->
   - Atlas 训练系列产品
-  <!-- end id34 -->
-  <!-- npu="x90" id35 -->
+  <!-- end id27 -->
+  <!-- npu="x90" id28 -->
   - Kirin X90
-  <!-- end id35 -->
-  <!-- npu="9030" id36 -->
+  <!-- end id28 -->
+  <!-- npu="9030" id29 -->
   - Kirin 9030
-  <!-- end id36 -->
-  <!-- end id37 -->
+  <!-- end id29 -->
+<!-- end id23 -->
 
 ## 关键特性说明
 
@@ -195,30 +195,30 @@
 
 **不同硬件形态对应的`ReduceSum`相加方式如下：**
 
-<!-- npu="950" id22 -->
+<!-- npu="950" id30 -->
 - Ascend 950PR/Ascend 950DT，tensor前n个数据计算接口和tensor高维切分计算接口Counter模式在`oneRepSize < count ≤ 4 * oneRepSize`时采用方式三，否则采用方式二。tensor高维切分计算接口[Normal模式](../SIMD计算说明/掩码/概述.md#mask-mode)采用方式二。
-<!-- end id22 -->
-<!-- npu="A3" id23 -->
+<!-- end id30 -->
+<!-- npu="A3" id31 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品，tensor前n个数据计算接口采用方式一，tensor高维切分计算接口采用方式二。
-<!-- end id23 -->
-<!-- npu="910b" id24 -->
+<!-- end id31 -->
+<!-- npu="910b" id32 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品，tensor前n个数据计算接口采用方式一，tensor高维切分计算接口采用方式二。
-<!-- end id24 -->
-<!-- npu="310b" id25 -->
+<!-- end id32 -->
+<!-- npu="310b" id33 -->
 - Atlas 200I/500 A2 推理产品，采用方式二。
-<!-- end id25 -->
-<!-- npu="310p" id26 -->
+<!-- end id33 -->
+<!-- npu="310p" id34 -->
 - Atlas 推理系列产品AI Core，采用方式二。
-<!-- end id26 -->
-<!-- npu="910" id27 -->
+<!-- end id34 -->
+<!-- npu="910" id35 -->
 - Atlas 训练系列产品，采用方式二。
-<!-- end id27 -->
-<!-- npu="x90" id28 -->
+<!-- end id35 -->
+<!-- npu="x90" id36 -->
 - Kirin X90，采用方式二。
-<!-- end id28 -->
-<!-- npu="9030" id29 -->
+<!-- end id36 -->
+<!-- npu="9030" id37 -->
 - Kirin 9030，采用方式二。
-<!-- end id29 -->
+<!-- end id37 -->
 
 ## 调用示例
 
