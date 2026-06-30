@@ -49,7 +49,7 @@ GM(ND) -> L1(Nz/Zz) -> L0A(Zz)/L0B(Zn) -> L0C(Zz) -> GM(ND)
 Each phase processes the following:
 
 1. **GM -> L1**: Call `DataCopy` interface with `Nd2NzParams` structure parameters to convert A / B matrices from ND layout to Nz or Zz layout.
-2. **L1 -> L0A / L0B**: Based on data type, transpose flags, and L1 layout, select `LoadData (LoadData2DParams)`, `LoadDataWithTranspose`, or `LoadData (LoadData3DParamsV2)` to complete transfer and format transformation. For convenience, these are abbreviated as `Load2D`, `LoadDataWithTranspose`, and `Load3Dv2` respectively below.
+2. **L1 -> L0A / L0B**: Based on data type, transpose flags, and L1 layout, select `LoadData (LoadData2DParams)`, `LoadDataWithTranspose`, or `LoadData (LoadData3DParamsV2)` to complete transfer and format transformation. For convenience, these are abbreviated as `LoadData 2D`, `LoadDataWithTranspose`, and `LoadData 3D` respectively below.
 3. **Matrix multiplication**: Call `Mmad` interface to perform matrix multiplication.
 4. **L0C -> GM**: Call `Fixpipe` interface to transfer result C matrix out to GM.
 
@@ -92,39 +92,39 @@ The data layout formats of A / B matrices in different storage units are shown i
   </tr>
   <tr>
     <td align="center"><span style="font-weight: bold;">A non-transposed input [m, k]<br>L1 -> L0A no transpose needed</span></td>
-    <td align="center"><code>Load2D</code>, <code>Load3Dv2</code></td>
-    <td align="center"><code>Load2D</code>, <code>Load3Dv2</code></td>
-    <td align="center"><code>Load2D</code>, <code>Load3Dv2</code></td>
-    <td align="center"><code>Load2D</code>, <code>Load3Dv2</code></td>
+    <td align="center"><code>LoadData 2D</code>, <code>LoadData 3D</code></td>
+    <td align="center"><code>LoadData 2D</code>, <code>LoadData 3D</code></td>
+    <td align="center"><code>LoadData 2D</code>, <code>LoadData 3D</code></td>
+    <td align="center"><code>LoadData 2D</code>, <code>LoadData 3D</code></td>
   </tr>
     <tr>
     <td align="center"><span style="font-weight: bold;">A transposed input [k, m]<br>L1 -> L0A transpose needed</span></td>
     <td align="center">Not supported</td>
     <td align="center"><code>LoadDataWithTranspose</code></td>
-    <td align="center"><code>Load2D</code>, <code>Load3Dv2</code>, <code>LoadDataWithTranspose</code></td>
-    <td align="center"><code>Load3Dv2</code>, <br><code>LoadDataWithTranspose</code> (L1 data layout is Zz)</td>
+    <td align="center"><code>LoadData 2D</code>, <code>LoadData 3D</code>, <code>LoadDataWithTranspose</code></td>
+    <td align="center"><code>LoadData 3D</code>, <br><code>LoadDataWithTranspose</code> (L1 data layout is Zz)</td>
   </tr>
     <tr>
     <td align="center"><span style="font-weight: bold;">B non-transposed input [k, n]<br>L1 -> L0B transpose needed</span></td>
     <td align="center"><code>LoadDataWithTranspose</code></td>
     <td align="center"><code>LoadDataWithTranspose</code></td>
-    <td align="center"><code>Load2D</code>, <code>Load3Dv2</code>, <code>LoadDataWithTranspose</code></td>
-    <td align="center"><code>Load3Dv2</code>, <br><code>LoadDataWithTranspose</code> (L1 data layout is Zz)</td>
+    <td align="center"><code>LoadData 2D</code>, <code>LoadData 3D</code>, <code>LoadDataWithTranspose</code></td>
+    <td align="center"><code>LoadData 3D</code>, <br><code>LoadDataWithTranspose</code> (L1 data layout is Zz)</td>
   </tr>
     <tr>
     <td align="center"><span style="font-weight: bold;">B transposed input [n, k]<br>L1 -> L0B no transpose needed</span></td>
-    <td align="center"><code>Load2D</code></td>
-    <td align="center"><code>Load2D</code></td>
-    <td align="center"><code>Load2D</code></td>
-    <td align="center"><code>Load2D</code></td>
+    <td align="center"><code>LoadData 2D</code></td>
+    <td align="center"><code>LoadData 2D</code></td>
+    <td align="center"><code>LoadData 2D</code></td>
+    <td align="center"><code>LoadData 2D</code></td>
   </tr>
 </table>
 
 `loadDataMode` is a general term used in this document to describe the L1 -> L0 transfer method, not an Ascend C interface parameter. In the code, A matrix and B matrix select the L1 -> L0 transfer method through template parameters `loadData2AMode` and `loadData2BMode` respectively:
 
-- `0`: Use `Load2D`, that is `LoadData (LoadData2DParams)`.
+- `0`: Use `LoadData 2D`, that is `LoadData (LoadData2DParams)`.
 - `1`: Use `LoadDataWithTranspose`.
-- `2`: Use `Load3Dv2`, that is `LoadData (LoadData3DParamsV2)`.
+- `2`: Use `LoadData 3D`, that is `LoadData (LoadData3DParamsV2)`.
 
 ### 2. Key Scenario Differences
 
@@ -153,15 +153,15 @@ Note: When scenarioNum is 1 to 13, A and B matrices on L1 are all in Nz layout; 
     <td>A [40, 70]<br>B [50, 70]</td>
     <td>false</td>
     <td>true</td>
-    <td><code>Load2D</code></td>
-    <td><code>Load2D</code></td>
+    <td><code>LoadData 2D</code></td>
+    <td><code>LoadData 2D</code></td>
   </tr>
   <tr>
     <td><span style="font-weight: bold;">2</span></td>
     <td>A [40, 70]<br>B [70, 50]</td>
     <td>false</td>
     <td>false</td>
-    <td><code>Load3Dv2</code></td>
+    <td><code>LoadData 3D</code></td>
     <td><code>LoadDataWithTranspose</code></td>
   </tr>
   <tr>
@@ -171,16 +171,16 @@ Note: When scenarioNum is 1 to 13, A and B matrices on L1 are all in Nz layout; 
     <td>A [40, 70]<br>B [50, 70]</td>
     <td>false</td>
     <td>true</td>
-    <td><code>Load2D</code></td>
-    <td><code>Load2D</code></td>
+    <td><code>LoadData 2D</code></td>
+    <td><code>LoadData 2D</code></td>
   </tr>
   <tr>
     <td><span style="font-weight: bold;">4</span></td>
     <td>A [40, 70]<br>B [50, 70]</td>
     <td>false</td>
     <td>true</td>
-    <td><code>Load3Dv2</code></td>
-    <td><code>Load2D</code></td>
+    <td><code>LoadData 3D</code></td>
+    <td><code>LoadData 2D</code></td>
   </tr>
   <tr>
     <td><span style="font-weight: bold;">5</span></td>
@@ -197,24 +197,24 @@ Note: When scenarioNum is 1 to 13, A and B matrices on L1 are all in Nz layout; 
     <td>A [40, 70]<br>B [50, 70]</td>
     <td>false</td>
     <td>true</td>
-    <td><code>Load2D</code></td>
-    <td><code>Load2D</code></td>
+    <td><code>LoadData 2D</code></td>
+    <td><code>LoadData 2D</code></td>
   </tr>
   <tr>
     <td><span style="font-weight: bold;">7</span></td>
     <td>A [40, 70]<br>B [50, 70]</td>
     <td>false</td>
     <td>true</td>
-    <td><code>Load3Dv2</code></td>
-    <td><code>Load2D</code></td>
+    <td><code>LoadData 3D</code></td>
+    <td><code>LoadData 2D</code></td>
   </tr>
   <tr>
     <td><span style="font-weight: bold;">8</span></td>
     <td>A [70, 40]<br>B [70, 50]</td>
     <td>true</td>
     <td>false</td>
-    <td><code>Load2D</code></td>
-    <td><code>Load2D</code></td>
+    <td><code>LoadData 2D</code></td>
+    <td><code>LoadData 2D</code></td>
   </tr>
   <tr>
     <td><span style="font-weight: bold;">9</span></td>
@@ -229,8 +229,8 @@ Note: When scenarioNum is 1 to 13, A and B matrices on L1 are all in Nz layout; 
     <td>A [70, 40]<br>B [70, 50]</td>
     <td>true</td>
     <td>false</td>
-    <td><code>Load3Dv2</code></td>
-    <td><code>Load3Dv2</code></td>
+    <td><code>LoadData 3D</code></td>
+    <td><code>LoadData 3D</code></td>
   </tr>
   <tr>
     <td><span style="font-weight: bold;">11</span></td>
@@ -239,24 +239,24 @@ Note: When scenarioNum is 1 to 13, A and B matrices on L1 are all in Nz layout; 
     <td>A [40, 70]<br>B [50, 70]</td>
     <td>false</td>
     <td>true</td>
-    <td><code>Load2D</code></td>
-    <td><code>Load2D</code></td>
+    <td><code>LoadData 2D</code></td>
+    <td><code>LoadData 2D</code></td>
   </tr>
   <tr>
     <td><span style="font-weight: bold;">12</span></td>
     <td>A [40, 70]<br>B [50, 70]</td>
     <td>false</td>
     <td>true</td>
-    <td><code>Load3Dv2</code></td>
-    <td><code>Load2D</code></td>
+    <td><code>LoadData 3D</code></td>
+    <td><code>LoadData 2D</code></td>
   </tr>
   <tr>
     <td><span style="font-weight: bold;">13</span></td>
     <td>A [70, 40]<br>B [70, 50]</td>
     <td>true</td>
     <td>false</td>
-    <td><code>Load3Dv2</code></td>
-    <td><code>Load3Dv2</code></td>
+    <td><code>LoadData 3D</code></td>
+    <td><code>LoadData 3D</code></td>
   </tr>
   <tr>
     <td><span style="font-weight: bold;">14</span></td>
@@ -272,35 +272,35 @@ Note: When scenarioNum is 1 to 13, A and B matrices on L1 are all in Nz layout; 
 
 This section describes key differences by transfer mode.
 
-**`Load2D` non-transpose transfer: Scenarios 1 / 3 / 6 / 11**
+**`LoadData 2D` non-transpose transfer: Scenarios 1 / 3 / 6 / 11**
 
-- A matrix non-transposed input `[m, k]`, use `Load2D` to transfer to L0A, for loop along m direction, transferring `CeilDivision(k, fractalShape[1])` fractals in k direction at once.
-- B matrix transposed input `[n, k]`, use `Load2D` to transfer to L0B, for loop along k direction, transferring `CeilDivision(n, fractalShape[0])` fractals in n direction at once.
+- A matrix non-transposed input `[m, k]`, use `LoadData 2D` to transfer to L0A, for loop along m direction, transferring `CeilDivision(k, fractalShape[1])` fractals in k direction at once.
+- B matrix transposed input `[n, k]`, use `LoadData 2D` to transfer to L0B, for loop along k direction, transferring `CeilDivision(n, fractalShape[0])` fractals in n direction at once.
 - Both A / B matrices complete L1 -> L0 transfer and large fractal layout format changes by configuring `srcStride`, `dstGap` and other parameters.
 
-**A-side `Load3Dv2` non-transpose transfer: Scenarios 2 / 4 / 7 / 12**
+**A-side `LoadData 3D` non-transpose transfer: Scenarios 2 / 4 / 7 / 12**
 
-- A matrix non-transposed input `[m, k]`, use `Load3Dv2` to transfer from L1 to L0A, converting Nz layout on L1 to Zz layout needed by L0A.
-- `Load3Dv2` configures N as 1, convolution kernel width and height as 1, padding as 0, stride as 1, dilation as 1. After image to column expansion, the data layout can be viewed as Nz fractal layout on L1.
+- A matrix non-transposed input `[m, k]`, use `LoadData 3D` to transfer from L1 to L0A, converting Nz layout on L1 to Zz layout needed by L0A.
+- `LoadData 3D` configures N as 1, convolution kernel width and height as 1, padding as 0, stride as 1, dilation as 1. After image to column expansion, the data layout can be viewed as Nz fractal layout on L1.
 - A matrix completes transfer by configuring `l1H`, `l1W`, `kExtension`, `mExtension` and other parameters.
-- B matrix uses `LoadDataWithTranspose` or `Load2D` based on scenario: in scenario 2, B matrix non-transposed input `[k, n]` completes transposed transfer through `LoadDataWithTranspose`; in scenarios 4 / 7 / 12, B matrix transposed input `[n, k]` completes non-transposed transfer through `Load2D`.
+- B matrix uses `LoadDataWithTranspose` or `LoadData 2D` based on scenario: in scenario 2, B matrix non-transposed input `[k, n]` completes transposed transfer through `LoadDataWithTranspose`; in scenarios 4 / 7 / 12, B matrix transposed input `[n, k]` completes non-transposed transfer through `LoadData 2D`.
 
 **`LoadDataWithTranspose` transpose transfer: Scenarios 5 / 9 / 14**
 
 - In scenarios 5 / 9, A / B matrices on L1 are all in Nz layout. A matrix transposed input `[k, m]`, B matrix non-transposed input `[k, n]`, both use `LoadDataWithTranspose` for transfer with transpose.
 - In scenario 14, A / B matrices on L1 are all in Zz layout, both use `LoadDataWithTranspose` to complete L1 -> L0 transfer with transpose during the transfer process.
 
-**`Load2D` transpose transfer: Scenario 8**
+**`LoadData 2D` transpose transfer: Scenario 8**
 
-- Both A / B matrices use `Load2D` with `ifTranspose = true`.
-- A matrix for loops along m direction, B matrix for loops along k direction; the number of fractals transferred per iteration is the same as in `Load2D` non-transpose scenarios.
-- During L1 -> L0 transfer, `Load2D` completes small fractal transpose and large fractal layout format changes through `ifTranspose = true`.
+- Both A / B matrices use `LoadData 2D` with `ifTranspose = true`.
+- A matrix for loops along m direction, B matrix for loops along k direction; the number of fractals transferred per iteration is the same as in `LoadData 2D` non-transpose scenarios.
+- During L1 -> L0 transfer, `LoadData 2D` completes small fractal transpose and large fractal layout format changes through `ifTranspose = true`.
 
-**`Load3Dv2` transpose transfer: Scenarios 10 / 13**
+**`LoadData 3D` transpose transfer: Scenarios 10 / 13**
 
-- Both A / B matrices use `Load3Dv2`.
+- Both A / B matrices use `LoadData 3D`.
 - A matrix completes L1 -> L0A transpose transfer by configuring `enTranspose`, `l1H`, `l1W`, `kExtension`, `mExtension` and other parameters.
-- B matrix enables transpose by default when calling `Load3Dv2`, no need to configure `enTranspose`, other configurations are similar to A matrix transfer.
+- B matrix enables transpose by default when calling `LoadData 3D`, no need to configure `enTranspose`, other configurations are similar to A matrix transfer.
 
 ### 3. Parameter Description
 
@@ -497,7 +497,7 @@ This section describes how to transfer A / B matrices from L1 to L0A / L0B. Firs
 
 - **Non-transpose transfer**: Only large fractal layout format changes occur. A matrix transferred to L0A becomes Zz, B matrix transferred to L0B becomes Zn.
 - **Transpose transfer**: Both small fractal transpose and large fractal layout format changes occur.
-- **L1 is Nz layout**: Can select `Load2D`, `LoadDataWithTranspose`, or `Load3Dv2` based on data type.
+- **L1 is Nz layout**: Can select `LoadData 2D`, `LoadDataWithTranspose`, or `LoadData 3D` based on data type.
 - **L1 is Zz layout**: Scenario 14 uses `LoadDataWithTranspose` for float transpose transfer.
 
 Focus on `repeatTimes`, `srcStride`, `dstGap`, `dstFracGap`, `ifTranspose`, and `enTranspose` parameters in code blocks, as they determine the number of fractals per transfer, adjacent fractal intervals, and whether to transpose.
