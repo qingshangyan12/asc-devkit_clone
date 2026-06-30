@@ -96,6 +96,9 @@ public:
         uint64_t prevCtrl = get_ctrl() & 0x1000000000000;
         uint64_t val = 0x1000000000000008 | prevCtrl;
         set_ctrl(val);
+        #if (__NPU_ARCH__ == 3510)
+            set_loop3_para(static_cast<uint64_t>(1));
+        #endif
         #if (__NPU_ARCH__ == 5102)
             InitCoupledArchSpr();
         #else
