@@ -1,8 +1,8 @@
 # 矩阵数据搬入至L1 Buffer<a id="ZH-CN_TOPIC_0000002538071198"></a>
 
-- **[GMToL1 Load2D指令搬运](GMToL1-Load2D指令搬运.md)**
+- **[GMToL1 LoadData 2D指令搬运](GMToL1-LoadData 2D指令搬运.md)**
 
-- **[GMToL1 Load2DV2指令搬运](GMToL1-Load2DV2指令搬运.md)**
+- **[GMToL1 LoadData 2DV2指令搬运](GMToL1-LoadData 2DV2指令搬运.md)**
 
 - **[GMToL1连续数据搬运（DataCopy）](GMToL1连续数据搬运（DataCopy）.md)**
 
