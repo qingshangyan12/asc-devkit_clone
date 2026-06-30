@@ -57,6 +57,25 @@
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
+**表1**  模板参数说明
+
+<a name="table012895562310"></a>
+<table><thead align="left"><tr id="row2128195532318"><th class="cellrowborder" valign="top" width="12.65%" id="mcps1.2.3.1.1"><p id="p1212885512232"><a name="p1212885512232"></a><a name="p1212885512232"></a>参数名称</p>
+</th>
+<th class="cellrowborder" valign="top" width="87.35000000000001%" id="mcps1.2.3.1.2"><p id="p16129155552315"><a name="p16129155552315"></a><a name="p16129155552315"></a>含义</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row6129355182310"><td class="cellrowborder" valign="top" width="12.65%" headers="mcps1.2.3.1.1 "><p id="p81291855102318"><a name="p81291855102318"></a><a name="p81291855102318"></a>T</p>
+</td>
+<td class="cellrowborder" valign="top" width="87.35000000000001%" headers="mcps1.2.3.1.2 "><p id="p14983161812418"><a name="p14983161812418"></a><a name="p14983161812418"></a>待获取Tensor的数据类型，支持的类型请见<a href="../../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>相关描述。</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+**表2**  接口参数说明
+
 <a name="table1794522316251"></a>
 <table><thead align="left"><tr id="row19456238252"><th class="cellrowborder" valign="top" width="12.36%" id="mcps1.1.4.1.1"><p id="p119458239258"><a name="p119458239258"></a><a name="p119458239258"></a>参数名</p>
 </th>

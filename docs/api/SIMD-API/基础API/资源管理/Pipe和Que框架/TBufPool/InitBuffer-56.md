@@ -40,6 +40,7 @@
 
 ```
 template <class T> __aicore__ inline bool InitBuffer(T& que, uint8_t num, uint32_t len)
+
 template <TPosition pos> __aicore__ inline bool InitBuffer(TBuf<pos>& buf, uint32_t len)
 ```
 
@@ -67,7 +68,7 @@ template <TPosition pos> __aicore__ inline bool InitBuffer(TBuf<pos>& buf, uint3
 </tbody>
 </table>
 
-**表2**  InitBuffer\(T& que, uint8\_t num, uint32\_t len\)原型定义参数说明
+**表2**  为TQue分配内存接口参数说明
 
 <a name="table193329316393"></a>
 <table><thead align="left"><tr id="row123331131153919"><th class="cellrowborder" valign="top" width="12.36%" id="mcps1.2.4.1.1"><p id="p8333133153913"><a name="p8333133153913"></a><a name="p8333133153913"></a>参数名称</p>
@@ -102,7 +103,7 @@ template <TPosition pos> __aicore__ inline bool InitBuffer(TBuf<pos>& buf, uint3
 </tbody>
 </table>
 
-**表3**  InitBuffer\(TBuf<pos\>& buf, uint32\_t len\)原型定义参数说明
+**表3**  为TBuf分配内存接口参数说明
 
 <a name="table5376122715308"></a>
 <table><thead align="left"><tr id="row1337716275309"><th class="cellrowborder" valign="top" width="12.36%" id="mcps1.2.4.1.1"><p id="p1537762711305"><a name="p1537762711305"></a><a name="p1537762711305"></a>参数名称</p>

@@ -54,7 +54,24 @@
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表1**  接口参数说明
+**表1**  模板参数说明
+
+<a name="table012895562310"></a>
+<table><thead align="left"><tr id="row2128195532318"><th class="cellrowborder" valign="top" width="12.65%" id="mcps1.2.3.1.1"><p id="p1212885512232"><a name="p1212885512232"></a><a name="p1212885512232"></a>参数名称</p>
+</th>
+<th class="cellrowborder" valign="top" width="87.35000000000001%" id="mcps1.2.3.1.2"><p id="p16129155552315"><a name="p16129155552315"></a><a name="p16129155552315"></a>含义</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row6129355182310"><td class="cellrowborder" valign="top" width="12.65%" headers="mcps1.2.3.1.1 "><p id="p81291855102318"><a name="p81291855102318"></a><a name="p81291855102318"></a>T</p>
+</td>
+<td class="cellrowborder" valign="top" width="87.35000000000001%" headers="mcps1.2.3.1.2 "><p id="p14983161812418"><a name="p14983161812418"></a><a name="p14983161812418"></a>待获取Tensor的数据类型，支持的类型请见<a href="../../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>相关描述。</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+**表2**  接口参数说明
 
 <a name="table1794522316251"></a>
 <table><thead align="left"><tr id="row19456238252"><th class="cellrowborder" valign="top" width="12.36%" id="mcps1.2.4.1.1"><p id="p119458239258"><a name="p119458239258"></a><a name="p119458239258"></a>参数名称</p>
@@ -76,7 +93,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="12.379999999999999%" headers="mcps1.2.4.1.2 "><p id="p6249142931114"><a name="p6249142931114"></a><a name="p6249142931114"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="75.26%" headers="mcps1.2.4.1.3 "><p id="p18111121482617"><a name="p18111121482617"></a><a name="p18111121482617"></a>搬运参数，DataCopyParams类型，DataCopyParams结构定义请参考<a href="#table9182515919">表2</a>。</p>
+<td class="cellrowborder" valign="top" width="75.26%" headers="mcps1.2.4.1.3 "><p id="p18111121482617"><a name="p18111121482617"></a><a name="p18111121482617"></a>搬运参数，DataCopyParams类型，DataCopyParams结构定义请参考<a href="#table9182515919">表3</a>。</p>
 </td>
 </tr>
 <tr id="row138643616158"><td class="cellrowborder" valign="top" width="12.36%" headers="mcps1.2.4.1.1 "><p id="p1986436201513"><a name="p1986436201513"></a><a name="p1986436201513"></a>readSize</p>
@@ -96,7 +113,7 @@
 </tbody>
 </table>
 
-**表2**  DataCopyParams结构体参数定义
+**表3**  DataCopyParams结构体参数定义
 
 <a name="table9182515919"></a>
 <table><thead align="left"><tr id="row151816516917"><th class="cellrowborder" valign="top" width="15%" id="mcps1.2.3.1.1"><p id="p18182513916"><a name="p18182513916"></a><a name="p18182513916"></a>参数名称</p>

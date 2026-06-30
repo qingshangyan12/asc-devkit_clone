@@ -36,6 +36,10 @@
 
 通过Tpipe::InitBufPool接口可划分出整块资源，整块TbufPool资源可以继续通过TBufPool::InitBufPool接口划分成小块资源。
 
+资源分配的非共享模式与共享模式：
+- 非共享模式：从Tpipe中划分出一块新的资源池。
+- 共享模式：从Tpipe划分出的新资源池与其他资源池共享起始地址及长度。
+
 ## 函数原型<a name="section620mcpsimp"></a>
 
 -   非共享模式
@@ -76,7 +80,7 @@
 </tbody>
 </table>
 
-**表2**  InitBufPool\(T& bufPool, uint32\_t len\)原型定义参数说明
+**表2**  非共享模式接口参数说明
 
 <a name="table1960411494236"></a>
 <table><thead align="left"><tr id="row17605204922320"><th class="cellrowborder" valign="top" width="12.36%" id="mcps1.2.4.1.1"><p id="p6605649122315"><a name="p6605649122315"></a><a name="p6605649122315"></a>参数名称</p>
@@ -104,7 +108,7 @@
 </tbody>
 </table>
 
-**表3**  InitBufPool\(T& bufPool, uint32\_t len, U& shareBuf\)原型定义参数说明
+**表3**  共享模式接口参数说明
 
 <a name="table5376122715308"></a>
 <table><thead align="left"><tr id="row1337716275309"><th class="cellrowborder" valign="top" width="12.36%" id="mcps1.2.4.1.1"><p id="p1537762711305"><a name="p1537762711305"></a><a name="p1537762711305"></a>参数名称</p>
@@ -141,9 +145,9 @@
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-1.  新划分的资源池与被复用资源池的物理内存需要一致，两者共享起始地址及长度；
-2.  输入长度需要小于等于被复用资源池长度；
-3.  其他泛用约束参考[TBufPool](TBufPool.md)；
+- 新划分的资源池与被复用资源池的物理内存需要一致，两者共享起始地址及长度；
+- 输入长度需要小于等于被复用资源池长度；
+- 其他泛用约束参考[TBufPool](TBufPool.md)；
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

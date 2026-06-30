@@ -1,5 +1,11 @@
 # 避免bank冲突（NPU架构版本3510）<a name="ZH-CN_TOPIC_0000002531242067"></a>
 
+【优先级】中
+
+>[!NOTE]说明 
+>该性能优化建议适用于如下产品型号：
+>- Ascend 950PR/Ascend 950DT
+
 Unified Buffer缓存总大小为256KB，包含8个bank group，每个bank group包含2个bank。每个bank大小为16KB，由512行组成，每行长度为32B，采用低位地址交织。
 
 UB的地址编码格式：
@@ -17,7 +23,7 @@ UB_ADDR[18:0] = {BANK_DEPTH[8:0], BANK[0], BG[2:0], BANK_WIDTH[4:0]}
 
 ![](../../../../figures/低位交织地址排布.png "低位交织地址排布")
 
-每个bank可分为4个subbank，每个subbank宽度为8B，subnbank仅在gather/scatter场景被感知，连续读写只感知到bank。
+每个bank可分为4个subbank，每个subbank宽度为8B，subbank仅在gather/scatter场景被感知，连续读写只感知到bank。
 
 **图3** subbank结构
 
