@@ -393,14 +393,6 @@ UB 18 位地址编码遵循如下规则：
 
   > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
-- 一键测试全部场景
-
-  在本样例目录下执行如下命令。
-
-  ```bash
-  bash test.sh    # 测试 SCENARIO_NUM 1~8 全部场景
-  ```
-
 - 单个场景测试
 
   ```bash

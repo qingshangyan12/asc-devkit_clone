@@ -393,14 +393,6 @@ Execute the following steps in the root directory of this sample to build and ru
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation path is specified, the default installation location is `/usr/local/Ascend`.
 
-- One-click test for all scenarios
-
-  Run the following command in this sample directory.
-
-  ```bash
-  bash test.sh    # Test all scenarios SCENARIO_NUM 1~8
-  ```
-
 - Single scenario test
 
   ```bash
