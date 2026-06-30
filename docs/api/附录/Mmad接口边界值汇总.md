@@ -1,8 +1,14 @@
 # Mmad接口边界值汇总<a name="ZH-CN_TOPIC_0000002607849175"></a>
 
-<cann-filter npu-type="A3,910b">
+<cann-filter npu-type="950,A3,910b">
 
 本节汇总介绍了Mmad计算接口在边界值输入下的输出结果，以下内容针对如下型号生效：
+
+<cann-filter npu-type="950">
+
+- Ascend 950PR/Ascend 950DT
+
+</cann-filter>
 
 <cann-filter npu-type="A3">
 
@@ -42,8 +48,6 @@
 
 注：
 
-（1）INF/NAN模式（非饱和模式）下，乘法阶段：inf\*非零值输出inf，inf\*0输出nan，输入包含nan时输出为nan。加法阶段：正负inf相加时输出为nan。
-
-（2）饱和模式下，+inf按照数据类型取对应max，-inf按照数据类型取对应min值参与计算，nan值按照0参与计算。
+INF/NAN模式（非饱和模式）下，乘法阶段：inf\*非零值输出inf，inf\*0输出nan，输入包含nan时输出为nan。加法阶段：正负inf相加时输出为nan。
 
 </cann-filter>
