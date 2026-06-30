@@ -12,6 +12,17 @@
  * \file integral_constant.h
  * \brief
  */
+
+#include "enable_if.h" 
+#include "is_const.h" 
+#include "../algorithm/max.h" 
+#include "../algorithm/min.h" 
+#include "../cmath/divide.h" 
+#include "../cmath/ceil_division.h" 
+#include "../cmath/ceil_align.h" 
+#include "../cmath/sqrt.h" 
+#include "is_integral.h"
+
 #ifndef IMPL_STD_ASCENDC_STD_INTEGRAL_CONSTANT_IMPL__H
 #define IMPL_STD_ASCENDC_STD_INTEGRAL_CONSTANT_IMPL__H
 
