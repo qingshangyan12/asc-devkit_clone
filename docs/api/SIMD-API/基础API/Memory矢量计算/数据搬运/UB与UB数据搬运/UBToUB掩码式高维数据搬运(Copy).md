@@ -149,10 +149,17 @@
     | dstRepeatSize | [0, 4095] |
     | srcRepeatSize | [0, 4095] |
 
-- <!-- npu="A3,910b" id19 -->repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
-  - <!-- npu="A3" id16 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品<!-- end id16 -->
-  - <!-- npu="910b" id17 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id17 -->
-  - <!-- npu="950" id18 -->Ascend 950PR/Ascend 950DT<!-- end id18 -->
+<!-- npu="A3,910b" id19 -->
+- repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
+  <!-- npu="A3" id16 -->
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  <!-- end id16 -->
+  <!-- npu="910b" id17 -->
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  <!-- end id17 -->
+  <!-- npu="950" id18 -->
+  - Ascend 950PR/Ascend 950DT
+  <!-- end id18 -->
 <!-- end id19 -->
 
 - Copy和矢量计算API一样，支持和掩码操作API配合使用。但Counter模式配合高维切分计算API时，和[通用的Counter模式](../../SIMD计算说明/掩码/接口内设置Mask.md)有一定差异。具体差异如下：

@@ -361,7 +361,9 @@ enum class RoundMode {
 - 当dst或src为int4b\_t时，由于一个int4b\_t只占半个字节，故申请Tensor空间时，只需申请相同数量的int8\_t数据空间的一半。host侧目前暂不支持int4b\_t，故在申请int4b\_t类型的tensor时，应先申请一个类型为int8\_t的tensor，再用Reinterpretcast接口转化为int4b\_t类型的tensor，接着调用Cast指令。
 - 当dst或src为int4b\_t时，tensor高维切分计算接口的连续模式的mask与tensor前n个数据计算接口的count必须为偶数；对于tensor高维切分计算接口的逐bit模式，对应同一字节的相邻两个比特位的数值必须一致，即0-1位数值一致，2-3位数值一致，4-5位数值一致，以此类推。
 - int32\_t到half数据类型的转换，设置舍入模式无效，需要与[SetDeqScale](寄存器配置说明/SetDeqScale.md)接口配合使用。
-- <!-- npu="950" id18 -->针对Ascend 950PR/Ascend 950DT，complex32/complex64/double数据类型仅支持tensor前n个数据计算接口。<!-- end id18 -->
+<!-- npu="950" id18 -->
+- 针对Ascend 950PR/Ascend 950DT，complex32/complex64/double数据类型仅支持tensor前n个数据计算接口。
+<!-- end id18 -->
 <!-- npu="A3,910b,950" id23 -->
 - 当参数count或repeatTime取值为0时，该接口的行为如下：
     <!-- npu="A3,910b" id21 -->

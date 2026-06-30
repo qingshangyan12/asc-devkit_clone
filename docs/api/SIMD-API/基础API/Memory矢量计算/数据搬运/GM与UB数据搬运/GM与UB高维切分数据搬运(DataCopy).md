@@ -44,7 +44,9 @@
     - GM -> VECIN
 - Unified Buffer -> Global Memory
     - VECOUT -> GM
-    - <!-- npu="310p" id10 -->CO2 -> GM（仅Atlas 推理系列产品AI Core支持）<!-- end id10 -->
+    <!-- npu="310p" id10 -->
+    - CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
+    <!-- end id10 -->
 
 ## 函数原型<a name="section1954364615315"></a>
 
@@ -186,10 +188,17 @@
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - 位于Global Memory的地址必须1字节对齐，位于Unified Buffer的地址必须32字节对齐。
-- <!-- npu="A3,910b,950" id23 -->当DataCopyParams结构体参数blockCount、blockLen任意一个值为0时，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
-  - <!-- npu="A3" id20 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品<!-- end id20 -->
-  - <!-- npu="910b" id21 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id21 -->
-  - <!-- npu="950" id22 -->Ascend 950PR/Ascend 950DT<!-- end id22 -->
+<!-- npu="A3,910b,950" id23 -->
+- 当DataCopyParams结构体参数blockCount、blockLen任意一个值为0时，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
+  <!-- npu="A3" id20 -->
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  <!-- end id20 -->
+  <!-- npu="910b" id21 -->
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  <!-- end id21 -->
+  <!-- npu="950" id22 -->
+  - Ascend 950PR/Ascend 950DT
+  <!-- end id22 -->
 <!-- end id23 -->
 - DataCopyParams结构体参数的值需在取值范围内：
 

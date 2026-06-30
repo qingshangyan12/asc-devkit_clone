@@ -2,47 +2,52 @@
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
+### 不支持数据搬运模式mode的原型
+
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：不支持数据搬运模式mode的原型：支持
+- Ascend 950PR/Ascend 950DT：支持
 <!-- end id1 -->
-<!-- npu="950" id2 -->
-- Ascend 950PR/Ascend 950DT：支持数据搬运模式mode的原型：支持
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
 <!-- end id2 -->
-<!-- npu="A3" id3 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持数据搬运模式mode的原型：支持
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
 <!-- end id3 -->
-<!-- npu="A3" id4 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持数据搬运模式mode的原型：不支持
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：支持
 <!-- end id4 -->
-<!-- npu="910b" id5 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持数据搬运模式mode的原型：支持
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
 <!-- end id5 -->
-<!-- npu="910b" id6 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持数据搬运模式mode的原型：不支持
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
 <!-- end id6 -->
-<!-- npu="310b" id7 -->
-- Atlas 200I/500 A2 推理产品：不支持数据搬运模式mode的原型：支持
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
 <!-- end id7 -->
-<!-- npu="310b" id8 -->
-- Atlas 200I/500 A2 推理产品：支持数据搬运模式mode的原型：不支持
+
+### 支持数据搬运模式mode的原型
+
+<!-- npu="950" id8 -->
+- Ascend 950PR/Ascend 950DT：支持
 <!-- end id8 -->
-<!-- npu="310p" id9 -->
-- Atlas 推理系列产品AI Core：不支持数据搬运模式mode的原型：不支持
+<!-- npu="A3" id9 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
 <!-- end id9 -->
-<!-- npu="310p" id10 -->
-- Atlas 推理系列产品AI Core：支持数据搬运模式mode的原型：不支持
+<!-- npu="910b" id10 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
 <!-- end id10 -->
-<!-- npu="310p" id11 -->
-- Atlas 推理系列产品Vector Core：不支持数据搬运模式mode的原型：不支持
+<!-- npu="310b" id11 -->
+- Atlas 200I/500 A2 推理产品：不支持
 <!-- end id11 -->
 <!-- npu="310p" id12 -->
-- Atlas 推理系列产品Vector Core：支持数据搬运模式mode的原型：不支持
+- Atlas 推理系列产品AI Core：不支持
 <!-- end id12 -->
-<!-- npu="910" id13 -->
-- Atlas 训练系列产品：不支持数据搬运模式mode的原型：不支持
+<!-- npu="310p" id13 -->
+- Atlas 推理系列产品Vector Core：不支持
 <!-- end id13 -->
 <!-- npu="910" id14 -->
-- Atlas 训练系列产品：支持数据搬运模式mode的原型：不支持
+- Atlas 训练系列产品：不支持
 <!-- end id14 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -183,10 +188,17 @@
 
     <!-- end id20 -->
 
-- <!-- npu="A3,910b,950" id24 -->当DataCopyExtParams结构体参数blockCount、blockLen任意一个值为0时，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
-  - <!-- npu="A3" id21 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品<!-- end id21 -->
-  - <!-- npu="910b" id22 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id22 -->
-  - <!-- npu="950" id23 -->Ascend 950PR/Ascend 950DT<!-- end id23 -->
+<!-- npu="A3,910b,950" id24 -->
+- 当DataCopyExtParams结构体参数blockCount、blockLen任意一个值为0时，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
+  <!-- npu="A3" id21 -->
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  <!-- end id21 -->
+  <!-- npu="910b" id22 -->
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  <!-- end id22 -->
+  <!-- npu="950" id23 -->
+  - Ascend 950PR/Ascend 950DT
+  <!-- end id23 -->
 <!-- end id24 -->
 
 ## 调用示例<a name="section177231425115410"></a>

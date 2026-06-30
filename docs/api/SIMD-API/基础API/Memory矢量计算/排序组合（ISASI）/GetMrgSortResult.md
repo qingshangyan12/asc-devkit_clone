@@ -34,13 +34,21 @@
 
     以上说明适用于如下型号：
 
-    <!-- npu="950" id8 -->Ascend 950PR/Ascend 950DT<!-- end id8 -->
+    <!-- npu="950" id8 -->
+    Ascend 950PR/Ascend 950DT
+    <!-- end id8 -->
 
-    <!-- npu="A3" id9 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品<!-- end id9 -->
+    <!-- npu="A3" id9 -->
+    Atlas A3 训练系列产品/Atlas A3 推理系列产品
+    <!-- end id9 -->
 
-    <!-- npu="910b" id10 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id10 -->
+    <!-- npu="910b" id10 -->
+    Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    <!-- end id10 -->
 
-    <!-- npu="310b" id11 -->Atlas 200I/500 A2 推理产品<!-- end id11 -->
+    <!-- npu="310b" id11 -->
+    Atlas 200I/500 A2 推理产品
+    <!-- end id11 -->
 
 <!-- end id12 -->
 

@@ -97,7 +97,9 @@ def Duplicate(scalarValue, dst, count):
 | ------ | ------ | ------ |
 | dst | 输出 | 目的操作数，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT（存储位置为Unified Buffer）。LocalTensor的起始地址需要按照32字节对齐。|
 | scalarValue | 输入 | 被复制的源操作数，数据类型需与dst中元素的数据类型保持一致。|
-|<!-- npu="950" id11 --> src | 输入| 源操作数，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>数据类型需与dst中元素的数据类型保持一致。<br>当传入该参数时，会将src[0]复制多次并填充到向量中。<!-- end id11 -->|
+<!-- npu="950" id11 --> 
+| src | 输入| 源操作数，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>数据类型需与dst中元素的数据类型保持一致。<br>当传入该参数时，会将src[0]复制多次并填充到向量中。|
+<!-- end id11 -->
 | count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。|
 | mask/mask[] | 输入 | mask用于控制每次迭代内参与计算的元素。<br>设置详见[掩码操作](../掩码操作/掩码操作.md)。 |
 | repeatTime | 输入 | 指令迭代次数，每次迭代完成8个DataBlock的数据收集，取值范围：repeatTime∈[0,255]。|
@@ -108,7 +110,6 @@ def Duplicate(scalarValue, dst, count):
 
 <!-- npu="950" id12 -->
 - 针对Ascend 950PR/Ascend 950DT，T支持的数据类型为：bool、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、complex64。其中，bool、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、fp8_e8m0_t、complex32、int64_t、uint64_t、complex64数据类型仅支持tensor前n个数据计算接口。
-  - 其中，bool、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、 complex32、int64_t、uint64_t、complex64数据类型仅支持tensor前n个数据计算接口。
 <!-- end id12 -->
 <!-- npu="A3" id13 -->
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
