@@ -46,7 +46,7 @@ __global__ __cube__ void matmul_custom(...)
 ### 矩阵计算内存布局
 
 矩阵计算单元采用分块计算逻辑，其中16×16是矩阵计算单元分形的基本粒度（对于half数据类型；int8类型为16×32或32×16；fp32类型分形为16×8），硬件可以并行处理多个矩阵计算单元。在传统的线性存储布局（如行主序或列主序）中，数据按行或列连续存放。当需要读取一个16×16的矩形数据块时，若直接从内存中获取，则需访问不连续的多个内存地址以逐行“收集”数据，这种非连续访问会导致内存效率显著下降。
-为解决上述问题，引入了矩阵分形存储格式。该格式通过软件层对数据进行重排，使每个16×16计算块在物理内存中连续存放。硬件仅需发起一次连续读取，即可将整个数据块加载至片上寄存器，避免了多地址寻址开销，从而大幅提升矩阵计算单元的数据吞吐率。**对于half数据类型，16×16是矩阵计算单元的基本分形粒度，当前支持Cube计算的产品型号包括NPU架构版本2201和NPU架构版本3510。**
+为解决上述问题，引入了矩阵分形存储格式。该格式通过软件层对数据进行重排，使每个16×16计算块在物理内存中连续存放。硬件仅需发起一次连续读取，即可将整个数据块加载至片上寄存器，避免了多地址寻址开销，从而大幅提升矩阵计算单元的数据吞吐率。对于half数据类型，16×16是矩阵计算单元的基本分形粒度，当前支持Cube计算的产品型号包括NPU架构版本2201和NPU架构版本3510。
 昇腾AI处理器的矩阵计算单元为追求极高的数据吞吐率与计算密度，采用了专有的硬件架构设计。与通用CPU常用的连续线性存储不同，该单元要求输入输出数据必须符合特定的分形存储格式。在使用Ascend C的Mmad类接口进行算子开发时，深入理解这些数据格式对于实现正确的数据搬运、分块及性能优化至关重要。
 为便于理解与记忆，文档采用“大Y小x”的直观命名法：
  - 大Y（Z/N）：表示分形矩阵之间的排列顺序（Z为行主序，N为列主序）。
@@ -58,7 +58,7 @@ __global__ __cube__ void matmul_custom(...)
 为了适配矩阵计算单元的物理读取路径，不同的产品形态有不同的格式要求：
 针对NPU架构版本2201，矩阵乘法C = A × B要求：左矩阵A使用Zz格式，右矩阵B使用Zn格式，结果矩阵C使用Nz格式，如下图所示：
 
-<img src="../../../../figures/矩阵乘法场景设计的数据格式.png" alt="矩阵乘法场景设计的数据格式" width="800" />
+<img src="../../../../figures/矩阵乘法场景设计的数据格式.png" alt="矩阵乘法场景涉及的数据格式" width="800" />
 
 针对NPU架构版本3510，矩阵乘法C = A × B要求：左矩阵A使用Nz格式，右矩阵B使用Zn格式，结果矩阵C使用Nz格式，如下图所示：
 
@@ -185,7 +185,7 @@ AscendC::LoadData(l0a_buffer, l1_buffer, l12l0Params);
 
 搬运到L0B Buffer采用同样的`LoadData`接口实现，接口参数及实现功能同L12L0A，可参考[矩阵计算的搬入](../../../../../api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵计算的搬入.md)查看更多内容。
 
-当输入A矩阵（GM）是转置排布(K×M)时，搬入到L1 Buffer为(K×M)排布的Nz分形。要使L0A Buffer存放(M×K)的Zz或Nz格式（NPU架构版本3510），需要在L12L0A时进行转置，调用带transpose参数的接口。
+当输入A矩阵（GM）是转置排布(K×M)时，搬入到L1 Buffer为(K×M)排布的Nz分形。要使L0A Buffer存放(M×K)的Zz或Nz格式（[[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)](../../../语言扩展层/SIMD-BuiltIn关键字.md)），需要在L12L0A时进行转置，调用带transpose参数的接口。
 
 <img src="../../../../figures/需要转置的处理场景.png" alt="需要转置的处理场景" width="800" />
 
@@ -274,9 +274,9 @@ AscendC::SetFixpipePreQuantFlag(deqScalar);
 
 `Mmad`是Ascend C封装NPU硬件计算能力的矩阵乘加核心接口，用于全连接层、卷积层等算子开发，实现C = A × B + C的矩阵乘加计算（输入为L0A Buffer和L0B Buffer，输出为L0C Buffer），其中针对NPU架构版本2201，L0A Buffer分形为Zz、L0B Buffer分形为Zn、L0C Buffer分形为Nz，而NPU架构版本3510产品L0A Buffer分形为Nz。
 
-![NPU架构版本3510 `Mmad`计算](../../../../figures/Ascend950PR-Ascend950DT-asc_mmad计算.png)
+![[[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)](../../../语言扩展层/SIMD-BuiltIn关键字.md) `Mmad`计算](../../../../figures/Ascend950PR-Ascend950DT-asc_mmad计算.png)
 
-**表 矩阵乘计算A、B、C矩阵说明（NPU架构版本3510）**
+**表 矩阵乘计算A、B、C矩阵说明（[[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)](../../../语言扩展层/SIMD-BuiltIn关键字.md)）**
 
 | 矩阵 | 存储位置 | 维度 | 数据格式 | 数据类型 |
 |---|---|---|---|---|
@@ -386,7 +386,7 @@ __global__ __cube__ void matmul_kernel(__gm__ float* x, __gm__ float* y, __gm__ 
 
 NPU架构版本3510在Tensor基础上引入Layout布局概念，将Shape和Stride移到编译期确定，实现类型安全和分形布局自动生成。开发者只需定义Tensor的Layout，搬运和计算接口自动推断底层参数，大幅降低矩阵算子开发难度。
 
-> 📌 扩展Tensor（带有Layout）能力从**NPU架构版本3510**开始支持。
+> 📌 扩展Tensor（带有Layout）能力从**[[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)](../../../语言扩展层/SIMD-BuiltIn关键字.md)**开始支持。
 
 ### Layout的层次化表述
 
@@ -493,7 +493,10 @@ AscendC::Te::Copy(l1Tensor, globalBias.Slice(AscendC::Te::MakeCoord(0, j * baseN
 // Create custom CopyAtom based on OP, CopyGM2L1 implements custom GM->L1 copy capability
 auto atomCopy = AscendC::Te::MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
 AscendC::Te::Copy(atomCopy, dstTensor, srcTensor);
+```
 
+- **L0C2GM搬出**: 基于CopyTraits定制随路处理（如Fixpipe量化），将L0C Buffer计算结果搬出至GM。
+```cpp
 // Fixpipe inline quantization example
 AscendC::Te::Copy(CopyAtom<CopyTraits<CopyL0C2GM, FixpipeTraitDefault>>{}, globalC, l0CTensor, quantScalar);
 ```

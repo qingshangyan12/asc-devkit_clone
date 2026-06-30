@@ -8,7 +8,7 @@ C++ Tensor编程是Ascend C SIMD编程路径的基础编程接口，基于Tensor
 
 ## 内存层级
 
-AI Core采用分级存储架构，Cube矩阵计算采用「Global Memory（以下简称为GM） → L1/L0系列Buffer」两级层级服务于矩阵计算，Vector矢量计算传统架构为「Global Memory → Unified Buffer（以下简称为UB）」两级层级，而[NPU架构版本3510](../../../../高级编程/硬件实现/架构规格/NPU架构版本3510.md)引入寄存器后构建「GM → UB → Register」三级层级，其中GM存放输入输出数据、UB作为矢量计算中间缓存、Register位于Vector计算单元最内层直接与执行单元交互。
+AI Core采用分级存储架构，Cube矩阵计算采用「Global Memory（以下简称为GM） → L1/L0系列Buffer」两级层级服务于矩阵计算，Vector矢量计算传统架构为「Global Memory → Unified Buffer（以下简称为UB）」两级层级，而[[[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)](../../../语言扩展层/SIMD-BuiltIn关键字.md)](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入寄存器后构建「GM → UB → Register」三级层级，其中GM存放输入输出数据、UB作为矢量计算中间缓存、Register位于Vector计算单元最内层直接与执行单元交互。
 
 <img src="../../../../figures/AI_Core存储层次结构_c.png" alt="AI Core存储层次结构" width="800" />
 
@@ -16,7 +16,7 @@ AI Core采用分级存储架构，Cube矩阵计算采用「Global Memory（以�
 
 Tensor本质是基于数组的编程抽象，而非简单的内存地址封装，通过数组方式管理内存并执行计算，更匹配SIMD硬件执行模型。其核心思想是将原始内存地址抽象为Tensor对象，实现从“地址操作”到“对象管理”的编程层次提升。
 
-根据芯片分级存储架构，Tensor分为三类：**GlobalTensor**对应GM，存放算子输入/输出数据；**LocalTensor**对应片上内存（UB、L1 Buffer、L0A Buffer/L0B Buffer/L0C Buffer等缓冲区），承载计算过程数据；**RegTensor**对应寄存器，用于寄存器级矢量计算（NPU架构版本3510引入）。Tensor体系持续演进：基础Tensor仅携带数据指针和大小信息，需手动传递操作参数；扩展Tensor引入Layout概念，携带Shape和Stride信息，接口可自动推导搬运长度、计算元素数等参数，大幅降低编程复杂度。
+根据芯片分级存储架构，Tensor分为三类：**GlobalTensor**对应GM，存放算子输入/输出数据；**LocalTensor**对应片上内存（UB、L1 Buffer、L0A Buffer/L0B Buffer/L0C Buffer等缓冲区），承载计算过程数据；**RegTensor**对应寄存器，用于寄存器级矢量计算（NPU架构版本3510引入）。Tensor体系持续演进：基础Tensor仅携带数据指针和大小信息，需手动传递操作参数；扩展Tensor（Tensor API）引入Layout概念，携带Shape和Stride信息，接口可自动推导搬运长度、计算元素数等参数，大幅降低编程复杂度。该能力引入的接口统一通过`AscendC::Te`命名空间调用（如`AscendC::Te::Mmad`）。
 
 #### 基础Tensor与扩展Tensor抽象定义
 
@@ -114,7 +114,7 @@ GM作为大容量全局内存，用于Host与Device交互及算子输入输出�
 
 ### 内部存储
 
-AI Core包含三类计算单元：Cube负责矩阵计算、Vector负责矢量计算、Scalar负责标量计算。计算前需将数据从外部存储加载到内部存储，不同存储单元服务不同计算单元：UB支撑矢量计算，L1 Buffer和L0 Buffer支撑矩阵计算。
+AI Core包含三类计算单元：Cube负责矩阵计算、Vector负责矢量计算、Scalar负责标量计算。计算前需将数据从外部存储加载到内部存储，不同存储单元服务不同计算单元：UB支撑矢量计算，L1 Buffer和L0A/L0B Buffer支撑矩阵计算。
 
 #### AIV内部存储之UB
 
@@ -149,7 +149,7 @@ __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm
 ```
 > 📌 其中AscendC::TPosition::VECCALC为对物理位置的逻辑抽象定义，与物理位置的映射参考文件[逻辑位置和物理存储的映射](../../../../../api/SIMD-API/通用说明和约束.md)。
 
-相比基础Tensor，NPU架构版本3510引入Layout描述并将其作为Tensor的核心属性，开发者可在Tensor创建时直接关联Shape与Stride信息，简化多维数据的布局管理。通过`MakeTensor`，开发者可灵活指定内存地址和Layout布局，更便捷地描述ND、NZ等典型数据排布。
+相比基础Tensor，[Nc](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入Layout描述并将其作为Tensor的核心属性，开发者可在Tensor创建时直接关联Shape与Stride信息，简化多维数据的布局管理。通过`MakeTensor`，开发者可灵活指定内存地址和Layout布局，更便捷地描述ND、NZ等典型数据排布。
 
 ```cpp
 // UB buffer declaration
@@ -160,13 +160,13 @@ auto ubTensor = AscendC::Te::MakeTensor(ubPointer, AscendC::Te::MakeLayout(Ascen
 ```
 > 📌 UB地址必须32字节对齐，以匹配硬件总线粒度和SIMD计算单元并行度，非对齐访问将导致运行时错误。
 
-#### Register File
+#### AIV内部存储之Register File
 
 NPU架构版本3510引入寄存器可编程能力，Vector计算单元的所有计算均需经「GM → UB → Register」三级数据流转，在寄存器上完成矢量计算。C++ Tensor编程通过定义RegTensor方式进行寄存器编程。详见[Reg矢量计算编程](./Reg矢量计算编程.md)。
 
-> 📌 寄存器可编程能力从**NPU架构版本3510**引入。
+> 📌 寄存器可编程能力从**[[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)](../../../语言扩展层/SIMD-BuiltIn关键字.md)**引入。
 
-#### L1 Buffer & L0 Buffer
+#### AIC内部存储之L1 Buffer & L0 Buffer
 
 Cube计算单元专用的缓存为：L0A Buffer存储左矩阵，L0B Buffer存储右矩阵，L0C Buffer存储初始累加值及矩阵计算结果。L1 Buffer用于缓存矩阵计算输入数据。
 
@@ -183,7 +183,7 @@ Cube计算单元专用的缓存为：L0A Buffer存储左矩阵，L0B Buffer存�
 
 同UB的申请方式，开发者可通过LocalMemAllocator或直接构造LocalTensor来申请L1/L0 Buffer内存。为提升Cube计算效率，L1 Buffer和L0 Buffer采用分形格式。不同产品型号的分形格式存在差异：
 
-| 存储单元 | NPU架构版本2201 | NPU架构版本3510 |
+| 存储单元 | [NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md) | [[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)](../../../语言扩展层/SIMD-BuiltIn关键字.md) |
 |---------|----------------------------|---------------------------|
 | L1 Buffer | Nz | Nz |
 | L0A Buffer | Zz | Nz |
@@ -258,7 +258,7 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
 | **多流水同步（机制一）** | Mutex互斥锁用于核内异步流水间的同步，功能类似传统CPU锁机制。NPU架构版本3510新引入，比SetFlag/WaitFlag更简便。 | `Mutex::Lock` & `Mutex::Unlock` | `AscendC::Mutex::Lock<PIPE_MTE2>(mutexId);`<br>`AscendC::DataCopy(srcLocal, srcGlobal, dataSize);`<br>`AscendC::Mutex::Unlock<PIPE_MTE2>(mutexId);`<br>`AscendC::Mutex::Lock<PIPE_V>(mutexId);`<br>`AscendC::Add(dstLocal, src0Local, src1Local, dataSize);`<br>`AscendC::Mutex::Unlock<PIPE_V>(mutexId);` |
 | **多流水同步（机制二）** | SetFlag与WaitFlag实现两条流水间同步等待。引入Mutex后仍保持兼容，但优先推荐Mutex机制。 | `SetFlag` & `WaitFlag` | `AscendC::DataCopy(srcLocal, srcGlobal, dataSize);`<br>`AscendC::SetFlag<HardEvent::MTE2_V>(eventId);`<br>`AscendC::WaitFlag<HardEvent::MTE2_V>(eventId);`<br>`AscendC::Add(dstLocal, src0Local, src1Local, count);` |
 | **单流水同步** | PipeBarrier等待同一流水内前序指令完成，用于同一流水内的前后数据依赖。 | `PipeBarrier` | `AscendC::Add(dstLocal, src0Local, src1Local, count);`<br>`AscendC::PipeBarrier<PIPE_V>();`<br>`AscendC::Sub(dstLocal, dstLocal, src0Local, count);` |
-| 内存访问顺序控制 | 等待所有前序内存访问完成，用于存在数据依赖或内存依赖的场景。 | `DataSyncBarrier` | `AscendC::DataSyncBarrier<AscendC::MemDsbT::DDR>();` |
+| **内存访问顺序控制** | 等待所有前序内存访问完成，用于存在数据依赖或内存依赖的场景。 | `DataSyncBarrier` | `AscendC::DataSyncBarrier<AscendC::MemDsbT::DDR>();` |
 
 ### 核间同步
 
@@ -272,82 +272,15 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
 
 <img src="../../../../figures/block和subblock之间关系.png" alt="block和subblock之间关系" width="800" />
 
-算子按计算特征可划分为三类：Cube算子（矩阵计算）、Vector算子（矢量计算）和CV融合算子（矩阵与矢量混合计算）。算子类型决定了其核间同步方式与group配置模式的选择。针对不同算子场景，C++ Tensor编程提供了相应的编程接口，以满足多样化的算子开发需求。
+算子按计算特征可划分为三类：Cube算子（矩阵计算）、Vector算子（矢量计算）和CV融合算子（矩阵与矢量混合计算）。算子类型决定了其核间同步方式与group配置模式的选择。针对不同算子场景，C++ Tensor编程通过`CrossCoreSetFlag`和`CrossCoreWaitFlag`两个接口组合实现核间同步，以满足多样化的算子开发需求。
 
-<table>
-  <thead>
-    <tr>
-      <th>核间同步类型</th>
-      <th>场景说明</th>
-      <th>主要接口</th>
-      <th>实现代码示例</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>所有AIC核同步</strong></td>
-      <td><p>同步所有AIC核，通常用于对Cube算子计算结果进行多核累加操作。</p></td>
-      <td><pre><code>CrossCoreSetFlag
-                      CrossCoreWaitFlag</code></pre></td>
-      <td>
-        <code>if ASCEND_IS_AIC {</code><br>
-        <code>    AscendC::CrossCoreSetFlag&lt;0x0, PIPE_FIX&gt;(flagID);</code><br>
-        <code>    AscendC::CrossCoreWaitFlag(flagID);</code><br>
-        <code>}</code>
-      </td>
-    </tr>
-    <tr>
-      <td><strong>所有AIV核同步</strong></td>
-      <td><p>同步所有AIV核，通常用于对Vector算子计算结果进行多核累加操作。</p></td>
-      <td><code>CrossCoreSetFlag</code><br><code>CrossCoreWaitFlag</code></td>
-      <td>
-        <code>if ASCEND_IS_AIV {</code><br>
-        <code>    AscendC::CrossCoreSetFlag&lt;0x0, PIPE_MTE3&gt;(flagID);</code><br>
-        <code>    AscendC::CrossCoreWaitFlag(flagID);</code><br>
-        <code>}</code>
-      </td>
-    </tr>
-    <tr>
-      <td><strong>单个AI Core内两个AIV子核之间同步</strong></td>
-      <td><p>同步单个AI Core内两个AIV子核，通常用于Vector算子内需要分组进行同步的场景。</p></td>
-      <td><code>CrossCoreSetFlag</code><br><code>CrossCoreWaitFlag</code></td>
-      <td>
-        <code>if ASCEND_IS_AIV {</code><br>
-        <code>    AscendC::CrossCoreSetFlag&lt;0x1, PIPE_MTE3&gt;(flagID);</code><br>
-        <code>    AscendC::CrossCoreWaitFlag(flagID);</code><br>
-        <code>}</code>
-      </td>
-    </tr>
-    <tr>
-      <td><strong>单个AI Core内AIC与AIV同步</strong></td>
-      <td><p>同步单个AI Core内AIC与AIV核，通常用于CV融合算子中Cube与Vector间的交互操作。两个AIV同时触发AIC等待。</p></td>
-      <td><code>CrossCoreSetFlag</code><br><code>CrossCoreWaitFlag</code></td>
-      <td>
-        <code>if ASCEND_IS_AIC {</code><br>
-        <code>    AscendC::CrossCoreSetFlag&lt;0x2, PIPE_FIX&gt;(0);</code><br>
-        <code>}</code><br>
-        <code>if ASCEND_IS_AIV {</code><br>
-        <code>    AscendC::CrossCoreWaitFlag(0);</code><br>
-        <code>}</code>
-      </td>
-    </tr>
-    <tr>
-      <td><strong>单个AI Core内AIC与AIV同步（NPU架构版本3510新引入）</strong></td>
-      <td><p>同步单个AI Core内AIC与AIV核，通常用于CV融合算子中Cube与Vector间的交互操作。AIV0与AIV1可单独触发AIC等待。</p></td>
-      <td><code>CrossCoreSetFlag</code><br><code>CrossCoreWaitFlag</code></td>
-      <td>
-        <code>if ASCEND_IS_AIC {</code><br>
-        <code>    AscendC::CrossCoreSetFlag&lt;0x4, PIPE_FIX&gt;(0);</code><br>
-        <code>    AscendC::CrossCoreSetFlag&lt;0x4, PIPE_FIX&gt;(16);</code><br>
-        <code>}</code><br>
-        <code>if ASCEND_IS_AIV {</code><br>
-        <code>    AscendC::CrossCoreWaitFlag(0);</code><br>
-        <code>}</code>
-      </td>
-    </tr>
-
-  </tbody>
-</table>
+| 核间同步类型 | 场景说明 | 实现代码示例 |
+|---|---|---|
+| **所有AIC核同步** | 同步所有AIC核，通常用于对Cube算子计算结果进行多核累加操作。 | `if ASCEND_IS_AIC {`<br>`    AscendC::CrossCoreSetFlag<0x0, PIPE_FIX>(flagID);`<br>`    AscendC::CrossCoreWaitFlag(flagID);`<br>`}` |
+| **所有AIV核同步** | 同步所有AIV核，通常用于对Vector算子计算结果进行多核累加操作。 | `if ASCEND_IS_AIV {`<br>`    AscendC::CrossCoreSetFlag<0x0, PIPE_MTE3>(flagID);`<br>`    AscendC::CrossCoreWaitFlag(flagID);`<br>`}` |
+| **单个AI Core内两个AIV子核之间同步** | 同步单个AI Core内两个AIV子核，通常用于Vector算子内需要分组进行同步的场景。 | `if ASCEND_IS_AIV {`<br>`    AscendC::CrossCoreSetFlag<0x1, PIPE_MTE3>(flagID);`<br>`    AscendC::CrossCoreWaitFlag(flagID);`<br>`}` |
+| **单个AI Core内AIC与AIV同步** | 同步单个AI Core内AIC与AIV核，通常用于CV融合算子中Cube与Vector间的交互操作。两个AIV同时触发AIC等待。 | `if ASCEND_IS_AIC {`<br>`    AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0);`<br>`}`<br>`if ASCEND_IS_AIV {`<br>`    AscendC::CrossCoreWaitFlag(0);`<br>`}` |
+| **单个AI Core内AIC与AIV同步（NPU架构版本3510新引入）** | 同步单个AI Core内AIC与AIV核，通常用于CV融合算子中Cube与Vector间的交互操作。AIV0与AIV1可单独触发AIC等待。 | `if ASCEND_IS_AIC {`<br>`    AscendC::CrossCoreSetFlag<0x4, PIPE_FIX>(0);`<br>`    AscendC::CrossCoreSetFlag<0x4, PIPE_FIX>(16);`<br>`}`<br>`if ASCEND_IS_AIV {`<br>`    AscendC::CrossCoreWaitFlag(0);`<br>`}` |
 
 > 📌 基于分离模式（AIC和AIV分离）开发融合算子时，算子逻辑中通常同时包含AIV和AIC的处理逻辑，此时需要使用Ascend C提供的宏ASCEND_IS_AIV/ASCEND_IS_AIC来对AIV和AIC的代码进行隔离。
 >
@@ -383,7 +316,7 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 
 NPU架构版本3510新一代架构，引入寄存器可编程能力，在传统UB缓存体系的基础上，开放寄存器（Register）可编程能力，构建出「GM → UB → Register」的三级内存层级。新一代架构下的矢量计算都需要从UB加载到Register寄存器后，再利用Register寄存器进行计算操作。可参考[Reg矢量计算编程](./Reg矢量计算编程.md)中有关Reg矢量计算编程的描述。
 
-> 📌 寄存器可编程能力从**NPU架构版本3510**引入。
+> 📌 寄存器可编程能力从**Nc**引入。
 
 ### Cube矩阵计算
 

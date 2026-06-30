@@ -29,7 +29,7 @@ __global__ __vector__ void add_custom(...)
 
 ## Memory数据搬运
 
-Global Memory（GM）与UB之间的数据搬运提供了多样化的接口，支持丰富的数据搬运场景。为实现高效的Vector计算，系统支持将数据从GM搬运至UB，供Vector计算单元进行向量计算。计算完成后，再将结果从UB搬回GM，完成数据闭环。
+GM与UB之间的数据搬运提供了多样化的接口，支持丰富的数据搬运场景。为实现高效的Vector计算，系统支持将数据从GM搬运至UB，供Vector计算单元进行向量计算。计算完成后，再将结果从UB搬回GM，完成数据闭环。
 
 开发者通过灵活配置DataCopyParams参数，精确控制数据块数量、地址长度及间隔等关键属性，实现连续和非连续数据搬运（高维切分数据搬运），充分释放硬件的数据搬运与计算协同能力，提升向量算子的执行效率。
 
@@ -52,7 +52,7 @@ Global Memory（GM）与UB之间的数据搬运提供了多样化的接口，支
 AscendC::DataCopy(dstLocal, srcGlobal, 256);
 ```
 
-**高维切分搬运**: 当需要将多块非连续的Global Memory数据搬入单个UB时，可通过高维切分模式配置搬运数据块的数量、单个数据块长度及块间间隔。以srcGlobal数据（shape为256，数据类型为half）为例，如下场景的数据搬运可直接通过C++ Tensor接口实现：
+**高维切分搬运**: 当需要将多块非连续的GM数据搬入单个UB时，可通过高维切分模式配置搬运数据块的数量、单个数据块长度及块间间隔。以srcGlobal数据（shape为256，数据类型为half）为例，如下场景的数据搬运可直接通过C++ Tensor接口实现：
 
 <img src="../../../../figures/非连续搬运.png" alt="非连续搬运" width="800" />
 
@@ -61,16 +61,16 @@ AscendC::DataCopy(dstLocal, srcGlobal, 256);
 uint16_t blockCount = 2;
 // Length of single data block (in 32B units): value is 8
 uint16_t blockLen = 8;
-// Gap from previous block to next block in source data (in 32B units): source blocks are consecutive, value is 0
-uint16_t srcGap = 0;
-// Gap from previous block to next block in destination data (in 32B units): interval of one block between destination blocks, value is 1
-uint16_t dstGap = 1;
+// Gap from previous block to next block in source data (in 32B units): source blocks are consecutive, value is 1
+uint16_t srcGap = 1;
+// Gap from previous block to next block in destination data (in 32B units): interval of one block between destination blocks, value is 2
+uint16_t dstGap = 2;
 
 DataCopyParams copyParams {blockCount, blockLen, srcGap, dstGap};
 AscendC::DataCopy(dstLocal, srcGlobal, copyParams);
 ```
 
-**非对齐搬运**: 高维切分数据搬运提供了用户进行非连续多个数据块搬入的能力，但该接口要求`Global Memory`中搬运的长度和间隔都必须保证是32B对齐的，因此对于一些非对齐场景无法支持。例如需要进行如下图所示的搬运，则无法通过`DataCopy`高维切分接口完成隔行数据的搬运，此时需要突破32B的约束限制。Ascend C根据芯片能力，提供了`DataCopyPad`接口来支持该搬运形式，该接口可以指定以字节为单位的blockLen和stride信息，完成搬运操作。
+**非对齐搬运**: 高维切分数据搬运提供了用户进行非连续多个数据块搬入的能力，但该接口要求GM中搬运的长度和间隔都必须保证是32B对齐的，因此对于一些非对齐场景无法支持。例如需要进行如下图所示的搬运，则无法通过`DataCopy`高维切分接口完成隔行数据的搬运，此时需要突破32B的约束限制。Ascend C根据芯片能力，提供了`DataCopyPad`接口来支持该搬运形式，该接口可以指定以字节为单位的blockLen和stride信息，完成搬运操作。
 
 <img src="../../../../figures/非对齐搬入能力.png" alt="非对齐搬入能力" width="800" />
 
@@ -109,7 +109,7 @@ AscendC::DataCopyPad(dstLocal, srcGlobal, copyParams, padParams);
 Memory矢量计算提供连续计算和高维切分两种计算模式，并可通过掩码实现数据选择性参与计算。
 以Add接口为例，两种计算模式的调用方式示意图如下。其中连续计算简单直观，适合一维Tensor连续数据处理；高维切分计算灵活可控，支持迭代执行和地址间隔配置。开发者可根据实际业务需求选择合适的计算方式。
 
-<img src="../../../../figures/Memory 矢量计算模式示意图.png" alt="Memory矢量计算模式示意图" width="800" />
+<img src="../../../../figures/Memory矢量计算模式示意图.png" alt="Memory矢量计算模式示意图" width="800" />
 
 ### 高维切分计算
 
@@ -205,19 +205,14 @@ AscendC::Adds(dstLocal, src0Local, scalarValue, 1, { 1, 1, 1, 8, 8, 8 });
 AscendC::SetMaskNormal();
 ```
 
-在**Normal计算**模式中，MASK寄存器会作为每个Repeat的掩码使用。只有高维切分支持此模式，在接口上区分为逐bit模式和连续模式。
-
+Normal计算模式下，MASK寄存器作为每个Repeat的掩码使用，通过SetVectorMask设置mask值，控制单次迭代内参与计算的元素个数。该模式仅高维切分支持，区分为单次迭代内连续模式和单次迭代内逐比特模式。
 > 📌 Normal为默认模式。若未发生模式切换，则无需重复配置该模式。
-
-在Normal计算模式下，mask参数用来控制单次迭代内参与计算的元素个数，可通过`SetVectorMask`来设置mask的值。
 
 - 单次迭代内连续模式：表示前n个连续元素参与计算。取值范围和操作数的数据类型有关，数据类型不同，每次迭代内能够处理的元素个数最大值不同。
 
 > **mask范围推导**：Vector计算单元单次迭代固定处理32B × 8 block = 256B数据，因此mask最大值 = 256B / sizeof(DataType)。当操作数为16位（sizeof=2B）时，mask∈[0, 128]（256/2=128）；当操作数为32位（sizeof=4B）时，mask∈[0, 64]（256/4=64）；当操作数为64位（sizeof=8B）时，mask∈[0, 32]（256/8=32）。此推导规则可推广至其他数据类型（如bfloat16=16bit→mask上限128，fp32=32bit→mask上限64）。
 
-连续模式下，mask超出范围按照对应数据类型下mask最大值计算；mask = 0表示指令不会执行计算操作，该接口将被视为NOP（空操作）；若设置为负值可能产生未定义行为。
-
-  该模式下，可以指定单次迭代内计算前n个连续元素，其他数据不参与计算。例如：对src数据（shape为256，数据类型为half），该数据需通过2次迭代计算完（每次迭代计算128个元素），可通过设置mask = 100，表示第1次迭代计算[0, 99]范围的元素，第2次迭代使[128, 227]范围的元素参与计算，其他元素不参与计算。
+连续模式下，mask指定单次迭代内参与计算的前n个连续元素，超范围按对应数据类型mask最大值计算，mask为0视为NOP（空操作），负值产生未定义行为。例如对shape为256、数据类型为half的src数据（需2次迭代、每次128个元素），设置mask = 100时，第1次迭代计算0, 99、第2次迭代计算128, 227范围的元素，其余元素不参与计算。
 
 <img src="../../../../figures/单次迭代内连续计算.png" alt="单次迭代内连续计算" width="600" />
 
