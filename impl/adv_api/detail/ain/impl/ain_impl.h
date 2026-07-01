@@ -103,7 +103,7 @@ AIN_DEVICE void Ain::waitSignal(HcclAinSignal_t signalId, uint64_t least, uint32
     uint64_t mask = bits >= 64U ? UINT64_MAX : ((1ULL << bits) - 1ULL);
     while (true) {
         uint64_t got = ld_dev(ptr, 0);
-        if (least <= (mask & got)) {
+        if (least <= (got & mask)) {
             break;
         }
     }
