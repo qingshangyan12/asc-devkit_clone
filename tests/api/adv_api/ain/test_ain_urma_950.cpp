@@ -11,6 +11,7 @@
 #include <array>
 #include <gtest/gtest.h>
 #include <vector>
+#include "acl/acl.h"
 #define private public
 #include "kernel_operator.h"
 #include "ain/ain.h"
