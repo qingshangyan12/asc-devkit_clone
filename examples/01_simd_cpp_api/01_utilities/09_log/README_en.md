@@ -118,12 +118,13 @@ Run the following steps in the root directory of this example to build and execu
   > **Notice:** Before switching build modes, clean the cmake cache by running `rm CMakeCache.txt` in the build directory and then re-run cmake.
 
 - Build Options Description
+
   | Option | Values | Description |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debugging, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture:<br>dav-2201 corresponds to Atlas A2 training series products/Atlas A2 inference series products and Atlas A3 training series products/Atlas A3 inference series products<br>dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
 
-- Execution Result (NPU mode, using non-screen-output mode as an example; for file storage details, refer to [Ascend Log Function Reference](https://hiascend.com/document/redirect/CannCommunitylogref))
+- Execution Result (NPU mode, using screen-output mode as an example; for file storage details, refer to [Ascend Log Function Reference](https://hiascend.com/document/redirect/CannCommunitylogref))
   After execution, the following information is printed:
   ```bash
   [INFO] Matrix shape: M=256, K=64, N=256
