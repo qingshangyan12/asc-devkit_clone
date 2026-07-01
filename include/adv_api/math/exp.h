@@ -27,8 +27,8 @@
 #include "kernel_tensor.h"
 
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "../../../impl/adv_api/detail/math/exp/exp_3510_impl.h"
 #else
 #include "../../../impl/adv_api/detail/math/exp/exp_common_impl.h"
@@ -63,7 +63,7 @@ __aicore__ inline void Exp(const LocalTensor<T>& dstLocal, const LocalTensor<T>&
         (std::is_same<T, float>::value || std::is_same<T, half>::value),
         "Failed to check the data types, current api support data types are half/float.");
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     ExpAPI::ExpImpl<T, taylorExpandLevel, isReuseSource>(dstLocal, srcLocal, calCount);
 #endif
 }
@@ -99,7 +99,7 @@ __aicore__ inline void Exp(
         (std::is_same<T, float>::value || std::is_same<T, half>::value),
         "Failed to check the data types, current api support data types are half/float.");
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     ExpAPI::ExpImpl<T, taylorExpandLevel, isReuseSource>(dstLocal, srcLocal, sharedTmpBuffer, calCount);
 #endif
 }

@@ -87,7 +87,7 @@ __simd_callee__ inline void DigammaPositiveTmp0(Reg::RegTensor<float>& dstReg, R
     Reg::Muls(tmpReg2, tmpReg1, 0.5f, mask);
     Reg::Sub(dstReg, dstReg, tmpReg2, mask);
     Reg::Mul(tmpReg1, tmpReg1, tmpReg1, mask);
-    Reg::Duplicate(tmpReg2, 8.33333333333333333333e-2, mask);
+    Reg::Duplicate(tmpReg2, 8.33333333333333333333e-2f, mask);
     Reg::Duplicate(tmpScalarReg, posCalcConst[0U], mask);
     Reg::Mul(tmpReg2, tmpReg1, tmpReg2, mask);
     Reg::Sub(tmpReg2, tmpScalarReg, tmpReg2, mask);
