@@ -26,6 +26,8 @@
 
 ## 功能说明<a name="section165477552317"></a>
 
+头文件路径为：`"basic_api/kernel_prof_trace_intf.h"`。
+
 推荐使用[asc\_mark\_stamp](../../../../Utils-API/调测接口/asc_mark_stamp.md)接口进行特定位置的标记，该接口同时适用于C语言和C++语言编程。
 
 用户通过调用接口，用于在算子执行过程中标记特定位置，便于后期通过流水图分析代码执行路径与性能热点。
