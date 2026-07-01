@@ -29,8 +29,6 @@
 
 namespace AscendC {
 
-typedef uint32_t AinSignal;
-
 template <typename T, typename U>
 struct AinIsSame {
     static constexpr bool value = false;
@@ -72,6 +70,18 @@ typedef struct {
 } HcclDevComm;
 
 enum class SymmetricMemoryMode { HCCS = 0, URMA = 1 };
+
+typedef enum {
+    COMM_MEM_TYPE_INVALID = -1,
+    COMM_MEM_TYPE_DEVICE = 0,
+    COMM_MEM_TYPE_HOST = 1,
+} CommMemType;
+
+typedef struct {
+    CommMemType type;
+    void *addr;
+    uint64_t size;
+} CommMem;
 
 struct SymmetricWindow {
     void* userVa;

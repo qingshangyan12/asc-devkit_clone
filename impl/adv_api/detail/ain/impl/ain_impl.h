@@ -152,7 +152,7 @@ AIN_DEVICE void Ain::signal(AinTeam team, uint32_t peer, RemoteAction action, co
     auto amoSignalId = aivRes->ainWorldBarrier.signal0 + team.rank;
     uint64_t amoOffset = amoSignalId * sizeof(uint64_t);
     auto amoSignal = reinterpret_cast<__gm__ uint8_t *>(
-        reinterpret_cast<uintptr_t>(aivRes->symMemPool) + amoOffset);
+        reinterpret_cast<uintptr_t>(aivRes->ainSignalShadows) + amoOffset);
 
     if (commitFlags == AIN_COMMIT_DELAYED) {
         hcomm_.AtomicFAA<uint64_t, false>(channel, remoteSignal, amoSignal, signalOpArg);

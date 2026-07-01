@@ -82,10 +82,10 @@ public:
         const DescriptorUbuf &ubuf = DescriptorUbuf{}, AinCommitFlags commitFlags = AIN_COMMIT_IMMED);
 
     AIN_DEVICE uint64_t readSignal(AinSignal signalId, uint32_t bits,
-        AinMemoryOrder order = AIN_MEMORY_ORDER_ACQUIRE) const;
+        AinMemoryOrder order = AIN_MEMORY_ORDER_DEFAULT) const;
 
     AIN_DEVICE void waitSignal(AinSignal signalId, uint64_t least, uint32_t bits,
-        AinMemoryOrder order = AIN_MEMORY_ORDER_ACQUIRE) const;
+        AinMemoryOrder order = AIN_MEMORY_ORDER_DEFAULT) const;
 
     AIN_DEVICE __gm__ uint64_t *getSignalShadowPtr(AinSignal signalId) const;
 
