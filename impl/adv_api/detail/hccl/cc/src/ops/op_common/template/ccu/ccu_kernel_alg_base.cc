@@ -70,22 +70,16 @@ std::vector<uint64_t> CalGoSize(uint64_t size, const LoopGroupConfig &config)
         // 此时tailSize = 0，可以依次做为跳过LoopGroup1的条件
         loopExtendNum = 0; // loopExtendNum 赋值
         tailSize = 0;      // tailSize 赋值
-        loopExtendNum = 0;
-        tailSize      = 0;
     } else if (n != 0 && p == 0) {
         // 数据量为256K * m + 4K * n
         // 因为p == 0, 所以只需要使用第一个Loop, 数据量4K, 展开成n次
         loopExtendNum = GetParallelParam(n - 1, 0, 1); // loopExtendNum 赋值
-        tailSize = moConfig.memSlice;                  // tailSize 赋值
-        loopExtendNum = GetParallelParam(n - 1, 0, 1);
-        tailSize      = config.memSlice;
+        tailSize = config.memSlice;                  // tailSize 赋值
     } else if (n == 0 && p != 0) {
         // 数据量为256K * m + p
         // 因为n == 0, 所以只需要使用第一个Loop, 数据量p, 不展开
         loopExtendNum = GetParallelParam(0, 0, 1); // loopExtendNum 赋值
         tailSize = p;                              // tailSize 赋值
-        loopExtendNum = GetParallelParam(0, 0, 1);
-        tailSize      = p;
     } else {
         loopExtendNum = GetParallelParam(n - 1, 1, LoopNumTwo);
         tailSize      = p;
