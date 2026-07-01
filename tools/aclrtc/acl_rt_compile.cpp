@@ -88,16 +88,16 @@ inline bool EndsWith(std::string_view str, std::string_view suffix) noexcept
 
 std::string ExtractCannPath(const std::string& pluginPath)
 {
-    const std::vector<std::string> potentialPath = {
-        "/x86_64-linux/lib64/libacl_rtc.so",
-        "/aarch64-linux/lib64/libacl_rtc.so",
-    };
-    for (const std::string& expectedPath : potentialPath) {
-        if (EndsWith(pluginPath, expectedPath)) {
-            return pluginPath.substr(0, pluginPath.size() - expectedPath.size());
-        }
+    constexpr std::string_view libSuffix = "/lib64/libacl_rtc.so";
+    if (!EndsWith(pluginPath, libSuffix)) {
+        return std::string();
     }
-    return std::string();
+    std::string platformPath = pluginPath.substr(0, pluginPath.size() - libSuffix.size());
+    size_t pos = platformPath.find_last_of('/');
+    if (pos == std::string::npos) {
+        return std::string();
+    }
+    return platformPath.substr(0, pos);
 }
 
 std::string GetCannPath()
@@ -112,6 +112,11 @@ std::string GetCannPath()
         }
     }
     return "";
+}
+
+std::string GetAsrtcLibPath(const std::string& cannPath)
+{
+    return cannPath + "/tools/bisheng_compiler/lib/libasrtc.so";
 }
 
 bool PathCheck(const char* path)
@@ -167,13 +172,10 @@ asrtcGetProgramLogFuncPtr asrtcGetProgramLogPtr = nullptr;
 aclError LoadExtraLib()
 {
     std::string cannPath = GetCannPath();
-    std::string libPathX86 = cannPath + "/x86_64-linux/ccec_compiler/lib/libasrtc.so";
-    std::string libPathArm = cannPath + "/aarch64-linux/ccec_compiler/lib/libasrtc.so";
+    std::string libPath = GetAsrtcLibPath(cannPath);
     // 3. dlopen
-    if (PathCheck(libPathX86.c_str())) {
-        handle = dlopen(libPathX86.c_str(), RTLD_GLOBAL | RTLD_NOW);
-    } else if (PathCheck(libPathArm.c_str())) {
-        handle = dlopen(libPathArm.c_str(), RTLD_GLOBAL | RTLD_NOW);
+    if (PathCheck(libPath.c_str())) {
+        handle = dlopen(libPath.c_str(), RTLD_GLOBAL | RTLD_NOW);
     }
     if (!handle) {
         fprintf(stderr, "[ERROR] Failed to load inner rtc library, please check it!\n");
@@ -254,7 +256,15 @@ aclError aclrtcCreateProg(
 aclError aclrtcCompileProg(aclrtcProg prog, int numOptions, const char** options)
 {
     if (prog == nullptr) {
+        return ACL_ERROR_RTC_INVALID_PROG;
+    }
+    if (numOptions < 0 || (numOptions > 0 && options == nullptr)) {
         return ACL_ERROR_RTC_INVALID_INPUT;
+    }
+    for (int i = 0; i < numOptions; ++i) {
+        if (options[i] == nullptr) {
+            return ACL_ERROR_RTC_INVALID_INPUT;
+        }
     }
     AclrtcProgram* ascProg = static_cast<AclrtcProgram*>(prog);
     AclrtcType compileType = ascProg->GetType();
@@ -295,7 +305,10 @@ aclError aclrtcCompileProg(aclrtcProg prog, int numOptions, const char** options
 
 aclError aclrtcAddNameExpr(aclrtcProg prog, const char* const nameExpression)
 {
-    if (prog == nullptr || nameExpression == nullptr) {
+    if (prog == nullptr) {
+        return ACL_ERROR_RTC_INVALID_PROG;
+    }
+    if (nameExpression == nullptr) {
         return ACL_ERROR_RTC_INVALID_INPUT;
     }
     AclrtcProgram* ascProg = static_cast<AclrtcProgram*>(prog);
@@ -304,7 +317,10 @@ aclError aclrtcAddNameExpr(aclrtcProg prog, const char* const nameExpression)
 
 aclError aclrtcGetLoweredName(aclrtcProg prog, const char* nameExpression, const char** loweredName)
 {
-    if (prog == nullptr || nameExpression == nullptr || loweredName == nullptr) {
+    if (prog == nullptr) {
+        return ACL_ERROR_RTC_INVALID_PROG;
+    }
+    if (nameExpression == nullptr || loweredName == nullptr) {
         return ACL_ERROR_RTC_INVALID_INPUT;
     }
     AclrtcProgram* ascProg = static_cast<AclrtcProgram*>(prog);
@@ -316,16 +332,23 @@ aclError aclrtcDestroyProg(aclrtcProg* prog)
     if (prog == nullptr) {
         return ACL_ERROR_RTC_INVALID_INPUT;
     }
+    if (*prog == nullptr) {
+        return ACL_ERROR_RTC_INVALID_PROG;
+    }
     AclrtcProgram* ascProg = static_cast<AclrtcProgram*>(*prog);
     aclrtcProg program = ascProg->GetProgram();
     aclError ret = ErrorCodeProcess(asrtcDestroyProgramPtr(&program));
     delete ascProg;
+    *prog = nullptr;
     return ret;
 }
 
 aclError aclrtcGetBinData(aclrtcProg prog, char* binData)
 {
-    if (prog == nullptr || binData == nullptr) {
+    if (prog == nullptr) {
+        return ACL_ERROR_RTC_INVALID_PROG;
+    }
+    if (binData == nullptr) {
         return ACL_ERROR_RTC_INVALID_INPUT;
     }
     AclrtcProgram* ascProg = static_cast<AclrtcProgram*>(prog);
@@ -334,7 +357,10 @@ aclError aclrtcGetBinData(aclrtcProg prog, char* binData)
 
 aclError aclrtcGetBinDataSize(aclrtcProg prog, size_t* binDataSizeRet)
 {
-    if (prog == nullptr || binDataSizeRet == nullptr) {
+    if (prog == nullptr) {
+        return ACL_ERROR_RTC_INVALID_PROG;
+    }
+    if (binDataSizeRet == nullptr) {
         return ACL_ERROR_RTC_INVALID_INPUT;
     }
     AclrtcProgram* ascProg = static_cast<AclrtcProgram*>(prog);
@@ -343,7 +369,10 @@ aclError aclrtcGetBinDataSize(aclrtcProg prog, size_t* binDataSizeRet)
 
 aclError aclrtcGetCompileLogSize(aclrtcProg prog, size_t* logSizeRet)
 {
-    if (prog == nullptr || logSizeRet == nullptr) {
+    if (prog == nullptr) {
+        return ACL_ERROR_RTC_INVALID_PROG;
+    }
+    if (logSizeRet == nullptr) {
         return ACL_ERROR_RTC_INVALID_INPUT;
     }
     AclrtcProgram* ascProg = static_cast<AclrtcProgram*>(prog);
@@ -354,7 +383,10 @@ aclError aclrtcGetCompileLogSize(aclrtcProg prog, size_t* logSizeRet)
 
 aclError aclrtcGetCompileLog(aclrtcProg prog, char* log)
 {
-    if (prog == nullptr || log == nullptr) {
+    if (prog == nullptr) {
+        return ACL_ERROR_RTC_INVALID_PROG;
+    }
+    if (log == nullptr) {
         return ACL_ERROR_RTC_INVALID_INPUT;
     }
     AclrtcProgram* ascProg = static_cast<AclrtcProgram*>(prog);

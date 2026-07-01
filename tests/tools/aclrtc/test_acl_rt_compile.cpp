@@ -48,6 +48,7 @@ extern inline bool EndsWith(std::string_view str, std::string_view suffix);
 extern std::string ExtractCannPath(const std::string& pluginPath);
 extern bool PathCheck(const char* path);
 extern std::string GetCannPath();
+extern std::string GetAsrtcLibPath(const std::string& cannPath);
 extern void* handle;
 extern aclError LoadExtraLib();
 extern void UnloadExtraLib();
@@ -74,7 +75,7 @@ TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcGetCompileLogSize)
     aclrtcProg prog = nullptr;
     size_t actualLogSize = 1024;
     aclError result = aclrtcGetCompileLogSize(prog, &actualLogSize);
-    EXPECT_EQ(result, ACL_ERROR_RTC_INVALID_INPUT);
+    EXPECT_EQ(result, ACL_ERROR_RTC_INVALID_PROG);
 }
 
 TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcGetCompileLog)
@@ -85,7 +86,7 @@ TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcGetCompileLog)
     aclrtcProg prog = nullptr;
     char log[32] = "some log info ...";
     aclError result = aclrtcGetCompileLog(prog, log);
-    EXPECT_EQ(result, ACL_ERROR_RTC_INVALID_INPUT);
+    EXPECT_EQ(result, ACL_ERROR_RTC_INVALID_PROG);
 }
 
 TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcAddNameExpr_nullptr)
@@ -93,7 +94,7 @@ TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcAddNameExpr_nullptr)
     aclrtcProg prog = nullptr;
     const char* nameExpr = "hello_world";
     aclError result = aclrtcAddNameExpr(prog, nameExpr);
-    EXPECT_EQ(result, ACL_ERROR_RTC_INVALID_INPUT);
+    EXPECT_EQ(result, ACL_ERROR_RTC_INVALID_PROG);
 }
 
 TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcAddNameExpr)
@@ -117,7 +118,7 @@ TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcGetLoweredName_nullptr)
     const char* nameExpr = "hello_world";
     const char* loweredName = "hello_world";
     aclError result = aclrtcGetLoweredName(prog, nameExpr, &loweredName);
-    EXPECT_EQ(result, ACL_ERROR_RTC_INVALID_INPUT);
+    EXPECT_EQ(result, ACL_ERROR_RTC_INVALID_PROG);
 }
 
 TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcGetLoweredName)
@@ -147,7 +148,7 @@ TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcCompileProg)
     int numOptions = sizeof(options) / sizeof(options[0]);
     MOCKER(PathCheck).stubs().will(returnValue(true));
     aclError result = aclrtcCompileProg(prog, numOptions, options);
-    EXPECT_EQ(result, ACL_ERROR_RTC_INVALID_INPUT);
+    EXPECT_EQ(result, ACL_ERROR_RTC_INVALID_PROG);
 }
 
 TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcCompileProg_unknown)
@@ -161,6 +162,36 @@ TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcCompileProg_unknown)
     int numOptions = sizeof(options) / sizeof(options[0]);
     MOCKER(PathCheck).stubs().will(returnValue(true));
     aclError result = aclrtcCompileProg(prog, numOptions, options);
+    EXPECT_EQ(result, ACL_ERROR_RTC_INVALID_PROG);
+}
+
+TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcCompileProg_negative_num_options)
+{
+    auto mockFunc = [](asrtcProgram, int, const char* const*) -> asrtcResult { return ASRTC_SUCCESS; };
+    asrtcCompileProgramPtr = mockFunc;
+    MOCKER(PathCheck).stubs().will(returnValue(true));
+    alignas(void*) char fakeProgMem[64] = {0};
+    aclrtcProg prog = reinterpret_cast<aclrtcProg>(fakeProgMem);
+    aclError result = aclrtcCompileProg(prog, -1, nullptr);
+    EXPECT_EQ(result, ACL_ERROR_RTC_INVALID_INPUT);
+}
+
+TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcCompileProg_null_options_with_positive_num_options)
+{
+    MOCKER(PathCheck).stubs().will(returnValue(true));
+    alignas(void*) char fakeProgMem[64] = {0};
+    aclrtcProg prog = reinterpret_cast<aclrtcProg>(fakeProgMem);
+    aclError result = aclrtcCompileProg(prog, 1, nullptr);
+    EXPECT_EQ(result, ACL_ERROR_RTC_INVALID_INPUT);
+}
+
+TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcCompileProg_null_option_item)
+{
+    MOCKER(PathCheck).stubs().will(returnValue(true));
+    alignas(void*) char fakeProgMem[64] = {0};
+    aclrtcProg prog = reinterpret_cast<aclrtcProg>(fakeProgMem);
+    const char* options[] = {nullptr};
+    aclError result = aclrtcCompileProg(prog, 1, options);
     EXPECT_EQ(result, ACL_ERROR_RTC_INVALID_INPUT);
 }
 
@@ -219,6 +250,14 @@ __global__ __aicore__ void add_custom(GM_ADDR x) {*x = 3 + MY_CONST;}
     aclrtcCreateProg(&prog, src, "test_kernel", 0, nullptr, nullptr);
     aclError result = aclrtcDestroyProg(&prog);
     EXPECT_EQ(result, ACL_SUCCESS);
+    EXPECT_EQ(prog, nullptr);
+}
+
+TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcDestroyProg_null_program_handle)
+{
+    aclrtcProg prog = nullptr;
+    aclError result = aclrtcDestroyProg(&prog);
+    EXPECT_EQ(result, ACL_ERROR_RTC_INVALID_PROG);
 }
 
 TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcGetBinData)
@@ -230,7 +269,7 @@ TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcGetBinData)
     aclrtcProg prog = nullptr;
     char binData[32] = "some bin data ...";
     aclError result = aclrtcGetBinData(prog, binData);
-    EXPECT_EQ(result, ACL_ERROR_RTC_INVALID_INPUT);
+    EXPECT_EQ(result, ACL_ERROR_RTC_INVALID_PROG);
 }
 
 TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcGetBinDataSize)
@@ -242,7 +281,7 @@ TEST_F(TEST_ACL_RT_COMPILE, aclrtc_aclrtcGetBinDataSize)
     aclrtcProg prog = nullptr;
     size_t binDataSizeRet = 1024;
     aclError result = aclrtcGetBinDataSize(prog, &binDataSizeRet);
-    EXPECT_EQ(result, ACL_ERROR_RTC_INVALID_INPUT);
+    EXPECT_EQ(result, ACL_ERROR_RTC_INVALID_PROG);
 }
 
 TEST_F(TEST_ACL_RT_COMPILE, aclrtc_EndsWith)
@@ -254,10 +293,23 @@ TEST_F(TEST_ACL_RT_COMPILE, aclrtc_EndsWith)
 
 TEST_F(TEST_ACL_RT_COMPILE, aclrtc_ExtractCannPath)
 {
-    std::string pluginPath = "/x86_64-linux/lib64/libacl_rtc.so";
-    MOCKER(EndsWith).stubs().will(returnValue(true));
+    std::string pluginPath = "/usr/local/Ascend/cann/x86_64-linux/lib64/libacl_rtc.so";
     std::string res = ExtractCannPath(pluginPath);
-    EXPECT_EQ(res, std::string(""));
+    EXPECT_EQ(res, std::string("/usr/local/Ascend/cann"));
+}
+
+TEST_F(TEST_ACL_RT_COMPILE, aclrtc_ExtractCannPath_aarch64)
+{
+    std::string pluginPath = "/usr/local/Ascend/cann/aarch64-linux/lib64/libacl_rtc.so";
+    std::string res = ExtractCannPath(pluginPath);
+    EXPECT_EQ(res, std::string("/usr/local/Ascend/cann"));
+}
+
+TEST_F(TEST_ACL_RT_COMPILE, aclrtc_GetAsrtcLibPath)
+{
+    std::string cannPath = "/usr/local/Ascend/cann-9.1.0";
+    std::string res = GetAsrtcLibPath(cannPath);
+    EXPECT_EQ(res, std::string("/usr/local/Ascend/cann-9.1.0/tools/bisheng_compiler/lib/libasrtc.so"));
 }
 
 TEST_F(TEST_ACL_RT_COMPILE, aclrtc_PathCheck)
