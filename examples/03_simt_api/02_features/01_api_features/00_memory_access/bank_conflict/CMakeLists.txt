@@ -14,13 +14,10 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-set(SCENARIO_NUM "3" CACHE STRING "Case type to run (0-5)")
-if(NOT SCENARIO_NUM MATCHES "^[0-5]$")
-    message(FATAL_ERROR "SCENARIO_NUM must be one of 0, 1, 2, 3, 4, 5, but got ${SCENARIO_NUM}")
+set(SCENARIO_NUM "0" CACHE STRING "Case type to run (0-4)")
+if(NOT SCENARIO_NUM MATCHES "^[0-4]$")
+    message(FATAL_ERROR "SCENARIO_NUM must be one of 0, 1, 2, 3, 4, but got ${SCENARIO_NUM}")
 endif()
-
-set(RUN_MODE "npu" CACHE STRING "Run mode: npu, sim")
-set(SOC_VERSION "" CACHE STRING "Simulator SOC version, e.g. Ascend950PR_9599")
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU ARCH, e.g. dav-3510")
 
 add_executable(demo
@@ -39,15 +36,8 @@ target_compile_definitions(demo PRIVATE
 # ======================================================================================
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt>
-    $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:-g -O0>>
-)
-
-target_link_directories(demo PRIVATE
-    $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:$ENV{ASCEND_HOME_PATH}/tools/simulator/${SOC_VERSION}/lib>>
 )
 
 target_link_libraries(demo PRIVATE
     m
-    $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:runtime_camodel>>
-    $<BUILD_INTERFACE:$<$<STREQUAL:${RUN_MODE},sim>:npu_drv>>
 )
