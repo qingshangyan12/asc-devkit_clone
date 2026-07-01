@@ -40,7 +40,7 @@
 
 ```cpp
 template <typename T>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParamsV2& loadDataParam)
+__aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParamsV2& loadDataParams)
 ```
 
 ## 参数说明<a id="section622mcpsimp"></a>
@@ -57,7 +57,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>
 | ---------- | ---------- | ---------- |
 | dst | 输出 | 目的操作数，类型为LocalTensor。支持的物理存储位置为L1 Buffer（TPosition为A1/B1）。<br>数据分形无格式要求，一般情况下为NZ格式。NZ格式下，对应的分形大小为16 \* (32字节 / sizeof(T))。 |
 | src | 输入 | 源操作数，类型为GlobalTensor。数据类型需要与dst保持一致。 |
-| loadDataParam | 输入 | LoadData参数结构体，类型为LoadData2DParamsV2，具体参考[表3](#table49630346128)。 |
+| loadDataParams | 输入 | LoadData参数结构体，类型为LoadData2DParamsV2，具体参考[表3](#table49630346128)。 |
 
 **表 3** LoadData2DParamsV2结构体内参数说明<a id="table49630346128"></a>
 
@@ -72,14 +72,14 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>
 | ifTranspose | 是否启用转置功能，对每个分形矩阵进行转置，默认为false。<br>&nbsp;&nbsp;&bull; true：启用。<br>&nbsp;&nbsp;&bull; false：不启用。<br>注意：本通路场景下（GM->L1 Buffer）不支持转置，参数无意义，保持默认值即可。 |
 | sid | 预留参数，配置为0即可。 |
 
-LoadData2DParamsV2结构体在不启用转置时，示意图如下，参数设置值和解释说明如下：
+以half数据类型，不启用转置为例，LoadData2DParamsV2结构体参数值设置说明及其示意图如下：
 
-- mStartPosition = 2，表示源矩阵M轴方向的起始位置为第32个元素（2*16个元素）。
-- kStartPosition = 2，表示源矩阵K轴方向的起始位置为第32个元素（2*32字节）。
-- mStep = 2，表示源矩阵M轴方向搬运长度为32个元素（2*16个元素）。
-- kStep = 3，表示源矩阵K轴方向搬运长度为48个元素（3*32字节）。
-- srcStride = 5，表示源矩阵K方向前一个分形起始地址与后一个分形起始地址的间隔为1280个元素（5*512字节）。
-- dstStride = 3，表示目的矩阵K方向前一个分形起始地址与后一个分形起始地址的间隔为768个元素（3*512字节）。
+- mStartPosition = 2，参数单位为16个元素，2*16=32，所以表示源矩阵M轴方向的起始位置为第32个元素。
+- kStartPosition = 2，参数单位为32字节，对应的元素个数为2*32/2=32，所以表示源矩阵K轴方向的起始位置为第32个元素。
+- mStep = 2，参数单位为16个元素，2*16=32，所以表示源矩阵M轴方向搬运长度为32个元素。
+- kStep = 3，参数单位为32字节，对应的元素个数为3*32/2=48，所以表示源矩阵K轴方向搬运长度为48个元素。
+- srcStride = 5，参数单位为512字节，对应的元素个数为5*512/2=1280，所以表示源矩阵K方向前一个分形起始地址与后一个分形起始地址的间隔为1280个元素。
+- dstStride = 3，参数单位为512字节，对应的元素个数为3*512/2=768，所以表示目的矩阵K方向前一个分形起始地址与后一个分形起始地址的间隔为768个元素。
 - ifTranspose = false，表示不启用转置。
 - sid = 0，预留参数，配置为0即可。
 
