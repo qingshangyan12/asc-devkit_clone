@@ -6049,124 +6049,118 @@ export default {
               "collapsed": true,
               "items": [
                 {
-                  "text": "Conv3D",
+                  "text": "Conv3D Kernel侧接口",
                   "collapsed": true,
                   "items": [
                     {
-                      "text": "Conv3D Kernel侧接口",
-                      "collapsed": true,
-                      "items": [
-                        {
-                          "text": "Conv3D使用说明",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Kernel侧接口/Conv3D使用说明"
-                        },
-                        {
-                          "text": "Conv3D模板参数",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Kernel侧接口/Conv3D模板参数"
-                        },
-                        {
-                          "text": "Init",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Kernel侧接口/Init-101"
-                        },
-                        {
-                          "text": "SetInput",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Kernel侧接口/SetInput"
-                        },
-                        {
-                          "text": "SetWeight",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Kernel侧接口/SetWeight"
-                        },
-                        {
-                          "text": "SetBias",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Kernel侧接口/SetBias-102"
-                        },
-                        {
-                          "text": "SetSingleOutputShape",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Kernel侧接口/SetSingleOutputShape"
-                        },
-                        {
-                          "text": "SetInputStartPosition",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Kernel侧接口/SetInputStartPosition"
-                        },
-                        {
-                          "text": "IterateAll",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Kernel侧接口/IterateAll-103"
-                        },
-                        {
-                          "text": "End",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Kernel侧接口/End-104"
-                        }
-                      ]
+                      "text": "Conv3D使用说明",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Kernel侧接口/Conv3D使用说明"
                     },
                     {
-                      "text": "Conv3D Tiling侧接口",
-                      "collapsed": true,
-                      "items": [
-                        {
-                          "text": "Conv3D Tiling使用说明",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Tiling侧接口/Conv3D-Tiling使用说明"
-                        },
-                        {
-                          "text": "Conv3D Tiling构造函数",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Tiling侧接口/Conv3D-Tiling构造函数"
-                        },
-                        {
-                          "text": "TConv3DApiTiling结构体",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Tiling侧接口/TConv3DApiTiling结构体"
-                        },
-                        {
-                          "text": "GetTiling",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Tiling侧接口/GetTiling-105"
-                        },
-                        {
-                          "text": "SetOrgWeightShape",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Tiling侧接口/SetOrgWeightShape"
-                        },
-                        {
-                          "text": "SetOrgInputShape",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Tiling侧接口/SetOrgInputShape"
-                        },
-                        {
-                          "text": "SetSingleWeightShape",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Tiling侧接口/SetSingleWeightShape"
-                        },
-                        {
-                          "text": "SetSingleOutputShape",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Tiling侧接口/SetSingleOutputShape-106"
-                        },
-                        {
-                          "text": "SetInputType",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Tiling侧接口/SetInputType"
-                        },
-                        {
-                          "text": "SetWeightType",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Tiling侧接口/SetWeightType"
-                        },
-                        {
-                          "text": "SetBiasType",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Tiling侧接口/SetBiasType-107"
-                        },
-                        {
-                          "text": "SetOutputType",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Tiling侧接口/SetOutputType"
-                        },
-                        {
-                          "text": "SetPadding",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Tiling侧接口/SetPadding"
-                        },
-                        {
-                          "text": "SetDilation",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Tiling侧接口/SetDilation"
-                        },
-                        {
-                          "text": "SetStride",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Tiling侧接口/SetStride"
-                        },
-                        {
-                          "text": "SetGroups",
-                          "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D/Conv3D-Tiling侧接口/SetGroups"
-                        }
-                      ]
+                      "text": "Conv3D模板参数",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Kernel侧接口/Conv3D模板参数"
+                    },
+                    {
+                      "text": "Init",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Kernel侧接口/Init-101"
+                    },
+                    {
+                      "text": "SetInput",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Kernel侧接口/SetInput"
+                    },
+                    {
+                      "text": "SetWeight",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Kernel侧接口/SetWeight"
+                    },
+                    {
+                      "text": "SetBias",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Kernel侧接口/SetBias-102"
+                    },
+                    {
+                      "text": "SetSingleOutputShape",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Kernel侧接口/SetSingleOutputShape"
+                    },
+                    {
+                      "text": "SetInputStartPosition",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Kernel侧接口/SetInputStartPosition"
+                    },
+                    {
+                      "text": "IterateAll",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Kernel侧接口/IterateAll-103"
+                    },
+                    {
+                      "text": "End",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Kernel侧接口/End-104"
+                    }
+                  ]
+                },
+                {
+                  "text": "Conv3D Tiling侧接口",
+                  "collapsed": true,
+                  "items": [
+                    {
+                      "text": "Conv3D Tiling使用说明",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Tiling侧接口/Conv3D-Tiling使用说明"
+                    },
+                    {
+                      "text": "Conv3D Tiling构造函数",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Tiling侧接口/Conv3D-Tiling构造函数"
+                    },
+                    {
+                      "text": "TConv3DApiTiling结构体",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Tiling侧接口/TConv3DApiTiling结构体"
+                    },
+                    {
+                      "text": "GetTiling",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Tiling侧接口/GetTiling-105"
+                    },
+                    {
+                      "text": "SetOrgWeightShape",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Tiling侧接口/SetOrgWeightShape"
+                    },
+                    {
+                      "text": "SetOrgInputShape",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Tiling侧接口/SetOrgInputShape"
+                    },
+                    {
+                      "text": "SetSingleWeightShape",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Tiling侧接口/SetSingleWeightShape"
+                    },
+                    {
+                      "text": "SetSingleOutputShape",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Tiling侧接口/SetSingleOutputShape-106"
+                    },
+                    {
+                      "text": "SetInputType",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Tiling侧接口/SetInputType"
+                    },
+                    {
+                      "text": "SetWeightType",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Tiling侧接口/SetWeightType"
+                    },
+                    {
+                      "text": "SetBiasType",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Tiling侧接口/SetBiasType-107"
+                    },
+                    {
+                      "text": "SetOutputType",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Tiling侧接口/SetOutputType"
+                    },
+                    {
+                      "text": "SetPadding",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Tiling侧接口/SetPadding"
+                    },
+                    {
+                      "text": "SetDilation",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Tiling侧接口/SetDilation"
+                    },
+                    {
+                      "text": "SetStride",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Tiling侧接口/SetStride"
+                    },
+                    {
+                      "text": "SetGroups",
+                      "link": "/api/SIMD-API/高阶API/卷积计算/Conv3D-Tiling侧接口/SetGroups"
                     }
                   ]
                 },
