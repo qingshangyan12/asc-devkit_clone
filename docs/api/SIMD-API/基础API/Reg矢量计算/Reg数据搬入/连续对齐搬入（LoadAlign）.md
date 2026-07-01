@@ -258,7 +258,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
         AscendC::Reg::RegTensor<T> srcReg1;
         AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T>();
         for (uint16_t i = 0; i < repeatTimes; ++i) {
-            AscendC::Reg::LoadAlign<T, AscendC::Reg::LoadDist::DIST_DINTLV_B8>(srcReg0, srcAddr + i * oneRepeatSize);
+            AscendC::Reg::LoadAlign<T, AscendC::Reg::LoadDist::DIST_DINTLV_B8>(srcReg0, srcReg1, srcAddr + i * oneRepeatSize);
             AscendC::Reg::StoreAlign<T, AscendC::Reg::StoreDist::DIST_INTLV_B8>(dstAddr + i * oneRepeatSize, srcReg0, srcReg1, mask);
         }
     }
