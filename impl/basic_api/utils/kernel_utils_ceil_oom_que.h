@@ -331,7 +331,7 @@ template <auto T, auto U, auto... Args> __aicore__ constexpr bool SupportEnum()
     return T == U;
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || defined(__ASC_NPU_HOST__)
 template <typename T> struct GetComplexElementType {
     using Type = T;
 };
@@ -374,18 +374,18 @@ template <typename T, int U, int... Args> __aicore__ constexpr bool SupportBytes
     }
     return sizeof(T) == U;
 }
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
-template <auto funcPtr, typename... Args> __aicore__ inline void VF_CALL(Args &&... args)
-{
-    __VEC_SCOPE__
-    {
-        funcPtr(args...);
-    }
-}
-#endif
+// #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+// template <auto funcPtr, typename... Args> __aicore__ inline void VF_CALL(Args &&... args)
+// {
+//     __VEC_SCOPE__
+//     {
+//         funcPtr(args...);
+//     }
+// }
+// #endif
 } // namespace AscendC
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || defined(__ASC_NPU_HOST__)
 using complex32 = AscendC::Complex<half>;
 using complex64 = AscendC::Complex<float>;
 
@@ -427,7 +427,7 @@ template <typename T, typename U> __aicore__ constexpr bool IsLocalTensorType()
 
 template <auto funcPtr, typename... Args> __aicore__ inline void VF_CALL(Args &&... args)
 {
-#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 5102) || defined(SPLIT_CORE_VEC) || defined(ASCENDC_CPU_DEBUG)
+#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 5102) || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || defined(SPLIT_CORE_VEC) || defined(ASCENDC_CPU_DEBUG)
     __VEC_SCOPE__
     {
         funcPtr(args...);
