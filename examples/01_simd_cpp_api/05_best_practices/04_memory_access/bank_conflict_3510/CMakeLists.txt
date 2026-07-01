@@ -25,6 +25,10 @@ target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--cce-simd-vf-fusion=false>
 )
 
+set(SCENARIO_NUM 0 CACHE STRING "Test scenario number (1-14)")
+if(SCENARIO_NUM LESS 1 OR SCENARIO_NUM GREATER 14)
+    message(FATAL_ERROR "SCENARIO_NUM must be between 1 and 14, got: ${SCENARIO_NUM}")
+endif()
 message(STATUS "SCENARIO_NUM = ${SCENARIO_NUM}")
 
 target_compile_definitions(demo PRIVATE

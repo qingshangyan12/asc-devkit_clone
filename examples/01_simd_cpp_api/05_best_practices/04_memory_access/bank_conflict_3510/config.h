@@ -129,5 +129,7 @@ constexpr uint32_t zLocalAddr = 0x4100;
 using T1 = float;
 using T2 = float;
 using T3 = float;
+#else
+#error "Unsupported SCENARIO_NUM. Valid values: 1-14"
 #endif
 #endif // BANK_CONFLICT_CONFIG_H

@@ -23,13 +23,6 @@ def gen_golden_add():
     return x, y, x + y
 
 
-def gen_golden_adds():
-    N = 4096
-    x = np.random.uniform(1, 100, [N]).astype(np.float32)
-    y = np.random.uniform(1, 100, [N]).astype(np.float32)
-    return x, y, y.astype(np.float32)
-
-
 def gen_golden_case2(repeat=1):
     N = 4096
     x = np.random.uniform(1, 100, [N]).astype(np.float32)
@@ -59,7 +52,7 @@ def gen_golden_gather(case, repeat=1):
     for b in range(N // one_rep):
         batch_idx = indices[b * one_rep : (b + 1) * one_rep]
         for pos in np.unique(batch_idx):
-            golden[pos] = y[pos] + float(repeat)
+            golden[pos] += float(repeat)
     return indices, y, golden
 
 
@@ -67,7 +60,7 @@ def gen_golden_adds_512():
     N = 512
     x = np.random.uniform(1, 100, [N]).astype(np.float32)
     y = np.random.uniform(1, 100, [N]).astype(np.float32)
-    return x, y, y.astype(np.float32)
+    return x, y, x.astype(np.float32)
 
 
 def gen_golden_block_stride0():
@@ -77,7 +70,7 @@ def gen_golden_block_stride0():
     golden = np.zeros(N, dtype=np.float32)
     for i in range(8):
         for j in range(64):
-            golden[i * 64 + j] = y[i * 64 + j % 8]
+            golden[i * 64 + j] = x[i * 64 + j % 8]
     return x, y, golden
 
 
@@ -92,7 +85,7 @@ def gen_golden_repeat_stride0():
     N = 512
     x = np.random.uniform(1, 100, [N]).astype(np.float32)
     y = np.random.uniform(1, 100, [N]).astype(np.float32)
-    golden = np.tile(y[:64], 8)
+    golden = np.tile(x[:64], 8)
     return x, y, golden
 
 
@@ -127,6 +120,5 @@ def gen_golden_data(case=1, repeat=1):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate test data")
     parser.add_argument("--case", "-c", type=int, help="case number", default=1)
-    parser.add_argument("--repeat", "-r", type=int, help="repeat times (for gather/scatter)", default=1)
     args = parser.parse_args()
-    gen_golden_data(args.case, args.repeat)
+    gen_golden_data(args.case)
