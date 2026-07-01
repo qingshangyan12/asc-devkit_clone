@@ -1,0 +1,187 @@
+/**
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
+/*!
+ * \file ain.h
+ * \brief Ain interface
+ */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_AIN_H__
+#endif
+
+#ifndef INCLUDE_ADV_API_AIN_AIN_H
+#define INCLUDE_ADV_API_AIN_AIN_H
+
+#include "../hcomm/hcomm.h"
+#include "ain_common.h"
+#include "../../../impl/adv_api/detail/ain/impl/ain_impl_def.h"
+
+namespace AscendC {
+
+/*!
+ * @class Ain
+ * @brief This class provides device-side one-sided communication primitives (put/get) layered on top
+ *        of the Hcomm point-to-point engine. It resolves the per-peer communication channel from the
+ *        device communication table, translates symmetric-window handles into remote/local addresses,
+ *        and either rings the doorbell immediately or leaves tasks to be completed by a later flush().
+ */
+class Ain {
+public:
+    /*!
+     * @brief Construct an Ain instance bound to a device communication context.
+     * @param [in] devComm: Device communication context.
+     * @param [in] contextIndex: Index of the communication context to operate on.
+     */
+    AIN_DEVICE Ain(AinDevComm devComm, int contextIndex);
+    AIN_DEVICE ~Ain();
+
+    /*!
+     * @brief Drain every peer channel in the communication table.
+     */
+    AIN_DEVICE void flush();
+
+    /*!
+     * @brief Issue a one-sided write (put) from a local window to a remote peer's window.
+     */
+    template <
+        typename RemoteAction = AinRemoteNone, typename LocalAction = AinLocalNone,
+        typename DescriptorUbuf = AinDescriptorUbuf>
+    AIN_DEVICE void put(
+        HcclTeam team, uint32_t peer, AinCommSymWindow dstWin, uint64_t dstOffset, AinCommSymWindow srcWin,
+        uint64_t srcOffset, uint64_t bytes, const DescriptorUbuf& ubuf = DescriptorUbuf{},
+        RemoteAction remoteAction = RemoteAction{}, LocalAction localAction = LocalAction{},
+        AinCommitFlags commitFlags = AIN_COMMIT_IMMED);
+
+    /*!
+     * @brief Issue a one-sided read (get) from a remote peer's window into a local window.
+     */
+    template <typename DescriptorUbuf = AinDescriptorUbuf>
+    AIN_DEVICE void get(
+        HcclTeam team, uint32_t peer, AinCommSymWindow dstWin, uint64_t dstOffset, AinCommSymWindow srcWin,
+        uint64_t srcOffset, uint64_t bytes, const DescriptorUbuf& ubuf = DescriptorUbuf{},
+        AinCommitFlags commitFlags = AIN_COMMIT_IMMED);
+    
+    template <typename RemoteAction, typename DescriptorUbuf = AinDescriptorUbuf>
+    AIN_DEVICE void signal(HcclTeam team, uint32_t peer, RemoteAction action,
+        const DescriptorUbuf &ubuf = DescriptorUbuf{}, AinCommitFlags commitFlags = AIN_COMMIT_IMMED);
+
+    AIN_DEVICE uint64_t readSignal(HcclAinSignal_t signalId, uint32_t bits,
+        AinMemoryOrder order = AIN_MEMORY_ORDER_ACQUIRE) const;
+
+    AIN_DEVICE void waitSignal(HcclAinSignal_t signalId, uint64_t least, uint32_t bits,
+        AinMemoryOrder order = AIN_MEMORY_ORDER_ACQUIRE) const;
+
+    AIN_DEVICE __gm__ uint64_t *getSignalShadowPtr(HcclAinSignal_t signalId) const;
+
+    AIN_DEVICE uint64_t getDevComm() const;
+
+private:
+    uint64_t devComm_ = 0;
+    int contextIndex_ = 0;
+    AscendC::Hcomm<AscendC::CommProtocol::COMM_PROTOCOL_UBC_CTP> hcomm_;
+};
+
+} // namespace AscendC
+
+#include "../../../impl/adv_api/detail/ain/impl/ain_impl.h"
+
+#endif // INCLUDE_ADV_API_AIN_AIN_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_AIN_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_AIN_H__
+#endif
+
+
+/**
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
+/*!
+ * \file ain.h
+ * \brief Ain device interface
+ */
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_AIN_H__
+#endif
+
+#ifndef INCLUDE_ADV_API_AIN_AIN_H
+#define INCLUDE_ADV_API_AIN_AIN_H
+
+#include <cstddef>
+#include <cstdint>
+
+#include "adv_api/hcomm/hcomm.h"
+#include "../../../impl/adv_api/detail/ain/impl/ain_impl_def.h"
+
+namespace AscendC {
+
+static AIN_DEVICE inline HcclTeam HcclTeamWorld(__gm__ HcclDevComm *devComm)
+{
+    HcclTeam team;
+    team.nRanks = devComm->rankSize;
+    team.rank = devComm->rankId;
+    team.stride = 1;
+    return team;
+}
+
+class Ain {
+public:
+    AIN_DEVICE Ain(__gm__ void *devComm, int contextIndex);
+    AIN_DEVICE ~Ain();
+
+    AIN_DEVICE void flush();
+
+    template <typename RemoteAction = AinRemoteNone, typename LocalAction = AinLocalNone,
+        typename DescriptorUbuf = AinDescriptorUbuf>
+    AIN_DEVICE void put(void *team, uint32_t peer, __gm__ void *dstWin, uint64_t dstOffset,
+        __gm__ void *srcWin, uint64_t srcOffset, uint64_t bytes, const DescriptorUbuf &ubuf = DescriptorUbuf{},
+        RemoteAction remoteAction = RemoteAction{}, LocalAction localAction = LocalAction{},
+        AinCommitFlags commitFlags = AIN_COMMIT_IMMED);
+
+    template <typename DescriptorUbuf = AinDescriptorUbuf>
+    AIN_DEVICE void get(void *team, uint32_t peer, __gm__ void *dstWin, uint64_t dstOffset,
+        __gm__ void *srcWin, uint64_t srcOffset, uint64_t bytes, const DescriptorUbuf &ubuf = DescriptorUbuf{},
+        AinCommitFlags commitFlags = AIN_COMMIT_IMMED);
+
+     
+
+     uint64_t devComm_ = 0;
+private:
+     int contextIndex_ = 0;
+     static constexpr uint32_t MAX_PENDING_CHANNELS = 64;
+
+     AIN_DEVICE uint32_t DecodeWindow(__gm__ void *window) const;
+
+     AIN_DEVICE void RecordChannel(AscendC::ChannelHandle channel);
+
+     AscendC::Hcomm<AscendC::CommProtocol::COMM_PROTOCOL_UBC_CTP> hcomm_;
+     AscendC::ChannelHandle pendingChannels_[MAX_PENDING_CHANNELS] = {};
+     uint32_t pendingChannelCount_ = 0;
+};
+
+}  // namespace AscendC
+
+#include "../../../impl/adv_api/detail/ain/impl/ain_impl.h"
+
+#endif  // INCLUDE_ADV_API_AIN_AIN_H
+
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_AIN_H__)
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_AIN_H__
+#endif
