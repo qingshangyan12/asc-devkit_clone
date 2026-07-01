@@ -1,4 +1,4 @@
-﻿# Load2DMX<a id="ZH-CN_TOPIC_0000002517258774"></a>
+﻿# LoadData（MX矩阵搬运）<a id="ZH-CN_TOPIC_0000002517258774"></a>
 
 ## 产品支持情况<a id="section1550532418810"></a>
 
@@ -73,7 +73,7 @@ __aicore__ inline void LoadData(const LocalTensor<U>& dst, const LocalTensor<T>&
 | dst | 输出 | 目的操作数，类型为LocalTensor。<br>数据连续排列顺序由目的操作数所在TPosition决定，具体约束如下：<br>&nbsp;&nbsp;&bull; A2：ZZ格式/NZ格式；对应的分形大小为16 \* (32字节 / sizeof(T))。<br>&nbsp;&nbsp;&bull; B2：ZN格式；对应的分形大小为 (32字节 / sizeof(T))  \* 16。 <br>支持的物理存储位置为L0A Buffer（TPosition: A2）/L0B Buffer（TPosition: B2）。<br>**注：L0A_MX Buffer和L0B_MX Buffer的地址和L0A/L0B的地址是固定比例关系，接口中会自行按照L0A/L0B的地址进行推导，用户无需配置。** |
 | src | 输入 | 源操作数，类型为LocalTensor。<br>数据类型需要与dst保持一致。  <br>支持的物理存储位置为L1 Buffer（TPosition: A1/B1）。 |
 | srcMx | 输入 | 源操作数，类型为LocalTensor，仅支持fp8_e8m0_t类型。 |
-| loadDataParams | 输入 | LoadData参数结构体，类型为LoadData2DParamsV2。具体参考表[Load2DV2](Load2DV2.md)中的LoadData2DParamsV2结构体内参数说明。 <br>**本结构体用于控制左右矩阵数据的搬运。**  <br>|
+| loadDataParams | 输入 | LoadData参数结构体，类型为LoadData2DParamsV2。具体参考表[LoadData（2D矩阵搬运V2）](LoadData（2D矩阵搬运V2）.md)中的LoadData2DParamsV2结构体内参数说明。 <br>**本结构体用于控制左右矩阵数据的搬运。**  <br>|
 | loadMxDataParams | 输入 | LoadData参数结构体，类型为LoadData2DMxParams。具体参考[表3](#table15901153712305)。<br>**本结构体用于控制左右量化系数矩阵的搬运。**  <br>上述结构体参数定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_mm.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
 
 **表 3** LoadData2DMxParams结构体参数说明<a name="table15901153712305"></a>
@@ -113,7 +113,7 @@ __aicore__ inline void LoadData(const LocalTensor<U>& dst, const LocalTensor<T>&
 
 ## 关键特性说明
 
-左右矩阵搬运的相关关键特性与Load2DV2一致，可参考[Load2DV2的关键特性说明](Load2DV2.md)。
+左右矩阵搬运的相关关键特性与LoadData（2D矩阵搬运V2）一致，可参考[LoadData（2D矩阵搬运V2）的关键特性说明](LoadData（2D矩阵搬运V2）.md)。
 
 量化系数矩阵的搬运特性说明如下，起始地址计算公式为：
 
@@ -127,4 +127,4 @@ $$startAddr = srcAddr + (xStartPosition \times \lvert srcStride \rvert + yStartP
 
 ## 调用示例
 
-完整调用示例请参考[Load2DMX样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_2dmx_l12l0)。
+完整调用示例请参考[LoadData（MX矩阵搬运）样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_2dmx_l12l0)。

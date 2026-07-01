@@ -1,4 +1,4 @@
-﻿# Load2D
+﻿# LoadData（2D矩阵搬运）
 
 ## 产品支持情况
 
@@ -47,7 +47,7 @@
 - 对于b16数据类型，每个数据分形为一个16×16的矩阵。
 - 对于b32数据类型，每个数据分形在L0A Buffer中为一个16×8的矩阵，在L0B Buffer中为一个8×16的矩阵。
 
-实现原理可参考伪代码：[Load2D伪代码](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0/scripts/load2d.py)。
+实现原理可参考伪代码：[LoadData（2D矩阵搬运）伪代码](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0/scripts/load2d.py)。
 
 ## 函数原型
 
@@ -250,7 +250,7 @@ dstGap为2：表示目的操作数上，前一个数据分形的尾地址与后�
 
 ## 调用示例
 
-一、如下示例中：在A矩阵不转置，数据类型为half的场景下，可以直接调用Load2D接口，无需开启转置相关参数。
+一、如下示例中：在A矩阵不转置，数据类型为half的场景下，可以直接调用LoadData（2D矩阵搬运）接口，无需开启转置相关参数。
 
 搬运过程的数据排布变化示意图如下：
 
@@ -272,7 +272,7 @@ for (int i = 0; i < CeilDivision(m, fractalShape[0]); ++i) {
 }
 ```
 
-二、如下示例中：在A矩阵转置，数据类型为half的场景下，调用Load2D接口需开启转置相关参数。
+二、如下示例中：在A矩阵转置，数据类型为half的场景下，调用LoadData（2D矩阵搬运）接口需开启转置相关参数。
 
 搬运过程的数据排布变化示意图如下：
 
