@@ -1,4 +1,4 @@
-﻿# LoadDataWithTranspose<a id="ZH-CN_TOPIC_0000002538231154"></a>
+﻿# LoadDataWithTranspose（2D转置矩阵数据搬运）<a id="ZH-CN_TOPIC_0000002538231154"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002543851571_section796754519912"></a>
 
@@ -373,7 +373,7 @@ Kirin X90，支持数据类型：int8_t、half。
 
 ### b8数据类型，A矩阵需要转置的场景示例
 
-在数据类型为b8，A矩阵转置的场景下，Load2D接口不支持转置，因此需要调用LoadDataWithTranspose接口完成数据搬运。
+在数据类型为b8，A矩阵转置的场景下，LoadData 2D接口不支持转置，因此需要调用LoadDataWithTranspose接口完成数据搬运。
 
 搬运过程的数据排布变化示意图如下：
 
