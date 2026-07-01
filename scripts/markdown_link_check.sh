@@ -418,6 +418,17 @@ def should_skip_chunk(input_paths, changed):
     return changed[0] not in input_set
 
 
+def should_skip_manifest_chunk(input_paths, changed, reverse_targets):
+    if not changed and not reverse_targets:
+        return False
+    input_set = {path for path in input_paths if path}
+    if not input_set:
+        return False
+    manifest_set = {path for path in changed if path}
+    manifest_set.update(path for path in reverse_targets if path)
+    return input_set.isdisjoint(manifest_set)
+
+
 def staged_markdown_changes():
     try:
         result = subprocess.run(
@@ -592,7 +603,7 @@ else:
     skip_scan = False
     if ci_mod_filelist_exists:
         ci_changes, ci_reverse_targets = ci_markdown_changes()
-        if should_skip_chunk(input_paths, ci_changes):
+        if should_skip_manifest_chunk(input_paths, ci_changes, ci_reverse_targets):
             skip_scan = True
         else:
             changed = list(dict.fromkeys(ci_changes))
@@ -883,6 +894,7 @@ set -e
 
 set +e
 python3 - "$REPO_ROOT" "$SCAN_SET_FILE" "$GITCODE_LINK_OUTPUT_FILE" "$(markdown_check_duration)" <<'PY'
+import os
 import posixpath
 import re
 import subprocess
@@ -1003,6 +1015,28 @@ def worktree_object_type(path):
     return None
 
 
+def normalize_branch_name(branch):
+    if branch.startswith("refs/heads/"):
+        return branch[len("refs/heads/"):]
+    if branch.startswith("origin/"):
+        return branch[len("origin/"):]
+    return branch
+
+
+def resolve_target_branch():
+    for env_name in (
+        "PR_TARGET_BRANCH",
+        "CHANGE_TARGET",
+        "CI_MERGE_REQUEST_TARGET_BRANCH_NAME",
+        "TARGET_BRANCH",
+        "BASE_REF",
+    ):
+        branch = os.environ.get(env_name)
+        if branch:
+            return normalize_branch_name(branch)
+    return None
+
+
 def asc_devkit_gitcode_target(target):
     parsed = urlparse(target.strip().strip("<>").strip("\"'"))
     if parsed.scheme not in ("http", "https") or parsed.netloc != "gitcode.com":
@@ -1032,6 +1066,7 @@ for raw_line in scan_set_file.read_text(encoding="utf-8").splitlines():
 errors = []
 ref_cache = {}
 object_cache = {}
+target_branch = resolve_target_branch()
 for source in scan_files:
     source_path = repo_root / source
     try:
@@ -1055,6 +1090,12 @@ for source in scan_files:
                 continue
 
             branch, target_path = parsed
+            if target_branch is not None and branch != target_branch:
+                errors.append(
+                    f"{source}:{line_number}: GitCode link branch must match PR target branch: "
+                    f"{target} uses {branch}, target branch is {target_branch}"
+                )
+                continue
             if branch in ("master", "main"):
                 ref = "working tree"
                 cache_key = (ref, target_path)
