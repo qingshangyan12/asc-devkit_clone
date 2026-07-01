@@ -26,7 +26,11 @@
 #define AIN_DEVICE __attribute__((always_inline)) __aicore__ __inline__
 #endif
 
+#define AIN_URMA_MASK 0u
+
 namespace AscendC {
+
+typedef uint32_t AinSignal;
 
 using AinDevComm = __gm__ void*;
 using AinCommSymWindow = __gm__ void*;

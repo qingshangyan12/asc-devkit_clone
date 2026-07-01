@@ -24,18 +24,9 @@
 #ifndef IMPL_ADV_API_DETAIL_AIN_IMPL_BARRIER_IMPL_H
 #define IMPL_ADV_API_DETAIL_AIN_IMPL_BARRIER_IMPL_H
 
+#include "barrier_impl_def.h"
+
 namespace AscendC {
-
-class AinBarrierSessionImpl {
-    Ain* ain;
-    AinTeam team;    // barrier 作用域
-    HcclAinBarrierHandle handle;
-    int index;   // barrier资源索引
-    AinSignal signal;  // handle.signal0 + index * nranks
-
-    template<bool EnableTimeout, typename DescriptorUbuf>
-    AIN_DEVICE int32_t syncInternal(AinMemoryOrder order, uint64_t timeoutCycles, const DescriptorUbuf &ubuf);
-};
 
 AIN_DEVICE AinBarrierSession::AinBarrierSession(
     Ain* ain, AinTeamTagWorld, uint32_t index)
@@ -51,12 +42,12 @@ AIN_DEVICE AinBarrierSession::AinBarrierSession(
 
 template<typename DescriptorUbuf>
 AIN_DEVICE void AinBarrierSession::sync(AinMemoryOrder order, const DescriptorUbuf &ubuf) {
-    this->template syncInternal<false>(order, 0);
+    this->template syncInternal<false>(order, 0, ubuf);
 }
 
 template<typename DescriptorUbuf>
 AIN_DEVICE int32_t AinBarrierSession::sync(AinMemoryOrder order, uint64_t timeoutCycles, const DescriptorUbuf &ubuf) {
-    return this->template syncInternal<true>(order, timeoutCycles);
+    return this->template syncInternal<true>(order, timeoutCycles, ubuf);
 }
 
 template<bool EnableTimeout, typename DescriptorUbuf>
@@ -75,7 +66,6 @@ AIN_DEVICE int32_t AinBarrierSessionImpl::syncInternal(AinMemoryOrder order, uin
         }
         
         this->ain->signal(this->team, peer, AinSignalInc{this->signal + this->team.rank}, ubuf);
-        this->ain->flush();
 
         __gm__ uint32_t* shadowPtr = (__gm__ uint32_t*)this->ain->getSignalShadowPtr(this->signal + peer);
         uint32_t waitVal = ++(*shadowPtr);

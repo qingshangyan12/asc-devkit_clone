@@ -26,20 +26,9 @@
 
 #include <cstddef>
 #include <cstdint>
+#include "../../../../basic_api/utils/kernel_utils_ceil_oom_que.h"
 
 namespace AscendC {
-
-typedef uint32_t AinSignal;
-
-template <typename T, typename U>
-struct AinIsSame {
-    static constexpr bool value = false;
-};
-
-template <typename T>
-struct AinIsSame<T, T> {
-    static constexpr bool value = true;
-};
 
 typedef struct {
     uint32_t signal0;
@@ -73,6 +62,18 @@ typedef struct {
 
 enum class SymmetricMemoryMode { HCCS = 0, URMA = 1 };
 
+typedef enum {
+    COMM_MEM_TYPE_INVALID = -1,
+    COMM_MEM_TYPE_DEVICE = 0,
+    COMM_MEM_TYPE_HOST = 1,
+} CommMemType;
+
+typedef struct {
+    CommMemType type;
+    void *addr;
+    uint64_t size;
+} CommMem;
+
 struct SymmetricWindow {
     void* userVa;
     size_t userSize;
@@ -83,7 +84,7 @@ struct SymmetricWindow {
     uint32_t localRank;
     uint32_t rankSize;
     size_t stride;
-    aclrtDrvMemHandle paHandle;
+    void* paHandle;
     SymmetricMemoryMode mode;
     CommMem* remoteMems;
     uint32_t remoteMemNum;
