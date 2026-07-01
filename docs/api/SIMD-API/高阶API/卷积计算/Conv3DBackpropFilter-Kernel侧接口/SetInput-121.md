@@ -1,4 +1,4 @@
-# SetGradOutput
+# SetInput
 
 ## 产品支持情况
 
@@ -24,12 +24,12 @@
 
 ## 功能说明
 
-设置卷积反向计算的输入矩阵GradOutput。
+设置特征矩阵Input。
 
 ## 函数原型
 
 ```
-__aicore__ inline void SetGradOutput(const AscendC::GlobalTensor<SrcT>& gradOutput)
+__aicore__ inline void SetInput(const AscendC::GlobalTensor<SrcT>& input)
 ```
 
 ## 参数说明
@@ -38,7 +38,7 @@ __aicore__ inline void SetGradOutput(const AscendC::GlobalTensor<SrcT>& gradOutp
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| gradOutput | 输入 | GradOutput矩阵在Global Memory上的首地址。类型为[GlobalTensor](../../../../基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor.md)。SrcT表示GradOutput矩阵的数据类型，当前支持的数据类型为：half、bfloat16_t。 |
+| input | 输入 | Input在Global Memory上的首地址。类型为[GlobalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor.md)。特征矩阵Input支持的数据类型SrcT为：half、bfloat16_t。 |
 
 ## 返回值说明
 
@@ -53,10 +53,9 @@ __aicore__ inline void SetGradOutput(const AscendC::GlobalTensor<SrcT>& gradOutp
 ```
 const Conv3DBackpropFilterTilingData* tilingData;
 // ...初始化tilingData
-ConvBackpropApi::Conv3DBackpropFilter <inputType, weightSizeType, gradOutputType, gradWeightType> gradWeight_;
+ConvBackpropApi::Conv3DBackpropFilter <inputType, weightSizeType, gradOutputType, gradWeightType > gradWeight_;
 gradWeight_.Init(&(tilingData->dwTiling));
+// 设置Input
 gradWeight_.SetInput(inputGm_[offsetB_]);
-// 设置gradOutput
-gradWeight_.SetGradOutput(gradOutputGm_[offsetA_]);
 ...
 ```

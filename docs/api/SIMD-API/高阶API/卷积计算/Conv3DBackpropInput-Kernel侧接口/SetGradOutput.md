@@ -1,4 +1,4 @@
-# SetWeight
+# SetGradOutput
 
 ## 产品支持情况
 
@@ -24,12 +24,12 @@
 
 ## 功能说明
 
-设置卷积反向计算的输入矩阵Weight。
+设置卷积反向计算的输入矩阵GradOutput。
 
 ## 函数原型
 
 ```
-__aicore__ inline void SetWeight(const AscendC::GlobalTensor<SrcT>& weight)
+__aicore__ inline void SetGradOutput(const AscendC::GlobalTensor<SrcT>& gradOutput)
 ```
 
 ## 参数说明
@@ -38,7 +38,7 @@ __aicore__ inline void SetWeight(const AscendC::GlobalTensor<SrcT>& weight)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| weight | 输入 | Weight矩阵在Global Memory上的首地址。类型为[GlobalTensor](../../../../基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor.md)。SrcT表示Weight矩阵的数据类型，当前支持的数据类型为：half、bfloat16_t。 |
+| gradOutput | 输入 | GradOutput矩阵在Global Memory上的首地址。类型为[GlobalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor.md)。SrcT表示GradOutput矩阵的数据类型，当前支持的数据类型为：half、bfloat16_t。 |
 
 ## 返回值说明
 
@@ -51,9 +51,9 @@ __aicore__ inline void SetWeight(const AscendC::GlobalTensor<SrcT>& weight)
 ## 调用示例
 
 ```
-const Conv3DBackpropInputTilingData* tilingData;
-// ...初始化tilingData
 ConvBackpropApi::Conv3DBackpropInput<weightDxType, inputSizeDxType, gradOutputDxType, gradInputDxType> gradInput_;
-// ...设置其它参数
-gradInput_.SetWeight(weightGm_[offsetB_]);
+// 设置GradOutput中GlobalTensor的地址
+GlobalTensor<gradOutputType> gradOutputGm_;
+gradOutputGm_.SetGlobalBuffer((__gm__ gradOutputType*)gradOutput);
+gradInput_.SetGradOutput(gradOutputGm_);
 ```
