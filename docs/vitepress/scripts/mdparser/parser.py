@@ -132,6 +132,89 @@ def _escape_lone_tildes(md_text: str) -> str:
     return '\n'.join(result)
 
 
+_MATH_BLOCK_RE = re.compile(r'\$\$[\s\S]*?\$\$')
+
+_MATH_PLACEHOLDER_FMT = '@@MATH{n}@@'
+
+
+def _split_by_fences(md_text: str):
+    lines = md_text.split('\n')
+    segments = []
+    current = []
+    is_code = False
+    fence_char = None
+
+    for line in lines:
+        stripped = line.lstrip(' \t')
+
+        if is_code:
+            current.append(line)
+            if fence_char and re.match(
+                rf'^{re.escape(fence_char)}{{3,}}[ \t]*$', stripped
+            ):
+                is_code = False
+                fence_char = None
+                segments.append((True, '\n'.join(current)))
+                current = []
+            continue
+
+        fence_match = re.match(r'^(`{3,}|~{3,})', stripped)
+        if fence_match:
+            if current:
+                segments.append((False, '\n'.join(current)))
+                current = []
+            is_code = True
+            fence_char = fence_match.group(1)[0]
+            current.append(line)
+            continue
+
+        current.append(line)
+
+    if current:
+        segments.append((is_code, '\n'.join(current)))
+
+    return segments
+
+
+def _extract_math_blocks(md_text: str) -> tuple:
+    segments = _split_by_fences(md_text)
+    blocks = []
+    result = []
+    for is_code, content in segments:
+        if is_code:
+            result.append(content)
+            continue
+
+        code_spans = []
+
+        def _stash_code(m):
+            code_spans.append(m.group(0))
+            return f'\x00CODE{len(code_spans) - 1}\x00'
+
+        text = _INLINE_CODE_SPAN_RE.sub(_stash_code, content)
+
+        def _stash_math(m):
+            blocks.append(m.group(0))
+            return _MATH_PLACEHOLDER_FMT.format(n=len(blocks) - 1)
+
+        text = _MATH_BLOCK_RE.sub(_stash_math, text)
+
+        for i, code in enumerate(code_spans):
+            text = text.replace(f'\x00CODE{i}\x00', code)
+
+        result.append(text)
+
+    return '\n'.join(result), blocks
+
+
+def _restore_math_blocks(html: str, blocks: list) -> str:
+    for i, block in enumerate(blocks):
+        placeholder = _MATH_PLACEHOLDER_FMT.format(n=i)
+        encoded = block.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+        html = html.replace(placeholder, encoded)
+    return html
+
+
 def _convert_cann_filter(md_text: str) -> str:
     """将所有 cann-filter 标签转为 HTML 注释，保留筛选信息。
 
@@ -492,10 +575,12 @@ def _highlight_code(html: str) -> str:
 def parse_string(text: str, gfm: bool = True) -> str:
     text = _convert_cann_filter(text)
     text = _escape_lone_tildes(text)
+    text, math_blocks = _extract_math_blocks(text)
     if gfm:
         html = gfm_to_html(text)
     else:
         html = markdown_to_html(text)
+    html = _restore_math_blocks(html, math_blocks)
     html = _fix_links(html)
     html = _fix_callouts(html)
     html = _highlight_code(html)
