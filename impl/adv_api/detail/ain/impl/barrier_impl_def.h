@@ -28,18 +28,15 @@
 
 namespace AscendC {
 
-struct HcclTeamTagWorld {};
-struct HcclTeamTagRail {};
-
-struct AinBarrierSessionImpl {
+class AinBarrierSessionImpl {
     Ain* ain;   
-    HcclTeam team;    // barrier 作用域
+    AinTeam team;    // barrier 作用域
     HcclAinBarrierHandle handle;
     int index;   // barrier资源索引      
-    HcclAinSignal_t signal;  // handle.signal0 + index * nranks
+    AinSignal signal;  // handle.signal0 + index * nranks
 
-    template<bool EnableTimeout>
-    AIN_DEVICE HcclResult syncInternal(AinMemoryOrder order, uint64_t timeoutCycles);
+    template<bool EnableTimeout, typename DescriptorUbuf>
+    AIN_DEVICE int32_t syncInternal(AinMemoryOrder order, uint64_t timeoutCycles, const DescriptorUbuf &ubuf);
 };
 
 }  // namespace AscendC

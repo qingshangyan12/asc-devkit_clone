@@ -29,58 +29,45 @@
 namespace AscendC{
 
 AIN_DEVICE AinBarrierSession::AinBarrierSession(
-    Ain* ain, HcclTeamTagWorld, uint32_t index) 
+    Ain* ain, AinTeamTagWorld, uint32_t index) 
 {
-    auto devComm = reinterpret_cast<__gm__ HcclDevComm *>(ain->getDevComm());
+    auto devComm = reinterpret_cast<__gm__ HcclDevComm *>(ain->devComm_);
     auto aivRes = reinterpret_cast<AivRes *>(reinterpret_cast<uint64_t>(devComm->AivRes));
     this->ain = ain;
-    this->team = HcclTeamWorld(devComm);
+    this->team = AinTeamWorld(devComm);
     this->handle = aivRes->ainWorldBarrier;
     this->index = index;
     this->signal = this->handle.signal0 + index * this->team.nRanks; 
 }
 
-AIN_DEVICE void AinBarrierSession::sync(AinMemoryOrder order) {
+template<typename DescriptorUbuf>
+AIN_DEVICE void AinBarrierSession::sync(AinMemoryOrder order, const DescriptorUbuf &ubuf) {
     this->template syncInternal<false>(order, 0);
 }
 
-AIN_DEVICE HcclResult AinBarrierSession::sync(AinMemoryOrder order, uint64_t timeoutCycles) {
+template<typename DescriptorUbuf>
+AIN_DEVICE int32_t AinBarrierSession::sync(AinMemoryOrder order, uint64_t timeoutCycles, const DescriptorUbuf &ubuf) {
     return this->template syncInternal<true>(order, timeoutCycles);
 }
 
-template<bool EnableTimeout>
-AIN_DEVICE HcclResult AinBarrierSessionImpl::syncInternal(AinMemoryOrder order, uint64_t timeoutCycles)
+template<bool EnableTimeout, typename DescriptorUbuf>
+AIN_DEVICE int32_t AinBarrierSessionImpl::syncInternal(AinMemoryOrder order, uint64_t timeoutCycles, const DescriptorUbuf &ubuf)
 {
-    AscendC::LocalTensor<uint8_t> hcommLocal = AscendC::LocalTensor<uint8_t>(
-        AscendC::TPosition::VECOUT, 0, AscendC::HCOMM_URMA_TMP_BUF_SIZE);    
-    AscendC::AinDescriptorUbuf hcommUbuf{
-        reinterpret_cast<__ubuf__ uint8_t*>(hcommLocal.GetPhyAddr()),
-        AscendC::HCOMM_URMA_TMP_BUF_SIZE,
-        0
-    };
-
     uint64_t startCycle;
-    HcclResult ret = HcclResult::HCCL_SUCCESS;   // 这里需要 #include "hccl_res.h"，删除？
-
-    int32_t vecId = AscendC::GetBlockIdx();    // vec核ID
-    int32_t vecSize = AscendC::GetBlockNum() * AscendC::GetTaskRation();  // AIV核数
-
-    // 全核同步
-    AscendC::SyncAll<true>(); 
 
     if constexpr (EnableTimeout) {
-        startCycle = AscendC::GetSystemCycle();   // 记录开始时间
+        startCycle = AscendC::GetSystemCycle(); 
     }
 
     if ASCEND_IS_AIV {
-        for (int32_t i = vecId; i < this->team.nRanks - 1; i += vecSize) { 
+        for (int32_t i = 0; i < this->team.nRanks - 1; ++i) { 
             int peer = 1 + this->team.rank + i;
             if (this->team.nRanks <= peer) {
                 peer -= this->team.nRanks;
             }
             
-            this->ain->signal(this->team, peer, AinSignalInc{this->signal + this->team.rank}, hcommUbuf);
-            this->ain->flush();  // 需要吗？
+            this->ain->signal(this->team, peer, AinSignalInc{this->signal + this->team.rank}, ubuf);
+            this->ain->flush();
 
             __gm__ uint32_t* shadowPtr = (__gm__ uint32_t*)this->ain->getSignalShadowPtr(this->signal + peer);
             uint32_t waitVal = ++(*shadowPtr);
@@ -93,20 +80,16 @@ AIN_DEVICE HcclResult AinBarrierSessionImpl::syncInternal(AinMemoryOrder order, 
                     }
                     uint64_t endCycle = AscendC::GetSystemCycle();
                     if (endCycle - startCycle >= timeoutCycles) {
-                        ret = HcclResult::HCCL_E_TIMEOUT;
-                        break;
+                        return -1;
                     }
                 }
             } else {
                 this->ain->waitSignal(this->signal + peer, waitVal, 32);
             }
-            
         }
     }
 
-    // 全核同步
-    AscendC::SyncAll<true>();
-    return ret;
+    return 0;
 }
 
 }  // namespace AscendC
