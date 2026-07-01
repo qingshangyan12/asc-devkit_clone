@@ -12,6 +12,8 @@
 
 asc_squeeze_v2接口搭配[asc_storeunalign_postupdate](../reg_store/asc_storeunalign_postupdate.md)接口使用时，会将有效数据大小保存至AR寄存器，搬出时使用该值作为存储偏移量。AR寄存器中的数值可以通过[asc_get_squeeze_status](../../sys_var/asc_get_squeeze_status.md)接口获取。
 
+> 其中asc_squeeze_v2接口已废弃，请使用[asc_squeeze_with_status](asc_squeeze_with_status.md)实现此功能。
+
 ## 函数原型
 
   ```cpp

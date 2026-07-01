@@ -18,10 +18,11 @@ reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存�
   - INTLV搬出模式：双搬出模式，忽略mask，将src0，src1中的元素交错存储于dst中，存储长度为VL*2。
 - 从掩码寄存器连续对齐搬出到UB的场景
   - NORM搬出模式：正常模式，搬运VL数据，支持数据类型为u8、u16、u32。
-  - PACK搬出模式：压缩模式，将src中元素的低半部分bit数据连续存储于dst中，支持数据类型为u8、u16、u32。
+    - PACK搬出模式：压缩模式，将src中元素的低半部分bit数据连续存储于dst中，支持数据类型为u8、u16、u32。
+
+> 该接口已废弃。其中asc_storealign_pack_v2请使用[asc_storealign_pack_quarter](../asc_storealign_pack_quarter.md)实现此功能。
 
 ## 函数原型
-
 - 从矢量数据寄存器连续对齐搬出到UB的场景
   ```cpp
   // NORM搬出模式

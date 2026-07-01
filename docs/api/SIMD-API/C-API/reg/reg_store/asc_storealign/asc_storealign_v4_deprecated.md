@@ -19,6 +19,8 @@ reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存�
   - NORM搬出模式：正常模式，搬运VL数据，支持数据类型为u8、u16、u32。
   - PACK搬出模式：压缩模式，将src中元素的低半部分bit数据连续存储于dst中，支持数据类型为u8、u16、u32。
 
+> 该接口已废弃。其中asc_storealign_pack_postupdate_v2请使用[asc_storealign_pack_quarter_postupdate](../asc_storealign_pack_quarter_postupdate.md)实现此功能。
+
 ## 函数原型
 
 - 从矢量数据寄存器连续对齐搬出到UB的场景
