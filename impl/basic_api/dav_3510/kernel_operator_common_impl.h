@@ -141,7 +141,6 @@ __aicore__ static inline void ResetCtrlSprImpl()
     set_ctrl(value);
 }
 
-<<<<<<< Updated upstream
 namespace Internal {
 template <SaturationMode mode>
 __aicore__ inline constexpr bool IsSupportedSaturationMode()
@@ -150,7 +149,7 @@ __aicore__ inline constexpr bool IsSupportedSaturationMode()
            mode == SaturationMode::CAST;
 }
 } // namespace Internal
-=======
+
 template <CacheMode cacheMode>
 __aicore__ inline constexpr uint8_t GetCacheModeBits()
 {
@@ -166,6 +165,8 @@ __aicore__ inline constexpr uint8_t GetCacheModeBits()
 template <CacheRwMode rwMode, CacheMode cacheMode>
 __aicore__ inline void SetScalarCacheModeImpl()
 {
+    static_assert(rwMode == CacheRwMode::READ || rwMode == CacheRwMode::WRITE,
+        "SetScalarCacheMode only supports READ or WRITE mode, RW mode is not supported");
     // READ mode: CTRL[19:16], WRITE mode: CTRL[23:20]
     constexpr uint8_t startBit = (rwMode == CacheRwMode::READ) ? 16 : 20;
     constexpr uint8_t cacheBits = GetCacheModeBits<cacheMode>();
@@ -175,7 +176,25 @@ __aicore__ inline void SetScalarCacheModeImpl()
     ctrlValue |= (static_cast<uint64_t>(cacheBits) << startBit);
     set_ctrl(ctrlValue);
 }
->>>>>>> Stashed changes
+
+template <CacheRwMode rwMode>
+__aicore__ inline CacheMode GetScalarCacheModeImpl()
+{
+    static_assert(rwMode == CacheRwMode::READ || rwMode == CacheRwMode::WRITE,
+        "GetScalarCacheMode only supports READ or WRITE mode, RW mode is not supported");
+    // READ mode: CTRL[19:16], WRITE mode: CTRL[23:20]
+    constexpr uint8_t startBit = (rwMode == CacheRwMode::READ) ? 16 : 20;
+    int64_t ctrlValue = get_ctrl();
+    uint8_t cacheBits = static_cast<uint8_t>((ctrlValue >> startBit) & 0xF);
+    
+    switch (cacheBits) {
+        case 0:  return CacheMode::CACHE_MODE_NORMAL;
+        case 1:  return CacheMode::CACHE_MODE_LAST;
+        case 2:  return CacheMode::CACHE_MODE_PERSISTENT;
+        case 4:  return CacheMode::CACHE_MODE_DISABLE;
+        default: return CacheMode::CACHE_MODE_NORMAL;
+    }
+}
 
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H
