@@ -82,6 +82,56 @@ _OTHER_TAG_ANY_RE = re.compile(
 )
 
 
+_FENCE_OPEN_RE = re.compile(r'^[ \t]{0,3}(`{3,}|~{3,})', re.MULTILINE)
+
+_INLINE_CODE_SPAN_RE = re.compile(r'`+[^\n]*?`+')
+
+_LONE_TILDE_RE = re.compile(r'(?<!\\)(?<!~)~(?!~)')
+
+
+def _escape_lone_tildes_in_line(line: str) -> str:
+    result = []
+    last_end = 0
+    for m in _INLINE_CODE_SPAN_RE.finditer(line):
+        before = line[last_end:m.start()]
+        result.append(_LONE_TILDE_RE.sub(r'\\~', before))
+        result.append(m.group())
+        last_end = m.end()
+    remaining = line[last_end:]
+    result.append(_LONE_TILDE_RE.sub(r'\\~', remaining))
+    return ''.join(result)
+
+
+def _escape_lone_tildes(md_text: str) -> str:
+    lines = md_text.split('\n')
+    result = []
+    in_fence = False
+    fence_char = None
+
+    for line in lines:
+        stripped = line.lstrip(' \t')
+
+        if in_fence:
+            result.append(line)
+            if fence_char and re.match(
+                rf'^{re.escape(fence_char)}{{3,}}[ \t]*$', stripped
+            ):
+                in_fence = False
+                fence_char = None
+            continue
+
+        fence_match = re.match(r'^(`{3,}|~{3,})', stripped)
+        if fence_match:
+            in_fence = True
+            fence_char = fence_match.group(1)[0]
+            result.append(line)
+            continue
+
+        result.append(_escape_lone_tildes_in_line(line))
+
+    return '\n'.join(result)
+
+
 def _convert_cann_filter(md_text: str) -> str:
     """将所有 cann-filter 标签转为 HTML 注释，保留筛选信息。
 
@@ -441,6 +491,7 @@ def _highlight_code(html: str) -> str:
 
 def parse_string(text: str, gfm: bool = True) -> str:
     text = _convert_cann_filter(text)
+    text = _escape_lone_tildes(text)
     if gfm:
         html = gfm_to_html(text)
     else:
