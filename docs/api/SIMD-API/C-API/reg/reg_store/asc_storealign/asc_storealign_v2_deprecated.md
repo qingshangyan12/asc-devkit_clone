@@ -8,6 +8,8 @@
 
 ## 功能说明
 
+**该接口已废弃。其中asc_storealign_pack_v2请使用[asc_storealign_pack_quarter](../asc_storealign_pack_quarter.md)实现此功能。**
+
 reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存器连续对齐搬出到UB的场景，并支持多种搬出模式，接口通过地址寄存器传入偏移，用户可以选择更新偏移或者更新目的操作数的地址。
 
 - 从矢量数据寄存器连续对齐搬出到UB的场景
@@ -19,8 +21,6 @@ reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存�
 - 从掩码寄存器连续对齐搬出到UB的场景
   - NORM搬出模式：正常模式，搬运VL数据，支持数据类型为u8、u16、u32。
     - PACK搬出模式：压缩模式，将src中元素的低半部分bit数据连续存储于dst中，支持数据类型为u8、u16、u32。
-
-> 该接口已废弃。其中asc_storealign_pack_v2请使用[asc_storealign_pack_quarter](../asc_storealign_pack_quarter.md)实现此功能。
 
 ## 函数原型
 - 从矢量数据寄存器连续对齐搬出到UB的场景

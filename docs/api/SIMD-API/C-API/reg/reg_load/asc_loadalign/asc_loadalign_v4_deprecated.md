@@ -8,6 +8,8 @@
 
 ## 功能说明
 
+**该接口已废弃。其中asc_loadalign_brc_postupdate_v2请使用[asc_loadalign_brc_datablock_postupdate](../asc_loadalign_brc_datablock_postupdate.md)，asc_loadalign_brc_postupdate_v3请使用[asc_loadalign_brc_elem2datablock_postupdate](../asc_loadalign_brc_elem2datablock_postupdate.md)，asc_loadalign_unpack_postupdate_v2请使用[asc_loadalign_unpack4_postupdate](../asc_loadalign_unpack4_postupdate.md)实现此功能。**
+
 对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式，接口通过int32_t传入偏移，同时设置成硬件自动Post Update，用户不用更新偏移或者更新源操作数的地址。
 
 - NORM搬入模式：正常模式，搬运VL数据。
@@ -19,8 +21,6 @@
 - BRCV2搬入模式：读取一个DataBlock（32B），并广播到VL。
 - BRCV3搬入模式：加载（VL/DataBlock）B的数据，并将每个元素（16bit/32bit）广播到一个DataBlock（32B）中。
 - DEINTLV搬入模式：双搬入模式，基于元素的交错搬运，从src中读取2*VL长度数据，将偶数索引的元素存入dst0，将奇数索引的元素存入dst1，数据类型为b8/b16/b32。
-
-> 该接口已废弃。其中asc_loadalign_brc_postupdate_v2请使用[asc_loadalign_brc_datablock_postupdate](../asc_loadalign_brc_datablock_postupdate.md)，asc_loadalign_brc_postupdate_v3请使用[asc_loadalign_brc_elem2datablock_postupdate](../asc_loadalign_brc_elem2datablock_postupdate.md)，asc_loadalign_unpack_postupdate_v2请使用[asc_loadalign_unpack4_postupdate](../asc_loadalign_unpack4_postupdate.md)实现此功能。
 
 ## 函数原型
 
