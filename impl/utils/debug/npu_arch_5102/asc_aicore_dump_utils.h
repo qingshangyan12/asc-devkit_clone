@@ -20,16 +20,6 @@
 #include "kernel_macros.h"
 
 namespace __asc_aicore {
-constexpr uint32_t ASC_DEBUG_BUS_UNLOCK_OFFSET = 0x078;
-constexpr uint32_t ASC_DEBUG_BUS_CTRL_OFFSET = 0x100;
-constexpr uint32_t ASC_DEBUG_BUS_ADDR_LOW_OFFSET = 0x108;
-constexpr uint32_t ASC_DEBUG_BUS_MODEL_BASE_OFFSET = 0x10c;
-constexpr uint32_t ASC_DEBUG_BUS_DATA_OFFSET = 0x110;
-constexpr uint32_t ASC_DEBUG_BUS_BUSY_OFFSET = 0x130;
-constexpr uint32_t ASC_DEBUG_BUS_UNLOCK_VALUE = 0x19101920;
-constexpr uint32_t ASC_DEBUG_BUS_READ_MASK = 0x2;
-constexpr uint32_t ASC_DEBUG_BUS_CHUNK_WORDS = 8;
-constexpr uint32_t ASC_DEBUG_BUS_CHUNK_BYTES = ASC_DEBUG_BUS_CHUNK_WORDS * sizeof(uint32_t);
 
 template<typename T>
 __aicore__ inline uint32_t mem_copy_cbuf_to_gm_impl(__gm__ T* dst, __cc__ T* src, const uint32_t& dumpSize)
