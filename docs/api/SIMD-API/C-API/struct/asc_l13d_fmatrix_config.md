@@ -19,6 +19,10 @@ union asc_l13d_fmatrix_config {
 };
 ```
 
+## 约束说明
+
+
+
 ## 字段详解
 
 |字段名|字段含义|
