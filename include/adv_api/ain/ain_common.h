@@ -28,6 +28,8 @@
 
 namespace AscendC {
 
+typedef uint32_t AinSignal;
+
 using AinDevComm = __gm__ void*;
 using AinCommSymWindow = __gm__ void*;
 
