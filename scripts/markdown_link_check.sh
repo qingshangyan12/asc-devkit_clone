@@ -418,6 +418,17 @@ def should_skip_chunk(input_paths, changed):
     return changed[0] not in input_set
 
 
+def should_skip_manifest_chunk(input_paths, changed, reverse_targets):
+    if not changed and not reverse_targets:
+        return False
+    input_set = {path for path in input_paths if path}
+    if not input_set:
+        return False
+    manifest_set = {path for path in changed if path}
+    manifest_set.update(path for path in reverse_targets if path)
+    return input_set.isdisjoint(manifest_set)
+
+
 def staged_markdown_changes():
     try:
         result = subprocess.run(
@@ -592,7 +603,7 @@ else:
     skip_scan = False
     if ci_mod_filelist_exists:
         ci_changes, ci_reverse_targets = ci_markdown_changes()
-        if should_skip_chunk(input_paths, ci_changes):
+        if should_skip_manifest_chunk(input_paths, ci_changes, ci_reverse_targets):
             skip_scan = True
         else:
             changed = list(dict.fromkeys(ci_changes))
