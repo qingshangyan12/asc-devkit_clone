@@ -96,31 +96,31 @@
 
 -   同一个TPosition上的所有Queue，连续调用AllocTensor接口申请的Tensor数量，根据AI处理器型号的不同，有数量约束。申请Buffer时，需要满足该约束。
     <!-- npu="950" id10 -->
-    Ascend 950PR/Ascend 950DT不超过8个。
+    - Ascend 950PR/Ascend 950DT不超过8个。
     <!-- end id10 -->
     <!-- npu="A3" id11 -->
-    Atlas A3 训练系列产品/Atlas A3 推理系列产品不超过8个。
+    - Atlas A3 训练系列产品/Atlas A3 推理系列产品不超过8个。
     <!-- end id11 -->
     <!-- npu="910b" id12 -->
-    Atlas A2 训练系列产品/Atlas A2 推理系列产品不超过8个。
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品不超过8个。
     <!-- end id12 -->
     <!-- npu="310b" id13 -->
-    Atlas 200I/500 A2 推理产品不超过8个。
+    - Atlas 200I/500 A2 推理产品不超过8个。
     <!-- end id13 -->
     <!-- npu="310p" id14 -->
-    Atlas 推理系列产品AI Core不超过8个。
+    - Atlas 推理系列产品AI Core不超过8个。
     <!-- end id14 -->
     <!-- npu="310p" id15 -->
-    Atlas 推理系列产品Vector Core不超过8个。
+    - Atlas 推理系列产品Vector Core不超过8个。
     <!-- end id15 -->
     <!-- npu="910" id16 -->
-    Atlas 训练系列产品不超过4个。
+    - Atlas 训练系列产品不超过4个。
     <!-- end id16 -->
     <!-- npu="x90" id17 -->
-    Kirin X90不超过8个。
+    - Kirin X90不超过8个。
     <!-- end id17 -->
     <!-- npu="9030" id18 -->
-    Kirin 9030不超过8个。
+    - Kirin 9030不超过8个。
     <!-- end id18 -->    
 -   non-inplace接口分配的Tensor内容可能包含随机值。
 -   non-inplace接口，需要将TQueBind的depth模板参数设置为非零值；inplace接口，需要将TQueBind的depth模板参数设置为0。

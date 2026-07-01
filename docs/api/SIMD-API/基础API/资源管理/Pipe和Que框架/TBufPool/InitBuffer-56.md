@@ -38,37 +38,26 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```cpp
-template <class T> __aicore__ inline bool InitBuffer(T& que, uint8_t num, uint32_t len)
-
-template <TPosition pos> __aicore__ inline bool InitBuffer(TBuf<pos>& buf, uint32_t len)
-```
+-   为TQue分配内存
+    ```cpp
+    template <class T>
+    __aicore__ inline bool InitBuffer(T& que, uint8_t num, uint32_t len)
+    ```
+-   为TBuf分配内存
+    ```cpp
+    template <TPosition pos>
+    __aicore__ inline bool InitBuffer(TBuf<pos>& buf, uint32_t len)
+    ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表1**  模板参数说明
+**表1**  为TQue分配内存的函数原型-模板参数说明
 
-<a name="table1550165916920"></a>
-<table><thead align="left"><tr id="row115015591391"><th class="cellrowborder" valign="top" width="12.139999999999999%" id="mcps1.2.3.1.1"><p id="p12501159099"><a name="p12501159099"></a><a name="p12501159099"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="87.86%" id="mcps1.2.3.1.2"><p id="p85019592918"><a name="p85019592918"></a><a name="p85019592918"></a>说明</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row1550117591914"><td class="cellrowborder" valign="top" width="12.139999999999999%" headers="mcps1.2.3.1.1 "><p id="p185019592913"><a name="p185019592913"></a><a name="p185019592913"></a>T</p>
-</td>
-<td class="cellrowborder" valign="top" width="87.86%" headers="mcps1.2.3.1.2 "><p id="p12101541625"><a name="p12101541625"></a><a name="p12101541625"></a><span>que参数的类型。</span></p>
-</td>
-</tr>
-<tr id="row758993611212"><td class="cellrowborder" valign="top" width="12.139999999999999%" headers="mcps1.2.3.1.1 "><p id="p12692424332"><a name="p12692424332"></a><a name="p12692424332"></a>pos</p>
-</td>
-<td class="cellrowborder" valign="top" width="87.86%" headers="mcps1.2.3.1.2 "><p id="p35011591693"><a name="p35011591693"></a><a name="p35011591693"></a>Buffer逻辑位置，可以为<span>VECIN、VECOUT、</span>VECCALC、A1<span>、</span>B1、C1。<span>关于TPosition的具体介绍请参考</span><a href="../../../数据结构/辅助数据结构//TPosition.md">TPosition</a>。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名称 | 含义 |
+| -------- | ---- |
+| T | que参数的类型。|
 
-**表2**  为TQue分配内存接口参数说明
+**表2**  为TQue分配内存的函数原型-接口参数说明
 
 <a name="table193329316393"></a>
 <table><thead align="left"><tr id="row123331131153919"><th class="cellrowborder" valign="top" width="12.36%" id="mcps1.2.4.1.1"><p id="p8333133153913"><a name="p8333133153913"></a><a name="p8333133153913"></a>参数名称</p>
@@ -103,7 +92,13 @@ template <TPosition pos> __aicore__ inline bool InitBuffer(TBuf<pos>& buf, uint3
 </tbody>
 </table>
 
-**表3**  为TBuf分配内存接口参数说明
+**表3**  为TBuf分配内存的函数原型-模板参数说明
+
+| 参数名称 | 含义 |
+| -------- | ---- |
+| pos | Buffer逻辑位置，可以为VECIN、VECOUT、VECCALC、A1、B1、C1。关于TPosition的具体介绍请参考[TPosition](../../../数据结构/辅助数据结构/TPosition.md)。|
+
+**表4**  为TBuf分配内存的函数原型-接口参数说明
 
 <a name="table5376122715308"></a>
 <table><thead align="left"><tr id="row1337716275309"><th class="cellrowborder" valign="top" width="12.36%" id="mcps1.2.4.1.1"><p id="p1537762711305"><a name="p1537762711305"></a><a name="p1537762711305"></a>参数名称</p>
