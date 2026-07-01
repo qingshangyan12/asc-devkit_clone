@@ -47,6 +47,7 @@ Tensor本质是基于数组的编程抽象，而非简单的内存地址封装�
       // 扩展Tensor（Tensor API）携带Layout信息，搬运接口自动推导参数
       auto gmA = AscendC::Te::MakeTensor(AscendC::Te::MakeMemPtr(a), AscendC::Te::MakeFrameLayout<AscendC::Te::NDExtLayoutPtn>(M, K));
       auto gmB = AscendC::Te::MakeTensor(AscendC::Te::MakeMemPtr(b), AscendC::Te::MakeFrameLayout<AscendC::Te::NDExtLayoutPtn>(K, N));
+      __cbuf__ half l1ABuf[1024];
       auto l1ATensor = AscendC::Te::MakeTensor(AscendC::Te::MakeMemPtr(l1ABuf), AscendC::Te::MakeFrameLayout<AscendC::Te::NZLayoutPtn>(baseM, K));
 
       // 一行代码完成搬运，无需手动传入size参数
@@ -123,9 +124,9 @@ UB是AI Core内主要用于矢量计算的内部存储单元，位于每个Vecto
 ```cpp
 __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
 {
-  // Basic Tensor: allocate through Allocator
-  AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
-  AscendC::LocalTensor<half> ubTensor = ubAllocator.Alloc<half, 256>();
+    // Basic Tensor: allocate through Allocator
+    AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
+    AscendC::LocalTensor<half> ubTensor = ubAllocator.Alloc<half, 256>();
 }
 ```
 
@@ -383,8 +384,8 @@ __global__ __mix__ void mix_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 - 同步事件由开发者使用`SetFlag/WaitFlag(ISASI)`和`PipeBarrier(ISASI)`手动插入，事件的类型和事件ID由开发者自行管理，但需要注意事件ID不能使用6和7（可能与内部使用的事件ID出现冲突，进而出现未定义行为）。
 - Kernel入口处需要开发者手动调用[InitSocState](../../../../../api/SIMD-API/基础API/工具接口/系统初始化/InitSocState.md)接口用来初始化全局状态寄存器。因为全局状态寄存器处于不确定状态，如果不调用该接口，可能导致算子执行过程中出现未定义行为。在TPipe框架编程中，初始化过程由TPipe完成，无需开发者关注。
 - Kernel结束前需要开发者手动调用[PipeBarrier<PIPE_ALL>()](../../../../../api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md)。
-- 部分API内部通过软仿真实现，需占用Ascend C预留的UB空间，开发者使用时需关注目标API是否依赖该预留空间（针对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)，Select等API内部使用了8KB的预留UB空间，用于存储中间数据；针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，Exp等API内部使用了2KB的预留UB空间，用于指令兼容或存储中间数据）。若开启--cce-disable-asc-reserved-ubuf编译选项，在对应产品版本下调用相关API会触发编译期报错。具体API范围见使用[预留UB空间的API列表](#section_reserved_ubuf_api)。
-- 同时另外一些软仿实现接口内部会占用系统分配的事件ID，如果开发者手动调用`SetFlag/WaitFlag(ISASI)`插入自定义事件ID时会跟接口内部的事件ID产生冲突, 所以用户自定义事件ID时，只能支持部分API。具体支持的API列表见[支持的API范围](#section2633193623711)。
+- 部分API内部通过软仿真实现，需占用Ascend C预留的UB空间，开发者使用时需关注目标API是否依赖该预留空间（针对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)，Select等API内部使用了8KB的预留UB空间，用于存储中间数据；针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，Exp等API内部使用了2KB的预留UB空间，用于指令兼容或存储中间数据）。若开启--cce-disable-asc-reserved-ubuf编译选项，在对应产品版本下调用相关API会触发编译期报错。具体API范围见[使用预留UB空间的API列表](#section_reserved_ubuf_api)。
+- 同时另外一些软仿实现接口内部会占用系统分配的事件ID，如果开发者手动调用`SetFlag/WaitFlag(ISASI)`插入自定义事件ID时会跟接口内部的事件ID产生冲突，所以用户自定义事件ID时，只能支持部分API。具体支持的API列表见[支持的API范围](#section2633193623711)。
 
 ## 支持的API范围<a name="section2633193623711"></a>
 

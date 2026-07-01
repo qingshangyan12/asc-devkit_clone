@@ -1,4 +1,4 @@
-# Memory矢量计算编程<a name="ZH-CN_TOPIC_0000002600000003"></a>
+# Memory矢量计算编程<a name="ZH-CN_TOPIC_0000002600000004"></a>
 
 本文介绍如何在Ascend C中使用C++ Tensor编程API编写基于Unified Buffer（以下简称UB）的矢量计算代码，该能力是Ascend C最基础、最通用的矢量编程方式。这种基于UB内存的编程方式被称为Memory矢量计算编程。[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品支持完整的Memory矢量计算UB直接编程能力；而[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)虽也支持UB操作，但推荐使用Reg矢量计算编程以获得更高性能。
 
@@ -57,13 +57,13 @@ AscendC::DataCopy(dstLocal, srcGlobal, 256);
 ![非连续搬运](../../../../figures/非连续搬运.png)
 
 ```cpp
-// Number of consecutive data blocks: 16 rows of data, transfer every alternate row to UB, needing to transfer 8 rows
+// A total of 6 dataBlocks are transferred, split into two rounds of 3 dataBlocks each.
 uint16_t blockCount = 2;
-// Length of single data block (in 32B units): value is 8
-uint16_t blockLen = 8;
-// Gap from previous block to next block in source data (in 32B units): source blocks are consecutive, value is 1
+// Length of single data block (in 32B units): value is 3
+uint16_t blockLen = 3;
+// Gap from previous block to next block in source data (in 32B units): value is 1
 uint16_t srcGap = 1;
-// Gap from previous block to next block in destination data (in 32B units): interval of one block between destination blocks, value is 2
+// Gap from previous block to next block in destination data (in 32B units): interval of one datablock between destination blocks, value is 2
 uint16_t dstGap = 2;
 
 DataCopyParams copyParams {blockCount, blockLen, srcGap, dstGap};
@@ -169,7 +169,7 @@ uint8_t dstRepeatStride = 9;
 uint8_t src0RepeatStride = 9;
 uint8_t src1RepeatStride = 9;
 
-AscendC::Add(zTensor, xTensor, yTensor, mask, repeatTime, { dstBlockStride, src0BlockStride, src1BlockStride, dstRepeatStride, src0RepeatStride, src1RepeatStride });
+AscendC::Add(dstLocal, src0Local, src1Local, mask, repeatTime, { dstBlockStride, src0BlockStride, src1BlockStride, dstRepeatStride, src0RepeatStride, src1RepeatStride });
 ```
 
 #### 掩码设置
@@ -230,7 +230,7 @@ half scalarValue = 1.0;
 AscendC::SetMaskNormal();
 // 2.2 Set Mask value to 100, indicating single iteration computes first 100 elements
 AscendC::SetVectorMask(0, static_cast<uint64_t>(100)); 
-AscendC::Adds(dstLocal, src0Local, scalarValue, AscendC::MASK_PLACEHOLDER, 2, { 1, 1, 8, 8 });
+AscendC::Adds<half, false>(dstLocal, src0Local, scalarValue, AscendC::MASK_PLACEHOLDER, 2, { 1, 1, 8, 8 });
 ```
 
 - 单次迭代内逐比特模式：可以按位控制哪些元素参与计算，bit位的值为1表示参与计算，0表示不参与。分为maskHigh（高位mask）和maskLow（低位mask）。参数取值范围和操作数的数据类型有关，数据类型不同，每次迭代内能够处理的元素个数最大值不同。当操作数为16位时，maskLow、maskHigh∈[0, 2^64-1]，并且不同时为0；当操作数为32位时，maskHigh为0，maskLow∈(0, 2^64-1]；当操作数为64位时，maskHigh为0，maskLow∈(0, 2^32-1]。
@@ -250,7 +250,7 @@ AscendC::Adds(dstLocal, src0Local, scalarValue, AscendC::MASK_PLACEHOLDER, 2, { 
   AscendC::SetMaskNormal();
   // 2.2 Set Mask to bit-wise mode (0101...), implement interleaved computation
   AscendC::SetVectorMask(0x000000000000AAAA, 0x0000000000000000); 
-  AscendC::Add(dstLocal, src0Local, src1Local, AscendC::MASK_PLACEHOLDER, 2, { 1, 1, 1, 8, 8, 8 });
+  AscendC::Add<half, false>(dstLocal, src0Local, src1Local, AscendC::MASK_PLACEHOLDER, 2, { 1, 1, 1, 8, 8, 8 });
   ```
 
 ### 连续计算

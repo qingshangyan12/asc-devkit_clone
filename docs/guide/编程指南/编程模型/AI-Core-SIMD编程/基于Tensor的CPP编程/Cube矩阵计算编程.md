@@ -22,24 +22,24 @@ Cube矩阵计算的基本步骤为：数据搬入 → 数据加载 → 计算 �
 ```cpp
 __global__ __cube__ void matmul_custom(...)
 {
-  constexpr uint32_t m_size = 128;
-  constexpr uint32_t n_size = 128;
-  constexpr uint32_t k_size = 256;
-  
-  AscendC::LocalMemAllocator<AscendC::Hardware::L1> l1Allocator;
-  AscendC::LocalMemAllocator<AscendC::Hardware::L0A> l0aAllocator;
-  AscendC::LocalMemAllocator<AscendC::Hardware::L0B> l0bAllocator;
-  AscendC::LocalMemAllocator<AscendC::Hardware::L0C> l0cAllocator;
-  
-  // Allocate L1 Buffer for matrix A and B
-  LocalTensor<half> l1a_buffer = l1Allocator.Alloc<half, m_size * k_size>();
-  LocalTensor<half> l1b_buffer = l1Allocator.Alloc<half, k_size * n_size>();
-  // Allocate L0A/L0B/L0C Buffer for matrix computation
-  LocalTensor<half> l0a_buffer = l0aAllocator.Alloc<half, m_size * k_size>();
-  LocalTensor<half> l0b_buffer = l0bAllocator.Alloc<half, k_size * n_size>();
-  LocalTensor<float> l0c_buffer = l0cAllocator.Alloc<float, m_size * n_size>();
-  
-  // ... Use Buffer for matrix computation
+    constexpr uint32_t m_size = 128;
+    constexpr uint32_t n_size = 128;
+    constexpr uint32_t k_size = 256;
+
+    AscendC::LocalMemAllocator<AscendC::Hardware::L1> l1Allocator;
+    AscendC::LocalMemAllocator<AscendC::Hardware::L0A> l0aAllocator;
+    AscendC::LocalMemAllocator<AscendC::Hardware::L0B> l0bAllocator;
+    AscendC::LocalMemAllocator<AscendC::Hardware::L0C> l0cAllocator;
+
+    // Allocate L1 Buffer for matrix A and B
+    LocalTensor<half> l1a_buffer = l1Allocator.Alloc<half, m_size * k_size>();
+    LocalTensor<half> l1b_buffer = l1Allocator.Alloc<half, k_size * n_size>();
+    // Allocate L0A/L0B/L0C Buffer for matrix computation
+    LocalTensor<half> l0a_buffer = l0aAllocator.Alloc<half, m_size * k_size>();
+    LocalTensor<half> l0b_buffer = l0bAllocator.Alloc<half, k_size * n_size>();
+    LocalTensor<float> l0c_buffer = l0cAllocator.Alloc<float, m_size * n_size>();
+
+    // ... Use Buffer for matrix computation
 }
 ```
 
@@ -272,7 +272,7 @@ AscendC::SetFixpipePreQuantFlag(deqScalar);
 
 ### 矩阵计算
 
-`Mmad`是Ascend C封装NPU硬件计算能力的矩阵乘加核心接口，用于全连接层、卷积层等算子开发，实现C = A × B + C的矩阵乘加计算（输入为L0A Buffer和L0B Buffer，输出为L0C Buffer），其中针对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)，L0A Buffer分形为Zz、L0B Buffer分形为Zn、L0C Buffer分形为Nz，而[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品L0A Buffer分形为Nz。
+[Mmad](../../../../../api/SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/Mmad.md)是Ascend C封装NPU硬件计算能力的矩阵乘加核心接口，用于全连接层、卷积层等算子开发，实现C = A × B + C的矩阵乘加计算（输入为L0A Buffer和L0B Buffer，输出为L0C Buffer），其中针对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)，L0A Buffer分形为Zz、L0B Buffer分形为Zn、L0C Buffer分形为Nz，而[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品L0A Buffer分形为Nz。
 
 ![NPU架构版本3510 `Mmad`计算](../../../../figures/Ascend950PR-Ascend950DT-asc_mmad计算.png)
 
@@ -352,9 +352,10 @@ __global__ __cube__ void matmul_kernel(__gm__ float* x, __gm__ float* y, __gm__ 
     
     // Step 1: Data transfer in (Global Memory → L1 Buffer), pipeline is PIPE_MTE2
     AscendC::Mutex::Lock<PIPE_MTE2>(mutex_id);
-    AscendC::Nd2NzParams nd2nzParams{1, 16, 23, 0, 32, 32, 1, 0};
-    AscendC::DataCopy(al1ATensor, aGm, nd2nzParams);
-    AscendC::DataCopy(bl1BTensor, bGm, nd2nzParams);
+    AscendC::Nd2NzParams nd2nzParamsA{1, 16, 23, 0, 32, 32, 1, 0};
+    AscendC::DataCopy(al1ATensor, aGm, nd2nzParamsA);
+    AscendC::Nd2NzParams nd2nzParamsB{1, 16, 23, 0, 32, 32, 1, 0};
+    AscendC::DataCopy(bl1BTensor, bGm, nd2nzParamsB);
     AscendC::Mutex::Unlock<PIPE_MTE2>(mutex_id);
     
     // Step 2: Data transfer in (L1 Buffer → L0A/B Buffer), pipeline is PIPE_MTE1
@@ -366,7 +367,7 @@ __global__ __cube__ void matmul_kernel(__gm__ float* x, __gm__ float* y, __gm__ 
     
     // Step 3: Matrix computation (L0A/B Buffer → L0C Buffer), pipeline is PIPE_M
     AscendC::Mutex::Lock<PIPE_M>(mutex_id);
-    AscendC::MmadParams mmadParams{BLOCK_M, BLOCK_K, BLOCK_N, 0, false, false, false};
+    AscendC::MmadParams mmadParams{BLOCK_M, BLOCK_K, BLOCK_N, 0, false, false, true};
     AscendC::Mmad(l0cTensor, l0aTensor, l0bTensor, mmadParams);
     AscendC::Mutex::Unlock<PIPE_M>(mutex_id);
     
