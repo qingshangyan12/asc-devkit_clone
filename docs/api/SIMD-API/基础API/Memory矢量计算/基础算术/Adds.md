@@ -43,7 +43,7 @@ $dst_i = src_i + scalarValue$
 - tensor前n个数据连续计算
 
     ```cpp
-    template <typename T>
+    template <typename T, bool isSetMask = true>
     __aicore__ inline void Adds(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue, const int32_t& count)
     ```
 
