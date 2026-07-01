@@ -28,6 +28,17 @@
 
 namespace AscendC {
 
+static AIN_DEVICE AinTeam AinTeamWorld(AinDevComm devComm)
+{
+    __gm__ HcclDevComm* hcclDevComm = reinterpret_cast<__gm__ HcclDevComm*>(devComm);
+    AinTeam team;
+    team.nRanks = hcclDevComm->rankSize;
+    team.rank = hcclDevComm->rankId;
+    team.stride = 1;
+    return team;
+}
+
+template <unsigned commEngineMask>
 AIN_DEVICE Ain::Ain(AinDevComm devComm, int contextIndex)
     : devComm_(reinterpret_cast<uint64_t>(devComm)), contextIndex_(contextIndex)
 {}
@@ -57,7 +68,7 @@ AIN_DEVICE void Ain::put(
     AinCommitFlags commitFlags)
 {
     static_assert(
-        !AinIsSame<DescriptorUbuf, AinDescriptorUbufNone>::value,
+        !IsSameType<DescriptorUbuf, AinDescriptorUbufNone>::value,
         "put requires a valid DescriptorUbuf; AinDescriptorUbufNone is not allowed");
     (void)team;
     (void)remoteAction;
@@ -88,7 +99,7 @@ AIN_DEVICE void Ain::get(
     uint64_t srcOffset, uint64_t bytes, const DescriptorUbuf& ubuf, AinCommitFlags commitFlags)
 {
     static_assert(
-        !AinIsSame<DescriptorUbuf, AinDescriptorUbufNone>::value,
+        !IsSameType<DescriptorUbuf, AinDescriptorUbufNone>::value,
         "get requires a valid DescriptorUbuf; AinDescriptorUbufNone is not allowed");
     (void)team;
     hcomm_.Init(ubuf.addr, ubuf.bytes);
@@ -123,7 +134,7 @@ AIN_DEVICE AinSignalDescriptor GetSignalDescriptor(const Ain& ain, T action)
 template <typename T>
 AIN_DEVICE uint64_t GetSignalOpArg(T action)
 {
-    if constexpr (AinIsSame<T, AinSignalInc>::value) {
+    if constexpr (IsSameType<T, AinSignalInc>::value) {
         return 1;
     } else {
         return action.value;
@@ -134,7 +145,7 @@ template <typename RemoteAction, typename DescriptorUbuf>
 AIN_DEVICE void Ain::signal(AinTeam team, uint32_t peer, RemoteAction action, const DescriptorUbuf &ubuf,
     AinCommitFlags commitFlags)
 {
-    static_assert(!AinIsSame<DescriptorUbuf, AinDescriptorUbufNone>::value,
+    static_assert(!IsSameType<DescriptorUbuf, AinDescriptorUbufNone>::value,
         "signal requires a valid DescriptorUbuf; AinDescriptorUbufNone is not allowed");
     hcomm_.Init(ubuf.addr, ubuf.bytes);
 
@@ -152,13 +163,13 @@ AIN_DEVICE void Ain::signal(AinTeam team, uint32_t peer, RemoteAction action, co
     auto amoSignalId = aivRes->ainWorldBarrier.signal0 + team.rank;
     uint64_t amoOffset = amoSignalId * sizeof(uint64_t);
     auto amoSignal = reinterpret_cast<__gm__ uint8_t *>(
-        reinterpret_cast<uintptr_t>(aivRes->symMemPool) + amoOffset);
+        reinterpret_cast<uintptr_t>(aivRes->ainSignalShadows) + amoOffset);
 
-    if (commitFlags == AIN_COMMIT_DELAYED) {
-        hcomm_.AtomicFAA<uint64_t, false>(channel, remoteSignal, amoSignal, signalOpArg);
-    } else {
-        hcomm_.AtomicFAA(channel, remoteSignal, amoSignal, signalOpArg);
-    }
+    // if (commitFlags == AIN_COMMIT_DELAYED) {
+    //     hcomm_.AtomicFAA<uint64_t, false>(channel, remoteSignal, amoSignal, signalOpArg);
+    // } else {
+    //     hcomm_.AtomicFAA(channel, remoteSignal, amoSignal, signalOpArg);
+    // }
 }
 
 AIN_DEVICE uint64_t Ain::readSignal(AinSignal signalId, uint32_t bits, AinMemoryOrder order) const
