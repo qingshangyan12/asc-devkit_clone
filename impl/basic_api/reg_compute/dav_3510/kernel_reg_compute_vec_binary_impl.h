@@ -866,92 +866,48 @@ __simd_callee__ inline void DivPrecisionImpl(U& dstReg, U& srcReg0, U& srcReg1, 
 
     // x = x1 + e
     // x = vsel(inf_nan_cmp_mask, x1, x)
-    constexpr DivSpecificMode sprMode = Internal::GetDivSpecificMode(mode);
-    constexpr auto modeValue = GetMaskMergeMode<sprMode.mrgMode>();
-    constexpr uint32_t infNanBound = 0xff800000u;
-    constexpr uint32_t signBitNum = 0x80000000u;
-    constexpr int32_t precisionThreshold = -64;
-    constexpr uint32_t exponentMask = 0x7F800000u;
-    constexpr uint32_t mantissaMask = 0x007FFFFFu;
-    constexpr int32_t exponentBias = 127;
+    constexpr DivSpecificMode sprMode = Internal::GetDivSpecificMode(mode);	 
+    constexpr auto modeValue = GetMaskMergeMode<sprMode.mrgMode>();	 
+    constexpr uint32_t infNanBound = 0xff800000u;	 
+    constexpr uint32_t signBitNum = 0x80000000u;	 
+    RegTensor<T> regNegZero;	 
+    RegTensor<T> tmpDst;	 
+    RegTensor<T> r, z, y;	 
+    RegTensor<uint32_t> infNan;	 
+    MaskReg cmpMaskReg;	 
+    MaskReg infNanCmp;	 
+    MaskReg zeroCmp;	 
+    MaskReg preg;	 
+    preg = pset_b8(PAT_ALL);	 
+    vdup((vector_u32&)regNegZero, signBitNum, preg, modeValue);	 
+    vdiv(z, srcReg0, srcReg1, mask, modeValue);	 
+    vor(infNan, (vector_u32&)z, (vector_u32&)regNegZero, mask, modeValue);	 
+    tmpDst = z;	 
+    vcmps_eq(zeroCmp, z, 0.0f, mask);	 
+    vcmps_ge(infNanCmp, infNan, infNanBound, mask);	 
+    por(infNanCmp, infNanCmp, zeroCmp, mask);	 
+    vmuls(y, srcReg1, -1.0f, mask, modeValue);	 
+    r = srcReg0;	 
+    vmula(r, z, y, mask, modeValue);	 
+    RegTensor<T> rPre, rNext, zPre, zNext;	 
 
-    RegTensor<T> regNegZero;
-    RegTensor<T> tmpDst;
-    RegTensor<T> r, z, y;
-    RegTensor<uint32_t> infNan;
+    vadds((vector_s32&)zPre, (vector_s32&)z, -1, mask, modeValue);	 
+    vadds((vector_s32&)zNext, (vector_s32&)z, 1, mask, modeValue);	 
 
-    MaskReg cmpMaskReg;
-    MaskReg infNanCmp;
-    MaskReg zeroCmp;
-    MaskReg preg;
-    preg = pset_b8(PAT_ALL);
-    vdup((vector_u32&)regNegZero, signBitNum, preg, modeValue);
-    vdiv(z, srcReg0, srcReg1, mask, modeValue);
-    vor(infNan, (vector_u32&)z, (vector_u32&)regNegZero, mask, modeValue);
-    tmpDst = z;
-    vcmps_eq(zeroCmp, z, 0.0f, mask);
-    vcmps_ge(infNanCmp, infNan, infNanBound, mask);
-    por(infNanCmp, infNanCmp, zeroCmp, mask);
+    rPre = srcReg0;	 
+    rNext = srcReg0;	 
+    vmula(rPre, zPre, y, mask, modeValue);	 
+    vmula(rNext, zNext, y, mask, modeValue);	 
 
-    RegTensor<uint32_t> src0ExpBits, src0Reg;
-    RegTensor<int32_t> src0Exp;
-    RegTensor<uint32_t> scaleBits;
-    RegTensor<T> scale;
-    RegTensor<T> aScaled, bScaled;
-    MaskReg needScaleMask;
-    MaskReg noScaleMask;
+    vabs(r, r, mask, modeValue);	 
+    vabs(rPre, rPre, mask, modeValue);	 
+    vabs(rNext, rNext, mask, modeValue);	 
+    vcmp_lt(cmpMaskReg, r, rPre, mask);	 
+    vsel(r, r, rPre, cmpMaskReg);	 
+    vsel(z, z, zPre, cmpMaskReg);	 
 
-    vdup(src0Reg, exponentMask, mask, modeValue);
-    And(src0ExpBits, (RegTensor<uint32_t>&)srcReg0, src0Reg, mask);
-    vshrs(src0ExpBits, src0ExpBits, (int16_t)23, mask, modeValue);
-    vdup(src0Reg, exponentBias, mask, modeValue);
-    vsub(src0Exp, (RegTensor<int32_t>&)src0ExpBits, (RegTensor<int32_t>&)src0Reg, mask, modeValue);
-    
-    Compares<int32_t, CMPMODE::LT>(needScaleMask, src0Exp, precisionThreshold, mask);
-    MaskNot(noScaleMask, needScaleMask, mask);
-
-    RegTensor<int32_t> k;
-    RegTensor<int32_t> thresholdVec;
-    RegTensor<int32_t> zeroVec;
-    vdup(thresholdVec, precisionThreshold, mask, modeValue);
-    vdup(zeroVec, 0, mask, modeValue);
-    vsub(k, thresholdVec, src0Exp, mask, modeValue);
-    vmax(k, k, zeroVec, mask, modeValue);
-
-    RegTensor<int32_t> newExp;
-    vadds(newExp, k, exponentBias, needScaleMask, modeValue);
-    vshls(scaleBits, (RegTensor<uint32_t>&)newExp, (int16_t)23, needScaleMask, modeValue);
-    
-    RegTensor<T> scaleOne;
-    vdup(scaleOne, 1.0f, mask, modeValue);
-    vsel(scale, (RegTensor<T>&)scaleBits, scaleOne, needScaleMask);
-
-    vmul(aScaled, srcReg0, scale, mask, modeValue);
-    vmul(bScaled, srcReg1, scale, mask, modeValue);
-
-    vmuls(y, bScaled, -1.0f, mask, modeValue);
-    r = aScaled;
-    vmula(r, z, y, mask, modeValue);
-    RegTensor<T> rPre, rNext, zPre, zNext;
-
-    vadds((vector_s32&)zPre, (vector_s32&)z, -1, mask, modeValue);
-    vadds((vector_s32&)zNext, (vector_s32&)z, 1, mask, modeValue);
-
-    rPre = aScaled;
-    rNext = aScaled;
-
-    vmula(rPre, zPre, y, mask, modeValue);
-    vmula(rNext, zNext, y, mask, modeValue);
-
-    vabs(r, r, mask, modeValue);
-    vabs(rPre, rPre, mask, modeValue);
-    vabs(rNext, rNext, mask, modeValue);
-    vcmp_lt(cmpMaskReg, r, rPre, mask);
-    vsel(r, r, rPre, cmpMaskReg);
-    vsel(z, z, zPre, cmpMaskReg);
-
-    vcmp_lt(cmpMaskReg, rNext, r, mask);
-    vsel(z, zNext, z, cmpMaskReg);
+    vcmp_lt(cmpMaskReg, rNext, r, mask);	 
+    vsel(z, zNext, z, cmpMaskReg);	 
     vsel(dstReg, tmpDst, z, infNanCmp);
 }
 
