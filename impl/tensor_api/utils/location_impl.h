@@ -53,6 +53,7 @@ namespace Te {
     M(bfloat16_t    , __VA_ARGS__)  \
     M(fp4x2_e1m2_t  , __VA_ARGS__)  \
     M(fp4x2_e2m1_t  , __VA_ARGS__)  \
+    M(hifloat4x2_t  , __VA_ARGS__)  \
     M(fp8_e5m2_t    , __VA_ARGS__)  \
     M(fp8_e4m3fn_t  , __VA_ARGS__)  \
     M(fp8_e8m0_t  , __VA_ARGS__)
