@@ -107,6 +107,21 @@ AIN_DEVICE void Ain::waitSignal(HcclAinSignal_t signalId, uint64_t least, uint32
             break;
         }
     }
+AIN_DEVICE void Ain::waitSignal(HcclAinSignal_t signalId, uint64_t least, uint32_t bits, AinMemoryOrder order) const
+{
+    (void)order;
+    auto hcclDevComm = reinterpret_cast<__gm__ HcclDevComm *>(devComm_);
+    auto aivRes = reinterpret_cast<AivRes *>(reinterpret_cast<uint64_t>(hcclDevComm->AivRes));
+    uint64_t signalOffset = signalId * sizeof(uint64_t);
+    __gm__ uint64_t *ptr = reinterpret_cast<__gm__ uint64_t *>(
+        reinterpret_cast<uintptr_t>(aivRes->symMemPool) + signalOffset);
+    uint64_t mask = bits >= 64U ? UINT64_MAX : ((1ULL << bits) - 1ULL);
+    while (true) {
+        uint64_t got = ld_dev(ptr, 0);
+        if (least <= (got & mask)) {
+            break;
+        }
+    }
 }
 
 AIN_DEVICE __gm__ uint64_t* Ain::getSignalShadowPtr(HcclAinSignal_t signalId) const
