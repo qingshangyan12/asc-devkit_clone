@@ -67,5 +67,4 @@
     - **[二元计算](vector_computation/binary_computation.md)**
     - **[标量二元计算](vector_computation/binary_scalar_computation.md)**
     - **[类型转换](vector_computation/cast_computation.md)**
-    - **[Axpy计算](vector_computation/axpy_computation.md)**
     - **[双输出计算](vector_computation/dual_computation.md)**

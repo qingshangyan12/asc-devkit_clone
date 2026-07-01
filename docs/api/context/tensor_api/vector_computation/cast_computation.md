@@ -18,13 +18,13 @@ Cast Trait 用于指定类型转换的附加属性，包括舍入模式（RoundM
 
 | 舍入模式 | 说明 |
 | :--- | :--- |
-| `CastRoundMode::RD` | 向下取整（Round Down） |
-| `CastRoundMode::RN` | 就近舍入（Round Nearest） |
-| `CastRoundMode::RNA` | 就近舍入到偶数（Round Nearest Away） |
-| `CastRoundMode::RH` | HI 浮点舍入（Round Hifloat） |
-| `CastRoundMode::RO` | 奇数舍入（Round Odd） |
-| `CastRoundMode::RU` | 向上取整（Round Up） |
-| `CastRoundMode::RZ` | 向零舍入（Round Zero） |
+| `CastRoundMode::RD` | floor模式，向下取整） |
+| `CastRoundMode::RN` | 返回最接近参数的整数，如果有2个整数同样接近，则会返回偶数的那个  |
+| `CastRoundMode::RNA` | round模式，四舍五入求整 |
+| `CastRoundMode::RH` | 随机舍入，算子中目前特指输出结果是hif8数据时，会用到的一种随机舍入。 |
+| `CastRoundMode::RO` | 向奇数的方向舍入，既当小数点后数值不为0时，如果整数位是偶数，则进位 |
+| `CastRoundMode::RU` | ceil模 式，向上取整 |
+| `CastRoundMode::RZ` | truncation模式，截断取整） |
 
 ### 饱和模式（SatMode）
 

@@ -58,8 +58,6 @@ __aicore__ inline void Transform(const DstTensor& dst, const SrcTensor0& src0, c
 - 源 Tensor 和目的 Tensor 均需位于 Unified Buffer（UB），存储位置为 `Location::UB`。
 - 两个源 Tensor 和目的 Tensor 的数据类型需一致。
 - 两个源 Tensor 和目的 Tensor 的数据量（由 Layout 的 `Size()` 确定）需匹配。
-- 带进位的加法运算仅支持int32_t和uint32_t类型。
-- 带进位的加法运算需手动调用，接口内部不支持自动识别触发。
 
 ## 调用示例
 
