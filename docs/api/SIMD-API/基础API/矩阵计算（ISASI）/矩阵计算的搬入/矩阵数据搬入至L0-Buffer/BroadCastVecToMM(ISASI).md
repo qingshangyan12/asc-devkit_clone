@@ -52,7 +52,7 @@ __aicore__ inline void BroadCastVecToMM(const LocalTensor<T> &dst, const LocalTe
 
 | 参数名称 | 类型 | 说明 |
 | ---------- | ---------- | ---------- |
-| dst | 输出 | 目的操作数，结果矩阵，类型为LocalTensor，支持的物理地址为L0C Buffer（TPosition：CO1）。<br>LocalTensor的起始地址需要256个元素对齐。<br>支持的数据类型为：half、int32_t、float。 |
+| dst | 输出 | 目的操作数，结果矩阵，类型为LocalTensor，支持的物理地址为L0C Buffer（TPosition：CO1）。<br>LocalTensor的起始地址需要256个元素对齐。<br>支持的数据类型为：int16_t、uint16_t、half。 |
 | src | 输入 | 源操作数，输入矢量，类型为LocalTensor，支持的物理地址为Unified Buffer（TPosition：VECIN/VECCALC/VECOUT）。<br>支持的数据类型需要与dst一致。 |
 | blockCount | 输入 | 指定该指令包含的连续广播数据块个数，取值范围：blockCount∈[1, 255]。 |
 | blockLen | 输入 | 指定该指令每个连续广播数据块长度，单位为16个元素。取值范围：blockLen∈[1, 255]。 |
