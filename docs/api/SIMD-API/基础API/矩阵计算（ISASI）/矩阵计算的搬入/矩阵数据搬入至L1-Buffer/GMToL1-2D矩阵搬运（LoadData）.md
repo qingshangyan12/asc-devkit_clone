@@ -1,4 +1,4 @@
-# GMToL1 Load2D指令搬运<a id="ZH-CN_TOPIC_0000002538231138"></a>
+# GMToL1-2D矩阵搬运（LoadData）<a id="ZH-CN_TOPIC_0000002538231138"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002567745223_section796754519912"></a>
 
@@ -115,7 +115,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 ## 调用示例<a id="zh-cn_topic_0000002567745223_section088124295117"></a>
 
-如下示例中：在数据类型为half的场景下，通过调用Load2D指令完成GM->L1 Buffer的Nz2Nz数据搬运。
+如下示例中：在数据类型为half的场景下，通过调用LoadData接口完成GM->L1 Buffer的Nz2Nz数据搬运。
 
 搬运过程的数据排布变化示意图如下：
 

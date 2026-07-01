@@ -1,8 +1,8 @@
-﻿# Load3D<a id="ZH-CN_TOPIC_0000002538071224"></a>
+﻿# LoadData（卷积数据搬运）<a id="ZH-CN_TOPIC_0000002538071224"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002512171652_section796754519912"></a>
 
-### Load3Dv1接口
+### LoadData（卷积数据搬运） v1接口
 
 <!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：不支持
@@ -32,7 +32,7 @@
 - Kirin 9030：不支持
 <!-- end id9 -->
 
-### Load3Dv2接口和Load3Dv2Pro接口
+### LoadData（卷积数据搬运） v2接口和LoadData（卷积数据搬运） v2 Pro接口
 
 <!-- npu="950" id10 -->
 - Ascend 950PR/Ascend 950DT：支持
@@ -66,35 +66,35 @@
 
 头文件路径为：basic_api/kernel_operator_mm_intf.h。
 
-Load3D本质上是用于将NC1HWC0格式的Feature Map完成Image to Column展开，然后再从展开后的二维矩阵中选取指定数据块搬入对应内存位置。见图1。
+LoadData（卷积数据搬运）本质上是用于将NC1HWC0格式的Feature Map完成Image to Column展开，然后再从展开后的二维矩阵中选取指定数据块搬入对应内存位置。见图1。
 
-由于Load3D搬运过程中，是以512字节的数据分形为单位进行搬运的，因此，Load3D也可以用于普通矩阵计算所需的2D格式数据的搬运。如何使用Load3D进行2D格式数据的搬运可以参考[关键特性说明](#zh-cn_topic_0000002512171652_section102629572045)。
+由于LoadData搬运过程中，是以512字节的数据分形为单位进行搬运的，因此，LoadData也可以用于普通矩阵计算所需的2D格式数据的搬运。如何使用LoadData进行2D格式数据的搬运可以参考[关键特性说明](#zh-cn_topic_0000002512171652_section102629572045)。
 
-Load3D仅支持如下数据通路：L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer。
+LoadData（卷积数据搬运）仅支持如下数据通路：L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer。
 
-实现原理可参考伪代码：[Load3D伪代码](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0/scripts/load3d.py)。
+实现原理可参考伪代码：[LoadData（卷积数据搬运）伪代码](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0/scripts/load3d.py)。
 
-**图1** Load3D to L0A Buffer功能示意图<a id="zh-cn_topic_0000002512171652_fig54450833715"></a>  
+**图1** LoadData to L0A Buffer功能示意图<a id="zh-cn_topic_0000002512171652_fig54450833715"></a>  
 
-![](../../../../../figures/load3d_l1tol0a_demo.png "Load3D-to-L0A Buffer功能示意图")
+![](../../../../../figures/load3d_l1tol0a_demo.png "LoadData-to-L0A Buffer功能示意图")
 
 ## 函数原型<a id="zh-cn_topic_0000002512171652_section82039854412"></a>
 
-**Load3Dv1接口：**
+**LoadData（卷积数据搬运） v1接口：**
 
 ```cpp
 template <typename T, const IsResetLoad3dConfig &defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV1<U>& loadDataParams)
 ```
 
-**Load3Dv2接口：**
+**LoadData（卷积数据搬运） v2接口：**
 
 ```cpp
 template <typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV2<U>& loadDataParams)
 ```
 
-**Load3Dv2Pro接口：**
+**LoadData（卷积数据搬运） v2 Pro接口：**
 
 ```cpp
 template <typename T>
@@ -108,7 +108,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 | 参数名称 | 含义 |
 | ---------- | ------ |
 | T | 源操作数和目的操作数的数据类型。支持的数据类型请参考[数据类型](#zh-cn_topic_0000002512171652_section4219135304818)。 |
-| defaultConfig | 控制是否在Load3Dv1/Load3Dv2接口内部设置相关属性。IsResetLoad3dConfig类型。IsResetLoad3dConfig结构定义如下：<pre>struct IsResetLoad3dConfig {<br>   bool isSetFMatrix = true;<br>   bool isSetPadding = true;<br>};</pre>isSetFMatrix配置为true，表示在接口内部设置FeatureMap的属性描述（包括l1H、l1W、padList，参数介绍参考[表3](#zh-cn_topic_0000002512171652_table679014222918)、[表4](#zh-cn_topic_0000002512171652_table193501032193419)）；设置为false，表示该接口传入的FeatureMap的属性描述不生效，开发者需要通过SetFmatrix进行设置。<br>isSetPadding配置为true，表示在接口内部设置Pad属性描述（即padValue参数，参数介绍参考[表3](#zh-cn_topic_0000002512171652_table679014222918)、[表4](#zh-cn_topic_0000002512171652_table193501032193419)）；设置为false，表示该接口传入的Pad属性不生效，开发者需要通过SetLoadDataPaddingValue进行设置。可参考样例SetFmatrix调用示例。<br>该参数的默认值如下：<pre>constexpr IsResetLoad3dConfig IS_RESER_LOAD3D_DEFAULT_CONFIG = {true, true};</pre>特性细节可参考：[Feature Map、Pad属性描述寄存器设置](#zh-cn_topic_0000002512171652_section1881795134015)。 |
+| defaultConfig | 控制是否在LoadData（卷积数据搬运） v1/LoadData（卷积数据搬运） v2接口内部设置相关属性。IsResetLoad3dConfig类型。IsResetLoad3dConfig结构定义如下：<pre>struct IsResetLoad3dConfig {<br>   bool isSetFMatrix = true;<br>   bool isSetPadding = true;<br>};</pre>isSetFMatrix配置为true，表示在接口内部设置FeatureMap的属性描述（包括l1H、l1W、padList，参数介绍参考[表3](#zh-cn_topic_0000002512171652_table679014222918)、[表4](#zh-cn_topic_0000002512171652_table193501032193419)）；设置为false，表示该接口传入的FeatureMap的属性描述不生效，开发者需要通过SetFmatrix进行设置。<br>isSetPadding配置为true，表示在接口内部设置Pad属性描述（即padValue参数，参数介绍参考[表3](#zh-cn_topic_0000002512171652_table679014222918)、[表4](#zh-cn_topic_0000002512171652_table193501032193419)）；设置为false，表示该接口传入的Pad属性不生效，开发者需要通过SetLoadDataPaddingValue进行设置。可参考样例SetFmatrix调用示例。<br>该参数的默认值如下：<pre>constexpr IsResetLoad3dConfig IS_RESER_LOAD3D_DEFAULT_CONFIG = {true, true};</pre>特性细节可参考：[Feature Map、Pad属性描述寄存器设置](#zh-cn_topic_0000002512171652_section1881795134015)。 |
 | U | LoadData3DParamsV1/LoadData3DParamsV2中padValue的数据类型。<br>&nbsp;&nbsp;&bull;当dst、src使用基础数据类型时，U和dst、src的数据类型T需保持一致，否则编译失败。<br>&nbsp;&nbsp;&bull;当dst、src使用TensorTrait类型时，U和dst、src的数据类型T的LiteType需保持一致，否则编译失败。<br>最后一个模板参数仅用于上述数据类型检查，用户无需关注。 |
 
 **表2** 通用参数说明
@@ -168,7 +168,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 | padValue | Pad填充值的数值，数据类型需要与src保持一致。若不想开启padding，可将padList设为全0。默认为0。 |
 | filterSizeW | 是否在filterW的基础上将卷积核width增加256个元素。true，增加；false，不增加。默认为false。 |
 | filterSizeH | 是否在filterH的基础上将卷积核height增加256个元素。true，增加；false，不增加。默认为false。 |
-| fMatrixCtrl | 表示Load3DV2指令从左矩阵还是右矩阵获取FeatureMap的属性描述，与SetFmatrix配合使用，默认值为false。当前只支持设置为false。<br>&nbsp;&nbsp;&bull; true：从右矩阵中获取FeatureMap的属性描述；<br>&nbsp;&nbsp;&bull; false：从左矩阵中获取FeatureMap的属性描述。 |
+| fMatrixCtrl | 表示LoadData（卷积数据搬运） v2指令从左矩阵还是右矩阵获取FeatureMap的属性描述，与SetFmatrix配合使用，默认值为false。当前只支持设置为false。<br>&nbsp;&nbsp;&bull; true：从右矩阵中获取FeatureMap的属性描述；<br>&nbsp;&nbsp;&bull; false：从左矩阵中获取FeatureMap的属性描述。 |
 
 **表5** LoadData3DParamsV2Pro结构体内参数说明<a id="zh-cn_topic_0000002512171652_table118027314415"></a>
 
@@ -179,14 +179,14 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 | enSmallK | 是否开启small k特性，每个分形矩阵大小为16\*4，支持数据类型为bool，默认为false。<br>**注：当前产品形态，该特性已不再支持。** |
 | filterSizeW | 是否在filterW的基础上将卷积核width增加256个元素。true，增加；false，不增加。 |
 | filterSizeH | 是否在filterH的基础上将卷积核height增加256个元素。true，增加；false，不增加。 |
-| fMatrixCtrl | 表示Load3DV2指令从左矩阵还是右矩阵获取FeatureMap的属性描述，与SetFmatrix配合使用，当前只支持设置为false，默认值为false。<br>&nbsp;&nbsp;&bull; true：从右矩阵中获取FeatureMap的属性描述；<br>&nbsp;&nbsp;&bull; false：从左矩阵中获取FeatureMap的属性描述。 |
+| fMatrixCtrl | 表示LoadData（卷积数据搬运） v2指令从左矩阵还是右矩阵获取FeatureMap的属性描述，与SetFmatrix配合使用，当前只支持设置为false，默认值为false。<br>&nbsp;&nbsp;&bull; true：从右矩阵中获取FeatureMap的属性描述；<br>&nbsp;&nbsp;&bull; false：从左矩阵中获取FeatureMap的属性描述。 |
 | extConfig | 组合参数（uint64_t类型），默认值为0；<br><pre>extConfig = ((uint64_t)mStartPt << 48)<br>    &#124; ((uint64_t)kStartPt << 32)<br>    &#124; ((uint64_t)mExtension << 16)<br>    &#124; (uint64_t)kExtension;</pre> |
 | filterConfig | 组合参数（uint64_t类型），默认值为0X10101010101；<br><pre>filterConfig = ((uint64_t)dilationFilterH << 40)<br>    &#124; ((uint64_t)dilationFilterW << 32)<br>    &#124; ((uint64_t)filterH << 24)<br>    &#124; ((uint64_t)filterW << 16)<br>    &#124; ((uint64_t)strideH << 8)<br>    &#124; (uint64_t)strideW;</pre> |
 
 ## 数据类型<a id="zh-cn_topic_0000002512171652_section4219135304818"></a>
 
 <!-- npu="310p,910" id19 -->
-**Load3Dv1接口：**
+**LoadData（卷积数据搬运） v1接口：**
 
 <!-- npu="310p" id20 -->
 - Atlas 推理系列产品AI Core，支持的数据类型为：int8_t、uint8_t、half。
@@ -198,7 +198,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 <!-- end id19 -->
 
 <!-- npu="950,A3,910b,310b,310p,x90" id22 -->
-**Load3Dv2接口、Load3Dv2Pro接口：**
+**LoadData（卷积数据搬运） v2接口、LoadData（卷积数据搬运） v2 Pro接口：**
 
 <!-- npu="950" id23 -->
 - Ascend 950PR/Ascend 950DT，支持数据类型为：int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t、int32_t、uint32_t、float。
@@ -301,9 +301,9 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 ## 关键特性说明<a id="zh-cn_topic_0000002512171652_section102629572045"></a>
 
-### 使用Load3D完成矩阵计算所需2D格式数据的搬运<a id="zh-cn_topic_0000002512171652_section86392366416"></a>
+### 使用LoadData（卷积数据搬运）完成矩阵计算所需2D格式数据的搬运<a id="zh-cn_topic_0000002512171652_section86392366416"></a>
 
-对于NC1HWC0格式的数据，当N为1，卷积核width和height为1，padding为0，卷积核在源操作数width维度和height维度滑动的步长为1，卷积核width和height膨胀系数为1，此时经过image to column展开后的数据排布可以看成矩阵计算过程中L1 Buffer上的NZ分形排布，因此该场景下可以使用Load3D接口进行矩阵计算所需2D格式数据的搬运，示意图如下所示：
+对于NC1HWC0格式的数据，当N为1，卷积核width和height为1，padding为0，卷积核在源操作数width维度和height维度滑动的步长为1，卷积核width和height膨胀系数为1，此时经过image to column展开后的数据排布可以看成矩阵计算过程中L1 Buffer上的NZ分形排布，因此该场景下可以使用LoadData（卷积数据搬运）接口进行矩阵计算所需2D格式数据的搬运，示意图如下所示：
 
 ![](../../../../../figures/load3d_3d22d_demo.png)
 
@@ -314,7 +314,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 <!-- npu="A3,910b" id40 -->
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品：
 
-    Load3D会自动完成分形的变换，从L1 Buffer上的NZ分形排布转换成L0A Buffer中所需的ZZ分形排布，如下b16类型场景的示意图所示：
+    LoadData（卷积数据搬运）会自动完成分形的变换，从L1 Buffer上的NZ分形排布转换成L0A Buffer中所需的ZZ分形排布，如下b16类型场景的示意图所示：
 
     ![](../../../../../figures/load3d_l1tol0a_b16_nontrans.png)
 <!-- end id40 -->
@@ -322,7 +322,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 <!-- npu="950" id41 -->
 - 针对Ascend 950PR/Ascend 950DT：
 
-    L1 Buffer上的分形排布就是L0A Buffer中所需的NZ分形排布，Load3D不会进行分形排布转换，如下b16类型场景的示意图所示：
+    L1 Buffer上的分形排布就是L0A Buffer中所需的NZ分形排布，LoadData（卷积数据搬运）不会进行分形排布转换，如下b16类型场景的示意图所示：
 
     ![](../../../../../figures/load3d_l1tol0a_b16_nontrans_950.png)
 <!-- end id41 -->
@@ -332,7 +332,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 <!-- npu="A3,910b" id42 -->
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品：
 
-    Load3D仅在b16/b32数据类型下支持转置（enTranspose=True），按照类型详细说明：
+    LoadData（卷积数据搬运）仅在b16/b32数据类型下支持转置（enTranspose=True），按照类型详细说明：
 
     - 对于b16场景：每个分形大小是16×16。
 
@@ -340,7 +340,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
         ![](../../../../../figures/load3d_l1tol0a_b16_trans.png)
 
-        L1 Buffer->L0B Buffer通路下，Load3D接口会自动完成转置，不需要配置enTranspose参数，enTranspose参数此时无效，转置示意图如下：
+        L1 Buffer->L0B Buffer通路下，LoadData（卷积数据搬运）接口会自动完成转置，不需要配置enTranspose参数，enTranspose参数此时无效，转置示意图如下：
 
         ![](../../../../../figures/load3d_l1tol0b_b16_trans.png)
 
@@ -350,7 +350,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
         ![](../../../../../figures/load3d_l1tol0a_b32_trans.png)
 
-        L1 Buffer->L0B Buffer通路下，Load3D接口会自动完成转置，不需要配置enTranspose参数，enTranspose参数此时无效，转置示意图如下：
+        L1 Buffer->L0B Buffer通路下，LoadData（卷积数据搬运）接口会自动完成转置，不需要配置enTranspose参数，enTranspose参数此时无效，转置示意图如下：
 
         ![](../../../../../figures/load3d_l1tol0b_b32_trans.png)
 <!-- end id42 -->
@@ -358,7 +358,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 <!-- npu="950" id43 -->
 - 针对Ascend 950PR/Ascend 950DT：
 
-    Load3D在b8/b16/b32数据类型下均支持转置，其中，L1 Buffer->L0A Buffer通路通过开启enTranspose参数开启转置，L1 Buffer->L0B Buffer通路下会自动完成转置，不需要配置enTranspose参数，enTranspose参数此时无效。下面按照类型详细说明。
+    LoadData（卷积数据搬运）在b8/b16/b32数据类型下均支持转置，其中，L1 Buffer->L0A Buffer通路通过开启enTranspose参数开启转置，L1 Buffer->L0B Buffer通路下会自动完成转置，不需要配置enTranspose参数，enTranspose参数此时无效。下面按照类型详细说明。
 
     - 对于b8场景：每个分形大小是16×32。
 
@@ -366,7 +366,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
         ![](../../../../../figures/load3d_l1tol0a_b8_trans_950.png)
 
-        L1 Buffer->L0B Buffer通路下，Load3D接口会自动完成转置，不需要配置enTranspose参数，enTranspose参数此时无效，转置示意图如下：
+        L1 Buffer->L0B Buffer通路下，LoadData（卷积数据搬运）接口会自动完成转置，不需要配置enTranspose参数，enTranspose参数此时无效，转置示意图如下：
 
         ![](../../../../../figures/load3d_l1tol0b_b8_trans_950.png)
 
@@ -376,7 +376,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
         ![](../../../../../figures/load3d_l1tol0a_b16_trans_950.png)
 
-        L1 Buffer->L0B Buffer通路下，Load3D接口会自动完成转置，不需要配置enTranspose参数，enTranspose参数此时无效，转置示意图如下：
+        L1 Buffer->L0B Buffer通路下，LoadData（卷积数据搬运）接口会自动完成转置，不需要配置enTranspose参数，enTranspose参数此时无效，转置示意图如下：
 
         ![](../../../../../figures/load3d_l1tol0b_b16_trans_950.png)
 
@@ -386,14 +386,14 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
         ![](../../../../../figures/load3d_l1tol0a_b32_trans_950.png)
 
-        L1 Buffer->L0B Buffer通路下，Load3D接口会自动完成转置，不需要配置enTranspose参数，enTranspose参数此时无效，转置示意图如下：
+        L1 Buffer->L0B Buffer通路下，LoadData（卷积数据搬运）接口会自动完成转置，不需要配置enTranspose参数，enTranspose参数此时无效，转置示意图如下：
 
         ![](../../../../../figures/load3d_l1tol0b_b32_trans_950.png)
 <!-- end id43 -->
 
 ### Repeat Mode<a id="zh-cn_topic_0000002512171652_section131671145123912"></a>
 
-Load3D可以通过配置mExtension和kExtension来完成多个方向的数据块搬运，我们把这里的多块数据的搬运看成一次迭代，Load3D支持通过配置repeat mode，能实现在M方向（height）或者K方向（width）进行repeat搬运，也就是说，调用一次Load3D接口可以完成多次迭代的数据搬运，如下图所示，其中repeatStride和repeatTime还有沿哪个方向repeat，我们通过[SetLoadDataRepeat](../辅助配置接口/SetLoadDataRepeat.md)配置。
+LoadData（卷积数据搬运）接口可以通过配置mExtension和kExtension来完成多个方向的数据块搬运，我们把这里的多块数据的搬运看成一次迭代，支持通过配置repeat mode，能实现在M方向（height）或者K方向（width）进行repeat搬运，也就是说，调用一次LoadData（卷积数据搬运）接口可以完成多次迭代的数据搬运，如下图所示，其中repeatStride和repeatTime还有沿哪个方向repeat，我们通过[SetLoadDataRepeat](../辅助配置接口/SetLoadDataRepeat.md)配置。
 
 <!-- npu="A3,910b" id44 -->
 针对如下产品型号：
@@ -410,7 +410,7 @@ M方向repeat示意图：
 
 ![](../../../../../figures/load3d_repeatmode.png)
 
-需要注意的是，当我们调用Load3D指令在M方向进行repeat搬运时，如果我们开启转置，则重复过程中的所有分块矩阵将被视为一个整体大矩阵，并按照我们前文所述的转置场景进行处理。以b32场景为例，下图给出了在M方向进行repeat搬运时的转置示意图，其中repeatMode=0，repeatStride=2，repeatTime=3。
+需要注意的是，当我们调用LoadData（卷积数据搬运）接口在M方向进行repeat搬运时，如果我们开启转置，则重复过程中的所有分块矩阵将被视为一个整体大矩阵，并按照我们前文所述的转置场景进行处理。以b32场景为例，下图给出了在M方向进行repeat搬运时的转置示意图，其中repeatMode=0，repeatStride=2，repeatTime=3。
 
 ![](../../../../../figures/load3d_repeatmode_m.png)
 
@@ -418,7 +418,7 @@ K方向repeat示意图：
 
 ![](../../../../../figures/load3d_repeatmode_k.png)
 
-当我们调用Load3D指令在K方向进行repeat搬运时，如果我们开启转置，则重复过程中的所有分块矩阵也将被视为一个整体大矩阵，并按照我们前文所述的转置场景进行处理。以b32场景为例，下图给出了在K方向进行repeat搬运时的转置示意图，其中repeatMode=1，repeatStride=2，repeatTime=3。
+当我们调用LoadData（卷积数据搬运）接口在K方向进行repeat搬运时，如果我们开启转置，则重复过程中的所有分块矩阵也将被视为一个整体大矩阵，并按照我们前文所述的转置场景进行处理。以b32场景为例，下图给出了在K方向进行repeat搬运时的转置示意图，其中repeatMode=1，repeatStride=2，repeatTime=3。
 
 ![](../../../../../figures/load3d_repeatmode_k_trans.png)
 <!-- end id44 -->
@@ -430,7 +430,7 @@ K方向repeat示意图：
 
 ![](../../../../../figures/load3d_repeatmode_m_950.png)
 
-当我们调用Load3D指令在M方向进行repeat搬运时，如果我们开启转置，则重复过程中的所有分块矩阵将被视为一个整体大矩阵，并按照我们前文所述的转置场景进行处理。以b32场景为例，下图给出了在M方向进行repeat搬运时的转置示意图，其中repeatMode=0，repeatStride=2，repeatTime=3，dstStride=3。
+当我们调用LoadData（卷积数据搬运）接口在M方向进行repeat搬运时，如果我们开启转置，则重复过程中的所有分块矩阵将被视为一个整体大矩阵，并按照我们前文所述的转置场景进行处理。以b32场景为例，下图给出了在M方向进行repeat搬运时的转置示意图，其中repeatMode=0，repeatStride=2，repeatTime=3，dstStride=3。
 
 ![](../../../../../figures/load3d_repeatmode_m_trans_950.png)
 
@@ -438,14 +438,14 @@ K方向repeat示意图：
 
 ![](../../../../../figures/load3d_repeatmode_k_950.png)
 
-当我们调用Load3D指令在K方向进行repeat搬运时，如果我们开启转置，则重复过程中的所有分块矩阵也将被视为一个整体大矩阵，并按照我们前文所述的转置场景进行处理。以b32场景为例，下图给出了在K方向进行repeat搬运时的转置示意图，其中repeatMode=1，repeatStride=2，repeatTime=3，dstStride=3。
+当我们调用LoadData（卷积数据搬运）接口在K方向进行repeat搬运时，如果我们开启转置，则重复过程中的所有分块矩阵也将被视为一个整体大矩阵，并按照我们前文所述的转置场景进行处理。以b32场景为例，下图给出了在K方向进行repeat搬运时的转置示意图，其中repeatMode=1，repeatStride=2，repeatTime=3，dstStride=3。
 
 ![](../../../../../figures/load3d_repeatmode_k_trans_950.png)
 <!-- end id47 -->
 
 ### Feature Map、Pad属性描述寄存器设置<a id="zh-cn_topic_0000002512171652_section1881795134015"></a>
 
-Load3D具备两个特殊寄存器：Feature Map属性描述和Pad属性描述寄存器，作为Image to Column展开时的参数。当我们进行矩阵计算时，出于高性能搬运考虑，往往会从GM搬运大块数据到L1 Buffer，即在L1 Buffer中缓存一块较大的数据，然后通过for循环进行L1 Buffer->L0 Buffer的搬入并进行Mmad计算。当通过Load3D进行L1 Buffer->L0 Buffer的搬入时，对于Load3D中的Feature Map属性和Pad属性我们通常只需要设置一次，不需要反复进行设置，因此我们提供了IsResetLoad3dConfig这个模板参数用于手动管理这两个属性，减少反复设置带来的指令性能开销。
+LoadData（卷积数据搬运）接口具备两个特殊寄存器：Feature Map属性描述和Pad属性描述寄存器，作为Image to Column展开时的参数。当我们进行矩阵计算时，出于高性能搬运考虑，往往会从GM搬运大块数据到L1 Buffer，即在L1 Buffer中缓存一块较大的数据，然后通过for循环进行L1 Buffer->L0 Buffer的搬入并进行Mmad计算。当通过LoadData（卷积数据搬运）接口进行L1 Buffer->L0 Buffer的搬入时，对于Feature Map属性和Pad属性我们通常只需要设置一次，不需要反复进行设置，因此我们提供了IsResetLoad3dConfig这个模板参数用于手动管理这两个属性，减少反复设置带来的指令性能开销。
 
 IsResetLoad3dConfig结构定义如下：
 
@@ -456,17 +456,17 @@ struct IsResetLoad3dConfig {
 }; 
 ```
 
-isSetFMatrix配置为true，表示在Load3D接口内部设置FeatureMap的属性描述（包括l1H、l1W、padList，参数介绍参考[表4](#zh-cn_topic_0000002512171652_table193501032193419)）；设置为false，表示该接口传入的FeatureMap的属性描述不生效，开发者需要通过[SetFmatrix](../辅助配置接口/SetFmatrix.md)进行手动管理设置。
+isSetFMatrix配置为true，表示在LoadData（卷积数据搬运）接口内部设置FeatureMap的属性描述（包括l1H、l1W、padList，参数介绍参考[表4](#zh-cn_topic_0000002512171652_table193501032193419)）；设置为false，表示该接口传入的FeatureMap的属性描述不生效，开发者需要通过[SetFmatrix](../辅助配置接口/SetFmatrix.md)进行手动管理设置。
 
 isSetPadding配置为true，表示在接口内部设置Pad属性描述（即padValue参数，参数介绍参考[表4](#zh-cn_topic_0000002512171652_table193501032193419)）；设置为false，表示该接口传入的Pad属性不生效，开发者需要通过[SetLoadDataPaddingValue](../辅助配置接口/SetLoadDataPaddingValue.md)进行设置。
 
-### Load3D数据格式说明<a id="zh-cn_topic_0000002512171652_section726316123184"></a>
+### LoadData（卷积数据搬运）接口数据格式说明<a id="zh-cn_topic_0000002512171652_section726316123184"></a>
 
 要求输入的feature map和filter的格式是[NC1HWC0](../../矩阵计算分形介绍/关键分形格式详解.md#zh-cn_topic_0000002545089965_section217615301084)，其中C0是最低维度而且C0是固定值为16（对于u8/s8类型为32），C1=C/C0。
 
-为了简化场景，以下场景假设输入的feature map的channel为4，即Ci=4。输入feature maps在A1中的形状为（Hi,Wi,Ci），经过Load3D处理后在A2的数据形状为（Wo\*Ho, Hk\*Wk\*Ci）。其中Wo和Ho是卷积后输出的shape，Hk和Wk是filter的shape。
+为了简化场景，以下场景假设输入的feature map的channel为4，即Ci=4。输入feature maps在A1中的形状为（Hi,Wi,Ci），经过LoadData处理后在A2的数据形状为（Wo\*Ho, Hk\*Wk\*Ci）。其中Wo和Ho是卷积后输出的shape，Hk和Wk是filter的shape。
 
-直观地来看，img2col的过程就是filter在feature map上扫过，将对应feature map的数据展开成输出数据的每一行的过程。filter首先在W方向上滑动Wo步，然后在H方向上走一步然后重复以上过程，最终输出Wo\*Ho行数据。下图中红色和黄色的数据分别代表第一行和第二行。数字表示原始输入数据，filter和输出数据三者之间的关联关系。可以看到，Load3D首先在输入数据的Ci维度搬运对应于00的4个数，然后搬运对应于01的四个数，最终这一行的大小为Hk\*Wk\*Ci即3\*3\*4=36个数。
+直观地来看，img2col的过程就是filter在feature map上扫过，将对应feature map的数据展开成输出数据的每一行的过程。filter首先在W方向上滑动Wo步，然后在H方向上走一步然后重复以上过程，最终输出Wo\*Ho行数据。下图中红色和黄色的数据分别代表第一行和第二行。数字表示原始输入数据，filter和输出数据三者之间的关联关系。可以看到，LoadData首先在输入数据的Ci维度搬运对应于00的4个数，然后搬运对应于01的四个数，最终这一行的大小为Hk\*Wk\*Ci即3\*3\*4=36个数。
 
 对应的feature map格式如下图：
 
@@ -510,13 +510,13 @@ repeatMode =1的时候filter窗口中读取数据的位置保持不变，每个r
 
 ![](../../../../../figures/load3d_l1tol0a_b32demo.png)
 
-此时可以调用Load3D接口实现A矩阵转置。调用Load3DV2指令时，在写入L0A Buffer之前会先分别将A矩阵高度和宽度轴向16、8对齐，接着该指令会将整个A矩阵进行转置并且每一个分形也转置，最终写入到L0A Buffer的A矩阵是ZZ排布
+此时可以调用LoadData（卷积数据搬运）接口实现A矩阵转置。调用LoadData（卷积数据搬运） v2接口时，在写入L0A Buffer之前会先分别将A矩阵高度和宽度轴向16、8对齐，接着该指令会将整个A矩阵进行转置并且每一个分形也转置，最终写入到L0A Buffer的A矩阵是ZZ排布
 
 示例代码片段如下，仅展示样例中的部分代码，完整示例请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0)。
 
 ```cpp
-// Load3Dv2指令完成img2col的过程，可知img2col后A矩阵高度为ho * wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：A矩阵的高度为CeilAlign(k, fractalShape[0])；img2col后A矩阵宽度为ci * kh * kw，代入kh=1，kw=1，可知A矩阵的宽度为CeilAlign(m, fractalShape[1])。最后，配置loadDataParams.enTranspose = true，将整个A矩阵转置并且将其中每一个分形转置
-// 使用Load3D接口，实现NZ2ZZ
+// LoadData（卷积数据搬运） v2接口完成img2col的过程，可知img2col后A矩阵高度为ho * wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：A矩阵的高度为CeilAlign(k, fractalShape[0])；img2col后A矩阵宽度为ci * kh * kw，代入kh=1，kw=1，可知A矩阵的宽度为CeilAlign(m, fractalShape[1])。最后，配置loadDataParams.enTranspose = true，将整个A矩阵转置并且将其中每一个分形转置
+// 使用LoadData（卷积数据搬运）接口，实现NZ2ZZ
 AscendC::LoadData3DParamsV2<T> loadDataParams;
 // 源操作数height
 loadDataParams.l1H = 1;
@@ -549,4 +549,4 @@ loadDataParams.fMatrixCtrl = false;
 AscendC::LoadData(a2Local, a1Local, loadDataParams);
 ```
 
-关于如何使用Load3D进行2D数据搬运，请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0)中的对应场景。
+关于如何使用LoadData（卷积数据搬运）进行2D数据搬运，请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0)中的对应场景。
