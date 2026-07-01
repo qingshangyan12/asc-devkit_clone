@@ -21,47 +21,44 @@ constexpr u32 INVALID_VALUE_RANKID = 0xFFFFFFFF; // rank id非法值
 class DfxOpInfo {
 public:
     CollOperator op_;
-    std::string tag_; // 实际是opType
-    std::string algType_;
-    u32 commIndex_;
-    u64 beginTime_;
-    u64 endTime_;
-    void* comm_{nullptr};
-    bool isIndop_{false};
-    std::string algTag_;
-    std::string groupName_;
-    u32 rankSize_{0};
-    u32 cpuWaitAicpuNotifyId_{0};
-    std::string commId_{};
-    u32 opIndex_{0};           // 下发算子总计数(单算子/图模式/CCU快速下发)
-    u64 headOpCounterAddr_{0}; // 执行算子头计数器地址（执行前加一）
-    u64 tailOpCounterAddr_{0}; // 执行算子尾计数器地址（执行后加一）
-    CommEngine engine{CommEngine::COMM_ENGINE_RESERVED};
+    std::string  tag_; // 实际是opType
+    std::string  algType_;
+    u32          commIndex_;
+    u64          beginTime_;
+    u64          endTime_;
+    void        *comm_{nullptr};
+    bool         isIndop_{false};
+    std::string  algTag_;
+    std::string  groupName_;
+    u32          rankSize_{0};
+    u32          cpuWaitAicpuNotifyId_{0};
+    std::string  commId_{};
+	u32          opIndex_{0};             // 下发算子总计数(单算子/图模式/CCU快速下发)
+	u64          headOpCounterAddr_{0};   // 执行算子头计数器地址（执行前加一）
+    u64          tailOpCounterAddr_{0};   // 执行算子尾计数器地址（执行后加一）
+    CommEngine   engine{CommEngine::COMM_ENGINE_RESERVED};
 
 public:
     std::string Describe() const
     {
         return StringFormat(
-            "DfxOpInfo: [opType:[%s], tag:[%s], algType:[%s], commIndex:[%u], commId[%s], beginTime:[%llu], "
-            "endTime:[%llu], opIndex[%u], headOpCounterAddr[%llx], tailOpCounterAddr[%llx]",
-            op_.opType.Describe().c_str(), tag_.c_str(), algType_.c_str(), commIndex_, commId_.c_str(), beginTime_,
-            endTime_, opIndex_, headOpCounterAddr_, tailOpCounterAddr_);
+                "DfxOpInfo: [collOperator:[%s], tag:[%s], algType:[%s], commIndex:[%u], commId[%s], beginTime:[%llu], endTime:[%llu], opIndex[%u], headOpCounterAddr[%llx], tailOpCounterAddr[%llx]",
+	            CollOpToString(op_).c_str(), tag_.c_str(), algType_.c_str(), commIndex_, commId_.c_str(), beginTime_, endTime_, opIndex_, headOpCounterAddr_, tailOpCounterAddr_);
     }
 };
 
 class TaskInfo {
 public:
-    u32 streamId_;
-    u32 taskId_;
-    u32 remoteRank_{0xffffffff};
-    TaskParam taskParam_;
+    u32                        streamId_;
+    u32                        taskId_;
+    u32                        remoteRank_{0xffffffff};
+    TaskParam                  taskParam_;
     std::shared_ptr<DfxOpInfo> dfxOpInfo_;
-    bool isMaster_;
+    bool                       isMaster_;
 
 public:
-    TaskInfo(
-        u32 streamId, u32 taskId, u32 remoteRank, TaskParam taskParam, std::shared_ptr<DfxOpInfo> dfxOpInfo = nullptr,
-        bool isMaster = false);
+    TaskInfo(u32 streamId, u32 taskId, u32 remoteRank, TaskParam taskParam,
+              std::shared_ptr<DfxOpInfo> dfxOpInfo = nullptr, bool isMaster = false);
 
     std::string Describe() const;
 
@@ -70,6 +67,9 @@ public:
     std::string GetConciseBaseInfo() const;
     std::string GetParaInfo() const;
     std::string GetOpInfo() const;
+
+    std::string GetIndopDataInfo() const;
+    std::string GetIndopBaseInfo() const;
 
 private:
     std::string GetParaDMA() const;

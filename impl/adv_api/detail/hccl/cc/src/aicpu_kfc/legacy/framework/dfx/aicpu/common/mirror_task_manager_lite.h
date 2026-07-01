@@ -29,8 +29,8 @@ public:
     void SetCurrDfxOpInfo(std::shared_ptr<DfxOpInfo> dfxOpInfo);
 
     std::shared_ptr<DfxOpInfo> GetCurrDfxOpInfo() const;
-    std::shared_ptr<TaskInfo> GetTaskInfo(u32 streamId, u32 taskId) const;
-    TaskInfoQueue* GetQueue(u32 streamId) const;
+    std::shared_ptr<TaskInfo>  GetTaskInfo(u32 streamId, u32 taskId) const;
+    TaskInfoQueue             *GetQueue(u32 streamId) const;
 
 public:
     TaskInfoQueueMap::iterator Begin();
@@ -39,16 +39,16 @@ public:
     ~MirrorTaskManagerLite();
 
 private:
-    bool isStaticGraphMode_{false};
-    OpMode opMode_;
-    TaskInfoQueueMap queueMap_;
-    std::unordered_map<u32, u32> queueTaskNum;
-    std::shared_ptr<DfxOpInfo> currDfxOpInfo_;
-    std::function<void()> fullyCallBack_;
-    std::function<void(const std::string&, u32)> fullyNewCallBack_;
+    bool                           isStaticGraphMode_{false};
+    OpMode                         opMode_;
+    TaskInfoQueueMap               queueMap_;
+    std::unordered_map<u32, u32>   queueTaskNum;
+    std::shared_ptr<DfxOpInfo>     currDfxOpInfo_;
+    std::function<void()>          fullyCallBack_;
+    std::function<void(const std::string&, u32)>          fullyNewCallBack_;
 
 private:
-    bool IsStaticGraphMode(const CollOperator& collOperator) const;
+    bool      IsStaticGraphMode(const CollOperator &collOperator) const;
 };
 
 } // namespace Hccl

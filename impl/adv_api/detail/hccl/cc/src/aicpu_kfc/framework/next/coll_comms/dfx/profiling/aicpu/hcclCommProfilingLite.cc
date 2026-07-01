@@ -14,32 +14,25 @@
 namespace hccl {
 // 构造函数
 HcclCommProfilingLite::HcclCommProfilingLite(Hccl::DevId deviceId, Hccl::MirrorTaskManagerLite* mirrorTaskManagerLite)
-{
-    // 获取deviceID
-    mirrorTaskManagerLite_ = std::unique_ptr<Hccl::MirrorTaskManagerLite>(mirrorTaskManagerLite);
-    profilingReporterLite_ = std::make_unique<Hccl::ProfilingReporterLite>(
-        mirrorTaskManagerLite_.get(), &Hccl::ProfilingHandlerLite::GetInstance(), true);
-}
+    : mirrorTaskManagerLite_(mirrorTaskManagerLite),
+      profilingReporterLite_(std::make_unique<Hccl::ProfilingReporterLite>(mirrorTaskManagerLite_, &Hccl::ProfilingHandlerLite::GetInstance(), true)) {}
 
 // HcclCommProfilingLite任务上报
-void HcclCommProfilingLite::ReportAllTasks()
-{
+void HcclCommProfilingLite::ReportAllTasks() {
     if (profilingReporterLite_) {
         profilingReporterLite_->ReportAllTasks();
     }
 }
 
 // HcclCommProfilingLite::UpdateProfStat实现
-void HcclCommProfilingLite::UpdateProfStat()
-{
+void HcclCommProfilingLite::UpdateProfStat() {
     if (profilingReporterLite_) {
         profilingReporterLite_->UpdateProfStat();
     }
 }
 
-Hccl::MirrorTaskManagerLite* HcclCommProfilingLite::GetMirrorTaskManagerLite() const
-{
-    return mirrorTaskManagerLite_.get();
-}
+ Hccl::MirrorTaskManagerLite* HcclCommProfilingLite::GetMirrorTaskManagerLite() const{
+    return mirrorTaskManagerLite_;
+ }
 
-} // namespace hccl
+}
