@@ -37,7 +37,7 @@ struct LayerNormInternalPara {
     uint32_t hRepeatCtrl;
     uint32_t hTailCtrl;
     uint32_t hTailOffset;
-    uint32_t hDim;
+    float hDim;
 };
 
 template <typename T>
@@ -45,7 +45,7 @@ __aicore__ inline void GetLayerNormInternalPara(LayerNormInternalPara& para, con
 {
     para.hRepeatTimes = tiling.hLength / static_cast<uint32_t>(oneRegSize);
     para.hTailSize = tiling.hLength % oneRegSize;
-    para.hDim = tiling.hLength;
+    para.hDim = static_cast<int32_t>(tiling.hLength);
     para.hRepeatCtrl = 1;
     para.hTailCtrl = 1;
     para.hTailOffset = para.hRepeatTimes * oneRegSize;
