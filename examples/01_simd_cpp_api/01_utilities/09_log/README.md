@@ -85,9 +85,9 @@
 - 配置日志环境变量（仅NPU模式）
   本样例支持通过环境变量控制日志输出行为（以下环境变量仅在NPU模式下生效）：
   ```bash
-  export ASCEND_PROCESS_LOG_PATH=./log        // 日志落盘路径
-  export ASCEND_SLOG_PRINT_TO_STDOUT=1        // 控制日志是否打印到屏幕（1：开启，0：关闭）
-  export ASCEND_GLOBAL_LOG_LEVEL=1            // 控制日志级别
+  export ASCEND_PROCESS_LOG_PATH=./log        # 日志落盘路径
+  export ASCEND_SLOG_PRINT_TO_STDOUT=1        # 控制日志是否打印到屏幕（1：开启，0：关闭）
+  export ASCEND_GLOBAL_LOG_LEVEL=1            # 控制日志级别
   ```
 
   > 注意：
@@ -118,12 +118,13 @@
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
+
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：<br>dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
-- 执行结果（NPU模式，以非打屏模式下为例，落盘文件详情可参考[Ascend 日志功能参考](https://hiascend.com/document/redirect/CannCommunitylogref)）
+- 执行结果（NPU模式，以打屏模式下为例，落盘文件详情可参考[Ascend 日志功能参考](https://hiascend.com/document/redirect/CannCommunitylogref)）
   执行后会打印类似以下信息：
   ```bash
   [INFO] Matrix shape: M=256, K=64, N=256
