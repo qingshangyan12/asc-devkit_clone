@@ -112,6 +112,7 @@ Kernel侧实现Conv3D运算的步骤概括为：
 
     **表1**  ConvType说明
 
+    <a name="table19081115275"></a>
     | 参数 | 说明 |
     | --- | --- |
     | TPosition | 内存逻辑位置。<br>    Input矩阵可设置为TPosition::GM。<br>Weight矩阵可设置为TPosition::GM。<br>Bias矩阵可设置为TPosition::GM。<br>Output矩阵可设置为TPosition::GM。 |
