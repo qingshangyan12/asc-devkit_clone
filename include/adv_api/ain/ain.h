@@ -18,12 +18,14 @@
 #include "kernel_basic_intf.h"
 #include "ain_common.h"
 #include "../hcomm/hcomm.h"
-#include "hccl/hccl_types.h"
 
 namespace AscendC {
 
-using HcclDevComm = __gm__ void *;
-AIN_DEVICE HcclTeam HcclTeamWorld(HcclDevComm devComm) { return nullptr;}
+using AinDevComm = __gm__ void *;
+using AinTeam = void *;
+using AinSymWindow = void *;
+
+AIN_DEVICE AinTeam HcclTeamWorld(AinDevComm devComm) { return nullptr;}
 
 /*!
  * @class Ain
@@ -44,7 +46,7 @@ public:
      * @param [in] devComm: Pointer to the device communication table in global memory.
      * @param [in] contextIndex: Index of the communication context to operate on.
      */
-    AIN_DEVICE Ain(HcclDevComm devComm, int contextIndex);
+    AIN_DEVICE Ain(AinDevComm devComm, int contextIndex);
     AIN_DEVICE ~Ain();
 
     /*!
@@ -73,8 +75,8 @@ public:
      */
     template <typename RemoteAction = AinRemoteNone, typename LocalAction = AinLocalNone,
               typename DescriptorUbuf = AinDescriptorUbuf>
-    AIN_DEVICE void put(HcclTeam team, uint32_t peer, HcclCommSymWindow dstWin, uint64_t dstOffset,
-                        HcclCommSymWindow srcWin, uint64_t srcOffset, uint64_t bytes,
+    AIN_DEVICE void put(AinTeam team, uint32_t peer, AinSymWindow dstWin, uint64_t dstOffset,
+                        AinSymWindow srcWin, uint64_t srcOffset, uint64_t bytes,
                         RemoteAction remoteAction = AinRemoteNone{}, LocalAction localAction = AinLocalNone{},
                         const DescriptorUbuf &ubuf = DescriptorUbuf{}, AinCommitFlags commitFlags = AIN_COMMIT_IMMED);
 
@@ -93,8 +95,8 @@ public:
      * @note Requires a valid DescriptorUbuf; AinDescriptorUbufNone is rejected at compile time.
      */
     template <typename DescriptorUbuf = AinDescriptorUbuf>
-    AIN_DEVICE void get(HcclTeam team, uint32_t peer, HcclCommSymWindow dstWin, uint64_t dstOffset,
-                        HcclCommSymWindow srcWin, uint64_t srcOffset, uint64_t bytes,
+    AIN_DEVICE void get(AinTeam team, uint32_t peer, AinSymWindow dstWin, uint64_t dstOffset,
+                        AinSymWindow srcWin, uint64_t srcOffset, uint64_t bytes,
                         const DescriptorUbuf &ubuf = DescriptorUbuf{},
                         AinCommitFlags commitFlags = AIN_COMMIT_IMMED);
 
@@ -105,7 +107,7 @@ private:
     /*!
      * @brief Decode a symmetric-window handle into its window index.
      */
-    AIN_DEVICE uint32_t decode_window(HcclCommSymWindow window) const;
+    AIN_DEVICE uint32_t decode_window(AinSymWindow window) const;
 
     Hcomm<COMM_PROTOCOL_UBC_CTP> hcomm_;
 };
@@ -124,7 +126,7 @@ public:
      * @param [in] team: Team id this session synchronizes over.
      * @param [in] index: Session index within the team.
      */
-    AIN_DEVICE AinBarrierSession(Ain *ain, HcclTeam team, uint32_t index);
+    AIN_DEVICE AinBarrierSession(Ain *ain, AinTeam team, uint32_t index);
     AIN_DEVICE ~AinBarrierSession();
     AinBarrierSession(AinBarrierSession const &) = delete; // Sessions are not copyable
 
@@ -146,7 +148,7 @@ private:
     AIN_DEVICE void dcci_cacheline(__gm__ uint8_t *addr);
 
     Ain *ain_;
-    HcclTeam team_;
+    AinTeam team_;
     uint32_t index_;
 };
 

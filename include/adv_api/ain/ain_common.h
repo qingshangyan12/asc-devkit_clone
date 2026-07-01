@@ -26,8 +26,6 @@
 
 namespace AscendC {
 
-typedef void* HcclTeam;
-
 /*!
  * @brief Placeholder tag for "no remote action" in the put primitive.
  */

@@ -38,7 +38,7 @@ struct AinIsSame { static constexpr bool value = false; };
 template <typename T>
 struct AinIsSame<T, T> { static constexpr bool value = true; };
 
-AIN_DEVICE Ain::Ain(HcclDevComm devComm, int contextIndex)
+AIN_DEVICE Ain::Ain(AinDevComm devComm, int contextIndex)
     : devComm_(reinterpret_cast<uint64_t>(devComm)), contextIndex_(contextIndex) {}
 
 AIN_DEVICE Ain::~Ain() {}
@@ -57,8 +57,8 @@ AIN_DEVICE void Ain::flush()
 }
 
 template <typename RemoteAction, typename LocalAction, typename DescriptorUbuf>
-AIN_DEVICE void Ain::put(HcclTeam team, uint32_t peer, HcclCommSymWindow dstWin, uint64_t dstOffset,
-                         HcclCommSymWindow srcWin, uint64_t srcOffset, uint64_t bytes, RemoteAction remoteAction,
+AIN_DEVICE void Ain::put(AinTeam team, uint32_t peer, AinSymWindow dstWin, uint64_t dstOffset,
+                         AinSymWindow srcWin, uint64_t srcOffset, uint64_t bytes, RemoteAction remoteAction,
                          LocalAction localAction, const DescriptorUbuf &ubuf, AinCommitFlags commitFlags)
 {
     static_assert(!AinIsSame<DescriptorUbuf, AinDescriptorUbufNone>::value,
@@ -88,8 +88,8 @@ AIN_DEVICE void Ain::put(HcclTeam team, uint32_t peer, HcclCommSymWindow dstWin,
 }
 
 template <typename DescriptorUbuf>
-AIN_DEVICE void Ain::get(HcclTeam team, uint32_t peer, HcclCommSymWindow dstWin, uint64_t dstOffset,
-                         HcclCommSymWindow srcWin, uint64_t srcOffset, uint64_t bytes, const DescriptorUbuf &ubuf,
+AIN_DEVICE void Ain::get(AinTeam team, uint32_t peer, AinSymWindow dstWin, uint64_t dstOffset,
+                         AinSymWindow srcWin, uint64_t srcOffset, uint64_t bytes, const DescriptorUbuf &ubuf,
                          AinCommitFlags commitFlags)
 {
     static_assert(!AinIsSame<DescriptorUbuf, AinDescriptorUbufNone>::value,
@@ -116,12 +116,12 @@ AIN_DEVICE void Ain::get(HcclTeam team, uint32_t peer, HcclCommSymWindow dstWin,
     }
 }
 
-AIN_DEVICE uint32_t Ain::decode_window(__gm__ HcclCommSymWindow window) const
+AIN_DEVICE uint32_t Ain::decode_window(__gm__ AinSymWindow window) const
 {
     return static_cast<uint32_t>(reinterpret_cast<uintptr_t>(window));
 }
 
-AIN_DEVICE AinBarrierSession::AinBarrierSession(Ain *ain, HcclTeam team, uint32_t index)
+AIN_DEVICE AinBarrierSession::AinBarrierSession(Ain *ain, AinTeam team, uint32_t index)
     : ain_(ain), team_(team), index_(index) {}
 
 AIN_DEVICE AinBarrierSession::~AinBarrierSession() {}
