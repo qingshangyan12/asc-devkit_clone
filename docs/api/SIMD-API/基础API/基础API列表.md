@@ -164,16 +164,16 @@
 | [Sqrt](Memory矢量计算/基础算术/Sqrt.md) | Sqrt属于单目矢量类计算接口，负责将输入的tensor按元素做开方。 |
 | [Rsqrt](Memory矢量计算/基础算术/Rsqrt.md) | Rsqrt属于单目矢量类计算接口，负责将输入的tensor按元素进行开方后取倒数运算。 |
 | [Relu](Memory矢量计算/基础算术/Relu.md) | Relu属于单目矢量类计算接口，负责将输入的tensor按元素做ReLU（Rectified Linear Unit）计算。 |
-| [Neg(ISASI)](Memory矢量计算/基础算术/Neg(ISASI).md) | 按元素进行取相反数操作。 |
+| [Neg](Memory矢量计算/基础算术/Neg.md) | 按元素进行取相反数操作。 |
 | [Add](Memory矢量计算/基础算术/Add.md) | Add属于双目矢量类计算接口，负责将输入的两个tensor按元素求和。 |
 | [Sub](Memory矢量计算/基础算术/Sub.md) | Sub属于双目矢量类计算接口，负责将输入的两个tensor按元素求差。 |
 | [Mul](Memory矢量计算/基础算术/Mul.md) | Mul属于双目矢量类计算接口，负责将输入的两个tensor按元素求积。 |
 | [Div](Memory矢量计算/基础算术/Div.md) | Div属于双目矢量类计算接口，负责将输入的两个tensor按元素求商。 |
 | [Max](Memory矢量计算/基础算术/Max.md) | Max属于双目矢量类计算接口，负责将输入的两个tensor按元素求最大值。 |
 | [Min](Memory矢量计算/基础算术/Min.md) | Min属于双目矢量类计算接口，负责将输入的两个tensor按元素求最小值。 |
-| [BilinearInterpolation(ISASI)](Memory矢量计算/基础算术/BilinearInterpolation(ISASI).md) | BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭代+垂直迭代的双层循环完成乘累加运算，适用于非规则数据访问+权重乘加的向量运算场景（数据Gather+Multiply+Reduce）。 |
-| [Prelu(ISASI)](Memory矢量计算/基础算术/Prelu(ISASI).md) | 源操作数src0大于0的情况下直接将src0写入目的操作数dst，否则将源操作数src0 * src1的结果写入dst。 |
-| [Mull(ISASI)](Memory矢量计算/基础算术/Mull(ISASI).md) | 对前count个输入数据src0、src1按元素相乘操作，将结果写入dst0Local，溢出部分写入dst1Local。 |
+| [BilinearInterpolation](Memory矢量计算/基础算术/BilinearInterpolation.md) | BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭代+垂直迭代的双层循环完成乘累加运算，适用于非规则数据访问+权重乘加的向量运算场景（数据Gather+Multiply+Reduce）。 |
+| [Prelu](Memory矢量计算/基础算术/Prelu.md) | 源操作数src0大于0的情况下直接将src0写入目的操作数dst，否则将源操作数src0 * src1的结果写入dst。 |
+| [Mull](Memory矢量计算/基础算术/Mull.md) | 对前count个输入数据src0、src1按元素相乘操作，将结果写入dst0Local，溢出部分写入dst1Local。 |
 | [Adds](Memory矢量计算/基础算术/Adds.md) | Adds属于双目标量类计算接口，输入为一个矢量tensor和一个标量scalar，Adds负责将矢量tensor内的每个元素与标量进行求和。 |
 | [Adds（灵活标量位置）](Memory矢量计算/基础算术/Adds（灵活标量位置）.md) | 提供灵活标量位置的接口，支持标量在前和标量在后两种场景。其中标量输入支持配置LocalTensor单点元素。 |
 | [Muls](Memory矢量计算/基础算术/Muls.md) | Muls属于双目标量类计算接口，输入为一个矢量tensor和一个标量scalar，Muls负责将矢量tensor内的每个元素与标量进行求积。 |
