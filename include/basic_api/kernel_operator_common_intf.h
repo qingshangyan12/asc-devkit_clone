@@ -89,7 +89,6 @@ __aicore__ inline void SetSaturationFlag(bool enableSat);
 template <SaturationMode mode>
 __aicore__ inline bool GetSaturationFlag();
 
-<<<<<<< Updated upstream
 template <OverrideStrategy strategy>
 __aicore__ inline void SetSaturationStrategy();
 

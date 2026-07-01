@@ -11,7 +11,6 @@
 #include "kernel_operator.h"
 #include "mockcpp/mockcpp.hpp"
 
-<<<<<<< Updated upstream
 using namespace AscendC;
 
 template <SaturationMode mode, int8_t ctrlBit, int64_t enabledValue, int64_t disabledValue>
@@ -152,26 +151,14 @@ protected:
     }
 };
 
-<<<<<<< Updated upstream
 INSTANTIATE_TEST_CASE_P(
     TEST_CTRL_SPR, CtrlSprTestsuite,
     ::testing::Values(
         CtrlSprTestParams{CtrlSprKernel}, CtrlSprTestParams{ScalarCacheModeReadKernel},
         CtrlSprTestParams{ScalarCacheModeWriteKernel}, CtrlSprTestParams{ScalarCacheModeCombinedKernel}));
-=======
-INSTANTIATE_TEST_CASE_P(
-    TEST_CTRL_SPR, CtrlSprTestsuite,
-    ::testing::Values(
-        CtrlSprTestParams{ScalarCacheModeReadKernel}, CtrlSprTestParams{ScalarCacheModeWriteKernel},
-        CtrlSprTestParams{ScalarCacheModeCombinedKernel}));
->>>>>>> Stashed changes
 
 TEST_P(CtrlSprTestsuite, CtrlSprTestCase)
 {
     auto param = GetParam();
     param.calFunc();
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes
