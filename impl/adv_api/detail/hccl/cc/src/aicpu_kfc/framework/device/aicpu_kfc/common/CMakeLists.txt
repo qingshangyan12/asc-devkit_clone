@@ -12,9 +12,11 @@ set(src_list
     aicpu_kfc_utils.cc
 )
 
-target_sources(asc_ccl_kernel PRIVATE
-    ${src_list}
-)
+if(NOT MC2_SERVER_MINIMAL)
+    target_sources(asc_ccl_kernel PRIVATE
+        ${src_list}
+    )
+endif()
 
 if(TARGET mc2_server)
     add_mc2_server_ccl_object(mc2_server_aicpu_kfc_common
