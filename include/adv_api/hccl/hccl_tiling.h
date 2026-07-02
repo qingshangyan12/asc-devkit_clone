@@ -44,6 +44,7 @@ public:
     uint32_t SetQueueNum(uint16_t num);
     uint32_t SetCommBlockNum(uint16_t num);
     uint32_t SetCommEngine(uint8_t commEngine);
+    uint32_t SetDataCount(uint64_t count);
 
 private:
     HcclTilingImpl impl_;

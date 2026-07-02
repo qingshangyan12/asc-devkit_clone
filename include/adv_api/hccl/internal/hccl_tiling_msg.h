@@ -19,6 +19,7 @@
 namespace HcclApi {
 constexpr uint32_t INIT_TILING_VERSION = 100U;
 constexpr uint32_t MAX_CC_TILING_NUM = 8U;
+constexpr uint8_t CC_TILING_VERSION = 2U;
 struct Mc2InitTilingInner {
     uint32_t version;
     uint32_t mc2HcommCnt;
@@ -46,8 +47,10 @@ struct Mc2CcTilingInner {
     char algConfig[ALG_CONFIG_SIZE];
     uint32_t opType;
     uint32_t reduceType;
-    char reserved2[232];
+    uint64_t dataCount;
+    char reserved2[224];
 };
+static_assert(sizeof(Mc2CcTilingInner) == 512U, "Mc2CcTilingInner size must be 512 bytes.");
 } // namespace HcclApi
 
 #endif // IMPL_HCCL_HCCL_TILING_MSG_H
