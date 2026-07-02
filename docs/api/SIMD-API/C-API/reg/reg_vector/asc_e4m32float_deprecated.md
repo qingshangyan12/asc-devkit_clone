@@ -10,6 +10,8 @@
 
 头文件路径：`"c_api/reg_compute/reg_convert.h"`。
 
+**该接口已废弃。其中v2接口请使用[asc_e4m32float](asc_e4m32float.md)传入ASC_DISPERSE_SECOND_QUARTER参数，v3接口请传入ASC_DISPERSE_THIRD_QUARTER参数，v4接口请传入ASC_DISPERSE_FOURTH_QUARTER参数实现此功能。**
+
 将fp8_e4m3fn_t类型转化为float类型。
 
 由于源操作数与目的操作数类型位宽比为1:4，读取数据时需要将一个VL大小的数据分为四部分，根据不同接口选取索引0、索引1、索引2或者索引3。

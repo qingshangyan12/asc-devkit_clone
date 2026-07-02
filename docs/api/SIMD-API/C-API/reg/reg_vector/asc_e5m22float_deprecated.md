@@ -10,6 +10,8 @@
 
 头文件路径：`"c_api/reg_compute/reg_convert.h"`。
 
+**该接口已废弃。其中v2接口请使用[asc_e5m22float](asc_e5m22float.md)传入ASC_DISPERSE_SECOND_QUARTER参数，v3接口请传入ASC_DISPERSE_THIRD_QUARTER参数，v4接口请传入ASC_DISPERSE_FOURTH_QUARTER参数实现此功能。**
+
 将vector_fp8_e5m2_t类型的源操作数以256B为单位分为四部分，读取其中一部分元素，将其转换成vector_float类型并写入目的操作数。
 
 - asc_e5m22float：读取第一部分。

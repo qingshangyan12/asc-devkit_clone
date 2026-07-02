@@ -10,6 +10,8 @@
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
+**该接口已废弃。其中v2接口请使用[asc_exp_sub](asc_exp_sub.md)传入ASC_POSITION_ODD参数实现此功能。**
+
 将src0与src1相减，差值作为e的指数计算，i为元素索引。计算公式如下：
 
 - 当src0和src1为float类型时：

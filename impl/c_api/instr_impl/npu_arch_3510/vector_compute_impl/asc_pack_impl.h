@@ -95,6 +95,76 @@ __simd_callee__ inline void asc_pack_v2_impl(vector_bool& dst, vector_bool src)
     }
 }
 
+__simd_callee__ inline void asc_pack_impl(vector_uint8_t& dst, vector_uint16_t src, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        vpack(dst, src, LOWER, MODE_UNKNOWN);
+    }
+}
+
+__simd_callee__ inline void asc_pack_impl(vector_uint8_t& dst, vector_uint16_t src, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        vpack(dst, src, HIGHER, MODE_UNKNOWN);
+    }
+}
+
+__simd_callee__ inline void asc_pack_impl(vector_uint8_t& dst, vector_int16_t src, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        vpack(dst, src, LOWER, MODE_UNKNOWN);
+    }
+}
+
+__simd_callee__ inline void asc_pack_impl(vector_uint8_t& dst, vector_int16_t src, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        vpack(dst, src, HIGHER, MODE_UNKNOWN);
+    }
+}
+
+__simd_callee__ inline void asc_pack_impl(vector_uint16_t& dst, vector_uint32_t src, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        vpack(dst, src, LOWER, MODE_UNKNOWN);
+    }
+}
+
+__simd_callee__ inline void asc_pack_impl(vector_uint16_t& dst, vector_uint32_t src, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        vpack(dst, src, HIGHER, MODE_UNKNOWN);
+    }
+}
+
+__simd_callee__ inline void asc_pack_impl(vector_uint16_t& dst, vector_int32_t src, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        vpack(dst, src, LOWER, MODE_UNKNOWN);
+    }
+}
+
+__simd_callee__ inline void asc_pack_impl(vector_uint16_t& dst, vector_int32_t src, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        vpack(dst, src, HIGHER, MODE_UNKNOWN);
+    }
+}
+
+__simd_callee__ inline void asc_pack_impl(vector_bool& dst, vector_bool src, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        ppack(dst, src, LOWER);
+    }
+}
+
+__simd_callee__ inline void asc_pack_impl(vector_bool& dst, vector_bool src, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        ppack(dst, src, HIGHER);
+    }
+}
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
