@@ -374,15 +374,7 @@ template <typename T, int U, int... Args> __aicore__ constexpr bool SupportBytes
     }
     return sizeof(T) == U;
 }
-// #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
-// template <auto funcPtr, typename... Args> __aicore__ inline void VF_CALL(Args &&... args)
-// {
-//     __VEC_SCOPE__
-//     {
-//         funcPtr(args...);
-//     }
-// }
-// #endif
+
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || defined(__ASC_NPU_HOST__)
