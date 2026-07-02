@@ -387,6 +387,8 @@ __global__ __mix__ void mix_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 
 ## 编程约束和限制
 
+C++ Tensor编程提供了更灵活的底层控制能力，开发者可通过LocalMemAllocator分配内存、LocalTensor构造函数直接指定地址和存储位置，并通过同步函数手动管理同步事件。这种脱离[TPipe-TQue框架](../基于TPipe-TQue框架编程/TPipe-TQue框架编程范式.md)的手动管理方式赋予开发者对内存布局和流水线同步的完全控制权，但也带来更高的编程复杂度。在此场景下，需遵循以下约束和限制：
+
 - 同步事件由开发者使用`SetFlag/WaitFlag(ISASI)`和`PipeBarrier(ISASI)`手动插入，事件的类型和事件ID由开发者自行管理，但需要注意事件ID不能使用6和7（可能与内部使用的事件ID出现冲突，进而出现未定义行为）。
 - Kernel入口处需要开发者手动调用[InitSocState](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/工具接口/系统初始化/InitSocState.md)接口用来初始化全局状态寄存器。因为全局状态寄存器处于不确定状态，如果不调用该接口，可能导致算子执行过程中出现未定义行为。在TPipe框架编程中，初始化过程由TPipe完成，无需开发者关注。
 - Kernel结束前需要开发者手动调用[PipeBarrier<PIPE_ALL>()](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md)。
