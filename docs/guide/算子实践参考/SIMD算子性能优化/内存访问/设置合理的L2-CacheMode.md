@@ -72,7 +72,7 @@ yGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);</pre>
 </table>
 
 >[!NOTE]说明 
->你可以通过执行如下命令行，通过msprof工具获取上述示例的性能数据并进行对比。
+>你可以通过执行如下命令行，通过msOpProf工具获取上述示例的性能数据并进行对比。
 >```
 >msprof op --launch-count=2 --output=./prof ./execute_add_op
 >```
