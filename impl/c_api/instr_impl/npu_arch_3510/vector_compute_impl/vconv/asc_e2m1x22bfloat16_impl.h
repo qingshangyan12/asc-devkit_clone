@@ -47,11 +47,6 @@ __simd_callee__ inline void asc_e2m1x22bfloat16_v4_impl(vector_bfloat16_t& dst, 
         vcvt(dst, src, mask, PART_P3, MODE_ZEROING);
     }
 }
-#endif
-
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 
 __simd_callee__ inline void asc_e2m1x22bfloat16_impl(vector_bfloat16_t& dst, vector_fp4x2_e2m1_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> quarter)
 {
@@ -81,4 +76,9 @@ __simd_callee__ inline void asc_e2m1x22bfloat16_impl(vector_bfloat16_t& dst, vec
     }
 }
 
+#endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
