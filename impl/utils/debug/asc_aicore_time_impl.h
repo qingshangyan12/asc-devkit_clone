@@ -15,18 +15,20 @@
 #ifndef IMPL_UTILS_DEBUG_ASC_AICORE_TIME_IMPL_H
 #define IMPL_UTILS_DEBUG_ASC_AICORE_TIME_IMPL_H
 
-#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102
 #ifndef ASCENDC_CPU_DEBUG
 #include "impl/utils/debug/asc_debug_utils.h"
 
 namespace __asc_aicore {
-__aicore__ inline void asc_time_stamp_impl(uint32_t desc_id)
+
+#ifdef ASCENDC_TIME_STAMP_ON
+__BLOCK_LOCAL__ __inline__ uint8_t g_timeStampEntryFlag = 0;
+#endif
+
+__aicore__ inline void asc_write_time_stamp_tlv(__gm__ DebugBlockHeadInfo* block_info, uint32_t desc_id, uint64_t cycle,
+    uint64_t entry)
 {
-    __gm__ DebugBlockHeadInfo* block_info = get_block_info();
-    if (block_info == nullptr) {
-        return;
-    }
-    uint32_t tlv_len = sizeof(TimeStampTlv);
+    constexpr uint32_t tlv_len = sizeof(TimeStampTlv);
     if (!check_ringbuf_space(block_info, tlv_len)) {
         return;
     }
@@ -37,9 +39,9 @@ __aicore__ inline void asc_time_stamp_impl(uint32_t desc_id)
     time_stamp_tlv->descId = desc_id;
     time_stamp_tlv->blockIdx = static_cast<uint16_t>(asc_debug_get_block_idx());
     time_stamp_tlv->resv = static_cast<uint16_t>(0U);
-    time_stamp_tlv->cycle = asc_debug_get_system_cycle();
+    time_stamp_tlv->cycle = cycle;
     time_stamp_tlv->pc = static_cast<uint64_t>(asc_debug_get_program_counter());
-    time_stamp_tlv->entry = static_cast<uint64_t>(__get_entry_sys_cnt()); 
+    time_stamp_tlv->entry = entry;
     time_stamp_tlv->resvMem[0] = static_cast<uint32_t>(0U);
     time_stamp_tlv->resvMem[1] = static_cast<uint32_t>(0U);
     asc_entire_dcci((__gm__ uint64_t*)time_stamp_tlv);
@@ -49,29 +51,51 @@ __aicore__ inline void asc_time_stamp_impl(uint32_t desc_id)
     update_write_info(write_info, tlv_len);
 }
 
+__aicore__ inline void asc_time_stamp_impl(uint32_t desc_id)
+{
+#ifdef ASCENDC_TIME_STAMP_ON
+    const uint64_t time = asc_debug_get_system_cycle();
+    const uint64_t entry = static_cast<uint64_t>(__get_entry_sys_cnt());
+    __gm__ DebugBlockHeadInfo* block_info = get_block_info();
+    if (block_info == nullptr) {
+        return;
+    }
+    if (g_timeStampEntryFlag == 0) {
+        g_timeStampEntryFlag = 1;
+        asc_write_time_stamp_tlv(block_info, static_cast<uint32_t>(AscendC::TimeStampId::TIME_STAMP_WRAP_FIRST), entry,
+            entry);
+    }
+    asc_write_time_stamp_tlv(block_info, desc_id, time, entry);
+#endif
+}
+
 __aicore__ inline void asc_time_stamp(uint32_t desc_id)
 {
-#if defined(ASCENDC_TIME_STAMP_ON)
     enable_asc_diagnostics();
     asc_time_stamp_impl(desc_id);
-#endif
 }
 
 __aicore__ inline void asc_prof_start()
 {
-#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
     bisheng::cce::metrics_prof_start();
-#endif
 }
 
 __aicore__ inline void asc_prof_stop()
 {
-#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
     bisheng::cce::metrics_prof_stop();
-#endif
 }
 
-#if __NPU_ARCH__ == 3510
+__aicore__ inline uint64_t clock_impl(void)
+{
+    return static_cast<uint64_t>(get_sys_cnt());
+}
+
+__aicore__ inline uint64_t clock(void)
+{
+    return clock_impl();
+}
+
+#if __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102
 template<pipe_t pipe>
 __aicore__ inline void asc_mark_stamp(uint16_t idx)
 {
@@ -86,7 +110,7 @@ __aicore__ inline void asc_mark_stamp()
 #endif
 } // namespace __asc_aicore
 #else
-#include "kernel_log.h"
+#include "../../basic_api/kernel_log.h"
 
 namespace __asc_aicore {
 __aicore__ inline void asc_time_stamp(uint32_t desc_id) {
@@ -128,11 +152,11 @@ __aicore__ inline void prof_mark_event(void)
 #define TRACE_STOP_FUNC(N, ...) TRACE_STOP_##N(__VA_ARGS__)
 #define TRACE_STOP_IMPL(...) TRACE_STOP_INTERNAL(GET_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 #if __NPU_ARCH__ == 3510
-#define TRACE_START_2(pipe, idx) asc_mark_stamp<pipe>(idx)
-#define TRACE_STOP_2(pipe, idx) asc_mark_stamp<pipe>(idx)
+#define TRACE_START_2(pipe, idx) asc_mark_stamp<pipe>(static_cast<uint16_t>(idx) | 0x400)
+#define TRACE_STOP_2(pipe, idx) asc_mark_stamp<pipe>(static_cast<uint16_t>(idx) | 0xc00)
 #else
-#define TRACE_START_2(pipe, idx)
-#define TRACE_STOP_2(pipe, idx)
+#define TRACE_START_2(pipe, idx) TRACE_START_1(idx)
+#define TRACE_STOP_2(pipe, idx) TRACE_STOP_1(idx)
 #endif
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
@@ -141,8 +165,12 @@ __aicore__ inline void TRACE_START_1(TraceId apid)
 __aicore__ inline void TRACE_STOP_1(TraceId apid)
 {}
 
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#define TRACE_START_1(apid) asc_mark_stamp<PIPE_S>(static_cast<uint16_t>(apid) | 0x400)
+#define TRACE_STOP_1(apid) asc_mark_stamp<PIPE_S>(static_cast<uint16_t>(apid) | 0xc00)
+
 #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \
-      (__NPU_ARCH__ == 3113)) || (__NPU_ARCH__ == 3510)
+      (__NPU_ARCH__ == 3113))
     #define TRACE_START_1(apid)                                          \
     do {                                                           \
         uint32_t v = (ASC_PROF_START_EVENT | static_cast<uint32_t>(apid));                               \

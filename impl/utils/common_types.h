@@ -21,10 +21,17 @@
 
 namespace AscendC {
 enum class Hardware : uint8_t { GM, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, MAX };
-}
+
+enum class ReduceType {
+    NONE = -1,
+    SUM = 0,
+    MAX,
+    MIN,
+};
+} // namespace AscendC
 
 #if !defined(ASCENDC_CPU_DEBUG)
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3510)) || defined(__ASC_NPU_HOST__)
+#if (defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3510))) || defined(__NPU_HOST__) || defined(__ASC_NPU_HOST__)
     using fp4x2_e2m1_t = float4_e2m1x2_t;
     using fp4x2_e1m2_t = float4_e1m2x2_t;
     using fp8_e5m2_t = float8_e5m2_t;
