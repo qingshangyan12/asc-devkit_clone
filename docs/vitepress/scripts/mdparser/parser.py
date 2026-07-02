@@ -176,6 +176,24 @@ def _split_by_fences(md_text: str):
     return segments
 
 
+def _make_code_stasher():
+    spans = []
+
+    def _stash(m):
+        spans.append(m.group(0))
+        return f'\x00CODE{len(spans) - 1}\x00'
+
+    return _stash, spans
+
+
+def _make_math_stasher(blocks):
+    def _stash(m):
+        blocks.append(m.group(0))
+        return _MATH_PLACEHOLDER_FMT.format(n=len(blocks) - 1)
+
+    return _stash
+
+
 def _extract_math_blocks(md_text: str) -> tuple:
     segments = _split_by_fences(md_text)
     blocks = []
@@ -185,19 +203,11 @@ def _extract_math_blocks(md_text: str) -> tuple:
             result.append(content)
             continue
 
-        code_spans = []
+        stash_code, code_spans = _make_code_stasher()
+        text = _INLINE_CODE_SPAN_RE.sub(stash_code, content)
 
-        def _stash_code(m):
-            code_spans.append(m.group(0))
-            return f'\x00CODE{len(code_spans) - 1}\x00'
-
-        text = _INLINE_CODE_SPAN_RE.sub(_stash_code, content)
-
-        def _stash_math(m):
-            blocks.append(m.group(0))
-            return _MATH_PLACEHOLDER_FMT.format(n=len(blocks) - 1)
-
-        text = _MATH_BLOCK_RE.sub(_stash_math, text)
+        stash_math = _make_math_stasher(blocks)
+        text = _MATH_BLOCK_RE.sub(stash_math, text)
 
         for i, code in enumerate(code_spans):
             text = text.replace(f'\x00CODE{i}\x00', code)
