@@ -27,6 +27,7 @@ struct ErrorMessageReport {
     u32 notifyValue = 0;
     u32 rankId = 0;
     u32 rankSize = 0;
+    char algType[MAX_NAME_LEN]{0};
     TaskParamType taskType = TaskParamType::TASK_SDMA;
     DfxLinkType linkType = DfxLinkType::RESERVED;
     std::size_t size = 0;
