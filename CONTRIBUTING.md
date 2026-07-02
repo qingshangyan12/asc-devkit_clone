@@ -1,4 +1,4 @@
-# 贡献指南
+﻿# 贡献指南
 
 本项目欢迎广大开发者体验并参与贡献，在参与社区贡献之前。请参见[cann-community](https://gitcode.com/cann/community)了解行为准则，进行CLA协议签署，了解源码仓的贡献流程。
 
@@ -35,7 +35,7 @@ C API提供纯C风格的接口，符合C语言算子开发习惯，开放芯片�
 
 ## 资料贡献指南
 
-本项目包含Ascend C的四份核心资料文档（编程指南、API参考手册、算子实践参考、跨代迁移兼容性指南），开发者可以对资料内容进行纠错、补充和贡献。
+本项目包含Ascend C的五份核心资料文档（入门教程、编程指南、API参考手册、算子实践参考、跨代迁移兼容性指南），开发者可以对资料内容进行纠错、补充和贡献。
 
 - **资料编写规范**：[docs/asc_doc_contributing.md](./docs/asc_doc_contributing.md) — 资料贡献场景、各文档编写规范、PR自检清单
 - **资料设计原则**：[docs/asc_doc_design_rules.md](./docs/asc_doc_design_rules.md) — 可获取性、可读性、完备性三维度设计规范
