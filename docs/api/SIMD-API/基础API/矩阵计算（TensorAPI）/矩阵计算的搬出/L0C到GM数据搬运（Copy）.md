@@ -150,7 +150,7 @@ L0C Buffer到Global Memory搬运根据是否传入量化参数自动选择量化
 ## 约束说明
 
 - 源矩阵`NZ`格式，地址要求64字节对齐。目的矩阵`DN`或`ND`格式时，地址要求1字节对齐，`NZ`格式时，地址要求32字节对齐。
-- 目的矩阵为`NZ`输出时，N方向大小需要为16的倍数；`b8`类型通道合并场景为32的倍数，`float`使能`enableChannelSplit`通道拆分场景为8的倍数。
+- 目的矩阵为`NZ`输出时，N方向大小需要为16的倍数；`float`使能`enableChannelSplit`通道拆分场景N为8的倍数。
 - tensor量化参数张量应位于L1 Buffer，元素类型为`uint64_t`，地址要求32字节对齐。详情参见[随路量化](关键特性说明/quant_pre.md)。
 - 使能`unitFlag`时，需要配合`Mmad`同时使能。
 - 使用`RoundMode::HYBRID`时，源类型必须为`float`，目的类型必须为`hifloat8_t`。
