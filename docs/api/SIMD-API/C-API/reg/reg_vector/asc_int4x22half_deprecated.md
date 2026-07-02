@@ -8,6 +8,8 @@
 
 ## 功能说明
 
+**该接口已废弃。其中v2接口请使用[asc_int4x22half](asc_int4x22half.md)传入ASC_POSITION_ODD参数实现此功能。**
+
 将int4x2类型数据转换为half类型。
 
 ## 函数原型

@@ -8,6 +8,8 @@
 
 ## 功能说明
 
+**该接口已废弃。其中v2接口请使用[asc_int4x22bfloat16](asc_int4x22bfloat16.md)传入ASC_POSITION_ODD参数实现此功能。**
+
 将int4x2_t类型转化为bfloat16_t类型，无舍入模式。
 
 ## 函数原型
