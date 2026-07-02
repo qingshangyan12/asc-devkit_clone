@@ -101,4 +101,4 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 
 - [基本概念与术语](../技术附录/概念原理和术语/术语表.md)
 - [C++语言标准支持](../技术附录/CPP标准支持/概述.md)
-- [Ascend C API参考（含每个API的规格与约束）](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_0003.html)
+- [Ascend C API参考（含每个API的规格与约束）](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta2/API/ascendcopapi/atlasascendc_api_07_0003.html)
