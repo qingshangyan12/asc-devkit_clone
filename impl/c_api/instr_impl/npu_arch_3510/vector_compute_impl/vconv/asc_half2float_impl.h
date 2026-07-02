@@ -39,11 +39,6 @@ __simd_callee__ inline void asc_half2float_v2_impl(vector_float& dst, vector_hal
     }
 }
 
-#endif
-
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 
 __simd_callee__ inline void asc_half2float_impl(vector_float& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
 {
@@ -59,4 +54,9 @@ __simd_callee__ inline void asc_half2float_impl(vector_float& dst, vector_half s
     }
 }
 
+#endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif

@@ -39,11 +39,6 @@ __simd_callee__ inline void asc_int82int16_v2_impl(vector_int16_t& dst, vector_i
     }
 }
 
-#endif
-
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 
 __simd_callee__ inline void asc_int82int16_impl(vector_int16_t& dst, vector_int8_t src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
 {
@@ -59,4 +54,9 @@ __simd_callee__ inline void asc_int82int16_impl(vector_int16_t& dst, vector_int8
     }
 }
 
+#endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
