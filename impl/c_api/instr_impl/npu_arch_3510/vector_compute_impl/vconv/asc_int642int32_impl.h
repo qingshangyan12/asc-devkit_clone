@@ -58,4 +58,33 @@ __simd_callee__ inline void asc_int642int32_sat_v2_impl(vector_int32_t& dst, vec
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+
+__simd_callee__ inline void asc_int642int32_impl(vector_int32_t& dst, vector_int64_t src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtii_s642s32_x(src, mask, (ULL)0, (ULL)0);
+    }
+}
+
+__simd_callee__ inline void asc_int642int32_impl(vector_int32_t& dst, vector_int64_t src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtii_s642s32_x(src, mask, (ULL)0, (ULL)1);
+    }
+}
+
+__simd_callee__ inline void asc_int642int32_sat_impl(vector_int32_t& dst, vector_int64_t src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtii_s642s32_x(src, mask, (ULL)0, (ULL)0);
+    }
+}
+
+__simd_callee__ inline void asc_int642int32_sat_impl(vector_int32_t& dst, vector_int64_t src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtii_s642s32_x(src, mask, (ULL)0, (ULL)1);
+    }
+}
+
 #endif
