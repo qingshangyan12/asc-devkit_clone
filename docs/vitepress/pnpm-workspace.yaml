@@ -1,4 +1,0 @@
-allowBuilds:
-  esbuild: true
-  pagefind: true
-  vue-demi: true
