@@ -12,6 +12,12 @@ set(HCCL_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(ORION_REAL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/legacy)
 set(HCOMM_REAL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
+set(MC2_SERVER_MINIMAL_DEFAULT OFF)
+if(TARGET mc2_server AND PRODUCT_SIDE STREQUAL "device")
+    set(MC2_SERVER_MINIMAL_DEFAULT ON)
+endif()
+option(MC2_SERVER_MINIMAL "Build only the 950 mc2_server entry path under aicpu_kfc." ${MC2_SERVER_MINIMAL_DEFAULT})
+
 #组件间对外头文件目录
 add_library(asc_hccl_headers INTERFACE)
 target_include_directories(asc_hccl_headers INTERFACE
@@ -24,6 +30,23 @@ target_include_directories(asc_hccl_headers INTERFACE
 )
 
 # 创建 ccl_kernel_plf共享库
+if(MC2_SERVER_MINIMAL AND TARGET mc2_server)
+    if(BUILD_OPEN_PROJECT)
+        add_cann_third_party(json)
+        add_cann_third_party(rdma-core)
+
+        if(NOT TARGET rdma_core_headers)
+            add_library(rdma_core_headers INTERFACE)
+            target_include_directories(rdma_core_headers INTERFACE
+                ${RDMA_CORE_INCLUDE_DIR}
+            )
+        endif()
+    endif()
+
+    add_subdirectory(framework)
+    return()
+endif()
+
 add_library(asc_ccl_kernel_plf  SHARED)
 # 创建 ccl_kernel_plf_a静态库
 add_library(asc_ccl_kernel_plf_a  STATIC)
