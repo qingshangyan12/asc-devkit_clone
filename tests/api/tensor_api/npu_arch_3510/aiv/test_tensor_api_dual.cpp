@@ -34,7 +34,7 @@ __aicore__ inline void TestTransformDual(
     asc_init();
 
     constexpr uint8_t cacheMode = 0;
-    constexpr uint32_t burstLength = TILE_LENGTH * 4;
+    constexpr uint32_t burstLength = TILE_LENGTH * sizeof(T);;
     constexpr uint64_t srcStride = 0;
     constexpr uint32_t dstStride = 0;
 

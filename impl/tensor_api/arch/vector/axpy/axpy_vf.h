@@ -44,7 +44,7 @@ public:
         SrcRegType reg_src;
 
         for (uint16_t i = 0; i < repeat; i++) {
-            vmask = Inst::UpdateMask::template Run<U>(dataSize);
+            vmask = Inst::UpdateMask::template Run<U>(oneRepSize);
             asc_loadalign(reg_src, src + i * oneRepSize);
             asc_loadalign(reg_dst, dst + i * oneRepSize);
             CalcFunc::template Run(reg_dst, reg_src, value, vmask);
