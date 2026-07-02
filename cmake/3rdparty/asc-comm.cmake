@@ -13,7 +13,7 @@
 # 如果要拉取 pr 使用 refs/merge-requests/123/head 的 tag id
 # set(ASC_COMM_TAG_ID refs/merge-requests/123/head CACHE STRING "asc-comm git ref for source checkout")
 set(ASC_COMM_TAG_ID master CACHE STRING "asc-comm git ref for source checkout")
-set(ASC_COMM_HCOMM_RELATIVE_DIR "include/asc-comm/aicpu/hcomm")
+set(ASC_COMM_HCOMM_RELATIVE_DIR "include/aicpu/hcomm")
 # 精简鉴权：不考虑安全因素，固定使用公共账户 aoe_public 及其令牌拉取 asc-comm 仓。
 set(ASC_COMM_GIT_USER "aoe_public")
 set(ASC_COMM_GIT_PASSWORD "KTZ21WLiB_fZv67g9kzGQiyc")
@@ -64,9 +64,9 @@ if(NOT IS_DIRECTORY "${ASC_COMM_HCOMM_SOURCE_DIR}")
     message(FATAL_ERROR "[ThirdPartyLib][asc-comm] hcomm headers not found: ${ASC_COMM_HCOMM_SOURCE_DIR}")
 endif()
 
-# asc-comm 新增 asc-comm/aicpu/hcomm 目录，源码侧暂不改头文件引用，
+# asc-comm 新增 aicpu/hcomm 目录，源码侧暂不改头文件引用，
 # 编译期暴露到 aicpu 这一层，继续按 "hcomm/xxx.h" 解析。
-set(ASC_COMM_HEADER_INCLUDE_DIR "${ASC_COMM_SOURCE_PATH}/include/asc-comm/aicpu"
+set(ASC_COMM_HEADER_INCLUDE_DIR "${ASC_COMM_SOURCE_PATH}/include/aicpu"
     CACHE PATH "include root exposing asc-comm hcomm headers as hcomm/*" FORCE)
 message(STATUS "[ThirdPartyLib][asc-comm] Exposed asc-comm headers at: ${ASC_COMM_HEADER_INCLUDE_DIR}")
 
