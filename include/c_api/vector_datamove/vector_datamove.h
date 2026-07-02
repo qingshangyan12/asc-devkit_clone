@@ -222,7 +222,7 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ uint64_t* dst, __ubuf__ 
 
 // ==========asc_copy_gm2ub==========
 __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src,
-    uint16_t n_burst, uint16_t len_burst, uint16_t src_stride, uint16_t dst_stride);
+    uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap);
 
 __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint32_t size);
 
@@ -232,7 +232,7 @@ __aicore__ inline void asc_copy_gm2ub_sync(__ubuf__ void* dst, __gm__ void* src,
 __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src, uint32_t size);
 
 __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src,
-    uint16_t n_burst, uint16_t len_burst, uint16_t dst_stride, uint16_t src_stride);
+    uint16_t burst_count, uint16_t burst_len, uint16_t dst_gap, uint16_t src_gap);
 
 __aicore__ inline void asc_copy_ub2gm_sync(__gm__ void* dst, __ubuf__ void* src, uint32_t size);
 

@@ -37,8 +37,8 @@
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
 #endif
 
-#ifndef INCLUDE_C_API_VECTOR_COMPUTE_VECTOR_COMPUTE_H
-#define INCLUDE_C_API_VECTOR_COMPUTE_VECTOR_COMPUTE_H
+#ifndef INCLUDE_C_API_VECTOR_COMPUTE_VECTOR_COMPUTE_EMULATION_H
+#define INCLUDE_C_API_VECTOR_COMPUTE_VECTOR_COMPUTE_EMULATION_H
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "instr_impl/npu_arch_2201/vector_compute_impl.h"
@@ -316,18 +316,18 @@ __aicore__ inline void asc_ne_sync(__ubuf__ uint8_t* dst, __ubuf__ float* src0, 
  * @details Performs element-wise greater-or-equal comparison: result = (src0[i] >= src1[i]).
  *          Supports half and float data types. Result is stored as boolean mask.
  */
-__aicore__ inline void asc_ge_sync(__ubuf__ half* scr0, __ubuf__ half* scr1, uint8_t repeat, uint8_t dst_block_stride,
-    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, int8_t src0_repeat_stride,
-    int8_t src1_repeat_stride);
-__aicore__ inline void asc_ge_sync(__ubuf__ float* scr0, __ubuf__ float* scr1, uint8_t repeat, uint8_t dst_block_stride,
-    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, int8_t src0_repeat_stride,
-    int8_t src1_repeat_stride);
-__aicore__ inline void asc_ge_sync(__ubuf__ uint8_t* dst, __ubuf__ half* scr0, __ubuf__ half* scr1, uint8_t repeat,
+__aicore__ inline void asc_ge_sync(__ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
+    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
+    uint8_t src1_repeat_stride);
+__aicore__ inline void asc_ge_sync(__ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
+    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
+    uint8_t src1_repeat_stride);
+__aicore__ inline void asc_ge_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat,
     uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
-    int8_t src0_repeat_stride, int8_t src1_repeat_stride);
-__aicore__ inline void asc_ge_sync(__ubuf__ uint8_t* dst, __ubuf__ float* scr0, __ubuf__ float* scr1, uint8_t repeat,
+    uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
+__aicore__ inline void asc_ge_sync(__ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat,
     uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
-    int8_t src0_repeat_stride, int8_t src1_repeat_stride);
+    uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
 
 /*
  * @ingroup VectorCompute

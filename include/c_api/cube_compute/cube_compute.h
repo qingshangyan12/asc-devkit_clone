@@ -147,8 +147,8 @@ __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c, __ca__ int4b_t* a, __cb__ 
  * @param [in] k Columns of matrix A / Rows of matrix B
  * @param [in] n Columns of matrix B
  * @param [in] unit_flag Unit flag for operation control
- * @param [in] enable_cube_init Source of C matrix
- * @param [in] enable_cube_zero_init Initial value of C matrix
+ * @param [in] enable_cube_init Whether to initialize cube
+ * @param [in] enable_cube_zero_init Whether to initialize cube to zero
  * @details Performs sparse C = A * B matrix multiplication with int8 inputs and int32 output.
  *          This is a hardware-level interface that requires manual synchronization.
  */
@@ -342,13 +342,13 @@ __aicore__ inline void asc_mmad(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8
                                 uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
                                 bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
 
-__aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ hifloat8_t* a_matrix, __cb__ hifloat8_t* b_matrix,
-                                        uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag,
-                                        bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
-        
-__aicore__ inline void asc_mmad_sync(__cc__ float* c_matrix, __ca__ hifloat8_t* a_matrix, __cb__ hifloat8_t* b_matrix,
-                                             uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag,
-                                             bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
+__aicore__ inline void asc_mmad(__cc__ float* c, __ca__ hifloat8_t* a, __cb__ hifloat8_t* b,
+                                        uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
+                                        bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
+
+__aicore__ inline void asc_mmad_sync(__cc__ float* c, __ca__ hifloat8_t* a, __cb__ hifloat8_t* b,
+                                             uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
+                                             bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
 
 __aicore__ inline void asc_enable_hf32_trans(uint32_t mode);
 
