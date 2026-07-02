@@ -15,12 +15,44 @@
 
 #ifndef DATA_UTILS_H
 #define DATA_UTILS_H
+#ifdef ASCENDC_CPU_DEBUG
+#include "tiling/platform/platform_ascendc.h"
+#endif
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fstream>
 
 #define ERROR_LOG(fmt, args...) fprintf(stdout, "[ERROR]  " fmt "\n", ##args)
+
+#ifdef ASCENDC_CPU_DEBUG
+static inline const char* GetCpuDebugSocVersion()
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    return "Ascend910B1";
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    return "Ascend950PR_9599";
+#else
+    return nullptr;
+#endif
+}
+#endif
+
+static inline bool InitCpuDebugPlatform()
+{
+#ifdef ASCENDC_CPU_DEBUG
+    const char* socVersion = GetCpuDebugSocVersion();
+    if (socVersion == nullptr) {
+        ERROR_LOG("CPU debug mode only supports dav-2201 and dav-3510 in this sample.");
+        return false;
+    }
+    if (platform_ascendc::PlatformAscendCManager::GetInstance(socVersion) == nullptr) {
+        ERROR_LOG("Failed to initialize CPU debug platform for %s.", socVersion);
+        return false;
+    }
+#endif
+    return true;
+}
 
 bool ReadFile(const std::string& filePath, size_t& fileSize, void* buffer, size_t bufferSize)
 {
