@@ -16,6 +16,13 @@
 #define ULL unsigned long long
 #endif
 
+// Add .val member to vector_s4x2 for CPU mode (matching CCE compiler struct)
+struct vector_s4x2_ext : public vector_s4x2 {
+    vector_s8 val;
+};
+#undef vector_s4x2
+using vector_s4x2 = vector_s4x2_ext;
+
 void vsts(
     vector_f8e4m3 data, __ubuf__ fp8_e4m3fn_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
 void vsts(vector_f8e5m2 data, __ubuf__ fp8_e5m2_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);

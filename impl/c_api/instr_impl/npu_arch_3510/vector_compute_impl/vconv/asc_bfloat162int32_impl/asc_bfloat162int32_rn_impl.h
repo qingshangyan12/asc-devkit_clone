@@ -52,11 +52,6 @@ __simd_callee__ inline void asc_bfloat162int32_rn_sat_v2_impl(vector_int32_t& ds
         vcvt(dst, src, mask, ROUND_R, RS_ENABLE, PART_ODD, MODE_ZEROING);
     }
 }
-#endif
-
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 
 __simd_callee__ inline void asc_bfloat162int32_rn_impl(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
 {
@@ -86,4 +81,9 @@ __simd_callee__ inline void asc_bfloat162int32_rn_sat_impl(vector_int32_t& dst, 
     }
 }
 
+#endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif

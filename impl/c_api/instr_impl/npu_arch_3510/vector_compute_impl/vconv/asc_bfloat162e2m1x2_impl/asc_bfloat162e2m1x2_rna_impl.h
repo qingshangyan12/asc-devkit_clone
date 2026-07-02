@@ -47,11 +47,6 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rna_v4_impl(vector_fp4x2_e2m1_t&
         vcvt(dst, src, mask, ROUND_A, PART_P3, MODE_ZEROING);
     }
 }
-#endif
-
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 
 __simd_callee__ inline void asc_bfloat162e2m1x2_rna_impl(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> quarter)
 {
@@ -81,4 +76,9 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rna_impl(vector_fp4x2_e2m1_t& ds
     }
 }
 
+#endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif

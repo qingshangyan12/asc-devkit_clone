@@ -81,11 +81,6 @@ __simd_callee__ inline void asc_float2e5m2_rn_sat_v4_impl(vector_fp8_e5m2_t& dst
     }
 }
 
-#endif
-
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 
 __simd_callee__ inline void asc_float2e5m2_rn_impl(vector_fp8_e5m2_t& dst, vector_float src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> quarter)
 {
@@ -143,4 +138,9 @@ __simd_callee__ inline void asc_float2e5m2_rn_sat_impl(vector_fp8_e5m2_t& dst, v
     }
 }
 
+#endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
