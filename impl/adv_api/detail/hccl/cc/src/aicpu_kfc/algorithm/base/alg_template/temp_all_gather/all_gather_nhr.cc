@@ -107,7 +107,7 @@ HcclResult AllGatherNHR::SdmaRx(const LINK &linkLeft, const LINK &linkRight, std
     return HCCL_SUCCESS;
 }
 
-HcclResult AllGatherNHR::RdmaTxRx(const LINK &linkLeft, const LINK &linkRight, InterServerAlgoStep &stepInfo, 
+HcclResult AllGatherNHR::RdmaTxRx(const LINK &linkLeft, const LINK &linkRight, InterServerAlgoStep &stepInfo,
     std::vector<Slice> &txSlices, std::vector<Slice> &rxSlices)
 {
     HcclResult ret = HCCL_SUCCESS;
@@ -119,7 +119,7 @@ HcclResult AllGatherNHR::RdmaTxRx(const LINK &linkLeft, const LINK &linkRight, I
     ret = Rx(linkLeft, rxSlices);
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[AllGatherNHR][RunAllGather] rank[%u] round[%u] "
         "rx %u slices failed", stepInfo.myRank, stepInfo.step, stepInfo.nSlices), ret);
-        
+
     ret = linkLeft->PostFinAck(stream_);
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[AllGatherNHR][RunAllGather] PostFinAck failed"), ret);
     ret = linkRight->WaitFinAck(stream_);
@@ -166,7 +166,7 @@ HcclResult AllGatherNHR::RunAllGather(u32 rank, u32 rankSize, const std::vector<
 
         // 合并连续slices
         MergeSlices(rxSlices);
-        MergeSlices(txSlices); 
+        MergeSlices(txSlices);
 
         if (linkLeft->IsSpInlineReduce() && linkRight->IsSpInlineReduce()) {
             ret = SdmaRx(linkLeft, linkRight, rxSlices);

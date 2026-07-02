@@ -41,7 +41,7 @@ public:
 private:
     OpExeCounter() = default;
     ~OpExeCounter();
-    
+
     void* headCountMem_{};
     void* tailCountMem_{};
     void* addOneMem_{};

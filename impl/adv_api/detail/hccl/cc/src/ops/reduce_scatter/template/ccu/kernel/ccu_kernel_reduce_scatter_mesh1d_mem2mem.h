@@ -52,9 +52,9 @@ public:
                                                 uint64_t inputRepeatStride, uint64_t outputRepeatStride,
                                                 uint64_t normalSliceSize, uint64_t lastSliceSize, uint64_t repeatNum)
         : inputAddr_(inputAddr), outputAddr_(outputAddr), token_(token), scratchAddr_(scratchAddr),
-        inputSliceStride_(inputSliceStride), outputSliceStride_(outputSliceStride), 
+        inputSliceStride_(inputSliceStride), outputSliceStride_(outputSliceStride),
         inputRepeatStride_(inputRepeatStride), outputRepeatStride_(outputRepeatStride),
-        normalSliceSize_(normalSliceSize), lastSliceSize_(lastSliceSize), repeatNum_(repeatNum) 
+        normalSliceSize_(normalSliceSize), lastSliceSize_(lastSliceSize), repeatNum_(repeatNum)
     {
         HCCL_INFO("[CcuTaskArgReduceScatterMesh1DMem2Mem] inputAddr: %lu, outputAddr: %lu, scratchAddr: %lu, "
                    "inputSliceStride: %lu, outputSliceStride: %lu, inputRepeatStride: %lu, "
@@ -92,12 +92,12 @@ private:
     void PostSync();
     void DoRepeatReduceScatter();
     void DoReduceScatter();
-    
+
     std::string GetLoopBlockTag(std::string loopType, int32_t index);
     void CreateReduceLoop(uint32_t size, HcclDataType dataType, HcclDataType outputDataType, HcclReduceOp opType);
     void ReduceLoopGroup(CcuRep::LocalAddr outDstOrg, CcuRep::LocalAddr srcOrg, std::vector<CcuRep::LocalAddr> &scratchOrg,
         GroupOpSize goSize, HcclDataType dataType, HcclDataType outputDataType, HcclReduceOp opType);
- 
+
     const std::string LOOP_BLOCK_TAG{"_local_copy_reduce_loop_"};
 
     uint64_t rankSize_{0};

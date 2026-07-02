@@ -116,7 +116,7 @@ HcclIpAddress::HcclIpAddress(const Eid &eidInput)
     HCCL_INFO("[IpAddress] %s", eid.Describe().c_str());
     // IPoURMA适配后，使用EID初始化时转为ipv6建链
     this->family = AF_INET6;
-    (void)memcpy_s(binaryAddr.addr6.s6_addr, sizeof(eid.raw), eid.raw, sizeof(eid.raw));  
+    (void)memcpy_s(binaryAddr.addr6.s6_addr, sizeof(eid.raw), eid.raw, sizeof(eid.raw));
     (void)SetBianryAddress(family, binaryAddr);
 }
 
@@ -146,7 +146,7 @@ std::string HcclIpAddress::GetIpStr() const
         src = &binaryAddr.addr;
     } else if (family == AF_INET6) {
         src = &binaryAddr.addr6;
-    } 
+    }
     char dst[INET6_ADDRSTRLEN];
     const char *res = inet_ntop(family, src, dst, INET6_ADDRSTRLEN);
     if (res == nullptr) {
@@ -178,23 +178,23 @@ bool HcclIpAddress::IsIPv4(const std::string& str) {
     if (len < MIN_IPV4_LEN || len > MAX_IPV4_LEN) {
         return false;
     }
-    
+
     uint32_t num = 0;
     uint32_t dotCount = 0;
     bool hasDigit = false;
-    
+
     for (size_t i = 0; i < len; ++i) {
         char c = str[i];
-        
+
         if (c >= '0' && c <= '9') {
             // 检查前导零
             if (!hasDigit && c == '0' && i + 1 < len && str[i + 1] != '.') {
                 return false;
             }
-            
+
             num = num * BASE + (c - '0');
             hasDigit = true;
-            
+
             if (num > MAX_IPV4_SEGMENT_VALUE) {
                 return false;
             }
@@ -203,7 +203,7 @@ bool HcclIpAddress::IsIPv4(const std::string& str) {
             if (!hasDigit || dotCount >= MAX_DOT_COUNT || i == 0 || i == len - 1) {
                 return false;
             }
-            
+
             dotCount++;
             num = 0;
             hasDigit = false;
@@ -211,7 +211,7 @@ bool HcclIpAddress::IsIPv4(const std::string& str) {
             return false;
         }
     }
-    
+
     return dotCount == MAX_DOT_COUNT && hasDigit;
 }
 

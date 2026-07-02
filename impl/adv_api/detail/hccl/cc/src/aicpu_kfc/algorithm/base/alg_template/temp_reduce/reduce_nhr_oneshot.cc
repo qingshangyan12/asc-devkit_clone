@@ -76,7 +76,7 @@ HcclResult ReduceNHROneshot::SimpleCheck(const u32 rank, const u32 rankSize, con
     return HCCL_SUCCESS;
 }
 
-HcclResult ReduceNHROneshot::SdmaRx(LINK &linkLeft, LINK &linkRight, InterServerAlgoStep &stepInfo, 
+HcclResult ReduceNHROneshot::SdmaRx(LINK &linkLeft, LINK &linkRight, InterServerAlgoStep &stepInfo,
     const std::vector<LINK> &links)
 {
     HcclResult ret = HCCL_SUCCESS;
@@ -112,7 +112,7 @@ HcclResult ReduceNHROneshot::SdmaRx(LINK &linkLeft, LINK &linkRight, InterServer
     return ret;
 }
 
-HcclResult ReduceNHROneshot::RdmaTxRx(LINK &linkLeft, LINK &linkRight, InterServerAlgoStep &stepInfo, 
+HcclResult ReduceNHROneshot::RdmaTxRx(LINK &linkLeft, LINK &linkRight, InterServerAlgoStep &stepInfo,
     const std::vector<LINK> &links)
 {
     HcclResult ret = HCCL_SUCCESS;

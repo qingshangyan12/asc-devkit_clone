@@ -1,20 +1,20 @@
 # TQue<a name="ZH-CN_TOPIC_0000001499708577"></a>
 
--   **[TQue简介](TQue简介.md)**  
+-   **[TQue简介](TQue简介.md)**
 
--   **[AllocTensor](AllocTensor.md)**  
+-   **[AllocTensor](AllocTensor.md)**
 
--   **[FreeTensor](FreeTensor.md)**  
+-   **[FreeTensor](FreeTensor.md)**
 
--   **[EnQue](EnQue.md)**  
+-   **[EnQue](EnQue.md)**
 
--   **[DeQue](DeQue.md)**  
+-   **[DeQue](DeQue.md)**
 
--   **[VacantInQue](VacantInQue.md)**  
+-   **[VacantInQue](VacantInQue.md)**
 
--   **[HasTensorInQue](HasTensorInQue.md)**  
+-   **[HasTensorInQue](HasTensorInQue.md)**
 
--   **[GetTensorCountInQue](GetTensorCountInQue.md)**  
+-   **[GetTensorCountInQue](GetTensorCountInQue.md)**
 
--   **[HasIdleBuffer](HasIdleBuffer.md)**  
+-   **[HasIdleBuffer](HasIdleBuffer.md)**
 

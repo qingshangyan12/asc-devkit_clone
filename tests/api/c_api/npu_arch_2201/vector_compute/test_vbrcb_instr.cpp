@@ -27,7 +27,7 @@
     void cce_name##_##data_type##_uint8_t_uint16_t_uint16_Stub(                                                  \
         __ubuf__ data_type* dst, __ubuf__ data_type* src, uint16_t dst_block_stride, uint16_t dst_repeat_stride, \
         uint8_t repeat)                                                                                          \
-    \  
+    \
 {                                                                                                          \
         EXPECT_EQ(dst, reinterpret_cast<__ubuf__ data_type*>(11));                                               \
         EXPECT_EQ(src, reinterpret_cast<__ubuf__ data_type*>(22));                                               \

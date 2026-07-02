@@ -80,9 +80,9 @@ public:
             rankId_, instType_.Describe().c_str());
     }
 
-        void SetInstType(CcuInstType instType) 
-    { 
-        instType_ = instType; 
+        void SetInstType(CcuInstType instType)
+    {
+        instType_ = instType;
     }
 
     std::unique_ptr<CcuCtxArg> GetCtxArg() const override

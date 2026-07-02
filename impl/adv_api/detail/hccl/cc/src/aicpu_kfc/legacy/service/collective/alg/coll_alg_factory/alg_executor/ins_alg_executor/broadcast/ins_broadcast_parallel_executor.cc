@@ -67,7 +67,7 @@ HcclResult InsBroadcastParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTem
     algResReq.primQueueNum = resReqIntra.streamNum + resReqInter.streamNum;
 
     CHK_RET(CalcParallelNotifyReq(algResReq.primQueueNum, algResReq.queueNotifys));
-    
+
     CHK_RET(CalcResLinks(myRank_, rankGraph, linkPriority_, resReqIntra.links, algResReq.links));
     CHK_RET(CalcResLinks(myRank_, rankGraph, linkPriority_, resReqInter.links, algResReq.links));
 

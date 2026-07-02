@@ -26,14 +26,14 @@ This example, based on the kernel direct invocation example project, demonstrate
 
 ## Example Description
 
-- Example function:  
+- Example function:
   This example calls the WelfordUpdate and WelfordFinalize high-level APIs sequentially within a single kernel function to implement the complete Welford online algorithm. Advantages of the Welford algorithm:
   - Incrementally compute mean and variance of all samples without storing all samples
   - Only requires a single pass over the data, reducing memory access and improving computation performance
   - WelfordUpdate: Online update of mean and variance, with formulas $M_t = M_{t-1} + (x_t - M_{t-1}) / n$, $S_t = S_{t-1} + (x_t - M_{t-1}) \times (x_t - M_t)$
   - WelfordFinalize: Aggregate results from multiple blocks to obtain the final mean and variance, with formulas $Mean = \frac{\sum(M_i \cdot n_i)}{\sum n_i}$, $Var = \frac{\sum(S_i + (Mean_i - Mean)^2 \cdot n_i)}{\sum n_i}$
 
-- Example specifications:  
+- Example specifications:
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> welford </td></tr>
 
@@ -52,7 +52,7 @@ This example, based on the kernel direct invocation example project, demonstrate
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">welford_coop_custom</td></tr>
   </table>
 
-- Example implementation:  
+- Example implementation:
   This example implements a fused Welford example with fixed shapes (RN=1, AB=64).
 
   This example calls two APIs within a single kernel function:
@@ -63,7 +63,7 @@ This example, based on the kernel direct invocation example project, demonstrate
 
   - Kernel implementation
 
-    The computation logic is:  
+    The computation logic is:
     Call the WelfordUpdate and WelfordFinalize high-level APIs sequentially within a single kernel function to implement the complete Welford online algorithm, and transfer the computation results to external storage.
 
   - Tiling implementation
@@ -72,20 +72,20 @@ This example, based on the kernel direct invocation example project, demonstrate
     1. Call AscendC::GetWelfordUpdateMaxMinTmpSize to obtain the minimum temporary space size required by the WelfordUpdate API, and use the minimum value as the workspace size to ensure correct functionality.
     2. Use the CopyTilingData function to copy tiling data from GM to the kernel side.
 
-  - Invocation implementation  
+  - Invocation implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run  
+## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
-    
+
 - Run the example
 
   Run the following commands in the example directory.

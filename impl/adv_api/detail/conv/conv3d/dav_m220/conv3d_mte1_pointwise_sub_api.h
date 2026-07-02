@@ -80,9 +80,9 @@ private:
     __aicore__ inline void LoadAL0ByLoad2d()
     {
         // currentKAL1需要对齐到k0_, kAL1Tail在InitKDirectionBaseValue中已经对齐过�?
-        currentKAL1 = self_->ctx.kAL1Iter == self_->ctx.maxKAL1Iter ? 
+        currentKAL1 = self_->ctx.kAL1Iter == self_->ctx.maxKAL1Iter ?
                     alignKAL1Tail : self_->ctx.conv3dTiling->kAL1;
-        
+
         load2dSrcOffset = self_->ctx.mAL0Iter * self_->ctx.conv3dTiling->mL0 * currentKAL1 +
                             self_->ctx.kAL0Iter * self_->ctx.conv3dTiling->kL0 * ConvApi::BLOCK_L0_N;
 
@@ -94,7 +94,7 @@ private:
         loadData2dParams.dstGap = numML0Block_ - 1;
         KERNEL_LOG(KERNEL_DEBUG, "[LoadAL0WithPointWise LoadAL0ByLoad2d] load2dSrcOffset: %u currentKAL1: %u currentKL0: %u\n",
             load2dSrcOffset, currentKAL1, currentKL0);
-        
+
         uint64_t continueOffset = currentKAL1 * ConvApi::BLOCK_L0_N;
         for (uint32_t copy_part = 0; copy_part < numML0Block_; ++copy_part) {
             AscendC::LoadData<typename Intf::InputT>(self_->ctx.al0[copy_part * fractalElements],
@@ -102,13 +102,13 @@ private:
                     loadData2dParams);
         }
     }
-    
+
     __aicore__ inline bool IsMTail()
     {
         return self_->ctx.mAL1Iter == self_->ctx.maxMAL1Iter;
     }
 
-    __aicore__ inline void SetLoadData2dTransposeParams(AscendC::LoadData2dTransposeParams &loadData2dTransposeParams, 
+    __aicore__ inline void SetLoadData2dTransposeParams(AscendC::LoadData2dTransposeParams &loadData2dTransposeParams,
                                                         const uint64_t &repeatTimes)
     {
         // 从小z大N变成小n大Z
@@ -164,12 +164,12 @@ public:
 
     __aicore__ inline void LoadBL0()
     {
-        currentNBL1 = self_->ctx.nBL1Iter == self_->ctx.maxNBL1Iter ? 
+        currentNBL1 = self_->ctx.nBL1Iter == self_->ctx.maxNBL1Iter ?
                 alignNBL1Tail : self_->ctx.conv3dTiling->nBL1;
         currentKL0 = self_->ctx.kIter == self_->ctx.maxKL0Iter ? alignKL0Tail
                                                                 : self_->ctx.conv3dTiling->kL0;
 
-        uint64_t load2dSrcOffset = self_->ctx.kBL0Iter * self_->ctx.conv3dTiling->kL0 * currentNBL1 + 
+        uint64_t load2dSrcOffset = self_->ctx.kBL0Iter * self_->ctx.conv3dTiling->kL0 * currentNBL1 +
                           self_->ctx.nBL0Iter * self_->ctx.conv3dTiling->nL0 * k0_;
         KERNEL_LOG(KERNEL_DEBUG, "[LoadBL0WithPointWise] load2dSrcOffset: %u currentNBL1: %u currentKL0: %u\n",
                         load2dSrcOffset, currentNBL1, currentKL0);

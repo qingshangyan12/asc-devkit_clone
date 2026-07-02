@@ -152,7 +152,7 @@ HcclResult InsTempAllGatherMesh1D::RunMesh(const u32 myAlgRank, const std::vecto
 
         for (u32 queIdx = 0; queIdx < vTopo.size() - 1; queIdx++) {
             RankId connectedRank = vTopo[(myAlgRank + 1 + queIdx) % vTopo.size()];
-            
+
             u32 connectedAlgRank = 0;
             CHK_RET(GetAlgRank(connectedRank, tempVTopo_[0], connectedAlgRank));
             auto it = tempLinks_.find(connectedRank);

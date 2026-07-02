@@ -48,7 +48,7 @@ HcclResult CollAlltoAllVContinuousPipeline::CalcStreamNum(u32& streamNum)
 {
     const u32 level0StreamNum = topoAttr_.deviceNumPerAggregation - 1;
     const u32 level1StreamNum = 1; // 先固定1条
-    
+
     streamNum = level0StreamNum + level1StreamNum;
     HCCL_INFO("[CollAlltoAllVContinuousPipeline]tag[%s] level0StreamNum[%u], level1StreamNum[%u], streamNum[%u]",
         tag_.c_str(), level0StreamNum, level1StreamNum, streamNum);

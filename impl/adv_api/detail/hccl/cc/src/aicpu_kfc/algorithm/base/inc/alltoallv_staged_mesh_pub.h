@@ -19,14 +19,14 @@ public:
     explicit AlltoAllVStagedMesh(const HcclDispatcher dispatcher);
     ~AlltoAllVStagedMesh() override;
     HcclResult Prepare(DeviceMem &sendMem, DeviceMem &recvMem, StageAlltoAllVAddrInfo &sendAddrInfo,
-        StageAlltoAllVAddrInfo &recvAddrInfo, bool isAlltoAllZCopyMode, u32 userRank, Stream &mainStream, 
-        std::vector<Stream> &subStreams, 
-        std::vector<std::shared_ptr<LocalNotify>> &meshSignalMainToSub, 
+        StageAlltoAllVAddrInfo &recvAddrInfo, bool isAlltoAllZCopyMode, u32 userRank, Stream &mainStream,
+        std::vector<Stream> &subStreams,
+        std::vector<std::shared_ptr<LocalNotify>> &meshSignalMainToSub,
         std::vector<std::shared_ptr<LocalNotify>> &meshSignalSubToMain) override;
     HcclResult Prepare(DeviceMem &sendMem, DeviceMem &recvMem, DeviceMem &scratchInputMem,
         DeviceMem &scratchOutputMem, StageAlltoAllVAddrInfo &sendAddrInfo, StageAlltoAllVAddrInfo &recvAddrInfo,
-        bool isAlltoAllZCopyMode, u32 userRank, Stream &mainStream, std::vector<Stream> &subStreams, 
-        std::vector<std::shared_ptr<LocalNotify>> &meshSignalMainToSub, 
+        bool isAlltoAllZCopyMode, u32 userRank, Stream &mainStream, std::vector<Stream> &subStreams,
+        std::vector<std::shared_ptr<LocalNotify>> &meshSignalMainToSub,
         std::vector<std::shared_ptr<LocalNotify>> &meshSignalSubToMain) override;
     HcclResult RunAsync(const u32 rank, const u32 rankSize, const std::vector<LINK> &links) override;
 

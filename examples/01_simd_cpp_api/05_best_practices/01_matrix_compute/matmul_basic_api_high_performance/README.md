@@ -485,7 +485,7 @@ $$MTE2耗时误差 = \frac{1874.267 - 1832.10}{1832.10} = 2.30\%$$
 AscendC::printf("matmul blockIdx=%d\n", AscendC::GetBlockIdx());
 ```
 
-> [!CAUTION]注意 
+> [!CAUTION]注意
 >printf（PRINTF）接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC\_DUMP=0的方式关闭打印功能。
 
 ### DumpTensor
@@ -498,7 +498,7 @@ AscendC::printf("matmul blockIdx=%d\n", AscendC::GetBlockIdx());
 AscendC::DumpTensor(cLocal, baseM * baseN);
 ```
 
-> [!CAUTION]注意 
+> [!CAUTION]注意
 >DumpTensor接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC\_DUMP=0来关闭打印功能。
 
 ## 性能调试

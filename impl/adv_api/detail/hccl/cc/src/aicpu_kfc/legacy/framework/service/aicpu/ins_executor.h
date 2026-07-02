@@ -28,11 +28,11 @@ public:
 private:
     void ExecuteSingleQue(const InsQueue &insQueue, const StreamLite *streamLite, const bool isMaster = false);
     void ReportMainStreamTask(const StreamLite &stream, MainStreamTaskType type) const;
-    
+
     void ExecuteAllQueues950(const InsQueue &insQueue, StreamLiteMgr *streamLiteMgr);
-    void ExecuteSlaveQueue950(list<InsQueue::Iterator> &slaveQueueIters, StreamLiteMgr *streamLiteMgr, 
+    void ExecuteSlaveQueue950(list<InsQueue::Iterator> &slaveQueueIters, StreamLiteMgr *streamLiteMgr,
                                     bool &isLaunchTask, std::set<u32> &slaveStreamIndexSet);
-    void ExecuteMasterQueue950(InsQueue::Iterator &masterQueueIter, StreamLite *masterStream, 
+    void ExecuteMasterQueue950(InsQueue::Iterator &masterQueueIter, StreamLite *masterStream,
                                     bool &isMasterInsIterEnd, bool &isLaunchTask);
 
     void AddOpCounter(const StreamLite &stream, bool isHead) const;

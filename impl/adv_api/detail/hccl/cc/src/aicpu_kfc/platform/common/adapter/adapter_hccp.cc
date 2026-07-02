@@ -109,7 +109,7 @@ constexpr s32 HCCL_SEND_CQ_DEPTH_DEFAULT = (8 * 1024); // HCCL 默认的scq深�
 constexpr u32 TYPICAL_QP_MODIFY = 46; // opcode: RA_RS_TYPICAL_QP_MODIFY
 constexpr u32 TYPICAL_QP_MODIFY_VERSION = 2; // 支持QP解耦socket建链版本号
 
-constexpr u32 SOCKET_ABORT = 97; // opcode: RA_RS_SOCKET_ABORT 
+constexpr u32 SOCKET_ABORT = 97; // opcode: RA_RS_SOCKET_ABORT
 constexpr u32 SOCKET_ABORT_VERSION = 1; // 支持socket abort的版本号
 
 constexpr u32 RS_INIT = 15; // opcode: RA_RS_INIT
@@ -168,7 +168,7 @@ HcclResult hrtRaTypicalQpCreate(RdmaHandle rdmaHandle, int flag,
         std::vector<std::string>({"resource_type", "resource_info"}), std::vector<std::string>({"qp", qpInfoStr}));
 
     CHK_PRT_RET(ret != 0 || (qpHandle == nullptr), HCCL_ERROR("[%s][%s]errNo[0x%016llx] ra qp create fail. "\
-        "params: flag[%d], qpMode[%d]. return: ret[%d]", LOG_KEYWORDS_INIT_GROUP.c_str(), LOG_KEYWORDS_RESOURCE.c_str(), 
+        "params: flag[%d], qpMode[%d]. return: ret[%d]", LOG_KEYWORDS_INIT_GROUP.c_str(), LOG_KEYWORDS_RESOURCE.c_str(),
         HCCL_ERROR_CODE(HCCL_E_NETWORK), flag, qpMode, ret), HCCL_E_NETWORK);
 
     s32 deviceId = 0;
@@ -593,10 +593,10 @@ HcclResult HrtRaSendNormalWrlist(QpHandle handle, struct WrInfo wr[], struct Sen
         *completeNum += completeNumLocal;
         if (!ret) {
             break;  // 成功跳出
-        } 
+        }
         if ((ret == ROCE_ENOENT) || (ret == ROCE_EAGAIN) || ret == ROCE_ENOMEM) {
             remainNum -= completeNumLocal;
-            bool bTimeout = ((chrono::steady_clock::now() - startTime) >= timeout);  
+            bool bTimeout = ((chrono::steady_clock::now() - startTime) >= timeout);
             CHK_PRT_RET(bTimeout, HCCL_ERROR("[Send][HrtRaSendNormalWrlist]errNo[0x%016llx] ra send wrlsit async timeout[%d s]. "\
                 "return[%d], params: send_wrAddr[%p], opRspAddr[%p]",
                 HCCL_ERROR_CODE(HCCL_E_ROCE_TRANSFER), timeout,  ret, wr, opRsp), HCCL_E_ROCE_TRANSFER);
@@ -607,10 +607,10 @@ HcclResult HrtRaSendNormalWrlist(QpHandle handle, struct WrInfo wr[], struct Sen
             return HCCL_E_ROCE_TRANSFER; // 非-2/-11场景错误，不轮询，直接退出
         }
     }
- 
+
     return HCCL_SUCCESS;
 }
- 
+
 
 HcclResult HrtRaGetNotifyBaseAddr(RdmaHandle handle, u64 *va, u64 *size, std::function<bool()> needStop)
 {
@@ -720,7 +720,7 @@ HcclResult HrtRaRdmaInit(int mode, u32 notifyType, struct rdev rdevInfo, RdmaHan
         "[IP]", string(deviceIp[0].GetReadableIP()) })
     );
 #endif
-    CHK_PRT_CONT(ret == HCCP_EINVALIDIPS, 
+    CHK_PRT_CONT(ret == HCCP_EINVALIDIPS,
         HCCL_ERROR("[%s][%s]the IP address in the ranktable is inconsistent with the IP address of the network adapter.",
         LOG_KEYWORDS_INIT_GROUP.c_str(), LOG_KEYWORDS_RANKTABLE_CHECK.c_str()));
 
@@ -743,7 +743,7 @@ HcclResult HrtRaRdmaInitWithAttr(struct RdevInitInfo &init_info, const struct rd
         vector<string>({"device_id", "reason"}),
         vector<string>({std::to_string(rdevInfo.phyId), "The network port is down"})
     );
-    CHK_PRT_CONT(ret == HCCP_ELINKDOWN, 
+    CHK_PRT_CONT(ret == HCCP_ELINKDOWN,
         HCCL_ERROR("[%s][%s]rdma init failed because RoCE link status is down, please check the network adapter configuration.",
         LOG_KEYWORDS_INIT_GROUP.c_str(), LOG_KEYWORDS_RESOURCE.c_str()));
 #ifndef HCCD
@@ -757,7 +757,7 @@ HcclResult HrtRaRdmaInitWithAttr(struct RdevInitInfo &init_info, const struct rd
         vector<string>({ string(HcclIpAddress(rdevInfo.localIp.addr.s_addr).GetReadableIP()), "[IP]", string(deviceIp[0].GetReadableIP()) })
     );
 #endif
-    CHK_PRT_CONT(ret == HCCP_EINVALIDIPS, 
+    CHK_PRT_CONT(ret == HCCP_EINVALIDIPS,
         HCCL_ERROR("[%s][%s]the IP address in the ranktable is inconsistent with the IP address of the network adapter.",
         LOG_KEYWORDS_INIT_GROUP.c_str(), LOG_KEYWORDS_RANKTABLE_CHECK.c_str()));
 
@@ -787,7 +787,7 @@ HcclResult HrtRdmaInitWithBackupAttr(struct RdevInitInfo &init_info, struct rdev
         vector<string>({"device_id", "reason"}),
         vector<string>({std::to_string(rdevInfo.phyId), "The network port is down"})
     );
-    CHK_PRT_CONT(ret == HCCP_ELINKDOWN, 
+    CHK_PRT_CONT(ret == HCCP_ELINKDOWN,
         HCCL_ERROR("[%s][%s]rdma init failed because RoCE link status is down, please check the network adapter configuration.",
         LOG_KEYWORDS_INIT_GROUP.c_str(), LOG_KEYWORDS_RESOURCE.c_str()));
 #ifndef HCCD
@@ -801,7 +801,7 @@ HcclResult HrtRdmaInitWithBackupAttr(struct RdevInitInfo &init_info, struct rdev
         vector<string>({ string(HcclIpAddress(rdevInfo.localIp.addr.s_addr).GetReadableIP()), "[IP]", string(deviceIp[0].GetReadableIP()) })
     );
 #endif
-    CHK_PRT_CONT(ret == HCCP_EINVALIDIPS, 
+    CHK_PRT_CONT(ret == HCCP_EINVALIDIPS,
         HCCL_ERROR("[%s][%s]the IP address in the ranktable is inconsistent with the IP address of the network adapter.",
         LOG_KEYWORDS_INIT_GROUP.c_str(), LOG_KEYWORDS_RANKTABLE_CHECK.c_str()));
 
@@ -1118,7 +1118,7 @@ HcclResult IsSupportRaSocketAbort(bool& isSupportRaSocketAbort)
     CHK_RET(hrtGetDevice(&deviceLogicID));
     CHK_RET(hrtGetDevicePhyIdByIndex(static_cast<u32>(deviceLogicID), devicePhyId));
     u32 configVersion = 0;
- 
+
     // 获取版本号查看是否兼容
     HcclResult ret = hrtRaGetInterfaceVersion(devicePhyId, SOCKET_ABORT, &configVersion);
     CHK_PRT_RET(ret == HCCL_E_NETWORK, HCCL_ERROR("[IsSupportRaSendNormalWrlist]hrtRaGetInterfaceVersion "\
@@ -1127,7 +1127,7 @@ HcclResult IsSupportRaSocketAbort(bool& isSupportRaSocketAbort)
         HCCL_WARNING("this package does not support hrtRaGetInterfaceVersion, please change new package");
         return HCCL_SUCCESS;
     }
- 
+
     if (configVersion >= SOCKET_ABORT_VERSION) {
         isSupportRaSocketAbort = true;
     }
@@ -1263,7 +1263,7 @@ HcclResult hrtRaNonBlockGetSockets(u32 role, struct SocketInfoT conn[], u32 num,
         HCCL_ERROR("[hrtRaNonBlockGetSockets]get ra socket error. role[%u], num[%u], ret[%d], connected num[%u]", \
             role, num, ret, *connectedNum);
         for (u32 idx = 0; idx < num; idx++) {
-            HCCL_ERROR("cur idx[%u] socketHandle[%u] s_addr[%u] tag[%s]", idx, conn[idx].socketHandle, 
+            HCCL_ERROR("cur idx[%u] socketHandle[%u] s_addr[%u] tag[%s]", idx, conn[idx].socketHandle,
                 conn[idx].remoteIp.addr.s_addr, conn[idx].tag);
         }
         return HCCL_E_TCP_CONNECT;
@@ -1328,7 +1328,7 @@ HcclResult hrtRaSocketNonBlockSendHeterog(const FdHandle fdHandle, const void *d
             "sent[%llu Byte], ret[%d]", data, size, *sentSize, ret);
         return HCCL_E_NETWORK;
     }
- 
+
     return HCCL_SUCCESS;
 }
 
@@ -1435,7 +1435,7 @@ HcclResult hrtRaSocketNonBlockRecvHeterog(const FdHandle fdHandle, void *data, u
              "recv[%llu Byte], ret[%d], errno[%d][%s]", data, size, recvSize, ret, errno, strerror(errno));
         return HCCL_E_TCP_TRANSFER;
     }
- 
+
     return HCCL_SUCCESS;
 }
 
@@ -1517,7 +1517,7 @@ HcclResult IsSupportHdcAsync(bool &isSupportHdcAsync)
     CHK_RET(hrtGetDevice(&deviceLogicID));
     CHK_RET(hrtGetDevicePhyIdByIndex(static_cast<u32>(deviceLogicID), devicePhyId));
     u32 version = 0;
- 
+
     // 获取版本号查看是否兼容
     HcclResult ret = hrtRaGetInterfaceVersion(devicePhyId, RS_INIT, &version);
     CHK_PRT_RET(ret == HCCL_E_NETWORK, HCCL_ERROR("[IsSupportHdcAsync]hrtRaGetInterfaceVersion "\
@@ -1526,7 +1526,7 @@ HcclResult IsSupportHdcAsync(bool &isSupportHdcAsync)
         HCCL_WARNING("this package does not support hrtRaGetInterfaceVersion, please change new package");
         return HCCL_SUCCESS;
     }
- 
+
     if (version >= RS_INIT_SUPPORT_ASYNC_VERSION) {
         isSupportHdcAsync = true;
     }
@@ -2381,7 +2381,7 @@ HcclResult IsSupportRaSendNormalWrlist(bool& isSupportRaSendNormalWrlist)
     CHK_RET(hrtGetDevicePhyIdByIndex(static_cast<u32>(deviceLogicID), devicePhyId));
     u32 configVersion = 0;
     isSupportRaSendNormalWrlist = false;
- 
+
     // 获取版本号查看是否兼容
     HcclResult ret = hrtRaGetInterfaceVersion(devicePhyId, SEND_NORMAL_WRLIST, &configVersion);
     CHK_PRT_RET(ret == HCCL_E_NETWORK, HCCL_ERROR("[IsSupportRaSendNormalWrlist]hrtRaGetInterfaceVersion "\
@@ -2390,14 +2390,14 @@ HcclResult IsSupportRaSendNormalWrlist(bool& isSupportRaSendNormalWrlist)
         HCCL_WARNING("this package does not support hrtRaGetInterfaceVersion, please change new package");
         return HCCL_SUCCESS;
     }
- 
+
     if (configVersion >= SEND_NORMAL_WRLIST_VERSION) {
         isSupportRaSendNormalWrlist = true;
     }
     HCCL_INFO("IsSupportRaSendNormalWrlist support:%d", isSupportRaSendNormalWrlist);
     return HCCL_SUCCESS;
 }
- 
+
 
 HcclResult hrtRaGetQpAttr(QpHandle qpHandle, struct QpAttr *attr)
 {
@@ -2513,7 +2513,7 @@ HcclResult hrtRaQpCreateWithAttrs(RdmaHandle rdmaHandle, struct QpExtAttrs *attr
         HCCL_ERROR("[Create][RaQp]errNo[0x%016llx] ra qp create with attrs fail. qpInfo:[%s], return: ret[%d]",
         HCCL_ERROR_CODE(HCCL_E_NETWORK), qpInfo.c_str(), ret),
         HCCL_E_NETWORK);
-    
+
     struct QpAttr attr{};
     CHK_RET(hrtRaGetQpAttr(qpHandle, &attr));
     s32 deviceId = 0;
@@ -2690,13 +2690,13 @@ HcclResult H2DTlvInit(struct TlvInitInfo *init_info, uint32_t *buffer_size, void
         HCCL_WARNING("this package does not support H2DTlvInit for device, please change new package");
         return HCCL_E_NOT_SUPPORT;
     }
- 
+
     s32 ret = DlRaFunction::GetInstance().dlH2DTlvInit(init_info, buffer_size, tlv_handle);
     CHK_PRT_RET(ret != 0, HCCL_WARNING("[H2DTlvInit]errNo[0x%016llx] dlH2DTlvInit fail. "
             "return: ret[%d]", HCCL_ERROR_CODE(HCCL_E_NETWORK), ret), HCCL_E_NETWORK);
     return HCCL_SUCCESS;
 }
- 
+
 HcclResult H2DTlvRequest(void *tlv_handle, unsigned int module_type, struct TlvMsg *send_msg, struct TlvMsg *recv_msg)
 {
     u32 tlvVersion = 0;
@@ -2711,13 +2711,13 @@ HcclResult H2DTlvRequest(void *tlv_handle, unsigned int module_type, struct TlvM
         HCCL_WARNING("driver package does not support H2DTlvRequest, please change new package");
         return HCCL_E_NOT_SUPPORT;
     }
- 
+
     s32 ret = DlRaFunction::GetInstance().dlH2DTlvRequest(tlv_handle, module_type, send_msg, recv_msg);
     CHK_PRT_RET(ret != 0, HCCL_WARNING("[H2DTlvRequest]errNo[0x%016llx] dlH2DTlvRequest fail. module_type[%u]"
             "return: ret[%d]", HCCL_ERROR_CODE(HCCL_E_NETWORK), module_type, ret), HCCL_E_NETWORK);
     return HCCL_SUCCESS;
 }
- 
+
 HcclResult H2DTlvDeinit(void *tlv_handle)
 {
     u32 tlvVersion = 0;
@@ -2727,7 +2727,7 @@ HcclResult H2DTlvDeinit(void *tlv_handle)
         HCCL_WARNING("this package does not support H2DTlvDeinit for device, please change new package");
         return HCCL_E_NOT_SUPPORT;
     }
- 
+
     s32 ret = DlRaFunction::GetInstance().dlH2DTlvDeinit(tlv_handle);
     CHK_PRT_RET(ret != 0, HCCL_WARNING("[H2DTlvDeinit]errNo[0x%016llx] ra tlv deinit fail. "
             "return: ret[%d]", HCCL_ERROR_CODE(HCCL_E_NETWORK), ret), HCCL_E_NETWORK);
@@ -2890,7 +2890,7 @@ HcclResult CreateQpWithDepthConfig(RdmaHandle rdmaHandle, s32 qpMode, const QpCo
     HCCL_DEBUG("CreateQp qpMode[%d], sq_depth[%u], rq_depth[%u], scq_depth[%u], rcq_depth[%u], TC[%u], SL[%u], rdmaRetryCnt[%u], rdmaTimeOut[%u]",
         qpMode, qpConfig.sq_depth, qpConfig.rq_depth, qpConfig.scq_depth, qpConfig.rcq_depth, qpInfo.tc, qpInfo.sl, qpInfo.retryCnt,
         qpInfo.retryTime);
-    
+
     struct QpExtAttrs ext_attrs{};
     ext_attrs.qpMode = qpMode;
     ext_attrs.cqAttr.sendCqDepth = qpConfig.scq_depth;

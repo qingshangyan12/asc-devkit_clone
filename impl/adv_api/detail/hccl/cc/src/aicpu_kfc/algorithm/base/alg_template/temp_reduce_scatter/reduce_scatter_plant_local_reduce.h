@@ -21,7 +21,7 @@ public:
     HcclResult Prepare(void *inputMemPtr, DeviceMem &cclInMem, DeviceMem &outputMem,
         const Stream &stream, std::vector<Stream> &subStreams,
         std::vector<std::shared_ptr<LocalNotify>> &meshSignal, std::vector<std::shared_ptr<LocalNotify>> &meshSignalAux,
-        GroupSlicesInfo &grouSlicesInfo, const HcclReduceOp reductionOp, u32 all2allOffset, 
+        GroupSlicesInfo &grouSlicesInfo, const HcclReduceOp reductionOp, u32 all2allOffset,
         const HcclDataType dataType, bool isNeedSpaceBorrow, bool reverseMemUsage = false, bool isA3CrossNode = false) override;
     HcclResult RunAsync(const u32 rank, const u32 rankSize, const std::vector<LINK> &links) override;
 

@@ -25,14 +25,14 @@ CcuTempAllGather2DiesMeshMem2Mem1D::CcuTempAllGather2DiesMeshMem2Mem1D(const OpP
         mySubCommRank_ = std::distance(subCommRanks[0].begin(), it);
     }
 }
- 
+
 CcuTempAllGather2DiesMeshMem2Mem1D::~CcuTempAllGather2DiesMeshMem2Mem1D()
 {
 }
- 
+
 HcclResult CcuTempAllGather2DiesMeshMem2Mem1D::CalcRes(HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
                                                       AlgResourceRequest& resourceRequest)
-{   
+{
     resourceRequest.notifyNumOnMainThread = 1;
     resourceRequest.slaveThreadNum = 1;
     resourceRequest.ccuKernelNum.push_back(ALL_GATHER_2DIES_M2M_THREAD_NUM);
@@ -83,14 +83,14 @@ HcclResult CcuTempAllGather2DiesMeshMem2Mem1D::CalcRes(HcclComm comm, const OpPa
         resourceRequest.ccuKernelInfos.push_back(kernelInfo0);
     }
     if (rankIdGroup1.size() != 0) {
-        resourceRequest.ccuKernelInfos.push_back(kernelInfo1);  
+        resourceRequest.ccuKernelInfos.push_back(kernelInfo1);
     }
     HCCL_DEBUG("[CcuTempAllGather2DiesMeshMem2Mem1D::CalcRes] channelDescs.size()=%llu, dimsize=%llu, "
                "ccuKernelInfos.size()=%llu",
                channelDescs.size(), subCommRanks_[0].size(), resourceRequest.ccuKernelInfos.size());
     return HcclResult::HCCL_SUCCESS;
 }
- 
+
 HcclResult CcuTempAllGather2DiesMeshMem2Mem1D::KernelRun(const OpParam& param, const TemplateDataParams& templateDataParams,
                                                         TemplateResource& templateResource)
 {

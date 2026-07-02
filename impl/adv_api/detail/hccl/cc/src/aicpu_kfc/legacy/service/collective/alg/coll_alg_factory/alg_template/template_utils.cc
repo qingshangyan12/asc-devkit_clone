@@ -165,7 +165,7 @@ HcclResult CalcResLinksMesh(const RankId myRank, const u32 tempRankSize,
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult CalcResLinksMesh2D(const RankId myRank, const std::vector<std::vector<RankId>> &tempVTopo, 
+HcclResult CalcResLinksMesh2D(const RankId myRank, const std::vector<std::vector<RankId>> &tempVTopo,
                             const u32 linkNumBtwPeers, AlgTempResReq &tempResReq)
 {
     u32 myAlgRank;

@@ -66,7 +66,7 @@ private:
     u32 level2RankSize_ = INVALID_VALUE_RANKSIZE;
 
     Stream mainStream_; // SDMA+localcopy
-    std::vector<Stream> subStreams_; 
+    std::vector<Stream> subStreams_;
     Stream rdmaMainStream_;
     std::vector<Stream> sdmaSubStreams_;
     std::shared_ptr<LocalNotify> notifyMainToRdma_;

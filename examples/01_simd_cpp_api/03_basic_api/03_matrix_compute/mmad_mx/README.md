@@ -163,7 +163,7 @@ MX矩阵乘法计算公式：$$ C = (ScaleA ⊗ A) x (ScaleB ⊗ B) + Bias $$
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行算子。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -180,7 +180,7 @@ MX矩阵乘法计算公式：$$ C = (ScaleA ⊗ A) x (ScaleB ⊗ B) + Bias $$
   ```
 
   如果未安装上述依赖，脚本无法正确生成FP4/FP8类型的输入数据和真值数据，可能导致精度校验失败。
-  
+
 - 样例执行
 
   在本样例目录下执行如下命令。

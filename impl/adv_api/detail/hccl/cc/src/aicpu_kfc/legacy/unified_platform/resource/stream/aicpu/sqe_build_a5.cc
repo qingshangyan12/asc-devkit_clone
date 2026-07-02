@@ -18,7 +18,7 @@ u32 GetKernelExecTimeoutFromEnvConfig()
     return envTimeout;
 }
 
-namespace 
+namespace
 {
 void ConstructLHWI(const Rt91095StarsCondIsaRegister_t dstReg, const u64 immd, Rt91095StarsCondOpLHWI_t &opLHWI)
 {
@@ -77,7 +77,7 @@ void ConstructNop(Rt91095StarsCondOpNop_t &nop)
     nop.rs1 = static_cast<uint32_t>(Rt91095StarsCondIsaRegister_t::RT_91095_STARS_COND_ISA_REGISTER_R0);
     nop.immd = 0U;
 }
-} 
+}
 
 void BuildA5SqeCCoreNotifyWait(u32 streamId, u32 taskId, u64 waitAddr, u64 actAddr, bool last, uint8_t * const sqeIn)
 {

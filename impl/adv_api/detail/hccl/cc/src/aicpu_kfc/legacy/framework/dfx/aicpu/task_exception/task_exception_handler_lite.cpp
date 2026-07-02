@@ -220,7 +220,7 @@ HcclResult SendTaskExceptionByMBox(CommunicatorImplLite *aicpuComm, const rtLogi
     }
     HCCL_INFO("[TaskExceptionHandlerLite][SendTaskExceptionByMBox] HostToDeviceLogicId[%u], localDeviceid[%u]",
         devPhyId, localDeviceId);
-    
+
     CHK_RET(SendTaskExceptionByMBox(localDeviceId, notifyId, 0, aicpuComm->GetUserStreamId(), exceptionInfo));
     return HCCL_SUCCESS;
 }

@@ -1,18 +1,18 @@
 # OpAICoreDef<a name="ZH-CN_TOPIC_0000002114052049"></a>
 
--   **[SetTiling](SetTiling.md)**  
+-   **[SetTiling](SetTiling.md)**
 
--   **[SetCheckSupport](SetCheckSupport.md)**  
+-   **[SetCheckSupport](SetCheckSupport.md)**
 
--   **[SetOpSelectFormat](SetOpSelectFormat.md)**  
+-   **[SetOpSelectFormat](SetOpSelectFormat.md)**
 
--   **[SetOpSupportInfo](SetOpSupportInfo.md)**  
+-   **[SetOpSupportInfo](SetOpSupportInfo.md)**
 
--   **[SetOpSpecInfo](SetOpSpecInfo.md)**  
+-   **[SetOpSpecInfo](SetOpSpecInfo.md)**
 
--   **[SetParamGeneralize](SetParamGeneralize.md)**  
+-   **[SetParamGeneralize](SetParamGeneralize.md)**
 
--   **[AddConfig](AddConfig.md)**  
+-   **[AddConfig](AddConfig.md)**
 
--   **[LaunchWithZeroEleOutputTensors](LaunchWithZeroEleOutputTensors.md)**  
+-   **[LaunchWithZeroEleOutputTensors](LaunchWithZeroEleOutputTensors.md)**
 

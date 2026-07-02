@@ -50,16 +50,16 @@
 </table>
 </div>
 
-- 样例实现：  
+- 样例实现：
   本样例中实现的是固定shape为输入src[128, 128]，输出dst[128, 128]的logsoftmax_custom样例。
 
-  - Kernel实现  
+  - Kernel实现
     核心计算步骤：将输入数据搬入后，调用 `AscendC::LogSoftMax` 完成 LogSoftMax 计算，再将结果搬出。
 
-  - Tiling实现  
+  - Tiling实现
     本样例为单核计算场景，无复杂分核逻辑。Host端通过 `AscendC::GetLogSoftMaxMinTmpSize` 获取API所需临时缓冲区大小，Kernel内部使用 `LogSoftMaxTiling` 结构体传递API所需的tiling参数。
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行

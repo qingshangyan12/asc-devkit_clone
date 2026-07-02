@@ -220,7 +220,7 @@
         ```
         // 配套的host侧tiling函数示例：
         ge::graphStatus TilingFunc(gert::TilingContext* context)
-        {	
+        {
             // 启用VectorCore，将numBlocks置为AI Core中vector核数 + Vector Core中的vector核数
             auto ascendcPlatform = platform_ascendc::PlatformAscendC(platformInfo);
             auto totalCoreNum = ascendcPlatform.GetCoreNumAiv();
@@ -255,7 +255,7 @@
     }
     // 配套的host侧tiling函数示例：
     ge::graphStatus TilingFunc(gert::TilingContext* context)
-    {	
+    {
         // ...
         if (context->GetInputShape(0) > 10) {
             context->SetTilingKey(1);

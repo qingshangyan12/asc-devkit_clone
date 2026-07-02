@@ -21,7 +21,7 @@
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_REDUCE_REDUCE_PROD_REDUCE_PROD_CHECK_AICORE_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_REDUCE_REDUCE_PROD_REDUCE_PROD_CHECK_AICORE_H_
 
-namespace AscendC {  
+namespace AscendC {
 namespace HighLevelApiCheck {
 template <typename T, class pattern>
 class CheckFuncClassReduceProd {

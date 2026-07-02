@@ -29,7 +29,7 @@ To help developers quickly familiarize with this project, corresponding document
 
 ## Appendix
 Besides the systematic development documentation introduced above, you can also selectively learn about corresponding specialized content based on actual scenarios and development stages.
-- Technical Articles  
+- Technical Articles
   - Basics Introduction
     - [Ascend C Programming Introduction](https://www.hiascend.com/zh/developer/techArticles/20230830-1)
     - [Ascend C Quick Start](https://www.hiascend.com/zh/developer/techArticles/20230830-2)
@@ -39,7 +39,7 @@ Besides the systematic development documentation introduced above, you can also 
     - [Ascend C Non-aligned Data Processing Solutions](https://www.hiascend.com/zh/developer/techArticles/20250627-1)
     - [Deep Understanding of Multi-core Parallel/Pipeline Computing/Double Buffer Technology](https://www.hiascend.com/zh/developer/techArticles/20230807-1)
   - Problem Cases
-    - [Ascend C Operator Development Common Problem Cases](https://www.hiascend.com/zh/developer/techArticles/20240106-1) 
+    - [Ascend C Operator Development Common Problem Cases](https://www.hiascend.com/zh/developer/techArticles/20240106-1)
     - [Locating Precision Issues in Operators Containing Matmul High-level API](https://www.hiascend.com/zh/developer/techArticles/20250107-1)
   - Performance Optimization
     - [Ascend C Operator Performance Optimization Practical Tips 01 - Pipeline Optimization](https://www.hiascend.com/zh/developer/techArticles/20240819-1)

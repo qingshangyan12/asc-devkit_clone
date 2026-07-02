@@ -181,7 +181,7 @@ void Interpret(const InsLocalCopy &ins, const StreamLite &stream, ResMgrFetcher 
             blockSize = ins.GetSrcSlice().GetSize() - u32Max * (splitingTimes - 1);
             offset = 0;
         }
-        
+
         auto taskId = stream.GetRtsq()->GetTaskId();
         stream.GetRtsq()->SdmaCopy(src, dst, blockSize, 0); // 待确认， PART_ID是否固定设置为 0
         HCCL_INFO("InsLocalCopy srcA:0x%llx dstA:0x%llx,size=0x%llx", src, dst, blockSize);
@@ -195,9 +195,9 @@ void Interpret(const InsLocalCopy &ins, const StreamLite &stream, ResMgrFetcher 
         taskParam.taskPara.DMA.linkType = DfxLinkType::ONCHIP;
         taskParam.taskPara.DMA.dmaOp    = DmaOp::HCCL_DMA_READ;
         auto taskInfo = std::make_shared<TaskInfo>(stream.GetSqId(), taskId, INVALID_VALUE_RANKID, taskParam);
-        resMgrFetcher->GetMirrorTaskMgrLite()->AddTaskInfo(taskInfo);   
+        resMgrFetcher->GetMirrorTaskMgrLite()->AddTaskInfo(taskInfo);
         src += offset;
-        dst += offset;    
+        dst += offset;
     }
 }
 
@@ -222,7 +222,7 @@ void Interpret(const InsLocalCopyExtend &ins, const StreamLite &stream, ResMgrFe
             blockSize = ins.GetSrcBuffer().GetSize() - u32Max * (splitingTimes - 1);
             offset = 0;
         }
-    
+
         auto taskId = stream.GetRtsq()->GetTaskId();
         stream.GetRtsq()->SdmaCopy(src, dst, blockSize, 0); // 待确认， PART_ID是否固定设置为 0
         HCCL_INFO("InsLocalCopyExtend srcA:0x%llx dstA:0x%llx,size=0x%llx", src, dst, blockSize);
@@ -238,7 +238,7 @@ void Interpret(const InsLocalCopyExtend &ins, const StreamLite &stream, ResMgrFe
         auto taskInfo = std::make_shared<TaskInfo>(stream.GetSqId(), taskId, INVALID_VALUE_RANKID, taskParam);
         resMgrFetcher->GetMirrorTaskMgrLite()->AddTaskInfo(taskInfo);
         src += offset;
-        dst += offset; 
+        dst += offset;
     }
 }
 
@@ -264,7 +264,7 @@ void Interpret(const InsLocalReduce &ins, const StreamLite &stream, ResMgrFetche
         HCCL_WARNING("%s InsLocalReduce srcSlice size is not equal to dstSlice size, return", __func__);
         return;
     }
-    
+
     AicpuCheckLocalReduceIns(ins);
     RmaBufferLite* srcPtr = resMgrFetcher->GetRmaBufferLite(ins.GetSrcSlice().GetType());
     RmaBufferLite* dstPtr = resMgrFetcher->GetRmaBufferLite(ins.GetDstSlice().GetType());
@@ -278,7 +278,7 @@ void Interpret(const InsLocalReduce &ins, const StreamLite &stream, ResMgrFetche
     u64 src = srcPtr->GetAddr() + srcOffset;
     u64 dst = dstPtr->GetAddr() + dstOffset;
     ReduceIn reduceIn(ins.GetDataType(), ins.GetReduceOp());
-    
+
     stream.GetRtsq()->SdmaReduce(src, dst, ins.GetSrcSlice().GetSize(), 0, reduceIn); // 待确认， PART_ID是否固定设置为 0
 
     HCCL_INFO("InsLocalReduce srcA:0x%llx dstA:0x%llx,size=0x%llx", src, dst, ins.GetSrcSlice().GetSize());
@@ -672,7 +672,7 @@ void Interpret(const InsStreamSync &insStreamSync, const StreamLite &stream, Res
             HCCL_INFO("[StreamSync]Current state. sqid:%d, head:%u, tail:%u",
                 sqId, head, tail);
         }
-    } while (head != tail);  
+    } while (head != tail);
 }
 
 void Interpret(const InsPreStreamSync &insPreStreamSync, const StreamLite &stream, ResMgrFetcher *resMgrFetcher)
@@ -697,7 +697,7 @@ void Interpret(const InsAicpuReduce &insAicpuReduce, const StreamLite &stream, R
         HCCL_WARNING("%s InsAicpuReduce srcSlice size is not equal to dstSlice size, return", __func__);
         return;
     }
-    
+
     RmaBufferLite* srcPtr = resMgrFetcher->GetRmaBufferLite(insAicpuReduce.GetSrcSlice().GetType());
     RmaBufferLite* dstPtr = resMgrFetcher->GetRmaBufferLite(insAicpuReduce.GetDstSlice().GetType());
     u64 srcOffset = insAicpuReduce.GetSrcSlice().GetOffset();
@@ -756,7 +756,7 @@ const std::unordered_map<InstructionType, InsToSqeRule91095, std::EnumClassHash>
     {InstructionType::WAIT_FIN_ACK, Rule91095<InsWaitFinAck>()},
     {InstructionType::STREAM_SYNC, Rule91095<InsStreamSync>()},
     {InstructionType::PRE_STREAM_SYNC, Rule91095<InsPreStreamSync>()},
-    {InstructionType::AICPU_REDUCE, Rule91095<InsAicpuReduce>()} 
+    {InstructionType::AICPU_REDUCE, Rule91095<InsAicpuReduce>()}
 };
 
 void Interpret(const Instruction &ins, const StreamLite &stream, ResMgrFetcher *resMgrFetcher)

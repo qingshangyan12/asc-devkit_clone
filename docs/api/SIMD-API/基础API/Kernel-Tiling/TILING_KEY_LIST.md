@@ -103,7 +103,7 @@ extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8
     } else if (TILING_KEY_LIST(3,4)) {
         KERNEL_TASK_TYPE(4, KERNEL_TYPE_MIX_AIC_1_2);
         op.Process2();
-    } 
+    }
     // 其他代码逻辑
     ...
     // 此处示例当TilingKey为3或4时，会执行ProcessOther

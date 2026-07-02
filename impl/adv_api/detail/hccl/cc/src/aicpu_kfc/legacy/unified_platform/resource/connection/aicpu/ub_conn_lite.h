@@ -101,7 +101,7 @@ public:
 
 private:
     u16  pi{0};
-    u16  ci{0}; 
+    u16  ci{0};
     u32  piDetourCount{0};
     u32  ciDetourCount{0};
     void ProcessSlices(const RmaBufSliceLite &loc, const RmtRmaBufSliceLite &rmt,

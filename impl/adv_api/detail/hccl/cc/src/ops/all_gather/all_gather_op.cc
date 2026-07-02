@@ -69,10 +69,10 @@ HcclResult HcclAllGatherGraphMode(void *sendBuf, void *recvBuf, uint64_t sendCou
     HcclUs startut = TIME_NOW();// 走老流程的判断时间不统计在内
     std::string opTag;
     CHK_RET(AllGatherInitAndCheck(comm, sendBuf, recvBuf, sendCount, dataType, stream, opTag));
-    
+
     // 检查tag有效性
     CHK_RET(HcclCheckTag(tag));
-    
+
     // 拼装ResPackGraphMode
     ResPackGraphMode resPack;
     // 设置tag

@@ -35,7 +35,7 @@ private:
 
     HcclResult SdmaRx(LINK &linkLeft, LINK &linkRight, InterServerAlgoStep &stepInfo,
         const std::vector<LINK> &links);
-        
+
     HcclResult RdmaTxRx(LINK &linkLeft, LINK &linkRight, InterServerAlgoStep &stepInfo,
         const std::vector<LINK> &links);
 

@@ -88,7 +88,7 @@ void NsRecoveryFuncLite::StreamClean(CollCommAicpu *deviceComm)
     u32 localDevId{0};
     auto ret = drvGetLocalDevIDByHostDevID(deviceComm->GetTopoInfo().devicePhyId, &localDevId);
     if (ret != DRV_ERROR_NONE) {
-        HCCL_ERROR("NsRecoveryFuncLite::%s call drvGetLocalDevIDByHostDevID failed, devPhyId %u, ret %d", __func__, 
+        HCCL_ERROR("NsRecoveryFuncLite::%s call drvGetLocalDevIDByHostDevID failed, devPhyId %u, ret %d", __func__,
             deviceComm->GetTopoInfo().devicePhyId, ret);
         return;
     }

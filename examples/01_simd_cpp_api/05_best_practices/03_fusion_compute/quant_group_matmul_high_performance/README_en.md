@@ -28,7 +28,7 @@ This example implements per-token quantized grouped matrix multiplication (Quant
 
 ## Example Description
 
-- Example Function:  
+- Example Function:
   The example implements grouped per-token quantized matmul computation with the grouping axis being the m axis, and performs Gelu activation function computation on the result.
 
   The QuantGroupMatmul computation formula is:
@@ -68,7 +68,7 @@ This example implements per-token quantized grouped matrix multiplication (Quant
 <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">quant_group_matmul_custom</td></tr>
 </table>
 
-- Invocation Implementation  
+- Invocation Implementation
   Use the kernel invocation <<<>>> to call the kernel function.
 
 ## Example Implementation

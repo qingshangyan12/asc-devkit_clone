@@ -1,8 +1,8 @@
 # workspace<a name="ZH-CN_TOPIC_0000001618732636"></a>
 
--   **[GetSysWorkSpacePtr](GetSysWorkSpacePtr.md)**  
+-   **[GetSysWorkSpacePtr](GetSysWorkSpacePtr.md)**
 
--   **[SetSysWorkSpace](SetSysWorkSpace.md)**  
+-   **[SetSysWorkSpace](SetSysWorkSpace.md)**
 
--   **[GetUserWorkspace](GetUserWorkspace.md)**  
+-   **[GetUserWorkspace](GetUserWorkspace.md)**
 

@@ -166,7 +166,7 @@ HcclResult InsTempReduceScatterMesh2D::SendRecvProcess(const ResLinks &tempLinks
     CHK_PRT_THROW(queIdx >= tempInsQues.size(),
                     HCCL_ERROR("[InsTempReduceScatterMesh2D] queIdx[%u] is bigger than tempInsQues size[%zu].", queIdx,
                                 tempInsQues.size()),
-                    InvalidParamsException, "queIdx is invalid");                                
+                    InvalidParamsException, "queIdx is invalid");
     // 做了DMA消减之后只支持PUT
     CHK_PRT_RET(SendRecv(sendRecvInfo, tempInsQues[queIdx], 0, true, DmaMode::PUT),
                 HCCL_ERROR("[InsTempReduceScatterMesh2D] RunReduceScatter SendReduce failed"),

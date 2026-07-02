@@ -5,7 +5,7 @@ C API开放芯片完备编程能力，支持以数组形式分配内存，一般
 包含asc\_simd.h文件来调用C API相应接口。如无特殊说明，包含该头文件即可满足接口调用需求。若[API文档](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API.md)中有特殊说明，则应遵循API的具体说明。
 
 ```
-#include "c_api/asc_simd.h" 
+#include "c_api/asc_simd.h"
 ```
 
 对于C API，主要分为以下几类：

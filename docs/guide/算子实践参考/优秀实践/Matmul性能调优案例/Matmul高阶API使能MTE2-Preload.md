@@ -75,7 +75,7 @@
 
     ```
      // preloadMode = 2
-    static constexpr MatmulConfig MM_CFG = GetMDLConfig(false, false, preloadMode); 
+    static constexpr MatmulConfig MM_CFG = GetMDLConfig(false, false, preloadMode);
     ```
 
 2.  基于自定义MatmulConfig模板参数，创建Matmul对象。

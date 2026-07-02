@@ -7,19 +7,19 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
- 
+
 #include "asymmetric_hierarchical_concatenate_alg_template_base.h"
- 
+
 #include <iostream>
 #include <fstream>
- 
+
 namespace hccl {
- 
+
 AHCAlgTemplateBase::AHCAlgTemplateBase(const HcclDispatcher dispatcher)
     : AlgTemplateBase(dispatcher), needTraslateSliceAddr_(false), rankSize_(1), extendFlag_(false)
 {
 }
- 
+
 AHCAlgTemplateBase::~AHCAlgTemplateBase()
 {
 }
@@ -45,7 +45,7 @@ HcclResult AHCAlgTemplateBase::DisposeSubGroups(const u32 rank)
 {
     return HCCL_SUCCESS;
 }
- 
+
 HcclResult AHCAlgTemplateBase::CommAHCInfoInit()
 {
     return HCCL_SUCCESS;
@@ -58,13 +58,13 @@ HcclResult AHCAlgTemplateBase::PrepareRunAsync(const u32 rank, const u32 rankSiz
     CHK_PTR_NULL(stream_.ptr());
     CHK_PRT_RET(!outputMem_ || !inputMem_,
         HCCL_ERROR("[AHCAlgTemplateBase][PrepareRunAsync]rank[%u] run_async inputmem or outputmem is null", rank), HCCL_E_PTR);
- 
+
     HCCL_INFO("AHCAlgTemplateBase run: rank[%u] ranksize[%u] inputMem[%p] outputMem[%p] count[%llu]", \
               rank, rankSize, inputMem_.ptr(), outputMem_.ptr(), count_);
- 
+
     CHK_PRT_RET(links.size() < rankSize, HCCL_ERROR("[AHCAlgTemplateBase][PrepareRunAsync]rank[%u] linksize[%llu] is less "\
         "than rankSize[%u]", rank, links.size(), rankSize), HCCL_E_INTERNAL);
- 
+
     // 如果ranksize为1, inline reduce和普通跨片reduce操作一致，从input->output
     if (rankSize == 1) {
         if (inputMem_ != outputMem_) {
@@ -74,13 +74,13 @@ HcclResult AHCAlgTemplateBase::PrepareRunAsync(const u32 rank, const u32 rankSiz
         }
         return ret;
     }
- 
+
     DisposeSubGroups(rank);
- 
+
     rankSize_ = rankSize;
- 
+
     CommAHCInfoInit();
-    
+
     // 保存物理slice,可能非连续
     physicalSlices_ = slices_;
 
@@ -89,7 +89,7 @@ HcclResult AHCAlgTemplateBase::PrepareRunAsync(const u32 rank, const u32 rankSiz
         HCCL_DEBUG("[AHCAlgTemplateBase][PrepareRunAsync] clear logic slice_");
         slices_.clear();
     }
- 
+
     return HCCL_SUCCESS;
 }
 
@@ -99,7 +99,7 @@ HcclResult AHCAlgTemplateBase::GetNslbAdjInfoPro(const u32 rank, const u32 rankS
     HCCL_DEBUG("[NSLB-AHC] entry GetNslbAdjInfoPro");
     DisposeSubGroups(rank);
     CommAHCInfoInit();
-    
+
     if (rankSize == 1 || links.size() < rankSize) {
         return HCCL_SUCCESS;
     }
@@ -154,10 +154,10 @@ HcclResult AHCAlgTemplateBase::PrepareAlgTemplate(std::unique_ptr<AlgTemplateBas
 
     CHK_PRT_RET(ret != HCCL_SUCCESS,
         HCCL_ERROR("[AHCAlgTemplateBase][PrepareAlgTemplate] prepare step error"), ret);
-     
+
     return ret;
 }
- 
+
 HcclResult AHCAlgTemplateBase::MemcpyForSingleOp(const u32 rank, AHCOpType opType)
 {
     HcclResult ret = HCCL_SUCCESS;
@@ -166,7 +166,7 @@ HcclResult AHCAlgTemplateBase::MemcpyForSingleOp(const u32 rank, AHCOpType opTyp
     switch (opType) {
         case AHCOpType::AHC_OP_TYPE_REDUCE_SCATTER:{
             u64 srcSize = (inputMem_.size() - commRank * count_ * DataUnitSize(dataType_)) > count_ * DataUnitSize(dataType_) ?
-                count_ * DataUnitSize(dataType_) : (inputMem_.size() - commRank * count_ * DataUnitSize(dataType_)); 
+                count_ * DataUnitSize(dataType_) : (inputMem_.size() - commRank * count_ * DataUnitSize(dataType_));
             DeviceMem srcMem = inputMem_.range(commRank * count_ * DataUnitSize(dataType_), srcSize);
             ret = HcclD2DMemcpyAsync(dispatcher_, outputMem_, srcMem, stream_);
             break;
@@ -190,12 +190,12 @@ HcclResult AHCAlgTemplateBase::MemcpyForSingleOp(const u32 rank, AHCOpType opTyp
     }
     return ret;
 }
- 
+
 HcclResult AHCAlgTemplateBase::RunInstance(const u32 rank, const std::vector<LINK> &links, std::vector<Slice> &slices,
         std::unique_ptr<AlgTemplateBase> &tempAlg, AHCOpType opType)
 {
     HcclResult ret = HCCL_SUCCESS;
- 
+
     // 判断是否关闭reducescatter的barrier
     if (!barrierSwitchOn_) {
         tempAlg->CloseBarrier();
@@ -212,70 +212,70 @@ HcclResult AHCAlgTemplateBase::RunInstance(const u32 rank, const std::vector<LIN
     ret = PrepareAlgTemplate(tempAlg, slices, opType);
     CHK_PRT_RET(ret != HCCL_SUCCESS,
         HCCL_ERROR("[AHCAlgTemplateBase][RunInstance]rank[%u] prepare optype[%d] failed", rank, opType), ret);
-  
+
     ret = tempAlg->RegisterProfiler(
         profilerInput_.planeID, profilerInput_.stage, profilerInput_.step, stream_);
     CHK_PRT_RET(ret != HCCL_SUCCESS,
         HCCL_ERROR("[AHCAlgTemplateBase][RunInstance]rank[%u] registerProfiler optype[%d] failed", rank, opType), ret);
-    
+
     ret = tempAlg->RunAsync(rank, links.size(), links);
     CHK_PRT_RET(ret != HCCL_SUCCESS,
         HCCL_ERROR("[AHCAlgTemplateBase][RunInstance]rank[%u] run optype[%d] failed", rank, opType), ret);
- 
+
     return ret;
 }
- 
+
 ReduceScatterAHCBase::ReduceScatterAHCBase(const HcclDispatcher dispatcher)
     : AHCAlgTemplateBase(dispatcher)
 {
 }
- 
+
 ReduceScatterAHCBase::~ReduceScatterAHCBase()
 {
 }
- 
+
 HcclResult ReduceScatterAHCBase::RunAsync(const u32 rank, const u32 rankSize,
     const std::vector<LINK> &links)
 {
     HCCL_INFO("[ReduceScatterAHCBase][RunAsync] start rank[%u] rankSize[%u]", rank, rankSize);
- 
+
     HcclResult ret = HCCL_SUCCESS;
     ret = PrepareRunAsync(rank, rankSize, links);
     HCCL_DEBUG("[ReduceScatterAHCBase][RunAsync] inputmem.size[%llu] outputmem.size[%llu] count[%llu]", inputMem_.size(), outputMem_.size(), count_);
- 
+
     // 设置地址翻译标记有效，并计算逻辑的totalsize
     needTraslateSliceAddr_ = true;
     commAHCBaseInfo_->ParseInputSlice(physicalSlices_);
- 
+
     CHK_PRT_RET(ret != HCCL_SUCCESS,
         HCCL_ERROR("[ReduceScatterAHCBase][RunAsync]rank[%u] count[%llu] failed in PrepareRunAsync step", rank, count_), ret);
- 
+
     CHK_PRT_RET(rankSize == 1, HCCL_INFO("[ReduceScatterAHCBase][RunAsync] rankSize[%u], do nothing.",
         rankSize), HCCL_SUCCESS);
- 
+
     HCCL_DEBUG("[ReduceScatterAHCBase][RunAsync] rank[%u] begin intra rs", rank);
- 
+
     // 做组内 reduce-scatter
     ret = RunIntraReduceScatter(rank, links, commAHCBaseInfo_);
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[ReduceScatterAHCBase][RunAsync]rank[%u] count[%llu] failed in "\
         "RunIntraReduceScatter  step", rank, count_), ret);
- 
+
     HCCL_DEBUG("[ReduceScatterAHCBase][RunAsync] rank[%u] end intra rs begin inter", rank);
- 
+
     // 做组间 reduce-scatter
     ret = RunInterReduceScatter(rank, links, commAHCBaseInfo_);
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[ReduceScatterAHCBase][RunAsync]rank[%u] count[%llu] failed in "\
         "RunInterReduceScatter step", rank, count_), ret);
- 
+
     // 对于单独的 Reduce-scatter 算子，在运算结束时进行数据搬运
     if (inputMem_ != outputMem_) {
         ret = MemcpyForSingleOp(rank, AHCOpType::AHC_OP_TYPE_REDUCE_SCATTER);
         CHK_PRT_RET(ret != HCCL_SUCCESS,
             HCCL_ERROR("[ReduceScatterAHCBase][RunAsync]rank[%u] memcpy failed", rank), ret);
     }
- 
+
     HCCL_DEBUG("[ReduceScatterAHCBase][RunAsync] rank[%u] end inter rs", rank);
- 
+
     HCCL_INFO("[ReduceScatterAHCBase][RunAsync] finished: rank[%u]", rank);
     return HCCL_SUCCESS;
 }
@@ -292,21 +292,21 @@ HcclResult ReduceScatterAHCBase::RunIntraReduceScatter(const u32 rank, const std
     // 获取当前rank的组内rank
     HcclResult ret = HCCL_SUCCESS;
     HCCL_INFO("[ReduceScatterAHC][RunIntraReduceScatter] begin intra ReduceScatter rank[%u] count[%llu]", rank, count_);
- 
+
     u32 intraRank = commAHCBaseInfo->GetIntraRank(rank);
- 
+
     // 创建执行算子实列
     std::unique_ptr<AlgTemplateBase> tempAlg;
     commAHCBaseInfo->GetIntraAlgTemplateOpInstance(AHCOpType::AHC_OP_TYPE_REDUCE_SCATTER, tempAlg, dispatcher_, reduceAttr_,
         extendFlag_, ahcExtendPreparePara_);
- 
+
     std::vector<std::vector<Slice>> intraSlicesVector;
     std::vector<std::vector<LINK>> intraLinksVector;
     CHK_RET(commAHCBaseInfo->CalcIntraSlicesAndLinks(rank, DataUnitSize(dataType_), count_, links, intraLinksVector, intraSlicesVector));
- 
+
     HCCL_DEBUG("[ReduceScatterAHCBase][RunIntraReduceScatter] run inst rank[%u] intraRank[%u]",
         rank, intraRank);
- 
+
     for (u32 i = 0; i < intraLinksVector.size(); i++) {
         std::vector<Slice> intraSlices = intraSlicesVector[i];
         std::vector<LINK> intraLinks = intraLinksVector[i];
@@ -315,26 +315,26 @@ HcclResult ReduceScatterAHCBase::RunIntraReduceScatter(const u32 rank, const std
         }
         CHK_RET(RunInstance(intraRank, intraLinks, intraSlices, tempAlg, AHCOpType::AHC_OP_TYPE_REDUCE_SCATTER));
     }
- 
+
     HCCL_DEBUG("[ReduceScatterAHCBase][RunIntraReduceScatter] end intra ReduceScatter rank[%u]", rank);
- 
+
     return ret;
 }
- 
+
 AllGatherAHCBase::AllGatherAHCBase(const HcclDispatcher dispatcher)
     : AHCAlgTemplateBase(dispatcher)
 {
 }
- 
+
 AllGatherAHCBase::~AllGatherAHCBase()
 {
 }
- 
+
 HcclResult AllGatherAHCBase::RunAsync(const u32 rank, const u32 rankSize,
     const std::vector<LINK> &links)
 {
     HCCL_INFO("[AllGatherAHCBase][RunAsync] start rank[%u] rankSize[%u]", rank, rankSize);
- 
+
     HcclResult ret = HCCL_SUCCESS;
     ret = PrepareRunAsync(rank, rankSize, links);
     HCCL_DEBUG("[AllGatherAHCBase][RunAsync] inputmem.size[%llu] outputmem.size[%llu] count[%llu]", inputMem_.size(), outputMem_.size(), count_);
@@ -342,36 +342,36 @@ HcclResult AllGatherAHCBase::RunAsync(const u32 rank, const u32 rankSize,
     // 设置地址翻译标记有效，并计算逻辑的totalsize
     needTraslateSliceAddr_ = true;
     commAHCBaseInfo_->ParseInputSlice(physicalSlices_);
- 
+
     CHK_PRT_RET(ret != HCCL_SUCCESS,
         HCCL_ERROR("[AllGatherAHCBase][RunAsync]rank[%u] count[%llu] failed in PrepareRunAsync step", rank, count_), ret);
- 
+
     CHK_PRT_RET(rankSize == 1, HCCL_INFO("[AllGatherAHCBase][RunAsync] rankSize[%u], do nothing.",
         rankSize), HCCL_SUCCESS);
- 
+
     HCCL_DEBUG("[AllGatherAHCBase][RunAsync] rank[%u] begin intra ag", rank);
- 
+
     // 对于单独的 All-gather 算子，在运算开始时进行数据搬运
     if (inputMem_ != outputMem_) {
         ret = MemcpyForSingleOp(rank, AHCOpType::AHC_OP_TYPE_ALLGATHER);
         CHK_PRT_RET(ret != HCCL_SUCCESS,
             HCCL_ERROR("[AllGatherAHCBase][RunAsync]rank[%u] memcpy failed", rank), ret);
     }
- 
+
     // 做组间 all-gather
     ret = RunInterAllGather(rank, links, commAHCBaseInfo_);
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[AllGatherAHCBase][RunAsync]rank[%u] count[%llu] failed in "\
         "RunInterAllGather step", rank, count_), ret);
- 
+
     HCCL_DEBUG("[AllGatherAHCBase][RunAsync] rank[%u] end inter ag", rank);
- 
+
     // 做组内 allgather
     ret = RunIntraAllGather(rank, links, commAHCBaseInfo_);
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[AllGatherAHCBase][RunAsync]rank[%u] count[%llu] failed in "\
         "RunIntraAllGather  step", rank, count_), ret);
- 
+
     HCCL_DEBUG("[AllGatherAHCBase][RunAsync] rank[%u] end intra ag begin inter", rank);
- 
+
     HCCL_INFO("[AllGatherAHCBase][RunAsync] finished: rank[%u]", rank);
     return HCCL_SUCCESS;
 }
@@ -387,21 +387,21 @@ HcclResult AllGatherAHCBase::RunIntraAllGather(const u32 rank, const std::vector
 {
     // 获取当前rank的组内rank
     HCCL_INFO("[AllGatherAHCBase][RunIntraAllGather] begin intra AllGather rank[%u]", rank);
- 
+
     u32 intraRank = commAHCBaseInfo->GetIntraRank(rank);
- 
+
     // 创建执行算子实列
     std::unique_ptr<AlgTemplateBase> tempAlg;
     commAHCBaseInfo->GetIntraAlgTemplateOpInstance(AHCOpType::AHC_OP_TYPE_ALLGATHER, tempAlg, dispatcher_, reduceAttr_,
         extendFlag_, ahcExtendPreparePara_);
- 
+
     std::vector<std::vector<Slice>> intraSlicesVector;
     std::vector<std::vector<LINK>> intraLinksVector;
     CHK_RET(commAHCBaseInfo->CalcIntraSlicesAndLinks(rank, DataUnitSize(dataType_), count_, links, intraLinksVector, intraSlicesVector));
- 
+
     HCCL_DEBUG("[AllGatherAHCBase][RunIntraAllGather] run inst rank[%u] intraRank[%u]",
         rank, intraRank);
- 
+
     for (u32 i = 0; i < intraLinksVector.size(); i++) {
         std::vector<Slice> intraSlices = intraSlicesVector[i];
         std::vector<LINK> intraLinks = intraLinksVector[i];
@@ -410,9 +410,9 @@ HcclResult AllGatherAHCBase::RunIntraAllGather(const u32 rank, const std::vector
         }
         CHK_RET(RunInstance(intraRank, intraLinks, intraSlices, tempAlg, AHCOpType::AHC_OP_TYPE_ALLGATHER));
     }
- 
+
     HCCL_DEBUG("[AllGatherAHCBase][RunIntraAllGather] end intra AllGather rank[%u]", rank);
- 
+
     return HCCL_SUCCESS;
 }
 
@@ -420,54 +420,54 @@ AllReduceAHCBase::AllReduceAHCBase(const HcclDispatcher dispatcher)
     : AHCAlgTemplateBase(dispatcher)
 {
 }
- 
+
 AllReduceAHCBase::~AllReduceAHCBase()
 {
 }
- 
+
 HcclResult AllReduceAHCBase::RunAsync(const u32 rank, const u32 rankSize,
     const std::vector<LINK> &links)
-{  
+{
     HCCL_INFO("[AllReduceAHCBase][RunAsync] start rank[%u] rankSize[%u]", rank, rankSize);
- 
+
     HcclResult ret = HCCL_SUCCESS;
     ret = PrepareRunAsync(rank, rankSize, links);
     HCCL_DEBUG("[AllReduceAHCBase][RunAsync] inputmem.size[%llu] outputmem.size[%llu] count[%llu]", inputMem_.size(), outputMem_.size(), count_);
 
     CHK_PRT_RET(ret != HCCL_SUCCESS,
         HCCL_ERROR("[AllReduceAHCBase][RunAsync]rank[%u] count[%llu] failed in PrepareRunAsync step", rank, count_), ret);
- 
+
     CHK_PRT_RET(rankSize == 1, HCCL_INFO("[AllReduceAHCBase][RunAsync] rankSize[%u], do nothing.",
         rankSize), HCCL_SUCCESS);
- 
+
     CHK_PRT_RET(count_ == 0, HCCL_INFO("[AllReduceAHCBase][RunAsync] count_[%llu], do nothing.", count_), HCCL_SUCCESS);
 
     HCCL_DEBUG("[AllReduceAHCBase][RunAsync] rank[%u] begin intra rs", rank);
- 
+
     ret = RunIntraReduceScatter(rank, links, commAHCBaseInfo_);
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[AllReduceAHCBase][RunAsync]rank[%u] count[%llu] failed in "\
         "RunIntraReduceScatter  step", rank, count_), ret);
- 
+
     HCCL_DEBUG("[AllReduceAHCBase][RunAsync] rank[%u] end intra rs begin inter", rank);
- 
+
     // 垂直方向做allreduce ring
     ret = RunInterAllReduce(rank, links, commAHCBaseInfo_);
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[AllReduceAHCBase][RunAsync]rank[%u] count[%llu] failed in "\
         "RunInterAllReduce step", rank, count_), ret);
- 
+
     HCCL_DEBUG("[AllReduceAHCBase][RunAsync] rank[%u] end inter begin intra ag", rank);
- 
+
     // 水平方向做broken allgather ring
     ret = RunIntraAllGather(rank, links, commAHCBaseInfo_);
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[AllReduceAHCBase][RunAsync]rank[%u] count[%llu] failed in "\
         "RunIntraAllGather step", rank, count_), ret);
- 
+
     HCCL_DEBUG("[AllReduceAHCBase][RunAsync] rank[%u] end intra ag", rank);
- 
+
     HCCL_INFO("[AllReduceAHCBase][RunAsync] finished: rank[%u]", rank);
     return HCCL_SUCCESS;
 }
- 
+
 HcclResult AllReduceAHCBase::GetNslbAdjInfo(const u32 rank, const u32 rankSize,
                                         const std::vector<LINK> &links, AdjInfo& nslbAdjInfo)
 {
@@ -499,63 +499,63 @@ HcclResult AllReduceAHCBase::RunIntraReduceScatter(const u32 rank, const std::ve
 {
     // 获取当前rank的组内rank
     HCCL_INFO("[AllReduceAHCBase][RunIntraReduceScatter] begin intra ReduceScatter rank[%u]", rank);
- 
+
     u32 intraRank = commAHCBaseInfo->GetIntraRank(rank);
- 
+
     // 创建执行算子实列
     std::unique_ptr<AlgTemplateBase> tempAlg;
     commAHCBaseInfo->GetIntraAlgTemplateOpInstance(AHCOpType::AHC_OP_TYPE_REDUCE_SCATTER, tempAlg, dispatcher_, reduceAttr_,
         extendFlag_, ahcExtendPreparePara_);
- 
+
     std::vector<Slice> intraSlices;
     std::vector<LINK> intraLinks;
     CHK_RET(commAHCBaseInfo->CalcIntraSlicesAndLinks(rank, DataUnitSize(dataType_), count_, links, intraLinks, intraSlices));
- 
+
     // 长度不足2，直接跳过
     if (intraLinks.size() <= 1) {
         return HCCL_SUCCESS;
     }
- 
+
     HCCL_DEBUG("[AllReduceAHCBase][RunIntraReduceScatter] run inst rank[%u] intraRank[%u], IntraSize=%u",
         rank, intraRank, intraLinks.size());
- 
+
     CHK_RET(RunInstance(intraRank, intraLinks, intraSlices, tempAlg, AHCOpType::AHC_OP_TYPE_REDUCE_SCATTER));
- 
+
     HCCL_DEBUG("[AllReduceAHCBase][RunIntraReduceScatter] end intra ReduceScatter rank[%u]", rank);
- 
+
     return HCCL_SUCCESS;
 }
- 
+
 HcclResult AllReduceAHCBase::RunIntraAllGather(const u32 rank, const std::vector<LINK> &links,
     const std::unique_ptr<CommAHCBaseInfo> &commAHCBaseInfo)
 {
     HCCL_INFO("[AllReduceAHCBase][RunIntraAllGather] begin intra allgather rank[%u]", rank);
- 
+
     // 获取当前rank的组内rank
     u32 intraRank = commAHCBaseInfo->GetIntraRank(rank);
- 
+
     // 创建执行算子实列
     std::unique_ptr<AlgTemplateBase> tempAlg;
     commAHCBaseInfo->GetIntraAlgTemplateOpInstance(AHCOpType::AHC_OP_TYPE_ALLGATHER, tempAlg, dispatcher_, reduceAttr_,
         extendFlag_, ahcExtendPreparePara_);
- 
+
     std::vector<Slice> intraSlices;
     std::vector<LINK> intraLinks;
- 
+
     CHK_RET(commAHCBaseInfo->CalcIntraSlicesAndLinks(rank, DataUnitSize(dataType_), count_, links, intraLinks, intraSlices));
- 
+
     // 长度不足2，直接跳过
     if (intraLinks.size() <= 1) {
         return HCCL_SUCCESS;
     }
- 
+
     HCCL_DEBUG("[AllReduceAHCBase][RunIntraAllGather] run inst rank[%u] intraRank[%u], IntraSize=%u",
         rank, intraRank, intraLinks.size());
- 
+
     CHK_RET(RunInstance(intraRank, intraLinks, intraSlices, tempAlg, AHCOpType::AHC_OP_TYPE_ALLGATHER));
- 
+
     HCCL_DEBUG("[AllReduceAHCBase][RunIntraAllGather] end intra allgather rank[%u]", rank);
     return HCCL_SUCCESS;
 }
- 
+
 }   // ~~ namespace hccl

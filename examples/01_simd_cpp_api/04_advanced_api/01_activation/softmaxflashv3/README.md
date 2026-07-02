@@ -80,16 +80,16 @@
 </table>
 </div>
 
-- 样例实现：  
+- 样例实现：
   本样例中实现的是固定shape为输入src[8, 2048]，inMax[8, 8]，inSum[8, 8]，inMean[8, 8]， 输出dst[8, 2048]的softmaxflashv3样例。
 
-  - Kernel实现  
+  - Kernel实现
     核心计算步骤：将输入数据搬入后，调用 `AscendC::SoftmaxFlashV3` 完成 SoftmaxFlashV3 计算，再将结果搬出。
 
-  - Tiling实现  
+  - Tiling实现
     softmaxflashv3样例的tiling实现流程如下：首先对shape按照行数进行分核，使用平均分配法先按照核数向上对齐分配，确定主核的计算行数，再确定尾核计算行数，Kernel侧根据baseM自行计算SoftMaxTiling参数。
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行

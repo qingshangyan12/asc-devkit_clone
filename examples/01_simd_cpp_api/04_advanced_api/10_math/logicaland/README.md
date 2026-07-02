@@ -32,14 +32,14 @@
 
 ## 样例描述
 
-- 样例功能：  
-  按元素进行与操作。当输入的数据类型不是bool时，零被视为False，非零数据被视为True。  
+- 样例功能：
+  按元素进行与操作。当输入的数据类型不是bool时，零被视为False，非零数据被视为True。
   计算公式如下：
   $$
   dst_i = src0_i \&\& src1_i
   $$
 
-- 样例规格：  
+- 样例规格：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center"> logicaland </td></tr>
 
@@ -53,21 +53,21 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">logicaland_custom</td></tr>
   </table>
 
-- 样例实现：  
+- 样例实现：
   本样例中实现的是固定shape为输入src0[1, 1024]、src1[1, 1024]，输出dst[1, 1024]的logicaland_custom样例。
 
   - Kernel实现
 
     使用LogicalAnd高阶API接口完成按元素与操作的计算。
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
-## 编译运行  
+## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行算子。
 
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

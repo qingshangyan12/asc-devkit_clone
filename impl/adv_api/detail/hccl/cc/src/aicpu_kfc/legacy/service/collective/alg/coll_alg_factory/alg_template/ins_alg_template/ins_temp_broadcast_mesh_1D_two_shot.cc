@@ -199,7 +199,7 @@ HcclResult InsTempBroadcastMesh1DTwoShot::RankRecvData(const u64 memOffset,
     } else {
         sendDstOffset1 += tempAlgParams.buffInfo.outBuffBaseOff;
     }
-    
+
     DataSlice recvSrcSlice1 = DataSlice(BufferType::INPUT, sendSrcOffset1, sliceInfoVec[rootIdx][0].size);
     DataSlice recvDstSlice1 = DataSlice(dstBufferType_, sendDstOffset1, sliceInfoVec[rootIdx][0].size);
 

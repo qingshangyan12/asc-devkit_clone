@@ -117,7 +117,7 @@ HcclResult CcuKernelAllGatherNHR1DMultiJettyMem2Mem::PreSync()
         CHK_RET(NotifyRecord(channel, CKE_IDX_0, OUTPUT_XN_ID, output_[localSize_], 1 << OUTPUT_XN_ID)); // 同步并置位远端
         CHK_RET(NotifyRecord(channel, CKE_IDX_0, TOKEN_XN_ID, token_[localSize_], 1 << TOKEN_XN_ID));
     }
-    
+
     uint16_t allBit = 1 << OUTPUT_XN_ID | 1 << TOKEN_XN_ID;
     for (ChannelHandle channel : channels_) {
         CHK_RET(NotifyWait(channel, CKE_IDX_0, allBit));
@@ -209,7 +209,7 @@ HcclResult CcuKernelAllGatherNHR1DMultiJettyMem2Mem::DoRepeatAllGatherNHRSingleS
         srcMem_.addr += outputSliceOffset_[sendSliceIdx];
         dstMem_.addr = output_[toRankIdx];
         dstMem_.addr += outputSliceOffset_[sendSliceIdx];
-        
+
         repeatTimeflag_ = 0;
         tmpCopyRepeatNumInv_ = repeatNumInv_;
         CCU_WHILE(tmpCopyRepeatNumInv_ != UINT64_MAX)
@@ -304,7 +304,7 @@ std::vector<uint64_t> CcuKernelAllGatherNHR1DMultiJettyMem2Mem::GeneArgs(const C
     HCCL_INFO("[CcuKernelAllGatherNHR1DMultiJettyMem2Mem] TaskArgs: inputAddr[%llu], outputAddr[%llu], "
     "sliceSize[%llu], sliceSizePerJetty[%llu], lastSliceSizePerJetty[%llu], repeatNumInv[%llu],"
     "inputSliceStride[%llu], outputSliceStride[%llu], inputRepeatStride[%llu], outputRepeatStride[%llu], isInputOutputEqual[%llu]",
-    inputAddr, outputAddr, sliceSize, sliceSizePerJetty, lastSliceSizePerJetty, repeatNumInv, inputSliceStride, 
+    inputAddr, outputAddr, sliceSize, sliceSizePerJetty, lastSliceSizePerJetty, repeatNumInv, inputSliceStride,
     outputSliceStride, inputRepeatStride, outputRepeatStride, isInputOutputEqual);
 
     return {inputAddr,          outputAddr,          token,

@@ -30,10 +30,10 @@ This example uses the Erf high-level API to implement element-wise error functio
 
 ## Example Description
 
-- Example function:  
-  Perform element-wise error function computation (also known as the Gaussian error function).  
+- Example function:
+  Perform element-wise error function computation (also known as the Gaussian error function).
   $$\mathrm{Erf}(x) = \frac{2}{\sqrt{\pi}} \int_x^0 e^{-t^2} dt$$
-- Example specifications:  
+- Example specifications:
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> erf </td></tr>
 
@@ -46,24 +46,24 @@ This example uses the Erf high-level API to implement element-wise error functio
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">erf_custom</td></tr>
   </table>
 
-- Example implementation:  
+- Example implementation:
   This example implements an erf_custom example with fixed shapes of input x[1, 12288] and output y[1, 12288].
 
   - Kernel implementation
 
     Use the Erf high-level API to complete the error function computation.
 
-  - Tiling implementation  
+  - Tiling implementation
     Set the tiling parameters totalLength and tileNum based on the input length and the number of cores used.
 
-  - Invocation implementation  
+  - Invocation implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run  
+## Build and Run
 
 Run the following steps in the root directory of this example to build and run the operator.
 
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -82,7 +82,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-  
+
   For example:
 
   ```bash

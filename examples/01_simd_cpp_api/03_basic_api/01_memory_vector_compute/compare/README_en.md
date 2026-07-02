@@ -44,9 +44,9 @@ This example switches between different scenarios through the compilation parame
 
 **Scenario 2: Compare (Result Stored in Register)**
 - Description: Element-wise comparison of `src0Local` and `src1Local` tensor sizes, storing results in the cmpMask register
-- Input: src0Local=[1, 64], src1Local=[1, 64] 
+- Input: src0Local=[1, 64], src1Local=[1, 64]
 - Input data type: float
-- Output: [1, 32] 
+- Output: [1, 32]
 - Output data type: uint8_t
 - Implementation:
   ```cpp
@@ -84,14 +84,14 @@ This example switches between different scenarios through the compilation parame
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
-    
+
 - Run the example
 
   Run the following commands in the example directory.
@@ -110,7 +110,7 @@ Run the following steps in the root directory of this example to build and run t
   cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # CPU debug mode
   cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # NPU simulation mode
   ```
-  
+
   > **Notice:** Clear the cmake cache before switching build modes. Run `rm CMakeCache.txt` in the build directory and then re-run cmake.
 
 - Build option description
@@ -121,7 +121,7 @@ Run the following steps in the root directory of this example to build and run t
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `1` (default), `2`, `3`, `4` | Scenario number: 1: Compare, 2: Compare (result in register), 3: Compares, 4: Compares (flexible scalar) |
 
-- Execution result  
+- Execution result
   The following execution result indicates that the accuracy comparison is successful.
   ```bash
   test pass!

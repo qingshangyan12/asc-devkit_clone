@@ -135,7 +135,7 @@ namespace hccl {
             if (opType == HcclCMDType::HCCL_CMD_ALLTOALLV || opType == HcclCMDType::HCCL_CMD_ALLTOALLVC) {
                 CHK_RET(ClearEntry(iter->first));
             }
-            
+
             // 注意: ClearEntry后不能再访问iter (已经从cacheHashMap_中被erase了)
 
             // 推进iter到下一个位置
@@ -279,7 +279,7 @@ namespace hccl {
                     const rtStarsNotifySqeV2_t *notifyV2SqePtr = reinterpret_cast<const rtStarsNotifySqeV2_t *>(sqePtr);
                     PLF_CONFIG_DEBUG(PLF_TASK, "[OpUnfoldCache][DumpSqeContent] rtStarsNotifySqeV2_t sqeType[%u]", sqeType);
                     CHK_RET(DumpSqeHeader(notifyV2SqePtr->header));
-                    PLF_CONFIG_DEBUG(PLF_TASK, "[OpUnfoldCache][DumpSqeContent] notify_id[%u] res2[%u] res3[%u] kernel_credit[%u] res4[%u]",    
+                    PLF_CONFIG_DEBUG(PLF_TASK, "[OpUnfoldCache][DumpSqeContent] notify_id[%u] res2[%u] res3[%u] kernel_credit[%u] res4[%u]",
                         notifyV2SqePtr->notify_id, notifyV2SqePtr->res2, notifyV2SqePtr->res3, notifyV2SqePtr->kernel_credit, notifyV2SqePtr->res);
                     PLF_CONFIG_DEBUG(PLF_TASK, "[OpUnfoldCache][DumpSqeContent] res[0][%u] res[1][%u] res[2][%u] res[3][%u] res[4][%u] res[5][%u]",
                         notifyV2SqePtr->res[0], notifyV2SqePtr->res[1], notifyV2SqePtr->res[2], notifyV2SqePtr->res[3], notifyV2SqePtr->res[4], notifyV2SqePtr->res[5]);
@@ -291,7 +291,7 @@ namespace hccl {
                     const rtStarsWriteValueSqeV2_t *writeValueV2SqePtr = reinterpret_cast<const rtStarsWriteValueSqeV2_t *>(sqePtr);
                     PLF_CONFIG_DEBUG(PLF_TASK, "[OpUnfoldCache][DumpSqeContent] rtStarsWriteValueSqeV2_t sqeType[%u]", sqeType);
                     CHK_RET(DumpSqeHeader(writeValueV2SqePtr->header));
-                    PLF_CONFIG_DEBUG(PLF_TASK, "[OpUnfoldCache][DumpSqeContent] reg_addr_low[0x%08x] reg_addr_high[0x%08x] awsize[%u] snoop[%u] res2[%u] awcache[%u] awprot[%u] VA[%u]",  
+                    PLF_CONFIG_DEBUG(PLF_TASK, "[OpUnfoldCache][DumpSqeContent] reg_addr_low[0x%08x] reg_addr_high[0x%08x] awsize[%u] snoop[%u] res2[%u] awcache[%u] awprot[%u] VA[%u]",
                         writeValueV2SqePtr->reg_addr_low, writeValueV2SqePtr->reg_addr_high, writeValueV2SqePtr->awsize, writeValueV2SqePtr->snoop, writeValueV2SqePtr->res2, writeValueV2SqePtr->awcache, writeValueV2SqePtr->awprot, writeValueV2SqePtr->VA);
                     PLF_CONFIG_DEBUG(PLF_TASK, "[OpUnfoldCache][DumpSqeContent] write_val[0][%u] write_val[1][%u] write_val[2][%u] write_val[3][%u] write_val[4][%u] write_val[5][%u] write_val[6][%u] write_val[7][%u]",
                         writeValueV2SqePtr->write_val[0], writeValueV2SqePtr->write_val[1], writeValueV2SqePtr->write_val[2], writeValueV2SqePtr->write_val[3], writeValueV2SqePtr->write_val[4], writeValueV2SqePtr->write_val[5], writeValueV2SqePtr->write_val[6], writeValueV2SqePtr->write_val[7]);

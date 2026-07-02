@@ -27,10 +27,10 @@
 
 ## 样例描述
 
-- 样例功能：  
+- 样例功能：
   本样例实现了对输入tensor按元素执行Leaky Relu（Leaky Rectified Linear Unit）操作，返回计算结果的功能。
 
-  对应的数学表达式为：  
+  对应的数学表达式为：
   $$
   out =
   \begin{cases}
@@ -48,21 +48,21 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">element_wise_arithmetic_kernel</td></tr>
   </table>
 
-- 样例实现：  
+- 样例实现：
   本样例中实现的是固定shape为[4, 128]的LeakyRelu样例。
-  - Kernel实现  
+  - Kernel实现
     - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer）
     - 调用LeakyRelu接口，对输入Tensor执行Leaky Relu操作
     - 调用DataCopy基础API，将计算结果从UB（Unified Buffer）搬运至GM（Global Memory）
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -82,7 +82,7 @@
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
-  
+
   示例如：
 
   ```bash

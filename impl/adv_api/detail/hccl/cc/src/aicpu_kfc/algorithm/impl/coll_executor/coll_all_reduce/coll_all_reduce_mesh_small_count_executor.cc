@@ -196,7 +196,7 @@ HcclResult CollAllReduceMeshSmallCountExecutor::KernelRun(const OpParam &param, 
         HCCL_CONFIG_INFO(HCCL_ALG, "[%s] Run TEMPLATE_ALL_REDUCE_REDUCE_BCAST in COMM_LEVEL0", __func__);
     } else if (topoAttr_.deviceNumPerAggregation == DEVICE_EIGHT) {
         if (workflowMode_ != HcclWorkflowMode::HCCL_WORKFLOW_MODE_OP_BASE || aicpuUnfoldMode_) {
-            level0TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_REDUCE_DOUBLING, 
+            level0TempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(TemplateType::TEMPLATE_ALL_REDUCE_DOUBLING,
                 dispatcher_);
             HCCL_CONFIG_INFO(HCCL_ALG, "[%s] Run TEMPLATE_ALL_REDUCE_DOUBLING in COMM_LEVEL0", __func__);
             CHK_SMART_PTR_NULL(level0TempAlg);

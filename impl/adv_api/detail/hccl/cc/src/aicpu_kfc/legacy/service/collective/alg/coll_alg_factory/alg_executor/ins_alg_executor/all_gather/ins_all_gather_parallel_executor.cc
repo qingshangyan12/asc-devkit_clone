@@ -119,7 +119,7 @@ HcclResult InsAllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTem
     algResReq.primQueueNum = resReqIntra.streamNum + resReqInter.streamNum;
 
     CHK_RET(CalcParallelNotifyReq(algResReq.primQueueNum, algResReq.queueNotifys));
-    
+
     HCCL_DEBUG("[InsAllGatherParallelExecutor] algResReq.primQueueNum %u", algResReq.primQueueNum);
     CHK_RET(CalcResLinks(myRank_, rankGraph, linkPriority_, resReqIntra.links, algResReq.links));
     CHK_RET(CalcResLinks(myRank_, rankGraph, linkPriority_, resReqInter.links, algResReq.links));
@@ -296,7 +296,7 @@ HcclResult InsAllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTem
         }
     }
     syncQueues_.emplace_back(intraQue_[0]);
-    syncQueues_.emplace_back(interQue_[0]);   
+    syncQueues_.emplace_back(interQue_[0]);
 
     CHK_RET(PrepResLinks(myRank_, rankGraph, linkPriority_, resReqIntra.links, intraLinks_));
     CHK_RET(PrepResLinks(myRank_, rankGraph, linkPriority_, resReqInter.links, interLinks_));
@@ -412,7 +412,7 @@ HcclResult InsAllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTem
     tempAlgIntra.SetDmaMode(dmaMode_);
     tempAlgIntra.SetDataType(dataType_);
     tempAlgIntra.SetCollOp(op);  // CCU template需要传递op信息
- 
+
     tempAlgInter.SetDmaMode(dmaMode_);
     tempAlgInter.SetDataType(dataType_);
     tempAlgInter.SetCollOp(op);  // CCU template需要传递op信息

@@ -42,7 +42,7 @@ int CommunicatorImplLite::LoadWithOpBasedMode(HcclKernelParamLite *kernelParam)
         HCCL_ERROR("Some unknown error ocured.");
         return KERNEL_ERROR_CODE;
     }
- 
+
     return KERNEL_SUCCESS_CODE;
 }
 
@@ -226,7 +226,7 @@ void CommunicatorImplLite::UpdateLocBuffer(HcclKernelParamLite *kernelParam)
     if (kernelParam->oneSidedComm) {
         if ((kernelParam->op.batchPutGetLocalAddr == nullptr) || (kernelParam->op.batchPutGetRemoteAddr == nullptr)) {
             THROW<InternalException>("batchPutGetAddr is nullptr");
-        }       
+        }
     }
 
     InitCurrentOp(kernelParam);
@@ -253,7 +253,7 @@ void CommunicatorImplLite::RestoreAllTransports(u64 addr, u64 bufSize)
     HCCL_INFO("[NsRecovery] CommunicatorImplLite::RestoreAllTransports: RestoreData %s", Bytes2hex(data.data(), data.size()).c_str());
     AicpuResPackageHelper helper;
     auto                  dataVec = helper.ParsePackedData(data);
-    
+
     AicpuResMgrType resType = AicpuResMgrType::TRANSPORT;
     GetTransportLiteMgr()->ParseAllPackedData(dataVec[resType].data);
     HCCL_INFO("[NsRecovery] CommunicatorImplLite::RestoreAllTransports: GetResMgr %s Data", resType.Describe().c_str());
@@ -273,7 +273,7 @@ bool CommunicatorImplLite::CheckNeedUpdateRes(HcclKernelParamLite *kernelParam)
 
 void CommunicatorImplLite::UpdateRes(HcclKernelParamLite *kernelParam)
 {
-    if (CheckNeedUpdateRes(kernelParam)) {   
+    if (CheckNeedUpdateRes(kernelParam)) {
         HCCL_INFO("[UpdateRes] start, opMode[%s]", kernelParam->op.algOperator.opMode.Describe().c_str());
         RestoreOpRes(kernelParam->opTag, kernelParam->tagKey, kernelParam->binaryResAddr, kernelParam->binaryResSize);
         HCCL_INFO("[UpdateRes] end");
@@ -282,7 +282,7 @@ void CommunicatorImplLite::UpdateRes(HcclKernelParamLite *kernelParam)
 
 void CommunicatorImplLite::UpdateHDCommnicate(HcclKernelParamLite *kernelParam)
 {
-    CHK_RET_THROW(InternalException, StringFormat("[CommunicatorImplLite][%s] failed to init kfcControlTransferH2DParams", __func__), 
+    CHK_RET_THROW(InternalException, StringFormat("[CommunicatorImplLite][%s] failed to init kfcControlTransferH2DParams", __func__),
             kfcControlTransferH2D->Init(kernelParam->kfcControlTransferH2DParams));
     CHK_RET_THROW(InternalException, StringFormat("[CommunicatorImplLite][%s] failed to init kfcControlTransferD2HParams", __func__),
             kfcStatusTransferD2H->Init(kernelParam->kfcControlTransferD2HParams));
@@ -295,7 +295,7 @@ void CommunicatorImplLite::UpdateDynamicOpData(HcclKernelParamLite *kernelParam)
     HCCL_INFO("[CommunicatorImplLite][UpdateDynamicOpData] OpType[%s]", kernelParam->op.algOperator.opType.Describe().c_str());
     u8* dynamicDataPtr = reinterpret_cast<u8*>(kernelParam) + sizeof(struct HcclKernelParamLite);
     if (kernelParam->op.algOperator.opType == OpType::BATCHSENDRECV) {
-        struct BatchSendRecvDataDes* batchSendRecvDataPtr = 
+        struct BatchSendRecvDataDes* batchSendRecvDataPtr =
             reinterpret_cast<struct BatchSendRecvDataDes*>(dynamicDataPtr);
         kernelParam->op.algOperator.batchSendRecvDataDes.itemNum = batchSendRecvDataPtr->itemNum;
         kernelParam->op.algOperator.batchSendRecvDataDes.sendRecvItemsPtr = batchSendRecvDataPtr->batchSendRecvItem;
@@ -304,7 +304,7 @@ void CommunicatorImplLite::UpdateDynamicOpData(HcclKernelParamLite *kernelParam)
             HCCL_INFO("[CommunicatorImplLite][UpdateDynamicOpData] batchSendRecvDataDes remoteRank[%u]", (itemPtr + i)->remoteRank);
         }
     } else if (kernelParam->op.algOperator.opType == OpType::ALLTOALLV) {
-        struct AllToAllvDataDes* alltoallvDataPtr = 
+        struct AllToAllvDataDes* alltoallvDataPtr =
             reinterpret_cast<struct AllToAllvDataDes *>(dynamicDataPtr);
         kernelParam->op.algOperator.all2AllVDataDes.sendType = static_cast<DataType::Value>(alltoallvDataPtr->sendType);
         kernelParam->op.algOperator.all2AllVDataDes.recvType = static_cast<DataType::Value>(alltoallvDataPtr->recvType);
@@ -314,12 +314,12 @@ void CommunicatorImplLite::UpdateDynamicOpData(HcclKernelParamLite *kernelParam)
         kernelParam->op.algOperator.all2AllVDataDes.sdispls = static_cast<void *>(static_cast<u64 *>(alltoallvDataPtr->sendRecvInfos) + ALLTOALLV_DATA_INDEX_2 * rankSize);
         kernelParam->op.algOperator.all2AllVDataDes.rdispls = static_cast<void *>(static_cast<u64 *>(alltoallvDataPtr->sendRecvInfos) + ALLTOALLV_DATA_INDEX_3 * rankSize);
         for (u32 i = 0; i < rankSize; i++) {
-            HCCL_INFO("[CommunicatorImplLite][UpdateDynamicOpData] alltoallv sendCounts[%llu], recvCounts[%llu]", 
-                *(static_cast<const u64 *>(kernelParam->op.algOperator.all2AllVDataDes.sendCounts) + i), 
+            HCCL_INFO("[CommunicatorImplLite][UpdateDynamicOpData] alltoallv sendCounts[%llu], recvCounts[%llu]",
+                *(static_cast<const u64 *>(kernelParam->op.algOperator.all2AllVDataDes.sendCounts) + i),
                 *(static_cast<const u64 *>(kernelParam->op.algOperator.all2AllVDataDes.recvCounts) + i));
         }
     } else if (kernelParam->op.algOperator.opType == OpType::ALLTOALLVC) {
-        struct AllToAllvcDataDes* alltoallvcDataPtr = 
+        struct AllToAllvcDataDes* alltoallvcDataPtr =
             reinterpret_cast<struct AllToAllvcDataDes *>(dynamicDataPtr);
         kernelParam->op.algOperator.all2AllVCDataDes.sendType = static_cast<DataType::Value>(alltoallvcDataPtr->sendType);
         kernelParam->op.algOperator.all2AllVCDataDes.recvType = static_cast<DataType::Value>(alltoallvcDataPtr->recvType);

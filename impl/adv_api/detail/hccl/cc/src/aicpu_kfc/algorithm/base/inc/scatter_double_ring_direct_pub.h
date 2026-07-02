@@ -21,10 +21,10 @@ public:
     ~ScatterDoubleRingDirect() override;
 
     // should be called soon after template ScatterDoubleRingDirect instance created
-    HcclResult Prepare(HcomCollOpInfo *opInfo, const u32 userRank, const u32 subRingRank, 
-        std::vector<Stream> &subStreams, const std::vector<std::shared_ptr<LocalNotify>> &mainSignals, 
-        const std::vector<std::shared_ptr<LocalNotify>> &subSignals, const std::vector<std::vector<u32>> &ringsOrders, 
-        const std::vector<std::vector<Slice>> &multiRingSlices, 
+    HcclResult Prepare(HcomCollOpInfo *opInfo, const u32 userRank, const u32 subRingRank,
+        std::vector<Stream> &subStreams, const std::vector<std::shared_ptr<LocalNotify>> &mainSignals,
+        const std::vector<std::shared_ptr<LocalNotify>> &subSignals, const std::vector<std::vector<u32>> &ringsOrders,
+        const std::vector<std::vector<Slice>> &multiRingSlices,
         const std::vector<std::vector<Slice>> &userMemInputSlices) override;
 
     HcclResult RunAsync(const u32 rank, const u32 rankSize, const std::vector<LINK> &links) override;

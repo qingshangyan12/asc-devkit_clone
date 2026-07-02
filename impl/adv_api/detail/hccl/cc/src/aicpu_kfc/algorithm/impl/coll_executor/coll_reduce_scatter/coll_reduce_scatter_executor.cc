@@ -71,7 +71,7 @@ HcclResult CollReduceScatterExecutor::Orchestrate(OpParam& param, AlgResourceRes
         }
         // 在Level1和Level2执行RunLoop
         if (topoAttr_.serverNum > 1) {
-            ret = RunLoop(param, algRes); 
+            ret = RunLoop(param, algRes);
         } else {        // 单机场景，数据直接从UserInput搬到UserOutput
             u64 totalSize = count * SIZE_TABLE[dataType];
             DeviceMem srcMem = DeviceMem::create(static_cast<u8 *>(algRes.paramInputMem.ptr()) + totalSize * topoAttr_.userRank, totalSize);
@@ -209,7 +209,7 @@ HcclResult CollReduceScatterExecutor::RunLoopInner(OpParam &param, const ReduceT
     u64 curSize = execMem.count * unitSize; // 单位：字节
     CHK_PRT_RET((execMem.count == 0),
         HCCL_ERROR("[CollReduceScatterExecutor][RunLoopInner]In OP_BASE curCount is zero."), HCCL_E_PARA);
-        
+
     // 不开启dma消减，且通信buffer足够大时，将user in到ccl的拷贝任务合并成一个
     const bool preloadCopyOpt = IsPreloadCopyOptimizeCondition(param, execMem);
 
@@ -257,7 +257,7 @@ HcclResult CollReduceScatterExecutor::RunLoopInner(OpParam &param, const ReduceT
     }
 
     HcclResult ret = HCCL_SUCCESS;
-    if (!desc_.isZeroCopy) {  
+    if (!desc_.isZeroCopy) {
         ret = KernelRun(param, execMem);
     } else {
         ret = KernelRunInterServer(param, execMem);

@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
 g++ rtc_hello_world.cpp -I${ASCEND_HOME_PATH}/include -L${ASCEND_HOME_PATH}/lib64 -lascendcl -lacl_rtc -o main
 ```
 
-对于非模板核函数（如`hello_world`），编译器可自动导出符号，无需额外操作。  
+对于非模板核函数（如`hello_world`），编译器可自动导出符号，无需额外操作。
 当核函数为模板函数时，编译器无法自动确定需要导出的特化实例，需要通过`aclrtcAddNameExpr`手动注册需要导出的核函数名（含模板参数）；编译后通过`aclrtcGetLoweredName`获取mangled name，用于后续`aclrtBinaryGetFunction`查找句柄。
 
 ```c++

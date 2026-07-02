@@ -79,7 +79,7 @@ HcclResult HcclRankGraphGetLinks(HcclComm comm, uint32_t netLayer, uint32_t srcR
             HCCL_RUN_INFO("[%s] success, linkNum [%u]", __func__, *linkNum);
             return HCCL_SUCCESS;
         }());
-    hccl::hcclComm *hcclComm = static_cast<hccl::hcclComm *>(comm);  
+    hccl::hcclComm *hcclComm = static_cast<hccl::hcclComm *>(comm);
     HCCL_RUN_INFO("Entry-%s: comm[%s], netLayer[%u], srcRank[%u], dstRank[%u]", __func__,
     hcclComm->GetIdentifier().c_str(), netLayer, srcRank, dstRank);
     ret = hcclComm->GetLinks(netLayer, srcRank, dstRank, links, linkNum);
@@ -142,7 +142,7 @@ HcclResult HcclRankGraphGetRankSizeByLayer(HcclComm comm, uint32_t netLayer, uin
 {
     CHK_PTR_NULL(comm);
     CHK_PTR_NULL(rankNum);
-    
+
     HcclResult ret = HCCL_SUCCESS;
     HCCLV2_FUNC_RUN(
     [&]() -> HcclResult {
@@ -153,7 +153,7 @@ HcclResult HcclRankGraphGetRankSizeByLayer(HcclComm comm, uint32_t netLayer, uin
         return HCCL_SUCCESS;
     }());
     hccl::hcclComm *hcclComm = static_cast<hccl::hcclComm *>(comm);
-    ret = hcclComm->GetInstSizeByNetLayer(netLayer, rankNum);    
+    ret = hcclComm->GetInstSizeByNetLayer(netLayer, rankNum);
     if (ret != HCCL_SUCCESS) {
         HCCL_ERROR("[%s] Failed, ret[%d]", __func__, ret);
         return ret;

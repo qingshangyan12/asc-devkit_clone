@@ -46,5 +46,5 @@ PIPE_S
 
 ```c++
 half pad_value = 2.0;
-asc_set_ndim_pad_value(pad_value); 
+asc_set_ndim_pad_value(pad_value);
 ```

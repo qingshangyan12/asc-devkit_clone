@@ -79,9 +79,9 @@ HcclResult TransportTcp::Init()
         machinePara_.inputMem.ptr(), machinePara_.outputMem.ptr(), machinePara_.exchangeInfo.size());
 
     HCCL_USER_CRITICAL_LOG("create hccl transport:communicator[%s], local rank[%u], remote rank[%u], "\
-        "transporttype[%s]", machinePara_.collectiveId.c_str(), machinePara_.localUserrank, 
+        "transporttype[%s]", machinePara_.collectiveId.c_str(), machinePara_.localUserrank,
         machinePara_.remoteUserrank, GetLinkTypeEnumStr(GetLinkType()).c_str());
-        
+
     return HCCL_SUCCESS;
 }
 

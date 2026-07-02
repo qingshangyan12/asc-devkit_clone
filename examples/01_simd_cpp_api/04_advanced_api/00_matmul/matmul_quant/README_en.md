@@ -24,10 +24,10 @@ A Matmul example with output dequantization, supporting both uniform coefficient
 ```
 
 ## Example Description
-- Example Function:  
+- Example Function:
   When the Matmul example calls the Matmul API for computation with int8_t type input, the computation result is output as half type with dequantization, supporting both uniform coefficient dequantization mode and vector dequantization mode. In this scenario, when the C matrix data is transferred from CO1 to Global Memory, a dequantization operation is performed, applying a uniform coefficient or vector to all values of the output matrix for dequantization.
 
-- Example Specifications:  
+- Example Specifications:
   In this example: M = 1024, N = 1024, K = 1024.
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="5" align="center">Matmul</td></tr>
@@ -39,10 +39,10 @@ A Matmul example with output dequantization, supporting both uniform coefficient
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="5" align="center">matmul_quant_custom</td></tr>
   </table>
 
-- Example Implementation: 
+- Example Implementation:
   - Key Kernel Steps
-    - Set dequantization parameters.  
-      When the build option QUANT_MODE is 1, set the build macro CUSTOM_QUANT_VECTOR and compile to execute the vector dequantization mode.    
+    - Set dequantization parameters.
+      When the build option QUANT_MODE is 1, set the build macro CUSTOM_QUANT_VECTOR and compile to execute the vector dequantization mode.
       Based on whether the macro CUSTOM_QUANT_VECTOR is defined, set the corresponding dequantization parameters.
       ```cpp
       #if defined(CUSTOM_QUANT_VECTOR)
@@ -64,12 +64,12 @@ A Matmul example with output dequantization, supporting both uniform coefficient
       #endif
       ```
 
-  - Invocation Implementation  
+  - Invocation Implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

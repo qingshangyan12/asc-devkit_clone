@@ -220,7 +220,7 @@ HcclResult InsV2ReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes(
     CHK_RET(GetTemplateResRequest(rankGraph, algTemplate, tempResReq));
 
     CHK_RET(CalcLinkInfo(myRank_, rankGraph, tempResReq.links, algResReq.levelRankPairs));
-    algResReq.topoInfo.UpdateSingleLevelTopo(virtRanks_, virtRankMap_, vTopo_);   
+    algResReq.topoInfo.UpdateSingleLevelTopo(virtRanks_, virtRankMap_, vTopo_);
     algResReq.queueNotifys = tempResReq.queNotifys;
     algResReq.localWaitGroupCntNotify = tempResReq.localWaitGroupCntNotify;
     algResReq.primQueueNum = tempResReq.streamNum;

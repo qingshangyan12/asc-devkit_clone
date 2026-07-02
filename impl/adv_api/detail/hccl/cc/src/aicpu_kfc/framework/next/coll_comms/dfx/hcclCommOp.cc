@@ -13,7 +13,7 @@ namespace hccl {
 std::shared_ptr<Hccl::DfxOpInfo> ConvertToDfxOpInfo(const HcclDfxOpInfo& dfxOpInfo) {
     auto dfxOpInfoOnce = std::make_shared<Hccl::DfxOpInfo>();
     Hccl::CollOperator collOp{};
-    collOp.opMode = static_cast<Hccl::OpMode::Value>(dfxOpInfo.opMode); 
+    collOp.opMode = static_cast<Hccl::OpMode::Value>(dfxOpInfo.opMode);
     if (Hccl::OP_TYPE_MAP.find(static_cast<HcclCMDType>(dfxOpInfo.opType)) == Hccl::OP_TYPE_MAP.end()) {
         HCCL_ERROR("%s static_cast<HcclCMDType>(dfxOpInfo.opType)[%d] is not supported.", __func__, static_cast<HcclCMDType>(dfxOpInfo.opType));
         return {};

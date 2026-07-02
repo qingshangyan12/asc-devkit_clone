@@ -64,7 +64,7 @@ public:
     HcclResult run(const HcclDispatcher dispatcher, const std::shared_ptr<Transport> &link,
                   const std::vector<ReducerMemoryInfo> &reducerMems, u32 notifyIdx, Stream &stream,
                   DstMemType resultMem = DstMemType::RESULT_INPUT_MEM) const;
-    
+
     void SetPreSyncFunc(std::function<HcclResult()> lambda);
     void SetPostSyncFunc(std::function<HcclResult()> lambda);
 

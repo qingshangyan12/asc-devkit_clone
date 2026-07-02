@@ -278,7 +278,7 @@ HcclResult AllGatherRingConcurrentDirect::RunAllGather(const u32 rank, const u32
                 if (!isSdma_ && step == rankSize - DMA_REDUCE_TWO_OFFSET) {
                     HCCL_DEBUG("DMAReduce(rdma) record final addr");
                     finalSrc.push_back(outputMem_.range(rxSliceVector[sliceIdx].offset, rxSliceVector[sliceIdx].size));
-                    finalDst.push_back(DeviceMem::create(static_cast<u8 *>(opInfo_->outputAddr) + 
+                    finalDst.push_back(DeviceMem::create(static_cast<u8 *>(opInfo_->outputAddr) +
                     mainSliceVector[sliceIdx].offset, mainSliceVector[sliceIdx].size));
                 }
             }

@@ -174,7 +174,7 @@ HcclResult CollAllGatherVExecutor::RunLoop(OpParam &param, AlgResourceResponse &
             HCCL_ERROR_CODE(ret), param.tag.c_str(), commInputPtr, commOutputPtr,
             curCount, dataType),
             ret);
-        
+
         if (!DMAReduceFlag_) {
             u64 offSetCount = 0;
             // 如果使用CCL buffer，需要将CCL buffer out中的结果拷贝到user buffer out

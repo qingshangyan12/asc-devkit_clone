@@ -114,7 +114,7 @@ void CompareAlltoAllVCOp(const CollOperator &localOpData, const CollOperator &re
         ReportOpCheckFailed("all2AllVCDataDes.sendType", localOpData.all2AllVCDataDes.sendType.Describe(),
                             remoteOpData.all2AllVCDataDes.recvType.Describe(), localOpData.opType, localOpData.opTag);
     }
- 
+
     if (localOpData.all2AllVCDataDes.recvType != remoteOpData.all2AllVCDataDes.sendType) {
         ReportOpCheckFailed("all2AllVCDataDes.recvType", localOpData.all2AllVCDataDes.recvType.Describe(),
                             remoteOpData.all2AllVCDataDes.sendType.Describe(), localOpData.opType, localOpData.opTag);

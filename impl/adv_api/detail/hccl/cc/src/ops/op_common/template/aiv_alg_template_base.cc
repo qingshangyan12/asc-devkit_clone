@@ -78,7 +78,7 @@ HcclResult AivAlgTemplateBase::CalNumBlocks(u32& numBlocks, u64 dataSize, u32 nu
         numBlocks = tempRankSize_;
     } else {
         numBlocks = numBlocksLimit;
-    } 
+    }
     HCCL_INFO("[AivAlgTemplateBase] Actually use core num[%u]", numBlocks);
     return HCCL_SUCCESS;
 }

@@ -38,5 +38,5 @@ PIPE_S
 
 ```c++
 asc_ndim_pad_count_config config;  // config默认初始值为0。
-asc_set_ndim_pad_count(config); 
+asc_set_ndim_pad_count(config);
 ```

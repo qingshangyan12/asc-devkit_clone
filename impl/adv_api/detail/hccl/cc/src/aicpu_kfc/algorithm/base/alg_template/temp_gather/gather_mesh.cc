@@ -212,4 +212,4 @@ HcclResult GatherMesh::AddMainSteamSubStreamSyncPost(u32 rank, u32 rankSize)
     return HCCL_SUCCESS;
 }
 REGISTER_TEMPLATE(TemplateType::TEMPLATE_GATHER_MESH, GatherMesh);
-} 
+}

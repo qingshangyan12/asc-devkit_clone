@@ -98,13 +98,13 @@ HcclResult ReduceScatterMeshDirect::RunAsync(const u32 rank, const u32 rankSize,
         DeviceMem::create(static_cast<char *>(opInfo_->inputAddr) + slices_[rank].offset, slices_[rank].size);
     DeviceMem userMemOut = DeviceMem::create(static_cast<char *>(opInfo_->outputAddr), slices_[rank].size);
     DeviceMem commMemOut = DeviceMem::create(outputMem_.ptr(), outputMem_.size());
-    
+
     DeviceMem src;
     DeviceMem dst;
-    
+
     dst = commMemOut.range(0, slices_[rank].size);
     CHK_RET(HcclD2DMemcpyAsync(dispatcher_, dst, userMemIn, stream_));
-    
+
     CHK_RET(MainRecordSub());
     CHK_RET(SubWaitMain());
 

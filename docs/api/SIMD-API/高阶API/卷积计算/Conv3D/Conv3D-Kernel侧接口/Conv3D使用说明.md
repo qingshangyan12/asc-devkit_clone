@@ -9,7 +9,7 @@ Ascend C提供一组Conv3D高阶API，方便用户快速实现3维卷积正向�
 -   B为Conv3D卷积的偏置矩阵Bias。
 -   Y为完成卷积及偏置操作之后的结果矩阵Output。
 
-**图1**  3维正向卷积示意图<a name="fig198021635102613"></a>  
+**图1**  3维正向卷积示意图<a name="fig198021635102613"></a>
 ![](../../../../../figures/3维正向卷积示意图.png "3维正向卷积示意图")
 
 > [!NOTE]说明
@@ -22,13 +22,13 @@ Ascend C提供一组Conv3D高阶API，方便用户快速实现3维卷积正向�
 -   Stride代表卷积核三个维度上滑动的距离，见[图3](#fig137769564018)。
 -   Dilation代表卷积核三个维度上每个数据的间距，见[图4](#fig1015315044111)。
 
-**图2**  卷积3D正向Padding示意图<a name="fig16852164019363"></a>  
+**图2**  卷积3D正向Padding示意图<a name="fig16852164019363"></a>
 ![](../../../../../figures/卷积3D正向Padding示意图.png "卷积3D正向Padding示意图")
 
-**图3**  卷积3D正向Stride示意图<a name="fig137769564018"></a>  
+**图3**  卷积3D正向Stride示意图<a name="fig137769564018"></a>
 ![](../../../../../figures/卷积3D正向Stride示意图.png "卷积3D正向Stride示意图")
 
-**图4**  卷积3D正向Dilation示意图<a name="fig1015315044111"></a>  
+**图4**  卷积3D正向Dilation示意图<a name="fig1015315044111"></a>
 ![](../../../../../figures/卷积3D正向Dilation示意图.png "卷积3D正向Dilation示意图")
 
 Kernel侧实现Conv3D运算的步骤概括为：

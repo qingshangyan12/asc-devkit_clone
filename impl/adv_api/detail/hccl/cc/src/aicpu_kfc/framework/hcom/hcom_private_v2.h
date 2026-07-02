@@ -55,7 +55,7 @@ HcclResult __attribute__((weak)) HcomGetLocalRankIdV2(const char *group, u32 *lo
 HcclResult __attribute__((weak)) HcomCalcTaskNumV2(HcomOpParam *hcomOpParam, u32 &taskNum);
 HcclResult __attribute__((weak)) HcomGetTopoDescV2(const char *group, HcclTopoDescs *topoDescs, uint32_t topoSize);
 HcclResult __attribute__((weak)) HcomGetCommHandleByGroupV2(const char *group, HcclComm *commHandle);
- 
+
 HcclResult __attribute__((weak)) HcomCreateCommCclBufV2(const char *group);
 HcclResult __attribute__((weak)) HcomGetInCclBufV2(const char *group, void* &commInputPtr, u64 &commInputSize);
 HcclResult __attribute__((weak)) HcomGetOutCclBufV2(const char *group, void* &commOutputPtr, u64 &commOutputSize);
@@ -69,7 +69,7 @@ HcclResult __attribute__((weak)) HcclCommGraphAllGatherV2(const char *tag, void 
 HcclResult __attribute__((weak)) HcomGraphAllReduceV2(const char *tag, void *inputPtr, void *outputPtr, u64 count, HcclDataType dataType,
     HcclReduceOp op, s64 opBaseHcom, rtStream_t stream);
 HcclResult __attribute__((weak)) HcomGraphReduceV2(const char *tag, void *inputPtr, void *outputPtr, u64 count, HcclDataType dataType,
-    HcclReduceOp op, u32 root, s64 opBaseHcom, rtStream_t stream);    
+    HcclReduceOp op, u32 root, s64 opBaseHcom, rtStream_t stream);
 HcclResult __attribute__((weak)) HcomGraphReduceScatterV2(const char *tag, void *inputPtr, void *outputPtr, u64 count, HcclDataType dataType,
     HcclReduceOp op, s64 opBaseHcom, rtStream_t &stream);
 HcclResult __attribute__((weak)) HcomGraphSendV2(const char *tag, void *inputPtr, u64 count, HcclDataType dataType, u32 destRank, u32 srTag,
@@ -78,10 +78,10 @@ HcclResult __attribute__((weak)) HcomGraphReceiveV2(const char *tag, void *outpu
     s64 opBaseHcom, rtStream_t &stream);
 HcclResult __attribute__((weak)) HcomGraphBroadcastV2(const char *tag, void *ptr, u64 count, HcclDataType dataType,
     u32 root, s64 opBaseHcom, rtStream_t stream);
- 
+
 HcclResult __attribute__((weak)) HcomGetIndirectInCclBufV2(const char *group, void *&commInputPtr, u64 &commInputSize);
 HcclResult __attribute__((weak)) HcomGetIndirectOutCclBufV2(const char *group, void *&commOutputPtr, u64 &commOutputSize);
- 
+
 HcclResult __attribute__((weak)) HcomGetDevTypeV2(DevType &devType);
 HcclResult __attribute__((weak)) HcomGetInitStatusV2(bool &initiated);
 HcclResult __attribute__((weak)) HcomCheckCommValidityV2(const char *group);
@@ -107,7 +107,7 @@ HcclResult __attribute__((weak)) HcomCalcNumBlocksV2(const char *group, HcclCMDT
     HcclDataType dataType, int32_t aivCoreLimit, std::string &algName, u32 &numBlocks);
 HcclResult __attribute__((weak)) HcclGetAlgExecParamV2(const std::string &tag, const char *group, u64 count,
     void *inputPtr, void *outputPtr, HcclCMDType opType, bool clearEnable, HcclDataType dataType, HcclReduceOp op,
-    void *&commContext, u64 &len, u32 aivCoreLimit); 
+    void *&commContext, u64 &len, u32 aivCoreLimit);
 HcclResult __attribute__((weak)) HcomGetDevIdV2(const char *group, s32 *devId);
 HcclResult __attribute__((weak)) HcomSetAttachedStreamV2();
 HcclResult __attribute__((weak)) HcomReleaseSubCommsV2();

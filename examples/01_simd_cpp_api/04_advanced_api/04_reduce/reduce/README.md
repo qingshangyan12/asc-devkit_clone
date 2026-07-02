@@ -28,14 +28,14 @@
 
 ## 算子描述
 
-- 算子功能：  
+- 算子功能：
   ReduceCustom算子实现了连续内存上数据元素的累加，返回累加结果的功能。对应的数学表达式为：
 
   ```cpp
   z = sum(x)
   ```
 
-- 算子规格：  
+- 算子规格：
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center"> reduce </td></tr>
 
@@ -48,7 +48,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce_custom</td></tr>
   </table>
 
-- 算子实现：  
+- 算子实现：
 
   当输入数据类型为 `float` 时，输入数据长度的取值范围为 `(0, 4096]`；当输入数据类型为 `half` 时，输入数据长度的取值范围为 `(0, 16384]`。本样例以 `float`类型输入为例，固定输入 `x` 的 shape 为 `[4096]`，输出 `y` 的 shape 为 `[32]`。
 
@@ -62,15 +62,15 @@
 
       - 4、长度在float输入为10000时，ComputeKey = 4，对应WholeReduceSumImpl中的处理方法，在Counter模式下，采用ReduceRepeat<SUM>指令，循环处理二维数据中的每一行，得到每一行的归约运行结果。
 
-      - 5、长度在float输入为20000时，ComputeKey = 5，对应BinaryReduceSumImpl中的处理方法，在Counter模式下，先将运算数据一分为二，使用Add指令将两部分数据相加，循环往复，最后一条ReduceRepeat<SUM>指令得到归约的运行结果。此种操作方式，相比较ReduceRepeat<SUM>单指令操作的方式，在数据量较大，循环次数较多的场景下，性能更优。  
+      - 5、长度在float输入为20000时，ComputeKey = 5，对应BinaryReduceSumImpl中的处理方法，在Counter模式下，先将运算数据一分为二，使用Add指令将两部分数据相加，循环往复，最后一条ReduceRepeat<SUM>指令得到归约的运行结果。此种操作方式，相比较ReduceRepeat<SUM>单指令操作的方式，在数据量较大，循环次数较多的场景下，性能更优。
       注意代码中使用了Counter模式。
 
-  - Kernel实现  
+  - Kernel实现
     计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Reduce高阶API接口完成reduce计算，得到最终结果，再搬出到外部存储上。
 
     ReduceCustom算子的实现流程分为3个基本任务：CopyIn，Compute，CopyOut。CopyIn任务负责将Global Memory上的输入Tensor xGm存储在xLocal中，Compute任务对xLocal执行reduce计算，计算的方式通过ComputeKey参数决定，ComputeKey由输入的长度决定，计算结果存储在zLocal中，CopyOut任务负责将输出数据从zLocal搬运至Global Memory上的输出Tensor zGm。
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
@@ -109,14 +109,14 @@
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
-- 
+-
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
   执行结果如下，说明精度对比成功。
-  
+
   ```bash
   test pass!
   ```

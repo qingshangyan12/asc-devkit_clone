@@ -46,7 +46,7 @@
         uint16_t dst_gap = static_cast<uint16_t>(66);                                                                \
         uint16_t dst_frac_gap = static_cast<uint16_t>(77);                                                           \
         uint16_t src_frac_gap = static_cast<uint16_t>(88);                                                           \
-        \   
+        \
     MOCKER_CPP(                                                                                                      \
             cce_name, void(data_type*, data_type*, uint16_t, uint8_t, uint16_t, uint16_t, bool, uint16_t, uint16_t)) \
             .times(1)                                                                                                \

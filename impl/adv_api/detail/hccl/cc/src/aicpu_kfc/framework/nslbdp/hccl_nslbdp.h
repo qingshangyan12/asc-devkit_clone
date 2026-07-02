@@ -37,12 +37,12 @@ constexpr unsigned int NSLBDP_TYPE_TBL_ROOT_RANK = 1006;
 constexpr unsigned int NSLBDP_TYPE_INIT_NETCO = 9001;
 constexpr unsigned int NSLBDP_TYPE_DEINIT_NETCO = 9002;
 
-constexpr u32 NSLBDP_RANKTOTALNUM_BLOCK_FIR = 1024; 
-constexpr u32 NSLBDP_RANKTOTALNUM_BLOCK_SEC = 2 * 1024; 
+constexpr u32 NSLBDP_RANKTOTALNUM_BLOCK_FIR = 1024;
+constexpr u32 NSLBDP_RANKTOTALNUM_BLOCK_SEC = 2 * 1024;
 constexpr u32 NSLBDP_RANKTOTALNUM_BLOCK_THR = 3 * 1024;
 constexpr u32 NSLBDP_RANKTOTALNUM_BLOCK_FOU = 4 * 1024;
 
-constexpr u32 NSLBDP_HIGH_8BIT = 8; 
+constexpr u32 NSLBDP_HIGH_8BIT = 8;
 
 constexpr u16 NSLBDP_COMMINTERVAL_FLAG = 128;
 constexpr u16 NSLBDP_COMMINTERVAL_FLAGSEC = 256;
@@ -51,14 +51,14 @@ constexpr u16 NSLBDP_COMMINTERVAL_FLAGFOU = 1024;
 constexpr u16 NSLBDP_COMMINTERVAL_FLAGFIV = 2048;
 constexpr u16 NSLBDP_COMMINTERVAL_FLAGSIX = 4096;
 
-constexpr u32 NSLBDP_PKTNUM_FIR = 1; 
-constexpr u32 NSLBDP_PKTNUM_SEC = 2; 
-constexpr u32 NSLBDP_PKTNUM_THR = 3; 
-constexpr u32 NSLBDP_PKTNUM_FOU = 4; 
+constexpr u32 NSLBDP_PKTNUM_FIR = 1;
+constexpr u32 NSLBDP_PKTNUM_SEC = 2;
+constexpr u32 NSLBDP_PKTNUM_THR = 3;
+constexpr u32 NSLBDP_PKTNUM_FOU = 4;
 
-constexpr u32 NSLBDP_TASKID_OFFSET = 32; 
+constexpr u32 NSLBDP_TASKID_OFFSET = 32;
 
-constexpr u32 NSLBDP_INITIME_MILLISENDS = 1000; 
+constexpr u32 NSLBDP_INITIME_MILLISENDS = 1000;
 
 constexpr u32 NSLBDP_PAIRWISE = 5;
 
@@ -177,7 +177,7 @@ public:
     HcclResult SetCommInfo_NoRankTable(const RankTable_t rankTable, std::string identifier);
     HcclResult SetCommInfo_RankTableExit(RankTable_t  rankTable);
     HcclResult SetGlobalRank_RankTableExit(const RankTable_t  rankTable);
-    HcclResult GenerateOpAndAdjTable(HcclCMDType opType, u32 rootRank, u32 srcLocalRankId, 
+    HcclResult GenerateOpAndAdjTable(HcclCMDType opType, u32 rootRank, u32 srcLocalRankId,
                                      u8 algType, std::string identifier, u64 count, u32 rankSize);
     HcclResult GetAlgAdjacencyTable(HcclCMDType opType, u32 srcLocalRankId, u32 rootRank, u8 algType, std::string identifier, AdjInfo nslbAdjInfo);
     HcclResult GetNslbDpl4SPortId(u32 rankSize, u8 algType, u16 *l4SPortId);

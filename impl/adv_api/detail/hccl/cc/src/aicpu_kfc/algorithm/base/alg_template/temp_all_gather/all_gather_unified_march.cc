@@ -138,10 +138,10 @@ HcclResult AllGatherUnifiedMarch::NotifyNeighborsEnd(LINK& prevIntraLink, LINK& 
     for (u32 neighborRankId = 0; neighborRankId < neighbors; neighborRankId++) {
         if (neighborRankId == 0) {
             CHK_RET(prevIntraLink->TxDataSignal(subStreams_[neighborRankId]));      // DataRecord
-            CHK_RET(nextIntralLink->RxDataSignal(subStreams_[neighborRankId]));     
+            CHK_RET(nextIntralLink->RxDataSignal(subStreams_[neighborRankId]));
         } else if (neighborRankId == 1) {
             CHK_RET(nextIntralLink->TxDataSignal(subStreams_[neighborRankId]));
-            CHK_RET(prevIntraLink->RxDataSignal(subStreams_[neighborRankId]));   
+            CHK_RET(prevIntraLink->RxDataSignal(subStreams_[neighborRankId]));
         }
     }
     HCCL_DEBUG("[AllGatherUnifiedMarch][NotifyNeighborsStart] intraRank[%u] notifys [%u]neigbhbors sdma read done",
@@ -190,7 +190,7 @@ HcclResult AllGatherUnifiedMarch::RunSingleStep(u32 ringPrevRank, u32 ringNextRa
     }
 
     if(step == totalStep - 1) {
-        CHK_RET(NotifyNeighborsEnd(prevIntraLink, nextIntralLink, neighbors));        
+        CHK_RET(NotifyNeighborsEnd(prevIntraLink, nextIntralLink, neighbors));
     }
     notifyIdx_++;
 
@@ -313,7 +313,7 @@ HcclResult AllGatherUnifiedMarch::Prepare(const Stream &mainStream,
     CHK_PRT_RET(multRingsUserMemSlice_[0].size() % intraRankSize_ != 0,
         HCCL_ERROR("[AllGatherUnifiedMarch] multRingsUserMemSlice_[0] size[%u] can not be divided by rank size[%u]",
         multRingsUserMemSlice_[0].size(), intraRankSize_), HCCL_E_PARA);
-    
+
     baseOffset_ = baseOffset;
 
     return HCCL_SUCCESS;

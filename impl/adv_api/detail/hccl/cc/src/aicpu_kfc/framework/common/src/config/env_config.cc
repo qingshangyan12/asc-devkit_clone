@@ -519,15 +519,15 @@ HcclResult ParseEnvConfig(const EnvConfigParam& param, std::string& envValue, u3
         HCCL_ERROR("[Parse][%s] errNo[0x%016llx] Invalid %s env len, len is bigger than [%u], errorno[%d]",
         param.envName.c_str(), HCCL_ERROR_CODE(HCCL_E_PARA), param.envName.c_str(), g_envConfig.MAX_LEN_OF_DIGIT_ENV, HCCL_E_PARA),
         HCCL_E_PARA);
-    
+
     CHK_RET(IsAllDigit(envValue.c_str()));
-    
+
     HcclResult ret = SalStrToULong(envValue.c_str(), HCCL_BASE_DECIMAL, resultValue);
     // 若转换出错或者设置的值不在有效范围内，报错
     CHK_PRT_RET((ret != HCCL_SUCCESS || resultValue < param.minValue || resultValue > param.maxValue),
         HCCL_ERROR("[Parse][%s] is invalid. except: [%u, %u], actual: [%u]", param.envName.c_str(), param.minValue, param.maxValue, resultValue),
         HCCL_E_PARA);
-    
+
     // 如果提供了baseValue，检查是否是baseValue的整数倍
     if (param.baseValue != 0 && resultValue % param.baseValue != 0) {
         HCCL_ERROR("[Parse] %s[%u] is not a multiple of [%u]", param.envName.c_str(), resultValue, param.baseValue);

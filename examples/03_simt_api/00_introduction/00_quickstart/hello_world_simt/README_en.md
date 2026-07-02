@@ -23,7 +23,7 @@ This example is a SIMT programming introductory example. It uses the `<<<>>>` ke
 
 Execute the following steps in the root directory of this example to compile and run the example.
 
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development toolkit on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -39,7 +39,7 @@ Execute the following steps in the root directory of this example to compile and
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # Compile the project
   ./demo                        # Execute the example
   ```
-  
+
   Compilation Options
 
   | Option | Available Values | Description |

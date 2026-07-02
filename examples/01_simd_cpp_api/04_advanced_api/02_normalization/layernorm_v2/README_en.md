@@ -13,7 +13,7 @@ This example, based on the kernel direct invocation example project, demonstrate
 | Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
 
 ## Directory Structure
- 
+
 ```
 ├── layernorm_v2
 │   ├── scripts
@@ -26,7 +26,7 @@ This example, based on the kernel direct invocation example project, demonstrate
 
 ## Example Description
 
-- Example function:  
+- Example function:
   This example calls the LayerNorm and Normalize high-level APIs sequentially within a single kernel function. The two APIs work together to implement complete normalization computation. LayerNorm computes the mean and the reciprocal of the standard deviation (rstd), then computes the variance var based on rstd using the formula:
   $$
   var = 1/(rstd*rstd) - \epsilon
@@ -36,7 +36,7 @@ This example, based on the kernel direct invocation example project, demonstrate
   y_i = \gamma_i \cdot \frac{x_i - \mu}{\sqrt{var + \epsilon}} + \beta_i
   $$
 
-- Example specifications:  
+- Example specifications:
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> layernorm_v2 </td></tr>
 
@@ -56,7 +56,7 @@ This example, based on the kernel direct invocation example project, demonstrate
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">layernormv2_custom</td></tr>
   </table>
 
-- Example implementation:  
+- Example implementation:
   This example uses the **AR format** (shape is [A, R]) and calls the LayerNorm and Normalize high-level APIs sequentially within a single kernel function for normalization computation. A is the batch processing axis and R is the normalization axis. For detailed information, refer to the LayerNorm API documentation and Normalize API documentation.
 
   - Kernel implementation
@@ -72,20 +72,20 @@ This example, based on the kernel direct invocation example project, demonstrate
     1. Obtain and set the minimum temporary space size required by the LayerNorm and Normalize APIs respectively.
     2. Obtain the tiling parameters required by the kernel-side APIs of the two APIs based on the input shape, remaining available computation space, and other information.
 
-  - Invocation implementation  
+  - Invocation implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run  
+## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
-    
+
 - Run the example
 
   Run the following commands in the example directory.

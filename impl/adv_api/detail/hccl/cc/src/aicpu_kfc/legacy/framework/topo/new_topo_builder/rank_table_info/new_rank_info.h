@@ -23,12 +23,12 @@ constexpr unsigned int MAX_VALUE_DEVICEID = 64;
 constexpr unsigned int DEFAULT_VALUE_DEVICEPORT = 16666;
 constexpr unsigned int MAX_VALUE_DEVICEPORT = 65535;
 constexpr unsigned int MIN_VALUE_DEVICEPORT = 1;
-constexpr unsigned int MAX_LEVEL_lIST  = 8; 
+constexpr unsigned int MAX_LEVEL_lIST  = 8;
 class NewRankInfo{
 public:
     NewRankInfo() {};
     ~NewRankInfo() {};
-    
+
     u32                        rankId{0};
     u32                        deviceId{0};
     u32                        localId{0};

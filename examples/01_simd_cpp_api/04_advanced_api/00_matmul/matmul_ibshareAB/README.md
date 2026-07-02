@@ -42,15 +42,15 @@
 
 ## 样例描述
 
-- 样例功能：  
+- 样例功能：
   调用Matmul高阶API时开启A、B矩阵的IBShare功能，计算过程中同一AIC对应的两个AIV在每次迭代时用到的A、B矩阵在L1 Buffer上的数据一致。
 
   A矩阵与B矩阵均使能IBShare时，不对k列进行切分计算；均未使能IBShare时，按照k列进行切分计算。通过对比两种场景的运行时间，可以得出该特性的性能提升。
-  使能AB矩阵IBShare场景的数据处理说明图示(A矩阵和B矩阵不切分处理)：![alt text](./figures/matmul_ABshare.png)  
-  不使能AB矩阵ibshareAB场景的数据处理说明图示(A矩阵和B矩阵切分处理)：![alt text](./figures/matmul_noABshare.png)  
+  使能AB矩阵IBShare场景的数据处理说明图示(A矩阵和B矩阵不切分处理)：![alt text](./figures/matmul_ABshare.png)
+  不使能AB矩阵ibshareAB场景的数据处理说明图示(A矩阵和B矩阵切分处理)：![alt text](./figures/matmul_noABshare.png)
 
 
-- 样例规格：  
+- 样例规格：
   本样例中：M = 128, N = 256, K = 384。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
@@ -61,10 +61,10 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_ABshare_custom</td></tr>
   </table>
 
-- 样例实现： 
+- 样例实现：
 
-  - Kernel关键步骤  
-    - 创建Matmul对象：  
+  - Kernel关键步骤
+    - 创建Matmul对象：
         根据CMakeLists里的SCENARIO_NUM编译选项，配置A、B矩阵IBShare参数为true或者false。
         ```cpp
         #if SCENARIO_NUM == 1
@@ -80,13 +80,13 @@
         ```
 
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

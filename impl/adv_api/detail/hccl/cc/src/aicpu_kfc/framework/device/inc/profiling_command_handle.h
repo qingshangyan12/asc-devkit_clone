@@ -13,7 +13,7 @@
 #include "stream_pub.h"
 #include "hccl_common.h"
 #include "common/aicpu_hccl_def.h"
- 
+
 namespace hccl {
 using Prof_Status = uint32_t;
 const Prof_Status PROF_SUCCESS = 0x0;

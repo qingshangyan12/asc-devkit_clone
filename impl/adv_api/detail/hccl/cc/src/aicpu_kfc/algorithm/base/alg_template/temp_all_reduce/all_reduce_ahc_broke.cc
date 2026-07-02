@@ -24,7 +24,7 @@ HcclResult AllReduceAHCBroke::DisposeSubGroups(const u32 rank)
     CommAHCBaseInfo::DisposeSubGroups(rank, globalSubGroups_, level0SubGroups_, level1SubGroups_);
     return HCCL_SUCCESS;
 }
- 
+
 HcclResult AllReduceAHCBroke::CommAHCInfoInit()
 {
     commAHCBaseInfo_.reset(new (std::nothrow) CommBrokeAlignInfo(level0SubGroups_));
@@ -33,7 +33,7 @@ HcclResult AllReduceAHCBroke::CommAHCInfoInit()
     return HCCL_SUCCESS;
 }
 
-HcclResult AllReduceAHCBroke::RunInterAllReduce(const u32 rank, const std::vector<LINK> &links, 
+HcclResult AllReduceAHCBroke::RunInterAllReduce(const u32 rank, const std::vector<LINK> &links,
     const std::unique_ptr<CommAHCBaseInfo> &commAHCBaseInfo)
 {
     if (!commAHCBaseInfo->IsNeedInterProc(rank) ) {
@@ -56,13 +56,13 @@ HcclResult AllReduceAHCBroke::RunInterAllReduce(const u32 rank, const std::vecto
     std::vector<std::vector<Slice>> interSlicesVector;
     std::vector<std::vector<LINK>>  interLinksVector;
     std::vector<u32>                logicCardList;
-    CHK_RET(commAHCBaseInfo->CalcInterSlicesAndLinks(rank, DataUnitSize(dataType_), count_, links, 
+    CHK_RET(commAHCBaseInfo->CalcInterSlicesAndLinks(rank, DataUnitSize(dataType_), count_, links,
         interLinksVector, interSlicesVector, logicCardList));
 
     HCCL_DEBUG("[AllReduceAHCBroke][perform] rank[%u] end calc inter slices", rank);
 
     if(interLinksVector.size() != interSlicesVector.size()) {
-        HCCL_ERROR("[AllReduceAHCBroke][RunInterAllReduceBrokeType]rank[%u] linksVector size[%llu] is no equal to slicesVector size [%u]", 
+        HCCL_ERROR("[AllReduceAHCBroke][RunInterAllReduceBrokeType]rank[%u] linksVector size[%llu] is no equal to slicesVector size [%u]",
             rank, interLinksVector.size(), interSlicesVector.size());
         return HCCL_E_INTERNAL;
     }

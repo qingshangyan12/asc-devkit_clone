@@ -21,10 +21,10 @@ public:
 
     ~ReduceScatterHalvingDoubling() override;
 
-    HcclResult Prepare(DeviceMem &inputMem, DeviceMem &outputMem, DeviceMem &scratchMem, 
-        const u64 count, const HcclDataType dataType, const Stream &stream, 
+    HcclResult Prepare(DeviceMem &inputMem, DeviceMem &outputMem, DeviceMem &scratchMem,
+        const u64 count, const HcclDataType dataType, const Stream &stream,
         const HcclReduceOp reductionOp, const u32 root,
-        const std::vector<Slice> &slices, const u64 baseOffset, 
+        const std::vector<Slice> &slices, const u64 baseOffset,
         const u32 blockSize, const u64 reduceAttrBitMap,
         const UserMemType hdInputMemType, const UserMemType hdOutputMemType) override;
 

@@ -114,7 +114,7 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes(
 
     CHK_RET(CalcLinkInfo(myRank_, rankGraph, tempResReq.links, algResReq.levelRankPairs));
     algResReq.topoInfo.UpdateSingleLevelTopo(virtRanks_, virtRankMap_, vTopo_);
-    algResReq.primQueueNum = tempResReq.streamNum;   
+    algResReq.primQueueNum = tempResReq.streamNum;
     algResReq.localWaitGroupCntNotify = tempResReq.localWaitGroupCntNotify;
     algResReq.localBcastPostCntNotify = tempResReq.localBcastPostCntNotify;
     algResReq.queueNotifys = tempResReq.queNotifys;
@@ -193,7 +193,7 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     CHK_RET(GetTemplateResRequest(linkMgr, algTemplate, tempResReq));
 
     HCCL_DEBUG("[InsV2AllReduceSoleExecutor][Orchestrate] Rank[%d], template [%s], requiredQue Num [%u].",
-        myRank_, algTemplate->Describe().c_str(), 
+        myRank_, algTemplate->Describe().c_str(),
         tempResReq.queNum);
     CHK_RET(InitQueue(tempResReq.queNum, tempInsQue_));
     CHK_RET(PrepResLinks(myRank_, tempResReq.links, linkMgr, tempResLinks_));
@@ -217,7 +217,7 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     tempAlgParams.buffInfo.scratBuffType = BufferType::SCRATCH;
     tempAlgParams.inputRepeatStride = 0;
     tempAlgParams.outputRepeatStride = 0;
-    
+
     TempFuncs tempFuncs;
     tempFuncs.opMode = opMode_;
     //template 中2D未适配
@@ -291,6 +291,6 @@ INS_REGISTER_IMPL_BY_TEMP(OpType::ALLREDUCE, CcuAllReduceMeshMem2Mem1D, InsV2All
 INS_REGISTER_IMPL_BY_TEMP(OpType::ALLREDUCE, InsAllReduceAicpuReduce, InsV2AllReduceSoleExecutor, TopoMatchMesh,
                           InsTempAllReduceAicpuReduce);
 INS_REGISTER_IMPL_BY_TEMP(OpType::ALLREDUCE, InsAllReduceAicpuReduceMesh2D, InsV2AllReduceSoleExecutor, TopoMatchConcurrMesh,
-                          InsTempAllReduceAicpuReduceMesh2D);                          
+                          InsTempAllReduceAicpuReduceMesh2D);
 
 }  // namespace Hccl

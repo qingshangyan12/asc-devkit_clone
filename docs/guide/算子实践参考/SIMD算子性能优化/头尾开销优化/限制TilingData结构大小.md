@@ -44,7 +44,7 @@ static ge::graphStatus TilingFunc(gert::TilingContext *context)
     // formerNum、tailNum保证不超过0-NUM_BLOCKS数据范围
     uint32_t formerNum = (totalLengthAligned / ALIGN_NUM) % NUM_BLOCKS;
     uint32_t tailNum = NUM_BLOCKS - formerNum;
-    // formerLength等变量根据其计算逻辑，不会超出uint32_t的范围   
+    // formerLength等变量根据其计算逻辑，不会超出uint32_t的范围
     uint32_t formerLength = ((totalLengthAligned / NUM_BLOCKS + ALIGN_NUM - 1) / ALIGN_NUM) * ALIGN_NUM;
     uint32_t tailLength = (totalLengthAligned / NUM_BLOCKS / ALIGN_NUM) * ALIGN_NUM;
     ...
@@ -58,7 +58,7 @@ Tiling变量无冗余，变量数据类型最小化。
 ```
 BEGIN_TILING_DATA_DEF(TilingDataUnalign)
   TILING_DATA_FIELD_DEF(uint8_t, formerNum);
-  TILING_DATA_FIELD_DEF(uint8_t, tailNum); 
+  TILING_DATA_FIELD_DEF(uint8_t, tailNum);
   TILING_DATA_FIELD_DEF(uint32_t, formerLength);
   TILING_DATA_FIELD_DEF(uint32_t, tailLength);
   TILING_DATA_FIELD_DEF(uint32_t, alignNum);

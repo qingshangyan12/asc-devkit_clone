@@ -40,8 +40,8 @@ std::string TransferAlgTypeStr(AlgType algType)
     auto level0Iter = HCCL_ALGO_LEVEL0_NAME_MAP.find(algType.algoLevel0);
     auto level1Iter = HCCL_ALGO_LEVEL1_NAME_MAP.find(algType.algoLevel1);
     auto level2Iter = HCCL_ALGO_LEVEL2_NAME_MAP.find(algType.algoLevel2);
-    if (level0Iter == HCCL_ALGO_LEVEL0_NAME_MAP.end() || 
-        level1Iter == HCCL_ALGO_LEVEL1_NAME_MAP.end() || 
+    if (level0Iter == HCCL_ALGO_LEVEL0_NAME_MAP.end() ||
+        level1Iter == HCCL_ALGO_LEVEL1_NAME_MAP.end() ||
         level2Iter == HCCL_ALGO_LEVEL2_NAME_MAP.end()) {
         algTypeStr = "not found";
     } else {
@@ -61,8 +61,8 @@ std::string TransferAlgType(AlgType algType)
     auto level0Iter = HCCL_ALGO_LEVEL0_NAME_MAP.find(algType.algoLevel0);
     auto level1Iter = HCCL_ALGO_LEVEL1_NAME_MAP.find(algType.algoLevel1);
     auto level2Iter = HCCL_ALGO_LEVEL2_NAME_MAP.find(algType.algoLevel2);
-    if (level0Iter == HCCL_ALGO_LEVEL0_NAME_MAP.end() || 
-        level1Iter == HCCL_ALGO_LEVEL1_NAME_MAP.end() || 
+    if (level0Iter == HCCL_ALGO_LEVEL0_NAME_MAP.end() ||
+        level1Iter == HCCL_ALGO_LEVEL1_NAME_MAP.end() ||
         level2Iter == HCCL_ALGO_LEVEL2_NAME_MAP.end()) {
         algTypeStr = "not found";
     } else {

@@ -138,7 +138,7 @@ HcclResult DispatcherAiCpu::WaitValue(hccl::Stream &stream, u64 waitAddr, u64 va
         HCCL_ERROR("[DispatcherAiCpu][WaitValue] AddCcoreWait sqeCtx is nullptr");
         return HCCL_E_INTERNAL;
     }
-    sqeCtx->buffer.addInfo[taskId % hccl::HCCL_SQE_MAX_CNT] = 
+    sqeCtx->buffer.addInfo[taskId % hccl::HCCL_SQE_MAX_CNT] =
         ((turnNum << TURN_LEFT_SHIFT_BIT) + static_cast<uint32_t>(reset));
     return HCCL_SUCCESS;
 }
@@ -184,7 +184,7 @@ HcclResult DispatcherAiCpu::SignalRecord(HcclRtNotify signal, hccl::Stream &stre
         // 只有使能alltoallv类算子的aicpu cache才需要cache-write placeholder
         CHK_PRT_RET(!(needAddSqe_ && isAlltoallv_), HCCL_ERROR("[DispatcherAiCpu][SignalRecord] isPlaceholder_[%u]"
             "needAddSqe_[%u] isAlltoallv_[%u]", isPlaceholder_, needAddSqe_, isAlltoallv_), HCCL_E_INTERNAL);
-        
+
         // 只有p2p的SignalRecord才需要cache-write placeholder
         // 不需要为inchip场景下LocalNotify::Post的SignalRecord调用addOneCacheNotifyRecordPlaceholderSqe_生成cache-notify placeholder
         CHK_PRT_RET(inchip, HCCL_ERROR("[DispatcherAiCpu][SignalRecord] isPlaceholder_[%u], inchip[%u]",
@@ -239,7 +239,7 @@ HcclResult DispatcherAiCpu::SignalRecord(hccl::DeviceMem &dst, hccl::DeviceMem &
         // 只有使能alltoallv类算子的aicpu cache才需要cache-memcpy-record placeholder
         CHK_PRT_RET(!(needAddSqe_ && isAlltoallv_), HCCL_ERROR("[DispatcherAiCpu][SignalRecord] isPlaceholder_[%u]"
             "needAddSqe_[%u] isAlltoallv_[%u]", isPlaceholder_, needAddSqe_, isAlltoallv_), HCCL_E_INTERNAL);
-        
+
         addOneCacheMemcpyRecordPlaceholderSqe_(streamInfo.actualStreamId, taskId, src.ptr(), src.size() , ACL_FLOAT, rtReduceOp,
             dst.ptr(), 0, aicpuInfo_.ssid, aicpuInfo_.devId, aicpuInfo_.overflowAddr, linkType, sqeBuffer, sqeTypeAddr, SDMA_QOS_DEFAULT);
         HCCL_INFO("%s generate cache-memcpy-record placeholder for signal record", __func__);
@@ -280,7 +280,7 @@ HcclResult DispatcherAiCpu::SignalWait(HcclRtNotify signal, Stream &stream, u32 
             HCCL_ERROR("[DispatcherAiCpu][SignalWait] isPlaceholder_[%u] inchip[%u] devType[%u]",
                 isPlaceholder_, inchip, aicpuInfo_.devType),
             HCCL_E_INTERNAL);
-        
+
         addOneCacheNotifyWaitPlaceholderSqe_(streamInfo.actualStreamId, taskId, notifyId, sqeBuffer, sqeTypeAddr, dfxTimeOutConfig_);
         HCCL_INFO("%s generate cache-notify placeholder for signal wait", __func__);
     } else { // 正常生成SQE
@@ -326,11 +326,11 @@ HcclResult DispatcherAiCpu::MemcpyAsync(hccl::DeviceMem &dst, const hccl::Device
         // 只有零长拷贝才需要cache-memcpy placeholder
         CHK_PRT_RET(src.size() != 0, HCCL_ERROR("[DispatcherAiCpu][MemcpyAsync] isPlaceholder_[%u] src.size[%llu]",
             isPlaceholder_, src.size()), HCCL_E_INTERNAL);
-        
+
         // 只有使能alltoallv类算子的aicpu cache才需要cache-memcpy placeholder
         CHK_PRT_RET(!(needAddSqe_ && isAlltoallv_), HCCL_ERROR("[DispatcherAiCpu][MemcpyAsync] isPlaceholder_[%u]"
             "needAddSqe_[%u] isAlltoallv_[%u]", isPlaceholder_, needAddSqe_, isAlltoallv_), HCCL_E_INTERNAL);
-        
+
         // 准备SQE, sqeType, dfxInfo
         uint8_t *sqeBuffer = nullptr;
         uint8_t *sqeTypeAddr = nullptr;
@@ -486,7 +486,7 @@ HcclResult DispatcherAiCpu::LaunchNewTask(OpUnfoldCacheEntry *entryPtr, const st
         CHK_RET(entryPtr->UpdateAndGetSqeArray(arrayIdx, userInputMemRanges, userOutputMemRanges, mainStream, slaveStreams,
             opRingBufferIdx_, sqeCount, &sqeArray, &sqeTypeArray, &sqeDfxInfoArray, &streamPtr, flipInfos,
             profL1Enable, profTimestamps, isAlltoallv, alltoallvMetadata, alltoallvSendRecvInfo));
-        
+
         // Profiling timestamp的个数应该等于缓存的SQE个数 + flip placeholder个数
         CHK_PRT_RET((!profL1Enable) && (profTimestamps.size() != 0),
             HCCL_ERROR("[DispatcherAiCpu][LaunchNewTask] profL1Enable[%u] profTimestamps.size[%u]",
@@ -653,7 +653,7 @@ HcclResult DispatcherAiCpu::LaunchTask(Stream &stream, bool isBlockLaunch)
         }
 
         u64 curUsec = GetCurAicpuTimestamp();
-        if (dfxTimeOutConfig_.sqFullWaitTimeOut != 0 && 
+        if (dfxTimeOutConfig_.sqFullWaitTimeOut != 0 &&
             (curUsec - startUsec > NANOSECOND_TO_SECOND * dfxTimeOutConfig_.sqFullWaitTimeOut)) {
             HCCL_ERROR("Rtsq full, timeout %lus. curhead:%u, sqId:%d", dfxTimeOutConfig_.sqFullWaitTimeOut, head,
                 streamInfo.sqId);
@@ -743,7 +743,7 @@ HcclResult DispatcherAiCpu::LaunchTask(Stream &stream, bool isBlockLaunch)
             } else {
                 PLF_CONFIG_DEBUG(PLF_TASK, "[DispatcherAicpu][LaunchTask] %uth dispatched SQE", sqeIdx);
             }
-            
+
             CHK_RET(OpUnfoldCache::DumpSqeContent(sqePtr, sqeType));
 
             const AicpuDfxInfo& dfxinfo = sqeDfxInfoArray[sqeIdx];
@@ -1024,7 +1024,7 @@ HcclResult DispatcherAiCpu::WaitRtsq(Stream& stream, const size_t& sqeCount, con
         HCCL_ERROR("[DispatcherAiCpu][WaitRtsq] sqeCount %u should be smaller than sqDepth %u]", sqeCount, streamInfo.sqDepth);
         return HCCL_E_PTR;
     }
-    
+
     // Get head and tail of RTSQ ring buffer
     HcclSqeContext *sqeContext = stream.GetSqeContextPtr();
     CHK_PTR_NULL(sqeContext);
@@ -1060,7 +1060,7 @@ HcclResult DispatcherAiCpu::WaitRtsq(Stream& stream, const size_t& sqeCount, con
 
         // 等待超时
         u64 curUsec = GetCurAicpuTimestamp();
-        if (dfxTimeOutConfig_.sqFullWaitTimeOut != 0 && 
+        if (dfxTimeOutConfig_.sqFullWaitTimeOut != 0 &&
             (curUsec - startUsec > NANOSECOND_TO_SECOND * dfxTimeOutConfig_.sqFullWaitTimeOut)) {
             HCCL_ERROR("[DispatcherAicpu][WaitRtsq] Rtsq full, timeout %lus. curhead:%u, sqId:%d", dfxTimeOutConfig_.sqFullWaitTimeOut, head, streamInfo.sqId);
             return HCCL_E_AGAIN;
@@ -1081,7 +1081,7 @@ HcclResult DispatcherAiCpu::WaitRtsq(Stream& stream, const size_t& sqeCount, con
                 opExecStatus);
         }
     }
-    
+
     return HCCL_SUCCESS;
 }
 
@@ -1172,7 +1172,7 @@ HcclResult DispatcherAiCpu::MemcpyRtsq(Stream& stream, const size_t sqeCount, co
     tail = newTail;
     PLF_CONFIG_INFO(PLF_TASK,
         "%s success, sqid:%d, sqe_num:%u, curHead:%u, curtail:%u", __func__, streamInfo.sqId, sqeCount, head, tail);
-    
+
     // 上报profiling信息
     if (profL1Enable) {
         // Cache hit下SQE ring buffer中[tail-cnt, tail)为待下发SQE, 其数量一定为0 (否则更新tailSqeIdx后, 会导致待下发SQE未下发, 而已下发SQE重复下发)
@@ -1231,7 +1231,7 @@ HcclResult DispatcherAiCpu::MemcpyRtsq(Stream& stream, const size_t sqeCount, co
                     hccl::TaskPara taskPara(TaskType::TASK_BATCH_REPORT, para);
                     callback_(callBackUserPtr_, (void *)&taskPara, sizeof(struct TaskPara));
                 }
-                
+
                 // SQE ring buffer中所有SQE均为已上报 -> 清理SQE ring buffer
                 HCCL_INFO("[DispatcherAicpu][MemcpyRtsq] Sqe index to %u, need clear", HCCL_SQE_MAX_CNT);
                 CHK_PRT_RET(sqeContextBuffer->sqeCnt != 0, HCCL_ERROR("[DispatcherAicpu][MemcpyRtsq] Sqe index to %u, but sqeCnt[%u] is not 0", HCCL_SQE_MAX_CNT, sqeContextBuffer->sqeCnt), HCCL_E_INTERNAL);
@@ -1272,18 +1272,18 @@ HcclResult DispatcherAiCpu::AddFlipTask(Stream &stream)
     }
 
     const HcclComStreamInfo &streamInfo = stream.GetHcclStreamInfo();
- 
+
     uint8_t *sqeBufferAddr = nullptr;
     uint8_t *sqeTypeAddr = nullptr;
     uint8_t *sqeDfxInfoAddr = nullptr;
     CHK_RET(stream.GetNextSqeBufferAddr(sqeBufferAddr, sqeTypeAddr, sqeDfxInfoAddr, taskId));
- 
+
     AicpuDfxInfo * const dfxInfo = (AicpuDfxInfo * const)sqeDfxInfoAddr;
     dfxInfo->opRingBufferIdx = opRingBufferIdx_;
     dfxInfo->remoteRank = INVALID_VALUE_RANKID;
     dfxInfo->notifyId = INVALID_VALUE_RANKID;
     addOneFlipPlaceHolderSqe_(streamInfo.actualStreamId, flipNum, taskId, sqeBufferAddr, sqeTypeAddr);
- 
+
     PLF_CONFIG_INFO(PLF_TASK,
         "%s para: taskId[%u] streamId[%u] flipNum[%u]", __func__, taskId, streamInfo.actualStreamId, flipNum);
     return HCCL_SUCCESS;

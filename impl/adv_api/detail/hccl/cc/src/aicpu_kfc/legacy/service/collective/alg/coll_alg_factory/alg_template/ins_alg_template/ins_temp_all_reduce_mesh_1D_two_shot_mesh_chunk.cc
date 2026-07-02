@@ -149,7 +149,7 @@ HcclResult InsTempAllReduceMesh1DTwoShotMeshChunk::PreCopy(const TemplateDataPar
             CHK_PRT_RET(LocalCopy(tempInsQues[0], localsrcSlice, loacldestSlice),
                 HCCL_ERROR("[InsTempAllReduceMesh1DTwoShotMeshChunk][RunReduceScatter] RunAllReduce scatter LocalCopy failed"),
                 HcclResult::HCCL_E_INTERNAL);
-        } 
+        }
     }
     return HcclResult::HCCL_SUCCESS;
 }
@@ -192,8 +192,8 @@ HcclResult InsTempAllReduceMesh1DTwoShotMeshChunk::RunReduceScatter(const RankSl
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult InsTempAllReduceMesh1DTwoShotMeshChunk::ReduceScatterMeshChunk(const RankSliceInfo &sliceInfoVec, const ResLinks &tempLinks, 
-    std::vector<InsQuePtr> &tempInsQues,const TemplateDataParams &tempAlgParams, const std::vector<vector<u64>> &sliceSize, 
+HcclResult InsTempAllReduceMesh1DTwoShotMeshChunk::ReduceScatterMeshChunk(const RankSliceInfo &sliceInfoVec, const ResLinks &tempLinks,
+    std::vector<InsQuePtr> &tempInsQues,const TemplateDataParams &tempAlgParams, const std::vector<vector<u64>> &sliceSize,
     const u32 &stepIndex, const u32 &myAlgRank)
 {
     u64 inBuffBaseOff = tempAlgParams.buffInfo.inBuffBaseOff;

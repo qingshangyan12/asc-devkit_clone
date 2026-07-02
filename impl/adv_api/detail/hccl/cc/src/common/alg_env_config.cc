@@ -41,27 +41,27 @@ std::string GetEnv(mmEnvId IdName)
 static bool IsValidTimeoutFormat(const std::string &str)
 {
     if (str.empty()) return false;
-    
+
     size_t dotPos = str.find('.');
     size_t pos = 0;
-    
+
     // 检查小数点前的数字
     while (pos < str.length() && pos != dotPos) {
         if (!std::isdigit(str[pos])) return false;
         pos++;
     }
-    
+
     // 如果有小数点，检查小数部分
     if (dotPos != std::string::npos) {
         if (dotPos == 0 || dotPos == str.length() - 1) return false;
         size_t decimalLen = str.length() - dotPos - 1;
         if (decimalLen > 2) return false; // 最多2位小数
-        
+
         for (size_t i = dotPos + 1; i < str.length(); i++) {
             if (!std::isdigit(str[i])) return false;
         }
     }
-    
+
     return true;
 }
 
@@ -118,7 +118,7 @@ HcclResult InitEnvConfig()
     CHK_PRT_RET(ret != HCCL_SUCCESS,
         HCCL_ERROR("[Init][EnvVarParam]errNo[0x%016llx] In init env variable param, parse "\
             "HCCL_OP_EXPANSION_MODE failed. errorno[%d]", HCCL_ERROR_CODE(ret), ret), ret);
-    
+
     if (g_algEnvConfig.initialized) {
         return HCCL_SUCCESS;
     }
@@ -687,13 +687,13 @@ HcclResult ParseOpExpansion()
     if (opExpansionModeEnv == "CCU_MS") {
         g_algEnvConfig.ccuMSMode = true;
         return HCCL_SUCCESS;
-    } 
-    
+    }
+
     if (opExpansionModeEnv == "CCU_SCHED") {
         g_algEnvConfig.ccuSchedMode = true;
         return HCCL_SUCCESS;
-    } 
-    
+    }
+
     DevType deviceType;
     CHK_RET(hrtGetDeviceType(deviceType));
     // 910_93默认打开AICPU展开

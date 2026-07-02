@@ -73,7 +73,7 @@ private:
 
     // 处理发送给跨module rank数据的本地拷贝，根据起始stepNum和步长计算具体要处理哪些rank的数据
     HcclResult DoLocalCopy(const u32 beginStepNum, const u32 endStepNum, const u32 loopIdx);
-    
+
     // 在module内分发来自跨module rank发送过来的数据，根据起始stepNum和步长计算具体要处理哪些rank的数据
     HcclResult DoIntraDistribution(const u32 beginStepNum, const u32 endStepNum, const u32 loopIdx);
 
@@ -88,7 +88,7 @@ private:
 
     // Sdma前后同步
     HcclResult DoSdmaSync(const SdmaSyncType syncType);
-    
+
     // 向module内其他rank广播本rank的counts信息
     HcclResult DoIntraInfoBroadcast();
 
@@ -108,7 +108,7 @@ private:
     HcclResult NotifySdmaSubStreamStart();
     // 主流等待SDMA从流，SDMA从流通知主流
     HcclResult WaitSdmaSubStreamFinish();
-    
+
     // 主流通知RDMA从流，RDMA从流等待主流
     HcclResult NotifyRdmaSubStreamStart();
     // 主流等待RDMA从流，RDMA从流通知主流
@@ -147,11 +147,11 @@ private:
     u32 userRankSize_{0};
     u32 intraRankSize_{0};
     u32 interRankSize_{0};
- 
+
     u32 userRank_{0};
     u32 intraRankId_{0};
     u32 interRankId_{0};
- 
+
     std::vector<std::vector<u32>> ranksPerModule_; // 按照module将rank分组
 
     u32 rdmaConcurrentNum_{0}; // 跨module通信并发度

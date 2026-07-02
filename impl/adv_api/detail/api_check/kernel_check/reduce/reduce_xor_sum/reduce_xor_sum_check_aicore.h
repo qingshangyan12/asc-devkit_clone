@@ -21,7 +21,7 @@
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_REDUCE_REDUCE_XOR_SUM_REDUCE_XOR_SUM_CHECK_AICORE_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_REDUCE_REDUCE_XOR_SUM_REDUCE_XOR_SUM_CHECK_AICORE_H_
 
-namespace AscendC {  
+namespace AscendC {
 namespace HighLevelApiCheck {
 template <typename T, bool isReuseSource = false>
 class CheckFuncClassReduceXorSum {

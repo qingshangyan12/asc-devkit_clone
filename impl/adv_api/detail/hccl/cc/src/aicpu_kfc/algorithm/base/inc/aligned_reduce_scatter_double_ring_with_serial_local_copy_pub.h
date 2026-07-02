@@ -17,7 +17,7 @@ class AlignedReduceScatterDoubleRingWithSerialLocalCopy : public AlignedReduceSc
 public:
     explicit AlignedReduceScatterDoubleRingWithSerialLocalCopy(const HcclDispatcher dispatcher);
     ~AlignedReduceScatterDoubleRingWithSerialLocalCopy() override;
-    
+
     HcclResult RunAsync(const u32 rank, const u32 rankSize, const std::vector<LINK> &links) override;
 
 protected:

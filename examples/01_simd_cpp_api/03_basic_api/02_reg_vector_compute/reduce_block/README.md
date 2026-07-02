@@ -22,8 +22,8 @@
 ```
 
 ## 样例描述
-- 样例功能：  
-  对输入向量做ReduceDataBlock归约求和运算，向量shape为[1, 256]，数据类型为float。  
+- 样例功能：
+  对输入向量做ReduceDataBlock归约求和运算，向量shape为[1, 256]，数据类型为float。
   每8个float（一个DataBlock=32B）产生一个求和结果，共输出32个结果。
 - 每个 `oneRepeatSize`（如 float 类型为 64 元素）块中：
   - 前 `blocksPerRepeat`（8个）位置存放有效的归约结果
@@ -37,7 +37,7 @@
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[1, 32]</td><td align="center">float</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce_block</td></tr>
   </table>
-- 样例实现：  
+- 样例实现：
    ReduceDataBlockSumVF函数内调用ReduceDataBlock接口进行归约计算：
    - 使用LoadAlign加载数据到寄存器
    - 使用ReduceDataBlock(ReduceType::SUM)对每个DataBlock(32B)内的元素求和

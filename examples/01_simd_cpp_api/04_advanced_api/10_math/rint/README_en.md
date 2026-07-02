@@ -24,7 +24,7 @@ This example uses the Rint high-level API to obtain the nearest integer to the i
 
 ## Example Description
 
-- Example function:  
+- Example function:
   Obtain the nearest integer to the input data. If two integers are equally close, the even integer is returned.
 
   The computation formula is as follows:
@@ -32,7 +32,7 @@ This example uses the Rint high-level API to obtain the nearest integer to the i
   dst_i = Rint(src_i)
   $$
 
-- Example specifications:  
+- Example specifications:
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> rint </td></tr>
 
@@ -45,7 +45,7 @@ This example uses the Rint high-level API to obtain the nearest integer to the i
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">rint_custom</td></tr>
   </table>
 
-- Example implementation:  
+- Example implementation:
   This example implements a rint_custom example with fixed shapes of input src[1, 1024] and output dst[1, 1024].
 
   - Kernel implementation
@@ -56,14 +56,14 @@ This example uses the Rint high-level API to obtain the nearest integer to the i
 
     The host side obtains the maximum and minimum temporary space required by the Rint API through GetRintMaxMinTmpSize.
 
-  - Invocation implementation  
+  - Invocation implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run  
+## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -82,7 +82,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-  
+
   For example:
 
   ```bash

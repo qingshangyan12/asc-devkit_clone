@@ -82,11 +82,11 @@ HcclResult InsReduceScatterConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, Ins
             channelDescs0.push_back(channel);
         }
     }
-    
+
     CHK_PRT_RET(channelDescs0.empty(),
                 HCCL_ERROR("[%s] channelDescs0.size()[%zu] is zero.", __func__, channelDescs0.size()),
                 HcclResult::HCCL_E_INTERNAL);
- 
+
     std::vector<HcclChannelDesc> channelDescs1;
     std::vector<HcclChannelDesc> channelDescsTemp1;
 
@@ -98,11 +98,11 @@ HcclResult InsReduceScatterConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, Ins
             channelDescs1.push_back(channel);
         }
     }
-    
+
     CHK_PRT_RET(channelDescs1.empty(),
                 HCCL_ERROR("[%s] channelDescs1.size()[%zu] is zero.", __func__, channelDescs1.size()),
                 HcclResult::HCCL_E_INTERNAL);
- 
+
     // 两者数量应相等
     CHK_PRT_RET(channelDescs0.size() != channelDescs1.size(),
                 HCCL_ERROR("[%s] channelDescs0.size()[%zu] is not equal to channelDescs1.size()[%zu]", __func__,
@@ -226,7 +226,7 @@ HcclResult InsReduceScatterConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, Ins
         cclMem1.addr = static_cast<void *>(static_cast<s8 *>(cclMemAddr) + cclMem0.size);
         cclMem1.size = cclMemSize - cclMem0.size;
     }
-    
+
     u64 maxCountPerLoopforTemp0 = static_cast<u64>(UB_MAX_DATA_SIZE) / dataTypeSize_;
     u64 maxCountPerLoopforTemp1 = static_cast<u64>(UB_MAX_DATA_SIZE) / dataTypeSize_;
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Matrix multiplication with quantization scales in MXFP4/MXFP8 data format, that is, the MxMatmul example. The computation formula is: C = (scaleA ⊗ A) * (scaleB ⊗ B) + Bias. "⊗" denotes broadcast multiplication.  
+Matrix multiplication with quantization scales in MXFP4/MXFP8 data format, that is, the MxMatmul example. The computation formula is: C = (scaleA ⊗ A) * (scaleB ⊗ B) + Bias. "⊗" denotes broadcast multiplication.
 When the ceiling value of K divided by 32 is odd, the value of scaleK needs to be aligned upward to an even number based on that value, and the scaleA and scaleB matrices also need to be extended accordingly.
 
 ## Supported Products and CANN Versions
@@ -26,10 +26,10 @@ When the ceiling value of K divided by 32 is odd, the value of scaleK needs to b
 
 ## Example Description
 
-- Example Function:  
+- Example Function:
   When the MatmulMxNormEvenCustom example calls the Matmul API for computation, the left quantization scale matrix is multiplied with the left matrix, the right quantization scale matrix is multiplied with the right matrix, and matrix multiplication is performed on the two products.
 
-- Example Specifications:  
+- Example Specifications:
   In this example: M = 32, N = 128, K = 128, scaleK = 4. scaleK is the result of K divided by 32, which is 4.
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="5" align="center">MatmulMxNormEvenCustom</td></tr>
@@ -43,7 +43,7 @@ When the ceiling value of K divided by 32 is odd, the value of scaleK needs to b
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="5" align="center">matmulMxNormEvenCustom</td></tr>
   </table>
 
-- Example Implementation: 
+- Example Implementation:
   - Key Kernel Steps
     - Create the Matmul object: use MatmulTypeWithScale to enable scaleA and scaleB.
       ```cpp
@@ -74,13 +74,13 @@ When the ceiling value of K divided by 32 is odd, the value of scaleK needs to b
         cubeTiling.SetScaleBType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, false);
         ```
 
-  - Invocation Implementation  
+  - Invocation Implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

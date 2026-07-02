@@ -64,20 +64,20 @@ This example demonstrates the usage of compound computation interfaces. Compound
     - Call different compound computation interfaces based on the scenario: Scenario 1 calls AddRelu to fuse vector addition with ReLU activation; Scenario 2 calls Axpy to fuse scalar multiplication with vector addition
     - Call the DataCopy basic API to transfer results from UB (Unified Buffer) to GM (Global Memory)
 
-- Invocation implementation  
+- Invocation implementation
   Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run  
+## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
-    
+
 - Run the example
 
   Run the following commands in the example directory.

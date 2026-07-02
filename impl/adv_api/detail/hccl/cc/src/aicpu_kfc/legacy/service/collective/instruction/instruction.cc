@@ -339,7 +339,7 @@ string InsReadExtend::Describe() const
     return StringFormat("InsReadExtend[remoteRank=%d, link=%s, localBuffer=%s, remoteBuffer=%s]", remoteRank_,
                         link_.Describe().c_str(), localBuffer_.Describe().c_str(), remoteBuffer_.Describe().c_str());
 }
- 
+
 RankId InsReadExtend::GetRemoteRank() const
 {
     return remoteRank_;
@@ -415,7 +415,7 @@ string InsReadReduceExtend::Describe() const
         link_.Describe().c_str(), dataType_.Describe().c_str(), reduceOp_.Describe().c_str(),
         localBuffer_.Describe().c_str(), remoteBuffer_.Describe().c_str());
 }
- 
+
 RankId InsReadReduceExtend::GetRemoteRank() const
 {
     return remoteRank_;
@@ -469,7 +469,7 @@ string InsWriteExtend::Describe() const
     return StringFormat("InsWriteExtend[remoteRank=%d, link=%s, localBuffer=%s, remoteBuffer=%s]", remoteRank_,
                         link_.Describe().c_str(), localBuffer_.Describe().c_str(), remoteBuffer_.Describe().c_str());
 }
- 
+
 RankId InsWriteExtend::GetRemoteRank() const
 {
     return remoteRank_;
@@ -714,7 +714,7 @@ const NotifyType &InsWriteWithFin::GetNotifyType() const
 {
     return notifyType_;
 }
- 
+
 const u32 &InsWriteWithFin::GetTopicId() const
 {
     return topicId_;
@@ -847,7 +847,7 @@ void InsAicpuReduce::AicpuReduceTemplate(T* dst, u64 dstSize, T* src, u64 srcSiz
             default:
                 string msg = StringFormat("ReduceOp[%d] not support", int(reduceOp));
                 THROW<NotSupportException>(msg);
-                break;   
+                break;
         }
     }
 }
@@ -867,7 +867,7 @@ void InsAicpuReduce::RunAicpuReduce(void* dst, u64 dstSize, void* src, u64 srcSi
         default:
             string msg = StringFormat("DataType[%d] not support", int(dataType));
             THROW<NotSupportException>(msg);
-            break; 
+            break;
     }
 }
 

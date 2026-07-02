@@ -53,7 +53,7 @@ public:
     HcclResult CalcTaskNum(OpType opType, DataType dataType, u32 count, u32 &taskNum);
 
     HcclResult CalNumBlocks(u32& numBlocks, u64 dataSize, OpType opType, string &algName, u32 numBlocksLimit) const;
-    
+
     // for AICPU
     virtual std::vector<std::string> GetOpAlgNames(const OpType      &opType,
                                                    const OrchestMode &orchestMode = OrchestMode::PRIMITIVE);

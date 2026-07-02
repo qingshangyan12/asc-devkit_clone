@@ -90,12 +90,12 @@ __aicore__ inline void InitDetermineComputeWorkspace(GlobalTensor<int32_t>& gmWo
 
         // 等待前序核（blockIdx-1）完成操作。
         AscendC::WaitPreBlock(gmWorkspace, ubWorkspace);
-        
+
         // 开启原子累加。
         AscendC::SetAtomicAdd<T>();
         AscendC::DataCopy(dstGlobal[i * tileCount], srcLocal, tileCount);
         AscendC::DisableDmaAtomic();
-        
+
         // 通知后序核（blockIdx+1）当前核已完成。
         AscendC::NotifyNextBlock(gmWorkspace, ubWorkspace);
         que.FreeTensor(srcLocal);

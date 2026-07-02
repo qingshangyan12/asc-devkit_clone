@@ -114,13 +114,13 @@ HcclResult __attribute__((weak)) HcclGetRankGraphV2(HcclComm *comm, void **rankG
 HcclResult __attribute__((weak)) HcclGetCclBuffer(HcclComm comm, uintptr_t &cclBufferAddr, size_t &cclBufferSize, HcclMemType &cclBufferMemType);
 
 HcclResult __attribute__((weak)) HcclCommWorkingDevNicSetV2(HcclComm comm, uint32_t *ranks, bool *useBackup, uint32_t nRanks);
- 
+
 HcclResult __attribute__((weak)) HcclCommSetMemoryRangeV2(HcclComm comm, void *baseVirPtr, size_t size, size_t alignment, uint64_t flags);
- 
+
 HcclResult __attribute__((weak)) HcclCommUnsetMemoryRangeV2(HcclComm comm, void *baseVirPtr);
- 
+
 HcclResult __attribute__((weak)) HcclCommActivateCommMemoryV2(HcclComm comm, void *virPtr, size_t size, size_t offset, void* handle, uint64_t flags);
- 
+
 HcclResult __attribute__((weak)) HcclCommDeactivateCommMemoryV2(HcclComm comm, void *virPtr);
 
 HcclResult __attribute__((weak)) HcommFlushV2();
@@ -156,7 +156,7 @@ HcclResult __attribute__((weak)) HcclRankGraphGetEndpointDescV2(HcclComm comm, u
 HcclResult __attribute__((weak)) HcclRankGraphGetEndpointInfoV2(HcclComm comm, uint32_t rankId, const EndpointDesc *endpointDesc, EndpointAttr endpointAttr, uint32_t infoLen, void *info);
 
 HcclResult __attribute__((weak)) HcclGetOpArgsV2(void **opArgs);
- 	 
+
 HcclResult __attribute__((weak)) HcclFreeOpArgsV2(void *opArgs);
 
 HcclResult __attribute__((weak)) HcclSetOpSrcDataTypeV2(void *opArgs, uint8_t srcDataType);

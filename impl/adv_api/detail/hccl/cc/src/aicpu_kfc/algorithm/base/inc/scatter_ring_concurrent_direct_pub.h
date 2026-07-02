@@ -21,9 +21,9 @@ public:
     ~ScatterRingConcurrentDirect() override;
 
     // should be called soon after template ScatterRingConcurrentDirect instance created
-    HcclResult Prepare(HcomCollOpInfo *opInfo, const u32 userRank, std::vector<Stream> &subStreams, 
-        const std::vector<std::shared_ptr<LocalNotify>> &mainSignals, 
-        const std::vector<std::shared_ptr<LocalNotify>> &subSignals, const std::vector<u32> &ringsOrder, 
+    HcclResult Prepare(HcomCollOpInfo *opInfo, const u32 userRank, std::vector<Stream> &subStreams,
+        const std::vector<std::shared_ptr<LocalNotify>> &mainSignals,
+        const std::vector<std::shared_ptr<LocalNotify>> &subSignals, const std::vector<u32> &ringsOrder,
         const std::vector<Slice> &userMemSlices, bool isSdma = true) override;
 
     HcclResult RunAsync(const u32 rank, const u32 rankSize, const std::vector<LINK> &links) override;

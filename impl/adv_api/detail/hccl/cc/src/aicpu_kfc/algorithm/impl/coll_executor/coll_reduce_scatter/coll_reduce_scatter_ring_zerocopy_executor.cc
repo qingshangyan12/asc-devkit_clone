@@ -71,7 +71,7 @@ HcclResult CollReduceScatterRingZerocopyExecutor::CalcTransportMemType(Transport
     } else {
         outputType = TransportMemType::CCL_OUTPUT;
     }
-    
+
     HCCL_INFO("[CollReduceScatterRingZerocopyExecutor][CalcTransportMemType] tag[%s] inputType[%d], outputType[%d]",
         tag_.c_str(), inputType, outputType);
     return HCCL_SUCCESS;
@@ -110,7 +110,7 @@ HcclResult CollReduceScatterRingZerocopyExecutor::SemiRingReduceScatter(
     (void) baseOffset;
     (void) opInfo;
     HCCL_INFO("[CollReduceScatterRingZerocopyExecutor][SemiRingReduceScatter] SemiRingReduceScatter starts");
-    
+
     CHK_RET(CheckCommSize(COMM_LEVEL0, COMM_INDEX_0 + 1));
     SubCommInfo level0CommInfo = GetSubCommInfo(COMM_LEVEL0, COMM_INDEX_0);
 
@@ -181,7 +181,7 @@ HcclResult CollReduceScatterRingZerocopyExecutor::KernelRunIntraServerPre(const 
     // 计算slice信息
     std::vector<Slice> dataSegsSlice;
     CHK_RET(CalcLevel0DataSlices(param, execMem, dataSegsSlice));
-    
+
     // 执行ReduceScatter
     u64 level0Count = (dataSegsSlice.size() > level0RankSize_) ?     // 如果是非连续数据通信
                       (execMem.count) : (execMem.count * level1RankSize_ * level2RankSize_);
@@ -189,7 +189,7 @@ HcclResult CollReduceScatterRingZerocopyExecutor::KernelRunIntraServerPre(const 
     CHK_RET(RunIntraSeverReduceScatter(param.tag, execMem.inputMem, execMem.scratchMem, level0Count,
         param.DataDes.dataType, param.reduceType,
         multRingsUserMemSlice, param.stream, PROF_STAGE_1, 0, nullptr, multRingsUserMemSlice, true));
-    
+
     return HCCL_SUCCESS;
 }
 
@@ -228,7 +228,7 @@ HcclResult CollReduceScatterRingZerocopyExecutor::KernelRunInterServer(const OpP
     // 计算slice
     std::vector<Slice> level1DataSegsSlice;
     CalcLevel1DataSlices(execMem.outputMem.size(), level1RankSize_, level2RankSize_, level1DataSegsSlice);
-    
+
     // 超节点内、节点间通信
     bool isAHCAlgo = algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_AHC || algType_.algoLevel1 == AlgTypeLevel1::ALG_LEVEL1_AHC_BROKE;
     if (level1RankSize_ > 1) {

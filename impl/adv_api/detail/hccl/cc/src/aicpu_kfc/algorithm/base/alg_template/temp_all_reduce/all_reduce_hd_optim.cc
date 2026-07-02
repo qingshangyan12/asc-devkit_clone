@@ -117,7 +117,7 @@ HcclResult AllReduceHDOptim::RunAsync(const u32 rank, const u32 rankSize, const 
             HCCL_ERROR("[AllReduceHDOptim][RunAsync]rank[%u] count[%llu] failed RunAllReduceHDOptim step",
                 rank, count_), ret);
     }
-    
+
     if (stepPow != rankSize) {
         ret = RunFinalStep(rank, rankSize, links);
         CHK_PRT_RET(ret != HCCL_SUCCESS,

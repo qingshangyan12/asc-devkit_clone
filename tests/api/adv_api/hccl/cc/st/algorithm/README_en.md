@@ -93,7 +93,7 @@ As shown below, run the single operator flow in a multi-threaded manner.
 ![](../../../docs/figures/algorithm_analyzer/compile_testcase_6.png)
 
 1. Construct operator input parameters.
-   
+
    Construct the parameters required for single operator execution, including:
    - SetDevice: Binds a thread to a Rank so that each thread simulates a corresponding Rank.
    - Main stream resource creation: Call the aclrtCreateStream interface, with stub implementation to simulate stream resource creation.

@@ -26,7 +26,7 @@ InsTempAllGatherNHR::~InsTempAllGatherNHR()
 
 HcclResult InsTempAllGatherNHR::CalcRes(AlgTempResReq &tempResReq)
 {
-    // NHR 需要的 que Num 为 1 
+    // NHR 需要的 que Num 为 1
     tempResReq.queNum = 1;
     tempResReq.streamNum = tempResReq.queNum;
     tempResReq.queNotifys = CreateMasterSlaveQueNotifiesRequest(tempResReq.queNum);
@@ -192,7 +192,7 @@ HcclResult InsTempAllGatherNHR::RunNHR(std::vector<InsQuePtr> &tempInsQues)
             for (u32 i = 0; i < stepInfo.nSlices; ++i) {
                 const u32 txIdx = stepInfo.txSliceIdxs[i];
                 const u32 rxIdx = stepInfo.rxSliceIdxs[i];
-                
+
                 const u64 txScratchOff = scratchBase + tempAlgParams_.sliceSize * txIdx;
 
                 const u64 rxScratchOff = scratchBase + tempAlgParams_.sliceSize * rxIdx;

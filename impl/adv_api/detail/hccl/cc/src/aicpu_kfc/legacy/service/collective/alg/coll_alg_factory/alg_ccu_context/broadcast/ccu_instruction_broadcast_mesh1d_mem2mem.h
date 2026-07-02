@@ -66,13 +66,13 @@ public:
     uint64_t allgatherOffset_;
     uint64_t repeatNumVar_;
 };
- 
+
 class CcuInstructionBroadcastMesh1DMem2Mem : public CcuInstruction {
 public:
     CcuInstructionBroadcastMesh1DMem2Mem() : CcuInstruction()
     {
     }
- 
+
     void Init(uint32_t rankId, uint32_t rootId, const CollAlgOperator &op,
               const std::vector<std::vector<RankId>> &tempVTopo, uint64_t inputAddr, uint64_t outputAddr,
               uint64_t token, uint64_t inputSliceStride, uint64_t outputSliceStride, uint32_t repeatNum,
@@ -115,15 +115,15 @@ public:
         return StringFormat("CcuInstructionBroadcastMesh1DMem2Mem rankId [%u], instType[%s]", rankId_,
                             instType_.Describe().c_str());
     }
- 
+
     std::unique_ptr<CcuCtxArg> GetCtxArg() const override
     {
         return std::make_unique<CcuCtxArgBroadcastMesh1DMem2Mem>(dimSize_, rankId_, rootId_, op_, tempVTopo_);
     }
 
-    void SetInstType(CcuInstType instType) 
-    { 
-        instType_ = instType; 
+    void SetInstType(CcuInstType instType)
+    {
+        instType_ = instType;
     }
 
     std::unique_ptr<CcuTaskArg> GetTaskArg() const override
@@ -132,7 +132,7 @@ public:
             inputAddr_, outputAddr_, token_, inputSliceStride_, outputSliceStride_, repeatNum_, inputRepeatStride_,
             outputRepeatStride_, normalSliceSize_, lastSliceSize_, allgatherOffset_, repeatNumVar_);
     }
- 
+
 private:
     CcuInstType                      instType_ = CcuInstType::CCU_BROADCAST_MESH_1D_MEM2MEM;
     std::vector<uint64_t>            dimSize_;

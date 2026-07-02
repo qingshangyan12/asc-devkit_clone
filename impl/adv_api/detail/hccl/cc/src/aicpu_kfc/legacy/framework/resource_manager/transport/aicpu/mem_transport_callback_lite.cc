@@ -10,7 +10,7 @@
 #include "mem_transport_callback_lite.h"
 
 namespace Hccl{
-    
+
 MemTransportCallbackLite::MemTransportCallbackLite(const LinkData link, MirrorTaskManagerLite &mirrorTaskManagerLite)
 : link_(link), mirrorTaskManagerLite_(mirrorTaskManagerLite)
 {}
@@ -19,7 +19,7 @@ void MemTransportCallbackLite::operator()(u32 streamId, u32 taskId, const TaskPa
 {
     shared_ptr<TaskInfo> taskInfo = std::make_shared<TaskInfo>(streamId, taskId,
         link_.GetRemoteRankId(), taskParam, mirrorTaskManagerLite_.GetCurrDfxOpInfo());
-        
+
     mirrorTaskManagerLite_.AddTaskInfo(taskInfo);
     return;
 }

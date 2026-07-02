@@ -80,6 +80,6 @@ __ubuf__ half src[total_length];
 __ubuf__ half dst[total_length];
 asc_max_scalar(dst, src, value, total_length);
 // src : [1, 2, 3, 4, ... , 256]
-// value : 3 
+// value : 3
 // dst : [3, 3, 3, 5, ... , 256]
 ```

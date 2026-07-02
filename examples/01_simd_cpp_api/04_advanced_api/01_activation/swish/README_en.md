@@ -31,7 +31,7 @@ This example controls the two modes through the compilation macro `USE_SILU_MODE
 
 ## Example Description
 
-- Example function:  
+- Example function:
   This example performs element-wise Swish/Silu activation computation on the input tensor and writes the computation result to the output tensor. Swish and Silu have a close mathematical relationship; Silu is a special case of Swish when beta=1.
 
   The computation formulas are as follows:
@@ -57,10 +57,10 @@ This example controls the two modes through the compilation macro `USE_SILU_MODE
 </table>
 </div>
 
-- Example implementation:  
+- Example implementation:
   This example implements a swish_custom example with fixed shapes of input src[1, 32] and output dst[1, 32].
 
-  - Kernel implementation  
+  - Kernel implementation
     Core computation steps: After transferring the input data in, call the corresponding high-level API to complete the computation, then transfer the result out.
 
     Swish mode invocation:
@@ -73,10 +73,10 @@ This example controls the two modes through the compilation macro `USE_SILU_MODE
     AscendC::Silu<T, false>(dstLocal, srcLocal, dataSize);
     ```
 
-  - Tiling implementation  
+  - Tiling implementation
     This example is a single-core element-wise computation scenario with no complex multi-core logic. The host side obtains the temporary buffer size required by the API through `AscendC::GetSwishTmpSize` (Swish mode) or `AscendC::GetSiluTmpSize` (Silu mode) and passes it directly to the kernel.
 
-  - Invocation implementation  
+  - Invocation implementation
     Use the kernel invocation operator `<<<>>>` to call the kernel function.
 
 ## Build and Run

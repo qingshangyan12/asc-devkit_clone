@@ -26,7 +26,7 @@
         - 启动NPU计算任务：通过`<<<...>>>`语法糖启动核函数。
         - 同步等待：调用`aclrtSynchronizeStream`或`aclrtSynchronizeDevice`等待任务完成。
         - 数据搬出：使用`aclrtMemcpy`将计算结果从Device Memory拷贝回Host Memory。
-      
+
       > [!NOTE] 说明
       > - 请参见[Ascend-C概述与学习路径](../../Ascend-C概述与学习路径.md)技术附录章节，获取`Ascend C API参考`和`CANN运行时接口`链接，以查阅更多接口信息。
 
@@ -43,7 +43,7 @@
           asc_init();
 
           constexpr uint32_t block_length = TOTAL_LENGTH / NUM_BLOCKS;
-          
+
           // Determine the data that each block needs to process
           __gm__ float* x_gm = x + block_idx * block_length;
           __gm__ float* y_gm = y + block_idx * block_length;
@@ -81,28 +81,28 @@
       __vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z)
       {
           AscendC::InitSocState();
-          
+
           // Determine the data that each block needs to process
           AscendC::GlobalTensor<float> xGm, yGm, zGm;
           xGm.SetGlobalBuffer(x + block_idx * blockLength, blockLength);
           yGm.SetGlobalBuffer(y + block_idx * blockLength, blockLength);
           zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
-          
+
           // Allocate on-chip UB memory
           AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
           AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, blockLength>();
           AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, blockLength>();
           AscendC::LocalTensor<float> zLocal = ubAllocator.Alloc<float, blockLength>();
-          
+
           // Copy input data from Global Memory (i.e., Device Memory) to on-chip UB memory
           AscendC::DataCopy(xLocal, xGm, blockLength);
           AscendC::DataCopy(yLocal, yGm, blockLength);
           AscendC::PipeBarrier<PIPE_ALL>();
-          
+
           // Call SIMD API to complete the Add operation
           AscendC::Add(zLocal, xLocal, yLocal, blockLength);
           AscendC::PipeBarrier<PIPE_ALL>();
-          
+
           // Write the result from on-chip UB memory back to Global Memory
           AscendC::DataCopy(zGm, zLocal, blockLength);
           AscendC::PipeBarrier<PIPE_ALL>();
@@ -128,7 +128,7 @@
           // Create runtime stream by aclrtCreateStream API
           aclrtStream stream = nullptr;
           aclrtCreateStream(&stream);
-          
+
           // Allocate host and device memory, and copy input data from host to device
           aclrtMalloc((void**)&xDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
           aclrtMalloc((void**)&yDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);

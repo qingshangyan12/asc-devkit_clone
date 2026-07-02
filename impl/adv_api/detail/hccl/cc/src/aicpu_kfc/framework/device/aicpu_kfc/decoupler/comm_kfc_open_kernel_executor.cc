@@ -133,7 +133,7 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t> &opParam)
     std::vector<char> seq(ctx, ctx + param->ctxSize);
     resCtx.DeSerialize(seq);
     HCCL_INFO("[MC2_OPEN_DIAG][Launch] opType %u, algName[%s], inputPtr %p, outputPtr %p, resCtx %p, ctxSize %llu, stream %p."
-              "userRank %u, userRankSize %u, threadNum %zu, cclMemAddr %p, cclMemSize %llu.", 
+              "userRank %u, userRankSize %u, threadNum %zu, cclMemAddr %p, cclMemSize %llu.",
               static_cast<u32>(param->opType), param->algName, param->inputPtr, param->outputPtr,
               param->resCtx, static_cast<unsigned long long>(param->ctxSize), param->stream,
               resCtx.topoInfo.userRank, resCtx.topoInfo.userRankSize, resCtx.threads.size(), resCtx.cclMem.addr,

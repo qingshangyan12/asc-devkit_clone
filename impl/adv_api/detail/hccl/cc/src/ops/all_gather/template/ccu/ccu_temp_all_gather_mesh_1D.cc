@@ -45,7 +45,7 @@ HcclResult CcuTempAllGatherMesh1D::CalcRes(HcclComm comm, const OpParam& param, 
 
     // 创建每个kernel的ctxArg，放入kernelInfo, 然后将kernelinfo放入resourceRequest.ccuKernelInfos
     CcuKernelInfo kernelInfo;
-    
+
     kernelInfo.creator = [](const hcomm::CcuKernelArg &arg) {
                              return std::make_unique<CcuKernelAllGatherMesh1D>(arg);
                          };
@@ -88,7 +88,7 @@ HcclResult CcuTempAllGatherMesh1D::KernelRun(const OpParam& param,
     uint64_t outputAddr         = PointerToAddr(buffInfo_.outputPtr) + buffInfo_.outBuffBaseOff;
     uint64_t token;
     CHK_RET(GetToken(buffInfo_, token));
-                                                       
+
     uint32_t rankId    = mySubCommRank_;
     uint64_t offset    = rankId * templateDataParams.outputSliceStride;;
 
@@ -104,7 +104,7 @@ HcclResult CcuTempAllGatherMesh1D::KernelRun(const OpParam& param,
 
     std::unique_ptr<hcomm::CcuTaskArg> taskArg = std::make_unique<CcuTaskArgAllGatherMesh1D>(
         inputAddr, outputAddr, token, offset, sliceSize);
-    
+
     void* taskArgPtr = static_cast<void*>(taskArg.get());
 
     CHK_RET(HcclCcuKernelLaunch(param.hcclComm, templateResource.threads[0], templateResource.ccuKernels[0], taskArgPtr));
@@ -124,7 +124,7 @@ u64 CcuTempAllGatherMesh1D::GetThreadNum() const
 {
     return 1;
 }
- 
+
 HcclResult CcuTempAllGatherMesh1D::GetRes(AlgResourceRequest& resourceRequest) const
 {
     resourceRequest.slaveThreadNum = 0;

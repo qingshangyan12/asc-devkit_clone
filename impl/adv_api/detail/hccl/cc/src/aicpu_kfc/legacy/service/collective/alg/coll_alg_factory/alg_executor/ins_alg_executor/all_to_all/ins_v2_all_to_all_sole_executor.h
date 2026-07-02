@@ -28,7 +28,7 @@ public:
         ConnectedLinkMgr *linkMgr, InsQuePtr insQue) override;
     // HOST 接口
     HcclResult Orchestrate(const RankGraph *rankGraph, const CollAlgOperator &op, const CollAlgParams &params,
-        InsQuePtr insQue) override;    
+        InsQuePtr insQue) override;
 
     HcclResult CalcResOffload(
         const RankGraph *rankGraph, const u64 &dataSize, CollOffloadOpResReq &resReq) override;
@@ -37,7 +37,7 @@ public:
 
     HcclResult CalNumBlocks(u32& numBlocks, u64 dataSize, u32 numBlocksLimit) override;
 
-private:   
+private:
     HcclResult InitCommInfo(const RankGraph *rankGraph);
     HcclResult InitCommInfo(const AlgTopoInfo &topoInfo);
     HcclResult CreateTemplates(std::shared_ptr<InsAlgTemplate> &algTemplatePtr);
@@ -49,7 +49,7 @@ private:
     HcclResult OrchestrateLoop(std::shared_ptr<InsAlgTemplate> algTemplate);
 
     std::vector<RankId> virtRanks_;
-    std::map<RankId, u32> virtRankMap_;  
+    std::map<RankId, u32> virtRankMap_;
     ResLinks tempResLinks_;
     std::vector<InsQuePtr> tempInsQue_;
     std::vector<std::vector<RankId>> vTopo_;

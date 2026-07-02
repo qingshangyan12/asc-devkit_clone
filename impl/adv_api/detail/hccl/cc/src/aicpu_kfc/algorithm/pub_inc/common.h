@@ -59,7 +59,7 @@ enum class AlgTypeLevel0 {
     ALG_LEVEL0_PAIRWISE,
     ALG_LEVEL0_RESERVED
 };
- 
+
 enum class AlgTypeLevel1 {
     ALG_LEVEL1_WHOLE_RING = 0,  // 单层拓扑, 所有level均为Whole ring时，组成一个大环
     ALG_LEVEL1_HD,              // 拓扑组合1层, HDR
@@ -73,7 +73,7 @@ enum class AlgTypeLevel1 {
     ALG_LEVEL1_AHC_BROKE,       // 拓扑组合1层，AHC_BROKE
     ALG_LEVEL1_RESERVED
 };
- 
+
 enum class AlgTypeLevel2 {
     ALG_LEVEL2_WHOLE_RING = 0,  // 单层拓扑, 所有leve2均为Whole ring时，组成一个大环
     ALG_LEVEL2_HD,              // 拓扑组合2层, HDR
@@ -83,8 +83,8 @@ enum class AlgTypeLevel2 {
     ALG_LEVEL2_PIPELINE,        // 拓扑组合2层, Pipeline
     ALG_LEVEL2_RESERVED
 };
- 
- 
+
+
 using AlgType = struct TagAlgType {
     AlgTypeLevel0 algoLevel0;
     AlgTypeLevel1 algoLevel1;
@@ -93,7 +93,7 @@ using AlgType = struct TagAlgType {
         algoLevel2(AlgTypeLevel2::ALG_LEVEL2_WHOLE_RING)
     {
     }
- 
+
     explicit TagAlgType(AlgTypeLevel0 algoLevel0) : algoLevel0(algoLevel0), algoLevel1(AlgTypeLevel1::ALG_LEVEL1_WHOLE_RING),
         algoLevel2(AlgTypeLevel2::ALG_LEVEL2_WHOLE_RING)
     {
@@ -102,12 +102,12 @@ using AlgType = struct TagAlgType {
         algoLevel1(algoLevel1), algoLevel2(AlgTypeLevel2::ALG_LEVEL2_WHOLE_RING)
     {
     }
- 
+
     TagAlgType(AlgTypeLevel0 algoLevel0, AlgTypeLevel2 algoLevel2) : algoLevel0(algoLevel0),
         algoLevel1(AlgTypeLevel1::ALG_LEVEL1_WHOLE_RING), algoLevel2(algoLevel2)
     {
     }
- 
+
     TagAlgType(AlgTypeLevel0 algoLevel0, AlgTypeLevel1 algoLevel1, AlgTypeLevel2 algoLevel2) : algoLevel0(algoLevel0),
         algoLevel1(algoLevel1), algoLevel2(algoLevel2)
     {
@@ -116,25 +116,25 @@ using AlgType = struct TagAlgType {
         algoLevel2(AlgTypeLevel2::ALG_LEVEL2_WHOLE_RING)
     {
     }
- 
+
     TagAlgType(AlgTypeLevel1 algoLevel1, AlgTypeLevel2 algoLevel2) : algoLevel0(AlgTypeLevel0::ALG_LEVEL0_WHOLE_RING),
         algoLevel1(algoLevel1), algoLevel2(algoLevel2)
     {
     }
- 
+
     explicit TagAlgType(AlgTypeLevel2 algoLevel2) : algoLevel0(AlgTypeLevel0::ALG_LEVEL0_WHOLE_RING),
         algoLevel1(AlgTypeLevel1::ALG_LEVEL1_WHOLE_RING), algoLevel2(algoLevel2)
     {
     }
- 
+
     static TagAlgType Reserved() {
         return TagAlgType(AlgTypeLevel0::ALG_LEVEL0_RESERVED, AlgTypeLevel1::ALG_LEVEL1_RESERVED, AlgTypeLevel2::ALG_LEVEL2_RESERVED);
     }
- 
+
     TagAlgType(const TagAlgType &that) : algoLevel0(that.algoLevel0), algoLevel1(that.algoLevel1), algoLevel2(that.algoLevel2)
     {
     }
- 
+
     TagAlgType &operator=(const TagAlgType &that)
     {
         if (&that != this) {
@@ -254,7 +254,7 @@ const std::map<AlgTypeLevel0, std::string> HCCL_ALGO_LEVEL0_MAP = {
     {AlgTypeLevel0::ALG_LEVEL0_PAIRWISE, "PAIRWISE"},
     {AlgTypeLevel0::ALG_LEVEL0_RESERVED, "NA"},
 };
- 
+
 const std::map<AlgTypeLevel1, std::string> HCCL_ALGO_LEVEL1_MAP = {
     {AlgTypeLevel1::ALG_LEVEL1_WHOLE_RING, "RING"},
     {AlgTypeLevel1::ALG_LEVEL1_HD, "HD"},
@@ -278,7 +278,7 @@ const std::map<AlgTypeLevel2, std::string> HCCL_ALGO_LEVEL2_MAP = {
     {AlgTypeLevel2::ALG_LEVEL2_PIPELINE, "PIPELINE"},
     {AlgTypeLevel2::ALG_LEVEL2_RESERVED, "NA"},
 };
- 
+
 inline std::string TransferAlgType(AlgType algType)
 {
     std::string algTypeStr;
@@ -293,7 +293,7 @@ inline std::string TransferAlgType(AlgType algType)
                   .append("-").append(static_cast<std::string>(level2Iter->second));
         HCCL_INFO("The algtype for profiling is [%s]", algTypeStr.c_str());
     }
- 
+
     return algTypeStr;
 }
 
@@ -304,11 +304,11 @@ inline bool TransferStrToAlgType(const std::string& algTypeStr, AlgType& algType
     std::stringstream ss(algTypeStr);
     std::string part;
     constexpr u32 algTypeLevelNum = 3;
-    
+
     while (std::getline(ss, part, '-')) {
         parts.push_back(part);
     }
-    
+
     // 检查格式
     if (parts.size() != algTypeLevelNum) {
         HCCL_ERROR("Invalid algType string format: %s", algTypeStr.c_str());

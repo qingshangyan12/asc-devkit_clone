@@ -49,7 +49,7 @@ public:
     CntNto1NotifyLiteMgr        *GetCntNto1NotifyLiteMgr() override;
     ConnectedLinkMgr            *GetConnectedLinkMgr() override;
     DevId                        GetDevPhyId() override;
-    u32                          GetExecTimeOut() override;  
+    u32                          GetExecTimeOut() override;
 
     MemTransportLiteMgr *GetTransportLiteMgr() override
     {
@@ -94,7 +94,7 @@ public:
     {
         return mirrorTaskMgrLite.get();
     }
-    
+
     string GetId() const
     {
         return commId;
@@ -128,7 +128,7 @@ public:
     {
         needClean = flag;
     }
-    
+
     bool IsNeedClean() const
     {
         return needClean;
@@ -201,7 +201,7 @@ public:
 
     void ResetErrorReported() {
         isErrorReported_ = false;
-    } 
+    }
 
     void UnfoldOp(HcclKernelParamLite *kernelParam);
     void RegisterRtsqCallback();

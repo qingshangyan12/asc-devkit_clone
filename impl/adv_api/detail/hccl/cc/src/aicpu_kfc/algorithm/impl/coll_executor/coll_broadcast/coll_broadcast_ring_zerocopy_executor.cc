@@ -78,7 +78,7 @@ HcclResult CollBroadCastRingZerocopyExecutor::DoubleRingScatter(const std::strin
     HCCL_INFO("[BroadCastOperator][CollBroadCastRingZerocopyExecutor] DoubleRingScatter starts");
     CHK_RET(CheckCommSize(COMM_LEVEL0, COMM_INDEX_0 + 1));
     SubCommInfo level0RingCommInfo = GetSubCommInfo(COMM_LEVEL0, COMM_INDEX_0);
-    
+
     // 适配AlignedDoubleRing的入参
     u32 ringSize = multRingsSliceZero[0].size();
     std::vector<std::vector<u32>> rankOrders(TWO_RING, std::vector<u32>(ringSize));
@@ -94,7 +94,7 @@ HcclResult CollBroadCastRingZerocopyExecutor::DoubleRingScatter(const std::strin
     HCCL_CONFIG_INFO(HCCL_ALG, "[%s] Run TEMPLATE_SCATTER_DOUBLE_RING_DIRECT in COMM_LEVEL0", __func__);
     CHK_SMART_PTR_NULL(tempAlg);
     CHK_RET(tempAlg ->Prepare(opInfo, topoAttr_.userRank, level0RankSubRing,
-        algResResp_->slaveStreams, algResResp_->notifiesMain, algResResp_->notifiesAux, 
+        algResResp_->slaveStreams, algResResp_->notifiesMain, algResResp_->notifiesAux,
         rankOrders, multRingsSliceZero, multRingsSliceZero));
     u32 rootRank = 0;
     HcclResult ret = GetRankByUserRank(COMM_LEVEL0, COMM_INDEX_0, root, rootRank);
@@ -398,11 +398,11 @@ HcclResult CollBroadCastRingZerocopyExecutor::DoubleRingAllGather(
 {
     (void) tag;
     HCCL_INFO("[CollBroadCastRingZerocopyExecutor][DoubleRingAllGather] DoubleRingAllGather starts");
- 
+
     // 拿到ring环映射关系
     CHK_RET(CheckCommSize(COMM_LEVEL0, COMM_INDEX_0 + 1));
     SubCommInfo level0RingCommInfo = GetSubCommInfo(COMM_LEVEL0, COMM_INDEX_0);
- 
+
     // 构造rankOrders
     u32 ringSize = multRingsSliceZero[0].size();
     std::vector<std::vector<u32>> rankOrders(TWO_RING, std::vector<u32>(ringSize));
@@ -410,13 +410,13 @@ HcclResult CollBroadCastRingZerocopyExecutor::DoubleRingAllGather(
         rankOrders[0][i] = i;
         rankOrders[1][i] = (i == 0) ? 0 : (ringSize - i);
     }
- 
+
     // 执行算法编排
     std::unique_ptr<AlgTemplateBase> tempAlg = AlgTemplateRegistry::Instance().GetAlgTemplate(
         TemplateType::TEMPLATE_ALIGNED_ALL_GATHER_DOUBLE_RING, dispatcher_);
     HCCL_CONFIG_INFO(HCCL_ALG, "[%s] Run TEMPLATE_ALIGNED_ALL_GATHER_DOUBLE_RING in COMM_LEVEL0", __func__);
     CHK_SMART_PTR_NULL(tempAlg);
-    CHK_RET(tempAlg->Prepare(opInfo, topoAttr_.userRank, algResResp_->slaveStreams, 
+    CHK_RET(tempAlg->Prepare(opInfo, topoAttr_.userRank, algResResp_->slaveStreams,
         algResResp_->notifiesMain, algResResp_->notifiesAux, rankOrders, multRingsUserMemSlice));
     CHK_RET(tempAlg->Prepare(outputMem, outputMem, inputMem, count, dataType, stream, multRingsSliceZero,
         HCCL_REDUCE_RESERVED, LEVEL0_BRIDGE_RANK_ID, baseOffset));
@@ -425,7 +425,7 @@ HcclResult CollBroadCastRingZerocopyExecutor::DoubleRingAllGather(
         (level0RankSize_ << PROF_RANKSIZE_OFFSET_OF_PLANEID) + level0Rank_,
         profStage, HCCL_EXEC_STEP_NOT_SET, stream));
     CHK_RET(RunTemplate(tempAlg, level0RingCommInfo));
- 
+
     return HCCL_SUCCESS;
 }
 
@@ -434,7 +434,7 @@ HcclResult CollBroadCastRingZerocopyExecutor::KernelRunIntraServerPost(const OpP
     HcomCollOpInfo allgatherOpInfo = {
         "", nullptr, execMem.outputMem.ptr(), execMem.count, param.DataDes.dataType, param.root, param.reduceType
     };
- 
+
     if (topoType_ == TopoType::TOPO_TYPE_NP_SINGLE_RING) {
         CHK_RET(MultiRingAllGather(param.tag, execMem.inputMem, execMem.outputMem, execMem.count,
             param.DataDes.dataType, level0MultiRingDataSlices_, param.stream, PROF_STAGE_2,

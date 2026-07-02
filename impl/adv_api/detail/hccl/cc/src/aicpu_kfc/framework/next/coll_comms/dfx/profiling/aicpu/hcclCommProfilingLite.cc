@@ -32,7 +32,7 @@ void HcclCommProfilingLite::UpdateProfStat() {
         profilingReporterLite_->UpdateProfStat();
     }
 }
-    
+
  Hccl::MirrorTaskManagerLite* HcclCommProfilingLite::GetMirrorTaskManagerLite() const{
     return mirrorTaskManagerLite_.get();
  }

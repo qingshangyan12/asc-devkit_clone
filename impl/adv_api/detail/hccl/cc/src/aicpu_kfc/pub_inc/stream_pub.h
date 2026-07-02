@@ -157,7 +157,7 @@ public:
     {
         return logicCqid_;
     }
- 
+
     u32 cqId() const
     {
         return cqId_;

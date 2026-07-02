@@ -75,7 +75,7 @@ private:
             self_->ctx.mAL0Iter * self_->ctx.conv3dTiling->mL0 + self_->ctx.mStartPos % self_->ctx.orgWo :
             self_->ctx.mAL0Iter * self_->ctx.conv3dTiling->mL0 +
             (self_->ctx.mStartPos + self_->ctx.mAL1Iter * self_->ctx.conv3dTiling->mAL1) % self_->ctx.orgWo;
-        KERNEL_LOG(KERNEL_DEBUG, 
+        KERNEL_LOG(KERNEL_DEBUG,
             "[LoadAL0] loadData3Dv2Params.channelSize %d, loadData3Dv2Params.kExtension %d, "
             "loadData3Dv2Params.kStartPt %d, loadData3Dv2Params.mExtension %d, loadData3Dv2Params.mStartPt %d.\n",
             loadData3Dv2Params.channelSize,

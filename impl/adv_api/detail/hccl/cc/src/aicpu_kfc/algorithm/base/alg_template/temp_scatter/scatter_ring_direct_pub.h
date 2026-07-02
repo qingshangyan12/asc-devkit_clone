@@ -35,7 +35,7 @@ private:
     HcclResult RunScatterOnOtherRank(const u32 stepsFromRank2Root, const u32 step, const Slice &txSlice,
                                      const Slice &rxSlice, const u32 rankSize);
     HcclResult RunScatterOnRootRank(const u32 step, const Slice &subSlice, const Slice &cclSlice, const u32 rank,
-                                    const u32 rankSize); 
+                                    const u32 rankSize);
     LINK leftLink_;
     LINK rightLink_;
 

@@ -33,7 +33,7 @@ reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存�
   __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ half*& dst_align32b, vector_half src, int32_t offset, vector_bool mask)
   __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ float*& dst_align32b, vector_float src, int32_t offset, vector_bool mask)
   __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ bfloat16_t*& dst_align32b, vector_bfloat16_t src, int32_t offset, vector_bool mask)
-  
+
   // FIRST搬出模式
   __simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__  int8_t*& dst_align32b, vector_int8_t src, int32_t offset)
   __simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__  uint8_t*& dst_align32b, vector_uint8_t src, int32_t offset)
@@ -44,7 +44,7 @@ reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存�
   __simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__  half*& dst_align32b, vector_half src, int32_t offset)
   __simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__  float*& dst_align32b, vector_float src, int32_t offset)
   __simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__  bfloat16_t*& dst_align32b, vector_bfloat16_t src, int32_t offset)
-  
+
   // PACK搬出模式
   __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__  int16_t*& dst_align32b, vector_int16_t src, int32_t offset, vector_bool mask)
   __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__  uint16_t*& dst_align32b, vector_uint16_t src, int32_t offset, vector_bool mask)
@@ -67,7 +67,7 @@ reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存�
   __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint32_t*& dst, vector_bool src, int32_t offset)
   __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint16_t*& dst, vector_bool src, int32_t offset)
   __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint8_t*& dst, vector_bool src, int32_t offset)
-  
+
   // PACK搬出模式
   __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint32_t*& dst, vector_bool src, int32_t offset)
   __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint16_t*& dst, vector_bool src, int32_t offset)

@@ -32,7 +32,7 @@ public:
     virtual HcclResult Config(const HcclDispatcher &dispatcher, const HcclRankLinkInfo &localRankInfo,
         const RankTable_t *rankTable, std::string identifier = "", bool isStandardCard = false,
         const std::unordered_set<u32>& enableP2PRankIds = {});
-    
+
     // 析构时要处理的逻辑
     virtual HcclResult DeInit();
 

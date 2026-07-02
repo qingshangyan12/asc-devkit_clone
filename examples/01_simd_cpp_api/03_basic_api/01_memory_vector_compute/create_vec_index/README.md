@@ -27,10 +27,10 @@
 
 ## 样例描述
 
-- 样例功能：  
+- 样例功能：
   本样例展示了使用CreateVecIndex API创建指定起始值的向量索引，用于生成连续的整数序列。CreateVecIndex API适用于需要生成序列索引的场景，例如为数组元素生成下标、创建步长序列、创建循环索引等。通过startIndex参数指定起始值，通过count参数指定生成的元素个数。所用API详细介绍请参考[CreateVecIndex API文档](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/API/ascendcopapi/atlasascendc_api_07_0090.html)。
 
-- 样例规格：  
+- 样例规格：
   <table border="2" align="center">
   <caption>表1：样例输入输出规格</caption>
   <tr><td rowspan="1" align="center">样例类型</td><td colspan="4" align="center">CreateVecIndex</td></tr>
@@ -43,34 +43,34 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">testCreateVecIndex</td></tr>
   </table>
 
-- 样例实现：  
+- 样例实现：
   本样例中实现的是固定shape为输出y[1,128]的CreateVecIndex样例，生成从0开始的128个连续整数索引（0, 1, 2, ..., 127）。
-  
+
   CreateVecIndex API参数说明：
   - dst：目的操作数，用于存储生成的索引向量
   - startIndex：索引的起始值，本样例中为0
   - count：参与计算的元素个数，本样例中为128
 
-  - Kernel实现  
+  - Kernel实现
     - 调用Duplicate接口，初始化UB（Unified Buffer）缓冲区为0
     - 调用CreateVecIndex接口，生成从0开始的连续索引向量
     - 调用DataCopy基础API，将结果从UB（Unified Buffer）搬运到GM（Global Memory）
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
-    
+
 - 样例执行
 
   在本样例目录下执行如下命令。
@@ -87,7 +87,7 @@
   ```
 
   使用CPU调试或NPU仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
-  
+
   示例如下：
   ```bash
   cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201;make -j; # CPU调试模式

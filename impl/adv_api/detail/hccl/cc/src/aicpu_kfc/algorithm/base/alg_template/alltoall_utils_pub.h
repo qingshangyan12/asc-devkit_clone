@@ -91,7 +91,7 @@ struct AlltoAllVBufferInfo{
             }
             return *this;
         }
-}; 
+};
 
 struct OneSendRecvAddrInfo{
     u64 localOffset;

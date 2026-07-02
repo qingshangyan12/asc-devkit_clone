@@ -22,10 +22,10 @@ A Matmul example with M/N-axis pipeline parallelism. This feature applies to sce
 │   └── README.md                           // Example description document
 ```
 ## Example Description
-- Example Function:  
+- Example Function:
   This example calls the Matmul high-level API to perform matrix multiplication and bias addition on the input A and B matrices. When defining the Matmul object, pass the MatmulConfig that configures parameters such as scheduleType as a template parameter to enable M/N-axis pipeline parallelism. This example uses the MDL template with N-direction pipeline parallelism. For the Norm template or M-direction pipeline parallelism, refer to this example for implementation.
 
-- Example Specifications:  
+- Example Specifications:
   In this example: M = 128, N = 7680, K = 16
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center">Matmul</td></tr>
@@ -59,12 +59,12 @@ A Matmul example with M/N-axis pipeline parallelism. This feature applies to sce
       cubeTiling.SetMatmulConfigParams(matmulConfigParams);
       ```
 
-- Invocation Implementation  
+- Invocation Implementation
   Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

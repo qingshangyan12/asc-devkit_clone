@@ -10,13 +10,13 @@
 #include "hccl_comm_pub.h"
 #include "hccl_communicator.h"
 #include "aicpu_indop_process.h"
- 
+
 namespace hccl {
 HcclResult hcclComm::RegistTaskAbortHandler() const
 {
     return HCCL_SUCCESS;
 }
- 
+
 HcclResult hcclComm::UnRegistTaskAbortHandler() const
 {
     return HCCL_SUCCESS;
@@ -183,4 +183,3 @@ HcclResult hcclComm::GetCommStatus(HcclCommStatus &status)
 }
 
 }  // namespace hccl
- 

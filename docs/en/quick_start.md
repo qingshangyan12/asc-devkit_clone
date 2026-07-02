@@ -165,7 +165,7 @@ Verify that the environment and driver are working properly:
     ```
 
 - **Check CANN package installation**:
-  
+
     ```bash
     # View version information provided by CANN package's version field (default path installation). For WebIDE scenario, replace /usr/local with /home/developer
     cat /usr/local/Ascend/cann/$(uname -m)-linux/ascend_toolkit_install.info

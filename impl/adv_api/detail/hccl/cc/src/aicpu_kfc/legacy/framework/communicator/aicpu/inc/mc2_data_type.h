@@ -12,9 +12,9 @@
 #include "hccl_types.h"
 
 enum HcclTaskStatus {
-    HCCL_NORMAL_STATUS, 
-    HCCL_CQE_ERROR, 
-    HCCL_END_STATUS 
+    HCCL_NORMAL_STATUS,
+    HCCL_CQE_ERROR,
+    HCCL_END_STATUS
 };
 
 struct HcclOpData {

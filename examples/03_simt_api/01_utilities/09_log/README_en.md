@@ -23,7 +23,7 @@ For more log function details, refer to: [Ascend Log Function Reference](https:/
 |   └── README.md
 ```
 
-## Example Description  
+## Example Description
 
 - Log Function Description:
   - **Log Screen Output**: Control whether logs are output to standard output (screen) through environment variables for real-time viewing
@@ -40,13 +40,13 @@ For more log function details, refer to: [Ascend Log Function Reference](https:/
   | 3 | ERROR | Output only ERROR level logs |
   | 4 | NULL | Do not output logs |
 
-- Example Implementation:  
+- Example Implementation:
   This example demonstrates the complete flow of Kernel-side exception throwing and Host-side error catching by constructing an exception scenario:
 
-  - Kernel Implementation  
+  - Kernel Implementation
     Use standard C `assert` assertions in the Kernel function. When the condition is not met, a device-side exception is triggered. To avoid all threads printing repeatedly, typically only `thread 0` triggers the assertion.
 
-  - Host Implementation  
+  - Host Implementation
     After Kernel execution, the Host side uses the `ASCENDC_CHECK` macro to catch and print error information. `ASCENDC_CHECK` is a utility macro for catching and printing ACL errors, defined as follows:
 
     ```c
@@ -71,7 +71,7 @@ For more log function details, refer to: [Ascend Log Function Reference](https:/
 
 Run the following steps in the root directory of this example to build and execute the operator.
 
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -118,7 +118,7 @@ Run the following steps in the root directory of this example to build and execu
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
 
-- Execution Result (using non-screen-output mode as an example; for file storage details, refer to [Ascend Log Function Reference](https://hiascend.com/document/redirect/CannCommunitylogref))  
+- Execution Result (using non-screen-output mode as an example; for file storage details, refer to [Ascend Log Function Reference](https://hiascend.com/document/redirect/CannCommunitylogref))
   After execution, the following information is printed:
   ```bash
   [INFO] Input shape: 12288

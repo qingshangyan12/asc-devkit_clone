@@ -23,7 +23,7 @@
 |   └── README.md
 ```
 
-## 样例描述  
+## 样例描述
 
 - 日志功能说明：
   - **日志打屏**：通过环境变量控制日志是否输出到标准输出（屏幕），便于实时查看
@@ -40,13 +40,13 @@
   | 3 | ERROR | 仅输出ERROR级别日志 |
   | 4 | NULL | 不输出日志 |
 
-- 样例实现：  
+- 样例实现：
   本样例通过构造异常场景，演示Kernel侧异常抛出与Host侧错误捕获的完整流程：
 
-  - Kernel实现  
+  - Kernel实现
     在Kernel函数中使用标准C `assert` 断言，当条件不满足时触发设备侧异常。为避免所有线程重复打印，通常仅由 `thread 0` 触发断言。
 
-  - Host实现  
+  - Host实现
     Kernel执行后，Host侧通过 `ASCENDC_CHECK` 宏捕获并打印错误信息。`ASCENDC_CHECK` 是用于捕获并打印ACL错误的工具宏，定义如下：
 
     ```c
@@ -71,7 +71,7 @@
 
 在本样例根目录下执行如下步骤，编译并执行算子。
 
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -118,7 +118,7 @@
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
 
-- 执行结果（以非打屏模式下为例，落盘文件详情可参考[Ascend 日志功能参考](https://hiascend.com/document/redirect/CannCommunitylogref)）  
+- 执行结果（以非打屏模式下为例，落盘文件详情可参考[Ascend 日志功能参考](https://hiascend.com/document/redirect/CannCommunitylogref)）
   执行后会打印类似以下信息：
   ```bash
   [INFO] Input shape: 12288

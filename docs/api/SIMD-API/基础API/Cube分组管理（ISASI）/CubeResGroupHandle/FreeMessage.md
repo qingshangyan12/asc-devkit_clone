@@ -54,8 +54,8 @@
 ## 函数原型<a name="section765814724715"></a>
 
 ```
-__aicore__ inline uint16_t FreeMessage(__gm__ CubeMsgType *msg);     
-__aicore__ inline uint16_t FreeMessage(__gm__ CubeMsgType *msg, CubeMsgState waitState);   
+__aicore__ inline uint16_t FreeMessage(__gm__ CubeMsgType *msg);
+__aicore__ inline uint16_t FreeMessage(__gm__ CubeMsgType *msg, CubeMsgState waitState);
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001526206862_section129451113125413"></a>

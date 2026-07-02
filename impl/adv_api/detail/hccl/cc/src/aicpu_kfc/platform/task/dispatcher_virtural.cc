@@ -7,16 +7,16 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
- 
+
 #include "dispatcher_virtural.h"
 #include "externalinput_pub.h"
 #include "hccl_tbe_task.h"
- 
+
 namespace hccl {
 DispatcherVirtural::DispatcherVirtural(const s32 deviceLogicId)
     : DispatcherPub(deviceLogicId)
 {}
- 
+
 DispatcherVirtural::~DispatcherVirtural() {}
 
 HcclResult DispatcherVirtural::Init()
@@ -47,10 +47,10 @@ HcclResult DispatcherVirtural::SignalRecord(HcclRtNotify signal, Stream &stream,
     TaskLogicInfo info(0, TaskLogicType::DISPATCHER_TYPE, TaskLogicFuncType::DISPATCHER_SIGNALRECORD_TYPE,
         signal, userRank, offset, stage);
     stream.PushTaskLogicInfo(info);
- 
+
     return HCCL_SUCCESS;
 }
- 
+
 HcclResult DispatcherVirtural::SignalWait(HcclRtNotify signal, Stream &stream, u32 userRank, u32 remoteUserRank,
     s32 stage, bool inchip, u32 notifyId, u32 timeOut)
 {
@@ -59,7 +59,7 @@ HcclResult DispatcherVirtural::SignalWait(HcclRtNotify signal, Stream &stream, u
     stream.PushTaskLogicInfo(info);
     return HCCL_SUCCESS;
 }
- 
+
 HcclResult DispatcherVirtural::MemcpyAsync(hccl::DeviceMem &dst, const hccl::DeviceMem &src, hccl::Stream &stream,
     u32 remoteUserRank, hccl::LinkType inLinkType)
 {
@@ -72,7 +72,7 @@ HcclResult DispatcherVirtural::MemcpyAsync(hccl::DeviceMem &dst, const hccl::Dev
 
     TaskLogicInfo info(0, TaskLogicType::DISPATCHER_TYPE, TaskLogicFuncType::DISPATCHER_MEMCPYASYNC_TYPE, dst.ptr(),
         dst.size(), src.ptr(), src.size(), HcclRtMemcpyKind::HCCL_RT_MEMCPY_KIND_DEVICE_TO_DEVICE);
- 
+
     stream.PushTaskLogicInfo(info);
     return HCCL_SUCCESS;
 }

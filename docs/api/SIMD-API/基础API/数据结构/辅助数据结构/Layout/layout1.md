@@ -78,6 +78,6 @@ AscendC::Stride<int,int,int> stride = AscendC::MakeStride(1, 100, 200);
 
 AscendC::Layout<AscendC::Shape<int, int, int>, AscendC::Stride<int, int, int>> layoutInit(shape, stride);
 
-// 使用layout函数获取实例化对象 
+// 使用layout函数获取实例化对象
 constexpr auto& layout = layoutInit.layout();
 ```

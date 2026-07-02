@@ -56,20 +56,20 @@ HcclResult CollAlltoAllSingleRankExecutor::KernelRun(const OpParam &param, ExecM
     HcclOpMetaInfo opMeta ;
     if (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL || param.opType == HcclCMDType::HCCL_CMD_ALLTOALLVC){
         sendCount = *(static_cast<u64 *>(param.All2AllDataDes.sendCountMatrix));
-        totalSize = sendCount * unitSize ; 
-        opMeta = HcclOpMetaInfo::GetOneForAllToAllVC(copyPattern, totalSize, totalSize > SDMA_SEND_MAX_SIZE); 
+        totalSize = sendCount * unitSize ;
+        opMeta = HcclOpMetaInfo::GetOneForAllToAllVC(copyPattern, totalSize, totalSize > SDMA_SEND_MAX_SIZE);
     } else {
         sendCount = *(static_cast<u64 *>(param.All2AllDataDes.sendCounts))  ;
-        totalSize = sendCount * unitSize ; 
-        opMeta = HcclOpMetaInfo::GetOneForAllToAllVC(copyPattern, totalSize, totalSize > SDMA_SEND_MAX_SIZE); 
+        totalSize = sendCount * unitSize ;
+        opMeta = HcclOpMetaInfo::GetOneForAllToAllVC(copyPattern, totalSize, totalSize > SDMA_SEND_MAX_SIZE);
     }
     CHK_RET(InitTask(dispatcher_, const_cast<Stream&>(param.stream), opMeta.isEnableCache, opMeta.GetCacheKey()));
-    
+
     if (execMem.inputPtr != execMem.outputPtr) {
         DeviceMem srcMem(execMem.inputPtr, totalSize);
         DeviceMem dstMem(execMem.outputPtr, totalSize);
         CHK_RET(HcclD2DMemcpyAsync(dispatcher_, dstMem, srcMem, const_cast<Stream&>(param.stream)));
-    } 
+    }
     CHK_RET(LaunchTaskExtend(dispatcher_, const_cast<Stream&>(param.stream), algResResp_->slaveStreams));
     return HCCL_SUCCESS;
 }

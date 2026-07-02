@@ -264,7 +264,7 @@ public:
 
     void SetHcclQos(u32 hcclQos);
  	void SetMpamid(u32 mPamid);
- 	 
+
  	uint32_t GetHcclQos()
  	{
  	    return hcclQos_;

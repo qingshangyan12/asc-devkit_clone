@@ -27,7 +27,7 @@ AHCCommCalcFuncRegistry &AHCCommCalcFuncRegistry::Instance()
     static AHCCommCalcFuncRegistry globalAlgTemplateRegistry;
     return globalAlgTemplateRegistry;
 }
- 
+
 HcclResult AHCCommCalcFuncRegistry::Register(AHCTemplateType type, AHCCommCalcFuncPtr funPtr)
 {
     if (type >= AHCTemplateType::AHC_TEMPLATE_RESERVED) {
@@ -43,7 +43,7 @@ HcclResult AHCCommCalcFuncRegistry::Register(AHCTemplateType type, AHCCommCalcFu
     commCalcFuncCreators_[static_cast<u32>(type)] = funPtr;
     return HcclResult::HCCL_SUCCESS;
 }
- 
+
 AHCCommCalcFuncPtr AHCCommCalcFuncRegistry::GetCommCalcFunction(AHCTemplateType type)
 {
     if ( type >= AHCTemplateType::AHC_TEMPLATE_RESERVED) {
@@ -124,7 +124,7 @@ HcclResult CommAHCBaseInfo::DisposeSubGroups(const u32 rank, const std::vector<s
     }
     return HCCL_SUCCESS;
 }
- 
+
 HcclResult CommAHCBaseInfo::DisposeSubGroups(const u32 rank, const std::vector<std::vector<std::vector<u32>>> &globalSubGroups,
     std::vector<std::vector<u32>> &level0SubGroups, std::vector<std::vector<u32>> &level1SubGroups,
     u64 &globalTotalSliceSegment, u32 &rankSizeLevel0)
@@ -191,7 +191,7 @@ HcclResult CommAHCBaseInfo::SetIsAlignBound(bool isAlignBound)
     HCCL_DEBUG("[CommAHCBaseInfo][SetIsAlignBound] isAlignBound_ set [%d].", isAlignBound_);
     return HCCL_SUCCESS;
 }
- 
+
 HcclResult CommAHCBaseInfo::SetGlobalTotalSliceSegment(u64 globalTotalSliceSegment)
 {
     (void) globalTotalSliceSegment;
@@ -201,7 +201,7 @@ HcclResult CommAHCBaseInfo::SetGlobalTotalSliceSegment(u64 globalTotalSliceSegme
 HcclResult CommAHCBaseInfo::ParseInputSlice(const std::vector<Slice> &physicalSlices)
 {
     totalSize_ = 0;
-    
+
     for (u32 i = 0; i < physicalSlices.size(); i++) {
         HCCL_DEBUG("[CommAHCBaseInfo][ParseInputSlice] physicalSlices index[%u] offset[%llu] size[%llu]",
             i, physicalSlices[i].offset, physicalSlices[i].size);
@@ -227,9 +227,9 @@ HcclResult CommAHCBaseInfo::TrasLogicSliceToPhysical(std::vector<Slice> &slices,
 
         for (u32 j = 0; j < physicalSlices.size(); j++) {
             bool startOffsetInRange = ((slices[i].offset >= logicOffset) && (slices[i].offset <= (logicOffset + physicalSlices[j].size - 1)));
-            bool endOffsetInRange = (((slices[i].offset + slices[i].size - 1) >= logicOffset) && 
+            bool endOffsetInRange = (((slices[i].offset + slices[i].size - 1) >= logicOffset) &&
                 ((slices[i].offset + slices[i].size - 1) <= (logicOffset + physicalSlices[j].size - 1)));
-            
+
             if (isContinusSlice_ && startOffsetInRange) { //连续silie，检查逻辑slice起始边界在物理slice范围,则正常翻译
                 translateSuccess = true;
                 HCCL_DEBUG("[CommAHCBaseInfo][TrasLogicSliceToPhysical] translate  to continuous slice offset[%llu] size[%llu] in physical slice offset[%llu] size[%llu]",
@@ -251,7 +251,7 @@ HcclResult CommAHCBaseInfo::TrasLogicSliceToPhysical(std::vector<Slice> &slices,
             logicOffset = logicOffset + physicalSlices[j].size;
         }
 
-        //检查翻译结果 
+        //检查翻译结果
         if (slices[i].size == 0) {
             // 0 切片特殊处理
             slices[i].offset = logicOffset;
@@ -264,14 +264,14 @@ HcclResult CommAHCBaseInfo::TrasLogicSliceToPhysical(std::vector<Slice> &slices,
 
     return HCCL_SUCCESS;
 }
- 
+
 HcclResult CommAHCBaseInfo::CheckGlobalGroups(std::vector<std::vector<std::vector<u32>>> &globalSubGroups)
 {
     if (globalSubGroups.size() == 0) {
         HCCL_ERROR("[CommAHCBaseInfo][globalSubGroups] globalSubGroups.size() == 0, globalSubGroups init ERROR");
         return HCCL_E_PARA;
     }
- 
+
     for (u32 i = 0; i < globalSubGroups.size(); i++) {
         CHK_RET(CheckSubGroups(globalSubGroups[i]));
     }
@@ -289,7 +289,7 @@ HcclResult CommAHCBaseInfo::CheckSubGroups(std::vector<std::vector<u32>> &subGro
         if (subGroups[i].size() == 0) {
             HCCL_ERROR("[CommAHCBaseInfo][CheckSubGroups] subGroups[%u].size() == 0, subGroups[] init ERROR", i);
             return HCCL_E_PARA;
-        }        
+        }
         for (u32 j = 0; j < subGroups[i].size(); j++){
             HCCL_DEBUG("[CommAHCBaseInfo][CheckSubGroups] subGroups[%u][%u] = %u", i, j, subGroups[i][j]);
         }
@@ -332,7 +332,7 @@ HcclResult CommAHCBaseInfo::CalcDstRanks(u32 rank, std::set<u32> &dstRanks, AHCL
     //组内和组间通信域计算
     std::vector<u32> intraCommGroup;
     std::vector<u32> interCommGroupIdxList;
- 
+
     GetIntraCommGroup(rank, intraCommGroup);
     GetInterCommGroupIdxList(rank, interCommGroupIdxList);
     for (u32 i = 0; i < intraCommGroup.size(); i++) {
@@ -344,7 +344,7 @@ HcclResult CommAHCBaseInfo::CalcDstRanks(u32 rank, std::set<u32> &dstRanks, AHCL
                 rank, interCommGroupIdxList[i], j, logicCardCommGroups_[interCommGroupIdxList[i]][j]);
         }
     }
- 
+
     //组内通信关系计算
     AHCConcOpType concOpType;
     concOpType.ahcLevel = ahcLevel;
@@ -354,7 +354,7 @@ HcclResult CommAHCBaseInfo::CalcDstRanks(u32 rank, std::set<u32> &dstRanks, AHCL
     TemplateType algType = ahcAlgOption_[concOpType];
     HCCL_DEBUG("[CommAHCBaseInfo][CalcDstRanks] Level[%u] ConcType[%u] choose algType[%u]",
             ahcLevel, ConcType::CONC_INTRA, algType);
- 
+
     auto iterAHCCaclTemplateType = templateToAHCCalcTemplateMap.find(algType);
     if (iterAHCCaclTemplateType == templateToAHCCalcTemplateMap.end()) {
         HCCL_ERROR("[CommAHCBaseInfo][CalcDstRanks] intra algo type[%u] is invalid, is not register.", algType);
@@ -365,12 +365,12 @@ HcclResult CommAHCBaseInfo::CalcDstRanks(u32 rank, std::set<u32> &dstRanks, AHCL
     CHK_PTR_NULL(intraFunctionPtr);
     intraFunctionPtr(GetIntraRank(rank), intraCommGroup, dstRanks);
 
-    //组间通信关系计算 
+    //组间通信关系计算
     concOpType.concType = ConcType::CONC_INTER;
     algType = ahcAlgOption_[concOpType];
     HCCL_DEBUG("[CommAHCBaseInfo][CalcDstRanks] Level[%u] ConcType[%u] choose algType[%u]",
             ahcLevel, ConcType::CONC_INTER, algType);
- 
+
     iterAHCCaclTemplateType = templateToAHCCalcTemplateMap.find(algType);
     if (iterAHCCaclTemplateType == templateToAHCCalcTemplateMap.end()) {
         HCCL_ERROR("[CommAHCBaseInfo][CalcDstRanks] inter algo type[%u] is invalid, is not register.", algType);
@@ -382,7 +382,7 @@ HcclResult CommAHCBaseInfo::CalcDstRanks(u32 rank, std::set<u32> &dstRanks, AHCL
     for (u32 i = 0; i < interCommGroupIdxList.size(); ++i) {
         interFunctionPtr(GetInterRank(interCommGroupIdxList[i], rank), logicCardCommGroups_[interCommGroupIdxList[i]], dstRanks);
     }
- 
+
     return HCCL_SUCCESS;
 }
 
@@ -391,7 +391,7 @@ HcclResult CommAHCBaseInfo::GetNslbDstRanks(u32 rank, std::vector<u32> &dstRanks
     HCCL_DEBUG("[NSLB-AHC] entry GetNslbDstRanks rank[%u]", rank);
     std::vector<u32> intraCommGroup;
     std::vector<u32> interCommGroupIdxList;
- 
+
     GetIntraCommGroup(rank, intraCommGroup);
     GetInterCommGroupIdxList(rank, interCommGroupIdxList);
 
@@ -414,7 +414,7 @@ HcclResult CommAHCBaseInfo::GetNslbDstRanks(u32 rank, std::vector<u32> &dstRanks
         AHCTemplateType type = iterAHCCaclTemplateType->second;
         GetDstRanksByType(type, GetInterRank(interCommGroupIdxList[i], rank), logicCardCommGroups_[interCommGroupIdxList[i]], dstRanks);
     }
- 
+
     return HCCL_SUCCESS;
 }
 
@@ -438,14 +438,14 @@ u32 CommAHCBaseInfo::GetInterRank(const u32 groupIdx, const u32 rank)
     HCCL_DEBUG("[CommAHCBaseInfo][GetInterRank] rank[%u] group[%u] interRank[%u]", rank, groupIdx, interRank);
     return interRank;
 }
- 
+
 u32 CommAHCBaseInfo::GetCommRank(const u32 rank)
 {
     return rankCommMap_[rank];
 }
- 
+
 HcclResult CommAHCBaseInfo::CalcIntraSlicesAndLinks(const u32 rank, const u32 dataUnitSize, const u64 count,
-        const std::vector<LINK> &links, std::vector<std::vector<LINK>> &intraLinksVector, 
+        const std::vector<LINK> &links, std::vector<std::vector<LINK>> &intraLinksVector,
         std::vector<std::vector<Slice>> &intraSlicesVector)
 {
     (void)rank;
@@ -507,7 +507,7 @@ HcclResult CommAHCBaseInfo::GetAlgTemplateOpInstance(const AHCOpType opType, std
     ahcConcOpType.ahcOpType = opType;
 
     TemplateType algType = ahcAlgOption_[ahcConcOpType];
- 
+
     HCCL_DEBUG("[CommAHCBaseInfo][GetAlgTemplateOpInstance] Level[%u] ConcType[%u] choose algType[%u]",
             ahcLevel, concType, algType);
 
@@ -524,12 +524,12 @@ HcclResult CommAHCBaseInfo::GetAlgTemplateOpInstance(const AHCOpType opType, std
         }
     }
 
-    //AHC 扩展属性传递    
+    //AHC 扩展属性传递
     if (extendFlag) {
         CHK_RET(tempAlg->Prepare(extendPara));
     }
 
-    return HCCL_SUCCESS;    
+    return HCCL_SUCCESS;
 }
 
 bool CommAHCBaseInfo::IsNeedInterProc(const u32 rank)
@@ -554,7 +554,7 @@ HcclResult CommBrokeAlignInfo::Init(AHCOpType opType, std::map<AHCConcOpType, Te
     // 参数检查
     opType_ = opType;
     CHK_RET(CheckSubGroups(subGroups_));
- 
+
     //初始化broke 对齐的组间通信域相关信息
     for (u32 i = 0; i < subGroups_[minSubGroupIdx_].size(); ++i) {
         std::map<u32, u32> interRankOrder;
@@ -566,7 +566,7 @@ HcclResult CommBrokeAlignInfo::Init(AHCOpType opType, std::map<AHCConcOpType, Te
         interRankList_.push_back(interRankOrder);
         logicCardCommGroups_.push_back(logicGroup);
     }
- 
+
     // Reduce-Scatter 及 All-Gather 增加建链信息
     if (opType_ != AHCOpType::AHC_OP_TYPE_ALLREDUCE) {
         // 生成 broke中Reduce-scatter的执行顺序及通信关系分组
@@ -599,7 +599,7 @@ HcclResult CommBrokeAlignInfo::Init(AHCOpType opType, std::map<AHCConcOpType, Te
             emptyGroupOrder_.insert(std::make_pair(i, tmpEmptyGroupOrder));
         }
     }
- 
+
     return HCCL_SUCCESS;
 }
 
@@ -616,11 +616,11 @@ bool CommBrokeAlignInfo::IsNeedInterProc(const u32 rank)
 
 // Reduce-Scatter 及 All-Gather 组内切片逻辑
 HcclResult CommBrokeAlignInfo::CalcIntraSlicesAndLinks(const u32 rank, const u32 dataUnitSize, const u64 count,
-        const std::vector<LINK> &links, std::vector<std::vector<LINK>> &intraLinksVector, 
+        const std::vector<LINK> &links, std::vector<std::vector<LINK>> &intraLinksVector,
         std::vector<std::vector<Slice>> &intraSlicesVector)
 {
     HCCL_DEBUG("[CommBrokeAlignInfo][CalcIntraSlicesAndLinks] begin calc intra slices and links rank[%u]", rank);
- 
+
     u64 sliceSizeAligned = totalSize_ / rankSize_;
     u64 curoffset = 0;
 
@@ -662,11 +662,11 @@ HcclResult CommBrokeAlignInfo::CalcIntraSlicesAndLinks(const u32 rank, const u32
         intraLinksVector.push_back(intraLinks);
         intraSlicesVector.push_back(intraSlices);
     }
- 
+
     HCCL_DEBUG("[CommBrokeAlignInfo][CalcIntraSlicesAndLinks] end calc intra slices and links rank[%u]", rank);
     return HCCL_SUCCESS;
 }
- 
+
 // All-Reduce 组内切片逻辑
 HcclResult CommBrokeAlignInfo::CalcIntraSlicesAndLinks(const u32 rank, const u32 dataUnitSize, const u64 count,
         const std::vector<LINK> &links, std::vector<LINK> &intraLinks, std::vector<Slice> &intraSlices)
@@ -731,7 +731,7 @@ HcclResult CommBrokeAlignInfo::CalcInterSlicesAndLinks(const u32 rank, const u32
     }
     return ret;
 }
- 
+
 HcclResult CommBrokeAlignInfo::PrepareIntraSlices(const u32 rank, const u32 dataUnitSize, const u64 count,
         std::vector<Slice> &intraSlices) const
 {
@@ -740,10 +740,10 @@ HcclResult CommBrokeAlignInfo::PrepareIntraSlices(const u32 rank, const u32 data
 
     // 计算组内每个rank结果上的offset和size
     HCCL_DEBUG("[CommBrokeAlignInfo][PrepareIntraSlices] begin calc intra slices and links rank[%u] ranksize[%u]", rank, rankSize_);
- 
+
     u64 sliceSizeAligned = totalSize_ / rankSize_;
     u64 curoffset = 0;
- 
+
     for (u32 i = 0; i < rankSize_; ++i) {
         Slice slice;
         slice.size = sliceSizeAligned;
@@ -756,13 +756,13 @@ HcclResult CommBrokeAlignInfo::PrepareIntraSlices(const u32 rank, const u32 data
     HCCL_DEBUG("[CommBrokeAlignInfo][PrepareIntraSlices] end calc intra slices and links rank[%u]", rank);
     return HCCL_SUCCESS;
 }
- 
+
 HcclResult CommBrokeAlignInfo::CalcInterSlicesAndLinksForRS(const u32 rank, const u32 dataUnitSize, const u64 count,
         const std::vector<LINK> &links, std::vector<std::vector<LINK>> &interLinksVector,
         std::vector<std::vector<Slice>> &interSlicesVector, std::vector<u32> &logicCardList)
 {
     std::vector<Slice> intraSlices;
-    
+
     CHK_RET(PrepareIntraSlices(rank, dataUnitSize, count, intraSlices));
     HCCL_DEBUG("[CommBrokeAlignInfo][CalcInterSlicesAndLinksForRS] rank[%u] begin inter", rank);
     u32 intraRank = GetIntraRank(rank);
@@ -770,7 +770,7 @@ HcclResult CommBrokeAlignInfo::CalcInterSlicesAndLinksForRS(const u32 rank, cons
     if (subGroups_[maxSubGroupIdx_].size() % subGroups_[rankGroupMap_[rank]].size() > intraRank) {
         groupCountForRank++;
     }
- 
+
     for (u32 k = 0; k < groupCountForRank; ++k) {
         std::vector<Slice> interSlices;
         std::vector<LINK> interLinks;
@@ -807,7 +807,7 @@ HcclResult CommBrokeAlignInfo::CalcInterSlicesAndLinksForRS(const u32 rank, cons
         interLinksVector.push_back(interLinks);
         interSlicesVector.push_back(interSlices);
     }
- 
+
     HCCL_DEBUG("[CommBrokeAlignInfo][CalcInterSlicesAndLinksForRS] rank[%u] end inter", rank);
     return HCCL_SUCCESS;
 }
@@ -868,7 +868,7 @@ CommAHCAlignInfo::~CommAHCAlignInfo()
 HcclResult CommAHCAlignInfo::Init(AHCOpType opType, std::map<AHCConcOpType, TemplateType> &ahcAlgOption)
 {
     ahcAlgOption_= ahcAlgOption;
-    
+
     // 参数检查
     opType_ = opType;
     CHK_RET(CheckSubGroups(subGroups_));
@@ -880,7 +880,7 @@ HcclResult CommAHCAlignInfo::Init(AHCOpType opType, std::map<AHCConcOpType, Temp
     InitLogicCardInfo();
 
     //初始化相关Map信息
-    CHK_RET(InitMapInfo());    
+    CHK_RET(InitMapInfo());
 
     return HCCL_SUCCESS;
 }
@@ -921,7 +921,7 @@ HcclResult CommAHCAlignInfo::InitSliceInfo()
     }
 
     CHK_PRT_RET(logicCardSliceSize_.size() !=(logicCardSliceOffset_.size() - 1),
-        HCCL_ERROR("[CommAHCAlignInfo][InitSliceInfo] cardOffset size [%u]  cardSize size [%u] check error", 
+        HCCL_ERROR("[CommAHCAlignInfo][InitSliceInfo] cardOffset size [%u]  cardSize size [%u] check error",
         logicCardSliceSize_.size(),logicCardSliceOffset_.size() ), HCCL_E_INTERNAL);
 
     return HCCL_SUCCESS;
@@ -1044,15 +1044,15 @@ HcclResult CommAHCAlignInfo::SliceSizeAlignBound(Slice &slice, u64 offsetCount, 
     curOffset = curOffset + offsetCount;
     return HCCL_SUCCESS;
 }
- 
+
 // Reduce-Scatter 及 All-Gather 组内切片逻辑
 HcclResult CommAHCAlignInfo::CalcIntraSlicesAndLinks(const u32 rank, const u32 dataUnitSize, const u64 count,
-        const std::vector<LINK> &links, std::vector<std::vector<LINK>> &intraLinksVector, 
+        const std::vector<LINK> &links, std::vector<std::vector<LINK>> &intraLinksVector,
         std::vector<std::vector<Slice>> &intraSlicesVector)
 {
     // Boundary 指在 RS 及 AG 中单卡应有的数据量的 offset， 如八卡跑8K，boundary 为 1024
     HCCL_DEBUG("[CommAHCAlignInfo][CalcIntraSlicesAndLinks] begin calc intra slices and links rank[%u]", rank);
- 
+
     u32 singleRankOffset = globalTotalSliceSegment_ / rankSize_; // 每个 rank 最后结果应有的小块数据份数
     u64 sliceSizeCalculated = (totalSize_ / dataUnitSize + globalTotalSliceSegment_ - 1)
         / globalTotalSliceSegment_ * dataUnitSize * (globalTotalSliceSegment_ / rankSize_ / totalSliceSegment_);
@@ -1060,7 +1060,7 @@ HcclResult CommAHCAlignInfo::CalcIntraSlicesAndLinks(const u32 rank, const u32 d
     u64 residueSize = totalSize;
     HCCL_DEBUG("[CommAHCAlignInfo][AHCDEBUG] count[%u] ranksize[%u] sliceSizeCalculated[%u] totalSize[%u] globalTotalSliceSegment[%u] totalSliceSegment[%u] dataUnitSize[%u]",
             count, rankSize_, sliceSizeCalculated, totalSize, globalTotalSliceSegment_, totalSliceSegment_, dataUnitSize);
- 
+
     u32 curOffset = 0;
     for (u32 k = 0; k < subGroups_.size(); ++k) {
         std::vector<Slice> intraSlices;
@@ -1093,11 +1093,11 @@ HcclResult CommAHCAlignInfo::CalcIntraSlicesAndLinks(const u32 rank, const u32 d
         intraLinksVector.push_back(intraLinks);
         intraSlicesVector.push_back(intraSlices);
     }
- 
+
     HCCL_DEBUG("[CommAHCAlignInfo][CalcIntraSlicesAndLinks] end calc intra slices and links rank[%u]", rank);
     return HCCL_SUCCESS;
 }
- 
+
 // All-Reduce 组内切片逻辑
 HcclResult CommAHCAlignInfo::CalcIntraSlicesAndLinks(const u32 rank, const u32 dataUnitSize, const u64 count,
         const std::vector<LINK> &links, std::vector<LINK> &intraLinks, std::vector<Slice> &intraSlices)
@@ -1116,7 +1116,7 @@ HcclResult CommAHCAlignInfo::CalcIntraSlicesAndLinks(const u32 rank, const u32 d
     } else {
         sliceSizeAligned = AlgTemplateBase::RoundUpWithDivisor(sliceSizeCalculated, sizeAlignedMinSize);
     }
-    sliceSizeAligned = sliceSizeAligned * static_cast<u32>(subGroups_.size()) * 
+    sliceSizeAligned = sliceSizeAligned * static_cast<u32>(subGroups_.size()) *
         (totalSliceSegment_ / static_cast<u32>(subGroups_[rankGroupMap_[rank]].size()));
 
     for (u32 i = 0; i < subGroups_[rankGroupMap_[rank]].size(); ++i) {
@@ -1133,7 +1133,7 @@ HcclResult CommAHCAlignInfo::CalcIntraSlicesAndLinks(const u32 rank, const u32 d
     HCCL_DEBUG("[CommAHCAlignInfo][CalcIntraSlicesAndLinks] end calc intra slices and links rank[%u]", rank);
     return HCCL_SUCCESS;
 }
- 
+
 // 组间切片逻辑统一对外接口
 HcclResult CommAHCAlignInfo::CalcInterSlicesAndLinks(const u32 rank, const u32 dataUnitSize, const u64 count,
         const std::vector<LINK> &links, std::vector<std::vector<LINK>> &interLinksVector,
@@ -1159,13 +1159,13 @@ HcclResult CommAHCAlignInfo::CalcInterSlicesAndLinks(const u32 rank, const u32 d
     }
     return ret;
 }
- 
+
 HcclResult CommAHCAlignInfo::PrepareIntraSlices(const u32 rank, const u32 dataUnitSize, const u64 count,
         std::vector<std::vector<Slice>> &intraSlicesVector)
 {
     // 计算组内每个rank结果上的offset和size
     HCCL_DEBUG("[CommAHCAlignInfo][PrepareIntraSlices] begin calc intra slices and links rank[%u]", rank);
- 
+
     u32 singleRankOffset = globalTotalSliceSegment_ / rankSize_;
     u64 sliceSizeCalculated = (totalSize_ / dataUnitSize + globalTotalSliceSegment_ - 1)
         / globalTotalSliceSegment_ * dataUnitSize * (globalTotalSliceSegment_ / rankSize_ / totalSliceSegment_);
@@ -1173,12 +1173,12 @@ HcclResult CommAHCAlignInfo::PrepareIntraSlices(const u32 rank, const u32 dataUn
     u64 residueSize = totalSize;
     HCCL_DEBUG("[CommAHCAlignInfo][AHCDEBUG] count[%u] ranksize[%u] sliceSizeCalculated[%u] totalSize[%u]",
             count, rankSize_, sliceSizeCalculated, totalSize);
- 
+
     for (u32 i = 0; i < logicCardCommGroups_.size(); ++i) {
         std::vector<Slice> intraSlices;
         intraSlicesVector.push_back(intraSlices);
     }
- 
+
     u32 curOffset = 0;
     for (u32 i = 0; i < subGroups_.size(); i++) {
         for (u32 j = 0; j < logicCardCommGroups_.size(); ++j) {
@@ -1203,17 +1203,17 @@ HcclResult CommAHCAlignInfo::PrepareIntraSlices(const u32 rank, const u32 dataUn
     HCCL_DEBUG("[CommAHCAlignInfo][PrepareIntraSlices] end calc intra slices and links rank[%u]", rank);
     return HCCL_SUCCESS;
 }
- 
+
 HcclResult CommAHCAlignInfo::CalcInterSlicesAndLinksForRS(const u32 rank, const u32 dataUnitSize, const u64 count,
         const std::vector<LINK> &links, std::vector<std::vector<LINK>> &interLinksVector,
         std::vector<std::vector<Slice>> &interSlicesVector, std::vector<u32> &logicCardList)
 {
     HCCL_DEBUG("[CommAHCAlignInfo][CalcInterSlicesAndLinksForRS] begin calc inter slices and links rank[%u]", rank);
     std::vector<std::vector<Slice>> intraSlicesVecotr;
-    
+
     CHK_RET(PrepareIntraSlices(rank, dataUnitSize, count, intraSlicesVecotr));
     GetLogicCardExecuteOrder(rank, logicCardList);
- 
+
     for (u32 i = 0; i < logicCardList.size(); i++) {
         u32 logicGroupIdx = logicCardList[i]; // 获取当前处理的目标逻辑同号卡组的下标
         std::vector<Slice> curIntraSliceVector = intraSlicesVecotr[logicGroupIdx];
@@ -1263,15 +1263,15 @@ HcclResult CommAHCAlignInfo::PreparePartialLogicSlices(const Slice &intraSlice, 
         // 计算当前逻辑同号组的offset大小
         u32 offsetDiff = logicCardSliceOffset_[logicRank + 1] - logicCardSliceOffset_[logicRank];
         HCCL_DEBUG("[CommAHCAlignInfo][CalcInterSlicesAndLinks] logicGroupSlice begin, logicRank : [%u]," \
-            "offsetDiff : [%u], offset_next : [%u], offset_cur[%u]", logicRank, offsetDiff, 
+            "offsetDiff : [%u], offset_next : [%u], offset_cur[%u]", logicRank, offsetDiff,
             logicCardSliceOffset_[logicRank + 1], logicCardSliceOffset_[logicRank]);
 
         // 当前rank在组内对应的offset能获取到完全的数据，即前几个逻辑同号卡
-        if ((logicCardSliceOffset_[logicRank + 1] - originOffset) <= intraSlice.size / sliceSizeAligned) { 
+        if ((logicCardSliceOffset_[logicRank + 1] - originOffset) <= intraSlice.size / sliceSizeAligned) {
             logicSlice.size = sliceSizeAligned * offsetDiff;
             logicSlice.offset = intraSlice.offset + sliceSizeAligned * (logicCardSliceOffset_[logicRank] - originOffset);
         // 当前rank在组内对应的offset能获取到部分的数据，即边界上的逻辑同号卡
-        } else if ((logicCardSliceOffset_[logicRank] - originOffset) <= intraSlice.size / sliceSizeAligned){ 
+        } else if ((logicCardSliceOffset_[logicRank] - originOffset) <= intraSlice.size / sliceSizeAligned){
             logicSlice.size = intraSlice.size - (logicCardSliceOffset_[logicRank] - originOffset) * sliceSizeAligned;
             logicSlice.offset = intraSlice.offset + sliceSizeAligned * (logicCardSliceOffset_[logicRank] - originOffset);
         // 当前rank在组内对应的offset不能获取到数据，即最后的逻辑同号卡
@@ -1342,7 +1342,7 @@ HcclResult CommAHCAlignInfo::CalcInterSlicesAndLinksForAR(const u32 rank, const 
 
     std::vector<Slice> intraSlices;
     std::vector<LINK> intraLinks;
-    
+
     CHK_RET(CalcIntraSlicesAndLinks(rank, dataUnitSize, count, links, intraLinks, intraSlices));
     GetLogicCardExecuteOrder(rank, logicCardList);
 
@@ -1359,7 +1359,7 @@ HcclResult CommAHCAlignInfo::CalcInterSlicesAndLinksForAR(const u32 rank, const 
 
     sliceSizeAligned = sliceSizeAligned * static_cast<u32>(subGroups_.size());
     u32 originOffset = intraRank *  totalSliceSegment_ / subGroups_[rankGroupMap_[rank]].size(); // 当前rank起始offset
-    
+
     HCCL_DEBUG("[CommAHCAlignInfo][CalcInterSlicesAndLinksForAR] rank : [%u], intraslice.size : [%u], intraslice.offset : [%u]," \
         "sliceSizeAligned : [%u], originOffset : [%u]", rank, intraSlices[intraRank].size, intraSlices[intraRank].offset,
         sliceSizeAligned, originOffset);
@@ -1367,7 +1367,7 @@ HcclResult CommAHCAlignInfo::CalcInterSlicesAndLinksForAR(const u32 rank, const 
     // 进行逻辑同号组对应的slice切分
     std::vector<Slice> logicGroupSlice; // 逻辑同号组对应的slice
     HCCL_DEBUG("[CommAHCAlignInfo][CalcInterSlicesAndLinksForAR] check rank : [%u], intraSlices[%u].size : [%u], sliceSizeAligned : [%u]," \
-        "totalSliceSegment_ : [%u], subGroups_[rankGroupMap_[rank]].size : [%u]", rank, intraRank, intraSlices[intraRank].size, 
+        "totalSliceSegment_ : [%u], subGroups_[rankGroupMap_[rank]].size : [%u]", rank, intraRank, intraSlices[intraRank].size,
         sliceSizeAligned, totalSliceSegment_, subGroups_[rankGroupMap_[rank]].size());
 
     // 当前rank有完整的对齐后的数据量

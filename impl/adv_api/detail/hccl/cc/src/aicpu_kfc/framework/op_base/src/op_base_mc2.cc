@@ -76,7 +76,7 @@ HcclResult HcclMc2ComResourceByTiling(HcclComm comm, void *mc2Tiling, rtStream_t
             opParam.BatchWriteDataDes.queueNum = LOCAL_STREAM_MAX_NUM;
             HCCL_INFO("Requiring %u queues for batch-write.", opParam.BatchWriteDataDes.queueNum);
         }
-        HCCL_INFO("Comm resource will be created for group %s. isAicpuCommEngine[%d] commEngine[%u]", 
+        HCCL_INFO("Comm resource will be created for group %s. isAicpuCommEngine[%d] commEngine[%u]",
             commIdentifier.c_str(), isAicpuCommEngine, tiling->commEngine);
         CHK_RET(hcclComm->AllocComResourceByTiling(tiling->algConfig, reinterpret_cast<void *>(&opParam)));
         // commEngine为0代表使能AICPU引擎
@@ -264,7 +264,7 @@ HcclResult HcclAllocComResourceByTiling(HcclComm comm, void* stream, void* Mc2Ti
 }
 
 #if (!defined (HCCD)) && (!defined (CCL_KERNEL_AICPU))
-HcclResult HcclGetOpArgs(void **opArgs) 
+HcclResult HcclGetOpArgs(void **opArgs)
 {
     CHK_PTR_NULL(opArgs);
     HCCLV2_FUNC_RUN(HcclGetOpArgsV2(opArgs));

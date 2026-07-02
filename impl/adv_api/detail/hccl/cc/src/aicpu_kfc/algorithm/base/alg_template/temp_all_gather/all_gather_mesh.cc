@@ -120,7 +120,7 @@ HcclResult AllGatherMesh::RunAsync(const u32 rank, const u32 rankSize, const std
     HcclResult ret = HCCL_SUCCESS;
     CHK_SMART_PTR_NULL(dispatcher_);
     CHK_PTR_NULL(stream_.ptr());
-    HCCL_INFO("AllGatherMesh run: rank[%u] totalrank[%u] inputMem[%p] outputMem[%p] count[%llu]", 
+    HCCL_INFO("AllGatherMesh run: rank[%u] totalrank[%u] inputMem[%p] outputMem[%p] count[%llu]",
         rank, rankSize, inputMem_.ptr(), outputMem_.ptr(), count_);
 
     interRank_ = rank;
@@ -167,7 +167,7 @@ HcclResult AllGatherMesh::RunAsync(const u32 rank, const u32 rankSize, const std
 
             inputSlices[i].size = sliceSize;
             inputSlices[i].offset = (inputMem_.size() < outputMem_.size()) ? 0 : (sliceSize * i);
-            HCCL_DEBUG("rank[%u], slices[%u].offset=%llu, slices[%u].size=%llu", 
+            HCCL_DEBUG("rank[%u], slices[%u].offset=%llu, slices[%u].size=%llu",
                 rank, i, slices_[i].offset, i, slices_[i].size);
         }
     }

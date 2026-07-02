@@ -60,7 +60,7 @@ Additionally, Ascend C provides high-level APIs and operator template libraries 
 
 | API Level |  Target Users | Primary Use |
 |----------|----------|----------|
-| **Operator Template Library (CATLASS/ATVOSS and others)** |  Algorithm developers | Perform custom extensions based on typical operator implementations to meet high-performance requirements in specific scenarios | 
+| **Operator Template Library (CATLASS/ATVOSS and others)** |  Algorithm developers | Perform custom extensions based on typical operator implementations to meet high-performance requirements in specific scenarios |
 | **High-level API** |Algorithm developers | Reuse general single-core algorithms to quickly complete algorithm verification |
 
 

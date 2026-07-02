@@ -26,9 +26,9 @@ This example uses the Sort high-level API in a sorting scenario to sort the inpu
 
 ## Example Description
 
-- Example function:  
+- Example function:
   This example implements the Sort function, which sorts input data in descending order by numerical value while retaining the original index information.
-- Example specifications:  
+- Example specifications:
   <table>
   <caption>Table 1: Example Input/Output Specifications</caption>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> sort </td></tr>
@@ -47,16 +47,16 @@ This example uses the Sort high-level API in a sorting scenario to sort the inpu
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">sort_custom</td></tr>
   </table>
 
-- Example implementation:  
+- Example implementation:
     This example implements a Sort example with fixed shapes of input srcLocalValue[1, 128], srcLocalIndex[1, 128], and output dstLocalValue[1, 128], dstLocalIndex[1, 128].
 
-  - Kernel implementation:  
+  - Kernel implementation:
     The computation logic is: Input data must first be transferred to on-chip storage, then the Sort high-level API is used to complete the sorting computation, and the result is transferred out.
 
-  - Tiling implementation:  
+  - Tiling implementation:
     The tiling implementation process is as follows: Use the GetSortMaxMinTmpSize API to calculate the required maximum/minimum temporary space size, use the minimum temporary space, and then determine the required tiling parameters based on the input length.
 
-  - Invocation implementation  
+  - Invocation implementation
     Use the kernel invocation operator <<<>>> to call the kernel function, passing the input/output addresses and tiling parameters.
 
 ## Build and Run

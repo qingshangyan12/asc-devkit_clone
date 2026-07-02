@@ -42,7 +42,7 @@ public:
     HcclResult SetRmaInfo(void* rmaInfo);
 
     // batchsendrecv需要增量建链
-    virtual HcclResult CalcIncreLinkRequest(const OpParam& param, std::set<u32>& ranksLinked, 
+    virtual HcclResult CalcIncreLinkRequest(const OpParam& param, std::set<u32>& ranksLinked,
         AlgResourceRequest &resourceRequest, bool& needIncreLink);
 
     static HcclResult RunTemplate(const std::unique_ptr<AlgTemplateBase> &tempAlg, const SubCommInfo &commInfo);

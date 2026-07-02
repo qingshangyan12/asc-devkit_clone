@@ -24,15 +24,15 @@
 以下函数原型仅支持：
 
 <cann-filter npu-type = "910b">
- 
+
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
- 
+
 </cann-filter>
- 
+
 <cann-filter npu-type = "A3">
- 
+
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
- 
+
 </cann-filter>
 
 bfloat16\_t类型转换为float类型：
@@ -53,7 +53,7 @@ template <typename T, typename U = float,
         typename = Std::enable_if_t<
         (Std::is_same<T, bfloat16_t>::value || Std::is_same<T, hifloat8_t>::value ||
             Std::is_same<T, fp8_e5m2_t>::value || Std::is_same<T, fp8_e4m3fn_t>::value ||
-            Std::is_same<T, fp4x2_e1m2_t>::value || Std::is_same<T, fp4x2_e2m1_t>::value), 
+            Std::is_same<T, fp4x2_e1m2_t>::value || Std::is_same<T, fp4x2_e2m1_t>::value),
         void>>
 __aicore__ constexpr inline U Cast(T bVal)
 ```

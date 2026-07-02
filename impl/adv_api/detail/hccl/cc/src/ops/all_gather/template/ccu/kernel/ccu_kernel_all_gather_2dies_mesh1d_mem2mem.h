@@ -53,7 +53,7 @@ public:
         HCCL_DEBUG("[CcuTaskArgReduceScatterMeshMem2Mem1D] inputAddr: %lu, outputAddr: %lu, sliceSize: %u, offSet: %u",
                    inputAddr_, outputAddr_, sliceSize_, offSet_);
     }
- 
+
     uint64_t inputAddr_;
     uint64_t outputAddr_;
     uint64_t sliceSize_;
@@ -65,10 +65,10 @@ class CcuKernelAllGather2DiesMeshMem2Mem1D : public CcuKernelAlgBase {
 public:
     CcuKernelAllGather2DiesMeshMem2Mem1D(const hcomm::CcuKernelArg &arg);
     ~CcuKernelAllGather2DiesMeshMem2Mem1D() override {}
- 
+
     HcclResult Algorithm() override;
     std::vector<uint64_t> GeneArgs(const hcomm::CcuTaskArg &arg) override;
- 
+
 private:
     HcclResult InitResource();
     void LoadArgs();

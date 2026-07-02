@@ -90,13 +90,13 @@ HcclResult CollAlltoAllExecutor::GetAdjInfo(AlgResourceResponse& algRes, AdjInfo
 
     adjInfo.dstRankNum = nslbAdjInfo.dstRankNum;
     HCCL_INFO("[GetAdjInfo-nslbdp] adjInfo.dstRankNum[%u].", adjInfo.dstRankNum);
-    
+
     for (size_t i = 0; i < nslbAdjInfo.nsAdjInfo.size(); i++) {
         NslbDpAdjInfo dpAdjInfo = {0};
         dpAdjInfo.dstLocalRankId = nslbAdjInfo.nsAdjInfo[i].dstLocalRankId;
         dpAdjInfo.phaseId = nslbAdjInfo.nsAdjInfo[i].phaseId;
         dpAdjInfo.rev = 0;
-        adjInfo.nsAdjInfo.push_back(dpAdjInfo); 
+        adjInfo.nsAdjInfo.push_back(dpAdjInfo);
         HCCL_INFO("[nslbdp]GetAdjInfo dstLocalRankId[%u], phaseId[%u].",
                    nslbAdjInfo.nsAdjInfo[i].dstLocalRankId, nslbAdjInfo.nsAdjInfo[i].phaseId);
     }

@@ -51,13 +51,13 @@
 
 AIV从消息队列里申请消息空间，用于存放消息结构体，返回当前申请的消息空间的地址。消息队列的深度固定为4，申请消息空间的顺序为自上而下，然后循环。当消息队列指针指向的消息空间为FREE状态时，AllocMessage返回空间的地址，否则循环等待，直到当前空间的状态为FREE。
 
-**图1**  AllocMessage示意图<a name="fig153760010192"></a>  
+**图1**  AllocMessage示意图<a name="fig153760010192"></a>
 ![](../../../../figures/AllocMessage示意图.png "AllocMessage示意图")
 
 ## 函数原型<a name="section765814724715"></a>
 
 ```
-template <PipeMode pipeMode = PipeMode::SCALAR_MODE>             
+template <PipeMode pipeMode = PipeMode::SCALAR_MODE>
 __aicore__ inline __gm__ CubeMsgType *AllocMessage()
 ```
 
@@ -75,10 +75,10 @@ __aicore__ inline __gm__ CubeMsgType *AllocMessage()
 <tbody><tr id="row14365116121111"><td class="cellrowborder" valign="top" width="12.82%" headers="mcps1.2.3.1.1 "><p id="p23653641116"><a name="p23653641116"></a><a name="p23653641116"></a>pipeMode</p>
 </td>
 <td class="cellrowborder" valign="top" width="87.18%" headers="mcps1.2.3.1.2 "><p id="p1213214123127"><a name="p1213214123127"></a><a name="p1213214123127"></a>用于配置发送消息的执行单元。PipeMode类型，其定义如下：</p>
-<a name="screen11132212171216"></a><a name="screen11132212171216"></a><pre class="screen" codetype="Cpp" id="screen11132212171216">enum class PipeMode : uint8_t { 
+<a name="screen11132212171216"></a><a name="screen11132212171216"></a><pre class="screen" codetype="Cpp" id="screen11132212171216">enum class PipeMode : uint8_t {
   SCALAR_MODE = 0, // Scalar执行单元往GM上写消息。
   MTE3_MODE = 1, // 使用MTE3单元往GM上写消息。
-  MAX 
+  MAX
 }</pre>
 <p id="p168827373292"><a name="p168827373292"></a><a name="p168827373292"></a></p>
 <p id="p2132171218121"><a name="p2132171218121"></a><a name="p2132171218121"></a>注意，pipeMode为MTE3_MODE时，后续只能使用PostMessage接口发送消息。同时两个接口AllocMessage与PostMessage的模板参数pipeMode需要相同。</p>

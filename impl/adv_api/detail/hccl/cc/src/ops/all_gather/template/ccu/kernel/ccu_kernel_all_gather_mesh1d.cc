@@ -17,7 +17,7 @@ constexpr int OUTPUT_XN_ID = 1;
 constexpr int TOKEN_XN_ID = 2;
 constexpr int CKE_IDX_0 = 0;
 constexpr int CKE_IDX_1 = 1;
-constexpr int POST_SYNC_ID = 3;  
+constexpr int POST_SYNC_ID = 3;
 
 CcuKernelAllGatherMesh1D::CcuKernelAllGatherMesh1D(const CcuKernelArg &arg)
     : CcuKernelAlgBase(arg)
@@ -138,7 +138,7 @@ HcclResult CcuKernelAllGatherMesh1D::Algorithm()
     PostSync();
 
     HCCL_INFO("[CcuKernelAllGatherMesh1D] AllGatherMesh1D end");
-    
+
     return HcclResult::HCCL_SUCCESS;
 }
 

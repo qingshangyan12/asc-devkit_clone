@@ -16,8 +16,8 @@
 namespace hccl {
 
 
-ThreadMgr::ThreadMgr(uint32_t threadNum, uint32_t notifyNumPerThread, std::string commId, 
-    aclrtBinHandle binHandle, const ManagerCallbacks& callbacks) : threadNum_(threadNum), notifyNumPerThread_(notifyNumPerThread), 
+ThreadMgr::ThreadMgr(uint32_t threadNum, uint32_t notifyNumPerThread, std::string commId,
+    aclrtBinHandle binHandle, const ManagerCallbacks& callbacks) : threadNum_(threadNum), notifyNumPerThread_(notifyNumPerThread),
     commId_(commId), binHandle_(binHandle), callbacks_(callbacks){}
 
 uint64_t ThreadMgr::GetMaxNotifyTotal()
@@ -44,7 +44,7 @@ HcclResult ThreadMgr::CheckNotifyNum(CommEngine engine, uint32_t threadNum, uint
     uint64_t needNotifyTotal = static_cast<uint64_t>(threadNum) * static_cast<uint64_t>(notifyNumPerThread);
     if (remainNotifyQuota < needNotifyTotal  || notifyNumPerThread > notifyNumPerThread_ ||
         maxNotifyTotal > HCCL_THREAD_NOTIFY_MAX_NUM) {
-        HCCL_ERROR("[ThreadMgr][%s] Notify quota exhausted: remainQuota[%llu], total[%llu], used[%llu], need[%llu], " 
+        HCCL_ERROR("[ThreadMgr][%s] Notify quota exhausted: remainQuota[%llu], total[%llu], used[%llu], need[%llu], "
             "setPreNum[%u], allocPreNum[%u]", __func__, remainNotifyQuota, maxNotifyTotal, used, needNotifyTotal,
             notifyNumPerThread_, notifyNumPerThread);
         return HCCL_E_UNAVAIL;
@@ -109,7 +109,7 @@ HcclResult ThreadMgr::SupplementNotify(CommEngine engine, uint32_t threadNum, ui
         if (!callbacks_.getAicpuCommState()) {
             HCCL_INFO("ThreadMgr::SupplementNotify kernelLaunchAicpuCommInit start");
             HcclResult ret = callbacks_.kernelLaunchAicpuCommInit();
-            CHK_PRT_RET(ret != HCCL_SUCCESS, 
+            CHK_PRT_RET(ret != HCCL_SUCCESS,
                 HCCL_ERROR("[%s] kernelLaunchAicpuCommInit failed, return [%d].", __func__, ret), ret);
             callbacks_.setAicpuCommState(true);
         }
@@ -290,7 +290,7 @@ HcclResult ThreadMgr::HcclThreadAcquire(CommEngine engine, uint32_t threadNum,
         if (!callbacks_.getAicpuCommState()) {
             HCCL_INFO("ThreadMgr::HcclAllocThreadRes kernelLaunchAicpuCommInit start");
             HcclResult ret = callbacks_.kernelLaunchAicpuCommInit();
-            CHK_PRT_RET(ret != HCCL_SUCCESS, 
+            CHK_PRT_RET(ret != HCCL_SUCCESS,
                 HCCL_ERROR("[%s] kernelLaunchAicpuCommInit failed, return [%d].", __func__, ret), ret);
             callbacks_.setAicpuCommState(true);
         }
@@ -479,17 +479,17 @@ HcclResult ThreadMgr::HcclThreadExportToCommEngine(uint32_t threadNum, const Thr
 
 HcclResult ThreadMgr::HcclThreadResGetInfo(ThreadHandle thread, ThreadResType resType, uint32_t infoLen, void **info)
 {
-    CHK_PRT_RET(resType != ThreadResType::THREAD_RES_TYPE_STREAM, HCCL_ERROR("[%s] failed. resType[%d] is not supported.", 
+    CHK_PRT_RET(resType != ThreadResType::THREAD_RES_TYPE_STREAM, HCCL_ERROR("[%s] failed. resType[%d] is not supported.",
         __func__, static_cast<int32_t>(resType)), HCCL_E_NOT_SUPPORT);
 
     std::lock_guard<std::mutex> threadhandleToThreadMtx(threadhandleToThreadMutex_);
     auto it = threadMap_.find(thread);
-    CHK_PRT_RET(it == threadMap_.end(), 
+    CHK_PRT_RET(it == threadMap_.end(),
         HCCL_ERROR("[%s] failed to find handle mapping in threadMap_, thread[0x%llx].", __func__, thread), HCCL_E_NOT_FOUND);
     std::shared_ptr<Thread> threadPtr = it->second;
     CHK_PTR_NULL(threadPtr);
     if (resType == ThreadResType::THREAD_RES_TYPE_STREAM) {
-        CHK_PRT_RET(infoLen != sizeof(ThreadResTypeStream), HCCL_ERROR("[%s] failed. infoLen[%u] is mismatch sizeof(ThreadResTypeStream)[%zu]", 
+        CHK_PRT_RET(infoLen != sizeof(ThreadResTypeStream), HCCL_ERROR("[%s] failed. infoLen[%u] is mismatch sizeof(ThreadResTypeStream)[%zu]",
                     __func__, infoLen, sizeof(ThreadResTypeStream)), HCCL_E_PARA);
         CHK_PTR_NULL(threadPtr->GetStream());
         ThreadResTypeStream stream = threadPtr->GetStream()->ptr();

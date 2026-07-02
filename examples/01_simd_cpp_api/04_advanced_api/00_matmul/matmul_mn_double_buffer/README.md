@@ -22,10 +22,10 @@ M/N轴方向的流水并行的Matmul样例。该功能的应用场景为输入�
 │   └── README.md                           // 样例说明文档
 ```
 ## 样例描述
-- 样例功能：  
+- 样例功能：
   本样例调用Matmul高阶API对输入的A，B矩阵做矩阵乘和加bias偏置。在定义Matmul对象时，将配置scheduleType等参数的MatmulConfig作为模板参数传入，使能M/N轴方向的流水并行功能。本样例以MDL模板且N方向流水并行为例，对于Norm模板或M方向流水并行功能也可以参考该样例的实现。
 
-- 样例规格：  
+- 样例规格：
   本样例中：M = 128, N = 7680, K = 16
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
@@ -59,12 +59,12 @@ M/N轴方向的流水并行的Matmul样例。该功能的应用场景为输入�
       cubeTiling.SetMatmulConfigParams(matmulConfigParams);
       ```
 
-- 调用实现  
+- 调用实现
   使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

@@ -47,7 +47,7 @@ HcclResult CcuTempReduceScatterNhrMultiJettyMem2Mem1D::CalcRes(HcclComm comm, co
 
     // 创建每个kernel的ctxArg，放入kernelInfo, 然后将kernelinfo放入resourceRequest.ccuKernelInfos
     CcuKernelInfo kernelInfo;
-    
+
     kernelInfo.creator = [](const hcomm::CcuKernelArg &arg) {
                              return std::make_unique<CcuKernelReduceScatterNhrMutilJettyMem2Mem1D>(arg);
                          };
@@ -118,7 +118,7 @@ HcclResult CcuTempReduceScatterNhrMultiJettyMem2Mem1D::KernelRun(const OpParam& 
     std::unique_ptr<hcomm::CcuTaskArg> taskArg = std::make_unique<CcuTaskArgReduceScatterNhrMutilJettyMem2Mem1D>(
         inputAddr, outputAddr, token, sliceSize, inputSliceStride, outputSliceStride, sliceOneJettySize,
         sliceLastJettySize, repeatNum, inputRepeatStride, outputRepeatStride);
-    
+
     HCCL_INFO("[CcuTempReduceScatterNhrMultiJettyMem2Mem1D::KernelRun] inputAddr[%llx], outputAddr[%llx], sliceSize[%u]"
                 "sliceOneJettySize[%u], repeatNum[%llu], inputRepeatStride[%u], outputRepeatStride[%u]", inputAddr, outputAddr,
                 sliceSize, sliceOneJettySize, repeatNum, inputRepeatStride, outputRepeatStride);
@@ -128,7 +128,7 @@ HcclResult CcuTempReduceScatterNhrMultiJettyMem2Mem1D::KernelRun(const OpParam& 
     }
     void* taskArgPtr = static_cast<void*>(taskArg.get());
     CHK_RET(HcclCcuKernelLaunch(param.hcclComm, templateResource.threads[0], templateResource.ccuKernels[0], taskArgPtr));
-    
+
     HCCL_DEBUG("[CcuTempReduceScatterNhrMultiJettyMem2Mem1D::KernelRun] end");
 
     return HcclResult::HCCL_SUCCESS;

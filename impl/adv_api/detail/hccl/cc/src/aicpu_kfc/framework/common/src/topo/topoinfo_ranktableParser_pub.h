@@ -127,7 +127,7 @@ protected:
 private:
     TopoInfoRanktableParser(const TopoInfoRanktableParser&);
     TopoInfoRanktableParser& operator=(const TopoInfoRanktableParser&);
-    
+
     static bool CompareWithDevicePhyId(const RankInfo_t &left, const RankInfo_t &right);
     bool IsReady() const;
     HcclResult RefreshStatus();

@@ -73,7 +73,7 @@ void HcclUBNotifyWaitSqe::Config(u16 streamId, u16 taskId, u64 notifyId)
     sqe->header.rtStreamId = streamId;
     sqe->header.taskId = taskId;
     sqe->notifyId = notifyId;
-    
+
     HCCL_INFO("[SQE]HcclUBNotifyWaitSqe streamId=%u, taskId=%hu, notifyId:%llu\n", streamId, taskId, notifyId);
 }
 

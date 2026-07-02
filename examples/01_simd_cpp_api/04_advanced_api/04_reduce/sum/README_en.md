@@ -29,7 +29,7 @@ This example demonstrates the Sum high-level API, which computes the sum of elem
 
 ## Example Specifications
 
-- Example function:  
+- Example function:
   This example computes the sum of elements in each row of the matrix.
 
 <table>
@@ -45,12 +45,12 @@ This example demonstrates the Sum high-level API, which computes the sum of elem
 <tr><td rowspan="1" align="left">Kernel Function Name</td><td colspan="4" align="center">sum_custom</td></tr>
 </table>
 
-- Example implementation:  
+- Example implementation:
   This example implements a fixed shape with input x[3, 32] and output y[8, 1], where the number of valid values in y is 3. After summing the elements of each row of input x, the valid data of output y occupies the first 3 positions, and the last 5 positions are padding data.
-  - Kernel implementation:  
+  - Kernel implementation:
     The computation logic is: This example transfers the input data to on-chip storage, then uses the Sum high-level API to complete the summation, and transfers the result out.
 
-  - Tiling implementation:  
+  - Tiling implementation:
     The tiling implementation process is as follows: Use the GetSumMaxMinTmpSize API to calculate the required maximum/minimum temporary space size, use the minimum temporary space, and then determine the required tiling parameters based on the input length.
 
 ## Build and Run

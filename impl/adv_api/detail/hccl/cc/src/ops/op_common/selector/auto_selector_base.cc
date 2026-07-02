@@ -362,7 +362,7 @@ bool AutoSelectorBase::ProcessAivConfig(OpParam &opParam, TopoInfoWithNetLayerDe
                                         std::string &selectAlgName, SelectorStatus &ret) const
 {
     if (opParam.opExecuteConfig != OpExecuteConfig::AIV && opParam.opExecuteConfig != OpExecuteConfig::AIV_ONLY) {
-        return false; 
+        return false;
     }
 
     ret = SelectAivAlgo(topoInfo, opParam, configAlgMap, selectAlgName);
@@ -372,10 +372,10 @@ bool AutoSelectorBase::ProcessAivConfig(OpParam &opParam, TopoInfoWithNetLayerDe
             return true;
         }
         opParam.opExecuteConfig = OpExecuteConfig::CCU_FAIL;
-        return false; 
-    } 
-    
-    return true; 
+        return false;
+    }
+
+    return true;
 }
 
 }

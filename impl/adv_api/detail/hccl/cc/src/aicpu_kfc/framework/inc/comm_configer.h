@@ -7,25 +7,25 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
- 
+
 #ifndef HCCL_COMM_CONFIGER_H
 #define HCCL_COMM_CONFIGER_H
- 
+
 #include <unordered_map>
 #include <memory>
 #include <mutex>
- 
+
 #include "comm_config_pub.h"
 #include "hccl/hccl_types.h"
 #include "hccl_common.h"
- 
+
 namespace hccl {
 // config通信域粒度配置相关参数
 class CommConfiger {
 public:
     static CommConfiger& GetInstance();
     ~CommConfiger();
- 
+
     HcclResult SetCommConfig(CommConfig config, const std::string& identifier = HCCL_WORLD_GROUP);
     HcclResult SetCommConfigExecTimeOut(s32 execTimeOut, const std::string& identifier = HCCL_WORLD_GROUP);
     s32 GetCommConfigExecTimeOut(const std::string& identifier = HCCL_WORLD_GROUP);
@@ -37,7 +37,7 @@ public:
     u32 GetCommConfigRetryHoldTime(const std::string& identifier = HCCL_WORLD_GROUP);
     u32 GetCommConfigRetryIntervalTime(const std::string& identifier = HCCL_WORLD_GROUP);
     void UnRegisterToCommConfiger(const std::string& identifier = HCCL_WORLD_GROUP);
- 
+
 private:
     CommConfiger();
     std::mutex lock_; // 锁保证多线程安全

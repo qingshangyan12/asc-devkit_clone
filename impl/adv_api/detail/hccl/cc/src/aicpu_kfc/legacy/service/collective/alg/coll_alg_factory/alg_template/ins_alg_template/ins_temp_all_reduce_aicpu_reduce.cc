@@ -38,7 +38,7 @@ HcclResult InsTempAllReduceAicpuReduce::CalcRes(AlgTempResReq &tempResReq)
 }
 
 u32 InsTempAllReduceAicpuReduce::CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) const
-{   
+{
     (void) inBuffType;
     (void) outBuffType;
     return tempRankSize_;
@@ -46,9 +46,9 @@ u32 InsTempAllReduceAicpuReduce::CalcScratchMultiple(BufferType inBuffType, Buff
 
 HcclResult InsTempAllReduceAicpuReduce::RunAllGatherMesh(const TempFuncs &tempFuncs, const TemplateDataParams &templateDataParams,
                         const ResLinks &tempLinks, std::vector<InsQuePtr> &tempInsQues)
-{   
+{
     (void) tempFuncs;
-    // 本端rank数据从本端input -> 本端scratch 
+    // 本端rank数据从本端input -> 本端scratch
     u64       srcOffset = templateDataParams.buffInfo.inBuffBaseOff;
     u64       srcSize   = templateDataParams.sliceSize;
     u64       dstOffset = templateDataParams.sliceSize * myRank_;
@@ -58,7 +58,7 @@ HcclResult InsTempAllReduceAicpuReduce::RunAllGatherMesh(const TempFuncs &tempFu
     tempInsQues[0]->Append(std::move(insLocalCopy));
 
     CHK_RET(PreSyncInterQueues(tempInsQues));
-    // 本端rank数据从本端input -> 对端scratch 
+    // 本端rank数据从本端input -> 对端scratch
     std::vector<DataSlice> txSrcSlices;
     std::vector<DataSlice> txDstSlices;
     DataSlice currSendSliceSrc
@@ -91,7 +91,7 @@ HcclResult InsTempAllReduceAicpuReduce::RunAllGatherMesh(const TempFuncs &tempFu
 }
 
 HcclResult InsTempAllReduceAicpuReduce::RunAicpuLocalReduce(const TemplateDataParams &templateDataParams, std::vector<InsQuePtr> &tempInsQues)
-{   
+{
     DataSlice dataSlice = DataSlice(BufferType::SCRATCH, 0, templateDataParams.sliceSize);
     for (u32 rankId = 1; rankId < tempRankSize_; rankId++) {
         DataSlice addSlice = DataSlice(BufferType::SCRATCH, templateDataParams.sliceSize * rankId, templateDataParams.sliceSize);

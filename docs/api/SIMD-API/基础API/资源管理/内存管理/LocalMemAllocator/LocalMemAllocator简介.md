@@ -20,13 +20,13 @@ public:
     __aicore__ inline uint32_t GetCurAddr() const;
     template <class DataType, uint32_t tileSize> LocalTensor<DataType> __aicore__ inline Alloc();
     template <TPosition pos, class DataType, uint32_t tileSize> __aicore__ inline LocalTensor<DataType> Alloc();
-    template <class DataType> LocalTensor<DataType> __aicore__ inline Alloc(uint32_t tileSize);    
+    template <class DataType> LocalTensor<DataType> __aicore__ inline Alloc(uint32_t tileSize);
     template <TPosition pos, class DataType> LocalTensor<DataType> __aicore__ inline Alloc(uint32_t tileSize);
-    
+
     template <class DataType> LocalTensor<DataType> __aicore__ inline Alloc();
-    
-    
-   
+
+
+
 };
 ```
 
@@ -44,7 +44,7 @@ public:
 <tbody><tr id="row260915573419"><td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.2.3.1.1 "><p id="p2060925573411"><a name="p2060925573411"></a><a name="p2060925573411"></a>hard</p>
 </td>
 <td class="cellrowborder" valign="top" width="78.2%" headers="mcps1.2.3.1.2 "><p id="p823866165711"><a name="p823866165711"></a><a name="p823866165711"></a><span id="ph46543142425"><a name="ph46543142425"></a><a name="ph46543142425"></a>用于表示数据的物理位置，Hardware枚举类型，定义如下，合法位置为：UB、L1、L0A、L0B、L0C、BIAS、FIXBUF。</span></p>
-<a name="screen79541519214"></a><a name="screen79541519214"></a><pre class="screen" codetype="Cpp" id="screen79541519214">enum class Hardware : uint8_t { 
+<a name="screen79541519214"></a><a name="screen79541519214"></a><pre class="screen" codetype="Cpp" id="screen79541519214">enum class Hardware : uint8_t {
 GM,     // Global Memory
 UB,     // Unified Buffer
 L1,     // L1 Buffer

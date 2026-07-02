@@ -50,7 +50,7 @@ private:
     std::vector<std::vector<std::vector<RankId>>> vTopo_;
     std::vector<std::vector<RankId>>              virtRanks_;
     std::vector<std::map<RankId, u32>>            virtRankMap_; // map<virtRank, virtRankOrder>
-    
+
     u32 rankSizeLevel0_{0};
     u32 rankSizeLevel1_{0};
 

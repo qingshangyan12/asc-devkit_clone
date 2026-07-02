@@ -49,7 +49,7 @@ reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存�
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ int16_t*& dst, vector_store_unalign& src0, vector_int16_t src1, uint32_t count)
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint16_t*& dst, vector_store_unalign& src0, vector_uint16_t src1, uint32_t count)
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ int32_t*& dst, vector_store_unalign& src0, vector_int32_t src1, uint32_t count)
-    __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint32_t*& dst, vector_store_unalign& src0, vector_uint32_t src1, uint32_t count) 
+    __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint32_t*& dst, vector_store_unalign& src0, vector_uint32_t src1, uint32_t count)
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ int64_t*& dst, vector_store_unalign& src0, vector_int64_t src1, uint32_t count)
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ half*& dst, vector_store_unalign& src0, vector_half src1, uint32_t count)
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ float*& dst, vector_store_unalign& src0, vector_float src1, uint32_t count)

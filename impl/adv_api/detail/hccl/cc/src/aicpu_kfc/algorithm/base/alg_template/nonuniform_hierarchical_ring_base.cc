@@ -135,7 +135,7 @@ void NHRBase::MergeSlices(std::vector<Slice> &slices)
     slices[mergedIdx].size = tmpSliceSize;
     slices[mergedIdx].offset = tmpSliceOffset;
     mergedIdx += 1;
-    
+
     // 原地清理
     slices.erase(slices.begin() + mergedIdx, slices.end());
 

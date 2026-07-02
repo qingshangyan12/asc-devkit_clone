@@ -4,7 +4,7 @@ A Matmul example that enables the L0 cache feature to reduce redundant MTE1 tran
 
 L0 cache does not have an external switch. The Matmul API internally determines whether L0 cache can be enabled based on the shape information configured by the user. Currently, only L0A cache is supported, and the enabling requirements are as follows:
 - All Tiling parameters must be configured as constants, that is, singleCoreM/singleCoreN/singleCoreK and baseM/baseN/baseK must all be set through constant interfaces;
-- singleCoreM=baseM and singleCoreK=baseK.  
+- singleCoreM=baseM and singleCoreK=baseK.
 
 ## Supported Products and CANN Versions
 
@@ -16,7 +16,7 @@ L0 cache does not have an external switch. The Matmul API internally determines 
 
 ## Build and Run
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

@@ -89,7 +89,7 @@ HcclResult RemoteAccessImpl::RemoteWrite(const vector<HcomRemoteAccessAddrInfo>&
     size_t infoSize = addrInfos.size();
     CHK_PRT_RET(addrInfos.empty(), HCCL_ERROR("[Remote][Write]addrInfos is empty!"), HCCL_E_PARA);
     CHK_RET(IsInSamePlane(userRank_, addrInfos));
-    
+
     Stream streamObj(stream);
     //  GE 保证传入的addrInfos按照remotetRankID排序，如果目标是同一个remotetRank，优化性能
     if (infoSize > 1 && addrInfos[0].remotetRankID == addrInfos[infoSize - 1].remotetRankID) {
@@ -122,7 +122,7 @@ HcclResult RemoteAccessImpl::RemoteRead(const vector<HcomRemoteAccessAddrInfo>& 
     CHK_PRT_RET(addrInfos.empty(), HCCL_ERROR("[Remote][Read]addrInfos is empty!"), HCCL_E_PARA);
 
     CHK_RET(IsInSamePlane(userRank_, addrInfos));
-    
+
     Stream streamObj(stream);
     //  GE 保证传入的addrInfos按照remotetRankID排序，如果目标是同一个remotetRank，优化性能
     if (infoSize > 1 && addrInfos[0].remotetRankID == addrInfos[infoSize - 1].remotetRankID) {

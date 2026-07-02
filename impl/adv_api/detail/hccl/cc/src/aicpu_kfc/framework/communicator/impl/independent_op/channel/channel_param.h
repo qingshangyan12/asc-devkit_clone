@@ -26,7 +26,7 @@ struct HcclChannelP2p {
     hccl::TransportAttr transportAttr;
     u32 qos;
 };
- 
+
 struct HcclChannelRoce {
     // 将固定数组改为指针
     MemDetails* remoteUserHostMem = nullptr;    // 远端用户主机内存
@@ -45,7 +45,7 @@ struct HcclChannelRoce {
     HcclQpInfoV2 QpInfo[RDMA_QP_MAX_NUM];
     u32 qpsPerConnection{1};
 };
- 
+
 struct HcclIndOpChannelRemoteResV2 {
     u64 p2pNotifyNum = 0;            // 用于linkp2p添加notify信息
     u64 roceNotifyNum = 0;           // 主链路：用于linkroce添加notify信息
@@ -56,7 +56,7 @@ struct HcclIndOpChannelRemoteResV2 {
     HcclChannelP2p channelP2p;       // P2p资源
     HcclChannelRoce channelRoce;     // Roce资源
 };
- 
+
 struct HcclIndOpChannelRemoteResV3 {
     char hcomId[HCOMID_MAX_LENGTH];                     // 通信域ID 最大长度待修改
     char channelTag[TAG_MAX_LENGTH];                    // channelTag 最大长度待修改

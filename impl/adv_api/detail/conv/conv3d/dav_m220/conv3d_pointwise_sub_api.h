@@ -108,7 +108,7 @@ public:
     {
         uint32_t offset = 0;
         if (self_->ctx.conv3dTiling->biasFullLoadFlag) {
-            offset = self_->ctx.nBL1Iter * tilingNBL1_ * ConvApi::K0_BIAS + 
+            offset = self_->ctx.nBL1Iter * tilingNBL1_ * ConvApi::K0_BIAS +
                      self_->ctx.nBL0Iter * self_->ctx.conv3dTiling->nL0 * ConvApi::K0_BIAS;
         }
         AscendC::LoadData2DParams loadData2dParams;
@@ -137,7 +137,7 @@ private:
         initConstValueParams.blockNum = blockNum;
         initConstValueParams.dstGap = 0;
         initConstValueParams.initValue = 1;
-        KERNEL_LOG(KERNEL_DEBUG, 
+        KERNEL_LOG(KERNEL_DEBUG,
             "[LoadBiasL0WithBroadcast] initConstValueParams.repeatTimes %d, initConstValueParams.blockNum %d \n",
             initConstValueParams.repeatTimes,
             initConstValueParams.blockNum);
@@ -180,7 +180,7 @@ public:
         mmadParams.cmatrixInitVal = true;
         mmadParams.cmatrixSource = false;
         mmadParams.isBias = false;
-        KERNEL_LOG(KERNEL_DEBUG, 
+        KERNEL_LOG(KERNEL_DEBUG,
             "[MMadWithPointWise] mmadParams.cmatrixInitVal %d, mmadParams.cmatrixSource %d, mmadParams.isBias %d, "
             "mmadParams.k %d, mmadParams.n %d, mmadParams.m %d.\n",
             mmadParams.cmatrixInitVal,
@@ -218,7 +218,7 @@ public:
         mmadParams.cmatrixSource = false;
         mmadParams.isBias = false;
 
-        KERNEL_LOG(KERNEL_DEBUG, 
+        KERNEL_LOG(KERNEL_DEBUG,
             "[MMadWithPointWise] mmadParams.cmatrixInitVal %d, mmadParams.cmatrixSource %d, mmadParams.isBias %d, "
             "mmadParams.k %d, mmadParams.n %d, mmadParams.m %d.\n",
             mmadParams.cmatrixInitVal,

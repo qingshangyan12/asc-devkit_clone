@@ -25,7 +25,7 @@ private:
         std::vector<LevelNSubCommTransport>& opTransport) override;
     HcclResult CalcLevel2CommInfo(TransportMemType inputType, TransportMemType outputType,
         std::vector<LevelNSubCommTransport>& opTransport) override;
-    
+
     /* *************** 算法编排 *************** */
     u64 CalcLoopMaxCount(const u64 cclBuffSize, const u32 unitSize) override;
     u64 CalcDstMemOffset(const OpParam &param, u64 inputMemSize) const;

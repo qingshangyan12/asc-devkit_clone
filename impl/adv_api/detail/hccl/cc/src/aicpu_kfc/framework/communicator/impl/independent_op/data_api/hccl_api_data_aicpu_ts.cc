@@ -89,7 +89,7 @@ bool IsSupportReduce(HcommDataType dataType, HcommReduceOp op)
     bool checkReduceType = (op == HCOMM_REDUCE_SUM || op == HCOMM_REDUCE_MAX || op == HCOMM_REDUCE_MIN);
     return checkDataType && checkReduceType;
 }
- 
+
 HcclResult HcommThreadGetNotifyId(ThreadHandle thread, uint32_t notifyIdx, uint32_t *notifyId)
 {
     Thread *const threadPtr = reinterpret_cast<Thread *>(thread);
@@ -642,7 +642,7 @@ int32_t HcommWriteWithNotifyOnThread(ThreadHandle thread, ChannelHandle channel,
 int32_t HcommWriteReduceWithNotifyOnThread(ThreadHandle thread, ChannelHandle channel, void *dst,
     const void *src, uint64_t count, HcommDataType dataType, HcommReduceOp reduceOp, uint32_t remoteNotifyIdx)
 {
-    HCCL_INFO("[%s] START. thread[0x%llx], channel[0x%llx], dst[0x%llx], src[0x%llx], count[%llu], dataType[%d], reduceOp[%d], remoteNotifyIdx[%u].", 
+    HCCL_INFO("[%s] START. thread[0x%llx], channel[0x%llx], dst[0x%llx], src[0x%llx], count[%llu], dataType[%d], reduceOp[%d], remoteNotifyIdx[%u].",
         __func__, thread, channel, dst, src, count, dataType, reduceOp, remoteNotifyIdx);
 
     CHK_PTR_NULL(dst);
@@ -668,7 +668,7 @@ int32_t HcommWriteReduceWithNotifyOnThread(ThreadHandle thread, ChannelHandle ch
             HCCL_ERROR("[%s] FAIL at BuildLocRmaBufferLite. thread[0x%llx], channel[0x%llx], dst[0x%llx], src[0x%llx], count[%llu], dataType[%d], reduceOp[%d], remoteNotifyIdx[%u].",
             __func__, thread, channel, dst, src, count, dataType, reduceOp, remoteNotifyIdx), ret);
         const Hccl::Buffer rmtBuf{reinterpret_cast<uintptr_t>(dst), len};
-        
+
         ret = CheckDataTypeAndReduceOp(dataType, reduceOp);
         CHK_PRT_RET(ret != HCCL_SUCCESS,
             HCCL_ERROR("[%s] FAIL at CheckDataTypeAndReduceOp. thread[0x%llx], channel[0x%llx], dst[0x%llx], src[0x%llx], count[%llu], dataType[%d], reduceOp[%d], remoteNotifyIdx[%u].",
@@ -1171,7 +1171,7 @@ HcclResult HcommProfilingReportKernelEndTask(uint64_t thread, const char* groupn
     flagTaskInfo.streamId = streamLitePtr->GetId();
     flagTaskInfo.taskId = streamLitePtr->GetRtsq()->GetTaskId() - 1;
     flagTaskInfo.type = Hccl::MainStreamTaskType::TAIL;
-    
+
     Hccl::ProfilingHandlerLite::GetInstance().ReportMainStreamTask(flagTaskInfo);
     CHK_RET(AicpuIndopProcess::ReportAllTasks(groupname));
     HCCL_INFO("[%s] SUCCESS.", __func__);

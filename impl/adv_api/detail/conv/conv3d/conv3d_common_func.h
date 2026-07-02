@@ -84,7 +84,7 @@ struct IterateAll {
     }
 
     static __aicore__ void inline IterateAllBase(
-        Intf *self, const AscendC::GlobalTensor<typename Intf::OutputT> &output, bool enPartialSum = false) 
+        Intf *self, const AscendC::GlobalTensor<typename Intf::OutputT> &output, bool enPartialSum = false)
     {
         if (self->ctx.biasFullLoadFlag && self->ctx.enableBias) {
             self->ctx.biasL1 = self->ctx.queueBiasL1.template AllocTensor<typename Intf::BiasT>();

@@ -71,7 +71,7 @@ HcclResult AllgatherMeshDirect::RunAsync(const u32 rank, const u32 rankSize, con
 {
     CHK_SMART_PTR_NULL(dispatcher_);
     CHK_PTR_NULL(stream_.ptr());
-    HCCL_INFO("AllGatherMeshDirect run: rank[%u] totalrank[%u] inputMem[%p] outputMem[%p] count[%llu]", 
+    HCCL_INFO("AllGatherMeshDirect run: rank[%u] totalrank[%u] inputMem[%p] outputMem[%p] count[%llu]",
         rank, rankSize, inputMem_.ptr(), outputMem_.ptr(), count_);
 
     char* curUerMemInPtr = static_cast<char *>(opInfo_->inputAddr);
@@ -168,7 +168,7 @@ HcclResult AllgatherMeshDirect::RunAsync(const u32 rank, const u32 rankSize, con
     CHK_RET(SubRecordMain());
     CHK_RET(MainWaitSub());
     CHK_RET(HcclD2DMemcpyAsync(dispatcher_, emptyMem, emptyMem, stream_));
-    
+
     HCCL_INFO("AllGatherMeshDirect finished: rank[%u]", rank);
     return HCCL_SUCCESS;
 }

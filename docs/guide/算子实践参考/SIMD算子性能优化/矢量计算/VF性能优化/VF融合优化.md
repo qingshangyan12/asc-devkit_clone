@@ -67,11 +67,11 @@ VF融合优化可分为三个阶段：VF浅度融合、VF深度融合和VF内自
         public:
         __aicore__ inline Kernel() = default;
         __aicore__ inline void Init(__gm__ uint8_t* x, __gm__ uint8_t* y, uint32_t count, AscendC::TPipe* pipeIn){
-            // ... 
-     
+            // ...
+
         }
         __aicore__ inline void CopyIn(){
-            // ... 
+            // ...
         }
         __aicore__ inline void Compute(){
             AscendC::LocalTensor<T> xLocal = inQueueX.DeQue<T>();
@@ -86,7 +86,7 @@ VF融合优化可分为三个阶段：VF浅度融合、VF深度融合和VF内自
             outQueueY.EnQue<T>(yLocal);
         }
         __aicore__ inline void CopyOut(){
-            // ... 
+            // ...
         }
         __aicore__ inline void Process(){
             CopyIn();

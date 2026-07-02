@@ -71,7 +71,7 @@ int assertFlag = 10;
 assert(assertFlag == 10);
 ```
 
-> [!CAUTION]注意 
+> [!CAUTION]注意
 > 该接口主要用于调试分析，开启后会对算子性能产生一定影响，通常在调试阶段使用，生产环境建议关闭。<br>
 > 默认情况下，调用该接口就会打印相关内容，开发者可以参考[关闭ASCENDC_DUMP说明](../关闭ASCENDC_DUMP说明.md)，按需关闭该接口功能。
 
@@ -93,7 +93,7 @@ define assert(...)
 
 无
 
-## 返回值说明<a name="section640mcpsimp"></a>	 
+## 返回值说明<a name="section640mcpsimp"></a>
 
 无
 
@@ -113,5 +113,5 @@ assert(assertFlag != 10);
 程序运行时会触发assert，打印效果如下：
 
 ```plain
-[ASSERT] /home/.../add_custom.cpp:44: Assertion `assertFlag != 10' 
+[ASSERT] /home/.../add_custom.cpp:44: Assertion `assertFlag != 10'
 ```

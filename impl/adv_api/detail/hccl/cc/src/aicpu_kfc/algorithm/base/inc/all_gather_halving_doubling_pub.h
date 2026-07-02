@@ -17,7 +17,7 @@ class AllGatherHalvingDoubling : public AlgTemplateBase {
 public:
     explicit AllGatherHalvingDoubling(const HcclDispatcher dispatcher);
     ~AllGatherHalvingDoubling() override;
-    
+
     // should be called soon after template AllGatherHalvingDoubling instance created
     HcclResult Prepare(u32 blockSize, UserMemType hdInputMemType, UserMemType hdOutputMemType) override;
 

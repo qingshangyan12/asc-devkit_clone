@@ -253,7 +253,7 @@ HcclResult InsTempAllReduceMesh2DTwoShot::InitInnerParams(const TempFuncs &tempF
  * param: tempFuncs: 辅助信息包括userIn/OutSlices, opMode等标记信息
  * return: HcclResult
  */
-HcclResult InsTempAllReduceMesh2DTwoShot::RunReduceScatter(SubStageArgs& subparams, 
+HcclResult InsTempAllReduceMesh2DTwoShot::RunReduceScatter(SubStageArgs& subparams,
     const RankSliceInfo &sliceInfoVec, const ResLinks &tempLinks, std::vector<InsQuePtr> &tempInsQues,
     const std::vector<RankId> &rankInfo) const
 {
@@ -263,9 +263,9 @@ HcclResult InsTempAllReduceMesh2DTwoShot::RunReduceScatter(SubStageArgs& subpara
     CHK_RET(PreSyncQues(tempInsQues, 0));
     // scatter
     for (u32 rankId = 0; rankId < rankInfo.size(); rankId++) {// 写模式
-        DataSlice ssrcSlice = DataSlice(subparams.inType, 
+        DataSlice ssrcSlice = DataSlice(subparams.inType,
         sliceInfoVec[rankId][0].offset + subparams.inbaseOff, sliceInfoVec[rankId][0].size);
-        DataSlice sdestSlice = DataSlice(subparams.outType, 
+        DataSlice sdestSlice = DataSlice(subparams.outType,
         myAlgrankId * sliceInfoVec[rankId][0].size + subparams.outbaesOff, sliceInfoVec[rankId][0].size);
         if (rankId == myAlgrankId) {
             if (sliceInfoVec[rankId][0].size != 0) {// 如果是本地rank，直接拷贝到scratch对应位置
@@ -280,9 +280,9 @@ HcclResult InsTempAllReduceMesh2DTwoShot::RunReduceScatter(SubStageArgs& subpara
             std::vector<DataSlice> sendSrcSlices{ssrcSlice};
             std::vector<DataSlice> sendDestSlices{sdestSlice};
             // 接收，未过滤size为0的情况
-            DataSlice rsrcSlice = DataSlice(subparams.inType, 
+            DataSlice rsrcSlice = DataSlice(subparams.inType,
             sliceInfoVec[myAlgrankId][0].offset + subparams.inbaseOff, sliceInfoVec[myAlgrankId][0].size);
-            DataSlice rdestSlice = DataSlice(subparams.outType, 
+            DataSlice rdestSlice = DataSlice(subparams.outType,
             rankId * sliceInfoVec[myAlgrankId][0].size + subparams.outbaesOff, sliceInfoVec[myAlgrankId][0].size);
             std::vector<DataSlice> recvSrcSlices{rsrcSlice};
             std::vector<DataSlice> recvDestSlices{rdestSlice};
@@ -298,7 +298,7 @@ HcclResult InsTempAllReduceMesh2DTwoShot::RunReduceScatter(SubStageArgs& subpara
     if (sliceInfoVec[myAlgrankId][0].size != 0) {  // local reduce, 计算结果都放在最开始的位置
         DataSlice ldestSlice = DataSlice(subparams.outType, subparams.outbaesOff, sliceInfoVec[myAlgrankId][0].size);
         for (u32 rankId = 1; rankId < rankInfo.size(); rankId++) {
-            DataSlice lsrcSlice = DataSlice(subparams.outType, 
+            DataSlice lsrcSlice = DataSlice(subparams.outType,
             rankId * sliceInfoVec[myAlgrankId][0].size + subparams.outbaesOff, sliceInfoVec[myAlgrankId][0].size);
             // 所有reduce操作在同一个insque中才能保序；
             CHK_PRT_RET(LocalReduce(tempInsQues[0], lsrcSlice, ldestSlice, dataType_, redOp_),
@@ -316,7 +316,7 @@ HcclResult InsTempAllReduceMesh2DTwoShot::RunReduceScatter(SubStageArgs& subpara
  * param: tempFuncs: 辅助信息包括userIn/OutSlices, opMode等标记信息
  * return: HcclResult
  */
-HcclResult InsTempAllReduceMesh2DTwoShot::RunAllgather(SubStageArgs& subparams, 
+HcclResult InsTempAllReduceMesh2DTwoShot::RunAllgather(SubStageArgs& subparams,
     const RankSliceInfo &sliceInfoVec, const ResLinks &tempLinks, std::vector<InsQuePtr> &tempInsQues,
     const std::vector<RankId> &rankInfo) const
 {

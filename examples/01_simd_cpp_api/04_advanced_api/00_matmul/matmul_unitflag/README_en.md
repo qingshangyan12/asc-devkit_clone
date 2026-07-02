@@ -24,7 +24,7 @@ A Matmul example that enables the UnitFlag feature to parallelize the CUBE compu
 ```
 
 ## Example Description
-- Example Function:  
+- Example Function:
   When the Matmul example calls the Matmul API for computation, it enables the UnitFlag feature for the MDL template by setting the enUnitFlag parameter in MatmulConfig to true. The Norm and IBShare templates enable the UnitFlag feature by default, while the MDL template does not enable it by default.
 
 - Constraints
@@ -32,7 +32,7 @@ A Matmul example that enables the UnitFlag feature to parallelize the CUBE compu
   - When the UnitFlag feature is enabled, the example does not support having both L0C transfer-out to Global Memory and L1 transfer-out to Global Memory pipelines simultaneously.
   - When the UnitFlag feature is enabled and the L0C accumulation feature is also enabled, multiple Iterate computations with a single GetTensorC output are not supported.
 
-- Example Specifications:  
+- Example Specifications:
   In this example: M = 1024, N = 4096, K = 1024.
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="5" align="center">Matmul</td></tr>
@@ -44,7 +44,7 @@ A Matmul example that enables the UnitFlag feature to parallelize the CUBE compu
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="5" align="center">matmul_unitflag_custom</td></tr>
   </table>
 
-- Example Implementation: 
+- Example Implementation:
   - Key Kernel Steps
     - When creating the Matmul object, customize the MatmulConfig parameters and set the enUnitFlag parameter to true to enable the UnitFlag feature, obtaining a custom Matmul object using the MDL template.
       ```cpp
@@ -66,12 +66,12 @@ A Matmul example that enables the UnitFlag feature to parallelize the CUBE compu
       AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL_UNITFLAG> matmulObj;
       ```
 
-  - Invocation Implementation  
+  - Invocation Implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
