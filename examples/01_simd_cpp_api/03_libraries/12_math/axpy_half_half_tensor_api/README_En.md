@@ -1,10 +1,10 @@
-# Axpy Operator Direct Call Sample (Tensor API)
+# AXPY Operator Direct Call Sample (Tensor API)
 
 ## Overview
 
-This sample implements the Axpy function, where each element in the source operand src is multiplied by a scalar and then added to the corresponding element in the destination operand dst. The Axpy interface supports three data type combinations for source and destination operands: (half, half), (float, float), and (half, float). In this sample, the input tensor, scalar, and output tensor are all of type half.
+This sample implements the AXPY function, where each element in the source operand src is multiplied by a scalar and then added to the corresponding element in the destination operand dst. The AXPY interface supports three data type combinations for source and destination operands: (half, half), (float, float), and (half, float). In this sample, the input tensor, scalar, and output tensor are all of type half.
 
-This sample implements the Axpy operator using Ascend C programming language, and uses the <<<>>> kernel call operator to complete the basic flow of running the operator kernel function on the NPU side, providing an end-to-end implementation. Unlike the basic API sample, this sample uses the Tensor API `Transform<Inst::Axpy>` interface to perform the computation.
+This sample implements the AXPY operator using Ascend C programming language, and uses the <<<>>> kernel call operator to complete the basic flow of running the operator kernel function on the NPU side, providing an end-to-end implementation. Unlike the basic API sample, this sample uses the Tensor API transform interface to perform the computation.
 
 ## Supported Products
 
@@ -25,7 +25,7 @@ This sample implements the Axpy operator using Ascend C programming language, an
 ## Operator Description
 
 - **Operator Function:**
-  The Axpy operator implements the function of multiplying each element in the source operand src by a scalar, adding it to the corresponding element in the destination operand dst, and returning the computation result.
+  The AXPY operator implements the function of multiplying each element in the source operand src by a scalar, adding it to the corresponding element in the destination operand dst, and returning the computation result.
 
   The corresponding mathematical expression is:
   ```
@@ -34,23 +34,23 @@ This sample implements the Axpy operator using Ascend C programming language, an
 
 - **Operator Specification:**
   <table>
-  <tr><td rowspan="1" align="center">OpType</td><td colspan="5" align="center"> Axpy </td></tr>
+  <tr><td rowspan="1" align="center">OpType</td><td colspan="5" align="center"> AXPY </td></tr>
   <tr><td rowspan="2" align="center">Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">default</td></tr> <tr><td align="center">x</td><td align="center">4 * 128</td><td align="center">float16</td><td align="center">ND</td><td align="center">\</td></tr> <tr><td rowspan="1" align="center">Output</td><td align="center">out</td><td align="center">4 * 128</td><td align="center">float16</td><td align="center">ND</td><td align="center">\</td></tr> <tr><td rowspan="1" align="center">Kernel Name</td><td colspan="5" align="center">kernel_axpy_half_half_tensor_api</td></tr>
   </table>
 
 - **Operator Implementation:**
-  This sample implements the Axpy operator with a fixed shape of 4*128.
+  This sample implements the AXPY operator with a fixed shape of 4*128.
 
   - **Kernel Implementation**
 
-    The mathematical expression of the Axpy operator is:
+    The mathematical expression of the AXPY operator is:
     ```
     out = x * scalar + out
     ```
 
-    The computation logic is: using the vector computation interface provided by Tensor API, the input data needs to be first moved to on-chip storage, then the `Transform<Inst::Axpy>` interface is used to multiply x by the scalar and add the original value in out to obtain the final result, which is then moved out to external storage.
+    The computation logic is: using the vector computation interface provided by Tensor API, the input data needs to be first moved to on-chip storage, then the transform interface is used to multiply x by the scalar and add the original value in out to obtain the final result, which is then moved out to external storage.
 
-    The implementation flow of the Axpy operator is divided into 5 steps: Create GM/UB Tensor, CopyIn, Compute, CopyOut. The CopyIn task is responsible for moving the input Tensor from Global Memory to UB Local Memory. The Compute task is responsible for executing `Transform<Inst::Axpy>` on srcUbTensor, and the computation result is stored in dstUbTensor. The CopyOut task is responsible for moving the output data from dstUbTensor to the output Tensor in Global Memory.
+    The implementation flow of the AXPY operator is divided into 5 steps: Create GM/UB Tensor, CopyIn, Compute, CopyOut. The CopyIn task is responsible for moving the input Tensor from Global Memory to UB Local Memory. The Compute task is responsible for executing the transform operation on srcUbTensor, and the computation result is stored in dstUbTensor. The CopyOut task is responsible for moving the output data from dstUbTensor to the output Tensor in Global Memory.
 
   - **Call Implementation**
 

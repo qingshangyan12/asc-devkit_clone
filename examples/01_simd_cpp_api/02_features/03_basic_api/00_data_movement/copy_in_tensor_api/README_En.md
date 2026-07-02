@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example implements dynamic shape matrix multiplication with Bias based on the Tensor API programming approach, demonstrating the usage of Copy (GM to L1, L1 to L0) transpose and non-transpose scenarios and Mmad (matrix multiply-add) Tensor APIs. It supports selecting the transpose mode and data type through the build-time parameter SCENARIO_NUM. Shape parameters are dynamically passed at runtime through the MatmulTiling structure.
+This example implements dynamic shape matrix multiplication with Bias based on the Tensor API programming approach, demonstrating the usage of Copy (GM to L1, L1 to L0) in transpose and non-transpose scenarios and matrix multiply-add Tensor APIs. It supports selecting the transpose mode and data type through the build-time parameter SCENARIO_NUM. Shape parameters are dynamically passed at runtime through the MatmulTiling structure.
 
 ## Supported Products and CANN Versions
 
@@ -29,7 +29,7 @@ This example implements dynamic shape matrix multiplication with Bias based on t
 ## Example Description
 
 - Example functionality:
-  This example implements dynamic Shape multi-core Matmul with Bias, performing GM-to-L1 and L1-to-L0 data transfer through the Copy API, and matrix multiply-add computation through the Mmad API.
+  This example implements dynamic Shape multi-core Matmul with Bias, performing GM-to-L1 and L1-to-L0 data transfer through the Copy API, and matrix multiply-add computation through the matrix multiply-add API.
 
   1. Dynamic Matmul Functionality
 
@@ -37,7 +37,7 @@ This example implements dynamic shape matrix multiplication with Bias based on t
 
   2. Bias Functionality
 
-  This example adds the Bias vector to the matrix multiplication result through the Mmad API in the first iteration of Matmul computation. Bias is a float-type one-dimensional vector with length N.
+  This example adds the Bias vector to the matrix multiplication result through the matrix multiply-add API in the first iteration of Matmul computation. Bias is a float-type one-dimensional vector with length N.
 
   3. Multi-scenario Support
 

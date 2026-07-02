@@ -1,5 +1,7 @@
 # MxFP4 Matmul Tensor API High-Performance Example
 
+<!-- codespell:ignore Mmad MmadParams cmatrixInitVal -->
+
 ## Overview
 
 This example introduces how to implement a high-performance MxFP4 Matmul kernel based on Ascend C Tensor API and static Tensor programming, through multiple optimization methods including L1/L0 double buffering, large packet transfer, and fine-grained pipeline synchronization.
@@ -21,7 +23,7 @@ This example introduces how to implement a high-performance MxFP4 Matmul kernel 
 │   │   └── verify_result.py    // Ground truth comparison script
 │   ├── CMakeLists.txt          // Build project file
 │   ├── data_utils.h            // Data read/write functions
-│   ├── figures                 // Illustrations
+│   ├── figure                  // Illustrations
 │   ├── mmad_mx.asc             // Ascend C Tensor API example implementation
 │   └── README.md               // Example documentation
 ```
@@ -42,7 +44,7 @@ $$
 
 In MxMatmul, every 32 elements along the K direction share one scale. That is, the number of scales is much fewer than matrix elements, but it broadcasts along the K direction to the corresponding group of MxFP4 data, as shown in the figure:
 
-  <img src="figures/MxMatmul.png"  width="80%">
+  <img src="figure/MxMatmul.png"  width="80%">
 
 ## Example Specifications
 
@@ -70,11 +72,11 @@ Compared to standard Matmul, MxMatmul has additional scale transfer, loading, an
 
 - Four-way input data layout format is shown below:
 
-  <img src="figures/formatOfMx.png">
+  <img src="figure/formatOfMx.png">
 
 - Four-way input transfer and computation is shown below:
 
-  <img src="figures/InputOfMxMatmul.png">
+  <img src="figure/InputOfMxMatmul.png">
 
 ### Key Parameters
 
@@ -115,7 +117,7 @@ Physical Address                               Pipeline
   v
   L0A / L0B / L0ScaleA / L0ScaleB
   |
-  |  Mmad                              M
+  |  Matrix computation                M
   v
   L0C
   |
@@ -202,9 +204,9 @@ The main buffer layout of this example is:
 | L1 | `B Ping/Pong` | B large packet data | Stores GM->L1 B data |
 | L1 | `ScaleA Ping/Pong` | Scale data corresponding to A | Stores A side MXScale |
 | L1 | `ScaleB Ping/Pong` | Scale data corresponding to B | Stores B side MXScale |
-| L0A | `A Ping/Pong` | Current K block A data | Cube `Mmad` left operand |
-| L0B | `B Ping/Pong` | Current K block B data | Cube `Mmad` right operand |
-| L0C | `C` | float accumulation result | `Mmad` output, for write-back to GM |
+| L0A | `A Ping/Pong` | Current K block A data | Cube matrix-computation left operand |
+| L0B | `B Ping/Pong` | Current K block B data | Cube matrix-computation right operand |
+| L0C | `C` | float accumulation result | Matrix-computation output, for write-back to GM |
 
 A simplified pipeline rhythm is:
 
@@ -213,7 +215,7 @@ time     |----------------------------------------------------------------------
 
 GM->L1   | A/B/ScaleA/ScaleB Ping | A/B/ScaleA/ScaleB Pong | A/B/ScaleA/ScaleB Ping |
 L1->L0                            | L0 Ping load --|       | L0 Pong load --|
-Cube                                               | Mmad Ping ---|   | Mmad Pong ---|
+Cube                                               | Compute Ping ---|   | Compute Pong ---|
 L0C->GM                                                           | Copy L0C to GM ---
 ```
 
@@ -231,10 +233,10 @@ for nBlock in N blocks:
     for kBlock in K blocks:
         Copy(A block, ScaleA block)
         Copy(B block, ScaleB block)
-        Mmad accumulate
+        Accumulate
 ```
 
-`Mmad` input comes from L0A/L0B, output accumulates to L0C. The first K block initializes the accumulation result, subsequent K blocks continue accumulating until the complete K direction computation is finished.
+Matrix-computation input comes from L0A/L0B, output accumulates to L0C. The first K block initializes the accumulation result, subsequent K blocks continue accumulating until the complete K direction computation is finished.
 
 Key parameters in the computation stage include `m/n/k` dimensions and whether to initialize the C matrix:
 
@@ -244,7 +246,7 @@ mmadParams.cmatrixInitVal = (kBlockIdx == 0);
 AscendC::Te::Mmad(mmadAtom.with(mmadParams), l0TensorC, l0TensorA, l0TensorB);
 ```
 
-Where `cmatrixInitVal` controls the first K block to initialize the accumulation result, and subsequent K blocks continue accumulating on existing L0C data.
+The initialization control parameter controls the first K block to initialize the accumulation result, and subsequent K blocks continue accumulating on existing L0C data.
 
 #### 6. L0C Write-Back to GM: Converting from float to bfloat16 Output
 
@@ -271,8 +273,8 @@ When using static Tensor programming, synchronization is key to performance and 
 |------|------|------|----------|
 | `MTE2_MTE1` | GM->L1 notifies L1->L0 | After GM->L1 Copy completes, notifies L1->L0 Copy that L1 data can be read | `EVENT_ID0/1`: A+B Data Ping/Pong; `EVENT_ID2/3`: As+Bs Scale Ping/Pong |
 | `MTE1_MTE2` | L1->L0 notifies GM->L1 | After L1->L0 Copy consumes L1 data, notifies GM->L1 Copy that the buffer can be overwritten | Same as above |
-| `MTE1_M` | L1->L0 notifies Cube | After L1->L0 Copy completes, notifies Mmad that computation can start | `EVENT_ID0/1`: L0 Ping/Pong |
-| `M_MTE1` | Cube notifies L1->L0 | After Mmad consumes L0 buffer, notifies next L1->L0 Copy that it can write | `EVENT_ID0/1`: L0 Ping/Pong |
+| `MTE1_M` | L1->L0 notifies Cube | After L1->L0 Copy completes, notifies matrix computation that it can start | `EVENT_ID0/1`: L0 Ping/Pong |
+| `M_MTE1` | Cube notifies L1->L0 | After matrix computation consumes the L0 buffer, notifies next L1->L0 Copy that it can write | `EVENT_ID0/1`: L0 Ping/Pong |
 
 A/B data have the same lifecycle, so they are bound to the same event group by Ping/Pong phase; ScaleA/ScaleB have the same lifecycle, but scale chunks are typically larger than data chunks, so they use a separate Ping/Pong event group.
 
@@ -315,7 +317,7 @@ Copy(L1->L0)
         |
         | MTE1_M
         v
-Mmad(Cube)
+Matrix computation (Cube)
         |
         | M_MTE1
         v
@@ -341,7 +343,7 @@ Performance metric description table:
 | `Task Duration(μs)` | Total execution time of the entire task, operator end-to-end execution time is determined by this parameter |
 | `Block Num` | Number of cores used, that is, the number of blocks launched by the kernel |
 | `aicore_time(μs)` | Average AI Core execution time |
-| `aic_mac_time(μs)` | Cube computation unit execution time, primarily corresponding to `Mmad` stage |
+| `aic_mac_time(μs)` | Cube computation unit execution time, primarily corresponding to the matrix-computation stage |
 | `aic_mac_ratio` | Cube computation unit time ratio, reflecting computation unit utilization |
 | `aic_scalar_time(μs)` | Scalar instruction execution time, reflecting loop scheduling, address computation, parameter configuration overhead |
 | `aic_scalar_ratio` | Scalar time ratio |

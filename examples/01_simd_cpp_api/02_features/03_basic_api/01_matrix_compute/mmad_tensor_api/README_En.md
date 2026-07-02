@@ -1,8 +1,8 @@
-# Mmad Inline Quantization Example Based on Tensor API
+# Matrix Multiply-Add Inline Quantization Example Based on Tensor API
 
 ## Overview
 
-This example implements dynamic Shape matrix multiplication and inline quantization computation based on the Tensor API programming paradigm. Matrix A is not transposed, matrix B is stored transposed, A/B matrix data type is int8, Mmad accumulation type is int32, and output matrix C data type is half. The quantization coefficient quant is input in uint64_t format, scaling the int32 accumulation results in L0C during the Fixpipe phase and writing back to GM.
+This example implements dynamic Shape matrix multiplication and inline quantization computation based on the Tensor API programming paradigm. Matrix A is not transposed, matrix B is stored transposed, A/B matrix data type is int8, matrix multiply-add accumulation type is int32, and output matrix C data type is half. The quantization coefficient quant is input in uint64_t format, scaling the int32 accumulation results in L0C during the Fixpipe phase and writing back to GM.
 
 ## Supported Products and CANN Versions
 
@@ -33,19 +33,19 @@ This example implements dynamic Shape matrix multiplication and inline quantizat
 
   1. Dynamic Matmul functionality
 
-     The example constructs Tensor objects on GM, L1, L0A, L0B, L0C through Tensor API in the Kernel, uses the Copy interface to complete block transfers from GM to L1 and L1 to L0, and performs matrix multiplication through the Mmad interface. Matrix A is read in ND layout, matrix B is read in DN layout (stored as transposed [N, K] in input files). Shape parameters (M, N, K, singleCoreM, singleCoreN, singleCoreK) are passed to the Kernel at runtime, while baseM, baseN, baseK and stepM, stepN, stepK, ENABLE_UNITFLAG serve as compile-time template parameters determining L1/L0 Buffer allocation sizes and block stepping.
+     The example constructs Tensor objects on GM, L1, L0A, L0B, and L0C through Tensor API in the Kernel, uses the Copy interface to complete block transfers from GM to L1 and L1 to L0, and performs matrix multiplication through the matrix multiply-add interface. Matrix A is read in ND layout, matrix B is read in DN layout (stored as transposed [N, K] in input files). Shape parameters (M, N, K, singleCoreM, singleCoreN, singleCoreK) are passed to the Kernel at runtime, while baseM, baseN, baseK and stepM, stepN, stepK, ENABLE_UNITFLAG serve as compile-time template parameters determining L1/L0 Buffer allocation sizes and block stepping.
 
-  2. Fixpipe inline quantization/dequantization functionality
+  2. Fixpipe inline quantization and inverse quantization functionality
 
      For specific input/output data types, Fixpipe supports performing data quantization operations on output C matrix elements when transferring computation results from L0C to GM, by configuring Fixpipe quantization mode and quantization parameters.
      Fixpipe provides two different granularities of inline quantization: per_tensor and per_channel.
-      1. per_tensor: Quantize/dequantize the entire Tensor, with the Tensor having a unique scaling factor. This approach can reduce model storage and computation costs but decreases model accuracy.
-      2. per_channel: Quantize/dequantize each channel of the Tensor individually, with the same scaling factor shared within a channel and different scaling factors between channels. This approach better preserves model accuracy but increases model storage and computation costs.
+      1. per_tensor: Quantize the entire Tensor or restore it from a quantized representation, with the Tensor having a unique scaling factor. This approach can reduce model storage and computation costs but decreases model accuracy.
+      2. per_channel: Quantize each channel of the Tensor or restore it from a quantized representation individually, with the same scaling factor shared within a channel and different scaling factors between channels. This approach better preserves model accuracy but increases model storage and computation costs.
 
   3. ENABLE_UNITFLAG
 
      The example controls the unitFlag feature switch through the `ENABLE_UNITFLAG` template parameter, with default value true.
-     For a detailed description of unitFlag, see the Mmad unitFlag feature sample in the upstream `asc-devkit` repository.
+     For a detailed description of unitFlag, see the unitFlag feature sample in the upstream `asc-devkit` repository.
 
 - Example specifications:
 

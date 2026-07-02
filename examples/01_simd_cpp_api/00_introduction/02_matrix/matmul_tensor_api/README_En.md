@@ -51,7 +51,7 @@ This example implements multi-core matrix multiplication computation based on th
     <tr><td align="left">2</td><td align="left">MakeTensor + Slice</td><td align="left">Create GM tensor and slice to get data block processed by current core</td><td align="left">ND format</td></tr>
     <tr><td align="left">3</td><td align="left">Copy(CopyGM2L1)</td><td align="left">Move A matrix and B matrix data from GM to L1</td><td align="left">ND->NZ format conversion</td></tr>
     <tr><td align="left">4</td><td align="left">Copy(CopyL12L0A/B)</td><td align="left">Move data from L1 to L0A and L0B</td><td align="left">L1->L0A: NZ->NZ<br>L1->L0B: NZ->ZN</td></tr>
-    <tr><td align="left">5</td><td align="left">Mmad</td><td align="left">Complete matrix multiply-accumulate computation</td><td align="left">Matrix multiplication result is NZ format</td></tr>
+    <tr><td align="left">5</td><td align="left">Matrix multiply-accumulate API</td><td align="left">Complete matrix multiply-accumulate computation</td><td align="left">Matrix multiplication result is NZ format</td></tr>
     <tr><td align="left">6</td><td align="left">Copy(CopyL0C2GM)</td><td align="left">Move computation result from L0C to GM</td><td align="left">NZ->ND format conversion</td></tr>
     </table>
 
@@ -65,8 +65,8 @@ This example implements multi-core matrix multiplication computation based on th
        - CopyL12L0A/B: Data movement from L1 to L0A/L0B
        - CopyL0C2GM: Data movement from L0C to GM, automatically handles NZ→ND format conversion
 
-    3. **Matrix Multiplication Interface**: Use Mmad + MmadAtom abstraction
-       - Automatically manages accumulation control (cmatrixInitVal parameter)
+    3. **Matrix Multiplication Interface**: Use the matrix multiply-accumulate abstraction
+       - Automatically manages accumulation control parameters
 
     4. **Slicing Interface**: Use Slice + MakeCoord + MakeShape to get tensor sub-regions
        - Implements multi-core logic: each core processes different data blocks
@@ -86,7 +86,7 @@ This example primarily uses the following Tensor API capabilities for implementa
 | Data Movement | Use Copy to complete cross-level movement |
 | Format Conversion | Rely on layout patterns to automatically complete NZ / ZN conversion |
 | Multi-core Logic | Use Slice to get data block processed by current core |
-| Computation Interface | Use Mmad to complete matrix multiply-accumulate |
+| Computation Interface | Use the matrix multiply-accumulate API to complete computation |
 
 ## Build and Run
 

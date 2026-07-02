@@ -1,5 +1,7 @@
 # Batch Matmul Example
 
+<!-- codespell:ignore Mmad MmadParams -->
+
 ## Overview
 
 This example implements batched matrix multiplication (Batch Matmul) with bias using the Tensor API programming paradigm. The input matrices A, B, and Bias all use half data type, and the output matrix C also uses half data type. Neither matrix A nor matrix B is transposed. The core computation logic is defined as follows:
@@ -35,12 +37,12 @@ The data flow of this example is as follows:
 1. Global Memory -> L1 Buffer: Call the Copy interface with `CopyGM2L1` `Operation` transfer capability to transfer `L1BatchSize` of matrix A, matrix B, and Bias from Global Memory to L1 Buffer.
 2. L1 Buffer -> L0A Buffer/L0B Buffer: Call the Copy interface with `CopyL12L0A` and `CopyL12L0B` `Operation` transfer capability to transfer `L0BatchSize` of matrix A and matrix B from L1 Buffer to L0 Buffer.
 3. L1 Buffer -> BiasTable Buffer: Call the Copy interface with `CopyL12BT` `Operation` transfer capability to transfer `L0BatchSize` of Bias from L1 Buffer to BiasTable Buffer.
-4. Mmad: Loop through matrices A, B, and Bias on L0 Buffer `L0BatchSize` times, computing one batch group of A, B matrix multiplication plus Bias each time and writing to L0C Buffer.
+4. Matrix computation: Loop through matrices A, B, and Bias on L0 Buffer `L0BatchSize` times, computing one batch group of A, B matrix multiplication plus Bias each time and writing to L0C Buffer.
 5. L0C Buffer -> Global Memory: Call the Copy interface with `CopyL0C2GM` `Operation` transfer capability to transfer `L0BatchSize` result matrices C out to Global Memory at once.
 
-### Batch Matmul Definition
+### Batch Matrix Multiplication Definition
 
-Batch matrix multiplication (batch matmul) is an extension of standard matrix multiplication along the batch dimension. The core logic is: for a batch of data containing multiple matrices, perform standard matrix multiplication on each matrix in the batch individually, outputting the same number of result matrices.
+Batch matrix multiplication is an extension of standard matrix multiplication along the batch dimension. The core logic is: for a batch of data containing multiple matrices, perform standard matrix multiplication on each matrix in the batch individually, outputting the same number of result matrices.
 
 In scenarios with Bias, if the input matrices A, B, and Bias have shapes `[B, M, K]`, `[B, K, N]`, and `[B, 1, N]` respectively, the output matrix C has shape `[B, M, N]`. For any batch `i`, take `A[i]` and `B[i]` for standard matrix multiplication, then add `Bias[i]` to produce `C[i]`.
 
@@ -109,9 +111,9 @@ for (uint32_t l1batchIndex = BIndexStart; l1batchIndex < BIndexEnd; l1batchIndex
 }
 ```
 
-### Mmad Batch Computation
+### Batch Matrix Computation
 
-Each Batch's Mmad operation corresponds to an independent Bias. Since the hardware mad instruction does not support batch data matrix multiply-add operations, Mmad operations must be looped along the Batch dimension, with each iteration taking a single input matrix A, matrix B, and Bias as input operands for computation.
+Each batch matrix multiply-add operation corresponds to an independent Bias. Since the hardware MAD instruction does not support batch data matrix multiply-add operations, the operation must be looped along the batch dimension, with each iteration taking a single input matrix A, matrix B, and Bias as input operands for computation.
 
 ```cpp
 for (uint32_t l0CBatchIndex = 0; l0CBatchIndex < l0BatchSize; l0CBatchIndex++) {

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example implements dynamic Shape matrix multiplication with Bias based on the Tensor API programming approach, demonstrating the usage of Copy Out APIs (L0C to GM, L0C to UB) and Mmad (matrix multiply-add) Tensor APIs. Select different write-back modes through the build-time parameter `SCENARIO_NUM`. Shape parameters are dynamically passed at runtime through the `MatmulTiling` structure.
+This example implements dynamic Shape matrix multiplication with Bias based on the Tensor API programming approach, demonstrating the usage of Copy Out APIs (L0C to GM, L0C to UB) and matrix multiply-add Tensor APIs. Select different write-back modes through the build-time parameter `SCENARIO_NUM`. Shape parameters are dynamically passed at runtime through the `MatmulTiling` structure.
 
 ## Supported Products and CANN Versions
 
@@ -28,7 +28,7 @@ This example implements dynamic Shape matrix multiplication with Bias based on t
 ## Example Description
 
 - Example functionality:
-  This example implements dynamic Shape multi-core Matmul with Bias, performing L0C-to-GM or L0C-to-UB data transfer through the Copy API, and matrix multiply-add computation through the Mmad API.
+  This example implements dynamic Shape multi-core Matmul with Bias, performing L0C-to-GM or L0C-to-UB data transfer through the Copy API, and matrix multiply-add computation through the matrix multiply-add API.
 
   1. Dynamic Matmul Functionality
 
@@ -36,7 +36,7 @@ This example implements dynamic Shape matrix multiplication with Bias based on t
 
   2. Bias Functionality
 
-  This example adds the Bias vector to the matrix multiplication result through the Mmad API in the first iteration of Matmul computation. Bias is a float-type one-dimensional vector with length N.
+  This example adds the Bias vector to the matrix multiplication result through the matrix multiply-add API in the first iteration of Matmul computation. Bias is a float-type one-dimensional vector with length N.
 
   3. Multi-scenario Support
 
