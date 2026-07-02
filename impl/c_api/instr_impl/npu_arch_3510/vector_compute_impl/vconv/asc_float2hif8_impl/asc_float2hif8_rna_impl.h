@@ -80,4 +80,61 @@ __simd_callee__ inline void asc_float2hif8_rna_v4_impl(vector_hifloat8_t& dst, v
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+
+__simd_callee__ inline void asc_float2hif8_rna_impl(vector_hifloat8_t& dst, vector_float src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> quarter)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_f322hif8_x(src, mask, (ULL)1, (ULL)1, (ULL)0);
+    }
+}
+
+__simd_callee__ inline void asc_float2hif8_rna_impl(vector_hifloat8_t& dst, vector_float src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::SECOND> quarter)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_f322hif8_x(src, mask, (ULL)1, (ULL)1, (ULL)1);
+    }
+}
+
+__simd_callee__ inline void asc_float2hif8_rna_impl(vector_hifloat8_t& dst, vector_float src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::THIRD> quarter)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_f322hif8_x(src, mask, (ULL)1, (ULL)1, (ULL)2);
+    }
+}
+
+__simd_callee__ inline void asc_float2hif8_rna_impl(vector_hifloat8_t& dst, vector_float src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FOURTH> quarter)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_f322hif8_x(src, mask, (ULL)1, (ULL)1, (ULL)3);
+    }
+}
+
+__simd_callee__ inline void asc_float2hif8_rna_sat_impl(vector_hifloat8_t& dst, vector_float src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> quarter)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_f322hif8_x(src, mask, (ULL)1, (ULL)1, (ULL)0);
+    }
+}
+
+__simd_callee__ inline void asc_float2hif8_rna_sat_impl(vector_hifloat8_t& dst, vector_float src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::SECOND> quarter)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_f322hif8_x(src, mask, (ULL)1, (ULL)1, (ULL)1);
+    }
+}
+
+__simd_callee__ inline void asc_float2hif8_rna_sat_impl(vector_hifloat8_t& dst, vector_float src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::THIRD> quarter)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_f322hif8_x(src, mask, (ULL)1, (ULL)1, (ULL)2);
+    }
+}
+
+__simd_callee__ inline void asc_float2hif8_rna_sat_impl(vector_hifloat8_t& dst, vector_float src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FOURTH> quarter)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_f322hif8_x(src, mask, (ULL)1, (ULL)1, (ULL)3);
+    }
+}
+
 #endif
