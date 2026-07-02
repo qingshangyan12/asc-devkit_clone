@@ -30,8 +30,13 @@
 
 namespace AscendC {
 
+typedef uint32_t AinSignal;
+
 using AinDevComm = __gm__ void*;
 using AinCommSymWindow = __gm__ void*;
+
+struct AinTeamTagWorld {};
+struct AinTeamTagRail {};
 
 /*!
  * @brief Describes the communication team used by Ain interfaces.
@@ -81,6 +86,19 @@ enum AinCommitFlags {
     AIN_COMMIT_IMMED = 0,         /*!< Assemble the WQE and ring the doorbell immediately. */
     AIN_COMMIT_DELAYED = (1 << 0) /*!< Assemble the WQE only; caller drains later through flush(). */
 };
+
+enum AinMemoryOrder {
+    AIN_MEMORY_ORDER_DEFAULT
+};
+
+typedef struct {
+    AinSignal signalId;
+    uint64_t value;
+} AinSignalAdd;
+
+typedef struct {
+    AinSignal signalId;
+} AinSignalInc;
 
 } // namespace AscendC
 
