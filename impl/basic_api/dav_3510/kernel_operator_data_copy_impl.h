@@ -74,11 +74,7 @@ __aicore__ inline void CopyGmToUbufAlignV2(__ubuf__ T* dst, __gm__ T* src, const
             rigntPaddingCnt = 0;
             leftPaddingCnt = 0;
         }
-        if constexpr (sizeof(T) == 8) { // B64
-            // asc_copy_gm2ub_pad();
-            // asc_copy_gm2ub_align((__ubuf__ uint32_t*)dst, (__gm__ uint32_t*)src, 0, blockCount, burstLength,
-            //                          leftPaddingCnt * 2, rigntPaddingCnt * 2, isPad, cacheMode, srcStride310,
-            //                          dstStride310);
+        if constexpr (sizeof(T) == 8) {
             copy_gm_to_ubuf_align_v2((__ubuf__ uint32_t*)dst, (__gm__ uint32_t*)src, 0, blockCount, burstLength,
                                      leftPaddingCnt * 2, rigntPaddingCnt * 2, isPad, cacheMode, srcStride310,
                                      dstStride310);
