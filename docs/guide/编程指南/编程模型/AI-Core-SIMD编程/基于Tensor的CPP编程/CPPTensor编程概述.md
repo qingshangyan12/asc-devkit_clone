@@ -152,7 +152,7 @@ __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm
   AscendC::LocalTensor<float> zLocalPing(AscendC::TPosition::VECCALC, zAddrPing, 256);
 }
 ```
-> 📌 其中AscendC::TPosition::VECCALC为对物理位置的逻辑抽象定义，与物理位置的映射参考文件[逻辑位置和物理存储的映射](../../../../../api/SIMD-API/通用说明和约束.md)。
+> 📌 其中AscendC::TPosition::VECCALC为对物理位置的逻辑抽象定义，与物理位置的映射参考文件[逻辑位置和物理存储的映射](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/通用说明和约束.md)。
 
 相比基础Tensor，[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入Layout描述并将其作为Tensor的核心属性，开发者可在Tensor创建时直接关联Shape与Stride信息，简化多维数据的布局管理。通过`MakeTensor`，开发者可灵活指定内存地址和Layout布局，更便捷地描述ND、NZ等典型数据排布。
 
@@ -277,7 +277,7 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
 
 ![block和subblock之间关系](../../../../figures/block和subblock之间关系.png)
 
-算子按计算特征可划分为三类：Cube算子（矩阵计算）、Vector算子（矢量计算）和CV融合算子（矩阵与矢量混合计算）。算子类型决定了其核间同步方式与group配置模式的选择。针对不同算子场景，C++ Tensor编程通过[CrossCoreSetFlag](../../../../../api/SIMD-API/基础API/同步控制/核间同步/CrossCoreSetFlag(ISASI).md)和[CrossCoreWaitFlag](../../../../../api/SIMD-API/基础API/同步控制/核间同步/CrossCoreWaitFlag(ISASI).md)两个接口组合实现核间同步，以满足多样化的算子开发需求。
+算子按计算特征可划分为三类：Cube算子（矩阵计算）、Vector算子（矢量计算）和CV融合算子（矩阵与矢量混合计算）。算子类型决定了其核间同步方式与group配置模式的选择。针对不同算子场景，C++ Tensor编程通过[CrossCoreSetFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreSetFlag(ISASI).md)和[CrossCoreWaitFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreWaitFlag(ISASI).md)两个接口组合实现核间同步，以满足多样化的算子开发需求。
 
 | 核间同步类型 | 场景说明 | 实现代码示例 |
 |---|---|---|
@@ -388,8 +388,8 @@ __global__ __mix__ void mix_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 ## 编程约束和限制
 
 - 同步事件由开发者使用`SetFlag/WaitFlag(ISASI)`和`PipeBarrier(ISASI)`手动插入，事件的类型和事件ID由开发者自行管理，但需要注意事件ID不能使用6和7（可能与内部使用的事件ID出现冲突，进而出现未定义行为）。
-- Kernel入口处需要开发者手动调用[InitSocState](../../../../../api/SIMD-API/基础API/工具接口/系统初始化/InitSocState.md)接口用来初始化全局状态寄存器。因为全局状态寄存器处于不确定状态，如果不调用该接口，可能导致算子执行过程中出现未定义行为。在TPipe框架编程中，初始化过程由TPipe完成，无需开发者关注。
-- Kernel结束前需要开发者手动调用[PipeBarrier<PIPE_ALL>()](../../../../../api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md)。
+- Kernel入口处需要开发者手动调用[InitSocState](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/工具接口/系统初始化/InitSocState.md)接口用来初始化全局状态寄存器。因为全局状态寄存器处于不确定状态，如果不调用该接口，可能导致算子执行过程中出现未定义行为。在TPipe框架编程中，初始化过程由TPipe完成，无需开发者关注。
+- Kernel结束前需要开发者手动调用[PipeBarrier<PIPE_ALL>()](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md)。
 - 部分API内部通过软仿真实现，需占用Ascend C预留的UB空间，开发者使用时需关注目标API是否依赖该预留空间（针对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)，Select等API内部使用了8KB的预留UB空间，用于存储中间数据；针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，Exp等API内部使用了2KB的预留UB空间，用于指令兼容或存储中间数据）。若开启--cce-disable-asc-reserved-ubuf编译选项，在对应产品版本下调用相关API会触发编译期报错。具体API范围见[使用预留UB空间的API列表](#section_reserved_ubuf_api)。
 - 同时另外一些软仿实现接口内部会占用系统分配的事件ID，如果开发者手动调用`SetFlag/WaitFlag(ISASI)`插入自定义事件ID时会跟接口内部的事件ID产生冲突，所以用户自定义事件ID时，只能支持部分API。具体支持的API列表见[支持的API范围](#section2633193623711)。
 
