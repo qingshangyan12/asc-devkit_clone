@@ -135,7 +135,7 @@ Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock�
 连续计算，`dataBlockStride`设置为1，对同一迭代内的8个DataBlock数据连续进行处理。
 非连续计算，`dataBlockStride`值大于1（如取2），同一迭代内不同DataBlock之间在读取数据时出现一个DataBlock的间隔，如下图所示。
 
-![dataBlockStride示例](../../../../figures/data_block_stride示例_c.png)
+![dataBlockStride示例](../../../../figures/data_block_stride示例.png)
 
 > 📌 若dst_block_stride == 0，等同于dst_block_stride = 1；若src_block_stride = 0，则源操作数将始终复用第一个dataBlock。
 

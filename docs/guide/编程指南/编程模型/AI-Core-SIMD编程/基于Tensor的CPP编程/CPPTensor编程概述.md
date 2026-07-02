@@ -44,14 +44,20 @@ Tensor本质是基于数组的编程抽象，而非简单的内存地址封装�
 
     ```cpp
     __global__ __cube__ void matmul_custom(__gm__ half* a, __gm__ half* b, __gm__ half* c) {
-      // 扩展Tensor（Tensor API）携带Layout信息，搬运接口自动推导参数
-      auto gmA = AscendC::Te::MakeTensor(AscendC::Te::MakeMemPtr(a), AscendC::Te::MakeFrameLayout<AscendC::Te::NDExtLayoutPtn>(M, K));
-      auto gmB = AscendC::Te::MakeTensor(AscendC::Te::MakeMemPtr(b), AscendC::Te::MakeFrameLayout<AscendC::Te::NDExtLayoutPtn>(K, N));
-      __cbuf__ half l1ABuf[1024];
-      auto l1ATensor = AscendC::Te::MakeTensor(AscendC::Te::MakeMemPtr(l1ABuf), AscendC::Te::MakeFrameLayout<AscendC::Te::NZLayoutPtn>(baseM, K));
-
-      // 一行代码完成搬运，无需手动传入size参数
-      AscendC::Te::Copy(l1ATensor, gmA);
+        // 实现代码示例，其中M, N, K为单核上GM上左右矩阵的大小, (baseM, K), (baseN, K)为搬运到L1上左右矩阵的大小
+        // 扩展Tensor（Tensor API）携带Layout信息，搬运接口自动推导参数
+        auto gmATensor = AscendC::Te::MakeTensor(AscendC::Te::MakeMemPtr(a), AscendC::Te::MakeFrameLayout<AscendC::Te::NDExtLayoutPtn>(M, K));
+        auto gmBTensor = AscendC::Te::MakeTensor(AscendC::Te::MakeMemPtr(b), AscendC::Te::MakeFrameLayout<AscendC::Te::NDExtLayoutPtn>(K, N));
+        ...
+        // __cbuf__ 为L1 Buffer的声明修饰符
+        __cbuf__ half l1ABuf[1024];
+        __cbuf__ half l1BBuf[1024];
+        auto l1ATensor = AscendC::Te::MakeTensor(AscendC::Te::MakeMemPtr(l1ABuf), AscendC::Te::MakeFrameLayout<AscendC::Te::NZLayoutPtn>(baseM, K));
+        auto l1BTensor = AscendC::Te::MakeTensor(AscendC::Te::MakeMemPtr(l1BBuf), AscendC::Te::MakeFrameLayout<AscendC::Te::NZLayoutPtn>(baseN, K));
+        ...
+        // 一行代码完成搬运，无需手动传入size参数
+        AscendC::Te::Copy(l1ATensor, gmATensor);
+        AscendC::Te::Copy(l1BTensor, gmBTensor);
     }
     ```
 
@@ -93,7 +99,7 @@ std::vector<float> kernel_add(std::vector<float> &x, std::vector<float> &y) {
 
     // Launch kernel function
     uint32_t numBlocks = 1;
-    add_custom<<<numBlocks, nullptr, stream>>>((uint8_t*)xDevice, (uint8_t*)yDevice, (uint8_t*)zDevice);
+    add_custom<<<numBlocks, 0, stream>>>((uint8_t*)xDevice, (uint8_t*)yDevice, (uint8_t*)zDevice);
     aclrtSynchronizeStream(stream);
 
     // Device to Host data copy
@@ -195,7 +201,7 @@ Cube计算单元专用的缓存为：L0A Buffer存储左矩阵，L0B Buffer存�
 
 #### Bank冲突
 
-为了提高数据访问的效率和吞吐量，内部存储采用了bank（大小相等的内存模块）结构设计。以UB为例，[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品上，UB总大小为256KB（256 × 1024字节），包含8个bank group，每个bank group包含2个bank。每个bank大小为16KB，由512行组成，每行长度为32B，采用低位地址交织。[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)的UB容量规格请参考相应硬件架构文档。
+为了提高数据访问的效率和吞吐量，内部存储采用了bank（大小相等的内存模块）结构设计。以UB为例，[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品上，UB总大小为256KB（256 × 1024字节），包含8个bank group，每个bank group包含2个bank。每个bank大小为16KB，由512行组成，每行长度为32B，采用低位地址交织。[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)的UB容量规格请参考[UB bank结构](../../../../算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免bank冲突（NPU架构版本2201）.md)。
 
 ![UB Bank冲突示意图](../../../../figures/UB_Bank冲突示意图.png)
 
@@ -271,7 +277,7 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
 
 ![block和subblock之间关系](../../../../figures/block和subblock之间关系.png)
 
-算子按计算特征可划分为三类：Cube算子（矩阵计算）、Vector算子（矢量计算）和CV融合算子（矩阵与矢量混合计算）。算子类型决定了其核间同步方式与group配置模式的选择。针对不同算子场景，C++ Tensor编程通过`CrossCoreSetFlag`和`CrossCoreWaitFlag`两个接口组合实现核间同步，以满足多样化的算子开发需求。
+算子按计算特征可划分为三类：Cube算子（矩阵计算）、Vector算子（矢量计算）和CV融合算子（矩阵与矢量混合计算）。算子类型决定了其核间同步方式与group配置模式的选择。针对不同算子场景，C++ Tensor编程通过[CrossCoreSetFlag](../../../../../api/SIMD-API/基础API/同步控制/核间同步/CrossCoreSetFlag(ISASI).md)和[CrossCoreWaitFlag](../../../../../api/SIMD-API/基础API/同步控制/核间同步/CrossCoreWaitFlag(ISASI).md)两个接口组合实现核间同步，以满足多样化的算子开发需求。
 
 | 核间同步类型 | 场景说明 | 实现代码示例 |
 |---|---|---|
