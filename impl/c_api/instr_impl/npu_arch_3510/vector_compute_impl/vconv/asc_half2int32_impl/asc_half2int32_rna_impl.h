@@ -39,11 +39,6 @@ __simd_callee__ inline void asc_half2int32_rna_v2_impl(vector_int32_t& dst, vect
     }
 }
 
-#endif
-
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 
 __simd_callee__ inline void asc_half2int32_rna_impl(vector_int32_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
 {
@@ -59,4 +54,9 @@ __simd_callee__ inline void asc_half2int32_rna_impl(vector_int32_t& dst, vector_
     }
 }
 
+#endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
