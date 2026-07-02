@@ -91,9 +91,27 @@ struct SymmetricWindow {
     void* devWin;
 };
 
-} // namespace AscendC
+enum AinSignalType {
+    AIN_SIGNAL_TYPE_NONE,
+    AIN_SIGNAL_TYPE_VA,
+    AIN_SIGNAL_TYPE_INDEXED,
+};
 
-#endif // IMPL_ADV_API_DETAIL_AIN_IMPL_AIN_IMPL_DEF_H
+typedef struct {
+    AinSignalType type;
+    union {
+        struct {
+        } vaSignal;
+
+        struct {
+            AinSignal signalId;
+        } indexedSignal;
+    };
+} AinSignalDescriptor;
+
+}  // namespace AscendC
+
+#endif  // IMPL_ADV_API_DETAIL_AIN_IMPL_AIN_IMPL_DEF_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_AIN_IMPL_DEF_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
