@@ -8,34 +8,24 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # -----------------------------------------------------------------------------------------------------------
 
-# asc-comm 仅承载 hcomm 代码；hccl/mc2 仍保留在 devkit 本仓，不从 asc-comm 拉取。
+include_guard(GLOBAL)
 
+set(ASC_COMM_HCOMM_RELATIVE_DIR "include/aicpu/hcomm")
+set(ASC_COMM_SOURCE_PATH "" CACHE PATH "Path to asc-comm source tree")
+set(ASC_COMM_URL "https://gitcode.com/cann/asc-comm.git" CACHE STRING "asc-comm git url")
+set(ASC_COMM_TAG_ID "master" CACHE STRING "asc-comm git ref")
 # 如果要拉取 pr 使用 refs/merge-requests/123/head 的 tag id
 # set(ASC_COMM_TAG_ID refs/merge-requests/123/head CACHE STRING "asc-comm git ref for source checkout")
-set(ASC_COMM_TAG_ID master CACHE STRING "asc-comm git ref for source checkout")
-set(ASC_COMM_HCOMM_RELATIVE_DIR "include/aicpu/hcomm")
-# 精简鉴权：不考虑安全因素，固定使用公共账户 aoe_public 及其令牌拉取 asc-comm 仓。
-set(ASC_COMM_GIT_USER "aoe_public")
-set(ASC_COMM_GIT_PASSWORD "KTZ21WLiB_fZv67g9kzGQiyc")
-set(ASC_COMM_GIT_URL
-    "https://${ASC_COMM_GIT_USER}:${ASC_COMM_GIT_PASSWORD}@gitcode.com/cann/asc-comm.git"
-    CACHE STRING "asc-comm git url" FORCE)
-set(ENV{GIT_TERMINAL_PROMPT} "0")
 
-# 优先探测本地已存在的 asc-comm 源码：命中任一候选目录即直接使用，不触发任何线上拉取；
-# 仅当所有候选都不存在(ASC_COMM_SOURCE_PATH 为空)时，才用固定账户从线上拉取。
-# 候选路径以本文件所在目录(<devkit>/cmake/3rdparty)为锚，推导出 devkit 仓根的同级 asc-comm，
-# 不依赖 include 点(CMAKE_CURRENT_SOURCE_DIR)，避免独立 test project include 时算错层级而误触发线上拉取。
-message(STATUS "[ThirdPartyLib][asc-comm] project source dir: ${PROJECT_SOURCE_DIR}")
 get_filename_component(_ASC_COMM_DEVKIT_ROOT "${CMAKE_CURRENT_LIST_DIR}/../.." REALPATH)
-set(ASC_COMM_SOURCE_PATH "")
-set(ASC_COMM_SOURCE_CANDIDATES
-    "${_ASC_COMM_DEVKIT_ROOT}/../asc-comm"
-)
+set(ASC_COMM_SOURCE_CANDIDATES "")
+if(ASC_COMM_SOURCE_PATH)
+    list(APPEND ASC_COMM_SOURCE_CANDIDATES "${ASC_COMM_SOURCE_PATH}")
+endif()
+list(APPEND ASC_COMM_SOURCE_CANDIDATES "${_ASC_COMM_DEVKIT_ROOT}/../asc-comm")
 if(CANN_3RD_LIB_PATH)
     list(APPEND ASC_COMM_SOURCE_CANDIDATES "${CANN_3RD_LIB_PATH}/asc-comm")
 endif()
-message(STATUS "[ThirdPartyLib][asc-comm] candidate source dirs: ${ASC_COMM_SOURCE_CANDIDATES}")
 
 foreach(source_candidate IN LISTS ASC_COMM_SOURCE_CANDIDATES)
     if(IS_DIRECTORY "${source_candidate}/${ASC_COMM_HCOMM_RELATIVE_DIR}")
@@ -46,17 +36,23 @@ foreach(source_candidate IN LISTS ASC_COMM_SOURCE_CANDIDATES)
 endforeach()
 
 if(NOT ASC_COMM_SOURCE_PATH)
-    message(STATUS "[ThirdPartyLib][asc-comm] No local source found, fetching ${ASC_COMM_TAG_ID} from remote.")
+    set(_ASC_COMM_DOWNLOAD_SOURCE_DIR "${CMAKE_BINARY_DIR}/_deps/asc-comm-src")
+    if(CANN_3RD_LIB_PATH)
+        set(_ASC_COMM_DOWNLOAD_SOURCE_DIR "${CANN_3RD_LIB_PATH}/asc-comm")
+    endif()
+
+    message(STATUS "[ThirdPartyLib][asc-comm] No local source found, fetching ${ASC_COMM_TAG_ID} from ${ASC_COMM_URL}.")
+    set(ENV{GIT_TERMINAL_PROMPT} "0")
     include(FetchContent)
     FetchContent_Declare(
-        asc-comm
-        GIT_REPOSITORY ${ASC_COMM_GIT_URL}
+        asc_comm
+        GIT_REPOSITORY ${ASC_COMM_URL}
         GIT_TAG ${ASC_COMM_TAG_ID}
         GIT_PROGRESS TRUE
-        SOURCE_DIR ${CANN_3RD_LIB_PATH}/asc-comm
+        SOURCE_DIR ${_ASC_COMM_DOWNLOAD_SOURCE_DIR}
     )
-    FetchContent_Populate(asc-comm)
-    set(ASC_COMM_SOURCE_PATH ${CANN_3RD_LIB_PATH}/asc-comm)
+    FetchContent_Populate(asc_comm)
+    set(ASC_COMM_SOURCE_PATH ${_ASC_COMM_DOWNLOAD_SOURCE_DIR})
 endif()
 
 set(ASC_COMM_HCOMM_SOURCE_DIR "${ASC_COMM_SOURCE_PATH}/${ASC_COMM_HCOMM_RELATIVE_DIR}")
@@ -64,19 +60,6 @@ if(NOT IS_DIRECTORY "${ASC_COMM_HCOMM_SOURCE_DIR}")
     message(FATAL_ERROR "[ThirdPartyLib][asc-comm] hcomm headers not found: ${ASC_COMM_HCOMM_SOURCE_DIR}")
 endif()
 
-# asc-comm 新增 aicpu/hcomm 目录，源码侧暂不改头文件引用，
-# 编译期暴露到 aicpu 这一层，继续按 "hcomm/xxx.h" 解析。
-set(ASC_COMM_HEADER_INCLUDE_DIR "${ASC_COMM_SOURCE_PATH}/include/aicpu"
-    CACHE PATH "include root exposing asc-comm hcomm headers as hcomm/*" FORCE)
-message(STATUS "[ThirdPartyLib][asc-comm] Exposed asc-comm headers at: ${ASC_COMM_HEADER_INCLUDE_DIR}")
-
-if(TARGET asc_kernel_headers)
-    set_property(TARGET asc_kernel_headers APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES
-        "$<BUILD_INTERFACE:${ASC_COMM_HEADER_INCLUDE_DIR}>"
-    )
-endif()
-
-# asc-comm 迁出后，devkit 把 asc-comm 中新增的 asc-comm/aicpu/hcomm 头安装到指定目录。
 install(DIRECTORY "${ASC_COMM_HCOMM_SOURCE_DIR}/"
     DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/asc-comm/aicpu/hcomm
     COMPONENT asc-devkit

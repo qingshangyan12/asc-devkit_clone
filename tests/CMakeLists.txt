@@ -18,8 +18,6 @@ if (BUILD_OPEN_PROJECT)
     include(cmake/config.cmake)
     include(cmake/intf.cmake)
     include(cmake/func.cmake)
-    # hcomm 已迁出至 asc-comm，UT 编译期需 asc-comm 暴露 hcomm 头供伞头(kernel_api.h)解析。
-    include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/3rdparty/asc-comm.cmake)
 endif()
 
 add_subdirectory(api)
