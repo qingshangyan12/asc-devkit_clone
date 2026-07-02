@@ -36,6 +36,9 @@ set(ASCENDC_TEST_HEADER_FILES
     ${ASCENDC_DIR}/include/basic_api
     ${ASCENDC_DIR}/impl
     ${ASCENDC_DIR}/impl/basic_api
+    # hcomm 迁出 asc-comm 后，相关头随 asc-comm 源码发布；
+    # ASC_COMM_HEADER_INCLUDE_DIR 暴露 asc-comm 的 aicpu include 根，供 UT 解析 hcomm/*。
+    ${ASC_COMM_HEADER_INCLUDE_DIR}
 )
 
 # # ================ adv_api kernel ut ================
