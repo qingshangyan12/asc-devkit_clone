@@ -38,11 +38,6 @@ __simd_callee__ inline void asc_int162int32_v2_impl(vector_int32_t& dst, vector_
         vcvt(dst, src, mask, PART_ODD, MODE_ZEROING);
     }
 }
-#endif
-
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 
 __simd_callee__ inline void asc_int162int32_impl(vector_int32_t& dst, vector_int16_t src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
 {
@@ -58,4 +53,9 @@ __simd_callee__ inline void asc_int162int32_impl(vector_int32_t& dst, vector_int
     }
 }
 
+#endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
