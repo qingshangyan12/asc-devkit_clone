@@ -130,6 +130,261 @@ foreach (dir ${sources_list})
     endif()
 endforeach()
 
+if(MC2_SERVER_MINIMAL AND TARGET mc2_server)
+    set(MC2_SERVER_ASC_CCL_KERNEL_STUB_SRC
+        ${CMAKE_CURRENT_BINARY_DIR}/mc2_server_asc_ccl_kernel_stub.cc)
+    file(WRITE ${MC2_SERVER_ASC_CCL_KERNEL_STUB_SRC}
+        "extern \"C\" void __mc2_server_asc_ccl_kernel_stub(void) {}\n")
+    add_library(asc_ccl_kernel SHARED
+        ${MC2_SERVER_ASC_CCL_KERNEL_STUB_SRC})
+
+    set(CCL_KERNEL_INCLUDE_LIST
+        ${HCCL_LOCAL_HEADER_DIRS}
+        ${HCCL_HCOMM_HEADER_DIR}
+        ${HCCL_HCOMM_HEADER_DIR}/hccl
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
+        ${HCCL_HCOMM_HEADER_DIR}/externel_depends/tsch/
+        ${HCCL_BASE_DIR}/../inc/hccl/hccl
+        ${HCCL_BASE_DIR}/algorithm/base/inc
+        ${HCCL_BASE_DIR}/algorithm/base/alg_template
+        ${HCCL_BASE_DIR}/algorithm/base/communicator
+        ${HCCL_BASE_DIR}/algorithm/base/communicator/legacy
+        ${HCCL_BASE_DIR}/algorithm/impl
+        ${HCCL_BASE_DIR}/algorithm/impl/resource_manager
+        ${HCCL_BASE_DIR}/algorithm/impl/coll_executor
+        ${HCCL_BASE_DIR}/algorithm/pub_inc
+        ${HCCL_BASE_DIR}/pub_inc
+        ${HCCL_BASE_DIR}/pub_inc/aicpu
+        ${HCCL_BASE_DIR}/pub_inc/inner
+        ${HCCL_BASE_DIR}/pub_inc/new
+        ${HCCL_BASE_DIR}/common/debug/profiling/inc
+        ${HCCL_BASE_DIR}/common/debug/profiling/inc/aicpu
+        ${HCCL_BASE_DIR}/platform
+        ${HCCL_BASE_DIR}/platform/inc
+        ${HCCL_BASE_DIR}/platform/inc/adapter
+        ${HCCL_BASE_DIR}/platform/common
+        ${HCCL_BASE_DIR}/platform/hccp/inc
+        ${HCCL_BASE_DIR}/platform/hccp/inc/network
+        ${HCCL_BASE_DIR}/platform/hccp/external_depends/inc/log
+        ${HCCL_BASE_DIR}/platform/resource/notify
+        ${HCCL_BASE_DIR}/platform/task
+        ${HCCL_BASE_DIR}/framework
+        ${HCCL_BASE_DIR}/framework/inc
+        ${HCCL_BASE_DIR}/framework/device
+        ${HCCL_BASE_DIR}/framework/device/common
+        ${HCCL_BASE_DIR}/framework/device/inc
+        ${HCCL_BASE_DIR}/framework/device/framework
+        ${HCCL_BASE_DIR}/framework/device/aicpu_kfc
+        ${HCCL_BASE_DIR}/framework/device/aicpu_kfc/common
+        ${HCCL_BASE_DIR}/framework/device/aicpu_kfc/decoupler
+        ${HCCL_BASE_DIR}/framework/common/src
+        ${HCCL_BASE_DIR}/framework/common/src/config
+        ${HCCL_BASE_DIR}/framework/common/src/thread
+        ${HCCL_BASE_DIR}/framework/communicator/impl/resource_manager
+        ${HCCL_BASE_DIR}/framework/communicator/impl/independent_op
+        ${HCCL_BASE_DIR}/framework/communicator/impl/independent_op/channel
+        ${HCCL_BASE_DIR}/framework/communicator/impl/independent_op/channel/device
+        ${HCCL_BASE_DIR}/framework/communicator/impl/independent_op/data_api
+        ${HCCL_BASE_DIR}/framework/communicator/impl/independent_op/device
+        ${HCCL_BASE_DIR}/framework/communicator/impl/independent_op/resource
+        ${HCCL_BASE_DIR}/framework/communicator/impl/independent_op/resource/device
+        ${HCCL_BASE_DIR}/framework/communicator/impl/independent_op/resource/engine
+        ${HCCL_BASE_DIR}/framework/next/coll_comms/communicator
+        ${HCCL_BASE_DIR}/framework/next/coll_comms/communicator/aicpu
+        ${HCCL_BASE_DIR}/framework/next/coll_comms/communicator/ns_recovery/aicpu
+        ${HCCL_BASE_DIR}/framework/next/coll_comms/dfx
+        ${HCCL_BASE_DIR}/framework/next/coll_comms/dfx/profiling/aicpu
+        ${HCCL_BASE_DIR}/framework/next/coll_comms/dfx/taskException/aicpu
+        ${HCCL_BASE_DIR}/framework/next/comms/comm_engine_res/threads
+        ${HCCL_BASE_DIR}/framework/next/comms/endpoint_pairs/channels/aicpu/device
+        ${HCCL_BASE_DIR}/legacy/framework/communicator/aicpu
+        ${HCCL_BASE_DIR}/legacy/framework/communicator/aicpu/daemon
+        ${HCCL_BASE_DIR}/legacy/framework/dfx/aicpu/common
+        ${HCCL_BASE_DIR}/legacy/framework/dfx/aicpu/profiling
+        ${HCCL_BASE_DIR}/legacy/unified_platform/resource/transport/aicpu
+        ${HCCL_BASE_DIR}/legacy/common
+        ${HCCL_BASE_DIR}/legacy/common/exception
+        ${HCCL_BASE_DIR}/legacy/common/types
+        ${HCCL_BASE_DIR}/legacy/common/utils
+        ${HCCL_BASE_DIR}/legacy/unified_platform/common
+        ${HCCL_BASE_DIR}/legacy/unified_platform/external_system
+        ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
+        ${HCCL_BASE_DIR}/legacy/unified_platform/resource/transport
+        ${HCCL_THIRD_PARTY_DIR}
+        ${RDMA_CORE_INCLUDE_DIR}
+        ${THIRD_PARTY_NLOHMANN_PATH}
+    )
+
+    if(DEFINED ASCEND_CANN_PACKAGE_PATH)
+        list(APPEND CCL_KERNEL_INCLUDE_LIST
+            ${ASCEND_CANN_PACKAGE_PATH}/include
+            ${ASCEND_CANN_PACKAGE_PATH}/include/base
+            ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc
+            ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base
+            ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/runtime
+            ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/runtime/runtime
+            ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/profiling
+        )
+    endif()
+
+    if(TARGET unified_dlog)
+        get_target_property(MC2_SERVER_UNIFIED_DLOG_INCLUDE_DIRS unified_dlog INTERFACE_INCLUDE_DIRECTORIES)
+        if(MC2_SERVER_UNIFIED_DLOG_INCLUDE_DIRS AND NOT MC2_SERVER_UNIFIED_DLOG_INCLUDE_DIRS STREQUAL "MC2_SERVER_UNIFIED_DLOG_INCLUDE_DIRS-NOTFOUND")
+            list(APPEND CCL_KERNEL_INCLUDE_LIST ${MC2_SERVER_UNIFIED_DLOG_INCLUDE_DIRS})
+        endif()
+        get_target_property(MC2_SERVER_UNIFIED_DLOG_SYSTEM_INCLUDE_DIRS unified_dlog INTERFACE_SYSTEM_INCLUDE_DIRECTORIES)
+        if(MC2_SERVER_UNIFIED_DLOG_SYSTEM_INCLUDE_DIRS AND NOT MC2_SERVER_UNIFIED_DLOG_SYSTEM_INCLUDE_DIRS STREQUAL "MC2_SERVER_UNIFIED_DLOG_SYSTEM_INCLUDE_DIRS-NOTFOUND")
+            list(APPEND CCL_KERNEL_INCLUDE_LIST ${MC2_SERVER_UNIFIED_DLOG_SYSTEM_INCLUDE_DIRS})
+        endif()
+    endif()
+
+    target_include_directories(asc_ccl_kernel PRIVATE
+        ${CCL_KERNEL_INCLUDE_LIST}
+        ${ORION_HEAD_LIST}
+    )
+
+    target_compile_options(asc_ccl_kernel PRIVATE
+        -Wfloat-equal
+        -Wall
+        -fno-common
+        -fstack-protector-strong
+        -fno-strict-aliasing
+        -pipe
+        -O3
+        -std=c++14
+    )
+
+    target_compile_definitions(asc_ccl_kernel PRIVATE
+        HCCD
+        CCL_KERNEL_AICPU
+        MC2_SERVER_ONLY
+    )
+
+    function(add_mc2_server_ccl_object target_name)
+        add_library(${target_name} OBJECT ${ARGN})
+        set_target_properties(${target_name} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+        target_compile_definitions(${target_name} PRIVATE
+            $<TARGET_PROPERTY:asc_ccl_kernel,COMPILE_DEFINITIONS>
+            MC2_SERVER_ONLY
+        )
+        target_compile_options(${target_name} PRIVATE
+            $<TARGET_PROPERTY:asc_ccl_kernel,COMPILE_OPTIONS>
+        )
+        target_include_directories(${target_name} PRIVATE
+            ${CCL_KERNEL_INCLUDE_LIST}
+            ${ORION_HEAD_LIST}
+        )
+        target_link_libraries(${target_name} PRIVATE
+            rdma_core_headers
+            ascend_hal
+            c_sec
+            unified_dlog
+            runtime_headers
+            acl_rt_headers
+        )
+        if(TARGET json)
+            target_link_libraries(${target_name} PRIVATE json)
+            add_dependencies(${target_name} json)
+        endif()
+        target_sources(mc2_server PRIVATE $<TARGET_OBJECTS:${target_name}>)
+        add_dependencies(mc2_server ${target_name})
+    endfunction()
+
+    set(MC2_SERVER_CCL_KERNEL_STUB_SRC
+        ${CMAKE_CURRENT_BINARY_DIR}/mc2_server_ccl_kernel_stub.cc)
+    file(WRITE ${MC2_SERVER_CCL_KERNEL_STUB_SRC}
+        "extern \"C\" void __mc2_ccl_kernel_stub(void) {}\n")
+    add_library(mc2_server_ccl_kernel_stub SHARED
+        ${MC2_SERVER_CCL_KERNEL_STUB_SRC})
+    set_target_properties(mc2_server_ccl_kernel_stub PROPERTIES
+        OUTPUT_NAME ccl_kernel
+        LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/mc2_server_link_stub)
+    target_link_options(mc2_server_ccl_kernel_stub PRIVATE
+        -Wl,-soname,libccl_kernel.so)
+
+    set(MC2_SERVER_CCL_KERNEL_PLF_STUB_SRC
+        ${CMAKE_CURRENT_BINARY_DIR}/mc2_server_ccl_kernel_plf_stub.cc)
+    file(WRITE ${MC2_SERVER_CCL_KERNEL_PLF_STUB_SRC}
+        "extern \"C\" void __mc2_ccl_kernel_plf_stub(void) {}\n")
+    add_library(mc2_server_ccl_kernel_plf_stub SHARED
+        ${MC2_SERVER_CCL_KERNEL_PLF_STUB_SRC})
+    set_target_properties(mc2_server_ccl_kernel_plf_stub PROPERTIES
+        OUTPUT_NAME ccl_kernel_plf
+        LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/mc2_server_link_stub)
+    target_link_options(mc2_server_ccl_kernel_plf_stub PRIVATE
+        -Wl,-soname,libccl_kernel_plf.so)
+
+    target_compile_definitions(mc2_server PRIVATE
+        $<TARGET_PROPERTY:asc_ccl_kernel,COMPILE_DEFINITIONS>
+    )
+    target_compile_options(mc2_server PRIVATE
+        $<TARGET_PROPERTY:asc_ccl_kernel,COMPILE_OPTIONS>
+    )
+    target_include_directories(mc2_server PRIVATE
+        ${CCL_KERNEL_INCLUDE_LIST}
+        ${ORION_HEAD_LIST}
+    )
+    target_link_libraries(mc2_server PRIVATE
+        rdma_core_headers
+        -Wl,--no-as-needed
+        ascend_hal
+        c_sec
+        unified_dlog
+        mc2_server_ccl_kernel_stub
+        ${HCCL_C_SEC_LINK}
+        ${HCCL_UNIFIED_DLOG_LINK}
+        mc2_server_ccl_kernel_plf_stub
+        ${HCCL_MMPA_LINK}
+        -Wl,--as-needed
+        -lrt
+        -ldl
+        -lpthread
+    )
+    if(TARGET json)
+        target_link_libraries(mc2_server PRIVATE json)
+        add_dependencies(mc2_server json)
+    endif()
+
+    add_mc2_server_ccl_object(mc2_server_next_thread_runtime
+        ${HCCL_BASE_DIR}/framework/next/comms/comm_engine_res/threads/cpu_ts_thread.cc
+        ${HCCL_BASE_DIR}/framework/next/comms/comm_engine_res/threads/aicpu_ts_thread.cc
+        ${HCCL_BASE_DIR}/framework/next/comms/comm_engine_res/threads/aiv_thread.cc
+        ${HCCL_BASE_DIR}/framework/next/comms/comm_engine_res/threads/thread.cc
+        ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu/stream_lite.cc
+        ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu/rtsq_base.cc
+        ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu/rtsq_a5.cc
+        ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu/sqe_build_a5.cc
+    )
+
+    add_mc2_server_ccl_object(mc2_server_next_comm_runtime
+        ${HCCL_BASE_DIR}/platform/resource/mem/hdc.cc
+        ${HCCL_BASE_DIR}/platform/resource/notify/local_notify.cc
+        ${HCCL_BASE_DIR}/framework/next/coll_comms/dfx/hcclCommDfxLite.cc
+        ${HCCL_BASE_DIR}/framework/next/coll_comms/dfx/profiling/aicpu/hcclCommProfilingLite.cc
+        ${HCCL_BASE_DIR}/legacy/framework/dfx/aicpu/common/mirror_task_manager_lite.cc
+        ${HCCL_BASE_DIR}/legacy/framework/dfx/aicpu/profiling/profiling_handler_lite.cc
+        ${HCCL_BASE_DIR}/legacy/framework/dfx/aicpu/profiling/profiling_reporter_lite.cc
+        ${HCCL_BASE_DIR}/legacy/framework/dfx/aicpu/profiling/profiling_command_handle_lite.cc
+        ${HCCL_BASE_DIR}/legacy/framework/communicator/aicpu/aicpu_res_package_helper.cc
+        ${HCCL_BASE_DIR}/legacy/unified_platform/common/dlhal_function_v2.cc
+        ${HCCL_BASE_DIR}/legacy/unified_platform/resource/transport/aicpu/ub_transport_lite_impl.cc
+        ${HCCL_BASE_DIR}/legacy/unified_platform/resource/transport/aicpu/p2p_transport_lite_impl.cc
+        ${HCCL_BASE_DIR}/legacy/unified_platform/resource/transport/aicpu/roce_transport_lite_impl.cc
+    )
+
+    add_subdirectory(device/aicpu_kfc)
+    add_subdirectory(communicator/impl/independent_op/device)
+    add_subdirectory(communicator/impl/independent_op/resource/device)
+    add_subdirectory(communicator/impl/independent_op/resource/engine)
+    add_subdirectory(next/coll_comms/communicator/aicpu)
+    add_subdirectory(next/coll_comms/communicator/ns_recovery/aicpu)
+    add_subdirectory(next/coll_comms/dfx/taskException/aicpu)
+    add_subdirectory(next/comms/endpoint_pairs/channels/aicpu/device)
+    return()
+endif()
+
 if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
     add_library(asc_ccl_kernel  SHARED)
 
