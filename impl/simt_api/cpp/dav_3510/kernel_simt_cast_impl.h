@@ -15,7 +15,7 @@
 #ifndef IMPL_SIMT_API_CPP_DAV_C310_KERNEL_SIMT_CAST_IMPL_H
 #define IMPL_SIMT_API_CPP_DAV_C310_KERNEL_SIMT_CAST_IMPL_H
 
-#include "kernel_utils.h"
+#include "../../../basic_api/kernel_utils.h"
 #include "impl/simt_api/cpp/dav_3510/kernel_simt_common_impl.h"
 #include "impl/simt_api/cpp/dav_3510/kernel_simt_cast_sat_impl.h"
 
@@ -199,7 +199,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T CastFallback(U x)
 {
     T y;
     switch (roundMode) {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) 
         case RoundMode::CAST_EVEN:
             Rint_(y, x);
             break;

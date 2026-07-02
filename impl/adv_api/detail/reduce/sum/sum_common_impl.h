@@ -23,9 +23,9 @@
 #ifndef IMPL_REDUCE_SUM_SUM_COMMON_IMPL_H
 #define IMPL_REDUCE_SUM_SUM_COMMON_IMPL_H
 
-#include "kernel_basic_intf.h"
-#include "kernel_tensor.h"
-#include "include/adv_api/reduce/sum_utils.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
+#include "../../../../../include/adv_api/reduce/sum_utils.h"
 #ifdef ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_check/reduce/sum/sum_check.h"
 #endif // ASCENDC_CPU_DEBUG
@@ -56,7 +56,7 @@ __aicore__ inline void SumCompute(
     }
     CHECK_FUNC_HIGHLEVEL_API(
         Sum, (T, reduceDim, isReuseSource, isBasicBlock), (dstTensor, srcTensor, sharedTmpBuffer, sumParams));
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002)
     uint32_t elementNumPerRep = ONE_REPEAT_BYTE_SIZE / sizeof(T);
     uint32_t elementNumPerBlk = ONE_BLK_SIZE / sizeof(T);
     uint32_t firstRepeatTimes = (sumParams.n + elementNumPerRep - 1) / elementNumPerRep;

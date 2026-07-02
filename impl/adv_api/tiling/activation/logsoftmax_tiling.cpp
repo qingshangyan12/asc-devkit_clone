@@ -13,12 +13,12 @@
  * \brief
  */
 
-#include "include/adv_api/activation/logsoftmax_tiling.h"
+#include "../../../../include/adv_api/activation/logsoftmax_tiling.h"
 
 #include <set>
 
-#include "include/adv_api/activation/logsoftmax_tilingdata.h"
-#include "tiling/platform/platform_ascendc.h"
+#include "../../../../include/adv_api/activation/logsoftmax_tilingdata.h"
+#include "../../../../include/utils/tiling/platform/platform_ascendc.h"
 #include "../../detail/api_check/host_apicheck.h"
 
 namespace optiling {
@@ -89,7 +89,7 @@ uint32_t GetLogSoftMaxMaxTmpSize(const ge::Shape srcShape, const uint32_t dataTy
     const auto npuArch = platform->GetCurNpuArch();
 
     uint32_t needSize;
-    if (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_5102) {
+    if (npuArch == NpuArch::DAV_3510) {
         uint32_t needSize1 = srcM * (BASIC_TILE_NUM + srcK) + SOFTMAX_BASICBLOCK_UNIT * SOFTMAX_FLOAT_SIZE +
                              (srcM + BASIC_TILE_NUM - 1) / BASIC_TILE_NUM * BASIC_TILE_NUM;
         uint32_t needSize2 = srcM * (elementNumPerBlk + srcK + SOFTMAX_BASICBLOCK_UNIT);
@@ -121,7 +121,7 @@ uint32_t GetLogSoftMaxMinTmpSize(const ge::Shape srcShape, const uint32_t dataTy
     const auto npuArch = platform->GetCurNpuArch();
 
     uint32_t needSize;
-    if (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_5102) {
+    if (npuArch == NpuArch::DAV_3510) {
         uint32_t needSize1 = srcM * (BASIC_TILE_NUM + srcK) + SOFTMAX_BASICBLOCK_UNIT * SOFTMAX_FLOAT_SIZE +
                              (srcM + BASIC_TILE_NUM - 1) / BASIC_TILE_NUM * BASIC_TILE_NUM;
         uint32_t needSize2 = srcM * (elementNumPerBlk + srcK);

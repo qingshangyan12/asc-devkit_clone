@@ -19,7 +19,7 @@
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_BILINEARINTERPOLATION_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_BILINEARINTERPOLATION_INTERFACE_IMPL_H
-#include "kernel_tensor.h"
+#include "../../include/basic_api/kernel_tensor.h"
 #include "kernel_check.h"
 #include "mstx_local_tensor_info.h"
 
@@ -35,8 +35,6 @@
 #include "dav_m310/kernel_operator_vec_bilinearinterpolation_impl.h"
 #elif __NPU_ARCH__ == 3510
 #include "dav_3510/kernel_operator_vec_bilinearinterpolation_impl.h"
-#elif (__NPU_ARCH__ == 5102)
-#include "dav_m510/kernel_operator_vec_bilinearinterpolation_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "dav_l311/kernel_operator_vec_bilinearinterpolation_impl.h"
 #endif
@@ -51,7 +49,7 @@ __aicore__ inline void BilinearInterpolationCheck(const LocalTensor<T> &src0, co
     uint32_t sharedTmpBufferSize = sharedTmpBuffer.GetSize();
 #if __NPU_ARCH__ == 2201
     uint32_t expectedTmpBufferSize = (src0.GetSize() + src1.GetSize()) * 32;
-#elif (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#elif (__NPU_ARCH__ == 3510) 
     uint32_t expectedTmpBufferSize = 0;
 #else
     uint32_t expectedTmpBufferSize = src0Offset.GetSize() * sizeof(uint32_t);

@@ -16,7 +16,7 @@
 #ifndef INCLUDE_C_API_REG_COMPUTE_REG_CONVERT_H
 #define INCLUDE_C_API_REG_COMPUTE_REG_CONVERT_H
 
-#include "instr_impl/npu_arch_3510/vector_compute_impl.h"
+#include "../../../impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 
 // ==========asc_float2half(rd/ru/rz/rn/rna)==========
 __simd_callee__ inline void asc_float2half_rd(vector_half& dst, vector_float src, vector_bool mask);
@@ -536,7 +536,7 @@ __simd_callee__ inline void asc_int162half_rna(vector_half& dst, vector_int16_t 
 
 __simd_callee__ inline void asc_int162half_ru(vector_half& dst, vector_int16_t src, vector_bool mask);
 
-__simd_callee__ inline void asc_int162half_rc(vector_half& dst, vector_int16_t src, vector_bool mask);
+__simd_callee__ inline void asc_int162half_rz(vector_half& dst, vector_int16_t src, vector_bool mask);
 
 //================asc_int4x22half==============
 __simd_callee__ inline void asc_int4x22half(vector_half& dst, vector_int4x2_t src, vector_bool mask);

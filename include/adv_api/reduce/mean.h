@@ -24,13 +24,13 @@
 #include "kernel_tensor.h"
 #include "kernel_basic_intf.h"
 #include "include/adv_api/reduce/mean_utils.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "../../../impl/adv_api/detail/reduce/mean/mean_3510_impl.h"
 #else
 #include "../../../impl/adv_api/detail/reduce/mean/mean_common_impl.h"
 #endif
 #if ASCENDC_CPU_DEBUG
-#include "kernel_log.h"
+#include "../../../impl/basic_api/kernel_log.h"
 #include <type_traits>
 #include <stdio.h>
 #endif

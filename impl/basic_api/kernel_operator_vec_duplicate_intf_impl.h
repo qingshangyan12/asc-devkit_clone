@@ -19,7 +19,7 @@
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_DUPLICATE_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_DUPLICATE_INTERFACE_IMPL_H
-#include "kernel_tensor.h"
+#include "../../include/basic_api/kernel_tensor.h"
 #include "kernel_check.h"
 #include "kernel_npu_debug.h"
 #include "mstx_local_tensor_info.h"
@@ -35,11 +35,8 @@
 #elif __NPU_ARCH__ == 3102
 #include "dav_m310/kernel_operator_vec_duplicate_impl.h"
 #elif __NPU_ARCH__ == 3510
-#include "reg_compute/kernel_reg_compute_intf.h"
+#include "../../include/basic_api/reg_compute/kernel_reg_compute_intf.h"
 #include "dav_3510/kernel_operator_vec_duplicate_impl.h"
-#elif (__NPU_ARCH__ == 5102)
-#include "reg_compute/kernel_reg_compute_intf.h"
-#include "dav_m510/kernel_operator_vec_duplicate_impl.h"
 #elif __NPU_ARCH__ == 3003
 #include "dav_l300/kernel_operator_vec_duplicate_impl.h"
 #elif __NPU_ARCH__ == 3113
@@ -131,7 +128,7 @@ __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue
     DuplicateImpl<T>((__ubuf__ T*)dst.GetPhyAddr(), scalarValue, count);
 }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 /*
  * @ingroup Duplicate lowest position of src
  * @brief dst = dst[i] = src[0]

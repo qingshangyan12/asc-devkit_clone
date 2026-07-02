@@ -16,11 +16,11 @@ Warp Shfl类接口主要实现Warp级数据交换，能够实现直接读取某�
 
 -   **Warp分组**
 
-    Warp内的线程可分为多个组，用户通过参数width配置分组宽度（分组的线程数），分组内的线程可进行数据交换，组内线程通过相对组内起始线程位置来标识索引，称为逻辑LaneId。
+    Warp内的线程可分为多个组，用户通过参数width配置分组宽度（分组的线程数），分组内的线程可进行数据交换，组内线程通过相对组内起始线程位置来标识索引，称为逻辑Lane ID。
 
 -   **数据交换**
 
-    本接口主要是获取分组内指定线程持有的var值，用户通过参数src\_lane指定线程。如果src\_lane大于等于width，指定线程的逻辑LaneId是src\_lane%width。
+    本接口主要是获取分组内指定线程持有的var值，用户通过参数src\_lane指定线程。如果src\_lane大于等于width，指定线程的逻辑Lane ID是src\_lane%width。
 
 **主要使用场景**
 
@@ -77,7 +77,7 @@ inline bfloat16x2_t asc_shfl(bfloat16x2_t var, int32_t src_lane, int32_t width =
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | var | 输入 | 线程用于交换的输入操作数。 |
-| src_lane | 输入 | 期望获取的var值所在线程的LaneId。 |
+| src_lane | 输入 | 期望获取的var值所在线程的Lane ID。 |
 | width | 输入 | Warp内参与交换的线程的分组宽度，默认值为32。width的取值范围为(0, 32]，width必须是2的倍数。 |
 
 ## 返回值说明
@@ -107,7 +107,7 @@ Warp内指定线程的var值。
 
 ## 调用示例
 
-完整样例请参考[InsertHashTable算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/02_features/01_api_features/00_memory_access/insert_hash_table/README.md)。
+完整样例请参考[InsertHashTable算子样例](https://gitcode.com/cann/asc-devkit/tree/9.1.0/examples/03_simt_api/02_features/01_api_features/00_memory_access/insert_hash_table/README.md)。
 
 -   SIMT编程场景：
 

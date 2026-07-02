@@ -21,10 +21,10 @@
 #define ASCENDC_MODULE_CHECK_VEC_BINARY_SCALAR_H
 
 #if ASCENDC_CPU_DEBUG
-#include "kernel_check_util.h"
-#include "kernel_common.h"
-#include "kernel_struct_binary.h"
-#include "kernel_struct_unary.h"
+#include "../kernel_check_util.h"
+#include "../../../include/basic_api/kernel_common.h"
+#include "../../../include/basic_api/kernel_struct_binary.h"
+#include "../../../include/basic_api/kernel_struct_unary.h"
 
 namespace AscendC {
 template <typename T, typename U>
@@ -66,7 +66,7 @@ bool CheckFuncVecBinaryScalarCmp(const LocalTensor<U>& dst, const LocalTensor<T>
     return CheckFuncVecBinaryScalarCmpImpl(chkParams, intriName);
 }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) 
 template <const BinaryConfig &config, typename T, typename U, typename S>
 bool CheckFuncVecBinaryScalarCmp(const T& dstLocal, const U& src0, const S& src1,
     const int32_t& count, const char* intriName)
@@ -245,7 +245,7 @@ bool CheckFunVecBinaryScalar(const LocalTensor<T>& dst, const LocalTensor<T>& sr
     return CheckFunVecBinaryScalarImpl(chkParams, intriName);
 }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) 
 template <const BinaryConfig &config, typename T, typename S>
 check::VecBinaryScalarApiParams BuildVecUnaryParamsPos0(const T& dstLocal, const S& src1,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)

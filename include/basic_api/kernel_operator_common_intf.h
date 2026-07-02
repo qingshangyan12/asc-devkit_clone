@@ -20,7 +20,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_COMMON_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_COMMON_INTERFACE_H
 
-#include "kernel_macros.h"
+#include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
 #include "kernel_struct_mm.h"
 #include "kernel_base_types.h"
@@ -84,7 +84,6 @@ __aicore__ inline void SetSaturationFlag(bool enableSat);
 template <SaturationMode mode>
 __aicore__ inline bool GetSaturationFlag();
 }  // namespace AscendC
-
 #if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_common_intf_impl.h"
 #endif

@@ -8,14 +8,14 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include "include/adv_api/transpose/transdata_tiling.h"
+#include "../../../../include/adv_api/transpose/transdata_tiling.h"
 
 #include <cstdint>
 #include <algorithm>
 
 #include "graph/tensor.h"
 #include "../../detail/host_log.h"
-#include "tiling/platform/platform_ascendc.h"
+#include "../../../../include/utils/tiling/platform/platform_ascendc.h"
 namespace AscendC {
 namespace {
 constexpr int32_t PAD_ELE_FOR_HALF = 16;
@@ -197,7 +197,7 @@ bool GetTransDataMaxMinTmpSize(
     const auto npuArch = platform.GetCurNpuArch();
     ;
     ASCENDC_HOST_ASSERT(
-        (npuArch == NpuArch::DAV_2201 || npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_5102), return false,
+        (npuArch == NpuArch::DAV_2201 || npuArch == NpuArch::DAV_3510), return false,
         "[TransData][GetTransDataMaxMinTmpSize] Unsupported NpuArch for TransData API.");
 
     TmpTransDataParams tmpParam;

@@ -14,7 +14,7 @@
 
 判断Warp中每个活跃线程的输入是否非零。
 
-当Warp内所有活跃线程执行本接口后，对所有活跃线程的输入操作数predicate进行判断，返回一个32bit的无符号整数，若Warp内活跃线程输入的predicate不为0，则返回值中与线程LaneId对应的bit位为1，否则为0。Warp内所有活跃线程返回相同的结果。
+当Warp内所有活跃线程执行本接口后，对所有活跃线程的输入操作数predicate进行判断，返回一个32bit的无符号整数，若Warp内活跃线程输入的predicate不为0，则返回值中与线程Lane ID对应的bit位为1，否则为0。Warp内所有活跃线程返回相同的结果。
 
 ## 函数原型
 
@@ -32,7 +32,7 @@ inline uint32_t asc_ballot(int32_t predicate)
 
 ## 返回值说明
 
-32bit的无符号整数：若Warp内活跃线程输入的predicate不为0，则返回值中与线程LaneId对应的bit位为1，否则为0。
+32bit的无符号整数：若Warp内活跃线程输入的predicate不为0，则返回值中与线程Lane ID对应的bit位为1，否则为0。
 
 ## 约束说明
 
@@ -48,7 +48,7 @@ inline uint32_t asc_ballot(int32_t predicate)
 
 ## 调用示例
 
-完整样例请参考[Sobel边缘检测样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/02_features/01_api_features/03_warp_instruction/sobel_warp_shfl/README.md)。
+完整样例请参考[Sobel边缘检测样例](https://gitcode.com/cann/asc-devkit/tree/9.1.0/examples/03_simt_api/02_features/01_api_features/03_warp_instruction/sobel_warp_shfl/README.md)。
 
 -   SIMT编程场景：
 

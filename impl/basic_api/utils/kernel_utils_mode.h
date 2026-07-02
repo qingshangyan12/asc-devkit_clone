@@ -19,8 +19,8 @@
 #endif
 #ifndef ASCENDC_MODULE_UTILS_MODE_H
 #define ASCENDC_MODULE_UTILS_MODE_H
-#include "utils/kernel_utils_constants.h"
-#include "utils/kernel_utils_mode_cpu.h"
+#include "kernel_utils_constants.h"
+#include "kernel_utils_mode_cpu.h"
 
 namespace AscendC {
 /*
@@ -106,7 +106,7 @@ enum class RoundMode : uint8_t {
     CAST_ROUND, // away-zero
     CAST_TRUNC, // to-zero
     CAST_ODD,   // Von Neumann rounding
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003))|| defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 3003))|| defined(__ASC_NPU_HOST__)
     CAST_HYBRID,  // hybrid round
     CAST_EVEN,
     CAST_ZERO,

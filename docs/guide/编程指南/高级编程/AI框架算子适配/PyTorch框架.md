@@ -18,7 +18,7 @@ Pybind适用于快速将C++函数暴露给Python，实现高效接口绑定。�
 
 ## torch.library<a name="section9528173218278"></a>
 
-下面代码以add\_custom（Add自定义算子为例）算子为例，介绍通过torch.library如何调用算子Kernel程序，文档中仅介绍核心步骤，完整样例请参考[torch.library样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/00_framework/00_pytorch/torch_library)。
+下面代码以add\_custom（Add自定义算子为例）算子为例，介绍通过torch.library如何调用算子Kernel程序，文档中仅介绍核心步骤，完整样例请参考[torch.library样例](https://gitcode.com/cann/asc-devkit/tree/9.1.0/examples/01_simd_cpp_api/02_features/00_framework/00_pytorch/torch_library)。
 
 1.  环境准备。
 
@@ -47,7 +47,7 @@ Pybind适用于快速将C++函数暴露给Python，实现高效接口绑定。�
             totalLength *= size;
         }
         // 用<<<>>>接口调用核函数完成指定的运算
-        add_custom<<<numBlocks, nullptr, aclStream>>>((uint8_t*)(x.mutable_data_ptr()), (uint8_t*)(y.mutable_data_ptr()), (uint8_t*)(z.mutable_data_ptr()), totalLength);
+        add_custom<<<numBlocks, 0, aclStream>>>((uint8_t*)(x.mutable_data_ptr()), (uint8_t*)(y.mutable_data_ptr()), (uint8_t*)(z.mutable_data_ptr()), totalLength);
         // 将Device上的运算结果拷贝回Host并释放申请的资源
         return z;
     }
@@ -79,7 +79,7 @@ Pybind适用于快速将C++函数暴露给Python，实现高效接口绑定。�
 
 ## Pybind<a name="section1788413437123"></a>
 
-下面代码以add\_custom算子为例，介绍通过Pybind方式实现Pytorch脚本中调用自定义算子的流程。文档中仅介绍核心步骤，完整样例请参考[Pybind样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/00_framework/00_pytorch/pybind)。
+下面代码以add\_custom算子为例，介绍通过Pybind方式实现Pytorch脚本中调用自定义算子的流程。文档中仅介绍核心步骤，完整样例请参考[Pybind样例](https://gitcode.com/cann/asc-devkit/tree/9.1.0/examples/01_simd_cpp_api/02_features/00_framework/00_pytorch/pybind)。
 
 1.  环境准备。
 
@@ -121,7 +121,7 @@ Pybind适用于快速将C++函数暴露给Python，实现高效接口绑定。�
             totalLength *= size;
         }
         // 用<<<>>>接口调用核函数完成指定的运算
-        add_custom<<<numBlocks, nullptr, aclStream>>>((uint8_t*)(x.mutable_data_ptr()), (uint8_t*)(y.mutable_data_ptr()), (uint8_t*)(z.mutable_data_ptr()), totalLength);
+        add_custom<<<numBlocks, 0, aclStream>>>((uint8_t*)(x.mutable_data_ptr()), (uint8_t*)(y.mutable_data_ptr()), (uint8_t*)(z.mutable_data_ptr()), totalLength);
         // 将Device上的运算结果拷贝回Host并释放申请的资源
         return z;
     }

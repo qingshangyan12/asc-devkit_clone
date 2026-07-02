@@ -25,10 +25,7 @@
 #include "impl/utils/debug/npu_arch_2201/asc_aicore_dump_utils.h"
 #elif __NPU_ARCH__ == 3510
 #include "impl/utils/debug/npu_arch_3510/asc_aicore_dump_utils.h"
-#elif __NPU_ARCH__ == 5102
-#include "impl/utils/debug/npu_arch_5102/asc_aicore_dump_utils.h"
 #endif
-
 namespace __asc_aicore {
 
 template <AscendC::Hardware hardware, typename T, typename U>
@@ -182,7 +179,7 @@ __aicore__ inline void asc_dump(__cbuf__ T* input, uint32_t desc, uint32_t dump_
 }
 } // namespace __asc_aicore
 #else
-#include "kernel_log.h"
+#include "../../basic_api/kernel_log.h"
 
 namespace __asc_aicore {
 template<typename T>

@@ -2,7 +2,7 @@
 
 本入门示例基于Ascend C SIMT实现一维Gather算子，带你快速上手实践，涵盖Device端核函数实现、Host端调用以及编译运行的完整流程，帮助开发者建立整体认知。
 
-开始前请参考[环境准备](../../环境准备.md)安装所需的CANN软件包，完整样例请见[Gather](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/00_introduction/01_gather/basic_gather/gather_1d)。
+开始前请参考[环境准备](../../环境准备.md)安装所需的CANN软件包，完整样例请见[Gather](https://gitcode.com/cann/asc-devkit/tree/9.1.0/examples/03_simt_api/00_introduction/01_gather/basic_gather/gather_1d)。
 
 - **Gather算子功能介绍**：
 
@@ -17,8 +17,8 @@
 - **算子设计**：
 
     - **Device端核函数编程接口**
-        - 核函数定义：通过 [\_\_global\_\_](../../../编程指南/语言扩展层/SIMT-BuiltIn关键字.md) 修饰符声明。
-        - 数据划分：使用内置关键字 [threadIdx、blockIdx、blockDim](../../../编程指南/语言扩展层/SIMT-BuiltIn关键字.md) 计算线程索引，并为每个线程分配需要处理的数据元素。
+        - 核函数定义：通过 [\_\_global\_\_](../../../编程指南/语言扩展层/SIMT-BuiltIn关键字.md#section204112391232)修饰符声明。
+        - 数据划分：使用内置变量[threadIdx](../../../编程指南/语言扩展层/SIMT-BuiltIn关键字.md#li7760123814919)、[blockIdx](../../../编程指南/语言扩展层/SIMT-BuiltIn关键字.md#li1676053814914)、[blockDim](../../../编程指南/语言扩展层/SIMT-BuiltIn关键字.md#li076017381191)计算线程索引，并为每个线程分配需要处理的数据元素。
         - 数据搬入：无需额外接口，直接通过指针访问即可。
         - 数据计算：根据`index`中的索引值及操作符`[]`读取输入数据。
         - 数据搬出：无需额外接口，直接通过指针访问即可。

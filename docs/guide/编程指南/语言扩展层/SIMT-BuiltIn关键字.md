@@ -95,16 +95,16 @@
     -   对于二维线程块，其线程ID为二维结构，其计算公式为：
 
         ```
-        thread_id_x = blockIdx.x * blockDim.x + threadIdx.x；
-        thread_id_y = blockIdx.y * blockDim.y + threadIdx.y；
+        thread_id_x = blockIdx.x * blockDim.x + threadIdx.x;
+        thread_id_y = blockIdx.y * blockDim.y + threadIdx.y;
         ```
 
     -   对于三维线程块，其线程ID为三维结构，其计算公式为：
 
         ```
-        thread_id_x = blockIdx.x * blockDim.x + threadIdx.x；
-        thread_id_y = blockIdx.y * blockDim.y + threadIdx.y；
-        thread_id_z = blockIdx.z * blockDim.z + threadIdx.z；
+        thread_id_x = blockIdx.x * blockDim.x + threadIdx.x;
+        thread_id_y = blockIdx.y * blockDim.y + threadIdx.y;
+        thread_id_z = blockIdx.z * blockDim.z + threadIdx.z;
         ```
 
 当前提供了以下仅在Device上可用的int类型的内置变量：
@@ -314,7 +314,7 @@ add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, 
 
     \_\_maxnreg\_\_\(N\)的参数N需要满足：
     -   N的取值范围为（0,128]区间的整数;
-    -   若输入值N的范围为（0,16]，则会使用16个寄存器；若输入值N的范围为（16,32]，则会使用32个寄存器；若输入值N的范围为（32,64\]，则会使用64个寄存器；若输入值N的范围为（64,128\]，则会使用128个寄存器；
+    -   若输入值N的范围为（0,16]，则每个线程最多可以使用16个寄存器；若输入值N的范围为（16,32]，则每个线程最多可以使用32个寄存器；若输入值N的范围为（32,64\]，则每个线程最多可以使用64个寄存器；若输入值N的范围为（64,128\]，则每个线程最多可以使用128个寄存器；
     -   若未配置\_\_maxnreg\_\_，单个线程最多可分配的寄存器数量默认为32。
 
     每个线程可用的最大寄存器数量对每个block实际启动的线程数有限制，具体对应关系请见下表。

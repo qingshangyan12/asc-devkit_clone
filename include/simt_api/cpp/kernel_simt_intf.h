@@ -17,21 +17,19 @@
 
 #include "kernel_tensor.h"
 #include "kernel_tpipe.h"
-#include "kernel_utils.h"
+#include "../../../impl/basic_api/kernel_utils.h"
 #include "kernel_common.h"
 #include "kernel_operator_data_copy_intf.h"
 #include "kernel_operator_vec_binary_scalar_intf.h"
-#if (__NPU_ARCH__ == 5102)
-#include "dav_m510/kernel_operator_common_impl.h"
-#else
-#include "dav_3510/kernel_operator_common_impl.h"
+#if (__NPU_ARCH__ == 3510)
+#include "../../../impl/basic_api/dav_3510/kernel_operator_common_impl.h"
 #endif
 
 #ifdef ASCENDC_CPU_DEBUG
 #include "simt_stub.h"
 #endif
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510)
 #include "simt_api/device_types.h"
 #include "simt_api/cpp/kernel_simt_common_intf.h"
 #include "simt_api/cpp/kernel_simt_atomic_intf.h"

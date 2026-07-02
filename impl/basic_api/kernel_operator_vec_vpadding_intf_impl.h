@@ -19,9 +19,9 @@
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_VPADDING_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_VPADDING_INTERFACE_IMPL_H
-#include "kernel_tensor.h"
+#include "../../include/basic_api/kernel_tensor.h"
 #include "kernel_check.h"
-#include "kernel_struct_unary.h"
+#include "../../include/basic_api/kernel_struct_unary.h"
 
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_vec_vpadding_impl.h"
@@ -35,8 +35,6 @@
 #include "dav_m310/kernel_operator_vec_vpadding_impl.h"
 #elif __NPU_ARCH__ == 3510
 #include "dav_3510/kernel_operator_vec_vpadding_impl.h"
-#elif (__NPU_ARCH__ == 5102)
-#include "dav_m510/kernel_operator_vec_vpadding_impl.h"
 #elif __NPU_ARCH__ == 3003
 #include "dav_l300/kernel_operator_vec_vpadding_impl.h"
 #elif __NPU_ARCH__ == 3113

@@ -19,12 +19,12 @@
 #ifndef ASCENDC_MODULE_OPERATOR_BLOCK_SYNC_INTF_H
 #define ASCENDC_MODULE_OPERATOR_BLOCK_SYNC_INTF_H
 
-#include "kernel_macros.h"
-#include "kernel_event.h"
-#include "kernel_reg.h"
+#include "../../impl/basic_api/kernel_macros.h"
+#include "../../impl/basic_api/kernel_event.h"
+#include "../../impl/basic_api/kernel_reg.h"
 #include "kernel_tensor.h"
-#include "kernel_tensor_base.h"
-#include "utils/kernel_utils_mode.h"
+#include "../../impl/basic_api/kernel_tensor_base.h"
+#include "../../impl/basic_api/utils/kernel_utils_mode.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -71,7 +71,7 @@ template <bool isAIVOnly = true>
 __aicore__ inline void SyncAll(const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace,
                                  const int32_t usedCores = 0);
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
 template <bool isAIVOnly = true, const SyncAllConfig& config = DEFAULT_SYNC_ALL_CONFIG>
 __aicore__ inline void SyncAll();
 #else

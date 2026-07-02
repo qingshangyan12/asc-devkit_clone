@@ -78,7 +78,7 @@ Unified Buffer或Global Memory上的初始数据。
 
 ## 约束说明
 
-无
+原子操作保证对同一地址的读改写过程具有原子性，但不保证多个线程之间的执行顺序。对于浮点累加顺序敏感场景，结果可能随线程调度变化而不同。
 
 ## 需要包含的头文件
 
@@ -98,7 +98,7 @@ Unified Buffer或Global Memory上的初始数据。
 
 ## 调用示例
 
-可参阅[字节序频率直方图样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/02_features/01_api_features/02_atomic_operation/histogram)，该样例详细展示了如何利用`asc_atomic_add`接口，高效统计输入字节序列中每个字节值的出现频率。
+可参阅[字节序频率直方图样例](https://gitcode.com/cann/asc-devkit/tree/9.1.0/examples/03_simt_api/02_features/01_api_features/02_atomic_operation/histogram)，该样例详细展示了如何利用`asc_atomic_add`接口，高效统计输入字节序列中每个字节值的出现频率。
 
 简单示例场景：多个线程扫描状态数组，状态非0表示一条异常记录，使用`asc_atomic_add`接口统计异常状态的数量。输入参数说明如下：
 

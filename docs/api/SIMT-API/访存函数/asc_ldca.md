@@ -12,11 +12,13 @@
 
 ## 功能说明
 
-首先从Data Cache加载缓存数据，若未命中，则尝试从L2 Cache加载。L2 Cache与Global Memory之间的数据一致性由硬件保证。如果Data Cache和L2 Cache中均未找到所需数据，则从Global Memory中读取数据，然后将其缓存到L2 Cache和Data Cache中。但Data Cache和Global Memory之间的数据一致性并不能保证。  
+首先从Data Cache加载缓存数据，若未命中，则尝试从L2 Cache加载。L2 Cache与Global Memory之间的数据一致性由硬件保证，但Data Cache和Global Memory之间的数据一致性并不能保证。如果Data Cache和L2 Cache中均未找到所需数据，则从Global Memory中读取数据，然后将其缓存到L2 Cache和Data Cache中。  
 默认访存的底层实现与本接口一致，例如：
 ```
 dst[idx] = src[idx];
-等价于 
+``` 
+其底层实现等价于 
+```
 dst[idx] = asc_ldca(src + idx);
 ```
 
@@ -180,7 +182,11 @@ inline half2 asc_ldca(half2* address)
 
 ## 返回值说明
 
-Data Cache或L2 Cache中的缓存数据，或输入的Global Memory地址上的数据。
+返回输入指向的Global Memory的数据。读取数据的执行流程如下：
+
+- 若Data Cache命中，直接从Data Cache返回该地址对应的数据；
+- 若Data Cache未命中但L2 Cache命中，从L2 Cache返回该地址对应的数据；
+- 若Data Cache和L2 Cache均未命中，从Global Memory读取该地址对应的数据并返回。
 
 ## 约束说明
 

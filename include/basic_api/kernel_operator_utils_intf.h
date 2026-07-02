@@ -20,7 +20,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_UTILS_INTF_H
 #define ASCENDC_MODULE_OPERATOR_UTILS_INTF_H
 
-#include "kernel_macros.h"
+#include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_operator_block_sync_intf.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -32,7 +32,7 @@ namespace AscendC {
 template <int count = 1>
 __aicore__ inline void Nop()
 {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) 
     if (count <= 0) {
         return;
     }

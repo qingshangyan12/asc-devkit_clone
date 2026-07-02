@@ -22,7 +22,7 @@
 #include <cstdint>
 #if defined(ASCENDC_TPL_KERNEL) && !defined(ASCENDC_TPL_PRE)
 #include "kernel_type.h"
-#include "utils/kernel_utils_constants.h"
+#include "../../../impl/basic_api/utils/kernel_utils_constants.h"
 #endif
 #ifndef ASCENDC_TPL_KERNEL
 #include <iostream>
@@ -110,18 +110,6 @@ constexpr uint64_t INVALID_TILING_KEY = 0XFFFFFFFFFFFFFFFF;
 #endif
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
     #define ASC_INNER_DATATYPE_ENABLE_BF16
-    #define ASC_INNER_DATATYPE_ENABLE_COMPLEX64
-    #define ASC_INNER_DATATYPE_ENABLE_COMPLEX32
-    #define ASC_INNER_DATATYPE_ENABLE_HIFLOAT8
-    #define ASC_INNER_DATATYPE_ENABLE_FLOAT8_E5M2
-    #define ASC_INNER_DATATYPE_ENABLE_FLOAT8_E4M3FN
-    #define ASC_INNER_DATATYPE_ENABLE_FLOAT4_E2M1
-    #define ASC_INNER_DATATYPE_ENABLE_FLOAT4_E1M2
-#endif
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 5102
-    #define ASC_INNER_DATATYPE_ENABLE_BF16
-    #define ASC_INNER_DATATYPE_ENABLE_UINT1
-    #define ASC_INNER_DATATYPE_ENABLE_INT2
     #define ASC_INNER_DATATYPE_ENABLE_COMPLEX64
     #define ASC_INNER_DATATYPE_ENABLE_COMPLEX32
     #define ASC_INNER_DATATYPE_ENABLE_HIFLOAT8

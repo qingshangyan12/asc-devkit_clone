@@ -32,9 +32,9 @@
 #define unlikely(x) __builtin_expect(!!(x), 0)
 #endif
 
-#include "kernel_macros.h"
-#include "kernel_log.h"
-#include "kernel_event.h"
+#include "../kernel_macros.h"
+#include "../kernel_log.h"
+#include "../kernel_event.h"
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <set>
 #include <map>
@@ -244,7 +244,7 @@ enum class CacheRwMode {
     RW = 3
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || defined(__ASC_NPU_HOST__)
 constexpr uint64_t L2_CACHE_OFFSET = 60;
 constexpr uint64_t L2_CACHE_OFFSET_MASK = (1ul << L2_CACHE_OFFSET) - 1;
 template <class T, CacheRwMode rwMode = CacheRwMode::RW>
@@ -421,7 +421,7 @@ struct int4x2_t {
 #endif
 
 #if !defined(ASCENDC_CPU_DEBUG)
-#include "impl/utils/common_types.h"
+#include "../../utils/common_types.h"
 #endif
 
 namespace AscendC {

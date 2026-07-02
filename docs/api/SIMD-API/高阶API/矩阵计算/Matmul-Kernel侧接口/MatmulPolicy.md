@@ -11,9 +11,6 @@
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
-<!-- npu="x90" id1 -->
-- Kirin X90：支持
-<!-- end id1 -->
 
 ### TrianUpperMatmulPolicy/TrianLowerMatmulPolicy
 
@@ -24,9 +21,6 @@
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
-<!-- npu="x90" id2 -->
-- Kirin X90：支持
-<!-- end id2 -->
 
 ### NBuffer33MatmulPolicy
 
@@ -37,9 +31,6 @@
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
-<!-- npu="x90" id3 -->
-- Kirin X90：支持
-<!-- end id3 -->
 
 ### MatmulWithScalePolicy/SplitMMatmulPolicy/SplitNMatmulPolicy
 
@@ -50,13 +41,10 @@
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
-<!-- npu="x90" id4 -->
-- Kirin X90：不支持
-<!-- end id4 -->
 
 ## 功能说明
 
-模板参数MatmulPolicy用于定义Matmul可拓展模块策略。目前支持设置以下四种Matmul内置模板策略。
+模板参数MatmulPolicy用于定义Matmul可拓展模块策略。目前支持设置以下几种Matmul内置模板策略。
 
 -   MatmulPolicy（默认模板策略）
 
@@ -202,7 +190,7 @@
 
     AscendC::Matmul<aType, bType, cType, biasType, CFG_MDL, MatmulCallBackFunc<nullptr, nullptr, nullptr>, AscendC::Impl::Detail::NBuffer33MatmulPolicy> mm;
 
-    // 使用NBuffer33逻辑进行Matmul计算，最后输结果
+    // 使用NBuffer33逻辑进行Matmul计算，最后输出结果
     TPipe pipe;
     TCubeTiling tiling;
     REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);

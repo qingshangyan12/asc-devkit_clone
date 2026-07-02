@@ -31,8 +31,8 @@
 #include "utils/kernel_check_func.h"
 #include "utils/kernel_check_conv2d.h"
 #include "utils/kernel_check_data_copy_overflow.h"
-#include "kernel_struct_mm.h"
-#include "kernel_struct_gather.h"
+#include "../../include/basic_api/kernel_struct_mm.h"
+#include "../../include/basic_api/kernel_struct_gather.h"
 
 namespace AscendC {
 
@@ -42,12 +42,6 @@ uint64_t GetLoadDataLocalLen(const uint64_t tensorSize)
     // tensorSize is tensor.GetSize()
     if constexpr (IsSameType<PrimT<T>, int4b_t>::value) {
         return tensorSize / INT4_TWO;
-#if (__NPU_ARCH__ == 5102)
-    } else if constexpr(IsSameType<PrimT<T>, int2b_t>::value) {
-        return tensorSize / INT2_FOUR;
-    } else if constexpr(IsSameType<PrimT<T>, uint1b_t>::value) {
-        return tensorSize / INT1_EIGHT;
-#endif
     } else {
         return tensorSize * sizeof(PrimT<T>);
     }

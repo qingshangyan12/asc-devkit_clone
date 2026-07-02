@@ -19,9 +19,9 @@
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_MULCAST_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_MULCAST_INTERFACE_IMPL_H
-#include "kernel_tensor.h"
+#include "../../include/basic_api/kernel_tensor.h"
 #include "kernel_check.h"
-#include "kernel_struct_binary.h"
+#include "../../include/basic_api/kernel_struct_binary.h"
 #include "kernel_npu_debug.h"
 #include "mstx_local_tensor_info.h"
 
@@ -37,8 +37,6 @@
 #include "dav_m310/kernel_operator_vec_mulcast_impl.h"
 #elif __NPU_ARCH__ == 3510
 #include "dav_3510/kernel_operator_vec_mulcast_impl.h"
-#elif (__NPU_ARCH__ == 5102)
-#include "dav_m510/kernel_operator_vec_mulcast_impl.h"
 #elif (__NPU_ARCH__ == 3003)
 #include "dav_l300/kernel_operator_vec_mulcast_impl.h"
 #elif (__NPU_ARCH__ == 3113)

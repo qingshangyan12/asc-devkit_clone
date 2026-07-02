@@ -21,10 +21,10 @@
 #endif
 #ifndef LIB_MATH_SIN_C310_IMPL_H
 #define LIB_MATH_SIN_C310_IMPL_H
-#include "kernel_basic_intf.h"
-#include "kernel_tensor.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #if __NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113
 #include "../sincos/sincos_3510_impl.h"
 #endif

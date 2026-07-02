@@ -16,8 +16,8 @@
 #include <vector>
 #include "graph/tensor.h"
 #include "../../detail/host_log.h"
-#include "include/adv_api/math/sin_tiling.h"
-#include "tiling/platform/platform_ascendc.h"
+#include "../../../../include/adv_api/math/sin_tiling.h"
+#include "../../../../include/utils/tiling/platform/platform_ascendc.h"
 
 namespace AscendC {
 namespace {
@@ -86,7 +86,7 @@ void GetSinTmpBufferFactorSize(
 
     auto npuArch = platform->GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_3003 || npuArch == NpuArch::DAV_5102), return,
+        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_3003), return,
         "Unsupported NpuArch of Cos API.");
     if (config.algo == SinAlgo::POLYNOMIAL_APPROXIMATION) {
         extraBuf = 0;
@@ -114,7 +114,7 @@ void GetSinMaxMinTmpSize(
 
     auto npuArch = platform->GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_3003 || npuArch == NpuArch::DAV_5102), return,
+        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_3003), return,
         "Unsupported NpuArch of Cos API.");
 
     if (config.algo == SinAlgo::POLYNOMIAL_APPROXIMATION) {

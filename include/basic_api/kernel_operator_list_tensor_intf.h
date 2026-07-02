@@ -20,11 +20,11 @@
 #ifndef ASCENDC_MODULE_OPERATOR_LIST_TENSOR_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_LIST_TENSOR_INTERFACE_H
 
-#include "kernel_macros.h"
+#include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
 
 #if ASCENDC_CPU_DEBUG
-#include "kernel_check.h"
+#include "../../impl/basic_api/kernel_check.h"
 #endif
 
 #include "../../impl/basic_api/kernel_operator_list_tensor_intf_impl.h"
@@ -34,7 +34,7 @@ class ListTensorDesc;
 template<class T> class TensorDesc {
 #if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||                       \
     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                       \
-    (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||                       \
+    (__NPU_ARCH__ == 3510) ||                       \
     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 public:
     __aicore__ inline TensorDesc() {}
@@ -86,7 +86,7 @@ public:
     }
 #if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) ||                       \
     (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) ||                       \
-    (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||                       \
+    (__NPU_ARCH__ == 3510) ||                       \
     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
     template<class T> __aicore__ inline void GetDesc(TensorDesc<T>& desc, uint32_t index)
     {

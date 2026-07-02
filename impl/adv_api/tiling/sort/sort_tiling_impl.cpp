@@ -12,11 +12,11 @@
 #include <set>
 #include <map>
 
-#include "include/adv_api/sort/sort_tiling_intf.h"
+#include "../../../../include/adv_api/sort/sort_tiling_intf.h"
 #include "graph/tensor.h"
 #include "graph/types.h"
 #include "../../detail/host_log.h"
-#include "tiling/platform/platform_ascendc.h"
+#include "../../../../include/utils/tiling/platform/platform_ascendc.h"
 
 namespace AscendC {
 namespace {
@@ -49,7 +49,7 @@ void GetSortMaxMinTmpSize(
     ASCENDC_HOST_ASSERT(platform != nullptr, return, "Failed to get PlatformAscendC");
     auto npuArch = platform->GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_5102, return, "Unsupported NpuArch for Sort API.");
+        npuArch == NpuArch::DAV_3510 , return, "Unsupported NpuArch for Sort API.");
     std::set<ge::DataType> supportValueType = {ge::DT_INT8,   ge::DT_UINT8,  ge::DT_FLOAT, ge::DT_FLOAT16,
                                                ge::DT_BF16,   ge::DT_INT16,  ge::DT_INT32, ge::DT_UINT16,
                                                ge::DT_UINT32, ge::DT_UINT64, ge::DT_INT64};

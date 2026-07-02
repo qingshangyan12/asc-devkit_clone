@@ -12,8 +12,8 @@
  * \file lgamma_tiling.cpp
  * \brief
  */
-#include "include/adv_api/math/lgamma_tiling.h"
-#include "tiling/platform/platform_ascendc.h"
+#include "../../../../include/adv_api/math/lgamma_tiling.h"
+#include "../../../../include/utils/tiling/platform/platform_ascendc.h"
 #include "../../detail/host_log.h"
 
 namespace AscendC {
@@ -62,7 +62,7 @@ void GetLgammaMaxMinTmpSize(
     platform_ascendc::PlatformAscendC* platform = platform_ascendc::PlatformAscendCManager::GetInstance();
     ASCENDC_HOST_ASSERT((platform != nullptr), return, "Failed to get PlatformAscendC.");
     const auto npuArch = platform->GetCurNpuArch();
-    if (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_5102) {
+    if (npuArch == NpuArch::DAV_3510) {
         minValue = inputSize * LGAMMA_FLOAT_SIZE;
         maxValue = minValue;
     } else {

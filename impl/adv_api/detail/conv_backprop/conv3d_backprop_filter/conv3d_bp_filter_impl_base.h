@@ -16,11 +16,11 @@
 #ifndef CONV3D_BP_FILTER_IMPL_BASE_H
 #define CONV3D_BP_FILTER_IMPL_BASE_H
 
-#include "include/adv_api/conv_backprop/common/conv3d_bp_config_base.h"
+#include "../../../../../include/adv_api/conv_backprop/common/conv3d_bp_config_base.h"
 #include "conv3d_bp_filter_func.h"
 #include "../common/conv3d_bp_util.h"
-#include "kernel_utils.h"
-#include "kernel_basic_intf.h"
+#include "../../../../basic_api/kernel_utils.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
 
 namespace ConvBackpropApi {
 template <typename Intf, class Config_>
@@ -98,7 +98,7 @@ public:
         DEFINE_STUCT_FIELD(uint32_t, bL1PadUpPing);
         DEFINE_STUCT_FIELD(uint32_t, bL1PadUpPong);
         DEFINE_STUCT_FIELD(uint32_t, curLoadKal1_);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
         DEFINE_STUCT_FIELD(AscendC::LoadData2DParamsV2, load2dv2_);
 #endif
         using LoadData3DParamsV2SrcT = AscendC::LoadData3DParamsV2<typename Intf::SrcT>;

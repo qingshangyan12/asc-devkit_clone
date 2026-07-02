@@ -15,8 +15,8 @@
 #ifndef IMPL_MATMUL_TILING_MATMUL_CONSTANT_TILING_STRUCT_H
 #define IMPL_MATMUL_TILING_MATMUL_CONSTANT_TILING_STRUCT_H
 
-#include "kernel_basic_intf.h"
-#include "include/adv_api/matmul/tiling.h"
+#include "../../../../include/basic_api/kernel_basic_intf.h"
+#include "../../../../include/adv_api/matmul/tiling.h"
 #include "../../detail/matmul/utils/matmul_utils.h"
 
 namespace AscendC {
@@ -196,7 +196,7 @@ struct MatmulTiling {
     }
     __aicore__ inline int32_t GetShareUbSize() const
     {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
         return 0;
 #else
         if constexpr (IsSameTypeV<TILING_TYPE, MatmulApiStaticTiling>) {

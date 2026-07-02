@@ -69,7 +69,7 @@ Unified Buffer或Global Memory上的初始数据。
 
 ## 约束说明
 
-无
+原子操作保证对同一地址的读改写过程具有原子性，但不保证多个线程之间的执行顺序。使用`asc_atomic_cas`实现抢占逻辑时，可保证最多一个线程抢占成功，但不保证固定由哪个线程抢占成功。
 
 ## 需要包含的头文件
 
@@ -89,7 +89,7 @@ Unified Buffer或Global Memory上的初始数据。
 
 ## 调用示例
 
-完整样例请参考[InsertHashTable算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/02_features/01_api_features/00_memory_access/insert_hash_table/README.md)。
+完整样例请参考[InsertHashTable算子样例](https://gitcode.com/cann/asc-devkit/tree/9.1.0/examples/03_simt_api/02_features/01_api_features/00_memory_access/insert_hash_table/README.md)。
 
 简单示例场景为：多个线程尝试抢占同一个任务，任务初始拥有者ID为0。使用`asc_atomic_cas`接口实现只有一个线程抢占成功，其它线程读到非0后抢占失败。输入输出参数说明如下：
 

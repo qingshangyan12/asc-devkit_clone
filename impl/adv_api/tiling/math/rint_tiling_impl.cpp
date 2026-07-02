@@ -13,7 +13,8 @@
  * \brief
  */
 #include <set>
-#include "include/adv_api/math/rint_tiling.h"
+#include "../../../../include/adv_api/math/rint_tiling.h"
+#include "../../../../include/utils/tiling/platform/platform_ascendc.h"
 #include "../../detail/host_log.h"
 #include "../../detail/api_check/host_apicheck.h"
 #include "graph/tensor.h"
@@ -37,7 +38,7 @@ void GetRintMaxMinTmpSize(
     auto npuArch = ascendcPlatform.GetCurNpuArch();
 
     ASCENDC_HOST_ASSERT(
-        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_5102), return, "Unsupported NpuArch of Rint API.");
+        (npuArch == NpuArch::DAV_3510), return, "Unsupported NpuArch of Rint API.");
     maxValue = 0u;
     minValue = 0u;
 }
@@ -49,7 +50,7 @@ void GetRintTmpBufferFactorSize(
     HighLevelApiCheck::TypeSizeVerifyingParameters<RINT_GET_TMP_BUFFER>(typeSize, SUPPORT_TYPESIZE);
     auto npuArch = ascendcPlatform.GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_5102), return, "Unsupported NpuArch of Rint API.");
+        (npuArch == NpuArch::DAV_3510), return, "Unsupported NpuArch of Rint API.");
     extraBuf = 0u;
     maxLivedNodeCount = 0u;
 }

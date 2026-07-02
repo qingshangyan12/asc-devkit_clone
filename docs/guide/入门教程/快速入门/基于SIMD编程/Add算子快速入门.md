@@ -2,7 +2,7 @@
 
 本示例是一个入门实践，基于Ascend C SIMD实现Add算子，帮助您快速上手。它完整呈现了Device端核函数实现、Host端调用及编译运行的全流程，助您建立整体认知。开始前，请先参考[环境准备](../../环境准备.md)安装所需的CANN软件包。
 
-下面分别介绍基于C API与C++ API的Add算子实现，完整示例代码请参考[基于C API实现的Add算子示例](https://gitcode.com/cann/asc-devkit/blob/master/examples/02_simd_c_api/00_introduction/01_add/c_api_async_add/README.md)和[基于C++ API实现的Add算子示例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/00_introduction/01_add/add/README.md)。
+下面分别介绍基于C API与C++ API的Add算子实现，完整示例代码请参考[基于C API实现的Add算子示例](https://gitcode.com/cann/asc-devkit/blob/9.1.0/examples/02_simd_c_api/00_introduction/01_add/c_api_async_add/README.md)和[基于C++ API实现的Add算子示例](https://gitcode.com/cann/asc-devkit/blob/9.1.0/examples/01_simd_cpp_api/00_introduction/01_add/add/README.md)。
 
 - **Add算子功能介绍**：
 
@@ -55,8 +55,8 @@
           __ubuf__ float z_local[block_length];
 
           // Copy input data from Global Memory (i.e., Device Memory) to on-chip UB memory
-          asc_copy_gm2ub((__ubuf__ void*)x_local, (__gm__ void*)x_gm, block_length * sizeof(float));
-          asc_copy_gm2ub((__ubuf__ void*)y_local, (__gm__ void*)y_gm, block_length * sizeof(float));
+          asc_copy_gm2ub(x_local, x_gm, block_length * sizeof(float));
+          asc_copy_gm2ub(y_local, y_gm, block_length * sizeof(float));
           asc_sync();
 
           // Call SIMD API to complete the Add operation
@@ -64,7 +64,7 @@
           asc_sync();
 
           // Write the result from on-chip UB memory back to Global Memory
-          asc_copy_ub2gm((__gm__ void*)z_gm, (__ubuf__ void*)z_local, block_length * sizeof(float));
+          asc_copy_ub2gm(z_gm, z_local, block_length * sizeof(float));
           asc_sync();
       }
       ```
@@ -117,38 +117,40 @@
 
   - **Host端代码实现**：
 
-    Host端通过`<<<>>>`语法糖调用Device端核函数，示例代码如下：
+    Host端通过`<<<>>>`语法糖调用Device端核函数，示例代码片段如下：
     ```cpp
       int32_t main(int argc, char const *argv[])
       {
           ...
-          constexpr uint32_t num_blocks = 8;
+          constexpr uint32_t numBlocks = 8;
           ...
+
+          // Create runtime stream by aclrtCreateStream API
+          aclrtStream stream = nullptr;
+          aclrtCreateStream(&stream);
           
           // Allocate host and device memory, and copy input data from host to device
-          aclrtMallocHost((void **)(&z_host), total_byte_size);
-          aclrtMalloc((void **)&x_device, total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
-          aclrtMalloc((void **)&y_device, total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
-          aclrtMalloc((void **)&z_device, total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
-          aclrtMemcpy((uint8_t*)x_device, total_byte_size, x_host, total_byte_size, ACL_MEMCPY_HOST_TO_DEVICE);
-          aclrtMemcpy((uint8_t*)y_device, total_byte_size, y_host, total_byte_size, ACL_MEMCPY_HOST_TO_DEVICE);
+          aclrtMalloc((void**)&xDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
+          aclrtMalloc((void**)&yDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
+          aclrtMalloc((void**)&zDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
+          aclrtMallocHost((void**)&zHost, totalByteSize);
+
+          aclrtMemcpy(xDevice, totalByteSize, x.data(), totalByteSize, ACL_MEMCPY_HOST_TO_DEVICE);
+          aclrtMemcpy(yDevice, totalByteSize, y.data(), totalByteSize, ACL_MEMCPY_HOST_TO_DEVICE);
 
           // Launch kernel <<<numBlocks, dynUBufSize, stream>>>
           // numBlocks : Number of blocks. Default to 8 in this example.
           // dynUBufSize : Dynamic unified buffer size. Default to 0 in this example.
-          // nullptr : Runtime stream. Uses default stream in this example.
+          // stream : Runtime stream.
 
-          // Example One：Call add kernel which is implemented by SIMD C API
-          add_custom<<<num_blocks, 0>>>(xDevice, yDevice, zDevice);
-
-          // Example Two：Call add kernel which is implemented by SIMD C++ Basic API
-          // add_custom<blockLength><<<numBlocks, 0, stream>>>(xDevice, yDevice, zDevice);
+          // Example：Call add kernel which is implemented by SIMD C++ Basic API
+          add_custom<blockLength><<<numBlocks, 0, stream>>>(xDevice, yDevice, zDevice);
 
           // Wait for the add_custom kernel to complete
-          aclrtSynchronizeDevice();
+          aclrtSynchronizeStream(stream);
 
           // Copy the result from device memory to host memory
-          aclrtMemcpy(z_host, total_byte_size, (uint8_t*)z_device, total_byte_size, ACL_MEMCPY_DEVICE_TO_HOST);
+          aclrtMemcpy(zHost, totalByteSize, zDevice, totalByteSize, ACL_MEMCPY_DEVICE_TO_HOST);
           ...
       }
     ```
@@ -156,7 +158,7 @@
 - **算子编译与运行**：
 
   CMake配置文件示例：
-  ```
+  ```cmake
   cmake_minimum_required(VERSION 3.16)
 
   find_package(ASC REQUIRED)
@@ -168,17 +170,17 @@
   )
 
   # ======================================================================================
-  # NPU 编译选项配置
+  # NPU编译选项配置
   #
   # 说明：
-  #   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
+  #   - 需根据实际部署的NPU硬件架构选择对应的`npu-arch`参数。
   # ======================================================================================
   target_compile_options(c_api_add_example PRIVATE
       $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
   )
   ```
   编译与执行示例：
-  ```
+  ```bash
   mkdir -p build && cd build;   # 创建并进入build目录
   cmake ..;make -j;             # 编译工程
   ./c_api_add_example           # 运行样例
@@ -190,10 +192,10 @@
 
 | API层级 | 矢量计算类型 | Add算子实例 | 说明 |
 |--------------|-----------|--------------|--------------|
-| SIMD C API | 基于指针的Memory矢量计算 | [Memory矢量计算Add算子示例（同上述C API实现样例）](https://gitcode.com/cann/asc-devkit/blob/master/examples/02_simd_c_api/00_introduction/01_add/c_api_async_add/README.md) | 贴合C语言开发习惯，易于上手 |
-| SIMD C API | 基于指针和Reg计算的Reg矢量计算 | [Reg矢量计算Add算子示例](https://gitcode.com/cann/asc-devkit/blob/master/examples/02_simd_c_api/00_introduction/04_reg_base_add_compute/c_api_simd_add/README.md) | 贴合C语言开发习惯，性能上限更高 |
-| 基础API | 基于Tensor的Memory矢量计算 | [Memory矢量计算Add算子示例（同上述C++ Tensor实现样例）](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/00_introduction/01_add/add/README.md) | 匹配Tensor编程习惯，易于上手 |
-| 基础API | 基于Tensor的Reg矢量计算 | [Reg矢量计算Add算子示例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/00_introduction/04_reg_compute/add/README.md) | 匹配Tensor编程习惯，性能上限更高 |
+| SIMD C API | 基于指针的Memory矢量计算 | [Memory矢量计算Add算子示例（同上述C API实现样例）](https://gitcode.com/cann/asc-devkit/blob/9.1.0/examples/02_simd_c_api/00_introduction/01_add/c_api_async_add/README.md) | 贴合C语言开发习惯，易于上手 |
+| SIMD C API | 基于指针和Reg计算的Reg矢量计算 | [Reg矢量计算Add算子示例](https://gitcode.com/cann/asc-devkit/blob/9.1.0/examples/02_simd_c_api/00_introduction/04_reg_base_add_compute/c_api_simd_add/README.md) | 贴合C语言开发习惯，性能上限更高 |
+| 基础API | 基于Tensor的Memory矢量计算 | [Memory矢量计算Add算子示例（同上述C++ Tensor实现样例）](https://gitcode.com/cann/asc-devkit/blob/9.1.0/examples/01_simd_cpp_api/00_introduction/01_add/add/README.md) | 匹配Tensor编程习惯，易于上手 |
+| 基础API | 基于Tensor的Reg矢量计算 | [Reg矢量计算Add算子示例](https://gitcode.com/cann/asc-devkit/blob/9.1.0/examples/01_simd_cpp_api/00_introduction/04_reg_compute/add/README.md) | 匹配Tensor编程习惯，性能上限更高 |
 
 > [!NOTE] 说明
 > Ascend 950PR/Ascend 950DT新一代架构在传统[UB](../../../技术附录/概念原理和术语/术语表.md)缓存体系的基础上，开放了寄存器（Register）可编程能力，单个寄存器大小为256B。基于寄存器的矢量计算称为Reg矢量计算，而基于传统UB的矢量计算称为Memory矢量计算。

@@ -16,8 +16,8 @@
 
 #include "graph/tensor.h"
 #include "../../detail/host_log.h"
-#include "include/adv_api/math/cos_tiling.h"
-#include "tiling/platform/platform_ascendc.h"
+#include "../../../../include/adv_api/math/cos_tiling.h"
+#include "../../../../include/utils/tiling/platform/platform_ascendc.h"
 
 namespace AscendC {
 namespace {
@@ -84,7 +84,7 @@ void GetCosMaxMinTmpSize(
 
     auto npuArch = platform->GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_5102), return, "Unsupported NpuArch of Cos API.");
+        (npuArch == NpuArch::DAV_3510), return, "Unsupported NpuArch of Cos API.");
 
     if (config.algo == CosAlgo::POLYNOMIAL_APPROXIMATION) {
         maxValue = 0;
@@ -109,7 +109,7 @@ void GetCosTmpBufferFactorSize(
 
     auto npuArch = platform->GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_5102), return, "Unsupported NpuArch of Cos API.");
+        (npuArch == NpuArch::DAV_3510), return, "Unsupported NpuArch of Cos API.");
     if (config.algo == CosAlgo::POLYNOMIAL_APPROXIMATION) {
         extraBuf = 0;
         maxLiveNodeCount = 0;

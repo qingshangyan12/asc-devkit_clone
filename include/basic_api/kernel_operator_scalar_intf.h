@@ -20,8 +20,8 @@
 #ifndef ASCENDC_MODULE_OPERATOR_SCALAR_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_SCALAR_INTERFACE_H
 
-#include "kernel_macros.h"
-#include "utils/kernel_utils_mode.h"
+#include "../../impl/basic_api/kernel_macros.h"
+#include "../../impl/basic_api/utils/kernel_utils_mode.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -62,7 +62,7 @@ __aicore__ inline U ScalarCast(T valueIn);
 
 #if defined(__NPU_ARCH__) &&                                                    \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||                        \
-     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||                        \
+     (__NPU_ARCH__ == 3510) ||                        \
      (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 // 所有架构共用的：float -> bfloat16_t
 __aicore__ inline bfloat16_t Cast(const float& fVal);
@@ -70,9 +70,9 @@ __aicore__ inline bfloat16_t Cast(const float& fVal);
 
 #if defined(__NPU_ARCH__) &&                                                    \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||                        \
-     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+     (__NPU_ARCH__ == 3510))
 // 各架构特化的：类型 -> float
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
 template <typename T, typename U, typename>
 __aicore__ constexpr inline U Cast(T bVal);
 #else
