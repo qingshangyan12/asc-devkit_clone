@@ -730,6 +730,8 @@ __simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_float src, fl
 // ==========asc_muls==========
 __simd_callee__ inline void asc_muls(vector_half& dst, vector_float src, float value, vector_bool mask);
 
+[[deprecated("NOTICE: asc_muls_v2 is deprecated. "
+             "Please use asc_muls with ASC_POSITION_ODD instead.")]]
 __simd_callee__ inline void asc_muls_v2(vector_half& dst, vector_float src, float value, vector_bool mask);
 
 // ==========asc_add(u8/s8/u16/s18/u32/s32)=========
@@ -993,14 +995,24 @@ __simd_callee__ inline void asc_pack(vector_uint16_t& dst, vector_int32_t src);
 
 __simd_callee__ inline void asc_pack(vector_bool& dst, vector_bool src);
 
+[[deprecated("NOTICE: asc_pack_v2 is deprecated. "
+             "Please use asc_pack with ASC_POSITION_ODD instead.")]]
 __simd_callee__ inline void asc_pack_v2(vector_uint8_t& dst, vector_uint16_t src);
 
+[[deprecated("NOTICE: asc_pack_v2 is deprecated. "
+             "Please use asc_pack with ASC_POSITION_ODD instead.")]]
 __simd_callee__ inline void asc_pack_v2(vector_uint8_t& dst, vector_int16_t src);
 
+[[deprecated("NOTICE: asc_pack_v2 is deprecated. "
+             "Please use asc_pack with ASC_POSITION_ODD instead.")]]
 __simd_callee__ inline void asc_pack_v2(vector_uint16_t& dst, vector_uint32_t src);
 
+[[deprecated("NOTICE: asc_pack_v2 is deprecated. "
+             "Please use asc_pack with ASC_POSITION_ODD instead.")]]
 __simd_callee__ inline void asc_pack_v2(vector_uint16_t& dst, vector_int32_t src);
 
+[[deprecated("NOTICE: asc_pack_v2 is deprecated. "
+             "Please use asc_pack with ASC_POSITION_ODD instead.")]]
 __simd_callee__ inline void asc_pack_v2(vector_bool& dst, vector_bool src);
 
 // ==========asc_exp_sub(half/float)==========
@@ -1008,7 +1020,26 @@ __simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_half src0, vec
 
 __simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
+[[deprecated("NOTICE: asc_exp_sub_v2 is deprecated. "
+             "Please use asc_exp_sub with ASC_POSITION_ODD instead.")]]
 __simd_callee__ inline void asc_exp_sub_v2(vector_float& dst, vector_half src0, vector_half src1, vector_bool mask);
+// ==========asc_muls/asc_exp_sub/asc_pack with pos parameter==========
+__simd_callee__ inline void asc_muls(vector_half& dst, vector_float src, float value, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos);
+__simd_callee__ inline void asc_muls(vector_half& dst, vector_float src, float value, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos);
+__simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_half src0, vector_half src1, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos);
+__simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_half src0, vector_half src1, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos);
+__simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos);
+__simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos);
+__simd_callee__ inline void asc_pack(vector_uint8_t& dst, vector_uint16_t src, std::integral_constant<asc_position, asc_position::EVEN> pos);
+__simd_callee__ inline void asc_pack(vector_uint8_t& dst, vector_uint16_t src, std::integral_constant<asc_position, asc_position::ODD> pos);
+__simd_callee__ inline void asc_pack(vector_uint8_t& dst, vector_int16_t src, std::integral_constant<asc_position, asc_position::EVEN> pos);
+__simd_callee__ inline void asc_pack(vector_uint8_t& dst, vector_int16_t src, std::integral_constant<asc_position, asc_position::ODD> pos);
+__simd_callee__ inline void asc_pack(vector_uint16_t& dst, vector_uint32_t src, std::integral_constant<asc_position, asc_position::EVEN> pos);
+__simd_callee__ inline void asc_pack(vector_uint16_t& dst, vector_uint32_t src, std::integral_constant<asc_position, asc_position::ODD> pos);
+__simd_callee__ inline void asc_pack(vector_uint16_t& dst, vector_int32_t src, std::integral_constant<asc_position, asc_position::EVEN> pos);
+__simd_callee__ inline void asc_pack(vector_uint16_t& dst, vector_int32_t src, std::integral_constant<asc_position, asc_position::ODD> pos);
+__simd_callee__ inline void asc_pack(vector_bool& dst, vector_bool src, std::integral_constant<asc_position, asc_position::EVEN> pos);
+__simd_callee__ inline void asc_pack(vector_bool& dst, vector_bool src, std::integral_constant<asc_position, asc_position::ODD> pos);
 
 [[deprecated("NOTICE: asc_exp_sub_v2 in this parameter list is deprecated. "
              "Please use asc_exp_sub instead.")]]
