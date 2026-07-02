@@ -4504,7 +4504,7 @@ __simd_callee__ inline void asc_muls(vector_half& dst, vector_float src, float v
 }
 
 [[deprecated("NOTICE: asc_muls_v2 is deprecated. "
-             "Currently asc_muls_v2 is an unsupported API on current device.")]]
+             "Please use asc_muls with ASC_POSITION_ODD instead.")]]
 __simd_callee__ inline void asc_muls_v2(vector_half& dst, vector_float src, float value, vector_bool mask)
 {
     asc_muls_v2_impl(dst, src, value, mask);
@@ -4945,35 +4945,35 @@ __simd_callee__ inline void asc_pack(vector_bool& dst, vector_bool src)
 }
 
 [[deprecated("NOTICE: asc_pack_v2 is deprecated. "
-             "Currently asc_pack_v2 is an unsupported API on current device.")]]
+             "Please use asc_pack with ASC_POSITION_ODD instead.")]]
 __simd_callee__ inline void asc_pack_v2(vector_uint8_t& dst, vector_uint16_t src)
 {
     asc_pack_v2_impl(dst, src);
 }
 
 [[deprecated("NOTICE: asc_pack_v2 is deprecated. "
-             "Currently asc_pack_v2 is an unsupported API on current device.")]]
+             "Please use asc_pack with ASC_POSITION_ODD instead.")]]
 __simd_callee__ inline void asc_pack_v2(vector_uint8_t& dst, vector_int16_t src)
 {
     asc_pack_v2_impl(dst, src);
 }
 
 [[deprecated("NOTICE: asc_pack_v2 is deprecated. "
-             "Currently asc_pack_v2 is an unsupported API on current device.")]]
+             "Please use asc_pack with ASC_POSITION_ODD instead.")]]
 __simd_callee__ inline void asc_pack_v2(vector_uint16_t& dst, vector_uint32_t src)
 {
     asc_pack_v2_impl(dst, src);
 }
 
 [[deprecated("NOTICE: asc_pack_v2 is deprecated. "
-             "Currently asc_pack_v2 is an unsupported API on current device.")]]
+             "Please use asc_pack with ASC_POSITION_ODD instead.")]]
 __simd_callee__ inline void asc_pack_v2(vector_uint16_t& dst, vector_int32_t src)
 {
     asc_pack_v2_impl(dst, src);
 }
 
 [[deprecated("NOTICE: asc_pack_v2 is deprecated. "
-             "Currently asc_pack_v2 is an unsupported API on current device.")]]
+             "Please use asc_pack with ASC_POSITION_ODD instead.")]]
 __simd_callee__ inline void asc_pack_v2(vector_bool& dst, vector_bool src)
 {
     asc_pack_v2_impl(dst, src);
@@ -4991,14 +4991,14 @@ __simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_float src0, ve
 }
 
 [[deprecated("NOTICE: asc_exp_sub_v2 is deprecated. "
-             "Currently asc_exp_sub_v2 is an unsupported API on current device.")]]
+             "Please use asc_exp_sub with ASC_POSITION_ODD instead.")]]
 __simd_callee__ inline void asc_exp_sub_v2(vector_float& dst, vector_half src0, vector_half src1, vector_bool mask)
 {
     asc_exp_sub_v2_impl(dst, src0, src1, mask);
 }
 
 [[deprecated("NOTICE: asc_exp_sub_v2 is deprecated. "
-             "Currently asc_exp_sub_v2 is an unsupported API on current device.")]]
+             "Please use asc_exp_sub with ASC_POSITION_ODD instead.")]]
 __simd_callee__ inline void asc_exp_sub_v2(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
 {
     asc_exp_sub_v2_impl(dst, src0, src1, mask);
@@ -7825,6 +7825,89 @@ __simd_callee__ inline void asc_half2uint8_rz_sat(vector_uint8_t& dst, vector_ha
 __simd_callee__ inline void asc_half2uint8_rz_sat(vector_uint8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
 {
     asc_half2uint8_rz_sat_impl(dst, src, mask, pos);
+}
+
+
+// ========== Composite compute vN replacement dispatch wrappers ==========
+
+__simd_callee__ inline void asc_muls(vector_half& dst, vector_float src, float value, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    asc_muls_impl(dst, src, value, mask, pos);
+}
+
+__simd_callee__ inline void asc_muls(vector_half& dst, vector_float src, float value, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    asc_muls_impl(dst, src, value, mask, pos);
+}
+
+__simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_half src0, vector_half src1, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    asc_exp_sub_impl(dst, src0, src1, mask, pos);
+}
+
+__simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_half src0, vector_half src1, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    asc_exp_sub_impl(dst, src0, src1, mask, pos);
+}
+
+__simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    asc_exp_sub_impl(dst, src0, src1, mask, pos);
+}
+
+__simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    asc_exp_sub_impl(dst, src0, src1, mask, pos);
+}
+
+__simd_callee__ inline void asc_pack(vector_uint8_t& dst, vector_uint16_t src, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    asc_pack_impl(dst, src, pos);
+}
+
+__simd_callee__ inline void asc_pack(vector_uint8_t& dst, vector_uint16_t src, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    asc_pack_impl(dst, src, pos);
+}
+
+__simd_callee__ inline void asc_pack(vector_uint8_t& dst, vector_int16_t src, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    asc_pack_impl(dst, src, pos);
+}
+
+__simd_callee__ inline void asc_pack(vector_uint8_t& dst, vector_int16_t src, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    asc_pack_impl(dst, src, pos);
+}
+
+__simd_callee__ inline void asc_pack(vector_uint16_t& dst, vector_uint32_t src, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    asc_pack_impl(dst, src, pos);
+}
+
+__simd_callee__ inline void asc_pack(vector_uint16_t& dst, vector_uint32_t src, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    asc_pack_impl(dst, src, pos);
+}
+
+__simd_callee__ inline void asc_pack(vector_uint16_t& dst, vector_int32_t src, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    asc_pack_impl(dst, src, pos);
+}
+
+__simd_callee__ inline void asc_pack(vector_uint16_t& dst, vector_int32_t src, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    asc_pack_impl(dst, src, pos);
+}
+
+__simd_callee__ inline void asc_pack(vector_bool& dst, vector_bool src, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    asc_pack_impl(dst, src, pos);
+}
+
+__simd_callee__ inline void asc_pack(vector_bool& dst, vector_bool src, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    asc_pack_impl(dst, src, pos);
 }
 
 #endif

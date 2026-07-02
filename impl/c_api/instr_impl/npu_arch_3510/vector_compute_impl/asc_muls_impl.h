@@ -39,6 +39,20 @@ __simd_callee__ inline void asc_muls_v2_impl(vector_half& dst, vector_float src,
     }
 }
 
+__simd_callee__ inline void asc_muls_impl(vector_half& dst, vector_float src, float value, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        vmulscvt(dst, src, value, mask, PART_EVEN);
+    }
+}
+
+__simd_callee__ inline void asc_muls_impl(vector_half& dst, vector_float src, float value, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        vmulscvt(dst, src, value, mask, PART_ODD);
+    }
+}
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
