@@ -58,4 +58,33 @@ __simd_callee__ inline void asc_float2bfloat16_rd_sat_v2_impl(vector_bfloat16_t&
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+
+__simd_callee__ inline void asc_float2bfloat16_rd_impl(vector_bfloat16_t& dst, vector_float src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_f322bf16_x(src, mask, (ULL)2, (ULL)0, (ULL)0);
+    }
+}
+
+__simd_callee__ inline void asc_float2bfloat16_rd_impl(vector_bfloat16_t& dst, vector_float src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_f322bf16_x(src, mask, (ULL)2, (ULL)0, (ULL)1);
+    }
+}
+
+__simd_callee__ inline void asc_float2bfloat16_rd_sat_impl(vector_bfloat16_t& dst, vector_float src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_f322bf16_x(src, mask, (ULL)2, (ULL)0, (ULL)0);
+    }
+}
+
+__simd_callee__ inline void asc_float2bfloat16_rd_sat_impl(vector_bfloat16_t& dst, vector_float src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_f322bf16_x(src, mask, (ULL)2, (ULL)0, (ULL)1);
+    }
+}
+
 #endif
