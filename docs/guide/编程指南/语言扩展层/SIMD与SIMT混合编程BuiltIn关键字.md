@@ -106,7 +106,7 @@ __global__ __vector__ void kernel_name(__gm__ type* param1, __gm__ type* param2,
 
 ### <<<\>\>\>调用
 
-核函数的调用是通过<<<...\>\>\>内核调用符在Host侧调用，语法如下：
+SIMD与SIMT混合编程是在SIMD编程模型的核函数执行流程基础上引入SIMT VF（Vector Function）子任务。核函数仍按SIMD编程方式在Host侧通过<<<...\>\>\>启动，语法如下：
 
 ```
 kernel_name<<<block_num, dyn_ub_size, stream>>>(args...);
@@ -185,7 +185,7 @@ __global__ __vector__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
 
 -   threadIdx
 
-    内置全局变量，在核函数中可以直接使用，用于获取当前线程在线程块内部的索引。threadIdx.x，threadIdx.y，threadIdx.z分别表示当前线程在3个维度的索引，threadIdx.x的范围为\[0, blockDim.x\)，threadIdx.y的范围为\[0, blockDim.y\)，threadIdx.z的范围为\[0, blockDim.z\)。线程块内线程的索引计算方式如下：
+    内置全局变量，只能在SIMT VF函数中使用，用于获取当前线程在线程块内部的索引。threadIdx.x，threadIdx.y，threadIdx.z分别表示当前线程在3个维度的索引，threadIdx.x的范围为\[0, blockDim.x\)，threadIdx.y的范围为\[0, blockDim.y\)，threadIdx.z的范围为\[0, blockDim.z\)。线程块内线程的索引计算方式如下：
 
     -   对于一维线程块，线程块内线程的索引为threadIdx.x。
     -   对于二维线程块，线程块内线程的索引为\(threadIdx.x + threadIdx.y \* blockDim.x\)。
@@ -196,6 +196,39 @@ __global__ __vector__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
 -   warpSize
 
     运行时变量，表示一个线程束（Warp）中的线程数量，当前为固定值32。
+
+## 执行模块间差异说明
+
+### SIMT VF线程层级与SIMD核函数层级的差异
+
+SIMD与SIMT混合编程以SIMD核函数作为Device侧入口，在核函数或`__aicore__`函数中通过`asc_vf_call`启动SIMT VF子任务。Host侧<<<...\>\>\>调用配置的是外层核函数的逻辑核数；SIMT VF内部的`gridDim`、`blockIdx`、`blockDim`和`threadIdx`描述的是SIMT VF子任务的线程层次。两类概念所属层级不同，不能混用，下表列出了SIMD核函数层级和SIMT VF线程层级中常见概念的差异。
+
+| 内置变量或方法 | 所属层级 | 使用位置 | 含义 |
+| --- | --- | --- | --- | --- |
+| `AscendC::GetBlockNum()` | SIMD核函数层级 | 核函数或`__aicore__`函数，SIMT VF内部不可见 | 获取Host侧<<<...\>\>\>调用配置的核函数逻辑核数，即`block_num`。 |
+| `AscendC::GetBlockIdx()` | SIMD核函数层级 | 核函数或`__aicore__`函数，SIMT VF内部不可见 | 获取当前执行核函数的逻辑核索引。 |
+| `gridDim` | SIMT VF线程层级 | `__simt_vf__`或`__simt_callee__`函数，SIMT VF外部不可见 | 获取SIMT VF线程层次中的网格维度，表示本次SIMT VF子任务在各维度上的线程块数量。其值由Host侧<<<...\>\>\>调用配置的核函数逻辑核数决定。 |
+| `blockIdx` | SIMT VF线程层级 | `__simt_vf__`或`__simt_callee__`函数， SIMT VF外部不可见 | 获取SIMT VF线程层次中的线程块索引，表示当前线程所在的SIMT线程块在VF执行网格中的位置。 |
+| `blockDim` | SIMT VF线程层级 | `__simt_vf__`或`__simt_callee__`函数，SIMT VF外部不可见 | 获取SIMT VF线程块内的线程三维结构，其值由调用SIMT VF时`asc_vf_call`的第一个`dim3`参数指定。 |
+| `threadIdx` | SIMT VF线程层级 | `__simt_vf__`或`__simt_callee__`函数，SIMT VF外部不可见 | 获取当前SIMT线程在线程块内部的索引。 |
+
+使用时需注意：
+
+-   SIMD侧核函数不能使用SIMT VF线程层级相关内置变量，SIMT VF也无法感知SIMD核函数层级的逻辑核编号或逻辑核数量。
+-   如果SIMT VF需要使用外层SIMD流程中的逻辑核编号或逻辑核数量，建议在核函数或`__aicore__`函数中通过`AscendC::GetBlockIdx()`、`AscendC::GetBlockNum()`获取对应值后，以普通参数传入SIMT VF。
+
+### SIMT VF与SIMD VF的调用差异
+
+SIMT VF和SIMD VF都通过`asc_vf_call`从核函数或`__aicore__`函数中启动VF子任务，但两类VF面向的执行模型不同，调用参数和VF函数内部可使用的内置能力也不同。
+
+| 对比项 | SIMT VF调用 | SIMD VF调用 |
+| --- | --- | --- |
+| VF入口函数标识 | 使用`__simt_vf__`修饰。 | 使用`__simd_vf__`修饰。 |
+| 调用形式 | `asc_vf_call<simt_func>(dim3(threadNums), arg1, arg2, ...)` | `asc_vf_call<simd_func>(arg1, arg2, ...)` |
+| 第一个运行时参数 | 必须传入`dim3`类型的线程配置，用于指定SIMT线程块内线程数量。 | 没有线程配置参数，调用参数从SIMD VF函数的第一个实参开始传入。 |
+| 并行粒度 | 线程级并行。SIMT VF内部可使用`threadIdx`、`blockIdx`、`blockDim`、`gridDim`等SIMT内置变量组织线程级计算，但不能调用SIMD侧的GetBlockIdx()、GetBlockNum()。 | 向量级并行。SIMD VF内部通过Reg矢量计算接口组织向量计算，不能使用SIMT线程层次内置变量。 |
+| 指针入参 | 支持指向GM或UB的指针，需按实际内存空间使用`__gm__`或`__ubuf__`修饰。 | 指针入参需使用`__ubuf__`地址空间限定符修饰，不能直接访问GM内存。 |
+| 典型用途 | 处理复杂控制流、离散访存、线程级索引映射等不规则片段。 | 处理连续规整的向量计算片段。 |
 
 
 ## 内置数据类型<a name="zh-cn_topic_0000002571575581_section1880403364916"></a><a name="cn_topic_0000002571575581_section1880403364916"></a>
