@@ -45,7 +45,7 @@ SIMT能够通过大量线程的并发执行实现高效处理大批数据，但�
     **图 3**  多线程哈希冲突<a name="fig162521813558"></a>  
     ![](../../figures/多线程哈希冲突.png "多线程哈希冲突")
 
-    程序实现时，在Bucket结构体中添加一个标记位”flag”，用于标记当前桶的写入权限，线程通过原子指令[asc\_atomic\_cas](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_10382.html)修改flag来获取桶的写权限。
+    程序实现时，在Bucket结构体中添加一个标记位”flag”，用于标记当前桶的写入权限，线程通过原子指令[asc\_atomic\_cas](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta2/API/ascendcopapi/atlasascendc_api_07_10382.html)修改flag来获取桶的写权限。
 
     ```
     inline int32_t asc_atomic_cas(int32_t *address, int32_t compare, int32_t val)
@@ -71,7 +71,7 @@ SIMT能够通过大量线程的并发执行实现高效处理大批数据，但�
     int r1 = A;        // load A
     ```
 
-    在弱内存模型下，core 0的store A和store flag可能被重排序，导致其他核先看到flag=1，而A=1的更新尚未到达共享缓存。这时core 1可能会读到r1=0，这与程序的顺序执行逻辑不符。常见的解决方法是使用内存屏障来强制保证屏障两侧的内存操作不被重排序，[asc\_threadfence\(\)](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_10307.html)接口用于实现此功能。
+    在弱内存模型下，core 0的store A和store flag可能被重排序，导致其他核先看到flag=1，而A=1的更新尚未到达共享缓存。这时core 1可能会读到r1=0，这与程序的顺序执行逻辑不符。常见的解决方法是使用内存屏障来强制保证屏障两侧的内存操作不被重排序，[asc\_threadfence\(\)](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta2/API/ascendcopapi/atlasascendc_api_07_10307.html)接口用于实现此功能。
 
     程序实现时，在Bucket结构体中添加一个标记位“state”，用于标识key值的写入状态。写线程中，在写入key后将state标记位置为1，并在二者之间调用asc\_threadfence\(\)接口，确保当state被设置为1时，key的写入操作已经完成。读线程中，通过while循环轮询state值，直到state被设置为1，然后再读取key值，判断当前的key与桶中的key是否一致。
 
