@@ -45,7 +45,9 @@ function saveWidth() {
 }
 
 function readStoredWidth() {
-  const v = Number(localStorage.getItem(STORAGE_KEY))
+  const raw = localStorage.getItem(STORAGE_KEY)
+  if (raw === null || raw === '') return DEFAULT_WIDTH
+  const v = Number(raw)
   if (Number.isFinite(v)) return Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, v))
   return DEFAULT_WIDTH
 }
