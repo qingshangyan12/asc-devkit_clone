@@ -268,4 +268,3 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
         }
     }
     ```
-

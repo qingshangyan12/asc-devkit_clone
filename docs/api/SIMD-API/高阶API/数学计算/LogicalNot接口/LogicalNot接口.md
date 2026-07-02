@@ -5,4 +5,3 @@
 -   **[GetLogicalNotMaxMinTmpSize](GetLogicalNotMaxMinTmpSize.md)**
 
 -   **[GetLogicalNotTmpBufferFactorSize](GetLogicalNotTmpBufferFactorSize.md)**
-

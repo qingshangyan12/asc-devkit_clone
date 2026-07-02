@@ -389,4 +389,3 @@ HcclResult CollReduceScatterRingExecutor::SelectTempAlg(std::unique_ptr<AlgTempl
 REGISTER_EXEC("ReduceScatterRingExecutor", ReduceScatterRing, CollReduceScatterRingExecutor);
 
 }
-

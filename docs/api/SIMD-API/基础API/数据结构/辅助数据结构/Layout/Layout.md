@@ -19,4 +19,3 @@
 -   **[MakeLayout](MakeLayout.md)**  
 
 -   **[is\_layout](is_layout.md)**  
-

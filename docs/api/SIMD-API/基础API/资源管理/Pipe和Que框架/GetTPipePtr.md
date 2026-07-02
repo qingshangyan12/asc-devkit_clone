@@ -82,4 +82,3 @@ GetTPipePtr()->InitBuffer(inQueueX, 2, this->tileLength * sizeof(float));
 GetTPipePtr()->InitBuffer(inQueueY, 2, this->tileLength * sizeof(float));
 GetTPipePtr()->InitBuffer(outQueueZ, 2, this->tileLength * sizeof(float));
 ```
-

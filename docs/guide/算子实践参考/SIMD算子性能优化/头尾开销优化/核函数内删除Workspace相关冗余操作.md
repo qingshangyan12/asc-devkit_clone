@@ -68,4 +68,3 @@ __global__ __aicore__ void fast_gelu(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm_
     }
 }
 ```
-

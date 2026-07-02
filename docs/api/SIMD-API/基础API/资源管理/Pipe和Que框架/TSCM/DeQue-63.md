@@ -73,4 +73,3 @@ __aicore__ inline LocalTensor<T> DeQue()
 ## 调用示例<a name="section642mcpsimp"></a>
 
 参考[调用示例](AllocTensor-60.md#section642mcpsimp)。
-

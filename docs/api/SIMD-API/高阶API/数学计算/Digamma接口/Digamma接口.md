@@ -5,4 +5,3 @@
 -   **[GetDigammaMaxMinTmpSize](GetDigammaMaxMinTmpSize.md)**
 
 -   **[GetDigammaTmpBufferFactorSize](GetDigammaTmpBufferFactorSize.md)**
-

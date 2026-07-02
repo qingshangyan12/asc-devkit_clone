@@ -31,4 +31,3 @@
 -   **[h2ceil](h2ceil.md)**
 
 -   **[h2trunc](h2trunc.md)**
-

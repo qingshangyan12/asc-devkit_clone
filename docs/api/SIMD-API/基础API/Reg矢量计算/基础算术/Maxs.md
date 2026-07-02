@@ -88,4 +88,3 @@ __simd_vf__ inline void MaxsVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, T scala
     }
 }
 ```
-

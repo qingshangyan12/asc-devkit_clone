@@ -189,4 +189,3 @@ HcclResult SendReceive::BatchReceiveRunAsync()
     return HCCL_SUCCESS;
 }
 } // namespace hccl
-

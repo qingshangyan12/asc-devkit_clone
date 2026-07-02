@@ -40,4 +40,3 @@ this->Output("y1")
     .Format({ge::FORMAT_ND, ge::FORMAT_ND})
     .OutputShapeDependOnCompute();
 ```
-

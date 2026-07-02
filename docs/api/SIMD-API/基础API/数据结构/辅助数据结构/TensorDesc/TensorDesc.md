@@ -15,4 +15,3 @@
 -   **[GetDataPtr](GetDataPtr.md)**  
 
 -   **[GetDataObj](GetDataObj.md)**  
-

@@ -37,4 +37,3 @@ auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInf
 Conv3dTilingApi::Conv3dTiling conv3dApiTiling(ascendcPlatform);
 conv3dApiTiling.SetPadding(padHead, padTail, padUp, padDown, padLeft, padRight);
 ```
-

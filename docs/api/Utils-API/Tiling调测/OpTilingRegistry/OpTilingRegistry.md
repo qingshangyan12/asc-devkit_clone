@@ -7,4 +7,3 @@
 -   **[GetTilingFunc](GetTilingFunc.md)**  
 
 -   **[LoadTilingLibrary](LoadTilingLibrary.md)**  
-

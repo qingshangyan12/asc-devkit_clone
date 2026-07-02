@@ -121,4 +121,3 @@ void CommRing::SetMachineLinkMode(MachinePara &machinePara)
     machinePara.linkMode = LinkMode::LINK_DUPLEX_MODE;
 }
 }  // namespace hccl
-

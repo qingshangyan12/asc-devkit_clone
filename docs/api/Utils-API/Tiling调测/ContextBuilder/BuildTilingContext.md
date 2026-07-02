@@ -35,4 +35,3 @@ auto tilingContextHolder = context_ascendc::ContextBuilder().
   .BuildTilingContext(...);
 gert::TilingContext *tilingContext = tilingContextHolder->GetContext<gert::TilingContext>();
 ```
-

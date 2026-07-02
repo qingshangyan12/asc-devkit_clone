@@ -31,4 +31,3 @@ struct MatrixOffset {
 ## 约束说明
 
 无
-

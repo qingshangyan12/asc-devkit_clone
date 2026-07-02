@@ -144,4 +144,3 @@ __aicore__ inline TensorTrait(const LayoutType& t = {})
     AscendC::LocalTensor<AscendC::TensorTrait<half>> tensor3 = que3.AllocTensor<AscendC::TensorTrait<half>>();
     Add(tensor3, tensor1, tensor2, tensor3.GetSize());
     ```
-

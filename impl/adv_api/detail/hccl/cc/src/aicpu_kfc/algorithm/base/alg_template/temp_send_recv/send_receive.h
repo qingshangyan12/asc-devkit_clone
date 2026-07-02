@@ -16,4 +16,3 @@ namespace hccl {
 } // namespace hccl
 
 #endif /** SEND_RECEIVE_H */
-

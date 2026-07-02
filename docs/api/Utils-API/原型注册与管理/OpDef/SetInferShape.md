@@ -39,4 +39,3 @@ OpDef算子定义，OpDef请参考[OpDef](OpDef.md)。
 ## 约束说明<a name="zh-cn_topic_0000001600267337_zh-cn_topic_0000001526112350_zh-cn_topic_0000001525424352_section19165124931511"></a>
 
 无
-

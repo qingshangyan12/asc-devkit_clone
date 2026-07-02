@@ -77,4 +77,3 @@ inline void asc_threadfence_block()
         dst[0] = src[0];
     }
     ```
-

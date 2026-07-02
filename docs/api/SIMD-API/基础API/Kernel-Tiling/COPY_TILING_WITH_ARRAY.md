@@ -126,4 +126,3 @@ extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8
     }
 }
 ```
-

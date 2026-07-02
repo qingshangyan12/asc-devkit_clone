@@ -35,4 +35,3 @@
 -   **[\_\_hmax\_nan](__hmax_nan-174.md)**
 
 -   **[\_\_hmin\_nan](__hmin_nan-175.md)**
-

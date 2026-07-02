@@ -5,4 +5,3 @@
 -   **[GetSinCosMaxMinTmpSize](GetSinCosMaxMinTmpSize.md)**
 
 -   **[GetSinCosTmpBufferFactorSize](GetSinCosTmpBufferFactorSize.md)**
-

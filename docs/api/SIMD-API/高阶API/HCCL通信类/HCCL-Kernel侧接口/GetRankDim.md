@@ -47,4 +47,3 @@ __aicore__ inline uint32_t GetRankDim()
 ## 调用示例
 
 请参见[GetWindowsInAddr](GetWindowsInAddr.md)的调用示例。
-

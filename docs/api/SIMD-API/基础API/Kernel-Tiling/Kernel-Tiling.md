@@ -23,4 +23,3 @@
 -   **[REGISTER\_NONE\_TILING](REGISTER_NONE_TILING.md)**  
 
 -   **[设置Kernel类型](设置Kernel类型.md)**  
-

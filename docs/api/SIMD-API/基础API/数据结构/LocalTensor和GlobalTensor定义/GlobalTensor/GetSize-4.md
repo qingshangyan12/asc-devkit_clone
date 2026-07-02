@@ -76,4 +76,3 @@ AscendC::LocalTensor<uint8_t> stackBuffer;
 AscendC::PopStackBuffer<uint8_t, AscendC::TPosition::LCM>(stackBuffer);
 uint32_t stackBufferSize = stackBuffer.GetSize();
 ```
-

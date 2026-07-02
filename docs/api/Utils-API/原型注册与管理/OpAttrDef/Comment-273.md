@@ -48,4 +48,3 @@ OpAttrDef &Comment(const char *comment)
 ```
 this->Attr("attrname").Comment("Attr cmt 1");
 ```
-

@@ -173,4 +173,3 @@
 -   **[\_\_bfloat1622float2](__bfloat1622float2.md)**
 
 -   **[\_\_ushort\_as\_bfloat16](__ushort_as_bfloat16.md)**
-

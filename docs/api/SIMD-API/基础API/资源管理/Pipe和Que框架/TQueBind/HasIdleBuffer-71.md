@@ -87,4 +87,3 @@ AscendC::LocalTensor<half> tensor3 = que.AllocTensor<half>();
 AscendC::LocalTensor<half> tensor4 = que.AllocTensor<half>();
 ret = que.HasIdleBuffer(); // AllocTensor了四块内存，当前无空闲内存，返回值为false，继续AllocTensor会报错
 ```
-

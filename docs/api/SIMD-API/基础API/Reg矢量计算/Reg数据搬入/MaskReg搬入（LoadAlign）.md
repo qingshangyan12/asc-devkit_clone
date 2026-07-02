@@ -128,4 +128,3 @@ __simd_vf__ inline void LoadAlignVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, ui
     }
 }
 ```
-

@@ -104,4 +104,3 @@ AscendC::Reg::RegTensor<T> srcReg;
     }
 }
 ```
-

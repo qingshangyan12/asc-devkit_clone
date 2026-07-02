@@ -36,4 +36,3 @@ __aicore__ inline void asc_icache_preload_impl(const void* addr, int64_t prefetc
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
 #endif  
-

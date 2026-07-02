@@ -5,4 +5,3 @@
 -   **[GetRoundMaxMinTmpSize](GetRoundMaxMinTmpSize.md)**
 
 -   **[GetRoundTmpBufferFactorSize](GetRoundTmpBufferFactorSize.md)**
-

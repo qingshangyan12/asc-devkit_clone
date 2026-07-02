@@ -99,4 +99,3 @@ __simd_vf__ inline void MaskGenWithRegTensorVF(__ubuf__ T* dstAddr, __ubuf__ T* 
     AscendC::Reg::StoreAlign(dstAddr, mask);
 }
 ```
-

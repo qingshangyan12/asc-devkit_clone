@@ -51,4 +51,3 @@ void AddWorkspaceData(gert::ContinuousVector *ws)
     ......
 }
 ```
-

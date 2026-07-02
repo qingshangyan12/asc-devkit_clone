@@ -5,4 +5,3 @@
 -   **[GetTanMaxMinTmpSize](GetTanMaxMinTmpSize.md)**
 
 -   **[GetTanTmpBufferFactorSize](GetTanTmpBufferFactorSize.md)**
-

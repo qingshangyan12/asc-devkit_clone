@@ -5,4 +5,3 @@
 -   **[GetBitwiseOrMaxMinTmpSize](GetBitwiseOrMaxMinTmpSize.md)**
 
 -   **[GetBitwiseOrTmpBufferFactorSize](GetBitwiseOrTmpBufferFactorSize.md)**
-

@@ -5,4 +5,3 @@
 -   **[GetSinhMaxMinTmpSize](GetSinhMaxMinTmpSize.md)**
 
 -   **[GetSinhTmpBufferFactorSize](GetSinhTmpBufferFactorSize.md)**
-

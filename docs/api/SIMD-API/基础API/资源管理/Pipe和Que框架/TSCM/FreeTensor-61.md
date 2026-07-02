@@ -90,4 +90,3 @@ __aicore__ inline void FreeTensor(LocalTensor<T>& tensor)
 ## 调用示例<a name="section642mcpsimp"></a>
 
 参考[调用示例](AllocTensor-60.md#section642mcpsimp)。
-

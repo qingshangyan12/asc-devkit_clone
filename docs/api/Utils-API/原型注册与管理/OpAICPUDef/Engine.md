@@ -38,4 +38,3 @@ OpAICPUDef算子定义，OpAICPUDef请参考[OpAICPUDef](OpAICPUDef.md)。
 ## 约束说明<a name="zh-cn_topic_0000001549507408_zh-cn_topic_0000001576923281_zh-cn_topic_0000001525424352_section19165124931511"></a>
 
 无
-

@@ -5,4 +5,3 @@
 -   **[GetIsNanMaxMinTmpSize](GetIsNanMaxMinTmpSize.md)**
 
 -   **[GetIsNanTmpBufferFactorSize](GetIsNanTmpBufferFactorSize.md)**
-

@@ -133,4 +133,3 @@ __aicore__ inline int64_t asc_get_sys_virtual_base()
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
 #endif  
-

@@ -39,4 +39,3 @@ int ret = conv3DBpDxTiling.GetTiling(tilingData); // if ret = -1, get tiling fai
 ```
 #include "lib/conv_backprop/conv3d_bp_input_tiling.h"
 ```
-

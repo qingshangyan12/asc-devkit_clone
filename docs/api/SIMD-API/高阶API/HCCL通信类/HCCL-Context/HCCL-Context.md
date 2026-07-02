@@ -5,4 +5,3 @@
 -   **[SetHcclContext](SetHcclContext.md)**
 
 -   **[GetHcclContext](GetHcclContext.md)**
-

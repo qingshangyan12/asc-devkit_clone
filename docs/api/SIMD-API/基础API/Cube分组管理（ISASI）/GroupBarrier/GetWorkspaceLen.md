@@ -82,4 +82,3 @@ uint64_t offset = barA.GetWorkspaceLen(); // 返回barA所占用的GlobalMemory�
 ```
 占用的GlobalMemory空间(offset)的大小为: 3072
 ```
-

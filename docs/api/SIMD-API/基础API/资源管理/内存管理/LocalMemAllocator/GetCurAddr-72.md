@@ -77,4 +77,3 @@ LocalMemAllocator allocator;
 // 默认的物理位置为UB，由于从0地址开始分配，下面的打印结果为0
 AscendC::printf("current addr is %u\n", allocator.GetCurAddr());
 ```
-
