@@ -38,7 +38,7 @@ void AicpuUtils::CreateSingleInstance(void *args) const
     auto *kernelParam = reinterpret_cast<HcclKernelParamLite *>(args);
     UbConnLiteMgr::GetInstance();
     AicpuDaemonService::GetInstance();
-    TaskExceptionFunc::GetInstance().SetEnable(kernelParam->envConfig.taskExceptionEnable); // � �据环境变量使能TaskException
+    TaskExceptionFunc::GetInstance().SetEnable(kernelParam->envConfig.taskExceptionEnable); //  据环境变量使能TaskException
     AicpuCommDestroyFunc::GetInstance();
     TaskExceptionHandlerLite::GetInstance();
     ProfilingHandlerLite::GetInstance();
@@ -89,7 +89,7 @@ HcclResult AicpuUtils::GetCommHandle(CommunicatorImplLite *communicatorImplLite,
     if (kernelParam_->op.algOperator.opMode == OpMode::OPBASE) {
         communicatorImplLite->SetCurrentOpMode(kernelParam_->op.algOperator.opMode);
         communicatorImplLite->UpdateCommParam(kernelParam_);
-        EXCEPTION_CATCH(communicatorImplLite->UpdateRes(kernelParam_), return HCCL_E_INTERNAL);
+        EXECEPTION_CATCH(communicatorImplLite->UpdateRes(kernelParam_), return HCCL_E_INTERNAL);
     } else {
         HCCL_ERROR("[%s]%s only support opbase, but get opMode %s.", __func__, __func__,
                     kernelParam_->op.algOperator.opMode.Describe().c_str());

@@ -8,20 +8,19 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "aicpu_indop_env.h"
-#include "aicpu_init_param.h"
 
 namespace hcomm {
-static DevAicpuCommConfig g_configEnv;
+static bool g_taskExceptionEnable = true;
 
 void SetTaskExceptionEnable(bool taskExceptionEnable)
 {
-    g_configEnv.taskExceptionEnable = taskExceptionEnable;
+    g_taskExceptionEnable = taskExceptionEnable;
     HCCL_INFO("[%s] taskExceptionEnable[%d]", __func__, taskExceptionEnable);
 }
 
 const bool& GetTaskExceptionEnable()
 {
-    return g_configEnv.taskExceptionEnable;
+    return g_taskExceptionEnable;
 }
 
 }  // namespace hcomm
