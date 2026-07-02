@@ -221,7 +221,6 @@
 | GetUBSizeInBytes | PIPE_S |
 | GetRuntimeUBSize | PIPE_S |
 | GetVecLen | PIPE_S |
-| CeilDivision | PIPE_S |
 | GetSsbufBaseAddr | PIPE_S |
 
 **表7**  缓存控制接口流水类型汇总

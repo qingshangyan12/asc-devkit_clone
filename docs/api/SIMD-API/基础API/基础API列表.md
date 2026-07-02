@@ -561,7 +561,6 @@
 | [QuietNaN](工具接口/数学计算/NumericLimits/QuietNaN.md) | 返回指定数据类型的安静NaN值（浮点尾数最高位为1）。 |
 | [SignalingNaN](工具接口/数学计算/NumericLimits/SignalingNaN.md) | 返回指定数据类型的发信NaN值（浮点尾数最高位为0）。 |
 | [DeNormMin](工具接口/数学计算/NumericLimits/DeNormMin.md) | 返回指定数据类型的最小正的非正规值。 |
-| [CeilDivision](工具接口/数学计算/CeilDivision.md) | 计算两个整数num1和num2相除后向上取整结果。 |
 | [GetTaskRatio](工具接口/系统资源与变量/GetTaskRatio.md) | 分离模式下，获取任务启动的Cube Core（AIC）或者Vector Core（AIV）的数量与逻辑AI Core数量的比例。 |
 | [GetUBSizeInBytes](工具接口/系统资源与变量/GetUBSizeInBytes.md) | 获取UB空间的大小，单位为Byte。开发者根据UB的大小来计算循环次数等参数值。 |
 | [GetRuntimeUBSize](工具接口/系统资源与变量/GetRuntimeUBSize.md) | 获取运行时UB空间的大小，单位为Byte。开发者根据UB的大小来计算循环次数等参数值。 |
