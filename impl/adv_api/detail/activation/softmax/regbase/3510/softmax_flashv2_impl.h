@@ -26,6 +26,9 @@
 #include "softmax_common_impl.h"
 #include "softmax_impl.h"
 #include "../../../../common/common.h"
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#include "softmax_flashv2_5102_impl.h"
+#endif
 
 namespace AscendC {
 
@@ -896,14 +899,29 @@ __aicore__ inline void SoftMaxFlashV2NZImpl(
                 dstTensor, expSumTensor, maxTensor, srcTensor, workLocal, originalSrcShape, tiling);
         }
     } else {
-        if (originalSrcShape.k != tiling.srcK) {
-            SoftmaxFlashV2NZWithTailUpdateImpl<T1, T2>(
-                dstTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inExpSumTensor, inMaxTensor, workLocal,
-                originalSrcShape, tiling);
-        } else {
-            SoftmaxFlashV2NZUpdateImpl<T1, T2>(
-                dstTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inExpSumTensor, inMaxTensor, workLocal,
-                originalSrcShape, tiling);
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+        if constexpr (IsSameType<T1, half>::value && IsSameType<T2, half>::value) {
+            if (originalSrcShape.k != tiling.srcK) {
+                SoftmaxFlashV2NZWithTailUpdate5102Impl(
+                    dstTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inExpSumTensor, inMaxTensor,
+                    workLocal, originalSrcShape, tiling);
+            } else {
+                SoftmaxFlashV2NZUpdate5102Impl(
+                    dstTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inExpSumTensor, inMaxTensor,
+                    workLocal, originalSrcShape, tiling);
+            }
+        } else
+#endif
+        {
+            if (originalSrcShape.k != tiling.srcK) {
+                SoftmaxFlashV2NZWithTailUpdateImpl<T1, T2>(
+                    dstTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inExpSumTensor, inMaxTensor, workLocal,
+                    originalSrcShape, tiling);
+            } else {
+                SoftmaxFlashV2NZUpdateImpl<T1, T2>(
+                    dstTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inExpSumTensor, inMaxTensor, workLocal,
+                    originalSrcShape, tiling);
+            }
         }
     }
 }
@@ -1167,23 +1185,38 @@ __aicore__ inline void SoftmaxFlashV2PostProcess(
             (SupportType<T1, half>() && SupportType<T2, half>()) ||
             (SupportType<T1, half>() && SupportType<T2, float>()),
         "SoftMaxFlashV2 api only support half/float on current device");
-    if constexpr (isBasicBlock && isUpdate) {
-        SoftmaxFlashV2NDUpdateImpl<T1, T2>(
-            dstTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inExpSumTensor, inMaxTensor, workLocal,
-            originalSrcShape, tiling);
-    } else {
-        if constexpr (!isUpdate) {
-            SoftmaxFlashV2NDNoUpdateImpl<T1, T2, isBasicBlock>(
-                dstTensor, expSumTensor, maxTensor, srcTensor, workLocal, originalSrcShape, tiling);
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+    if constexpr (isUpdate && IsSameType<T1, half>::value && IsSameType<T2, half>::value) {
+        if (originalSrcShape.k % FLOAT_REPEAT_SIZE) {
+            SoftmaxFlashV2NDWithTailUpdate5102Impl(
+                dstTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inExpSumTensor, inMaxTensor, workLocal,
+                originalSrcShape, tiling);
         } else {
-            if (originalSrcShape.k % FLOAT_REPEAT_SIZE) {
-                SoftmaxFlashV2NDWithTailUpdateImpl<T1, T2>(
-                    dstTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inExpSumTensor, inMaxTensor, workLocal,
-                    originalSrcShape, tiling);
+            SoftmaxFlashV2NDUpdate5102Impl(
+                dstTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inExpSumTensor, inMaxTensor, workLocal,
+                originalSrcShape, tiling);
+        }
+    } else
+#endif
+    {
+        if constexpr (isBasicBlock && isUpdate) {
+            SoftmaxFlashV2NDUpdateImpl<T1, T2>(
+                dstTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inExpSumTensor, inMaxTensor, workLocal,
+                originalSrcShape, tiling);
+        } else {
+            if constexpr (!isUpdate) {
+                SoftmaxFlashV2NDNoUpdateImpl<T1, T2, isBasicBlock>(
+                    dstTensor, expSumTensor, maxTensor, srcTensor, workLocal, originalSrcShape, tiling);
             } else {
-                SoftmaxFlashV2NDUpdateImpl<T1, T2>(
-                    dstTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inExpSumTensor, inMaxTensor, workLocal,
-                    originalSrcShape, tiling);
+                if (originalSrcShape.k % FLOAT_REPEAT_SIZE) {
+                    SoftmaxFlashV2NDWithTailUpdateImpl<T1, T2>(
+                        dstTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inExpSumTensor, inMaxTensor,
+                        workLocal, originalSrcShape, tiling);
+                } else {
+                    SoftmaxFlashV2NDUpdateImpl<T1, T2>(
+                        dstTensor, expSumTensor, maxTensor, srcTensor, expMaxTensor, inExpSumTensor, inMaxTensor,
+                        workLocal, originalSrcShape, tiling);
+                }
             }
         }
     }
