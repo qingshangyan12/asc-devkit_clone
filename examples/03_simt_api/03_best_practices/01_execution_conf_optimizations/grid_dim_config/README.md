@@ -286,7 +286,7 @@ for (uint32_t i = global_idx; i < index_total_length; i += stride) {
 
 ## 性能分析
 
-使用`msprof`工具获取详细性能数据：
+使用`msOpProf`工具获取详细性能数据：
 
 ```bash
 msprof op ./grid_config   # 分析case的性能

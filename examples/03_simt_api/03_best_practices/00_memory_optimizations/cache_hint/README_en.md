@@ -239,7 +239,7 @@ Run the following steps in the root directory of this example to build and execu
 
 ## Performance Analysis
 
-Use the `msprof` tool to collect detailed performance data:
+Use the `msOpProf` tool to collect detailed performance data:
 
 ```bash
 msprof op ./data_cache_hint   # Analyze case performance

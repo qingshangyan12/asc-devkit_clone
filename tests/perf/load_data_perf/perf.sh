@@ -176,12 +176,12 @@ for shape in "${SHAPES[@]}"; do
     echo -e "${YELLOW}测试 ${test_id}: Shape [${M}, ${K}, ${N}]${NC}"
     echo -e "${YELLOW}----------------------------------------${NC}"
     
-    # 清理之前的 msprof 输出目录
+    # 清理之前的 msOpProf 输出目录
     rm -rf OPPROF_* 2>/dev/null || true
     
-    # 使用 msprof 采集性能数据
+    # 使用 msOpProf 采集性能数据
     echo -e "${GREEN}开始 msprof 性能采集...${NC}"
-    # 检查 msprof 执行结果。该命令可能返回非 0，不能被 set -e 提前中断。
+    # 检查 msOpProf 执行结果。该命令可能返回非 0，不能被 set -e 提前中断。
     set +e
     msprof op build/demo "${SCENARIO}" "${M}" "${K}" "${N}" > /dev/null 2>&1
     msprof_exit_code=$?
@@ -193,7 +193,7 @@ for shape in "${SHAPES[@]}"; do
         continue
     fi
     
-    # 查找 msprof 生成的性能数据目录
+    # 查找 msOpProf 生成的性能数据目录
     msprof_dir=$(ls -dt OPPROF_* 2>/dev/null | head -n 1 || true)
     
     if [ -z "$msprof_dir" ] || [ ! -d "$msprof_dir" ]; then
@@ -375,7 +375,7 @@ for shape in "${SHAPES[@]}"; do
     echo -e "${GREEN}  Cycle: ${cycle_count} cycles${NC}"
     echo -e "${GREEN}  Bandwidth: ${bandwidth} GB/s${NC}"
     
-    # 保存 msprof 输出目录
+    # 保存 msOpProf 输出目录
     if [ "$perf_time" != "N/A" ]; then
         mv "${msprof_dir}" "${PERF_DATA_DIR}/test_${test_id}_${shape_str}" 2>/dev/null || true
     fi

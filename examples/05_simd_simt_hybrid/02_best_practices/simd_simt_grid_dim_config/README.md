@@ -364,7 +364,7 @@ __global__ __vector__ void gather_kernel(..., uint32_t thread_num)
 
 ## 性能分析
 
-使用 `msprof` 工具获取详细性能数据：
+使用 `msOpProf` 工具获取详细性能数据：
 
 ```bash
 msprof ./grid_config   # 分析性能

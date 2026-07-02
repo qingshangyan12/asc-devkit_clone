@@ -576,10 +576,10 @@ Run the following steps in the root directory of this example to build and run t
 
 ### Performance Analysis
 
-Use the `msprof` tool to obtain detailed performance data:
+Use the `msOpProf` tool to obtain detailed performance data:
 
 ```bash
-msprof ./demo   # Analyze performance
+msprof op ./demo   # Analyze performance
 ```
 
 A PROF_ prefixed folder is generated in the current directory. The `mindstudio_profiler_output` directory stores Host and Device performance data summaries. Performance data analysis is recommended to view files in this directory.

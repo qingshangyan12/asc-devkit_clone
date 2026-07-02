@@ -199,7 +199,7 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
 
 ## Performance Data Collection
 
-  Use the `msprof` tool to collect performance data on a single component:
+  Use the `msOpProf` tool to collect performance data on a single component:
 
   ```bash
   msprof op ./demo   # Analyze example performance

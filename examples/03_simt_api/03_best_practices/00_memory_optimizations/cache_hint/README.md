@@ -239,7 +239,7 @@ asc_stcg(&output[idx], y);
 
 ## 性能分析
 
-使用 `msprof` 工具获取详细性能数据：
+使用 `msOpProf` 工具获取详细性能数据：
 
 ```bash
 msprof op ./data_cache_hint   # 分析case的性能

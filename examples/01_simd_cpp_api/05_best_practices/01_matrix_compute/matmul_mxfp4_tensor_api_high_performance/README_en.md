@@ -482,10 +482,10 @@ test pass!
 
 ### NPU Mode Performance Analysis
 
-Use the `msprof` tool to obtain detailed NPU mode runtime performance data:
+Use the `msOpProf` tool to obtain detailed NPU mode runtime performance data:
 
 ```bash
-msprof ./demo
+msprof op ./demo
 ```
 
 A PROF_ prefixed folder is generated in the current directory. The `mindstudio_profiler_output` directory stores performance data summaries. Performance data analysis is recommended to view files in this directory:

@@ -441,10 +441,10 @@ Run the following steps in the root directory of this example to build and run t
 
 - Performance collection
 
-  Use the `msprof` tool to obtain detailed performance data:
+  Use the `msOpProf` tool to obtain detailed performance data:
 
   ```bash
-  msprof ./demo
+  msprof op ./demo
   msprof --ai-core=on --aic-metrics=L2Cache ./demo    # Use for L2Cache related scenarios
   ```
 

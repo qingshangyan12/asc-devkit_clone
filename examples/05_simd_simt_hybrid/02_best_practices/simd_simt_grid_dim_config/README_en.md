@@ -364,7 +364,7 @@ Run the following steps in the root directory of this example to build and run t
 
 ## Performance Analysis
 
-Use the `msprof` tool to obtain detailed performance data:
+Use the `msOpProf` tool to obtain detailed performance data:
 
 ```bash
 msprof ./grid_config   # Analyze performance

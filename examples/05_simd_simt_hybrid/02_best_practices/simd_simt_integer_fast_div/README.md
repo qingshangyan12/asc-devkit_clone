@@ -269,7 +269,7 @@ uint32_t result = (value + q) >> shift;
 
 ### 性能分析
 
-使用 `msprof` 工具获取详细性能数据。
+使用 `msOpProf` 工具获取详细性能数据。
 
 ```bash
 msprof ./integer_div   # 分析性能

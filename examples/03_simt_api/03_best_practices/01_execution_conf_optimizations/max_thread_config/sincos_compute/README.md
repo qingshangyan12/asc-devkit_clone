@@ -257,7 +257,7 @@ __global__ __launch_bounds__(512) void sincos_thread_512(float* input,
 
 ## 性能分析
 
-使用 `msprof` 工具获取详细性能数据：
+使用 `msOpProf` 工具获取详细性能数据：
 
 ```bash
 msprof op ./sincos_compute 1024   # 分析基线case的性能
