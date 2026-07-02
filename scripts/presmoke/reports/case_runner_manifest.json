@@ -606,6 +606,9 @@
     "target_runnable": true,
     "skip": true,
     "skip_reason": "requires TensorFlow 2.6.5 environment; skipped by presmoke",
+    "skip_modes": [
+      "npu"
+    ],
     "reasons": [
       "no_cmake_step",
       "no_make_step",
@@ -631,6 +634,9 @@
     "target_runnable": true,
     "skip": true,
     "skip_reason": "requires TensorFlow 2.6.5 environment; skipped by presmoke",
+    "skip_modes": [
+      "npu"
+    ],
     "reasons": [
       "special_02_features_00_01_02",
       "explicit_skip"
@@ -716,10 +722,12 @@
       "special_02_features_00_01_02"
     ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=1",
       "make -j",
-      "./demo 1",
-      "./demo 2"
+      "./demo",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=2",
+      "make -j",
+      "./demo"
     ]
   },
   {
@@ -2711,6 +2719,34 @@
     ]
   },
   {
+    "case": "01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_with_stride",
+    "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_with_stride/run.sh",
+    "source": "readme",
+    "confidence": "low",
+    "supported_archs": [
+      "dav-3510"
+    ],
+    "supported_modes": [
+      "cpu",
+      "npu",
+      "sim"
+    ],
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [
+      "shell_variable_reference",
+      "unsupported_on_target_arch_or_mode"
+    ],
+    "commands": [
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "make -j",
+      "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
+      "./demo",
+      "python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin output/golden.bin"
+    ]
+  },
+  {
     "case": "01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad/run.sh",
     "source": "readme",
@@ -4063,8 +4099,13 @@
     ],
     "target_runnable": true,
     "skip": false,
-    "skip_reason": "",
-    "reasons": [],
+    "skip_reason": "data size (~308M) causes overtime in cpu mode; cpu mode skipped by presmoke",
+    "skip_modes": [
+      "cpu"
+    ],
+    "reasons": [
+      "partial_mode_skip"
+    ],
     "commands": [
       "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "make -j",
