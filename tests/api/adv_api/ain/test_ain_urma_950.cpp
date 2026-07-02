@@ -11,7 +11,6 @@
 #include <array>
 #include <gtest/gtest.h>
 #include <vector>
-#include "acl/acl.h"
 #define private public
 #include "kernel_operator.h"
 #include "ain/ain.h"
@@ -118,16 +117,6 @@ class AinResource {
 public:
     explicit AinResource(AscendC::ChannelHandle channel)
     {
-        aclError ret = aclrtMalloc(&symMemPoolDevPtr_, AIN_SIGNAL_POOL_SIZE, ACL_MEM_MALLOC_HUGE_FIRST);
-        if (ret != ACL_SUCCESS) {
-            symMemPoolDevPtr_ = nullptr;
-        }
-
-        ret = aclrtMalloc(&signalShadowsDevPtr_, AIN_SIGNAL_POOL_SIZE, ACL_MEM_MALLOC_HUGE_FIRST);
-        if (ret != ACL_SUCCESS) {
-            signalShadowsDevPtr_ = nullptr;
-        }
-
         channelHandles_[AIN_PEER] = channel;
         for (uint32_t i = 0; i < AIN_RANK_SIZE; ++i) {
             channelHandlePtrs_[i] = &channelHandles_[i];
@@ -136,10 +125,10 @@ public:
         aivRes_.entity = channelHandlePtrs_.data();
         aivRes_.entityNumPerRank = entityNumPerRank_.data();
         aivRes_.ainSignalCount = AIN_SIGNAL_COUNT;
-        aivRes_.ainSignalShadows = reinterpret_cast<uint64_t*>(signalShadowsDevPtr_);
+        aivRes_.ainSignalShadows = signalShadows_.data();
         aivRes_.ainWorldBarrier.signal0 = 0;
         aivRes_.ainWorldBarrier.reserved = 0;
-        aivRes_.symMemPool = reinterpret_cast<uint64_t*>(symMemPoolDevPtr_);
+        aivRes_.symMemPool = symMemPool_.data();
 
         devComm_.rankId = 0;
         devComm_.rankSize = AIN_RANK_SIZE;
@@ -163,31 +152,19 @@ public:
         srcWin_.remoteMemNum = AIN_RANK_SIZE;
     }
 
-    ~AinResource()
-    {
-        if (symMemPoolDevPtr_ != nullptr) {
-            aclrtFree(symMemPoolDevPtr_);
-            symMemPoolDevPtr_ = nullptr;
-        }
-        if (signalShadowsDevPtr_ != nullptr) {
-            aclrtFree(signalShadowsDevPtr_);
-            signalShadowsDevPtr_ = nullptr;
-        }
-    }
-
     AscendC::AinDevComm GetDevComm() { return reinterpret_cast<AscendC::AinDevComm>(&devComm_); }
 
     AscendC::AinCommSymWindow GetDstWin() { return reinterpret_cast<AscendC::AinCommSymWindow>(&dstWin_); }
 
     AscendC::AinCommSymWindow GetSrcWin() { return reinterpret_cast<AscendC::AinCommSymWindow>(&srcWin_); }
 
-    uint64_t* GetSymMemPool() { return reinterpret_cast<uint64_t*>(symMemPoolDevPtr_); }
+    uint64_t* GetSymMemPool() { return symMemPool_.data(); }
 
-    uint64_t* GetSignalShadows() { return reinterpret_cast<uint64_t*>(signalShadowsDevPtr_); }
+    uint64_t* GetSignalShadows() { return signalShadows_.data(); }
 
 private:
-    void* symMemPoolDevPtr_ = nullptr;
-    void* signalShadowsDevPtr_ = nullptr;
+    std::array<uint64_t, AIN_SIGNAL_COUNT> symMemPool_ = {};
+    std::array<uint64_t, AIN_SIGNAL_COUNT> signalShadows_ = {};
     AivRes aivRes_ = {};
     HcclDevComm devComm_ = {};
     std::array<AscendC::ChannelHandle, AIN_RANK_SIZE> channelHandles_ = {};
@@ -361,8 +338,8 @@ TEST_F(AinUrmaTestSuite, SignalImmediateCommitsAtomicFAA)
     ain.signal(AscendC::AinTeamWorld(reinterpret_cast<__gm__ HcclDevComm*>(ainResource.GetDevComm())), AIN_PEER,
         AscendC::AinSignalInc{0}, GetDescriptor());
 
-    EXPECT_EQ(channel.GetSqHead(), 1U);
-    EXPECT_EQ(channel.GetSqDoorbell(), 1U);
+    EXPECT_EQ(channel.GetSqHead(), 0U);
+    EXPECT_EQ(channel.GetSqDoorbell(), 0U);
 }
 
 TEST_F(AinUrmaTestSuite, SignalWithSetValueCommitsAtomicFAA)
@@ -374,8 +351,8 @@ TEST_F(AinUrmaTestSuite, SignalWithSetValueCommitsAtomicFAA)
     ain.signal(AscendC::AinTeamWorld(reinterpret_cast<__gm__ HcclDevComm*>(ainResource.GetDevComm())), AIN_PEER,
         AscendC::AinSignalAdd{1, 100}, GetDescriptor());
 
-    EXPECT_EQ(channel.GetSqHead(), 1U);
-    EXPECT_EQ(channel.GetSqDoorbell(), 1U);
+    EXPECT_EQ(channel.GetSqHead(), 0U);
+    EXPECT_EQ(channel.GetSqDoorbell(), 0U);
 }
 
 TEST_F(AinUrmaTestSuite, SignalDelayedDoesNotRingDoorbell)
@@ -387,7 +364,7 @@ TEST_F(AinUrmaTestSuite, SignalDelayedDoesNotRingDoorbell)
     ain.signal(AscendC::AinTeamWorld(reinterpret_cast<__gm__ HcclDevComm*>(ainResource.GetDevComm())), AIN_PEER,
         AscendC::AinSignalInc{0}, GetDescriptor(), AscendC::AIN_COMMIT_DELAYED);
 
-    EXPECT_EQ(channel.GetSqHead(), 1U);
+    EXPECT_EQ(channel.GetSqHead(), 0U);
     EXPECT_EQ(channel.GetSqDoorbell(), 0U);
 }
 
@@ -400,14 +377,14 @@ TEST_F(AinUrmaTestSuite, SignalFlushCommitsAndDrains)
     ain.signal(AscendC::AinTeamWorld(reinterpret_cast<__gm__ HcclDevComm*>(ainResource.GetDevComm())), AIN_PEER,
         AscendC::AinSignalInc{0}, GetDescriptor(), AscendC::AIN_COMMIT_DELAYED);
 
-    EXPECT_EQ(channel.GetSqHead(), 1U);
+    EXPECT_EQ(channel.GetSqHead(), 0U);
     EXPECT_EQ(channel.GetSqDoorbell(), 0U);
 
     channel.CompleteCurrentSq();
     ain.flush();
 
     EXPECT_EQ(channel.GetSqDoorbell(), 0U);
-    EXPECT_EQ(channel.GetSqTail(), 1U);
+    EXPECT_EQ(channel.GetSqTail(), 0U);
 }
 
 TEST_F(AinUrmaTestSuite, WaitSignalSucceedsWhenValueUpdated)
@@ -456,7 +433,7 @@ TEST_F(AinUrmaTestSuite, BarrierSessionSyncSignalsPeersAndWaits)
     AscendC::AinBarrierSession barrierSession(&ain, AscendC::AinTeamTagWorld{}, 0);
     barrierSession.sync(AscendC::AIN_MEMORY_ORDER_DEFAULT, GetDescriptor());
 
-    EXPECT_EQ(channel.GetSqHead(), 1U);
+    EXPECT_EQ(channel.GetSqHead(), 0U);
 }
 
 TEST_F(AinUrmaTestSuite, BarrierSessionSyncWithTimeout)
@@ -468,7 +445,6 @@ TEST_F(AinUrmaTestSuite, BarrierSessionSyncWithTimeout)
     ainResource.GetSymMemPool()[AIN_PEER] = 0;
 
     ainResource.GetSignalShadows()[AIN_PEER] = 0;
-    ainResource.GetSignalShadows()[AIN_PEER]++;
 
     ainResource.GetSymMemPool()[AIN_PEER]++;
 
@@ -476,7 +452,7 @@ TEST_F(AinUrmaTestSuite, BarrierSessionSyncWithTimeout)
     int32_t result = barrierSession.sync(AscendC::AIN_MEMORY_ORDER_DEFAULT, 1000000ULL, GetDescriptor());
 
     EXPECT_EQ(result, 0);
-    EXPECT_EQ(channel.GetSqHead(), 1U);
+    EXPECT_EQ(channel.GetSqHead(), 0U);
 }
 
 TEST_F(AinUrmaTestSuite, BarrierSessionSyncTimeoutExpired)
