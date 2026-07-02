@@ -52,8 +52,9 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-__ubuf__ half* src0_addr;
-__ubuf__ half* src1_addr;
+constexpr uint32_t total_length = 128;
+__ubuf__ half src0_addr[total_length];
+__ubuf__ half src1_addr[total_length];
 
 vector_half src0;
 vector_half src1;
