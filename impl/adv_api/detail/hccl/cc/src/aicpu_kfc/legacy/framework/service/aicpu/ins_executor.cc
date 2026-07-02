@@ -1,12 +1,12 @@
 /**
- * Copyright (c) 2025 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
- * Please refer to the License for details. You may not use this file except in compliance with the License.
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
- * See LICENSE in the root of the software repository for the full text of the License.
- */
+� * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+� * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+� * CANN Open Software License Agreement Version 2.0 (the "License").
+� * Please refer to the License for details. You may not use this file except in compliance with the License.
+� * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+� * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+� * See LICENSE in the root of the software repository for the full text of the License.
+� */
 #include <algorithm>
 #include "ins_to_sqe_rule.h"
 #include "null_ptr_exception.h"
@@ -60,13 +60,13 @@ void InsExecutor::AddOpCounter(const StreamLite &stream, bool isHead) const
     taskParam.taskPara.Reduce.linkType = DfxLinkType::ONCHIP;
     taskParam.taskPara.Reduce.reduceOp = HcclReduceOp::HCCL_REDUCE_SUM;
     taskParam.taskPara.Reduce.dataType = HcclDataType::HCCL_DATA_TYPE_FP32;
-    auto taskInfo = std::make_shared<TaskInfo>(stream.GetSqId(), taskId, INVALID_VALUE_RANKID, taskParam);
-    resMgrFetcher_->GetMirrorTaskMgrLite()->AddTaskInfo(taskInfo);
+    auto taskInfo = std::make_unique<TaskInfo>(stream.GetSqId(), taskId, INVALID_VALUE_RANKID, taskParam);
+    resMgrFetcher_->GetMirrorTaskMgrLite()->AddTaskInfo(std::move(taskInfo));
 }
 
 void InsExecutor::ExecuteV82(const InsQueue &insQueue, bool isMc2)
 {
-    // InsQueue 非空已经在外部进行了校验
+    // InsQueue 非空已经在外部进行了� �验
     if (resMgrFetcher_ == nullptr) {
         THROW<NullPtrException>(StringFormat("InsExecutor::%s resMgrFetcher is null, isMc2 %d.", __func__, isMc2));
         return;
@@ -93,8 +93,8 @@ void InsExecutor::ExecuteV82(const InsQueue &insQueue, bool isMc2)
         taskParam.beginTime                = ProfGetCurCpuTimestamp();
         taskParam.taskPara.Notify.notifyID = deviceWaitNotifyId;
         taskParam.taskPara.Notify.value    = 1;
-        auto taskInfo = std::make_shared<TaskInfo>(masterStream->GetSqId(), taskId, INVALID_VALUE_RANKID, taskParam);
-        resMgrFetcher_->GetMirrorTaskMgrLite()->AddTaskInfo(taskInfo);
+        auto taskInfo = std::make_unique<TaskInfo>(masterStream->GetSqId(), taskId, INVALID_VALUE_RANKID, taskParam);
+        resMgrFetcher_->GetMirrorTaskMgrLite()->AddTaskInfo(std::move(taskInfo));
     }
     AddOpCounter(*masterStream, true);
 
@@ -114,8 +114,8 @@ void InsExecutor::ExecuteV82(const InsQueue &insQueue, bool isMc2)
         taskParam.beginTime                = ProfGetCurCpuTimestamp();
         taskParam.taskPara.Notify.notifyID = hostWaitNotifyId;
         taskParam.taskPara.Notify.value    = 1;
-        auto taskInfo = std::make_shared<TaskInfo>(masterStream->GetSqId(), taskId, INVALID_VALUE_RANKID, taskParam);
-        resMgrFetcher_->GetMirrorTaskMgrLite()->AddTaskInfo(taskInfo);
+        auto taskInfo = std::make_unique<TaskInfo>(masterStream->GetSqId(), taskId, INVALID_VALUE_RANKID, taskParam);
+        resMgrFetcher_->GetMirrorTaskMgrLite()->AddTaskInfo(std::move(taskInfo));
     }
     masterStream->GetRtsq()->LaunchTask();
 }
@@ -123,10 +123,9 @@ void InsExecutor::ExecuteV82(const InsQueue &insQueue, bool isMc2)
 void InsExecutor::ReportMainStreamTask(const StreamLite &stream, MainStreamTaskType type) const
 {
     FlagTaskInfo flagTaskInfo;
-    flagTaskInfo.streamId = stream.GetId();
     flagTaskInfo.taskId   = stream.GetRtsq()->GetTaskId();
     flagTaskInfo.type     = type;
-    HCCL_INFO("[%s] TaskInfo yaskId %u streamId %u", __func__, flagTaskInfo.taskId, flagTaskInfo.streamId);
+    HCCL_INFO("[%s] TaskInfo taskId %u", __func__, flagTaskInfo.taskId);
     ProfilingHandlerLite::GetInstance().ReportMainStreamTask(flagTaskInfo);
 }
 

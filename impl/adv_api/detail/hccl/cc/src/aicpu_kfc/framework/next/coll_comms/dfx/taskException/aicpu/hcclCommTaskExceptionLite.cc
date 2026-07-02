@@ -17,7 +17,7 @@
 #include "aicpu_indop_env.h"
 
 namespace hcomm {
-constexpr u32 RT_SDMA_COMPERR = 0x9; // A3 sdma error类型为0x9时，表示写拷贝发生超时代答，或者数据搬移时地址译码错误
+constexpr u32 RT_SDMA_COMPERR = 0x9; // A3 sdma error类型为0x9时，表示写拷贝发生超时代答，或者数据搬移时地址译� �错误
 constexpr u32 RT_SDMA_COMPDATAERR = 0xa; // A3 sdma error类型为0xa时，表示读拷贝发生超时代答，或者读HBM返回ERROR
 constexpr u32 RT_SDMA_DATAERR = 0x8; // A3 sdma error类型为0x8时，表示读HBM返回ERROR
 constexpr u32 RT_UB_LOCAL_OPERATIOINERR = 0x2; // A5 ub error类型为0x2时，表示UB本端返回ERROR
@@ -291,20 +291,17 @@ HcclResult HcclCommTaskExceptionLite::GenerateErrorMessageReport(CollCommAicpu *
     const Hccl::TaskInfo& taskInfo, const rtLogicCqReport_t &exceptionInfo, Hccl::ErrorMessageReport &errMsgInfo)
 {
     // 获取需要上报的关键信息
-    errMsgInfo.remoteUserRank = taskInfo.remoteRank_;
+    errMsgInfo.remoteUserRank = taskInfo.GetRemoteRankId();
     errMsgInfo.streamId = taskInfo.streamId_;
     errMsgInfo.taskId = taskInfo.taskId_;
     errMsgInfo.rankId = aicpuComm->GetTopoInfo().userRank;
     errMsgInfo.rankSize = aicpuComm->GetTopoInfo().userRankSize;
-    CHK_SAFETY_FUNC_RET(strcpy_s(errMsgInfo.algType, MAX_NAME_LEN, taskInfo.dfxOpInfo_->algType_.c_str()));
     errMsgInfo.opIndex = taskInfo.dfxOpInfo_->opIndex_;
     errMsgInfo.opType = taskInfo.dfxOpInfo_->op_.opType;
     errMsgInfo.count = taskInfo.dfxOpInfo_->op_.dataCount;
     errMsgInfo.dataType = taskInfo.dfxOpInfo_->op_.dataType;
-    errMsgInfo.srcAddr = taskInfo.dfxOpInfo_->op_.inputMem == nullptr ? 0 :
-        static_cast<u64>(taskInfo.dfxOpInfo_->op_.inputMem->GetAddr());
-    errMsgInfo.dstAddr = taskInfo.dfxOpInfo_->op_.outputMem == nullptr ? 0 :
-        static_cast<u64>(taskInfo.dfxOpInfo_->op_.outputMem->GetAddr());
+    errMsgInfo.srcAddr = taskInfo.dfxOpInfo_->op_.newInputMem;
+    errMsgInfo.dstAddr = taskInfo.dfxOpInfo_->op_.newOutputMem;
     errMsgInfo.taskType = taskInfo.taskParam_.taskType;
 
     errMsgInfo.rtCqErrorType = exceptionInfo.errorType;
@@ -458,7 +455,7 @@ HcclResult HcclCommTaskExceptionLite::SendTaskExceptionByMBox(const u32 notifyId
     return HCCL_SUCCESS;
 }
 
-// 把UB类错误码转换成Ts对应的错误码
+// 把UB类错误� �转换成Ts对应的错误� �
 uint16_t HcclCommTaskExceptionLite::SwitchUBCqeErrCodeToTsErrCode(u32 cqeErrCode) {
     switch (cqeErrCode) {
         case RT_UB_LOCAL_OPERATIOINERR:
@@ -472,7 +469,7 @@ uint16_t HcclCommTaskExceptionLite::SwitchUBCqeErrCodeToTsErrCode(u32 cqeErrCode
     }
 }
 
-// 把SDMA类错误码转换成Ts对应的错误码
+// 把SDMA类错误� �转换成Ts对应的错误� �
 uint16_t HcclCommTaskExceptionLite::SwitchSdmaCqeErrCodeToTsErrCode(u32 cqeErrCode) {
     switch (cqeErrCode) {
         case RT_SDMA_COMPERR:
@@ -493,7 +490,7 @@ HcclResult HcclCommTaskExceptionLite::CollectTaskContext(CollCommAicpu *aicpuCom
     CHK_PRT_RET(queue == nullptr,
         HCCL_ERROR("[%s]GetQueue nullptr, devId[%u], sqId[%u].", __func__, devId_, sqId), HCCL_E_PARA);
 
-    auto func = [taskId] (const std::shared_ptr<Hccl::TaskInfo>& task) { return task->taskId_ == taskId; };
+    auto func = [taskId] (const std::unique_ptr<Hccl::TaskInfo>& task) { return task->taskId_ == taskId; };
     auto taskIterPtr = queue->Find(func);
     CHK_PRT_RET(taskIterPtr == nullptr || *taskIterPtr == *queue->End(),
         HCCL_ERROR("[%s]exception task not found, devId[%u], sqId[%u], taskId[%u]", __func__, devId_, sqId, taskId),
@@ -506,7 +503,7 @@ HcclResult HcclCommTaskExceptionLite::CollectTaskContext(CollCommAicpu *aicpuCom
                 __func__, (**taskIterPtr)->taskId_, taskId, taskContext.size());
             break;
         }
-        taskContext.emplace_back(**taskIterPtr);
+        taskContext.emplace_back((**taskIterPtr).get());
 
         if (*taskIterPtr == *queue->Begin()) { // 遍历到起始位置中止
             HCCL_ERROR("[%s]taskId[%u] is queue Begin, taskNum[%u], stop traversal",
@@ -566,7 +563,7 @@ std::string HcclCommTaskExceptionLite::GetGroupInfo(CollCommAicpu *aicpuComm)
         return "";
     }
     return Hccl::StringFormat("group:[%s], rankSize:[%u], localRank:[%d]",
-	    aicpuComm->GetIdentifier().c_str(), aicpuComm->GetTopoInfo().userRankSize, aicpuComm->GetTopoInfo().userRank);
+        aicpuComm->GetIdentifier().c_str(), aicpuComm->GetTopoInfo().userRankSize, aicpuComm->GetTopoInfo().userRank);
 }
 
 void HcclCommTaskExceptionLite::PrintEid(const Hccl::TaskInfo& taskInfo)

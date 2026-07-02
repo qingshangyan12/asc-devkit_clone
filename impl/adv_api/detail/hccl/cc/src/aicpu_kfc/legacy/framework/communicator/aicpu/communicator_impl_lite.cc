@@ -1,12 +1,12 @@
 /**
- * Copyright (c) 2025 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
- * Please refer to the License for details. You may not use this file except in compliance with the License.
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
- * See LICENSE in the root of the software repository for the full text of the License.
- */
+� * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+� * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+� * CANN Open Software License Agreement Version 2.0 (the "License").
+� * Please refer to the License for details. You may not use this file except in compliance with the License.
+� * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+� * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+� * See LICENSE in the root of the software repository for the full text of the License.
+� */
 
 #include "communicator_impl_lite.h"
 #include "aicpu_daemon_service.h"
@@ -27,11 +27,23 @@ constexpr int KERNEL_ERROR_CODE   = 1;
 constexpr int ALLTOALLV_DATA_INDEX_2 = 2; // sdispls在sendRecvInfos数组中的偏移
 constexpr int ALLTOALLV_DATA_INDEX_3 = 3; // rdispls在sendRecvInfos数组中的偏移
 
+HcclResult CommunicatorImplLite::InitProfilingReporterLite()
+{
+    CHK_RET(Hccl::ProfilingHandlerLite::GetInstance().Init());
+    CHK_RET(profilingReporterLite->Init());
+    return HCCL_SUCCESS;
+}
+
 int CommunicatorImplLite::LoadWithOpBasedMode(HcclKernelParamLite *kernelParam)
 {
     try {
         // 设定devType，初始化能力，算法及其他模块通过Get获取能力
         DevCapability::GetInstance().Init(kernelParam->comm.devType);
+        HcclResult ret = InitProfilingReporterLite();
+        if (ret != HCCL_SUCCESS) {
+            HCCL_ERROR("InitProfilingReporterLite failed, ret[%d]", ret);
+            return KERNEL_ERROR_CODE;
+        }
         UnfoldOp(kernelParam);
     } catch (HcclException &e) {
         HCCL_ERROR("Hccl exception %s was caught.", e.what());
@@ -472,9 +484,9 @@ void CommunicatorImplLite::SetDfxOpInfo(uint64_t beginTime)
     dfxopInfo->beginTime_    = beginTime;
     dfxopInfo->comm_         = this;
     dfxopInfo->commId_       = commId;
-	dfxopInfo->opIndex_      = opIndex_;
-	dfxopInfo->headOpCounterAddr_ = opCounterAddr + size;
-	dfxopInfo->tailOpCounterAddr_ = opCounterAddr + size * TAILADDR_OFFSET_MULTIPLIER;
+     dfxopInfo->opIndex_      = opIndex_;
+     dfxopInfo->headOpCounterAddr_ = opCounterAddr + size;
+     dfxopInfo->tailOpCounterAddr_ = opCounterAddr + size * TAILADDR_OFFSET_MULTIPLIER;
     CHECK_NULLPTR(streamLiteMgr->GetMaster(), "[SetDfxOpInfo]master stream is nullptr!");
     mirrorTaskMgrLite->SetCurrDfxOpInfo(dfxopInfo);
 }

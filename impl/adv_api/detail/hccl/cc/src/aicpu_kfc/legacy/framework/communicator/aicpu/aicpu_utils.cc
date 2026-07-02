@@ -38,12 +38,18 @@ void AicpuUtils::CreateSingleInstance(void *args) const
     auto *kernelParam = reinterpret_cast<HcclKernelParamLite *>(args);
     UbConnLiteMgr::GetInstance();
     AicpuDaemonService::GetInstance();
-    TaskExceptionFunc::GetInstance().SetEnable(kernelParam->envConfig.taskExceptionEnable); // 根据环境变量使能TaskException
+    TaskExceptionFunc::GetInstance().SetEnable(kernelParam->envConfig.taskExceptionEnable); // � �据环境变量使能TaskException
     AicpuCommDestroyFunc::GetInstance();
     TaskExceptionHandlerLite::GetInstance();
     ProfilingHandlerLite::GetInstance();
     DevCapability::GetInstance();
     CommunicatorImplLiteMgr::GetInstance().SetEnvConfig(kernelParam->envConfig); // 初始化并设置Device侧环境变量
+}
+
+HcclResult AicpuUtils::Init() const
+{
+    CHK_RET(ProfilingHandlerLite::GetInstance().Init());
+    return HCCL_SUCCESS;
 }
 
 HcclResult AicpuUtils::WaitCommFree(CommunicatorImplLite *communicatorImplLite, const char* funcName) const

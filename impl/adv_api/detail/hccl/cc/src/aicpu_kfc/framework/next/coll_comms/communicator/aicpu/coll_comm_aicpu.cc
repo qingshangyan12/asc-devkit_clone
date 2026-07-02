@@ -1,12 +1,12 @@
 /**
- * Copyright (c) 2025 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
- * Please refer to the License for details. You may not use this file except in compliance with the License.
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
- * See LICENSE in the root of the software repository for the full text of the License.
- */
+� * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+� * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+� * CANN Open Software License Agreement Version 2.0 (the "License").
+� * Please refer to the License for details. You may not use this file except in compliance with the License.
+� * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+� * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+� * See LICENSE in the root of the software repository for the full text of the License.
+� */
 
 #include "coll_comm_aicpu.h"
 #include "aicpu_operator_pub.h"
@@ -58,7 +58,7 @@ HcclResult CollCommAicpu::InitAicpuIndOp(CommAicpuParam *commAicpuParam)
     CHK_RET(hrtSetlocalDevice(topoInfo_.deviceLogicId));
     CHK_RET(hrtSetlocalDeviceType(topoInfo_.deviceType));
     CHK_RET(hrtDrvGetLocalDevIDByHostDevID(topoInfo_.devicePhyId, &devId_));
-    CHK_RET(dfx_.Init(devId_, identifier_));
+    CHK_RET(dfx_.Init(devId_, identifier_, topoInfo_.userRankSize));
     CHK_RET(RegisterProfCallBack());
     CHK_RET(InitHDCommunicate(commAicpuParam));
 
@@ -137,7 +137,7 @@ HcclResult CollCommAicpu::InitThreads(ThreadMgrAicpuParam *param)
     }
 
     ThreadHandle *threadArray = static_cast<ThreadHandle*>(param->deviceHandle);
-    // 空指针校验
+    // 空指针� �验
     CHK_PTR_NULL(threadArray);
     for (size_t i = 0; i < outThreads.size(); ++i) {
         threadArray[i] = reinterpret_cast<ThreadHandle>(outThreads[i].get());  // 拷贝裸指针
@@ -172,7 +172,7 @@ HcclResult CollCommAicpu::RegisterThreadAddDfxTaskInfo(ThreadHandle thread)
             __func__, ret, thread, checkExecStatusCallback);
         return HCCL_E_PTR;
     }
-	return HCCL_SUCCESS;
+     return HCCL_SUCCESS;
 }
 
 HcclResult CollCommAicpu::AllocChannelResource(HcclChannelUrmaRes *commParam)
@@ -295,7 +295,7 @@ HcclResult CollCommAicpu::NotifyFree(NotifyMgrAicpuParam *param)
     u32 notifyNum = param->notifyNum;
     NotifyHandle *notifyArray = static_cast<NotifyHandle*>(param->deviceHandle);
     std::string hcomId(param->hcomId);
-    // 空指针校验
+    // 空指针� �验
     CHK_PTR_NULL(notifyArray);
     for (size_t i = 0; i < notifyNum; ++i) {
         LocalNotify* notify = reinterpret_cast<LocalNotify*>(notifyArray[i]);
@@ -345,7 +345,7 @@ HcclResult CollCommAicpu::NotifyAlloc(NotifyMgrAicpuParam *param)
         __func__, hcomId.c_str(), notifyNum, notifys_.size());
     NotifyHandle *notifyArray = static_cast<NotifyHandle*>(param->deviceHandle);
     CHK_PTR_NULL(notifyArray);
-    // 空指针校验
+    // 空指针� �验
     for (size_t i = 0; i < notifyNum; ++i) {
         notifyArray[i] = reinterpret_cast<NotifyHandle>(notifys_[i + notifySize].get());  // 拷贝裸指针
         HCCL_INFO("[CollCommAicpu][%s] notifyArray[%u] = [%lu]", __func__, i + notifySize, notifyArray[i]);
