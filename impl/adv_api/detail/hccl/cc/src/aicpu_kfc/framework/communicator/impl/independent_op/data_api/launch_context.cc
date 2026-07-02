@@ -17,77 +17,57 @@ extern HcclResult DispatchAllStreams(ThreadHandle* threads, uint32_t threadNum);
 void LaunchContext::AddThread(ThreadHandle thread)
 {
     if (mode_ != HCOMM_LAUNCH_MODE_BATCH) {
-        // 仅 BATCH 模式缓存线程
         return;
     }
-    // 检查线程是否已存在，避免重复添加
-    auto& threadSet = launchModeMap_[launchTag_];
-    if (threadSet.find(thread) != threadSet.end()) {
-        HCCL_INFO("[%s] Thread already exists, launchTag[%s], thread[%lu].", __func__, launchTag_.c_str(), thread);
+    if (std::find(threadVec_.begin(), threadVec_.end(), thread) != threadVec_.end()) {
         return;
     }
 
-    threadSet.insert(thread);
-    HCCL_INFO(
-        "[%s] AddThread end, launchTag[%s], launchMode[%d], thread[%lu].", __func__, launchTag_.c_str(),
-        static_cast<int32_t>(mode_), thread);
+    threadVec_.push_back(thread);
+    HCCL_DEBUG("[%s] AddThread end, launchTag[%s], thread[%lu].", __func__, launchTag_.c_str(), thread);
 }
 
 HcclResult LaunchContext::HandleEagerMode()
 {
-    auto it = launchModeMap_.find(launchTag_);
-    if (it == launchModeMap_.end()) {
-        HCCL_WARNING("[%s] launchTag[%s] not found.", __func__, launchTag_.c_str());
-        return HCCL_SUCCESS;
+    if (!launchModeMap_.empty()) {
+        auto it = launchModeMap_.find(launchTag_);
+        if (it != launchModeMap_.end() && !it->second.empty()) {
+            std::vector<ThreadHandle> threadVec(it->second.begin(), it->second.end());
+            CHK_RET(CommTaskLaunch(threadVec.data(), threadVec.size()));
+            HCCL_INFO("[%s] success, launchTag[%s], tagThreadSize[%zu].", __func__, launchTag_.c_str(),
+                threadVec.size());
+        }
     }
 
-    const auto& threadSet = it->second;
-    if (threadSet.empty()) {
-        HCCL_WARNING("[%s] launchTag[%s] has no threads.", __func__, launchTag_.c_str());
-        return HCCL_SUCCESS;
+    if (!threadVec_.empty()) {
+        CHK_RET(CommTaskLaunch(threadVec_.data(), threadVec_.size()));
+        HCCL_INFO("[%s] success, launchTag[%s], threadSize[%zu].", __func__, launchTag_.c_str(), threadVec_.size());
     }
-
-    std::vector<ThreadHandle> threadVec(threadSet.begin(), threadSet.end());
-    for (size_t i = 0; i < threadVec.size(); i++) {
-        HCCL_INFO(
-            "[%s] HandleEagerMode begin, launchTag[%s], launchMode[%d], thread[%lu].", __func__, launchTag_.c_str(),
-            static_cast<int32_t>(mode_), threadVec[i]);
-    }
-    return CommTaskLaunch(threadVec.data(), threadVec.size());
+    return HCCL_SUCCESS;
 }
 
 HcclResult LaunchContext::HandleDispatchAllStreams()
 {
-    auto it = launchModeMap_.find(launchTag_);
-    if (it == launchModeMap_.end()) {
-        HCCL_DEBUG("[%s] launchTag[%s] not found.", __func__, launchTag_.c_str());
-        return HCCL_SUCCESS;
+    if (!launchModeMap_.empty()) {
+        auto it = launchModeMap_.find(launchTag_);
+        if (it != launchModeMap_.end() && !it->second.empty()) {
+            std::vector<ThreadHandle> threadVec(it->second.begin(), it->second.end());
+            CHK_RET(DispatchAllStreams(threadVec.data(), threadVec.size()));
+        }
     }
 
-    const auto& threadSet = it->second;
-    if (threadSet.empty()) {
-        HCCL_DEBUG("[%s] launchTag[%s] has no threads.", __func__, launchTag_.c_str());
-        return HCCL_SUCCESS;
+    if (!threadVec_.empty()) {
+        CHK_RET(DispatchAllStreams(threadVec_.data(), threadVec_.size()));
     }
-
-    std::vector<ThreadHandle> threadVec(threadSet.begin(), threadSet.end());
-    for (size_t i = 0; i < threadVec.size(); i++) {
-        HCCL_DEBUG(
-            "[%s] HandleDispatchAllStreams begin, launchTag[%s], thread[%lu].", __func__, launchTag_.c_str(),
-            threadVec[i]);
-    }
-    return DispatchAllStreams(threadVec.data(), threadVec.size());
+    return HCCL_SUCCESS;
 }
 
 HcclResult LaunchContext::HandleClear()
 {
-    auto it = launchModeMap_.find(launchTag_);
-    if (it == launchModeMap_.end()) {
-        HCCL_WARNING("[%s] launchTag[%s] not found.", __func__, launchTag_.c_str());
-        return HCCL_SUCCESS;
+    threadVec_.clear();
+    if (!launchModeMap_.empty()) {
+        launchModeMap_.erase(launchTag_);
     }
-
-    launchModeMap_.erase(it);
     HCCL_INFO(
         "[%s] begin clear, launchTag[%s], launchMode[%d]", __func__, launchTag_.c_str(), static_cast<int32_t>(mode_));
 
@@ -154,8 +134,8 @@ HcclResult LaunchContext::SetLaunchMode(const char* launchTag, HcommLaunchMode m
                 // 仅非缺省 tag 需要准备任务缓存
                 return CommTaskPrepare(const_cast<char*>(launchTag_.c_str()), launchTag_.length());
             }
-            return HCCL_SUCCESS;
 #endif
+            return HCCL_SUCCESS;
         case HCOMM_LAUNCH_MODE_EAGER:
             CHK_RET(HandleEagerMode());
             // 缺省 tag 模式下清理缓存
