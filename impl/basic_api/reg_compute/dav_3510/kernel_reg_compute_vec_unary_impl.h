@@ -296,10 +296,6 @@ __simd_callee__ inline void ExpImpl(U& dstReg, U& srcReg, MaskReg& mask)
         MaskReg maskSubnormal;
         U tmpReg;
         if constexpr (SupportType<ActualT, float>()) {
-            NotNumUnion posInf;
-            posInf.i = 0x7f800000;
-            NotNumUnion negInf;
-            negInf.i = 0xff800000;
             NotNumUnion subnormalBound;
             subnormalBound.i = 0x7fffff;
             vexp(dstReg, srcReg, mask, modeValue);
@@ -307,10 +303,6 @@ __simd_callee__ inline void ExpImpl(U& dstReg, U& srcReg, MaskReg& mask)
             ExpPrecision(tmpReg, srcReg, maskSubnormal);
             vsel(dstReg, tmpReg, dstReg, maskSubnormal);
         } else {
-            HalfUnion posInf;
-            posInf.i = 0x7C00;
-            HalfUnion negInf;
-            negInf.i = 0xfC00;
             NotNumUnion subnormalBound;
             subnormalBound.i = 0x3ff;
             vexp(dstReg, srcReg, mask, modeValue);
