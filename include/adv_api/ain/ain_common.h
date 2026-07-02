@@ -26,7 +26,7 @@
 #define AIN_DEVICE __attribute__((always_inline)) __aicore__ __inline__
 #endif
 
-#define AIN_URMA_MASK 0u
+#define AIN_MASK_ALL 0u
 
 namespace AscendC {
 
