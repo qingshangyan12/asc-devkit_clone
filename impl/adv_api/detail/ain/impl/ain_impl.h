@@ -14,7 +14,7 @@
  */
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message( \
+#pragma message(                                                                                         \
     "impl/adv_api/detail/ain/impl/ain_impl.h is an internal header file and must not be used directly. " \
     "Please use public interface headers.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__

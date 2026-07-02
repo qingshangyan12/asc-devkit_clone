@@ -42,7 +42,7 @@ public:
      * @param [in] devComm: Device communication context.
      * @param [in] contextIndex: Index of the communication context to operate on.
      */
-    template <unsigned commEngineMask = AIN_URMA_MASK>
+    template <unsigned commEngineMask = AIN_MASK_ALL>
     AIN_DEVICE Ain(AinDevComm devComm, int contextIndex);
     AIN_DEVICE ~Ain();
 

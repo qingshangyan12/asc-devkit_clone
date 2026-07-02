@@ -14,7 +14,7 @@
  */
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message( \
+#pragma message(                                                                                             \
     "impl/adv_api/detail/ain/impl/ain_impl_def.h is an internal header file and must not be used directly. " \
     "Please use public interface headers.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
@@ -26,7 +26,7 @@
 
 #include <cstddef>
 #include <cstdint>
-#include "../../../../basic_api/utils/kernel_utils_ceil_oom_que.h"
+#include "../../../../basic_api/kernel_utils.h"
 
 namespace AscendC {
 
