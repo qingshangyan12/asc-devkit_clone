@@ -369,15 +369,14 @@ Analysis results:
 
 ## Sample Specifications
 
-<table border="2">
-<caption>Table 1: Sample Input/Output Specifications</caption>
-<tr><td rowspan="3" align="center">Sample Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-<tr><td align="center">x</td><td align="center">[1, 4096]</td><td align="center">float</td><td align="center">ND</td></tr>
-<tr><td align="center">y</td><td align="center">[1, 4096]</td><td align="center">float</td><td align="center">ND</td></tr>
-<tr><td rowspan="2" align="center">Sample Output</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-<tr><td align="center">z</td><td align="center">[1, 4096]</td><td align="center">float</td><td align="center">ND</td></tr>
-<tr><td rowspan="1" align="center">Kernel Function</td><td colspan="4" align="center">add_custom</td></tr>
-</table>
+**Table 1**  Sample Input/Output Specifications
+
+| Category | name | shape | data type | format |
+| --- | --- | --- | --- | --- |
+| Sample Input | x | [1, 4096] | float | ND |
+| Sample Input | y | [1, 4096] | float | ND |
+| Sample Output | z | [1, 4096] | float | ND |
+| Kernel Function | add_custom | - | - | - |
 
 ## Build and Run
 
