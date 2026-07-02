@@ -24,18 +24,16 @@ Tensor本质是基于数组的编程抽象，而非简单的内存地址封装�
 
     ```cpp
     __global__ __vector__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z) {
-      AscendC::GlobalTensor<float> xGm, yGm, zGm;
+      AscendC::GlobalTensor<float> xGm;
       xGm.SetGlobalBuffer(x + block_idx * blockLength, blockLength);
-      yGm.SetGlobalBuffer(y + block_idx * blockLength, blockLength);
-      zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
 
       AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
       AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, blockLength>();
-      AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, blockLength>();
-      AscendC::LocalTensor<float> zLocal = ubAllocator.Alloc<float, blockLength>();
 
       // Data copy and computation require manual size parameter
       AscendC::DataCopy(xLocal, xGm, blockLength);
+      // yLocal, zLocal的定义、搬运等跟xLocal保持一致，此处省略
+      ...
       AscendC::Add(zLocal, xLocal, yLocal, blockLength);
     }
     ```
@@ -67,12 +65,14 @@ Tensor本质是基于数组的编程抽象，而非简单的内存地址封装�
 GM是昇腾NPU的设备内存，位于AI Core外部，容量大、带宽高但访问延迟较长。用于存储算子的输入数据、输出结果和中间计算数据。GM具有持久性：其中存储的数据持续保留，直到内存空间被释放或应用程序终止。
 用户通过Runtime API管理Device侧全局内存。Host侧使用`aclrtMalloc`分配Device内存，通过`aclrtMemcpy`完成Host与Device间的数据拷贝，通过`<<<>>>`拉起核函数执行，最后使用`aclrtFree`释放内存。有关Runtime API的详细信息，可参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
 
+如下示例展示了在Host侧通过Runtime API管理分配Device内存、在Host与Device之间数据拷贝以及核函数的调用过程：
 ```cpp
 // Kernel function definition (using __global__ prefix to indicate Host call, Device execution)
 __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
 {
     AscendC::GlobalTensor<float> xGm;
     xGm.SetGlobalBuffer(x + block_idx * blockLength, blockLength);
+    ...
 }
 
 // Host side: allocate Device memory, copy data, launch kernel function
