@@ -28,6 +28,16 @@
 
 namespace AscendC {
 
+static AIN_DEVICE AinTeam AinTeamWorld(AinDevComm devComm)
+{
+    __gm__ HcclDevComm* hcclDevComm = reinterpret_cast<__gm__ HcclDevComm*>(devComm);
+    AinTeam team;
+    team.nRanks = hcclDevComm->rankSize;
+    team.rank = hcclDevComm->rankId;
+    team.stride = 1;
+    return team;
+}
+
 template <unsigned commEngineMask>
 AIN_DEVICE Ain::Ain(AinDevComm devComm, int contextIndex)
     : devComm_(reinterpret_cast<uint64_t>(devComm)), contextIndex_(contextIndex)
@@ -111,9 +121,93 @@ AIN_DEVICE void Ain::get(
     }
 }
 
-} // namespace AscendC
+template <typename T>
+AIN_DEVICE AinSignalDescriptor GetSignalDescriptor(const Ain& ain, T action)
+{
+    (void)ain;
+    AinSignalDescriptor desc{};
+    desc.type = AIN_SIGNAL_TYPE_INDEXED;
+    desc.indexedSignal.signalId = action.signalId;
+    return desc;
+}
 
-#endif // IMPL_ADV_API_DETAIL_AIN_IMPL_AIN_IMPL_H
+template <typename T>
+AIN_DEVICE uint64_t GetSignalOpArg(T action)
+{
+    if constexpr (IsSameType<T, AinSignalInc>::value) {
+        return 1;
+    } else {
+        return action.value;
+    }
+}
+
+template <typename RemoteAction, typename DescriptorUbuf>
+AIN_DEVICE void Ain::signal(AinTeam team, uint32_t peer, RemoteAction action, const DescriptorUbuf& ubuf,
+    AinCommitFlags commitFlags)
+{
+    static_assert(!IsSameType<DescriptorUbuf, AinDescriptorUbufNone>::value,
+        "signal requires a valid DescriptorUbuf; AinDescriptorUbufNone is not allowed");
+    hcomm_.Init(ubuf.addr, ubuf.bytes);
+
+    AinSignalDescriptor signalDesc = GetSignalDescriptor(*this, action);
+    uint64_t signalOpArg = GetSignalOpArg(action);
+
+    auto hcclDevComm = reinterpret_cast<__gm__ HcclDevComm*>(devComm_);
+    auto aivRes = reinterpret_cast<AivRes*>(reinterpret_cast<uint64_t>(hcclDevComm->AivRes));
+    ChannelHandle channel = aivRes->entity[peer][0];
+
+    uint64_t signalOffset = signalDesc.indexedSignal.signalId * sizeof(uint64_t);
+    auto remoteSignal = reinterpret_cast<__gm__ uint8_t*>(
+        reinterpret_cast<uintptr_t>(aivRes->symMemPool) + signalOffset);
+
+    auto amoSignalId = aivRes->ainWorldBarrier.signal0 + team.rank;
+    uint64_t amoOffset = amoSignalId * sizeof(uint64_t);
+    auto amoSignal = reinterpret_cast<__gm__ uint8_t*>(
+        reinterpret_cast<uintptr_t>(aivRes->ainSignalShadows) + amoOffset);
+}
+
+AIN_DEVICE uint64_t Ain::readSignal(AinSignal signalId, uint32_t bits, AinMemoryOrder order) const
+{
+    (void)order;
+    auto hcclDevComm = reinterpret_cast<__gm__ HcclDevComm*>(devComm_);
+    auto aivRes = reinterpret_cast<AivRes*>(reinterpret_cast<uint64_t>(hcclDevComm->AivRes));
+    uint64_t signalOffset = signalId * sizeof(uint64_t);
+    __gm__ uint64_t* ptr = reinterpret_cast<__gm__ uint64_t*>(
+        reinterpret_cast<uintptr_t>(aivRes->symMemPool) + signalOffset);
+    uint64_t mask = bits >= 64U ? UINT64_MAX : ((1ULL << bits) - 1ULL);
+    uint64_t got = ld_dev(ptr, 0);
+    return mask & got;
+}
+
+AIN_DEVICE void Ain::waitSignal(AinSignal signalId, uint64_t least, uint32_t bits, AinMemoryOrder order) const
+{
+    (void)order;
+    auto hcclDevComm = reinterpret_cast<__gm__ HcclDevComm*>(devComm_);
+    auto aivRes = reinterpret_cast<AivRes*>(reinterpret_cast<uint64_t>(hcclDevComm->AivRes));
+    uint64_t signalOffset = signalId * sizeof(uint64_t);
+    __gm__ uint64_t* ptr = reinterpret_cast<__gm__ uint64_t*>(
+        reinterpret_cast<uintptr_t>(aivRes->symMemPool) + signalOffset);
+    uint64_t mask = bits >= 64U ? UINT64_MAX : ((1ULL << bits) - 1ULL);
+    while (true) {
+        uint64_t got = ld_dev(ptr, 0);
+        if (least <= (got & mask)) {
+            break;
+        }
+    }
+}
+
+AIN_DEVICE __gm__ uint64_t* Ain::getSignalShadowPtr(AinSignal signalId) const
+{
+    auto hcclDevComm = reinterpret_cast<__gm__ HcclDevComm*>(devComm_);
+    auto aivRes = reinterpret_cast<AivRes*>(reinterpret_cast<uint64_t>(hcclDevComm->AivRes));
+    uint64_t signalOffset = signalId * sizeof(uint64_t);
+    return reinterpret_cast<__gm__ uint64_t*>(
+        reinterpret_cast<uintptr_t>(aivRes->ainSignalShadows) + signalOffset);
+}
+
+}  // namespace AscendC
+
+#endif  // IMPL_ADV_API_DETAIL_AIN_IMPL_AIN_IMPL_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_AIN_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
