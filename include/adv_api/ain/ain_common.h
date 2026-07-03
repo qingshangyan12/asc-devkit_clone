@@ -21,30 +21,16 @@
 #ifndef AIN_DEVICE
 /*!
  * @brief Force-inline qualifier for Ain device-side member functions.
- *        All Ain methods run on AICORE and are always inlined.
+ *        All Ain/AinBarrierSession methods run on the AICORE and are always inlined.
  */
 #define AIN_DEVICE __attribute__((always_inline)) __aicore__ __inline__
 #endif
-
 #define AIN_MASK_ALL 0u
 
 namespace AscendC {
-
-using AinDevComm = __gm__ void*;
-using AinCommSymWindow = __gm__ void*;
-
-/*!
- * @brief Describes the communication team used by Ain interfaces.
- *
- * nRanks is the number of ranks in the team, rank is the local rank within the team,
- * stride is the interval used to index the rank list, and ranks points to the rank list.
- */
-typedef struct {
-    uint32_t nRanks;
-    uint32_t rank;
-    uint32_t stride;
-    void* ranks;
-} AinTeam;
+using AinDevComm = __gm__ void *;
+using AinCommSymWindow = void *;
+using AinTeam = void *;
 
 /*!
  * @brief Placeholder tag for "no remote action" in the put primitive.
@@ -67,19 +53,26 @@ typedef struct {
 
 /*!
  * @brief Describes the UB workspace handed to the underlying Hcomm engine.
+ * @param addr: Start address of the UB buffer.
+ * @param bytes: Length of the UB buffer in bytes.
+ * @param eventId: Event id reserved for synchronization with the comm engine.
  */
 typedef struct {
-    __ubuf__ uint8_t* addr; /*!< Start address of the UB buffer. */
-    uint32_t bytes;         /*!< Length of the UB buffer in bytes. */
-    uint32_t eventId;       /*!< Event id reserved for synchronization with the comm engine. */
+    __ubuf__ uint8_t *addr;
+    uint32_t bytes;
+    uint32_t eventId;
 } AinDescriptorUbuf;
 
 /*!
- * @brief Commit behavior for put/get tasks.
+ * @brief Commit behaviour for put/get tasks.
  */
 enum AinCommitFlags {
-    AIN_COMMIT_IMMED = 0,         /*!< Assemble the WQE and ring the doorbell immediately. */
-    AIN_COMMIT_DELAYED = (1 << 0) /*!< Assemble the WQE only; caller drains later through flush(). */
+    AIN_COMMIT_IMMED   = 0,        ///< Default: assemble the WQE and ring the doorbell immediately.
+    AIN_COMMIT_DELAYED = (1 << 0)  ///< Assemble the WQE only; ringing the doorbell when commit AIN_COMMIT_IMMED.
+};
+
+enum AinMemoryOrder {
+    AIN_MEMORY_ORDER_DEFAULT
 };
 
 } // namespace AscendC
