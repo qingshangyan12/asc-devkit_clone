@@ -14,12 +14,12 @@
 
 该算子进行带bias的矩阵乘计算时，过程如下：
 
--   将矩阵乘的计算结果从CO1\(L0C\)搬运到workspace\(GM\)上；
+-   将矩阵乘的计算结果从CO1\(L0C Buffer\)搬运到workspace\(Global Memory\)上；
 -   从workspace搬运到UB上；
 -   在UB上进行加bias的运算；
 -   最后将结果搬运到GM。
 
-当循环n次该计算过程，则分别增加了n次CO1-\>workspace、workspace-\>UB的搬运。
+当循环n次该计算过程，则分别增加了n次CO1\(L0C Buffer\)-\>workspace\(Global Memory\)、workspace-\>UB的搬运。
 
 ```
 // 该样例仅做示例说明，非完整代码，省略了部分同步控制代码
@@ -128,7 +128,7 @@ private:
         fixpipeParams.ndNum = 1;
         fixpipeParams.srcNdStride = 0;
         fixpipeParams.dstNdStride = 0;
-        // 将矩阵乘的计算结果从CO1搬运到workspace
+        // 将矩阵乘的计算结果从CO1(L0C Buffer)搬运到workspace(Global Memory)
         Fixpipe(xGm, c1Local, fixpipeParams);
         outQueueCO1.FreeTensor(c1Local);
     }
