@@ -224,7 +224,7 @@ Kernel侧实现Matmul矩阵乘运算的步骤概括为：
 
 计算过程分为如下几步：
 
-1.  数据从GM搬到A1：DataCopy每次从矩阵A，搬出一个stepM\*baseM\*stepKa\*baseK的矩阵块a1，循环多次完成矩阵A的搬运；数据从GM搬到B1：DataCopy每次从矩阵B，搬出一个stepKb\*baseK\*stepN\*baseN的矩阵块b1，循环多次完成矩阵B的搬运；
+1.  数据从GM搬到A1和B1（L1 Buffer）：DataCopy每次从矩阵A，搬出一个stepM\*baseM\*stepKa\*baseK的矩阵块a1，循环多次完成矩阵A的搬运；DataCopy每次从矩阵B，搬出一个stepKb\*baseK\*stepN\*baseN的矩阵块b1，循环多次完成矩阵B的搬运；
 2.  数据从A1搬到A2：LoadData每次从矩阵块a1，搬出一个baseM \* baseK的矩阵块a0；数据从B1搬到B2，并完成转置：LoadData每次从矩阵块b1，搬出一个baseK \* baseN的矩阵块，并将其转置为baseN \* baseK的矩阵块b0；
 3.  矩阵乘：每次完成一个矩阵块a0 \* b0的计算，得到baseM \* baseN的矩阵块co1；
 4.  数据从矩阵块co1搬到矩阵块co2:DataCopy每次搬运一块baseM \* baseN的矩阵块co1到singleCoreM \* singleCoreN的矩阵块co2中；
