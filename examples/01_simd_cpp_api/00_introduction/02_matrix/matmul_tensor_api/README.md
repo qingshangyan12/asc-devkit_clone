@@ -33,7 +33,7 @@
   C = A * B
   $$
 - 样例规格：
-  本样例参数M = 512, N = 1024, K = 512，调用16个核完成计算，输入规格如下表所示：
+  本样例参数M = 512, N = 1024, K = 512，调用16个核完成计算，输入输出规格如下表所示：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
@@ -111,7 +111,7 @@
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
 
-  使用NPU仿真 模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
 
   示例如下：
 
@@ -126,6 +126,7 @@
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
   > **说明：** 本样例仅支持dav-3510架构（对应 Ascend 950PR/Ascend 950DT）。
 

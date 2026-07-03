@@ -2,52 +2,31 @@
 
 ## 产品支持情况<a name="section73648168211"></a>
 
-<a name="table38301303189"></a>
-<table><thead align="left"><tr id="row20831180131817"><th class="cellrowborder" valign="top" width="57.99999999999999%" id="mcps1.1.3.1.1"><p id="p1883113061818"><a name="p1883113061818"></a><a name="p1883113061818"></a><span id="ph20833205312295"><a name="ph20833205312295"></a><a name="ph20833205312295"></a>产品</span></p>
-</th>
-<th class="cellrowborder" align="center" valign="top" width="42%" id="mcps1.1.3.1.2"><p id="p783113012187"><a name="p783113012187"></a><a name="p783113012187"></a>是否支持</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row1272474920205"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p17301775812"><a name="p17301775812"></a><a name="p17301775812"></a><span id="ph2272194216543"><a name="ph2272194216543"></a><a name="ph2272194216543"></a>Ascend 950PR/Ascend 950DT</span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p37256491200"><a name="p37256491200"></a><a name="p37256491200"></a>√</p>
-</td>
-</tr>
-<tr id="row220181016240"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p48327011813"><a name="p48327011813"></a><a name="p48327011813"></a><span id="ph583230201815"><a name="ph583230201815"></a><a name="ph583230201815"></a><term id="zh-cn_topic_0000001312391781_term1253731311225"><a name="zh-cn_topic_0000001312391781_term1253731311225"></a><a name="zh-cn_topic_0000001312391781_term1253731311225"></a>Atlas A3 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term131434243115"><a name="zh-cn_topic_0000001312391781_term131434243115"></a><a name="zh-cn_topic_0000001312391781_term131434243115"></a>Atlas A3 推理系列产品</term></span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p7948163910184"><a name="p7948163910184"></a><a name="p7948163910184"></a>√</p>
-</td>
-</tr>
-<tr id="row173226882415"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p14832120181815"><a name="p14832120181815"></a><a name="p14832120181815"></a><span id="ph1483216010188"><a name="ph1483216010188"></a><a name="ph1483216010188"></a><term id="zh-cn_topic_0000001312391781_term11962195213215"><a name="zh-cn_topic_0000001312391781_term11962195213215"></a><a name="zh-cn_topic_0000001312391781_term11962195213215"></a>Atlas A2 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term184716139811"><a name="zh-cn_topic_0000001312391781_term184716139811"></a><a name="zh-cn_topic_0000001312391781_term184716139811"></a>Atlas A2 推理系列产品</term></span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p19948143911820"><a name="p19948143911820"></a><a name="p19948143911820"></a>√</p>
-</td>
-</tr>
-<tr id="row103361763242"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p1983180181813"><a name="p1983180181813"></a><a name="p1983180181813"></a><span id="ph783112021813"><a name="ph783112021813"></a><a name="ph783112021813"></a><term id="zh-cn_topic_0000001312391781_term354143892110"><a name="zh-cn_topic_0000001312391781_term354143892110"></a><a name="zh-cn_topic_0000001312391781_term354143892110"></a>Atlas 200I/500 A2 推理产品</term></span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p1695483941817"><a name="p1695483941817"></a><a name="p1695483941817"></a>x</p>
-</td>
-</tr>
-<tr id="row18403312418"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p78319051815"><a name="p78319051815"></a><a name="p78319051815"></a><span id="ph163561737112019"><a name="ph163561737112019"></a><a name="ph163561737112019"></a><term id="zh-cn_topic_0000001312391781_term1964153212227"><a name="zh-cn_topic_0000001312391781_term1964153212227"></a><a name="zh-cn_topic_0000001312391781_term1964153212227"></a>Atlas 推理系列产品</term>AI Core</span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p1475518272503"><a name="p1475518272503"></a><a name="p1475518272503"></a>√</p>
-</td>
-</tr>
-<tr id="row242332080"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p10519331187"><a name="p10519331187"></a><a name="p10519331187"></a><span id="ph1335623792013"><a name="ph1335623792013"></a><a name="ph1335623792013"></a><term id="zh-cn_topic_0000001312391781_term1463893615224"><a name="zh-cn_topic_0000001312391781_term1463893615224"></a><a name="zh-cn_topic_0000001312391781_term1463893615224"></a>Atlas 推理系列产品</term>Vector Core</span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p3312102911500"><a name="p3312102911500"></a><a name="p3312102911500"></a>√</p>
-</td>
-</tr>
-<tr id="row17253142120252"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p38313021813"><a name="p38313021813"></a><a name="p38313021813"></a><span id="ph58317041819"><a name="ph58317041819"></a><a name="ph58317041819"></a><term id="zh-cn_topic_0000001312391781_term71949488213"><a name="zh-cn_topic_0000001312391781_term71949488213"></a><a name="zh-cn_topic_0000001312391781_term71949488213"></a>Atlas 训练系列产品</term></span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p395243920186"><a name="p395243920186"></a><a name="p395243920186"></a>x</p>
-</td>
-</tr>
-</tbody>
-</table>
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
+
+头文件路径为：`"basic_api/kernel_tensor.h"`。
 
 根据用户指定的逻辑位置、数据类型、数据长度返回对应的LocalTensor对象。
 
@@ -55,7 +34,7 @@
 
 -   原型1：tileSize为模板参数
 
-    ```
+    ```cpp
     // 当tileSize为常量时，建议使用此接口，以获得更优的性能
     template <class DataType, uint32_t tileSize> LocalTensor<DataType> __aicore__ inline Alloc()
     template <TPosition pos, class DataType, uint32_t tileSize> __aicore__ inline LocalTensor<DataType> Alloc()
@@ -63,7 +42,7 @@
 
 -   原型2：tileSize为接口入参
 
-    ```
+    ```cpp
     // 当tileSize为动态参数时使用此接口
     template <class DataType> LocalTensor<DataType> __aicore__ inline Alloc(uint32_t tileSize)
     template <TPosition pos, class DataType> LocalTensor<DataType> __aicore__ inline Alloc(uint32_t tileSize)
@@ -71,7 +50,7 @@
 
 -   原型3：使用TensorTrait时使用此接口
 
-    ```
+    ```cpp
     template <class DataType> LocalTensor<DataType> __aicore__ inline Alloc()
     ```
 
@@ -88,7 +67,7 @@
 </thead>
 <tbody><tr id="row18835145716587"><td class="cellrowborder" valign="top" width="17.43%" headers="mcps1.2.3.1.1 "><p id="p1383515717581"><a name="p1383515717581"></a><a name="p1383515717581"></a>pos</p>
 </td>
-<td class="cellrowborder" valign="top" width="82.57%" headers="mcps1.2.3.1.2 "><p id="p18689719202918"><a name="p18689719202918"></a><a name="p18689719202918"></a><a href="../../../数据结构/辅助数据结构//TPosition.md">TPosition</a>位置，需要符合<a href="LocalMemAllocator简介.md">LocalMemAllocator</a>中指定的Hardware物理位置（静态Tensor编程场景下，此参数可以省略）。</p>
+<td class="cellrowborder" valign="top" width="82.57%" headers="mcps1.2.3.1.2 "><p id="p18689719202918"><a name="p18689719202918"></a><a name="p18689719202918"></a><a href="../../../数据结构/辅助数据结构//TPosition.md">TPosition</a>位置，需要符合<a href="LocalMemAllocator简介.md">LocalMemAllocator</a>中指定的Hardware物理位置（C++ Tensor编程场景下，此参数可以省略）。</p>
 </td>
 </tr>
 <tr id="row199212475441"><td class="cellrowborder" valign="top" width="17.43%" headers="mcps1.2.3.1.1 "><p id="p352033512453"><a name="p352033512453"></a><a name="p352033512453"></a>DataType</p>
@@ -149,11 +128,14 @@
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-无
+<!-- npu="950" id1 -->
+- 针对Ascend 950PR/Ascend 950DT，对UB的内存分配，会基于静态内存的基础上进行分配，即动态内存初始位置，参考[内存层级](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/内存层级.md)。
+<!-- end id1 -->
+- 当前暂不支持与L1 Buffer, L0A Buffer, L0B Buffer, L0C Buffer, BiasTable静态数组混用。
 
 ## 调用示例<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section320753512363"></a>
 
-```
+```cpp
 template <uint32_t v>
 using UIntImm = Std::integral_constant<uint32_t, v>;
 ...
