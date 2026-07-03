@@ -15,11 +15,11 @@
 
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_UNARY_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_UNARY_IMPL_H
-#include "kernel_utils.h"
+#include "../kernel_utils.h"
 #include "kernel_operator_common_impl.h"
-#include "kernel_operator_sys_var_intf.h"
+#include "../../../include/basic_api/kernel_operator_sys_var_intf.h"
 #include "kernel_operator_vec_template_impl.h"
-#include "reg_compute/kernel_reg_compute_intf.h"
+#include "../../../include/basic_api/reg_compute/kernel_reg_compute_intf.h"
 
 namespace AscendC {
 namespace Internal {
@@ -239,7 +239,7 @@ __aicore__ inline void VecUnaryLevel0Template(__ubuf__ T *dst, __ubuf__ T *src, 
         if constexpr (isMaskBitMode) {
             if constexpr (SupportBytes<T, 1>()) {
                 ASCENDC_ASSERT(isSetMask, "mask must be set when sizeof(T) is 1.");
-                auto eventIDV2S = FetchEventID<HardEvent::V_S>();
+                auto eventIDV2S = GetTPipePtr()->FetchEventID(HardEvent::V_S);
                 SetFlag<HardEvent::V_S>(eventIDV2S);
                 WaitFlag<HardEvent::V_S>(eventIDV2S);
                 maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(GetRuntimeUBSize(), 4);
@@ -247,7 +247,7 @@ __aicore__ inline void VecUnaryLevel0Template(__ubuf__ T *dst, __ubuf__ T *src, 
                 maskBuf[1] = maskArray[1];
                 maskBuf[2] = maskArray[2];
                 maskBuf[3] = maskArray[3];
-                auto eventIDS2V = FetchEventID<HardEvent::S_V>();
+                auto eventIDS2V = GetTPipePtr()->FetchEventID(HardEvent::S_V);
                 SetFlag<HardEvent::S_V>(eventIDS2V);
                 WaitFlag<HardEvent::S_V>(eventIDS2V);
             } else if constexpr (isSetMask) {

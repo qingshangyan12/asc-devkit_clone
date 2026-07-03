@@ -19,9 +19,9 @@
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_REDUCE_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_REDUCE_INTERFACE_IMPL_H
-#include "kernel_tensor.h"
+#include "../../include/basic_api/kernel_tensor.h"
 #include "mstx_local_tensor_info.h"
-#include "utils/std/type_traits/enable_if.h"
+#include "../utils/std/type_traits/enable_if.h"
 
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_vec_reduce_impl.h"
@@ -1218,7 +1218,7 @@ __aicore__ inline void ReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>
         DEFAULT_REPEAT_STRIDE);
     ReduceImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(), params, 0, ReduceMode::REDUCE_SUM);
-    event_t eventIdVToS = static_cast<event_t>(FetchEventID<HardEvent::V_S>());
+    event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
     SetFlag<HardEvent::V_S>(eventIdVToS);
     WaitFlag<HardEvent::V_S>(eventIdVToS);
     PrimType bodySumValue = dst.GetValue(0);
@@ -1230,14 +1230,14 @@ __aicore__ inline void ReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>
         ReduceImpl<PrimType>((__ubuf__ PrimType*)dst.GetPhyAddr(),
             (__ubuf__ PrimType*)src.GetPhyAddr(elementNumPerRep * repeatTime), (__ubuf__ PrimType*)sharedTmpBuffer.GetPhyAddr(),
             tailParams, 0, ReduceMode::REDUCE_SUM);
-        event_t eventIdVToS1 = static_cast<event_t>(FetchEventID<HardEvent::V_S>());
+        event_t eventIdVToS1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
         SetFlag<HardEvent::V_S>(eventIdVToS1);
         WaitFlag<HardEvent::V_S>(eventIdVToS1);
         PrimType tailSumValue = dst.GetValue(0);
 
         sharedTmpBuffer.SetValue(0, bodySumValue);
         sharedTmpBuffer.SetValue(1, tailSumValue); // bodyresult tailresult vcadd again
-        event_t eventIdSToV = static_cast<event_t>(FetchEventID<HardEvent::S_V>());
+        event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
         SetFlag<HardEvent::S_V>(eventIdSToV);
         WaitFlag<HardEvent::S_V>(eventIdSToV);
         struct ReduceRepeatParams newParams(2, 1, DEFAULT_REDUCE_DST_REP_STRIDE, DEFAULT_BLK_STRIDE,

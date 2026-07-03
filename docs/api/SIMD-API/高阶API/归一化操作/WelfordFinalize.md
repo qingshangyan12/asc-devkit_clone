@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
@@ -20,6 +32,7 @@ LayerNorm算法中Reduce轴较大的场景，可以通过切分Reduce轴，联�
 
     ![](../../../figures/zh-cn_formulaimage_0000002047308822.png)
 
+    <!-- npu="950" id7 -->
     对于Ascend 950PR/Ascend 950DT，方差计算公式如下。
 
     -   方差系数未修正场景：
@@ -29,15 +42,17 @@ LayerNorm算法中Reduce轴较大的场景，可以通过切分Reduce轴，联�
     -   方差系数修正场景：
 
         ![](../../../figures/zh-cn_formulaimage_0000002223917377.png)
+    <!-- end id7 -->
 
     其中，Mean为均值输出，Var为方差输出。
 
-    Mean<sub>i</sub>代表输入的第i个均值，Var<sub>i</sub>代表输入的第i个方差。Ab代表Reduce轴切分后一次计算的大小，Rn代表Reduce轴按Ab拆分的次数，![](../../../figures/zh-cn_formulaimage_0000002235200305.png)代表未修正的方差系数rRec，![](../../../figures/zh-cn_image_0000002200279866.png)代表修正方差系数rRecWithCorrection。
+    Mean<sub>i</sub>代表输入的第i个均值，Var<sub>i</sub>代表输入的第i个方差。Ab代表Reduce轴切分后一次计算的大小，Rn代表Reduce轴按Ab拆分的次数，![](../../../figures/zh-cn_formulaimage_0000002235200305.png)代表<!-- npu="950" id14 -->未修正的<!-- end id14 -->方差系数rRec<!-- npu="950" id15 -->，![](../../../figures/zh-cn_image_0000002200279866.png)代表修正方差系数rRecWithCorrection<!-- end id15 -->。
 
 -   带尾块/带counts参数场景：
 
     ![](../../../figures/zh-cn_formulaimage_0000002047309002.png)
 
+    <!-- npu="950" id8 -->
     对于Ascend 950PR/Ascend 950DT，方差计算公式如下。
 
     -   方差系数未修正场景：
@@ -47,8 +62,9 @@ LayerNorm算法中Reduce轴较大的场景，可以通过切分Reduce轴，联�
     -   方差系数修正场景：
 
         ![](../../../figures/zh-cn_formulaimage_0000002223917381.png)
+    <!-- end id8 -->
 
-    除上述参数含义外，counts<sub>i</sub>代表Mean<sub>i</sub>对应的系数，R代表未切分的原始Reduce轴长度，![](../../../figures/zh-cn_formulaimage_0000002200133484.png)代表未修正的方差系数rRec，![](../../../figures/zh-cn_image_0000002200279878.png)代表修正系数rRecWithCorrection。
+    除上述参数含义外，counts<sub>i</sub>代表Mean<sub>i</sub>对应的系数，R代表未切分的原始Reduce轴长度，![](../../../figures/zh-cn_formulaimage_0000002200133484.png)代表<!-- npu="950" id16 -->未修正的<!-- end id16 -->方差系数rRec<!-- npu="950" id17 -->，![](../../../figures/zh-cn_image_0000002200279878.png)代表修正系数rRecWithCorrection<!-- end id17 -->。
 
 ## 函数原型
 
@@ -97,12 +113,12 @@ LayerNorm算法中Reduce轴较大的场景，可以通过切分Reduce轴，联�
 | 参数名 | 描述 |
 | --- | --- |
 | isReuseSource | 该参数预留，传入默认值false即可。 |
-| config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br><br>结构体模板参数，用于配置相关信息，WelfordFinalizeConfig类型，定义如下方代码所示，其中参数的含义如下。<br>isCorrection：计算方差时，是否使用修正系数，取值如下：false：不使用修正系数，即方差系数为rRec。true：使用修正系数rRecWithCorrection。 |
+| config | <!-- npu="950" id9 -->该参数仅支持Ascend 950PR/Ascend 950DT。<br><br><!-- end id9 -->结构体模板参数，用于配置相关信息，WelfordFinalizeConfig类型，定义如下方代码所示，其中参数的含义如下。<br>isCorrection：计算方差时，是否使用修正系数，取值如下：false：不使用修正系数，即方差系数为rRec。true：使用修正系数rRecWithCorrection。 |
 
 ```
 struct WelfordFinalizeConfig {
-     bool isCorrection = false;
-}
+    bool isCorrection = false;
+};
 ```
 
 配置示例如下。
@@ -121,7 +137,7 @@ constexpr WelfordFinalizeConfig WFFINALIZE_DEFAULT_CFG = { false };
 | inputVariance | 输入 | 方差源操作数，数据类型为float。shape为[abLength]。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | counts | 输入 | 源操作数，数据类型为int32_t。shape为[abLength]。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | sharedTmpBuffer | 输入 | 临时空间，数据类型为uint8_t。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>接口内部复杂计算时用于存储中间变量，由开发者提供。<br><br>临时空间大小BufferSize的获取方式请参考[WelfordFinalize Tiling](WelfordFinalize-Tiling.md)。 |
-| para | 输入 | 计算所需的参数信息。WelfordFinalizePara类型，定义如下方代码所示，其中参数的含义如下。<br>rnLength：输入的Reduce轴，按abLength为一次计算的大小，拆分的次数。如果拆分后有尾块，则次数向上取整。<br>abLength：Reduce轴拆分的大小。在不带counts参数的接口中，abLength=headCountLength+tailCountLength。<br>headCount：在不带counts参数的接口中开启该参数，作为公式中非尾块的counts系数，headCount值。<br>headCountLength：在不带counts参数的接口中开启该参数，headCount值对应的长度。<br>tailCount：在不带counts参数的接口中开启该参数，作为公式中尾块的counts系数，tailCount值。<br>tailCountLength：在不带counts参数的接口中开启该参数，tailCount值对应的长度。<br>abRec：abLength的倒数，即为1/abLength的值。<br>rRec：输入的Reduce轴拆分后，若没有尾块，表示1/(rnLength*abLength)的值，若有尾块，表示1/R的值。<br>rRecWithCorrection：输入的方差修正系数，当模板参数config中的isCorrection为true时生效。该参数仅支持Ascend 950PR/Ascend 950DT。 |
+| para | 输入 | 计算所需的参数信息。WelfordFinalizePara类型，定义如下方代码所示，其中参数的含义如下。<br>rnLength：输入的Reduce轴，按abLength为一次计算的大小，拆分的次数。如果拆分后有尾块，则次数向上取整。<br>abLength：Reduce轴拆分的大小。在不带counts参数的接口中，abLength=headCountLength+tailCountLength。<br>headCount：在不带counts参数的接口中开启该参数，作为公式中非尾块的counts系数，headCount值。<br>headCountLength：在不带counts参数的接口中开启该参数，headCount值对应的长度。<br>tailCount：在不带counts参数的接口中开启该参数，作为公式中尾块的counts系数，tailCount值。<br>tailCountLength：在不带counts参数的接口中开启该参数，tailCount值对应的长度。<br>abRec：abLength的倒数，即为1/abLength的值。<br>rRec：输入的Reduce轴拆分后，若没有尾块，表示1/(rnLength*abLength)的值，若有尾块，表示1/R的值。<!-- npu="950" id10 --><br>rRecWithCorrection：输入的方差修正系数，当模板参数config中的isCorrection为true时生效。该参数仅支持Ascend 950PR/Ascend 950DT。<!-- end id10 --> |
 
 ```
 struct WelfordFinalizePara {
@@ -147,9 +163,15 @@ struct WelfordFinalizePara {
 -   接口参数para.headCountLength与para.tailCountLength的和必须等于参数para.abLength。
 -   接口处理逻辑以参数para中设置的具体参数值为准，不依赖源操作数的shape信息。
 -   对于以下芯片版本，接口参数para.tailCount为0时，禁止配置para.tailCountLength为非0值。
+    <!-- npu="A3" id11 -->
     - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+    <!-- end id11 -->
+    <!-- npu="910b" id12 -->
     - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    <!-- end id12 -->
+    <!-- npu="310p" id13 -->
     - Atlas 推理系列产品AI Core
+    <!-- end id13 -->
 -   不支持源操作数与目的操作数地址重叠。
 -   不支持sharedTmpBuffer与源操作数和目的操作数地址重叠。
 
@@ -159,7 +181,8 @@ struct WelfordFinalizePara {
 pipe.InitBuffer(sharedTmpBuffer, stackBufferSize);
 AscendC::LocalTensor<uint8_t> tmpLocalTensor = sharedTmpBuffer.Get<uint8_t>();
 struct AscendC::WelfordFinalizePara para = {rnLength, abLength, head, headLength, tail, tailLength, abRec, rRec};
-AscendC::WelfordFinalize<false>(meanLocal, varianceLocal, inputMeanLocal, inputVarianceLocal, inputCountsLocal, tmpLocalTensor, para);
+AscendC::WelfordFinalize<false>(
+    meanLocal, varianceLocal, inputMeanLocal, inputVarianceLocal, inputCountsLocal, tmpLocalTensor, para);
 ```
 
 ```
@@ -172,7 +195,8 @@ AscendC::WelfordFinalize<false>(meanLocal, varianceLocal, inputMeanLocal, inputV
 
 // 计算方差时不使用修正系数
 static constexpr AscendC::WelfordFinalizeConfig CONFIG = {false};
-AscendC::WelfordFinalizePara para = { rnLength, abLength, head, headLength, tail, tailLength, abRec, rRec, rRecWithCorrection};
+AscendC::WelfordFinalizePara para = {rnLength, abLength, head, headLength, tail,
+                                     tailLength, abRec, rRec, rRecWithCorrection};
 AscendC::WelfordFinalize<false, CONFIG>(meanLocal, varianceLocal, inmeanLocal, invarLocal, inputXLocal, para);
 ```
 

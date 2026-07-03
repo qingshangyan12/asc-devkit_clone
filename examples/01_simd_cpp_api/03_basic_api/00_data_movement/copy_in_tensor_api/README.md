@@ -16,9 +16,9 @@
 
 ```text
 ├── copy_in_tensor_api
-│   └── scripts
-│       ├── gen_data.py                    // 输入数据和真值数据生成脚本文件
-│       └── verify_result.py               // 真值对比文件
+│   ├── scripts
+│   │   ├── gen_data.py                    // 输入数据和真值数据生成脚本文件
+│   │   └── verify_result.py               // 真值对比文件
 │   ├── CMakeLists.txt                     // 编译工程文件
 │   ├── data_utils.h                       // 数据读入写出函数
 │   ├── copy_in_tensor_api.asc             // Ascend C样例实现 & 调用样例
@@ -188,6 +188,7 @@
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `SCENARIO_NUM` | `0`（默认）、`1`、`2`、`3` | 场景编号：0=AB不转置 half，1=AB不转置 float，2=AB转置 half，3=AB转置 float |
 
 - 执行结果
 
