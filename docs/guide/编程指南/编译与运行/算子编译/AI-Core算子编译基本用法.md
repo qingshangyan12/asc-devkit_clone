@@ -58,7 +58,7 @@ AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成
   bisheng -dc add_compute.asc -o add_compute.o --npu-arch=dav-xxxx
   bisheng -dc add_kernel.asc -o add_kernel.o --npu-arch=dav-xxxx
   bisheng -c main.cpp -o main.o -I${ASCEND_HOME_PATH}/include
-  bisheng add_compute.o example.o main.o -o program
+  bisheng add_compute.o add_kernel.o main.o -o program
   ```
 
 - 动态库编译，完整样例请参考[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/04_compile/02_dynamic_library_compile/README.md)。
