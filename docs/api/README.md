@@ -2996,7 +2996,7 @@
     -   [SuperKernel](Utils-API/SuperKernel/SuperKernel.md)
         -   [SK\_BIND](Utils-API/SuperKernel/SK_BIND.md)
 
--   [AI CPU API](AI-CPU-API/AI-CPU-API概述.md)
+-   [AI CPU API](AI-CPU-API/AI-CPU-API.md)
     -   [AI CPU API列表](AI-CPU-API/AI-CPU-API列表.md)
     -   [printf](AI-CPU-API/printf-292.md)
     -   [assert](AI-CPU-API/assert-293.md)
