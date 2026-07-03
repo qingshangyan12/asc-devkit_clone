@@ -72,6 +72,7 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
     GM_ADDR sendBuf, void* sendCounts, void* sdispls, HcclDataType sendType, GM_ADDR recvBuf, void* recvCounts,
     void* rdispls, HcclDataType recvType, uint8_t repeat)
 {
+    printf("[LBH] AlltoAllV start!\n");
     ASCENDC_HCCL_API_ASSERT(
         sendType == recvType, { return INVALID_HANDLE_ID; },
         "Call AlltoAllV failed, param sendType[%d] is not equal to recvType[%d], invalid.",
