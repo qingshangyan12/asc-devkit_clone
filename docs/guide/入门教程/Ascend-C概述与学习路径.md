@@ -74,7 +74,7 @@ CANN基于分层架构设计,实现了上层应用与底层硬件的无缝衔接
 </li>
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
 <strong style="color: #1a1a1a;">🔧 构建与运行</strong><br/>
-<a href="../编程指南/编译与运行/编译与运行.md" style="color: #3b82f6; font-size: 14px;">编译与运行</a>
+<a href="../编程指南/编译与运行/异步执行.md" style="color: #3b82f6; font-size: 14px;">异步执行</a> | <a href="../编程指南/编译与运行/算子编译/毕昇编译器.md" style="color: #3b82f6; font-size: 14px;">算子编译</a>
 </li>
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
 <strong style="color: #1a1a1a;">🔧 调试与调优</strong><br/>
@@ -130,6 +130,7 @@ CANN基于分层架构设计,实现了上层应用与底层硬件的无缝衔接
 </div>
 <div style="flex: 1; min-width: 200px;">
 <a href="https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta2/API/ascendcopapi/atlasascendc_api_07_0003.html" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">📖 Ascend C API参考</a>
+<a href="https://hiascend.com/document/redirect/CannCommunityadev" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">🚀 CANN Runtime接口</a>
 </div>
 </div>
 </div>
