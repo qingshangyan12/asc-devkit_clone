@@ -1265,7 +1265,6 @@
             -   [asc_sflbits](SIMD-API/C-API/scalar_compute/asc_sflbits.md)
             -   [asc_store_dev](SIMD-API/C-API/scalar_compute/asc_store_dev.md)
             -   [asc_zero_bits_cnt](SIMD-API/C-API/scalar_compute/asc_zero_bits_cnt.md)
-            <cann-filter npu-type="950">
             -   [asc_atomic_add](SIMD-API/C-API/scalar_compute/asc_atomic_add.md)
             -   [asc_atomic_sub](SIMD-API/C-API/scalar_compute/asc_atomic_sub.md)
             -   [asc_atomic_or](SIMD-API/C-API/scalar_compute/asc_atomic_or.md)
@@ -1277,7 +1276,6 @@
             -   [asc_atomic_dec](SIMD-API/C-API/scalar_compute/asc_atomic_dec.md)
             -   [asc_atomic_exch](SIMD-API/C-API/scalar_compute/asc_atomic_exch.md)
             -   [asc_atomic_cas](SIMD-API/C-API/scalar_compute/asc_atomic_cas.md)
-            </cann-filter>
         -   [同步控制](SIMD-API/C-API/sync/同步控制.md)
             -   [asc_lock](SIMD-API/C-API/sync/asc_lock.md)
             -   [asc_sync](SIMD-API/C-API/sync/asc_sync.md)
