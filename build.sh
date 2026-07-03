@@ -10,10 +10,9 @@
 # ----------------------------------------------------------------------------------------------------------
 
 set -e
-
 SUPPORTED_SHORT_OPTS=("h" "j" "t" "p" "f")
 SUPPORTED_LONG_OPTS=(
-    "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "adv_test_two" "arm_test" "basic_test_one" "basic_test_two" "basic_test_three" "basic_test_four" "basic_test_five" "build-type" "extra-cmake-args" "changed_file" "enable-sign" "sign-script"
+    "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "adv_test_two" "arm_test" "basic_test_one" "basic_test_two" "basic_test_three" "basic_test_four" "basic_test_five" "build-type" "extra-cmake-args" "changed_file" "enable-sign" "sign-script" "noexec"
 )
 
 CURRENT_DIR=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
@@ -30,6 +29,7 @@ CMAKE_TOOLCHAIN_FILE_VAL=""
 CHANGED_FILES=""
 CI_MODE=FALSE
 ENABLE_SIGN="false"
+ENABLE_UT_EXEC=TRUE
 VERSION_INFO="8.5.0"
 CUSTOM_SIGN_SCRIPT="${CURRENT_DIR}/impl/adv_api/detail/hccl/cc/scripts/sign/community_sign_build.py"
 
@@ -76,10 +76,12 @@ usage() {
         echo "    --cann_3rd_lib_path  Set the path for third-party library dependencies, eg: ./build"
         echo "    --cov                Enable code coverage for unit tests"
         echo "    --asan               Enable ASAN (address Sanitizer)"
+        echo "    --noexec             Only compile ut, do not execute the compiled executable file"
         echo $dotted_line
         echo "Examples:"
         echo "    bash build.sh -t --cov"
         echo "    bash build.sh --test_part --asan -j 32"
+        echo "    bash build.sh -t --noexec"
         return
         ;;
       clean)
@@ -115,6 +117,7 @@ usage() {
   echo "    --cann_3rd_lib_path  Set the path for third-party library dependencies, eg: ./build"
   echo "    --cov                Enable code coverage for unit tests"
   echo "    --asan               Enable ASAN (address Sanitizer)"
+  echo "    --noexec             Only compile ut, do not execute the compiled executable file"
   echo "    --make_clean         Clean build artifacts"
   echo "    --build-type=<TYPE>"
   echo "                         Specify build type (TYPE options: Release/Debug), Default:Release"
@@ -411,6 +414,10 @@ set_options() {
       COV="true"
       shift
       ;;
+    --noexec)
+      ENABLE_UT_EXEC=FALSE
+      shift
+      ;;
     --pkg)
       PKG="true"
       check_param_test_pkg
@@ -635,11 +642,11 @@ main() {
   CUSTOM_OPTION="${CUSTOM_OPTION} -DASCEND_CANN_PACKAGE_PATH=${ASCEND_CANN_PACKAGE_PATH}"
 
   if [ -n "${TEST}" ];then
-    CUSTOM_OPTION="${CUSTOM_OPTION} -DENABLE_TEST=ON -DTEST_MOD=all"
+    CUSTOM_OPTION="${CUSTOM_OPTION} -DENABLE_TEST=ON -DTEST_MOD=all -DENABLE_UT_EXEC=${ENABLE_UT_EXEC}"
   fi
 
   if [ -n "${TEST_PART}" ]; then
-    CUSTOM_OPTION="${CUSTOM_OPTION} -DENABLE_TEST=ON"
+    CUSTOM_OPTION="${CUSTOM_OPTION} -DENABLE_TEST=ON -DENABLE_UT_EXEC=${ENABLE_UT_EXEC}"
   fi
 
   if [ "${ASAN}" == "true" ];then
