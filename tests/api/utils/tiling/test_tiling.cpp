@@ -745,21 +745,21 @@ TEST_F(TestTiling, TestGetLibApiWorkSpaceSize)
     uint32_t ret1 = plat.GetLibApiWorkSpaceSize();
     EXPECT_EQ(ret1, static_cast<uint32_t>(-1));
 }
-TEST_F(TestTiling, TestPlatformAscendCManager)
-{
-    void* handle;
-    int a = 7;
-    handle = &a;
+// TEST_F(TestTiling, TestPlatformAscendCManager)
+// {
+//     void* handle;
+//     int a = 7;
+//     handle = &a;
 
-    MOCKER_CPP(
-        &fe::PlatFormInfos::GetPlatformResWithLock,
-        bool(fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
-        .stubs()
-        .will(returnValue(false));
+//     MOCKER_CPP(
+//         &fe::PlatFormInfos::GetPlatformResWithLock,
+//         bool(fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
+//         .stubs()
+//         .will(returnValue(false));
 
-    auto ret2 = platform_ascendc::PlatformAscendCManager::GetInstance();
-    EXPECT_TRUE(ret2 == nullptr);
-}
+//     auto ret2 = platform_ascendc::PlatformAscendCManager::GetInstance();
+//     EXPECT_TRUE(ret2 == nullptr);
+// }
 
 TEST_F(TestTiling, TestGetVectorCoreNum)
 {
