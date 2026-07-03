@@ -63,7 +63,7 @@ CANN基于分层架构设计,实现了上层应用与底层硬件的无缝衔接
 <h3 style="color: #1a1a1a; font-size: 16px; margin-top: 20px;">学习路线：</h3>
 <ul style="list-style-type: none; padding-left: 0;">
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
-<strong style="color: #1a1a1a;"><a href="../编程指南/编程模型/编程模型.md" style="color: #3b82f6; text-decoration: none;">📖 编程模型</a></strong> <span style="font-size: 12px; color: #3b82f6;">🔗</span><br/>
+<strong style="color: #1a1a1a;"><a href="../编程指南/编程模型/编程模型.md" style="color: #3b82f6; text-decoration: none;">📖 编程模型</a></strong> <span style="font-size: 12px; color: #3b82f6;">▸</span><br/>
 <span style="color: #666; font-size: 14px;">• <a href="../编程指南/编程模型/AI-Core-SIMD编程/概述.md" style="color: #3b82f6; font-size: 14px;">SIMD编程</a></span><br/>
 <span style="color: #999; font-size: 13px;">  - <a href="../编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/C语言编程概述.md" style="color: #3b82f6; font-size: 13px;">基于指针的C语言编程</a></span><br/>
 <span style="color: #999; font-size: 13px;">  - <a href="../编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md" style="color: #3b82f6; font-size: 13px;">基于Tensor的C++编程</a></span><br/>
@@ -76,7 +76,7 @@ CANN基于分层架构设计,实现了上层应用与底层硬件的无缝衔接
 <a href="../编程指南/编译与运行/异步执行.md" style="color: #3b82f6; font-size: 14px;">异步执行</a> | <a href="../编程指南/编译与运行/算子编译/毕昇编译器.md" style="color: #3b82f6; font-size: 14px;">算子编译</a>
 </li>
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
-<strong style="color: #1a1a1a;"><a href="../编程指南/调试调优/概述.md" style="color: #3b82f6; text-decoration: none;">🔧 调试与调优</a></strong> <span style="font-size: 12px; color: #3b82f6;">🔗</span><br/>
+<strong style="color: #1a1a1a;"><a href="../编程指南/调试调优/概述.md" style="color: #3b82f6; text-decoration: none;">🔧 调试与调优</a></strong> <span style="font-size: 12px; color: #3b82f6;">▸</span><br/>
 <span style="color: #666; font-size: 14px;">• <a href="../编程指南/调试调优/功能调试/CPU域孪生调试.md" style="color: #3b82f6; font-size: 14px;">功能调试</a></span><br/>
 <span style="color: #999; font-size: 13px;">  - <a href="../编程指南/调试调优/功能调试/CPU域孪生调试.md" style="color: #3b82f6; font-size: 13px;">CPU域孪生调试</a></span><br/>
 <span style="color: #999; font-size: 13px;">  - <a href="../编程指南/调试调优/功能调试/NPU域上板调试.md" style="color: #3b82f6; font-size: 13px;">NPU域孪生调试</a></span><br/>
