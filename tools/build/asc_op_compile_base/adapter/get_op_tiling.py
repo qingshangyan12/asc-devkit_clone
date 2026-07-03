@@ -571,7 +571,7 @@ def gen_micro_assign_value_of_tiling(tiling_struct: str, tiling_raw_data: str):
             class_body += \
                 f"    const uint8_t __ascendc_arr_##tiling_data[{tiling_size}] = {{{tiling_arr_data_str}}};   \\\n"
             class_body += \
-                f"    const {tiling_struct} tiling_data = "
+                f"    static constexpr {tiling_struct} tiling_data = "
             class_body += \
                 f"convert_from_bytes<{tiling_struct}>(__ascendc_arr_##tiling_data);\n\n"
 
@@ -580,7 +580,7 @@ def gen_micro_assign_value_of_tiling(tiling_struct: str, tiling_raw_data: str):
         class_body += \
             f"    const uint8_t __ascendc_arr_##tiling_data[{tiling_size}] = {{{tiling_arr_data_str}}};    \\\n"
         class_body += \
-            f"    const tiling_struct tiling_data = "
+            f"    static constexpr tiling_struct tiling_data = "
         class_body += \
             f"convert_from_bytes<tiling_struct>(__ascendc_arr_##tiling_data); \n\n"
 
@@ -588,7 +588,8 @@ def gen_micro_assign_value_of_tiling(tiling_struct: str, tiling_raw_data: str):
         class_body += "    REGISTER_TILINGDATA_SIZE(tiling_type, __COUNTER__);                                  \\\n"
         class_body += f"    const uint8_t __ascendc_arr_##var[{tiling_size}] = {{{tiling_arr_data_str}}}; \\\n"
         class_body += \
-            f"    const tiling_type __ascendc_point##var = convert_from_bytes<tiling_type>(__ascendc_arr_##var);\\\n"
+            f"    static constexpr tiling_type __ascendc_point##var = "
+        class_body += f"convert_from_bytes<tiling_type>(__ascendc_arr_##var);\\\n"
         class_body += "    auto& var = __ascendc_point##var.member;\n\n"
     return class_body, tiling_assign_str
 
@@ -1594,8 +1595,8 @@ def get_tiling_info_isolate(op_info: OpInfo, input_tiling_info_dict: dict):
 
         isolate_python_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), \
             "ascendc_gen_tiling_struct_isolate.py")
-
-        result = subprocess.run(["python3", isolate_python_path, op_info.op_type, isolate_json_path])
+        soc_version = get_soc_spec("FULL_SOC_VERSION")
+        result = subprocess.run(["python3", isolate_python_path, op_info.op_type, isolate_json_path, soc_version])
 
         if result.returncode == 0:
             tiling_info = get_isolate_tiling_info(op_info.op_type, isolate_json_path)

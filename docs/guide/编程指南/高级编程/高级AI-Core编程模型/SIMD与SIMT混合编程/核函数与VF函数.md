@@ -7,7 +7,7 @@ SIMD与SIMT混合编程中涉及的函数类型如下表所示：
 <a name="zh-cn_topic_0000002571578013_table1818191292017"></a>
 | 修饰符 | 函数功能 | 调用方式 |
 | --- | --- | --- |
-| `__global__ __aicore__` | 算子入口，协调VF执行 | Host侧通过`<<<...>>>`调用 |
+| `__global__ __aicore__` | 算子入口，协调VF执行。若只有在AIV核内执行的SIMD与SIMT混合编程场景，可使用__global__ __vector__来标识只启动AIV核。 | Host侧通过`<<<...>>>`调用 |
 | `__aicore__` | Device侧辅助函数 | 核函数或同级函数调用 |
 | `__simt_vf__` | 线程级并行计算任务 | 通过SIMT提供的`asc_vf_call`接口调用 |
 | `__simd_vf__` | 向量级并行计算任务 | 通过SIMD提供的`asc_vf_call`接口调用 |
@@ -96,7 +96,7 @@ asc_vf_call<function_name>(dim3(blockDim), arg1, arg2, ...);
 
 SIMT VF函数有以下约束：
 
--   入参仅支持Ascend C的[内置数据类型](../../../语言扩展层/SIMD&SIMT-BuiltIn关键字.md#zh-cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）及其组成的指针、数组、结构体类型，且指针类型必须指向GM或者UB内存。
+-   入参仅支持Ascend C的[内置数据类型](../../../语言扩展层/SIMD与SIMT混合编程BuiltIn关键字.md#zh-cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）及其组成的指针、数组、结构体类型，且指针类型必须指向GM或者UB内存。
 -   不支持将核函数中局部变量的地址或引用传递给VF函数。
 -   函数返回类型必须是void。
 -   SIMT VF内只能调用\_\_simt\_callee\_\_函数或\_\_callee\_\_函数。
@@ -117,6 +117,6 @@ return_type result = function_name(arg1, arg2, ...);
 
 该函数有以下约束：
 
--   入参仅支持Ascend C的[内置数据类型](../../../语言扩展层/SIMD&SIMT-BuiltIn关键字.md#zh-cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）和指针类型。
--   函数返回值只能是Ascend C的[内置数据类型](../../../语言扩展层/SIMD&SIMT-BuiltIn关键字.md#zh-cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）及对应的指针类型。
+-   入参仅支持Ascend C的[内置数据类型](../../../语言扩展层/SIMD与SIMT混合编程BuiltIn关键字.md#zh-cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）和指针类型。
+-   函数返回值只能是Ascend C的[内置数据类型](../../../语言扩展层/SIMD与SIMT混合编程BuiltIn关键字.md#zh-cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）及对应的指针类型。
 -   函数内只能调用\_\_simt\_callee\_\_函数或\_\_callee\_\_函数。
