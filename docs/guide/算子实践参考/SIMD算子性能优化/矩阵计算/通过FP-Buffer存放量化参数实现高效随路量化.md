@@ -17,12 +17,12 @@
 
 对矩阵乘结果进行量化计算的过程如下：
 
--   将矩阵乘的结果从CO1搬运到workspace上；
+-   将矩阵乘的结果从CO1（L0C Buffer）搬运到workspace（Global Memory）上；
 -   再从workspace搬运到UB上；
 -   将量化参数搬运到UB上，和矩阵乘的结果一起在UB上进行一系列量化计算；
 -   将最终量化结果从UB搬运到GM上。
 
-相比于正确示例多增加了CO1-\>workspace、workspace-\>UB的搬运过程和量化的vector计算。
+相比于正确示例多增加了CO1（L0C Buffer）-\>workspace（Global Memory）、workspace-\>UB的搬运过程和量化的vector计算。
 
 ```
 ...
@@ -132,7 +132,7 @@ private:
         fixpipeParams.ndNum = 1;
         fixpipeParams.srcNdStride = 0;
         fixpipeParams.dstNdStride = 0;
-        // 将矩阵乘的计算结果从CO1搬运到workspace
+        // 将矩阵乘的计算结果从CO1（L0C Buffer）搬运到workspace（Global Memory）
         Fixpipe(xGm, c1Local, fixpipeParams);
         outQueueCO1.FreeTensor(c1Local);
     }
