@@ -29,7 +29,7 @@ This example introduces the usage of the asc_dump_xxx series APIs to enable tens
 
 - Example features:
 
-  Implement matrix multiplication using the static Tensor programming mode to demonstrate the basic usage of the asc_dump_xxx series APIs.
+  Implement matrix multiplication using the C++ tensorogramming mode to demonstrate the basic usage of the asc_dump_xxx series APIs.
   This series of APIs is compatible with the AscendC::DumpTensor API. However, for future development, it is recommended to use the asc_dump series APIs first. If you need to dump data at a specified offset, since the asc_dump series does not yet support this capability, you can continue to use the DumpAccChkPoint API.
 
   The matrix multiplication formula is:

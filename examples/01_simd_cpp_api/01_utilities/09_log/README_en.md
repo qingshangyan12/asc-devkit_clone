@@ -45,7 +45,7 @@ For more log function details, refer to: [Ascend Log Function Reference](https:/
   | 4 | NULL | Do not output logs |
 
 - Example Implementation:
-  This example implements matrix multiplication (Matmul) using the static tensor programming mode. By constructing an exception scenario, it demonstrates the complete flow of Kernel-side exception throwing and Host-side error catching:
+  This example implements matrix multiplication (Matmul) using the C++ tensor programming mode. By constructing an exception scenario, it demonstrates the complete flow of Kernel-side exception throwing and Host-side error catching:
 
   - Kernel Implementation
     Use standard C `assert` assertions in the Kernel function. When the condition is not met, a device-side exception is triggered.

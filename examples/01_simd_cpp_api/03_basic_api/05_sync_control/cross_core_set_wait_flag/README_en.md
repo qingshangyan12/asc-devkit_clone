@@ -279,7 +279,7 @@ if ASCEND_IS_AIV {
 ```
 (2) GetBlockIdx (obtaining the index of the current core) has different value ranges in AIC and AIV, and its values are related to the logical core count set by the operator and the AIC to AIV ratio in one AI Core. In this example, NUM_BLOCKS=8 and the AIC to AIV ratio is 1:2, so GetBlockIdx ranges from 0-7 in AIC and 0-15 in AIV.
 
-(3) The example uses the static Tensor programming paradigm, which requires manually inserting intra-core synchronization. Additionally, in the static Tensor programming mode, developers need to manually call the InitSocState() interface to initialize the global state register.
+(3) The example uses the C++ tensor programming paradigm, which requires manually inserting intra-core synchronization. Additionally, in the C++ tensor programming mode, developers need to manually call the InitSocState() interface to initialize the global state register.
 
 #### 3.2 Pure Vector Computation Scenario
 (1) When using the CrossCoreSetFlag and CrossCoreWaitFlag inter-core synchronization interfaces, even in pure Vector computation scenarios, the kernel function cannot use the __vector__ modifier.
@@ -292,7 +292,7 @@ if ASCEND_IS_AIV {
 ```
  (2) Mode 1 requires that the 2 AIVs participating in synchronization must belong to the same AI Core, otherwise the program will hang. In this example, the two AIVs participating in synchronization have GetBlockIdx=2, 3, which belong to the 2nd AI Core (index starting from 1); if GetBlockIdx is changed to 3 and 4 (belonging to two different AI Cores), the program will hang.
 
- (3) The example uses the static Tensor programming paradigm, which requires manually inserting intra-core synchronization. Additionally, in the static Tensor programming mode, developers need to manually call the InitSocState() interface to initialize the global state register.
+ (3) The example uses the C++ tensor programming paradigm, which requires manually inserting intra-core synchronization. Additionally, in the C++ tensor programming mode, developers need to manually call the InitSocState() interface to initialize the global state register.
 
 ## Build and Run
 

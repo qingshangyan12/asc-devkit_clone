@@ -307,8 +307,8 @@ The core logic of these two scenarios is the same, with the difference being tha
 When `SCENARIO_NUM=1` and `SCENARIO_NUM=2`, the example supports Ascend 950PR/Ascend 950DT.
 When `SCENARIO_NUM=3`, it calls `DataCopy` to transfer data from L1 to GM. However, under the Ascend 950PR/Ascend 950DT architecture, the DataCopy API does not support the L1 Buffer -> GM path. Therefore, when `SCENARIO_NUM=3`, the example does not support Ascend 950PR/Ascend 950DT. To support Ascend 950PR/Ascend 950DT, refer to the compatibility scheme in the [basic API migration guide](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/opdevg/Ascendcopdevg/atlas_ascendc_compatibility_10_00005.html).
 
-#### (2) When `SCENARIO_NUM=2`, the example does not support static tensor programming.
-When SCENARIO_NUM=2, it calls `IBSet` and `IBWait` for inter-core synchronization. However, the internal implementation of these two APIs requires the TPipe framework for intra-core synchronization. Therefore, when SCENARIO_NUM=2, the example does not support static tensor programming.
+#### (2) When `SCENARIO_NUM=2`, the example does not support C++ tensor programming.
+When SCENARIO_NUM=2, it calls `IBSet` and `IBWait` for inter-core synchronization. However, the internal implementation of these two APIs requires the TPipe framework for intra-core synchronization. Therefore, when SCENARIO_NUM=2, the example does not support C++ tensor programming.
 
 ## Build and Run
 Run the following steps in the root directory of this example to build and run it.

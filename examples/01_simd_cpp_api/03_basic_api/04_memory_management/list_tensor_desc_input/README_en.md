@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example implements an AddN example based on the static Tensor programming model, using the ListTensorDesc structure to handle dynamic input parameters, combining static memory allocation with event synchronization mechanisms to achieve coordinated scheduling of data transfer and computation tasks.
+This example implements an AddN example based on the C++ tensor programming model, using the ListTensorDesc structure to handle dynamic input parameters, combining static memory allocation with event synchronization mechanisms to achieve coordinated scheduling of data transfer and computation tasks.
 
 ## Supported Products and CANN Versions
 
@@ -25,7 +25,7 @@ This example implements an AddN example based on the static Tensor programming m
 
 - Example function
 
-  This example demonstrates the usage of ListTensorDesc dynamic input parameters in the static Tensor programming model using Add computation, applicable to the following scenarios:
+  This example demonstrates the usage of ListTensorDesc dynamic input parameters in the C++ tensor programming model using Add computation, applicable to the following scenarios:
   1. Dynamic processing of multiple input parameters: supports dynamic combination operations of multiple input tensors in models (such as multi-branch network structures).
   2. Memory pipeline optimization: achieves pipelined parallelism of data transfer and computation through static double buffering and event synchronization mechanisms, reducing memory access latency.
   3. Multi-core parallel computation: adapts to the multi-core architecture of AI processors, supporting efficient distribution of large-scale tensor operations.

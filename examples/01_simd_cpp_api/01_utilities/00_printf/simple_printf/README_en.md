@@ -29,7 +29,7 @@ This example introduces the usage of the printf API to print kernel function rel
 
 - Example features:
 
-  Implement matrix multiplication using the static Tensor programming mode to demonstrate the basic usage of the printf API.
+  Implement matrix multiplication using the C++ tensor programming mode to demonstrate the basic usage of the printf API.
 
   The matrix multiplication formula is:
 

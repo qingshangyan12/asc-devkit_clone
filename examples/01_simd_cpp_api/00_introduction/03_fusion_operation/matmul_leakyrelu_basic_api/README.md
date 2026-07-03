@@ -2,7 +2,7 @@
 
 ## 算子概述
 
-本样例基于静态Tensor编程模式（编译期确定张量形状和内存布局的编程方式）实现Matmul和LeakyRelu融合计算，展示Cube单元（矩阵计算单元，执行Matmul等矩阵运算）和Vector单元（向量计算单元，执行逐元素运算）协同计算的编程模式。Cube核完成矩阵乘计算，Vector核完成LeakyRelu激活计算。
+本样例基于C++ Tensor编程(开发者自主申请内存和插入同步)实现Matmul和LeakyRelu融合计算，展示Cube单元（矩阵计算单元，执行Matmul等矩阵运算）和Vector单元（向量计算单元，执行逐元素运算）协同计算的编程模式。Cube核完成矩阵乘计算，Vector核完成LeakyRelu激活计算。
 
 ## 本样例支持的产品及CANN软件版本
 

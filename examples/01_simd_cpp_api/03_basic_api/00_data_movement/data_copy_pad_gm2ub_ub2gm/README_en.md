@@ -4,7 +4,7 @@
 
 This example implements non-32-byte-aligned data transfer and padding functionality based on the DataCopyPad API in a data transfer scenario. The DataCopyPad API supports unaligned data transfer from Global Memory to Local Memory, with the ability to pad specified values on the left or right side of the data.
 
-The data transfer process includes: Global Memory (GM) -> Unified Buffer (UB) (using DataCopyPad for unaligned transfer and padding) -> Global Memory (GM). This example uses static Tensor allocation for UB memory and supports switching between different scenarios through build parameters, demonstrating various usage methods of DataCopyPad.
+The data transfer process includes: Global Memory (GM) -> Unified Buffer (UB) (using DataCopyPad for unaligned transfer and padding) -> Global Memory (GM). This example uses C++ tensor allocation for UB memory and supports switching between different scenarios through build parameters, demonstrating various usage methods of DataCopyPad.
 
 ## Supported Products and CANN Versions
 
