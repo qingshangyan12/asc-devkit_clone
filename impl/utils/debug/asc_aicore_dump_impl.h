@@ -53,7 +53,7 @@ __aicore__ inline void set_dump_tlv_info(U src, __gm__ DumpTensorTlv* dumpTlv, u
 
 __aicore__ inline void set_dump_shape_info(__gm__ DumpTensorTlv* dumpTlv, const uint32_t shapeDim, const uint32_t* shape)
 {
-    if (shapeDim <= 0 || shapeDim >= K_MAX_SHAPE_DIM || shape == nullptr) {
+    if (shapeDim <= 0 || shapeDim > K_MAX_SHAPE_DIM || shape == nullptr) {
         return;
     }
     dumpTlv->dim = static_cast<uint32_t>(shapeDim);
