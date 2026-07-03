@@ -176,7 +176,7 @@ uint32_t Mc2CcTilingConfig::GetTiling(::Mc2CcTiling& tiling)
     tilingInner->skipLocalRankCopy = impl_.skipLocalRankCopy_;
     tilingInner->skipBufferWindowCopy = impl_.skipBufferWindowCopy_;
     tilingInner->stepSize = impl_.stepSize_;
-    tilingInner->version = CC_TILING_VERSION;
+    tilingInner->version = 1U;
     (void)memset_s(tilingInner->reserved, sizeof(tilingInner->reserved), 0, sizeof(tilingInner->reserved));
     (void)memset_s(tilingInner->reserved2, sizeof(tilingInner->reserved2), 0, sizeof(tilingInner->reserved2));
     auto ret = strcpy_s(tilingInner->groupName, sizeof(tilingInner->groupName), impl_.groupName_.c_str());

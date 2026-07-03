@@ -35,7 +35,7 @@ constexpr u32 ALL_TO_ALL_OFFSET_RDISPLS = 3U;
 
 u64 GetCcTilingDataCount(const HcclApi::Mc2CcTilingInner* tiling)
 {
-    if (tiling == nullptr || tiling->version < HcclApi::CC_TILING_VERSION) {
+    if (tiling == nullptr) {
         return 0U;
     }
     return tiling->dataCount;
@@ -181,7 +181,7 @@ HcclResult HcclMc2ComOpResCtx(
     opParam.aicpuUnfoldMode = true;
     opParam.opType = static_cast<HcclCMDType>(opType);
     HcclApi::Mc2CcTilingInner tiling{};
-    tiling.version = HcclApi::CC_TILING_VERSION;
+    tiling.version = 1U;
     tiling.srcDataType = static_cast<uint8_t>(srcDataType);
     tiling.dstDataType = static_cast<uint8_t>(dstDataType);
     tiling.opType = static_cast<uint32_t>(opParam.opType);
