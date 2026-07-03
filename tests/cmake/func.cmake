@@ -22,7 +22,13 @@ function(run_llt_test)
         set(ENV_PREFIX "")
     endif()
 
-    if (ENABLE_ASAN)
+    if(DEFINED ENABLE_UT_EXEC AND NOT ENABLE_UT_EXEC)
+        add_custom_command(
+            TARGET ${LLT_TARGET} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E echo "skip execute ${LLT_TARGET}"
+            COMMENT "Skip ${LLT_TARGET} (noexec mode)"
+        )
+    elseif (ENABLE_ASAN)
         execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_MAJOR)
         string(REGEX MATCHALL "[0-9]+" GCC_MAJOR ${GCC_MAJOR})
         if("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
@@ -128,7 +134,7 @@ function(run_python_llt_test)
     if(NOT DEFINED PYTHON_TASK_NUM)
         set(PYTHON_TASK_NUM 8)
     endif()
-    if(DEFINED SKIP_EXECUTE)
+    if(DEFINED ENABLE_UT_EXEC AND NOT ENABLE_UT_EXEC)
         set(LLT_EXECUTE_COMMAND echo "skip execute ${PYTHON_TARGET}" )
     else()
         set(LLT_EXECUTE_COMMAND bash ${ASCENDC_DIR}/tests/cmake/scripts/python_llt_run_and_check.sh ${CMAKE_INSTALL_PREFIX} ${PYTHON_TARGET}
