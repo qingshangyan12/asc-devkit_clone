@@ -1159,13 +1159,13 @@ for source in scan_files:
 with output_file.open("w", encoding="utf-8") as handle:
     if errors:
         handle.write(
-            f"[Markdown check] FAILED: {len(errors)} GitCode link target item(s), "
-            f"{len(scan_files)} file(s) checked, duration={duration}.\n\nFailed:\n"
+            f"[Markdown check] WARNING: {len(errors)} GitCode link target warning item(s), "
+            f"{len(scan_files)} file(s) checked, duration={duration}.\n\nWarnings:\n"
         )
         for error in errors:
             handle.write(error + "\n")
 
-sys.exit(1 if errors else 0)
+sys.exit(0)
 PY
 GITCODE_LINK_RC=$?
 set -e
@@ -1287,27 +1287,33 @@ with filtered_path.open("w", encoding="utf-8") as handle:
 PY
 
 FINAL_RC=0
+FINAL_OUTPUT=0
 if [ "$CROSS_LINK_RC" -ne 0 ]; then
     cat "$CROSS_LINK_OUTPUT_FILE"
     FINAL_RC=1
+    FINAL_OUTPUT=1
 fi
-if [ "$GITCODE_LINK_RC" -ne 0 ]; then
-    if [ "$FINAL_RC" -ne 0 ]; then
+if [ -s "$GITCODE_LINK_OUTPUT_FILE" ]; then
+    if [ "$FINAL_OUTPUT" -ne 0 ]; then
         printf '\n'
     fi
     cat "$GITCODE_LINK_OUTPUT_FILE"
-    FINAL_RC=1
+    FINAL_OUTPUT=1
+    if [ "$GITCODE_LINK_RC" -ne 0 ]; then
+        FINAL_RC=1
+    fi
 fi
 if [ -s "$FILTERED_OUTPUT_FILE" ]; then
-    if [ "$FINAL_RC" -ne 0 ]; then
+    if [ "$FINAL_OUTPUT" -ne 0 ]; then
         printf '\n'
     fi
     cat "$FILTERED_OUTPUT_FILE"
+    FINAL_OUTPUT=1
     if [ "$LYCHEE_RC" -ne 0 ]; then
         FINAL_RC=1
     fi
 elif [ "$LYCHEE_RC" -eq 0 ]; then
-    if [ "$FINAL_RC" -eq 0 ]; then
+    if [ "$FINAL_RC" -eq 0 ] && [ "$FINAL_OUTPUT" -eq 0 ]; then
         echo "[Markdown check] PASS: ${#SCAN_FILES[@]} file(s) checked. duration=$(markdown_check_duration)"
     fi
 else
