@@ -16,12 +16,6 @@
 #define ULL unsigned long long
 #endif
 
-// Add .val member to vector_s4x2 for CPU mode (matching CCE compiler struct)
-struct vector_s4x2_ext : public vector_s4x2 {
-    vector_s8 val;
-};
-#undef vector_s4x2
-using vector_s4x2 = vector_s4x2_ext;
 
 void vsts(
     vector_f8e4m3 data, __ubuf__ fp8_e4m3fn_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
@@ -636,8 +630,11 @@ inline vector_u8 __builtin_cce_vcvtfi_f162u8_x(vector_f16 src, vector_bool mask,
 inline vector_s16 __builtin_cce_vcvtfi_f322s16_x(vector_f32 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2) { return vector_s16(); }
 inline vector_s64 __builtin_cce_vcvtfi_f322s64_x(vector_f32 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2) { return vector_s64(); }
 inline vector_f32 __builtin_cce_vcvtif_s162f32_x(vector_s16 src, vector_bool mask, ULL arg0) { return vector_f32(); }
-inline vector_bf16 __builtin_cce_vcvtif_s4x22bf16_x(vector_s8 src, vector_bool mask, ULL arg0) { return vector_bf16(); }
-inline vector_f16 __builtin_cce_vcvtif_s4x22f16_x(vector_s8 src, vector_bool mask, ULL arg0) { return vector_f16(); }
+#ifndef val
+#define val data()
+#endif
+inline vector_bf16 __builtin_cce_vcvtif_s4x22bf16_x(int4x2_t* src, vector_bool mask, ULL arg0) { return vector_bf16(); }
+inline vector_f16 __builtin_cce_vcvtif_s4x22f16_x(int4x2_t* src, vector_bool mask, ULL arg0) { return vector_f16(); }
 inline vector_f32 __builtin_cce_vcvtif_s642f32_x(vector_s64 src, vector_bool mask, ULL arg0, ULL arg1) { return vector_f32(); }
 inline vector_f16 __builtin_cce_vcvtif_s82f16_x(vector_s8 src, vector_bool mask, ULL arg0) { return vector_f16(); }
 inline vector_f16 __builtin_cce_vcvtif_u82f16_x(vector_u8 src, vector_bool mask, ULL arg0) { return vector_f16(); }
@@ -648,7 +645,8 @@ inline vector_s16 __builtin_cce_vcvtii_s322s16_x(vector_s32 src, vector_bool mas
 inline vector_s64 __builtin_cce_vcvtii_s322s64_x(vector_s32 src, vector_bool mask, ULL arg0) { return vector_s64(); }
 inline vector_u16 __builtin_cce_vcvtii_s322u16_x(vector_s32 src, vector_bool mask, ULL arg0, ULL arg1) { return vector_u16(); }
 inline vector_u8 __builtin_cce_vcvtii_s322u8_x(vector_s32 src, vector_bool mask, ULL arg0, ULL arg1) { return vector_u8(); }
-inline vector_s16 __builtin_cce_vcvtii_s4x22s16_x(vector_s8 src, vector_bool mask, ULL arg0) { return vector_s16(); }
+inline vector_s16 __builtin_cce_vcvtii_s4x22s16_x(int4x2_t* src, vector_bool mask, ULL arg0) { return vector_s16(); }
+#undef val
 inline vector_s32 __builtin_cce_vcvtii_s642s32_x(vector_s64 src, vector_bool mask, ULL arg0, ULL arg1) { return vector_s32(); }
 inline vector_s16 __builtin_cce_vcvtii_s82s16_x(vector_s8 src, vector_bool mask, ULL arg0) { return vector_s16(); }
 inline vector_s32 __builtin_cce_vcvtii_s82s32_x(vector_s8 src, vector_bool mask, ULL arg0) { return vector_s32(); }
