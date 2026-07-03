@@ -98,9 +98,9 @@ __simd_callee__ inline void ShiftLeft(S& dstReg, S& srcReg0, V& srcReg1, MaskReg
 
 ```cpp
 // 示例：对src0Addr中的数据，按src1Addr对应元素的值进行左移，结果写入dstAddr
-// 输入：src0Addr指向待移位的数据（如uint16_t类型[1, 2, 3, 4]）
-//       src1Addr指向每个元素左移的位数（如int16_t类型[1, 2, 3, 4]）
-// 输出：dstAddr存储左移结果（如[2, 8, 24, 64]，即1<<1=2, 2<<2=8, 3<<3=24, 4<<4=64）
+// 输入：src0Addr指向待移位的数据（如uint16_t类型[1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 9, 3, 4, 6, 5, 7, ...]）
+//       src1Addr指向每个元素左移的位数（如int16_t类型[1, 2, 3, 4, 1, 2, 3, 4, 2, 3, 1, 2, 3, 1, 2, 1, ...]）
+// 输出：dstAddr存储左移结果（如[2, 8, 24, 64, 10, 24, 56, 128, 4, 16, 18, 12, 32, 12, 20, 14, ...]，即1<<1=2, 2<<2=8, 3<<3=24, 4<<4=64...）
 template<typename T, typename U>
 __simd_vf__ inline void ShiftLeftVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ U* src1Addr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {

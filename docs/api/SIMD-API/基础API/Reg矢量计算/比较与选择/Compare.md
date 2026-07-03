@@ -88,10 +88,10 @@ __simd_callee__ inline void Compare(MaskReg& dst, U& srcReg0, U& srcReg1, MaskRe
 
 ```cpp
 // 示例：逐元素比较src0Addr和src1Addr的数据（EQ模式），再按比较结果掩码选取元素写入dstAddr
-// 输入：src0Addr指向源操作数0（如half类型[1.0, 4.0, 3.0, 2.0]）
-//       src1Addr指向源操作数1（如half类型[1.0, 3.0, 3.0, 5.0]）
-//       对应位置关系：pos0等于(1.0==1.0)、pos1大于(4.0>3.0)、pos2等于(3.0==3.0)、pos3小于(2.0<5.0)
-// 输出：dstMask为比较结果掩码（EQ模式下[1, 0, 1, 0]，等于位置为1，其余为0）
+// 输入：src0Addr指向源操作数0（如half类型[1.0, 4.0, 3.0, 2.0, 5.0, 6.0, 7.0, 8.0, 1.0, 2.0, 9.0, 3.0, 4.0, 6.0, 5.0, 7.0, ...]）
+//       src1Addr指向源操作数1（如half类型[1.0, 3.0, 3.0, 5.0, 2.0, 6.0, 9.0, 4.0, 2.0, 5.0, 9.0, 1.0, 8.0, 3.0, 5.0, 6.0, ...]）
+//       对应位置关系：pos0等于(1.0==1.0)、pos1大于(4.0>3.0)、pos2等于(3.0==3.0)、pos3小于(2.0<5.0)...
+// 输出：dstMask为比较结果掩码（EQ模式下[1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, ...]，等于位置为1，其余为0）
 //       dstAddr存储按掩码Select选取的结果
 template<typename T>
 __simd_vf__ inline void CompareVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
