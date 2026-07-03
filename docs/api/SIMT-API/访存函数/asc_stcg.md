@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
@@ -202,10 +214,10 @@ inline void asc_stcg(half2* address, half2 val)
 -   SIMT编程场景：
 
     ```
-    __global__ __launch_bounds__(1024) void kernel_asc_stcg(float* src, float* val)
+    __global__ __launch_bounds__(1024) void kernel_asc_stcg(float* dst, float* val)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        asc_stcg(src + idx, val[idx]);
+        asc_stcg(dst + idx, val[idx]);
     }
     ```
 
@@ -214,9 +226,9 @@ inline void asc_stcg(half2* address, half2 val)
     SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：\_\_gm\_\_表示Global Memory内存空间。
 
     ```
-    __simt_vf__ __launch_bounds__(1024) inline void kernel_asc_stcg(__gm__ float* src, __gm__ float* val)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_asc_stcg(__gm__ float* dst, __gm__ float* val)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        asc_stcg(src + idx, val[idx]);
+        asc_stcg(dst + idx, val[idx]);
     }
     ```

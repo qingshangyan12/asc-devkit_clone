@@ -23,11 +23,21 @@ from .model import Cell, Command, ExampleSpec, RunResult, Suggestion
 
 
 @dataclass
+class CaseRunnerOptions:
+    arch: str
+    modes: Iterable[str]
+    includes: Iterable[str]
+    excludes: Iterable[str]
+    werror: bool = False
+
+
+@dataclass
 class CaseRunnerContext:
     project_root: Path
     runners_root: Path
     arch: str
     modes: List[str]
+    werror: bool
     cells: List[Cell]
     suggestions: List[Suggestion]
     skipped: List[RunResult]
@@ -40,27 +50,26 @@ class RunnerInfo:
     supported_modes: List[str]
     skip: bool
     skip_reason: str
+    skip_modes: List[str]
     confidence: str
     reasons: List[str]
 
 
 def build_case_runner_cells_with_skips(
     project_root: Path,
-    arch: str,
-    modes: Iterable[str],
-    includes: Iterable[str],
-    excludes: Iterable[str],
+    options: CaseRunnerOptions,
 ) -> tuple[List[Cell], List[Suggestion], List[RunResult]]:
     runners_root = project_root / "scripts" / "presmoke" / "cases"
     manifest = load_manifest(project_root)
     runner_dirs = sorted(path.parent for path in runners_root.rglob("run.sh"))
-    runner_dirs = filter_examples(runner_dirs, includes, excludes)
-    modes_list = list(modes)
+    runner_dirs = filter_examples(runner_dirs, options.includes, options.excludes)
+    modes_list = list(options.modes)
     context = CaseRunnerContext(
         project_root=project_root,
         runners_root=runners_root,
-        arch=arch,
+        arch=options.arch,
         modes=modes_list,
+        werror=options.werror,
         cells=[],
         suggestions=[],
         skipped=[],
@@ -90,6 +99,7 @@ def load_runner_info(context: CaseRunnerContext, runner_dir: Path, manifest: dic
         supported_modes=list(info.get("supported_modes") or context.modes or ["npu"]),
         skip=bool(info.get("skip")),
         skip_reason=info.get("skip_reason") or "explicit skip",
+        skip_modes=list(info.get("skip_modes", [])),
         confidence=info.get("confidence", ""),
         reasons=list(info.get("reasons", [])),
     )
@@ -121,6 +131,16 @@ def append_confidence_suggestion(context: CaseRunnerContext, info: RunnerInfo) -
 
 
 def mode_supported(context: CaseRunnerContext, info: RunnerInfo, mode: str) -> bool:
+    if mode in info.skip_modes:
+        context.skipped.append(
+            RunResult(info.rel_path, context.arch, mode, "SKIP",
+                f"Mode {mode} in skip_modes", duration_s=0, source="case-runner")
+        )
+        context.suggestions.append(
+            Suggestion(info.rel_path, "case-runner", "info",
+                f"Excluded on skip_modes list", f"Skip modes: {', '.join(info.skip_modes)}")
+        )
+        return False
     if context.arch not in info.supported_archs:
         context.suggestions.append(
             Suggestion(
@@ -153,6 +173,8 @@ def make_runner_cell(context: CaseRunnerContext, runner_dir: Path, info: RunnerI
         "PRESMOKE_ARCH": context.arch,
         "PRESMOKE_MODE": mode,
     }
+    if getattr(context, "werror", False):
+        command_env["PRESMOKE_WERROR"] = "1"
     commands = [
         Command(f"bash {runner} clean", "clean", command_env),
         Command(f"bash {runner} build", "build", command_env),
