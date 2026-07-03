@@ -22,6 +22,10 @@
 #include "utils/context/context_builder.h"
 #include "utils/context/context_builder_impl.h"
 
+
+// bash build.sh --basic_test_one --noexec -j64
+// echo -e "r\nbt\ninfo registers\nq\n" > command.txt
+// gdb -batch -x command.txt ./build/tests/api/utils/tiling/ascendc_ut_tiling_utils_ascend910 2>&1 | tee gdb_log.txt
 static int64_t GetTensorSizeByStorageShapeStub(const gert::StorageShape& storageShape, const ge::DataType& dtype)
 {
     (void)storageShape;
@@ -779,8 +783,6 @@ TEST_F(TestTiling, TestGetVectorCoreNum)
 
     uint32_t ret1 = plat.GetCoreNumVector();
     EXPECT_EQ(ret1, static_cast<uint32_t>(0));
-    MOCKER_CPP(&platform_ascendc::PlatformAscendCManager::PlatformAscendCInit).stubs().will(returnValue(platform_info));
-    auto ret2 = platform_ascendc::PlatformAscendCManager::GetInstance();
 }
 
 TEST_F(TestTiling, TestGetVecRegLen)
@@ -868,6 +870,13 @@ TEST_F(TestTiling, TestPlatformCustomSocVersion)
     auto ret3 = platform_ascendc::PlatformAscendCManager::PlatformAscendCInit("Ascend910B1");
     EXPECT_NE(nullptr, ret3);
 
+    // PlatformAscendCManager::GetInstance() caches its outcome in a process-lifetime static that is
+    // pinned by the first call in the whole process, so its result would otherwise depend on which
+    // GetInstance-using test runs first. Force this first initialization to fail (return nullptr) so
+    // the singleton is deterministically pinned to nullptr regardless of test execution order.
+    MOCKER_CPP(&platform_ascendc::PlatformAscendCManager::PlatformAscendCInit)
+        .stubs()
+        .will(returnValue(static_cast<fe::PlatFormInfos*>(nullptr)));
     auto ret4 = platform_ascendc::PlatformAscendCManager::GetInstance("Ascend910B1");
     EXPECT_EQ(nullptr, ret4);
 }
@@ -890,13 +899,13 @@ TEST_F(TestTiling, TestPlatformAscendCInitWithRuntimePlatformInfos)
     MOCKER_CPP(
         &fe::PlatformInfoManager::InitRuntimePlatformInfos, uint32_t(fe::PlatformInfoManager::*)(const std::string&))
         .stubs()
-        .will(returnValue(0));
+        .will(returnValue(static_cast<uint32_t>(0)));
 
     MOCKER_CPP(
         &fe::PlatformInfoManager::GetRuntimePlatformInfosByDevice,
         uint32_t(fe::PlatformInfoManager::*)(const uint32_t&, fe::PlatFormInfos&, bool))
         .stubs()
-        .will(returnValue(0));
+        .will(returnValue(static_cast<uint32_t>(0)));
 
     auto ret = platform_ascendc::PlatformAscendCManager::PlatformAscendCInit(customSocVersion);
     EXPECT_NE(nullptr, ret);
