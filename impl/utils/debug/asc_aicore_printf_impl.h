@@ -253,12 +253,13 @@ inline __aicore__ void printf_impl_assert_msg(const __gm__ char* __assertion, co
     enable_asc_assert();
     set_atomic_none();
 #ifdef __DAV_VEC__
-    scalar_printf_impl(DumpType::DUMP_ASSERT, fmt, "[AIV Block %u/%u] ", asc_debug_get_block_idx(), asc_debug_get_block_total_num(), args...);
+    scalar_printf_impl(DumpType::DUMP_ASSERT, "[ASSERT] %s:%u: %s: Assertion `%s' failed.\n", "[AIV Block %u/%u] ",
+        asc_debug_get_block_idx(), asc_debug_get_block_total_num(), __file, __line, __function, __assertion);
 #else
-    scalar_printf_impl(DumpType::DUMP_ASSERT, fmt, "[AIC Block %u/%u] ", asc_debug_get_block_idx(), asc_debug_get_block_total_num(), args...);
+    scalar_printf_impl(DumpType::DUMP_ASSERT, "[ASSERT] %s:%u: %s: Assertion `%s' failed.\n", "[AIC Block %u/%u] ",
+        asc_debug_get_block_idx(), asc_debug_get_block_total_num(), __file, __line, __function, __assertion);
 #endif
-    scalar_printf_impl(DumpType::DUMP_ASSERT, "[ASSERT] %s:%u: %s: Assertion `%s' failed.\n",
-                       "", __file, __line, __function, __assertion);
+    scalar_printf_impl(DumpType::DUMP_ASSERT, fmt, "", args...);
     set_ctrl(ctrlValue);
 #endif
 }
@@ -292,8 +293,8 @@ template <typename... Args>
 inline __aicore__ void printf_impl_assert_msg(const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line,
     const __gm__ char* __function, const __gm__ char* fmt, Args&&... args) {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    std::printf(fmt, args...);
     std::printf("[ASSERT] %s:%u: %s: Assertion `%s' failed.\n",  __file, __line, __function, __assertion);
+    std::printf(fmt, args...);
 #endif
 }
 
