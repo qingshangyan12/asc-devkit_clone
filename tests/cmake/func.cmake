@@ -128,7 +128,7 @@ function(run_python_llt_test)
     if(NOT DEFINED PYTHON_TASK_NUM)
         set(PYTHON_TASK_NUM 8)
     endif()
-    if(DEFINED SKIP_EXECUTE)
+    if(DEFINED ENABLE_UT_EXEC AND NOT ENABLE_UT_EXEC)
         set(LLT_EXECUTE_COMMAND echo "skip execute ${PYTHON_TARGET}" )
     else()
         set(LLT_EXECUTE_COMMAND bash ${ASCENDC_DIR}/tests/cmake/scripts/python_llt_run_and_check.sh ${CMAKE_INSTALL_PREFIX} ${PYTHON_TARGET}
