@@ -40,7 +40,7 @@ SPECIAL_PREFIXES = (
 
 CUSTOM_OP_PACKAGE_CASE = "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op"
 PARALLEL_OPS_PACKAGE_CASE = "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/parallel_ops_package"
-TILING_SINK_PROGRAMMING_CASE = "04_aicpu/02_features/00_framwork/00_pytorch/tiling_sink_programming"
+TILING_SINK_PROGRAMMING_CASE = "04_aicpu/02_features/00_framework/00_pytorch/tiling_sink_programming"
 TILING_SINK_GENERATE_TASK_PATTERN = (
     "GenerateTaskForSinkOp:Node [AddCustomTilingSink, AddCustomTilingSink] starts to generate tasks "
     "for the tiling sink, sk_flag [0]."
@@ -72,6 +72,30 @@ NO_CMAKE_ARCH_INJECTION_CASES = {
 }
 
 TENSORFLOW_SKIP_REASON = "requires TensorFlow 2.6.5 environment; skipped by presmoke"
+MATMUL_L2CACHE_SKIP_REASON = "data size (~308M) causes overtime in cpu mode; cpu mode skipped by presmoke"
+
+
+@dataclass
+class SkipConfig:
+    reason: str = ""
+    modes: List[str] = field(default_factory=list)
+
+
+SKIP_CONFIG = {
+    "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin": SkipConfig(
+        reason=TENSORFLOW_SKIP_REASON,
+        modes=["npu"],
+    ),
+    "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom": SkipConfig(
+        reason=TENSORFLOW_SKIP_REASON,
+        modes=["npu"],
+    ),
+    "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_l2cache": SkipConfig(
+        reason=MATMUL_L2CACHE_SKIP_REASON,
+        modes=["cpu"],
+    ),
+}
+
 ARCH_OVERRIDES = {
     "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op": ["dav-2201", "dav-3510"],
     "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/parallel_ops_package": ["dav-2201", "dav-3510"],
@@ -81,7 +105,7 @@ ARCH_OVERRIDES = {
     "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin": ["dav-2201", "dav-3510"],
     "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom": ["dav-2201", "dav-3510"],
     "01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin": ["dav-2201", "dav-3510"],
-    "04_aicpu/02_features/00_framwork/00_pytorch/tiling_sink_programming": ["dav-2201", "dav-3510"],
+    "04_aicpu/02_features/00_framework/00_pytorch/tiling_sink_programming": ["dav-2201", "dav-3510"],
     # README "支持的产品" only lists Ascend 950PR/950DT. The option table also
     # mentions dav-2201, but the sample uses FP8/hifloat8 types unavailable on 910B.
     "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_fp8": ["dav-3510"],
@@ -120,6 +144,7 @@ class CaseReport:
     target_runnable: bool = False
     skip: bool = False
     skip_reason: str = ""
+    skip_modes: List[str] = field(default_factory=list)
     reasons: List[str] = field(default_factory=list)
     commands: List[str] = field(default_factory=list)
 
@@ -133,6 +158,7 @@ class RunnerRenderSpec:
     custom_op_dependency: bool = False
     custom_op_package_case: bool = False
     skip_reason: str = ""
+    skip_modes: List[str] = field(default_factory=list)
 
 
 def main() -> int:
@@ -199,6 +225,8 @@ def write_runner(project_root: Path, runners_root: Path, cell, runnable_on_targe
     runner.write_text(text, encoding="utf-8")
     runner.chmod(0o755)
     skip_reason = render_spec.skip_reason
+    skip_modes = render_spec.skip_modes
+    all_modes_skipped = bool(skip_reason and all(mode in skip_modes for mode in cell.example.modes))
     return CaseReport(
         case=rel,
         runner=runner.relative_to(project_root).as_posix(),
@@ -207,8 +235,9 @@ def write_runner(project_root: Path, runners_root: Path, cell, runnable_on_targe
         supported_archs=cell.example.archs,
         supported_modes=cell.example.modes,
         target_runnable=runnable_on_target,
-        skip=bool(skip_reason),
+        skip=all_modes_skipped,
         skip_reason=skip_reason,
+        skip_modes=skip_modes,
         reasons=reasons,
         commands=[command.raw for command in cell.commands if command.raw],
     )
@@ -226,6 +255,7 @@ def build_runner_render_spec(cell, confidence: str, reasons: List[str]) -> tuple
     rel = cell.example.rel_path
     build_cmds = build_commands_for_runner(cell.commands)
     run_cmds = run_commands_for_runner(cell.commands, build_cmds)
+    build_cmds, run_cmds = merge_export_commands_into_run(build_cmds, run_cmds)
     verify_cmds = [command for command in cell.commands if command.raw and command.kind == "verify"]
     if not run_cmds:
         run_cmds = [Command(":", "run")]
@@ -236,11 +266,15 @@ def build_runner_render_spec(cell, confidence: str, reasons: List[str]) -> tuple
         verify_cmds = [Command(":", "verify")]
     custom_op_package_case = rel == CUSTOM_OP_PACKAGE_CASE
     custom_op_dependency = requires_custom_op_package(rel)
-    skip_reason = explicit_skip_reason(rel)
-    if skip_reason:
+    skip_reason, skip_modes = explicit_skip_config(rel)
+    all_modes_skipped = skip_reason and all(mode in skip_modes for mode in cell.example.modes)
+    if all_modes_skipped:
         reasons.append("explicit_skip")
         confidence = "high"
         build_cmds, run_cmds, verify_cmds = noop_stage_commands()
+    elif skip_reason:
+        reasons.append("partial_mode_skip")
+        confidence = "high"
     elif custom_op_package_case:
         reasons.append("custom_op_package_provider")
         build_cmds, run_cmds, verify_cmds = noop_stage_commands()
@@ -255,6 +289,7 @@ def build_runner_render_spec(cell, confidence: str, reasons: List[str]) -> tuple
             custom_op_dependency=custom_op_dependency,
             custom_op_package_case=custom_op_package_case,
             skip_reason=skip_reason,
+            skip_modes=skip_modes,
         ),
         confidence,
     )
@@ -286,6 +321,29 @@ def run_commands_for_runner(commands: Iterable[Command], build_cmds: List[Comman
         if command not in build_cmds:
             result.append(command)
     return result
+
+
+def merge_export_commands_into_run(
+    build_cmds: List[Command],
+    run_cmds: List[Command],
+) -> tuple[List[Command], List[Command]]:
+    export_cmds: List[str] = []
+    remaining_build_cmds: List[Command] = []
+    for command in build_cmds:
+        if is_export_command(command.raw):
+            export_cmds.append(command.raw)
+        else:
+            remaining_build_cmds.append(command)
+    if not export_cmds or not run_cmds:
+        return build_cmds, run_cmds
+
+    first_run = run_cmds[0]
+    merged_run = Command("; ".join([*export_cmds, first_run.raw]), first_run.kind, dict(first_run.env))
+    return remaining_build_cmds, [merged_run, *run_cmds[1:]]
+
+
+def is_export_command(command: str) -> bool:
+    return bool(re.match(r"^export\s+[A-Za-z_][A-Za-z0-9_]*=", command.strip()))
 
 
 def classify_confidence(cell) -> tuple[str, List[str]]:
@@ -351,10 +409,9 @@ def requires_custom_op_package(rel: str) -> bool:
     return False
 
 
-def explicit_skip_reason(rel: str) -> str:
-    if "/00_framework/01_tensorflow/" in rel:
-        return TENSORFLOW_SKIP_REASON
-    return ""
+def explicit_skip_config(rel: str) -> tuple[str, List[str]]:
+    config = SKIP_CONFIG.get(rel, SkipConfig())
+    return config.reason, config.modes
 
 
 def render_runner(
@@ -450,6 +507,7 @@ def runner_header(spec: RunnerRenderSpec) -> List[str]:
         "",
         f'CASE_REL={shlex.quote(spec.rel)}',
         *skip_reason_lines(spec.skip_reason),
+        *skip_modes_lines(spec.skip_modes),
         'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"',
         f'source "$SCRIPT_DIR/{case_entry_relative_path(spec.rel)}"',
         'presmoke_case_init "$CASE_REL"',
@@ -461,6 +519,13 @@ def skip_reason_lines(skip_reason: str) -> List[str]:
     if not skip_reason:
         return []
     return [f"SKIP_REASON={shlex.quote(skip_reason)}", ""]
+
+
+def skip_modes_lines(skip_modes: List[str]) -> List[str]:
+    if not skip_modes:
+        return []
+    modes_str = " ".join(skip_modes)
+    return [f"SKIP_MODES=({modes_str})", ""]
 
 
 def runner_function(name: str, body: List[str]) -> List[str]:
@@ -528,6 +593,8 @@ def command_workdir(command: str, default_cd_build: bool = False) -> str:
 
 
 def command_runs_from_build_dir(command: str, default_cd_build: bool = False) -> bool:
+    if re.match(r"^(export\s+[A-Za-z_][A-Za-z0-9_]*=.*;\s*)+\./", command.strip()):
+        return True
     if command.startswith("python3 ../"):
         return True
     if 'python3 ../' in command and ("--application=" in command or command.startswith("msprof ")):

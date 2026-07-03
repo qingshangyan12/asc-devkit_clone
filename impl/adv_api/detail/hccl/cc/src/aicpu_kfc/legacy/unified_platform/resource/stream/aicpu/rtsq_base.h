@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #ifndef HCCLV2_RTSQ_BASE_H
 #define HCCLV2_RTSQ_BASE_H
 #include <vector>
@@ -23,7 +23,8 @@
 
 #include "ascend_hal.h"
 namespace aicpu {
-void __attribute__((weak)) __attribute__((visibility("default"))) GetSqeId(const uint32_t num, uint32_t &start, uint32_t &end);
+void __attribute__((weak)) __attribute__((visibility("default")))
+GetSqeId(const uint32_t num, uint32_t& start, uint32_t& end);
 }
 
 namespace Hccl {
@@ -35,40 +36,19 @@ public:
 
     virtual void Reset();
 
-    inline u32 GetSqDepth()
-    {
-        return sqDepth_;
-    }
+    inline u32 GetSqDepth() const { return sqDepth_; }
 
-    inline u32 GetHead()
-    {
-        return sqHead_;
-    }
+    inline u32 GetHead() const { return sqHead_; }
 
-    inline u32 GetTail()
-    {
-        return sqTail_;
-    }
+    inline u32 GetTail() const { return sqTail_; }
 
-    inline u32 GetTaskId()
-    {
-        return taskId_;
-    }
+    inline u32 GetTaskId() const { return taskId_; }
 
-    void SetOpExecStatusCallback(std::function<void()> callback)
-    {
-        checkOpExecStatusCallback_ = callback;
-    }
+    void SetOpExecStatusCallback(std::function<void()> callback) { checkOpExecStatusCallback_ = callback; }
 
-    virtual void LaunchTask()
-    {
-        MACRO_THROW(NotSupportException, StringFormat("not supported."));
-    }
+    virtual void LaunchTask() { MACRO_THROW(NotSupportException, StringFormat("not supported.")); }
 
-    virtual void TryLaunchTask()
-    {
-        MACRO_THROW(NotSupportException, StringFormat("not supported."));
-    }
+    virtual void TryLaunchTask() { MACRO_THROW(NotSupportException, StringFormat("not supported.")); }
 
     virtual void NotifyWait(u32 notifyId)
     {
@@ -133,7 +113,7 @@ public:
         MACRO_THROW(NotSupportException, StringFormat("not supported."));
     }
 
-    virtual void SdmaReduce(u64 srcAddr, u64 dstAddr, u32 size, u32 partId, const ReduceIn &reduceIn)
+    virtual void SdmaReduce(u64 srcAddr, u64 dstAddr, u32 size, u32 partId, const ReduceIn& reduceIn)
     {
         (void)srcAddr;
         (void)dstAddr;
@@ -150,21 +130,21 @@ public:
         MACRO_THROW(NotSupportException, StringFormat("not supported."));
     }
 
-    virtual void UbDbSend(const UbJettyLiteId &jettyLiteId, u16 piValue)
+    virtual void UbDbSend(const UbJettyLiteId& jettyLiteId, u16 piValue)
     {
         (void)jettyLiteId;
         (void)piValue;
         MACRO_THROW(NotSupportException, StringFormat("not supported."));
     }
 
-    virtual void RdmaDbSend(const uint64_t &dbAddr, const uint64_t &dbValue)
+    virtual void RdmaDbSend(const uint64_t& dbAddr, const uint64_t& dbValue)
     {
         (void)dbAddr;
         (void)dbValue;
         MACRO_THROW(NotSupportException, StringFormat("not supported."));
     }
 
-    virtual void UbDirectSend(const UbJettyLiteId &jettyLiteId, u32 dwqeSize, const u8 *wqe)
+    virtual void UbDirectSend(const UbJettyLiteId& jettyLiteId, u32 dwqeSize, const u8* wqe)
     {
         (void)jettyLiteId;
         (void)dwqeSize;
@@ -194,13 +174,10 @@ public:
         MACRO_THROW(NotSupportException, StringFormat("not supported."));
     }
 
-    u32 QuerySqHead();
-    u32 QuerySqTail();
+    u32 QuerySqHead() const;
+    u32 QuerySqTail() const;
 
-    virtual bool IsRtsqQueueSpaceSufficient()
-    {
-        return true;
-    }
+    virtual bool IsRtsqQueueSpaceSufficient() { return true; }
 
     virtual HcclResult SetPreStreamSyncReady()
     {
@@ -214,10 +191,7 @@ public:
         return HCCL_SUCCESS;
     }
 
-    virtual bool GetPreStreamSyncStatus()
-    {
-        return false;
-    }
+    virtual bool GetPreStreamSyncStatus() { return false; }
 
 protected:
     u32 devPhyId_{0};
@@ -234,9 +208,9 @@ protected:
 
     std::function<void()> checkOpExecStatusCallback_{nullptr};
 
-    u32 QuerySqDepth();
+    u32 QuerySqDepth() const;
 
-    std::string GetHwSqDescribe();
+    std::string GetHwSqDescribe() const;
 
     void ConfigSqTail(u32 value);
     void ConfigDisableToEnable(u32 value);
@@ -244,10 +218,10 @@ protected:
     HcclResult SetTaskIdBySqeId();
 
 private:
-    u64 QuerySqBaseAddr();
-    u32 QueryCqeStatus();
+    u64 QuerySqBaseAddr() const;
+    u32 QueryCqeStatus() const;
 
-    u32 QuerySqStatusByType(drvSqCqPropType_t givenType);
+    u32 QuerySqStatusByType(drvSqCqPropType_t givenType) const;
     void ConfigSqStatusByType(drvSqCqPropType_t givenType, u32 value);
 };
 
