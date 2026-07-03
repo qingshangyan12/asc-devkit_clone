@@ -42,17 +42,17 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 <h3 style="color: #1a1a1a; font-size: 16px; margin-top: 20px;">学习路线：</h3>
 <ul style="list-style-type: none; padding-left: 0;">
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
-<strong style="color: #1a1a1a;">📦 环境搭建</strong><br/>
-<a href="./环境准备.md" style="color: #3b82f6;">CANN环境安装</a>
+<strong style="color: #1a1a1a;">🔧 环境搭建</strong><br/>
+<a href="./环境准备.md" style="color: #3b82f6; font-size: 14px;">CANN环境安装</a>
 </li>
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
 <strong style="color: #1a1a1a;">📖 异构系统与编程模型概览</strong><br/>
-<a href="./快速入门/异构系统与编程模型.md" style="color: #3b82f6;">异构系统与SIMD/SIMT编程模型介绍</a>
+<a href="./快速入门/异构系统与编程模型.md" style="color: #3b82f6; font-size: 14px;">异构系统与SIMD/SIMT编程模型介绍</a>
 </li>
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
-<strong style="color: #1a1a1a;">💻 动手实践</strong><br/>
-<a href="./快速入门/基于SIMD编程/基于SIMD编程.md" style="color: #3b82f6;">SIMD算子快速入门</a><br/>
-<a href="./快速入门/基于SIMT编程/基于SIMT编程.md" style="color: #3b82f6;">SIMT算子快速入门</a>
+<strong style="color: #1a1a1a;">📝 动手实践</strong><br/>
+<a href="./快速入门/基于SIMD编程/基于SIMD编程.md" style="color: #3b82f6; font-size: 14px;">SIMD算子快速入门</a><br/>
+<a href="./快速入门/基于SIMT编程/基于SIMT编程.md" style="color: #3b82f6; font-size: 14px;">SIMT算子快速入门</a>
 </li>
 </ul>
 </div>
@@ -63,28 +63,28 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 <h3 style="color: #1a1a1a; font-size: 16px; margin-top: 20px;">学习路线：</h3>
 <ul style="list-style-type: none; padding-left: 0;">
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
-<strong style="color: #1a1a1a;">🔧 编程模型</strong><br/>
-<a href="../编程指南/编程模型/编程模型.md" style="color: #3b82f6;">编程模型概述</a><br/>
-<span style="color: #666; font-size: 13px;">• <a href="../编程指南/编程模型/AI-Core-SIMD编程/概述.md" style="color: #3b82f6;">SIMD编程</a></span><br/>
-<span style="color: #666; font-size: 13px;">• <a href="../编程指南/编程模型/AI-Core-SIMT编程/概述.md" style="color: #3b82f6;">SIMT编程</a></span>
+<strong style="color: #1a1a1a;">📖 编程模型</strong><br/>
+<a href="../编程指南/编程模型/编程模型.md" style="color: #3b82f6; font-size: 14px;">编程模型概述</a><br/>
+<span style="color: #666; font-size: 14px;">• <a href="../编程指南/编程模型/AI-Core-SIMD编程/概述.md" style="color: #3b82f6; font-size: 14px;">SIMD编程</a></span><br/>
+<span style="color: #666; font-size: 14px;">• <a href="../编程指南/编程模型/AI-Core-SIMT编程/概述.md" style="color: #3b82f6; font-size: 14px;">SIMT编程</a></span>
 </li>
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
-<strong style="color: #1a1a1a;">🔨 编译与运行</strong><br/>
-<a href="../编程指南/编译与运行/异步执行.md" style="color: #3b82f6;">异步执行</a> | <a href="../编程指南/编译与运行/算子编译/毕昇编译器.md" style="color: #3b82f6;">算子编译</a>
+<strong style="color: #1a1a1a;">🔧 编译与运行</strong><br/>
+<a href="../编程指南/编译与运行/异步执行.md" style="color: #3b82f6; font-size: 14px;">异步执行</a> | <a href="../编程指南/编译与运行/算子编译/毕昇编译器.md" style="color: #3b82f6; font-size: 14px;">算子编译</a>
 </li>
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
-<strong style="color: #1a1a1a;">🔍 调试与调优</strong><br/>
-<a href="../编程指南/调试调优/概述.md" style="color: #3b82f6;">调试调优概述</a> | <a href="../编程指南/调试调优/性能调优.md" style="color: #3b82f6;">性能调试</a>
+<strong style="color: #1a1a1a;">🔧 调试与调优</strong><br/>
+<a href="../编程指南/调试调优/概述.md" style="color: #3b82f6; font-size: 14px;">调试调优概述</a> | <a href="../编程指南/调试调优/性能调优.md" style="color: #3b82f6; font-size: 14px;">性能调试</a>
 </li>
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
-<strong style="color: #1a1a1a;">🚀 算子部署</strong><br/>
-<a href="../编程指南/高级编程/高级特性/AI框架算子适配/PyTorch框架.md" style="color: #3b82f6;">PyTorch框架适配</a>
+<strong style="color: #1a1a1a;">📦 算子部署</strong><br/>
+<a href="../编程指南/高级编程/高级特性/AI框架算子适配/PyTorch框架.md" style="color: #3b82f6; font-size: 14px;">PyTorch框架适配</a>
 </li>
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
-<strong style="color: #1a1a1a;">💪 实践巩固</strong><br/>
-<span style="color: #666; font-size: 13px;">• <a href="../算子实践参考/SIMD算子实现/矢量编程/概述.md" style="color: #3b82f6;">SIMD矢量算子</a></span><br/>
-<span style="color: #666; font-size: 13px;">• <a href="../算子实践参考/SIMD算子实现/矩阵编程（基础API）/分离模式.md" style="color: #3b82f6;">SIMD矩阵算子</a></span><br/>
-<span style="color: #666; font-size: 13px;">• <a href="../算子实践参考/SIMT算子实现/算子实现.md" style="color: #3b82f6;">SIMT算子</a></span>
+<strong style="color: #1a1a1a;">📝 实践巩固</strong><br/>
+<span style="color: #666; font-size: 14px;">• <a href="../算子实践参考/SIMD算子实现/矢量编程/概述.md" style="color: #3b82f6; font-size: 14px;">SIMD矢量算子</a></span><br/>
+<span style="color: #666; font-size: 14px;">• <a href="../算子实践参考/SIMD算子实现/矩阵编程（基础API）/分离模式.md" style="color: #3b82f6; font-size: 14px;">SIMD矩阵算子</a></span><br/>
+<span style="color: #666; font-size: 14px;">• <a href="../算子实践参考/SIMT算子实现/算子实现.md" style="color: #3b82f6; font-size: 14px;">SIMT算子</a></span>
 </li>
 </ul>
 </div>
@@ -95,21 +95,21 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 <h3 style="color: #1a1a1a; font-size: 16px; margin-top: 20px;">学习路线：</h3>
 <ul style="list-style-type: none; padding-left: 0;">
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
-<strong style="color: #1a1a1a;">🎯 高级编程</strong><br/>
-<a href="../编程指南/高级编程/硬件实现/基本架构.md" style="color: #3b82f6;">硬件实现</a><br/>
-<span style="color: #666; font-size: 13px;">• <a href="../编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/概述.md" style="color: #3b82f6;">SIMD & SIMT混合编程</a></span><br/>
-<span style="color: #666; font-size: 13px;">• <a href="../编程指南/高级编程/高级特性/Aclnn算子工程化开发/概述.md" style="color: #3b82f6;">Aclnn算子工程化开发</a></span><br/>
-<span style="color: #666; font-size: 13px;">• <a href="../编程指南/高级编程/高级特性/算子入图开发/概述.md" style="color: #3b82f6;">算子入图开发</a></span><br/>
-<span style="color: #666; font-size: 13px;">• <a href="../编程指南/高级编程/高级特性/AI框架算子适配/概述.md" style="color: #3b82f6;">AI框架算子适配</a></span>
+<strong style="color: #1a1a1a;">📖 高级编程</strong><br/>
+<a href="../编程指南/高级编程/硬件实现/基本架构.md" style="color: #3b82f6; font-size: 14px;">硬件实现</a><br/>
+<span style="color: #666; font-size: 14px;">• <a href="../编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/概述.md" style="color: #3b82f6; font-size: 14px;">SIMD & SIMT混合编程</a></span><br/>
+<span style="color: #666; font-size: 14px;">• <a href="../编程指南/高级编程/高级特性/Aclnn算子工程化开发/概述.md" style="color: #3b82f6; font-size: 14px;">Aclnn算子工程化开发</a></span><br/>
+<span style="color: #666; font-size: 14px;">• <a href="../编程指南/高级编程/高级特性/算子入图开发/概述.md" style="color: #3b82f6; font-size: 14px;">算子入图开发</a></span><br/>
+<span style="color: #666; font-size: 14px;">• <a href="../编程指南/高级编程/高级特性/AI框架算子适配/概述.md" style="color: #3b82f6; font-size: 14px;">AI框架算子适配</a></span>
 </li>
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
-<strong style="color: #1a1a1a;">💪 实践巩固</strong><br/>
-<a href="../算子实践参考/SIMD与SIMT混合算子实现/算子实现.md" style="color: #3b82f6;">典型SIMD & SIMT混合算子开发</a><br/>
-<a href="https://gitcode.com/cann/cann-samples" style="color: #3b82f6;">Ascend C算子高性能实践样例仓</a>
+<strong style="color: #1a1a1a;">📝 实践巩固</strong><br/>
+<a href="../算子实践参考/SIMD与SIMT混合算子实现/算子实现.md" style="color: #3b82f6; font-size: 14px;">典型SIMD & SIMT混合算子开发</a><br/>
+<a href="https://gitcode.com/cann/cann-samples" style="color: #3b82f6; font-size: 14px;">Ascend C算子高性能实践样例仓</a>
 </li>
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
 <strong style="color: #1a1a1a;">🔄 跨代迁移</strong><br/>
-<a href="../跨代迁移兼容性指南/概述.md" style="color: #3b82f6;">跨代迁移兼容性指南</a>
+<a href="../跨代迁移兼容性指南/概述.md" style="color: #3b82f6; font-size: 14px;">跨代迁移兼容性指南</a>
 </li>
 </ul>
 </div>
@@ -120,12 +120,12 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 <h2 style="color: #1a1a1a; margin-top: 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">📚 技术附录</h2>
 <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
 <div style="flex: 1; min-width: 200px;">
-<a href="../技术附录/概念原理和术语/术语表.md" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px;">📖 基本概念与术语</a>
-<a href="../技术附录/CPP标准支持/概述.md" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px;">⚡ C++语言标准支持</a>
+<a href="../技术附录/概念原理和术语/术语表.md" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">📖 基本概念与术语</a>
+<a href="../技术附录/CPP标准支持/概述.md" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">🔧 C++语言标准支持</a>
 </div>
 <div style="flex: 1; min-width: 200px;">
-<a href="https://hiascend.com/document/redirect/CannCommunityAscendCApi" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px;">🔧 Ascend C API参考</a>
-<a href="https://hiascend.com/document/redirect/CannCommunityadev" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px;">🚀 CANN Runtime接口</a>
+<a href="https://hiascend.com/document/redirect/CannCommunityAscendCApi" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">📖 Ascend C API参考</a>
+<a href="https://hiascend.com/document/redirect/CannCommunityadev" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">🚀 CANN Runtime接口</a>
 </div>
 </div>
 </div>
