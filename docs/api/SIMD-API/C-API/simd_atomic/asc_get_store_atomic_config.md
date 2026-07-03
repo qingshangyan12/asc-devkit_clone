@@ -12,6 +12,10 @@
 
 获取原子操作启用位与原子操作类型的值。
 
+<cann-filter npu-type="950">
+**Ascend 950PR/Ascend 950DT产品上该接口已废弃。原子加操作请使用[asc_atomic_add](../scalar_compute/asc_atomic_add.md)实现。**
+</cann-filter>
+
 ## 函数原型
 
 ```c++
@@ -34,7 +38,7 @@ PIPE_S
 
 ## 约束说明
 
-- 需配合[asc_set_store_atomic_config_v1](./asc_set_store_atomic_config_v1.md)和[asc_set_store_atomic_config_v2](./asc_set_store_atomic_config_v2.md)接口使用，该接口用于设置原子操作启用位和原子操作类型的值。
+- 需配合[asc_set_store_atomic_config_v1](./asc_set_store_atomic_config_v1.md)和[asc_set_store_atomic_config_v2（废弃）](./asc_set_store_atomic_config_v2_deprecated.md)接口使用，该接口用于设置原子操作启用位和原子操作类型的值。
 
 ## 调用示例
 

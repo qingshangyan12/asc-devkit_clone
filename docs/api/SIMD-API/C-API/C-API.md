@@ -193,6 +193,17 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_zero_bits_cnt](scalar_compute/asc_zero_bits_cnt.md) | 获取一个uint64_t类型数字的二进制中0的个数。 |
 | [asc_store_dev](scalar_compute/asc_store_dev.md) | 不经过DCache向GM地址上写数据。 |
 | [asc_float2int32](scalar_compute/asc_float2int32.md) | 将float类型转化为int32_t类型，并支持多种舍入模式。 |
+| [asc_atomic_add](scalar_compute/asc_atomic_add.md) |  |
+| [asc_atomic_sub](scalar_compute/asc_atomic_sub.md) |  |
+| [asc_atomic_or](scalar_compute/asc_atomic_or.md) |  |
+| [asc_atomic_xor](scalar_compute/asc_atomic_xor.md) |  |
+| [asc_atomic_and](scalar_compute/asc_atomic_and.md) |  |
+| [asc_atomic_max](scalar_compute/asc_atomic_max.md) |  |
+| [asc_atomic_min](scalar_compute/asc_atomic_min.md) |  |
+| [asc_atomic_inc](scalar_compute/asc_atomic_inc.md) |  |
+| [asc_atomic_dec](scalar_compute/asc_atomic_dec.md) |  |
+| [asc_atomic_exch](scalar_compute/asc_atomic_exch.md) |  |
+| [asc_atomic_cas](scalar_compute/asc_atomic_cas.md) |  |
 
 ## 矩阵计算
 
@@ -310,7 +321,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_set_atomic_min_int8](simd_atomic/asc_set_atomic_min.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int8_t数据与GM中已有数据进行逐元素比较，并将最小值写入GM。 |
 | [asc_set_atomic_min_int16](simd_atomic/asc_set_atomic_min.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int16_t数据与GM中已有数据进行逐元素比较，并将最小值写入GM。 |
 | [asc_set_store_atomic_config_v1](simd_atomic/asc_set_store_atomic_config_v1.md)| 设置原子操作启用位与原子操作类型的值，适用于Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品。 |
-| <cann-filter npu_type = "950" > [asc_set_store_atomic_config_v2](simd_atomic/asc_set_store_atomic_config_v2.md)| 设置原子操作启用位与原子操作类型的值，适用于Ascend 950PR/Ascend 950DT。</cann-filter>|
+| <cann-filter npu_type = "950" > [asc_set_store_atomic_config_v2（废弃）](simd_atomic/asc_set_store_atomic_config_v2_deprecated.md)| 设置原子操作启用位与原子操作类型的值，适用于Ascend 950PR/Ascend 950DT。</cann-filter>|
 | [asc_get_store_atomic_config](simd_atomic/asc_get_store_atomic_config.md)| 获取原子操作启用位与原子操作类型的值。 |
 | [asc_set_atomic_none](simd_atomic/asc_set_atomic_none.md) | 清空原子操作的状态。 |
 
