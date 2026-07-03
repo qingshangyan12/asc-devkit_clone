@@ -890,13 +890,13 @@ TEST_F(TestTiling, TestPlatformAscendCInitWithRuntimePlatformInfos)
     MOCKER_CPP(
         &fe::PlatformInfoManager::InitRuntimePlatformInfos, uint32_t(fe::PlatformInfoManager::*)(const std::string&))
         .stubs()
-        .will(returnValue(0));
+        .will(returnValue(static_cast<uint32_t>(0)));
 
     MOCKER_CPP(
         &fe::PlatformInfoManager::GetRuntimePlatformInfosByDevice,
         uint32_t(fe::PlatformInfoManager::*)(const uint32_t&, fe::PlatFormInfos&, bool))
         .stubs()
-        .will(returnValue(0));
+        .will(returnValue(static_cast<uint32_t>(0)));
 
     auto ret = platform_ascendc::PlatformAscendCManager::PlatformAscendCInit(customSocVersion);
     EXPECT_NE(nullptr, ret);
