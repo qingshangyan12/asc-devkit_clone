@@ -66,7 +66,7 @@ CANN基于分层架构设计,实现了上层应用与底层硬件的无缝衔接
 <strong style="color: #1a1a1a;">📖 编程模型</strong><br/>
 <a href="../编程指南/编程模型/编程模型.md" style="color: #3b82f6; font-size: 14px;">编程模型概述</a><br/>
 <span style="color: #666; font-size: 14px;">• <a href="../编程指南/编程模型/AI-Core-SIMD编程/概述.md" style="color: #3b82f6; font-size: 14px;">SIMD编程</a></span><br/>
-<span style="color: #999; font-size: 13px;">  - <a href="../编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/基于语言扩展层C-API编程.md" style="color: #3b82f6; font-size: 13px;">基于指针的C语言编程</a></span><br/>
+<span style="color: #999; font-size: 13px;">  - <a href="../编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/C语言编程概述.md" style="color: #3b82f6; font-size: 13px;">基于指针的C语言编程</a></span><br/>
 <span style="color: #999; font-size: 13px;">  - <a href="../编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md" style="color: #3b82f6; font-size: 13px;">基于Tensor的C++编程</a></span><br/>
 <span style="color: #999; font-size: 13px;">  - <a href="../编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程原理.md" style="color: #3b82f6; font-size: 13px;">基于TPipe-TQue框架编程</a></span><br/>
 <span style="color: #666; font-size: 14px;">• <a href="../编程指南/编程模型/AI-Core-SIMT编程/AI-Core-SIMT编程.md" style="color: #3b82f6; font-size: 14px;">SIMT编程</a></span><br/>
@@ -78,7 +78,10 @@ CANN基于分层架构设计,实现了上层应用与底层硬件的无缝衔接
 </li>
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
 <strong style="color: #1a1a1a;">🔧 调试与调优</strong><br/>
-<a href="../编程指南/调试调优/概述.md" style="color: #3b82f6; font-size: 14px;">调试概述</a><br/>
+<a href="../编程指南/调试调优/概述.md" style="color: #3b82f6; font-size: 14px;">调试调优概述</a><br/>
+<span style="color: #666; font-size: 14px;">• <a href="../编程指南/调试调优/功能调试/CPU域孪生调试.md" style="color: #3b82f6; font-size: 14px;">功能调试</a></span><br/>
+<span style="color: #999; font-size: 13px;">  - <a href="../编程指南/调试调优/功能调试/CPU域孪生调试.md" style="color: #3b82f6; font-size: 13px;">CPU域孪生调试</a></span><br/>
+<span style="color: #999; font-size: 13px;">  - <a href="../编程指南/调试调优/功能调试/NPU域上板调试.md" style="color: #3b82f6; font-size: 13px;">NPU域孪生调试</a></span><br/>
 <span style="color: #666; font-size: 14px;">• <a href="../编程指南/调试调优/性能调优.md" style="color: #3b82f6; font-size: 14px;">性能调试</a></span>
 </li>
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
@@ -102,7 +105,7 @@ CANN基于分层架构设计,实现了上层应用与底层硬件的无缝衔接
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
 <strong style="color: #1a1a1a;">📖 高级编程</strong><br/>
 <a href="../编程指南/高级编程/硬件实现/基本架构.md" style="color: #3b82f6; font-size: 14px;">硬件实现</a><br/>
-<span style="color: #666; font-size: 14px;">• <a href="../编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程.md" style="color: #3b82f6; font-size: 14px;">SIMD & SIMT混合编程</a></span><br/>
+<span style="color: #666; font-size: 14px;">• <a href="../编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/概述.md" style="color: #3b82f6; font-size: 14px;">SIMD & SIMT混合编程</a></span><br/>
 <span style="color: #666; font-size: 14px;">• <a href="../编程指南/高级编程/Aclnn算子工程化开发/概述.md" style="color: #3b82f6; font-size: 14px;">Aclnn算子工程化开发</a></span><br/>
 <span style="color: #666; font-size: 14px;">• <a href="../编程指南/高级编程/算子入图开发/概述.md" style="color: #3b82f6; font-size: 14px;">算子入图开发</a></span><br/>
 <span style="color: #666; font-size: 14px;">• <a href="../编程指南/高级编程/AI框架算子适配/概述.md" style="color: #3b82f6; font-size: 14px;">AI框架算子适配</a></span>
@@ -129,8 +132,8 @@ CANN基于分层架构设计,实现了上层应用与底层硬件的无缝衔接
 <a href="../技术附录/CPP标准支持/概述.md" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">🔧 C++语言标准支持</a>
 </div>
 <div style="flex: 1; min-width: 200px;">
-<a href="https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta2/API/ascendcopapi/atlasascendc_api_07_0003.html" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">📖 Ascend C API参考</a>
-<a href="https://hiascend.com/document/redirect/CannCommunityadev" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">🚀 CANN Runtime接口</a>
+<a href="https://hiascend.com/document/redirect/CannCommunityAscendCApi" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">📖 Ascend C API参考</a>
+<a href="https://hiascend.com/document/redirect/CannCommunityadev" style="display: block; padding: 10px; background: #fff; border-radius: 5px; color: #3b82f6; text-decoration: none; margin-bottom: 10px; font-size: 14px;">🚀 CANN Runtime接口可参考《应用开发（C&C++）》</a>
 </div>
 </div>
 </div>
