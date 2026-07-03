@@ -59,14 +59,14 @@
 
 **传入FixpipeParamsArch3510参数的接口：**
 
-- 通路L0C Buffer（CO1）-\>GM，不开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
+- 通路L0C Buffer-\>Global Memory（GM），不开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
     __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsArch3510<config.format>& intriParams)
     ```
 
-- 通路L0C Buffer（CO1）-\>GM，开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
+- 通路L0C Buffer-\>Global Memory（GM），开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
@@ -75,14 +75,14 @@
 
 **传入FixpipeParamsV220参数的接口：**
 
-- 通路L0C Buffer（CO1）-\>GM，不开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
+- 通路L0C Buffer-\>Global Memory（GM），不开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
     __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsV220& intriParams)
     ```
 
-- 通路L0C Buffer（CO1）-\>GM，开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
+- 通路L0C Buffer-\>Global Memory（GM），开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S = uint64_t, typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
@@ -91,14 +91,14 @@
 
 **传入FixpipeParamsM300参数的接口：**
 
-- 通路L0C Buffer（CO1）-\>GM，不开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
+- 通路L0C Buffer-\>Global Memory（GM），不开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
     __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsM300& intriParams)
     ```
 
-- 通路L0C Buffer（CO1）-\>GM，开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
+- 通路L0C Buffer-\>Global Memory（GM），开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S = uint64_t, typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
