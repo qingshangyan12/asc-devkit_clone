@@ -22,12 +22,14 @@ AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成
   __global__ __vector__ add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z)
 
   bisheng -c add_kernel.asc -o add_kernel.o --npu-arch=dav-xxxx
-  bisheng -c main.cpp -o main.o
+  bisheng -c main.cpp -o main.o -I${INSTALL_DIR}/include
   bisheng add_kernel.o main.o -o main
   // 或
   bisheng main.cpp add_kernel.asc -o main --npu-arch=dav-xxxx
   ```
-
+  > [!NOTE] 说明
+  > ${INSTALL_DIR}请替换为CANN软件安装后文件存储路径。以root用户安装为例，安装后文件默认存储路径为：/usr/local/Ascend/cann。
+  
 - 单独编译
 
   bisheng异构编译默认采用的是全程序编译模式，该模式要求单个源文件X.asc中编译的设备程序没有任何未解析的外部设备函数和变量引用。设备函数可以调用其他编译单元中定义的设备函数或访问其中定义的设备变量，但必须在bisheng命令行中指定`-dc`编译选项，才能启用不同编译单元间设备代码的链接功能。这种支持跨编译单元链接设备代码与符号的能力，被称为单独编译。
@@ -60,8 +62,6 @@ AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成
   bisheng -c main.cpp -o main.o -I${INSTALL_DIR}/include
   bisheng add_compute.o add_kernel.o main.o -o program
   ```
-  > [!NOTE] 说明
-  > ${INSTALL_DIR}请替换为CANN软件安装后文件存储路径。以root用户安装为例，安装后文件默认存储路径为：/usr/local/Ascend/cann。
 
 - 动态库编译
    ```shell
