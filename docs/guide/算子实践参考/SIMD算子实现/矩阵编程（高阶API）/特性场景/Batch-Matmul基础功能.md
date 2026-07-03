@@ -36,7 +36,7 @@ Matmul计算需要计算出多个singleCoreM \* singleCoreN大小的C矩阵，�
 
 -   Tiling实现
 
-    使用[SetBatchInfoForNormal](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Tiling侧接口/Matmul-Tiling类/SetBatchInfoForNormal.md)设置A/B/C的M/N/K轴信息和A/B矩阵的BatchNum。
+    使用[SetBatchInfoForNormal](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Tiling类/SetBatchInfoForNormal.md)设置A/B/C的M/N/K轴信息和A/B矩阵的BatchNum。
 
     ```
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
