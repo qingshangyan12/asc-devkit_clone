@@ -70,7 +70,13 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(const LocalTensor<T>& d
         LoadData2DGM2L0BCal((__cb__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), loadDataParams);
     } else if (dstScope == Hardware::L1) {
         LoadData2DGM2L1Cal((__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), loadDataParams);
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+        const uint8_t cacheMode = ExtractCacheMode(src);
+        LoadData2DGM2L1Cal((__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), loadDataParams, cacheMode);
+#else
+        LoadData2DGM2L1Cal((__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), loadDataParams);
     }
+#endif
 }
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
