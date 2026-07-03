@@ -161,7 +161,16 @@ __aicore__ __gm__ inline DebugBlockHeadInfo* get_block_info()
     uint32_t blockLength = reinterpret_cast<__gm__ DebugBlockHeadInfo*>(g_sysPrintFifoSpace)->length;
     __gm__ DebugBlockHeadInfo* blockInfo =
         reinterpret_cast<__gm__ DebugBlockHeadInfo*>(g_sysPrintFifoSpace + blockLength * blockIdx);
-    return blockInfo->magic == 0xAE86 ? blockInfo : nullptr;
+    if (blockInfo->magic != 0xAE86) {
+        return nullptr;
+    }
+    if ASCEND_IS_AIV {
+        blockInfo->flag = 1;
+    } else {
+        blockInfo->flag = 0;
+    }
+    dcci(reinterpret_cast<__gm__ uint64_t*>(blockInfo), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+    return blockInfo;
 }
 
 __aicore__ __gm__ inline DebugBlockReadInfo* get_block_read_info(__gm__ DebugBlockHeadInfo* blockInfo)
