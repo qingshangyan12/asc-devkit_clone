@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
@@ -84,11 +96,11 @@
 | sharedTmpBuffer | 输入 | 该API用于计算的临时空间，所需空间大小根据[GetSelectMaxMinTmpSize](GetSelectMaxMinTmpSize.md)获取。 |
 | info | 输入 | 描述SrcTensor和maskTensor的shape信息。SelectWithBytesMaskShapeInfo类型，定义如下方代码所示，其中参数的含义为：<br>firstAxis：srcLocal/maskTensor的前轴元素个数。<br>srcLastAxis：srcLocal的尾轴元素个数。<br>maskLastAxis：maskTensor的尾轴元素个数。<br>注意：<br>需要满足srcTensor和maskTensor的前轴元素个数相同，均为firstAxis。<br>需要满足firstAxis * srcLastAxis = srcTensor.GetSize()；firstAxis * maskLastAxis = maskTensor.GetSize()。<br>maskTensor尾轴的元素个数大于等于srcTensor尾轴的元素个数，计算时会丢弃maskTensor多余部分，不参与计算。 |
 
-```
+```cpp
 struct SelectWithBytesMaskShapeInfo {
-    __aicore__ SelectShapeInfo(){};
-    uint32_t firstAxis = 0;    
-    uint32_t srcLastAxis = 0; 
+    __aicore__ SelectWithBytesMaskShapeInfo() {};
+    uint32_t firstAxis = 0;
+    uint32_t srcLastAxis = 0;
     uint32_t maskLastAxis = 0;
 };
 ```
