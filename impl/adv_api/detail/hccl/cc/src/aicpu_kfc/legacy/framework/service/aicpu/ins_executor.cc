@@ -1,12 +1,12 @@
 /**
-� * Copyright (c) 2025 Huawei Technologies Co., Ltd.
-� * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-� * CANN Open Software License Agreement Version 2.0 (the "License").
-� * Please refer to the License for details. You may not use this file except in compliance with the License.
-� * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-� * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-� * See LICENSE in the root of the software repository for the full text of the License.
-� */
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include <algorithm>
 #include "ins_to_sqe_rule.h"
 #include "null_ptr_exception.h"
@@ -66,7 +66,7 @@ void InsExecutor::AddOpCounter(const StreamLite &stream, bool isHead) const
 
 void InsExecutor::ExecuteV82(const InsQueue &insQueue, bool isMc2)
 {
-    // InsQueue 非空已经在外部进行了� �验
+    // InsQueue 非空已经在外部进行了� �验
     if (resMgrFetcher_ == nullptr) {
         THROW<NullPtrException>(StringFormat("InsExecutor::%s resMgrFetcher is null, isMc2 %d.", __func__, isMc2));
         return;

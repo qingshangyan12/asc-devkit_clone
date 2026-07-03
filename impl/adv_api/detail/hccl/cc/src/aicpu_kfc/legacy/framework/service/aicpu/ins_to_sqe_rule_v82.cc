@@ -1,12 +1,12 @@
 /**
-� * Copyright (c) 2025 Huawei Technologies Co., Ltd.
-� * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-� * CANN Open Software License Agreement Version 2.0 (the "License").
-� * Please refer to the License for details. You may not use this file except in compliance with the License.
-� * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-� * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-� * See LICENSE in the root of the software repository for the full text of the License.
-� */
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #include <regex>
 #include "ins_to_sqe_rule.h"
@@ -169,7 +169,7 @@ void Interpret(const InsLocalCopy &ins, const StreamLite &stream, ResMgrFetcher 
         return;
     }
 
-    // � 入数据大小不能超过 u32最大值， 需要进行切分
+    // � 入数据大小不能超过 u32最大值， 需要进行切分
     u64 u32Max = UINT32_MAX;
     double countSplitingTimes = static_cast<double>(ins.GetSrcSlice().GetSize()) / static_cast<double>(u32Max);
     u64 splitingTimes = static_cast<int>(std::ceil(countSplitingTimes));
@@ -210,7 +210,7 @@ void Interpret(const InsLocalCopyExtend &ins, const StreamLite &stream, ResMgrFe
         return;
     }
 
-    // � 入数据大小不能超过 u32最大值， 需要进行切分
+    // � 入数据大小不能超过 u32最大值， 需要进行切分
     u64 u32Max = UINT32_MAX;
     double countSplitingTimes = static_cast<double>(ins.GetSrcBuffer().GetSize()) / static_cast<double>(u32Max);
     u64 splitingTimes = static_cast<int>(std::ceil(countSplitingTimes));

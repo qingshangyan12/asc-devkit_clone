@@ -1,12 +1,12 @@
 /**
-� * Copyright (c) 2025 Huawei Technologies Co., Ltd.
-� * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-� * CANN Open Software License Agreement Version 2.0 (the "License").
-� * Please refer to the License for details. You may not use this file except in compliance with the License.
-� * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-� * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-� * See LICENSE in the root of the software repository for the full text of the License.
-� */
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #include "task_exception_handler_lite.h"
 #include "task_exception_func.h"
@@ -123,14 +123,14 @@ HcclResult SendErrorMessageReportToHost(CommunicatorImplLite *aicpuComm, ErrorMe
     return HCCL_SUCCESS;
 }
 
-constexpr u32 RT_SDMA_COMPERR = 0x9; // A3 sdma error类型为0x9时，表示写拷贝发生超时代答，或者数据搬移时地址译� �错误
+constexpr u32 RT_SDMA_COMPERR = 0x9; // A3 sdma error类型为0x9时，表示写拷贝发生超时代答，或者数据搬移时地址译� �错误
 constexpr u32 RT_SDMA_COMPDATAERR = 0xa; // A3 sdma error类型为0xa时，表示读拷贝发生超时代答，或者读HBM返回ERROR
 constexpr u32 RT_SDMA_DATAERR = 0x8; // A3 sdma error类型为0x8时，表示读HBM返回ERROR
 constexpr u32 RT_UB_LOCAL_OPERATIOINERR = 0x2; // A5 ub error类型为0x2时，表示UB本端返回ERROR
 constexpr u32 RT_UB_REMOTE_OPERATIOINERR = 0x3; // A5 ub error类型为0x3时，表示UB远端返回ERROR
 constexpr u32 RT_UB_LINK_FAILEDERR = 0x5; // A5 ub error类型为0x5时，表示网络异常，taack超时
 
-// 把SDMA类错误� �转换成Ts对应的错误� �
+// 把SDMA类错误� �转换成Ts对应的错误� �
 uint16_t SwitchSdmaCqeErrCodeToTsErrCode(u32 cqeErrCode){
     switch (cqeErrCode) {
         case RT_SDMA_COMPERR:
@@ -144,7 +144,7 @@ uint16_t SwitchSdmaCqeErrCodeToTsErrCode(u32 cqeErrCode){
     }
 }
 
-// 把UB类错误� �转换成Ts对应的错误� �
+// 把UB类错误� �转换成Ts对应的错误� �
 uint16_t SwitchUBCqeErrCodeToTsErrCode(u32 cqeErrCode){
     switch (cqeErrCode) {
         case RT_UB_LOCAL_OPERATIOINERR:

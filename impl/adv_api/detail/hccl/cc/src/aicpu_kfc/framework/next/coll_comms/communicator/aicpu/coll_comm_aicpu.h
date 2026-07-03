@@ -8,7 +8,6 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-
 #ifndef __COLL_COMM_AICPU_H__
 #define __COLL_COMM_AICPU_H__
 

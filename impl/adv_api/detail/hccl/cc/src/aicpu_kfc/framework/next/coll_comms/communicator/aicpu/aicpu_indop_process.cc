@@ -1,12 +1,12 @@
 /**
-Â * Copyright (c) 2025 Huawei Technologies Co., Ltd.
-Â * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-Â * CANN Open Software License Agreement Version 2.0 (the "License").
-Â * Please refer to the License for details. You may not use this file except in compliance with the License.
-Â * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-Â * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-Â * See LICENSE in the root of the software repository for the full text of the License.
-Â */
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #include "aicpu_indop_process.h"
 #include "coll_comm_aicpu_mgr.h"
@@ -66,7 +66,7 @@ HcclResult AicpuIndopProcess::AcquireAicpuCommMgr(const std::string &group, Coll
     // åˆ›å»ºaicpué€šä¿¡åŸŸ
     CHK_RET(aicpuCommMgr->AcquireCollCommAicpu());
 
-    // å°†æ–°å®žä¾‹åŠ å…¥æ˜ å°„è¡¨
+    // å°†æ–°å®žä¾‹ï¿½ å…¥ï¿½ å°„è¡¨
     *aicpuCommMgrPtr = aicpuCommMgr.get();
     g_commAicpuInfo.commMgrMap.insert({group, std::move(aicpuCommMgr)});
     HCCL_RUN_INFO("[%s]Created new comm group [%s]", __func__, group.c_str());
