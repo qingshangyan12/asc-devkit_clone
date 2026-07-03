@@ -255,17 +255,13 @@ inline __aicore__ void printf_impl_assert_msg(
     enable_asc_assert();
     set_atomic_none();
 #ifdef __DAV_VEC__
-    scalar_printf_impl(
-        DumpType::DUMP_ASSERT, fmt, "[AIV Block %u/%u] ", asc_debug_get_block_idx(), asc_debug_get_block_total_num(),
-        args...);
+    scalar_printf_impl(DumpType::DUMP_ASSERT, "[ASSERT] %s:%u: %s: Assertion `%s' failed.\n", "[AIV Block %u/%u] ",
+        asc_debug_get_block_idx(), asc_debug_get_block_total_num(), __file, __line, __function, __assertion);
 #else
-    scalar_printf_impl(
-        DumpType::DUMP_ASSERT, fmt, "[AIC Block %u/%u] ", asc_debug_get_block_idx(), asc_debug_get_block_total_num(),
-        args...);
+    scalar_printf_impl(DumpType::DUMP_ASSERT, "[ASSERT] %s:%u: %s: Assertion `%s' failed.\n", "[AIC Block %u/%u] ",
+        asc_debug_get_block_idx(), asc_debug_get_block_total_num(), __file, __line, __function, __assertion);
 #endif
-    scalar_printf_impl(
-        DumpType::DUMP_ASSERT, "[ASSERT] %s:%u: %s: Assertion `%s' failed.\n", "", __file, __line, __function,
-        __assertion);
+    scalar_printf_impl(DumpType::DUMP_ASSERT, fmt, "", args...);
     set_ctrl(ctrlValue);
 #endif
 }
@@ -301,8 +297,8 @@ inline __aicore__ void printf_impl_assert_msg(
     const __gm__ char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    std::printf(fmt, args...);
     std::printf("[ASSERT] %s:%u: %s: Assertion `%s' failed.\n", __file, __line, __function, __assertion);
+    std::printf(fmt, args...);
 #endif
 }
 
@@ -311,12 +307,7 @@ __aicore__ inline void scalar_printf_impl(
     DumpType debugType, __gm__ const char* fmt, __gm__ const char* dumphead, Args&&... args)
 {}
 
-__aicore__ inline void enable_asc_diagnostics() {}
-
-} // namespace __asc_aicore
-
 using namespace __asc_aicore;
-#endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_AICORE_PRINTF_IMPL__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
