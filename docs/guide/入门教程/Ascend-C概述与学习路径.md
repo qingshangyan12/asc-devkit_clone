@@ -40,7 +40,7 @@ CANN基于分层架构设计,实现了上层应用与底层硬件的无缝衔接
 <h2 style="color: #1a1a1a; margin-top: 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">🚀 快速入门：快速上手实操，构建全景认知</h2>
 <p style="color: #555; font-size: 14px; line-height: 1.6; margin-bottom: 15px;">初级阶段的目标是让您在最短时间内跑通第一个算子，理解Ascend C的基本工作方式。</p>
 <h3 style="color: #1a1a1a; font-size: 16px; margin-top: 20px;">学习路线：</h3>
-<ul style="list-style-type: none; padding-left: 0;">
+<ul style="list-style-type: none; padding-left: 0; margin: 0;">
 <li style="list-style-type: none; margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
 <strong style="color: #1a1a1a;">🔧 环境搭建</strong><br/>
 <a href="./环境准备.md" style="color: #3b82f6; font-size: 14px;">CANN环境安装</a>
@@ -61,7 +61,7 @@ CANN基于分层架构设计,实现了上层应用与底层硬件的无缝衔接
 <h2 style="color: #1a1a1a; margin-top: 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">⚡ 进阶编程：掌握编程模型,实现定制开发</h2>
 <p style="color: #555; font-size: 14px; line-height: 1.6; margin-bottom: 15px;">本阶段聚焦于理解并掌握Ascend C的SIMD与SIMT编程模型,使您具备自主开发矢量及矩阵类算子的能力,从而满足常规场景下的基本性能要求。</p>
 <h3 style="color: #1a1a1a; font-size: 16px; margin-top: 20px;">学习路线：</h3>
-<ul style="list-style-type: none; padding-left: 0;">
+<ul style="list-style-type: none; padding-left: 0; margin: 0;">
 <li style="list-style-type: none; margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
 <strong style="color: #1a1a1a;"><a href="../编程指南/编程模型/编程模型.md" style="color: #3b82f6; text-decoration: none;">📖 编程模型</a></strong><br/>
 <div style="display: flex; gap: 15px; margin-top: 10px;">
@@ -106,7 +106,7 @@ CANN基于分层架构设计,实现了上层应用与底层硬件的无缝衔接
 <h2 style="color: #1a1a1a; margin-top: 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">🏆 高级编程：挖掘极限性能,驾驭复杂场景</h2>
 <p style="color: #555; font-size: 14px; line-height: 1.6; margin-bottom: 15px;">本阶段聚焦于深入理解硬件底层细节,全面掌握高阶编程特性,以支撑实现算子的极致性能目标。</p>
 <h3 style="color: #1a1a1a; font-size: 16px; margin-top: 20px;">学习路线：</h3>
-<ul style="list-style-type: none; padding-left: 0;">
+<ul style="list-style-type: none; padding-left: 0; margin: 0;">
 <li style="list-style-type: none; margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
 <strong style="color: #1a1a1a;">📖 高级编程</strong><br/>
 <a href="../编程指南/高级编程/硬件实现/基本架构.md" style="color: #3b82f6; font-size: 14px;">硬件实现</a><br/>
