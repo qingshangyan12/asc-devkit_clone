@@ -1,8 +1,8 @@
-# Matmul Basic API Computation Based on Static Tensor Programming
+# Matmul Basic API Computation Based on c++ tensor Programming
 
 ## Overview
 
-This sample implements multi-core matrix multiplication computation based on the static Tensor programming paradigm.
+This sample implements multi-core matrix multiplication computation based on the c++ tensor programming paradigm.
 
 ## Supported Products and CANN Software Versions
 

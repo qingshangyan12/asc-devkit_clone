@@ -14,7 +14,7 @@ Release Date: 2026/04/30
 
 ### 🎯 Samples
 - Existing sample rectification: rectification of basic, high-level cube, vector, and data movement API samples ([PR#1200](https://gitcode.com/cann/asc-devkit/pull/1200) [PR#1429](https://gitcode.com/cann/asc-devkit/pull/1429) [PR#1454](https://gitcode.com/cann/asc-devkit/pull/1454) [PR#1311](https://gitcode.com/cann/asc-devkit/pull/1311) [PR#1563](https://gitcode.com/cann/asc-devkit/pull/1563)).
-- Added static Tensor best practices: add high-performance sample ([PR#1262](https://gitcode.com/cann/asc-devkit/pull/1262)).
+- Added c++ tensor best practices: add high-performance sample ([PR#1262](https://gitcode.com/cann/asc-devkit/pull/1262)).
 - Added low-bit cube best practices: matmul high-level and basic API samples, MXFP4 basic API samples ([PR#1535](https://gitcode.com/cann/asc-devkit/pull/1535) [PR#1648](https://gitcode.com/cann/asc-devkit/pull/1648) [PR#1788](https://gitcode.com/cann/asc-devkit/pull/1788)).
 - Added custom operator project multi-vendors compilation sample ([PR#1466](https://gitcode.com/cann/asc-devkit/pull/1466)).
 - Added atomic feature samples ([PR#1688](https://gitcode.com/cann/asc-devkit/pull/1688)).

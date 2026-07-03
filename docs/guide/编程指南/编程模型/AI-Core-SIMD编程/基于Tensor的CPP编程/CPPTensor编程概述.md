@@ -125,7 +125,7 @@ AI Core包含三类计算单元：Cube负责矩阵计算、Vector负责矢量计
 
 UB是AI Core内主要用于矢量计算的内部存储单元，位于每个Vector Core（AIV）内部。容量较小但带宽高、延迟低，可视为内核执行期间由用户管理的高速缓存。
 
-在C++ Tensor编程中，通过LocalTensor对象管理UB内存，其中对于基础Tensor（不带Layout）而言，主要通过[LocalMemAllocator](../../../../../api/SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/LocalMemAllocator.md)指定物理存储位置和内存大小来创建对应的Tensor。LocalMemAllocator是一种线性内存分配器，开发者可以调用Alloc方法进行内存分配，根据调用次序依次向后进行线性分配，但该分配器不提供内存释放以及其它内存管理的能力。
+在C++ Tensor编程中，通过LocalTensor对象管理UB内存，其中对于基础Tensor（不带Layout）而言，主要通过[LocalMemAllocator](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/LocalMemAllocator.md)指定物理存储位置和内存大小来创建对应的Tensor。LocalMemAllocator是一种线性内存分配器，开发者可以调用Alloc方法进行内存分配，根据调用次序依次向后进行线性分配，但该分配器不提供内存释放以及其它内存管理的能力。
 
 ```cpp
 __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
