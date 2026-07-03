@@ -17,14 +17,14 @@ TQueBind绑定源逻辑位置和目的逻辑位置，根据源位置和目的位
 </th>
 </tr>
 </thead>
-<tbody><tr id="row18293184354216"><td class="cellrowborder" valign="top" width="22.71%" headers="mcps1.2.4.1.1 "><p id="p194510267433"><a name="p194510267433"></a><a name="p194510267433"></a>GM-&gt;VECIN</p>
+<tbody><tr id="row18293184354216"><td class="cellrowborder" valign="top" width="22.71%" headers="mcps1.2.4.1.1 "><p id="p194510267433"><a name="p194510267433"></a><a name="p194510267433"></a>GM-&gt;VECIN（UB）</p>
 </td>
 <td class="cellrowborder" valign="top" width="44.42%" headers="mcps1.2.4.1.2 "><pre class="codeblock" id="codeblock653942891212"><a name="codeblock653942891212"></a><a name="codeblock653942891212"></a>TQueBind&lt;TPosition::GM, TPosition::VECIN, 1&gt;</pre>
 </td>
 <td class="cellrowborder" valign="top" width="32.87%" headers="mcps1.2.4.1.3 "><pre class="codeblock" id="codeblock149969438127"><a name="codeblock149969438127"></a><a name="codeblock149969438127"></a>TQue&lt;TPosition::VECIN, 1&gt;</pre>
 </td>
 </tr>
-<tr id="row472743920427"><td class="cellrowborder" valign="top" width="22.71%" headers="mcps1.2.4.1.1 "><p id="p16451152684316"><a name="p16451152684316"></a><a name="p16451152684316"></a>VECOUT-&gt;GM</p>
+<tr id="row472743920427"><td class="cellrowborder" valign="top" width="22.71%" headers="mcps1.2.4.1.1 "><p id="p16451152684316"><a name="p16451152684316"></a><a name="p16451152684316"></a>VECOUT（UB）-&gt;GM</p>
 </td>
 <td class="cellrowborder" valign="top" width="44.42%" headers="mcps1.2.4.1.2 "><pre class="codeblock" id="codeblock330274851210"><a name="codeblock330274851210"></a><a name="codeblock330274851210"></a>TQueBind&lt;TPosition::VECOUT, TPosition::GM, 1&gt;</pre>
 </td>
@@ -38,21 +38,21 @@ TQueBind绑定源逻辑位置和目的逻辑位置，根据源位置和目的位
 <td class="cellrowborder" valign="top" width="32.87%" headers="mcps1.2.4.1.3 "><p id="p11997181214229"><a name="p11997181214229"></a><a name="p11997181214229"></a>-</p>
 </td>
 </tr>
-<tr id="row1118213346566"><td class="cellrowborder" valign="top" width="22.71%" headers="mcps1.2.4.1.1 "><p id="p169524825614"><a name="p169524825614"></a><a name="p169524825614"></a>GM-&gt;A1</p>
+<tr id="row1118213346566"><td class="cellrowborder" valign="top" width="22.71%" headers="mcps1.2.4.1.1 "><p id="p169524825614"><a name="p169524825614"></a><a name="p169524825614"></a>GM-&gt;A1（L1 Buffer）</p>
 </td>
 <td class="cellrowborder" valign="top" width="44.42%" headers="mcps1.2.4.1.2 "><pre class="codeblock" id="codeblock19855119151320"><a name="codeblock19855119151320"></a><a name="codeblock19855119151320"></a>TQueBind&lt;TPosition::GM, TPosition::A1, 1&gt;</pre>
 </td>
 <td class="cellrowborder" valign="top" width="32.87%" headers="mcps1.2.4.1.3 "><pre class="codeblock" id="codeblock1035819162139"><a name="codeblock1035819162139"></a><a name="codeblock1035819162139"></a>TQue&lt;TPosition::A1, 1&gt;</pre>
 </td>
 </tr>
-<tr id="row131824349564"><td class="cellrowborder" valign="top" width="22.71%" headers="mcps1.2.4.1.1 "><p id="p116958483561"><a name="p116958483561"></a><a name="p116958483561"></a>GM-&gt;B1</p>
+<tr id="row131824349564"><td class="cellrowborder" valign="top" width="22.71%" headers="mcps1.2.4.1.1 "><p id="p116958483561"><a name="p116958483561"></a><a name="p116958483561"></a>GM-&gt;B1（L1 Buffer）</p>
 </td>
 <td class="cellrowborder" valign="top" width="44.42%" headers="mcps1.2.4.1.2 "><pre class="codeblock" id="codeblock9773162110138"><a name="codeblock9773162110138"></a><a name="codeblock9773162110138"></a>TQueBind&lt;TPosition::GM, TPosition::B1, 1&gt;</pre>
 </td>
 <td class="cellrowborder" valign="top" width="32.87%" headers="mcps1.2.4.1.3 "><pre class="codeblock" id="codeblock4847182510138"><a name="codeblock4847182510138"></a><a name="codeblock4847182510138"></a>TQue&lt;TPosition::B1, 1&gt;</pre>
 </td>
 </tr>
-<tr id="row201824342566"><td class="cellrowborder" valign="top" width="22.71%" headers="mcps1.2.4.1.1 "><p id="p186958481569"><a name="p186958481569"></a><a name="p186958481569"></a>GM-&gt;C1</p>
+<tr id="row201824342566"><td class="cellrowborder" valign="top" width="22.71%" headers="mcps1.2.4.1.1 "><p id="p186958481569"><a name="p186958481569"></a><a name="p186958481569"></a>GM-&gt;C1（L1 Buffer/UB）</p>
 </td>
 <td class="cellrowborder" valign="top" width="44.42%" headers="mcps1.2.4.1.2 "><pre class="codeblock" id="codeblock149532378137"><a name="codeblock149532378137"></a><a name="codeblock149532378137"></a>TQueBind&lt;TPosition::GM, TPosition::C1, 1&gt;</pre>
 </td>
@@ -87,7 +87,7 @@ TQueBind绑定源逻辑位置和目的逻辑位置，根据源位置和目的位
 <td class="cellrowborder" valign="top" width="32.87%" headers="mcps1.2.4.1.3 "><pre class="codeblock" id="codeblock1388062161412"><a name="codeblock1388062161412"></a><a name="codeblock1388062161412"></a>TQue&lt;TPosition::CO1, 1&gt;</pre>
 </td>
 </tr>
-<tr id="row1282101712571"><td class="cellrowborder" valign="top" width="22.71%" headers="mcps1.2.4.1.1 "><p id="p1043354016144"><a name="p1043354016144"></a><a name="p1043354016144"></a>CO2-&gt;GM</p>
+<tr id="row1282101712571"><td class="cellrowborder" valign="top" width="22.71%" headers="mcps1.2.4.1.1 "><p id="p1043354016144"><a name="p1043354016144"></a><a name="p1043354016144"></a>CO2（UB/Global Memory）-&gt;GM</p>
 </td>
 <td class="cellrowborder" valign="top" width="44.42%" headers="mcps1.2.4.1.2 "><pre class="codeblock" id="codeblock123131826191417"><a name="codeblock123131826191417"></a><a name="codeblock123131826191417"></a>TQueBind&lt;TPosition::CO2, TPosition::GM, 1&gt;</pre>
 </td>
