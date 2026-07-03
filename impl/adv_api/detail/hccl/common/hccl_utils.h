@@ -19,6 +19,7 @@ namespace AscendC {
 __aicore__ inline void FlushDataCache(GlobalTensor<int64_t>& globalHcclMsgArea, __gm__ void* gmAddr)
 {
     AscendC::Barrier();
+    printf("[LBH] FlushDataCache gmAddr = %p\n", gmAddr);
     globalHcclMsgArea.SetGlobalBuffer((__gm__ int64_t*)gmAddr);
     __asm__("NOP");
     DataCacheCleanAndInvalid<int64_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(globalHcclMsgArea);

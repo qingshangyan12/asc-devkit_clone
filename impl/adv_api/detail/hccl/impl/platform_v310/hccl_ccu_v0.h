@@ -565,6 +565,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::F
         ccuMsg_.commitCKEAddr = GetCommitCkeAddr(globalCurWaitId_);
         ccuMsg_.xnAddr = hcclContext_->xnOffset + CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE * globalCurWaitId_;
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr) = 0xffffffffffffffff;
+        printf("[LBH] Finalize FlushDataCache ccuMsg_.xnAddr = %ld\n", ccuMsg_.xnAddr);
         FlushDataCache(ccuMsg_.xnAddr);
         WriteHBMData(ccuMsg_.commitCKEAddr, CCU_MSG_CKE_SET_VALUE);
         KERNEL_LOG(
