@@ -14,7 +14,7 @@
 
 ### 🎯 样例更新
 - 存量样例整改：涉及基础、高阶的cube、vector、数据搬运等API样例整改（[PR#1200](https://gitcode.com/cann/asc-devkit/pull/1200) [PR#1429](https://gitcode.com/cann/asc-devkit/pull/1429) [PR#1454](https://gitcode.com/cann/asc-devkit/pull/1454) [PR#1311](https://gitcode.com/cann/asc-devkit/pull/1311) [PR#1563](https://gitcode.com/cann/asc-devkit/pull/1563)）。
-- 新增静态Tensor最佳实践：add高性能样例（[PR#1262](https://gitcode.com/cann/asc-devkit/pull/1262)）。
+- 新增C++ Tensor编程最佳实践：add高性能样例（[PR#1262](https://gitcode.com/cann/asc-devkit/pull/1262)）。
 - 新增低比特cube最佳实践：matmul的高阶、基础API样例，MXFP4基础API样例（[PR#1535](https://gitcode.com/cann/asc-devkit/pull/1535) [PR#1648](https://gitcode.com/cann/asc-devkit/pull/1648) [PR#1788](https://gitcode.com/cann/asc-devkit/pull/1788)）。
 - 新增自定义算子工程多vendors编译样例（[PR#1466](https://gitcode.com/cann/asc-devkit/pull/1466)）。
 - 新增atomic类特性样例（[PR#1688](https://gitcode.com/cann/asc-devkit/pull/1688)）。
