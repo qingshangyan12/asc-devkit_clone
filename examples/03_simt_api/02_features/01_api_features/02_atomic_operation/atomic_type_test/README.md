@@ -51,6 +51,24 @@ make -j
 
 默认 workload 为 `48×256×256=3145728` 次原子加，用于和其他 atomic 性能样例的 profiling 配置对齐。
 
+## 性能数据
+
+以下数据均使用 `msprof op --launch-count=1` 采集，workload 为 `BLOCK_NUM=48`、`THREADS_PER_BLOCK=256`、`ITERATIONS=256`、`SLOTS=1024`，总原子加次数为 `3145728`。指标为 `OpBasicInfo.csv` 中的 `Task Duration(us)`。
+
+浮点族数据来自本样例；整数数据来自同目录 `atomic_add_perf` 样例的 `1..6` 场景。`atomic_add_perf` 仅包含 UB int32 对照，不包含 UB int64 场景。
+
+| 类型 | GM return（us） | GM no-return（us） | UB return（us） | UB no-return（us） |
+|---|---:|---:|---:|---:|
+| `int32_t` | 22344.602 | 136.744 | 59.577 | 58.064 |
+| `int64_t` | 11239.149 | 11281.082 | - | - |
+| `float` | 138386.203 | 139.927 | 107.113 | 58.123 |
+| `half` | 613.570 | 291.880 | 67.901 | 59.135 |
+| `bfloat16_t` | 613.066 | 291.855 | 67.078 | 58.302 |
+| `half2` | 104079.648 | 145.236 | 103.620 | 107.712 |
+| `bfloat16x2_t` | 34108.656 | 145.196 | 102.003 | 106.420 |
+
+> 说明：GM 场景在 `msprof op` replay 下建议保持 `SKIP_VALIDATION=ON`。`half` 和 `bfloat16_t` 的返回值在接口文档中已说明不准确，本表中的 return 场景只表示触发返回值路径，正确性不依赖返回值。
+
 ## msprof op 采集
 
 建议 profiling 时保持 `SKIP_VALIDATION=ON`，避免可选校验 kernel 和 host 拷贝混入采集流程，也避免 `msprof op` warmup/replay 对 GM counter 重复累加导致校验失败。
