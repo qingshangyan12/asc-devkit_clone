@@ -75,7 +75,7 @@ __aicore__ inline void DumpShapeImpl(const ShapeInfo &shapeInfo)
 }
 
 template <typename T>
-__aicore__ void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t desc, uint32_t size,
+__aicore__ void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t desc, uint32_t dumpSize,
                                     const uint32_t* shape, const uint32_t shapeDim)
 {
     uint64_t ctrlValue = get_ctrl();
@@ -91,7 +91,7 @@ __aicore__ void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t desc, u
 }
 
 template <typename T>
-__aicore__ void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc, uint32_t size,
+__aicore__ void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc, uint32_t dumpSize,
                                         const uint32_t* shape, const uint32_t shapeDim)
 {
     uint64_t ctrlValue = get_ctrl();
@@ -112,9 +112,9 @@ __aicore__ void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc,
 }
 
 template <typename T>
-__aicore__ void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc, uint32_t size)
+__aicore__ void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc, uint32_t dumpSize)
 {
-    DumpTensorLocal2GMImpl(src, desc, size, nullptr, 0);
+    DumpTensorLocal2GMImpl(src, desc, dumpSize, nullptr, 0);
 }
 
 __aicore__ inline void InitDump(bool mixFlag, uint32_t gmLen)
