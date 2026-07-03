@@ -12,6 +12,7 @@
 #include <future>
 #include <map>
 #include <string>
+#include <vector>
 #include <hccl/hccl_types.h>
 #include "aicpu_operator_pub.h"
 #include "coll_alg_param.h"
@@ -27,6 +28,71 @@ using namespace hccl;
 namespace {
 const u32 MC2_TILING_VERSION = 2U;
 const u32 ENABLE_AICPU_COMM_ENGINE = 0U;
+constexpr u32 ALL_TO_ALL_VECTOR_NUM = 4U;
+constexpr u32 ALL_TO_ALL_OFFSET_RECV_COUNTS = 1U;
+constexpr u32 ALL_TO_ALL_OFFSET_SDISPLS = 2U;
+constexpr u32 ALL_TO_ALL_OFFSET_RDISPLS = 3U;
+
+u64 GetCcTilingDataCount(const HcclApi::Mc2CcTilingInner* tiling)
+{
+    if (tiling == nullptr) {
+        return 0U;
+    }
+    return tiling->dataCount;
+}
+
+bool IsFixedCountOp(HcclCMDType opType)
+{
+    return opType == HcclCMDType::HCCL_CMD_ALLREDUCE || opType == HcclCMDType::HCCL_CMD_ALLGATHER ||
+           opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
+}
+
+void PrepareFixedCountSelectorInput(const HcclApi::Mc2CcTilingInner& tiling, u64 dataCount, OpParam& opParam)
+{
+    if (!IsFixedCountOp(opParam.opType)) {
+        return;
+    }
+    opParam.DataDes.count = dataCount;
+    opParam.DataDes.dataType = static_cast<HcclDataType>(tiling.srcDataType);
+}
+
+HcclResult PrepareAllToAllSelectorInput(
+    HcclComm comm, const HcclApi::Mc2CcTilingInner& tiling, u64 dataCount, std::vector<u64>& allToAllVarData,
+    OpParam& opParam)
+{
+    if (opParam.opType != HcclCMDType::HCCL_CMD_ALLTOALL || dataCount == 0U) {
+        return HCCL_SUCCESS;
+    }
+
+    u32 rankSize = 0U;
+    CHK_RET(HcclGetRankSize(comm, &rankSize));
+    allToAllVarData.assign(ALL_TO_ALL_VECTOR_NUM * rankSize, 0U);
+    auto* sendCounts = allToAllVarData.data();
+    auto* recvCounts = sendCounts + ALL_TO_ALL_OFFSET_RECV_COUNTS * rankSize;
+    auto* sdispls = sendCounts + ALL_TO_ALL_OFFSET_SDISPLS * rankSize;
+    auto* rdispls = sendCounts + ALL_TO_ALL_OFFSET_RDISPLS * rankSize;
+    for (u32 i = 0U; i < rankSize; ++i) {
+        sendCounts[i] = dataCount;
+        recvCounts[i] = dataCount;
+        sdispls[i] = static_cast<u64>(i) * dataCount;
+        rdispls[i] = static_cast<u64>(i) * dataCount;
+    }
+
+    opParam.All2AllDataDes.sendType = static_cast<HcclDataType>(tiling.srcDataType);
+    opParam.All2AllDataDes.recvType = static_cast<HcclDataType>(tiling.dstDataType);
+    opParam.All2AllDataDes.sendCount = dataCount;
+    opParam.All2AllDataDes.recvCount = dataCount;
+    opParam.All2AllDataDes.sendCounts = reinterpret_cast<void*>(sendCounts);
+    opParam.All2AllDataDes.recvCounts = reinterpret_cast<void*>(recvCounts);
+    opParam.All2AllDataDes.sdispls = reinterpret_cast<void*>(sdispls);
+    opParam.All2AllDataDes.rdispls = reinterpret_cast<void*>(rdispls);
+    HCCL_INFO(
+        "[MC2_DATA_COUNT][OpBase] opType[%u], dataCount[%llu], rankSize[%u], sendType[%u], recvType[%u], algConfig[%s].",
+        static_cast<u32>(opParam.opType), static_cast<unsigned long long>(dataCount), rankSize,
+        static_cast<u32>(opParam.All2AllDataDes.sendType), static_cast<u32>(opParam.All2AllDataDes.recvType),
+        tiling.algConfig);
+    return HCCL_SUCCESS;
+}
 } // namespace
 HcclResult HcclGetInitTilingList(const void* mc2Tiling, const void* p[], uint32_t& cnt)
 {
@@ -72,13 +138,19 @@ HcclResult HcclMc2ComResourceByTiling(HcclComm comm, void* mc2Tiling, rtStream_t
         opParam.syncMode = SyncMode::DEFAULT_TIMEWAITSYNCMODE;
         opParam.aicpuUnfoldMode = true;
         opParam.opType = static_cast<HcclCMDType>(tiling->opType);
+        const u64 dataCount = GetCcTilingDataCount(tiling);
+        std::vector<u64> allToAllVarData;
+        PrepareFixedCountSelectorInput(*tiling, dataCount, opParam);
+        CHK_RET(PrepareAllToAllSelectorInput(comm, *tiling, dataCount, allToAllVarData, opParam));
         if (opParam.opType == HcclCMDType::HCCL_CMD_BATCH_WRITE) {
             opParam.BatchWriteDataDes.queueNum = LOCAL_STREAM_MAX_NUM;
             HCCL_INFO("Requiring %u queues for batch-write.", opParam.BatchWriteDataDes.queueNum);
         }
         HCCL_INFO(
-            "Comm resource will be created for group %s. isAicpuCommEngine[%d] commEngine[%u]", commIdentifier.c_str(),
-            isAicpuCommEngine, tiling->commEngine);
+            "Comm resource will be created for group %s. isAicpuCommEngine[%d] commEngine[%u] opType[%u] "
+            "dataCount[%llu] algConfig[%s]",
+            commIdentifier.c_str(), isAicpuCommEngine, tiling->commEngine, tiling->opType,
+            static_cast<unsigned long long>(dataCount), tiling->algConfig);
         CHK_RET(hcclComm->AllocComResourceByTiling(tiling->algConfig, reinterpret_cast<void*>(&opParam)));
         // commEngine为0代表使能AICPU引擎
         if (!isAicpuCommEngine && tiling->commEngine == ENABLE_AICPU_COMM_ENGINE) {
@@ -108,6 +180,18 @@ HcclResult HcclMc2ComOpResCtx(
     opParam.syncMode = SyncMode::DEFAULT_TIMEWAITSYNCMODE;
     opParam.aicpuUnfoldMode = true;
     opParam.opType = static_cast<HcclCMDType>(opType);
+    HcclApi::Mc2CcTilingInner tiling{};
+    tiling.version = 1U;
+    tiling.srcDataType = static_cast<uint8_t>(srcDataType);
+    tiling.dstDataType = static_cast<uint8_t>(dstDataType);
+    tiling.opType = static_cast<uint32_t>(opParam.opType);
+    tiling.dataCount = count;
+    if (algConfig != nullptr) {
+        (void)strncpy_s(tiling.algConfig, sizeof(tiling.algConfig), algConfig, sizeof(tiling.algConfig) - 1);
+    }
+    std::vector<u64> allToAllVarData;
+    PrepareFixedCountSelectorInput(tiling, count, opParam);
+    CHK_RET(PrepareAllToAllSelectorInput(comm, tiling, count, allToAllVarData, opParam));
     if (opParam.opType == HcclCMDType::HCCL_CMD_BATCH_WRITE) {
         opParam.BatchWriteDataDes.queueNum = LOCAL_STREAM_MAX_NUM;
         HCCL_INFO("Requiring %u queues for batch-write.", opParam.BatchWriteDataDes.queueNum);

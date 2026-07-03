@@ -58,6 +58,7 @@ void PrintMc2CcTiling(const Mc2CcTilingInner& tiling)
     TILING_LOG_DEBUG("Mc2CcTiling msg dstDataType:%u", tiling.dstDataType);
     TILING_LOG_DEBUG("Mc2CcTiling msg srcDataType:%u", tiling.srcDataType);
     TILING_LOG_DEBUG("Mc2CcTiling msg commEngine:%u", tiling.commEngine);
+    TILING_LOG_DEBUG("Mc2CcTiling msg dataCount:%lu", tiling.dataCount);
     TILING_LOG_DEBUG("Mc2CcTiling msg end.");
 }
 
@@ -177,6 +178,7 @@ uint32_t Mc2CcTilingConfig::GetTiling(::Mc2CcTiling& tiling)
     tilingInner->stepSize = impl_.stepSize_;
     tilingInner->version = 1U;
     (void)memset_s(tilingInner->reserved, sizeof(tilingInner->reserved), 0, sizeof(tilingInner->reserved));
+    (void)memset_s(tilingInner->reserved2, sizeof(tilingInner->reserved2), 0, sizeof(tilingInner->reserved2));
     auto ret = strcpy_s(tilingInner->groupName, sizeof(tilingInner->groupName), impl_.groupName_.c_str());
     ASCENDC_HOST_ASSERT(ret == EOK, return EXIT_FAILURE, "groupName(%s) copy failed.", impl_.groupName_.c_str());
     ret = strcpy_s(tilingInner->algConfig, sizeof(tilingInner->algConfig), impl_.algConfig_.c_str());
@@ -186,6 +188,7 @@ uint32_t Mc2CcTilingConfig::GetTiling(::Mc2CcTiling& tiling)
     tilingInner->srcDataType = impl_.srcDataType_;
     tilingInner->dstDataType = impl_.dstDataType_;
     tilingInner->commEngine = impl_.commEngine_;
+    tilingInner->dataCount = impl_.dataCount_;
 
     uint64_t ccTilingAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&tiling));
     ASCENDC_HOST_ASSERT(
@@ -296,6 +299,12 @@ uint32_t Mc2CcTilingConfig::SetCommBlockNum(uint16_t num)
 uint32_t Mc2CcTilingConfig::SetCommEngine(uint8_t commEngine)
 {
     impl_.commEngine_ = commEngine;
+    return EXIT_SUCCESS;
+}
+
+uint32_t Mc2CcTilingConfig::SetDataCount(uint64_t count)
+{
+    impl_.dataCount_ = count;
     return EXIT_SUCCESS;
 }
 } // namespace AscendC

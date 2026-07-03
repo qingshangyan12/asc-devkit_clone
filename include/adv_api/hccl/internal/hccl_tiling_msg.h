@@ -46,8 +46,10 @@ struct Mc2CcTilingInner {
     char algConfig[ALG_CONFIG_SIZE];
     uint32_t opType;
     uint32_t reduceType;
-    char reserved2[232];
+    uint64_t dataCount;
+    char reserved2[224];
 };
+static_assert(sizeof(Mc2CcTilingInner) == 512U, "Mc2CcTilingInner size must be 512 bytes.");
 } // namespace HcclApi
 
 #endif // IMPL_HCCL_HCCL_TILING_MSG_H

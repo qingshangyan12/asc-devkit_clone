@@ -37,6 +37,10 @@ class CollAlgExecRegistryV2;
 
 constexpr uint32_t MC2_TILING_VERSION = 2U;
 constexpr uint32_t MAX_HCOM_NUM = 3U;
+constexpr uint8_t MC2_CC_TILING_VERSION = 2U;
+constexpr uint32_t ALL_TO_ALL_V_OFFSET_RECV_COUNTS = 1U;
+constexpr uint32_t ALL_TO_ALL_V_OFFSET_SDISPLS = 2U;
+constexpr uint32_t ALL_TO_ALL_V_OFFSET_RDISPLS = 3U;
 
 constexpr uint32_t INIT_TILING_VERSION = 100U;
 constexpr uint32_t MAX_CC_TILING_NUM = 8U;
@@ -77,7 +81,10 @@ struct Mc2CcTilingInner {
     char algConfig[MC2_ALG_CONFIG_SIZE];
     uint32_t opType;
     uint32_t reduceType;
+    uint64_t dataCount;
+    char reserved2[224];
 };
+static_assert(sizeof(Mc2CcTilingInner) == 512U, "Mc2CcTilingInner size must be 512 bytes.");
 
 struct AlgInfo {
     uint64_t offset;
@@ -262,6 +269,14 @@ HcclResult ConvertAlltoAllParam(
     return HCCL_SUCCESS;
 }
 
+u64 GetCcTilingDataCount(const Mc2CcTilingInner* ccTiling)
+{
+    if (ccTiling == nullptr || ccTiling->version < MC2_CC_TILING_VERSION) {
+        return 0U;
+    }
+    return ccTiling->dataCount;
+}
+
 HcclResult PrepareOpsCommParam(const std::string& tag, OpParam& param)
 {
     param.opMode = OpMode::OPBASE;
@@ -313,7 +328,8 @@ HcclResult PrepareParamForAllGather(
 
     param.opType = HcclCMDType::HCCL_CMD_ALLGATHER;
     param.DataDes.dataType = static_cast<HcclDataType>(ccTiling->srcDataType);
-    param.DataDes.count = 0;
+    param.DataDes.outputType = static_cast<HcclDataType>(ccTiling->dstDataType);
+    param.DataDes.count = GetCcTilingDataCount(ccTiling);
 
     HCCL_INFO("Print PrepareParamForAllGather.");
     CHK_RET(PrintOpsCommParam(param));
@@ -339,7 +355,8 @@ HcclResult PrepareParamForAllReduce(
     param.opType = HcclCMDType::HCCL_CMD_ALLREDUCE;
     param.reduceType = static_cast<HcclReduceOp>(ccTiling->reduceType);
     param.DataDes.dataType = static_cast<HcclDataType>(ccTiling->srcDataType);
-    param.DataDes.count = 0;
+    param.DataDes.outputType = static_cast<HcclDataType>(ccTiling->dstDataType);
+    param.DataDes.count = GetCcTilingDataCount(ccTiling);
 
     HCCL_INFO("Print PrepareParamForAllReduce.");
     CHK_RET(PrintOpsCommParam(param));
@@ -366,7 +383,8 @@ HcclResult PrepareParamForReduceScatter(
     param.opType = HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
     param.reduceType = static_cast<HcclReduceOp>(ccTiling->reduceType);
     param.DataDes.dataType = static_cast<HcclDataType>(ccTiling->srcDataType);
-    param.DataDes.count = 0;
+    param.DataDes.outputType = static_cast<HcclDataType>(ccTiling->dstDataType);
+    param.DataDes.count = GetCcTilingDataCount(ccTiling);
 
     HCCL_INFO("Print PrepareParamForReduceScatter.");
     CHK_RET(PrintOpsCommParam(param));
@@ -569,12 +587,42 @@ HcclResult GetOpParam(
     // 该数组持有在本函数栈帧，覆盖opParam的全部使用范围。
     constexpr uint64_t ALLTOALL_DEFAULT_SEND_COUNTS = 200ULL * 1024 * 1024;
     std::vector<uint64_t> sendCounts;
+    std::vector<uint64_t> allToAllVarData;
     void* origSendCounts = opParam.all2AllVDataDes.sendCounts;
+    void* origRecvCounts = opParam.all2AllVDataDes.recvCounts;
+    void* origSdispls = opParam.all2AllVDataDes.sdispls;
+    void* origRdispls = opParam.all2AllVDataDes.rdispls;
     if (opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALL) {
         uint32_t userRankSize = 0;
         CHK_RET(HcclGetRankSize(comm, &userRankSize));
-        sendCounts.assign(userRankSize, ALLTOALL_DEFAULT_SEND_COUNTS);
-        opParam.all2AllVDataDes.sendCounts = reinterpret_cast<void*>(sendCounts.data());
+        const uint64_t dataCount = GetCcTilingDataCount(ccTiling);
+        if (dataCount > 0U) {
+            allToAllVarData.assign(ALL_TO_ALL_V_VECTOR_NUM * userRankSize, 0U);
+            auto* sendCountPtr = allToAllVarData.data();
+            auto* recvCountPtr = sendCountPtr + userRankSize;
+            auto* sdisplsPtr = sendCountPtr + ALL_TO_ALL_V_OFFSET_SDISPLS * userRankSize;
+            auto* rdisplsPtr = sendCountPtr + ALL_TO_ALL_V_OFFSET_RDISPLS * userRankSize;
+            for (uint32_t i = 0U; i < userRankSize; ++i) {
+                sendCountPtr[i] = dataCount;
+                recvCountPtr[i] = dataCount;
+                sdisplsPtr[i] = static_cast<uint64_t>(i) * dataCount;
+                rdisplsPtr[i] = static_cast<uint64_t>(i) * dataCount;
+            }
+            opParam.varMemSize = allToAllVarData.size() * sizeof(uint64_t);
+            opParam.all2AllVDataDes.sendCounts = reinterpret_cast<void*>(sendCountPtr);
+            opParam.all2AllVDataDes.recvCounts = reinterpret_cast<void*>(recvCountPtr);
+            opParam.all2AllVDataDes.sdispls = reinterpret_cast<void*>(sdisplsPtr);
+            opParam.all2AllVDataDes.rdispls = reinterpret_cast<void*>(rdisplsPtr);
+        } else {
+            sendCounts.assign(userRankSize, ALLTOALL_DEFAULT_SEND_COUNTS);
+            opParam.all2AllVDataDes.sendCounts = reinterpret_cast<void*>(sendCounts.data());
+        }
+        HCCL_INFO(
+            "[MC2_DATA_COUNT][GetOpParam] opType[%u], dataCount[%llu], rankSize[%u], sendType[%u], recvType[%u], "
+            "algConfig[%s].",
+            static_cast<uint32_t>(opParam.opType), static_cast<unsigned long long>(dataCount), userRankSize,
+            static_cast<uint32_t>(opParam.all2AllVDataDes.sendType),
+            static_cast<uint32_t>(opParam.all2AllVDataDes.recvType), ccTiling->algConfig);
     }
 
     std::string algName;
@@ -590,6 +638,9 @@ HcclResult GetOpParam(
     CHK_RET(HandleSingleRankAndCommMode(comm, opParam, skipGetRes));
     if (skipGetRes) {
         opParam.all2AllVDataDes.sendCounts = origSendCounts;
+        opParam.all2AllVDataDes.recvCounts = origRecvCounts;
+        opParam.all2AllVDataDes.sdispls = origSdispls;
+        opParam.all2AllVDataDes.rdispls = origRdispls;
         return HCCL_SUCCESS;
     }
 
@@ -598,6 +649,9 @@ HcclResult GetOpParam(
     // GetOpParamResCtx执行结束，sendCounts的临时host数组已不再需要，
     // 将指向恢复为原值(大概率为nullptr)，避免遗留指向本函数栈内vector的悬空指针。
     opParam.all2AllVDataDes.sendCounts = origSendCounts;
+    opParam.all2AllVDataDes.recvCounts = origRecvCounts;
+    opParam.all2AllVDataDes.sdispls = origSdispls;
+    opParam.all2AllVDataDes.rdispls = origRdispls;
     return HCCL_SUCCESS;
 }
 
