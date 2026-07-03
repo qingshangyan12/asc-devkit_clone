@@ -1,6 +1,6 @@
 # Reg矢量计算编程<a name="ZH-CN_TOPIC_0000002600000001"></a>
 
-> 📌 **提示**：Reg矢量编程仅在Ascend 950PR/Ascend 950DT进行SIMD矢量计算编程时支持。
+> 📌 **提示**：Reg矢量编程仅在[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)进行SIMD矢量计算编程时支持。
 
 本文介绍如何在Ascend C中使用语言扩展C API进行寄存器级**矢量计算编程**，该能力面向已经熟悉[Ascend C编程模型](../../编程模型概述.md)的开发者。这种基于硬件寄存器的编程方式称为Reg矢量计算编程。
 
@@ -20,7 +20,7 @@
 
 ### Reg矢量计算的定位
 
-为了突破上述Memory矢量编程瓶颈限制，Ascend 950PR/Ascend 950DT在硬件中新增了一级缓存**SIMD Register File**（以下简称寄存器）这一级存储；Reg矢量编程正是面向这一级寄存器的编程方式。其核心思想是：将一段连续的矢量计算保留在寄存器中完成，仅在进入和退出这段计算时与UB交互一次，中间结果可不再回写UB。
+为了突破上述Memory矢量编程瓶颈限制，[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)在硬件中新增了一级缓存**SIMD Register File**（以下简称寄存器）这一级存储；Reg矢量编程正是面向这一级寄存器的编程方式。其核心思想是：将一段连续的矢量计算保留在寄存器中完成，仅在进入和退出这段计算时与UB交互一次，中间结果可不再回写UB。
 
 Reg矢量计算与Memory矢量计算的对比如下：
 
@@ -89,7 +89,7 @@ AIV的内存层级如下：
 
 **图3** Regbase编程总体结构
 
-![](../../../../figures/Regbase编程模型总体结构.png "RRegbase编程模型总体结构")
+![](../../../../figures/Regbase编程模型总体结构.png "Regbase编程模型总体结构")
 
 ### VF函数与执行域
 
@@ -129,14 +129,14 @@ Reg矢量计算编程模型中`Load` -> `Compute`  ->`Store`的执行过程，�
 ```cpp
 __aicore__ inline void compute()
 {
-    // 1. 准备输入/输出数据。
+    // 1. Prepare input/output data.
     // ...
 
-    // 2. 通过asc_vf_call进入寄存器级VF函数域。
+    // 2. Enter register-level VF function domain via asc_vf_call.
     asc_vf_call<add_vf>(dst_addr, src0_addr, src1_addr,
                         one_repeat_size, repeat_times);
 
-    // 3. 收尾工作。
+    // 3. Finalize work.
     // ...
 }
 ```
@@ -156,7 +156,7 @@ for (i = 0; i < repeat_times; ++i) {
 
 寄存器根据功能类型主要分以下五类，在实际编程代码中，寄存器作为变量直接使用，由编译器自动分配到硬件寄存器。
 
-| 寄存器类型 | 变量类型定义 | Ascend 950PR/Ascend 950DT |
+| 寄存器类型 | 变量类型定义 | [NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md) |
 | --- | --- | --- |
 | 矢量数据寄存器 | `vector_*`，例如vector_float | VL = 256B |
 | 掩码寄存器 | `vector_bool` | VL/8 = 32B |
@@ -166,7 +166,7 @@ for (i = 0; i < repeat_times; ++i) {
 
 #### 矢量数据寄存器
 
-在Ascend 950PR/Ascend 950DT中，矢量数据寄存器宽度为VL = 256B，按数据类型解释其中元素数量。
+在[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)中，矢量数据寄存器宽度为VL = 256B，按数据类型解释其中元素数量。
 
 
 | 位宽      | 矢量数据类型| 元素数 |
@@ -181,16 +181,16 @@ for (i = 0; i < repeat_times; ++i) {
 
 
 ```cpp
-// 申请矢量数据寄存器，定义数据类型为float
+// Allocate vector data register with float data type
 vector_float vector_reg;
 
-// 申请矢量数据寄存器，定义数据类型为half
+// Allocate vector data register with half data type
 vector_half vector_reg;
 
-// 将UB地址为src_addr的数据加载到vector_float src0_reg
+// Load data from UB address src_addr to vector_float src0_reg
 asc_load(src0_reg, src_addr);
 
-// vector_float src0_reg, src1_reg, dst_reg计算加法
+// Compute addition with vector_float src0_reg, src1_reg, dst_reg
 asc_add(dst_reg, src0_reg, src1_reg, mask_reg);
 ```
 
@@ -214,16 +214,16 @@ asc_add(dst_reg, src0_reg, src1_reg, mask_reg);
 `vector_bool`的创建以及常见的使用方式如下：
 
 ```cpp
-// 直接申请掩码寄存器
+// Directly allocate mask register
 vector_bool mask_reg;
 
-// 创建全部元素有效的掩码寄存器
+// Create mask register with all elements valid
 vector_bool mask_reg = asc_create_mask_b32(PAT_ALL);
 
-// 根据剩余元素更新创建掩码寄存器
+// Create mask register based on remaining elements update
 vector_bool mask = asc_update_mask_b32(remainCount);
 
-// vector_bool mask_reg作为控制参与计算有效元素掩码
+// Use vector_bool mask_reg as mask to control valid elements in computation
 asc_add(dst_reg, src0_reg, src1_reg, mask_reg);
 ```
 
@@ -232,7 +232,7 @@ asc_add(dst_reg, src0_reg, src1_reg, mask_reg);
 当用作1bit元素参与运算时，支持vector_* 和vector_bool的混合计算以及vector_bool和vector_bool的计算
 
 ```cpp
-// vector_bool dst_mask_reg作为x计算参数与vector_* src0_vector_reg计算
+// Use vector_bool dst_mask_reg as x computation parameter with vector_* src0_vector_reg
 asc_select(dst_mask_reg, src0_vector_reg, src1_vector_reg, mask_reg);
 
 // vector_bool src0_mask_reg, src1_mask_reg, dst_mask_reg作为参数计算
@@ -244,9 +244,9 @@ asc_and(dst_mask_reg, src0_mask_reg, src1_mask_reg, mask_reg);
 `iter_reg`用于保存UB访问的地址偏移量。它把原本需要在循环体内反复执行的标量地址计算转化为寄存器化的地址管理，最多支持四维偏移叠加。`AddrReg`通过`asc_create_iter_reg_b*`初始化，偏移量计算公式为：`offset = index0*stride0 + index1*stride1 + ...`。
 
 ```cpp
-// 申请地址迭代寄存器
+// Allocate address iteration register
 iter_reg a_reg;
-// 作为b32元素的2维偏移叠加
+// Use as 2D offset accumulation for b32 elements
 for(uint16_t i = 0;i < extent1; i++){
     for(uint16_t j = 0;j < extent2; j++){
         a_reg = asc_create_iter_reg_b32(i, stride0, j, stride1);
@@ -260,7 +260,7 @@ for(uint16_t i = 0;i < extent1; i++){
 `vector_load_unalign`用于实现从UB非对齐地址连续搬入到矢量数据寄存器的临时缓存，首先通过`asc_loadunalign_pre`初始化，将包含非对齐的数据载入`vector_load_unalign`，然后调用`asc_loadunalign`搬运数据。具体的使用流程可以参考后续[特性描述](#section_part4)章节中对非对齐搬运的描述。
 
 ```
-// 申请搬入非对齐寄存器
+// Allocate load unalign register
 vector_load_unalign ureg0;
 
 // 使用非对齐UB地址src_addr,初始化vector_load_unalign
@@ -275,13 +275,13 @@ asc_loadunalign(src_reg, ureg0, src_addr);
 `vector_store_unalign`用于实现从矢量数据寄存器搬出到UB非对齐地址的临时缓存，首先通过`asc_storeunalign`搬运数据，尾部数据会保留在`vector_store_unalign`，最后调用一次`asc_storeunalign_post`，将`vector_store_unalign`内的尾部数据搬出到UB，具体的使用流程可以参考后续[特性描述](#section_part4)章节中对非对齐搬运的描述。
 
 ```cpp
-// 申请搬出非对齐寄存器
+// Allocate store unalign register
 vector_store_unalign ureg0;
 
 // 搬出vreg0到非对齐UB地址dst_addr
 asc_storeunalign(dst_addr, vreg0, ureg0, stride);
 
-// 将搬出非对齐寄存器尾部数据搬出到UB
+// Store tail data from store unalign register to UB
 asc_storeunalign_post(dst_addr, ureg0, 0);
 ```
 
@@ -299,13 +299,13 @@ asc_storeunalign_post(dst_addr, ureg0, 0);
 显式同步通过asc_mem_bar实现：
 
 ```cpp
-// store数据UB地址和load数据UB地址相同时，插入源Store到目的Load同步
+// Insert source Store to destination Load synchronization when store and load UB addresses are the same
 asc_store(ub_addr, vreg0);
 asc_mem_bar(VST_LD);
 asc_load(vreg1, ub_addr);
 ```
 
-同步的方向包括多个指定的[枚举值](../../../../../api/c_api/reg/reg_vector/asc_mem_bar.md)，用于指定需要同步的两条流水方向。如下图**操作相同UB地址时**，读写依赖需要插入`Load->Store`同步`asc_mem_bar(VLD_ST)` ；写写依赖需要插入Store->Store同步`asc_mem_bar(VST_ST)`  。仅当在读写相同UB地址中间存在寄存器变量依赖计算时，同一数据串行处理，无需插入同步。
+同步的方向包括多个指定的[枚举值](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_vector/asc_mem_bar.md)，用于指定需要同步的两条流水方向。如下图**操作相同UB地址时**，读写依赖需要插入`Load->Store`同步`asc_mem_bar(VLD_ST)` ；写写依赖需要插入Store->Store同步`asc_mem_bar(VST_ST)`  。仅当在读写相同UB地址中间存在寄存器变量依赖计算时，同一数据串行处理，无需插入同步。
 
 **图5** 流水线同步示意
 
@@ -334,7 +334,7 @@ Reg矢量计算C API（在源码中以`asc_`为前缀，属于语言扩展C API�
 下面是一个compute调用的VF函数示例，实现`dst[i] = src0[i] + src1[i]`：
 
 ```cpp
-// VF函数：在寄存器域完成向量加法
+// VF function: complete vector addition in register domain
 __simd_vf__ inline void add_vf(__ubuf__ float* dst_addr,
                                __ubuf__ float* src0_addr,
                                __ubuf__ float* src1_addr,
@@ -355,7 +355,7 @@ __simd_vf__ inline void add_vf(__ubuf__ float* dst_addr,
     }
 }
 
-// 调用方：在__aicore__域准备LocalTensor和UB地址
+// Caller: prepare LocalTensor and UB address in __aicore__ domain
 __aicore__ inline void compute(__ubuf__ float* dst_addr,
                                __ubuf__ float* src0_addr,
                                __ubuf__ float* src1_addr,
@@ -383,16 +383,16 @@ Reg矢量编程的关键特性按用途分为三大类：
 
 #### 通用搬运
 
-[`asc_load`](../../../../../api/c_api/reg/reg_load/asc_load.md) / [`asc_store`](../../../../../api/c_api/reg/reg_store/asc_store.md)是不区分UB地址是否对齐的通用搬运接口，用于将连续VL数据在UB与矢量数据寄存器之间搬运，或将不超过一个VL的元素数据从矢量数据寄存器搬出到UB。
+[`asc_load`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_load/asc_load.md) / [`asc_store`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_store/asc_store.md)是不区分UB地址是否对齐的通用搬运接口，用于将连续VL数据在UB与矢量数据寄存器之间搬运，或将不超过一个VL的元素数据从矢量数据寄存器搬出到UB。
 
 ```cpp
-// 搬运1个VL长度的数据，从UB地址src_addr到矢量数据寄存器src_reg
+// Transfer 1 VL length data from UB address src_addr to vector data register src_reg
 asc_load(src_reg, src_addr);
 
-// 搬运1个VL长度的数据，从矢量数据寄存器到UB地址dst_addr
+// Transfer 1 VL length data from vector data register to UB address dst_addr
 asc_store(dst_addr, dst_reg);
 
-// 搬运少于1个VL长度的数据10个元素，从矢量数据寄存器到UB地址dst_addr
+// Transfer less than 1 VL length data (10 elements) from vector data register to UB address dst_addr
 asc_store(dst_addr, dst_reg, 10);
 ```
 
@@ -402,13 +402,13 @@ asc_store(dst_addr, dst_reg, 10);
 
 #### 对齐搬运
 
-[`asc_loadalign`](../../../../../api/c_api/reg/reg_load/asc_loadalign) / [`asc_storealign`](../../../../../api/c_api/reg/reg_store/asc_storealign)要求UB地址满足32B对齐。相比通用搬运，对齐搬运的性能开销更低，是连续对齐场景下的首选接口。
+[`asc_loadalign`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_load/asc_loadalign/asc_loadalign.md) / [`asc_storealign`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_store/asc_storealign/asc_storealign.md)要求UB地址满足32B对齐。相比通用搬运，对齐搬运的性能开销更低，是连续对齐场景下的首选接口。
 
 ```cpp
 for (uint16_t i = 0; i < repeat_times; ++i) {
     uint32_t offset = i * one_repeat_size;
     asc_loadalign(srcReg, src_addr + offset);
-    // RegTensor上的计算
+    // Computation on RegTensor
     ...
     asc_storealign(dst_addr + offset, dstReg, mask);
 }
@@ -420,8 +420,8 @@ for (uint16_t i = 0; i < repeat_times; ++i) {
 
 非对齐搬运是指UB地址非对齐，但仍需要在UB和矢量数据寄存器之间连续读写数据的场景。在直接与非对齐UB地址进行数据搬运时，硬件性能会急剧下降，为了提升此场景性能，通过`vector_load_unalign` / `vector_store_unalign`作为临时缓存，保存跨对齐边界的数据，通过多轮循环拼接成对齐地址的读写，减少直接访问非对齐UB地址的次数，从而减少非对齐访问的额外开销。
 
-**非对齐搬入**由[`asc_loadunalign_pre`](../../../../../api/c_api/reg/reg_load/asc_loadunalign_pre.md)和[`asc_loadunalign`](../../../../../api/c_api/reg/reg_load/asc_loadunalign.md)组合完成：
-例如在Ascend 950PR/Ascend 950DT，当想要搬入如下UB地址为48开始的256Bytes数据时:
+**非对齐搬入**由[`asc_loadunalign_pre`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_load/asc_loadunalign_pre.md)和[`asc_loadunalign`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_load/asc_loadunalign.md)组合完成：
+例如在[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，当想要搬入如下UB地址为48开始的256Bytes数据时:
 
 **图6** 非对齐搬入预期
 
@@ -439,8 +439,8 @@ for (uint16_t i = 0; i < repeat_times; ++i) {
 
    ![](../../../../figures/Reg非对齐读4.png "Reg非对齐读4")
 
-**非对齐搬出**由[`asc_storeunalign`](../../../../../api/c_api/reg/reg_store/asc_storeunalign.md)和[`asc_storeunalign_post`](../../../../../api/c_api/reg/reg_store/asc_storeunalign_post.md)组合完成：循环内使用`asc_storeunalign`搬运，循环结束后由`asc_storeunalign_post`将`vector_store_unalign`中的尾部数据搬出到UB。
-例如在Ascend 950PR/Ascend 950DT，当想要搬出如下UB地址为48开始的512Bytes数据时：
+**非对齐搬出**由[`asc_storeunalign`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_store/asc_storeunalign.md)和[`asc_storeunalign_post`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_store/asc_storeunalign_post.md)组合完成：循环内使用`asc_storeunalign`搬运，循环结束后由`asc_storeunalign_post`将`vector_store_unalign`中的尾部数据搬出到UB。
+例如在[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，当想要搬出如下UB地址为48开始的512Bytes数据时：
 
 **图9** 非对齐搬出预期
 
@@ -473,7 +473,7 @@ vector_store_unalign store_ureg;
 asc_loadunalign_pre(load_ureg, src_addr);
 for (uint16_t i = 0; i < repeat_times; ++i) {
     asc_loadunalign(src_reg, load_ureg, src_addr, stride);
-    // Reg矢量计算
+    // Reg vector computation
     ...
     asc_storeunalign(dst_addr, dst_reg, store_ureg, stride);
 }
@@ -481,7 +481,7 @@ asc_storeunalign_post(dst_addr, store_ureg, 0);
 ```
 
 #### PostUpdate模式
-PostUpdate表示搬运接口在完成本次访问后自动更新UB地址指针。在搬运接口会以*_postupdate结尾表示。例如：使用对齐搬运的[`asc_loadalign_postupdate`](../../../../../api/c_api/reg/reg_load/asc_loadunalign_postupdate.md)。当i = 0时：搬入数据地址src_addr，同时在搬运后硬件更新src_addr = src_addr + offset；当i = 1时：搬入数据地址为更新后的src_addr,同时在搬运后硬件再次更新src_addr = src_addr + stride；以此类推。
+PostUpdate表示搬运接口在完成本次访问后自动更新UB地址指针。在搬运接口会以*_postupdate结尾表示。例如：使用对齐搬运的[`asc_loadalign_postupdate`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_load/asc_loadunalign_postupdate.md)。当i = 0时：搬入数据地址src_addr，同时在搬运后硬件更新src_addr = src_addr + offset；当i = 1时：搬入数据地址为更新后的src_addr,同时在搬运后硬件再次更新src_addr = src_addr + stride；以此类推。
 
 ```cpp
 for (uint16_t i = 0; i < repeat_times; ++i) {
@@ -511,6 +511,78 @@ for (uint16_t i = 0; i < extent1; ++i) {
 `iter_reg`最多支持四维寻址，偏移量公式为`offset = index0*stride0 + index1*stride1 + index2*stride2 + index3*stride3`。
 
 ### 矢量计算
+
+Reg矢量计算接口直接操作矢量数据寄存器或掩码寄存器，通常带有mask参数控制有效元素。主要分为三类：
+
+#### 矢量数据寄存器计算
+
+基础算术接口完成寄存器之间的逐元素计算：
+
+```cpp
+vector_float src0_reg;
+vector_float src1_reg;
+vector_float dst_reg;
+vector_bool mask = asc_create_mask_b32(MASK_PATTERN_ALL);
+
+// 矢量加法
+asc_add(dst_reg, src0_reg, src1_reg, mask);
+
+// 矢量乘法
+asc_mul(dst_reg, src0_reg, src1_reg, mask);
+
+// 矢量减法
+asc_sub(dst_reg, src0_reg, src1_reg, mask);
+
+// 矢量除法
+asc_div(dst_reg, src0_reg, src1_reg, mask);
+```
+
+标量算术接口完成寄存器与标量的逐元素计算：
+
+```cpp
+float scalar_value = 2.0f;
+
+// 矢量加标量
+asc_adds(dst_reg, src_reg, scalar_value, mask);
+
+// 矢量乘标量
+asc_muls(dst_reg, src_reg, scalar_value, mask);
+```
+
+#### 掩码寄存器计算
+
+逻辑接口可操作矢量数据寄存器或掩码寄存器：
+
+```cpp
+vector_bool mask0;
+vector_bool mask1;
+vector_bool dst_mask;
+
+// 逻辑与
+asc_and(dst_mask, mask0, mask1, mask);
+
+// 逻辑或
+asc_or(dst_mask, mask0, mask1, mask);
+
+// 逻辑非
+asc_not(dst_mask, mask0, mask);
+```
+
+#### 比较与选择
+
+比较接口输出比较结果，选择接口按mask在两个源操作数之间选择：
+
+```cpp
+vector_bool cmp_mask;
+
+// 比较（输出比较结果mask）
+asc_compare(cmp_mask, src0_reg, src1_reg, CMPMODE::EQ, mask);
+
+// 选择（按cmp_mask选择src0或src1）
+asc_select(dst_reg, cmp_mask, src0_reg, src1_reg, SELMODE::SEL, mask);
+```
+
+这些接口往往有更多参数或限制条件，建议在具体使用时查看对应API页面。
 
 #### 尾块处理
 
@@ -608,6 +680,6 @@ VF融合可以分成两个层级：
 
 ## 小结<a name="section_part7"></a>
 
-Reg矢量计算编程基于Ascend 950PR/Ascend 950DT新增的SIMD Register File开放的寄存器级编程能力，使开发者直接组织寄存器搬运、计算、掩码控制和同步操作。它以`__aicore__`和`__simd_vf__`两层执行域为基本结构，其中`__aicore__`侧负责整体任务组织、数据切分和VF调用，`__simd_vf__`侧通过五类寄存器及其配套API完成细粒度矢量计算。
+Reg矢量计算编程基于[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)新增的SIMD Register File开放的寄存器级编程能力，使开发者直接组织寄存器搬运、计算、掩码控制和同步操作。它以`__aicore__`和`__simd_vf__`两层执行域为基本结构，其中`__aicore__`侧负责整体任务组织、数据切分和VF调用，`__simd_vf__`侧通过五类寄存器及其配套API完成细粒度矢量计算。
 
 实际开发时，Reg矢量计算不仅要关注接口本身，还需要结合硬件执行特征开发代码。优先使用对齐搬运，保持循环满足Hardware Loop识别规范，并在寄存器资源允许的范围内进行VF融合，通常可以减少搬运、同步和循环启动开销，从而获得更稳定的性能表现。
