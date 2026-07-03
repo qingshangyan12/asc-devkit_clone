@@ -28,7 +28,7 @@
 
 本样例用于验证Ascend C SIMT编程方式下同一个Warp内多个线程访问UB时的bank冲突现象。样例通过编译期参数`SCENARIO_NUM`选择不同case，构造同地址合并、连续float访问中的同一8B范围合并、跨bank/subbank分散访问、同subbank不同行冲突，以及同一bank group内同编号subbank冲突等典型访问模式。
 
-Host侧构造输入数组并拷贝到GM，kernel先将输入数据从GM搬入UB，再按照当前case对应的UB地址模式重复读取数据，并使用[`clock()`](../../../../../../docs/api/Utils-API/调测接口/clock.md)统计读取UB数据的cycles。
+Host侧构造输入数组并拷贝到GM，kernel先将输入数据从GM搬入UB，再按照当前case对应的UB地址模式重复读取数据，并使用[`clock()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/调测接口/clock.md)统计读取UB数据的cycles。
 
 ### 样例规格
 
@@ -88,7 +88,7 @@ SIMT编程方式下subbank冲突主要有以下几种：
 - `blockDim`：`(32, 1, 1)`。
 - `threadIdx.x`范围为0-31，对应同一个Warp内的32个线程。
 - 每个线程先按`threadIdx.x + n * blockDim.x`的索引模式参与GM到UB搬运，使`input[4096]`完整搬入UB数组。
-- 所有线程调用[`asc_syncthreads()`](../../../../../../docs/api/SIMT-API/同步与内存栅栏/同步接口/asc_syncthreads.md)同步后，每个线程根据自己的`thread_id`和当前case计算UB读索引，并重复读取`REPEAT_TIMES`次。
+- 所有线程调用[`asc_syncthreads()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/同步与内存栅栏/同步接口/asc_syncthreads.md)同步后，每个线程根据自己的`thread_id`和当前case计算UB读索引，并重复读取`REPEAT_TIMES`次。
 - Host侧校验32个线程的累加输出应与CPU计算结果一致；不同case的cycles可用于对比UB访问模式带来的开销差异。
 
 ### 访问打点

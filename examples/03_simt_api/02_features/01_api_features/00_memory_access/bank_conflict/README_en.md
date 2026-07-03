@@ -29,7 +29,7 @@ This example introduces UB bank conflicts that may occur when multiple threads i
 
 This example is used to verify UB bank conflict behavior when multiple threads in the same Warp access UB in Ascend C SIMT programming. The example uses the compile-time parameter `SCENARIO_NUM` to select different cases and construct typical access patterns, including same-address merge, same 8B-range merge in contiguous float access, cross-bank/subbank distributed access, same-subbank different-row conflicts, and same-index subbank conflicts within the same bank group.
 
-On the Host side, the input array is constructed and copied to GM. The kernel first moves input data from GM to UB, then repeatedly reads data according to the UB address pattern of the current case, and uses [`clock()`](../../../../../../docs/api/Utils-API/调测接口/clock.md) to count the cycles spent reading UB data.
+On the Host side, the input array is constructed and copied to GM. The kernel first moves input data from GM to UB, then repeatedly reads data according to the UB address pattern of the current case, and uses [`clock()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/调测接口/clock.md) to count the cycles spent reading UB data.
 
 ### Example Specifications
 
@@ -89,7 +89,7 @@ The kernel entry of this example is marked with `__global__`, and the maximum th
 - `blockDim`: `(32, 1, 1)`.
 - The range of `threadIdx.x` is 0-31, corresponding to 32 threads in the same Warp.
 - Each thread first participates in GM-to-UB movement with the index pattern `threadIdx.x + n * blockDim.x`, so that `input[4096]` is fully moved into the UB array.
-- After all threads call [`asc_syncthreads()`](../../../../../../docs/api/SIMT-API/同步与内存栅栏/同步接口/asc_syncthreads.md) for synchronization, each thread computes the UB read index according to its `thread_id` and the current case, and repeatedly reads the data `REPEAT_TIMES` times.
+- After all threads call [`asc_syncthreads()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/同步与内存栅栏/同步接口/asc_syncthreads.md) for synchronization, each thread computes the UB read index according to its `thread_id` and the current case, and repeatedly reads the data `REPEAT_TIMES` times.
 - The Host side verifies that the accumulated output of the 32 threads matches the CPU result. The cycles of different cases can be used to compare the overhead caused by different UB access patterns.
 
 ### Access Timing
