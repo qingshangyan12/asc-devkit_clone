@@ -251,7 +251,7 @@ SIMT编程模式下，L2 Cache是以Cache Line=128字节为单位进行访问。
 
 ## 性能数据获取
 
-使用 `msprof` 工具获取单个组件上的性能数据：
+使用 `msOpProf` 工具获取单个组件上的性能数据：
 
 ```bash
 msprof op ./demo   # 分析case的性能

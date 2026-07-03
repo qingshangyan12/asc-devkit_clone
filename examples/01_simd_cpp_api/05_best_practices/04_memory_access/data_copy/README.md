@@ -441,10 +441,10 @@ for (uint32_t mBlockIdx = 0; mBlockIdx < fullMBlockCount; mBlockIdx++) {
 
 - 性能采集
 
-  使用 `msprof` 工具获取详细性能数据：
+  使用 `msOpProf` 工具获取详细性能数据：
 
   ```bash
-  msprof ./demo
+  msprof op ./demo
   msprof --ai-core=on --aic-metrics=L2Cache ./demo    # L2Cache 相关场景使用
   ```
 

@@ -256,7 +256,7 @@ Cube                                               | Mmad Ping ---|   | Mmad Pon
 Fixpipe                                                           | fixpipe C ---
 ```
 
-图中横线长度只用于表达不同阶段耗时可能不同，并不代表实测比例；真实耗时需要以 `msprof` 采集结果为准。
+图中横线长度只用于表达不同阶段耗时可能不同，并不代表实测比例；真实耗时需要以 `msOpProf` 采集结果为准。
 
 在 K 循环中，当前 K block 进入 Cube 计算时，下一批 A/B/scaleA/scaleB 可以提前发起搬运。Ping 和 Pong 交替使用，生产者和消费者通过事件同步确认缓冲区是否可写、数据是否可读。
 
@@ -534,10 +534,10 @@ test pass!
 
 ### 性能分析
 
-使用 `msprof` 工具获取详细性能数据：
+使用 `msOpProf` 工具获取详细性能数据：
 
 ```bash
-msprof ./demo
+msprof op ./demo
 ```
 
 当前目录下会生成 PROF_ 前缀的文件夹，`mindstudio_profiler_output` 目录保存性能数据汇总，性能数据分析推荐查看该目录下文件：

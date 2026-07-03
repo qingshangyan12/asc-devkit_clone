@@ -283,7 +283,7 @@ AscendC::DataCopyPad<float>(cGM[gmOffset], geluOutUB, copyOutParams);
 
 **Performance Data**
 
-> The following data is based on msprof tool measurement, taking the median of 5 runs. Matrix specifications M=4096, K=1024, N=1536(A2)/N=1024(950PR), input data type float16, output data type float32.
+> The following data is based on msOpProf tool measurement, taking the median of 5 runs. Matrix specifications M=4096, K=1024, N=1536(A2)/N=1024(950PR), input data type float16, output data type float32.
 
 ##### Atlas A2 Training Series Chip
 
@@ -370,7 +370,7 @@ AscendC::DataCopyPad<float>(cGM[mBlockIdx * baseM * N + nBlockIdx * baseN + loca
 
 **Performance Data**
 
-> The following data is based on msprof tool measurement, taking the median of 5 runs. Matrix specifications M=4096, K=1024, N=1024, input data type float16, output data type float32.
+> The following data is based on msOpProf tool measurement, taking the median of 5 runs. Matrix specifications M=4096, K=1024, N=1024, input data type float16, output data type float32.
 
 ##### Ascend 950PR Chip
 
@@ -479,10 +479,10 @@ AscendC::DumpTensor(yLocal, 1, 16);
 
 ## Performance Debugging
 
-Use the `msprof` tool to obtain detailed performance data:
+Use the `msOpProf` tool to obtain detailed performance data:
 
 ```bash
-msprof ./demo   # Analyze example performance
+msprof op ./demo   # Analyze example performance
 ```
 
 A PROF_ prefixed folder is generated in the current directory. The `mindstudio_profiler_output` directory stores Host and Device performance data summaries. Performance data analysis is recommended to view files in this directory:

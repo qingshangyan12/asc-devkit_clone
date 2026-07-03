@@ -33,9 +33,9 @@
 
 输入`x`、`y`和输出`z`的Shape均为`[8, 2048]`。Host侧直接构造输入数据和golden数据，将输入数据拷贝到Device侧后启动`add_custom` Kernel，Kernel按`blockNum = 8`切分数据并完成Add计算，最后将结果拷贝回Host侧完成精度对比。
 
-## msProf工具介绍
+## msOpProf工具介绍
 
-msProf工具是单算子性能分析工具，包含`msprof op`和`msprof op simulator`两种使用方式。该工具可采集算子执行时间、流水占比、存储访问等性能数据，辅助分析算子性能瓶颈。
+msOpProf工具是单算子性能分析工具，包含`msprof op`和`msprof op simulator`两种使用方式。该工具可采集算子执行时间、流水占比、存储访问等性能数据，辅助分析算子性能瓶颈。
 
 - 上板性能采集
 

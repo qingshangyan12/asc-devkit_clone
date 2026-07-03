@@ -366,7 +366,7 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 
 ## 性能分析
 
-使用 `msprof` 工具获取详细性能数据：
+使用 `msOpProf` 工具获取详细性能数据：
 
 ```bash
 msprof op ./matrix_transpose   # 分析case的性能

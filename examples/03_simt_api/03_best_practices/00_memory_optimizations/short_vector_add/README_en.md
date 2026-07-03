@@ -250,7 +250,7 @@ Run the following steps in the root directory of this example to build and execu
 
 ## Performance Data Collection
 
-Use the `msprof` tool to collect performance data on a single component:
+Use the `msOpProf` tool to collect performance data on a single component:
 
 ```bash
 msprof op ./demo   # Analyze case performance
