@@ -16,7 +16,7 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_VECTOR_DATAMOVE_IMPL_REG_STORE_ASC_STOREUNALIGN_POSTUPDATE_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_VECTOR_DATAMOVE_IMPL_REG_STORE_ASC_STOREUNALIGN_POSTUPDATE_IMPL_H
 
-#include "instr_impl/npu_arch_3510/utils_impl.h"
+#include "../../utils_impl.h"
 
 // ==========偏移固定传入0，由用户自行更新目的操作数的地址=========
 __simd_callee__ inline void asc_storeunalign_postupdate_impl(__ubuf__  int8_t*& dst, vector_store_unalign& src0,
@@ -276,6 +276,31 @@ __simd_callee__ inline void asc_storeunalign_postupdate_impl(__ubuf__  int4b_t* 
     if ASC_IS_AIV {
         __ubuf__ float4_e1m2x2_t*& dst_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*&>(dst);
         vstur(src0, *reinterpret_cast<vector_fp4x2_e1m2_t*>(&src1), dst_tmp, POST_UPDATE);
+    }
+}
+
+__simd_callee__ inline void asc_storeunalign_postupdate_impl(__ubuf__ uint16_t*& dst, vector_store_unalign& src0,
+    vector_bool src1)
+{
+    if ASC_IS_AIV {
+        pstu(src0, src1, dst);
+    }
+}
+
+__simd_callee__ inline void asc_storeunalign_postupdate_impl(__ubuf__ uint32_t*& dst, vector_store_unalign& src0,
+    vector_bool src1)
+{
+    if ASC_IS_AIV {
+        pstu(src0, src1, dst);
+    }
+}
+
+__simd_callee__ inline void asc_storeunalign_postupdate_impl(__ubuf__ uint8_t*& dst, vector_store_unalign& src0,
+    vector_bool src1)
+{
+    if ASC_IS_AIV {
+        __ubuf__ uint32_t*& dst_tmp = reinterpret_cast<__ubuf__ uint32_t*&>(dst);
+        pstu(src0, src1, dst_tmp);
     }
 }
 

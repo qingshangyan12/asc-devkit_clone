@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
@@ -81,12 +93,7 @@ struct DequantizeConfig {
     bool hasOffset = false;
     int32_t kDim = 1;
 };
-enum class DequantizePolicy : int32_t {
-    PER_TENSOR,
-    PER_CHANNEL,
-    PER_TOKEN,
-    PER_GROUP
-};
+enum class DequantizePolicy : int32_t { PER_TENSOR, PER_CHANNEL, PER_TOKEN, PER_GROUP };
 ```
 
 **表2**  接口参数说明
@@ -102,9 +109,9 @@ enum class DequantizePolicy : int32_t {
 
 ```
 struct DequantizeParams {
-        uint32_t m;
-        uint32_t n;
-        uint32_t groupSize = 0;
+    uint32_t m;
+    uint32_t n;
+    uint32_t groupSize = 0;
 };
 ```
 
@@ -156,9 +163,9 @@ struct DequantizeParams {
     // m,n为外部传入参数，表示srcLocal实际参与的m、n方向的元素个数
     params.m = m;
     params.n = n;
-    params.groupSize = n;  // 仅PER_GROUP场景下生效，此处表示n方向所有元素共享一组scale和offset
+    params.groupSize = n; // 仅PER_GROUP场景下生效，此处表示n方向所有元素共享一组scale和offset
     // srcLocal为int32_t类型的LocalTensor，dstLocal、scaleLocal、offsetLocal为float类型的LocalTensor
-    Dequantize<config>(dstLocal, srcLocal, scaleLocal, offsetLocal, params);  // offsetLocal为预留参数，可配置为空Tensor;
+    Dequantize<config>(dstLocal, srcLocal, scaleLocal, offsetLocal, params); // offsetLocal为预留参数，可配置为空Tensor;
     ```
 
 -   PER\_TENSOR模式
@@ -171,9 +178,9 @@ struct DequantizeParams {
     // m,n为外部传入参数，表示srcLocal实际参与的m、n方向的元素个数
     params.m = m;
     params.n = n;
-    params.groupSize = 0;  // 仅PER_GROUP场景下生效
+    params.groupSize = 0; // 仅PER_GROUP场景下生效
     // srcLocal为int32_t类型的LocalTensor，dstLocal为float类型的LocalTensor，scale、offset为float类型的标量
-    Dequantize<config>(dstLocal, srcLocal, scale, offset, params);  // offset为预留参数，可配置为0;
+    Dequantize<config>(dstLocal, srcLocal, scale, offset, params); // offset为预留参数，可配置为0;
     ```
 
 结果示例如下：

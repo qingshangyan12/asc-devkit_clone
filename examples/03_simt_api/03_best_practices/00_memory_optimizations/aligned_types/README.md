@@ -114,11 +114,11 @@
   |      Task Duration(μs)      | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。          |
   |      aiv_total_cycles       | Task在 Vector Core上执行所消耗的CPU周期（Cycle）总数。          |
 
-  除 Task Duration 外，本例中其余指标均展示的为所有 block 上性能指标的平均值。
+  除 Task Duration 外，本例中其余指标均展示的是所有 block 上性能指标的平均值。
 
 - 性能数据
 
-  |       TData       | Task Duration(us) | aiv_total_cycles |
+  |       TData       | Task Duration(μs) | aiv_total_cycles |
   | :---------------: | :---------------: | :--------------: |
   |      Align4       |     27889.33      |   46005213.32    |
   |     Misalign4     |     81223.02      |   134028903.60   |
@@ -139,7 +139,7 @@
 
   本次所有测试用例的总搬运数据量统一为512MiB，更宽的访存指令，总体耗时更少，搬运效率更高。将各对照组对齐前后的耗时差异汇总如下：
 
-  | 结构体大小                  | 对齐Task Duration(us) | 非对齐Task Duration(us)  | 非对齐Task Duration/对齐Task Duration |
+  | 结构体大小                  | 对齐Task Duration(μs) | 非对齐Task Duration(μs)  | 非对齐Task Duration/对齐Task Duration |
   | :------------------------: | :-------------------: | :---------------------: | :---------: |
   | 4B (4×u8)                  | 27889.33 (alignof=4)  | 81223.02 (alignof=1)    | **2.91x**   |
   | 4B (2×u16)                 | 27833.56 (alignof=4)  | 46656.61 (alignof=2)    | **1.68x**   |
