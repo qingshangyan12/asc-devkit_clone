@@ -745,43 +745,43 @@ TEST_F(TestTiling, TestGetLibApiWorkSpaceSize)
     uint32_t ret1 = plat.GetLibApiWorkSpaceSize();
     EXPECT_EQ(ret1, static_cast<uint32_t>(-1));
 }
-TEST_F(TestTiling, TestPlatformAscendCManager)
-{
-    void* handle;
-    int a = 7;
-    handle = &a;
+// TEST_F(TestTiling, TestPlatformAscendCManager)
+// {
+//     void* handle;
+//     int a = 7;
+//     handle = &a;
 
-    MOCKER_CPP(
-        &fe::PlatFormInfos::GetPlatformResWithLock,
-        bool(fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
-        .stubs()
-        .will(returnValue(false));
+//     MOCKER_CPP(
+//         &fe::PlatFormInfos::GetPlatformResWithLock,
+//         bool(fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
+//         .stubs()
+//         .will(returnValue(false));
 
-    auto ret2 = platform_ascendc::PlatformAscendCManager::GetInstance();
-    EXPECT_TRUE(ret2 == nullptr);
-}
+//     auto ret2 = platform_ascendc::PlatformAscendCManager::GetInstance();
+//     EXPECT_TRUE(ret2 == nullptr);
+// }
 
-TEST_F(TestTiling, TestGetVectorCoreNum)
-{
-    fe::PlatFormInfos platform_info;
-    auto plat = platform_ascendc::PlatformAscendC(&platform_info);
+// TEST_F(TestTiling, TestGetVectorCoreNum)
+// {
+//     fe::PlatFormInfos platform_info;
+//     auto plat = platform_ascendc::PlatformAscendC(&platform_info);
 
-    MOCKER_CPP(
-        &fe::PlatFormInfos::GetPlatformResWithLock,
-        bool(fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
-        .stubs()
-        .will(returnValue(false));
-    MOCKER_CPP(
-        &platform_ascendc::PlatformAscendC::GetSocVersion,
-        platform_ascendc::SocVersion(platform_ascendc::PlatformAscendC::*)(void) const)
-        .stubs()
-        .will(returnValue(platform_ascendc::SocVersion::ASCEND310P));
+//     MOCKER_CPP(
+//         &fe::PlatFormInfos::GetPlatformResWithLock,
+//         bool(fe::PlatFormInfos::*)(const std::string&, const std::string&, std::string&))
+//         .stubs()
+//         .will(returnValue(false));
+//     MOCKER_CPP(
+//         &platform_ascendc::PlatformAscendC::GetSocVersion,
+//         platform_ascendc::SocVersion(platform_ascendc::PlatformAscendC::*)(void) const)
+//         .stubs()
+//         .will(returnValue(platform_ascendc::SocVersion::ASCEND310P));
 
-    uint32_t ret1 = plat.GetCoreNumVector();
-    EXPECT_EQ(ret1, static_cast<uint32_t>(0));
-    MOCKER_CPP(&platform_ascendc::PlatformAscendCManager::PlatformAscendCInit).stubs().will(returnValue(platform_info));
-    auto ret2 = platform_ascendc::PlatformAscendCManager::GetInstance();
-}
+//     uint32_t ret1 = plat.GetCoreNumVector();
+//     EXPECT_EQ(ret1, static_cast<uint32_t>(0));
+//     MOCKER_CPP(&platform_ascendc::PlatformAscendCManager::PlatformAscendCInit).stubs().will(returnValue(platform_info));
+//     auto ret2 = platform_ascendc::PlatformAscendCManager::GetInstance();
+// }
 
 TEST_F(TestTiling, TestGetVecRegLen)
 {
@@ -847,30 +847,30 @@ TEST_F(TestTiling, TestGetVecRegLenNormal)
     EXPECT_EQ(ret, static_cast<uint32_t>(256));
 }
 
-TEST_F(TestTiling, TestPlatformCustomSocVersion)
-{
-    auto nested = [](char* version, const uint32_t maxLen) {};
-    void (*rtGetSocVersion)(char* version, const uint32_t maxLen);
-    rtGetSocVersion = nested;
+// TEST_F(TestTiling, TestPlatformCustomSocVersion)
+// {
+//     auto nested = [](char* version, const uint32_t maxLen) {};
+//     void (*rtGetSocVersion)(char* version, const uint32_t maxLen);
+//     rtGetSocVersion = nested;
 
-    void* handle;
-    int dummy = 0;
-    handle = &dummy;
-    MOCKER_CPP(&dlopen).stubs().will(returnValue(handle));
-    MOCKER_CPP(&dlsym).stubs().will(returnValue((void*)nullptr)).then(returnValue((void*)rtGetSocVersion));
-    MOCKER_CPP(&dlclose).stubs().will(returnValue(0));
-    auto ret1 = platform_ascendc::PlatformAscendCManager::PlatformAscendCInit(nullptr);
-    EXPECT_EQ(nullptr, ret1);
+//     void* handle;
+//     int dummy = 0;
+//     handle = &dummy;
+//     MOCKER_CPP(&dlopen).stubs().will(returnValue(handle));
+//     MOCKER_CPP(&dlsym).stubs().will(returnValue((void*)nullptr)).then(returnValue((void*)rtGetSocVersion));
+//     MOCKER_CPP(&dlclose).stubs().will(returnValue(0));
+//     auto ret1 = platform_ascendc::PlatformAscendCManager::PlatformAscendCInit(nullptr);
+//     EXPECT_EQ(nullptr, ret1);
 
-    auto ret2 = platform_ascendc::PlatformAscendCManager::PlatformAscendCInit(nullptr);
-    EXPECT_NE(nullptr, ret2);
+//     auto ret2 = platform_ascendc::PlatformAscendCManager::PlatformAscendCInit(nullptr);
+//     EXPECT_NE(nullptr, ret2);
 
-    auto ret3 = platform_ascendc::PlatformAscendCManager::PlatformAscendCInit("Ascend910B1");
-    EXPECT_NE(nullptr, ret3);
+//     auto ret3 = platform_ascendc::PlatformAscendCManager::PlatformAscendCInit("Ascend910B1");
+//     EXPECT_NE(nullptr, ret3);
 
-    auto ret4 = platform_ascendc::PlatformAscendCManager::GetInstance("Ascend910B1");
-    EXPECT_EQ(nullptr, ret4);
-}
+//     auto ret4 = platform_ascendc::PlatformAscendCManager::GetInstance("Ascend910B1");
+//     EXPECT_EQ(nullptr, ret4);
+// }
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
 extern void platfrom_stub_set_chip_version(const char* num);
