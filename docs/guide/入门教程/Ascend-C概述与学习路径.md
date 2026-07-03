@@ -100,7 +100,7 @@ CANN基于分层架构设计,实现了上层应用与底层硬件的无缝衔接
 
 <div style="flex: 1; min-width: 300px; border: 2px solid #e5e7eb; border-radius: 10px; padding: 8px; background: linear-gradient(135deg, #eae8fb 0%, #ffffff 100%);">
 <h2 style="color: #1a1a1a; margin-top: 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">🏆 高级编程：挖掘极限性能，驾驭复杂场景</h2>
-<p style="color: #555; font-size: 14px; line-height: 1.6; min-height: 65px; margin-bottom: 10px;">本阶段聚焦于深入理解硬件底层细节，全面掌握高阶编程特性,以支撑实现算子的极致性能目标。</p>
+<p style="color: #555; font-size: 14px; line-height: 1.6; min-height: 65px; margin-bottom: 10px;">本阶段聚焦于深入理解硬件底层细节，全面掌握高阶编程特性，以支撑实现算子的极致性能目标。</p>
 
 <div style=" margin: 5px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
 <strong style="color: #1a1a1a;">📖 高级编程</strong><br/><span style="color: #666; font-size: 14px;">• 
