@@ -260,7 +260,7 @@ Case 1/Case 2 的 `aic_mac_time` 分别为 `660.150 μs` / `641.444 μs`，相�
 使用 `msOpProf` 工具获取详细性能数据：
 
 ```bash
-msprof op ./demo   # 分析性能
+msopprof ./demo   # 分析性能
 ```
 
 当前目录下会生成PROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件

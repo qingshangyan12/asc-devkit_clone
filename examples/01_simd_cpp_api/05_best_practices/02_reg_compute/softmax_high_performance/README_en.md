@@ -383,6 +383,6 @@ Execute the following steps in the sample's root directory to build and run the 
 Use the `msOpProf` tool to obtain detailed performance data:
 
 ```bash
-msprof op ./demo
+msopprof ./demo
 cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
 ```

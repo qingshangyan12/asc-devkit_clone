@@ -289,7 +289,7 @@ for (uint32_t i = global_idx; i < index_total_length; i += stride) {
 使用`msOpProf`工具获取详细性能数据：
 
 ```bash
-msprof op ./grid_config   # 分析case的性能
+msopprof ./grid_config   # 分析case的性能
 ```
 
 命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹，性能数据文件夹结构示例如下：

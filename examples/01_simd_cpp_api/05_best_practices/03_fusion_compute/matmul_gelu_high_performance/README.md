@@ -319,7 +319,7 @@ AscendC::DataCopyPad<float>(cGM[gmOffset], geluOutUB, copyOutParams);
 
 ![Scenario1 CV融合-GM中转流水并行](figures/CVParallell_L0C_GM_UB.png)
 
-> 💡 使用 msProf 工具需安装 CANN 商用/社区版，详细信息可参考[msOpProf工具安装指南](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md)。流水图基于msprof工具上板获取，获取命令：`msprof op --aic-metrics=PipeTimeline ./demo`
+> 💡 使用 msProf 工具需安装 CANN 商用/社区版，详细信息可参考[msOpProf工具安装指南](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md)。流水图基于msprof工具上板获取，获取命令：`msopprof --aic-metrics=PipeTimeline ./demo`
 
 **MTE2时间显著减少的原因：**
 
@@ -493,7 +493,7 @@ AscendC::DumpTensor(yLocal, 1, 16);
 使用 `msOpProf` 工具获取详细性能数据：
 
 ```bash
-msprof op ./demo   # 分析样例性能
+msopprof ./demo   # 分析样例性能
 ```
 
 当前目录下会生成 PROF\_ 前缀的文件夹，`mindstudio_profiler_output` 目录保存 Host 和各个 Device 的性能数据汇总，性能数据分析推荐查看该目录下文件：

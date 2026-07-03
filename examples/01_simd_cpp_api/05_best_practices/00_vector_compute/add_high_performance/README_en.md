@@ -634,7 +634,7 @@ $$
 Use the `msOpProf` tool to obtain detailed performance data:
 
 ```bash
-msprof op ./demo   # Analyze performance
+msopprof ./demo   # Analyze performance
 ```
 
 A PROF_ prefixed folder is generated in the current directory. The `mindstudio_profiler_output` directory stores Host and Device performance data summaries. Performance data analysis is recommended to view files in this directory.

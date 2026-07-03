@@ -242,7 +242,7 @@ Run the following steps in the root directory of this example to build and execu
 Use the `msOpProf` tool to collect detailed performance data:
 
 ```bash
-msprof op ./data_cache_hint   # Analyze case performance
+msopprof ./data_cache_hint   # Analyze case performance
 ```
 
 After the command completes, a folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The performance data folder structure example is as follows:

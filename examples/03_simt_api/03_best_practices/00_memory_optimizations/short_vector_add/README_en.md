@@ -253,7 +253,7 @@ Run the following steps in the root directory of this example to build and execu
 Use the `msOpProf` tool to collect performance data on a single component:
 
 ```bash
-msprof op ./demo   # Analyze case performance
+msopprof ./demo   # Analyze case performance
 ```
 
 After the command completes, a folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The performance data folder structure example is as follows:

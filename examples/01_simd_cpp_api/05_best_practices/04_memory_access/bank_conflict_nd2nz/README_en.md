@@ -563,7 +563,7 @@ The measured `aiv_vec_time` is `9.14μs`. The gap from the 4.965μs theoretical 
 Use the `msOpProf` tool to obtain detailed performance data:
 
 ```bash
-msprof op ./demo
+msopprof ./demo
 ```
 
 A `PROF_` prefixed folder is generated in the current directory. The `mindstudio_profiler_output` directory stores Host and Device performance data summaries:

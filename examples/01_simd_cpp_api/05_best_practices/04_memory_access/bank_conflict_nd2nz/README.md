@@ -563,7 +563,7 @@ $$
 使用 `msOpProf` 工具获取详细性能数据：
 
 ```bash
-msprof op ./demo
+msopprof ./demo
 ```
 
 当前目录下会生成 `PROF_` 前缀的文件夹，`mindstudio_profiler_output` 目录保存 Host 和各 Device 的性能数据汇总：
