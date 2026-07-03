@@ -81,7 +81,7 @@ quantPre和reluPre必须是Fixpipe Buffer上的Tensor。
 ```cpp
 __aicore__ inline void SetFPC(const LocalTensor <int32_t>& reluPreTensor, const LocalTensor <int32_t>& quantPreTensor)
 {
-
+ 
     AscendC::LocalTensor<uint64_t> workA1 = inQueueDeqA1.AllocTensor<uint64_t>();
     uint16_t deqSize = 128; // deq tensor的size
     AscendC::DataCopy(workA1, deqGlobal, deqSize); // deqGlobal为量化系数的gm地址

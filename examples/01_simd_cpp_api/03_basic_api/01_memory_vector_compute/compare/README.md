@@ -44,9 +44,9 @@
 
 **场景2：Compare（结果存入寄存器）**
 - 说明：逐元素比较`src0Local`和`src1Local`两个tensor大小，并将计算结果存入cmpMask寄存器中
-- 输入：src0Local=[1, 64], src1Local=[1, 64]
+- 输入：src0Local=[1, 64], src1Local=[1, 64] 
 - 输入数据类型：float
-- 输出：[1, 32]
+- 输出：[1, 32] 
 - 输出数据类型：uint8_t
 - 实现：
   ```cpp
@@ -85,14 +85,14 @@
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
-
+    
 - 样例执行
 
   在本样例目录下执行如下命令。
@@ -111,7 +111,7 @@
   cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # CPU调试模式
   cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # NPU仿真模式
   ```
-
+  
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
@@ -122,7 +122,7 @@
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `1`（默认）、`2`、`3`、`4` | 场景编号<br>1：Compare<br>2：Compare（结果存入寄存器）<br>3：Compares<br>4：Compares（灵活标量位置） |
 
-- 执行结果
+- 执行结果  
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!

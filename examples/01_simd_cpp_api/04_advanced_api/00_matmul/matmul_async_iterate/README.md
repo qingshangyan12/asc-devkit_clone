@@ -1,6 +1,6 @@
 # Matmul Iterate异步场景直调样例
 ## 概述
-异步场景下的Matmul样例，实现方式为调用Iterate和GetTensorC输出到VECIN。
+异步场景下的Matmul样例，实现方式为调用Iterate和GetTensorC输出到VECIN。  
 异步场景指的是程序执行时，不需要等待某个操作完成就可以执行下一步操作。异步场景可以减少同步等待，提高并行度，开发者对计算性能要求较高时，可以选用该方式。
 
 ## 本样例支持的产品及CANN软件版本
@@ -13,7 +13,7 @@
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

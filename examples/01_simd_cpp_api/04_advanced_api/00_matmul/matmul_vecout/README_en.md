@@ -22,10 +22,10 @@ A Matmul example that uses user-defined VECOUT input, allowing developers to man
 ```
 
 ## Example Description
-- Example Function:
+- Example Function:  
   The Matmul example calls the Matmul API to perform matrix multiplication and bias addition on the input A and B matrices. The input position of matrix A is VECOUT.
 
-- Example Specifications:
+- Example Specifications:  
   In this example: M = 31, N = 31, K = 31.
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center">Matmul</td></tr>
@@ -37,8 +37,8 @@ A Matmul example that uses user-defined VECOUT input, allowing developers to man
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">matmul_vecout_custom</td></tr>
   </table>
 
-- Example Implementation:
-  - Key Kernel Steps
+- Example Implementation: 
+  - Key Kernel Steps  
     - Create the Matmul object. In the MatmulType of the left matrix A, POSITION is VECOUT.
       ```cpp
       AscendC::MatmulType<AscendC::TPosition::VECOUT, CubeFormat::ND, AType>
@@ -60,12 +60,12 @@ A Matmul example that uses user-defined VECOUT input, allowing developers to man
       matmulObj.SetTensorA(vecoutLocal, isTransA);
       ```
 
-  - Invocation Implementation
+  - Invocation Implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables
+- Configure Environment Variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

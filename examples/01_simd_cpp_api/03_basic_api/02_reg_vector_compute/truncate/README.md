@@ -21,7 +21,7 @@
 ```
 
 ## 样例描述
-- 样例功能：
+- 样例功能：  
   本样例将输入向量的浮点数元素截断到整数位，截断时向下取整。
 
 - 样例规格：
@@ -32,14 +32,14 @@
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">truncate</td></tr>
   </table>
-- 样例实现：
+- 样例实现：  
    TruncateVF函数内调用Truncate接口进行计算，结果写回UB
-  - 调用实现
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -56,7 +56,7 @@
   python3 ../scripts/gen_data.py                                            # 生成测试输入数据
   ./demo                                                                    # 执行编译生成的可执行程序，执行样例
   ```
-
+ 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 
   示例如下：
@@ -74,7 +74,7 @@
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
-- 执行结果
+- 执行结果  
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!

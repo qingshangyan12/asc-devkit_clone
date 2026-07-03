@@ -32,7 +32,7 @@
 
 ## 样例描述
 
-- 样例功能：
+- 样例功能：  
   验证CTRL寄存器非饱和模式操作的完整流程及其功能效果：
   1. SetCtrlSpr：设置 `CTRL[60]=1` 使能全局生效，设置 `CTRL[48]=1` 选择非饱和模式（INF/NaN保持原输出）
   2. GetCtrlSpr：读取 `CTRL[48]` 设置后的值，存入 `ctrlLocal` 前4位
@@ -48,7 +48,7 @@
   <tr><td align="center">src</td><td align="center">[1, 256]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td rowspan="2" align="center">样例输出</td><td align="center">output_ctrl</td><td align="center">[1, 8]</td><td align="center">int64_t</td><td align="center">ND</td></tr>
   <tr><td align="center">output_sat</td><td align="center">[1, 256]</td><td align="center">half</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">kernel_ctrl_spr</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">kernel_ctrl_spr</td></tr>  
   </table>
 
 - 输出说明：
@@ -65,7 +65,7 @@
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -85,7 +85,7 @@
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
-
+  
   示例如：
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;   # cpu调试模式

@@ -12,7 +12,7 @@ The fractal transformation involves compatibility adaptation for the following t
 1. L0A is not reused. A single mmad computation is performed on an entire A matrix.
 2. L0A is reused. The M axis is split, the A matrix is divided into two sub-matrices, and two mmad computations are performed.
 
-**For Scenario 1**, the logic of the L1>L0A transfer process needs to be modified, changing from Nz->Zz fractal transformation to Nz->Nz. For details, refer to [Example Implementation](#example-implementation).
+**For Scenario 1**, the logic of the L1>L0A transfer process needs to be modified, changing from Nz->Zz fractal transformation to Nz->Nz. For details, refer to [Example Implementation](#example-implementation).  
 **For Scenario 2**, on Atlas A2/A3 Series Products, since the Zz fractal is inherently continuous along the M axis, the L1->L0A transfer logic is the same as Scenario 1. For Ascend 950PR/Ascend 950DT Series Products, splitting the M axis causes matrix discontinuity, requiring splitting into two Nz matrices. For details, refer to [Example Implementation](#example-implementation).
 
 ## Supported Products and CANN Versions

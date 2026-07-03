@@ -88,3 +88,4 @@ def gen_golden_data(dst_type=np.float32):
 
 if __name__ == "__main__":
     gen_golden_data()
+    

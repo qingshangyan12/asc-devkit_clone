@@ -139,7 +139,7 @@ Breakpoint 1: where = device_debugdata`_ZN17MatmulLeakyKernelIDhDhffE7CopyOutEj_
 (msdebug) s
 Process 177943 stopped
 [Switching to focus on Kernel matmul_leakyrelu_custom, CoreId 44, Type aiv]
-* thread #1, name = 'matmul_leakyrelu', stop reason = step over   //   通过回显可查看pc的位置，表示单步成功
+* thread #1, name = 'matmul_leakyrelu', stop reason = step over   //   通过回显可查看pc的位置，表示单步成功 
     frame #0: 0x000000000000f048 device_debugdata`_ZN17MatmulLeakyKernelIDhDhffE10CalcOffsetEiiRK11TCubeTilingRiS4_S4_S4__mix_aiv(this=0x0000000000217b60, blockIdx=0, usedCoreNum=2, tiling=0x0000000000217e28, offsetA=0x00000000002175c8, offsetB=0x00000000002175c4, offsetC=0x00000000002175c0, offsetBias=0x00000000002175bc) at matmul_leakyrelu_kernel.cpp:130:18
    127      offsetA = mCoreIndx * tiling.Ka * tiling.singleCoreM;
    128      offsetB = nCoreIndx * tiling.singleCoreN;

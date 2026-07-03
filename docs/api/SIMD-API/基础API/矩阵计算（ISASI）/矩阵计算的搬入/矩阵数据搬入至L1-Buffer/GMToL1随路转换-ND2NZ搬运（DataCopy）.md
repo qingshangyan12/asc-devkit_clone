@@ -193,7 +193,7 @@ Kirin 9030，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、hal
 
 enableSmallC0开启模式下的ND2NZ转换示意图如下：
 
-**图4** enableSmallC0开启模式下的ND2NZ转换示意图（half数据类型）<a name="fig07641913195410"></a>
+**图4** enableSmallC0开启模式下的ND2NZ转换示意图（half数据类型）<a name="fig07641913195410"></a>  
 
 ![](../../../../../figures/enableSmallC0开启模式下的ND2NZ转换示意图-（half数据类型）.png "enableSmallC0开启模式下的ND2NZ转换示意图-（half数据类型）")
 

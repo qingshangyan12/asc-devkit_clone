@@ -46,10 +46,10 @@ int32_t laneid()
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/device\_functions.h"头文件。
+使用该接口需要包含"simt\_api/device\_functions.h"头文件。 
 
-```
-#include "simt_api/device_functions.h"
+``` 
+#include "simt_api/device_functions.h" 
 ```
 
 ## 调用示例

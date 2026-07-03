@@ -82,7 +82,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
     __simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, U& srcReg0, U& srcReg1, MaskReg& mask)
     ```
 
-- 双搬出模式：使用AddrReg存储偏移量，需要配合CreateAddrReg接口使用
+- 双搬出模式：使用AddrReg存储偏移量，需要配合CreateAddrReg接口使用   
 
     ```cpp
     template <typename T = DefaultType, StoreDist dist, typename U>

@@ -60,10 +60,10 @@ TopK提供了两种不同的排序算法，MERGE\_SORT算法和RADIX\_SELECT算�
 
     以float类型，ND格式，shape为\[outter,  inner\]的输入Tensor为例，描述TopK高阶API内部算法框图，如下图所示。
 
-    **图1**  TopK算法框图
+    **图1**  TopK算法框图  
     ![](../../../figures/TopK算法框图.png "TopK算法框图")
 
-    **图2**  TopK算法框图
+    **图2**  TopK算法框图  
     ![](../../../figures/TopK算法框图-51.png "TopK算法框图-51")
 
     根据TopKMode不同的模式选择，可分为两个分支。
@@ -189,7 +189,7 @@ TopK提供了两种不同的排序算法，MERGE\_SORT算法和RADIX\_SELECT算�
     该算法仅在Ascend 950PR/Ascend 950DT上支持。
     <!-- end id43 -->
 
-    **图3**  TopK算法框图
+    **图3**  TopK算法框图  
     ![](../../../figures/TopK算法框图-52.png "TopK算法框图-52")
 
     计算过程分为如下几步：

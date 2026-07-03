@@ -28,12 +28,12 @@ By transferring multiple Matmul input data in a single transfer, the number of t
 ```
 ## Example Description
 
-- Example Function:
+- Example Function:  
   Call the Matmul high-level API to batch process 3 sets of Matmul computations, performing matrix multiplication and adding bias on A and B matrices in BSNGD format for each set.
 
   For details about the BSNGD format, refer to the data layout description in [IterateBatch](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/IterateBatch.md).
 
-- Example Specifications:
+- Example Specifications:   
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="6" align="center">BatchMatmulCustom</td></tr>
   <tr><td rowspan="3" align="center">Example Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td><td align="center">layout</td></tr>
@@ -43,7 +43,7 @@ By transferring multiple Matmul input data in a single transfer, the number of t
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="6" align="center">batch_matmul_custom</td></tr>
   </table>
 
-- Example Implementation:
+- Example Implementation:  
   - Key Kernel Steps
     - Complete the multi-batch matrix multiplication operation.
       ```cpp
@@ -59,14 +59,14 @@ By transferring multiple Matmul input data in a single transfer, the number of t
       cubeTiling->SetBatchNum(BATCH_NUM);
       ```
 
-  - Invocation Implementation
+  - Invocation Implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure Environment Variables
+- Configure Environment Variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

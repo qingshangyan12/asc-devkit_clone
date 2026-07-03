@@ -102,13 +102,13 @@
     - 通过`TPipe::InitBuffer`初始化TQue队列，指定队列深度和buffer大小
     - 使用`TQue::AllocTensor`申请LocalTensor，使用`TQue::FreeTensor`释放LocalTensor
     - 通过队列的EnQue/DeQue机制管理数据的流入流出
-
+    
     **场景2（Process2）：使用LocalMemAllocator分配器**
     - 创建`LocalMemAllocator<Hardware::UB>`分配器对象
     - 调用`Alloc<T>`方法直接分配指定大小的LocalTensor
     - 需要手动调用`SetFlag/WaitFlag`进行硬件事件同步
     - 当buffer的大小tileSize为常量时，建议使用tileSize模板参数，以获得更优的性能
-
+    
     **场景3（Process3）：使用地址偏移手动管理**
     - 手动计算各tensor在UB中的起始地址偏移
     - 通过LocalTensor构造函数指定`TPosition`和起始地址

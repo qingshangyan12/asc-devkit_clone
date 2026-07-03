@@ -78,7 +78,7 @@ __simd_vf__ inline void MinsVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, T scal
 {
     AscendC::Reg::RegTensor<T> srcReg;
     AscendC::Reg::RegTensor<T> dstReg;
-    AscendC::Reg::MaskReg mask;
+    AscendC::Reg::MaskReg mask;    
     for (uint16_t i = 0; i < repeatTimes; i++) {
         mask = AscendC::Reg::UpdateMask<T>(count);
         AscendC::Reg::LoadAlign(srcReg, src0Addr + i * oneRepeatSize);

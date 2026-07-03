@@ -80,16 +80,16 @@ This example uses the SoftmaxFlashV3 high-level API in a large model training at
 </table>
 </div>
 
-- Example implementation:
+- Example implementation:  
   This example implements a softmaxflashv3 example with fixed shapes of input src[8, 2048], inMax[8, 8], inSum[8, 8], inMean[8, 8], and output dst[8, 2048].
 
-  - Kernel implementation
+  - Kernel implementation  
     Core computation steps: After transferring the input data in, call `AscendC::SoftmaxFlashV3` to complete the SoftmaxFlashV3 computation, then transfer the result out.
 
-  - Tiling implementation
+  - Tiling implementation  
     The tiling implementation process for the softmaxflashv3 example is as follows: First split the shape by row count for multi-core processing, using average allocation aligned upward by the number of cores to determine the computation row count for the main core, then determine the tail core computation row count. The kernel side computes the SoftMaxTiling parameters independently based on baseM.
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run

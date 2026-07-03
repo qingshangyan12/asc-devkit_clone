@@ -25,10 +25,10 @@ A Matmul example with input and output matrices in COLUMN_MAJOR (column-major) f
 
 ## Example Description
 
-- Example Function:
+- Example Function:  
   When the MatmulColumnMajorCustom example calls the Matmul API for computation, it sets the Format parameter of A, B, and C matrices (whose elements are contiguous in memory along the column direction) to CubeFormat::COLUMN_MAJOR, implementing column-major matrix multiplication. The example implements matrix multiplication and bias addition on the input A and B matrices.
 
-- Example Specifications:
+- Example Specifications:  
     In this example: M = 428, N = 479, K = 528.
     <table>
     <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="5" align="center">MatmulColumnMajor</td></tr>
@@ -40,7 +40,7 @@ A Matmul example with input and output matrices in COLUMN_MAJOR (column-major) f
     <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="5" align="center">matmulColumnMajorCustom</td></tr>
     </table>
 
-- Example Implementation:
+- Example Implementation: 
   - Key Kernel Steps
     - Create the Matmul object: set the Format of matrix C to COLUMN_MAJOR.
       ```cpp
@@ -62,13 +62,13 @@ A Matmul example with input and output matrices in COLUMN_MAJOR (column-major) f
           matmul_tiling::DataType::DT_FLOAT);
       ```
 
-  - Invocation Implementation
+  - Invocation Implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables
+- Configure Environment Variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

@@ -97,10 +97,10 @@ SIMT能够通过大量线程的并发执行实现高效处理大批数据，但�
 
 ## 算子描述
 
-- 算子功能：
+- 算子功能：  
   InsertHashTable算子实现将N个键值对插入容量为Z的哈希表中，其中key为int64_t类型数，value为长度M的float类型的Tensor。
 
-- 算子规格：
+- 算子规格：  
   <table>
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">insert_hash_table</td></tr>
   </tr>
@@ -114,16 +114,16 @@ SIMT能够通过大量线程的并发执行实现高效处理大批数据，但�
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">insert_hash_table</td></tr>
   </table>
 
-- 算子实现：
+- 算子实现：  
   InsertHashTable算子的实现流程为，每个warp处理一个键值对，warp中线程0负责根据key的哈希值寻找可用桶，线程0-31负责将value存入桶中。线程0寻找可用桶时，通过开放寻址法解决哈希冲突问题，并使用`asc_atomic_cas()`接口解决多线程冲突问题，使用`asc_threadfence()`接口解决核间数据同步问题。
 
-- 调用实现：
+- 调用实现：  
   使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行算子。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

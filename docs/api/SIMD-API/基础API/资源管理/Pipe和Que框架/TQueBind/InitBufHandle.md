@@ -121,7 +121,7 @@ __aicore__ inline void InitBufHandle(T* bufPool, uint32_t index, TBufHandle bufh
 ```cpp
 // 假设自定义tbufpool类为MyBufPool
 // 自定义tbufpool类内部对TQue初始化的InitBuffer函数：
-template<class T>
+template<class T> 
 __aicore__ inline bool MyBufPool::InitBuffer(T& que, uint8_t num, uint32_t len)
 {
    ...
@@ -136,7 +136,7 @@ __aicore__ inline bool MyBufPool::InitBuffer(T& que, uint8_t num, uint32_t len)
 }
 
 // 自定义tbufpool类内部对TBuf初始化的InitBuffer函数：
-template<class T>
+template<class T> 
 __aicore__ inline bool MyBufPool::InitBuffer(TBuf<bufPos>& buf, uint32_t len)
 {
    ...

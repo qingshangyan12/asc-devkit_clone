@@ -94,7 +94,7 @@ This example demonstrates how to display operator input/output Shape, data type,
 - Install PyTorch and Ascend Extension for PyTorch
 
   Refer to the [pytorch: Ascend Extension for PyTorch](https://gitcode.com/Ascend/pytorch) open source repository or [Ascend Extension for PyTorch Community](https://hiascend.com/document/redirect/Pytorch-index) installation instructions. Select a compatible `Python` version distribution and complete the installation of `torch` and `torch-npu`.
-
+  
   > The torch_npu version is 26.0.0.
 
 - Install prerequisites

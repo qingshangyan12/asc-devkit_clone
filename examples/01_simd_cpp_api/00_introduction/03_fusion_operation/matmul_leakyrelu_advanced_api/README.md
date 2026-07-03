@@ -100,7 +100,7 @@
   MIX场景（包含矩阵计算和矢量计算），分离模式下（本样例支持的产品的基本架构为分离模式），Matmul API是从AIV侧发起的，AIV调用`Iterate`时通知AIC做矩阵计算，AIC完成后再通知AIV。因此tiling侧按AIV视角切分任务。
 
   本样例中`SetDim(2)`表示tiling侧按照2个AIV逻辑核生成Matmul分核参数；`__mix__(1, 2)`表示每个AI Core组合包含1个AIC和2个AIV；
-
+  
   本样例为Kernel直调样例，Host侧kernel launch的`numBlocks = 1`表示启动1个AI Core组合，对应2个AIV侧逻辑任务，正好与`SetDim(2)`配置的2个AIV逻辑核对应。
 
 - 接口参数说明：
@@ -121,7 +121,7 @@
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -158,7 +158,7 @@
 
   > **说明：** 当 `CMAKE_ASC_ARCHITECTURES=dav-3510` 时，编译工程会自动为ASC编译添加 `-DENABLE_CV_COMM_VIA_SSBUF=true`，开启SSBUF通信；`dav-2201` 场景不会添加该编译宏。
 
-- 执行结果
+- 执行结果  
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!

@@ -139,7 +139,7 @@ tbufPool1.InitBuffer(srcQue0, 1, bufSize);
 tbufPool1.InitBuffer(srcQue1, 1, bufSize);
 tbufPool1.InitBuffer(dstQue0, 1, bufSize);
 CopyIn();
-Compute();
+Compute(); 
 CopyOut();
 tbufPool1.Reset();
 tbufPool2.InitBuffer(srcQue2, 1, bufSize);

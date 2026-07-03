@@ -43,3 +43,4 @@ __aicore__ inline constexpr auto Rank(const Layout<Shape, Stride>& layout);
   auto rank1 = Rank(layout); //rank1 = 2
   auto rank2 = Rank<0>(layout); //rank2 = 1
   ```
+  

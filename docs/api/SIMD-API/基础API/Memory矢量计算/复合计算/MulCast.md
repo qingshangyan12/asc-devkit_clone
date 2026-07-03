@@ -187,7 +187,7 @@ $$
 - tensor高维切分计算样例-mask逐bit模式。
 
   ```cpp
-  uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
+  uint64_t mask[2] = { UINT64_MAX, UINT64_MAX }; 
   // repeatTime = 4，一次迭代计算128个数，共计算512个数
   // dstBlkStride, src0BlkStride, src1BlkStride = 1，单次迭代内数据连续读取和写入
   // dstRepStride = 4，相邻迭代间数据连续写入

@@ -87,12 +87,12 @@ ND2NZ转换示意图如下，样例中参数设置值和解释说明如下：
 - dstNzNStride = 2，表示src中一个ND矩阵的第x行和第x+1行转换为NZ格式后在dst中的偏移，即A1和B1在dst之间的偏移为2个DataBlock。
 - dstNzMatrixStride = 96，表达dst中第x个ND矩阵的起点和第x+1个ND矩阵的起点的偏移，即A1和C1之间的距离，即为6个DataBlock，6 \* 16 = 96个元素。
 
-**图1**  ND2NZ转换示意图（half数据类型）<a name="fig128961542184620"></a>
+**图1**  ND2NZ转换示意图（half数据类型）<a name="fig128961542184620"></a>  
 ![](../../../../../figures/nd2nz_conversion_half.png "ND2NZ转换示意图（half数据类型）")
 
 enableSmallC0开启模式下的ND2NZ转换示意图如下：
 
-**图2**  enableSmallC0开启模式下的ND2NZ转换示意图（half数据类型）<a name="fig07641913195410"></a>
+**图2**  enableSmallC0开启模式下的ND2NZ转换示意图（half数据类型）<a name="fig07641913195410"></a>  
 ![](../../../../../figures/enable_smallc0_nd2nz_conversion_half.png "enableSmallC0开启模式下的ND2NZ转换示意图-（half数据类型）")
 
 ## 数据类型<a name="section4219135304818"></a>

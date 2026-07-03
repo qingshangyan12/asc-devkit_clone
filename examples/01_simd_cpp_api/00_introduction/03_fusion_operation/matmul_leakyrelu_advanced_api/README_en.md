@@ -100,7 +100,7 @@ This example uses high-level APIs to implement fused computation of Matmul and L
   In MIX scenarios (including matrix computation and vector computation), in separation mode (the basic architecture of products supported by this example is separation mode), the Matmul API is initiated from the AIV side. When AIV calls `Iterate`, it notifies AIC to perform matrix computation, and after AIC completes, it notifies AIV. Therefore, the tiling side splits tasks from the AIV perspective.
 
   In this example, `SetDim(2)` indicates that the tiling side generates Matmul core splitting parameters for 2 AIV logical cores. `__mix__(1, 2)` indicates that each AI Core combination contains 1 AIC and 2 AIVs.
-
+  
   This example is a Kernel direct call example. The Host-side kernel launch `numBlocks = 1` means launching 1 AI Core combination, corresponding to 2 AIV-side logical tasks, which exactly matches the 2 AIV logical cores configured by `SetDim(2)`.
 
 - Interface Parameter Description:

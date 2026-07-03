@@ -21,7 +21,7 @@
     mm.SetTensorB(gm_b);
     mm.SetBias(gm_bias);
     mm.IterateAll(gm_c);
-
+    
     DataCopy(local_c, gm_c, c_size);
     DataCopy(local_d, gm_d, d_size);
     event_t eventIdMTE2ToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_V));
@@ -35,9 +35,9 @@
  extern "C" __global__ __aicore__ void example_kernel(...)
  {
      ...
-     typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, half> aType;
-     typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, half> bType;
-     typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, float> cType;
+     typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, half> aType; 
+     typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, half> bType; 
+     typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, float> cType; 
      typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, float> biasType;
      MatMulKernel<aType, bType, cType, biasType>(...);
      ...
@@ -71,9 +71,9 @@
  extern "C" __global__ __aicore__ void example_kernel(...)
  {
      ...
-     typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, half> aType;
-     typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, half> bType;
-     typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, float> cType;
+     typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, half> aType; 
+     typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, half> bType; 
+     typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, float> cType; 
      typedef AscendC::MatmulType<TPosition::GM, CubeFormat::ND, float> biasType;
      MatMulKernel<aType, bType, cType, biasType>(...);
      ...
@@ -82,7 +82,7 @@
 
 【性能对比】
 
-**图1**  Matmul开启AtomicAdd选项前后性能对比<a name="fig1924944205516"></a>
+**图1**  Matmul开启AtomicAdd选项前后性能对比<a name="fig1924944205516"></a>  
 ![](../../../figures/Matmul使能AtomicAdd选项前后性能对比.png "Matmul开启AtomicAdd选项前后性能对比")
 
 以矩阵维度M=64，N=256，K=256，矩阵D为\(64, 256\)为例，Matmul开启AtomicAdd选项前后的性能对比如上图所示，平均cycle数从开启AtomicAdd选项前的154181变为开启后的135054，性能优化12.4%。因此在这种场景下，开启AtomicAdd选项能获取更优的性能。

@@ -446,13 +446,13 @@ for (uint16_t i = 0; i < repeat_times; ++i) {
 
 ![](../../../../figures/Reg非对齐写0.png "Reg非对齐写0")
 
-1. 先使用`asc_storeunalign`，首次循环时：将尾部对齐到32B的长度为240B的矢量数据寄存器数据写入UB，同时将剩余的16B写入`vector_store_unalign`;
+1. 先使用`asc_storeunalign`，首次循环时：将尾部对齐到32B的长度为240B的矢量数据寄存器数据写入UB，同时将剩余的16B写入`vector_store_unalign`; 
 
    **图10** 第一次写出预期数据
 
    ![](../../../../figures/Reg非对齐写1.png "Reg非对齐写1")
 
-2. 当第二次循环时：将暂存在`vector_store_unalign`中的16B数据，与本次循环需要写出的矢量数据寄存器中的240B拼接成256B数据后，写出到UB。同时将本次循环中剩余的16B更新写入`vector_store_unalign`;
+2. 当第二次循环时：将暂存在`vector_store_unalign`中的16B数据，与本次循环需要写出的矢量数据寄存器中的240B拼接成256B数据后，写出到UB。同时将本次循环中剩余的16B更新写入`vector_store_unalign`; 
 
    **图11** 第二次写出预期数据
 

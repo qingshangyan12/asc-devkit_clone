@@ -78,7 +78,7 @@ Run the following steps in the root directory of this example to build and execu
 
 - Execution result
   The following output indicates successful execution.
-
+  
   ```bash
   [AIV Block 0/8] Hello World!!!
   [AIV Block 1/8] Hello World!!!

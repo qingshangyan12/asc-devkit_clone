@@ -109,7 +109,7 @@ for (uint32_t i = 0; i < curLen; i++) {
 
 **性能优化建议**：
 > ⚠️ **避免标量循环，使用向量指令**
->
+> 
 > 在Ascend C编程中，应避免使用`for`循环配合`GetValue/SetValue`的标量运算。使用`AscendC::Add`等向量指令可带来数量级的性能提升。
 
 ---
@@ -153,7 +153,7 @@ AscendC::Add(zLocal, xLocal, yLocal, curLen);
 
 **性能优化建议**：
 > 💡 **使用向量指令替代标量循环**
->
+> 
 > 使用`AscendC::Add`、`AscendC::Mul`等向量API替代逐元素的标量循环，可充分利用AI Core的向量计算单元，获得百倍以上的性能提升。
 
 > 💡 **不建议用户仅使用单核**
@@ -213,7 +213,7 @@ if (blockIdxM < remainderM) {
 
 **性能优化建议**：
 > 💡 **充分利用多核并行，采用均匀切分策略**
->
+> 
 > 1. 将数据均匀切分到多个AIV Core，实现并行计算
 > 2. 使用均匀切分策略（余数分配到前几个核），确保负载均衡
 > 3. 切分粒度需考虑：核数、数据量、UB空间大小
@@ -254,14 +254,14 @@ if (blockIdxM < remainderM) {
 
 **性能优化建议**：
 > 💡 **增大单次数据搬运量，减少搬运次数**
->
+> 
 > 1. 在UB空间允许的范围内，尽量增大`dataCopyLen`
 > 2. 使用连续的大块数据搬运，避免频繁的小数据块搬运
 > 3. 需平衡UB空间使用和搬运效率
 
 
 > ⚠️ **注意：dataCopyLen并非越大越好**
->
+> 
 > 在Case 3的基础上，如果进一步增大dataCopyLen（如从16384增至16512），端到端性能基本持平（268.5μs vs 267.76μs）。建议结合数据总量、UB空间、对齐要求综合考虑，确定最优的dataCopyLen值。
 
 ---
@@ -337,12 +337,12 @@ UB内存分配（双缓冲）：
 **原理说明**：
 - **Ping-Pong机制**：
   - Ping缓冲区进行计算时，Pong缓冲区进行数据搬运
-  - 交替执行，实现计算与搬运的流水线并行，如下图所示
+  - 交替执行，实现计算与搬运的流水线并行，如下图所示  
     <img src="figures/DoubleBuffer.png" width="50%">
 
 **性能优化建议**：
 > 💡 **使用双缓冲实现搬运与计算并行**
->
+> 
 > 1. 当计算与搬运时间相近时，双缓冲收益最大
 > 2. 需要足够的UB空间（约2倍单缓冲空间）
 > 3. 使用独立的Event ID管理两组缓冲区的同步
@@ -397,7 +397,7 @@ UB内存分配（双缓冲）：
 
 **性能优化建议**：
 > 💡 **合理采用L2 Cache bypass**
->
+> 
 > 1. 对于只读取一次的输入数据（如本例的x、y），设置`SetL2CacheHint(CACHE_MODE_DISABLE)`
 > 2. 对于需要重复访问的数据（如卷积的权重），保留L2 Cache
 > 3. 建议用户按照实测数据进行配置优化，在实际的模型和训练场景中，需要结合上下游进行合理配置
@@ -477,9 +477,9 @@ static constexpr uint32_t zAddrPongBC = zAddrPingBC + BANK_CONFLICT_DATA_COPY_LE
 
 **性能优化建议**：
 > 💡 **优化UB内存布局，避免Bank Conflict**
->
+> 
 > 1. 当`aiv_vec_time`异常高时，可能存在Bank Conflict
-> 2. 通过调整dataCopyLen或内存布局偏移，使数据分布在不同Bank Group
+> 2. 通过调整dataCopyLen或内存布局偏移，使数据分布在不同Bank Group 
 > 3. Bank Conflict优化对vector-bound场景收益明显
 
 **最终性能总结**：
@@ -606,18 +606,18 @@ Ascend 950系列未达到理论vector耗时峰值的原因如下：
   - `5`: 双缓冲 + L2Cache bypass
   - `6`: 双缓冲 + L2Cache bypass + 避免Bank Conflict
 
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
-
+    
 - 样例执行
 
   在本样例目录下执行如下命令。
-  ```bash
+  ```bash 
   mkdir -p build && cd build;   # 创建并进入build目录
   cmake -DSCENARIO_NUM=6 -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;  # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
@@ -634,7 +634,7 @@ Ascend 950系列未达到理论vector耗时峰值的原因如下：
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
-
+  
 
 - 编译选项说明
 
@@ -643,7 +643,7 @@ Ascend 950系列未达到理论vector耗时峰值的原因如下：
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `0`（默认）、`1`、`2`、`3`、`4`、`5`、`6` | 性能优化case编号 |
-
+  
   执行结果如下，说明精度对比成功。
   ```bash
   error ratio: 0.0000, tolerance:0.0001

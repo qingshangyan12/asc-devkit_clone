@@ -24,10 +24,10 @@
 ```
 
 ## 样例描述
-- 样例功能：
+- 样例功能：  
   Matmul样例调用Matmul API计算时int8_t类型输入，计算结果以half类型反量化输出，同时支持同一系数的反量化模式与向量的反量化模式。该场景下将C矩阵数据从CO1搬出到Global Memory时，会执行反量化操作，对输出矩阵的所有值采用同一系数或向量进行反量化。
 
-- 样例规格：
+- 样例规格：  
   本样例中：M = 1024, N = 1024, K = 1024。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
@@ -39,10 +39,10 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_quant_custom</td></tr>
   </table>
 
-- 样例实现：
+- 样例实现： 
   - Kernel关键步骤
-    - 设置反量化参数。
-      当编译选项QUANT_MODE的值为1时，设置编译宏：CUSTOM_QUANT_VECTOR，编译执行向量的反量化模式。
+    - 设置反量化参数。  
+      当编译选项QUANT_MODE的值为1时，设置编译宏：CUSTOM_QUANT_VECTOR，编译执行向量的反量化模式。    
       根据是否定义宏：CUSTOM_QUANT_VECTOR，设置对应的反量化参数。
       ```cpp
       #if defined(CUSTOM_QUANT_VECTOR)
@@ -64,12 +64,12 @@
       #endif
       ```
 
-  - 调用实现
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

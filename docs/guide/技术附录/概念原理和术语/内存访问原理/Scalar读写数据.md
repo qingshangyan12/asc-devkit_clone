@@ -64,12 +64,12 @@ Scalar读写Global Memory和Unified Buffer时属于PIPE\_S（Scalar流水）操�
 float inputVal = srcLocal.GetValue(0);
 SetFlag<HardEvent::S_V>(eventID1);
 WaitFlag<HardEvent::S_V>(eventID1);
-AscendC::Duplicate(dstLocal, inputVal, srcDataSize);
+AscendC::Duplicate(dstLocal, inputVal, srcDataSize); 
 
 // SetValue为Scalar操作，与后续的数据搬运操作存在数据依赖
 // 因此MTE3流水需要等待Scalar操作结束
 srcLocal.SetValue(0, value);
 SetFlag<HardEvent::S_MTE3>(eventID2);
 WaitFlag<HardEvent::S_MTE3>(eventID2);
-AscendC::DataCopy(dstGlobal, srcLocal, srcDataSize);
+AscendC::DataCopy(dstGlobal, srcLocal, srcDataSize); 
 ```

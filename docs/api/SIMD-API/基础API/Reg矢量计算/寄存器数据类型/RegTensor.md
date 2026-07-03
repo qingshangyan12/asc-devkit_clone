@@ -40,7 +40,7 @@ template <typename T, const RegTrait& regTrait = RegTraitNumOne> struct RegTenso
 
 | 参数名 | 描述 |
 | :-- | :------------ |
-| T | 操作数数据类型，支持的数据类型(宽度)为b8、b16、b32、b64。<br>&bull; b8：bool、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、fp8_e8m0_t（fp4x2_e2m1_t、fp4x2_e1m2_t这两个b4类型在Vector侧的内存排布需要为两个一组，表现为b8类型；int4b_t也使用b8类型表达；bool数据类型只支持数据搬运）。<br>&bull; b16：int16_t、uint16_t、half、bfloat16_t。<br>&bull; b32：int32_t、uint32_t、float、complex32。<br>&bull; b64：int64_t、uint64_t、complex64。|
+| T | 操作数数据类型，支持的数据类型(宽度)为b8、b16、b32、b64。<br>&bull; b8：bool、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、fp8_e8m0_t（fp4x2_e2m1_t、fp4x2_e1m2_t这两个b4类型在Vector侧的内存排布需要为两个一组，表现为b8类型；int4b_t也使用b8类型表达；bool数据类型只支持数据搬运）。<br>&bull; b16：int16_t、uint16_t、half、bfloat16_t。<br>&bull; b32：int32_t、uint32_t、float、complex32。<br>&bull; b64：int64_t、uint64_t、complex64。| 
 | regTrait | 类型为RegTrait，支持配置为RegTraitNumOne或RegTraitNumTwo。<br>&bull; RegTraitNumOne：该RegTensor类型中包含1个相应数据类型的矢量Reg，长度为VL。支持的数据类型为：b8、b16、b32、b64。<br>&bull; RegTraitNumTwo：该RegTensor类型中包含2个相应数据类型的矢量Reg，每个矢量Reg长度为VL，总长度为2*VL。支持的数据类型为：complex32、b64。|
 
 ## 约束说明<a name="section177921451558"></a>
@@ -59,9 +59,9 @@ template <typename T, const RegTrait& regTrait = RegTraitNumOne> struct RegTenso
     ![](../../../../figures/RegTensor搬运complex32.png "RegTensor搬运complex32")
 
     complex32是一个包含两个half（实部real、虚部imag）类型的复合类型，通常是连续存储，低位为实部高位为虚部。
-
+    
     在RegTraitNumOne场景下，从UB（src0Addr）中以DIST_NORM模式搬运VL数据量，在RegTensor中连续存储。
-
+    
     在RegTraitNumTwo场景下，从UB（src0Addr）中以DIST_DINTLV_B16双搬入模式读取2*VL数据量，将complex32数据交错搬运，偶数索引（实部）的元素存入reg[0]，将奇数索引（虚部）的元素存入reg[1]，数据类型为uint16_t。两个RegTensor存储512B的数据量，reg[0]存的是128个complex32的前16位（实部），reg[1]存的是128个complex32的前16位（虚部）。
 
 -   complex64类型RegTensor存储结构
@@ -73,9 +73,9 @@ template <typename T, const RegTrait& regTrait = RegTraitNumOne> struct RegTenso
     ![](../../../../figures/RegTensor搬运complex64.png "RegTensor搬运complex64")
 
     complex64是一个包含两个float（实部real、虚部imag）类型的复合类型，通常是连续存储，低位为实部高位为虚部。
-
+    
     在RegTraitNumOne场景下，从UB（src0Addr）中以DIST_NORM模式搬运VL数据量，在RegTensor中连续存储。
-
+    
     在RegTraitNumTwo场景下，从UB（src0Addr）中以DIST_DINTLV_B32双搬入模式读取2*VL数据量，将complex64数据交错搬运，偶数索引（实部）的元素存入reg[0]，将奇数索引（虚部）的元素存入reg[1]，数据类型为uint32_t。两个RegTensor存储512B的数据量，reg[0]存的是64个complex64的前32位（实部），reg[1]存的是64个complex64的后32位（虚部）。
 
 -   b64类型RegTensor存储结构
@@ -87,7 +87,7 @@ template <typename T, const RegTrait& regTrait = RegTraitNumOne> struct RegTenso
     ![](../../../../figures/RegTensor搬运b64.png "RegTensor搬运b64")
 
     在RegTraitNumOne场景下，从UB（src0Addr）中以DIST_NORM模式搬运VL数据量。
-
+    
     在RegTraitNumTwo场景下，从UB（src0Addr）中以DIST_DINTLV_B32双搬入模式读取2*VL数据量，将b64数据交错搬运，偶数索引（低位）的元素存入reg[0]，将奇数索引（高位）的元素存入reg[1]，数据类型为b32。两个RegTensor存储512B的数据量，reg[0]存的是64个b64的前32位（低位），reg[1]存的是64个b64的后32位（高位）。
 
 ## 调用示例<a name="section1398164912391"></a>

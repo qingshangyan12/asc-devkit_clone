@@ -40,7 +40,7 @@
 
 仅支持如下数据通路的搬运：L1 Buffer->L0B Buffer。
 
-**图1** L1 Buffer->L0B Buffer LoadDataWithSparse示意图，LoadData2dParams参数配置startIndex = 1，repeatTimes = 5，表示需要从源操作数src中第1块数据分形开始搬运5块连续的数据分形，从源操作数idx中第1块index分形开始搬运5块连续的index分形。<a name="zh-cn_topic_0000002512171654_fig71111314164414"></a>
+**图1** L1 Buffer->L0B Buffer LoadDataWithSparse示意图，LoadData2dParams参数配置startIndex = 1，repeatTimes = 5，表示需要从源操作数src中第1块数据分形开始搬运5块连续的数据分形，从源操作数idx中第1块index分形开始搬运5块连续的index分形。<a name="zh-cn_topic_0000002512171654_fig71111314164414"></a>  
 
 ![](../../../../../figures/loaddatawithsparse_l12l0b.png)
 

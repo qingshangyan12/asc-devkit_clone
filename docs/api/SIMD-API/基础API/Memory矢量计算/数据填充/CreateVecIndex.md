@@ -44,23 +44,23 @@ def CreateVecIndex(dst, firstValue, count):
 - tensor前n个数据计算
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void CreateVecIndex(LocalTensor<T> dst, const T &firstValue, uint32_t count)
+    template <typename T> 
+    __aicore__ inline void CreateVecIndex(LocalTensor<T> dst, const T &firstValue, uint32_t count) 
     ```
 
 - tensor高维切分计算
     - mask逐bit模式
 
         ```cpp
-        template <typename T>
-        __aicore__ inline void CreateVecIndex(LocalTensor<T> &dst, const T &firstValue, uint64_t mask[], uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)
+        template <typename T> 
+        __aicore__ inline void CreateVecIndex(LocalTensor<T> &dst, const T &firstValue, uint64_t mask[], uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)  
         ```
 
     - mask连续模式
 
         ```cpp
-        template <typename T>
-        __aicore__ inline void CreateVecIndex(LocalTensor<T> &dst, const T &firstValue, uint64_t mask, uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)
+        template <typename T> 
+        __aicore__ inline void CreateVecIndex(LocalTensor<T> &dst, const T &firstValue, uint64_t mask, uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride) 
         ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -155,6 +155,6 @@ def CreateVecIndex(dst, firstValue, count):
 结果示例如下：
 
 ```plain
-输入数据（firstValue）：0
+输入数据（firstValue）：0 
 输出数据（dstLocal）：[0 1 2 ... 127]
 ```

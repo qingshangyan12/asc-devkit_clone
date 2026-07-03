@@ -342,7 +342,7 @@ __global__ __cube__ void matmul_kernel(__gm__ float* x, __gm__ float* y, __gm__ 
     AscendC::LocalMemAllocator<AscendC::Hardware::L0A> l0aAllocator;
     AscendC::LocalMemAllocator<AscendC::Hardware::L0B> l0bAllocator;
     AscendC::LocalMemAllocator<AscendC::Hardware::L0C> l0cAllocator;
-
+    
     AscendC::LocalTensor<half> a_l1_buf = l1Allocator.Alloc<half, BLOCK_M * BLOCK_K>();
     AscendC::LocalTensor<half> b_l1_buf = l1Allocator.Alloc<half, BLOCK_K * BLOCK_N>();
     AscendC::LocalTensor<half> l0a_buf = l0aAllocator.Alloc<half, BLOCK_M * BLOCK_K>();

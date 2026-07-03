@@ -1,6 +1,6 @@
 # WaitPreTaskEnd<a name="ZH-CN_TOPIC_0000002337883177"></a>
 
-> [!NOTE]说明
+> [!NOTE]说明 
 >本接口为试验接口，在后续版本中可能会调整或改进，不保证后续兼容性。请开发者在使用过程中关注后续版本更新。
 
 ## 产品支持情况<a name="section17196114513104"></a>
@@ -29,7 +29,7 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
 
 **开发者需要自行保证调用此接口前的指令不会与前序算子互相干扰而导致精度问题，推荐在整个算子第一条搬运指令前调用此接口。**
 
-**图1**  通过WaitPreTaskEnd实现并行示意图<a name="fig99271836191110"></a>
+**图1**  通过WaitPreTaskEnd实现并行示意图<a name="fig99271836191110"></a>  
 ![](../../../../figures/wait_pre_task_end_parallel_diagram.png "通过WaitPreTaskEnd实现并行示意图")
 
 ## 函数原型<a name="section620mcpsimp"></a>

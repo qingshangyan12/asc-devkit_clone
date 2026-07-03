@@ -27,7 +27,7 @@ This example describes the direct invocation method for the Add operator kernel 
 
 ## Operator Description
 
-- Operator function:
+- Operator function:  
   The Add operator adds two data inputs and returns the sum. The corresponding mathematical expression is:
   ```
   z = x + y
@@ -43,8 +43,8 @@ This example describes the direct invocation method for the Add operator kernel 
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">add_broadcast_custom</td></tr>
   </table>
 
-- Operator implementation:
-
+- Operator implementation:  
+  
   The computation logic is: The vector computation APIs provided by Ascend C operate on LocalTensor elements. Input data must first be transferred to on-chip storage, then the computation APIs are used to add the two input parameters, obtain the final result, and transfer it to external storage.
 
     The implementation process of the Add operator consists of three basic tasks: CopyIn, Compute, and CopyOut.
@@ -52,14 +52,14 @@ This example describes the direct invocation method for the Add operator kernel 
     The Compute task performs Broadcast on xLocal and yLocal, stores the result in temporary memory, then executes the addition operation, with the result stored in zLocal.
     The CopyOut task transfers the output data from zLocal to the output tensor zGm in Global Memory.
 
-  - Tiling implementation
+  - Tiling implementation  
     TilingData parameter design: TilingData parameters are essentially parameters related to parallel data splitting.
 
     This example attempts to evenly distribute the input data across a given number of cores. If even distribution is not possible, it calculates the number of regular cores and tail cores, which process different amounts of data. UB_BLOCK_NUM is defined as the maximum available UB data blocks, corresponding to a UB size of UB_BLOCK_NUM * 32 Bytes. Tiling splitting is performed with UB_BLOCK_NUM as the granularity.
 
     This example operator uses 20 tiling parameters: xLen, yLen, and dataType are the total length and data type of x and y input data; coef is the expansion factor for the input that requires Broadcast; axis is the Broadcast axis of the input data; blockLength, tileNum, tileLength, and lastTileLength are the computation amount per core, number of tiling splits, and regular/tail block lengths in the even core distribution scenario; former(tail)Num, former(tail)Length, former(tail)TileNum, former(tail)TileLength, and former(tail)LastTileLength are the splitting data related to regular and tail cores in the uneven core distribution scenario, corresponding to the even core distribution scenario; isEvenCore is used to determine whether the current scenario is an even core distribution.
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run

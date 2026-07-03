@@ -26,15 +26,15 @@
 
 ## 样例描述
 
-- 样例功能：
-  实现对shape大小为[B，S，H]的输入数据的RmsNorm归一化，其计算公式如下：
+- 样例功能：  
+  实现对shape大小为[B，S，H]的输入数据的RmsNorm归一化，其计算公式如下：    
   $$
   y_i = RmsNorm(x_i)\\
   y_i=\frac{x_i}{\sqrt{\frac{1}{N}\sum_{i = 1}^{N}x_i^2+\varepsilon}}\times\gamma
   $$
 
 
-- 样例规格：
+- 样例规格：  
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center"> rmsnorm </td></tr>
 
@@ -49,12 +49,12 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">rmsnorm_custom</td></tr>
   </table>
 
-- 样例实现：
+- 样例实现：  
 
   本样例未使用基本块模式（isBasicBlock=false），详细说明请参考RmsNorm API文档。
 
-  - Kernel实现
-    计算逻辑是：
+  - Kernel实现  
+    计算逻辑是：  
     输入数据需要先搬运进片上存储，然后使用RmsNorm高阶API接口完成rmsnorm计算，得到最终结果，再搬出到外部存储上。
 
   - Tiling实现
@@ -63,20 +63,20 @@
     1. AscendC::GetRmsNormMaxMinTmpSize 获取 RmsNorm 接口计算所需的最大和最小临时空间大小后，再根据mode计算出使用大小stackSize，然后调用 AscendC::GetRmsNormTilingInfo 根据输入 shape 和工作空间大小获取kernel侧接口所需 Tiling 参数。
     2. 将 Tiling 参数封装到 RmsNormTilingData 结构体中，传递给 Kernel 侧使用。
 
-  - 调用实现
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
-## 编译运行
+## 编译运行  
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
-
+    
 - 样例执行
 
   在本样例目录下执行如下命令。

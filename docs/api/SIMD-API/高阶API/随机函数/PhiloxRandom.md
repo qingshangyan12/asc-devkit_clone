@@ -71,7 +71,7 @@ struct PhiloxRandomParams {
 };
 ```
 
-**图1**  PhiloxRandom示意图
+**图1**  PhiloxRandom示意图  
 ![](../../../figures/PhiloxRandom示意图.png "PhiloxRandom示意图")
 
 上图是一个生成随机数的示意图。

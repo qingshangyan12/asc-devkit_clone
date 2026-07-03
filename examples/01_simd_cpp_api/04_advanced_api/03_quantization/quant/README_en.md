@@ -26,7 +26,7 @@ This example uses the [AscendQuant](https://gitcode.com/cann/asc-devkit/blob/mas
 
 ## Example Description
 
-- Example function:
+- Example function:  
   QuantCustom single example, performing element-wise quantization on the input tensor, converting half/float data types to int8_t data type.
 
 - Example specifications:
@@ -48,29 +48,29 @@ This example uses the [AscendQuant](https://gitcode.com/cann/asc-devkit/blob/mas
   <br clear="left" />
 <br />
 
-- Example implementation:
+- Example implementation:  
   This example implements a fixed shape input inputGm[1, 1024] with quantization parameters scale=2.0 and offset=0.9. This example is for the PER_TENSOR scenario (per-tensor quantization), converting float data type to int8_t data type.
 
-  - Kernel implementation
+  - Kernel implementation  
     The computation logic is: The vector computation APIs provided by Ascend C operate on LocalTensor elements. Input data must first be transferred to on-chip storage, then the AscendQuant (A2/A3) or Quantize (950 series) high-level API is used to complete the quantization computation, obtain the final result, and transfer it to external storage.
 
-  - Tiling implementation
+  - Tiling implementation  
     The tiling implementation process for the QuantCustom example is as follows: First obtain the maximum/minimum temporary space size required by the AscendQuant or Quantize API, use the minimum temporary space, and then determine the required tiling parameters based on the input length dataLength.
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run
+## Build and Run  
 
 Run the following steps in the root directory of this example to build and run the operator.
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
-
+    
 - Run the example
 
   Run the following commands in the example directory.
@@ -97,8 +97,8 @@ Run the following steps in the root directory of this example to build and run t
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU run, CPU debug, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products; dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
-
-- Execution result
+  
+- Execution result  
   The following execution result indicates that the precision comparison is successful.
   ```bash
   test pass!

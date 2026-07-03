@@ -18,7 +18,7 @@ TSCM表示L1 Buffer空间对应的逻辑内存，L1 Buffer相关内容见[存储
 
 ```
 TQue<TPosition::A1, 1> scm; // 队列逻辑位置A1，队列深度为1
-pipe->InitBuffer(scm, 1, tiling.M * tiling.Ka * sizeof(A_T));
+pipe->InitBuffer(scm, 1, tiling.M * tiling.Ka * sizeof(A_T)); 
 // A_TYPE的TPosition为TSCM， B_TYPE的TPosition为GM
 Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE> mm1;
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm1);

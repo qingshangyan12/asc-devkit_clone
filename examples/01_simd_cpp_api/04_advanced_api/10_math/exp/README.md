@@ -26,7 +26,7 @@
 
 ## 样例描述
 
-- 样例功能：
+- 样例功能：  
   按元素取自然指数，用户可以选择是否使用泰勒展开公式进行计算，计算公式如下：
 
   $$
@@ -47,7 +47,7 @@
 
   $$e^{x B_i} = 1 + xB_i +... + \frac{xB_i^n}{n!}$$
 
-- 样例规格：
+- 样例规格：  
   <table>
   <caption>表1：样例输入输出规格</caption>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center"> exp </td></tr>
@@ -61,7 +61,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">exp_custom</td></tr>
   </table>
 
-- 样例实现：
+- 样例实现：  
   本样例中实现的是固定shape为输入src[1, 8192]，输出dst[1, 8192]的exp_custom样例。
 
   - Kernel实现
@@ -76,11 +76,11 @@
 
     使用内核调用符<<<>>>调用核函数。
 
-## 编译运行
+## 编译运行  
 
 在本样例根目录下执行如下步骤，编译并执行算子。
 
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -99,7 +99,7 @@
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
-
+  
   示例如下：
 
   ```bash

@@ -15,12 +15,12 @@ template <typename ComputeT> class KernelExample {
      __aicore__ inline void Process(...)
      {
          for (int i = 0; i < iLen; ++i) {
-             ...
+             ... 
              auto iLocal = QueI.AllocTensor<ComputeT>();
              DataCopy(iLocal, inGm[i * 32], size);
              QueI.EnQue(iLocal);
              iLocal = QueI.DeQue<ComputeT>();
-             for (int j = 0; j < jLen; ++j) {
+             for (int j = 0; j < jLen; ++j) { 
                  ...
                  auto oLocal = QueO.AllocTensor<ComputeT>();
                  DataCopy(oLocal, iLocal, size); // LocalTensor -> LocalTensor的DataCopy指令,以实现数据从VECIN到VECOUT的搬运
@@ -35,7 +35,7 @@ template <typename ComputeT> class KernelExample {
      }
 
  private:
-     ...
+     ... 
      TQue<TPosition::VECIN, BUFFER_NUM> QueI;
      TQue<TPosition::VECOUT, BUFFER_NUM> QueO;
      ...
@@ -59,7 +59,7 @@ template <typename ComputeT> class KernelExample {
      __aicore__ inline void Process(...)
      {
          for (int i = 0; i < iLen; ++i) {
-             ...
+             ... 
              auto bindLocal = queBind.AllocTensor<ComputeT>();
              DataCopy(bindLocal, inGm[i * 32], size);
              queBind.EnQue(bindLocal);
@@ -73,7 +73,7 @@ template <typename ComputeT> class KernelExample {
      }
 
  private:
-     ...
+     ... 
      TQueBind<TPosition::VECIN, TPosition::VECOUT, BUFFER_NUM> queBind; // 使用TQueBind替换原来的QueI，QueO
      ...
  };
@@ -87,7 +87,7 @@ template <typename ComputeT> class KernelExample {
 
 【性能对比】
 
-**图1**  aiv\_vec\_time优化前后对比<a name="fig74881227195511"></a>
+**图1**  aiv\_vec\_time优化前后对比<a name="fig74881227195511"></a>  
 
 ![](../../../figures/1.png)
 

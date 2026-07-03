@@ -6,7 +6,7 @@
 -   单算子API调用：该模式下的适配插件开发流程和具体样例请参见 [《Ascend Extension for PyTorch》](https://www.hiascend.com/document/redirect/pytorchuserguide)中的“《Ascend Extension for PyTorch 框架特性指南》 > 基于OpPlugin算子适配开发”章节。
 -   图模式调用：自定义算子在Pytorch图模式下的适配开发指导请参见 [《Ascend Extension for PyTorch》](https://www.hiascend.com/document/redirect/pytorchuserguide)中的“《Pytorch图模式使用(TorchAir)》 >  自定义算子入图”章节。
 
-**图1**  Pytorch框架部署方式<a name="fig1969201074516"></a>
+**图1**  Pytorch框架部署方式<a name="fig1969201074516"></a>  
 ![](../../../figures/Pytorch框架部署方式.png "Pytorch框架部署方式")
 
 **本节主要提供通过torch.library与Pybind注册自定义算子并实现PyTorch框架调用算子Kernel程序的指导。**
@@ -64,7 +64,7 @@ Pybind适用于快速将C++函数暴露给Python，实现高效接口绑定。�
     {
         m.def("ascendc_add(Tensor x, Tensor y) -> Tensor");
     }
-
+    
     // 注册PrivateUse1实现，NPU设备
     TORCH_LIBRARY_IMPL(ascendc_ops, PrivateUse1, m)
     {
@@ -103,10 +103,10 @@ Pybind适用于快速将C++函数暴露给Python，实现高效接口绑定。�
     // Pybind和PyTorch调用所需的头文件
     #include <pybind11/pybind11.h>
     #include <torch/extension.h>
-
+    
     #include "torch_npu/csrc/core/npu/NPUStream.h"
     // Kernel侧实现需要的头文件
-    #include "kernel_operator.h"
+    #include "kernel_operator.h" 
     ...
     namespace ascendc_ops {
     at::Tensor ascendc_add(const at::Tensor& x, const at::Tensor& y)

@@ -26,17 +26,17 @@ using TSCM = TQueBind<pos, TPosition::TSCM, depth, mask>;
 <td class="cellrowborder" valign="top" width="86.37%" headers="mcps1.2.3.1.2 "><p id="p8510214185418"><a name="p8510214185418"></a><a name="p8510214185418"></a>队列的深度表示该队列可以连续进行入队/出队的次数，在代码运行时，对同一个队列有n次连续的EnQue（中间没有DeQue），那么该队列的深度就需要设置为n。</p>
 <p id="p7674135716528"><a name="p7674135716528"></a><a name="p7674135716528"></a>注意，这里的队列深度和double buffer无关，队列机制用于实现流水线并行，double buffer在此基础上进一步提高流水线的利用率。即使队列的深度为1，仍可以开启double buffer。</p>
 <p id="p1334591855410"><a name="p1334591855410"></a><a name="p1334591855410"></a>队列的深度设置为1时，编译器对这种场景做了特殊优化，性能通常更好，<strong id="b0597122135416"><a name="b0597122135416"></a><a name="b0597122135416"></a>推荐设置为1</strong>。</p>
-<a name="ul26757572527"></a><a name="ul26757572527"></a><ul id="ul26757572527"><li>如下样例中队列没有连续入队，队列的深度设置为1。<a name="screen17724335125812"></a><a name="screen17724335125812"></a><pre class="screen" codetype="Cpp" id="screen17724335125812">a1 = que.AllocTensor();
+<a name="ul26757572527"></a><a name="ul26757572527"></a><ul id="ul26757572527"><li>如下样例中队列没有连续入队，队列的深度设置为1。<a name="screen17724335125812"></a><a name="screen17724335125812"></a><pre class="screen" codetype="Cpp" id="screen17724335125812">a1 = que.AllocTensor(); 
 que.EnQue(a1);
 a1 = que.DeQue();
 que.FreeTensor(a1);</pre>
 </li></ul>
-<a name="ul12675135785214"></a><a name="ul12675135785214"></a><ul id="ul12675135785214"><li>如下样例中队列连续2次入队，队列的深度应设置为2，仅在极少数preload场景（比如连续搬入两份数据，计算处理一份，完成后再搬入一份，然后计算处理提前搬入的一份...）可能会使用。其他情况下均不推荐depth &gt;= 2 。<a name="screen11973229582"></a><a name="screen11973229582"></a><pre class="screen" codetype="Cpp" id="screen11973229582">a1 = que.AllocTensor();
+<a name="ul12675135785214"></a><a name="ul12675135785214"></a><ul id="ul12675135785214"><li>如下样例中队列连续2次入队，队列的深度应设置为2，仅在极少数preload场景（比如连续搬入两份数据，计算处理一份，完成后再搬入一份，然后计算处理提前搬入的一份...）可能会使用。其他情况下均不推荐depth &gt;= 2 。<a name="screen11973229582"></a><a name="screen11973229582"></a><pre class="screen" codetype="Cpp" id="screen11973229582">a1 = que.AllocTensor(); 
 a2 = que.AllocTensor();
 que.EnQue(a1);
 que.EnQue(a2);
 a1 = que.DeQue();
-a2 = que.DeQue();
+a2 = que.DeQue(); 
 que.FreeTensor(a1);
 que.FreeTensor(a2);</pre>
 </li></ul>
@@ -63,7 +63,7 @@ que.FreeTensor(a2);</pre>
 </tbody>
 </table>
 
-> [!NOTE]说明
+> [!NOTE]说明 
 >-   TSCM通过using定义TSCM为TQueBind目的地址为TSCM Position时的别名。
 >    -   支持AllocTensor/EnQue/DeQue/FreeTensor接口。必须严格按照AllocTensor-\>EnQue-\>DeQue-\>FreeTensor的操作执行完整的生命周期，且配对使用。
 >    -   但TSCM并不需要支持TQueBind的所有接口。不支持VacantInQue/HasTensorInQue/GetTensorCountInQue/HasIdleBuffer。
@@ -94,7 +94,7 @@ for () {
     typedef matmul::MatmulType<AscendC::TPosition::TSCM, CubeFormat::NZ, half, true, LayoutMode::NONE, false, AscendC::TPosition::VECIN> A_TYPE;
     typedef matmul::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> B_TYPE;
     typedef matmul::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> C_TYPE;
-    typedef matmul::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> BIAS_TYPE;
+    typedef matmul::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> BIAS_TYPE; 
     matmul::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE> mm1;
     constexpr uint32_t M = 32;
     constexpr uint32_t N = 32;

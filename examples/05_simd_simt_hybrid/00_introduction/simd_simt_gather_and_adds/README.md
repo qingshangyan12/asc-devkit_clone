@@ -25,7 +25,7 @@
 
 ## 样例描述
 
-- 样例功能：
+- 样例功能：  
   计算公式：
 
   ```
@@ -42,7 +42,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">gather_and_adds_kernel</td></tr>
   </table>
 
-- 样例实现：
+- 样例实现：  
   Vector Core中SIMT单元和SIMD单元共享片上存储，可以使用片上存储完成SIMT和SIMD的混合编程。本例中样例输入index的shape为[8192]，可设置核数为8，每个核处理数据量为1024，设置线程数`THREAD_COUNT`为1024，每个线程处理1个数据元素，单个核只需调用1次simt_gather函数即可完成gather运算。
 
   > ⚠️ **注意** 当单核处理数据量大于设置的线程数时，需要切分数据到多个线程块，可使用asc_vf_call多次调用simt_gather函数启动多个线程块完成获取指定索引数据的操作。
@@ -73,13 +73,13 @@
 
   （3）将输出数据从UB（Unified Buffer）搬出至GM（Global Memory）上。
 
-- 调用实现：
+- 调用实现：  
   使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -115,7 +115,7 @@
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：Ascend 950PR/Ascend 950DT |
 
-- 执行结果
+- 执行结果  
   执行结果如下，说明精度对比成功。
   ```
   test pass!

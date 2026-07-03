@@ -69,7 +69,7 @@ static __aicore__ inline void Lock(MutexID id)
     // 错误写法 1：先Unlock再Lock，顺序颠倒。
     AscendC::Mutex::Unlock<PIPE_V>(0);
     AscendC::Mutex::Lock<PIPE_V>(0);
-
+    
     // 错误写法 2：连续两次Lock后再连续两次Unlock，未遵循成对使用原则。
     AscendC::Mutex::Lock<PIPE_V>(0);
     AscendC::Mutex::Lock<PIPE_V>(0);
@@ -77,8 +77,8 @@ static __aicore__ inline void Lock(MutexID id)
     AscendC::Mutex::Unlock<PIPE_V>(0);
 
 
-
-
+    
+    
     // 正确写法：Lock和Unlock严格成对出现。
     AscendC::Mutex::Lock<PIPE_V>(0);
     AscendC::Mutex::Unlock<PIPE_V>(0);
@@ -94,10 +94,10 @@ static __aicore__ inline void Lock(MutexID id)
     AscendC::Add(zLocal, xLocal, yLocal, TILE_LENGTH);
     AscendC::Mutex::Unlock<PIPE_V>(0);
     // 不能达到阻塞PIPE_V的效果。
-    AscendC::Mutex::Lock<PIPE_V>(0);
+    AscendC::Mutex::Lock<PIPE_V>(0); 
     AscendC::Add(zLocal, xLocal, yLocal, TILE_LENGTH);
     AscendC::Mutex::Unlock<PIPE_V>(0);
-
+    
     // 正确写法：使用PipeBarrier进行单流水内同步。
     AscendC::Add(zLocal, xLocal, yLocal, TILE_LENGTH);
     AscendC::PipeBarrier<PIPE_V>();

@@ -59,7 +59,7 @@ for (int h = 0; h < dnNum; h++) {
 
 如下图所示，在L0C Buffer中有两个NZ格式的矩阵，每个矩阵N方向上维度为32，M方向上维度为48，经过NZ2DN转换，将数据格式变为右部分所示排布。
 
-**图1** NZ2DN示意图<a name="fig3981319172211"></a>
+**图1** NZ2DN示意图<a name="fig3981319172211"></a>  
 
 ![](../../../../../figures/fixpipe_nz2dn.png)
 

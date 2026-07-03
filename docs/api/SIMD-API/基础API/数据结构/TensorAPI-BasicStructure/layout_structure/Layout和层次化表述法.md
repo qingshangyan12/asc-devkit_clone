@@ -59,9 +59,9 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
     // StrideColumn1应满足：
     // StrideColumn1 % (ShapeRow0 * ShapeColumn0) == 0
     ```
-    **图4** NZ Layout
+    **图4** NZ Layout  
     ![NZ-格式](../../../../../figures/Nz-格式.png)
-
+    
     下面是一个连续的NZ Layout示例，其中C0_ELEMENT = _32{} / sizeof(T)。
 
     ```cpp
@@ -82,7 +82,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
     // StrideRow1 % (ShapeRow0 * ShapeColumn0) == 0
     ```
 
-    **图5** ZN Layout
+    **图5** ZN Layout  
     ![ZN-格式](../../../../../figures/Zn-格式(以half类型为例).png)
 
     下面是一个连续的ZN Layout示例，其中C0_ELEMENT = _32{} / sizeof(T)。

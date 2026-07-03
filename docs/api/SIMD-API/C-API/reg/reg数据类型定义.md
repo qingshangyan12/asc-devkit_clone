@@ -113,10 +113,10 @@ __simd_vf__ inline void add_4d_vf(
     vector_float src_reg, dst_reg;
     vector_bool mask = asc_create_mask_b32(PAT_ALL);
     iter_reg a_reg;
-    for (uint16_t n = 0; n < N; n++) {
-        for (uint16_t c = 0; c < C; c++) {
-            for (uint16_t h = 0; h < H; h++) {
-                for (uint16_t w = 0; w < W; w++) {
+    for (uint16_t n = 0; n < N; n++) {          
+        for (uint16_t c = 0; c < C; c++) {       
+            for (uint16_t h = 0; h < H; h++) {    
+                for (uint16_t w = 0; w < W; w++) {  
                     a_reg = asc_create_iter_reg_b32(n_stride, c_stride, h_stride, w_stride);
                     asc_loadalign(src_reg, src_addr, a_reg);
                     asc_add(dst_reg, src_reg, src_reg, mask);

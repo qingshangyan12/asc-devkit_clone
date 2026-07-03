@@ -24,7 +24,7 @@
 
 ## 样例描述
 
-- 样例功能：
+- 样例功能：  
   样例计算int64_t类型数据，分别使用RegTraitNumOne和RegTraitNumTwo配置regTrait作为RegTensor、MaskReg模板参数实现向量除法运算。计算公式如下：
   $$z_i = \frac{x_i}{y_i}$$
 
@@ -49,30 +49,30 @@
         7. 将计算结果从Unified Buffer搬回Global Memory
         8. 在Host端进行精度验证和golden data对比
 
-    - 多场景说明：
+    - 多场景说明：  
         - 场景1（SCENARIO_NUM=1）：使用RegTraitNumOne作为RegTensor和MaskReg的regTrait模板参数
             - 实现函数：TraitNumOneVF<T>
-            - 实现：
+            - 实现：  
               `AscendC::Reg::RegTensor<T, AscendC::Reg::RegTraitNumOne> xReg, yReg, zReg;`
               `AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL, AscendC::Reg::RegTraitNumOne>();`
             - 可支持b8/b16/b32/b64类型数据，对b64类型数据单次指令发射收益变低。
 
         - 场景2（SCENARIO_NUM=2）：使用RegTraitNumTwo作为RegTensor和MaskReg的regTrait模板参数
             - 实现函数：TraitNumTwoVF<T>
-            - 实现：
-              `AscendC::Reg::RegTensor<T, AscendC::Reg::RegTraitNumTwo> xReg, yReg, zReg;`
+            - 实现：  
+              `AscendC::Reg::RegTensor<T, AscendC::Reg::RegTraitNumTwo> xReg, yReg, zReg;`  
               `AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL, AscendC::Reg::RegTraitNumTwo>();`
             - 仅支持b64/complex32类型数据，提高单次指令发射中处理的元素个数，提高并行度。
 
-    - 性能对比：
+    - 性能对比：  
       下表为样例在Ascend 950系列产品上运行的性能数据：
-
+       
        | 场景 | 核数 | Task Duration(μs) | aiv_total_cycles | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
        |:---:|:---:|:-----------------:|:----------------:|:------------:|:----------------:|:-------------:|:-------------------:|:----------------:|:-----------------:|:--------------:|:-----------------:|:--------------:|
        |  1  |  1  |      58.168       |      95271       |    57.92     |      56.09       |     0.969     |        0.268        |      0.004       |       1.082       |     0.019      |       0.463       |     0.008      |
        |  2  |  1  |      39.563       |      64543       |    39.318    |      37.471      |     0.953     |        0.273        |      0.007       |       1.082       |     0.038      |       0.471       |     0.012      |
-
-       场景2相较场景1配置使用2倍的RegTensor位宽，同样数据规模整体耗时从 58.168 μs 减少到 39.563 μs，总耗时减少18.605 μs，性能提升了约 32%，指令执行周期从 95,271 锐减至 64,543。表明更大位宽的寄存器配置有效消除了由于位宽限制导致的指令拆分与流水线等待周期，释放了 Vector 单元的算力。
+        
+       场景2相较场景1配置使用2倍的RegTensor位宽，同样数据规模整体耗时从 58.168 μs 减少到 39.563 μs，总耗时减少18.605 μs，性能提升了约 32%，指令执行周期从 95,271 锐减至 64,543。表明更大位宽的寄存器配置有效消除了由于位宽限制导致的指令拆分与流水线等待周期，释放了 Vector 单元的算力。  
       <br>
       **性能指标说明：**
 
@@ -134,7 +134,7 @@
   | `CMAKE_ASC_RUN_MODE`      | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真                      |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`            | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
-- 执行结果
+- 执行结果  
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!

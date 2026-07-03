@@ -91,7 +91,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
     - srcGap = 0，源操作数相邻数据块之间的间隔为0。
     - dstGap = 0，目的操作数相邻数据块之间的间隔为0。
 
-    **图1**  连续搬运示意图<a name="zh-cn_topic_0000002535088926_fig4621152141711"></a>
+    **图1**  连续搬运示意图<a name="zh-cn_topic_0000002535088926_fig4621152141711"></a>  
     ![](../../../../../figures/continuous_data_copy_diagram.png "连续搬运示意图")
 
 - 示例2：非连续搬运
@@ -105,7 +105,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
     - srcGap = 1，源操作数相邻数据块之间的间隔为1。
     - dstGap = 2，目的操作数相邻数据块之间的间隔为2。
 
-    **图2**  非连续搬运示意图<a name="zh-cn_topic_0000002535088926_fig422819202304"></a>
+    **图2**  非连续搬运示意图<a name="zh-cn_topic_0000002535088926_fig422819202304"></a>  
     ![](../../../../../figures/discontinuous_data_copy_diagram.png "非连续搬运示意图")
 
 ## 数据类型<a name="section4219135304818"></a>
@@ -188,7 +188,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
     // srcLocal、dstLocal为half类型的LocalTensor。
     // 使用传入count参数的搬运接口，完成连续搬运。
     AscendC::DataCopy(dstLocal, srcLocal, 128);
-
+    
     // 使用传入DataCopyParams参数的搬运接口，实现相同的连续搬运效果。
     // blockCount = 1：连续数据块个数为1
     // blockLen = 8：一个数据块长度为8个DataBlock（128个half元素 ÷ (32B/2B) = 8）。

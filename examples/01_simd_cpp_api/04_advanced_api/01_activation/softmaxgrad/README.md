@@ -44,13 +44,13 @@
 </table>
 </div>
 
-- 样例实现:
+- 样例实现:  
 本样例实现的是固定 shape 的样例，输入 x `[960, 960]`，y `[960, 960]`，分核进行计算。
 
-  - Tiling 实现
+  - Tiling 实现  
     按照行数进行分核，使用平均分配法按核数向上对齐分配，确定主核和尾核的计算行数。根据 reduce 轴长度查询 SLICE_TABLE 确定每次循环处理的行数，调用 `GetSoftMaxGradMinTmpSize` 和 `SoftMaxGradTilingFunc` 获取 API 所需的 Tiling 参数。
 
-  - Kernel 实现
+  - Kernel 实现  
     核心计算步骤：将输入数据搬入后，调用对应的 SoftmaxGrad/SoftmaxGradFront API 完成梯度计算，再将结果搬出。
 
     SoftmaxGrad 模式调用方式：
@@ -63,7 +63,7 @@
     AscendC::SoftmaxGradFront<float>(zLocal, xLocal, yLocal, tmpBuffer, softmaxTiling, srcShape);
     ```
 
-- 调用实现
+- 调用实现  
   使用内核调用符 `<<<>>>` 调用核函数。
 
 ## 编译运行

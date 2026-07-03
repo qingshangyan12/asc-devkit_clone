@@ -29,21 +29,21 @@
 
 ## 样例描述
 
-- 样例功能：
-  按元素判断输入的浮点数是否非NAN、非INF，输出结果为浮点数或者布尔值。对于非NAN或者非INF的输入数据，当输出为浮点类型时，对应位置的结果为该浮点类型的1，反之为0；当输出为bool类型时，对应位置的结果为true，反之false。
-  计算公式如下：
+- 样例功能：  
+  按元素判断输入的浮点数是否非NAN、非INF，输出结果为浮点数或者布尔值。对于非NAN或者非INF的输入数据，当输出为浮点类型时，对应位置的结果为该浮点类型的1，反之为0；当输出为bool类型时，对应位置的结果为true，反之false。  
+  计算公式如下：  
   $$dst_i = IsFinite(src_i)$$
 
-  当输入为浮点类型时：
+  当输入为浮点类型时：  
   $$
-  IsFinite(x) =
+  IsFinite(x) = 
   \begin{cases}
   0.0, & x = \pm\inf \text{ or } x = \text{nan} \\
   1.0, & x \ne \pm\inf \text{ and } x \ne \text{nan}
   \end{cases}
   $$
 
-  当输出为bool类型时：
+  当输出为bool类型时：  
   $$
   IsFinite(x) =
   \begin{cases}
@@ -51,7 +51,7 @@
   true, & x \ne \pm\inf \text{ and } x \ne \text{nan}
   \end{cases}
   $$
-- 样例规格：
+- 样例规格：  
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center"> isfinite </td></tr>
 
@@ -64,20 +64,20 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">isfinite_custom</td></tr>
   </table>
 
-- 样例实现：
+- 样例实现：  
   本样例中实现的是固定shape为输入x[1, 1024]，输出y[1, 1024]的isfinite_custom样例。
 
-  - Kernel实现
+  - Kernel实现  
     计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用IsFinite高阶API接口完成isfinite计算，得到最终结果，再搬出到外部存储上。
 
-  - 调用实现
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
-## 编译运行
+## 编译运行  
 
 在本样例根目录下执行如下步骤，编译并执行算子。
 
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

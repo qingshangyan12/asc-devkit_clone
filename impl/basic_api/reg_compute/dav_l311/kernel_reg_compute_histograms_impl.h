@@ -7,7 +7,7 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-
+ 
 /*!
  * \file kernel_reg_compute_histograms_impl.h
  * \brief
@@ -21,7 +21,7 @@
 
 #ifndef ASCENDC_MODULE_REG_COMPUTE_HISTOGRAMS_IMPL_H
 #define ASCENDC_MODULE_REG_COMPUTE_HISTOGRAMS_IMPL_H
-
+ 
 #include "kernel_reg_compute_common_impl.h"
 namespace AscendC {
 namespace Reg {

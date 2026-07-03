@@ -1,18 +1,18 @@
 # TensorDesc<a name="ZH-CN_TOPIC_0000001666000904"></a>
 
--   **[TensorDesc简介](TensorDesc简介.md)**
+-   **[TensorDesc简介](TensorDesc简介.md)**  
 
--   **[构造和析构函数](构造和析构函数.md)**
+-   **[构造和析构函数](构造和析构函数.md)**  
 
--   **[SetShapeAddr](SetShapeAddr.md)**
+-   **[SetShapeAddr](SetShapeAddr.md)**  
 
--   **[GetDim](GetDim.md)**
+-   **[GetDim](GetDim.md)**  
 
--   **[GetIndex](GetIndex.md)**
+-   **[GetIndex](GetIndex.md)**  
 
--   **[GetShape](GetShape-138.md)**
+-   **[GetShape](GetShape-138.md)**  
 
--   **[GetDataPtr](GetDataPtr.md)**
+-   **[GetDataPtr](GetDataPtr.md)**  
 
--   **[GetDataObj](GetDataObj.md)**
+-   **[GetDataObj](GetDataObj.md)**  
 

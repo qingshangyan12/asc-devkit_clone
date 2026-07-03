@@ -30,7 +30,7 @@ This example uses the Gelu high-level API in an activation function scenario to 
 
 ## Example Description
 
-- Example function:
+- Example function:  
   This example performs element-wise GELU activation computation on the input tensor and writes the computation result to the output tensor.
 
   The computation formulas are as follows:
@@ -54,22 +54,22 @@ This example uses the Gelu high-level API in an activation function scenario to 
 </table>
 </div>
 
-- Example implementation:
+- Example implementation:  
   This example implements a gelu_custom example with fixed shapes of input src[1, 32] and output dst[1, 32].
 
-  - Kernel implementation
+  - Kernel implementation  
     Core computation steps: After transferring the input data in, call `AscendC::Gelu` to complete the GELU computation, then transfer the result out.
 
-  - Tiling implementation
+  - Tiling implementation  
     This example is a single-core element-wise computation scenario with no complex multi-core logic. The host side obtains the temporary buffer size required by the API through `AscendC::GetGeluMinTmpSize` and passes it directly to the kernel.
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -104,7 +104,7 @@ Run the following steps in the root directory of this example to build and run t
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU run, CPU debug, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products; dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
 
-- Execution result
+- Execution result  
   The following execution result indicates that the precision comparison is successful.
   ```bash
   test pass!

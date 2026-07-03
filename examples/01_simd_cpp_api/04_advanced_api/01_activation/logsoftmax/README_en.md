@@ -50,16 +50,16 @@ This example uses the LogSoftMax high-level API in a multi-classification task s
 </table>
 </div>
 
-- Example implementation:
+- Example implementation:  
   This example implements a logsoftmax_custom example with fixed shapes of input src[128, 128] and output dst[128, 128].
 
-  - Kernel implementation
+  - Kernel implementation  
     Core computation steps: After transferring the input data in, call `AscendC::LogSoftMax` to complete the LogSoftMax computation, then transfer the result out.
 
-  - Tiling implementation
+  - Tiling implementation  
     This example is a single-core computation scenario with no complex multi-core logic. The host side obtains the temporary buffer size required by the API through `AscendC::GetLogSoftMaxMinTmpSize`. The kernel internally uses the `LogSoftMaxTiling` struct to pass the tiling parameters required by the API.
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run

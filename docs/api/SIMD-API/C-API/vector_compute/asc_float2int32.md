@@ -16,13 +16,13 @@
 * FLOOR舍入模式：向负无穷舍入
 * CEIL舍入模式：向正无穷舍入
 * TRUNC舍入模式：向零舍入
-
-
+  
+  
 
 ## 函数原型
 
 * 前n个数据计算
-
+  
   ```cpp
   // RINT舍入模式
   __aicore__ inline void asc_float2int32_rn(__ubuf__ int32_t* dst, __ubuf__ float* src, uint32_t count)
@@ -37,7 +37,7 @@
   ```
 
 - 高维切分计算
-
+  
   ```cpp
   // RINT舍入模式
   __aicore__ inline void asc_float2int32_rn(__ubuf__ int32_t* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
@@ -52,7 +52,7 @@
   ```
 
 - 同步计算
-
+  
   ```cpp
   // RINT舍入模式
   __aicore__ inline void asc_float2int32_rn_sync(__ubuf__ int32_t* dst, __ubuf__ float* src, uint32_t count)

@@ -24,7 +24,7 @@
 ```
 
 ## 样例描述
-- 样例功能：
+- 样例功能：  
   Matmul样例调用Matmul API计算时，通过配置MatmulConfig中的enUnitFlag参数为true，使能MDL模板开启UnitFlag功能。Norm模板、IBShare模板默认使能UnitFlag功能，MDL模板默认不使能UnitFlag功能。
 
 - 约束条件
@@ -32,7 +32,7 @@
   - 使能UnitFlag功能时，不支持样例内同时存在L0C搬出到Global Memory和L1搬出到Global Memory的两种流水。
   - 使能UnitFlag功能时，若同时使能L0C累加功能，不支持多次Iterate计算，一次GetTensorC输出。
 
-- 样例规格：
+- 样例规格：  
   本样例中：M = 1024, N = 4096, K = 1024。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
@@ -44,7 +44,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_unitflag_custom</td></tr>
   </table>
 
-- 样例实现：
+- 样例实现： 
   - Kernel关键步骤
     - 创建Matmul对象时，自定义MatmulConfig参数，将其中的enUnitFlag参数设置为true，使能UnitFlag功能，获得自定义的使用MDL模板的Matmul对象。
       ```cpp
@@ -66,12 +66,12 @@
       AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL_UNITFLAG> matmulObj;
       ```
 
-  - 调用实现
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

@@ -114,9 +114,9 @@ extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8
     KernelAdd op;
 
     GET_TILING_DATA_PTR_WITH_STRUCT(AddCustomTilingData, tilingDataPtr, tiling);
-
+ 
     if ASCEND_IS_AIV {
-        COPY_TILING_WITH_ARRAY(uint64_t, 2, tilingDataPtr->vectorTilingArray, vTilingArrayPtr);
+        COPY_TILING_WITH_ARRAY(uint64_t, 2, tilingDataPtr->vectorTilingArray, vTilingArrayPtr);        
         op.Init(x, y, z, (*vTilingArrayPtr)[0], (*vTilingArrayPtr)[1]);
         op.Process();
     } else {

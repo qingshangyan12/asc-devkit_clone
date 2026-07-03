@@ -52,7 +52,7 @@ This example uses the Acosh high-level API to compute the inverse hyperbolic cos
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">acosh_custom</td></tr>
   </table>
 
-- Example implementation:
+- Example implementation:  
   This example implements an acosh_custom example with fixed shapes of input src[1, 16] and output dst[1, 16].
 
   - Kernel implementation
@@ -66,11 +66,11 @@ This example uses the Acosh high-level API to compute the inverse hyperbolic cos
   - Invocation implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run
+## Build and Run  
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -88,7 +88,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-
+  
   For example:
 
   ```bash

@@ -30,7 +30,7 @@
 
 ## 样例描述
 
-- 样例功能：
+- 样例功能：  
   本样例对输入Tensor按元素做GELU激活计算，将计算结果写入输出Tensor。
 
   计算公式如下：
@@ -54,22 +54,22 @@
 </table>
 </div>
 
-- 样例实现：
+- 样例实现：  
   本样例中实现的是固定shape为输入src[1, 32]，输出dst[1, 32]的gelu_custom样例。
 
-  - Kernel实现
+  - Kernel实现  
     核心计算步骤：将输入数据搬入后，调用 `AscendC::Gelu` 完成GELU计算，再将结果搬出。
 
-  - Tiling实现
+  - Tiling实现  
     本样例为单核逐元素计算场景，无复杂分核逻辑。Host端通过 `AscendC::GetGeluMinTmpSize` 获取API所需临时缓冲区大小，直接传递给Kernel使用。
 
-  - 调用实现
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -104,7 +104,7 @@
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
-- 执行结果
+- 执行结果  
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!

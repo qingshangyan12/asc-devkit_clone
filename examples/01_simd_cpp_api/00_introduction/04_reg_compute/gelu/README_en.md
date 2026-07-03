@@ -218,7 +218,7 @@ cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
 
 ## Directory Structure
 
-```
+``` 
 ├── gelu
 │   ├── scripts
 │   │   ├── gen_data.py     // Input data and golden data generation script
@@ -233,7 +233,7 @@ cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
 
 Execute the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables according to the [installation method](https://gitcode.com/cann/asc-devkit/blob/master/docs/quick_start.md#prepare&install) of the CANN development toolkit on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -268,7 +268,7 @@ Execute the following steps in the root directory of this example to build and r
   | `CMAKE_VF_MODE` | `true` (default), `false` | VF fusion mode: enable or disable `--cce-simd-vf-fusion` |
 
 
-- Execution result
+- Execution result  
   The execution result is as follows, indicating that the accuracy comparison succeeded.
   ```bash
   test pass!

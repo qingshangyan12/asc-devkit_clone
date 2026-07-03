@@ -19,17 +19,17 @@
     #include <iostream>
     #include "exe_graph/runtime/storage_shape.h"
     #include "tiling/context/context_builder.h"
-
+    
     int main()
     {
         gert::StorageShape x_shape = {{2, 32}, {2, 32}};
         gert::StorageShape y_shape = {{2, 32}, {2, 32}};
         gert::StorageShape z_shape = {{2, 32}, {2, 32}};
-
+    
         auto param = gert::TilingData::CreateCap(4096);
         auto workspace_size_holder = gert::ContinuousVector::Create<size_t>(4096);
         auto ws_size = reinterpret_cast<gert::ContinuousVector *>(workspace_size_holder.get());
-
+    
         auto holder = context_ascendc::ContextBuilder()
                                     .NodeIoNum(2, 1)
                                     .IrInstanceNum({1, 1})

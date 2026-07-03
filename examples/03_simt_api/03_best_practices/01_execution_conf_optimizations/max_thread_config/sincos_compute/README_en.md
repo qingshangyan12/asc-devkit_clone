@@ -99,11 +99,11 @@ This example demonstrates the effect of `__launch_bounds__` through 2 independen
 **Key Code**:
 
 ```cpp
-__global__ void sincos_thread_1024(float* input, float* output_sin,
+__global__ void sincos_thread_1024(float* input, float* output_sin, 
                                     float* output_cos, uint64_t total_length)
 {
     int32_t blk_start_idx = blockIdx.x * THREADS_PER_BLOCK * PER_THREAD_LOOP;
-
+    
     // Each core computes PER_THREAD_LOOP * THREADS_PER_BLOCK operations
     for (int i = 0; i < PER_THREAD_LOOP; i++) {
         int idx = blk_start_idx + i * THREADS_PER_BLOCK + threadIdx.x;
@@ -151,12 +151,12 @@ Optimization direction: Use `__launch_bounds__` to inform the compiler of the ac
 **Key Code**:
 
 ```cpp
-__global__ __launch_bounds__(512) void sincos_thread_512(float* input,
+__global__ __launch_bounds__(512) void sincos_thread_512(float* input, 
                                     float* output_sin, float* output_cos,
                                     uint64_t total_length)
 {
     int32_t blk_start_idx = blockIdx.x * THREADS_PER_BLOCK * PER_THREAD_LOOP;
-
+    
     // Each core computes PER_THREAD_LOOP * THREADS_PER_BLOCK operations
     for (int i = 0; i < PER_THREAD_LOOP; i++) {
         int idx = blk_start_idx + i * THREADS_PER_BLOCK + threadIdx.x;
@@ -227,7 +227,7 @@ __global__ __launch_bounds__(512) void sincos_thread_512(float* input,
 
 Run the following steps in the root directory of this example to build and execute the example.
 
-- Configure Environment Variables
+- Configure Environment Variables  
   Configure environment variables based on the [installation method](../../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
 
   ```bash

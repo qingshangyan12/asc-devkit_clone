@@ -27,7 +27,7 @@ This sample implements the Add vector addition operation based on the memory and
 
 ## Sample Description
 
-- Sample Function:
+- Sample Function:  
   Calculation formula:
   ```
   z = x + y
@@ -53,7 +53,7 @@ This sample implements the Add vector addition operation based on the memory and
   </table>
 
 - Sample Implementation:
-  - Kernel Implementation
+  - Kernel Implementation  
     The kernel function entry `add_custom` in `add_tpipe_tque.asc` receives `totalLength`, and inside the kernel function calculates the `blockLength` that each core needs to process based on `GetBlockNum()`, then calculates the data start point in GM for the current core using `GetBlockIdx()`. After that, the kernel function directly completes the entire flow of moving input data to UB and enqueuing, executing `Add` after dequeuing, and writing the result back to GM.
 
   - Kernel Entry Implementation
@@ -65,7 +65,7 @@ This sample implements the Add vector addition operation based on the memory and
 ## Compilation and Execution
 
 Execute the following steps in the root directory of this sample to compile and run the sample.
-- Configure Environment Variables
+- Configure Environment Variables  
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development toolkit package on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -100,7 +100,7 @@ Execute the following steps in the root directory of this sample to compile and 
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debug, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
 
-- Execution Result
+- Execution Result  
   The execution result is as follows, indicating that the precision comparison succeeded.
   ```bash
   test pass!

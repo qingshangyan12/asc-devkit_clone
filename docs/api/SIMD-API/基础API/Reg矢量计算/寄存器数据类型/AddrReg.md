@@ -31,40 +31,40 @@
 AddrReg是用于Reg矢量计算接口管理地址偏移量的专用寄存器。在循环外定义后，在循环内调用模板函数CreateAddrReg<T>接口赋值并绑定每层循环轴索引（index）与步长（stride），能够在多维循环中逐层累加地址偏移。CreateAddrReg接口支持绑定1-4层for循环，返回的地址偏移由index*stride的决定，在循环中，index每次递增1，AddrReg的偏移量就自动增加对应的stride，具体的偏移量满足如下伪代码所示：
 
 ```cpp
-// 1层循环:
-AscendC::Reg::AddrReg aReg;
-for (uint16_t index0 = 0; index0 < loopNum0; ++index0){
-    aReg = AscendC::Reg::CreateAddrReg<T>(index0, stride0);  // Offset = index0 * stride0
-}
-
-// 2层循环
-AscendC::Reg::AddrReg aReg;
-for (uint16_t index0 = 0; index0 < loopNum0; ++index0){
-    for (uint16_t index1 = 0; index1 < loopNum1; ++index1){
-        aReg = AscendC::Reg::CreateAddrReg<T>(index0, stride0, index1, stride1);  // Offset = index0 * stride0 + index1 * stride1
-    }
-}
-
-// 3层循环：
-AscendC::Reg::AddrReg aReg;
-for (uint16_t index0 = 0; index0 < loopNum0; ++index0){
-    for (uint16_t index1 = 0; index1 < loopNum1; ++index1){
-        for (uint16_t index2 = 0; index2 < loopNum2; ++index2){
-            aReg = AscendC::Reg::CreateAddrReg<T>(index0, stride0, index1, stride1, index2, stride2);  // Offset = index0 * stride0 + index1 * stride1 + index2 * stride2
-        }
-    }
-}
-
-// 4层循环：
-AscendC::Reg::AddrReg aReg;
-for (uint16_t index0 = 0; index0 < loopNum0; ++index0){
-    for (uint16_t index1 = 0; index1 < loopNum1; ++index1){
-        for (uint16_t index2 = 0; index2 < loopNum2; ++index2){
-            for (uint16_t index3 = 0; index3 < loopNum3; ++index3){
-                aReg = AscendC::Reg::CreateAddrReg<T>(index0, stride0, index1, stride1, index2, stride2, index3, stride3);  // Offset = index0 * stride0 + index1 * stride1 + index2 * stride2 + index3 * stride3
-            }
-        }
-    }
+// 1层循环: 
+AscendC::Reg::AddrReg aReg; 
+for (uint16_t index0 = 0; index0 < loopNum0; ++index0){ 
+    aReg = AscendC::Reg::CreateAddrReg<T>(index0, stride0);  // Offset = index0 * stride0 
+} 
+    
+// 2层循环 
+AscendC::Reg::AddrReg aReg; 
+for (uint16_t index0 = 0; index0 < loopNum0; ++index0){ 
+    for (uint16_t index1 = 0; index1 < loopNum1; ++index1){ 
+        aReg = AscendC::Reg::CreateAddrReg<T>(index0, stride0, index1, stride1);  // Offset = index0 * stride0 + index1 * stride1 
+    } 
+} 
+ 
+// 3层循环： 
+AscendC::Reg::AddrReg aReg; 
+for (uint16_t index0 = 0; index0 < loopNum0; ++index0){ 
+    for (uint16_t index1 = 0; index1 < loopNum1; ++index1){ 
+        for (uint16_t index2 = 0; index2 < loopNum2; ++index2){ 
+            aReg = AscendC::Reg::CreateAddrReg<T>(index0, stride0, index1, stride1, index2, stride2);  // Offset = index0 * stride0 + index1 * stride1 + index2 * stride2 
+        } 
+    } 
+} 
+ 
+// 4层循环： 
+AscendC::Reg::AddrReg aReg; 
+for (uint16_t index0 = 0; index0 < loopNum0; ++index0){ 
+    for (uint16_t index1 = 0; index1 < loopNum1; ++index1){ 
+        for (uint16_t index2 = 0; index2 < loopNum2; ++index2){ 
+            for (uint16_t index3 = 0; index3 < loopNum3; ++index3){ 
+                aReg = AscendC::Reg::CreateAddrReg<T>(index0, stride0, index1, stride1, index2, stride2, index3, stride3);  // Offset = index0 * stride0 + index1 * stride1 + index2 * stride2 + index3 * stride3 
+            } 
+        } 
+    } 
 }
 ```
 
@@ -73,27 +73,27 @@ AddrReg应该通过CreateAddrReg API初始化，然后在循环中使用AddrReg�
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-// offset = index0 * stride0
-template <typename T>
-__simd_callee__ inline AddrReg CreateAddrReg(uint16_t index0, uint32_t stride0)
-
-// offset = index0 * stride0 + index1 * stride1
-template <typename T>
-__simd_callee__ inline AddrReg CreateAddrReg(uint16_t index0, uint32_t stride0, uint16_t index1, uint32_t stride1)
-
-// offset = index0 * stride0 + index1 * stride1 + index2 * stride2
-template <typename T>
+// offset = index0 * stride0 
+template <typename T> 
+__simd_callee__ inline AddrReg CreateAddrReg(uint16_t index0, uint32_t stride0) 
+  
+// offset = index0 * stride0 + index1 * stride1 
+template <typename T> 
+__simd_callee__ inline AddrReg CreateAddrReg(uint16_t index0, uint32_t stride0, uint16_t index1, uint32_t stride1) 
+  
+// offset = index0 * stride0 + index1 * stride1 + index2 * stride2 
+template <typename T> 
 __simd_callee__ inline AddrReg CreateAddrReg(uint16_t index0, uint32_t stride0, uint16_t index1, uint32_t stride1, uint16_t index2, uint32_t stride2)
-
-// offset = index0 * stride0 + index1 * stride1 + index2 * stride2 + index3 * stride3
-template <typename T>
+ 
+// offset = index0 * stride0 + index1 * stride1 + index2 * stride2 + index3 * stride3 
+template <typename T> 
 __simd_callee__ inline AddrReg CreateAddrReg(uint16_t index0, uint32_t stride0, uint16_t index1, uint32_t stride1, uint16_t index2, uint32_t stride2, uint16_t index3, uint32_t stride3)
 ```
 
 ## 参数说明<a name="section132601254123919"></a>
 
 | 参数 | 含义 |
-| :-- | :------------ |
+| :-- | :------------ | 
 | T | 模板参数，支持的数据类型为b8、b16、b32、b64。 |
 | index0 | 计算偏移量时作为最外层循环轴。 |
 | index1 | 计算偏移量时作为第二层循环轴。 |

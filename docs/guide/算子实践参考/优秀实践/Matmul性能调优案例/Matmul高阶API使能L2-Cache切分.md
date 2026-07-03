@@ -63,7 +63,7 @@
     -   优化前，输入数据不进行切分，所有核一次计算全部数据。如下图所示，图中数字表示核id，24个核一次计算A和B矩阵的所有数据。
     -   优化后，输入数据被切分多次，所有核分多次计算，每个核单次计算只依赖切分后的数据量。L2 Cache切分方案确保单次计算的数据都在L2 Cache缓存中，搬运输入数据的效率更高。
 
-    **图1**  优化点一示意图<a name="fig37871937335"></a>
+    **图1**  优化点一示意图<a name="fig37871937335"></a>  
     ![](../../../figures/优化点一示意图.png "优化点一示意图")
 
 -   优化点二：选择拖尾较小的L2 Cache切分方案
@@ -72,7 +72,7 @@
 
     在实际场景中，满足切分后的数据量小于L2 Cache大小的前提下，拖尾越小越好。基于这个原则可以确定L2 Cache切分块数。
 
-    **图2**  优化点二示意图<a name="fig187267372095"></a>
+    **图2**  优化点二示意图<a name="fig187267372095"></a>  
     ![](../../../figures/优化点二示意图.png "优化点二示意图")
 
 -   优化点三：错位分核，减少左右矩阵同地址冲突问题
@@ -81,7 +81,7 @@
 
     在M和N方向，将矩阵数据L2 Cache切分为大数据块，然后在数据块间错位分核，即将每个数据块依次沿对角线分配给不同的核处理，从而有效减少同地址冲突的问题。比如，在处理同一行的尾块数据0，1，2，3时，如果顺序分配执行的核，多核会同时读同一行左矩阵数据，导致读读冲突。若按照对角线方式分配执行的核，在对角线上的尾块数据被分配给核0，1，2，3计算，多核访问不同行的左矩阵数据，将减少同地址冲突的次数。
 
-    **图3**  优化点三示意图<a name="fig12727153717911"></a>
+    **图3**  优化点三示意图<a name="fig12727153717911"></a>  
     ![](../../../figures/优化点三示意图.png "优化点三示意图")
 
 Matmul API开启L2 Cache切分的完整样例请参考[L2 Cache切分的算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_l2cache)。实现L2 Cache切分的关键步骤如下：
@@ -89,35 +89,35 @@ Matmul API开启L2 Cache切分的完整样例请参考[L2 Cache切分的算子�
 1.  判断是否需要进行L2 Cache切分。如果数据总量超过设定的L2 Cache大小，则计算L2 Cache切分数目。
 
     ```
-    bool smallDim = mTileNum_ < L1_MIN_UST_DIM && nTileNum_ < L1_MIN_UST_DIM;
-    if (smallDim || (!EnableL2Tile())) { // 判断计算数据总量是否小于L2Cache阈值
+    bool smallDim = mTileNum_ < L1_MIN_UST_DIM && nTileNum_ < L1_MIN_UST_DIM; 
+    if (smallDim || (!EnableL2Tile())) { // 判断计算数据总量是否小于L2Cache阈值     
         mL2TileNum_ = mTileNum_;
         nL2TileNum_ = nTileNum_;
         mL2BlockNum_ = 1;
         nL2BlockNum_ = 1;
-        return; // 不需要切分，提前返回
-    }
+        return; // 不需要切分，提前返回 
+    } 
     InitL2TileTail(); // 计算L2切分
     ```
 
 2.  基于负载均衡原则，计算L2 Cache切分的份数，m方向L2 Cache切分数：mL2TileNum\_，n方向L2 Cache切分数：nL2TileNum\_。
 
     ```
-    int64_t mConflict = INT64_MAX;
-    int64_t nConflict = INT64_MAX;
-    constexpr bool isNMajor = l1N > l1M; // 根据shape大小，判断主维度
-    for (int64_t i = maxMajor; i >= L1_MIN_UST_DIM; i--) {
-        for (int64_t j = maxMinor; j >= minMinor; j--) {
-            if (GetTotalSize(j * l1M, i * l1N, k_) <= L2_TILE_THRESHOLD) { // 确保分块小于L2Cache阈值
-                uint64_t mConflictTmp = AscendC::Ceil(blockNum_, mL2TileNumTailTmp); // 计算负载冲突值
-                uint64_t nConflictTmp = AscendC::Ceil(blockNum_, nL2TileNumTailTmp);
-                if (mConflict >= mConflictTmp && nConflict >= nConflictTmp) { // 若冲突值更小，更新分块数量
-                    mConflict = mConflictTmp;
-                    nConflict = nConflictTmp;
-                    mL2TileNum_ = curMajorDim;
-                    nL2TileNum_ = curMinorDim;
-                }
-             }
+    int64_t mConflict = INT64_MAX; 
+    int64_t nConflict = INT64_MAX; 
+    constexpr bool isNMajor = l1N > l1M; // 根据shape大小，判断主维度 
+    for (int64_t i = maxMajor; i >= L1_MIN_UST_DIM; i--) {     
+        for (int64_t j = maxMinor; j >= minMinor; j--) {         
+            if (GetTotalSize(j * l1M, i * l1N, k_) <= L2_TILE_THRESHOLD) { // 确保分块小于L2Cache阈值           
+                uint64_t mConflictTmp = AscendC::Ceil(blockNum_, mL2TileNumTailTmp); // 计算负载冲突值            
+                uint64_t nConflictTmp = AscendC::Ceil(blockNum_, nL2TileNumTailTmp);            
+                if (mConflict >= mConflictTmp && nConflict >= nConflictTmp) { // 若冲突值更小，更新分块数量             
+                    mConflict = mConflictTmp;              
+                    nConflict = nConflictTmp;         
+                    mL2TileNum_ = curMajorDim;                 
+                    nL2TileNum_ = curMinorDim;     
+                }       
+             }   
          }
      }
     ```
@@ -125,16 +125,16 @@ Matmul API开启L2 Cache切分的完整样例请参考[L2 Cache切分的算子�
 3.  错位分核。输入当前数据块的下标，获取按对角线分配的核的下标。
 
     ```
-    __aicore__ inline BlockCoord GetBlockCoord(int64_t tileIdx)    {
-        GetCommonTileIndex(tileIdx);
+    __aicore__ inline BlockCoord GetBlockCoord(int64_t tileIdx)    {  
+        GetCommonTileIndex(tileIdx); 
         int64_t mTileIdx = newBlockIdx_ % mL2TileNumTmp_;
         mTileIdx = mTileIdx + mL2Idx_ * mL2TileNum_;
-        int64_t nTileIdx = 0;
-        if (mL2TileNumTmp_ != 0 && nL2TileNumTmp_ != 0) {
+        int64_t nTileIdx = 0;     
+        if (mL2TileNumTmp_ != 0 && nL2TileNumTmp_ != 0) {  
             int64_t tmp = newBlockIdx_ /CalcLcm(mL2TileNumTmp_, nL2TileNumTmp_);
             nTileIdx = (newBlockIdx_ + tmp) % nL2TileNumTmp_;
-        }
-        nTileIdx = nTileIdx + nL2Idx_ * nL2TileNum_;
+        }      
+        nTileIdx = nTileIdx + nL2Idx_ * nL2TileNum_;     
         return {mTileIdx * l1M, nTileIdx * l1N, 0};
     }
     ```
@@ -142,28 +142,28 @@ Matmul API开启L2 Cache切分的完整样例请参考[L2 Cache切分的算子�
 4.  设置左右矩阵，根据前序步骤计算的L2 Cache切分数和执行核的下标，循环多次计算Matmul。
 
     ```
-    L2CacheOpt l2Opt(shapes, blockNum);
+    L2CacheOpt l2Opt(shapes, blockNum); 
     matmulObj.SetOrgShape(shapes.m, shapes.n, shapes.k);
-    for (int64_t tileIdx = curBlockIdx; tileIdx < l2Opt.GetTileNum(); tileIdx += blockNum) {
-        auto blockShape = l2Opt.GetBlockShape(tileIdx);  // 获取单次计算L2切分块大小
+    for (int64_t tileIdx = curBlockIdx; tileIdx < l2Opt.GetTileNum(); tileIdx += blockNum) { 
+        auto blockShape = l2Opt.GetBlockShape(tileIdx);  // 获取单次计算L2切分块大小     
         if (Get<0>(blockShape) <= 0 ||
             Get<1>(blockShape) <= 0){
             return;
         }
-        auto blockCoord = l2Opt.GetBlockCoord(tileIdx);
-        // 获取当前执行计算的核的下标blockCoord
-        matmulObj.SetTail(Get<0>(blockShape), Get<1>(blockShape), Get<2>(blockShape));
-        const auto& offsetCoord = CalcOffset(shapes, blockCoord); // 基于下标计算矩阵偏移
+        auto blockCoord = l2Opt.GetBlockCoord(tileIdx); 
+        // 获取当前执行计算的核的下标blockCoord    
+        matmulObj.SetTail(Get<0>(blockShape), Get<1>(blockShape), Get<2>(blockShape)); 
+        const auto& offsetCoord = CalcOffset(shapes, blockCoord); // 基于下标计算矩阵偏移    
         int64_t offsetA = Get<0>(offsetCoord);
-        int64_t offsetB = Get<1>(offsetCoord);
+        int64_t offsetB = Get<1>(offsetCoord);   
         int64_t offsetC = Get<2>(offsetCoord);
-        matmulObj.SetTensorA(aGlobal[offsetA], false);
-        matmulObj.SetTensorB(bGlobal[offsetB], false);
-        if (shapes.isBias) {
-            matmulObj.SetBias(biasGlobal);
-        }
-        matmulObj.IterateAll(cGlobal[offsetC]);  // 计算L2切分块
-    }
+        matmulObj.SetTensorA(aGlobal[offsetA], false);  
+        matmulObj.SetTensorB(bGlobal[offsetB], false);  
+        if (shapes.isBias) {          
+            matmulObj.SetBias(biasGlobal);    
+        }  
+        matmulObj.IterateAll(cGlobal[offsetC]);  // 计算L2切分块 
+    } 
     matmulObj.End();
     ```
 

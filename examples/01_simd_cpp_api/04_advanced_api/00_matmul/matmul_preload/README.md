@@ -23,7 +23,7 @@ M/N方向预加载的Matmul样例，可以减少MTE2间隙。在MTE2流水间隙
 ```
 ## 样例描述
 
-- 样例功能：
+- 样例功能：  
   样例中实现了2种场景的样例，分别是Preload M方向流水并行，Preload N方向流水并行，通过MatmulConfig doMTE2Preload参数控制，即代码中的preloadMode取值为1时，M方向流水并行，代码中的preloadMode取值为2时，N方向流水并行。
 
 - 约束条件
@@ -33,7 +33,7 @@ M/N方向预加载的Matmul样例，可以减少MTE2间隙。在MTE2流水间隙
   - M开启Double buffer 的条件是depthA1 = stepM * stepK * 2
   - N开启Double buffer 的条件是depthB1 = stepN * stepK * 2
 
-- 样例规格：
+- 样例规格：  
   本样例中：M = 128, N = 24576, K = 512。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
@@ -49,7 +49,7 @@ M/N方向预加载的Matmul样例，可以减少MTE2间隙。在MTE2流水间隙
   - Kernel关键步骤
     - 配置MatmulConfig模板参数，开启doMTE2Preload开关，1（M方向）或 2（N方向），创建Matmul对象。
       ```cpp
-      static constexpr MatmulConfig MM_CFG_PRELOAD = GetMDLConfig(false, false, 2);
+      static constexpr MatmulConfig MM_CFG_PRELOAD = GetMDLConfig(false, false, 2); 
       AscendC::Matmul<
         AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
         AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
@@ -58,12 +58,12 @@ M/N方向预加载的Matmul样例，可以减少MTE2间隙。在MTE2流水间隙
         MM_CFG_PRELOAD> matmulObj;
       ```
 
-- 调用实现
+- 调用实现  
   使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

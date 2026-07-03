@@ -68,7 +68,7 @@ __aicore__ inline void SetFixpipePreQuantFlag(uint64_t config)
 ```cpp
 float tmp = (float)0.5;
 // 将float的tmp转换成uint64_t的deqScalar
-uint64_t deqScalar = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&tmp));
+uint64_t deqScalar = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&tmp)); 
 AscendC::SetFixpipePreQuantFlag(deqScalar);  // 设置量化参数
 AscendC::PipeBarrier<PIPE_FIX>();
 ```

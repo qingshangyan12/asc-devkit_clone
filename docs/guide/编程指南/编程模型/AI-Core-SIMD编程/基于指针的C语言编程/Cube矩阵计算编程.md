@@ -232,8 +232,8 @@ C语言编程提供了`asc_copy_l0c2gm`来使能发挥芯片的各种随路能�
 ```c
 __aicore__ inline void asc_copy_l0c2gm(__gm__ bfloat16_t *dst_addr, __cc__ float *src_addr,
                         uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl,
-                        uint8_t clip_relu_pre, uint8_t unit_flag_ctrl, uint64_t quant_pre, uint8_t relu_pre,
-                        bool enable_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post,
+                        uint8_t clip_relu_pre, uint8_t unit_flag_ctrl, uint64_t quant_pre, uint8_t relu_pre, 
+                        bool enable_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, 
                         bool enable_clip_relu_post, uint8_t eltwise_op, bool enable_eltwise_antq, bool enable_c0_pad,
                         bool enable_broadcast, bool enable_nz2dn);
 

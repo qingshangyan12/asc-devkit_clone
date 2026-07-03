@@ -121,7 +121,7 @@
     <!-- end id17 -->
     <!-- npu="9030" id18 -->
     - Kirin 9030不超过8个。
-    <!-- end id18 -->
+    <!-- end id18 -->    
 -   non-inplace接口分配的Tensor内容可能包含随机值。
 -   non-inplace接口，需要将TQueBind的depth模板参数设置为非零值；inplace接口，需要将TQueBind的depth模板参数设置为0。
 
@@ -164,14 +164,14 @@ non-inplace接口返回值为LocalTensor对象，inplace接口没有返回值。
     pipe.InitBuffer(que3, 1, len);
     pipe.InitBuffer(que4, 1, len);
     pipe.InitBuffer(que5, 1, len);
-
+    
     AscendC::LocalTensor<T> local1 = que0.AllocTensor<T>();
     AscendC::LocalTensor<T> local2 = que1.AllocTensor<T>();
     AscendC::LocalTensor<T> local3 = que2.AllocTensor<T>();
     AscendC::LocalTensor<T> local4 = que3.AllocTensor<T>();
     // 第5个AllocTensor会出现资源分配失败，同一个TPosition上同时Alloc出来的Tensor数量超出了4个的限制
     AscendC::LocalTensor<T> local5 = que4.AllocTensor<T>();
-
+    
     // 此时建议通过以下方法解决：
     // 如果确实有多块buffer使用,可以将多个buffer合并到一块buffer,通过偏移使用
     pipe.InitBuffer(que0, 1, len * 3);

@@ -264,7 +264,7 @@ AscendC::SetFixpipeNz2ndFlag(ndNum, srcNdStride, dstNdStride);
 // Set scalar quantization parameter for on-the-fly quantization in DataCopy (L0C->GM, L0C->L1)
 float tmp = (float)0.5;
 // Convert float value tmp to uint64_t deqScalar
-uint64_t deqScalar = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&tmp));
+uint64_t deqScalar = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&tmp)); 
 AscendC::SetFixpipePreQuantFlag(deqScalar);
 ```
 
@@ -332,24 +332,24 @@ AI Core内部执行单元（如MTE2搬运单元、Vector计算单元等）以异
 __global__ __cube__ void matmul_kernel(__gm__ float* x, __gm__ float* y, __gm__ float* z)
 {
     uint8_t mutex_id = 1;
-
+    
     AscendC::LocalMemAllocator<AscendC::Hardware::L1> l1Allocator;
     AscendC::LocalMemAllocator<AscendC::Hardware::L0A> l0aAllocator;
     AscendC::LocalMemAllocator<AscendC::Hardware::L0B> l0bAllocator;
     AscendC::LocalMemAllocator<AscendC::Hardware::L0C> l0cAllocator;
-
+    
     AscendC::LocalTensor<half> al1ATensor = l1Allocator.Alloc<half, BLOCK_M * BLOCK_K>();
     AscendC::LocalTensor<half> bl1BTensor = l1Allocator.Alloc<half, BLOCK_K * BLOCK_N>();
     AscendC::LocalTensor<half> l0aTensor = l0aAllocator.Alloc<half, BLOCK_M * BLOCK_K>();
     AscendC::LocalTensor<half> l0bTensor = l0bAllocator.Alloc<half, BLOCK_K * BLOCK_N>();
     AscendC::LocalTensor<float> l0cTensor = l0cAllocator.Alloc<float, BLOCK_M * BLOCK_N>();
-
+    
     AscendC::GlobalTensor<half> aGm, bGm;
     AscendC::GlobalTensor<float> cGm;
     aGm.SetGlobalBuffer((__gm__ half*)x);
     bGm.SetGlobalBuffer((__gm__ half*)y);
     cGm.SetGlobalBuffer((__gm__ float*)z);
-
+    
     // Step 1: Data transfer in (Global Memory → L1 Buffer), pipeline is PIPE_MTE2
     AscendC::Mutex::Lock<PIPE_MTE2>(mutex_id);
     AscendC::Nd2NzParams nd2nzParamsA{1, 16, 23, 0, 32, 32, 1, 0};
@@ -357,20 +357,20 @@ __global__ __cube__ void matmul_kernel(__gm__ float* x, __gm__ float* y, __gm__ 
     AscendC::Nd2NzParams nd2nzParamsB{1, 16, 23, 0, 32, 32, 1, 0};
     AscendC::DataCopy(bl1BTensor, bGm, nd2nzParamsB);
     AscendC::Mutex::Unlock<PIPE_MTE2>(mutex_id);
-
+    
     // Step 2: Data transfer in (L1 Buffer → L0A/B Buffer), pipeline is PIPE_MTE1
     AscendC::Mutex::Lock<PIPE_MTE1>(mutex_id);
     ...
     AscendC::LoadData(l0aTensor, al1ATensor, loadParams);
     AscendC::LoadData(l0bTensor, bl1BTensor, loadParams);
     AscendC::Mutex::Unlock<PIPE_MTE1>(mutex_id);
-
+    
     // Step 3: Matrix computation (L0A/B Buffer → L0C Buffer), pipeline is PIPE_M
     AscendC::Mutex::Lock<PIPE_M>(mutex_id);
     AscendC::MmadParams mmadParams{BLOCK_M, BLOCK_K, BLOCK_N, 0, false, false, true};
     AscendC::Mmad(l0cTensor, l0aTensor, l0bTensor, mmadParams);
     AscendC::Mutex::Unlock<PIPE_M>(mutex_id);
-
+    
     // Step 4: Data transfer out (L0C Buffer → Global Memory), pipeline is PIPE_FIX
     AscendC::Mutex::Lock<PIPE_FIX>(mutex_id);
     ...
@@ -460,7 +460,7 @@ auto NzLayout = AscendC::Te::MakeFrameLayout<AscendC::Te::NZLayoutPtn>(128, 256)
 C++ Tensor提供了`MakeTensor`函数让开发者能够简便地构造出带有Layout的扩展Tensor结构，定义一个(shape = (128, 256), type = half)的Global Memory和一个同等大小的L1 Buffer数据块(Nz分形布局)，通过结合Layout构造函数可以表达为：
 
 ```cpp
-// Construct Layout for Global Memory & L1 Buffer
+// Construct Layout for Global Memory & L1 Buffer 
 auto globalLayout = AscendC::Te::MakeLayout(AscendC::Te::MakeShape(128, 256));
 auto l1Layout = AscendC::Te::MakeFrameLayout<AscendC::Te::NZLayoutPtn>(128, 256);
 

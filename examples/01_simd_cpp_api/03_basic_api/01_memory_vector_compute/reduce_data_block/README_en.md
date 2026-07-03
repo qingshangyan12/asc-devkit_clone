@@ -85,7 +85,7 @@ This example selects different reduction scenarios through the compilation param
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
 
   ```bash
@@ -93,11 +93,11 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
-
+    
 - Run the example
 
   Run the following commands in the example directory.
-
+  
   ```bash
   SCENARIO_NUM=1
   mkdir -p build && cd build;      # Create and enter the build directory
@@ -108,7 +108,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debug or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-
+  
   Examples:
 
   ```bash

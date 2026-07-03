@@ -39,7 +39,7 @@
 ## 样例描述
 
 ### 场景1：基础搬运场景
-- 样例功能：
+- 样例功能：  
   - 数据搬入：取输入矩阵的前256bit数据，调用LoadAlign接口将数据从UB搬入MaskReg。
   - 数据搬出：将MaskReg的比特位全部置为1，调用StoreAlign接口将数据从MaskReg搬出至UB。
 - 样例规格：
@@ -50,7 +50,7 @@
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[1, 1024]</td><td align="center">uint8_t</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">ld_st_reg_mask_scenario_1</td></tr>
   </table>
-- 样例实现：
+- 样例实现：  
 <p align="center">
   <img src="figures/ld_st_reg_mask.png" width="1000">
 </p>
@@ -61,7 +61,7 @@
   4. 将MaskReg中的bit位全部置为1，通过StoreAlign接口将MaskReg中的数据保存到UB(地址=step3中的保存地址+256B)，实现MaskReg数据存储在UB上的功能。对应32个uint8_t数，每个数的每位比特位都为1，因此每个数的值都是255(0xFF)。
 
 ### 场景2：复合计算场景
-- 样例功能：
+- 样例功能：  
   对根据maskReg中的比特位，选择对应位置的xReg或yReg向量中的值，当mask的比特位为1时，选取src0中对应的元素；当mask的比特位为0时，选取src1中对应的元素。
 - 样例规格：
   <table>
@@ -73,22 +73,22 @@
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">ld_st_reg_mask_scenario_2</td></tr>
   </table>
-- 样例实现：
+- 样例实现：  
    SelectVF函数内，调用LoadAlign接口将掩码数据从UB搬入MaskReg，再传入Select接口进行计算，结果写回UB。
 
-- 调用实现
+- 调用实现  
   使用内核调用符<<<>>>调用核函数。
-
+    
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
-
+    
 - 样例执行
 
   在本样例目录下执行如下命令。
@@ -118,7 +118,7 @@
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`　　　　　　　　　| NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `1`、`2` | 场景编号：1=基础搬运场景，2=复合计算场景 |
 
-- 执行结果
+- 执行结果  
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!

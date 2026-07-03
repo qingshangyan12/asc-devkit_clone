@@ -47,7 +47,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 [图1 连续对齐搬入分布模式图示](#fig-loadalign-dist)展示了DIST_NORM、DIST_BRC_B16、DIST_UNPACK_B16分布模式。
 
-**图 1**  数据搬入分布模式图示<a id="fig-loadalign-dist"></a>
+**图 1**  数据搬入分布模式图示<a id="fig-loadalign-dist"></a>  
 
 ![](../../../../figures/reg_loadalign_1.png)
 
@@ -198,7 +198,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 - 使用AddrReg存储偏移量接口：在每次迭代中，需要先调用CreateAddrReg手动设定地址偏移量，再调用搬运指令。
 
 <a id="fig-loadalign-regtrait"></a>
-**图 2**  regTrait为RegTraitNumOne时的三类搬运接口调用方式
+**图 2**  regTrait为RegTraitNumOne时的三类搬运接口调用方式  
 ![](../../../../figures/reg_loadstorealign.png)
 
 ## 调用示例<a name="section642mcpsimp"></a>

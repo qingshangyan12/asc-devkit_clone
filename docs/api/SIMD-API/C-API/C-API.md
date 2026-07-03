@@ -126,7 +126,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | API名称                                                                                                                       |   说明   |
 |-----------------------------------------------------------------------------------------------------------------------------|-----------|
 | [asc_copy_gm2l0a](cube_datamove/asc_copy_gm2l0a.md)                                                                         | 将GM中的数据搬运到L0A中。 |
-| [asc_copy_gm2l0b](cube_datamove/asc_copy_gm2l0b.md)                                                                         | 将GM中的数据搬运到L0B中。 |
+| [asc_copy_gm2l0b](cube_datamove/asc_copy_gm2l0b.md)                                                                         | 将GM中的数据搬运到L0B中。 | 
 | [asc_copy_gm2l1](cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_arch_2201.md)                                                  | 将GM中的数据搬运到L1中。|
 | [asc_copy_gm2l1_nd2nz](cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz.md)                                                                  | 将GM中的数据搬运到L1中。|
 | <cann-filter npu_type = "950"> [asc_copy_gm2l1_align](cube_datamove/asc_copy_gm2l1_align.md)                                | 将GM中的数据padding后搬运到L1中。</cann-filter> |

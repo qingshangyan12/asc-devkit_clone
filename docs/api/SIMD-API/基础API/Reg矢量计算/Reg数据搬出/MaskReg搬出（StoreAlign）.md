@@ -59,7 +59,7 @@ StoreAlign能够实现数据从[MaskReg](../寄存器数据类型/MaskReg.md)搬
     template <typename T, MaskDist dist = MaskDist::DIST_NORM>
     __simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, MaskReg& mask, AddrReg offset)
     ```
-
+    
 ## 参数说明<a name="section622mcpsimp"></a>
 
 **表 1**  模板参数说明

@@ -40,7 +40,7 @@ Atlas A2/A3 Series Products set the L1 Buffer boundary value through the `SetLoa
 </table>
 
 ## Example Implementation
-
+    
 - **Atlas A2/A3 Training/Inference Series Products**: Set the L1 Buffer boundary value to 1024 bytes through the SetLoadDataBoundary interface. When the LoadData (convolution data transfer) instruction processes the source operand, if the source operand address on the L1 Buffer exceeds the set boundary, data is automatically read from the start address of the L1 Buffer, implementing the circular data reading function.
 
 - **Ascend 950PR/950DT**: The new architecture hardware has removed the L1 Buffer boundary value setting registers and no longer supports the SetLoadDataBoundary interface. To implement the same circular data reading function, the LoadData (convolution data transfer) interface must be manually split into multiple instructions, implementing manual wrap-around by adjusting the destination operand address offset.

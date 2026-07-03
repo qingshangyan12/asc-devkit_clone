@@ -34,7 +34,7 @@ static ge::graphStatus TilingFunc(gert::TilingContext* context)
     auto ascendcPlatform = platform_ascendc:: PlatformAscendC(context->GetPlatformInfo());
     uint32_t sysWorkspaceSize = ascendcPlatform.GetLibApiWorkSpaceSize();
     // 设置用户需要使用的workspace和CreateCubeResGroup需要的大小作为usrWorkspace的总大小。
-    size_t usrSize = 256 + ascendcPlatform.GetResCubeGroupWorkSpaceSize();
+    size_t usrSize = 256 + ascendcPlatform.GetResCubeGroupWorkSpaceSize(); 
     size_t *currentWorkspace = context->GetWorkspaceSizes(1); // 通过框架获取workspace的指针，GetWorkspaceSizes入参为所需workspace的块数。当前限制使用一块。
     currentWorkspace[0] = usrSize + sysWorkspaceSize; // 设置总的workspace的数值大小，总的workspace空间由框架来申请并管理。
     ...

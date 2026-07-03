@@ -8,7 +8,7 @@ Matmul的计算公式为：C = A \* B + Bias，其示意图如下。
 -   C为目的操作数，存放矩阵乘结果的矩阵，形状为\[M, N\]。
 -   Bias为矩阵乘偏置，形状为\[1, N\]。对A\*B结果矩阵的每一行都采用该Bias进行偏置。
 
-**图1**  Matmul矩阵乘示意图
+**图1**  Matmul矩阵乘示意图  
 ![](../../../../figures/Matmul矩阵乘示意图.png "Matmul矩阵乘示意图")
 
 > [!NOTE]说明
@@ -140,7 +140,7 @@ Kernel侧实现Matmul矩阵乘运算的步骤概括为：
         ```
 
     <a id="user-managed-co1"></a>
-
+    
     -   用户申请用于存放矩阵乘结果的逻辑位置CO1内存，调用一次或多次[Iterate](Iterate.md#li4843165185812)完成单次或多次迭代计算，在需要搬出计算结果时，调用[Fixpipe](../../../基础API/矩阵计算（ISASI）/矩阵计算的搬出/L0C到GM数据搬运（Fixpipe）.md)接口完成CO1上计算结果的搬运，然后释放申请的CO1内存。该方式下，用户可以灵活控制计算和搬运的节奏，根据实际需要，一次计算对应一次结果的搬出，或者将多次计算结果缓存在CO1内存中，再一次性搬出计算结果。
 
         在此种调用方式下，创建Matmul对象时，必须定义C矩阵的内存逻辑位置为TPosition::CO1、数据排布格式为CubeFormat::NZ、数据类型为float或int32\_t。
@@ -218,7 +218,7 @@ Kernel侧实现Matmul矩阵乘运算的步骤概括为：
 
 以输入矩阵A \(GM, ND, half\)、矩阵B\(GM, ND, half\)，输出矩阵C \(GM, ND, float\)，无Bias场景为例，其中\(GM, ND, half\)表示数据存放在GM上，数据格式为ND，数据类型为half，描述Matmul高阶API典型场景的内部算法框图，如下图所示。
 
-**图2**  Matmul算法框图
+**图2**  Matmul算法框图  
 ![](../../../../figures/Matmul算法框图.png "Matmul算法框图")
 
 计算过程分为如下几步：

@@ -218,7 +218,7 @@ cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
 
 ## 目录结构介绍
 
-```
+``` 
 ├── gelu
 │   ├── scripts
 │   │   ├── gen_data.py     // 输入数据和真值数据生成脚本
@@ -233,7 +233,7 @@ cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](https://gitcode.com/cann/asc-devkit/blob/master/docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -267,7 +267,7 @@ cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`（默认） | NPU架构：Ascend 950PR/Ascend 950DT |
 
 
-- 执行结果
+- 执行结果  
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!

@@ -59,16 +59,16 @@ This example uses the GeGLU high-level API in a GLU (Gated Linear Unit) gated ac
 </table>
 </div>
 
-- Example implementation:
+- Example implementation:  
   This example implements a geglu_custom example with fixed shapes of input src[1,1024], src1[1,1024], and output dst[1,1024].
 
-  - Kernel implementation
+  - Kernel implementation  
     Core computation steps: After transferring the input data in, call `AscendC::GeGLU` to complete the GeGLU gated activation computation, then transfer the result out.
 
-  - Tiling implementation
+  - Tiling implementation  
     This example is a single-core element-wise computation scenario with no complex multi-core logic. The host side obtains the temporary buffer size required by the API through `AscendC::GetGeGLUMaxMinTmpSize` and passes it directly to the kernel.
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run

@@ -49,7 +49,7 @@ def log_softmax(src):
 
 以float类型，ND格式，shape为\[m, k\]的输入Tensor为例，描述LogSoftMax高阶API内部算法框图，如下图所示。
 
-**图1**  LogSoftMax算法框图
+**图1**  LogSoftMax算法框图  
 ![](../../../../figures/LogSoftMax算法框图.png "LogSoftMax算法框图")
 
 计算过程分为如下几步，均在Vector上进行：

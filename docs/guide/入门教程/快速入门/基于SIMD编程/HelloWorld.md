@@ -19,9 +19,9 @@
     ```
     > [!NOTE] 说明
     > - SIMD算子的Kernel函数需要额外的修饰符，如[`__vector__`](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md)修饰符说明该算子仅在向量计算单元上执行。
-
+    
 - **Host端代码实现**：
-
+ 
     Host端通过<<<>>>语法糖调用Device端代码片段。
     ```cpp
     int main(int argc, char const* argv[])
@@ -29,7 +29,7 @@
         ...
         constexpr uint32_t numBlocks = 8;
         ...
-
+        
         aclrtStream stream = nullptr;
         aclrtCreateStream(&stream);
         // Launch kernel <<<numBlocks, dynUBufSize, stream>>>
@@ -42,7 +42,7 @@
     ```
 
 - **算子编译与运行**：
-
+ 
     ```bash
     bisheng hello_world.asc --npu-arch=dav-2201 -o demo
     ./demo

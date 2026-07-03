@@ -97,10 +97,10 @@ When a hash collision occurs, a thread needs to determine whether the key stored
 
 ## Operator Description
 
-- Operator Function:
+- Operator Function:  
   The InsertHashTable operator inserts N key-value pairs into a hash table with capacity Z, where key is an int64_t type number and value is a float type Tensor of length M.
 
-- Operator Specifications:
+- Operator Specifications:  
   <table>
   <tr><td rowspan="1" align="center">OpType</td><td colspan="4" align="center">insert_hash_table</td></tr>
   </tr>
@@ -114,16 +114,16 @@ When a hash collision occurs, a thread needs to determine whether the key stored
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">insert_hash_table</td></tr>
   </table>
 
-- Operator Implementation:
+- Operator Implementation:  
   The InsertHashTable operator implementation flow is: each warp processes one key-value pair. Thread 0 in the warp is responsible for finding an available bucket based on the key's hash value, and threads 0-31 are responsible for storing the value into the bucket. When thread 0 searches for an available bucket, it uses open addressing to resolve hash collisions, uses the `asc_atomic_cas()` interface to resolve multi-thread conflicts, and uses the `asc_threadfence()` interface to resolve inter-core data synchronization.
 
-- Invocation Implementation:
+- Invocation Implementation:  
   Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and execute the operator.
-- Configure Environment Variables
+- Configure Environment Variables  
   Configure environment variables based on the [installation method](../../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

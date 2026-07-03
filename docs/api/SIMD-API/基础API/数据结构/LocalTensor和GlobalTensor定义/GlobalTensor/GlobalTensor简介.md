@@ -12,13 +12,13 @@ public:
     // 构造函数
     __aicore__ inline GlobalTensor<T>() {}
     // 初始化GlobalTensor
-    __aicore__ inline void SetGlobalBuffer(__gm__ PrimType* buffer, uint64_t bufferSize);
+    __aicore__ inline void SetGlobalBuffer(__gm__ PrimType* buffer, uint64_t bufferSize); 
     __aicore__ inline void SetGlobalBuffer(__gm__ PrimType* buffer);
-    // 获取全局数据的地址
+    // 获取全局数据的地址 
     __aicore__ inline const __gm__ PrimType* GetPhyAddr() const;
     __aicore__ inline __gm__ PrimType* GetPhyAddr(const uint64_t offset) const;
     // 获取GlobalTensor的相应偏移位置的值
-    __aicore__ inline __inout_pipe__(S) PrimType GetValue(const uint64_t offset) const;
+    __aicore__ inline __inout_pipe__(S) PrimType GetValue(const uint64_t offset) const; 
     // 获取某个索引位置的元素的引用
     __aicore__ inline __inout_pipe__(S) __gm__ PrimType& operator()(const uint64_t offset) const;
     // 设置GlobalTensor相应偏移位置的值
@@ -26,7 +26,7 @@ public:
     // 获取GlobalTensor的元素个数
     __aicore__ inline uint64_t GetSize() const;
     // 返回指定偏移量的GlobalTensor
-    __aicore__ inline GlobalTensor operator[](const uint64_t offset) const;
+    __aicore__ inline GlobalTensor operator[](const uint64_t offset) const; 
     // 设置GlobalTensor的shape信息
     __aicore__ inline void SetShapeInfo(const ShapeInfo& shapeInfo);
     // 获取GlobalTensor的shape信息

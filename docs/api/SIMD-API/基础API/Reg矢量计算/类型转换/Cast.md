@@ -37,11 +37,11 @@ Cast用于数据类型精度转换，将源操作数数据类型转换成目的�
 不同数据类型下元素对应的mask位宽不一致，在Cast进行类型转换时，MaskReg根据输入的源操作数进行有效元素筛选。
 图[b16到b32类型转换过程](#fig1)和图[b32到b16类型转换过程](#fig2)展示了MaskReg和RegLayout同时作用时b16和b32进行类型转换的过程。
 
-**图1** b16到b32类型转换过程<a id="fig1"></a>
+**图1** b16到b32类型转换过程<a id="fig1"></a>  
 
 ![](../../../../figures/b16到b32类型转换过程.png)
 
-**图2** b32到b16类型转换过程<a id="fig2"></a>
+**图2** b32到b16类型转换过程<a id="fig2"></a>  
 
 ![](../../../../figures/b32到b16类型转换过程.png)
 
@@ -121,11 +121,11 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask);
 
     图[fp4x2_e2m1_t到bfloat16_t转换过程](#fig3)和图[bfloat16_t到fp4x2_e2m1_t转换过程](#fig4)展示了MaskReg和RegLayout同时作用时fp4x2_e2m1_t和bfloat16_t之间的转换。
 
-    **图3**  fp4x2_e2m1_t到bfloat16_t转换过程<a id="fig3"></a>
-
+    **图3**  fp4x2_e2m1_t到bfloat16_t转换过程<a id="fig3"></a>  
+    
     ![](../../../../figures/reg_cast_1.png)
 
-    **图4**  bfloat16_t到fp4x2_e2m1_t转换过程<a id="fig4"></a>
+    **图4**  bfloat16_t到fp4x2_e2m1_t转换过程<a id="fig4"></a>  
     ![](../../../../figures/reg_cast_2.png)
 
 ## 关键特性说明
@@ -331,7 +331,7 @@ else
     end if
     encode {tmp3[31], Ev, M} to tmp3[7 : 0] following HiF encoding rule;
 end if
-result[i][7 : 0] = saturation(tmp3[7 : 0]) according to control bit;
+result[i][7 : 0] = saturation(tmp3[7 : 0]) according to control bit; 
 ```
 
 ## 调用示例<a name="section642mcpsimp"></a>

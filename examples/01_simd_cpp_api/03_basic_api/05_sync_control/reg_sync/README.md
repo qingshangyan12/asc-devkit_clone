@@ -51,7 +51,7 @@
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="3" align="center">reg_sync</td></tr>
 </table>
 
-- 样例实现
+- 样例实现  
 1. 调用LoadAlign接口，从UB地址 dataAddr 读取数据，写入 reg0 中
 2. 对 reg0 进行 Exp 计算，结果也写入 reg0 中
 3. 调用StoreAlign接口，将计算后的 reg0 写回相同的 dataAddr
@@ -60,7 +60,7 @@
 1. 上述样例实现的步骤1、步骤3中，LoadAlign和StoreAlign操作同一地址，需要保证先读UB、后写UB的时序
 2. 因为读UB、写UB使用的是同一寄存器 reg0，所以触发了硬件的寄存器保序，指令会按代码顺序执行，不需要插入同步指令
 
-- 调用实现
+- 调用实现  
   使用内核调用符`<<<>>>`调用核函数，启动1个核。
 
 ### 场景2：LocalMemBar（写读依赖）
@@ -76,8 +76,8 @@
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="3" align="center">reg_sync</td></tr>
 </table>
 
-- 样例实现
-
+- 样例实现 
+ 
 1. 对全部输入数据 x 求最大值，将最大值填充满 maxReg
 2. 依次计算输入数据和最大值的差值，并对差值取自然指数，即 expReg = exp(srcReg - maxReg)
 3. 调用StoreAlign接口，将 exp 结果搬出至UB的临时缓冲区（tmpLocal）中
@@ -91,19 +91,19 @@
 2. 手动调用LocalMemBar接口，插入 VEC_STORE 和 VEC_LOAD 之间的同步，以保证指令按代码顺序执行
 3. 若缺少LocalMemBar，步骤5可能先执行，从 tmpLocal 读到未经步骤3更新的旧数据
 
-- 调用实现
+- 调用实现  
   使用内核调用符`<<<>>>`调用核函数，启动1个核。
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行算子。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
-
+    
 - 样例执行
 
   在本样例目录下执行如下命令。
@@ -135,7 +135,7 @@
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `1`、`2`　　　　　　　　　　| 场景编号：1=寄存器保序，2=LocalMemBar　　　　　　　|
 
-- 执行结果
+- 执行结果  
   执行结果如下，说明精度对比成功。
 
   ```bash

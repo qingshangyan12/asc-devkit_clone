@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example uses the Where high-level API to select elements from two source operands based on a specified condition. Both source operands can be LocalTensor or scalar.
+This example uses the Where high-level API to select elements from two source operands based on a specified condition. Both source operands can be LocalTensor or scalar.  
 
 ## Supported Products and CANN Software Versions
 
@@ -24,16 +24,16 @@ This example uses the Where high-level API to select elements from two source op
 
 ## Example Description
 
-- Example function:
+- Example function:  
   Select elements from two source operands based on a specified condition to generate the destination operand. Both source operands can be LocalTensor or scalar.
 
-  The computation formula is as follows:
+  The computation formula is as follows:  
   $$dst_i = \begin{cases}
   src0, & if condition \\
   src1, & otherwise
   \end{cases}$$
 
-- Example specifications:
+- Example specifications:  
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> where </td></tr>
 
@@ -48,21 +48,21 @@ This example uses the Where high-level API to select elements from two source op
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">where_custom</td></tr>
   </table>
 
-- Example implementation:
+- Example implementation:  
   This example implements a where_custom example with fixed shapes of input src0[1, 32], src1[1, 32], condition[1, 32], and output dst[1, 32].
 
   - Kernel implementation
 
     Use the Where high-level API to select elements from two source operands based on a condition, supporting mixed tensor and scalar modes.
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run
+## Build and Run  
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -81,7 +81,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-
+  
   For example:
 
   ```bash

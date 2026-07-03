@@ -58,15 +58,15 @@ This example demonstrates how to use the `clock()` interface in SIMT programming
   __global__ void simt_gather(float* input, int32_t* index, float* output, uint64_t index_total_length)
   {
       uint64_t start = clock();
-
+  
       int32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-
+  
       // Maps to the index of output tensor
       if (idx >= index_total_length) {
           return;
       }
       output[idx] = input[index[idx]];
-
+  
       uint64_t end = clock();
       if (blockIdx.x == 0 && threadIdx.x == 0) {
           printf("%s execute cycle : %lu\n", "simt_gather", end - start);
@@ -78,7 +78,7 @@ This example demonstrates how to use the `clock()` interface in SIMT programming
 
 Run the following steps in the root directory of this example to build and execute the operator.
 
-- Configure Environment Variables
+- Configure Environment Variables  
   Configure environment variables based on the [installation method](../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

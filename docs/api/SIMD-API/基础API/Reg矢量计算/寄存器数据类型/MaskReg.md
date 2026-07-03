@@ -204,7 +204,7 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
     ```
 
 - 方式3<a id="method3"></a>
-
+  
   采用[LoadAlign](../Reg数据搬入/MaskReg搬入（LoadAlign）.md)从UB搬运Mask到MaskReg。在UB中设置Mask。
 
   ```cpp
@@ -224,7 +224,7 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
   ```
 
 - 方式4<a id="method4"></a>
-
+  
   采用[MaskGenWithRegTensor](../Reg数据搬入/MaskReg搬入（MaskGenWithRegTensor）.md)从RegTensor搬运Mask到MaskReg。在RegTensor中设置Mask。
 
   ```cpp
@@ -247,7 +247,7 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
   ```
 
 - 方式5<a id="method5"></a>
-
+  
   采用[MoveMask](../MaskReg计算/MoveMask.md)，从SetVectorMask设置的掩码寄存器{MASK1,MASK0}中读取Mask值，并按模板参数T对应的数据格式转换后写入返回值MaskReg。b16类型读取完整128bit的{MASK1,MASK0}，将每个bit复制为2bit；b32类型读取64bit的MASK0，并将每个bit复制为4bit。
 
   ```cpp

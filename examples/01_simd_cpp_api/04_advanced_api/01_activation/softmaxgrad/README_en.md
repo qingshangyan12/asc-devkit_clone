@@ -44,13 +44,13 @@ Relationship between the two APIs: `SoftmaxGradFront` is a subset of `SoftmaxGra
 </table>
 </div>
 
-- Example implementation:
+- Example implementation:  
 This example implements a fixed-shape example with input x `[960, 960]` and y `[960, 960]`, computed across multiple cores.
 
-  - Tiling implementation
+  - Tiling implementation  
     Split by row count, using average allocation aligned upward by the number of cores to determine the computation row count for the main core and tail core. Determine the number of rows processed per loop iteration by querying SLICE_TABLE based on the reduce axis length. Call `GetSoftMaxGradMinTmpSize` and `SoftMaxGradTilingFunc` to obtain the tiling parameters required by the API.
 
-  - Kernel implementation
+  - Kernel implementation  
     Core computation steps: After transferring the input data in, call the corresponding SoftmaxGrad/SoftmaxGradFront API to complete the gradient computation, then transfer the result out.
 
     SoftmaxGrad mode invocation:
@@ -63,7 +63,7 @@ This example implements a fixed-shape example with input x `[960, 960]` and y `[
     AscendC::SoftmaxGradFront<float>(zLocal, xLocal, yLocal, tmpBuffer, softmaxTiling, srcShape);
     ```
 
-- Invocation implementation
+- Invocation implementation  
   Use the kernel invocation operator `<<<>>>` to call the kernel function.
 
 ## Build and Run

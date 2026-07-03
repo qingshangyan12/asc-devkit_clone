@@ -26,7 +26,7 @@ This example implements a generalized shape Gather operator based on the Ascend 
 
 ### 1. gather Operator
 
-- Operator Function:
+- Operator Function:   
   The gather operator retrieves m rows of data at specified indices from a two-dimensional input tensor with shape [M,N]. The row indices for these m rows are specified by the input index. The calculation formula for the i-th row of the operator output is:
 
   ```text
@@ -49,17 +49,17 @@ This example implements a generalized shape Gather operator based on the Ascend 
   * Single thread processing: 1 row
   * Maximum processing capacity: 65535 * 2048 = 134215680 rows
 
-- Operator Implementation:
+- Operator Implementation:   
   The gather operator retrieves data at specified indices from the input (Global Memory). Based on the data partitioning described above, the implementation first calculates the data index that each thread should process, then stores one row of data to Global Memory through an assignment operation. Since the computation process is relatively simple, the kernel function limits the maximum number of threads to 2048.
 
-- Invocation Implementation:
+- Invocation Implementation:   
   The kernel function is invoked using the kernel call operator <<<>>>.
 
 ### 2. gather_v2 Operator
 
-- Operator Function:
+- Operator Function:   
   The gather_v2 operator collects data along a specified dimension axis from a multi-dimensional input tensor. The indices tensor specifies the index positions to collect. It supports batch_dims batch processing mode, allowing different batches to use different index sets.
-- Processing Flow:
+- Processing Flow:   
   For example, if the input tensor has shape [2,2,3,2] and the indices tensor has shape [2,2]:
 
   ```text
@@ -130,16 +130,16 @@ This example implements a generalized shape Gather operator based on the Ascend 
   The advantages of this partitioning approach are:
   * Load balancing: The workload difference among all threads is at most 1 element, avoiding thread idling
   * Memory access friendly: Adjacent threads access consecutive memory addresses, facilitating coalesced memory access
-- Operator Implementation:
+- Operator Implementation:   
   The gather_v2 operator collects data along a specified dimension axis from a multi-dimensional input tensor. Based on the data partitioning strategy described above, each thread dynamically processes a portion of data. For each output index, it decomposes the one-dimensional output index into logical coordinates, finds the corresponding collection position based on indices, and finally calculates the linear index of the input and completes the data transfer.
-- Invocation Implementation:
+- Invocation Implementation:   
   The kernel function is invoked using the kernel call operator <<<>>>.
 
 ## Compilation and Execution
 
 Execute the following steps in the root directory of this example to compile and run the operator.
 
-- Configure Environment Variables
+- Configure Environment Variables  
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

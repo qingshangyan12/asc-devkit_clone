@@ -107,7 +107,7 @@ __simd_callee__ inline void ReduceDataBlock(U& dstReg, U srcReg, MaskReg mask)
 2. data01和data02相加得到data001，data03和data04相加得到data002，……，data07和data08相加得到data004；
 3. 以此类推，得到目的操作数为1个half类型的数据sum。
 
-**图1** ReduceDataBlock示意图<a name="zh-cn_topic_0000002568852247_fig10524085414"></a>
+**图1** ReduceDataBlock示意图<a name="zh-cn_topic_0000002568852247_fig10524085414"></a>  
 ![ReduceDataBlock示意图](../../../../figures/reg_reduce_datablock_index.png "ReduceDataBlock示意图")
 
 **mask为空与srcReg异常值处理规则：**
@@ -121,7 +121,7 @@ __simd_callee__ inline void ReduceDataBlock(U& dstReg, U srcReg, MaskReg mask)
 
 ```cpp
 template<typename T>
-__simd_vf__ inline void ReduceDataBlockVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count,
+__simd_vf__ inline void ReduceDataBlockVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, 
  uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> srcReg;
@@ -136,7 +136,7 @@ __simd_vf__ inline void ReduceDataBlockVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAd
         // AscendC::Reg::ReduceDataBlock<AscendC::Reg::ReduceType::MAX>(dstReg, srcReg, mask);
         // type = ReduceType::MIN
         // AscendC::Reg::ReduceDataBlock<AscendC::Reg::ReduceType::MIN>(dstReg, srcReg, mask);
-        AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+        AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask); 
     }
 }
 ```

@@ -50,13 +50,13 @@
 </table>
 </div>
 
-- 样例实现：
+- 样例实现：  
   本样例中实现的是固定shape为输入src[1, 1024]，输出dst[1, 1024]的sigmoid_custom样例。
 
-  - Kernel实现
+  - Kernel实现  
     核心计算步骤：将输入数据搬入后，调用 `AscendC::Sigmoid` 完成 Sigmoid 计算，再将结果搬出。
 
-  - Tiling实现
+  - Tiling实现  
     本样例为单核逐元素计算场景，无需复杂分核逻辑。Host端通过 `AscendC::GetSigmoidMaxMinTmpSize` 获取API所需临时缓冲区大小，直接传递给Kernel使用。
 
   - 调用实现

@@ -50,7 +50,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     | srcTensor      |  输入  |源操作数。   |
     | scalarValue   | 输入  |scalar标量。支持的数据类型为half/float。scalar操作数的类型需要和srcTensor保持一致。      |
     | sharedTmpBuffer   | 输入  | 临时缓存。类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。由于该接口的内部实现需要额外的临时空间来存储计算过程中的中间变量。临时空间需要开发者通过sharedTmpBuffer入参传入。      |
-    | calCount   | 输入 | 参与计算的元素个数。     |
+    | calCount   | 输入 | 参与计算的元素个数。     | 
 - Tiling侧
 
     Kernel侧接口的计算需要开发者预留/申请临时空间，该临时空间的大小需要在Tiling侧根据获取到的源操作数shape大小，计算高阶API所需的最大(maxValue)临时空间和最小临时空间(minValue)的大小。因此在Tiling侧提供一个用于计算maxValue和minValue的接口。接口的输入参数包括源操作数Tensor的shape大小和源操作数数据类型所占字节数，shape大小的参数使用ge::Shape类型，数据类型所占的字节数使用`uint32_t`类型，输出参数包括minValue和maxValue。与Axpy接口中的isReuseSource参数系统，Tiling接口中的isReuseSource为预留参数。
@@ -64,11 +64,11 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     | typeSize      |  输入  | 算子输入的数据类型大小，单位为字节。比如算子输入的数据类型为half，此处应该传入2。   |
     | isReuseSource   | 输入  |  预留参数。     |
     | maxValue   | 输出  | Axpy接口能完成计算所需的最大临时空间大小，超出该值的空间不会被接口使用。在最小临时空间-最大临时空间范围内，随着临时空间增大，kernel侧接口计算性能会有一定程度的优化提升。为了达到更好的性能，开发者可以根据实际的内存使用情况进行空间申请，最大空间大小为0表示计算不需要临时空间。      |
-    | minValue   | 输出 | Axpy接口能完成计算所需的最小临时空间大小。为保证功能正确，接口计算时申请的临时空间不能小于该数值。最小空间大小为0表示计算不需要临时空间。   |
+    | minValue   | 输出 | Axpy接口能完成计算所需的最小临时空间大小。为保证功能正确，接口计算时申请的临时空间不能小于该数值。最小空间大小为0表示计算不需要临时空间。   | 
 ### 开发API
 #### 编写API对外接口
 - Kernel侧接口
-
+    
     在`include/adv_api/`对应分类的目录下，新增[axpy.h](../include/adv_api/math/axpy.h)文件。根据上述分析设计的API函数原型，编写对外接口的代码，函数实现中调用AxpyImpl的实现。
     ```c++
     template <typename T, typename U, bool isReuseSource = false>
@@ -79,7 +79,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     }
     ```
 - Tiling侧接口
-
+    
     在`include/adv_api/`对应分类的目录下，新增[axpy_tiling.h](../include/adv_api/math/axpy_tiling.h)文件。根据上述分析设计的Tiling侧接口，编写函数声明。
     ```c++
     void GetAxpyMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
@@ -94,7 +94,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     // ...
     #endif // __NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201
     ```
-
+    
     [include/adv_api/tiling_api.h](../include/adv_api/tiling_api.h)文件中包含了所有高阶API的TIling接口头文件，建议在该文件中引入新增的Tiling接口头文件，这样在调用高阶API的Tiling函数时，只需要引入`"tiling_api.h"`。
     ```c++
     #include "math/axpy_tiling.h"
@@ -128,7 +128,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     `AxpySub`函数根据临时空间大小制定计算策略，主要包括确定计算循环次数round、整块计算量stackSize、尾块计算量tail，具体代码如下。由于传入接口的sharedTmpBuffer是uint8类型，而源操作数元素是float类型，因此需要将sharedTmpBuffer的元素类型转化为float，获取其中的元素个数。根据硬件架构的特点，一次计算的最小单元为一个Block，即32字节，`axpyTmpCalc`函数将获取的临时空间能够存储的元素个数向下32字节对齐，得到一次计算的整块计算量stackSize。同时，当目的操作数元素类型为half时，为了提升精度，计算过程中会对源操作数和目的操作数分别做一次Cast精度转换，二分之一的临时空间被Cast结果占用，所以该场景下，计算的数据量为临时空间能够存储的元素个数向下32字节对齐后的大小的一半。已知总计算量calCount、单次整块计算量stackSize，计算出循环次数round和尾块计算量tail。计算公式如下：
    $$stackSize = \begin{cases}
     Align32(tmpbufferSize \div 2) &T = half
-    \\
+    \\ 
     Align32(tmpbufferSize) &T = float
     \end{cases}$$
     $$round = calCount/stackSize$$
@@ -217,7 +217,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     constexpr uint32_t AXPY_ONE_REPEAT_BYTE_SIZE = 256;
     ```
     在`GetAxpyMaxMinTmpSize`接口中，调用`GetAxpyMaxTmpSize`接口获取所需临时空间最大值，调用`GetAxpyMinTmpSize`接口获取所需临时空间最小值。
-
+   
     ```c++
     void GetAxpyMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource,
     uint32_t& maxValue, uint32_t& minValue)
@@ -302,7 +302,7 @@ UT测试使用gTest作为测试框架，一般验证接口编译是否正常，�
     ```c++
     #include <gtest/gtest.h>
     #include "kernel_operator.h"
-    ```
+    ``` 
 2. 实现算子
     - 初始化变量。
         ```c++
@@ -370,11 +370,11 @@ UT测试使用gTest作为测试框架，一般验证接口编译是否正常，�
             void SetUp() {}
             void TearDown() {}
         };
-        ```
+        ``` 
     - 注入用例数据。
         ```c++
         INSTANTIATE_TEST_CASE_P(TEST_AXPY, AxpyTestsuite,
-            ::testing::Values(AxpyTestParams{256, 2, AxpyKernel<half, half>},
+            ::testing::Values(AxpyTestParams{256, 2, AxpyKernel<half, half>}, 
                 AxpyTestParams{256, 4, AxpyKernel<float, float>}));
         ```
     - 编写`TEST_P`。
@@ -409,7 +409,7 @@ TEST_F(TestTiling, TestAxpyTiling)
 在执行UT用例前，需要修改[CMakeLists.txt](../tests/api/adv_api/CMakeLists.txt)文件，由于Kernel侧和Tiling侧的UT执行对象不同，需要在不同的target下添加测试文件。以Kernel侧验证Atlas A2 训练系列产品/Atlas A2 推理系列产品的UT为例，将UT测试文件路径添加到用例的源文件列表`ASCENDC_TEST_ASCEND910B1_AIV_CASE_SRC_PART_FILES`中，即新增文件路径`${ASCENDC_TESTS_DIR}/math/axpy/test_operator_axpy.cpp`。Tiling侧同理，需要将测试文件添加到`ASCENDC_TILING_TEST_SRC_FILES`列表。
 ##### 执行UT
 - 执行全量UT用例
-
+  
   进入仓库主目录，执行如下命令进行测试。
   ```bash
   bash build.sh -t

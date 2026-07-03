@@ -1,7 +1,7 @@
 # Vector Compute Practices Sample Introduction
 ## Overview
 Optimization samples based on Vector Compute API usage, introducing performance tuning methods for static Tensor-based programming through the `<<<>>>` kernel direct call implementation.
-
+ 
 ## Sample List
 | Directory Name | Description | Supported Products |
 | ------------------------------------------------------------ | ---------------------------------------------------- | --- |

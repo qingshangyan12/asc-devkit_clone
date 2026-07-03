@@ -64,7 +64,7 @@ AscendC::TQue<AscendC::TPosition::VECOUT, 4> que;
 int num = 10;
 int len = 1024;
 pipe.InitBuffer(que, num, len);
-bool ret = que.VacantInQue(); // 返回为true
+bool ret = que.VacantInQue(); // 返回为true 
 AscendC::LocalTensor<half> tensor1 = que.AllocTensor<half>();
 AscendC::LocalTensor<half> tensor2 = que.AllocTensor<half>();
 AscendC::LocalTensor<half> tensor3 = que.AllocTensor<half>();

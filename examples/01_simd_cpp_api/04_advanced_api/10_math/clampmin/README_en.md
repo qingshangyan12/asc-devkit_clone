@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example uses the ClampMin/ClampMax high-level APIs to implement single-side clamping of a tensor to a scalar value.
+This example uses the ClampMin/ClampMax high-level APIs to implement single-side clamping of a tensor to a scalar value.  
 ClampMin replaces elements in the input tensor that are less than the scalar with the scalar. ClampMax replaces elements in the input tensor that are greater than the scalar with the scalar. Use parameter configuration to select ClampMin or ClampMax functionality.
 
 ## Supported Products and CANN Software Versions
@@ -27,12 +27,12 @@ ClampMin replaces elements in the input tensor that are less than the scalar wit
 
 ## Example Description
 
-- Example function:
+- Example function:  
   Select ClampMin or ClampMax functionality through parameter configuration:
   - ClampMin: Replace values in srcTensor that are less than the scalar with the scalar; values greater than or equal to the scalar remain unchanged and are output as dstTensor.
   - ClampMax: Replace values in srcTensor that are greater than the scalar with the scalar; values less than or equal to the scalar remain unchanged and are output as dstTensor.
 
-  The computation formulas are as follows:
+  The computation formulas are as follows:  
 
   $$
   ClampMin(srcTensor_i, scalar) =
@@ -50,7 +50,7 @@ ClampMin replaces elements in the input tensor that are less than the scalar wit
   \end{cases}
   $$
 
-- Example specifications:
+- Example specifications:  
   <table>
   <caption>Table 1: Example Specifications</caption>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> clampmin/clampmax </td></tr>
@@ -64,7 +64,7 @@ ClampMin replaces elements in the input tensor that are less than the scalar wit
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">clampmin_clampmax_custom</td></tr>
   </table>
 
-- Example implementation:
+- Example implementation:  
 
   - Kernel implementation
 
@@ -74,14 +74,14 @@ ClampMin replaces elements in the input tensor that are less than the scalar wit
 
     The host side obtains the maximum and minimum temporary space required by the ClampMin/ClampMax APIs through the GetClampMaxMinTmpSize API.
 
-  - Invocation implementation
+  - Invocation implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run
+## Build and Run  
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables
+- Configure environment variables  
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -101,7 +101,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-
+  
   For example:
 
   ```bash

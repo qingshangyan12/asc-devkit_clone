@@ -235,7 +235,7 @@ half scalar_value = 1.0;
 // 2.1 Set mask counter mode
 asc_set_mask_count();
 // 2.2 Set Mask value to 200, indicating this computation processes 200 elements
-asc_set_vector_mask(0, static_cast<uint64_t>(200));
+asc_set_vector_mask(0, static_cast<uint64_t>(200)); 
 asc_add_scalar(dst_ub, src0_ub, scalar_value, 1, 1, 1, 1, 8, 8, 8);
 
 // 3. Default needs to reset to Normal mode, if subsequent still requires Counter mode then no need to reset to Normal mode
@@ -265,7 +265,7 @@ asc_set_mask_normal();
     // 2.1 Set mask Normal mode
     asc_set_mask_normal();
     // 2.2 Set Mask value to 100, indicating single iteration computes first 100 elements
-    asc_set_vector_mask(0, static_cast<uint64_t>(100));
+    asc_set_vector_mask(0, static_cast<uint64_t>(100)); 
     asc_adds(dst_ub, src0_ub, scalar_value, 2, 1, 1, 1, 8, 8, 8);
     ```
 
@@ -286,7 +286,7 @@ asc_set_mask_normal();
     // 2.1 Set mask Normal mode
     asc_set_mask_normal();
     // 2.2 Set Mask to bit-wise mode (0101...), implement interleaved computation
-    asc_set_vector_mask(0x000000000000AAAA, 0x0000000000000000);
+    asc_set_vector_mask(0x000000000000AAAA, 0x0000000000000000); 
     asc_add(dst_ub, src0_ub, src1_ub, 2, 1, 1, 1, 8, 8, 8);
     ```
 
@@ -317,7 +317,7 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
     asc_lock(PIPE_V, mutex_id);
     asc_add(z, x, y, 4096);
     asc_unlock(PIPE_V, mutex_id);
-
+    
     // 3. Step 3: Data transfer out, execution pipeline is PIPE_MTE3
     asc_lock(PIPE_MTE3, mutex_id);
     asc_copy_ub2gm_align(z_gm, z_local, 1, 48 * sizeof(int8_t), 0, 0, 0);

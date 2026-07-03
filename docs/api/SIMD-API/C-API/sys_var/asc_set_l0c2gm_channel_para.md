@@ -29,8 +29,8 @@ __aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config)
 
 |CHANNEL_PARA比特位    |功能|
 | :-------     | :---- |
-| CHANNEL_PARA[48-0]    |  保留位，设置无效  |
-| CHANNEL_PARA[63-48]    |  表示loop0源步长，单位为C0_SIZE。当开启NZ2DN模式时有效，且不能为0。  |
+| CHANNEL_PARA[48-0]    |  保留位，设置无效  | 
+| CHANNEL_PARA[63-48]    |  表示loop0源步长，单位为C0_SIZE。当开启NZ2DN模式时有效，且不能为0。  | 
 
 
 ## 返回值说明

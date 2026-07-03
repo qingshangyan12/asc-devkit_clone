@@ -2,7 +2,7 @@
 
 【优先级】中
 
->[!NOTE]说明
+>[!NOTE]说明 
 >该性能优化建议适用于如下产品型号：
 >- Ascend 950PR/Ascend 950DT
 
@@ -13,7 +13,7 @@ UB的地址编码格式：
 UB_ADDR[18:0] = {BANK_DEPTH[8:0], BANK[0], BG[2:0], BANK_WIDTH[4:0]}
 ```
 
-**图1**  bank结构示意图（图中箭头方向表示内存排布的顺序）<a name="fig873359165316"></a>
+**图1**  bank结构示意图（图中箭头方向表示内存排布的顺序）<a name="fig873359165316"></a>  
 
 ![](../../../../figures/950_UB内存结构图.png "950_UB内存结构图")
 
@@ -204,7 +204,7 @@ UB_ADDR[18:0] = {BANK_DEPTH[8:0], BANK[0], BG[2:0], BANK_WIDTH[4:0]}
     </table>
 
 -   读读冲突
-
+    
     **表4** 读读冲突示例
     <table><thead align="left"><tr id="row134631185514"><th class="cellrowborder" valign="top" width="5.9988002399520095%" id="mcps1.2.7.1.1"><p id="p16461312553"><a name="p16461312553"></a><a name="p16461312553"></a>序号</p>
     </th>

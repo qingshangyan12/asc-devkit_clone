@@ -93,7 +93,7 @@ HCCL算法分析器用于在离线环境中模拟HCCL算法的运行，验证算
 ![](../../../docs/figures/algorithm_analyzer/compile_testcase_6.png)
 
 1. 构造算子入参。
-
+   
    构造单算子运行所需的参数，包含如下内容：
    - SetDevice：用以将线程与Rank绑定，使得每个线程模拟一张对应的Rank。
    - 主流资源创建：调用aclrtCreateStream接口，打桩实现模拟流资源的创建。

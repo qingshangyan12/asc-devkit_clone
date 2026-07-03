@@ -78,7 +78,7 @@
 
 ## 样例描述
 
-- 样例功能
+- 样例功能  
   将矩阵乘的结果从L0C Buffer搬运到GM（Global Memory），支持以下两种随路量化模式：
   - Scalar量化：使用SetFixpipePreQuantFlag接口设置Scalar量化参数。
   - Vector量化：使用SetFixPipeConfig接口设置Vector量化参数。
@@ -164,13 +164,13 @@
 
     - 配置DataCopyCO12DstParams参数用于DataCopy随路量化激活搬运，将Mmad计算出的结果从L0C Buffer搬出到GM（Global Memory）。
 
-  - 调用实现
+  - 调用实现  
     使用内核调用符`<<<>>>`调用核函数。
 
-## 编译运行
-
+## 编译运行 
+ 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
+- 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -191,7 +191,7 @@
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
-
+  
   示例如下：
   ```bash
   cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # cpu调试模式
@@ -208,7 +208,7 @@
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品 与 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `1`、`2`、`3`、`4`、`5`、`6`　　　　　| 场景编号：1=Scalar量化+relu激活+ND输出，2=Vector量化+NZ输出，3=Scalar量化+NZ输出，4=Vector量化+relu激活+ND输出，5=Scalar量化+ND输出，6=Vector量化+relu激活+NZ输出 |
 
-- 执行结果
+- 执行结果  
   执行结果如下，说明精度对比成功：
   ```bash
   test pass!

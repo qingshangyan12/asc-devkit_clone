@@ -81,13 +81,13 @@ OpAICoreDef请参考[OpAICoreDef](OpAICoreDef.md)。
             this->Output("z")
                 .ParamType(REQUIRED);
             this->SetInferShape(ge::InferShape);
-
+    
             this->AICore()
                 .SetTiling(optiling::TilingFunc)
                 .SetTilingParse(optiling::TilingPrepare)
                 .SetOpSelectFormat(optiling::OpSelectFormat)
                 .SetCheckSupport(optiling::CheckSupported);
-
+    
             OpAICoreConfig aicConfig;
             aicConfig.DynamicCompileStaticFlag(true)
                 .DynamicFormatFlag(true)

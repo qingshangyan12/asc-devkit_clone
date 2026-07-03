@@ -54,16 +54,16 @@ AdjustSoftMaxRes用于对SoftMax计算结果做后处理，当输入的max中存
 </table>
 </div>
 
-- 样例实现：
+- 样例实现：  
   本样例中实现的是固定shape为输入x[32, 32]，输出y[32, 32]、max[32, 8]、sum[32, 8]的softmax样例。
 
-  - Kernel实现
+  - Kernel实现  
     核心计算步骤：将输入数据搬入后，调用 `AscendC::SoftMax` 完成 SoftMax 计算，再调用 `AscendC::AdjustSoftMaxRes` 对结果做后处理，最后将结果搬出。
 
-  - Tiling实现
+  - Tiling实现  
     softmax样例的tiling实现流程如下：首先对shape按照行数进行分核，使用平均分配法先按照核数向上对齐分配，确定主核的计算行数，再确定尾核计算行数，对主核计算的shape调用GetSoftMaxMinTmpSize获取API所需临时缓冲区大小，再调用SoftMax高阶API的tiling函数获取API所需tiling参数，尾核计算所需的高阶API的tiling由kernel侧自行计算。
 
-  - 调用实现
+  - 调用实现  
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行

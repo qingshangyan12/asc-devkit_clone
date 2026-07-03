@@ -45,7 +45,7 @@
                     -   [GetShapeInfo](SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GetShapeInfo.md)
                     -   [SetL2CacheHint](SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/SetL2CacheHint.md)
                     -   [ReinterpretCast](SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/ReinterpretCast.md)
-
+                    
             -   [Tensor API基础数据结构](SIMD-API/基础API/数据结构/TensorAPI-BasicStructure/TensorAPI-BasicStructure.md)
                 -   [Layout数据结构](SIMD-API/基础API/数据结构/TensorAPI-BasicStructure/layout_structure/layout_structure.md)
                     -   [Capacity](SIMD-API/基础API/数据结构/TensorAPI-BasicStructure/layout_structure/Capacity.md)
@@ -148,7 +148,7 @@
                 -   [辅助矩阵分形格式详解](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算分形介绍/辅助矩阵分形格式详解.md)
 
                 </cann-filter>
-
+            
             -   [矩阵计算的搬入](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵计算的搬入.md)
                 -   [总体说明](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/总体说明.md)
                 -   [矩阵计算输入搬运约束](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵计算输入搬运约束.md)
@@ -263,7 +263,7 @@
                     -   [SetFixpipeNz2ndFlag](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬出/寄存器配置说明/SetFixpipeNz2ndFlag.md)
                     -   [SetFixPipeClipRelu](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬出/寄存器配置说明/SetFixPipeClipRelu.md)
                     -   [SetFixPipeAddr](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬出/寄存器配置说明/SetFixPipeAddr.md)
-
+                
         -   [矩阵计算（Tensor API）](SIMD-API/基础API/矩阵计算（TensorAPI）/矩阵计算（TensorAPI）.md)
             -   [概述](SIMD-API/基础API/矩阵计算（TensorAPI）/概述/概述.md)
                 -   [矩阵计算单元](SIMD-API/基础API/矩阵计算（ISASI）/概述/矩阵计算单元.md)
@@ -418,21 +418,21 @@
                 -   [Truncate\(ISASI\)](SIMD-API/基础API/Memory矢量计算/类型转换/Truncate(ISASI).md)
 
             -   [归约计算](SIMD-API/基础API/Memory矢量计算/归约计算/归约计算.md)
-
+            
                 - [概述](SIMD-API/基础API/Memory矢量计算/归约计算/Introduction.md)
-
-                - [ReduceDataBlock](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceDataBlock.md)
-
-                - [ReduceRepeat](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceRepeat.md)
-
-                - [ReducePairElem](SIMD-API/基础API/Memory矢量计算/归约计算/ReducePairElem.md)
-
-                - [ReduceMax](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceMax.md)
-
-                - [ReduceMin](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceMin.md)
-
-                - [ReduceSum](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceSum.md)
-
+                
+                - [ReduceDataBlock](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceDataBlock.md) 
+                
+                - [ReduceRepeat](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceRepeat.md)  
+                
+                - [ReducePairElem](SIMD-API/基础API/Memory矢量计算/归约计算/ReducePairElem.md)  
+                
+                - [ReduceMax](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceMax.md)  
+                
+                - [ReduceMin](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceMin.md)  
+                
+                - [ReduceSum](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceSum.md)  
+                
                 - [寄存器辅助接口](SIMD-API/基础API/Memory矢量计算/归约计算/寄存器辅助接口/寄存器辅助接口.md)
 
                     - [GetReduceRepeatSumSpr\(ISASI\)](SIMD-API/基础API/Memory矢量计算/归约计算/寄存器辅助接口/GetReduceRepeatSumSpr(ISASI).md)
@@ -869,7 +869,7 @@
             -   [REGISTER\_TILING\_FOR\_TILINGKEY](SIMD-API/基础API/Kernel-Tiling/REGISTER_TILING_FOR_TILINGKEY.md)
             -   [REGISTER\_NONE\_TILING](SIMD-API/基础API/Kernel-Tiling/REGISTER_NONE_TILING.md)
             -   [设置Kernel类型](SIMD-API/基础API/Kernel-Tiling/设置Kernel类型.md)
-
+        
         -   [特殊寄存器访问](SIMD-API/基础API/特殊寄存器访问/特殊寄存器访问.md)
             -   [GetSpr](SIMD-API/基础API/特殊寄存器访问/GetSpr.md)
             -   [ClearSpr](SIMD-API/基础API/特殊寄存器访问/ClearSpr.md)

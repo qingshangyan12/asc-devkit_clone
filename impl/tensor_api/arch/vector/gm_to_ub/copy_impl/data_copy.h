@@ -76,8 +76,8 @@ private:
             srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) * sizeof(SRC_TYPE);
             dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) * sizeof(DST_TYPE);
         } else {
-            static_assert((IsSatisfiedPtnFormatV<U, NDExtLayoutPtn> && IsSatisfiedPtnFormatV<T, NDExtLayoutPtn>) ||
-                          (IsSatisfiedPtnFormatV<U, DNExtLayoutPtn> && IsSatisfiedPtnFormatV<T, DNExtLayoutPtn>) ||
+            static_assert((IsSatisfiedPtnFormatV<U, NDExtLayoutPtn> && IsSatisfiedPtnFormatV<T, NDExtLayoutPtn>) || 
+                          (IsSatisfiedPtnFormatV<U, DNExtLayoutPtn> && IsSatisfiedPtnFormatV<T, DNExtLayoutPtn>) || 
                           (IsSatisfiedPtnFormatV<U, NZLayoutPtn> && IsSatisfiedPtnFormatV<T, NZLayoutPtn>),
                           "Unsupported layout type combination for DataCopyGM2UB");
         }
