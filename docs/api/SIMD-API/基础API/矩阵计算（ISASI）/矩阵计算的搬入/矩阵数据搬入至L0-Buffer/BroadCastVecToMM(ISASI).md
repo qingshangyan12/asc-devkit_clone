@@ -2,15 +2,27 @@
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
-| 产品 | 是否支持 |
-| ---------- | :----------: |
-| <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT | x </cann-filter> |
-| <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x </cann-filter> |
-| <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x </cann-filter> |
-| <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品 | x </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core | √ </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品Vector Core | x </cann-filter> |
-| <cann-filter npu-type = "910">Atlas 训练系列产品 | x </cann-filter> |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：不支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -44,12 +56,12 @@ __aicore__ inline void BroadCastVecToMM(const LocalTensor<T> &dst, const LocalTe
 | src | 输入 | 源操作数，输入矢量，类型为LocalTensor，支持的物理地址为Unified Buffer（TPosition：VECIN/VECCALC/VECOUT）。<br>支持的数据类型需要与dst一致。 |
 | blockCount | 输入 | 指定该指令包含的连续广播数据块个数，取值范围：blockCount∈[1, 255]。 |
 | blockLen | 输入 | 指定该指令每个连续广播数据块长度，单位为16个元素。取值范围：blockLen∈[1, 255]。 |
-| srcGap | 输入 | 源操作数，相邻连续数据块的间隔（前面一个数据块的尾与后面数据块的头的间隔），单位为datablock(32字节)。 |
+| srcGap | 输入 | 源操作数，相邻连续数据块的间隔（前面一个数据块的尾与后面数据块的头的间隔），单位为datablock（32字节）。 |
 | dstGap | 输入 | 目的操作数，相邻连续数据块间的间隔（前面一个数据块的尾与后面数据块的头的间隔），单位为256个元素。 |
 
 ## 数据类型
 
-Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t、half。
+Atlas 推理系列产品AI Core，支持的数据类型为：half、int32_t、float。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 

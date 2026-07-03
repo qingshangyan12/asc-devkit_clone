@@ -40,7 +40,7 @@ NPU内部有不同的计算单元，在计算时往往需要把计算数据搬�
 - PIPE_FIX：Fixpipe流水线。
 - PIPE_ALL：所有流水线。
 
-可通过[同步控制](同步控制/同步控制.md)类API控制同一流水线内的运行顺序和不同流水线间的执行顺序。
+可通过[同步控制](sync/同步控制.md)类API控制同一流水线内的运行顺序和不同流水线间的执行顺序。
 
 ## API列表
 
@@ -61,5 +61,5 @@ NPU内部有不同的计算单元，在计算时往往需要把计算数据搬�
 
 ## 参考样例
 
-Atlas A3 训练系列产品/Atlas A3 推理系列产品的C API样例请参考[C API Add样例](../../../../examples/02_simd_c_api/00_introduction/01_add)。
-Ascend 950PR/Ascend 950DT的C API样例请参考[C API Add样例](../../../../examples/02_simd_c_api/00_introduction/04_reg_base_add_compute)。
+Atlas A3 训练系列产品/Atlas A3 推理系列产品的C API样例请参考[C API Add样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/02_simd_c_api/00_introduction/01_add)。
+Ascend 950PR/Ascend 950DT的C API样例请参考[C API Add样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/02_simd_c_api/00_introduction/04_reg_base_add_compute)。

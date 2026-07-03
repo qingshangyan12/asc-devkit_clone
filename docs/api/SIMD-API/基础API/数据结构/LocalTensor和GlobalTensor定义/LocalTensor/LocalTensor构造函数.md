@@ -7,7 +7,7 @@
 </th>
 <th class="cellrowborder" align="center" valign="top" width="23.1%" id="mcps1.1.4.1.2"><p id="p783113012187"><a name="p783113012187"></a><a name="p783113012187"></a>是否支持（Pipe框架）</p>
 </th>
-<th class="cellrowborder" align="center" valign="top" width="23.26%" id="mcps1.1.4.1.3"><p id="p510433120182"><a name="p510433120182"></a><a name="p510433120182"></a>是否支持（静态Tensor编程）</p>
+<th class="cellrowborder" align="center" valign="top" width="23.26%" id="mcps1.1.4.1.3"><p id="p510433120182"><a name="p510433120182"></a><a name="p510433120182"></a>是否支持（C++ Tensor编程）</p>
 </th>
 </tr>
 </thead>
@@ -69,13 +69,13 @@ LocalTensor构造函数。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
--   适用于[Pipe编程框架](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/SIMD编程/基于TPipe和TQue编程.md)，通常情况下开发者不直接调用，该函数不会对LocaTensor成员变量赋初值，均为随机值。
+-   适用于[Pipe编程框架](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程原理.md)，通常情况下开发者不直接调用，该函数不会对LocaTensor成员变量赋初值，均为随机值。
 
     ```cpp
     __aicore__ inline LocalTensor<T>() {}
     ```
 
--   适用于[静态Tensor编程](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/SIMD编程/静态Tensor编程.md)，根据指定的逻辑位置/地址/长度，返回Tensor对象。
+-   适用于[静态Tensor编程](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md)，根据指定的逻辑位置/地址/长度，返回Tensor对象。
 
     ```cpp
     __aicore__ inline LocalTensor<T>(TPosition pos, uint32_t addr, uint32_t tileSize)
@@ -95,7 +95,7 @@ LocalTensor构造函数。
 </thead>
 <tbody><tr id="zh-cn_topic_0000001429830437_row1835857145817"><td class="cellrowborder" valign="top" width="16.28%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000001429830437_p5835457165816"><a name="zh-cn_topic_0000001429830437_p5835457165816"></a><a name="zh-cn_topic_0000001429830437_p5835457165816"></a>T</p>
 </td>
-<td class="cellrowborder" valign="top" width="83.72%" headers="mcps1.2.3.1.2 "><a name="ul171781281310"></a><a name="ul171781281310"></a><ul id="ul171781281310"><li>适用于Pipe编程框架的原型，支持基础数据类型以及<a href="../../辅助数据结构/TensorTrait/TensorTrait.md">TensorTrait</a>类型。</li><li>适用于静态Tensor编程的原型，支持的数据类型如下：<pre class="screen" id="screen148501140172610"><a name="screen148501140172610"></a><a name="screen148501140172610"></a>// 仅支持基础数据类型
+<td class="cellrowborder" valign="top" width="83.72%" headers="mcps1.2.3.1.2 "><a name="ul171781281310"></a><a name="ul171781281310"></a><ul id="ul171781281310"><li>适用于Pipe编程框架的原型，支持基础数据类型以及<a href="../../辅助数据结构/TensorTrait/TensorTrait.md">TensorTrait</a>类型。</li><li>适用于C++ Tensor编程的原型，支持的数据类型如下：<pre class="screen" id="screen148501140172610"><a name="screen148501140172610"></a><a name="screen148501140172610"></a>// 仅支持基础数据类型
 __aicore__ inline LocalTensor&lt;T&gt;(TPosition pos, uint32_t addr, uint32_t tileSize)
 // 仅支持TensorTrait类型
 __aicore__ inline LocalTensor&lt;T&gt;(uint32_t addr)</pre>
@@ -288,7 +288,7 @@ inputLocal.Print();
 // 0008: 9 10 11 12 13 14 15
 #endif
 
-// 示例20在静态Tensor编程场景使用，根据传入的逻辑位置VECIN、起始地址128、元素个数32、数据类型float，构造出Tensor对象
+// 示例20在C++ Tensor编程场景使用，根据传入的逻辑位置VECIN、起始地址128、元素个数32、数据类型float，构造出Tensor对象
 uint32_t addr = 128;
 uint32_t tileSize = 32;
 AscendC::LocalTensor<float> tensor1 = AscendC::LocalTensor<float>(AscendC::TPosition::VECIN, addr, tileSize);

@@ -20,9 +20,9 @@
 #include <unistd.h>
 #endif
 
-#include "kernel_basic_intf.h"
+#include "../../../../include/basic_api/kernel_basic_intf.h"
 #ifdef LIB_MATMUL_MATMUL_INTF_H
-#include "include/adv_api/matmul/matmul_client.h"
+#include "../../../../include/adv_api/matmul/matmul_client.h"
 #include "../matmul/kfc/matmul_server_aux.h"
 #endif
 namespace AscendC {
@@ -247,7 +247,6 @@ public:
         if constexpr (sizeof(T) == sizeof(void*)) { // Skip previous invalid pointer for compatibility
             InitObj(b...);
         } else {
-            ASSERT(kfcCommSrv != nullptr && "kfc comm server cannot be nullptr when init obj");
             auto ptr = reinterpret_cast<KFC_COMM_SERVER_PTR>(kfcCommSrv);
             for (int i = 0; i < MIX_NUM; i++, ptr++) {
                 InitObjAux(tpipe, ptr, i, 0, a, b...);
