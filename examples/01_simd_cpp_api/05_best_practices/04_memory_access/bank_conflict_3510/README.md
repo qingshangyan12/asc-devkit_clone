@@ -100,7 +100,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ## 测试场景概览
 
-本文围绕连续对齐搬入/搬出、离散与聚合、非连续对齐搬入/搬出三类API的bank冲突场景展开验证分析。所有场景的输入数据类型为 `float`（离散与聚合场景的index为 `uint32_t`），执行1000次以放大性能差异。
+本文围绕连续对齐搬入/搬出、离散与聚合、非连续对齐搬入/搬出三类API的bank冲突场景展开验证分析。所有场景的输入数据类型为 `float`（离散与聚合场景的index为 `uint32_t`），VF重复执行1000次以放大性能差异。
 
 > **性能说明**：下表"打点性能"为VF连续执行1000次的总cycles数（使用`GetSystemCycle` 打点），数值越低性能越好。"LDU冲突率"和"STU冲突率"来自 `msprof op --aic-metrics=Default` 采集的 `ResourceConflictRatio` 指标，分别表示向量单元的load单元冲突比例和store单元冲突比例（单位：%）。
 
@@ -108,34 +108,34 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 **注意：在Ascend 950PR/Ascend 950DT中，src0/src1/dst首地址分布在不同bank group的不同bank的场景不存在，二读一写场景无法避免读写冲突**  
 
-| case | 计算公式 | 场景描述 | bank冲突情况 | src0首地址 | src1首地址 | dst首地址 | 打点性能(cycles) | LDU冲突率(%) | STU冲突率(%) | 备注 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | dst = src0 + src1 | src0/src1首地址在同一个bank，dst首地址在不同bank | 读读冲突+读写冲突 | 0x0000 | 0x5000 | 0xA100 | 1,332,802 | 40.9 | 17.6 | LDU冲突显著 |
-| 2 | dst = src0 + src1 | src0/dst首地址在同一个bank，src0/src1首地址在同一个bank group | 读写冲突 | 0x0000 | 0x5100 | 0xA000 | 1,470,520 | 0.0 | 27.1 | LDU无冲突，STU冲突率高 |
-| 3 | dst = src0 + src1 | src0/dst首地址在同一个bank，且地址重叠，src1在不同bank | 读写冲突 | 0x0000 | 0x5100 | 0x0000 | 1,470,753 | 0.0 | 27.2 | 对比case2，地址重叠未改善STU冲突 |
-| 4 | dst = src0 + src1 | src1/dst首地址在同一个bank，src0/src1首地址在同一个bank group | 读写冲突 | 0x0000 | 0x5100 | 0xA100 | 1,440,590 | 0.0 | 25.6 | 对比case2，冲突特征相同 |
-| 5 | dst = src0 + src1 | src1/dst首地址在同一个bank，且地址重叠，src0在不同bank | 读写冲突 | 0x0000 | 0x5100 | 0x5100 | 1,440,708 | 0.0 | 25.8 | 对比case3，地址重叠未改善STU冲突 |
-| 6 | dst = src0 + src1 | src0/src1/dst同bank，既有读读冲突，又有读写冲突 | 读读冲突+读写冲突 | 0x0000 | 0x5000 | 0xA000 | 1,420,560 | 4.1 | 23.8 | STU冲突显著 |
-| 7 | dst = src0 + src1 | 冲突特征同case6，**对指令进行循环展开** | 读读冲突+读写冲突 | 0x0000 | 0x5000 | 0xA000 | 1,330,688 | 40.8 | 18.2 | 对比case6，LDU冲突增加，STU冲突减少，性能提升6.3% |
-| 8 | dst = src0 + src1 | 地址同Case6，kernel增加大量计算，使kernel由访存bound变为计算bound | 读读冲突+读写冲突 | 0x0000 | 0x5000 | 0xA000 | 1,810,355,431 | 0.1 | 0.0 | 计算bound下LDU/STU冲突几乎消失，对比case6，cycles高约1274倍 |
+| case | 计算公式 | 场景描述 | bank冲突情况 | src0首地址 | src1首地址 | dst首地址 | 单次VF计算数据量(B) | 打点性能(cycles) | LDU冲突率(%) | STU冲突率(%) | 备注 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | dst = src0 + src1 | src0/src1首地址在同一个bank，dst首地址在不同bank | 读读冲突+读写冲突 | 0x0000 | 0x5000 | 0xA100 | 16384 | 1,332,802 | 40.9 | 17.6 | LDU冲突显著 |
+| 2 | dst = src0 + src1 | src0/dst首地址在同一个bank，src0/src1首地址在同一个bank group | 读写冲突 | 0x0000 | 0x5100 | 0xA000 | 16384 | 1,470,520 | 0.0 | 27.1 | LDU无冲突，STU冲突率高 |
+| 3 | dst = src0 + src1 | src0/dst首地址在同一个bank，且地址重叠，src1在不同bank | 读写冲突 | 0x0000 | 0x5100 | 0x0000 | 16384 | 1,470,753 | 0.0 | 27.2 | 对比case2，地址重叠未改善STU冲突 |
+| 4 | dst = src0 + src1 | src1/dst首地址在同一个bank，src0/src1首地址在同一个bank group | 读写冲突 | 0x0000 | 0x5100 | 0xA100 | 16384 | 1,440,590 | 0.0 | 25.6 | 对比case2，冲突特征相同 |
+| 5 | dst = src0 + src1 | src1/dst首地址在同一个bank，且地址重叠，src0在不同bank | 读写冲突 | 0x0000 | 0x5100 | 0x5100 | 16384 | 1,440,708 | 0.0 | 25.8 | 对比case3，地址重叠未改善STU冲突 |
+| 6 | dst = src0 + src1 | src0/src1/dst同bank，既有读读冲突，又有读写冲突 | 读读冲突+读写冲突 | 0x0000 | 0x5000 | 0xA000 | 16384 | 1,420,560 | 4.1 | 23.8 | STU冲突显著 |
+| 7 | dst = src0 + src1 | 冲突特征同case6，**对指令进行循环展开** | 读读冲突+读写冲突 | 0x0000 | 0x5000 | 0xA000 | 16384 | 1,330,688 | 40.8 | 18.2 | 对比case6，LDU冲突增加，STU冲突减少，性能提升6.3% |
+| 8 | dst = src0 + src1 | 地址同Case6，kernel增加大量计算，使kernel由访存bound变为计算bound | 读读冲突+读写冲突 | 0x0000 | 0x5000 | 0xA000 | 16384 | 1,810,355,431 | 0.1 | 0.0 | 计算bound下LDU/STU冲突几乎消失，对比case6，cycles高约1274倍 |
 
 ### 离散与聚合场景（Case 9-10）
 
 **注：subbank冲突属于更低层级的存储冲突，不被LDU/STU冲突率指标捕获**
 
-| case | 计算公式 | 场景描述 | subbank冲突情况 | index地址 | data地址 | index模式 | 打点性能(cycles) | LDU冲突率(%) | STU冲突率(%) | 备注 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 9 | Gather + Add + Scatter | Gather数据索引[0..255]连续 | 跨bank分散，无冲突 | 0x0000 | 0x0400 | 索引[0..255]连续 | 650,670 | NA | NA | 数据分散在16个bank的不同sub bank中，冲突率低 |
-| 10 | Gather + Add + Scatter | Gather数据索引0、128交替重复 | 同subbank不同行冲突 | 0x0000 | 0x0400 | 索引0、128交替 | **750,707** | NA | NA | 对比Case 9，性能劣化15.4% |
+| case | 计算公式 | 场景描述 | subbank冲突情况 | index地址 | data地址 | index模式 | 单次VF计算数据量(B) | 打点性能(cycles) | LDU冲突率(%) | STU冲突率(%) | 备注 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 9 | Gather + Add + Scatter | Gather数据索引[0..255]连续 | 跨bank分散，无冲突 | 0x0000 | 0x0400 | 索引[0..255]连续 | 1024 | 650,670 | NA | NA | 数据分散在16个bank的不同sub bank中，冲突率低 |
+| 10 | Gather + Add + Scatter | Gather数据索引0、128交替重复 | 同subbank不同行冲突 | 0x0000 | 0x0400 | 索引0、128交替 | 1024 | **750,707** | NA | NA | 对比Case 9，性能劣化15.4% |
 
 ### 非连续搬运跨步对比（Case 11-14）
 
-| case | 计算公式 | 场景描述 | src0首地址 | dst首地址 | 搬运方式 | 打点性能(cycles) | LDU冲突率(%) | STU冲突率(%) | 备注 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 11 | dst = src0 | 512元素按行计算，repeat内8个DataBlock连续排布，repeat间间隔256B | 0x0000 | 0x4100 | DataBlock连续搬运 | 443,135 | 0 | 0 | LDU/STU均无冲突 |
-| 12 | dst = src0 | 512元素按列计算，repeat内8个DataBlock间间隔256B，repeat间间隔32B  | 0x0000 | 0x4100 | DataBlock非连续搬运 | 1,510,497 | 0 | **53.5** | 对比case11，STU冲突率极高，性能劣化明显 |
-| 13 | dst = src0 | 同一repeat内8个DataBlock均从同一起始地址读取数据 | 0x0000 | 0x4100 | DataBlock重复读取 | 440,911 | 0.0 | 0.0 | 对比case11，无劣化，同地址合并，无额外开销 |
-| 14 | dst = src0 | 8轮迭代，每次迭代数据从同一起始地址读取数据  | 0x0000 | 0x4100 | repeat重复读取 | 440,847 | 10.1 | 0.0 | 对比case11，无劣化，同地址合并，无额外开销 |
+| case | 计算公式 | 场景描述 | src0首地址 | dst首地址 | 搬运方式 | 单次VF计算数据量(B) | 打点性能(cycles) | LDU冲突率(%) | STU冲突率(%) | 备注 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 11 | dst = src0 | 512元素按行计算，repeat内8个DataBlock连续排布，repeat间间隔256B | 0x0000 | 0x4100 | DataBlock连续搬运 | 2048 | 443,135 | 0 | 0 | LDU/STU均无冲突 |
+| 12 | dst = src0 | 512元素按列计算，repeat内8个DataBlock间间隔256B，repeat间间隔32B  | 0x0000 | 0x4100 | DataBlock非连续搬运 | 2048 | 1,510,497 | 0 | **53.5** | 对比case11，STU冲突率极高，性能劣化明显 |
+| 13 | dst = src0 | 同一repeat内8个DataBlock均从同一起始地址读取数据 | 0x0000 | 0x4100 | DataBlock重复读取 | 2048 | 440,911 | 0.0 | 0.0 | 对比case11，无劣化，同地址合并，无额外开销 |
+| 14 | dst = src0 | 8轮迭代，每次迭代数据从同一起始地址读取数据  | 0x0000 | 0x4100 | repeat重复读取 | 2048 | 440,847 | 10.1 | 0.0 | 对比case11，无劣化，同地址合并，无额外开销 |
 
 
 **各case的详细分析见下文对应章节。**
@@ -153,6 +153,12 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 ### UB读写示意
 
 ![case1](./figures/case1.png)
+
+### 性能数据
+
+- 打点性能：1,332,802 cycles
+- LDU冲突率：40.9%
+- STU冲突率：17.6%
 
 ### 分析结论
 
@@ -174,6 +180,12 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ![case2](./figures/case2.png)
 
+### 性能数据
+
+- 打点性能：1,470,520 cycles
+- LDU冲突率：0.0%
+- STU冲突率：27.1%
+
 ### 分析结论
 
 - src0/dst落在bank0，src1落在bank1，三者位于同一bank group，由于二读一写限制发生读写冲突。
@@ -193,6 +205,12 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 ### UB读写示意
 
 ![case3](./figures/case3.png)
+
+### 性能数据
+
+- 打点性能：1,470,753 cycles
+- LDU冲突率：0.0%
+- STU冲突率：27.2%
 
 ### 分析结论
 
@@ -214,6 +232,12 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ![case4](./figures/case4.png)
 
+### 性能数据
+
+- 打点性能：1,440,590 cycles
+- LDU冲突率：0.0%
+- STU冲突率：25.6%
+
 ### 分析结论
 
 - src1/dst同落在 bank1，src0在bank0，三者同属 BG=0，性能接近，与Case2冲突模式不变。
@@ -231,6 +255,12 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 ### UB读写示意
 
 ![case5](./figures/case5.png)
+
+### 性能数据
+
+- 打点性能：1,440,708 cycles
+- LDU冲突率：0.0%
+- STU冲突率：25.8%
 
 ### 分析结论
 
@@ -252,6 +282,12 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ![case6——7](./figures/case6_7.png)
 
+### 性能数据
+
+- 打点性能：1,420,560 cycles
+- LDU冲突率：4.1%
+- STU冲突率：23.8%
+
 ### 分析结论
 
 - 三个操作数全落在 bank0（BG=0）。既存在 src0/src1 之间的读读冲突，又存在读写冲突。
@@ -265,6 +301,12 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 ### UB读写示意
 
 与Case 6一致。
+
+### 性能数据
+
+- 打点性能：1,330,688 cycles
+- LDU冲突率：40.8%
+- STU冲突率：18.2%
 
 ### 分析结论
 
@@ -280,6 +322,12 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 ### UB读写示意
 
 与Case 6一致。
+
+### 性能数据
+
+- 打点性能：1,810,355,431 cycles
+- LDU冲突率：0.1%
+- STU冲突率：0.0%
 
 ### 分析结论
 
@@ -299,6 +347,12 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 ### UB读写示意
 
 ![case9](./figures/case8.png)
+
+### 性能数据
+
+- 打点性能：650,670 cycles
+- LDU冲突率：NA
+- STU冲突率：NA
 
 ### 案例分析
 
@@ -320,6 +374,12 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ![case10](./figures/case9.png)
 
+### 性能数据
+
+- 打点性能：750,707 cycles
+- LDU冲突率：NA
+- STU冲突率：NA
+
 ### 案例分析
 
 - 地址配置与 Case 9 完全相同，区别在于 index 模式为 0、128 交替重复（每个 repeat 内一半元素通过 index=0 读取，另一半通过 index=128 读取），二者均落在同一 bank 的同一 subbank（sub0），但位于不同 depth 行，离散读取需要在同一 subbank 的不同行间切换，触发 subbank 冲突。
@@ -339,6 +399,12 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ![case11](./figures/case10.png)
 
+### 性能数据
+
+- 打点性能：443,135 cycles
+- LDU冲突率：0%
+- STU冲突率：0%
+
 ### 分析结论
 
 - 每个 repeat 内 8 个 DataBlock 间隔 32B 连续排布，沿 UB 地址递增，由于 32B 恰好是 bank group 轮转周期（每 32B 切换一个 bank group），8 个 DataBlock 自然命中 BG 0-7 各一次，无 bank group 竞争。
@@ -356,6 +422,12 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 ### UB读写示意
 
 ![case12](./figures/case11.png)
+
+### 性能数据
+
+- 打点性能：1,510,497 cycles
+- LDU冲突率：0%
+- STU冲突率：53.5%
 
 ### 分析结论
 
@@ -375,6 +447,12 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ![case13](./figures/case12.png)
 
+### 性能数据
+
+- 打点性能：440,911 cycles
+- LDU冲突率：0.0%
+- STU冲突率：0.0%
+
 ### 分析结论
 
 - 设置blockStride=0。同一repeat 内8个DataBlock 均从同一32B基地址读取，硬件自动检测到同一repeat内的相同地址读取请求，合并为单次UB读取，8个DataBlock共享同一份数据。
@@ -392,6 +470,12 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 ### UB读写示意
 
 ![case14](./figures/case13.png)
+
+### 性能数据
+
+- 打点性能：440,847 cycles
+- LDU冲突率：10.1%
+- STU冲突率：0.0%
 
 ### 分析结论
 

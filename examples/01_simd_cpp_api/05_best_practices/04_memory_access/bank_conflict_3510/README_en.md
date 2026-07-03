@@ -108,34 +108,34 @@ This document focuses on verification and analysis of bank conflict scenarios fo
 
 **Note: In Ascend 950PR/Ascend 950DT, the scenario where src0/src1/dst starting addresses are distributed in different banks of different bank groups does not exist, and the read-write conflict cannot be avoided in two-read-one-write scenarios**
 
-| Case | Formula | Scenario Description | Bank Conflict | src0 Address | src1 Address | dst Address | Benchmark Performance (cycles) | LDU Conflict Ratio (%) | STU Conflict Ratio (%) | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | dst = src0 + src1 | src0/src1 starting addresses in the same bank, dst starting address in a different bank | Read-read conflict + Read-write conflict | 0x0000 | 0x5000 | 0xA100 | 1,332,802 | 40.9 | 17.6 | Significant LDU conflict |
-| 2 | dst = src0 + src1 | src0/dst starting addresses in the same bank, src0/src1 starting addresses in the same bank group | Read-write conflict | 0x0000 | 0x5100 | 0xA000 | 1,470,520 | 0.0 | 27.1 | No LDU conflict, high STU conflict ratio |
-| 3 | dst = src0 + src1 | src0/dst starting addresses in the same bank with address overlap, src1 in a different bank | Read-write conflict | 0x0000 | 0x5100 | 0x0000 | 1,470,753 | 0.0 | 27.2 | Compared to case2, address overlap did not improve STU conflict |
-| 4 | dst = src0 + src1 | src1/dst starting addresses in the same bank, src0/src1 starting addresses in the same bank group | Read-write conflict | 0x0000 | 0x5100 | 0xA100 | 1,440,590 | 0.0 | 25.6 | Compared to case2, same conflict characteristics |
-| 5 | dst = src0 + src1 | src1/dst starting addresses in the same bank with address overlap, src0 in a different bank | Read-write conflict | 0x0000 | 0x5100 | 0x5100 | 1,440,708 | 0.0 | 25.8 | Compared to case3, address overlap did not improve STU conflict |
-| 6 | dst = src0 + src1 | src0/src1/dst in the same bank, both read-read conflict and read-write conflict | Read-read conflict + Read-write conflict | 0x0000 | 0x5000 | 0xA000 | 1,420,560 | 4.1 | 23.8 | Significant STU conflict |
-| 7 | dst = src0 + src1 | Same conflict characteristics as case6, **loop unrolling applied to instructions** | Read-read conflict + Read-write conflict | 0x0000 | 0x5000 | 0xA000 | 1,330,688 | 40.8 | 18.2 | Compared to case6, LDU conflict increased, STU conflict decreased, performance improved by 6.3% |
-| 8 | dst = src0 + src1 | Same addresses as Case6, kernel adds heavy computation, changing kernel from memory-bound to compute-bound | Read-read conflict + Read-write conflict | 0x0000 | 0x5000 | 0xA000 | 1,810,355,431 | 0.1 | 0.0 | Under compute-bound, LDU/STU conflicts almost disappear. Compared to case6, cycles are ~1274x higher |
+| Case | Formula | Scenario Description | Bank Conflict | src0 Address | src1 Address | dst Address | Single VF Data Volume (B) | Benchmark Performance (cycles) | LDU Conflict Ratio (%) | STU Conflict Ratio (%) | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | dst = src0 + src1 | src0/src1 starting addresses in the same bank, dst starting address in a different bank | Read-read conflict + Read-write conflict | 0x0000 | 0x5000 | 0xA100 | 16384 | 1,332,802 | 40.9 | 17.6 | Significant LDU conflict |
+| 2 | dst = src0 + src1 | src0/dst starting addresses in the same bank, src0/src1 starting addresses in the same bank group | Read-write conflict | 0x0000 | 0x5100 | 0xA000 | 16384 | 1,470,520 | 0.0 | 27.1 | No LDU conflict, high STU conflict ratio |
+| 3 | dst = src0 + src1 | src0/dst starting addresses in the same bank with address overlap, src1 in a different bank | Read-write conflict | 0x0000 | 0x5100 | 0x0000 | 16384 | 1,470,753 | 0.0 | 27.2 | Compared to case2, address overlap did not improve STU conflict |
+| 4 | dst = src0 + src1 | src1/dst starting addresses in the same bank, src0/src1 starting addresses in the same bank group | Read-write conflict | 0x0000 | 0x5100 | 0xA100 | 16384 | 1,440,590 | 0.0 | 25.6 | Compared to case2, same conflict characteristics |
+| 5 | dst = src0 + src1 | src1/dst starting addresses in the same bank with address overlap, src0 in a different bank | Read-write conflict | 0x0000 | 0x5100 | 0x5100 | 16384 | 1,440,708 | 0.0 | 25.8 | Compared to case3, address overlap did not improve STU conflict |
+| 6 | dst = src0 + src1 | src0/src1/dst in the same bank, both read-read conflict and read-write conflict | Read-read conflict + Read-write conflict | 0x0000 | 0x5000 | 0xA000 | 16384 | 1,420,560 | 4.1 | 23.8 | Significant STU conflict |
+| 7 | dst = src0 + src1 | Same conflict characteristics as case6, **loop unrolling applied to instructions** | Read-read conflict + Read-write conflict | 0x0000 | 0x5000 | 0xA000 | 16384 | 1,330,688 | 40.8 | 18.2 | Compared to case6, LDU conflict increased, STU conflict decreased, performance improved by 6.3% |
+| 8 | dst = src0 + src1 | Same addresses as Case6, kernel adds heavy computation, changing kernel from memory-bound to compute-bound | Read-read conflict + Read-write conflict | 0x0000 | 0x5000 | 0xA000 | 16384 | 1,810,355,431 | 0.1 | 0.0 | Under compute-bound, LDU/STU conflicts almost disappear. Compared to case6, cycles are ~1274x higher |
 
 ### Scatter and Gather Scenarios (Case 9-10)
 
 **Note: Subbank conflicts are a lower-level storage conflict and are not captured by LDU/STU conflict ratio metrics**
 
-| Case | Formula | Scenario Description | Subbank Conflict | index Address | data Address | index Pattern | Benchmark Performance (cycles) | LDU Conflict Ratio (%) | STU Conflict Ratio (%) | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 9 | Gather + Add + Scatter | Gather data indices [0..255] continuous | Cross-bank dispersed, no conflict | 0x0000 | 0x0400 | Indices [0..255] continuous | 650,670 | NA | NA | Data dispersed across different subbanks of 16 banks, low conflict ratio |
-| 10 | Gather + Add + Scatter | Gather data indices 0, 128 alternating repeat | Same subbank different row conflict | 0x0000 | 0x0400 | Indices 0, 128 alternating | **750,707** | NA | NA | Compared to Case 9, performance degraded by 15.4% |
+| Case | Formula | Scenario Description | Subbank Conflict | index Address | data Address | index Pattern | Single VF Data Volume (B) | Benchmark Performance (cycles) | LDU Conflict Ratio (%) | STU Conflict Ratio (%) | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 9 | Gather + Add + Scatter | Gather data indices [0..255] continuous | Cross-bank dispersed, no conflict | 0x0000 | 0x0400 | Indices [0..255] continuous | 1024 | 650,670 | NA | NA | Data dispersed across different subbanks of 16 banks, low conflict ratio |
+| 10 | Gather + Add + Scatter | Gather data indices 0, 128 alternating repeat | Same subbank different row conflict | 0x0000 | 0x0400 | Indices 0, 128 alternating | 1024 | **750,707** | NA | NA | Compared to Case 9, performance degraded by 15.4% |
 
 ### Non-Continuous Load/Store Stride Comparison (Case 11-14)
 
-| Case | Formula | Scenario Description | src0 Address | dst Address | Load/Store Method | Benchmark Performance (cycles) | LDU Conflict Ratio (%) | STU Conflict Ratio (%) | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 11 | dst = src0 | 512 elements computed by row, 8 DataBlocks within repeat are continuously arranged, 256B gap between repeats | 0x0000 | 0x4100 | DataBlock continuous load/store | 443,135 | 0 | 0 | No LDU/STU conflict |
-| 12 | dst = src0 | 512 elements computed by column, 256B gap between 8 DataBlocks within repeat, 32B gap between repeats | 0x0000 | 0x4100 | DataBlock non-continuous load/store | 1,510,497 | 0 | **53.5** | Compared to case11, extremely high STU conflict ratio, significant performance degradation |
-| 13 | dst = src0 | 8 DataBlocks within the same repeat all read data from the same starting address | 0x0000 | 0x4100 | DataBlock repeated read | 440,911 | 0.0 | 0.0 | Compared to case11, no degradation, same address merged, no extra overhead |
-| 14 | dst = src0 | 8 iterations, each iteration reads data from the same starting address | 0x0000 | 0x4100 | Repeat repeated read | 440,847 | 10.1 | 0.0 | Compared to case11, no degradation, same address merged, no extra overhead |
+| Case | Formula | Scenario Description | src0 Address | dst Address | Load/Store Method | Single VF Data Volume (B) | Benchmark Performance (cycles) | LDU Conflict Ratio (%) | STU Conflict Ratio (%) | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 11 | dst = src0 | 512 elements computed by row, 8 DataBlocks within repeat are continuously arranged, 256B gap between repeats | 0x0000 | 0x4100 | DataBlock continuous load/store | 2048 | 443,135 | 0 | 0 | No LDU/STU conflict |
+| 12 | dst = src0 | 512 elements computed by column, 256B gap between 8 DataBlocks within repeat, 32B gap between repeats | 0x0000 | 0x4100 | DataBlock non-continuous load/store | 2048 | 1,510,497 | 0 | **53.5** | Compared to case11, extremely high STU conflict ratio, significant performance degradation |
+| 13 | dst = src0 | 8 DataBlocks within the same repeat all read data from the same starting address | 0x0000 | 0x4100 | DataBlock repeated read | 2048 | 440,911 | 0.0 | 0.0 | Compared to case11, no degradation, same address merged, no extra overhead |
+| 14 | dst = src0 | 8 iterations, each iteration reads data from the same starting address | 0x0000 | 0x4100 | Repeat repeated read | 2048 | 440,847 | 10.1 | 0.0 | Compared to case11, no degradation, same address merged, no extra overhead |
 
 
 **Detailed analysis of each case is in the corresponding sections below.**
@@ -153,6 +153,12 @@ This document focuses on verification and analysis of bank conflict scenarios fo
 ### UB Read/Write Diagram
 
 ![case1](./figures/case1.png)
+
+### Performance Data
+
+- Benchmark Performance: 1,332,802 cycles
+- LDU Conflict Ratio: 40.9%
+- STU Conflict Ratio: 17.6%
 
 ### Analysis Conclusion
 
@@ -174,6 +180,12 @@ This document focuses on verification and analysis of bank conflict scenarios fo
 
 ![case2](./figures/case2.png)
 
+### Performance Data
+
+- Benchmark Performance: 1,470,520 cycles
+- LDU Conflict Ratio: 0.0%
+- STU Conflict Ratio: 27.1%
+
 ### Analysis Conclusion
 
 - src0/dst fall in bank0, src1 falls in bank1, all three are in the same bank group. Read-write conflict occurs due to the two-read-one-write limitation.
@@ -193,6 +205,12 @@ This document focuses on verification and analysis of bank conflict scenarios fo
 ### UB Read/Write Diagram
 
 ![case3](./figures/case3.png)
+
+### Performance Data
+
+- Benchmark Performance: 1,470,753 cycles
+- LDU Conflict Ratio: 0.0%
+- STU Conflict Ratio: 27.2%
 
 ### Analysis Conclusion
 
@@ -214,6 +232,12 @@ This document focuses on verification and analysis of bank conflict scenarios fo
 
 ![case4](./figures/case4.png)
 
+### Performance Data
+
+- Benchmark Performance: 1,440,590 cycles
+- LDU Conflict Ratio: 0.0%
+- STU Conflict Ratio: 25.6%
+
 ### Analysis Conclusion
 
 - src1/dst both fall in bank1, src0 is in bank0, all three belong to BG=0. Performance is similar, with the same conflict pattern as Case2.
@@ -231,6 +255,12 @@ This document focuses on verification and analysis of bank conflict scenarios fo
 ### UB Read/Write Diagram
 
 ![case5](./figures/case5.png)
+
+### Performance Data
+
+- Benchmark Performance: 1,440,708 cycles
+- LDU Conflict Ratio: 0.0%
+- STU Conflict Ratio: 25.8%
 
 ### Analysis Conclusion
 
@@ -252,6 +282,12 @@ This document focuses on verification and analysis of bank conflict scenarios fo
 
 ![case6——7](./figures/case6_7.png)
 
+### Performance Data
+
+- Benchmark Performance: 1,420,560 cycles
+- LDU Conflict Ratio: 4.1%
+- STU Conflict Ratio: 23.8%
+
 ### Analysis Conclusion
 
 - All three operands fall in bank0 (BG=0). There is both a read-read conflict between src0/src1 and a read-write conflict.
@@ -265,6 +301,12 @@ Same as Case 6.
 ### UB Read/Write Diagram
 
 Same as Case 6.
+
+### Performance Data
+
+- Benchmark Performance: 1,330,688 cycles
+- LDU Conflict Ratio: 40.8%
+- STU Conflict Ratio: 18.2%
 
 ### Analysis Conclusion
 
@@ -280,6 +322,12 @@ Same as Case 6.
 ### UB Read/Write Diagram
 
 Same as Case 6.
+
+### Performance Data
+
+- Benchmark Performance: 1,810,355,431 cycles
+- LDU Conflict Ratio: 0.1%
+- STU Conflict Ratio: 0.0%
 
 ### Analysis Conclusion
 
@@ -299,6 +347,12 @@ Same as Case 6.
 ### UB Read/Write Diagram
 
 ![case9](./figures/case8.png)
+
+### Performance Data
+
+- Benchmark Performance: 650,670 cycles
+- LDU Conflict Ratio: NA
+- STU Conflict Ratio: NA
 
 ### Case Analysis
 
@@ -320,6 +374,12 @@ Same as Case 6.
 
 ![case10](./figures/case9.png)
 
+### Performance Data
+
+- Benchmark Performance: 750,707 cycles
+- LDU Conflict Ratio: NA
+- STU Conflict Ratio: NA
+
 ### Case Analysis
 
 - The address configuration is exactly the same as Case 9. The difference is that the index pattern is 0, 128 alternating repeat (within each repeat, half the elements are read via index=0, the other half via index=128). Both fall in the same subbank (sub0) of the same bank, but at different depth rows. The scatter read needs to switch between different rows of the same subbank, triggering a subbank conflict.
@@ -339,6 +399,12 @@ Same as Case 6.
 
 ![case11](./figures/case10.png)
 
+### Performance Data
+
+- Benchmark Performance: 443,135 cycles
+- LDU Conflict Ratio: 0%
+- STU Conflict Ratio: 0%
+
 ### Analysis Conclusion
 
 - Within each repeat, 8 DataBlocks are arranged continuously with 32B intervals, incrementing along the UB address. Since 32B is exactly the bank group rotation period (switching one bank group every 32B), the 8 DataBlocks naturally hit BG 0-7 once each, with no bank group competition.
@@ -356,6 +422,12 @@ Same as Case 6.
 ### UB Read/Write Diagram
 
 ![case12](./figures/case11.png)
+
+### Performance Data
+
+- Benchmark Performance: 1,510,497 cycles
+- LDU Conflict Ratio: 0%
+- STU Conflict Ratio: 53.5%
 
 ### Analysis Conclusion
 
@@ -375,6 +447,12 @@ Same as Case 6.
 
 ![case13](./figures/case12.png)
 
+### Performance Data
+
+- Benchmark Performance: 440,911 cycles
+- LDU Conflict Ratio: 0.0%
+- STU Conflict Ratio: 0.0%
+
 ### Analysis Conclusion
 
 - Set blockStride=0. All 8 DataBlocks within the same repeat read from the same 32B base address. The hardware automatically detects the same address read requests within the same repeat and merges them into a single UB read. The 8 DataBlocks share the same data.
@@ -392,6 +470,12 @@ Same as Case 6.
 ### UB Read/Write Diagram
 
 ![case14](./figures/case13.png)
+
+### Performance Data
+
+- Benchmark Performance: 440,847 cycles
+- LDU Conflict Ratio: 10.1%
+- STU Conflict Ratio: 0.0%
 
 ### Analysis Conclusion
 
