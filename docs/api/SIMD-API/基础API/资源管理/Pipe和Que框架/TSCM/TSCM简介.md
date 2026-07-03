@@ -76,7 +76,7 @@ que.FreeTensor(a2);</pre>
 ```cpp
 TSCM<TPosition::VECIN, 1> tscm;
 for () {
-    auto scmTensor = tscm.AllocTensor<float>(); // 在搬运数据从UB->TSCM前分配Buffer
+    auto scmTensor = tscm.AllocTensor<float>(); // 在搬运数据从UB->TSCM（L1 Buffer）前分配Buffer
     DataCopy(scmTensor, ubLocal, 1024); // 将UB数据搬运至TSCM，准备用于Matmul计算
     tscm.EnQue(scmTensor); //搬运完成在Matmul计算前，EnQue/DeQue
     LocalTensor<float> scmLocal = tscm.DeQue<float>();
