@@ -28,6 +28,8 @@ constexpr uint32_t AIN_PEER = 1;
 constexpr uint64_t REMOTE_BASE = 0x3000;
 constexpr uint64_t LOCAL_BASE = 0x5000;
 constexpr uint32_t DESCRIPTOR_SIZE = AscendC::HCOMM_URMA_TMP_BUF_SIZE + 32;
+constexpr uint32_t AIN_SIGNAL_COUNT = 16;
+constexpr uint32_t AIN_SIGNAL_POOL_SIZE = AIN_SIGNAL_COUNT * sizeof(uint64_t);
 
 class UrmaChannelResource {
 public:
@@ -122,6 +124,11 @@ public:
         }
         aivRes_.entity = channelHandlePtrs_.data();
         aivRes_.entityNumPerRank = entityNumPerRank_.data();
+        aivRes_.ainSignalCount = AIN_SIGNAL_COUNT;
+        aivRes_.ainSignalShadows = signalShadows_.data();
+        aivRes_.ainWorldBarrier.signal0 = 0;
+        aivRes_.ainWorldBarrier.reserved = 0;
+        aivRes_.symMemPool = symMemPool_.data();
 
         devComm_.rankId = 0;
         devComm_.rankSize = AIN_RANK_SIZE;
@@ -151,7 +158,13 @@ public:
 
     AscendC::AinCommSymWindow GetSrcWin() { return reinterpret_cast<AscendC::AinCommSymWindow>(&srcWin_); }
 
+    uint64_t* GetSymMemPool() { return symMemPool_.data(); }
+
+    uint64_t* GetSignalShadows() { return signalShadows_.data(); }
+
 private:
+    std::array<uint64_t, AIN_SIGNAL_COUNT> symMemPool_ = {};
+    std::array<uint64_t, AIN_SIGNAL_COUNT> signalShadows_ = {};
     AivRes aivRes_ = {};
     HcclDevComm devComm_ = {};
     std::array<AscendC::ChannelHandle, AIN_RANK_SIZE> channelHandles_ = {};
@@ -276,4 +289,189 @@ TEST_F(AinUrmaTestSuite, DelayedOperationsFlushPeerChannel)
 
     EXPECT_EQ(channel.GetSqDoorbell(), 0U);
     EXPECT_EQ(channel.GetSqTail(), 2U);
+}
+
+TEST_F(AinUrmaTestSuite, ReadSignalReturnsValueFromPool)
+{
+    UrmaChannelResource channel;
+    AinResource ainResource(channel.GetHandle());
+    AscendC::Ain ain(ainResource.GetDevComm(), 0);
+
+    ainResource.GetSymMemPool()[0] = 42;
+    ainResource.GetSymMemPool()[1] = 100;
+
+    EXPECT_EQ(ain.readSignal(0, 64), 42U);
+    EXPECT_EQ(ain.readSignal(1, 64), 100U);
+}
+
+TEST_F(AinUrmaTestSuite, ReadSignalWithBitsMasksValue)
+{
+    UrmaChannelResource channel;
+    AinResource ainResource(channel.GetHandle());
+    AscendC::Ain ain(ainResource.GetDevComm(), 0);
+
+    ainResource.GetSymMemPool()[0] = 0xFF;
+
+    EXPECT_EQ(ain.readSignal(0, 8), 0xFFU);
+    EXPECT_EQ(ain.readSignal(0, 4), 0xFU);
+    EXPECT_EQ(ain.readSignal(0, 32), 0xFFU);
+}
+
+TEST_F(AinUrmaTestSuite, GetSignalShadowPtrReturnsCorrectAddress)
+{
+    UrmaChannelResource channel;
+    AinResource ainResource(channel.GetHandle());
+    AscendC::Ain ain(ainResource.GetDevComm(), 0);
+
+    constexpr uint32_t signalId = 5;
+    __gm__ uint64_t* shadowPtr = ain.getSignalShadowPtr(signalId);
+
+    EXPECT_NE(shadowPtr, nullptr);
+}
+
+TEST_F(AinUrmaTestSuite, SignalImmediateCommitsAtomicFAA)
+{
+    UrmaChannelResource channel;
+    AinResource ainResource(channel.GetHandle());
+    AscendC::Ain ain(ainResource.GetDevComm(), 0);
+
+    ain.signal(
+        AscendC::AinTeamWorld(reinterpret_cast<__gm__ HcclDevComm*>(ainResource.GetDevComm())), AIN_PEER,
+        AscendC::AinSignalInc{0}, GetDescriptor());
+
+    EXPECT_EQ(channel.GetSqHead(), 0U);
+    EXPECT_EQ(channel.GetSqDoorbell(), 0U);
+}
+
+TEST_F(AinUrmaTestSuite, SignalWithSetValueCommitsAtomicFAA)
+{
+    UrmaChannelResource channel;
+    AinResource ainResource(channel.GetHandle());
+    AscendC::Ain ain(ainResource.GetDevComm(), 0);
+
+    ain.signal(
+        AscendC::AinTeamWorld(reinterpret_cast<__gm__ HcclDevComm*>(ainResource.GetDevComm())), AIN_PEER,
+        AscendC::AinSignalAdd{1, 100}, GetDescriptor());
+
+    EXPECT_EQ(channel.GetSqHead(), 0U);
+    EXPECT_EQ(channel.GetSqDoorbell(), 0U);
+}
+
+TEST_F(AinUrmaTestSuite, SignalDelayedDoesNotRingDoorbell)
+{
+    UrmaChannelResource channel;
+    AinResource ainResource(channel.GetHandle());
+    AscendC::Ain ain(ainResource.GetDevComm(), 0);
+
+    ain.signal(
+        AscendC::AinTeamWorld(reinterpret_cast<__gm__ HcclDevComm*>(ainResource.GetDevComm())), AIN_PEER,
+        AscendC::AinSignalInc{0}, GetDescriptor(), AscendC::AIN_COMMIT_DELAYED);
+
+    EXPECT_EQ(channel.GetSqHead(), 0U);
+    EXPECT_EQ(channel.GetSqDoorbell(), 0U);
+}
+
+TEST_F(AinUrmaTestSuite, SignalFlushCommitsAndDrains)
+{
+    UrmaChannelResource channel;
+    AinResource ainResource(channel.GetHandle());
+    AscendC::Ain ain(ainResource.GetDevComm(), 0);
+
+    ain.signal(
+        AscendC::AinTeamWorld(reinterpret_cast<__gm__ HcclDevComm*>(ainResource.GetDevComm())), AIN_PEER,
+        AscendC::AinSignalInc{0}, GetDescriptor(), AscendC::AIN_COMMIT_DELAYED);
+
+    EXPECT_EQ(channel.GetSqHead(), 0U);
+    EXPECT_EQ(channel.GetSqDoorbell(), 0U);
+
+    channel.CompleteCurrentSq();
+    ain.flush();
+
+    EXPECT_EQ(channel.GetSqDoorbell(), 0U);
+    EXPECT_EQ(channel.GetSqTail(), 0U);
+}
+
+TEST_F(AinUrmaTestSuite, WaitSignalSucceedsWhenValueUpdated)
+{
+    UrmaChannelResource channel;
+    AinResource ainResource(channel.GetHandle());
+    AscendC::Ain ain(ainResource.GetDevComm(), 0);
+
+    constexpr uint64_t targetValue = 10ULL;
+    ainResource.GetSymMemPool()[5] = 9ULL;
+
+    ainResource.GetSymMemPool()[5]++;
+
+    ain.waitSignal(5, targetValue, 64);
+
+    EXPECT_EQ(ainResource.GetSymMemPool()[5], targetValue);
+}
+
+TEST_F(AinUrmaTestSuite, WaitSignalWithMaskBitsWhenValueUpdated)
+{
+    UrmaChannelResource channel;
+    AinResource ainResource(channel.GetHandle());
+    AscendC::Ain ain(ainResource.GetDevComm(), 0);
+
+    constexpr uint64_t testValue = 0x12345678ULL;
+    ainResource.GetSymMemPool()[6] = 0x12345677ULL;
+
+    ainResource.GetSymMemPool()[6]++;
+
+    ain.waitSignal(6, testValue, 32);
+
+    EXPECT_EQ(ainResource.GetSymMemPool()[6] & 0xFFFFFFFFULL, testValue);
+}
+
+TEST_F(AinUrmaTestSuite, BarrierSessionSyncSignalsPeersAndWaits)
+{
+    UrmaChannelResource channel;
+    AinResource ainResource(channel.GetHandle());
+    AscendC::Ain ain(ainResource.GetDevComm(), 0);
+
+    ainResource.GetSignalShadows()[0] = 0;
+    ainResource.GetSignalShadows()[1] = 0;
+
+    ainResource.GetSymMemPool()[1] = 1;
+
+    AscendC::AinBarrierSession barrierSession(&ain, AscendC::AinTeamTagWorld{}, 0);
+    barrierSession.sync(AscendC::AIN_MEMORY_ORDER_DEFAULT, GetDescriptor());
+
+    EXPECT_EQ(channel.GetSqHead(), 0U);
+}
+
+TEST_F(AinUrmaTestSuite, BarrierSessionSyncWithTimeout)
+{
+    UrmaChannelResource channel;
+    AinResource ainResource(channel.GetHandle());
+    AscendC::Ain ain(ainResource.GetDevComm(), 0);
+
+    ainResource.GetSymMemPool()[AIN_PEER] = 0;
+
+    ainResource.GetSignalShadows()[AIN_PEER] = 0;
+
+    ainResource.GetSymMemPool()[AIN_PEER]++;
+
+    AscendC::AinBarrierSession barrierSession(&ain, AscendC::AinTeamTagWorld{}, 0);
+    int32_t result = barrierSession.sync(AscendC::AIN_MEMORY_ORDER_DEFAULT, 1000000ULL, GetDescriptor());
+
+    EXPECT_EQ(result, 0);
+    EXPECT_EQ(channel.GetSqHead(), 0U);
+}
+
+TEST_F(AinUrmaTestSuite, BarrierSessionSyncTimeoutExpired)
+{
+    UrmaChannelResource channel;
+    AinResource ainResource(channel.GetHandle());
+    AscendC::Ain ain(ainResource.GetDevComm(), 0);
+
+    ainResource.GetSignalShadows()[0] = 0;
+    ainResource.GetSignalShadows()[1] = 0;
+
+    ainResource.GetSymMemPool()[1] = 0;
+
+    AscendC::AinBarrierSession barrierSession(&ain, AscendC::AinTeamTagWorld{}, 0);
+    int32_t result = barrierSession.sync(AscendC::AIN_MEMORY_ORDER_DEFAULT, 1ULL, GetDescriptor());
+
+    EXPECT_EQ(result, -1);
 }

@@ -22,8 +22,11 @@
 
 #include "../hcomm/hcomm.h"
 #include "ain_common.h"
+#include "../../../impl/adv_api/detail/ain/impl/barrier_impl_def.h"
 
 namespace AscendC {
+
+static AIN_DEVICE AinTeam AinTeamWorld(AinDevComm devComm);
 
 /*!
  * @class Ain
@@ -69,15 +72,41 @@ public:
         uint64_t srcOffset, uint64_t bytes, const DescriptorUbuf& ubuf = DescriptorUbuf{},
         AinCommitFlags commitFlags = AIN_COMMIT_IMMED);
 
-private:
+    template <typename RemoteAction, typename DescriptorUbuf = AinDescriptorUbuf>
+    AIN_DEVICE void signal(
+        AinTeam team, uint32_t peer, RemoteAction action, const DescriptorUbuf& ubuf = DescriptorUbuf{},
+        AinCommitFlags commitFlags = AIN_COMMIT_IMMED);
+
+    AIN_DEVICE uint64_t
+    readSignal(AinSignal signalId, uint32_t bits, AinMemoryOrder order = AIN_MEMORY_ORDER_DEFAULT) const;
+
+    AIN_DEVICE void waitSignal(
+        AinSignal signalId, uint64_t least, uint32_t bits, AinMemoryOrder order = AIN_MEMORY_ORDER_DEFAULT) const;
+
+    AIN_DEVICE __gm__ uint64_t* getSignalShadowPtr(AinSignal signalId) const;
+
     uint64_t devComm_ = 0;
+
+private:
     int contextIndex_ = 0;
     AscendC::Hcomm<AscendC::CommProtocol::COMM_PROTOCOL_UBC_CTP> hcomm_;
+};
+
+class AinBarrierSession : AinBarrierSessionImpl {
+public:
+    AIN_DEVICE AinBarrierSession(Ain* ain, AinTeamTagWorld, uint32_t index);
+
+    template <typename DescriptorUbuf = AinDescriptorUbuf>
+    AIN_DEVICE void sync(AinMemoryOrder order, const DescriptorUbuf& ubuf = DescriptorUbuf{});
+    template <typename DescriptorUbuf = AinDescriptorUbuf>
+    AIN_DEVICE int32_t
+    sync(AinMemoryOrder order, uint64_t timeoutCycles, const DescriptorUbuf& ubuf = DescriptorUbuf{});
 };
 
 } // namespace AscendC
 
 #include "../../../impl/adv_api/detail/ain/impl/ain_impl.h"
+#include "../../../impl/adv_api/detail/ain/impl/barrier_impl.h"
 
 #endif // INCLUDE_ADV_API_AIN_AIN_H
 
