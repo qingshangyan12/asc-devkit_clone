@@ -64,19 +64,19 @@ CANN基于分层架构设计,实现了上层应用与底层硬件的无缝衔接
 <ul style="list-style-type: none; padding-left: 0;">
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
 <strong style="color: #1a1a1a;"><a href="../编程指南/编程模型/编程模型.md" style="color: #3b82f6; text-decoration: none;">📖 编程模型</a></strong><br/>
-<div style="display: inline-block; vertical-align: top; margin-right: 15px;">
+<div style="display: flex; gap: 15px; margin-top: 10px;">
+<div style="flex: 1; background: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #e5e7eb;">
 <a href="../编程指南/编程模型/AI-Core-SIMD编程/概述.md" style="color: #3b82f6; font-size: 14px; font-weight: bold;">SIMD编程</a><br/>
 <span style="color: #999; font-size: 13px;">  - <a href="../编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/C语言编程概述.md" style="color: #3b82f6; font-size: 13px;">基于指针的C语言编程</a></span><br/>
 <span style="color: #999; font-size: 13px;">  - <a href="../编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md" style="color: #3b82f6; font-size: 13px;">基于Tensor的C++编程</a></span><br/>
 <span style="color: #999; font-size: 13px;">  - <a href="../编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程原理.md" style="color: #3b82f6; font-size: 13px;">基于TPipe-TQue框架编程</a></span>
 </div>
-<span style="color: #3b82f6; font-size: 24px; font-weight: bold; margin-right: 15px;">｜</span>
-<div style="display: inline-block; vertical-align: top; margin-right: 15px;">
-<a href="../编程指南/编程模型/AI-Core-SIMT编程/AI-Core-SIMT编程.md" style="color: #3b82f6; font-size: 14px;">SIMT编程</a>
+<div style="flex: 1; background: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #e5e7eb;">
+<a href="../编程指南/编程模型/AI-Core-SIMT编程/AI-Core-SIMT编程.md" style="color: #3b82f6; font-size: 14px; font-weight: bold;">SIMT编程</a>
 </div>
-<span style="color: #3b82f6; font-size: 24px; font-weight: bold; margin-right: 15px;">｜</span>
-<div style="display: inline-block; vertical-align: top;">
-<a href="../编程指南/语言扩展层/SIMD-BuiltIn关键字.md" style="color: #3b82f6; font-size: 14px;">语言扩展层概述</a>
+<div style="flex: 1; background: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #e5e7eb;">
+<a href="../编程指南/语言扩展层/SIMD-BuiltIn关键字.md" style="color: #3b82f6; font-size: 14px; font-weight: bold;">语言扩展层概述</a>
+</div>
 </div>
 </li>
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
