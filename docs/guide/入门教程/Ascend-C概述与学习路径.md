@@ -66,6 +66,9 @@ CANN基于分层架构设计,实现了上层应用与底层硬件的无缝衔接
 <strong style="color: #1a1a1a;">📖 编程模型</strong><br/>
 <a href="../编程指南/编程模型/编程模型.md" style="color: #3b82f6; font-size: 14px;">编程模型概述</a><br/>
 <span style="color: #666; font-size: 14px;">• <a href="../编程指南/编程模型/AI-Core-SIMD编程/概述.md" style="color: #3b82f6; font-size: 14px;">SIMD编程</a></span><br/>
+<span style="color: #999; font-size: 13px;">  - <a href="../编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/基于语言扩展层C-API编程.md" style="color: #3b82f6; font-size: 13px;">基于指针的C语言编程</a></span><br/>
+<span style="color: #999; font-size: 13px;">  - <a href="../编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md" style="color: #3b82f6; font-size: 13px;">基于Tensor的C++编程</a></span><br/>
+<span style="color: #999; font-size: 13px;">  - <a href="../编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程原理.md" style="color: #3b82f6; font-size: 13px;">基于TPipe-TQue框架编程</a></span><br/>
 <span style="color: #666; font-size: 14px;">• <a href="../编程指南/编程模型/AI-Core-SIMT编程/AI-Core-SIMT编程.md" style="color: #3b82f6; font-size: 14px;">SIMT编程</a></span><br/>
 <span style="color: #666; font-size: 14px;">• <a href="../编程指南/语言扩展层/SIMD-BuiltIn关键字.md" style="color: #3b82f6; font-size: 14px;">语言扩展层概述</a></span>
 </li>
