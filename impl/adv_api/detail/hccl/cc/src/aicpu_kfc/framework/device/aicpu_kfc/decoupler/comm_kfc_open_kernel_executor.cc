@@ -16,9 +16,13 @@
 #include "alg_param.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "cann_dispatch_bridge.h"
-#include "hccl_api_data.h"
 
 namespace {
+constexpr int32_t MC2_HCOMM_LAUNCH_MODE_EAGER = 0;
+constexpr int32_t MC2_HCOMM_LAUNCH_MODE_BATCH = 1;
+
+extern "C" int32_t HcommSetLaunchMode(const char* launchTag, int32_t mode);
+
 mc2_ops_hccl::OpParam* AsOpenOpParam(std::vector<uint8_t>& opParam)
 {
     return reinterpret_cast<mc2_ops_hccl::OpParam*>(opParam.data());
@@ -122,17 +126,17 @@ bool IsMc2BatchModeOp(HcclCMDType opType)
            opType == HCCL_CMD_ALLTOALLV || opType == HCCL_CMD_ALLTOALL;
 }
 
-HcclResult SetMc2BatchMode(const mc2_ops_hccl::OpParam& param, HcommLaunchMode mode, const char* stage)
+HcclResult SetMc2BatchMode(const mc2_ops_hccl::OpParam& param, int32_t mode, const char* stage)
 {
     HCCL_INFO(
         "[MC2_BATCH][%s] opType %u, algName[%s], algTag[%s], mode %d.",
-        stage, static_cast<u32>(param.opType), param.algName, param.algTag, static_cast<int32_t>(mode));
+        stage, static_cast<u32>(param.opType), param.algName, param.algTag, mode);
     int32_t ret = HcommSetLaunchMode(param.algTag, mode);
     CHK_PRT_RET(
         ret != HCCL_SUCCESS,
         HCCL_ERROR(
             "[MC2_BATCH][%s] set launch mode failed, ret %d, opType %u, algName[%s], algTag[%s], mode %d.",
-            stage, ret, static_cast<u32>(param.opType), param.algName, param.algTag, static_cast<int32_t>(mode)),
+            stage, ret, static_cast<u32>(param.opType), param.algName, param.algTag, mode),
         static_cast<HcclResult>(ret));
     return HCCL_SUCCESS;
 }
@@ -144,7 +148,7 @@ HcclResult RunWithMc2BatchMode(const mc2_ops_hccl::OpParam& param, Func func)
         return func();
     }
 
-    HcclResult ret = SetMc2BatchMode(param, HCOMM_LAUNCH_MODE_BATCH, "Start");
+    HcclResult ret = SetMc2BatchMode(param, MC2_HCOMM_LAUNCH_MODE_BATCH, "Start");
     CHK_RET(ret);
 
     HcclResult execRet = func();
@@ -155,7 +159,7 @@ HcclResult RunWithMc2BatchMode(const mc2_ops_hccl::OpParam& param, Func func)
             execRet, static_cast<u32>(param.opType), param.algName, param.algTag);
     }
 
-    HcclResult eagerRet = SetMc2BatchMode(param, HCOMM_LAUNCH_MODE_EAGER, endStage);
+    HcclResult eagerRet = SetMc2BatchMode(param, MC2_HCOMM_LAUNCH_MODE_EAGER, endStage);
     if (execRet != HCCL_SUCCESS) {
         if (eagerRet != HCCL_SUCCESS) {
             HCCL_ERROR(
