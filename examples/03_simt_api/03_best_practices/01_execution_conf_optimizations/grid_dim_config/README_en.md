@@ -286,10 +286,10 @@ Run the following steps in the root directory of this example to build and execu
 
 ## Performance Analysis
 
-Use the `msprof` tool to collect detailed performance data:
+Use the `msOpProf` tool to collect detailed performance data:
 
 ```bash
-msprof op ./grid_config   # Analyze case performance
+msopprof ./grid_config   # Analyze case performance
 ```
 
 After the command completes, a folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The performance data folder structure example is as follows:

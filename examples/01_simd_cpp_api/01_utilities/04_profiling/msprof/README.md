@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例以Add计算为载体，演示通过`msprof op`采集上板性能数据的方法。样例在Host侧直接构造输入数据和golden数据，执行Ascend C核函数后在进程内完成结果校验，不依赖额外的数据生成或校验脚本。
+本样例以Add计算为载体，演示通过`msopprof`采集上板性能数据的方法。样例在Host侧直接构造输入数据和golden数据，执行Ascend C核函数后在进程内完成结果校验，不依赖额外的数据生成或校验脚本。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -35,14 +35,14 @@
 
 ## msProf工具介绍
 
-msProf工具是单算子性能分析工具，包含`msprof op`和`msprof op simulator`两种使用方式。该工具可采集算子执行时间、流水占比、存储访问等性能数据，辅助分析算子性能瓶颈。
+msProf工具是单算子性能分析工具，包含`msopprof`和`msopprof simulator`两种使用方式。该工具可采集算子执行时间、流水占比、存储访问等性能数据，辅助分析算子性能瓶颈。
 
 - 上板性能采集
 
   通过上板性能采集，可以直接测定算子在昇腾AI处理器上的运行时间。基于可执行文件`demo`执行如下命令：
 
   ```bash
-  msprof op ./demo
+  msopprof ./demo
   ```
 
   命令完成后，会在默认目录下生成以`OPPROF_{timestamp}_XXX`命名的文件夹，性能数据文件夹结构示例如下：
@@ -84,7 +84,7 @@ msProf工具是单算子性能分析工具，包含`msprof op`和`msprof op simu
   ```bash
   mkdir -p build && cd build;           # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;   # 编译工程
-  msprof op ./demo                      # 基于可执行文件demo通过msprof op执行性能调优
+  msopprof ./demo                      # 基于可执行文件demo通过msopprof执行性能调优
   ```
 
 - 编译选项说明
@@ -101,4 +101,4 @@ msProf工具是单算子性能分析工具，包含`msprof op`和`msprof op simu
   test pass!
   ```
 
-  `msprof op`执行完成后，会在当前目录下生成以`OPPROF_{timestamp}_XXX`命名的性能数据目录，目录中包含执行时间、流水占比、存储访问等性能数据文件。
+  `msopprof`执行完成后，会在当前目录下生成以`OPPROF_{timestamp}_XXX`命名的性能数据目录，目录中包含执行时间、流水占比、存储访问等性能数据文件。

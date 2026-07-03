@@ -183,7 +183,7 @@ for shape in "${SHAPES[@]}"; do
     echo -e "${GREEN}开始 msprof 性能采集...${NC}"
     # 检查 msprof 执行结果。该命令可能返回非 0，不能被 set -e 提前中断。
     set +e
-    msprof op build/demo "${SCENARIO}" "${M}" "${K}" "${N}" > /dev/null 2>&1
+    msopprof build/demo "${SCENARIO}" "${M}" "${K}" "${N}" > /dev/null 2>&1
     msprof_exit_code=$?
     set -e
     if [ "${msprof_exit_code}" -ne 0 ]; then

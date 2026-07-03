@@ -119,7 +119,7 @@
   ```bash
   mkdir -p build; cd build
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..; make -j
-  msprof --application="python3 ../torch_library_report_tensor.py" --output="../result"
+  msopprof --application="python3 ../torch_library_report_tensor.py" --output="../result"
   ```
 
 - 编译选项说明

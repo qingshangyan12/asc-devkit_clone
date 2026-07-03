@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例以MatmulLeakyRelu融合计算为载体，展示Ascend C程序在CAmodel仿真模式下的编译、运行、结果校验与性能数据采集流程。用户可通过`msprof op simulator`获取仿真性能数据，用于分析性能瓶颈、提升性能分析效率。
+本样例以MatmulLeakyRelu融合计算为载体，展示Ascend C程序在CAmodel仿真模式下的编译、运行、结果校验与性能数据采集流程。用户可通过`msopprof simulator`获取仿真性能数据，用于分析性能瓶颈、提升性能分析效率。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -76,7 +76,7 @@
   mkdir -p build && cd build
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..; make -j
   python3 ../scripts/gen_data.py
-  msprof op simulator --soc-version=Ascend910B1 ./demo
+  msopprof simulator --soc-version=Ascend910B1 ./demo
   python3 ../scripts/verify_result.py ./output/output.bin ./output/golden.bin
   ```
 
@@ -95,10 +95,10 @@
 
 ## 仿真调优
 
-基于`./demo`可通过`msprof op simulator`进行仿真性能分析，生成可视化的指令流水图等信息，指令如下：
+基于`./demo`可通过`msopprof simulator`进行仿真性能分析，生成可视化的指令流水图等信息，指令如下：
 
 ```bash
-msprof op simulator --soc-version=<soc_version> ./demo
+msopprof simulator --soc-version=<soc_version> ./demo
 ```
 
 > AI处理器的型号`<soc_version>`请通过如下方式获取：

@@ -238,7 +238,7 @@ Based on Case 0 Profiling data, the core performance bottlenecks of the current 
 
 **Profiling Data Collection**:
 
-Use the `msprof` tool to collect performance data for Case 0. Key metrics:
+Use the `msOpProf` tool to collect performance data for Case 0. Key metrics:
 
 | Metric | Value | Ratio |
 |:---|:---|:---|
@@ -659,10 +659,10 @@ Run the following steps in the root directory of this example to build and run t
 
 ### Performance Analysis
 
-Use the `msprof` tool to obtain detailed performance data:
+Use the `msOpProf` tool to obtain detailed performance data:
 
 ```bash
-msprof ./demo   # Analyze performance
+msopprof ./demo   # Analyze performance
 ```
 
 A PROF_ prefixed folder is generated in the current directory. The `mindstudio_profiler_output` directory stores Host and Device performance data summaries. Performance data analysis is recommended to view files in this directory.

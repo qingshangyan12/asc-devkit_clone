@@ -484,10 +484,10 @@ test pass!
 
 ### NPU模式性能分析
 
-使用 `msprof` 工具获取NPU模式运行时详细的性能数据：
+使用 `msOpProf` 工具获取NPU模式运行时详细的性能数据：
 
 ```bash
-msprof ./demo
+msopprof ./demo
 ```
 
 当前目录下会生成 PROF_ 前缀的文件夹，`mindstudio_profiler_output` 目录保存性能数据汇总，性能数据分析推荐查看该目录下文件：

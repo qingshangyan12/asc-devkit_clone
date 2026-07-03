@@ -212,7 +212,7 @@ Ascend 950 系列按 GM 带宽约 1.6TB/s 估算，理论耗时约 188.74μs。�
 
 ### 优化点3：重复搬运与 L2Cache 复用
 
-**实现方式**：重复搬运场景在同一数据规模下执行多轮 GM 读取，使用 `msprof --ai-core=on --aic-metrics=L2Cache` 采集 L2Cache 读命中和 miss allocate 数据。
+**实现方式**：重复搬运场景在同一数据规模下执行多轮 GM 读取，使用 `msopprof --ai-core=on --aic-metrics=L2Cache` 采集 L2Cache 读命中和 miss allocate 数据。
 
 整块重复搬运时，`RepeatCopy(0, n, 4)` 表示 `nStart=0`、`nCount=N`、`repeatTimes=4`，每轮都按完整 N 方向读取同一块数据。A2/A3 的 L2Cache 大小为 192MB，950PR 的 L2Cache 大小为 128MB。本样例单个 `M * N` 矩阵大小约为 301.99MB，整块重复搬运时单轮工作集大于 L2Cache 容量，容易发生写替换，导致 L2Cache 命中率较低。
 
@@ -441,11 +441,11 @@ for (uint32_t mBlockIdx = 0; mBlockIdx < fullMBlockCount; mBlockIdx++) {
 
 - 性能采集
 
-  使用 `msprof` 工具获取详细性能数据：
+  使用 `msOpProf` 工具获取详细性能数据：
 
   ```bash
-  msprof ./demo
-  msprof --ai-core=on --aic-metrics=L2Cache ./demo    # L2Cache 相关场景使用
+  msopprof ./demo
+  msopprof --ai-core=on --aic-metrics=L2Cache ./demo    # L2Cache 相关场景使用
   ```
 
   采集后会在当前目录生成 `PROF_` 前缀目录，性能汇总文件位于 `mindstudio_profiler_output` 目录下。

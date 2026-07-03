@@ -212,7 +212,7 @@ In the unaligned scenario of this example, the full tile transfer volume for GM 
 
 ### Optimization Point 3: Repeated Transfer and L2Cache Reuse
 
-**Implementation**: The repeated transfer scenario performs multiple rounds of GM reads on the same data scale, using `msprof --ai-core=on --aic-metrics=L2Cache` to collect L2Cache read hit and miss allocate data.
+**Implementation**: The repeated transfer scenario performs multiple rounds of GM reads on the same data scale, using `msopprof --ai-core=on --aic-metrics=L2Cache` to collect L2Cache read hit and miss allocate data.
 
 For full-block repeated transfer, `RepeatCopy(0, n, 4)` means `nStart=0`, `nCount=N`, `repeatTimes=4`, with each round reading the same data block along the full N direction. A2/A3 has an L2Cache size of 192MB, and 950PR has an L2Cache size of 128MB. In this example, a single `M * N` matrix is approximately 301.99MB. During full-block repeated transfer, the single-round working set exceeds L2Cache capacity, making write eviction likely and resulting in low L2Cache hit rates.
 
@@ -441,11 +441,11 @@ Run the following steps in the root directory of this example to build and run t
 
 - Performance collection
 
-  Use the `msprof` tool to obtain detailed performance data:
+  Use the `msOpProf` tool to obtain detailed performance data:
 
   ```bash
-  msprof ./demo
-  msprof --ai-core=on --aic-metrics=L2Cache ./demo    # Use for L2Cache related scenarios
+  msopprof ./demo
+  msopprof --ai-core=on --aic-metrics=L2Cache ./demo    # Use for L2Cache related scenarios
   ```
 
   After collection, a `PROF_` prefixed directory is generated in the current directory. Performance summary files are located in the `mindstudio_profiler_output` directory.

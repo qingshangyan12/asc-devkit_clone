@@ -115,13 +115,13 @@ make -j
 
 ## 性能数据获取
 
-使用 `msprof` 工具获取详细性能数据：
+使用 `msOpProf` 工具获取详细性能数据：
 
 ```bash
-msprof op ./demo 1 128 128 128
+msopprof ./demo 1 128 128 128
 ```
 
-  > 💡 使用 `msprof` 工具需安装 CANN 商用/社区版，详细信息可参考[msprof工具安装指南](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md)。
+  > 💡 使用 `msOpProf` 工具需安装 CANN 商用/社区版，详细信息可参考[msOpProf工具安装指南](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md)。
 
   命令完成后，会在默认目录下生成以`OPPROF_{timestamp}_XXX`命名的文件夹，性能数据文件夹结构示例如下：
 
@@ -154,7 +154,7 @@ cat ./OPPROF_*/PipeUtilization.csv
 
 ## 性能测试脚本
 
-`perf.sh` 用于批量编译、执行 `msprof op`、提取性能指标并生成 CSV 汇总结果。
+`perf.sh` 用于批量编译、执行 `msopprof`、提取性能指标并生成 CSV 汇总结果。
 
 ```bash
 # 查看帮助

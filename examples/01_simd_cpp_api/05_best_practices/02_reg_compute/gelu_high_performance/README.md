@@ -238,7 +238,7 @@ __aicore__ inline void GeluCompute(
 
 **Profiling 数据抓取**：
 
-使用 `msprof` 工具对 Case 0 进行性能采集，关键指标如下：
+使用 `msOpProf` 工具对 Case 0 进行性能采集，关键指标如下：
 
 | 指标 | 数值 | 占比 |
 |:---|:---|:---|
@@ -687,10 +687,10 @@ $$
 
 ### 性能分析
 
-使用 `msprof` 工具获取详细性能数据：
+使用 `msOpProf` 工具获取详细性能数据：
 
 ```bash
-msprof ./demo   # 分析性能
+msopprof ./demo   # 分析性能
 ```
 
 当前目录下会生成PROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件

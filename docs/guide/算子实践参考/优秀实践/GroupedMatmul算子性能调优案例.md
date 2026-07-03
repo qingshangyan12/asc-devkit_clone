@@ -112,12 +112,12 @@ for i in range(g):
 
 ## 分析主要瓶颈点<a name="section371410542511"></a>
 
-固定8核进行测试的情况下，通过msprof op命令获取指令的cycle占比数据如下：
+固定8核进行测试的情况下，通过msopprof命令获取指令的cycle占比数据如下：
 
 **图1**  指令的cycle占比数据ArithmeticUtilization.csv（性能总耗时为218.1us）<a name="fig394318012515"></a>  
 ![](../../figures/指令的cycle占比数据ArithmeticUtilization-csv（性能总耗时为218-1us）.png "指令的cycle占比数据ArithmeticUtilization-csv（性能总耗时为218-1us）")
 
-通过msprof op simulator获取到的指令流水图如下图所示：
+通过msopprof simulator获取到的指令流水图如下图所示：
 
 **图2**  指令流水图<a name="fig1566120572287"></a>  
 ![](../../figures/指令流水图.png "指令流水图")

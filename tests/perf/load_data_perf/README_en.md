@@ -115,13 +115,13 @@ The runtime parameter order is `SCENARIO_NUM M K N`:
 
 ## Collecting Performance Data
 
-Use the `msprof` tool to collect detailed performance data:
+Use the `msOpProf` tool to collect detailed performance data:
 
 ```bash
-msprof op ./demo 1 128 128 128
+msopprof ./demo 1 128 128 128
 ```
 
-  > **Note:** To use the `msprof` tool, install the CANN commercial/community edition. For details, see the [msprof Tool Installation Guide](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md).
+  > **Note:** To use the `msOpProf` tool, install the CANN commercial/community edition. For details, see the [msprof Tool Installation Guide](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md).
 
   After the command completes, a directory named in the format `OPPROF_{timestamp}_XXX` is generated in the default directory. The following is an example of the performance data directory structure:
 
@@ -153,7 +153,7 @@ Focus on the following metrics:
 
 ## Performance Test Script
 
-`perf.sh` is used to batch build, run `msprof op`, extract performance metrics, and generate CSV summary results.
+`perf.sh` is used to batch build, run `msopprof`, extract performance metrics, and generate CSV summary results.
 
 ```bash
 # Show help

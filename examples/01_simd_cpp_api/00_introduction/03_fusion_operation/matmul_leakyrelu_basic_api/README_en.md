@@ -543,10 +543,10 @@ AscendC::DumpTensor(zLocal, 1, 16);
 
 ## Performance Debugging
 
-Use the `msprof` tool to obtain detailed performance data:
+Use the `msOpProf` tool to obtain detailed performance data:
 
 ```bash
-msprof ./demo   # Analyze performance
+msopprof ./demo   # Analyze performance
 ```
 
 A folder with the PROF_ prefix will be generated in the current directory. The `mindstudio_profiler_output` directory contains the performance data summary of the Host and each Device. For performance data analysis, it is recommended to view the files in this directory:

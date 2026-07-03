@@ -682,10 +682,10 @@ AscendC::DumpTensor(zLocal, 1, 32);
 
 ## 性能调试
 
-使用 `msprof` 工具获取详细性能数据：
+使用 `msOpProf` 工具获取详细性能数据：
 
 ```bash
-msprof ./demo   # 分析性能
+msopprof ./demo   # 分析性能
 ```
 
 当前目录下会生成PROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件
