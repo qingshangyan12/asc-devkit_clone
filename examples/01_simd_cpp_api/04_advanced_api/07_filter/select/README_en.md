@@ -26,9 +26,9 @@ This example uses the Select high-level API to implement conditional selection. 
 
 ## Example Description
 
-- Example function:  
+- Example function:
   This example selects elements from source operand src0 and source operand src1Scalar based on the mask value at the corresponding position to produce dstTensor. When the mask value is 1, src1Scalar is selected. When the mask value is 0, the element at the corresponding position of src0 is selected.
-  
+
 - Example specifications:
   <table>
   <caption>Table 1: Example Input/Output Specifications</caption>
@@ -48,29 +48,29 @@ This example uses the Select high-level API to implement conditional selection. 
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">select_custom</td></tr>
   </table>
 
-- Example implementation:  
+- Example implementation:
     This example implements a SelectCustom example with fixed shapes of input src0[2, 32], mask[2, 32], and output dst[2, 32]. src1Scalar is a fixed value of 1.234 with float data type.
 
-  - Kernel implementation:  
+  - Kernel implementation:
     The computation logic is: Input data must first be transferred to on-chip storage, then the Select high-level API is used to complete the computation, and the result is transferred out.
 
-  - Tiling implementation:  
+  - Tiling implementation:
     The tiling implementation process is as follows: Use the GetSelectMaxMinTmpSize API to calculate the required maximum/minimum temporary space size, use the minimum temporary space, then determine the required tiling parameters based on the input length, and include the scalar-type source operand in the tiling to pass to the kernel side.
 
-  - Invocation implementation:  
+  - Invocation implementation:
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run  
+## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
-    
+
 - Run the example (NPU mode)
   ```bash
   mkdir -p build && cd build;   # Create and enter the build directory

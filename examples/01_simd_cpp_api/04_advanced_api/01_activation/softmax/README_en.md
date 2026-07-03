@@ -54,16 +54,16 @@ AdjustSoftMaxRes is used for post-processing of SoftMax computation results. Whe
 </table>
 </div>
 
-- Example implementation:  
+- Example implementation:
   This example implements a softmax example with fixed shapes of input x[32, 32] and output y[32, 32], max[32, 8], sum[32, 8].
 
-  - Kernel implementation  
+  - Kernel implementation
     Core computation steps: After transferring the input data in, call `AscendC::SoftMax` to complete the SoftMax computation, then call `AscendC::AdjustSoftMaxRes` for post-processing of the result, and finally transfer the result out.
 
-  - Tiling implementation  
+  - Tiling implementation
     The tiling implementation process for the softmax example is as follows: First split the shape by row count for multi-core processing, using average allocation aligned upward by the number of cores to determine the computation row count for the main core, then determine the tail core computation row count. For the main core computation shape, call GetSoftMaxMinTmpSize to obtain the temporary buffer size required by the API, then call the tiling function of the SoftMax high-level API to obtain the tiling parameters required by the API. The tiling required by the high-level API for tail core computation is calculated by the kernel side independently.
 
-  - Invocation implementation  
+  - Invocation implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run

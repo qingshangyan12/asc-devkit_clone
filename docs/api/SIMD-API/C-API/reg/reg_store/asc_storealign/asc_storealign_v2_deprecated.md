@@ -71,12 +71,12 @@ reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存�
   __simd_callee__ inline void asc_storealign_pack(__ubuf__  half* dst_align32b, vector_half src, iter_reg offset, vector_bool mask)
   __simd_callee__ inline void asc_storealign_pack(__ubuf__  float* dst_align32b, vector_float src, iter_reg offset, vector_bool mask)
   __simd_callee__ inline void asc_storealign_pack(__ubuf__  bfloat16_t* dst_align32b, vector_bfloat16_t src, iter_reg offset, vector_bool mask)
-  
+
   // PACKV2搬出模式
   __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__  int32_t* dst_align32b, vector_int32_t src, iter_reg offset, vector_bool mask)
   __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__  uint32_t* dst_align32b, vector_uint32_t src, iter_reg offset, vector_bool mask)
   __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__  float* dst_align32b, vector_float src, iter_reg offset, vector_bool mask)
-  
+
   // INTLV搬出模式
   __simd_callee__ inline void asc_storealign_intlv(__ubuf__  int8_t* dst_align32b, vector_int8_t src0, vector_int8_t src1, iter_reg offset)
   __simd_callee__ inline void asc_storealign_intlv(__ubuf__  uint8_t* dst_align32b, vector_uint8_t src0, vector_uint8_t src1, iter_reg offset)
@@ -100,7 +100,7 @@ reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存�
   __simd_callee__ inline void asc_storealign(__ubuf__ uint32_t* dst, vector_bool src, iter_reg offset)
   __simd_callee__ inline void asc_storealign(__ubuf__ uint16_t* dst, vector_bool src, iter_reg offset)
   __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t* dst, vector_bool src, iter_reg offset)
-  
+
   // PACK搬出模式
   __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint32_t* dst,  vector_bool src,  iter_reg offset)
   __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint16_t* dst,  vector_bool src,  iter_reg offset)

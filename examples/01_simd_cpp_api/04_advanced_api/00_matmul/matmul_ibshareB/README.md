@@ -41,13 +41,13 @@
 
 ## 样例描述
 
-- 样例功能：  
+- 样例功能：
   调用Matmul高阶API时开启B矩阵的IBShare功能，计算过程中同一AIC对应的两个AIV在每次迭代时用到的B矩阵在L1 Buffer上的数据一致。
 
 - 约束条件：
   - A矩阵或B矩阵单独使能IBShare的场景，要求复用的矩阵必须在L1 Buffer上全载。
 
-- 样例规格：  
+- 样例规格：
   本样例中：M = 64, N = 256, K = 384。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">MatmulIBShareBCustom</td></tr>
@@ -58,13 +58,13 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_ibshareb_custom</td></tr>
   </table>
 
-- 样例实现： 
+- 样例实现：
   - Kernel关键步骤
     - 创建Matmul对象，设置B矩阵的IBShare参数为true。
       - 方式一：默认实现，使用默认的IBShare模板CFG_IBSHARE_NORM创建Matmul对象。
         ```cpp
         #include "lib/matmul_intf.h"
-    
+
         using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
         using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false, LayoutMode::NONE, true>;
         using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
@@ -83,22 +83,22 @@
         AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_NORM> matmulObj;
         ```
 
-  - 核函数  
+  - 核函数
     使用纯Cube模式时，在核函数实现的入口处，指定__cube__。
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
     ```cpp
     matmul_ibshareb_custom<<<tilingData.usedCoreNum / MIX_RATIO, 0, stream>>>(x1, x2, bias, y, workspaceDevice,
                           tilingDevice);       // 方式一：非纯Cube模式，SetDim设置为AIV:AIC组合的核数
     matmul_ibshareb_custom<<<tilingData.usedCoreNum, 0, stream>>>(x1, x2, bias, y, workspaceDevice,
-                          tilingDevice);       // 方式二：纯Cube模式，SetDim设置为AIC的核数                          
+                          tilingDevice);       // 方式二：纯Cube模式，SetDim设置为AIC的核数
     ```
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

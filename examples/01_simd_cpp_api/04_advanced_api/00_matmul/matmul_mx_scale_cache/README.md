@@ -26,20 +26,20 @@
 
 ## 样例描述
 
-- 样例功能：  
-  Matmul Tiling中的mxTypePara参数表示scale多倍缓存。其中：  
+- 样例功能：
+  Matmul Tiling中的mxTypePara参数表示scale多倍缓存。其中：
   - mxTypePara[0:7]表示 scaleA 与 A 矩阵在 K 方向载入数据量的比例系数scaleFactorKa。
   - mxTypePara[8:15]表示 scaleB 与 B 矩阵在 K 方向载入数据量的比例系数scaleFactorKb。
   - mxTypePara[16:23]表示 scaleA 与 A 矩阵在 M 方向载入数据量的比例系数scaleFactorM。
   - mxTypePara[24:31]表示 scaleA 与 A 矩阵在 N 方向载入数据量的比例系数scaleFactorN。
-  
+
   例如 tilingData.mxTypePara = 0x01010104，则 scaleFactorKa = 4，表示scaleA在K方向开启4倍缓存。
 
 - 约束条件
   - 对于scaleA矩阵，仅scaleA的K方向在L1上全载时，才允许使能M方向多倍缓存。
   - 对于scaleB矩阵，仅scaleB的K方向在L1上全载时，才允许使能N方向多倍缓存。
 
-- 样例规格：  
+- 样例规格：
   本样例中：M = 32，N = 128，K = 128，scaleK = 4。其中scaleK为K整除32的结果4。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">MatmulMxTypeParaCustom</td></tr>
@@ -52,7 +52,7 @@
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmulMxTypeParaCustom</td></tr>
   </table>
-- 样例实现： 
+- 样例实现：
   - Kernel关键步骤
       - 创建Matmul对象：使用MatmulTypeWithScale定义A、scaleA、B、scaleB的参数类型信息，包括：内存逻辑位置、数据格式、数据类型、转置信息。
         ```cpp
@@ -89,13 +89,13 @@
       tilingData.mxTypePara = 16843012;
       ```
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

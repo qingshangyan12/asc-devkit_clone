@@ -48,7 +48,7 @@
     template <typename T>
     __aicore__ inline void GetReduceRepeatMaxMinSpr(T &maxMinValue, T &maxMinIndex)
     ```
-    
+
 <!-- end id8 -->
 
 <!-- npu="310p" id11 -->

@@ -26,10 +26,10 @@ This example uses the UnPad high-level API to remove padding from row data of a 
 
 ## Example Description
 
-- Example function:  
+- Example function:
   Remove padding from a 2D tensor row by row. If a row of the tensor is not 32B aligned, this API is not supported.
 
-- Example specifications:  
+- Example specifications:
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> unpad </td></tr>
 
@@ -44,7 +44,7 @@ This example uses the UnPad high-level API to remove padding from row data of a 
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">unpad_custom</td></tr>
   </table>
 
-- Example implementation:  
+- Example implementation:
   This example implements a unpad_custom example with a fixed shape of input src[8, 8] and output dst[8, 7].
 
   - Kernel implementation
@@ -56,14 +56,14 @@ This example uses the UnPad high-level API to remove padding from row data of a 
     1. Call the GetUnPadMaxMinTmpSize API to obtain the minimum and maximum temporary space sizes required by the UnPad API.
     2. Call the UnPadTilingFunc API to obtain the tiling information required by UnPad, and pass it to the UnPad API for computation.
 
-  - Invocation implementation  
+  - Invocation implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run  
+## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -82,7 +82,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-  
+
   For example:
 
   ```bash

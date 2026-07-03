@@ -69,7 +69,7 @@ __aicore__ inline void Sort32(const LocalTensor<T>& dst, const LocalTensor<T>& s
 
 **表3**  数据类型组合情况
 
-| src0数据类型 | src1数据类型 | dst数据类型 | 
+| src0数据类型 | src1数据类型 | dst数据类型 |
 |---|---|---|
 | half | uint32_t | half |
 | float | uint32_t | float |

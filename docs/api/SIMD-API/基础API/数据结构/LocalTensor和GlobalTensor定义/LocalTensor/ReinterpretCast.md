@@ -54,7 +54,7 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename CAST_T> 
+template <typename CAST_T>
 __aicore__ inline LocalTensor<CAST_T> ReinterpretCast() const
 ```
 

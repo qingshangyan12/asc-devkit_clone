@@ -23,7 +23,7 @@
 - DMA搬运单元读写GM，数据通过DataCopy等接口在UB等Local Memory和GM间交互，没有Cache一致性问题。
 - Scalar单元访问GM，首先会访问每个核内的Data Cache，因此存在Data Cache与GM的Cache一致性问题。
 
-**图1**  DataCache内存层次示意图<a name="zh-cn_topic_0000002530021782_fig1161014168448"></a>  
+**图1**  DataCache内存层次示意图<a name="zh-cn_topic_0000002530021782_fig1161014168448"></a>
 
 ![](../../../figures/datacache.png)
 
@@ -94,7 +94,7 @@ DataCacheCleanAndInvalid接口用于解决上述一致性问题，其功能可�
 
 ## 调用示例<a name="section837496171220"></a>
 
-- **示例1：SINGLE\_CACHE\_LINE模式（64B对齐场景）**  
+- **示例1：SINGLE\_CACHE\_LINE模式（64B对齐场景）**
   假设mmAddr\_为0x40（64B对齐），调用一次指令即可刷新整个Cache Line。
 
     ```cpp
@@ -107,7 +107,7 @@ DataCacheCleanAndInvalid接口用于解决上述一致性问题，其功能可�
     AscendC::DataCacheCleanAndInvalid<uint64_t, AscendC::CacheLine::SINGLE_CACHE_LINE, AscendC::DcciDst::CACHELINE_OUT>(global);
     ```
 
-- **示例2：SINGLE\_CACHE\_LINE模式（非64B对齐场景）**  
+- **示例2：SINGLE\_CACHE\_LINE模式（非64B对齐场景）**
   假设mmAddr\_为0x20（非64B对齐），需要调用两次指令才能刷新完整Cache Line。
 
     ```cpp
@@ -122,7 +122,7 @@ DataCacheCleanAndInvalid接口用于解决上述一致性问题，其功能可�
     AscendC::DataCacheCleanAndInvalid<uint64_t, AscendC::CacheLine::SINGLE_CACHE_LINE, AscendC::DcciDst::CACHELINE_OUT>(global[4]);
     ```
 
-- **<a name="example3_multi_core"></a>示例3：SINGLE\_CACHE\_LINE模式（多核处理场景）**  
+- **<a name="example3_multi_core"></a>示例3：SINGLE\_CACHE\_LINE模式（多核处理场景）**
   假设mmAddr\_为0x40（64B对齐），多核操作同一条Cache Line时可能出现随机覆盖。本样例仅做示例说明，便于开发者理解使用限制，非正常使用样例。
 
     ```cpp
@@ -134,7 +134,7 @@ DataCacheCleanAndInvalid接口用于解决上述一致性问题，其功能可�
     AscendC::DataCacheCleanAndInvalid<uint64_t, AscendC::CacheLine::SINGLE_CACHE_LINE, AscendC::DcciDst::CACHELINE_OUT>(global);
     ```
 
-- **示例4：ENTIRE\_DATA\_CACHE模式**  
+- **示例4：ENTIRE\_DATA\_CACHE模式**
   假设mmAddr\_为0x20（非64B对齐），刷新整个DCache。本样例仅做示例说明，便于开发者理解使用限制，非正常使用样例。
 
     ```cpp

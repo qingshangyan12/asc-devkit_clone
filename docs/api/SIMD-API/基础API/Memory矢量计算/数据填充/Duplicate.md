@@ -42,7 +42,7 @@ Duplicate接口将一个变量或立即数复制多次并填充到向量中。
 import numpy as np
 
 def Duplicate(scalarValue, dst, count):
-    for i in range(count):     
+    for i in range(count):
         dst[i] = scalarValue
 ```
 <!-- npu="950" id26 -->
@@ -131,7 +131,7 @@ def Duplicate(scalarValue, dst, count):
 - 针对Kirin 9030，T支持的数据类型为：half。
 <!-- end id19 -->
 
-## 返回值说明<a name="section640mcpsimp"></a>	 
+## 返回值说明<a name="section640mcpsimp"></a>
 
 无
 

@@ -38,12 +38,12 @@
 
 如下图所示，将数据空间内最后三行初始化为0，配置InitConstValueParams参数：initValue=0表示初始化值为0，repeatTimes=5表示按照行方向迭代5次，blockNum=3表示每次repeat对列方向的3块32Byte数据块清0，dstGap=5表示相邻repeat之间间隔5个数据块。
 
-**图1** L1 Buffer中Fill示意图<a name="zh-cn_topic_0000002512331632_fig197511640134513"></a>  
+**图1** L1 Buffer中Fill示意图<a name="zh-cn_topic_0000002512331632_fig197511640134513"></a>
 ![](../../../../../figures/Fill_L1.png "L1 Buffer中Fill示意图")
 
 如下图所示，将内存空间内的值全部初始化为0，需要配置InitConstValueParams参数：initValue=0表示初始化值为0，repeatTimes=5表示按照行方向迭代5次，blockNum=2表示每次repeat对列方向的2块512Byte数据块清0，dstGap=3表示相邻repeat之间间隔3个数据块。
 
-**图2** L0A Buffer中Fill示意图<a name="zh-cn_topic_0000002512331632_fig11499125816478"></a>  
+**图2** L0A Buffer中Fill示意图<a name="zh-cn_topic_0000002512331632_fig11499125816478"></a>
 ![](../../../../../figures/Fill_L0A.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
@@ -103,7 +103,7 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
     - 仅支持配置迭代次数和初始化值场景下，其他参数配置无效。每次迭代处理固定数据量（512字节），迭代间无间隔。
     - 支持配置所有参数场景下，支持配置迭代次数、初始化值、每个迭代处理的数据块个数和迭代间间隔。
     - 特别地，针对如下型号，仅支持配置迭代次数和初始化值。
-        
+
         <!-- npu="910" id18 -->
         - Atlas 训练系列产品。
         <!-- end id18 -->

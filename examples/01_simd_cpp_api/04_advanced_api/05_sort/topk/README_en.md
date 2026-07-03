@@ -26,9 +26,9 @@ This example uses the TopK high-level API in a sorting scenario to find the top 
 
 ## Example Description
 
-- Example function:  
+- Example function:
   This example performs TopK computation on the input tensor in Normal mode to obtain the top k maximum or minimum values and their corresponding indices along the last dimension.
-- Example specifications:  
+- Example specifications:
   <table>
   <caption>Table 1: Example Input/Output Specifications</caption>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> topk </td></tr>
@@ -48,16 +48,16 @@ This example uses the TopK high-level API in a sorting scenario to find the top 
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">topk_custom</td></tr>
   </table>
 
-- Example implementation:  
+- Example implementation:
     This example implements a topk example with fixed shapes of input value tensor srcLocalValue[2, 32], index tensor srcLocalIndex[1, 32], finish flag srcLocalFinish[1, 32], and output result values dstLocalValue[2, 8], result indices dstLocalIndex[2, 8].
 
-  - Kernel implementation:  
+  - Kernel implementation:
     The computation logic is: Input data must first be transferred to on-chip storage, the TopK high-level API is used to complete the topk computation, and the result is transferred out.
 
-  - Tiling implementation:  
+  - Tiling implementation:
     The tiling implementation process is as follows: Use the GetTopKMaxMinTmpSize API to calculate the required maximum/minimum temporary space size, use the minimum temporary space, and then determine the required tiling parameters based on the input length.
 
-  - Invocation implementation  
+  - Invocation implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run

@@ -92,7 +92,7 @@ uint8_t leftPadding = 2;
 // Right padding of transfer result (element count): value is 6 / sizeof(half) = 3
 uint8_t rightPadding = 3;
 
-AscendC::DataCopyExtParams copyParams {blockCount, blockLen, srcStride, dstStride, 0}; 
+AscendC::DataCopyExtParams copyParams {blockCount, blockLen, srcStride, dstStride, 0};
 AscendC::DataCopyPadExtParams<half> padParams {isPad, leftPadding, rightPadding, 0};
 
 AscendC::DataCopyPad(dstLocal, srcGlobal, copyParams, padParams);
@@ -200,7 +200,7 @@ half scalarValue = 1.0;
 // 2.1 Set mask counter mode
 AscendC::SetMaskCount();
 // 2.2 Set Mask value to 200, indicating this computation processes 200 elements
-AscendC::SetVectorMask(0, static_cast<uint64_t>(200)); 
+AscendC::SetVectorMask(0, static_cast<uint64_t>(200));
 
 AscendC::Adds<half, false>(dstLocal, src0Local, scalarValue, AscendC::MASK_PLACEHOLDER, 1, { 1, 1, 8, 8 });
 
@@ -229,7 +229,7 @@ half scalarValue = 1.0;
 // 2.1 Set mask Normal mode
 AscendC::SetMaskNormal();
 // 2.2 Set Mask value to 100, indicating single iteration computes first 100 elements
-AscendC::SetVectorMask(0, static_cast<uint64_t>(100)); 
+AscendC::SetVectorMask(0, static_cast<uint64_t>(100));
 AscendC::Adds<half, false>(dstLocal, src0Local, scalarValue, AscendC::MASK_PLACEHOLDER, 2, { 1, 1, 8, 8 });
 ```
 
@@ -249,7 +249,7 @@ AscendC::Adds<half, false>(dstLocal, src0Local, scalarValue, AscendC::MASK_PLACE
   // 2.1 Set mask Normal mode
   AscendC::SetMaskNormal();
   // 2.2 Set Mask to bit-wise mode (0101...), implement interleaved computation
-  AscendC::SetVectorMask(0x000000000000AAAA, 0x0000000000000000); 
+  AscendC::SetVectorMask(0x000000000000AAAA, 0x0000000000000000);
   AscendC::Add<half, false>(dstLocal, src0Local, src1Local, AscendC::MASK_PLACEHOLDER, 2, { 1, 1, 1, 8, 8, 8 });
   ```
 
@@ -277,12 +277,12 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
     AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, 48>();
     AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, 48>();
     AscendC::LocalTensor<float> zLocal = ubAllocator.Alloc<float, 48>();
-    
+
     AscendC::GlobalTensor<float> xGlobal, yGlobal, zGlobal;
     xGlobal.SetGlobalBuffer((__gm__ float*)x);
     yGlobal.SetGlobalBuffer((__gm__ float*)y);
     zGlobal.SetGlobalBuffer((__gm__ float*)z);
-    
+
     // ...
     // 1. Step 1: Data transfer in, execution pipeline is PIPE_MTE2
     AscendC::Mutex::Lock<PIPE_MTE2>(mutex_id);
@@ -294,7 +294,7 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
     AscendC::Mutex::Lock<PIPE_V>(mutex_id);
     AscendC::Add(zLocal, xLocal, yLocal, 48);
     AscendC::Mutex::Unlock<PIPE_V>(mutex_id);
-    
+
     // 3. Step 3: Data transfer out, execution pipeline is PIPE_MTE3
     AscendC::Mutex::Lock<PIPE_MTE3>(mutex_id);
     AscendC::DataCopy(zGlobal, zLocal, 48);

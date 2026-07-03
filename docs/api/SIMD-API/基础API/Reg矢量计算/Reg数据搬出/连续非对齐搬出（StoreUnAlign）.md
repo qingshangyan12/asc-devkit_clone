@@ -217,7 +217,7 @@ __simd_vf__ inline void LoadUnAlignVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, 
     template <typename T>
     __simd_vf__ inline void StoreUnAlignVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t oneRepeatSize, uint16_t repeatTimes)
     {
-        AscendC::Reg::RegTensor<T> srcReg;    
+        AscendC::Reg::RegTensor<T> srcReg;
         AscendC::Reg::UnalignRegForLoad ureg0;
         AscendC::Reg::UnalignRegForStore ureg1;
         AscendC::Reg::AddrReg aReg;

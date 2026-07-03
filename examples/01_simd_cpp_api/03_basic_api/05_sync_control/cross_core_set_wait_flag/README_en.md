@@ -78,7 +78,7 @@ This example controls execution branches through SCENARIO_NUM. Different values 
 ### Computation Formula and Example Specifications
 
 #### SCENARIO_NUM=0 (Pure Vector Computation Scenario, Mode 0)
-- Computation formula:  
+- Computation formula:
   $$
   z = \sum_{i=0}^{15} (x \times i)
   $$
@@ -96,7 +96,7 @@ This example controls execution branches through SCENARIO_NUM. Different values 
   </table>
 
 #### SCENARIO_NUM=1 (Pure Vector Computation Scenario, Mode 1)
-- Computation formula:  
+- Computation formula:
   $$
   z = (x \times 2) + (x \times 3)
   $$
@@ -114,7 +114,7 @@ This example controls execution branches through SCENARIO_NUM. Different values 
   </table>
 
 #### SCENARIO_NUM=2 (Cube and Vector Fused Computation Scenario)
-- Computation formula:  
+- Computation formula:
   $$
   C = \text{LeakyRelu}(Cast(A) \times Cast(B))
   $$
@@ -187,11 +187,11 @@ $$
         Compute(a2Local, b2Local, c1Local);
         CopyOut(c1Local);
         // Mode 0: 8 AICs from 8 AI Cores synchronize
-        AscendC::CrossCoreSetFlag<0, PIPE_FIX>(SYNC_AIC_FLAG);  
-        AscendC::CrossCoreWaitFlag(SYNC_AIC_FLAG);  
+        AscendC::CrossCoreSetFlag<0, PIPE_FIX>(SYNC_AIC_FLAG);
+        AscendC::CrossCoreWaitFlag(SYNC_AIC_FLAG);
 
         // Mode 2: within each AI Core, 2 AIVs wait for AIC
-        AscendC::CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_AIV_FLAG);  
+        AscendC::CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_AIV_FLAG);
 
 <p align="center">
   <img src="figures/融合场景_分块矩阵乘与原子累加阶段.png" width="100%">
@@ -241,13 +241,13 @@ As shown in Figure 6 below, the overall logic of mode 0 is divided into the foll
 (3) Step 3 corresponds to the following code snippet. atomicResultGm is used to store the accumulated results after all 16 AIVs complete transfer. By calling CrossCoreSetFlag and CrossCoreWaitFlag interfaces, synchronization control is achieved: ensuring that after all 16 AIVs complete the PIPE_MTE3 transfer instruction, instructions after CrossCoreWaitFlag can execute.
 
          // Enable atomic accumulation for UB to GM transfer: data transferred to atomicResult is accumulated with the original value and overwrites the original value
-        AscendC::SetAtomicAdd<float>(); 
+        AscendC::SetAtomicAdd<float>();
         // DataCopy is a PIPE_MTE3 pipeline operation
-        AscendC::DataCopy(atomicResultGm, xLocal, this->blockLength);   
+        AscendC::DataCopy(atomicResultGm, xLocal, this->blockLength);
         // After this AIV completes the preceding PIPE_MTE3 (DataCopy) pipeline operation, notify other AIV cores that this AIV has completed
-        AscendC::CrossCoreSetFlag<0, PIPE_MTE3>(0);  
+        AscendC::CrossCoreSetFlag<0, PIPE_MTE3>(0);
         // Block this AIV from continuing to execute instructions until all other AIVs complete the PIPE_MTE3 pipeline operation, then unblock and continue execution
-        AscendC::CrossCoreWaitFlag(0); 
+        AscendC::CrossCoreWaitFlag(0);
 
 After the above synchronization is complete, atomicResultGm already contains the accumulated value of vector computation results from 16 AIVs.
 If the synchronization in the previous step is not inserted correctly, the data transferred from atomicResultGm to AIV may be the accumulated value of vector computation results from only some AIVs, resulting in inaccurate results.
@@ -271,7 +271,7 @@ KernelMmad op;
 if ASCEND_IS_AIC {
     op.InitAIC(A, B, c);
     op.ProcessAIC();
-} 
+}
 if ASCEND_IS_AIV {
     op.InitAIV(a, b, A, B, c);
     op.ProcessAIV();
@@ -298,14 +298,14 @@ if ASCEND_IS_AIV {
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
-    
+
 - Run the example
 
   Run the following commands in the example directory.
@@ -319,7 +319,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debug or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-  
+
   Examples:
   ```bash
   cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # CPU debug mode

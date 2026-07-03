@@ -68,7 +68,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
 ### Develop API
 #### Write API External Interface
 - Kernel Side Interface
-    
+
     In the corresponding category directory under `include/adv_api/`, add new file [axpy.h](../../include/adv_api/math/axpy.h). Based on the above analyzed and designed API function prototype, write external interface code. Function implementation calls AxpyImpl implementation.
     ```c++
     template <typename T, typename U, bool isReuseSource = false>
@@ -79,7 +79,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     }
     ```
 - Tiling Side Interface
-    
+
     In the corresponding category directory under `include/adv_api/`, add new file [axpy_tiling.h](../../include/adv_api/math/axpy_tiling.h). Based on the above analyzed and designed Tiling side interface, write function declaration.
     ```c++
     void GetAxpyMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
@@ -94,7 +94,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     // ...
     #endif // __NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201
     ```
-    
+
     [include/adv_api/tiling_api.h](../../include/adv_api/tiling_api.h) file includes all high-level API Tiling interface header files. Recommend including new Tiling interface header files in this file, so when calling high-level API Tiling functions, only need to include `"tiling_api.h"`.
     ```c++
     #include "math/axpy_tiling.h"
@@ -128,7 +128,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     `AxpySub` function determines computation strategy based on temporary space size, mainly includes determining computation loop count round, full block computation amount stackSize, tail block computation amount tail. Specific code is as follows. Since sharedTmpBuffer passed to interface is uint8 type while source operand elements are float type, need to convert sharedTmpBuffer element type to float to get element count. Based on hardware architecture characteristics, minimum computation unit is one Block, that is 32 bytes. `axpyTmpCalc` function aligns down the element count that temporary space can store to 32 bytes, getting full block computation amount stackSize for one computation. Meanwhile, when destination operand element type is half, to improve precision, Cast precision conversion is done for source operand and destination operand respectively during computation. Half of temporary space is occupied by Cast results. So in this scenario, computation data amount is half of the element count that temporary space can store after aligning down to 32 bytes. Given total computation amount calCount, single full block computation amount stackSize, compute loop count round and tail block computation amount tail. Calculation formula is as follows:
     $$stackSize = \begin{cases}
     Align32(tmpbufferSize \div 2) &T = half
-    \\ 
+    \\
     Align32(tmpbufferSize) &T = float
     \end{cases}$$
     $$round = calCount/stackSize$$
@@ -217,7 +217,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     constexpr uint32_t AXPY_ONE_REPEAT_BYTE_SIZE = 256;
     ```
     In `GetAxpyMaxMinTmpSize` interface, call `GetAxpyMaxTmpSize` interface to get required temporary space maximum value, call `GetAxpyMinTmpSize` interface to get required temporary space minimum value.
-   
+
     ```c++
     void GetAxpyMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource,
     uint32_t& maxValue, uint32_t& minValue)
@@ -302,7 +302,7 @@ In UT directory [tests/api/adv_api/math](../../tests/api/adv_api/math), add new 
     ```c++
     #include <gtest/gtest.h>
     #include "kernel_operator.h"
-    ``` 
+    ```
 2. Implement operator
     - Initialize variables.
         ```c++
@@ -370,11 +370,11 @@ In UT directory [tests/api/adv_api/math](../../tests/api/adv_api/math), add new 
             void SetUp() {}
             void TearDown() {}
         };
-        ``` 
+        ```
     - Inject case data.
         ```c++
         INSTANTIATE_TEST_CASE_P(TEST_AXPY, AxpyTestsuite,
-            ::testing::Values(AxpyTestParams{256, 2, AxpyKernel<half, half>}, 
+            ::testing::Values(AxpyTestParams{256, 2, AxpyKernel<half, half>},
                 AxpyTestParams{256, 4, AxpyKernel<float, float>}));
         ```
     - Write `TEST_P`.
@@ -409,7 +409,7 @@ TEST_F(TestTiling, TestAxpyTiling)
 Before executing UT cases, need to modify [CMakeLists.txt](../../tests/api/adv_api/CMakeLists.txt) file. Since Kernel side and Tiling side UT execution objects are different, need to add test files under different targets. Using Kernel side UT for Atlas A2 training series products/Atlas A2 inference series products as example, add UT test file path to case source file list `ASCENDC_TEST_ASCEND910B1_AIV_CASE_SRC_PART_FILES`, that is add new file path `${ASCENDC_TESTS_DIR}/math/axpy/test_operator_axpy.cpp`. Same for Tiling side, need to add test file to `ASCENDC_TILING_TEST_SRC_FILES` list.
 ##### Execute UT
 - Execute all UT cases
-  
+
   Enter repository main directory, execute the following command for testing.
   ```bash
   bash build.sh -t

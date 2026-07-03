@@ -39,16 +39,16 @@
 #endif
 #endif
 
-namespace AscendC { 
+namespace AscendC {
 namespace Reg {
 
-template <MemType src, MemType dst> 
-__simd_callee__ inline void LocalMemBar() 
-{ 
-    LocalMemBarImpl<src, dst>(); 
+template <MemType src, MemType dst>
+__simd_callee__ inline void LocalMemBar()
+{
+    LocalMemBarImpl<src, dst>();
 }
 
-} // namespace Reg 
+} // namespace Reg
 } // namespace AscendC
 
 #endif // ASCENDC_KERNEL_REG_COMPUTE_MEMBAR_INTERFACE_IMPL_H

@@ -26,11 +26,11 @@ This example uses the Frac high-level API to extract the fractional part of each
 
 ## Example Description
 
-- Example function:  
-  Extract the fractional part of each element. The computation formula is as follows:  
+- Example function:
+  Extract the fractional part of each element. The computation formula is as follows:
   $$dstTensor_i = Frac(srcTensor_i)$$
 
-- Example specifications:  
+- Example specifications:
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> frac </td></tr>
 
@@ -43,7 +43,7 @@ This example uses the Frac high-level API to extract the fractional part of each
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">frac_custom</td></tr>
   </table>
 
-- Example implementation:  
+- Example implementation:
   This example implements a frac_custom example with fixed shapes of input src[1, 4096] and output dst[1, 4096].
 
   - Kernel implementation
@@ -54,14 +54,14 @@ This example uses the Frac high-level API to extract the fractional part of each
 
     The host side obtains the maximum and minimum temporary space required by the Frac API through GetFracMaxMinTmpSize.
 
-  - Invocation implementation  
+  - Invocation implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run  
+## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -80,7 +80,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-  
+
   For example:
 
   ```bash

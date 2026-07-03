@@ -1,6 +1,6 @@
 # Matmul Iterate Async Direct Invocation Example
 ## Overview
-A Matmul example in async scenario, implemented by calling Iterate and GetTensorC to output to VECIN.  
+A Matmul example in async scenario, implemented by calling Iterate and GetTensorC to output to VECIN.
 Async scenario means that during program execution, there is no need to wait for an operation to complete before executing the next operation. Async scenarios reduce synchronous waiting and improve parallelism. Developers can choose this approach when high computation performance is required.
 
 ## Supported Products and CANN Versions
@@ -13,7 +13,7 @@ Async scenario means that during program execution, there is no need to wait for
 
 ## Build and Run
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

@@ -43,7 +43,7 @@ def Gatherb(dst, src, offset, repeatTime, repeatParams):
     oneDataBlockSize = 32;
     if repeatParams.dstBlkStride == 0:
         repeatParams.dstBlkStride = 1
-    for i in range(repeatTime): 
+    for i in range(repeatTime):
         for j in range(8):
             srcBlockStartIndex = offset[i * 8 + j] // inputType.itemsize
             srcBlockEndIndex = srcBlockStartIndex + oneDataBlockSize // inputType.itemsize
@@ -164,9 +164,9 @@ AscendC::Gatherb<uint16_t>(y_buf, x_buf, offset_buf, repeatTime, params); // rep
 输入数据(offsetLocal): [224 192 160 128 96 64 32 0]
 输入数据(srcLocal): [0 1 2 3 4 5 6 7 ... 120 121 122 123 124 125 126 127]
 输出数据(dstGlobal):[
-112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 
+112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127
 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111
-... 
+...
 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
 ]
 ```

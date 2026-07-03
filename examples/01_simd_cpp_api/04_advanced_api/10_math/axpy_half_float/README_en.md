@@ -27,10 +27,10 @@ This example uses the Axpy high-level API to multiply each element in the source
 
 ## Example Description
 
-- Example function:  
+- Example function:
   The Axpy example multiplies each element in the source operand src by a scalar, adds the result to the corresponding element in the destination operand dst, and returns the computation result.
 
-  The corresponding mathematical expression is:  
+  The corresponding mathematical expression is:
 
   $$
   out = x * scalar + out
@@ -46,7 +46,7 @@ This example uses the Axpy high-level API to multiply each element in the source
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="5" align="center">kernel_vec_ternary_scalar_Axpy_half_2_float</td></tr>
   </table>
 
-- Example implementation:  
+- Example implementation:
   This example implements an Axpy example with fixed shapes of input x[4, 128] and output out[4, 128].
   - Kernel implementation
 
@@ -56,14 +56,14 @@ This example uses the Axpy high-level API to multiply each element in the source
 
     The host side obtains the maximum and minimum temporary space required by the Axpy API through GetAxpyMaxMinTmpSize.
 
-  - Invocation implementation  
+  - Invocation implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run  
+## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -83,7 +83,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-  
+
   For example:
 
   ```bash

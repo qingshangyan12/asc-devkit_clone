@@ -198,7 +198,7 @@ __aicore__ inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint
             };
             // 不开启ReLU与channelSplit
             AscendC::DataCopyCO12DstParams intriParams(nSize, mSize, dstStride, srcStride, deqMode, 0, false, nz2ndEn);
-           
+
             // mov l0c to gm, deq scalar quant
             AscendC::SetFixpipePreQuantFlag(deqScalar);  // 设置量化参数
             AscendC::PipeBarrier<PIPE_FIX>();
@@ -219,7 +219,7 @@ __aicore__ inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint
             // AscendC::SetFixPipeConfig(deqFB);
             // AscendC::PipeBarrier<PIPE_FIX>();
             // // mov l0c to gm，量化操作后开启ClipReLU操作
-            // intriParams.clipReluPre = 1; 
+            // intriParams.clipReluPre = 1;
             // // 设置clip ReLU的值到寄存器
             // uint64_t clipReluVal = 0x3c00; // value 1, half
             // SetFixPipeClipRelu(clipReluVal);
@@ -231,7 +231,7 @@ __aicore__ inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint
             // AscendC::PipeBarrier<PIPE_ALL>();
             // // 将存放element-wise tensor的地址设置到寄存器里
             // SetFixPipeAddr(eleWiseTensor, 1);
-    
+
             // AscendC::DataCopy(dstGlobal, dstCO1, intriParams);
             // inQueueDeqA1.FreeTensor(workA1);
             // inQueueDeqFB.FreeTensor(deqFB);
@@ -288,4 +288,3 @@ __aicore__ inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint
         }
     KERNEL_CUBE_DATACOPY(half, int8_t, int8_t, int32_t, 128, 1, 1, QuantMode_t::DEQF16);
     ```
-    

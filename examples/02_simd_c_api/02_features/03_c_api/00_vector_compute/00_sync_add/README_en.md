@@ -12,8 +12,8 @@ This example demonstrates the Add operator using C_API interfaces, implemented b
 ```
 
 ## Operator Description
-- Operator Function:  
-  The Add operator adds two data inputs and returns the sum. The corresponding mathematical expression is:  
+- Operator Function:
+  The Add operator adds two data inputs and returns the sum. The corresponding mathematical expression is:
   ```
   z = x + y
   ```
@@ -34,19 +34,19 @@ This example demonstrates the Add operator using C_API interfaces, implemented b
 
 - Operator Implementation:
 
-  - Kernel Implementation  
+  - Kernel Implementation
 
     For C_API, input data must first be transferred to on-chip storage, then the compute interface is used to add the two input parameters and produce the final result, which is then transferred back to external storage.
 
     The Add operator implementation consists of 3 steps:
 
     Step 1: Transfer input x and y from Global Memory to Local Memory, stored in xLocal and yLocal respectively.
-    
+
     Step 2: Perform addition on xLocal and yLocal, and store the result in zLocal.
-    
+
     Step 3: Transfer the output data from zLocal to output z in Global Memory.
 
-  - Invocation Implementation  
+  - Invocation Implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
@@ -57,7 +57,7 @@ Run the following steps in the root directory of this example to build and execu
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
     ```
-    
+
   - Default path, non-root user installs the CANN package
     ```bash
     source $HOME/Ascend/cann/set_env.sh

@@ -14,7 +14,7 @@ Kernel侧接口的内部实现一般涉及复杂的数学计算，需要额外�
 
 ```
 // 算子输入的数据类型T为half，isReuseSource传入默认值false
-auto shape_input = context->GetInputTensor(0)->GetOriginShape();    
+auto shape_input = context->GetInputTensor(0)->GetOriginShape();
 std::vector<int64_t> srcDims = {shape_input.GetDim(0), shape_input.GetDim(1)};
 uint32_t srcSize = 1;
 for (auto dim : srcDims) {
@@ -93,7 +93,7 @@ if (asinMaxLiveNodeCount != 0) {
 }
 // 计算Acos算子单次最大计算元素数量
 if (acosMaxLiveNodeCount != 0) {
-    srcAcosCurSize = (tmpSize - acosExtraBuf) / acosMaxLiveNodeCount / typeSize; 
+    srcAcosCurSize = (tmpSize - acosExtraBuf) / acosMaxLiveNodeCount / typeSize;
 } else {
     srcAcosCurSize = srcSize;
 }

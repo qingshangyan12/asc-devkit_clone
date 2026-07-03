@@ -2,7 +2,7 @@
 
 AI CPU是位于Device侧ARM64架构的处理器，其具备与AI Core相同的内存访问能力，可直接访问Device侧内存资源；也可以与Host侧的CPU一样，进行类似的数据计算，通常作为AI Core的补充，主要承担非矩阵类、逻辑比较复杂的分支密集型计算。AI CPU的运行环境为基础的Linux环境，编程时可使用libc库，C++标准库，STL模板库等。其硬件架构图如下所示：
 
-**图1**  AI CPU硬件架构图<a name="fig1146075111341"></a>  
+**图1**  AI CPU硬件架构图<a name="fig1146075111341"></a>
 ![](../../figures/AI-CPU硬件架构图.png "AI-CPU硬件架构图")
 
 本节介绍的AI CPU编程仅支持如下产品型号：
@@ -28,7 +28,7 @@ __global__ __aicpu__ uint32_t hello_world(void *args)
 }
 ```
 
->[!NOTE]说明 
+>[!NOTE]说明
 >编程时需要遵循如下规范：
 >- \_\_aicpu\_\_ \_\_global\_\_函数不能是void返回类型，并且入参只能是一个指针。
 >- \_\_aicpu\_\_ \_\_global\_\_函数不能是类的成员函数，也不能存在于匿名空间下。
@@ -46,7 +46,7 @@ hello_world<<<numBlocks, nullptr, stream>>>(&args, sizeof(KernelArgs));
 -   l2ctrl：保留参数，当前固定为nullptr，开发者无需关注。
 -   stream：类型为aclrtStream，stream用于维护一些异步操作的执行顺序，确保按照应用程序中的代码调用顺序在Device上执行。stream创建等管理接口请参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
 
->[!NOTE]说明 
+>[!NOTE]说明
 >在编写调用代码时需要遵循如下规范：
 >- \_\_aicpu\_\_ \_\_global\_\_函数不能在.asc文件中进行定义，只能声明，且需要使用extern。
 >- Host侧调用\_\_global\_\_ \_\_aicpu\_\_函数时必须使用<<<\>\>\>异构调用语法，输入的函数入参在入参指针的基础上需要输入从指针中读取的数据大小。
@@ -80,5 +80,5 @@ template extern __global__ __aicpu__ uint32_t hello_world<KernelArgs, 4096>(void
 
 ## 更多进阶用法<a name="section109268265171"></a>
 
->[!NOTE]说明 
+>[!NOTE]说明
 >更多AI CPU API的使用方法请参考[AI CPU API](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/AI-CPU-API/AI-CPU-API.md)。

@@ -3,7 +3,7 @@
 ## Overview
 
 This example uses the Clamp high-level API to clamp input values (excluding NaN) to the interval [min, max].
-When min is greater than max, all non-NaN values are replaced with max. Both min and max can be scalars or tensors.  
+When min is greater than max, all non-NaN values are replaced with max. Both min and max can be scalars or tensors.
 
 ## Supported Products and CANN Software Versions
 
@@ -25,10 +25,10 @@ When min is greater than max, all non-NaN values are replaced with max. Both min
 
 ## Example Description
 
-- Example function:  
+- Example function:
   Replace non-NaN values in the input that are greater than max with max, and replace non-NaN values that are less than min with min. Values between min and max (inclusive) remain unchanged as output. When min is greater than max, all non-NaN values are replaced with max. Both min and max can be scalars or tensors.
 
-  The computation formulas are as follows:  
+  The computation formulas are as follows:
 
   $$
   dst_i = Clamp(src_i, min_i, max_i)
@@ -43,7 +43,7 @@ When min is greater than max, all non-NaN values are replaced with max. Both min
   \end{cases}
   $$
 
-- Example specifications:  
+- Example specifications:
   <table>
   <caption>Table 1: Example Specifications</caption>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> clamp </td></tr>
@@ -81,11 +81,11 @@ When min is greater than max, all non-NaN values are replaced with max. Both min
 
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run  
+## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -104,7 +104,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-  
+
   For example:
 
   ```bash

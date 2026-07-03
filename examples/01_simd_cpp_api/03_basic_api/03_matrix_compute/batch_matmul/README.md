@@ -148,7 +148,7 @@ fixpipeParams.dstStride = n;
 // 源NZ矩阵的数目，也就是传输ND矩阵的数目
 fixpipeParams.ndNum = B;
 // 不同NZ矩阵起始地址之间的间隔，单位：1024B
-fixpipeParams.srcNdStride = (CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape[0])) 
+fixpipeParams.srcNdStride = (CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape[0]))
                                 / (cubeShape[0] * cubeShape[0]);
 // 目的相邻ND矩阵起始地址之间的偏移，单位：element
 ```
@@ -162,7 +162,7 @@ fixpipeParams.srcNdStride = (CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape
 
 在本样例根目录下执行如下步骤，编译并执行算子。
 
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

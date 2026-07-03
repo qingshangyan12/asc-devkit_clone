@@ -26,20 +26,20 @@ Taking the left quantization scale matrix scaleA with K-direction multi-cache an
 
 ## Example Description
 
-- Example Function:  
-  The mxTypePara parameter in Matmul Tiling represents scale multi-cache. Specifically:  
+- Example Function:
+  The mxTypePara parameter in Matmul Tiling represents scale multi-cache. Specifically:
   - mxTypePara[0:7] represents the ratio coefficient scaleFactorKa of the data load amount between scaleA and matrix A in the K direction.
   - mxTypePara[8:15] represents the ratio coefficient scaleFactorKb of the data load amount between scaleB and matrix B in the K direction.
   - mxTypePara[16:23] represents the ratio coefficient scaleFactorM of the data load amount between scaleA and matrix A in the M direction.
   - mxTypePara[24:31] represents the ratio coefficient scaleFactorN of the data load amount between scaleA and matrix A in the N direction.
-  
+
   For example, if tilingData.mxTypePara = 0x01010104, then scaleFactorKa = 4, indicating that 4x cache is enabled for scaleA in the K direction.
 
 - Constraints
   - For the scaleA matrix, M-direction multi-cache is only allowed when the K direction of scaleA is fully loaded on L1.
   - For the scaleB matrix, N-direction multi-cache is only allowed when the K direction of scaleB is fully loaded on L1.
 
-- Example Specifications:  
+- Example Specifications:
   In this example: M = 32, N = 128, K = 128, scaleK = 4. scaleK is the result of K divided by 32, which is 4.
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="5" align="center">MatmulMxTypeParaCustom</td></tr>
@@ -52,7 +52,7 @@ Taking the left quantization scale matrix scaleA with K-direction multi-cache an
   <tr><td rowspan="1" align="center">Example Output</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="5" align="center">matmulMxTypeParaCustom</td></tr>
   </table>
-- Example Implementation: 
+- Example Implementation:
   - Key Kernel Steps
       - Create the Matmul object: use MatmulTypeWithScale to define the parameter type information of A, scaleA, B, and scaleB, including memory logical position, data format, data type, and transpose information.
         ```cpp
@@ -89,13 +89,13 @@ Taking the left quantization scale matrix scaleA with K-direction multi-cache an
       tilingData.mxTypePara = 16843012;
       ```
 
-  - Invocation Implementation  
+  - Invocation Implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

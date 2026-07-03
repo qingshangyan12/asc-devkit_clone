@@ -47,7 +47,7 @@ This project includes five core Ascend C documentation sets (Getting Started Tut
   If you discover certain bugs in this project and want to fix them, you are welcome to create a new Issue for feedback and tracking.
 
   Follow the [Submit Issue/Process Issue Task](https://gitcode.com/cann/community#提交Issue处理Issue任务) guide to create a `Bug-Report|缺陷反馈` type Issue to describe the bug, then enter "/assign" or "/assign @yourself" in the comment box to assign the Issue to yourself for processing.
-  
+
 - Code Optimization
 
   If you have generalization enhancement/performance optimization ideas for certain API implementations in this project and want to implement these optimization points, you are welcome to contribute API optimizations.
@@ -59,7 +59,7 @@ This project includes five core Ascend C documentation sets (Getting Started Tut
   If you discover certain documentation description errors in this project, you are welcome to create a new Issue for feedback and correction.
 
   Follow the [Submit Issue/Process Issue Task](https://gitcode.com/cann/community#提交Issue处理Issue任务) guide to create a `Documentation|文档反馈` type Issue to point out the corresponding documentation problems, then enter "/assign" or "/assign @yourself" in the comment box to assign the Issue to yourself to correct the corresponding documentation description.
-  
+
 - Help Resolve Others' Issues
 
   If you have appropriate solutions for problems encountered by others in the community, you are welcome to comment and communicate in the Issue to help others solve problems and pain points, jointly improving usability.

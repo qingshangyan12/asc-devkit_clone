@@ -50,7 +50,7 @@ context_ascendc::OpTilingRegistry tmpIns;
 bool flag = tmpIns.LoadTilingLibrary("/your/path/to/so_path/liboptiling.so");
 if (flag == false) {
     std::cout << "Load tiling so failed" << std::endl;
-    return -1;        
+    return -1;
 }
 context_ascendc::TilingFunc tilingFunc = tmpIns.GetTilingFunc("AddCustom");
 if (tilingFunc != nullptr) {

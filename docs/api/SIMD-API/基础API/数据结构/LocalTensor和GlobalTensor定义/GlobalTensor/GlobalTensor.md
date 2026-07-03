@@ -1,28 +1,28 @@
 # GlobalTensor<a name="ZH-CN_TOPIC_0000001493774269"></a>
 
--   **[GlobalTensor简介](GlobalTensor简介.md)**  
+-   **[GlobalTensor简介](GlobalTensor简介.md)**
 
--   **[GlobalTensor构造函数](GlobalTensor构造函数.md)**  
+-   **[GlobalTensor构造函数](GlobalTensor构造函数.md)**
 
--   **[SetGlobalBuffer](SetGlobalBuffer.md)**  
+-   **[SetGlobalBuffer](SetGlobalBuffer.md)**
 
--   **[GetPhyAddr](GetPhyAddr.md)**  
+-   **[GetPhyAddr](GetPhyAddr.md)**
 
--   **[GetValue](GetValue.md)**  
+-   **[GetValue](GetValue.md)**
 
--   **[operator\(\)](operator().md)**  
+-   **[operator\(\)](operator().md)**
 
--   **[SetValue](SetValue.md)**  
+-   **[SetValue](SetValue.md)**
 
--   **[GetSize](GetSize.md)**  
+-   **[GetSize](GetSize.md)**
 
--   **[operator\[\]](operator.md)**  
+-   **[operator\[\]](operator.md)**
 
--   **[SetShapeInfo](SetShapeInfo.md)**  
+-   **[SetShapeInfo](SetShapeInfo.md)**
 
--   **[GetShapeInfo](GetShapeInfo.md)**  
+-   **[GetShapeInfo](GetShapeInfo.md)**
 
--   **[SetL2CacheHint](SetL2CacheHint.md)**  
+-   **[SetL2CacheHint](SetL2CacheHint.md)**
 
--   **[ReinterpretCast](ReinterpretCast.md)**  
+-   **[ReinterpretCast](ReinterpretCast.md)**
 

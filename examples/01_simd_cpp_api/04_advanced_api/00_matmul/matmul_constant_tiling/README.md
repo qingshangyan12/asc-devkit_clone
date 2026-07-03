@@ -22,10 +22,10 @@ Tiling常量化的Matmul样例。Tiling常量化即在编译期期间将部分�
 │   └── README.md                      // 样例说明文档
 ```
 ## 样例描述
-- 样例功能：  
+- 样例功能：
   MatmulConstantCustom样例，对输入的A、B矩阵做矩阵乘和加bias偏置，同时使用常量化Tiling方式实现Kernel侧静态编译，在样例执行前推导出Tiling信息。通过实现Matmul Tiling常量化，减少样例中的Scalar操作，提升样例性能。Tiling常量化场景中，在Kernel侧使用SetSingleShape接口设置的SingleShape是运行时单核计算的最大形状，实际计算时shape应该小于等于该形状。
 
-- 样例规格：  
+- 样例规格：
   本样例中：M = 128, N = 30720, K = 64。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
@@ -90,12 +90,12 @@ Tiling常量化的Matmul样例。Tiling常量化即在编译期期间将部分�
   - Tiling关键步骤
       - Ascend C提供一组Matmul Tiling API，方便用户获取Matmul kernel计算时所需的Tiling参数。只需要传入A/B/C矩阵等信息，调用API接口，即可获取到TCubeTiling结构体中的相关参数，由于常量化Tiling，在Tiling中只需要实现分核的操作即可。用户可以通过多核Tiling接口，获取最优的多核切分策略。其他Tiling信息在Kernel侧通过常量化推导，Kernel侧不再需要运行时Tiling信息。
 
-- 调用实现  
+- 调用实现
   使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh

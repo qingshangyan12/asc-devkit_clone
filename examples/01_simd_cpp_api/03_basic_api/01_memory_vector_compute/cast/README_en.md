@@ -27,9 +27,9 @@ This example implements data type and precision conversion between source and de
 
 ## Example Description
 
-- Example function:  
+- Example function:
   The CastCustom example performs precision conversion based on the data types of the source and destination operand Tensors.
-- Example specifications:  
+- Example specifications:
   <table>
   <caption>Table 1: Example Specifications</caption>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> cast </td></tr>
@@ -43,7 +43,7 @@ This example implements data type and precision conversion between source and de
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">cast_custom</td></tr>
   </table>
 
-- Scenario description:  
+- Scenario description:
   <table>
   <caption>Table 2: SCENARIO_NUM Parameter Description</caption>
   <tr><td align="center">SCENARIO_NUM</td><td align="center">Input Type</td><td align="center">Output Type</td><td align="center">Description</td></tr>
@@ -51,22 +51,22 @@ This example implements data type and precision conversion between source and de
   <tr><td align="center">1</td><td align="center">half</td><td align="center">int32_t</td><td align="center">half to int32_t</td></tr>
   </table>
 
-- Example implementation:  
+- Example implementation:
   This example implements a CastCustom example with fixed input shape x[1, 512] and output shape y[1, 512], supporting two conversion scenarios: half to int32_t and half to int4b_t.
 
-  - Kernel implementation  
+  - Kernel implementation
     - Call the DataCopy basic API to transfer data from GM (Global Memory) to UB (Unified Buffer)
     - Call the Cast interface to perform data type conversion (half to int32_t or half to int4b_t)
     - Call the DataCopy basic API to transfer results from UB (Unified Buffer) to GM (Global Memory)
 
-  - Invocation implementation  
+  - Invocation implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run  
+## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -87,7 +87,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debug or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-  
+
   Examples:
 
   ```bash

@@ -117,7 +117,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
-    
+
 - Run the example
 
   Run the following commands in the example directory.
@@ -132,7 +132,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debug or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-  
+
   Examples:
 
   ```bash

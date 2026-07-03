@@ -327,7 +327,7 @@ dst_nchw = np.transpose(src_nhwc, axes=(0,3,1,2))
     238. 239.]
    [240. 241. 242. 243. 244. 245. 246. 247. 248. 249. 250. 251. 252. 253.
     254. 255.]]
-  
+
   输出数据dst_gm:
   [[  0.  16.  32.  48.  64.  80.  96. 112. 128. 144. 160. 176. 192. 208.
     224. 240.]
@@ -371,6 +371,6 @@ dst_nchw = np.transpose(src_nhwc, axes=(0,3,1,2))
   transposeParams.cSize = C; // C轴长度
   transposeParams.hSize = H; // H轴长度
   transposeParams.wSize = W; // W轴长度
-  transposeParams.transposeType = transposeType; 
+  transposeParams.transposeType = transposeType;
   AscendC::Transpose(dstLocal, srcLocal, stackBuffer, transposeParams);
   ```

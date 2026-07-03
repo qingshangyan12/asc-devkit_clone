@@ -61,6 +61,6 @@ __ubuf__ uint32_t dst[total_length];
 __ubuf__ uint32_t src[total_length];
 asc_gather_datablock(dst, src, src_offset, 8, 1, 2);
 // src [1, 2, 3, ..., 126, 127, 128] 128个uint32_t类型数据
-// src_offset [0, 32, 64, ..., 416, 448, 480] 
+// src_offset [0, 32, 64, ..., 416, 448, 480]
 // dst [1, 2, 3, ..., 126, 127, 128]
 ```

@@ -166,11 +166,11 @@ __global__ void add2(T* x, T* y, T* z, uint64_t size)
 - Write cache hit rate: **89.1%**
 - Read/write bandwidth: **14.51(GB/s) | 7.25(GB/s)**
 
-**Principle Description**:  
+**Principle Description**:
 In SIMT programming mode, L2 Cache accesses data in units of Cache Line = 128 bytes.
 
-- Case 1 (scalar half): Incomplete cache line causes RMW write amplification  
-  Using scalar half (2B). When a single Warp (32 threads) issues instructions simultaneously, the total width concatenated spatially is:  
+- Case 1 (scalar half): Incomplete cache line causes RMW write amplification
+  Using scalar half (2B). When a single Warp (32 threads) issues instructions simultaneously, the total width concatenated spatially is:
   $$
   32 * 2B = 64B
   $$
@@ -202,7 +202,7 @@ In SIMT programming mode, L2 Cache accesses data in units of Cache Line = 128 by
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and execute the example.
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
 
   ```bash
@@ -241,7 +241,7 @@ Run the following steps in the root directory of this example to build and execu
   | `CMAKE_ASC_RUN_MODE`      | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation                                 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`      | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
 
-- Execution Result  
+- Execution Result
   The following output indicates that the accuracy verification is successful.
 
   ```bash

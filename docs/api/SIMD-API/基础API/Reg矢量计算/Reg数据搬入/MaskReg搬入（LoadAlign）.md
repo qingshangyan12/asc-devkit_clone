@@ -41,13 +41,13 @@ LoadAlign能够实现数据从Unified Buffer（UB）搬运至[MaskReg](../寄存
 
 [图1](#fig-loadalign-maskreg-norm)、[图2](#fig-loadalign-maskreg-us)、[图3](#fig-loadalign-maskreg-ds)展示了DIST_NORM、DIST_US、DIST_DS分布模式。
 
-**图1**  DIST_NORM模式搬入<a id="fig-loadalign-maskreg-norm"></a>  
+**图1**  DIST_NORM模式搬入<a id="fig-loadalign-maskreg-norm"></a>
 ![](../../../../figures/DIST_NORM模式搬入.png)
 
-**图2**  DIST_US模式搬入<a id="fig-loadalign-maskreg-us"></a>  
+**图2**  DIST_US模式搬入<a id="fig-loadalign-maskreg-us"></a>
 ![](../../../../figures/DIST_US模式搬入.png)
 
-**图3**  DIST_DS模式搬入<a id="fig-loadalign-maskreg-ds"></a>  
+**图3**  DIST_DS模式搬入<a id="fig-loadalign-maskreg-ds"></a>
 ![](../../../../figures/DIST_DS模式搬入.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>

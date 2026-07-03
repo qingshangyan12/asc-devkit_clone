@@ -98,7 +98,7 @@
         - **dstNzNStride**为src中ndMatrix的相邻行在NZ矩阵中相隔多少个datablock，如A1\~B1的距离，即为2个datablock（A1 + 空白）；
         - **dstNzMatrixStride**为相邻NZ矩阵之间的元素个数，因为仅涉及1个NZ矩阵，所以可以填为0。
 
-    **图1** UB->L1 Buffer（VECIN/VECOUT->TSCM）搬运示意图<a name="fig9329040132719"></a>  
+    **图1** UB->L1 Buffer（VECIN/VECOUT->TSCM）搬运示意图<a name="fig9329040132719"></a>
 
     ![](../../../../../figures/VECIN-VECOUT--TSCM搬运示意图.png "VECIN-VECOUT--TSCM搬运示意图")
 

@@ -1,6 +1,6 @@
 # 基于样例工程完成Kernel直调<a name="ZH-CN_TOPIC_0000001731910633"></a>
 
->[!NOTE]说明 
+>[!NOTE]说明
 >本章节介绍的基于样例工程完成Kernel直调的方式，后续不再演进。推荐开发者直接使用命令行或者编写Cmake文件进行编译，详细内容请参考[AI Core SIMD编译](../编译与运行/算子编译/AI-Core算子编译基本用法.md)。
 
 下文将以Add矢量算子为例对Kernel直调算子开发流程进行详细介绍。
@@ -11,11 +11,11 @@
 -   使用该算子工程要求cmake版本为3.16及以上版本，如不符合要求，请参考如下的命令示例更新cmake版本，如下示例以更新到3.16.0版本为例。
 
     ```
-    wget https://cmake.org/files/v3.16/cmake-3.16.0.tar.gz 
-    tar -zxvf cmake-3.16.0.tar.gz 
+    wget https://cmake.org/files/v3.16/cmake-3.16.0.tar.gz
+    tar -zxvf cmake-3.16.0.tar.gz
     cd cmake-3.16.0
-     ./bootstrap --prefix=/usr 
-    sudo make 
+     ./bootstrap --prefix=/usr
+    sudo make
     sudo make install
     ```
 
@@ -49,7 +49,7 @@ AddKernelInvocationNeo
 
 请参考工程目录中的矢量算子、矩阵算子、融合算子的Kernel实现完成Ascend C算子实现文件的编写。
 
->[!NOTE]说明 
+>[!NOTE]说明
 >一个算子Kernel实现文件中只支持定义一个核函数。
 
 ## 算子调用应用程序<a name="section883611324486"></a>
@@ -77,7 +77,7 @@ AddKernelInvocationNeo
         uint32_t numBlocks = 8;
         size_t inputByteSize = 8 * 2048 * sizeof(uint16_t);
         size_t outputByteSize = 8 * 2048 * sizeof(uint16_t);
-    
+
     #ifdef ASCENDC_CPU_DEBUG
         // 用于CPU调试的调用程序
     #else
@@ -89,7 +89,7 @@ AddKernelInvocationNeo
 
 3.  CPU侧运行验证。完成算子核函数CPU侧运行验证的步骤如下：
 
-    **图1**  CPU侧运行验证步骤<a name="fig13576112114442"></a>  
+    **图1**  CPU侧运行验证步骤<a name="fig13576112114442"></a>
     ![](../../figures/CPU侧运行验证步骤.png "CPU侧运行验证步骤")
 
     ```
@@ -97,7 +97,7 @@ AddKernelInvocationNeo
         uint8_t* x = (uint8_t*)AscendC::GmAlloc(inputByteSize);
         uint8_t* y = (uint8_t*)AscendC::GmAlloc(inputByteSize);
         uint8_t* z = (uint8_t*)AscendC::GmAlloc(outputByteSize);
-    
+
         ReadFile("./input/input_x.bin", inputByteSize, x, inputByteSize);
         ReadFile("./input/input_y.bin", inputByteSize, y, inputByteSize);
         // 矢量算子需要设置内核模式为AIV模式
@@ -114,7 +114,7 @@ AddKernelInvocationNeo
 
 4.  NPU侧运行验证。完成算子核函数NPU侧运行验证的步骤如下：
 
-    **图2**  NPU侧运行验证步骤<a name="fig558132018817"></a>  
+    **图2**  NPU侧运行验证步骤<a name="fig558132018817"></a>
     ![](../../figures/NPU侧运行验证步骤.png "NPU侧运行验证步骤")
 
     ```
@@ -128,7 +128,7 @@ AddKernelInvocationNeo
         // 分配Host内存
         uint8_t *xHost, *yHost, *zHost;
         uint8_t *xDevice, *yDevice, *zDevice;
-    
+
         CHECK_ACL(aclrtMallocHost((void**)(&xHost), inputByteSize));
         CHECK_ACL(aclrtMallocHost((void**)(&yHost), inputByteSize));
         CHECK_ACL(aclrtMallocHost((void**)(&zHost), outputByteSize));
@@ -163,7 +163,7 @@ AddKernelInvocationNeo
         CHECK_ACL(aclFinalize());
     ```
 
-    >[!NOTE]说明 
+    >[!NOTE]说明
     >针对<<<\>\>\>调用方式在[核函数](../编程模型/AI-Core-SIMD编程/核函数.md)章节已有说明，这里仅对ACLRT\_LAUNCH\_KERNEL调用接口的使用方法介绍如下：
     >```
     >ACLRT_LAUNCH_KERNEL(kernel_name)(numBlocks, stream, argument list);
@@ -294,14 +294,14 @@ AddKernelInvocationNeo
 
 简化的编译流程图如下图所示：将算子核函数源文件编译生成kernel侧的库文件（\*.so或\*.a库文件）；工程框架自动生成核函数调用接口声明头文件；编译main.cpp（算子调用应用程序）时依赖上述头文件，将编译应用程序生成的目标文件和kernel侧的库文件进行链接，生成最终的可执行文件。
 
-**图3**  编译简化流程图<a name="fig744344916358"></a>  
+**图3**  编译简化流程图<a name="fig744344916358"></a>
 ![](../../figures/编译简化流程图.png "编译简化流程图")
 
 编译安装结束后在CMAKE\_INSTALL\_PREFIX目录下生成的编译产物示例如下；最终的可执行文件会生成在cmake命令的执行目录下。
 
 ```
 out
-├── lib 
+├── lib
 │   ├── libkernels1.a
 │   ├── libkernels2.so
 ├── include
@@ -369,10 +369,10 @@ if __name__ == '__main__':
 
 您可以基于样例工程中提供的一键式编译运行脚本进行快速编译，并在CPU侧和NPU侧执行Ascend C算子。一键式编译运行脚本主要完成以下功能：
 
-**图4**  一键式编译运行脚本流程图<a name="fig125041443583"></a>  
+**图4**  一键式编译运行脚本流程图<a name="fig125041443583"></a>
 ![](../../figures/一键式编译运行脚本流程图.png "一键式编译运行脚本流程图")
 
->[!NOTE]说明 
+>[!NOTE]说明
 >**样例中提供的一键式编译运行脚本并不能适用于所有的算子运行验证场景，使用时请根据实际情况进行修改。**
 >- 根据Ascend C算子的算法原理的不同，自行实现输入和真值数据的生成脚本。
 
@@ -445,7 +445,7 @@ bash run.sh -r npu  -v <soc_version> -i <install_path> -b Debug -p <install-pref
 
 在非昇腾设备上，开发者可以利用CPU仿真环境先行进行算子开发和测试，并在准备就绪后，利用昇腾设备进行加速计算。在[编译与运行](../编译与运行/算子编译/AI-Core算子编译基本用法.md)章节，我们已经介绍了算子Kernel程序NPU域的编译运行。类似地，CPU域调试也是通过毕昇编译器编译算子Kernel程序。此时算子Kernel程序链接CPU调测库，执行编译生成的可执行文件，可以完成算子CPU域的运行验证。CPU侧的运行程序，通过GDB通用调试工具进行单步调试，可以精准验证程序执行流程是否符合预期。
 
-**图5**  CPU域和NPU域的核函数运行逻辑对比<a name="fig1274642720202"></a>  
+**图5**  CPU域和NPU域的核函数运行逻辑对比<a name="fig1274642720202"></a>
 ![](../../figures/CPU域和NPU域的核函数运行逻辑对比-36.png "CPU域和NPU域的核函数运行逻辑对比-36")
 
 基于Kernel直调样例工程，通过ACLRT\_LAUNCH\_KERNEL接口调用核函数时，可实现CPU与NPU域的代码的统一，且该方式仅支持以下型号：
@@ -490,7 +490,7 @@ bash run.sh -r npu  -v <soc_version> -i <install_path> -b Debug -p <install-pref
         // 分配Host内存
         uint8_t *xHost, *yHost, *zHost;
         uint8_t *xDevice, *yDevice, *zDevice;
-    
+
         CHECK_ACL(aclrtMallocHost((void**)(&xHost), inputByteSize));
         CHECK_ACL(aclrtMallocHost((void**)(&yHost), inputByteSize));
         CHECK_ACL(aclrtMallocHost((void**)(&zHost), outputByteSize));
@@ -523,7 +523,7 @@ bash run.sh -r npu  -v <soc_version> -i <install_path> -b Debug -p <install-pref
         CHECK_ACL(aclFinalize());
     ```
 
->[!NOTE]说明 
+>[!NOTE]说明
 >为了实现CPU域与NPU域代码归一，仅对部分acl接口进行适配，开发者在使用CPU域调测功能时，仅支持使用如下acl接口：
 >- 有实际功能接口，支持CPU域调用
 >    - aclDataTypeSize、aclFloat16ToFloat、aclFloatToFloat16。

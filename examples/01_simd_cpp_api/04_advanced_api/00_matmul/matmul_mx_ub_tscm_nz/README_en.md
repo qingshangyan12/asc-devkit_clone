@@ -24,10 +24,10 @@ An MxMatmul example that uses user-defined TSCM and VECOUT input in MXFP4/MXFP8 
 
 ## Example Description
 
-- Example Function:  
+- Example Function:
   When the MatmulMxUbTscmNzCustom example calls the Matmul API for computation, the memory logical positions of matrices A and B use VECOUT, the memory logical positions of scaleA and scaleB matrices use TSCM, and all 4 input matrices are in NZ format. The left quantization scale matrix is multiplied with the left matrix, the right quantization scale matrix is multiplied with the right matrix, and matrix multiplication is performed on the two products.
 
-- Example Specifications:  
+- Example Specifications:
   In this example: M = 64, N = 128, K = 128, scaleK = 4. scaleK is the result of K divided by 32, which is 4.
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="5" align="center">MatmulMxUbTscmNzCustom</td></tr>
@@ -40,7 +40,7 @@ An MxMatmul example that uses user-defined TSCM and VECOUT input in MXFP4/MXFP8 
   <tr><td rowspan="1" align="center">Example Output</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="5" align="center">matmulMxUbTscmNzCustom</td></tr>
   </table>
-- Example Implementation: 
+- Example Implementation:
   - Key Kernel Steps
     - Create the Matmul object: use MatmulTypeWithScale to enable scaleA and scaleB, set the memory logical positions of the left and right matrices to VECOUT, set the memory logical positions of the left and right quantization scale matrices to TSCM, set the physical layout format of all input matrix data to NZ, and set the SCALE_ISTRANS parameter of scaleB to true.
       ```cpp
@@ -59,14 +59,14 @@ An MxMatmul example that uses user-defined TSCM and VECOUT input in MXFP4/MXFP8 
       DataCopy(bufferLeft, aGlobal, tiling.singleCoreM * tiling.singleCoreK);
       AscendC::PipeBarrier<PIPE_ALL>();
       matmulObj.SetTensorA(bufferLeft, isTransA);
-      
+
       // SetTensorB
       pipe->InitBuffer(rightMatrixQue, 1, tiling.singleCoreK * tiling.singleCoreN);
       bufferRight = rightMatrixQue.AllocTensor<fp4x2_e1m2_t>();
       DataCopy(bufferRight, bGlobal, tiling.singleCoreK * tiling.singleCoreN);
       AscendC::PipeBarrier<PIPE_ALL>();
       matmulObj.SetTensorB(bufferRight, isTransB);
-      
+
       // SetTensorScaleA
       pipe->InitBuffer(qidMxA1, 1, alignSingleCoreM * alignSingleCoreK / 32);
       bufferLeftScale = qidMxA1.AllocTensor<fp8_e8m0_t>();
@@ -102,13 +102,13 @@ An MxMatmul example that uses user-defined TSCM and VECOUT input in MXFP4/MXFP8 
       cubeTiling.SetMadType(matmul_tiling::MatrixMadType::MXMODE);
       ```
 
-  - Invocation Implementation  
+  - Invocation Implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

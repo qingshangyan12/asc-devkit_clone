@@ -30,7 +30,7 @@ This example uses the BitwiseAnd high-level API to perform bitwise AND operation
 
 ## Example Description
 
-- Example function:  
+- Example function:
   Perform bitwise AND operations on two inputs.
 
   The computation formula is as follows:
@@ -38,7 +38,7 @@ This example uses the BitwiseAnd high-level API to perform bitwise AND operation
   dst_i = src0_i \& src1_i
   $$
 
-- Example specifications:  
+- Example specifications:
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> bitwiseand </td></tr>
 
@@ -52,21 +52,21 @@ This example uses the BitwiseAnd high-level API to perform bitwise AND operation
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">bitwiseand_custom</td></tr>
   </table>
 
-- Example implementation:  
+- Example implementation:
   This example implements a bitwiseand_custom example with fixed shapes of input src0[1, 1024], src1[1, 1024], and output dst[1, 1024].
 
   - Kernel implementation
 
     Use the BitwiseAnd high-level API to complete bitwise AND operations, then transfer the final result to external storage.
 
-  - Invocation implementation  
+  - Invocation implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run  
+## Build and Run
 
 Run the following steps in the root directory of this example to build and run the operator.
 
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

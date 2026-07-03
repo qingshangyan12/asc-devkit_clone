@@ -26,7 +26,7 @@ This example uses the TransData high-level API to implement data layout format c
 
 ## Example Description
 
-Convert the input data layout to a target layout format.  
+Convert the input data layout to a target layout format.
 In addition to dimension order changes, this involves splitting the C axis and N axis. Specifically, the C axis is split into C1 and C0 axes, and the N axis is split into N1 and N0 axes. For data types with a bit width of 16, C0 and N0 are fixed at 16. The formulas for C1 and N1 are as follows:
 
 $$ C1 = (C + C0 - 1) / C0 $$
@@ -121,7 +121,7 @@ This example supports the following four data format conversion scenarios:
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -141,7 +141,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-  
+
   For example:
 
   ```bash

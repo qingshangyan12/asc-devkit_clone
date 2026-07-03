@@ -73,10 +73,10 @@ __aicore__ inline GroupBarrier(GM_ADDR groupWorkspace, uint32_t arriveSizeIn, ui
 <tbody><tr id="row484511235519"><td class="cellrowborder" valign="top" width="17.119999999999997%" headers="mcps1.2.3.1.1 "><p id="p988616883917"><a name="p988616883917"></a><a name="p988616883917"></a>PipeMode</p>
 </td>
 <td class="cellrowborder" valign="top" width="82.88%" headers="mcps1.2.3.1.2 "><p id="p112701021123919"><a name="p112701021123919"></a><a name="p112701021123919"></a>GroupBarrier发送组同步消息时使用的执行单元，仅支持MTE3_MODE。</p>
-<a name="screen1488615823912"></a><a name="screen1488615823912"></a><pre class="screen" codetype="Cpp" id="screen1488615823912">enum class PipeMode : uint8_t { 
+<a name="screen1488615823912"></a><a name="screen1488615823912"></a><pre class="screen" codetype="Cpp" id="screen1488615823912">enum class PipeMode : uint8_t {
   SCALAR_MODE = 0,
   MTE3_MODE = 1,
-  MAX 
+  MAX
 }</pre>
 </td>
 </tr>

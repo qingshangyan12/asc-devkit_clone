@@ -74,7 +74,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 - Enter GDB debug mode
   > **Note:** GDB version 12.1 or later is required.
-  
+
   The compiled CPU domain executable supports debugging through GDB. GDB supports common debugging operations such as setting breakpoints, viewing registers and memory state, single-stepping, and viewing the call stack. Add "gdb --args" before "./cpu_debug" in the above command and run the command again to enter GDB mode.
   ```bash
   gdb --args ./cpu_debug

@@ -89,9 +89,9 @@ mm.SetTensorA(gm_a);    // 设置左矩阵A
 mm.SetTensorB(gm_b);    // 设置右矩阵B
 mm.SetBias(gm_bias);    // 设置Bias
 // Compute阶段：完成矩阵乘计算
-while (mm.Iterate()) { 
+while (mm.Iterate()) {
     // CopyOut阶段：完成从LocalMemory到GM的搬运
-    mm.GetTensorC(gm_c); 
+    mm.GetTensorC(gm_c);
 }
 // 结束矩阵乘操作
 mm.End();

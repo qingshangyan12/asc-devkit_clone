@@ -107,7 +107,7 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
     <cann-filter npu-type = "310p">
 
     Atlas 推理系列产品AI Core，支持配置方式二。
-    
+
     </cann-filter>
 
 图1采用内置固定模式2进行计算，每个repeat取奇数索引元素。

@@ -25,10 +25,10 @@ A Matmul example with A and B matrices as hifloat8, fp8_e4m3fn, or fp8_e5m2 data
 
 ## Example Description
 
-- Example Function:  
+- Example Function:
   Performs matrix multiplication and bias addition on the input A and B matrices, implementing a Matmul example with hifloat8, fp8_e4m3fn, and fp8_e5m2 data type input. When the input data type is hifloat8, the data types of A and B must be the same.
 
-- Example Specifications:  
+- Example Specifications:
   In this example: M = 428, N = 479, K = 158.
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="5" align="center">Matmul</td></tr>
@@ -39,7 +39,7 @@ A Matmul example with A and B matrices as hifloat8, fp8_e4m3fn, or fp8_e5m2 data
   <tr><td rowspan="1" align="center">Example Output</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="5" align="center">matmul_fp8_custom</td></tr>
   </table>
-- Example Implementation: 
+- Example Implementation:
   - Key Kernel Steps
     - Create the Matmul object, setting the data type to hifloat8 or various fp8 data types based on SCENARIO_NUM.
       ```cpp
@@ -62,13 +62,13 @@ A Matmul example with A and B matrices as hifloat8, fp8_e4m3fn, or fp8_e5m2 data
         AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, cType>,
         AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, biasType>, mmCfg> matmulObj;
       ```
-  - Invocation Implementation  
+  - Invocation Implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

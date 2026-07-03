@@ -118,7 +118,7 @@ Ascend 950PR/Ascend 950DT，源操作数dst和目的操作数src支持的数据�
     // 灵活标量位置，src1Local[0]作为标量
     static constexpr AscendC::BinaryConfig config = { 1 };
     AscendC::Select<BinaryDefaultType, uint8_t, config>(dstLocal, maskLocal, src0Local, src1Local[0], AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE, dataSize);
-    
+
     // 灵活标量位置，src0Local[0]作为标量
     static constexpr AscendC::BinaryConfig config = { 0 };
     AscendC::Select<BinaryDefaultType, uint8_t, config>(dstLocal, maskLocal, src0Local[0], src1Local, AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE, dataSize);

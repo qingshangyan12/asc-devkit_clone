@@ -102,13 +102,13 @@ This example includes 4 scenarios. Scenarios 1 to 3 demonstrate three allocation
     - Initialize TQue queue through `TPipe::InitBuffer`, specifying queue depth and buffer size
     - Allocate LocalTensor using `TQue::AllocTensor`, and free LocalTensor using `TQue::FreeTensor`
     - Manage data flow through the queue's EnQue/DeQue mechanism
-    
+
     **Scenario 2 (Process2): Using LocalMemAllocator allocator**
     - Create a `LocalMemAllocator<Hardware::UB>` allocator object
     - Call the `Alloc<T>` method to directly allocate LocalTensor of specified size
     - Requires manual invocation of `SetFlag/WaitFlag` for hardware event synchronization
     - When the buffer size tileSize is a constant, it is recommended to use the tileSize template parameter for better performance
-    
+
     **Scenario 3 (Process3): Using address offset for manual management**
     - Manually calculate the starting address offset of each tensor in UB
     - Specify `TPosition` and starting address through LocalTensor constructor

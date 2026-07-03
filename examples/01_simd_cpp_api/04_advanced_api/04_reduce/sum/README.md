@@ -29,7 +29,7 @@
 
 ## 样例规格
 
-- 样例功能：  
+- 样例功能：
   本样例是对矩阵的每行元素求和。
 
 <table>
@@ -45,12 +45,12 @@
 <tr><td rowspan="1" align="left">核函数名</td><td colspan="4" align="center">sum_custom</td></tr>
 </table>
 
-- 样例实现：  
+- 样例实现：
   本样例中实现的是固定shape为输入x[3，32]，输出y[8，1]，其中y中的有效值数量为3，对输入x的每行元素求和后，输出y的有效数据为前3位，最后5位为padding填充的数据。
-  - Kernel实现:  
+  - Kernel实现:
     计算逻辑是：本样例将输入数据搬运到片上存储，然后使用Sum高阶API接口完成求和，再将结果搬出。
 
-  - Tiling实现:  
+  - Tiling实现:
     该样例的tiling实现流程如下：使用GetSumMaxMinTmpSize接口计算所需最大/最小临时空间大小，使用最小临时空间，然后根据输入长度确定所需tiling参数。
 
 ## 编译运行

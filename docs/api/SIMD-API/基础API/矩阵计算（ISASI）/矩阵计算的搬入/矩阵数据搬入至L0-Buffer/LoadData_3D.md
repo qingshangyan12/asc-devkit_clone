@@ -74,7 +74,7 @@ LoadData（卷积数据搬运）仅支持如下数据通路：L1 Buffer->L0A Buf
 
 实现原理可参考伪代码：[LoadData（卷积数据搬运）伪代码](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0/scripts/load3d.py)。
 
-**图1** LoadData to L0A Buffer功能示意图<a id="zh-cn_topic_0000002512171652_fig54450833715"></a>  
+**图1** LoadData to L0A Buffer功能示意图<a id="zh-cn_topic_0000002512171652_fig54450833715"></a>
 
 ![](../../../../../figures/load3d_l1tol0a_demo.png "LoadData-to-L0A Buffer功能示意图")
 
@@ -453,7 +453,7 @@ IsResetLoad3dConfig结构定义如下：
 struct IsResetLoad3dConfig {
    bool isSetFMatrix = true;
    bool isSetPadding = true;
-}; 
+};
 ```
 
 isSetFMatrix配置为true，表示在LoadData（卷积数据搬运）接口内部设置FeatureMap的属性描述（包括l1H、l1W、padList，参数介绍参考[表4](#zh-cn_topic_0000002512171652_table193501032193419)）；设置为false，表示该接口传入的FeatureMap的属性描述不生效，开发者需要通过[SetFmatrix](../辅助配置接口/SetFmatrix.md)进行手动管理设置。
@@ -470,7 +470,7 @@ isSetPadding配置为true，表示在接口内部设置Pad属性描述（即padV
 
 对应的feature map格式如下图：
 
-**图2** feature map格式<a id="zh-cn_topic_0000002512171652_fig8137131714319"></a>  
+**图2** feature map格式<a id="zh-cn_topic_0000002512171652_fig8137131714319"></a>
 
 ![](../../../../../figures/feature-map格式.png "feature-map格式")
 
@@ -478,13 +478,13 @@ isSetPadding配置为true，表示在接口内部设置Pad属性描述（即padV
 
 其中n为filter的个数，可以看出维度排布为（Hk,Wk,Ci,n），但是需要注意的是下图的格式还需要根据Mmad中B矩阵的格式转换。
 
-**图3** filter的格式<a id="zh-cn_topic_0000002512171652_fig1395194710496"></a>  
+**图3** filter的格式<a id="zh-cn_topic_0000002512171652_fig1395194710496"></a>
 
 ![](../../../../../figures/filter的格式.png "filter的格式")
 
 实际操作中，由于存储空间或者计算能力限制，我们通常会将整个卷积计算分块，一次只搬运并计算一小块数据。
 
-**图4** 卷积计算分块<a id="zh-cn_topic_0000002512171652_fig5278110624"></a>  
+**图4** 卷积计算分块<a id="zh-cn_topic_0000002512171652_fig5278110624"></a>
 
 ![](../../../../../figures/卷积计算分块.png "卷积计算分块")
 
@@ -494,13 +494,13 @@ isSetPadding配置为true，表示在接口内部设置Pad属性描述（即padV
 
 repeatMode =0时，每次repeat会改变在filter窗口中读取数据点的位置，然后跳到下一个C0的位置。
 
-**图5** repeatMode = 0时的filter窗口<a id="zh-cn_topic_0000002512171652_fig11710143294513"></a>  
+**图5** repeatMode = 0时的filter窗口<a id="zh-cn_topic_0000002512171652_fig11710143294513"></a>
 
 ![](../../../../../figures/repeatMode-0-时的filter窗口.png "repeatMode-0-时的filter窗口")
 
 repeatMode =1的时候filter窗口中读取数据的位置保持不变，每个repeat在feature map中前进C0个元素。
 
-**图6** repeatMode = 1时的filter窗口<a id="zh-cn_topic_0000002512171652_fig1648315981717"></a>  
+**图6** repeatMode = 1时的filter窗口<a id="zh-cn_topic_0000002512171652_fig1648315981717"></a>
 
 ![](../../../../../figures/repeatMode-1-时的filter窗口.png "repeatMode-1-时的filter窗口")
 

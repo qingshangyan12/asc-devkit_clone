@@ -56,7 +56,7 @@
     __aicore__ inline void DataCopy(const GlobalTensor<T> &dst, const LocalTensor<T> &src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[], const uint32_t dimValue = 1)
     ```
 
-> [!NOTE]说明 
+> [!NOTE]说明
 > 各原型支持的数据类型，请参考[数据类型](#zh-cn_topic_0000002565968945_section4219135304818)。
 
 ## 参数说明<a name="zh-cn_topic_0000002565968945_section16128134420472"></a>
@@ -89,7 +89,7 @@
 
 如[图1](#fig1196816115710)所示，以float数据类型为例，切片搬运接口能从shape为3\*87的源操作中，选取四个不连续的横向切片搬运到目的操作数中，下面结合图示对SliceInfo结构体参数进行解析：
 
-**图1**  参数解析示意图<a name="fig1196816115710"></a>  
+**图1**  参数解析示意图<a name="fig1196816115710"></a>
 ![](../../../../../figures/slice_datacopy_parameter_analysis_diagram.png "参数解析示意图")
 
 - dimValue为2，表示操作数有2维。

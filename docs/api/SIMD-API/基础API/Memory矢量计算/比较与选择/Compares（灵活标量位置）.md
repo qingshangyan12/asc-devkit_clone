@@ -127,7 +127,7 @@ Ascend 950PR/Ascend 950DT，目的操作数dst支持的数据类型为：uint8_t
     ```cpp
     // 标量在后，src1Local[0]作为标量
     AscendC::Compares(dstLocal, src0Local, src1Local[0], AscendC::CMPMODE::LT, srcDataSize);
-    
+
     // 标量在前，src0Local[0]作为标量
     static constexpr AscendC::BinaryConfig config = { 0 };
     AscendC::Compares<BinaryDefaultType, BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, AscendC::CMPMODE::LT, srcDataSize);
@@ -144,7 +144,7 @@ Ascend 950PR/Ascend 950DT，目的操作数dst支持的数据类型为：uint8_t
     // dstRepStride, srcRepStride = 8, no gap between repeats
     // 标量在后，src1Local[0]作为标量
     AscendC::Compares(dstLocal, src0Local, src1Local[0], AscendC::CMPMODE::LT, mask, repeat, repeatParams);
-    
+
     // 标量在前，src0Local[0]作为标量
     static constexpr AscendC::BinaryConfig config = { 0 };
     AscendC::Compares<BinaryDefaultType, BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, AscendC::CMPMODE::LT, mask, repeat, repeatParams);
@@ -161,7 +161,7 @@ Ascend 950PR/Ascend 950DT，目的操作数dst支持的数据类型为：uint8_t
     // dstRepStride, srcRepStride = 8, no gap between repeats
     // 标量在后，src1Local[0]作为标量
     AscendC::Compares(dstLocal, src0Local, src1Local[0], AscendC::CMPMODE::LT, mask, repeat, repeatParams);
-    
+
     // 标量在前，src0Local[0]作为标量
     static constexpr AscendC::BinaryConfig config = { 0 };
     AscendC::Compares<BinaryDefaultType, BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, AscendC::CMPMODE::LT, mask, repeat, repeatParams);

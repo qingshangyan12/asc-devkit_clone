@@ -14,7 +14,7 @@ Vector计算单元专用于执行向量计算。如下图所示，高亮部分�
 
   **表1** 向量计算单元关联的存储单元
 
-  | 存储单元 | 说明 | 
+  | 存储单元 | 说明 |
   | --- | --- |
   | Unified Buffer | AI Core内部物理存储单元，通常用于存储向量计算的输入/输出数据。 |
 
@@ -30,7 +30,7 @@ Vector计算单元专用于执行向量计算。如下图所示，高亮部分�
 
   **表2** 向量计算单元关联的存储单元
 
-  | 存储单元 | 说明 | 
+  | 存储单元 | 说明 |
   | --- | --- |
   | Unified Buffer | AI Core内部物理存储单元，通常用于存储向量计算的输入/输出数据。 |
   | SIMD Register File | AI Core内部物理存储单元，在SIMD程序中，数据从Unified Buffer搬运到Register进行计算，产生的中间结果可以不用传回Unified Buffer，直接在寄存器计算。 |
@@ -81,7 +81,7 @@ Vector计算单元专用于执行向量计算。如下图所示，高亮部分�
     - **读写冲突**：读操作和写操作同时尝试访问同一个bank。
     - **写写冲突**：多个写操作同时尝试访问同一个bank group。
     - **读读冲突**：两个读操作同时尝试访问同一个bank，或者两个以上读操作同时尝试访问同一个bank group。
-  
+
   - bank冲突优化
 
     可参考[避免bank冲突（NPU架构版本3510）](<https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免bank冲突（NPU架构版本3510）.md>)。

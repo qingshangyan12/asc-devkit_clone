@@ -163,7 +163,7 @@ Note that mmadParams.k takes alignK = CeilAlign(k, 64) = 128, not the original k
 
 ## Build and Run
 Run the following steps in the root directory of this example to build and run the operator.
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -180,7 +180,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   Without these dependencies installed, the script cannot correctly generate FP4/FP8 type input data and ground truth data, which may cause accuracy verification failures.
-  
+
 - Run the example
 
   Run the following commands in the example directory.

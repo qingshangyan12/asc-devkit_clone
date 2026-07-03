@@ -26,7 +26,7 @@
 
 ## 样例描述
 
-- 样例功能：  
+- 样例功能：
   对输入Tensor做广播计算。
 
 - 样例规格：
@@ -104,23 +104,23 @@
   <tr><td align="center">1</td><td align="center">[96, 1]</td><td align="center">[96, 96]</td><td align="center">1</td><td align="center">在第二维进行广播，将1扩展为96</td></tr>
   </table>
 
-- 样例实现：  
+- 样例实现：
   本样例中实现了两种场景的broadcast样例，分别是[1, 48]到[96, 48]的广播和[96, 1]到[96, 96]的广播。
 
-  - Kernel实现  
+  - Kernel实现
     使用Broadcast高阶API接口完成广播，将输入Tensor按照指定轴扩展到目标shape
 
-  - Tiling实现  
+  - Tiling实现
     broadcast样例的tiling实现流程如下：首先获取input和output的二维shape，然后将其与广播的轴、input/output tensor的维度填充到TilingData中。
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
-## 编译运行  
+## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -140,7 +140,7 @@
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
-  
+
   示例如下：
 
   ```bash

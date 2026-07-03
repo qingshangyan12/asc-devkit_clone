@@ -29,7 +29,7 @@ When multiple cores operate on GM addresses, if the data cannot be aligned to Ca
 
 ## Example Description
 
-- Example function:  
+- Example function:
   Combine calls to `ReadGmByPassDCache` and `WriteGmByPassDCache` to implement:
   1. Use `ReadGmByPassDCache` to read int32_t elements one by one from GM addresses
   2. Use `WriteGmByPassDCache` to write the read values plus 100 to the output GM addresses
@@ -40,14 +40,14 @@ When multiple cores operate on GM addresses, if the data cannot be aligned to Ca
   <tr><td rowspan="2" align="center">Example Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">x</td><td align="center">[1, 1024]</td><td align="center">int32_t</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">Example Output</td><td align="center">z</td><td align="center">[1, 1024]</td><td align="center">int32_t</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">kernel_gm_by_pass_dcache</td></tr>  
+  <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">kernel_gm_by_pass_dcache</td></tr>
   </table>
 
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -81,7 +81,7 @@ Run the following steps in the root directory of this example to build and run t
   |--------|--------|-------------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu` | Run mode: NPU execution, CPU debug |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products/Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
-  
+
 - Execution result
 
   The following execution result indicates that the accuracy comparison is successful:

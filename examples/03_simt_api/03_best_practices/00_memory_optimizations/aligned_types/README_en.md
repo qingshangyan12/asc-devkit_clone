@@ -80,7 +80,7 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
 
 - Example Implementation
 
-  - Kernel Implementation  
+  - Kernel Implementation
 
     This example has a fixed total data size of 512MiB, using 2048 threads on a single core to perform data transfer. The kernel function is implemented as a template, supporting different types and alignment structs, performing element-wise transfer operations. The specific implementation is as follows:
 
@@ -101,7 +101,7 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
     }
     ```
 
-  - Invocation Implementation  
+  - Invocation Implementation
 
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
@@ -152,7 +152,7 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
   From the table above:
 
   (1) With the same total data size, structs with the same `sizeof` show significantly higher transfer efficiency when type-aligned compared to non-aligned. The 4B group shows the most significant contrast. As `alignof` increases from `1B to 2B to 4B`, the `Non-aligned Task Duration / Aligned Task Duration` ratio decreases, meaning transfer latency decreases progressively. This is because `alignof` affects the bit width of memory access instructions; smaller widths result in longer transfer times.
-  
+
   > Note that **doubling the instruction width does not equal halving the latency**: the kernel function uses a for loop to load/store data element by element, and load/store instructions between different elements can execute in pipeline parallel. Taking elements `x1` and `x2` as an example, after `load x1` completes, `store x1` and `load x2` can enter the memory pipeline simultaneously, and the execution time of multiple memory accesses is partially hidden by pipelining. Therefore, the measured speedup ratio for the 4B group is less than the theoretical upper bound calculated from instruction counts.
 
   (2) The three 4B struct groups (2xu16, 2xu8 + u16, u8 + 1B padding + u16) show no difference in `Task Duration` when compared vertically, indicating that whether fields are the same type or mixed types, and whether padding exists, does not affect transfer efficiency. The compiler only cares about the overall `sizeof` and `alignof` of the struct.
@@ -165,7 +165,7 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
 
 ## Build and Run
 
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

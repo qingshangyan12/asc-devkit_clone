@@ -13,8 +13,8 @@
 ```
 
 ## 算子描述
-- 算子功能：  
-  Add算子实现了两个数据相加，返回相加结果的功能。对应的数学表达式为：  
+- 算子功能：
+  Add算子实现了两个数据相加，返回相加结果的功能。对应的数学表达式为：
   ```
   z = x + y
   ```
@@ -34,18 +34,18 @@
   </table>
 
 - 算子实现：
-  - kernel实现  
+  - kernel实现
     计算逻辑是：C_API输入数据需要先搬运进片上存储，然后使用计算接口完成两个输入参数相加，得到最终结果，再搬出到外部存储上。
 
     Add算子的实现流程分为3个步骤：
 
     第一步将Global Memory上的输入x和y搬运到Local Memory，分别存储在xLocal、yLocal。
-    
+
     第二步对xLocal、yLocal执行加法操作，计算结果存储在zLocal中。
-    
+
     第三步将输出数据从zLocal搬运至Global Memory上的输出z中。
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
 ## 编译运行
@@ -56,7 +56,7 @@
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
     ```
-    
+
   - 默认路径，非root用户安装CANN软件包
     ```bash
     source $HOME/Ascend/cann/set_env.sh

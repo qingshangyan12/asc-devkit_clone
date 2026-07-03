@@ -99,7 +99,7 @@
     __simd_vf__ inline void DuplicateVF(__ubuf__ T* dstAddr, T scalarValue, uint16_t oneRepeatSize, uint16_t repeatTimes)
     {
         AscendC::Reg::RegTensor<T> dstReg;
-        AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T>();    
+        AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T>();
         for (uint16_t i = 0; i < repeatTimes; i++) {
             AscendC::Reg::Duplicate(dstReg, scalarValue);
             AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
@@ -114,7 +114,7 @@
     __simd_vf__ inline void DuplicateVF(__ubuf__ T* dstAddr, T scalarValue, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
     {
         AscendC::Reg::RegTensor<T> dstReg;
-        AscendC::Reg::MaskReg mask;    
+        AscendC::Reg::MaskReg mask;
         for (uint16_t i = 0; i < repeatTimes; i++) {
             mask = AscendC::Reg::UpdateMask<T>(count);
             AscendC::Reg::LoadAlign(srcReg, src0Addr + i * oneRepeatSize);

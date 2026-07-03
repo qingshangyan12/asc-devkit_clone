@@ -85,16 +85,16 @@
 
 以下以2维的例子介绍几个典型使用场景。
 
-**图1**  2D Padding场景<a name="fig10722115123919"></a>  
+**图1**  2D Padding场景<a name="fig10722115123919"></a>
 ![](../../../../../figures/2d_padding_scenario.png "2D-Padding场景")
 
-**图2**  2D Transpose场景<a name="fig104451143104510"></a>  
+**图2**  2D Transpose场景<a name="fig104451143104510"></a>
 ![](../../../../../figures/2d_transpose_scenario.png "2D-Transpose场景")
 
-**图3**  2D BroadCast场景<a name="fig4654326132913"></a>  
+**图3**  2D BroadCast场景<a name="fig4654326132913"></a>
 ![](../../../../../figures/2d_broadcast_scenario.png "2D-BroadCast场景")
 
-**图4**  2D Slice场景<a name="fig13061435132915"></a>  
+**图4**  2D Slice场景<a name="fig13061435132915"></a>
 ![](../../../../../figures/2d_slice_scenario.png "2D-Slice场景")
 
 ## 数据类型

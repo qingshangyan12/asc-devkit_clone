@@ -22,10 +22,10 @@ A Matmul example with constant Tiling. Constant Tiling converts some or all Tili
 │   └── README.md                      // Example description document
 ```
 ## Example Description
-- Example Function:  
+- Example Function:
   The MatmulConstantCustom example performs matrix multiplication and bias addition on the input A and B matrices, while using constant Tiling to implement static compilation on the Kernel side, deriving Tiling information before example execution. By implementing constant Matmul Tiling, Scalar operations in the example are reduced, improving example performance. In the constant Tiling scenario, the SingleShape set using the SetSingleShape interface on the Kernel side is the maximum shape for single-core computation at runtime, and the actual computation shape should be less than or equal to this shape.
 
-- Example Specifications:  
+- Example Specifications:
   In this example: M = 128, N = 30720, K = 64.
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center">Matmul</td></tr>
@@ -90,12 +90,12 @@ A Matmul example with constant Tiling. Constant Tiling converts some or all Tili
   - Key Tiling Steps
       - Ascend C provides a set of Matmul Tiling APIs to help users obtain the Tiling parameters needed for Matmul kernel computation. Simply pass in the A/B/C matrix information and call the API interfaces to obtain the relevant parameters in the TCubeTiling structure. Since Tiling is constant, only the core-splitting operation needs to be implemented in Tiling. Users can obtain the optimal multi-core splitting strategy through the multi-core Tiling interface. Other Tiling information is derived through constant deduction on the Kernel side, and the Kernel side no longer needs runtime Tiling information.
 
-- Invocation Implementation  
+- Invocation Implementation
   Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

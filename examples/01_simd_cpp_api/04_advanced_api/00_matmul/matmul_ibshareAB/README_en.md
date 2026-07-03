@@ -42,15 +42,15 @@ An example that calls the Matmul high-level API to enable the IBShare feature, r
 
 ## Example Description
 
-- Example Function:  
+- Example Function:
   When calling the Matmul high-level API, enable the IBShare feature for both A and B matrices. During computation, the two AIVs corresponding to the same AIC use the same A and B matrix data on the L1 Buffer in each iteration.
 
   When both matrix A and matrix B have IBShare enabled, the K column is not split for computation. When neither has IBShare enabled, computation is split along the K column. By comparing the execution time of the two scenarios, the performance improvement of this feature can be observed.
-  Data processing illustration for the AB matrix IBShare enabled scenario (A and B matrices are not split): ![alt text](./figures/matmul_ABshare.png)  
-  Data processing illustration for the AB matrix IBShare disabled scenario (A and B matrices are split): ![alt text](./figures/matmul_noABshare.png)  
+  Data processing illustration for the AB matrix IBShare enabled scenario (A and B matrices are not split): ![alt text](./figures/matmul_ABshare.png)
+  Data processing illustration for the AB matrix IBShare disabled scenario (A and B matrices are split): ![alt text](./figures/matmul_noABshare.png)
 
 
-- Example Specifications:  
+- Example Specifications:
   In this example: M = 128, N = 256, K = 384.
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center">Matmul</td></tr>
@@ -61,10 +61,10 @@ An example that calls the Matmul high-level API to enable the IBShare feature, r
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">matmul_ABshare_custom</td></tr>
   </table>
 
-- Example Implementation: 
+- Example Implementation:
 
-  - Key Kernel Steps  
-    - Create the Matmul object:  
+  - Key Kernel Steps
+    - Create the Matmul object:
         Configure the A and B matrix IBShare parameters as true or false based on the SCENARIO_NUM build option in CMakeLists.
         ```cpp
         #if SCENARIO_NUM == 1
@@ -80,13 +80,13 @@ An example that calls the Matmul high-level API to enable the IBShare feature, r
         ```
 
 
-  - Invocation Implementation  
+  - Invocation Implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh

@@ -90,7 +90,7 @@ __aicore__ inline void GetMrgSortResult(uint16_t &mrgSortList1, uint16_t &mrgSor
 - 配合[MrgSort指令](MrgSort.md)使用示例。
 
     ```cpp
-    
+
     uint16_t elementLengths[4] = { 0 };
     uint32_t sortedNum[4] = { 0 };
     elementLengths[0] = 32;
@@ -98,16 +98,16 @@ __aicore__ inline void GetMrgSortResult(uint16_t &mrgSortList1, uint16_t &mrgSor
     elementLengths[2] = 32;
     elementLengths[3] = 32;
     uint16_t validBit = 0b1111;
-    
+
     AscendC::MrgSortSrcList<float> srcList;
     srcList.src1 = workLocal[0];
     srcList.src2 = workLocal[32 * 1 * 2];
     srcList.src3 = workLocal[32 * 2 * 2];
     srcList.src4 = workLocal[32 * 3 * 2];
-    
+
     AscendC::MrgSort4Info mrgSortInfo(elementLengths, true, validBit, 1);
     AscendC::MrgSort(dstLocal, srcList, mrgSortInfo);
-    
+
     uint16_t mrgRes1 = 0;
     uint16_t mrgRes2 = 0;
     uint16_t mrgRes3 = 0;
@@ -118,7 +118,7 @@ __aicore__ inline void GetMrgSortResult(uint16_t &mrgSortList1, uint16_t &mrgSor
     输出示例:
 
     ```cpp
-    srcList: 
+    srcList:
      [1.   2.   3.   4.   5.   6.   7.   8.   9.  10.  11.  12.  13.  14.
       15.  16.  17.  18.  19.  20.  21.  22.  23.  24.  25.  26.  27.  28.
       29.  30.  31.  32.  33.  34.  35.  36.  37.  38.  39.  40.  41.  42.
@@ -166,16 +166,16 @@ __aicore__ inline void GetMrgSortResult(uint16_t &mrgSortList1, uint16_t &mrgSor
     elementLengths[2] = 32;
     elementLengths[3] = 32;
     uint16_t validBit = 0b1111;
-    
+
     AscendC::MrgSortSrcList<float> srcList;
     srcList.src1 = workLocal[0];
     srcList.src2 = workLocal[32 * 1 * 2];
     srcList.src3 = workLocal[32 * 2 * 2];
     srcList.src4 = workLocal[32 * 3 * 2];
-    
+
     AscendC::MrgSort4Info mrgSortInfo(elementLengths, true, validBit, 1);
     AscendC::MrgSort4(dstLocal, srcList, mrgSortInfo);
-    
+
     uint16_t mrgRes1 = 0;
     uint16_t mrgRes2 = 0;
     uint16_t mrgRes3 = 0;

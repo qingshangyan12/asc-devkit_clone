@@ -103,7 +103,7 @@ Atlas 推理系列产品AI Core，支持的数据类型为：uint16_t、half、u
 -   操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#section668772811100)。
 
 - dstOffset的取值要求如下：
-  - 偏移地址不能有相同值，如果存在2个或者多个偏移重复的情况，行为是不可预期的。 
+  - 偏移地址不能有相同值，如果存在2个或者多个偏移重复的情况，行为是不可预期的。
   - 取值应保证dst元素类型位宽对齐。
   - 偏移地址后不能超出UB大小数据的范围。
   <!-- npu="950,310b" id12 -->
@@ -159,7 +159,7 @@ AscendC::Scatter(dstLocal, srcLocal, dstOffsetLocal, (uint32_t)0, COUNT); // dst
 ```plain
 输入数据dstOffsetLocal:
 [254 252 250 ... 4 2 0]
-输入数据srcLocal（128个half类型数据）: 
+输入数据srcLocal（128个half类型数据）:
 [0 1 2 ... 125 126 127]
 输出数据dstGlobal:
 [127 126 125 ... 2 1 0]

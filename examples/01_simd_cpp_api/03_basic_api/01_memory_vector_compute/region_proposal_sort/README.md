@@ -25,7 +25,7 @@
 
 ## 样例描述
 
-- 样例功能：  
+- 样例功能：
   将64个score值通过完整流水线排序后输出。一个Region Proposal由8个half元素组成，其中第5个元素（offset=4）为score域。
 
 - 样例规格：
@@ -39,7 +39,7 @@
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">region_proposal_sort_custom</td></tr>
 </table>
 
-- 样例实现：  
+- 样例实现：
   本样例实现的是Region Proposal排序完整流水线：
   1. **ProposalConcat**：将连续的16个score值合入16个Region Proposal的score域位置（offset=4），共4组，每组1次repeat
   2. **RpSort16**：对每组16个Region Proposal按score域从大到小排序，共4组
@@ -49,14 +49,14 @@
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
-    
+
 - 样例执行
 
   在本样例目录下执行如下命令。
@@ -69,7 +69,7 @@
   ```
 
   使用CPU调试或NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=cpu`或`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
-  
+
   示例如：
 
   ```bash

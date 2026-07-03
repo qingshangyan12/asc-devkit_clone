@@ -22,7 +22,7 @@
 ```
 
 ## 样例描述
-- 样例功能：  
+- 样例功能：
   本样例基于RegBase编程范式实现向量自加操作。输入`x`为`float`类型二维数据，输出`y`与输入shape一致，每个输出元素满足`y[i] = x[i] + x[i]`。样例采用4核并行处理，输入总长度为`256 * 256`个`float`元素，每个核处理`totalLength / 4`个连续元素，展示GM/UB数据搬运、VF函数调用、RegBase寄存器计算和流水同步的基本流程。
 - 样例规格：
   <table>
@@ -44,13 +44,13 @@
     - 使用`SetFlag<HardEvent::V_MTE3>`和`WaitFlag<HardEvent::V_MTE3>`保证Vector计算完成后再将UB结果搬运回GM。
     - 调用`DataCopy`将结果从UB搬运至GM。
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符`<<<>>>`启动`vector_add`核函数。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -86,7 +86,7 @@
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：Ascend 950PR/Ascend 950DT |
 
-- 执行结果  
+- 执行结果
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!

@@ -2,7 +2,7 @@
 
 本工具主要针对工程编译生成的算子ELF文件（Executable and Linkable Format）提供解析和解压功能，并将结果信息以可读形式呈现，方便开发者直观获得kernel文件信息。当前支持解析融合编译工程、标准/简易自定义算子工程，以及Kernel直调工程生成的相关产物。
 
->[!NOTE]说明 
+>[!NOTE]说明
 >- ELF文件是一种用于二进制文件、可执行文件、目标代码、共享库和核心转储的文件格式，包括常见的\*.a、\*.so文件等。ELF文件常见构成如下：
 >    - ELF头部：描述了整个文件的组织结构，包括文件类型、机器类型、版本号等信息。
 >    - 程序头部表：描述了文件中各种段（segments）信息，包括程序如何加载到内存中执行的信息。
@@ -176,7 +176,7 @@
         ```
         ====== [elf header infos] ======
         ELF Header:
-          Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00 
+          Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00
           Class:                             ELF64
           Data:                              2's complement, little endian
           Version:                           1 (current)
@@ -195,7 +195,7 @@
           Size of section headers:           64 (bytes)
           Number of section headers:         16
           Section header string table index: 14
-    
+
         Section Headers:
           [Nr] Name              Type            Address          Off    Size   ES Flg Lk Inf Al
           [ 0]                   NULL            0000000000000000 000000 000000 00      0   0  0
@@ -207,15 +207,15 @@
           L (link order), O (extra OS processing required), G (group), T (TLS),
           C (compressed), x (unknown), o (OS specific), E (exclude),
           D (mbind), p (processor specific)
-    
+
         There are no section groups in this file.
-    
+
         Program Headers:
           Type           Offset   VirtAddr           PhysAddr           FileSiz  MemSiz   Flg Align
           LOAD           0x0000e8 0x0000000000000000 0x0000000000000000 0x006ca7 0x006ca7 R E 0x1000
           LOAD           0x0070e8 0x0000000000007000 0x0000000000007000 0x000210 0x000210 RW  0x1000
           GNU_STACK      0x000000 0x0000000000000000 0x0000000000000000 0x000000 0x000000 RW  0
-    
+
         ......
         ```
 
@@ -262,7 +262,7 @@
     -   简单打印
 
         ```
-        msobjdump --dump-elf ${cmake_install_dir}/op_api/lib/libcust_opapi.so 
+        msobjdump --dump-elf ${cmake_install_dir}/op_api/lib/libcust_opapi.so
         ```
 
         执行上述命令，终端打印基础device信息，示例如下：
@@ -376,7 +376,7 @@
           Section header string table index: 7
         Section Headers:
           [Nr] Name              Type            Address          Off    Size   ES Flg Lk Inf Al
-          [ 0]                   NULL            0000000000000000 000000 000000 00      0   0  0 
+          [ 0]                   NULL            0000000000000000 000000 000000 00      0   0  0
            .....................................................................................
           [ 8] .strtab           STRTAB          0000000000000000 00529b 000119 00      0   0  1
         Key to Flags:
@@ -385,7 +385,7 @@
           C (compressed), x (unknown), o (OS specific), E (exclude),
           D (mbind), p (processor specific)
         ................................................
-        
+
         ===== [elf header infos] in ascendxxx_matmul_leakyrelu_custom_MatmulLeakyreluCustom_e052bee3255764ac919095f3bdf83389.o =====:
         ELF Header:
           Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00
@@ -410,27 +410,27 @@
 -   **解压包含device信息的库文件并落盘**
 
     ```
-    msobjdump --extract-elf ${cmake_install_dir}/op_api/lib/libcust_opapi.so 
+    msobjdump --extract-elf ${cmake_install_dir}/op_api/lib/libcust_opapi.so
     ```
 
     执行上述命令，默认在当前执行路径下保存解压文件，产物目录如下：
 
     ```
     |-- config                                                               // 算子原型配置文件目录
-    |    ├── ${soc_version}   
-    |        ├── acos_custom.json                                  
-    |        ├── matmul_leakyrelu_custom.json                               
-    |        ├── .......                                             
+    |    ├── ${soc_version}
+    |        ├── acos_custom.json
+    |        ├── matmul_leakyrelu_custom.json
+    |        ├── .......
     |-- ${soc_version}                                                    // AI处理器名
     |     ├── acos_custom                                               // 基础单算子编译文件*.o和对应的*.json文件
     |         ├── AcosCustom_da824ede53d7e754f85c14b9446ec2fc.json      // 命名规则：${op_type}_${parm_info}.json或${op_type}_${parm_info}.o，${parm_info}是基于算子输入/输出dtype、shape等信息生成的标识码
     |         ├── AcosCustom_da824ede53d7e754f85c14b9446ec2fc.o
     |         ├── AcosCustom_dad9c8ca8fcbfd789010c8b1c0da8e26.json
     |         ├── AcosCustom_dad9c8ca8fcbfd789010c8b1c0da8e26.o
-    |     ├── matmul_leakyrelu_custom  
+    |     ├── matmul_leakyrelu_custom
     |         ├── MatmulLeakyreluCustom_e052bee3255764ac919095f3bdf83389.json
     |         ├── MatmulLeakyreluCustom_e052bee3255764ac919095f3bdf83389.o
-    |     ├── axpy_custom    
+    |     ├── axpy_custom
     |         ├── .....
     ```
 
@@ -493,7 +493,7 @@
                     "int64Mode": false,
                     "simplifiedKeyMode": 0,
                     "simplifiedKey": [
-          
+
                     ],
                     "staticKey": "27d6f997f2f3551axxxx,1385590c47affa578eb429xxx",
                     "inputs": [
@@ -650,7 +650,7 @@
 -   **获取包含device信息的库文件列表**
 
     ```
-    msobjdump --list-elf ${cmake_install_dir}/op_api/lib/libcust_opapi.so 
+    msobjdump --list-elf ${cmake_install_dir}/op_api/lib/libcust_opapi.so
     ```
 
     执行上述命令，终端会打印所有文件，屏显信息形如：
@@ -742,7 +742,7 @@ out
           Size of section headers:           64 (bytes)
           Number of section headers:         20
           Section header string table index: 18
-        
+
         Section Headers:
           [Nr] Name              Type            Address          Off    Size   ES Flg Lk Inf Al
           [ 0]                   NULL            0000000000000000 000000 000000 00      0   0  0
@@ -754,9 +754,9 @@ out
           L (link order), O (extra OS processing required), G (group), T (TLS),
           C (compressed), x (unknown), o (OS specific), E (exclude),
           D (mbind), p (processor specific)
-        
+
         There are no section groups in this file.
-        
+
         Program Headers:
           Type           Offset   VirtAddr           PhysAddr           FileSiz  MemSiz   Flg Align
           LOAD           0x0000b0 0x0000000000000000 0x0000000000000000 0x010aa8 0x010aa8 R E 0x1000

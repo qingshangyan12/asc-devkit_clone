@@ -65,16 +65,16 @@ This example uses the SoftmaxFlashV2 high-level API in a large language model at
 </table>
 </div>
 
-- Example implementation:  
+- Example implementation:
   This example implements a softmaxflashv2 example with fixed shapes of input x [960, 960] and output max[960, 8], sum[960, 8].
 
-  - Kernel implementation  
+  - Kernel implementation
     Core computation steps: After transferring the input data in, call `AscendC::SoftmaxFlashV2(xLocal, sumLocal, maxLocal, xLocal, expmaxLocal, sharedTmpBuffer, softmaxTiling)` to complete the SoftmaxFlashV2 computation, then transfer the result out.
 
-  - Tiling implementation  
+  - Tiling implementation
     The tiling implementation process for the softmaxflashv2 example is as follows: First split the shape by row count for multi-core processing, using average allocation aligned upward by the number of cores to determine the computation row count for the main core, then determine the tail core computation row count. For the main core computation shape, call the tiling function of the SoftmaxFlashV2 high-level API to obtain the tiling parameters required by the API. The tiling required by the high-level API for tail core computation is calculated by the kernel side independently.
 
-  - Invocation implementation  
+  - Invocation implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
 ## Build and Run

@@ -26,10 +26,10 @@ This example uses the Fill high-level API to initialize data in Global Memory to
 
 ## Example Description
 
-- Example function:  
+- Example function:
   This example uses the Fill high-level API to initialize data in Global Memory to a specified value in scenarios where Global Memory data needs to be pre-initialized, and combines it with the Add API to complete vector addition computation.
 
-- Example specifications:  
+- Example specifications:
   <table>
   <caption>Table 1: Example Input/Output Specifications</caption>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center">fill</td></tr>
@@ -45,26 +45,26 @@ This example uses the Fill high-level API to initialize data in Global Memory to
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">fill_custom</td></tr>
   </table>
 
-- Example implementation:  
+- Example implementation:
   This example implements a fill example with a fixed shape of input input_x[1, 256], input_y[1, 256], and output output_z[1, 256]. For detailed API information, refer to the [Fill API documentation](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/张量变换/Fill-97.md).
 
-  - Kernel implementation  
+  - Kernel implementation
     The computation logic includes the following steps:
     1. Use the Fill high-level API to initialize the output Global Memory to the blockIdx value of the current core.
     2. Use the Add API to perform vector addition.
     3. Use the SetAtomicAdd mode to accumulate the computation result into the output Global Memory.
 
-  - Tiling implementation  
+  - Tiling implementation
     In this example, no tiling implementation is required.
 
-  - Invocation implementation  
+  - Invocation implementation
     Use the kernel invocation operator <<<>>> to call the kernel function.
 
-## Build and Run  
+## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
 
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -83,7 +83,7 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
-  
+
   For example:
 
   ```bash

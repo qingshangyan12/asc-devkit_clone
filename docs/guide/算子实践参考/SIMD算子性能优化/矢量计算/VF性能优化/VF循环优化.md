@@ -57,10 +57,10 @@ Ascend 950PR/Ascend 950DT对应的架构中，Vector Function（VF）是实现�
 ```
 //【正例】被编译器优化为Hardware Loop
 // 嵌套循环
-for (uint16_t i = 0; i < LoopBound; i++) {            
-    for (uint16_t j = 0; j < LoopBound; j++) {   
-        for (uint16_t k = 0; k < LoopBound; k++) {   
-            for (uint16_t m = 0; m < LoopBound; m++) {  
+for (uint16_t i = 0; i < LoopBound; i++) {
+    for (uint16_t j = 0; j < LoopBound; j++) {
+        for (uint16_t k = 0; k < LoopBound; k++) {
+            for (uint16_t m = 0; m < LoopBound; m++) {
               // ...
             }
          }
@@ -75,7 +75,7 @@ for (uint16_t i = 0; i < LoopBound; i++) {     // Software Loop，循环内包�
         ...
     }
 }
- 
+
 for (uint16_t i = 2; i < LoopBound*3; i+=2){  // Software Loop，循环起始值不为0，循环步长不为1
 ...
 }
@@ -121,7 +121,7 @@ template<typename T>
 __simd_vf__ inline void DuplicateVF(__ubuf__ T* dstAddr, T scalarValue, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> dstReg;
-    AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T>();  
+    AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T>();
     for (uint16_t i = 0; i < repeatTimes; i++) {
         AscendC::Reg::Duplicate(dstReg, scalarValue);
         AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
@@ -135,7 +135,7 @@ template<typename T>
 __simd_vf__ inline void DuplicateVF(__ubuf__ T* dstAddr, T scalarValue, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> dstReg;
-    AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T>();  
+    AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T>();
     AscendC::Reg::Duplicate(dstReg, scalarValue);
     for (uint16_t i = 0; i < repeatTimes; i++) {
         AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);

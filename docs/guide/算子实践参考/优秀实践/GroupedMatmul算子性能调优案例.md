@@ -114,12 +114,12 @@ for i in range(g):
 
 固定8核进行测试的情况下，通过msprof op命令获取指令的cycle占比数据如下：
 
-**图1**  指令的cycle占比数据ArithmeticUtilization.csv（性能总耗时为218.1us）<a name="fig394318012515"></a>  
+**图1**  指令的cycle占比数据ArithmeticUtilization.csv（性能总耗时为218.1us）<a name="fig394318012515"></a>
 ![](../../figures/指令的cycle占比数据ArithmeticUtilization-csv（性能总耗时为218-1us）.png "指令的cycle占比数据ArithmeticUtilization-csv（性能总耗时为218-1us）")
 
 通过msprof op simulator获取到的指令流水图如下图所示：
 
-**图2**  指令流水图<a name="fig1566120572287"></a>  
+**图2**  指令流水图<a name="fig1566120572287"></a>
 ![](../../figures/指令流水图.png "指令流水图")
 
 结合上述两种数据（真实数据和仿真数据）进行性能分析：
@@ -154,8 +154,8 @@ for i in range(g):
             if (vecCount % taskRation != subBlockIdx) {
                 continue;  // AIV0和AIV1交替进行计算
             }
-            if (unlikely(offsetM + vecBaseM >= curCubeSingleM)) { 
-                curVecBaseM = curCubeSingleM - offsetM; 
+            if (unlikely(offsetM + vecBaseM >= curCubeSingleM)) {
+                curVecBaseM = curCubeSingleM - offsetM;
             }
             // 使用AscendDequant接口做perchannel反量化
             LocalTensor<cT::T> mmOutLocal = vecInQueue.AllocTensor<cT::T>();

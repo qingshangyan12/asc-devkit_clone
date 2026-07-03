@@ -36,7 +36,7 @@
 
 **表 1**  各接口模板参数isSetMask支持情况汇总表
 
-| 接口类别 | 接口名称 | Tensor前n个数计算 | Tensor高维切分计算 | 
+| 接口类别 | 接口名称 | Tensor前n个数计算 | Tensor高维切分计算 |
 | --- | --- | --- | --- |
 | 基础算术 | [Add](../SIMD-API/基础API/Memory矢量计算/基础算术/Add.md)、[Exp](../SIMD-API/基础API/Memory矢量计算/基础算术/Exp.md)、[Ln](../SIMD-API/基础API/Memory矢量计算/基础算术/Ln.md)、[Abs](../SIMD-API/基础API/Memory矢量计算/基础算术/Abs.md)、[Reciprocal](../SIMD-API/基础API/Memory矢量计算/基础算术/Reciprocal.md)、[Sqrt](../SIMD-API/基础API/Memory矢量计算/基础算术/Sqrt.md)、[Rsqrt](../SIMD-API/基础API/Memory矢量计算/基础算术/Rsqrt.md)、[Relu](../SIMD-API/基础API/Memory矢量计算/基础算术/Relu.md)、[Sub](../SIMD-API/基础API/Memory矢量计算/基础算术/Sub.md)、[Mul](../SIMD-API/基础API/Memory矢量计算/基础算术/Mul.md)、[Div](../SIMD-API/基础API/Memory矢量计算/基础算术/Div.md)、[Max](../SIMD-API/基础API/Memory矢量计算/基础算术/Max.md)、[Min](../SIMD-API/基础API/Memory矢量计算/基础算术/Min.md) | &bull; 无isSetMask。<br>&bull; 接口内已设置Mask。 | &bull; 有isSetMask。<br>&bull; 接口内通过模板参数控制。 |
 | 基础算术 | [BilinearInterpolation](../SIMD-API/基础API/Memory矢量计算/基础算术/BilinearInterpolation(ISASI).md) | - | &bull; 无isSetMask。<br>&bull; 接口内已设置Mask。 |

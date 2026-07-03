@@ -78,7 +78,7 @@
 ### 计算公式与样例规格
 
 #### SCENARIO_NUM=0（纯 Vector 计算场景，模式0）
-- 计算公式：  
+- 计算公式：
   $$
   z = \sum_{i=0}^{15} (x \times i)
   $$
@@ -96,7 +96,7 @@
   </table>
 
 #### SCENARIO_NUM=1（纯 Vector 计算场景，模式1）
-- 计算公式：  
+- 计算公式：
   $$
   z = (x \times 2) + (x \times 3)
   $$
@@ -114,7 +114,7 @@
   </table>
 
 #### SCENARIO_NUM=2（Cube 与 Vector 融合计算场景）
-- 计算公式：  
+- 计算公式：
   $$
   C = \text{LeakyRelu}(Cast(A) \times Cast(B))
   $$
@@ -187,11 +187,11 @@ $$
         Compute(a2Local, b2Local, c1Local);
         CopyOut(c1Local);
         // 模式0,8个AICore 包含的8个AIC同步
-        AscendC::CrossCoreSetFlag<0, PIPE_FIX>(SYNC_AIC_FLAG);  
-        AscendC::CrossCoreWaitFlag(SYNC_AIC_FLAG);  
+        AscendC::CrossCoreSetFlag<0, PIPE_FIX>(SYNC_AIC_FLAG);
+        AscendC::CrossCoreWaitFlag(SYNC_AIC_FLAG);
 
         // 模式2,每一个AICore内部，2个AIV等AIC
-        AscendC::CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_AIV_FLAG);  
+        AscendC::CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_AIV_FLAG);
 
 <p align="center">
   <img src="figures/融合场景_分块矩阵乘与原子累加阶段.png" width="100%">
@@ -241,13 +241,13 @@ $$
 (3) 步骤 3 对应代码片段如下，atomicResultGm 用于存储 16 个 AIV 全部搬运完成后的累加结果。通过调用 CrossCoreSetFlag 与 CrossCoreWaitFlag 接口，实现同步控制：确保 16 个 AIV 均完成 PIPE_MTE3 搬运指令后，方可执行 CrossCoreWaitFlag 后续指令
 
          // UB 到 GM 搬运启用原子累加：搬运至 atomicResult 的数据与原值累加后覆盖原值
-        AscendC::SetAtomicAdd<float>(); 
+        AscendC::SetAtomicAdd<float>();
         // DataCopy属于PIPE_MTE3流水操作
-        AscendC::DataCopy(atomicResultGm, xLocal, this->blockLength);   
+        AscendC::DataCopy(atomicResultGm, xLocal, this->blockLength);
         // 当本AIV完成前置PIPE_MTE3(DataCopy)流水操作后，通知其他AIV核，本AIV已经完成
-        AscendC::CrossCoreSetFlag<0, PIPE_MTE3>(0);  
+        AscendC::CrossCoreSetFlag<0, PIPE_MTE3>(0);
         // 阻塞本AIV继续往下执行指令，直到其他AIV全部都完成PIPE_MTE3流水操作，才解除阻塞往下执行。
-        AscendC::CrossCoreWaitFlag(0); 
+        AscendC::CrossCoreWaitFlag(0);
 
 上述同步完成之后，此时atomicResultGm已经是16个AIV中矢量计算结果的累加值。
 如果上一步骤的同步插入不正确，那么从atomicResultGm往AIV搬运的数据可能是部分AIV中矢量计算结果的累加值，导致结果不准确。
@@ -271,7 +271,7 @@ KernelMmad op;
 if ASCEND_IS_AIC {
     op.InitAIC(A, B, c);
     op.ProcessAIC();
-} 
+}
 if ASCEND_IS_AIV {
     op.InitAIV(a, b, A, B, c);
     op.ProcessAIV();
@@ -298,14 +298,14 @@ if ASCEND_IS_AIV {
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
-    
+
 - 样例执行
 
   在本样例目录下执行如下命令。
@@ -319,7 +319,7 @@ if ASCEND_IS_AIV {
   ```
 
   使用CPU调试或NPU仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
-  
+
   示例如下：
   ```bash
   cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # CPU调试模式

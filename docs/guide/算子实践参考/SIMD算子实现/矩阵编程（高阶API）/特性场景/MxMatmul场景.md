@@ -14,7 +14,7 @@ MX格式是一种块数据格式，若干个数据可以组成一个块（或者
 
 下图为MX格式的浮点数的数据结构，S、E和M分别用于表示浮点数的符号、指数和尾数字段的值。其中，共享缩放因子X是一个用于整个数据块的缩放比例因子，它决定了数据块中所有元素的动态范围。通过引入共享缩放因子，MX格式的数据能够在保持低位宽的同时，灵活地表示不同范围的数据。块大小k指的是组成一个数据块（或组）的低比特数据的数量。私有元素P<sub>i</sub>是指数据块中的每个低比特数据元素。这些元素经过缩放因子X的调整后，共同表示了一个高精度的浮点数或整数。
 
-**图1**  MX格式组成示意图<a name="zh-cn_topic_0000002270097206_fig11888194743220"></a>  
+**图1**  MX格式组成示意图<a name="zh-cn_topic_0000002270097206_fig11888194743220"></a>
 ![](../../../../figures/MX格式组成示意图.png "MX格式组成示意图")
 
 MX格式的数据类型包含多种，例如MXFP8、MXFP4、MXFP16、MXINT4等。下表列举了[MxMatmul场景](#zh-cn_topic_0000002270097206_section310824820358)（全称Microscaling Matmul）支持的数据类型。
@@ -101,21 +101,21 @@ MxMatmul的计算公式为：C = \(scaleA ⊗ A\) \* \(scaleB ⊗ B\) + Bias，�
 -   C为目的操作数，存放矩阵乘结果的矩阵，形状为\[M, N\]。
 -   Bias为矩阵乘偏置，形状为\[1, N\]。对\(scaleA ⊗ A\) \* \(scaleB ⊗ B\)结果矩阵的每一行都采用该Bias进行偏置。
 
-**图2**  MxMatmul矩阵乘示意图<a name="zh-cn_topic_0000002270097206_fig1942919398330"></a>  
+**图2**  MxMatmul矩阵乘示意图<a name="zh-cn_topic_0000002270097206_fig1942919398330"></a>
 ![](../../../../figures/MxMatmul矩阵乘示意图.png "MxMatmul矩阵乘示意图")
 
 矩阵A、scaleA、B、scaleB在不同位置中的排布格式分别如下图所示。
 
-**图3**  A矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig384531413014"></a>  
+**图3**  A矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig384531413014"></a>
 ![](../../../../figures/A矩阵在不同位置的排布格式.png "A矩阵在不同位置的排布格式")
 
-**图4**  B矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig674419451902"></a>  
+**图4**  B矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig674419451902"></a>
 ![](../../../../figures/B矩阵在不同位置的排布格式.png "B矩阵在不同位置的排布格式")
 
-**图5**  scaleA矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig107863142019"></a>  
+**图5**  scaleA矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig107863142019"></a>
 ![](../../../../figures/scaleA矩阵在不同位置的排布格式.png "scaleA矩阵在不同位置的排布格式")
 
-**图6**  scaleB矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig76682054103416"></a>  
+**图6**  scaleB矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig76682054103416"></a>
 ![](../../../../figures/scaleB矩阵在不同位置的排布格式.png "scaleB矩阵在不同位置的排布格式")
 
 ## 使用场景<a name="zh-cn_topic_0000002270097206_section118051016163613"></a>
@@ -202,7 +202,7 @@ Host侧自动获取Tiling参数的关键步骤介绍如下：
 
     ```
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
-    matmul_tiling::MatmulApiTiling cubeTiling(ascendcPlatform); 
+    matmul_tiling::MatmulApiTiling cubeTiling(ascendcPlatform);
     ```
 
     传入硬件平台信息创建PlatformAscendC对象，然后创建Tiling对象，硬件平台信息可以通过GetPlatformInfo获取。
@@ -253,8 +253,8 @@ Host侧自动获取Tiling参数的关键步骤介绍如下：
 
     ```
     MatmulCustomTilingData tiling;
-    if (cubeTiling.GetTiling(tiling.cubeTilingData) == -1){ 
-        return ge::GRAPH_FAILED;  
+    if (cubeTiling.GetTiling(tiling.cubeTilingData) == -1){
+        return ge::GRAPH_FAILED;
     }
     ```
 
@@ -266,12 +266,12 @@ Kernel侧的关键步骤介绍如下：
 
     ```
     // MxMatmul场景通过MatmulTypeWithScale定义A、scaleA、B、scaleB的参数类型信息
-    typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, isTransposeA> aType; 
+    typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, isTransposeA> aType;
     typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, isTransposeB> bType;
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType; 
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType; 
+    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType;
+    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
     // 定义matmul对象时，传入MatmulWithScalePolicy表明开启MxMatmul模板策略
-    AscendC::Matmul<aType, bType, cType, biasType, CFG_MDL, MatmulCallBackFunc<nullptr, nullptr, nullptr>, AscendC::Impl::Detail::MatmulWithScalePolicy> mm; 
+    AscendC::Matmul<aType, bType, cType, biasType, CFG_MDL, MatmulCallBackFunc<nullptr, nullptr, nullptr>, AscendC::Impl::Detail::MatmulWithScalePolicy> mm;
     ```
 
     创建对象时需要传入A、scaleA、B、scaleB、C、Bias的参数类型信息， A、scaleA、B、scaleB类型信息通过[MatmulTypeWithScale](#zh-cn_topic_0000002270097206_table14759942142014)来定义，C、Bias类型信息通过[MatmulType](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/Matmul使用说明.md)来定义，包括：内存逻辑位置、数据格式、数据类型、转置信息。同时，通过模板参数[MatmulPolicy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/MatmulPolicy.md)传入[MatmulWithScalePolicy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/MatmulPolicy.md)表明开启MxMatmul场景。
@@ -308,8 +308,8 @@ Kernel侧的关键步骤介绍如下：
     -   调用[Iterate](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/Iterate.md)完成单次迭代计算，叠加while循环完成单核全量数据的计算。Iterate方式，可以自行控制迭代次数，完成所需数据量的计算，方式比较灵活。
 
         ```
-        while (mm.Iterate()) {   
-            mm.GetTensorC(gm_c); 
+        while (mm.Iterate()) {
+            mm.GetTensorC(gm_c);
         }
         ```
 

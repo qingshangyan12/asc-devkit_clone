@@ -110,13 +110,13 @@ Mask操作的使用方式如下：
     AscendC::LocalTensor<half> dstLocal;
     AscendC::LocalTensor<half> src0Local;
     AscendC::LocalTensor<half> src1Local;
-    
+
     // 1、设置Normal模式
     AscendC::SetMaskNorm();
     // 2、设置Mask
     AscendC::SetVectorMask<half, AscendC::MaskMode::NORMAL>(0xffffffffffffffff, 0xffffffffffffffff);  // 逐bit模式
     // SetVectorMask<half, MaskMode::NORMAL>(128);  // 连续模式
-    
+
     // 3、多次调用矢量计算API, isSetMask模板参数设置为false，接口入参中的mask值设置为占位符MASK_PLACEHOLDER，用于占位，无实际含义
     // 根据使用场景配置repeatTime、dataBlockStride、repeatStride参数
     // dstBlkStride, src0BlkStride, src1BlkStride = 1,单次迭代内数据连续读取和写入
@@ -155,7 +155,7 @@ Mask操作的使用方式如下：
     ```
     AscendC::LocalTensor<half> dstLocal;
     AscendC::LocalTensor<half> src0Local;
-    half num = 2; 
+    half num = 2;
     // 1、设置Mask
     AscendC::SetVectorMask<half, AscendC::MaskMode::COUNTER>(128); // 参与计算的元素个数为128
     // 2、调用前n个数据计算API，isSetMask模板参数设置为false；接口入参中的calCount建议设置成1。
@@ -167,7 +167,7 @@ Mask操作的使用方式如下：
     AscendC::ResetMask();
     ```
 
->[!NOTE]说明 
+>[!NOTE]说明
 >- 前n个数据计算API接口内部会设置工作模式为Counter模式，所以如果前n个数据计算API配合Counter模式使用时，无需手动调用[SetMaskCount](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory矢量计算/掩码操作/SetMaskCount.md)设置Counter模式。
 >- 所有手动使用Counter模式的场景，使用完毕后，需要调用[SetMaskNorm](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory矢量计算/掩码操作/SetMaskNorm.md)恢复工作模式。
 >- 调用[SetVectorMask](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory矢量计算/掩码操作/SetVectorMask.md)设置Mask，使用完毕后，需要调用[ResetMask](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory矢量计算/掩码操作/ResetMask.md)恢复Mask值为默认值。

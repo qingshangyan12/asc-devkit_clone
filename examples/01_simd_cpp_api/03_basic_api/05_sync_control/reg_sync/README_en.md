@@ -51,7 +51,7 @@ This example implements a synchronization mechanism for UB (Unified Buffer) read
 <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="3" align="center">reg_sync</td></tr>
 </table>
 
-- Example implementation  
+- Example implementation
 1. Call the LoadAlign interface to read data from the UB address dataAddr and write it to reg0
 2. Perform Exp computation on reg0, writing the result back to reg0
 3. Call the StoreAlign interface to write the computed reg0 back to the same dataAddr
@@ -60,7 +60,7 @@ This example implements a synchronization mechanism for UB (Unified Buffer) read
 1. In steps 1 and 3 above, LoadAlign and StoreAlign operate on the same address, requiring the timing of reading UB first and then writing UB
 2. Because reading UB and writing UB use the same register reg0, hardware register ordering is triggered, and instructions execute in code order without inserting synchronization instructions
 
-- Invocation implementation  
+- Invocation implementation
   Use the kernel invocation operator `<<<>>>` to call the kernel function, launching 1 core.
 
 ### Scenario 2: LocalMemBar (Write-Read Dependency)
@@ -76,8 +76,8 @@ This example implements a synchronization mechanism for UB (Unified Buffer) read
 <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="3" align="center">reg_sync</td></tr>
 </table>
 
-- Example implementation 
- 
+- Example implementation
+
 1. Find the maximum value of all input data x, and fill maxReg with the maximum value
 2. Compute the difference between input data and the maximum value sequentially, then take the natural exponent of the difference, that is, expReg = exp(srcReg - maxReg)
 3. Call the StoreAlign interface to transfer the exp result to the temporary buffer (tmpLocal) in UB
@@ -91,19 +91,19 @@ This example implements a synchronization mechanism for UB (Unified Buffer) read
 2. Manually call the LocalMemBar interface to insert synchronization between VEC_STORE and VEC_LOAD to ensure instructions execute in code order
 3. Without LocalMemBar, step 5 may execute first, reading old data from tmpLocal that has not been updated by step 3
 
-- Invocation implementation  
+- Invocation implementation
   Use the kernel invocation operator `<<<>>>` to call the kernel function, launching 1 core.
 
 ## Build and Run
 Run the following steps in the root directory of this example to build and run the operator.
-- Configure environment variables  
+- Configure environment variables
   Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
   > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
-    
+
 - Run the example
 
   Run the following commands in the example directory.
@@ -135,7 +135,7 @@ Run the following steps in the root directory of this example to build and run t
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `1`, `2` | Scenario number: 1=Register ordering, 2=LocalMemBar |
 
-- Execution result  
+- Execution result
   The following execution result indicates that the accuracy comparison is successful.
 
   ```bash

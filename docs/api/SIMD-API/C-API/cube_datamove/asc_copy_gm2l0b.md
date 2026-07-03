@@ -68,7 +68,7 @@ PIPE_MTE2
 //搬运的起始分块为1
 constexpr uint16_t base_idx = 1;
 //搬运的迭代次数为2
-constexpr uint8_t repeat = 2; 
+constexpr uint8_t repeat = 2;
 //输入的搬运步长为0字节，输出的搬运步长为1024字节
 constexpr uint16_t src_stride = 0;
 constexpr uint16_t dst_gap = 1;

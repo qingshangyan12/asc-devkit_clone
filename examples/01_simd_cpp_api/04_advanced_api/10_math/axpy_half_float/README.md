@@ -27,10 +27,10 @@
 
 ## 样例描述
 
-- 样例功能：  
+- 样例功能：
   Axpy样例实现了源操作数src中每个元素与标量求积后和目的操作数dst中的对应元素相加，并返回计算结果的功能。
 
-  对应的数学表达式为：  
+  对应的数学表达式为：
 
   $$
   out = x * scalar + out
@@ -46,7 +46,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">kernel_vec_ternary_scalar_Axpy_half_2_float</td></tr>
   </table>
 
-- 样例实现：  
+- 样例实现：
   本样例中实现的是固定shape为输入x[4, 128], 输出out[4, 128]的Axpy样例。
   - Kernel实现
 
@@ -56,14 +56,14 @@
 
     Host侧通过GetAxpyMaxMinTmpSize获取Axpy接口计算所需的最大和最小临时空间。
 
-  - 调用实现  
+  - 调用实现
     使用内核调用符<<<>>>调用核函数。
 
-## 编译运行  
+## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -83,7 +83,7 @@
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
-  
+
   示例如下：
 
   ```bash

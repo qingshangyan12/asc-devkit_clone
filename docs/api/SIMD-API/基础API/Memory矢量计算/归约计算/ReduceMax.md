@@ -201,7 +201,7 @@
     - 需要返回最大值索引：
 
         ```cpp
-        int firstMaxRepeat = repeatTime; 
+        int firstMaxRepeat = repeatTime;
         // 对于tensor高维切分计算接口，firstMaxRepeat就是repeatTime；对于tensor前n个数据计算接口，firstMaxRepeat为count/elementsPerRepeat
         int iter1OutputCount = firstMaxRepeat * 2;                                            // 第一轮操作产生的元素个数
         int iter2AlignStart = RoundUp(iter1OutputCount, elementsPerBlock) * elementsPerBlock; // 第二轮操作起始位置偏移，即第一轮产生的元素个数按照datablock(32字节)向上对齐的结果
