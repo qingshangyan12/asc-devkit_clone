@@ -50,7 +50,7 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 <a href="./快速入门/异构系统与编程模型.md" style="color: #3b82f6; font-size: 14px;">异构系统与SIMD/SIMT编程模型介绍</a>
 </li>
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
-<strong style="color: #1a1a1a;">📝 动手实践</strong><br/>
+<strong style="color: #1a1a1a;">💻 动手实践</strong><br/>
 <a href="./快速入门/基于SIMD编程/基于SIMD编程.md" style="color: #3b82f6; font-size: 14px;">SIMD算子快速入门</a><br/>
 <a href="./快速入门/基于SIMT编程/基于SIMT编程.md" style="color: #3b82f6; font-size: 14px;">SIMT算子快速入门</a>
 </li>
@@ -81,7 +81,7 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 <a href="../编程指南/高级编程/高级特性/AI框架算子适配/PyTorch框架.md" style="color: #3b82f6; font-size: 14px;">PyTorch框架适配</a>
 </li>
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
-<strong style="color: #1a1a1a;">📝 实践巩固</strong><br/>
+<strong style="color: #1a1a1a;">💻 实践巩固</strong><br/>
 <span style="color: #666; font-size: 14px;">• <a href="../算子实践参考/SIMD算子实现/矢量编程/概述.md" style="color: #3b82f6; font-size: 14px;">SIMD矢量算子</a></span><br/>
 <span style="color: #666; font-size: 14px;">• <a href="../算子实践参考/SIMD算子实现/矩阵编程（基础API）/分离模式.md" style="color: #3b82f6; font-size: 14px;">SIMD矩阵算子</a></span><br/>
 <span style="color: #666; font-size: 14px;">• <a href="../算子实践参考/SIMT算子实现/算子实现.md" style="color: #3b82f6; font-size: 14px;">SIMT算子</a></span>
@@ -103,7 +103,7 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 <span style="color: #666; font-size: 14px;">• <a href="../编程指南/高级编程/高级特性/AI框架算子适配/概述.md" style="color: #3b82f6; font-size: 14px;">AI框架算子适配</a></span>
 </li>
 <li style="margin: 10px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
-<strong style="color: #1a1a1a;">📝 实践巩固</strong><br/>
+<strong style="color: #1a1a1a;">💻 实践巩固</strong><br/>
 <a href="../算子实践参考/SIMD与SIMT混合算子实现/算子实现.md" style="color: #3b82f6; font-size: 14px;">典型SIMD & SIMT混合算子开发</a><br/>
 <a href="https://gitcode.com/cann/cann-samples" style="color: #3b82f6; font-size: 14px;">Ascend C算子高性能实践样例仓</a>
 </li>
