@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例以 `asc_atomic_add()` 原子加为例，在相同原子加总次数下，展示内存层级（Global Memory / Unified Buffer）、数据类型（int32 / int64）、是否使用返回值、以及计数器在内存中的排布密度对原子加性能的影响，并给出相应的优化指导。程序本身只输出场景信息和正确性校验结果，性能数据统一通过外部 Profiling 工具（`msprof op`）采集。
+本样例以 `asc_atomic_add()` 原子加为例，在相同原子加总次数下，展示内存层级（Global Memory / Unified Buffer）、数据类型（int32 / int64）、以及是否使用返回值对原子加性能的影响，并给出相应的优化指导。程序本身只输出场景信息和正确性校验结果，性能数据统一通过外部 Profiling 工具（`msprof op`）采集。
 
 ## 支持的产品
 
@@ -24,7 +24,7 @@
 
 ## 样例描述
 
-本样例通过 `SCENARIO_NUM` 选择一个待测场景，每次运行只启动一个目标 kernel，便于外部 Profiling 工具采集单场景性能数据。8 个场景覆盖 4 组对照维度：
+本样例通过 `SCENARIO_NUM` 选择一个待测场景，每次运行只启动一个目标 kernel，便于外部 Profiling 工具采集单场景性能数据。6 个场景覆盖 3 组对照维度：
 
 | 场景编号 | 内存位置 | 数据类型 | 是否使用返回值 | 对照维度 |
 |:---:|:---:|:---:|:---:|---|
@@ -34,14 +34,11 @@
 | 4 | Global Memory | int64_t | 否 | 返回值开销对照（对场景3） |
 | 5 | Unified Buffer | int32_t | 是 | 内存层级对照（对场景1） |
 | 6 | Unified Buffer | int32_t | 否 | 返回值开销对照（对场景5） |
-| 7 | Global Memory | int32_t | 是 | slot 按 `SLOT_STRIDE` 间距排布，cacheline 伪共享扫描（int32） |
-| 8 | Global Memory | int64_t | 是 | slot 按 `SLOT_STRIDE` 间距排布，cacheline 伪共享扫描（int64） |
 
 - 计算逻辑：
   - GM 场景：GM counter 数组长度为 `SLOTS`（默认 1024），每个线程根据 `global_tid % SLOTS` 选择一个 slot 执行原子加；host 侧逐 slot 校验计数并校验总和等于 `TOTAL_ATOMIC_ADDS`。
   - UB 场景：每个 ThreadBlock 内使用长度为 1024 的 UB counter 数组，每个线程根据 `global_tid % 1024` 选择一个 slot 执行原子加，kernel 结束前将每个 Block 的 1024 个 slot 写回 GM，host 侧逐 slot 校验。
   - 带返回值场景：每次 `asc_atomic_add()` 返回的旧值写入线程本地 `volatile` 变量，防止返回值路径被编译器优化掉，同时避免引入额外累加和 GM 写回。
-  - 场景 7/8：逻辑分别与场景 1、场景 3 完全相同（带返回值），仅把相邻 slot 在 GM 中拉开 `SLOT_STRIDE` 个本类型元素，用于扫描 cacheline 打包密度对串行化的影响。
 
 - 原子加总次数：
 
@@ -123,39 +120,9 @@
 
 - 反直觉：窄类型 int32 反而比宽类型 int64 慢约 **2 倍**。对比两者 metric，事务笔数、字节数、指令数完全相同，唯一差 2 倍的是 `aiv_total_cycles`（≈36.0M vs ≈18.0M，干净的 2.0×）。
 - 根因是 **cacheline 伪共享串行化**：GM 原子 RMW 以一条 **128B cacheline** 为串行化粒度，同一条 line 上的所有原子操作排一条队逐笔执行——哪怕是两个独立地址。int32 每条 line 挤进 32 个计数器、int64 只挤 16 个，i32 的 line 内密度恰为 i64 的 2 倍，队列长一倍，周期翻倍。
-- 这与"int32 这个类型本身"无关，纯粹是排布密度差异。Case 4 用 stride 扫描证实了这一点。
+- 这与"int32 这个类型本身"无关，主要来自紧密排布下每条 cacheline 的计数器密度差异。
 
 **结论**：不要凭"类型更窄应更快"的直觉给高竞争 GM 计数器选 int32。紧密布局下窄类型每条 cacheline 打包更密，竞争反而更重。
-
----
-
-### Case 4：计数器排布密度——cacheline 伪共享扫描
-
-**样例目标**：通过拉开相邻计数器在 GM 中的间距，验证 GM 原子的串行化粒度，并给出消除伪共享的方法。
-
-**核心实现**：场景 7（int32）/场景 8（int64）逻辑与场景 1/3 完全相同（带返回值、每 slot 12 线程真竞争），仅把相邻 slot 拉开 `SLOT_STRIDE` 个本类型元素，只改变 cacheline 打包密度、不改变真竞争量。
-
-**性能数据**（48×256×256，扫 `SLOT_STRIDE`）：
-
-| `SLOT_STRIDE` | 每 128B line 计数器数 | int32 间距 | int32（μs） | int64 间距 | int64（μs） | 偏差 |
-|:---:|:---:|:---:|---:|:---:|---:|:---:|
-| 1 | 32（仅 i32） | 4B | 22226.78 | — | — | — |
-| 2 | 16 | 8B | 11248.16 | 8B | 11291.87 | 0.4% |
-| 4 | 8 | 16B | 5552.79 | 16B | 5548.53 | 0.1% |
-| 8 | 4 | 32B | 3000.70 | 32B | 3006.00 | 0.2% |
-| 16 | 2 | 64B | 1526.90 | 64B | 1531.57 | 0.3% |
-| 32 | 1（独占 128B line） | 128B | 1050.29 | 128B | 1059.55 | 0.9% |
-
-**分析**：
-
-- **耗时只取决于"每条 128B line 装几个计数器"，与数据类型完全无关。** 把横轴从 stride 换成"每 128B line 计数器数"后，int32 与 int64 两条曲线处处重合（偏差 < 1%）。
-- **串行化粒度实测为 128B**：间距每翻一倍耗时几乎干净减半，直到每计数器独占一条 128B line 时触底（i32 stride=32→1050μs，i64 stride=16→1060μs）；再拉一倍到 256B 仅降约 3%，证实粒度就是一整条 128B cacheline。
-- 耗时线性正比于每 line 计数器数 n，拟合 `T ≈ 275 + 686 × n`。
-- 从紧密排布到 128B 隔离，int32 提速约 **21 倍**（1050 vs 22344μs），比 int64 紧密排布还快约 **10.7 倍**。
-
-**结论**：高竞争 GM 原子计数器应按 cacheline 对齐——让每个计数器独占 128B（或填充到 ≥128B 间距），可彻底消除伪共享串行化。
-
-> **UB 无需 cacheline 对齐：** 补充实测表明，UB 上的 `asc_atomic_add` 不存在 cacheline 伪共享，且对真竞争也基本不敏感（同一 block 内 256 线程全砸同一 UB 地址，仅比无竞争慢约 2%）。伪共享规避手段是 GM（L2 原子串行化）专属问题，搬到 UB 上强行按 128B 填充只会白白放大 UB 占用。详见 `PROFILING_REPORT.md` §7 与 `CACHELINE_FALSE_SHARING_CUDA.md`。
 
 ---
 
@@ -165,15 +132,13 @@
 |---|---|---|---|
 | 内存层级 | UB（60μs） vs GM（22344μs） | ~375× | 原子累加尽量收敛到 UB 等靠近计算单元的层级 |
 | 返回值 | int32 丢弃返回值（137μs） vs 带返回值（22344μs） | ~163× | 不需要旧值时丢弃返回值，可触发本地聚合快路径 |
-| cacheline 对齐 | int32 128B 独占（1050μs） vs 紧密排布（22344μs） | ~21× | 高竞争 GM 计数器按 128B cacheline 对齐/填充 |
-| 数据类型 | 同排布密度下 int32 ≈ int64 | ~1× | 类型选择不影响原子性能，密度才是关键 |
+| 数据类型 | int32 紧密排布（22344μs） vs int64 紧密排布（11239μs） | ~0.5× | 不要只按类型宽窄推断原子性能，紧密布局下窄类型竞争可能更重 |
 
 ## 调优建议
 
 1. **优先降低原子操作的内存层级**：GM 原子在 L2 上串行执行、延迟高，UB 原子在计算核内执行、快两到三个数量级。能在 block 内私有内存完成的原子累加不要放到 GM。
 2. **纯计数场景丢弃返回值**：读回旧值会使部分类型（如 int32）退出本地聚合快路径，退回逐笔串行 RMW，代价可能相差百倍以上。
-3. **高竞争 GM 计数器按 128B cacheline 对齐**：GM 原子以 128B cacheline 为串行化粒度，落在同一条 line 上的独立计数器会互相排队（伪共享）。为每个计数器填充到独占 128B 可获得约 20 倍收益。
-4. **不要以数据类型宽窄推断原子性能**：性能取决于每条 cacheline 的计数器打包密度，而非类型本身。紧密布局下窄类型密度更高，竞争反而更重。
+3. **不要以数据类型宽窄推断原子性能**：性能取决于每条 cacheline 的计数器打包密度，而非类型本身。紧密布局下窄类型密度更高，竞争反而更重。
 
 ## 编译运行
 
@@ -205,11 +170,10 @@
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT） |
-  | `SCENARIO_NUM` | `1`-`8` | 待测场景编号 |
+  | `SCENARIO_NUM` | `1`-`6` | 待测场景编号 |
   | `BLOCK_NUM` | 正整数 | ThreadBlock数量 |
   | `THREADS_PER_BLOCK` | 正整数 | 每个ThreadBlock中的线程数 |
   | `ITERATIONS` | 正整数 | 每个线程执行的原子加次数 |
-  | `SLOT_STRIDE` | 正整数 | 相邻slot的元素间距，仅场景7/8生效 |
   | `SKIP_VALIDATION` | `ON`/`OFF` | 是否跳过结果校验，默认`OFF`。使用`msprof op`采集GM场景时建议设为`ON` |
 
   执行结果如下，说明正确性校验通过。
@@ -230,10 +194,10 @@ make -j
 msprof op --launch-count=1 ./atomic_add_perf
 ```
 
-完整采集流程、各场景原始数据、metric 分析（含 cacheline 伪共享的 stride 扫描与 UB 对照实验）见同目录 `PROFILING_REPORT.md`。
+完整采集流程、各场景原始数据、metric 分析见同目录 `PROFILING_REPORT.md`。
 
 > **规模与超时说明：** `msprof op` 为采集多种 metric 会对同一 kernel 做 warmup 并多次 replay。若单次 kernel 耗时过长（超过 stream 同步超时，默认 10s），replay 会失败并报 `Stream synchronize timeout`。各场景敏感度差异很大：
-> - **GM 场景（1-4、7-8）** 按 `global_tid % SLOTS` 分散竞争，调大 workload 后仍可能因原子竞争触发较长耗时。需要 `msprof op` 采集时建议 `total_atomic_adds` 不超过约 2000 万，`BLOCK_NUM` 也不宜过大（动态插桩对 sub block 总数有限制，过大时会有 `sub blocks exceeding 108` 告警导致部分插桩数据丢失）。
+> - **GM 场景（1-4）** 按 `global_tid % SLOTS` 分散竞争，调大 workload 后仍可能因原子竞争触发较长耗时。需要 `msprof op` 采集时建议 `total_atomic_adds` 不超过约 2000 万，`BLOCK_NUM` 也不宜过大（动态插桩对 sub block 总数有限制，过大时会有 `sub blocks exceeding 108` 告警导致部分插桩数据丢失）。
 > - **UB 场景（5-6）** 通常明显快于 GM，常规调参基本不会触及超时。
 >
 > 因此默认 workload 已设为较小的 `total_atomic_adds=131072`。仅做**裸跑压测**（不挂 msProf）时可自由调大。
