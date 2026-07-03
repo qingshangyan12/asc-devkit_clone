@@ -1,6 +1,6 @@
 # 单算子API调用<a name="ZH-CN_TOPIC_0000001566407580"></a>
 
-单算子API调用方式，是指直接调用单算子API接口，基于C语言的API执行算子。算子工程创建完成后，基于工程代码框架完成算子原型定义、kernel侧算子实现、host侧tiling实现，通过工程编译脚本完成算子的编译部署，之后再进行单算子API的调用。
+单算子API调用方式，是指直接调用单算子API接口，基于C语言的API执行算子。算子工程创建完成后，基于工程代码框架完成算子原型定义、Kernel 侧算子实现、Host 侧 tiling 实现，通过工程编译脚本完成算子的编译部署，之后再进行单算子API的调用。
 
 ## 基本原理<a name="section9403945674"></a>
 
@@ -50,7 +50,7 @@ aclnnStatus aclnnXxx(void *workspace, uint64_t workspaceSize, aclOpExecutor *exe
 aclnnStatus aclnnXxxTensorGetWorkspaceSize(const aclTensor *src, ..., aclTensor *out, uint64_t *workspaceSize, aclOpExecutor **executor);
 ```
 
-**在aclnn_Xxx_TensorGetWorkspaceSize**中，**aclnn_Xxx_GetWorkspaceSize**参数的数据类型（aclIntArray、aclFloatArray和aclBoolArray）将被转换为aclTensor数据类型，其他输入输出参数生成规则与**aclnn_Xxx_GetWorkspaceSize**一致。如下示例中，x0、x1、x2是算子声明为数据依赖的输入，数据类型分别为DT\_INT64、DT\_BOOL、DT\_FLOAT，out是算子输出。
+**在 aclnn_Xxx_TensorGetWorkspaceSize** 中，**aclnn_Xxx_GetWorkspaceSize** 参数的数据类型（aclIntArray、aclFloatArray和aclBoolArray）将被转换为aclTensor数据类型，其他输入输出参数生成规则与**aclnn_Xxx_GetWorkspaceSize**一致。如下示例中，x0、x1、x2是算子声明为数据依赖的输入，数据类型分别为DT\_INT64、DT\_BOOL、DT\_FLOAT，out是算子输出。
 
 ```
 aclnnStatus aclnnXxxGetWorkspaceSize(const aclIntArray *x0, const aclBoolArray *x1, const aclFloatArray *x2, aclTensor *out, uint64_t *workspaceSize, aclOpExecutor **executor);
@@ -61,7 +61,7 @@ aclnnStatus aclnnXxxTensorGetWorkspaceSize(const aclTensor *x0, const aclTensor 
 
 -   参考[创建算子工程](创建算子工程.md)完成自定义算子工程的创建。
 -   参考[Kernel侧算子实现](Kernel侧算子实现.md)完成kernel侧实现的相关准备，参考[Host侧Tiling实现](Host侧Tiling实现/基本流程.md)、[算子原型定义](算子原型定义.md)完成host侧实现相关准备。
--   对于算子包编译场景，参考[算子工程编译](算子包编译/算子工程编译.md)、[算子包部署](算子包编译/算子包部署.md)完成算子的编译部署，编译部署时需要开启算子的二进制编译功能：修改算子工程中的编译配置项文件CMakePresets.json，将ENABLE\_BINARY\_PACKAGE设置为True。编译部署时可将算子的二进制部署到当前环境，便于后续算子的调用。
+-   对于算子包编译场景，参考[算子工程编译](算子包编译/算子工程编译.md)、[算子包部署](算子包编译/算子包部署.md)完成算子的编译部署，编译部署时需要开启算子的二进制编译功能：修改算子工程中的编译配置项文件 CMakePresets.json，将 ENABLE\_BINARY\_PACKAGE 设置为 True。编译部署时可将算子的二进制部署到当前环境，便于后续算子的调用。
 
     ```
     "ENABLE_BINARY_PACKAGE": {
@@ -202,7 +202,7 @@ CHECK_ACL(aclnnFinalize());
     ```
 
 2.  编译样例工程，生成单算子验证可执行文件。
-    1.  切换到样例工程根目录，然后在样例工程根目录下执行如下命令创建目录用于存放编译文件，例如，创建的目录为“build“。
+    1.  切换到样例工程根目录，然后在样例工程根目录下执行如下命令创建目录用于存放编译文件，例如，创建的目录为“build”。
 
         ```
         mkdir -p build
@@ -223,7 +223,7 @@ CHECK_ACL(aclnnFinalize());
         make
         ```
 
-        会在工程目录的output目录下生成可执行文件**execute\_add\_op**。
+        会在工程目录的 output 目录下生成可执行文件**execute\_add\_op**。
 
 3.  执行单算子
     1.  以运行用户（例如HwHiAiUser）拷贝开发环境中样例工程output目录下的**execute\_add\_op**到运行环境任一目录。
