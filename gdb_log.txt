@@ -1,0 +1,1759 @@
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <https://debuginfod.ubuntu.com>
+Enable debuginfod for this session? (y or [n]) [answered N; input not from terminal]
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+Python Exception <class 'ModuleNotFoundError'>: No module named 'math'
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/aarch64-linux-gnu/libthread_db.so.1".
+[==========] Running 23 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 23 tests from TestTiling
+[ RUN      ] TestTiling.TestAddInputTdMallocFailed
+[context_builder_impl.cpp:430][ReadBinFile] Path[./test_data.bin] is not exist.
+[context_builder_impl.cpp:209][AddInputTd] Add Input Idx :0 error, file path is invalid
+[context_builder_impl.cpp:104][BuildTilingContext] Build Context Error!
+[       OK ] TestTiling.TestAddInputTdMallocFailed (0 ms)
+[ RUN      ] TestTiling.GetShapeSize
+[shape.cpp:125]422377 GetShapeSize: ErrorNo: 4294967295(Ascend Log Tiling Sink) [Check][Overflow] mul overflow: 9223372036854775807, 9223372036854775807[shape.cpp:125]422377 GetShapeSize: ErrorNo: 4294967295(Ascend Log Tiling Sink) [Check][Overflow] mul overflow: -9223372036854775808, -9223372036854775808[shape.cpp:125]422377 GetShapeSize: ErrorNo: 4294967295(Ascend Log Tiling Sink) [Check][Overflow] mul overflow: 9223372036854775807, -9223372036854775808[shape.cpp:125]422377 GetShapeSize: ErrorNo: 4294967295(Ascend Log Tiling Sink) [Check][Overflow] mul overflow: -9223372036854775808, 9223372036854775807[       OK ] TestTiling.GetShapeSize (0 ms)
+[ RUN      ] TestTiling.TestPlatformAscendCReserveLocalMemory
+[platform_ascendc.cpp:199][ReserveLocalMemory] failed to find ReserveSize, current enum id is 5
+[       OK ] TestTiling.TestPlatformAscendCReserveLocalMemory (0 ms)
+[ RUN      ] TestTiling.TestKernelContextBuild
+[       OK ] TestTiling.TestKernelContextBuild (0 ms)
+[ RUN      ] TestTiling.TestTilingContextBuildWithBinFile
+[context_builder_impl.cpp:452][GetTensorSizeByStorageShape] Add Input Idx Invalid: shape size overflow.
+[context_builder_impl.cpp:141][AddInputTd] tensor idx: 1 size is below 0
+[context_builder_impl.cpp:452][GetTensorSizeByStorageShape] Add Input Idx Invalid: shape size overflow.
+[context_builder_impl.cpp:141][AddInputTd] tensor idx: 2 size is below 0
+[context_builder_impl.cpp:430][ReadBinFile] Path[./expert_tokens_data.bin] is not exist.
+[context_builder_impl.cpp:209][AddInputTd] Add Input Idx :3 error, file path is invalid
+[context_builder_impl.cpp:452][GetTensorSizeByStorageShape] Add Input Idx Invalid: shape size overflow.
+[context_builder_impl.cpp:141][AddInputTd] tensor idx: 4 size is below 0
+[context_builder_impl.cpp:104][BuildTilingContext] Build Context Error!
+[context_builder_impl.cpp:424][ReadBinFile] Path[FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF] is too long.
+[context_builder_impl.cpp:209][AddInputTd] Add Input Idx :1 error, file path is invalid
+[context_builder_impl.cpp:420][ReadBinFile] Path is NULL.
+[context_builder_impl.cpp:209][AddInputTd] Add Input Idx :2 error, file path is invalid
+[context_builder_impl.cpp:430][ReadBinFile] Path[./expert_tokens_data.bin] is not exist.
+[context_builder_impl.cpp:209][AddInputTd] Add Input Idx :3 error, file path is invalid
+[context_builder_impl.cpp:104][BuildTilingContext] Build Context Error!
+[       OK ] TestTiling.TestTilingContextBuildWithBinFile (448 ms)
+[ RUN      ] TestTiling.TestTilingContextBuildWithConstValue
+[       OK ] TestTiling.TestTilingContextBuildWithConstValue (233 ms)
+[ RUN      ] TestTiling.TestTilingContextBuildWithConstValue350
+[       OK ] TestTiling.TestTilingContextBuildWithConstValue350 (233 ms)
+[ RUN      ] TestTiling.TestTilingContextBuildFailed
+[context_builder_impl.cpp:452][GetTensorSizeByStorageShape] Add Input Idx Invalid: shape size overflow.
+[context_builder_impl.cpp:163][AddInputTd] tensor idx: 0 size is below 0
+[context_builder_impl.cpp:104][BuildTilingContext] Build Context Error!
+[       OK ] TestTiling.TestTilingContextBuildFailed (16 ms)
+[ RUN      ] TestTiling.TestOpTilingRegistryLoadTilingLibrary
+[context_builder.cpp:65][LoadTilingLibrary] tilingSoPath is null.
+[context_builder.cpp:74][LoadTilingLibrary] OpTilingRegistry Tiling so path [testsopath] is not exist.
+[context_builder.cpp:74][LoadTilingLibrary] OpTilingRegistry Tiling so path [11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111] is not exist.
+[context_builder.cpp:83][LoadTilingLibrary] OpTilingRegistry dlopen so path [] failed.
+[context_builder.cpp:90][LoadTilingLibrary] OpTilingRegistry get TbeLoadSoAndSaveToRegistry func failed.
+[       OK ] TestTiling.TestOpTilingRegistryLoadTilingLibrary (0 ms)
+[ RUN      ] TestTiling.TestOpTilingRegistryGetTilingFunc
+[       OK ] TestTiling.TestOpTilingRegistryGetTilingFunc (0 ms)
+[ RUN      ] TestTiling.TestTilingContextIoFailed
+[context_builder_impl.cpp:452][GetTensorSizeByStorageShape] Add Input Idx Invalid: shape size overflow.
+[context_builder_impl.cpp:163][AddInputTd] tensor idx: 0 size is below 0
+[context_builder_impl.cpp:104][BuildTilingContext] Build Context Error!
+[       OK ] TestTiling.TestTilingContextIoFailed (15 ms)
+[ RUN      ] TestTiling.TestGetSocVersion
+[platform_ascendc.cpp:210][GetSocVersion] platform do not support get socVersion!
+[       OK ] TestTiling.TestGetSocVersion (0 ms)
+[ RUN      ] TestTiling.TestGetNpuArchFailed
+[platform_ascendc.cpp:221][GetCurNpuArch] platform do not support get npu arch!
+[       OK ] TestTiling.TestGetNpuArchFailed (0 ms)
+[ RUN      ] TestTiling.TestCoreNum
+[platform_ascendc.cpp:111][GetCoreNumByType] get platform failed, val is 
+[platform_ascendc.cpp:122][GetCoreNumByType] get platform failed, key is ai_core_cnt, val is 
+[platform_ascendc.cpp:111][GetCoreNumByType] get platform failed, val is 
+[platform_ascendc.cpp:122][GetCoreNumByType] get platform failed, key is ai_core_cnt, val is 
+[       OK ] TestTiling.TestCoreNum (0 ms)
+[ RUN      ] TestTiling.TestGetLibApiWorkSpaceSize
+[platform_ascendc.cpp:221][GetCurNpuArch] platform do not support get npu arch!
+[platform_ascendc.cpp:277][GetLibApiWorkSpaceSize] get platform failed, CurNpuArch is NpuArch::DAV_RESV
+[       OK ] TestTiling.TestGetLibApiWorkSpaceSize (0 ms)
+[ RUN      ] TestTiling.TestPlatformAscendCManager
+[New Thread 0xfffff4d8ee60 (LWP 422388)]
+[New Thread 0xfffff457ee60 (LWP 422389)]
+[platform_manager_v2.cpp:119]422377 AssemblePlatformInfoVector:Failed to initialize platform: 
+0
+Intrinsic_vshl
+int16
+uint16
+int32
+uint32
+)
+Intrinsic_vcmpvs_gt
+float16
+float32
+2
+Intrinsic_set_l1
+f16
+u16
+s16
+f32
+s32
+u32
+ 
+Intrinsic_vmrgsort4	
+float16
+2
+Intrinsic_vmin 
+float16
+float32
+int32
+int16
++
+Intrinsic_vcmp
+float16
+float32
+int16
+*
+Intrinsic_vmulconv
+u8f16f16
+s8f16f16
+3
+Intrinsic_vmuls 
+float16
+float32
+int32
+int16
+C
+Intrinsic_vcopy0
+int16
+uint16
+float16
+float32
+int32
+uint32
+F
+Intrinsic_vaxpy3
+	f16f16f16
+	f32f32f32
+	f32f16f16
+float16
+float32
+
+
+Intrinsic_clz
+uint64
+,
+Intrinsic_vrelu
+float16
+float32
+int32
+C
+Intrinsic_data_move_l12bt&
+u8
+s8
+f16
+u16
+s16
+f32
+s32
+u32
+;
+&Intrinsic_fix_pipe_pre_act_scalar_relu
+f16
+s8
+u8
+s4
+*
+Intrinsic_vbitsort32
+float16
+float32
+,
+Intrinsic_fix_pipe_l0c2l1
+f32
+s32
+f16
+
+Intrinsic_bcnt0
+uint64
+6
++Intrinsic_fix_pipe_post_transform_func_list
+nz2nd
+#
+
+Intrinsic_vbi
+float16
+float32
+!
+
+Intrinsic_min
+int64
+float32
+$
+Intrinsic_vexp
+float16
+float32
+0
+Intrinsic_vtranspose
+uint16
+int16
+float16
+0
+Intrinsic_vcmpvs_eq
+float16
+float32
+int32
+
+Intrinsic_vbitsort	
+float16
+O
+$Intrinsic_fix_pipe_pre_act_func_list'
+normal_relu
+scalar_relu
+vector_relu
+
+Intrinsic_mmad
+u32u8u8
+s32s8s8
+s32u8s8
+	f16f16f16
+	f32f16f16
+f16f16u2
+u8
+s8
+f162f16
+f162f32
+f16u2
+u8s8
+h322f32
+	f32f32f32
+f322f32
+%
+Intrinsic_vcmax
+float16
+float32
+2
+Intrinsic_vmul 
+float16
+float32
+int32
+int16
+E
+Intrinsic_vmla3
+	f16f16f16
+	f32f32f32
+	f32f16f16
+float16
+float32
+?
+#Intrinsic_fix_pipe_pre_conv_requant
+s322s8
+s322u8
+s322s4
+)
+Intrinsic_vcmpvs_ge
+float16
+float32
+D
+Intrinsic_data_move_l12l0a&
+u8
+s8
+f16
+u16
+s16
+f32
+s32
+u32
+3
+Intrinsic_vadds 
+float16
+float32
+int32
+int16
+H
+%Intrinsic_fix_pipe_pre_conv_func_list
+requant
+dequant
+quant
+cast
+$
+Intrinsic_vsel
+float16
+float32
+7
+ Intrinsic_fix_pipe_pre_conv_cast
+f322f16
+f322bf16
+!
+Intrinsic_vnot
+int16
+uint16
+2
+Intrinsic_vsub 
+float16
+float32
+int32
+int16
+ 
+
+Intrinsic_vor
+int16
+uint16
+C
+Intrinsic_fix_pipe_unit_list#
+pre_conv
+pre_act
+post_transform
+(
+Intrinsic_vcmpv_ne
+float16
+float32
+#
+
+Intrinsic_vln
+float16
+float32
+4
+*Intrinsic_fix_pipe_support_multiple_output
+true
+!
+
+Intrinsic_abs
+int64
+float32
+N
+$Intrinsic_data_move_transpose_l12l0a&
+u8
+s8
+f16
+u16
+s16
+f32
+s32
+u32
+$
+Intrinsic_vrec
+float16
+float32
+/
+Intrinsic_vaddrelu
+int16
+float16
+float32
+!
+
+Intrinsic_max
+int64
+float32
+b
+Intrinsic_data_move_padG
+uint8
+int8
+uint16
+int16
+float16
+int32
+float32
+uint32
+bfloat16
+(
+Intrinsic_vcmpv_lt
+float16
+float32
+$
+Intrinsic_vdiv
+float16
+float32
+%
+Intrinsic_vsqrt
+float16
+float32
+
+Intrinsic_bcnt1
+uint64
+D
+Intrinsic_data_move_l12l0b&
+u8
+s8
+f16
+u16
+s16
+f32
+s32
+u32
+&
+Intrinsic_vrsqrt
+float16
+float32
+$
+Intrinsic_vabs
+float16
+float32
+(
+Intrinsic_vcmpv_gt
+float16
+float32
+ę
+Intrinsic_vconvÖ
+f322f32r
+f322f32f
+f322f32c
+deq
+f322f32a
+f322f32z
+f322f16
+f322f16r
+f322f16f
+f322f16c
+f322f16a
+f322f16z
+f322f16o
+f322s64r
+f322s64f
+f322s64c
+f322s64a
+f322s64z
+f322s32r
+f322s32f
+f322s32c
+f322s32a
+f322s32z
+f322s16r
+f322s16f
+f322s16c
+f322s16a
+f322s16z
+f162f32
+f162s32r
+f162s32f
+f162s32c
+f162s32a
+f162s32z
+f162s16r
+f162s16f
+f162s16c
+f162s16a
+f162s16z
+f162s8
+f162s8r
+f162s8f
+f162s8c
+f162s8a
+f162s8z
+f162u8
+f162u8r
+f162u8f
+f162u8c
+f162u8a
+f162u8z
+u82f16
+s82f16
+s162f16
+s162f16r
+s162f16f
+s162f16c
+s162f16a
+s162f16z
+s162f32
+s162s8
+s162u8
+s322f32
+s322f32r
+s322f32f
+s322f32c
+s322f32a
+s322f32z
+s322f16
+s322s64
+s322s16
+s642s32
+s642f32r
+s642f32f
+s642f32c
+s642f32a
+s642f32z
+	f322bf16r
+	f322bf16f
+	f322bf16c
+	f322bf16a
+	f322bf16z
+bf162f32
+	bf162s32r
+	bf162s32f
+	bf162s32c
+	bf162s32a
+	bf162s32z
+L
+'Intrinsic_fix_pipe_post_transform_nz2nd!
+f32
+f16
+bf16
+s8
+u8
+s4
+s32
+3
+Intrinsic_vmins 
+float16
+float32
+int32
+int16
+&
+Intrinsic_vcgmin
+float16
+float32
+K
+&Intrinsic_fix_pipe_pre_act_normal_relu!
+f32
+f16
+bf16
+s8
+u8
+s4
+s32
+E
+Intrinsic_data_move_out2l0b&
+u8
+s8
+f16
+u16
+s16
+f32
+s32
+u32
+)
+Intrinsic_vcmpvs_le
+float16
+float32
+/
+Intrinsic_vcmpv_eq
+float16
+float32
+int32
+(
+Intrinsic_vcmpv_ge
+float16
+float32
+T
+Intrinsic_vnchwconv=
+int16
+uint16
+int8
+uint8
+float16
+int32
+uint32
+float32
+E
+Intrinsic_vgather0
+int16
+uint16
+float16
+float32
+int32
+uint32
+D
+Intrinsic_data_move_out2l1&
+u8
+s8
+f16
+u16
+s16
+f32
+s32
+u32
+B
+Intrinsic_fix_pipe_l12fb&
+u8
+s8
+f16
+u16
+s16
+f32
+s32
+u32
+&
+Intrinsic_vlrelu
+float16
+float32
++
+Intrinsic_vmrgsort4v2
+float16
+float32
+=
+!Intrinsic_fix_pipe_pre_conv_quant
+f322s8
+f322u8
+f322s4
+G
+Intrinsic_vreducev20
+int16
+uint16
+float16
+float32
+int32
+uint32
+P
+ Intrinsic_data_move_out2l1_nd2nz,
+u8
+s8
+f16
+bf16
+u16
+s16
+f32
+s32
+u32
+%
+Intrinsic_vcadd
+float16
+float32
+2
+Intrinsic_vmax 
+float16
+float32
+int32
+int16
+3
+Intrinsic_set_l0a
+f16
+u16
+s16
+f32
+s32
+u32
+(
+Intrinsic_vcmpv_le
+float16
+float32
+)
+Intrinsic_vcmpvs_lt
+float16
+float32
+0
+Intrinsic_vshr
+uint16
+int16
+uint32
+int32
+&
+Intrinsic_vcgadd
+float16
+float32
+N
+$Intrinsic_data_move_transpose_l12l0b&
+u8
+s8
+f16
+u16
+s16
+f32
+s32
+u32
+!
+Intrinsic_vand
+int16
+uint16
+F
+Intrinsic_vgatherb0
+u16u16
+s16s16
+f16f16
+u32u32
+s32s32
+f32f32
+"
+Intrinsic_sqrt
+int64
+float32
+%
+Intrinsic_vmadd
+float16
+float32
+-
+Intrinsic_fix_pipe_l0c2out
+f32
+s32
+f16
+;
+&Intrinsic_fix_pipe_pre_act_vector_relu
+f16
+s8
+u8
+s4
+3
+Intrinsic_vmaxs 
+float16
+float32
+int32
+int16
+&
+Intrinsic_vcgmax
+float16
+float32
+)
+Intrinsic_vmaddrelu
+float16
+float32
+3
+Intrinsic_set_l0b
+f16
+u16
+s16
+f32
+s32
+u32
+0
+#Intrinsic_fix_pipe_pre_conv_dequant	
+s322f16
+D
+Intrinsic_data_move_l12out&
+u8
+s8
+f16
+u16
+s16
+f32
+s32
+u32
+&
+Intrinsic_vcpadd
+float16
+float32
+E
+Intrinsic_data_move_out2l0a&
+u8
+s8
+f16
+u16
+s16
+f32
+s32
+u32
+C
+Intrinsic_vbrcb0
+u16u16
+s16s16
+f16f16
+u32u32
+s32s32
+f32f32
+%
+Intrinsic_vcmin
+float16
+float32
+E
+Intrinsic_vreduce0
+int16
+uint16
+float16
+float32
+int32
+uint32
+2
+Intrinsic_vadd 
+float16
+float32
+int32
+int16
+)
+Intrinsic_vcmpvs_ne
+float16
+float32!
+
+Intrinsic_max
+int64
+float32%
+Intrinsic_vsqrt
+float16
+float32%
+Intrinsic_vcmin
+float16
+float32E
+Intrinsic_vgather0
+int16
+uint16
+float16
+float32
+int32
+uint32&
+Intrinsic_vlrelu
+float16
+float32)
+Intrinsic_vcmpvs_gt
+float16
+float32G
+Intrinsic_vreducev20
+int16
+uint16
+float16
+float32
+int32
+uint322
+Intrinsic_vadd 
+float16
+float32
+int32
+int16!
+Intrinsic_vnot
+int16
+uint16
+
+Intrinsic_clz
+uint643
+Intrinsic_vmuls 
+float16
+float32
+int32
+int16$
+Intrinsic_vdiv
+float16
+float32
+Intrinsic_vbitsort	
+float16#
+
+Intrinsic_vbi
+float16
+float32b
+Intrinsic_data_move_padG
+uint8
+int8
+uint16
+int16
+float16
+int32
+float32
+uint32
+bfloat16#
+
+Intrinsic_vln
+float16
+float32&
+Intrinsic_vcgmax
+float16
+float32(
+Intrinsic_vcmpv_gt
+float16
+float32E
+Intrinsic_vreduce0
+int16
+uint16
+float16
+float32
+int32
+uint32(
+Intrinsic_vcmpv_le
+float16
+float32 
+
+Intrinsic_vor
+int16
+uint16)
+Intrinsic_vmaddrelu
+float16
+float32*
+Intrinsic_vmulconv
+u8f16f16
+s8f16f16$
+Intrinsic_vabs
+float16
+float32"
+Intrinsic_sqrt
+int64
+float320
+Intrinsic_vshl
+int16
+uint16
+int32
+uint32!
+Intrinsic_vand
+int16
+uint16!
+
+Intrinsic_min
+int64
+float32ę
+Intrinsic_vconvÖ
+f322f32r
+f322f32f
+f322f32c
+deq
+f322f32a
+f322f32z
+f322f16
+f322f16r
+f322f16f
+f322f16c
+f322f16a
+f322f16z
+f322f16o
+f322s64r
+f322s64f
+f322s64c
+f322s64a
+f322s64z
+f322s32r
+f322s32f
+f322s32c
+f322s32a
+f322s32z
+f322s16r
+f322s16f
+f322s16c
+f322s16a
+f322s16z
+f162f32
+f162s32r
+f162s32f
+f162s32c
+f162s32a
+f162s32z
+f162s16r
+f162s16f
+f162s16c
+f162s16a
+f162s16z
+f162s8
+f162s8r
+f162s8f
+f162s8c
+f162s8a
+f162s8z
+f162u8
+f162u8r
+f162u8f
+f162u8c
+f162u8a
+f162u8z
+u82f16
+s82f16
+s162f16
+s162f16r
+s162f16f
+s162f16c
+s162f16a
+s162f16z
+s162f32
+s162s8
+s162u8
+s322f32
+s322f32r
+s322f32f
+s322f32c
+s322f32a
+s322f32z
+s322f16
+s322s64
+s322s16
+s642s32
+s642f32r
+s642f32f
+s642f32c
+s642f32a
+s642f32z
+	f322bf16r
+	f322bf16f
+	f322bf16c
+	f322bf16a
+	f322bf16z
+bf162f32
+	bf162s32r
+	bf162s32f
+	bf162s32c
+	bf162s32a
+	bf162s32z&
+Intrinsic_vcgadd
+float16
+float32(
+Intrinsic_vcmpv_ne
+float16
+float322
+Intrinsic_vsub 
+float16
+float32
+int32
+int16$
+Intrinsic_vrec
+float16
+float32
+Intrinsic_bcnt0
+uint64%
+Intrinsic_vcadd
+float16
+float32&
+Intrinsic_vcgmin
+float16
+float32+
+Intrinsic_vmrgsort4v2
+float16
+float32)
+Intrinsic_vcmpvs_ne
+float16
+float32$
+Intrinsic_vexp
+float16
+float32)
+Intrinsic_vcmpvs_le
+float16
+float32$
+Intrinsic_vsel
+float16
+float32/
+Intrinsic_vaddrelu
+int16
+float16
+float323
+Intrinsic_vmaxs 
+float16
+float32
+int32
+int16T
+Intrinsic_vnchwconv=
+int16
+uint16
+int8
+uint8
+float16
+int32
+uint32
+float32%
+Intrinsic_vcmax
+float16
+float320
+Intrinsic_vshr
+uint16
+int16
+uint32
+int32%
+Intrinsic_vmadd
+float16
+float32)
+Intrinsic_vcmpvs_ge
+float16
+float322
+Intrinsic_vmin 
+float16
+float32
+int32
+int162
+Intrinsic_vmul 
+float16
+float32
+int32
+int162
+Intrinsic_vmax 
+float16
+float32
+int32
+int16C
+Intrinsic_vbrcb0
+u16u16
+s16s16
+f16f16
+u32u32
+s32s32
+f32f323
+Intrinsic_vadds 
+float16
+float32
+int32
+int163
+Intrinsic_vmins 
+float16
+float32
+int32
+int160
+Intrinsic_vcmpvs_eq
+float16
+float32
+int32 
+Intrinsic_vmrgsort4	
+float16,
+Intrinsic_vrelu
+float16
+float32
+int32F
+Intrinsic_vgatherb0
+u16u16
+s16s16
+f16f16
+u32u32
+s32s32
+f32f32-
+Intrinsic_fix_pipe_l0c2out
+f32
+s32
+f16$
+Intrinsic_vcmp
+float16
+float32)
+Intrinsic_vcmpvs_lt
+float16
+float32C
+Intrinsic_vcopy0
+int16
+uint16
+float16
+float32
+int32
+uint32!
+
+Intrinsic_abs
+int64
+float32t
+Intrinsic_mmadb
+u32u8u8
+s32s8s8
+s32u8s8
+	f16f16f16
+	f32f16f16
+f16f16u2
+u8
+s8
+f162f16
+f162f32
+f16u2
+u8s8&
+Intrinsic_vrsqrt
+float16
+float32
+Intrinsic_bcnt1
+uint64*
+Intrinsic_vbitsort32
+float16
+float32(
+Intrinsic_vcmpv_ge
+float16
+float32/
+Intrinsic_vcmpv_eq
+float16
+float32
+int320
+Intrinsic_vtranspose
+uint16
+int16
+float16&
+Intrinsic_vcpadd
+float16
+float32F
+Intrinsic_vaxpy3
+	f16f16f16
+	f32f32f32
+	f32f16f16
+float16
+float32E
+Intrinsic_vmla3
+	f16f16f16
+	f32f32f32
+	f32f16f16
+float16
+float32(
+Intrinsic_vcmpv_lt
+float16
+float32Ö
+SoCInfoĘ
+
+hardware_sync_betweencore1
+
+normal_stream_num32768
+
+support_inf_nan1
+
+l2_type0
+
+l2_size	176160768
+
+
+cube_core_cnt20
+
+	l2PageNum64
+
+	ffts_mode	ffts-plus
+
+huge_stream_num0
+
+huge_stream_depth0
+
+memory_size34359738368
+
+normal_stream_depth2048
+
+
+ai_cpu_cnt6
+
+
+vir_type_list	4,5,10,20
+
+vector_core_cnt40
+
+ai_core_cnt20
+
+support_bf161
+
+cube_vector_combinesplit
+%
+core_type_listCubeCore,VectorCoreŚ
+DtypeMKN
+
+DT_UINT2	16,128,16
+
+DT_INT416,64,16
+
+DT_INT816,32,16
+
+Default16,16,16
+
+DT_UINT1	16,256,16
+
+DT_UINT816,32,16
+
+DT_INT2	16,128,164
+CPUCache(
+
+
+TSCPUSyncBySW0
+
+
+AICPUSyncBySW0Ę
+versionž
+
+	Chip_type5
+
+AIC_version	AIC-C-220
+ 
+CCEC_AIV_versiondav-c220-vec
+!
+Compiler_aicpu_support_ostrue
+
+	Arch_type4
+
+NpuArch2201
+!
+Short_SoC_versionAscend910_93
+#
+CCEC_VECTOR_versiondav-c220-vec
+
+SoC_versionAscend910_9362
+!
+CCEC_AIC_version
+dav-c220-cube
+"
+CCEC_CUBE_version
+dav-c220-cube
+VectorCoreintrinsicDtypeMapű
+"
+Intrinsic_vcminfloat16,float32
+
+Intrinsic_vmrgsort4float16
+,
+Intrinsic_vtransposeuint16,int16,float16
+&
+Intrinsic_vcmpvs_gefloat16,float32
+!
+Intrinsic_vcmpfloat16,float32
+-
+Intrinsic_vminfloat16,float32,int32,int16
+-
+Intrinsic_vmulfloat16,float32,int32,int16
+>
+Intrinsic_vreduce)int16,uint16,float16,float32,int32,uint32
+
+
+Intrinsic_abs
+int64,float32
+"
+Intrinsic_vmaddfloat16,float32
+#
+Intrinsic_vrsqrtfloat16,float32
+
+
+Intrinsic_clzuint64
+?
+Intrinsic_vgatherb)u16u16,s16s16,f16f16,u32u32,s32s32,f32f32
+.
+Intrinsic_vaddsfloat16,float32,int32,int16
+<
+Intrinsic_vbrcb)u16u16,s16s16,f16f16,u32u32,s32s32,f32f32
+,
+Intrinsic_vcmpvs_eqfloat16,float32,int32
+
+Intrinsic_vconvýf322f32r,f322f32f,f322f32c,deq,f322f32a,f322f32z,f322f16,f322f16r,f322f16f,f322f16c,f322f16a,f322f16z,f322f16o,f322s64r,f322s64f,f322s64c,f322s64a,f322s64z,f322s32r,f322s32f,f322s32c,f322s32a,f322s32z,f322s16r,f322s16f,f322s16c,f322s16a,f322s16z,f162f32,f162s32r,f162s32f,f162s32c,f162s32a,f162s32z,f162s16r,f162s16f,f162s16c,f162s16a,f162s16z,f162s8,f162s8r,f162s8f,f162s8c,f162s8a,f162s8z,f162u8,f162u8r,f162u8f,f162u8c,f162u8a,f162u8z,u82f16,s82f16,s162f16,s162f16r,s162f16f,s162f16c,s162f16a,s162f16z,s162f32,s162s8,s162u8,s322f32,s322f32r,s322f32f,s322f32c,s322f32a,s322f32z,s322f16,s322s64,s322s16,s642s32,s642f32r,s642f32f,s642f32c,s642f32a,s642f32z,f322bf16r,f322bf16f,f322bf16c,f322bf16a,f322bf16z,bf162f32,bf162s32r,bf162s32f,bf162s32c,bf162s32a,bf162s32z
+g
+Intrinsic_mmadUu32u8u8,s32s8s8,s32u8s8,f16f16f16,f32f16f16,f16f16u2,u8,s8,f162f16,f162f32,f16u2,u8s8
+ 
+
+Intrinsic_vbifloat16,float32
+X
+Intrinsic_data_move_pad=uint8,int8,uint16,int16,float16,int32,float32,uint32,bfloat16
+
+Intrinsic_bcnt1uint64
+%
+Intrinsic_vcmpv_gtfloat16,float32
+!
+Intrinsic_vexpfloat16,float32
+'
+Intrinsic_vmulconvu8f16f16,s8f16f16
+@
+Intrinsic_vreducev2)int16,uint16,float16,float32,int32,uint32
+'
+Intrinsic_vbitsort32float16,float32
+
+Intrinsic_vandint16,uint16
+&
+Intrinsic_vcmpvs_gtfloat16,float32
+#
+Intrinsic_vlrelufloat16,float32
+>
+Intrinsic_vgather)int16,uint16,float16,float32,int32,uint32
+
+
+Intrinsic_vorint16,uint16
+(
+Intrinsic_vrelufloat16,float32,int32
+
+Intrinsic_bcnt0uint64
+&
+Intrinsic_vcmpvs_lefloat16,float32
+!
+Intrinsic_vselfloat16,float32
+?
+Intrinsic_vmla-f16f16f16,f32f32f32,f32f16f16,float16,float32
++
+Intrinsic_vshruint16,int16,uint32,int32
+%
+Intrinsic_vcmpv_lefloat16,float32
+&
+Intrinsic_vcmpvs_ltfloat16,float32
+
+
+Intrinsic_max
+int64,float32
+(
+Intrinsic_vmrgsort4v2float16,float32
+<
+Intrinsic_vcopy)int16,uint16,float16,float32,int32,uint32
+#
+Intrinsic_vcgmaxfloat16,float32
+.
+Intrinsic_vmaxsfloat16,float32,int32,int16
+.
+Intrinsic_vmulsfloat16,float32,int32,int16
+"
+Intrinsic_vcmaxfloat16,float32
+&
+Intrinsic_vmaddrelufloat16,float32
+-
+Intrinsic_vsubfloat16,float32,int32,int16
+&
+Intrinsic_vcmpvs_nefloat16,float32
+%
+Intrinsic_vcmpv_ltfloat16,float32
+)
+Intrinsic_fix_pipe_l0c2outf32,s32,f16
+ 
+
+Intrinsic_vlnfloat16,float32
+#
+Intrinsic_vcpaddfloat16,float32
+"
+Intrinsic_vsqrtfloat16,float32
+
+Intrinsic_sqrt
+int64,float32
++
+Intrinsic_vcmpv_eqfloat16,float32,int32
+%
+Intrinsic_vcmpv_nefloat16,float32
+-
+Intrinsic_vmaxfloat16,float32,int32,int16
+-
+Intrinsic_vaddfloat16,float32,int32,int16
+
+Intrinsic_vnotint16,uint16
++
+Intrinsic_vaddreluint16,float16,float32
+.
+Intrinsic_vminsfloat16,float32,int32,int16
+
+
+Intrinsic_min
+int64,float32
+!
+Intrinsic_vdivfloat16,float32
+@
+Intrinsic_vaxpy-f16f16f16,f32f32f32,f32f16f16,float16,float32
+
+Intrinsic_vbitsortfloat16
+K
+Intrinsic_vnchwconv4int16,uint16,int8,uint8,float16,int32,uint32,float32
+#
+Intrinsic_vcgaddfloat16,float32
++
+Intrinsic_vshlint16,uint16,int32,uint32
+!
+Intrinsic_vrecfloat16,float32
+%
+Intrinsic_vcmpv_gefloat16,float32
+!
+Intrinsic_vabsfloat16,float32
+"
+Intrinsic_vcaddfloat16,float32
+#
+Intrinsic_vcgminfloat16,float32)
+	DSARandom
+
+CounterWorkspaceSize48Ş
+AICoreMemoryRates
+
+l1_to_l0_b_rate256
+
+l2_read_rate110
+
+
+ub_to_l1_rate128
+
+
+ub_to_l2_rate64
+
+ddr_rate32
+
+ddr_write_rate32
+
+l0_c_to_ub_rate256
+
+ub_to_ddr_rate64
+
+
+l1_to_ub_rate128
+
+l2_rate110
+
+
+ddr_read_rate32
+
+
+l2_write_rate86
+
+l1_to_l0_a_rate512
+CUBECoreintrinsicDtypeMapk
+i
+0dIntrinsic_mmad|u32u8u8,s32s8s8,s32u8s8,f16f16f16,f32f16f16,f16f16u2,u8,s8,f162f16,f162f32,f16u2,u8s8ž,
+AICoreintrinsicDtypeMap˘,
+"
+Intrinsic_vsqrtfloat16,float32
+,
+Intrinsic_vtransposeuint16,int16,float16
+,
+Intrinsic_vcmpvs_eqfloat16,float32,int32
+(
+Intrinsic_vrelufloat16,float32,int32
+.
+Intrinsic_vaddsfloat16,float32,int32,int16
++
+Intrinsic_vshlint16,uint16,int32,uint32
+ 
+
+Intrinsic_vbifloat16,float32
+&
+Intrinsic_vcmpvs_ltfloat16,float32
+
+Intrinsic_vnotint16,uint16
+-
+Intrinsic_vsubfloat16,float32,int32,int16
+!
+Intrinsic_vrecfloat16,float32
+>
+Intrinsic_vgather)int16,uint16,float16,float32,int32,uint32
+K
+Intrinsic_vnchwconv4int16,uint16,int8,uint8,float16,int32,uint32,float32
++
+Intrinsic_vaddreluint16,float16,float32
+6
+&Intrinsic_fix_pipe_pre_act_scalar_reluf16,s8,u8,s4
+
+Intrinsic_vmrgsort4float16
+%
+Intrinsic_vcmpv_gefloat16,float32
+
+
+Intrinsic_min
+int64,float32
+#
+Intrinsic_vcgmaxfloat16,float32
+!
+Intrinsic_vdivfloat16,float32
+&
+Intrinsic_vcmpvs_lefloat16,float32
+-
+Intrinsic_vmulfloat16,float32,int32,int16
+
+
+Intrinsic_abs
+int64,float32
+@
+Intrinsic_vaxpy-f16f16f16,f32f32f32,f32f16f16,float16,float32
+
+Intrinsic_sqrt
+int64,float32
+#
+Intrinsic_vcgaddfloat16,float32
+F
+ Intrinsic_data_move_out2l1_nd2nz"u8,s8,f16,bf16,u16,s16,f32,s32,u32
+<
+Intrinsic_vcopy)int16,uint16,float16,float32,int32,uint32
+-
+Intrinsic_vminfloat16,float32,int32,int16
+
+
+Intrinsic_clzuint64
+<
+Intrinsic_data_move_out2l0bu8,s8,f16,u16,s16,f32,s32,u32
+?
+Intrinsic_fix_pipe_unit_listpre_conv,pre_act,post_transform
+%
+Intrinsic_vcmpv_nefloat16,float32
+?
+Intrinsic_vgatherb)u16u16,s16s16,f16f16,u32u32,s32s32,f32f32
+2
+*Intrinsic_fix_pipe_support_multiple_outputtrue
+:
+Intrinsic_data_move_l12btu8,s8,f16,u16,s16,f32,s32,u32
+'
+Intrinsic_vcmpfloat16,float32,int16
+C
+&Intrinsic_fix_pipe_pre_act_normal_reluf32,f16,bf16,s8,u8,s4,s32
+#
+Intrinsic_vcpaddfloat16,float32
+;
+Intrinsic_data_move_l12l0bu8,s8,f16,u16,s16,f32,s32,u32
+#
+Intrinsic_vlrelufloat16,float32
+#
+Intrinsic_vrsqrtfloat16,float32
+
+
+Intrinsic_max
+int64,float32
+?
+Intrinsic_vmla-f16f16f16,f32f32f32,f32f16f16,float16,float32
+!
+Intrinsic_vselfloat16,float32
+)
+Intrinsic_fix_pipe_l0c2outf32,s32,f16
+;
+Intrinsic_data_move_out2l1u8,s8,f16,u16,s16,f32,s32,u32
++
+Intrinsic_vcmpv_eqfloat16,float32,int32
+&
+Intrinsic_vcmpvs_gtfloat16,float32
+
+
+Intrinsic_vorint16,uint16
+;
+Intrinsic_data_move_l12l0au8,s8,f16,u16,s16,f32,s32,u32
+
+Intrinsic_vconvýf322f32r,f322f32f,f322f32c,deq,f322f32a,f322f32z,f322f16,f322f16r,f322f16f,f322f16c,f322f16a,f322f16z,f322f16o,f322s64r,f322s64f,f322s64c,f322s64a,f322s64z,f322s32r,f322s32f,f322s32c,f322s32a,f322s32z,f322s16r,f322s16f,f322s16c,f322s16a,f322s16z,f162f32,f162s32r,f162s32f,f162s32c,f162s32a,f162s32z,f162s16r,f162s16f,f162s16c,f162s16a,f162s16z,f162s8,f162s8r,f162s8f,f162s8c,f162s8a,f162s8z,f162u8,f162u8r,f162u8f,f162u8c,f162u8a,f162u8z,u82f16,s82f16,s162f16,s162f16r,s162f16f,s162f16c,s162f16a,s162f16z,s162f32,s162s8,s162u8,s322f32,s322f32r,s322f32f,s322f32c,s322f32a,s322f32z,s322f16,s322s64,s322s16,s642s32,s642f32r,s642f32f,s642f32c,s642f32a,s642f32z,f322bf16r,f322bf16f,f322bf16c,f322bf16a,f322bf16z,bf162f32,bf162s32r,bf162s32f,bf162s32c,bf162s32a,bf162s32z
+"
+Intrinsic_vmaddfloat16,float32
+.
+Intrinsic_vmulsfloat16,float32,int32,int16
+
+Intrinsic_bcnt0uint64
+&
+Intrinsic_vmaddrelufloat16,float32
++
+Intrinsic_vshruint16,int16,uint32,int32
+
+Intrinsic_vandint16,uint16
+E
+$Intrinsic_data_move_transpose_l12l0au8,s8,f16,u16,s16,f32,s32,u32
+!
+Intrinsic_vabsfloat16,float32
+&
+Intrinsic_vcmpvs_nefloat16,float32
+4
+ Intrinsic_fix_pipe_pre_conv_castf322f16,f322bf16
+(
+Intrinsic_vmrgsort4v2float16,float32
+,
+Intrinsic_set_l0bf16,u16,s16,f32,s32,u32
+.
+#Intrinsic_fix_pipe_pre_conv_dequants322f16
+%
+Intrinsic_vcmpv_lefloat16,float32
+>
+Intrinsic_vreduce)int16,uint16,float16,float32,int32,uint32
+4
++Intrinsic_fix_pipe_post_transform_func_listnz2nd
+%
+Intrinsic_vcmpv_ltfloat16,float32
+#
+Intrinsic_vcgminfloat16,float32
+E
+$Intrinsic_data_move_transpose_l12l0bu8,s8,f16,u16,s16,f32,s32,u32
+
+Intrinsic_mmadou32u8u8,s32s8s8,s32u8s8,f16f16f16,f32f16f16,f16f16u2,u8,s8,f162f16,f162f32,f16u2,u8s8,h322f32,f32f32f32,f322f32
+-
+Intrinsic_vaddfloat16,float32,int32,int16
+9
+Intrinsic_fix_pipe_l12fbu8,s8,f16,u16,s16,f32,s32,u32
+-[Thread 0xfffff457ee60 (LWP 422389) exited]
+[Thread 0xfffff4d8ee60 (LWP 422388) exited]
+
+Intrinsic_vmaxfloat16,float32,int32,int16
+,
+Intrinsic_set_l0af16,u16,s16,f32,s32,u32
+(
+Intrinsic_fix_pipe_l0c2l1f32,s32,f16
+;
+#Intrinsic_fix_pipe_pre_conv_requants322s8,s322u8,s322s4
+
+Intrinsic_vbitsortfloat16
+C
+%Intrinsic_fix_pipe_pre_conv_func_listrequant,dequant,quant,cast
++
+Intrinsic_set_l1f16,u16,s16,f32,s32,u32
+6
+&Intrinsic_fix_pipe_pre_act_vector_reluf16,s8,u8,s4
+<
+Intrinsic_vbrcb)u16u16,s16s16,f16f16,u32u32,s32s32,f32f32
+;
+Intrinsic_data_move_l12outu8,s8,f16,u16,s16,f32,s32,u32
+%
+Intrinsic_vcmpv_gtfloat16,float32
+.
+Intrinsic_vminsfloat16,float32,int32,int16
+K
+$Intrinsic_fix_pipe_pre_act_func_list#normal_relu,scalar_relu,vector_relu
+'
+Intrinsic_vbitsort32float16,float32
+"
+Intrinsic_vcaddfloat16,float32
+"
+Intrinsic_vcminfloat16,float32
+@
+Intrinsic_vreducev2)int16,uint16,float16,float32,int32,uint32
+!
+Intrinsic_vexpfloat16,float32
+<
+Intrinsic_data_move_out2l0au8,s8,f16,u16,s16,f32,s32,u32
+.
+Intrinsic_vmaxsfloat16,float32,int32,int16
+&
+Intrinsic_vcmpvs_gefloat16,float32
+'
+Intrinsic_vmulconvu8f16f16,s8f16f16
+ 
+
+Intrinsic_vlnfloat16,float32
+X
+Intrinsic_data_move_pad=uint8,int8,uint16,int16,float16,int32,float32,uint32,bfloat16
+D
+'Intrinsic_fix_pipe_post_transform_nz2ndf32,f16,bf16,s8,u8,s4,s32
+
+Intrinsic_bcnt1uint64
+9
+!Intrinsic_fix_pipe_pre_conv_quantf322s8,f322u8,f322s4
+"
+Intrinsic_vcmaxfloat16,float32ž
+
+AICoreSpecŻ
+
+ubbank_group_num16
+
+
+vec_calc_size128
+
+ubblock_size32
+
+ubburst_in_one_block32
+
+	l0_c_size131072
+
+sparsity1
+
+	l0_b_size65536
+
+ubbank_size4096
+
+cube_m_size16
+
+unzip_max_ratios64
+
+unzip_is_tight1
+
+smask_buffer0
+
+fb0_size2048
+
+cube_n_size16
+
+
+ubbank_num64
+
+fb2_size2048
+
+fb1_size1024
+
+	l0_a_size65536
+
+ub_size196608
+
+bt_size1024
+
+
+unzip_engines4
+
+cube_k_size16
+
+padding_size32
+
+fb3_size2048
+
+support_fixpipe1
+
+	cube_freq1500
+
+unzip_channels2
+
+l1_size524288.
+[platform_manager_v2.cpp:91]422377 LoadIniFile:Assemble platform info failed.
+[platform_manager_v2.cpp:222]422377 InitPlatformInfos:Failed to load ini file[/home/developer/Ascend/cann-9.1.0/aarch64-linux/data/platform_config/Ascend910_9362.ini].
+[soc_info.cc:29]422377 GetChipTypeFromPlatform:Get chip type from platform failed, socName=Ascend910_9362, ret=119472129.
+[runtime.cc:683]422377 InitSocVersionByDrvSocVersion:Get chipType by socVersion=Ascend910_9362 from platform failed.
+[runtime.cc:753]422377 InitSocVersion:Init socVersion and chipType failed.
+[runtime.cc:799]422377 InitChipTypeAndSocVersion:Init socVersion failed.
+[api_c_soc.cc:55]422377 rtGetSocVersion:Null rtInstance pointer, ErrCode=507000
+[platform_ascendc.cpp:542][PlatformAscendCInit] get platform short version failed by fe, socVersion is 
+[platform_ascendc.cpp:76][SocVersionStrMap] get platform failed, convertMap do not find soc  version
+[platform_ascendc.cpp:546][PlatformAscendCInit] Invalid SocVersion.
+[       OK ] TestTiling.TestPlatformAscendCManager (308 ms)
+[ RUN      ] TestTiling.TestGetVectorCoreNum
+[platform_ascendc.cpp:133][GetCoreNumVector] get platform vector num failed, val is 
+[       OK ] TestTiling.TestGetVectorCoreNum (0 ms)
+[ RUN      ] TestTiling.TestGetVecRegLen
+[platform_ascendc.cpp:85][GetVecRegLen] platform do not support get vector_reg_width size !
+[       OK ] TestTiling.TestGetVecRegLen (0 ms)
+[ RUN      ] TestTiling.TestGetVecRegLenWhenSizeExceed
+[platform_ascendc.cpp:92][GetVecRegLen] The bit width exceeds the maximum value of uint32!
+[       OK ] TestTiling.TestGetVecRegLenWhenSizeExceed (0 ms)
+[ RUN      ] TestTiling.TestGetVecRegLenWhenSizeStrIllegal
+[platform_ascendc.cpp:100][GetVecRegLen] The sizeStr is invalid.
+[       OK ] TestTiling.TestGetVecRegLenWhenSizeStrIllegal (0 ms)
+[ RUN      ] TestTiling.TestGetVecRegLenNormal
+[       OK ] TestTiling.TestGetVecRegLenNormal (0 ms)
+[ RUN      ] TestTiling.TestPlatformCustomSocVersion
+[platform_ascendc.cpp:474][GetRealSocVersion] Failed to get short soc version, cannot dlsym symbol rtGetSocVersion
+[platform_ascendc.cpp:527][PlatformAscendCInit] Failed to run platform ascendc init, GetRealSocVersion failed
+[       OK ] TestTiling.TestPlatformCustomSocVersion (0 ms)
+[ RUN      ] TestTiling.TestPlatformAscendCInitWithRuntimePlatformInfos
+[       OK ] TestTiling.TestPlatformAscendCInitWithRuntimePlatformInfos (0 ms)
+[----------] 23 tests from TestTiling (1256 ms total)
+
+[----------] Global test environment tear-down
+[==========] 23 tests from 1 test suite ran. (1256 ms total)
+[  PASSED  ] 23 tests.
+[Inferior 1 (process 422377) exited normally]
+command.txt:2: Error in sourced command file:
+No stack.
