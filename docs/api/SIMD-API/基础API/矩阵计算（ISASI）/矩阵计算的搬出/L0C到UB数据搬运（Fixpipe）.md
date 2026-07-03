@@ -51,14 +51,14 @@ L0C Buffer到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内�
 <!-- npu="950" id11 -->
 针对Ascend 950PR/Ascend 950DT：
 
-- 通路L0C Buffer-\>UB，不开启tensor量化功能：
+- 通路L0C Buffer-\>Unified Buffer（UB），不开启tensor量化功能：
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
     __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsArch3510<config.format>& intriParams)
     ```
 
-- 通路L0C Buffer-\>UB，开启tensor量化功能：
+- 通路L0C Buffer-\>Unified Buffer（UB），开启tensor量化功能：
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
@@ -69,14 +69,14 @@ L0C Buffer到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内�
 <!-- npu="310b" id12 -->
 针对Atlas 200I/500 A2 推理产品：
 
-- 通路L0C Buffer-\>UB，不开启tensor量化功能：
+- 通路L0C Buffer-\>Unified Buffer（UB），不开启tensor量化功能：
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
     __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsM300& intriParams)
     ```
 
-- 通路L0C Buffer-\>UB，开启tensor量化功能：
+- 通路L0C Buffer-\>Unified Buffer（UB），开启tensor量化功能：
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S = uint64_t, typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
