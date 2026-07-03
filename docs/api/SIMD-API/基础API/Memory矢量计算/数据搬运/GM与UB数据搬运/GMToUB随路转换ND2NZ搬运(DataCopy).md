@@ -23,7 +23,7 @@
 具体支持的数据通路为（以[逻辑位置TPosition](../../../数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
-    - GM -> VECIN
+    - GM -> VECIN（UB）
 
 ## 函数原型<a name="section1954364615315"></a>
 

@@ -41,11 +41,11 @@
 具体支持的数据通路为（以[逻辑位置TPosition](../../../数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
-    - GM -> VECIN
+    - GM -> VECIN（UB）
 - Unified Buffer -> Global Memory
-    - VECOUT -> GM
+    - VECOUT（UB） -> GM
     <!-- npu="310p" id10 -->
-    - CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
+    - CO2（UB） -> GM（仅Atlas 推理系列产品AI Core支持）
     <!-- end id10 -->
 
 ## 函数原型<a name="section1954364615315"></a>

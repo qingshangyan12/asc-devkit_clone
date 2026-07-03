@@ -21,8 +21,8 @@
 具体支持的数据通路为（以[逻辑位置TPosition](../../../数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Unified Buffer -> Global Memory
-    - VECOUT -> GM
-    - <cann-filter npu-type="310p">CO2 -> GM（仅Atlas 推理系列产品AI Core支持）</cann-filter>
+    - VECOUT（UB） -> GM
+    - <cann-filter npu-type="310p">CO2（UB） -> GM（仅Atlas 推理系列产品AI Core支持）</cann-filter>
 
 ## 函数原型<a name="section1792117555586"></a>
 

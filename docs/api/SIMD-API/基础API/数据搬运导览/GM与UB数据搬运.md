@@ -29,10 +29,10 @@ Global Memory（GM）与Unified Buffer（UB）之间的数据搬运提供了多�
 具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
-    - GM -> VECIN
+    - GM -> VECIN（UB）
 - Unified Buffer -> Global Memory
-    - VECOUT -> GM
-    - <cann-filter npu-type="310p">CO2 -> GM（仅Atlas 推理系列产品AI Core支持）</cann-filter>
+    - VECOUT（UB） -> GM
+    - <cann-filter npu-type="310p">CO2（UB） -> GM（仅Atlas 推理系列产品AI Core支持）</cann-filter>
 
 搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[GM与UB连续数据搬运(DataCopy)](../Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB连续数据搬运(DataCopy).md)。
 
@@ -61,10 +61,10 @@ src和dst分别为源操作数和目的操作数；count为连续搬运的元素
 具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
-    - GM -> VECIN
+    - GM -> VECIN（UB）
 - Unified Buffer -> Global Memory
-    - VECOUT -> GM
-    - <cann-filter npu-type="310p">CO2 -> GM（仅Atlas 推理系列产品AI Core支持）</cann-filter>
+    - VECOUT（UB） -> GM
+    - <cann-filter npu-type="310p">CO2（UB） -> GM（仅Atlas 推理系列产品AI Core支持）</cann-filter>
 
 搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[GM与UB高维切分数据搬运(DataCopy)](../Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB高维切分数据搬运(DataCopy).md)。
 
@@ -91,10 +91,10 @@ src和dst分别为源操作数和目的操作数；repeatParams为DataCopyParams
 具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
-    - GM -> VECIN
+    - GM -> VECIN（UB）
 - Unified Buffer -> Global Memory
-    - VECOUT -> GM
-    - <cann-filter npu-type="310p">CO2 -> GM（仅Atlas 推理系列产品AI Core支持）</cann-filter>
+    - VECOUT（UB） -> GM
+    - <cann-filter npu-type="310p">CO2（UB） -> GM（仅Atlas 推理系列产品AI Core支持）</cann-filter>
 
 搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[GM与UB切片数据搬运(DataCopy)](../Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB切片数据搬运(DataCopy).md)。
 
@@ -121,7 +121,7 @@ src和dst分别为源操作数和目的操作数；dstSliceInfo和srcSliceInfo�
 具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
-    - GM -> VECIN
+    - GM -> VECIN（UB）
 
 搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[GM -> UB随路转换ND2NZ搬运(DataCopy)](../Memory矢量计算/数据搬运/GM与UB数据搬运/GMToUB随路转换ND2NZ搬运(DataCopy).md)。
 
@@ -152,8 +152,8 @@ src和dst分别为源操作数和目的操作数；intriParams为Nd2NzParams类�
 具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Unified Buffer -> Global Memory
-    - VECOUT -> GM
-    - <cann-filter npu-type="310p">CO2 -> GM（仅Atlas 推理系列产品AI Core支持）</cann-filter>
+    - VECOUT（UB） -> GM
+    - <cann-filter npu-type="310p">CO2（UB） -> GM（仅Atlas 推理系列产品AI Core支持）</cann-filter>
 
 搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[UB->GM随路转换NZ2ND搬运(DataCopy)](../Memory矢量计算/数据搬运/GM与UB数据搬运/UBToGM随路转换NZ2ND搬运(DataCopy).md)。
 
@@ -171,7 +171,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
-    - GM -> VECIN
+    - GM -> VECIN（UB）
 
 搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[GM -> UB多维数据搬运NDDMA(DataCopy)](../Memory矢量计算/数据搬运/GM与UB数据搬运/GMToUB多维数据搬运NDDMA(DataCopy).md)。
 
@@ -199,9 +199,9 @@ src和dst分别为源操作数和目的操作数；params为NdDmaParams类型的
 具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
-    - GM -> VECIN
-    - GM -> VECOUT
-    - <cann-filter npu-type="950">GM -> VECCALC（仅Ascend 950PR/Ascend 950DT支持）</cann-filter>
+    - GM -> VECIN（UB）
+    - GM -> VECOUT（UB）
+    - <cann-filter npu-type="950">GM -> VECCALC（UB，仅Ascend 950PR/Ascend 950DT支持）</cann-filter>
 
 搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[GM -> UB非对齐数据搬运(DataCopyPad)](../Memory矢量计算/数据搬运/GM与UB数据搬运/GMToUB非对齐数据搬运(DataCopyPad).md)。
 
@@ -234,8 +234,8 @@ src和dst分别为源操作数和目的操作数；dataCopyParams为DataCopyExtP
 具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Unified Buffer -> Global Memory
-    - VECIN -> GM
-    - VECOUT -> GM
+    - VECIN（UB） -> GM
+    - VECOUT（UB） -> GM
 
 搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[UB -> GM非对齐数据搬运(DataCopyPad)](../Memory矢量计算/数据搬运/GM与UB数据搬运/UBToGM非对齐数据搬运(DataCopyPad).md)。
 

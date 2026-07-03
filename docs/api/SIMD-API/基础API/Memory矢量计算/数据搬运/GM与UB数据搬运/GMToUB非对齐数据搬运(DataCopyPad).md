@@ -65,10 +65,10 @@
 具体支持的数据通路为（以[逻辑位置TPosition](../../../数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
-    - GM -> VECIN
-    - GM -> VECOUT
+    - GM -> VECIN（UB）
+    - GM -> VECOUT（UB）
     <!-- npu="950" id16 -->
-    - GM -> VECCALC（仅Ascend 950PR/Ascend 950DT支持）
+    - GM -> VECCALC（UB，仅Ascend 950PR/Ascend 950DT支持）
     <!-- end id16 -->
 
 填充的数据有两种配置方式：
@@ -136,9 +136,9 @@
 | rightPadding | 连续搬运数据块右侧需要补充的数据范围，单位为元素个数。<br>若PaddingMode为Compact模式，该参数无效，只会在**最后一个数据块右侧**填充数据。<br>**leftPadding、rightPadding所占的字节数均不能超过32字节。** |
 | paddingValue | 左右两侧需要填充的数据值，需要保证在数据占用字节范围内。<br>数据类型和源操作数保持一致，数据类型为模板参数T。<br>**当数据类型长度为64位时，该参数只能设置为0。** |
 
-- GM -> VECIN/VECOUT配置示例<a name="li73127579197"></a>
+- GM -> VECIN（UB）/VECOUT（UB）配置示例<a name="li73127579197"></a>
 
-    下面通过三个示例展示DataCopyPad在GM -> VECIN/VECOUT通路上的不同配置场景。示例1演示32字节对齐场景下的数据搬运，示例2演示非32字节对齐时的dummy填充机制，示例3（仅Ascend 950PR/Ascend 950DT支持）演示负stride实现重复搬运同一数据块的场景。
+    下面通过三个示例展示DataCopyPad在GM -> VECIN（UB）/VECOUT（UB）通路上的不同配置场景。示例1演示32字节对齐场景下的数据搬运，示例2演示非32字节对齐时的dummy填充机制，示例3（仅Ascend 950PR/Ascend 950DT支持）演示负stride实现重复搬运同一数据块的场景。
 
     - 参数解释
         - 当blockLen+leftPadding+rightPadding满足32字节对齐时，若isPad为false，左右两侧填充的数据值会默认为随机值；否则为paddingValue。

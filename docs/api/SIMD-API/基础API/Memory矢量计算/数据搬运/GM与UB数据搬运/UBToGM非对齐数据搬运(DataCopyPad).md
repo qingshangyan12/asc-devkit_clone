@@ -59,8 +59,8 @@
 具体支持的数据通路为（以[逻辑位置TPosition](../../../数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Unified Buffer -> Global Memory
-    - VECIN -> GM
-    - VECOUT -> GM
+    - VECIN（UB） -> GM
+    - VECOUT（UB） -> GM
 
 - 如[图1](#fig_datacopypad3)所示，对于32字节对齐搬运场景，从Unified Buffer读取的所有数据都会搬运至Global Memory。
 - 如[图2](#fig_datacopypad4)所示，对于非32字节对齐的场景，在读取Unified Buffer数据时会填入dummy假数据，对齐到32B，搬入Global Memory时会将dummy空数据丢弃，从而实现Unified Buffer到Global Memory的非对齐搬运。
