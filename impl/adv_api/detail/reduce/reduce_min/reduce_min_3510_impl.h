@@ -82,7 +82,11 @@ template <class T, bool isReuseSource = false>
 __aicore__ inline void ReduceMinRAB64ReuseSourceCompute(
     __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, __ubuf__ T* tmpAddr, const uint32_t srcShape[])
 {
-    if ((srcShape[1] * sizeof(T)) % 32 == 0) {
+    if (srcShape[1] * sizeof(T) < GetVecLen() / 2){
+        ReduceRAConcatImpl<
+            T, Reg::RegTraitNumTwo, Reg::Min<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T, Reg::RegTraitNumTwo>>,
+            isReuseSource>(dstAddr, srcAddr, tmpAddr, srcShape[1], srcShape[0]);
+    } else if ((srcShape[1] * sizeof(T)) % 32 == 0) {
         ReduceRAB64ReuseSource<
             T, Reg::RegTraitNumTwo, Reg::Min<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T, Reg::RegTraitNumTwo>>,
             isReuseSource>(dstAddr, srcAddr, tmpAddr, srcShape[1], srcShape[0]);
