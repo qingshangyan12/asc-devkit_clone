@@ -20,10 +20,10 @@
 
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_CREATEVECINDEX_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_CREATEVECINDEX_IMPL_H
-#include "kernel_tensor.h"
+#include "../../../include/basic_api/kernel_tensor.h"
 #include "kernel_operator_common_impl.h"
 #if ASCENDC_CPU_DEBUG
-#include "kernel_check.h"
+#include "../kernel_check.h"
 #endif
 
 namespace AscendC {
@@ -123,7 +123,7 @@ __aicore__ inline void CreateVecIndexCalc(LocalTensor<T> dstLocal, const T first
 
     __ubuf__ T* dstLocalAddr = (__ubuf__ T*)dstLocal.GetPhyAddr();
     uint32_t sreg = (uint32_t)calCount;
-    uint32_t sregLower = (uint32_t)(VECTOR_REG_WIDTH / sizeof(T));
+    int32_t sregLower = (int32_t)(VECTOR_REG_WIDTH / sizeof(T));
     uint16_t repeatTimes = CeilDivision(calCount, sregLower);
 
     __VEC_SCOPE__

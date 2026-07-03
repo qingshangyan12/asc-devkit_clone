@@ -64,12 +64,15 @@ public:
     __aicore__ inline int32_t Init(__ubuf__ uint8_t* buff, uint32_t len);
     template <typename T>
     __aicore__ inline int32_t Init(const LocalTensor<T>& buff, uint32_t len);
-    template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
-        auto const &config = URMA_DEFAULT_CFG>
+    template <
+        bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
+        auto const& config = URMA_DEFAULT_CFG>
     __aicore__ inline int32_t WriteNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
-    template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
-        auto const &config = URMA_DEFAULT_CFG>
+    template <
+        bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
+        auto const& config = URMA_DEFAULT_CFG>
     __aicore__ inline int32_t ReadNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
+<<<<<<< HEAD
     template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
     __aicore__ inline int32_t WriteWithNotifyNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len,
@@ -80,14 +83,27 @@ public:
     template <typename T, bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
     __aicore__ inline int32_t AtomicCAS(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, T compareVal, T swapVal);
+=======
+    template <
+        bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
+        auto const& config = URMA_DEFAULT_CFG>
+    __aicore__ inline int32_t WriteWithNotifyNbi(
+        ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal);
+>>>>>>> upstream/master
     template <pipe_t pipe = PIPE_S>
     __aicore__ inline int32_t Commit(ChannelHandle channel);
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Drain(ChannelHandle channel);
 
 private:
+<<<<<<< HEAD
     template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
         HcommUrmaOpCode opCode = HcommUrmaOpCode::WRITE, auto const &config = URMA_DEFAULT_CFG, typename T = uint64_t>
+=======
+    template <
+        bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
+        HcommUrmaOpCode opCode = HcommUrmaOpCode::WRITE, auto const& config = URMA_DEFAULT_CFG>
+>>>>>>> upstream/master
     __aicore__ inline int32_t PostSend(
         ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr = nullptr,
         const UdmaParams<T>& params = UdmaParams<T>{});
@@ -98,9 +114,6 @@ private:
 private:
     LocalTensor<uint32_t> wqeItem_;
     LocalTensor<uint32_t> cqeItem_;
-    LocalTensor<uint32_t> sqPI_;
-    LocalTensor<uint32_t> sqCI_;
-    LocalTensor<uint32_t> cqCI_;
 };
 } // namespace AscendC
 

@@ -4,7 +4,9 @@
 
 设置是否开启HF32模式。**当前版本暂不支持。**
 
+<!-- npu="950" id1 -->
 对于Ascend 950PR/Ascend 950DT，本接口可用于设置是否开启HF32模式（**当前版本暂不支持**）、设置是否开启MxMatmul场景。在MxMatmul场景，必须调用该接口并配置为开启MxMatmul场景，从而保证该场景下正确计算并返回Tiling参数。
+<!-- end id1 -->
 
 ## 函数原型
 
@@ -22,9 +24,9 @@ int32_t SetMadType(MatrixMadType madType)
 
 ```
 enum class MatrixMadType : int32_t {
-NORMAL = 0,
-HF32 = 1,
-MXMODE = 2,
+    NORMAL = 0,
+    HF32 = 1,
+    MXMODE = 2,
 };
 ```
 
@@ -41,6 +43,6 @@ MXMODE = 2,
 ```
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 matmul_tiling::MatmulApiTiling tiling(ascendcPlatform);
-tiling.SetTraverse(MatrixTraverse::FIRSTM);  // 设置遍历方式
-tiling.SetMadType(MatrixMadType::MXMODE);  // 开启MxMatmul场景
+tiling.SetTraverse(MatrixTraverse::FIRSTM); // 设置遍历方式
+tiling.SetMadType(MatrixMadType::MXMODE);   // 开启MxMatmul场景
 ```

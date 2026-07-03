@@ -42,10 +42,10 @@
     constexpr uint32_t xAddr = 0;
     constexpr uint32_t yAddr = xAddr + DATA_COUNT * sizeof(half);
 
-    // 核函数入口：使用__vector__显式声明Vector核函数，搭配静态Tensor方式编程
+    // 核函数入口：使用__vector__显式声明Vector核函数，搭配C++ Tensor方式编程
     __vector__ __global__ void ln_custom(__gm__ uint8_t* src, __gm__ uint8_t* dst)
     {
-        // 静态Tensor需要手动调用InitSocState初始化全局状态寄存器
+        // C++ Tensor需要手动调用InitSocState初始化全局状态寄存器
         AscendC::InitSocState();
 
         AscendC::GlobalTensor<half> srcGlobal;
@@ -53,7 +53,7 @@
         srcGlobal.SetGlobalBuffer((__gm__ half*)src, DATA_COUNT);
         dstGlobal.SetGlobalBuffer((__gm__ half*)dst, DATA_COUNT);
 
-        // 直接构造指定地址和存储位置的LocalTensor（静态Tensor方式）
+        // 直接构造指定地址和存储位置的LocalTensor（C++ Tensor方式）
         AscendC::LocalTensor<half> srcLocal(AscendC::TPosition::VECCALC, xAddr, DATA_COUNT);
         AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::VECCALC, yAddr, DATA_COUNT);
 
@@ -342,7 +342,7 @@
 
         ![](../../../figures/3_zn.png)
 
-    **兼容方案**：非L0A Buffer切分的场景兼容2201版本，L0A Buffer切分的场景需要根据新的分形重新适配。具体代码可参考[pattern_transformation兼容性样例](https://gitcode.com/cann/asc-devkit/tree/c6dc78cfbccfb1a8f910ed4b6845bfacde5d2d9f/examples/01_simd_cpp_api/06_compatibility_guide/pattern_transformation)。
+    **兼容方案**：非L0A Buffer切分的场景兼容2201版本，L0A Buffer切分的场景需要根据新的分形重新适配。具体代码可参考[pattern_transformation兼容性样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/06_compatibility_guide/pattern_transformation)。
 
     在2201架构中，矩阵计算要求左矩阵为ZZ分形（3510中为NZ），右矩阵为ZN分形，由于L1 Buffer的数据分形为NZ，所以2201架构下将左矩阵从L1 Buffer搬运到L0A Buffer需要额外做NZ分形到ZZ分形的转换，3510架构下则不用转换分形。
 
