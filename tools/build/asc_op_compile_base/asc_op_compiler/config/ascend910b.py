@@ -48,11 +48,11 @@ class ArchRuntimeConfig(RuntimeConfig):
         with_time_stamp_static = True
         tiling_format = "uint64"
         macro_def = [
-            "defined(__DAV_C220_CUBE__)", 
-            "false", 
-            "false", 
-            "false", 
-            "true", 
+            "defined(__DAV_C220_CUBE__)",
+            "false",
+            "false",
+            "false",
+            "true",
             "false",
             ]
         need_const_tiling_qualifier = False
