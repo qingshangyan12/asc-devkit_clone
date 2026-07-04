@@ -1716,6 +1716,13 @@ __aicore__ inline void asc_gather_datablock_sync(__ubuf__ uint16_t* dst, __ubuf_
             uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat);
 __aicore__ inline void asc_gather_datablock_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset,
             uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat);
+
+__aicore__ inline void asc_mrgsort4_sync(__ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN],
+    uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2,
+    uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit);
+__aicore__ inline void asc_mrgsort4_sync(__ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN],
+    uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2,
+    uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit);
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  

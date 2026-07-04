@@ -49,14 +49,6 @@ __aicore__ inline void asc_dcci_single(__gm__ void* dst);
 
 /*
  * @ingroup CacheControl
- * @brief Data cache clean and invalidate single entry (Global Memory)
- * @param [in] dst address in Global Memory to clean and invalidate
- * @details Clean and invalidate a single data cache entry for the specified Global Memory address
- */
-__aicore__ inline void asc_simd_dcci_single(__gm__ void* dst);
-
-/*
- * @ingroup CacheControl
  * @brief Unified Buffer data cache clean and invalidate single entry
  * @param [in] dst address in Unified Buffer to clean and invalidate
  * @details Clean and invalidate a single data cache entry for the specified Unified Buffer address
