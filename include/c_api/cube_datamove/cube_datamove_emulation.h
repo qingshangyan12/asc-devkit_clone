@@ -37,8 +37,8 @@
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
 #endif
 
-#ifndef INCLUDE_C_API_CUBE_DATAMOVE_CUBE_DATAMOVE_H
-#define INCLUDE_C_API_CUBE_DATAMOVE_CUBE_DATAMOVE_H
+#ifndef INCLUDE_C_API_CUBE_DATAMOVE_CUBE_DATAMOVE_EMULATION_H
+#define INCLUDE_C_API_CUBE_DATAMOVE_CUBE_DATAMOVE_EMULATION_H
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
@@ -51,7 +51,7 @@
 #endif
 
 /*
- * @ingroup CubeDataMove
+ * @ingroup cccc
  * @brief Copy data from Cube Buffer (L1) to Feature Buffer (L1) for various data types
  * @param [out] dst Destination buffer pointer in Feature Buffer (L1)
  * @param [in] src Source buffer pointer in Cube Buffer (L1)
@@ -144,6 +144,8 @@ __aicore__ inline void asc_fill_l0b_sync(__cb__ uint32_t *dst, half value, const
 __aicore__ inline void asc_fill_l0b_sync(__cb__ uint32_t *dst, uint32_t value, const asc_fill_value_config& config);
 
 __aicore__ inline void asc_fill_l0b_sync(__cb__ bfloat16_t *dst, bfloat16_t value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b_sync(__cb__ bfloat16_t* dst, half value, const asc_fill_value_config& config);
+__aicore__ inline void asc_fill_l0b_sync(__cb__ bfloat16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
 /*
  * @ingroup CubeDataMove
@@ -579,30 +581,64 @@ __aicore__ inline void asc_copy_gm2l0a_sync(__ca__ uint32_t *dst, __gm__ uint32_
 
 __aicore__ inline void asc_copy_gm2l0a_sync(__ca__ int4b_t* dst, __gm__ int4b_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
+
+__aicore__ inline void asc_copy_l0c2gm_sync(__gm__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, 
+                                            uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag, 
+                                            uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2dn);
+__aicore__ inline void asc_copy_l0c2gm_sync(__gm__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, 
+                                            uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag, 
+                                            uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2dn);
+__aicore__ inline void asc_copy_l0c2gm_sync(__gm__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, 
+                                            uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag, 
+                                            uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2dn);
+__aicore__ inline void asc_copy_l0c2gm_sync(__gm__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, 
+                                            uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag, 
+                                            uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2dn);
+__aicore__ inline void asc_copy_l0c2gm_sync(__gm__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, 
+                                            uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag, 
+                                            uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2dn);
+__aicore__ inline void asc_copy_l0c2gm_sync(__gm__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, 
+                                            uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag, 
+                                            uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2dn);
+__aicore__ inline void asc_copy_l0c2gm_sync(__gm__ int16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, 
+                                            uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag, 
+                                            uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2dn);
+__aicore__ inline void asc_copy_l0c2gm_sync(__gm__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, 
+                                            uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag, 
+                                            uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2dn);
+__aicore__ inline void asc_copy_l0c2gm_sync(__gm__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, 
+                                            uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag, 
+                                            uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2dn);
+
+__aicore__ inline void asc_copy_l0c2l1_sync(__cbuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size,
+                                            uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag,
+                                            uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd);
+__aicore__ inline void asc_copy_l0c2l1_sync(__cbuf__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size,
+                                            uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag,
+                                            uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd);
+__aicore__ inline void asc_copy_l0c2l1_sync(__cbuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size,
+                                            uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag,
+                                            uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd);
+__aicore__ inline void asc_copy_l0c2l1_sync(__cbuf__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size,
+                                            uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag,
+                                            uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd);
+__aicore__ inline void asc_copy_l0c2l1_sync(__cbuf__ int16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size,
+                                            uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag,
+                                            uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd);
+__aicore__ inline void asc_copy_l0c2l1_sync(__cbuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size,
+                                            uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag,
+                                            uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd);
+__aicore__ inline void asc_copy_l0c2l1_sync(__cbuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size,
+                                            uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag,
+                                            uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd);
+__aicore__ inline void asc_copy_l0c2l1_sync(__cbuf__ void* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size,
+                                            uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag,
+                                            uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd);
+__aicore__ inline void asc_copy_l0c2l1_sync(__cbuf__ void* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size,
+                                            uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag,
+                                            uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd);
+
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-
-/*
- * @ingroup CubeDataMove
- * @brief Copy data from L0C buffer to Cube Buffer (L1) for various data types
- * @param [out] dst Destination buffer pointer in Cube Buffer (L1)
- * @param [in] src Source buffer pointer in L0C
- * @param [in] n_size N dimension size
- * @param [in] m_size M dimension size
- * @param [in] dst_stride Destination stride value
- * @param [in] src_stride Source stride value
- * @param [in] unit_flag Unit flag mode setting
- * @param [in] quant_pre_mode Pre-quantization parameter
- * @param [in] relu_pre_mode Pre-ReLU parameter
- * @param [in] enable_split Enable channel split flag
- * @param [in] enable_nz2nd Enable NZ to ND conversion flag
- * @details Copies data from L0C buffer (__cc__) to Cube Buffer (__cbuf__).
- *          Supports float and int32_t data types with quantization and ReLU support.
- *          This is a software emulation interface with automatic synchronization.
- */
-__aicore__ inline void asc_copy_l0c2l1_sync(__cbuf__ void *dst, __cc__ float *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd);
-
-__aicore__ inline void asc_copy_l0c2l1_sync(__cbuf__ void *dst, __cc__ int32_t *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd);
-
 /*
  * @ingroup CubeDataMove
  * @brief Copy MX format data from Cube Buffer (L1) to L0A buffer

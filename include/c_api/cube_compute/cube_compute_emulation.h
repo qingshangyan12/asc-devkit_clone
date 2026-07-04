@@ -246,6 +246,11 @@ __aicore__ inline void asc_mmad_sync(__cc__ int32_t* c, __ca__ int8_t* a, __cb__
                                      uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
                                      bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
 
+__aicore__ inline void asc_mmad_sync(__cc__ float* c, __ca__ hifloat8_t* a, __cb__ hifloat8_t* b,
+                                             uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
+                                             bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
+
+                                     
 #endif
 
 #endif // INCLUDE_C_API_CUBE_COMPUTE_CUBE_COMPUTE_EMULATION_H

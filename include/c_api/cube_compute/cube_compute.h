@@ -46,8 +46,43 @@
  */
 __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre_addr, uint64_t quant_pre_addr, bool enable_unit_flag);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+/*
+ * @ingroup CubeCompute
+ * @brief Set MMAD computation direction to M direction
+ * @details Configure the matrix multiplication direction to optimize M direction computation
+ */
+__aicore__ inline void asc_set_mmad_direction_m();
 
+/*
+ * @ingroup CubeCompute
+ * @brief Set MMAD computation direction to N direction
+ * @details Configure the matrix multiplication direction to optimize N direction computation
+ */
+__aicore__ inline void asc_set_mmad_direction_n();
+
+/*
+ * @ingroup CubeCompute
+ * @brief Enable HF32 transformation mode
+ * @param [in] mode HF32 transformation mode value
+ * @details Configure HF32 transformation mode for specific precision requirements
+ */
+__aicore__ inline void asc_enable_hf32_trans(uint32_t mode);
+
+/*
+ * @ingroup CubeCompute
+ * @brief Enable HF32 mode
+ * @details Enable HF32 precision mode for matrix operations
+ */
+__aicore__ inline void asc_enable_hf32();
+
+/*
+ * @ingroup CubeCompute
+ * @brief Set FP32 mode
+ * @details Configure FP32 precision mode for matrix operations
+ */
+__aicore__ inline void asc_set_fp32_mode();
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 /*
  * @ingroup CubeCompute
  * @brief Matrix multiply-add operation with bfloat16 inputs and float output
@@ -160,43 +195,7 @@ __aicore__ inline void asc_mmad_sparse_sync(__cc__ int32_t* c, __ca__ int8_t* a,
                                             bool enable_cube_zero_init);
 
 /*
- * @ingroup CubeCompute
- * @brief Set MMAD computation direction to M direction
- * @details Configure the matrix multiplication direction to optimize M direction computation
- */
-__aicore__ inline void asc_set_mmad_direction_m();
-
-/*
- * @ingroup CubeCompute
- * @brief Set MMAD computation direction to N direction
- * @details Configure the matrix multiplication direction to optimize N direction computation
- */
-__aicore__ inline void asc_set_mmad_direction_n();
-
-/*
- * @ingroup CubeCompute
- * @brief Enable HF32 transformation mode
- * @param [in] mode HF32 transformation mode value
- * @details Configure HF32 transformation mode for specific precision requirements
- */
-__aicore__ inline void asc_enable_hf32_trans(uint32_t mode);
-
-/*
- * @ingroup CubeCompute
- * @brief Enable HF32 mode
- * @details Enable HF32 precision mode for matrix operations
- */
-__aicore__ inline void asc_enable_hf32();
-
-/*
- * @ingroup CubeCompute
- * @brief Set FP32 mode
- * @details Configure FP32 precision mode for matrix operations
- */
-__aicore__ inline void asc_set_fp32_mode();
-
-/*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Get L0C to GM ReLU configuration
  * @return ReLU configuration value
  * @details Retrieve the current ReLU configuration for L0C to GM transfer
@@ -204,7 +203,7 @@ __aicore__ inline void asc_set_fp32_mode();
 __aicore__ inline uint64_t asc_get_l0c2gm_relu();
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Get L0C to GM unit flag configuration
  * @return Unit flag configuration value
  * @details Retrieve the current unit flag configuration for L0C to GM transfer
@@ -212,7 +211,7 @@ __aicore__ inline uint64_t asc_get_l0c2gm_relu();
 __aicore__ inline uint64_t asc_get_l0c2gm_unitflag();
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Get L0C to GM pre-quantization configuration
  * @return Pre-quantization configuration value
  * @details Retrieve the current pre-quantization configuration for L0C to GM transfer
@@ -221,7 +220,7 @@ __aicore__ inline uint64_t asc_get_l0c2gm_prequant();
 
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Set L0C to GM NZ to ND format conversion configuration
  * @param [in] nd_num Number of ND blocks
  * @param [in] src_nd_stride Source ND stride
@@ -264,7 +263,7 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c, __ca__ fp4x2_e2m1_t* a,
 
 /*
  * @ingroup CubeCompute
- * @brief Matrix multiply-add operation with FP8 format inputs (e4m3fn * e4m3fn) and float output
+ * @brief Matrix multiply-add operation with FP8 format inputs and float output
  * @param [out] c Output matrix pointer, stored in L0C buffer
  * @param [in] a Input matrix A pointer with fp8_e4m3fn_t format, stored in L0A buffer
  * @param [in] b Input matrix B pointer with fp8_e4m3fn_t format, stored in L0B buffer
@@ -275,7 +274,7 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c, __ca__ fp4x2_e2m1_t* a,
  * @param [in] disable_gemv Whether to disable GEMV optimization
  * @param [in] enable_cube_init Whether to initialize cube
  * @param [in] enable_cube_zero_init Whether to initialize cube to zero
- * @details Performs C = A * B matrix multiplication with FP8 format (e4m3fn) inputs and float output.
+ * @details Performs C = A * B matrix multiplication with FP8 format inputs and float output.
  *          This is a hardware-level interface that requires manual synchronization.
  */
 __aicore__ inline void asc_mmad_mx(__cc__ float* c, __ca__ fp8_e4m3fn_t* a,
@@ -296,7 +295,7 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c, __ca__ fp8_e5m2_t* a,
 
 /*
  * @ingroup CubeCompute
- * @brief Matrix multiply-add operation with bfloat16 inputs and float output
+ * @brief Matrix multiply-add operation with bfloat16、fp8... inputs and float output, input types: 
  * @param [out] c Output matrix pointer, stored in L0C buffer
  * @param [in] a Input matrix A pointer, stored in L0A buffer
  * @param [in] b Input matrix B pointer, stored in L0B buffer
@@ -343,26 +342,24 @@ __aicore__ inline void asc_mmad(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8
                                 bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
 
 __aicore__ inline void asc_mmad(__cc__ float* c, __ca__ hifloat8_t* a, __cb__ hifloat8_t* b,
-                                        uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
-                                        bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
+                                uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
+                                bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
 
-__aicore__ inline void asc_mmad_sync(__cc__ float* c, __ca__ hifloat8_t* a, __cb__ hifloat8_t* b,
-                                             uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
-                                             bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
-
-__aicore__ inline void asc_enable_hf32_trans(uint32_t mode);
-
-__aicore__ inline void asc_enable_hf32();
-
-__aicore__ inline void asc_set_fp32_mode();
-
+/*
+ * @ingroup CubeCompute
+ * @brief Enable HiFloat8 mode
+ * @details Enable HiFloat8 (hif8) precision mode for matrix operations,
+ *          allowing the Cube unit to process hifloat8_t data types
+ */
 __aicore__ inline void asc_enable_hif8();
 
+/*
+ * @ingroup CubeCompute
+ * @brief Enable fp8 mode
+ * @details Enable fp8 precision mode for matrix operations,
+ *          allowing the Cube unit to process fp8 data types
+ */
 __aicore__ inline void asc_enable_fp8();
-
-__aicore__ inline void asc_set_mmad_direction_m();
-
-__aicore__ inline void asc_set_mmad_direction_n();
 
 #endif
 
