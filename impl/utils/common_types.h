@@ -22,6 +22,112 @@
 namespace AscendC {
 enum class Hardware : uint8_t { GM, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, MAX };
 
+enum class ExpAlgo {
+    INTRINSIC = 0,
+    PRECISION_1ULP_FTZ_TRUE,
+    PRECISION_1ULP_FTZ_FALSE,
+};
+struct ExpConfig {
+    ExpAlgo algo = ExpAlgo::INTRINSIC;
+};
+
+constexpr ExpConfig DEFAULT_EXP_CONFIG = {ExpAlgo::INTRINSIC};
+
+enum class LnAlgo {
+    INTRINSIC = 0,
+    PRECISION_1ULP_FTZ_TRUE,
+    PRECISION_1ULP_FTZ_FALSE,
+};
+struct LnConfig {
+    LnAlgo algo = LnAlgo::INTRINSIC;
+};
+
+constexpr LnConfig DEFAULT_LN_CONFIG = {LnAlgo::INTRINSIC};
+
+enum class LogAlgo {
+    INTRINSIC = 0,
+    PRECISION_1ULP_FTZ_TRUE,
+    PRECISION_1ULP_FTZ_FALSE,
+};
+struct LogConfig {
+    LogAlgo algo = LogAlgo::INTRINSIC;
+};
+
+constexpr LogConfig DEFAULT_Log_CONFIG = {LogAlgo::INTRINSIC};
+
+enum class Log2Algo {
+    INTRINSIC = 0,
+    PRECISION_1ULP_FTZ_TRUE,
+    PRECISION_1ULP_FTZ_FALSE,
+};
+struct Log2Config {
+    Log2Algo algo = Log2Algo::INTRINSIC;
+};
+
+constexpr Log2Config DEFAULT_Log2_CONFIG = {Log2Algo::INTRINSIC};
+
+enum class Log10Algo {
+    INTRINSIC = 0,
+    PRECISION_1ULP_FTZ_TRUE,
+    PRECISION_1ULP_FTZ_FALSE,
+};
+struct Log10Config {
+    Log10Algo algo = Log10Algo::INTRINSIC;
+};
+
+constexpr Log10Config DEFAULT_Log10_CONFIG = {Log10Algo::INTRINSIC};
+
+enum class ReciprocalAlgo {
+    INTRINSIC = 0,
+    PRECISION_1ULP_FTZ_TRUE,
+    PRECISION_1ULP_FTZ_FALSE,
+};
+struct ReciprocalConfig {
+    ReciprocalAlgo algo = ReciprocalAlgo::INTRINSIC;
+};
+
+constexpr ReciprocalConfig DEFAULT_RECIPROCAL_CONFIG = {ReciprocalAlgo::INTRINSIC};
+
+enum class DivAlgo {
+    INTRINSIC = 0,
+    DIFF_COMPENSATION,
+    PRECISION_1ULP_FTZ_TRUE,
+    PRECISION_0ULP_FTZ_TRUE,
+    PRECISION_0ULP_FTZ_FALSE,
+    PRECISION_1ULP_FTZ_FALSE
+};
+struct DivConfig {
+    DivAlgo algo = DivAlgo::INTRINSIC;
+};
+
+constexpr DivConfig DEFAULT_DIV_CONFIG = {DivAlgo::INTRINSIC};
+
+enum class SqrtAlgo {
+    INTRINSIC = 0,
+    FAST_INVERSE,
+    PRECISION_1ULP_FTZ_TRUE,
+    PRECISION_0ULP_FTZ_FALSE,
+    PRECISION_1ULP_FTZ_FALSE,
+};
+struct SqrtConfig {
+    SqrtAlgo algo = SqrtAlgo::INTRINSIC;
+};
+
+constexpr SqrtConfig DEFAULT_SQRT_CONFIG = {SqrtAlgo::INTRINSIC};
+
+enum class RsqrtAlgo {
+    INTRINSIC = 0,
+    FAST_INVERSE,
+    PRECISION_1ULP_FTZ_TRUE,
+    PRECISION_0ULP_FTZ_FALSE,
+    PRECISION_1ULP_FTZ_FALSE,
+};
+struct RsqrtConfig {
+    RsqrtAlgo algo = RsqrtAlgo::INTRINSIC;
+};
+
+constexpr RsqrtConfig DEFAULT_RSQRT_CONFIG = {RsqrtAlgo::INTRINSIC};
+
 enum class ReduceType {
     NONE = -1,
     SUM = 0,

@@ -150,30 +150,33 @@ template <typename T> __aicore__ inline void ReluImpl(__ubuf__ T* dst, __ubuf__ 
 
 /* **************************************** Exp ****************************************** */
 // Exp::Level 0
-template <typename T, bool isSetMask = true>
+template <typename T, bool isSetMask = true, const ExpConfig& config = DEFAULT_EXP_CONFIG>
 __aicore__ inline void ExpImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask[], const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
     if ASCEND_IS_AIV {
+        static_assert((config.algo == ExpAlgo::INTRINSIC), "current config type is not supported on current device!");
         AscendCUtils::SetMask<T, isSetMask>(mask[1], mask[0]);
         ExpIntrinsicsImpl(dst, src, repeatTime, repeatParams);
     }
 }
 
-template <typename T, bool isSetMask = true>
+template <typename T, bool isSetMask = true, const ExpConfig& config = DEFAULT_EXP_CONFIG>
 __aicore__ inline void ExpImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
-{
-    if ASCEND_IS_AIV {
+{    
+    if ASCEND_IS_AIV {    
+        static_assert((config.algo == ExpAlgo::INTRINSIC), "current config type is not supported on current device!");
         AscendCUtils::SetMask<T, isSetMask>(mask);
         ExpIntrinsicsImpl(dst, src, repeatTime, repeatParams);
     }
 }
 
 // Exp::Level 2
-template <typename T> __aicore__ inline void ExpImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
+template <typename T, const ExpConfig& config = DEFAULT_EXP_CONFIG> __aicore__ inline void ExpImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
 {
     if ASCEND_IS_AIV {
+        static_assert((config.algo == ExpAlgo::INTRINSIC), "current config type is not supported on current device!");
         ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
             "dtype in Exp, current api support dtype combination is src and dst both: half / float.\n"));
         set_mask_count();
@@ -187,30 +190,33 @@ template <typename T> __aicore__ inline void ExpImpl(__ubuf__ T* dst, __ubuf__ T
 
 /* **************************************** Ln ****************************************** */
 // Ln::Level 0
-template <typename T, bool isSetMask = true>
+template <typename T, bool isSetMask = true, const LnConfig& config = DEFAULT_LN_CONFIG>
 __aicore__ inline void LnImpl(__ubuf__ T* dst, __ubuf__ T* src, uint64_t mask[], uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
     if ASCEND_IS_AIV {
+        static_assert((config.algo == LnAlgo::INTRINSIC), "current config type is not supported on current device!");
         AscendCUtils::SetMask<T, isSetMask>(mask[1], mask[0]);
         LnIntrinsicsImpl(dst, src, repeatTime, repeatParams);
     }
 }
 
-template <typename T, bool isSetMask = true>
+template <typename T, bool isSetMask = true, const LnConfig& config = DEFAULT_LN_CONFIG>
 __aicore__ inline void LnImpl(__ubuf__ T* dst, __ubuf__ T* src, uint64_t mask, uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
     if ASCEND_IS_AIV {
+        static_assert((config.algo == LnAlgo::INTRINSIC), "current config type is not supported on current device!");
         AscendCUtils::SetMask<T, isSetMask>(mask);
         LnIntrinsicsImpl(dst, src, repeatTime, repeatParams);
     }
 }
 
 // Ln::Level 2
-template <typename T> __aicore__ inline void LnImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
+template <typename T, const LnConfig& config = DEFAULT_LN_CONFIG> __aicore__ inline void LnImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
 {
     if ASCEND_IS_AIV {
+        static_assert((config.algo == LnAlgo::INTRINSIC), "current config type is not supported on current device!");
         ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
             "dtype in Ln, current api support dtype combination is src and dst both: half / float.\n"));
         set_mask_count();
@@ -261,30 +267,33 @@ template <typename T> __aicore__ inline void AbsImpl(__ubuf__ T* dst, __ubuf__ T
 
 /* **************************************** Reciprocal ****************************************** */
 // Reciprocal::Level 0
-template <typename T, bool isSetMask = true>
+template <typename T, bool isSetMask = true, const ReciprocalConfig& config = DEFAULT_RECIPROCAL_CONFIG>
 __aicore__ inline void ReciprocalImpl(__ubuf__ T* dst, __ubuf__ T* src, uint64_t mask[], uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
     if ASCEND_IS_AIV {
+        static_assert((config.algo == ReciprocalAlgo::INTRINSIC), "current config type is not supported on current device!");
         AscendCUtils::SetMask<T, isSetMask>(mask[1], mask[0]);
         ReciprocalIntrinsicsImpl(dst, src, repeatTime, repeatParams);
     }
 }
 
-template <typename T, bool isSetMask = true>
+template <typename T, bool isSetMask = true, const ReciprocalConfig& config = DEFAULT_RECIPROCAL_CONFIG>
 __aicore__ inline void ReciprocalImpl(__ubuf__ T* dst, __ubuf__ T* src, uint64_t mask, uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
     if ASCEND_IS_AIV {
+        static_assert((config.algo == ReciprocalAlgo::INTRINSIC), "current config type is not supported on current device!");
         AscendCUtils::SetMask<T, isSetMask>(mask);
         ReciprocalIntrinsicsImpl(dst, src, repeatTime, repeatParams);
     }
 }
 
 // Reciprocal::Level 2
-template <typename T> __aicore__ inline void ReciprocalImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
+template <typename T, const ReciprocalConfig& config = DEFAULT_RECIPROCAL_CONFIG> __aicore__ inline void ReciprocalImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
 {
     if ASCEND_IS_AIV {
+        static_assert((config.algo == ReciprocalAlgo::INTRINSIC), "current config type is not supported on current device!");
         ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
             "dtype in Reciprocal, current api support dtype combination is src and dst both: half / float.\n"));
         set_mask_count();
@@ -298,30 +307,33 @@ template <typename T> __aicore__ inline void ReciprocalImpl(__ubuf__ T* dst, __u
 
 /* **************************************** Rsqrt ****************************************** */
 // Rsqrt::Level 0
-template <typename T, bool isSetMask = true>
+template <typename T, bool isSetMask = true, const RsqrtConfig& config = DEFAULT_RSQRT_CONFIG>
 __aicore__ inline void RsqrtImpl(__ubuf__ T* dst, __ubuf__ T* src, uint64_t mask[], uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
     if ASCEND_IS_AIV {
+        static_assert((config.algo == RsqrtAlgo::INTRINSIC), "current config type is not supported on current device!");
         AscendCUtils::SetMask<T, isSetMask>(mask[1], mask[0]);
         RsqrtIntrinsicsImpl(dst, src, repeatTime, repeatParams);
     }
 }
 
-template <typename T, bool isSetMask = true>
+template <typename T, bool isSetMask = true, const RsqrtConfig& config = DEFAULT_RSQRT_CONFIG>
 __aicore__ inline void RsqrtImpl(__ubuf__ T* dst, __ubuf__ T* src, uint64_t mask, uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
     if ASCEND_IS_AIV {
+        static_assert((config.algo == RsqrtAlgo::INTRINSIC), "current config type is not supported on current device!");
         AscendCUtils::SetMask<T, isSetMask>(mask);
         RsqrtIntrinsicsImpl(dst, src, repeatTime, repeatParams);
     }
 }
 
 // Rsqrt::Level 2
-template <typename T> __aicore__ inline void RsqrtImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
+template <typename T, const RsqrtConfig& config = DEFAULT_RSQRT_CONFIG> __aicore__ inline void RsqrtImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
 {
     if ASCEND_IS_AIV {
+        static_assert((config.algo == RsqrtAlgo::INTRINSIC), "current config type is not supported on current device!");
         ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
             "dtype in Rsqrt, current api support dtype combination is src and dst both: half / float.\n"));
         set_mask_count();
@@ -335,30 +347,33 @@ template <typename T> __aicore__ inline void RsqrtImpl(__ubuf__ T* dst, __ubuf__
 
 /* **************************************** Sqrt ****************************************** */
 // Sqrt::Level 0
-template <typename T, bool isSetMask = true>
+template <typename T, bool isSetMask = true, const SqrtConfig& config = DEFAULT_SQRT_CONFIG>
 __aicore__ inline void SqrtImpl(__ubuf__ T* dst, __ubuf__ T* src, uint64_t mask[], uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
     if ASCEND_IS_AIV {
+        static_assert((config.algo == SqrtAlgo::INTRINSIC), "current config type is not supported on current device!");
         AscendCUtils::SetMask<T, isSetMask>(mask[1], mask[0]);
         SqrtIntrinsicsImpl(dst, src, repeatTime, repeatParams);
     }
 }
 
-template <typename T, bool isSetMask = true>
+template <typename T, bool isSetMask = true, const SqrtConfig& config = DEFAULT_SQRT_CONFIG>
 __aicore__ inline void SqrtImpl(__ubuf__ T* dst, __ubuf__ T* src, uint64_t mask, uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
     if ASCEND_IS_AIV {
+        static_assert((config.algo == SqrtAlgo::INTRINSIC), "current config type is not supported on current device!");
         AscendCUtils::SetMask<T, isSetMask>(mask);
         SqrtIntrinsicsImpl(dst, src, repeatTime, repeatParams);
     }
 }
 
 // Sqrt::Level 2
-template <typename T> __aicore__ inline void SqrtImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
+template <typename T, const SqrtConfig& config = DEFAULT_SQRT_CONFIG> __aicore__ inline void SqrtImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
 {
     if ASCEND_IS_AIV {
+        static_assert((config.algo == SqrtAlgo::INTRINSIC), "current config type is not supported on current device!");
         ASCENDC_DEBUG_ASSERT((SupportType<T, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check "
             "dtype in Sqrt, current api support dtype combination is src and dst both: half / float.\n"));
         set_mask_count();
