@@ -19,6 +19,7 @@ import datetime
 import json
 import logging
 import re
+import statistics
 import sys
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
@@ -68,6 +69,124 @@ def timeout_examples(report_path: Path) -> list[str]:
         for result in data.get("results", [])
         if result.get("status") == "FAIL" and result.get("reason") == "timeout"
     ]
+
+
+def list_examples(report_path: Path) -> list[str]:
+    data = read_json(report_path)
+    if not data:
+        return []
+    return [str(result.get("example", "")) for result in data.get("results", []) if result.get("example")]
+
+
+def shard_examples(
+    report_path: Path,
+    cards: list[str],
+    manifest_path: Path | None = None,
+    schedule_report: Path | None = None,
+    excludes: set[str] | None = None,
+    keep_source_groups: bool = True,
+) -> list[tuple[str, str]]:
+    examples = [example for example in list_examples(report_path) if example not in (excludes or set())]
+    if not cards or not examples:
+        return []
+
+    source_case = load_source_case_map(manifest_path) if keep_source_groups else {}
+    weights = load_duration_seconds(schedule_report)
+    default_weight = default_duration_weight(weights, examples)
+    groups = group_examples_by_source_case(examples, source_case)
+    order_index = {example: index for index, example in enumerate(examples)}
+    group_items = []
+    for source, group_examples in groups.items():
+        group_weight = sum(weights.get(example, default_weight) for example in group_examples)
+        first_index = min(order_index[example] for example in group_examples)
+        group_items.append((group_weight, first_index, source, group_examples))
+
+    card_loads = {card: 0.0 for card in cards}
+    card_groups: dict[str, list[list[str]]] = {card: [] for card in cards}
+    for group_weight, _, _, group_examples in sorted(group_items, key=lambda item: (-item[0], item[1])):
+        card = min(cards, key=lambda item: (card_loads[item], cards.index(item)))
+        card_loads[card] += group_weight
+        card_groups[card].append(group_examples)
+
+    assignments = []
+    for card in cards:
+        for example in interleave_group_examples(card_groups[card], order_index):
+            assignments.append((card, example))
+    return assignments
+
+
+def load_source_case_map(manifest_path: Path | None) -> dict[str, str]:
+    if manifest_path is None or not manifest_path.exists():
+        return {}
+    data = json.loads(manifest_path.read_text(encoding="utf-8"))
+    return {
+        str(item.get("case")): str(item.get("source_case") or item.get("case"))
+        for item in data
+        if item.get("case")
+    }
+
+
+def group_examples_by_source_case(examples: list[str], source_case: dict[str, str]) -> dict[str, list[str]]:
+    groups: dict[str, list[str]] = {}
+    for example in examples:
+        groups.setdefault(source_case.get(example, example), []).append(example)
+    return groups
+
+
+def interleave_group_examples(groups: list[list[str]], order_index: dict[str, int]) -> list[str]:
+    queues = [sorted(group, key=lambda item: order_index[item]) for group in groups if group]
+    queues.sort(key=lambda group: order_index[group[0]])
+    ordered: list[str] = []
+    while queues:
+        next_queues: list[list[str]] = []
+        for group in queues:
+            ordered.append(group.pop(0))
+            if group:
+                next_queues.append(group)
+        queues = sorted(next_queues, key=lambda group: order_index[group[0]])
+    return ordered
+
+
+def load_duration_seconds(report_path: Path | None) -> dict[str, float]:
+    if report_path is None or not report_path.exists():
+        return {}
+    if report_path.is_dir():
+        timings = report_path / "ALL_CASE_TIMINGS.tsv"
+        if timings.exists():
+            return load_duration_seconds(timings)
+        weights: dict[str, float] = {}
+        for report in sorted(report_path.glob("*/results/report.json")):
+            weights.update(load_duration_seconds(report))
+        return weights
+    if report_path.suffix == ".tsv":
+        return load_duration_seconds_from_tsv(report_path)
+    data = read_json(report_path)
+    if not data:
+        return {}
+    return {
+        str(result.get("example")): float(result.get("duration_s") or 0)
+        for result in data.get("results", [])
+        if result.get("example")
+    }
+
+
+def load_duration_seconds_from_tsv(report_path: Path) -> dict[str, float]:
+    weights: dict[str, float] = {}
+    with report_path.open(encoding="utf-8", newline="") as handle:
+        for row in csv.DictReader(handle, delimiter="\t"):
+            example = row.get("example", "")
+            if not example:
+                continue
+            try:
+                weights[example] = float(row.get("duration_s") or 0)
+            except ValueError:
+                weights[example] = 0.0
+    return weights
+
+
+def default_duration_weight(weights: dict[str, float], examples: list[str]) -> float:
+    known = [weights[example] for example in examples if weights.get(example, 0) > 0]
+    return statistics.median(known) if known else 1.0
 
 
 def retry_status(report_path: Path) -> str:
@@ -157,19 +276,98 @@ def log_failed_cases(results: list[dict[str, Any]]) -> None:
 
 
 def load_primary_run(root: Path) -> tuple[str, Path, dict[str, str], dict[str, Any]] | None:
+    runs = load_primary_runs(root)
+    if not runs:
+        return None
+    if len(runs) == 1:
+        return runs[0]
+    return merge_primary_runs(root, runs)
+
+
+def load_primary_runs(root: Path) -> list[tuple[str, Path, dict[str, str], dict[str, Any]]]:
+    primary_runs: list[tuple[str, Path, dict[str, str], dict[str, Any]]] = []
     for report in sorted(root.glob("*/results/report.json")):
         run_dir = report.parents[1]
         if not run_dir.name.startswith("full_card"):
             continue
         data = read_json(report)
         if data:
-            return run_dir.name, run_dir, read_meta(run_dir / "meta.txt"), data
-    return None
+            primary_runs.append((run_dir.name, run_dir, read_meta(run_dir / "meta.txt"), data))
+    return primary_runs
+
+
+def merge_primary_runs(
+    root: Path,
+    runs: list[tuple[str, Path, dict[str, str], dict[str, Any]]],
+) -> tuple[str, Path, dict[str, str], dict[str, Any]]:
+    first_meta = dict(runs[0][2])
+    results: list[dict[str, Any]] = []
+    busy_s = 0.0
+    idle_s = 0.0
+    for _, _, _, data in runs:
+        results.extend(data.get("results", []))
+        npu_stats = data.get("npu_stats") or {}
+        busy_s += float(npu_stats.get("busy_s") or 0)
+        idle_s += float(npu_stats.get("idle_s") or 0)
+
+    summary = {
+        "PASS": sum(1 for result in results if result.get("status") == "PASS"),
+        "FAIL": sum(1 for result in results if result.get("status") == "FAIL"),
+        "SKIP": sum(1 for result in results if result.get("status") == "SKIP"),
+    }
+    unique_cards = sorted({meta.get("card", "") for _, _, meta, _ in runs if meta.get("card", "")}, key=int)
+    first_meta["card"] = ",".join(unique_cards)
+    first_meta["elapsed_sec"] = merged_elapsed_sec(runs)
+    first_meta["npu_slots"] = str(len(unique_cards) or len(runs))
+
+    total_s = busy_s + idle_s
+    parallel_config = dict(runs[0][3].get("parallel_config") or {})
+    parallel_config["npu_slots"] = len(unique_cards) or len(runs)
+    merged_data = {
+        "summary": summary,
+        "results": results,
+        "parallel_config": parallel_config,
+        "npu_stats": {
+            "busy_s": busy_s,
+            "idle_s": idle_s,
+            "utilization": busy_s / total_s if total_s > 0 else 0,
+            "queue_model": "multi-card",
+        },
+    }
+    return "full_multi", root, first_meta, merged_data
+
+
+def merged_elapsed_sec(runs: list[tuple[str, Path, dict[str, str], dict[str, Any]]]) -> str:
+    starts = [parse_meta_time(meta.get("started_at", "")) for _, _, meta, _ in runs]
+    finishes = [parse_meta_time(meta.get("finished_at", "")) for _, _, meta, _ in runs]
+    starts = [value for value in starts if value]
+    finishes = [value for value in finishes if value]
+    if starts and finishes:
+        return str(int((max(finishes) - min(starts)).total_seconds()))
+    elapsed_values = [
+        int(meta.get("elapsed_sec") or 0)
+        for _, _, meta, _ in runs
+        if str(meta.get("elapsed_sec") or "").isdigit()
+    ]
+    return str(max(elapsed_values) if elapsed_values else "")
+
+
+def parse_meta_time(value: str) -> datetime.datetime | None:
+    if not value:
+        return None
+    try:
+        return datetime.datetime.fromisoformat(value)
+    except ValueError:
+        pass
+    try:
+        return datetime.datetime.strptime(value, "%Y-%m-%dT%H:%M:%S%z")
+    except ValueError:
+        return None
 
 
 def write_final_report(root: Path) -> None:
     runs = load_runs(root)
-    primary = next((item for item in runs if item[0].startswith("full_card")), None)
+    primary = load_primary_run(root)
     retry_by_example = collect_retry_results(runs)
 
     timings_path = root / "ALL_CASE_TIMINGS.tsv"
@@ -622,6 +820,15 @@ def main() -> int:
     subparsers = parser.add_subparsers(dest="command", required=True)
     timeout_parser = subparsers.add_parser("timeout-examples")
     timeout_parser.add_argument("report", type=Path)
+    list_parser = subparsers.add_parser("list-examples")
+    list_parser.add_argument("report", type=Path)
+    shard_parser = subparsers.add_parser("shard-examples")
+    shard_parser.add_argument("report", type=Path)
+    shard_parser.add_argument("--cards", nargs="+", required=True)
+    shard_parser.add_argument("--manifest", type=Path)
+    shard_parser.add_argument("--schedule-report", type=Path)
+    shard_parser.add_argument("--exclude", action="append", default=[])
+    shard_parser.add_argument("--split-source-groups", action="store_true")
     status_parser = subparsers.add_parser("retry-status")
     status_parser.add_argument("report", type=Path)
     report_parser = subparsers.add_parser("write-final-report")
@@ -633,6 +840,19 @@ def main() -> int:
     if args.command == "timeout-examples":
         for example in timeout_examples(args.report):
             LOG.info("%s", example)
+    elif args.command == "list-examples":
+        for example in list_examples(args.report):
+            LOG.info("%s", example)
+    elif args.command == "shard-examples":
+        for card, example in shard_examples(
+            args.report,
+            args.cards,
+            args.manifest,
+            args.schedule_report,
+            set(args.exclude),
+            keep_source_groups=not args.split_source_groups,
+        ):
+            LOG.info("%s\t%s", card, example)
     elif args.command == "retry-status":
         LOG.info("%s", retry_status(args.report))
     elif args.command == "write-final-report":

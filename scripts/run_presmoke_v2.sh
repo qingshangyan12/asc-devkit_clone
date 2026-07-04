@@ -18,6 +18,7 @@ ARCH="${ARCH:-dav-2201}"
 MODES="${MODES:-${MODE:-npu}}"
 RUNNER_MODE="${RUNNER_MODE:-case-runner}"
 SCHEDULE="${SCHEDULE:-fixed}"
+SCHEDULE_REPORT="${SCHEDULE_REPORT:-}"
 SCHEDULE_FILE="${SCHEDULE_FILE:-}"
 STRICT_SCHEDULE="${STRICT_SCHEDULE:-1}"
 JOBS="${JOBS:-auto}"
@@ -28,10 +29,14 @@ TIMEOUT="${TIMEOUT:-120}"
 CPU_RUN_TIMEOUT="${CPU_RUN_TIMEOUT:-300}"
 PRIMARY_CARD="${PRIMARY_CARD:-0}"
 RETRY_CARDS="${RETRY_CARDS:-}"
+NPU_CARDS="${NPU_CARDS:-}"
 REPORT_FORMAT="${REPORT_FORMAT:-all}"
 PRESMOKE_WERROR="${PRESMOKE_WERROR:-0}"
 OUT_ROOT="${OUT_ROOT:-${PROJECT_ROOT}/presmoke_reports/presmoke_${ARCH}_$(date +%Y%m%d_%H%M%S)}"
 LOCK_DIR="${LOCK_DIR:-${PROJECT_ROOT}/.presmoke_locks/run_presmoke.lock}"
+MULTI_CARD_WORKSPACE_MODE="${MULTI_CARD_WORKSPACE_MODE:-copy}"
+PRESMOKE_SHARED_LOCK_DIR="${PRESMOKE_SHARED_LOCK_DIR:-${OUT_ROOT}/.locks}"
+PRESMOKE_SHARED_STATE_DIR="${PRESMOKE_SHARED_STATE_DIR:-${OUT_ROOT}/.state}"
 
 if [[ "$MODES" != "npu" && "${SCHEDULE:-}" == "fixed" && -z "$SCHEDULE_FILE" ]]; then
     SCHEDULE="default"
@@ -150,7 +155,7 @@ should_clean_cann_vendors() {
     local arg
     for arg in "$@"; do
         case "$arg" in
-            --dry-run|--filter|--filter=*|--suggestions-only) return 1 ;;
+            --dry-run|--filter|--filter=*|--exact-filter|--exact-filter=*|--suggestions-only) return 1 ;;
         esac
     done
     return 0
@@ -169,9 +174,292 @@ should_strict_schedule() {
     truthy "$STRICT_SCHEDULE" || return 1
     for arg in "$@"; do
         case "$arg" in
-            --filter|--filter=*|--exclude|--exclude=*|--suggestions-only) return 1 ;;
+            --filter|--filter=*|--exact-filter|--exact-filter=*|--exclude|--exclude=*|--suggestions-only) return 1 ;;
         esac
     done
+    return 0
+}
+
+detect_npu_cards() {
+    if ! command -v npu-smi >/dev/null 2>&1; then
+        return 0
+    fi
+    npu_smi_info | awk '
+        {
+            gsub(/\|/, " ")
+            if ($1 ~ /^[0-9]+$/) {
+                print $1
+            }
+        }
+    ' | sort -n -u
+}
+
+normalize_card_list() {
+    local raw="$1"
+    raw="${raw//,/ }"
+    local card
+    for card in $raw; do
+        [[ -n "$card" ]] && printf '%s\n' "$card"
+    done
+}
+
+resolve_npu_cards() {
+    if [[ -z "$NPU_CARDS" ]]; then
+        printf '%s\n' "$PRIMARY_CARD"
+        return
+    fi
+    if [[ "$NPU_CARDS" == "auto" ]]; then
+        local detected
+        detected="$(detect_npu_cards)"
+        if [[ -n "$detected" ]]; then
+            printf '%s\n' "$detected"
+        else
+            printf '%s\n' "$PRIMARY_CARD"
+        fi
+        return
+    fi
+    normalize_card_list "$NPU_CARDS"
+}
+
+has_arg_requiring_single_run() {
+    local arg
+    for arg in "$@"; do
+        case "$arg" in
+            --dry-run|--filter|--filter=*|--exact-filter|--exact-filter=*|--exclude|--exclude=*) return 0 ;;
+            --suggestions-only) return 0 ;;
+        esac
+    done
+    return 1
+}
+
+should_run_multi_card() {
+    local card_count="$1"
+    shift
+    [[ "$MODES" == "npu" ]] || return 1
+    [[ -n "$NPU_CARDS" ]] || return 1
+    (( card_count > 1 )) || return 1
+    ! has_arg_requiring_single_run "$@"
+}
+
+plan_examples_for_sharding() {
+    local plan_dir="$OUT_ROOT/.plan"
+    rm -rf "$plan_dir"
+    mkdir -p "$plan_dir/results"
+    (
+        cd "$PROJECT_ROOT"
+        export ASCEND_HOME_DIR
+        export PRESMOKE_WERROR
+        args=(
+            --runner-mode "$RUNNER_MODE"
+            --arch "$ARCH"
+            --modes "$MODES"
+            --jobs "$JOBS"
+            --npu-slots "$NPU_SLOTS"
+            --cpu-run-slots "$CPU_RUN_SLOTS"
+            --make-jobs "$MAKE_JOBS"
+            --timeout "$TIMEOUT"
+            --cpu-run-timeout "$CPU_RUN_TIMEOUT"
+            --schedule "$SCHEDULE"
+            --report-format "$REPORT_FORMAT"
+            --results "$plan_dir/results"
+            --dry-run
+        )
+        if [[ -n "$SCHEDULE_FILE" ]]; then
+            args+=(--schedule-file "$SCHEDULE_FILE")
+        fi
+        if [[ -n "$SCHEDULE_REPORT" ]]; then
+            args+=(--schedule-report "$SCHEDULE_REPORT")
+        fi
+        if should_strict_schedule "$@"; then
+            args+=(--strict-schedule)
+        fi
+        if truthy "$PRESMOKE_WERROR"; then
+            args+=(--werror)
+        fi
+        run_python_presmoke "${args[@]}" "$@"
+    ) > "$plan_dir/stdout.log" 2> "$plan_dir/stderr.log"
+    run_python_module presmoke.orchestrate_report list-examples "$plan_dir/results/report.json"
+}
+
+is_multi_card_setup_example() {
+    case "$1" in
+        01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op_static_lib) return 0 ;;
+        01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/parallel_ops_package) return 0 ;;
+        01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+write_multi_card_shards() {
+    local shards_dir="$1"
+    shift
+    local cards=("$@")
+    local assignments="$OUT_ROOT/.plan/shards.tsv"
+    local shard_args=(
+        presmoke.orchestrate_report
+        shard-examples
+        "$OUT_ROOT/.plan/results/report.json"
+        --manifest "$PROJECT_ROOT/scripts/presmoke/reports/case_runner_manifest.json"
+    )
+    if [[ -n "$SCHEDULE_REPORT" ]]; then
+        shard_args+=(--schedule-report "$SCHEDULE_REPORT")
+    fi
+    if [[ "$MULTI_CARD_WORKSPACE_MODE" == "copy" ]]; then
+        shard_args+=(--split-source-groups)
+    fi
+    local example
+    if (( ${#setup_examples[@]} > 0 )); then
+        for example in "${setup_examples[@]}"; do
+            shard_args+=(--exclude "$example")
+        done
+    fi
+    shard_args+=(--cards "${cards[@]}")
+
+    rm -rf "$shards_dir"
+    mkdir -p "$shards_dir"
+    run_python_module "${shard_args[@]}" > "$assignments"
+
+    local card
+    while IFS=$'\t' read -r card example; do
+        [[ -n "$card" && -n "$example" ]] || continue
+        printf '%s\n' "$example" >> "$shards_dir/card_${card}.txt"
+    done < "$assignments"
+}
+
+workspace_for_card() {
+    local card="$1"
+    if [[ "$MULTI_CARD_WORKSPACE_MODE" == "copy" ]]; then
+        printf '%s/.workspaces/card_%s\n' "$OUT_ROOT" "$card"
+        return
+    fi
+    printf '%s\n' "$PROJECT_ROOT"
+}
+
+copy_project_workspace() {
+    local dst="$1"
+    local project_abs out_abs out_rel=""
+    local out_excludes=()
+    project_abs="$(cd "$PROJECT_ROOT" && pwd -P)"
+    out_abs="$(cd "$OUT_ROOT" && pwd -P)"
+    if [[ "$out_abs" == "$project_abs/"* ]]; then
+        out_rel="${out_abs#"$project_abs/"}"
+        out_excludes=("--exclude=/$out_rel/")
+    fi
+    rm -rf "$dst"
+    mkdir -p "$dst"
+    if command -v rsync >/dev/null 2>&1; then
+        rsync -a --delete \
+            --exclude='/.git/' \
+            --exclude='/presmoke_reports/' \
+            --exclude='/.presmoke_locks/' \
+            --exclude='/.presmoke_state/' \
+            --exclude='build/' \
+            --exclude='build_*/' \
+            "${out_excludes[@]}" \
+            "$PROJECT_ROOT/" "$dst/"
+        return
+    fi
+    (
+        cd "$PROJECT_ROOT"
+        tar \
+            --exclude='./.git' \
+            --exclude='./presmoke_reports' \
+            --exclude='./.presmoke_locks' \
+            --exclude='./.presmoke_state' \
+            ${out_rel:+--exclude="./$out_rel"} \
+            --exclude='*/build' \
+            --exclude='*/build_*' \
+            -cf - .
+    ) | (cd "$dst" && tar -xf -)
+}
+
+prepare_multi_card_workspaces() {
+    [[ "$MULTI_CARD_WORKSPACE_MODE" == "copy" ]] || return
+    local card workspace
+    rm -rf "$OUT_ROOT/.workspaces"
+    mkdir -p "$OUT_ROOT/.workspaces"
+    for card in "$@"; do
+        workspace="$(workspace_for_card "$card")"
+        log "multi_card_workspace_copy_start card=$card path=$workspace"
+        copy_project_workspace "$workspace"
+        log "multi_card_workspace_copy_done card=$card path=$workspace"
+    done
+}
+
+run_multi_card_presmoke() {
+    local cards_csv="$1"
+    shift
+    local cards=()
+    local examples=()
+    local setup_examples=()
+    local shard_examples=()
+    local card example
+    while IFS= read -r card; do
+        [[ -n "$card" ]] && cards+=("$card")
+    done <<< "$cards_csv"
+    while IFS= read -r example; do
+        [[ -n "$example" ]] || continue
+        examples+=("$example")
+        if is_multi_card_setup_example "$example"; then
+            setup_examples+=("$example")
+        else
+            shard_examples+=("$example")
+        fi
+    done < <(plan_examples_for_sharding "$@")
+    if [[ "${#examples[@]}" -eq 0 ]]; then
+        log "multi_card_skip no_planned_cases"
+        run_presmoke "full_card${PRIMARY_CARD}" "$PRIMARY_CARD" "$@"
+        return
+    fi
+
+    log "multi_card_start cards=${cards[*]} cases=${#examples[@]}"
+    if [[ "${#setup_examples[@]}" -gt 0 ]]; then
+        local setup_args=()
+        for example in "${setup_examples[@]}"; do
+            setup_args+=(--exact-filter "$example")
+        done
+        log "multi_card_setup_start card=${cards[0]} count=${#setup_examples[@]}"
+        run_presmoke "full_card${cards[0]}_setup" "${cards[0]}" "${setup_args[@]}" "$@"
+        log "multi_card_setup_done card=${cards[0]} count=${#setup_examples[@]}"
+    fi
+    prepare_multi_card_workspaces "${cards[@]}"
+    local shards_dir="$OUT_ROOT/.plan/shards"
+    write_multi_card_shards "$shards_dir" "${cards[@]}"
+
+    local index shard_count pid rc run_project_root
+    local pids=()
+    for index in "${!cards[@]}"; do
+        card="${cards[$index]}"
+        shard_count=0
+        local shard_args=()
+        local shard_file="$shards_dir/card_${card}.txt"
+        if [[ -f "$shard_file" ]]; then
+            while IFS= read -r example; do
+                [[ -n "$example" ]] || continue
+                shard_args+=(--exact-filter "$example")
+                shard_count=$((shard_count + 1))
+            done < "$shard_file"
+        fi
+        if (( shard_count == 0 )); then
+            log "multi_card_shard_skip card=$card count=0"
+            continue
+        fi
+        log "multi_card_shard_start card=$card count=$shard_count"
+        run_project_root="$(workspace_for_card "$card")"
+        (
+            export RUN_PRESMOKE_PROJECT_ROOT="$run_project_root"
+            run_presmoke "full_card${card}" "$card" "${shard_args[@]}" "$@"
+        ) &
+        pids+=("$!")
+    done
+
+    rc=0
+    for pid in "${pids[@]}"; do
+        if ! wait "$pid"; then
+            rc=1
+        fi
+    done
+    log "multi_card_done rc=$rc"
     return 0
 }
 
@@ -179,18 +467,24 @@ run_presmoke() {
     local name="$1"
     local card="$2"
     shift 2
+    local run_project_root="${RUN_PRESMOKE_PROJECT_ROOT:-$PROJECT_ROOT}"
     local run_dir="$OUT_ROOT/$name"
     mkdir -p "$run_dir"
-    log "run_start name=$name card=$card arch=$ARCH modes=$MODES jobs=$JOBS npu_slots=$NPU_SLOTS cpu_run_slots=$CPU_RUN_SLOTS make_jobs=$MAKE_JOBS timeout=$TIMEOUT cpu_run_timeout=$CPU_RUN_TIMEOUT schedule=$SCHEDULE werror=$PRESMOKE_WERROR args=$*"
+    log "run_start name=$name card=$card arch=$ARCH modes=$MODES jobs=$JOBS" \
+        "npu_slots=$NPU_SLOTS cpu_run_slots=$CPU_RUN_SLOTS make_jobs=$MAKE_JOBS" \
+        "timeout=$TIMEOUT cpu_run_timeout=$CPU_RUN_TIMEOUT schedule=$SCHEDULE" \
+        "workspace_mode=$MULTI_CARD_WORKSPACE_MODE werror=$PRESMOKE_WERROR args=$*"
     {
         echo "name=$name"
         echo "started_at=$(date_iso)"
-        echo "project_root=$PROJECT_ROOT"
-        echo "git=$(cd "$PROJECT_ROOT" && git rev-parse --short HEAD 2>/dev/null || true)"
+        echo "project_root=$run_project_root"
+        echo "source_project_root=$PROJECT_ROOT"
+        echo "git=$(cd "$run_project_root" && git rev-parse --short HEAD 2>/dev/null || true)"
         echo "arch=$ARCH"
         echo "modes=$MODES"
         echo "runner_mode=$RUNNER_MODE"
         echo "schedule=$SCHEDULE"
+        echo "schedule_report=$SCHEDULE_REPORT"
         echo "schedule_file=$SCHEDULE_FILE"
         echo "strict_schedule=$STRICT_SCHEDULE"
         echo "jobs=$JOBS"
@@ -200,6 +494,7 @@ run_presmoke() {
         echo "timeout=$TIMEOUT"
         echo "cpu_run_timeout=$CPU_RUN_TIMEOUT"
         echo "werror=$PRESMOKE_WERROR"
+        echo "workspace_mode=$MULTI_CARD_WORKSPACE_MODE"
         echo "card=$card"
         echo "extra_args=$*"
         source_cann
@@ -212,13 +507,15 @@ run_presmoke() {
     local start end rc
     start="$(date +%s)"
     (
-        cd "$PROJECT_ROOT"
+        cd "$run_project_root"
         export ASCEND_HOME_DIR
         export ASCEND_RT_VISIBLE_DEVICES="$card"
         export ASCEND_VISIBLE_DEVICES="$card"
         export ASCEND_DEVICE_ID=0
         export NPU_DEVICE_ID=0
         export PRESMOKE_WERROR
+        export PRESMOKE_LOCK_DIR="$PRESMOKE_SHARED_LOCK_DIR"
+        export PRESMOKE_STATE_DIR="$PRESMOKE_SHARED_STATE_DIR"
         args=(
             --runner-mode "$RUNNER_MODE"
             --arch "$ARCH"
@@ -236,12 +533,16 @@ run_presmoke() {
         if [[ -n "$SCHEDULE_FILE" ]]; then
             args+=(--schedule-file "$SCHEDULE_FILE")
         fi
+        if [[ -n "$SCHEDULE_REPORT" ]]; then
+            args+=(--schedule-report "$SCHEDULE_REPORT")
+        fi
         if should_strict_schedule "$@"; then
             args+=(--strict-schedule)
         fi
         if truthy "$PRESMOKE_WERROR"; then
             args+=(--werror)
         fi
+        PROJECT_ROOT="$run_project_root"
         run_python_presmoke "${args[@]}" "$@"
     ) > "$run_dir/stdout.log" 2> "$run_dir/stderr.log"
     rc=$?
@@ -268,12 +569,19 @@ timeout_examples() {
 }
 
 retry_timeouts() {
-    local full_report="$OUT_ROOT/full_card${PRIMARY_CARD}/results/report.json"
-    [[ -f "$full_report" ]] || return
+    local full_reports=()
+    local full_report
+    while IFS= read -r full_report; do
+        [[ -f "$full_report" ]] && full_reports+=("$full_report")
+    done < <(find "$OUT_ROOT" -mindepth 3 -maxdepth 3 -path '*/full_card*/results/report.json' | sort)
+    [[ "${#full_reports[@]}" -gt 0 ]] || return
     local examples=()
-    while IFS= read -r example; do
-        examples+=("$example")
-    done < <(timeout_examples "$full_report")
+    local example
+    for full_report in "${full_reports[@]}"; do
+        while IFS= read -r example; do
+            examples+=("$example")
+        done < <(timeout_examples "$full_report")
+    done
     if [[ "${#examples[@]}" -eq 0 ]]; then
         log "retry_skip no_timeouts"
         return
@@ -290,7 +598,7 @@ retry_timeouts() {
         safe_name="${example//\//__}"
         for card in $RETRY_CARDS; do
             log "retry_start example=$example card=$card"
-            run_presmoke "retry_${safe_name}_card${card}" "$card" --filter "$example"
+            run_presmoke "retry_${safe_name}_card${card}" "$card" --exact-filter "$example"
             retry_report="$OUT_ROOT/retry_${safe_name}_card${card}/results/report.json"
             status="$(run_python_module presmoke.orchestrate_report retry-status "$retry_report")"
             log "retry_done example=$example card=$card status=$status"
@@ -312,7 +620,18 @@ main() {
     else
         log "vendors_clean_skip reason=non_full_run args=$*"
     fi
-    run_presmoke "full_card${PRIMARY_CARD}" "$PRIMARY_CARD" "$@"
+    local cards_csv
+    local cards=()
+    local card
+    cards_csv="$(resolve_npu_cards)"
+    while IFS= read -r card; do
+        [[ -n "$card" ]] && cards+=("$card")
+    done <<< "$cards_csv"
+    if should_run_multi_card "${#cards[@]}" "$@"; then
+        run_multi_card_presmoke "$cards_csv" "$@"
+    else
+        run_presmoke "full_card${PRIMARY_CARD}" "$PRIMARY_CARD" "$@"
+    fi
     retry_timeouts
     write_final_report
     local effective_rc
