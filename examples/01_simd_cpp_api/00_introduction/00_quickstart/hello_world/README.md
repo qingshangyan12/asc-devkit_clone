@@ -64,6 +64,7 @@
   执行结果如下，说明执行成功。
   
   ```bash
+  cann 9.1.0 环境执行结果：
   [AIV Block 0/8] Hello World!!!
   [AIV Block 1/8] Hello World!!!
   [AIV Block 2/8] Hello World!!!
@@ -72,6 +73,26 @@
   [AIV Block 5/8] Hello World!!!
   [AIV Block 6/8] Hello World!!!
   [AIV Block 7/8] Hello World!!!
+  cann 9.0.0 环境执行结果：
+  Hello World!!!
+  Hello World!!!
+  Hello World!!!
+  Hello World!!!
+  Hello World!!!
+  Hello World!!!
+  Hello World!!!
+  Hello World!!!
   ```
 
   输出共 8 行，每行对应一个 AIV（AI Vector）Core 的打印结果。`[AIV Block X/8]` 表示当前为第 X 个核（共 8 个核），说明核函数已在 8 个 AIV Core 上成功执行。
+
+- 注
+  ```bash
+  cann 9.1.0 环境安装步骤
+  1. wget https://ascend-cann.obs.cn-north-4.myhuaweicloud.com/CANN/20260701_newest/Ascend-cann-toolkit_9.1.0_linux-aarch64.run
+  2. chmod +x Ascend-cann-toolkit_9.1.0_linux-aarch64.run
+  3. ./Ascend-cann-toolkit_9.1.0_linux-aarch64.run --install --install-path=/home/developer/Ascend
+  4. export cann_install_path=/home/developer/Ascend
+  5. source ${cann_install_path}/cann/set_env.sh
+
+  ```
