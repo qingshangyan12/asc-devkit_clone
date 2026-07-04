@@ -14,7 +14,7 @@
 
 - asc_loadunalign_pre（不带iter_reg入参）：配合asc_loadunalign（不带iter_reg入参）接口使用。
 
-- asc_loadunalign_pre（带iter_reg入参）：配合asc_loadunalign（带iter_reg入参）接口使用。
+- asc_loadunalign_pre（带iter_reg入参）：配合asc_loadunalign_postupdate（带iter_reg入参）接口使用。
 
 ## 函数原型
 

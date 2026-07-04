@@ -44,13 +44,13 @@ protected:
         bool clip_relu_post = true;                                                                                    \
         uint8_t eltwise_op = 15;                                                                                       \
         bool eltwise_antq_en = true;                                                                                   \
-        bool C0_pad_en = true;                                                                                         \
+        bool c0_pad_en = true;                                                                                         \
         bool broadcast_en = false;                                                                                     \
-        bool NZ2DN_en = false;                                                                                         \
+        bool nz2dn_en = false;                                                                                         \
         c_api_name(                                                                                                    \
             dst, src, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,      \
             unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, eltwise_op, \
-            eltwise_antq_en, C0_pad_en, broadcast_en, NZ2DN_en);                                                       \
+            eltwise_antq_en, c0_pad_en, broadcast_en, nz2dn_en);                                                       \
         GlobalMockObject::verify();                                                                                    \
     }
 

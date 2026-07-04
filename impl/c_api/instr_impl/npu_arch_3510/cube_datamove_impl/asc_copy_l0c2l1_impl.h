@@ -146,13 +146,13 @@ __aicore__ inline void asc_copy_l0c2l1_impl(__cbuf__ void *dst, __cc__ float *sr
             uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t l2_cache_ctl, uint8_t clip_relu_pre,
             uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split, bool NZ2ND_en, uint64_t quant_post,
             uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, bool eltwise_antq_en,
-            bool C0_pad_en, bool broadcast_en, bool NZ2DN_en)
+            bool c0_pad_en, bool broadcast_en, bool nz2dn_en)
 {
     if ASC_IS_AIC {
         copy_matrix_cc_to_cbuf_s4(dst, src, 0, n_size, m_size, dst_stride, src_stride, l2_cache_ctl, clip_relu_pre,
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, NZ2ND_en, static_cast<QuantMode_post>(quant_post),
-            relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en, false, C0_pad_en, false,
-            broadcast_en, NZ2DN_en);
+            relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en, false, c0_pad_en, false,
+            broadcast_en, nz2dn_en);
     }
 }
 
@@ -160,11 +160,11 @@ __aicore__ inline void asc_copy_l0c2l1_sync_impl(__cbuf__ void *dst, __cc__ floa
             uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t l2_cache_ctl, uint8_t clip_relu_pre,
             uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split, bool NZ2ND_en, uint64_t quant_post,
             uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, bool eltwise_antq_en,
-            bool C0_pad_en, bool broadcast_en, bool NZ2DN_en)
+            bool c0_pad_en, bool broadcast_en, bool nz2dn_en)
 {
     asc_copy_l0c2l1_impl(dst, src, n_size, m_size, dst_stride, src_stride, l2_cache_ctl, clip_relu_pre,
         unit_flag_mode, quant_pre, relu_pre, channel_split, NZ2ND_en, quant_post, relu_post, clip_relu_post,
-        eltwise_op, eltwise_antq_en, C0_pad_en, broadcast_en, NZ2DN_en);
+        eltwise_op, eltwise_antq_en, c0_pad_en, broadcast_en, nz2dn_en);
     asc_sync_post_process();
 }
 
@@ -173,13 +173,13 @@ __aicore__ inline void asc_copy_l0c2l1_impl(__cbuf__ void *dst, __cc__ int32_t *
             uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t l2_cache_ctl, uint8_t clip_relu_pre,
             uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split, bool NZ2ND_en, uint64_t quant_post,
             uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, bool eltwise_antq_en,
-            bool C0_pad_en, bool broadcast_en, bool NZ2DN_en)
+            bool c0_pad_en, bool broadcast_en, bool nz2dn_en)
 {
     if ASC_IS_AIC {
         copy_matrix_cc_to_cbuf_s4(dst, src, 0, n_size, m_size, dst_stride, src_stride, l2_cache_ctl, clip_relu_pre,
             unit_flag_mode, static_cast<QuantMode_t>(quant_pre), relu_pre, channel_split, NZ2ND_en, static_cast<QuantMode_post>(quant_post),
-            relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en, false, C0_pad_en, false,
-            broadcast_en, NZ2DN_en);
+            relu_post, clip_relu_post, false, eltwise_op, eltwise_antq_en, false, c0_pad_en, false,
+            broadcast_en, nz2dn_en);
     }
 }
 
@@ -187,11 +187,11 @@ __aicore__ inline void asc_copy_l0c2l1_sync_impl(__cbuf__ void *dst, __cc__ int3
             uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t l2_cache_ctl, uint8_t clip_relu_pre,
             uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split, bool NZ2ND_en, uint64_t quant_post,
             uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, bool eltwise_antq_en,
-            bool C0_pad_en, bool broadcast_en, bool NZ2DN_en)
+            bool c0_pad_en, bool broadcast_en, bool nz2dn_en)
 {
     asc_copy_l0c2l1_impl(dst, src, n_size, m_size, dst_stride, src_stride, l2_cache_ctl, clip_relu_pre,
         unit_flag_mode, quant_pre, relu_pre, channel_split, NZ2ND_en, quant_post, relu_post, clip_relu_post,
-        eltwise_op, eltwise_antq_en, C0_pad_en, broadcast_en, NZ2DN_en);
+        eltwise_op, eltwise_antq_en, c0_pad_en, broadcast_en, nz2dn_en);
     asc_sync_post_process();
 }
 
