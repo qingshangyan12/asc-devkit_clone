@@ -122,7 +122,7 @@ __simd_callee__ inline void ReduceDataBlock(U& dstReg, U srcReg, MaskReg mask)
 ```cpp
 template<typename T>
 __simd_vf__ inline void ReduceDataBlockVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, 
- uint32_t oneRepeatSize, uint16_t repeatTimes)
+ uint16_t oneRepeatSize, uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> srcReg;
     AscendC::Reg::RegTensor<T> dstReg;

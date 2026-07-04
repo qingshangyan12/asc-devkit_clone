@@ -203,7 +203,7 @@ AscendC::Reg::StoreAlign(dstAddr, dstReg, pregVL1);
 
     ```cpp
     template<typename T>
-    __aicore__ inline void ReduceVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
+    __aicore__ inline void ReduceVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
     {
         AscendC::Reg::RegTensor<T> srcReg;
         AscendC::Reg::RegTensor<T> dstReg;
