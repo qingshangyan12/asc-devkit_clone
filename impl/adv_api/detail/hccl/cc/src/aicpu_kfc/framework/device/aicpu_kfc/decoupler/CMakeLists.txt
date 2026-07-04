@@ -100,7 +100,8 @@ target_include_directories(ccl_kernel_decoupler_open BEFORE PRIVATE
     ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
 
-    $<TARGET_PROPERTY:asc_ccl_kernel,INCLUDE_DIRECTORIES>
+    ${MC2_SERVER_CCL_INCLUDE_LIST}
+    ${MC2_SERVER_ORION_HEAD_LIST}
 )
 
 target_link_libraries(ccl_kernel_decoupler_open PRIVATE
@@ -242,7 +243,8 @@ if(TARGET mc2_server)
         ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
         ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
 
-        $<TARGET_PROPERTY:asc_ccl_kernel,INCLUDE_DIRECTORIES>
+        ${MC2_SERVER_CCL_INCLUDE_LIST}
+        ${MC2_SERVER_ORION_HEAD_LIST}
     )
 
     target_link_libraries(mc2_server_decoupler PRIVATE
