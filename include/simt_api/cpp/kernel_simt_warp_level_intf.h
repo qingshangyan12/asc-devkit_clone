@@ -8,10 +8,6 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-#error "kernel_simt_warp_level_intf.h is not supported in pure SIMT mode."
-#endif
-
 #ifndef ASCENDC_MODULE_SIMT_WARP_LEVEL_INTERFACE_H
 #define ASCENDC_MODULE_SIMT_WARP_LEVEL_INTERFACE_H
 

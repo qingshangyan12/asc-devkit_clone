@@ -12,11 +12,6 @@
  * \file tiling.h
  * \brief
  */
-
-#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-#error "tiling.h is not supported in pure SIMT mode."
-#endif
-
 #ifndef LIB_MATMUL_TILING_H
 #define LIB_MATMUL_TILING_H
 #include "kernel_basic_intf.h"
