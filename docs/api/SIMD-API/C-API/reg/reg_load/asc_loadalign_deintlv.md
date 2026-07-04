@@ -8,6 +8,8 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/reg_compute/reg_load.h"`。
+
 `asc_loadalign_deintlv`用于从UB中读取以32B对齐地址为起始位置的连续`2 x VL`长度数据。数据按元素类型宽度进行解释，在Load过程中完成解交织后，分别写入两个目的矢量数据寄存器。
 
 以`float`数据类型、Ascend 950PR/Ascend 950DT产品为例，若`VL = 256B`，则单次操作覆盖64个`float`元素。调用`asc_loadalign_deintlv`后，数据从UB到Reg的排布如下图所示。
@@ -169,8 +171,8 @@ for (uint16_t i = 0; i < repeat_times; i++) {
 ### 地址寄存器偏移寻址接口
 
 ```cpp
-iter_reg addr_reg = asc_create_iter_reg_b32(one_repeat_size);
 for (uint16_t i = 0; i < repeat_times; i++) {
+    iter_reg addr_reg = asc_create_iter_reg_b32(one_repeat_size);
     asc_loadalign_deintlv(reg0, reg1, src, addr_reg);
     ...
 }

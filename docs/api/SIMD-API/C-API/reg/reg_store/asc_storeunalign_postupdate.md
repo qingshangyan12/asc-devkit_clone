@@ -8,6 +8,8 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/reg_compute/reg_store.h"`。
+
 reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存器连续非32B对齐的起始地址连续搬出到UB的场景。
 
 该接口每调用一次接口会更新目的操作数在UB上的地址。
@@ -155,7 +157,7 @@ PIPE_V
         // 跨32B边界的尾块缓存在ureg中
         asc_storeunalign_postupdate(dst, ureg, src);
     }
-    // 循环结束后调用一次post，将ureg中剩余数据刷至UB；src1_dst已自增至结束位置，offset为0
+    // 循环结束后调用一次post，将ureg中剩余数据刷至UB；dst已自增至结束位置，offset为0
     asc_storeunalign_post(dst, ureg, 0);
     ```
 

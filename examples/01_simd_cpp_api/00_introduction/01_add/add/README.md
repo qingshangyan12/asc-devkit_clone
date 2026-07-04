@@ -86,7 +86,7 @@ __vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
 }
 ```
 
-调用方式：使用内核调用符`<<<numBlocks, nullptr, stream>>>`调用核函数，`numBlocks=8`指定使用8个核并行执行。
+调用方式：使用内核调用符`<<<numBlocks, 0, stream>>>`调用核函数，`numBlocks=8`指定使用8个核并行执行。
 
 ## 实现流程解析
 
@@ -156,8 +156,8 @@ msprof ./demo   # 分析性能
 ```bash
 PROF_xxxx_XXXXXX
 ├── device_{id}
-└── host
-└── mindstudio_profiler_log
+├── host
+├── mindstudio_profiler_log
 └── mindstudio_profiler_output    # 保存Host和各个Device的性能数据汇总
     ├── msprof_*.json
     ├── xx_*.csv

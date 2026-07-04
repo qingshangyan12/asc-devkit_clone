@@ -9,6 +9,8 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/cube_datamove/cube_datamove.h"`。
+
 矩阵计算完成后，对结果进行量化处理，之后将处理结果搬运到Unified Buffer中。量化参数共有2个：quant_pre和quant_post，分别对应预处理和后处理阶段。
 
 quant_pre可选量化模式分别为：
@@ -296,13 +298,13 @@ uint8_t dual_dst_ctl = 5;
 bool sub_blockid = true;
 uint8_t clip_relu_pre = 0;
 uint8_t unit_flag_ctl = 0;
-uint64_t quant_pre = DEQF16;
+uint64_t quant_pre = QuantMode_t::F322BF16;
 uint8_t relu_pre = 0;
-bool split_en = true;
+bool split_en = false;
 bool NZ2ND_en = true;
-uint64_t quant_post = VQS162B8_POST;
+uint64_t quant_post = QuantMode_t::NoConv;
 uint8_t relu_post = 0;
-bool clip_relu_post = true;
+bool clip_relu_post = false;
 uint8_t eltwise_op = 0;
 bool eltwise_antq_en = true;
 bool C0_pad_en = true;

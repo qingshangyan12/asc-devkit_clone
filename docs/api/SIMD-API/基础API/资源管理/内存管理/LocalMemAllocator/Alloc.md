@@ -67,7 +67,7 @@
 </thead>
 <tbody><tr id="row18835145716587"><td class="cellrowborder" valign="top" width="17.43%" headers="mcps1.2.3.1.1 "><p id="p1383515717581"><a name="p1383515717581"></a><a name="p1383515717581"></a>pos</p>
 </td>
-<td class="cellrowborder" valign="top" width="82.57%" headers="mcps1.2.3.1.2 "><p id="p18689719202918"><a name="p18689719202918"></a><a name="p18689719202918"></a><a href="../../../数据结构/辅助数据结构//TPosition.md">TPosition</a>位置，需要符合<a href="LocalMemAllocator简介.md">LocalMemAllocator</a>中指定的Hardware物理位置（静态Tensor编程场景下，此参数可以省略）。</p>
+<td class="cellrowborder" valign="top" width="82.57%" headers="mcps1.2.3.1.2 "><p id="p18689719202918"><a name="p18689719202918"></a><a name="p18689719202918"></a><a href="../../../数据结构/辅助数据结构//TPosition.md">TPosition</a>位置，需要符合<a href="LocalMemAllocator简介.md">LocalMemAllocator</a>中指定的Hardware物理位置（C++ Tensor编程场景下，此参数可以省略）。</p>
 </td>
 </tr>
 <tr id="row199212475441"><td class="cellrowborder" valign="top" width="17.43%" headers="mcps1.2.3.1.1 "><p id="p352033512453"><a name="p352033512453"></a><a name="p352033512453"></a>DataType</p>
@@ -128,7 +128,10 @@
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-无
+<!-- npu="950" id1 -->
+- 针对Ascend 950PR/Ascend 950DT，对UB的内存分配，会基于静态内存的基础上进行分配，即动态内存初始位置，参考[内存层级](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/内存层级.md)。
+<!-- end id1 -->
+- 当前暂不支持与L1 Buffer, L0A Buffer, L0B Buffer, L0C Buffer, BiasTable静态数组混用。
 
 ## 调用示例<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section320753512363"></a>
 

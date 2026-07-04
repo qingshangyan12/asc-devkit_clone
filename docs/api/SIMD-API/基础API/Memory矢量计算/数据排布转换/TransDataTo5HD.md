@@ -154,7 +154,6 @@ Kirin 9030，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、
   transDataParams.repeatTimes = 1;    // 重复迭代次数，每次repeat处理16个DataBlock
   transDataParams.dstRepStride = 0;
   transDataParams.srcRepStride = 0;
-  AscendC::LocalTensor<int8_t> dstLocalList[16];
   int width = 32 / sizeof(int8_t); // 每个DataBlock存储的元素个数，此处为32个
   uint64_t dstLocalList[16];
   for (int i = 0; i < 16; i++) {   // dstLocal为int8_t类型的LocalTensor
@@ -245,8 +244,8 @@ Kirin 9030，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、
   transDataParams.repeatTimes = 1; // 重复迭代次数，每次repeat处理16个DataBlock
   transDataParams.dstRepStride = 0;
   transDataParams.srcRepStride = 0;
-  AscendC::LocalTensor<int8_t> dstLocalList[16];
   int width = 32 / sizeof(int8_t); // 每个DataBlock存储的元素个数，此处为32个
+  AscendC::LocalTensor<int8_t> dstLocalList[16];
   for (int i = 0; i < 16; i++) { // dstLocal为int8_t类型的LocalTensor
       dstLocalList[i] = dstLocal[width * i];
   }
@@ -266,7 +265,6 @@ Kirin 9030，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、
   transDataParams.repeatTimes = 1; // 重复迭代次数，每次repeat处理16个DataBlock
   transDataParams.dstRepStride = 0;
   transDataParams.srcRepStride = 0;
-  AscendC::LocalTensor<int8_t> dstLocalList[16];
   int width = 32 / sizeof(int8_t); // 每个DataBlock存储的元素个数，此处为32个
   uint64_t dstLocalList[16];
   for (int i = 0; i < 16; i++) { // dstLocal为int8_t类型的LocalTensor
@@ -288,7 +286,6 @@ Kirin 9030，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、
   transDataParams.repeatTimes = 1; // 重复迭代次数，每次repeat处理16个DataBlock
   transDataParams.dstRepStride = 0;
   transDataParams.srcRepStride = 0;
-  AscendC::LocalTensor<int8_t> dstLocalList[16];
   int width = 32 / sizeof(int8_t); // 每个DataBlock存储的元素个数，此处为32个
   // 使用TQue分配uint64_t的地址LocalTensor，用于存储dstLocal与srcLocal的地址
   AscendC::LocalTensor<uint64_t> dst = workQueueSrc1.AllocTensor<uint64_t>();
