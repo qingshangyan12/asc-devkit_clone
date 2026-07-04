@@ -14,6 +14,10 @@
  * e.g. Trunc(3.1) = 3, Trunc(-3.1) = -3, Trunc(3.9) = 3, Trunc(-3.9) = -3
  */
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "trunc.h is not supported in pure SIMT mode."
+#endif
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_TRUNC_H__

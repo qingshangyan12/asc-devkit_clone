@@ -7,7 +7,10 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
- 
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "cache_ctrl.h is not supported in pure SIMT mode."
+#endif
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)  
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
