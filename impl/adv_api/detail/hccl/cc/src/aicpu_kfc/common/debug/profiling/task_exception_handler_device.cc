@@ -16,7 +16,7 @@
 #include "externalinput_pub.h"
 #include "config_log.h"
 #include "sal_pub.h"
-#include "../../../algorithm/pub_inc/common.h"
+#include "common.h"
 #include "task_exception_handler.h"
 
 using namespace hccl;
