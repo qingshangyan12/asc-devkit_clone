@@ -584,6 +584,61 @@ presmoke_ensure_custom_op_package
             self.assertTrue((opp / "vendors/customize/op_impl/ai_core/tbe/customize_impl/dynamic/add_custom_tiling_sink.py").exists())
             self.assertTrue((add_custom_dynamic / "add_custom_tiling.h").exists())
 
+    def test_custom_op_package_install_does_not_pass_unused_cmake_arch(self) -> None:
+        project_root = Path(__file__).resolve().parents[3]
+        case_common = project_root / "scripts/presmoke/case_common.sh"
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            custom_op = root / "examples/01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op"
+            custom_op.mkdir(parents=True)
+            opp = root / "opp"
+            log = root / "cmake_args.log"
+
+            script = f"""
+set -euo pipefail
+source {case_common}
+export PRESMOKE_PROJECT_ROOT={root}
+export ASCEND_OPP_PATH={opp}
+export PRESMOKE_ARCH=dav-2201
+export PRESMOKE_MODE=npu
+presmoke_run_command() {{
+    printf '%q ' "$@" >> {log}
+    printf '\\n' >> {log}
+    if [[ "$1" == "make" ]]; then
+        cat > custom_opp_test.run <<'RUN'
+#!/usr/bin/env bash
+set -euo pipefail
+vendor="$ASCEND_OPP_PATH/vendors/customize"
+mkdir -p "$vendor/op_impl/ai_core/tbe/customize_impl/dynamic"
+mkdir -p "$vendor/op_api/include" "$vendor/op_api/lib"
+mkdir -p "$vendor/framework/onnx" "$vendor/op_impl/ai_core/tbe/op_master_device/lib"
+touch "$vendor/op_impl/ai_core/tbe/customize_impl/dynamic/add_custom.py"
+touch "$vendor/op_impl/ai_core/tbe/customize_impl/dynamic/add_custom_tiling_sink.py"
+touch "$vendor/op_api/include/aclnn_add_custom.h"
+touch "$vendor/op_api/include/aclnn_add_custom_tiling_sink.h"
+touch "$vendor/op_api/lib/libcust_opapi.so"
+touch "$vendor/framework/onnx/libcust_onnx_parsers.so"
+touch "$vendor/op_impl/ai_core/tbe/op_master_device/lib/libcust_opmaster.so"
+RUN
+        chmod +x custom_opp_test.run
+        return 0
+    fi
+    if [[ "$1" == "./custom_opp_test.run" ]]; then
+        "$@"
+        return
+    fi
+    return 0
+}}
+presmoke_ensure_custom_op_package
+"""
+
+            result = subprocess.run(["bash", "-c", script], text=True, capture_output=True, check=False)
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("cmake ..", log.read_text(encoding="utf-8"))
+            self.assertNotIn("CMAKE_ASC_ARCHITECTURES", log.read_text(encoding="utf-8"))
+
 
 if __name__ == "__main__":
     unittest.main()
