@@ -12,6 +12,11 @@
  * \file kernel_simt_intf.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "kernel_simt_intf.h is not supported in pure SIMT mode."
+#endif
+
 #ifndef ASCENDC_MODULE_SIMT_INTERFACE_H
 #define ASCENDC_MODULE_SIMT_INTERFACE_H
 

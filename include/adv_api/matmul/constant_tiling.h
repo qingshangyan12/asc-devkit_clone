@@ -12,6 +12,11 @@
  * \file constant_tiling.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "constant_tiling.h is not supported in pure SIMT mode."
+#endif
+
 #ifndef LIB_MATMUL_CONSTANT_TILING_H
 #define LIB_MATMUL_CONSTANT_TILING_H
 
