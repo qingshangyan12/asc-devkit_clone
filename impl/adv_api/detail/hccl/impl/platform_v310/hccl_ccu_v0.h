@@ -134,6 +134,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     ASCENDC_HCCL_API_ASSERT(
         context != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
     hcclContext_ = (__gm__ HcclCombineOpParam*)context;
+    printf("[LBH] hcclContext_->workSpace = %ld, hcclContext_->xnOffset = %ld, hcclContext_->ckeOffset = %ld.\n", hcclContext_->workSpace, hcclContext_->xnOffset, hcclContext_->ckeOffset);
     // ensure hcclMsgArea 512B aligned
     uint64_t msgAddr = hcclContext_->workSpace;
     if (msgAddr & 0x1ff) {
