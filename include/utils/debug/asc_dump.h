@@ -12,11 +12,6 @@
  * \file asc_dump.h
  * \brief
  */
-
-#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-#error "asc_dump.h is not supported in pure SIMT mode."
-#endif
-
 #ifndef INCLUDE_UTILS_DEBUG_ASC_DUMP_H
 #define INCLUDE_UTILS_DEBUG_ASC_DUMP_H
 

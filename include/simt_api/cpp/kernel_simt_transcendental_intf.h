@@ -8,10 +8,6 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-#error "kernel_simt_transcendental_intf.h is not supported in pure SIMT mode."
-#endif
-
 #ifndef ASCENDC_MODULE_SIMT_TRANSCENDENTAL_INTERFACE_H
 #define ASCENDC_MODULE_SIMT_TRANSCENDENTAL_INTERFACE_H
 
