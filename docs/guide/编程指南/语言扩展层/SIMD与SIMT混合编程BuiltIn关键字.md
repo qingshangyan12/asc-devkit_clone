@@ -120,9 +120,10 @@ kernel_name<<<block_num, dyn_ub_size, stream>>>(args...);
 | dyn_ub_size | uint32_t | 指定动态内存大小，单位为字节 | 不超过最大可配置值：256KB - 8KB - 32KB - 静态内存 |
 | stream | aclrtStream | 用于维护异步操作执行顺序 | 无 |
 
-## SIMT VF的asc\_vf\_call调用
+## VF函数的asc\_vf\_call调用
 
-在SIMD与SIMT混合编程场景，需使用asc\_vf\_call启动SIMT VF（Vector Function）子任务，通过参数配置，启动指定数目的线程，执行指定的SIMT VF函数。其函数原型如下：
+### SIMT VF的asc\_vf\_call调用
+SIMD与SIMT混合编程以SIMD核函数作为Device侧入口，在核函数或`__aicore__`函数中通过`asc_vf_call`启动SIMT VF子任务，通过参数配置，启动指定数目的线程，执行指定的SIMT VF函数。其函数原型如下：
 
 ```
 template <auto funcPtr, typename... Args>
@@ -163,14 +164,27 @@ __global__ __vector__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
     asc_vf_call<add_simt>(dim3{1024, 1, 1}, z, x, y);
 }
 ```
-## SIMD VF的asc\_vf\_call调用
 
-使用asc\_vf\_call接口调用SIMD VF入口函数启动VF子任务，详细接口说明参见
+### SIMD VF的asc\_vf\_call调用
+
+使用`asc_vf_call`接口调用SIMD VF入口函数启动VF子任务，详细接口说明参见
 [asc\_vf\_call接口说明](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md)。
 
-## 内置变量<a name="zh-cn_topic_0000002571575581_section13165113520576"></a>
-当前提供了以下仅在Device上可用的dim3结构的内置变量：  
+### SIMT VF与SIMD VF的调用差异
 
+SIMT VF和SIMD VF都通过`asc_vf_call`从核函数或`__aicore__`函数中启动VF子任务，但两类VF面向的执行模型不同，调用参数和VF函数内部可使用的内置能力也不同。
+
+| 对比项 | SIMT VF调用 | SIMD VF调用 |
+| --- | --- | --- |
+| VF入口函数标识 | 使用`__simt_vf__`修饰。 | 使用`__simd_vf__`修饰。 |
+| 调用形式 | `asc_vf_call<simt_func>(dim3(threadNums), arg1, arg2, ...)` | `asc_vf_call<simd_func>(arg1, arg2, ...)` |
+| 第一个运行时参数 | 必须传入`dim3`类型的线程配置，用于指定SIMT线程块内线程数量。 | 没有线程配置参数，调用参数从SIMD VF函数的第一个实参开始传入。 |
+| 指针入参 | 支持指向GM或UB的指针，需按实际内存空间使用`__gm__`或`__ubuf__`修饰。 | 指针入参需使用`__ubuf__`地址空间限定符修饰，不能直接访问GM内存。 |
+| 典型用途 | 处理复杂控制流、离散访存、线程级索引映射等不规则片段。 | 处理连续规整的向量计算片段。 |
+
+## 内置变量<a name="zh-cn_topic_0000002571575581_section13165113520576"></a>
+
+当前提供了以下仅在SIMT VF内可用的内置变量：  
 -   gridDim<a name="zh-cn_topic_0000002571575581_li20760123812911"></a>
 
     内置全局变量，只能在SIMT VF函数中使用，表示整个计算任务在各个维度上分别由多少个线程块构成。gridDim.x <= 65535；gridDim.y、gridDim.z必须为1。
@@ -191,17 +205,15 @@ __global__ __vector__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
     -   对于二维线程块，线程块内线程的索引为\(threadIdx.x + threadIdx.y \* blockDim.x\)。
     -   对于三维线程块，线程块内线程的索引为\(threadIdx.x + threadIdx.y \* blockDim.x + threadIdx.z \* blockDim.x \* blockDim.y\)。
 
-当前提供了以下仅在Device上可用的int类型的内置变量：
-
 -   warpSize
 
     运行时变量，表示一个线程束（Warp）中的线程数量，当前为固定值32。
 
-## 执行模块间差异说明
+SIMD核函数层级的内置变量参见[SIMD核函数层内置变量](./SIMD-BuiltIn关键字.md#内置变量)
 
-### SIMT VF线程层级与SIMD核函数层级的差异
+### 不同层级的内置变量使用限制
 
-SIMD与SIMT混合编程以SIMD核函数作为Device侧入口，在核函数或`__aicore__`函数中通过`asc_vf_call`启动SIMT VF子任务。Host侧<<<...\>\>\>调用配置的是外层核函数的逻辑核数；SIMT VF内部的`gridDim`、`blockIdx`、`blockDim`和`threadIdx`描述的是SIMT VF子任务的线程层次。两类概念所属层级不同，不能混用，下表列出了SIMD核函数层级和SIMT VF线程层级中常见概念的差异。
+Host侧<<<...\>\>\>调用配置的是外层核函数的逻辑核数；SIMT VF内部的线程架构类内置变量描述的是SIMT VF子任务的线程层次。两类概念所属层级不同，不能混用，下表列出了SIMD核函数层级和SIMT VF线程层级中常见概念的差异。
 
 | 内置变量或方法 | 所属层级 | 使用位置 | 含义 |
 | --- | --- | --- | --- |
@@ -216,20 +228,6 @@ SIMD与SIMT混合编程以SIMD核函数作为Device侧入口，在核函数或`_
 
 -   SIMD侧核函数不能使用SIMT VF线程层级相关内置变量，SIMT VF也无法感知SIMD核函数层级的逻辑核编号或逻辑核数量。
 -   如果SIMT VF需要使用外层SIMD流程中的逻辑核编号或逻辑核数量，建议在核函数或`__aicore__`函数中通过`AscendC::GetBlockIdx()`、`AscendC::GetBlockNum()`获取对应值后，以普通参数传入SIMT VF。
-
-### SIMT VF与SIMD VF的调用差异
-
-SIMT VF和SIMD VF都通过`asc_vf_call`从核函数或`__aicore__`函数中启动VF子任务，但两类VF面向的执行模型不同，调用参数和VF函数内部可使用的内置能力也不同。
-
-| 对比项 | SIMT VF调用 | SIMD VF调用 |
-| --- | --- | --- |
-| VF入口函数标识 | 使用`__simt_vf__`修饰。 | 使用`__simd_vf__`修饰。 |
-| 调用形式 | `asc_vf_call<simt_func>(dim3(threadNums), arg1, arg2, ...)` | `asc_vf_call<simd_func>(arg1, arg2, ...)` |
-| 第一个运行时参数 | 必须传入`dim3`类型的线程配置，用于指定SIMT线程块内线程数量。 | 没有线程配置参数，调用参数从SIMD VF函数的第一个实参开始传入。 |
-| 并行粒度 | 线程级并行。SIMT VF内部可使用`threadIdx`、`blockIdx`、`blockDim`、`gridDim`等SIMT内置变量组织线程级计算，但不能调用SIMD侧的`GetBlockIdx()`、`GetBlockNum()`。 | 向量级并行。SIMD VF内部通过Reg矢量计算接口组织向量计算，不能使用SIMT线程层次内置变量。 |
-| 指针入参 | 支持指向GM或UB的指针，需按实际内存空间使用`__gm__`或`__ubuf__`修饰。 | 指针入参需使用`__ubuf__`地址空间限定符修饰，不能直接访问GM内存。 |
-| 典型用途 | 处理复杂控制流、离散访存、线程级索引映射等不规则片段。 | 处理连续规整的向量计算片段。 |
-
 
 ## 内置数据类型<a name="zh-cn_topic_0000002571575581_section1880403364916"></a><a name="cn_topic_0000002571575581_section1880403364916"></a>
 
