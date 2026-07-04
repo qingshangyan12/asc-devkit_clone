@@ -631,95 +631,19 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
         add_dependencies(asc_ccl_kernel json)
     endif()
 
+    set(MC2_SERVER_CCL_OBJECT_ALLOWLIST
+        mc2_server_aicpu_kfc_common
+    )
+
     function(add_mc2_server_ccl_object target_name)
-        if(TARGET mc2_server)
-            add_library(${target_name} OBJECT ${ARGN})
-            set_target_properties(${target_name} PROPERTIES POSITION_INDEPENDENT_CODE ON)
-            target_compile_definitions(${target_name} PRIVATE
-                $<TARGET_PROPERTY:asc_ccl_kernel,COMPILE_DEFINITIONS>
-                MC2_SERVER_ONLY
-            )
-            target_compile_options(${target_name} PRIVATE
-                $<TARGET_PROPERTY:asc_ccl_kernel,COMPILE_OPTIONS>
-            )
-            target_include_directories(${target_name} PRIVATE
-                ${CCL_KERNEL_INCLUDE_LIST}
-                ${ORION_HEAD_LIST}
-            )
-            target_link_libraries(${target_name} PRIVATE
-                rdma_core_headers
-                ascend_hal 
-                c_sec 
-                unified_dlog 
-                runtime_headers 
-                acl_rt_headers
-            )
-            if(TARGET json)
-                target_link_libraries(${target_name} PRIVATE json)
-                add_dependencies(${target_name} json)
-            endif()
-            target_sources(mc2_server PRIVATE $<TARGET_OBJECTS:${target_name}>)
-            add_dependencies(mc2_server ${target_name})
+        if("${target_name}" IN_LIST MC2_SERVER_CCL_OBJECT_ALLOWLIST)
+            add_mc2_server_object(${target_name} ${ARGN})
+        else()
+            add_mc2_server_detached_object(${target_name} ${ARGN})
         endif()
     endfunction()
 
-    if(TARGET mc2_server)
-        set(MC2_SERVER_CCL_KERNEL_STUB_SRC
-            ${CMAKE_CURRENT_BINARY_DIR}/mc2_server_ccl_kernel_stub.cc)
-        file(WRITE ${MC2_SERVER_CCL_KERNEL_STUB_SRC}
-            "extern \"C\" void __mc2_ccl_kernel_stub(void) {}\n")
-        add_library(mc2_server_ccl_kernel_stub SHARED
-            ${MC2_SERVER_CCL_KERNEL_STUB_SRC})
-        set_target_properties(mc2_server_ccl_kernel_stub PROPERTIES
-            OUTPUT_NAME ccl_kernel
-            LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/mc2_server_link_stub)
-        target_link_options(mc2_server_ccl_kernel_stub PRIVATE
-            -Wl,-soname,libccl_kernel.so)
-
-        set(MC2_SERVER_CCL_KERNEL_PLF_STUB_SRC
-            ${CMAKE_CURRENT_BINARY_DIR}/mc2_server_ccl_kernel_plf_stub.cc)
-        file(WRITE ${MC2_SERVER_CCL_KERNEL_PLF_STUB_SRC}
-            "extern \"C\" void __mc2_ccl_kernel_plf_stub(void) {}\n")
-        add_library(mc2_server_ccl_kernel_plf_stub SHARED
-            ${MC2_SERVER_CCL_KERNEL_PLF_STUB_SRC})
-        set_target_properties(mc2_server_ccl_kernel_plf_stub PROPERTIES
-            OUTPUT_NAME ccl_kernel_plf
-            LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/mc2_server_link_stub)
-        target_link_options(mc2_server_ccl_kernel_plf_stub PRIVATE
-            -Wl,-soname,libccl_kernel_plf.so)
-
-        target_compile_definitions(mc2_server PRIVATE
-            $<TARGET_PROPERTY:asc_ccl_kernel,COMPILE_DEFINITIONS>
-        )
-        target_compile_options(mc2_server PRIVATE
-            $<TARGET_PROPERTY:asc_ccl_kernel,COMPILE_OPTIONS>
-        )
-        target_include_directories(mc2_server PRIVATE
-            ${CCL_KERNEL_INCLUDE_LIST}
-            ${ORION_HEAD_LIST}
-        )
-
-        target_link_libraries(mc2_server PRIVATE
-            rdma_core_headers
-            -Wl,--no-as-needed
-            ascend_hal
-            c_sec
-            unified_dlog
-            mc2_server_ccl_kernel_stub
-            ${HCCL_C_SEC_LINK}
-            ${HCCL_UNIFIED_DLOG_LINK}
-            mc2_server_ccl_kernel_plf_stub
-            ${HCCL_MMPA_LINK}
-            -Wl,--as-needed
-            -lrt
-            -ldl
-            -lpthread
-        )
-        if(TARGET json)
-            target_link_libraries(mc2_server PRIVATE json)
-            add_dependencies(mc2_server json)
-        endif()
-    endif()
+    configure_mc2_server_minimal_target()
 
     add_subdirectory(device)
 

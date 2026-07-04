@@ -7,8 +7,6 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
-target_sources(asc_ccl_kernel PRIVATE aicpu_kfc_interface.cc)
-
 if(TARGET mc2_server)
     add_library(mc2_server_kernel_entry OBJECT mc2_server_kernel_entry.cc)
     set_target_properties(mc2_server_kernel_entry PROPERTIES
@@ -34,8 +32,6 @@ if(TARGET mc2_server)
     )
 endif()
 
-add_subdirectory(algorithm)
 add_subdirectory(common)
 add_subdirectory(dfx)
-add_subdirectory(framework)
 add_subdirectory(decoupler)
