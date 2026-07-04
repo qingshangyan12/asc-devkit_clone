@@ -50,6 +50,24 @@
 // Arithmetic Operations - Basic arithmetic computations
 // ============================================================================
 
+/*
+ * @ingroup VectorCompute
+ * @brief Synchronous bitonic sort and merge sort 4 for half/float data types
+ * @param [out] dst Destination buffer for sorted result
+ * @param [in] src0 First source buffer (for bitsort)
+ * @param [in] src1 Second source buffer, sort keys (for bitsort)
+ * @param [in] src Source buffer (for mrgsort4)
+ * @param [in] repeat Number of repeat operations
+ * @param [in] element_length_0 Length of first element group (for mrgsort4)
+ * @param [in] element_length_1 Length of second element group (for mrgsort4)
+ * @param [in] element_length_2 Length of third element group (for mrgsort4)
+ * @param [in] element_length_3 Length of fourth element group (for mrgsort4)
+ * @param [in] if_exhausted_suspension Whether to suspend when exhausted (for mrgsort4)
+ * @param [in] valid_bit Valid bit mask (for mrgsort4)
+ * @details Provides synchronous versions of bitonic sort (asc_bitsort_sync) and
+ *          4-way merge sort (asc_mrgsort4_sync) for half or float data.
+ *          These operations block until the sort completes.
+ */
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 __aicore__ inline void asc_bitsort_sync(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat);
 __aicore__ inline void asc_bitsort_sync(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, int32_t repeat);
@@ -291,6 +309,23 @@ __aicore__ inline void asc_mul_cast_half2uint8_sync(__ubuf__ uint8_t* dst, __ubu
 // Comparison Operations - Element-wise comparison between vectors
 // ============================================================================
 
+/*
+ * @ingroup VectorCompute
+ * @brief Synchronous vector less-than and greater-than comparison for half/float data types
+ * @param [out] dst Destination buffer for result (optional, uint8 mask)
+ * @param [in] src0 First source buffer
+ * @param [in] src1 Second source buffer
+ * @param [in] repeat Number of repeat operations
+ * @param [in] dst_block_stride Destination block stride
+ * @param [in] src0_block_stride First source block stride
+ * @param [in] src1_block_stride Second source block stride
+ * @param [in] dst_repeat_stride Destination repeat stride
+ * @param [in] src0_repeat_stride First source repeat stride
+ * @param [in] src1_repeat_stride Second source repeat stride
+ * @details Performs synchronous element-wise less-than (asc_lt_sync) or
+ *          greater-than (asc_gt_sync) comparison for half and float data types.
+ *          Result is stored as boolean mask.
+ */
 __aicore__ inline void asc_lt_sync(__ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
         uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
 __aicore__ inline void asc_lt_sync(__ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
@@ -442,8 +477,23 @@ __aicore__ inline void asc_ge_scalar_sync(__ubuf__ uint8_t* dst, __ubuf__ half* 
 __aicore__ inline void asc_ge_scalar_sync(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat,
     uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/*
+ * @ingroup VectorCompute
+ * @brief Synchronous vector comparison with scalar for half/float data types
+ * @param [out] dst Destination buffer for result (uint8 mask)
+ * @param [in] src Source buffer
+ * @param [in] value Scalar value to compare
+ * @param [in] repeat Number of repeat operations
+ * @param [in] dst_block_stride Destination block stride
+ * @param [in] src_block_stride Source block stride
+ * @param [in] dst_repeat_stride Destination repeat stride
+ * @param [in] src_repeat_stride Source repeat stride
+ * @details Performs synchronous element-wise comparison with scalar:
+ *          less-than (asc_lt_scalar_sync), greater-than (asc_gt_scalar_sync),
+ *          and not-equal (asc_ne_scalar_sync) for half and float data types.
+ *          Result is stored as boolean mask.
+ */
 __aicore__ inline void asc_lt_scalar_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
-
 __aicore__ inline void asc_lt_scalar_sync(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
 __aicore__ inline void asc_gt_scalar_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat,
@@ -1075,6 +1125,27 @@ __aicore__ inline void asc_int322int64_sync(__ubuf__ int64_t* dst, __ubuf__ int3
 __aicore__ inline void asc_int642int32(__ubuf__ int32_t* dst, __ubuf__ int64_t* src, uint32_t count);
 __aicore__ inline void asc_int642int32_sync(__ubuf__ int32_t* dst, __ubuf__ int64_t* src, uint32_t count);
 
+/*
+ * @ingroup VectorCompute
+ * @brief Synchronous vector equal comparison and equal-with-scalar comparison
+ * @param [out] dst Destination buffer for result (optional, uint8 mask)
+ * @param [in] src0 First source buffer
+ * @param [in] src1 Second source buffer
+ * @param [in] src Source buffer (for scalar variants)
+ * @param [in] value Scalar value to compare (for scalar variants)
+ * @param [in] repeat Number of repeat operations
+ * @param [in] dst_block_stride Destination block stride
+ * @param [in] src0_block_stride First source block stride
+ * @param [in] src1_block_stride Second source block stride
+ * @param [in] dst_repeat_stride Destination repeat stride
+ * @param [in] src0_repeat_stride First source repeat stride
+ * @param [in] src1_repeat_stride Second source repeat stride
+ * @param [in] src_block_stride Source block stride (for scalar variants)
+ * @param [in] src_repeat_stride Source repeat stride (for scalar variants)
+ * @details Performs synchronous element-wise equal comparison (asc_eq_sync) and
+ *          equal comparison with scalar (asc_eq_scalar_sync) for half, float,
+ *          and int32 data types. Result is stored as boolean mask.
+ */
 __aicore__ inline void asc_eq_sync(__ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat,
     uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride,
     uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
@@ -1441,6 +1512,18 @@ __aicore__ inline void asc_copy_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* sr
 __aicore__ inline void asc_copy(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t count);
 __aicore__ inline void asc_copy_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t count);
 
+/*
+ * @ingroup VectorCompute
+ * @brief Synchronous broadcast block operation for uint16/uint32 data types
+ * @param [out] dst Destination buffer
+ * @param [in] src Source buffer to broadcast
+ * @param [in] dst_block_stride Destination block stride for data layout
+ * @param [in] dst_repeat_stride Destination repeat stride for iteration control
+ * @param [in] repeat Number of repeat operations
+ * @details Broadcasts a block of data to multiple locations in the destination buffer.
+ *          Supports uint16_t and uint32_t data types. Synchronous version blocks
+ *          until the operation completes.
+ */
 __aicore__ inline void asc_brcb_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src,
     uint16_t dst_block_stride, uint16_t dst_repeat_stride, uint8_t repeat);
 __aicore__ inline void asc_brcb_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src,
@@ -1616,6 +1699,19 @@ __aicore__ inline void asc_gather_sync(__ubuf__ float* dst, __ubuf__ float* src,
 __aicore__ inline void asc_transpose_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src);
 __aicore__ inline void asc_transpose_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src);
 
+/*
+ * @ingroup VectorCompute
+ * @brief Synchronous gather data blocks from source buffer for uint16/uint32 data types
+ * @param [out] dst Destination buffer
+ * @param [in] src Source buffer
+ * @param [in] src_offset Buffer containing indices for gathering
+ * @param [in] dst_repeat_stride Destination repeat stride
+ * @param [in] dst_block_stride Destination block stride
+ * @param [in] repeat Number of repeat operations
+ * @details Gathers data blocks from source buffer at positions specified by src_offset.
+ *          Supports uint16_t and uint32_t data types. Synchronous version blocks
+ *          until the operation completes.
+ */
 __aicore__ inline void asc_gather_datablock_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset,
             uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat);
 __aicore__ inline void asc_gather_datablock_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset,

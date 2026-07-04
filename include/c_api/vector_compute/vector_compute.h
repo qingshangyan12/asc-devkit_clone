@@ -1054,6 +1054,11 @@ __aicore__ inline void asc_ge_scalar(__ubuf__ uint8_t* dst, __ubuf__ half* src, 
 __aicore__ inline void asc_ge_scalar(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat,
     uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+__aicore__ inline void asc_gt_scalar(__ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+__aicore__ inline void asc_gt_scalar(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+
 /*
  * @ingroup VectorCompute
  * @brief Dequantize int32 to half precision
@@ -1421,6 +1426,15 @@ __aicore__ inline void asc_shiftright(__ubuf__ int32_t* dst, __ubuf__ int32_t* s
     uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 __aicore__ inline void asc_shiftright(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t value, uint8_t repeat,
 uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+__aicore__ inline void asc_shiftright(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, uint8_t repeat,
+    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+
+__aicore__ inline void asc_shiftright_round(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value,
+    uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride,
+    uint16_t src_repeat_stride);
+__aicore__ inline void asc_shiftright_round(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value,
+    uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride,
+    uint16_t src_repeat_stride);
 
 
 /*
@@ -1911,6 +1925,25 @@ __aicore__ inline void asc_lt(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf
 __aicore__ inline void asc_lt(__ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
         uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
 
+
+/*
+ * @ingroup VectorCompute
+ * @brief Element-wise less than comparison with scalar for half/float data types
+ * @param [out] dst Destination buffer for comparison result (uint8_t)
+ * @param [in] src Source buffer
+ * @param [in] value Scalar value to compare against
+ * @param [in] repeat Number of repeat operations
+ * @param [in] dst_block_stride Destination block stride
+ * @param [in] src_block_stride Source block stride
+ * @param [in] dst_repeat_stride Destination repeat stride
+ * @param [in] src_repeat_stride Source repeat stride
+ * @details Performs element-wise less than comparison: dst[i] = (src[i] < value) ? 1 : 0.
+ *          Supports half and float data types.
+ */
+__aicore__ inline void asc_lt_scalar(__ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+
+__aicore__ inline void asc_lt_scalar(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+
 /*
  * @ingroup VectorCompute
  * @brief Element-wise not equal comparison with scalar for half/float data types
@@ -2070,7 +2103,37 @@ __aicore__ inline void asc_gt(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf
 __aicore__ inline void asc_gt(__ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, 
     uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, 
     uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
-    
+
+
+/*
+ * @ingroup VectorCompute
+ * @brief Element-wise greater or equal comparison for half/float data types
+ * @param [out] dst Destination buffer for comparison result (uint8_t, optional)
+ * @param [in] src0 First source buffer
+ * @param [in] src1 Second source buffer
+ * @param [in] repeat Number of repeat operations
+ * @param [in] dst_block_stride Destination block stride
+ * @param [in] src0_block_stride First source block stride
+ * @param [in] src1_block_stride Second source block stride
+ * @param [in] dst_repeat_stride Destination repeat stride
+ * @param [in] src0_repeat_stride First source repeat stride
+ * @param [in] src1_repeat_stride Second source repeat stride
+ * @details Performs element-wise greater or equal comparison: dst[i] = (src0[i] >= src1[i]) ? 1 : 0.
+ *          Supports half and float data types. Some variants output to uint8_t buffer.
+ */
+__aicore__ inline void asc_ge(__ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
+    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
+    uint8_t src1_repeat_stride);
+__aicore__ inline void asc_ge(__ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
+    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
+    uint8_t src1_repeat_stride);
+__aicore__ inline void asc_ge(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat,
+    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+    uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
+__aicore__ inline void asc_ge(__ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat,
+    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+    uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
+
 /*
  * @ingroup VectorCompute
  * @brief Convert half precision to 8-bit unsigned integer with various rounding modes
@@ -2149,6 +2212,9 @@ __aicore__ inline void asc_le(__ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubu
 __aicore__ inline void asc_le_scalar(__ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat,
                                      uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride,
                                      uint16_t src_repeat_stride);
+__aicore__ inline void asc_le_scalar(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat,
+                                     uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride,
+                                     uint16_t src_repeat_stride);
 
 /*
  * @ingroup VectorCompute
@@ -2213,74 +2279,70 @@ __aicore__ inline void asc_squeeze(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* sr
     uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride,
     uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
 
+/*
+ * @ingroup VectorCompute
+ * @brief Natural logarithm for half/float data types
+ * @param [out] dst Destination buffer for result
+ * @param [in] src Source buffer
+ * @param [in] repeat Number of repeat operations
+ * @param [in] dst_block_stride Destination block stride
+ * @param [in] src_block_stride Source block stride
+ * @param [in] dst_repeat_stride Destination repeat stride
+ * @param [in] src_repeat_stride Source repeat stride
+ * @details Computes natural logarithm: dst[i] = log(src[i]).
+ *          Supports half and float data types.
+ */
+__aicore__ inline void asc_log(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride,
+    uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+__aicore__ inline void asc_log(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride,
+    uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+
+/*
+ * @ingroup VectorCompute
+ * @brief Multiply-add operation for half/float data types
+ * @param [out] dst Destination buffer for result
+ * @param [in] src0 First source buffer
+ * @param [in] src1 Second source buffer
+ * @param [in] repeat Number of repeat operations
+ * @param [in] dst_block_stride Destination block stride
+ * @param [in] src0_block_stride First source block stride
+ * @param [in] src1_block_stride Second source block stride
+ * @param [in] dst_repeat_stride Destination repeat stride
+ * @param [in] src0_repeat_stride First source repeat stride
+ * @param [in] src1_repeat_stride Second source repeat stride
+ * @details Performs multiply-add operation: dst[i] = dst[i] + src0[i] * src1[i].
+ *          Supports half and float data types.
+ */
+__aicore__ inline void asc_mul_add(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat,
+    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+    uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
+__aicore__ inline void asc_mul_add(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat,
+    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+    uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
+
+/*
+ * @ingroup VectorCompute
+ * @brief Multiply-add-relu operation for half/float data types
+ * @param [out] dst Destination buffer for result
+ * @param [in] src0 First source buffer
+ * @param [in] src1 Second source buffer
+ * @param [in] repeat Number of repeat operations
+ * @param [in] dst_block_stride Destination block stride
+ * @param [in] src0_block_stride First source block stride
+ * @param [in] src1_block_stride Second source block stride
+ * @param [in] dst_repeat_stride Destination repeat stride
+ * @param [in] src0_repeat_stride First source repeat stride
+ * @param [in] src1_repeat_stride Second source repeat stride
+ * @details Performs multiply-add-relu: dst[i] = relu(dst[i] + src0[i] * src1[i]).
+ *          Supports half and float data types.
+ */
+__aicore__ inline void asc_mul_add_relu(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
+    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
+__aicore__ inline void asc_mul_add_relu(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
+    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
-
-
-// ========== Signatures unified with master ==========
-
-__aicore__ inline void asc_log(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride,
-    uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
-
-__aicore__ inline void asc_log(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride,
-    uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
-
-__aicore__ inline void asc_gt_scalar(__ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
-
-__aicore__ inline void asc_gt_scalar(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
-
-__aicore__ inline void asc_shiftright(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
-
-__aicore__ inline void asc_shiftright_round(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value,
-    uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride,
-    uint16_t src_repeat_stride);
-
-__aicore__ inline void asc_shiftright_round(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value,
-    uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride,
-    uint16_t src_repeat_stride);
-
-__aicore__ inline void asc_mul_add(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat,
-    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
-    uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
-
-__aicore__ inline void asc_mul_add(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat,
-    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
-    uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
-
-__aicore__ inline void asc_mul_add_relu(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
-    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
-
-__aicore__ inline void asc_mul_add_relu(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
-    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
-
-__aicore__ inline void asc_lt_scalar(__ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
-
-__aicore__ inline void asc_lt_scalar(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
-
-__aicore__ inline void asc_ge(__ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
-    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
-    uint8_t src1_repeat_stride);
-
-__aicore__ inline void asc_ge(__ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
-    uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
-    uint8_t src1_repeat_stride);
-
-__aicore__ inline void asc_ge(__ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat,
-    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
-    uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
-
-__aicore__ inline void asc_ge(__ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat,
-    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride,
-    uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
-
-__aicore__ inline void asc_le_scalar(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat,
-                                     uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride,
-                                     uint16_t src_repeat_stride);
-
-#endif    
