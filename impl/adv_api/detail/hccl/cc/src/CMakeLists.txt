@@ -9,14 +9,33 @@
 # ----------------------------------------------------------------------------------------------------------
 set(OPS_BASE_DIR ${HCCL_CC_DIR})
 option(MC2_CLIENT_ENABLE_CCU "Build CCU algorithm implementations into mc2_client" OFF)
+set(ASCCOMM_SOURCE_DIR "/mnt/workspace/gitCode/cann/asc-comm" CACHE PATH "asc-comm source tree with CCU data-plane")
+set(ASCCOMM_CCU_DATAPLANE_BUILD_DIR "${ASCCOMM_SOURCE_DIR}/build/ccu-check/src/ccu" CACHE PATH "asc-comm CCU data-plane library directory")
 
 set(INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}
     ${HCCL_CC_INCLUDE_DIR}/hcomm
     ${HCCL_CC_INCLUDE_DIR}/hcomm/hccl
     ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl
-    ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu
     ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc
+    ${ASCCOMM_SOURCE_DIR}/include
+    ${ASCCOMM_SOURCE_DIR}/include/ccu
+    ${ASCCOMM_SOURCE_DIR}/include/ccu/hcomm
+    ${ASCCOMM_SOURCE_DIR}/include/ccu/hcomm/ccu
+    ${ASCCOMM_SOURCE_DIR}/src/ccu/dataplane/device/impl/adv_api/detail
+    ${ASCCOMM_SOURCE_DIR}/src/ccu/dataplane/device/impl/adv_api/detail/hccl
+    ${ASCCOMM_SOURCE_DIR}/src/ccu/dataplane/device/impl/adv_api/detail/hccl/impl
+    ${ASCCOMM_SOURCE_DIR}/src/ccu/dataplane/hccl/common
+    ${ASCCOMM_SOURCE_DIR}/src/ccu/dataplane/hccl/common/hcomm_dlsym
+    ${ASCCOMM_SOURCE_DIR}/src/ccu/dataplane/hccl/common/hcomm_dlsym/ccu
+    ${ASCCOMM_SOURCE_DIR}/src/ccu/dataplane/hccl/ops/op_common/template
+    ${ASCCOMM_SOURCE_DIR}/src/ccu/dataplane/hccl/ops/op_common/template/ccu
+    ${ASCCOMM_SOURCE_DIR}/src/ccu/dataplane/hccl/ops/all_gather/template
+    ${ASCCOMM_SOURCE_DIR}/src/ccu/dataplane/hccl/ops/all_gather/template/ccu
+    ${ASCCOMM_SOURCE_DIR}/src/ccu/dataplane/hccl/ops/all_gather/template/ccu/kernel
+    ${ASCCOMM_SOURCE_DIR}/src/ccu/dataplane/hccl/ops/reduce_scatter/template
+    ${ASCCOMM_SOURCE_DIR}/src/ccu/dataplane/hccl/ops/reduce_scatter/template/ccu
+    ${ASCCOMM_SOURCE_DIR}/src/ccu/dataplane/hccl/ops/reduce_scatter/template/ccu/kernel
     ${CMAKE_CURRENT_SOURCE_DIR}/common
     ${CMAKE_CURRENT_SOURCE_DIR}/common/hcomm_dlsym
 
@@ -36,8 +55,6 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/wrapper
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/aiv
     # ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/hostdpu
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/ccu
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/ccu/kernel
 
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/topo
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/interface_graph_mode
@@ -48,8 +65,6 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/aicpu
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/aiv
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/ccu
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/ccu/kernel
 
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/executor
@@ -57,8 +72,6 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/aicpu
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/aiv
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/ccu
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/ccu/kernel
 )
 
 
