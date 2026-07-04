@@ -72,6 +72,7 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
     GM_ADDR sendBuf, void* sendCounts, void* sdispls, HcclDataType sendType, GM_ADDR recvBuf, void* recvCounts,
     void* rdispls, HcclDataType recvType, uint8_t repeat)
 {
+    printf("[LBH] AlltoAllV start!\n");
     ASCENDC_HCCL_API_ASSERT(
         sendType == recvType, { return INVALID_HANDLE_ID; },
         "Call AlltoAllV failed, param sendType[%d] is not equal to recvType[%d], invalid.",
@@ -133,6 +134,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     ASCENDC_HCCL_API_ASSERT(
         context != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
     hcclContext_ = (__gm__ HcclCombineOpParam*)context;
+    printf("[LBH] hcclContext_->workSpace = %ld, hcclContext_->xnOffset = %ld, hcclContext_->ckeOffset = %ld.\n", hcclContext_->workSpace, hcclContext_->xnOffset, hcclContext_->ckeOffset);
     // ensure hcclMsgArea 512B aligned
     uint64_t msgAddr = hcclContext_->workSpace;
     if (msgAddr & 0x1ff) {
@@ -400,11 +402,11 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         FlushDataCache(ccuMsg_.xnAddr + MAX_DCCI_CNT * i);
     }
 
-    KERNEL_LOG(
-        KERNEL_INFO,
-        "ApiClient CcuSendMsg ccuMsg_.xnAddr, Id0: 0x%llx, Id1: 0x%llx, Id2: 0x%llx, Id3: 0x%llx, Id4: 0x%llx, Id5: "
+    printf(
+        "[LBH] ApiClient CcuSendMsg ccuMsg_.xnAddr=%llu, ccuMsg_.commitCKEAddr=%llu, Id0: 0x%llx, Id1: 0x%llx, Id2: 0x%llx, Id3: 0x%llx, Id4: 0x%llx, Id5: "
         "0x%llx, Id6: 0x%llx, Id7: 0x%llx, Id8: 0x%llx, Id9: 0x%llx, Id10: 0x%llx, Id11: 0x%llx, Id12: 0x%llx, Id13: "
-        "0x%llx, Id14: 0x%llx",
+        "0x%llx, Id14: 0x%llx\n",
+        ccuMsg_.xnAddr, ccuMsg_.commitCKEAddr,
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr), *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 8),
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 16),
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 24),
@@ -420,7 +422,33 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 104),
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 112));
 
+    {
+        GlobalTensor<uint64_t> id1Global;
+        GlobalTensor<uint64_t> id2Global;
+        id1Global.SetGlobalBuffer(reinterpret_cast<__gm__ uint64_t*>(xnData_[1]));
+        id2Global.SetGlobalBuffer(reinterpret_cast<__gm__ uint64_t*>(xnData_[2]));
+        LocalTensor<uint64_t> id1Local;
+        LocalTensor<uint64_t> id2Local;
+        DataCopy(id1Local, id1Global, 1);
+        DataCopy(id2Local, id2Global, 1);
+        printf("[LBH] Before CKE: Id1 GM=0x%llx data=0x%llx, Id2 GM=0x%llx data=0x%llx\n",
+            xnData_[1], id1Local.GetValue(0), xnData_[2], id2Local.GetValue(0));
+    }
+
     WriteHBMData(ccuMsg_.commitCKEAddr, CCU_MSG_CKE_SET_VALUE);
+
+    {
+        GlobalTensor<uint64_t> id1Global;
+        GlobalTensor<uint64_t> id2Global;
+        id1Global.SetGlobalBuffer(reinterpret_cast<__gm__ uint64_t*>(xnData_[1]));
+        id2Global.SetGlobalBuffer(reinterpret_cast<__gm__ uint64_t*>(xnData_[2]));
+        LocalTensor<uint64_t> id1Local;
+        LocalTensor<uint64_t> id2Local;
+        DataCopy(id1Local, id1Global, 1);
+        DataCopy(id2Local, id2Global, 1);
+        printf("[LBH] After CKE: Id1 GM=0x%llx data=0x%llx, Id2 GM=0x%llx data=0x%llx\n",
+            xnData_[1], id1Local.GetValue(0), xnData_[2], id2Local.GetValue(0));
+    }
 }
 
 template <const auto& config>
@@ -566,6 +594,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::F
         ccuMsg_.commitCKEAddr = GetCommitCkeAddr(globalCurWaitId_);
         ccuMsg_.xnAddr = hcclContext_->xnOffset + CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE * globalCurWaitId_;
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr) = 0xffffffffffffffff;
+        printf("[LBH] Finalize FlushDataCache ccuMsg_.xnAddr = %ld\n", ccuMsg_.xnAddr);
         FlushDataCache(ccuMsg_.xnAddr);
         WriteHBMData(ccuMsg_.commitCKEAddr, CCU_MSG_CKE_SET_VALUE);
         KERNEL_LOG(
