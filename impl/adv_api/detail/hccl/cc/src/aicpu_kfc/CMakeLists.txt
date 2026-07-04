@@ -11,6 +11,7 @@ set(HCCL_HCOMM_HEADER_DIR ${HCCL_CC_INCLUDE_DIR}/hcomm)
 set(HCCL_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(ORION_REAL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/legacy)
 set(HCOMM_REAL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/..)
+include(${CMAKE_CURRENT_SOURCE_DIR}/mc2_server_minimal.cmake)
 
 #组件间对外头文件目录
 add_library(asc_hccl_headers INTERFACE)
