@@ -140,13 +140,14 @@ def collect_cases(args: argparse.Namespace, config: RuntimeConfig) -> CaseSelect
                 modes=config.modes,
                 includes=args.filter,
                 excludes=args.exclude,
+                exact_includes=args.exact_filter,
                 werror=args.werror,
             ),
         )
         suggestions.extend(runner_suggestions)
     else:
         examples = discover_examples(config.examples_root)
-        examples = filter_examples(examples, args.filter, args.exclude)
+        examples = filter_examples(examples, args.filter, args.exclude, args.exact_filter)
         specs = [parse_readme(path, config.examples_root) for path in examples]
         for spec in specs:
             suggestions.extend(spec.suggestions)
@@ -294,6 +295,7 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--make-jobs", default="auto")
     parser.add_argument("--cpu-run-timeout", default=str(CPU_RUN_TIMEOUT))
     parser.add_argument("--filter", action="append", default=[])
+    parser.add_argument("--exact-filter", action="append", default=[])
     parser.add_argument("--exclude", action="append", default=[])
     parser.add_argument("--timeout", type=int, default=120)
     parser.add_argument("--report-format", choices=["console", "json", "markdown", "all"], default="console")
