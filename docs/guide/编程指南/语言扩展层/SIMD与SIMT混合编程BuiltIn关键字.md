@@ -172,14 +172,14 @@ __global__ __vector__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
 
 ### SIMT VF与SIMD VF的调用差异
 
-SIMT VF和SIMD VF都通过`asc_vf_call`从核函数或`__aicore__`函数中启动VF子任务，但两类VF面向的执行模型不同，调用参数和VF函数内部可使用的内置能力也不同。
+SIMT VF与SIMD VF均通过`asc_vf_call`接口在核函数或`__aicore__`函数中启动VF子任务，但二者面向的并行执行模型不同：SIMT VF以线程为基本执行单元，实现线程级并行；SIMD VF基于矢量寄存器对连续数据实现数据级并行。执行模型的差异进一步决定了二者在调用形式上存在差异，具体如下表所示：
 
 | 对比项 | SIMT VF调用 | SIMD VF调用 |
 | --- | --- | --- |
-| VF入口函数标识 | 使用`__simt_vf__`修饰。 | 使用`__simd_vf__`修饰。 |
-| 调用形式 | `asc_vf_call<simt_func>(dim3(threadNums), arg1, arg2, ...)` | `asc_vf_call<simd_func>(arg1, arg2, ...)` |
-| 第一个运行时参数 | 必须传入`dim3`类型的线程配置，用于指定SIMT线程块内线程数量。 | 没有线程配置参数，调用参数从SIMD VF函数的第一个实参开始传入。 |
-| 指针入参 | 支持指向GM或UB的指针，需按实际内存空间使用`__gm__`或`__ubuf__`修饰。 | 指针入参需使用`__ubuf__`地址空间限定符修饰，不能直接访问GM内存。 |
+| VF入口函数标识 | 使用<code>__simt_vf_</code>修饰。 | 使用<code>__simd_vf__</code>修饰。 |
+| 调用形式 | <code>asc_vf_call<simt_func>(dim3(threadNums), arg1, arg2, ...)</code> | <code>asc_vf_call<simd_func>(arg1, arg2, ...)</code> |
+| 第一个运行时参数 | 必须传入<code>dim3</code>类型的线程配置，用于指定SIMT线程块内线程数量。 | 没有线程配置参数，调用参数从SIMD VF函数的第一个实参开始传入。 |
+| 指针入参 | 支持指向GM或UB的指针，需按实际内存空间使用<code>__gm__</code>或<code>__ubuf__</code>修饰。 | 指针入参需使用<code>__ubuf__</code>地址空间限定符修饰，不能直接访问GM内存。 |
 | 典型用途 | 处理复杂控制流、离散访存、线程级索引映射等不规则片段。 | 处理连续规整的向量计算片段。 |
 
 ## 内置变量<a name="zh-cn_topic_0000002571575581_section13165113520576"></a>
@@ -209,7 +209,7 @@ SIMT VF和SIMD VF都通过`asc_vf_call`从核函数或`__aicore__`函数中启�
 
     运行时变量，表示一个线程束（Warp）中的线程数量，当前为固定值32。
 
-SIMD核函数层级的内置变量参见[SIMD核函数层内置变量](./SIMD-BuiltIn关键字.md#内置变量)
+SIMD核函数层级的内置变量参见[SIMD核函数层内置变量](./SIMD-BuiltIn关键字.md#内置变量)。
 
 ### 不同层级的内置变量使用限制
 
