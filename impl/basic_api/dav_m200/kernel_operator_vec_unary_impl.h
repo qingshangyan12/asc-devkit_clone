@@ -170,25 +170,28 @@ template <typename T> __aicore__ inline void ExpImpl(__ubuf__ T* dst, __ubuf__ T
 
 /* **************************************** Ln ****************************************** */
 // Ln::Level 0
-template <typename T, bool isSetMask = true>
+template <typename T, bool isSetMask = true, const LnConfig& config = DEFAULT_LN_CONFIG>
 __aicore__ inline void LnImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask[], const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
+    static_assert((config.algo == LnAlgo::INTRINSIC), "current config type is not supported on current device!");
     AscendCUtils::SetMask<T, isSetMask>(mask[1], mask[0]);
     LnIntrinsicsImpl(dst, src, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask = true>
+template <typename T, bool isSetMask = true, const LnConfig& config = DEFAULT_LN_CONFIG>
 __aicore__ inline void LnImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
+    static_assert((config.algo == LnAlgo::INTRINSIC), "current config type is not supported on current device!");
     AscendCUtils::SetMask<T, isSetMask>(mask);
     LnIntrinsicsImpl(dst, src, repeatTime, repeatParams);
 }
 
 // Ln::Level 2
-template <typename T> __aicore__ inline void LnImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
+template <typename T, const LnConfig& config = DEFAULT_LN_CONFIG> __aicore__ inline void LnImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
 {
+    static_assert((config.algo == LnAlgo::INTRINSIC), "current config type is not supported on current device!");
     SetMaskCount();
     SetVectorMask<T, MaskMode::COUNTER>(0, count);
     LnIntrinsicsImpl(dst, src, 1, {DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE, DEFAULT_REPEAT_STRIDE,
@@ -228,25 +231,28 @@ template <typename T> __aicore__ inline void AbsImpl(__ubuf__ T* dst, __ubuf__ T
 
 /* **************************************** Reciprocal ****************************************** */
 // Reciprocal::Level 0
-template <typename T, bool isSetMask = true>
+template <typename T, bool isSetMask = true, const ReciprocalConfig& config = DEFAULT_RECIPROCAL_CONFIG>
 __aicore__ inline void ReciprocalImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
 {
+    static_assert((config.algo == ReciprocalAlgo::INTRINSIC), "current config type is not supported on current device!");
     AscendCUtils::SetMask<T, isSetMask>(mask[1], mask[0]);
     ReciprocalIntrinsicsImpl(dst, src, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask = true>
+template <typename T, bool isSetMask = true, const ReciprocalConfig& config = DEFAULT_RECIPROCAL_CONFIG>
 __aicore__ inline void ReciprocalImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
+    static_assert((config.algo == ReciprocalAlgo::INTRINSIC), "current config type is not supported on current device!");
     AscendCUtils::SetMask<T, isSetMask>(mask);
     ReciprocalIntrinsicsImpl(dst, src, repeatTime, repeatParams);
 }
 
 // Reciprocal::Level 2
-template <typename T> __aicore__ inline void ReciprocalImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
+template <typename T, const ReciprocalConfig& config = DEFAULT_RECIPROCAL_CONFIG> __aicore__ inline void ReciprocalImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
 {
+    static_assert((config.algo == ReciprocalAlgo::INTRINSIC), "current config type is not supported on current device!");
     SetMaskCount();
     SetVectorMask<T, MaskMode::COUNTER>(0, count);
     ReciprocalIntrinsicsImpl(dst, src, 1, {DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE, DEFAULT_REPEAT_STRIDE,
@@ -257,25 +263,28 @@ template <typename T> __aicore__ inline void ReciprocalImpl(__ubuf__ T* dst, __u
 
 /* **************************************** Rsqrt ****************************************** */
 // Rsqrt::Level 0
-template <typename T, bool isSetMask = true>
+template <typename T, bool isSetMask = true, const RsqrtConfig& config = DEFAULT_RSQRT_CONFIG>
 __aicore__ inline void RsqrtImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask[], const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
+    static_assert((config.algo == RsqrtAlgo::INTRINSIC), "current config type is not supported on current device!");
     AscendCUtils::SetMask<T, isSetMask>(mask[1], mask[0]);
     RsqrtIntrinsicsImpl(dst, src, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask = true>
+template <typename T, bool isSetMask = true, const RsqrtConfig& config = DEFAULT_RSQRT_CONFIG>
 __aicore__ inline void RsqrtImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
+    static_assert((config.algo == RsqrtAlgo::INTRINSIC), "current config type is not supported on current device!");
     AscendCUtils::SetMask<T, isSetMask>(mask);
     RsqrtIntrinsicsImpl(dst, src, repeatTime, repeatParams);
 }
 
 // Rsqrt::Level 2
-template <typename T> __aicore__ inline void RsqrtImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
+template <typename T, const RsqrtConfig& config = DEFAULT_RSQRT_CONFIG> __aicore__ inline void RsqrtImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
 {
+    static_assert((config.algo == RsqrtAlgo::INTRINSIC), "current config type is not supported on current device!");
     SetMaskCount();
     SetVectorMask<T, MaskMode::COUNTER>(0, count);
     RsqrtIntrinsicsImpl(dst, src, 1, {DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE, DEFAULT_REPEAT_STRIDE,
@@ -286,25 +295,28 @@ template <typename T> __aicore__ inline void RsqrtImpl(__ubuf__ T* dst, __ubuf__
 
 /* **************************************** Sqrt ****************************************** */
 // Sqrt::Level 0
-template <typename T, bool isSetMask = true>
+template <typename T, bool isSetMask = true, const SqrtConfig& config = DEFAULT_SQRT_CONFIG>
 __aicore__ inline void SqrtImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask[], const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
+    static_assert((config.algo == SqrtAlgo::INTRINSIC), "current config type is not supported on current device!");
     AscendCUtils::SetMask<T, isSetMask>(mask[1], mask[0]);
     SqrtIntrinsicsImpl(dst, src, repeatTime, repeatParams);
 }
 
-template <typename T, bool isSetMask = true>
+template <typename T, bool isSetMask = true, const SqrtConfig& config = DEFAULT_SQRT_CONFIG>
 __aicore__ inline void SqrtImpl(__ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask, const uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams)
 {
+    static_assert((config.algo == SqrtAlgo::INTRINSIC), "current config type is not supported on current device!");
     AscendCUtils::SetMask<T, isSetMask>(mask);
     SqrtIntrinsicsImpl(dst, src, repeatTime, repeatParams);
 }
 
 // Rsqrt::Level 2
-template <typename T> __aicore__ inline void SqrtImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
+template <typename T, const SqrtConfig& config = DEFAULT_SQRT_CONFIG> __aicore__ inline void SqrtImpl(__ubuf__ T* dst, __ubuf__ T* src, const int32_t& count)
 {
+    static_assert((config.algo == SqrtAlgo::INTRINSIC), "current config type is not supported on current device!");
     SetMaskCount();
     SetVectorMask<T, MaskMode::COUNTER>(0, count);
     SqrtIntrinsicsImpl(dst, src, 1, {DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE, DEFAULT_REPEAT_STRIDE,

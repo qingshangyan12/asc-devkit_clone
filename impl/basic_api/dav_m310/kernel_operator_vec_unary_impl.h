@@ -280,6 +280,163 @@ __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* sr
     }                                                                                                          \
 }                                                                                                              \
 
+// -------------------------------------------------------------------
+// Macros for level-0/level-2 api with Config template parameter
+// -------------------------------------------------------------------
+// for normal 16-bit types with Config
+#define UNARY_VEC_NORMAL_T16_WITH_CONFIG(FUNC_NAME, OP_NAME, DATA_TYPE, REG_TYPE, CONFIG_TYPE, ALGO_TYPE, DEFAULT_CONFIG) \
+template <typename T = DATA_TYPE, bool isSetMask = true, const CONFIG_TYPE& config = DEFAULT_CONFIG>                     \
+__aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* src, const uint64_t mask,                 \
+    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)                                                   \
+{                                                                                                                       \
+    static_assert((config.algo == ALGO_TYPE::INTRINSIC), "current config type is not supported on current device!");     \
+    __VEC_SCOPE__                                                                                                       \
+    {                                                                                                                   \
+        REG_TYPE vreg0;                                                                                                 \
+        REG_TYPE vreg1;                                                                                                 \
+        uint32_t sreg = static_cast<uint32_t>(mask);                                                                                 \
+        vector_bool preg = plt_b16(sreg, POST_UPDATE);                                                                  \
+        uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.srcBlkStride)) << 16);                                         \
+        uint32_t strideConfig1 = ((static_cast<uint32_t>(repeatParams.dstBlkStride)) << 16);                                         \
+        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {                                                          \
+            vsldb(vreg0, src + i * repeatParams.srcRepStride * B16_BLOCK_SIZE, strideConfig0, preg);                    \
+            OP_NAME(vreg1, vreg0, preg, MODE_ZEROING);                                                                  \
+            vsstb(vreg1, dst + i * repeatParams.dstRepStride * B16_BLOCK_SIZE, strideConfig1, preg);                    \
+        }                                                                                                               \
+    }                                                                                                                   \
+}                                                                                                                       \
+
+// for normal 32-bit types with Config
+#define UNARY_VEC_NORMAL_T32_WITH_CONFIG(FUNC_NAME, OP_NAME, DATA_TYPE, REG_TYPE, CONFIG_TYPE, ALGO_TYPE, DEFAULT_CONFIG) \
+template <typename T = DATA_TYPE, bool isSetMask = true, const CONFIG_TYPE& config = DEFAULT_CONFIG>                     \
+__aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* src, const uint64_t mask,                 \
+    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)                                                   \
+{                                                                                                                       \
+    static_assert((config.algo == ALGO_TYPE::INTRINSIC), "current config type is not supported on current device!");     \
+    __VEC_SCOPE__                                                                                                       \
+    {                                                                                                                   \
+        REG_TYPE vreg0;                                                                                                 \
+        REG_TYPE vreg1;                                                                                                 \
+        uint32_t sreg = static_cast<uint32_t>(mask);                                                                                 \
+        vector_bool preg = plt_b32(sreg, POST_UPDATE);                                                                  \
+        uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.srcBlkStride)) << 16);                                         \
+        uint32_t strideConfig1 = ((static_cast<uint32_t>(repeatParams.dstBlkStride)) << 16);                                         \
+        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {                                                          \
+            vsldb(vreg0, src + i * repeatParams.srcRepStride * B32_BLOCK_SIZE, strideConfig0, preg);                    \
+            OP_NAME(vreg1, vreg0, preg, MODE_ZEROING);                                                                  \
+            vsstb(vreg1, dst + i * repeatParams.dstRepStride * B32_BLOCK_SIZE, strideConfig1, preg);                    \
+        }                                                                                                               \
+    }                                                                                                                   \
+}                                                                                                                       \
+
+// for bit-wise 16-bit types with Config
+#define UNARY_VEC_BITWISE_T16_WITH_CONFIG(FUNC_NAME, OP_NAME, DATA_TYPE, REG_TYPE, CONFIG_TYPE, ALGO_TYPE, DEFAULT_CONFIG) \
+    template <typename T = DATA_TYPE, bool isSetMask = true, const CONFIG_TYPE& config = DEFAULT_CONFIG>                 \
+    __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* src, const uint64_t mask[],           \
+        const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)                                               \
+    {                                                                                                                   \
+        static_assert((config.algo == ALGO_TYPE::INTRINSIC), "current config type is not supported on current device!"); \
+        __ubuf__ uint64_t* maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 2);                  \
+        maskBuf[0] = mask[0];                                                                                           \
+        maskBuf[1] = mask[1];                                                                                           \
+        event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));                        \
+        SetFlag<HardEvent::S_V>(eventIdSToV);                                                                           \
+        WaitFlag<HardEvent::S_V>(eventIdSToV);                                                                          \
+        __VEC_SCOPE__                                                                                                   \
+        {                                                                                                               \
+            REG_TYPE vreg0;                                                                                             \
+            REG_TYPE vreg1;                                                                                             \
+            vector_bool preg;                                                                                           \
+            plds(preg, ((__ubuf__ uint32_t*)maskBuf), 0, US);                                                           \
+            uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.srcBlkStride)) << 16);                                     \
+            uint32_t strideConfig1 = ((static_cast<uint32_t>(repeatParams.dstBlkStride)) << 16);                                     \
+            for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {                                                      \
+                vsldb(vreg0, src + i * repeatParams.srcRepStride * B16_BLOCK_SIZE, strideConfig0, preg);                \
+                OP_NAME(vreg1, vreg0, preg, MODE_ZEROING);                                                              \
+                vsstb(vreg1, dst + i * repeatParams.dstRepStride * B16_BLOCK_SIZE, strideConfig1, preg);                \
+            }                                                                                                           \
+        }                                                                                                               \
+        AscendCUtils::FreeTemporaryBuffer<uint64_t>(maskBuf);                                                           \
+    }                                                                                                                   \
+
+// for bit-wise 32-bit types with Config
+#define UNARY_VEC_BITWISE_T32_WITH_CONFIG(FUNC_NAME, OP_NAME, DATA_TYPE, REG_TYPE, CONFIG_TYPE, ALGO_TYPE, DEFAULT_CONFIG) \
+    template <typename T = DATA_TYPE, bool isSetMask = true, const CONFIG_TYPE& config = DEFAULT_CONFIG>                 \
+    __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* src, const uint64_t mask[],           \
+        const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)                                               \
+    {                                                                                                                   \
+        static_assert((config.algo == ALGO_TYPE::INTRINSIC), "current config type is not supported on current device!"); \
+        __ubuf__ uint64_t* maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(TMP_UB_OFFSET, 2);                  \
+        maskBuf[0] = mask[0];                                                                                           \
+        maskBuf[1] = mask[1];                                                                                           \
+        event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));                        \
+        SetFlag<HardEvent::S_V>(eventIdSToV);                                                                           \
+        WaitFlag<HardEvent::S_V>(eventIdSToV);                                                                          \
+        __VEC_SCOPE__                                                                                                   \
+        {                                                                                                               \
+            REG_TYPE vreg0;                                                                                             \
+            REG_TYPE vreg1;                                                                                             \
+            vector_bool preg;                                                                                           \
+            vector_bool preg1;                                                                                          \
+            plds(preg, ((__ubuf__ uint32_t*)maskBuf), 0, US);                                                           \
+            punpack(preg1, preg, LOWER);                                                                                \
+            uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.srcBlkStride)) << 16);                                     \
+            uint32_t strideConfig1 = ((static_cast<uint32_t>(repeatParams.dstBlkStride)) << 16);                                     \
+            for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {                                                      \
+                vsldb(vreg0, src + i * repeatParams.srcRepStride * B32_BLOCK_SIZE, strideConfig0, preg1);               \
+                OP_NAME(vreg1, vreg0, preg1, MODE_ZEROING);                                                             \
+                vsstb(vreg1, dst + i * repeatParams.dstRepStride * B32_BLOCK_SIZE, strideConfig1, preg1);               \
+            }                                                                                                           \
+        }                                                                                                               \
+        AscendCUtils::FreeTemporaryBuffer<uint64_t>(maskBuf);                                                           \
+    }                                                                                                                   \
+
+// for counter level-2 16-bit data with Config
+#define UNARY_VEC_COUNTER_T16_WITH_CONFIG(FUNC_NAME, OP_NAME, DATA_TYPE, REG_TYPE, CONFIG_TYPE, ALGO_TYPE, DEFAULT_CONFIG) \
+template <typename T = DATA_TYPE, const CONFIG_TYPE& config = DEFAULT_CONFIG>                                           \
+__aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* src, const int32_t& count)                \
+{                                                                                                                       \
+    static_assert((config.algo == ALGO_TYPE::INTRINSIC), "current config type is not supported on current device!");     \
+    __VEC_SCOPE__                                                                                                       \
+    {                                                                                                                   \
+        REG_TYPE vreg0;                                                                                                 \
+        REG_TYPE vreg1;                                                                                                 \
+        uint32_t sreg = static_cast<uint32_t>(count);                                                                                \
+        vector_bool preg;                                                                                               \
+        uint32_t sregLower = static_cast<uint32_t>(B16_REPEAT_SIZE);                                                                 \
+        uint16_t repeatTime = CeilDivision(count, B16_REPEAT_SIZE);                                                 \
+        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {                                                          \
+            preg = plt_b16(sreg, POST_UPDATE);                                                                          \
+            vlds(vreg0, src, i * sregLower, NORM);                                                                      \
+            OP_NAME(vreg1, vreg0, preg, MODE_ZEROING);                                                                  \
+            vsts(vreg1, dst, i * sregLower, NORM_B16, preg);                                                            \
+        }                                                                                                               \
+    }                                                                                                                   \
+}                                                                                                                       \
+
+// for counter level-2 32-bit data with Config
+#define UNARY_VEC_COUNTER_T32_WITH_CONFIG(FUNC_NAME, OP_NAME, DATA_TYPE, REG_TYPE, CONFIG_TYPE, ALGO_TYPE, DEFAULT_CONFIG) \
+template <typename T = DATA_TYPE, const CONFIG_TYPE& config = DEFAULT_CONFIG>                                           \
+__aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* src, const int32_t& count)                \
+{                                                                                                                       \
+    static_assert((config.algo == ALGO_TYPE::INTRINSIC), "current config type is not supported on current device!");     \
+    __VEC_SCOPE__                                                                                                       \
+    {                                                                                                                   \
+        REG_TYPE vreg0;                                                                                                 \
+        REG_TYPE vreg1;                                                                                                 \
+        uint32_t sreg = static_cast<uint32_t>(count);                                                                                \
+        vector_bool preg;                                                                                               \
+        uint32_t sregLower = static_cast<uint32_t>(B32_REPEAT_SIZE);                                                                 \
+        uint16_t repeatTime = CeilDivision(count, B32_REPEAT_SIZE);                                                 \
+        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {                                                          \
+            preg = plt_b32(sreg, POST_UPDATE);                                                                          \
+            vlds(vreg0, src, i * sregLower, NORM);                                                                      \
+            OP_NAME(vreg1, vreg0, preg, MODE_ZEROING);                                                                  \
+            vsts(vreg1, dst, i * sregLower, NORM_B32, preg);                                                            \
+        }                                                                                                               \
+    }                                                                                                                   \
+}                                                                                                              \
+
 /* **************************************************************************************************
  * Exp                                             *
  * ************************************************************************************************* */
@@ -287,17 +444,17 @@ __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* sr
 UNARY_VEC_NORMAL_NOT_SUPPORT(ExpImpl);
 UNARY_VEC_BITWISE_NOT_SUPPORT(ExpImpl);
 
-UNARY_VEC_NORMAL_T16(ExpImpl, vexp, half, vector_f16);
-UNARY_VEC_NORMAL_T32(ExpImpl, vexp, float, vector_f32);
+UNARY_VEC_NORMAL_T16_WITH_CONFIG(ExpImpl, vexp, half, vector_f16, ExpConfig, ExpAlgo, DEFAULT_EXP_CONFIG);
+UNARY_VEC_NORMAL_T32_WITH_CONFIG(ExpImpl, vexp, float, vector_f32, ExpConfig, ExpAlgo, DEFAULT_EXP_CONFIG);
 
-UNARY_VEC_BITWISE_T16(ExpImpl, vexp, half, vector_f16);
-UNARY_VEC_BITWISE_T32(ExpImpl, vexp, float, vector_f32);
+UNARY_VEC_BITWISE_T16_WITH_CONFIG(ExpImpl, vexp, half, vector_f16, ExpConfig, ExpAlgo, DEFAULT_EXP_CONFIG);
+UNARY_VEC_BITWISE_T32_WITH_CONFIG(ExpImpl, vexp, float, vector_f32, ExpConfig, ExpAlgo, DEFAULT_EXP_CONFIG);
 
 // // Exp::Level 2
 UNARY_VEC_COUNTER_NOT_SUPPORT(ExpImpl);
 
-UNARY_VEC_COUNTER_T16(ExpImpl, vexp, half, vector_f16);
-UNARY_VEC_COUNTER_T32(ExpImpl, vexp, float, vector_f32);
+UNARY_VEC_COUNTER_T16_WITH_CONFIG(ExpImpl, vexp, half, vector_f16, ExpConfig, ExpAlgo, DEFAULT_EXP_CONFIG);
+UNARY_VEC_COUNTER_T32_WITH_CONFIG(ExpImpl, vexp, float, vector_f32, ExpConfig, ExpAlgo, DEFAULT_EXP_CONFIG);
 
 
 // /* **************************************************************************************************
@@ -307,17 +464,17 @@ UNARY_VEC_COUNTER_T32(ExpImpl, vexp, float, vector_f32);
 UNARY_VEC_NORMAL_NOT_SUPPORT(LnImpl);
 UNARY_VEC_BITWISE_NOT_SUPPORT(LnImpl);
 
-UNARY_VEC_NORMAL_T16(LnImpl, vln, half, vector_f16);
-UNARY_VEC_NORMAL_T32(LnImpl, vln, float, vector_f32);
+UNARY_VEC_NORMAL_T16_WITH_CONFIG(LnImpl, vln, half, vector_f16, LnConfig, LnAlgo, DEFAULT_LN_CONFIG);
+UNARY_VEC_NORMAL_T32_WITH_CONFIG(LnImpl, vln, float, vector_f32, LnConfig, LnAlgo, DEFAULT_LN_CONFIG);
 
-UNARY_VEC_BITWISE_T16(LnImpl, vln, half, vector_f16);
-UNARY_VEC_BITWISE_T32(LnImpl, vln, float, vector_f32);
+UNARY_VEC_BITWISE_T16_WITH_CONFIG(LnImpl, vln, half, vector_f16, LnConfig, LnAlgo, DEFAULT_LN_CONFIG);
+UNARY_VEC_BITWISE_T32_WITH_CONFIG(LnImpl, vln, float, vector_f32, LnConfig, LnAlgo, DEFAULT_LN_CONFIG);
 
 // // Ln::Level 2
 UNARY_VEC_COUNTER_NOT_SUPPORT(LnImpl);
 
-UNARY_VEC_COUNTER_T16(LnImpl, vln, half, vector_f16);
-UNARY_VEC_COUNTER_T32(LnImpl, vln, float, vector_f32);
+UNARY_VEC_COUNTER_T16_WITH_CONFIG(LnImpl, vln, half, vector_f16, LnConfig, LnAlgo, DEFAULT_LN_CONFIG);
+UNARY_VEC_COUNTER_T32_WITH_CONFIG(LnImpl, vln, float, vector_f32, LnConfig, LnAlgo, DEFAULT_LN_CONFIG);
 
 
 // /* **************************************************************************************************
@@ -355,17 +512,17 @@ UNARY_VEC_COUNTER_T32(AbsImpl, vabs, int32_t, vector_s32);
 UNARY_VEC_NORMAL_NOT_SUPPORT(ReciprocalImpl);
 UNARY_VEC_BITWISE_NOT_SUPPORT(ReciprocalImpl);
 
-UNARY_VEC_NORMAL_T16(ReciprocalImpl, vrec, half, vector_f16);
-UNARY_VEC_NORMAL_T32(ReciprocalImpl, vrec, float, vector_f32);
+UNARY_VEC_NORMAL_T16_WITH_CONFIG(ReciprocalImpl, vrec, half, vector_f16, ReciprocalConfig, ReciprocalAlgo, DEFAULT_RECIPROCAL_CONFIG);
+UNARY_VEC_NORMAL_T32_WITH_CONFIG(ReciprocalImpl, vrec, float, vector_f32, ReciprocalConfig, ReciprocalAlgo, DEFAULT_RECIPROCAL_CONFIG);
 
-UNARY_VEC_BITWISE_T16(ReciprocalImpl, vrec, half, vector_f16);
-UNARY_VEC_BITWISE_T32(ReciprocalImpl, vrec, float, vector_f32);
+UNARY_VEC_BITWISE_T16_WITH_CONFIG(ReciprocalImpl, vrec, half, vector_f16, ReciprocalConfig, ReciprocalAlgo, DEFAULT_RECIPROCAL_CONFIG);
+UNARY_VEC_BITWISE_T32_WITH_CONFIG(ReciprocalImpl, vrec, float, vector_f32, ReciprocalConfig, ReciprocalAlgo, DEFAULT_RECIPROCAL_CONFIG);
 
 // // Rec::Level 2
 UNARY_VEC_COUNTER_NOT_SUPPORT(ReciprocalImpl);
 
-UNARY_VEC_COUNTER_T16(ReciprocalImpl, vrec, half, vector_f16);
-UNARY_VEC_COUNTER_T32(ReciprocalImpl, vrec, float, vector_f32);
+UNARY_VEC_COUNTER_T16_WITH_CONFIG(ReciprocalImpl, vrec, half, vector_f16, ReciprocalConfig, ReciprocalAlgo, DEFAULT_RECIPROCAL_CONFIG);
+UNARY_VEC_COUNTER_T32_WITH_CONFIG(ReciprocalImpl, vrec, float, vector_f32, ReciprocalConfig, ReciprocalAlgo, DEFAULT_RECIPROCAL_CONFIG);
 
 
 // /* **************************************************************************************************
@@ -375,17 +532,17 @@ UNARY_VEC_COUNTER_T32(ReciprocalImpl, vrec, float, vector_f32);
 UNARY_VEC_NORMAL_NOT_SUPPORT(SqrtImpl);
 UNARY_VEC_BITWISE_NOT_SUPPORT(SqrtImpl);
 
-UNARY_VEC_NORMAL_T16(SqrtImpl, vsqrt, half, vector_f16);
-UNARY_VEC_NORMAL_T32(SqrtImpl, vsqrt, float, vector_f32);
+UNARY_VEC_NORMAL_T16_WITH_CONFIG(SqrtImpl, vsqrt, half, vector_f16, SqrtConfig, SqrtAlgo, DEFAULT_SQRT_CONFIG);
+UNARY_VEC_NORMAL_T32_WITH_CONFIG(SqrtImpl, vsqrt, float, vector_f32, SqrtConfig, SqrtAlgo, DEFAULT_SQRT_CONFIG);
 
-UNARY_VEC_BITWISE_T16(SqrtImpl, vsqrt, half, vector_f16);
-UNARY_VEC_BITWISE_T32(SqrtImpl, vsqrt, float, vector_f32);
+UNARY_VEC_BITWISE_T16_WITH_CONFIG(SqrtImpl, vsqrt, half, vector_f16, SqrtConfig, SqrtAlgo, DEFAULT_SQRT_CONFIG);
+UNARY_VEC_BITWISE_T32_WITH_CONFIG(SqrtImpl, vsqrt, float, vector_f32, SqrtConfig, SqrtAlgo, DEFAULT_SQRT_CONFIG);
 
 // // Sqrt::Level 2
 UNARY_VEC_COUNTER_NOT_SUPPORT(SqrtImpl);
 
-UNARY_VEC_COUNTER_T16(SqrtImpl, vsqrt, half, vector_f16);
-UNARY_VEC_COUNTER_T32(SqrtImpl, vsqrt, float, vector_f32);
+UNARY_VEC_COUNTER_T16_WITH_CONFIG(SqrtImpl, vsqrt, half, vector_f16, SqrtConfig, SqrtAlgo, DEFAULT_SQRT_CONFIG);
+UNARY_VEC_COUNTER_T32_WITH_CONFIG(SqrtImpl, vsqrt, float, vector_f32, SqrtConfig, SqrtAlgo, DEFAULT_SQRT_CONFIG);
 
 
 // // /* **************************************************************************************************
@@ -395,17 +552,17 @@ UNARY_VEC_COUNTER_T32(SqrtImpl, vsqrt, float, vector_f32);
 UNARY_VEC_NORMAL_NOT_SUPPORT(RsqrtImpl);
 UNARY_VEC_BITWISE_NOT_SUPPORT(RsqrtImpl);
 
-UNARY_VEC_NORMAL_T16(RsqrtImpl, vrsqrt, half, vector_f16);
-UNARY_VEC_NORMAL_T32(RsqrtImpl, vrsqrt, float, vector_f32);
+UNARY_VEC_NORMAL_T16_WITH_CONFIG(RsqrtImpl, vrsqrt, half, vector_f16, RsqrtConfig, RsqrtAlgo, DEFAULT_RSQRT_CONFIG);
+UNARY_VEC_NORMAL_T32_WITH_CONFIG(RsqrtImpl, vrsqrt, float, vector_f32, RsqrtConfig, RsqrtAlgo, DEFAULT_RSQRT_CONFIG);
 
-UNARY_VEC_BITWISE_T16(RsqrtImpl, vrsqrt, half, vector_f16);
-UNARY_VEC_BITWISE_T32(RsqrtImpl, vrsqrt, float, vector_f32);
+UNARY_VEC_BITWISE_T16_WITH_CONFIG(RsqrtImpl, vrsqrt, half, vector_f16, RsqrtConfig, RsqrtAlgo, DEFAULT_RSQRT_CONFIG);
+UNARY_VEC_BITWISE_T32_WITH_CONFIG(RsqrtImpl, vrsqrt, float, vector_f32, RsqrtConfig, RsqrtAlgo, DEFAULT_RSQRT_CONFIG);
 
 // // Rec::Level 2
 UNARY_VEC_COUNTER_NOT_SUPPORT(RsqrtImpl);
 
-UNARY_VEC_COUNTER_T16(RsqrtImpl, vrsqrt, half, vector_f16);
-UNARY_VEC_COUNTER_T32(RsqrtImpl, vrsqrt, float, vector_f32);
+UNARY_VEC_COUNTER_T16_WITH_CONFIG(RsqrtImpl, vrsqrt, half, vector_f16, RsqrtConfig, RsqrtAlgo, DEFAULT_RSQRT_CONFIG);
+UNARY_VEC_COUNTER_T32_WITH_CONFIG(RsqrtImpl, vrsqrt, float, vector_f32, RsqrtConfig, RsqrtAlgo, DEFAULT_RSQRT_CONFIG);
 
 
 // // /* **************************************************************************************************
