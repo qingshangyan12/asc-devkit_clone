@@ -53,22 +53,6 @@ struct CommonPrepareParam {
     AlltoAllvWriteParamExt wParamExt; // only used by AlltoAllvWrite
 };
 
-struct CommonPrepareParamCcu {
-    HcclCommType commType;
-    GM_ADDR sendBuf;
-    GM_ADDR recvBuf;
-    uint64_t count;
-    HcclDataType dataType;
-    HcclDataType dstDataType;
-    HcclReduceOp op;
-    uint64_t strideCount;
-    uint8_t repeat = 1U;
-    uint8_t reservedPartA[7];
-    AlltoAllVParamExt paramExt;       // only used by AlltoAllV
-    AlltoAllvWriteParamExt wParamExt; // only used by AlltoAllvWrite
-    uint8_t reservedPartB[8];
-};
-
 struct MemDetails {
     uint64_t size;
     uint64_t addr;
@@ -138,53 +122,5 @@ struct HcclOpResParam {
     uint32_t rWinStart;
 };
 } // namespace HcclContextDef
-constexpr uint16_t CCU_CKE_SIZE = 8;
-constexpr uint64_t CCU_XN_DATA_SIZE = 8;       // Number of bytes per xn
-constexpr uint16_t CCU_USED_XN_NUM = 15;       // Currently xn are used
-constexpr uint16_t CCU_MAX_MSG_NUM = 64;       // The message queue length sent to CCU
-constexpr uint16_t CCU_MSG_XN_NUM = 64;        // Maximum xn number, each CCU message body occupies 8 registers
-                                               // the message body length is 64*8B=512B
-constexpr uint64_t CCU_LOOP_COUNT = 128;       // CCU cycle number, MC2 is not aware of it
-constexpr uint64_t CCU_LOOP_COUNT_M2M_RE = 16; // AllReduce ReduceScatter
-constexpr uint64_t CCU_LOOP_COUNT_M2M_AG = 8;  // AllGather
-constexpr uint64_t CCU_LOOP_COUNT_ATAVW = 8;   // CCU cycle number, only for AlltoAllvWrite
-constexpr uint64_t ALIGN_64_BYTE = 64;
-constexpr uint64_t CCU_MEMSLICE_SIZE = 4096; // CCU MS size, MC2 is not aware of it
-constexpr uint8_t CCU_MSG_CKE_INIT_VALUE = 0;
-constexpr uint8_t CCU_MSG_CKE_SET_VALUE = 1;
-constexpr uint64_t CCU_MAX_COMM_DATA = 268435456; // 256 * 1024 * 1024
-
-struct CCUMsg {
-    GM_ADDR xnData; // Msg is converted to CCU register value
-    GM_ADDR xnAddr;
-    GM_ADDR commitCKEAddr; // The commit address corresponding to each msg
-    GM_ADDR waitCKEAddr;   // The wait address corresponding to each Msg
-};
-
-struct CCUMsgExt { // AllToAllv HcclMsgExt trans for ccu
-    uint64_t sendSize;
-    uint64_t loopNum = UINT64_MAX - 1;
-    uint64_t sendOffset;
-    uint64_t recvOffset;
-};
-
-struct CcuPrepareParam {
-    uint32_t rankNum;
-    uint32_t rankId;
-    uint32_t repeatIndex;
-    uint8_t alltoallvCnt = 0;
-    __gm__ CCUMsgExt* ccuMsgExt;
-    uint64_t scratchAddr;
-};
-
-struct AlltoAllVParamCcu {
-    uint64_t sendCounts[HCCL_MAX_RANK_NUM];
-    uint64_t sdispls[HCCL_MAX_RANK_NUM];
-    uint64_t recvCounts[HCCL_MAX_RANK_NUM];
-    uint64_t rdispls[HCCL_MAX_RANK_NUM];
-};
-
-constexpr uint64_t CCU_MSG_EXT_RANK_OFFSET = sizeof(CCUMsgExt) * HCCL_MAX_RANK_NUM_V2;
-constexpr uint64_t CCU_MSG_EXT_MAX_OFFSET = CCU_MSG_EXT_RANK_OFFSET * HCCL_MSG_CNT;
 } // namespace AscendC
 #endif // IMPL_HCCL_HCCL_INNER_DEF_H
