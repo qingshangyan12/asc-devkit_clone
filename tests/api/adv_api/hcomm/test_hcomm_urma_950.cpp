@@ -283,14 +283,14 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_InitLocalTensor)
 // These guards are never reached through the normal send path, so exercise them directly.
 TEST_F(HcommUrmaTestSuite, Aiv_Urma_DumpHelpers_Nullptr)
 {
-    AscendC::HcommUrmaDumpWqeCtx(nullptr);
+    AscendC::HcommUrmaDumpWqeCtx(nullptr, sizeof(uint8_t));
     AscendC::HcommUrmaDumpCqeCtx(nullptr);
-    AscendC::HcommUrmaDumpSgeCtx(nullptr, nullptr);
+    AscendC::HcommUrmaDumpSgeCtx(nullptr, nullptr, sizeof(uint8_t));
 
     // sqeCtx non-null but sgeAddr null still hits the guard
     std::vector<uint8_t> sqeBuf(sizeof(AscendC::HcommUrmaSqeCtx), 0);
     auto* sqe = reinterpret_cast<__ubuf__ AscendC::HcommUrmaSqeCtx*>(sqeBuf.data());
-    AscendC::HcommUrmaDumpSgeCtx(sqe, nullptr);
+    AscendC::HcommUrmaDumpSgeCtx(sqe, nullptr, sizeof(uint8_t));
 }
 
 // Dump helpers: full function bodies.
@@ -312,7 +312,7 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_DumpHelpers_Valid)
     auto* sqe = reinterpret_cast<__ubuf__ AscendC::HcommUrmaSqeCtx*>(buf.data());
     sqe->sgeNum = sgeNum;
     auto* sgeAddr = reinterpret_cast<__ubuf__ uint8_t*>(buf.data() + sizeof(AscendC::HcommUrmaSqeCtx));
-    AscendC::HcommUrmaDumpSgeCtx(sqe, sgeAddr);
+    AscendC::HcommUrmaDumpSgeCtx(sqe, sgeAddr, sizeof(uint8_t));
 
     // WQE dump with WRITE_WITH_NOTIFY opcode: covers the notify branch inside HcommUrmaDumpWqeCtx
     constexpr uint32_t wqeBufSize =
@@ -321,5 +321,5 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_DumpHelpers_Valid)
     auto* wqe = reinterpret_cast<__ubuf__ AscendC::HcommUrmaSqeCtx*>(wqeBuf.data());
     wqe->opcode = static_cast<uint32_t>(AscendC::HcommUrmaOpCode::WRITE_WITH_NOTIFY);
     wqe->sgeNum = 1;
-    AscendC::HcommUrmaDumpWqeCtx(wqe);
+    AscendC::HcommUrmaDumpWqeCtx(wqe, sizeof(uint8_t));
 }
