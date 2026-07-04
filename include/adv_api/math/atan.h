@@ -19,6 +19,10 @@
  * when x belongs to (tan(pi/4), +�?, Atan(x) = pi/4 + atan((x-1)/(x+1))
  */
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "atan.h is not supported in pure SIMT mode."
+#endif
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ATAN_H__
