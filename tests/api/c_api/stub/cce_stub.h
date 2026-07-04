@@ -16,9 +16,8 @@
 #define ULL unsigned long long
 #endif
 
-#ifndef val
+#undef val
 #define val data()
-#endif
 
 void vsts(
     vector_f8e4m3 data, __ubuf__ fp8_e4m3fn_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
