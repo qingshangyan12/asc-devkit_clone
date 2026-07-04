@@ -72,7 +72,7 @@ __aicore__ void hello_world_impl(GM_ADDR m)
 // AI Core算子总入口
 // tilingInfo: 和AI CPU算子共同传递的参数，用于数据共享
 template<typename T, int8_t mode, int8_t len>
-__mix__(1,2) __global__ __aicore__ void hello_world(GM_ADDR m, GM_ADDR TilingPtr)
+__mix__(1,2) __global__ void hello_world(GM_ADDR m, GM_ADDR TilingPtr)
 {
      __gm__ struct KernelInfo::TilingInfo *ti = (__gm__ struct KernelInfo::TilingInfo *)TilingPtr;
     AscendC::GlobalTensor<uint64_t> lock;
