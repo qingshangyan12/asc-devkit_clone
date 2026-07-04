@@ -19,12 +19,12 @@
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_CREATEVECINDEX_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_CREATEVECINDEX_IMPL_H
-#include "kernel_tensor.h"
-#include "kernel_struct_unary.h"
-#include "kernel_tpipe.h"
+#include "../../../include/basic_api/kernel_tensor.h"
+#include "../../../include/basic_api/kernel_struct_unary.h"
+#include "../../../include/basic_api/kernel_tpipe.h"
 #include "../../../include/basic_api/kernel_operator_vec_binary_scalar_intf.h"
 #if ASCENDC_CPU_DEBUG
-#include "kernel_check.h"
+#include "../kernel_check.h"
 #endif
 
 namespace AscendC {
@@ -48,7 +48,7 @@ __aicore__ inline void CreateVecIndexOneBlk(const LocalTensor<T> &dst, const T &
     for (int32_t i = 0; i < static_cast<int32_t>(count); i++) {
         dst.SetValue(i, GetCreateVecIndexValue(firstValue, i));
     }
-    auto eventIdSToV = FetchEventID<HardEvent::S_V>();
+    auto eventIdSToV = GetTPipePtr()->FetchEventID(HardEvent::S_V);
     SetFlag<HardEvent::S_V>(eventIdSToV);
     WaitFlag<HardEvent::S_V>(eventIdSToV);
 }
@@ -83,7 +83,7 @@ __aicore__ inline void CreateVecIndexOneRep(const LocalTensor<T> &dst, const T &
             maskValue <<= 1;
         }
     }
-    auto eventIdSToV = FetchEventID<HardEvent::S_V>();
+    auto eventIdSToV = GetTPipePtr()->FetchEventID(HardEvent::S_V);
     SetFlag<HardEvent::S_V>(eventIdSToV);
     WaitFlag<HardEvent::S_V>(eventIdSToV);
 }

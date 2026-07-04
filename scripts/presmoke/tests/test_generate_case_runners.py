@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# coding=utf-8
+
 # ----------------------------------------------------------------------------------------------------------
 # Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
@@ -22,8 +25,10 @@ from presmoke.generate_case_runners import (
     NO_CMAKE_ARCH_INJECTION_CASES,
     apply_case_overrides,
     command_env_prefix,
-    explicit_skip_reason,
+    command_workdir,
+    explicit_skip_config,
     is_atc_prerequisite_command,
+    merge_export_commands_into_run,
     quote_env_value,
     render_runner,
     requires_custom_op_package,
@@ -39,6 +44,8 @@ def render_runner_from_parts(
     verify_cmds: list[Command],
     custom_op_dependency: bool = False,
     custom_op_package_case: bool = False,
+    skip_reason: str = "",
+    skip_modes: list[str] = [],
 ) -> str:
     return render_runner(
         RunnerRenderSpec(
@@ -48,6 +55,8 @@ def render_runner_from_parts(
             verify_cmds=verify_cmds,
             custom_op_dependency=custom_op_dependency,
             custom_op_package_case=custom_op_package_case,
+            skip_reason=skip_reason,
+            skip_modes=skip_modes,
         )
     )
 
@@ -104,6 +113,30 @@ class GenerateCaseRunnersTest(unittest.TestCase):
             rel_path = readme.parent.relative_to(examples_root).as_posix()
             item = manifest.get(rel_path)
             if not item or "cpu" not in item.get("supported_modes", []):
+                missing.append(rel_path)
+
+        self.assertEqual(missing, [])
+
+    def test_manifest_includes_leaf_cmake_executable_cases(self) -> None:
+        project_root = Path(__file__).resolve().parents[3]
+        examples_root = project_root / "examples"
+        manifest_cases = {
+            item["case"]
+            for item in json.loads(
+                (project_root / "scripts/presmoke/reports/case_runner_manifest.json").read_text(encoding="utf-8")
+            )
+        }
+        missing = []
+        for cmake_file in examples_root.rglob("CMakeLists.txt"):
+            text = cmake_file.read_text(encoding="utf-8", errors="ignore")
+            if not re.search(r"\badd_executable\s*\(", text):
+                continue
+            rel_path = cmake_file.parent.relative_to(examples_root).as_posix()
+            if rel_path in manifest_cases:
+                continue
+            readme = cmake_file.parent / "README.md"
+            has_child_case = any(case.startswith(rel_path + "/") for case in manifest_cases)
+            if readme.exists() and not has_child_case:
                 missing.append(rel_path)
 
         self.assertEqual(missing, [])
@@ -173,6 +206,22 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         self.assertIn('python3 ../torch_library_report_tensor.py', script)
         self.assertNotIn('(cd "$CASE_DIR" && soc_version=$SOC_VERSION bash -lc', script)
 
+    def test_export_command_is_merged_into_first_run_command(self) -> None:
+        build_cmds, run_cmds = merge_export_commands_into_run(
+            [
+                Command("cmake ..", "cmake"),
+                Command('export ASCEND_CUSTOM_OPP_PATH="$(pwd)/output:${ASCEND_CUSTOM_OPP_PATH}"', "shell"),
+            ],
+            [Command("./demo", "run")],
+        )
+
+        self.assertEqual([command.raw for command in build_cmds], ["cmake .."])
+        self.assertEqual(
+            run_cmds[0].raw,
+            'export ASCEND_CUSTOM_OPP_PATH="$(pwd)/output:${ASCEND_CUSTOM_OPP_PATH}"; ./demo',
+        )
+        self.assertEqual(command_workdir(run_cmds[0].raw, default_cd_build=True), "$BUILD_DIR")
+
     def test_env_value_references_are_not_single_quoted(self) -> None:
         self.assertEqual(quote_env_value("$ARCH"), "$ARCH")
         self.assertEqual(quote_env_value("$SOC_VERSION"), "$SOC_VERSION")
@@ -207,7 +256,7 @@ class GenerateCaseRunnersTest(unittest.TestCase):
 
     def test_tiling_sink_runner_validates_sink_task_generation_log(self) -> None:
         script = render_runner_from_parts(
-            "04_aicpu/02_features/00_framwork/00_pytorch/tiling_sink_programming",
+            "04_aicpu/02_features/00_framework/00_pytorch/tiling_sink_programming",
             [],
             [Command("python3 test_add_custom_tiling_sink.py", "run")],
             [],
@@ -240,7 +289,16 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         self.assertTrue(requires_custom_op_package("01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclnn_invocation"))
         self.assertTrue(requires_custom_op_package("01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin"))
         self.assertTrue(requires_custom_op_package("01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom"))
-        self.assertIn("TensorFlow 2.6.5", explicit_skip_reason("01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom"))
+        reason, modes = explicit_skip_config("01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom")
+        self.assertIn("TensorFlow 2.6.5", reason)
+        self.assertEqual(modes, ["npu"])
+        reason, modes = explicit_skip_config("01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin")
+        self.assertEqual(modes, ["npu"])
+
+    def test_matmul_l2cache_skip_config(self) -> None:
+        reason, modes = explicit_skip_config("01_simd_cpp_api/04_advanced_api/00_matmul/matmul_l2cache")
+        self.assertIn("308M", reason)
+        self.assertEqual(modes, ["cpu"])
 
     def test_matmul_fp8_is_950_only(self) -> None:
         self.assertEqual(
@@ -267,7 +325,7 @@ class GenerateCaseRunnersTest(unittest.TestCase):
             "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin",
             "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom",
             "01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin",
-            "04_aicpu/02_features/00_framwork/00_pytorch/tiling_sink_programming",
+            "04_aicpu/02_features/00_framework/00_pytorch/tiling_sink_programming",
         ]:
             self.assertEqual(ARCH_OVERRIDES[rel_path], expected)
 
@@ -303,6 +361,20 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         self.assertNotIn('ACTION="${1:-all}"', script)
         self.assertNotIn('case "$ACTION" in', script)
 
+    def test_rtc_template_add_runner_uses_cmake_target_name(self) -> None:
+        project_root = Path(__file__).resolve().parents[3]
+        runner = (
+            project_root
+            / "scripts/presmoke/cases/01_simd_cpp_api/02_features/05_aclrtc/rtc_template_add/run.sh"
+        )
+        manifest = json.loads((project_root / "scripts/presmoke/reports/case_runner_manifest.json").read_text())
+        item = next(entry for entry in manifest if entry["case"].endswith("05_aclrtc/rtc_template_add"))
+
+        self.assertIn("bash -lc ./demo", runner.read_text(encoding="utf-8"))
+        self.assertNotIn("bash -lc ./main", runner.read_text(encoding="utf-8"))
+        self.assertIn("./demo", item["commands"])
+        self.assertNotIn("./main", item["commands"])
+
     def test_skip_runner_clean_still_removes_build_directory(self) -> None:
         project_root = Path(__file__).resolve().parents[3]
         runner = project_root / "scripts/presmoke/cases/01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin/run.sh"
@@ -318,6 +390,17 @@ class GenerateCaseRunnersTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertFalse(build_dir.exists())
+
+    def test_skip_modes_lines_generates_bash_array(self) -> None:
+        script = render_runner_from_parts(
+            "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_l2cache",
+            [],
+            [],
+            [],
+            skip_reason="test skip",
+            skip_modes=["cpu", "sim"],
+        )
+        self.assertIn("SKIP_MODES=(cpu sim)", script)
 
     def test_case_common_maps_950_arch_to_supported_soc_version(self) -> None:
         project_root = Path(__file__).resolve().parents[3]

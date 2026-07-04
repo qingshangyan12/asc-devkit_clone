@@ -19,11 +19,11 @@
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_IMPL_H
-#include "kernel_tensor.h"
+#include "../../include/basic_api/kernel_tensor.h"
 #include "kernel_check.h"
-#include "kernel_struct_binary.h"
-#include "kernel_struct_unary.h"
-#include "kernel_struct_vdeq.h"
+#include "../../include/basic_api/kernel_struct_binary.h"
+#include "../../include/basic_api/kernel_struct_unary.h"
+#include "../../include/basic_api/kernel_struct_vdeq.h"
 #include "kernel_npu_debug.h"
 #include "mstx_local_tensor_info.h"
 
@@ -84,7 +84,7 @@ __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src
         DstPrimType, SrcPrimType>::type;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Cast", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
-    CheckMaskRepeat<MaskCheckType>(mask, repeatTime, "Cast");
+    CheckMaskRepeat<MaskCheckType, isSetMask>(mask, repeatTime, "Cast");
 #endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecUnaryCastInfo<T, U, isSetMask>(dst, src, mask[0], mask[1], repeatTime, repeatParams, "Cast");
@@ -119,7 +119,7 @@ __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src
         DstPrimType, SrcPrimType>::type;
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckVectorTensor("Cast", NamedTensor(dst, "dst"), NamedTensor(src, "src"));
-    CheckMaskRepeat<MaskCheckType>(mask, repeatTime, "Cast");
+    CheckMaskRepeat<MaskCheckType, isSetMask>(mask, repeatTime, "Cast");
 #endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecUnaryCastInfo<T, U, isSetMask>(dst, src, mask, repeatTime, repeatParams, "Cast");

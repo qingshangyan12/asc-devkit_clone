@@ -39,17 +39,11 @@ Hash Table是一种高效的数据结构，它通过一个哈希函数将“键�
 
 由于每个键值对的存储位置由计算出的哈希值决定，这些值通常是随机且离散的，加上哈希冲突的存在，导致在实际写入数据前需要进行多个条件判断，因此，哈希表不适合基于SIMD编程模型来实现。相比之下，SIMT编程中每个线程都能独立处理分支判断，并支持离散访存，因此在实现哈希表方面更具优势。
 
-## 算法分析
+## 结构体设计
 
-SIMT能够通过大量线程的并发执行实现高效处理大批数据，但同时也带来了两个问题：多线程写冲突和核间数据同步问题。
+哈希表插入过程涉及哈希表首地址、容量、桶大小、输入key/value等多项信息，若在函数间逐一传递这些参数，接口会变得冗长，模块间耦合也会增加。因此，样例通过结构体分别封装哈希表上下文和输入数据，提升代码可读性和维护性。
 
-### 多线程写冲突问题
-
-在多线程操作同一块内存时，资源冲突问题在所难免。当两个线程插入的key产生哈希冲突时，多个线程会尝试向桶数组的同一位置写入数据，因此需要确保仅有一个线程能够获得桶的写入权限。程序实现时，在Bucket结构体中添加一个标记位“flag”，用于标记当前桶的写入权限，线程通过原子指令[`asc_atomic_cas()`](../../../../../../docs/api/SIMT-API/原子操作/asc_atomic_cas.md)修改flag来获取桶的写入权限。
-
-### 核间数据同步问题
-
-当发生哈希冲突时，线程需要判断当前桶中存储的key是否与待插入的key相同，这要求当前线程能够读取其他线程写入的数据，并确保数据的完整性。程序实现时，在Bucket结构体中添加一个标记位“state”，用于标识key值的写入状态。写线程中在写入key后将state标记位置1，并在二者之间调用[`asc_threadfence()`](../../../../../../docs/api/SIMT-API/同步与内存栅栏/内存栅栏接口/asc_threadfence.md)接口，确保当state被设置为1时，key的写入操作已经完成。读线程中，通过while循环轮询state值，直到state被设置为1，然后再读取key值。
+`Bucket`是哈希表中实际存储键值对的目标内存结构，其中`key`存储键，`value`存储对应的值，`state`用于同步key写入状态，`flag`用于控制桶写权限。
 
 ```C++
 struct Bucket {
@@ -59,6 +53,47 @@ struct Bucket {
     float value[32];        // 值
 };
 ```
+
+`KeyValueData`用于封装待插入键值对信息，包括输入key、输入value、value维度和键值对数量。
+
+```C++
+struct KeyValueData {
+    int64_t* keys;       // 输入key
+    float* values;       // 输入value
+    uint32_t value_dim;  // value维度
+    uint32_t key_num;    // 键值对数量
+
+    __aicore__ inline int64_t load_key(uint32_t kv_idx) const; // 读取key
+    __aicore__ inline float load_value(uint32_t kv_idx, uint32_t j) const; // 读取value
+};
+```
+
+`HashTableContext`保存哈希表自身参数，包括哈希表首地址、容量和桶大小，用于计算桶地址、查找并占用目标桶；写入value时，`insert`函数通过`KeyValueData`入参读取对应的输入value。
+
+```C++
+struct HashTableContext {
+    uint8_t* table_addr;     // 哈希表首地址
+    uint32_t capacity;       // 哈希表容量
+    uint32_t bucket_size;    // 桶大小
+
+    __aicore__ inline Bucket* get_bucket(uint32_t bucket_idx) const; // 获取桶地址
+    __aicore__ inline Bucket* query(int64_t key, int32_t& success); // 查找并占用桶
+    __aicore__ inline void insert(Bucket* bucket, const KeyValueData* input,
+                                  uint32_t kv_idx, int32_t lane_id); // 写入value
+};
+```
+
+## 算法分析
+
+SIMT能够通过大量线程的并发执行实现高效处理大批数据，但同时也带来了两个问题：多线程写冲突和核间数据同步问题。
+
+### 多线程写冲突问题
+
+在多线程操作同一块内存时，资源冲突问题在所难免。当两个线程插入的key产生哈希冲突时，多个线程会尝试向桶数组的同一位置写入数据，因此需要确保仅有一个线程能够获得桶的写入权限。程序实现时，在Bucket结构体中添加一个标记位“flag”，用于标记当前桶的写入权限，线程通过原子指令[`asc_atomic_cas()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/原子操作/asc_atomic_cas.md)修改flag来获取桶的写入权限。
+
+### 核间数据同步问题
+
+当发生哈希冲突时，线程需要判断当前桶中存储的key是否与待插入的key相同，这要求当前线程能够读取其他线程写入的数据，并确保数据的完整性。程序实现时，在Bucket结构体中添加一个标记位“state”，用于标识key值的写入状态。写线程中在写入key后将state标记位置1，并在二者之间调用[`asc_threadfence()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/同步与内存栅栏/内存栅栏接口/asc_threadfence.md)接口，确保当state被设置为1时，key的写入操作已经完成。读线程中，通过while循环轮询state值，直到state被设置为1，然后再读取key值。
 
 ## 算子描述
 

@@ -139,7 +139,7 @@ Total blocks = 4 * 8 = 32
 对应的核索引计算如下：
 
 ```cpp
-constexpr uint32_t mIter = AscendC::DivCeil(M, singleCoreM);
+constexpr uint32_t mIter = DivCeil(M, singleCoreM);
 uint32_t mIterIdx = AscendC::GetBlockIdx() % mIter;
 uint32_t nIterIdx = AscendC::GetBlockIdx() / mIter;
 
@@ -166,7 +166,7 @@ scale 的搬运粒度由 `scaleFactorKa=4`、`scaleFactorKb=4` 控制，一次�
 以 A 侧为例，`DataCopyInA` 使用 `Nd2NzParams` 一次搬入 `stepKa` 个 K 方向 base 块，每个base块为`baseM * baseK`：
 
 ```cpp
-constexpr uint32_t packedStepK = AscendC::DivCeil(baseK * stepKa, 2);
+constexpr uint32_t packedStepK = DivCeil(baseK * stepKa, 2);
 AscendC::Nd2NzParams nd2nzA1Params;
 nd2nzA1Params.ndNum = 1;
 nd2nzA1Params.nValue = curM;
@@ -180,7 +180,7 @@ AscendC::DataCopy(a1Local, aGM[kChunkIdx * baseK + mBlockIdx * K * baseM], nd2nz
 scale 侧按 b16 搬运。由于 `Mmad` 读取数据时的最小分形需要 K 方向连续，对应地 scale 数据在 K 方向必须满足 2Byte 连续，因此使用 b16类型搬运以确保数据布局正确：
 
 ```cpp
-constexpr uint32_t stepScaleK = AscendC::DivCeil(baseK * stepKa * scaleFactorKa, SCALE_CEIL_NUMBER);
+constexpr uint32_t stepScaleK = DivCeil(baseK * stepKa * scaleFactorKa, SCALE_CEIL_NUMBER);
 AscendC::Dn2NzParams dn2nzParams;
 dn2nzParams.dValue = curM;
 dn2nzParams.nValue = stepScaleK / 2;
@@ -266,7 +266,7 @@ Fixpipe                                                           | fixpipe C --
 
 ```text
 for nBlock in N blocks:
-  for nBlock in M blocks:
+  for mBlock in M blocks:
     for kBlock in K blocks:
         LoadData(A block, scaleA block)
         LoadData(B block, scaleB block)
@@ -409,7 +409,7 @@ Ascend 950PR 芯片性能数据如下：
 |------|------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
 | 基础 API MxMatmul | 681.056 | 32 | 679.99 | 640.16 | 0.941 | 62.824 | 0.092 | 312.728 | 0.46 | 588.736 | 0.866 | 32.422 | 0.048 |
 
-可以看到，本样例已达到理论性能峰值的 `94.1%`（即表中的`aic_mac_ratio`）。
+可以看到，本样例的 Cube 计算时间占 AI Core 时间的比例（即表中的`aic_mac_ratio`）达到 `94.1%`。
 
 ### Cube计算性能分析
 
@@ -435,7 +435,7 @@ $$E_{cube} = \frac{T_{actual} - T_{cube}}{T_{cube}} = \frac{640.16 - 635.5}{635.
 MxFP4 Matmul 还包含两路 scale 输入，K 方向每 32 个元素共享一个 scale，因此 `scaleK = K/32`：
 
 - scaleA 形状 `[M, scaleK]`，按 M 方向切成 `M/baseM` 个行块，每个 scaleA 行块参与 N 方向 `N/baseN` 个输出块的计算
-- scaleB 形状 `[scaleK, N]`，按 N 方向切成 `N/baseN` 个列块，每个 scaleB 列块参与 M 方向 `M/baseM` 个输出块的计算
+- scaleB 形状 `[N, scaleK]`，按 N 方向切成 `N/baseN` 个列块，每个 scaleB 列块参与 M 方向 `M/baseM` 个输出块的计算
 
 由于 L1/L2Cache 容量有限，无法缓存所有输入数据，同一数据块会被多次从 HBM 搬运到 L2Cache/L1，导致数据重复搬运。
 
