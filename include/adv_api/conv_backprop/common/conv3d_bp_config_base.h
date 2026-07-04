@@ -13,6 +13,10 @@
  * \brief
  */
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "conv3d_bp_config_base.h is not supported in pure SIMT mode."
+#endif
+
 #ifndef CONV3D_BP_CONFIG_BASE_H
 #define CONV3D_BP_CONFIG_BASE_H
 
