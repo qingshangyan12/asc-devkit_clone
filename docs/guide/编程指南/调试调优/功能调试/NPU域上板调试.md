@@ -62,7 +62,7 @@ msSanitizer工具是基于AI处理器的异常检测工具，包含了单算子�
 **异常检测程序编译**
 ```shell
 // bisheng编译时增加sanitizer命令行
-bisheng add_custom.asc -o add_custom --sanitizer -lineinfo
+bisheng add_custom.asc -o add_custom --sanitizer --lineinfo
 ```
 **异常检测工具的使用**
 ```shell
@@ -92,7 +92,7 @@ msDebug是一款面向昇腾设备的算子调试工具，用于调试NPU侧运�
 
 #### 调试程序编译
 ```shell
-// bisheng编译时增加debug命令行
+// bisheng编译时增加sanitizer命令行
 bisheng add_custom.asc -o add_custom  -O0 -g
 ```
 #### 调试程序运行
