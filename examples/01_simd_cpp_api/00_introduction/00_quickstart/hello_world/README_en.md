@@ -66,7 +66,12 @@ Execute the following steps in the root directory of this sample to build and ru
 
   The following execution results indicate successful execution.
   
-  ```bash
+
+
+
+  
+    ```bash
+  cann 9.1.0 result：
   [AIV Block 0/8] Hello World!!!
   [AIV Block 1/8] Hello World!!!
   [AIV Block 2/8] Hello World!!!
@@ -75,6 +80,26 @@ Execute the following steps in the root directory of this sample to build and ru
   [AIV Block 5/8] Hello World!!!
   [AIV Block 6/8] Hello World!!!
   [AIV Block 7/8] Hello World!!!
+  cann 9.0.0 result：
+  Hello World!!!
+  Hello World!!!
+  Hello World!!!
+  Hello World!!!
+  Hello World!!!
+  Hello World!!!
+  Hello World!!!
+  Hello World!!!
   ```
 
   The output consists of 8 lines, each corresponding to the print result of one AIV (AI Vector) Core. `[AIV Block X/8]` indicates the current core X (out of 8 cores total), showing that the kernel function has successfully executed on 8 AIV Cores.
+
+- Note
+  ```bash
+  Installation steps for the Cann 9.1.0 environment
+  1. wget https://ascend-cann.obs.cn-north-4.myhuaweicloud.com/CANN/20260701_newest/Ascend-cann-toolkit_9.1.0_linux-aarch64.run
+  2. chmod +x Ascend-cann-toolkit_9.1.0_linux-aarch64.run
+  3. ./Ascend-cann-toolkit_9.1.0_linux-aarch64.run --install --install-path=/home/developer/Ascend
+  4. export cann_install_path=/home/developer/Ascend
+  5. source ${cann_install_path}/cann/set_env.sh
+
+  ```
