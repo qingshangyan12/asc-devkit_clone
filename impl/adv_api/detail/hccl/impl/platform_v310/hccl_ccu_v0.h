@@ -422,7 +422,33 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 104),
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 112));
 
+    {
+        GlobalTensor<uint64_t> id1Global;
+        GlobalTensor<uint64_t> id2Global;
+        id1Global.SetGlobalBuffer(reinterpret_cast<__gm__ uint64_t*>(xnData_[1]));
+        id2Global.SetGlobalBuffer(reinterpret_cast<__gm__ uint64_t*>(xnData_[2]));
+        LocalTensor<uint64_t> id1Local;
+        LocalTensor<uint64_t> id2Local;
+        DataCopy(id1Local, id1Global, 1);
+        DataCopy(id2Local, id2Global, 1);
+        printf("[LBH] Before CKE: Id1 GM=0x%llx data=0x%llx, Id2 GM=0x%llx data=0x%llx\n",
+            xnData_[1], id1Local.GetValue(0), xnData_[2], id2Local.GetValue(0));
+    }
+
     WriteHBMData(ccuMsg_.commitCKEAddr, CCU_MSG_CKE_SET_VALUE);
+
+    {
+        GlobalTensor<uint64_t> id1Global;
+        GlobalTensor<uint64_t> id2Global;
+        id1Global.SetGlobalBuffer(reinterpret_cast<__gm__ uint64_t*>(xnData_[1]));
+        id2Global.SetGlobalBuffer(reinterpret_cast<__gm__ uint64_t*>(xnData_[2]));
+        LocalTensor<uint64_t> id1Local;
+        LocalTensor<uint64_t> id2Local;
+        DataCopy(id1Local, id1Global, 1);
+        DataCopy(id2Local, id2Global, 1);
+        printf("[LBH] After CKE: Id1 GM=0x%llx data=0x%llx, Id2 GM=0x%llx data=0x%llx\n",
+            xnData_[1], id1Local.GetValue(0), xnData_[2], id2Local.GetValue(0));
+    }
 }
 
 template <const auto& config>
