@@ -112,7 +112,7 @@ PIPE_FIX
 
 ```cpp
 // dst src分别对应目的操作数的输出地址和源操作数的输入地址
-constexpr uint64_t total_length = 256
+constexpr uint64_t total_length = 256;
 __cbuf__ int32_t dst[total_length];
 __cc__ int32_t src[total_length];
 // 其余入参均已默认数值传入
@@ -120,6 +120,7 @@ uint16_t n_size = 16;
 uint16_t m_size = 16;
 uint32_t dst_stride = 8;
 uint16_t src_stride = 8;
+uint8_t l2_cache_ctl = 0;
 uint8_t clip_relu_pre = 0;
 uint8_t unit_flag_mode = 0;
 uint64_t quant_pre = QuantMode_t::NoConv;
@@ -130,7 +131,9 @@ uint64_t quant_post = QuantMode_t::NoConv;
 uint8_t relu_post = 0;
 bool clip_relu_post = false;
 uint8_t eltwise_op = 0;
-uint8_t eltwise_antq_cfg = 0;
+bool eltwise_antq_en = false;
 bool c0_pad_en = false;
-asc_copy_l0c2l1(dst, src, n_size, m_size, dst_stride, src_stride, clip_relu_pre, unit_flag_mode, quant_pre, relu_pre, channel_split, nz2nd_en, quant_post, relu_post, clip_relu_post, eltwise_op, eltwise_antq_cfg, c0_pad_en);
+bool broadcast_en = false;
+bool nz2dn_en = false;
+asc_copy_l0c2l1(dst, src, n_size, m_size, dst_stride, src_stride, l2_cache_ctl, clip_relu_pre, unit_flag_mode, quant_pre, relu_pre, channel_split, nz2nd_en, quant_post, relu_post, clip_relu_post, eltwise_op, eltwise_antq_en, c0_pad_en, broadcast_en, nz2dn_en);
 ```

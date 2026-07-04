@@ -88,7 +88,7 @@ PIPE_FIX
 
 ```cpp
 // dst src分别对应目的操作数的输出地址和源操作数的输入地址
-constexpr uint64_t total_length = 256
+constexpr uint64_t total_length = 256;
 __cbuf__ int32_t dst[total_length];
 __cc__ int32_t src[total_length];
 // 其余入参均已默认数值传入
