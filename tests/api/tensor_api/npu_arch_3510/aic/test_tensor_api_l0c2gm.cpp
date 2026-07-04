@@ -146,7 +146,7 @@ void RunL0C2GMBatchNoQuant(uint32_t expectedDstStride, bool nz2ndEn, bool nz2dnE
     src_stride_global = kSrcMatrixStride;
     dst_stride_global = expectedDstStride;
     NZ2ND_en_global = nz2ndEn;
-    nz2dn_en_global = nz2dnEn;
+    NZ2DN_en_global = nz2dnEn;
     gm_addr_global = dst;
     quant_pre_global = static_cast<uint64_t>(QuantMode_t::NoQuant);
     gExpectedLoop3Para =
@@ -189,7 +189,7 @@ void RunL0C2GMBatchNZ2NZNoQuant()
     src_stride_global = kSrcMatrixStride;
     dst_stride_global = kDstMatrixStride;
     NZ2ND_en_global = false;
-    nz2dn_en_global = false;
+    NZ2DN_en_global = false;
     gm_addr_global = nullptr;
     quant_pre_global = static_cast<uint64_t>(QuantMode_t::NoQuant);
     gExpectedLoop3Para = 1;
@@ -370,7 +370,7 @@ public:
             src_stride_global =
                 C0_SIZE<uint16_t> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, FRACTAL_FIXED) / FRACTAL_FIXED;
             NZ2ND_en_global = true;
-            nz2dn_en_global = false;
+            NZ2DN_en_global = false;
         } else if constexpr (C_TYPE::format == CubeFormat::NZ) {
             if constexpr (HAS_COORD) {
                 n_size_global = AscendC::Std::ceil_align(n - base, FRACTAL_FIXED);
@@ -384,7 +384,7 @@ public:
             src_stride_global =
                 C0_SIZE<> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, FRACTAL_FIXED) / FRACTAL_FIXED;
             NZ2ND_en_global = false;
-            nz2dn_en_global = false;
+            NZ2DN_en_global = false;
         } else {
             if constexpr (HAS_COORD) {
                 n_size_global = n - base;
@@ -397,7 +397,7 @@ public:
             src_stride_global =
                 C0_SIZE<uint16_t> / sizeof(uint16_t) * AscendC::Std::ceil_align(m, FRACTAL_FIXED) / FRACTAL_FIXED;
             NZ2ND_en_global = false;
-            nz2dn_en_global = true;
+            NZ2DN_en_global = true;
         }
 
         auto gmTensor = MakeGMTensor();

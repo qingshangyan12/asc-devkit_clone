@@ -148,7 +148,7 @@ void RunL0C2UBBatchNoQuant(uint32_t expectedDstStride, bool nz2ndEn, bool nz2dnE
     src_stride_global = kSrcMatrixStride;
     dst_stride_global = expectedDstStride;
     NZ2ND_en_global = nz2ndEn;
-    nz2dn_en_global = nz2dnEn;
+    NZ2DN_en_global = nz2dnEn;
     is_mock_copy_matrix_cc_to_ub = true;
     ub_addr_global = dst;
     quant_pre_global = static_cast<uint64_t>(QuantMode_t::NoQuant);
@@ -193,7 +193,7 @@ void RunL0C2UBBatchNZ2NZNoQuant()
     src_stride_global = kSrcMatrixStride;
     dst_stride_global = kDstMatrixStride;
     NZ2ND_en_global = false;
-    nz2dn_en_global = false;
+    NZ2DN_en_global = false;
     is_mock_copy_matrix_cc_to_ub = true;
     ub_addr_global = nullptr;
     quant_pre_global = static_cast<uint64_t>(QuantMode_t::NoQuant);
