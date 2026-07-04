@@ -92,5 +92,7 @@
   1. wget https://ascend-cann.obs.cn-north-4.myhuaweicloud.com/CANN/20260701_newest/Ascend-cann-toolkit_9.1.0_linux-aarch64.run
   2. chmod +x Ascend-cann-toolkit_9.1.0_linux-aarch64.run
   3. ./Ascend-cann-toolkit_9.1.0_linux-aarch64.run --install --install-path=/home/developer/Ascend
-  4. source ${cann_install_path}/Ascend/set_env.sh
+  4. export cann_install_path=/home/developer/Ascend
+  5. source ${cann_install_path}/cann/set_env.sh
+
   ```
