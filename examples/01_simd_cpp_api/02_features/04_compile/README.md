@@ -12,3 +12,4 @@
 | [01_separate_compile](./01_separate_compile) | 展示将Device侧代码拆分到多个.asc文件中，通过单独编译实现跨文件设备函数调用的流程。 |
 | [02_dynamic_library_compile](./02_dynamic_library_compile) | 展示将Device侧.asc编译为动态共享库（.so）的编译流程。 |
 | [03_static_library_compile](./03_static_library_compile) | 展示将Device侧.asc编译为静态库（.a）的编译流程。 |
+| [04_xmake](./04_xmake/) | 展示基于xmake构建ascend c算子的编译构建流程 |
