@@ -13,7 +13,7 @@
 ## 目录结构介绍
 
 ```text
-├── xmake_add
+├── 04_xmake
 │   ├── xmake.lua      // xmake工程文件
 │   ├── add.asc        // Ascend C Add算子实现与调用样例
 │   └── README.md      // 样例说明
