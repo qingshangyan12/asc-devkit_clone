@@ -155,7 +155,7 @@ asc-devkit/
 | data_copy | 数据搬运 | DataCopy, LoadData |
 | fixpipe | 流水线控制 | Fixpipe |
 | mm | 矩阵乘法 | Mmad, Conv2D |
-| scalar | 标量运算 | ToFloat |
+| scalar | 标量运算 | Cast |
 | atomic | 原子操作 | AtomicAdd, AtomicCAS |
 
 ---

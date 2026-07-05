@@ -155,7 +155,7 @@ asc-devkit/
 | data_copy | Data movement | DataCopy, LoadData |
 | fixpipe | Pipeline control | Fixpipe |
 | mm | Matrix multiplication | Mmad, Conv2D |
-| scalar | Scalar operations | ToFloat |
+| scalar | Scalar operations | Cast |
 | atomic | Atomic operations | AtomicAdd, AtomicCAS |
 
 ---
