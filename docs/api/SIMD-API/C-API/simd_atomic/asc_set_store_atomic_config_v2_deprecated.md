@@ -8,7 +8,7 @@
 
 ## 功能说明
 
-**该接口已废弃。原子加操作请使用[asc_atomic_add](../scalar_compute/asc_atomic_add)实现。**
+**该接口已废弃。原子加操作请使用[asc_atomic_add](../scalar_compute/asc_atomic_add.md)实现。**
 
 头文件路径：`"c_api/atomic/atomic.h"`。
 
