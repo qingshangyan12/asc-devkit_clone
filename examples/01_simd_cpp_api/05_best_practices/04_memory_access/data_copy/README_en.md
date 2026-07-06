@@ -468,5 +468,5 @@ Run the following steps in the root directory of this example to build and run t
 
   ```bash
   # View Task Duration and various data
-  cat ./OPPROF_*/PipeUtilization*.csv
+  cat ./OPPROF_*/PipeUtilization.csv
   ```

@@ -507,5 +507,5 @@ msopprof ./demo
 View the specific performance analysis results:
 
 ```bash
-cat ./OPPROF_*/PipeUtilization*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```

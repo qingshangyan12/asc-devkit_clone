@@ -171,7 +171,7 @@ View specific performance analysis results:
 
 ```bash
 # View Task Duration and various metrics
-cat ./OPPROF_*/PipeUtilization*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```
 
 For more msProf tool usage, please refer to the [MindStudio tool](https://www.hiascend.com/document/redirect/CannCommercialToolOpDev) operator tuning (msProf) content.

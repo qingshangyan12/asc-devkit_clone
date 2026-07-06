@@ -282,5 +282,5 @@ View the specific performance analysis results:
 
 ```bash
 # View Task Duration and various data
-cat ./OPPROF_*/PipeUtilization*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```
