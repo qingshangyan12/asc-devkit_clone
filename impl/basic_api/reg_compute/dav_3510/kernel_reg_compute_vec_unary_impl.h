@@ -291,8 +291,6 @@ __simd_callee__ inline void ExpImpl(U& dstReg, U& srcReg, MaskReg& mask)
         "current Exp api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<sprMode.mrgMode>();
     if constexpr (sprMode.algo == ExpAlgo::PRECISION_1ULP_FTZ_FALSE) {
-        MaskReg maskInf;
-        MaskReg maskNegInf;
         MaskReg maskSubnormal;
         U tmpReg;
         if constexpr (SupportType<ActualT, float>()) {
