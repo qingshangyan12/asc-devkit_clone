@@ -29,13 +29,13 @@ TIMEOUT="${TIMEOUT:-120}"
 CPU_RUN_TIMEOUT="${CPU_RUN_TIMEOUT:-300}"
 PRIMARY_CARD="${PRIMARY_CARD:-0}"
 RETRY_CARDS="${RETRY_CARDS:-}"
-NPU_CARDS="${NPU_CARDS:-}"
+NPU_CARDS="${NPU_CARDS:-auto}"
+NPU_CARD_DEV_GLOB="${NPU_CARD_DEV_GLOB:-/dev/davinci[0-9]*}"
 REPORT_FORMAT="${REPORT_FORMAT:-all}"
 PRESMOKE_WERROR="${PRESMOKE_WERROR:-0}"
 OUT_ROOT="${OUT_ROOT:-${PROJECT_ROOT}/presmoke_reports/presmoke_${ARCH}_$(date +%Y%m%d_%H%M%S)}"
 LOCK_DIR="${LOCK_DIR:-${PROJECT_ROOT}/.presmoke_locks/run_presmoke.lock}"
 MULTI_CARD_WORKSPACE_MODE="${MULTI_CARD_WORKSPACE_MODE:-copy}"
-PRESMOKE_SHARED_LOCK_DIR="${PRESMOKE_SHARED_LOCK_DIR:-${OUT_ROOT}/.locks}"
 PRESMOKE_SHARED_STATE_DIR="${PRESMOKE_SHARED_STATE_DIR:-${OUT_ROOT}/.state}"
 
 if [[ "$MODES" != "npu" && "${SCHEDULE:-}" == "fixed" && -z "$SCHEDULE_FILE" ]]; then
@@ -181,6 +181,17 @@ should_strict_schedule() {
 }
 
 detect_npu_cards() {
+    local dev base id
+    for dev in $NPU_CARD_DEV_GLOB; do
+        [[ -e "$dev" ]] || continue
+        base="$(basename "$dev")"
+        id="${base#davinci}"
+        [[ "$id" =~ ^[0-9]+$ ]] || continue
+        printf '%s\n' "$id"
+    done | sort -n -u
+}
+
+detect_npu_cards_by_smi() {
     if ! command -v npu-smi >/dev/null 2>&1; then
         return 0
     fi
@@ -203,14 +214,65 @@ normalize_card_list() {
     done
 }
 
-resolve_npu_cards() {
-    if [[ -z "$NPU_CARDS" ]]; then
-        printf '%s\n' "$PRIMARY_CARD"
+detect_cpu_count() {
+    if command -v lscpu >/dev/null 2>&1; then
+        lscpu | awk -F: '/^CPU\(s\):/ {gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2; exit}'
         return
     fi
+    getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1
+}
+
+resolve_npu_jobs_for_cpus() {
+    local cpus="$1"
+    if (( cpus >= 160 )); then
+        echo 12
+    elif (( cpus >= 80 )); then
+        echo 8
+    elif (( cpus >= 24 )); then
+        echo 6
+    else
+        echo 4
+    fi
+}
+
+resolve_shard_parallel_value() {
+    local value="$1"
+    local resolved="$2"
+    if [[ "$value" == "auto" ]]; then
+        echo "$resolved"
+    else
+        echo "$value"
+    fi
+}
+
+resolve_multi_card_shard_parallel() {
+    local card_count="$1"
+    local cpu_count per_card_cpus shard_jobs shard_make_jobs shard_cpu_run_slots
+    cpu_count="$(detect_cpu_count)"
+    per_card_cpus=$(( (cpu_count + card_count - 1) / card_count ))
+    if (( per_card_cpus < 1 )); then
+        per_card_cpus=1
+    fi
+    shard_jobs="$(resolve_npu_jobs_for_cpus "$per_card_cpus")"
+    shard_make_jobs=$(( per_card_cpus / shard_jobs ))
+    if (( shard_make_jobs < 1 )); then
+        shard_make_jobs=1
+    fi
+    shard_cpu_run_slots="$per_card_cpus"
+    printf '%s\t%s\t%s\t%s\n' \
+        "$(resolve_shard_parallel_value "$JOBS" "$shard_jobs")" \
+        "$(resolve_shard_parallel_value "$MAKE_JOBS" "$shard_make_jobs")" \
+        "$(resolve_shard_parallel_value "$CPU_RUN_SLOTS" "$shard_cpu_run_slots")" \
+        "$per_card_cpus"
+}
+
+resolve_npu_cards() {
     if [[ "$NPU_CARDS" == "auto" ]]; then
         local detected
         detected="$(detect_npu_cards)"
+        if [[ -z "$detected" ]]; then
+            detected="$(detect_npu_cards_by_smi)"
+        fi
         if [[ -n "$detected" ]]; then
             printf '%s\n' "$detected"
         else
@@ -306,6 +368,11 @@ write_multi_card_shards() {
     fi
     if [[ "$MULTI_CARD_WORKSPACE_MODE" == "copy" ]]; then
         shard_args+=(--split-source-groups)
+    fi
+    if [[ "${MULTI_CARD_SHARD_JOBS:-}" =~ ^[0-9]+$ ]]; then
+        shard_args+=(--jobs "$MULTI_CARD_SHARD_JOBS")
+    elif [[ "$JOBS" =~ ^[0-9]+$ ]]; then
+        shard_args+=(--jobs "$JOBS")
     fi
     local example
     if (( ${#setup_examples[@]} > 0 )); then
@@ -408,11 +475,17 @@ run_multi_card_presmoke() {
     done < <(plan_examples_for_sharding "$@")
     if [[ "${#examples[@]}" -eq 0 ]]; then
         log "multi_card_skip no_planned_cases"
-        run_presmoke "full_card${PRIMARY_CARD}" "$PRIMARY_CARD" "$@"
+        local fallback_card="${cards[0]:-$PRIMARY_CARD}"
+        run_presmoke "full_card${fallback_card}" "$fallback_card" "$@"
         return
     fi
 
     log "multi_card_start cards=${cards[*]} cases=${#examples[@]}"
+    local shard_parallel shard_jobs shard_make_jobs shard_cpu_run_slots shard_per_card_cpus
+    shard_parallel="$(resolve_multi_card_shard_parallel "${#cards[@]}")"
+    IFS=$'\t' read -r shard_jobs shard_make_jobs shard_cpu_run_slots shard_per_card_cpus <<< "$shard_parallel"
+    log "multi_card_shard_parallel per_card_cpus=$shard_per_card_cpus" \
+        "jobs=$shard_jobs make_jobs=$shard_make_jobs cpu_run_slots=$shard_cpu_run_slots"
     if [[ "${#setup_examples[@]}" -gt 0 ]]; then
         local setup_args=()
         for example in "${setup_examples[@]}"; do
@@ -424,7 +497,7 @@ run_multi_card_presmoke() {
     fi
     prepare_multi_card_workspaces "${cards[@]}"
     local shards_dir="$OUT_ROOT/.plan/shards"
-    write_multi_card_shards "$shards_dir" "${cards[@]}"
+    MULTI_CARD_SHARD_JOBS="$shard_jobs" write_multi_card_shards "$shards_dir" "${cards[@]}"
 
     local index shard_count pid rc run_project_root
     local pids=()
@@ -448,6 +521,9 @@ run_multi_card_presmoke() {
         run_project_root="$(workspace_for_card "$card")"
         (
             export RUN_PRESMOKE_PROJECT_ROOT="$run_project_root"
+            export RUN_PRESMOKE_JOBS="$shard_jobs"
+            export RUN_PRESMOKE_MAKE_JOBS="$shard_make_jobs"
+            export RUN_PRESMOKE_CPU_RUN_SLOTS="$shard_cpu_run_slots"
             run_presmoke "full_card${card}" "$card" "${shard_args[@]}" "$@"
         ) &
         pids+=("$!")
@@ -468,10 +544,13 @@ run_presmoke() {
     local card="$2"
     shift 2
     local run_project_root="${RUN_PRESMOKE_PROJECT_ROOT:-$PROJECT_ROOT}"
+    local run_jobs="${RUN_PRESMOKE_JOBS:-$JOBS}"
+    local run_make_jobs="${RUN_PRESMOKE_MAKE_JOBS:-$MAKE_JOBS}"
+    local run_cpu_run_slots="${RUN_PRESMOKE_CPU_RUN_SLOTS:-$CPU_RUN_SLOTS}"
     local run_dir="$OUT_ROOT/$name"
     mkdir -p "$run_dir"
-    log "run_start name=$name card=$card arch=$ARCH modes=$MODES jobs=$JOBS" \
-        "npu_slots=$NPU_SLOTS cpu_run_slots=$CPU_RUN_SLOTS make_jobs=$MAKE_JOBS" \
+    log "run_start name=$name card=$card arch=$ARCH modes=$MODES jobs=$run_jobs" \
+        "npu_slots=$NPU_SLOTS cpu_run_slots=$run_cpu_run_slots make_jobs=$run_make_jobs" \
         "timeout=$TIMEOUT cpu_run_timeout=$CPU_RUN_TIMEOUT schedule=$SCHEDULE" \
         "workspace_mode=$MULTI_CARD_WORKSPACE_MODE werror=$PRESMOKE_WERROR args=$*"
     {
@@ -487,10 +566,10 @@ run_presmoke() {
         echo "schedule_report=$SCHEDULE_REPORT"
         echo "schedule_file=$SCHEDULE_FILE"
         echo "strict_schedule=$STRICT_SCHEDULE"
-        echo "jobs=$JOBS"
+        echo "jobs=$run_jobs"
         echo "npu_slots=$NPU_SLOTS"
-        echo "cpu_run_slots=$CPU_RUN_SLOTS"
-        echo "make_jobs=$MAKE_JOBS"
+        echo "cpu_run_slots=$run_cpu_run_slots"
+        echo "make_jobs=$run_make_jobs"
         echo "timeout=$TIMEOUT"
         echo "cpu_run_timeout=$CPU_RUN_TIMEOUT"
         echo "werror=$PRESMOKE_WERROR"
@@ -514,16 +593,16 @@ run_presmoke() {
         export ASCEND_DEVICE_ID=0
         export NPU_DEVICE_ID=0
         export PRESMOKE_WERROR
-        export PRESMOKE_LOCK_DIR="$PRESMOKE_SHARED_LOCK_DIR"
+        export PRESMOKE_LOCK_DIR="$run_dir/.locks"
         export PRESMOKE_STATE_DIR="$PRESMOKE_SHARED_STATE_DIR"
         args=(
             --runner-mode "$RUNNER_MODE"
             --arch "$ARCH"
             --modes "$MODES"
-            --jobs "$JOBS"
+            --jobs "$run_jobs"
             --npu-slots "$NPU_SLOTS"
-            --cpu-run-slots "$CPU_RUN_SLOTS"
-            --make-jobs "$MAKE_JOBS"
+            --cpu-run-slots "$run_cpu_run_slots"
+            --make-jobs "$run_make_jobs"
             --timeout "$TIMEOUT"
             --cpu-run-timeout "$CPU_RUN_TIMEOUT"
             --schedule "$SCHEDULE"
@@ -630,7 +709,8 @@ main() {
     if should_run_multi_card "${#cards[@]}" "$@"; then
         run_multi_card_presmoke "$cards_csv" "$@"
     else
-        run_presmoke "full_card${PRIMARY_CARD}" "$PRIMARY_CARD" "$@"
+        card="${cards[0]:-$PRIMARY_CARD}"
+        run_presmoke "full_card${card}" "$card" "$@"
     fi
     retry_timeouts
     write_final_report

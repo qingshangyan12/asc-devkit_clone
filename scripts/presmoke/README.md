@@ -18,7 +18,8 @@ Default behavior:
 
 - `ARCH=dav-2201`, for 910B.
 - `MODES=npu`.
-- `PRIMARY_CARD=0`.
+- `NPU_CARDS=auto`, detect visible `/dev/davinci*` cards and run them in parallel.
+- `PRIMARY_CARD=0`, used only when auto detection finds no NPU card or for single-run fallbacks.
 - `SCHEDULE=fixed`.
 - `JOBS=auto`.
 - `NPU_SLOTS=1`.
@@ -36,7 +37,7 @@ bash scripts/run_presmoke.sh --dry-run
 Run 910B on a specific card:
 
 ```bash
-PRIMARY_CARD=7 bash scripts/run_presmoke.sh
+NPU_CARDS=7 PRIMARY_CARD=7 bash scripts/run_presmoke.sh
 ```
 
 Run 950:
@@ -112,7 +113,8 @@ ARCH=dav-2201 PRIMARY_CARD=7 bash scripts/run_presmoke.sh --dry-run
 | `PROJECT_ROOT` | script parent repo | asc-devkit checkout to run. |
 | `ASCEND_HOME_DIR` | `/usr/local/Ascend/ascend-toolkit/latest` | CANN toolkit root containing `set_env.sh`. |
 | `ARCH` | `dav-2201` | Target arch. Use `dav-2201` for 910B and `dav-3510` for 950. |
-| `PRIMARY_CARD` | `0` | Main NPU card id used for the full run. |
+| `NPU_CARDS` | `auto` | NPU cards used by NPU mode. `auto` detects visible `/dev/davinci*` first, then falls back to `npu-smi`. Set `NPU_CARDS=7` for a forced single-card run. |
+| `PRIMARY_CARD` | `0` | Fallback/main NPU card id when auto detection finds no cards or the run is forced to single-run mode. |
 | `RETRY_CARDS` | empty | Space-separated card ids for retrying timeout cases. |
 | `JOBS` | `auto` | Parallel build workers. NPU mode uses a conservative CPU-count ladder; CPU-only mode uses `ceil(CPU(s) / 4)`, capped at 64. |
 | `NPU_SLOTS` | `1` | NPU queue concurrency. Keep `1` for watch runs. |

@@ -194,6 +194,7 @@ EOF
                 PROJECT_ROOT=str(root),
                 OUT_ROOT=str(root / "out"),
                 ASCEND_OPP_PATH=str(root / "opp"),
+                NPU_CARDS="0",
             )
 
             result = subprocess.run(["bash", str(script)], text=True, capture_output=True, env=env, check=False)
@@ -340,6 +341,7 @@ EOF
                 OUT_ROOT=str(root / "out"),
                 ASCEND_OPP_PATH=str(root / "opp"),
                 PRESMOKE_STUB_RC="1",
+                NPU_CARDS="0",
             )
 
             result = subprocess.run(["bash", str(script)], text=True, capture_output=True, env=env, check=False)
@@ -349,7 +351,7 @@ EOF
             self.assertIn("Cases: total=1 pass=0 fail=1 skip=0", result.stdout)
             self.assertIn("execute samples failed", result.stderr)
 
-    def test_auto_npu_cards_shards_cases_across_detected_cards(self) -> None:
+    def test_default_npu_cards_shards_cases_across_detected_cards(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             script = self.copy_orchestrate_fixture(root)
@@ -358,7 +360,6 @@ EOF
                 PROJECT_ROOT=str(root),
                 OUT_ROOT=str(root / "out"),
                 ASCEND_OPP_PATH=str(root / "opp"),
-                NPU_CARDS="auto",
             )
 
             result = subprocess.run(["bash", str(script)], text=True, capture_output=True, env=env, check=False)
@@ -380,6 +381,58 @@ EOF
             self.assertIn("filters=case/b case/e", (root / "out/full_card1/run_env.txt").read_text(encoding="utf-8"))
             self.assertIn("filters=case/c", (root / "out/full_card2/run_env.txt").read_text(encoding="utf-8"))
             self.assertIn("Cases: total=5 pass=5 fail=0 skip=0", result.stdout)
+
+    def test_auto_npu_cards_prefers_davinci_devices_over_npu_smi(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            script = self.copy_orchestrate_fixture(root)
+            dev_dir = root / "dev"
+            dev_dir.mkdir()
+            (dev_dir / "davinci4").touch()
+            (dev_dir / "davinci6").touch()
+            env = self.base_env(
+                root,
+                PROJECT_ROOT=str(root),
+                OUT_ROOT=str(root / "out"),
+                ASCEND_OPP_PATH=str(root / "opp"),
+                NPU_CARD_DEV_GLOB=str(dev_dir / "davinci[0-9]*"),
+            )
+
+            result = subprocess.run(["bash", str(script)], text=True, capture_output=True, env=env, check=False)
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue((root / "out/full_card4/results/report.json").exists())
+            self.assertTrue((root / "out/full_card6/results/report.json").exists())
+            self.assertFalse((root / "out/full_card0/results/report.json").exists())
+            self.assertIn("multi_card_start cards=4 6 cases=5", result.stdout)
+
+    def test_single_detected_npu_card_is_used_for_single_run(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            script = self.copy_orchestrate_fixture(root)
+            dev_dir = root / "dev"
+            dev_dir.mkdir()
+            (dev_dir / "davinci7").touch()
+            env = self.base_env(
+                root,
+                PROJECT_ROOT=str(root),
+                OUT_ROOT=str(root / "out"),
+                ASCEND_OPP_PATH=str(root / "opp"),
+                NPU_CARD_DEV_GLOB=str(dev_dir / "davinci[0-9]*"),
+            )
+
+            result = subprocess.run(
+                ["bash", str(script), "--filter", "case/a"],
+                text=True,
+                capture_output=True,
+                env=env,
+                check=False,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue((root / "out/full_card7/results/report.json").exists())
+            self.assertFalse((root / "out/full_card0/results/report.json").exists())
+            self.assertIn("device=7", (root / "out/full_card7/run_env.txt").read_text(encoding="utf-8"))
 
     def test_make_wrapper_limits_explicit_parallel_jobs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
