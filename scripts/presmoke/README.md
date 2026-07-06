@@ -4,7 +4,7 @@
 
 For direct Python CLI experiments, use `PYTHONPATH=scripts PRESMOKE_PROJECT_ROOT=$PWD python3 -m presmoke ...`.
 
-Before a full watch run, the orchestrator removes all entries under the active CANN `opp/vendors` directory. This keeps custom-op package installation deterministic across rounds. Runs with `--filter`, `--dry-run`, or `--suggestions-only` do not clean `opp/vendors`.
+Before a full watch run, the orchestrator removes all entries under the active CANN `opp/vendors` directory. This keeps custom-op package installation deterministic across rounds. Runs with `--filter` or `--dry-run` do not clean `opp/vendors`.
 
 ## Quick Start
 
@@ -125,7 +125,6 @@ ARCH=dav-2201 PRIMARY_CARD=7 bash scripts/run_presmoke.sh --dry-run
 | `SCHEDULE` | `fixed` | Case submit order. Watch runs should use `fixed`. |
 | `SCHEDULE_FILE` | built-in | Optional fixed order override. |
 | `OUT_ROOT` | `presmoke_reports/presmoke_<arch>_<timestamp>` | Output directory for CI archive. |
-| `RUNNER_MODE` | `case-runner` | Default runner implementation. |
 | `MODES` | `npu` | Presmoke modes. |
 | `MODE` | unset | Alias used only when `MODES` is unset. For example, `MODE=cpu`. |
 
@@ -168,7 +167,6 @@ To regenerate a fixed schedule from a previous run:
 
 ```bash
 PYTHONPATH=scripts PRESMOKE_PROJECT_ROOT=$PWD python3 -m presmoke \
-  --runner-mode case-runner \
   --arch dav-2201 \
   --modes npu \
   --jobs auto \
