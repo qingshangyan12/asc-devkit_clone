@@ -217,7 +217,7 @@ Cube                                               | Mmad Ping ---|   | Mmad Pon
 L0C->GM                                                           | Copy L0C to GM ---
 ```
 
-The horizontal line lengths in the figure only express that different stages may have different durations and do not represent measured ratios; actual durations require `msprof` collection results.
+The horizontal line lengths in the figure only express that different stages may have different durations and do not represent measured ratios; actual durations require `msopprof` collection results.
 
 In the K loop, when the current K block enters Cube computation, the next batch of A/B/ScaleA/ScaleB can initiate transfer in advance. Ping and Pong alternate, with producers and consumers confirming buffer writability and data readability through event synchronization.
 
