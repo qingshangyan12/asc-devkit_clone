@@ -60,10 +60,10 @@
     ![频率统计](../../../../figures/reg_histograms_1.png)
 
 - 累计统计  
-    如下图所示，在低位模式下，目的寄存器dstReg会统计源寄存器srcReg中值落在低位区间[0-127]的数据分布情况；在高位模式下，目的寄存器dstReg则会统计srcReg中值落在高位区间[128-255]的数据分布情况。在dst0 和dst1中，第n位的数据表示srcReg中从0到n的所有数值在对应区间中出现的总频率。最终，统计结果会在目的寄存器原始数据的基础上进行累加。
+    如下图所示，在低位模式下，目的寄存器dstReg会统计源寄存器srcReg中值落在低位区间[0-127]的数据分布情况；在高位模式下，目的寄存器dstReg则会统计srcReg中值落在高位区间[128-255]的数据分布情况。dstReg中的第n个元素表示srcReg中从0到n的所有数值在对应区间中出现的总频率。最终，统计结果会在目的寄存器原始数据的基础上进行累加。
 
     **图 2**  累计统计  
-    ![频率统计](../../../../figures/reg_histograms_2.png)
+    ![累计统计](../../../../figures/reg_histograms_2.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -82,8 +82,8 @@ __simd_callee__ inline void Histograms(V& dstReg, S& srcReg, MaskReg& mask)
 | U | 目的操作数的数据类型。 |
 | mode | HistogramsBinType枚举类型，用于控制统计src的低位区间[0-127]（前半部分）或高位区间[128-255]（后半部分）的数据。VL长度为256Byte，dst数据类型为uint16_t，一个dst可以存储128个数据，因此需要两个dst。<br>• BIN0表示低位模式，统计src中[0-127]范围内的数据写入dst0。<br>• BIN1表示高位模式，统计src中[128-255]范围内的数据写入dst1。 |
 | type | HistogramsType 枚举类型，表示统计模式。<br>• FREQUENCY：频率统计模式，统计srcReg中[0, 255]每个数的数量。每个dst有128个元素，其中低位模式dstReg中每个元素对应src中[0, 127]每个元素的累加个数，高位模式dstReg中每个元素对应src中[128,255]每个元素的累加个数。<br>• ACCUMULATE：累计统计模式，统计srcReg中[0, 255]每个数及其之前出现数的数量总和。每个dst有128个元素，其中低位模式dstReg中每个元素对应src中[0, 127]每个元素区间累加个数，高位模式dstReg中每个元素对应src中[128,255]每个元素区间累加个数。 |
-| S | 目的操作数RegTensor类型，由编译器自动推导，用户不需要填写。 |
-| V | 源操作数RegTensor类型，由编译器自动推导，用户不需要填写。 |
+| S | 源操作数RegTensor类型，由编译器自动推导，用户不需要填写。 |
+| V | 目的操作数RegTensor类型，由编译器自动推导，用户不需要填写。 |
 
 **表2**  参数说明
 
