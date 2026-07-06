@@ -41,9 +41,9 @@
 #define INCLUDE_C_API_VECTOR_COMPUTE_VECTOR_COMPUTE_EMULATION_H
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-#include "instr_impl/npu_arch_2201/vector_compute_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/vector_compute_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "instr_impl/npu_arch_3510/vector_compute_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
 
 // ============================================================================
