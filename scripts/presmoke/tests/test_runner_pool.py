@@ -24,9 +24,8 @@ from pathlib import Path
 from presmoke.case_runners import CaseRunnerOptions, build_case_runner_cells_with_skips
 from presmoke.cli import parse_args, presmoke_run_lock
 from presmoke.model import Cell, Command, ExampleSpec, RunReport
-from presmoke.pool import NpuSlotPool
 from presmoke.report import write_json, write_markdown
-from presmoke.runner import PipelineOptions, RunOptions
+from presmoke.runner import NpuSlotPool, PipelineOptions, RunOptions
 from presmoke.runner import run_cell_with_options
 from presmoke.runner import run_cells_pipeline_with_options
 
@@ -60,6 +59,9 @@ class RunnerPoolTest(unittest.TestCase):
             ["--changed-only"],
             ["--since", "HEAD~1"],
             ["--host-timeout", "1"],
+            ["--examples-root", "examples"],
+            ["--runner-mode", "readme"],
+            ["--suggestions-only"],
         ]
 
         for option in removed_options:
@@ -128,8 +130,6 @@ class RunnerPoolTest(unittest.TestCase):
 
             def work(c):
                 nonlocal active, max_active
-                command = Command("./demo", "run")
-
                 def gated() -> int:
                     nonlocal active, max_active
                     with lock:
@@ -140,7 +140,7 @@ class RunnerPoolTest(unittest.TestCase):
                         active -= 1
                     return 0
 
-                pool.gate(c, command, gated)
+                pool.gate(gated)
                 return c.key
 
             cells = [cell(Path(tmp), f"x{i}") for i in range(5)]

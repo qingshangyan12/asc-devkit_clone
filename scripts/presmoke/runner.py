@@ -27,15 +27,27 @@ from pathlib import Path
 from typing import Callable, Dict, Iterable, Iterator, List, Optional, Union
 
 from .model import Cell, Command, NpuStats, RunCellsResult, RunResult, StepResult
-from .pool import NpuSlotPool
 
 
-NpuGate = Callable[[Cell, Command, Callable[[], int]], tuple[int, float]]
+NpuGate = Callable[[Callable[[], int]], tuple[int, float]]
 
 PRESERVE_BUILD_ARTIFACT_CASES = {
     "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op",
 }
 CPU_RUN_TIMEOUT = 300
+
+
+class NpuSlotPool:
+    def __init__(self, slots: int) -> None:
+        if slots <= 0:
+            raise ValueError("npu slots must be positive")
+        self._sem = threading.BoundedSemaphore(slots)
+
+    def gate(self, fn: Callable[[], int]) -> tuple[int, float]:
+        started = time.monotonic()
+        with self._sem:
+            wait_s = time.monotonic() - started
+            return fn(), wait_s
 
 
 @dataclass(frozen=True)
@@ -681,8 +693,6 @@ def execute_command_step(
     step_timeout = select_timeout(context.cell, command, uses_npu, options.timeout, options.cpu_run_timeout)
     if uses_npu and options.npu_gate:
         step_rc, wait_s = options.npu_gate(
-            context.cell,
-            command,
             lambda: _run_command(command, context.run_dir, _TeeLog(context.log, context.stage_log), step_timeout),
         )
     else:

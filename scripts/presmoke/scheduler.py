@@ -200,34 +200,6 @@ def add_next_from(cells: List[Cell], used: set[str], result: List[Cell], count: 
         used.add(next_cell.key)
 
 
-def simulate_npu_idle(cells: List[Cell], report_path: Path, jobs: int = 1) -> float:
-    timings = load_stage_seconds(report_path)
-    build_seconds = with_default_seconds({case: build_s for case, (build_s, _) in timings.items()}, cells)
-    run_seconds = with_default_seconds({case: run_s for case, (_, run_s) in timings.items()}, cells)
-    build_finishes = simulate_build_finishes(cells, build_seconds, jobs)
-
-    npu_available = 0.0
-    idle_s = 0.0
-    for ready_at, _, cell in sorted(build_finishes, key=lambda item: (item[0], item[1])):
-        if npu_available < ready_at:
-            idle_s += ready_at - npu_available
-            npu_available = ready_at
-        npu_available += run_seconds[cell.example.rel_path]
-    return idle_s
-
-
-def simulate_npu_makespan(cells: List[Cell], report_path: Path, jobs: int = 1) -> float:
-    timings = load_stage_seconds(report_path)
-    build_seconds = with_default_seconds({case: build_s for case, (build_s, _) in timings.items()}, cells)
-    run_seconds = with_default_seconds({case: run_s for case, (_, run_s) in timings.items()}, cells)
-    build_finishes = simulate_build_finishes(cells, build_seconds, jobs)
-
-    npu_available = 0.0
-    for ready_at, _, cell in sorted(build_finishes, key=lambda item: (item[0], item[1])):
-        npu_available = max(npu_available, ready_at) + run_seconds[cell.example.rel_path]
-    return npu_available
-
-
 def simulate_pipeline_npu_idle(cells: List[Cell], report_path: Path, jobs: int = 1) -> float:
     return simulate_pipeline(cells, report_path, jobs)[0]
 
