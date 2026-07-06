@@ -209,7 +209,7 @@ __simd_vf__ inline void InterleaveImplOneRepeat(__ubuf__ T *dst0Local, __ubuf__ 
     Reg::LoadAlign(src1Reg, src1Local);
     Reg::Interleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
     Reg::StoreAlign(dst0Local, dst0Reg, preg);
-    Reg::StoreAlign(dst0Local , dst1Reg, preg);
+    Reg::StoreAlign(dst1Local , dst1Reg, preg);
 }
 
 template <typename T, bool hasUnalign = true>
@@ -346,13 +346,13 @@ __aicore__ inline void InterleaveImpl(__ubuf__ T *dst0Local, __ubuf__ T *dst1Loc
     uint64_t src0Addr = reinterpret_cast<uint64_t>(src0Local);
     uint64_t src1Addr = reinterpret_cast<uint64_t>(src1Local);
     uint32_t oneRepeatVecLen = (sizeof(T) != 8) ? GetVecLen() : GetVecLen() * 2;
-    ASCENDC_ASSERT((dst0Addr != dst1Addr), { KERNEL_LOG(KERNEL_ERROR, "Interleave does not "
-        "support dst0 and dst1 tensor having same addr!"); });
-    ASCENDC_ASSERT((calCount * sizeof(T) > oneRepeatVecLen) && (dst0Addr != src0Addr) && (dst0Addr != src1Addr) &&
-        (dst1Addr != src0Addr) && (dst1Addr != src1Addr), { KERNEL_LOG(KERNEL_ERROR, "Interleave does not "
-        "support src0/src1 and dsr0/dst1 tensor having same addr when calCount is greater than "
+    ASCENDC_DEBUG_ASSERT((dst0Addr != dst1Addr), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Interleave does not support dst0 tensor and dst1 tensor having same addr!\n"));
+    ASCENDC_DEBUG_ASSERT(((calCount * sizeof(T) > oneRepeatVecLen) && (dst0Addr != src0Addr) && (dst0Addr != src1Addr) &&
+        (dst1Addr != src0Addr) && (dst1Addr != src1Addr)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Interleave does not support src0/src1 tensor and dsr0/dst1 tensor having same addr when calCount is greater than "
         "calCount * sizeof(T) > GetVecLen() if data type is not int64_t/uint64_t, or calCount is greater than "
-        "calCount * sizeof(T) > GetVecLen() * 2 if data type is int64_t/uint64_t!"); });
+        "calCount * sizeof(T) > GetVecLen() * 2 if data type is int64_t/uint64_t!\n"));
 #endif
     if constexpr (sizeof(T) != 8) {
         if (calCount * sizeof(T) <= oneRepeatVecLen) {
