@@ -36,6 +36,7 @@ from presmoke.scheduler import (
     ScheduleOptions,
     simulate_npu_idle,
     simulate_npu_makespan,
+    simulate_pipeline_npu_idle,
 )
 
 
@@ -921,6 +922,28 @@ class SchedulerTest(unittest.TestCase):
 
         self.assertLessEqual(scheduled_idle, build_desc_idle)
         self.assertLessEqual(scheduled_makespan, build_desc_makespan)
+
+    def test_npu_idle_min_accepts_tsv_stage_timing_report(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            report = root / "timings.tsv"
+            report.write_text(
+                "\n".join(
+                    [
+                        "example\tbuild_s\trun_s\tverify_s\tduration_s",
+                        "long-verify\t1\t1\t20\t22",
+                        "short\t1\t1\t0\t2",
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            cells = [cell(root, "short"), cell(root, "long-verify")]
+
+            scheduled = schedule_cells(cells, ScheduleOptions(schedule="npu-idle-min", schedule_report=report, jobs=2))
+
+            self.assertEqual([item.example.rel_path for item in scheduled][0], "long-verify")
+            self.assertEqual(simulate_pipeline_npu_idle(scheduled, report, jobs=2), 20.0)
 
 
 if __name__ == "__main__":

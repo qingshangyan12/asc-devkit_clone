@@ -66,6 +66,31 @@ class OrchestrateShardingTest(unittest.TestCase):
         self.assertNotEqual(assignments["case/a"], assignments["case/b"])
         self.assertEqual(assignments["case/a"], assignments["case/c"])
 
+    def test_sharding_uses_stage_timings_to_balance_pipeline_makespan(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            report = write_plan_report(root, ["case/a", "case/b", "case/c"])
+            timings = root / "ALL_CASE_TIMINGS.tsv"
+            timings.write_text(
+                "\n".join(
+                    [
+                        "example\tbuild_s\trun_s\tverify_s\tduration_s",
+                        "case/a\t100\t1\t1\t102",
+                        "case/b\t90\t1\t1\t92",
+                        "case/c\t1\t1\t1\t3",
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            assignments = dict((example, card) for card, example in shard_examples(
+                report, ["0", "1"], schedule_report=timings, jobs=2
+            ))
+
+        self.assertNotEqual(assignments["case/a"], assignments["case/b"])
+        self.assertIn(assignments["case/c"], {"0", "1"})
+
     def test_sharding_interleaves_same_card_source_groups(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
