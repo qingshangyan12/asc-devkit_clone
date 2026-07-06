@@ -20,7 +20,7 @@
 
 ## 函数原型
 
-```c++
+```cpp
 __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config)
 ```
 
