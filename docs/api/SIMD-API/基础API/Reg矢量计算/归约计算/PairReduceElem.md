@@ -92,7 +92,7 @@ __simd_vf__ inline void PairReduceElemVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAdd
     for (uint16_t i = 0; i < repeatTimes; i++) {
         AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
         calMask = AscendC::Reg::UpdateMask<T>(count);
-        AscendC::Reg::DeInterleaved<T>(carryMask, tmpMask, calMask, allFMask);
+        AscendC::Reg::DeInterleave<T>(carryMask, tmpMask, calMask, allFMask);
         AscendC::Reg::PairReduceElem<AscendC::Reg::PairReduce::SUM>(dstReg, srcReg, calMask);
         AscendC::Reg::StoreAlign(dstAddr + i * dstOneRepeatSize, dstReg, carryMask);
     }
