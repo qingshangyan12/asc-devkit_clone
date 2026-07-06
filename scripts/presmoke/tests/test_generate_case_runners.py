@@ -199,7 +199,7 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         script = render_runner_from_parts(
             "x",
             [],
-            [Command('msprof --application="python3 ../torch_library_report_tensor.py" --output="../result"', "run")],
+            [Command('msopprof --application="python3 ../torch_library_report_tensor.py" --output="../result"', "run")],
             [],
         )
         self.assertIn('(cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc', script)

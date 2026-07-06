@@ -176,34 +176,34 @@ for shape in "${SHAPES[@]}"; do
     echo -e "${YELLOW}测试 ${test_id}: Shape [${M}, ${K}, ${N}]${NC}"
     echo -e "${YELLOW}----------------------------------------${NC}"
     
-    # 清理之前的 msprof 输出目录
+    # 清理之前的 msopprof 输出目录
     rm -rf OPPROF_* 2>/dev/null || true
     
-    # 使用 msprof 采集性能数据
-    echo -e "${GREEN}开始 msprof 性能采集...${NC}"
-    # 检查 msprof 执行结果。该命令可能返回非 0，不能被 set -e 提前中断。
+    # 使用 msopprof 采集性能数据
+    echo -e "${GREEN}开始 msopprof 性能采集...${NC}"
+    # 检查 msopprof 执行结果。该命令可能返回非 0，不能被 set -e 提前中断。
     set +e
-    msprof op build/demo "${SCENARIO}" "${M}" "${K}" "${N}" > /dev/null 2>&1
+    msopprof build/demo "${SCENARIO}" "${M}" "${K}" "${N}" > /dev/null 2>&1
     msprof_exit_code=$?
     set -e
     if [ "${msprof_exit_code}" -ne 0 ]; then
-        echo -e "${RED}msprof 执行失败（退出码: ${msprof_exit_code}）${NC}"
+        echo -e "${RED}msopprof 执行失败（退出码: ${msprof_exit_code}）${NC}"
         echo "${test_id},${M},${K},${N},${shape_str},ERROR,ERROR,ERROR" >> "${RESULT_CSV}"
         test_id=$((test_id + 1))
         continue
     fi
     
-    # 查找 msprof 生成的性能数据目录
+    # 查找 msopprof 生成的性能数据目录
     msprof_dir=$(ls -dt OPPROF_* 2>/dev/null | head -n 1 || true)
     
     if [ -z "$msprof_dir" ] || [ ! -d "$msprof_dir" ]; then
-        echo -e "${RED}未找到 msprof 输出目录 OPPROF_*${NC}"
+        echo -e "${RED}未找到 msopprof 输出目录 OPPROF_*${NC}"
         echo "${test_id},${M},${K},${N},${shape_str},N/A,N/A,N/A" >> "${RESULT_CSV}"
         test_id=$((test_id + 1))
         continue
     fi
     
-    echo -e "${GREEN}msprof 输出目录: ${msprof_dir}${NC}"
+    echo -e "${GREEN}msopprof 输出目录: ${msprof_dir}${NC}"
     
     # 根据场景选择要提取的性能指标（动态搜索列名）
     perf_time="N/A"
@@ -280,7 +280,7 @@ for shape in "${SHAPES[@]}"; do
         fi
     else
         echo -e "${YELLOW}警告: 未找到 PipeUtilization.csv${NC}"
-        echo -e "${YELLOW}列出 msprof 输出目录内容:${NC}"
+        echo -e "${YELLOW}列出 msopprof 输出目录内容:${NC}"
         ls -la "${msprof_dir}/" || true
     fi
     
@@ -375,7 +375,7 @@ for shape in "${SHAPES[@]}"; do
     echo -e "${GREEN}  Cycle: ${cycle_count} cycles${NC}"
     echo -e "${GREEN}  Bandwidth: ${bandwidth} GB/s${NC}"
     
-    # 保存 msprof 输出目录
+    # 保存 msopprof 输出目录
     if [ "$perf_time" != "N/A" ]; then
         mv "${msprof_dir}" "${PERF_DATA_DIR}/test_${test_id}_${shape_str}" 2>/dev/null || true
     fi

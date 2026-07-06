@@ -24,7 +24,7 @@ case_build() {
 
 case_run() {
     mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'msprof --application="python3 ../torch_library_report_tensor.py" --output="../result"')
+    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'msopprof --application="python3 ../torch_library_report_tensor.py" --output="../result"')
 }
 
 case_verify() {

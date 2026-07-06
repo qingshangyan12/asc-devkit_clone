@@ -119,7 +119,7 @@ This example demonstrates how to display operator input/output Shape, data type,
   ```bash
   mkdir -p build; cd build
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..; make -j
-  msprof --application="python3 ../torch_library_report_tensor.py" --output="../result"
+  msopprof --application="python3 ../torch_library_report_tensor.py" --output="../result"
   ```
 
 - Build options
@@ -139,7 +139,7 @@ This example demonstrates how to display operator input/output Shape, data type,
 
 - Shape information display
 
-  Open `../result/PROF_000001_*/mindstudio_profiler_output/op_summary_*.csv` to view Shape information. The Shape information in this example is written to the following fields.
+  Open `../result/OPPROF_*/PipeUtilization.csv` to view Shape information. The Shape information in this example is written to the following fields.
 
   <table>
     <tr>

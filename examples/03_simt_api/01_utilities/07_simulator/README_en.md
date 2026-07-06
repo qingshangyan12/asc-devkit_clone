@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example uses Add computation to demonstrate the compilation, execution, result verification, and performance data collection flow of Ascend C programs in CAmodel simulation mode. Users can obtain simulation performance data through `msprof op simulator` to analyze performance bottlenecks and improve performance analysis efficiency.
+This example uses Add computation to demonstrate the compilation, execution, result verification, and performance data collection flow of Ascend C programs in CAmodel simulation mode. Users can obtain simulation performance data through `msopprof simulator` to analyze performance bottlenecks and improve performance analysis efficiency.
 
 ## Supported Products
 
@@ -66,7 +66,7 @@ Run the following steps in the root directory of this example to build and execu
   mkdir -p build && cd build
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j
   python3 ../scripts/gen_data.py
-  msprof op simulator --soc-version=<soc_version> ./demo
+  msopprof simulator --soc-version=<soc_version> ./demo
   python3 ../scripts/verify_result.py ./output/output.bin ./output/golden.bin
   ```
 
@@ -87,10 +87,10 @@ Run the following steps in the root directory of this example to build and execu
 
 ## Simulation Tuning
 
-Based on `./demo`, use `msprof op simulator` for simulation performance analysis to generate visualized instruction pipeline diagrams and other information. The command is as follows:
+Based on `./demo`, use `msopprof simulator` for simulation performance analysis to generate visualized instruction pipeline diagrams and other information. The command is as follows:
 
 ```bash
-msprof op simulator --soc-version=<soc_version> ./demo
+msopprof simulator --soc-version=<soc_version> ./demo
 ```
 
 > Obtain the AI processor model `<soc_version>` through the following method:
