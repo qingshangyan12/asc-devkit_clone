@@ -82,16 +82,10 @@ AscendC::LocalTensor<uint32_t> yLocal = ubAllocator.Alloc<uint32_t>(DATA_SIZE);
 AscendC::GlobalTensor<uint32_t> yGlobal;
 yGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ uint32_t*>(y), DATA_SIZE);
 
-if constexpr (scenarioNum == 1) {
-    // AtomicAdd：三个核分别对GM首个元素原子加1。
-    uint32_t value = 1;
-    AscendC::AtomicAdd(reinterpret_cast<__gm__ uint32_t*>(y), value);
-} else {
-    // AtomicCas：三个核分别对GM首个元素原子比较交换。
-    uint32_t expected = 1;
-    uint32_t newValue = 2;
-    AscendC::AtomicCas(reinterpret_cast<__gm__ uint32_t*>(y), expected, newValue);
-}
+// AtomicCas：三个核分别对GM首个元素原子比较交换。
+uint32_t expected = 1;
+uint32_t newValue = 2;
+AscendC::AtomicCas(reinterpret_cast<__gm__ uint32_t*>(y), expected, newValue);
 
 // 原子操作后插入同步。
 AscendC::SetFlag<AscendC::HardEvent::S_MTE2>(EVENT_ID0);
