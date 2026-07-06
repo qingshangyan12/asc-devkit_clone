@@ -38,7 +38,7 @@ protected:
         uint64_t quant_pre = 11;                                                                                       \
         uint8_t relu_pre = 12;                                                                                         \
         bool split_en = true;                                                                                          \
-        bool NZ2ND_en = true;                                                                                          \
+        bool nz2nd_en = true;                                                                                          \
         uint64_t quant_post = 13;                                                                                      \
         uint8_t relu_post = 14;                                                                                        \
         bool clip_relu_post = true;                                                                                    \
@@ -49,7 +49,7 @@ protected:
         bool nz2dn_en = false;                                                                                         \
         c_api_name(                                                                                                    \
             dst, src, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,      \
-            unit_flag_ctl, quant_pre, relu_pre, split_en, NZ2ND_en, quant_post, relu_post, clip_relu_post, eltwise_op, \
+            unit_flag_ctl, quant_pre, relu_pre, split_en, nz2nd_en, quant_post, relu_post, clip_relu_post, eltwise_op, \
             eltwise_antq_en, c0_pad_en, broadcast_en, nz2dn_en);                                                       \
         GlobalMockObject::verify();                                                                                    \
     }
