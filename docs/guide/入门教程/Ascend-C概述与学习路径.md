@@ -63,8 +63,8 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 <div style="display: flex; gap: 15px; margin-top: 10px;">
 <div style="flex: 1; background: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #e5e7eb;">
 <a href="../编程指南/编程模型/AI-Core-SIMD编程/概述.md" style="color: #3b82f6; font-size: 14px; font-weight: bold;">SIMD编程</a><br/>
-<span style="color: #666; font-size: 14px;">• <a href="../编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/C语言编程概述.md" style="color: #3b82f6; font-size: 13px;">基于指针的C语言编程</a></span><br/>
-<span style="color: #666; font-size: 14px;">• <a href="../编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/CPPTensor编程概述.md" style="color: #3b82f6; font-size: 13px;">基于Tensor的C++编程</a></span><br/>
+<span style="color: #666; font-size: 14px;">• <a href="../编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/基于语言扩展层C-API编程.md" style="color: #3b82f6; font-size: 13px;">基于指针的C语言编程</a></span><br/>
+<span style="color: #666; font-size: 14px;">• <a href="../编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md" style="color: #3b82f6; font-size: 13px;">基于Tensor的C++编程</a></span><br/>
 <span style="color: #666; font-size: 14px;">•  <a href="../编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程原理.md" style="color: #3b82f6; font-size: 13px;">基于TPipe-TQue框架编程</a></span>
 </div>
 <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
@@ -91,8 +91,8 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 </div>
 <div style=" margin: 5px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
 <strong style="color: #1a1a1a;"><span style="color: #3b82f6;">💻</span> 实践巩固</strong><br/>
-<span style="color: #666; font-size: 14px;">• <a href="../算子实践参考/SIMD算子实现/矢量编程/概述.md" style="color: #3b82f6; font-size: 14px;">典型SIMD矢量算子开发</a></span><br/>
-<span style="color: #666; font-size: 14px;">• <a href="../算子实践参考/SIMD算子实现/矩阵编程（基础API）/分离模式.md" style="color: #3b82f6; font-size: 14px;">典型SIMD矩阵类算子开发</a></span><br/>
+<span style="color: #666; font-size: 14px;">• <a href="../算子实践参考/典型算子实践案例/SIMD算子实现/Add矢量算子实践/入门功能落地.md" style="color: #3b82f6; font-size: 14px;">典型SIMD矢量算子开发</a></span><br/>
+<span style="color: #666; font-size: 14px;">• <a href="../算子实践参考/典型算子实践案例/SIMD算子实现/Matmul矩阵算子实践/入门功能落地.md" style="color: #3b82f6; font-size: 14px;">典型SIMD矩阵类算子开发</a></span><br/>
 <span style="color: #666; font-size: 14px;">• <a href="../算子实践参考/SIMT算子实现/算子实现.md" style="color: #3b82f6; font-size: 14px;">典型SIMT算子开发</a></span>
 </div>
 
