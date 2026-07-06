@@ -1,6 +1,44 @@
 # Reg矢量计算接口软仿情况汇总
 
 <!-- npu="950" id1 -->
+本节汇总介绍了Reg矢量计算接口软仿数据类型的情况，本节内容仅针对如下型号生效：
+
+Ascend 950PR/Ascend 950DT
+
+[Reg数据搬入](../SIMD-API/基础API/Reg矢量计算/Reg数据搬入/Reg数据搬入.md)和[Reg数据搬出](../SIMD-API/基础API/Reg矢量计算/Reg数据搬出/Reg数据搬出.md)目录下提供了UB与RegTensor、UB与MaskReg之间的数据搬运接口。
+
+UB与RegTensor之间的数据搬运根据操作数的数据类型位宽来搬运，与数据类型本身无关，表1和表2列出的软仿支持的数据类型包括以下情况：
+
+- 底层硬件不支持该数据类型，通过其他位宽相同的数据类型支持的搬运指令实现。
+- 底层硬件不支持该数据类型，通过多种接口组合软仿实现。
+- 底层硬件不支持该数据类型，通过双搬入/双搬出模式软仿实现RegTraitNumTwo的数据类型。
+
+**表1**  Reg数据搬入
+
+| 接口 | 软仿支持数据类型 |
+| :---------- | :---------------- |
+| 连续对齐搬入（LoadAlign） | bool、complex32、int64_t、uint64_t |
+| 非连续对齐搬入（LoadAlign） | bool、complex32 |
+| 连续非对齐搬入（LoadAlign） | bool、complex32、int64_t、uint64_t |
+| MaskReg搬入（LoadAlign） | - |
+| MaskReg搬入（MaskGenWithRegTensor） | - |
+| 离散搬入（Gather） | int64_t、uint64_t |
+| 离散搬入（GatherB） | - |
+| Load | bool、complex32、int64_t、uint64_t |
+| Move | bool、int64_t、uint64_t |
+
+**表1**  Reg数据搬出
+
+| 接口 | 软仿支持数据类型 |
+| :---------- | :---------------- |
+| 连续对齐搬出（StoreAlign） | bool、complex32、int64_t、uint64_t |
+| 非连续对齐搬出（StoreAlign） | bool、complex32 |
+| 连续非对齐搬出（StoreUnAlign） | bool、complex32、int64_t、uint64_t |
+| MaskReg搬出（StoreAlign） | - |
+| MaskReg非对齐搬出（StoreUnAlign） | - |
+| 离散搬出（Scatter） | int64_t、uint64_t |
+| Store | - |
+
 **表1**  基础算术
 
 | 接口 | 软仿支持数据类型 |
