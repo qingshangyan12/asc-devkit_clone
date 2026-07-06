@@ -354,7 +354,7 @@ __aicore__ inline void InterleaveImpl(__ubuf__ T *dst0Local, __ubuf__ T *dst1Loc
         "calCount is greater than (GetVecLen() * 2) / sizeof(T) if data type is int64_t/uint64_t!\n"));
     if constexpr (sizeof(T) != 8) {
         if (calCount * sizeof(T) <= oneRepeatVecLen) {
-            InterleaveImplOneRepeat<T, RegTraitNumOne>(dst0Local, dst1Local, src0Local, src1Local, calCount);
+            InterleaveImplOneRepeat<T, Reg::RegTraitNumOne>(dst0Local, dst1Local, src0Local, src1Local, calCount);
         } else if (calCount * sizeof(T) / 2 % ONE_BLOCK_SIZE == 0) {
             InterleaveImplNormal<T, false>(dst0Local, dst1Local, src0Local, src1Local, calCount);
         } else {
@@ -362,7 +362,7 @@ __aicore__ inline void InterleaveImpl(__ubuf__ T *dst0Local, __ubuf__ T *dst1Loc
         }
     } else {
         if (calCount * sizeof(T) <= oneRepeatVecLen) {
-            InterleaveImplOneRepeat<T, RegTraitNumTwo>(dst0Local, dst1Local, src0Local, src1Local, calCount);
+            InterleaveImplOneRepeat<T, Reg::RegTraitNumTwo>(dst0Local, dst1Local, src0Local, src1Local, calCount);
         } else if (calCount * sizeof(T) / 2 % ONE_BLOCK_SIZE == 0) {
             InterleaveImplB64<T, false>(dst0Local, dst1Local, src0Local, src1Local, calCount);
         } else {
