@@ -153,14 +153,32 @@ TEST_F(TestBatchLoop, batch_loop_bias)
             }
         }
     }
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    EXPECT_EQ(mm.GetOuterIndex(), 2);
+#else
     EXPECT_EQ(mm.GetOuterIndex(), 4);
+#endif
     EXPECT_EQ(mm.GetDstOffset(), 262144);
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    EXPECT_EQ(mm.GetBatchNum(), 2);
+#else
     EXPECT_EQ(mm.GetBatchNum(), 1);
+#endif
     EXPECT_EQ(mm.GetBiasBatchSrcOffset(), 1024);
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    EXPECT_EQ(mm.GetSplitIndex(), 2);
+    EXPECT_EQ(mm.GetSplitSize(), 2);
+#else
     EXPECT_EQ(mm.GetSplitIndex(), 1);
     EXPECT_EQ(mm.GetSplitSize(), 1);
+#endif
     EXPECT_EQ(mm.GetSplitBatchNum(), 1);
     EXPECT_EQ(mm.GetInnerIndex(), 1);
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    EXPECT_EQ(mm.GetBatchIndex(), 2);
+    EXPECT_EQ(mm.GetMainBatchBlockA(), 2);
+#else
     EXPECT_EQ(mm.GetBatchIndex(), 1);
     EXPECT_EQ(mm.GetMainBatchBlockA(), 1);
+#endif
 }

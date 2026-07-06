@@ -236,12 +236,22 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIC_CASE_SRC_FILES
     matmul/resource/cube_out_buffer/test_cube_out_buffer_co1_shared.cpp
     matmul/param/test_matmul_cross_core_sync.cpp
     matmul/kfc/test_matmul_server_c310.cpp
+    matmul/cube_in_buffer/test_cube_in_buffer_normal.cpp
+    matmul/iterator/test_batch_loop.cpp
+    matmul/iterator/test_k_loop_mdl.cpp
+    matmul/iterator/test_m_loop_mdl.cpp
+    matmul/load_buffer/test_matmul_load_to_l0a.cpp
+    matmul/load_buffer/test_matmul_load_to_l0b.cpp
+    matmul/load_buffer/test_matmul_tbufpool_l0.cpp
+    matmul/test_matmul_l0c_buffer.cpp
     matmul/copy_cube_in/test_copy_cube_in_ub_to_l1_ss.cpp
     matmul/tiling/test_matmul_constant_tiling_impl.cpp
     matmul/test_operator_matmul_mx_c310.cpp
     matmul/test_mx_matmul_impl.cpp
     matmul/utils/test_mx_matmul_utils.cpp
+    matmul/utils/test_matmul_internal_coverage.cpp
     matmul/scheduler/test_scheduler_norm_mx.cpp
+    matmul/scheduler/test_scheduler_mdl.cpp
     matmul/scheduler/test_scheduler_mdl_mx.cpp
     matmul/iterator/test_k_loop_mdl_mx.cpp
     matmul/copy_cube_in/test_copy_cube_in_norm_mx.cpp

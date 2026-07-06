@@ -85,6 +85,8 @@ public:
 
     __aicore__ inline uint32_t GetInnerIdx() const { return 0; }
 
+    __aicore__ inline int32_t GetStepInnerIdx() const { return 0; }
+
     __aicore__ inline uint32_t GetInnerStartIdx() const { return 0; }
 
     __aicore__ inline uint32_t GetOuterKaIdx() const { return 0; }
