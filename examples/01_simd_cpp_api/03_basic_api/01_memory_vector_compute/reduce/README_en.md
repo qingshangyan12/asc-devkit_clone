@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example describes how to call the `ReduceRepeat<SUM>` and `ReduceDataBlock<SUM>` high-level APIs to implement the reduce operator, which accumulates data elements in contiguous memory and returns the accumulation result.
+This example describes how to call the `ReduceRepeat<SUM>` and `ReduceDataBlock<SUM>` basic APIs to implement the reduce operator, which accumulates data elements in contiguous memory and returns the accumulation result.
 
 Note: `ReduceRepeat` and `ReduceDataBlock` are APIs renamed in CANN 9.1.0. For CANN 9.0.0 and earlier versions, use `WholeReduceSum` and `BlockReduceSum` instead.
 
@@ -66,7 +66,7 @@ Note: `ReduceRepeat` and `ReduceDataBlock` are APIs renamed in CANN 9.1.0. For C
       Note that the code uses Counter mode.
 
   - Kernel implementation  
-    The computation logic is: The vector computation APIs provided by Ascend C operate on LocalTensor elements. Input data must first be transferred to on-chip storage, then the Reduce high-level API is used to complete the reduce computation, obtain the final result, and transfer it to external storage.
+    The computation logic is: The vector computation APIs provided by Ascend C operate on LocalTensor elements. Input data must first be transferred to on-chip storage, then the Reduce basic API is used to complete the reduce computation, obtain the final result, and transfer it to external storage.
 
     The implementation process of the ReduceCustom operator consists of three basic tasks: CopyIn, Compute, and CopyOut. The CopyIn task stores the input tensor xGm from Global Memory into xLocal. The Compute task performs reduce computation on xLocal, with the computation method determined by the ComputeKey parameter, which is determined by the input length. The computation result is stored in zLocal. The CopyOut task transfers the output data from zLocal to the output tensor zGm in Global Memory.
 
