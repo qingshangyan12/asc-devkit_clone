@@ -340,18 +340,6 @@ __aicore__ inline void InterleaveImpl(__ubuf__ T *dst0Local, __ubuf__ T *dst1Loc
         uint64_t, int64_t>(),
         "current data type is not supported on current device!");
     ASCENDC_ASSERT((calCount % 2 == 0), { KERNEL_LOG(KERNEL_ERROR, "calCount % 2 = 0!"); });
-    uint64_t dst0Addr = reinterpret_cast<uint64_t>(dst0Local);
-    uint64_t dst1Addr = reinterpret_cast<uint64_t>(dst1Local);
-    uint64_t src0Addr = reinterpret_cast<uint64_t>(src0Local);
-    uint64_t src1Addr = reinterpret_cast<uint64_t>(src1Local);
-    uint32_t oneRepeatVecLen = (sizeof(T) != 8) ? GetVecLen() : GetVecLen() * 2;
-    ASCENDC_DEBUG_ASSERT((dst0Addr != dst1Addr), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Interleave does not support dst0 tensor and dst1 tensor having same addr!\n"));
-    ASCENDC_DEBUG_ASSERT(((calCount * sizeof(T) > oneRepeatVecLen) && (dst0Addr != src0Addr) && (dst0Addr != src1Addr) &&
-        (dst1Addr != src0Addr) && (dst1Addr != src1Addr)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
-        "Interleave does not support src0/src1 tensor and dsr0/dst1 tensor having same addr when "
-        "calCount is greater than GetVecLen() / sizeof(T) if data type is not int64_t/uint64_t, or "
-        "calCount is greater than (GetVecLen() * 2) / sizeof(T) if data type is int64_t/uint64_t!\n"));
     if constexpr (sizeof(T) != 8) {
         if (calCount * sizeof(T) <= oneRepeatVecLen) {
             InterleaveImplOneRepeat<T, Reg::RegTraitNumOne>(dst0Local, dst1Local, src0Local, src1Local, calCount);
