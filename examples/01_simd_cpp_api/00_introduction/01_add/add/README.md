@@ -171,7 +171,7 @@ msopprof ./demo   # 分析性能
 
 ```bash
 # 查看Task Duration 以及各项数据
-cat ./OPPROF_*├──PipeUtilization*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```
 
 更多msProf工具使用方式请参考[MindStudio工具](https://www.hiascend.com/document/redirect/CannCommercialToolOpDev)算子调优（msProf）中的内容。

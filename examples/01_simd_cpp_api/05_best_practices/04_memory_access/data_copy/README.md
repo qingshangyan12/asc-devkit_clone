@@ -468,5 +468,5 @@ for (uint32_t mBlockIdx = 0; mBlockIdx < fullMBlockCount; mBlockIdx++) {
 
   ```bash
   # 查看 Task Duration 以及各项数据
-  cat ./OPPROF_*├──PipeUtilization*.csv
+  cat ./OPPROF_*/PipeUtilization.csv
   ```

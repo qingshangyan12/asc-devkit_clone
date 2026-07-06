@@ -585,5 +585,5 @@ msopprof ./demo
 查看具体的性能分析结果：
 
 ```bash
-cat ./OPPROF_*├──PipeUtilization*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```

@@ -617,5 +617,5 @@ msopprof ./demo   # 分析性能
 查看具体的性能分析结果：
 ```bash
 # 查看Task Duration 以及各项数据
-cat ./OPPROF_*├──PipeUtilization*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```
