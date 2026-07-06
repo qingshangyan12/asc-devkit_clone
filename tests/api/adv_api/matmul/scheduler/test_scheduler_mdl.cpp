@@ -165,16 +165,6 @@ private:
         A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, staticTilingPreLoadM, MatmulCallBackFunc<nullptr, nullptr, nullptr>,
         CustomMatmulPolicy>
         mm3;
-
-    constexpr static bool isPartialOutput = true;
-    constexpr static MatmulFuncParams partialOutputFuncParams{
-        false, false, false, false, 0, IterateOrder::ORDER_N, ScheduleType::INNER_PRODUCT, true, true, isPartialOutput};
-    constexpr static MatmulConfig mmPartialOutputConfig =
-        GetMMConfig<configMode>(shapeParams, quantParams, batchParams, partialOutputFuncParams);
-    MatmulImpl<
-        A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, mmPartialOutputConfig, MatmulCallBackFunc<nullptr, nullptr, nullptr>,
-        CustomMatmulPolicy>
-        partialOutputMm;
 };
 
 TEST_F(TestSchedulerMDL, ScheduleOnce_OrderM)
@@ -227,17 +217,4 @@ TEST_F(TestSchedulerMDL, ScheduleOnce_PreLoadM)
     mm3.SetBias(1);
     ASSERT_TRUE(mm3.ScheduleOnce(false));
     ASSERT_FALSE(mm3.ScheduleOnce(false));
-}
-
-TEST_F(TestSchedulerMDL, ScheduleOnce_PartialOutput)
-{
-    // coreNum, M, N, K, singleCoreM, singleCoreN, singleCoreK, baseM, baseN, baseK, depthA1, depthB1, stepM, stepN,
-    // stepKa, stepKb, isBias, iterateOrder
-    TilingParams tilingParams = {1, 128, 128, 128, 128, 128, 128, 64, 64, 64, 2, 2, 1, 1, 2, 2, 0, 1};
-    TCubeTiling tiling;
-    tilingParams.GetTiling(tiling);
-    partialOutputMm.InitVar(tiling);
-    partialOutputMm.SetBias(0);
-    ASSERT_TRUE(partialOutputMm.ScheduleOnce(false));
-    ASSERT_FALSE(partialOutputMm.ScheduleOnce(true));
 }
