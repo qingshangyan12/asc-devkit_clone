@@ -169,7 +169,7 @@ __aicore__ __gm__ inline DebugBlockHeadInfo* get_block_info()
     } else {
         blockInfo->flag = 0;
     }
-    dcci(reinterpret_cast<__gm__ uint64_t*>(blockInfo), cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+    asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(blockInfo));
     return blockInfo;
 }
 
