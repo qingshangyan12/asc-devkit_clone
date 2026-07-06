@@ -7,7 +7,7 @@ SIMD与SIMT混合编程中涉及的函数类型如下表所示：
 <a name="zh-cn_topic_0000002571578013_table1818191292017"></a>
 | 修饰符 | 函数功能 | 调用方式 |
 | --- | --- | --- |
-| `__global__ __aicore__` | 算子入口，协调VF执行。若只有在AIV核内执行的SIMD与SIMT混合编程场景，可使用`__global__` `__vector__`来标识只启动AIV核。 | Host侧通过`<<<...>>>`调用 |
+| `__global__ __aicore__` | 算子入口，协调VF执行。若只有在AIV核内执行的SIMD与SIMT混合编程场景，可使用`__global__ __vector__`来标识只启动AIV核。 | Host侧通过`<<<...>>>`调用 |
 | `__aicore__` | Device侧辅助函数 | 核函数或同级函数调用 |
 | `__simt_vf__` | 线程级并行计算任务 | 通过SIMT提供的`asc_vf_call`接口调用 |
 | `__simd_vf__` | 向量级并行计算任务 | 通过SIMD提供的`asc_vf_call`接口调用 |
@@ -18,12 +18,12 @@ SIMD与SIMT混合编程中涉及的函数类型如下表所示：
 各层函数间的调用关系如下：
 - 核函数：是Device侧的入口函数，可以调用`__aicore__`函数和VF函数。
 - simd vf函数：能被核函数或者`__aicore__`函数通过`asc_vf_call`接口调用。simd vf函数内只能调用`__simd_callee__`函数和`__callee__`函数。
-- simt vf函数：使用`__simt_vf__`标记，能被核函数或者`__aicore__`函数通过`asc_vf_call`接口调用。simt vf函数内只能调用`__simt_callee__`函数和`__callee__`函数。
+- simt vf函数：使用'__simt_vf__'标记，能被核函数或者`__aicore__`函数通过`asc_vf_call`接口调用。simt vf函数内只能调用`__simt_callee__`函数和`__callee__`函数。
 - `__simd_callee__`子函数：simd vf函数内部的子函数，子函数可能有返回值或者通过引用传参。__simd_callee__函数内只能调用`__simd_callee__`函数和`__callee__`函数。
 - `__simt_callee__`子函数：simt vf函数内部的子函数，子函数可能有返回值或者通过引用传参。`__simt_callee__`函数内只能调用`__simt_callee__`函数和`__callee__`函数。
 - `__callee__`公共函数：可供VF内部调用的公共子函数。`__callee__`函数内只能调用`__callee__`函数。
 
-**图 1** SIMD与SIMT混合编程函数调用层级  
+**图1** SIMD与SIMT混合编程函数调用层级  
 <img src="../../../../figures/SIMT_混合_函数调用层级.png" title="SIMD与SIMT混合编程函数调用层级" width="70%" />
 
 ## 核函数的定义与执行配置<a name="zh-cn_topic_0000002571578013_section156822920311"></a>
@@ -85,7 +85,7 @@ SIMT VF函数定义中的关键修饰符说明如下：
 | `__gm__` | 内存空间修饰符，标识内存空间为GM |
 | `__ubuf__` | 内存空间修饰符，标识内存空间为UB |
 
-通过SIMT的[asc\_vf\_call](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/SIMT-API/SIMD%E4%B8%8ESIMT%E6%B7%B7%E5%90%88%E7%BC%96%E7%A8%8B%E7%AE%80%E4%BB%8B/%E6%89%A9%E5%B1%95%E8%AF%AD%E6%B3%95/%E6%A0%B8%E5%87%BD%E6%95%B0%E9%85%8D%E7%BD%AE-147.md#asc_vf_call%E8%B0%83%E7%94%A8)接口在核函数或\_\_aicore\_\_函数中调用，调用示例如下：
+通过SIMT的[asc\_vf\_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/SIMD%E4%B8%8ESIMT%E6%B7%B7%E5%90%88%E7%BC%96%E7%A8%8B%E7%AE%80%E4%BB%8B/%E6%89%A9%E5%B1%95%E8%AF%AD%E6%B3%95/%E6%A0%B8%E5%87%BD%E6%95%B0%E9%85%8D%E7%BD%AE-147.md#asc_vf_call%E8%B0%83%E7%94%A8)接口在核函数或\_\_aicore\_\_函数中调用，调用示例如下：
 
 ```
 asc_vf_call<function_name>(dim3(blockDim), arg1, arg2, ...);
