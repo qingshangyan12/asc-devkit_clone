@@ -195,6 +195,23 @@ __aicore__ inline void DuplicateImpl(__ubuf__ T* dstLocal, __ubuf__ T* srcLocal,
     }
 }
 
+template <typename T, const Reg::RegTrait& regTrait>
+__simd_vf__ inline void InterleaveImplOneRepeat(__ubuf__ T *dst0Local, __ubuf__ T *dst1Local, __ubuf__ T *src0Local,
+    __ubuf__ T *src1Local, const int32_t calCount)
+{
+    Reg::RegTensor<T, regTrait> src0Reg;
+    Reg::RegTensor<T, regTrait> src1Reg;
+    Reg::RegTensor<T, regTrait> dst0Reg;
+    Reg::RegTensor<T, regTrait> dst1Reg;
+    uint32_t sreg = calCount;
+    Reg::MaskReg preg = Reg::UpdateMask<T, regTrait>(sreg);
+    Reg::LoadAlign(src0Reg, src0Local);
+    Reg::LoadAlign(src1Reg, src1Local);
+    Reg::Interleave(dst0Reg, dst1Reg, src0Reg, src1Reg);
+    Reg::StoreAlign(dst0Local, dst0Reg, preg);
+    Reg::StoreAlign(dst0Local , dst1Reg, preg);
+}
+
 template <typename T, bool hasUnalign = true>
 __simd_vf__ inline void InterleaveImplNormal(__ubuf__ T *dst0Local, __ubuf__ T *dst1Local, __ubuf__ T *src0Local,
     __ubuf__ T *src1Local, const int32_t calCount)
@@ -323,14 +340,32 @@ __aicore__ inline void InterleaveImpl(__ubuf__ T *dst0Local, __ubuf__ T *dst1Loc
         uint64_t, int64_t>(),
         "current data type is not supported on current device!");
     ASCENDC_ASSERT((calCount % 2 == 0), { KERNEL_LOG(KERNEL_ERROR, "calCount % 2 = 0!"); });
+#if defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1)
+    uint64_t dst0Addr = reinterpret_cast<uint64_t>(dst0Local);
+    uint64_t dst1Addr = reinterpret_cast<uint64_t>(dst1Local);
+    uint64_t src0Addr = reinterpret_cast<uint64_t>(src0Local);
+    uint64_t src1Addr = reinterpret_cast<uint64_t>(src1Local);
+    uint32_t oneRepeatVecLen = (sizeof(T) != 8) ? GetVecLen() : GetVecLen() * 2;
+    ASCENDC_ASSERT((dst0Addr != dst1Addr), { KERNEL_LOG(KERNEL_ERROR, "Interleave does not "
+        "support dst0 and dst1 tensor having same addr!"); });
+    ASCENDC_ASSERT((calCount * sizeof(T) > oneRepeatVecLen) && (dst0Addr != src0Addr) && (dst0Addr != src1Addr) &&
+        (dst1Addr != src0Addr) && (dst1Addr != src1Addr), { KERNEL_LOG(KERNEL_ERROR, "Interleave does not "
+        "support src0/src1 and dsr0/dst1 tensor having same addr when calCount is greater than "
+        "calCount * sizeof(T) > GetVecLen() if data type is not int64_t/uint64_t, or calCount is greater than "
+        "calCount * sizeof(T) > GetVecLen() * 2 if data type is int64_t/uint64_t!"); });
+#endif
     if constexpr (sizeof(T) != 8) {
-        if (calCount * sizeof(T) / 2 % ONE_BLOCK_SIZE == 0) {
+        if (calCount * sizeof(T) <= oneRepeatVecLen) {
+            InterleaveImplOneRepeat<T, RegTraitNumOne>(dst0Local, dst1Local, src0Local, src1Local, calCount);
+        } else if (calCount * sizeof(T) / 2 % ONE_BLOCK_SIZE == 0) {
             InterleaveImplNormal<T, false>(dst0Local, dst1Local, src0Local, src1Local, calCount);
         } else {
             InterleaveImplNormal<T, true>(dst0Local, dst1Local, src0Local, src1Local, calCount);
         }
     } else {
-        if (calCount * sizeof(T) / 2 % ONE_BLOCK_SIZE == 0) {
+        if (calCount * sizeof(T) <= oneRepeatVecLen) {
+            InterleaveImplOneRepeat<T, RegTraitNumTwo>(dst0Local, dst1Local, src0Local, src1Local, calCount);
+        } else if (calCount * sizeof(T) / 2 % ONE_BLOCK_SIZE == 0) {
             InterleaveImplB64<T, false>(dst0Local, dst1Local, src0Local, src1Local, calCount);
         } else {
             InterleaveImplB64<T, true>(dst0Local, dst1Local, src0Local, src1Local, calCount);
