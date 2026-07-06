@@ -35,7 +35,7 @@ void GetLayerNormMaxMinTmpSize(
 [[deprecated("GetLayerNormNDTillingInfo is deprecated, please use GetLayerNormNDTilingInfo instead!")]]
 void GetLayerNormNDTillingInfo(
     const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
-    optiling::LayerNormTiling& tilling);
+    optiling::LayerNormTiling& tiling);
 
 /*!
  * \brief get tiling for LayerNorm interface.

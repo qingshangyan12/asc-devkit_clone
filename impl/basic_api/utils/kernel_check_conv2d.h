@@ -37,9 +37,9 @@ __aicore__ inline bool CheckConv2DRange(const uint32_t *rangePair, const uint32_
     return false;
 }
 
-__aicore__ inline bool CheckConv2DParamsRange(Conv2dParams &conv2dParams, Conv2dTilling &tilling)
+__aicore__ inline bool CheckConv2DParamsRange(Conv2dParams &conv2dParams, Conv2dTilling &tiling)
 {
-    uint32_t cinRange[] = {tilling.c0Size, 4096};
+    uint32_t cinRange[] = {tiling.c0Size, 4096};
     uint32_t coutRange[] = {16, 4096};
 
     uint32_t loopTime[] = {CONV2D_IMG_SIZE, CONV2D_KERNEL_SIZE, CONV2D_STRIDE, CONV2D_PAD, CONV2D_DILATION};
@@ -73,14 +73,14 @@ __aicore__ inline bool CheckConv2DParamsRange(Conv2dParams &conv2dParams, Conv2d
 
 template <typename T, typename U>
 __aicore__ inline bool CheckConv2DOverflow(const LocalTensor<T> &dst, const LocalTensor<U> &featureMap,
-    const LocalTensor<U> &weight, Conv2dParams &conv2dParams, Conv2dTilling &tilling)
+    const LocalTensor<U> &weight, Conv2dParams &conv2dParams, Conv2dTilling &tiling)
 {
     // check l0c
-    uint32_t roundM = tilling.roundM;
-    uint32_t roundN = tilling.roundN;
-    uint32_t roundK = tilling.roundK;
+    uint32_t roundM = tiling.roundM;
+    uint32_t roundN = tiling.roundN;
+    uint32_t roundK = tiling.roundK;
 
-    uint32_t kTileBlock = tilling.kTileBlock;
+    uint32_t kTileBlock = tiling.kTileBlock;
 
     uint32_t needElementLoc = roundM * roundN * sizeof(PrimT<T>);
     if (needElementLoc > TOTAL_L0C_SIZE) {
@@ -96,8 +96,8 @@ __aicore__ inline bool CheckConv2DOverflow(const LocalTensor<T> &dst, const Loca
         return false;
     }
 
-    uint32_t minElementL0a = roundM * kTileBlock * tilling.c0Size * sizeof(PrimT<U>);
-    uint32_t minElementL0b = roundN * kTileBlock * tilling.c0Size * sizeof(PrimT<U>);
+    uint32_t minElementL0a = roundM * kTileBlock * tiling.c0Size * sizeof(PrimT<U>);
+    uint32_t minElementL0b = roundN * kTileBlock * tiling.c0Size * sizeof(PrimT<U>);
 
     if (minElementL0a > TOTAL_L0A_SIZE) {
         return false;
@@ -113,9 +113,9 @@ __aicore__ inline bool CheckConv2DOverflow(const LocalTensor<T> &dst, const Loca
 template <typename T, typename U>
 __aicore__ inline bool CheckConv2DParams(const LocalTensor<T> &dst, const LocalTensor<T> &bias,
     const LocalTensor<U> &featureMap, const LocalTensor<U> &weight, Conv2dParams &conv2dParams,
-    Conv2dTilling &tilling)
+    Conv2dTilling &tiling)
 {
-    if (tilling.c0Size == 0) {
+    if (tiling.c0Size == 0) {
         return false;
     }
 
@@ -140,13 +140,13 @@ __aicore__ inline bool CheckConv2DParams(const LocalTensor<T> &dst, const LocalT
     }
 
     // check range
-    bool check = CheckConv2DParamsRange(conv2dParams, tilling);
+    bool check = CheckConv2DParamsRange(conv2dParams, tiling);
     if (check == false) {
         return false;
     }
 
     // check overflow
-    if (!CheckConv2DOverflow(dst, featureMap, weight, conv2dParams, tilling)) {
+    if (!CheckConv2DOverflow(dst, featureMap, weight, conv2dParams, tiling)) {
         return false;
     }
 

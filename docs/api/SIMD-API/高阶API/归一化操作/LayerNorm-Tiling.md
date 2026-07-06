@@ -115,7 +115,7 @@ Ascend C提供一组LayerNorm Tiling API，方便用户获取LayerNorm kernel计
     -   输出归一化结果、均值和方差的LayerNorm接口所需的tiling参数（不推荐使用）
 
         ```
-        void GetLayerNormNDTillingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, optiling::LayerNormTiling& tilling)
+        void GetLayerNormNDTillingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, optiling::LayerNormTiling& tiling)
         ```
 
     -   输出归一化结果、均值和标准差的倒数的LayerNorm接口所需的tiling参数
@@ -151,7 +151,7 @@ Ascend C提供一组LayerNorm Tiling API，方便用户获取LayerNorm kernel计
 | typeSize | 输入 | 输入的数据类型大小，单位为字节。比如输入的数据类型为half，此处应传入2。 |
 | isReuseSource | 输入 | 是否可以复用inputX的内存空间。 |
 | isComputeRstd | 输入 | 是否计算标准差的倒数rstd。用于Tiling中区分选择的LayerNorm API。 |
-| tilling | 输出 | 输入数据的切分信息。 |
+| tiling | 输出 | 输入数据的切分信息。 |
 
 ## 返回值说明
 

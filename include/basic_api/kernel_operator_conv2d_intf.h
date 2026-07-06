@@ -55,12 +55,12 @@ template <typename T> __aicore__ inline Conv2dTilling GetConv2dTiling(Conv2dPara
 template <typename T, typename U>
 __aicore__ inline __in_pipe__(MTE2)
     __out_pipe__(MTE3) void Conv2D(const LocalTensor<T> &dst, const LocalTensor<U> &featureMap,
-    const LocalTensor<U> &weight, Conv2dParams &conv2dParams, Conv2dTilling &tilling);
+    const LocalTensor<U> &weight, Conv2dParams &conv2dParams, Conv2dTilling &tiling);
 
 template <typename T, typename U>
 __aicore__ inline __in_pipe__(MTE2)__out_pipe__(MTE3) void Conv2D(const LocalTensor<T> &dst,
     const LocalTensor<T> &bias, const LocalTensor<U> &featureMap, const LocalTensor<U> &weight,
-    Conv2dParams &conv2dParams, Conv2dTilling &tilling);
+    Conv2dParams &conv2dParams, Conv2dTilling &tiling);
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__)

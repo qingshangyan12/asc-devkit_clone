@@ -31,38 +31,38 @@ template <typename T>
         "Please do not use it!")]]
 __aicore__ inline Conv2dTilling GetConv2dTiling(Conv2dParams& conv2dParams)
 {
-    Conv2dTilling tilling;
-    GetTypeforC0<T>(conv2dParams, tilling);
+    Conv2dTilling tiling;
+    GetTypeforC0<T>(conv2dParams, tiling);
 
-    tilling.loopMode = LoopMode::MODE_NM;
+    tiling.loopMode = LoopMode::MODE_NM;
 
-    tilling.strideH = conv2dParams.stride[0];
-    tilling.strideW = conv2dParams.stride[1];
-    tilling.dilationH = conv2dParams.dilation[0];
-    tilling.dilationW = conv2dParams.dilation[1];
-    tilling.hi = conv2dParams.imgShape[0];
-    tilling.wi = conv2dParams.imgShape[1];
-    tilling.ho = (tilling.hi + conv2dParams.padList[2] + conv2dParams.padList[3] -
-        tilling.dilationH * (conv2dParams.kernelShape[0] - 1) - 1) /
-        tilling.strideH +
+    tiling.strideH = conv2dParams.stride[0];
+    tiling.strideW = conv2dParams.stride[1];
+    tiling.dilationH = conv2dParams.dilation[0];
+    tiling.dilationW = conv2dParams.dilation[1];
+    tiling.hi = conv2dParams.imgShape[0];
+    tiling.wi = conv2dParams.imgShape[1];
+    tiling.ho = (tiling.hi + conv2dParams.padList[2] + conv2dParams.padList[3] -
+        tiling.dilationH * (conv2dParams.kernelShape[0] - 1) - 1) /
+        tiling.strideH +
         1;
-    tilling.wo = (tilling.wi + conv2dParams.padList[0] + conv2dParams.padList[1] -
-        tilling.dilationW * (conv2dParams.kernelShape[1] - 1) - 1) /
-        tilling.strideW +
+    tiling.wo = (tiling.wi + conv2dParams.padList[0] + conv2dParams.padList[1] -
+        tiling.dilationW * (conv2dParams.kernelShape[1] - 1) - 1) /
+        tiling.strideW +
         1;
 
-    tilling.height = conv2dParams.kernelShape[0];
-    tilling.width = conv2dParams.kernelShape[1];
+    tiling.height = conv2dParams.kernelShape[0];
+    tiling.width = conv2dParams.kernelShape[1];
 
-    tilling.howo = tilling.ho * tilling.wo;
+    tiling.howo = tiling.ho * tiling.wo;
 
-    tilling.mNum = tilling.howo;
-    tilling.nNum = conv2dParams.cout;
-    tilling.kNum = conv2dParams.cin * tilling.height * tilling.width;
+    tiling.mNum = tiling.howo;
+    tiling.nNum = conv2dParams.cout;
+    tiling.kNum = conv2dParams.cin * tiling.height * tiling.width;
 
-    CalculateConv2dTiling(tilling);
+    CalculateConv2dTiling(tiling);
 
-    return tilling;
+    return tiling;
 }
 
 /*
@@ -88,13 +88,13 @@ template <typename T, typename U>
         "Please do not use it!")]]
 __aicore__ inline __in_pipe__(MTE2)
     __out_pipe__(MTE3) void Conv2D(const LocalTensor<T> &dst, const LocalTensor<U> &featureMap,
-    const LocalTensor<U> &weight, Conv2dParams &conv2dParams, Conv2dTilling &tilling)
+    const LocalTensor<U> &weight, Conv2dParams &conv2dParams, Conv2dTilling &tiling)
 {
     if (conv2dParams.initY == 2) {
         return;
     }
 
-    Conv2D(dst, dst, featureMap, weight, conv2dParams, tilling);
+    Conv2D(dst, dst, featureMap, weight, conv2dParams, tiling);
 }
 
 template <typename T, typename U>
@@ -102,10 +102,10 @@ template <typename T, typename U>
         "Please do not use it!")]]
 __aicore__ inline __in_pipe__(MTE2)__out_pipe__(MTE3) void Conv2D(const LocalTensor<T> &dst,
     const LocalTensor<T> &bias, const LocalTensor<U> &featureMap, const LocalTensor<U> &weight,
-    Conv2dParams &conv2dParams, Conv2dTilling &tilling)
+    Conv2dParams &conv2dParams, Conv2dTilling &tiling)
 {
 #if ASCENDC_CPU_DEBUG
-    if (!CheckConv2DParams(dst, bias, featureMap, weight, conv2dParams, tilling)) {
+    if (!CheckConv2DParams(dst, bias, featureMap, weight, conv2dParams, tiling)) {
         return;
     }
 #endif
@@ -133,10 +133,10 @@ __aicore__ inline __in_pipe__(MTE2)__out_pipe__(MTE3) void Conv2D(const LocalTen
 #endif
     }
 
-    if (tilling.loopMode == LoopMode::MODE_NM) {
-        Conv2DExecNm(l0c, bias, featureMap, weight, conv2dParams, tilling);
-    } else if (tilling.loopMode == LoopMode::MODE_MN) {
-        Conv2DExecMn(l0c, bias, featureMap, weight, conv2dParams, tilling);
+    if (tiling.loopMode == LoopMode::MODE_NM) {
+        Conv2DExecNm(l0c, bias, featureMap, weight, conv2dParams, tiling);
+    } else if (tiling.loopMode == LoopMode::MODE_MN) {
+        Conv2DExecMn(l0c, bias, featureMap, weight, conv2dParams, tiling);
     } else {
         // other mode are not supported
     }
@@ -144,7 +144,7 @@ __aicore__ inline __in_pipe__(MTE2)__out_pipe__(MTE3) void Conv2D(const LocalTen
 #if (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
     if ((!conv2dParams.partialSum) && (dstScope == Hardware::UB)) {
         pipe_barrier(PIPE_ALL);
-        dataCopyParams.blockLen = tilling.roundM * tilling.roundN * sizeof(PrimT<T>) / 1024;
+        dataCopyParams.blockLen = tiling.roundM * tiling.roundN * sizeof(PrimT<T>) / 1024;
         DataCopy(dst, l0c, dataCopyParams, enhancedParams);
     }
 #endif

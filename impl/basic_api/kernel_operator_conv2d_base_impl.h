@@ -30,78 +30,78 @@
 
 namespace AscendC {
 
-template <typename T> __aicore__ inline void GetTypeforC0(Conv2dParams& conv2dParams, Conv2dTilling& tilling)
+template <typename T> __aicore__ inline void GetTypeforC0(Conv2dParams& conv2dParams, Conv2dTilling& tiling)
 {
     if (IsSameType<PrimT<T>, int8_t>::value) {
-        tilling.c0Size = 32;
-        tilling.dTypeSize = 1;
+        tiling.c0Size = 32;
+        tiling.dTypeSize = 1;
     } else if (IsSameType<PrimT<T>, half>::value) {
-        tilling.c0Size = 16;   // 32Byte-block
-        tilling.dTypeSize = 2; // sizeof(dtype)
+        tiling.c0Size = 16;   // 32Byte-block
+        tiling.dTypeSize = 2; // sizeof(dtype)
     } else {
-        tilling.c0Size = 0;
-        tilling.dTypeSize = 0;
+        tiling.c0Size = 0;
+        tiling.dTypeSize = 0;
     }
 }
 
-__aicore__ inline void CalculateConv2dTiling(Conv2dTilling& tilling)
+__aicore__ inline void CalculateConv2dTiling(Conv2dTilling& tiling)
 {
-    tilling.mBlockNum = DivCeil(tilling.mNum, tilling.blockSize);
-    tilling.nBlockNum = DivCeil(tilling.nNum, tilling.blockSize);
-    tilling.kBlockNum = DivCeil(tilling.kNum, tilling.c0Size);
+    tiling.mBlockNum = DivCeil(tiling.mNum, tiling.blockSize);
+    tiling.nBlockNum = DivCeil(tiling.nNum, tiling.blockSize);
+    tiling.kBlockNum = DivCeil(tiling.kNum, tiling.c0Size);
 
-    tilling.roundM = DivCeil(tilling.mNum, tilling.blockSize) * tilling.blockSize; // blockSize = 16(16X16)
-    tilling.roundN = DivCeil(tilling.nNum, tilling.blockSize) * tilling.blockSize;
-    tilling.roundK = DivCeil(tilling.kNum, tilling.c0Size) * tilling.c0Size; // c0Size = 16 || c0Size = 32
+    tiling.roundM = DivCeil(tiling.mNum, tiling.blockSize) * tiling.blockSize; // blockSize = 16(16X16)
+    tiling.roundN = DivCeil(tiling.nNum, tiling.blockSize) * tiling.blockSize;
+    tiling.roundK = DivCeil(tiling.kNum, tiling.c0Size) * tiling.c0Size; // c0Size = 16 || c0Size = 32
 
-    uint32_t k0a = TOTAL_L0A_SIZE / 2 / (tilling.roundM * tilling.dTypeSize);
-    uint32_t k0b = TOTAL_L0B_SIZE / 2 / (tilling.roundN * tilling.dTypeSize);
+    uint32_t k0a = TOTAL_L0A_SIZE / 2 / (tiling.roundM * tiling.dTypeSize);
+    uint32_t k0b = TOTAL_L0B_SIZE / 2 / (tiling.roundN * tiling.dTypeSize);
     uint32_t k0 = k0a > k0b ? k0b : k0a;
-    k0 = k0 > tilling.kNum ? tilling.kNum : k0;
+    k0 = k0 > tiling.kNum ? tiling.kNum : k0;
 
-    tilling.kTileBlock = k0 / tilling.c0Size;
-    if (tilling.kTileBlock == 0) {
-        tilling.kTileBlock = 1;
+    tiling.kTileBlock = k0 / tiling.c0Size;
+    if (tiling.kTileBlock == 0) {
+        tiling.kTileBlock = 1;
     }
 
-    tilling.mIterNum = 1;
-    tilling.nIterNum = 1;
-    tilling.kIterNum = DivCeil(tilling.kBlockNum, tilling.kTileBlock);
+    tiling.mIterNum = 1;
+    tiling.nIterNum = 1;
+    tiling.kIterNum = DivCeil(tiling.kBlockNum, tiling.kTileBlock);
 
-    tilling.mTileBlock = DivCeil(tilling.mBlockNum, tilling.mIterNum);
-    tilling.nTileBlock = DivCeil(tilling.nBlockNum, tilling.nIterNum);
+    tiling.mTileBlock = DivCeil(tiling.mBlockNum, tiling.mIterNum);
+    tiling.nTileBlock = DivCeil(tiling.nBlockNum, tiling.nIterNum);
 
-    tilling.mTileNums = tilling.mTileBlock * tilling.blockSize;
+    tiling.mTileNums = tiling.mTileBlock * tiling.blockSize;
 
-    tilling.mHasTail = (tilling.howo != tilling.mIterNum * tilling.mTileBlock * tilling.blockSize) ? true : false;
-    tilling.kHasTail = (tilling.kBlockNum < tilling.kIterNum * tilling.kTileBlock) ? true : false;
-    tilling.nHasTail = (tilling.nBlockNum < tilling.nIterNum * tilling.nTileBlock) ? true : false;
+    tiling.mHasTail = (tiling.howo != tiling.mIterNum * tiling.mTileBlock * tiling.blockSize) ? true : false;
+    tiling.kHasTail = (tiling.kBlockNum < tiling.kIterNum * tiling.kTileBlock) ? true : false;
+    tiling.nHasTail = (tiling.nBlockNum < tiling.nIterNum * tiling.nTileBlock) ? true : false;
 
-    tilling.mTailBlock = tilling.mBlockNum - (tilling.mIterNum - 1) * tilling.mTileBlock; // mTailBlock <= mBlockNum
-    tilling.mTailNums = tilling.howo - (tilling.mIterNum - 1) * tilling.mTileBlock * tilling.blockSize;
+    tiling.mTailBlock = tiling.mBlockNum - (tiling.mIterNum - 1) * tiling.mTileBlock; // mTailBlock <= mBlockNum
+    tiling.mTailNums = tiling.howo - (tiling.mIterNum - 1) * tiling.mTileBlock * tiling.blockSize;
 
-    tilling.kTailBlock = tilling.kBlockNum - (tilling.kIterNum - 1) * tilling.kTileBlock;
-    tilling.nTailBlock = tilling.nBlockNum - (tilling.nIterNum - 1) * tilling.nTileBlock;
+    tiling.kTailBlock = tiling.kBlockNum - (tiling.kIterNum - 1) * tiling.kTileBlock;
+    tiling.nTailBlock = tiling.nBlockNum - (tiling.nIterNum - 1) * tiling.nTileBlock;
 }
 
 template <typename T>
 __aicore__ inline void LoadL0AForConv2DV1(uint32_t kBlocks, uint32_t indexK, uint32_t mBlocks, uint32_t indexM,
-    Conv2dParams& conv2dParams, Conv2dTilling& tilling, const LocalTensor<T>& src0, const LocalTensor<T>& l0a)
+    Conv2dParams& conv2dParams, Conv2dTilling& tiling, const LocalTensor<T>& src0, const LocalTensor<T>& l0a)
 {
-    uint32_t cinPos = indexK * tilling.kTileBlock;
+    uint32_t cinPos = indexK * tiling.kTileBlock;
     // load by column
-    for (size_t index = 0; index < tilling.mTileBlock; index++) {
-        uint32_t hoWoPos = (indexM * tilling.mTileBlock + index) * tilling.blockSize;
-        uint32_t hoIdx = hoWoPos / tilling.wo;
-        uint32_t woIdx = hoWoPos % tilling.wo;
-        uint32_t hiIdx = hoIdx * tilling.strideH;
-        uint32_t wiIdx = woIdx * tilling.strideW;
+    for (size_t index = 0; index < tiling.mTileBlock; index++) {
+        uint32_t hoWoPos = (indexM * tiling.mTileBlock + index) * tiling.blockSize;
+        uint32_t hoIdx = hoWoPos / tiling.wo;
+        uint32_t woIdx = hoWoPos % tiling.wo;
+        uint32_t hiIdx = hoIdx * tiling.strideH;
+        uint32_t wiIdx = woIdx * tiling.strideW;
         // we load the whole row in 1 load3d
-        uint32_t c1Idx = cinPos / (tilling.height * tilling.width);
-        uint32_t kHwIdx = cinPos % (tilling.height * tilling.width);
-        uint32_t l0aIdx = index * kBlocks * tilling.blockSize * tilling.c0Size;
+        uint32_t c1Idx = cinPos / (tiling.height * tiling.width);
+        uint32_t kHwIdx = cinPos % (tiling.height * tiling.width);
+        uint32_t l0aIdx = index * kBlocks * tiling.blockSize * tiling.c0Size;
         uint32_t disableC1 = 0;
-        uint32_t c1Offset = c1Idx * tilling.c0Size * tilling.hi * tilling.wi;
+        uint32_t c1Offset = c1Idx * tiling.c0Size * tiling.hi * tiling.wi;
 
         LoadData3DParamsV1<PrimT<T>> params;
 
@@ -109,19 +109,19 @@ __aicore__ inline void LoadL0AForConv2DV1(uint32_t kBlocks, uint32_t indexK, uin
             params.padList[i] = conv2dParams.padList[i];
         }
 
-        params.l1H = tilling.hi;
-        params.l1W = tilling.wi;
+        params.l1H = tiling.hi;
+        params.l1W = tiling.wi;
         params.c1Index = disableC1;
-        params.fetchFilterW = kHwIdx % tilling.width;
-        params.fetchFilterH = kHwIdx / tilling.width;
+        params.fetchFilterW = kHwIdx % tiling.width;
+        params.fetchFilterH = kHwIdx / tiling.width;
         params.leftTopW = wiIdx - params.padList[0];
         params.leftTopH = hiIdx - params.padList[2];
-        params.strideW = tilling.strideW;
-        params.strideH = tilling.strideH;
-        params.filterW = tilling.width;
-        params.filterH = tilling.height;
-        params.dilationFilterW = tilling.dilationW;
-        params.dilationFilterH = tilling.dilationH;
+        params.strideW = tiling.strideW;
+        params.strideH = tiling.strideH;
+        params.filterW = tiling.width;
+        params.filterH = tiling.height;
+        params.dilationFilterW = tiling.dilationW;
+        params.dilationFilterH = tiling.dilationH;
         params.jumpStride = 1;
         params.repeatMode = 0;
         params.repeatTime = kBlocks;
@@ -134,11 +134,11 @@ __aicore__ inline void LoadL0AForConv2DV1(uint32_t kBlocks, uint32_t indexK, uin
 
 template <typename T>
 __aicore__ inline void LoadL0AForConv2DV2(uint32_t kBlocks, uint32_t indexK, uint32_t mBlocks, uint32_t indexM,
-    Conv2dParams& conv2dParams, Conv2dTilling& tilling, const LocalTensor<T>& src0, const LocalTensor<T>& l0a)
+    Conv2dParams& conv2dParams, Conv2dTilling& tiling, const LocalTensor<T>& src0, const LocalTensor<T>& l0a)
 {
     // data l0a size only need hw_actual_size * cin_actual blocks,
     // but for performance of ping pong with tail block, apply m_tile_block * cin_actual blocks
-    uint32_t kStartPt = indexK * kBlocks * tilling.c0Size;
+    uint32_t kStartPt = indexK * kBlocks * tiling.c0Size;
     uint32_t mStartPt = indexM * mBlocks;
     uint32_t channelSize = conv2dParams.cin;
 
@@ -148,19 +148,19 @@ __aicore__ inline void LoadL0AForConv2DV2(uint32_t kBlocks, uint32_t indexK, uin
         params.padList[i] = conv2dParams.padList[i];
     }
 
-    params.l1H = tilling.hi;
-    params.l1W = tilling.wi;
+    params.l1H = tiling.hi;
+    params.l1W = tiling.wi;
     params.channelSize = channelSize;
-    params.kExtension = kBlocks * tilling.c0Size;
+    params.kExtension = kBlocks * tiling.c0Size;
     params.mExtension = mBlocks;
     params.kStartPt = kStartPt;
     params.mStartPt = mStartPt;
-    params.strideW = tilling.strideW;
-    params.strideH = tilling.strideH;
-    params.filterW = tilling.width;
-    params.filterH = tilling.height;
-    params.dilationFilterW = tilling.dilationW;
-    params.dilationFilterH = tilling.dilationH;
+    params.strideW = tiling.strideW;
+    params.strideH = tiling.strideH;
+    params.filterW = tiling.width;
+    params.filterH = tiling.height;
+    params.dilationFilterW = tiling.dilationW;
+    params.dilationFilterH = tiling.dilationH;
     params.enTranspose = false;
     params.enSmallK = false;
     params.padValue = 0;
@@ -173,23 +173,23 @@ __aicore__ inline void LoadL0AForConv2DV2(uint32_t kBlocks, uint32_t indexK, uin
 
 template <typename T>
 __aicore__ inline void LoadL0AForConv2D(uint32_t kBlocks, uint32_t indexK, uint32_t mBlocks, uint32_t indexM,
-    Conv2dParams& conv2dParams, Conv2dTilling& tilling, const LocalTensor<T>& src0, const LocalTensor<T>& l0a)
+    Conv2dParams& conv2dParams, Conv2dTilling& tiling, const LocalTensor<T>& src0, const LocalTensor<T>& l0a)
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 1001) && (__NPU_ARCH__ != 2002)
-    LoadL0AForConv2DV2(kBlocks, indexK, mBlocks, indexM, conv2dParams, tilling, src0, l0a);
+    LoadL0AForConv2DV2(kBlocks, indexK, mBlocks, indexM, conv2dParams, tiling, src0, l0a);
 #else
-    LoadL0AForConv2DV1(kBlocks, indexK, mBlocks, indexM, conv2dParams, tilling, src0, l0a);
+    LoadL0AForConv2DV1(kBlocks, indexK, mBlocks, indexM, conv2dParams, tiling, src0, l0a);
 #endif
 }
 
 template <typename T>
 __aicore__ inline void LoadL0BForConv2D(uint32_t kBlocks, uint32_t nBlocks, uint32_t indexK, uint32_t indexN,
-    Conv2dTilling& tilling, const LocalTensor<T>& src1, const LocalTensor<T>& l0b)
+    Conv2dTilling& tiling, const LocalTensor<T>& src1, const LocalTensor<T>& l0b)
 {
-    if (tilling.nIterNum == 1) {
+    if (tiling.nIterNum == 1) {
         // load one column at once
-        uint32_t wSize = tilling.blockSize * tilling.c0Size;
-        uint32_t wIdx = (indexK * tilling.kTileBlock * tilling.nBlockNum + indexN * tilling.nTileBlock) * wSize;
+        uint32_t wSize = tiling.blockSize * tiling.c0Size;
+        uint32_t wIdx = (indexK * tiling.kTileBlock * tiling.nBlockNum + indexN * tiling.nTileBlock) * wSize;
         LoadData2DParams params;
         params.startIndex = 0;
         params.repeatTimes = kBlocks * nBlocks;
@@ -198,10 +198,10 @@ __aicore__ inline void LoadL0BForConv2D(uint32_t kBlocks, uint32_t nBlocks, uint
     } else {
         // load data row by row
         for (size_t index = 0; index < kBlocks; index++) {
-            uint32_t wSize = indexN * tilling.nTileBlock * tilling.blockSize * tilling.c0Size;
+            uint32_t wSize = indexN * tiling.nTileBlock * tiling.blockSize * tiling.c0Size;
             uint32_t wIdx =
-                (indexK * tilling.kTileBlock + index) * tilling.nBlockNum * tilling.blockSize * tilling.c0Size + wSize;
-            uint32_t l0bIdx = index * nBlocks * tilling.blockSize * tilling.c0Size;
+                (indexK * tiling.kTileBlock + index) * tiling.nBlockNum * tiling.blockSize * tiling.c0Size + wSize;
+            uint32_t l0bIdx = index * nBlocks * tiling.blockSize * tiling.c0Size;
             LoadData2DParams params;
             params.startIndex = 0;
             params.repeatTimes = nBlocks;
@@ -213,12 +213,12 @@ __aicore__ inline void LoadL0BForConv2D(uint32_t kBlocks, uint32_t nBlocks, uint
 
 template <typename T, typename U>
 __aicore__ inline void MmadFuncForConv2D(const LocalTensor<U>& l0a, const LocalTensor<U>& l0b,
-    const LocalTensor<T>& l0c, const LocalTensor<T>& bias, Conv2dParams& conv2dParams, Conv2dTilling tilling,
+    const LocalTensor<T>& l0c, const LocalTensor<T>& bias, Conv2dParams& conv2dParams, Conv2dTilling tiling,
     uint32_t kBlocks, uint32_t mBlocks, uint32_t nBlocks, uint32_t indexK, uint32_t indexM, uint32_t indexN)
 {
     // only care data in K dim
-    uint32_t bSize = tilling.blockSize * tilling.blockSize;
-    uint32_t dstFlattenIdx = (indexN * tilling.mBlockNum * tilling.nTileBlock + indexM * tilling.mTileBlock) * bSize;
+    uint32_t bSize = tiling.blockSize * tiling.blockSize;
+    uint32_t dstFlattenIdx = (indexN * tiling.mBlockNum * tiling.nTileBlock + indexM * tiling.mTileBlock) * bSize;
     uint32_t hwActualSize = mBlocks;
 
     // for m_extension is 1, mmad is GEMV mode, GEMV mode must L0A shape M is 1
@@ -231,8 +231,8 @@ __aicore__ inline void MmadFuncForConv2D(const LocalTensor<U>& l0a, const LocalT
     MmadParams mmadParams;
 
     mmadParams.m = hwActualSize;
-    mmadParams.k = kBlocks * tilling.c0Size;
-    mmadParams.n = nBlocks * tilling.blockSize;
+    mmadParams.k = kBlocks * tiling.c0Size;
+    mmadParams.n = nBlocks * tiling.blockSize;
     mmadParams.isBias = 1;
 
     if ((indexK == 0) && (conv2dParams.initY == 0)) {
@@ -258,31 +258,31 @@ __aicore__ inline void MmadFuncForConv2D(const LocalTensor<U>& l0a, const LocalT
 template <typename T, typename U>
 __aicore__ inline void Conv2DExecNmNopingpong(const LocalTensor<T>& l0c, const LocalTensor<T>& bias,
     const LocalTensor<U>& src0, const LocalTensor<U>& src1, Conv2dParams& conv2dParams,
-    Conv2dTilling& tilling)
+    Conv2dTilling& tiling)
 {
     LocalTensor<U> l0b;
     LocalTensor<U> l0a;
     GetSingleThreadBuffer(l0a, l0b);
     event_t eventIdMToMte1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::M_MTE1));
     SetFlag<HardEvent::M_MTE1>(eventIdMToMte1);
-    for (size_t indexK = 0; indexK < tilling.kIterNum; indexK++) {
-        uint32_t kBlocks = tilling.kTileBlock;
-        if (indexK == tilling.kIterNum - 1) {
-            kBlocks = tilling.kTailBlock;
+    for (size_t indexK = 0; indexK < tiling.kIterNum; indexK++) {
+        uint32_t kBlocks = tiling.kTileBlock;
+        if (indexK == tiling.kIterNum - 1) {
+            kBlocks = tiling.kTailBlock;
         }
         WaitFlag<HardEvent::M_MTE1>(eventIdMToMte1);
-        for (size_t indexN = 0; indexN < tilling.nIterNum; indexN++) {
+        for (size_t indexN = 0; indexN < tiling.nIterNum; indexN++) {
             // load data from l1 to l0b
-            LoadL0BForConv2D(kBlocks, tilling.nTileBlock, indexK, indexN, tilling, src1, l0b);
-            for (size_t indexM = 0; indexM < tilling.mIterNum; indexM++) {
+            LoadL0BForConv2D(kBlocks, tiling.nTileBlock, indexK, indexN, tiling, src1, l0b);
+            for (size_t indexM = 0; indexM < tiling.mIterNum; indexM++) {
                 // load data from l1 to l0a
-                LoadL0AForConv2D(kBlocks, indexK, tilling.mTileNums, indexM, conv2dParams, tilling, src0, l0a);
+                LoadL0AForConv2D(kBlocks, indexK, tiling.mTileNums, indexM, conv2dParams, tiling, src0, l0a);
                 event_t eventIdMte1ToM = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE1_M));
                 SetFlag<HardEvent::MTE1_M>(eventIdMte1ToM);
                 WaitFlag<HardEvent::MTE1_M>(eventIdMte1ToM);
                 PipeBarrier<PIPE_M>();
-                MmadFuncForConv2D(l0a, l0b, l0c, bias, conv2dParams, tilling, kBlocks, tilling.mTileNums,
-                    tilling.nTileBlock, indexK, indexM, indexN);
+                MmadFuncForConv2D(l0a, l0b, l0c, bias, conv2dParams, tiling, kBlocks, tiling.mTileNums,
+                    tiling.nTileBlock, indexK, indexM, indexN);
             }
         }
         SetFlag<HardEvent::M_MTE1>(eventIdMToMte1);
@@ -309,7 +309,7 @@ __aicore__ inline void PingPongReleaseEvent(event_t eventId0, event_t eventId1)
 template <typename T, typename U>
 __aicore__ inline void Conv2DExecNmPingPong(const LocalTensor<T>& l0c, const LocalTensor<T>& bias,
     const LocalTensor<U>& src0, const LocalTensor<U>& src1, Conv2dParams& conv2dParams,
-    Conv2dTilling& tilling)
+    Conv2dTilling& tiling)
 {
     uint32_t ping = 1;
     LocalTensor<U> l0aPing;
@@ -324,38 +324,38 @@ __aicore__ inline void Conv2DExecNmPingPong(const LocalTensor<T>& l0c, const Loc
     SetFlag<HardEvent::M_MTE1>(eventId0);
     SetFlag<HardEvent::M_MTE1>(eventId1);
 
-    for (size_t indexK = 0; indexK < tilling.kIterNum; indexK++) {
-        uint32_t kBlocks = tilling.kTileBlock;
-        if (indexK == tilling.kIterNum - 1) {
-            kBlocks = tilling.kTailBlock;
+    for (size_t indexK = 0; indexK < tiling.kIterNum; indexK++) {
+        uint32_t kBlocks = tiling.kTileBlock;
+        if (indexK == tiling.kIterNum - 1) {
+            kBlocks = tiling.kTailBlock;
         }
         if (ping == 1) {
             WaitFlag<HardEvent::M_MTE1>(eventId0);
-            for (size_t indexN = 0; indexN < tilling.nIterNum; indexN++) {
+            for (size_t indexN = 0; indexN < tiling.nIterNum; indexN++) {
                 // load data from l1 to l0b
-                LoadL0BForConv2D(kBlocks, tilling.nTileBlock, indexK, indexN, tilling, src1, l0bPing);
-                for (size_t indexM = 0; indexM < tilling.mIterNum; indexM++) {
+                LoadL0BForConv2D(kBlocks, tiling.nTileBlock, indexK, indexN, tiling, src1, l0bPing);
+                for (size_t indexM = 0; indexM < tiling.mIterNum; indexM++) {
                     // load data from l1 to l0a
-                    LoadL0AForConv2D(kBlocks, indexK, tilling.mTileNums, indexM, conv2dParams, tilling, src0,
+                    LoadL0AForConv2D(kBlocks, indexK, tiling.mTileNums, indexM, conv2dParams, tiling, src0,
                         l0aPing);
                     SetWaitFlagMte1ToM();
-                    MmadFuncForConv2D(l0aPing, l0bPing, l0c, bias, conv2dParams, tilling, kBlocks, tilling.mTileNums,
-                        tilling.nTileBlock, indexK, indexM, indexN);
+                    MmadFuncForConv2D(l0aPing, l0bPing, l0c, bias, conv2dParams, tiling, kBlocks, tiling.mTileNums,
+                        tiling.nTileBlock, indexK, indexM, indexN);
                 }
             }
             SetFlag<HardEvent::M_MTE1>(eventId0);
         } else {
             WaitFlag<HardEvent::M_MTE1>(eventId1);
-            for (size_t indexN = 0; indexN < tilling.nIterNum; indexN++) {
+            for (size_t indexN = 0; indexN < tiling.nIterNum; indexN++) {
                 // load data from l1 to l0b
-                LoadL0BForConv2D(kBlocks, tilling.nTileBlock, indexK, indexN, tilling, src1, l0bPong);
-                for (size_t indexM = 0; indexM < tilling.mIterNum; indexM++) {
+                LoadL0BForConv2D(kBlocks, tiling.nTileBlock, indexK, indexN, tiling, src1, l0bPong);
+                for (size_t indexM = 0; indexM < tiling.mIterNum; indexM++) {
                     // load data from l1 to l0a
-                    LoadL0AForConv2D(kBlocks, indexK, tilling.mTileNums, indexM, conv2dParams, tilling, src0,
+                    LoadL0AForConv2D(kBlocks, indexK, tiling.mTileNums, indexM, conv2dParams, tiling, src0,
                         l0aPong);
                     SetWaitFlagMte1ToM();
-                    MmadFuncForConv2D(l0aPong, l0bPong, l0c, bias, conv2dParams, tilling, kBlocks, tilling.mTileNums,
-                        tilling.nTileBlock, indexK, indexM, indexN);
+                    MmadFuncForConv2D(l0aPong, l0bPong, l0c, bias, conv2dParams, tiling, kBlocks, tiling.mTileNums,
+                        tiling.nTileBlock, indexK, indexM, indexN);
                 }
             }
             SetFlag<HardEvent::M_MTE1>(eventId1);
@@ -369,45 +369,45 @@ __aicore__ inline void Conv2DExecNmPingPong(const LocalTensor<T>& l0c, const Loc
 template <typename T, typename U>
 __aicore__ inline void Conv2DExecNm(const LocalTensor<T>& l0c, const LocalTensor<T>& bias,
     const LocalTensor<U>& src0, const LocalTensor<U>& src1, Conv2dParams& conv2dParams,
-    Conv2dTilling& tilling)
+    Conv2dTilling& tiling)
 {
-    uint32_t needL0Asize = tilling.roundM * tilling.dTypeSize * tilling.c0Size * tilling.kTileBlock * 2;
-    uint32_t needL0Bsize = tilling.roundN * tilling.dTypeSize * tilling.c0Size * tilling.kTileBlock * 2;
+    uint32_t needL0Asize = tiling.roundM * tiling.dTypeSize * tiling.c0Size * tiling.kTileBlock * 2;
+    uint32_t needL0Bsize = tiling.roundN * tiling.dTypeSize * tiling.c0Size * tiling.kTileBlock * 2;
     if (needL0Asize > TOTAL_L0A_SIZE || needL0Bsize > TOTAL_L0B_SIZE) {
-        Conv2DExecNmNopingpong(l0c, bias, src0, src1, conv2dParams, tilling);
+        Conv2DExecNmNopingpong(l0c, bias, src0, src1, conv2dParams, tiling);
         return;
     }
-    Conv2DExecNmPingPong(l0c, bias, src0, src1, conv2dParams, tilling);
+    Conv2DExecNmPingPong(l0c, bias, src0, src1, conv2dParams, tiling);
 }
 
 template <typename T, typename U>
 __aicore__ inline void Conv2DExecMnNopingpong(const LocalTensor<T>& l0c, const LocalTensor<T>& bias,
     const LocalTensor<U>& src0, const LocalTensor<U>& src1, Conv2dParams& conv2dParams,
-    Conv2dTilling& tilling)
+    Conv2dTilling& tiling)
 {
     LocalTensor<U> l0a;
     LocalTensor<U> l0b;
     GetSingleThreadBuffer(l0a, l0b);
     event_t eventIdMToMte1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::M_MTE1));
     SetFlag<HardEvent::M_MTE1>(eventIdMToMte1);
-    for (size_t indexK = 0; indexK < tilling.kIterNum; indexK++) {
-        uint32_t kBlocks = tilling.kTileBlock;
-        if (indexK == tilling.kIterNum - 1) {
-            kBlocks = tilling.kTailBlock;
+    for (size_t indexK = 0; indexK < tiling.kIterNum; indexK++) {
+        uint32_t kBlocks = tiling.kTileBlock;
+        if (indexK == tiling.kIterNum - 1) {
+            kBlocks = tiling.kTailBlock;
         }
         WaitFlag<HardEvent::M_MTE1>(eventIdMToMte1);
-        for (size_t indexM = 0; indexM < tilling.mIterNum; indexM++) {
+        for (size_t indexM = 0; indexM < tiling.mIterNum; indexM++) {
             // load data from l1 to l0a
-            LoadL0AForConv2D(kBlocks, indexK, tilling.mTileNums, indexM, conv2dParams, tilling, src0, l0a);
-            for (size_t indexN = 0; indexN < tilling.nIterNum; indexN++) {
+            LoadL0AForConv2D(kBlocks, indexK, tiling.mTileNums, indexM, conv2dParams, tiling, src0, l0a);
+            for (size_t indexN = 0; indexN < tiling.nIterNum; indexN++) {
                 // load data from l1 to l0b
-                LoadL0BForConv2D(kBlocks, tilling.nTileBlock, indexK, indexN, tilling, src1, l0b);
+                LoadL0BForConv2D(kBlocks, tiling.nTileBlock, indexK, indexN, tiling, src1, l0b);
                 event_t eventIdMte1ToM = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE1_M));
                 SetFlag<HardEvent::MTE1_M>(eventIdMte1ToM);
                 WaitFlag<HardEvent::MTE1_M>(eventIdMte1ToM);
                 PipeBarrier<PIPE_M>();
-                MmadFuncForConv2D(l0a, l0b, l0c, bias, conv2dParams, tilling, kBlocks, tilling.mTileNums,
-                    tilling.nTileBlock, indexK, indexM, indexN);
+                MmadFuncForConv2D(l0a, l0b, l0c, bias, conv2dParams, tiling, kBlocks, tiling.mTileNums,
+                    tiling.nTileBlock, indexK, indexM, indexN);
             }
         }
         SetFlag<HardEvent::M_MTE1>(eventIdMToMte1);
@@ -418,7 +418,7 @@ __aicore__ inline void Conv2DExecMnNopingpong(const LocalTensor<T>& l0c, const L
 template <typename T, typename U>
 __aicore__ inline void Conv2DExecMnPingPong(const LocalTensor<T>& l0c, const LocalTensor<T>& bias,
     const LocalTensor<U>& src0, const LocalTensor<U>& src1, Conv2dParams& conv2dParams,
-    Conv2dTilling& tilling)
+    Conv2dTilling& tiling)
 {
     uint32_t ping = 1;
     LocalTensor<U> l0aPing;
@@ -432,36 +432,36 @@ __aicore__ inline void Conv2DExecMnPingPong(const LocalTensor<T>& l0c, const Loc
     SetFlag<HardEvent::M_MTE1>(eventId0);
     SetFlag<HardEvent::M_MTE1>(eventId1);
 
-    for (size_t indexK = 0; indexK < tilling.kIterNum; indexK++) {
-        uint32_t kBlocks = tilling.kTileBlock;
-        if (indexK == tilling.kIterNum - 1) {
-            kBlocks = tilling.kTailBlock;
+    for (size_t indexK = 0; indexK < tiling.kIterNum; indexK++) {
+        uint32_t kBlocks = tiling.kTileBlock;
+        if (indexK == tiling.kIterNum - 1) {
+            kBlocks = tiling.kTailBlock;
         }
         if (ping == 1) {
             WaitFlag<HardEvent::M_MTE1>(eventId0);
-            for (size_t indexM = 0; indexM < tilling.mIterNum; indexM++) {
+            for (size_t indexM = 0; indexM < tiling.mIterNum; indexM++) {
                 // load data from l1 to l0a
-                LoadL0AForConv2D(kBlocks, indexK, tilling.mTileNums, indexM, conv2dParams, tilling, src0, l0aPing);
-                for (size_t indexN = 0; indexN < tilling.nIterNum; indexN++) {
+                LoadL0AForConv2D(kBlocks, indexK, tiling.mTileNums, indexM, conv2dParams, tiling, src0, l0aPing);
+                for (size_t indexN = 0; indexN < tiling.nIterNum; indexN++) {
                     // load data from l1 to l0b
-                    LoadL0BForConv2D(kBlocks, tilling.nTileBlock, indexK, indexN, tilling, src1, l0bPing);
+                    LoadL0BForConv2D(kBlocks, tiling.nTileBlock, indexK, indexN, tiling, src1, l0bPing);
                     SetWaitFlagMte1ToM();
-                    MmadFuncForConv2D(l0aPing, l0bPing, l0c, bias, conv2dParams, tilling, kBlocks, tilling.mTileNums,
-                        tilling.nTileBlock, indexK, indexM, indexN);
+                    MmadFuncForConv2D(l0aPing, l0bPing, l0c, bias, conv2dParams, tiling, kBlocks, tiling.mTileNums,
+                        tiling.nTileBlock, indexK, indexM, indexN);
                 }
             }
             SetFlag<HardEvent::M_MTE1>(eventId0);
         } else {
             WaitFlag<HardEvent::M_MTE1>(eventId1);
-            for (size_t indexM = 0; indexM < tilling.mIterNum; indexM++) {
+            for (size_t indexM = 0; indexM < tiling.mIterNum; indexM++) {
                 // load data from l1 to l0a
-                LoadL0AForConv2D(kBlocks, indexK, tilling.mTileNums, indexM, conv2dParams, tilling, src0, l0aPong);
-                for (size_t indexN = 0; indexN < tilling.nIterNum; indexN++) {
+                LoadL0AForConv2D(kBlocks, indexK, tiling.mTileNums, indexM, conv2dParams, tiling, src0, l0aPong);
+                for (size_t indexN = 0; indexN < tiling.nIterNum; indexN++) {
                     // load data from l1 to l0b
-                    LoadL0BForConv2D(kBlocks, tilling.nTileBlock, indexK, indexN, tilling, src1, l0bPong);
+                    LoadL0BForConv2D(kBlocks, tiling.nTileBlock, indexK, indexN, tiling, src1, l0bPong);
                     SetWaitFlagMte1ToM();
-                    MmadFuncForConv2D(l0aPong, l0bPong, l0c, bias, conv2dParams, tilling, kBlocks, tilling.mTileNums,
-                        tilling.nTileBlock, indexK, indexM, indexN);
+                    MmadFuncForConv2D(l0aPong, l0bPong, l0c, bias, conv2dParams, tiling, kBlocks, tiling.mTileNums,
+                        tiling.nTileBlock, indexK, indexM, indexN);
                 }
             }
             SetFlag<HardEvent::M_MTE1>(eventId1);
@@ -475,15 +475,15 @@ __aicore__ inline void Conv2DExecMnPingPong(const LocalTensor<T>& l0c, const Loc
 template <typename T, typename U>
 __aicore__ inline void Conv2DExecMn(const LocalTensor<T>& l0c, const LocalTensor<T>& bias,
     const LocalTensor<U>& src0, const LocalTensor<U>& src1, Conv2dParams& conv2dParams,
-    Conv2dTilling& tilling)
+    Conv2dTilling& tiling)
 {
-    uint32_t needL0Bsize = tilling.roundN * tilling.dTypeSize * tilling.c0Size * tilling.kTileBlock * 2;
-    uint32_t needL0Asize = tilling.roundM * tilling.dTypeSize * tilling.c0Size * tilling.kTileBlock * 2;
+    uint32_t needL0Bsize = tiling.roundN * tiling.dTypeSize * tiling.c0Size * tiling.kTileBlock * 2;
+    uint32_t needL0Asize = tiling.roundM * tiling.dTypeSize * tiling.c0Size * tiling.kTileBlock * 2;
     if (needL0Asize > TOTAL_L0A_SIZE || needL0Bsize > TOTAL_L0B_SIZE) {
-        Conv2DExecMnNopingpong(l0c, bias, src0, src1, conv2dParams, tilling);
+        Conv2DExecMnNopingpong(l0c, bias, src0, src1, conv2dParams, tiling);
         return;
     }
-    Conv2DExecMnPingPong(l0c, bias, src0, src1, conv2dParams, tilling);
+    Conv2DExecMnPingPong(l0c, bias, src0, src1, conv2dParams, tiling);
 }
 
 } // namespace AscendC

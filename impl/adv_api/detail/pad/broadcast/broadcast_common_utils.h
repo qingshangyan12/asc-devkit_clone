@@ -117,11 +117,11 @@ __aicore__ inline void DstShapeCheck(const uint32_t* dstShape, uint32_t dim)
     }
 }
 
-__aicore__ inline void ShapeCheck(uint32_t* tillingShape, const uint32_t* shape, uint32_t rank)
+__aicore__ inline void ShapeCheck(uint32_t* tilingShape, const uint32_t* shape, uint32_t rank)
 {
     for (uint16_t i = 0; i < rank; ++i) {
         ASCENDC_ASSERT(
-            (shape[i] == tillingShape[i]), { KERNEL_LOG(KERNEL_ERROR, "Tilling shape should be equal to shape!"); });
+            (shape[i] == tilingShape[i]), { KERNEL_LOG(KERNEL_ERROR, "Tilling shape should be equal to shape!"); });
     }
 }
 } // namespace BroadcastInternal
