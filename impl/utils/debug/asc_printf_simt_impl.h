@@ -135,11 +135,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void enable_printf()
 }
 
 template <uint32_t count = 1>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void nop()
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_nop()
 {
-    #pragma unroll
     for (uint32_t i = 0; i < count; ++i) {
-        asm volatile("NOP wait:0b0000000 stall:15"::);  // skip 15 cycle
+        __nop();
     }
 }
 
@@ -217,7 +216,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void ring_buffer_wait(__simt_gm__ RingBufR
     volatile uint64_t tmp = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>(&read_info->bufOffset);
     while (end_offset >= tmp) {
         tmp = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>(&read_info->bufOffset);
-        nop<nop_count>();
+        __internal_nop<nop_count>();
     }
 #else
     while (end_offset > *reinterpret_cast<volatile uint64_t*>(&read_info->bufOffset)) {}

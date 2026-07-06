@@ -1817,6 +1817,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_dcci_single(void* dst) {
 #endif
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_nop()
+{
+    __nop();
+}
+
 #endif
 #endif  // IMPL_SIMT_API_DEVICE_FUNCTIONS_IMPL_H
 
