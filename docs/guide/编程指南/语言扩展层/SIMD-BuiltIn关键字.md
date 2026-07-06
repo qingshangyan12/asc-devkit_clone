@@ -218,7 +218,6 @@
     ```
     // Declare a AI CPU kernel function in .asc file
     extern __global__ __aicpu__ uint32_t hello_world(void *args);// OK
-    }
     ```
 
 -   **\_\_inline\_\_**
@@ -315,7 +314,7 @@
                 AscendC::Reg::LoadAlign(srcReg, input + i * oneRepeatSize);
                 AscendC::Reg::Adds(dstReg, srcReg, 1.0f, maskReg);
                 // store data from RegTensor to UB.
-                AscendC::Reg::StoreAlign(output + i * one_repeat_size, dstReg, maskReg);
+                AscendC::Reg::StoreAlign(output + i * oneRepeatSize, dstReg, maskReg);
             }
         }
         ```
