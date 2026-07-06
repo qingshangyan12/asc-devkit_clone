@@ -94,22 +94,22 @@ __aicore__ inline void asc_set_fp32_mode();
  * @param [in] k Columns of matrix A / Rows of matrix B
  * @param [in] unit_flag Unit flag for operation control
  * @param [in] enable_k_direction_align Whether to enable K direction alignment
- * @param [in] enable_cube_init Whether to initialize cube
- * @param [in] enable_cube_zero_init Whether to initialize cube to zero
+ * @param [in] init_with_btbufWhether to initialize cube
+ * @param [in] init_with_zero Whether to initialize cube to zero
  * @details Performs C = A * B matrix multiplication with bfloat16 inputs and float output.
  *          This is a hardware-level interface that requires manual synchronization.
  */
 __aicore__ inline void asc_mmad(__cc__ float* c, __ca__ bfloat16_t* a, __cb__ bfloat16_t* b, uint16_t m,
-    uint16_t n, uint16_t k, uint8_t unit_flag, bool enable_k_direction_align, bool enable_cube_init, bool enable_cube_zero_init);
+    uint16_t n, uint16_t k, uint8_t unit_flag, bool enable_k_direction_align, bool enable_cube_init, bool init_with_zero);
 
 __aicore__ inline void asc_mmad(__cc__ float* c, __ca__ half* a, __cb__ half* b, uint16_t m,
-     uint16_t n, uint16_t k, uint8_t unit_flag, bool enable_k_direction_align, bool enable_cube_init, bool enable_cube_zero_init);
+     uint16_t n, uint16_t k, uint8_t unit_flag, bool enable_k_direction_align, bool enable_cube_init, bool init_with_zero);
 
 __aicore__ inline void asc_mmad(__cc__ float* c, __ca__ float* a, __cb__ float* b, uint16_t m,
-     uint16_t n, uint16_t k, uint8_t unit_flag, bool enable_k_direction_align, bool enable_cube_init, bool enable_cube_zero_init);
+     uint16_t n, uint16_t k, uint8_t unit_flag, bool enable_k_direction_align, bool enable_cube_init, bool init_with_zero);
 
 __aicore__ inline void asc_mmad(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m,
-     uint16_t n, uint16_t k, uint8_t unit_flag, bool enable_k_direction_align, bool enable_cube_init, bool enable_cube_zero_init);
+     uint16_t n, uint16_t k, uint8_t unit_flag, bool enable_k_direction_align, bool enable_cube_init, bool init_with_zero);
 
 /*
  * @ingroup CubeCompute
@@ -125,29 +125,29 @@ __aicore__ inline void asc_mmad(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8
  * @param [in] unit_flag Unit flag for operation control
  * @param [in] enable_k_direction_align Whether to enable K direction alignment
  * @param [in] enable_weight_offset Whether weight offset is enabled
- * @param [in] enable_cube_init Whether to initialize cube
- * @param [in] enable_cube_zero_init Whether to initialize cube to zero
+ * @param [in] init_with_btbufWhether to initialize cube
+ * @param [in] init_with_zero Whether to initialize cube to zero
  * @details Performs C = A * B matrix multiplication with bfloat16 inputs and float output,
  *          supporting offset parameters. This is a hardware-level interface.
  */
 __aicore__ inline void asc_mmad(__cc__ float* c, __ca__ bfloat16_t* a, __cb__ bfloat16_t* b,
     uint16_t m,  uint16_t n, uint16_t k, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag,
-    bool enable_k_direction_align, bool enable_weight_offset, bool enable_cube_init, bool enable_cube_zero_init);
+    bool enable_k_direction_align, bool enable_weight_offset, bool enable_cube_init, bool init_with_zero);
 
 
 __aicore__ inline void asc_mmad(__cc__ float* c, __ca__ half* a, __cb__ half* b, uint16_t m,
      uint16_t n, uint16_t k, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool enable_k_direction_align,
-    bool enable_weight_offset, bool enable_cube_init, bool enable_cube_zero_init);
+    bool enable_weight_offset, bool enable_cube_init, bool init_with_zero);
 
 
 __aicore__ inline void asc_mmad(__cc__ float* c, __ca__ float* a, __cb__ float* b, uint16_t m,
      uint16_t n, uint16_t k, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool enable_k_direction_align,
-    bool enable_weight_offset, bool enable_cube_init, bool enable_cube_zero_init);
+    bool enable_weight_offset, bool enable_cube_init, bool init_with_zero);
 
 
 __aicore__ inline void asc_mmad(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m,
      uint16_t n, uint16_t k, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool enable_k_direction_align,
-    bool enable_weight_offset, bool enable_cube_init, bool enable_cube_zero_init);
+    bool enable_weight_offset, bool enable_cube_init, bool init_with_zero);
 
 /*
  * @ingroup CubeCompute
@@ -160,17 +160,17 @@ __aicore__ inline void asc_mmad(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8
  * @param [in] k Columns of matrix A / Rows of matrix B
  * @param [in] unit_flag Unit flag for operation control
  * @param [in] enable_k_direction_align Whether to enable K direction alignment
- * @param [in] enable_cube_init Whether to initialize cube
- * @param [in] enable_cube_zero_init Whether to initialize cube to zero
+ * @param [in] init_with_btbufWhether to initialize cube
+ * @param [in] init_with_zero Whether to initialize cube to zero
  * @details Performs C = A * B matrix multiplication with int4 inputs and int32 output.
  *          This is a hardware-level interface that requires manual synchronization.
  */
 __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c, __ca__ int4b_t* a, __cb__ int4b_t* b, uint16_t m,
-     uint16_t n, uint16_t k, uint8_t unit_flag, bool enable_k_direction_align, bool enable_cube_init, bool enable_cube_zero_init);
+     uint16_t n, uint16_t k, uint8_t unit_flag, bool enable_k_direction_align, bool enable_cube_init, bool init_with_zero);
 
 __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c, __ca__ int4b_t* a, __cb__ int4b_t* b, uint16_t m,
      uint16_t n, uint16_t k, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool enable_k_direction_align, bool enable_weight_offset,
-    bool enable_cube_init, bool enable_cube_zero_init);
+    bool enable_cube_init, bool init_with_zero);
 
 /*
  * @ingroup CubeCompute
@@ -182,17 +182,17 @@ __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c, __ca__ int4b_t* a, __cb__ 
  * @param [in] k Columns of matrix A / Rows of matrix B
  * @param [in] n Columns of matrix B
  * @param [in] unit_flag Unit flag for operation control
- * @param [in] enable_cube_init Whether to initialize cube
- * @param [in] enable_cube_zero_init Whether to initialize cube to zero
+ * @param [in] init_with_btbufWhether to initialize cube
+ * @param [in] init_with_zero Whether to initialize cube to zero
  * @details Performs sparse C = A * B matrix multiplication with int8 inputs and int32 output.
  *          This is a hardware-level interface that requires manual synchronization.
  */
 __aicore__ inline void asc_mmad_sparse(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m, uint16_t k,
-                                       uint16_t n, uint8_t unit_flag, bool enable_cube_init, bool enable_cube_zero_init);
+                                       uint16_t n, uint8_t unit_flag, bool enable_cube_init, bool init_with_zero);
 
 __aicore__ inline void asc_mmad_sparse_sync(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m,
                                             uint16_t k, uint16_t n, uint8_t unit_flag, bool enable_cube_init,
-                                            bool enable_cube_zero_init);
+                                            bool init_with_zero);
 
 /*
  * @ingroup CubeDataMove
@@ -240,26 +240,26 @@ __aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_str
  * @param [in] k Columns of matrix A / Rows of matrix B
  * @param [in] unit_flag Unit flag for operation control
  * @param [in] disable_gemv Whether to disable GEMV optimization
- * @param [in] enable_cube_init Whether to initialize cube
- * @param [in] enable_cube_zero_init Whether to initialize cube to zero
+ * @param [in] init_with_btbufWhether to initialize cube
+ * @param [in] init_with_zero Whether to initialize cube to zero
  * @details Performs C = A * B matrix multiplication with MX format (e1m2) inputs and float output.
  *          This is a hardware-level interface that requires manual synchronization.
  */
 __aicore__ inline void asc_mmad_mx(__cc__ float* c, __ca__ fp4x2_e1m2_t* a,
     __cb__ fp4x2_e1m2_t* b, uint16_t m, uint16_t n, uint16_t k,
-    uint8_t unit_flag, bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
+    uint8_t unit_flag, bool disable_gemv, bool enable_cube_init, bool init_with_zero);
 
 __aicore__ inline void asc_mmad_mx(__cc__ float* c, __ca__ fp4x2_e1m2_t* a,
     __cb__ fp4x2_e2m1_t* b, uint16_t m, uint16_t n, uint16_t k,
-    uint8_t unit_flag, bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
+    uint8_t unit_flag, bool disable_gemv, bool enable_cube_init, bool init_with_zero);
 
 __aicore__ inline void asc_mmad_mx(__cc__ float* c, __ca__ fp4x2_e2m1_t* a,
     __cb__ fp4x2_e1m2_t* b, uint16_t m, uint16_t n, uint16_t k,
-    uint8_t unit_flag, bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
+    uint8_t unit_flag, bool disable_gemv, bool enable_cube_init, bool init_with_zero);
 
 __aicore__ inline void asc_mmad_mx(__cc__ float* c, __ca__ fp4x2_e2m1_t* a,
     __cb__ fp4x2_e2m1_t* b, uint16_t m, uint16_t n, uint16_t k,
-    uint8_t unit_flag, bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
+    uint8_t unit_flag, bool disable_gemv, bool enable_cube_init, bool init_with_zero);
 
 /*
  * @ingroup CubeCompute
@@ -272,26 +272,26 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c, __ca__ fp4x2_e2m1_t* a,
  * @param [in] k Columns of matrix A / Rows of matrix B
  * @param [in] unit_flag Unit flag for operation control
  * @param [in] disable_gemv Whether to disable GEMV optimization
- * @param [in] enable_cube_init Whether to initialize cube
- * @param [in] enable_cube_zero_init Whether to initialize cube to zero
+ * @param [in] init_with_btbufWhether to initialize cube
+ * @param [in] init_with_zero Whether to initialize cube to zero
  * @details Performs C = A * B matrix multiplication with FP8 format inputs and float output.
  *          This is a hardware-level interface that requires manual synchronization.
  */
 __aicore__ inline void asc_mmad_mx(__cc__ float* c, __ca__ fp8_e4m3fn_t* a,
     __cb__ fp8_e4m3fn_t* b, uint16_t m, uint16_t n, uint16_t k,
-    uint8_t unit_flag, bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
+    uint8_t unit_flag, bool disable_gemv, bool enable_cube_init, bool init_with_zero);
 
 __aicore__ inline void asc_mmad_mx(__cc__ float* c, __ca__ fp8_e4m3fn_t* a,
     __cb__ fp8_e5m2_t* b, uint16_t m, uint16_t n, uint16_t k,
-    uint8_t unit_flag, bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
+    uint8_t unit_flag, bool disable_gemv, bool enable_cube_init, bool init_with_zero);
 
 __aicore__ inline void asc_mmad_mx(__cc__ float* c, __ca__ fp8_e5m2_t* a,
     __cb__ fp8_e4m3fn_t* b, uint16_t m, uint16_t n, uint16_t k,
-    uint8_t unit_flag, bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
+    uint8_t unit_flag, bool disable_gemv, bool enable_cube_init, bool init_with_zero);
 
 __aicore__ inline void asc_mmad_mx(__cc__ float* c, __ca__ fp8_e5m2_t* a,
     __cb__ fp8_e5m2_t* b, uint16_t m, uint16_t n, uint16_t k,
-    uint8_t unit_flag, bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
+    uint8_t unit_flag, bool disable_gemv, bool enable_cube_init, bool init_with_zero);
 
 /*
  * @ingroup CubeCompute
@@ -304,46 +304,46 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c, __ca__ fp8_e5m2_t* a,
  * @param [in] k Columns of matrix A / Rows of matrix B
  * @param [in] unit_flag Unit flag for operation control
  * @param [in] disable_gemv Whether to disable GEMV optimization
- * @param [in] enable_cube_init Whether to initialize cube
- * @param [in] enable_cube_zero_init Whether to initialize cube to zero
+ * @param [in] init_with_btbufWhether to initialize cube
+ * @param [in] init_with_zero Whether to initialize cube to zero
  * @details Performs C = A * B matrix multiplication with bfloat16 inputs and float output.
  *          This is a hardware-level interface that requires manual synchronization.
  */
 __aicore__ inline void asc_mmad(__cc__ float* c, __ca__ bfloat16_t* a, __cb__ bfloat16_t* b,
                                 uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
-                                bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
+                                bool disable_gemv, bool enable_cube_init, bool init_with_zero);
 
 __aicore__ inline void asc_mmad(__cc__ float* c, __ca__ fp8_e4m3fn_t* a, __cb__ fp8_e4m3fn_t* b,
                                 uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
-                                bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
+                                bool disable_gemv, bool enable_cube_init, bool init_with_zero);
 
 __aicore__ inline void asc_mmad(__cc__ float* c, __ca__ fp8_e4m3fn_t* a, __cb__ fp8_e5m2_t* b,
                                 uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
-                                bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
+                                bool disable_gemv, bool enable_cube_init, bool init_with_zero);
 
 __aicore__ inline void asc_mmad(__cc__ float* c, __ca__ fp8_e5m2_t* a, __cb__ fp8_e4m3fn_t* b,
                                 uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
-                                bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
+                                bool disable_gemv, bool enable_cube_init, bool init_with_zero);
 
 __aicore__ inline void asc_mmad(__cc__ float* c, __ca__ fp8_e5m2_t* a, __cb__ fp8_e5m2_t* b,
                                 uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
-                                bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
+                                bool disable_gemv, bool enable_cube_init, bool init_with_zero);
 
 __aicore__ inline void asc_mmad(__cc__ float* c, __ca__ half* a, __cb__ half* b,
                                 uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
-                                bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
+                                bool disable_gemv, bool enable_cube_init, bool init_with_zero);
 
 __aicore__ inline void asc_mmad(__cc__ float* c, __ca__ float* a, __cb__ float* b,
                                 uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
-                                bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
+                                bool disable_gemv, bool enable_cube_init, bool init_with_zero);
 
 __aicore__ inline void asc_mmad(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b,
                                 uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
-                                bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
+                                bool disable_gemv, bool enable_cube_init, bool init_with_zero);
 
 __aicore__ inline void asc_mmad(__cc__ float* c, __ca__ hifloat8_t* a, __cb__ hifloat8_t* b,
                                 uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
-                                bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
+                                bool disable_gemv, bool enable_cube_init, bool init_with_zero);
 
 /*
  * @ingroup CubeCompute
