@@ -1087,7 +1087,7 @@
                 -   [asc_bfloat162int32](SIMD-API/C-API/reg/reg_vector/asc_bfloat162int32.md)
                 -   [asc_clear_ar_spr](SIMD-API/C-API/reg/reg_vector/asc_clear_ar_spr.md)
                 -   [asc_copy](SIMD-API/C-API/reg/reg_vector/asc_copy.md)
-                -   [asc_create_iter_reg](SIMD-API/C-API/reg/reg_vector/asc_create_iter_reg.md)
+                -   [asc_create_addr_reg](SIMD-API/C-API/reg/reg_vector/asc_create_addr_reg.md)
                 -   [asc_create_mask](SIMD-API/C-API/reg/reg_vector/asc_create_mask.md)
                 -   [asc_cumulative_histogram](SIMD-API/C-API/reg/reg_vector/asc_cumulative_histogram.md)
                 -   [asc_deintlv](SIMD-API/C-API/reg/reg_vector/asc_deintlv.md)
