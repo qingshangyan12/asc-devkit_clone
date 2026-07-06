@@ -90,5 +90,5 @@
 | [asc\_prof\_start](调测接口/asc_prof_start.md) | 设置性能数据采集信号启动，和asc\_prof\_stop配合使用，用于指定需要调优的代码段范围。 |
 | [asc\_prof\_stop](调测接口/asc_prof_stop.md) | 设置性能数据采集信号停止，和asc\_prof\_start配合使用，用于指定需要调优的代码段范围。 |
 | [asc\_mark\_stamp](调测接口/asc_mark_stamp.md) | 在算子执行过程中标记特定位置，便于后期通过流水图分析代码执行路径与性能热点。 |
-| [TRACE\_START](调测接口/TRACE_START.md) | 通过CAModel进行算子性能仿真时，可对算子任意运行阶段打点，从而分析不同指令的流水图，以便进一步性能调优。 |
-| [TRACE\_STOP](调测接口/TRACE_STOP.md) | 通过CAModel进行算子性能仿真时，可对算子任意运行阶段打点，从而分析不同指令的流水图，以便进一步性能调优。 |
+| [TRACE\_START](调测接口/TRACE_START.md) | 通过仿真器进行算子性能仿真时，可对算子任意运行阶段打点，从而分析不同指令的流水图，以便进一步性能调优。 |
+| [TRACE\_STOP](调测接口/TRACE_STOP.md) | 通过仿真器进行算子性能仿真时，可对算子任意运行阶段打点，从而分析不同指令的流水图，以便进一步性能调优。 |
