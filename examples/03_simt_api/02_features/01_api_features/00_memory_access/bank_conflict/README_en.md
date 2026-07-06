@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example introduces UB bank conflicts that may occur when multiple threads in the same Warp access UB in the Ascend C SIMT programming model. The example constructs 5 cases with different UB read address patterns, demonstrating typical scenarios such as same-address merge, same 8B-range merge for contiguous float access, cross-bank/subbank distributed access, same-subbank different-row conflicts, and same-index subbank conflicts within the same bank group.
+This example introduces UB bank conflicts that may occur when multiple threads in the same Warp access UB in the Ascend C SIMT programming model. The example constructs 5 cases with different UB read address patterns, demonstrating typical scenarios such as same-address merge, cross-bank/subbank distributed access, same 8B-range merge for contiguous float access, same-subbank different-row conflicts, and same-index subbank conflicts within the same bank group.
 
 ## Supported Products
 
@@ -27,7 +27,7 @@ This example introduces UB bank conflicts that may occur when multiple threads i
 
 ### Example Function
 
-This example is used to verify UB bank conflict behavior when multiple threads in the same Warp access UB in Ascend C SIMT programming. The example uses the compile-time parameter `SCENARIO_NUM` to select different cases and construct typical access patterns, including same-address merge, same 8B-range merge in contiguous float access, cross-bank/subbank distributed access, same-subbank different-row conflicts, and same-index subbank conflicts within the same bank group.
+This example is used to verify UB bank conflict behavior when multiple threads in the same Warp access UB in Ascend C SIMT programming. The example uses the compile-time parameter `SCENARIO_NUM` to select different cases and construct typical access patterns, including same-address merge, cross-bank/subbank distributed access, same 8B-range merge in contiguous float access, same-subbank different-row conflicts, and same-index subbank conflicts within the same bank group.
 
 On the Host side, the input array is constructed and copied to GM. The kernel first moves input data from GM to UB, then repeatedly reads data according to the UB address pattern of the current case, and uses [`clock()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/调测接口/clock.md) to count the cycles spent reading UB data.
 
@@ -46,13 +46,17 @@ On the Host side, the input array is constructed and copied to GM. The kernel fi
 
 ### UB Bank and Subbank Rules
 
-Taking Ascend 950PR/Ascend 950DT as an example, the following figure shows the UB bank structure. The total UB size is 256KB, divided into 16 banks. Each bank contains 512 rows, each row is 32B, so each bank is 16KB. These 16 banks are further organized into 8 bank groups. Each bank group contains 2 banks, and bank i and bank i+8 belong to bank group i, namely `bank_group_id = bank_id % 8`. In SIMT programming mode, each bank is further divided into 4 subbanks, and each subbank has a width of 8B.
+In this document, UB bank conflict in SIMT programming mainly refers to a subbank conflict where multiple threads in the same Warp compete for same-index subbank resources in the same bank group in one UB access instruction.
 
-In SIMT scenarios, multiple threads in the same Warp may access UB at the same time in one UB access instruction. When the accessed data belongs to subbank resources with the same index in the same bank group, the hardware cannot process all requests in one cycle, so the requests need to wait in sequence, forming subbank conflicts and increasing access latency. If the accessed data belongs to the same 8B address range in the same row of the same subbank, the hardware merges these requests and no subbank conflict is formed.
+Taking Ascend 950PR/Ascend 950DT as an example, the following figure shows the UB bank structure. The total UB size is 256KB and is divided into 8 bank groups. Each bank group contains 2 banks. The 16 banks are numbered from bank0 to bank15. Bank i and bank i+8 belong to bank group i, namely `bank_group_id = bank_id % 8`. Each bank is 16KB and contains 512 rows, with each row being 32B. In SIMT programming mode, each 32B row in a bank is further divided into 4 subbanks at 8B granularity.
+
+In SIMT scenarios, multiple threads in the same Warp may access UB at the same time in one UB access instruction. When the accessed data belongs to subbank resources with the same index in the same bank group, for example, subbank2 in bank0 and subbank2 in bank8, the hardware cannot process all requests in one cycle, so the requests need to wait in sequence, forming subbank conflicts and increasing access latency. If the accessed data belongs to the same 8B address range in the same row of the same subbank, the hardware merges these requests, and no subbank conflict is formed.
 
 **Figure 1** Bank structure
 
 ![](./figures/bank结构示意图.png)
+
+### Address Encoding Rules
 
 UB addresses use low-bit interleaving. As shown in the following figure, consecutive addresses are mapped to bank0 through bank15 at 32B granularity: the first 32B address segment maps to bank0, the second maps to bank1, and so on. The 16th segment maps to bank15, and the 17th segment maps back to the next row of bank0.
 
@@ -62,22 +66,41 @@ UB addresses use low-bit interleaving. As shown in the following figure, consecu
 
 The main subbank conflict types in SIMT programming are as follows:
 
-- **Write-Write Conflict**: Multiple write operations simultaneously attempt to access subbanks with the same index in the same bank group.
-- **Read-Read Conflict**: Multiple read operations simultaneously attempt to access subbanks with the same index in the same bank group.
+- **Write-Write Conflict**: Multiple write operations simultaneously attempt to access subbanks with the same index in the same bank group, for example, multiple threads simultaneously write subbank2 in bank0 and subbank2 in bank8.
+- **Read-Read Conflict**: Multiple read operations simultaneously attempt to access subbanks with the same index in the same bank group, for example, multiple threads simultaneously read subbank2 in bank0 and subbank2 in bank8.
+
+This example focuses on read-read conflicts. It uses multiple threads in the same UB read instruction to access different UB address patterns and observe the cycle differences among mergeable access, conflict-free access, and subbank-conflict access.
 
 ### Case Implementation Description
 
-This example uses a `float` array as the UB access object. Each thread computes one UB read index according to its `thread_id`. The Device-side index calculation function is marked with `__aicore__`. Each case only changes how `ub_index` is computed in `get_ub_index_device()`, so that 32 threads form different access distributions in the same UB read instruction: exactly the same address, contiguous addresses, 8B-granularity distribution to different subbanks, 512B-stride access returning to different rows of the same bank and subbank, or 256B-stride access landing on same-index subbank resources in the same bank group.
+This example uses a `float` array as the UB access object. Each thread computes one UB read index according to its `thread_id`. Each case only changes how `ub_index` is computed in `get_ub_index_device()`, so that 32 threads form different access distributions in the same UB read instruction: exactly the same address, 8B-granularity distribution to different subbanks, contiguous addresses, 512B-stride access returning to different rows of the same bank and subbank, or 256B-stride access landing on same-index subbank resources in the same bank group.
 
 With this design, the example compares the access merge and subbank conflict differences caused only by UB address pattern changes while keeping the data type and thread organization unchanged.
+
+The kernel first moves input data from GM to the `__ubuf__` array `ub`, obtains the current thread ID through `threadIdx.x`, and calls `get_ub_index_device()` to obtain the UB read index for the current case. `ub_ptr` points to the same UB array. The `volatile` qualifier is added to ensure that each read in the loop remains an actual UB read access, preventing the compiler from optimizing repeated reads into a single read.
+
+```cpp
+for (uint32_t i = tid; i < UB_ELEMENT_COUNT; i += blockDim.x) {
+    ub[i] = input[i];
+}
+
+uint32_t ub_index = get_ub_index_device(tid);
+__ubuf__ volatile float* ub_ptr;
+ub_ptr = ub;
+
+#pragma unroll
+for (uint32_t i = 0; i < REPEAT_TIMES; ++i) {
+    acc += ub_ptr[ub_index];
+}
+```
 
 **Table 2** Case implementation description
 
 | Case | Scenario Description | Expected Access Characteristics |
 | --- | --- | --- |
 | Case 0 | Threads in the same Warp read the same address | Same-address requests are merged |
-| Case 1 | Threads in the same Warp access adjacent float elements continuously | Adjacent two threads access the same 8B range, and the hardware can merge the requests |
-| Case 2 | Cross-bank/subbank access | 32 threads access different subbanks across 8 bank groups; this is the conflict-free baseline |
+| Case 1 | Cross-bank/subbank access | 32 threads access different subbanks across 8 bank groups; this is the conflict-free baseline |
+| Case 2 | Threads in the same Warp access adjacent float elements continuously | Adjacent two threads access the same 8B range, and the hardware can merge the requests |
 | Case 3 | Access different rows of the same subbank in the same bank | 32 threads access different rows of the same bank and same subbank, forming a subbank conflict |
 | Case 4 | Access same-index subbanks in the same bank group | 32 threads access same-index subbanks in the same bank group, forming a subbank conflict |
 
@@ -88,26 +111,17 @@ The kernel entry of this example is marked with `__global__`, and the maximum th
 - `gridDim`: `(1, 1, 1)`.
 - `blockDim`: `(32, 1, 1)`.
 - The range of `threadIdx.x` is 0-31, corresponding to 32 threads in the same Warp.
-- Each thread first participates in GM-to-UB movement with the index pattern `threadIdx.x + n * blockDim.x`, so that `input[4096]` is fully moved into the UB array.
-- After all threads call [`asc_syncthreads()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/同步与内存栅栏/同步接口/asc_syncthreads.md) for synchronization, each thread computes the UB read index according to its `thread_id` and the current case, and repeatedly reads the data `REPEAT_TIMES` times.
+- Each thread first participates in GM-to-UB movement with the index pattern `threadIdx.x + n * blockDim.x`, where `n` indicates the movement loop iteration, so that `input[4096]` is fully moved into the UB array.
+- This example launches only 32 threads, and these 32 threads are in the same Warp. After GM-to-UB movement, each thread directly computes the UB read index according to its `thread_id` and the current case, and repeatedly reads the data `REPEAT_TIMES` times.
 - The Host side verifies that the accumulated output of the 32 threads matches the CPU result. The cycles of different cases can be used to compare the overhead caused by different UB access patterns.
 
 ### Access Timing
 
-The example first moves input data from GM to UB and stores it in the `__ubuf__` array `ub`. After synchronization, each thread obtains the current thread ID through `threadIdx.x` and calls `get_ub_index_device()` to obtain the UB read index for the current case. `ub_ptr` points to the same UB array. The `volatile` qualifier is added to ensure that each read in the loop remains an actual UB read access, preventing the compiler from optimizing repeated reads into a single read. In the kernel, 32 threads write their accumulated UB read results and corresponding cycles back to GM. The Host side verifies the results and prints the cycles for each thread accessing `ub`.
+This example uses `clock()` to time the repeated UB read loop. The difference between the loop start and end timestamps is used as the cycles of the current thread and is written to `cycle_output` for return to the Host side. The timing code is as follows:
 
 ```cpp
-uint32_t thread_id = threadIdx.x;
-uint32_t ub_index = get_ub_index_device(thread_id);
-
-__ubuf__ volatile float* ub_ptr;
-ub_ptr = ub;
-
 uint64_t start = clock();
-#pragma unroll
-for (uint32_t i = 0; i < REPEAT_TIMES; ++i) {
-    acc += ub_ptr[ub_index];
-}
+// Repeated UB read loop.
 uint64_t end = clock();
 cycle_output[threadIdx.x] = end - start;
 ```
@@ -155,38 +169,7 @@ Cycles per thread: 1078 1078 1078 1078 1078 1078 1078 1078 1078 1078 1078 1078 1
 
 In Case 0, the read requests of 32 threads point to the same UB address. The hardware can merge these requests, so no subbank resource contention is generated.
 
-### Case 1: Same 8B-Range Merge in Contiguous Float Access
-
-**Example Goal**: 32 threads access 32 different addresses. Case 1 accesses adjacent float elements continuously, so every adjacent two threads access the same 8B range, and the hardware can merge the requests.
-
-**Core Implementation**:
-
-```cpp
-__aicore__ inline uint32_t get_ub_index_device(uint32_t thread_id)
-{
-...
-#elif SCENARIO_NUM == 1
-    // Contiguous float access makes every adjacent two threads fall into the same 8B subbank range.
-    return thread_id;
-...
-}
-```
-
-In this case, the 32 threads read `ub[0]` through `ub[31]`. For the float type, `ub[0]` and `ub[1]` are in the same 8B range of the same subbank row, `ub[2]` and `ub[3]` are in the same 8B range of the next subbank row, and so on. The accesses of every adjacent two threads can be merged according to the same 8B range. The access pattern is shown below:
-
-![](./figures/case1.png)
-
-**Performance Data**:
-
-```text
-Cycles per thread: 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081
-```
-
-**Analysis**:
-
-In Case 1, the 32 threads access contiguous `float` elements. Every adjacent two threads access the same 8B range, and the hardware can merge these requests. Compared with Case 2, both cases access 32 different addresses, but Case 1 has same-8B-range merge between adjacent threads, so its cycles are slightly lower than Case 2.
-
-### Case 2: Cross-Bank/Subbank Distributed Access
+### Case 1: Cross-Bank/Subbank Distributed Access
 
 **Example Goal**: Construct a conflict-free UB access baseline.
 
@@ -196,7 +179,7 @@ In Case 1, the 32 threads access contiguous `float` elements. Every adjacent two
 __aicore__ inline uint32_t get_ub_index_device(uint32_t thread_id)
 {
 ...
-#elif SCENARIO_NUM == 2
+#elif SCENARIO_NUM == 1
     // 8B access stride distributes 32 threads to 4 subbanks in 8 bank groups.
     return thread_id * 2;
 ...
@@ -215,11 +198,42 @@ Cycles per thread: 1107 1107 1107 1107 1107 1107 1107 1107 1107 1107 1107 1107 1
 
 **Analysis**:
 
-In Case 2, the 32 threads access 4 subbanks in 8 bank groups at 8B granularity. Under the same UB access instruction, each subbank in each bank group is accessed by only one thread, so no subbank resource contention is formed. This case is used as the conflict-free baseline for comparison with Case 3 and Case 4.
+In Case 1, the 32 threads access 4 subbanks in 8 bank groups at 8B granularity. Under the same UB access instruction, each subbank in each bank group is accessed by only one thread, so no subbank resource contention is formed. This case is used as the conflict-free baseline for comparison with Case 2, Case 3, and Case 4.
+
+### Case 2: Same 8B-Range Merge in Contiguous Float Access
+
+**Example Goal**: 32 threads access 32 different addresses. Case 2 accesses adjacent float elements continuously, so every adjacent two threads access the same 8B range, and the hardware can merge the requests.
+
+**Core Implementation**:
+
+```cpp
+__aicore__ inline uint32_t get_ub_index_device(uint32_t thread_id)
+{
+...
+#elif SCENARIO_NUM == 2
+    // Contiguous float access makes every adjacent two threads fall into the same 8B subbank range.
+    return thread_id;
+...
+}
+```
+
+In this case, the 32 threads read `ub[0]` through `ub[31]`. For the float type, `ub[0]` and `ub[1]` are in the same 8B range in the same row of the same subbank, `ub[2]` and `ub[3]` are in the same 8B range in the same row of the next subbank, and so on. The accesses of every adjacent two threads can be merged according to the same 8B range. The access pattern is shown below:
+
+![](./figures/case1.png)
+
+**Performance Data**:
+
+```text
+Cycles per thread: 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081 1081
+```
+
+**Analysis**:
+
+In Case 2, the 32 threads access contiguous `float` elements. Every adjacent two threads access the same 8B range, and the hardware can merge these requests. Compared with Case 1, both cases access 32 different addresses, but Case 2 has same-8B-range merge between adjacent threads, so its cycles are slightly lower than Case 1.
 
 ### Case 3: Same-Subbank Different-Row Conflict in the Same Bank
 
-**Example Goal**: Use Case 2 as the comparison baseline and construct 32 threads that access different addresses but all concentrate on different rows of the same subbank.
+**Example Goal**: Construct 32 threads that access different addresses but all concentrate on different rows of the same subbank.
 
 **Core Implementation**:
 
@@ -246,11 +260,11 @@ Cycles per thread: 3760 3760 3760 3760 3760 3760 3760 3760 3760 3760 3760 3760 3
 
 **Analysis**:
 
-In Case 3, 32 threads access different rows of the same bank and same subbank, causing contention for the same subbank resource. Compared with the conflict-free baseline in Case 2, cycles increase significantly, indicating that this access pattern forms a subbank conflict.
+In Case 3, 32 threads access different rows of the same bank and same subbank, causing contention for the same subbank resource. Compared with the conflict-free baseline in Case 1, cycles increase significantly, indicating that this access pattern forms a subbank conflict.
 
 ### Case 4: Same-Index Subbank Conflict in the Same Bank Group
 
-**Example Goal**: Use Case 2 as the comparison baseline and construct 32 threads that access different addresses but all concentrate on same-index subbank resources in the same bank group.
+**Example Goal**: Construct 32 threads that access different addresses but all concentrate on same-index subbank resources in the same bank group.
 
 **Core Implementation**:
 
@@ -265,7 +279,7 @@ __aicore__ inline uint32_t get_ub_index_device(uint32_t thread_id)
 }
 ```
 
-64 floats equal 256B. A 256B access stride switches the bank ID inside the bank group but keeps the bank group ID and subbank ID unchanged. Therefore, the 32 threads in the same Warp concentrate on same-index subbank resources in the same bank group, forming a subbank conflict. This case shows that subbank conflicts not only occur within the same physical bank; same-index subbanks in different banks of the same bank group also need attention. The access pattern is shown below:
+`thread_id * 64` means that adjacent threads are spaced by 64 `float` elements, that is, 256B. A 256B access stride switches the bank ID inside the bank group but keeps the bank group ID and subbank ID unchanged. Therefore, the 32 threads in the same Warp concentrate on same-index subbank resources in the same bank group, forming a subbank conflict. The access pattern is shown below:
 
 ![](./figures/case4.png)
 
@@ -277,7 +291,13 @@ Cycles per thread: 3760 3760 3760 3760 3760 3760 3760 3760 3760 3760 3760 3760 3
 
 **Analysis**:
 
-In Case 4, the 32 threads concentrate on same-index subbank resources in the same bank group. Compared with Case 2, cycles increase significantly, indicating that accessing same-index subbanks in the same bank group also causes subbank resource contention.
+In Case 4, the 32 threads concentrate on same-index subbank resources in the same bank group. Compared with Case 1, cycles increase significantly, indicating that accessing same-index subbanks in the same bank group also causes subbank resource contention.
+
+### Tuning Suggestions
+
+Case 0 and Case 2 show that mergeable access does not form subbank conflicts, and Case 1 is the conflict-free baseline. The cycles of Case 3 and Case 4 increase significantly, indicating that concentrating accesses on same-index subbanks in the same bank group causes subbank resource contention.
+
+When writing SIMT code, avoid concentrating multiple threads in the same Warp on same-index subbanks in the same bank group in one UB access instruction. If such an access pattern is unavoidable, consider adjusting the data layout, access stride, or adding padding in UB to distribute subbank accesses.
 
 ## Build and Run
 
@@ -314,5 +334,5 @@ Run the following steps in the root directory of this example to build and execu
   The following output indicates that the accuracy verification is successful.
 
   ```text
-  [Success] Case accuracy is verification passed.
+  [Success] Case accuracy verification passed.
   ```
