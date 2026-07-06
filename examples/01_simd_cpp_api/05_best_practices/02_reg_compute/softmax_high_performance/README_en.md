@@ -384,5 +384,5 @@ Use the `msOpProf` tool to obtain detailed performance data:
 
 ```bash
 msopprof ./demo
-cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
+cat ./OPPROF_*/PipeUtilization*.csv
 ```
