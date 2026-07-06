@@ -12,7 +12,7 @@
 
 #include <cstdint>
 #include "stub_fun.h"
-#include "../c_api/stub/cce_stub.h"
+#include "../../c_api/stub/cce_stub.h"
 
 using float8_e4m3_t = fp8_e4m3fn_t;
 using float8_e5m2_t = fp8_e5m2_t;
