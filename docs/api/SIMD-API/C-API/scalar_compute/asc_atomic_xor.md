@@ -65,7 +65,7 @@ PIPE_S
 ## 调用示例
 
 ```cpp
-uint32_t parity = 0x0;     // 初始值
+uint32_t dst = 0x0;     // 初始值
 asc_dcci_entire_all();            // 手动同步
-uint32_t old = asc_atomic_xor(&parity, 0x1);  // parity = 0x1, old = 0x0
+uint32_t old = asc_atomic_xor(&dst, 0x1);  // dst = 0x1, old = 0x0
 ```

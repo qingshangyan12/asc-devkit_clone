@@ -69,5 +69,5 @@ PIPE_S
 ```cpp
 int32_t dst = 10;          // 初始值
 asc_dcci_entire_all();            // 手动同步
-int32_t old = asc_atomic_min(&dst, 3);  // dst = 3, old = 10
+int32_t old = asc_atomic_min(&dst, 3);  // dst = min(10, 3) = 3。 old = 10，即在进行asc_atomic_min操作前dst的值。
 ```
