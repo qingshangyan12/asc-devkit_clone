@@ -45,12 +45,12 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ half* dst, __cc__ float* src, ui
                                             uint32_t dst_stride, uint16_t src_stride, uint8_t clip_relu_pre,
                                             uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre,
                                             bool channel_split, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post,
-                                            bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_cfg,
+                                            bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en,
                                             bool c0_pad_en)
 {
     asc_copy_l0c2l1_impl(dst, src, n_size, m_size, dst_stride, src_stride, clip_relu_pre, unit_flag_mode,
         quant_pre, relu_pre, channel_split, nz2nd_en, quant_post, relu_post, clip_relu_post, eltwise_op,
-        eltwise_antq_cfg, c0_pad_en);
+        eltwise_antq_en, c0_pad_en);
 }
 
 // int8_t  float
@@ -58,12 +58,12 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ int8_t* dst, __cc__ float* src, 
                                             uint32_t dst_stride, uint16_t src_stride, uint8_t clip_relu_pre,
                                             uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre,
                                             bool channel_split, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post,
-                                            bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_cfg,
+                                            bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en,
                                             bool c0_pad_en)
 {
     asc_copy_l0c2l1_impl(dst, src, n_size, m_size, dst_stride, src_stride, clip_relu_pre, unit_flag_mode,
         quant_pre, relu_pre, channel_split, nz2nd_en, quant_post, relu_post, clip_relu_post, eltwise_op,
-        eltwise_antq_cfg, c0_pad_en);
+        eltwise_antq_en, c0_pad_en);
 }
 
 // uint8_t  float
@@ -71,12 +71,12 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ uint8_t* dst, __cc__ float* src,
                                             uint32_t dst_stride, uint16_t src_stride, uint8_t clip_relu_pre,
                                             uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre,
                                             bool channel_split, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post,
-                                            bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_cfg,
+                                            bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en,
                                             bool c0_pad_en)
 {
     asc_copy_l0c2l1_impl(dst, src, n_size, m_size, dst_stride, src_stride, clip_relu_pre, unit_flag_mode,
         quant_pre, relu_pre, channel_split, nz2nd_en, quant_post, relu_post, clip_relu_post, eltwise_op,
-        eltwise_antq_cfg, c0_pad_en);
+        eltwise_antq_en, c0_pad_en);
 }
 
 // float  float
@@ -84,12 +84,12 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ float* dst, __cc__ float* src, u
                                             uint32_t dst_stride, uint16_t src_stride, uint8_t clip_relu_pre,
                                             uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre,
                                             bool channel_split, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post,
-                                            bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_cfg,
+                                            bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en,
                                             bool c0_pad_en)
 {
     asc_copy_l0c2l1_impl(dst, src, n_size, m_size, dst_stride, src_stride, clip_relu_pre, unit_flag_mode,
         quant_pre, relu_pre, channel_split, nz2nd_en, quant_post, relu_post, clip_relu_post, eltwise_op,
-        eltwise_antq_cfg, c0_pad_en);
+        eltwise_antq_en, c0_pad_en);
 }
 
 // half int32_t
@@ -97,12 +97,12 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ half* dst, __cc__ int32_t* src, 
                                             uint32_t dst_stride, uint16_t src_stride, uint8_t clip_relu_pre,
                                             uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre,
                                             bool channel_split, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post,
-                                            bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_cfg,
+                                            bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en,
                                             bool c0_pad_en)
 {
     asc_copy_l0c2l1_impl(dst, src, n_size, m_size, dst_stride, src_stride, clip_relu_pre, unit_flag_mode,
         quant_pre, relu_pre, channel_split, nz2nd_en, quant_post, relu_post, clip_relu_post, eltwise_op,
-        eltwise_antq_cfg, c0_pad_en);
+        eltwise_antq_en, c0_pad_en);
 }
 
 // int8_t int32_t
@@ -110,12 +110,12 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ int8_t* dst, __cc__ int32_t* src
                                             uint32_t dst_stride, uint16_t src_stride, uint8_t clip_relu_pre,
                                             uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre,
                                             bool channel_split, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post,
-                                            bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_cfg,
+                                            bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en,
                                             bool c0_pad_en)
 {
     asc_copy_l0c2l1_impl(dst, src, n_size, m_size, dst_stride, src_stride, clip_relu_pre, unit_flag_mode,
         quant_pre, relu_pre, channel_split, nz2nd_en, quant_post, relu_post, clip_relu_post, eltwise_op,
-        eltwise_antq_cfg, c0_pad_en);
+        eltwise_antq_en, c0_pad_en);
 }
 
 // uint8_t int32_t
@@ -123,12 +123,12 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ uint8_t* dst, __cc__ int32_t* sr
                                             uint32_t dst_stride, uint16_t src_stride, uint8_t clip_relu_pre,
                                             uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre,
                                             bool channel_split, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post,
-                                            bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_cfg,
+                                            bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en,
                                             bool c0_pad_en)
 {
     asc_copy_l0c2l1_impl(dst, src, n_size, m_size, dst_stride, src_stride, clip_relu_pre, unit_flag_mode,
         quant_pre, relu_pre, channel_split, nz2nd_en, quant_post, relu_post, clip_relu_post, eltwise_op,
-        eltwise_antq_cfg, c0_pad_en);
+        eltwise_antq_en, c0_pad_en);
 }
 
 // int32_t int32_t
@@ -136,12 +136,12 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ int32_t* dst, __cc__ int32_t* sr
                                             uint32_t dst_stride, uint16_t src_stride, uint8_t clip_relu_pre,
                                             uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre,
                                             bool channel_split, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post,
-                                            bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_cfg,
+                                            bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en,
                                             bool c0_pad_en)
 {
     asc_copy_l0c2l1_impl(dst, src, n_size, m_size, dst_stride, src_stride, clip_relu_pre, unit_flag_mode,
         quant_pre, relu_pre, channel_split, nz2nd_en, quant_post, relu_post, clip_relu_post, eltwise_op,
-        eltwise_antq_cfg, c0_pad_en);
+        eltwise_antq_en, c0_pad_en);
 }
 
 __aicore__ inline void asc_copy_l12l0a_mx(uint64_t dst, __cbuf__ fp8_e8m0_t* src, uint16_t x_start_pos,
