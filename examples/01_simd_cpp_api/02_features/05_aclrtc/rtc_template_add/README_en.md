@@ -1,8 +1,8 @@
-# Aclrtc Runtime Compilation + Static Tensor Programming Add Example
+# Aclrtc Runtime Compilation + C++ tensor Programming Add Example
 
 ## Overview
 
-This example demonstrates how to use the **Aclrtc (runtime compilation)** mode of AscendC to dynamically compile kernel function source code on the host side and execute it. The kernel function uses the **static tensor programming paradigm** (LocalMemAllocator + SetFlag/WaitFlag event synchronization). The kernel function source code is embedded as a string in the host code and compiled and executed at runtime through the aclrtc API.
+This example demonstrates how to use the **Aclrtc (runtime compilation)** mode of AscendC to dynamically compile kernel function source code on the host side and execute it. The kernel function uses the **C++ tensor programming paradigm** (LocalMemAllocator + SetFlag/WaitFlag event synchronization). The kernel function source code is embedded as a string in the host code and compiled and executed at runtime through the aclrtc API.
 
 Unlike traditional custom operator projects, Aclrtc does not require pre-compiling operator packages (.run), making it suitable for rapid verification and prototype development.
 

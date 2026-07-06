@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example is based on the static Tensor programming paradigm, implementing high-performance matrix multiplication through multiple optimization methods including L1/L0 double buffering, large packet transfer, fine-grained pipeline synchronization, UnitFlag, and L2Cache. This example is implemented based on the basic API, using the same optimization methods as the high-level API version. The example goal is to demonstrate tuning implementation details based on the static Tensor programming paradigm.
+This example is based on the C++ tensor programming paradigm, implementing high-performance matrix multiplication through multiple optimization methods including L1/L0 double buffering, large packet transfer, fine-grained pipeline synchronization, UnitFlag, and L2Cache. This example is implemented based on the basic API, using the same optimization methods as the high-level API version. The example goal is to demonstrate tuning implementation details based on the C++ tensor programming paradigm.
 
 ## Supported Products and CANN Versions
 

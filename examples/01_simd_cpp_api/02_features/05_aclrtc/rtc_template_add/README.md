@@ -1,8 +1,8 @@
-# Aclrtc运行时编译+静态Tensor编程Add样例
+# Aclrtc运行时编译+C++ Tensor编程Add样例
 
 ## 概述
 
-本样例展示了如何使用AscendC的 **Aclrtc（运行时编译）** 模式，在Host侧动态编译核函数源码并执行。核函数内部采用 **静态Tensor编程范式**（LocalMemAllocator+SetFlag/WaitFlag事件同步），将核函数源码以字符串形式嵌入Host代码中，通过aclrtc API在运行时编译并执行。
+本样例展示了如何使用AscendC的 **Aclrtc（运行时编译）** 模式，在Host侧动态编译核函数源码并执行。核函数内部采用 **C++ Tensor编程**（LocalMemAllocator+SetFlag/WaitFlag事件同步），将核函数源码以字符串形式嵌入Host代码中，通过aclrtc API在运行时编译并执行。
 
 与传统自定义算子工程不同，Aclrtc无需提前编译算子包（.run），适合快速验证和原型开发。
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example introduces how to implement a high-performance MxFP4 Matmul kernel based on Ascend C Tensor API and static Tensor programming, through multiple optimization methods including L1/L0 double buffering, large packet transfer, and fine-grained pipeline synchronization.
+This example introduces how to implement a high-performance MxFP4 Matmul kernel based on Ascend C Tensor API and C++ tensor programming, through multiple optimization methods including L1/L0 double buffering, large packet transfer, and fine-grained pipeline synchronization.
 
 ## Supported Products and CANN Versions
 
@@ -265,7 +265,7 @@ AscendC::Te::Copy(l0c2GmAtom.with(fixpipeParams), c.Slice(AscendC::Te::MakeCoord
 
 ### Event Synchronization: Pipelining the Flow
 
-When using static Tensor programming, synchronization is key to performance and correctness. This example primarily uses four types of events, with eventID controlled from `EVENT_ID0` to `EVENT_ID3`:
+When using C++ Tensor programming, synchronization is key to performance and correctness. This example primarily uses four types of events, with eventID controlled from `EVENT_ID0` to `EVENT_ID3`:
 
 | Event | Direction | Purpose | Flag Number |
 |------|------|------|----------|

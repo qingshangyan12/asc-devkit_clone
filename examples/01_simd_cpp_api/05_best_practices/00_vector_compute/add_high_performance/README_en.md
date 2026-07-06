@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example uses addition to introduce performance tuning methods based on static Tensor programming. The entire tuning process is divided into seven steps (case 0-6), progressively demonstrating the complete tuning path from scalar operations to vector operations, from single-core to multi-core, and from basic implementation to deep optimization.
+This example uses addition to introduce performance tuning methods based on C++ tensor programming. The entire tuning process is divided into seven steps (case 0-6), progressively demonstrating the complete tuning path from scalar operations to vector operations, from single-core to multi-core, and from basic implementation to deep optimization.
 
 **Optimization Path**:
 - Case 0: Single-core scalar version (baseline)

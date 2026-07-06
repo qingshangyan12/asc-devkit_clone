@@ -265,7 +265,7 @@ AscendC::Te::Copy(l0c2GmAtom.with(fixpipeParams), c.Slice(AscendC::Te::MakeCoord
 
 ### 事件同步：把流水并行起来
 
-使用静态Tensor编程时，同步是性能和正确性的关键。本样例主要使用四类事件，eventID 控制在
+使用C++ Tensor编程时，同步是性能和正确性的关键。本样例主要使用四类事件，eventID 控制在
 `EVENT_ID0` 到 `EVENT_ID3`：
 
 | 事件 | 方向 | 作用 | flag 编号 |

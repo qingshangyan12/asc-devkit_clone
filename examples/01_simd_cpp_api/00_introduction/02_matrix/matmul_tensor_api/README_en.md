@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example implements multi-core matrix multiplication computation based on the static Tensor API programming paradigm. It uses the high-level abstraction interfaces of Tensor API to complete matrix data movement, slicing, and multiply-accumulate processes.
+This example implements multi-core matrix multiplication computation based on the C++ tensor API programming paradigm. It uses the high-level abstraction interfaces of Tensor API to complete matrix data movement, slicing, and multiply-accumulate processes.
 
 ## Supported Products and CANN Software Versions
 

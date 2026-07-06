@@ -1,8 +1,8 @@
-# 基于静态Tensor编程实现Matmul基础API计算
+# 基于C++ Tensor编程实现Matmul基础API计算
 
 ## 概述
 
-本样例基于静态Tensor编程范式实现多核矩阵乘计算。
+本样例基于C++ Tensor编程(开发者自主申请内存和插入同步)实现多核矩阵乘计算。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -52,7 +52,7 @@
 - 样例实现：
   - Kernel侧整体思路
     - `mmad_custom`是一个[`__global__`](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md) [`__cube__`](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)核函数，表示该函数运行在[AI Core](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/术语表.md)的[Cube](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/术语表.md)计算单元上，主要用于矩阵计算。
-    - 样例使用[静态Tensor编程方式](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md)，通过[`LocalMemAllocator`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/LocalMemAllocator简介.md)创建[`LocalTensor`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md)。
+    - 样例使用[C++ Tensor编程](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/CPPTensor编程概述.md)，通过[`LocalMemAllocator`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/LocalMemAllocator简介.md)创建[`LocalTensor`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md)。
     - `CUBE_BLOCK = 16`表示half数据类型分形为`16 x 16`，代码中按`16 x 16`的分形为单位进行[`LoadData`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/LoadData_2D.md)搬运。
 
   - Kernel侧详细流程

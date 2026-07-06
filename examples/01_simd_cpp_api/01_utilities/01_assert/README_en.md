@@ -29,7 +29,7 @@ This example introduces the usage of the ascendc_assert assertion API. If the as
 
 - Example features:
 
-  Implement matrix multiplication using the static Tensor programming mode to demonstrate the basic usage of the ascendc_assert API.
+  Implement matrix multiplication using the C++ tensorogramming mode to demonstrate the basic usage of the ascendc_assert API.
 
   The matrix multiplication formula is:
 

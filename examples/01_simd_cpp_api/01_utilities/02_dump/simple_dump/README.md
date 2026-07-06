@@ -29,7 +29,7 @@
 
 - 样例功能：
 
-  使用静态Tensor编程模式实现矩阵乘法，展示asc_dump_xxx系列接口的基本使用方法。
+  使用C++ Tensor编程(开发者自主申请内存和插入同步)实现矩阵乘法，展示asc_dump_xxx系列接口的基本使用方法。
   该系列接口兼容AscendC::DumpTensor接口。但后续开发中，建议优先使用asc_dump系列接口；若需Dump指定偏移位置的数据，由于asc_dump系列暂不支持该能力，可继续使用DumpAccChkPoint接口。
 
   矩阵乘法的计算公式为：

@@ -75,7 +75,7 @@ LocalTensor构造函数。
     __aicore__ inline LocalTensor<T>() {}
     ```
 
--   适用于[静态Tensor编程](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md)，根据指定的逻辑位置/地址/长度，返回Tensor对象。
+-   适用于[静态Tensor编程](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/CPPTensor编程概述.md)，根据指定的逻辑位置/地址/长度，返回Tensor对象。
 
     ```cpp
     __aicore__ inline LocalTensor<T>(TPosition pos, uint32_t addr, uint32_t tileSize)

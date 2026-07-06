@@ -4,7 +4,7 @@
 
 本样例在数据搬运场景下，基于DataCopyPad API实现非32字节对齐数据的搬运及填充功能。DataCopyPad API支持从Global Memory到Local Memory的非对齐数据搬运，并可在数据左侧或右侧填充指定数值。
 
-数据搬运过程包括：Global Memory（GM）→Unified Buffer（UB）（使用DataCopyPad进行非对齐搬运并填充）→Global Memory（GM）。本样例使用静态Tensor方式分配UB内存，支持通过编译参数切换不同场景，演示DataCopyPad的不同使用方式。
+数据搬运过程包括：Global Memory（GM）→Unified Buffer（UB）（使用DataCopyPad进行非对齐搬运并填充）→Global Memory（GM）。本样例使用C++ Tensor编程(开发者自主申请内存和插入同步)分配UB内存，支持通过编译参数切换不同场景，演示DataCopyPad的不同使用方式。
 
 ## 本样例支持的产品及CANN软件版本
 

@@ -1,8 +1,8 @@
-# Matmul Basic API Computation Based on Static Tensor Programming
+# Matmul Basic API Computation Based on C++ tensor Programming
 
 ## Overview
 
-This sample implements multi-core matrix multiplication computation based on the static Tensor programming paradigm.
+This sample implements multi-core matrix multiplication computation based on the C++ tensor programming paradigm.
 
 ## Supported Products and CANN Software Versions
 
@@ -52,7 +52,7 @@ This sample implements multi-core matrix multiplication computation based on the
 - Sample Implementation:
   - Kernel-side Overall Approach
     - `mmad_custom` is a [`__global__`](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md) [`__cube__`](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md) kernel function, which indicates that this function runs on the [Cube](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/术语表.md) computation unit of [AI Core](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/术语表.md), primarily used for matrix computation.
-    - The sample uses the [static Tensor programming method](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md) and creates [`LocalTensor`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md) through [`LocalMemAllocator`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/LocalMemAllocator简介.md).
+    - The sample uses the [C++ tensor programming method](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/CPPTensor编程概述.md) and creates [`LocalTensor`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md) through [`LocalMemAllocator`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/LocalMemAllocator简介.md).
     - `CUBE_BLOCK = 16` indicates that the half data type fractal is `16 x 16`, and the code performs [`LoadData`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/LoadData_2D.md) transfers in units of `16 x 16` fractals.
 
   - Kernel-side Detailed Process

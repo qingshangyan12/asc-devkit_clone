@@ -2,7 +2,7 @@
 
 ## Operator Overview
 
-This example implements Matmul and LeakyRelu fusion computation based on the static Tensor programming mode (a programming approach where tensor shapes and memory layouts are determined at compile time). It demonstrates the collaborative computing programming pattern between the Cube unit (matrix computation unit that executes matrix operations such as Matmul) and the Vector unit (vector computation unit that executes element-wise operations). The Cube core completes the matrix multiplication computation, and the Vector core completes the LeakyRelu activation computation.
+This example implements Matmul and LeakyRelu fusion computation based on the C++ tensor programming mode (a programming approach where tensor shapes and memory layouts are determined at compile time). It demonstrates the collaborative computing programming pattern between the Cube unit (matrix computation unit that executes matrix operations such as Matmul) and the Vector unit (vector computation unit that executes element-wise operations). The Cube core completes the matrix multiplication computation, and the Vector core completes the LeakyRelu activation computation.
 
 ## Supported Products and CANN Software Versions
 

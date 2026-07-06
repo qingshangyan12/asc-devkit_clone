@@ -125,7 +125,7 @@ AI Core包含三类计算单元：Cube负责矩阵计算、Vector负责矢量计
 
 UB是AI Core内主要用于矢量计算的内部存储单元，位于每个Vector Core（AIV）内部。容量较小但带宽高、延迟低，可视为内核执行期间由用户管理的高速缓存。
 
-在C++ Tensor编程中，通过LocalTensor对象管理UB内存，其中对于基础Tensor（不带Layout）而言，主要通过`LocalMemAllocator`指定物理存储位置和内存大小来创建对应的Tensor。LocalMemAllocator是一种线性内存分配器，开发者可以调用Alloc方法进行内存分配，根据调用次序依次向后进行线性分配，但该分配器不提供内存释放以及其它内存管理的能力。
+在C++ Tensor编程中，通过LocalTensor对象管理UB内存，其中对于基础Tensor（不带Layout）而言，主要通过[LocalMemAllocator](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/LocalMemAllocator.md)指定物理存储位置和内存大小来创建对应的Tensor。LocalMemAllocator是一种线性内存分配器，开发者可以调用Alloc方法进行内存分配，根据调用次序依次向后进行线性分配，但该分配器不提供内存释放以及其它内存管理的能力。
 
 ```cpp
 __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
@@ -153,6 +153,8 @@ __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm
 }
 ```
 > 📌 其中AscendC::TPosition::VECCALC为对物理位置的逻辑抽象定义，与物理位置的映射参考文件[逻辑位置和物理存储的映射](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/通用说明和约束.md)。
+
+开发者通过LocalMemAllocator分配内存或通过LocalTensor构造函数直接指定地址，并手动插入同步的编程方式，称为静态Tensor编程；此外，开发者也可以使用[TPipe-TQue编程框架](../基于TPipe-TQue框架编程/TPipe-TQue框架编程范式.md)来简化内存分配和同步管理。
 
 相比基础Tensor，[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入Layout描述并将其作为Tensor的核心属性，开发者可在Tensor创建时直接关联Shape与Stride信息，简化多维数据的布局管理。通过`MakeTensor`，开发者可灵活指定内存地址和Layout布局，更便捷地描述ND、NZ等典型数据排布。
 
@@ -271,7 +273,7 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
 
 以下图为例，AIC（AI Cube，主要用于Cube计算）需要依赖于AIV（AI Vector，负责Vector计算）的ReduceSum计算结果。由于整体矢量较大，必须拆分为多个部分，由每个AIV分别完成部分计算。每个AIV将其部分计算结果通过原子累加写入GM。AIC需要读取的必须是所有AIV均完成累加后的最终结果。
 
-![核间同步业务场景示例](../../../../figures/核间同步业务场景示例.png)
+![核间同步业务场景示例](../../../../figures/核间同步概述.png)
 
 从上图可以看到，当前AI Core是由AIC核和AIV核组成，其中AIC核主要用于Cube计算，AIV核负责Vector计算。AIC/AIV按group进行划分。一个group内细分block及subblock，block与subblock比例为1:N（N>=1），block表示多少个“主核”，subblock表示一个“主核”带多少个“从核”。
 
