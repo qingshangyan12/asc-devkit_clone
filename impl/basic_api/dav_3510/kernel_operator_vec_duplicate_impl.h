@@ -340,6 +340,7 @@ __aicore__ inline void InterleaveImpl(__ubuf__ T *dst0Local, __ubuf__ T *dst1Loc
         uint64_t, int64_t>(),
         "current data type is not supported on current device!");
     ASCENDC_ASSERT((calCount % 2 == 0), { KERNEL_LOG(KERNEL_ERROR, "calCount % 2 = 0!"); });
+    uint32_t oneRepeatVecLen = (sizeof(T) != 8) ? GetVecLen() : GetVecLen() * 2;
     if constexpr (sizeof(T) != 8) {
         if (calCount * sizeof(T) <= oneRepeatVecLen) {
             InterleaveImplOneRepeat<T, Reg::RegTraitNumOne>(dst0Local, dst1Local, src0Local, src1Local, calCount);
