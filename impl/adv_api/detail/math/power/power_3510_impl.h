@@ -154,7 +154,7 @@ __simd_callee__ inline void GetLogFExtStepOne(
      */
     Reg::MaskReg cmpMask;
     Reg::CompareScalar<float, CMPMODE::LT>(cmpMask, srcReg, LOG2_LOWEST_VALUE, mask);
-    Reg::Muls(tmpAReg, srcReg, LOG2_LOWEST_VALUE_MULS, mask);
+    Reg::Muls(tmpAReg, srcReg, LOG2_LOWEST_VALUE_MULS, cmpMask);
     Reg::Select(tmpAReg, tmpAReg, srcReg, cmpMask);
     Reg::Select(tmpIReg, params.fractionReg, params.zeroReg, cmpMask);
     // step 1: e = (__float_as_int (a) - __float_as_int (0.70710678f)) & 0xff800000;
