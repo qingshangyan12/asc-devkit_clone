@@ -34,9 +34,8 @@ from presmoke.scheduler import (
     export_schedule_file,
     schedule_cells,
     ScheduleOptions,
-    simulate_npu_idle,
-    simulate_npu_makespan,
     simulate_pipeline_npu_idle,
+    simulate_pipeline_makespan,
 )
 
 
@@ -352,8 +351,6 @@ class SchedulerTest(unittest.TestCase):
             with mock.patch.dict(os.environ, {"PRESMOKE_PROJECT_ROOT": str(root)}):
                 rc = main(
                     [
-                        "--runner-mode",
-                        "case-runner",
                         "--arch",
                         "dav-2201",
                         "--modes",
@@ -402,8 +399,6 @@ class SchedulerTest(unittest.TestCase):
             with mock.patch.dict(os.environ, {"PRESMOKE_PROJECT_ROOT": str(root)}):
                 rc = main(
                     [
-                        "--runner-mode",
-                        "case-runner",
                         "--arch",
                         "dav-2201",
                         "--modes",
@@ -448,8 +443,6 @@ class SchedulerTest(unittest.TestCase):
             with mock.patch.dict(os.environ, {"PRESMOKE_PROJECT_ROOT": str(root)}):
                 rc = main(
                     [
-                        "--runner-mode",
-                        "case-runner",
                         "--arch",
                         "dav-2201",
                         "--modes",
@@ -493,8 +486,6 @@ class SchedulerTest(unittest.TestCase):
             with mock.patch.dict(os.environ, {"PRESMOKE_PROJECT_ROOT": str(root)}):
                 rc = main(
                     [
-                        "--runner-mode",
-                        "case-runner",
                         "--arch",
                         "dav-2201",
                         "--modes",
@@ -535,8 +526,6 @@ class SchedulerTest(unittest.TestCase):
             with mock.patch.dict(os.environ, {"PRESMOKE_PROJECT_ROOT": str(root)}):
                 rc = main(
                     [
-                        "--runner-mode",
-                        "case-runner",
                         "--arch",
                         "dav-2201",
                         "--modes",
@@ -612,8 +601,6 @@ class SchedulerTest(unittest.TestCase):
             with mock.patch.dict(os.environ, {"PRESMOKE_PROJECT_ROOT": str(root)}):
                 rc = main(
                     [
-                        "--runner-mode",
-                        "case-runner",
                         "--arch",
                         "dav-2201",
                         "--modes",
@@ -661,8 +648,6 @@ class SchedulerTest(unittest.TestCase):
             with mock.patch.dict(os.environ, {"PRESMOKE_PROJECT_ROOT": str(root)}):
                 rc = main(
                     [
-                        "--runner-mode",
-                        "case-runner",
                         "--arch",
                         "dav-2201",
                         "--modes",
@@ -704,10 +689,10 @@ class SchedulerTest(unittest.TestCase):
             build_desc = schedule_cells(cells, ScheduleOptions(schedule="build-desc", schedule_report=report, jobs=2))
             idle_min = schedule_cells(cells, ScheduleOptions(schedule="npu-idle-min", schedule_report=report, jobs=2))
 
-            idle_min_s = simulate_npu_idle(idle_min, report, jobs=2)
-            build_desc_idle_s = simulate_npu_idle(build_desc, report, jobs=2)
-            idle_min_makespan_s = simulate_npu_makespan(idle_min, report, jobs=2)
-            build_desc_makespan_s = simulate_npu_makespan(build_desc, report, jobs=2)
+            idle_min_s = simulate_pipeline_npu_idle(idle_min, report, jobs=2)
+            build_desc_idle_s = simulate_pipeline_npu_idle(build_desc, report, jobs=2)
+            idle_min_makespan_s = simulate_pipeline_makespan(idle_min, report, jobs=2)
+            build_desc_makespan_s = simulate_pipeline_makespan(build_desc, report, jobs=2)
 
         self.assertLessEqual(idle_min_s, build_desc_idle_s)
         self.assertLessEqual(idle_min_makespan_s, build_desc_makespan_s)
@@ -760,8 +745,6 @@ class SchedulerTest(unittest.TestCase):
             with mock.patch.dict(os.environ, {"PRESMOKE_PROJECT_ROOT": str(root)}):
                 rc = main(
                     [
-                        "--runner-mode",
-                        "case-runner",
                         "--arch",
                         "dav-2201",
                         "--modes",
@@ -826,8 +809,6 @@ class SchedulerTest(unittest.TestCase):
                 with mock.patch("presmoke.cli.detect_cpu_count", return_value=88):
                     rc = main(
                         [
-                            "--runner-mode",
-                            "case-runner",
                             "--arch",
                             "dav-2201",
                             "--modes",
@@ -891,7 +872,7 @@ class SchedulerTest(unittest.TestCase):
             ]
 
             scheduled = schedule_cells(cells, ScheduleOptions(schedule="npu-idle-min", schedule_report=report, jobs=4))
-            scheduled_idle = simulate_npu_idle(scheduled, report, jobs=4)
+            scheduled_idle = simulate_pipeline_npu_idle(scheduled, report, jobs=4)
 
         names = [item.example.rel_path for item in scheduled]
         self.assertLessEqual(scheduled_idle, 58.0)
@@ -915,10 +896,10 @@ class SchedulerTest(unittest.TestCase):
             scheduled = schedule_cells(cells, ScheduleOptions(schedule="npu-idle-min", schedule_report=report, jobs=3))
             build_desc = schedule_cells(cells, ScheduleOptions(schedule="build-desc", schedule_report=report, jobs=3))
 
-            scheduled_idle = simulate_npu_idle(scheduled, report, jobs=3)
-            build_desc_idle = simulate_npu_idle(build_desc, report, jobs=3)
-            scheduled_makespan = simulate_npu_makespan(scheduled, report, jobs=3)
-            build_desc_makespan = simulate_npu_makespan(build_desc, report, jobs=3)
+            scheduled_idle = simulate_pipeline_npu_idle(scheduled, report, jobs=3)
+            build_desc_idle = simulate_pipeline_npu_idle(build_desc, report, jobs=3)
+            scheduled_makespan = simulate_pipeline_makespan(scheduled, report, jobs=3)
+            build_desc_makespan = simulate_pipeline_makespan(build_desc, report, jobs=3)
 
         self.assertLessEqual(scheduled_idle, build_desc_idle)
         self.assertLessEqual(scheduled_makespan, build_desc_makespan)

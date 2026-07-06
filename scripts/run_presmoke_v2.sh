@@ -16,7 +16,6 @@ PROJECT_ROOT="${PROJECT_ROOT:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
 ASCEND_HOME_DIR="${ASCEND_HOME_DIR:-/usr/local/Ascend/ascend-toolkit/latest}"
 ARCH="${ARCH:-dav-2201}"
 MODES="${MODES:-${MODE:-npu}}"
-RUNNER_MODE="${RUNNER_MODE:-case-runner}"
 SCHEDULE="${SCHEDULE:-fixed}"
 SCHEDULE_REPORT="${SCHEDULE_REPORT:-}"
 SCHEDULE_FILE="${SCHEDULE_FILE:-}"
@@ -155,7 +154,7 @@ should_clean_cann_vendors() {
     local arg
     for arg in "$@"; do
         case "$arg" in
-            --dry-run|--filter|--filter=*|--exact-filter|--exact-filter=*|--suggestions-only) return 1 ;;
+            --dry-run|--filter|--filter=*|--exact-filter|--exact-filter=*) return 1 ;;
         esac
     done
     return 0
@@ -174,7 +173,7 @@ should_strict_schedule() {
     truthy "$STRICT_SCHEDULE" || return 1
     for arg in "$@"; do
         case "$arg" in
-            --filter|--filter=*|--exact-filter|--exact-filter=*|--exclude|--exclude=*|--suggestions-only) return 1 ;;
+            --filter|--filter=*|--exact-filter|--exact-filter=*|--exclude|--exclude=*) return 1 ;;
         esac
     done
     return 0
@@ -288,7 +287,6 @@ has_arg_requiring_single_run() {
     for arg in "$@"; do
         case "$arg" in
             --dry-run|--filter|--filter=*|--exact-filter|--exact-filter=*|--exclude|--exclude=*) return 0 ;;
-            --suggestions-only) return 0 ;;
         esac
     done
     return 1
@@ -312,7 +310,6 @@ plan_examples_for_sharding() {
         export ASCEND_HOME_DIR
         export PRESMOKE_WERROR
         args=(
-            --runner-mode "$RUNNER_MODE"
             --arch "$ARCH"
             --modes "$MODES"
             --jobs "$JOBS"
@@ -561,7 +558,6 @@ run_presmoke() {
         echo "git=$(cd "$run_project_root" && git rev-parse --short HEAD 2>/dev/null || true)"
         echo "arch=$ARCH"
         echo "modes=$MODES"
-        echo "runner_mode=$RUNNER_MODE"
         echo "schedule=$SCHEDULE"
         echo "schedule_report=$SCHEDULE_REPORT"
         echo "schedule_file=$SCHEDULE_FILE"
@@ -596,7 +592,6 @@ run_presmoke() {
         export PRESMOKE_LOCK_DIR="$run_dir/.locks"
         export PRESMOKE_STATE_DIR="$PRESMOKE_SHARED_STATE_DIR"
         args=(
-            --runner-mode "$RUNNER_MODE"
             --arch "$ARCH"
             --modes "$MODES"
             --jobs "$run_jobs"
