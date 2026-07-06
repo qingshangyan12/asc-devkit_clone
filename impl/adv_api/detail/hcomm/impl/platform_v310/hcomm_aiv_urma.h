@@ -371,7 +371,7 @@ __aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCq(ChannelHandl
         }
         curTail++;
         auto entryIdx = cqeUb->entryIdx;
-        if ((entryIdx + 1) == exceptIdx) {
+        if ((entryIdx + 1) == expectIdx) {
             break;
         }
     }
