@@ -878,8 +878,8 @@ HcclResult HcclSocketManager::WaitLinksEstablishCompleted(
     for (auto iter = rankSocketsMap.begin(); iter != rankSocketsMap.end(); iter++) {
         auto rankSockets = iter->second;
         for (u32 i = 0; i < rankSockets.size(); i++) {
-            HcclResult ret = WaitLinkEstablish(
-                rankSockets[i], [this]() -> bool { return this->GetStopFlag(); }, timeout);
+            HcclResult ret =
+                WaitLinkEstablish(rankSockets[i], [this]() -> bool { return this->GetStopFlag(); }, timeout);
             CHK_PRT_RET(
                 ret != HCCL_SUCCESS, HCCL_ERROR("[Wait][LinksEstablishCompleted] is failed. ret[%d].", ret), ret);
         }

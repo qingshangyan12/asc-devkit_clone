@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
  * \file kernel_simt_bessel_impl.h
@@ -41,7 +41,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T Y0Impl(T x);
 template <typename T>
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline T Y1Impl(T x);
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float TrigRedSlowpathFFastMode(float a, int *quadrant)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float TrigRedSlowpathFFastMode(float a, int* quadrant)
 {
     uint64_t q, q2;
     q = (uint64_t)(a * ConstantsInternal::TWO_OVER_PI);
@@ -62,7 +62,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float SinfPoly(float a, float s)
     r = FmaImpl(r, s, 8.33338592e-3f);
     r = FmaImpl(r, s, -1.66666672e-1f);
     float t = FmaImpl(a, s, 0.0f);
-    r = FmaImpl(r,t,a);
+    r = FmaImpl(r, t, a);
     return r;
 }
 
@@ -83,12 +83,12 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float SinCosfMinusPIOverFour(float a, int 
     a = a * 0.0f + a;
     r = TrigRedSlowpathFFastMode(a, &i);
     float c, s, t;
-	s = r * r;
+    s = r * r;
     c = CosfPoly(s);
     s = SinfPoly(r, s);
     if (i & 2) { // 2:Third and Fourth Quadrants
-        s = 0.0f-s;
-        c = 0.0f-c;
+        s = 0.0f - s;
+        c = 0.0f - c;
     }
     if (index == 0) { // 0:Calculate CosfMinusPIOverFour
         if (i & 1) {
@@ -151,7 +151,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float CalJ0XLess8(float x)
 {
     float d1 = x - 2.4048254f;
     d1 = d1 - 1.087059e-7f;
-    float res = 9.619266247e-13f;                    
+    float res = 9.619266247e-13f;
     res = FmaImpl(res, d1, 5.702105547e-12f);
     res = FmaImpl(res, d1, -4.398487105e-10f);
     res = FmaImpl(res, d1, 4.604940853e-10f);
@@ -171,7 +171,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float CalJ0XLess8(float x)
     float d3 = x - 8.653728f;
     d3 = d3 - 3.8147791e-7f;
     res = d3 * res;
-    return res;  
+    return res;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float CalJ1XLess8(float x)
@@ -196,7 +196,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float CalJ1XLess8(float x)
     d2 = d2 + 1.8321172e-7f;
     res = d2 * res;
     res = res * x;
-    return res;  
+    return res;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float JnYnAsymptoticBesselAmplitude(int n, float x, int index)
@@ -207,11 +207,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float JnYnAsymptoticBesselAmplitude(int n,
     txq *= txq;
     if (index == 0) { // 0:Calculate JnAsymptoticBesselAmplitude
         // 1 + (4 * n^2 - 1) / (8 * x^2) + 3 * (4 * n^2 - 1) * (4 * n^2 - 9) / (128 * x^4)
-        s += (mu - 1) / (2 * txq); // 1,2:Constants in formulas
+        s += (mu - 1) / (2 * txq);                      // 1,2:Constants in formulas
         s += 3 * (mu - 1) * (mu - 9) / (txq * txq * 8); // 3,1,9,8:Constants in formulas
     } else {
-        s += (mu - 1) / (2 * txq); // 1,2:Constants in formulas
-        s += 3 * (mu - 1) * (mu - 9) / (txq * txq * 8); // 3,1,9,8:Constants in formulas
+        s += (mu - 1) / (2 * txq);                                             // 1,2:Constants in formulas
+        s += 3 * (mu - 1) * (mu - 9) / (txq * txq * 8);                        // 3,1,9,8:Constants in formulas
         s += 15 * (mu - 1) * (mu - 9) * (mu - 25) / (txq * txq * txq * 8 * 6); // 15,1,9,25,8,6:Constants in formulas
     }
     return SqrtImpl(s * 2 / (ConstantsInternal::PI * x)); // 2:Constants in formulas    sqrt(2*s/(π*x))
@@ -223,7 +223,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float JnYnAsymptoticBesselPhaseMx(int n, f
     float denom = 4 * x;
     float denomMult = denom * denom;
     float s = 0;
-    // (4 * n^2 - 1) / (8 * x) + (4 * n^2 - 1) * (4 * n^2 - 25) / (384 * x^3) + (4 * n^2 - 1) * (16 * n^4 - 456 * n^2 + 1073) / (5120 * x^5)
+    // (4 * n^2 - 1) / (8 * x) + (4 * n^2 - 1) * (4 * n^2 - 25) / (384 * x^3) + (4 * n^2 - 1) * (16 * n^4 - 456 * n^2 +
+    // 1073) / (5120 * x^5)
     s += (mu - 1) / (2 * denom); // 1,2:Constants in formulas
     denom *= denomMult;
     s += (mu - 1) * (mu - 25) / (6 * denom); // 1,25,6:Constants in formulas
@@ -241,7 +242,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float JnCase1(int n, float x)
     float offset = (float)n / 2 + 0.25f;
     SinCospiImpl(offset, si, ci);
     SinCosImpl(phase, sp, cp);
-    float sinPhase = cp * (cx * ci + sx * si) - sp * (sx *ci - cx * si);
+    float sinPhase = cp * (cx * ci + sx * si) - sp * (sx * ci - cx * si);
     return sinPhase * ampl;
 }
 
@@ -249,7 +250,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float JnCase2(int n, float x)
 {
     float prev = J0Impl(x);
     float current = J1Impl(x);
-    for(int k = 1; k < n; k++){
+    for (int k = 1; k < n; k++) {
         float value = (2 * k * current / x) - prev;
         prev = current;
         current = value;
@@ -285,7 +286,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float JnCase4(int n, float x)
     float s = 0;
     float scale = 1;
     float res;
-    for (int k = N-1; k >= 0; k--) {
+    for (int k = N - 1; k >= 0; k--) {
         float fact = 2 * (k + 1) / x;
         if (fact > 1 && AbsImpl(current) > maxValue) {
             prev /= maxValue;
@@ -337,7 +338,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float J0XLess8(float x)
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float CalY0XLessdot5(float x)
-{        
+{
     float part1 = 0.636619772367f * J0XLess8(x) * LogImpl(x);
     float part2 = FmaImpl(0.0007977247950890495f, x, -0.016524315326267768f);
     part2 = FmaImpl(part2, x, 0.0001196180186f);
@@ -386,14 +387,14 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float CalY0XPart2(float x)
     res = FmaImpl(res, d3, -3.743254148e-02f);
     res = FmaImpl(res, d3, 9.592770584e-02f);
     res = d3 * res;
-    float d2 = x - 3.95767832f;   
+    float d2 = x - 3.95767832f;
     d2 = d2 - 1.01291178e-7f;
     res = d2 * res;
     return res;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float CalY0XLarger8(float x)
-{  
+{
     if (IsInfImpl(x)) {
         return 0.0f;
     }
@@ -415,7 +416,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float CalY0XLarger8(float x)
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float CalY1XLess1dot2(float x, float minus_two_over_pi_mul_inv_x)
-{        
+{
     float part1 = 0.636619772367f * CalJ1XLess8(x) * LogImpl(x);
     float part2 = FmaImpl(0.0002798307076f, x, -0.0034028867918f);
     part2 = FmaImpl(part2, x, 0.0003643335439f);
@@ -448,7 +449,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float CalY1XPart1(float x)
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float CalY1XPart2(float x)
-{ 
+{
     float d2 = x - 5.42968082f;
     d2 = d2 - 2.16514351e-7f;
     float res = -4.575132868e-10f;
@@ -495,14 +496,15 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float YnCase1(int n, float x)
 {
     float lgammaN = LgammaImpl(n);
     float gammaN = ExpImpl(lgammaN);
-    return -gammaN / ConstantsInternal::PI * PowImpl(2 / x, (float)n); // 2:Constants in formulas -(n - 1)! * (2 / x)^n / π
+    return -gammaN / ConstantsInternal::PI *
+           PowImpl(2 / x, (float)n); // 2:Constants in formulas -(n - 1)! * (2 / x)^n / π
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float YnCase2(int n, float x)
 {
     float ampl = JnYnAsymptoticBesselAmplitude(n, x, 1); // 1: Calculate YnAsymptoticBesselAmplitude
     float phase = JnYnAsymptoticBesselPhaseMx(n, x);
-    float phaseShift = n * float(ConstantsInternal::PI)/2 + float(ConstantsInternal::PI)/4;
+    float phaseShift = n * float(ConstantsInternal::PI) / 2 + float(ConstantsInternal::PI) / 4;
     float cosX = CosImpl(x);
     float sinX = SinImpl(x);
     float cosShift = CosImpl(phaseShift - phase);
@@ -519,12 +521,12 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float YnCase3(int n, float x)
 
     int k = 1;
     float mult = 2 * k / x;
-    float value = mult * current - prev;  
+    float value = mult * current - prev;
     prev = current;
     current = value;
     k += 1;
     while (k < n) {
-        if (AbsImpl(mult) > 1.0f  && AbsImpl(current) > 1.0f && k > 2) { // 2 : index
+        if (AbsImpl(mult) > 1.0f && AbsImpl(current) > 1.0f && k > 2) { // 2 : index
             current = 1.0f;
         }
         mult = 2 * k / x; // 2:Constant coefficient 2 * k / x
@@ -554,9 +556,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T J0Impl(T x)
     }
     float res;
     if (f1 > 8.0f) {
-        res = CalJ0XLarger8(f1); 
+        res = CalJ0XLarger8(f1);
     } else {
-        res = CalJ0XLess8(f1);   
+        res = CalJ0XLess8(f1);
     }
     return res;
 }
@@ -629,7 +631,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T Y0Impl(T x)
     if (f1 > 1e13f && IsFiniteImpl(f1)) {
         return 0;
     }
-    float res;     
+    float res;
     if (f1 < 0.5f) {
         res = CalY0XLessdot5(f1);
     } else if (f1 < 2.1971413260310170351f) {
@@ -654,10 +656,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T Y1Impl(T x)
         return 0;
     }
     if (x == 0.0f) {
-        return -ConstantsInternal::SIMT_FP32_INF;  
+        return -ConstantsInternal::SIMT_FP32_INF;
     }
-    float minus_two_over_pi_mul_inv_x = -0.636619772367f / f1;                
-    float res;     
+    float minus_two_over_pi_mul_inv_x = -0.636619772367f / f1;
+    float res;
     if (f1 < 1.17549435e-38f) {
         res = minus_two_over_pi_mul_inv_x;
     }
@@ -707,7 +709,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline U YnImpl(T n, U x)
     return YnCase3(n, x);
 }
 
-
-}  // namespace Simt
-}  // namespace AscendC
-#endif  // IMPL_SIMT_API_CPP_DAV_C310_KERNEL_SIMT_BESSEL_IMPL_H
+} // namespace Simt
+} // namespace AscendC
+#endif // IMPL_SIMT_API_CPP_DAV_C310_KERNEL_SIMT_BESSEL_IMPL_H

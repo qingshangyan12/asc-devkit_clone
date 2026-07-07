@@ -34,7 +34,7 @@ struct MemBlockQueue {
     std::vector<void*> entry;
     u32 blockCap = MEM_BLOCK_CAP;
     MemBlockQueue() : entry{} {};
-    ~MemBlockQueue(){};
+    ~MemBlockQueue() {};
     void Init(u32 capNum)
     {
         blockCap = capNum;

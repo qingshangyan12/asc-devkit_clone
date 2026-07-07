@@ -34,7 +34,7 @@ public:
 public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, PadParams& padParams,
-        const LocalTensor<uint8_t>& sharedTmpBuffer, PadTiling& tiling){};
+        const LocalTensor<uint8_t>& sharedTmpBuffer, PadTiling& tiling) {};
 };
 
 } // namespace HighLevelApiCheck

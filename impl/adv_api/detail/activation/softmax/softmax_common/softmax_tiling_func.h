@@ -171,7 +171,7 @@ __aicore__ inline bool SoftMaxGradTilingFunc(
     return true;
 }
 
-};     // namespace AscendC
+}; // namespace AscendC
 #endif // IMPL_ACTIVATION_SOFTMAX_SOFTMAX_TILING_FUNC_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAX_TILING_FUNC_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

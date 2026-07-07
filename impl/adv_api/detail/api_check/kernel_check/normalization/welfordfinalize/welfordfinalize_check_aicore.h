@@ -37,7 +37,7 @@ public:
         const LocalTensor<float>& outputMean, const LocalTensor<float>& outputVariance,
         const LocalTensor<float>& inputMean, const LocalTensor<float>& inputVariance,
         const LocalTensor<int32_t>& counts, const LocalTensor<uint8_t>& sharedTmpBuffer,
-        const WelfordFinalizePara& para){};
+        const WelfordFinalizePara& para) {};
 };
 
 template <bool isReuseSource = false>
@@ -50,7 +50,7 @@ public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<float>& outputMean, const LocalTensor<float>& outputVariance,
         const LocalTensor<float>& inputMean, const LocalTensor<float>& inputVariance,
-        const LocalTensor<uint8_t>& sharedTmpBuffer, const WelfordFinalizePara& para){};
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const WelfordFinalizePara& para) {};
 };
 
 } // namespace HighLevelApiCheck

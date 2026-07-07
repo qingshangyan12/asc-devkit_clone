@@ -22,7 +22,7 @@ constexpr unsigned int MAX_RANKCOUNT = 65536;
 constexpr u32 UNDEFIEND_LOCAL_ID = UINT_MAX;
 class RankTableInfo {
 public:
-    RankTableInfo(){};
+    RankTableInfo() {};
     RankTableInfo(BinaryStream& binaryStream);
     std::string version;
     u32 rankCount{0};

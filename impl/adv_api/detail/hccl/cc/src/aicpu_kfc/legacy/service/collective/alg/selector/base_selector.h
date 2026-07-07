@@ -38,7 +38,7 @@ const std::map<OpType, std::string> OP_TYPE_TO_AICPU_SOLE_ALG_MAP = {
 
 class BaseSelector {
 public:
-    virtual ~BaseSelector(){};
+    virtual ~BaseSelector() {};
     BaseSelector& SetVirtualTopo(RankGraph* rankGraph);
     BaseSelector& SetDevType(DevType devType);
     BaseSelector& SetMyRank(RankId myRank);

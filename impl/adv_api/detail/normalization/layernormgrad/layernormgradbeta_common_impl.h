@@ -32,7 +32,7 @@
 
 namespace AscendC {
 struct LayerNormGradBetaParams {
-    __aicore__ LayerNormGradBetaParams(){};
+    __aicore__ LayerNormGradBetaParams() {};
 
     uint32_t bLength = 0;
     uint32_t sLength = 0;

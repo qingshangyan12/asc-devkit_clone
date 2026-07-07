@@ -65,7 +65,7 @@ struct BroadCastLastND {
     uint32_t srcK;
 };
 
-};     // namespace AscendC
+}; // namespace AscendC
 #endif // IMPL_ACTIVATION_SOFTMAX_SOFTMAX_COMMON_UTILS_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAX_COMMON_UTILS_H__)

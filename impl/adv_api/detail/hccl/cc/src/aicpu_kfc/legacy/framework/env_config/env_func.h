@@ -55,13 +55,13 @@ struct SocketIfName {
     std::string configIfNameStr{""};
     SocketIfName() = default;
     SocketIfName(const std::vector<std::string>& configIfNames, bool searchNot, bool searchExact)
-        : configIfNames(configIfNames), searchNot(searchNot), searchExact(searchExact){};
+        : configIfNames(configIfNames), searchNot(searchNot), searchExact(searchExact) {};
 };
 
 struct DfsConfig {
     bool taskExceptionEnable{true};
     DfsConfig() = default;
-    DfsConfig(bool taskException) : taskExceptionEnable(taskException){};
+    DfsConfig(bool taskException) : taskExceptionEnable(taskException) {};
 };
 
 enum class NpuProtoType {

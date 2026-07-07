@@ -37,7 +37,7 @@ constexpr uint32_t FLOAT_PER_BLOCK = 8;
 constexpr float RSQRT_EXPONENT = -0.5;
 
 struct RmsNormParams {
-    __aicore__ RmsNormParams(){};
+    __aicore__ RmsNormParams() {};
     uint32_t curBsLength = 0;
     uint32_t curBshLength = 0;
     LocalTensor<float> tmpAddr;

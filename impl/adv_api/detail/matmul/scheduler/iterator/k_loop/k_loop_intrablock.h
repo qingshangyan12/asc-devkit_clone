@@ -114,7 +114,7 @@ public:
         return GetOuterIdx<IS_INTRA_BLOCK>() + 1 == GetOuterIter<IS_INTRA_BLOCK>();
     }
 
-    __aicore__ inline void InnerStart(){};
+    __aicore__ inline void InnerStart() {};
 
     __aicore__ inline bool InnerNext() { return false; }
 
