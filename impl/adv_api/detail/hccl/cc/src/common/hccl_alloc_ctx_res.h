@@ -546,6 +546,11 @@ HcclResult GetOpParamResCtx(
         executor.get() == nullptr, HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
 
     std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
+    resCtxHost->isHcommBatchTransferOnThreadSupported = HcommIsSupportHcommBatchTransferOnThread();
+    HCCL_INFO(
+        "[MC2_BATCH_TRANSFER][HostSupport] opType[%u], algName[%s], supported[%d].",
+        static_cast<uint32_t>(opParam.opType), algName.c_str(),
+        static_cast<int>(resCtxHost->isHcommBatchTransferOnThreadSupported));
     bool isResourceReused = false;
 
     ThreadHandle cpuTsThread{0};

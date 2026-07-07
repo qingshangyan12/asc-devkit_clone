@@ -18,6 +18,11 @@
 #include "cann_dispatch_bridge.h"
 
 namespace {
+constexpr int32_t MC2_HCOMM_LAUNCH_MODE_EAGER = 0;
+constexpr int32_t MC2_HCOMM_LAUNCH_MODE_BATCH = 1;
+
+extern "C" int32_t HcommSetLaunchMode(const char* launchTag, int32_t mode);
+
 mc2_ops_hccl::OpParam* AsOpenOpParam(std::vector<uint8_t>& opParam)
 {
     return reinterpret_cast<mc2_ops_hccl::OpParam*>(opParam.data());
@@ -114,6 +119,57 @@ HcclResult RestoreVarDataIfNeeded(mc2_ops_hccl::OpParam& param, const mc2_ops_hc
     }
     return ret;
 }
+
+bool IsMc2BatchModeOp(HcclCMDType opType)
+{
+    return opType == HCCL_CMD_ALLREDUCE || opType == HCCL_CMD_ALLGATHER || opType == HCCL_CMD_REDUCE_SCATTER ||
+           opType == HCCL_CMD_ALLTOALLV || opType == HCCL_CMD_ALLTOALL;
+}
+
+HcclResult SetMc2BatchMode(const mc2_ops_hccl::OpParam& param, int32_t mode, const char* stage)
+{
+    HCCL_INFO(
+        "[MC2_BATCH][%s] opType %u, algName[%s], algTag[%s], mode %d.",
+        stage, static_cast<u32>(param.opType), param.algName, param.algTag, mode);
+    int32_t ret = HcommSetLaunchMode(param.algTag, mode);
+    CHK_PRT_RET(
+        ret != HCCL_SUCCESS,
+        HCCL_ERROR(
+            "[MC2_BATCH][%s] set launch mode failed, ret %d, opType %u, algName[%s], algTag[%s], mode %d.",
+            stage, ret, static_cast<u32>(param.opType), param.algName, param.algTag, mode),
+        static_cast<HcclResult>(ret));
+    return HCCL_SUCCESS;
+}
+
+template <typename Func>
+HcclResult RunWithMc2BatchMode(const mc2_ops_hccl::OpParam& param, Func func)
+{
+    if (!IsMc2BatchModeOp(param.opType)) {
+        return func();
+    }
+
+    HcclResult ret = SetMc2BatchMode(param, MC2_HCOMM_LAUNCH_MODE_BATCH, "Start");
+    CHK_RET(ret);
+
+    HcclResult execRet = func();
+    const char* endStage = (execRet == HCCL_SUCCESS) ? "End" : "Cleanup";
+    if (execRet != HCCL_SUCCESS) {
+        HCCL_ERROR(
+            "[MC2_BATCH][Cleanup] executor failed, ret %u, opType %u, algName[%s], algTag[%s].",
+            execRet, static_cast<u32>(param.opType), param.algName, param.algTag);
+    }
+
+    HcclResult eagerRet = SetMc2BatchMode(param, MC2_HCOMM_LAUNCH_MODE_EAGER, endStage);
+    if (execRet != HCCL_SUCCESS) {
+        if (eagerRet != HCCL_SUCCESS) {
+            HCCL_ERROR(
+                "[MC2_BATCH][Cleanup] eager mode cleanup also failed, ret %u, opType %u, algName[%s], algTag[%s].",
+                eagerRet, static_cast<u32>(param.opType), param.algName, param.algTag);
+        }
+        return execRet;
+    }
+    return eagerRet;
+}
 } // namespace
 
 HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t>& opParam)
@@ -179,7 +235,8 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t>& opParam)
         (param->opType == HCCL_CMD_ALLTOALL || param->opType == HCCL_CMD_ALLTOALLV ||
          param->opType == HCCL_CMD_ALLREDUCE);
     if (useCannBridge) {
-        HcclResult cannRet = mc2_ops_hccl::LaunchViaCann(*param, resCtx);
+        HcclResult cannRet = RunWithMc2BatchMode(
+            *param, [&]() -> HcclResult { return mc2_ops_hccl::LaunchViaCann(*param, resCtx); });
         CHK_PRT_RET(
             cannRet != HCCL_SUCCESS,
             HCCL_ERROR(
@@ -193,7 +250,7 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t>& opParam)
         mc2_ops_hccl::CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, std::string(param->algName));
     CHK_SMART_PTR_NULL(executor);
 
-    HcclResult ret = executor->Orchestrate(*param, resCtx);
+    HcclResult ret = RunWithMc2BatchMode(*param, [&]() -> HcclResult { return executor->Orchestrate(*param, resCtx); });
     CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("orchestrate failed for alg:%s", param->algName), ret);
 
     return HCCL_SUCCESS;

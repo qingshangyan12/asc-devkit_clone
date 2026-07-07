@@ -10,6 +10,7 @@
 #ifndef LAUNCH_CONTEXT_H
 #define LAUNCH_CONTEXT_H
 
+#include <algorithm>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -33,6 +34,7 @@ private:
 
     std::string launchTag_; // 当前tag
     std::unordered_map<std::string, std::unordered_set<ThreadHandle>> launchModeMap_;
+    std::vector<ThreadHandle> threadVec_;
     std::mutex mtx_;
     HcommLaunchMode mode_ = HCOMM_LAUNCH_MODE_EAGER;
 };
