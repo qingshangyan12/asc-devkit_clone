@@ -63,6 +63,16 @@ typedef struct {
     uint32_t eventId;
 } AinDescriptorUbuf;
 
+typedef uint32_t AinSignal;
+typedef struct {
+    AinSignal signalId;
+    uint64_t value;
+} AinSignalAdd;
+
+typedef struct {
+    AinSignal signalId;
+} AinSignalInc;
+
 /*!
  * @brief Commit behaviour for put/get tasks.
  */
