@@ -62,6 +62,16 @@ class BatchScheduler<
     using BiasT = typename BIAS_TYPE::T;
     using DstT = typename C_TYPE::T;
 
+    struct BatchResultSync {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        MutexID ping{0};
+        MutexID pong{0};
+        uint8_t index{0};
+#else
+        event_t eventID{0};
+#endif
+    };
+
 public:
     // fix framework module name
     using BASE_MODULE = AscendC::Impl::Detail::BatchSchedulerBase<IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG>;
@@ -100,7 +110,7 @@ public:
                 auto a1 = MATMUL_MODULE(BatchCopyCubeInA)->AllocTensor();
                 auto b1 = MATMUL_MODULE(BatchCopyCubeInB)->AllocTensor();
                 event_t eventIDMte2ToMte1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_MTE1));
-                event_t eventIDMToMte1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::M_MTE1));
+                BatchResultSync resultSync = AllocBatchResultSync();
                 auto batchLoop = MATMUL_MODULE(BatchLoop);
                 for (batchLoop->SplitStart(); !batchLoop->SplitEnd(); batchLoop->SplitNext()) {
                     uint32_t outerIdxA;
@@ -114,34 +124,20 @@ public:
                             b1, matrixStrideB, outerIdxB, batchLoop->GetSplitIndex(), batchLoop->GetSplitSize());
                     SetFlag<HardEvent::MTE2_MTE1>(eventIDMte2ToMte1);
                     WaitFlag<HardEvent::MTE2_MTE1>(eventIDMte2ToMte1);
-                    auto batchLoop = MATMUL_MODULE(BatchLoop);
-                    for (batchLoop->InnerStart(); !batchLoop->InnerEnd(); batchLoop->InnerNext()) {
-                        BASE_MODULE::isFirstIter_ = true;
-                        if (batchOffsetInfo.setBiasFlag &&
-                            (batchLoop->GetBatchIndex() % batchOffsetInfo.divisorBias == 1)) {
-                            MATMUL_MODULE(BiasScheduler)->StopBias(bias);
-                        }
-                        UpdateInnerOffset(batchOffsetInfo, ctx);
-                        while (BASE_MODULE::MoveNext()) { // iterate
-                            MATMUL_MODULE(CubeOutBuffer)->AllocTensor();
-                            ComputeBatch(a1, b1, bias, enPartialSum, ctx);
-                            BatchScheduler::GetBatchResultImpl(dst, ctx, enAtomic, enSequentialWrite);
-                            SetFlag<HardEvent::M_MTE1>(eventIDMToMte1);
-                            WaitFlag<HardEvent::M_MTE1>(eventIDMToMte1);
-                        }
-                        EndIterate();
-                    }
+                    ProcessInnerBatch(
+                        dst, a1, b1, bias, enPartialSum, batchOffsetInfo, ctx, resultSync, enAtomic, enSequentialWrite);
                     BASE_MODULE::End();
                 }
                 MATMUL_MODULE(BatchCopyCubeInA)->BatchDestroy(a1);
                 MATMUL_MODULE(BatchCopyCubeInB)->BatchDestroy(b1);
+                ReleaseBatchResultSync(resultSync);
             } else {
                 auto batchLoop = MATMUL_MODULE(BatchLoop);
                 for (batchLoop->SplitStart(); !batchLoop->SplitEnd(); batchLoop->SplitNext()) {
                     LocalTensor<TransAT> a1;
                     LocalTensor<TransBT> b1;
                     event_t eventIDMte2ToMte1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_MTE1));
-                    event_t eventIDMToMte1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::M_MTE1));
+                    BatchResultSync resultSync = AllocBatchResultSync();
                     auto splitIdxA = batchLoop->template GetSplitIndex<InputTypeTag::A>();
                     auto splitIdxB = batchLoop->template GetSplitIndex<InputTypeTag::B>();
                     MATMUL_MODULE(BatchCopyCubeInA)
@@ -152,28 +148,14 @@ public:
                             b1, matrixStrideB, batchLoop->GetOuterIndex(), splitIdxB, batchLoop->GetSplitSize());
                     SetFlag<HardEvent::MTE2_MTE1>(eventIDMte2ToMte1);
                     WaitFlag<HardEvent::MTE2_MTE1>(eventIDMte2ToMte1);
-                    auto batchLoop = MATMUL_MODULE(BatchLoop);
-                    for (batchLoop->InnerStart(); !batchLoop->InnerEnd(); batchLoop->InnerNext()) {
-                        BASE_MODULE::isFirstIter_ = true;
-                        if (batchOffsetInfo.setBiasFlag &&
-                            (batchLoop->GetBatchIndex() % batchOffsetInfo.divisorBias == 1)) {
-                            MATMUL_MODULE(BiasScheduler)->StopBias(bias);
-                        }
-                        UpdateInnerOffset(batchOffsetInfo, ctx);
-                        while (BASE_MODULE::MoveNext()) { // iterate
-                            MATMUL_MODULE(CubeOutBuffer)->AllocTensor();
-                            ComputeBatch(a1, b1, bias, enPartialSum, ctx);
-                            BatchScheduler::GetBatchResultImpl(dst, ctx, enAtomic, enSequentialWrite);
-                            SetFlag<HardEvent::M_MTE1>(eventIDMToMte1);
-                            WaitFlag<HardEvent::M_MTE1>(eventIDMToMte1);
-                        }
-                        EndIterate();
-                    }
+                    ProcessInnerBatch(
+                        dst, a1, b1, bias, enPartialSum, batchOffsetInfo, ctx, resultSync, enAtomic, enSequentialWrite);
 
                     MATMUL_MODULE(BatchCopyCubeInA)->BatchDestroy(a1);
                     MATMUL_MODULE(BatchCopyCubeInB)->BatchDestroy(b1);
                     MATMUL_MODULE(BiasScheduler)->End();
                     MATMUL_MODULE(CubeOutBuffer)->Destroy();
+                    ReleaseBatchResultSync(resultSync);
                 }
 
                 MATMUL_MODULE(BatchCopyCubeInA)->Reset();
@@ -191,6 +173,67 @@ public:
     }
 
 private:
+    __aicore__ inline BatchResultSync AllocBatchResultSync()
+    {
+        BatchResultSync resultSync;
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        resultSync.ping = GetTPipePtr()->AllocMutexID();
+        resultSync.pong = GetTPipePtr()->AllocMutexID();
+#else
+        resultSync.eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::M_MTE1));
+#endif
+        return resultSync;
+    }
+
+    __aicore__ inline void ReleaseBatchResultSync(const BatchResultSync& resultSync)
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        GetTPipePtr()->ReleaseMutexID(resultSync.ping);
+        GetTPipePtr()->ReleaseMutexID(resultSync.pong);
+#endif
+    }
+
+    template <class T>
+    __aicore__ inline void CommitBatchResult(
+        const T& dst, BatchSchedulerContext& ctx, BatchResultSync& resultSync, uint8_t enAtomic, bool enSequentialWrite)
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        MutexID syncIdMToMte1 = (resultSync.index == 0) ? resultSync.ping : resultSync.pong;
+        resultSync.index = 1 - resultSync.index;
+        Mutex::Lock<PIPE_M>(syncIdMToMte1);
+        BatchScheduler::GetBatchResultImpl(dst, ctx, enAtomic, enSequentialWrite);
+        Mutex::Unlock<PIPE_M>(syncIdMToMte1);
+        Mutex::Lock<PIPE_MTE1>(syncIdMToMte1);
+        Mutex::Unlock<PIPE_MTE1>(syncIdMToMte1);
+#else
+        BatchScheduler::GetBatchResultImpl(dst, ctx, enAtomic, enSequentialWrite);
+        SetFlag<HardEvent::M_MTE1>(resultSync.eventID);
+        WaitFlag<HardEvent::M_MTE1>(resultSync.eventID);
+#endif
+    }
+
+    template <class T>
+    __aicore__ inline void ProcessInnerBatch(
+        const T& dst, LocalTensor<TransAT>& a1, LocalTensor<TransBT>& b1, LocalTensor<BiasT>& bias, bool enPartialSum,
+        BatchOffsetInfo& batchOffsetInfo, BatchSchedulerContext& ctx, BatchResultSync& resultSync, uint8_t enAtomic,
+        bool enSequentialWrite)
+    {
+        auto batchLoop = MATMUL_MODULE(BatchLoop);
+        for (batchLoop->InnerStart(); !batchLoop->InnerEnd(); batchLoop->InnerNext()) {
+            BASE_MODULE::isFirstIter_ = true;
+            if (batchOffsetInfo.setBiasFlag && (batchLoop->GetBatchIndex() % batchOffsetInfo.divisorBias == 1)) {
+                MATMUL_MODULE(BiasScheduler)->StopBias(bias);
+            }
+            UpdateInnerOffset(batchOffsetInfo, ctx);
+            while (BASE_MODULE::MoveNext()) { // iterate
+                MATMUL_MODULE(CubeOutBuffer)->AllocTensor();
+                ComputeBatch(a1, b1, bias, enPartialSum, ctx);
+                CommitBatchResult(dst, ctx, resultSync, enAtomic, enSequentialWrite);
+            }
+            EndIterate();
+        }
+    }
+
     __aicore__ inline BatchOffsetInfo PrepareOffset()
     {
         // calculate corresponding mod, divisor, alignSize for A/B/Bias offset

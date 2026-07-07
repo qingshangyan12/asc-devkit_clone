@@ -48,25 +48,66 @@ class C2Buffer<
          DoMatmulSpecialMDL(MM_CFG) || IsBasicBlockEnable<MM_CFG> || DoMatmulIBShareNorm(MM_CFG))>> {
 public:
     __aicore__ inline C2Buffer() {}
-    __aicore__ inline ~C2Buffer() {}
+    __aicore__ inline ~C2Buffer()
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        if (biasMutexId_ != static_cast<MutexID>(INVALID_TBUFID)) {
+            ReleaseMutexID(biasMutexId_);
+        }
+#endif
+    }
 
-    __aicore__ inline void Init() { GetTPipePtr()->InitBuffer(biasBuf_, BIAS_TABLE_SIZE); }
+    __aicore__ inline void Init()
+    {
+        GetTPipePtr()->InitBuffer(biasBuf_, BIAS_TABLE_SIZE);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        biasMutexId_ = GetTPipePtr()->AllocMutexID();
+#endif
+    }
 
     __aicore__ inline LocalTensor<L0cT> Allocate()
     {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Lock<PIPE_MTE1>(biasMutexId_);
+#else
         WaitFlag<HardEvent::M_MTE1>(EVENT_ID2);
+#endif
         LocalTensor<L0cT> biasC2 = biasBuf_.Get<L0cT>();
         return biasC2;
     }
 
-    __aicore__ inline void Free() { SetFlag<HardEvent::M_MTE1>(EVENT_ID2); }
+    __aicore__ inline void Free()
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Unlock<PIPE_M>(biasMutexId_);
+#else
+        SetFlag<HardEvent::M_MTE1>(EVENT_ID2);
+#endif
+    }
 
-    __aicore__ inline void EnQue() { SetFlag<HardEvent::MTE1_M>(EVENT_ID2); }
+    __aicore__ inline void EnQue()
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Unlock<PIPE_MTE1>(biasMutexId_);
+#else
+        SetFlag<HardEvent::MTE1_M>(EVENT_ID2);
+#endif
+    }
 
-    __aicore__ inline void DeQue() { WaitFlag<HardEvent::MTE1_M>(EVENT_ID2); }
+    __aicore__ inline void DeQue()
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Lock<PIPE_M>(biasMutexId_);
+#else
+        WaitFlag<HardEvent::MTE1_M>(EVENT_ID2);
+#endif
+    }
 
 private:
     TBuf<TPosition::C2> biasBuf_;
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+    MutexID biasMutexId_{static_cast<MutexID>(INVALID_TBUFID)};
+#endif
 };
 
 } // namespace Detail
