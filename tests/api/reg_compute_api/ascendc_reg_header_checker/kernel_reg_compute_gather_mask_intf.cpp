@@ -35,11 +35,3 @@ extern "C" __simd_vf__ void gather_mask_test()
     // __simd_callee__ inline void Gather(S& dstReg, S& srcReg, V& indexReg);
     AscendC::Reg::Gather(dstReg, srcReg, indexReg);
 }
-
-extern "C" __global__ __aicore__ void gather_mask_test_2()
-{
-    // template <SpecialPurposeReg spr>
-    // __aicore__ inline int64_t GetSpr();
-    // (GetSpr cannot be tested in __simd_vf__ context)
-    auto res = AscendC::Reg::GetSpr<AscendC::SpecialPurposeReg::AR>();
-}
