@@ -260,16 +260,16 @@ output_tile[tile_col + tile_row * height] = input_tile[tile_col * TILE_DIM + til
 
 ## 性能分析
 
-### msProf工具介绍
-msProf工具是单算子性能分析工具。包含msprof op和msprof op simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
+### msOpProf工具介绍
+msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
 
 - 上板性能采集
 
     通过上板性能采集，可以直接测定算子昇腾AI处理器上的运行时间。该方式适合在板环境中快速定位算子性能问题。
 
-    基于可执行文件demo通过msprof op执行算子调优：
+    基于可执行文件demo通过msprof执行算子调优：
     ```
-    msprof op ./demo
+    msopprof ./demo
     ```
 
     - 性能数据说明  

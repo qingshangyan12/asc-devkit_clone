@@ -443,9 +443,9 @@ for (uint32_t mBlockIdx = 0; mBlockIdx < fullMBlockCount; mBlockIdx++) {
 
     通过上板性能采集，可以直接测定算子昇腾AI处理器上的运行时间。该方式适合在板环境中快速定位算子性能问题。
 
-    基于可执行文件demo通过msprof op执行算子调优：
+    基于可执行文件demo通过msopprof执行算子调优：
     ```
-    msprof op ./demo
+    msopprof ./demo
     ```
 
     - 性能数据说明  
