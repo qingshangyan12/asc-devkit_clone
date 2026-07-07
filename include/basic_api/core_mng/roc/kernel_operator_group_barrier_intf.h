@@ -30,7 +30,11 @@ namespace AscendC {
 template <PipeMode pipeMode>
 class GroupBarrier {
 public:
+#if defined(__NPU_ARCH__)
     __aicore__ inline GroupBarrier(GM_ADDR groupWorkspace, uint32_t arriveSizeIn, uint32_t waitSizeIn);
+#else
+    __aicore__ inline GroupBarrier(GM_ADDR groupWorkspace, uint32_t arriveSizeIn, uint32_t waitSizeIn){}
+#endif
     __aicore__ inline void Arrive(uint32_t arriveIndex);
     // stuck in while loop until all aiv has arrived, then update wait counter
     __aicore__ inline void Wait(uint32_t waitIndex);

@@ -286,7 +286,11 @@ private:
 template<Hardware hard = Hardware::UB>
 class LocalMemAllocator {
 public:
+#if defined(__NPU_ARCH__)
     __aicore__ inline LocalMemAllocator();
+#else
+    __aicore__ inline LocalMemAllocator(){}
+#endif
     __aicore__ inline uint32_t GetCurAddr() const;
     template <TPosition pos, class DataType, uint32_t tileSize> __aicore__ inline LocalTensor<DataType> Alloc();
     template <TPosition pos, class DataType> LocalTensor<DataType> __aicore__ inline Alloc(uint32_t tileSize);

@@ -38,10 +38,15 @@
 namespace AscendC {
 class KfcWorkspace {
 public:
+#if defined(__NPU_ARCH__)
     __aicore__ inline KfcWorkspace(GM_ADDR workspace);
+    __aicore__ inline ~KfcWorkspace();
+#else
+    __aicore__ inline KfcWorkspace(GM_ADDR workspace){}
+    __aicore__ inline ~KfcWorkspace(){}
+#endif
     __aicore__ inline void UpdateKfcWorkspace(uint32_t offset);
     __aicore__ inline GM_ADDR GetKfcWorkspace();
-    __aicore__ inline ~KfcWorkspace();
 
 private:
     friend __aicore__ inline uint8_t GetEventId(KfcWorkspace &desc);
