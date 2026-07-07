@@ -2,14 +2,14 @@
 
 基于Ascend C方式实现带有Tiling的算子的开发流程如下图所示。
 
-**图1**  算子开发流程<a name="zh-cn_topic_0000002236197677_fig18330201774715"></a>  
+**图1**  算子开发流程<a name="zh-cn_topic_0000002236197677_fig18330201774715"></a>
 ![](../../../../figures/算子开发流程.png "算子开发流程")
 
 ## 算子分析<a name="zh-cn_topic_0000002236197677_section179012044886"></a>
 
 本样例为输入数据在核间均分、核内均分场景。本样例的Tiling策略为：数据整体长度TOTAL\_LENGTH为8 \* 2048，数据平均分配到8个核上运行，每个核上计算的数据长度BLOCK\_LENGTH为2048，将单核上的数据切分成16块（此处切分成16块仅用来作为Tiling的样例，并不代表性能最佳，仅供参考），每块数据的长度TILE\_LENGTH为128。数据切分示意如下图所示：
 
-**图2**  数据切分示意图<a name="zh-cn_topic_0000002236197677_fig1986021174914"></a>  
+**图2**  数据切分示意图<a name="zh-cn_topic_0000002236197677_fig1986021174914"></a>
 ![](../../../../figures/数据切分示意图.png "数据切分示意图")
 
 通过以上分析，得到Ascend C  Add算子的设计规格如下：
@@ -60,13 +60,10 @@
     </tbody>
     </table>
 
--   核函数名称：tiling\_strategy\_custom
 -   使用的主要接口：
     -   DataCopy：数据搬移接口
     -   Add：矢量基础算术接口
     -   EnQue、DeQue等接口：Queue队列管理接口
-
--   算子实现文件名称：tiling\_strategy.asc
 
 ## Tiling实现<a name="zh-cn_topic_0000002236197677_section480741815522"></a>
 
@@ -120,7 +117,7 @@ void GenerateTilingData(uint8_t* tilingBuf, uint32_t numBlocks)
     size_t tilingSize = sizeof(AddCustomTilingData);
     GenerateTilingData(tiling, NUM_BLOCKS);  // 调用tiling参数计算函数
     ....
-    
+
     tiling_strategy_custom<<<NUM_BLOCKS, 0, stream>>>(xDevice, yDevice, zDevice,
                                                *reinterpret_cast<AddCustomTilingData*>(tiling));
     ....
@@ -140,14 +137,14 @@ Kernel侧算子实现仍遵循[矢量算子核函数实现流程](../基础矢�
     xGm.SetGlobalBuffer((__gm__ half *)x + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
     ```
 
-    **图3**  多核并行处理示意图<a name="zh-cn_topic_0000002236197677_fig398721711313"></a>  
+    **图3**  多核并行处理示意图<a name="zh-cn_topic_0000002236197677_fig398721711313"></a>
     ![](../../../../figures/多核并行处理示意图-38.png "多核并行处理示意图-38")
 
 -   通过Pipe内存管理对象为输入输出Queue分配内存。
 
     对于单核上的处理数据，可以进行数据切块（Tiling），在本示例中，仅作为参考，将单核上的数据（2048个数）切分成16块（并不意味着16块就是性能最优），每块tileLength（128）个数据。数据切分示意图如[图4](#zh-cn_topic_0000002236197677_fig1319211154719)所示。
 
-    **图4**  单核数据切分示意图<a name="zh-cn_topic_0000002236197677_fig1319211154719"></a>  
+    **图4**  单核数据切分示意图<a name="zh-cn_topic_0000002236197677_fig1319211154719"></a>
     ![](../../../../figures/单核数据切分示意图-39.png "单核数据切分示意图-39")
 
     与[基础矢量算子](../基础矢量算子.md)相比，在通过Pipe内存管理对象为输入输出Queue分配内存时，需使用单核内每个数据块的长度tileLength作为分配内存的长度。比如，为输入x的Queue分配内存，可以通过如下代码段实现，Pipe为inQueueX分配了一块大小为tileLength \* sizeof\(half\)个字节的内存块，每个内存块能容纳tileLength（128）个half类型数据。

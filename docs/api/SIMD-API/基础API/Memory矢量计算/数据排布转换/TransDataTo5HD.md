@@ -44,21 +44,21 @@ TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1H
 
   ```cpp
   template <typename T>
-  __aicore__ inline void TransDataTo5HD(uint64_t dstList[NCHW_CONV_ADDR_LIST_SIZE], uint64_t srcList[NCHW_CONV_ADDR_LIST_SIZE], const TransDataTo5HDParams& nchwconvParams) 
+  __aicore__ inline void TransDataTo5HD(uint64_t dstList[NCHW_CONV_ADDR_LIST_SIZE], uint64_t srcList[NCHW_CONV_ADDR_LIST_SIZE], const TransDataTo5HDParams& nchwconvParams)
   ```
 
 - dst与src类型为uint64\_t的LocalTensor，连续存储对应LocalTensor的地址值。开发者可以通过LocalTensor的GetPhyAddr接口获取该地址值。
 
   ```cpp
   template <typename T>
-  __aicore__ inline void TransDataTo5HD(const LocalTensor<uint64_t>& dst, const LocalTensor<uint64_t>& src, const TransDataTo5HDParams& nchwconvParams) 
+  __aicore__ inline void TransDataTo5HD(const LocalTensor<uint64_t>& dst, const LocalTensor<uint64_t>& src, const TransDataTo5HDParams& nchwconvParams)
   ```
 
 - dstList与srcList类型为LocalTensor的数组。
 
   ```cpp
   template <typename T>
-  __aicore__ inline void TransDataTo5HD(const LocalTensor<T> (&dstList)[NCHW_CONV_ADDR_LIST_SIZE], const LocalTensor<T> (&srcList)[NCHW_CONV_ADDR_LIST_SIZE], const TransDataTo5HDParams& nchwconvParams) 
+  __aicore__ inline void TransDataTo5HD(const LocalTensor<T> (&dstList)[NCHW_CONV_ADDR_LIST_SIZE], const LocalTensor<T> (&srcList)[NCHW_CONV_ADDR_LIST_SIZE], const TransDataTo5HDParams& nchwconvParams)
   ```
 
 ## 参数说明<a name="zh-cn_topic_0000001521260417_section622mcpsimp"></a>
@@ -233,7 +233,7 @@ Kirin 9030，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、
 
 ## 调用示例<a name="zh-cn_topic_0000001521260417_section19372434133520"></a>
 
-本样例中只展示Compute流程中的部分代码。如果您需要运行样例代码，请将该代码段拷贝并替换[Transpose类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/transpose)场景三完整样例模板中Compute函数的部分代码即可。
+本样中只展示部分关键代码。如果您需要运行样例代码，请将该代码段拷贝并替换[Transpose类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/transpose)场景三完整样例模板中Compute函数的部分代码即可。
 
 - 入参类型是LocalTensor的调用方式：
 
@@ -394,7 +394,7 @@ Kirin 9030，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、
     238. 239.]
    [240. 241. 242. 243. 244. 245. 246. 247. 248. 249. 250. 251. 252. 253.
     254. 255.]]
-  
+
   输出数据(dstGm)：
   [[  0.  16.  32.  48.  64.  80.  96. 112. 128. 144. 160. 176. 192. 208.
     224. 240.]
@@ -452,10 +452,10 @@ Kirin 9030，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、
    [ 120 121 122 123 124 125  126 127]]
   输出数据（dstGm）：
   [[ 0 8 16 24 32 40 48 56 64 72 80 88 96 104 112 120   ]
-   [ 1 9 17 25 33 41 49 57 65 73 81 89 97 105 113 121   ] 
+   [ 1 9 17 25 33 41 49 57 65 73 81 89 97 105 113 121   ]
    [ 2 10 18 26 34 42 50 58 66 74 82 90 98 106 114 122  ]
    [ 3 11 19 27 35 43 51 59 67 75 83 91 99 107 115 123  ]
-   [ 4 12 20 28 36 44 52 60 68 76 84 92 100 108 116 124 ] 
+   [ 4 12 20 28 36 44 52 60 68 76 84 92 100 108 116 124 ]
    [ 5 13 21 29 37 45 53 61 69 77 85 93 101 109 117 125 ]
    [ 6 14 22 30 38 46 54 62 70 78 86 94 102 110 118 126 ]
    [ 7 15 23 31 39 47 55 63 71 79 87 95 103 111 119 127 ]]
