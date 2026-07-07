@@ -39,6 +39,6 @@ using vector_fp4x2_e1m2_t = vector_f4e1m2x2;
 using vector_store_unalign = vector_align;
 using vector_load_unalign = vector_align;
 using addr_reg = vector_address;
-[[deprecated("NOTICE: iter_reg is deprecated. Please use addr_reg instead.")]] using iter_reg = addr_reg;
+using iter_reg = addr_reg; // deprecated, please use addr_reg instead
 
 #endif
