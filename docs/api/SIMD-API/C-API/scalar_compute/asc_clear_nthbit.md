@@ -42,7 +42,7 @@ PIPE_S
 ## 调用示例
 
 ```cpp
-uint64_t bits = 0x1;
+uint64_t bits = 0x7;
 int64_t idx = 0x2;
 uint64_t res = asc_clear_nthbit(bits, idx);
 ```
