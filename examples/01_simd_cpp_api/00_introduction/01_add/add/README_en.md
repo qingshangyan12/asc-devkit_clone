@@ -74,11 +74,11 @@ __vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
     // GM -> UB: Load input data
     AscendC::DataCopy(xLocal, xGm, blockLength);
     AscendC::DataCopy(yLocal, yGm, blockLength);
-    AscendC::PipeBarrier<PIPE_ALL>();  // Ensure load completes before computation
+    AscendC::PipeBarrier<PIPE_ALL>();
 
     // Vector computation: z = x + y
     AscendC::Add(zLocal, xLocal, yLocal, blockLength);
-    AscendC::PipeBarrier<PIPE_ALL>();  // Ensure computation completes before store
+    AscendC::PipeBarrier<PIPE_ALL>();
 
     // UB -> GM: Store computation result
     AscendC::DataCopy(zGm, zLocal, blockLength);
@@ -96,9 +96,9 @@ Invocation method: Use the kernel invocation operator `<<<numBlocks, 0, stream>>
 | GM Address Allocation | `SetGlobalBuffer(x + block_idx * blockLength, blockLength)` | Each core calculates offset based on `block_idx` to process different data segments, enabling multi-core parallelism |
 | UB Space Allocation | `ubAllocator.Alloc<float, blockLength>()` | Allocate contiguous memory blocks on UB for x, y, z for vector computation |
 | Load (Stage 1) | GM → UB: `DataCopy(xLocal, xGm)`, `DataCopy(yLocal, yGm)` | Transfer input data from GM to UB, since the vector computation unit can only access data on UB |
-| Pipeline Sync | `PipeBarrier<PIPE_ALL>()` | Ensure load completes before computation begins, preventing the computation unit from reading unready data |
+| Pipeline Sync | `SetFlag<HardEvent::MTE2_V>`, `WaitFlag<HardEvent::MTE2_V>` | Ensure load completes before computation begins, preventing the computation unit from reading unready data |
 | Compute (Stage 2) | UB computation: `Add(zLocal, xLocal, yLocal)` | Execute vector addition on UB, leveraging the vector unit to process multiple elements in parallel |
-| Pipeline Sync | `PipeBarrier<PIPE_ALL>()` | Ensure computation completes before store begins, preventing storing incomplete results |
+| Pipeline Sync | `SetFlag<HardEvent::V_MTE3>`, `WaitFlag<HardEvent::V_MTE3>` | Ensure computation completes before store begins, preventing storing incomplete results |
 | Store (Stage 3) | UB → GM: `DataCopy(zGm, zLocal)` | Transfer computation results from UB back to GM for subsequent use or output |
 | Pipeline Sync | `PipeBarrier<PIPE_ALL>()` | Ensure store completes, guaranteeing data consistency |
 
