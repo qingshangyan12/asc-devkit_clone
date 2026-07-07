@@ -1,8 +1,8 @@
-# asc_atomic_add 原子加性能样例
+# asc_atomic_add原子加性能样例
 
 ## 概述
 
-本样例以 `asc_atomic_add()` 原子加为例，在相同原子加总次数下，展示内存层级（Global Memory / Unified Buffer）、数据类型（int32 / int64）、以及是否使用返回值对原子加性能的影响，并给出相应的优化指导。程序本身只输出场景信息和正确性校验结果，性能数据统一通过外部 Profiling 工具（`msprof op`）采集。
+本样例以`asc_atomic_add()`原子加为例，在相同原子加总次数下，展示内存层级（Global Memory / Unified Buffer）、数据类型（int32 / int64）、以及是否使用返回值对原子加性能的影响，并给出相应的优化指导。
 
 ## 支持的产品
 
@@ -17,128 +17,162 @@
 ```text
 ├── atomic_add_perf
 │   ├── CMakeLists.txt         // 样例构建脚本
-│   ├── atomic_add_perf.asc    // 原子加性能workload实现 & 调用样例
+│   ├── atomic_add_perf.asc    // 样例代码
 │   ├── README.md
 │   └── README_en.md
 ```
 
 ## 样例描述
 
-本样例通过 `SCENARIO_NUM` 选择一个待测场景，每次运行只启动一个目标 kernel，便于外部 Profiling 工具采集单场景性能数据。6 个场景覆盖 3 组对照维度：
+本样例通过`SCENARIO_NUM`选择一个待测场景，每次运行只启动一个目标Kernel。6个场景两两配对，形成3组对照。
 
-| 场景编号 | 内存位置 | 数据类型 | 是否使用返回值 | 对照维度 |
-|:---:|:---:|:---:|:---:|---|
-| 1 | Global Memory | int32_t | 是 | GM vs UB、返回值、数据类型基准 |
-| 2 | Global Memory | int32_t | 否 | 返回值开销对照（对场景1） |
-| 3 | Global Memory | int64_t | 是 | 数据类型对照（对场景1） |
-| 4 | Global Memory | int64_t | 否 | 返回值开销对照（对场景3） |
-| 5 | Unified Buffer | int32_t | 是 | 内存层级对照（对场景1） |
-| 6 | Unified Buffer | int32_t | 否 | 返回值开销对照（对场景5） |
+**场景清单**：每个场景由「内存位置 + 数据类型 + 是否使用返回值」三个属性确定。
 
-- 计算逻辑：
-  - GM 场景：GM counter 数组长度为 `SLOTS`（默认 1024），每个线程根据 `global_tid % SLOTS` 选择一个 slot 执行原子加；host 侧逐 slot 校验计数并校验总和等于 `TOTAL_ATOMIC_ADDS`。
-  - UB 场景：每个 ThreadBlock 内使用长度为 1024 的 UB counter 数组，每个线程根据 `global_tid % 1024` 选择一个 slot 执行原子加，kernel 结束前将每个 Block 的 1024 个 slot 写回 GM，host 侧逐 slot 校验。
-  - 带返回值场景：每次 `asc_atomic_add()` 返回的旧值写入线程本地 `volatile` 变量，防止返回值路径被编译器优化掉，同时避免引入额外累加和 GM 写回。
+| 场景编号 | 内存位置 | 数据类型 | 是否使用返回值 |
+|:---:|:---:|:---:|:---:|
+| 1 | Global Memory | int32_t | 是 |
+| 2 | Global Memory | int32_t | 否 |
+| 3 | Global Memory | int64_t | 是 |
+| 4 | Global Memory | int64_t | 否 |
+| 5 | Unified Buffer | int32_t | 是 |
+| 6 | Unified Buffer | int32_t | 否 |
 
-- 原子加总次数：
+**3组对照**：每组只改变表中一个属性、其余保持一致，从而单独对比该属性对性能的影响。
 
-  ```text
-  TOTAL_ATOMIC_ADDS = BLOCK_NUM * THREADS_PER_BLOCK * ITERATIONS
-  ```
+| 对照维度 | 参与场景 | 唯一变化的属性 | 对应下文 |
+|---|---|---|:---:|
+| 内存位置 | 场景1 ↔ 场景5 | Global Memory → Unified Buffer | Case 1 |
+| 是否使用返回值 | 场景1 ↔ 场景2（int32）<br>场景3 ↔ 场景4（int64） | 使用返回值 → 不使用返回值 | Case 2 |
+| 数据类型 | 场景1 ↔ 场景3 | int32_t → int64_t | Case 3 |
+
+
 
 ## 样例实现
 
+本节先说明6个场景共用的计算逻辑与性能指标，再以三组对照（Case 1~3）逐一分析内存层级、返回值、数据类型对原子加性能的影响。每组对照只改变一个属性、其余保持一致，并给出对应的`msprof op`实测数据与优化建议。
+
+### 计算逻辑
+
+ 每个ThreadBlock拥有`SLOTS`个计数器（`SLOTS`为编译期可配的计数器个数），Block内每个线程按`线程号 % SLOTS`选定其中一个计数器，循环做`ITERATIONS`次原子加。因此原子加总次数为：
+
+```text
+TOTAL_ATOMIC_ADDS = BLOCK_NUM * THREADS_PER_BLOCK * ITERATIONS
+```
+
+GM与UB两种场景下线程到计数器的映射完全一致，竞争程度严格相同，**唯一变量是计数器所在的内存层级**：
+
+- **GM场景**：所有Block的计数器统一放在GM上，排成`BLOCK_NUM × SLOTS`的数组，每个Block使用其中属于自身的一段。
+- **UB场景**：每个Block将自身的`SLOTS`个计数器放在各自的UB上，并在kernel结束前将本Block的计数值写回GM。
+
+两种场景均在host侧逐个计数器校验计数值，并校验总和等于`TOTAL_ATOMIC_ADDS`。
+
+**竞争程度**由「每个计数器被多少线程共用」决定，即`SLOTS`与`THREADS_PER_BLOCK`的关系。`SLOTS >= THREADS_PER_BLOCK`时每个线程独占一个计数器（无同地址竞争）；`SLOTS < THREADS_PER_BLOCK`时每个计数器被`ceil(THREADS_PER_BLOCK / SLOTS)`个线程争用。下文性能数据取`SLOTS = THREADS_PER_BLOCK = 256`，即每个线程独占一个计数器、无同地址竞争的基准场景。
+
+**带返回值场景**：每次`asc_atomic_add()`返回的旧值写入线程本地`volatile`变量，防止返回值路径被编译器优化掉，同时避免引入额外累加和GM写回。
+
 ### 性能指标说明
 
-| 指标 | 说明 |
-|------|------|
-| Task Duration（μs） | Task 整体耗时，来自 `msprof op` 采集的 `OpBasicInfo.csv`，包含调度到加速器、加速器上执行、以及响应结束的时间 |
-| 平均耗时（ns/atomic） | `Task Duration / TOTAL_ATOMIC_ADDS`，单笔原子加的均摊代价 |
+| 指标                | 说明                                                                                      |
+| ------------------- | ----------------------------------------------------------------------------------------- |
+| Task Duration（μs）   | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间                  |
 
-> **采集配置说明：** 下文除特别注明的基准表外，性能数据统一采用 `BLOCK_NUM=48`、`THREADS_PER_BLOCK=256`、`ITERATIONS=256`、`SLOTS=1024`（`total_atomic_adds=3145728`），采集命令为 `msprof op --launch-count=1 ./atomic_add_perf`，采集环境为 dav-3510、Device Freq 1650 MHz。默认 workload 已在源码中调小为 `8×64×256=131072`，以保证 `msprof op` 采集稳定快速（详见「Profiling 采集」）。
+> **采集配置说明：** 下文性能数据统一采用`BLOCK_NUM=48`、`THREADS_PER_BLOCK=256`、`ITERATIONS=256`、`SLOTS=256`（`total_atomic_adds=3145728`）。此时每个线程独占一个计数器，**无同地址原子竞争**，GM与UB的线程映射完全一致，从而可作为同竞争程度下的公平对比。
 
-### Case 1：内存层级——GM 原子加 vs UB 原子加
+### Case 1：内存层级——GM原子加vsUB原子加
 
-**样例目标**：相同原子加总次数下，对比原子操作打在 Global Memory 与 Unified Buffer 上的性能差异。
+**样例目标**：相同原子加总次数下，对比原子操作打在Global Memory与Unified Buffer上的性能差异。
 
-**核心实现**：通过 `SCENARIO_NUM` 取值 1（GM int32 带返回值）与 5（UB int32 带返回值）分别启动对应 kernel，两者原子加总次数、slot 映射一致。
+**核心实现**：通过`SCENARIO_NUM`取值1（GM int32带返回值）和5（UB int32带返回值）分别启动对应kernel。`SLOTS=256`下每线程独占一个计数器，无同地址竞争，唯一差异是计数器所在内存层级。
 
 **性能数据**：
 
-| 场景 | 内存 | Task Duration（μs） | 平均耗时（ns/atomic） |
-|:---:|:---:|---:|---:|
-| 1 | Global Memory | 22344.60 | 7.103 |
-| 5 | Unified Buffer | 59.58 | 0.019 |
+| 场景 | 内存 | Task Duration（μs） |
+|:---:|:---:|---:|
+| 1 | Global Memory | 2539.92 |
+| 5 | Unified Buffer | 59.03 |
 
 **分析**：
 
-- 相同的原子加总次数下，UB 场景 Task Duration 约 60μs，GM 场景高达约 22300μs，相差约 **375 倍**。
-- GM 原子 read-modify-write 在 L2 原子单元上执行、访问延迟高；`PipeUtilization` 显示 `aiv_vec_ratio ≈ 0.9999`，即 vector 单元几乎一直"忙"，但实际是在原子重试/等待。UB 原子在 AIV（vector core）内部执行，访问延迟低一到两个数量级。
+- 在竞争程度完全一致（每线程独占一个计数器）、无同地址争用的前提下，GM场景约2540μs，UB场景约59μs，相差约 **43倍**。该差异仅由内存层级引起，不受竞争范围影响。
 
-**结论**：原子加应尽量收敛到更靠近计算单元的内存层级。能在 UB（block 内私有）完成的原子累加，不要放到 GM 上做。
 
-> **说明：** GM 场景按 `global_tid % 1024` 分散到 1024 个 GM 地址；UB 场景是每个 ThreadBlock 内部各自维护 1024 个 UB slot。两类场景竞争范围不同，**不能作为同竞争范围下的绝对性能对比**，仅反映"原子加打在不同内存层级"的整体代价量级。
+**结论**：可在UB完成的原子累加，不宜放到GM上执行。
 
 ---
 
 ### Case 2：返回值开销
 
-**样例目标**：对比 `asc_atomic_add()` 使用返回值（读回旧值）与丢弃返回值的性能差异。
+**样例目标**：对比`asc_atomic_add()`使用返回值（读回旧值）与不使用返回值的性能差异。
 
-**核心实现**：通过 `SCENARIO_NUM` 取值 1/2（GM int32）与 3/4（GM int64）成对对照，成对场景仅"是否消费返回值"不同。
+**核心实现**：通过`SCENARIO_NUM`取值1/2（GM int32）、3/4（GM int64）、5/6（UB int32）成对对照，成对场景仅在「是否使用返回值」上不同。
 
 **性能数据**：
 
-| 数据类型 | 带返回值（μs） | 不带返回值（μs） | 带/不带比值 |
+| 数据类型 | 带返回值（μs） | 不带返回值（μs） | 带返回值/不带返回值比值 |
 |:---:|---:|---:|:---:|
-| int32（场景1 vs 2） | 22344.60 | 136.74 | 163.4× |
-| int64（场景3 vs 4） | 11239.15 | 11281.08 | 0.996× |
+| GM int32（场景1 vs 2） | 2539.92 | 48.97 | 51.9× |
+| GM int64（场景3 vs 4） | 1362.38 | 1377.40 | 0.989× |
+| UB int32（场景5 vs 6） | 59.03 | 57.79 | 1.02× |
 
 **分析**：
 
-- **int32**：不带返回值场景仅 137μs——`L2Cache.csv` 显示其 L2 写事务为 0，硬件把单线程 256 次连续累加在本地聚合掉了，不逐笔过 L2；一旦要返回旧值，就退回到 65536 笔逐笔串行 RMW，竞争才被暴露，因此带返回值慢 100 倍以上。
-- **int64**：无此本地聚合快路径，带/不带返回值都走完整 RMW，两者基本持平。
+- **GM int32**：不使用返回值时硬件会优化，比带返回值快约52倍。
+- **UB int32**：不使用返回值也会有硬件优化，但UB原子本身就很快，带/不带返回值基本持平（约1.02倍）。
+- **GM int64**：无硬件优化，带/不带返回值耗时基本持平。
 
-**结论**：只在业务确实需要旧值时才使用原子加返回值。对于纯计数场景，丢弃返回值可能触发硬件的本地聚合快路径（如 int32），获得数量级收益。
+**结论**：非必要业务场景，不要使用接口的返回值；并且优先使用int32，而不是int64。
 
 ---
 
-### Case 3：数据类型——int32 与 int64（伪共享陷阱）
+### Case 3：数据类型——int32与int64（同cacheline排队）
 
-**样例目标**：对比 int32 与 int64 原子加的性能，并解释一个反直觉现象。
+**样例目标**：对比int32与int64原子加的性能。
 
-**核心实现**：通过 `SCENARIO_NUM` 取值 1（GM int32 带返回值）与 3（GM int64 带返回值）对照，两者竞争映射完全相同（12288 线程 `% 1024`，每 slot 12 线程），slot 均按元素紧密排布。
+**核心实现**：通过`SCENARIO_NUM`取值1（GM int32带返回值）与3（GM int64带返回值）对照，两者线程映射完全相同（每Block 256线程按`线程号 % 256`各占一个计数器，无同地址竞争），计数器均按元素紧密排布。
 
 **性能数据**：
 
-| 数据类型 | Task Duration（μs） | 每 128B cacheline 容纳 slot 数 | 同 line 排队线程数 |
+| 数据类型 | Task Duration（μs） | 每128B cacheline容纳计数器数 | 同cacheline线程数 |
 |:---:|---:|:---:|:---:|
-| int32（场景1） | 22344.60 | 128B/4B = 32 | 32 × 12 = 384 |
-| int64（场景3） | 11239.15 | 128B/8B = 16 | 16 × 12 = 192 |
+| int32（场景1） | 2539.92 | 128B/4B = 32 | 32 |
+| int64（场景3） | 1362.38 | 128B/8B = 16 | 16 |
 
 **分析**：
 
-- 反直觉：窄类型 int32 反而比宽类型 int64 慢约 **2 倍**。对比两者 metric，事务笔数、字节数、指令数完全相同，唯一差 2 倍的是 `aiv_total_cycles`（≈36.0M vs ≈18.0M，干净的 2.0×）。
-- 根因是 **cacheline 伪共享串行化**：GM 原子 RMW 以一条 **128B cacheline** 为串行化粒度，同一条 line 上的所有原子操作排一条队逐笔执行——哪怕是两个独立地址。int32 每条 line 挤进 32 个计数器、int64 只挤 16 个，i32 的 line 内密度恰为 i64 的 2 倍，队列长一倍，周期翻倍。
-- 这与"int32 这个类型本身"无关，主要来自紧密排布下每条 cacheline 的计数器密度差异。
+- 与直觉相悖：即使每个线程独占一个计数器、**不存在两个线程修改同一计数器的情况**，窄类型int32仍比宽类型int64慢约 **1.86倍**（2539.92 vs 1362.38）。
+- 根因在于 **同一条cacheline上的原子操作需要排队**：GM原子操作以一条**128B cacheline**为最小串行化单位，落在同一条cacheline上的原子操作必须排队逐笔执行，即使它们修改的是各自独立、彼此不冲突的地址。int32每条cacheline可容纳32个计数器，int64仅容纳16个，因此int32每条cacheline上排队的线程数恰为int64的2倍，耗时也近似翻倍。
+- 该现象与int32类型本身无关，仅源于紧密排布下每条cacheline容纳的计数器数量更多。
 
-**结论**：不要凭"类型更窄应更快"的直觉给高竞争 GM 计数器选 int32。紧密布局下窄类型每条 cacheline 打包更密，竞争反而更重。
+**结论**：不应凭「类型更窄则更快」的直觉为紧密排布的 GM 原子目标选择 int32。即使各线程访问的地址互不冲突，窄类型每条cacheline容纳的数据更多，同一条cacheline上排队的原子操作也更多，反而更慢。可通过为数据添加间距（padding），使每条cacheline只放置更少的数据来缓解。
 
 ---
 
 ## 性能对比总结
 
+**全场景Task Duration汇总**（`BLOCK_NUM=48`、`THREADS_PER_BLOCK=256`、`ITERATIONS=256`、`SLOTS=256`，`total_atomic_adds=3145728`，无同地址竞争）：
+
+| 场景 | 内存 | 数据类型 | 返回值 | Task Duration（μs） |
+|:---:|:---:|:---:|:---:|---:|
+| 1 | Global Memory | int32 | 是 | 2539.92 |
+| 2 | Global Memory | int32 | 否 | 48.97 |
+| 3 | Global Memory | int64 | 是 | 1362.38 |
+| 4 | Global Memory | int64 | 否 | 1377.40 |
+| 5 | Unified Buffer | int32 | 是 | 59.03 |
+| 6 | Unified Buffer | int32 | 否 | 57.79 |
+
+**三组对照收益**：
+
 | 优化维度 | 关键对照 | 收益量级 | 建议 |
 |---|---|---|---|
-| 内存层级 | UB（60μs） vs GM（22344μs） | ~375× | 原子累加尽量收敛到 UB 等靠近计算单元的层级 |
-| 返回值 | int32 丢弃返回值（137μs） vs 带返回值（22344μs） | ~163× | 不需要旧值时丢弃返回值，可触发本地聚合快路径 |
-| 数据类型 | int32 紧密排布（22344μs） vs int64 紧密排布（11239μs） | ~0.5× | 不要只按类型宽窄推断原子性能，紧密布局下窄类型竞争可能更重 |
+| 内存层级 | UB（59μs） vs GM（2540μs） | ~43× | 原子累加在UB上执行 |
+| 返回值 | int32不使用返回值（49μs） vs带返回值（2540μs） | ~52× | 非业务需要，不使用返回值|
+| 数据类型 | int32紧密排布（2540μs） vs int64紧密排布（1362μs） | ~0.5× | 不应仅按类型宽窄推断原子性能，紧密布局下窄类型同cacheline排队更多 |
 
 ## 调优建议
 
-1. **优先降低原子操作的内存层级**：GM 原子在 L2 上串行执行、延迟高，UB 原子在计算核内执行、快两到三个数量级。能在 block 内私有内存完成的原子累加不要放到 GM。
-2. **纯计数场景丢弃返回值**：读回旧值会使部分类型（如 int32）退出本地聚合快路径，退回逐笔串行 RMW，代价可能相差百倍以上。
-3. **不要以数据类型宽窄推断原子性能**：性能取决于每条 cacheline 的计数器打包密度，而非类型本身。紧密布局下窄类型密度更高，竞争反而更重。
+1. **优先降低原子操作的内存层级**：可在UB中完成的原子累加不宜放到GM。
+2. **纯计数场景不使用返回值**：非必要业务场景，不要使用接口的返回值；并且优先使用int32，而不是int64，因为int32在不使用返回值的时候会进行优化，int64则没有。
+3. **不应以数据类型宽窄推断原子性能**：性能取决于每条cacheline容纳的原子操作的目标个数，而非类型本身。即使各线程访问的地址互不冲突，紧密布局下窄类型每条cacheline容纳更多数据，同一条cacheline上排队的原子操作也更多，反而更慢。高竞争或紧密布局场景可为数据添加间距（padding），使每条cacheline放置少数原子操作的目标。
 
 ## 编译运行
 
@@ -152,7 +186,7 @@
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至`/usr/local/Ascend`下。
+  > **说明：** `${install_path}`为CANN包安装目录，未指定安装目录时默认安装至`/usr/local/Ascend`下。
 
 - 样例执行
 
@@ -174,32 +208,37 @@
   | `BLOCK_NUM` | 正整数 | ThreadBlock数量 |
   | `THREADS_PER_BLOCK` | 正整数 | 每个ThreadBlock中的线程数 |
   | `ITERATIONS` | 正整数 | 每个线程执行的原子加次数 |
+  | `SLOTS` | 正整数 | 每个Block的计数器个数，默认`1024`。`SLOTS < THREADS_PER_BLOCK`时同一个计数器会被多个线程共用（产生同地址竞争），共用线程数为`ceil(THREADS_PER_BLOCK / SLOTS)`；`SLOTS >= THREADS_PER_BLOCK`时每个线程独占一个计数器，无同地址竞争 |
   | `SKIP_VALIDATION` | `ON`/`OFF` | 是否跳过结果校验，默认`OFF`。使用`msprof op`采集GM场景时建议设为`ON` |
 
   执行结果如下，说明正确性校验通过。
 
   ```text
   Scenario 1: GM int32 with return value
-  Workload: blocks=8 threads_per_block=64 iterations=256 total_atomic_adds=131072
+  Workload: blocks=48 threads_per_block=64 iterations=256 slots=1024 total_atomic_adds=786432
   Validation passed
   ```
+## 性能分析
 
-## Profiling 采集
-
-程序不内置计时逻辑。性能数据请使用 `msprof op` 采集单场景运行结果。为避免多个 kernel 混在同一份数据中，建议每次只配置一个 `SCENARIO_NUM` 并单独运行；采集 GM 场景时建议打开 `SKIP_VALIDATION`：
+使用`msprof`工具获取详细性能数据：
 
 ```bash
-cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=1 -DSKIP_VALIDATION=ON ..
-make -j
-msprof op --launch-count=1 ./atomic_add_perf
+msprof op ./atomic_add_perf   # 分析case的性能
 ```
 
-完整采集流程、各场景原始数据、metric 分析见同目录 `PROFILING_REPORT.md`。
+命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹，性能数据文件夹结构示例如下：
 
-> **规模与超时说明：** `msprof op` 为采集多种 metric 会对同一 kernel 做 warmup 并多次 replay。若单次 kernel 耗时过长（超过 stream 同步超时，默认 10s），replay 会失败并报 `Stream synchronize timeout`。各场景敏感度差异很大：
-> - **GM 场景（1-4）** 按 `global_tid % SLOTS` 分散竞争，调大 workload 后仍可能因原子竞争触发较长耗时。需要 `msprof op` 采集时建议 `total_atomic_adds` 不超过约 2000 万，`BLOCK_NUM` 也不宜过大（动态插桩对 sub block 总数有限制，过大时会有 `sub blocks exceeding 108` 告警导致部分插桩数据丢失）。
-> - **UB 场景（5-6）** 通常明显快于 GM，常规调参基本不会触及超时。
->
-> 因此默认 workload 已设为较小的 `total_atomic_adds=131072`。仅做**裸跑压测**（不挂 msProf）时可自由调大。
+```text
+├──dump                       # 原始的性能数据，用户无需关注
+├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
+├──L2Cache.csv                # L2 Cache命中率
+├──Memory.csv                 # UB，L1和主存储器读写带宽速率
+├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
+├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
+├──OpBasicInfo.csv            # 算子基础信息
+├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
+├──ResourceConflictRatio.csv  # UB上的bank group、bank conflict和资源冲突率在所有指令中的占比
+└──visualize_data.bin         # MindStudio Insight呈现文件
+```
 
-> **关于 GM 场景的 Validation failed：** GM 场景的 counter slots 仅在 host 侧分配时清零一次，kernel 只累加、不在入口清零。`msprof op` 的 warmup+replay 会在同一块 GM 内存上重复执行 kernel，counter 被累加多次，因此严格校验模式下会报 `Validation failed`（计数为期望值的整数倍）。这是 replay 机制与校验逻辑的固有冲突，**不影响 profiling 数据采集**，metric 仍正常落盘。采集 GM 场景时建议通过 `-DSKIP_VALIDATION=ON` 跳过校验。UB 场景的 counter slots 在 kernel 入口自清零，对 replay 幂等，校验仍 passed。
+> **关于GM场景的Validation failed：** GM场景的计数器数组仅在host侧分配时清零一次，kernel只累加、不在入口清零。`msprof op`的warmup+replay会在同一块GM内存上重复执行kernel，counter被累加多次，因此严格校验模式下会报`Validation failed`（计数为期望值的整数倍）。这是replay机制与校验逻辑的固有冲突，**不影响profiling数据采集**，metric仍正常落盘。采集GM场景时建议通过`-DSKIP_VALIDATION=ON`跳过校验。UB场景的计数器数组在kernel入口自清零，对replay幂等，校验仍passed。
