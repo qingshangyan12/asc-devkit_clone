@@ -148,7 +148,6 @@ static void test_host_kernel_reg_compute_gather_mask_intf()
 {
     using AscendC::Reg::ClearSpr;
     using AscendC::Reg::Gather;
-    using AscendC::Reg::GetSpr;
     using AscendC::Reg::Squeeze;
     using AscendC::Reg::Unsqueeze;
 }
