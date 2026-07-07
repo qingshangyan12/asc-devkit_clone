@@ -16,7 +16,6 @@ from __future__ import annotations
 import argparse
 import json
 import logging
-import os
 import re
 import shlex
 from dataclasses import asdict, dataclass, field
@@ -357,7 +356,6 @@ def write_runner(project_root: Path, runners_root: Path, cell, runnable_on_targe
         # Multi-scenario case: generate per-scenario runners (__scenario_N/run.sh)
         # Skip the first scenario (it's the default, handled by main run.sh)
         scenario_nums = scenarios.split()
-        examples_root = project_root / "examples"
         for scenario_num in scenario_nums[1:]:
             scenario_dir = runners_root / f"{rel}__scenario_{scenario_num}"
             scenario_dir.mkdir(parents=True, exist_ok=True)
@@ -367,16 +365,6 @@ def write_runner(project_root: Path, runners_root: Path, cell, runnable_on_targe
             text = render_per_scenario_runner(render_spec, scenario_num)
             runner.write_text(text, encoding="utf-8")
             runner.chmod(0o755)
-        # Ensure examples/ symlinks for each scenario, regardless of
-        # whether the runner already existed (needed by presmoke driver)
-        for scenario_num in scenario_nums[1:]:
-            example_scenario = examples_root / f"{rel}__scenario_{scenario_num}"
-            if not example_scenario.exists():
-                example_scenario.parent.mkdir(parents=True, exist_ok=True)
-                target = os.path.relpath(
-                    examples_root / rel, example_scenario.parent
-                )
-                example_scenario.symlink_to(target)
         # Report uses the main runner (which already exists from upstream)
         runner_path = runner_dir / "run.sh"
     else:
@@ -979,32 +967,25 @@ def write_manifest(reports_root: Path, reports: List[CaseReport]) -> None:
 def remove_stale_runners(runners_root: Path, reports: List[CaseReport]) -> None:
     expected_cases = {item.case for item in reports}
     multi_scenario_cases = {c for c in expected_cases if has_scenario(c)}
-    examples_root = runners_root.parent.parent.parent / "examples"
-    stale_links: List[Path] = []
     for runner in list(runners_root.rglob("run.sh")):
         rel = runner.parent.relative_to(runners_root).as_posix()
         scenario_match = re.match(r'^(.+)__scenario_(\d+)$', rel)
         if scenario_match:
             base_case = scenario_match.group(1)
             if base_case in multi_scenario_cases:
+                # Keep existing __scenario_N runners for known multi-scenario cases
                 continue
+            # Clean up orphaned __scenario_N dirs (case no longer has scenarios)
             LOG.info("remove_stale_runner=%s", rel)
             runner.unlink()
             remove_empty_parents(runner.parent, runners_root)
-            stale_links.append(examples_root / rel)
         else:
+            # Keep all main run.sh files (single and multi-scenario alike)
             if rel in expected_cases:
                 continue
             LOG.info("remove_stale_runner=%s", rel)
             runner.unlink()
             remove_empty_parents(runner.parent, runners_root)
-            stale_links.append(examples_root / rel)
-    # Clean up stale examples/ symlinks
-    for link in stale_links:
-        if link.is_symlink():
-            LOG.info("remove_stale_example_symlink=%s", link.relative_to(examples_root.parent))
-            link.unlink()
-            remove_empty_parents(link.parent, examples_root)
 
 
 def remove_empty_parents(path: Path, stop: Path) -> None:
