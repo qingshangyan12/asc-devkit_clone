@@ -65,40 +65,20 @@ uint32_t __activemask()
 #endif
 
 template <typename T>
-T AscShflCPU(T var, int32_t num)
+T AscShflCPU3Params(T var, int32_t src_lane, int32_t width)
 {
-    int32_t srcLane = num & 0xff;
-    int32_t width = 32 - ((num >> 16) & 0xff);
-
     uint32_t warpId = AscendC::Simt::GetWarpId();
     uint32_t laneId = AscendC::Simt::GetLaneId();
     AscendC::Simt::Warp& warp = AscendC::Simt::ThreadBlock::GetBlockInstance().warps_[warpId];
     int32_t minLane = laneId / width * width;
-    srcLane = minLane + srcLane % width;
+    int32_t actualSrcLane = minLane + src_lane % width;
 
-    return warp.WarpShuffleOp(var, laneId, srcLane);
+    return warp.WarpShuffleOp(var, laneId, actualSrcLane);
 }
 
-#define REGISTER_SIMT_ASC_SHFL(INTRI, TYPE) \
-    TYPE INTRI(TYPE var, int32_t num) { return AscShflCPU<TYPE>(var, num); }
-
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-REGISTER_SIMT_ASC_SHFL(__shfl, uint32_t);
-REGISTER_SIMT_ASC_SHFL(__shfl, int32_t);
-REGISTER_SIMT_ASC_SHFL(__shfl, uint64_t);
-REGISTER_SIMT_ASC_SHFL(__shfl, int64_t);
-REGISTER_SIMT_ASC_SHFL(__shfl, float);
-REGISTER_SIMT_ASC_SHFL(__shfl, half);
-REGISTER_SIMT_ASC_SHFL(__shfl, half2);
-REGISTER_SIMT_ASC_SHFL(__shfl, bfloat16_t);
-REGISTER_SIMT_ASC_SHFL(__shfl, bfloat16x2_t);
-#endif
-
 template <typename T>
-T AscShflUpCPU(T var, int32_t num)
+T AscShflUpCPU3Params(T var, int32_t delta, int32_t width)
 {
-    int32_t delta = num & 0xff;
-    int32_t width = 32 - ((num >> 16) & 0xff);
     uint32_t warpId = AscendC::Simt::GetWarpId();
     uint32_t laneId = AscendC::Simt::GetLaneId();
     AscendC::Simt::Warp& warp = AscendC::Simt::ThreadBlock::GetBlockInstance().warps_[warpId];
@@ -112,32 +92,14 @@ T AscShflUpCPU(T var, int32_t num)
     return warp.WarpShuffleOp(var, laneId, srcLane);
 }
 
-#define REGISTER_SIMT_ASC_SHFL_UP(INTRI, TYPE) \
-    TYPE INTRI(TYPE var, int32_t num) { return AscShflUpCPU<TYPE>(var, num); }
-
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-REGISTER_SIMT_ASC_SHFL_UP(__shfl_up, uint32_t);
-REGISTER_SIMT_ASC_SHFL_UP(__shfl_up, int32_t);
-REGISTER_SIMT_ASC_SHFL_UP(__shfl_up, uint64_t);
-REGISTER_SIMT_ASC_SHFL_UP(__shfl_up, int64_t);
-REGISTER_SIMT_ASC_SHFL_UP(__shfl_up, float);
-REGISTER_SIMT_ASC_SHFL_UP(__shfl_up, half);
-REGISTER_SIMT_ASC_SHFL_UP(__shfl_up, half2);
-REGISTER_SIMT_ASC_SHFL_UP(__shfl_up, bfloat16_t);
-REGISTER_SIMT_ASC_SHFL_UP(__shfl_up, bfloat16x2_t);
-#endif
-
 template <typename T>
-T AscShflDownCPU(T var, int32_t num)
+T AscShflDownCPU3Params(T var, int32_t delta, int32_t width)
 {
-    int32_t delta = num & 0xff;
-    int32_t width = 32 - ((num >> 16) & 0xff);
-
     uint32_t warpId = AscendC::Simt::GetWarpId();
     uint32_t laneId = AscendC::Simt::GetLaneId();
     AscendC::Simt::Warp& warp = AscendC::Simt::ThreadBlock::GetBlockInstance().warps_[warpId];
     int32_t minLane = laneId / width * width;
-    int32_t maxLane = minLane + MAX_SHLF_OFFSET % width;
+    int32_t maxLane = minLane + width - 1;
     int32_t srcLane = laneId + delta;
 
     if (srcLane > maxLane) {
@@ -147,54 +109,75 @@ T AscShflDownCPU(T var, int32_t num)
     return warp.WarpShuffleOp(var, laneId, srcLane);
 }
 
-#define REGISTER_SIMT_ASC_SHFL_DOWN(INTRI, TYPE) \
-    TYPE INTRI(TYPE var, int32_t num) { return AscShflDownCPU<TYPE>(var, num); }
-
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-REGISTER_SIMT_ASC_SHFL_DOWN(__shfl_down, uint32_t);
-REGISTER_SIMT_ASC_SHFL_DOWN(__shfl_down, int32_t);
-REGISTER_SIMT_ASC_SHFL_DOWN(__shfl_down, uint64_t);
-REGISTER_SIMT_ASC_SHFL_DOWN(__shfl_down, int64_t);
-REGISTER_SIMT_ASC_SHFL_DOWN(__shfl_down, float);
-REGISTER_SIMT_ASC_SHFL_DOWN(__shfl_down, half);
-REGISTER_SIMT_ASC_SHFL_DOWN(__shfl_down, half2);
-REGISTER_SIMT_ASC_SHFL_DOWN(__shfl_down, bfloat16_t);
-REGISTER_SIMT_ASC_SHFL_DOWN(__shfl_down, bfloat16x2_t);
-#endif
-
 template <typename T>
-T AscShflXorCPU(T var, int32_t num)
+T AscShflXorCPU3Params(T var, int32_t lane_mask, int32_t width)
 {
-    int32_t laneMask = num & 0xff;
-    int32_t width = 32 - ((num >> 16) & 0xff);
-
     uint32_t warpId = AscendC::Simt::GetWarpId();
     uint32_t laneId = AscendC::Simt::GetLaneId();
     AscendC::Simt::Warp& warp = AscendC::Simt::ThreadBlock::GetBlockInstance().warps_[warpId];
     int32_t minLane = laneId / width * width;
-    int32_t maxLane = minLane + MAX_SHLF_OFFSET % width;
-    int32_t srcLane = laneId ^ laneMask;
+    int32_t maxLane = minLane + width - 1;
+    int32_t srcLane = laneId ^ lane_mask;
 
-    if (srcLane < 0 || srcLane > maxLane) {
+    if (srcLane < minLane || srcLane > maxLane) {
         srcLane = laneId;
     }
 
     return warp.WarpShuffleOp(var, laneId, srcLane);
 }
 
-#define REGISTER_SIMT_ASC_SHFL_XOR(INTRI, TYPE) \
-    TYPE INTRI(TYPE var, int32_t num) { return AscShflXorCPU<TYPE>(var, num); }
+#define REGISTER_SIMT_ASC_SHFL_3PARAMS(INTRI, TYPE) \
+    TYPE INTRI(TYPE var, int32_t src_lane, int32_t width) { return AscShflCPU3Params<TYPE>(var, src_lane, width); }
+
+#define REGISTER_SIMT_ASC_SHFL_UP_3PARAMS(INTRI, TYPE) \
+    TYPE INTRI(TYPE var, int32_t delta, int32_t width) { return AscShflUpCPU3Params<TYPE>(var, delta, width); }
+
+#define REGISTER_SIMT_ASC_SHFL_DOWN_3PARAMS(INTRI, TYPE) \
+    TYPE INTRI(TYPE var, int32_t delta, int32_t width) { return AscShflDownCPU3Params<TYPE>(var, delta, width); }
+
+#define REGISTER_SIMT_ASC_SHFL_XOR_3PARAMS(INTRI, TYPE) \
+    TYPE INTRI(TYPE var, int32_t lane_mask, int32_t width) { return AscShflXorCPU3Params<TYPE>(var, lane_mask, width); }
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-REGISTER_SIMT_ASC_SHFL_XOR(__shfl_xor, uint32_t);
-REGISTER_SIMT_ASC_SHFL_XOR(__shfl_xor, int32_t);
-REGISTER_SIMT_ASC_SHFL_XOR(__shfl_xor, uint64_t);
-REGISTER_SIMT_ASC_SHFL_XOR(__shfl_xor, int64_t);
-REGISTER_SIMT_ASC_SHFL_XOR(__shfl_xor, float);
-REGISTER_SIMT_ASC_SHFL_XOR(__shfl_xor, half);
-REGISTER_SIMT_ASC_SHFL_XOR(__shfl_xor, half2);
-REGISTER_SIMT_ASC_SHFL_XOR(__shfl_xor, bfloat16_t);
-REGISTER_SIMT_ASC_SHFL_XOR(__shfl_xor, bfloat16x2_t);
+REGISTER_SIMT_ASC_SHFL_3PARAMS(__shfl, uint32_t);
+REGISTER_SIMT_ASC_SHFL_3PARAMS(__shfl, int32_t);
+REGISTER_SIMT_ASC_SHFL_3PARAMS(__shfl, uint64_t);
+REGISTER_SIMT_ASC_SHFL_3PARAMS(__shfl, int64_t);
+REGISTER_SIMT_ASC_SHFL_3PARAMS(__shfl, float);
+REGISTER_SIMT_ASC_SHFL_3PARAMS(__shfl, half);
+REGISTER_SIMT_ASC_SHFL_3PARAMS(__shfl, half2);
+REGISTER_SIMT_ASC_SHFL_3PARAMS(__shfl, bfloat16_t);
+REGISTER_SIMT_ASC_SHFL_3PARAMS(__shfl, bfloat16x2_t);
+
+REGISTER_SIMT_ASC_SHFL_UP_3PARAMS(__shfl_up, uint32_t);
+REGISTER_SIMT_ASC_SHFL_UP_3PARAMS(__shfl_up, int32_t);
+REGISTER_SIMT_ASC_SHFL_UP_3PARAMS(__shfl_up, uint64_t);
+REGISTER_SIMT_ASC_SHFL_UP_3PARAMS(__shfl_up, int64_t);
+REGISTER_SIMT_ASC_SHFL_UP_3PARAMS(__shfl_up, float);
+REGISTER_SIMT_ASC_SHFL_UP_3PARAMS(__shfl_up, half);
+REGISTER_SIMT_ASC_SHFL_UP_3PARAMS(__shfl_up, half2);
+REGISTER_SIMT_ASC_SHFL_UP_3PARAMS(__shfl_up, bfloat16_t);
+REGISTER_SIMT_ASC_SHFL_UP_3PARAMS(__shfl_up, bfloat16x2_t);
+
+REGISTER_SIMT_ASC_SHFL_DOWN_3PARAMS(__shfl_down, uint32_t);
+REGISTER_SIMT_ASC_SHFL_DOWN_3PARAMS(__shfl_down, int32_t);
+REGISTER_SIMT_ASC_SHFL_DOWN_3PARAMS(__shfl_down, uint64_t);
+REGISTER_SIMT_ASC_SHFL_DOWN_3PARAMS(__shfl_down, int64_t);
+REGISTER_SIMT_ASC_SHFL_DOWN_3PARAMS(__shfl_down, float);
+REGISTER_SIMT_ASC_SHFL_DOWN_3PARAMS(__shfl_down, half);
+REGISTER_SIMT_ASC_SHFL_DOWN_3PARAMS(__shfl_down, half2);
+REGISTER_SIMT_ASC_SHFL_DOWN_3PARAMS(__shfl_down, bfloat16_t);
+REGISTER_SIMT_ASC_SHFL_DOWN_3PARAMS(__shfl_down, bfloat16x2_t);
+
+REGISTER_SIMT_ASC_SHFL_XOR_3PARAMS(__shfl_xor, uint32_t);
+REGISTER_SIMT_ASC_SHFL_XOR_3PARAMS(__shfl_xor, int32_t);
+REGISTER_SIMT_ASC_SHFL_XOR_3PARAMS(__shfl_xor, uint64_t);
+REGISTER_SIMT_ASC_SHFL_XOR_3PARAMS(__shfl_xor, int64_t);
+REGISTER_SIMT_ASC_SHFL_XOR_3PARAMS(__shfl_xor, float);
+REGISTER_SIMT_ASC_SHFL_XOR_3PARAMS(__shfl_xor, half);
+REGISTER_SIMT_ASC_SHFL_XOR_3PARAMS(__shfl_xor, half2);
+REGISTER_SIMT_ASC_SHFL_XOR_3PARAMS(__shfl_xor, bfloat16_t);
+REGISTER_SIMT_ASC_SHFL_XOR_3PARAMS(__shfl_xor, bfloat16x2_t);
 #endif
 
 template <typename T>
