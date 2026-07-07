@@ -48,8 +48,10 @@ __simd_vf__ inline void LogicalTemplateVF(
         mask = Reg::UpdateMask<U, Trait>(count);
         Reg::LoadAlign(src0Vreg, src0 + i * oneRepElm);
         Reg::LoadAlign(src1Vreg, src1 + i * oneRepElm);
-        Reg::CompareScalar<U, CMPMODE::NE>(cmpMask0, src0Vreg, static_cast<U>(0), mask);
-        Reg::CompareScalar<U, CMPMODE::NE>(cmpMask1, src1Vreg, static_cast<U>(0), mask);
+        Reg::CompareScalar<U, CMPMODE::EQ>(cmpMask0, src0Vreg, static_cast<U>(0), mask);
+        Reg::Not(cmpMask0, cmpMask0, mask);
+        Reg::CompareScalar<U, CMPMODE::EQ>(cmpMask1, src1Vreg, static_cast<U>(0), mask);
+        Reg::Not(cmpMask1, cmpMask1, mask);
         func(cmpMask2, cmpMask0, cmpMask1, mask);
         if constexpr (sizeof(U) == 2) {
             Reg::MaskPack(cmpMask2, cmpMask2);
