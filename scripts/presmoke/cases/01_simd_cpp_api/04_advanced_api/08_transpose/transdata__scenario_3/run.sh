@@ -11,22 +11,24 @@
 
 set -euo pipefail
 
-CASE_REL=03_simt_api/03_best_practices/01_execution_conf_optimizations/grid_dim_config
+CASE_REL=01_simd_cpp_api/04_advanced_api/08_transpose/transdata
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../../../_case_entry.sh"
 presmoke_case_init "$CASE_REL"
-BUILD_DIR="$CASE_DIR/build_${MODE}_scenario_1"
+
+BUILD_DIR="$CASE_DIR/build_${MODE}_scenario_3"
 export BUILD_DIR
 
 case_build() {
     mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && SCENARIO_NUM=1 soc_version=$SOC_VERSION bash -lc 'cmake -DSCENARIO_NUM=1 .. -DCMAKE_ASC_ARCHITECTURES="$ARCH" $RUN_MODE_ARG')
-    (cd "$BUILD_DIR" && SCENARIO_NUM=1 soc_version=$SOC_VERSION bash -lc 'make -j')
+    (cd "$BUILD_DIR" && SCENARIO_NUM=3 SCENARIO=3 soc_version=$SOC_VERSION bash -lc 'cmake -DSCENARIO=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES="$ARCH" $RUN_MODE_ARG')
+    (cd "$BUILD_DIR" && SCENARIO_NUM=3 SCENARIO=3 soc_version=$SOC_VERSION bash -lc 'make -j')
+    (cd "$BUILD_DIR" && SCENARIO_NUM=3 SCENARIO=3 soc_version=$SOC_VERSION bash -lc 'python3 ../scripts/gen_data.py --mode $SCENARIO')
 }
 
 case_run() {
     mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && SCENARIO_NUM=1 soc_version=$SOC_VERSION bash -lc ./grid_config)
+    (cd "$BUILD_DIR" && SCENARIO_NUM=3 SCENARIO=3 soc_version=$SOC_VERSION bash -lc ./demo)
 }
 
 case_verify() {
