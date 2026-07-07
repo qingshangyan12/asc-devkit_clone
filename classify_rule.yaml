@@ -217,6 +217,26 @@ asc-devkit:
       - impl/adv_api/detail/conv/conv3d/conv3d_iterate_impl.h
       - impl/adv_api/detail/conv_backprop/conv3d_backprop_input/dav_v220/conv3d_bp_input_sub_func.h
       - impl/adv_api/detail/api_check/kernel_check/math/logical_ands/logical_ands_check.h
+      - impl/basic_api/dav_m510/kfc/kfc_log.h
+      - impl/basic_api/dav_c220/kernel_operator_vec_scatter_impl.h
+      - impl/basic_api/dav_c220/kernel_operator_reg_others_impl.h
+      - impl/utils/context/context_builder.cpp
+      - impl/basic_api/dav_m310/kernel_operator_set_atomic_impl.h
+      - impl/simt_api/cpp/kernel_simt_cast_intf_impl.h
+      - impl/utils/context/context_builder_impl.cpp
+      - impl/utils/stub/shape.cpp
+      - impl/basic_api/dav_c220/kfc/kfc_log.h
+      - impl/simt_api/cpp/kernel_simt_atomic_intf_impl.h
+      - impl/c_api/instr_impl/npu_arch_2201/vector_compute_impl/asc_set_vector_mask_impl.h
+      - impl/basic_api/kernel_operator_intf_impl.h
+      - impl/basic_api/dav_m310/kernel_operator_proposal_impl.h
+      - impl/utils/tiling/platform/platform_ascendc.cpp
+      - impl/basic_api/kernel_check_util.h
+      - impl/basic_api/dav_c220/kernel_operator_cube_others_impl.h
+      - impl/simt_api/cpp/kernel_simt_warp_level_intf_impl.h
+      - impl/simt_api/cpp/dav_3510/kernel_simt_constant.h
+      - impl/basic_api/dav_c220/kernel_operator_vec_others_impl.h
+      - impl/simt_api/cpp/kernel_simt_bessel_intf_impl.h
 
   llt:
     ut_check: true
