@@ -1008,12 +1008,10 @@ __simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_half src0, vec
 
 __simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
-[[deprecated("NOTICE: asc_exp_sub_v2 is deprecated. "
-             "Currently asc_exp_sub_v2 is an unsupported API on current device.")]]
 __simd_callee__ inline void asc_exp_sub_v2(vector_float& dst, vector_half src0, vector_half src1, vector_bool mask);
 
-[[deprecated("NOTICE: asc_exp_sub_v2 is deprecated. "
-             "Currently asc_exp_sub_v2 is an unsupported API on current device.")]]
+[[deprecated("NOTICE: asc_exp_sub_v2 in this parameter list is deprecated. "
+             "Please use asc_exp_sub instead.")]]
 __simd_callee__ inline void asc_exp_sub_v2(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
 // ==========asc_ln(half/float)==========
