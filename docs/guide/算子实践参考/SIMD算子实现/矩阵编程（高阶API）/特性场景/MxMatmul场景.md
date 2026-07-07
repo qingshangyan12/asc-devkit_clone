@@ -1,6 +1,6 @@
-# MxMatmul场景<a name="ZH-CN_TOPIC_0000002500468246"></a>
+# MxMatmul场景
 
-## 背景介绍<a name="zh-cn_topic_0000002270097206_section182549454374"></a>
+## 背景介绍
 
 浮点数在科学计算、图像处理、神经网络等领域应用广泛。以AI训练为例，现有的浮点数格式或数值范围不足，或精度不高，这影响了模型的收敛速度和性能。如果要同时满足数值范围和精度的要求，将会导致内存占用过大，从而增加数据存储和传输的成本。基于此种情况，业内提出了一种新的浮点数格式——微缩放（Microscaling，MX）格式。MX格式的浮点数可以支持更低比特位宽的AI训练和推理，并且占用的内存更少。符合MX标准的数据格式在使用8位或更低比特位的情况下，能够实现稳健的AI训练和推理模型精度。
 
@@ -14,82 +14,19 @@ MX格式是一种块数据格式，若干个数据可以组成一个块（或者
 
 下图为MX格式的浮点数的数据结构，S、E和M分别用于表示浮点数的符号、指数和尾数字段的值。其中，共享缩放因子X是一个用于整个数据块的缩放比例因子，它决定了数据块中所有元素的动态范围。通过引入共享缩放因子，MX格式的数据能够在保持低位宽的同时，灵活地表示不同范围的数据。块大小k指的是组成一个数据块（或组）的低比特数据的数量。私有元素P<sub>i</sub>是指数据块中的每个低比特数据元素。这些元素经过缩放因子X的调整后，共同表示了一个高精度的浮点数或整数。
 
-**图1**  MX格式组成示意图<a name="zh-cn_topic_0000002270097206_fig11888194743220"></a>  
+**图1**  MX格式组成示意图  
 ![](../../../../figures/MX格式组成示意图.png "MX格式组成示意图")
 
 MX格式的数据类型包含多种，例如MXFP8、MXFP4、MXFP16、MXINT4等。下表列举了[MxMatmul场景](#zh-cn_topic_0000002270097206_section310824820358)（全称Microscaling Matmul）支持的数据类型。
 
 **表1**  MxMatmul支持MX格式的数据类型
 
-<a name="zh-cn_topic_0000002270097206_table5383144710452"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0000002270097206_row193837473457"><th class="cellrowborder" valign="top" width="16.666666666666664%" id="mcps1.2.7.1.1"><p id="zh-cn_topic_0000002270097206_p410517278313"><a name="zh-cn_topic_0000002270097206_p410517278313"></a><a name="zh-cn_topic_0000002270097206_p410517278313"></a>数据类型</p>
-</th>
-<th class="cellrowborder" valign="top" width="16.666666666666664%" id="mcps1.2.7.1.2"><p id="zh-cn_topic_0000002270097206_p12383184711457"><a name="zh-cn_topic_0000002270097206_p12383184711457"></a><a name="zh-cn_topic_0000002270097206_p12383184711457"></a>私有元素数据类型</p>
-</th>
-<th class="cellrowborder" valign="top" width="16.666666666666664%" id="mcps1.2.7.1.3"><p id="zh-cn_topic_0000002270097206_p2383647184516"><a name="zh-cn_topic_0000002270097206_p2383647184516"></a><a name="zh-cn_topic_0000002270097206_p2383647184516"></a>私有元素位宽（d）</p>
-</th>
-<th class="cellrowborder" valign="top" width="16.666666666666664%" id="mcps1.2.7.1.4"><p id="zh-cn_topic_0000002270097206_p16383847154510"><a name="zh-cn_topic_0000002270097206_p16383847154510"></a><a name="zh-cn_topic_0000002270097206_p16383847154510"></a>块大小(k)</p>
-</th>
-<th class="cellrowborder" valign="top" width="16.666666666666664%" id="mcps1.2.7.1.5"><p id="zh-cn_topic_0000002270097206_p1238334784520"><a name="zh-cn_topic_0000002270097206_p1238334784520"></a><a name="zh-cn_topic_0000002270097206_p1238334784520"></a>共享缩放因子数据类型</p>
-</th>
-<th class="cellrowborder" valign="top" width="16.666666666666664%" id="mcps1.2.7.1.6"><p id="zh-cn_topic_0000002270097206_p113831847114514"><a name="zh-cn_topic_0000002270097206_p113831847114514"></a><a name="zh-cn_topic_0000002270097206_p113831847114514"></a>共享缩放因子位宽(w)</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="zh-cn_topic_0000002270097206_row238320470455"><td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.1 "><p id="zh-cn_topic_0000002270097206_p9383134734518"><a name="zh-cn_topic_0000002270097206_p9383134734518"></a><a name="zh-cn_topic_0000002270097206_p9383134734518"></a>MXFP8</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.2 "><p id="zh-cn_topic_0000002270097206_p11383447164519"><a name="zh-cn_topic_0000002270097206_p11383447164519"></a><a name="zh-cn_topic_0000002270097206_p11383447164519"></a>fp8_e5m2_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.3 "><p id="zh-cn_topic_0000002270097206_p33831947194516"><a name="zh-cn_topic_0000002270097206_p33831947194516"></a><a name="zh-cn_topic_0000002270097206_p33831947194516"></a>8</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.4 "><p id="zh-cn_topic_0000002270097206_p1338311471456"><a name="zh-cn_topic_0000002270097206_p1338311471456"></a><a name="zh-cn_topic_0000002270097206_p1338311471456"></a>32</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.5 "><p id="zh-cn_topic_0000002270097206_p1661204742410"><a name="zh-cn_topic_0000002270097206_p1661204742410"></a><a name="zh-cn_topic_0000002270097206_p1661204742410"></a>fp8_e8m0_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.6 "><p id="zh-cn_topic_0000002270097206_p149798459481"><a name="zh-cn_topic_0000002270097206_p149798459481"></a><a name="zh-cn_topic_0000002270097206_p149798459481"></a>8</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002270097206_row133831647204514"><td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.1 "><p id="p448511510259"><a name="p448511510259"></a><a name="p448511510259"></a>MXFP8</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.2 "><p id="zh-cn_topic_0000002270097206_p09723273916"><a name="zh-cn_topic_0000002270097206_p09723273916"></a><a name="zh-cn_topic_0000002270097206_p09723273916"></a>fp8_e4m3fn_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.3 "><p id="p175322662417"><a name="p175322662417"></a><a name="p175322662417"></a>8</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.4 "><p id="p11711191614244"><a name="p11711191614244"></a><a name="p11711191614244"></a>32</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.5 "><p id="p75995345248"><a name="p75995345248"></a><a name="p75995345248"></a>fp8_e8m0_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.6 "><p id="p11842154562416"><a name="p11842154562416"></a><a name="p11842154562416"></a>8</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002270097206_row1138444719456"><td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.1 "><p id="zh-cn_topic_0000002270097206_p173841478457"><a name="zh-cn_topic_0000002270097206_p173841478457"></a><a name="zh-cn_topic_0000002270097206_p173841478457"></a>MXFP4</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.2 "><p id="zh-cn_topic_0000002270097206_p158615210394"><a name="zh-cn_topic_0000002270097206_p158615210394"></a><a name="zh-cn_topic_0000002270097206_p158615210394"></a>fp4x2_e1m2_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.3 "><p id="zh-cn_topic_0000002270097206_p238444704512"><a name="zh-cn_topic_0000002270097206_p238444704512"></a><a name="zh-cn_topic_0000002270097206_p238444704512"></a>4</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.4 "><p id="zh-cn_topic_0000002270097206_p2038434716454"><a name="zh-cn_topic_0000002270097206_p2038434716454"></a><a name="zh-cn_topic_0000002270097206_p2038434716454"></a>32</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.5 "><p id="p205991534102413"><a name="p205991534102413"></a><a name="p205991534102413"></a>fp8_e8m0_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.6 "><p id="p1842145182418"><a name="p1842145182418"></a><a name="p1842145182418"></a>8</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002270097206_row12384154710452"><td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.1 "><p id="p10647179102513"><a name="p10647179102513"></a><a name="p10647179102513"></a>MXFP4</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.2 "><p id="zh-cn_topic_0000002270097206_p8952103819241"><a name="zh-cn_topic_0000002270097206_p8952103819241"></a><a name="zh-cn_topic_0000002270097206_p8952103819241"></a>fp4x2_e2m1_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.3 "><p id="p69001011132410"><a name="p69001011132410"></a><a name="p69001011132410"></a>4</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.4 "><p id="p250011195246"><a name="p250011195246"></a><a name="p250011195246"></a>32</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.5 "><p id="p125992348249"><a name="p125992348249"></a><a name="p125992348249"></a>fp8_e8m0_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.666666666666664%" headers="mcps1.2.7.1.6 "><p id="p284212453244"><a name="p284212453244"></a><a name="p284212453244"></a>8</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 数据类型 | 私有元素数据类型 | 私有元素位宽（d） | 块大小(k) | 共享缩放因子数据类型 | 共享缩放因子位宽(w) |
+| --- | --- | --- | --- | --- | --- |
+| MXFP8 | fp8_e5m2_t | 8 | 32 | fp8_e8m0_t | 8 |
+| MXFP8 | fp8_e4m3fn_t | 8 | 32 | fp8_e8m0_t | 8 |
+| MXFP4 | fp4x2_e1m2_t | 4 | 32 | fp8_e8m0_t | 8 |
+| MXFP4 | fp4x2_e2m1_t | 4 | 32 | fp8_e8m0_t | 8 |
 
 ## 功能介绍<a name="zh-cn_topic_0000002270097206_section310824820358"></a>
 
@@ -106,95 +43,32 @@ MxMatmul的计算公式为：C = \(scaleA ⊗ A\) \* \(scaleB ⊗ B\) + Bias，�
 
 矩阵A、scaleA、B、scaleB在不同位置中的排布格式分别如下图所示。
 
-**图3**  A矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig384531413014"></a>  
+**图3**  A矩阵在不同位置的排布格式  
 ![](../../../../figures/A矩阵在不同位置的排布格式.png "A矩阵在不同位置的排布格式")
 
-**图4**  B矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig674419451902"></a>  
+**图4**  B矩阵在不同位置的排布格式  
 ![](../../../../figures/B矩阵在不同位置的排布格式.png "B矩阵在不同位置的排布格式")
 
-**图5**  scaleA矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig107863142019"></a>  
+**图5**  scaleA矩阵在不同位置的排布格式  
 ![](../../../../figures/scaleA矩阵在不同位置的排布格式.png "scaleA矩阵在不同位置的排布格式")
 
-**图6**  scaleB矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig76682054103416"></a>  
+**图6**  scaleB矩阵在不同位置的排布格式  
 ![](../../../../figures/scaleB矩阵在不同位置的排布格式.png "scaleB矩阵在不同位置的排布格式")
 
-## 使用场景<a name="zh-cn_topic_0000002270097206_section118051016163613"></a>
+## 使用场景
 
-矩阵计算之前，需要对A、B矩阵进行量化操作的场景。当前该场景下，Matmul输入输出矩阵支持的数据类型如下表所示。
+矩阵计算之前，需要对A、B矩阵进行量化操作的场景。当前该场景下，Matmul输入输出矩阵支持的数据类型如下表所示。<!-- npu="950" id1 -->表中所列量化场景仅在Ascend 950PR/Ascend 950DT上支持。<!-- end id1 -->
 
 **表2**  MxMatmul支持的量化场景
 
-<a name="zh-cn_topic_0000002270097206_table2844113219191"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0000002270097206_row4844732121915"><th class="cellrowborder" valign="top" width="10.41%" id="mcps1.2.7.1.1"><p id="zh-cn_topic_0000002270097206_p1084417322199"><a name="zh-cn_topic_0000002270097206_p1084417322199"></a><a name="zh-cn_topic_0000002270097206_p1084417322199"></a>A矩阵</p>
-</th>
-<th class="cellrowborder" valign="top" width="20.599999999999998%" id="mcps1.2.7.1.2"><p id="zh-cn_topic_0000002270097206_p178441532121916"><a name="zh-cn_topic_0000002270097206_p178441532121916"></a><a name="zh-cn_topic_0000002270097206_p178441532121916"></a>B矩阵</p>
-</th>
-<th class="cellrowborder" valign="top" width="15.340000000000002%" id="mcps1.2.7.1.3"><p id="zh-cn_topic_0000002270097206_p9844203201914"><a name="zh-cn_topic_0000002270097206_p9844203201914"></a><a name="zh-cn_topic_0000002270097206_p9844203201914"></a>ScaleA矩阵/ScaleB矩阵</p>
-</th>
-<th class="cellrowborder" valign="top" width="18.85%" id="mcps1.2.7.1.4"><p id="zh-cn_topic_0000002270097206_p6532145910546"><a name="zh-cn_topic_0000002270097206_p6532145910546"></a><a name="zh-cn_topic_0000002270097206_p6532145910546"></a>Bias矩阵</p>
-</th>
-<th class="cellrowborder" valign="top" width="17.72%" id="mcps1.2.7.1.5"><p id="zh-cn_topic_0000002270097206_p131201522142011"><a name="zh-cn_topic_0000002270097206_p131201522142011"></a><a name="zh-cn_topic_0000002270097206_p131201522142011"></a>C矩阵</p>
-</th>
-<th class="cellrowborder" valign="top" width="17.080000000000002%" id="mcps1.2.7.1.6"><p id="zh-cn_topic_0000002270097206_p1012052214207"><a name="zh-cn_topic_0000002270097206_p1012052214207"></a><a name="zh-cn_topic_0000002270097206_p1012052214207"></a>支持平台</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="zh-cn_topic_0000002270097206_row12844932171910"><td class="cellrowborder" valign="top" width="10.41%" headers="mcps1.2.7.1.1 "><p id="zh-cn_topic_0000002270097206_p7777112717207"><a name="zh-cn_topic_0000002270097206_p7777112717207"></a><a name="zh-cn_topic_0000002270097206_p7777112717207"></a>fp4x2_e1m2_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="20.599999999999998%" headers="mcps1.2.7.1.2 "><p id="zh-cn_topic_0000002270097206_p57771127152013"><a name="zh-cn_topic_0000002270097206_p57771127152013"></a><a name="zh-cn_topic_0000002270097206_p57771127152013"></a>fp4x2_e1m2_t/fp4x2_e2m1_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="15.340000000000002%" headers="mcps1.2.7.1.3 "><p id="zh-cn_topic_0000002270097206_p1377792713202"><a name="zh-cn_topic_0000002270097206_p1377792713202"></a><a name="zh-cn_topic_0000002270097206_p1377792713202"></a>fp8_e8m0_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="18.85%" headers="mcps1.2.7.1.4 "><p id="zh-cn_topic_0000002270097206_p4532125918544"><a name="zh-cn_topic_0000002270097206_p4532125918544"></a><a name="zh-cn_topic_0000002270097206_p4532125918544"></a>float/half/bfloat16_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="17.72%" headers="mcps1.2.7.1.5 "><p id="zh-cn_topic_0000002270097206_p6777827162018"><a name="zh-cn_topic_0000002270097206_p6777827162018"></a><a name="zh-cn_topic_0000002270097206_p6777827162018"></a>float/half/bfloat16_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="17.080000000000002%" headers="mcps1.2.7.1.6 "><p id="p355413382268"><a name="p355413382268"></a><a name="p355413382268"></a><span id="zh-cn_topic_0000002270097206_ph3777122762015"><a name="zh-cn_topic_0000002270097206_ph3777122762015"></a><a name="zh-cn_topic_0000002270097206_ph3777122762015"></a>Ascend 950PR/Ascend 950DT</span></p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002270097206_row11845153220193"><td class="cellrowborder" valign="top" width="10.41%" headers="mcps1.2.7.1.1 "><p id="zh-cn_topic_0000002270097206_p377742710204"><a name="zh-cn_topic_0000002270097206_p377742710204"></a><a name="zh-cn_topic_0000002270097206_p377742710204"></a>fp4x2_e2m1_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="20.599999999999998%" headers="mcps1.2.7.1.2 "><p id="zh-cn_topic_0000002270097206_p177771427132012"><a name="zh-cn_topic_0000002270097206_p177771427132012"></a><a name="zh-cn_topic_0000002270097206_p177771427132012"></a>fp4x2_e2m1_t/fp4x2_e1m2_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="15.340000000000002%" headers="mcps1.2.7.1.3 "><p id="zh-cn_topic_0000002270097206_p17777162715206"><a name="zh-cn_topic_0000002270097206_p17777162715206"></a><a name="zh-cn_topic_0000002270097206_p17777162715206"></a>fp8_e8m0_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="18.85%" headers="mcps1.2.7.1.4 "><p id="zh-cn_topic_0000002270097206_p853295911547"><a name="zh-cn_topic_0000002270097206_p853295911547"></a><a name="zh-cn_topic_0000002270097206_p853295911547"></a>float/half/bfloat16_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="17.72%" headers="mcps1.2.7.1.5 "><p id="zh-cn_topic_0000002270097206_p57779278201"><a name="zh-cn_topic_0000002270097206_p57779278201"></a><a name="zh-cn_topic_0000002270097206_p57779278201"></a>float/half/bfloat16_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="17.080000000000002%" headers="mcps1.2.7.1.6 "><p id="p15680154020265"><a name="p15680154020265"></a><a name="p15680154020265"></a><span id="zh-cn_topic_0000002270097206_ph1677719278204"><a name="zh-cn_topic_0000002270097206_ph1677719278204"></a><a name="zh-cn_topic_0000002270097206_ph1677719278204"></a>Ascend 950PR/Ascend 950DT</span></p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002270097206_row0845173241915"><td class="cellrowborder" valign="top" width="10.41%" headers="mcps1.2.7.1.1 "><p id="zh-cn_topic_0000002270097206_p1677712716209"><a name="zh-cn_topic_0000002270097206_p1677712716209"></a><a name="zh-cn_topic_0000002270097206_p1677712716209"></a>fp8_e4m3fn_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="20.599999999999998%" headers="mcps1.2.7.1.2 "><p id="zh-cn_topic_0000002270097206_p87771927182015"><a name="zh-cn_topic_0000002270097206_p87771927182015"></a><a name="zh-cn_topic_0000002270097206_p87771927182015"></a>fp8_e4m3fn_t/fp8_e5m2_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="15.340000000000002%" headers="mcps1.2.7.1.3 "><p id="zh-cn_topic_0000002270097206_p1577832742016"><a name="zh-cn_topic_0000002270097206_p1577832742016"></a><a name="zh-cn_topic_0000002270097206_p1577832742016"></a>fp8_e8m0_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="18.85%" headers="mcps1.2.7.1.4 "><p id="zh-cn_topic_0000002270097206_p6532125914546"><a name="zh-cn_topic_0000002270097206_p6532125914546"></a><a name="zh-cn_topic_0000002270097206_p6532125914546"></a>float/half/bfloat16_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="17.72%" headers="mcps1.2.7.1.5 "><p id="zh-cn_topic_0000002270097206_p37781627172014"><a name="zh-cn_topic_0000002270097206_p37781627172014"></a><a name="zh-cn_topic_0000002270097206_p37781627172014"></a>float/half/bfloat16_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="17.080000000000002%" headers="mcps1.2.7.1.6 "><p id="p16938423262"><a name="p16938423262"></a><a name="p16938423262"></a><span id="zh-cn_topic_0000002270097206_ph77781527182016"><a name="zh-cn_topic_0000002270097206_ph77781527182016"></a><a name="zh-cn_topic_0000002270097206_ph77781527182016"></a>Ascend 950PR/Ascend 950DT</span></p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002270097206_row178451932101918"><td class="cellrowborder" valign="top" width="10.41%" headers="mcps1.2.7.1.1 "><p id="zh-cn_topic_0000002270097206_p3778172722012"><a name="zh-cn_topic_0000002270097206_p3778172722012"></a><a name="zh-cn_topic_0000002270097206_p3778172722012"></a>fp8_e5m2_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="20.599999999999998%" headers="mcps1.2.7.1.2 "><p id="zh-cn_topic_0000002270097206_p17778727112016"><a name="zh-cn_topic_0000002270097206_p17778727112016"></a><a name="zh-cn_topic_0000002270097206_p17778727112016"></a>fp8_e4m3fn_t/fp8_e5m2_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="15.340000000000002%" headers="mcps1.2.7.1.3 "><p id="zh-cn_topic_0000002270097206_p6778627122015"><a name="zh-cn_topic_0000002270097206_p6778627122015"></a><a name="zh-cn_topic_0000002270097206_p6778627122015"></a>fp8_e8m0_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="18.85%" headers="mcps1.2.7.1.4 "><p id="zh-cn_topic_0000002270097206_p7532145915540"><a name="zh-cn_topic_0000002270097206_p7532145915540"></a><a name="zh-cn_topic_0000002270097206_p7532145915540"></a>float/half/bfloat16_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="17.72%" headers="mcps1.2.7.1.5 "><p id="zh-cn_topic_0000002270097206_p18778102710208"><a name="zh-cn_topic_0000002270097206_p18778102710208"></a><a name="zh-cn_topic_0000002270097206_p18778102710208"></a>float/half/bfloat16_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="17.080000000000002%" headers="mcps1.2.7.1.6 "><p id="p1366354422615"><a name="p1366354422615"></a><a name="p1366354422615"></a><span id="zh-cn_topic_0000002270097206_ph1877832711205"><a name="zh-cn_topic_0000002270097206_ph1877832711205"></a><a name="zh-cn_topic_0000002270097206_ph1877832711205"></a>Ascend 950PR/Ascend 950DT</span></p>
-</td>
-</tr>
-</tbody>
-</table>
+| A矩阵 | B矩阵 | ScaleA矩阵/ScaleB矩阵 | Bias矩阵 | C矩阵 |
+| --- | --- | --- | --- | --- |
+| fp4x2_e1m2_t | fp4x2_e1m2_t/fp4x2_e2m1_t | fp8_e8m0_t | float/half/bfloat16_t | float/half/bfloat16_t |
+| fp4x2_e2m1_t | fp4x2_e2m1_t/fp4x2_e1m2_t | fp8_e8m0_t | float/half/bfloat16_t | float/half/bfloat16_t |
+| fp8_e4m3fn_t | fp8_e4m3fn_t/fp8_e5m2_t | fp8_e8m0_t | float/half/bfloat16_t | float/half/bfloat16_t |
+| fp8_e5m2_t | fp8_e4m3fn_t/fp8_e5m2_t | fp8_e8m0_t | float/half/bfloat16_t | float/half/bfloat16_t |
 
-## 实现流程<a name="zh-cn_topic_0000002270097206_section17128015184410"></a>
+## 实现流程
 
 Host侧自动获取Tiling参数的关键步骤介绍如下：
 
@@ -202,7 +76,7 @@ Host侧自动获取Tiling参数的关键步骤介绍如下：
 
     ```
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
-    matmul_tiling::MatmulApiTiling cubeTiling(ascendcPlatform); 
+    matmul_tiling::MatmulApiTiling cubeTiling(ascendcPlatform);
     ```
 
     传入硬件平台信息创建PlatformAscendC对象，然后创建Tiling对象，硬件平台信息可以通过GetPlatformInfo获取。
@@ -253,8 +127,8 @@ Host侧自动获取Tiling参数的关键步骤介绍如下：
 
     ```
     MatmulCustomTilingData tiling;
-    if (cubeTiling.GetTiling(tiling.cubeTilingData) == -1){ 
-        return ge::GRAPH_FAILED;  
+    if (cubeTiling.GetTiling(tiling.cubeTilingData) == -1){
+        return ge::GRAPH_FAILED;
     }
     ```
 
@@ -266,12 +140,12 @@ Kernel侧的关键步骤介绍如下：
 
     ```
     // MxMatmul场景通过MatmulTypeWithScale定义A、scaleA、B、scaleB的参数类型信息
-    typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, isTransposeA> aType; 
+    typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, isTransposeA> aType;
     typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, isTransposeB> bType;
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType; 
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType; 
+    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType;
+    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
     // 定义matmul对象时，传入MatmulWithScalePolicy表明开启MxMatmul模板策略
-    AscendC::Matmul<aType, bType, cType, biasType, CFG_MDL, MatmulCallBackFunc<nullptr, nullptr, nullptr>, AscendC::Impl::Detail::MatmulWithScalePolicy> mm; 
+    AscendC::Matmul<aType, bType, cType, biasType, CFG_MDL, MatmulCallBackFunc<nullptr, nullptr, nullptr>, AscendC::Impl::Detail::MatmulWithScalePolicy> mm;
     ```
 
     创建对象时需要传入A、scaleA、B、scaleB、C、Bias的参数类型信息， A、scaleA、B、scaleB类型信息通过[MatmulTypeWithScale](#zh-cn_topic_0000002270097206_table14759942142014)来定义，C、Bias类型信息通过[MatmulType](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/Matmul使用说明.md)来定义，包括：内存逻辑位置、数据格式、数据类型、转置信息。同时，通过模板参数[MatmulPolicy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/MatmulPolicy.md)传入[MatmulWithScalePolicy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/MatmulPolicy.md)表明开启MxMatmul场景。
@@ -308,8 +182,8 @@ Kernel侧的关键步骤介绍如下：
     -   调用[Iterate](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/Iterate.md)完成单次迭代计算，叠加while循环完成单核全量数据的计算。Iterate方式，可以自行控制迭代次数，完成所需数据量的计算，方式比较灵活。
 
         ```
-        while (mm.Iterate()) {   
-            mm.GetTensorC(gm_c); 
+        while (mm.Iterate()) {
+            mm.GetTensorC(gm_c);
         }
         ```
 
@@ -327,98 +201,24 @@ Kernel侧的关键步骤介绍如下：
 
 更多完整的算子样例请参考[MxMatmul样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_mx)、[自定义输入来源的MxMatmul样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_mx_ub_tscm_nz)、[scale多倍缓存的MxMatmul样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_mx_scale_cache)。
 
-## 参数说明<a name="zh-cn_topic_0000002270097206_section2756107144914"></a>
+## 参数说明
 
 **表3**  MatmulTypeWithScale参数说明
 
 <a name="zh-cn_topic_0000002270097206_table14759942142014"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0000002270097206_row07595429207"><th class="cellrowborder" valign="top" width="18.11%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0000002270097206_p1818821912211"><a name="zh-cn_topic_0000002270097206_p1818821912211"></a><a name="zh-cn_topic_0000002270097206_p1818821912211"></a>参数</p>
-</th>
-<th class="cellrowborder" valign="top" width="81.89%" id="mcps1.2.3.1.2"><p id="zh-cn_topic_0000002270097206_p9188219102113"><a name="zh-cn_topic_0000002270097206_p9188219102113"></a><a name="zh-cn_topic_0000002270097206_p9188219102113"></a>说明</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="zh-cn_topic_0000002270097206_row207591442162020"><td class="cellrowborder" valign="top" width="18.11%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002270097206_p57591442162010"><a name="zh-cn_topic_0000002270097206_p57591442162010"></a><a name="zh-cn_topic_0000002270097206_p57591442162010"></a>POSITION</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p126441432182115"><a name="zh-cn_topic_0000002270097206_p126441432182115"></a><a name="zh-cn_topic_0000002270097206_p126441432182115"></a>左右矩阵的内存逻辑位置。</p>
-<p id="zh-cn_topic_0000002270097206_p11644432192117"><a name="zh-cn_topic_0000002270097206_p11644432192117"></a><a name="zh-cn_topic_0000002270097206_p11644432192117"></a>针对<span id="zh-cn_topic_0000002270097206_ph498220912720"><a name="zh-cn_topic_0000002270097206_ph498220912720"></a><a name="zh-cn_topic_0000002270097206_ph498220912720"></a>Ascend 950PR/Ascend 950DT</span>：</p>
-<p id="p199760149278"><a name="p199760149278"></a><a name="p199760149278"></a>A矩阵可设置为TPosition::GM，TPosition::VECOUT，TPosition::TSCM</p>
-<p id="p1297671462717"><a name="p1297671462717"></a><a name="p1297671462717"></a>B矩阵可设置为TPosition::GM，TPosition::VECOUT，TPosition::TSCM</p>
-<p id="zh-cn_topic_0000002270097206_p1267723333010"><a name="zh-cn_topic_0000002270097206_p1267723333010"></a><a name="zh-cn_topic_0000002270097206_p1267723333010"></a>注意：A、B矩阵设置为TPosition::TSCM时，对应的Format仅支持CubeFormat::NZ。</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002270097206_row13470153112518"><td class="cellrowborder" valign="top" width="18.11%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002270097206_p9507104014512"><a name="zh-cn_topic_0000002270097206_p9507104014512"></a><a name="zh-cn_topic_0000002270097206_p9507104014512"></a>SCALE_POSITION</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p3507174020512"><a name="zh-cn_topic_0000002270097206_p3507174020512"></a><a name="zh-cn_topic_0000002270097206_p3507174020512"></a>量化系数矩阵的内存逻辑位置。</p>
-<p id="zh-cn_topic_0000002270097206_p145073401055"><a name="zh-cn_topic_0000002270097206_p145073401055"></a><a name="zh-cn_topic_0000002270097206_p145073401055"></a>针对<span id="zh-cn_topic_0000002270097206_ph185821514192716"><a name="zh-cn_topic_0000002270097206_ph185821514192716"></a><a name="zh-cn_topic_0000002270097206_ph185821514192716"></a>Ascend 950PR/Ascend 950DT</span>：</p>
-<p id="p28081820162716"><a name="p28081820162716"></a><a name="p28081820162716"></a>scaleA矩阵可设置为TPosition::GM，TPosition::VECOUT，TPosition::TSCM</p>
-<p id="p08081820132714"><a name="p08081820132714"></a><a name="p08081820132714"></a>scaleB矩阵可设置为TPosition::GM，TPosition::VECOUT，TPosition::TSCM</p>
-<p id="zh-cn_topic_0000002270097206_p274171193714"><a name="zh-cn_topic_0000002270097206_p274171193714"></a><a name="zh-cn_topic_0000002270097206_p274171193714"></a>注意：scaleA、scaleB矩阵设置为TPosition::TSCM时，对应的SCALE_FORMAT参数仅支持CubeFormat::NZ。</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002270097206_row1175904217207"><td class="cellrowborder" valign="top" width="18.11%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002270097206_p5537172115157"><a name="zh-cn_topic_0000002270097206_p5537172115157"></a><a name="zh-cn_topic_0000002270097206_p5537172115157"></a>FORMAT</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p6310416287"><a name="zh-cn_topic_0000002270097206_p6310416287"></a><a name="zh-cn_topic_0000002270097206_p6310416287"></a>数据的物理排布格式。</p>
-<p id="zh-cn_topic_0000002270097206_p1175934213209"><a name="zh-cn_topic_0000002270097206_p1175934213209"></a><a name="zh-cn_topic_0000002270097206_p1175934213209"></a>针对<span id="zh-cn_topic_0000002270097206_ph1712219180275"><a name="zh-cn_topic_0000002270097206_ph1712219180275"></a><a name="zh-cn_topic_0000002270097206_ph1712219180275"></a>Ascend 950PR/Ascend 950DT</span>：</p>
-<p id="p1638262618270"><a name="p1638262618270"></a><a name="p1638262618270"></a>A矩阵可设置为CubeFormat::ND，CubeFormat::NZ，CubeFormat::VECTOR</p>
-<p id="p183823268273"><a name="p183823268273"></a><a name="p183823268273"></a>B矩阵可设置为CubeFormat::ND，CubeFormat::NZ</p>
-<p id="zh-cn_topic_0000002270097206_p9185171813367"><a name="zh-cn_topic_0000002270097206_p9185171813367"></a><a name="zh-cn_topic_0000002270097206_p9185171813367"></a>注意：NZ排布格式，A/B的排布格式请参考<a href="../基础知识.md#zh-cn_topic_0000001622194138_section1453415011">数据格式</a>。</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002270097206_row167591242142019"><td class="cellrowborder" valign="top" width="18.11%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002270097206_p675984214203"><a name="zh-cn_topic_0000002270097206_p675984214203"></a><a name="zh-cn_topic_0000002270097206_p675984214203"></a>TYPE</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="p33861110112812"><a name="p33861110112812"></a><a name="p33861110112812"></a>数据类型。</p>
-<p id="zh-cn_topic_0000002270097206_p86091832163315"><a name="zh-cn_topic_0000002270097206_p86091832163315"></a><a name="zh-cn_topic_0000002270097206_p86091832163315"></a>针对<span id="zh-cn_topic_0000002270097206_ph11118321102719"><a name="zh-cn_topic_0000002270097206_ph11118321102719"></a><a name="zh-cn_topic_0000002270097206_ph11118321102719"></a>Ascend 950PR/Ascend 950DT</span>：</p>
-<p id="p9107163120275"><a name="p9107163120275"></a><a name="p9107163120275"></a>A矩阵可设置为fp4x2_e1m2_t、fp4x2_e2m1_t、fp8_e4m3fn_t、fp8_e5m2_t</p>
-<p id="p161081731182712"><a name="p161081731182712"></a><a name="p161081731182712"></a>B矩阵可设置为fp4x2_e1m2_t、fp4x2_e2m1_t、fp8_e4m3fn_t、fp8_e5m2_t</p>
-<p id="zh-cn_topic_0000002270097206_p1732612596387"><a name="zh-cn_topic_0000002270097206_p1732612596387"></a><a name="zh-cn_topic_0000002270097206_p1732612596387"></a><strong id="zh-cn_topic_0000002270097206_b8326205913819"><a name="zh-cn_topic_0000002270097206_b8326205913819"></a><a name="zh-cn_topic_0000002270097206_b8326205913819"></a>注意：具体数据类型组合关系请参考</strong><a href="#zh-cn_topic_0000002270097206_table5383144710452">MxMatmul支持数据类型</a>。</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002270097206_row67591429205"><td class="cellrowborder" valign="top" width="18.11%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002270097206_p1475904232016"><a name="zh-cn_topic_0000002270097206_p1475904232016"></a><a name="zh-cn_topic_0000002270097206_p1475904232016"></a>ISTRANS</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p15691340143420"><a name="zh-cn_topic_0000002270097206_p15691340143420"></a><a name="zh-cn_topic_0000002270097206_p15691340143420"></a>是否开启A、B矩阵转置的功能。默认值为false。参数支持的取值如下：</p>
-<p id="p11558102715289"><a name="p11558102715289"></a><a name="p11558102715289"></a>true：开启矩阵转置的功能，开启后，分别通过SetTensorA和SetTensorB中的isTransposeA、isTransposeB参数设置A、B矩阵是否转置。若设置A、B矩阵转置，Matmul会认为A矩阵形状为[K, M]，B矩阵形状为[N, K]。</p>
-<p id="p45581527162811"><a name="p45581527162811"></a><a name="p45581527162811"></a>false：不开启矩阵转置的功能，通过SetTensorA和SetTensorB不能设置A、B矩阵的转置情况。Matmul会认为A矩阵形状为[M, K]，B矩阵形状为[K, N]。</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002270097206_row68812038163520"><td class="cellrowborder" valign="top" width="18.11%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002270097206_p54471329153612"><a name="zh-cn_topic_0000002270097206_p54471329153612"></a><a name="zh-cn_topic_0000002270097206_p54471329153612"></a>SRCPOS</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p204471629153618"><a name="zh-cn_topic_0000002270097206_p204471629153618"></a><a name="zh-cn_topic_0000002270097206_p204471629153618"></a>A/B矩阵的POSITION参数配置为TPosition::TSCM时，要设置TSCM中矩阵数据的来源的内存逻辑位置，默认为TPosition::GM。</p>
-<p id="zh-cn_topic_0000002270097206_p2231172914619"><a name="zh-cn_topic_0000002270097206_p2231172914619"></a><a name="zh-cn_topic_0000002270097206_p2231172914619"></a>针对<span id="zh-cn_topic_0000002270097206_ph1231182974620"><a name="zh-cn_topic_0000002270097206_ph1231182974620"></a><a name="zh-cn_topic_0000002270097206_ph1231182974620"></a>Ascend 950PR/Ascend 950DT</span>：</p>
-<p id="p13320143342815"><a name="p13320143342815"></a><a name="p13320143342815"></a>A矩阵可设置为TPosition::GM，TPosition::VECOUT</p>
-<p id="p12320163310288"><a name="p12320163310288"></a><a name="p12320163310288"></a>B矩阵可设置为TPosition::GM，TPosition::VECOUT</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002270097206_row7921164017113"><td class="cellrowborder" valign="top" width="18.11%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002270097206_p11226185115114"><a name="zh-cn_topic_0000002270097206_p11226185115114"></a><a name="zh-cn_topic_0000002270097206_p11226185115114"></a>SCALE_FORMAT</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p78145661612"><a name="zh-cn_topic_0000002270097206_p78145661612"></a><a name="zh-cn_topic_0000002270097206_p78145661612"></a>量化系数矩阵的物理排布格式，详细介绍请参考<a href="#zh-cn_topic_0000002270097206_fig107863142019">数据格式</a>。默认值为FORMAT参数的取值。</p>
-<p id="zh-cn_topic_0000002270097206_p158141465164"><a name="zh-cn_topic_0000002270097206_p158141465164"></a><a name="zh-cn_topic_0000002270097206_p158141465164"></a>针对<span id="zh-cn_topic_0000002270097206_ph695882732713"><a name="zh-cn_topic_0000002270097206_ph695882732713"></a><a name="zh-cn_topic_0000002270097206_ph695882732713"></a>Ascend 950PR/Ascend 950DT</span>：</p>
-<p id="p15845121173011"><a name="p15845121173011"></a><a name="p15845121173011"></a>scaleA矩阵可设置为CubeFormat::ND，CubeFormat::NZ，CubeFormat::VECTOR</p>
-<p id="p884571116308"><a name="p884571116308"></a><a name="p884571116308"></a>scaleB矩阵可设置为CubeFormat::ND，CubeFormat::NZ</p>
-<p id="zh-cn_topic_0000002270097206_p7332111273413"><a name="zh-cn_topic_0000002270097206_p7332111273413"></a><a name="zh-cn_topic_0000002270097206_p7332111273413"></a>注意：</p>
-<p id="p15352181633019"><a name="p15352181633019"></a><a name="p15352181633019"></a>NZ排布格式请参考<a href="../../../../技术附录/概念原理和术语/神经网络和算子/数据排布格式.md#li19960204116136">NZ</a>。MxMatmul场景，scaleA、scaleB的数据类型为fp8_e8m0_t，分形大小H0=16，W0=2。</p>
-<p id="p43523162303"><a name="p43523162303"></a><a name="p43523162303"></a>在Scale矩阵为ND格式的场景中，当通过SetTensorScaleA接口设置scaleA矩阵转置时，scaleA内存排布格式必须按照(K/64, M，2)排布，通过SetTensorScaleB接口设置scaleB矩阵不转置时，scaleB内存排布格式必须按照(K/64，N， 2)排布，详细介绍请参考<a href="#zh-cn_topic_0000002270097206_fig76682054103416">数据格式</a>。</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002270097206_row0325310101910"><td class="cellrowborder" valign="top" width="18.11%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002270097206_p19617394191"><a name="zh-cn_topic_0000002270097206_p19617394191"></a><a name="zh-cn_topic_0000002270097206_p19617394191"></a>SCALE_ISTRANS</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p22682252237"><a name="zh-cn_topic_0000002270097206_p22682252237"></a><a name="zh-cn_topic_0000002270097206_p22682252237"></a>是否开启scaleA、scaleB矩阵转置的功能。默认值为ISTRANS参数的取值。参数支持的取值如下：</p>
-<p id="p1407842193011"><a name="p1407842193011"></a><a name="p1407842193011"></a>true：开启矩阵转置的功能。开启后，分别通过SetTensorScaleA和SetTensorScaleB中的isTransposeScaleA、isTransposeScaleB参数设置scaleA、scaleB矩阵是否转置。在Scale矩阵为ND格式的场景中，若设置scaleA、scaleB矩阵转置，Matmul会认为scaleA矩阵形状为[Ceil(K/64), M, 2]，scaleB矩阵形状为[N, Ceil(K/64), 2]。</p>
-<p id="p19408124217308"><a name="p19408124217308"></a><a name="p19408124217308"></a>false：不开启矩阵转置的功能。通过SetTensorScaleA和SetTensorScaleB不能设置scaleA、scaleB矩阵的转置情况。Matmul会认为scaleA矩阵形状为[M, Ceil(K/64), 2]，scaleB矩阵形状为[Ceil(K/64), N, 2]。</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002270097206_row11254846161912"><td class="cellrowborder" valign="top" width="18.11%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002270097206_p6158144912199"><a name="zh-cn_topic_0000002270097206_p6158144912199"></a><a name="zh-cn_topic_0000002270097206_p6158144912199"></a>SCALE_SRCPOS</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.89%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002270097206_p642071011551"><a name="zh-cn_topic_0000002270097206_p642071011551"></a><a name="zh-cn_topic_0000002270097206_p642071011551"></a>scaleA、scaleB矩阵的SCALE_POSITION参数设置为TPosition::TSCM时，需要通过本参数设置TSCM中矩阵数据来源的内存逻辑位置，默认值为SRCPOS参数的取值。</p>
-<p id="zh-cn_topic_0000002270097206_p134201910115519"><a name="zh-cn_topic_0000002270097206_p134201910115519"></a><a name="zh-cn_topic_0000002270097206_p134201910115519"></a>针对<span id="zh-cn_topic_0000002270097206_ph2420111019559"><a name="zh-cn_topic_0000002270097206_ph2420111019559"></a><a name="zh-cn_topic_0000002270097206_ph2420111019559"></a>Ascend 950PR/Ascend 950DT</span>：</p>
-<p id="p138204923010"><a name="p138204923010"></a><a name="p138204923010"></a>scaleA矩阵可设置为TPosition::GM，TPosition::VECOUT</p>
-<p id="p68316492306"><a name="p68316492306"></a><a name="p68316492306"></a>scaleB矩阵可设置为TPosition::GM，TPosition::VECOUT</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数 | 说明 |
+| --- | --- |
+| POSITION | 左右矩阵的内存逻辑位置。<!-- npu="950" id2 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>A矩阵可设置为TPosition::GM，TPosition::VECOUT，TPosition::TSCM<br><br>B矩阵可设置为TPosition::GM，TPosition::VECOUT，TPosition::TSCM<br><br>注意：A、B矩阵设置为TPosition::TSCM时，对应的Format仅支持CubeFormat::NZ。<!-- end id2 --> |
+| SCALE_POSITION | 量化系数矩阵的内存逻辑位置。<!-- npu="950" id3 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>scaleA矩阵可设置为TPosition::GM，TPosition::VECOUT，TPosition::TSCM<br><br>scaleB矩阵可设置为TPosition::GM，TPosition::VECOUT，TPosition::TSCM<br><br>注意：scaleA、scaleB矩阵设置为TPosition::TSCM时，对应的SCALE_FORMAT参数仅支持CubeFormat::NZ。<!-- end id3 --> |
+| FORMAT | 数据的物理排布格式。<!-- npu="950" id4 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>A矩阵可设置为CubeFormat::ND，CubeFormat::NZ，CubeFormat::VECTOR<br><br>B矩阵可设置为CubeFormat::ND，CubeFormat::NZ<br><br>注意：NZ排布格式，A/B的排布格式请参考[数据格式](../基础知识.md#zh-cn_topic_0000001622194138_section1453415011)。<!-- end id4 --> |
+| TYPE | 数据类型。<!-- npu="950" id5 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>A矩阵可设置为fp4x2_e1m2_t、fp4x2_e2m1_t、fp8_e4m3fn_t、fp8_e5m2_t<br><br>B矩阵可设置为fp4x2_e1m2_t、fp4x2_e2m1_t、fp8_e4m3fn_t、fp8_e5m2_t<br><br>注意：具体数据类型组合关系请参考[MxMatmul支持数据类型](#zh-cn_topic_0000002270097206_table5383144710452)。<!-- end id5 --> |
+| ISTRANS | 是否开启A、B矩阵转置的功能。默认值为false。参数支持的取值如下：<br><br>true：开启矩阵转置的功能，开启后，分别通过SetTensorA和SetTensorB中的isTransposeA、isTransposeB参数设置A、B矩阵是否转置。若设置A、B矩阵转置，Matmul会认为A矩阵形状为[K, M]，B矩阵形状为[N, K]。<br><br>false：不开启矩阵转置的功能，通过SetTensorA和SetTensorB不能设置A、B矩阵的转置情况。Matmul会认为A矩阵形状为[M, K]，B矩阵形状为[K, N]。 |
+| SRCPOS | A/B矩阵的POSITION参数配置为TPosition::TSCM时，要设置TSCM中矩阵数据的来源的内存逻辑位置，默认为TPosition::GM。<!-- npu="950" id6 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>A矩阵可设置为TPosition::GM，TPosition::VECOUT<br><br>B矩阵可设置为TPosition::GM，TPosition::VECOUT<!-- end id6 --> |
+| SCALE_FORMAT | 量化系数矩阵的物理排布格式，详细介绍请参考[数据格式](#zh-cn_topic_0000002270097206_fig107863142019)。默认值为FORMAT参数的取值。<!-- npu="950" id7 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>scaleA矩阵可设置为CubeFormat::ND，CubeFormat::NZ，CubeFormat::VECTOR<br><br>scaleB矩阵可设置为CubeFormat::ND，CubeFormat::NZ<br><br>注意：<br><br>NZ排布格式请参考[NZ](../../../../技术附录/概念原理和术语/神经网络和算子/数据排布格式.md#li19960204116136)。MxMatmul场景，scaleA、scaleB的数据类型为fp8_e8m0_t，分形大小H0=16，W0=2。<br><br>在Scale矩阵为ND格式的场景中，当通过SetTensorScaleA接口设置scaleA矩阵转置时，scaleA内存排布格式必须按照(K/64, M，2)排布，通过SetTensorScaleB接口设置scaleB矩阵不转置时，scaleB内存排布格式必须按照(K/64，N， 2)排布，详细介绍请参考[数据格式](#zh-cn_topic_0000002270097206_fig76682054103416)。<!-- end id7 --> |
+| SCALE_ISTRANS | 是否开启scaleA、scaleB矩阵转置的功能。默认值为ISTRANS参数的取值。参数支持的取值如下：<br><br>true：开启矩阵转置的功能。开启后，分别通过SetTensorScaleA和SetTensorScaleB中的isTransposeScaleA、isTransposeScaleB参数设置scaleA、scaleB矩阵是否转置。在Scale矩阵为ND格式的场景中，若设置scaleA、scaleB矩阵转置，Matmul会认为scaleA矩阵形状为[Ceil(K/64), M, 2]，scaleB矩阵形状为[N, Ceil(K/64), 2]。<br><br>false：不开启矩阵转置的功能。通过SetTensorScaleA和SetTensorScaleB不能设置scaleA、scaleB矩阵的转置情况。Matmul会认为scaleA矩阵形状为[M, Ceil(K/64), 2]，scaleB矩阵形状为[Ceil(K/64), N, 2]。 |
+| SCALE_SRCPOS | scaleA、scaleB矩阵的SCALE_POSITION参数设置为TPosition::TSCM时，需要通过本参数设置TSCM中矩阵数据来源的内存逻辑位置，默认值为SRCPOS参数的取值。<!-- npu="950" id8 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>scaleA矩阵可设置为TPosition::GM，TPosition::VECOUT<br><br>scaleB矩阵可设置为TPosition::GM，TPosition::VECOUT<!-- end id8 --> |
 
-## 约束说明<a name="zh-cn_topic_0000002270097206_section14160134220363"></a>
+## 约束说明
 
 -   MxMatmul场景仅支持[Norm模板](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/MatmulConfig.md)和[MDL模板](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/MatmulConfig.md)。
 
