@@ -96,8 +96,13 @@ public:
                         const DescriptorUbuf &ubuf = DescriptorUbuf{},
                         AinCommitFlags commitFlags = AIN_COMMIT_IMMED);
 
+    template <typename RemoteAction, typename DescriptorUbuf = AinDescriptorUbuf>
+    AIN_DEVICE void signal(AinTeam team, uint32_t peer, RemoteAction action,
+                           const DescriptorUbuf &ubuf = DescriptorUbuf{}, AinCommitFlags commitFlags = AIN_COMMIT_IMMED);
+
+    AIN_DEVICE __gm__ uint64_t* getSignalShadowPtr(AinSignal signalId) const;
+
     uint64_t devComm_;
-    int contextIndex_;
 
 private:
     /*!
@@ -106,6 +111,7 @@ private:
     AIN_DEVICE uint32_t decode_window(AinCommSymWindow window) const;
 
     Hcomm<COMM_PROTOCOL_UBC_CTP> hcomm_;
+    int contextIndex_;
 };
 
 /*!
