@@ -15,7 +15,7 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-set(SCENARIO_NUM "6" CACHE STRING "Case type to run (0-7)")
+set(SCENARIO_NUM "7" CACHE STRING "Case type to run (0-7)")
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU ARCH, e.g. dav-3510")
 
 add_executable(matrix_transpose

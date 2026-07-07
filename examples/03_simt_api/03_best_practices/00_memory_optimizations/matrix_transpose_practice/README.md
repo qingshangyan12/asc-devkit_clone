@@ -401,7 +401,7 @@ for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x)
   在本样例目录下执行如下命令。
 
   ```bash
-  SCENARIO_NUM=6                                                                     # 选择执行场景，可选0-7
+  SCENARIO_NUM=7                                                                     # 选择执行场景，可选0-7
   mkdir -p build && cd build;                                                        # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # 编译工程
   ./matrix_transpose                                                        # 执行样例
@@ -414,7 +414,7 @@ for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x)
   | 选项                       | 可选值      | 说明                                                       |
   | -------------------------- | ----------- | ---------------------------------------------------------- |
   | `CMAKE_ASC_ARCHITECTURES`  | `dav-3510`  | NPU架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT） |
-  | `SCENARIO_NUM`             | `0`-`7`     | 样例类型，默认为6                                          |
+  | `SCENARIO_NUM`             | `0`-`7`     | 样例类型，默认为7                                          |
 
   执行结果如下，说明精度对比成功。
 

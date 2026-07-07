@@ -401,7 +401,7 @@ Run the following steps in the root directory of this example to build and execu
   Run the following commands in this example directory.
 
   ```bash
-  SCENARIO_NUM=6                                                                     # Select the execution scenario, options 0-7
+  SCENARIO_NUM=7                                                                     # Select the execution scenario, options 0-7
   mkdir -p build && cd build;                                                        # Create and enter the build directory
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # Build the project
   ./matrix_transpose 1024                                                   # Run the example
@@ -414,7 +414,7 @@ Run the following steps in the root directory of this example to build and execu
   | Option                      | Values      | Description                                                        |
   | --------------------------- | ----------- | ------------------------------------------------------------------ |
   | `CMAKE_ASC_ARCHITECTURES`   | `dav-3510`  | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
-  | `SCENARIO_NUM`              | `0`-`7`     | Example type, default is 6                                         |
+  | `SCENARIO_NUM`              | `0`-`7`     | Example type, default is 7                                         |
 
   The following output indicates that the accuracy verification is successful.
 
