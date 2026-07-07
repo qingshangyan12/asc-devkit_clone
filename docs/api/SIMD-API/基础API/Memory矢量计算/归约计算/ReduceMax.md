@@ -108,7 +108,7 @@
 - <cann-filter npu-type = "950">针对Ascend 950PR/Ascend 950DT，`int64_t`/`uint64_t`数据类型仅支持tensor前n个数据计算接口。</cann-filter>
 - <cann-filter npu-type = "950">对于Ascend 950PR/Ascend 950DT，因接口内部算法实现不同，无需使用`sharedTmpBuffer`，可以直接传入`src`或者任意大小的`sharedTmpBuffer`。</cann-filter>
 
-<cann-filter npu-type = "A3,910b,310b,310p,910,x90,9030">
+<cann-filter npu-type = "A3,910b,310b,310p,910">
 
 - 针对如下型号，需要使用`sharedTmpBuffer`。
   - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
