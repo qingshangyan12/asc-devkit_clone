@@ -31,14 +31,18 @@ __simd_callee__ inline void asc_int162float_v2_impl(vector_float& dst, vector_in
     }
 }
 
-__simd_callee__ inline void asc_int162float_impl(vector_float& dst, vector_int16_t src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+__simd_callee__ inline void asc_int162float_impl(
+    vector_float& dst, vector_int16_t src, vector_bool mask,
+    std::integral_constant<asc_position, asc_position::EVEN> pos)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtif_s162f32_x(src, mask, (ULL)0);
     }
 }
 
-__simd_callee__ inline void asc_int162float_impl(vector_float& dst, vector_int16_t src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+__simd_callee__ inline void asc_int162float_impl(
+    vector_float& dst, vector_int16_t src, vector_bool mask,
+    std::integral_constant<asc_position, asc_position::ODD> pos)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtif_s162f32_x(src, mask, (ULL)1);

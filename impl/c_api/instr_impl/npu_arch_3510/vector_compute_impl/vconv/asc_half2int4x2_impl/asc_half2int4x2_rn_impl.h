@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_VECTOR_COMPUTE_IMPL_VCONV_ASC_HALF2INT4X2_IMPL_ASC_HALF2INT4X2_RN_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_VECTOR_COMPUTE_IMPL_VCONV_ASC_HALF2INT4X2_IMPL_ASC_HALF2INT4X2_RN_IMPL_H
@@ -70,57 +70,72 @@ __simd_callee__ inline void asc_half2int4x2_rn_sat_v4_impl(vector_int4x2_t& dst,
     }
 }
 
-
-__simd_callee__ inline void asc_half2int4x2_rn_impl(vector_int4x2_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> quarter)
+__simd_callee__ inline void asc_half2int4x2_rn_impl(
+    vector_int4x2_t& dst, vector_half src, vector_bool mask,
+    std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> quarter)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtfi_f162s4x2_x(src, mask, (ULL)0, (ULL)0, (ULL)0);
     }
 }
 
-__simd_callee__ inline void asc_half2int4x2_rn_impl(vector_int4x2_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::SECOND> quarter)
+__simd_callee__ inline void asc_half2int4x2_rn_impl(
+    vector_int4x2_t& dst, vector_half src, vector_bool mask,
+    std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::SECOND> quarter)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtfi_f162s4x2_x(src, mask, (ULL)0, (ULL)0, (ULL)1);
     }
 }
 
-__simd_callee__ inline void asc_half2int4x2_rn_impl(vector_int4x2_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::THIRD> quarter)
+__simd_callee__ inline void asc_half2int4x2_rn_impl(
+    vector_int4x2_t& dst, vector_half src, vector_bool mask,
+    std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::THIRD> quarter)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtfi_f162s4x2_x(src, mask, (ULL)0, (ULL)0, (ULL)2);
     }
 }
 
-__simd_callee__ inline void asc_half2int4x2_rn_impl(vector_int4x2_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FOURTH> quarter)
+__simd_callee__ inline void asc_half2int4x2_rn_impl(
+    vector_int4x2_t& dst, vector_half src, vector_bool mask,
+    std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FOURTH> quarter)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtfi_f162s4x2_x(src, mask, (ULL)0, (ULL)0, (ULL)3);
     }
 }
 
-__simd_callee__ inline void asc_half2int4x2_rn_sat_impl(vector_int4x2_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> quarter)
+__simd_callee__ inline void asc_half2int4x2_rn_sat_impl(
+    vector_int4x2_t& dst, vector_half src, vector_bool mask,
+    std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> quarter)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtfi_f162s4x2_x(src, mask, (ULL)0, (ULL)0, (ULL)0);
     }
 }
 
-__simd_callee__ inline void asc_half2int4x2_rn_sat_impl(vector_int4x2_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::SECOND> quarter)
+__simd_callee__ inline void asc_half2int4x2_rn_sat_impl(
+    vector_int4x2_t& dst, vector_half src, vector_bool mask,
+    std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::SECOND> quarter)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtfi_f162s4x2_x(src, mask, (ULL)0, (ULL)0, (ULL)1);
     }
 }
 
-__simd_callee__ inline void asc_half2int4x2_rn_sat_impl(vector_int4x2_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::THIRD> quarter)
+__simd_callee__ inline void asc_half2int4x2_rn_sat_impl(
+    vector_int4x2_t& dst, vector_half src, vector_bool mask,
+    std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::THIRD> quarter)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtfi_f162s4x2_x(src, mask, (ULL)0, (ULL)0, (ULL)2);
     }
 }
 
-__simd_callee__ inline void asc_half2int4x2_rn_sat_impl(vector_int4x2_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FOURTH> quarter)
+__simd_callee__ inline void asc_half2int4x2_rn_sat_impl(
+    vector_int4x2_t& dst, vector_half src, vector_bool mask,
+    std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FOURTH> quarter)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtfi_f162s4x2_x(src, mask, (ULL)0, (ULL)0, (ULL)3);
