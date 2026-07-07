@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/vector/gm_to_ub/copy_impl/instruction.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -38,33 +38,35 @@ public:
         if constexpr (sizeof(srcType) == 1) {
             CopyGmToUbufAlignV2((__ubuf__ uint8_t*)(dst.Data().Get()), (__gm__ uint8_t*)(src.Data().Get()), params...);
         } else if constexpr (sizeof(srcType) == 2) {
-            CopyGmToUbufAlignV2((__ubuf__ uint16_t*)(dst.Data().Get()), (__gm__ uint16_t*)(src.Data().Get()),
-                                params...);
+            CopyGmToUbufAlignV2(
+                (__ubuf__ uint16_t*)(dst.Data().Get()), (__gm__ uint16_t*)(src.Data().Get()), params...);
         } else if constexpr (sizeof(srcType) == 4) {
-            CopyGmToUbufAlignV2((__ubuf__ uint32_t*)(dst.Data().Get()), (__gm__ uint32_t*)(src.Data().Get()),
-                                params...);
+            CopyGmToUbufAlignV2(
+                (__ubuf__ uint32_t*)(dst.Data().Get()), (__gm__ uint32_t*)(src.Data().Get()), params...);
         } else if constexpr (sizeof(srcType) == 8) {
-            CopyGmToUbufAlignV2((__ubuf__ uint32_t*)(dst.Data().Get()), (__gm__ uint32_t*)(src.Data().Get()),
-                                params...);
+            CopyGmToUbufAlignV2(
+                (__ubuf__ uint32_t*)(dst.Data().Get()), (__gm__ uint32_t*)(src.Data().Get()), params...);
         } else {
-            static_assert(sizeof(srcType) == 1 || sizeof(srcType) == 2 || sizeof(srcType) == 4 || sizeof(srcType) == 8,
-                          "Unsupported data type size for CopyGmToUbufAlignV2");
+            static_assert(
+                sizeof(srcType) == 1 || sizeof(srcType) == 2 || sizeof(srcType) == 4 || sizeof(srcType) == 8,
+                "Unsupported data type size for CopyGmToUbufAlignV2");
         }
     }
 
 private:
     template <typename T>
-    __aicore__ inline static void
-    CopyGmToUbufAlignV2(__ubuf__ T* dst, __gm__ T* src, const uint16_t blockCount, const uint32_t blockLen,
-                        const uint8_t leftPaddingCount, const uint8_t rightPaddingCount, const int64_t srcStride,
-                        const int64_t dstStride, const uint8_t cacheMode = 0, const bool isPad = true)
+    __aicore__ inline static void CopyGmToUbufAlignV2(
+        __ubuf__ T* dst, __gm__ T* src, const uint16_t blockCount, const uint32_t blockLen,
+        const uint8_t leftPaddingCount, const uint8_t rightPaddingCount, const int64_t srcStride,
+        const int64_t dstStride, const uint8_t cacheMode = 0, const bool isPad = true)
     {
         if ASCEND_IS_AIC {
             return;
         }
 
-        asc_copy_gm2ub_align(dst, src, blockCount, blockLen, leftPaddingCount, rightPaddingCount, isPad,
-                                    cacheMode, srcStride, dstStride);
+        asc_copy_gm2ub_align(
+            dst, src, blockCount, blockLen, leftPaddingCount, rightPaddingCount, isPad, cacheMode, srcStride,
+            dstStride);
     }
 };
 

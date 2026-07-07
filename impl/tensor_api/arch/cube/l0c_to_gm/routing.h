@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/cube/l0c_to_gm/routing.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -32,8 +32,8 @@ class CopyL0C2GMIgnore {
 public:
     template <const CopyL0C2GMTrait& trait, typename... Args>
     __aicore__ inline static void Run(const Args&... args)
-    { 
-        static_assert(Std::is_same_v<Args..., void>, "CopyL0C2GMIgnore should not be called"); 
+    {
+        static_assert(Std::is_same_v<Args..., void>, "CopyL0C2GMIgnore should not be called");
     }
 };
 
