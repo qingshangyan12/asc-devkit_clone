@@ -30,7 +30,7 @@
 
 为提升对不规则内存地址的处理能力，Reg矢量计算支持在数据搬运过程中对非32字节对齐的地址进行访问，降低非对齐访问带来的性能开销。StoreUnAlign能够实现数据从[RegTensor](../寄存器数据类型/RegTensor.md)连续搬运至非对齐Unified Buffer（UB），利用非对齐寄存器UnalignRegForStore作为临时缓存区，暂存跨对齐边界的数据，从而实现高效的连续非对齐数据传输。
 
-非对齐搬运接口有：PostUpdate扩展搬运接口、使用[AddrReg](../寄存器数据类型/AddrReg.md)寄存器存储偏移量接口、使用AR寄存器存储偏移量接口。
+非对齐搬运接口有：PostUpdate扩展搬运接口、使用[AddrReg](../寄存器数据类型/AddrReg.md)寄存器存储偏移量接口、使用[AR寄存器](../比较与选择/Squeeze.md)存储偏移量接口。
 
 RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体支持情况如下：
 
@@ -65,7 +65,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
     __simd_callee__ inline void StoreUnAlignPost(__ubuf__ T*& dstAddr, UnalignRegForStore& ureg, AddrReg& areg)
     ```
 
-- 使用AR寄存器存储偏移量接口：配合Squeeze使用，Squeeze会存储有效元素的总字节数到AR特殊寄存器，使用此接口会将AR寄存器中有效元素个数作为存储偏移量。
+- 使用AR寄存器存储偏移量接口：配合[Squeeze](../比较与选择/Squeeze.md)使用，Squeeze会存储有效元素的总字节数到AR特殊寄存器，使用此接口会将AR寄存器中有效元素个数作为存储偏移量。
 
     ```cpp
     template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE, typename U>
