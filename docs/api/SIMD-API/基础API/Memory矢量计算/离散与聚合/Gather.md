@@ -48,23 +48,23 @@ def Gather(dst, src, count, srcOffset, srcBaseAddr):
 - tensor前n个数据计算。
 
   ```cpp
-  template <typename T> 
-  __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& srcOffset, const uint32_t srcBaseAddr, const uint32_t count) 
+  template <typename T>
+  __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& srcOffset, const uint32_t srcBaseAddr, const uint32_t count)
   ```
 
 - tensor高维切分计算。
   - mask逐bit模式。
 
     ```cpp
-    template <typename T> 
-    __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& src,const LocalTensor<uint32_t>& srcOffset, const uint32_t srcBaseAddr, const uint64_t mask[], const uint8_t repeatTime, const uint16_t dstRepStride) 
+    template <typename T>
+    __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& src,const LocalTensor<uint32_t>& srcOffset, const uint32_t srcBaseAddr, const uint64_t mask[], const uint8_t repeatTime, const uint16_t dstRepStride)
     ```
 
   - mask连续模式。
 
     ```cpp
-    template <typename T> 
-    __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& srcOffset, const uint32_t srcBaseAddr, const uint64_t mask, const uint8_t repeatTime, const uint16_t dstRepStride) 
+    template <typename T>
+    __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& srcOffset, const uint32_t srcBaseAddr, const uint64_t mask, const uint8_t repeatTime, const uint16_t dstRepStride)
     ```
 
 ## 参数说明<a name="section1619484392111"></a>
@@ -184,7 +184,7 @@ Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t�
 
 ## 调用示例<a name="section11276201527"></a>
 
-本样例中只展示Compute流程中的部分代码。如果您需要运行样例代码，请将该代码段拷贝并替换[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/gather)场景三中Compute函数的部分代码即可。
+本样中只展示部分关键代码。如果您需要运行样例代码，请将该代码段拷贝并替换[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/gather)场景三中Compute函数的部分代码即可。
 
 - tensor高维切分计算样例-mask连续模式。
 
@@ -192,7 +192,7 @@ Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t�
   // repeatTime = 4, mask = 128, 128 elements one repeat, 512 elements total
   // srcLocal数据类型为half，srcOffsetLocal数据类型为uint32_t，dstLocal数据类型为half
   // srcBaseAddr = 0, srcLocal的起始基地址为0
-  // dstRepStride = 8, no gap between repeats 
+  // dstRepStride = 8, no gap between repeats
   AscendC::Gather(dstLocal, srcLocal, srcOffsetLocal, (uint32_t)0, 128, 4, 8);
   ```
 
@@ -203,7 +203,7 @@ Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t�
   // repeatTime = 4, 128 elements one repeat, 512 elements total
   // srcLocal数据类型为half，srcOffsetLocal数据类型为uint32_t，dstLocal数据类型为half
   // srcBaseAddr = 0, srcLocal的起始基地址为0
-  // dstRepStride = 8, no gap between repeats 
+  // dstRepStride = 8, no gap between repeats
   AscendC::Gather(dstLocal, srcLocal, srcOffsetLocal, (uint32_t)0, mask, 4, 8);
   ```
 
@@ -221,7 +221,7 @@ Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t�
 ```plain
 输入数据srcOffsetLocal:
 [254 252 250 ... 4 2 0]
-输入数据srcLocal（128个half类型数据）: 
+输入数据srcLocal（128个half类型数据）:
 [0 1 2 ... 125 126 127]
 输出数据(dstLocal)初始值:
 [0. 0. 0. 0. 0. 0. ... 0.]
