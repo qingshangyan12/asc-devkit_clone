@@ -48,7 +48,8 @@ The Add operator's computation logic follows the three-stage pipeline structure 
 - [GM (Global Memory)](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor简介.md): The global storage external to the AI Core, accessed via [GlobalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor简介.md), with large capacity but slower access speed.
 - [UB (Unified Buffer)](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md): The dedicated on-chip cache for vector computation inside the AI Core, accessed via [LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md), with limited capacity but fast access speed.
 - [DataCopy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB连续数据搬运(DataCopy).md): The API used for data transfer between GM and UB, with the transfer direction determined by the parameter order.
-- [PipeBarrier](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md): Pipeline synchronization barrier, ensuring data transfer completes before subsequent operations to avoid read/write conflicts.
+- [SetFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag(ISASI).md)/[WaitFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/WaitFlag(ISASI).md): Pipeline event synchronization, ensuring data transfer completes before subsequent operations to avoid read/write conflicts.
+- [PipeBarrier](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md): Pipeline synchronization barrier, ensuring all pipeline operations complete before subsequent operations.
 - `block_idx`: A built-in variable representing the current core's index (equivalent to [GetBlockIdx()](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/工具接口/系统资源与变量/GetBlockIdx.md)), used for data partitioning in multi-core parallel computation.
 
 The core code is as follows:
@@ -74,11 +75,13 @@ __vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
     // GM -> UB: Load input data
     AscendC::DataCopy(xLocal, xGm, blockLength);
     AscendC::DataCopy(yLocal, yGm, blockLength);
-    AscendC::PipeBarrier<PIPE_ALL>();  // Ensure load completes before computation
+    AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
     // Vector computation: z = x + y
     AscendC::Add(zLocal, xLocal, yLocal, blockLength);
-    AscendC::PipeBarrier<PIPE_ALL>();  // Ensure computation completes before store
+    AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
 
     // UB -> GM: Store computation result
     AscendC::DataCopy(zGm, zLocal, blockLength);
@@ -96,9 +99,9 @@ Invocation method: Use the kernel invocation operator `<<<numBlocks, 0, stream>>
 | GM Address Allocation | `SetGlobalBuffer(x + block_idx * blockLength, blockLength)` | Each core calculates offset based on `block_idx` to process different data segments, enabling multi-core parallelism |
 | UB Space Allocation | `ubAllocator.Alloc<float, blockLength>()` | Allocate contiguous memory blocks on UB for x, y, z for vector computation |
 | Load (Stage 1) | GM → UB: `DataCopy(xLocal, xGm)`, `DataCopy(yLocal, yGm)` | Transfer input data from GM to UB, since the vector computation unit can only access data on UB |
-| Pipeline Sync | `PipeBarrier<PIPE_ALL>()` | Ensure load completes before computation begins, preventing the computation unit from reading unready data |
+| Pipeline Sync | `SetFlag<HardEvent::MTE2_V>`, `WaitFlag<HardEvent::MTE2_V>` | Ensure load completes before computation begins, preventing the computation unit from reading unready data |
 | Compute (Stage 2) | UB computation: `Add(zLocal, xLocal, yLocal)` | Execute vector addition on UB, leveraging the vector unit to process multiple elements in parallel |
-| Pipeline Sync | `PipeBarrier<PIPE_ALL>()` | Ensure computation completes before store begins, preventing storing incomplete results |
+| Pipeline Sync | `SetFlag<HardEvent::V_MTE3>`, `WaitFlag<HardEvent::V_MTE3>` | Ensure computation completes before store begins, preventing storing incomplete results |
 | Store (Stage 3) | UB → GM: `DataCopy(zGm, zLocal)` | Transfer computation results from UB back to GM for subsequent use or output |
 | Pipeline Sync | `PipeBarrier<PIPE_ALL>()` | Ensure store completes, guaranteeing data consistency |
 

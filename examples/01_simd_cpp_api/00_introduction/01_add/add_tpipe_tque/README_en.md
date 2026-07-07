@@ -35,8 +35,8 @@ This sample implements the Add vector addition operation based on the memory and
   This sample performs element-wise addition of two tensors with the same shape and writes the result to the output tensor. The sample inputs are two `float` type tensors `x` and `y`, both with shape `[8, 2048]`, and the output `z` has the same shape as the inputs. The sample launches the kernel with 8 cores for parallel computation, with each core responsible for processing a contiguous segment of data.
 
 - Processing Flow:
-  1. `add_custom` serves as the kernel entry point and receives `totalLength`.
-  2. In `add_custom`, calculate the data length for the current block using `GetBlockNum()`, and calculate the data start point in GM for the current core using `GetBlockIdx()`.
+  1. `vector_add_custom` serves as the kernel entry point and receives `totalLength`.
+  2. In `vector_add_custom`, calculate the data length for the current block using `GetBlockNum()`, and calculate the data start point in GM for the current core using `GetBlockIdx()`.
   3. In the kernel function, use `DataCopy` to move input data from GM to UB, and place the input `LocalTensor` into the input queue through `EnQue`.
   4. Retrieve the input tensor from the input queue through `DeQue`, execute `Add` in UB, and then place the result `LocalTensor` into the output queue through `EnQue`.
   5. Retrieve the result from the output queue through `DeQue`, and use `DataCopy` to write back to the GM slice that the current core is responsible for.
@@ -49,15 +49,15 @@ This sample implements the Add vector addition operation based on the memory and
   <tr><td align="center">x</td><td align="center">[8, 2048]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td align="center">y</td><td align="center">[8, 2048]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">Sample Output</td><td align="center">z</td><td align="center">[8, 2048]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">add_custom</td></tr>
+  <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">vector_add_custom</td></tr>
   </table>
 
 - Sample Implementation:
   - Kernel Implementation  
-    The kernel function entry `add_custom` in `add_tpipe_tque.asc` receives `totalLength`, and inside the kernel function calculates the `blockLength` that each core needs to process based on `GetBlockNum()`, then calculates the data start point in GM for the current core using `GetBlockIdx()`. After that, the kernel function directly completes the entire flow of moving input data to UB and enqueuing, executing `Add` after dequeuing, and writing the result back to GM.
+    The kernel function entry `vector_add_custom` in `add_tpipe_tque.asc` receives `totalLength`, and inside the kernel function calculates the `blockLength` that each core needs to process based on `GetBlockNum()`, then calculates the data start point in GM for the current core using `GetBlockIdx()`. After that, the kernel function directly completes the entire flow of moving input data to UB and enqueuing, executing `Add` after dequeuing, and writing the result back to GM.
 
   - Kernel Entry Implementation
-    `add_custom` is responsible for creating `TPipe`, `TQue`, and `GlobalTensor` objects, and executes the input move, compute, and output move processing chain in sequence.
+    `vector_add_custom` is responsible for creating `TPipe`, `TQue`, and `GlobalTensor` objects, and executes the input move, compute, and output move processing chain in sequence.
 
   - Call Implementation
     Use the kernel call operator `<<<>>>` to invoke the kernel function. During the call, runtime parameters pass the Device-side x, y, z tensor addresses and the total data length `totalLength`.
