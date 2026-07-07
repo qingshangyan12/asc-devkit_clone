@@ -60,9 +60,7 @@ auto tile4 = tiled_partition<4>(block);
 
 `thread_block_tile`除支持`sync()`、`thread_rank()`、`num_threads()`等基础接口外，还支持shfl类和vote类接口，例如`shfl()`、`shfl_up()`、`shfl_down()`、`shfl_xor()`、`any()`、`all()`和`ballot()`。
 
-### coalesced_group
-
-在SIMT架构的硬件层面上，处理器以32个线程为一组（一个Warp）来执行线程。当线程遇到条件分支时会出现发散，Warp会串行地执行每个分支，在执行某个分支时会屏蔽不在该指令路径上的线程。在路径上保持活跃的线程被称为合并线程（coalesced）。`coalesced_group`表示当前Warp内处于活跃状态并参与当前执行路径的线程集合，通过`coalesced_threads()`接口创建。它常用于条件分支中，仅让到达当前分支的活跃线程组成协作组。
+### coalesced_group在SIMT架构的硬件层面上，处理器以32个线程为一组（一个Warp）来执行线程。当线程遇到条件分支时会出现发散，Warp会串行地执行每个分支，在执行某个分支时会屏蔽不在该指令路径上的线程。在路径上保持活跃的线程被称为合并线程（coalesced）。`coalesced_group`表示当前Warp内处于活跃状态并参与当前执行路径的线程集合，通过`coalesced_threads()`接口创建。它常用于条件分支中，仅让到达当前分支的活跃线程组成协作组。
 
 示例代码中创建一个名为`active`的组，该组包含Warp中所有线程id为偶数的线程。
 
