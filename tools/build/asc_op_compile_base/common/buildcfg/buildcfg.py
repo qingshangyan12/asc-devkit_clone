@@ -144,4 +144,3 @@ def set_current_build_config(key, value):
 
     if key in GlobalInfoContainer.global_info:
         GlobalInfoContainer.global_info[key] = value
-

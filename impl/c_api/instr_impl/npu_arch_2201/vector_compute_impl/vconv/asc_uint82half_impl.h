@@ -53,4 +53,3 @@ __aicore__ inline void asc_uint82half_sync_impl(__ubuf__ half* dst, __ubuf__ uin
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
-

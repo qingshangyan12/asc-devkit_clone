@@ -496,4 +496,3 @@ no need to detect SIMT type", AscendCLogLevel.LOG_INFO)
             return check_op_type_is_simt(obj_path, kernel_name)
 
     return False
-

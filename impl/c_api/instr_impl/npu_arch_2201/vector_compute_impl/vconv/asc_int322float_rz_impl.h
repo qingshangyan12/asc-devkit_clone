@@ -51,4 +51,3 @@ __aicore__ inline void asc_int322float_rz_sync_impl(__ubuf__ float* dst, __ubuf_
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
-

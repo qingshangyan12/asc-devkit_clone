@@ -76,4 +76,3 @@ __aicore__ inline void asc_deq_int162b8_h_sync_impl(__ubuf__ uint8_t* dst, __ubu
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
-

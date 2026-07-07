@@ -53,4 +53,3 @@ __aicore__ inline void asc_int322int16_sync_impl(__ubuf__ int16_t* dst, __ubuf__
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
-

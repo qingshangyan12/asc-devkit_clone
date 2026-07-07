@@ -74,4 +74,3 @@ __aicore__ inline void asc_datablock_reduce_sum_sync_impl(__ubuf__ float* dst, _
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
-

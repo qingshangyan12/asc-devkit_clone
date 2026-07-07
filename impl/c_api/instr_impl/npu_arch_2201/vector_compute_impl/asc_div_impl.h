@@ -78,4 +78,3 @@ __aicore__ inline void asc_div_sync_impl(__ubuf__ float* dst, __ubuf__ float* sr
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
-

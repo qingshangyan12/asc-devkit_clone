@@ -206,4 +206,3 @@ __aicore__ inline void asc_repeat_reduce_min_only_index_sync_impl(__ubuf__ float
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
-

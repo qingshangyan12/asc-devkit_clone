@@ -31,4 +31,3 @@ __aicore__ inline uint64_t asc_get_phy_buf_addr_impl(uint64_t offset)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
-

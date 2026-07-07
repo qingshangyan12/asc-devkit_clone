@@ -54,4 +54,3 @@ __aicore__ inline void asc_get_reduce_max_cnt_impl(float& val, uint32_t& index)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
-

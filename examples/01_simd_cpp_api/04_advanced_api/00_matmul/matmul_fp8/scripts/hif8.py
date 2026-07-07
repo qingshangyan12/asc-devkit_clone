@@ -504,4 +504,3 @@ def trans_np_hifuint8_tensor_to_float32(in_tensor):
         out_tensor[i] = cvt_hifuint8_to_float(in_tensor[i])
     out_tensor = out_tensor.reshape(shape_tensor).astype(np.float32)
     return out_tensor
-

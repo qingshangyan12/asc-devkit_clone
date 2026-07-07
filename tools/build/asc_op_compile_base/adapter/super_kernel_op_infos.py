@@ -1050,5 +1050,3 @@ split_dynamic_o_in_super_kernel(orign_bin_path, rename_file_path_list[i-1], i, s
             "send_event_list": send_event_list,
             "recv_event_list": recv_event_list
         }
-
-

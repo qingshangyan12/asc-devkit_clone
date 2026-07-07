@@ -52,4 +52,3 @@ __aicore__ inline void asc_int642float_rna_sync_impl(__ubuf__ float* dst, __ubuf
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
-

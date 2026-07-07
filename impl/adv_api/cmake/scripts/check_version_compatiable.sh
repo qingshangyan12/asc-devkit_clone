@@ -43,9 +43,3 @@ function main()
 }
 
 main
-
-
-
-
-
-

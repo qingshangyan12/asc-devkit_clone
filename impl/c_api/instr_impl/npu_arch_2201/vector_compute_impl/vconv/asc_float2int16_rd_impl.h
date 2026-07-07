@@ -51,4 +51,3 @@ __aicore__ inline void asc_float2int16_rd_sync_impl(__ubuf__ int16_t* dst, __ubu
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
-

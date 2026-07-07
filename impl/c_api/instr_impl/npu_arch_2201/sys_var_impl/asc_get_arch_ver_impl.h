@@ -33,4 +33,3 @@ __aicore__ inline void asc_get_arch_ver_impl(uint32_t& core_version)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
-

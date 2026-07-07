@@ -31,4 +31,3 @@ __aicore__ inline void asc_set_ctrl_impl(uint64_t config)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
-

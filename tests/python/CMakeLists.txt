@@ -106,4 +106,3 @@ add_custom_target(run_all_tests_and_clean ALL
     COMMENT "clean generated test files"
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
-
