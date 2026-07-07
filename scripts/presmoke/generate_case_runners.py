@@ -23,7 +23,7 @@ from pathlib import Path
 from typing import Iterable, List
 
 from presmoke.discover import discover_examples
-from presmoke.model import Cell, Command, ExampleSpec
+from presmoke.model import Cell, Command
 from presmoke.planner import is_cmake_configure
 from presmoke.planner import build_cells, rewrite_command
 from presmoke.readme_spec import parse_readme
@@ -73,6 +73,7 @@ NO_CMAKE_ARCH_INJECTION_CASES = {
 
 TENSORFLOW_SKIP_REASON = "requires TensorFlow 2.6.5 environment; skipped by presmoke"
 MATMUL_L2CACHE_SKIP_REASON = "data size (~308M) causes overtime in cpu mode; cpu mode skipped by presmoke"
+LONG_TIME_REASON = "The execution time in CPU mode is too long and needs to be skipped"
 
 
 @dataclass
@@ -94,6 +95,26 @@ SKIP_CONFIG = {
         reason=MATMUL_L2CACHE_SKIP_REASON,
         modes=["cpu"],
     ),
+        "01_simd_cpp_api/03_basic_api/05_sync_control/mutex": SkipConfig(
+        reason=LONG_TIME_REASON,
+        modes=["cpu"],
+    ),
+        "01_simd_cpp_api/05_best_practices/00_vector_compute/add_high_performance": SkipConfig(
+        reason=LONG_TIME_REASON,
+        modes=["cpu"],
+    ),
+        "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_eltwise_high_performance": SkipConfig(
+        reason=LONG_TIME_REASON,
+        modes=["cpu"],
+    ),
+        "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_high_performance": SkipConfig(
+        reason=LONG_TIME_REASON,
+        modes=["cpu"],
+    ),
+        "01_simd_cpp_api/05_best_practices/04_memory_access/bank_conflict_nd2nz": SkipConfig(
+        reason=LONG_TIME_REASON,
+        modes=["cpu"],
+    ),
 }
 
 ARCH_OVERRIDES = {
@@ -109,6 +130,114 @@ ARCH_OVERRIDES = {
     # README "支持的产品" only lists Ascend 950PR/950DT. The option table also
     # mentions dav-2201, but the sample uses FP8/hifloat8 types unavailable on 910B.
     "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_fp8": ["dav-3510"],
+}
+
+SCENARIO_NUM_MAP: dict[str, str] = {
+    "01_simd_cpp_api/02_features/02_tiling_selector/vector_tiling_strategy": "0 1 2 3",
+    "01_simd_cpp_api/03_basic_api/00_data_movement/copy_in_tensor_api": "0 1 2 3",
+    "01_simd_cpp_api/03_basic_api/00_data_movement/copy_out_tensor_api": "0 1 2",
+    "01_simd_cpp_api/03_basic_api/00_data_movement/copy_ub2ub": "1 2 3",
+    "01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2ub_nddma": "1 2 3 4 5",
+    "01_simd_cpp_api/03_basic_api/00_data_movement/reg_load_store_mask": "1 2",
+    "01_simd_cpp_api/03_basic_api/00_data_movement/reg_load_store_unalign": "1 2",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/cast": "0 1",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/element_wise_compound_compute": "1 2",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/gather": "1 2 3 4",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/interleave_pair": "1 2",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/mrg_sort": "1 2 3",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/reduce_computation": "1 2 3 4 5 6",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/reduce_data_block": "1 2 3",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/reduce_repeat": "1 2 3 4",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/transpose": "1 2 3",
+    "01_simd_cpp_api/03_basic_api/02_reg_vector_compute/cast": "1 2",
+    "01_simd_cpp_api/03_basic_api/02_reg_vector_compute/compare": "1 2",
+    "01_simd_cpp_api/03_basic_api/02_reg_vector_compute/data_relayout": "1 2",
+    "01_simd_cpp_api/03_basic_api/02_reg_vector_compute/subnormal": "1 2",
+    "01_simd_cpp_api/03_basic_api/02_reg_vector_compute/trait": "1 2",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2l1": "1 2 3 4",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2ub": "1 2 3 4",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_2dmx_l12l0": "1 2 3 4 5 6",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_2dv2_l12l0": "1 2 3 4 5 6 7",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0": "1 2 3 4 5 6 7 8 9 10 11 12 13 14",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_load3dv2": "1 2 3 4 5",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_mx": "1 2 3 4",
+    "01_simd_cpp_api/03_basic_api/04_memory_management/tbufpool_management": "1 2 3",
+    "01_simd_cpp_api/03_basic_api/05_sync_control/cross_core_set_wait_flag": "0 1 2",
+    "01_simd_cpp_api/03_basic_api/05_sync_control/reg_sync": "1 2",
+    "01_simd_cpp_api/03_basic_api/06_atomic/data_movement_with_atomic_operations": "1 2",
+    "01_simd_cpp_api/03_basic_api/06_atomic/scalar_atomic_operations": "1 2",
+    "01_simd_cpp_api/03_basic_api/09_utils/get_ub_size": "1 2",
+    "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_fp8": "0 1 2 3 4",
+    "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_ibshareAB": "1 2",
+    "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_ibshareB": "1 2",
+    "01_simd_cpp_api/04_advanced_api/08_transpose/transdata": "1 2 3 4",
+    "01_simd_cpp_api/04_advanced_api/10_math/clampmin": "0 1",
+    "01_simd_cpp_api/04_advanced_api/10_math/power": "0 1 2",
+    "01_simd_cpp_api/05_best_practices/00_vector_compute/add_high_performance": "0 1 2 3 4 5 6",
+    "01_simd_cpp_api/05_best_practices/01_matrix_compute/matmul_basic_api_high_performance": "1 2",
+    "01_simd_cpp_api/05_best_practices/01_matrix_compute/matmul_high_performance": "0 1 2 3 4 5 6 7 8",
+    "01_simd_cpp_api/05_best_practices/01_matrix_compute/matmul_mxfp4_high_performance": "1 2",
+    "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_eltwise_high_performance": "0 1 2 3",
+    "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_high_performance": "0 1 2",
+    "01_simd_cpp_api/05_best_practices/03_fusion_compute/quant_group_matmul_high_performance": "0 1 2",
+    "01_simd_cpp_api/05_best_practices/04_memory_access/bank_conflict_nd2nz": "1 2",
+    "01_simd_cpp_api/05_best_practices/04_memory_access/data_copy": "1 2 3 4 5 6 7 8",
+    "03_simt_api/03_best_practices/00_memory_optimizations/cache_hint": "0 1",
+    "03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice": "0 1 2 3",
+    "03_simt_api/03_best_practices/00_memory_optimizations/short_vector_add": "1 2",
+    "03_simt_api/03_best_practices/01_execution_conf_optimizations/grid_dim_config": "1 2 3 4 5 6 7 8 9 10 11 12 13",
+    # Upstream per-scenario runner cases (not in original MAP)
+    "01_simd_cpp_api/02_features/00_framework/04_aclgraph": "2",
+    "01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_l0c2gm": "2 3 4 5 6",
+    "01_simd_cpp_api/03_basic_api/00_data_movement/reg_load_gather": "2",
+    "01_simd_cpp_api/03_basic_api/00_data_movement/reg_load_store_align": "2 3 4 5 6",
+    "01_simd_cpp_api/03_basic_api/00_data_movement/reg_move": "2",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_with_stride": "2 3 4 5 6",
+    "01_simd_cpp_api/03_basic_api/04_memory_management/tensor_allocation": "2 3 4",
+    "01_simd_cpp_api/05_best_practices/02_reg_compute/softmax_high_performance": "0 1 2 3 4",
+    "01_simd_cpp_api/05_best_practices/04_memory_access/bank_conflict_ub": "2 3 4 5 6 7 8",
+    "01_simd_cpp_api/06_compatibility_guide/pattern_transformation": "2",
+    "03_simt_api/02_features/01_api_features/01_sync_instruction/memory_fence": "2",
+    "03_simt_api/03_best_practices/02_control_flow/warp_divergence": "2",
+    "05_simd_simt_hybrid/02_best_practices/simd_simt_grid_dim_config": "2 3 4 5 6 7 8 9 10 11 12 13 14 15 16",
+    "05_simd_simt_hybrid/02_best_practices/simd_simt_high_performance": "0 2 3",
+    "05_simd_simt_hybrid/02_best_practices/simd_simt_integer_fast_div": "1",
+    "05_simd_simt_hybrid/02_best_practices/simd_simt_matrix_transpose": "1",
+}
+
+SCENARIO_NUM_ARCH_MAP: dict[str, dict[str, str]] = {
+    "01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2l1": {
+        "dav-3510": "1 2 3 4 5",
+        "default": "1 2 4 5",
+    },
+    "01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm": {
+        "dav-3510": "1 2 3 4 5 6",
+        "default": "1 2",
+    },
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/compare": {
+        "dav-3510": "1 2 3 4",
+        "default": "1 2 3",
+    },
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/element_wise_logic": {
+        "dav-3510": "1 2 3 4",
+        "default": "1 4",
+    },
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/select": {
+        "dav-3510": "1 2 3 4",
+        "default": "1 2 3",
+    },
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2gm": {
+        "dav-3510": "1 2 3 4 5 6 7",
+        "default": "1 2 4 5 6 7",
+    },
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad": {
+        "dav-2201": "1 2 3 4",
+        "default": "1 2 3",
+    },
+    "01_simd_cpp_api/05_best_practices/03_fusion_compute/matmul_gelu_high_performance": {
+        "dav-3510": "1 2",
+        "default": "1",
+    },
 }
 
 ARCH_ENV_KEYS = {
@@ -156,12 +285,23 @@ class RunnerRenderSpec:
     build_cmds: List[Command]
     run_cmds: List[Command]
     verify_cmds: List[Command]
-    source_rel: str = ""
-    scenario_num: int | None = None
     custom_op_dependency: bool = False
     custom_op_package_case: bool = False
     skip_reason: str = ""
     skip_modes: List[str] = field(default_factory=list)
+    arch: str = ""
+    scenarios: str = ""
+
+
+@dataclass
+class _ReportContext:
+    """Stable context from write_runner for make_report calls."""
+    project_root: Path
+    cell: Any
+    runnable_on_target: bool
+    confidence: str
+    reasons: List[str]
+    render_spec: Any
 
 
 def main() -> int:
@@ -177,20 +317,16 @@ def main() -> int:
     specs = [parse_readme(path, examples_root) for path in discover_examples(examples_root)]
     apply_case_overrides(specs)
     cells, _ = build_cells(specs, args.arch, [args.mode])
-    cells = expand_scenario_cells(cells, project_root)
-    cells = [cell for cell in cells if args.arch in cell.example.archs and args.mode in cell.example.modes]
     runnable_by_rel = {cell.example.rel_path: cell for cell in cells}
     all_cells = [cell_for_spec(spec, args.arch, args.mode) for spec in specs]
-    all_cells = expand_scenario_cells(all_cells, project_root)
     reports: List[CaseReport] = []
     for cell in all_cells:
-        report = write_runner(
+        reports.extend(write_runner(
             project_root,
             runners_root,
             cell,
             runnable_on_target=cell.example.rel_path in runnable_by_rel,
-        )
-        reports.append(report)
+        ))
 
     remove_stale_runners(runners_root, reports)
     write_manifest(reports_root, reports)
@@ -220,234 +356,69 @@ def apply_case_overrides(specs) -> None:
             spec.archs = ARCH_OVERRIDES[spec.rel_path]
 
 
-def write_runner(project_root: Path, runners_root: Path, cell, runnable_on_target: bool) -> CaseReport:
-    rel = cell.example.rel_path
-    runner_dir = runners_root / rel
-    runner_dir.mkdir(parents=True, exist_ok=True)
-    runner = runner_dir / "run.sh"
-    confidence, reasons = runner_confidence(cell, runnable_on_target)
-    render_spec, confidence = build_runner_render_spec(cell, confidence, reasons)
-    text = render_runner(render_spec)
-    runner.write_text(text, encoding="utf-8")
-    runner.chmod(0o755)
-    skip_reason = render_spec.skip_reason
-    skip_modes = render_spec.skip_modes
-    all_modes_skipped = bool(skip_reason and all(mode in skip_modes for mode in cell.example.modes))
+def make_report(rel: str, runner: Path, ctx: _ReportContext) -> CaseReport:
+    skip_reason = ctx.render_spec.skip_reason
+    skip_modes = ctx.render_spec.skip_modes
+    all_modes_skipped = bool(skip_reason and all(mode in skip_modes for mode in ctx.cell.example.modes))
+    source_case = re.sub(r'__scenario_\d+$', '', rel)
     return CaseReport(
         case=rel,
-        runner=runner.relative_to(project_root).as_posix(),
-        source_case=source_rel_for_cell(project_root, cell),
-        source=cell.example.source,
-        confidence=confidence,
-        supported_archs=cell.example.archs,
-        supported_modes=cell.example.modes,
-        target_runnable=runnable_on_target,
+        runner=runner.relative_to(ctx.project_root).as_posix(),
+        source=ctx.cell.example.source,
+        source_case=source_case,
+        confidence=ctx.confidence,
+        supported_archs=ctx.cell.example.archs,
+        supported_modes=ctx.cell.example.modes,
+        target_runnable=ctx.runnable_on_target,
         skip=all_modes_skipped,
         skip_reason=skip_reason,
         skip_modes=skip_modes,
-        reasons=reasons,
-        commands=[command.raw for command in cell.commands if command.raw],
+        reasons=ctx.reasons,
+        commands=[command.raw for command in ctx.cell.commands if command.raw],
     )
 
 
-def expand_scenario_cells(cells: Iterable[Cell], project_root: Path) -> List[Cell]:
-    expanded: List[Cell] = []
-    for cell in cells:
-        expanded.append(cell)
-        cmake_file = cell.example.path / "CMakeLists.txt"
-        values = parse_scenario_values_from_cmake(cmake_file)
-        if len(values) <= 1:
-            continue
-        default_value = default_scenario_value(cell, cmake_file)
-        for value in values:
-            if value == default_value:
+def write_runner(project_root: Path, runners_root: Path, cell, runnable_on_target: bool) -> List[CaseReport]:
+    rel = cell.example.rel_path
+    runner_dir = runners_root / rel
+    confidence, reasons = runner_confidence(cell, runnable_on_target)
+    render_spec, confidence = build_runner_render_spec(cell, confidence, reasons)
+    ctx = _ReportContext(
+        project_root=project_root, cell=cell, runnable_on_target=runnable_on_target,
+        confidence=confidence, reasons=reasons, render_spec=render_spec,
+    )
+    reports: List[CaseReport] = []
+    scenarios = get_all_scenario_values(rel)
+    if scenarios:
+        # Multi-scenario case: generate per-scenario runners (__scenario_N/run.sh)
+        scenario_nums = scenarios.split()
+        for i, scenario_num in enumerate(scenario_nums):
+            # "0" is always the implicit default (handled by main run.sh)
+            if scenario_num == "0":
                 continue
-            expanded.append(make_scenario_cell(cell, project_root, value))
-    return expanded
-
-
-def parse_scenario_values_from_cmake(cmake_file: Path) -> List[int]:
-    if not cmake_file.exists():
-        return []
-    text = cmake_file.read_text(encoding="utf-8", errors="ignore")
-    if "SCENARIO_NUM" not in text:
-        return []
-
-    values: set[int] = set()
-    for match in re.finditer(r"set\s*\(\s*SCENARIO_NUM\s+[^)]*CACHE\s+STRING\s+\"([^\"]*)\"", text):
-        values.update(parse_scenario_values_from_text(match.group(1)))
-    for match in re.finditer(r"SCENARIO_NUM[^\n\r\"]*\"([^\"]*)\"", text):
-        values.update(parse_scenario_values_from_text(match.group(1)))
-    for match in re.finditer(r"set\s*\(\s*VALID_SCENARIOS\s+([^)]+)\)", text):
-        values.update(parse_scenario_values_from_text(match.group(1)))
-    for match in re.finditer(r"SCENARIO_NUM[^\n\r]*(?:must be|Valid values are|specify)[^\n\r]*", text):
-        values.update(parse_scenario_values_from_text(match.group(0)))
-    return sorted(value for value in values if 0 <= value <= 32)
-
-
-def parse_scenario_values_from_text(text: str) -> List[int]:
-    values: set[int] = set()
-    text = collect_regex_character_class_scenarios(text, values)
-    for start, end in re.findall(r"(?<!\d)(\d+)\s*-\s*(\d+)(?!\d)", text):
-        first = int(start)
-        last = int(end)
-        if 0 <= first <= last <= 32:
-            values.update(range(first, last + 1))
-    for number in re.findall(r"(?<!\d)(\d+)(?!\d)", text):
-        value = int(number)
-        if 0 <= value <= 32:
-            values.add(value)
-    return sorted(values)
-
-
-def collect_regex_character_class_scenarios(text: str, values: set[int]) -> str:
-    def replace(match: re.Match) -> str:
-        for char in match.group(1):
-            values.add(int(char))
-        return " "
-
-    return re.sub(r"\^\[([0-9]+)\]\$", replace, text)
-
-
-def default_scenario_value(cell: Cell, cmake_file: Path) -> int | None:
-    for command in cell.commands:
-        value = scenario_value_from_command(command)
-        if value is not None:
-            return value
-    if not cmake_file.exists():
-        return None
-    text = cmake_file.read_text(encoding="utf-8", errors="ignore")
-    match = re.search(r"set\s*\(\s*SCENARIO_NUM\s+\"?(\d+)\"?", text)
-    return int(match.group(1)) if match else None
-
-
-def scenario_value_from_command(command: Command) -> int | None:
-    if "SCENARIO_NUM" in command.env:
-        value = command.env["SCENARIO_NUM"]
-        if value.isdigit():
-            return int(value)
-    match = re.search(r"(?:-DSCENARIO_NUM=|SCENARIO_NUM=)(\d+)", command.raw)
-    return int(match.group(1)) if match else None
-
-
-def make_scenario_cell(cell: Cell, project_root: Path, scenario_num: int) -> Cell:
-    source_rel = source_rel_for_cell(project_root, cell)
-    scenario_rel = f"{source_rel}__scenario_{scenario_num}"
-    commands = [rewrite_command_for_scenario(command, scenario_num) for command in cell.commands]
-    archs = supported_archs_for_scenario(cell.example.archs, cell.example.path / "CMakeLists.txt", scenario_num)
-    example = ExampleSpec(
-        cell.example.path,
-        scenario_rel,
-        commands,
-        archs,
-        cell.example.modes,
-        cell.example.source,
-        cell.example.suggestions,
-    )
-    return Cell(example, cell.arch, cell.mode, commands, cell.example.path / f"build_{cell.mode}_scenario_{scenario_num}")
-
-
-def rewrite_command_for_scenario(command: Command, scenario_num: int) -> Command:
-    raw = command.raw
-    if raw:
-        raw = replace_scenario_num_arg(raw, scenario_num)
-        if command.kind == "cmake" and is_cmake_configure(raw) and "-DSCENARIO_NUM=" not in raw:
-            raw = f"{raw} -DSCENARIO_NUM={scenario_num}"
-    env = dict(command.env)
-    env["SCENARIO_NUM"] = str(scenario_num)
-    return Command(raw, command.kind, env)
-
-
-def replace_scenario_num_arg(command: str, scenario_num: int) -> str:
-    value = str(scenario_num)
-    patterns = [
-        r"(-DSCENARIO_NUM=)(?:\$\{?SCENARIO_NUM\}?|\d+)",
-        r"(-scenarioNum(?:=|\s+))(?:\$\{?SCENARIO_NUM\}?|\d+)",
-        r"(-scenario_num(?:=|\s+))(?:\$\{?SCENARIO_NUM\}?|\d+)",
-        r"(--scenario(?:=|\s+))(?:\$\{?SCENARIO_NUM\}?|\d+)",
-    ]
-    for pattern in patterns:
-        command = re.sub(pattern, lambda match: match.group(1) + value, command)
-    return command
-
-
-def supported_archs_for_scenario(base_archs: List[str], cmake_file: Path, scenario_num: int) -> List[str]:
-    if not cmake_file.exists():
-        return base_archs
-    text = scenario_arch_text(cmake_file)
-    if scenario_only_supports_arch(text, scenario_num, "dav-3510"):
-        return [arch for arch in base_archs if arch == "dav-3510"]
-    if scenario_only_supports_arch(text, scenario_num, "dav-2201"):
-        return [arch for arch in base_archs if arch == "dav-2201"]
-    return base_archs
-
-
-def scenario_arch_text(cmake_file: Path) -> str:
-    parts = [cmake_file.read_text(encoding="utf-8", errors="ignore")]
-    readme = cmake_file.parent / "README.md"
-    if readme.exists():
-        parts.append(readme.read_text(encoding="utf-8", errors="ignore"))
-    for asc_file in sorted(cmake_file.parent.glob("*.asc")):
-        parts.append(asc_file.read_text(encoding="utf-8", errors="ignore"))
-    return "\n".join(parts)
-
-
-def scenario_only_supports_arch(text: str, scenario_num: int, arch: str) -> bool:
-    scenario = str(scenario_num)
-    if re.search(rf"场景[0-9/、,，\s]*{scenario}[0-9/、,，\s]*仅支持{arch}", text):
-        return True
-    if re.search(
-        rf"<tr>(?:(?!</tr>).)*<td>\s*{scenario}\s*</td>(?:(?!</tr>).)*仅支持\s*{arch}(?:(?!</tr>).)*</tr>",
-        text,
-        flags=re.S,
-    ):
-        return True
-    if arch == "dav-3510" and re.search(
-        rf"(?:场景|Scenario)\s*{scenario}[^\n\r]*(?:仅在|only supports)[^\n\r]*Ascend\s*950",
-        text,
-        flags=re.IGNORECASE,
-    ):
-        return True
-    if re.search(rf"{scenario}\s*=[^\n\r,，)]*(?:仅|only supports).*(?:Ascend\s*950|{arch})", text):
-        return True
-    if arch == "dav-3510" and scenario != "1":
-        if re.search(r"A2/A3架构仅支持Scenario\s*1", text, flags=re.IGNORECASE):
-            return True
-
-    for match in re.finditer(r"if\s*\((.*?)\)(.*?)(?:endif\s*\(\)|$)", text, flags=re.S):
-        condition = match.group(1)
-        body = match.group(2)
-        if not re.search(rf"SCENARIO_NUM[^\n\r)]*(?:STREQUAL|EQUAL)\s*\"?{scenario}\"?", condition):
-            continue
-        combined = condition + "\n" + body
-        if arch == "dav-3510" and (
-            f'NOT CMAKE_ASC_ARCHITECTURES STREQUAL "{arch}"' in combined
-            or f"only supports {arch}" in combined
-            or f"仅支持{arch}" in combined
-            or "仅Ascend 950" in combined
-        ):
-            return True
-        if arch == "dav-2201" and (
-            f'CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510"' in combined
-            and "only supports dav-2201" in combined
-        ):
-            return True
-    return False
-
-
-def scenario_num_from_case_rel(rel: str) -> int | None:
-    match = re.search(r"__scenario_(\d+)$", rel)
-    return int(match.group(1)) if match else None
-
-
-def source_rel_for_cell(project_root: Path | None, cell: Cell) -> str:
-    if project_root is None:
-        return re.sub(r"__scenario_\d+$", "", cell.example.rel_path)
-    examples_root = project_root / "examples"
-    try:
-        return cell.example.path.relative_to(examples_root).as_posix()
-    except ValueError:
-        return re.sub(r"__scenario_\d+$", "", cell.example.rel_path)
+            # If "1" is the first of multiple values, it's the base runner's default
+            if i == 0 and scenario_num == "1" and len(scenario_nums) > 1:
+                continue
+            scenario_dir = runners_root / f"{rel}__scenario_{scenario_num}"
+            scenario_dir.mkdir(parents=True, exist_ok=True)
+            runner = scenario_dir / "run.sh"
+            if not runner.exists():
+                text = render_per_scenario_runner(render_spec, scenario_num)
+                runner.write_text(text, encoding="utf-8")
+                runner.chmod(0o755)
+            reports.append(make_report(f"{rel}__scenario_{scenario_num}", runner, ctx))
+        # Report uses the main runner (which already exists from upstream)
+        runner_path = runner_dir / "run.sh"
+    else:
+        # Single-scenario case: generate main run.sh
+        runner_dir.mkdir(parents=True, exist_ok=True)
+        runner = runner_dir / "run.sh"
+        text = render_runner(render_spec)
+        runner.write_text(text, encoding="utf-8")
+        runner.chmod(0o755)
+        runner_path = runner
+    reports.append(make_report(rel, runner_path, ctx))
+    return reports
 
 
 def runner_confidence(cell, runnable_on_target: bool) -> tuple[str, List[str]]:
@@ -458,9 +429,59 @@ def runner_confidence(cell, runnable_on_target: bool) -> tuple[str, List[str]]:
     return confidence, reasons
 
 
+@dataclass
+class SkipStrategy:
+    confidence: str
+    skip_reason: str
+    skip_modes: List[str]
+    noop_needed: bool
+    custom_op_package_case: bool
+    custom_op_dependency: bool
+
+
+def _resolve_skip_strategy(
+    rel: str, modes: List[str], reasons: List[str], confidence: str
+) -> SkipStrategy:
+    custom_op_package_case = rel == CUSTOM_OP_PACKAGE_CASE
+    custom_op_dependency = requires_custom_op_package(rel)
+    skip_reason, skip_modes = explicit_skip_config(rel)
+    all_modes_skipped = skip_reason and all(mode in skip_modes for mode in modes)
+    noop_needed = all_modes_skipped or custom_op_package_case
+    if all_modes_skipped:
+        reasons.append("explicit_skip")
+        confidence = "high"
+    elif skip_reason:
+        reasons.append("partial_mode_skip")
+        confidence = "high"
+    elif custom_op_package_case:
+        reasons.append("custom_op_package_provider")
+    elif custom_op_dependency:
+        reasons.append("requires_custom_op_package")
+    return SkipStrategy(
+        confidence=confidence,
+        skip_reason=skip_reason,
+        skip_modes=skip_modes,
+        noop_needed=noop_needed,
+        custom_op_package_case=custom_op_package_case,
+        custom_op_dependency=custom_op_dependency,
+    )
+
+
+def _auto_append_scripts(cell, build_cmds: List[Command], verify_cmds: List[Command]) -> List[Command]:
+    scripts_dir = cell.example.path / "scripts"
+    has_gen_data = any(c.kind == "gen_data" for c in build_cmds)
+    if (scripts_dir / "gen_data.py").exists() and not has_gen_data:
+        build_cmds.append(Command("python3 ../scripts/gen_data.py", "gen_data"))
+    has_verify = any(c.kind == "verify" for c in verify_cmds)
+    if (scripts_dir / "verify_result.py").exists() and not has_verify:
+        verify_cmds.append(Command("python3 ../scripts/verify_result.py output/output.bin output/golden.bin", "verify"))
+    elif not has_verify:
+        verify_cmds[:] = [Command(":", "verify")]
+    return verify_cmds
+
+
 def build_runner_render_spec(cell, confidence: str, reasons: List[str]) -> tuple[RunnerRenderSpec, str]:
     rel = cell.example.rel_path
-    source_rel = source_rel_for_cell(None, cell)
     build_cmds = build_commands_for_runner(cell.commands)
     run_cmds = run_commands_for_runner(cell.commands, build_cmds)
     build_cmds, run_cmds = merge_export_commands_into_run(build_cmds, run_cmds)
@@ -472,36 +493,27 @@ def build_runner_render_spec(cell, confidence: str, reasons: List[str]) -> tuple
             confidence = downgrade(confidence)
     if not verify_cmds:
         verify_cmds = [Command(":", "verify")]
-    custom_op_package_case = source_rel == CUSTOM_OP_PACKAGE_CASE
-    custom_op_dependency = requires_custom_op_package(source_rel)
-    skip_reason, skip_modes = explicit_skip_config(source_rel)
-    all_modes_skipped = skip_reason and all(mode in skip_modes for mode in cell.example.modes)
-    if all_modes_skipped:
-        reasons.append("explicit_skip")
-        confidence = "high"
-        build_cmds, run_cmds, verify_cmds = noop_stage_commands()
-    elif skip_reason:
-        reasons.append("partial_mode_skip")
-        confidence = "high"
-    elif custom_op_package_case:
-        reasons.append("custom_op_package_provider")
-        build_cmds, run_cmds, verify_cmds = noop_stage_commands()
-    elif custom_op_dependency:
-        reasons.append("requires_custom_op_package")
+    s = _resolve_skip_strategy(rel, cell.example.modes, reasons, confidence)
+    if s.noop_needed:
+        build_cmds, run_cmds, verify_cmds = [Command(":", "build")], [Command(":", "run")], [Command(":", "verify")]
+    else:
+        verify_cmds = _auto_append_scripts(cell, build_cmds, verify_cmds)
+    arch = cell.arch
+    scenarios = get_scenario_values(rel, arch)
     return (
         RunnerRenderSpec(
             rel=rel,
-            source_rel=source_rel,
-            scenario_num=scenario_num_from_case_rel(rel),
             build_cmds=build_cmds,
             run_cmds=run_cmds,
             verify_cmds=verify_cmds,
-            custom_op_dependency=custom_op_dependency,
-            custom_op_package_case=custom_op_package_case,
-            skip_reason=skip_reason,
-            skip_modes=skip_modes,
+            custom_op_dependency=s.custom_op_dependency,
+            custom_op_package_case=s.custom_op_package_case,
+            skip_reason=s.skip_reason,
+            skip_modes=s.skip_modes,
+            arch=arch,
+            scenarios=scenarios,
         ),
-        confidence,
+        s.confidence,
     )
 
 
@@ -624,10 +636,35 @@ def explicit_skip_config(rel: str) -> tuple[str, List[str]]:
     return config.reason, config.modes
 
 
+def has_scenario(rel: str) -> bool:
+    return rel in SCENARIO_NUM_MAP or rel in SCENARIO_NUM_ARCH_MAP
+
+
+def get_scenario_values(rel: str, arch: str) -> str:
+    if rel in SCENARIO_NUM_ARCH_MAP:
+        arch_map = SCENARIO_NUM_ARCH_MAP[rel]
+        return arch_map.get(arch, arch_map.get("default", "1"))
+    if rel in SCENARIO_NUM_MAP:
+        return SCENARIO_NUM_MAP[rel]
+    return ""
+
+
+def get_all_scenario_values(rel: str) -> str:
+    """Return union of all scenario values across all architectures."""
+    if rel in SCENARIO_NUM_ARCH_MAP:
+        arch_map = SCENARIO_NUM_ARCH_MAP[rel]
+        all_nums = set()
+        for nums in arch_map.values():
+            all_nums.update(nums.split())
+        return " ".join(sorted(all_nums, key=int))
+    if rel in SCENARIO_NUM_MAP:
+        return SCENARIO_NUM_MAP[rel]
+    return ""
+
+
 def render_runner(
     spec: RunnerRenderSpec,
 ) -> str:
-    spec = apply_scenario_to_render_spec(spec)
     if spec.rel == PARALLEL_OPS_PACKAGE_CASE:
         return render_parallel_ops_package_runner(spec)
     if spec.rel == TILING_SINK_PROGRAMMING_CASE:
@@ -653,21 +690,85 @@ def render_runner(
     return "\n".join(lines)
 
 
-def apply_scenario_to_render_spec(spec: RunnerRenderSpec) -> RunnerRenderSpec:
-    if spec.scenario_num is None:
-        return spec
-    return RunnerRenderSpec(
-        rel=spec.rel,
-        build_cmds=[rewrite_command_for_scenario(command, spec.scenario_num) for command in spec.build_cmds],
-        run_cmds=[rewrite_command_for_scenario(command, spec.scenario_num) for command in spec.run_cmds],
-        verify_cmds=[rewrite_command_for_scenario(command, spec.scenario_num) for command in spec.verify_cmds],
-        source_rel=spec.source_rel,
-        scenario_num=spec.scenario_num,
-        custom_op_dependency=spec.custom_op_dependency,
-        custom_op_package_case=spec.custom_op_package_case,
-        skip_reason=spec.skip_reason,
-        skip_modes=spec.skip_modes,
+def rewrite_scenario_number(command: str, scenario_num: str) -> str:
+    """Replace scenario number placeholders with a concrete scenario number."""
+    command = re.sub(
+        r"-DSCENARIO_NUM=(?:'[^']*'|\"[^\"]*\"|\$[A-Za-z_][A-Za-z0-9_]*|\$\{[^}]+}|[^ \t;]+)",
+        f"-DSCENARIO_NUM={scenario_num}",
+        command,
     )
+    command = re.sub(
+        r"-scenarioNum=(?:'[^']*'|\"[^\"]*\"|\$[A-Za-z_][A-Za-z0-9_]*|\$\{[^}]+}|[^ \t;]+)",
+        f"-scenarioNum={scenario_num}",
+        command,
+    )
+    return command
+
+
+def indent_commands_for_scenario(
+    commands: Iterable[Command],
+    scenario_num: str,
+    default_cd_build: bool = False,
+    inject_cmake_arch: bool = True,
+) -> List[str]:
+    lines: List[str] = []
+    for command in commands:
+        if isinstance(command, str):
+            command = Command(command, "shell")
+        raw = command.raw
+        if not raw or raw == ":":
+            lines.append("    :")
+            continue
+        raw = rewrite_runtime_arch_options(raw)
+        raw = rewrite_runtime_cmake_options(raw, inject_cmake_arch)
+        raw = rewrite_scenario_number(raw, scenario_num)
+        quoted = shlex.quote(raw)
+        env_prefix = command_env_prefix(command)
+        # Rewrite scenario env vars to the concrete number
+        env_prefix = re.sub(r'\bSCENARIO_NUM=\S+', f'SCENARIO_NUM={scenario_num}', env_prefix)
+        env_prefix = re.sub(r'\bSCENARIO=\S+', f'SCENARIO={scenario_num}', env_prefix)
+        if 'SCENARIO_NUM=' not in env_prefix:
+            env_prefix = f'SCENARIO_NUM={scenario_num} {env_prefix}'
+        runner = f"{env_prefix}bash -lc {quoted}"
+        lines.append(f'    (cd "{command_workdir(raw, default_cd_build)}" && {runner})')
+    return lines
+
+
+def render_per_scenario_runner(spec: RunnerRenderSpec, scenario_num: str) -> str:
+    """Generate a per-scenario runner (case__scenario_N/run.sh) with hardcoded SCENARIO_NUM."""
+    build_prefix = custom_op_guard(spec.custom_op_dependency, spec.skip_reason)
+    run_prefix = custom_op_guard(spec.custom_op_package_case, spec.skip_reason)
+    inject_cmake_arch = spec.rel not in NO_CMAKE_ARCH_INJECTION_CASES
+    lines = [
+        *runner_header(spec),
+        f'BUILD_DIR="$CASE_DIR/build_${{MODE}}_scenario_{scenario_num}"',
+        "export BUILD_DIR",
+        "",
+        *runner_function(
+            "case_build",
+            [
+                *build_prefix,
+                *indent_commands_for_scenario(
+                    spec.build_cmds, scenario_num, inject_cmake_arch=inject_cmake_arch
+                ),
+            ],
+        ),
+        *runner_function(
+            "case_run",
+            [*run_prefix, *indent_commands_for_scenario(spec.run_cmds, scenario_num, default_cd_build=True)],
+        ),
+        *runner_function(
+            "case_verify",
+            indent_commands_for_scenario(spec.verify_cmds, scenario_num, default_cd_build=True),
+        ),
+        "case_clean() {",
+        "    presmoke_default_clean",
+        "}",
+        "",
+        'presmoke_case_main "$@"',
+        "",
+    ]
+    return "\n".join(lines)
 
 
 def render_tiling_sink_programming_runner(spec: RunnerRenderSpec) -> str:
@@ -728,29 +829,18 @@ def custom_op_guard(enabled: bool, skip_reason: str) -> List[str]:
 
 
 def runner_header(spec: RunnerRenderSpec) -> List[str]:
-    source_rel = spec.source_rel or spec.rel
     return [
         *BASH_LICENSE_HEADER,
         "",
         "set -euo pipefail",
         "",
-        f'CASE_REL={shlex.quote(source_rel)}',
+        f'CASE_REL={shlex.quote(spec.rel)}',
         *skip_reason_lines(spec.skip_reason),
         *skip_modes_lines(spec.skip_modes),
         'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"',
         f'source "$SCRIPT_DIR/{case_entry_relative_path(spec.rel)}"',
         'presmoke_case_init "$CASE_REL"',
-        *scenario_build_dir_lines(spec.scenario_num),
         "",
-    ]
-
-
-def scenario_build_dir_lines(scenario_num: int | None) -> List[str]:
-    if scenario_num is None:
-        return []
-    return [
-        f'BUILD_DIR="$CASE_DIR/build_${{MODE}}_scenario_{scenario_num}"',
-        "export BUILD_DIR",
     ]
 
 
@@ -902,14 +992,27 @@ def write_manifest(reports_root: Path, reports: List[CaseReport]) -> None:
 
 
 def remove_stale_runners(runners_root: Path, reports: List[CaseReport]) -> None:
-    expected = {item.case for item in reports}
+    expected_cases = {item.case for item in reports}
+    multi_scenario_cases = {c for c in expected_cases if has_scenario(c)}
     for runner in list(runners_root.rglob("run.sh")):
         rel = runner.parent.relative_to(runners_root).as_posix()
-        if rel in expected:
-            continue
-        LOG.info("remove_stale_runner=%s", rel)
-        runner.unlink()
-        remove_empty_parents(runner.parent, runners_root)
+        scenario_match = re.match(r'^(.+)__scenario_(\d+)$', rel)
+        if scenario_match:
+            base_case = scenario_match.group(1)
+            if base_case in multi_scenario_cases and rel in expected_cases:
+                # Keep __scenario_N runners that are in the manifest
+                continue
+            # Clean up orphaned __scenario_N dirs (scenario not in manifest)
+            LOG.info("remove_stale_runner=%s", rel)
+            runner.unlink()
+            remove_empty_parents(runner.parent, runners_root)
+        else:
+            # Keep all main run.sh files (single and multi-scenario alike)
+            if rel in expected_cases:
+                continue
+            LOG.info("remove_stale_runner=%s", rel)
+            runner.unlink()
+            remove_empty_parents(runner.parent, runners_root)
 
 
 def remove_empty_parents(path: Path, stop: Path) -> None:
