@@ -60,13 +60,10 @@
     </tbody>
     </table>
 
--   核函数名称：tiling\_strategy\_custom
 -   使用的主要接口：
     -   DataCopy：数据搬移接口
     -   Add：矢量基础算术接口
     -   EnQue、DeQue等接口：Queue队列管理接口
-
--   算子实现文件名称：tiling\_strategy.asc
 
 ## Tiling实现<a name="zh-cn_topic_0000002236197677_section480741815522"></a>
 
@@ -120,7 +117,7 @@ void GenerateTilingData(uint8_t* tilingBuf, uint32_t numBlocks)
     size_t tilingSize = sizeof(AddCustomTilingData);
     GenerateTilingData(tiling, NUM_BLOCKS);  // 调用tiling参数计算函数
     ....
-    
+
     tiling_strategy_custom<<<NUM_BLOCKS, 0, stream>>>(xDevice, yDevice, zDevice,
                                                *reinterpret_cast<AddCustomTilingData*>(tiling));
     ....
