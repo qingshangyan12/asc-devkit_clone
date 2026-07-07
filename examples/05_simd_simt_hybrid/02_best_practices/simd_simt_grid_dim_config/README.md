@@ -364,14 +364,20 @@ __global__ __vector__ void gather_kernel(..., uint32_t thread_num)
 
 ## 性能分析
 
-使用 `msOpProf` 工具获取详细性能数据：
+### msOpProf工具介绍
+msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
 
-```bash
-msopprof ./grid_config   # 分析性能
-```
+- 上板性能采集
+
+    通过上板性能采集，可以直接测定算子昇腾AI处理器上的运行时间。该方式适合在板环境中快速定位算子性能问题。
+
+    基于可执行文件demo通过msopprof执行算子调优：
+    ```
+    msopprof ./demo
+    ```
 
     - 性能数据说明  
-      命令完成后，会在默认目录下生成以"OPPROF_{timestamp}_XXX"命名的文件夹,性能数据文件夹结构示例如下：
+      命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
 
       ```bash
       ├──dump                       # 原始的性能数据，用户无需关注
@@ -382,7 +388,7 @@ msopprof ./grid_config   # 分析性能
       ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
       ├──OpBasicInfo.csv            # 算子基础信息
       ├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
-      ├──ResourceConflictRatio.csv  # UB上的 bank group、bank conflict和资源冲突率在所有指令中的占比
+      ├──ResourceConflictRatio.csv  # UB上的bank group、bank conflict和资源冲突率在所有指令中的占比
       └──visualize_data.bin         # MindStudio Insight呈现文件
       ```
 
