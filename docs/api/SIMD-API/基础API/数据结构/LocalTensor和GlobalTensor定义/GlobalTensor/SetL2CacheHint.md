@@ -72,7 +72,7 @@ __aicore__ inline void SetL2CacheHint(CacheMode mode);
 <tbody><tr id="row18835145716587"><td class="cellrowborder" valign="top" width="27.839999999999996%" headers="mcps1.2.3.1.1 "><p id="p1383515717581"><a name="p1383515717581"></a><a name="p1383515717581"></a><strong id="b53621266338"><a name="b53621266338"></a><a name="b53621266338"></a>rwMode</strong></p>
 </td>
 <td class="cellrowborder" valign="top" width="72.16%" headers="mcps1.2.3.1.2 "><p id="p77520541653"><a name="p77520541653"></a><a name="p77520541653"></a>设置L2 Cache读写模式。</p>
-<a name="screen774625064615"></a><a name="screen774625064615"></a><pre class="screen" codetype="Cpp" id="screen774625064615">enum CacheRwMode {
+<a name="screen774625064615"></a><a name="screen774625064615"></a><pre class="screen" codetype="Cpp" id="screen774625064615">enum class CacheRwMode {
 READ = 1,
 WRITE = 2,
 RW = 3
@@ -102,6 +102,7 @@ RW = 3
 <a name="screen1440994812502"></a><a name="screen1440994812502"></a><pre class="screen" codetype="Cpp" id="screen1440994812502">enum class CacheMode : uint8_t {
 CACHE_MODE_DISABLE = 0, // 不启用L2 Cache
 CACHE_MODE_NORMAL = 1,  // 启用L2 Cache
+CACHE_MODE_LAST = 2,
 CACHE_MODE_PERSISTENT = 4,  // 启用L2 Cache驻留模式
 };</pre>
 <p id="p595815581177"><a name="p595815581177"></a><a name="p595815581177"></a>当特定GlobalTensor启用L2 Cache后实测性能反而下降时，可考虑手动禁用该GlobalTensor的L2 Cache功能。例如，若某算子仅对特定GlobalTensor执行单次读取操作，将其数据缓存至L2 Cache不仅无法带来性能收益，反而可能因数据频繁搬运至L2 Cache而引入额外的开销，此时建议关闭该GlobalTensor的L2 Cache。</p>

@@ -8,7 +8,7 @@
 
 ## 功能说明
 
-头文件路径为：`"tensor_api/tensor.h"`。
+头文件路径为：`tensor_api/tensor.h`。
 
 `Mmad`接口用于完成L0A Buffer上左矩阵A和L0B Buffer上右矩阵B的矩阵乘加，结果写入L0C Buffer上结果矩阵C。默认模式为普通矩阵计算。数学表达式为：
 
@@ -24,11 +24,15 @@ C = A * B + Bias
 
 Mmad的矩阵乘加关系可参考下图：
 
-![](../../../../figures/mmad_formula.png)
+**图 1**  Mmad矩阵乘加公式
+
+![Mmad矩阵乘加公式](../../../../figures/mmad_formula.png)
 
 `Mmad`使用显式传入的`MmadAtom`配置矩阵计算功能。左矩阵A、右矩阵B、结果矩阵C的图示说明如下：
 
-![](../../../../figures/mmad_matrix_layout.png)
+**图 2**  Mmad矩阵布局
+
+![Mmad矩阵布局](../../../../figures/mmad_matrix_layout.png)
 
 ## 函数原型
 
@@ -67,7 +71,7 @@ Mmad的矩阵乘加关系可参考下图：
 
 ## 参数说明
 
-**表1**  `Mmad`接口参数说明
+**表 1**  `Mmad`接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
@@ -75,16 +79,16 @@ Mmad的矩阵乘加关系可参考下图：
 | dst | 输出 | 结果矩阵C，存储位置为`Location::L0C`，数据格式为NZ。 |
 | fm | 输入 | 左矩阵A，存储位置为`Location::L0A`，数据格式为NZ。 |
 | filter | 输入 | 右矩阵B，存储位置为`Location::L0B`，数据格式为ZN。 |
-| bias | 输入 | bias张量，存储位置为`Location::BIAS`，数据格式为ND。 |
+| bias | 输入 | bias张量，存储位置为`Location::BIAS`或`Location::L0C`，数据格式为ND。 |
 
-**表2**  `MakeMmad`接口参数说明
+**表 2**  `MakeMmad`接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
 | mmadOperation | 输入 | 矩阵计算操作对象，通过`MmadOperation{}`构造。 |
 | mmadTrait | 输入 | 矩阵计算Trait对象，用于指定矩阵计算静态特性。默认使用`MmadTraitDefault{}`。 |
 
-**表3**  `MmadParams`参数说明
+**表 3**  `MmadParams`参数说明
 
 | 参数名 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
@@ -94,7 +98,7 @@ Mmad的矩阵乘加关系可参考下图：
 | unitFlag | `uint8_t` | `0` | 控制`Mmad`和后续矩阵数据搬出的细粒度并行。`0`表示不使能，`2`表示使能且执行后不复位单元标记位，`3`表示使能且执行后复位单元标记位。 |
 | cmatrixInitVal | `bool` | `false` | 不传bias时，控制是否初始化结果矩阵C。`true`表示初始化后为零计算，`false`表示基于结果矩阵C原始值累加计算。 |
 
-**表4**  `MmadTrait`参数说明
+**表 4**  `MmadTrait`参数说明
 
 | 参数名 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
@@ -106,7 +110,7 @@ Mmad的矩阵乘加关系可参考下图：
 
 ## 数据类型
 
-支持如下左矩阵A、右矩阵B、结果矩阵C的数据类型组合如下：
+支持如下左矩阵A、右矩阵B、结果矩阵C的数据类型组合：
 
 | 左矩阵A | 右矩阵B | 结果矩阵C |
 | :--- | :--- | :--- |
@@ -131,11 +135,14 @@ Mmad的矩阵乘加关系可参考下图：
 - `dst`必须位于L0C Buffer，`fm`必须位于L0A Buffer，`filter`必须位于L0B Buffer。
 - 结果矩阵C起始地址需要满足64Byte地址对齐要求。
 - 左矩阵A和右矩阵B起始地址需要满足512Byte地址对齐要求。
+- 上述地址对齐要求属于硬件访问约束，编译器和运行时不对所有场景单独检查，用户需要保证入参满足约束。
 - `m`、`n`、`k`需要与实际参与`Mmad`计算的数据尺寸一致。
 - 开启`unitFlag`功能时，需要结果矩阵C搬出接口的`FixpipeParams::unitFlag`与`Mmad`计算的`MmadParams::unitFlag`参数配合设置。
-- 当M、K、N不是16的倍数时，硬件仍以16*16分形块组织数据，尾块中的无效数据会占用分形块空间但不参与有效计算。有效数据与无效数据排布方式如下图所示：
+- 当M、K、N不是16的倍数时，硬件仍以16×16分形块组织数据，尾块中的无效数据会占用分形块空间但不参与有效计算。有效数据与无效数据排布方式如下图所示：
 
-![](../../../../figures/mmad_tail_valid_data.png)
+**图 3**  尾块有效数据排布
+
+![尾块有效数据排布](../../../../figures/mmad_tail_valid_data.png)
 
 ## 关键特性说明
 
@@ -145,7 +152,9 @@ Mmad的矩阵乘加关系可参考下图：
 
 连续两次`Mmad`沿K方向累加时，通常需要关注中间结果的写读依赖。同步优化的阈值关系可参考下图：
 
-![](../../../../figures/mmad_pipebarrier_threshold.png)
+**图 4**  PipeBarrier阈值关系
+
+![PipeBarrier阈值关系](../../../../figures/mmad_pipebarrier_threshold.png)
 
 ### UnitFlag
 

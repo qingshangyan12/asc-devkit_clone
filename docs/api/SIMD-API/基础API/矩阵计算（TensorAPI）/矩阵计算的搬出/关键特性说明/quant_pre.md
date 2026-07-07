@@ -4,6 +4,8 @@
 
 ## 调用形式
 
+头文件路径为：`tensor_api/tensor.h`。
+
 不传入`quant`参数时，接口根据源类型和目的类型选择不量化输出或直接cast输出：
 
 ```cpp
@@ -34,7 +36,7 @@ scalar量化参数和tensor量化参数的元素类型均为`uint64_t`。
 
 ## 约束说明
 
-- tensor量化参数张量应位于L1 Buffer，元素类型为`uint64_t`，地址要求32字节对齐。
-- 量化参数不能为inf、nan或非规格化数。
+- tensor量化参数张量应位于L1 Buffer，地址要求32字节对齐，元素类型参见“量化参数”章节。
+- 量化参数不能为`Inf`、`NaN`或非规格化数。该约束属于硬件约束，接口不单独检查参数值。
 - `RoundMode::HYBRID`仅在源类型为`float`、目的类型为`hifloat8_t`的量化输出场景支持。
 - 不传入`quant`时，仅支持不量化输出或`float`到`half`/`bfloat16_t`的直接cast输出。
