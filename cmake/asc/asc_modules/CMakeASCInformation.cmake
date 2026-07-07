@@ -19,6 +19,7 @@ endif()
 
 set(CMAKE_INCLUDE_FLAG_ASC "-I")
 set(CMAKE_ASC_COMPILE_OPTIONS_PIC "-fPIC")
+set(CMAKE_SHARED_LIBRARY_ASC_FLAGS -fPIC)
 
 # CMAKE_BUILD_TYPE: ASC officially supports Debug | Release; other values fall through with a warning.
 if(CMAKE_BUILD_TYPE AND NOT CMAKE_BUILD_TYPE MATCHES "^(Debug|Release)$")
