@@ -16,7 +16,6 @@ is_quiet=n
 in_install_for_all=n
 setenv_flag=n
 docker_root=""
-sourcedir="$PWD/asc-devkit"
 curpath=$(dirname $(readlink -f "$0"))
 common_func_path="${curpath}/common_func.inc"
 pkg_version_path="${curpath}/../version.info"
@@ -133,10 +132,6 @@ if [ ! -d "$common_parse_dir" ]; then
 fi
 
 new_upgrade() {
-    if [ ! -d "${sourcedir}" ]; then
-        log "INFO" "no need to upgrade asc-devkit files."
-        return 0
-    fi
     output_progress 10
 
     local setenv_option=""
