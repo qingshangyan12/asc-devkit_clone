@@ -502,7 +502,7 @@ PostUpdate的优势在于：
 addr_reg a_reg;
 for (uint16_t i = 0; i < extent1; ++i) {
     for (uint16_t j = 0; j < extent2; ++j) {
-        a_reg = asc_create_addr_reg(i, stride0, j, stride1);
+        a_reg = asc_create_addr_reg_b32(i, stride0, j, stride1);
         asc_loadalign(src_reg, src_addr, a_reg);
     }
 }
