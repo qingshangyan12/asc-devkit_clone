@@ -30,6 +30,17 @@ protected:
 
 namespace {
 
+using namespace AscendC::Te;
+
+static_assert(Std::is_same_v<typename CopyUB2L1Routing<ArchVersion::V3510, NDExtLayoutPtn, NDExtLayoutPtn>::type,
+                             CopyUbufToCbufND>);
+static_assert(Std::is_same_v<typename CopyUB2L1Routing<ArchVersion::V3510, DNExtLayoutPtn, DNExtLayoutPtn>::type,
+                             CopyUbufToCbufDN>);
+static_assert(Std::is_same_v<typename CopyUB2L1Routing<ArchVersion::V3510, NZLayoutPtn, NZLayoutPtn>::type,
+                             CopyUbufToCbufNZ>);
+static_assert(Std::is_same_v<typename CopyUB2L1Routing<ArchVersion::V3510, ZNLayoutPtn, ZNLayoutPtn>::type,
+                             CopyUbufToCbufZN>);
+
 template <typename LocationTag, typename Pointer, typename Layout>
 auto MakeTensorAt(Pointer ptr, const Layout& layout)
 {
