@@ -23,13 +23,6 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
-<!-- npu="x90" id8 -->
-- Kirin X90：支持
-<!-- end id8 -->
-<!-- npu="9030" id9 -->
-- Kirin 9030：不支持
-<!-- end id9 -->
-
 ## 功能说明<a id="zh-cn_topic_0000002543851571_section106841136114319"></a>
 
 头文件路径为：basic_api/kernel_operator_mm_intf.h。
@@ -136,24 +129,6 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品：
 Atlas 200I/500 A2 推理产品，支持数据类型为：int4b_t、int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float。
 <!-- end id17 -->
 
-<!-- npu="x90" id18 -->
-Kirin X90，支持数据类型：int8_t、half。
-<!-- end id18 -->
-
-## 返回值说明<a id="zh-cn_topic_0000002543851571_section640mcpsimp"></a>
-
-无
-
-## 约束说明<a id="zh-cn_topic_0000002543851571_section2045914466492"></a>
-
-- repeatTimes为0时，表示不执行搬运，该接口将被视为NOP（空操作）。
-- 当目的地址位于L0A Buffer/L0B Buffer时，地址必须512字节对齐。源地址位于L1 Buffer且地址必须32字节对齐。b4数据类型仅在目的操作数为L0B Buffer的时候支持。指令执行占用的流水为PIPE_MTE1。
-- 当srcStride=0时，表示连续的repeat之间读取的源操作数中的同一块数据分形。
-- fp32场景下，源操作数2个连续的16\*8分形将被合并为1个16\*16的方块矩阵，然后再基于该方块矩阵做转置，因此要求两个连续分形合并为方块矩阵，要求L1 Buffer上的A矩阵满足ZZ或ZN排布。
-- 开发者需要保证目的操作数转置后的分形没有重叠。
-<!-- npu="950" id19 -->
-- 针对Ascend 950PR/Ascend 950DT，推荐使用LoadData2dTransposeParamsV2作为参数，该参数具有更精细的搬运粒度。
-<!-- end id19 -->
 ## 关键特性说明<a id="zh-cn_topic_0000002543851571_section1891111310132"></a>
 
 ### 功能和参数讲解
