@@ -30,9 +30,29 @@ namespace AscendC {
 
 constexpr uint32_t MY_RANK_POS = 0;
 constexpr uint32_t RANK_SIZE_POS = 1;
-constexpr uint32_t SIGNAL_POS = 2;
-constexpr uint32_t SHADOW_SIGNAL_BUF_POS = 3;
-constexpr uint32_t CHANNEL_POS = 4;
+constexpr uint32_t SIGNAL_POS = 2; // 共享signal起始索引
+constexpr uint32_t SIGNAL_BUF_POS = 3; // 本地共享signal内存地址
+constexpr uint32_t SHADOW_SIGNAL_BUF_POS = 4;
+constexpr uint32_t CHANNEL_POS = 5;
+
+enum AinSignalType {
+    AIN_SIGNAL_TYPE_NONE,
+    AIN_SIGNAL_TYPE_VA,
+    AIN_SIGNAL_TYPE_INDEXED,
+};
+
+typedef struct {
+    AinSignalType type;
+    union {
+        struct {
+        } vaSignal;
+
+        struct {
+            AinSignal signalId;
+
+        } indexedSignal;
+    };
+} AinSignalDescriptor;
 
 template <typename T, typename U>
 struct AinIsSame { static constexpr bool value = false; };
@@ -115,6 +135,83 @@ AIN_DEVICE void Ain::get(AinTeam team, uint32_t peer, AinCommSymWindow dstWin, u
         hcomm_.ReadNbi<false>(channel, remoteAddr, localAddr, bytes);
     } else {
         hcomm_.ReadNbi(channel, remoteAddr, localAddr, bytes);
+    }
+}
+
+template <typename T>
+AIN_DEVICE AinSignalDescriptor GetSignalDescriptor(const Ain& ain, T action)
+{
+    (void)ain;
+    AinSignalDescriptor desc{};
+    desc.type = AIN_SIGNAL_TYPE_INDEXED;
+    desc.indexedSignal.signalId = action.signalId;
+    return desc;
+}
+
+template <typename T>
+AIN_DEVICE uint64_t GetSignalOpArg(T action)
+{
+    if constexpr (IsSameType<T, AinSignalInc>::value) {
+        return 1;
+    } else {
+        return action.value;
+    }
+}
+
+template <typename RemoteAction, typename DescriptorUbuf>
+AIN_DEVICE void Ain::signal(AinTeam team, uint32_t peer, RemoteAction action, const DescriptorUbuf& ubuf,
+                            AinCommitFlags commitFlags)
+{
+    static_assert(
+        !IsSameType<DescriptorUbuf, AinDescriptorUbufNone>::value,
+        "signal requires a valid DescriptorUbuf; AinDescriptorUbufNone is not allowed");
+    hcomm_.Init(ubuf.addr, ubuf.bytes);
+
+    AinSignalDescriptor signalDesc = GetSignalDescriptor(*this, action);
+    uint64_t signalOpArg = GetSignalOpArg(action);
+
+    auto devCommTable = reinterpret_cast<__gm__ uint64_t *>(devComm_);
+    size_t actualPos = CHANNEL_POS + peer;
+    uint64_t channel = devCommTable[actualPos];
+    auto channelEntity = reinterpret_cast<__gm__ ChannelEntity *>(devCommTable[actualPos]);
+
+    uint32_t rankSize = devCommTable[RANK_SIZE_POS];
+    uint32_t signalPos = devCommTable[SIGNAL_POS];
+    uint64_t signalOffset = (signalDesc.indexedSignal.signalId) * sizeof(uint64_t) + rankSize * sizeof(uint64_t); // 跳过barrier signal内存
+    // 需要获取signal对应地址
+    auto remoteAddr = reinterpret_cast<__gm__ uint8_t *>(
+                    channelEntity->remoteBufferAddr[signalPos].bufferInfo.rma.addr + signalOffset);
+    // 调用FAA
+    // if (commitFlags == AIN_COMMIT_DELAYED) {
+    //     hcomm_.AtomicFAA<uint64_t, false>(channel, remoteAddr, amoAddr, 1);
+    // } else {
+    //     hcomm_.AtomicFAA<uint64_t>(channel, remoteAddr, amoAddr, 1);
+    // }
+}
+
+AIN_DEVICE uint64_t Ain::readSignal(AinSignal signalId, uint32_t bits, AinMemoryOrder order) const
+{
+    (void)order;
+    auto devCommTable = reinterpret_cast<__gm__ uint64_t *>(devComm_);
+    auto sharedSignalBuf = reinterpret_cast<__gm__ uint64_t *>(devCommTable[SIGNAL_BUF_POS]);
+    __gm__ uint64_t *ptr = sharedSignalBuf + signalId;
+    uint64_t mask = bits >= 64U ? UINT64_MAX : ((1ULL << bits) - 1ULL);
+    uint64_t got = ld_dev(ptr, 0);
+    return mask & got;
+}
+
+AIN_DEVICE void Ain::waitSignal(AinSignal signalId, uint64_t least, uint32_t bits, AinMemoryOrder order) const
+{
+    (void)order;
+    auto devCommTable = reinterpret_cast<__gm__ uint64_t *>(devComm_);
+    auto sharedSignalBuf = reinterpret_cast<__gm__ uint64_t *>(devCommTable[SIGNAL_BUF_POS]);
+    __gm__ uint64_t *ptr = sharedSignalBuf + signalId;
+    uint64_t mask = bits >= 64U ? UINT64_MAX : ((1ULL << bits) - 1ULL);
+    while (true) {
+        uint64_t got = ld_dev(ptr, 0);
+        if (least <= (got & mask)) {
+            break;
+        }
     }
 }
 
