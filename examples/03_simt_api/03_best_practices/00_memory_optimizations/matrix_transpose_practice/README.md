@@ -143,7 +143,8 @@ Case 0的Task Duration为6.262μs，对应读写混合带宽约1.34TB/s，达到
 ```cpp
 uint32_t row = i / width;
 uint32_t col = i - row * width;
-output[col * height + row] = input[i];   // input(row,col) -> output(col,row)
+// input(row,col) -> output(col,row)
+output[col * height + row] = input[i];
 ```
 
 **性能数据**：
@@ -173,8 +174,8 @@ UB中转的核心思想如下图所示：GM读取阶段按输入矩阵行方向�
 tile大小选为32×32，是因为`threadIdx.x`方向的32个线程可以对应tile内一行元素，使一个warp的GM读写访问覆盖32个连续float；同时32×32的tile含1024个元素，便于在1024线程配置下由一个Thread Block处理一个tile，或在2048线程配置下由一个Thread Block处理两个tile。
 
 ```cpp
-__ubuf__ float tile[2][TILE_DIM][TILE_DIM];
-uint32_t local_tile = threadIdx.y >> 5;
+__ubuf__ float tile[TILES_PER_BLOCK][TILE_DIM][TILE_DIM];
+uint32_t local_tile = threadIdx.y >> 5;                // 0或1，区分Thread Block内两个tile
 uint32_t ty = threadIdx.y & (TILE_DIM - 1);
 uint32_t tx = threadIdx.x;
 
@@ -302,8 +303,8 @@ Case 6中对UB中的tile数组增加两列padding，由每行32个元素改为34
 <img src="./figures/case6bank.png">
 
 ```cpp
-constexpr int TILE_PAD = 2;
-constexpr int TILE_PAD_STRIDE = TILE_DIM + TILE_PAD;   // 34
+constexpr int TILE_PAD = 2;                          // Case6/7的UB padding列数（32x34）
+constexpr int TILE_PAD_STRIDE = TILE_DIM + TILE_PAD;
 __ubuf__ float tile[TILE_DIM][TILE_PAD_STRIDE];
 ...
 tile[ty][tx] = input[x_index + y_index * width];
@@ -331,14 +332,14 @@ asc_syncthreads();
 **核心实现**：Case 6每轮循环包含两次同步：load后一次，保证tile写满后再按转置方向读出；store后一次，保证转置读取完成后再进入下一轮load，避免下一轮load覆盖仍在被读取的tile。本版本使用两份带padding的UB tile，按`cnt`轮换：下一轮load写入另一份buffer，不会覆盖当前轮正在被读取的buffer，因此可安全去除尾部同步，每轮仅保留一次同步。
 
 ```cpp
-__ubuf__ float tile[2][TILE_DIM][TILE_PAD_STRIDE];   // 两份带padding的buffer
+__ubuf__ float tile[2][TILE_DIM][TILE_PAD_STRIDE]; // 双缓冲：轮换buffer，去除尾部同步
 uint32_t cnt = 0;
 for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x) {
     ...
     tile[cnt][ty][tx] = input[x_index + y_index * width];
-    asc_syncthreads();                                // 仅保留load后的同步
+    asc_syncthreads(); // 保留load后的同步
     output[x_index + y_index * height] = tile[cnt][tx][ty];
-    cnt ^= 1;                                         // 轮换buffer，去除尾部同步
+    cnt ^= 1; // 切换到下一份buffer
 }
 ```
 

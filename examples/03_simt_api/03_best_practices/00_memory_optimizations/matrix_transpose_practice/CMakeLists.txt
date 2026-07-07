@@ -31,8 +31,6 @@ target_compile_definitions(matrix_transpose PRIVATE
 #
 # 说明：
 #   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
-#   - `--enable-simt`：SIMT模式必选。
-#   - `--cce-res-usage`：输出每个 kernel 的寄存器/资源占用，用于检查 case 4 是否寄存器溢出。
 # ======================================================================================
 target_compile_options(matrix_transpose PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt --cce-res-usage>

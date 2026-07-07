@@ -143,7 +143,8 @@ The Task Duration of Case 0 is 6.262μs, corresponding to a read/write mixed ban
 ```cpp
 uint32_t row = i / width;
 uint32_t col = i - row * width;
-output[col * height + row] = input[i];   // input(row,col) -> output(col,row)
+// input(row,col) -> output(col,row)
+output[col * height + row] = input[i];
 ```
 
 **Performance Data**:
@@ -173,8 +174,8 @@ Transpose requires swapping the row and column coordinates. If data is written b
 The tile size is chosen as 32x32 because the 32 threads in the `threadIdx.x` direction can correspond to one row of elements within the tile, so that GM read/write access of one Warp covers 32 contiguous floats. At the same time, a 32x32 tile contains 1024 elements, making it convenient for one thread block to process one tile under the 1024-thread configuration, or two tiles under the 2048-thread configuration.
 
 ```cpp
-__ubuf__ float tile[2][TILE_DIM][TILE_DIM];
-uint32_t local_tile = threadIdx.y >> 5;
+__ubuf__ float tile[TILES_PER_BLOCK][TILE_DIM][TILE_DIM];
+uint32_t local_tile = threadIdx.y >> 5;                // 0或1，区分Thread Block内两个tile
 uint32_t ty = threadIdx.y & (TILE_DIM - 1);
 uint32_t tx = threadIdx.x;
 
@@ -302,8 +303,8 @@ In Case 6, two columns of padding are added to the tile array in UB, changing fr
 <img src="./figures/case6bank.png">
 
 ```cpp
-constexpr int TILE_PAD = 2;
-constexpr int TILE_PAD_STRIDE = TILE_DIM + TILE_PAD;   // 34
+constexpr int TILE_PAD = 2;                          // Case6/7的UB padding列数（32x34）
+constexpr int TILE_PAD_STRIDE = TILE_DIM + TILE_PAD;
 __ubuf__ float tile[TILE_DIM][TILE_PAD_STRIDE];
 ...
 tile[ty][tx] = input[x_index + y_index * width];
@@ -331,14 +332,14 @@ Compared to 23.912μs in Case 5, padding reduces Task Duration to 15.152μs, a d
 **Core Implementation**: Each loop iteration in Case 6 has two synchronizations: one after load, to ensure the tile is fully written before reading in the transpose direction; and one after store, to ensure the transpose read is complete before entering the next load, preventing the next load from overwriting the tile still being read. This version uses two padded UB tiles, rotated by `cnt`: the next load writes to the other buffer, which does not overwrite the buffer being read in the current iteration, so the trailing synchronization can be safely removed, keeping only one synchronization per iteration.
 
 ```cpp
-__ubuf__ float tile[2][TILE_DIM][TILE_PAD_STRIDE];   // two padded buffers
+__ubuf__ float tile[2][TILE_DIM][TILE_PAD_STRIDE]; // 双缓冲：轮换buffer，去除尾部同步
 uint32_t cnt = 0;
 for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x) {
     ...
     tile[cnt][ty][tx] = input[x_index + y_index * width];
-    asc_syncthreads();                                // keep only the synchronization after load
+    asc_syncthreads(); // 保留load后的同步
     output[x_index + y_index * height] = tile[cnt][tx][ty];
-    cnt ^= 1;                                         // rotate buffer, removing trailing synchronization
+    cnt ^= 1; // 切换到下一份buffer
 }
 ```
 
