@@ -6,11 +6,15 @@
 | :--- | :------: | :-----: |
 | Ascend 950PR/Ascend 950DT | √ | √ |
 
+## 前置知识
+
+使用`Mmad`前，建议先了解[矩阵计算分形介绍](../矩阵计算分形介绍/矩阵计算分形介绍.md)、[矩阵数据搬入](../矩阵计算的搬入/矩阵计算的搬入.md)和[矩阵计算的搬出](../矩阵计算的搬出/矩阵计算的搬出.md)。
+
 ## 功能说明
 
 头文件路径为：`"tensor_api/tensor.h"`。
 
-`Mmad`接口用于完成L0A Buffer上左矩阵A和L0B Buffer上右矩阵B的矩阵乘加，结果写入L0C Buffer上结果矩阵C。默认模式为普通矩阵计算。数学表达式为：
+`Mmad`接口用于完成L0A Buffer上左矩阵A和L0B Buffer上右矩阵B的矩阵乘加，结果写入L0C Buffer上结果矩阵C。默认模式为普通矩阵计算。流水类型：PIPE_M。数学表达式为：
 
 ```text
 C = A * B
@@ -29,6 +33,14 @@ Mmad的矩阵乘加关系可参考下图：
 `Mmad`使用显式传入的`MmadAtom`配置矩阵计算功能。左矩阵A、右矩阵B、结果矩阵C的图示说明如下：
 
 ![](../../../../figures/mmad_matrix_layout.png)
+
+## 矩阵计算说明
+
+| 矩阵 | 物理位置 | 维度 | 数据格式 | 数据类型 |
+| :--- | :--- | :--- | :--- | :--- |
+| 左矩阵A | L0A Buffer | m × k | NZ | 参见[数据类型](#数据类型) |
+| 右矩阵B | L0B Buffer | k × n | ZN | 参见[数据类型](#数据类型) |
+| 结果矩阵C | L0C Buffer | m × n | NZ | 参见[数据类型](#数据类型) |
 
 ## 函数原型
 
@@ -133,6 +145,7 @@ Mmad的矩阵乘加关系可参考下图：
 - 左矩阵A和右矩阵B起始地址需要满足512Byte地址对齐要求。
 - `m`、`n`、`k`需要与实际参与`Mmad`计算的数据尺寸一致。
 - 开启`unitFlag`功能时，需要结果矩阵C搬出接口的`FixpipeParams::unitFlag`与`Mmad`计算的`MmadParams::unitFlag`参数配合设置。
+- 连续两次`Mmad`沿K方向累加时，需要关注结果矩阵C的写读依赖。同步优化的阈值关系可参考[结果矩阵C初始化](#结果矩阵c初始化)中的图示。
 - 当M、K、N不是16的倍数时，硬件仍以16*16分形块组织数据，尾块中的无效数据会占用分形块空间但不参与有效计算。有效数据与无效数据排布方式如下图所示：
 
 ![](../../../../figures/mmad_tail_valid_data.png)
@@ -180,6 +193,16 @@ MX Mmad支持如下左矩阵A、右矩阵B、结果矩阵C的数据类型组合�
 | `fp8_e5m2_t` | `fp8_e5m2_t` | `float` |
 
 MX Mmad通常需要在调用`Mmad`前完成左矩阵缩放数据ScaleA和右矩阵缩放数据ScaleB的搬运。ScaleA搬运可参考[L1到L0ScaleA数据搬运](../矩阵计算的搬入/矩阵数据搬入至L0/L1到L0ScaleA数据搬运（Copy）.md)，ScaleB搬运可参考[L1到L0ScaleB数据搬运](../矩阵计算的搬入/矩阵数据搬入至L0/L1到L0ScaleB数据搬运（Copy）.md)。矩阵缩放数据不作为`Mmad`函数参数传入，而是通过`Copy`接口提前搬运到L0ScaleA Buffer和L0ScaleB Buffer。
+
+## 相关接口
+
+- [UnitFlag](关键特性说明/UnitFlag.md)
+- [GEMV](关键特性说明/GEMV.md)
+- [HF32](关键特性说明/HF32.md)
+- [L1到L0ScaleA数据搬运](../矩阵计算的搬入/矩阵数据搬入至L0/L1到L0ScaleA数据搬运（Copy）.md)
+- [L1到L0ScaleB数据搬运](../矩阵计算的搬入/矩阵数据搬入至L0/L1到L0ScaleB数据搬运（Copy）.md)
+- [L0C到GM数据搬运](../矩阵计算的搬出/L0C到GM数据搬运（Copy）.md)
+- [L0C到UB数据搬运](../矩阵计算的搬出/L0C到UB数据搬运（Copy）.md)
 
 ## 调用示例
 
