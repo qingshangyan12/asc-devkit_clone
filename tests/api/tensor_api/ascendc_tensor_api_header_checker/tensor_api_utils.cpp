@@ -16,11 +16,11 @@
 
 static void test_tensor_api_utils_utils()
 {
-    using AscendC::Te::MmadTrait;
-    using AscendC::Te::MmadParams;
-    using AscendC::Te::FixpipeParams;
     using AscendC::Te::CacheMode;
+    using AscendC::Te::DualDstMode;
+    using AscendC::Te::FixpipeParams;
+    using AscendC::Te::MmadParams;
+    using AscendC::Te::MmadTrait;
     using AscendC::Te::MmadType;
     using AscendC::Te::RoundMode;
-    using AscendC::Te::DualDstMode;
 }

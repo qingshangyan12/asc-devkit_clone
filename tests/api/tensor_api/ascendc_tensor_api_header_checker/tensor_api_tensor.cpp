@@ -18,29 +18,23 @@
 
 static void test_tensor_api_tensor_layout()
 {
+    using AscendC::Te::Capacity;
+    using AscendC::Te::Cosize;
+    using AscendC::Te::Crd2Idx;
+    using AscendC::Te::Get;
+    using AscendC::Te::MakeCoord;
+    using AscendC::Te::MakeFrameLayout;
+    using AscendC::Te::MakeLayout;
+    using AscendC::Te::MakePatternLayout;
     using AscendC::Te::MakeShape;
     using AscendC::Te::MakeStride;
     using AscendC::Te::MakeTile;
-    using AscendC::Te::MakeCoord;
-    using AscendC::Te::MakeLayout;
-    using AscendC::Te::MakePatternLayout;
-    using AscendC::Te::MakeFrameLayout;
-    using AscendC::Te::Crd2Idx;
-    using AscendC::Te::Get;
-    using AscendC::Te::Cosize;
     using AscendC::Te::Rank;
     using AscendC::Te::Select;
     using AscendC::Te::Size;
-    using AscendC::Te::Capacity;
     using AscendC::Te::Slice;
 }
 
-static void test_tensor_api_tensor_pointer()
-{
-    using AscendC::Te::MakeMemPtr;
-}
+static void test_tensor_api_tensor_pointer() { using AscendC::Te::MakeMemPtr; }
 
-static void test_tensor_api_tensor_tensor()
-{
-    using AscendC::Te::MakeTensor;
-}
+static void test_tensor_api_tensor_tensor() { using AscendC::Te::MakeTensor; }
