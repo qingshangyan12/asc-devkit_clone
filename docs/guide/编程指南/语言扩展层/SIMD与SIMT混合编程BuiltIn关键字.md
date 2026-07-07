@@ -152,7 +152,7 @@ __aicore__ inline void asc_vf_call(dim3 threadNums, Args &&...args)
 __simt_vf__ inline void add_simt(
     __gm__ float* dst, __gm__ float* src0, __gm__ float* src1)
 {
-    // simt 代码
+    // simt代码
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
     dst[idx] = src0[idx] + src1[idx];
 }
@@ -179,13 +179,9 @@ __global__ __vector__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
 
     内置全局变量，在SIMT VF函数中可以直接使用，用于获取线程块中配置的线程的三维层次结构。blockDim.x，blockDim.y，blockDim.z分别表示线程块中三个维度的线程数，各个维度上线程数需满足blockDim.x \* blockDim.y \*blockDim.z  <= 2048。
 
--   blockIdx
+-   blockIdx内置全局变量，只能在SIMT VF函数中使用，用于获取块索引。表示当前线程所在的线程块在整个网格中的位置坐标。blockIdx.x的范围是0到gridDim.x - 1，blockIdx.y和blockIdx.z目前只能返回0。
 
-    内置全局变量，只能在SIMT VF函数中使用，用于获取块索引。表示当前线程所在的线程块在整个网格中的位置坐标。blockIdx.x的范围是0到gridDim.x - 1，blockIdx.y和blockIdx.z目前只能返回0。
-
--   threadIdx
-
-    内置全局变量，在核函数中可以直接使用，用于获取当前线程在线程块内部的索引。threadIdx.x，threadIdx.y，threadIdx.z分别表示当前线程在3个维度的索引，threadIdx.x的范围为\[0, blockDim.x\)，threadIdx.y的范围为\[0, blockDim.y\)，threadIdx.z的范围为\[0, blockDim.z\)。线程块内线程的索引计算方式如下：
+-   threadIdx内置全局变量，在核函数中可以直接使用，用于获取当前线程在线程块内部的索引。threadIdx.x，threadIdx.y，threadIdx.z分别表示当前线程在3个维度的索引，threadIdx.x的范围为\[0, blockDim.x\)，threadIdx.y的范围为\[0, blockDim.y\)，threadIdx.z的范围为\[0, blockDim.z\)。线程块内线程的索引计算方式如下：
 
     -   对于一维线程块，线程块内线程的索引为threadIdx.x。
     -   对于二维线程块，线程块内线程的索引为\(threadIdx.x + threadIdx.y \* blockDim.x\)。
@@ -193,9 +189,7 @@ __global__ __vector__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
 
 当前提供了以下仅在Device上可用的int类型的内置变量：
 
--   warpSize
-
-    运行时变量，表示一个线程束（Warp）中的线程数量，当前为固定值32。
+-   warpSize运行时变量，表示一个线程束（Warp）中的线程数量，当前为固定值32。
 
 
 ## 内置数据类型<a name="zh-cn_topic_0000002571575581_section1880403364916"></a><a name="cn_topic_0000002571575581_section1880403364916"></a>
