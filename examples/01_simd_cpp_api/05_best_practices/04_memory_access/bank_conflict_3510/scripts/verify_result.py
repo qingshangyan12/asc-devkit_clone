@@ -33,10 +33,10 @@ def verify_result(output, golden):
         real_index = different_element_indexes[index]
         golden_data = golden[real_index]
         output_data = output[real_index]
+        rdiff = abs(output_data - golden_data) / golden_data if golden_data != 0 else abs(output_data - golden_data)
         print(
             "data index: %06d, expected: %-.9f, actual: %-.9f, rdiff: %-.6f" %
-            (real_index, golden_data, output_data,
-             abs(output_data - golden_data) / golden_data))
+            (real_index, golden_data, output_data, rdiff))
         if index == 100:
             break
     error_ratio = float(different_element_indexes.size) / golden.size
