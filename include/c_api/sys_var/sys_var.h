@@ -39,6 +39,12 @@ __aicore__ inline int64_t asc_get_ctrl();
 
 __aicore__ inline int64_t asc_get_block_num();
 
+__aicore__ inline int64_t asc_get_block_idx();
+
+__aicore__ inline int64_t asc_get_sub_block_num();
+
+__aicore__ inline int64_t asc_get_sub_block_id();
+
 __aicore__ inline int64_t asc_get_system_cycle();
 
 __aicore__ inline void asc_set_ctrl(uint64_t config);
@@ -49,15 +55,9 @@ __aicore__ inline int64_t asc_get_ffts_base_addr();
 
 __aicore__ inline int64_t asc_get_core_id();
 
-__aicore__ inline int64_t asc_get_block_idx();
-
 __aicore__ inline uint64_t asc_get_overflow_status();
 
 __aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset);
-
-__aicore__ inline int64_t asc_get_sub_block_num();
-
-__aicore__ inline int64_t asc_get_sub_block_id();
 
 __aicore__ inline int64_t asc_get_program_counter();
 
