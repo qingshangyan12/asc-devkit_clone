@@ -8255,9 +8255,9 @@ __simd_callee__ inline void asc_storealign_pack_quarter_postupdate(__ubuf__ floa
 // ========== asc_storealign_pack_quarter_postupdate ==========
 [[deprecated("NOTICE: asc_set_gm2ub_pad is deprecated. "
              "Please use asc_set_copy_pad_val instead for pad value setting")]]
-__aicore__ inline void asc_set_gm2ub_pad(uint32_t pad_val) 
-{ 
-    asc_set_gm2ub_pad_impl(pad_val); 
+__aicore__ inline void asc_set_gm2ub_pad(uint32_t pad_val)
+{
+    asc_set_gm2ub_pad_impl(pad_val);
 }
 
 #endif

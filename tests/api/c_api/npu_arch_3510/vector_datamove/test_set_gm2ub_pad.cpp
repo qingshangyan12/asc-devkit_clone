@@ -8,12 +8,12 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#include <gtest/gtest.h>	 
-#include <mockcpp/mockcpp.hpp>	 
-#include "c_api/stub/cce_stub.h"	 
-#include "c_api/asc_simd.h"	 
+#include <gtest/gtest.h>
+#include <mockcpp/mockcpp.hpp>
+#include "c_api/stub/cce_stub.h"
+#include "c_api/asc_simd.h"
 
-class TestVectorDatamoveSetGM2UBPad : public testing::Test {
+class TestSetGM2UBPad : public testing::Test {
 protected:
     void SetUp() {}
     void TearDown() {}
@@ -25,13 +25,11 @@ void set_pad_val_outtoub_Stub(uint64_t config)
     uint64_t conf = 123;
     EXPECT_EQ(conf, config);
 }
-}
+}//namespace
 
-TEST_F(TestVectorDatamoveSetGM2UBPad, set_gm2ub_pad_Succ)
+TEST_F(TestSetGM2UBPad, set_gm2ub_pad_Succ)
 {
-    MOCKER(set_pad_val_outtoub, void(uint64_t))
-        .times(1)
-        .will(invoke(set_pad_val_outtoub_Stub));
+    MOCKER(set_pad_val_outtoub, void(uint64_t)).times(1).will(invoke(set_pad_val_outtoub_Stub));
     
     uint32_t config = 123;
     asc_set_gm2ub_pad(config);

@@ -42,7 +42,6 @@ __aicore__ inline void asc_set_gm2ub_pad(uint32_t pad_val)
 |------------|------------|-----------| 
 | pad_val    | 输入       | 左右两侧需要填补的数据值。| 
 
-
 ## 返回值说明 
 
 无 
