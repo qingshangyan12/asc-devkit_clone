@@ -19,7 +19,7 @@
 ## 🔥Latest News
 [2026/05] v9.1.0-beta.2 版本关键特性
 ### 🚀 关键特性
-- AscendC框架基础API支持NPU Check（[PR#1557](https://gitcode.com/cann/asc-devkit/pull/1557) [PR#1467](https://gitcode.com/cann/asc-devkit/pull/1467)），增强算子运行时校验能力。
+- Ascend C框架基础API支持NPU Check（[PR#1557](https://gitcode.com/cann/asc-devkit/pull/1557) [PR#1467](https://gitcode.com/cann/asc-devkit/pull/1467)），增强算子运行时校验能力。
 - SIMD VF内支持printf和reg dump打印（[PR#1605](https://gitcode.com/cann/asc-devkit/pull/1605)），提供调试打印和寄存器数据dump能力。
 - A5支持L1 Tensor数据的DumpTensor（[PR#2175](https://gitcode.com/cann/asc-devkit/pull/2175)），扩展L1层数据调试支持。
 - 编译工程CMakeModule支持CMAKE<LANG>编译选项（[PR#2055](https://gitcode.com/cann/asc-devkit/pull/2055)）；新增optype_collector工具，支持检查optype重名（[PR#285](https://gitcode.com/cann/asc-tools/pull/285)）。
@@ -40,7 +40,7 @@
 - 搭建VitePress文档站点，提供AscendC资料预览功能（[PR#2547](https://gitcode.com/cann/asc-devkit/pull/2547)）。
 - 增加SIMD与SIMT混合编程性能优化概述（[PR#2736](https://gitcode.com/cann/asc-devkit/pull/2736)）。
 
-有关所有历史版本及更新的详细信息，请参阅[CHANGELOG.md](./CHANGELOG.md)
+有关所有历史版本及更新的详细信息，请参阅[CHANGELOG.md](./CHANGELOG.md)。
 
 ## 🚀概述
 
@@ -68,7 +68,7 @@ Ascend C提供三类接口，均可实现底层的完备编程能力：
 
 | API层级 |  目标用户 | 主要用途 |
 |----------|----------|----------|
-| **算子模板库 (CATLASS/ATVOSS等)** |  算法开发人员 | 基于典型算子实现进行自定义扩展，满足特定场景高性能需求 | 
+| **算子模板库 (CATLASS/ATVOSS等)** |  算法开发人员 | 基于典型算子实现进行自定义扩展，满足特定场景高性能需求 |
 | **高阶API** |算法开发人员 | 复用通用单核算法，快速完成算法验证 |
 
 
