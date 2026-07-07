@@ -90,7 +90,15 @@ Unified Buffer或Global Memory上的初始数据。
 
 ## 约束说明
 
-原子操作保证对同一地址的读改写过程具有原子性，但不保证多个线程之间的执行顺序。对于浮点累加顺序敏感场景，结果可能随线程调度变化而不同。
+- 原子操作保证对同一地址的读改写过程具有原子性，但不保证多个线程之间的执行顺序。对于浮点累加顺序敏感场景，结果可能随线程调度变化而不同。
+
+- 不同数据类型的`asc_atomic_add`性能存在差异，且与是否使用返回值密切相关。
+    - 使用返回值（不含`half`、`bfloat16_t`）：
+        - Global Memory场景：`int64_t`性能较好，`int32_t`居中，`bfloat16x2_t`、`half2`、`float`性能较差（`float`最差）。
+        - Unified Buffer场景：`int32_t`性能较好，`float`、`half2`、`bfloat16x2_t`稍差但整体差异较小。
+    - 不使用返回值：
+        - Global Memory场景：`int32_t`、`float`、`half2`、`bfloat16x2_t`性能较好且接近，`half`、`bfloat16_t`居中，`int64_t`较差。
+        - Unified Buffer场景：各类型性能差异小，整体均优于Global Memory。
 
 ## 需要包含的头文件
 
