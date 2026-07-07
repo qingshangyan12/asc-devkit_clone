@@ -14,7 +14,7 @@ Gemv的核心功能体现为：当矩阵A的维度M取值为1时，接口可以�
 
 - 1×K矩阵A需满足512B地址对齐，K个数据连续存储。以half类型为例，当K=256时，软件侧可视作16×16分块，配置m=1后硬件解析为1×256向量，可通过Copy接口将256个half数据从L1 Buffer搬至L0A Buffer。
 
-- C矩阵是一个1×N的向量，当1×N向量被划分为多个1×16子向量时，每个子向量在L0C Buffer中占用1024B（u8/s8/f162f32）。但实际有效数据仅占最低32B或64B。例如，当N=50时，共划分4个1×16子向量，占用4×512B=2048B（f162f16），其中有效数据仅为4×32B=128B。
+- C矩阵是一个1×N的向量，当1×N向量被划分为多个1×16子向量时，每个子向量在L0C Buffer中占用1024B（`uint8_t`/`int8_t`/`half`/`float`等类型）。但实际有效数据仅占最低32B或64B。例如，当N=50时，共划分4个1×16子向量，占用4×512B=2048B（`half`），其中有效数据仅为4×32B=128B。
 
 **图1**  GEMV模式，矩阵乘示意图
 
@@ -50,7 +50,7 @@ M=1时开启GEMV模式，则矩阵乘法将M方向作为非对齐场景进行处
 | B | 4096 * 256 | half | NZ |
 | C | 1 * 256 | float | ND |
 
-通过`Copy`接口将输入矩阵A从Global Memory搬运到L1 Buffer上并保持ND格式不变，然后在L1 Buffer上将A矩阵转换为NZ格式，再通过`Copy`接口搬运到L0A Buffer，从而以GEMV模式执行矩阵乘。另外注意GEMV模式默认是关闭的，需要自定义`MmadTrait`来开启。
+通过`Copy`接口将输入矩阵A从Global Memory搬运到L1 Buffer上并保持ND格式不变，然后在L1 Buffer上将A矩阵转换为NZ格式，再通过`Copy`接口搬运到L0A Buffer，从而以GEMV模式执行矩阵乘。另外注意GEMV模式默认是关闭的，需要自定义`MmadTrait`来开启。相关接口可参考[Mmad](../Mmad.md)、[L1到L0A数据搬运（Copy）](../../矩阵计算的搬入/矩阵数据搬入至L0/L1到L0A数据搬运（Copy）.md)和[L1到L0B数据搬运（Copy）](../../矩阵计算的搬入/矩阵数据搬入至L0/L1到L0B数据搬运（Copy）.md)。
 
 ```cpp
 #include "tensor_api/tensor.h"
@@ -74,6 +74,8 @@ __aicore__ inline void MmadGemvExample(__gm__ half* aGm, __gm__ half* bGm, __gm_
 
     __cbuf__ AType l1ABuf[m * k];
     __ca__ AType l0ABuf[m * k];
+    __cb__ AType l0BBuf[k * n];
+    __cc__ float l0CBuf[m * n];
 
     // A矩阵Global Memory->L1 Buffer：ND->ND，1×K行向量按ND连续搬入L1 Buffer。
     auto gmATensor = MakeTensor(MakeMemPtr(aGm), MakeFrameLayout<NDExtLayoutPtn>(m, k));
@@ -87,6 +89,9 @@ __aicore__ inline void MmadGemvExample(__gm__ half* aGm, __gm__ half* bGm, __gm_
     auto l0ATensor = MakeTensor(MakeMemPtr(l0ABuf), MakeFrameLayout<NZLayoutPtn, AType>(k / c0, c0));
     auto copyL12L0A = MakeCopy(CopyL12L0A{}, CopyL12L0ATraitDefault{});
     Copy(copyL12L0A, l0ATensor, l1ANzTensor);
+
+    auto l0B = MakeTensor(MakeMemPtr(l0BBuf), MakeFrameLayout<ZNLayoutPtn, AType>(k, n));
+    auto l0C = MakeTensor(MakeMemPtr(l0CBuf), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
 
     // B矩阵搬运与基础场景相同（此处省略，假设已得到l0B）。
     // ...

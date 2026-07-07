@@ -10,7 +10,7 @@
 
 头文件路径为：`"tensor_api/tensor.h"`。
 
-`Mmad`接口用于完成L0A Buffer上左矩阵A和L0B Buffer上右矩阵B的矩阵乘加，结果写入L0C Buffer上结果矩阵C。默认模式为普通矩阵计算。数学表达式为：
+`Mmad`接口用于完成L0A Buffer上左矩阵A和L0B Buffer上右矩阵B的矩阵乘加，结果写入L0C Buffer上结果矩阵C。默认模式为普通矩阵计算。流水类型：PIPE_M。数学表达式为：
 
 ```text
 C = A * B
@@ -133,6 +133,7 @@ Mmad的矩阵乘加关系可参考下图：
 - 左矩阵A和右矩阵B起始地址需要满足512Byte地址对齐要求。
 - `m`、`n`、`k`需要与实际参与`Mmad`计算的数据尺寸一致。
 - 开启`unitFlag`功能时，需要结果矩阵C搬出接口的`FixpipeParams::unitFlag`与`Mmad`计算的`MmadParams::unitFlag`参数配合设置。
+- 连续两次`Mmad`沿K方向累加时，需要关注结果矩阵C的写读依赖。同步优化的阈值关系可参考[结果矩阵C初始化](#结果矩阵c初始化)中的图示。
 - 当M、K、N不是16的倍数时，硬件仍以16*16分形块组织数据，尾块中的无效数据会占用分形块空间但不参与有效计算。有效数据与无效数据排布方式如下图所示：
 
 ![](../../../../figures/mmad_tail_valid_data.png)
