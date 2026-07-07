@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /* !
  * \file kernel_reg_compute_common_impl.h
@@ -112,9 +112,9 @@ __simd_callee__ inline void TraitOneToTraitTwoTmpl(T& dstReg, U& srcReg)
     using ActualT1 = typename U::ActualT;
     using ActualT2 = typename T::ActualT;
     static_assert(CheckRegTrait<T, RegTraitNumTwo>() && CheckRegTrait<U, RegTraitNumOne>(),
-                  "T should be RegTraitNumTwo and U should be RegTraitNumOne");
+        "T should be RegTraitNumTwo and U should be RegTraitNumOne");
     static_assert(sizeof(ActualT2) == (sizeof(ShortType) * 2) && sizeof(ActualT1) == (sizeof(ShortType) * 2),
-                  "T and U should be 2 times of shortType length");
+        "T and U should be 2 times of shortType length");
     RegTensor<ShortType> zeroReg;
     MaskReg maskFull = CreateMask<ShortType, MaskPattern::ALL>();
     Duplicate(zeroReg, 0, maskFull);
@@ -128,96 +128,40 @@ __simd_callee__ inline void TraitTwoToTraitOneTmpl(T& dstReg, U& srcReg)
     using ActualT1 = typename T::ActualT;
     using ActualT2 = typename U::ActualT;
     static_assert(CheckRegTrait<T, RegTraitNumOne>() && CheckRegTrait<U, RegTraitNumTwo>(),
-                  "T should be RegTraitNumOne and U should be RegTraitNumTwo");
+        "T should be RegTraitNumOne and U should be RegTraitNumTwo");
     static_assert(sizeof(ActualT2) == (sizeof(ShortType) * 2) && sizeof(ActualT1) == (sizeof(ShortType) * 2),
-                  "U and T should be 2 times of shortType length");
+        "U and T should be 2 times of shortType length");
     RegTensor<ShortType> dstRegShortFake;
     Interleave((RegTensor<ShortType>&)dstReg, dstRegShortFake, (RegTensor<ShortType>&)srcReg.reg[0],
-               (RegTensor<ShortType>&)srcReg.reg[1]);
+        (RegTensor<ShortType>&)srcReg.reg[1]);
 }
 
-
 template <RegLayout layoutMode>
-__simd_callee__ inline void AdjustMaskUpCast_b32_b8(MaskReg& dstMask, MaskReg& srcMask)
+__simd_callee__ inline void AdjustMaskRatio2(MaskReg& dstMask, MaskReg& srcMask)
 {
     if constexpr (layoutMode == RegLayout::ZERO) {
-        MaskReg tmp;
-        ppack(tmp, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>());
-        ppack(dstMask, tmp, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>());
+        ppack(dstMask, srcMask, HILO_LOWEST);
+    } else {
+        ppack(dstMask, srcMask, HILO_HIGHEST);
+    }
+}
+
+template <RegLayout layoutMode>
+__simd_callee__ inline void AdjustMaskRatio4(MaskReg& dstMask, MaskReg& srcMask)
+{
+    MaskReg tmp;
+    if constexpr (layoutMode == RegLayout::ZERO) {
+        ppack(tmp, srcMask, HILO_LOWEST);
+        ppack(dstMask, tmp, HILO_LOWEST);
     } else if constexpr (layoutMode == RegLayout::ONE) {
-        MaskReg tmp;
-        ppack(tmp, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>());
-        ppack(dstMask, tmp, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::HIGHEST)>());
+        ppack(tmp, srcMask, HILO_LOWEST);
+        ppack(dstMask, tmp, HILO_HIGHEST);
     } else if constexpr (layoutMode == RegLayout::TWO) {
-        MaskReg tmp;
-        ppack(tmp, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::HIGHEST)>());
-        ppack(dstMask, tmp, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>());
-    } else if constexpr (layoutMode == RegLayout::THREE) {
-        MaskReg tmp;
-        ppack(tmp, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::HIGHEST)>());
-        ppack(dstMask, tmp, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::HIGHEST)>());
-    }
-}
-
-template <RegLayout layoutMode>
-__simd_callee__ inline void AdjustMaskUpCast_b32_b16(MaskReg& dstMask, MaskReg& srcMask)
-{
-    if constexpr (layoutMode == RegLayout::ZERO) {
-        ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>());
-    } else if constexpr (layoutMode == RegLayout::ONE) {
-        ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::HIGHEST)>());
-    }
-}
-
-template <RegLayout layoutMode>
-__simd_callee__ inline void AdjustMaskUpCast_b16_b8(MaskReg& dstMask, MaskReg& srcMask)
-{
-    if constexpr (layoutMode == RegLayout::ZERO) {
-        ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>());
-    } else if constexpr (layoutMode == RegLayout::ONE) {
-        ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::HIGHEST)>());
-    }
-}
-
-template <RegLayout layoutMode>
-__simd_callee__ inline void AdjustMaskDownCast_b8_b32(MaskReg& dstMask, MaskReg& srcMask)
-{
-    if constexpr (layoutMode == RegLayout::ZERO) {
-        MaskReg tmp;
-        ppack(tmp, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>());
-        ppack(dstMask, tmp, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>());
-    } else if constexpr (layoutMode == RegLayout::ONE) {
-        MaskReg tmp;
-        ppack(tmp, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>());
-        ppack(dstMask, tmp, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::HIGHEST)>());
-    } else if constexpr (layoutMode == RegLayout::TWO) {
-        MaskReg tmp;
-        ppack(tmp, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::HIGHEST)>());
-        ppack(dstMask, tmp, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>());
-    } else if constexpr (layoutMode == RegLayout::THREE) {
-        MaskReg tmp;
-        ppack(tmp, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::HIGHEST)>());
-        ppack(dstMask, tmp, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::HIGHEST)>());
-    }
-}
-
-template <RegLayout layoutMode>
-__simd_callee__ inline void AdjustMaskDownCast_b8_b16(MaskReg& dstMask, MaskReg& srcMask)
-{
-    if constexpr (layoutMode == RegLayout::ZERO) {
-        ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>());
-    } else if constexpr (layoutMode == RegLayout::ONE) {
-        ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::HIGHEST)>());
-    }
-}
-
-template <RegLayout layoutMode>
-__simd_callee__ inline void AdjustMaskDownCast_b16_b32(MaskReg& dstMask, MaskReg& srcMask)
-{
-    if constexpr (layoutMode == RegLayout::ZERO) {
-        ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>());
-    } else if constexpr (layoutMode == RegLayout::ONE) {
-        ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::HIGHEST)>());
+        ppack(tmp, srcMask, HILO_HIGHEST);
+        ppack(dstMask, tmp, HILO_LOWEST);
+    } else {
+        ppack(tmp, srcMask, HILO_HIGHEST);
+        ppack(dstMask, tmp, HILO_HIGHEST);
     }
 }
 
@@ -226,38 +170,22 @@ __simd_callee__ inline void AdjustMaskForCastMerge(MaskReg& dstMask, MaskReg& sr
 {
     if constexpr (std::is_same_v<U, DefaultType>) {
         dstMask = srcMask;
-        return;
-    }
-    constexpr size_t srcSize = sizeof(U);
-    constexpr size_t dstSize = sizeof(T);
-    if constexpr (srcSize > dstSize) {
-        if constexpr (srcSize == 4 && dstSize == 1) {
-            AdjustMaskUpCast_b32_b8<srcLayout>(dstMask, srcMask);
-        } else if constexpr (srcSize == 4 && dstSize == 2) {
-            AdjustMaskUpCast_b32_b16<srcLayout>(dstMask, srcMask);
-        } else if constexpr (srcSize == 2 && dstSize == 1) {
-            AdjustMaskUpCast_b16_b8<srcLayout>(dstMask, srcMask);
-        } else {
-            dstMask = srcMask;
-        }
-    } else if constexpr (srcSize < dstSize) {
-        if constexpr (srcSize == 1 && dstSize == 4) {
-            AdjustMaskDownCast_b8_b32<srcLayout>(dstMask, srcMask);
-        } else if constexpr (srcSize == 1 && dstSize == 2) {
-            AdjustMaskDownCast_b8_b16<srcLayout>(dstMask, srcMask);
-        } else if constexpr (srcSize == 2 && dstSize == 4) {
-            AdjustMaskDownCast_b16_b32<srcLayout>(dstMask, srcMask);
-        } else {
-            dstMask = srcMask;
-        }
+    } else if constexpr (sizeof(U) / sizeof(T) == 2) {
+        AdjustMaskRatio2<srcLayout>(dstMask, srcMask);
+    } else if constexpr (sizeof(U) / sizeof(T) == 4) {
+        AdjustMaskRatio4<srcLayout>(dstMask, srcMask);
+    } else if constexpr (sizeof(T) / sizeof(U) == 2) {
+        AdjustMaskRatio2<srcLayout>(dstMask, srcMask);
+    } else if constexpr (sizeof(T) / sizeof(U) == 4) {
+        AdjustMaskRatio4<srcLayout>(dstMask, srcMask);
     } else {
         dstMask = srcMask;
     }
 }
 
-
-template <typename T = DefaultType, typename U = DefaultType, RegLayout srcLayout = RegLayout::ZERO,
-        MaskMergeMode mode = MaskMergeMode::MERGING, typename RegT>
+template <
+    typename T = DefaultType, typename U = DefaultType, RegLayout srcLayout = RegLayout::ZERO,
+    MaskMergeMode mode = MaskMergeMode::MERGING, typename RegT>
 __simd_callee__ inline void CopyMergingImpl(RegT& dstReg, RegT& srcReg, MaskReg& mask)
 {
     using ActualT = typename RegT::ActualT;
@@ -274,17 +202,15 @@ __simd_callee__ inline void CopyMergingImpl(RegT& dstReg, RegT& srcReg, MaskReg&
         vmov((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg, adjustedMask, modeValue);
     } else if constexpr (sizeof(ActualT) == 8) {
         if constexpr (CheckRegTrait<RegT, RegTraitNumOne>()) {
-            constexpr auto lowerDist =
-                std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>();
             MaskReg dstMask;
             MaskReg tmpMask;
             MaskReg dumpMask;
-            ppack(tmpMask, adjustedMask, lowerDist);
+            ppack(tmpMask, adjustedMask, HILO_LOWEST);
             pintlv_b32(dstMask, dumpMask, tmpMask, tmpMask);
-            vmov((RegTensor<uint32_t> &)dstReg, (RegTensor<uint32_t> &)srcReg, dstMask, modeValue);
+            vmov((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg, dstMask, modeValue);
         } else if constexpr (CheckRegTrait<RegT, RegTraitNumTwo>()) {
-            vmov((RegTensor<uint32_t> &)dstReg.reg[0], (RegTensor<uint32_t> &)srcReg.reg[0], adjustedMask, modeValue);
-            vmov((RegTensor<uint32_t> &)dstReg.reg[1], (RegTensor<uint32_t> &)srcReg.reg[1], adjustedMask, modeValue);
+            vmov((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg.reg[0], adjustedMask, modeValue);
+            vmov((RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg.reg[1], adjustedMask, modeValue);
         }
     }
 }
