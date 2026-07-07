@@ -59,7 +59,11 @@ __simd_callee__ inline void Unsqueeze(U& dstReg, MaskReg& mask)
 template <SpecialPurposeReg spr>
 __aicore__ inline int64_t GetSpr()
 {
+#if defined(__NPU_ARCH__)
     return GetSprImpl<spr>();
+#else 
+    return 0;
+#endif
 }
 
 template <SpecialPurposeReg spr>
