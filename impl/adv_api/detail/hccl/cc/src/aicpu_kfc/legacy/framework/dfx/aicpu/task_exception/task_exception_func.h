@@ -70,7 +70,7 @@ public:
 
 private:
     // 私有构造函数，防止外部实例化
-    TaskExceptionFunc(){};
+    TaskExceptionFunc() {};
     // 禁用拷贝构造函数
     TaskExceptionFunc(const TaskExceptionFunc&) = delete;
     // 禁用赋值运算符

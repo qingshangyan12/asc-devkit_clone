@@ -23,7 +23,7 @@ constexpr unsigned int MIN_VALUE_ADDR = 1;
 constexpr unsigned int MAX_VALUE_ADDR = 256;
 class ControlPlane {
 public:
-    ControlPlane(){};
+    ControlPlane() {};
     AddrType addrType;
     IpAddress addr;
     u32 listenPort{0};

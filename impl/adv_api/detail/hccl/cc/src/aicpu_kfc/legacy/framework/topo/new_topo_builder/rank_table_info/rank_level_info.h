@@ -30,7 +30,7 @@ constexpr unsigned int MIN_VALUE_U32 = 0;
 
 class RankLevelInfo {
 public:
-    RankLevelInfo(){};
+    RankLevelInfo() {};
     u32 netLayer{0};
     std::string netInstId;
     NetType netType{NetType::CLOS};

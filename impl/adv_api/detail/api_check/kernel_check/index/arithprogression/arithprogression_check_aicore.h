@@ -32,7 +32,7 @@ public:
 
 public:
     __aicore__ inline void VerifyingParameters(
-        const LocalTensor<T>& dstLocal, const T firstValue, const T diffValue, const int32_t count){};
+        const LocalTensor<T>& dstLocal, const T firstValue, const T diffValue, const int32_t count) {};
 };
 
 } // namespace HighLevelApiCheck

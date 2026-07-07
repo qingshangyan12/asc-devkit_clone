@@ -509,8 +509,8 @@ public:
         Buffer(const void* addr, u64 size) : addr(addr), size(size) {}
     };
 
-    Transport(){};
-    explicit Transport(TransportBase* pimpl) : pimpl_(pimpl){};
+    Transport() {};
+    explicit Transport(TransportBase* pimpl) : pimpl_(pimpl) {};
     Transport(
         TransportType type, TransportPara& para, const HcclDispatcher dispatcher,
         const std::unique_ptr<NotifyPool>& notifyPool, MachinePara& machinePara,

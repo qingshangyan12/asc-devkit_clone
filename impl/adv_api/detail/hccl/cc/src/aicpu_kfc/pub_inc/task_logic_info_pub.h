@@ -129,7 +129,7 @@ struct TaskLogicInfo {
     } taskLogicPara;
     ParaTxAsync txAsync;
     ParaRxAsync rxAsync;
-    TaskLogicInfo(){};
+    TaskLogicInfo() {};
     TaskLogicInfo(u32 index, TaskLogicType taskLogicType, TaskLogicFuncType funcType);
     TaskLogicInfo(
         u32 index, TaskLogicType taskLogicType, TaskLogicFuncType funcType, std::vector<TxMemoryInfo>& txMems);

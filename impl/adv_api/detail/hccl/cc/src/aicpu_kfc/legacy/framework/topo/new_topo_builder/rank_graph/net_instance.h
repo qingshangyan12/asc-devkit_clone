@@ -264,7 +264,7 @@ protected:
 class InnerNetInstance : public NetInstance {
 public:
     InnerNetInstance(const u32 netLayer, const std::string& netInstId)
-        : NetInstance(netLayer, netInstId, NetType::TOPO_FILE_DESC){};
+        : NetInstance(netLayer, netInstId, NetType::TOPO_FILE_DESC) {};
 
     ~InnerNetInstance() override = default;
 
@@ -274,7 +274,7 @@ public:
 class ClosNetInstance : public NetInstance {
 public:
     ClosNetInstance(const u32 netLayer, const std::string& netInstId)
-        : NetInstance(netLayer, netInstId, NetType::CLOS){};
+        : NetInstance(netLayer, netInstId, NetType::CLOS) {};
 
     ~ClosNetInstance() override = default;
 

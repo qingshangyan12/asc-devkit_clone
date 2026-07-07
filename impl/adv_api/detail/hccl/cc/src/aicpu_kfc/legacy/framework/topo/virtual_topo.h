@@ -37,7 +37,7 @@ public:
           localRankId_(localRankId),
           remoteRankId_(remoteRankId),
           localPortId_(localPortId),
-          remotePortId_(remotePortId){};
+          remotePortId_(remotePortId) {};
     LinkData(
         PortDeploymentType portDeploymentType, LinkProtocol linkProtocol, RankId localRankId, RankId remoteRankId,
         IpAddress localAddr, IpAddress remoteAddr, u32 reuseIdx = 0)
@@ -47,7 +47,7 @@ public:
           remoteRankId_(remoteRankId),
           localAddr_(localAddr),
           remoteAddr_(remoteAddr),
-          reuseIdx_(reuseIdx){};
+          reuseIdx_(reuseIdx) {};
 
     explicit LinkData(const NetInstance::Path& path)
     {

@@ -42,15 +42,15 @@ struct LinkInfo {
     IpAddress remoteAddr;
 
     LinkInfo(RankId rId, u32 dId, IpAddress lAddr, IpAddress rAddr)
-        : rankId(rId), dieId(dId), localAddr(lAddr), remoteAddr(rAddr){};
+        : rankId(rId), dieId(dId), localAddr(lAddr), remoteAddr(rAddr) {};
 
     LinkInfo(const LinkData& linkdata)
         : rankId(linkdata.GetRemoteRankId()),
           dieId(linkdata.GetLocalDieId()),
           localAddr(linkdata.GetLocalAddr()),
-          remoteAddr(linkdata.GetRemoteAddr()){};
+          remoteAddr(linkdata.GetRemoteAddr()) {};
 
-    explicit LinkInfo() : rankId(0), dieId(0), localAddr(IpAddress("0.0.0.1")), remoteAddr(IpAddress("0.0.0.1")){};
+    explicit LinkInfo() : rankId(0), dieId(0), localAddr(IpAddress("0.0.0.1")), remoteAddr(IpAddress("0.0.0.1")) {};
 };
 
 class LinkGroup {

@@ -13,11 +13,11 @@
 
 namespace hccl {
 // HcclCommDfxLite构 函数实现
-HcclCommDfxLite::HcclCommDfxLite() {
-}
+HcclCommDfxLite::HcclCommDfxLite() {}
 
 // HcclCommDfxLite初始化流程 - 修改为返回HcclResult类型
-HcclResult HcclCommDfxLite::Init(u32 deviceId, const std::string& commTag, u32 rankSize) {
+HcclResult HcclCommDfxLite::Init(u32 deviceId, const std::string& commTag, u32 rankSize)
+{
     if (initializedFlag_) {
         return HCCL_SUCCESS;
     }
@@ -32,11 +32,13 @@ HcclResult HcclCommDfxLite::Init(u32 deviceId, const std::string& commTag, u32 r
     mirrorTaskManagerLite_->RegGetRemoteRankCallBack(getChannelRemoteRankId);
 
     // 2. 创建Profiling管理类
-    EXECEPTION_CATCH(profilingImpl_ = std::make_unique<HcclCommProfilingLite>(deviceId_, mirrorTaskManagerLite_.get()), return HCCL_E_PTR);
+    EXECEPTION_CATCH(
+        profilingImpl_ = std::make_unique<HcclCommProfilingLite>(deviceId_, mirrorTaskManagerLite_.get()),
+        return HCCL_E_PTR);
     CHK_RET(profilingImpl_->Init());
 
     // 3. 注册回调到单例
-    addTaskCallback_ = [this](u32 streamId, u32 taskId, const Hccl::TaskParam &taskParam, u64 handle) {
+    addTaskCallback_ = [this](u32 streamId, u32 taskId, const Hccl::TaskParam& taskParam, u64 handle) {
         return this->mirrorTaskManagerLite_->AddTaskInfo(streamId, taskId, taskParam, handle);
     };
 
@@ -49,30 +51,36 @@ HcclResult HcclCommDfxLite::Init(u32 deviceId, const std::string& commTag, u32 r
 HcclResult HcclCommDfxLite::SetCurrDfxOpInfo(std::shared_ptr<Hccl::DfxOpInfo> dfxOpInfo)
 {
     // 如果是a5老流程  还是从通信域里面取
-    if ((Hccl::ProfilingHandlerLite::GetInstance().GetProfL1State()
-        || Hccl::ProfilingHandlerLite::GetInstance().GetProfL0State() ) && !dfxOpInfo->isIndop_) {
-        Hccl::ProfilingHandlerLite::GetInstance().SetCachedGroupName(dfxOpInfo->groupName_.c_str(), dfxOpInfo->rankSize_);
+    if ((Hccl::ProfilingHandlerLite::GetInstance().GetProfL1State() ||
+         Hccl::ProfilingHandlerLite::GetInstance().GetProfL0State()) &&
+        !dfxOpInfo->isIndop_) {
+        Hccl::ProfilingHandlerLite::GetInstance().SetCachedGroupName(
+            dfxOpInfo->groupName_.c_str(), dfxOpInfo->rankSize_);
     }
     CHK_RET(mirrorTaskManagerLite_->SetCurrDfxOpInfo(std::move(dfxOpInfo)));
     return HCCL_SUCCESS;
 }
 
-HcclResult HcclCommDfxLite::ReportAllTasks() {
+HcclResult HcclCommDfxLite::ReportAllTasks()
+{
     profilingImpl_->ReportAllTasks();
     return HCCL_SUCCESS;
 }
 
-HcclResult HcclCommDfxLite::UpdateProfStat() {
+HcclResult HcclCommDfxLite::UpdateProfStat()
+{
     profilingImpl_->UpdateProfStat();
     return HCCL_SUCCESS;
 }
 
-void HcclCommDfxLite::AddChannelRemoteRankId(u64 handle, u32 remoteRankId) {
+void HcclCommDfxLite::AddChannelRemoteRankId(u64 handle, u32 remoteRankId)
+{
     HCCL_INFO("[%s] commTag[%s], handle[%lu], remoteRankId[%u]", __func__, commTag_.c_str(), handle, remoteRankId);
     channelRemoteRankIdLite_[handle] = remoteRankId;
 }
 
-u32 HcclCommDfxLite::GetChannelRemoteRankId(u64 handle) {
+u32 HcclCommDfxLite::GetChannelRemoteRankId(u64 handle)
+{
     if (handle == INVALID_U64) {
         return INVALID_UINT;
     }
@@ -84,7 +92,5 @@ u32 HcclCommDfxLite::GetChannelRemoteRankId(u64 handle) {
     return it->second;
 }
 
-Hccl::MirrorTaskManagerLite* HcclCommDfxLite::GetMirrorTaskManagerLite() const {
-    return mirrorTaskManagerLite_.get();
-}
-}
+Hccl::MirrorTaskManagerLite* HcclCommDfxLite::GetMirrorTaskManagerLite() const { return mirrorTaskManagerLite_.get(); }
+} // namespace hccl

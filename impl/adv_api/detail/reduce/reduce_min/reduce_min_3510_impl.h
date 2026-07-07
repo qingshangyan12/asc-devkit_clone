@@ -85,12 +85,14 @@ __aicore__ inline void ReduceMinRAB64ReuseSourceCompute(
     if ((srcShape[1] * sizeof(T)) % 32 == 0) {
         if (srcShape[1] * sizeof(T) <= GetVecLen() / 2) {
             ReduceRAConcatImpl<
-                T, Reg::RegTraitNumTwo, Reg::Min<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T, Reg::RegTraitNumTwo>>,
-                isReuseSource>(dstAddr, srcAddr, tmpAddr, srcShape[1], srcShape[0]);
+                T, Reg::RegTraitNumTwo,
+                Reg::Min<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T, Reg::RegTraitNumTwo>>, isReuseSource>(
+                dstAddr, srcAddr, tmpAddr, srcShape[1], srcShape[0]);
         } else {
             ReduceRAB64ReuseSource<
-                T, Reg::RegTraitNumTwo, Reg::Min<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T, Reg::RegTraitNumTwo>>,
-                isReuseSource>(dstAddr, srcAddr, tmpAddr, srcShape[1], srcShape[0]);
+                T, Reg::RegTraitNumTwo,
+                Reg::Min<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T, Reg::RegTraitNumTwo>>, isReuseSource>(
+                dstAddr, srcAddr, tmpAddr, srcShape[1], srcShape[0]);
         }
     } else {
         ReduceRAReuseSourceUnAlignedB64<

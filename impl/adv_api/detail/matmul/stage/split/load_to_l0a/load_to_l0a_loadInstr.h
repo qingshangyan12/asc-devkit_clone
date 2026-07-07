@@ -42,7 +42,7 @@ public:
     __aicore__ inline LoadToL0A(){};
     __aicore__ inline ~LoadToL0A(){};
 
-    __aicore__ inline void SetScalar(A_T scalar){};
+    __aicore__ inline void SetScalar(A_T scalar) {};
 
     __aicore__ inline void Prepare(bool isATranspose, uint16_t aL1K, uint16_t aL1M) const
     {

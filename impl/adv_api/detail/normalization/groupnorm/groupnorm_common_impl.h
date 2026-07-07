@@ -41,7 +41,7 @@ constexpr uint32_t GROUPNORM_ONE_BLK_SIZE = 8;
 
 template <typename T>
 struct GroupNormParams {
-    __aicore__ GroupNormParams(){};
+    __aicore__ GroupNormParams() {};
     LocalTensor<T> tempTensorA;
     LocalTensor<T> tempTensorB;
     LocalTensor<T> tempTensorC;

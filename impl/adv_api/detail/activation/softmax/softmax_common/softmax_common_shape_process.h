@@ -82,7 +82,7 @@ __aicore__ inline constexpr uint32_t CalculateNDSplitM(
     return splitM;
 }
 
-};     // namespace AscendC
+}; // namespace AscendC
 #endif // IMPL_ACTIVATION_SOFTMAX_SOFTMAX_COMMON_SHAPE_PROCESS_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAX_COMMON_SHAPE_PROCESS_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

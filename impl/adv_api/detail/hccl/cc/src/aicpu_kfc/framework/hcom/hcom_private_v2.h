@@ -37,8 +37,8 @@ HcclResult __attribute__((weak)) HcomReceiveV2(
     rtStream_t& stream);
 HcclResult __attribute__((weak)) HcomGetWorkspaceSubStreamNumV2(
     const char* group, u64& streamNum, u64 dataSize, HcclDataType dataType, HcclCMDType optype);
-HcclResult __attribute__((weak))
-HcomGetWorkspaceMemSizeV2(const std::string& opType, u64 count, HcclDataType dataType, const char* group, u64& memSize);
+HcclResult __attribute__((weak)) HcomGetWorkspaceMemSizeV2(
+    const std::string& opType, u64 count, HcclDataType dataType, const char* group, u64& memSize);
 HcclResult __attribute__((weak)) HcomSetWorkspaceResourceV2(
     const std::string& tag, const char* group, std::vector<rtStream_t> stream, void* memPtr, u64 maxSize);
 HcclResult __attribute__((weak)) HcomGetRankIdV2(const char* group, u32* rankId);
@@ -72,10 +72,10 @@ HcclResult __attribute__((weak)) HcomCreateCommCclBufV2(const char* group);
 HcclResult __attribute__((weak)) HcomGetInCclBufV2(const char* group, void*& commInputPtr, u64& commInputSize);
 HcclResult __attribute__((weak)) HcomGetOutCclBufV2(const char* group, void*& commOutputPtr, u64& commOutputSize);
 HcclResult __attribute__((weak)) HcomGraphCreateCommCclBufV2(const int64_t& hcomComm);
-HcclResult __attribute__((weak))
-HcomGraphGetInCclBufV2(const int64_t& hcomComm, void*& commInputPtr, u64& commInputSize);
-HcclResult __attribute__((weak))
-HcomGraphGetOutCclBufV2(const int64_t& hcomComm, void*& commOutputPtr, u64& commOutputSize);
+HcclResult __attribute__((weak)) HcomGraphGetInCclBufV2(
+    const int64_t& hcomComm, void*& commInputPtr, u64& commInputSize);
+HcclResult __attribute__((weak)) HcomGraphGetOutCclBufV2(
+    const int64_t& hcomComm, void*& commOutputPtr, u64& commOutputSize);
 HcclResult __attribute__((weak)) HcclCommGraphGetRankIdV2(s64 opBaseHcom, u32* rankId);
 HcclResult __attribute__((weak)) HcclCommGraphGetRankSizeV2(s64 opBaseHcom, u32* rankSize);
 HcclResult __attribute__((weak)) HcclCommGraphAllGatherV2(
@@ -100,8 +100,8 @@ HcclResult __attribute__((weak)) HcomGraphBroadcastV2(
     const char* tag, void* ptr, u64 count, HcclDataType dataType, u32 root, s64 opBaseHcom, rtStream_t stream);
 
 HcclResult __attribute__((weak)) HcomGetIndirectInCclBufV2(const char* group, void*& commInputPtr, u64& commInputSize);
-HcclResult __attribute__((weak))
-HcomGetIndirectOutCclBufV2(const char* group, void*& commOutputPtr, u64& commOutputSize);
+HcclResult __attribute__((weak)) HcomGetIndirectOutCclBufV2(
+    const char* group, void*& commOutputPtr, u64& commOutputSize);
 
 HcclResult __attribute__((weak)) HcomGetDevTypeV2(DevType& devType);
 HcclResult __attribute__((weak)) HcomGetInitStatusV2(bool& initiated);
@@ -124,8 +124,8 @@ HcclResult __attribute__((weak)) HcomResetQosCfgV2();
 HcclResult __attribute__((weak)) HcclCommSetQosCfgV2();
 HcclResult __attribute__((weak)) HcomGetL0TopoTypeExV2(const char* group, CommTopo* topoType, uint32_t flag);
 HcclResult __attribute__((weak)) HcomGetRankSizeExV2(const char* group, uint32_t* rankSize, uint32_t flag);
-HcclResult __attribute__((weak))
-HcomMc2AiCpuStreamAllocAndGetV2(const char* group, u32 streamMode, rtStream_t* aiCpuStream);
+HcclResult __attribute__((weak)) HcomMc2AiCpuStreamAllocAndGetV2(
+    const char* group, u32 streamMode, rtStream_t* aiCpuStream);
 HcclResult __attribute__((weak)) HcomSetAivClearEnableV2(const char* group, bool aivClearEnable);
 HcclResult __attribute__((weak)) HcomCalcNumBlocksV2(
     const char* group, HcclCMDType opType, u64 count, HcclDataType dataType, int32_t aivCoreLimit, std::string& algName,

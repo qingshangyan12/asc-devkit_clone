@@ -27,7 +27,7 @@
 namespace AscendC {
 template <typename T>
 struct ConfusionTranspose012Params {
-    __aicore__ ConfusionTranspose012Params(){};
+    __aicore__ ConfusionTranspose012Params() {};
 
     int32_t i;
     int32_t j;
