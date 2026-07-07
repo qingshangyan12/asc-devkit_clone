@@ -12,32 +12,34 @@
 #include "mirror_task_manager_lite.h"
 
 namespace hccl {
-// 构� 函数
+// 构造函数
 HcclCommProfilingLite::HcclCommProfilingLite(Hccl::DevId deviceId, Hccl::MirrorTaskManagerLite* mirrorTaskManagerLite)
-    : mirrorTaskManagerLite_(mirrorTaskManagerLite) { (void)deviceId; }
-
-HcclResult HcclCommProfilingLite::Init() {
-    if (initializedFlag_) {
-        return HCCL_SUCCESS;
-    }
-    CHK_RET(Hccl::ProfilingHandlerLite::GetInstance().Init());
+{
+    // 获取deviceID
+    mirrorTaskManagerLite_ = std::unique_ptr<Hccl::MirrorTaskManagerLite>(mirrorTaskManagerLite);
     profilingReporterLite_ = std::make_unique<Hccl::ProfilingReporterLite>(
-        mirrorTaskManagerLite_, &Hccl::ProfilingHandlerLite::GetInstance(), true);
-    CHK_RET(profilingReporterLite_->Init());
-    initializedFlag_ = true;
-    return HCCL_SUCCESS;
+        mirrorTaskManagerLite_.get(), &Hccl::ProfilingHandlerLite::GetInstance(), true);
 }
 
 // HcclCommProfilingLite任务上报
-void HcclCommProfilingLite::ReportAllTasks() {
-    profilingReporterLite_->ReportAllTasks();
+void HcclCommProfilingLite::ReportAllTasks()
+{
+    if (profilingReporterLite_) {
+        profilingReporterLite_->ReportAllTasks();
+    }
 }
 
-void HcclCommProfilingLite::UpdateProfStat() {
-    profilingReporterLite_->UpdateProfStat();
+// HcclCommProfilingLite::UpdateProfStat实现
+void HcclCommProfilingLite::UpdateProfStat()
+{
+    if (profilingReporterLite_) {
+        profilingReporterLite_->UpdateProfStat();
+    }
 }
 
-Hccl::MirrorTaskManagerLite* HcclCommProfilingLite::GetMirrorTaskManagerLite() const {
-    return mirrorTaskManagerLite_;
+Hccl::MirrorTaskManagerLite* HcclCommProfilingLite::GetMirrorTaskManagerLite() const
+{
+    return mirrorTaskManagerLite_.get();
 }
-}
+
+} // namespace hccl

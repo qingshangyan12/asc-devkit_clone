@@ -11,8 +11,12 @@
 
 namespace Hccl {
 
-MirrorTaskManagerLite::MirrorTaskManagerLite()
+MirrorTaskManagerLite::MirrorTaskManagerLite() {}
+
+void MirrorTaskManagerLite::RegFullyCallBack(std::function<void(const std::string&, u32)> callBack)
 {
+    fullyNewCallBack_ = callBack;
+    return;
 }
 
 void MirrorTaskManagerLite::RegFullyCallBack(std::function<void()> callBack)
@@ -21,106 +25,85 @@ void MirrorTaskManagerLite::RegFullyCallBack(std::function<void()> callBack)
     return;
 }
 
-void MirrorTaskManagerLite::RegGetRemoteRankCallBack(std::function<u32(u64)> callBack)
-{
-    getRemoteRankCallback_ = callBack;
-    return;
-}
-
-HcclResult MirrorTaskManagerLite::AddTaskInfo(u32 streamId, u32 taskId, const Hccl::TaskParam &taskParam, u64 handle)
-{
-    auto it = streamQueues_.find(streamId);
-    if (UNLIKELY(it == streamQueues_.end())) {
-        auto cq = std::make_unique<CircularQueue<std::unique_ptr<TaskInfo>>>(MAX_AICPU_CIRCULAR_QUEUE_LENGTH);
-        auto entry = StreamQueueEntry{std::move(cq), MAX_AICPU_CIRCULAR_QUEUE_LENGTH, 0};
-        it = streamQueues_.emplace(streamId, std::move(entry)).first;
-    }
-
-    auto &entry = it->second;
-    if (UNLIKELY(entry.taskNum == entry.capacity)) {
-        fullyCallBack_();
-        entry.taskNum = 0;
-    }
-
-    auto& taskInfo = entry.queue->GetAndUpdate();
-    if (taskInfo == nullptr) {
-        taskInfo = std::make_unique<Hccl::TaskInfo>(
-            streamId, taskId, INVALID_U32, taskParam, currDfxOpInfo_, taskParam.isMaster);
-    } else {
-        taskInfo->streamId_ = streamId;
-        taskInfo->taskId_ = taskId;
-        taskInfo->taskParam_ = taskParam;
-        taskInfo->dfxOpInfo_ = currDfxOpInfo_;
-        taskInfo->remoteRank_ = INVALID_U32;
-        taskInfo->isMaster_ = taskParam.isMaster;
-    }
-
-    taskInfo->channelHandle_ = handle;
-    taskInfo->getRemoteRankByHandle_ = getRemoteRankCallback_;
-    entry.taskNum++;
-    return HCCL_SUCCESS;
-}
-
-void MirrorTaskManagerLite::AddTaskInfo(std::unique_ptr<TaskInfo> &&taskInfo)
+void MirrorTaskManagerLite::AddTaskInfo(std::shared_ptr<TaskInfo> taskInfo)
 {
     if (UNLIKELY(taskInfo == nullptr)) {
-        THROW<InternalException>(
-            StringFormat("MirrorTaskManagerLite::AddTaskInfo taskInfo is nullptr"));
+        THROW<InternalException>(StringFormat("MirrorTaskManagerLite::AddTaskInfo taskInfo is nullptr"));
     }
 
-    auto it = streamQueues_.find(taskInfo->streamId_);
-    if (UNLIKELY(it == streamQueues_.end())) {
-        auto cq = std::make_unique<CircularQueue<std::unique_ptr<TaskInfo>>>(MAX_AICPU_CIRCULAR_QUEUE_LENGTH);
-        auto entry = StreamQueueEntry{std::move(cq), MAX_AICPU_CIRCULAR_QUEUE_LENGTH, 0};
-        it = streamQueues_.emplace(taskInfo->streamId_, std::move(entry)).first;
+    if (taskInfo->dfxOpInfo_ == nullptr) {
+        taskInfo->dfxOpInfo_ = currDfxOpInfo_;
     }
 
-    auto &entry = it->second;
-    if (UNLIKELY(entry.taskNum == entry.capacity)) {
+    if (queueMap_.find(taskInfo->streamId_) == queueMap_.end()) {
+        queueMap_[taskInfo->streamId_] =
+            std::make_unique<CircularQueue<std::shared_ptr<TaskInfo>>>(MAX_CIRCULAR_QUEUE_LENGTH);
+        queueTaskNum[taskInfo->streamId_] = 0;
+    }
+
+    if (queueTaskNum[taskInfo->streamId_] == static_cast<u32>(queueMap_[taskInfo->streamId_]->Capacity())) {
         fullyCallBack_();
-        entry.taskNum = 0;
+        queueTaskNum[taskInfo->streamId_] = 0;
     }
 
-    entry.queue->Append(std::move(taskInfo));
-    entry.taskNum++;
+    queueMap_[taskInfo->streamId_]->Append(taskInfo);
+    queueTaskNum[taskInfo->streamId_]++;
+
+    HCCL_INFO(
+        "[MirrorTaskManagerLite][AddTaskInfo]add streamId(sqId)[%u] taskId(sqeId)[%u] queueMapsize[%llu]",
+        taskInfo->streamId_, taskInfo->taskId_, static_cast<unsigned long long>(queueMap_.size()));
+
     return;
 }
 
-HcclResult MirrorTaskManagerLite::SetCurrDfxOpInfo(std::shared_ptr<DfxOpInfo> dfxOpInfo)
+bool MirrorTaskManagerLite::IsStaticGraphMode(const CollOperator& collOperator) const
 {
-    CHK_PTR_NULL(dfxOpInfo);
-    currDfxOpInfo_ = std::move(dfxOpInfo);
-    return HCCL_SUCCESS;
+    return (collOperator.staticAddr == false) && (collOperator.staticShape == false);
+}
+
+void MirrorTaskManagerLite::SetCurrDfxOpInfo(std::shared_ptr<DfxOpInfo> dfxOpInfo)
+{
+    if (dfxOpInfo == nullptr) {
+        HCCL_ERROR("[MirrorTaskManagerLite][SetCurrDfxOpInfo]fail, dfxOpInfo is nullptr");
+        return;
+    }
+    currDfxOpInfo_ = dfxOpInfo;
+    isStaticGraphMode_ = IsStaticGraphMode(dfxOpInfo->op_);
+    opMode_ = dfxOpInfo->op_.opMode;
+    HCCL_INFO(
+        "[MirrorTaskManagerLite][SetCurrDfxOpInfo] Succeed, currDfxOpInfo_[%p], this[%p] !", currDfxOpInfo_.get(),
+        this);
+    return;
 }
 
 std::shared_ptr<DfxOpInfo> MirrorTaskManagerLite::GetCurrDfxOpInfo() const
 {
+    HCCL_INFO(
+        "[MirrorTaskManagerLite][GetCurrDfxOpInfo] Succeed, currDfxOpInfo_[%p], this[%p] !", currDfxOpInfo_.get(),
+        this);
     return currDfxOpInfo_;
 }
 
-TaskInfoQueue *MirrorTaskManagerLite::GetQueue(u32 streamId) const
+TaskInfoQueue* MirrorTaskManagerLite::GetQueue(u32 streamId) const
 {
-    auto it = streamQueues_.find(streamId);
-    if (it == streamQueues_.end()) {
-        HCCL_ERROR("MirrorTaskManagerLite::GetQueue streamId(sqId)[%u] out of range", streamId);
-        return nullptr;
+    if (queueMap_.find(streamId) == queueMap_.end()) {
+        THROW<InternalException>(
+            StringFormat("MirrorTaskManagerLite::GetQueue streamId(sqId)[%u] out of range", streamId));
     }
-    return it->second.queue.get();
+    return queueMap_.find(streamId)->second.get();
 }
 
-TaskInfo* MirrorTaskManagerLite::GetTaskInfo(u32 streamId, u32 taskId) const
+std::shared_ptr<TaskInfo> MirrorTaskManagerLite::GetTaskInfo(u32 streamId, u32 taskId) const
 {
-    TaskInfoQueue *queue = nullptr;
+    TaskInfoQueue* queue = nullptr;
     try {
         queue = GetQueue(streamId);
-    } catch (HcclException &e) {
+    } catch (HcclException& e) {
         HCCL_ERROR("Hccl exception %s was caught.", e.what());
         return nullptr;
     }
 
-    auto FindTask = [taskId](const std::unique_ptr<TaskInfo> &taskInfo) {
-        return taskInfo->taskId_ == taskId;
-    };
+    auto FindTask = [taskId](const std::shared_ptr<TaskInfo>& taskInfo) { return taskInfo->taskId_ == taskId; };
 
     auto task = *queue->Find(FindTask);
     if (task == *queue->End()) {
@@ -129,21 +112,13 @@ TaskInfo* MirrorTaskManagerLite::GetTaskInfo(u32 streamId, u32 taskId) const
 
     HCCL_INFO("[MirrorTaskManagerLite][GetTaskInfo]find streamdId(sqId)[%u] taskId(sqeId)[%u]", streamId, taskId);
 
-    return (*task).get();
+    return *task;
 }
 
-std::unordered_map<u32, StreamQueueEntry>::iterator MirrorTaskManagerLite::Begin()
-{
-    return streamQueues_.begin();
-}
+TaskInfoQueueMap::iterator MirrorTaskManagerLite::Begin() { return queueMap_.begin(); }
 
-std::unordered_map<u32, StreamQueueEntry>::iterator MirrorTaskManagerLite::End()
-{
-    return streamQueues_.end();
-}
+TaskInfoQueueMap::iterator MirrorTaskManagerLite::End() { return queueMap_.end(); }
 
-MirrorTaskManagerLite::~MirrorTaskManagerLite()
-{
-}
+MirrorTaskManagerLite::~MirrorTaskManagerLite() {}
 
 } // namespace Hccl

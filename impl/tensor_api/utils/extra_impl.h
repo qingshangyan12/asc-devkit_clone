@@ -31,7 +31,6 @@
 #include "utils/std/utility.h"
 #include "utils/std/algorithm.h"
 #include "utils/std/cmath.h"
-#include "int_impl.h"
 
 namespace AscendC {
 namespace Te {

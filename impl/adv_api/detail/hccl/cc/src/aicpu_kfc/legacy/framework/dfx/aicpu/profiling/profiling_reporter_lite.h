@@ -16,19 +16,17 @@
 namespace Hccl {
 class ProfilingReporterLite {
 public:
-    explicit ProfilingReporterLite(MirrorTaskManagerLite *mirrorTaskMgrLite, ProfilingHandlerLite *profilingHandlerLite, bool isIndop = false);
+    explicit ProfilingReporterLite(
+        MirrorTaskManagerLite* mirrorTaskMgrLite, ProfilingHandlerLite* profilingHandlerLite, bool isIndop = false);
     virtual ~ProfilingReporterLite();
-    HcclResult Init();
+    void Init() const;
     void ReportAllTasks();
     void UpdateProfStat() const;
 
 private:
-    void ReportAllTasksLog();
-    void UpdateAllLastPos();
-    MirrorTaskManagerLite                                                         *mirrorTaskMgrLite_{nullptr};
-    ProfilingHandlerLite                                                      *profilingHandlerLite_{nullptr};
-    std::map<u32, std::shared_ptr<Queue<std::unique_ptr<TaskInfo>>::Iterator>> lastPoses_{};
-    bool initializedFlag_{false};
+    MirrorTaskManagerLite* mirrorTaskMgrLite_{nullptr};
+    ProfilingHandlerLite* profilingHandlerLite_{nullptr};
+    std::map<u32, std::shared_ptr<Queue<std::shared_ptr<TaskInfo>>::Iterator>> lastPoses_{};
 };
 } // namespace Hccl
 
