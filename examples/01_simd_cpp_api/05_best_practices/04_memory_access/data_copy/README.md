@@ -441,14 +441,15 @@ for (uint32_t mBlockIdx = 0; mBlockIdx < fullMBlockCount; mBlockIdx++) {
 
 - 性能采集
 
-  使用 `msOpProf` 工具获取详细性能数据：
+    通过上板性能采集，可以直接测定算子昇腾AI处理器上的运行时间。该方式适合在板环境中快速定位算子性能问题。
 
-```bash
-msopprof ./demo   # 分析性能
-```
+    基于可执行文件demo通过msprof op执行算子调优：
+    ```
+    msprof op ./demo
+    ```
 
     - 性能数据说明  
-      命令完成后，会在默认目录下生成以"OPPROF_{timestamp}_XXX"命名的文件夹,性能数据文件夹结构示例如下：
+      命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
 
       ```bash
       ├──dump                       # 原始的性能数据，用户无需关注
@@ -459,7 +460,7 @@ msopprof ./demo   # 分析性能
       ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
       ├──OpBasicInfo.csv            # 算子基础信息
       ├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
-      ├──ResourceConflictRatio.csv  # UB上的 bank group、bank conflict和资源冲突率在所有指令中的占比
+      ├──ResourceConflictRatio.csv  # UB上的bank group、bank conflict和资源冲突率在所有指令中的占比
       └──visualize_data.bin         # MindStudio Insight呈现文件
       ```
 
