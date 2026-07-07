@@ -12,9 +12,9 @@
 
 ```text
 ├── matrix_transpose_practice
-│   ├── figures                          // README中的图片资源
-│   ├── CMakeLists.txt                   // 编译工程文件
-│   ├── matrix_transpose.asc    // SIMT矩阵转置优化路径实现
+│   ├── figures                     // README中的图片资源
+│   ├── CMakeLists.txt              // 编译工程文件
+│   ├── matrix_transpose.asc        // SIMT矩阵转置优化路径实现
 │   └── README.md
 ```
 
@@ -431,9 +431,7 @@ for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x)
 msprof op ./build/matrix_transpose
 ```
 
-命令执行完成后，会在输出目录生成以`OPPROF_{timestamp}_XXX`命名的文件夹，其中`OpBasicInfo.csv`的`Task Duration(μs)`列即为本README性能表所采用的口径。
-
-性能数据文件夹结构示例如下：
+命令执行完成后，会在输出目录生成以`OPPROF_{timestamp}_XXX`命名的文件夹，性能数据文件夹结构示例如下：
 
 ```text
 ├── dump                       // 原始性能数据
