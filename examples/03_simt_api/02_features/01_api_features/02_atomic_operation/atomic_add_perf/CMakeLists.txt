@@ -16,9 +16,10 @@ project(atomic_add_perf LANGUAGES ASC CXX)
 
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU ARCH, e.g. dav-3510")
 set(SCENARIO_NUM "1" CACHE STRING "Scenario number (1-6)")
-set(BLOCK_NUM "8" CACHE STRING "Number of SIMT thread blocks")
+set(BLOCK_NUM "48" CACHE STRING "Number of SIMT thread blocks")
 set(THREADS_PER_BLOCK "64" CACHE STRING "Number of SIMT threads per block")
 set(ITERATIONS "256" CACHE STRING "Atomic add iterations per thread")
+set(SLOTS "1024" CACHE STRING "Counter slots per block; SLOTS < THREADS_PER_BLOCK creates intra-block contention")
 option(SKIP_VALIDATION "Skip result validation for replay-based profiling tools" OFF)
 
 if(NOT SCENARIO_NUM MATCHES "^[1-6]$")
@@ -34,6 +35,7 @@ target_compile_definitions(atomic_add_perf PRIVATE
     BLOCK_NUM=${BLOCK_NUM}
     THREADS_PER_BLOCK=${THREADS_PER_BLOCK}
     ITERATIONS=${ITERATIONS}
+    SLOTS=${SLOTS}
     SKIP_VALIDATION=$<BOOL:${SKIP_VALIDATION}>
 )
 
