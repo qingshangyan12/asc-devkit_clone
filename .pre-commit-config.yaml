@@ -14,7 +14,7 @@ repos:
       - id: trailing-whitespace
         exclude: \.md$
       - id: end-of-file-fixer
-        exclude: (\.md$|^tests/tools/utils/opbuild/(op_proto\.cc\.txt|op_proto_separate/.*_proto\.cpp\.txt)$)
+        exclude: \.md$
       - id: check-yaml
         args: ["--allow-multiple-documents"]
       - id: check-added-large-files
