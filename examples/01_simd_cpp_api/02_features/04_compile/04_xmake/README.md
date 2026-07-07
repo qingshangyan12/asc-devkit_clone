@@ -43,7 +43,7 @@
 
 - 配置环境变量
 
-  请确保当前环境已安装xmake，且xmake可使用`ascendc` toolchain。请根据当前环境上CANN开发套件包的安装方式配置环境变量，确保xmake可以通过`ASCEND_HOME_PATH`或`ASCEND_TOOLKIT_HOME`找到CANN SDK。
+  请确保当前环境已安装xmake（版本要求 >= 3.0.9），且xmake可使用`ascendc` toolchain。请根据当前环境上CANN开发套件包的安装方式配置环境变量，确保xmake可以通过`ASCEND_HOME_PATH`或`ASCEND_TOOLKIT_HOME`找到CANN SDK。
 
   默认路径，root用户安装CANN软件包时，可执行：
 
