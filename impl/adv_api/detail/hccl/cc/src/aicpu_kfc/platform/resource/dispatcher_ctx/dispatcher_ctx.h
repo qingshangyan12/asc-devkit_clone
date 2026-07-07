@@ -29,7 +29,7 @@ enum class CtxDispatcherType {
 class DispatcherCtx {
 public:
     explicit DispatcherCtx(u32 devicePhyId, u32 timeOut = INVALID_UINT)
-        : devicePhyId_(devicePhyId), waitTimeOut_(timeOut){};
+        : devicePhyId_(devicePhyId), waitTimeOut_(timeOut) {};
     ~DispatcherCtx() { Destroy(); };
     HcclResult Init();
     HcclResult Destroy();

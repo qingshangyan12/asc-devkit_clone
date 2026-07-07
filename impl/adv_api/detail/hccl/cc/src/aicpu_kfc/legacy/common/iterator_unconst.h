@@ -21,10 +21,10 @@ class BaseIterator<Sequence, T, typename enable_if<IsSharedPtr<T>::value || IsUn
 public:
     using V = typename T::element_type;
 
-    BaseIterator() : iter(nullptr), end(nullptr){};
+    BaseIterator() : iter(nullptr), end(nullptr) {};
 
-    explicit BaseIterator(Sequence<T>& seq) : iter(seq.begin()), end(seq.end()){};
-    virtual ~BaseIterator(){};
+    explicit BaseIterator(Sequence<T>& seq) : iter(seq.begin()), end(seq.end()) {};
+    virtual ~BaseIterator() {};
 
     virtual V& operator*() { return *(*iter); };
 

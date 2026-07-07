@@ -13,8 +13,8 @@
 extern "C" {
 #endif
 HcclResult __attribute__((weak)) HcomDestroyV2(void);
-HcclResult __attribute__((weak))
-HcomCreateGroupImplV2(const std::string& group, u32 rankNum, const std::vector<u32>& rankIds);
+HcclResult __attribute__((weak)) HcomCreateGroupImplV2(
+    const std::string& group, u32 rankNum, const std::vector<u32>& rankIds);
 HcclResult __attribute__((weak)) HcomDestroyGroupImplV2(const std::string& group);
 HcclResult __attribute__((weak)) HcomGetWorldRankFromGroupRankV2(const char* group, u32 groupRank, u32* worldRank);
 HcclResult __attribute__((weak)) HcomGetGroupRankFromWorldRankV2(u32 worldRank, const char* group, u32* groupRank);

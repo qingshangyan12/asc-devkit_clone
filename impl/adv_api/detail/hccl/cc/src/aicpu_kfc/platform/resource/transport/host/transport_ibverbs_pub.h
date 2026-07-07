@@ -88,15 +88,15 @@ using WqeInfo = struct TagWqeInfo {
 struct CombineQpHandle {
     QpHandle qpHandle = nullptr;
     u32 preWrOpcode = INVALID_UINT; // 记录这个qp内最后一次下发的wr的opcode
-    CombineQpHandle(){};
-    CombineQpHandle(QpHandle& qpHandle) : qpHandle(qpHandle){};
+    CombineQpHandle() {};
+    CombineQpHandle(QpHandle& qpHandle) : qpHandle(qpHandle) {};
 };
 
 struct CombineQpInfo {
     struct AiQpInfo aiQpInfo {};
     u32 preWrOpcode = INVALID_UINT; // 记录这个qp内最后一次下发的wr的opcode
-    CombineQpInfo(){};
-    CombineQpInfo(struct AiQpInfo& aiQpInfo) : aiQpInfo(aiQpInfo){};
+    CombineQpInfo() {};
+    CombineQpInfo(struct AiQpInfo& aiQpInfo) : aiQpInfo(aiQpInfo) {};
 };
 
 namespace {
@@ -257,8 +257,7 @@ protected:
     HcclResult CreateSingleQp(s32 qpMode);                      // 两个rank之间仅创建一个QP
     HcclResult CreateMultiQp(s32 qpMode, u32 qpsPerConnection); // 两个rank之间创建多QP
     HcclResult ConnectSingleQp(std::function<bool()> needStop = []() { return false; });
-    HcclResult ConnectMultiQp(
-        u32 qpsPerConnection, std::function<bool()> needStop = []() { return false; });
+    HcclResult ConnectMultiQp(u32 qpsPerConnection, std::function<bool()> needStop = []() { return false; });
     HcclResult ConnectQp();
     HcclResult InitQpConnect();
     HcclResult GetQpAttr();

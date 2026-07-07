@@ -36,8 +36,7 @@ private:
     HcclResult EnableP2P(uint32_t remoteDevicePhysicID);
     HcclResult DisableAllP2P();
     HcclResult DisableP2P(uint32_t localDeviceLogicID, uint32_t remoteDevicePhysicID);
-    HcclResult WaitP2PEnabled(
-        uint32_t remoteDevicePhysicID, std::function<bool()> needStop = []() { return false; });
+    HcclResult WaitP2PEnabled(uint32_t remoteDevicePhysicID, std::function<bool()> needStop = []() { return false; });
 
     HcclResult CheckP2P(uint32_t remoteDevicePhysicID, bool& enabled);
     HcclResult WaitP2PConnected(

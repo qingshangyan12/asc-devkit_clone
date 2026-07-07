@@ -26,8 +26,8 @@ constexpr unsigned int MIN_VALUE_DEVICEPORT = 1;
 constexpr unsigned int MAX_LEVEL_lIST = 8;
 class NewRankInfo {
 public:
-    NewRankInfo(){};
-    ~NewRankInfo(){};
+    NewRankInfo() {};
+    ~NewRankInfo() {};
 
     u32 rankId{0};
     u32 deviceId{0};

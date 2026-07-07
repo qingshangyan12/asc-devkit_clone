@@ -63,8 +63,9 @@ void PrintMc2CcTiling(const Mc2CcTilingInner& tiling)
 
 uint32_t SetDevType(Mc2InitTilingInner* tilingInner)
 {
-    const char *homePath = std::getenv("ASCEND_HOME_PATH");
-    ASCENDC_HOST_ASSERT((homePath != nullptr && homePath[0] != '\0'), return EXIT_FAILURE, "ASCEND_HOME_PATH is not set or empty.");
+    const char* homePath = std::getenv("ASCEND_HOME_PATH");
+    ASCENDC_HOST_ASSERT(
+        (homePath != nullptr && homePath[0] != '\0'), return EXIT_FAILURE, "ASCEND_HOME_PATH is not set or empty.");
     std::string pathName(homePath);
     pathName += "/lib64/";
     auto getSocVerFunc =
@@ -240,7 +241,6 @@ uint32_t Mc2CcTilingConfig::SetReduceType(uint32_t reduceType, uint8_t dstDataTy
     impl_.dstDataType_ = dstDataType;
     return EXIT_SUCCESS;
 }
-
 
 uint32_t Mc2CcTilingConfig::SetStepSize(uint8_t stepSize)
 {

@@ -32,7 +32,7 @@ MAKE_ENUM(
 
 class Primitive {
 public:
-    explicit Primitive(PrimType type) : type(type){};
+    explicit Primitive(PrimType type) : type(type) {};
 
     virtual ~Primitive() = default;
 

@@ -756,7 +756,7 @@ HcclResult OpUnfoldCacheEntry::UpdateRefreshAddrInfoForAlltoallv(
             // 刷新memcpy / cache-memcpy placeholder SQE后, 校验src/dst地址字段对应的memType
             CHK_RET(CheckMemTypeForAlltoallv(sqePtr, sqeType, srcRefreshAddrInfo, dstRefreshAddrInfo));
         } // sqeIdx
-    }     // arrayIdx
+    } // arrayIdx
 
     return HCCL_SUCCESS;
 }

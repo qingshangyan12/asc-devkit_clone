@@ -37,7 +37,7 @@ public:
         const LocalTensor<T>& output, const LocalTensor<float>& outputRstd, const LocalTensor<float>& inputMean,
         const LocalTensor<float>& inputVariance, const LocalTensor<T>& inputX, const LocalTensor<U>& gamma,
         const LocalTensor<U>& beta, const LocalTensor<uint8_t>& sharedTmpBuffer, const float epsilon,
-        const NormalizePara& para){};
+        const NormalizePara& para) {};
 };
 
 } // namespace HighLevelApiCheck

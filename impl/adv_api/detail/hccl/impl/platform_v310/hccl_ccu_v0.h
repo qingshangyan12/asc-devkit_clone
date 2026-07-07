@@ -130,8 +130,7 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::InitInner(
     GM_ADDR context, HcclTilingVersion version)
 {
-    ASCENDC_HCCL_API_ASSERT(
-        context != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
+    ASCENDC_HCCL_API_ASSERT(context != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
     hcclContext_ = (__gm__ HcclCombineOpParam*)context;
     // ensure hcclMsgArea 512B aligned
     uint64_t msgAddr = hcclContext_->workSpace;

@@ -111,7 +111,7 @@ public:
 
     inline ConnectProtoType GetProto() const { return proto_; };
 
-    explicit BasePortType(PortDeploymentType type) : type_(type){};
+    explicit BasePortType(PortDeploymentType type) : type_(type) {};
 
     bool operator==(const BasePortType& rhs) const { return type_ == rhs.type_ && proto_ == rhs.proto_; }
 
@@ -126,7 +126,7 @@ public:
         return proto_ < rhs.proto_;
     }
 
-    BasePortType(PortDeploymentType type, ConnectProtoType proto) : type_(type), proto_(proto){};
+    BasePortType(PortDeploymentType type, ConnectProtoType proto) : type_(type), proto_(proto) {};
 
     string Describe() const
     {

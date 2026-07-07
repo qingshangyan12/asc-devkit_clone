@@ -89,7 +89,7 @@ struct CounterStat {
     bool isNeedDetect = false;
     bool isFirst = true;
     std::uint64_t couterPrintInter = STUCK_COUNT;
-    CounterStat(){};
+    CounterStat() {};
 };
 
 enum class InconsistentType {

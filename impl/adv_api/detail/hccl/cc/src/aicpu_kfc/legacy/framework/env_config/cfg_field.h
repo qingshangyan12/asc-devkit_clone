@@ -35,7 +35,7 @@ public:
           cast(cast),
           validate(validate),
           postProc(postProc),
-          isParsed(false){};
+          isParsed(false) {};
 
     void Parse()
     {

@@ -196,7 +196,7 @@ __aicore__ inline void ReduceSumLastNZImpl(
     }
 }
 
-};     // namespace AscendC
+}; // namespace AscendC
 #endif // IMPL_ACTIVATION_SOFTMAX_SOFTMAX_COMMON_NZ_REDUCE_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAX_COMMON_NZ_REDUCE_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

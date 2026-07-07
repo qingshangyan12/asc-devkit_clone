@@ -78,7 +78,7 @@ public:
             MATMUL_MODULE(BiasScheduler)->End();
             MATMUL_MODULE(CubeOutBuffer)->Destroy();
             if constexpr (
-                ((IsSameTypeV<SrcT, int8_t> || IsSameTypeV<SrcT, int4b_t>)&&IsSameTypeV<DstT, half>) ||
+                ((IsSameTypeV<SrcT, int8_t> || IsSameTypeV<SrcT, int4b_t>) && IsSameTypeV<DstT, half>) ||
                 (IsSameTypeV<SrcT, int8_t> && (IsSameTypeV<DstT, int8_t> || IsSameTypeV<DstT, uint8_t>))) {
                 MATMUL_MODULE(MatmulQuantProcessor)->Destroy();
             }

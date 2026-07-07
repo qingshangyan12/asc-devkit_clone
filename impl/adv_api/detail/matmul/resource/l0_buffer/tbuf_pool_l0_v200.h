@@ -40,8 +40,8 @@ class TBufPoolL0<
         MatmulFeatureTrait<MM_CFG>::IsNeedUB() &&
         (DoMatmulMDL(MM_CFG) || isNormEnableScheduler<A_TYPE, MM_CFG> || IsBmmEnableScheduler<A_TYPE, MM_CFG> ||
          DoMatmulSpecialMDL(MM_CFG) || IsBasicBlockEnable<MM_CFG> || DoMatmulIBShareNorm(MM_CFG) ||
-         IsIntrablock<MM_CFG>)&&!IsA2B2Shared(MM_CFG) &&
-        !IsL0Cache<A_TYPE, MM_CFG>()>> : public TBufPoolL0Base<IMPL, A_TYPE, B_TYPE, MM_CFG> {
+         IsIntrablock<MM_CFG>) &&
+        !IsA2B2Shared(MM_CFG) && !IsL0Cache<A_TYPE, MM_CFG>()>> : public TBufPoolL0Base<IMPL, A_TYPE, B_TYPE, MM_CFG> {
 public:
     using BASE_MODULE = AscendC::Impl::Detail::TBufPoolL0Base<IMPL, A_TYPE, B_TYPE, MM_CFG>;
     __aicore__ inline TBufPoolL0() {}

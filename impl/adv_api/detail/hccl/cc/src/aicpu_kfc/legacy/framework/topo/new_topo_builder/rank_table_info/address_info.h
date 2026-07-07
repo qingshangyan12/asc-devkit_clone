@@ -29,8 +29,8 @@ constexpr unsigned int MAX_VALUE_ADDR_LENGRH = 256;
 
 class AddressInfo {
 public:
-    AddressInfo(){};
-    ~AddressInfo(){};
+    AddressInfo() {};
+    ~AddressInfo() {};
 
     IpAddress addr;
     AddrType addrType;

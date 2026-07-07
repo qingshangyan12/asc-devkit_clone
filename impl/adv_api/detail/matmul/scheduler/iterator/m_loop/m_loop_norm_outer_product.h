@@ -37,9 +37,9 @@ namespace Detail {
 template <typename IMPL, class A_TYPE, const auto& MM_CFG>
 class MLoop<
     IMPL, A_TYPE, MM_CFG,
-    enable_if_t<(isNormEnableScheduler<A_TYPE, MM_CFG> ||
-                 IsBmmSingleScheduler<A_TYPE, MM_CFG>)&&MatmulFeatureTrait<MM_CFG>()
-                    .IsSupportMNL0DB()>> : public MLoopNormBase<IMPL, A_TYPE, MM_CFG> {
+    enable_if_t<
+        (isNormEnableScheduler<A_TYPE, MM_CFG> || IsBmmSingleScheduler<A_TYPE, MM_CFG>) &&
+        MatmulFeatureTrait<MM_CFG>().IsSupportMNL0DB()>> : public MLoopNormBase<IMPL, A_TYPE, MM_CFG> {
     MATMUL_USE_MODULE(MatmulShapeTiling);
 
 public:

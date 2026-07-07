@@ -26,8 +26,8 @@ constexpr u32 MEMORY_PAGE_SIZE = 4096;
 constexpr u32 PRE_FETCH_THREADS_NUM = 24;
 constexpr u32 PRE_FETCH_MEMORY_THRESHOLD = 268435456; // 考虑到多线程预访问也有开销，只有在内存大于256MB时才启动预访问
 
-drvError_t __attribute__((weak))
-halResourceIdRestore(struct drvResIdKey* info); // custom进程notify资源同步，在调用halResourceIdCheck前调用
+drvError_t __attribute__((weak)) halResourceIdRestore(
+    struct drvResIdKey* info); // custom进程notify资源同步，在调用halResourceIdCheck前调用
 
 HcclResult HcclSetGrpIdCallback(int (*grpIdCallback)(int tag, int* grpId, int* devId))
 {
