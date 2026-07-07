@@ -97,7 +97,6 @@ public:
                         AinCommitFlags commitFlags = AIN_COMMIT_IMMED);
 
     uint64_t devComm_;
-    int contextIndex_;
 
 private:
     /*!
@@ -106,6 +105,7 @@ private:
     AIN_DEVICE uint32_t decode_window(AinCommSymWindow window) const;
 
     Hcomm<COMM_PROTOCOL_UBC_CTP> hcomm_;
+    int contextIndex_;
 };
 
 /*!

@@ -30,9 +30,29 @@ namespace AscendC {
 
 constexpr uint32_t MY_RANK_POS = 0;
 constexpr uint32_t RANK_SIZE_POS = 1;
-constexpr uint32_t SIGNAL_POS = 2;
-constexpr uint32_t SHADOW_SIGNAL_BUF_POS = 3;
-constexpr uint32_t CHANNEL_POS = 4;
+constexpr uint32_t SIGNAL_POS = 2; // 共享signal起始索引
+constexpr uint32_t SIGNAL_BUF_POS = 3; // 本地共享signal内存地址
+constexpr uint32_t SHADOW_SIGNAL_BUF_POS = 4;
+constexpr uint32_t CHANNEL_POS = 5;
+
+enum AinSignalType {
+    AIN_SIGNAL_TYPE_NONE,
+    AIN_SIGNAL_TYPE_VA,
+    AIN_SIGNAL_TYPE_INDEXED,
+};
+
+typedef struct {
+    AinSignalType type;
+    union {
+        struct {
+        } vaSignal;
+
+        struct {
+            AinSignal signalId;
+
+        } indexedSignal;
+    };
+} AinSignalDescriptor;
 
 template <typename T, typename U>
 struct AinIsSame { static constexpr bool value = false; };
@@ -115,6 +135,26 @@ AIN_DEVICE void Ain::get(AinTeam team, uint32_t peer, AinCommSymWindow dstWin, u
         hcomm_.ReadNbi<false>(channel, remoteAddr, localAddr, bytes);
     } else {
         hcomm_.ReadNbi(channel, remoteAddr, localAddr, bytes);
+    }
+}
+
+template <typename T>
+AIN_DEVICE AinSignalDescriptor GetSignalDescriptor(const Ain& ain, T action)
+{
+    (void)ain;
+    AinSignalDescriptor desc{};
+    desc.type = AIN_SIGNAL_TYPE_INDEXED;
+    desc.indexedSignal.signalId = action.signalId;
+    return desc;
+}
+
+template <typename T>
+AIN_DEVICE uint64_t GetSignalOpArg(T action)
+{
+    if constexpr (IsSameType<T, AinSignalInc>::value) {
+        return 1;
+    } else {
+        return action.value;
     }
 }
 
