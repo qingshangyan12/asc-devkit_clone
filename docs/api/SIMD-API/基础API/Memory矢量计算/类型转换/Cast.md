@@ -382,7 +382,7 @@ enum class RoundMode {
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-本样例中只展示Compute流程中的部分代码。本样例的srcLocal为half类型，dstLocal为int32\_t类型，计算mask时以int32\_t为准。
+本样例例中只展示部分关键代码。本样例的srcLocal为half类型，dstLocal为int32\_t类型，计算mask时以int32\_t为准。
 
 如果您需要运行样例代码，完整的调用样例请参考[Cast样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/cast)。
 
@@ -418,45 +418,45 @@ enum class RoundMode {
 结果示例如下：
 
 ```plain
-输入数据(srcLocal): 
+输入数据(srcLocal):
 [1.4, 1.5, 1.6, 2.4, 2.5, 2.6, ... 2.6]
-输出数据(dstLocal): 
+输出数据(dstLocal):
 [2, 2, 2, 3, 3, 3, ... 3]
 ```
 
 当RoundMode为RoundMode::CAST\_NONE（half转int32\_t有精度损失，此时同CAST\_RINT模式）或RoundMode::CAST\_RINT（四舍六入五成双舍入）时，结果示例如下：
 
 ```plain
-输入数据(srcLocal): 
+输入数据(srcLocal):
 [1.4, 1.5, 1.6, 2.4, 2.5, 2.6, ... 2.6]
-输出数据(dstLocal): 
+输出数据(dstLocal):
 [1, 2, 2, 2, 2, 3, ... 3]
 ```
 
 当RoundMode为RoundMode::CAST\_FLOOR（向负无穷舍入）时，结果示例如下：
 
 ```plain
-输入数据(srcLocal): 
+输入数据(srcLocal):
 [1.4, 1.5, 1.6, 2.4, 2.5, 2.6, ... 2.6]
-输出数据(dstLocal): 
+输出数据(dstLocal):
 [1, 1, 1, 2, 2, 2, ... 2]
 ```
 
 当RoundMode为RoundMode::CAST\_ROUND（四舍五入舍入）时，结果示例如下：
 
 ```plain
-输入数据(srcLocal): 
+输入数据(srcLocal):
 [1.4, 1.5, 1.6, 2.4, 2.5, 2.6, ... 2.6]
-输出数据(dstLocal): 
+输出数据(dstLocal):
 [1, 2, 2, 2, 3, 3, ... 3]
 ```
 
 当RoundMode为RoundMode::CAST\_TRUNC（向零舍入）时，结果示例如下：
 
 ```plain
-输入数据(srcLocal): 
+输入数据(srcLocal):
 [1.4, 1.5, 1.6, 2.4, 2.5, 2.6, ... 2.6]
-输出数据(dstLocal): 
+输出数据(dstLocal):
 [1, 1, 1, 2, 2, 2, ... 2]
 ```
 
@@ -493,7 +493,7 @@ AscendC::Cast(dstLocal, srcLocal, AscendC::RoundMode::CAST_CEIL, mask, 8, { 1, 1
 结果示例如下，输出数据中每个迭代的前32个数以外的数据是未初始化数据：
 
 ```plain
-输入数据(srcLocal): 
+输入数据(srcLocal):
 [37.4     7.11   53.5    19.44   22.66   43.     43.16    5.316  74.2
  15.7    87.75   86.94   92.56   25.45   36.06   94.6    73.6    30.48
  48.16   12.55   27.81   14.67    6.58   48.38   67.5    57.5    63.3
@@ -552,7 +552,7 @@ AscendC::Cast(dstLocal, srcLocal, AscendC::RoundMode::CAST_CEIL, mask, 8, { 1, 1
  10.06   11.38   88.8    57.22   94.56   35.     79.8    58.22   44.06
  26.9    16.25   99.94   51.1    42.38   84.25    0.9604 48.1   ]
 
-输出数据(dstLocal): 
+输出数据(dstLocal):
 [        38          8         54         20         23         43
          44          6         75         16         88         87
          93         26         37         95         74         31
