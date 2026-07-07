@@ -113,10 +113,17 @@ public:
     }
 
     __aicore__ inline void ResetCache() {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Lock<PIPE_MTE1>(this->GetL0MutexID(0)); // wait pingpong here
+        Mutex::Unlock<PIPE_MTE1>(this->GetL0MutexID(0));
+        Mutex::Lock<PIPE_MTE1>(this->GetL0MutexID(1));
+        Mutex::Unlock<PIPE_MTE1>(this->GetL0MutexID(1));
+#else
         WaitFlag<HardEvent::M_MTE1>(0); // To solve sync problem between multi objects, need to wait pingpong here
         SetFlag<HardEvent::M_MTE1>(0);
         WaitFlag<HardEvent::M_MTE1>(1);
         SetFlag<HardEvent::M_MTE1>(1);
+#endif
         l0aPingPongFlag_ = 1;
         l0bPingPongFlag_ = 1;
         l0aPingCachedPos_ = -1;

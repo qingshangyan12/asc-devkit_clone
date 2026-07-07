@@ -133,8 +133,13 @@ private:
         auto kAxisL1Len = CeilAlign(singleCoreK, BLOCK_CUBE);
         MATMUL_MODULE(LoadToB2)->Prepare(isBTranspose, kAxisL1Len);
         MATMUL_MODULE(CopyCubeInB)->AwaitLoadData();
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Lock<PIPE_MTE1>(MATMUL_MODULE(TBufPoolL0)->GetL0MutexID(0));
+        Mutex::Lock<PIPE_MTE1>(MATMUL_MODULE(TBufPoolL0)->GetL0MutexID(1));
+#else
         WaitFlag<HardEvent::M_MTE1>(0);
         WaitFlag<HardEvent::M_MTE1>(1);
+#endif
         auto baseN = MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseN();
         auto baseK = MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK();
         auto l0bStride = baseN * baseK;
@@ -159,10 +164,21 @@ private:
             } while (MATMUL_MODULE(KLoop)->template OuterEnd<IS_INTRA_BLOCK>());
         } while (MATMUL_MODULE(NLoop)->template OuterEnd<false, IS_INTRA_BLOCK>());
         MATMUL_MODULE(CopyCubeInB)->ClearLoadData(b1);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        MutexID mutexIdMte1ToM = GetTPipePtr()->AllocMutexID();
+        Mutex::Lock<PIPE_MTE1>(mutexIdMte1ToM);
+        Mutex::Unlock<PIPE_MTE1>(mutexIdMte1ToM);
+        Mutex::Lock<PIPE_M>(mutexIdMte1ToM);
+        Mutex::Unlock<PIPE_M>(mutexIdMte1ToM);
+        GetTPipePtr()->ReleaseMutexID(mutexIdMte1ToM);
+        Mutex::Unlock<PIPE_MTE1>(MATMUL_MODULE(TBufPoolL0)->GetL0MutexID(0));
+        Mutex::Unlock<PIPE_MTE1>(MATMUL_MODULE(TBufPoolL0)->GetL0MutexID(1));
+#else
         SetFlag<HardEvent::MTE1_M>(3);
         WaitFlag<HardEvent::MTE1_M>(3);
         SetFlag<HardEvent::M_MTE1>(0);
         SetFlag<HardEvent::M_MTE1>(1);
+#endif
     }
 
     template <bool IS_INTRA_BLOCK = false>
