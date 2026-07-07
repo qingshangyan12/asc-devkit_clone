@@ -271,6 +271,7 @@ template <auto funcPtr, typename... Args> __aicore__ inline void AscVFCallImpl(A
 {
     AscVFDebugInitUb();
     funcPtr(args...);
+    cce::async_invoke<finish_flag>(cce::dim3{1U});
     AscVFDebugTransferUb();
 }
 } // namespace AscendC

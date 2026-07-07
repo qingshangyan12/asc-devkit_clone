@@ -341,6 +341,14 @@ __aicore__ static __attribute__((noinline)) void AscVFDebugTransferUb()
 #endif
 }
 
+__simd_vf__ inline void finish_flag()
+{
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 && !defined(__ASC_DISABLE_RESERVED_UBUF__) && defined(ASCENDC_SIMD_VF_DEBUG)
+    __ubuf__ BlockVFBufInfo* blockInfo = __asc_simd_vf::get_printf_ubuf_addr(0);
+    blockInfo->finish = 1;
+#endif
+}
+
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS__
