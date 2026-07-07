@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /* !
  * \file asc_e4m32float_impl.h
@@ -46,29 +46,36 @@ __simd_callee__ inline void asc_e4m32float_v4_impl(vector_float& dst, vector_fp8
     }
 }
 
-
-__simd_callee__ inline void asc_e4m32float_impl(vector_float& dst, vector_fp8_e4m3fn_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> quarter)
+__simd_callee__ inline void asc_e4m32float_impl(
+    vector_float& dst, vector_fp8_e4m3fn_t src, vector_bool mask,
+    std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> quarter)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtff_f8e4m32f32_x(src, mask, (ULL)0);
     }
 }
 
-__simd_callee__ inline void asc_e4m32float_impl(vector_float& dst, vector_fp8_e4m3fn_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::SECOND> quarter)
+__simd_callee__ inline void asc_e4m32float_impl(
+    vector_float& dst, vector_fp8_e4m3fn_t src, vector_bool mask,
+    std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::SECOND> quarter)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtff_f8e4m32f32_x(src, mask, (ULL)1);
     }
 }
 
-__simd_callee__ inline void asc_e4m32float_impl(vector_float& dst, vector_fp8_e4m3fn_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::THIRD> quarter)
+__simd_callee__ inline void asc_e4m32float_impl(
+    vector_float& dst, vector_fp8_e4m3fn_t src, vector_bool mask,
+    std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::THIRD> quarter)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtff_f8e4m32f32_x(src, mask, (ULL)2);
     }
 }
 
-__simd_callee__ inline void asc_e4m32float_impl(vector_float& dst, vector_fp8_e4m3fn_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FOURTH> quarter)
+__simd_callee__ inline void asc_e4m32float_impl(
+    vector_float& dst, vector_fp8_e4m3fn_t src, vector_bool mask,
+    std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FOURTH> quarter)
 {
     if ASC_IS_AIV {
         dst = __builtin_cce_vcvtff_f8e4m32f32_x(src, mask, (ULL)3);
