@@ -349,6 +349,11 @@ HcclResult HcclExecOp(
 
     // 资源结构体
     std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
+    resCtxHost->isHcommBatchTransferOnThreadSupported = HcommIsSupportHcommBatchTransferOnThread();
+    HCCL_INFO(
+        "[MC2_BATCH_TRANSFER][HostSupport] opType[%u], algName[%s], supported[%d].",
+        static_cast<u32>(param.opType), algName.c_str(),
+        static_cast<int>(resCtxHost->isHcommBatchTransferOnThreadSupported));
     // 资源序列化结果
     void* resCtxSequence = nullptr;
     bool isResourceReused = false;

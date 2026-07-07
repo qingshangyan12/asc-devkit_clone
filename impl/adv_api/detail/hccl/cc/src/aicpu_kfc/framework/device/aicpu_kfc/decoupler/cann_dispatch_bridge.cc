@@ -26,14 +26,17 @@ constexpr const char* kDefaultCannLib = "libscatter_aicpu_kernel.so";
 constexpr const char* kSymInstance = "_ZN8ops_hccl21CollAlgExecRegistryV28InstanceEv";
 constexpr const char* kSymGetAlgExec = "_ZN8ops_hccl21CollAlgExecRegistryV210GetAlgExecE11HcclCMDTypeRKNSt7__cxx11"
                                        "12basic_stringIcSt11char_traitsIcESaIcEEE";
+constexpr const char* kSymInitBatchTransfer = "_ZN8ops_hccl39InitHcommBatchTransferOnThreadSupportedEb";
 
 using InstanceFn = void* (*)();
 using GetAlgExecFn = std::unique_ptr<InsCollAlgBase> (*)(void* self, HcclCMDType cmdType, const std::string& algName);
+using InitBatchTransferFn = HcclResult (*)(bool isSupported);
 
 struct CannSyms {
     void* handle = nullptr;
     InstanceFn instance = nullptr;
     GetAlgExecFn getAlgExec = nullptr;
+    InitBatchTransferFn initBatchTransfer = nullptr;
     bool ok = false;
 };
 
@@ -53,19 +56,47 @@ const CannSyms& LoadCannSyms()
         }
         s.instance = reinterpret_cast<InstanceFn>(dlsym(s.handle, kSymInstance));
         s.getAlgExec = reinterpret_cast<GetAlgExecFn>(dlsym(s.handle, kSymGetAlgExec));
+        s.initBatchTransfer = reinterpret_cast<InitBatchTransferFn>(dlsym(s.handle, kSymInitBatchTransfer));
         if (s.instance == nullptr || s.getAlgExec == nullptr) {
             HCCL_ERROR(
                 "[CannBridge] dlsym failed: Instance=%p GetAlgExec=%p err=%s", reinterpret_cast<void*>(s.instance),
                 reinterpret_cast<void*>(s.getAlgExec), dlerror());
             return s;
         }
+        if (s.initBatchTransfer == nullptr) {
+            HCCL_RUN_INFO(
+                "[MC2_BATCH_TRANSFER][CannInit][SkipNoSymbol] symbol[%s] not found in %s.",
+                kSymInitBatchTransfer, libName);
+        }
         s.ok = true;
         HCCL_RUN_INFO(
-            "[CannBridge] loaded %s handle=%p Instance=%p GetAlgExec=%p", libName, s.handle,
-            reinterpret_cast<void*>(s.instance), reinterpret_cast<void*>(s.getAlgExec));
+            "[CannBridge] loaded %s handle=%p Instance=%p GetAlgExec=%p InitBatchTransfer=%p", libName, s.handle,
+            reinterpret_cast<void*>(s.instance), reinterpret_cast<void*>(s.getAlgExec),
+            reinterpret_cast<void*>(s.initBatchTransfer));
         return s;
     }();
     return syms;
+}
+
+HcclResult InitCannBatchTransferIfNeeded(const CannSyms& syms, const OpParam& ascParam,
+    const AlgResourceCtxSerializable& ascResCtx)
+{
+    if (ascParam.opType != HCCL_CMD_ALLTOALLV) {
+        return HCCL_SUCCESS;
+    }
+    if (syms.initBatchTransfer == nullptr) {
+        HCCL_RUN_INFO(
+            "[MC2_BATCH_TRANSFER][CannInit][SkipNoSymbol] opType[%u], algName[%s], supported[%d].",
+            static_cast<u32>(ascParam.opType), ascParam.algName,
+            static_cast<int>(ascResCtx.isHcommBatchTransferOnThreadSupported));
+        return HCCL_SUCCESS;
+    }
+    HcclResult ret = syms.initBatchTransfer(ascResCtx.isHcommBatchTransferOnThreadSupported);
+    HCCL_INFO(
+        "[MC2_BATCH_TRANSFER][CannInit] opType[%u], algName[%s], supported[%d], ret[%d].",
+        static_cast<u32>(ascParam.opType), ascParam.algName,
+        static_cast<int>(ascResCtx.isHcommBatchTransferOnThreadSupported), static_cast<int>(ret));
+    return ret;
 }
 
 } // namespace
@@ -82,6 +113,7 @@ HcclResult LaunchViaCann(const OpParam& ascParam, const AlgResourceCtxSerializab
     }
 
     // 需要保证 OpParam / AlgResourceCtxSerializable 布局与 CANN 对齐，直接传入，无需逐字段转换。
+    CHK_RET(cann_abi::InitCannBatchTransferIfNeeded(syms, ascParam, ascResCtx));
     void* self = syms.instance();
     std::unique_ptr<cann_abi::InsCollAlgBase> executor =
         syms.getAlgExec(self, ascParam.opType, std::string(ascParam.algName));
