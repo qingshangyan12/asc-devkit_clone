@@ -38,7 +38,7 @@ __simd_callee__ inline void asc_pack_v2(vector_bool& dst, vector_bool src)
 | dst       | 输出    | 目的操作数（矢量数据寄存器/掩码寄存器）。            |
 | src | 输入    | 源操作数（矢量数据寄存器/掩码寄存器）。            |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)。
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg数据类型定义.md)。
 
 ## 返回值说明
 
