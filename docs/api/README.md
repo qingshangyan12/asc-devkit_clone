@@ -215,7 +215,7 @@
 
                     </cann-filter>
 
-                    <cann-filter npu-type="910b,A3,x90,9030">
+                    <cann-filter npu-type="910b,A3">
 
                     -   [K方向对齐约束](SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/关键特性说明/K-方向对齐约束.md)
 
@@ -591,7 +591,6 @@
                 -   [LocalMemBar](SIMD-API/基础API/Reg矢量计算/同步控制/LocalMemBar.md)
 
             -   [系统变量访问](SIMD-API/基础API/Reg矢量计算/系统变量访问/系统变量访问.md)
-                -   [GetSpr](SIMD-API/基础API/Reg矢量计算/系统变量访问/GetSpr.md)
                 -   [ClearSpr](SIMD-API/基础API/Reg矢量计算/系统变量访问/ClearSpr.md)
 
             -   [辅助数据类型](SIMD-API/基础API/Reg矢量计算/辅助数据类型/辅助数据类型.md)
@@ -2736,6 +2735,7 @@
         -   [asc\_stwt](SIMT-API/访存函数/asc_stwt.md)
         -   [asc\_dcci\_single](SIMT-API/访存函数/asc_dcci_single.md)
         -   [asc\_dcci\_entire](SIMT-API/访存函数/asc_dcci_entire.md)
+        -   [asc\_nop](SIMT-API/访存函数/asc_nop.md)
 
 
 -   [Utils API](Utils-API/Utils-API.md)
