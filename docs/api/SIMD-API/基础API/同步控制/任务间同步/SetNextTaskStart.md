@@ -32,7 +32,7 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-<cann-filter npu-type="950,A3,910b,310b,x90,9030">
+<cann-filter npu-type="950,A3,910b,310b">
 
 - 该原型支持如下产品型号：
 

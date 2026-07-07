@@ -183,7 +183,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 <!-- end id21 -->
 <!-- end id19 -->
 
-<!-- npu="950,A3,910b,310b,310p,x90" id22 -->
+<!-- npu="950,A3,910b,310b,310p" id22 -->
 **Load3Dv2接口、Load3Dv2Pro接口：**
 
 <!-- npu="950" id23 -->

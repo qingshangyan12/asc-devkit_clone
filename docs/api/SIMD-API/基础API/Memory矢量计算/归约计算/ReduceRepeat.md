@@ -94,7 +94,7 @@
 
 </cann-filter>
 
-<cann-filter npu-type = "A3,910b,310b,310p,910,x90,9030">
+<cann-filter npu-type = "A3,910b,310b,310p,910">
 
 **针对如下型号，目的操作数与源操作数的数据类型需要保持一致。**
 

@@ -100,7 +100,7 @@
 
 - <cann-filter npu-type = "950">针对Ascend 950PR/Ascend 950DT，`int64_t`/`uint64_t`数据类型仅支持tensor前n个数据计算接口。</cann-filter>
 - `srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
-<!-- npu="950,910,310p,310b,x90,9030" id1 -->
+<!-- npu="950,910,310p,310b" id1 -->
 - 针对以下型号，模板参数`isSetMask`参数不生效，保持默认值即可：
   <!-- npu="950" id2 -->
   - Ascend 950PR/Ascend 950DT
