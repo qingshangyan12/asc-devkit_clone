@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例以矩阵转置为例，介绍Ascend C SIMT编程方式下的访存优化思路。样例包含一维连续复制基线，以及一系列逐步优化的转置核函数：从直接全局内存转置出发，引入UB中转与分块、对比按切分后的tile分组启动Thread Block与固定Thread Block数两种映射方式、观察2048线程配置下的寄存器溢出、通过UB padding消除bank冲突，最后借助双缓冲去除循环尾部同步，完整呈现SIMT矩阵转置的调优路径。
+本样例以矩阵转置为例，介绍Ascend C SIMT编程方式下的访存优化思路。样例包含一维连续复制基线，以及一系列逐步优化的转置核函数：从直接全局内存转置出发，引入UB中转与分块、对比按切分后的tile分组启动Thread Block与固定Thread Block数两种映射方式、观察2048线程配置下的寄存器溢出、通过UB padding消除bank冲突，最后借助double buffer去除循环尾部同步，完整呈现SIMT矩阵转置的调优路径。
 
 ## 支持的产品
 
@@ -29,7 +29,6 @@
   - input为输入矩阵，形状为 [H, W]，数据类型为float
   - output为输出矩阵，形状为 [W, H]，数据类型为float
   - 连续复制基线（Case 0/1）不执行转置，校验output与input相等
-
 - 样例规格：
 
   <table>
@@ -46,29 +45,29 @@
 
 本样例通过8个Case构成一条优化路径，各Case的核函数、线程块数量、每个线程块的线程数和主要变化如下表所示。
 
-| Case | 核函数 | 线程块数量 | 每个线程块的线程数 | 本步引入的变化 |
-| --- | --- | --- | --- | --- |
-| 0 | `copy_kernel` | `core` | 2048 | 建立连续读写的耗时基线（高线程数） |
-| 1 | `copy_kernel` | `core` | 1024 | 仅降低线程数，对照无同步场景下的线程数影响 |
-| 2 | `transpose_naive_kernel` | `core` | 2048 | 写地址变为非连续，隔离非连续写的代价 |
-| 3 | `transpose_ub_2tile_naive_kernel` | `ceil(tiles / 2)` | 2048 | 引入UB与32×32分块，按切分后的tile分组启动Thread Block |
-| 4 | `transpose_ub_2tile_kernel` | `core` | 2048 | Thread Block数固定为硬件vector core数，单个Thread Block循环处理多个tile分组 |
-| 5 | `transpose_ub_kernel` | `core` | 1024 | 改为1024线程，单个Thread Block循环处理多个32×32的tile |
-| 6 | `transpose_ub_pad_kernel` | `core` | 1024 | UB tile增加2列padding，消除转置读阶段的bank冲突 |
-| 7 | `transpose_ub_pad_db_kernel` | `core` | 1024 | 双缓冲轮换，去除循环尾部同步 |
+| Case | 核函数                              | 线程块数量          | 每个线程块的线程数 | 本步引入的变化                                                              |
+| ---- | ----------------------------------- | ------------------- | ------------------ | --------------------------------------------------------------------------- |
+| 0    | `copy_kernel`                     | `core`            | 2048               | 建立连续读写的耗时基线                                                      |
+| 1    | `copy_kernel`                     | `core`            | 1024               | 仅降低线程数，与Case 5、Case 6、Case 7的启动配置一致                        |
+| 2    | `transpose_naive_kernel`          | `core`            | 2048               | 直接在GM中完成转置                                                          |
+| 3    | `transpose_ub_2tile_naive_kernel` | `ceil(tiles / 2)` | 2048               | 引入UB与32×32分块，按切分后的tile数量设置Thread Block数                    |
+| 4    | `transpose_ub_2tile_kernel`       | `core`            | 2048               | Thread Block数固定为硬件vector core数，单个Thread Block循环处理多个tile分组 |
+| 5    | `transpose_ub_kernel`             | `core`            | 1024               | 改为1024线程，单个Thread Block循环处理多个32×32的tile                      |
+| 6    | `transpose_ub_pad_kernel`         | `core`            | 1024               | UB tile增加2列padding，消除转置读阶段的bank冲突                             |
+| 7    | `transpose_ub_pad_db_kernel`      | `core`            | 1024               | double buffer轮换，去除循环尾部同步                                         |
 
-其中`core`为硬件vector core数，通过`aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)`在运行时查询获得。`tiles`为总tile数`(W/32) × (H/32)`，1024×1024时为1024。
+其中 `core`为硬件vector core数，通过 `aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)`在运行时查询获得。`tiles`为总tile数 `(W/32) × (H/32)`，1024×1024时为1024。
 
 #### 线程块与tile映射
 
-从Case 3开始，矩阵按32×32的tile处理。下图左侧表示1024×1024矩阵被划分为32×32个tile，右侧表示其中一个32×32的tile内的线程映射关系。tile内列索引记为`tx`，tile内行索引记为`ty`。
+从Case 3开始，矩阵按32×32的tile处理。下图左侧表示1024×1024矩阵被划分为32×32个tile，右侧表示其中一个32×32的tile内的线程映射关系。tile内列索引记为 `tx`，tile内行索引记为 `ty`。
 
 <img src="./figures/blockMapping.png" width="60%">
 
 以图中绿色元素为例，可以根据tile坐标和tile内局部坐标推导它在GM中的input坐标。
 
-- 图中绿色元素所在的tile坐标是`(2, 1)`。对于1024×1024矩阵，`tiles_x = 1024 / 32 = 32`，因此对应`tile_id = 2 * 32 + 1 = 65`。
-- 图中绿色元素在tile内的局部坐标是`(2, 29)`，对应`ty = 2`、`tx = 29`。
+- 图中绿色元素所在的tile坐标是 `(2, 1)`。对于1024×1024矩阵，`tiles_x = 1024 / 32 = 32`，因此对应 `tile_id = 2 * 32 + 1 = 65`。
+- 图中绿色元素在tile内的局部坐标是 `(2, 29)`，对应 `ty = 2`、`tx = 29`。
 
 代入坐标计算：
 
@@ -80,19 +79,19 @@ uint32_t y_index = tile_y * TILE_DIM + ty;                // 2 * 32 + 2  = 66
 uint32_t index = x_index + width * y_index;              // 61 + 1024 * 66
 ```
 
-因此该线程在GM中处理的输入元素坐标为`input[66,61]`。
+因此该线程在GM中处理的输入元素坐标为 `input[66,61]`。
 
 ### 性能指标说明
 
-| 指标 | 说明 |
-| --- | --- |
-| Task Duration(μs) | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间 |
-| aiv_time(μs) | Task在AI Vector Core上的理论执行时间，单位为μs |
-| aiv_total_cycles | 该Task被分配到每个AI Vector Core计算单元上后，每个AI Vector Core计算单元上的执行cycle总数 |
-| aiv_vec_time(μs) | vec类型指令（向量类运算指令）耗时，单位为μs |
-| aiv_vec_ratio | vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比 |
-| aiv_scalar_time(μs) | scalar类型指令（标量类运算指令）耗时，单位为μs |
-| aiv_scalar_ratio | scalar类型指令（标量类运算指令）的cycle数在total cycle数中的占用比 |
+| 指标                 | 说明                                                                                      |
+| -------------------- | ----------------------------------------------------------------------------------------- |
+| Task Duration(μs)   | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间                  |
+| aiv_time(μs)        | Task在AI Vector Core上的理论执行时间，单位为μs                                           |
+| aiv_total_cycles     | 该Task被分配到每个AI Vector Core计算单元上后，每个AI Vector Core计算单元上的执行cycle总数 |
+| aiv_vec_time(μs)    | vec类型指令（向量类运算指令）耗时，单位为μs                                              |
+| aiv_vec_ratio        | vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比                           |
+| aiv_scalar_time(μs) | scalar类型指令（标量类运算指令）耗时，单位为μs                                           |
+| aiv_scalar_ratio     | scalar类型指令（标量类运算指令）的cycle数在total cycle数中的占用比                        |
 
 除Task Duration外，其余指标均为所有Thread Block上的平均值。
 
@@ -100,7 +99,7 @@ uint32_t index = x_index + width * y_index;              // 61 + 1024 * 66
 
 **优化目标**：实测当前硬件上纯连续GM读写的数据搬运能力，作为后续转置实现可逼近的性能上限。
 
-**核心实现**：将矩阵视为一维数组，所有线程按grid-stride方式连续读、连续写。Case 0采用2048线程/Thread Block，Case 1采用1024线程/Thread Block。
+**核心实现**：将矩阵视为一维数组，所有线程按grid-stride方式连续读、连续写。Case 0每个Thread Block启动2048个线程，Case 1每个Thread Block启动1024个线程。
 
 ```cpp
 __global__ __launch_bounds__(THREADS_PER_BLOCK) void copy_kernel(float *output, const float *input, uint32_t elements)
@@ -116,29 +115,33 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void copy_kernel(float *output, 
 **性能数据**：
 
 | Case | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
-| --- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 0 | 6.262 | 4.971 | 8201.7 | 4.516 | 0.909 | 0.443 | 0.089 |
-| 1 | 8.649 | 7.321 | 12079.8 | 6.872 | 0.939 | 0.437 | 0.059 |
+| ---- | :----------------: | :-----------: | :--------------: | :---------------: | :-----------: | :------------------: | :--------------: |
+| 0    |       6.262       |     4.971     |      8201.7      |       4.516       |     0.909     |        0.443        |      0.089      |
+| 1    |       8.649       |     7.321     |     12079.8     |       6.872       |     0.939     |        0.437        |      0.059      |
 
 **分析**：
 
-Case 0/1只执行一维连续读写，不涉及坐标交换、UB中转和Thread Block内同步，主要用于实测当前硬件在该数据规模下的GM连续搬运能力。1024×1024的float矩阵复制需要从GM读取4MB数据并写回4MB数据，读写总数据量为：
+Case 0/1只执行连续读写，不涉及坐标交换、UB中转和Thread Block内同步，主要用于实测当前硬件在该数据规模下的GM连续搬运能力。1024×1024的float矩阵复制需要从GM读取4MB数据并写回4MB数据，读写总数据量为：
 
-$$D = 1024 \times 1024 \times 4B \times 2 = 8.39MB$$
+$$
+D = 1024 \times 1024 \times 4B \times 2 = 8.39MB
+$$
 
 Ascend 950PR的GM峰值带宽按1.6TB/s估算，连续复制的理论耗时为：
 
-$$T_{theory} = \frac{8.39MB}{1.6TB/s} \approx 5.243μs$$
+$$
+T_{theory} = \frac{8.39MB}{1.6TB/s} \approx 5.243μs
+$$
 
-Case 0的Task Duration为6.262μs，对应读写混合带宽约1.34TB/s，达到理论峰值带宽的约83.7%；Case 1的Task Duration为8.649μs，对应读写混合带宽约0.97TB/s，达到理论峰值带宽的约60.6%。在该无同步搬运场景下，2048线程配置更接近硬件连续搬运上限。未达峰值带宽的主要原因在于：实际耗时除了数据读写本身之外，还包含Task调度和其他计算指令的开销，这些非数据搬运开销摊薄了有效带宽；线程数较少时，单线程迭代次数更多，额外开销占比更高，带宽利用率相对更低。由于后续转置Case在完成坐标交换的同时还会引入UB访问和同步开销，因此Case 0的连续复制耗时可作为矩阵转置优化的性能上限参照。
+Case 0的Task Duration为6.262μs，对应读写混合带宽约1.34TB/s，达到理论峰值带宽的约83.7%；Case 1的Task Duration为8.649μs，对应读写混合带宽约0.97TB/s，达到理论峰值带宽的约60.6%。在连续读写的搬运场景下，2048线程配置更接近硬件连续搬运上限。未达峰值带宽的主要原因在于：实际耗时除了数据读写本身之外，还包含Task调度和其他计算指令的开销，这些非数据搬运开销摊薄了有效带宽；线程数较少时，单线程迭代次数更多，额外开销占比更高，带宽利用率相对更低。由于后续转置Case在完成坐标交换的同时还会引入UB访问和同步开销，因此Case 0的连续复制耗时可作为矩阵转置优化的性能上限参照。
 
 ---
 
 ### Case 2：直接全局内存转置
 
-**优化目标**：实现最直接的转置，隔离非连续全局内存写相对复制基线的代价。
+**优化目标**：在GM上直接进行坐标变换。
 
-**核心实现**：不分块、不使用UB。每个线程读取`input(row, col)`，直接写入转置位置`output(col, row)`。全局内存读取连续，写入地址按列跨行，为非连续写。
+**核心实现**：不分块、不使用UB。每个线程读取 `input(row, col)`，直接写入转置位置 `output(col, row)`。全局内存读取连续，写入地址按列跨行，为非连续写。
 
 ```cpp
 uint32_t row = i / width;
@@ -150,28 +153,28 @@ output[col * height + row] = input[i];
 **性能数据**：
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 36.337 | 34.022 | 56136.2 | 33.568 | 0.987 | 0.442 | 0.013 |
+| :----------------: | :-----------: | :--------------: | :---------------: | :-----------: | :------------------: | :--------------: |
+|       36.337       |    34.022    |     56136.2     |      33.568      |     0.987     |        0.442        |      0.013      |
 
 **分析**：
 
-Case 2在保持GM连续读取的同时，直接把数据写入转置后的输出位置，导致同一warp内相邻线程的写地址分布到输出矩阵的不同行。相比Case 0的连续复制基线，Task Duration从6.262μs增加到36.337μs，约为复制基线的5.8倍。由于矩阵转置本身计算量很小，这一差距主要来自GM非连续写。后续优化需要把非连续访问从GM转移到UB，使GM读写转变为连续访问模式。
+Case 2在保持GM连续读取的同时，直接把数据写入转置后的输出位置，导致同一Warp内相邻线程的写地址分布到输出矩阵的不同行。相比Case 0的连续复制基线，Task Duration从6.262μs增加到36.337μs，约为复制基线的5.8倍。由于矩阵转置本身计算量很小，这一差距主要来自GM非连续写。后续优化需要把非连续访问从GM转移到UB，使GM读写转变为连续访问模式。
 
 ---
 
 ### Case 3：UB中转转置，每个Thread Block处理两个32×32的tile
 
-**优化目标**：引入UB与分块，将Case 2的非连续全局内存写转换为UB内访问，使全局内存读写均恢复连续；本Case按切分后的tile分组启动Thread Block，每个Thread Block覆盖两个32×32的tile。
+**优化目标**：引入UB与分块，将Case 2的非连续全局内存写转换为UB内访问，使全局内存读写均恢复连续；本Case按切分后的tile数量设置Thread Block数，每个Thread Block处理两个32×32的tile。
 
-**核心实现**：将矩阵划分为32×32的tile，每个Thread Block使用2048线程处理两个tile，因此`blocks_per_grid=ceil(tiles / 2)`。每个Thread Block启动2048个线程，配置参数为`dim3(32,64,1)`，其中`threadIdx.y=0..31`的线程处理第一个tile，`threadIdx.y=32..63`的线程处理第二个tile；代码通过`local_tile=threadIdx.y>>5`得到当前线程所属的tile编号，通过`ty=threadIdx.y&31`得到tile内行索引。线程先将tile按原布局写入UB，经`asc_syncthreads()`同步后按转置方向读出并写回全局内存。
+**核心实现**：将矩阵划分为32×32的tile，总tile数为 `tiles=(W/32)×(H/32)`。本Case中每个Thread Block启动2048个线程，可同时处理两个tile，因此Thread Block数量设置为 `blocks_per_grid=ceil(tiles / 2)`。线程配置参数为 `dim3(32,64,1)`，其中 `threadIdx.y=0..31`的线程处理第一个tile，`threadIdx.y=32..63`的线程处理第二个tile；代码通过 `local_tile=threadIdx.y>>5`得到当前线程在Thread Block内负责的tile编号，通过 `ty=threadIdx.y&31`得到tile内行索引。线程先将tile按原布局写入UB，经 `asc_syncthreads()`同步后，再按转置方向从UB读出并连续写回GM。
 
 UB中转的核心思想如下图所示：GM读取阶段按输入矩阵行方向连续搬入UB；GM写回阶段交换输出tile坐标，使同一个warp写出输出矩阵的一行。原本非连续的GM写被转移为UB内转置方向读取。
 
 <img src="./figures/case3.png" width="60%">
 
-转置操作需要交换行列坐标，如果直接逐元素写回，输出地址会沿列方向跨行分散。分块后的处理粒度从单个元素变为局部tile：线程先按输入矩阵的行方向把tile连续读入UB，再从UB中按转置方向取数，最后按输出矩阵的行方向连续写回GM。这样，转置带来的不连续访问被限制在UB内部，GM读写都保持连续访问模式。
+Case 2的直接逐元素写回需要交换行列坐标，输出地址会沿列方向跨行分散，这是直接全局内存转置的主要问题。引入分块后，处理粒度从单个元素变为局部tile：线程先按输入矩阵的行方向把tile连续读入UB，再从UB中按转置方向取数，最后按输出矩阵的行方向连续写回GM。这样，转置带来的不连续访问被限制在UB内部，GM读写都保持连续访问模式。
 
-tile大小选为32×32，是因为`threadIdx.x`方向的32个线程可以对应tile内一行元素，使一个warp的GM读写访问覆盖32个连续float；同时32×32的tile含1024个元素，便于在1024线程配置下由一个Thread Block处理一个tile，或在2048线程配置下由一个Thread Block处理两个tile。
+tile大小选为32×32，是因为 `threadIdx.x`方向的32个线程可以对应tile内一行元素，使一个warp的GM读写访问覆盖32个连续float；同时32×32的tile含1024个元素，便于在1024线程配置下由一个Thread Block处理一个tile，或在2048线程配置下由一个Thread Block处理两个tile。
 
 ```cpp
 __ubuf__ float tile[TILES_PER_BLOCK][TILE_DIM][TILE_DIM];
@@ -195,12 +198,12 @@ output[x_index + y_index * height] = tile[local_tile][tx][ty];
 **性能数据**：
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 28.190 | 2.896 | 4778.1 | 2.712 | 0.938 | 0.172 | 0.058 |
+| :----------------: | :-----------: | :--------------: | :---------------: | :-----------: | :------------------: | :--------------: |
+|       28.190       |     2.896     |      4778.1      |       2.712       |     0.938     |        0.172        |      0.058      |
 
 **分析**：
 
-Case 3通过UB中转把非连续GM写转换为UB内转置读取，Task Duration从Case 2的36.337μs降至28.190μs，说明GM读写连续化已经带来收益。该实现按切分后的tile分组设置线程块数量，1024个tile对应512个Thread Block，线程块数量明显超过硬件vector core数，额外的线程块启动和调度开销会反映到Task Duration中。为了减少这部分开销，Case 4将Thread Block数固定为硬件vector core数，每个Thread Block通过循环处理多个tile分组。
+Case 3通过UB中转把非连续GM写转换为UB内转置读取，Task Duration从Case 2的36.337μs降至28.190μs，说明GM读写连续化已经带来收益。此时新的瓶颈主要来自Thread Block映射方式：该实现按切分后的tile分组设置线程块数量，1024个tile对应512个Thread Block，明显超过硬件vector core数，额外的线程块启动和调度开销会反映到Task Duration中。因此下一步优先优化Thread Block到tile的映射，减少需要启动和调度的Thread Block数量。
 
 ---
 
@@ -208,7 +211,7 @@ Case 3通过UB中转把非连续GM写转换为UB内转置读取，Task Duration�
 
 **优化目标**：将Case 3的线程块数量从切分后的tile分组数改为硬件vector core数，每个Thread Block通过循环处理多个tile分组，并观察2048线程配置下的寄存器使用情况。
 
-**核心实现**：每个Thread Block启动2048个线程，配置参数为`dim3(32,64,1)`。循环每轮会同时处理两个连续的32×32的tile：`threadIdx.y=0..31`的线程处理第一个tile，`threadIdx.y=32..63`的线程处理第二个tile；下一轮按`gridDim.x*2`跳到后续tile分组。
+**核心实现**：每个Thread Block启动2048个线程，配置参数为 `dim3(32,64,1)`。循环每轮会同时处理两个连续的32×32的tile：`threadIdx.y=0..31`的线程处理第一个tile，`threadIdx.y=32..63`的线程处理第二个tile；下一轮按 `gridDim.x*2`跳到后续tile分组。
 
 ```cpp
 __ubuf__ float tile[TILES_PER_BLOCK][TILE_DIM][TILE_DIM];
@@ -222,18 +225,18 @@ asc_syncthreads();
 **性能数据**：
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 27.113 | 25.043 | 41321.5 | 24.581 | 0.982 | 0.450 | 0.018 |
+| :----------------: | :-----------: | :--------------: | :---------------: | :-----------: | :------------------: | :--------------: |
+|       27.113       |    25.043    |     41321.5     |      24.581      |     0.982     |        0.450        |      0.018      |
 
 **分析**：
 
-Case 4将Thread Block数固定为硬件vector core数。相比Case 3启动512个Thread Block的写法，Case 4需要启动和调度的线程块数量更少，Task Duration由28.190μs降至27.113μs。增加`--cce-res-usage`编译选项后，可以在编译日志中看到寄存器和栈的使用情况，Case 4的输出如下：
+Case 4将Thread Block数固定为硬件vector core数。相比Case 3启动512个Thread Block的写法，Case 4需要启动和调度的线程块数量更少，Task Duration由28.190μs降至27.113μs。增加 `--cce-res-usage`编译选项后，可以在编译日志中看到寄存器和栈的使用情况，Case 4的输出如下：
 
 ```text
 [BISHENG] Function properties for _Z25transpose_ub_2tile_kernelPfPKfjjj_simt_entry: Stack size: 24 bytes, Used register number: 16
 ```
 
-该输出说明Case 4已经出现寄存器溢出。Case 4与Case 3同为2048线程配置，但Case 4将Thread Block数固定为硬件vector core数后，需要在kernel内部通过循环处理多个tile分组，索引更新逻辑比Case 3更复杂，需要维护的中间变量更多；同时`__launch_bounds__(2048)`限制了每个线程最多可使用16个寄存器，寄存器不足后部分变量会落到栈上，引入额外访存。寄存器溢出会抵消固定Thread Block数带来的收益，Case 5改用1024线程配置，让一个Thread Block每轮只处理一个tile，先消除寄存器溢出。
+该输出说明Case 4已经出现寄存器溢出。Case 4与Case 3同为2048线程配置，但Case 4将Thread Block数固定为硬件vector core数后，需要在kernel内部通过循环处理多个tile分组，索引更新逻辑比Case 3更复杂，需要维护的中间变量更多；同时 `__launch_bounds__(2048)`限制了每个线程最多可使用16个寄存器，寄存器不足后部分变量会落到栈上，引入额外访存。寄存器溢出会抵消固定Thread Block数带来的收益，Case 5改用1024线程配置，让一个Thread Block每轮只处理一个tile，先消除寄存器溢出。
 
 ---
 
@@ -241,7 +244,7 @@ Case 4将Thread Block数固定为硬件vector core数。相比Case 3启动512个
 
 **优化目标**：改为1024线程，将单轮处理粒度调整为一个32×32的tile，确定后续优化的基础配置。
 
-**核心实现**：在Case 4的基础上改为每个Thread Block启动1024个线程，配置参数为`dim3(32,32,1)`。一个32×32的tile包含1024个元素，因此一个Thread Block在循环每轮正好处理一个tile；下一轮按`gridDim.x`跳到后续tile。
+**核心实现**：在Case 4的基础上改为每个Thread Block启动1024个线程，配置参数为 `dim3(32,32,1)`。一个32×32的tile包含1024个元素，因此一个Thread Block在循环每轮正好处理一个tile；下一轮按 `gridDim.x`跳到后续tile。
 
 ```cpp
 __ubuf__ float tile[TILE_DIM][TILE_DIM];
@@ -255,14 +258,14 @@ asc_syncthreads();
 **性能数据**：
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 23.912 | 22.745 | 37528.9 | 22.297 | 0.980 | 0.435 | 0.019 |
+| :----------------: | :-----------: | :--------------: | :---------------: | :-----------: | :------------------: | :--------------: |
+|       23.912       |    22.745    |     37528.9     |      22.297      |     0.980     |        0.435        |      0.019      |
 
 **分析**：
 
-改为1024线程后，Stack size归零、不再溢出，Task Duration为23.912μs，优于Case 4的2048线程版本，说明1024线程更适合该转置实现。此时aiv_time已经接近Task Duration，线程块启动和调度开销占比已经较小；相对Case 2的直接转置（36.337μs），UB中转将非连续全局内存写转换为UB内访问，配合固定Thread Block数的循环处理方式，耗时下降约34%。
+改为1024线程后，Stack size归零，没有寄存器溢出现象，Task Duration为23.912μs，优于Case 4的2048线程版本，说明1024线程更适合该转置实现。此时aiv_time已经接近Task Duration，线程块启动和调度开销占比已经较小；相对Case 2的直接转置（36.337μs），UB中转将非连续全局内存写转换为UB内访问，配合固定Thread Block数的循环处理方式，耗时下降约34%。
 
-Case 5仍保留了一个新的瓶颈：UB转置读阶段需要按列读取`tile[tx][ty]`，会产生bank冲突。线程组织已经回到1024线程常驻配置，Case 6沿用该配置，只调整UB布局来处理转置读阶段的bank冲突。
+在当前配置下，寄存器溢出已经消除，Thread Block启动和调度开销占比也较小，下一步需要关注UB内部访问开销。写回阶段需要按转置方向读取 `tile[tx][ty]`，也就是按列访问32×32的UB tile，容易产生bank冲突，因此后续需要优先解决转置读阶段的UB bank冲突问题。
 
 ---
 
@@ -279,7 +282,7 @@ Case 5仍保留了一个新的瓶颈：UB转置读阶段需要按列读取`tile[
 
 下面以Ascend 950PR/Ascend 950DT的UB划分规则为例，说明本样例中bank冲突是如何产生的，以及Case 5和Case 6理论上的冲突强度差异。
 
-UB中的bank划分如下图所示。UB总大小256KB，划分为16个bank（每个bank512行×32B=16KB）；这16个bank进一步组织为8个bank group，每个bank group包含2个bank（bank i与bank i+8同属bank group i，即`bank_group_id=bank_id%8`）。在SIMT编程模式下，每个bank又会被划分为4个subbank，每个subbank的宽度为8B。
+UB中的bank划分如下图所示。UB总大小256KB，划分为16个bank（每个bank512行×32B=16KB）；这16个bank进一步组织为8个bank group，每个bank group包含2个bank（bank i与bank i+8同属bank group i，即 `bank_group_id=bank_id%8`）。在SIMT编程模式下，每个bank又会被划分为4个subbank，每个subbank的宽度为8B。
 
 SIMT场景下，同一个warp内的多个线程可能在同一条UB访问指令中同时访问UB；当这些访问数据属于同一个bank group的相同编号的subbank资源时，硬件无法在一个周期内处理全部请求，需要排队等待，从而形成subbank冲突并增加访问延迟；如果这些访问数据属于同一个subbank的同一行内的8B地址范围，硬件会将这些请求合并处理，不会形成subbank冲突。
 
@@ -316,8 +319,8 @@ asc_syncthreads();
 **性能数据**：
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 15.152 | 13.641 | 22507.6 | 13.176 | 0.966 | 0.453 | 0.033 |
+| :----------------: | :-----------: | :--------------: | :---------------: | :-----------: | :------------------: | :--------------: |
+|       15.152       |    13.641    |     22507.6     |      13.176      |     0.966     |        0.453        |      0.033      |
 
 **分析**：
 
@@ -325,14 +328,14 @@ asc_syncthreads();
 
 ---
 
-### Case 7：UB中转转置+padding+双缓冲，去除循环尾部同步（1024线程）
+### Case 7：UB中转转置+padding+double buffer，去除循环尾部同步（1024线程）
 
-**优化目标**：去除Case 6每轮循环末尾的`asc_syncthreads()`，减少同步开销。
+**优化目标**：去除Case 6每轮循环末尾的 `asc_syncthreads()`，减少同步开销。
 
-**核心实现**：Case 6每轮循环包含两次同步：load后一次，保证tile写满后再按转置方向读出；store后一次，保证转置读取完成后再进入下一轮load，避免下一轮load覆盖仍在被读取的tile。本版本使用两份带padding的UB tile，按`cnt`轮换：下一轮load写入另一份buffer，不会覆盖当前轮正在被读取的buffer，因此可安全去除尾部同步，每轮仅保留一次同步。
+**核心实现**：Case 6每轮循环包含两次同步：load后一次，保证tile写满后再按转置方向读出；store后一次，保证转置读取完成后再进入下一轮load，避免下一轮load覆盖仍在被读取的tile。本版本使用两份带padding的UB tile，按 `cnt`轮换：下一轮load写入另一份buffer，不会覆盖当前轮正在被读取的buffer，因此可安全去除尾部同步，每轮仅保留一次同步。
 
 ```cpp
-__ubuf__ float tile[2][TILE_DIM][TILE_PAD_STRIDE]; // 双缓冲：轮换buffer，去除尾部同步
+__ubuf__ float tile[2][TILE_DIM][TILE_PAD_STRIDE]; // double buffer：轮换buffer，去除尾部同步
 uint32_t cnt = 0;
 for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x) {
     ...
@@ -346,12 +349,12 @@ for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x)
 **性能数据**：
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 12.074 | 10.725 | 17696.8 | 10.285 | 0.959 | 0.428 | 0.040 |
+| :----------------: | :-----------: | :--------------: | :---------------: | :-----------: | :------------------: | :--------------: |
+|       12.074       |    10.725    |     17696.8     |      10.285      |     0.959     |        0.428        |      0.040      |
 
 **分析**：
 
-相对Case 6的15.152μs，去除每轮循环末尾的同步后Task Duration降至12.074μs，下降约20%。在1024×1024矩阵、64个Thread Block的配置下，每个Thread Block需要循环处理16个tile，双缓冲相当于每个Thread Block减少16次Thread Block内同步。该方法的代价是额外占用一份UB tile（共两份32×34），但未引入寄存器溢出。Case 7是本样例中耗时最低的SIMT转置版本，相对Case 0复制基线（6.262μs）约为1.9倍。
+相对Case 6的15.152μs，去除每轮循环末尾的同步后Task Duration降至12.074μs，下降约20%。在1024×1024矩阵、64个Thread Block的配置下，每个Thread Block需要循环处理16个tile，double buffer相当于每个Thread Block减少16次Thread Block内同步。该方法的代价是额外占用一份UB tile（共两份32×34），但未引入寄存器溢出。Case 7是本样例中耗时最低的SIMT转置版本，相对Case 0复制基线（6.262μs）约为1.9倍。
 
 ---
 
@@ -360,15 +363,15 @@ for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x)
 ### Ascend 950PR性能数据
 
 | Case | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
-| --- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 0 | 6.262 | 4.971 | 8201.7 | 4.516 | 0.909 | 0.443 | 0.089 |
-| 1 | 8.649 | 7.321 | 12079.8 | 6.872 | 0.939 | 0.437 | 0.059 |
-| 2 | 36.337 | 34.022 | 56136.2 | 33.568 | 0.987 | 0.442 | 0.013 |
-| 3 | 28.190 | 2.896 | 4778.1 | 2.712 | 0.938 | 0.172 | 0.058 |
-| 4 | 27.113 | 25.043 | 41321.5 | 24.581 | 0.982 | 0.450 | 0.018 |
-| 5 | 23.912 | 22.745 | 37528.9 | 22.297 | 0.980 | 0.435 | 0.019 |
-| 6 | 15.152 | 13.641 | 22507.6 | 13.176 | 0.966 | 0.453 | 0.033 |
-| 7 | 12.074 | 10.725 | 17696.8 | 10.285 | 0.959 | 0.428 | 0.040 |
+| ---- | :----------------: | :-----------: | :--------------: | :---------------: | :-----------: | :------------------: | :--------------: |
+| 0    |       6.262       |     4.971     |      8201.7      |       4.516       |     0.909     |        0.443        |      0.089      |
+| 1    |       8.649       |     7.321     |     12079.8     |       6.872       |     0.939     |        0.437        |      0.059      |
+| 2    |       36.337       |    34.022    |     56136.2     |      33.568      |     0.987     |        0.442        |      0.013      |
+| 3    |       28.190       |     2.896     |      4778.1      |       2.712       |     0.938     |        0.172        |      0.058      |
+| 4    |       27.113       |    25.043    |     41321.5     |      24.581      |     0.982     |        0.450        |      0.018      |
+| 5    |       23.912       |    22.745    |     37528.9     |      22.297      |     0.980     |        0.435        |      0.019      |
+| 6    |       15.152       |    13.641    |     22507.6     |      13.176      |     0.966     |        0.453        |      0.033      |
+| 7    |       12.074       |    10.725    |     17696.8     |      10.285      |     0.959     |        0.428        |      0.040      |
 
 **综合优化效果**：
 
@@ -379,16 +382,16 @@ for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x)
 
 访存类算子调优时，建议先用连续复制确认当前规模下的GM搬运上限，再用最直接的实现暴露主要差距。本样例中，直接转置与复制基线的差距主要来自非连续GM写，因此优化方向不是增加计算并行度，而是重排访存：以32×32的tile为单位连续读入UB，在UB内完成转置方向读取，再按输出矩阵行方向连续写回GM。
 
-分块后需要先确定Thread Block到tile的映射方式。按切分后的tile分组启动Thread Block实现简单，但当tile数远大于硬件vector core数时，会带来额外的启动和调度开销；将Thread Block数固定为硬件vector core数，并在kernel内循环处理多个tile，可以降低这部分开销。线程数也不能只参考连续搬运场景，高线程数会限制每个线程可使用的寄存器数量，索引逻辑变复杂后可能出现寄存器溢出，需要结合`--cce-res-usage`和实测耗时选择。
+分块后需要先确定Thread Block到tile的映射方式。按切分后的tile分组启动Thread Block实现简单，但当tile数远大于硬件vector core数时，会带来额外的启动和调度开销；将Thread Block数固定为硬件vector core数，并在kernel内循环处理多个tile，可以降低这部分开销。线程数也不能只参考连续搬运场景，高线程数会限制每个线程可使用的寄存器数量，索引逻辑变复杂后可能出现寄存器溢出，需要结合 `--cce-res-usage`和实测耗时选择。
 
-当GM访问已经转为连续后，瓶颈会转移到UB访问和同步。转置读UB时，如果按列访问32×32的tile，容易出现bank冲突，可以通过padding改变UB物理布局；循环中的同步也需要结合数据覆盖关系判断是否必要，双缓冲可以在不覆盖当前读取数据的前提下减少一次同步。
+当GM访问已经转为连续后，瓶颈会转移到UB访问和同步。转置读UB时，如果按列访问32×32的tile，容易出现bank冲突，可以通过padding改变UB物理布局；循环中的同步也需要结合数据覆盖关系判断是否必要，double buffer可以在不覆盖当前读取数据的前提下减少一次同步。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量
-  
+
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
 
   ```bash
@@ -396,7 +399,7 @@ for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x)
   ```
 
   > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
-
+  >
 - 样例执行
 
   在本样例目录下执行如下命令。
@@ -409,15 +412,15 @@ for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x)
   ```
 
   程序第一个参数为方阵边长，必须为32的整数倍。
-
 - 编译选项说明
 
-  | 选项                       | 可选值      | 说明                                                       |
-  | -------------------------- | ----------- | ---------------------------------------------------------- |
-  | `CMAKE_ASC_ARCHITECTURES`  | `dav-3510`  | NPU架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT） |
-  | `SCENARIO_NUM`             | `0`-`7`     | 样例类型，默认为7                                          |
+  | 选项                        | 可选值       | 说明                                                       |
+  | --------------------------- | ------------ | ---------------------------------------------------------- |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT） |
+  | `SCENARIO_NUM`            | `0`-`7`  | 样例类型，默认为7                                          |
 
   执行结果如下，说明精度对比成功。
+
 
   ```text
   [Success] Case accuracy verification passed.
@@ -425,13 +428,13 @@ for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x)
 
 ## 性能分析
 
-使用`msprof`工具获取详细性能数据：
+使用 `msprof`工具获取详细性能数据：
 
 ```bash
 msprof op ./build/matrix_transpose
 ```
 
-命令执行完成后，会在输出目录生成以`OPPROF_{timestamp}_XXX`命名的文件夹，性能数据文件夹结构示例如下：
+命令执行完成后，会在输出目录生成以 `OPPROF_{timestamp}_XXX`命名的文件夹，性能数据文件夹结构示例如下：
 
 ```text
 ├── dump                       // 原始性能数据
