@@ -703,6 +703,26 @@ function balanceDivTags(html) {
         if (result === code) return null
         return result
       },
+    }, {
+      name: 'pdf-inline-preview',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (req.url && /\.pdf(\?|$)/i.test(req.url)) {
+            res.setHeader('Content-Type', 'application/pdf')
+            res.setHeader('Content-Disposition', 'inline')
+          }
+          next()
+        })
+      },
+      configurePreviewServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (req.url && /\.pdf(\?|$)/i.test(req.url)) {
+            res.setHeader('Content-Type', 'application/pdf')
+            res.setHeader('Content-Disposition', 'inline')
+          }
+          next()
+        })
+      },
     }],
     vue: {
       template: {
