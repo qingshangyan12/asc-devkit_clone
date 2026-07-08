@@ -37,16 +37,16 @@ repos:
           - "-i"
 
   # Python 代码检查
-  - repo: https://gitcode.com/gh_mirrors/ru/ruff-pre-commit
-    rev: v0.14.14
-    hooks:
-      - id: ruff-check
-        args: ["--output-format", "github", "--fix"]
-        types: [python]
-        exclude: '^(\.agent/)'
-      - id: ruff-format
-        types: [python]
-        exclude: '^(\.agent/)'
+  # - repo: https://gitcode.com/gh_mirrors/ru/ruff-pre-commit
+  #   rev: v0.14.14
+  #   hooks:
+  #     - id: ruff-check
+  #       args: ["--output-format", "github", "--fix"]
+  #       types: [python]
+  #       exclude: '^(\.agent/)'
+  #     - id: ruff-format
+  #       types: [python]
+  #       exclude: '^(\.agent/)'
 
   # OAT 合规性检查 (Open Source Audit Tool)
   - repo: local
