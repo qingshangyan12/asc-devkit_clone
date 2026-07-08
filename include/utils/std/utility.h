@@ -14,7 +14,7 @@
  */
 
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-#error "utility.h is not supported in pure SIMT mode."
+#error "utility.h cannot be used with compile flag --enable-simt enabled."
 #endif
 
 #ifndef AICORE_UTILS_STD_UTILITY_H

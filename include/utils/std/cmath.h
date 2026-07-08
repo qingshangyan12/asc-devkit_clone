@@ -14,7 +14,7 @@
  */
 
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-#error "cmath.h is not supported in pure SIMT mode."
+#error "cmath.h cannot be used with compile flag --enable-simt enabled."
 #endif
 
 #ifndef AICORE_UTILS_STD_CMATH_H

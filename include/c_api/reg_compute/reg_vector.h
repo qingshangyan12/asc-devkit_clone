@@ -9,7 +9,7 @@
 */
 
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-#error "reg_vector.h is not supported in pure SIMT mode."
+#error "reg_vector.h cannot be used with compile flag --enable-simt enabled."
 #endif
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)

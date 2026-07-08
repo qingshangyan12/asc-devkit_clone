@@ -14,7 +14,7 @@
  */
 
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-#error "softmaxflashv2.h is not supported in pure SIMT mode."
+#error "softmaxflashv2.h cannot be used with compile flag --enable-simt enabled."
 #endif
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)

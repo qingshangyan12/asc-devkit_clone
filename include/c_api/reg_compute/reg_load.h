@@ -9,7 +9,7 @@
 */
 
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-#error "reg_load.h is not supported in pure SIMT mode."
+#error "reg_load.h cannot be used with compile flag --enable-simt enabled."
 #endif
 
 #ifndef INCLUDE_C_API_REG_COMPUTE_REG_LOAD_H
