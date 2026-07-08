@@ -11,7 +11,7 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_UTILS_IMPL_UTILS_C_API_TYPE_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_UTILS_IMPL_UTILS_C_API_TYPE_H
 
-#include "../../../../utils/common_types.h"
+#include "impl/utils/common_types.h"
 
 #ifndef INT4X2_T_STRUCT
 #define INT4X2_T_STRUCT
@@ -38,6 +38,8 @@ using vector_fp4x2_e2m1_t = vector_f4e2m1x2;
 using vector_fp4x2_e1m2_t = vector_f4e1m2x2;
 using vector_store_unalign = vector_align;
 using vector_load_unalign = vector_align;
-using iter_reg = vector_address;
+using addr_reg = vector_address;
+// iter_reg has been deprecated, please use addr_reg instead.
+using iter_reg [[deprecated("iter_reg has been deprecated, please use addr_reg instead.")]] = addr_reg;
 
 #endif

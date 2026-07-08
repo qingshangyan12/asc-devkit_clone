@@ -8,6 +8,8 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/reg_compute/reg_convert.h"`。
+
 将uint32_t类型转化为uint16_t类型，支持饱和/非饱和模式。
 
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](./rounding_mode.md)。
@@ -57,5 +59,6 @@ PIPE_V
 vector_uint32_t src;
 vector_uint16_t dst;
 vector_bool mask;
+mask = asc_create_mask_b32(PAT_ALL);
 asc_uint322uint16(dst, src, mask);
 ```

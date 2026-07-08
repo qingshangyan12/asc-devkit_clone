@@ -9,6 +9,8 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/cube_datamove/cube_datamove.h"`。
+
 将数据从L1 Buffer搬运到BiasTable Buffer中，BiasTable Buffer用于存放矩阵计算中的Bias。
 
 ## 函数原型
@@ -34,6 +36,7 @@
 | :--- | :--- | :--- |
 | dst | 输出 | 目的操作数起始地址。 |
 | src | 输入 | 源操作数起始地址。 |
+| size | 输入 | 搬运数据大小（字节）。|
 | conv_control | 输入 | 是否开启随路转化。|
 | n_burst | 输入 | 待搬运的连续传输数据块个数。取值范围：[1, 4095]。 |
 | len_burst | 输入 | 待搬运的每个连续传输数据块的长度，单位为DataBlock（32字节）。取值范围：[1, 65535]。 |

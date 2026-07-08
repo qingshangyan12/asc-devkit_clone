@@ -8,6 +8,8 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/reg_compute/reg_convert.h"`。
+
 将vector_int32_t类型转换成vector_uint16_t类型，写入目的操作数的上半部分或下半部分，并支持不同的饱和模式。
 
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](./rounding_mode.md)。
@@ -59,6 +61,7 @@ PIPE_V
 vector_uint16_t dst;
 vector_int32_t src;
 vector_bool mask;
+mask = asc_create_mask_b32(PAT_ALL);
 asc_int322uint16(dst, src, mask);    // 不饱和模式，将src转换成vector_uint16_t类型并写入dst的上半部分
 asc_int322uint16_sat(dst, src, mask);    // 饱和模式，将src转换成vector_uint16_t类型并写入dst的上半部分
 asc_int322uint16_v2(dst, src, mask);    // 不饱和模式，将src转换成vector_uint16_t类型并写入dst的下半部分

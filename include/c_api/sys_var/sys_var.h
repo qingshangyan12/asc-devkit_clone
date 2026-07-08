@@ -9,21 +9,21 @@
 */
 
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)  
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
-#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
-#endif     
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#endif
 
 #ifndef INCLUDE_C_API_SYS_VAR_SYS_VAR_H
 #define INCLUDE_C_API_SYS_VAR_SYS_VAR_H
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
-#include "../../../impl/c_api/instr_impl/npu_arch_2201/sys_var_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/sys_var_impl.h"
 
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
-#include "../../../impl/c_api/instr_impl/npu_arch_3510/sys_var_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl.h"
 
 #endif
 
@@ -105,7 +105,7 @@ __aicore__ inline int64_t asc_get_squeeze_status();
 
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
-#endif    
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#endif

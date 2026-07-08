@@ -9,6 +9,8 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/cube_datamove/cube_datamove.h"`。
+
 将数据从L1 Buffer搬运到Fixpipe Buffer中，Fixpipe Buffer用于存放量化参数。
 
 ## 函数原型
@@ -24,7 +26,7 @@
     ```
 
 - 同步搬运
-    ``cpp
+    ```cpp
     __aicore__ inline void asc_copy_l12fb_sync(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size)
     ```
 

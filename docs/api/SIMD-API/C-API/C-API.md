@@ -176,6 +176,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_set_ub2gm_loop_size](vector_datamove/asc_set_ub2gm_loop_size.md)                                                       | 使用[asc_copy_ub2gm_align](vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)将数据从Unified Buffer (UB)搬运到Global Memory (GM)时，设置内层循环和外层循环的次数。 |
 | [asc_set_ndim_loop_stride](vector_datamove/asc_set_ndim_loop_stride.md)                                                     | 设置[asc_ndim_copy_gm2ub](vector_datamove/asc_ndim_copy_gm2ub.md)在进行多维搬运时每个维度内的源操作数与目的操作数的元素之间的间隔，最多设置5个维度。 |
 | [asc_set_ndim_pad_value](vector_datamove/asc_set_ndim_pad_value.md)                                                         | 设置[asc_ndim_copy_gm2ub](vector_datamove/asc_ndim_copy_gm2ub.md)接口Padding的填充固定值。 |
+| [asc_set_gm2ub_pad（废弃）](vector_datamove/asc_set_gm2ub_pad_deprecated.md)                                                  | 使用[asc_copy_gm2ub_align](vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)将数据从Global Memory (GM)搬运到Unified Buffer (UB)且源操作数非对齐时，设置连续搬运数据块左右两侧需要填补的数据值。 |
 
 ## 标量操作
 
@@ -193,6 +194,17 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_zero_bits_cnt](scalar_compute/asc_zero_bits_cnt.md) | 获取一个uint64_t类型数字的二进制中0的个数。 |
 | [asc_store_dev](scalar_compute/asc_store_dev.md) | 不经过DCache向GM地址上写数据。 |
 | [asc_float2int32](scalar_compute/asc_float2int32.md) | 将float类型转化为int32_t类型，并支持多种舍入模式。 |
+| [asc_atomic_add](scalar_compute/asc_atomic_add.md) | 对Global Memory中的数据与指定数据执行原子加操作。 |
+| [asc_atomic_sub](scalar_compute/asc_atomic_sub.md) | 对Global Memory中的数据与指定数据执行原子减操作。 |
+| [asc_atomic_or](scalar_compute/asc_atomic_or.md) | 对Global Memory中的数据与指定数据执行原子或操作。 |
+| [asc_atomic_xor](scalar_compute/asc_atomic_xor.md) | 对Global Memory中的数据与指定数据执行原子异或操作。 |
+| [asc_atomic_and](scalar_compute/asc_atomic_and.md) | 对Global Memory中的数据与指定数据执行原子与操作。 |
+| [asc_atomic_max](scalar_compute/asc_atomic_max.md) | 对Global Memory中的数据与指定数据执行原子求最大值操作。 |
+| [asc_atomic_min](scalar_compute/asc_atomic_min.md) | 对Global Memory中的数据与指定数据执行原子求最小值操作。 |
+| [asc_atomic_inc](scalar_compute/asc_atomic_inc.md) | 对Global Memory中address指向的计数器执行原子递增操作，如果address上的数值大于等于指定数值val，则对address赋值为0，否则将address上数值加1。 |
+| [asc_atomic_dec](scalar_compute/asc_atomic_dec.md) | 对Global Memory中address指向的计数器执行原子递减操作，如果address上的数值等于0或大于指定数值val，则对address赋值为val，否则将address上数值减1。 |
+| [asc_atomic_exch](scalar_compute/asc_atomic_exch.md) | 对Global Memory中address指向的元素执行原子赋值操作。 |
+| [asc_atomic_cas](scalar_compute/asc_atomic_cas.md) | 对Global Memory中address指向的元素执行原子比较赋值操作，如果address上的数值等于指定数值compare，则对address赋值为指定数值val，否则address的数值不变。 |
 
 ## 矩阵计算
 
@@ -310,7 +322,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_set_atomic_min_int8](simd_atomic/asc_set_atomic_min.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int8_t数据与GM中已有数据进行逐元素比较，并将最小值写入GM。 |
 | [asc_set_atomic_min_int16](simd_atomic/asc_set_atomic_min.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int16_t数据与GM中已有数据进行逐元素比较，并将最小值写入GM。 |
 | [asc_set_store_atomic_config_v1](simd_atomic/asc_set_store_atomic_config_v1.md)| 设置原子操作启用位与原子操作类型的值，适用于Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品。 |
-| <cann-filter npu_type = "950" > [asc_set_store_atomic_config_v2](simd_atomic/asc_set_store_atomic_config_v2.md)| 设置原子操作启用位与原子操作类型的值，适用于Ascend 950PR/Ascend 950DT。</cann-filter>|
+| <cann-filter npu_type = "950" > [asc_set_store_atomic_config_v2（废弃）](simd_atomic/asc_set_store_atomic_config_v2_deprecated.md)| 设置原子操作启用位与原子操作类型的值，适用于Ascend 950PR/Ascend 950DT。</cann-filter>|
 | [asc_get_store_atomic_config](simd_atomic/asc_get_store_atomic_config.md)| 获取原子操作启用位与原子操作类型的值。 |
 | [asc_set_atomic_none](simd_atomic/asc_set_atomic_none.md) | 清空原子操作的状态。 |
 
@@ -386,7 +398,8 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 | [asc_bfloat162int32](reg/reg_vector/asc_bfloat162int32.md) | 将bfloat16_t类型数据转换为int32_t类型，并支持多种舍入模式。 |
 | [asc_clear_ar_spr](reg/reg_vector/asc_clear_ar_spr.md) | 对AR寄存器进行清理，AR寄存器通常由[asc_squeeze_with_status](reg/reg_vector/asc_squeeze_with_status.md)接口使用。 |
 | [asc_copy](reg/reg_vector/asc_copy.md) | 完成数据在寄存器内的搬运。 |
-| [asc_create_iter_reg](reg/reg_vector/asc_create_iter_reg.md) | 地址寄存器通过该接口初始化，然后在循环之中使用地址寄存器存储地址偏移量。 |
+| [asc_create_addr_reg](reg/reg_vector/asc_create_addr_reg.md) | 地址寄存器通过该接口初始化，然后在循环之中使用地址寄存器存储地址偏移量。 |
+| [asc_create_iter_reg（废弃）](reg/reg_vector/asc_create_iter_reg_deprecated.md) | 该接口已废弃，请使用asc_create_addr_reg实现此功能。 |
 | [asc_create_mask](reg/reg_vector/asc_create_mask.md) | 根据入参生成相应的掩码寄存器。 |
 | [asc_cumulative_histogram](reg/reg_vector/asc_cumulative_histogram.md) | 对直方图数据进行累计统计。 |
 | [asc_deintlv](reg/reg_vector/asc_deintlv.md) | 给定源操作数src0和src1，将src0和src1中的元素解交织存入结果操作数dst0和dst1中。 |

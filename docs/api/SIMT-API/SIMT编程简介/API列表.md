@@ -225,7 +225,7 @@
 | [__ll2half_rd](../数学函数/half类型/half类型精度转换函数/__ll2half_rd.md) | 获取输入遵循CAST_FLOOR模式转换成的half类型数据。 |
 | [__ll2half_ru](../数学函数/half类型/half类型精度转换函数/__ll2half_ru.md) | 获取输入遵循CAST_CEIL模式转换成的half类型数据。 |
 | [__ll2half_rna](../数学函数/half类型/half类型精度转换函数/__ll2half_rna.md) | 获取输入遵循CAST_ROUND模式转换成的half类型数据。 |
-| [__floats2half2_rn](../数学函数/half类型/half类型精度转换函数/__floats2half2_rn.md) | 将输入的数据x，y遵循CAST_RINT模式分别转换为bfloat16类型并填充到half2的前后两部分，返回转换后的half2类型数据。 |
+| [__floats2half2_rn](../数学函数/half类型/half类型精度转换函数/__floats2half2_rn.md) | 将输入的数据x，y遵循CAST_RINT模式分别转换为half类型并填充到half2的前后两部分，返回转换后的half2类型数据。 |
 | [__float22half2_rn](../数学函数/half类型/half类型精度转换函数/__float22half2_rn.md) | 将float2类型数据遵循CAST_RINT模式转换为half2类型，返回转换后的half2类型数据。 |
 | [__low2half](../数学函数/half类型/half类型精度转换函数/__low2half.md) | 返回输入数据的低16位。 |
 | [__low2half2](../数学函数/half类型/half类型精度转换函数/__low2half2.md) | 将输入数据的低16位填充到half2并返回。 |
@@ -726,7 +726,6 @@
 | [__usad](../数学函数/整型数学库函数/__usad.md) | 对输入数据x、y、z，计算|x - y|+z的结果，即第一个入参和第二个入参之差的绝对值与第三个入参的和。 |
 | [__mul24](../数学函数/整型数学库函数/__mul24.md) | 获取输入int32类型数据x和y低24位乘积的低32位结果。x和y的高8位被忽略。 |
 | [__umul24](../数学函数/整型数学库函数/__umul24.md) | 获取输入uint32类型数据x和y低24位乘积的低32位结果。x和y的高8位被忽略。 |
-|  |  |
 | [__hadd](../数学函数/整型数学库函数/__hadd-259.md) | 获取输入int32类型数据x和y的平均值，避免中间求和溢出。 |
 | [__rhadd](../数学函数/整型数学库函数/__rhadd.md) | 获取输入int32类型数据x和y的向上取整平均值，避免中间求和溢出。 |
 | [__uhadd](../数学函数/整型数学库函数/__uhadd.md) | 获取输入uint32类型数据x和y的平均值，避免中间求和溢出。 |
@@ -746,6 +745,7 @@
 | [asc_stwt](../访存函数/asc_stwt.md) | 将指定数据存储到Global Memory的地址address中，并缓存至Data Cache和L2 Cache。 |
 | [asc_dcci_single](../访存函数/asc_dcci_single.md) | 刷新指定地址所在的Cache Line，保证数据读取时Cache的一致性。 |
 | [asc_dcci_entire](../访存函数/asc_dcci_entire.md) | 刷新核内的整个Data Cache，保证数据读取时Cache的一致性。 |
+| [asc_nop](../访存函数/asc_nop.md) | 生成一条空操作指令，占用当前线程15个时钟周期，不执行任何实际计算与访存操作。 |
 
 ## 地址空间谓词函数<a name="section97001946144014"></a>
 

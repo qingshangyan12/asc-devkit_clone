@@ -8,6 +8,8 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/reg_compute/reg_convert.h"`。
+
 将int64_t类型的源操作数转换成int32_t类型，并支持不同的饱和模式。
 
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](./rounding_mode.md)。
@@ -57,5 +59,9 @@ PIPE_V
 vector_int32_t dst;
 vector_int64_t src;
 vector_bool mask;
-asc_int642int32(dst, src, mask);
+mask = asc_create_mask_b32(PAT_ALL); // 当前mask仅支持b8, b16, b32模式的mask，低位宽的fullmask可以给高位宽数据类型作为fullmask使用
+asc_int642int32(dst, src, mask);    // 不饱和模式，将src转换成vector_int32_t类型并写入dst的上半部分
+asc_int642int32_sat(dst, src, mask);    // 饱和模式，将src转换成vector_int32_t类型并写入dst的上半部分
+asc_int642int32_v2(dst, src, mask);    // 不饱和模式，将src转换成vector_int32_t类型并写入dst的下半部分
+asc_int642int32_sat_v2(dst, src, mask);    // 饱和模式，将src转换成vector_int32_t类型并写入dst的下半部分
 ```

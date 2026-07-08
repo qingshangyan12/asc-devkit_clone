@@ -8,6 +8,8 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/reg_compute/reg_convert.h"`。
+
 将uint8_t类型数据转为uint16_t类型。
 
 由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个VL大小的数据分为两部分，根据不同接口选择输入数据索引为奇数的位置或偶数的位置。
@@ -49,6 +51,7 @@ PIPE_V
 vector_uint16_t dst;
 vector_uint8_t src;
 vector_bool mask;
+mask = asc_create_mask_b8(PAT_ALL);
 asc_uint82uint16(dst, src, mask);    // 将src的上半部分转换成vector_uint16_t类型并写入dst
 asc_uint82uint16_v2(dst, src, mask);    // 将src的下半部分转换成vector_uint16_t类型并写入dst
 ```
