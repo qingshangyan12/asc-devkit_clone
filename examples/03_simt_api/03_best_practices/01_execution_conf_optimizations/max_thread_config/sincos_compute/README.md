@@ -73,7 +73,7 @@ sincos_compute/
 
 | Case   | 实现特点                                                                 | 使用的核函数                     | 优化特性                |
 |--------|----------------------------------------------------------------------|----------------------------|---------------------|
-| Case 0 | 不设置launch bounds，使用默认值                                | sincos_thread_1024  | 基线版本，未配置`__launch_bounds__`          |
+| Case 0 | 不设置`__launch_bounds__`，使用默认值                                | sincos_thread_1024  | 基线版本，未配置`__launch_bounds__`          |
 | Case 1 | 根据实际算子的计算规模，配置`__launch_bounds__(512)` | sincos_thread_512 | 编译器使用用户指定的配置值进行相应优化 |
 
 ---
@@ -199,7 +199,7 @@ __global__ __launch_bounds__(512) void sincos_thread_512(float* input,
 | Case version | Task Duration(μs) | Task Duration相对Case 0 | 优化点                   |
 |--------------|-------------------|-----------------------|-----------------------|
 | Case 0       | 102.47             | **1x**                | 基线版本，寄存器溢出到Global Memory |
-| Case 1       | 96.22            | **0.94x**           | 配置launch bounds避免寄存器溢出 |
+| Case 1       | 96.22            | **0.94x**           | 配置`__launch_bounds__`避免寄存器溢出 |
 
 ## 调优建议
 
