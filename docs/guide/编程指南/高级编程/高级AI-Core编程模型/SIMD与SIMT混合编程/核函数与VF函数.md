@@ -18,7 +18,7 @@ SIMD与SIMT混合编程中涉及的函数类型如下表所示：
 各层函数间的调用关系如下：
 - 核函数：是Device侧的入口函数，可以调用`__aicore__`函数和VF函数。
 - simd vf函数：能被核函数或者`__aicore__`函数通过`asc_vf_call`接口调用。simd vf函数内只能调用`__simd_callee__`函数和`__callee__`函数。
-- simt vf函数：使用__simt_vf__标记，能被核函数或者`__aicore__`函数通过`asc_vf_call`接口调用。simt vf函数内只能调用`__simt_callee__`函数和`__callee__`函数。
+- simt vf函数：使用`__simt_vf__`标记，能被核函数或者`__aicore__`函数通过`asc_vf_call`接口调用。simt vf函数内只能调用`__simt_callee__`函数和`__callee__`函数。
 - `__simd_callee__`子函数：simd vf函数内部的子函数，子函数可能有返回值或者通过引用传参。__simd_callee__函数内只能调用`__simd_callee__`函数和`__callee__`函数。
 - `__simt_callee__`子函数：simt vf函数内部的子函数，子函数可能有返回值或者通过引用传参。`__simt_callee__`函数内只能调用`__simt_callee__`函数和`__callee__`函数。
 - `__callee__`公共函数：可供VF内部调用的公共子函数。`__callee__`函数内只能调用`__callee__`函数。
@@ -41,6 +41,8 @@ __global__ __vector__ void kernel_name(__gm__ type* param1, __gm__ type* param2,
 | --- | --- | --- |
 | `__global__` | 标识核函数，表明可在Host侧通过`<<<...>>>`调用 | 必需 |
 | `__vector__` | 标识函数是在Device侧AI Vector上执行 | 必需 |
+
+> **说明**：概述表中核函数入口修饰符`__global__ __aicore__`中的`__aicore__`为通用Device侧执行空间限定符，`__vector__`是其特化形式，专用于AIV核执行。二者在核函数定义中可互换使用，`__vector__`更明确地指示AIV核执行。
 
 核函数定义有以下几个约束：
 
