@@ -58,7 +58,7 @@ def readme_commands(
     text: str,
     suggestions: List[Suggestion],
 ) -> tuple[List[Command], str, str]:
-    run_section = _section(text, "编译运行")
+    run_section = _section(text, "编译运行") or _section(text, "运行方式")
     if not run_section:
         suggestions.append(
             _suggest(rel_path, "structure", "warn", "README has no 编译运行 section", "Add a runnable 编译运行 section.")

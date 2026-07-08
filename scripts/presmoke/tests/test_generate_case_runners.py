@@ -24,14 +24,18 @@ from presmoke.generate_case_runners import (
     ARCH_OVERRIDES,
     NO_CMAKE_ARCH_INJECTION_CASES,
     apply_case_overrides,
+    cell_for_spec,
     command_env_prefix,
     command_workdir,
     explicit_skip_config,
+    expand_scenario_cells,
     is_atc_prerequisite_command,
     merge_export_commands_into_run,
     parse_scenario_values_from_cmake,
+    parse_scenario_values_from_readme,
     quote_env_value,
     render_runner,
+    rewrite_command_for_scenario,
     requires_custom_op_package,
     RunnerRenderSpec,
     supported_archs_for_scenario,
@@ -107,18 +111,17 @@ class GenerateCaseRunnersTest(unittest.TestCase):
     def test_manifest_modes_include_readme_cpu_support(self) -> None:
         project_root = Path(__file__).resolve().parents[3]
         examples_root = project_root / "examples"
-        manifest = {
-            item["case"]: item
-            for item in json.loads((project_root / "scripts/presmoke/reports/case_runner_manifest.json").read_text(encoding="utf-8"))
-        }
+        manifest_by_source: dict[str, list[dict]] = {}
+        for item in json.loads((project_root / "scripts/presmoke/reports/case_runner_manifest.json").read_text(encoding="utf-8")):
+            manifest_by_source.setdefault(item.get("source_case") or item["case"], []).append(item)
         missing = []
         for readme in examples_root.rglob("README.md"):
             text = readme.read_text(encoding="utf-8", errors="ignore")
             if "CMAKE_ASC_RUN_MODE=cpu" not in text:
                 continue
             rel_path = readme.parent.relative_to(examples_root).as_posix()
-            item = manifest.get(rel_path)
-            if not item or "cpu" not in item.get("supported_modes", []):
+            items = manifest_by_source.get(rel_path, [])
+            if not items or all("cpu" not in item.get("supported_modes", []) for item in items):
                 missing.append(rel_path)
 
         self.assertEqual(missing, [])
@@ -126,19 +129,18 @@ class GenerateCaseRunnersTest(unittest.TestCase):
     def test_manifest_includes_leaf_cmake_executable_cases(self) -> None:
         project_root = Path(__file__).resolve().parents[3]
         examples_root = project_root / "examples"
-        manifest_cases = {
-            item["case"]
-            for item in json.loads(
-                (project_root / "scripts/presmoke/reports/case_runner_manifest.json").read_text(encoding="utf-8")
-            )
-        }
+        manifest_items = json.loads(
+            (project_root / "scripts/presmoke/reports/case_runner_manifest.json").read_text(encoding="utf-8")
+        )
+        manifest_cases = {item["case"] for item in manifest_items}
+        manifest_sources = {item.get("source_case") or item["case"] for item in manifest_items}
         missing = []
         for cmake_file in examples_root.rglob("CMakeLists.txt"):
             text = cmake_file.read_text(encoding="utf-8", errors="ignore")
             if not re.search(r"\badd_executable\s*\(", text):
                 continue
             rel_path = cmake_file.parent.relative_to(examples_root).as_posix()
-            if rel_path in manifest_cases:
+            if rel_path in manifest_cases or rel_path in manifest_sources:
                 continue
             readme = cmake_file.parent / "README.md"
             has_child_case = any(case.startswith(rel_path + "/") for case in manifest_cases)
@@ -156,6 +158,12 @@ class GenerateCaseRunnersTest(unittest.TestCase):
 
         self.assertEqual(parse_scenario_values_from_cmake(cmake_file), [0, 1, 2, 3, 4, 5])
 
+    def test_scenario_range_can_be_discovered_from_readme_table(self) -> None:
+        project_root = Path(__file__).resolve().parents[3]
+        readme_file = project_root / "examples/01_simd_cpp_api/04_advanced_api/08_transpose/transdata/README.md"
+
+        self.assertEqual(parse_scenario_values_from_readme(readme_file), [1, 2, 3, 4])
+
     def test_scenario_runner_uses_source_case_and_unique_build_dir(self) -> None:
         script = render_runner_from_parts(
             "01_simd_cpp_api/05_best_practices/02_reg_compute/softmax_high_performance__scenario_5",
@@ -170,6 +178,32 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         self.assertIn('BUILD_DIR="$CASE_DIR/build_${MODE}_scenario_5"', script)
         self.assertIn("SCENARIO_NUM=5", script)
         self.assertIn("-DSCENARIO_NUM=5", script)
+
+    def test_default_scenario_is_named_explicitly(self) -> None:
+        project_root = Path(__file__).resolve().parents[3]
+        case_dir = project_root / "examples/01_simd_cpp_api/05_best_practices/02_reg_compute/softmax_high_performance"
+        spec = ExampleSpec(
+            case_dir,
+            "01_simd_cpp_api/05_best_practices/02_reg_compute/softmax_high_performance",
+            [Command("cmake .. -DSCENARIO_NUM=5", "cmake")],
+            ["dav-3510"],
+            ["npu"],
+            "readme",
+        )
+
+        expanded = expand_scenario_cells([cell_for_spec(spec, "dav-3510", "npu")], project_root)
+        names = [cell.example.rel_path for cell in expanded]
+
+        self.assertIn("01_simd_cpp_api/05_best_practices/02_reg_compute/softmax_high_performance__scenario_5", names)
+        self.assertNotIn("01_simd_cpp_api/05_best_practices/02_reg_compute/softmax_high_performance", names)
+
+    def test_exported_scenario_num_is_rewritten(self) -> None:
+        command = Command("export SCENARIO_NUM=1; ./demo", "run")
+
+        rewritten = rewrite_command_for_scenario(command, 14)
+
+        self.assertEqual(rewritten.raw, "export SCENARIO_NUM=14; ./demo")
+        self.assertEqual(rewritten.env["SCENARIO_NUM"], "14")
 
     def test_atc_prerequisite_python_stays_in_build_before_atc(self) -> None:
         commands = [

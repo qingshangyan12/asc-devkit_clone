@@ -253,15 +253,17 @@ def write_runner(project_root: Path, runners_root: Path, cell, runnable_on_targe
 def expand_scenario_cells(cells: Iterable[Cell], project_root: Path) -> List[Cell]:
     expanded: List[Cell] = []
     for cell in cells:
-        expanded.append(cell)
         cmake_file = cell.example.path / "CMakeLists.txt"
         values = parse_scenario_values_from_cmake(cmake_file)
+        if not values:
+            values = parse_scenario_values_from_readme(cell.example.path / "README.md")
         if len(values) <= 1:
+            expanded.append(cell)
             continue
         default_value = default_scenario_value(cell, cmake_file)
+        if default_value is None or default_value not in values:
+            expanded.append(cell)
         for value in values:
-            if value == default_value:
-                continue
             expanded.append(make_scenario_cell(cell, project_root, value))
     return expanded
 
@@ -270,11 +272,13 @@ def parse_scenario_values_from_cmake(cmake_file: Path) -> List[int]:
     if not cmake_file.exists():
         return []
     text = cmake_file.read_text(encoding="utf-8", errors="ignore")
-    if "SCENARIO_NUM" not in text:
+    if "SCENARIO_NUM" not in text and "SCENARIO" not in text:
         return []
 
     values: set[int] = set()
     for match in re.finditer(r"set\s*\(\s*SCENARIO_NUM\s+[^)]*CACHE\s+STRING\s+\"([^\"]*)\"", text):
+        values.update(parse_scenario_values_from_text(match.group(1)))
+    for match in re.finditer(r"set\s*\(\s*SCENARIO\s+[^)]*CACHE\s+STRING\s+\"([^\"]*)\"", text):
         values.update(parse_scenario_values_from_text(match.group(1)))
     for match in re.finditer(r"SCENARIO_NUM[^\n\r\"]*\"([^\"]*)\"", text):
         values.update(parse_scenario_values_from_text(match.group(1)))
@@ -282,6 +286,23 @@ def parse_scenario_values_from_cmake(cmake_file: Path) -> List[int]:
         values.update(parse_scenario_values_from_text(match.group(1)))
     for match in re.finditer(r"SCENARIO_NUM[^\n\r]*(?:must be|Valid values are|specify)[^\n\r]*", text):
         values.update(parse_scenario_values_from_text(match.group(0)))
+    return sorted(value for value in values if 0 <= value <= 32)
+
+
+def parse_scenario_values_from_readme(readme_file: Path) -> List[int]:
+    if not readme_file.exists():
+        return []
+    text = readme_file.read_text(encoding="utf-8", errors="ignore")
+    values: set[int] = set()
+    for line in text.splitlines():
+        if "SCENARIO" not in line:
+            continue
+        table_match = re.search(r"\|\s*`?SCENARIO`?\s*\|\s*([^|]+)\|", line)
+        if table_match:
+            values.update(parse_scenario_values_from_text(table_match.group(1)))
+            continue
+        if re.search(r"(?:取值|Scenario|场景|default|默认)", line):
+            values.update(parse_scenario_values_from_text(line))
     return sorted(value for value in values if 0 <= value <= 32)
 
 
@@ -326,7 +347,14 @@ def scenario_value_from_command(command: Command) -> int | None:
         value = command.env["SCENARIO_NUM"]
         if value.isdigit():
             return int(value)
+    if "SCENARIO" in command.env:
+        value = command.env["SCENARIO"]
+        if value.isdigit():
+            return int(value)
     match = re.search(r"(?:-DSCENARIO_NUM=|SCENARIO_NUM=)(\d+)", command.raw)
+    if match:
+        return int(match.group(1))
+    match = re.search(r"(?:-DSCENARIO=|SCENARIO=)(\d+)", command.raw)
     return int(match.group(1)) if match else None
 
 
@@ -351,20 +379,27 @@ def rewrite_command_for_scenario(command: Command, scenario_num: int) -> Command
     raw = command.raw
     if raw:
         raw = replace_scenario_num_arg(raw, scenario_num)
-        if command.kind == "cmake" and is_cmake_configure(raw) and "-DSCENARIO_NUM=" not in raw:
+        has_cmake_scenario = "-DSCENARIO_NUM=" in raw or "-DSCENARIO=" in raw
+        if command.kind == "cmake" and is_cmake_configure(raw) and not has_cmake_scenario:
             raw = f"{raw} -DSCENARIO_NUM={scenario_num}"
     env = dict(command.env)
     env["SCENARIO_NUM"] = str(scenario_num)
+    if "SCENARIO" in env:
+        env["SCENARIO"] = str(scenario_num)
     return Command(raw, command.kind, env)
 
 
 def replace_scenario_num_arg(command: str, scenario_num: int) -> str:
     value = str(scenario_num)
     patterns = [
-        r"(-DSCENARIO_NUM=)(?:\$\{?SCENARIO_NUM\}?|\d+)",
-        r"(-scenarioNum(?:=|\s+))(?:\$\{?SCENARIO_NUM\}?|\d+)",
-        r"(-scenario_num(?:=|\s+))(?:\$\{?SCENARIO_NUM\}?|\d+)",
-        r"(--scenario(?:=|\s+))(?:\$\{?SCENARIO_NUM\}?|\d+)",
+        r"(-DSCENARIO_NUM=)(?:\$\{?SCENARIO(?:_NUM)?\}?|\d+)",
+        r"(-DSCENARIO=)(?:\$\{?SCENARIO(?:_NUM)?\}?|\d+)",
+        r"(\bSCENARIO_NUM=)(?:\$\{?SCENARIO(?:_NUM)?\}?|\d+)",
+        r"(\bSCENARIO=)(?:\$\{?SCENARIO(?:_NUM)?\}?|\d+)",
+        r"(-scenarioNum(?:=|\s+))(?:\$\{?SCENARIO(?:_NUM)?\}?|\d+)",
+        r"(-scenario_num(?:=|\s+))(?:\$\{?SCENARIO(?:_NUM)?\}?|\d+)",
+        r"(--scenario(?:=|\s+))(?:\$\{?SCENARIO(?:_NUM)?\}?|\d+)",
+        r"(--mode(?:=|\s+))(?:\$\{?SCENARIO(?:_NUM)?\}?|\d+)",
     ]
     for pattern in patterns:
         command = re.sub(pattern, lambda match: match.group(1) + value, command)
