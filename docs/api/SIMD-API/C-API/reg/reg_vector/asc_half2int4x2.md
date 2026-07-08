@@ -12,89 +12,91 @@
 
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](./rounding_mode.md)。
 
+由于源操作数与目的操作数类型位宽比为4:1，写入数据时需要将一个VL大小的数据分为四部分，根据不同接口选取索引0、索引1、索引2或者索引3。
+
 ## 函数原型
 
 ```cpp
 // FLOOR舍入模式，非饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_half2int4x2_rd(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rd(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
 // FLOOR舍入模式，非饱和模式，选取索引1的位置
-__simd_callee__ inline void asc_half2int4x2_rd_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// FLOOR舍入模式，饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_half2int4x2_rd_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// FLOOR舍入模式，饱和模式，选取索引1的位置
-__simd_callee__ inline void asc_half2int4x2_rd_sat_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rd(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
 // FLOOR舍入模式，非饱和模式，选取索引2的位置
-__simd_callee__ inline void asc_half2int4x2_rd_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// FLOOR舍入模式，饱和模式，选取索引2的位置
-__simd_callee__ inline void asc_half2int4x2_rd_sat_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rd(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
 // FLOOR舍入模式，非饱和模式，选取索引3的位置
-__simd_callee__ inline void asc_half2int4x2_rd_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rd(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
+// FLOOR舍入模式，饱和模式，选取索引0的位置
+__simd_callee__ inline void asc_half2int4x2_rd_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
+// FLOOR舍入模式，饱和模式，选取索引1的位置
+__simd_callee__ inline void asc_half2int4x2_rd_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
+// FLOOR舍入模式，饱和模式，选取索引2的位置
+__simd_callee__ inline void asc_half2int4x2_rd_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
 // FLOOR舍入模式，饱和模式，选取索引3的位置
-__simd_callee__ inline void asc_half2int4x2_rd_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rd_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
 // RINT舍入模式，非饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_half2int4x2_rn(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rn(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
 // RINT舍入模式，非饱和模式，选取索引1的位置
-__simd_callee__ inline void asc_half2int4x2_rn_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// RINT舍入模式，饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_half2int4x2_rn_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// RINT舍入模式，饱和模式，选取索引1的位置
-__simd_callee__ inline void asc_half2int4x2_rn_sat_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rn(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
 // RINT舍入模式，非饱和模式，选取索引2的位置
-__simd_callee__ inline void asc_half2int4x2_rn_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// RINT舍入模式，饱和模式，选取索引2的位置
-__simd_callee__ inline void asc_half2int4x2_rn_sat_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rn(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
 // RINT舍入模式，非饱和模式，选取索引3的位置
-__simd_callee__ inline void asc_half2int4x2_rn_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rn(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
+// RINT舍入模式，饱和模式，选取索引0的位置
+__simd_callee__ inline void asc_half2int4x2_rn_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
+// RINT舍入模式，饱和模式，选取索引1的位置
+__simd_callee__ inline void asc_half2int4x2_rn_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
+// RINT舍入模式，饱和模式，选取索引2的位置
+__simd_callee__ inline void asc_half2int4x2_rn_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
 // RINT舍入模式，饱和模式，选取索引3的位置
-__simd_callee__ inline void asc_half2int4x2_rn_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rn_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
 // ROUND舍入模式，非饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_half2int4x2_rna(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rna(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
 // ROUND舍入模式，非饱和模式，选取索引1的位置
-__simd_callee__ inline void asc_half2int4x2_rna_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// ROUND舍入模式，饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_half2int4x2_rna_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// ROUND舍入模式，饱和模式，选取索引1的位置
-__simd_callee__ inline void asc_half2int4x2_rna_sat_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rna(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
 // ROUND舍入模式，非饱和模式，选取索引2的位置
-__simd_callee__ inline void asc_half2int4x2_rna_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// ROUND舍入模式，饱和模式，选取索引2的位置
-__simd_callee__ inline void asc_half2int4x2_rna_sat_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rna(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
 // ROUND舍入模式，非饱和模式，选取索引3的位置
-__simd_callee__ inline void asc_half2int4x2_rna_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rna(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
+// ROUND舍入模式，饱和模式，选取索引0的位置
+__simd_callee__ inline void asc_half2int4x2_rna_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
+// ROUND舍入模式，饱和模式，选取索引1的位置
+__simd_callee__ inline void asc_half2int4x2_rna_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
+// ROUND舍入模式，饱和模式，选取索引2的位置
+__simd_callee__ inline void asc_half2int4x2_rna_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
 // ROUND舍入模式，饱和模式，选取索引3的位置
-__simd_callee__ inline void asc_half2int4x2_rna_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rna_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
 // CEIL舍入模式，非饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_half2int4x2_ru(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_ru(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
 // CEIL舍入模式，非饱和模式，选取索引1的位置
-__simd_callee__ inline void asc_half2int4x2_ru_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// CEIL舍入模式，饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_half2int4x2_ru_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// CEIL舍入模式，饱和模式，选取索引1的位置
-__simd_callee__ inline void asc_half2int4x2_ru_sat_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_ru(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
 // CEIL舍入模式，非饱和模式，选取索引2的位置
-__simd_callee__ inline void asc_half2int4x2_ru_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// CEIL舍入模式，饱和模式，选取索引2的位置
-__simd_callee__ inline void asc_half2int4x2_ru_sat_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_ru(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
 // CEIL舍入模式，非饱和模式，选取索引3的位置
-__simd_callee__ inline void asc_half2int4x2_ru_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// CEIL舍入模式，饱和模式，选取索引3的位置  
-__simd_callee__ inline void asc_half2int4x2_ru_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_ru(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
+// CEIL舍入模式，饱和模式，选取索引0的位置
+__simd_callee__ inline void asc_half2int4x2_ru_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
+// CEIL舍入模式，饱和模式，选取索引1的位置
+__simd_callee__ inline void asc_half2int4x2_ru_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
+// CEIL舍入模式，饱和模式，选取索引2的位置
+__simd_callee__ inline void asc_half2int4x2_ru_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
+// CEIL舍入模式，饱和模式，选取索引3的位置
+__simd_callee__ inline void asc_half2int4x2_ru_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
 // TRUNC舍入模式，非饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_half2int4x2_rz(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rz(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
 // TRUNC舍入模式，非饱和模式，选取索引1的位置
-__simd_callee__ inline void asc_half2int4x2_rz_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// TRUNC舍入模式，饱和模式，选取索引0的位置
-__simd_callee__ inline void asc_half2int4x2_rz_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// TRUNC舍入模式，饱和模式，选取索引1的位置
-__simd_callee__ inline void asc_half2int4x2_rz_sat_v2(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rz(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
 // TRUNC舍入模式，非饱和模式，选取索引2的位置
-__simd_callee__ inline void asc_half2int4x2_rz_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// TRUNC舍入模式，饱和模式，选取索引2的位置
-__simd_callee__ inline void asc_half2int4x2_rz_sat_v3(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rz(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
 // TRUNC舍入模式，非饱和模式，选取索引3的位置
-__simd_callee__ inline void asc_half2int4x2_rz_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
-// TRUNC舍入模式，饱和模式，选取索引3的位置 
-__simd_callee__ inline void asc_half2int4x2_rz_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int4x2_rz(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
+// TRUNC舍入模式，饱和模式，选取索引0的位置
+__simd_callee__ inline void asc_half2int4x2_rz_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
+// TRUNC舍入模式，饱和模式，选取索引1的位置
+__simd_callee__ inline void asc_half2int4x2_rz_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
+// TRUNC舍入模式，饱和模式，选取索引2的位置
+__simd_callee__ inline void asc_half2int4x2_rz_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
+// TRUNC舍入模式，饱和模式，选取索引3的位置
+__simd_callee__ inline void asc_half2int4x2_rz_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
 ```
 
 ## 参数说明
@@ -104,6 +106,7 @@ __simd_callee__ inline void asc_half2int4x2_rz_sat_v4(vector_int4x2_t& dst, vect
 |dst|输出|目的操作数（矢量数据寄存器）。|
 |src|输入|源操作数（矢量数据寄存器）。|
 |mask|输入|源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。|
+|quarter|输入|位置参数，指定数据写入的位置，可选ASC_DISPERSE_FIRST_QUARTER（索引0）、ASC_DISPERSE_SECOND_QUARTER（索引1）、ASC_DISPERSE_THIRD_QUARTER（索引2）或ASC_DISPERSE_FOURTH_QUARTER（索引3）。|
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)。
 
@@ -126,5 +129,5 @@ vector_half src;
 vector_int4x2_t dst;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
-asc_half2int4x2_rna(dst, src, mask);
+asc_half2int4x2_rna(dst, src, mask, ASC_DISPERSE_FIRST_QUARTER);
 ```

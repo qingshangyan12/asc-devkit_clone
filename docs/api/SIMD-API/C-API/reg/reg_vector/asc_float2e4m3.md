@@ -18,22 +18,21 @@
 
 ```cpp
 // RINT舍入模式，非饱和模式，数据写入索引为0的位置
-__simd_callee__ inline void asc_float2e4m3_rn(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask)
-// RINT舍入模式，饱和模式，数据写入索引为0的位置
-__simd_callee__ inline void asc_float2e4m3_rn_sat(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask)
+__simd_callee__ inline void asc_float2e4m3_rn(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
 // RINT舍入模式，非饱和模式，数据写入索引为1的位置
-__simd_callee__ inline void asc_float2e4m3_rn_v2(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask)
-// RINT舍入模式，饱和模式，数据写入索引为1的位置
-__simd_callee__ inline void asc_float2e4m3_rn_sat_v2(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask)
+__simd_callee__ inline void asc_float2e4m3_rn(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
 // RINT舍入模式，非饱和模式，数据写入索引为2的位置
-__simd_callee__ inline void asc_float2e4m3_rn_v3(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask)
-// RINT舍入模式，饱和模式，数据写入索引为2的位置
-__simd_callee__ inline void asc_float2e4m3_rn_sat_v3(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask)
+__simd_callee__ inline void asc_float2e4m3_rn(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
 // RINT舍入模式，非饱和模式，数据写入索引为3的位置
-__simd_callee__ inline void asc_float2e4m3_rn_v4(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask)
+__simd_callee__ inline void asc_float2e4m3_rn(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
+// RINT舍入模式，饱和模式，数据写入索引为0的位置
+__simd_callee__ inline void asc_float2e4m3_rn_sat(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
+// RINT舍入模式，饱和模式，数据写入索引为1的位置
+__simd_callee__ inline void asc_float2e4m3_rn_sat(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
+// RINT舍入模式，饱和模式，数据写入索引为2的位置
+__simd_callee__ inline void asc_float2e4m3_rn_sat(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
 // RINT舍入模式，饱和模式，数据写入索引为3的位置
-__simd_callee__ inline void asc_float2e4m3_rn_sat_v4(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask)
-
+__simd_callee__ inline void asc_float2e4m3_rn_sat(vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
 ```
 
 ## 参数说明
@@ -43,7 +42,7 @@ __simd_callee__ inline void asc_float2e4m3_rn_sat_v4(vector_fp8_e4m3fn_t& dst, v
 | dst | 输出 | 目的操作数（矢量数据寄存器）。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
-| pos | 输入 | 位置参数，指定数据写入的位置，可选ASC_POSITION_EVEN（索引0）或ASC_POSITION_ODD（索引1）。 |
+| quarter | 输入 | 位置参数，指定数据写入的位置，可选ASC_DISPERSE_FIRST_QUARTER（索引0）、ASC_DISPERSE_SECOND_QUARTER（索引1）、ASC_DISPERSE_THIRD_QUARTER（索引2）或ASC_DISPERSE_FOURTH_QUARTER（索引3）。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)。
 
@@ -65,5 +64,5 @@ PIPE_V
 vector_float src;
 vector_fp8_e4m3fn_t dst;
 vector_bool mask;
-asc_float2e4m3_rn(dst, src, mask);
+asc_float2e4m3_rn(dst, src, mask, ASC_DISPERSE_FIRST_QUARTER);
 ```

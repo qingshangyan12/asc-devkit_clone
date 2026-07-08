@@ -17,18 +17,21 @@
 
 ```cpp
 // 非饱和模式，数据写入索引0的位置
-__simd_callee__ inline void asc_int322uint8(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
-// 饱和模式，数据写入索引0的位置
-__simd_callee__ inline void asc_int322uint8_sat(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
+__simd_callee__ inline void asc_int322uint8(vector_uint8_t& dst, vector_int32_t src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
 // 非饱和模式，数据写入索引1的位置
-// 饱和模式，数据写入索引1的位置
-__simd_callee__ inline void asc_int322uint8_sat_v2(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
+__simd_callee__ inline void asc_int322uint8(vector_uint8_t& dst, vector_int32_t src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
 // 非饱和模式，数据写入索引2的位置
-// 饱和模式，数据写入索引2的位置
-__simd_callee__ inline void asc_int322uint8_sat_v3(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
+__simd_callee__ inline void asc_int322uint8(vector_uint8_t& dst, vector_int32_t src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
 // 非饱和模式，数据写入索引3的位置
+__simd_callee__ inline void asc_int322uint8(vector_uint8_t& dst, vector_int32_t src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
+// 饱和模式，数据写入索引0的位置
+__simd_callee__ inline void asc_int322uint8_sat(vector_uint8_t& dst, vector_int32_t src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
+// 饱和模式，数据写入索引1的位置
+__simd_callee__ inline void asc_int322uint8_sat(vector_uint8_t& dst, vector_int32_t src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
+// 饱和模式，数据写入索引2的位置
+__simd_callee__ inline void asc_int322uint8_sat(vector_uint8_t& dst, vector_int32_t src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
 // 饱和模式，数据写入索引3的位置
-__simd_callee__ inline void asc_int322uint8_sat_v4(vector_uint8_t& dst, vector_int32_t src, vector_bool mask)
+__simd_callee__ inline void asc_int322uint8_sat(vector_uint8_t& dst, vector_int32_t src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
 ```
 
 ## 参数说明
@@ -38,7 +41,7 @@ __simd_callee__ inline void asc_int322uint8_sat_v4(vector_uint8_t& dst, vector_i
 | dst    | 输出    | 目的操作数（矢量数据寄存器）。            |
 | src    | 输入    | 源操作数（矢量数据寄存器）。             |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
-| pos | 输入 | 位置参数，指定数据写入的位置，可选ASC_POSITION_EVEN（索引0）或ASC_POSITION_ODD（索引1）。 |
+| quarter | 输入 | 位置参数，指定数据写入的位置，可选ASC_DISPERSE_FIRST_QUARTER（索引0）、ASC_DISPERSE_SECOND_QUARTER（索引1）、ASC_DISPERSE_THIRD_QUARTER（索引2）或ASC_DISPERSE_FOURTH_QUARTER（索引3）。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)。
 
@@ -61,5 +64,5 @@ vector_int32_t src;
 vector_uint8_t dst;
 vector_bool mask = asc_create_mask_b32(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
-asc_int322uint8(dst, src, mask);
+asc_int322uint8(dst, src, mask, ASC_DISPERSE_FIRST_QUARTER);
 ```

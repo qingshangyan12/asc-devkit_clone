@@ -16,10 +16,13 @@
 
 ```cpp
 // 选取索引0的位置
-__simd_callee__ inline void asc_hif82float(vector_float& dst, vector_hifloat8_t src, vector_bool mask)
+__simd_callee__ inline void asc_hif82float(vector_float& dst, vector_hifloat8_t src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
 // 选取索引1的位置
+__simd_callee__ inline void asc_hif82float(vector_float& dst, vector_hifloat8_t src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
 // 选取索引2的位置
+__simd_callee__ inline void asc_hif82float(vector_float& dst, vector_hifloat8_t src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
 // 选取索引3的位置
+__simd_callee__ inline void asc_hif82float(vector_float& dst, vector_hifloat8_t src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
 ```
 
 ## 参数说明
@@ -29,6 +32,7 @@ __simd_callee__ inline void asc_hif82float(vector_float& dst, vector_hifloat8_t 
 | dst        | 输出    | 目的操作数（矢量数据寄存器）。 |
 | src        | 输入    | 源操作数（矢量数据寄存器）。 |
 | mask       | 输入    | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| quarter | 输入 | 位置参数，指定数据读取的位置，可选ASC_DISPERSE_FIRST_QUARTER（索引0）、ASC_DISPERSE_SECOND_QUARTER（索引1）、ASC_DISPERSE_THIRD_QUARTER（索引2）或ASC_DISPERSE_FOURTH_QUARTER（索引3）。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)。
 
@@ -51,5 +55,5 @@ vector_hifloat8_t src;
 vector_float dst;
 vector_bool mask = asc_create_mask_b8(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
-asc_hif82float(dst, src, mask);
+asc_hif82float(dst, src, mask, ASC_DISPERSE_FIRST_QUARTER);
 ```
