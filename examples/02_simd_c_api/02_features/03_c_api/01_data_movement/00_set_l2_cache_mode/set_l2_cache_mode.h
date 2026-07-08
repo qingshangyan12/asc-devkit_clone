@@ -215,7 +215,7 @@ private:
      */
     __aicore__ inline void ProcessDoubleBufferImpl(uint8_t l2CacheMode)
     {
-        constexpr uint32_t totalBufSize = 6 * max_data_copy_len;
+        constexpr uint32_t totalBufSize = 3 * max_data_copy_len;
         __ubuf__ half ubBuf[totalBufSize];
 
         /* Ping 偏移 */
