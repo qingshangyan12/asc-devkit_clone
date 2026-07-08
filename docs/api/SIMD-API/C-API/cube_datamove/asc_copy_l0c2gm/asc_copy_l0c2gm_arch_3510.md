@@ -242,7 +242,7 @@ quant_post可选量化模式分别为：
 |------|------|------|
 | 0    | NORMAL模式 | 启用L2 Cache，采用write back策略写入L2 Cache，并且将分配的Cache Line标记为高替换优先级。|
 | 1    | LAST模式 | &bull; 启用L2 Cache，采用write back策略写入L2 Cache，并且将分配的Cache Line标记为低替换优先级。<br>&bull; **LAST模式功能，暂不支持。**|
-| 2    | PERSISTENT模式 | &bull; 启用L2 Cache，采用write back策略写入L2 Cache。已存入L2 Cache中的数据可能被替换，若需确保特定GlobalTensor的数据始终保留在L2 Cache中，可采用驻留模式。<br>&bull; 注意，被标记为驻留模式的Cache Line只能被其他同样被标记为驻留模式的Cache Line替换。<br>&bull; **目前该驻留模式功能尚在开发中，暂不支持，计划于Ascend 950PR/Ascend 950DT产品上提供支持。**|
+| 2    | PERSISTENT模式 | &bull; 启用L2 Cache，采用write back策略写入L2 Cache。已存入L2 Cache中的数据可能被替换，若需确保特定GlobalTensor的数据始终保留在L2 Cache中，可采用驻留模式。<br>&bull; 注意，被标记为驻留模式的Cache Line只能被其他同样被标记为驻留模式的Cache Line替换。<br>&bull; **目前该驻留模式功能尚在开发中，暂不支持，计划于Ascend 950PR/Ascend 950DT上提供支持。**|
 | 4    | DISABLE模式 | 不启用L2 Cache。如果写入地址在L2 Cache中已经被分配了Cache Line，则将本次写入的数据覆盖Cache Line原有数据后将Cache Line中最新数据写回到GM，并且将该Cache Line标记为invalid。如果写入地址在L2 Cache中没有被分配Cache Line，则直接写回到GM。|
 
 ## 返回值说明
