@@ -32,7 +32,7 @@ MakeMemPtr提供三种调用形式：
 
 ```cpp
     template <typename Hardware, typename Iterator,
-    EnableMakeHardwarePtr<Hardware, Iterator> Enable>
+        EnableMakeHardwarePtr<Hardware, Iterator> Enable>
     __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
 ```
 
