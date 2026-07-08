@@ -533,6 +533,7 @@ __simd_vf__ inline void ReduceSumCounterMode(
     __ubuf__ T* dstLocal, __ubuf__ T* srcLocal, __ubuf__ T* workLocal, uint32_t count, const int32_t srcRepStride)
 {
     constexpr uint32_t oneRepSize = GetVecLen() / sizeof(T);
+    constexpr uint32_t continuousSrcRepStride = GetVecLen() / GetDataBlockSizeInBytes();
     if constexpr (shapeScope == 1) {
         ReduceSumCount(dstLocal, srcLocal, count, 1, srcRepStride);
     } else if constexpr (shapeScope == 2) {
@@ -568,28 +569,28 @@ __simd_vf__ inline void ReduceSumCounterMode(
         Reg::MaskReg mask = Reg::UpdateMask<T>(sreg);
         Reg::MaskReg oneMask = Reg::CreateMask<T, Reg::MaskPattern::VL1>();
         Reg::RegTensor<T> srcVreg1, srcVreg2, srcVreg3, dstVreg;
-        Reg::LoadAlign<T>(srcVreg1, srcLocal);
-        Reg::LoadAlign<T>(srcVreg2, srcLocal + srcRepOffset);
-        Reg::LoadAlign<T>(dstVreg, srcLocal + srcRepOffset * 2);
+        Reg::LoadAlign<T>(dstVreg, srcLocal);
+        Reg::LoadAlign<T>(srcVreg1, srcLocal + srcRepOffset);
+        Reg::LoadAlign<T>(srcVreg2, srcLocal + srcRepOffset * 2);
         Reg::LoadAlign<T>(srcVreg3, srcLocal + srcRepOffset * 3);
-        Reg::Add(srcVreg1, srcVreg1, srcVreg2, fullMask);
-        Reg::Add<T, Reg::MaskMergeMode::MERGING>(dstVreg, dstVreg, srcVreg3, mask);
         Reg::Add(dstVreg, dstVreg, srcVreg1, fullMask);
+        Reg::Add<T, Reg::MaskMergeMode::MERGING>(srcVreg2, srcVreg2, srcVreg3, mask);
+        Reg::Add(dstVreg, dstVreg, srcVreg2, fullMask);
         Reg::ReduceSum(dstVreg, dstVreg, fullMask);
         Reg::StoreAlign(dstLocal, dstVreg, oneMask);
     } else if constexpr (shapeScope == 5) {
         uint32_t count2 = CeilDivision(count, oneRepSize);
         ReduceSumCount(workLocal, srcLocal, count, count2, srcRepStride);
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
-        ReduceSumCount(dstLocal, workLocal, count2, 1, 8);
+        ReduceSumCount(dstLocal, workLocal, count2, 1, continuousSrcRepStride);
     } else {
         uint32_t count2 = CeilDivision(count, oneRepSize);
         uint32_t count3 = CeilDivision(count2, oneRepSize);
         ReduceSumCount(workLocal, srcLocal, count, count2, srcRepStride);
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
-        ReduceSumCount(workLocal, workLocal, count2, count3, 8);
+        ReduceSumCount(workLocal, workLocal, count2, count3, continuousSrcRepStride);
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
-        ReduceSumCount(dstLocal, workLocal, count3, 1, 8);
+        ReduceSumCount(dstLocal, workLocal, count3, 1, continuousSrcRepStride);
     }
 }
 
@@ -618,19 +619,20 @@ __simd_vf__ inline void ReduceSumNormalMode(
     __ubuf__ T *dstLocal, __ubuf__ T *srcLocal,  __ubuf__ T *workLocal, uint32_t mask, int32_t repeat, const int32_t srcRepStride)
 {
     constexpr uint32_t oneRepSize = GetVecLen() / sizeof(T);
+    constexpr uint32_t continuousSrcRepStride = GetVecLen() / GetDataBlockSizeInBytes();
     if constexpr (shapeScope == 1) {
         ReduceSumMask<T, isBitMask>(dstLocal, srcLocal, mask, 1, srcRepStride);
     } else if constexpr (shapeScope == 2) {
         ReduceSumMask<T, isBitMask>(workLocal, srcLocal, mask, repeat, srcRepStride);
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
-        ReduceSumCount(dstLocal, workLocal, repeat, 1, 8);
+        ReduceSumCount(dstLocal, workLocal, repeat, 1, continuousSrcRepStride);
     } else {
         uint32_t count = CeilDivision(repeat, oneRepSize);
         ReduceSumMask<T, isBitMask>(workLocal, srcLocal, mask, repeat, srcRepStride);
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
-        ReduceSumCount(workLocal, workLocal, repeat, count, 8);
+        ReduceSumCount(workLocal, workLocal, repeat, count, continuousSrcRepStride);
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
-        ReduceSumCount(dstLocal, workLocal, count, 1, 8);
+        ReduceSumCount(dstLocal, workLocal, count, 1, continuousSrcRepStride);
     }
 }
 
@@ -638,7 +640,7 @@ template <typename T>
 __aicore__ inline void ReduceSumImpl(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal, __ubuf__ T *workLocal,
     const uint64_t mask[], const int32_t repeat, const int32_t srcRepStride)
 {
-    static_assert((SupportType<T, half, float>()), "ReduceSum current data type is not supported!");
+    static_assert((SupportType<T, half, float, uint32_t, int32_t>()), "ReduceSum current data type is not supported!");
     constexpr uint32_t oneRepSize = GetVecLen() / sizeof(T);
     bool isCounterMode = Internal::IsCounterMode();
     if (isCounterMode) {
@@ -660,7 +662,7 @@ template <typename T>
 __aicore__ inline void ReduceSumImpl(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal, __ubuf__ T *workLocal,
     const int32_t mask, const int32_t repeat, const int32_t srcRepStride)
 {
-    static_assert((SupportType<T, half, float>()), "ReduceSum current data type is not supported!");
+    static_assert((SupportType<T, half, float, uint32_t, int32_t>()), "ReduceSum current data type is not supported!");
     constexpr uint32_t oneRepSize = GetVecLen() / sizeof(T);
     bool isCounterMode = Internal::IsCounterMode();
     if (isCounterMode) {
@@ -705,7 +707,8 @@ __simd_vf__ inline void ReduceB64SumImpl(__ubuf__ T *dstLocal, __ubuf__ T *srcLo
 template <typename T>
 __aicore__ inline void ReduceSumImpl(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal, __ubuf__ T *workLocal, uint32_t count)
 {
-    static_assert((SupportType<T, half, float, uint64_t, int64_t>()), "ReduceSum current data type is not supported!");
+    static_assert((SupportType<T, half, float, uint32_t, int32_t, uint64_t, int64_t>()),
+        "ReduceSum current data type is not supported!");
     if constexpr (SupportType<T, uint64_t, int64_t>()) {
         ReduceB64SumImpl<T>(dstLocal, srcLocal, workLocal, count);
     } else {
