@@ -21,6 +21,17 @@
 static void* gLibHandle = nullptr;
 static bool gInitialized = false;
 
+namespace {
+void* DlOpenNoLoad(const char* libName)
+{
+    void* handle = dlopen(libName, RTLD_NOW | RTLD_LOCAL | RTLD_NOLOAD);
+    if (handle != nullptr) {
+        return handle;
+    }
+    return dlopen(libName, RTLD_NOW | RTLD_LOCAL);
+}
+} // namespace
+
 // 初始化
 void HcommDeviceDlInit(void)
 {
@@ -28,7 +39,10 @@ void HcommDeviceDlInit(void)
         return;
     }
 
-    gLibHandle = dlopen("libmc2_server.so", RTLD_NOW | RTLD_NOLOAD);
+    gLibHandle = DlOpenNoLoad("libccl_kernel.so");
+    if (!gLibHandle) {
+        gLibHandle = dlopen("libmc2_server.so", RTLD_NOW | RTLD_LOCAL | RTLD_NOLOAD);
+    }
     if (!gLibHandle) {
         gLibHandle = RTLD_DEFAULT;
     }

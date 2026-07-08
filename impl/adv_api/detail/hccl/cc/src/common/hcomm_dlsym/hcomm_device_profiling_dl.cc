@@ -12,14 +12,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-DEFINE_WEAK_FUNC(HcclResult, HcommProfilingReportMainStreamAndFirstTask, ThreadHandle thread);
-DEFINE_WEAK_FUNC(HcclResult, HcommProfilingReportMainStreamAndLastTask, ThreadHandle thread);
-DEFINE_WEAK_FUNC(HcclResult, HcommProfilingReportDeviceHcclOpInfo, HcomProInfoTmp profInfo);
-DEFINE_WEAK_FUNC(HcclResult, HcommProfilingInit, ThreadHandle* threads, uint32_t threadNum);
-DEFINE_WEAK_FUNC(HcclResult, HcommProfilingEnd, ThreadHandle* threads, uint32_t threadNum);
-DEFINE_WEAK_FUNC(HcclResult, HcommProfilingReportDeviceOp, const char* groupname);
-DEFINE_WEAK_FUNC(HcclResult, HcommProfilingReportKernelStartTask, uint64_t thread, const char* groupname);
-DEFINE_WEAK_FUNC(HcclResult, HcommProfilingReportKernelEndTask, uint64_t thread, const char* groupname);
+DEFINE_DLSYM_FUNC(HcclResult, HcommProfilingReportMainStreamAndFirstTask, (ThreadHandle thread), (thread));
+DEFINE_DLSYM_FUNC(HcclResult, HcommProfilingReportMainStreamAndLastTask, (ThreadHandle thread), (thread));
+DEFINE_DLSYM_FUNC(HcclResult, HcommProfilingReportDeviceHcclOpInfo, (HcomProInfoTmp profInfo), (profInfo));
+DEFINE_DLSYM_FUNC(HcclResult, HcommProfilingInit, (ThreadHandle* threads, uint32_t threadNum), (threads, threadNum));
+DEFINE_DLSYM_FUNC(HcclResult, HcommProfilingEnd, (ThreadHandle* threads, uint32_t threadNum), (threads, threadNum));
+DEFINE_DLSYM_FUNC(HcclResult, HcommProfilingReportDeviceOp, (const char* groupname), (groupname));
+DEFINE_DLSYM_FUNC(HcclResult, HcommProfilingReportKernelStartTask, (uint64_t thread, const char* groupname),
+    (thread, groupname));
+DEFINE_DLSYM_FUNC(HcclResult, HcommProfilingReportKernelEndTask, (uint64_t thread, const char* groupname),
+    (thread, groupname));
 
 // 初始化
 void HcommDeviceProfilingDlInit(void* libHcommHandle)

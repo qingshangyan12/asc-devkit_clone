@@ -79,34 +79,6 @@ function(configure_mc2_server_minimal_target)
     _mc2_server_get_include_list(_mc2_server_include_list)
     _mc2_server_get_orion_head_list(_mc2_server_orion_head_list)
 
-    if(NOT TARGET mc2_server_ccl_kernel_stub)
-        set(MC2_SERVER_CCL_KERNEL_STUB_SRC
-            ${CMAKE_CURRENT_BINARY_DIR}/mc2_server_ccl_kernel_stub.cc)
-        file(WRITE ${MC2_SERVER_CCL_KERNEL_STUB_SRC}
-            "extern \"C\" void __mc2_ccl_kernel_stub(void) {}\n")
-        add_library(mc2_server_ccl_kernel_stub SHARED
-            ${MC2_SERVER_CCL_KERNEL_STUB_SRC})
-        set_target_properties(mc2_server_ccl_kernel_stub PROPERTIES
-            OUTPUT_NAME ccl_kernel
-            LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/mc2_server_link_stub)
-        target_link_options(mc2_server_ccl_kernel_stub PRIVATE
-            -Wl,-soname,libccl_kernel.so)
-    endif()
-
-    if(NOT TARGET mc2_server_ccl_kernel_plf_stub)
-        set(MC2_SERVER_CCL_KERNEL_PLF_STUB_SRC
-            ${CMAKE_CURRENT_BINARY_DIR}/mc2_server_ccl_kernel_plf_stub.cc)
-        file(WRITE ${MC2_SERVER_CCL_KERNEL_PLF_STUB_SRC}
-            "extern \"C\" void __mc2_ccl_kernel_plf_stub(void) {}\n")
-        add_library(mc2_server_ccl_kernel_plf_stub SHARED
-            ${MC2_SERVER_CCL_KERNEL_PLF_STUB_SRC})
-        set_target_properties(mc2_server_ccl_kernel_plf_stub PROPERTIES
-            OUTPUT_NAME ccl_kernel_plf
-            LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/mc2_server_link_stub)
-        target_link_options(mc2_server_ccl_kernel_plf_stub PRIVATE
-            -Wl,-soname,libccl_kernel_plf.so)
-    endif()
-
     target_compile_definitions(mc2_server PRIVATE
         $<TARGET_PROPERTY:asc_ccl_kernel,INTERFACE_COMPILE_DEFINITIONS>
     )
@@ -124,10 +96,8 @@ function(configure_mc2_server_minimal_target)
         ascend_hal
         c_sec
         unified_dlog
-        mc2_server_ccl_kernel_stub
         ${HCCL_C_SEC_LINK}
         ${HCCL_UNIFIED_DLOG_LINK}
-        mc2_server_ccl_kernel_plf_stub
         ${HCCL_MMPA_LINK}
         -Wl,--as-needed
         -lrt
