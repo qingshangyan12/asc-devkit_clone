@@ -12,10 +12,10 @@ repos:
     rev: v4.6.0
     hooks:
       - id: trailing-whitespace
-        files: ^tests/api/c_api/
+        files: ^(tests/api/c_api/|include/adv_api/|include/basic_api/)
         exclude: \.md$
       - id: end-of-file-fixer
-        files: ^tests/api/c_api/
+        files: ^(tests/api/c_api/|include/adv_api/|include/basic_api/)
         exclude: \.md$
       - id: check-yaml
         args: ["--allow-multiple-documents"]
