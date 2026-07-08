@@ -22,7 +22,7 @@ __aicore__ inline void asc_sync_mte3(int id)
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
-| id | 输入 | 同步ID。 |
+| id | 输入 | 同步ID。取值范围[0,7]。 |
 
 ## 返回值说明
 
@@ -39,7 +39,7 @@ PIPE_S
 ## 调用示例
 
 ```cpp
-// 本例中total_length指参与计算的数据总长度。src0_gm，src1_gm，dst_gm是外部输入的float类型的源操作数、目的操作数，指向GM内存空间。
+// 本例中total_length指参与计算的数据总长度。src0_gm，src1_gm，src2_gm，dst_gm是外部输入的float类型的源操作数、目的操作数，指向GM内存空间。
 constexpr uint32_t total_length = 128;
 __ubuf__ float src0[total_length];
 __ubuf__ float src1[total_length];
@@ -60,4 +60,6 @@ asc_copy_ub2gm((__gm__ void*)dst_gm, (__ubuf__ void*)dst, blockLength * sizeof(f
 
 // 同步操作：数据搬运操作（UB到GM，PIPE_MTE3流水）完成后才能启动后续操作。
 asc_sync_mte3(0);
+
+asc_copy_gm2ub((__ubuf__ void*)dst, (__gm__ void*)src2_gm, total_length * sizeof(float));
 ```

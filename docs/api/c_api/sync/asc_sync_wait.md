@@ -10,7 +10,7 @@
 
 ## 功能说明
 
-等待特定的同步标志，阻塞当前流水线直到条件满足。
+等待特定的同步标志，阻塞当前流水线直到条件满足。需和[asc_sync_notify](asc_sync_notify.md)指令配对使用。
 
 ## 函数原型
 
@@ -24,7 +24,7 @@ __aicore__ inline void asc_sync_wait(pipe_t pipe, pipe_t tpipe, event_t id)
 | :--- | :--- | :--- |
 | pipe | 输入 | 等待的源流水线类型。需传入编译期常量。 |
 | tpipe | 输入 | 当前流水线类型。需传入编译期常量。 |
-| id | 输入 | 同步ID。 |
+| id | 输入 | 同步ID。取值范围：EVENT_ID0 ~ EVENT_ID7。 |
 
 ## 返回值说明
 

@@ -10,7 +10,7 @@
 
 ## 功能说明
 
-设置同步标志，通知目标流水线。
+设置同步标志，通知目标流水线。需和[asc_sync_wait](asc_sync_wait.md)指令配对使用。
 
 ## 函数原型
 
@@ -24,7 +24,7 @@ __aicore__ inline void asc_sync_notify(pipe_t pipe, pipe_t tpipe, event_t id)
 | :--- | :--- | :--- |
 | pipe | 输入 | 源流水线类型。需传入编译期常量。 |
 | tpipe | 输入 | 目标流水线类型。需传入编译期常量。 |
-| id | 输入 | 同步ID。 |
+| id | 输入 | 同步ID。取值范围：EVENT_ID0 ~ EVENT_ID7。 |
 
 ## 返回值说明
 
