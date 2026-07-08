@@ -191,20 +191,9 @@
 
             -   [Mmad计算](SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/Mmad计算.md)
                 -   [Mmad](SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/Mmad.md)
-
-                <cann-filter npu-type="950">
-
                 -   [MmadMx](SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/MmadMx.md)
                 -   [MmadBitMode](SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/MmadBitMode.md)
-
-                </cann-filter>
-
-                <cann-filter npu-type="910b,A3">
-
                 -   [MmadWithSparse](SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/MmadWithSparse.md)
-
-                </cann-filter>
-
                 -   [关键特性说明](SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/关键特性说明/关键特性说明.md)
                     -   [GEMV](SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/关键特性说明/GEMV.md)
 
@@ -221,15 +210,11 @@
 
                     </cann-filter>
 
-                <cann-filter npu-type="950,910b,A3,310b">
 
                 -   [寄存器配置说明](SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/寄存器配置说明/寄存器配置说明.md)
                     -   [SetMMColumnMajor/SetMMRowMajor](SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/寄存器配置说明/SetMMColumnMajor-SetMMRowMajor.md)
                     -   [SetHF32Mode](SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/寄存器配置说明/SetHF32Mode.md)
                     -   [SetHF32TransMode](SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/寄存器配置说明/SetHF32TransMode.md)
-
-                </cann-filter>
-
                 -   [Conv2D（废弃）](SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/Conv2D（废弃）.md)
                 -   [Gemm（废弃）](SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/Gemm（废弃）.md)
 
@@ -599,7 +584,6 @@
                 -   [LocalMemBar](SIMD-API/基础API/Reg矢量计算/同步控制/LocalMemBar.md)
 
             -   [系统变量访问](SIMD-API/基础API/Reg矢量计算/系统变量访问/系统变量访问.md)
-                -   [GetSpr](SIMD-API/基础API/Reg矢量计算/系统变量访问/GetSpr.md)
                 -   [ClearSpr](SIMD-API/基础API/Reg矢量计算/系统变量访问/ClearSpr.md)
 
             -   [辅助数据类型](SIMD-API/基础API/Reg矢量计算/辅助数据类型/辅助数据类型.md)
@@ -908,6 +892,7 @@
             -   [asc_set_gm2ub_loop_size](SIMD-API/C-API/vector_datamove/asc_set_gm2ub_loop_size.md)
             -   [asc_set_gm2ub_loop1_stride](SIMD-API/C-API/vector_datamove/asc_set_gm2ub_loop1_stride.md)
             -   [asc_set_gm2ub_loop2_stride](SIMD-API/C-API/vector_datamove/asc_set_gm2ub_loop2_stride.md)
+            -   [asc_set_gm2ub_pad（废弃）](SIMD-API/C-API/vector_datamove/asc_set_gm2ub_pad_deprecated.md)
             -   [asc_set_ndim_loop_stride](SIMD-API/C-API/vector_datamove/asc_set_ndim_loop_stride.md)
             -   [asc_set_ndim_pad_count](SIMD-API/C-API/vector_datamove/asc_set_ndim_pad_count.md)
             -   [asc_set_ndim_pad_value](SIMD-API/C-API/vector_datamove/asc_set_ndim_pad_value.md)
@@ -1050,7 +1035,7 @@
                 -   [asc_loadunalign](SIMD-API/C-API/reg/reg_load/asc_loadunalign.md)
                 -   [asc_loadunalign_pre](SIMD-API/C-API/reg/reg_load/asc_loadunalign_pre.md)
                 -   [asc_loadunalign_postupdate](SIMD-API/C-API/reg/reg_load/asc_loadunalign_postupdate.md)
-                -   [asc_scatter](SIMD-API/C-API/reg/reg_load/asc_scatter.md)
+                -   [asc_scatter（废弃）](SIMD-API/C-API/reg/reg_load/asc_scatter_deprecated.md)
             -   [reg_store](SIMD-API/C-API/reg/reg_store/reg_store.md)
                 -   [asc_storealign](SIMD-API/C-API/reg/reg_store/asc_storealign/asc_storealign.md)
                     -   [asc_storealign_v1（废弃）](SIMD-API/C-API/reg/reg_store/asc_storealign/asc_storealign_v1_deprecated.md)
@@ -1071,6 +1056,7 @@
                 -   [asc_storeunalign_post](SIMD-API/C-API/reg/reg_store/asc_storeunalign_post.md)
                 -   [asc_storeunalign_postupdate](SIMD-API/C-API/reg/reg_store/asc_storeunalign_postupdate.md)
                 -   [asc_storeunalign_post_postupdate](SIMD-API/C-API/reg/reg_store/asc_storeunalign_post_postupdate.md)
+                -   [asc_scatter](SIMD-API/C-API/reg/reg_store/asc_scatter.md)
             -   [reg_vector](SIMD-API/C-API/reg/reg_vector/reg_vector.md)
                 -   [asc_abs](SIMD-API/C-API/reg/reg_vector/asc_abs.md)
                 -   [asc_abs_sub](SIMD-API/C-API/reg/reg_vector/asc_abs_sub.md)
@@ -1087,7 +1073,8 @@
                 -   [asc_bfloat162int32](SIMD-API/C-API/reg/reg_vector/asc_bfloat162int32.md)
                 -   [asc_clear_ar_spr](SIMD-API/C-API/reg/reg_vector/asc_clear_ar_spr.md)
                 -   [asc_copy](SIMD-API/C-API/reg/reg_vector/asc_copy.md)
-                -   [asc_create_iter_reg](SIMD-API/C-API/reg/reg_vector/asc_create_iter_reg.md)
+                -   [asc_create_addr_reg](SIMD-API/C-API/reg/reg_vector/asc_create_addr_reg.md)
+                -   [asc_create_iter_reg（废弃）](SIMD-API/C-API/reg/reg_vector/asc_create_iter_reg_deprecated.md)
                 -   [asc_create_mask](SIMD-API/C-API/reg/reg_vector/asc_create_mask.md)
                 -   [asc_cumulative_histogram](SIMD-API/C-API/reg/reg_vector/asc_cumulative_histogram.md)
                 -   [asc_deintlv](SIMD-API/C-API/reg/reg_vector/asc_deintlv.md)
@@ -2773,6 +2760,7 @@
         -   [asc\_stwt](SIMT-API/访存函数/asc_stwt.md)
         -   [asc\_dcci\_single](SIMT-API/访存函数/asc_dcci_single.md)
         -   [asc\_dcci\_entire](SIMT-API/访存函数/asc_dcci_entire.md)
+        -   [asc\_nop](SIMT-API/访存函数/asc_nop.md)
 
 
 -   [Utils API](Utils-API/Utils-API.md)
@@ -3022,12 +3010,12 @@
     -   [Mmad接口边界值汇总](附录/Mmad接口边界值汇总.md)
     -   [Memory矢量计算接口边界值汇总](附录/Memory矢量计算接口边界值汇总.md)
     -   [Reg矢量计算接口边界值汇总](附录/Reg矢量计算接口边界值汇总.md)
+    -   [Reg矢量计算接口MergeMode支持情况汇总](附录/Reg矢量计算接口MergeMode支持情况汇总.md)
+    -   [Reg矢量计算接口软仿情况汇总](附录/Reg矢量计算接口软仿情况汇总.md)
+    -   [Reg矢量计算接口精度标准汇总](附录/Reg矢量计算接口精度标准汇总.md)
+    -   [Reg矢量计算接口指令单双发汇总](附录/Reg矢量计算接口指令单双发汇总.md)
     -   [原子操作类接口边界值汇总](附录/原子操作类接口边界值汇总.md)
     -   [SIMT接口软仿情况汇总](附录/SIMT接口软仿情况汇总.md)
     -   [SIMT接口精度标准汇总](附录/SIMT接口精度标准汇总.md)
-    -   [Reg矢量计算接口MergeMode支持情况汇总](附录/Reg矢量计算接口MergeMode支持情况汇总.md)
-    -   [Reg矢量计算接口软仿情况汇总](附录/Reg矢量计算接口软仿情况汇总.md)
     -   [预留接口](附录/预留接口.md)
     -   [接口变更说明](附录/接口变更说明.md)
-    -   [Reg矢量计算接口精度标准汇总](附录/Reg矢量计算接口精度标准汇总.md)
-    -   [Reg矢量计算接口指令单双发汇总](附录/Reg矢量计算接口指令单双发汇总.md)

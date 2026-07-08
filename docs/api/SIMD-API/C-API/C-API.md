@@ -176,6 +176,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_set_ub2gm_loop_size](vector_datamove/asc_set_ub2gm_loop_size.md)                                                       | 使用[asc_copy_ub2gm_align](vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)将数据从Unified Buffer (UB)搬运到Global Memory (GM)时，设置内层循环和外层循环的次数。 |
 | [asc_set_ndim_loop_stride](vector_datamove/asc_set_ndim_loop_stride.md)                                                     | 设置[asc_ndim_copy_gm2ub](vector_datamove/asc_ndim_copy_gm2ub.md)在进行多维搬运时每个维度内的源操作数与目的操作数的元素之间的间隔，最多设置5个维度。 |
 | [asc_set_ndim_pad_value](vector_datamove/asc_set_ndim_pad_value.md)                                                         | 设置[asc_ndim_copy_gm2ub](vector_datamove/asc_ndim_copy_gm2ub.md)接口Padding的填充固定值。 |
+| [asc_set_gm2ub_pad（废弃）](vector_datamove/asc_set_gm2ub_pad_deprecated.md)                                                  | 使用[asc_copy_gm2ub_align](vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)将数据从Global Memory (GM)搬运到Unified Buffer (UB)且源操作数非对齐时，设置连续搬运数据块左右两侧需要填补的数据值。 |
 
 ## 标量操作
 
@@ -397,7 +398,8 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 | [asc_bfloat162int32](reg/reg_vector/asc_bfloat162int32.md) | 将bfloat16_t类型数据转换为int32_t类型，并支持多种舍入模式。 |
 | [asc_clear_ar_spr](reg/reg_vector/asc_clear_ar_spr.md) | 对AR寄存器进行清理，AR寄存器通常由[asc_squeeze_with_status](reg/reg_vector/asc_squeeze_with_status.md)接口使用。 |
 | [asc_copy](reg/reg_vector/asc_copy.md) | 完成数据在寄存器内的搬运。 |
-| [asc_create_iter_reg](reg/reg_vector/asc_create_iter_reg.md) | 地址寄存器通过该接口初始化，然后在循环之中使用地址寄存器存储地址偏移量。 |
+| [asc_create_addr_reg](reg/reg_vector/asc_create_addr_reg.md) | 地址寄存器通过该接口初始化，然后在循环之中使用地址寄存器存储地址偏移量。 |
+| [asc_create_iter_reg（废弃）](reg/reg_vector/asc_create_iter_reg_deprecated.md) | 该接口已废弃，请使用asc_create_addr_reg实现此功能。 |
 | [asc_create_mask](reg/reg_vector/asc_create_mask.md) | 根据入参生成相应的掩码寄存器。 |
 | [asc_cumulative_histogram](reg/reg_vector/asc_cumulative_histogram.md) | 对直方图数据进行累计统计。 |
 | [asc_deintlv](reg/reg_vector/asc_deintlv.md) | 给定源操作数src0和src1，将src0和src1中的元素解交织存入结果操作数dst0和dst1中。 |
