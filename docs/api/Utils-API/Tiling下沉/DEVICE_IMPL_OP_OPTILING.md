@@ -37,15 +37,19 @@ public:
 **表1**  DEVICE\_IMPL\_OP\_OPTILING参数说明
 
 <a name="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_table111938719446"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_row6223476444"><th class="cellrowborder" valign="top" width="20%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_p10223674448"><a name="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_p10223674448"></a><a name="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_p10223674448"></a>参数名</p>
+<table><thead align="left"><tr id="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_row6223476444"><th class="cellrowborder" valign="top" width="17.22%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_p10223674448"><a name="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_p10223674448"></a><a name="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_p10223674448"></a>参数</p>
 </th>
-<th class="cellrowborder" valign="top" width="80%" id="mcps1.2.3.1.2"><p id="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_p1922337124411"><a name="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_p1922337124411"></a><a name="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_p1922337124411"></a>描述</p>
+<th class="cellrowborder" valign="top" width="15.340000000000002%" id="mcps1.2.4.1.2"><p id="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_p645511218169"><a name="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_p645511218169"></a><a name="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_p645511218169"></a>输入/输出</p>
+</th>
+<th class="cellrowborder" valign="top" width="67.44%" id="mcps1.2.4.1.3"><p id="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_p1922337124411"><a name="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_p1922337124411"></a><a name="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_p1922337124411"></a>说明</p>
 </th>
 </tr>
 </thead>
-<tbody><tr id="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_row152234713443"><td class="cellrowborder" valign="top" width="20%" headers="mcps1.2.3.1.1 "><p id="p1693913355118"><a name="p1693913355118"></a><a name="p1693913355118"></a>optype</p>
+<tbody><tr id="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_row152234713443"><td class="cellrowborder" valign="top" width="17.22%" headers="mcps1.2.4.1.1 "><p id="p1693913355118"><a name="p1693913355118"></a><a name="p1693913355118"></a>optype</p>
 </td>
-<td class="cellrowborder" valign="top" width="80%" headers="mcps1.2.3.1.2 "><p id="p3511614184115"><a name="p3511614184115"></a><a name="p3511614184115"></a>需要注册Tiling函数的OpType（算子类型）。</p>
+<td class="cellrowborder" valign="top" width="15.340000000000002%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_p15663137127"><a name="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_p15663137127"></a><a name="zh-cn_topic_0000001820490272_zh-cn_topic_0000001389787297_p15663137127"></a>输入</p>
+</td>
+<td class="cellrowborder" valign="top" width="67.44%" headers="mcps1.2.4.1.3 "><p id="p3511614184115"><a name="p3511614184115"></a><a name="p3511614184115"></a>需要注册Tiling函数的OpType（算子类型）。</p>
 </td>
 </tr>
 </tbody>
@@ -54,15 +58,19 @@ public:
 **表2**  Tiling成员函数参数说明
 
 <a name="table2060634264310"></a>
-<table><thead align="left"><tr id="row860654216436"><th class="cellrowborder" valign="top" width="20%" id="mcps1.2.3.1.1"><p id="p19606154212434"><a name="p19606154212434"></a><a name="p19606154212434"></a>参数名</p>
+<table><thead align="left"><tr id="row860654216436"><th class="cellrowborder" valign="top" width="17.22%" id="mcps1.2.4.1.1"><p id="p19606154212434"><a name="p19606154212434"></a><a name="p19606154212434"></a>参数</p>
 </th>
-<th class="cellrowborder" valign="top" width="80%" id="mcps1.2.3.1.2"><p id="p1460614224313"><a name="p1460614224313"></a><a name="p1460614224313"></a>描述</p>
+<th class="cellrowborder" valign="top" width="15.340000000000002%" id="mcps1.2.4.1.2"><p id="p17606174294315"><a name="p17606174294315"></a><a name="p17606174294315"></a>输入/输出</p>
+</th>
+<th class="cellrowborder" valign="top" width="67.44%" id="mcps1.2.4.1.3"><p id="p1460614224313"><a name="p1460614224313"></a><a name="p1460614224313"></a>说明</p>
 </th>
 </tr>
 </thead>
-<tbody><tr id="row160654218436"><td class="cellrowborder" valign="top" width="20%" headers="mcps1.2.3.1.1 "><p id="p14606104284320"><a name="p14606104284320"></a><a name="p14606104284320"></a>func</p>
+<tbody><tr id="row160654218436"><td class="cellrowborder" valign="top" width="17.22%" headers="mcps1.2.4.1.1 "><p id="p14606104284320"><a name="p14606104284320"></a><a name="p14606104284320"></a>func</p>
 </td>
-<td class="cellrowborder" valign="top" width="80%" headers="mcps1.2.3.1.2 "><p id="p25503505020"><a name="p25503505020"></a><a name="p25503505020"></a>需要注册的Tiling函数，该函数接受一个gert::TilingContext*作为输入，以ge::graphStatus为返回值。</p>
+<td class="cellrowborder" valign="top" width="15.340000000000002%" headers="mcps1.2.4.1.2 "><p id="p16606124294310"><a name="p16606124294310"></a><a name="p16606124294310"></a>输入</p>
+</td>
+<td class="cellrowborder" valign="top" width="67.44%" headers="mcps1.2.4.1.3 "><p id="p25503505020"><a name="p25503505020"></a><a name="p25503505020"></a>需要注册的Tiling函数，该函数接受一个gert::TilingContext*作为输入，以ge::graphStatus为返回值。</p>
 </td>
 </tr>
 </tbody>
