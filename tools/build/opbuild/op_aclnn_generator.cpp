@@ -16,6 +16,7 @@
 #include "op_aclnn_generator.h"
 #include <algorithm>
 #include <mutex>
+#include <regex>
 #include <set>
 #include <sstream>
 #include <sys/stat.h>
@@ -313,6 +314,50 @@ bool AreInputDataTypesSupported(
         }
     }
     return true;
+}
+
+bool IsSocVersionCharValid(const std::string& socVer)
+{
+    static const std::regex validSocVersionRegex("^[A-Za-z0-9_]+$");
+    return std::regex_match(socVer, validSocVersionRegex);
+}
+
+bool ValidateSocVersion(const std::string& socVer, const std::string& opType, const std::string& source)
+{
+    if (IsSocVersionCharValid(socVer)) {
+        return true;
+    }
+    ops::Generator::SetErrorMessage("Invalid soc version " + socVer + source + opType +
+                                    ", soc version can only contain letters, digits, and underscore '_'.");
+    return false;
+}
+
+void AppendComputeUnitSocList(
+    const std::string& opType, std::unordered_set<std::string>& seenEnums,
+    std::vector<ops::AclnnOpGenerator::SocEntry>& entries)
+{
+    auto computeUnitCfg = opbuild::Params::GetInstance().Optional("compute_unit");
+    if (computeUnitCfg.size() == 0) {
+        return;
+    }
+    std::vector<std::string> computeUnits;
+    Split(computeUnitCfg, ';', computeUnits);
+    for (uint32_t i = 0; i < computeUnits.size(); ++i) {
+        std::string socVer = computeUnits[i];
+        if (!ValidateSocVersion(socVer, opType, " from compute_unit of op ")) {
+            continue;
+        }
+        auto it = ops::SOC_SUPPORT_MAP.find(socVer);
+        if (it == ops::SOC_SUPPORT_MAP.end() || seenEnums.find(it->second) != seenEnums.end()) {
+            continue;
+        }
+        ops::AclnnOpGenerator::SocEntry entry;
+        entry.socName = socVer;
+        entry.enumConstant = it->second;
+        entry.hasAicoreConfig = false;
+        seenEnums.insert(it->second);
+        entries.push_back(std::move(entry));
+    }
 }
 } // Anonymous Namespace
 
@@ -1305,9 +1350,11 @@ std::vector<AclnnOpGenerator::SocEntry> AclnnOpGenerator::BuildUnifiedSocList(Op
     std::unordered_set<std::string> seenEnums;
     const std::string opType = opDef.GetOpType().GetString();
     std::map<ge::AscendString, OpAICoreConfig> map = opDef.AICore().GetAICoreConfigs();
-
     for (auto iter = map.begin(); iter != map.end(); ++iter) {
         std::string socVer = ToLower(iter->first.GetString());
+        if (!ValidateSocVersion(socVer, opType, " of op ")) {
+            continue;
+        }
         if (socVer.find("kirin") == 0) {
             continue;
         }
@@ -1329,26 +1376,7 @@ std::vector<AclnnOpGenerator::SocEntry> AclnnOpGenerator::BuildUnifiedSocList(Op
         entries.push_back(std::move(entry));
     }
 
-    auto computeUnitCfg = opbuild::Params::GetInstance().Optional("compute_unit");
-    if (computeUnitCfg.size() != 0) {
-        std::vector<std::string> computeUnits;
-        Split(computeUnitCfg, ';', computeUnits);
-        for (uint32_t i = 0; i < computeUnits.size(); ++i) {
-            std::string socVer = computeUnits[i];
-            auto it = SOC_SUPPORT_MAP.find(socVer);
-            if (it == SOC_SUPPORT_MAP.end()) {
-                continue;
-            }
-            if (seenEnums.find(it->second) == seenEnums.end()) {
-                SocEntry entry;
-                entry.socName = socVer;
-                entry.enumConstant = it->second;
-                entry.hasAicoreConfig = false;
-                seenEnums.insert(it->second);
-                entries.push_back(std::move(entry));
-            }
-        }
-    }
+    AppendComputeUnitSocList(opType, seenEnums, entries);
     return entries;
 }
 
