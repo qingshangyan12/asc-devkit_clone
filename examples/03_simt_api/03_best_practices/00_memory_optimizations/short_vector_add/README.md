@@ -108,7 +108,7 @@ __global__ void add(T* x, T* y, T* z, uint64_t size)
 - 端到端耗时：**86.478 μs**
 - 写Cache命中率：**49.3%**
 - 读写带宽：**7.77(GB/s) | 6.24(GB/s)**
-- 性能分析：Add算子进行简单的X+Y=Z，在回写结果时命中率低于50%，说明写Cache未命中率超过50%，触发额外的内存回读（RMW）操作，被判定为写未命中。一般原因为数据未对齐或者数据类型小导致Warp不能填满。
+- 性能分析：Add算子进行简单的X+Y=Z，在回写结果时命中率低于50%，说明写Cache未命中率超过50%，触发额外的内存回读（RMW）操作，被判定为写未命中。一般原因为数据未对齐或者数据类型位宽较小导致Warp不能填满。
 
 **性能优化建议**：
 > 💡 **引入half2类型**
@@ -170,7 +170,7 @@ __global__ void add2(T* x, T* y, T* z, uint64_t size)
 **原理说明**：  
 SIMT编程模式下，L2 Cache是以Cache Line=128字节为单位进行访问。
 
-- Case 1（标量 half）：不满行导致 RMW 写放大  
+- Case 1（标量 half）：无法填满整行导致 RMW 写放大  
   使用标量half（2B）。单个Warp（32线程）同时发射指令时，在空间上连续拼出的总宽度为：  
   $$
   32 * 2B = 64B
@@ -229,7 +229,7 @@ SIMT编程模式下，L2 Cache是以Cache Line=128字节为单位进行访问。
   示例如下：
 
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;   # NPU仿真模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
@@ -257,7 +257,7 @@ SIMT编程模式下，L2 Cache是以Cache Line=128字节为单位进行访问。
 msprof op ./demo   # 分析case的性能
 ```
 
-命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
+命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹，性能数据文件夹结构示例如下：
 
 ```text
 ├──dump                       # 原始的性能数据，用户无需关注
