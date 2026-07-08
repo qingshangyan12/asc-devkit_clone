@@ -164,9 +164,11 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
     Level0Shape level0Topo;
     bool Level0Nhr{false};
     bool Level1Nhr{false};
+    bool Level1Hd{false};
     bool is2DieFullMesh{false};
     bool level0PcieMix{false};
     bool level0BigClosRange{false};
+    bool level2Uboe{false};
     u32 topoInstDetailsOfLayerSize = 0;
     Level0MeshType level0MeshType;
     NetLayerDetails netLayerDetails;
@@ -196,9 +198,11 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream << level0Topo;
         binaryStream << Level0Nhr;
         binaryStream << Level1Nhr;
+        binaryStream << Level1Hd;
         binaryStream << is2DieFullMesh;
         binaryStream << level0PcieMix;
         binaryStream << level0BigClosRange;
+        binaryStream << level2Uboe;
         binaryStream << topoInstDetailsOfLayerSize;
         binaryStream << level0MeshType;
         binaryStream << netLayerDetails.netLayerNum;
@@ -242,9 +246,11 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream >> level0Topo;
         binaryStream >> Level0Nhr;
         binaryStream >> Level1Nhr;
+        binaryStream >> Level1Hd;
         binaryStream >> is2DieFullMesh;
         binaryStream >> level0PcieMix;
         binaryStream >> level0BigClosRange;
+        binaryStream >> level2Uboe;
         binaryStream >> topoInstDetailsOfLayerSize;
         binaryStream >> level0MeshType;
         binaryStream >> netLayerDetails.netLayerNum;
@@ -340,6 +346,7 @@ struct ChannelInfo {
     EndpointLocType locationType = EndpointLocType::ENDPOINT_LOC_TYPE_RESERVED;
     u32 notifyNum = 0;
     u32 portGroupSize = 1; // A5用的, 端口组大小，用于数据分片比例计算
+    u32 dieId = INVALID_VALUE_RANKID; // A5用的, 用于识别Server间双Die POD链路
     ChannelHandle handle = 0;
     HcclMem remoteCclMem;          // A5用的
     HcclMem remoteInputGraphMode;  // A5用的, 图模式下远端sendBuf地址
@@ -387,6 +394,7 @@ struct AlgResourceCtxSerializable {
     ThreadHandle unfoldThread = 0; // 展开流thread
     std::vector<std::vector<ChannelInfo>> channels;
     bool isHcommBatchTransferOnThreadSupported = false;
+    bool isHcclThreadAcquireWithConfigSupported = false;
     void* commInfoPtr = nullptr;
     // hostdpu
     void* npu2DpuShmemPtr = nullptr;
@@ -414,6 +422,7 @@ struct AlgResourceCtxSerializable {
         binaryStream << unfoldThread;
         binaryStream << channels;
         binaryStream << isHcommBatchTransferOnThreadSupported;
+        binaryStream << isHcclThreadAcquireWithConfigSupported;
 
         binaryStream << npu2DpuShmemPtr;
         binaryStream << dpu2NpuShmemPtr;
@@ -447,6 +456,7 @@ struct AlgResourceCtxSerializable {
         binaryStream >> unfoldThread;
         binaryStream >> channels;
         binaryStream >> isHcommBatchTransferOnThreadSupported;
+        binaryStream >> isHcclThreadAcquireWithConfigSupported;
 
         binaryStream >> npu2DpuShmemPtr;
         binaryStream >> dpu2NpuShmemPtr;
@@ -462,16 +472,23 @@ struct AlgResourceCtxSerializable {
     }
 };
 
+enum class MultipleDimensionSplitRatioSource : uint8_t {
+    BUILTIN_FORMULA = 0,
+    ENV_CONFIG,
+    COMM_CONFIG
+};
+
 struct DevAicpuOpConfig {
     u32 execTimeout = 0;
-    double multipleDimensionSplitRatio = 0.8;
-    // 如要新增配置类字段，在此处添加
+    double multipleDimensionSplitRatio = 0.5;
+    MultipleDimensionSplitRatioSource multipleDimensionSplitRatioSource =
+        MultipleDimensionSplitRatioSource::BUILTIN_FORMULA;
 };
 
 struct OpParam { // 不申请ctx，每个算子单独下发
     void* hcclComm;
-    char tag[TAG_LENGTH] = "";               // 保存topoInfo的key值
-    char algTag[ALG_TAG_LENGTH] = "";        // 保存资源的key值，和算法绑定
+    char tag[TAG_LENGTH] = ""; // 保存topoInfo的key值
+    char algTag[ALG_TAG_LENGTH] = ""; // 保存资源的key值，和算法绑定
     char fastLaunchTag[ALG_TAG_LENGTH] = ""; // 快速下发的key值
     char fallbackTag[ALG_MAX_LENGTH] = "";
     char commName[COMM_INDENTIFIER_MAX_LENGTH] = "";
@@ -494,6 +511,7 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     OpMode opMode;
     bool enableDetour{false};
     bool isMc2{false};
+    bool cacheValid{false};
     DevType deviceType = DevType::DEV_TYPE_COUNT;
     CommEngine engine = CommEngine::COMM_ENGINE_RESERVED;
     AlgType algType;
@@ -538,14 +556,14 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     bool isZeroCopy = false;
     char algName[OP_ALG_LENGTH] = "";
     HcclOpExpansionMode commOpExpansionMode = HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_INVALID;
-    OpExecuteConfig opExecuteConfig;
+    OpExecuteConfig opExecuteConfig{OpExecuteConfig::DEFAULT};
     u32 numBlocksLimit = 0;
     bool isAivClearEnable = false;
     u64 ctxSize = 0;
     void* resCtx = nullptr;
     ThreadHandle opThread = 0;
     u32 aicpuRecordCpuIdx = 0; // aicpu record host的notifyIdx
-    u32 dataCount = 0;         // 算子上报dfx的数据量
+    u32 dataCount = 0; // 算子上报dfx的数据量
     DevAicpuOpConfig opConfig; // 收编算子配置类变量
     u64 varMemSize{0};
     u8 varData[0];
