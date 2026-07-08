@@ -28,8 +28,8 @@
  * \brief half 向量加法辅助函数（寄存器模式/__simd_vf__）
  * 将 UB 中的数据加载到矢量寄存器中执行加法，再将结果写回 UB。
  */
-__simd_vf__ inline void add_vf_half(__ubuf__ half* x_local, __ubuf__ half* y_local,
-                                    __ubuf__ half* z_local, uint32_t data_len)
+__simd_vf__ inline void add_vf_half(
+    __ubuf__ half* x_local, __ubuf__ half* y_local, __ubuf__ half* z_local, uint32_t data_len)
 {
     uint16_t one_rep_size = asc_get_vf_len() / sizeof(half);
     uint16_t repeat_time = (data_len + one_rep_size - 1) / one_rep_size;
@@ -57,10 +57,7 @@ class KernelDataCopyPadGm2Ub {
 public:
     __aicore__ inline KernelDataCopyPadGm2Ub() {}
 
-    __aicore__ inline void Init(__gm__ half* src)
-    {
-        srcGlobal = src;
-    }
+    __aicore__ inline void Init(__gm__ half* src) { srcGlobal = src; }
 
     __aicore__ inline void Process()
     {
@@ -105,16 +102,14 @@ private:
                 uint32_t nIdx = nBlockIdx * tileN;
                 uint32_t curCols = (nIdx + tileN > n) ? (n - nIdx) : tileN;
                 asc_copy_gm2ub_align(
-                    ubLocal, srcGlobal + mIdx * n + nIdx,
-                    (uint16_t)tileM, (uint32_t)(curCols * sizeof(half)),
-                    0, 0, 0, 0,
-                    (uint64_t)((n - curCols) * sizeof(half)), 0);
+                    ubLocal, srcGlobal + mIdx * n + nIdx, (uint16_t)tileM, (uint32_t)(curCols * sizeof(half)), 0, 0, 0,
+                    0, (uint64_t)((n - curCols) * sizeof(half)), 0);
             }
         }
     }
 
-    __aicore__ inline void RepeatCopyImpl(__ubuf__ half* ubLocal, uint32_t nStart,
-                                          uint32_t nCount, uint32_t repeatTimes)
+    __aicore__ inline void RepeatCopyImpl(
+        __ubuf__ half* ubLocal, uint32_t nStart, uint32_t nCount, uint32_t repeatTimes)
     {
         uint32_t blockIdx = block_idx;
         uint32_t mStart = blockIdx * singleCoreM;
@@ -128,10 +123,8 @@ private:
                 for (uint32_t nBlockIdx = 0; nBlockIdx < nLoopCount; nBlockIdx++) {
                     uint32_t nIdx = nBlockIdx * tileN;
                     asc_copy_gm2ub_align(
-                        ubLocal, srcGlobal + mIdx * n + nStart + nIdx,
-                        (uint16_t)tileM, (uint32_t)(tileN * sizeof(half)),
-                        0, 0, 0, 0,
-                        (uint64_t)((n - tileN) * sizeof(half)), 0);
+                        ubLocal, srcGlobal + mIdx * n + nStart + nIdx, (uint16_t)tileM,
+                        (uint32_t)(tileN * sizeof(half)), 0, 0, 0, 0, (uint64_t)((n - tileN) * sizeof(half)), 0);
                 }
             }
         }
@@ -139,7 +132,6 @@ private:
 
     __gm__ half* srcGlobal;
 };
-
 
 // ====================================================================
 // 第二部分：KernelAdd（矩阵加法 Kernel）
@@ -182,20 +174,14 @@ public:
      * 但 Add 的输入 x、y 均为流式数据（每个元素只读一次），写入 L2 是纯浪费的。
      * 与 Case 4 对比，展示 L2 bypass 对流式数据的优化效果。
      */
-    __aicore__ inline void ProcessDoubleBuffer()
-    {
-        ProcessDoubleBufferImpl(0); /* l2CacheMode = NORMAL */
-    }
+    __aicore__ inline void ProcessDoubleBuffer() { ProcessDoubleBufferImpl(0); /* l2CacheMode = NORMAL */ }
 
     /* !
      * \brief Case 4：Add 双缓冲 + L2 Cache DISABLE（L2 bypass）
      *
      * 设计意图：流式数据通过 L2 bypass 跳过 L2 Cache 写回，节省带宽。
      */
-    __aicore__ inline void ProcessDoubleBufferL2Bypass()
-    {
-        ProcessDoubleBufferImpl(4); /* l2CacheMode = DISABLE */
-    }
+    __aicore__ inline void ProcessDoubleBufferL2Bypass() { ProcessDoubleBufferImpl(4); /* l2CacheMode = DISABLE */ }
 
 private:
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
@@ -204,10 +190,7 @@ private:
     static constexpr uint32_t max_data_copy_len = 16384;
 #endif
 
-    __aicore__ inline uint32_t GetTotalBlocks() const
-    {
-        return (totalElementsPerCore + dataCopyLen - 1) / dataCopyLen;
-    }
+    __aicore__ inline uint32_t GetTotalBlocks() const { return (totalElementsPerCore + dataCopyLen - 1) / dataCopyLen; }
 
     /* !
      * \brief 双缓冲核心流水线
@@ -249,14 +232,8 @@ private:
 
             asc_sync_wait(PIPE_V, PIPE_MTE2, eventID);
 
-            asc_copy_gm2ub_align(
-                xLocal, xGm + startElement,
-                1, curLen * sizeof(half),
-                0, 0, 0, l2CacheMode, 0, 0);
-            asc_copy_gm2ub_align(
-                yLocal, yGm + startElement,
-                1, curLen * sizeof(half),
-                0, 0, 0, l2CacheMode, 0, 0);
+            asc_copy_gm2ub_align(xLocal, xGm + startElement, 1, curLen * sizeof(half), 0, 0, 0, l2CacheMode, 0, 0);
+            asc_copy_gm2ub_align(yLocal, yGm + startElement, 1, curLen * sizeof(half), 0, 0, 0, l2CacheMode, 0, 0);
 
             asc_sync_notify(PIPE_MTE2, PIPE_V, eventID);
             asc_sync_wait(PIPE_MTE2, PIPE_V, eventID);
@@ -270,10 +247,7 @@ private:
             asc_sync_notify(PIPE_V, PIPE_MTE3, eventID);
             asc_sync_wait(PIPE_V, PIPE_MTE3, eventID);
 
-            asc_copy_ub2gm_align(
-                zGm + startElement, zLocal,
-                1, curLen * sizeof(half),
-                0, 0, 0);
+            asc_copy_ub2gm_align(zGm + startElement, zLocal, 1, curLen * sizeof(half), 0, 0, 0);
 
             asc_sync_notify(PIPE_MTE3, PIPE_V, eventID);
         }
