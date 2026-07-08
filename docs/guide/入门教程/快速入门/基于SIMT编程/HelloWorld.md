@@ -22,7 +22,7 @@
 
 - **Host端代码实现**：
 
-    Host端通过<<<>>>语法糖调用Device端代码。
+    Host端通过`<<<...>>>`语法糖调用Device端代码。
     ```cpp
     int32_t main(int argc, char const *argv[])
     {
