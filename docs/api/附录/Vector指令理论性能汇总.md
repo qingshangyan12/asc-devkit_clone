@@ -1,18 +1,11 @@
 # Vector指令理论性能汇总<a name="ZH-CN_TOPIC_0000002557396789"></a>
 
-<!-- npu="A3,910b" id1 -->
-
 本节汇总介绍了一些主要的Vector指令的理论性能，以下内容针对如下型号生效：
-
 <!-- npu="A3" id2 -->
-
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-
 <!-- end id3 -->
 
 注：
@@ -272,4 +265,3 @@
 | GetProgramCounter | 软仿指令，不涉及理论并行度 |
 | GetArchVersion | 软仿指令，不涉及理论并行度 |
 
-<!-- end id1 -->
