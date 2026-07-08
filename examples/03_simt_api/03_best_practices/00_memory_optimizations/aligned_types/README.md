@@ -42,7 +42,7 @@
 
   `alignas`的几条限制：
 
-  - **只能放大，不能缩小**：`alignas(N)`中的`N`必须≥类型的默认`alignof`，即所有字段`alignof`的最大值，否则编译器会忽略或报错。
+  - **只能放大，不能缩小**：`alignas(N)`中的`N`必须 ≥ 类型的默认`alignof`，即所有字段`alignof`的最大值，否则编译器会忽略或报错。
   - **取值必须是2的幂**：`alignas(N)`中的`N`必须是2的幂。
   - **会同步抬升sizeof**：`sizeof`必须是`alignof`的整数倍，所以放大`alignof`时，`sizeof`会向上进位。
 
@@ -205,7 +205,7 @@
   msprof op ./demo   # 分析样例的性能
   ```
 
-  命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
+  命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹，性能数据文件夹结构示例如下：
 
   ```text
   ├──dump                       # 原始的性能数据，用户无需关注
