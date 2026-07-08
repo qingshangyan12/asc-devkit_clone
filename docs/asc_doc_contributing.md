@@ -257,9 +257,9 @@ __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
 ```
 | 参数名称 | 输入/输出 | 含义 |
 |----------|----------|------|
-| c | 输出 | 目的操作数，结果矩阵c，类型为LocalTensor，物理存储位置为L0C Buffer(TPosition:CO1)。起始地址需按1024字节对齐。 |
-| a | 输入 | 源操作数，左矩阵a，类型为LocalTensor，物理存储位置为L0A Buffer(TPosition:A2)。起始地址需按512字节对齐。 |
-| b | 输入 | 源操作数，右矩阵b，类型为LocalTensor，物理存储位置为L0B Buffer(TPosition:B2)。起始地址需按512字节对齐。 |
+| c | 输出 | 目的操作数，结果矩阵c，类型为LocalTensor，物理存储位置为L0C Buffer（TPosition: CO1）。起始地址需按1024字节对齐。 |
+| a | 输入 | 源操作数，左矩阵a，类型为LocalTensor，物理存储位置为L0A Buffer（TPosition: A2）。起始地址需按512字节对齐。 |
+| b | 输入 | 源操作数，右矩阵b，类型为LocalTensor，物理存储位置为L0B Buffer（TPosition: B2）。起始地址需按512字节对齐。 |
 | bias | 输入 | 源操作数，bias矩阵，物理存储位置为BT Buffer(TPosition:C2)。起始地址需按64字节对齐。 |
 | mmadParams | 输入 | 矩阵乘相关参数。MmadParams参数说明请参考下表。 |
 ```
@@ -360,7 +360,7 @@ __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
 ```
 ## 约束说明
 
-- 结果矩阵C只支持位于CO1(L0C Buffer)，左矩阵A只支持位于A2(L0A Buffer)，右矩阵B只支持位于B2(L0B Buffer)。
+- 结果矩阵C只支持位于L0C Buffer（CO1），左矩阵A只支持位于L0A Buffer（A2），右矩阵B只支持位于L0B Buffer（B2）。
 - 当M、K、N中的任意一个值为0时，指令不执行，视为NOP（空操作）。**应尽量避免NOP.M操作**，NOP.M实测远大于1 cycle。
 - 当M=1时，默认开启GEMV模式，A矩阵按ND格式读取（不视为ZZ/NZ格式），起始地址仍要求512字节对齐。
 - 一次Mmad至少完成A(16×16×half)×B(16×16×half)的数据块计算。有效值非16倍数时无效数据排布如下：

@@ -153,7 +153,7 @@
 | deqScalar | 可选输入 | scalar量化参数，表示单个scale值，quantPre量化模式为[随路量化](./关键特性说明/随路量化.md)时需要设置该参数。支持的数据类型为`uint64_t`。 |
 | [reluEn](./关键特性说明/随路ReLU.md) | 可选输入 | 是否开启NormReLU的开关：<br>&nbsp;&nbsp;&bull; `false`：不开启NormReLU功能，默认为`false`；<br>&nbsp;&nbsp;&bull; `true`：开启NormReLU功能。 |
 | unitFlag | 可选输入 | unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&nbsp;&nbsp;&bull; 0（2'b00）：不开启unitFlag；<br>&nbsp;&nbsp;&bull; 2（2'b10）：开启unitFlag，硬件执行完指令之后，不复位单元标记位；<br>&nbsp;&nbsp;&bull; 3（2'b11）：开启unitFlag，硬件执行完指令之后，复位单元标记位。<br>开启该功能时，须将Mmad指令和Fixpipe指令的unitFlag值设置为2或3。<br>参数设置方案和特性细节可参考：Mmad计算中关键特性说明的[UnitFlag](../Mmad计算/关键特性说明/UnitFlag.md)章节。 |
-| [channelSplit](./关键特性说明/F32-Channel-Split.md) | 可选输入 | 仅在L0C Buffer(CO1) -> GM NZ float输出时生效，是否开启通道拆分的功能。默认为`false`，不开启该功能。 |
+| [channelSplit](./关键特性说明/F32-Channel-Split.md) | 可选输入 | 仅在L0C Buffer（CO1） -> GM NZ float输出时生效，是否开启通道拆分的功能。默认为`false`，不开启该功能。 |
 | ndNum | 可选输入 | L0C Buffer上源NZ矩阵的数目，也就是传输ND矩阵的数目，默认为1，取值范围为ndNum∈[0, 65535]，[NZ2ND](./关键特性说明/NZ2ND.md)多个NZ非连续矩阵的个数。<br>**注：ndNum=0表示不执行搬运，该接口将被视为NOP（空操作）。** |
 | srcNdStride | 可选输入 | 不同NZ矩阵起始地址之间的间隔，取值范围为srcNdStride∈[0, 512]，单位为数据块16*C0_Size。当ndNum配置为1时，srcNdStride配置为0即可，不生效。 |
 | dstNdStride | 可选输入 | 目的相邻ND矩阵起始地址之间的偏移，取值范围为dstNdStride∈[0, 65535]，单位为element。当ndNum配置为1时，dstNdStride配置为0即可，不生效。 |
