@@ -182,6 +182,8 @@ PIPE_V
         // 第二次：ureg[0:2] + src[0:62] 写入dst[-2:62]（即UB[256:512]）；同时src[62:64] 写入ureg[0:2]；同时dst自增为dst[128]（即UB[520]）
         asc_storeunalign_postupdate(dst, ureg, src, count);
     }
+    // dst结束地址为520，但此时dst已经自增到了520，所以offset要配置为0 
+    addr_reg offset = asc_create_addr_reg_b32(0);
     // ureg[0:2] 写入dst[-2:0]（即UB[512:520]）
     asc_storeunalign_post(dst, ureg, offset);
     ```
