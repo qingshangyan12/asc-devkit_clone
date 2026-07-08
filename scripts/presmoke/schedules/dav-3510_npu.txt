@@ -239,6 +239,8 @@
 01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op_static_lib
 01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/parallel_ops_package
 01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op
+01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin
+01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom
 04_aicpu/00_introduction/00_device_tiling/aicpu_device_tiling
 01_simd_cpp_api/04_advanced_api/10_math/log
 01_simd_cpp_api/03_basic_api/05_sync_control/sync_all
