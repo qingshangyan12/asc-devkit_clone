@@ -50,7 +50,7 @@
 
 DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同的寄存器，配合数据搬运指令开启不同的数据搬运能力，对应的接口如下：
 
-- 数据搬运接口，通路L0C Buffer（CO1）->L1 Buffer（C1），配合设置寄存器实现量化和ReLU激活。
+- 数据搬运接口，通路L0C Buffer(CO1)->L1 Buffer(C1)，配合设置寄存器实现量化和ReLU激活。
 
     ```cpp
     template <typename T, typename U>

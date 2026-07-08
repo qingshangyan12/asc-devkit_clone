@@ -257,9 +257,9 @@ __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
 ```
 | 参数名称 | 输入/输出 | 含义 |
 |----------|----------|------|
-| c | 输出 | 目的操作数，结果矩阵c，类型为LocalTensor，物理存储位置为L0C Buffer（TPosition: CO1）。起始地址需按1024字节对齐。 |
-| a | 输入 | 源操作数，左矩阵a，类型为LocalTensor，物理存储位置为L0A Buffer（TPosition: A2）。起始地址需按512字节对齐。 |
-| b | 输入 | 源操作数，右矩阵b，类型为LocalTensor，物理存储位置为L0B Buffer（TPosition: B2）。起始地址需按512字节对齐。 |
+| c | 输出 | 目的操作数，结果矩阵c，类型为LocalTensor，物理存储位置为L0C Buffer(TPosition:CO1)。起始地址需按1024字节对齐。 |
+| a | 输入 | 源操作数，左矩阵a，类型为LocalTensor，物理存储位置为L0A Buffer(TPosition:A2)。起始地址需按512字节对齐。 |
+| b | 输入 | 源操作数，右矩阵b，类型为LocalTensor，物理存储位置为L0B Buffer(TPosition:B2)。起始地址需按512字节对齐。 |
 | bias | 输入 | 源操作数，bias矩阵，物理存储位置为BT Buffer(TPosition:C2)。起始地址需按64字节对齐。 |
 | mmadParams | 输入 | 矩阵乘相关参数。MmadParams参数说明请参考下表。 |
 ```

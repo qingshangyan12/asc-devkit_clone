@@ -99,7 +99,7 @@ src数据类型支持uint64_t，dst数据类型支持uint64_t。
 
 ## 调用示例<a id="section_call_example"></a>
 
-L1 Buffer（C1）->Fixpipe Buffer（C2PIPE2GM），搬运Vector量化参数。
+L1 Buffer(C1)->Fixpipe Buffer(C2PIPE2GM)，搬运Vector量化参数。
 
 ```cpp
 // c1Addr = 0、fbAddr = 0、N = 256、n = 256；burstLen = CeilAlign(256 * sizeof(uint64_t), 128) / 128 = 16，dataCopyParams = {1, 16, 0, 0}。
