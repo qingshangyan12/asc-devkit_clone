@@ -12,8 +12,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-DEFINE_WEAK_FUNC(HcclResult, HcommRegOpInfo, const char* commId, void* opInfo, size_t size);
-DEFINE_WEAK_FUNC(HcclResult, HcommRegOpTaskException, const char* commId, HcommGetOpInfoCallback callback);
+DEFINE_DLSYM_FUNC(HcclResult, HcommRegOpInfo, (const char* commId, void* opInfo, size_t size),
+    (commId, opInfo, size));
+DEFINE_DLSYM_FUNC(HcclResult, HcommRegOpTaskException, (const char* commId, HcommGetOpInfoCallback callback),
+    (commId, callback));
 
 // 初始化
 void HcommDiagDlInit(void* libHcommHandle)

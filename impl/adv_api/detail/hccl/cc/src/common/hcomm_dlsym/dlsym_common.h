@@ -18,14 +18,19 @@ extern "C" {
 
 #define DECL_WEAK_FUNC(type, func_name, ...) type func_name(__VA_ARGS__) __attribute__((weak));
 
-#define DEFINE_WEAK_FUNC(type, func_name, ...)                                           \
-    static bool g_##func_name##Supported = false;                                        \
-    extern "C" bool HcommIsSupport##func_name(void) { return g_##func_name##Supported; } \
-    type func_name(__VA_ARGS__) __attribute__((weak));                                   \
-    type func_name(__VA_ARGS__)                                                          \
-    {                                                                                    \
-        HCCL_ERROR("[HcclWrapper] %s not supported", __func__);                          \
-        return (type)(-1);                                                               \
+#define DEFINE_DLSYM_FUNC(type, func_name, params, args)                                  \
+    static bool g_##func_name##Supported = false;                                         \
+    using func_name##Func = type (*) params;                                              \
+    static func_name##Func g_##func_name##Ptr = nullptr;                                  \
+    extern "C" bool HcommIsSupport##func_name(void) { return g_##func_name##Supported; }  \
+    extern "C" type func_name params __attribute__((weak));                               \
+    extern "C" type func_name params                                                     \
+    {                                                                                     \
+        if (g_##func_name##Ptr == nullptr) {                                              \
+            HCCL_ERROR("[HcclWrapper] %s not supported", __func__);                       \
+            return static_cast<type>(-1);                                                 \
+        }                                                                                 \
+        return g_##func_name##Ptr args;                                                   \
     }
 
 #define DECL_SUPPORT_FLAG(func_name) extern "C" bool HcommIsSupport##func_name(void)
@@ -35,10 +40,12 @@ extern "C" {
         dlerror();                                                                                  \
         void* ptr = (void*)dlsym(handle, #func_name);                                               \
         const char* err = dlerror();                                                                \
-        if (ptr == nullptr) {                                                                       \
+        if (ptr == nullptr || ptr == reinterpret_cast<void*>(&func_name)) {                          \
+            g_##func_name##Ptr = nullptr;                                                           \
             g_##func_name##Supported = false;                                                       \
-            HCCL_DEBUG("[HcclWrapper] %s not supported, %s", #func_name, err ? err : "(no error)"); \
+            HCCL_ERROR("[HcclWrapper] %s not supported, %s", #func_name, err ? err : "(no error)"); \
         } else {                                                                                    \
+            g_##func_name##Ptr = reinterpret_cast<func_name##Func>(ptr);                            \
             g_##func_name##Supported = true;                                                        \
         }                                                                                           \
     } while (0)

@@ -19,6 +19,7 @@ extern "C" {
 #endif
 
 DECL_SUPPORT_FLAG(HcclThreadExportToCommEngine);
+DECL_SUPPORT_FLAG(HcclThreadResGetInfo);
 // 动态库管理接口（大驼峰命名）
 void HcclResDlInit(void* libHcommHandle);
 

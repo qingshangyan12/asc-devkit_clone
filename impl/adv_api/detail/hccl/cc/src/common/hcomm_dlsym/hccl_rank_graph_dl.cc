@@ -12,25 +12,59 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-DEFINE_WEAK_FUNC(
-    HcclResult, HcclRankGraphGetTopoInstsByLayer, HcclComm comm, uint32_t netLayer, uint32_t** topoInsts,
-    uint32_t* topoInstNum);
-DEFINE_WEAK_FUNC(
-    HcclResult, HcclRankGraphGetTopoType, HcclComm comm, uint32_t netLayer, uint32_t topoInstId, CommTopo* topoType);
-DEFINE_WEAK_FUNC(
-    HcclResult, HcclRankGraphGetRanksByTopoInst, HcclComm comm, uint32_t netLayer, uint32_t topoInstId,
-    uint32_t** ranks, uint32_t* rankNum);
-DEFINE_WEAK_FUNC(
-    HcclResult, HcclRankGraphGetEndpointNum, HcclComm comm, uint32_t layer, uint32_t topoInstId, uint32_t* num);
-DEFINE_WEAK_FUNC(
-    HcclResult, HcclRankGraphGetEndpointDesc, HcclComm comm, uint32_t layer, uint32_t topoInstId, uint32_t* descNum,
-    EndpointDesc* endpointDesc);
-DEFINE_WEAK_FUNC(
-    HcclResult, HcclRankGraphGetEndpointInfo, HcclComm comm, uint32_t rankId, const EndpointDesc* endpointDesc,
-    EndpointAttr endpointAttr, uint32_t infoLen, void* info);
+DEFINE_DLSYM_FUNC(
+    HcclResult, HcclRankGraphGetLayers, (HcclComm comm, uint32_t** netLayers, uint32_t* netLayerNum),
+    (comm, netLayers, netLayerNum));
+DEFINE_DLSYM_FUNC(
+    HcclResult, HcclRankGraphGetRanksByLayer,
+    (HcclComm comm, uint32_t netLayer, uint32_t** ranks, uint32_t* rankNum), (comm, netLayer, ranks, rankNum));
+DEFINE_DLSYM_FUNC(
+    HcclResult, HcclRankGraphGetRankSizeByLayer, (HcclComm comm, uint32_t netLayer, uint32_t* rankNum),
+    (comm, netLayer, rankNum));
+DEFINE_DLSYM_FUNC(
+    HcclResult, HcclRankGraphGetTopoTypeByLayer, (HcclComm comm, uint32_t netLayer, CommTopo* topoType),
+    (comm, netLayer, topoType));
+DEFINE_DLSYM_FUNC(
+    HcclResult, HcclRankGraphGetInstSizeListByLayer,
+    (HcclComm comm, uint32_t netLayer, uint32_t** instSizeList, uint32_t* listSize),
+    (comm, netLayer, instSizeList, listSize));
+DEFINE_DLSYM_FUNC(
+    HcclResult, HcclRankGraphGetLinks,
+    (HcclComm comm, uint32_t netLayer, uint32_t srcRank, uint32_t dstRank, CommLink** links, uint32_t* linkNum),
+    (comm, netLayer, srcRank, dstRank, links, linkNum));
+DEFINE_DLSYM_FUNC(
+    HcclResult, HcclRankGraphGetTopoInstsByLayer,
+    (HcclComm comm, uint32_t netLayer, uint32_t** topoInsts, uint32_t* topoInstNum),
+    (comm, netLayer, topoInsts, topoInstNum));
+DEFINE_DLSYM_FUNC(
+    HcclResult, HcclRankGraphGetTopoType,
+    (HcclComm comm, uint32_t netLayer, uint32_t topoInstId, CommTopo* topoType),
+    (comm, netLayer, topoInstId, topoType));
+DEFINE_DLSYM_FUNC(
+    HcclResult, HcclRankGraphGetRanksByTopoInst,
+    (HcclComm comm, uint32_t netLayer, uint32_t topoInstId, uint32_t** ranks, uint32_t* rankNum),
+    (comm, netLayer, topoInstId, ranks, rankNum));
+DEFINE_DLSYM_FUNC(
+    HcclResult, HcclRankGraphGetEndpointNum, (HcclComm comm, uint32_t layer, uint32_t topoInstId, uint32_t* num),
+    (comm, layer, topoInstId, num));
+DEFINE_DLSYM_FUNC(
+    HcclResult, HcclRankGraphGetEndpointDesc,
+    (HcclComm comm, uint32_t layer, uint32_t topoInstId, uint32_t* descNum, EndpointDesc* endpointDesc),
+    (comm, layer, topoInstId, descNum, endpointDesc));
+DEFINE_DLSYM_FUNC(
+    HcclResult, HcclRankGraphGetEndpointInfo,
+    (HcclComm comm, uint32_t rankId, const EndpointDesc* endpointDesc, EndpointAttr endpointAttr, uint32_t infoLen,
+        void* info),
+    (comm, rankId, endpointDesc, endpointAttr, infoLen, info));
 
 void HcclRankGraphDlInit(void* libHcommHandle)
 {
+    INIT_SUPPORT_FLAG(libHcommHandle, HcclRankGraphGetLayers);
+    INIT_SUPPORT_FLAG(libHcommHandle, HcclRankGraphGetRanksByLayer);
+    INIT_SUPPORT_FLAG(libHcommHandle, HcclRankGraphGetRankSizeByLayer);
+    INIT_SUPPORT_FLAG(libHcommHandle, HcclRankGraphGetTopoTypeByLayer);
+    INIT_SUPPORT_FLAG(libHcommHandle, HcclRankGraphGetInstSizeListByLayer);
+    INIT_SUPPORT_FLAG(libHcommHandle, HcclRankGraphGetLinks);
     INIT_SUPPORT_FLAG(libHcommHandle, HcclRankGraphGetTopoInstsByLayer);
     INIT_SUPPORT_FLAG(libHcommHandle, HcclRankGraphGetTopoType);
     INIT_SUPPORT_FLAG(libHcommHandle, HcclRankGraphGetRanksByTopoInst);

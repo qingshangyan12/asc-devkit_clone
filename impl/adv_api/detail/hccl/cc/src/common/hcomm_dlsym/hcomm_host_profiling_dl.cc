@@ -13,14 +13,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-DEFINE_WEAK_FUNC(HcclResult, HcommProfilingRegThread, HcomProInfoTmp profInfo, ThreadHandle* threads);
-DEFINE_WEAK_FUNC(HcclResult, HcommProfilingUnRegThread, HcomProInfoTmp profInfo, ThreadHandle* threads);
-DEFINE_WEAK_FUNC(HcclResult, HcommProfilingReportKernel, uint64_t beginTime, const char* profName);
-DEFINE_WEAK_FUNC(HcclResult, HcommProfilingReportOp, HcomProInfoTmp profInfo);
-DEFINE_WEAK_FUNC(uint64_t, HcommGetProfilingSysCycleTime);
-DEFINE_WEAK_FUNC(HcclResult, HcclDfxRegOpInfo, HcclComm comm, void* dfxOpInfo);
-DEFINE_WEAK_FUNC(HcclResult, HcclProfilingReportOp, HcclComm comm, uint64_t beginTime);
-DEFINE_WEAK_FUNC(HcclResult, HcclReportAicpuKernel, HcclComm comm, uint64_t beginTime, char* kernelName);
+DEFINE_DLSYM_FUNC(HcclResult, HcommProfilingRegThread, (HcomProInfoTmp profInfo, ThreadHandle* threads),
+    (profInfo, threads));
+DEFINE_DLSYM_FUNC(HcclResult, HcommProfilingUnRegThread, (HcomProInfoTmp profInfo, ThreadHandle* threads),
+    (profInfo, threads));
+DEFINE_DLSYM_FUNC(HcclResult, HcommProfilingReportKernel, (uint64_t beginTime, const char* profName),
+    (beginTime, profName));
+DEFINE_DLSYM_FUNC(HcclResult, HcommProfilingReportOp, (HcomProInfoTmp profInfo), (profInfo));
+DEFINE_DLSYM_FUNC(uint64_t, HcommGetProfilingSysCycleTime, (void), ());
+DEFINE_DLSYM_FUNC(HcclResult, HcclDfxRegOpInfo, (HcclComm comm, void* dfxOpInfo), (comm, dfxOpInfo));
+DEFINE_DLSYM_FUNC(HcclResult, HcclProfilingReportOp, (HcclComm comm, uint64_t beginTime), (comm, beginTime));
+DEFINE_DLSYM_FUNC(HcclResult, HcclReportAicpuKernel, (HcclComm comm, uint64_t beginTime, char* kernelName),
+    (comm, beginTime, kernelName));
 
 // 初始化
 void HcommProfilingDlInit(void* libHcommHandle)

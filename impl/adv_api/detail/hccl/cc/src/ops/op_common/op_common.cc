@@ -38,8 +38,8 @@
 #include "dpu/kernel_launch.h"
 #include "hcomm_host_profiling_dl.h"
 #include "hccl_rank_graph_dl.h"
+#include "hccl_res_dl.h"
 #include "rt.h"
-#include "dlhcomm_function.h"
 #include "cann_host_bridge.h"
 
 #ifndef MC2_CLIENT_ENABLE_CCU
@@ -582,15 +582,14 @@ HcclResult AicpuKernelLaunch(HcclComm comm, OpParam& param, ThreadHandle unfoldT
     constexpr u32 numBlocks = 1;
     // 通过Thread获取展开流stream
     void* unfoldStream = nullptr;
-    auto& HcclThreadResGetInfoFunc = mc2_ops_hccl::DlHcommFunction::GetInstance();
     // 如果不支持这个接口则不走提前展开
-    if (!HcclThreadResGetInfoFunc.dlHcclThreadResGetInfo || param.opMode == OpMode::OFFLOAD) {
+    if (!HcommIsSupportHcclThreadResGetInfo() || param.opMode == OpMode::OFFLOAD) {
         HCCL_INFO(
             "[asc][AlgoExecute][AicpuKernelLaunch] launch on main stream, opMode[%d], stream[%p].", param.opMode,
             param.stream);
         ret = aclrtLaunchKernelWithConfig(funcHandle, numBlocks, param.stream, &cfg, argsHandle, nullptr);
     } else {
-        CHK_RET(HcclThreadResGetInfoFunc.dlHcclThreadResGetInfo(comm, unfoldThread, 0, sizeof(void*), &unfoldStream));
+        CHK_RET(HcclThreadResGetInfo(comm, unfoldThread, THREAD_RES_TYPE_STREAM, sizeof(void*), &unfoldStream));
         HCCL_INFO(
             "[asc][AlgoExecute][AicpuKernelLaunch] launch on unfold stream, unfoldThread[%lu], "
             "unfoldStream[%p].",
@@ -627,13 +626,12 @@ HcclResult CaptureSlaveStreams(HcclComm comm, aclrtStream mainStream, const std:
         return HCCL_SUCCESS;
     }
     // thread[0] is main thread
-    auto& HcclThreadResGetInfoFunc = mc2_ops_hccl::DlHcommFunction::GetInstance();
     for (size_t i = 1; i < threads.size(); ++i) {
         void* stream = nullptr;
         CHK_PRT_RET(
-            !HcclThreadResGetInfoFunc.dlHcclThreadResGetInfo, HCCL_ERROR("AclGraph is not support."),
+            !HcommIsSupportHcclThreadResGetInfo(), HCCL_ERROR("AclGraph is not support."),
             HCCL_E_NOT_SUPPORT);
-        CHK_RET(HcclThreadResGetInfoFunc.dlHcclThreadResGetInfo(comm, threads[i], 0, sizeof(void*), &stream));
+        CHK_RET(HcclThreadResGetInfo(comm, threads[i], THREAD_RES_TYPE_STREAM, sizeof(void*), &stream));
         rtError_t addRet = rtStreamAddToModel(stream, rtModel);
         CHK_PRT_RET(
             addRet != RT_ERROR_NONE, HCCL_ERROR("[%s]rtStreamAddToModel fail. return[%d].", __func__, addRet),
