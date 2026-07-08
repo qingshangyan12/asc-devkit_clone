@@ -4,6 +4,8 @@ L0C Buffer到Unified Buffer双目标模式用于将同一AI Core内L0C Buffer的
 
 Tensor API通过`CopyL0C2UBTrait::dualDstCtl`控制双目标模式。
 
+`dualDstCtl`取值如下：
+
 |取值|说明|
 |--------|--------|
 |`DUAL_DST_DISABLE`|单目标模式。整个矩阵写入默认目标Unified Buffer。|
@@ -48,9 +50,9 @@ M方向切分示例：
 - `srcStride = 64`，表示源NZ矩阵中相邻Z排布的起始地址偏移为`64 * C0_SIZE`。
 - `dstStride = 40 * C0`，表示目的NZ矩阵中相邻Z排布的起始地址偏移为`40 * 16`个元素。
 
-**图1**  NZ2NZ双目标搬运模式设置示意图
+**图 1**  NZ2NZ双目标搬运模式设置示意图
 
-![](../../../../../figures/nz2nz_dual_target_movement_mode_setting.png)
+![NZ2NZ双目标搬运模式设置示意图](../../../../../figures/nz2nz_dual_target_movement_mode_setting.png)
 
 ## NZ2ND双目标模式
 
@@ -64,9 +66,9 @@ M方向切分示例：
 - `srcNdStride = 240`，表示不同NZ矩阵起始地址之间的间隔为`240 * C0_SIZE`。
 - `dstNdStride = 4096`，表示目的相邻ND矩阵起始地址之间的偏移为4096个元素。
 
-**图2**  使能NZ2ND参数双搬入模式设置示意图
+**图 2**  NZ2ND双目标搬运模式设置示意图
 
-![](../../../../../figures/enable_nz2nd_param_dual_in_mode_setting.png)
+![NZ2ND双目标搬运模式设置示意图](../../../../../figures/enable_nz2nd_param_dual_in_mode_setting.png)
 
 ## 约束说明
 

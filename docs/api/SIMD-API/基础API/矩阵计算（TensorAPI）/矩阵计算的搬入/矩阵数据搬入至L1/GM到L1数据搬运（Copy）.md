@@ -8,7 +8,7 @@
 
 ## 功能说明
 
-头文件路径为：`"tensor_api/tensor.h"`。
+头文件路径为：`tensor_api/tensor.h`。
 
 Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将Global Memory中的数据搬运到L1 Buffer。`Copy`接口根据源张量和目的张量的存储位置、数据类型和Layout选择具体搬运实现。搬运块数、搬运长度、源/目的侧步长以及格式转换相关信息由Tensor Layout推导，用户不需要在`Copy`调用中额外传入搬运参数。
 
@@ -61,7 +61,7 @@ Global Memory到L1 Buffer通路使用`CopyGM2L1{}`作为`copyOperation`，使用
 
 **函数参数说明**
 
-**表1**  `Copy`接口参数说明
+**表 1**  `Copy`接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
@@ -69,7 +69,7 @@ Global Memory到L1 Buffer通路使用`CopyGM2L1{}`作为`copyOperation`，使用
 | dst | 输出 | 目的张量，存储位置为`Location::L1`。 |
 | src | 输入 | 源张量，存储位置为`Location::GM`。 |
 
-**表2**  `MakeCopy`接口参数说明
+**表 2**  `MakeCopy`接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
