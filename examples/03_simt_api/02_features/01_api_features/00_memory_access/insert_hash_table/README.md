@@ -98,7 +98,7 @@ SIMT能够通过大量线程的并发执行实现高效处理大批数据，但�
 ## 算子描述
 
 - 算子功能：  
-  InsertHashTable算子实现将N个键值对插入容量为Z的哈希表中，其中key为int64_t类型数，value为长度M的float类型的Tensor。
+  InsertHashTable算子实现将N个键值对插入容量为Z的哈希表中，其中`key`为int64_t类型数，`value`为长度M的float类型的Tensor。
 
 - 算子规格：  
   <table>
@@ -115,10 +115,10 @@ SIMT能够通过大量线程的并发执行实现高效处理大批数据，但�
   </table>
 
 - 算子实现：  
-  InsertHashTable算子的实现流程为，每个warp处理一个键值对，warp中线程0负责根据key的哈希值寻找可用桶，线程0-31负责将value存入桶中。线程0寻找可用桶时，通过开放寻址法解决哈希冲突问题，并使用`asc_atomic_cas()`接口解决多线程冲突问题，使用`asc_threadfence()`接口解决核间数据同步问题。
+  InsertHashTable算子的实现流程为，每个warp处理一个键值对，warp中线程0负责根据`key`的哈希值寻找可用桶，线程0-31负责将`value`存入桶中。线程0寻找可用桶时，通过开放寻址法解决哈希冲突问题，并使用`asc_atomic_cas()`接口解决多线程冲突问题，使用`asc_threadfence()`接口解决核间数据同步问题。
 
 - 调用实现：  
-  使用内核调用符<<<>>>调用核函数。
+  使用内核调用符`<<<...>>>`调用核函数。
 
 ## 编译运行
 
