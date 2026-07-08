@@ -16,6 +16,7 @@
 #include "op_aclnn_generator.h"
 #include <algorithm>
 #include <mutex>
+#include <regex>
 #include <set>
 #include <sstream>
 #include <sys/stat.h>
@@ -313,6 +314,12 @@ bool AreInputDataTypesSupported(
         }
     }
     return true;
+}
+
+bool IsValidSocVersion(const std::string& socVer)
+{
+    static const std::regex validSocVersionRegex("^[A-Za-z0-9_]+$");
+    return std::regex_match(socVer, validSocVersionRegex);
 }
 } // Anonymous Namespace
 
@@ -1308,6 +1315,11 @@ std::vector<AclnnOpGenerator::SocEntry> AclnnOpGenerator::BuildUnifiedSocList(Op
 
     for (auto iter = map.begin(); iter != map.end(); ++iter) {
         std::string socVer = ToLower(iter->first.GetString());
+        if (!IsValidSocVersion(socVer)) {
+            Generator::SetErrorMessage("Invalid soc version " + socVer + " of op " + opType +
+                                       ", soc version can only contain letters, digits, and underscore '_'.");
+            continue;
+        }
         if (socVer.find("kirin") == 0) {
             continue;
         }
@@ -1335,6 +1347,11 @@ std::vector<AclnnOpGenerator::SocEntry> AclnnOpGenerator::BuildUnifiedSocList(Op
         Split(computeUnitCfg, ';', computeUnits);
         for (uint32_t i = 0; i < computeUnits.size(); ++i) {
             std::string socVer = computeUnits[i];
+            if (!IsValidSocVersion(socVer)) {
+                Generator::SetErrorMessage("Invalid soc version " + socVer + " from compute_unit of op " + opType +
+                                           ", soc version can only contain letters, digits, and underscore '_'.");
+                continue;
+            }
             auto it = SOC_SUPPORT_MAP.find(socVer);
             if (it == SOC_SUPPORT_MAP.end()) {
                 continue;

@@ -1978,4 +1978,38 @@ TEST_F(TEST_OPBUILD, AclnnAddTik2WithComputeUnitRunSuccess)
     unsetenv("OPS_DIRECT_ACCESS_PREFIX");
 }
 
+TEST_F(TEST_OPBUILD, AclnnInvalidSocVersionCharSet)
+{
+    OpDef opDef("InvalidSocVersionChars");
+    opDef.Input("x1").DataType({ge::DT_FLOAT16});
+    opDef.Output("y1").DataType({ge::DT_FLOAT16});
+    OpAICoreConfig aicConfig;
+    opDef.AICore().AddConfig("ascend 910b", aicConfig);
+
+    std::vector<std::string> opsvec({"InvalidSocVersionChars"});
+    AclnnOpGenerator opGen(opsvec);
+    auto socEntries = opGen.BuildUnifiedSocList(opDef);
+
+    bool hasInvalidSoc = false;
+    for (const auto& entry : socEntries) {
+        if (entry.socName == "ascend 910b") {
+            hasInvalidSoc = true;
+        }
+    }
+    EXPECT_FALSE(hasInvalidSoc);
+
+    std::vector<std::string> errMessage = Generator::GetErrorMessage();
+    bool hasErrorMessage = false;
+    const std::string expectedErr =
+        "Invalid soc version ascend 910b of op InvalidSocVersionChars, "
+        "soc version can only contain letters, digits, and underscore '_'.";
+    for (size_t i = 0U; i < errMessage.size(); i++) {
+        if (errMessage[i] == expectedErr) {
+            hasErrorMessage = true;
+            break;
+        }
+    }
+    EXPECT_TRUE(hasErrorMessage);
+}
+
 } // namespace ops
