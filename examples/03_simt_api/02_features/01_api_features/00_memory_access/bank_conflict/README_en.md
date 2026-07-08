@@ -27,7 +27,7 @@ This example introduces UB bank conflicts that may occur when multiple threads i
 
 ### Example Function
 
-This example is used to verify UB bank conflict behavior when multiple threads in the same Warp access UB in Ascend C SIMT programming. The example uses the compile-time parameter `SCENARIO_NUM` to select different cases and construct typical access patterns, including same-address merge, cross-bank/subbank distributed access, same 8B-range merge in contiguous float access, same-subbank different-row conflicts, and same-index subbank conflicts within the same bank group.
+This example is used to verify UB bank conflict behavior when multiple threads in the same Warp access UB in Ascend C SIMT programming. The example uses the compile-time parameter `SCENARIO_NUM` to select different cases and construct typical access patterns, including same-address merge, cross-subbank distributed access, same 8B-range merge in contiguous float access, same-subbank different-row conflicts, and same-index subbank conflicts within the same bank group.
 
 On the Host side, the input array is constructed and copied to GM. The kernel first moves input data from GM to UB, then repeatedly reads data according to the UB address pattern of the current case, and uses [`clock()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/调测接口/clock.md) to count the cycles spent reading UB data.
 
@@ -48,7 +48,7 @@ On the Host side, the input array is constructed and copied to GM. The kernel fi
 
 In this document, UB bank conflict in SIMT programming mainly refers to a subbank conflict where multiple threads in the same Warp compete for same-index subbank resources in the same bank group in one UB access instruction.
 
-Taking Ascend 950PR/Ascend 950DT as an example, the following figure shows the UB bank structure. The total UB size is 256KB and is divided into 8 bank groups. Each bank group contains 2 banks. The 16 banks are numbered from bank0 to bank15. Bank i and bank i+8 belong to bank group i, namely `bank_group_id = bank_id % 8`. Each bank is 16KB and contains 512 rows, with each row being 32B. In SIMT programming mode, each 32B row in a bank is further divided into 4 subbanks at 8B granularity.
+Taking Ascend 950PR/Ascend 950DT as an example, the following figure shows the UB bank structure. The total UB size is 256KB and is divided into 8 bank groups. Each bank group contains 2 banks. The 16 banks are numbered from bank0 to bank15. Bank i and bank i+8 belong to bank group i, namely `bank_group_number = bank_number % 8`. Each bank is 16KB and contains 512 rows, with each row being 32B. In SIMT programming mode, each 32B row in a bank is further divided into 4 subbanks at 8B granularity.
 
 In SIMT scenarios, multiple threads in the same Warp may access UB at the same time in one UB access instruction. When the accessed data belongs to subbank resources with the same index in the same bank group, for example, subbank2 in bank0 and subbank2 in bank8, the hardware cannot process all requests in one cycle, so the requests need to wait in sequence, forming subbank conflicts and increasing access latency. If the accessed data belongs to the same 8B address range in the same row of the same subbank, the hardware merges these requests, and no subbank conflict is formed.
 
@@ -69,7 +69,7 @@ The main subbank conflict types in SIMT programming are as follows:
 - **Write-Write Conflict**: Multiple write operations simultaneously attempt to access subbanks with the same index in the same bank group, for example, multiple threads simultaneously write subbank2 in bank0 and subbank2 in bank8.
 - **Read-Read Conflict**: Multiple read operations simultaneously attempt to access subbanks with the same index in the same bank group, for example, multiple threads simultaneously read subbank2 in bank0 and subbank2 in bank8.
 
-This example focuses on read-read conflicts. It uses multiple threads in the same UB read instruction to access different UB address patterns and observe the cycle differences among mergeable access, conflict-free access, and subbank-conflict access.
+In SIMT programming mode, threads in the same Warp execute the same instruction at the same time, so there is no read-write conflict scenario. This example focuses on read-read conflicts. It uses multiple threads in the same UB read instruction to access different UB address patterns and observe the cycle differences among mergeable access, conflict-free access, and subbank-conflict access.
 
 ### Case Implementation Description
 
@@ -99,7 +99,7 @@ for (uint32_t i = 0; i < REPEAT_TIMES; ++i) {
 | Case | Scenario Description | Expected Access Characteristics |
 | --- | --- | --- |
 | Case 0 | Threads in the same Warp read the same address | Same-address requests are merged |
-| Case 1 | Cross-bank/subbank access | 32 threads access different subbanks across 8 bank groups; this is the conflict-free baseline |
+| Case 1 | Cross-subbank access | 32 threads access different subbanks across 8 bank groups; this is the conflict-free baseline |
 | Case 2 | Threads in the same Warp access adjacent float elements continuously | Adjacent two threads access the same 8B range, and the hardware can merge the requests |
 | Case 3 | Access different rows of the same subbank in the same bank | 32 threads access different rows of the same bank and same subbank, forming a subbank conflict |
 | Case 4 | Access same-index subbanks in the same bank group | 32 threads access same-index subbanks in the same bank group, forming a subbank conflict |
@@ -117,7 +117,7 @@ The kernel entry of this example is marked with `__global__`, and the maximum th
 
 ### Access Timing
 
-This example uses `clock()` to time the repeated UB read loop. The difference between the loop start and end timestamps is used as the cycles of the current thread and is written to `cycle_output` for return to the Host side. The timing code is as follows:
+Because subbank conflicts are lower-level storage conflicts that are not captured by the operator tuning tool msOpProf, this example uses `clock()` to time the UB access code. The difference between the loop start and end timestamps is used as the cycles spent by the current thread reading UB data and is written to `cycle_output` for return to the Host side. The timing code is as follows:
 
 ```cpp
 uint64_t start = clock();
@@ -128,9 +128,7 @@ cycle_output[threadIdx.x] = end - start;
 
 ### Performance Metrics Description
 
-This example uses `clock()` to count the loop latency of repeated UB reads inside the kernel. The timing starts before the UB read loop and ends after the UB read loop. Therefore, the output cycles only reflect the latency of `REPEAT_TIMES` UB reads and accumulations in the current case, excluding Host-side data construction, GM-to-UB movement, and Host-side verification.
-
-The kernel writes the cycles counted by each of the 32 threads to `cycle_output[32]`. The Host side prints the cycles of the 32 threads in thread order, which can be used to observe whether the counts of threads in the same Warp are consistent and to compare access overhead between different cases.
+The kernel writes the cycles counted by each of the 32 threads to `cycle_output[32]`. The Host side prints the cycles of the 32 threads in thread order to compare access overhead between different cases.
 
 The output format is as follows:
 
@@ -297,7 +295,7 @@ In Case 4, the 32 threads concentrate on same-index subbank resources in the sam
 
 Case 0 and Case 2 show that mergeable access does not form subbank conflicts, and Case 1 is the conflict-free baseline. The cycles of Case 3 and Case 4 increase significantly, indicating that concentrating accesses on same-index subbanks in the same bank group causes subbank resource contention.
 
-When writing SIMT code, avoid concentrating multiple threads in the same Warp on same-index subbanks in the same bank group in one UB access instruction. If such an access pattern is unavoidable, consider adjusting the data layout, access stride, or adding padding in UB to distribute subbank accesses.
+When writing SIMT code, avoid concentrating multiple threads in the same Warp on same-index subbanks in the same bank group in one UB access instruction. If such an access pattern is unavoidable, consider adjusting the data layout, access stride, or adding padding in UB to distribute subbank accesses. For an optimization example that avoids access conflicts, see the [matrix transpose example](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice).
 
 ## Build and Run
 

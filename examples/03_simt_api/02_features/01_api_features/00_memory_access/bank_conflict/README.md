@@ -26,7 +26,7 @@
 
 ### 样例功能
 
-本样例用于验证Ascend C SIMT编程方式下同一个Warp内多个线程访问UB时的bank冲突现象。样例通过编译期参数`SCENARIO_NUM`选择不同case，构造同地址合并、跨bank/subbank分散访问、连续float访问中的同一8B范围合并、同subbank不同行冲突，以及同一bank group内同编号subbank冲突等典型访问模式。
+本样例用于验证Ascend C SIMT编程方式下同一个Warp内多个线程访问UB时的bank冲突现象。样例通过编译期参数`SCENARIO_NUM`选择不同case，构造同地址合并、跨subbank分散访问、连续float访问中的同一8B范围合并、同subbank不同行冲突，以及同一bank group内同编号subbank冲突等典型访问模式。
 
 Host侧构造输入数组并拷贝到GM，kernel先将输入数据从GM搬入UB，再按照当前case对应的UB地址模式重复读取数据，并使用[`clock()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/调测接口/clock.md)统计读取UB数据的cycles。
 
@@ -47,7 +47,7 @@ Host侧构造输入数组并拷贝到GM，kernel先将输入数据从GM搬入UB�
 
 在本文中，SIMT编程模式下提到的UB bank冲突，主要指同一个Warp内多个线程在同一条UB访问指令中竞争同一个bank group内同编号subbank资源而产生的subbank冲突。
 
-以Ascend 950PR/Ascend 950DT为例，下图为UB bank结构示意图。UB总大小为256KB，划分为8个bank group，每个bank group包含2个bank。16个bank的编号为bank0到bank15，其中bank i与bank i+8同属bank group i，即`bank_group_id = bank_id % 8`。每个bank大小为16KB，包含512行，每行32B。在SIMT编程模式下，每个bank的32B行进一步按8B粒度划分为4个subbank。
+以Ascend 950PR/Ascend 950DT为例，下图为UB bank结构示意图。UB总大小为256KB，划分为8个bank group，每个bank group包含2个bank。16个bank的编号为bank0到bank15，其中bank i与bank i+8同属bank group i，即`bank_group_number = bank_number % 8`。每个bank大小为16KB，包含512行，每行32B。在SIMT编程模式下，每个bank的32B行进一步按8B粒度划分为4个subbank。
 
 SIMT场景下，同一个Warp内的多个线程可能在同一条UB访问指令中同时访问UB；当这些访问数据属于同一个bank group的相同编号的subbank资源时，例如同时访问bank0和bank8的subbank2，硬件无法在一个周期内处理全部请求，需要排队等待，从而形成subbank冲突并增加访问延迟；如果这些访问数据属于同一个subbank的同一行内的8B地址范围，硬件会将这些请求合并处理，不会形成subbank冲突。
 
@@ -68,7 +68,7 @@ SIMT编程方式下subbank冲突主要有以下几种：
 - **写写冲突**：多个写操作同时尝试访问同一个bank group的相同编号的subbank，例如多个线程同时写bank0中的subbank2和bank8中的subbank2。
 - **读读冲突**：多个读操作同时尝试访问同一个bank group的相同编号的subbank，例如多个线程同时读bank0中的subbank2和bank8中的subbank2。
 
-本样例聚焦读读冲突，通过多个线程在同一条UB读指令中访问不同UB地址模式，观察可合并访问、无冲突访问和subbank冲突访问的cycles差异。
+SIMT编程模式下同一个Warp内的线程同一时刻执行的是相同指令，无读写冲突场景，本样例聚焦读读冲突，通过多个线程在同一条UB读指令中访问不同UB地址模式，观察可合并访问、无冲突访问和subbank冲突访问的cycles差异。
 
 ### Case实现说明
 
@@ -98,7 +98,7 @@ for (uint32_t i = 0; i < REPEAT_TIMES; ++i) {
 | Case | 场景描述 | 预期访问特征 |
 | --- | --- | --- |
 | Case 0 | 同一Warp的线程读同一个地址 | 同地址请求合并 |
-| Case 1 | 跨bank/subbank访问 | 32个线程访问8个bank group的不同subbank，作为无冲突基线 |
+| Case 1 | 跨subbank访问 | 32个线程访问8个bank group的不同subbank，作为无冲突基线 |
 | Case 2 | 同一Warp的线程连续访问相邻float元素 | 相邻两个线程访问同一8B范围，硬件可合并处理 |
 | Case 3 | 访问同一bank的同subbank不同行 | 32个线程访问同一bank、同一subbank的不同行，形成subbank冲突 |
 | Case 4 | 访问同bank group的同编号subbank | 32个线程访问同一bank group内相同编号的两个subbank，形成subbank冲突 |
@@ -116,7 +116,7 @@ for (uint32_t i = 0; i < REPEAT_TIMES; ++i) {
 
 ### 访问打点
 
-本样例使用`clock()`对重复UB读循环打点，将循环起始和结束时刻相减得到当前线程的cycles，并写入`cycle_output`返回Host侧。打点代码如下：
+由于subbank冲突属于更低级别的存储冲突，不被算子调优工具msOpProf所捕获，因此本样例使用`clock()`对访问UB的代码打点，将循环起始和结束时刻相减得到当前线程读取UB数据所消耗的cycles，并写入`cycle_output`返回Host侧。打点代码如下：
 
 ```cpp
 uint64_t start = clock();
@@ -127,9 +127,7 @@ cycle_output[threadIdx.x] = end - start;
 
 ### 性能指标说明
 
-本样例使用`clock()`统计kernel内部重复读取UB的循环耗时。打点起点位于UB读循环前，打点终点位于UB读循环后，因此输出的cycles只反映当前case中`REPEAT_TIMES`次UB读取和累加的耗时，不包含Host侧数据构造、GM到UB搬运、Host侧校验等开销。
-
-kernel会将32个线程各自统计到的cycles写入`cycle_output[32]`。Host侧按线程顺序打印32个线程的cycles，用于观察同一个Warp内各线程的计数是否一致，并对比不同case之间的访问开销。
+kernel会将32个线程各自统计到的cycles写入`cycle_output[32]`。Host侧按线程顺序打印32个线程的cycles，对比不同case之间的访问开销。
 
 输出格式如下：
 
@@ -187,7 +185,7 @@ __aicore__ inline uint32_t get_ub_index_device(uint32_t thread_id)
 
 32个线程的访问覆盖连续256B空间，并按照8B粒度分散到8个bank group的4个subbank上。同一条UB访问指令下，每个bank group的每个subbank只被一个线程访问，因此该case可作为无冲突访问基线。访问示意图如下：
 
-![](./figures/case2.png)
+![](./figures/case1.png)
 
 **性能数据**：
 
@@ -218,7 +216,7 @@ __aicore__ inline uint32_t get_ub_index_device(uint32_t thread_id)
 
 该case中32个线程分别读取`ub[0]`到`ub[31]`。对float类型而言，`ub[0]`和`ub[1]`位于同一个subbank的同一行8B范围内，`ub[2]`和`ub[3]`位于下一个subbank同一行8B范围内，依次类推。相邻两个线程的访问可按同一8B范围合并处理。访问示意图如下：
 
-![](./figures/case1.png)
+![](./figures/case2.png)
 
 **性能数据**：
 
@@ -296,7 +294,7 @@ Case 4中32个线程集中访问同一bank group内的同编号subbank资源，�
 
 Case 0和Case 2用于说明可合并访问不会形成subbank冲突，Case 1作为无冲突基线；Case 3和Case 4的cycles明显升高，说明同一个Warp内集中访问同一个bank group的同编号subbank会产生subbank资源竞争。
 
-编写SIMT代码时，应尽量避免同一个Warp内多个线程在同一条UB访问指令中集中访问同一个bank group的同编号subbank；如果访问模式不可避免，可通过调整数据布局、访问步长或在UB中增加padding等方式分散subbank访问。
+编写SIMT代码时，应尽量避免同一个Warp内多个线程在同一条UB访问指令中集中访问同一个bank group的同编号subbank；如果访问模式不可避免，可通过调整数据布局、访问步长或在UB中增加padding等方式分散subbank访问，避免访问冲突的优化样例可参考[矩阵转置样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice)。
 
 ## 编译运行
 
