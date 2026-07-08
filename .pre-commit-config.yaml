@@ -7,6 +7,22 @@ ci:
   autoupdate_schedule: monthly
 
 repos:
+  # pre-commit 基础检查
+  - repo: https://gitcode.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: \.md$
+      - id: end-of-file-fixer
+        exclude: \.md$
+      - id: check-yaml
+        args: ["--allow-multiple-documents"]
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: check-json
+        exclude: ^\.devcontainer/devcontainer\.json$
+
   # C++ 代码格式化检查
   - repo: https://gitcode.com/pre-commit-clang/mirrors-clang-format
     rev: v18.1.8
@@ -14,11 +30,23 @@ repos:
       - id: clang-format
         types_or: [file]
         files: \.(c|h|cpp|hpp|cc|hh|cxx|hxx|asc)$
-        exclude: ^(tests/python/aclrt_launch_kernel/stub_files/|impl/|include/(?!adv_api/))
+        exclude: ^(\.pre-commit-config\.yaml$|tests/python/aclrt_launch_kernel/stub_files/|impl/|include/(?!adv_api/))
         args:
           - "--style=file"
           - "--verbose"
           - "-i"
+
+  # Python 代码检查
+  # - repo: https://gitcode.com/gh_mirrors/ru/ruff-pre-commit
+  #   rev: v0.14.14
+  #   hooks:
+  #     - id: ruff-check
+  #       args: ["--output-format", "github", "--fix"]
+  #       types: [python]
+  #       exclude: '^(\.agent/)'
+  #     - id: ruff-format
+  #       types: [python]
+  #       exclude: '^(\.agent/)'
 
   # OAT 合规性检查 (Open Source Audit Tool)
   - repo: local
