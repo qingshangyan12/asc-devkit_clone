@@ -30,7 +30,7 @@ __aicore__ inline constexpr auto MakeMemPtr(Addr addr)
 
     - 指定物理位置，从已有迭代器构造：
 
-    ```cpp
+```cpp
 template <typename Hardware, typename Iterator,
     EnableMakeHardwarePtr<Hardware, Iterator> Enable>
 __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
