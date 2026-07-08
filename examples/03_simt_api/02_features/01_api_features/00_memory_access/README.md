@@ -8,4 +8,4 @@
 
 | 目录名称 | 功能描述 |
 | --- | --- |
-| [insert_hash_table](./insert_hash_table) | 样例基于Ascend C SIMT编程方式实现InsertHashTable算子，展示SIMT算子处理复杂业务逻辑能力。 |
+| [insert_hash_table](./insert_hash_table) | 样例基于Ascend C SIMT编程方式实现InsertHashTable算子，展示通过`asc_atomic_cas()`原子操作和`asc_threadfence()`内存栅栏接口实现多线程哈希表插入的复杂业务逻辑能力。 |
