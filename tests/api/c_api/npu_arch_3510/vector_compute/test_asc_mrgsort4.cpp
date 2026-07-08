@@ -26,7 +26,7 @@
         __ubuf__ data_type* dst, __ubuf__ data_type** src, uint8_t repeat, uint16_t element_length_0,                  \
         uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, \
         uint8_t valid_bit)                                                                                             \
-    \ 
+\
 {                                                                                                                 \
         EXPECT_EQ(dst, reinterpret_cast<__ubuf__ data_type*>(11));                                                     \
         EXPECT_EQ(src[0], reinterpret_cast<__ubuf__ data_type*>(22));                                                  \
@@ -73,7 +73,7 @@
         GlobalMockObject::verify();                                                                                    \
     }
 
-// ==========asc_bitsort(half/float)==========
+// ==========asc_mrgsort4(half/float)==========
 TEST_VECTOR_COMPUTE_MRGSORT4_INSTR_3510(Mrgsort4, asc_mrgsort4, vmrgsort4, half);
 TEST_VECTOR_COMPUTE_MRGSORT4_INSTR_3510(Mrgsort4Sync, asc_mrgsort4_sync, vmrgsort4, half);
 TEST_VECTOR_COMPUTE_MRGSORT4_INSTR_3510(Mrgsort4, asc_mrgsort4, vmrgsort4, float);
