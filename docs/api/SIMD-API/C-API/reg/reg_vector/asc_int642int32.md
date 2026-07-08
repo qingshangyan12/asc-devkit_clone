@@ -2,32 +2,28 @@
 
 ## 产品支持情况
 
-| 产品     | 是否支持 |
-| ----------- | :----: |
-| Ascend 950PR/Ascend 950DT | √ |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
 
 ## 功能说明
 
-将vector_int64_t类型的源操作数转换成vector_int32_t类型，写入目的操作数的上半部分或下半部分，并支持不同的饱和模式。
+将int64_t类型的源操作数转换成int32_t类型，并支持不同的饱和模式。
 
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](./rounding_mode.md)。
 
-以asc_int642int32接口为例：
-
-- asc_int642int32：不饱和模式，写入目的操作数的上半部分。
-
-- asc_int642int32_sat：饱和模式，写入目的操作数的上半部分。
-
-- asc_int642int32_v2：不饱和模式，写入目的操作数的下半部分。
-
-- asc_int642int32_sat_v2：饱和模式，写入目的操作数的下半部分。
+由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个VL大小的数据分为两部分，根据不同接口选择数据写入索引为奇数的位置或偶数的位置。
 
 ## 函数原型
 
 ```cpp
+// 非饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_int642int32(vector_int32_t& dst, vector_int64_t src, vector_bool mask)
+// 饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_int642int32_sat(vector_int32_t& dst, vector_int64_t src, vector_bool mask)
+// 非饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_int642int32_v2(vector_int32_t& dst, vector_int64_t src, vector_bool mask)
+// 饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_int642int32_sat_v2(vector_int32_t& dst, vector_int64_t src, vector_bool mask)
 ```
 
@@ -51,6 +47,8 @@ PIPE_V
 
 ## 约束说明
 
+- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
+- 当数据写入目的操作数索引为奇数的位置，索引为偶数位置的数值置零。反之亦然。
 - 开启饱和模式和非饱和模式时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../../sys_var/asc_set_ctrl.md)。
 
 ## 调用示例
@@ -59,8 +57,5 @@ PIPE_V
 vector_int32_t dst;
 vector_int64_t src;
 vector_bool mask;
-asc_int642int32(dst, src, mask);    // 不饱和模式，将src转换成vector_int32_t类型并写入dst的上半部分
-asc_int642int32_sat(dst, src, mask);    // 饱和模式，将src转换成vector_int32_t类型并写入dst的上半部分
-asc_int642int32_v2(dst, src, mask);    // 不饱和模式，将src转换成vector_int32_t类型并写入dst的下半部分
-asc_int642int32_sat_v2(dst, src, mask);    // 饱和模式，将src转换成vector_int32_t类型并写入dst的下半部分
+asc_int642int32(dst, src, mask);
 ```

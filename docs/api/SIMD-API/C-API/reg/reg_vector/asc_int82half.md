@@ -2,22 +2,22 @@
 
 ## 产品支持情况
 
-|产品|是否支持|
-| :------------ | :------------: |
-| Ascend 950PR/Ascend 950DT | √ |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
 
 ## 功能说明
 
 将int8_t类型数据转换为half类型。
 
-由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个VL大小的数据分为两部分，根据不同接口选取索引0或者索引1。
+由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个VL大小的数据分为两部分，根据不同接口选择输入数据索引为奇数的位置或偶数的位置。
 
 ## 函数原型
 
 ```cpp
-// 选取索引0的位置
+// 选取索引为偶数的位置
 __simd_callee__ inline void asc_int82half(vector_half& dst, vector_int8_t src, vector_bool mask)
-// 选取索引1的位置
+// 选取索引为奇数的位置
 __simd_callee__ inline void asc_int82half_v2(vector_half& dst, vector_int8_t src, vector_bool mask)
 ```
 
@@ -41,7 +41,7 @@ PIPE_V
 
 ## 约束说明
 
-无
+- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
 
 ## 调用示例
 
