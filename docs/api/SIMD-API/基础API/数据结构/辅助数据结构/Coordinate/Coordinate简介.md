@@ -7,6 +7,8 @@ Coordinate本质上是一个元组（tuple），用于表示张量在不同维�
 
 ## 原型定义<a name="section10580930144614"></a>
 
+头文件路径为：`"tensor_api/tensor/layout.h"`。
+
 ```cpp
 template <typename... Coords>
 using Coord = Std::tuple<Coords...>
