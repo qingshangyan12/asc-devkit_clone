@@ -114,8 +114,7 @@ __aicore__ inline void asc_mark_stamp()
 
 namespace __asc_aicore {
 __aicore__ inline void asc_time_stamp(uint32_t desc_id) {
-    std::printf("asc_time_stamp is not supported in cpu mode.");
-    assert(false);
+    assert(false && "asc_time_stamp is not supported in cpu mode.");
 }
 } // namespace __asc_aicore
 

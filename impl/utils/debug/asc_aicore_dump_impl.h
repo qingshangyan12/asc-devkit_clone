@@ -269,64 +269,58 @@ __aicore__ inline void asc_dump(__cbuf__ T* input, uint32_t desc, uint32_t dump_
 #else
 #include <cstdio>
 
-namespace __asc_aicore {
-inline void asc_dump_not_support(const char* err_msg) {
-    std::printf(err_msg);
-    assert(false);
-}
-
 template<typename T>
 __aicore__ inline void asc_dump_gm(__gm__ T* input, uint32_t desc, uint32_t dump_size) {
-    asc_dump_not_support("asc_dump_gm is not supported in cpu mode.");
+    assert(false && "asc_dump_gm is not supported in cpu mode.");
 }
 
 template<typename T>
 __aicore__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dump_size) {
-    asc_dump_not_support("asc_dump_ubuf is not supported in cpu mode.");
+    assert(false && "asc_dump_ubuf is not supported in cpu mode.");
 }
 
 template<typename T>
 __aicore__ inline void asc_dump_cbuf(__cc__ T* input, uint32_t desc, uint32_t dump_size) {
-    asc_dump_not_support("asc_dump_cbuf is not supported in cpu mode.");
+    assert(false && "asc_dump_cbuf is not supported in cpu mode.");
 }
 
 template<typename T>
 __aicore__ inline void asc_dump_l1buf(__cbuf__ T* input, uint32_t desc, uint32_t dump_size) {
-    asc_dump_not_support("asc_dump_l1buf is not supported in cpu mode.");
+    assert(false && "asc_dump_l1buf is not supported in cpu mode.");
 }
 
 template<typename T>
 __aicore__ inline void asc_dump_gm(__gm__ T* input, uint32_t desc, uint32_t dump_size,
     const uint32_t* shape, const uint32_t shapeDim) {
-    asc_dump_not_support("asc_dump_gm is not supported in cpu mode.");
+    assert(false && "asc_dump_gm is not supported in cpu mode.");
 }
 
 template<typename T>
 __aicore__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dump_size,
     const uint32_t* shape, const uint32_t shapeDim) {
-    asc_dump_not_support("asc_dump_ubuf is not supported in cpu mode.");
+    assert(false && "asc_dump_ubuf is not supported in cpu mode.");
 }
 
 template<typename T>
 __aicore__ inline void asc_dump_cbuf(__cc__ T* input, uint32_t desc, uint32_t dump_size,
     const uint32_t* shape, const uint32_t shapeDim) {
-    asc_dump_not_support("asc_dump_cbuf is not supported in cpu mode.");
+    assert(false && "asc_dump_cbuf is not supported in cpu mode.");
 }
 
 template<typename T>
 __aicore__ inline void asc_dump_l1buf(__cbuf__ T* input, uint32_t desc, uint32_t dump_size,
     const uint32_t* shape, const uint32_t shapeDim) {
-    asc_dump_not_support("asc_dump_l1buf is not supported in cpu mode.");
+    assert(false && "asc_dump_l1buf is not supported in cpu mode.");
 }
 
 template<typename T>
 __aicore__ inline void asc_dump(T* input, uint32_t desc, uint32_t dump_size) {
-    asc_dump_not_support("asc_dump is not supported in cpu mode.");
+    assert(false && "asc_dump is not supported in cpu mode.");
 }
 
 __aicore__ inline void asc_dump_shape_impl(const uint32_t shapeDim, const uint32_t* shape)
 {
-    asc_dump_not_support("asc_dump_shape_impl is not supported in cpu mode.");
+    assert(false && "asc_dump_shape_impl is not supported in cpu mode.");
 }
 } // namespace __asc_aicore
 
