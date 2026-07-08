@@ -30,7 +30,6 @@
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
 #include "kernel_operator_swap_mem_intf.h"
 #include "kernel_operator_sys_var_intf.h"
-#include "kernel_tensor_base.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -146,7 +145,12 @@ template <HardEvent evt> __aicore__ inline TEventID FetchEventID()
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
     return 0;
 #else
-    return Internal::FetchEventIDImpl(evt);
+    auto eventIndex = EventToIndex(evt);
+    auto lastId = sff0(Internal::g_occupyEventPool[eventIndex]);
+    ASCENDC_DEBUG_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId,
+            QUE_MAX_EVENT));
+    return lastId;
 #endif
 }
 
