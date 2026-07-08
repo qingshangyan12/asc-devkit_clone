@@ -68,15 +68,18 @@ __aicore__ inline void CheckApiDtypeValid()
 template <typename DstT, typename ScaleT>
 __simd_callee__ inline void StoreRes(__ubuf__ DstT* dstAddr, Reg::RegTensor<DstT>& vreg, Reg::MaskReg& mask)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003)
     if (SupportType<ScaleT, float>()) {
-        Reg::StoreAlign<DstT, Reg::StoreDist::DIST_PACK4_B32>(dstAddr, vreg, mask);
-    } else {
-#endif
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003)
+        Reg::Pack<uint16_t, uint32_t, Reg::HighLowPart::LOWEST>(
+            (Reg::RegTensor<uint16_t>&)vreg, (Reg::RegTensor<uint32_t>&)vreg);
+        Reg::MaskPack<Reg::HighLowPart::LOWEST>(mask, mask);
         Reg::StoreAlign<DstT, Reg::StoreDist::DIST_PACK_B16>(dstAddr, vreg, mask);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003)
-    }
+#else
+        Reg::StoreAlign<DstT, Reg::StoreDist::DIST_PACK4_B32>(dstAddr, vreg, mask);
 #endif
+    } else {
+        Reg::StoreAlign<DstT, Reg::StoreDist::DIST_PACK_B16>(dstAddr, vreg, mask);
+    }
 }
 
 template <typename DstT, typename ScaleT, const Reg::CastTrait& castTrait>
@@ -425,10 +428,8 @@ __simd_vf__ inline void QuantizePerGroupForKColFp4VF(
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
             QuantizeUtils::TransRegForFp4<DstT, float, castTrait>(srcVreg, dstVreg, mask);
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003)
             Reg::StoreAlign<uint8_t, Reg::StoreDist::DIST_PACK4_B32>(
                 (__ubuf__ uint8_t*)dstUb + (i * params.n + j * vecLen) / 2, (Reg::RegTensor<uint8_t>&)dstVreg, mask);
-#endif
         }
     }
 }
