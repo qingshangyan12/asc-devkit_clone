@@ -18,45 +18,45 @@
 
 ```cpp
 // RINT舍入模式,数据写入索引0的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_rn(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rn(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
 // RINT舍入模式,数据写入索引1的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_rn_v2(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rn(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
 // RINT舍入模式,数据写入索引2的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_rn_v3(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rn(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
 // RINT舍入模式,数据写入索引3的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_rn_v4(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rn(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
 // ROUND舍入模式,数据写入索引0的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_rna(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rna(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
 // ROUND舍入模式,数据写入索引1的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_rna_v2(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rna(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
 // ROUND舍入模式,数据写入索引2的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_rna_v3(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rna(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
 // ROUND舍入模式,数据写入索引3的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_rna_v4(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rna(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
 // FLOOR舍入模式,数据写入索引0的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_rd(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rd(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
 // FLOOR舍入模式,数据写入索引1的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_rd_v2(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rd(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
 // FLOOR舍入模式,数据写入索引2的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_rd_v3(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rd(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
 // FLOOR舍入模式,数据写入索引3的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_rd_v4(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rd(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
 // CEIL舍入模式,数据写入索引0的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_ru(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_ru(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
 // CEIL舍入模式,数据写入索引1的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_ru_v2(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_ru(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
 // CEIL舍入模式,数据写入索引2的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_ru_v3(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_ru(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
 // CEIL舍入模式,数据写入索引3的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_ru_v4(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_ru(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
 // TRUNC舍入模式,数据写入索引0的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_rz(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rz(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
 // TRUNC舍入模式,数据写入索引1的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_rz_v2(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rz(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
 // TRUNC舍入模式,数据写入索引2的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_rz_v3(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rz(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
 // TRUNC舍入模式,数据写入索引3的位置
-__simd_callee__ inline void asc_bfloat162e1m2x2_rz_v4(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rz(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
 ```
 
 ## 参数说明
@@ -66,7 +66,7 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rz_v4(vector_fp4x2_e1m2_t& dst, 
 | dst    | 输出    | 目的操作数（矢量数据寄存器）。            |
 | src    | 输入    | 源操作数（矢量数据寄存器）。             |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
-| pos | 输入 | 位置参数，指定数据写入的位置，可选ASC_POSITION_EVEN（索引0）或ASC_POSITION_ODD（索引1）。 |
+| quarter | 输入 | 位置参数，指定数据写入的位置，可选ASC_DISPERSE_FIRST_QUARTER（索引0）、ASC_DISPERSE_SECOND_QUARTER（索引1）、ASC_DISPERSE_THIRD_QUARTER（索引2）或ASC_DISPERSE_FOURTH_QUARTER（索引3）。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)。
 
@@ -89,5 +89,5 @@ vector_bfloat16_t src;
 vector_fp4x2_e1m2_t dst;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
-asc_bfloat162e1m2x2_rn(dst, src, mask);
+asc_bfloat162e1m2x2_rn(dst, src, mask, ASC_DISPERSE_FIRST_QUARTER);
 ```

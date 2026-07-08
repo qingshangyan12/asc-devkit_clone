@@ -17,10 +17,13 @@
 
 ```cpp
 // 读取索引0的位置
-__simd_callee__ inline void asc_uint82uint32(vector_uint32_t& dst, vector_uint8_t src, vector_bool mask)
+__simd_callee__ inline void asc_uint82uint32(vector_uint32_t& dst, vector_uint8_t src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
 // 读取索引1的位置
+__simd_callee__ inline void asc_uint82uint32(vector_uint32_t& dst, vector_uint8_t src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
 // 读取索引2的位置
+__simd_callee__ inline void asc_uint82uint32(vector_uint32_t& dst, vector_uint8_t src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
 // 读取索引3的位置
+__simd_callee__ inline void asc_uint82uint32(vector_uint32_t& dst, vector_uint8_t src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
 ```
 
 ## 参数说明
@@ -52,5 +55,5 @@ PIPE_V
 vector_uint8_t src;
 vector_uint32_t dst;
 vector_bool mask;
-asc_uint82uint32(dst, src, mask);
+asc_uint82uint32(dst, src, mask, ASC_DISPERSE_FIRST_QUARTER);
 ```

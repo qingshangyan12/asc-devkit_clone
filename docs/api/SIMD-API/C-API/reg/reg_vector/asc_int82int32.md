@@ -16,10 +16,13 @@
 
 ```cpp
 // 数据读取索引0的位置
-__simd_callee__ inline void asc_int82int32(vector_int32_t& dst, vector_int8_t src, vector_bool mask)
+__simd_callee__ inline void asc_int82int32(vector_int32_t& dst, vector_int8_t src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
 // 数据读取索引1的位置
+__simd_callee__ inline void asc_int82int32(vector_int32_t& dst, vector_int8_t src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
 // 数据读取索引2的位置
+__simd_callee__ inline void asc_int82int32(vector_int32_t& dst, vector_int8_t src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
 // 数据读取索引3的位置
+__simd_callee__ inline void asc_int82int32(vector_int32_t& dst, vector_int8_t src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
 ```
 
 ## 参数说明
@@ -52,5 +55,5 @@ vector_int8_t src;
 vector_int32_t dst;
 vector_bool mask = asc_create_mask_b8(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
-asc_int82int32(dst, src, mask);
+asc_int82int32(dst, src, mask, ASC_DISPERSE_FIRST_QUARTER);
 ```

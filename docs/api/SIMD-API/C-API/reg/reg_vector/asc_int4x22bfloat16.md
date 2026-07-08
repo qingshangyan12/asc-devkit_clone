@@ -10,14 +10,19 @@
 
 将int4x2_t类型转化为bfloat16_t类型，无舍入模式。
 
+由于源操作数与目的操作数类型位宽比为1:4，读取数据时需要将一个VL大小的数据分为四部分，根据不同接口选取索引0、索引1、索引2或者索引3。
+
 ## 函数原型
 
 ```cpp
 // 数据读取索引为0的位置
-__simd_callee__ inline void asc_int4x22bfloat16(vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask)
+__simd_callee__ inline void asc_int4x22bfloat16(vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask, ASC_DISPERSE_FIRST_QUARTER)
 // 数据读取索引为1的位置
+__simd_callee__ inline void asc_int4x22bfloat16(vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask, ASC_DISPERSE_SECOND_QUARTER)
 // 数据读取索引为2的位置
+__simd_callee__ inline void asc_int4x22bfloat16(vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask, ASC_DISPERSE_THIRD_QUARTER)
 // 数据读取索引为3的位置
+__simd_callee__ inline void asc_int4x22bfloat16(vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask, ASC_DISPERSE_FOURTH_QUARTER)
 ```
 
 ## 参数说明
@@ -50,5 +55,5 @@ vector_int4x2_t src;
 vector_bfloat16_t dst;
 vector_bool mask = asc_create_mask_b8(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
-asc_int4x22bfloat16(dst, src, mask);
+asc_int4x22bfloat16(dst, src, mask, ASC_DISPERSE_FIRST_QUARTER);
 ```
