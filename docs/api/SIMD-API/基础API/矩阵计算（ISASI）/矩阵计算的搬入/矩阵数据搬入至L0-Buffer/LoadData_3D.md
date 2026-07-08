@@ -262,7 +262,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 - 当filterW为0且filterSizeW为false或者当filterH为0且filterSizeH为false时，该指令不会被执行。
 - 当目的地址位于L0A Buffer/L0B Buffer时，地址必须512字节对齐。当源地址位于L1 Buffer时，地址必须32字节对齐。指令执行占用的流水为PIPE_MTE1。
 <!-- npu="910,310p" id33 -->
-- LoadData3DParamsV1 cSize特性的开启，需要保证A1/B1中的feature map为4 channel对齐。
+- LoadData3DParamsV1 cSize特性的开启，需要保证L1 Buffer（A1/B1）中的feature map为4 channel对齐。
 <!-- end id33 -->
 
 - 数据连续排列顺序由目的操作数所在物理存储位置决定，具体约束如下：<a id="zh-cn_topic_0000002512171652_dst_layout"></a>
