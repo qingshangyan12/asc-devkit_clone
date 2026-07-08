@@ -21,9 +21,7 @@ import tempfile
 from pathlib import Path
 
 from presmoke.generate_case_runners import (
-    ARCH_OVERRIDES,
     NO_CMAKE_ARCH_INJECTION_CASES,
-    apply_case_overrides,
     cell_for_spec,
     command_env_prefix,
     command_workdir,
@@ -41,6 +39,7 @@ from presmoke.generate_case_runners import (
     supported_archs_for_scenario,
 )
 from presmoke.model import Command, ExampleSpec
+from presmoke.readme_spec import parse_readme
 
 
 def render_runner_from_parts(
@@ -77,7 +76,7 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         lines = text.splitlines()
         start = None
         for idx, line in enumerate(lines):
-            if re.match(r"^#+\s*(支持的产品|支持产品)\s*$", line.strip()):
+            if re.match(r"^#+\s+.*支持.*产品", line.strip()):
                 start = idx + 1
                 break
         if start is None:
@@ -365,24 +364,28 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         self.assertEqual(modes, ["cpu"])
 
     def test_matmul_fp8_is_950_only(self) -> None:
-        self.assertEqual(
-            ARCH_OVERRIDES["01_simd_cpp_api/04_advanced_api/00_matmul/matmul_fp8"],
-            ["dav-3510"],
-        )
+        project_root = Path(__file__).resolve().parents[3]
+        example_dir = project_root / "examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_fp8"
+
+        spec = parse_readme(example_dir, project_root / "examples")
+
+        self.assertEqual(spec.archs, ["dav-3510"])
 
     def test_custom_op_provider_cases_support_910b_and_950(self) -> None:
         expected = ["dav-2201", "dav-3510"]
-        self.assertEqual(
-            ARCH_OVERRIDES["01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op_static_lib"],
-            expected,
-        )
-        self.assertEqual(
-            ARCH_OVERRIDES["01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op"],
-            expected,
-        )
+        project_root = Path(__file__).resolve().parents[3]
+        examples_root = project_root / "examples"
+        for rel_path in [
+            "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op_static_lib",
+            "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op",
+        ]:
+            spec = parse_readme(examples_root / rel_path, examples_root)
+            self.assertEqual(spec.archs, expected)
 
     def test_custom_op_dependent_cases_support_910b_and_950(self) -> None:
         expected = ["dav-2201", "dav-3510"]
+        project_root = Path(__file__).resolve().parents[3]
+        examples_root = project_root / "examples"
         for rel_path in [
             "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclnn_invocation",
             "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclop_invocation",
@@ -391,19 +394,8 @@ class GenerateCaseRunnersTest(unittest.TestCase):
             "01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin",
             "04_aicpu/02_features/00_framework/00_pytorch/tiling_sink_programming",
         ]:
-            self.assertEqual(ARCH_OVERRIDES[rel_path], expected)
-
-    def test_arch_overrides_are_applied_before_planning(self) -> None:
-        spec = ExampleSpec(
-            Path("examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_fp8"),
-            "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_fp8",
-            [Command("cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201", "cmake")],
-            ["dav-2201", "dav-3510"],
-            ["npu"],
-            "readme",
-        )
-        apply_case_overrides([spec])
-        self.assertEqual(spec.archs, ["dav-3510"])
+            spec = parse_readme(examples_root / rel_path, examples_root)
+            self.assertEqual(spec.archs, expected)
 
     def test_scenario_arch_limit_accepts_compact_chinese_text(self) -> None:
         project_root = Path(__file__).resolve().parents[3]

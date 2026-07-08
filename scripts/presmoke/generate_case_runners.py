@@ -96,20 +96,7 @@ SKIP_CONFIG = {
     ),
 }
 
-ARCH_OVERRIDES = {
-    "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op": ["dav-2201", "dav-3510"],
-    "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/parallel_ops_package": ["dav-2201", "dav-3510"],
-    "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op_static_lib": ["dav-2201", "dav-3510"],
-    "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclnn_invocation": ["dav-2201", "dav-3510"],
-    "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclop_invocation": ["dav-2201", "dav-3510"],
-    "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin": ["dav-2201", "dav-3510"],
-    "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom": ["dav-2201", "dav-3510"],
-    "01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin": ["dav-2201", "dav-3510"],
-    "04_aicpu/02_features/00_framework/00_pytorch/tiling_sink_programming": ["dav-2201", "dav-3510"],
-    # README "支持的产品" only lists Ascend 950PR/950DT. The option table also
-    # mentions dav-2201, but the sample uses FP8/hifloat8 types unavailable on 910B.
-    "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_fp8": ["dav-3510"],
-}
+ARCH_OVERRIDES: dict[str, List[str]] = {}
 
 ARCH_ENV_KEYS = {
     "ARCH",
@@ -294,6 +281,7 @@ def parse_scenario_values_from_readme(readme_file: Path) -> List[int]:
         return []
     text = readme_file.read_text(encoding="utf-8", errors="ignore")
     values: set[int] = set()
+    values.update(parse_scenario_values_from_html_tables(text))
     for line in text.splitlines():
         if "SCENARIO" not in line:
             continue
@@ -303,6 +291,21 @@ def parse_scenario_values_from_readme(readme_file: Path) -> List[int]:
             continue
         if re.search(r"(?:取值|Scenario|场景|default|默认)", line):
             values.update(parse_scenario_values_from_text(line))
+    return sorted(value for value in values if 0 <= value <= 32)
+
+
+def parse_scenario_values_from_html_tables(text: str) -> List[int]:
+    values: set[int] = set()
+    for table in re.findall(r"<table\b.*?</table>", text, flags=re.S | re.I):
+        if "SCENARIO" not in table:
+            continue
+        for row in re.findall(r"<tr\b.*?</tr>", table, flags=re.S | re.I):
+            cells = re.findall(r"<td\b[^>]*>(.*?)</td>", row, flags=re.S | re.I)
+            if not cells:
+                continue
+            first_cell = re.sub(r"<.*?>", "", cells[0]).strip()
+            if re.fullmatch(r"\d+", first_cell):
+                values.add(int(first_cell))
     return sorted(value for value in values if 0 <= value <= 32)
 
 
@@ -439,6 +442,18 @@ def scenario_only_supports_arch(text: str, scenario_num: int, arch: str) -> bool
         return True
     if arch == "dav-3510" and re.search(
         rf"(?:场景|Scenario)\s*{scenario}[^\n\r]*(?:仅在|only supports)[^\n\r]*Ascend\s*950",
+        text,
+        flags=re.IGNORECASE,
+    ):
+        return True
+    if arch == "dav-2201" and re.search(
+        rf"SCENARIO_NUM\s*=\s*{scenario}[^\n\r]*(?:不支持|does not support|not support)[^\n\r]*Ascend\s*950",
+        text,
+        flags=re.IGNORECASE,
+    ):
+        return True
+    if arch == "dav-2201" and re.search(
+        rf"SCENARIO_NUM\s*={scenario}`?\s*时[^\n\r]*(?:不支持|does not support|not support)[^\n\r]*Ascend\s*950",
         text,
         flags=re.IGNORECASE,
     ):
