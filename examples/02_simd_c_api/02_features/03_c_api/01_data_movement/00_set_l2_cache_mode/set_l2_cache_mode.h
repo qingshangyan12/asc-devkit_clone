@@ -184,7 +184,7 @@ public:
     __aicore__ inline void ProcessDoubleBufferL2Bypass() { ProcessDoubleBufferImpl(4); /* l2CacheMode = DISABLE */ }
 
 private:
-static constexpr uint32_t max_data_copy_len = 20992;
+    static constexpr uint32_t max_data_copy_len = 20992;
 
     __aicore__ inline uint32_t GetTotalBlocks() const { return (totalElementsPerCore + dataCopyLen - 1) / dataCopyLen; }
 
