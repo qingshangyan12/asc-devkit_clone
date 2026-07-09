@@ -24,10 +24,6 @@
         <block name="DevlibCommon"/>
     </block_info>
 
-    <block_info dependtree="false" dst_path="" block_conf_path="ascend">
-        <block name="AscHcclLib"/>
-    </block_info>
-
     <dir_info value="asc-devkit" install_mod="550">
         <path value="compiler" install_mod="750"/>
         <path value="compiler/bin" install_mod="750"/>
@@ -45,7 +41,6 @@
         <path value="$(TARGET_ENV)/tikcpp/ascendc_kernel_cmake/fwk_modules/util/makeself"/>
         <path value="$(TARGET_ENV)/pkg_inc" install_softlink="pkg_inc"/>
         <path value="$(TARGET_ENV)/pkg_inc/asc"/>
-        <path value="$(TARGET_ENV)/pkg_inc/asc/hccl"/>
         <path value="$(TARGET_ENV)/ascendc" install_softlink="compiler/ascendc"/>
         <path value="$(TARGET_ENV)/ascendc/include"/>
         <path value="$(TARGET_ENV)/ascendc/include/basic_api"/>
@@ -68,7 +63,6 @@
         <path value="$(TARGET_ENV)/asc/include"/>
         <path value="$(TARGET_ENV)/asc/include/tiling" install_softlink="$(TARGET_ENV)/ascendc/include/highlevel_api/tiling;$(TARGET_ENV)/include/tiling;$(TARGET_ENV)/include/ascendc/host_api/tiling"/>
         <path value="$(TARGET_ENV)/asc/include/adv_api" install_softlink="$(TARGET_ENV)/tikcpp/tikcfw/include/adv_api;$(TARGET_ENV)/include/ascendc/include/adv_api;$(TARGET_ENV)/tikcpp/tikcfw/lib;$(TARGET_ENV)/ascendc/include/highlevel_api/lib;$(TARGET_ENV)/include/ascendc/highlevel_api/lib"/>
-        <path value="$(TARGET_ENV)/asc/include/adv_api/hccl"/>
         <path value="$(TARGET_ENV)/asc/impl"/>
         <path value="$(TARGET_ENV)/asc/impl/adv_api"/>
         <path value="$(TARGET_ENV)/lib64"/>
@@ -103,10 +97,6 @@
     <file_info copy_type="delivery" src_path="lib/host/asc/impl/adv_api" dst_path="$(TARGET_ENV)/asc/impl/adv_api" install_path="$(TARGET_ENV)/asc/impl/adv_api" install_type="all">
         <file value="detail" install_softlink="$(TARGET_ENV)/ascendc/include/highlevel_api/impl" install_mod="550" entity="true"/>
         <file value="tiling" install_mod="550" entity="true"/>
-    </file_info>
-
-    <file_info copy_type="delivery" src_path="lib/host/asc/include/adv_api" dst_path="$(TARGET_ENV)/asc/include/adv_api/hccl" install_path="$(TARGET_ENV)/asc/include/adv_api/hccl" install_type="all">
-        <file value="internal" install_softlink="$(TARGET_ENV)/pkg_inc/asc/hccl/internal" install_mod="550" entity="true"/>
     </file_info>
 
     <file_info copy_type="delivery" src_path="lib/host/asc/include" dst_path="$(TARGET_ENV)/asc/include" install_path="$(TARGET_ENV)/asc/include" install_type="all">
