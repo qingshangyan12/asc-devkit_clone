@@ -103,7 +103,7 @@ msdebug(MindStudio Debugger) is part of MindStudio Operator-dev Tools.
 The tool provides developers with a mechanism for debugging Ascend kernels running on actual hardware.
 This enables developers to debug Ascend kernels without being affected by potential changes brought by simulation and emulation environments.
 (msdebug) target create "python3"
-Current executable set to '${INSTALL_DIR}/projects/application' (aarch64).
+Current executable set to '`${INSTALL_DIR}`/projects/application' (aarch64).
 
 (msdebug) b matmul_leakyrelu_kernel.cpp:114
 Breakpoint 1: where = device_debugdata`_ZN17MatmulLeakyKernelIDhDhffE7CopyOutEj_mix_aiv + 240 at matmul_leakyrelu_kernel.cpp:114:14, address = 0x000000000000ff88
