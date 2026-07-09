@@ -2,13 +2,15 @@
 
 ## 产品支持情况
 
-| 产品     | 是否支持 |
-| ----------- | :----: |
-| Ascend 950PR/Ascend 950DT | √ |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
 
 ## 功能说明
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
+
+**该接口已废弃。其中v2接口请使用[asc_pack](asc_pack.md)传入ASC_POSITION_ODD参数实现此功能。**
 
 将源操作数中的元素选取低8位（b16）、低16位（b32）、低32位（b64）写入目的操作数的低半部分或高半部分。
 

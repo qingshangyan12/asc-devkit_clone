@@ -2,13 +2,15 @@
 
 ## 产品支持情况
 
-| 产品     | 是否支持 |
-| ----------- | :----: |
-| Ascend 950PR/Ascend 950DT | √ |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
 
 ## 功能说明
 
 头文件路径：`"c_api/reg_compute/reg_convert.h"`。
+
+**该接口已废弃。其中v2接口请使用[asc_e4m32float](asc_e4m32float.md)传入ASC_DISPERSE_SECOND_QUARTER参数，v3接口请传入ASC_DISPERSE_THIRD_QUARTER参数，v4接口请传入ASC_DISPERSE_FOURTH_QUARTER参数实现此功能。**
 
 将fp8_e4m3fn_t类型转化为float类型。
 

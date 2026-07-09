@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /* !
  * \file asc_int162uint32_impl.h
@@ -29,6 +29,24 @@ __simd_callee__ inline void asc_int162uint32_v2_impl(vector_uint32_t& dst, vecto
 {
     if ASC_IS_AIV {
         vcvt(dst, src, mask, PART_ODD, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_int162uint32_impl(
+    vector_uint32_t& dst, vector_int16_t src, vector_bool mask,
+    std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtii_s162u32_x(src, mask, (ULL)0);
+    }
+}
+
+__simd_callee__ inline void asc_int162uint32_impl(
+    vector_uint32_t& dst, vector_int16_t src, vector_bool mask,
+    std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtii_s162u32_x(src, mask, (ULL)1);
     }
 }
 
