@@ -19,6 +19,8 @@ log/
 !/examples/**/10_math/log/
 !/scripts/presmoke/cases/**/10_math/log/
 third_party/
+!cmake/third_party/
+!cmake/third_party/asc-comm.cmake
 openssl-device-src/
 openssl-host-src/
 build_device/
