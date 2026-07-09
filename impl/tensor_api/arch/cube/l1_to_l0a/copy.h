@@ -73,8 +73,53 @@ private:
     }
 };
 
-} // namespace Te
-} // namespace AscendC
+constexpr CopyL12L0AImg2ColTrait DEFAULT_COPY_L1_TO_L0A_IMG2COL_TRAIT;
+
+struct CopyL12L0AImg2ColTraitDefault {
+    using TraitType = CopyL12L0AImg2ColTrait;
+    static constexpr const TraitType value = DEFAULT_COPY_L1_TO_L0A_IMG2COL_TRAIT;
+};
+
+struct CopyL12L0AImg2ColBase {
+protected:
+    template<const CopyL12L0AImg2ColTrait& trait = DEFAULT_COPY_L1_TO_L0A_IMG2COL_TRAIT, typename T, typename U,
+        typename PadT>
+    __aicore__ inline static void LoadDataImpl(const T& dst, const U& src, const Img2ColParams<PadT>& params)
+    {
+        using dstPos = GetMemLocation<T>;
+        using srcPos = GetMemLocation<U>;
+        static_assert(Std::is_same_v<dstPos, Location::L0A>,
+            "When Img2Col Copy tensor from L1 to L0A, dst tensor must be from L0A.");
+        static_assert(Std::is_same_v<srcPos, Location::L1>,
+            "When Img2Col Copy tensor from L1 to L0A, src tensor must be from L1.");
+        LoadDataL12L0AImg2Col::template Run<trait, T, U, PadT>(dst, src, params);
+    }
+};
+
+// img2col load without extra params (uses default conv config).
+struct CopyL12L0AImg2Col : public CopyL12L0AImg2ColBase {
+    template <typename Tp, const Tp& traits, typename... Args>
+    __aicore__ inline static void Copy(const Args& ...args)
+    {
+        if ASCEND_IS_AIC {
+            LoadDataImpl<traits>(args..., DEFAULT_IMG2COL_PARAMS);
+        }
+    }
+};
+
+// img2col load carrying an Img2ColParams (bound through atom.with(params)).
+struct CopyL12L0AImg2ColWith : public CopyL12L0AImg2ColBase {
+    template <typename Tp, const Tp& traits, typename... Args>
+    __aicore__ inline static void Copy(const Args& ...args)
+    {
+        if ASCEND_IS_AIC {
+            LoadDataImpl<traits>(args...);
+        }
+    }
+};
+
+}
+}
 
 #endif // IMPL_TENSOR_API_ARCH_CUBE_L1_TO_L0A_COPY_H
 

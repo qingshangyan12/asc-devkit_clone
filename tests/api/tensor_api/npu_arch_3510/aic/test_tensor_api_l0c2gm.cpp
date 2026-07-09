@@ -542,3 +542,31 @@ KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 128, 64, DN, DNLayoutPtn, float, float, N
 KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 128, 64, DN, DNLayoutPtn, int32_t, int8_t, REQ8, false, false)
 KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 16, 16, ND, NDLayoutPtn, int32_t, half, VDEQF16, true, false)
 KERNEL_TENSOR_API_L0C2GM_E2E_LAYOUT(1, 16, 16, DN, DNLayoutPtn, int32_t, half, VDEQF16, true, false)
+
+// L0C(NZ) -> GM(NC1HWC0), N=1, no-quant. dst NC1HWC0 is a flat 5-dim layout built with MakeLayout
+// (no pattern tag); routing lands on CopyL0C2GMIgnore, which dispatches flat-5D to the NZ copy path.
+// src NZ (M=Ho*Wo, N=Cout=C1*C0); the stub is empty so this exercises routing/param derivation.
+TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2GMNZ2NC1HWC0)
+{
+    using namespace AscendC::Te;
+
+    constexpr uint32_t C1 = 2;
+    constexpr uint32_t H = 4;
+    constexpr uint32_t W = 4;
+    constexpr uint32_t C0 = 16;
+    constexpr uint32_t m = H * W;        // Ho*Wo = 16
+    constexpr uint32_t n = C1 * C0;      // Cout  = 32
+    __cc__ float src[m * n] = {0};
+    __gm__ float dst[m * n] = {0};
+
+    auto l0cTensor =
+        MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
+    auto gmTensor = MakeTensorAt<Location::GM>(
+        dst, MakeLayout(MakeShape(1, static_cast<int>(C1), static_cast<int>(H), static_cast<int>(W),
+                                  static_cast<int>(C0))));
+
+    RunCopyCallPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor);
+    RunCopyWithParamPaths<CopyL0C2GM, CopyL0C2GMTraitDefault>(gmTensor, l0cTensor, FixpipeParams{});
+
+    EXPECT_EQ(dst[0], 0);
+}
