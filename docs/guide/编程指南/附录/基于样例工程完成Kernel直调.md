@@ -21,7 +21,7 @@
 
 ## 工程目录<a name="section7363202715148"></a>
 
-您可以单击[矢量算子样例](https://gitee.com/ascend/samples/tree/master/operator/ascendc/0_introduction/3_add_kernellaunch/AddKernelInvocationNeo)，获取核函数开发和运行验证的完整样例。样例目录结构如下所示：
+样例目录结构如下所示：
 
 ```
 AddKernelInvocationNeo
@@ -443,7 +443,7 @@ bash run.sh -r npu  -v <soc_version> -i <install_path> -b Debug -p <install-pref
 
 ## CPU侧验证核函数<a name="section13472164395818"></a>
 
-在非昇腾设备上，开发者可以利用CPU仿真环境先行进行算子开发和测试，并在准备就绪后，利用昇腾设备进行加速计算。在[编译与运行](../编译与运行/算子编译/AI-Core算子编译基本用法.md)章节，我们已经介绍了算子Kernel程序NPU域的编译运行。相比于NPU域的算子运行逻辑，CPU域调试，实际上是通过标准的GCC编译器编译算子Kernel程序。此时算子Kernel程序链接CPU调测库，执行编译生成的可执行文件，可以完成算子CPU域的运行验证。CPU侧的运行程序，通过GDB通用调试工具进行单步调试，可以精准验证程序执行流程是否符合预期。
+在非昇腾设备上，开发者可以利用CPU仿真环境先行进行算子开发和测试，并在准备就绪后，利用昇腾设备进行加速计算。在[编译与运行](../编译与运行/算子编译/AI-Core算子编译基本用法.md)章节，我们已经介绍了算子Kernel程序NPU域的编译运行。类似地，CPU域调试也是通过毕昇编译器编译算子Kernel程序。此时算子Kernel程序链接CPU调测库，执行编译生成的可执行文件，可以完成算子CPU域的运行验证。CPU侧的运行程序，通过GDB通用调试工具进行单步调试，可以精准验证程序执行流程是否符合预期。
 
 **图5**  CPU域和NPU域的核函数运行逻辑对比<a name="fig1274642720202"></a>  
 ![](../../figures/CPU域和NPU域的核函数运行逻辑对比-36.png "CPU域和NPU域的核函数运行逻辑对比-36")

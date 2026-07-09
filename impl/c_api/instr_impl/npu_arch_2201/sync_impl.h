@@ -27,13 +27,15 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_SYNC_C_API_IMPL_SYNC_C_API_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_SYNC_C_API_IMPL_SYNC_C_API_IMPL_H
 
-#include "utils_impl/utils_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
-#include "sync_impl/asc_set_flag_impl.h"
-#include "sync_impl/asc_wait_flag_impl.h"
-#include "sync_impl/asc_pipe_barrier_impl.h"
-#include "sync_impl/asc_sync_data_barrier_impl.h"
-#include "sync_impl/asc_sync_block_arrive_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/sync_impl/asc_set_flag_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/sync_impl/asc_wait_flag_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/sync_impl/asc_pipe_barrier_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/sync_impl/asc_sync_data_barrier_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/sync_impl/asc_sync_block_arrive_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/sync_impl/asc_sync_inter_arrive_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/sync_impl/asc_sync_subblock_arrive_impl.h"
 
 __aicore__ inline void asc_sync_vec()
 {
@@ -61,4 +63,3 @@ __aicore__ inline void asc_sync()
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC  
 #endif  
-

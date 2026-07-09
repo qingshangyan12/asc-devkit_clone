@@ -2,21 +2,37 @@
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
-| 产品 | 是否支持 |
-| ---------- | :----------: |
-| <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT | x </cann-filter> |
-| <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x </cann-filter> |
-| <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x </cann-filter> |
-| <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品 | √ </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core | x </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品Vector Core | x </cann-filter> |
-| <cann-filter npu-type = "910">Atlas 训练系列产品 | x </cann-filter> |
-| <cann-filter npu-type = "x90">Kirin X90 | √ </cann-filter> |
-| <cann-filter npu-type = "9030">Kirin 9030 | √ </cann-filter> |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：不支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
+<!-- npu="x90" id8 -->
+- Kirin X90：支持
+<!-- end id8 -->
+<!-- npu="9030" id9 -->
+- Kirin 9030：支持
+<!-- end id9 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运（DataCopy）.md)）过程中进行随路量化后，通过调用该接口设置ClipReLU操作的最大值。
+DataCopy数据搬运（[L0C Buffer-\>GM](../L0C到GM数据搬运（DataCopy）.md)）过程中进行随路量化后，通过调用该接口设置ClipReLU操作的最大值。
 
 ClipReLU计算公式为`min(clipReluMaxVal, srcData)`，clipReluMaxVal为通过该接口设置的最大值，srcData为源数据。
 
@@ -32,7 +48,7 @@ __aicore__ inline void SetFixPipeClipRelu(uint64_t config)
 
 | 参数名称 | 输入/输出 | 含义 |
 | ---------- | ---------- | ---------- |
-| config | 输入 | clipReluMaxVal，ClipReLU操作中的最大值。clipReluMaxVal只占用0-15bit，必须大于0，不能为INF/NAN。 |
+| config | 输入 | clipReluMaxVal，ClipReLU操作中的最大值。clipReluMaxVal只占用0-15bit，必须大于0，不能为inf/nan。 |
 
 ## 数据类型
 
@@ -50,7 +66,7 @@ __aicore__ inline void SetFixPipeClipRelu(uint64_t config)
 
 ```cpp
 uint64_t clipReluMaxVal = 0x3c00;
-SetFixPipeClipRelu(clipReluMaxVal); // 开启ReLU的情况下，先进行ReLU操作，再进行clip，clipReluMaxVal为通过该接口设置的最大值
+SetFixPipeClipRelu(clipReluMaxVal); // 开启ReLU的情况下，先进行ReLU操作，再进行ClipReLU，clipReluMaxVal为通过该接口设置的最大值
 ```
 
 - 针对Atlas 200I/500 A2 推理产品，完整示例如下。随路格式转换数据搬运，通路：L0C Buffer-\>GM。
@@ -206,7 +222,7 @@ SetFixPipeClipRelu(clipReluMaxVal); // 开启ReLU的情况下，先进行ReLU操
             // AscendC::PipeBarrier<PIPE_FIX>();
             // // mov l0c to gm，量化操作后开启ClipReLU操作
             // intriParams.clipReluPre = 1; 
-            // // 设置clip ReLU的值到寄存器
+            // // 设置ClipReLU的值到寄存器
             // uint64_t clipReluVal = 0x3c00; // value 1, half
             // SetFixPipeClipRelu(clipReluVal);
             // //mov l0c to gm，量化操作后，设置element-wise操作，Add

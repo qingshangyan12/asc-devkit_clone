@@ -22,17 +22,17 @@
 #define ASCENDC_MODULE_REG_COMPUTE_STRUCT_INTERFACE_H
 
 #if (__NPU_ARCH__ == 3510) || defined(__ASC_NPU_HOST__)
-#include "../../impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_datatype_impl.h"
+#include "../../../impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_datatype_impl.h"
 #elif __NPU_ARCH__ == 5102
-#include "../../impl/basic_api/reg_compute/dav_m510/kernel_reg_compute_datatype_impl.h"
+#include "../../../impl/basic_api/reg_compute/dav_m510/kernel_reg_compute_datatype_impl.h"
 #elif __NPU_ARCH__ == 2103
-#include "../../impl/basic_api/reg_compute/dav_l210/kernel_reg_compute_datatype_impl.h"
+#include "../../../impl/basic_api/reg_compute/dav_l210/kernel_reg_compute_datatype_impl.h"
 #elif __NPU_ARCH__ == 3003
-#include "../../impl/basic_api/reg_compute/dav_l300/kernel_reg_compute_datatype_impl.h"
+#include "../../../impl/basic_api/reg_compute/dav_l300/kernel_reg_compute_datatype_impl.h"
 #elif __NPU_ARCH__ == 3103
-#include "../../impl/basic_api/reg_compute/dav_l310/kernel_reg_compute_datatype_impl.h"
+#include "../../../impl/basic_api/reg_compute/dav_l310/kernel_reg_compute_datatype_impl.h"
 #elif __NPU_ARCH__ == 3113
-#include "../../impl/basic_api/reg_compute/dav_l311/kernel_reg_compute_datatype_impl.h"
+#include "../../../impl/basic_api/reg_compute/dav_l311/kernel_reg_compute_datatype_impl.h"
 #endif
 
 namespace AscendC {
@@ -51,7 +51,12 @@ struct RegTensor {
     using ActualT = T;
     static constexpr RegTrait trait = regTrait;
     static constexpr int REG_NUM = trait.REG_NUM;
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || \
+    (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 2103)) || defined(__ASC_NPU_HOST__)
     using RegType = typename TypeGet<T>::T;
+#else
+    using RegType = int;
+#endif
     RegType reg[trait.REG_NUM];
 
     __simd_callee__ inline operator RegType& ()
@@ -65,11 +70,13 @@ struct RegTensor {
 } // namespace Reg
 } // namespace AscendC
 
-#include "../../impl/basic_api/reg_compute/kernel_reg_compute_struct_intf_impl.h"
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || \
+    (__NPU_ARCH__ == 3113)) || defined(__ASC_NPU_HOST__)
+#include "../../../impl/basic_api/reg_compute/kernel_reg_compute_struct_intf_impl.h"
+#endif
 #endif // ASCENDC_MODULE_REG_COMPUTE_STRUCT_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_STRUCT_INTF_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_STRUCT_INTF_H__
 #endif
-

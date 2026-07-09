@@ -4,10 +4,13 @@
 
 | 产品     | 是否支持 |
 | ----------- |:----:|
+|<cann-filter npu_type = "950"> Ascend 950PR/Ascend 950DT | √ </cann-filter>|
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √    |
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √    |
 
 ## 功能说明
+
+头文件路径：`"c_api/cube_compute/cube_compute.h"`。
 
 用于设置Mmad计算开启HF32模式，开启该模式后L0A Buffer/L0B Buffer中的FP32数据将在参与Mmad计算之前被舍入为HF32。
 

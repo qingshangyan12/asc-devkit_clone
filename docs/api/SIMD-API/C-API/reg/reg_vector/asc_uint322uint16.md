@@ -8,11 +8,11 @@
 
 ## 功能说明
 
-将uint32_t类型转化为uint16_t类型。
+头文件路径：`"c_api/reg_compute/reg_convert.h"`。
 
-根据输入数据的大小分为非饱和模式和饱和模式。
-- 非饱和模式：结果被截断至目标格式的数据宽度，且保留最低有效位（LSB）。
-- 饱和模式：结果被限制在目标格式的可表示范围内。
+将uint32_t类型转化为uint16_t类型，支持饱和/非饱和模式。
+
+关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](./rounding_mode.md)。
 
 由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个VL大小的数据分为两部分，根据不同接口选取索引0或者索引1。
 
@@ -57,5 +57,6 @@ PIPE_V
 vector_uint32_t src;
 vector_uint16_t dst;
 vector_bool mask;
+mask = asc_create_mask_b32(PAT_ALL);
 asc_uint322uint16(dst, src, mask);
 ```

@@ -8,17 +8,11 @@
 
 ## 功能说明
 
-将vector_float类型转换成vector_bfloat16_t类型，写入目的操作数的上半部分或下半部分，并支持多种舍入模式与饱和模式：
+头文件路径：`"c_api/reg_compute/reg_convert.h"`。
 
-- RINT舍入模式：四舍六入五成双舍入。
+将vector_float类型转换成vector_bfloat16_t类型，写入目的操作数的上半部分或下半部分，并支持多种舍入模式与饱和模式。
 
-- ROUND舍入模式：四舍五入舍入。
-
-- FLOOR舍入模式：向负无穷舍入。
-
-- CEIL舍入模式：向正无穷舍入。
-
-- TRUNC舍入模式：向零舍入。
+关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](./rounding_mode.md)。
 
 以asc_float2bfloat16_rd接口为例：
 
@@ -88,6 +82,7 @@ PIPE_V
 vector_bfloat16_t dst;
 vector_float src;
 vector_bool mask;
+mask = asc_create_mask_b32(PAT_ALL);
 asc_float2bfloat16_rd(dst, src, mask);    // FLOOR舍入模式，不饱和模式，将src转换成vector_bfloat16_t类型并写入dst上半部分
 asc_float2bfloat16_rd_sat(dst, src, mask);    // FLOOR舍入模式，饱和模式，将src转换成vector_bfloat16_t类型并写入dst上半部分
 asc_float2bfloat16_rd_v2(dst, src, mask);    // FLOOR舍入模式，不饱和模式，将src转换成vector_bfloat16_t类型并写入dst下半部分

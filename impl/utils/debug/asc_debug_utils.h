@@ -53,13 +53,8 @@ __aicore__ inline void enable_asc_diagnostics()
 __aicore__ inline void enable_asc_assert()
 {
 #if (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0)) || defined(ASCENDC_TIME_STAMP_ON)
-#if (__NPU_ARCH__ == 5102)
-    static const struct AscTlv __asc_assert_meta_section__ __attribute__ ((used, section (".ascend.meta"))) =
-    {4, 4, 1};
-#else
     static const struct AscTlv __asc_assert_meta_section__ __attribute__ ((used, section (".ascend.meta"))) =
     {4, 4, 5};
-#endif
 #endif // defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
 }
 
@@ -159,11 +154,23 @@ __aicore__ inline uint32_t mem_copy_gm_to_gm(__gm__ uint8_t* dst, __gm__ const u
 
 __aicore__ __gm__ inline DebugBlockHeadInfo* get_block_info()
 {
+    if (g_sysPrintFifoSpace == nullptr) {
+        return nullptr;
+    }
     uint32_t blockIdx = asc_debug_get_core_idx();
     uint32_t blockLength = reinterpret_cast<__gm__ DebugBlockHeadInfo*>(g_sysPrintFifoSpace)->length;
     __gm__ DebugBlockHeadInfo* blockInfo =
         reinterpret_cast<__gm__ DebugBlockHeadInfo*>(g_sysPrintFifoSpace + blockLength * blockIdx);
-    return blockInfo->magic == 0xAE86 ? blockInfo : nullptr;
+    if (blockInfo->magic != 0xAE86) {
+        return nullptr;
+    }
+    if ASCEND_IS_AIV {
+        blockInfo->flag = 1;
+    } else {
+        blockInfo->flag = 0;
+    }
+    asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(blockInfo));
+    return blockInfo;
 }
 
 __aicore__ __gm__ inline DebugBlockReadInfo* get_block_read_info(__gm__ DebugBlockHeadInfo* blockInfo)
@@ -271,7 +278,7 @@ __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo,
             return false;
         }
     }
-    
+
     return true;
 }
 

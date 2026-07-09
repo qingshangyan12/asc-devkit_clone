@@ -44,16 +44,24 @@ inline bfloat16x2_t h2rsqrt(bfloat16x2_t x)
 
 ## 返回值说明
 
-输入数据各元素的平方根的倒数。
+输入数据各元素的平方根的倒数。本接口受全局饱和模式影响，特殊值如下：
 
--   当输入元素为0时，返回值为inf。
--   当输入元素为inf时，返回值为0。
--   当输入元素为-inf时，返回值为nan。
--   当输入元素为nan时，返回值为nan。
+| 输入 | 非饱和模式返回值 | 饱和模式返回值 |
+|---|---|---|
+| 0 | inf | ASCRT_MAX_NORMAL_BF16 |
+| -0 | inf | ASCRT_MAX_NORMAL_BF16 |
+| nan | nan | 0 |
+| inf | 0 | 0 |
+| -inf | nan | 0 |
+| x＜0 | nan | 0 |
 
 ## 约束说明
 
 本接口支持的输入数据范围为x大于等于0，否则返回值为nan。
+
+<!-- npu="950" id7 -->
+针对Ascend 950PR/Ascend 950DT，本接口不支持Subnormal场景：本接口内部实现使用到了sqrtf，由于sqrtf不支持Subnormal场景，当输入x为Subnormal数据时，会导致本接口最终结果为+inf。
+<!-- end id7 -->
 
 ## 需要包含的头文件
 

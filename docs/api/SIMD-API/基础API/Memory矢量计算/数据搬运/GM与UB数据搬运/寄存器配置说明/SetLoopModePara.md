@@ -82,7 +82,7 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 
 ## 调用示例<a name="section1227835243314"></a>
 
-- SetLoopModePara使能loop mode，Normal模式
+- SetLoopModePara使能loop mode，Compact模式
 
     ```cpp
     // 场景4：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）。
@@ -97,7 +97,7 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
     AscendC::ResetLoopModePara(AscendC::DataCopyMVType::OUT_TO_UB);
     ```
 
-- SetLoopModePara使能loop mode，Compact模式
+- SetLoopModePara使能loop mode，Normal模式
 
     ```cpp
     // 场景5：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）。
@@ -139,7 +139,7 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
     AscendC::DataCopyExtParams copyParams{
         64,  // blockCount=64（第3维搬运64次）
         126,  // blockLen=126（第4维搬运126字节，padding到128）
-        0, 0, 0  // srcStride/dstStride=0
+        0, 0, 0  // srcStride=0, dstStride=0, rsv=0
     };
     AscendC::DataCopyPadExtParams<int8_t> padParams{true, 0, 0, 0};
 

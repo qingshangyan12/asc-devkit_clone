@@ -2,25 +2,45 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
 将已经排好序的最多4条队列，合并排列成1条队列，结果按照score域由大到小排序，排布方式如下：
 
+<!-- npu="950" id7 -->
 Ascend 950PR/Ascend 950DT采用方式一。
+<!-- end id7 -->
 
+<!-- npu="A3" id8 -->
 Atlas A3 训练系列产品/Atlas A3 推理系列产品采用方式一。
+<!-- end id8 -->
 
+<!-- npu="910b" id9 -->
 Atlas A2 训练系列产品/Atlas A2 推理系列产品采用方式一。
+<!-- end id9 -->
 
+<!-- npu="310p" id10 -->
 Atlas 推理系列产品AI Core采用方式二。
+<!-- end id10 -->
 
 -   排布方式一：
 
@@ -42,7 +62,7 @@ Atlas 推理系列产品AI Core采用方式二。
 
 ```
 template <typename T, bool isExhaustedSuspension = false>
-__aicore__ inline void MrgSort(const LocalTensor<T> &dst, const MrgSortSrcList<T> &sortList, const uint16_t elementCountList[4], uint32_t sortedNum[4], uint16_t validBit, const int32_t repeatTime)
+__aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T>& sortList, const uint16_t elementCountList[4], uint32_t sortedNum[4], uint16_t validBit, const int32_t repeatTime)
 ```
 
 ## 参数说明
@@ -100,14 +120,20 @@ struct MrgSortSrcList {
 
     该样例适用于：
 
+    <!-- npu="950" id11 -->
     Ascend 950PR/Ascend 950DT
+    <!-- end id11 -->
 
+    <!-- npu="910b" id12 -->
     Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    <!-- end id12 -->
 
+    <!-- npu="A3" id13 -->
     Atlas A3 训练系列产品/Atlas A3 推理系列产品
+    <!-- end id13 -->
 
     ```
-    uint32_t elementCount = 128; // 元素个数
+    uint32_t elementCount = 128;                // 元素个数
     uint32_t calcBufferSize = elementCount * 8; // 每个元素占据8字节
     uint32_t tmpBufferSize = elementCount * 8;
     uint32_t sortedLocalSize = elementCount * 4;
@@ -117,7 +143,9 @@ struct MrgSortSrcList {
 
     uint32_t singleMergeTmpElementCount = elementCount / 4;
     uint32_t baseOffset = AscendC::GetSortOffset<half>(singleMergeTmpElementCount);
-    AscendC::MrgSortSrcList sortList = AscendC::MrgSortSrcList(sortedLocal[0], sortedLocal[baseOffset], sortedLocal[2 * baseOffset], sortedLocal[3 * baseOffset]); // sortList：待合并的有序队列列表
+    // sortList：待合并的有序队列列表
+    AscendC::MrgSortSrcList sortList = AscendC::MrgSortSrcList(
+        sortedLocal[0], sortedLocal[baseOffset], sortedLocal[2 * baseOffset], sortedLocal[3 * baseOffset]);
     uint16_t singleDataSize = elementCount / 4; // 队列长度
     const uint16_t elementCountList[4] = {singleDataSize, singleDataSize, singleDataSize, singleDataSize}; // 4个队列的长度
     uint32_t sortedNum[4];
@@ -147,14 +175,18 @@ struct MrgSortSrcList {
 
     该样例适用于：
 
+    <!-- npu="310p" id14 -->
     Atlas 推理系列产品AI Core
+    <!-- end id14 -->
 
     ```
     uint32_t elementCount = 64; // 元素个数
     // 单条队列元素个数
     uint32_t singleMergeTmpElementCount = elementCount / 4;
     uint32_t baseOffset = AscendC::GetSortOffset<half>(singleMergeTmpElementCount);
-    AscendC::MrgSortSrcList sortList = AscendC::MrgSortSrcList(sortedLocal[0], sortedLocal[baseOffset], sortedLocal[2 * baseOffset], sortedLocal[3 * baseOffset]); // sortList：待合并的有序队列列表
+    // sortList：待合并的有序队列列表
+    AscendC::MrgSortSrcList sortList = AscendC::MrgSortSrcList(
+        sortedLocal[0], sortedLocal[baseOffset], sortedLocal[2 * baseOffset], sortedLocal[3 * baseOffset]);
     uint16_t singleDataSize = elementCount / 4; // 队列长度
     const uint16_t elementCountList[4] = {singleDataSize, singleDataSize, singleDataSize, singleDataSize}; // 4个队列的长度
     uint32_t sortedNum[4];

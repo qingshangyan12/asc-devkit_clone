@@ -1,5 +1,5 @@
 minimum_pre_commit_version: 4.0.0
-exclude: ^LICENSES/|\.(html|csv|svg)$
+exclude: ^LICENSES/|\.(html|csv|svg|tsv)$
 
 default_stages: [pre-commit]
 ci:
@@ -7,13 +7,32 @@ ci:
   autoupdate_schedule: monthly
 
 repos:
+  # pre-commit 基础检查
+  - repo: https://gitcode.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+        files: ^(tests/api/c_api/|include/adv_api/|include/basic_api/|impl/c_api/instr_impl/npu_arch_3510/|include/c_api/|impl/adv_api/(?!detail/(?:matmul|hccl)/)|impl/(?!adv_api/|c_api/)|tests/api/(?!adv_api/|basic_api/|c_api/)|impl/adv_api/detail/(?:matmul|hccl)/|tests/(?!api/|python/)|tests/api/basic_api/|examples/01_simd_cpp_api/03_basic_api/)
+        exclude: \.md$
+      - id: end-of-file-fixer
+        files: ^(tests/api/c_api/|include/adv_api/|include/basic_api/|impl/c_api/instr_impl/npu_arch_3510/|include/c_api/|impl/adv_api/(?!detail/(?:matmul|hccl)/)|impl/(?!adv_api/|c_api/)|tests/api/(?!adv_api/|basic_api/|c_api/)|impl/adv_api/detail/(?:matmul|hccl)/|tests/(?!api/|python/)|tests/api/basic_api/|examples/01_simd_cpp_api/03_basic_api/)
+        exclude: \.md$
+      - id: check-yaml
+        args: ["--allow-multiple-documents"]
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: check-json
+        exclude: ^\.devcontainer/devcontainer\.json$
+
   # C++ 代码格式化检查
   - repo: https://gitcode.com/pre-commit-clang/mirrors-clang-format
     rev: v18.1.8
     hooks:
       - id: clang-format
+        types_or: [file]
         files: \.(c|h|cpp|hpp|cc|hh|cxx|hxx|asc)$
-        exclude: ^(tests/python/aclrt_launch_kernel/stub_files/|impl/|include/|tools/)
+        exclude: ^(tests/python/aclrt_launch_kernel/stub_files/|impl/|include/(?!adv_api/))
         args:
           - "--style=file"
           - "--verbose"
@@ -29,4 +48,18 @@ repos:
         pass_filenames: true
         types: [file]
         stages: [pre-commit]
+        verbose: true
+
+  # Markdown 链接有效性检查
+  - repo: local
+    hooks:
+      - id: markdown-link-check
+        name: Markdown link check
+        entry: env LYCHEE_VERSION=0.23.0 bash scripts/markdown_link_check.sh
+        language: system
+        files: \.(md|markdown|mdx)$
+        exclude: ^CHANGELOG(_en)?\.md$
+        pass_filenames: true
+        always_run: true
+        stages: [pre-commit, manual]
         verbose: true

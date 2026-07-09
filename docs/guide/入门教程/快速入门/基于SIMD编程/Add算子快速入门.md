@@ -55,8 +55,8 @@
           __ubuf__ float z_local[block_length];
 
           // Copy input data from Global Memory (i.e., Device Memory) to on-chip UB memory
-          asc_copy_gm2ub((__ubuf__ void*)x_local, (__gm__ void*)x_gm, block_length * sizeof(float));
-          asc_copy_gm2ub((__ubuf__ void*)y_local, (__gm__ void*)y_gm, block_length * sizeof(float));
+          asc_copy_gm2ub(x_local, x_gm, block_length * sizeof(float));
+          asc_copy_gm2ub(y_local, y_gm, block_length * sizeof(float));
           asc_sync();
 
           // Call SIMD API to complete the Add operation
@@ -64,7 +64,7 @@
           asc_sync();
 
           // Write the result from on-chip UB memory back to Global Memory
-          asc_copy_ub2gm((__gm__ void*)z_gm, (__ubuf__ void*)z_local, block_length * sizeof(float));
+          asc_copy_ub2gm(z_gm, z_local, block_length * sizeof(float));
           asc_sync();
       }
       ```
@@ -73,6 +73,7 @@
       >     - Atlas A3训练系列产品/Atlas A3推理系列产品
       >     - Atlas A2训练系列产品/Atlas A2推理系列产品
       > - SIMD算子的Kernel函数需要额外修饰符，[`__vector__`](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md)修饰符表明该算子仅在向量计算单元上执行。
+      > - **性能提示**：示例中为简化同步操作，统一使用了 `asc_sync`。在实际算子开发中，建议根据流水线执行情况使用具体的同步控制指令，以获得更好的性能。详见[同步机制](../../../编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/C语言编程概述.md#同步机制)章节。
 
     - **基于C++ Tensor实现Memory矢量计算示例**
 
@@ -117,38 +118,40 @@
 
   - **Host端代码实现**：
 
-    Host端通过`<<<>>>`语法糖调用Device端核函数，示例代码如下：
+    Host端通过`<<<>>>`语法糖调用Device端核函数，示例代码片段如下：
     ```cpp
       int32_t main(int argc, char const *argv[])
       {
           ...
-          constexpr uint32_t num_blocks = 8;
+          constexpr uint32_t numBlocks = 8;
           ...
+
+          // Create runtime stream by aclrtCreateStream API
+          aclrtStream stream = nullptr;
+          aclrtCreateStream(&stream);
           
           // Allocate host and device memory, and copy input data from host to device
-          aclrtMallocHost((void **)(&z_host), total_byte_size);
-          aclrtMalloc((void **)&x_device, total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
-          aclrtMalloc((void **)&y_device, total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
-          aclrtMalloc((void **)&z_device, total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
-          aclrtMemcpy((uint8_t*)x_device, total_byte_size, x_host, total_byte_size, ACL_MEMCPY_HOST_TO_DEVICE);
-          aclrtMemcpy((uint8_t*)y_device, total_byte_size, y_host, total_byte_size, ACL_MEMCPY_HOST_TO_DEVICE);
+          aclrtMalloc((void**)&xDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
+          aclrtMalloc((void**)&yDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
+          aclrtMalloc((void**)&zDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
+          aclrtMallocHost((void**)&zHost, totalByteSize);
+
+          aclrtMemcpy(xDevice, totalByteSize, x.data(), totalByteSize, ACL_MEMCPY_HOST_TO_DEVICE);
+          aclrtMemcpy(yDevice, totalByteSize, y.data(), totalByteSize, ACL_MEMCPY_HOST_TO_DEVICE);
 
           // Launch kernel <<<numBlocks, dynUBufSize, stream>>>
           // numBlocks : Number of blocks. Default to 8 in this example.
           // dynUBufSize : Dynamic unified buffer size. Default to 0 in this example.
-          // nullptr : Runtime stream. Uses default stream in this example.
+          // stream : Runtime stream.
 
-          // Example One：Call add kernel which is implemented by SIMD C API
-          add_custom<<<num_blocks, 0>>>(xDevice, yDevice, zDevice);
-
-          // Example Two：Call add kernel which is implemented by SIMD C++ Basic API
-          // add_custom<blockLength><<<numBlocks, 0, stream>>>(xDevice, yDevice, zDevice);
+          // Example：Call add kernel which is implemented by SIMD C++ Basic API
+          add_custom<blockLength><<<numBlocks, 0, stream>>>(xDevice, yDevice, zDevice);
 
           // Wait for the add_custom kernel to complete
-          aclrtSynchronizeDevice();
+          aclrtSynchronizeStream(stream);
 
           // Copy the result from device memory to host memory
-          aclrtMemcpy(z_host, total_byte_size, (uint8_t*)z_device, total_byte_size, ACL_MEMCPY_DEVICE_TO_HOST);
+          aclrtMemcpy(zHost, totalByteSize, zDevice, totalByteSize, ACL_MEMCPY_DEVICE_TO_HOST);
           ...
       }
     ```
@@ -156,7 +159,7 @@
 - **算子编译与运行**：
 
   CMake配置文件示例：
-  ```
+  ```cmake
   cmake_minimum_required(VERSION 3.16)
 
   find_package(ASC REQUIRED)
@@ -178,7 +181,7 @@
   )
   ```
   编译与执行示例：
-  ```
+  ```bash
   mkdir -p build && cd build;   # 创建并进入build目录
   cmake ..;make -j;             # 编译工程
   ./c_api_add_example           # 运行样例

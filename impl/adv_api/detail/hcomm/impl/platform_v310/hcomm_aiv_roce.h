@@ -29,18 +29,18 @@
 
 namespace AscendC {
 
-__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::Init(__ubuf__ uint8_t *buff, uint32_t len)
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::Init(__ubuf__ uint8_t* buff, uint32_t len)
 {
     if (len < HCOMM_UB_BUF_SIZE) {
         return HCOMM_FAILED;
     }
-    __ubuf__ uint8_t *alignedAddr = AlignAddrTo32Bytes(buff);
+    __ubuf__ uint8_t* alignedAddr = AlignAddrTo32Bytes(buff);
     TBuffAddr addr;
     addr.logicPos = static_cast<uint8_t>(TPosition::VECOUT);
     addr.dataLen = len;
     addr.bufferAddr = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(alignedAddr));
 #if defined(UT_TEST)
-    addr.absAddr = reinterpret_cast<uint8_t *>(alignedAddr);
+    addr.absAddr = reinterpret_cast<uint8_t*>(alignedAddr);
 #endif
 
     wqeUB_.SetAddr(addr);
@@ -59,8 +59,9 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::Init(const LocalTensor<
     return HCOMM_SUCCESS;
 }
 
-__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::MakeWqe(__gm__ ChannelEntity* chnlPtr,
-    GM_ADDR dst, GM_ADDR src, uint64_t len, uint32_t opType, uint32_t sqHead, uint32_t sqDepth)
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::MakeWqe(
+    __gm__ ChannelEntity* chnlPtr, GM_ADDR dst, GM_ADDR src, uint64_t len, uint32_t opType, uint32_t sqHead,
+    uint32_t sqDepth)
 {
     int32_t remoteIdx = HcommFindBufferIdx(chnlPtr->remoteBufferAddr, chnlPtr->remoteBufferNum, dst, len);
     if (remoteIdx < 0) {
@@ -114,8 +115,8 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::PostSend(
     ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, uint32_t opType)
 {
     __gm__ ChannelEntity* chnlPtr = (__gm__ ChannelEntity*)(channel);
-    if (chnlPtr == nullptr || chnlPtr->sqNum == 0 || chnlPtr->cqNum == 0 ||
-        chnlPtr->sqContextAddr == nullptr || chnlPtr->cqContextAddr == nullptr) {
+    if (chnlPtr == nullptr || chnlPtr->sqNum == 0 || chnlPtr->cqNum == 0 || chnlPtr->sqContextAddr == nullptr ||
+        chnlPtr->cqContextAddr == nullptr) {
         KERNEL_LOG(KERNEL_INFO, "Hcomm PostSend: channel sqNum = %u, cqNum = %u.\n", chnlPtr->sqNum, chnlPtr->cqNum);
         return HCOMM_FAILED;
     }
@@ -132,8 +133,9 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::PostSend(
     constexpr uint32_t NUM_CQE_PER_POLL_CQ = 100;
     if ((sqHead + POLL_CQ_THRESHOLD) % cqDepth == sqTail % cqDepth) {
         uint32_t idx = (sqTail + NUM_CQE_PER_POLL_CQ) > sqHead ? sqHead : (sqTail + NUM_CQE_PER_POLL_CQ);
-        KERNEL_LOG(KERNEL_INFO, "Hcomm PostSend: RoCE SQ overflow sqHead=%u sqTail=%u idx=%u cqDepth=%u\n", sqHead,
-            sqTail, idx, cqDepth);
+        KERNEL_LOG(
+            KERNEL_INFO, "Hcomm PostSend: RoCE SQ overflow sqHead=%u sqTail=%u idx=%u cqDepth=%u\n", sqHead, sqTail,
+            idx, cqDepth);
         if (PollCq(chnlPtr, idx) != HCOMM_SUCCESS) {
             KERNEL_LOG(KERNEL_INFO, "Hcomm PostSend: RoCE SQ overflow, PollCq failed.\n");
             return HCOMM_FAILED;
@@ -156,25 +158,25 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::PostSend(
     return HCOMM_SUCCESS;
 }
 
-template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
+template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const& config>
 __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::WriteNbi(
     ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     (void)config;
-    return PostSend<commit, commitPipe, reqPipe>(channel, dst, src, len,
-        static_cast<uint32_t>(HCOMM_ROCE_OP_TYPE::WRITE));
+    return PostSend<commit, commitPipe, reqPipe>(
+        channel, dst, src, len, static_cast<uint32_t>(HCOMM_ROCE_OP_TYPE::WRITE));
 }
 
-template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
+template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const& config>
 __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::ReadNbi(
     ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     (void)config;
-    return PostSend<commit, commitPipe, reqPipe>(channel, src, dst, len,
-        static_cast<uint32_t>(HCOMM_ROCE_OP_TYPE::READ));
+    return PostSend<commit, commitPipe, reqPipe>(
+        channel, src, dst, len, static_cast<uint32_t>(HCOMM_ROCE_OP_TYPE::READ));
 }
 
-template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
+template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const& config>
 __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::WriteWithNotifyNbi(
     ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
 {
@@ -212,8 +214,7 @@ __aicore__ inline uint64_t HcommImpl<COMM_PROTOCOL_ROCE>::GetDbValue(uint32_t qp
 }
 
 template <pipe_t pipe>
-__aicore__ inline void HcommImpl<COMM_PROTOCOL_ROCE>::KnockDoorBell(__gm__ ChannelEntity* chnlPtr,
-    uint32_t sqHead)
+__aicore__ inline void HcommImpl<COMM_PROTOCOL_ROCE>::KnockDoorBell(__gm__ ChannelEntity* chnlPtr, uint32_t sqHead)
 {
     uint64_t dbValue = GetDbValue(chnlPtr->sqContextAddr->contextInfo.roceSq.qpn);
     KERNEL_LOG(KERNEL_INFO, "Hcomm KnockDoorBell: dbValue = %llu\n", dbValue);
@@ -261,15 +262,15 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::PollCq(__gm__ ChannelEn
         for (; loop < HCOMM_POLLCQ_MAX_RETRY_TIMES; loop ++) {
             DataCopy(cqeUB_, cqeGlobalTensor, sizeof(RoceCqeEntry));
             SyncAction<HardEvent::MTE2_S>();
-    #if defined(UT_TEST)
+#if defined(UT_TEST)
             cqTail = expectIdx;
             break;
-    #else
+#else
             uint8_t owner = (HtoNL(cqTail) & (cqDepth + 1)) == 0 ? 0 : 1;
             if (((((cqePtr->cqe0) >> 31) & 0x1) == owner) && ((cqePtr->cqe0 & 0xfffff) == qpn)) {
                 break;
             }
-    #endif
+#endif
         }
         if (loop >= HCOMM_POLLCQ_MAX_RETRY_TIMES) {
             KERNEL_LOG(KERNEL_INFO, "Hcomm PollCq: Overtime exit\n");

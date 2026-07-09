@@ -42,11 +42,14 @@ inline half hfloor(half x)
 
 ## 返回值说明
 
-小于或等于输入数据的最大整数值。特别场景说明如下：
+小于或等于输入数据的最大整数值。本接口受全局饱和寄存器的影响，特殊值如下：
 
--   当x为nan时，返回值为nan。
--   当x为inf时，返回值为inf。
--   当x为-inf时，返回值为-inf。
+| x值 | 非饱和模式返回值 | 饱和模式返回值 |
+| --- | --- | --- |
+| ±0 | 0 | 0 |
+| nan | nan | 0 |
+| inf | inf | ASCRT\_MAX\_NORMAL\_FP16 |
+| -inf | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
 
 ## 约束说明
 
@@ -65,7 +68,7 @@ inline half hfloor(half x)
 -   SIMT编程场景：
 
     ```
-    __global__ __launch_bounds__(1024) void KernelIsFinite(half* dst, half* x)
+    __global__ __launch_bounds__(1024) void kernel_hfloor(half* dst, half* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = hfloor(x[idx]);
@@ -75,7 +78,7 @@ inline half hfloor(half x)
 -   SIMD与SIMT混合编程场景：
 
     ```
-    __simt_vf__ __launch_bounds__(1024) inline void KernelIsFinite(__gm__ half* dst, __gm__ half* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_hfloor(__gm__ half* dst, __gm__ half* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = hfloor(x[idx]);

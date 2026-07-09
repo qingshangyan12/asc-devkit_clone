@@ -10,6 +10,8 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/sys_var/sys_var.h"`。
+
 获取当前系统cycle数，若换算成时间需要按照50MHz的频率，时间单位为us，换算公式为：time = (cycle数/50)us。
 
 ## 函数原型
@@ -37,10 +39,15 @@ PIPE_S
 ## 调用示例
 
 ```cpp
-asc_sync_notify(PIPE_V, PIPE_S, 0);
 int64_t system_cycle_before = asc_get_system_cycle(); // 计算操作指令前的cycle数
+asc_sync_notify(PIPE_S, PIPE_V, 0);
+asc_sync_wait(PIPE_S, PIPE_V, 0);
+
 ......// 进行PIPE_V流水的计算操作
+
 asc_sync_notify(PIPE_V, PIPE_S, 0);
+asc_sync_wait(PIPE_V, PIPE_S, 0);
+
 int64_t system_cycle_after = asc_get_system_cycle(); // 计算操作指令后的cycle数
 int64_t total_cycle = system_cycle_after - system_cycle_before; // 执行Add指令所用的cycle数
 ```

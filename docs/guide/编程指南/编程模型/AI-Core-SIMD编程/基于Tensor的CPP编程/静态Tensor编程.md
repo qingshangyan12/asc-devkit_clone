@@ -54,11 +54,11 @@
 
 -   正向同步
 
-    在本次数据搬入和计算之间，插入MTE2\_V（矢量计算流水等待MT2搬运流水）同步事件，确保数据搬入之后再进行计算；在本次数据计算和搬出之间，插入V\_MTE3（MTE3搬运流水等待矢量计算流水）同步事件，确保数据计算完成后再进行搬出。
+    在本次数据搬入和计算之间，插入MTE2\_V（矢量计算流水等待MTE2搬运流水）同步事件，确保数据搬入之后再进行计算；在本次数据计算和搬出之间，插入V\_MTE3（MTE3搬运流水等待矢量计算流水）同步事件，确保数据计算完成后再进行搬出。
 
 -   反向同步
 
-    在上一次的数据计算和本次数据搬入之间，插入V\_MTE2（MT2搬运流水等待矢量计算流水）同步事件，确保上一次的数据计算完成后，本次的数据再进行搬入。防止本次的数据会覆盖掉上一次未计算完成的数据；在上一次的数据搬出和本次数据计算之间，插入MTE3\_V（矢量计算流水等待MT3搬运流水）同步事件，确保上一次的数据搬出后，再进行本次数据的计算。防止本次的数据会覆盖掉上一次未搬出的数据。
+    在上一次的数据计算和本次数据搬入之间，插入V\_MTE2（MTE2搬运流水等待矢量计算流水）同步事件，确保上一次的数据计算完成后，本次的数据再进行搬入。防止本次的数据会覆盖掉上一次未计算完成的数据；在上一次的数据搬出和本次数据计算之间，插入MTE3\_V（矢量计算流水等待MTE3搬运流水）同步事件，确保上一次的数据搬出后，再进行本次数据的计算。防止本次的数据会覆盖掉上一次未搬出的数据。
 
 上述的同步逻辑在使用Pipe编程框架时，框架会使用EnQue/DeQue/AllocTensor/FreeTensor进行封装。您可以通过[TPipe-TQue框架编程原理](../基于TPipe-TQue框架编程/TPipe-TQue框架编程原理.md)来了解应该如何在使用静态Tensor编程方式时手动进行同步控制。
 
@@ -106,7 +106,7 @@
 
 ## 流水优化<a name="section121239188376"></a>
 
-在基于TPipe的编程范式中，开发者只需要在InitBuffer时指定buffer数量为2，即可自动开启Double Buffer。但是静态Tensor编程方式下，开发者需要手动开启Double Buffer，具体示例如下，完整样例请参考[静态Tensor编程样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/05_best_practices/00_vector_compute/add_high_performance)中的Double Buffer示例。
+在基于TPipe的编程范式中，开发者只需要在InitBuffer时指定buffer数量为2，即可自动开启DoubleBuffer。但是静态Tensor编程方式下，开发者需要手动开启DoubleBuffer，具体示例如下，完整样例请参考[静态Tensor编程样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/05_best_practices/00_vector_compute/add_high_performance)中的DoubleBuffer示例。
 
 ```
     // ping
@@ -120,7 +120,7 @@
 
     uint32_t totalBlocks = GetTotalBlocks();
 
-    // double buffer
+    // DoubleBuffer
     AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
     AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID1);
     AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
@@ -180,6 +180,7 @@
 -   同步事件需要由开发者使用[SetFlag/WaitFlag\(ISASI\)](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md)和[PipeBarrier\(ISASI\)](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md)手动插入，事件的类型和事件ID由开发者自行管理，但需要注意事件ID不能使用6和7（可能与内部使用的事件ID出现冲突，进而出现未定义行为）。
 -   由于需要使用SetFlag/WaitFlag/PipeBarrier底层同步接口（属于ISASI硬件体系结构相关的接口），无法保证算子跨硬件版本兼容。
 -   Kernel入口处需要开发者手动调用[InitSocState](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/工具接口/系统初始化/InitSocState.md)接口用来初始化全局状态寄存器。因为全局状态寄存器处于不确定状态，如果不调用该接口，可能导致算子执行过程中出现未定义行为。在TPipe框架编程中，初始化过程由TPipe完成，无需开发者关注。
+-   Kernel结束前需要开发者手动调用[PipeBarrier<PIPE_ALL>()](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md)。
 
 ## 支持的API范围<a name="section2633193623711"></a>
 
@@ -194,7 +195,7 @@
 </thead>
 <tbody><tr id="row146691342124318"><td class="cellrowborder" valign="top" width="30.28%" headers="mcps1.2.3.1.1 "><p id="p1669154234318"><a name="p1669154234318"></a><a name="p1669154234318"></a>基础API &gt; 标量计算</p>
 </td>
-<td class="cellrowborder" valign="top" width="69.72%" headers="mcps1.2.3.1.2 "><p id="p0669164213434"><a name="p0669164213434"></a><a name="p0669164213434"></a>ScalarGetCountOfValue、ScalarCountLeadingZero、ScalarCast、CountBitsCntSameAsSignBit、ScalarGetSFFValue</p>
+<td class="cellrowborder" valign="top" width="69.72%" headers="mcps1.2.3.1.2 "><p id="p0669164213434"><a name="p0669164213434"></a><a name="p0669164213434"></a>GetBitCount、CountLeadingZero、Cast、CountBitsCntSameAsSignBit、GetSFFValue</p>
 </td>
 </tr>
 <tr id="row1966914211437"><td class="cellrowborder" valign="top" width="30.28%" headers="mcps1.2.3.1.1 "><p id="p7669174224314"><a name="p7669174224314"></a><a name="p7669174224314"></a>基础API &gt; 矢量计算 &gt; 基础算术</p>
@@ -209,12 +210,12 @@
 </tr>
 <tr id="row46691542124317"><td class="cellrowborder" valign="top" width="30.28%" headers="mcps1.2.3.1.1 "><p id="p766994224314"><a name="p766994224314"></a><a name="p766994224314"></a>基础API &gt; 矢量计算 &gt; 复合计算</p>
 </td>
-<td class="cellrowborder" valign="top" width="69.72%" headers="mcps1.2.3.1.2 "><p id="p1559917570124"><a name="p1559917570124"></a><a name="p1559917570124"></a>Axpy、CastDequant、AddRelu、AddReluCast、AddDeqRelu、SubRelu、SubReluCast、MulAddDst、MulCast、FusedMulAdd、FusedMulAddRelu</p>
+<td class="cellrowborder" valign="top" width="69.72%" headers="mcps1.2.3.1.2 "><p id="p1559917570124"><a name="p1559917570124"></a><a name="p1559917570124"></a>Axpy、CastDequant、AddRelu、AddReluCast、AddDeqRelu、SubRelu、SubReluCast、MulAddDst、MulCast、FusedMulAdd、MulAddRelu</p>
 </td>
 </tr>
 <tr id="row176691942154313"><td class="cellrowborder" valign="top" width="30.28%" headers="mcps1.2.3.1.1 "><p id="p126691442184311"><a name="p126691442184311"></a><a name="p126691442184311"></a>基础API &gt; 矢量计算 &gt; 比较与选择</p>
 </td>
-<td class="cellrowborder" valign="top" width="69.72%" headers="mcps1.2.3.1.2 "><p id="p1670442104314"><a name="p1670442104314"></a><a name="p1670442104314"></a>Compare、Compare（结果存入寄存器）、CompareScalar、GetCmpMask、SetCmpMask、</p>
+<td class="cellrowborder" valign="top" width="69.72%" headers="mcps1.2.3.1.2 "><p id="p1670442104314"><a name="p1670442104314"></a><a name="p1670442104314"></a>Compare、Compare（结果存入寄存器）、Compares、GetCmpMask、SetCmpMask、</p>
 <p id="p367013429431"><a name="p367013429431"></a><a name="p367013429431"></a>Select、GatherMask</p>
 </td>
 </tr>
@@ -225,7 +226,7 @@
 </tr>
 <tr id="row267074213433"><td class="cellrowborder" valign="top" width="30.28%" headers="mcps1.2.3.1.1 "><p id="p1167094274316"><a name="p1167094274316"></a><a name="p1167094274316"></a>基础API &gt; 矢量计算 &gt; 归约计算</p>
 </td>
-<td class="cellrowborder" valign="top" width="69.72%" headers="mcps1.2.3.1.2 "><p id="p156703427434"><a name="p156703427434"></a><a name="p156703427434"></a>WholeReduceMax、WholeReduceMin、WholeReduceSum、BlockReduceMax、BlockReduceMin、BlockReduceSum、PairReduceSum、RepeatReduceSum、GetReduceMaxMinCount</p>
+<td class="cellrowborder" valign="top" width="69.72%" headers="mcps1.2.3.1.2 "><p id="p156703427434"><a name="p156703427434"></a><a name="p156703427434"></a>ReduceRepeat、ReduceDataBlock、ReducePairElem、GetReduceRepeatMaxMinSpr</p>
 </td>
 </tr>
 <tr id="row067015420439"><td class="cellrowborder" valign="top" width="30.28%" headers="mcps1.2.3.1.1 "><p id="p667094294319"><a name="p667094294319"></a><a name="p667094294319"></a>基础API &gt; 矢量计算 &gt; 数据转换</p>
@@ -280,12 +281,12 @@
 </tr>
 <tr id="row96714427439"><td class="cellrowborder" valign="top" width="30.28%" headers="mcps1.2.3.1.1 "><p id="p106711742154319"><a name="p106711742154319"></a><a name="p106711742154319"></a>基础API &gt; 原子操作</p>
 </td>
-<td class="cellrowborder" valign="top" width="69.72%" headers="mcps1.2.3.1.2 "><p id="p17671042164319"><a name="p17671042164319"></a><a name="p17671042164319"></a>SetAtomicAdd、SetAtomicNone</p>
+<td class="cellrowborder" valign="top" width="69.72%" headers="mcps1.2.3.1.2 "><p id="p17671042164319"><a name="p17671042164319"></a><a name="p17671042164319"></a>SetAtomicAdd、DisableDmaAtomic</p>
 </td>
 </tr>
 <tr id="row13671194254311"><td class="cellrowborder" valign="top" width="30.28%" headers="mcps1.2.3.1.1 "><p id="p6671184224317"><a name="p6671184224317"></a><a name="p6671184224317"></a>基础API &gt; 矩阵计算</p>
 </td>
-<td class="cellrowborder" valign="top" width="69.72%" headers="mcps1.2.3.1.2 "><p id="p147142311613"><a name="p147142311613"></a><a name="p147142311613"></a>InitConstValue、LoadData、SetAippFunctions、LoadImageToLocal、LoadUnzipIndex、LoadDataUnzip、SetLoadDataBoundary、SetLoadDataPaddingValue、Mmad</p>
+<td class="cellrowborder" valign="top" width="69.72%" headers="mcps1.2.3.1.2 "><p id="p147142311613"><a name="p147142311613"></a><a name="p147142311613"></a>Fill、LoadData、SetAippFunctions、LoadImageToLocal、LoadUnzipIndex、LoadDataUnzip、SetLoadDataBoundary、SetLoadDataPaddingValue、Mmad</p>
 </td>
 </tr>
 </tbody>
@@ -325,7 +326,7 @@
 </tr>
 <tr id="row1247575318435"><td class="cellrowborder" valign="top" width="29.9%" headers="mcps1.2.4.1.1 "><p id="p164751053124316"><a name="p164751053124316"></a><a name="p164751053124316"></a>基础API &gt; 矢量计算 &gt; 复合计算</p>
 </td>
-<td class="cellrowborder" valign="top" width="44.25%" headers="mcps1.2.4.1.2 "><p id="p1169817233416"><a name="p1169817233416"></a><a name="p1169817233416"></a>Axpy、CastDequant、AddRelu、AddReluCast、SubRelu、SubReluCast、MulAddDst、MulCast、FusedMulAdd、FusedMulAddRelu</p>
+<td class="cellrowborder" valign="top" width="44.25%" headers="mcps1.2.4.1.2 "><p id="p1169817233416"><a name="p1169817233416"></a><a name="p1169817233416"></a>Axpy、CastDequant、AddRelu、AddReluCast、SubRelu、SubReluCast、MulAddDst、MulCast、FusedMulAdd、MulAddRelu</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p5475153164312"><a name="p5475153164312"></a><a name="p5475153164312"></a>-</p>
 </td>
@@ -346,7 +347,7 @@
 </tr>
 <tr id="row1047545324316"><td class="cellrowborder" valign="top" width="29.9%" headers="mcps1.2.4.1.1 "><p id="p14475165364311"><a name="p14475165364311"></a><a name="p14475165364311"></a>基础API &gt; 矢量计算 &gt; 归约计算</p>
 </td>
-<td class="cellrowborder" valign="top" width="44.25%" headers="mcps1.2.4.1.2 "><p id="p847595312435"><a name="p847595312435"></a><a name="p847595312435"></a>WholeReduceMax、WholeReduceMin、WholeReduceSum、BlockReduceMax、BlockReduceMin、BlockReduceSum、PairReduceSum、RepeatReduceSum、GetReduceRepeatSumSpr、GetReduceRepeatMaxMinSpr</p>
+<td class="cellrowborder" valign="top" width="44.25%" headers="mcps1.2.4.1.2 "><p id="p847595312435"><a name="p847595312435"></a><a name="p847595312435"></a>ReduceRepeat、ReduceDataBlock、ReducePairElem、GetReduceRepeatSumSpr、GetReduceRepeatMaxMinSpr</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p18475115318430"><a name="p18475115318430"></a><a name="p18475115318430"></a>-</p>
 </td>
@@ -456,14 +457,14 @@
 </tr>
 <tr id="row174769538434"><td class="cellrowborder" valign="top" width="29.9%" headers="mcps1.2.4.1.1 "><p id="p14765531438"><a name="p14765531438"></a><a name="p14765531438"></a>基础API &gt; 原子操作</p>
 </td>
-<td class="cellrowborder" valign="top" width="44.25%" headers="mcps1.2.4.1.2 "><p id="p847615314436"><a name="p847615314436"></a><a name="p847615314436"></a>SetAtomicAdd、SetAtomicType、SetAtomicNone、SetAtomicMax、SetAtomicMin、SetStoreAtomicConfig、GetStoreAtomicConfig</p>
+<td class="cellrowborder" valign="top" width="44.25%" headers="mcps1.2.4.1.2 "><p id="p847615314436"><a name="p847615314436"></a><a name="p847615314436"></a>SetAtomicAdd、SetAtomicType、DisableDmaAtomic、SetAtomicMax、SetAtomicMin、SetStoreAtomicConfig、GetStoreAtomicConfig</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p10476153144316"><a name="p10476153144316"></a><a name="p10476153144316"></a>-</p>
 </td>
 </tr>
 <tr id="row7476053114311"><td class="cellrowborder" valign="top" width="29.9%" headers="mcps1.2.4.1.1 "><p id="p747710531433"><a name="p747710531433"></a><a name="p747710531433"></a>基础API &gt; 矩阵计算</p>
 </td>
-<td class="cellrowborder" valign="top" width="44.25%" headers="mcps1.2.4.1.2 "><p id="p847713536432"><a name="p847713536432"></a><a name="p847713536432"></a>Mmad、MmadWithSparse、SetHF32Mode、SetHF32TransMode、SetMMLayoutTransform、SetFixPipeConfig、SetFixpipeNz2ndFlag、SetFixpipePreQuantFlag、InitConstValue、LoadData、LoadDataWithTranspose、SetAippFunctions、LoadImageToLocal、LoadDataWithSparse、SetFmatrix、SetLoadDataBoundary、SetLoadDataRepeat、SetLoadDataPaddingValue、Fixpipe</p>
+<td class="cellrowborder" valign="top" width="44.25%" headers="mcps1.2.4.1.2 "><p id="p847713536432"><a name="p847713536432"></a><a name="p847713536432"></a>Mmad、MmadWithSparse、SetHF32Mode、SetHF32TransMode、SetMMRowMajor、SetMMColumnMajor、SetFixPipeConfig、SetFixpipeNz2ndFlag、SetFixpipePreQuantFlag、Fill、LoadData、LoadDataWithTranspose、SetAippFunctions、LoadImageToLocal、LoadDataWithSparse、SetFmatrix、SetLoadDataBoundary、SetLoadDataRepeat、SetLoadDataPaddingValue、Fixpipe</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p154771853144319"><a name="p154771853144319"></a><a name="p154771853144319"></a>-</p>
 </td>
@@ -526,7 +527,7 @@
 </tr>
 <tr id="row137061481120"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p53695511016"><a name="p53695511016"></a><a name="p53695511016"></a>基础API &gt; 矢量计算 &gt; 复合计算</p>
 </td>
-<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p6361255131014"><a name="p6361255131014"></a><a name="p6361255131014"></a>Axpy、CastDequant、AddRelu、AddReluCast、SubRelu、SubReluCast、MulAddDst、MulCast、FusedMulAdd、FusedMulAddRelu</p>
+<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p6361255131014"><a name="p6361255131014"></a><a name="p6361255131014"></a>Axpy、CastDequant、AddRelu、AddReluCast、SubRelu、SubReluCast、MulAddDst、MulCast、FusedMulAdd、MulAddRelu</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p153610555105"><a name="p153610555105"></a><a name="p153610555105"></a>-</p>
 </td>
@@ -547,7 +548,7 @@
 </tr>
 <tr id="row1570618486213"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p33635571010"><a name="p33635571010"></a><a name="p33635571010"></a>基础API &gt; 矢量计算 &gt; 归约计算</p>
 </td>
-<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p103612558107"><a name="p103612558107"></a><a name="p103612558107"></a>WholeReduceMax、WholeReduceMin、WholeReduceSum、BlockReduceMax、BlockReduceMin、BlockReduceSum、PairReduceSum、RepeatReduceSum、GetReduceRepeatSumSpr、GetReduceRepeatMaxMinSpr</p>
+<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p103612558107"><a name="p103612558107"></a><a name="p103612558107"></a>ReduceRepeat、ReduceDataBlock、ReducePairElem、GetReduceRepeatSumSpr、GetReduceRepeatMaxMinSpr</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p1736195513103"><a name="p1736195513103"></a><a name="p1736195513103"></a>-</p>
 </td>
@@ -656,14 +657,14 @@
 </tr>
 <tr id="row1170934815213"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p938105531011"><a name="p938105531011"></a><a name="p938105531011"></a>基础API &gt; 原子操作</p>
 </td>
-<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p1738145591014"><a name="p1738145591014"></a><a name="p1738145591014"></a>SetAtomicAdd、SetAtomicType、SetAtomicNone、SetAtomicMax、SetAtomicMin、SetStoreAtomicConfig、GetStoreAtomicConfig</p>
+<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p1738145591014"><a name="p1738145591014"></a><a name="p1738145591014"></a>SetAtomicAdd、SetAtomicType、DisableDmaAtomic、SetAtomicMax、SetAtomicMin、SetStoreAtomicConfig、GetStoreAtomicConfig</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p5388559106"><a name="p5388559106"></a><a name="p5388559106"></a>-</p>
 </td>
 </tr>
 <tr id="row67096482218"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p93875511014"><a name="p93875511014"></a><a name="p93875511014"></a>基础API &gt; 矩阵计算</p>
 </td>
-<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p53919552100"><a name="p53919552100"></a><a name="p53919552100"></a>Mmad、MmadWithSparse、SetHF32Mode、SetHF32TransMode、SetMMLayoutTransform、SetFixPipeConfig、SetFixpipeNz2ndFlag、SetFixpipePreQuantFlag、InitConstValue、LoadData、LoadDataWithTranspose、SetAippFunctions、LoadImageToLocal、LoadDataWithSparse、SetFmatrix、SetLoadDataBoundary、SetLoadDataRepeat、SetLoadDataPaddingValue、Fixpipe</p>
+<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p53919552100"><a name="p53919552100"></a><a name="p53919552100"></a>Mmad、MmadWithSparse、SetHF32Mode、SetHF32TransMode、SetMMRowMajor、SetMMColumnMajor、SetFixPipeConfig、SetFixpipeNz2ndFlag、SetFixpipePreQuantFlag、Fill、LoadData、LoadDataWithTranspose、SetAippFunctions、LoadImageToLocal、LoadDataWithSparse、SetFmatrix、SetLoadDataBoundary、SetLoadDataRepeat、SetLoadDataPaddingValue、Fixpipe</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p153985521019"><a name="p153985521019"></a><a name="p153985521019"></a>-</p>
 </td>
@@ -761,7 +762,7 @@
 </tr>
 <tr id="row7987193534118"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p898712358414"><a name="p898712358414"></a><a name="p898712358414"></a>基础API &gt; 矢量计算 &gt; 归约计算</p>
 </td>
-<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p675915224145"><a name="p675915224145"></a><a name="p675915224145"></a>ReduceMax、ReduceMin、WholeReduceSum、BlockReduceMax、BlockReduceMin、BlockReduceSum、PairReduceSum、RepeatReduceSum、</p>
+<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p675915224145"><a name="p675915224145"></a><a name="p675915224145"></a>ReduceMax、ReduceMin、ReduceRepeat、ReduceDataBlock、ReducePairElem</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p1398713564110"><a name="p1398713564110"></a><a name="p1398713564110"></a>-</p>
 </td>
@@ -944,10 +945,10 @@
 | 基础API > Memory数据搬运 | Copy |
 | 基础API > 基础算术 | Exp、Ln、Abs、Reciprocal、Sqrt、Rsqrt、Relu、Add、Sub、Mul、Div、Max、Min、Adds、Muls、Maxs、Mins、LeakyRelu、Subs、Divs |
 | 基础API > 逻辑计算 | Not、And、Or、ShiftLeft、ShiftRight、Ands、Ors |
-| 基础API > 复合计算 | Axpy、CastDequant、CastDeq、AddRelu、AddReluCast、AddDeqRelu、SubRelu、SubReluCast、MulAddDst、MulCast、FusedMulAdd、FusedMulAddRelu、MulAddRelu |
-| 基础API > 比较与选择 | Compare、Compares、CompareScalar、Select、GatherMask |
+| 基础API > 复合计算 | Axpy、CastDequant、AddRelu、AddReluCast、AddDeqRelu、SubRelu、SubReluCast、MulAddDst、MulCast、FusedMulAdd、MulAddRelu |
+| 基础API > 比较与选择 | Compare、Compares、Select、GatherMask |
 | 基础API > 类型转换 | Cast |
-| 基础API > 归约计算 | ReduceRepeat、ReduceDataBlock、ReducePairElem、BlockReduceMax、BlockReduceMin、BlockReduceSum、PairReduceSum、RepeatReduceSum、WholeReduceMax、WholeReduceMin、WholeReduceSum |
+| 基础API > 归约计算 | ReduceRepeat、ReduceDataBlock、ReducePairElem |
 | 基础API > 数据填充 | Duplicate |
 | 基础API > Kernel-Tiling | GET_TILING_DATA、GET_TILING_DATA_WITH_STRUCT、GET_TILING_DATA_MEMBER |
 | Utils API > 调测接口（SIMD VF） | printf、asc_dump_reg、asc_dump、asc_dump_ubuf |

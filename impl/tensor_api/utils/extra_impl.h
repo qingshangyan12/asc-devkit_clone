@@ -31,6 +31,7 @@
 #include "utils/std/utility.h"
 #include "utils/std/algorithm.h"
 #include "utils/std/cmath.h"
+#include "int_impl.h"
 
 namespace AscendC {
 namespace Te {
@@ -44,7 +45,7 @@ struct IterRef {
 
 template <typename T>
 struct IterRef<T, void_t<typename T::reference>> {
-    using type = typename T::reference; 
+    using type = typename T::reference;
 };
 
 template <typename T, typename = void>

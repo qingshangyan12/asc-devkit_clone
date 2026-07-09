@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id3 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id3 -->
+<!-- npu="A3" id4 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id4 -->
+<!-- npu="910b" id5 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id5 -->
+<!-- npu="310b" id6 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id6 -->
+<!-- npu="310p" id7 -->
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id7 -->
+<!-- npu="910" id8 -->
 - Atlas 训练系列产品：支持
+<!-- end id8 -->
 <!-- npu="x90" id1 -->
 - Kirin X90：支持
 <!-- end id1 -->
@@ -172,7 +184,7 @@ PER\_TOKEN/PER\_GROUP场景的计算逻辑如下：
 
 -   dstTensor非固定数据类型
 
-    仅支持Ascend 950PR/Ascend 950DT。
+    <!-- npu="950" id9 -->仅支持Ascend 950PR/Ascend 950DT。<!-- end id9 -->
 
     -   PER\_TENSOR量化：
         -   通过sharedTmpBuffer入参传入临时空间
@@ -308,11 +320,11 @@ PER\_TOKEN/PER\_GROUP场景的计算逻辑如下：
 | config | 结构体模板参数，此参数可选配，AscendQuantConfig类型，定义如下方代码所示，其中参数的含义如下。<br>calcCount：实际计算数据元素个数。calcCount∈[0, srcTensor.GetSize()]，在调用带有scaleCount入参的接口时，calcCount若取非零值则必须是scaleCount的整数倍。<br>offsetCount：实际量化参数元素个数。offsetCount∈[0, offsetTensor.GetSize()]，offsetCount与scaleCount的取值必须相等，要求是32的整数倍。若调用的接口不含offsetCount入参，取值为0即可。<br>scaleCount：实际量化参数元素个数。scaleCount∈[0, scaleTensor.GetSize()]，要求是32的整数倍。若调用的接口不含scaleCount入参，取值为0即可。<br>workLocalSize：临时缓存sharedTmpBuffer的大小，sharedTmpBuffer的大小/workLocalSize的获取方式请参考[GetAscendQuantMaxMinTmpSize](GetAscendQuantMaxMinTmpSize.md)。该参数取值不能大于sharedTmpBuffer的大小。若调用的接口不含sharedTmpBuffer入参，取值为0即可。<br><br>当上述参数的取值满足如下任一种场景，将开启参数常量化，即编译过程中使用常量化的相关参数，从而减少Scalar计算。<br>若调用的接口不含scaleCount入参，calcCount和workLocalSize取值为非0时，开启参数常量化。<br>若调用的接口带有scaleCount入参，scaleCount、calcCount和workLocalSize取值为非0时，开启参数常量化。 |
 
 ```
-struct AscendQuantConfig{
-uint32_t calcCount = 0;
-uint32_t offsetCount = 0;
-uint32_t scaleCount = 0;
-uint32_t workLocalSize = 0;
+struct AscendQuantConfig {
+    uint32_t calcCount = 0;
+    uint32_t offsetCount = 0;
+    uint32_t scaleCount = 0;
+    uint32_t workLocalSize = 0;
 };
 ```
 
@@ -340,10 +352,10 @@ constexpr AscendQuantConfig ASCEND_QUANT_DEFAULT_CFG = {0, 0, 0, 0};
 
 ```
 struct AscendQuantConfig {
-        bool hasOffset;
-        int32_t kDim = 1;
-        RoundMode roundMode = RoundMode::CAST_RINT;
-}
+    bool hasOffset;
+    int32_t kDim = 1;
+    RoundMode roundMode = RoundMode::CAST_RINT;
+};
 ```
 
 **表4**  PER\_TOKEN/PER\_GROUP场景支持的数据类型组合
@@ -407,11 +419,11 @@ struct AscendQuantConfig {
 
 ```
 struct AscendQuantParam {
-        uint32_t m;
-        uint32_t n;
-        uint32_t calCount;
-        uint32_t groupSize = 0;
-}
+    uint32_t m;
+    uint32_t n;
+    uint32_t calCount;
+    uint32_t groupSize = 0;
+};
 ```
 
 ## 返回值说明
@@ -424,8 +436,48 @@ struct AscendQuantParam {
 -   操作数地址对齐要求请参见[通用地址对齐约束](../../通用说明和约束.md#section796754519912)。
 -   输入输出操作数参与计算的数据长度要求32B对齐。
 -   当Scale为float类型时，其取值范围仍为half类型的取值范围。
--   Atlas 训练系列产品仅支持PER\_TENSOR量化，不支持PER\_CHANNEL量化。
--   PER\_TOKEN/PER\_GROUP场景仅在Ascend 950PR/Ascend 950DT上支持。
+-   dstTensor非固定数据类型的函数原型支持情况如下：
+    <!-- npu="950" id12 -->
+    - Ascend 950PR/Ascend 950DT：支持。
+    <!-- end id12 -->
+    <!-- npu="A3" id13 -->
+    - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持。
+    <!-- end id13 -->
+    <!-- npu="910b" id14 -->
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持。
+    <!-- end id14 -->
+    <!-- npu="310p" id15 -->
+    - Atlas 推理系列产品AI Core：不支持。
+    <!-- end id15 -->
+    <!-- npu="910" id16 -->
+    - Atlas 训练系列产品：不支持。
+    <!-- end id16 -->
+<!-- npu="910" id10 -->
+-   Atlas 训练系列产品仅支持PER\_TENSOR量化，不支持PER\_CHANNEL量化、PER\_TOKEN量化、PER\_GROUP量化。
+<!-- end id10 -->
+
+-   PER\_TOKEN/PER\_GROUP量化场景支持情况如下：
+
+    <!-- npu="950" id11 -->
+    - Ascend 950PR/Ascend 950DT：支持。
+    <!-- end id11 -->
+
+    <!-- npu="A3" id17 -->
+    - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持。
+    <!-- end id17 -->
+
+    <!-- npu="910b" id18 -->
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持。
+    <!-- end id18 -->
+
+    <!-- npu="310p" id19 -->
+    - Atlas 推理系列产品AI Core：不支持。
+    <!-- end id19 -->
+
+    <!-- npu="910" id20 -->
+    - Atlas 训练系列产品：不支持。
+    <!-- end id20 -->
+
 -   PER\_TOKEN/PER\_GROUP场景，连续计算方向（即n方向）的数据量要求32B对齐。
 
 ## 调用示例
@@ -437,9 +489,9 @@ struct AscendQuantParam {
     // srcLocal: 存放量化计算的输入Tensor，shape为1024，类型为float/half
     // sharedTmpBuffer: 存放量化计算过程中临时缓存的Tensor
 
-    const float scale = 0.02;  // 量化参数
+    const float scale = 0.02; // 量化参数
     const float offset = 0.9; // 量化参数，dstLocal[i] = srcLocal[i] * scale + offset
-    uint32_t calCount = 1022;  // srcTensor的前calCount个于元素参与计算
+    uint32_t calCount = 1022; // srcTensor的前calCount个元素参与计算
 
     // dstTensor为int8_t数据类型，通过sharedTmpBuffer入参传入临时空间
     AscendC::AscendQuant<srcType>(dstLocal, srcLocal, sharedTmpBuffer, scale, offset, calCount);
@@ -467,11 +519,12 @@ struct AscendQuantParam {
     // sharedTmpBuffer: 存放量化计算过程中临时缓存的Tensor
 
     uint32_t scaleCount = 64;  // 量化参数，要求是32的整数倍
-    uint32_t offsetCount = 64;  // 量化参数，要求与scaleCount相等
-    uint32_t calCount = 1022;  // srcTensor的前calCount个于元素参与计算
+    uint32_t offsetCount = 64; // 量化参数，要求与scaleCount相等
+    uint32_t calCount = 1022;  // srcTensor的前calCount个元素参与计算
 
     // dstTensor为int8_t数据类型，通过sharedTmpBuffer入参传入临时空间
-    AscendC::AscendQuant<srcType>(dstLocal, srcLocal, sharedTmpBuffer, scaleLocal, offsetLocal, scaleCount, offsetCount, calCount);
+    AscendC::AscendQuant<srcType>(
+        dstLocal, srcLocal, sharedTmpBuffer, scaleLocal, offsetLocal, scaleCount, offsetCount, calCount);
 
     // dstTensor非固定数据类型
     AscendC::AscendQuant<dstType, srcType>(dstLocal, srcLocal, scaleLocal, offsetLocal, scaleCount, offsetCount, calCount);
@@ -500,7 +553,8 @@ PER\_TOKEN/PER\_GROUP场景调用示例如下。
     para.m = m;
     para.n = n;
     para.calCount = calCount;
-    AscendQuant<dstType, srcType, scaleType, isReuseSource, config, policy>(dstLocal, srcLocal, sharedTmpBuffer, scaleLocal, offsetLocal, para);
+    AscendQuant<dstType, srcType, scaleType, isReuseSource, config, policy>(
+        dstLocal, srcLocal, sharedTmpBuffer, scaleLocal, offsetLocal, para);
     ```
 
 -   主动配置参数AscendQuantConfig的舍入模式roundMode。
@@ -515,5 +569,6 @@ PER\_TOKEN/PER\_GROUP场景调用示例如下。
     para.m = m;
     para.n = n;
     para.calCount = calCount;
-    AscendQuant<dstType, srcType, scaleType, isReuseSource, config, policy>(dstLocal, srcLocal, sharedTmpBuffer, scaleLocal, offsetLocal, para);
+    AscendQuant<dstType, srcType, scaleType, isReuseSource, config, policy>(
+        dstLocal, srcLocal, sharedTmpBuffer, scaleLocal, offsetLocal, para);
     ```

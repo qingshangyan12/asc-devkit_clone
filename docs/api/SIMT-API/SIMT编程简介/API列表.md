@@ -49,9 +49,9 @@
 | 接口名 | 功能描述 |
 | --- | --- |
 | [asc_shfl](../Warp函数/Warp-Shfl类函数/asc_shfl.md) | 获取Warp内指定线程srcLane输入的用于交换的var值。 |
-| [asc_shfl_up](../Warp函数/Warp-Shfl类函数/asc_shfl_up.md) | 获取Warp内当前线程向前偏移delta（当前线程LaneId-delta）的线程输入的用于交换的var值。 |
-| [asc_shfl_down](../Warp函数/Warp-Shfl类函数/asc_shfl_down.md) | 获取Warp内当前线程向后偏移delta（当前线程LaneId+delta）的线程输入的用于交换的var值。 |
-| [asc_shfl_xor](../Warp函数/Warp-Shfl类函数/asc_shfl_xor.md) | 获取Warp内当前线程LaneId与输入laneMask做异或操作（LaneId^laneMask）得到的dstLaneId对应线程输入的用于交换的var值。 |
+| [asc_shfl_up](../Warp函数/Warp-Shfl类函数/asc_shfl_up.md) | 获取Warp内当前线程向前偏移delta（当前线程Lane ID - delta）的线程输入的用于交换的var值。 |
+| [asc_shfl_down](../Warp函数/Warp-Shfl类函数/asc_shfl_down.md) | 获取Warp内当前线程向后偏移delta（当前线程Lane ID + delta）的线程输入的用于交换的var值。 |
+| [asc_shfl_xor](../Warp函数/Warp-Shfl类函数/asc_shfl_xor.md) | 获取Warp内当前线程Lane ID与输入laneMask做异或操作（Lane ID ^ laneMask）得到的dstLaneId对应线程输入的用于交换的var值。 |
 
 **表6**  Warp Reduce类函数
 
@@ -61,16 +61,16 @@
 | [asc_reduce_max](../Warp函数/Warp-Reduce类函数/asc_reduce_max.md) | 对Warp内所有活跃线程输入的val求最大值。 |
 | [asc_reduce_min](../Warp函数/Warp-Reduce类函数/asc_reduce_min.md) | 对Warp内所有活跃线程输入val求最小值。 |
 
-**表7** LaneID类函数
+**表7** Lane ID类函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
 | [laneid](../Warp函数/Lane-ID类函数/laneid.md) | 获取线程在其线程束内的索引。 |
 | [lanemask_eq](../Warp函数/Lane-ID类函数/lanemask_eq.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，只有当前线程所在的lane位被置为1，其余位为0。 |
-| [lanemask_le](../Warp函数/Lane-ID类函数/lanemask_le.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“laneid小于等于当前线程”的线程的对应位设为1，其余位为0。 |
-| [lanemask_lt](../Warp函数/Lane-ID类函数/lanemask_lt.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“laneid严格小于当前线程”的线程的对应位设为1，其余位为0。 |
-| [lanemask_ge](../Warp函数/Lane-ID类函数/lanemask_ge.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“laneid大于等于当前线程”的线程的对应位设为1，其余位为0。 |
-| [lanemask_gt](../Warp函数/Lane-ID类函数/lanemask_gt.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“laneid严格大于当前线程”的线程的对应位设为1，其余位为0。 |
+| [lanemask_le](../Warp函数/Lane-ID类函数/lanemask_le.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“Lane ID小于等于当前线程”的线程的对应位设为1，其余位为0。 |
+| [lanemask_lt](../Warp函数/Lane-ID类函数/lanemask_lt.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“Lane ID严格小于当前线程”的线程的对应位设为1，其余位为0。 |
+| [lanemask_ge](../Warp函数/Lane-ID类函数/lanemask_ge.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“Lane ID大于等于当前线程”的线程的对应位设为1，其余位为0。 |
+| [lanemask_gt](../Warp函数/Lane-ID类函数/lanemask_gt.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“Lane ID严格大于当前线程”的线程的对应位设为1，其余位为0。 |
 
 ## 数学函数
 
@@ -225,14 +225,14 @@
 | [__ll2half_rd](../数学函数/half类型/half类型精度转换函数/__ll2half_rd.md) | 获取输入遵循CAST_FLOOR模式转换成的half类型数据。 |
 | [__ll2half_ru](../数学函数/half类型/half类型精度转换函数/__ll2half_ru.md) | 获取输入遵循CAST_CEIL模式转换成的half类型数据。 |
 | [__ll2half_rna](../数学函数/half类型/half类型精度转换函数/__ll2half_rna.md) | 获取输入遵循CAST_ROUND模式转换成的half类型数据。 |
-| [__floats2half2_rn](../数学函数/half类型/half类型精度转换函数/__floats2half2_rn.md) | 将输入的数据x，y遵循CAST_RINT模式分别转换为bfloat16类型并填充到half2的前后两部分，返回转换后的half2类型数据。 |
+| [__floats2half2_rn](../数学函数/half类型/half类型精度转换函数/__floats2half2_rn.md) | 将输入的数据x，y遵循CAST_RINT模式分别转换为half类型并填充到half2的前后两部分，返回转换后的half2类型数据。 |
 | [__float22half2_rn](../数学函数/half类型/half类型精度转换函数/__float22half2_rn.md) | 将float2类型数据遵循CAST_RINT模式转换为half2类型，返回转换后的half2类型数据。 |
 | [__low2half](../数学函数/half类型/half类型精度转换函数/__low2half.md) | 返回输入数据的低16位。 |
 | [__low2half2](../数学函数/half类型/half类型精度转换函数/__low2half2.md) | 将输入数据的低16位填充到half2并返回。 |
 | [__low2float](../数学函数/half类型/half类型精度转换函数/__low2float.md) | 将输入数据的低16位转换为浮点数并返回结果。 |
 | [__lowhigh2highlow](../数学函数/half类型/half类型精度转换函数/__lowhigh2highlow.md) | 将输入数据的高低16位进行交换并返回。 |
 | [__high2half](../数学函数/half类型/half类型精度转换函数/__high2half.md) | 提取输入half2的高16位，并返回 |
-| [__high2half2](../数学函数/half类型/half类型精度转换函数/__high2half2.md) | 将输入数据的的高16位填充到half2并返回结果。 |
+| [__high2half2](../数学函数/half类型/half类型精度转换函数/__high2half2.md) | 将输入数据的高16位填充到half2并返回结果。 |
 | [__high2float](../数学函数/half类型/half类型精度转换函数/__high2float.md) | 将输入数据的高16位转换为float类型并返回结果。 |
 | [__highs2half2](../数学函数/half类型/half类型精度转换函数/__highs2half2.md) | 分别提取两个half2输入的高16位，并填充到half2中。返回填充后的数据。 |
 | [__lows2half2](../数学函数/half类型/half类型精度转换函数/__lows2half2.md) | 分别提取两个half2输入的低16位，并填充到half2中。返回填充后的数据。 |
@@ -726,7 +726,6 @@
 | [__usad](../数学函数/整型数学库函数/__usad.md) | 对输入数据x、y、z，计算|x - y|+z的结果，即第一个入参和第二个入参之差的绝对值与第三个入参的和。 |
 | [__mul24](../数学函数/整型数学库函数/__mul24.md) | 获取输入int32类型数据x和y低24位乘积的低32位结果。x和y的高8位被忽略。 |
 | [__umul24](../数学函数/整型数学库函数/__umul24.md) | 获取输入uint32类型数据x和y低24位乘积的低32位结果。x和y的高8位被忽略。 |
-|  |  |
 | [__hadd](../数学函数/整型数学库函数/__hadd-259.md) | 获取输入int32类型数据x和y的平均值，避免中间求和溢出。 |
 | [__rhadd](../数学函数/整型数学库函数/__rhadd.md) | 获取输入int32类型数据x和y的向上取整平均值，避免中间求和溢出。 |
 | [__uhadd](../数学函数/整型数学库函数/__uhadd.md) | 获取输入uint32类型数据x和y的平均值，避免中间求和溢出。 |
@@ -746,6 +745,7 @@
 | [asc_stwt](../访存函数/asc_stwt.md) | 将指定数据存储到Global Memory的地址address中，并缓存至Data Cache和L2 Cache。 |
 | [asc_dcci_single](../访存函数/asc_dcci_single.md) | 刷新指定地址所在的Cache Line，保证数据读取时Cache的一致性。 |
 | [asc_dcci_entire](../访存函数/asc_dcci_entire.md) | 刷新核内的整个Data Cache，保证数据读取时Cache的一致性。 |
+| [asc_nop](../访存函数/asc_nop.md) | 生成一条空操作指令，占用当前线程15个时钟周期，不执行任何实际计算与访存操作。 |
 
 ## 地址空间谓词函数<a name="section97001946144014"></a>
 

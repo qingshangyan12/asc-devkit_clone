@@ -23,48 +23,48 @@
 #ifndef IMPL_CAPI_INSTR_IMPL_NPU_ARCH_3510_VECTOR_COMPUTE_IMPL_ASC_REDUCE_SUM_IMPL_H
 #define IMPL_CAPI_INSTR_IMPL_NPU_ARCH_3510_VECTOR_COMPUTE_IMPL_ASC_REDUCE_SUM_IMPL_H
 
-#include "../utils_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/utils_impl.h"
 
 __simd_callee__ inline void asc_reduce_sum_impl(vector_int32_t& dst, vector_int16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
          vcadd(dst, src, mask, MODE_ZEROING);
-    }   
+    }
 }
 
 __simd_callee__ inline void asc_reduce_sum_impl(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
          vcadd(dst, src, mask, MODE_ZEROING);
-    }   
+    }
 }
 
 __simd_callee__ inline void asc_reduce_sum_impl(vector_uint32_t& dst, vector_uint16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
          vcadd(dst, src, mask, MODE_ZEROING);
-    }   
+    }
 }
 
 __simd_callee__ inline void asc_reduce_sum_impl(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
          vcadd(dst, src, mask, MODE_ZEROING);
-    }   
+    }
 }
 
 __simd_callee__ inline void asc_reduce_sum_impl(vector_half& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
          vcadd(dst, src, mask, MODE_ZEROING);
-    }   
+    }
 }
 
 __simd_callee__ inline void asc_reduce_sum_impl(vector_float& dst, vector_float src, vector_bool mask)
 {
     if ASC_IS_AIV {
          vcadd(dst, src, mask, MODE_ZEROING);
-    }   
+    }
 }
 
 #endif

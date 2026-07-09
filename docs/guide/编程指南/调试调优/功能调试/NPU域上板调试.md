@@ -57,12 +57,12 @@ msSanitizer工具是基于AI处理器的异常检测工具，包含了单算子�
 -   未初始化检测：工具可以协助用户定位由于内存未初始化可能导致的脏数据读取问题。
 -   同步检测：工具可以协助用户定位由于前序算子中的未配对同步指令导致的后续算子同步失败的问题。
 
-具体使用方法请参考[《算子开发工具用户指南》](https://hiascend.com/document/redirect/CannCommercialToolOpDev)。
+具体使用方法请参考[《msSanitizer用户指南》](https://gitcode.com/Ascend/mssanitizer/blob/master/docs/zh/user_guide/mssanitizer_user_guide.md)。
 
 **异常检测程序编译**
 ```shell
 // bisheng编译时增加sanitizer命令行
-bisheng add_custom.asc -o add_custom --sanitizer --lineinfo
+bisheng add_custom.asc -o add_custom --sanitizer -lineinfo
 ```
 **异常检测工具的使用**
 ```shell
@@ -92,7 +92,7 @@ msDebug是一款面向昇腾设备的算子调试工具，用于调试NPU侧运�
 
 #### 调试程序编译
 ```shell
-// bisheng编译时增加sanitizer命令行
+// bisheng编译时增加debug命令行
 bisheng add_custom.asc -o add_custom  -O0 -g
 ```
 #### 调试程序运行
@@ -169,4 +169,4 @@ export ASCEND_DUMP_PATH=./
 ```shell
 msdebug --core output2/extra-info/data-dump/0/xxx.core add_custom
 ```
-更多详细信息可以参考[《算子调试（msDebug）》](https://hiascend.com/document/redirect/mindstudio-op-msdebug)。
+更多详细信息可以参考[《msDebug用户指南》](https://gitcode.com/Ascend/msdebug/blob/master/docs/zh/user_guide/msdebug_user_guide.md)。

@@ -2,7 +2,7 @@
 
 ## 功能说明
 
-kernel侧TransData接口的计算需要开发者预留/申请临时空间，本接口用于在host侧获取预留/申请的最大最小临时空间大小，开发者基于此范围选择合适的空间大小作为Tiling参数传递到kernel侧使用。
+kernel侧TransData接口的计算需要开发者预留/申请临时空间，本接口用于在host侧获取预留/申请的最大和最小临时空间大小，开发者基于此范围选择合适的空间大小作为Tiling参数传递到kernel侧使用。
 
 -   为保证功能正确，预留/申请的临时空间大小不能小于最小临时空间大小。
 -   在最小临时空间-最大临时空间范围内，随着临时空间增大，kernel侧接口计算性能会有一定程度的优化提升。为了达到更好的性能，开发者可以根据实际的内存使用情况进行空间预留/申请。该接口**最大临时空间当前等于最小临时空间**。
@@ -10,7 +10,7 @@ kernel侧TransData接口的计算需要开发者预留/申请临时空间，本�
 ## 函数原型
 
 ```
-bool GetTransDataMaxMinTmpSize(const platform_ascendc::PlatformAscendC& platform, const ge::Shape& srcShape, const ge::Shape& dstShape,const ge::DataType dataType, const TransDataConfig &config, uint32_t& maxValue, uint32_t& minValue)
+bool GetTransDataMaxMinTmpSize(const platform_ascendc::PlatformAscendC& platform, const ge::Shape& srcShape, const ge::Shape& dstShape,const ge::DataType dataType, const TransDataConfig& config, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -62,9 +62,10 @@ GetTransDataMaxMinTmpSize返回值为true/false，true表示成功获取TransDat
 uint32_t maxSize;
 uint32_t minSize;
 int32_t n = 1, c = 16, d = 2, h = 4, w = 4, c1 = 1, c0 = 16;
-auto ncdhwShape = ge::Shape({ n, c, d, h, w });
-auto ndc1hwc0Shape = ge::Shape({ n, d, c1, h, w, c0});
+auto ncdhwShape = ge::Shape({n, c, d, h, w});
+auto ndc1hwc0Shape = ge::Shape({n, d, c1, h, w, c0});
 auto plat = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 TransDataConfig config = {DataFormat::NCDHW, DataFormat::NDC1HWC0};
-bool ret = GetTransDataMaxMinTmpSize(plat, ncdhwShape, ndc1hwc0Shape, ge::DataType::DT_FLOAT16, config, maxSize, minSize);
+bool ret =
+    GetTransDataMaxMinTmpSize(plat, ncdhwShape, ndc1hwc0Shape, ge::DataType::DT_FLOAT16, config, maxSize, minSize);
 ```
