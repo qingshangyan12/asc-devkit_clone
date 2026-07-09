@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例以矩阵转置为例，介绍Ascend C SIMD与SIMT混合编程场景下的访存合并优化思路。样例包含2个Case版本，从直接索引转置开始，再通过UB中转调整数据写回方式，使GM读写更接近连续访问，从而展示混合编程下矩阵转置的全局访存优化方法。
+本样例以矩阵转置为例，介绍Ascend C SIMD与SIMT混合编程方式下的访存优化思路。样例从连续复制基线和直接全局内存转置出发，逐步引入MTE搬运、UB中转、tile映射、UB padding和double buffer，展示在混合编程场景中如何用Vector侧MTE完成GM到UB的数据搬运，再通过SIMT VF完成UB内转置方向读取与GM写回。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -28,261 +28,159 @@
   output(x, y) = input(y, x)
   $$
 
-  - input为输入矩阵，形状为[H,W]，数据类型为float
-  - output为输出矩阵，形状为[W,H]，数据类型为float
+  - input为输入矩阵，形状为[H,W]，数据类型为float。
+  - output为输出矩阵，形状为[W,H]，数据类型为float。
 - 样例规格：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">MatrixTranspose</td></tr>
   <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">input</td><td align="center">[1024,1024]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">output</td><td align="center">[1024,1024]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">transpose_kernel</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">copy_kernel / transpose_naive_kernel / transpose_ub_*_kernel</td></tr>
   </table>
 
 ## 样例实现
 
 ### Case实现说明
 
-本样例通过调用不同的SIMT VF函数实现不同的访存策略，每个SIMT VF函数对应特定的Case版本。
+本样例通过编译期宏`SCENARIO_NUM`选择执行路径。Host侧以三槽形式启动`__global__ __vector__`核函数；核函数内部使用MTE接口将GM数据搬运到UB，并通过`asc_vf_call`调用`__simt_vf__`函数完成SIMT线程级处理。
 
-| Case   | 实现特点                                           | 调用的SIMT VF函数               | 优化特性              |
-| ------ | -------------------------------------------------- | -------------------------- | --------------------- |
-| Case 0 | 直接按照转置公式计算输出坐标，GM连续读、非连续写   | simt_transpose_naive     | 直接索引转置版本      |
-| Case 1 | 通过UB暂存tile并交换读写方向，GM读写更接近连续访问 | simt_transpose_coalesced | UB中转 + 全局访存合并 |
+| Case | 核函数 | 线程块数量 | SIMT线程数 | 本步引入的变化 |
+| --- | --- | --- | --- | --- |
+| 0 | `copy_kernel` | `core` | 2048 | 连续复制基线，Vector侧通过MTE执行GM->UB->GM搬运 |
+| 1 | `copy_kernel` | `core` | 1024 | 连续复制基线，线程数与后续1024线程转置版本对齐 |
+| 2 | `transpose_naive_kernel` | `core` | 2048 | 直接SIMT全局内存转置，GM连续读、非连续写 |
+| 3 | `transpose_ub_2tile_kernel` | `ceil(tiles / 2)` | 2048 | MTE搬入两个32x32 tile到UB，再由SIMT转置读UB并写回GM |
+| 4 | `transpose_ub_2tile_kernel` | `core` | 2048 | 固定Thread Block数，每个Thread Block循环处理多个tile分组 |
+| 5 | `transpose_ub_kernel` | `core` | 1024 | 每轮处理一个32x32 tile，降低线程数与索引复杂度 |
+| 6 | `transpose_ub_pad_kernel` | `core` | 1024 | UB tile增加2列padding，缓解转置读阶段的bank冲突 |
+| 7 | `transpose_ub_pad_kernel` | `core` | 1024 | 使用两份带padding的UB tile，为double buffer形式预留轮换buffer |
 
-#### 线程块布局
+其中`core`为硬件vector core数，通过`aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)`在运行时查询获得。`tiles`为总tile数`(W/32) x (H/32)`，1024x1024时为1024。
 
-本样例采用SIMD与SIMT混合编程方式，核函数内部通过 `asc_vf_call` 调用 `__simt_vf__` 函数。为方便对比各个版本的性能差异，本样例仅支持方阵，且矩阵宽高需要是32的整数倍，所有Case采用完全一致的线程块布局：
+### 线程块与tile映射
 
-- 本样例将二维tile坐标展平到一维 `blockIdx.x`，并将tile内32×32个元素展平到一维 `threadIdx.x`。
-- 每个tile大小为32×32，一个block处理一个tile。block数量为 `bn = grid_x * grid_y`，其中 `grid_x = matrix_width / TILE_DIM`，`grid_y = matrix_height / TILE_DIM`。
-
-基于上述切分方式，`blockIdx.x`表示展平后的一维tile编号。通过对 `grid_width` 整除和取模，可以还原出当前block负责的二维tile坐标 `(block_row, block_col)`。`threadIdx.x`表示tile内展平后的一维元素编号，通过对 `TILE_DIM` 整除和取模，可以还原出线程在tile内处理元素的局部坐标 `(tile_row, tile_col)`。
-
-```cpp
-int block_row = blockIdx.x / grid_width;
-int block_col = blockIdx.x % grid_width;
-
-int tile_row = threadIdx.x / TILE_DIM;
-int tile_col = threadIdx.x % TILE_DIM;
-```
-
-下图给出了一个更直观的映射示意。左侧表示1024×1024的矩阵被划分为32×32个tile。右侧表示其中一个block需要处理的一个tile，其大小为32×32。
+从Case 3开始，矩阵按32x32的tile处理。下图左侧表示1024x1024矩阵被划分为32x32个tile，右侧表示其中一个32x32的tile内的线程映射关系。tile内列索引记为`tx`，tile内行索引记为`ty`。
 
 <img src="./figures/blockMapping.png" width="60%">
 
-以图中绿色元素为例，可以直接用kernel里的内置变量来推导它在GM中的input坐标。
+以图中绿色元素为例，可以根据tile坐标和tile内局部坐标推导它在GM中的input坐标。
 
-- tile坐标是(2,1)，对应：
-  - block_row = 2
-  - block_col = 1
-  - blockIdx.x = block_row × grid_width + block_col = 2 × 32 + 1 = 65
-- 元素在tile内的局部坐标是(2,29)，对应：
-  - threadIdx.x = tile_row × TILE_DIM + tile_col = 2 × 32 + 29 = 93
+- 图中绿色元素所在的tile坐标是`(2, 1)`。对于1024x1024矩阵，`tiles_x = 1024 / 32 = 32`，因此对应`tile_id = 2 * 32 + 1 = 65`。
+- 图中绿色元素在tile内的局部坐标是`(2, 29)`，对应`ty = 2`、`tx = 29`。
 
-结合代码中的索引计算：
+代入坐标计算：
 
 ```cpp
-int input_row = block_row * TILE_DIM + tile_row;
-int input_col = block_col * TILE_DIM + tile_col;
-int index_in = input_col + width * input_row;
+uint32_t tile_y = tile_id / tiles_x;
+uint32_t tile_x = tile_id - tile_y * tiles_x;
+uint32_t x_index = tile_x * TILE_DIM + tx;
+uint32_t y_index = tile_y * TILE_DIM + ty;
+uint32_t input_offset = x_index + y_index * width;
 ```
 
-代入本例中的变量值：
+### 混合编程数据流
 
-- block_row = 65 / 32 = 2
-- block_col = 65 % 32 = 1
-- tile_row = 93 / 32 = 2
-- tile_col = 93 % 32 = 29
-- input_row = block_row × TILE_DIM + tile_row = 2 × 32 + 2 = 66
-- input_col = block_col × TILE_DIM + tile_col = 1 × 32 + 29 = 61
-
-因此，该线程在GM中处理的输入元素坐标就是：
-
-- input[input_row,input_col] = input[66,61]
-
-如果继续代入一维地址公式，则有：
-
-- index_in = input_col + width × input_row = 61 + 1024 × 66
-
-### 性能指标说明
-
-| 指标                | 说明                                                                                      |
-| ------------------- | ----------------------------------------------------------------------------------------- |
-| Task Duration(μs)|Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。|
-| aiv_time|Task在AI Vector Core上的理论执行时间，单位为μs。|
-| aiv_vec_time(μs) | vec类型指令（向量类运算指令）耗时，单位μs。 |
-| aiv_vec_ratio | vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比。 |
-| aiv_scalar_time(μs) | scalar类型指令（标量类运算指令）耗时，单位μs。 |
-| aiv_scalar_ratio | scalar类型指令（标量类运算指令）的cycle数在total cycle数中的占用比。 |
-| aiv_mte2_time(μs) | mte2类型指令（GM->UB搬运类指令）耗时，单位μs。 |
-| aiv_mte2_ratio | mte2类型指令（GM->UB搬运类指令）的cycle数在total cycle数中的占用比。 |
-| aiv_mte3_time(μs) | mte3类型指令（UB->GM搬运类指令）耗时，单位μs。 |
-| aiv_mte3_ratio | mte3类型指令（UB->GM搬运类指令）的cycle数在total cycle数中的占用比。 |
-
-### Case 0: 直接索引转置版本
-
-**样例目标**：实现基础的矩阵转置功能，作为后续优化版本的耗时对比基线
-
-**核心实现**：
-
-- 每个block处理一个32×32 tile。
-- 每个SIMT线程处理tile内1个元素。
-- 线程先按原坐标从GM读取输入元素，再计算该元素转置后的输出位置，并把数据直接写到转置后的GM地址。
-- GM读取方向连续，GM写回方向不连续。
-
-下图展示了Case 0的数据流，其中标红展示了一个Warp在读取GM和写入GM时处理的元素。对于同一个Warp的线程会读取GM输入中tile的一行元素，写回到GM输出中tile的一列。在读取GM输入时，相邻线程访问的元素地址连续，为连续读，在写回到输出时，相邻线程却被拆散到输出矩阵的不同行上，为不连续写。因此，这一版的核心问题是转置后的写回地址不再连续，这通常会显著影响整体吞吐。
-
-<img src="./figures/case0.png" width="60%">
-
-**关键代码**：
+Case 3及之后的转置主路径把GM到UB的数据搬运放在Vector侧执行：
 
 ```cpp
-int index_in = input_col + width * input_row;
-int index_out = input_row + height * input_col;
-
-output[index_out] = input[index_in];
+asc_set_gm2ub_loop_size(TILE_DIM, 1);
+asc_set_gm2ub_loop1_stride(width * sizeof(float), ub_row_bytes);
+asc_copy_gm2ub_align(dst, src, 1, TILE_ROW_BYTES, 0, 0, false, 0, 0, 0);
+asc_set_gm2ub_loop_size(1, 1);
 ```
 
-**性能数据**：
-
-| Task Duration(μs) | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
-|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| 63.731 | 62.810 | 58.143 | 0.926 | 2.439 | 0.039 | 0.059 | 0.001 | 0.02 | 0.0 |
-
-**分析**：
-
-- Case 0的Task Duration为63.731μs，作为直接索引转置版本，是后续优化版本的对比基线。
-- 该版本GM读取仍然是连续读，但GM写回是跨行、非连续写，同一个Warp的写请求难以高效合并，因此整体耗时主要受限于写回访存模式。
-
----
-
-### Case 1: UB中转 + 全局访存合并的转置版本
-
-**优化目标**：通过UB中转调整转置写回方式，使GM读写更接近连续访问，降低端到端耗时
-
-**核心实现**：
-
-- 将输入数据的tile从GM搬运到UB上。
-- 每个线程从UB中取数，一个Warp会读取UB中tile的一列元素。
-- 将取出的值写回GM中的转置位置，一个Warp会将读取UB的一列元素写入到GM输出中tile的一行。
-
-下图展示了Case 1的数据流，其中标红和标黄的元素展示了一个Warp的线程在读取GM和写入GM时处理的元素。读取GM输入时，整个tile会按照GM的排布搬到UB，在写入GM输出时一个Warp的线程会读取UB上的一列元素写回到其对应的转置后的位置。
-
-<img src="./figures/case1.png" width="60%">
-
-与Case 0不同的是，Case 0中线程是“直接把输入元素写到转置后的GM位置”，所以相邻线程会被打散到输出矩阵的不同行上，而Case 1中，核函数先通过 `asc_copy_gm2ub_align` 将输入tile按GM布局搬到UB，再由SIMT线程从UB中按转置方向读取并写回GM。因此，这一版的核心收益是：把原来不连续的GM写回转移为UB侧转置读取，换来GM侧“读连续、写也连续”的访问模式，整体耗时明显低于Case 0。
-
-**关键代码**：
+MTE搬运完成后，通过流水同步保证SIMT VF读取到完整tile：
 
 ```cpp
-uint32_t tile_row = threadIdx.x / TILE_DIM;
-uint32_t tile_col = threadIdx.x % TILE_DIM;
-
-output_tile[tile_col + tile_row * height] = input_tile[tile_col * TILE_DIM + tile_row];
+asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+asc_vf_call<simt_store_tile>(dim3(TILE_DIM, TILE_DIM, 1), output, tile, height, tiles_x, tile_id);
 ```
 
-**优化手段**：
+UB中转的核心思想如下图所示：GM读取阶段按输入矩阵行方向连续搬入UB；GM写回阶段交换输出tile坐标，使同一个warp写出输出矩阵的一行。原本非连续的GM写被转移为UB内转置方向读取。
 
-- 使用UB作为tile中转区，把Case 0中的非连续GM写转移为UB侧转置读取。
-- 调整输出tile的block坐标，使写回GM时同一个Warp更接近按行连续写入。
-- 通过 `asc_sync_notify()` / `asc_sync_wait()` 保证GM到UB的搬运完成后再启动SIMT VF处理。
+<img src="./figures/case3.png" width="60%">
 
-**性能数据**：
+### Case说明
 
-| Task Duration(μs) | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
-|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| 30.602 | 29.6 | 16.942 | 0.572 | 3.404 | 0.115 | 6.912 | 0.234 | 0.022 | 0.001 |
+#### Case 0 / Case 1：MTE连续复制基线
 
-**分析**：
+Case 0和Case 1不执行转置，只用于对比连续GM搬运能力。Vector核函数将连续数据从GM搬到UB，再从UB写回GM；SIMT VF只参与对UB tile的简单触达，用于保持混合编程调用路径。
 
-- 相比Case 0的直接索引转置版本，Case 1的Task Duration从63.731μs降低到30.602μs，耗时下降约52.0%。
-- 按Task Duration计算，Case 1整体约为Case 0的2.08倍性能，说明通过UB中转改善GM写回连续性后，端到端耗时有明显下降。
-- Case 1降低了Case 0中代价较高的非连续GM写回开销，但代码中仍存在GM到UB的tile搬运、流水同步以及SIMT线程对UB的转置方向读取，因此优化后的Task Duration仍不会等同于单纯连续GM读写的理想耗时。
+#### Case 2：直接全局内存转置
 
----
+Case 2不使用UB中转。SIMT线程读取`input(row, col)`，直接写入`output(col, row)`。同一个warp内相邻线程的GM读取地址连续，但写回地址跨输出矩阵的不同行，难以形成连续写事务。
 
-## 性能对比总结
+#### Case 3 / Case 4：MTE搬入UB后转置写回
 
-### Ascend 950PR性能数据
+Case 3按切分后的tile数量设置Thread Block数量，每个Thread Block处理两个tile。Case 4将Thread Block数量固定为硬件vector core数，并在核函数内部循环处理多个tile分组。两者都由Vector侧MTE完成GM到UB的tile搬入，再由SIMT VF按转置方向读取UB并连续写回GM。
 
-**综合优化效果**：
+#### Case 5：1024线程UB中转
 
-- 通过Case 0到Case 1的访存合并优化，样例Task Duration从63.731μs降低到30.602μs，耗时下降约52.0%。
-- Case 1相对Case 0性能提升约2.08倍，说明通过UB中转改善GM写回连续性后，端到端耗时有明显收益。
+Case 5每个Thread Block每轮处理一个32x32 tile，SIMT线程配置为`dim3(32, 32, 1)`。相比2048线程的双tile版本，该实现的索引逻辑更简单，也更接近一个tile对应一个Thread Block的自然映射。
 
-| Case version | Task Duration(μs) | 端到端性能相对Case 0 | 优化点                           |
-| ------------ | ----------------- | -------------------- | -------------------------------- |
-| Case 0       | 63.731            | **1x**         | 直接索引转置，GM连续读、非连续写 |
-| Case 1       | 30.602            | **2.08x**      | UB中转，全局访存合并             |
+#### Case 6：UB中转+padding
 
-## 调优建议
+Case 6把UB中的tile布局从32x32调整为32x34。MTE搬入时通过`asc_set_gm2ub_loop1_stride`将UB目的行跨度设置为`34 * sizeof(float)`，使每行末尾保留2列padding，后续SIMT VF仍只读取有效的32列。
 
-1. **优先关注GM访存连续性**：矩阵转置计算量很小，端到端耗时主要受读写访存模式影响。
-2. **使用UB中转改善写回模式**：当直接转置导致GM非连续写时，可以将不连续访问转移到UB侧，换取GM侧连续读写。
-3. **注意搬运与流水同步开销**：UB中转需要从GM搬运到UB，并通过流水同步保证tile数据可被SIMT线程读取，优化时需要同时关注GM访存收益、UB转置读和流水同步开销之间的平衡。
+下面以Ascend 950PR/Ascend 950DT的UB划分规则为例说明padding的作用。
+
+<img src="./figures/bank结构示意图.png">
+
+UB内连续地址按32B粒度映射到bank0到bank15：
+
+<img src="./figures/bank内存排布示意图.png">
+
+Case 5中，一个warp转置读UB时会读取同一列的32个元素，容易集中访问相同bank group的subbank资源：
+
+<img src="./figures/case5bank.png">
+
+Case 6增加padding后，行跨度由32个float变为34个float，同一列元素会错开排布到不同subbank，降低转置读阶段的bank冲突风险：
+
+<img src="./figures/case6bank.png">
+
+#### Case 7：UB中转+padding+double buffer形式
+
+Case 7使用两份32x34的UB tile按`cnt`轮换，为double buffer形式预留独立buffer。该版本的核心目的是展示混合编程场景下如何在Vector侧组织MTE搬入buffer，并把当前buffer交给SIMT VF处理。
 
 ## 编译运行
 
-在本样例根目录下执行如下步骤，编译并执行样例。
+编译前请先加载CANN环境变量：
 
-- 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，配置环境变量。
-  ```bash
-  source ${install_path}/cann/set_env.sh
-  ```
+```bash
+source ${install_path}/cann/set_env.sh
+```
 
-  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
+编译运行命令如下：
 
-- 样例执行
+```bash
+mkdir -p build
+cd build
+SCENARIO_NUM=7
+cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=${SCENARIO_NUM} ..
+make -j
+./matrix_transpose 1024
+```
 
-  在本样例目录下执行如下命令。
-  ```bash
-  SCENARIO_NUM=0                       # 选择执行场景，可选0-1
-  mkdir -p build && cd build;          # 创建并进入build目录
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # 编译工程
-  ./demo                               # 执行样例
-  ```
+`SCENARIO_NUM`取值范围为`0`到`7`，默认值为`7`。矩阵规模可通过运行参数指定，但需要是32的整数倍。
 
-- 编译选项说明
+运行成功时，输出示例如下：
 
-  | 选项             | 可选值      | 说明              |
-  | ---------------- | ----------- | ----------------- |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
-  | `SCENARIO_NUM` | `0`-`1` | 样例类型，默认为0 |
-
-- 执行结果
-
-  执行结果如下，说明精度对比成功。
-
-  ```text
-  [Success] Case accuracy is verification passed.
-  ```
+```text
+Usage: ./matrix_transpose [matrix_size] (compile-time SCENARIO_NUM=7)
+Running case 7: transpose_mte_ub_pad_db...
+Threads/Thread Block: 1024
+Matrix shape: 1024 x 1024
+[Success] Case accuracy verification passed.
+```
 
 ## 性能分析
 
-使用 `msprof` 工具获取详细性能数据：
+可使用`msprof op`采集性能数据：
 
 ```bash
-msprof ./demo   # 分析case的性能
+msprof op ./matrix_transpose 1024
 ```
 
-当前目录下会生成PROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件
-
-```bash
-PROF_xxxx_XXXXXX
-├── device_{id}
-└── host
-└── mindstudio_profiler_log
-└── mindstudio_profiler_output    # 保存Host和各个Device的性能数据汇总
-    ├── msprof_*.json
-    ├── xx_*.csv
-    └── README.txt
-```
-
-查看具体的性能分析结果：
-
-```bash
-# 查看Task Duration 以及各项数据
-cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
-```
+本样例的混合编程版本与纯SIMT版本实现路径不同，性能数据需要重新采集后再填入文档。分析时建议优先关注`OpBasicInfo.csv`中的`Task Duration`，并结合`PipeUtilization.csv`中的MTE2、Vector流水占比，以及`ResourceConflictRatio.csv`中的UB bank冲突信息判断瓶颈。

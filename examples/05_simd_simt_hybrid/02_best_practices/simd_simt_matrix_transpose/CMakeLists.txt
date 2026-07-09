@@ -14,21 +14,25 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-set(SCENARIO_NUM "0" CACHE STRING "Case type to run (0-1)")
+set(SCENARIO_NUM "7" CACHE STRING "Case type to run (0-7)")
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU ARCH, e.g. dav-3510")
 
-add_executable(demo
+if(NOT SCENARIO_NUM MATCHES "^[0-7]$")
+    message(FATAL_ERROR "SCENARIO_NUM must be one of 0, 1, 2, 3, 4, 5, 6, 7.")
+endif()
+
+add_executable(matrix_transpose
     matrix_transpose.asc
 )
 
-target_compile_definitions(demo PRIVATE
+target_compile_definitions(matrix_transpose PRIVATE
     SCENARIO_NUM=${SCENARIO_NUM}
 )
 
-target_compile_options(demo PRIVATE
+target_compile_options(matrix_transpose PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
 
-target_link_libraries(demo PRIVATE
+target_link_libraries(matrix_transpose PRIVATE
     m
 )
