@@ -8,7 +8,7 @@
 
 ## 功能说明
 
-头文件路径为：`"tensor_api/tensor.h"`。
+头文件路径为：`tensor_api/tensor.h`。
 
 Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的bias数据搬运到BiasTable Buffer，作为Mmad计算中的bias输入。
 
@@ -39,7 +39,7 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 ## 参数说明
 
-**表1**  Copy接口参数说明
+**表 1**  Copy接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
@@ -47,7 +47,7 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 | dst | 输出 | 目的张量，存储位置为`Location::BIAS`，数据格式为ND。 |
 | src | 输入 | 源张量，存储位置为`Location::L1`，数据格式为ND。 |
 
-**表2**  MakeCopy接口参数说明
+**表 2**  MakeCopy接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
@@ -57,6 +57,9 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 ## 数据类型
 
 支持的目的张量和源张量的数据类型组合如下：
+
+**表 3**  支持的数据类型组合
+
 | 目的张量数据类型 | 源张量数据类型 |
 | :--- | :--- |
 | `float` | `bfloat16_t` |
@@ -70,9 +73,9 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 ## 约束说明
 
-- 源张量内存地址和大小需要满足32Byte对齐要求
+- 源张量内存地址和大小需要满足32Byte对齐要求。
 - 目的张量内存地址和大小需要满足64Byte对齐要求。
-- 由于BiasTable Buffer大小为4KB，因此每次搬运最多4KB数据
+- 由于BiasTable Buffer大小为4KB，因此每次搬运最多4KB数据。
 - batch模式要求源张量和目的张量Batch数量一致。
 - batch模式下，如果Global Memory上的Shape大小非对齐，由于L1 Buffer和BiasTable Buffer上有数据对齐要求，源张量和目的张量列方向Shape大小必须按32Byte对齐。
 

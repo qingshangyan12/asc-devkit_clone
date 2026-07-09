@@ -43,12 +43,12 @@ auto atom = MakeCopy(CopyL0C2UB{}, CopyL0C2UBTraitCustom{}).with(params);
 Copy(atom, ub, l0c);
 ```
 
-## 支持范围
+## 产品支持情况
 
-参考底层Fixpipe能力，随路Relu包含Normal Relu、Leaky Relu和PRelu等模式。当前Tensor API的L0C Buffer到Global Memory/Unified Buffer搬运通过`enableRelu`暴露Normal Relu能力。当前不支持随路PRelu。
+根据底层Fixpipe的能力，随路Relu包含Normal Relu、Leaky Relu和PRelu等模式。当前Tensor API的L0C Buffer到Global Memory/Unified Buffer搬运通过`enableRelu`暴露Normal Relu能力，当前不支持随路PRelu。
 
 ## 约束说明
 
 - `enableRelu`为编译期trait配置，默认不使能。
-- 量化和Relu参数不能为INF、NaN或非规格化数。
+- 量化和Relu参数不能为`Inf`、`NaN`或非规格化数。
 - 当前Tensor API不支持随路PRelu。
