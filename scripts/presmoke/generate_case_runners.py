@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import json
 import logging
 import re
@@ -73,12 +74,14 @@ NO_CMAKE_ARCH_INJECTION_CASES = {
 
 TENSORFLOW_SKIP_REASON = "requires TensorFlow 2.6.5 environment; skipped by presmoke"
 MATMUL_L2CACHE_SKIP_REASON = "data size (~308M) causes overtime in cpu mode; cpu mode skipped by presmoke"
+LONG_TIME_REASON = "The execution time in CPU mode is too long and needs to be skipped"
 
 
 @dataclass
 class SkipConfig:
     reason: str = ""
     modes: List[str] = field(default_factory=list)
+    archs: List[str] = field(default_factory=list)
 
 
 SKIP_CONFIG = {
@@ -93,6 +96,21 @@ SKIP_CONFIG = {
     "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_l2cache": SkipConfig(
         reason=MATMUL_L2CACHE_SKIP_REASON,
         modes=["cpu"],
+    ),
+    "01_simd_cpp_api/05_best_practices/00_vector_compute/add_high_performance": SkipConfig(
+        reason=LONG_TIME_REASON,
+        modes=["cpu"],
+        archs=["dav-3510"],
+    ),
+    "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_eltwise_high_performance": SkipConfig(
+        reason=LONG_TIME_REASON,
+        modes=["cpu"],
+        archs=["dav-3510"],
+    ),
+    "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_high_performance": SkipConfig(
+        reason=LONG_TIME_REASON,
+        modes=["cpu"],
+        archs=["dav-3510"],
     ),
 }
 
@@ -133,6 +151,7 @@ class CaseReport:
     skip: bool = False
     skip_reason: str = ""
     skip_modes: List[str] = field(default_factory=list)
+    skip_archs: List[str] = field(default_factory=list)
     reasons: List[str] = field(default_factory=list)
     commands: List[str] = field(default_factory=list)
 
@@ -149,6 +168,7 @@ class RunnerRenderSpec:
     custom_op_package_case: bool = False
     skip_reason: str = ""
     skip_modes: List[str] = field(default_factory=list)
+    skip_archs: List[str] = field(default_factory=list)
 
 
 def main() -> int:
@@ -219,7 +239,9 @@ def write_runner(project_root: Path, runners_root: Path, cell, runnable_on_targe
     runner.chmod(0o755)
     skip_reason = render_spec.skip_reason
     skip_modes = render_spec.skip_modes
-    all_modes_skipped = bool(skip_reason and all(mode in skip_modes for mode in cell.example.modes))
+    skip_archs = render_spec.skip_archs
+    skip_active = not skip_archs or cell.arch in skip_archs
+    all_modes_skipped = skip_active and bool(skip_reason and all(mode in skip_modes for mode in cell.example.modes))
     return CaseReport(
         case=rel,
         runner=runner.relative_to(project_root).as_posix(),
@@ -232,6 +254,7 @@ def write_runner(project_root: Path, runners_root: Path, cell, runnable_on_targe
         skip=all_modes_skipped,
         skip_reason=skip_reason,
         skip_modes=skip_modes,
+        skip_archs=skip_archs,
         reasons=reasons,
         commands=[command.raw for command in cell.commands if command.raw],
     )
@@ -524,13 +547,14 @@ def build_runner_render_spec(cell, confidence: str, reasons: List[str]) -> tuple
         verify_cmds = [Command(":", "verify")]
     custom_op_package_case = source_rel == CUSTOM_OP_PACKAGE_CASE
     custom_op_dependency = requires_custom_op_package(source_rel)
-    skip_reason, skip_modes = explicit_skip_config(source_rel)
-    all_modes_skipped = skip_reason and all(mode in skip_modes for mode in cell.example.modes)
+    skip_reason, skip_modes, skip_archs = explicit_skip_config(source_rel)
+    skip_active = not skip_archs or cell.arch in skip_archs
+    all_modes_skipped = skip_active and skip_reason and all(mode in skip_modes for mode in cell.example.modes)
     if all_modes_skipped:
         reasons.append("explicit_skip")
         confidence = "high"
         build_cmds, run_cmds, verify_cmds = noop_stage_commands()
-    elif skip_reason:
+    elif skip_active and skip_reason:
         reasons.append("partial_mode_skip")
         confidence = "high"
     elif custom_op_package_case:
@@ -550,6 +574,7 @@ def build_runner_render_spec(cell, confidence: str, reasons: List[str]) -> tuple
             custom_op_package_case=custom_op_package_case,
             skip_reason=skip_reason,
             skip_modes=skip_modes,
+            skip_archs=skip_archs,
         ),
         confidence,
     )
@@ -669,9 +694,9 @@ def requires_custom_op_package(rel: str) -> bool:
     return False
 
 
-def explicit_skip_config(rel: str) -> tuple[str, List[str]]:
+def explicit_skip_config(rel: str, arch: str = "") -> tuple[str, List[str], List[str]]:
     config = SKIP_CONFIG.get(rel, SkipConfig())
-    return config.reason, config.modes
+    return config.reason, config.modes, config.archs
 
 
 def render_runner(
@@ -717,6 +742,7 @@ def apply_scenario_to_render_spec(spec: RunnerRenderSpec) -> RunnerRenderSpec:
         custom_op_package_case=spec.custom_op_package_case,
         skip_reason=spec.skip_reason,
         skip_modes=spec.skip_modes,
+        skip_archs=spec.skip_archs,
     )
 
 
@@ -787,6 +813,7 @@ def runner_header(spec: RunnerRenderSpec) -> List[str]:
         f'CASE_REL={shlex.quote(source_rel)}',
         *skip_reason_lines(spec.skip_reason),
         *skip_modes_lines(spec.skip_modes),
+        *skip_archs_lines(spec.skip_archs),
         'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"',
         f'source "$SCRIPT_DIR/{case_entry_relative_path(spec.rel)}"',
         'presmoke_case_init "$CASE_REL"',
@@ -815,6 +842,13 @@ def skip_modes_lines(skip_modes: List[str]) -> List[str]:
         return []
     modes_str = " ".join(skip_modes)
     return [f"SKIP_MODES=({modes_str})", ""]
+
+
+def skip_archs_lines(skip_archs: List[str]) -> List[str]:
+    if not skip_archs:
+        return []
+    archs_str = " ".join(skip_archs)
+    return [f"SKIP_ARCHS=({archs_str})", ""]
 
 
 def runner_function(name: str, body: List[str]) -> List[str]:
