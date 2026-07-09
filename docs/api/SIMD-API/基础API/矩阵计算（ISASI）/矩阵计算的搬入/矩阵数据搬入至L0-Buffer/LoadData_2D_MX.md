@@ -41,9 +41,9 @@
 
 其中，L0A_MX/L0B_MX Buffer的大小为4KB，和L0A/L0B Buffer地址的映射关系如下：
 
-$$L0A\_MX\ Buffer\ Address = L0A\ Buffer\ Address / 16$$
+$$L0A_MX\ Buffer\ Address = L0A\ Buffer\ Address / 16$$
 
-$$L0B\_MX\ Buffer\ Address = L0B\ Buffer\ Address / 16$$
+$$L0B_MX\ Buffer\ Address = L0B\ Buffer\ Address / 16$$
 
 - 对于b4数据类型，左右矩阵数据分形在L0A Buffer中为一个16×64的矩阵，在L0B Buffer中为一个64×16的矩阵。
 - 对于b8数据类型，左右矩阵数据分形在L0A Buffer中为一个16×32的矩阵，在L0B Buffer中为一个32×16的矩阵。
@@ -51,10 +51,10 @@ $$L0B\_MX\ Buffer\ Address = L0B\ Buffer\ Address / 16$$
 
 ## 函数原型<a id="section620mcpsimp"></a>
 
-```cpp
+``cpp
 template <typename T, typename U>
 __aicore__ inline void LoadData(const LocalTensor<U>& dst, const LocalTensor<T>& src, const LocalTensor<fp8_e8m0_t>& srcMx, const LoadData2DParamsV2& loadDataParams, const LoadData2DMxParams& loadMxDataParams)
-```
+``
 
 
 ## 参数说明<a id="section622mcpsimp"></a>
@@ -74,7 +74,7 @@ __aicore__ inline void LoadData(const LocalTensor<U>& dst, const LocalTensor<T>&
 | src | 输入 | 源操作数，类型为LocalTensor。<br>数据类型需要与dst保持一致。  <br>支持的物理存储位置为L1 Buffer（TPosition: A1/B1）。 |
 | srcMx | 输入 | 源操作数，类型为LocalTensor，仅支持fp8_e8m0_t类型。 |
 | loadDataParams | 输入 | LoadData参数结构体，类型为LoadData2DParamsV2。具体参考表[LoadData（2D矩阵搬运V2）](LoadData_2D_V2.md)中的LoadData2DParamsV2结构体内参数说明。 <br>**本结构体用于控制左右矩阵数据的搬运。**  <br>|
-| loadMxDataParams | 输入 | LoadData参数结构体，类型为LoadData2DMxParams。具体参考[表3](#table15901153712305)。<br>**本结构体用于控制左右量化系数矩阵的搬运。**  <br>上述结构体参数定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_mm.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
+| loadMxDataParams | 输入 | LoadData参数结构体，类型为LoadData2DMxParams。具体参考[表3](#table15901153712305)。<br>**本结构体用于控制左右量化系数矩阵的搬运。**  <br>上述结构体参数定义请参考`${INSTALL_DIR}/asc/include/ascendc/basic_api/interface/kernel_struct_mm.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
 
 **表 3** LoadData2DMxParams结构体参数说明<a name="table15901153712305"></a>
 

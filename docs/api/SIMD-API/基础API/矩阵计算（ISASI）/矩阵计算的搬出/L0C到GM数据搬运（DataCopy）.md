@@ -1,4 +1,4 @@
-# L0C到GM数据搬运（DataCopy）<a id="ZH-CN_TOPIC_0000002569070977"></a>
+﻿# L0C到GM数据搬运（DataCopy）<a id="ZH-CN_TOPIC_0000002569070977"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002542828493_section796754519912"></a>
 
@@ -52,10 +52,10 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 
 - 数据搬运接口，通路L0C Buffer（CO1）-\>GM，配合设置寄存器实现量化和ReLU激活，NZ到ND格式的转换，函数原型为：
 
-    ```cpp
+    ``cpp
     template <typename T, typename U>
     __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyCO12DstParams& intriParams)
-    ```
+    ``
 
 - [SetFixPipeConfig](./寄存器配置说明/SetFixPipeConfig.md)：寄存器设置接口，通过调用该接口设置Vector随路量化，其中tensor的每个元素都代表一个量化参数，启用tensor量化时需要设置。
 
@@ -86,7 +86,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 | ---------- | ---------- | ---------- |
 | dst | 输出 | 目的操作数，类型为GlobalTensor，数据格式为NZ、ND格式，ND地址要求满足1字节对齐，NZ地址需要满足32字节对齐。 |
 | src | 输入 | 源操作数，类型为LocalTensor，支持的物理地址为L0C Buffer（TPosition为CO1），为Mmad接口计算的结果。数据格式为NZ格式，地址需要满足64字节对齐。 |
-| intriParams | 输入 | 搬运参数，类型为[DataCopyCO12DstParams](#zh-cn_topic_0000002542828493_table35908519282)。 <br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
+| intriParams | 输入 | 搬运参数，类型为[DataCopyCO12DstParams](#zh-cn_topic_0000002542828493_table35908519282)。 <br>具体定义请参考`${INSTALL_DIR}/asc/include/ascendc/basic_api/interface/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
 
 **表3** DataCopyCO12DstParams结构体参数定义<a id="zh-cn_topic_0000002542828493_table35908519282"></a>
 
@@ -141,10 +141,10 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
     - 非饱和模式：CTRL\[48\]设置成1'b1，inf/nan保持原输出。
     - 饱和模式：CTRL\[48\]设置成1'b0，inf输出会被饱和为±MAX，nan输出会被饱和为0。
 
-        ```cpp
+        ``cpp
         // 设置CTRL[48]为0，开启浮点数饱和模式
         AscendC::AscendCUtils::SetOverflow(0);
-        ```
+        ``
 
     对于整数类型只有饱和模式。
 <!-- end id17 -->
@@ -153,15 +153,15 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 
     对于浮点类型inf/nan输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式；
 
-    对于fp8\_e4m3fn\_t类型，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行更精细的设置；
+    对于fp8_e4m3fn_t类型，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行更精细的设置；
 
-    - 非饱和模式：CTRL\[48\]设置成1'b1，inf/nan保持原输出。对于fp8\_e4m3fn\_t类型，若结果的绝对值为inf或大于fp8\_e4m3fn\_t的最大规格化值，则输出结果为nan。
-    - 饱和模式：CTRL\[48\]设置成1'b0，inf输出会被饱和为±MAX， nan输出会被饱和为0。对于fp8\_e4m3fn\_t类型，当CTRL\[50\]设置成1'b0时，nan被转换为零，当CTRL\[50\]设置成1'b1时，nan保持不变，若结果的绝对值为inf或大于fp8\_e4m3fn\_t的最大规格化值，则结果为最大规格化值。
+    - 非饱和模式：CTRL\[48\]设置成1'b1，inf/nan保持原输出。对于fp8_e4m3fn_t类型，若结果的绝对值为inf或大于fp8_e4m3fn_t的最大规格化值，则输出结果为nan。
+    - 饱和模式：CTRL\[48\]设置成1'b0，inf输出会被饱和为±MAX， nan输出会被饱和为0。对于fp8_e4m3fn_t类型，当CTRL\[50\]设置成1'b0时，nan被转换为零，当CTRL\[50\]设置成1'b1时，nan保持不变，若结果的绝对值为inf或大于fp8_e4m3fn_t的最大规格化值，则结果为最大规格化值。
 
-        ```cpp
+        ``cpp
         // 设置CTRL[48]为0，开启浮点数饱和模式
         AscendC::AscendCUtils::SetOverflow(0);
-        ```
+        ``
 
     对于整数类型只有饱和模式。
 <!-- end id20 -->
@@ -169,9 +169,9 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 ## 调用示例<a id="zh-cn_topic_0000002542828493_section088124295117"></a>
 
 <!-- npu="950,A3,910b" id21 -->
-- 示例一：Mmad含有矩阵乘偏置，左矩阵和右矩阵的数据类型为int8\_t，结果矩阵的数据类型为int32\_t。量化模式DEQF16，Scalar量化参数为2.0，将Mmad计算出的结果由int32\_t量化成half并搬出。DataCopy完整样例请参考[data_copy_l0c2gm](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_l0c2gm)。
+- 示例一：Mmad含有矩阵乘偏置，左矩阵和右矩阵的数据类型为int8_t，结果矩阵的数据类型为int32_t。量化模式DEQF16，Scalar量化参数为2.0，将Mmad计算出的结果由int32_t量化成half并搬出。DataCopy完整样例请参考[data_copy_l0c2gm](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_l0c2gm)。
 
-    ```cpp
+    ``cpp
     // Scalar量化，量化参数为2.0
     float quantScalar = 2.0;
     uint64_t deqScalar = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&quantScalar));
@@ -188,11 +188,11 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
     intriParams.nz2ndEn = true; // 开启NZ2ND格式转换
     // 根据intriParams中的参数，执行最终的数据搬运
     AscendC::DataCopy(cGM, cLocal, intriParams);
-    ```
+    ``
 
-- 示例二：Mmad含有矩阵乘偏置，左矩阵和右矩阵的数据类型为int8\_t，结果矩阵的数据类型为int32\_t。量化模式VDEQF16，Tensor量化，将Mmad计算出的结果由int32\_t量化成half并搬出。DataCopy完整样例请参考[data_copy_l0c2gm](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_l0c2gm)。
+- 示例二：Mmad含有矩阵乘偏置，左矩阵和右矩阵的数据类型为int8_t，结果矩阵的数据类型为int32_t。量化模式VDEQF16，Tensor量化，将Mmad计算出的结果由int32_t量化成half并搬出。DataCopy完整样例请参考[data_copy_l0c2gm](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_l0c2gm)。
 
-    ```cpp
+    ``cpp
     // CeilAlign定义如下
     __aicore__ inline uint16_t CeilAlign(uint16_t numerator, uint16_t denominator) 
     {
@@ -221,12 +221,12 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
     intriParams.reluPre = 1; // 开启ReLU
     // 根据intriParams中的参数，执行最终的数据搬运
     AscendC::DataCopy(cGM, cLocal, intriParams);
-    ```
+    ``
 <!-- end id21 -->
 <!-- npu="310b" id22 -->
-- 示例三：Mmad含有矩阵乘偏置，左矩阵和右矩阵的数据类型为int8\_t，结果矩阵的数据类型为int32\_t。量化模式DEQF16，scalar量化参数为0.5，将Mmad计算出的结果由int32\_t量化成half并搬出。（该示例仅适用于Atlas 200I/500 A2 推理产品）
+- 示例三：Mmad含有矩阵乘偏置，左矩阵和右矩阵的数据类型为int8_t，结果矩阵的数据类型为int32_t。量化模式DEQF16，scalar量化参数为0.5，将Mmad计算出的结果由int32_t量化成half并搬出。（该示例仅适用于Atlas 200I/500 A2 推理产品）
 
-    ```cpp
+    ``cpp
     #ifdef ASCENDC_CPU_DEBUG
     #include "tikicpulib.h"
     #endif
@@ -442,5 +442,5 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
             op.Process();                                                                                                     \
         }
     KERNEL_CUBE_DATACOPY(half, int8_t, int8_t, int32_t, 128, 1, 1, QuantMode_t::DEQF16);
-    ```
+    ``
 <!-- end id22 -->

@@ -76,9 +76,9 @@ MmadBitModeParams类使用union与bit-field方法，采用bit位表达参数类�
 
 MmadBitModeParams类可以直接使用MmadBitModeParams结构体类型对象初始化：
 
-```cpp
+``cpp
 __aicore__ inline MmadBitModeParams(const MmadBitModeParams &mmadParams_);
-```
+``
 
 也可以使用各参数的Set函数修改参数值，并且由于使用了联合体，还可以对config0直接进行逐bit位修改来修改参数。
 
@@ -86,23 +86,23 @@ __aicore__ inline MmadBitModeParams(const MmadBitModeParams &mmadParams_);
 
 - 不传入bias
 
-  ```cpp
+  ``cpp
   template <typename T, typename U, typename S>
   __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const MmadBitModeParams& mmadParams)
 
   template <typename T, typename U, typename S>
   __aicore__ inline void MmadMx(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const MmadBitModeParams& mmadParams)
-  ```
+  ``
 
 - 传入bias
 
-  ```cpp
+  ``cpp
   template <typename T, typename U, typename S, typename V>
   __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias, const MmadBitModeParams& mmadParams)
 
   template <typename T, typename U, typename S, typename V>
   __aicore__ inline void MmadMx(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias, const MmadBitModeParams& mmadParams)
-  ```
+  ``
 
 ## 参数说明
 
@@ -114,7 +114,7 @@ __aicore__ inline MmadBitModeParams(const MmadBitModeParams &mmadParams_);
 | fm | 输入 | 源操作数，左矩阵A，类型为LocalTensor，支持的物理存储位置为L0A Buffer（TPosition:A2）。<br>左矩阵A对应的scale矩阵起始地址为：A矩阵起始对应地址/16。<br>对于fp4场景LocalTensor的起始地址需要按照512字节对齐。对于fp8场景LocalTensor的起始地址需要按照1024字节对齐。 |
 | filter | 输入 | 源操作数，右矩阵B，类型为LocalTensor，支持的物理存储位置为L0B Buffer（TPosition:B2）。<br>右矩阵b对应的scale矩阵起始地址为：B矩阵起始对应地址/16。<br>对于fp4场景LocalTensor的起始地址需要按照512字节对齐。对于fp8场景LocalTensor的起始地址需要按照1024字节对齐。 |
 | bias | 输入 | 源操作数，Bias矩阵，类型为LocalTensor，支持的物理存储位置为BT Buffer（TPosition:C2）。<br>LocalTensor的起始地址需要按照64字节对齐。 |
-| mmadParams | 输入 | 矩阵乘相关参数。<br>该参数类型的具体定义请参考\$\{INSTALL_DIR\}/include/ascendc/basic_api/interface/kernel_struct_mm.h，\$\{INSTALL_DIR\}请替换为CANN软件安装后文件存储路径。<br>MmadBitModeParams参数说明请参考下表。 |
+| mmadParams | 输入 | 矩阵乘相关参数。<br>该参数类型的具体定义请参考`${INSTALL_DIR}/asc/include/ascendc/basic_api/interface/kernel_struct_mm.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。<br>MmadBitModeParams参数说明请参考下表。 |
 
 **表2** MmadBitModeParams类参数说明
 

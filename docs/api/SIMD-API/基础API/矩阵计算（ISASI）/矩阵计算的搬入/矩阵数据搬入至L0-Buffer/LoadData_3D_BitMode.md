@@ -38,10 +38,10 @@ LoadData（BitMode卷积数据搬运）用于完成image to column操作，将�
 
 ## 函数原型<a id="section620mcpsimp"></a>
 
-```cpp
+``cpp
 template <TPosition Dst, TPosition Src, typename T>
 __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const Load3DBitModeParam& loadDataParams)
-```
+``
 
 ## 参数说明<a id="section622mcpsimp"></a>
 
@@ -59,7 +59,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 | ---------- | ---------- | ---------- |
 | dst | 输出 | 目的操作数，类型为LocalTensor。<br>数据连续排列顺序由目的操作数所在TPosition决定，具体约束如下：<br>&nbsp;&nbsp;&bull; A2：ZZ格式/NZ格式；<br>&nbsp;&nbsp;&bull; B2：ZN格式；<br>&nbsp;&nbsp;&bull; A1/B1：无格式要求，一般情况下为NZ格式。 |
 | src | 输入 | 源操作数，类型为LocalTensor。<br>数据类型需要与dst保持一致。 |
-| loadDataParams | 输入 | LoadData参数结构体，类型为：<br>&nbsp;&nbsp;&bull; Load3DBitModeParam，具体参考[表3](#table106611666584)。<br>上述结构体参数定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_mm.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
+| loadDataParams | 输入 | LoadData参数结构体，类型为：<br>&nbsp;&nbsp;&bull; Load3DBitModeParam，具体参考[表3](#table106611666584)。<br>上述结构体参数定义请参考`${INSTALL_DIR}/asc/include/ascendc/basic_api/interface/kernel_struct_mm.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
 
 **表3** Load3DBitModeParam类参数说明<a name="table106611666584"></a>
 
@@ -82,10 +82,10 @@ Load3DBitModeParam类使用union与bit-field方法，采用bit位表达参数类
 
 Load3DBitModeParam类可以直接使用LoadData3DParamsV2结构体类型对象初始化：
 
-```cpp
+``cpp
 template <typename T>
 __aicore__ inline Load3DBitModeParam(const LoadData3DParamsV2<T> &loadData3DParams_);
-```
+``
 
 也可以使用各参数的Set函数修改参数值，并且由于使用了联合体，还可以对config0和config1直接进行逐bit位修改来修改参数。
 
@@ -130,7 +130,7 @@ __aicore__ inline Load3DBitModeParam(const LoadData3DParamsV2<T> &loadData3DPara
 
 示例代码片段如下：
 
-```cpp
+``cpp
 // featureMapA1为half类型、位于L1 Buffer，featureMapA2为half类型、位于L0A Buffer
 uint16_t H = 4, W = 4;
 uint8_t Kh = 2, Kw = 2;
@@ -150,4 +150,4 @@ AscendC::LoadData3DParamsV2<half> param = {
     false, false, (half)0, false, false, false};
 AscendC::Load3DBitModeParam paramBitMode(param);
 AscendC::LoadData<AscendC::TPosition::A2, AscendC::TPosition::A1, half>(featureMapA2, featureMapA1, paramBitMode);
-```
+``

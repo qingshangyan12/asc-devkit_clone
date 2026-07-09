@@ -1,4 +1,4 @@
-# UBToGM非对齐数据搬运(DataCopyPad)<a name="ZH-CN_TOPIC_0000001894460401"></a>
+﻿# UBToGM非对齐数据搬运(DataCopyPad)<a name="ZH-CN_TOPIC_0000001894460401"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -69,20 +69,20 @@
 
 - 不支持配置设置数据搬运模式mode
 
-    ```cpp
+    ``cpp
     template <typename T>
     __aicore__ inline void DataCopyPad(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams)
-    ```
+    ``
 
 <!-- npu="950" id15 -->
 
 - 支持配置设置数据搬运模式mode（仅Ascend 950PR/Ascend 950DT支持）
 
-    ```cpp
+    ``cpp
     // 该函数原型仅支持Ascend 950PR/Ascend 950DT
     template <typename T, PaddingMode mode = PaddingMode::Normal>
     __aicore__ inline void DataCopyPad(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams)
-    ```
+    ``
 
 <!-- end id15 -->
 
@@ -103,7 +103,7 @@
 | src | 输入 | 源操作数，类型为[LocalTensor](../../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md)。<br>起始地址需要保证32字节对齐。 |
 | dataCopyParams | 输入 | 搬运参数，DataCopyExtParams类型，具体参数说明请参考[表3](#table_ub2gm_pad_3)。 |
 
-下文表格中列出的结构体参数定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。
+下文表格中列出的结构体参数定义请参考`${INSTALL_DIR}/asc/include/ascendc/basic_api/interface/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。
 
 **表3**  DataCopyExtParams结构体参数定义<a name="table_ub2gm_pad_3"></a>
 
@@ -203,9 +203,9 @@
 
 ## 调用示例<a name="section177231425115410"></a>
 
-```cpp
+``cpp
 AscendC::DataCopyExtParams copyParams{1, dstTotalLength * sizeof(T), 0, 0, 0};
 AscendC::DataCopyPad(dstGlobal, srcLocal, copyParams);
-```
+``
 
 完整样例请参考[DataCopyPad样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm)。

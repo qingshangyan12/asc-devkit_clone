@@ -30,10 +30,10 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```cpp
+``cpp
 template <typename T>
 __aicore__ inline void LoadImageToLocal(const LocalTensor<T>& dst, const LoadImageToLocalParams& loadDataParams)
-```
+``
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
@@ -42,7 +42,7 @@ __aicore__ inline void LoadImageToLocal(const LocalTensor<T>& dst, const LoadIma
 | 参数名称 | 输入/输出 | 含义 |
 | --- | --- | --- |
 | dst | 输出 | 目的操作数，类型为LocalTensor。<br>LocalTensor的起始地址需要保证32字节对齐。 |
-| loadDataParams | 输入 | LoadData参数结构体，类型为LoadImageToLocalParams。<br>具体定义请参考：\$\{INSTALL_DIR\}/include/ascendc/basic_api/interface/kernel_struct_mm.h，\$\{INSTALL_DIR\}请替换为CANN软件安装后文件存储路径。<br>参数说明参考[表2](#table8955841508)。 |
+| loadDataParams | 输入 | LoadData参数结构体，类型为LoadImageToLocalParams。<br>具体定义请参考：`${INSTALL_DIR}/asc/include/ascendc/basic_api/interface/kernel_struct_mm.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。<br>参数说明参考[表2](#table8955841508)。 |
 
 <a name="table8955841508"></a>
 **表2** LoadImageToLocalParams结构体内参数说明
@@ -87,7 +87,7 @@ __aicore__ inline void LoadImageToLocal(const LocalTensor<T>& dst, const LoadIma
 <!-- npu="310p" id14 -->
 该调用示例支持的运行平台为Atlas 推理系列产品AI Core，示例图片格式为YUV420SP。
 
-```cpp
+``cpp
 constexpr uint16_t imageWidth = 32;
 constexpr uint16_t imageHeight = 32;
 constexpr uint32_t yPlaneSize = imageWidth * imageHeight;
@@ -138,5 +138,5 @@ loadParams.rightPadSize = 0;
 loadParams.sid = 0;
 
 AscendC::LoadImageToLocal(featureMapA1, loadParams);
-```
+``
 <!-- end id14 -->

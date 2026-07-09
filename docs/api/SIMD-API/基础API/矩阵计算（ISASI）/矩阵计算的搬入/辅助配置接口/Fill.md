@@ -1,4 +1,4 @@
-﻿# Fill<a name="ZH-CN_TOPIC_0000001834660669"></a>
+# Fill<a name="ZH-CN_TOPIC_0000001834660669"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -48,10 +48,10 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```cpp
+``cpp
 template <typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParams<U>& initConstValueParams)
-```
+``
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
@@ -67,7 +67,7 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
 | 参数名称 | 输入/输出 | 含义 |
 | --------- | ---------- | ------ |
 | dst | 输出 | 目的操作数，结果矩阵，类型为LocalTensor。 |
-| InitConstValueParams | 输入 | 初始化相关参数，类型为InitConstValueParams。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_mm.h，\${INSTALL\_DIR}请替换为CANN软件安装后文件存储路径。<br>参数说明请参考[表3](#table3)。 |
+| InitConstValueParams | 输入 | 初始化相关参数，类型为InitConstValueParams。<br>具体定义请参考`${INSTALL_DIR}/asc/include/ascendc/basic_api/interface/kernel_struct_mm.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。<br>参数说明请参考[表3](#table3)。 |
 
 <a name="table3"></a>
 **表3** InitConstValueParams结构体参数说明
@@ -97,7 +97,7 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../../通用说明和约束.md#section796754519912)。
-- 当目的操作数位于L0A Buffer/L0B Buffer时，指令执行占用的流水为PIPE\_MTE1，目的操作数地址需要512Byte对齐。当目的操作数位于L1 Buffer时，指令执行占用的流水为PIPE\_MTE2，目的地址需要32Byte对齐。
+- 当目的操作数位于L0A Buffer/L0B Buffer时，指令执行占用的流水为PIPE_MTE1，目的操作数地址需要512Byte对齐。当目的操作数位于L1 Buffer时，指令执行占用的流水为PIPE_MTE2，目的地址需要32Byte对齐。
 - 当repeatTimes为0或者blockNum为0时，指令不会进行任何操作。
 - 不同的型号在设置InitConstValueParams参数时，支持配置参数的不同。
     - 仅支持配置迭代次数和初始化值场景下，其他参数配置无效。每次迭代处理固定数据量（512字节），迭代间无间隔。
@@ -120,10 +120,10 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```cpp
+``cpp
 uint32_t mLength = 16;
 uint32_t kLength = 16;
 Fill(leftMatrix, {1, static_cast<uint16_t>(mLength * kLength * sizeof(float) / 32), 0, 1}); // 给leftMatrix填充mLength * kLength长度的数据为1，按32B的颗粒度进行填充
-```
+``
 
 若接口用于对L1 Buffer/L0A Buffer/L0B Buffer上的LocalTensor清0使用，示例请参考：[Fill调用样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/06_compatibility_guide/fill)。

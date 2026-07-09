@@ -1,4 +1,4 @@
-# assert<a name="ZH-CN_TOPIC_0000002507523647"></a>
+﻿# assert<a name="ZH-CN_TOPIC_0000002507523647"></a>
 
 ## 产品支持情况
 
@@ -19,15 +19,15 @@
 
 ## 需要包含的头文件<a name="section78885814919"></a>
 
-```
+``
 #include "aicpu_api.h"
-```
+``
 
 ## 函数原型<a name="section2067518173415"></a>
 
-```
+``
 assert(expr)
-```
+``
 
 ## 参数说明<a name="section158061867342"></a>
 
@@ -61,27 +61,27 @@ assert(expr)
 -   assert接口调用形式与C语言一致，不需要使用AscendC命名空间。
 
 -   该接口使用Dump功能，所有使用Dump功能的接口在每个核上Dump的数据总量不可超过1M。请开发者自行控制待打印的内容数据量，超出则不会打印。
--   使用该接口时，若采用bisheng命令行编译，开发者需要手动链接相关的静态库；而使用CMake编译时，框架会自动处理链接问题，无需开发者额外关注。具体编译命令如下：通过--cce-aicpu-laicpu\_api为Device链接libaicpu\_api.a，通过--cce-aicpu-L指定libaicpu\_api.a的库路径。
+-   使用该接口时，若采用bisheng命令行编译，开发者需要手动链接相关的静态库；而使用CMake编译时，框架会自动处理链接问题，无需开发者额外关注。具体编译命令如下：通过--cce-aicpu-laicpu_api为Device链接libaicpu_api.a，通过--cce-aicpu-L指定libaicpu_api.a的库路径。
 
-    ```
-    $bisheng -O2 foo.aicpu --cce-aicpu-L${INSTALL_DIR}/lib64/device/lib64 --cce-aicpu-laicpu_api -I${INSTALL_DIR}/include/ascendc/aicpu_api -c -o foo.aicpu.o
-    ```
+    ``
+    $bisheng -O2 foo.aicpu --cce-aicpu-L${INSTALL_DIR}/lib64/device/lib64 --cce-aicpu-laicpu_api -I`${INSTALL_DIR}/asc/include/ascendc/aicpu_api` -c -o foo.aicpu.o
+    ``
 
-    $\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。以root用户安装为例，安装后文件默认存储路径为：/usr/local/Ascend/cann。
+    `${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。以root用户安装为例，安装后文件默认存储路径为：/usr/local/Ascend/cann。
 
 ## 调用示例<a name="section82241477610"></a>
 
 在算子kernel侧实现代码中需要增加断言的地方使用assert检查代码示例如下：
 
-```
+``
 int assertFlag = 10;
 // 断言条件
 assert(assertFlag == 12);
-```
+``
 
 程序运行时会触发assert，打印效果如下：
 
-```
+``
 [ASSERT]` assertFlag == 12 ' at /home/.../test.cpp:36
-```
+``
 

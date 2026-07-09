@@ -1,4 +1,4 @@
-# SetLoadDataRepeat<a name="ZH-CN_TOPIC_0000001788021082"></a>
+﻿# SetLoadDataRepeat<a name="ZH-CN_TOPIC_0000001788021082"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -32,9 +32,9 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```cpp
+``cpp
 __aicore__ inline void SetLoadDataRepeat(const LoadDataRepeatParam& repeatParams)
-```
+``
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
@@ -44,7 +44,7 @@ __aicore__ inline void SetLoadDataRepeat(const LoadDataRepeatParam& repeatParams
 
 | 参数名称 | 输入/输出 | 含义 |
 | --- | --- | --- |
-| repeatParams | 输入 | 设置[LoadData（卷积数据搬运）](../矩阵数据搬入至L0-Buffer/LoadData_3D.md)接口的repeat参数，类型为LoadDataRepeatParam。<br>具体定义请参考：\$\{INSTALL_DIR\}/include/ascendc/basic_api/interface/kernel_struct_mm.h，\$\{INSTALL_DIR\}请替换为CANN软件安装后文件存储路径。<br>参数说明请参考[表2](#table15780447181917)。 |
+| repeatParams | 输入 | 设置[LoadData（卷积数据搬运）](../矩阵数据搬入至L0-Buffer/LoadData_3D.md)接口的repeat参数，类型为LoadDataRepeatParam。<br>具体定义请参考：`${INSTALL_DIR}/asc/include/ascendc/basic_api/interface/kernel_struct_mm.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。<br>参数说明请参考[表2](#table15780447181917)。 |
 
 <a name="table15780447181917"></a>
 **表2** LoadDataRepeatParam结构体参数说明
@@ -80,7 +80,7 @@ __aicore__ inline void SetLoadDataRepeat(const LoadDataRepeatParam& repeatParams
 
 ## 约束说明
 
-- 迭代沿height方向时，repeatStride的单位为16个元素，迭代沿width方向时，repeatStride的单位为32/sizeof\(data\_type\)个元素。
+- 迭代沿height方向时，repeatStride的单位为16个元素，迭代沿width方向时，repeatStride的单位为32/sizeof\(data_type\)个元素。
 - repeatTime=0表示LoadData（卷积数据搬运）不执行搬运，LoadData（卷积数据搬运）接口将被视为NOP（空操作）。
 
 <!-- npu="950" id12 -->
@@ -109,7 +109,7 @@ __aicore__ inline void SetLoadDataRepeat(const LoadDataRepeatParam& repeatParams
 
 展示代码示例片段：
 
-```cpp
+``cpp
 // LoadData（卷积数据搬运）v2指令完成img2col的过程，可知img2col后A矩阵高度为ho * wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：A矩阵的高度为CeilAlign(k, fractalShape[0])；img2col后A矩阵宽度为ci * kh * kw，代入kh=1，kw=1，可知A矩阵的宽度为CeilAlign(m, fractalShape[1])。最后，配置loadDataParams.enTranspose = true，将整个A矩阵转置并且将其中每一个分形转置
 // 使用load3d接口，实现NZ2ZZ
 AscendC::LoadData3DParamsV2<T> loadDataParams;
@@ -126,4 +126,4 @@ repeatParams.dstStride = CeilDivision(m, fractalShape[0]);  // 输出矩阵K轴�
 AscendC::SetLoadDataRepeat(repeatParams);
 
 AscendC::LoadData(a2Local, a1Local, loadDataParams);
-```
+``

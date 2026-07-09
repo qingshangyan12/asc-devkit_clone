@@ -86,10 +86,10 @@ $$
 
 ## 函数原型
 
-```cpp
+``cpp
 template <typename T = int32_t, typename U = int8_t, typename Std::enable_if<Std::is_same<PrimT<T>, int32_t>::value, bool>::type = true, typename Std::enable_if<Std::is_same<PrimT<U>, int8_t>::value, bool>::type = true>
 __aicore__ inline void MmadWithSparse(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<U>& filter, const MmadParams& mmadParams)
-```
+``
 
 ## 参数说明
 
@@ -107,7 +107,7 @@ __aicore__ inline void MmadWithSparse(const LocalTensor<T>& dst, const LocalTens
 | dst | 输出 | 目的操作数，结果矩阵C，类型为LocalTensor，支持的物理存储位置为L0C Buffer（TPosition:CO1）。<br>LocalTensor的起始地址需要256个元素（1024字节）对齐。 |
 | fm | 输入 | 源操作数，左矩阵A，类型为LocalTensor，支持的物理存储位置为L0A Buffer（TPosition: A2）。<br>LocalTensor的起始地址需要512字节对齐。 |
 | filter | 输入 | 源操作数，右矩阵B，类型为LocalTensor，支持的物理存储位置为L0B Buffer（TPosition:B2）。<br>LocalTensor的起始地址需要512字节对齐。 |
-| mmadParams | 输入 | 矩阵乘相关参数，类型为MmadParams。<br>具体定义请参考\$\{INSTALL_DIR\}/include/ascendc/basic_api/interface/kernel_struct_mm.h，\$\{INSTALL_DIR\}请替换为CANN软件安装后文件存储路径。<br>参数说明请参考[表5](#zh_cn_topic_mmadsparse_section5_table5)。 |
+| mmadParams | 输入 | 矩阵乘相关参数，类型为MmadParams。<br>具体定义请参考`${INSTALL_DIR}/asc/include/ascendc/basic_api/interface/kernel_struct_mm.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。<br>参数说明请参考[表5](#zh_cn_topic_mmadsparse_section5_table5)。 |
 
 **表5** MmadParams结构体内参数说明（Sparse场景）<a id="zh_cn_topic_mmadsparse_section5_table5"></a>
 
@@ -154,7 +154,7 @@ __aicore__ inline void MmadWithSparse(const LocalTensor<T>& dst, const LocalTens
 
 完整使用样例请参见[MmadWithSparse样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_with_sparse)。
 
-```cpp
+``cpp
 AscendC::LocalTensor<int8_t> a1Local(AscendC::TPosition::A1, a1Addr, aSize);
 AscendC::LocalTensor<int8_t> a2Local(AscendC::TPosition::A2, a2Addr, aSize);
 AscendC::LocalTensor<int8_t> b1Local(AscendC::TPosition::B1, b1Addr, bSize);
@@ -178,4 +178,4 @@ uint32_t m = 128;
 uint32_t k = 64;
 uint32_t n = 128;
 AscendC::MmadWithSparse(c1Local, a2Local, b2Local, { m, n, k, false, 0, false, false, false });
-```
+``

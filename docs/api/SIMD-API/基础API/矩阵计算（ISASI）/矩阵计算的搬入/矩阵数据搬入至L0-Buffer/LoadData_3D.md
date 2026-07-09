@@ -82,24 +82,24 @@ LoadData（卷积数据搬运）仅支持如下数据通路：L1 Buffer->L0A Buf
 
 **LoadData（卷积数据搬运） v1接口：**
 
-```cpp
+``cpp
 template <typename T, const IsResetLoad3dConfig &defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV1<U>& loadDataParams)
-```
+``
 
 **LoadData（卷积数据搬运） v2接口：**
 
-```cpp
+``cpp
 template <typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV2<U>& loadDataParams)
-```
+``
 
 **LoadData（卷积数据搬运） v2 Pro接口：**
 
-```cpp
+``cpp
 template <typename T>
 __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV2Pro& loadDataParams)
-```
+``
 
 ## 参数说明<a id="zh-cn_topic_0000002512171652_section16128134420472"></a>
 
@@ -117,7 +117,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 | ---------- | ----------- | ------ |
 | dst | 输出 | 目的操作数，类型为LocalTensor。<br>数据连续排列顺序由目的操作数所在物理存储位置决定，不同产品型号的具体格式约束请参考[约束说明](#zh-cn_topic_0000002512171652_dst_layout)。 |
 | src | 输入 | 源操作数，类型为LocalTensor。<br>数据连续排列顺序由目的操作数所在物理存储位置决定：<br>&nbsp;&nbsp;&bull; L1 Buffer（TPosition: A1/B1）：NC1HWC0格式。 |
-| loadDataParams | 输入 | LoadData参数结构体，类型为：<br>&nbsp;&nbsp;&bull; LoadData3DParamsV1，具体参考[表3](#zh-cn_topic_0000002512171652_table679014222918)。<br>&nbsp;&nbsp;&bull; LoadData3DParamsV2，具体参考[表4](#zh-cn_topic_0000002512171652_table193501032193419)。<br>&nbsp;&nbsp;&bull; LoadData3DParamsV2Pro，具体参考[表5](#zh-cn_topic_0000002512171652_table118027314415)。<br>上述结构体参数定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_mm.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
+| loadDataParams | 输入 | LoadData参数结构体，类型为：<br>&nbsp;&nbsp;&bull; LoadData3DParamsV1，具体参考[表3](#zh-cn_topic_0000002512171652_table679014222918)。<br>&nbsp;&nbsp;&bull; LoadData3DParamsV2，具体参考[表4](#zh-cn_topic_0000002512171652_table193501032193419)。<br>&nbsp;&nbsp;&bull; LoadData3DParamsV2Pro，具体参考[表5](#zh-cn_topic_0000002512171652_table118027314415)。<br>上述结构体参数定义请参考`${INSTALL_DIR}/asc/include/ascendc/basic_api/interface/kernel_struct_mm.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
 
 
 **表3** LoadData3DParamsV1结构体内参数说明<a id="zh-cn_topic_0000002512171652_table679014222918"></a>
@@ -449,12 +449,12 @@ LoadData（卷积数据搬运）接口具备两个特殊寄存器：Feature Map�
 
 IsResetLoad3dConfig结构定义如下：
 
-```cpp
+``cpp
 struct IsResetLoad3dConfig {
    bool isSetFMatrix = true;
    bool isSetPadding = true;
 }; 
-```
+``
 
 isSetFMatrix配置为true，表示在LoadData（卷积数据搬运）接口内部设置FeatureMap的属性描述（包括l1H、l1W、padList，参数介绍参考[表4](#zh-cn_topic_0000002512171652_table193501032193419)）；设置为false，表示该接口传入的FeatureMap的属性描述不生效，开发者需要通过[SetFmatrix](../辅助配置接口/SetFmatrix.md)进行手动管理设置。
 
@@ -514,7 +514,7 @@ repeatMode =1的时候filter窗口中读取数据的位置保持不变，每个r
 
 示例代码片段如下，仅展示样例中的部分代码，完整示例请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0)。
 
-```cpp
+``cpp
 // LoadData（卷积数据搬运） v2接口完成img2col的过程，可知img2col后A矩阵高度为ho * wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：A矩阵的高度为CeilAlign(k, fractalShape[0])；img2col后A矩阵宽度为ci * kh * kw，代入kh=1，kw=1，可知A矩阵的宽度为CeilAlign(m, fractalShape[1])。最后，配置loadDataParams.enTranspose = true，将整个A矩阵转置并且将其中每一个分形转置
 // 使用LoadData（卷积数据搬运）接口，实现NZ2ZZ
 AscendC::LoadData3DParamsV2<T> loadDataParams;
@@ -547,6 +547,6 @@ loadDataParams.filterSizeH = false;
 loadDataParams.enTranspose = true;
 loadDataParams.fMatrixCtrl = false;
 AscendC::LoadData(a2Local, a1Local, loadDataParams);
-```
+``
 
 关于如何使用LoadData（卷积数据搬运）进行2D数据搬运，请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0)中的对应场景。

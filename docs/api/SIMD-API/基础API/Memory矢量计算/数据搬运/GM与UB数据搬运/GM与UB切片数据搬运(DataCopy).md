@@ -1,4 +1,4 @@
-# GM与UB切片数据搬运\(DataCopy\)<a name="ZH-CN_TOPIC_0000002568770166"></a>
+﻿# GM与UB切片数据搬运\(DataCopy\)<a name="ZH-CN_TOPIC_0000002568770166"></a>
 
 ## 产品支持情况<a name="zh-cn_topic_0000002565968945_section796754519912"></a>
 
@@ -44,17 +44,17 @@
 
 - Global Memory -> Unified Buffer
 
-    ```cpp
+    ``cpp
     template <typename T>
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[], const uint32_t dimValue = 1)
-    ```
+    ``
 
 - Unified Buffer -> Global Memory
 
-    ```cpp
+    ``cpp
     template <typename T>
     __aicore__ inline void DataCopy(const GlobalTensor<T> &dst, const LocalTensor<T> &src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[], const uint32_t dimValue = 1)
-    ```
+    ``
 
 > [!NOTE]说明 
 > 各原型支持的数据类型，请参考[数据类型](#zh-cn_topic_0000002565968945_section4219135304818)。
@@ -74,7 +74,7 @@
 | dst | 输出 | 目的操作数。<br>&bull;类型为[LocalTensor](../../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md)时，存储位置为Unified Buffer，目的地址需要32字节对齐。<br>&bull;类型为[GlobalTensor](../../../数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor简介.md)时，存储位置为Global Memory，目的地址需要1字节对齐。 |
 | src | 输入 | 源操作数。<br>&bull;类型为GlobalTensor时，存储位置为Global Memory，源地址需要1字节对齐。<br>&bull;类型为LocalTensor时，存储位置为Unified Buffer，源地址需要32字节对齐。 |
 | dstSliceInfo | 输入 | 目的操作数切片信息，类型为SliceInfo。通过该参数可以配置切片的起始和终止元素个数、间隔、长度等信息。<br>SliceInfo参数说明请参考[表3](#table_slice_3)。 |
-| srcSliceInfo | 输入 | 源操作数切片信息，类型为SliceInfo。通过该参数可以配置切片的起始和终止元素个数、间隔、长度等信息。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。<br>SliceInfo参数说明请参考[表3](#table_slice_3)。 |
+| srcSliceInfo | 输入 | 源操作数切片信息，类型为SliceInfo。通过该参数可以配置切片的起始和终止元素个数、间隔、长度等信息。<br>具体定义请参考`${INSTALL_DIR}/asc/include/ascendc/basic_api/interface/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。<br>SliceInfo参数说明请参考[表3](#table_slice_3)。 |
 | dimValue | 输入 | 操作数维度信息，默认值为1。 |
 
 **表3**  SliceInfo结构体参数定义<a name="table_slice_3"></a>
@@ -191,7 +191,7 @@ $$startIndex < endIndex \le shapeValue$$
 
 ## 调用示例<a name="zh-cn_topic_0000002565968945_section088124295117"></a>
 
-```cpp
+``cpp
 // 配置切片搬运参数。
 AscendC::SliceInfo srcSliceInfoIn[] = {{16, 70, 7, 3, 87}, {0, 2, 1, 1, 3}};
 AscendC::SliceInfo dstSliceInfoIn[] = {{0, 47, 0, 3, 48}, {0, 1, 0, 1, 2}};
@@ -218,6 +218,6 @@ AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
 AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
 // Unified Buffer -> Global Memory: MTE3流水搬运。
 AscendC::DataCopy(dstGlobal, srcLocal, dstSliceInfo, dstSliceInfo, dimValue);
-```
+``
 
 完整样例请参考[切片数据搬运样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2ub_slice)。srcSliceInfo、dstSliceInfo参数解析与结果示例请参考[图1](#fig1196816115710)。

@@ -136,17 +136,17 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 - 不传入bias
 
-    ```cpp
+    ``cpp
     template <typename T, typename U, typename S>
     __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const MmadParams& mmadParams)
-    ```
+    ``
 
 - 传入bias
 
-    ```cpp
+    ``cpp
     template <typename T, typename U, typename S, typename V>
     __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias, const MmadParams& mmadParams)
-    ```
+    ``
 
 ## 参数说明
 
@@ -158,7 +158,7 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
 | fm | 输入 | 源操作数，左矩阵A，类型为LocalTensor，支持的物理存储位置为L0A Buffer（TPosition: A2）。<br>LocalTensor的起始地址需要按照512字节对齐。 |
 | filter | 输入 | 源操作数，右矩阵B，类型为LocalTensor，支持的物理存储位置为L0B Buffer（TPosition: B2）。<br>LocalTensor的起始地址需要按照512字节对齐。 |
 | bias | 输入 | 源操作数，Bias矩阵，类型为LocalTensor，支持的物理存储位置为BT Buffer（TPosition:C2）。<br>LocalTensor的起始地址需要按照64字节对齐。 |
-| mmadParams | 输入 | 矩阵乘相关参数。<br>该参数类型的具体定义请参考\$\{INSTALL_DIR\}/include/ascendc/basic_api/interface/kernel_struct_mm.h，\$\{INSTALL_DIR\}请替换为CANN软件安装后文件存储路径。<br>MmadParams参数说明请参考[表4](#zh_cn_topic_mmad_section4_table4)。 |
+| mmadParams | 输入 | 矩阵乘相关参数。<br>该参数类型的具体定义请参考`${INSTALL_DIR}/asc/include/ascendc/basic_api/interface/kernel_struct_mm.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。<br>MmadParams参数说明请参考[表4](#zh_cn_topic_mmad_section4_table4)。 |
 
 **表4** MmadParams结构体内参数说明<a id="zh_cn_topic_mmad_section4_table4"></a>
 
@@ -290,21 +290,21 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 - **同步优化说明**
 
-    当矩阵计算沿K轴进行累加时，中间结果通常需要写入同一块L0C Buffer。理论上，在连续两次Mmad接口调用之间，应插入PipeBarrier\(PIPE\_M\)，以确保前一次Mmad的写操作已完成，再进行下一轮Mmad的读操作，从而保证数据一致性。
+    当矩阵计算沿K轴进行累加时，中间结果通常需要写入同一块L0C Buffer。理论上，在连续两次Mmad接口调用之间，应插入PipeBarrier\(PIPE_M\)，以确保前一次Mmad的写操作已完成，再进行下一轮Mmad的读操作，从而保证数据一致性。
 
-    然而，当矩阵维度m和n超过一定阈值时，由于计算量足够大，数据访问模式具备良好的局部性和流水线并行潜力，硬件调度器能够自动处理写-读依赖问题。此时无需插入PipeBarrier\(PIPE\_M\)，Mmad指令可并行执行，从而显著提升计算性能。
+    然而，当矩阵维度m和n超过一定阈值时，由于计算量足够大，数据访问模式具备良好的局部性和流水线并行潜力，硬件调度器能够自动处理写-读依赖问题。此时无需插入PipeBarrier\(PIPE_M\)，Mmad指令可并行执行，从而显著提升计算性能。
 
     阈值公式：$$(m / 16) * (n / 16) < 10$$
 
-    当计算量小于阈值时，需要插入PipeBarrier\(PIPE\_M\)。
+    当计算量小于阈值时，需要插入PipeBarrier\(PIPE_M\)。
 
-    ```cpp
+    ``cpp
     if ((m / 16) * (n / 16) < 10) {
         AscendC::PipeBarrier<PIPE_M>();
     }
-    ```
+    ``
 
-    当计算量大于阈值时，不需要插入PipeBarrier\(PIPE\_M\)。
+    当计算量大于阈值时，不需要插入PipeBarrier\(PIPE_M\)。
 
 - **UnitFlag特性约束说明**
 
@@ -321,10 +321,10 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
   - 非饱和模式：CTRL\[48\]设置成1'b1，inf/nan保持原输出。
   - 饱和模式：CTRL\[48\]设置成1'b0，inf输出会被饱和为±MAX，nan输出会被饱和为0。
 
-    ```cpp
+    ``cpp
     // 设置CTRL[48]为0，开启浮点数计算饱和模式
     AscendC::AscendCUtils::SetOverflow(0);
-    ```
+    ``
 
     注：Mmad指令应避免NaN输入，否则可能会产生执行报错。
 

@@ -42,7 +42,7 @@ DataCopy数据搬运支持将随路量化参数从L1 Buffer移动到Fixpipe Buff
 
 ## 函数原型<a id="section_function_prototype"></a>
 
-```cpp
+``cpp
 // 连续搬运场景
 template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
@@ -50,7 +50,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 // 连续或非连续搬运场景（高维切分）
 template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
-```
+``
 
 ## 参数说明<a id="section_param_desc"></a>
 
@@ -66,7 +66,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 | ---------- | ---------- | ---------- |
 | dst | 输出 | 目的操作数，类型为LocalTensor。存储位置为Fixpipe Buffer，目的地址需要128字节对齐。 |
 | src | 输入 | 源操作数，类型为LocalTensor，存储位置为L1 Buffer，源地址需要32字节对齐。 |
-| repeatParams | 输入 | 搬运参数，DataCopyParams类型。通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。<br>上述结构体参数定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
+| repeatParams | 输入 | 搬运参数，DataCopyParams类型。通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。<br>上述结构体参数定义请参考`${INSTALL_DIR}/asc/include/ascendc/basic_api/interface/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
 | count | 输入 | 参与搬运的元素个数。count * sizeof(T)需要32字节对齐，若未对齐，则搬运量会向下取整到32字节对齐。 |
 
 **表3** DataCopyParams结构体参数定义
@@ -101,7 +101,7 @@ src数据类型支持uint64_t，dst数据类型支持uint64_t。
 
 L1 Buffer(C1)->Fixpipe Buffer(C2PIPE2GM)，搬运Vector量化参数。
 
-```cpp
+``cpp
 // c1Addr = 0、fbAddr = 0、N = 256、n = 256；burstLen = CeilAlign(256 * sizeof(uint64_t), 128) / 128 = 16，dataCopyParams = {1, 16, 0, 0}。
 AscendC::LocalTensor<uint64_t> quantAlphaTensor(AscendC::TPosition::C1, c1Addr, N);
 
@@ -122,6 +122,6 @@ uint16_t burstLen = CeilAlign(n * sizeof(uint64_t), 128) / 128;
 AscendC::DataCopyParams dataCopyParams(1, burstLen, 0, 0);
 AscendC::DataCopy(fbTensor, quantAlphaTensor, dataCopyParams);
 AscendC::SetFixPipeConfig(fbTensor);
-```
+``
 
 完整示例请参考[L1->Fixpipe Buffer数据搬运(DataCopy)](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_l0c2gm)中场景2、4、6。

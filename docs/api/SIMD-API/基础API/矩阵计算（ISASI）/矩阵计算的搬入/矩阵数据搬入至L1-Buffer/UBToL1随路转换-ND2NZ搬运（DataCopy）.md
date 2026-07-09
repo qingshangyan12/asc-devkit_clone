@@ -41,10 +41,10 @@
 
 ## 函数原型<a id="section1954364615315"></a>
 
-```cpp
+``cpp
 template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const Nd2NzParams& intriParams)
-```
+``
 
 ## 参数说明<a id="section1251613311396"></a>
 
@@ -60,7 +60,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 | ---------- | ---------- | ---------- |
 | dst | 输出 | 目的操作数，类型为LocalTensor，存储位置为L1 Buffer（TSCM）。 |
 | src | 输入 | 源操作数，类型为LocalTensor，存储位置为Unified Buffer（TPosition为VECIN/VECCALC/VECOUT）。 |
-| intriParams | 输入 | 搬运参数，类型为[Nd2NzParams](#table844881954715)。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\${INSTALL\_DIR}请替换为CANN软件安装后文件存储路径。 |
+| intriParams | 输入 | 搬运参数，类型为[Nd2NzParams](#table844881954715)。<br>具体定义请参考`${INSTALL_DIR}/asc/include/ascendc/basic_api/interface/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
 
 **表3** Nd2NzParams结构体参数定义<a id="table844881954715"></a>
 
@@ -145,7 +145,7 @@ $$((dValue \times sizeof(T) / 32 - 1) \times dstNzC0Stride + (nValue - 1) \times
 
 示例场景如[图1](#fig128961542184620)所示，示例代码片段如下：
 
-```cpp
+``cpp
 AscendC::Nd2NzParams nd2nzParams;
 // 传输2个ND矩阵。
 nd2nzParams.ndNum = 2;
@@ -165,4 +165,4 @@ nd2nzParams.dstNzNStride = 2;
 nd2nzParams.dstNzMatrixStride = 96;
 
 AscendC::DataCopy(dstLocal, srcLocal, nd2nzParams);
-```
+``

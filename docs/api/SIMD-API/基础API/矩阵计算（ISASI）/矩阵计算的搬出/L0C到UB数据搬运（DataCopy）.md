@@ -35,17 +35,17 @@
 
 - Local Memory -\> Local Memory
 
-    ```cpp
+    ``cpp
     template <typename T>
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
-    ```
+    ``
 
 - Local Memory -> Local Memory，支持源操作数和目的操作数类型不一致。
 
-    ```cpp
+    ``cpp
     template <typename T, typename U>
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
-    ```
+    ``
 
 >**说明：**
 > 各原型支持的具体数据通路和数据类型，请参考[数据类型](#section8664371012)。
@@ -65,7 +65,7 @@
 | dst | 输出 | 目的操作数，类型为LocalTensor。 |
 | src | 输入 | 源操作数，类型为LocalTensor。 |
 | intriParams | 输入 | 搬运参数。DataCopyParams类型。 |
-| enhancedParams | 输入 | 增强信息参数。DataCopyEnhancedParams类型。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
+| enhancedParams | 输入 | 增强信息参数。DataCopyEnhancedParams类型。<br>具体定义请参考`${INSTALL_DIR}/asc/include/ascendc/basic_api/interface/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
 
 **表3** DataCopyEnhancedParams结构参数说明
 
@@ -145,7 +145,7 @@
 
 - Local Memory -\> Local Memory
 
-    ```cpp
+    ``cpp
     // srcLocal、dstLocal为half类型的LocalTensor
     // 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运
     DataCopyParams intriParams;
@@ -163,11 +163,11 @@
     enhancedParams.padMode = pad_t::PAD_NONE; // 预留参数
     // 功能等同基础数据搬运
     AscendC::DataCopy(dstLocal, srcLocal, intriParams, enhancedParams);
-    ```
+    ``
 
 - Local Memory -\> Local Memory，源操作数与目的操作数类型不一致
 
-    ```cpp
+    ``cpp
     // 以下示例为L0C Buffer -> UB通路的数据搬运，仅在Atlas 推理系列产品AI Core场景下支持。srcLocal为int32_t类型的L0C Buffer上的LocalTensor，dstLocal为int8_t类型的UB上的LocalTensor
     // 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运
     DataCopyParams intriParams;
@@ -185,4 +185,4 @@
     enhancedParams.padMode = pad_t::PAD_NONE; // 预留参数
     // 此时dstLocal = srcLocal
     AscendC::DataCopy(dstLocal, srcLocal, intriParams, enhancedParams);
-    ```
+    ``

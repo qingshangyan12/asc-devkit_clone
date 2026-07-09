@@ -1,4 +1,4 @@
-# UBToGM随路转换NZ2ND搬运(DataCopy)<a name="ZH-CN_TOPIC_0000002391805265"></a>
+﻿# UBToGM随路转换NZ2ND搬运(DataCopy)<a name="ZH-CN_TOPIC_0000002391805265"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -26,10 +26,10 @@
 
 ## 函数原型<a name="section1792117555586"></a>
 
-```cpp
+``cpp
 template <typename T>
 __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const Nz2NdParamsFull& intriParams)
-```
+``
 
 ## 参数说明<a name="section14983445508"></a>
 
@@ -45,7 +45,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为[GlobalTensor](../../../数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor简介.md)。 |
 | src | 输入 | 源操作数，类型为[LocalTensor](../../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md)。 |
-| intriParams | 输入 | 搬运参数，类型为Nz2NdParamsFull，具体参数请参考[表3](#table_nz2nd_3)。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
+| intriParams | 输入 | 搬运参数，类型为Nz2NdParamsFull，具体参数请参考[表3](#table_nz2nd_3)。<br>具体定义请参考`${INSTALL_DIR}/asc/include/ascendc/basic_api/interface/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
 
 **表3**  Nz2NdParamsFull结构体内参数定义<a name="table_nz2nd_3"></a>
 
@@ -136,16 +136,16 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 intriParams参数解析请参考[图1](#fig15851251122815)。
 
-```cpp
+``cpp
 // srcLocal为half类型的LocalTensor，dstGlobal为half类型的GlobalTensor。
 AscendC::Nz2NdParamsFull intriParams{1, 32, 32, 1, 32, 32, 1};
 // Local Memory -> Global Memory
 AscendC::DataCopy(dstGlobal, srcLocal, intriParams);
-```
+``
 
 结果示例：
 
-```text
+``text
 输入数据(srcLocal): [1 2 3 ... 1024]
 输出数据(dstGlobal):[1 2 ... 15 16 513 514 ... 527 528 17 18 ... 31 32 529 530 ... 543 544 ...497 498 ...  511 512  1009 1010... 1023 1024]
-```
+``

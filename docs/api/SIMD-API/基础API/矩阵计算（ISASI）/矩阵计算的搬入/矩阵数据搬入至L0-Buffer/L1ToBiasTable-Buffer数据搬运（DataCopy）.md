@@ -47,22 +47,22 @@ DataCopy数据搬运支持将矩阵计算用到的Bias参数从L1 Buffer移动�
 
 - 连续搬运场景。
 
-  ```cpp
+  ``cpp
   template <typename T>
   __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
-  ```
+  ``
 - 连续或非连续搬运场景（高维切分）。
 
-  ```cpp
+  ``cpp
   template <typename T>
   __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
-  ```
+  ``
 - 连续或非连续搬运场景，支持源操作数和目的操作数数据类型不一致。
 
-  ```cpp
+  ``cpp
   template <typename T, typename U>
   __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyParams& repeatParams)
-  ```
+  ``
 
 ## 参数说明<a id="zh-cn_topic_0000002566886667_section16128134420472"></a>
 
@@ -81,7 +81,7 @@ DataCopy数据搬运支持将矩阵计算用到的Bias参数从L1 Buffer移动�
 | dst          | 输出      | 目的操作数，类型为LocalTensor。存储位置为BiasTable Buffer（TPosition为C2），目的地址需要64字节对齐。                                                                                                                                        |
 | src          | 输入      | 源操作数，类型为LocalTensor，存储位置为L1 Buffer（TPosition为C1），源地址需要32字节对齐。                                                                                                                                                   |
 | count        | 输入      | 参与搬运的元素个数。`count * sizeof(T)`需要32字节对齐，若未对齐，则搬运量会向下取整到32字节对齐。                                                                                                                                           |
-| repeatParams | 输入      | 搬运参数，DataCopyParams类型。通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。<br>上述结构体参数定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。参数说明见[表3](#zh-cn_topic_0000002566886667_table9182515919)。 |
+| repeatParams | 输入      | 搬运参数，DataCopyParams类型。通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。<br>上述结构体参数定义请参考`${INSTALL_DIR}/asc/include/ascendc/basic_api/interface/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。参数说明见[表3](#zh-cn_topic_0000002566886667_table9182515919)。 |
 
 **表3** DataCopyParams结构体参数定义<a id="zh-cn_topic_0000002566886667_table9182515919"></a>
 
@@ -142,7 +142,7 @@ DataCopy数据搬运支持将矩阵计算用到的Bias参数从L1 Buffer移动�
 
 L1 Buffer->BiasTable Buffer，搬运Bias参数。
 
-```cpp
+``cpp
 // c1Addr = 128 * 1024、c2Addr = 0；__NPU_ARCH__ == 3510时c12c2Params = {1, 32, 0, 0}，否则为 {1, 16, 0, 0}。
 AscendC::LocalTensor<outputType> bias1Local(AscendC::TPosition::C1, c1Addr, biasSizeAlign);
 AscendC::LocalTensor<outputType> bias2Local(AscendC::TPosition::C2, c2Addr, biasSizeAlign);
@@ -163,6 +163,6 @@ __aicore__ inline void SplitBias(AscendC::LocalTensor<outputType> bias1Local,
 #endif
     AscendC::DataCopy(bias2Local, bias1Local, c12c2Params);
 }
-```
+``
 
 完整示例请参考[data_copy_gm2l1样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2l1)中场景4。

@@ -31,9 +31,9 @@ check设定范围内的UB读写行为，如果有设定范围的读写行为则�
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```cpp
+``cpp
 __aicore__ inline void CheckLocalMemoryIA(const CheckLocalMemoryIAParam& checkParams)
-```
+``
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
@@ -69,7 +69,7 @@ __aicore__ inline void CheckLocalMemoryIA(const CheckLocalMemoryIAParam& checkPa
 
 该示例check矢量写访问是否在设定的(startAddr, endAddr]范围内。当前示例check到矢量写在设定的范围内，结果会报错（ACL_ERROR_RT_VECTOR_CORE_EXCEPTION）。
 
-```cpp
+``cpp
 AscendC::TPipe pipe;
 AscendC::TQue<AscendC::TPosition::VECIN, 1> inQueueSrc0, inQueueSrc1;
 AscendC::TQue<AscendC::TPosition::VECOUT, 1> outQueueDst;
@@ -81,4 +81,4 @@ AscendC::LocalTensor<half> src1Local = inQueueSrc1.DeQue<half>();
 AscendC::LocalTensor<half> dstLocal = outQueueDst.AllocTensor<half>();
 AscendC::CheckLocalMemoryIA({ 0, (uint32_t)(dstLocal.GetPhyAddr() / 32),(uint32_t)((dstLocal.GetPhyAddr() + 512 * sizeof(half)) / 32), false, false, false, true, false, false,
 true });
-```
+``

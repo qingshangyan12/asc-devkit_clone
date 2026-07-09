@@ -1,4 +1,4 @@
-# UBToUB高维切分数据搬运(DataCopy)<a name="ZH-CN_TOPIC_0000002382908021"></a>
+﻿# UBToUB高维切分数据搬运(DataCopy)<a name="ZH-CN_TOPIC_0000002382908021"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -46,10 +46,10 @@
 
 ## 函数原型<a name="section1954364615315"></a>
 
-```cpp
+``cpp
 template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
-```
+``
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
@@ -65,7 +65,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为[LocalTensor](../../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md)，存储位置为Unified Buffer，目的地址需要32字节对齐。 |
 | src | 输入 | 源操作数，类型为LocalTensor，存储位置为Unified Buffer，源地址需要32字节对齐。 |
-| repeatParams | 输入 | 搬运参数，DataCopyParams类型，参数说明请参考表3。通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
+| repeatParams | 输入 | 搬运参数，DataCopyParams类型，参数说明请参考表3。通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。<br>具体定义请参考`${INSTALL_DIR}/asc/include/ascendc/basic_api/interface/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
 
 **表3**  DataCopyParams结构体参数定义
 
@@ -184,7 +184,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 - 场景1：连续搬运——将源数据中128个half元素连续搬运至目的操作数（对应[图1](#zh-cn_topic_0000002535088926_fig4621152141711)）
 
-    ```cpp
+    ``cpp
     // srcLocal、dstLocal为half类型的LocalTensor。
     // 使用传入count参数的搬运接口，完成连续搬运。
     AscendC::DataCopy(dstLocal, srcLocal, 128);
@@ -199,11 +199,11 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
     params.srcGap = 0;
     params.dstGap = 0;
     AscendC::DataCopy(dstLocal, srcLocal, params);
-    ```
+    ``
 
 - 场景2：非连续搬运——从源数据中搬运2个数据块，每个数据块3个DataBlock，源间隔1个DataBlock、目的间隔2个DataBlock（对应[图2](#zh-cn_topic_0000002535088926_fig422819202304)）
 
-    ```cpp
+    ``cpp
     // srcLocal、dstLocal为half类型的LocalTensor。
     // 源数据shape为[1, 112]，共112个half元素（7个DataBlock）。
     // 目的数据接收非连续排列的2个数据块，共6个DataBlock（96个half元素）。
@@ -217,4 +217,4 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
     params.srcGap = 1;
     params.dstGap = 2;
     AscendC::DataCopy(dstLocal, srcLocal, params);
-    ```
+    ``

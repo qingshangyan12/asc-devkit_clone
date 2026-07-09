@@ -36,7 +36,7 @@
 
 ## 函数原型
 
-```cpp
+``cpp
 // 连续搬运
 template <typename T, uint8_t subBlockId = 0>
 __aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
@@ -44,7 +44,7 @@ __aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTens
 // 同时支持非连续搬运和连续搬运
 template <typename T, uint8_t subBlockId = 0>
 __aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
-```
+``
 
 ## 参数说明
 
@@ -61,7 +61,7 @@ __aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTens
 | :--- | :--- | :--- |
 | dst | 输出 | 目的操作数，类型为LocalTensor。LocalTensor的起始地址要求32字节对齐。 |
 | src | 输入 | 源操作数，类型为LocalTensor。LocalTensor的起始地址要求32字节对齐。 |
-| repeatParams | 输入 | 搬运参数，[DataCopyParams](#参数说明)类型。通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
+| repeatParams | 输入 | 搬运参数，[DataCopyParams](#参数说明)类型。通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。具体定义请参考`${INSTALL_DIR}/asc/include/ascendc/basic_api/interface/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
 | count | 输入 | 参与搬运的元素个数。<br>说明：count * sizeof(T)需要32字节对齐，若不对齐，搬运量将对32字节做向下取整。 |
 
 **表3** DataCopyParams结构体参数定义
@@ -89,7 +89,7 @@ __aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTens
 
 ## 调用示例
 
-```cpp
+``cpp
 // srcLocal、dstLocal为half类型的LocalTensor
 // 使用传入count参数的搬运接口，完成连续搬运
 AscendC::DataCopyL1ToUB(dstLocal, srcLocal, 512);
@@ -100,4 +100,4 @@ intriParams.blockLen = 512 * sizeof(half) / 32; // 连续数据块长度，单�
 intriParams.srcGap = 0; // 源操作数做连续搬运
 intriParams.dstGap = 0; // 目的操作数连续排布
 AscendC::DataCopyL1ToUB(dstLocal, srcLocal, intriParams);
-```
+``
