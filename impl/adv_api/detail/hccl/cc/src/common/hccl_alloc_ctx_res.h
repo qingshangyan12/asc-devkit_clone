@@ -897,6 +897,12 @@ HcclResult GetOpParam(
     return HCCL_SUCCESS;
 }
 
+HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex)
+{
+    HCCL_DEBUG("[CcuSelectAlgCheck] Default function.");
+    return HCCL_SUCCESS;
+}
+
 // CCU路径逐算子：算法选择 + 资源准备（参照GetOpParam形式）
 HcclResult CcuSelectAlg(
     HcclComm comm, void* stream, const std::string topoTag[], const void* ccTilingList[], uint32_t tilingNum,
@@ -988,8 +994,4 @@ HcclResult CcuSelectAlg(
     return HCCL_SUCCESS;
 }
 
-HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex)
-{
-    HCCL_DEBUG("[CcuSelectAlgCheck] Default function.");
-    return HCCL_SUCCESS;
-}
+#endif
