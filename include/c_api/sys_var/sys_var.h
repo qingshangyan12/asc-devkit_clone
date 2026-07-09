@@ -83,16 +83,6 @@ __aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config);
 
 __aicore__ inline void asc_set_l3d_rpt_b(uint64_t config);
 
-__aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config);
-
-__aicore__ inline void asc_set_l13d_padding(uint64_t config);
-
-__aicore__ inline void asc_set_l13d_padding(half config);
-
-__aicore__ inline void asc_set_l13d_padding(int16_t config);
-
-__aicore__ inline void asc_set_l13d_padding(uint16_t config);
-
 __aicore__ inline void asc_set_l12l0_padding_val(uint64_t config);
 
 __aicore__ inline void asc_set_l0c2gm_quant_post(uint64_t config);
@@ -101,7 +91,16 @@ __aicore__ inline void asc_set_l0c2gm_relu_alpha(uint64_t config);
 
 __aicore__ inline int64_t asc_get_squeeze_status();
 
+/*
+ * @ingroup CubeDataMove
+ * @brief Set MTE2_NZ_PARA register value before calling asc_copy_gm2l1_dn2nz and asc_copy_gm2l1_nd2nz
+ * @param [in] config Register value to set. Bit 15:0 is ND/DN matrix count, bit 31:16 is N dimension block interval, bit 47:32 is C0 column interval in same NZ matrix, bit 63:48 is NZ matrix interval between ND/DN matrices
+ * @details Sets parameters for format conversion in MTE2_NZ_PARA register before ND/DN to NZ format conversion.
+ *          This is a hardware-level instruction that requires manual synchronization.
+ */
+__aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config);
 #endif
+
 
 #endif
 
