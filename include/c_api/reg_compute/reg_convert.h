@@ -1713,9 +1713,9 @@ __simd_callee__ inline void asc_half2float_v2(vector_float& dst, vector_half src
 
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
 
 // ========== Type conversion vN replacement declarations ==========
 
@@ -2503,4 +2503,4 @@ __simd_callee__ inline void asc_half2uint8_rz_sat(vector_uint8_t& dst, vector_ha
 
 __simd_callee__ inline void asc_half2uint8_rz_sat(vector_uint8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos);
 
-#endif   
+#endif
