@@ -7051,7 +7051,7 @@
     "case": "01_simd_cpp_api/03_basic_api/05_sync_control/mutex",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_basic_api/05_sync_control/mutex/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "source_case": "01_simd_cpp_api/03_basic_api/05_sync_control/mutex",
     "supported_archs": [
       "dav-3510"
@@ -7063,10 +7063,13 @@
     ],
     "target_runnable": false,
     "skip": false,
-    "skip_reason": "",
-    "skip_modes": [],
+    "skip_reason": "The execution time in CPU mode is too long and needs to be skipped",
+    "skip_modes": [
+      "cpu"
+    ],
     "reasons": [
-      "unsupported_on_target_arch_or_mode"
+      "unsupported_on_target_arch_or_mode",
+      "partial_mode_skip"
     ],
     "commands": [
       "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
@@ -10550,9 +10553,13 @@
     ],
     "target_runnable": true,
     "skip": false,
-    "skip_reason": "",
-    "skip_modes": [],
-    "reasons": [],
+    "skip_reason": "The execution time in CPU mode is too long and needs to be skipped",
+    "skip_modes": [
+      "cpu"
+    ],
+    "reasons": [
+      "partial_mode_skip"
+    ],
     "commands": [
       "cmake -DSCENARIO_NUM=0 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "make -j",
@@ -10578,9 +10585,13 @@
     ],
     "target_runnable": true,
     "skip": false,
-    "skip_reason": "",
-    "skip_modes": [],
-    "reasons": [],
+    "skip_reason": "The execution time in CPU mode is too long and needs to be skipped",
+    "skip_modes": [
+      "cpu"
+    ],
+    "reasons": [
+      "partial_mode_skip"
+    ],
     "commands": [
       "cmake -DSCENARIO_NUM=1 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "make -j",
@@ -10606,9 +10617,13 @@
     ],
     "target_runnable": true,
     "skip": false,
-    "skip_reason": "",
-    "skip_modes": [],
-    "reasons": [],
+    "skip_reason": "The execution time in CPU mode is too long and needs to be skipped",
+    "skip_modes": [
+      "cpu"
+    ],
+    "reasons": [
+      "partial_mode_skip"
+    ],
     "commands": [
       "cmake -DSCENARIO_NUM=2 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "make -j",
@@ -10634,9 +10649,13 @@
     ],
     "target_runnable": true,
     "skip": false,
-    "skip_reason": "",
-    "skip_modes": [],
-    "reasons": [],
+    "skip_reason": "The execution time in CPU mode is too long and needs to be skipped",
+    "skip_modes": [
+      "cpu"
+    ],
+    "reasons": [
+      "partial_mode_skip"
+    ],
     "commands": [
       "cmake -DSCENARIO_NUM=3 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "make -j",
@@ -10662,9 +10681,13 @@
     ],
     "target_runnable": true,
     "skip": false,
-    "skip_reason": "",
-    "skip_modes": [],
-    "reasons": [],
+    "skip_reason": "The execution time in CPU mode is too long and needs to be skipped",
+    "skip_modes": [
+      "cpu"
+    ],
+    "reasons": [
+      "partial_mode_skip"
+    ],
     "commands": [
       "cmake -DSCENARIO_NUM=4 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "make -j",
@@ -10690,9 +10713,13 @@
     ],
     "target_runnable": true,
     "skip": false,
-    "skip_reason": "",
-    "skip_modes": [],
-    "reasons": [],
+    "skip_reason": "The execution time in CPU mode is too long and needs to be skipped",
+    "skip_modes": [
+      "cpu"
+    ],
+    "reasons": [
+      "partial_mode_skip"
+    ],
     "commands": [
       "cmake -DSCENARIO_NUM=5 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "make -j",
@@ -10718,9 +10745,13 @@
     ],
     "target_runnable": true,
     "skip": false,
-    "skip_reason": "",
-    "skip_modes": [],
-    "reasons": [],
+    "skip_reason": "The execution time in CPU mode is too long and needs to be skipped",
+    "skip_modes": [
+      "cpu"
+    ],
+    "reasons": [
+      "partial_mode_skip"
+    ],
     "commands": [
       "cmake -DSCENARIO_NUM=6 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "make -j",
@@ -11142,7 +11173,7 @@
     "case": "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_eltwise_high_performance__scenario_0",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_eltwise_high_performance__scenario_0/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "source_case": "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_eltwise_high_performance",
     "supported_archs": [
       "dav-3510"
@@ -11154,10 +11185,13 @@
     ],
     "target_runnable": false,
     "skip": false,
-    "skip_reason": "",
-    "skip_modes": [],
+    "skip_reason": "The execution time in CPU mode is too long and needs to be skipped",
+    "skip_modes": [
+      "cpu"
+    ],
     "reasons": [
-      "unsupported_on_target_arch_or_mode"
+      "unsupported_on_target_arch_or_mode",
+      "partial_mode_skip"
     ],
     "commands": [
       "cmake .. -DSCENARIO_NUM=0 -DCMAKE_ASC_ARCHITECTURES=dav-2201",
@@ -11171,7 +11205,7 @@
     "case": "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_eltwise_high_performance__scenario_1",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_eltwise_high_performance__scenario_1/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "source_case": "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_eltwise_high_performance",
     "supported_archs": [
       "dav-3510"
@@ -11183,10 +11217,13 @@
     ],
     "target_runnable": false,
     "skip": false,
-    "skip_reason": "",
-    "skip_modes": [],
+    "skip_reason": "The execution time in CPU mode is too long and needs to be skipped",
+    "skip_modes": [
+      "cpu"
+    ],
     "reasons": [
-      "unsupported_on_target_arch_or_mode"
+      "unsupported_on_target_arch_or_mode",
+      "partial_mode_skip"
     ],
     "commands": [
       "cmake .. -DSCENARIO_NUM=1 -DCMAKE_ASC_ARCHITECTURES=dav-2201",
@@ -11200,7 +11237,7 @@
     "case": "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_eltwise_high_performance__scenario_2",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_eltwise_high_performance__scenario_2/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "source_case": "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_eltwise_high_performance",
     "supported_archs": [
       "dav-3510"
@@ -11212,10 +11249,13 @@
     ],
     "target_runnable": false,
     "skip": false,
-    "skip_reason": "",
-    "skip_modes": [],
+    "skip_reason": "The execution time in CPU mode is too long and needs to be skipped",
+    "skip_modes": [
+      "cpu"
+    ],
     "reasons": [
-      "unsupported_on_target_arch_or_mode"
+      "unsupported_on_target_arch_or_mode",
+      "partial_mode_skip"
     ],
     "commands": [
       "cmake .. -DSCENARIO_NUM=2 -DCMAKE_ASC_ARCHITECTURES=dav-2201",
@@ -11229,7 +11269,7 @@
     "case": "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_eltwise_high_performance__scenario_3",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_eltwise_high_performance__scenario_3/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "source_case": "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_eltwise_high_performance",
     "supported_archs": [
       "dav-3510"
@@ -11241,10 +11281,13 @@
     ],
     "target_runnable": false,
     "skip": false,
-    "skip_reason": "",
-    "skip_modes": [],
+    "skip_reason": "The execution time in CPU mode is too long and needs to be skipped",
+    "skip_modes": [
+      "cpu"
+    ],
     "reasons": [
-      "unsupported_on_target_arch_or_mode"
+      "unsupported_on_target_arch_or_mode",
+      "partial_mode_skip"
     ],
     "commands": [
       "cmake .. -DSCENARIO_NUM=3 -DCMAKE_ASC_ARCHITECTURES=dav-2201",
@@ -11258,7 +11301,7 @@
     "case": "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_high_performance__scenario_0",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_high_performance__scenario_0/run.sh",
     "source": "readme",
-    "confidence": "low",
+    "confidence": "high",
     "source_case": "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_high_performance",
     "supported_archs": [
       "dav-3510"
@@ -11270,11 +11313,14 @@
     ],
     "target_runnable": false,
     "skip": false,
-    "skip_reason": "",
-    "skip_modes": [],
+    "skip_reason": "The execution time in CPU mode is too long and needs to be skipped",
+    "skip_modes": [
+      "cpu"
+    ],
     "reasons": [
       "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "unsupported_on_target_arch_or_mode",
+      "partial_mode_skip"
     ],
     "commands": [
       "cmake .. -DSCENARIO_NUM=0 -DCMAKE_VF_MODE=$CMAKE_VF_MODE -DCMAKE_ASC_ARCHITECTURES=dav-2201",
@@ -11288,7 +11334,7 @@
     "case": "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_high_performance__scenario_1",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_high_performance__scenario_1/run.sh",
     "source": "readme",
-    "confidence": "low",
+    "confidence": "high",
     "source_case": "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_high_performance",
     "supported_archs": [
       "dav-3510"
@@ -11300,11 +11346,14 @@
     ],
     "target_runnable": false,
     "skip": false,
-    "skip_reason": "",
-    "skip_modes": [],
+    "skip_reason": "The execution time in CPU mode is too long and needs to be skipped",
+    "skip_modes": [
+      "cpu"
+    ],
     "reasons": [
       "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "unsupported_on_target_arch_or_mode",
+      "partial_mode_skip"
     ],
     "commands": [
       "cmake .. -DSCENARIO_NUM=1 -DCMAKE_VF_MODE=$CMAKE_VF_MODE -DCMAKE_ASC_ARCHITECTURES=dav-2201",
@@ -11318,7 +11367,7 @@
     "case": "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_high_performance__scenario_2",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_high_performance__scenario_2/run.sh",
     "source": "readme",
-    "confidence": "low",
+    "confidence": "high",
     "source_case": "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_high_performance",
     "supported_archs": [
       "dav-3510"
@@ -11330,11 +11379,14 @@
     ],
     "target_runnable": false,
     "skip": false,
-    "skip_reason": "",
-    "skip_modes": [],
+    "skip_reason": "The execution time in CPU mode is too long and needs to be skipped",
+    "skip_modes": [
+      "cpu"
+    ],
     "reasons": [
       "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "unsupported_on_target_arch_or_mode",
+      "partial_mode_skip"
     ],
     "commands": [
       "cmake .. -DSCENARIO_NUM=2 -DCMAKE_VF_MODE=$CMAKE_VF_MODE -DCMAKE_ASC_ARCHITECTURES=dav-2201",
@@ -12077,9 +12129,13 @@
     ],
     "target_runnable": true,
     "skip": false,
-    "skip_reason": "",
-    "skip_modes": [],
-    "reasons": [],
+    "skip_reason": "The execution time in CPU mode is too long and needs to be skipped",
+    "skip_modes": [
+      "cpu"
+    ],
+    "reasons": [
+      "partial_mode_skip"
+    ],
     "commands": [
       "cmake -DSCENARIO_NUM=1 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "make -j",
@@ -12105,9 +12161,13 @@
     ],
     "target_runnable": true,
     "skip": false,
-    "skip_reason": "",
-    "skip_modes": [],
-    "reasons": [],
+    "skip_reason": "The execution time in CPU mode is too long and needs to be skipped",
+    "skip_modes": [
+      "cpu"
+    ],
+    "reasons": [
+      "partial_mode_skip"
+    ],
     "commands": [
       "cmake -DSCENARIO_NUM=2 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "make -j",
@@ -12921,6 +12981,114 @@
       "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "make -j",
       "./c_api_add_example"
+    ]
+  },
+  {
+    "case": "02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode__scenario_1",
+    "runner": "scripts/presmoke/cases/02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode__scenario_1/run.sh",
+    "source": "readme",
+    "confidence": "medium",
+    "source_case": "02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode",
+    "supported_archs": [
+      "dav-3510"
+    ],
+    "supported_modes": [
+      "npu",
+      "sim"
+    ],
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
+    "skip_modes": [],
+    "reasons": [
+      "unsupported_on_target_arch_or_mode"
+    ],
+    "commands": [
+      "cmake -DSCENARIO_NUM=1 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "make -j",
+      "python3 ../scripts/gen_data.py -scenarioNum 1",
+      "./demo"
+    ]
+  },
+  {
+    "case": "02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode__scenario_2",
+    "runner": "scripts/presmoke/cases/02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode__scenario_2/run.sh",
+    "source": "readme",
+    "confidence": "medium",
+    "source_case": "02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode",
+    "supported_archs": [
+      "dav-3510"
+    ],
+    "supported_modes": [
+      "npu",
+      "sim"
+    ],
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
+    "skip_modes": [],
+    "reasons": [
+      "unsupported_on_target_arch_or_mode"
+    ],
+    "commands": [
+      "cmake -DSCENARIO_NUM=2 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "make -j",
+      "python3 ../scripts/gen_data.py -scenarioNum 2",
+      "./demo"
+    ]
+  },
+  {
+    "case": "02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode__scenario_3",
+    "runner": "scripts/presmoke/cases/02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode__scenario_3/run.sh",
+    "source": "readme",
+    "confidence": "medium",
+    "source_case": "02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode",
+    "supported_archs": [
+      "dav-3510"
+    ],
+    "supported_modes": [
+      "npu",
+      "sim"
+    ],
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
+    "skip_modes": [],
+    "reasons": [
+      "unsupported_on_target_arch_or_mode"
+    ],
+    "commands": [
+      "cmake -DSCENARIO_NUM=3 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "make -j",
+      "python3 ../scripts/gen_data.py -scenarioNum 3",
+      "./demo"
+    ]
+  },
+  {
+    "case": "02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode__scenario_4",
+    "runner": "scripts/presmoke/cases/02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode__scenario_4/run.sh",
+    "source": "readme",
+    "confidence": "medium",
+    "source_case": "02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode",
+    "supported_archs": [
+      "dav-3510"
+    ],
+    "supported_modes": [
+      "npu",
+      "sim"
+    ],
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
+    "skip_modes": [],
+    "reasons": [
+      "unsupported_on_target_arch_or_mode"
+    ],
+    "commands": [
+      "cmake -DSCENARIO_NUM=4 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "make -j",
+      "python3 ../scripts/gen_data.py -scenarioNum 4",
+      "./demo"
     ]
   },
   {

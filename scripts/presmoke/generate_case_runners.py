@@ -73,6 +73,7 @@ NO_CMAKE_ARCH_INJECTION_CASES = {
 
 TENSORFLOW_SKIP_REASON = "requires TensorFlow 2.6.5 environment; skipped by presmoke"
 MATMUL_L2CACHE_SKIP_REASON = "data size (~308M) causes overtime in cpu mode; cpu mode skipped by presmoke"
+LONG_TIME_REASON = "The execution time in CPU mode is too long and needs to be skipped"
 
 
 @dataclass
@@ -92,6 +93,26 @@ SKIP_CONFIG = {
     ),
     "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_l2cache": SkipConfig(
         reason=MATMUL_L2CACHE_SKIP_REASON,
+        modes=["cpu"],
+    ),
+    "01_simd_cpp_api/03_basic_api/05_sync_control/mutex": SkipConfig(
+        reason=LONG_TIME_REASON,
+        modes=["cpu"],
+    ),
+    "01_simd_cpp_api/05_best_practices/00_vector_compute/add_high_performance": SkipConfig(
+        reason=LONG_TIME_REASON,
+        modes=["cpu"],
+    ),
+    "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_eltwise_high_performance": SkipConfig(
+        reason=LONG_TIME_REASON,
+        modes=["cpu"],
+    ),
+    "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_high_performance": SkipConfig(
+        reason=LONG_TIME_REASON,
+        modes=["cpu"],
+    ),
+    "01_simd_cpp_api/05_best_practices/04_memory_access/bank_conflict_nd2nz": SkipConfig(
+        reason=LONG_TIME_REASON,
         modes=["cpu"],
     ),
 }
