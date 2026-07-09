@@ -87,7 +87,7 @@ DataCacheCleanAndInvalid接口用于解决上述一致性问题，其功能可�
 |--------|------|
 | T | dst的数据类型。 |
 | entireType | 指令操作的模式：<br>SINGLE_CACHE_LINE：只刷新传入地址所在的Cache Line，**注意如果该地址非64B对齐，只会操作传入地址到64B对齐的部分。**<br>ENTIRE_DATA_CACHE：此时传入的地址无效，核内会刷新整个DCache，但是耗时较大，**性能敏感的场景慎用**。 |
-| dcciDst | 表示使用该接口来保证DCache与哪一种存储保持一致性，类型为DcciDst枚举类。<br>&bull; CACHELINE_ALL：与CACHELINE_OUT效果一致。<br>&bull; CACHELINE_UB：表示通过该接口来保证DCache与UB的一致性。<br>&bull; CACHELINE_OUT：表示通过该接口来保证DCache与GM的一致性。<br>&bull; CACHELINE_ATOMIC：<br>&ensp;&bull; <!-- npu="950" id9 -->Ascend 950PR/Ascend 950DT，原子操作过程中保证DCache和GM的一致性。<!-- end id9 --><br>&ensp;&bull; <!-- npu="A3" id10 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品，暂未支持。<!-- end id10 --><br>&ensp;&bull; <!-- npu="910b" id11 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品，暂未支持。<!-- end id11 --><br>&ensp;&bull; <!-- npu="310b" id12 -->Atlas 200I/500 A2 推理产品，暂未支持。<!-- end id12 --><br>&ensp;&bull; <!-- npu="310p" id13 -->Atlas 推理系列产品AI Core，暂未支持。<!-- end id13 --> |
+| dcciDst | 表示使用该接口来保证DCache与哪一种存储保持一致性，类型为DcciDst枚举类。<br>&bull; CACHELINE_ALL：与CACHELINE_OUT效果一致。<br>&bull; CACHELINE_UB：表示通过该接口来保证DCache与UB的一致性。<br>&bull; CACHELINE_OUT：表示通过该接口来保证DCache与GM的一致性。<br>&bull; CACHELINE_ATOMIC：<br><!-- npu="950" id9 -->&ensp;&ensp;- Ascend 950PR/Ascend 950DT，原子操作过程中保证DCache和GM的一致性。<br><!-- end id9 --><!-- npu="A3" id10 -->&ensp;&ensp;- Atlas A3 训练系列产品/Atlas A3 推理系列产品，暂未支持。<br><!-- end id10 --><!-- npu="910b" id11 -->&ensp;&ensp;- Atlas A2 训练系列产品/Atlas A2 推理系列产品，暂未支持。<br><!-- end id11 --><!-- npu="310b" id12 -->&ensp;&ensp;- Atlas 200I/500 A2 推理产品，暂未支持。<br><!-- end id12 --><!-- npu="310p" id13 -->&ensp;&ensp;- Atlas 推理系列产品AI Core，暂未支持。<!-- end id13 --> |
 
 **表2**  参数说明
 
