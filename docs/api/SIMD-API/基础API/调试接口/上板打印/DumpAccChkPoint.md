@@ -1,6 +1,6 @@
 # DumpAccChkPoint<a name="ZH-CN_TOPIC_0000001877958569"></a>
 
-## 产品支持情况<a name="section1550532418810"></a>
+## 产品支持情况
 
 <!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
@@ -23,7 +23,6 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
-
 
 ## 功能说明<a name="section259105813316"></a>
 
@@ -70,19 +69,14 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &tensor, uint32_t i
 
 <!-- npu="950" id101 -->
 - Ascend 950PR/Ascend 950DT，T支持的数据类型为：bool、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。<!-- end id101 -->
-
 <!-- npu="A3" id102 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。<!-- end id102 -->
-
 <!-- npu="910b" id103 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。<!-- end id103 -->
-
 <!-- npu="310b" id104 -->
 - Atlas 200I/500 A2 推理产品，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。<!-- end id104 -->
-
 <!-- npu="310p" id105 -->
 - Atlas 推理系列产品AI Core，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。<!-- end id105 -->
-
 <!-- npu="910" id106 -->
 - Atlas 训练系列产品，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。<!-- end id106 -->
 
@@ -94,7 +88,7 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &tensor, uint32_t i
 
 - 当前仅支持打印存储位置为Unified Buffer/L1 Buffer/L0C Buffer/Global Memory的Tensor信息。
 <!-- npu="950" id100 -->
-针对Ascend 950PR/Ascend 950DT，使用该接口打印L1 Tensor数据时，HDK版本需要至少升级到25.7.0以上。
+- 针对Ascend 950PR/Ascend 950DT，使用该接口打印L1 Tensor数据时，HDK版本需要至少升级到25.7.0以上。
 <!-- end id100 -->
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 - 单次调用DumpAccChkPoint打印的数据总量不可超过30KB（还包括少量框架需要的头尾信息，通常可忽略）。使用时应注意，如果超出这个限制，则数据不会被打印。
