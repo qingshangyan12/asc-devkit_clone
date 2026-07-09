@@ -65,11 +65,8 @@ uint32_t __activemask()
 #endif
 
 template <typename T>
-T AscShflCPU(T var, int32_t num)
+T AscShflCPU(T var, int32_t srcLane, int32_t width)
 {
-    int32_t srcLane = num & 0xff;
-    int32_t width = 32 - ((num >> 16) & 0xff);
-
     uint32_t warpId = AscendC::Simt::GetWarpId();
     uint32_t laneId = AscendC::Simt::GetLaneId();
     AscendC::Simt::Warp &warp = AscendC::Simt::ThreadBlock::GetBlockInstance().warps_[warpId];
@@ -80,9 +77,9 @@ T AscShflCPU(T var, int32_t num)
 }
 
 #define REGISTER_SIMT_ASC_SHFL(INTRI, TYPE)                                     \
-    TYPE INTRI(TYPE var, int32_t num)                                           \
+    TYPE INTRI(TYPE var, int32_t srcLane, int32_t width)                        \
     {                                                                           \
-        return AscShflCPU<TYPE>(var, num);                                      \
+        return AscShflCPU<TYPE>(var, srcLane, width);                           \
     }
 
 #if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
@@ -98,10 +95,8 @@ REGISTER_SIMT_ASC_SHFL(__shfl, bfloat16x2_t);
 #endif
 
 template <typename T>
-T AscShflUpCPU(T var, int32_t num)
+T AscShflUpCPU(T var, int32_t delta, int32_t width)
 {
-    int32_t delta = num & 0xff;
-    int32_t width = 32 - ((num >> 16) & 0xff);
     uint32_t warpId = AscendC::Simt::GetWarpId();
     uint32_t laneId = AscendC::Simt::GetLaneId();
     AscendC::Simt::Warp &warp = AscendC::Simt::ThreadBlock::GetBlockInstance().warps_[warpId];
@@ -116,9 +111,9 @@ T AscShflUpCPU(T var, int32_t num)
 }
 
 #define REGISTER_SIMT_ASC_SHFL_UP(INTRI, TYPE)                                  \
-    TYPE INTRI(TYPE var, int32_t num)                                           \
+    TYPE INTRI(TYPE var, int32_t delta, int32_t width)                          \
     {                                                                           \
-        return AscShflUpCPU<TYPE>(var, num);                                    \
+        return AscShflUpCPU<TYPE>(var, delta, width);                           \
     }
 
 #if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
@@ -134,16 +129,13 @@ REGISTER_SIMT_ASC_SHFL_UP(__shfl_up, bfloat16x2_t);
 #endif
 
 template <typename T>
-T AscShflDownCPU(T var, int32_t num)
+T AscShflDownCPU(T var, int32_t delta, int32_t width)
 {
-    int32_t delta = num & 0xff;
-    int32_t width = 32 - ((num >> 16) & 0xff);
-
     uint32_t warpId = AscendC::Simt::GetWarpId();
     uint32_t laneId = AscendC::Simt::GetLaneId();
     AscendC::Simt::Warp &warp = AscendC::Simt::ThreadBlock::GetBlockInstance().warps_[warpId];
     int32_t minLane = laneId / width * width;
-    int32_t maxLane = minLane + MAX_SHLF_OFFSET % width;
+    int32_t maxLane = minLane + width - 1;
     int32_t srcLane = laneId + delta;
 
     if (srcLane > maxLane) {
@@ -154,9 +146,9 @@ T AscShflDownCPU(T var, int32_t num)
 }
 
 #define REGISTER_SIMT_ASC_SHFL_DOWN(INTRI, TYPE)                                \
-    TYPE INTRI(TYPE var, int32_t num)                                           \
+    TYPE INTRI(TYPE var, int32_t delta, int32_t width)                          \
     {                                                                           \
-        return AscShflDownCPU<TYPE>(var, num);                                  \
+        return AscShflDownCPU<TYPE>(var, delta, width);                         \
     }
 
 #if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
@@ -172,19 +164,16 @@ REGISTER_SIMT_ASC_SHFL_DOWN(__shfl_down, bfloat16x2_t);
 #endif
 
 template <typename T>
-T AscShflXorCPU(T var, int32_t num)
+T AscShflXorCPU(T var, int32_t laneMask, int32_t width)
 {
-    int32_t laneMask = num & 0xff;
-    int32_t width = 32 - ((num >> 16) & 0xff);
-
     uint32_t warpId = AscendC::Simt::GetWarpId();
     uint32_t laneId = AscendC::Simt::GetLaneId();
     AscendC::Simt::Warp &warp = AscendC::Simt::ThreadBlock::GetBlockInstance().warps_[warpId];
     int32_t minLane = laneId / width * width;
-    int32_t maxLane = minLane + MAX_SHLF_OFFSET % width;
+    int32_t maxLane = minLane + width - 1;
     int32_t srcLane = laneId ^ laneMask;
 
-    if (srcLane < 0 || srcLane > maxLane) {
+    if (srcLane < minLane || srcLane > maxLane) {
         srcLane = laneId;
     }
 
@@ -192,9 +181,9 @@ T AscShflXorCPU(T var, int32_t num)
 }
 
 #define REGISTER_SIMT_ASC_SHFL_XOR(INTRI, TYPE)                                 \
-    TYPE INTRI(TYPE var, int32_t num)                                           \
+    TYPE INTRI(TYPE var, int32_t laneMask, int32_t width)                       \
     {                                                                           \
-        return AscShflXorCPU<TYPE>(var, num);                                   \
+        return AscShflXorCPU<TYPE>(var, laneMask, width);                       \
     }
 
 #if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
