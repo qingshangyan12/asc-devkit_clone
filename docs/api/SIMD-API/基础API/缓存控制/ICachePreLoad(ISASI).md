@@ -56,8 +56,12 @@ __aicore__ inline void ICachePreLoad(const int64_t preFetchLen)
 <!-- npu="910b" id11 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 <!-- end id11 -->
-preFetchLen参数单位为2K Byte，取值满足如下要求：  
-$ preFetchLen< \dfrac{ICache的大小}{2K}$  
+preFetchLen参数单位为2K Byte，取值满足如下要求：
+
+$$
+\text{preFetchLen}< \dfrac{\text{ICache的大小}}{2K}
+$$
+ 
 其中，AIC和AIV的ICache大小分别为32KB和16KB。
 <!-- end id8 -->
 <!-- npu="310p" id110 -->
