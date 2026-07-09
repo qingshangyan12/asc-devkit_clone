@@ -64,22 +64,37 @@ struct MmadParams {
     bool cmatrixInitVal = false;
 };
 
-enum class RoundMode : uint8_t {DEFAULT = 0, HYBRID};
+enum class RoundMode : uint8_t { DEFAULT = 0, HYBRID };
 
-enum DualDstMode : uint8_t {
-    DUAL_DST_DISABLE = 0,
-    DUAL_DST_SPLIT_M,
-    DUAL_DST_SPLIT_N
-};
+enum DualDstMode : uint8_t { DUAL_DST_DISABLE = 0, DUAL_DST_SPLIT_M, DUAL_DST_SPLIT_N };
 
 struct FixpipeParams {
-   __aicore__ constexpr FixpipeParams() {};
+    __aicore__ constexpr FixpipeParams(){};
 
-   __aicore__ constexpr FixpipeParams(uint8_t unitFlagIn, bool subBlockIdIn = false) : unitFlag(unitFlagIn), subBlockId(subBlockIdIn) {};
+    __aicore__ constexpr FixpipeParams(uint8_t unitFlagIn, bool subBlockIdIn = false)
+        : unitFlag(unitFlagIn), subBlockId(subBlockIdIn){};
 
     uint8_t unitFlag = 0;
 
     bool subBlockId = false;
+};
+
+template <typename T>
+struct Img2ColParams {
+    uint16_t mExtension = 0;
+    uint16_t kExtension = 0;
+    uint8_t padList[4] = {0, 0, 0, 0};
+    uint8_t strideW = 1;
+    uint8_t strideH = 1;
+    uint8_t filterW = 1;
+    uint8_t filterH = 1;
+    uint8_t dilationFilterW = 1;
+    uint8_t dilationFilterH = 1;
+    bool filterSizeW = false;
+    bool filterSizeH = false;
+    bool transpose = false;
+    bool fMatrixCtrl = false;
+    T padValue = 0;
 };
 
 } // namespace Te
