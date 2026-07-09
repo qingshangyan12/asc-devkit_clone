@@ -236,7 +236,11 @@ __simd_callee__ inline void set_dump_tlv_info_vf(U& src, __ubuf__ DumpTensorTlv*
 {
     dump_tlv->type = static_cast<uint32_t>(DumpType::DUMP_TENSOR);
     dump_tlv->length = sizeof(DumpTensorTlv) - sizeof(uint32_t[2]) + align_dump_len;
-    dump_tlv->tensorAddr = 0U; // set in aicore
+    if constexpr (dumpPosition == DumpTensorPosition::UB) {
+        dump_tlv->tensorAddr = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(src));
+    } else {
+        dump_tlv->tensorAddr = 0U;
+    }
     dump_tlv->dataType = static_cast<uint32_t>(get_dump_datatype<T>());
     dump_tlv->desc = desc;
     dump_tlv->blockIdx = block_idx;  // set in aicore
@@ -278,6 +282,7 @@ __simd_callee__ inline void set_dump_tlv_data_reg(U& src, __ubuf__ DumpTensorTlv
 template <DumpTensorPosition dumpPosition, typename T, typename U>
 __simd_callee__ inline void asc_dump_impl_reg(U& src, uint32_t desc, uint32_t dump_size)
 {
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     __ubuf__ BlockVFBufInfo *block_info = get_printf_ubuf_addr(0);
 
     constexpr uint16_t data_block_size = 32;
@@ -292,11 +297,13 @@ __simd_callee__ inline void asc_dump_impl_reg(U& src, uint32_t desc, uint32_t du
     block_info->magic = ASCENDC_SIMD_VF_MAGIC_NUMBER;
     block_info->writeLen += tlv_len;
     block_info->pidx += 1;
+#endif
 }
 
 template <DumpTensorPosition dumpPosition, typename T, typename U>
 __simd_callee__ inline void asc_dump_impl(U& src, uint32_t desc, uint32_t dump_size)
 {
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     __ubuf__ BlockVFBufInfo *block_info = get_printf_ubuf_addr(0);
 
     constexpr uint16_t data_block_size = 32;
@@ -311,6 +318,7 @@ __simd_callee__ inline void asc_dump_impl(U& src, uint32_t desc, uint32_t dump_s
     block_info->magic = ASCENDC_SIMD_VF_MAGIC_NUMBER;
     block_info->writeLen += tlv_len;
     block_info->pidx += 1;
+#endif
 }
 
 template <typename T, typename U>
