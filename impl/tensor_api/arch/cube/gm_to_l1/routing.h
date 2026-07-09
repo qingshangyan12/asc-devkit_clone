@@ -41,10 +41,21 @@ namespace Te {
 
 class CopyGM2L1Ignore {
 public:
-    template <const CopyGM2L1Trait& trait, typename... Args>
-    __aicore__ inline static void Run(const Args&... args)
+    template <const CopyGM2L1Trait& trait, typename T, typename U>
+    __aicore__ inline static void Run(const T& dst, const U& src)
     {
-        static_assert(Std::is_same_v<Args..., void>, "CopyGM2L1Ignore should not be called");
+        // Conv layouts (NC1HWC0) are built with MakeLayout and carry no pattern tag, so routing lands
+        // here. A flat 5-dim (N, C1, H, W, C0) layout (depth 5 AND rank 5, no nesting) is dispatched
+        // to the nd2nd conv path; anything else is genuinely unsupported.
+        constexpr auto srcDepth = NestingDepthV<decltype(src.Layout().Shape())>;
+        constexpr auto srcRank = Std::tuple_size_v<Std::remove_cvref_t<decltype(src.Layout().Shape())>>;
+        if constexpr (srcDepth == FIVE_DIM_DATA && srcRank == FIVE_DIM_DATA) {
+            CopyGmToCbufAlignV2ND::template EmitConv2DCopy<trait, T, U>(dst, src);
+        } else {
+            static_assert(
+                srcDepth == FIVE_DIM_DATA && srcRank == FIVE_DIM_DATA,
+                "CopyGM2L1: unsupported layout pattern combination.");
+        }
     }
 };
 
