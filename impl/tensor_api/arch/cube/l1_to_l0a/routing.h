@@ -26,6 +26,7 @@
 #include "impl/tensor_api/arch/cube/l1_to_l0a/copy_impl/nz2nz.h"
 #include "impl/tensor_api/arch/cube/l1_to_l0a/copy_impl/zn2nz.h"
 #include "impl/tensor_api/arch/cube/l1_to_l0a/copy_impl/zn2nzb8b4.h"
+#include "impl/tensor_api/arch/cube/l1_to_l0a/copy_impl/img2col.h"
 
 namespace AscendC {
 namespace Te {

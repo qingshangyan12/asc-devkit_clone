@@ -34,6 +34,38 @@ struct CopyTraits<CopyL12L0A, Traits> : public CopyTraits<CopyL12L0A, Traits, Co
 template <>
 struct CopyTraits<CopyL12L0A> : public CopyTraits<CopyL12L0A, CopyL12L0ATraitDefault> {};
 
+// Holds the Img2ColParams<PadT> bound via atom.with(params); appends it to the Copy args on unpack.
+// PadT is threaded through so the bound params keep their padValue type.
+template <typename TraitStruct, typename PadT>
+struct CopyTraits<CopyL12L0AImg2ColWith, TraitStruct, PadT> {
+    using TraitType = typename TraitStruct::TraitType;
+    static constexpr const TraitType defaultTrait = TraitStruct::value;
+
+    template <const TraitType& trait = defaultTrait, typename... Args>
+    __aicore__ inline void CopyUnpack(const Args&... args) const
+    {
+        CopyL12L0AImg2ColWith::Copy<TraitType, trait, Args...>(args..., params);
+    }
+    Img2ColParams<PadT> params;
+};
+
+// CopyL12L0AImg2Col inherits the no-param CopyUnpack from the base, and overrides with() to deduce
+// PadT from the user-supplied Img2ColParams<PadT> and return a CopyL12L0AImg2ColWith traits.
+template <typename Traits>
+struct CopyTraits<CopyL12L0AImg2Col, Traits> : public CopyTraits<CopyL12L0AImg2Col, Traits, CopyL12L0AImg2Col, Traits> {
+    using BaseType = CopyTraits<CopyL12L0AImg2Col, Traits, CopyL12L0AImg2Col, Traits>;
+    using TraitType = typename BaseType::TraitType;
+
+    template <typename PadT>
+    __aicore__ inline constexpr auto with(const Img2ColParams<PadT>& params) const
+    {
+        return CopyTraits<CopyL12L0AImg2ColWith, Traits, PadT>{params};
+    }
+};
+
+template <>
+struct CopyTraits<CopyL12L0AImg2Col> : public CopyTraits<CopyL12L0AImg2Col, CopyL12L0AImg2ColTraitDefault> {};
+
 } // namespace Te
 } // namespace AscendC
 
