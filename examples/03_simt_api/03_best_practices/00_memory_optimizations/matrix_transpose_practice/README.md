@@ -62,7 +62,9 @@
 
 从Case 3开始，矩阵按32×32的tile处理。下图左侧表示1024×1024矩阵被划分为32×32个tile，右侧表示其中一个32×32的tile内的线程映射关系。tile内列索引记为 `tx`，tile内行索引记为 `ty`。
 
-<img src="./figures/blockMapping.png" width="60%">
+**图1　Thread Block与tile的映射示意图**
+
+<img src="./figures/block_mapping.png" width="60%">
 
 以图中绿色元素为例，可以根据tile坐标和tile内局部坐标推导它在GM中的input坐标。
 
@@ -169,6 +171,8 @@ Case 2在保持GM连续读取的同时，直接把数据写入转置后的输出
 **核心实现**：将矩阵划分为32×32的tile，总tile数为 `tiles=(W/32)×(H/32)`。本Case中每个Thread Block启动2048个线程，可同时处理两个tile，因此Thread Block数量设置为 `blocks_per_grid=ceil(tiles / 2)`。线程配置参数为 `dim3(32,64,1)`，其中 `threadIdx.y=0..31`的线程处理第一个tile，`threadIdx.y=32..63`的线程处理第二个tile；代码通过 `local_tile=threadIdx.y>>5`得到当前线程在Thread Block内负责的tile编号，通过 `ty=threadIdx.y&31`得到tile内行索引。线程先将tile按原布局写入UB，经 `asc_syncthreads()`同步后，再按转置方向从UB读出并连续写回GM。
 
 UB中转的核心思想如下图所示：GM读取阶段按输入矩阵行方向连续搬入UB；GM写回阶段交换输出tile坐标，使同一个warp写出输出矩阵的一行。原本非连续的GM写被转移为UB内转置方向读取。
+
+**图2　Case 3 UB中转转置数据流向示意图**
 
 <img src="./figures/case3.png" width="60%">
 
@@ -286,9 +290,13 @@ UB中的bank划分如下图所示。UB总大小256KB，划分为16个bank（每�
 
 SIMT场景下，同一个warp内的多个线程可能在同一条UB访问指令中同时访问UB；当这些访问数据属于同一个bank group的相同编号的subbank资源时，硬件无法在一个周期内处理全部请求，需要排队等待，从而形成subbank冲突并增加访问延迟；如果这些访问数据属于同一个subbank的同一行内的8B地址范围，硬件会将这些请求合并处理，不会形成subbank冲突。
 
+**图3　UB bank结构示意图**
+
 <img src="./figures/bank结构示意图.png">
 
 **地址采用低位交织：** 如下图所示，UB内连续地址按32B粒度映射到bank0～bank15：第1个32B地址段映射到bank0，第2个映射到bank1，依次类推；第16个映射到bank15，第17个映射回bank0的下一行。
+
+**图4　UB地址低位交织排布示意图**
 
 <img src="./figures/bank内存排布示意图.png">
 
@@ -299,11 +307,15 @@ SIMT编程方式下subbank冲突主要有以下几种：
 
 Case 5中UB的tile数组按照行优先存储。按照地址低位交织规则，tile数组的第一行刚好覆盖bank0～bank3，第二行覆盖bank4～bank7，第三行覆盖bank8～bank11，其余行依次类推。每行32个float数据会恰好跨越4个bank存储。Case 5中，一个warp的线程会读取tile的一列元素写回GM输出；访问UB时，32个线程会集中访问两个bank group的subbank0，属于读读冲突场景。
 
-<img src="./figures/case5bank.png">
+**图5　Case 5转置读阶段的bank冲突示意图**
+
+<img src="./figures/case5_bank.png">
 
 Case 6中对UB中的tile数组增加两列padding，由每行32个元素改为34个元素，其在UB上的排列如下图所示。由于每行有34个元素，行跨度变为17个subbank，同一列元素会错开排布到不同的subbank。Case 6访问UB时，32个线程的访问会分布到各个bank group的每个subbank中，即同一条访问指令下每个subbank仅有一个线程访问，从而避免上述读读冲突。
 
-<img src="./figures/case6bank.png">
+**图6　Case 6加padding后的UB bank排布示意图**
+
+<img src="./figures/case6_bank.png">
 
 ```cpp
 constexpr int TILE_PAD = 2;                          // Case6/7的UB padding列数（32x34）
@@ -356,7 +368,15 @@ for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x)
 
 相对Case 6的15.152μs，去除每轮循环末尾的同步后Task Duration降至12.074μs，下降约20%。在1024×1024矩阵、64个Thread Block的配置下，每个Thread Block需要循环处理16个tile，double buffer相当于每个Thread Block减少16次Thread Block内同步。该方法的代价是额外占用一份UB tile（共两份32×34），但未引入寄存器溢出。Case 7是本样例中耗时最低的SIMT转置版本，相对Case 0复制基线（6.262μs）约为1.9倍。
 
----
+Case 6与Case 7的仿真指令流水图分别如图7、图8所示。Case 6每轮循环受尾部 `asc_syncthreads()` 约束，当前轮的写回必须全部完成后才能进入下一轮，下一轮load前的运算与GM读取只能串行等待。Case 7借助double buffer轮换两份UB tile，去除尾部同步后，当前轮的GM写回与下一轮load前的运算、以及下一轮的GM读取重叠执行，load与compute之间的串行等待被压缩。这也是Task Duration相对Case 6进一步下降的主要原因。
+
+**图7　Case 6仿真指令流水图**
+
+<img src="./figures/case6_trace.png">
+
+**图8　Case 7仿真指令流水图**
+
+<img src="./figures/case7_trace.png">
 
 ## 性能对比总结
 

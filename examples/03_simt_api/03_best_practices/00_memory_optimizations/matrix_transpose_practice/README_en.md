@@ -63,7 +63,9 @@ Here `core` is the hardware vector core count, queried at runtime via `aclrtGetD
 
 Starting from Case 3, the matrix is processed in 32x32 tiles. The left side of the figure below shows a 1024x1024 matrix divided into 32x32 tiles. The right side shows the thread mapping within one 32x32 tile. The in-tile column index is denoted `tx`, and the in-tile row index is denoted `ty`.
 
-<img src="./figures/blockMapping.png" width="60%">
+**Figure 1: Thread Block to tile mapping**
+
+<img src="./figures/block_mapping.png" width="60%">
 
 Taking the green element in the figure as an example, its input coordinates in GM can be derived from the tile coordinates and the local coordinates within the tile.
 
@@ -166,6 +168,8 @@ Case 2 keeps the GM read contiguous while writing data directly to the transpose
 **Core Implementation**: The matrix is partitioned into 32x32 tiles, with the total tile count `tiles=(W/32)x(H/32)`. In this case, each thread block launches 2048 threads and can process two tiles at the same time, so the thread block count is set to `blocks_per_grid=ceil(tiles / 2)`. The thread configuration is `dim3(32,64,1)`, where `threadIdx.y=0..31` processes the first tile and `threadIdx.y=32..63` processes the second tile; the code obtains the tile index handled by the current thread within the thread block via `local_tile=threadIdx.y>>5`, and the in-tile row index via `ty=threadIdx.y&31`. Threads first write the tile into UB in the original layout, and after `asc_syncthreads()` synchronization, read it from UB in the transpose direction and write it back to GM contiguously.
 
 The core idea of UB staging is shown in the figure below: in the GM read phase, the tile is contiguously loaded into UB row by row according to the input matrix layout; in the GM write-back phase, the output tile coordinates are swapped so that the same Warp writes out one row of the output matrix. The originally non-contiguous GM write is transferred to a transpose-direction read within UB.
+
+**Figure 2: Case 3 UB staging transpose data flow**
 
 <img src="./figures/case3.png" width="60%">
 
@@ -283,9 +287,13 @@ The bank partitioning in UB is shown in the figure below. The total UB size is 2
 
 In SIMT scenarios, multiple threads in the same Warp may access UB concurrently within the same UB access instruction. When the accessed data belongs to subbanks with the same index in the same bank group, the hardware cannot process all requests in one cycle, so the requests must queue, forming subbank conflicts and increasing access latency. If the accessed data belongs to the same 8B address range in the same row of the same subbank, the hardware merges these requests and no subbank conflict is formed.
 
+**Figure 3: UB bank structure**
+
 <img src="./figures/bank结构示意图.png">
 
 **Low-bit interleaving is used for addresses:** As shown in the figure below, consecutive UB addresses are mapped to bank0 through bank15 at 32B granularity. The first 32B address segment maps to bank0, the second maps to bank1, and so on; the 16th maps to bank15, and the 17th maps back to the next row of bank0.
+
+**Figure 4: UB low-bit interleaved address layout**
 
 <img src="./figures/bank内存排布示意图.png">
 
@@ -296,11 +304,15 @@ The main subbank conflict types in SIMT programming are as follows:
 
 In Case 5, the tile array in UB is stored in row-major order. According to the low-bit address interleaving rule, the first row of the tile array covers bank0 through bank3, the second row covers bank4 through bank7, the third row covers bank8 through bank11, and the remaining rows follow the same pattern. Each row of 32 float elements spans exactly 4 banks. In Case 5, one Warp of threads reads one column of the tile and writes it back to GM output; when accessing UB, the 32 threads concentrate on subbank 0 in two bank groups, which is a read-read conflict scenario.
 
-<img src="./figures/case5bank.png">
+**Figure 5: Case 5 bank conflict during transpose read**
+
+<img src="./figures/case5_bank.png">
 
 In Case 6, two columns of padding are added to the tile array in UB, changing from 32 elements per row to 34 elements per row. The layout in UB is shown in the figure below. Since each row has 34 elements, the row stride becomes 17 subbanks, so elements in the same column are staggered across different subbanks. When Case 6 accesses UB, the accesses from 32 threads are distributed across each subbank of each bank group. In other words, each subbank is accessed by only one thread under the same access instruction, avoiding the read-read conflict described above.
 
-<img src="./figures/case6bank.png">
+**Figure 6: Case 6 UB bank layout after padding**
+
+<img src="./figures/case6_bank.png">
 
 ```cpp
 constexpr int TILE_PAD = 2;                          // Number of UB padding columns in Case 6/7 (32x34)
@@ -352,6 +364,16 @@ for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x)
 **Analysis**:
 
 Compared to 15.152μs in Case 6, after removing the synchronization at the end of each loop iteration, Task Duration drops to 12.074μs, a decrease of approximately 20%. Under the 1024x1024 matrix and 64 thread block configuration, each thread block needs to loop over 16 tiles, so double buffer is equivalent to each thread block reducing 16 thread block synchronizations. The cost of this method is an extra UB tile (two 32x34 tiles in total), but it does not introduce register spill. Case 7 is the lowest-latency SIMT transpose version in this example, approximately 1.9x the Case 0 copy baseline (6.262μs).
+
+The simulation instruction pipeline diagrams of Case 6 and Case 7 are shown in Figure 7 and Figure 8, respectively. In Case 6, each loop iteration is constrained by the trailing `asc_syncthreads()`: the write-back of the current iteration must fully complete before the next iteration can start, so the computation before the next load and the GM read of the next iteration can only wait serially. In Case 7, by rotating two UB tiles with double buffer and removing the trailing synchronization, the GM write-back of the current iteration overlaps with the computation before the next load and the GM read of the next iteration, compressing the serial wait between load and compute. This is also the main reason why Task Duration drops further relative to Case 6.
+
+**Figure 7: Case 6 simulation instruction pipeline diagram**
+
+<img src="./figures/case6_trace.png">
+
+**Figure 8: Case 7 simulation instruction pipeline diagram**
+
+<img src="./figures/case7_trace.png">
 
 ---
 
