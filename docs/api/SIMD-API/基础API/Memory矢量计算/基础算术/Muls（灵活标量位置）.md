@@ -101,11 +101,17 @@ $dst_i = scalar * src_i$
 - 本接口传入LocalTensor单点数据作为标量时，idx参数需要传入编译期已知的常量，传入变量时需要声明为constexpr。
 
 <!-- npu="950" id9 -->
+<!-- npu="950" id1 -->
 - 针对Ascend 950PR/Ascend 950DT：该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，软仿行为不保证该接口被视为NOP（空操作）。
+<!-- end id1 -->
+<!-- npu="950" id2 -->
 - 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT：
+<!-- end id2 -->
   - tensor高维切分计算占用8KB Unified Buffer。
   - tensor前n个数据连续计算不涉及8KB Unified Buffer的占用。
+<!-- npu="950" id3 -->
 - 针对Ascend 950PR/Ascend 950DT，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。
+<!-- end id3 -->
 <!-- end id9 -->
 
 ## 调用示例<a name="section633mcpsimp"></a>

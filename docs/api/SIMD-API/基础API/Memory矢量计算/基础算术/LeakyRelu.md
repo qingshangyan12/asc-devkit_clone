@@ -129,21 +129,31 @@ T和U支持的数据类型为：half、float。
   <!-- npu="A3,910b" id17 -->
   - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
     <!-- npu="A3" id19 -->
+    <!-- npu="A3" id1 -->
     - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+    <!-- end id1 -->
     <!-- end id19 -->
     <!-- npu="910b" id21 -->
+    <!-- npu="910b" id2 -->
     - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    <!-- end id2 -->
     <!-- end id21 -->
   <!-- end id17 -->
   <!-- npu="950" id23 -->
+  <!-- npu="950" id3 -->
   - 针对Ascend 950PR/Ascend 950DT：该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，软仿行为不保证该接口被视为NOP（空操作）。
+  <!-- end id3 -->
   <!-- end id23 -->
 <!-- end id16 -->
 <!-- npu="950" id24 -->
+<!-- npu="950" id4 -->
 - 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT：
+<!-- end id4 -->
   - tensor高维切分计算占用8KB Unified Buffer。
   - tensor前n个数据连续计算不涉及8KB Unified Buffer的占用。
+<!-- npu="950" id5 -->
 - 针对Ascend 950PR/Ascend 950DT，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。
+<!-- end id5 -->
 <!-- end id24 -->
 
 ## 调用示例<a name="section112161084424"></a>

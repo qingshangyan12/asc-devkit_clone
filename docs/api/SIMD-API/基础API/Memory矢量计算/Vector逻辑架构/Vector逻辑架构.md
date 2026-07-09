@@ -4,9 +4,10 @@
 
 Vector计算单元专用于执行向量计算。如下图所示，高亮部分展示了Vector计算单元及其关联的存储单元。
 
-<cann-filter npu-type="A3,910b">
-
+<!-- npu="A3,910b" id1 -->
+<!-- npu="A3" id5 -->
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品，Vector逻辑架构如下图1所示。
+<!-- end id5 -->
 
   **图1** 向量计算单元架构图
 
@@ -17,12 +18,12 @@ Vector计算单元专用于执行向量计算。如下图所示，高亮部分�
   | 存储单元 | 说明 | 
   | --- | --- |
   | Unified Buffer | AI Core内部物理存储单元，通常用于存储向量计算的输入/输出数据。 |
+<!-- end id1 -->
 
-</cann-filter>
-
-<cann-filter npu-type="950">
-
+<!-- npu="950" id2 -->
+<!-- npu="950" id6 -->
 - 针对Ascend 950PR/Ascend 950DT，Vector逻辑架构如下图2所示。
+<!-- end id6 -->
 
   **图2** 向量计算单元架构图
 
@@ -34,8 +35,7 @@ Vector计算单元专用于执行向量计算。如下图所示，高亮部分�
   | --- | --- |
   | Unified Buffer | AI Core内部物理存储单元，通常用于存储向量计算的输入/输出数据。 |
   | SIMD Register File | AI Core内部物理存储单元，在SIMD程序中，数据从Unified Buffer搬运到Register进行计算，产生的中间结果可以不用传回Unified Buffer，直接在寄存器计算。 |
-
-</cann-filter>
+<!-- end id2 -->
 
 ## Unified Buffer介绍<a name="ZH-CN_TOPIC_0000002574022839"></a>
 
@@ -48,9 +48,10 @@ Vector计算单元专用于执行向量计算。如下图所示，高亮部分�
 
 为了提高数据访问的效率和吞吐量，Unified Buffer采用了大小相等的内存模块（bank）结构设计。当多条读写指令同时访问Unified Buffer时，由于硬件资源的限制，这些指令不能同时执行，从而引发bank冲突。在这种情况下，指令需要排队等待资源，无法在一个指令周期内完成。
 
-<cann-filter npu-type="A3,910b">
-
+<!-- npu="A3,910b" id3 -->
+<!-- npu="A3" id7 -->
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品
+<!-- end id7 -->
   - Unified Buffer的内存结构
 
     **图3** Unified Buffer的内存结构图
@@ -65,12 +66,12 @@ Vector计算单元专用于执行向量计算。如下图所示，高亮部分�
   - bank冲突优化
 
     可参考[避免bank冲突（NPU架构版本2201）](<https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免bank冲突（NPU架构版本2201）.md>)。
+<!-- end id3 -->
 
-</cann-filter>
-
-<cann-filter npu-type="950">
-
+<!-- npu="950" id4 -->
+<!-- npu="950" id8 -->
 - 针对Ascend 950PR/Ascend 950DT
+<!-- end id8 -->
   - Unified Buffer的内存结构
 
     **图4** Unified Buffer的内存结构图
@@ -85,5 +86,4 @@ Vector计算单元专用于执行向量计算。如下图所示，高亮部分�
   - bank冲突优化
 
     可参考[避免bank冲突（NPU架构版本3510）](<https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免bank冲突（NPU架构版本3510）.md>)。
-
-</cann-filter>
+<!-- end id4 -->

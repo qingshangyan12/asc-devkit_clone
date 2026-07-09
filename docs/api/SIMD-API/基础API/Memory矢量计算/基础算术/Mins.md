@@ -104,19 +104,29 @@ dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/T
 ## 数据类型
 
 <!-- npu="950" id13 -->
+<!-- npu="950" id1 -->
 - 针对Ascend 950PR/Ascend 950DT，T和U支持的数据类型为：int8_t、uint8_t、int16_t、half、bfloat16_t、int32_t、float、int64_t、uint64_t。数据类型int8_t、uint8_t、int64_t、uint64_t仅支持tensor前n个数据计算接口。
+<!-- end id1 -->
 <!-- end id13 -->
 <!-- npu="A3" id14 -->
+<!-- npu="A3" id2 -->
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T和U支持的数据类型为：int16_t、half、int32_t、float。
+<!-- end id2 -->
 <!-- end id14 -->
 <!-- npu="910b" id15 -->
+<!-- npu="910b" id3 -->
 - 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，T和U支持的数据类型为：int16_t、half、int32_t、float。
+<!-- end id3 -->
 <!-- end id15 -->
 <!-- npu="310b" id16 -->
+<!-- npu="310b" id4 -->
 - 针对Atlas 200I/500 A2 推理产品，T和U支持的数据类型为：int16_t、half、int32_t、float。
+<!-- end id4 -->
 <!-- end id16 -->
 <!-- npu="310p" id17 -->
+<!-- npu="310p" id5 -->
 - 针对Atlas 推理系列产品AI Core，T和U支持的数据类型为：int16_t、half、int32_t、float。
+<!-- end id5 -->
 <!-- end id17 -->
 ## 返回值说明<a name="section194321251175110"></a>
 
@@ -132,21 +142,31 @@ dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/T
   <!-- npu="A3,910b" id24 -->
   - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
     <!-- npu="A3" id26 -->
+    <!-- npu="A3" id6 -->
     - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+    <!-- end id6 -->
     <!-- end id26 -->
     <!-- npu="910b" id28 -->
+    <!-- npu="910b" id7 -->
     - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    <!-- end id7 -->
     <!-- end id28 -->
   <!-- end id24 -->
   <!-- npu="950" id30 -->
+  <!-- npu="950" id8 -->
   - 针对Ascend 950PR/Ascend 950DT：该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，软仿行为不保证该接口被视为NOP（空操作）。
+  <!-- end id8 -->
   <!-- end id30 -->
 <!-- end id23 -->
 <!-- npu="950" id31 -->
+<!-- npu="950" id9 -->
 - 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT：
+<!-- end id9 -->
   - tensor高维切分计算占用8KB Unified Buffer。
   - tensor前n个数据连续计算不涉及8KB Unified Buffer的占用。
+<!-- npu="950" id10 -->
 - 针对Ascend 950PR/Ascend 950DT，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。
+<!-- end id10 -->
 <!-- end id31 -->
 
 ## 调用示例<a name="section633mcpsimp"></a>

@@ -89,24 +89,36 @@ $dst_i = |src_i|$
 ## 数据类型
 
 <!-- npu="950" id12 -->
+<!-- npu="950" id1 -->
 - 针对Ascend 950PR/Ascend 950DT
+<!-- end id1 -->
     - T支持的数据类型为：int8_t、int16_t、half、int32_t、float、int64_t。数据类型int8_t、int64_t仅支持tensor前n个数据计算接口。
     - U支持的数据类型为：complex32、complex64；当U为complex32类型时，T必须是half类型；当U为complex64类型时，T必须是float类型。
 <!-- end id12 -->
 <!-- npu="A3" id13 -->
+<!-- npu="A3" id2 -->
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T支持的数据类型为：half、float。
+<!-- end id2 -->
 <!-- end id13 -->
 <!-- npu="910b" id14 -->
+<!-- npu="910b" id3 -->
 - 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，T支持的数据类型为：half、float。
+<!-- end id3 -->
 <!-- end id14 -->
 <!-- npu="310b" id15 -->
+<!-- npu="310b" id4 -->
 - 针对Atlas 200I/500 A2 推理产品，T支持的数据类型为：int16_t、half、float。
+<!-- end id4 -->
 <!-- end id15 -->
 <!-- npu="310p" id16 -->
+<!-- npu="310p" id5 -->
 - 针对Atlas 推理系列产品AI Core，T支持的数据类型为：half、float。
+<!-- end id5 -->
 <!-- end id16 -->
 <!-- npu="910" id17 -->
+<!-- npu="910" id6 -->
 - 针对Atlas 训练系列产品，T支持的数据类型为：half、float。
+<!-- end id6 -->
 <!-- end id17 -->
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -121,18 +133,26 @@ $dst_i = |src_i|$
   <!-- npu="A3,910b" id25 -->
   - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
     <!-- npu="A3" id26 -->
+    <!-- npu="A3" id7 -->
     - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+    <!-- end id7 -->
     <!-- end id26 -->
     <!-- npu="910b" id28 -->
+    <!-- npu="910b" id8 -->
     - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    <!-- end id8 -->
     <!-- end id28 -->
   <!-- end id25 -->
   <!-- npu="950" id27 -->
+  <!-- npu="950" id9 -->
   - 针对Ascend 950PR/Ascend 950DT：该接口通过VF调用[Reg矢量计算API](../../Reg矢量计算/Reg矢量计算.md)实现兼容，当参数count或repeatTime取值为0时，软仿行为不保证该接口被视为NOP（空操作）。
+  <!-- end id9 -->
   <!-- end id27 -->
 <!-- end id20 -->
 <!-- npu="950" id21 -->
+<!-- npu="950" id10 -->
 - 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT：
+<!-- end id10 -->
   - tensor高维切分计算占用8KB Unified Buffer。
   - tensor前n个数据连续计算不涉及8KB Unified Buffer的占用。
 <!-- end id21 -->
