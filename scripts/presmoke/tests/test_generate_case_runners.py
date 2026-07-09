@@ -457,7 +457,9 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         reason, modes = explicit_skip_config(
             "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin"
         )
+
         self.assertEqual(modes, ["npu"])
+        self.assertEqual(archs, [])
 
     def test_matmul_l2cache_skip_config(self) -> None:
         reason, modes = explicit_skip_config(
@@ -465,6 +467,7 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         )
         self.assertIn("308M", reason)
         self.assertEqual(modes, ["cpu"])
+        self.assertEqual(archs, [])
 
     def test_matmul_fp8_is_950_only(self) -> None:
         project_root = Path(__file__).resolve().parents[3]
