@@ -60,7 +60,7 @@ msOpProf工具是单算子性能分析工具，包含`msopprof`和`msopprof simu
   └── visualize_data.bin         # MindStudio Insight呈现文件
   ```
 
-更多msOpProf工具使用方式请参考[MindStudio工具](https://www.hiascend.com/document/redirect/CannCommercialToolOpDev)算子调优（msProf）中的内容。
+更多msOpProf工具使用方式请参考[MindStudio工具](https://www.hiascend.com/document/redirect/CannCommercialToolOpDev)算子调优（msOpProf）中的内容。
 
 ## 编译运行
 
@@ -81,7 +81,7 @@ msOpProf工具是单算子性能分析工具，包含`msopprof`和`msopprof simu
 - 样例执行
 
   在本样例目录下执行如下命令。
-  ```bash
+  ```bashs
   mkdir -p build && cd build;           # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;   # 编译工程
   msopprof ./demo                      # 基于可执行文件demo通过msopprof执行性能调优

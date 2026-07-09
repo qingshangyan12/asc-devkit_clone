@@ -139,7 +139,7 @@ This example demonstrates how to display operator input/output Shape, data type,
 
 - Shape information display
 
-  Open `../result/PROF_000001_*/mindstudio_profiler_output/PipeUtilization.csv` to view Shape information. The Shape information in this example is written to the following fields.
+  Open `../result/OPPROF_*/PipeUtilization.csv` to view Shape information. The Shape information in this example is written to the following fields.
 
   <table>
     <tr>
