@@ -39,10 +39,25 @@ __aicore__ inline int64_t asc_get_ctrl();
 
 __aicore__ inline int64_t asc_get_block_num();
 
+/*
+ * @ingroup SysVar
+ * @brief：Get the index of the current running block
+ * @return：The index of the current running block
+ */
 __aicore__ inline int64_t asc_get_block_idx();
 
+/*
+ * @ingroup SysVar
+ * @brief：Get the number of Cube Cores (AIC) or Vector Cores (AIV) on an AI Core in split mode
+ * @return：The number of sub-blocks on the AI Core
+ */
 __aicore__ inline int64_t asc_get_sub_block_num();
 
+/*
+ * @ingroup SysVar
+ * @brief：Get the ID of the Vector Core on an AI Core
+ * @return：The Vector Core ID
+ */
 __aicore__ inline int64_t asc_get_sub_block_id();
 
 __aicore__ inline int64_t asc_get_system_cycle();
