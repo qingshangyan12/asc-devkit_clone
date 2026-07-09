@@ -1,6 +1,6 @@
 # DumpTensor<a name="ZH-CN_TOPIC_0000001584608650"></a>
 
-## 产品支持情况<a name="section1550532418810"></a>
+## 产品支持情况
 
 <!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
