@@ -23,13 +23,13 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_VECTOR_DATAMOVE_IMPL_ASC_SET_UB2GM_LOOP1_STRIDE_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_VECTOR_DATAMOVE_IMPL_ASC_SET_UB2GM_LOOP1_STRIDE_IMPL_H
 
-#include "../utils_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/utils_impl.h"
 
 __aicore__ inline void asc_set_ub2gm_loop1_stride_impl(uint64_t loop1_src_stride, uint64_t loop1_dst_stride)
 {
      if ASC_IS_AIV {
         uint64_t config = loop1_src_stride << 40;
-        config |= loop1_dst_stride;      
+        config |= loop1_dst_stride;
         set_loop1_stride_ubtoout(config);
      }
 }

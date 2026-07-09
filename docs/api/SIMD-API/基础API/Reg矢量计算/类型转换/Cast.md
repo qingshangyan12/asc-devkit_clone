@@ -28,13 +28,22 @@
 
 头文件路径：`"basic_api/reg_compute/kernel_reg_compute_vec_vconv_intf.h"`。
 
-Cast用于数据类型精度转换，将源操作数数据类型转换成目的操作数数据类型，能够实现[浮点转整数](#表6-浮点转整数)、[浮点转浮点](#表7-浮点转浮点)、[整数转浮点](#表8-整数转浮点)、[整数转整数](#表9-整数转整数)的数据类型转换。
+Cast用于数据类型精度转换，将源操作数数据类型转换成目的操作数数据类型，能够实现[浮点转整数](#表6-浮点转整数)、[浮点转浮点](#表7-浮点转浮点)、[整数转浮点](#表8-整数转浮点)、[整数转整数](#表9-整数转整数)的数据类型转换。转换过程中，由于位宽变化、精度变化，支持配置如下参数进行功能实现：
+- [RegLayout](../辅助数据类型/RegLayout.md)：源操作数和目的操作数位宽不同时，单条指令计算量以位宽更大的数据类型为准，RegLayout用于控制位宽小的元素在寄存器中的排布方式。
+- [SatMode](../辅助数据类型/SatMode.md)：用于设置饱和与不饱和模式。
+- [MaskMergeMode](../辅助数据类型/MaskMergeMode.md)：用于指定写入寄存器数据模式，mask未选择的元素在dst中置零或保留dst原值。
+- [RoundMode](../辅助数据类型/RoundMode.md)：用于设置舍入模式。
 
+不同数据类型下元素对应的mask位宽不一致，在Cast进行类型转换时，MaskReg根据输入的源操作数进行有效元素筛选。
+图[b16到b32类型转换过程](#fig1)和图[b32到b16类型转换过程](#fig2)展示了MaskReg和RegLayout同时作用时b16和b32进行类型转换的过程。
 
-- [RegLayout](../数据类型/RegLayout.md)：源操作数和目的操作数位宽不同时，单条指令计算量以位宽更大的数据类型为准，RegLayout用于控制位宽小的元素在寄存器中的排布方式。
-- [SatMode](../数据类型/SatMode.md)：用于设置饱和与不饱和模式。
-- [MaskMergeMode](../数据类型/MaskMergeMode.md)：用于指定写入寄存器数据模式，mask未选择的元素在dst中置零或保留dst原值。
-- [RoundMode](../数据类型/RoundMode.md)：用于设置舍入模式。
+**图1** b16到b32类型转换过程<a id="fig1"></a>  
+
+![](../../../../figures/b16到b32类型转换过程.png)
+
+**图2** b32到b16类型转换过程<a id="fig2"></a>  
+
+![](../../../../figures/b32到b16类型转换过程.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -51,7 +60,7 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask);
 | --- | --- |
 | T | 目的操作数的数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 | U | 源操作数的数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
-| trait | CastTrait类型，类型转换模式结构体。包括[RegLayout](../数据类型/RegLayout.md)、[SatMode](../数据类型/SatMode.md)、[MaskMergeMode](../数据类型/MaskMergeMode.md)、[RoundMode](../数据类型/RoundMode.md)。<br><pre><code>struct CastTrait {<br>    RegLayout layoutMode = RegLayout::UNKNOWN;<br>    SatMode satMode = SatMode::UNKNOWN;<br>    MaskMergeMode mrgMode = MaskMergeMode::UNKNOWN;<br>    RoundMode roundMode = RoundMode::UNKNOWN;<br>};</code></pre>使能SatMode生效需与SetCtrlSpr配合使用。不饱和模式和饱和模式的具体配置请参考[表5 饱和模式全局或单指令生效配置表](#表5-饱和模式全局或单指令生效配置表)。<br>注：SetCtrlSpr需在SIMD_VF外调用。 |
+| trait | CastTrait类型，类型转换模式结构体。包括[RegLayout](../辅助数据类型/RegLayout.md)、[SatMode](../辅助数据类型/SatMode.md)、[MaskMergeMode](../辅助数据类型/MaskMergeMode.md)、[RoundMode](../辅助数据类型/RoundMode.md)。<br><pre><code>struct CastTrait {<br>    RegLayout layoutMode = RegLayout::UNKNOWN;<br>    SatMode satMode = SatMode::UNKNOWN;<br>    MaskMergeMode mrgMode = MaskMergeMode::UNKNOWN;<br>    RoundMode roundMode = RoundMode::UNKNOWN;<br>};</code></pre>使能SatMode生效需与SetCtrlSpr配合使用。不饱和模式和饱和模式的具体配置请参考[表5 饱和模式全局或单指令生效配置表](#表5-饱和模式全局或单指令生效配置表)。<br>注：SetCtrlSpr需在SIMD_VF外调用。 |
 | S | 目的操作数的[RegTensor](../寄存器数据类型/RegTensor.md)类型，例如RegTensor&lt;float&gt;，由编译器自动推导，用户不需要填写。 |
 | V | 源操作数的[RegTensor](../寄存器数据类型/RegTensor.md)类型，例如RegTensor&lt;int32_t&gt;，由编译器自动推导，用户不需要填写。 |
 
@@ -102,7 +111,7 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask);
     - 不饱和模式：当输出类型为fp8_e4m3fn_t时，由于fp8_e4m3fn_t没有inf表示格式，所以输出为nan。
     - 饱和模式：当输出类型为fp8_e5m2_t/fp8_e4m3fn_t时，输入nan，默认输出为0。如果CTRL\[50\] = 1'b1，则输出为nan。
     - fp4x2_e2m1_t/fp4x2_e1m2_t数据类型没有inf和nan的定义。对于bfloat16到float4的数据类型转换，输入bfloat16类型的值为inf或超出fp4x2_e2m1_t/fp4x2_e1m2_t数据最值范围时，会返回对应符号的fp4x2_e2m1_t/fp4x2_e1m2_t最值；输入nan时，fp4x2_e2m1_t/fp4x2_e1m2_t输出0。
-    - 对于fp8_e8m0_t类型：输入bfloat16_t +/-inf或绝对值超出fp8_e8m0_t类型最值，则返回fp8_e8m0_t最大值0b11111110；输入bfloat16_tnan输出fp8_e8m0_t nan = 0b11111111。
+    - 对于fp8_e8m0_t类型：输入bfloat16_t +/-inf或绝对值超出fp8_e8m0_t类型最大值，则返回fp8_e8m0_t最大值0b11111110；输入bfloat16_t nan输出fp8_e8m0_t nan = 0b11111111。
 
 - 整数转整数
 
@@ -110,13 +119,13 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask);
 
 - 特别地，int4x2_t/fp4x2_e2m1_t/fp4x2_e1m2_t和b16之间的转换，指令会以每2个元素为一对进行读写，大转小时mask有效位以偶数位为准。
 
-    图1和图2展示了MaskReg和RegLayout同时作用时fp4x2_e2m1_t和bfloat16_t之间的转换。
+    图[fp4x2_e2m1_t到bfloat16_t转换过程](#fig3)和图[bfloat16_t到fp4x2_e2m1_t转换过程](#fig4)展示了MaskReg和RegLayout同时作用时fp4x2_e2m1_t和bfloat16_t之间的转换。
 
-    **图 1**  fp4x2_e2m1_t到bfloat16_t转换过程  
+    **图3**  fp4x2_e2m1_t到bfloat16_t转换过程<a id="fig3"></a>  
     
     ![](../../../../figures/reg_cast_1.png)
 
-    **图 2**  bfloat16_t到fp4x2_e2m1_t转换过程  
+    **图4**  bfloat16_t到fp4x2_e2m1_t转换过程<a id="fig4"></a>  
     ![](../../../../figures/reg_cast_2.png)
 
 ## 关键特性说明
@@ -171,19 +180,18 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask);
 | --- | --- | --- | --- | --- | --- |
 | hifloat8_t | half | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
 | hifloat8_t | float | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| fp8_e4m3fn_t | bfloat16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_TRUNC |
-| fp8_e5m2_t | bfloat16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_TRUNC |
-| fp8_e4m3fn_t | float | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_TRUNC |
-| fp8_e5m2_t | float | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_TRUNC |
+| fp8_e4m3fn_t | float | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
+| fp8_e5m2_t | float | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
 | fp8_e8m0_t | bfloat16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
 | fp4x2_e2m1_t | bfloat16_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
 | fp4x2_e1m2_t | bfloat16_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
 | half | hifloat8_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::CAST_ROUND,  RoundMode::HYBRID |
 | half | bfloat16_t | RegLayout::UNKNOWN | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
 | bfloat16_t | half | RegLayout::UNKNOWN | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
-| bfloat16_t | fp4x2_e2m1_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_TRUNC |
-| bfloat16_t | fp4x2_e1m2_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_TRUNC |
+| bfloat16_t | fp4x2_e2m1_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
+| bfloat16_t | fp4x2_e1m2_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::CAST_RINT, RoundMode::CAST_ROUND, RoundMode::CAST_FLOOR, RoundMode::CAST_CEIL, RoundMode::CAST_TRUNC |
 | bfloat16_t | fp8_e8m0_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
+| bfloat16_t | float | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
 | float | hifloat8_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::CAST_ROUND,  RoundMode::HYBRID |
 | float | fp8_e4m3fn_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::CAST_RINT |
 | float | fp8_e5m2_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::CAST_RINT |
@@ -211,7 +219,7 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask);
 | --- | --- | --- | --- | --- | --- |
 | int4x2_t | int16_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
 | int8_t | int16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| int8_t | int32_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
+| int8_t | int32_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
 | uint8_t | uint16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
 | uint8_t | uint32_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
 | int16_t | int4x2_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
@@ -223,10 +231,10 @@ __simd_callee__ inline void Cast(S& dstReg, V& srcReg, MaskReg& mask);
 | int32_t | uint8_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
 | int32_t | int16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
 | int32_t | uint16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
+| int32_t | int64_t | RegLayout::ZERO, RegLayout::ONE | SatMode::UNKNOWN | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
 | uint32_t | uint8_t | RegLayout::ZERO, RegLayout::ONE, RegLayout::TWO, RegLayout::THREE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
 | uint32_t | int16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
 | uint32_t | uint16_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
-| uint32_t | int32_t | RegLayout::UNKNOWN | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
 | int64_t | int32_t | RegLayout::ZERO, RegLayout::ONE | SatMode::NO_SAT, SatMode::SAT | MaskMergeMode::ZEROING | RoundMode::UNKNOWN |
 
 ### float转hifloat8_t转换规则
@@ -237,7 +245,7 @@ Ev = tmp2[30 : 23] - 8'b01111111, thr = tmp2[13 : 0];
 if (Ev == 128 && tmp2[22 : 0] != 23'b0) then
     tmp3[7 : 0] = HiF8NAN(8'b10000000);
 else if ((Ev == 128 && tmp2[22 : 0] == 23'b0) || (Ev > 15)) then
-    tmp3[7 : 0] = (tmp2[31] == 1'b0) ? HiF8+INF(8'b01101111) : HiF8-INF(8'b11101111);
+    tmp3[7 : 0] = (tmp2[31] == 1'b0) ? HiF8+inf(8'b01101111) : HiF8-inf(8'b11101111);
 else if (Ev < -23) then
     tmp3[7 : 0] = HiF8ZERO (8'b00000000);
 else if (Ev == -23) then
@@ -285,7 +293,7 @@ Ev = tmp2[14 : 10] - 5'b01111, thr = {tmp2[0], 1’b1};
 if (Ev == 16 && tmp2[9 : 0] != 10'b0) then
     tmp3[7 : 0] = HiF8NAN(8'b10000000);
 else if (Ev == 16 && tmp2[9:0] == 10'b0) && (Ev > 15) then
-    tmp3[7 : 0] = (tmp2[31] == 1'b0) ? HiF8+INF(8'b01101111) : HiF8-INF(8'b11101111);
+    tmp3[7 : 0] = (tmp2[31] == 1'b0) ? HiF8+inf(8'b01101111) : HiF8-inf(8'b11101111);
 else if (Ev < -23) then
     tmp3[7 : 0] = HiF8ZERO(8'b00000000);
 else if (Ev == -23) then

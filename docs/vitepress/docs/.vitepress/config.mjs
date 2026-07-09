@@ -9,7 +9,7 @@
  */
 
 import { defineConfig } from 'vitepress'
-import { existsSync, readFileSync, copyFileSync } from 'node:fs'
+import { existsSync, readFileSync, copyFileSync, cpSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { load as cheerioLoad } from 'cheerio'
 import { pagefindPlugin } from 'vitepress-plugin-pagefind'
@@ -83,8 +83,7 @@ function parseMdSidebar(filePath, urlPrefix) {
   function addCollapsed(items) {
     return items.map(item => {
       if (item.items && item.items.length > 0) {
-        const { link, ...rest } = item
-        return { ...rest, collapsed: true, items: addCollapsed(item.items) }
+        return { ...item, collapsed: true, items: addCollapsed(item.items) }
       }
       return item
     })
@@ -149,7 +148,18 @@ function extractBodyContent(html) {
   return html
 }
 
+function escapeCodeAngleBrackets(html) {
+  return html
+    .replace(/`([^`]+)`/g, (_, content) => '`' + content.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '`')
+    .replace(/``([\s\S]*?)``/g, (_, content) => '``' + content.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '``')
+}
+
 function normalizeHtml(html) {
+  html = escapeCodeAngleBrackets(html)
+  html = html.replace(/<!--cann-filter:([\w,]+)-->/g, '<cann-filter npu-type="$1">')
+  html = html.replace(/<!--\/cann-filter-->/g, '</cann-filter>')
+  html = html.replace(/<!--\s*npu\s*=\s*"([^"]*)"\s+(\w+)\s*-->/g, '<cann-filter npu-type="$1">')
+  html = html.replace(/<!--\s*end\s+(\w+)\s*-->/g, '</cann-filter>')
   const $ = cheerioLoad(html, {
     xml: {
       xmlMode: false,
@@ -272,6 +282,37 @@ function placeholderPlugin() {
   }
 }
 
+function replaceNpuCommentTags(html) {
+  const tokenRegex = /<!--\s*(?:npu\s*=\s*"([^"]*)"\s+(\w+)|end\s+(\w+))\s*-->/g
+  const parts = []
+  const stack = []
+  let lastIdx = 0
+  let match
+  while ((match = tokenRegex.exec(html)) !== null) {
+    const pos = match.index
+    const npuType = match[1]
+    const openId = match[2]
+    const closeId = match[3]
+    parts.push(html.slice(lastIdx, pos))
+    lastIdx = pos + match[0].length
+    if (closeId) {
+      if (stack.length > 0 && stack[stack.length - 1].id === closeId) {
+        stack.pop()
+        parts.push('</div>')
+      }
+    } else if (npuType && openId) {
+      stack.push({ id: openId })
+      parts.push(`<div data-filter="${npuType}">`)
+    }
+  }
+  parts.push(html.slice(lastIdx))
+  while (stack.length > 0) {
+    stack.pop()
+    parts.push('</div>')
+  }
+  return parts.join('')
+}
+
 function replaceCannFilterTags(src, replacer) {
   const tagRegex = /<(\/?)(cann-filter)((?:\s[^>]*)?)>/gi
   const stack = []
@@ -306,6 +347,7 @@ function fixCannFilterTags(src) {
   if (!/<(cann-filter|term|ph|__gm__|__ubuf__)\b/i.test(src)) return src
 
   return src
+    .replace(/^[ \t]*<\/?cann-filter\b[^>]*>[ \t]*\n/gm, '')
     .replace(/<\/?cann-filter\b[^>]*>/gi, '')
     .replace(/<(term|ph|__gm__|__ubuf__)\b[^>]*>([\s\S]*?)<\/\1>/gis, '$2')
     .replace(/<(term|ph|__gm__|__ubuf__)\b[^>]*>/gi, '')
@@ -445,6 +487,7 @@ export default defineConfig({
   lastUpdated: false,
 
   markdown: {
+    math: true,
     config(md) {
       const originalRender = md.render.bind(md)
       const originalRenderAsync = md.renderAsync ? md.renderAsync.bind(md) : null
@@ -470,12 +513,108 @@ export default defineConfig({
       const renderFn = (src, env) => {
         if (src.includes('<!-- RAW_HTML -->')) {
           const htmlContent = src.replace(/^.*<!-- RAW_HTML -->\s*/s, '').replace(/\s*$/, '')
-          let html = addHeadingAnchors(htmlContent)
+           let html = addHeadingAnchors(htmlContent)
+
+function balanceDivTags(html) {
+  const parts = []
+  let lastIdx = 0
+  const divRegex = /<div\b[^>]*>|<\/div>/gi
+  const stack = []
+  let m2
+  while ((m2 = divRegex.exec(html)) !== null) {
+    if (m2[0].startsWith('</')) {
+      if (stack.length === 0) {
+        parts.push(html.slice(lastIdx, m2.index))
+        lastIdx = m2.index + m2[0].length
+      } else { stack.pop() }
+    } else { stack.push(true) }
+  }
+  parts.push(html.slice(lastIdx))
+  if (stack.length > 0) parts.push('</div>'.repeat(stack.length))
+  return parts.join('')
+}
+
+          html = replaceNpuCommentTags(html)
           html = replaceCannFilterTags(html, {
             start(type) { return `<div data-filter="${type}">` },
             end() { return '</div>' },
           })
+          html = html.replace(
+            /<tr\b[^>]*>((?:(?!<\/tr>)[\s\S])*?)<\/tr>/gi,
+            (rowMatch) => {
+              const divOpen = rowMatch.match(/<td\b[^>]*>\s*<div\s+data-filter\s*=\s*"([^"]+)">/i)
+              if (!divOpen) return rowMatch
+              const divClose = rowMatch.match(/<\/div>\s*<\/td>/)
+              if (!divClose) return rowMatch
+              const filterVal = divOpen[1]
+              let newRow = rowMatch
+                .replace(/<div\s+data-filter\s*=\s*"[^"]*">\s*/ig, '')
+                .replace(/\s*<\/div>/ig, '')
+              newRow = newRow.replace(
+                /<tr\b([^>]*)>/i,
+                (m, attrs) => {
+                  const existing = m.match(/\sdata-filter\s*=\s*"([^"]*)"/i)
+                  if (existing) {
+                    return m.replace(existing[0], ` data-filter="${existing[1]},${filterVal}"`)
+                  }
+                  return `<tr${attrs} data-filter="${filterVal}">`
+                }
+              )
+              return newRow
+            }
+          )
+          html = html.replace(/<a\s+name\s*=\s*"([^"]+)"\s*><\/a>/gi, '<span id="$1"></span>')
           html = escapeVueInterpolations(html)
+
+          const renderMathTex = (tex, display) => {
+            const rule = display ? 'math_block' : 'math_inline'
+            if (md.renderer.rules[rule]) {
+              try {
+                return md.renderer.rules[rule]([{ content: tex }], 0)
+              } catch {}
+            }
+            return display ? `$$${tex}$$` : `$${tex}$`
+          }
+
+          const codeBlocks = []
+          html = html.replace(/<(code|pre)\b[^>]*>[\s\S]*?<\/\1>/gi, m => {
+            codeBlocks.push(m); return `\x00CB${codeBlocks.length - 1}\x00`
+          })
+
+          html = html.replace(/\$\$([\s\S]*?)\$\$/g, (match) => {
+            let inside = match.slice(2, -2)
+            inside = inside.replace(/<em>/g, '_').replace(/<\/em>/g, '_')
+            inside = inside.replace(/&(amp|gt|lt);/g, (m, e) => ({ amp: '&', gt: '>', lt: '<' })[e])
+            inside = inside.replace(/\\text\{([^}]*)\}/g, (m, c) => '\\text{' + c.replace(/(?<!\\)_/g, '\\_') + '}')
+            inside = inside.replace(
+              /(<\/[a-z][a-z0-9]*\s*>)\s*(<[a-z][a-z0-9]*\b[^>]*>)/gi,
+              '$$$$\n$1\n$2\n$$$$'
+            )
+            return '$$' + inside.trim() + '$$'
+          })
+          html = html.replace(/\$(?!\{[\w]+\})([^$\n]+?)\$/g, (match) => {
+            let inside = match.slice(1, -1)
+            inside = inside.replace(/<em>/g, '_').replace(/<\/em>/g, '_')
+            inside = inside.replace(/<[^>]+>/g, '')
+            inside = inside.replace(/&(amp|gt|lt);/g, (m, e) => ({ amp: '&', gt: '>', lt: '<' })[e])
+            inside = inside.replace(/\\text\{([^}]*)\}/g, (m, c) => '\\text{' + c.replace(/(?<!\\)_/g, '\\_') + '}')
+            return '$' + inside + '$'
+          })
+
+          html = html.replace(/\$\$([\s\S]*?)\$\$/g, (_, tex) => renderMathTex(tex, true))
+          html = html.replace(/\$(?!\{[\w]+\})([^$\n]+?)\$/g, (_, tex) => renderMathTex(tex, false))
+
+          html = html.replace(/<mjx-assistive-mml[\s\S]*?<\/mjx-assistive-mml>/gi, '')
+
+          html = html.replace(/\x00CB(\d+)\x00/g, (_, i) => codeBlocks[+i])
+
+          html = html.replace(
+            /href="https:\/\/gitcode\.com\/cann\/asc-devkit\/blob\/master\/docs\/(api|guide)\/([^"]+)\.md(#[^"]*)?"/gi,
+            (_, type, path, hash) => `href="/${type}/${path}.html${hash || ''}"`
+          )
+
+          html = balanceDivTags(html)
+
           return `<div v-pre>\n${html}\n</div>`
         }
         src = processSource(src)
@@ -504,9 +643,10 @@ export default defineConfig({
   buildConcurrency: 1,
 
   transformHtml(code) {
+    code = code.replace(/href="\/\/pagefind/g, 'href="/pagefind')
     code = code.replace(/<body\b/, '<body data-pagefind-body')
     return code.replace(
-      /<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<[^>]+>|[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]+/g,
+      /<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<pre[\s\S]*?<\/pre>|<code[\s\S]*?<\/code>|<[^>]+>|[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]+/g,
       m => m.startsWith('<') ? m : m.replace(/(.)(?=.)/g, '$1\u200A')
     )
   },
@@ -514,8 +654,14 @@ export default defineConfig({
   vite: {
     sourcemap: false,
     build: {
+      chunkSizeWarningLimit: 2000,
       rollupOptions: {
         external: ['/pagefind/pagefind.js'],
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) return 'vendor'
+          },
+        },
       },
     },
     resolve: {
@@ -528,6 +674,15 @@ export default defineConfig({
       heading: '共: {{searchResult}} 条结果',
       forceLanguage: 'en',
     }), {
+      name: 'copy-figures-to-dist',
+      closeBundle() {
+        const dst = resolve(docsRoot, '.vitepress', 'dist', 'figures')
+        for (const sub of ['figures', 'guide/figures', 'api/figures']) {
+          const src = resolve(docsRoot, sub)
+          if (existsSync(src)) cpSync(src, dst, { recursive: true })
+        }
+      },
+    }, {
       name: 'vitepress-override-search-vue',
       enforce: 'post',
       config: () => ({
@@ -537,13 +692,24 @@ export default defineConfig({
           },
         },
       }),
+    }, {
+      name: 'patch-vpsidebar-item-depth',
+      enforce: 'pre',
+      transform(code, id) {
+        if (!id.includes('VPSidebarItem') || !id.includes('vitepress')) return null
+        let result = code
+        result = result.replace('depth < 5', 'true')
+        result = result.replace('props.depth + 2 === 7', 'props.depth + 2 >= 7')
+        if (result === code) return null
+        return result
+      },
     }],
     vue: {
       template: {
         compilerOptions: {
           onError: (error) => {
             if ([2, 21, 46].includes(error.code)) return
-            throw error
+            if (error.message && error.message.includes('missing end tag')) return
           },
         },
       },

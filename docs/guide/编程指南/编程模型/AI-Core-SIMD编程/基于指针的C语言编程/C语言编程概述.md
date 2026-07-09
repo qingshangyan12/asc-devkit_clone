@@ -14,7 +14,7 @@ AI Core采用分级存储架构，不同计算单元的编程视角有所差异�
 
 **Vector矢量计算**：传统架构采用「Global Memory → UB」两级层级；[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入寄存器后构建「Global Memory → Unified Buffer → Register」三级层级。Global Memory存放输入输出数据，Unified Buffer作为矢量计算数据中间缓存，Register位于Vector计算单元最内层，直接与矢量计算执行单元交互。
 
-<img src="../../../../figures/AI_Core存储层次结构_c.png" alt="AI Core存储层次结构" width="800" />
+<img src="../../../../figures/AI_Core存储层次结构.png" alt="AI Core存储层次结构" width="800" />
 
 
 ### 外部存储（Global Memory）
@@ -46,7 +46,7 @@ std::vector<float> kernel_add(std::vector<float> &x, std::vector<float> &y) {
     aclrtMemcpy((uint8_t*)xDevice, totalByteSize, xHost, totalByteSize, ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy((uint8_t*)yDevice, totalByteSize, yHost, totalByteSize, ACL_MEMCPY_HOST_TO_DEVICE);
     // Launch kernel via <<<>>>, passing Device memory pointers xDevice, yDevice, zDevice
-    add_custom<<<numBlocks, nullptr, stream>>>(xDevice, yDevice, zDevice);
+    add_custom<<<numBlocks, 0, stream>>>(xDevice, yDevice, zDevice);
     aclrtSynchronizeStream(stream);
     // Release Device memory
     aclrtFree(xDevice);
@@ -298,8 +298,12 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
     <tr>
       <td><strong>单个AI Core内两个AIV间同步</strong></td>
       <td><p>同步单个AI Core内两个AIV子核，通常用于Vector算子内AIV核间的协调操作。</p></td>
-      <td> <code>该功能当前C语言编程路径暂不支持，后续版本将提供支持。</code> </td>
-      <td>-</td>
+      <td><code>asc_sync_subblock_arrive</code><br><code>asc_sync_subblock_wait</code></td>
+      <td>
+        <code>int64_t flag_id = 1;</code><br>
+        <code>asc_sync_subblock_arrive(PIPE_S, flag_id);</code><br>
+        <code>asc_sync_subblock_wait(PIPE_S, flag_id);</code>
+      </td>
     </tr>
   </tbody>
 </table>

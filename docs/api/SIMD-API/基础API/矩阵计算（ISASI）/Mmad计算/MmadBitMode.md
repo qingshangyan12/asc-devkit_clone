@@ -2,17 +2,65 @@
 
 ## 产品支持情况
 
-| 产品 | 是否支持（<br><br>不传入bias的原型<br><br>） | 是否支持（<br><br>传入bias的原型<br><br>） |
-| ------------------------------------------- | -------------------------------------------- | ------------------------------------------ |
-| <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT | √ | √ </cann-filter> |
-| <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x | x </cann-filter> |
-| <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x | x </cann-filter> |
-| <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品 | x | x </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core | x | x </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品Vector Core | x | x </cann-filter> |
-| <cann-filter npu-type = "910">Atlas 训练系列产品 | x | x </cann-filter> |
-| <cann-filter npu-type = "x90">Kirin X90 | x | x </cann-filter> |
-| <cann-filter npu-type = "9030">Kirin 9030 | x | x </cann-filter> |
+### 不传入bias的原型
+
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
+<!-- npu="x90" id8 -->
+- Kirin X90：不支持
+<!-- end id8 -->
+<!-- npu="9030" id9 -->
+- Kirin 9030：不支持
+<!-- end id9 -->
+
+### 传入bias的原型
+
+<!-- npu="950" id10 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id10 -->
+<!-- npu="A3" id11 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id11 -->
+<!-- npu="910b" id12 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id12 -->
+<!-- npu="310b" id13 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id13 -->
+<!-- npu="310p" id14 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id14 -->
+<!-- npu="310p" id15 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id15 -->
+<!-- npu="910" id16 -->
+- Atlas 训练系列产品：不支持
+<!-- end id16 -->
+<!-- npu="x90" id17 -->
+- Kirin X90：不支持
+<!-- end id17 -->
+<!-- npu="9030" id18 -->
+- Kirin 9030：不支持
+<!-- end id18 -->
 
 ## 功能说明
 
@@ -79,13 +127,13 @@ __aicore__ inline MmadBitModeParams(const MmadBitModeParams &mmadParams_);
 
 | 参数名称 | 含义 |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| m | 左矩阵Height，取值范围：m∈[0，4095]。默认值为0。<br>该参数是位域结构体的最低位参数，占用12bit，可以使用MmadBitModeParams类对象的SetM()函数设置其值，使用GetM()函数获取其值。 |
-| k | 左矩阵Width、右矩阵Height，取值范围：k∈[0，4095]。默认值为0。<br>该参数是位域结构体的第二低位参数，占用12bit，可以使用MmadBitModeParams类对象的SetK()函数设置其值，使用GetK()函数获取其值。 |
-| n | 右矩阵Width，取值范围：n∈[0，4095]。默认值为0。<br>该参数是位域结构体的第三低位参数，占用12bit，可以使用MmadBitModeParams类对象的SetN()函数设置其值，使用GetN()函数获取其值。 |
+| m | 左矩阵Height，取值范围：m∈[0, 4095]。默认值为0。<br>该参数是位域结构体的最低位参数，占用12bit，可以使用MmadBitModeParams类对象的SetM()函数设置其值，使用GetM()函数获取其值。 |
+| k | 左矩阵Width、右矩阵Height，取值范围：k∈[0, 4095]。默认值为0。<br>该参数是位域结构体的第二低位参数，占用12bit，可以使用MmadBitModeParams类对象的SetK()函数设置其值，使用GetK()函数获取其值。 |
+| n | 右矩阵Width，取值范围：n∈[0, 4095]。默认值为0。<br>该参数是位域结构体的第三低位参数，占用12bit，可以使用MmadBitModeParams类对象的SetN()函数设置其值，使用GetN()函数获取其值。 |
 | unitFlag | 预留参数。为后续的功能做保留，开发者暂时无需关注，使用默认值即可。<br>该参数是位域结构体的第四低位参数，占用2bit，可以使用MmadBitModeParams类对象的SetUnitFlag()函数设置其值，使用GetUnitFlag()函数获取其值。 |
 | disableGemv | M = 1时，用于配置Mmad计算是否开启GEMV。当输入为false时，表示开启GEMV；反之，输入为true时，表示关闭GEMV。<br>GEMV（General Matrix-Vector Multiplication）表示实现矩阵和向量的乘积，开启GEMV后，Mmad API从L0A Buffer读取数据时，数据将以ND格式进行读取，而不会将其视为ZZ格式。<br>该参数是位域结构体的第五低位参数，占用1bit，可以使用MmadBitModeParams类对象的SetDisableGemv()函数设置其值，使用GetDisableGemv()函数获取其值。 |
-| cmatrixSource | 配置C矩阵初始值是否来源于BT Buffer（TPosition:C2）。默认值为false。<br>false：来源于L0C Buffer（TPosition:CO1）；<br>true：来源于BT Buffer（TPosition:C2）。<br>注意：带bias输入的接口配置该参数无效，会根据bias输入的位置来判断C矩阵初始值是否来源于L0C Buffer还是BT Buffer。<br>该参数是位域结构体的第六低位参数，占用1bit，可以使用MmadBitModeParams类对象的SetCmatrixSource()函数设置其值，使用GetCmatrixSource()函数获取其值。 |
-| cmatrixInitVal | 配置C矩阵初始值是否为0。默认值true。<br>true：C矩阵初始值为0；false：C矩阵初始值通过cmatrixSource参数进行配置。<br>该参数是位域结构体的最高位参数，占用1bit，可以使用MmadBitModeParams类对象的SetCmatrixInitVal()函数设置其值，使用GetCmatrixInitVal()函数获取其值。 |
+| cmatrixSource | 配置C矩阵初始值是否来源于BT Buffer（TPosition:C2）。默认值为false。<br>&nbsp;&nbsp;&bull; false：来源于L0C Buffer（TPosition:CO1）；<br>&nbsp;&nbsp;&bull; true：来源于BT Buffer（TPosition:C2）。<br>注意：带bias输入的接口配置该参数无效，会根据bias输入的位置来判断C矩阵初始值是否来源于L0C Buffer还是BT Buffer。<br>该参数是位域结构体的第六低位参数，占用1bit，可以使用MmadBitModeParams类对象的SetCmatrixSource()函数设置其值，使用GetCmatrixSource()函数获取其值。 |
+| cmatrixInitVal | 配置C矩阵初始值是否为0。默认值为 true。<br>&nbsp;&nbsp;&bull; true：C矩阵初始值为0；<br>&nbsp;&nbsp;&bull; false：C矩阵初始值通过cmatrixSource参数进行配置。<br>该参数是位域结构体的最高位参数，占用1bit，可以使用MmadBitModeParams类对象的SetCmatrixInitVal()函数设置其值，使用GetCmatrixInitVal()函数获取其值。 |
 
 ## 数据类型<a id="zh_cn_topic_mmadbitmode_section_datatype"></a>
 
@@ -136,4 +184,4 @@ __aicore__ inline MmadBitModeParams(const MmadBitModeParams &mmadParams_);
 
 ## 调用示例
 
-样例请参考[Mmad样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad)。
+样例请参考[Mmad样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad)。

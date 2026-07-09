@@ -9,13 +9,11 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/reg_compute/reg_convert.h"`。
+
 将源操作数的浮点数元素截断到整数位，同时源操作数的数据类型保持不变，并支持多种舍入模式。
 
-- RINT舍入模式：四舍六入五成双舍入
-- ROUND舍入模式：四舍五入舍入
-- FLOOR舍入模式：向负无穷舍入
-- CEIL舍入模式：向正无穷舍入
-- TRUNC舍入模式：向零舍入
+关于舍入模式的详细说明，请参见[舍入模式](./rounding_mode.md)。
 
 ## 函数原型
 
@@ -80,5 +78,6 @@ PIPE_V
 vector_half src;
 vector_half dst;
 vector_bool mask;
+mask = asc_create_mask_b16(PAT_ALL);
 asc_rint(dst, src, mask);
 ```

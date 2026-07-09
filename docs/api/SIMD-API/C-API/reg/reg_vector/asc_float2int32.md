@@ -8,22 +8,11 @@
 
 ## 功能说明
 
-将float类型转化为int32_t类型，并支持多种舍入模式。
+头文件路径：`"c_api/reg_compute/reg_convert.h"`。
 
-- RINT舍入模式：四舍六入五成双舍入
-- ROUND舍入模式：四舍五入舍入
-- FLOOR舍入模式：向负无穷舍入
-- CEIL舍入模式：向正无穷舍入
-- TRUNC舍入模式：向零舍入
+将float类型转化为int32_t类型，并支持多种舍入模式，饱和/非饱和模式。
 
-- 非饱和模式：
-  - 输入数据超过输出类型最值时，结果被截断为目标格式的数据宽度。
-  - 输入数据为+/-inf时，返回输出类型的最值。
-  - 输入数据为nan时，返回0。
-- 饱和模式：
-  - 输入数据超过输出类型最值时，返回输出类型的对应最值。
-  - 输入数据为+/-inf时，返回输出类型的最值。
-  - 输入数据为nan时，返回0。
+关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](./rounding_mode.md)。
 
 ## 函数原型
 
@@ -78,5 +67,6 @@ PIPE_V
 vector_float src;
 vector_int32_t dst;
 vector_bool mask;
+mask = asc_create_mask_b32(PAT_ALL);
 asc_float2int32_rn(dst, src, mask);
 ```

@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id2 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id2 -->
+<!-- npu="A3" id3 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id3 -->
+<!-- npu="910b" id4 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id4 -->
+<!-- npu="310b" id5 -->
 - Atlas 200I/500 A2 推理产品：支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
+<!-- end id7 -->
 <!-- npu="x90" id1 -->
 - Kirin X90：支持
 <!-- end id1 -->
@@ -57,7 +69,7 @@ __aicore__ inline void SetQuantScalar(const uint64_t quantScalar)
 
 ## 约束说明
 
-需与[SetDequantType](../Matmul-Tiling侧接口/Matmul-Tiling类/SetDequantType.md)保持一致。
+需与[SetDequantType](../Matmul-Tiling类/SetDequantType.md)保持一致。
 
 本接口必须在[Iterate](Iterate.md)或者[IterateAll](IterateAll.md)前调用。
 
@@ -65,7 +77,7 @@ __aicore__ inline void SetQuantScalar(const uint64_t quantScalar)
 
 ```
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
-float tmp = 0.1;  // 输出gm时会乘以0.1
+float tmp = 0.1; // 输出gm时会乘以0.1
 // 将浮点值的量化或反量化系数，转换为uint64_t类型
 uint64_t ans = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&tmp));
 mm.SetQuantScalar(ans);

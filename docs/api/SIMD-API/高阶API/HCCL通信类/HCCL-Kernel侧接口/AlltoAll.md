@@ -2,19 +2,31 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
 集合通信AlltoAll的任务下发接口，返回该任务的标识handleId给用户。AlltoAll的功能为：每张卡向通信域内所有卡发送相同数据量的数据，并从所有卡接收相同数据量的数据。结合原型中的参数，描述接口功能，具体为，第j张卡接收到来自第i张卡的sendBuf中第j块数据，并将该数据存放到本卡recvBuf中第i块的位置。
 
-![](../../../../figures/allreduce-60.png)
+![](../../../../figures/AlltoAll.png)
 
 ## 函数原型
 
@@ -50,11 +62,17 @@ __aicore__ inline HcclHandle AlltoAll(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t
 
 -   调用本接口前确保已调用过[InitV2](InitV2.md)和[SetCcTilingV2](SetCcTilingV2.md)接口。
 -   若HCCL对象的[config模板参数](HCCL模板参数.md#table884518212555)未指定下发通信任务的核，该接口只能在AIC核或者AIV核两者之一上调用。若HCCL对象的[config模板参数](HCCL模板参数.md#table884518212555)中指定了下发通信任务的核，则该接口可以在AIC核和AIV核上同时调用，接口内部会根据指定的核的类型，只在AIC核、AIV核二者之一下发该通信任务。
+<!-- npu="950" id7 -->
 -   对于Ascend 950PR/Ascend 950DT，通信服务端为CCU时，单次最大通信数据量不能超过256M。
 -   对于Ascend 950PR/Ascend 950DT，一个通信域内，所有Prepare接口的总调用次数不能超过63。
+<!-- end id7 -->
+<!-- npu="910b" id9 -->
 -   对于Atlas A2 训练系列产品/Atlas A2 推理系列产品，一个通信域内，所有Prepare接口的总调用次数不能超过63。
+<!-- end id9 -->
+<!-- npu="A3" id10 -->
 -   对于Atlas A3 训练系列产品/Atlas A3 推理系列产品，一个通信域内，所有Prepare接口和InterHcclGroupSync接口的总调用次数不能超过63。
 -   对于Atlas A3 训练系列产品/Atlas A3 推理系列产品，一个通信域内，最大支持128卡通信。
+<!-- end id10 -->
 
 ## 调用示例
 
@@ -66,26 +84,27 @@ __aicore__ inline HcclHandle AlltoAll(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t
     ![](../../../../figures/非多轮切分场景下4卡AlltoAll通信.png "非多轮切分场景下4卡AlltoAll通信")
 
     ```
-    extern "C" __global__ __aicore__ void alltoall_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM) {
-        constexpr uint64_t dataCount = 128U; // 数据量
-        auto sendBuf = xGM;  // xGM为AlltoAll的输入GM地址
-        auto recvBuf = yGM;  // yGM为AlltoAll的输出GM地址
-        REGISTER_TILING_DEFAULT(AllToAllCustomTilingData); //AllToAllCustomTilingData为对应算子头文件定义的结构体
+    extern "C" __global__ __aicore__ void alltoall_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
+    {
+        constexpr uint64_t dataCount = 128U;               // 数据量
+        auto sendBuf = xGM;                                // xGM为AlltoAll的输入GM地址
+        auto recvBuf = yGM;                                // yGM为AlltoAll的输出GM地址
+        REGISTER_TILING_DEFAULT(AllToAllCustomTilingData); // AllToAllCustomTilingData为对应算子头文件定义的结构体
         GET_TILING_DATA_WITH_STRUCT(AllToAllCustomTilingData, tilingData, tilingGM);
 
         Hccl hccl;
-        GM_ADDR contextGM = AscendC::GetHcclContext<0>();  // AscendC自定义算子kernel中，通过此方式获取HCCL context
+        GM_ADDR contextGM = AscendC::GetHcclContext<0>(); // AscendC自定义算子kernel中，通过此方式获取HCCL context
 
-        if (AscendC::g_coreType == AIV) {  // 指定AIV核通信
+        if (AscendC::g_coreType == AIV) { // 指定AIV核通信
             hccl.InitV2(contextGM, &tilingData);
             auto ret = hccl.SetCcTilingV2(offsetof(AllToAllCustomTilingData, alltoallCcTiling));
-    	if (ret != HCCL_SUCCESS) {
-    	    return;
-    	}
-    	HcclHandle handleId = hccl.AlltoAll<true>(sendBuf, recvBuf, dataCount, HcclDataType::HCCL_DATA_TYPE_FP16);
-    	hccl.Wait(handleId);
-    	AscendC::SyncAll<true>();  // AIV核全同步，防止0核执行过快，提前调用hccl.Finalize()接口，导致其他核Wait卡死
-    	hccl.Finalize();
+            if (ret != HCCL_SUCCESS) {
+                return;
+            }
+            HcclHandle handleId = hccl.AlltoAll<true>(sendBuf, recvBuf, dataCount, HcclDataType::HCCL_DATA_TYPE_FP16);
+            hccl.Wait(handleId);
+            AscendC::SyncAll<true>(); // AIV核全同步，防止0核执行过快，提前调用hccl.Finalize()接口，导致其他核Wait卡死
+            hccl.Finalize();
         }
     }
     ```
@@ -103,39 +122,42 @@ __aicore__ inline HcclHandle AlltoAll(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t
     ![](../../../../figures/第一轮4卡AlltoAll示意图.png "第一轮4卡AlltoAll示意图")
 
     ```
-    extern "C" __global__ __aicore__ void alltoall_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM) {
-        constexpr uint32_t tileNum = 2U;   // 首块数量
-        constexpr uint64_t tileLen = 128U; // 首块数据个数
-        constexpr uint32_t tailNum = 1U;   // 尾块数量
-        constexpr uint64_t tailLen = 100U; // 尾块数据个数
-        auto sendBuf = xGM;  // xGM为AlltoAll的输入GM地址
-        auto recvBuf = yGM;  // yGM为AlltoAll的输出GM地址
-        REGISTER_TILING_DEFAULT(AllToAllCustomTilingData); //AllToAllCustomTilingData为对应算子头文件定义的结构体
+    extern "C" __global__ __aicore__ void alltoall_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
+    {
+        constexpr uint32_t tileNum = 2U;                   // 首块数量
+        constexpr uint64_t tileLen = 128U;                 // 首块数据个数
+        constexpr uint32_t tailNum = 1U;                   // 尾块数量
+        constexpr uint64_t tailLen = 100U;                 // 尾块数据个数
+        auto sendBuf = xGM;                                // xGM为AlltoAll的输入GM地址
+        auto recvBuf = yGM;                                // yGM为AlltoAll的输出GM地址
+        REGISTER_TILING_DEFAULT(AllToAllCustomTilingData); // AllToAllCustomTilingData为对应算子头文件定义的结构体
         GET_TILING_DATA_WITH_STRUCT(AllToAllCustomTilingData, tilingData, tilingGM);
 
         Hccl hccl;
-        GM_ADDR contextGM = AscendC::GetHcclContext<0>();  // AscendC自定义算子kernel中，通过此方式获取HCCL context
+        GM_ADDR contextGM = AscendC::GetHcclContext<0>(); // AscendC自定义算子kernel中，通过此方式获取HCCL context
 
-        if (AscendC::g_coreType == AIV) {  // 指定AIV核通信
+        if (AscendC::g_coreType == AIV) { // 指定AIV核通信
             hccl.InitV2(contextGM, &tilingData);
             auto ret = hccl.SetCcTilingV2(offsetof(AllToAllCustomTilingData, alltoallCcTiling));
             if (ret != HCCL_SUCCESS) {
-              return;
+                return;
             }
             uint64_t strideCount = tileLen * tileNum + tailLen * tailNum;
             // 2个首块处理
-            HcclHandle handleId1 = hccl.AlltoAll<true>(sendBuf, recvBuf, tileLen, HcclDataType::HCCL_DATA_TYPE_FP16, strideCount, tileNum);
+            HcclHandle handleId1 =
+                hccl.AlltoAll<true>(sendBuf, recvBuf, tileLen, HcclDataType::HCCL_DATA_TYPE_FP16, strideCount, tileNum);
             // 1个尾块处理
             constexpr uint32_t kSizeOfFloat16 = 2U;
             sendBuf += tileLen * tileNum * kSizeOfFloat16;
             recvBuf += tileLen * tileNum * kSizeOfFloat16;
-            HcclHandle handleId2 = hccl.AlltoAll<true>(sendBuf, recvBuf, tailLen, HcclDataType::HCCL_DATA_TYPE_FP16, strideCount, tailNum);
+            HcclHandle handleId2 =
+                hccl.AlltoAll<true>(sendBuf, recvBuf, tailLen, HcclDataType::HCCL_DATA_TYPE_FP16, strideCount, tailNum);
 
-            for (uint8_t i=0; i<tileNum; i++) {
+            for (uint8_t i = 0; i < tileNum; i++) {
                 hccl.Wait(handleId1);
             }
             hccl.Wait(handleId2);
-            AscendC::SyncAll<true>();  // 全AIV核同步，防止0核执行过快，提前调用hccl.Finalize()接口，导致其他核Wait卡死
+            AscendC::SyncAll<true>(); // 全AIV核同步，防止0核执行过快，提前调用hccl.Finalize()接口，导致其他核Wait卡死
             hccl.Finalize();
         }
     }

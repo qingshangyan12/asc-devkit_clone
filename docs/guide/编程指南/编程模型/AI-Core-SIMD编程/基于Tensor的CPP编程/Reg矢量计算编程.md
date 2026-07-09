@@ -32,7 +32,7 @@ Reg矢量编程的硬件原理、内存层级、VF函数执行域、流水线同
 | 命名风格 | `LoadAlign`、`StoreUnAlignPost` | `asc_loadalign`、`asc_storeunalign_post` |
 | 矢量数据寄存器 | `RegTensor<T>` | `vector_float`、`vector_half`、`vector_int32_t`等 |
 | 掩码寄存器 | `MaskReg` | `vector_bool` |
-| 地址寄存器 | `AddrReg` | `iter_reg` |
+| 地址寄存器 | `AddrReg` | `addr_reg` |
 | 非对齐搬入/搬出寄存器 | `UnalignRegForLoad` / `UnalignRegForStore` | `vector_load_unalign` / `vector_store_unalign` |
 | 数据类型选择 | 模板参数`T`，通常可由参数推导 | 类型名或接口后缀，例如`_b8`、`_b16`、`_b32` |
 | PostUpdate | `PostLiteral`模板参数 | 接口名后缀，例如`_postupdate` |
@@ -44,7 +44,7 @@ Reg矢量编程的硬件原理、内存层级、VF函数执行域、流水线同
 | --- | --- | --- |
 | 创建全量mask | `CreateMask<T, MaskPattern::ALL>()` | `asc_create_mask_b*()` |
 | 更新尾块mask | `UpdateMask<T>(count)` | `asc_update_mask_b*()` |
-| 创建地址寄存器 | `CreateAddrReg<T>(...)` | `asc_create_iter_reg_b*()` |
+| 创建地址寄存器 | `CreateAddrReg<T>(...)` | `asc_create_addr_reg_b*()` |
 | 通用搬入/搬出 | `Load` / `Store` | `asc_load` / `asc_store` |
 | 对齐搬入/搬出 | `LoadAlign` / `StoreAlign` | `asc_loadalign` / `asc_storealign` |
 | 非对齐搬入 | `LoadUnAlignPre` + `LoadUnAlign` | `asc_loadunalign_pre` + `asc_loadunalign` |
@@ -149,7 +149,7 @@ __aicore__ inline void Compute()
 
 #### Mask创建
 
-[`CreateMask`](../../../../../api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md)用于创建固定模式的`MaskReg`，[`UpdateMask`](../../../../../api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md)用于根据剩余元素数生成尾块mask。
+[`CreateMask`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md)用于创建固定模式的`MaskReg`，[`UpdateMask`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md)用于根据剩余元素数生成尾块mask。
 
 ```cpp
 AscendC::Reg::MaskReg fullMask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
@@ -161,7 +161,7 @@ AscendC::Reg::MaskReg mask = AscendC::Reg::UpdateMask<T>(remainCount);
 
 #### 地址寄存器创建
 
-[`CreateAddrReg`](../../../../../api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/AddrReg.md)用于创建保存UB偏移量的`AddrReg`，最多支持四层循环跳转。
+[`CreateAddrReg`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/AddrReg.md)用于创建保存UB偏移量的`AddrReg`，最多支持四层循环跳转。
 
 ```cpp
 AscendC::Reg::AddrReg aReg;
@@ -193,7 +193,7 @@ AscendC::Reg::Store(dstAddr, dstReg, count);
 
 #### 对齐搬运
 
-[`LoadAlign`](../../../../../api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬入.md) / [`StoreAlign`](../../../../../api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬出.md)适用于UB地址满足对齐要求的连续搬入/搬出，是Reg矢量编程中最常见的搬运接口。在搬运时可以按照内置的功能随路进行数据排布等操作，具体功能以对应API章节为准。
+[`LoadAlign`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/连续对齐搬入（LoadAlign）.md) / [`StoreAlign`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/连续对齐搬出（StoreAlign）.md)适用于UB地址满足对齐要求的连续搬入/搬出，是Reg矢量编程中最常见的搬运接口。在搬运时可以按照内置的功能随路进行数据排布等操作，具体功能以对应API章节为准。
 
 ```cpp
 AscendC::Reg::LoadAlign(srcReg, srcAddr);
@@ -202,7 +202,7 @@ AscendC::Reg::StoreAlign(dstAddr, dstReg, mask);
 
 #### 非对齐搬运
 
-连续非对齐搬入由[`LoadUnAlignPre`](../../../../../api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续非对齐搬入.md)和[`LoadUnAlign`](../../../../../api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续非对齐搬入.md)组合使用；连续非对齐搬出由[`StoreUnAlign`](../../../../../api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续非对齐搬出.md)和[`StoreUnAlignPost`](../../../../../api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续非对齐搬出.md)组合使用。
+连续非对齐搬入由[`LoadUnAlignPre`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/连续非对齐搬入（LoadUnAlign）.md)和[`LoadUnAlign`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/连续非对齐搬入（LoadUnAlign）.md)组合使用；连续非对齐搬出由[`StoreUnAlign`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/连续非对齐搬出（StoreUnAlign）.md)和[`StoreUnAlignPost`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/连续非对齐搬出（StoreUnAlign）.md)组合使用。
 
 ```cpp
 AscendC::Reg::UnalignRegForLoad loadUreg;
@@ -247,7 +247,7 @@ AscendC::Reg::Select(dstReg, src0Reg, src1Reg, cmpMaskReg, mask);
 
 ### 同步控制类
 
-基础API使用[`LocalMemBar`](../../../../../api/SIMD-API/基础API/Reg矢量计算/同步控制/LocalMemBar.md)表达VF内部对UB访问流水线的同步约束。
+基础API使用[`LocalMemBar`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/同步控制/LocalMemBar.md)表达VF内部对UB访问流水线的同步约束。
 
 ```cpp
 AscendC::Reg::Store(dstAddr, dstReg);

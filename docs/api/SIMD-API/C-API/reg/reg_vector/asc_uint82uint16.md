@@ -8,6 +8,8 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/reg_compute/reg_convert.h"`。
+
 将vector_uint8_t类型的源操作数以256B为单位分为两部分，读取其中一部分元素，将其转换成vector_uint16_t类型并写入目的操作数。
 
 由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个VL大小的数据分为两部分，根据不同接口选取索引0或者索引1。
@@ -49,6 +51,7 @@ PIPE_V
 vector_uint16_t dst;
 vector_uint8_t src;
 vector_bool mask;
+mask = asc_create_mask_b8(PAT_ALL);
 asc_uint82uint16(dst, src, mask);    // 将src的上半部分转换成vector_uint16_t类型并写入dst
 asc_uint82uint16_v2(dst, src, mask);    // 将src的下半部分转换成vector_uint16_t类型并写入dst
 ```

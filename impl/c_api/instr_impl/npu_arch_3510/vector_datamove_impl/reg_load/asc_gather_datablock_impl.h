@@ -23,7 +23,7 @@
 #ifndef IMPL_C_API_INSTR_IMPL_VECTOR_DATAMOVE_IMPL_NPU_ARCH_3510_ASC_GATHER_DATABLOCK_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_VECTOR_DATAMOVE_IMPL_NPU_ARCH_3510_ASC_GATHER_DATABLOCK_IMPL_H
 
-#include "../../utils_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/utils_impl.h"
 
 // ==========有mask参数=========
 __simd_callee__ inline void asc_gather_datablock_impl(vector_int8_t& dst, __ubuf__  int8_t* src,
@@ -318,7 +318,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(vector_int4x2_t& dst, __ub
     }
 }
 
-__simd_callee__ inline void asc_gather_datablock_impl(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, 
+__simd_callee__ inline void asc_gather_datablock_impl(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src,
     vector_uint32_t index)
 {
     if ASC_IS_AIV {

@@ -9,6 +9,8 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/cube_datamove/cube_datamove.h"`。
+
 矩阵计算完成后，对结果进行量化处理，之后将处理结果搬运到GM中。量化模式共分为9种，分别为：
 - NoQuant：不开启量化功能。
 - F322F16：float量化成half。量化结果不支持INF_NAN模式。
@@ -84,8 +86,7 @@ PIPE_MTE1
 ```cpp
 // total_length指参与搬运的数据总长度
 constexpr uint64_t total_length = 128;
-// dst src分别对应目的操作数的输出地址和源操作数的输入地址
-__gm__ int32_t dst[total_length];
+// dst src分别对应目的操作数的输出地址和源操作数的输入地址，dst是外部输入的int32_t类型的GM地址。
 __cc__ int32_t src[total_length];
 // 其余入参均已默认数值传入
 uint16_t n_size = 16;
@@ -93,7 +94,7 @@ uint16_t m_size = 16;
 uint32_t dst_stride_dst_d = 0;
 uint16_t src_stride = 8;
 uint8_t unit_flag_mode = 0;
-uint64_t quant_pre = NoQuant;
+uint64_t quant_pre = QuantMode_t::NoQuant;
 uint8_t relu_pre = 0;
 bool channel_split = false;
 bool nz2nd_en = false;

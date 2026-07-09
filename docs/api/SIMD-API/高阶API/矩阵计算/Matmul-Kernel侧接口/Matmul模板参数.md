@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id5 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id5 -->
+<!-- npu="A3" id6 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id6 -->
+<!-- npu="910b" id7 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id7 -->
+<!-- npu="310b" id8 -->
 - Atlas 200I/500 A2 推理产品：支持
+<!-- end id8 -->
+<!-- npu="310p" id9 -->
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id9 -->
+<!-- npu="910" id10 -->
 - Atlas 训练系列产品：不支持
+<!-- end id10 -->
 <!-- npu="x90" id1 -->
 - Kirin X90：支持
 <!-- end id1 -->
@@ -23,41 +35,51 @@
 -   A、B、C、Bias的参数类型信息，类型信息通过MatmulType来定义，包括：内存逻辑位置、数据格式、数据类型、是否转置、数据排布和是否开启L1复用。
 -   MatmulConfig信息（可选），用于配置Matmul模板信息以及相关的配置参数。不配置默认使用Norm模板。
 
-    针对Atlas 200I/500 A2 推理产品，当前只支持使用默认的Norm模板。
+    <!-- npu="310b" id11 -->针对Atlas 200I/500 A2 推理产品，当前只支持使用默认的Norm模板。<!-- end id11 -->
+
+<a id="matmul-callback-func"></a>
 
 -   MatmulCallBackFunc回调函数信息（可选），用于配置左右矩阵从GM拷贝到A1/B1、计算结果从CO1拷贝到GM的自定义函数。当前支持如下产品型号：
 
+    <!-- npu="950" id12 -->
     Ascend 950PR/Ascend 950DT
-
+    <!-- end id12 -->
+    <!-- npu="A3" id13 -->
     Atlas A3 训练系列产品/Atlas A3 推理系列产品
-
+    <!-- end id13 -->
+    <!-- npu="910b" id14 -->
     Atlas A2 训练系列产品/Atlas A2 推理系列产品
-
+    <!-- end id14 -->
     <!-- npu="x90" id3 -->
     Kirin X90
     <!-- end id3 -->
 
 -   MatmulPolicy信息（可选），用于配置Matmul可拓展模块策略。不配置使用默认模板策略。当前支持如下产品型号：
 
+    <!-- npu="950" id15 -->
     Ascend 950PR/Ascend 950DT
-
+    <!-- end id15 -->
+    <!-- npu="A3" id16 -->
     Atlas A3 训练系列产品/Atlas A3 推理系列产品
-
+    <!-- end id16 -->
+    <!-- npu="910b" id17 -->
     Atlas A2 训练系列产品/Atlas A2 推理系列产品
-
+    <!-- end id17 -->
+    <!-- npu="310b" id18 -->
     Atlas 200I/500 A2 推理产品
-
+    <!-- end id18 -->
+    <!-- npu="310p" id19 -->
     Atlas 推理系列产品AI Core
-
+    <!-- end id19 -->
     <!-- npu="x90" id4 -->
     Kirin X90
     <!-- end id4 -->
 
 ## 函数原型
 
+Matmul模板参数如下：
 ```
 template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE = C_TYPE, const auto& MM_CFG = CFG_NORM, class MM_CB = MatmulCallBackFunc<nullptr, nullptr, nullptr>, MATMUL_POLICY_DEFAULT_OF(MatmulPolicy)>
-using Matmul = AscendC::MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>;
 ```
 
 -   A\_TYPE、B\_TYPE、C\_TYPE类型信息通过[MatmulType](Matmul使用说明.md#table1188045714378)来定义。
@@ -90,7 +112,7 @@ using Matmul = AscendC::MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM
 <a name="table7939847143412"></a>
 | 参数 | 数据类型 | 说明 |
 | --- | --- | --- |
-| M, N, Ka, Kb,<br><br>singleCoreM, singleCoreN, singleCoreK,<br><br>baseM, baseN, baseK,<br><br>depthA1, depthB1,<br><br>stepM， stepN，stepKa，stepKb,<br><br>isBias,<br><br>transLength,<br><br>iterateOrder,<br><br>dbL0A, dbL0B,<br><br>dbL0C,<br><br>shareMode,<br><br>shareL1Size,<br><br>shareL0CSize,<br><br>shareUbSize,<br><br>batchM,<br><br>batchN,<br><br>singleBatchM,<br><br>singleBatchN,<br><br>mxTypePara | int32_t | 与[TCubeTiling](../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md)结构体中各同名参数含义一致。本结构体中的参数是常量化后的常数值。 |
+| M, N, Ka, Kb,<br><br>singleCoreM, singleCoreN, singleCoreK,<br><br>baseM, baseN, baseK,<br><br>depthA1, depthB1,<br><br>stepM， stepN，stepKa，stepKb,<br><br>isBias,<br><br>transLength,<br><br>iterateOrder,<br><br>dbL0A, dbL0B,<br><br>dbL0C,<br><br>shareMode,<br><br>shareL1Size,<br><br>shareL0CSize,<br><br>shareUbSize,<br><br>batchM,<br><br>batchN,<br><br>singleBatchM,<br><br>singleBatchN,<br><br>mxTypePara | int32_t | 与[TCubeTiling](../Matmul-Tiling类/TCubeTiling结构体.md)结构体中各同名参数含义一致。本结构体中的参数是常量化后的常数值。 |
 | cfg | [MatmulConfig](MatmulConfig.md#table1761013213153) | Matmul模板的参数配置。 |
 
 ## 返回值说明
@@ -105,9 +127,15 @@ using Matmul = AscendC::MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM
 
 ```
 // 用户自定义回调函数
-void DataCopyOut(const __gm__ void *gm, const LocalTensor<int8_t> &co1Local, const void *dataCopyOutParams, const uint64_t tilingPtr, const uint64_t dataPtr);
-void CopyA1(const AscendC::LocalTensor<int8_t> &aMatrix, const __gm__ void *gm, int row, int col, int useM, int useK, const uint64_t tilingPtr, const uint64_t dataPtr);
-void CopyB1(const AscendC::LocalTensor<int8_t> &bMatrix, const __gm__ void *gm, int row, int col, int useK, int useN, const uint64_t tilingPtr, const uint64_t dataPtr);
+void DataCopyOut(
+    const __gm__ void* gm, const LocalTensor<int8_t>& co1Local, const void* dataCopyOutParams, const uint64_t tilingPtr,
+    const uint64_t dataPtr);
+void CopyA1(
+    const AscendC::LocalTensor<int8_t>& aMatrix, const __gm__ void* gm, int row, int col, int useM, int useK,
+    const uint64_t tilingPtr, const uint64_t dataPtr);
+void CopyB1(
+    const AscendC::LocalTensor<int8_t>& bMatrix, const __gm__ void* gm, int row, int col, int useK, int useN,
+    const uint64_t tilingPtr, const uint64_t dataPtr);
 
 // 定义创建对象时需要传入的A、B、C、Bias参数类型信息
 typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> aType;
@@ -118,7 +146,9 @@ typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasT
 // 使用MDL模板，创建Matmul实例
 AscendC::Matmul<aType, bType, cType, biasType, CFG_MDL> mm1;
 
-AscendC::MatmulConfig mmConfig{false/*不使用Norm模板*/, true/*使用BasicBlock模板*/, false/*不使用MDL模板*/, 128/*Matmul计算时base块M轴长度*/, 128/*Matmul计算时base块N轴长度*/, 64/*Matmul计算时base块K轴长度*/};
+AscendC::MatmulConfig mmConfig{false /*不使用Norm模板*/,          true /*使用BasicBlock模板*/,
+                               false /*不使用MDL模板*/,           128 /*Matmul计算时base块M轴长度*/,
+                               128 /*Matmul计算时base块N轴长度*/, 64 /*Matmul计算时base块K轴长度*/};
 mmConfig.enUnitFlag = false; // 不开启UnitFlag功能
 // 使用自定义的mmConfig，创建Matmul实例
 AscendC::Matmul<aType, bType, cType, biasType, mmConfig> mm2;

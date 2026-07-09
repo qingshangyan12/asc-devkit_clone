@@ -2,7 +2,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000001867289945_zh-cn_topic_0000001389787297_section36583473819"></a>
 
-在[Tiling下沉](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/高级编程/高级特性/算子入图开发/开启Tiling下沉.md)场景中，该宏定义用于生成Tiling下沉的注册类，再通过调用注册类的成员函数来注册需要下沉的Tiling函数。
+在[Tiling下沉](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/高级编程/算子入图开发/开启Tiling下沉.md)场景中，该宏定义用于生成Tiling下沉的注册类，再通过调用注册类的成员函数来注册需要下沉的Tiling函数。
 
 ## 函数原型<a name="zh-cn_topic_0000001867289945_zh-cn_topic_0000001389787297_section13230182415108"></a>
 
@@ -70,7 +70,7 @@ public:
 </td>
 <td class="cellrowborder" valign="top" width="15.340000000000002%" headers="mcps1.2.4.1.2 "><p id="p16606124294310"><a name="p16606124294310"></a><a name="p16606124294310"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="67.44%" headers="mcps1.2.4.1.3 "><p id="p25503505020"><a name="p25503505020"></a><a name="p25503505020"></a>需要注册的Tiling函数，该函数接受一个作为输入，以为返回值。</p>
+<td class="cellrowborder" valign="top" width="67.44%" headers="mcps1.2.4.1.3 "><p id="p25503505020"><a name="p25503505020"></a><a name="p25503505020"></a>需要注册的Tiling函数，该函数接受一个gert::TilingContext*作为输入，以ge::graphStatus为返回值。</p>
 </td>
 </tr>
 </tbody>

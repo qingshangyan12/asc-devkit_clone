@@ -4,10 +4,13 @@
 
 | 产品     | 是否支持 |
 | ----------- |:----:|
+|<cann-filter npu_type = "950"> Ascend 950PR/Ascend 950DT | √ </cann-filter>|
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √    |
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √    |
 
 ## 功能说明
+
+头文件路径：`"c_api/cube_compute/cube_compute.h"`。
 
 设置HF32模式取整方式，需要先使用[asc_enable_hf32](./asc_enable_hf32.md)开启HF32取整模式。
 
@@ -15,7 +18,7 @@
 ## 函数原型
 
  ```cpp
-   __aicore__ inline void asc_enable_hf32_trans(uint32_t mode);
+   __aicore__ inline void asc_enable_hf32_trans(uint32_t mode)
 ```
 
 

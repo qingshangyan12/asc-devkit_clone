@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
@@ -54,7 +66,7 @@ SubLayer\(X\)通常是指在DeepNorm模型中的一个子层（sub-layer），�
 | --- | --- | --- |
 | dstLocal | 输出 | 目的操作数。shape为[B，S，H]。H长度不可超过2040。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | meanLocal | 输出 | 均值，目的操作数。shape为[B，S]。meanLocal的数据类型需要与dstLocal保持一致。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| rstdLocal | 输出 | 方差，目的操作数。shape为[B，S]。rstdLocal的数据类型需要与dstLocal保持一致。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| rstdLocal | 输出 | 倒数标准差，目的操作数。shape为[B，S]。rstdLocal的数据类型需要与dstLocal保持一致。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | srcLocal | 输入 | 源操作数，shape为[B，S，H]。srcLocal的数据类型需要与目的操作数保持一致，尾轴长度需要32B对齐。H长度不可超过2040。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | gxLocal | 输入 | 源操作数，shape为[B，S，H]。gxLocal的数据类型需要与目的操作数保持一致，尾轴长度需要32B对齐。H长度不可超过2040。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>该参数对应计算公式中的SubLayer(X)的计算结果。 |
 | betaLocal | 输入 | 源操作数，shape为[H]。betaLocal的数据类型需要与目的操作数保持一致，长度需要32B对齐。H长度不可超过2040。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
@@ -81,7 +93,7 @@ SubLayer\(X\)通常是指在DeepNorm模型中的一个子层（sub-layer），�
 ```
 // dstLocal: 存放DeepNorm计算结果的Tensor
 // meanLocal: 输出均值Tensor
-// rstdLocal: 输出方差Tensor
+// rstdLocal: 输出倒数标准差Tensor
 // srcLocal: 输入的主数据X，shape为 [B, S, H]
 // gxLocal: SubLayer(X)的输出
 // betaLocal: LayerNorm的偏置系数β，shape为 [H]
@@ -94,16 +106,16 @@ SubLayer\(X\)通常是指在DeepNorm模型中的一个子层（sub-layer），�
 // 若尾轴的长度（H）不超过2040且为64的倍数，同时非尾轴长度（B*S）为8的倍数，可设置isBasicBlock = true提升性能
 // 若数据类型T为float且允许修改srcLocal，可设置isReuseSrc = true复用srcLocal内存空间以节省内存
 AscendC::DeepNorm<T, isReuseSrc, isBasicBlock>(
-    dstLocal,     // 输出：归一化后的结果
-    meanLocal,    // 输出：均值mean
-    rstdLocal,    // 输出：倒数标准差rstd
-    srcLocal,     // 输入：原始输入X
-    gxLocal,      // 输入：子层输出SubLayer(X)
-    betaLocal,    // 输入：LayerNorm偏置系数β
-    gammaLocal,   // 输入：LayerNorm缩放系数γ
-    alpha,        // 输入：残差路径缩放系数 α
-    epsilon,      // 输入：防除零系数 ε
-    tiling        // 输入：Tiling信息
+    dstLocal,   // 输出：归一化后的结果
+    meanLocal,  // 输出：均值mean
+    rstdLocal,  // 输出：倒数标准差rstd
+    srcLocal,   // 输入：原始输入X
+    gxLocal,    // 输入：子层输出SubLayer(X)
+    betaLocal,  // 输入：LayerNorm偏置系数β
+    gammaLocal, // 输入：LayerNorm缩放系数γ
+    alpha,      // 输入：残差路径缩放系数 α
+    epsilon,    // 输入：防除零系数 ε
+    tiling      // 输入：Tiling信息
 );
 ```
 
@@ -120,9 +132,9 @@ AscendC::DeepNorm<T, isReuseSrc, isBasicBlock>(
   16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
   32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47
   48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 ]
-输入数据(gammaLocal, shape:[4]):
+输入数据(gammaLocal, shape:[8]):
 [ 0 1 2 3 4 5 6 7 ]
-输入数据(betaLocal, shape:[4]):
+输入数据(betaLocal, shape:[8]):
 [ 0 1 2 3 4 5 6 7 ]
 输出数据(dstLocal):
 [ 0. 1.0439204 2.0527046 3.0263522 3.9648638 4.868239 5.7364774 6.56958

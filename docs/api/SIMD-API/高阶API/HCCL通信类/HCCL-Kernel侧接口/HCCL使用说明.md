@@ -2,7 +2,7 @@
 
 Ascend C提供一组HCCL通信类高阶API，方便算子Kernel开发用户在AI Core侧灵活管理通算融合算子中计算与通信任务的执行顺序。
 
-HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语接口（以下统称为Prepare接口），对标[集合通信C++接口](https://gitcode.com/cann/hccl/blob/master/docs/zh/api_ref/comm_op_interface/README.md)，当前支持[AllReduce](AllReduce.md)、[AllGather](AllGather.md)、[ReduceScatter](ReduceScatter.md)、[AlltoAll](AlltoAll.md)接口等。本章的所有接口运行在AI Core上，且不执行通信任务，而是由用户调用Prepare接口将对应类型的通信任务信息发送给AI CPU或CCU服务端，并在合适的时机通过[Commit](Commit.md)接口通知AI CPU或CCU上的服务端执行对应的通信任务。注意，当前Ascend 950PR/Ascend 950DT上仅支持CCU服务端。
+HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语接口（以下统称为Prepare接口），对标[集合通信C++接口](https://gitcode.com/cann/hccl/blob/master/docs/zh/api_ref/comm_op_interface/README.md)，当前支持[AllReduce](AllReduce.md)、[AllGather](AllGather.md)、[ReduceScatter](ReduceScatter.md)、[AlltoAll](AlltoAll.md)、[AlltoAllV](AlltoAllV.md)、[AlltoAllvWrite](AlltoAllvWrite.md)、[BatchWrite](BatchWrite.md)接口。本章的所有接口运行在AI Core上，且不执行通信任务，而是由用户调用Prepare接口将对应类型的通信任务信息发送给AI CPU或CCU服务端，并在合适的时机通过[Commit](Commit.md)接口通知AI CPU或CCU上的服务端执行对应的通信任务。<!-- npu="950" id1 -->注意，当前Ascend 950PR/Ascend 950DT上仅支持CCU服务端。<!-- end id1 -->
 
 所谓合适的时机，取决于用户编排的是先通信后计算的任务，还是先计算后通信的任务。对于这两种场景，简述如下：
 
@@ -14,11 +14,15 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
 **图1**  AI Core下发HCCL通信任务机制  
 ![](../../../../figures/AI-Core下发HCCL通信任务机制.png "AI-Core下发HCCL通信任务机制")
 
+<!-- npu="950" id3 -->
 **图2** Ascend 950PR/Ascend 950DT  AI Core下发HCCL通信任务机制  
 ![](../../../../figures/Ascend-950PR-Ascend-950DT-AI-Core下发HCCL通信任务机制.png "Ascend-950PR-Ascend-950DT-AI-Core下发HCCL通信任务机制")
+<!-- end id3 -->
 
+<!-- npu="A3" id2 -->
 > [!CAUTION]注意
 >对于Atlas A3 训练系列产品/Atlas A3 推理系列产品，在AI CPU作为服务端的场景中，HCCL通信API的功能依赖开放AI CPU用户态下发调度任务，存在一定的安全风险，用户需要自行确保AI Core自定义算子的安全可靠，防止恶意攻击行为。
+<!-- end id2 -->
 
 实现AI Core下发一个通信任务的具体步骤如下：
 
@@ -26,10 +30,11 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
 
     ```
     // 传initTiling地址的调用方式，推荐使用该方式
-    GET_TILING_DATA_WITH_STRUCT(AllGatherCustomTilingData, tilingData, tilingGM); // AllGatherCustomTilingData为对应算子头文件定义的结构体
+    GET_TILING_DATA_WITH_STRUCT(
+        AllGatherCustomTilingData, tilingData, tilingGM); // AllGatherCustomTilingData为对应算子头文件定义的结构体
 
     Hccl<HcclServerType::HCCL_SERVER_TYPE_AICPU> hccl; // 通过模板入参的方式选择硬件类型
-    GM_ADDR contextGM = GetHcclContext<0>();  // AscendC自定义算子kernel中，通过此方式获取HCCL context
+    GM_ADDR contextGM = GetHcclContext<0>(); // AscendC自定义算子kernel中，通过此方式获取HCCL context
 
     hccl.InitV2(contextGM, &tilingData);
     ```
@@ -45,20 +50,19 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
     GET_TILING_DATA_WITH_STRUCT(AllGatherCustomTilingData, tilingData, tilingGM);
 
     Hccl hccl;
-    GM_ADDR contextGM = GetHcclContext<0>();  // AscendC自定义算子kernel中，通过此方式获取HCCL context
+    GM_ADDR contextGM = GetHcclContext<0>(); // AscendC自定义算子kernel中，通过此方式获取HCCL context
 
     hccl.InitV2(contextGM, &tilingData);
     if (SetCcTilingV2(offsetof(AllGatherCustomTilingData, mc2CcTiling)) != HCCL_SUCCESS) {
-      return;
+        return;
     }
     ```
 
 3.  用户通过对应的Prepare接口异步下发对应类型的通信任务，并获取到该任务的标识handleId，服务端接收到后开始通信任务的展开和下发，示例如下。
 
     ```
-    auto handleId = hccl.ReduceScatter<false>(aGM, cGM, recvCount,
-                                              AscendC::HCCL_DATA_TYPE_FP16,
-                                              HCCL_REDUCE_SUM, strideCount, 1);
+    auto handleId =
+        hccl.ReduceScatter<false>(aGM, cGM, recvCount, AscendC::HCCL_DATA_TYPE_FP16, HCCL_REDUCE_SUM, strideCount, 1);
     // 对于Prepare接口，在调试时可增加异常值校验和PRINTF打印
     // if (handleId == INVALID_HANDLE_ID) {
     // 	PRINTF("[ERROR] call ReduceScatter failed, handleId is -1.");
@@ -77,24 +81,24 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
 
     ```
     enum HcclDataType {
-        HCCL_DATA_TYPE_INT8 = 0,   /* int8 */
-        HCCL_DATA_TYPE_INT16 = 1,  /* int16 */
-        HCCL_DATA_TYPE_INT32 = 2,  /* int32 */
-        HCCL_DATA_TYPE_FP16 = 3,   /* half或float16 */
-        HCCL_DATA_TYPE_FP32 = 4,   /* float */
-        HCCL_DATA_TYPE_INT64 = 5,  /* int64 */
-        HCCL_DATA_TYPE_UINT64 = 6, /* uint64 */
-        HCCL_DATA_TYPE_UINT8 = 7,  /* uint8 */
-        HCCL_DATA_TYPE_UINT16 = 8, /* uint16 */
-        HCCL_DATA_TYPE_UINT32 = 9, /* uint32 */
-        HCCL_DATA_TYPE_FP64 = 10,  /* float64 */
-        HCCL_DATA_TYPE_BFP16 = 11, /* bfloat16 */
-        HCCL_DATA_TYPE_INT128 = 12, /* int128预留类型，暂不支持 */
-        HCCL_DATA_TYPE_HIF8 = 14,  /* hif8 */
-        HCCL_DATA_TYPE_FP8E4M3 = 15,  /* fp8e4m3 */
-        HCCL_DATA_TYPE_FP8E5M2 = 16,  /* fp8e5m2 */
-        HCCL_DATA_TYPE_FP8E8M0 = 17,  /* fp8e8m0 */
-        HCCL_DATA_TYPE_RESERVED    /* reserved */
+        HCCL_DATA_TYPE_INT8 = 0,     /* int8 */
+        HCCL_DATA_TYPE_INT16 = 1,    /* int16 */
+        HCCL_DATA_TYPE_INT32 = 2,    /* int32 */
+        HCCL_DATA_TYPE_FP16 = 3,     /* half或float16 */
+        HCCL_DATA_TYPE_FP32 = 4,     /* float */
+        HCCL_DATA_TYPE_INT64 = 5,    /* int64 */
+        HCCL_DATA_TYPE_UINT64 = 6,   /* uint64 */
+        HCCL_DATA_TYPE_UINT8 = 7,    /* uint8 */
+        HCCL_DATA_TYPE_UINT16 = 8,   /* uint16 */
+        HCCL_DATA_TYPE_UINT32 = 9,   /* uint32 */
+        HCCL_DATA_TYPE_FP64 = 10,    /* float64 */
+        HCCL_DATA_TYPE_BFP16 = 11,   /* bfloat16 */
+        HCCL_DATA_TYPE_INT128 = 12,  /* int128预留类型，暂不支持 */
+        HCCL_DATA_TYPE_HIF8 = 14,    /* hif8 */
+        HCCL_DATA_TYPE_FP8E4M3 = 15, /* fp8e4m3 */
+        HCCL_DATA_TYPE_FP8E5M2 = 16, /* fp8e5m2 */
+        HCCL_DATA_TYPE_FP8E8M0 = 17, /* fp8e8m0 */
+        HCCL_DATA_TYPE_RESERVED      /* reserved */
     };
     ```
 
@@ -133,7 +137,7 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
     // }
 
     // 调用核间同步接口，防止部分核执行较快退出，触发Hccl析构，影响执行较慢的核
-    // 开发者可根据实际的业务场景，选择调用[SyncAll](../../../基础API/同步控制/核间同步/SyncAll.md)、[CrossCoreSetFlag(ISASI)](../../../基础API/同步控制/核间同步/CrossCoreSetFlag(ISASI).md)、[CrossCoreWaitFlag(ISASI)](../../../基础API/同步控制/核间同步/CrossCoreWaitFlag(ISASI).md)接口，保证全部核的任务完成后再退出执行
+    // 开发者可根据实际的业务场景，选择调用SyncAll、CrossCoreSetFlag、CrossCoreWaitFlag接口，保证全部核的任务完成后再退出执行
     ```
 
 6.  用户调用[Finalize](Finalize.md)接口，通知服务端后续无通信任务，执行结束后退出；客户端检测并等待最后一个通信任务执行结束。
@@ -157,37 +161,41 @@ if (g_coreType == AIV) {
 这种场景下，可以调用3次repeat参数为1的ReduceScatter接口，下发3个通信任务，同时更新每个ReduceScatter任务的收发地址，得到3个任务的handleId，每个handleId任务调用1次Commit和Wait接口，对应代码片段如下。
 
 ```
-extern "C" __global__ __aicore__ void reduce_scatter_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM) {
-    auto sendBuf = xGM;  // xGM为ReduceScatter的输入GM地址
-    auto recvBuf = yGM;  // yGM为ReduceScatter的输出GM地址
-    constexpr size_t rankSize = 4U; // 4张卡
-    constexpr size_t tileCnt = 3U;  // 卡上的数据均匀分成rankSize份，且每份又被切分成3份
-    constexpr size_t tileLen = 100U;  // 被切分后的每份数据个数
-    uint64_t strideCount = tileLen*tileCnt;  // 表示sendBuf上相邻数据块间的起始地址的偏移量
+extern "C" __global__ __aicore__ void reduce_scatter_custom(
+    GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
+{
+    auto sendBuf = xGM;                       // xGM为ReduceScatter的输入GM地址
+    auto recvBuf = yGM;                       // yGM为ReduceScatter的输出GM地址
+    constexpr size_t rankSize = 4U;           // 4张卡
+    constexpr size_t tileCnt = 3U;            // 卡上的数据均匀分成rankSize份，且每份又被切分成3份
+    constexpr size_t tileLen = 100U;          // 被切分后的每份数据个数
+    uint64_t strideCount = tileLen * tileCnt; // 表示sendBuf上相邻数据块间的起始地址的偏移量
 
-    REGISTER_TILING_DEFAULT(ReduceScatterCustomTilingData); //ReduceScatterCustomTilingData为对应算子头文件定义的结构体
+    REGISTER_TILING_DEFAULT(ReduceScatterCustomTilingData); // ReduceScatterCustomTilingData为对应算子头文件定义的结构体
     GET_TILING_DATA_WITH_STRUCT(ReduceScatterCustomTilingData, tilingData, tilingGM);
 
     Hccl hccl;
-    GM_ADDR contextGM = AscendC::GetHcclContext<0>();  // AscendC自定义算子kernel中，通过此方式获取HCCL context
-    if (AscendC::g_coreType == AIV) {  // 指定AIV核通信
+    GM_ADDR contextGM = AscendC::GetHcclContext<0>(); // AscendC自定义算子kernel中，通过此方式获取HCCL context
+    if (AscendC::g_coreType == AIV) {                 // 指定AIV核通信
         hccl.InitV2(contextGM, &tilingData);
         auto ret = hccl.SetCcTilingV2(offsetof(ReduceScatterCustomTilingData, reduceScatterCcTiling));
         if (ret != HCCL_SUCCESS) {
-          return;
+            return;
         }
-	// for循环中生成了3个handleId，每个handleId只调用了repeat=1次Commit和Wait接口
+        // for循环中生成了3个handleId，每个handleId只调用了repeat=1次Commit和Wait接口
         for (int i = 0; i < tileCnt; ++i) {
-	    auto handleId = hccl.ReduceScatter(sendBuf, recvBuf, tileLen, HcclDataType::HCCL_DATA_TYPE_FP32, HcclReduceOp::HCCL_REDUCE_SUM, strideCount, 1); //具体参数参见ReduceScatter接口说明
-	    hccl.Commit(handleId);
-	    auto ret = hccl.Wait(handleId);
-	    // 执行其他计算逻辑 ....
+            auto handleId = hccl.ReduceScatter(
+                sendBuf, recvBuf, tileLen, HcclDataType::HCCL_DATA_TYPE_FP32, HcclReduceOp::HCCL_REDUCE_SUM,
+                strideCount, 1); // 具体参数参见ReduceScatter接口说明
+            hccl.Commit(handleId);
+            auto ret = hccl.Wait(handleId);
+            // 执行其他计算逻辑 ....
 
-	    // 更新ReduceScatter的收发地址
-	    sendBuf += tileLen * sizeof(float);
-	    recvBuf += tileLen * sizeof(float);
-	}
-        AscendC::SyncAll<true>();  // 全AIV核同步，防止0核执行过快，提前调用hccl.Finalize()接口，导致其他核Wait卡死
+            // 更新ReduceScatter的收发地址
+            sendBuf += tileLen * sizeof(float);
+            recvBuf += tileLen * sizeof(float);
+        }
+        AscendC::SyncAll<true>(); // 全AIV核同步，防止0核执行过快，提前调用hccl.Finalize()接口，导致其他核Wait卡死
         hccl.Finalize();
     }
 }
@@ -196,33 +204,37 @@ extern "C" __global__ __aicore__ void reduce_scatter_custom(GM_ADDR xGM, GM_ADDR
 由于每张卡上3份数据的源地址SendBuf是连续的，且每张卡中目的地址recvBuf用来存储3份通信结果数据的内存也是连续的，因此以上代码可以优化，将ReduceScatter接口中的repeat参数设置为3，从而调用1次ReduceScatter接口，达到下发3个通信任务的效果。此时，只有1个handleId的任务，但是需要调用3次Commit和Wait接口，对应代码片段如下。
 
 ```
-extern "C" __global__ __aicore__ void reduce_scatter_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM) {
-    auto sendBuf = xGM;  // xGM为ReduceScatter的输入GM地址
-    auto recvBuf = yGM;  // yGM为ReduceScatter的输出GM地址
-    constexpr size_t rankSize = 4U; // 4张卡
-    constexpr size_t tileCnt = 3U;  // 卡上的数据均匀分成rankSize份，且每份又被切分成3份
-    constexpr size_t tileLen = 100U;  // 被切分后的每份数据个数
-    uint64_t strideCount = tileLen*tileCnt;  // 表示sendBuf上相邻数据块间的起始地址的偏移量
+extern "C" __global__ __aicore__ void reduce_scatter_custom(
+    GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
+{
+    auto sendBuf = xGM;                       // xGM为ReduceScatter的输入GM地址
+    auto recvBuf = yGM;                       // yGM为ReduceScatter的输出GM地址
+    constexpr size_t rankSize = 4U;           // 4张卡
+    constexpr size_t tileCnt = 3U;            // 卡上的数据均匀分成rankSize份，且每份又被切分成3份
+    constexpr size_t tileLen = 100U;          // 被切分后的每份数据个数
+    uint64_t strideCount = tileLen * tileCnt; // 表示sendBuf上相邻数据块间的起始地址的偏移量
 
-    REGISTER_TILING_DEFAULT(ReduceScatterCustomTilingData); //ReduceScatterCustomTilingData为对应算子头文件定义的结构体
+    REGISTER_TILING_DEFAULT(ReduceScatterCustomTilingData); // ReduceScatterCustomTilingData为对应算子头文件定义的结构体
     GET_TILING_DATA_WITH_STRUCT(ReduceScatterCustomTilingData, tilingData, tilingGM);
 
     Hccl hccl;
-    GM_ADDR contextGM = AscendC::GetHcclContext<0>();  // AscendC自定义算子kernel中，通过此方式获取HCCL context
-    if (AscendC::g_coreType == AIV) {  // 指定AIV核通信
+    GM_ADDR contextGM = AscendC::GetHcclContext<0>(); // AscendC自定义算子kernel中，通过此方式获取HCCL context
+    if (AscendC::g_coreType == AIV) {                 // 指定AIV核通信
         hccl.InitV2(contextGM, &tilingData);
         auto ret = hccl.SetCcTilingV2(offsetof(ReduceScatterCustomTilingData, reduceScatterCcTiling));
         if (ret != HCCL_SUCCESS) {
-          return;
+            return;
         }
 
-	auto handleId = hccl.ReduceScatter(sendBuf, recvBuf, tileLen, HcclDataType::HCCL_DATA_TYPE_FP32, HcclReduceOp::HCCL_REDUCE_SUM, strideCount, tileCnt); //具体参数参见ReduceScatter接口说明
-	for (int i = 0; i < tileCnt; ++i) {
-	    hccl.Commit(handleId);
-	    auto ret = hccl.Wait(handleId);
-	    // 执行其他计算逻辑 ....
-	}
-        AscendC::SyncAll<true>();  // 全AIV核同步，防止0核执行过快，提前调用hccl.Finalize()接口，导致其他核Wait卡死
+        auto handleId = hccl.ReduceScatter(
+            sendBuf, recvBuf, tileLen, HcclDataType::HCCL_DATA_TYPE_FP32, HcclReduceOp::HCCL_REDUCE_SUM, strideCount,
+            tileCnt); // 具体参数参见ReduceScatter接口说明
+        for (int i = 0; i < tileCnt; ++i) {
+            hccl.Commit(handleId);
+            auto ret = hccl.Wait(handleId);
+            // 执行其他计算逻辑 ....
+        }
+        AscendC::SyncAll<true>(); // 全AIV核同步，防止0核执行过快，提前调用hccl.Finalize()接口，导致其他核Wait卡死
         hccl.Finalize();
     }
 }

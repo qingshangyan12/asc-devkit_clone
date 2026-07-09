@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
@@ -204,7 +216,7 @@
 
     ```
     template <typename T>
-    __aicore__ inline void Transpose(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t> &sharedTmpBuffer, TransposeType transposeType, ConfusionTransposeTiling& tiling)
+    __aicore__ inline void Transpose(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer, TransposeType transposeType, ConfusionTransposeTiling& tiling)
     ```
 
     该方式下开发者需自行申请并管理临时内存空间，并在接口调用完成后，复用该部分内存，内存不会反复申请释放，灵活性较高，内存利用率也较高。
@@ -238,24 +250,24 @@
 
 ```
 enum class TransposeType : uint8_t {
-    TRANSPOSE_TYPE_NONE,            // default value
-    TRANSPOSE_NZ2ND_0213,           // 场景1：NZ2ND，1、2轴互换
-    TRANSPOSE_NZ2NZ_0213,           // 场景2：NZ2NZ，1、2轴互换
-    TRANSPOSE_NZ2NZ_012_WITH_N,     // 场景3：NZ2NZ，尾轴切分
-    TRANSPOSE_NZ2ND_012_WITH_N,     // 场景4：NZ2ND，尾轴切分
-    TRANSPOSE_NZ2ND_012_WITHOUT_N,  // 场景5：NZ2ND，尾轴合并
-    TRANSPOSE_NZ2NZ_012_WITHOUT_N,  // 场景6：NZ2NZ，尾轴合并
-    TRANSPOSE_ND2ND_ONLY,           // 场景7：二维转置 
-    TRANSPOSE_ND_UB_GM,             // 当前不支持
-    TRANSPOSE_GRAD_ND_UB_GM,        // 当前不支持
-    TRANSPOSE_ND2ND_B16,            // 当前不支持
-    TRANSPOSE_NCHW2NHWC,            // 当前不支持
-    TRANSPOSE_NHWC2NCHW,            // 当前不支持
-    TRANSPOSE_ND2ND_021,            // 场景13：二维转置或者三维中后两维转置
-    TRANSPOSE_ND2ND_102,            // 场景14：三维中第一维和第二维互换
-    TRANSPOSE_ND2ND_210,            // 场景15：三维中第一维和第三维互换 
-    TRANSPOSE_ND2NZ_WITH_INTLV      // 场景16：使用交织指令进行两维ND2NZ转置             
-    };
+    TRANSPOSE_TYPE_NONE,           // default value
+    TRANSPOSE_NZ2ND_0213,          // 场景1：NZ2ND，1、2轴互换
+    TRANSPOSE_NZ2NZ_0213,          // 场景2：NZ2NZ，1、2轴互换
+    TRANSPOSE_NZ2NZ_012_WITH_N,    // 场景3：NZ2NZ，尾轴切分
+    TRANSPOSE_NZ2ND_012_WITH_N,    // 场景4：NZ2ND，尾轴切分
+    TRANSPOSE_NZ2ND_012_WITHOUT_N, // 场景5：NZ2ND，尾轴合并
+    TRANSPOSE_NZ2NZ_012_WITHOUT_N, // 场景6：NZ2NZ，尾轴合并
+    TRANSPOSE_ND2ND_ONLY,          // 场景7：二维转置
+    TRANSPOSE_ND_UB_GM,            // 当前不支持
+    TRANSPOSE_GRAD_ND_UB_GM,       // 当前不支持
+    TRANSPOSE_ND2ND_B16,           // 当前不支持
+    TRANSPOSE_NCHW2NHWC,           // 当前不支持
+    TRANSPOSE_NHWC2NCHW,           // 当前不支持
+    TRANSPOSE_ND2ND_021,           // 场景13：二维转置或者三维中后两维转置
+    TRANSPOSE_ND2ND_102,           // 场景14：三维中第一维和第二维互换
+    TRANSPOSE_ND2ND_210,           // 场景15：三维中第一维和第三维互换
+    TRANSPOSE_ND2NZ_WITH_INTLV     // 场景16：使用交织指令进行两维ND2NZ转置
+};
 ```
 
 ## 返回值说明
@@ -265,8 +277,10 @@ enum class TransposeType : uint8_t {
 ## 约束说明
 
 -   操作数地址对齐要求请参见[通用地址对齐约束](../../通用说明和约束.md#section796754519912)。
+<!-- npu="950" id7 -->
 -   场景13到场景16仅在Ascend 950PR/Ascend 950DT上支持。
 -   Ascend 950PR/Ascend 950DT，场景13到场景16不支持dst和src空间复用。
+<!-- end id7 -->
 
 ## 调用示例
 
@@ -279,8 +293,8 @@ enum class TransposeType : uint8_t {
 B=1，N=2, S=64, H/N=32，输入数据类型均为half。更多完整样例请参考[Transpose样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/04_advanced_api/08_transpose/transpose)。
 
 ```
-// dst：输入Tensor
-// src：输出Tensor
+// dst：输出Tensor
+// src：输入Tensor
 // NZ2ND，1、2轴互换
 AscendC::Transpose(dst, src, AscendC::TransposeType::TRANSPOSE_NZ2ND_0213, this->tiling);
 ```
