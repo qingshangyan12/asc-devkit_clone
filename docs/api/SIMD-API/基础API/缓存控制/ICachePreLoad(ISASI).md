@@ -45,18 +45,18 @@ __aicore__ inline void ICachePreLoad(const int64_t preFetchLen)
 | preFetchLen | 输入 | 预取长度。|
 
 
-<!-- npu="950,A3,910b" id1 -->
+<!-- npu="950,A3,910b" id8 -->
 针对如下型号：preFetchLen参数单位为2K Byte，取值应小于ICache的大小/2K。AIC和AIV的ICache大小分别为32KB和16KB。
-<!-- npu="950" id2 -->
+<!-- npu="950" id9 -->
 - Ascend 950PR/Ascend 950DT
-<!-- end id2 -->
-<!-- npu="A3" id3 -->
+<!-- end id9 -->
+<!-- npu="A3" id10 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-<!-- end id3 -->
-<!-- npu="910b" id4 -->
+<!-- end id10 -->
+<!-- npu="910b" id11 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-<!-- end id4 -->
-<!-- end id1 -->
+<!-- end id11 -->
+<!-- end id8 -->
 <!-- npu="310p" id110 -->
 针对Atlas 推理系列产品AI Core，传入该参数无效，预取长度均为128Byte。
 <!-- end id110 --> 
