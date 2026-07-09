@@ -34,6 +34,25 @@ struct CopyTraits<CopyL12L0A, Traits> : public CopyTraits<CopyL12L0A, Traits, Co
 template <>
 struct CopyTraits<CopyL12L0A> : public CopyTraits<CopyL12L0A, CopyL12L0ATraitDefault> {};
 
+// Holds the Img2ColParams bound via atom.with(params); appends it to the Copy args on unpack.
+template <typename TraitStruct>
+struct CopyTraits<CopyL12L0AImg2ColWith, TraitStruct> {
+    using TraitType = typename TraitStruct::TraitType;
+    static constexpr const TraitType defaultTrait = TraitStruct::value;
+
+    template <const TraitType& trait = defaultTrait, typename... Args>
+    __aicore__ inline void CopyUnpack(const Args&... args) const
+    { CopyL12L0AImg2ColWith::Copy<TraitType, trait, Args...>(args..., params); }
+    Img2ColParams params;
+};
+
+template <typename Traits>
+struct CopyTraits<CopyL12L0AImg2Col, Traits>
+    : public CopyTraits<CopyL12L0AImg2Col, Traits, CopyL12L0AImg2ColWith, Traits> {};
+
+template <>
+struct CopyTraits<CopyL12L0AImg2Col> : public CopyTraits<CopyL12L0AImg2Col, CopyL12L0AImg2ColTraitDefault> {};
+
 } // namespace Te
 } // namespace AscendC
 
