@@ -111,11 +111,8 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
 - Atlas 训练系列产品，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。<!-- end id106 -->
 <!-- npu="x90" id107 -->
 - Kirin X90，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。<!-- end id107 -->
-
 <!-- npu="9030" id108 -->
 - Kirin 9030，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。<!-- end id108 -->
-
-
 
 ## 约束说明<a name="section794123819592"></a>
 
