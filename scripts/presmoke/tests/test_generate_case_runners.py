@@ -352,16 +352,19 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         self.assertTrue(requires_custom_op_package("01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclnn_invocation"))
         self.assertTrue(requires_custom_op_package("01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin"))
         self.assertTrue(requires_custom_op_package("01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom"))
-        reason, modes = explicit_skip_config("01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom")
+        reason, modes, archs = explicit_skip_config("01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom")
         self.assertIn("TensorFlow 2.6.5", reason)
         self.assertEqual(modes, ["npu"])
-        reason, modes = explicit_skip_config("01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin")
+        self.assertEqual(archs, [])
+        reason, modes, archs = explicit_skip_config("01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin")
         self.assertEqual(modes, ["npu"])
+        self.assertEqual(archs, [])
 
     def test_matmul_l2cache_skip_config(self) -> None:
-        reason, modes = explicit_skip_config("01_simd_cpp_api/04_advanced_api/00_matmul/matmul_l2cache")
+        reason, modes, archs = explicit_skip_config("01_simd_cpp_api/04_advanced_api/00_matmul/matmul_l2cache")
         self.assertIn("308M", reason)
         self.assertEqual(modes, ["cpu"])
+        self.assertEqual(archs, [])
 
     def test_matmul_fp8_is_950_only(self) -> None:
         project_root = Path(__file__).resolve().parents[3]
