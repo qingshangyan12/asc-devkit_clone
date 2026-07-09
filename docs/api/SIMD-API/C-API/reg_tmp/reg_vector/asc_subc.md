@@ -10,13 +10,19 @@
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
-根据mask对源操作数src0、src1以及进位数据carry_src进行按元素相减的操作，将结果写入目的操作数dst。src0、src1、carry_src相减时如果产生借位，在carry中对应位置每4bit的最低位写0，否则写1。
-
-计算公式如下：
+根据mask，对源操作数src0、src1及输入进位carry_src进行按元素求和操作，i为元素索引，相加结果写入dst，同时将每个元素的进位结果写入carry。计算公式如下：
 
 $$
-dst_i = src0_i - src1_i - carry\_src_i
+\{dst0_i, dst1_i\} = src0_i - src1_i - carry\_src_i
 $$
+
+Carry flag（进位标志）用于表示加法进位或者减法无借位，若src0，src1，carry_src输入按位相加后最高位有进位，在carry（存放进位的掩码寄存器）中对应位置每4bit设置1，否则写0。
+
+![](../../../../figures/asc_subc_1.png)
+
+以int64_t类型数据计算-1 + 8 = 7为例，asc_sub/asc_subc接口的适用场景如下图：
+
+![](../../../../figures/asc_subc_2.png)
 
 ## 函数原型
 
@@ -69,7 +75,7 @@ PIPE_V
 ## 约束说明
 
 <!-- npu="950" id5 -->
-<TODO>
+运算输出完整计算结果（包含进位位），硬件不会对输出进行饱和或截断。
 <!-- end id5 -->
 
 ## 调用示例
