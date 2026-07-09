@@ -42,6 +42,49 @@ public:
         }
     }
 
+    // GM(NC1HWC0) -> L1(NC1HWC0), W fully loaded. C1 bursts of (H, W, C0). No pattern tag required:
+    // the conv layout is built with MakeLayout, so this is dispatched from CopyGM2L1Ignore.
+    template <const CopyGM2L1Trait& trait, typename T, typename U>
+    __aicore__ inline static void EmitConv2DCopy(const T& dst, const U& src)
+    {
+        using type = typename U::elementType;
+        auto srcLayout = src.Layout();
+        auto dstLayout = dst.Layout();
+
+        // (N, C1, H, W, C0): C1 axis stride = H*W*C0, H axis stride = W*C0.
+        uint8_t cacheMode = src.Engine().GetCacheMode();
+        uint32_t c1 = Get<1>(dstLayout.Shape());
+        uint32_t rowElems = Get<2>(dstLayout.Stride()); // W*C0 (dst packed H stride)
+
+        uint64_t srcStride = Get<1>(srcLayout.Stride()) * sizeof(type); // burst_src_stride
+        uint32_t dstStride = Get<1>(dstLayout.Stride()) * sizeof(type); // burst_dst_stride
+        if constexpr (IsB4Type<type>) {
+            srcStride = srcStride >> 1;
+            dstStride = dstStride >> 1;
+        }
+
+        if (Get<2>(srcLayout.Stride()) == rowElems) {
+            // W fully loaded: src H rows contiguous, one burst per C1 of H*W*C0.
+            uint32_t blockLen = Get<1>(dstLayout.Stride()) * sizeof(type);
+            if constexpr (IsB4Type<type>) {
+                blockLen = blockLen >> 1;
+            }
+            CopyGmToCbufAlignV2Base::DataCopy(dst, src, c1, blockLen, 0, 0, cacheMode, srcStride, dstStride);
+        } else {
+            // W not fully loaded (sliced src): per-H loop, C1 bursts of W*C0 each.
+            uint32_t h = Get<2>(dstLayout.Shape());
+            uint32_t blockLen = rowElems * sizeof(type);
+            if constexpr (IsB4Type<type>) {
+                blockLen = blockLen >> 1;
+            }
+            for (uint32_t i = 0; i < h; ++i) {
+                auto srcH = src(MakeCoord(0, 0, i, 0, 0));
+                auto dstH = dst(MakeCoord(0, 0, i, 0, 0));
+                CopyGmToCbufAlignV2Base::DataCopy(dstH, srcH, c1, blockLen, 0, 0, cacheMode, srcStride, dstStride);
+            }
+        }
+    }
+
 private:
     template <const CopyGM2L1Trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void CheckTemplate()

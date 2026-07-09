@@ -30,10 +30,20 @@ namespace Te {
 
 class CopyL0C2GMIgnore {
 public:
-    template <const CopyL0C2GMTrait& trait, typename... Args>
-    __aicore__ inline static void Run(const Args&... args)
-    { 
-        static_assert(Std::is_same_v<Args..., void>, "CopyL0C2GMIgnore should not be called"); 
+    // NC1HWC0 dst is built with MakeLayout and carries no pattern tag, so routing lands here. A flat
+    // 5-dim (N, C1, H, W, C0) dst with an NZ src is dispatched to the NZ copy path (NC1HWC0 shares the
+    // NZ fractal memory layout, only the C0-block stride differs); anything else is unsupported.
+    template <const CopyL0C2GMTrait& trait, typename T, typename U>
+    __aicore__ inline static void Run(const T& dst, const U& src, const FixpipeParams& params)
+    {
+        constexpr auto dstDepth = NestingDepthV<decltype(dst.Layout().Shape())>;
+        constexpr auto dstRank = Std::tuple_size_v<Std::remove_cvref_t<decltype(dst.Layout().Shape())>>;
+        if constexpr (dstDepth == FIVE_DIM_DATA && dstRank == FIVE_DIM_DATA) {
+            DataCopyL0C2GM::template Run<trait, T, U>(dst, src, params);
+        } else {
+            static_assert(dstDepth == FIVE_DIM_DATA && dstRank == FIVE_DIM_DATA,
+                "CopyL0C2GM: unsupported layout pattern combination.");
+        }
     }
 };
 
