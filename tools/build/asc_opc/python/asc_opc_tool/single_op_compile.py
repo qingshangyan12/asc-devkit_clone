@@ -244,6 +244,9 @@ class SingleOpCompile:
         enable_vector_core = self.__op_info.get(CompileParam.ENABLE_VECTOR_CORE)
         enable_vector_core = False if enable_vector_core is None else enable_vector_core
         deterministic = self.__op_info.get(OpcOptions.DETERMINISTIC) == "true"
+        deterministic_level = self.__op_info.get(OpcOptions.DETERMINISTIC_LEVEL, "")
+        if deterministic_level != "":
+            logger.debug("deterministic_level is {}".format(deterministic_level))
         jit_compile_mode = self.__op_info.get(OpcOptions.JIT_COMPILE_MODE)
         op_relocatable_bin = self.__opc_compile_args.get(OpcOptions.RELOCATABLE_BIN, False)
         logger.debug("debug_config {}, enable_super_kernel {}.".format(debug_config, op_relocatable_bin))
@@ -255,7 +258,8 @@ class SingleOpCompile:
                           save_temp_cce_file=dump_cce_switch, random_cce_file_location=False,
                           status_check=status_check, enable_deterministic_mode=deterministic,
                           jit_compile_mode=jit_compile_mode, enable_vector_core=enable_vector_core,
-                          enable_super_kernel=op_relocatable_bin):
+                          enable_super_kernel=op_relocatable_bin,
+                          deterministic_level=deterministic_level):
             json_file_path = self.__call_op()
 
             return json_file_path
