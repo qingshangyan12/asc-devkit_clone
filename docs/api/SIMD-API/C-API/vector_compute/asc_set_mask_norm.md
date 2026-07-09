@@ -46,5 +46,5 @@ constexpr uint32_t total_length = 128; //total_length指参与计算的数据总
 __ubuf__ half src0[total_length];
 __ubuf__ half src1[total_length];
 __ubuf__ half dst[total_length];
-asc_add(dst, src0, src1, total_length);
+asc_add(dst, src0, src1, 1, 1, 1, 1, 8, 8, 8);
 ```
