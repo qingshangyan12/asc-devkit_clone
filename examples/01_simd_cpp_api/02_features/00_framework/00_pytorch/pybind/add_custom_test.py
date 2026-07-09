@@ -27,7 +27,10 @@ class TestCustomAdd(TestCase):
         length = [8, 2048]
         x = torch.rand(length, device='cpu', dtype=torch.float16)
         y = torch.rand(length, device='cpu', dtype=torch.float16)
-        output = ascendc_ops.ascendc_add(x.npu(), y.npu()).cpu()
+        x_npu = x.npu()
+        y_npu = y.npu()
+        z_npu = torch.empty_like(x_npu)
+        output = ascendc_ops.ascendc_add(x_npu, y_npu, z_npu).cpu()
         cpuout = torch.add(x, y)
         self.assertRtolEqual(output, cpuout)
 

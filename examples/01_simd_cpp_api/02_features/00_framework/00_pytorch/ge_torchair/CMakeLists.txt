@@ -13,8 +13,16 @@ cmake_minimum_required(VERSION 3.16)
 set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201, dav-3510")
 
 find_package(ASC REQUIRED)
-project(ge_torchair LANGUAGES ASC)
+project(ge_torchair LANGUAGES ASC CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+
+if (DEFINED ENV{ASCEND_HOME_PATH})
+    set(ASCEND_PATH $ENV{ASCEND_HOME_PATH})
+else ()
+    set(ASCEND_PATH /usr/local/Ascend/cann)
+endif()
 
 execute_process(
     COMMAND ${CMAKE_COMMAND} -E env TORCH_DEVICE_BACKEND_AUTOLOAD=0
@@ -26,27 +34,28 @@ find_package(Torch REQUIRED HINTS ${TORCH_CMAKE_PREFIX_PATH})
 
 add_library(ascendc_ops SHARED
     add_custom_kernel.asc
-    add_custom_pytorch.asc
+    add_custom_pytorch.cpp
     add_custom_ge.asc
 )
 
 target_include_directories(ascendc_ops PRIVATE
     ${CMAKE_SOURCE_DIR}
     ${TORCH_INCLUDE_DIRS}
-    ${ASCEND_HOME_PATH}/include
-    ${ASCEND_HOME_PATH}/include/graph
-    ${ASCEND_HOME_PATH}/include/register
-    ${ASCEND_HOME_PATH}/include/external
+    ${ASCEND_PATH}/include
+    ${ASCEND_PATH}/include/graph
+    ${ASCEND_PATH}/include/register
+    ${ASCEND_PATH}/include/external
 )
 
 target_link_directories(ascendc_ops PRIVATE
-    ${ASCEND_HOME_PATH}/lib64
+    ${ASCEND_PATH}/aarch64-linux/lib64
+    ${ASCEND_PATH}/aarch64-linux/devlib
 )
 
 target_link_libraries(ascendc_ops PRIVATE
     -Wl,--no-as-needed
     Python3::Python
-    ascendc_runtime
+    ${ASCEND_PATH}/aarch64-linux/lib64/libascendc_runtime.a
     acl_rt
     graph
     graph_base

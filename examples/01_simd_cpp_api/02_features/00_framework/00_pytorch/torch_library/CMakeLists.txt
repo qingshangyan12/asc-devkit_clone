@@ -15,17 +15,27 @@ set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201,
 
 find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 
 execute_process(
-    COMMAND ${Python3_EXECUTABLE} -c "import torch; print(torch.utils.cmake_prefix_path)"
+    COMMAND ${Python3_EXECUTABLE} -c
+            [=[
+import importlib.util
+print(importlib.util.find_spec('torch').submodule_search_locations[0] + '/share/cmake')
+]=]
     OUTPUT_STRIP_TRAILING_WHITESPACE
     OUTPUT_VARIABLE TORCH_CMAKE_PREFIX_PATH
 )
 find_package(Torch REQUIRED HINTS ${TORCH_CMAKE_PREFIX_PATH})
 
 execute_process(
-    COMMAND ${Python3_EXECUTABLE} -c "import os, torch_npu; print(os.path.dirname(torch_npu.__file__))"
+    COMMAND ${Python3_EXECUTABLE} -c
+            [=[
+import importlib.util
+print(importlib.util.find_spec('torch_npu').submodule_search_locations[0])
+]=]
     OUTPUT_STRIP_TRAILING_WHITESPACE
     OUTPUT_VARIABLE TORCH_NPU_PATH
 )
@@ -34,6 +44,7 @@ set(TORCH_NPU_LIBRARIES ${TORCH_NPU_PATH}/lib)
 
 add_library(ascendc_ops SHARED
     add_custom.asc
+    add_custom_register.cpp
 )
 
 target_include_directories(ascendc_ops PRIVATE
@@ -42,6 +53,7 @@ target_include_directories(ascendc_ops PRIVATE
 )
 
 target_link_libraries(ascendc_ops PRIVATE
+    ${TORCH_LIBRARIES}
     torch_npu
     Python3::Python
 )
