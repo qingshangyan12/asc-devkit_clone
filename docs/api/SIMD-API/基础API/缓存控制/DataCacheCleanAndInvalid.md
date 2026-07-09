@@ -23,9 +23,15 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- npu="x90" id8 -->
+- Kirin X90：支持
+<!-- end id8 -->
+<!-- npu="9030" id9 -->
+- Kirin 9030：支持
+<!-- end id9 -->
 
 > [!NOTE]说明
-> 上述产品支持情况中"支持"指同时支持配置dcciDst和不支持配置dcciDst的两种原型；"不支持"指两种原型均不支持。对于Atlas 推理系列产品AI Core，仅支持不支持配置dcciDst的原型。
+> 上述产品支持情况中"支持"指同时支持配置dcciDst和不支持配置dcciDst的两种原型；"不支持"指两种原型均不支持。对于Atlas 推理系列产品AI Core，仅支持不支持配置dcciDst的原型。对于Kirin X90和Kirin 9030，同时支持配置dcciDst和不支持配置dcciDst的两种原型。
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
