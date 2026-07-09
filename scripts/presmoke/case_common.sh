@@ -150,6 +150,29 @@ presmoke_case_main() {
     fi
 
     if [[ -n "${SKIP_REASON:-}" ]]; then
+        if [[ -n "${SKIP_ARCHS:-}" ]]; then
+            local arch_match=0
+            for a in ${SKIP_ARCHS[@]}; do
+                if [[ "$a" == "$(presmoke_arch)" ]]; then
+                    arch_match=1
+                    break
+                fi
+            done
+            if [[ "$arch_match" == "0" ]]; then
+                echo "SKIP_ARCHS does not include $(presmoke_arch); running normally" >&2
+                return 0
+            fi
+        fi
+        if [[ -n "${SKIP_MODES:-}" ]]; then
+            for m in ${SKIP_MODES[@]}; do
+                if [[ "$m" == "$(presmoke_mode)" ]]; then
+                    echo "SKIP: $SKIP_REASON"
+                    return 0
+                fi
+            done
+            echo "mode $(presmoke_mode) not in SKIP_MODES; running normally" >&2
+            return 0
+        fi
         echo "SKIP: $SKIP_REASON"
         return 0
     fi
