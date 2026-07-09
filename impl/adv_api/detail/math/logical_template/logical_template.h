@@ -135,11 +135,13 @@ __simd_vf__ inline void LogicalTemplateBothTensorVF(
         Reg::LoadAlign(dupVreg, scalar);
         Reg::Duplicate(dupVreg, dupVreg, fullMask);
     }
-    Reg::CompareScalar<U, CMPMODE::NE>(cmpMask1, dupVreg, static_cast<U>(0), fullMask);
+    Reg::CompareScalar<U, CMPMODE::EQ>(cmpMask1, dupVreg, static_cast<U>(0), fullMask);
+    Reg::Not(cmpMask1, cmpMask1, fullMask);
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = Reg::UpdateMask<U, Trait>(count);
         Reg::LoadAlign(srcVreg, src + i * oneRepElm);
-        Reg::CompareScalar<U, CMPMODE::NE>(cmpMask0, srcVreg, static_cast<U>(0), mask);
+        Reg::CompareScalar<U, CMPMODE::EQ>(cmpMask0, srcVreg, static_cast<U>(0), mask);
+        Reg::Not(cmpMask0, cmpMask0, mask);
         func(cmpMask2, cmpMask0, cmpMask1, mask);
         if constexpr (sizeof(U) == 2) {
             Reg::MaskPack(cmpMask2, cmpMask2);
@@ -175,11 +177,13 @@ __simd_vf__ inline void LogicalTemplateSingleScalarVF(
     Reg::Duplicate(brcZeroReg, 0u);
     fullMask = Reg::CreateMask<U, Reg::MaskPattern::ALL, Trait>();
     Reg::Duplicate(dupVreg, scalar);
-    Reg::CompareScalar<U, CMPMODE::NE>(cmpMask0, dupVreg, static_cast<U>(0), fullMask);
+    Reg::CompareScalar<U, CMPMODE::EQ>(cmpMask0, dupVreg, static_cast<U>(0), fullMask);
+    Reg::Not(cmpMask0, cmpMask0, fullMask);
     for (uint16_t i = 0; i < repeatTime; ++i) {
         mask = Reg::UpdateMask<U, Trait>(count);
         Reg::LoadAlign(srcVreg, src + i * oneRepElm);
-        Reg::CompareScalar<U, CMPMODE::NE>(cmpMask1, srcVreg, static_cast<U>(0), mask);
+        Reg::CompareScalar<U, CMPMODE::EQ>(cmpMask1, srcVreg, static_cast<U>(0), mask);
+        Reg::Not(cmpMask1, cmpMask1, mask);
         func(cmpMask2, cmpMask0, cmpMask1, mask);
         if constexpr (sizeof(U) == 2) {
             Reg::MaskPack(cmpMask2, cmpMask2);
