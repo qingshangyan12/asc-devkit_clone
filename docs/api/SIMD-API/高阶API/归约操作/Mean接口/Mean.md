@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
@@ -69,10 +81,10 @@
 | MeanParams | 输入 | srcTensor的shape信息。MeanParams类型，具体定义如下方代码所示，其中参数的含义为：<br>outter：输入数据的外轴长度。<br>inner：输入数据内轴实际元素个数32字节补齐后的元素个数，inner\*sizeof(T)必须是32字节的整数倍。<br>n：输入数据内轴的实际元素个数。<br>请注意：MeanParams.inner是MeanParams.n向上32字节对齐后的值，inner = (n *sizeof(T) + 32 - 1) / 32 * 32 / sizeof(T)，因此MeanParams.n的大小应该满足：1 <= MeanParams.n <= MeanParams.inner。 |
 
 ```
-struct MeanParams{
-    uint32_t outter = 1; 
-    uint32_t inner; 
-    uint32_t n; 
+struct MeanParams {
+    uint32_t outter = 1;
+    uint32_t inner;
+    uint32_t n;
 };
 ```
 
@@ -100,10 +112,11 @@ meanParams.outter = outter;
 meanParams.n = n;
 // inner = (n * sizeof(half) + 32 - 1)/32 * 32 / sizeof(half) = 16
 meanParams.inner = inner;
-// T为half，accTypes为实际计算的类型这里是half
-// dstLocal输出数据，srcLocal输入数据，tmplocalTensor用户传入的临时缓存AscendC::Mean<T, accType>(dstLocal, srcLocal, tmplocalTensor, meanParams)
-// 也可不使用tmplocalTensor。调用如下
-// AscendC::Mean<T, accType>(dstLocal, srcLocal, meanParams);
+// T为half，accTypes为实际计算的类型，这里是half
+// dstLocal输出数据，srcLocal输入数据，tmplocalTensor用户传入的临时缓存
+// AscendC::Mean<T, accType>(dstLocal, srcLocal,tmplocalTensor, meanParams)
+// 也可不使用tmplocalTensor。
+// 调用如下 AscendC::Mean<T, accType>(dstLocal, srcLocal, meanParams);
 ```
 
 结果示例如下：

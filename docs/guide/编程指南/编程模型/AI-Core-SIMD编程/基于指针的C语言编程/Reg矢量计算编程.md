@@ -160,7 +160,7 @@ for (i = 0; i < repeat_times; ++i) {
 | --- | --- | --- |
 | 矢量数据寄存器 | `vector_*`，例如vector_float | VL = 256B |
 | 掩码寄存器 | `vector_bool` | VL/8 = 32B |
-| 地址寄存器 | `iter_reg` | 32bits = 8B |
+| 地址寄存器 | `addr_reg` | 32bits = 8B |
 | 搬入非对齐寄存器 | `vector_load_unalign` | DataBlock = 32B |
 | 搬出非对齐寄存器 | `vector_store_unalign` | DataBlock = 32B |
 
@@ -241,15 +241,15 @@ asc_and(dst_mask_reg, src0_mask_reg, src1_mask_reg, mask_reg);
 
 #### 地址迭代寄存器
 
-`iter_reg`用于保存UB访问的地址偏移量。它把原本需要在循环体内反复执行的标量地址计算转化为寄存器化的地址管理，最多支持四维偏移叠加。`AddrReg`通过`asc_create_iter_reg_b*`初始化，偏移量计算公式为：`offset = index0*stride0 + index1*stride1 + ...`。
+`addr_reg`用于保存UB访问的地址偏移量。它把原本需要在循环体内反复执行的标量地址计算转化为寄存器化的地址管理，最多支持四维偏移叠加。`AddrReg`通过`asc_create_addr_reg_b*`初始化，偏移量计算公式为：`offset = index0*stride0 + index1*stride1 + ...`。
 
 ```cpp
 // Allocate address iteration register
-iter_reg a_reg;
+addr_reg a_reg;
 // Use as 2D offset accumulation for b32 elements
 for(uint16_t i = 0;i < extent1; i++){
     for(uint16_t j = 0;j < extent2; j++){
-        a_reg = asc_create_iter_reg_b32(i, stride0, j, stride1);
+        a_reg = asc_create_addr_reg_b32(i, stride0, j, stride1);
         asc_loadalign(src_reg, src_addr, a_reg);
     }
 }
@@ -305,7 +305,7 @@ asc_mem_bar(VST_LD);
 asc_load(vreg1, ub_addr);
 ```
 
-同步的方向包括多个指定的[枚举值](../../../../../api/c_api/reg/reg_vector/asc_mem_bar.md)，用于指定需要同步的两条流水方向。如下图**操作相同UB地址时**，读写依赖需要插入`Load->Store`同步`asc_mem_bar(VLD_ST)` ；写写依赖需要插入Store->Store同步`asc_mem_bar(VST_ST)`  。仅当在读写相同UB地址中间存在寄存器变量依赖计算时，同一数据串行处理，无需插入同步。
+同步的方向包括多个指定的[枚举值](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_vector/asc_mem_bar.md)，用于指定需要同步的两条流水方向。如下图**操作相同UB地址时**，读写依赖需要插入`Load->Store`同步`asc_mem_bar(VLD_ST)` ；写写依赖需要插入Store->Store同步`asc_mem_bar(VST_ST)`  。仅当在读写相同UB地址中间存在寄存器变量依赖计算时，同一数据串行处理，无需插入同步。
 
 **图5** 流水线同步示意
 
@@ -383,7 +383,7 @@ Reg矢量编程的关键特性按用途分为三大类：
 
 #### 通用搬运
 
-[`asc_load`](../../../../../api/c_api/reg/reg_load/asc_load.md) / [`asc_store`](../../../../../api/c_api/reg/reg_store/asc_store.md)是不区分UB地址是否对齐的通用搬运接口，用于将连续VL数据在UB与矢量数据寄存器之间搬运，或将不超过一个VL的元素数据从矢量数据寄存器搬出到UB。
+[`asc_load`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_load/asc_load.md) / [`asc_store`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_store/asc_store.md)是不区分UB地址是否对齐的通用搬运接口，用于将连续VL数据在UB与矢量数据寄存器之间搬运，或将不超过一个VL的元素数据从矢量数据寄存器搬出到UB。
 
 ```cpp
 // Transfer 1 VL length data from UB address src_addr to vector data register src_reg
@@ -402,7 +402,7 @@ asc_store(dst_addr, dst_reg, 10);
 
 #### 对齐搬运
 
-[`asc_loadalign`](../../../../../api/c_api/reg/reg_load/asc_loadalign) / [`asc_storealign`](../../../../../api/c_api/reg/reg_store/asc_storealign)要求UB地址满足32B对齐。相比通用搬运，对齐搬运的性能开销更低，是连续对齐场景下的首选接口。
+[`asc_loadalign`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_load/asc_loadalign/asc_loadalign.md) / [`asc_storealign`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_store/asc_storealign/asc_storealign.md)要求UB地址满足32B对齐。相比通用搬运，对齐搬运的性能开销更低，是连续对齐场景下的首选接口。
 
 ```cpp
 for (uint16_t i = 0; i < repeat_times; ++i) {
@@ -420,7 +420,7 @@ for (uint16_t i = 0; i < repeat_times; ++i) {
 
 非对齐搬运是指UB地址非对齐，但仍需要在UB和矢量数据寄存器之间连续读写数据的场景。在直接与非对齐UB地址进行数据搬运时，硬件性能会急剧下降，为了提升此场景性能，通过`vector_load_unalign` / `vector_store_unalign`作为临时缓存，保存跨对齐边界的数据，通过多轮循环拼接成对齐地址的读写，减少直接访问非对齐UB地址的次数，从而减少非对齐访问的额外开销。
 
-**非对齐搬入**由[`asc_loadunalign_pre`](../../../../../api/c_api/reg/reg_load/asc_loadunalign_pre.md)和[`asc_loadunalign`](../../../../../api/c_api/reg/reg_load/asc_loadunalign.md)组合完成：
+**非对齐搬入**由[`asc_loadunalign_pre`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_load/asc_loadunalign_pre.md)和[`asc_loadunalign`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_load/asc_loadunalign.md)组合完成：
 例如在[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，当想要搬入如下UB地址为48开始的256Bytes数据时:
 
 **图6** 非对齐搬入预期
@@ -439,7 +439,7 @@ for (uint16_t i = 0; i < repeat_times; ++i) {
 
    ![](../../../../figures/Reg非对齐读4.png "Reg非对齐读4")
 
-**非对齐搬出**由[`asc_storeunalign`](../../../../../api/c_api/reg/reg_store/asc_storeunalign.md)和[`asc_storeunalign_post`](../../../../../api/c_api/reg/reg_store/asc_storeunalign_post.md)组合完成：循环内使用`asc_storeunalign`搬运，循环结束后由`asc_storeunalign_post`将`vector_store_unalign`中的尾部数据搬出到UB。
+**非对齐搬出**由[`asc_storeunalign`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_store/asc_storeunalign.md)和[`asc_storeunalign_post`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_store/asc_storeunalign_post.md)组合完成：循环内使用`asc_storeunalign`搬运，循环结束后由`asc_storeunalign_post`将`vector_store_unalign`中的尾部数据搬出到UB。
 例如在[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，当想要搬出如下UB地址为48开始的512Bytes数据时：
 
 **图9** 非对齐搬出预期
@@ -481,7 +481,7 @@ asc_storeunalign_post(dst_addr, store_ureg, 0);
 ```
 
 #### PostUpdate模式
-PostUpdate表示搬运接口在完成本次访问后自动更新UB地址指针。在搬运接口会以*_postupdate结尾表示。例如：使用对齐搬运的[`asc_loadalign_postupdate`](../../../../../api/c_api/reg/reg_load/asc_loadunalign_postupdate.md)。当i = 0时：搬入数据地址src_addr，同时在搬运后硬件更新src_addr = src_addr + offset；当i = 1时：搬入数据地址为更新后的src_addr,同时在搬运后硬件再次更新src_addr = src_addr + stride；以此类推。
+PostUpdate表示搬运接口在完成本次访问后自动更新UB地址指针。在搬运接口会以*_postupdate结尾表示。例如：使用对齐搬运的[`asc_loadalign_postupdate`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/reg/reg_load/asc_loadunalign_postupdate.md)。当i = 0时：搬入数据地址src_addr，同时在搬运后硬件更新src_addr = src_addr + offset；当i = 1时：搬入数据地址为更新后的src_addr,同时在搬运后硬件再次更新src_addr = src_addr + stride；以此类推。
 
 ```cpp
 for (uint16_t i = 0; i < repeat_times; ++i) {
@@ -496,19 +496,19 @@ PostUpdate的优势在于：
 
 #### 使用地址寄存器搬运
 
-当循环中存在固定stride或多维索引时，可以使用`iter_reg`管理地址偏移，由硬件自动计算偏移减少标量指令消耗。例如两层循环示例如下：
+当循环中存在固定stride或多维索引时，可以使用`addr_reg`管理地址偏移，由硬件自动计算偏移减少标量指令消耗。例如两层循环示例如下：
 
 ```cpp
-iter_reg a_reg;
+addr_reg a_reg;
 for (uint16_t i = 0; i < extent1; ++i) {
     for (uint16_t j = 0; j < extent2; ++j) {
-        a_reg = asc_create_iter_reg(i, stride0, j, stride1);
+        a_reg = asc_create_addr_reg_b32(i, stride0, j, stride1);
         asc_loadalign(src_reg, src_addr, a_reg);
     }
 }
 ```
 
-`iter_reg`最多支持四维寻址，偏移量公式为`offset = index0*stride0 + index1*stride1 + index2*stride2 + index3*stride3`。
+`addr_reg`最多支持四维寻址，偏移量公式为`offset = index0*stride0 + index1*stride1 + index2*stride2 + index3*stride3`。
 
 ### 矢量计算
 

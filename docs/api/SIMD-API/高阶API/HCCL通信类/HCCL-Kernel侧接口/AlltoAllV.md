@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
@@ -16,13 +28,13 @@
 
 AlltoAllV的功能为：通信域内的卡互相发送和接收数据，并且定制每张卡给其它卡发送的数据量和从其它卡接收的数据量，以及定制发送和接收的数据在内存中的偏移。结合原型中的参数，描述接口功能，具体为：第i张卡发送sendBuf内存中第j块数据到第j张卡，该块数据在sendBuf中偏移为sdispls\[j\]的位置，且数据量为sendCounts\[j\]，第j张卡将该数据存放到本卡recvBuf中偏移为rdispls\[i\]的位置，接收数据量为recvCounts\[i\]，这里的sendCounts\[j\]与recvCounts\[i\]需要相等。注意：这里的偏移和数据量均为数据的个数，单位为sizeof\(sendType\)。
 
-![](../../../../figures/allreduce-61.png)
+![](../../../../figures/AlltoAllV.png)
 
 ## 函数原型
 
 ```
 template <bool commit = false>
-__aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void *sendCounts, void *sdispls, HcclDataType sendType, GM_ADDR recvBuf, void *recvCounts, void *rdispls, HcclDataType recvType, uint8_t repeat = 1)
+__aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void* sendCounts, void* sdispls, HcclDataType sendType, GM_ADDR recvBuf, void* recvCounts, void* rdispls, HcclDataType recvType, uint8_t repeat = 1)
 ```
 
 ## 参数说明
@@ -57,9 +69,13 @@ __aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void *sendCounts, void *
 -   若HCCL对象的[config模板参数](HCCL模板参数.md#table884518212555)未指定下发通信任务的核，该接口只能在AIC核或者AIV核两者之一上调用。若HCCL对象的[config模板参数](HCCL模板参数.md#table884518212555)中指定了下发通信任务的核，则该接口可以在AIC核和AIV核上同时调用，接口内部会根据指定的核的类型，只在AIC核、AIV核二者之一下发该通信任务。
 -   一个通信域内，所有Prepare接口和InterHcclGroupSync接口的总调用次数不能超过63。
 -   每张卡发送给卡rank\_j的数据量sendCounts\[j\]，与rank\_j接收对应卡rank\_i的数据量recvCounts\[i\]，必须相等。
+<!-- npu="A3" id7 -->
 -   对于Atlas A3 训练系列产品/Atlas A3 推理系列产品，一个通信域内，最大支持128卡通信。
+<!-- end id7 -->
+<!-- npu="950" id8 -->
 -   对于Ascend 950PR/Ascend 950DT，一个通信域内，所有Prepare接口的总调用次数不能超过63。
 -   对于Ascend 950PR/Ascend 950DT，通信服务端为CCU时，单次最大通信数据量不能超过256M。
+<!-- end id8 -->
 
 ## 调用示例
 
@@ -71,9 +87,10 @@ __aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void *sendCounts, void *
     ![](../../../../figures/非切分场景下4卡AlltoAllV图示.png "非切分场景下4卡AlltoAllV图示")
 
     ```
-    extern "C" __global__ __aicore__ void alltoallv_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM) {
+    extern "C" __global__ __aicore__ void alltoallv_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
+    {
         constexpr uint32_t rankNum = 4U;
-        constexpr uint32_t dataCount = 10U;   // 假设图中A\B\C\D数据块的个数均为10个
+        constexpr uint32_t dataCount = 10U; // 假设图中A\B\C\D数据块的个数均为10个
         uint64_t sendCounts[rankNum] = {0};
         uint64_t sDisplacements[rankNum] = {0};
         uint64_t recvCounts[rankNum] = {0};
@@ -84,26 +101,26 @@ __aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void *sendCounts, void *
             recvCounts[i] = dataCount;
             rDisplacements[i] = i * dataCount;
         }
-        auto sendBuf = xGM;  // xGM为AlltoAllV的输入GM地址
-        auto recvBuf = yGM;  // yGM为AlltoAllV的输出GM地址
+        auto sendBuf = xGM; // xGM为AlltoAllV的输入GM地址
+        auto recvBuf = yGM; // yGM为AlltoAllV的输出GM地址
         auto dtype = HcclDataType::HCCL_DATA_TYPE_FP16;
-        REGISTER_TILING_DEFAULT(AllToAllVCustomTilingData); //AllToAllVCustomTilingData为对应算子头文件定义的结构体
+        REGISTER_TILING_DEFAULT(AllToAllVCustomTilingData); // AllToAllVCustomTilingData为对应算子头文件定义的结构体
         GET_TILING_DATA_WITH_STRUCT(AllToAllVCustomTilingData, tilingData, tilingGM);
 
         Hccl hccl;
-        GM_ADDR contextGM = AscendC::GetHcclContext<0>();  // AscendC自定义算子kernel中，通过此方式获取HCCL context
+        GM_ADDR contextGM = AscendC::GetHcclContext<0>(); // AscendC自定义算子kernel中，通过此方式获取HCCL context
 
-        if (AscendC::g_coreType == AIV) {  // 指定AIV核通信
+        if (AscendC::g_coreType == AIV) { // 指定AIV核通信
             hccl.InitV2(contextGM, &tilingData);
             auto ret = hccl.SetCcTilingV2(offsetof(AllToAllVCustomTilingData, alltoallvCcTiling));
             if (ret != HCCL_SUCCESS) {
-              return;
+                return;
             }
-            auto handleId1 = hccl.AlltoAllV<true>(sendBuf, sendCounts, sDisplacements, dtype,
-                                                   recvBuf, recvCounts, rDisplacements, dtype);
+            auto handleId1 = hccl.AlltoAllV<true>(
+                sendBuf, sendCounts, sDisplacements, dtype, recvBuf, recvCounts, rDisplacements, dtype);
 
             hccl.Wait(handleId1);
-            AscendC::SyncAll<true>();  // 全AIV核同步，防止0核执行过快，提前调用hccl.Finalize()接口，导致其他核Wait卡死
+            AscendC::SyncAll<true>(); // 全AIV核同步，防止0核执行过快，提前调用hccl.Finalize()接口，导致其他核Wait卡死
             hccl.Finalize();
         }
     }
@@ -117,53 +134,94 @@ __aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void *sendCounts, void *
     ![](../../../../figures/非切分场景下4卡不均匀收发.png "非切分场景下4卡不均匀收发")
 
     ```
-    extern "C" __global__ __aicore__ void alltoallv_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM) {
+    extern "C" __global__ __aicore__ void alltoallv_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
+    {
         constexpr uint32_t rankNum = 4U;
         uint64_t sendCounts[rankNum] = {0};
         uint64_t sDisplacements[rankNum] = {0};
         uint64_t recvCounts[rankNum] = {0};
         uint64_t rDisplacements[rankNum] = {0};
-        auto sendBuf = xGM;  // xGM为AlltoAllV的输入GM地址
-        auto recvBuf = yGM;  // yGM为AlltoAllV的输出GM地址
+        auto sendBuf = xGM; // xGM为AlltoAllV的输入GM地址
+        auto recvBuf = yGM; // yGM为AlltoAllV的输出GM地址
         auto dtype = HcclDataType::HCCL_DATA_TYPE_FP16;
-        REGISTER_TILING_DEFAULT(AllToAllVCustomTilingData); //AllToAllVCustomTilingData为对应算子头文件定义的结构体
+        REGISTER_TILING_DEFAULT(AllToAllVCustomTilingData); // AllToAllVCustomTilingData为对应算子头文件定义的结构体
         GET_TILING_DATA_WITH_STRUCT(AllToAllVCustomTilingData, tilingData, tilingGM);
 
         Hccl hccl;
-        GM_ADDR contextGM = AscendC::GetHcclContext<0>();  // AscendC自定义算子kernel中，通过此方式获取HCCL context
+        GM_ADDR contextGM = AscendC::GetHcclContext<0>(); // AscendC自定义算子kernel中，通过此方式获取HCCL context
 
-        if (AscendC::g_coreType == AIV) {  // 指定AIV核通信
+        if (AscendC::g_coreType == AIV) { // 指定AIV核通信
             hccl.InitV2(contextGM, &tilingData);
             auto ret = hccl.SetCcTilingV2(offsetof(AllToAllVCustomTilingData, alltoallvCcTiling));
             if (ret != HCCL_SUCCESS) {
-              return;
+                return;
             }
-            if(hccl.GetRankId() == 0) {
-                sendCounts[0] = 3; sendCounts[1] = 3; sendCounts[2] = 3; sendCounts[3] = 3;
-                sDisplacements[1] = 3; sDisplacements[2] = 6; sDisplacements[2] = 9;
-                recvCounts[0] = 3; recvCounts[1] = 2; recvCounts[2] = 1; recvCounts[3] = 3;
-                rDisplacements[1] = 3; rDisplacements[2] = 5; rDisplacements[3] = 6;
-            } else if(hccl.GetRankId() == 1) {
-                sendCounts[0] = 2; sendCounts[1] = 2; sendCounts[2] = 3; sendCounts[3] = 2;
-                sDisplacements[1] = 2; sDisplacements[2] = 4; sDisplacements[2] = 7;
-                recvCounts[0] = 3; recvCounts[1] = 2; recvCounts[2] = 4; recvCounts[3] = 3;
-                rDisplacements[1] = 3; rDisplacements[2] = 5; rDisplacements[3] = 9;
-            } else if(hccl.GetRankId() == 2) {
-                sendCounts[0] = 1; sendCounts[1] = 4; sendCounts[2] = 4; sendCounts[3] = 4;
-                sDisplacements[1] = 1; sDisplacements[2] = 5; sDisplacements[2] = 9;
-                recvCounts[0] = 3; recvCounts[1] = 3; recvCounts[2] = 4; recvCounts[3] = 3;
-                rDisplacements[1] = 3; rDisplacements[2] = 6; rDisplacements[3] = 10;
-            } else if(hccl.GetRankId() == 3) {
-                sendCounts[0] = 3; sendCounts[1] = 3; sendCounts[2] = 3; sendCounts[3] = 3;
-                sDisplacements[1] = 3; sDisplacements[2] = 6; sDisplacements[2] = 9;
-                recvCounts[0] = 3; recvCounts[1] = 2; recvCounts[2] = 4; recvCounts[3] = 3;
-                rDisplacements[1] = 3; rDisplacements[2] = 5; rDisplacements[3] = 9;
+            if (hccl.GetRankId() == 0) {
+                sendCounts[0] = 3;
+                sendCounts[1] = 3;
+                sendCounts[2] = 3;
+                sendCounts[3] = 3;
+                sDisplacements[1] = 3;
+                sDisplacements[2] = 6;
+                sDisplacements[3] = 9;
+                recvCounts[0] = 3;
+                recvCounts[1] = 2;
+                recvCounts[2] = 1;
+                recvCounts[3] = 3;
+                rDisplacements[1] = 3;
+                rDisplacements[2] = 5;
+                rDisplacements[3] = 6;
+            } else if (hccl.GetRankId() == 1) {
+                sendCounts[0] = 2;
+                sendCounts[1] = 2;
+                sendCounts[2] = 3;
+                sendCounts[3] = 2;
+                sDisplacements[1] = 2;
+                sDisplacements[2] = 4;
+                sDisplacements[3] = 7;
+                recvCounts[0] = 3;
+                recvCounts[1] = 2;
+                recvCounts[2] = 4;
+                recvCounts[3] = 3;
+                rDisplacements[1] = 3;
+                rDisplacements[2] = 5;
+                rDisplacements[3] = 9;
+            } else if (hccl.GetRankId() == 2) {
+                sendCounts[0] = 1;
+                sendCounts[1] = 4;
+                sendCounts[2] = 4;
+                sendCounts[3] = 4;
+                sDisplacements[1] = 1;
+                sDisplacements[2] = 5;
+                sDisplacements[3] = 9;
+                recvCounts[0] = 3;
+                recvCounts[1] = 3;
+                recvCounts[2] = 4;
+                recvCounts[3] = 3;
+                rDisplacements[1] = 3;
+                rDisplacements[2] = 6;
+                rDisplacements[3] = 10;
+            } else if (hccl.GetRankId() == 3) {
+                sendCounts[0] = 3;
+                sendCounts[1] = 3;
+                sendCounts[2] = 3;
+                sendCounts[3] = 3;
+                sDisplacements[1] = 3;
+                sDisplacements[2] = 6;
+                sDisplacements[3] = 9;
+                recvCounts[0] = 3;
+                recvCounts[1] = 2;
+                recvCounts[2] = 4;
+                recvCounts[3] = 3;
+                rDisplacements[1] = 3;
+                rDisplacements[2] = 5;
+                rDisplacements[3] = 9;
             }
-            auto handleId = hccl.AlltoAllV<true>(sendBuf, sendCounts, sDisplacements, dtype,
-                                                   recvBuf, recvCounts, rDisplacements, dtype);
+            auto handleId = hccl.AlltoAllV<true>(
+                sendBuf, sendCounts, sDisplacements, dtype, recvBuf, recvCounts, rDisplacements, dtype);
 
             hccl.Wait(handleId);
-            AscendC::SyncAll<true>();  // 全AIV核同步，防止0核执行过快，提前调用hccl.Finalize()接口，导致其他核Wait卡死
+            AscendC::SyncAll<true>(); // 全AIV核同步，防止0核执行过快，提前调用hccl.Finalize()接口，导致其他核Wait卡死
             hccl.Finalize();
         }
     }

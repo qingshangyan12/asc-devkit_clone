@@ -1,6 +1,6 @@
 # asc_l13d_fmatrix_config
 
-asc_l13d_fmatrix_config用于设置[asc_copy_l12l0a](../cube_datamove/asc_copy_l12l0a)/[asc_copy_l12l0b](../cube_datamove/asc_copy_l12l0b)的3D格式搬运接口的Feature map属性参数。
+asc_l13d_fmatrix_config用于设置[asc_copy_l12l0a](../cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](../cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口的Feature map属性参数。
 
 ## 结构体具体定义
 
@@ -18,6 +18,10 @@ union asc_l13d_fmatrix_config {
     };
 };
 ```
+
+## 约束说明
+
+`asc_l13d_fmatrix_config`类型的联合体变量被定义后必须对`l1_height`和`l1_width`进行赋值以符合实际场景及取值范围要求。
 
 ## 字段详解
 

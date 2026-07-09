@@ -4,9 +4,9 @@
 
 根据输入的路径，加载对应的Tiling动态库。开发者基于工程化算子开发开发方式完成算子实现后，可通过**算子包编译**或**算子动态库编译**获取对应的Tiling动态库文件。
 
--   算子包编译：Tiling实现对应的动态库为算子包部署目录下的liboptiling.so。具体路径可参考[算子包部署](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/算子包编译/算子包部署.md)。
+-   算子包编译：Tiling实现对应的动态库为算子包部署目录下的liboptiling.so。具体路径可参考[算子包部署](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/高级编程/Aclnn算子工程化开发/算子包编译/算子包部署.md)。
 
--   动态库编译：Tiling实现集成在算子动态库libcust\_opapi.so中。具体路径可参考[算子动态库和静态库编译](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/高级编程/高级特性/Aclnn算子工程化开发/算子动态库和静态库编译.md)。
+-   动态库编译：Tiling实现集成在算子动态库libcust\_opapi.so中。具体路径可参考[算子动态库和静态库编译](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/高级编程/Aclnn算子工程化开发/算子动态库和静态库编译.md)。
 
 ## 函数原型<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section13230182415108"></a>
 
@@ -39,7 +39,7 @@ bool LoadTilingLibrary(const char *tilingSoPath) const
 
 true：Tiling动态库加载成功；false：Tiling动态库加载失败。具体错误可参考Log信息。
 
-关于日志配置和查看，请参考。
+关于日志配置和查看，请参考[《环境变量参考》](https://www.hiascend.com/document/redirect/CannCommunityEnvRef)中日志相关环境变量。
 
 ## 约束说明<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section19165124931511"></a>
 

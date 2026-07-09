@@ -26,7 +26,7 @@ asc_arange(dst, index);
 
 ## 掩码寄存器
 
-掩码寄存器的数据类型为vector_bool，用于矢量计算中选择参与计算的元素，其位宽为VL/8。
+掩码寄存器的数据类型为vector_bool，用于矢量计算中选择参与计算的元素，其位宽为VL/8。当搬运掩码寄存器时，ubuf中地址偏移单位为字节。
 
 ![vector_bool](../figures/vector_bool.png)
 
@@ -71,10 +71,11 @@ __simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_a
 
 ## 地址寄存器
 
-地址寄存器的数据类型为iter_reg，用于存储地址偏移量。iter_reg通过asc_create_iter_reg初始化，然后在循环之中使用iter_reg存储地址偏移量。iter_reg在每层循环中根据所设置的步长进行自增。
+地址寄存器的数据类型为addr_reg，用于存储地址偏移量。addr_reg通过asc_create_addr_reg初始化，然后在循环之中使用addr_reg存储地址偏移量。addr_reg在每层循环中根据所设置的步长进行自增。
 
 ### 调用示例<a name="调用示例-4"></a>
 
+#### 单参数版本
 ```cpp
 constexpr uint32_t one_repeat_size = 256 / sizeof(int8_t); // VL / sizeof(T)
 uint32_t total_length = 256;
@@ -86,14 +87,43 @@ __simd_vf__ inline void add_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src0_
     vector_int8_t src1;
     vector_int8_t dst;
     vector_bool mask;
-    iter_reg addr_reg;
+    addr_reg addr_reg;
     for (uint16_t i = 0; i < repeat_time; ++i) {
-        addr_reg = asc_create_iter_reg_b8(one_repeat_size); // 通过初始化iter_reg，每一次循环，地址偏移one_repeat_size
+        addr_reg = asc_create_addr_reg_b8(one_repeat_size); // 通过初始化addr_reg，每一次循环，地址偏移one_repeat_size
         mask = asc_update_mask_b8(count);
         asc_loadalign(src0, src0_addr, addr_reg);
         asc_loadalign(src1, src1_addr, addr_reg);
         asc_add(dst, src0, src1, mask);
         asc_storealign(dst_addr, dst, addr_reg, mask);
+    }
+}
+```
+
+#### 多参数版本（以4参数为例）
+```cpp
+__simd_vf__ inline void add_4d_vf(
+    __ubuf__ float* dst_addr,
+    __ubuf__ float* src_addr,
+    uint32_t n_stride,    // N间偏移 = C×H×W (float元素数)
+    uint32_t c_stride,    // C间偏移 = H×W (float元素数)
+    uint32_t h_stride,    // H间偏移 = W (float元素数)
+    uint32_t w_stride,    // W间偏移 = 64 (一个VL的float数)
+    uint16_t N, uint16_t C, uint16_t H, uint16_t W)
+{
+    vector_float src_reg, dst_reg;
+    vector_bool mask = asc_create_mask_b32(PAT_ALL);
+    addr_reg a_reg;
+    for (uint16_t n = 0; n < N; n++) {          
+        for (uint16_t c = 0; c < C; c++) {       
+            for (uint16_t h = 0; h < H; h++) {    
+                for (uint16_t w = 0; w < W; w++) {  
+                    a_reg = asc_create_addr_reg_b32(n_stride, c_stride, h_stride, w_stride);
+                    asc_loadalign(src_reg, src_addr, a_reg);
+                    asc_add(dst_reg, src_reg, src_reg, mask);
+                    asc_storealign(dst_addr, dst_reg, a_reg, mask);
+                }
+            }
+        }
     }
 }
 ```

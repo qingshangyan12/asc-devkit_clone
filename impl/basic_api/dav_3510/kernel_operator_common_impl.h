@@ -18,6 +18,7 @@
 #include "../../../include/basic_api/kernel_common.h"
 #include "../kernel_utils.h"
 #include "../../../include/basic_api/kernel_struct_mm.h"
+#include "../../../include/basic_api/kernel_base_types.h"
 namespace AscendC {
 
 __aicore__ inline void SetSysWorkspace(GM_ADDR workspace)
@@ -139,6 +140,62 @@ __aicore__ static inline void ResetCtrlSprImpl()
     value = value | defaultCtrl;
     set_ctrl(value);
 }
+
+namespace Internal {
+template <SaturationMode mode>
+__aicore__ inline constexpr bool IsSupportedSaturationMode()
+{
+    return mode == SaturationMode::FLOAT || mode == SaturationMode::FLOAT8 || mode == SaturationMode::INT ||
+           mode == SaturationMode::CAST;
+}
+} // namespace Internal
+
+template <CacheMode cacheMode>
+__aicore__ inline constexpr uint8_t GetCacheModeBits()
+{
+    switch (cacheMode) {
+        case CacheMode::CACHE_MODE_DISABLE:   return 4;   // 4'b0100
+        case CacheMode::CACHE_MODE_NORMAL:    return 0;   // 4'b0000
+        case CacheMode::CACHE_MODE_LAST:      return 1;   // 4'b0001
+        case CacheMode::CACHE_MODE_PERSISTENT: return 2;  // 4'b0010
+        default: return 0;
+    }
+}
+
+template <CacheRwMode rwMode, CacheMode cacheMode>
+__aicore__ inline void SetScalarCacheModeImpl()
+{
+    static_assert(rwMode == CacheRwMode::READ || rwMode == CacheRwMode::WRITE,
+        "SetScalarCacheMode only supports READ or WRITE mode, RW mode is not supported");
+    // READ mode: CTRL[19:16], WRITE mode: CTRL[23:20]
+    constexpr uint8_t startBit = (rwMode == CacheRwMode::READ) ? 16 : 20;
+    constexpr uint8_t cacheBits = GetCacheModeBits<cacheMode>();
+
+    uint64_t mask = ~((uint64_t(0xF) << startBit));
+    int64_t ctrlValue = get_ctrl() & mask;
+    ctrlValue |= (static_cast<uint64_t>(cacheBits) << startBit);
+    set_ctrl(ctrlValue);
+}
+
+template <CacheRwMode rwMode>
+__aicore__ inline CacheMode GetScalarCacheModeImpl()
+{
+    static_assert(rwMode == CacheRwMode::READ || rwMode == CacheRwMode::WRITE,
+        "GetScalarCacheMode only supports READ or WRITE mode, RW mode is not supported");
+    // READ mode: CTRL[19:16], WRITE mode: CTRL[23:20]
+    constexpr uint8_t startBit = (rwMode == CacheRwMode::READ) ? 16 : 20;
+    int64_t ctrlValue = get_ctrl();
+    uint8_t cacheBits = static_cast<uint8_t>((ctrlValue >> startBit) & 0xF);
+
+    switch (cacheBits) {
+        case 0:  return CacheMode::CACHE_MODE_NORMAL;
+        case 1:  return CacheMode::CACHE_MODE_LAST;
+        case 2:  return CacheMode::CACHE_MODE_PERSISTENT;
+        case 4:  return CacheMode::CACHE_MODE_DISABLE;
+        default: return CacheMode::CACHE_MODE_NORMAL;
+    }
+}
+
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_IMPL_H__)

@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id3 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id3 -->
+<!-- npu="A3" id4 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id4 -->
+<!-- npu="910b" id5 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id5 -->
+<!-- npu="310b" id6 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id6 -->
+<!-- npu="310p" id7 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id7 -->
+<!-- npu="910" id8 -->
 - Atlas 训练系列产品：不支持
+<!-- end id8 -->
 <!-- npu="x90" id1 -->
 - Kirin X90：不支持
 <!-- end id1 -->
@@ -46,11 +58,14 @@ __aicore__ inline void SetSubBlockIdx(uint8_t subBlockIdx)
 ## 调用示例
 
 ```
+#define ASCENDC_CUBE_ONLY
+#include "lib/matmul_intf.h"
+
 typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> aType;
 typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> bType;
 typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType;
 typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
 
-MatmulImpl<aType, bType, cType, biasType, CFG_NORM> mm;
-mm.SetSubBlockIdx(0);  // 子核ID设置为0
+Matmul<aType, bType, cType, biasType, CFG_NORM> mm;
+mm.SetSubBlockIdx(0); // 子核ID设置为0
 ```

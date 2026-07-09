@@ -8,6 +8,8 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/reg_compute/reg_vector.h"`。
+
 以传入的value为起始值，生成递增/递减的索引，并将生成的索引保存在dst中。算法逻辑表示如下：
   ```cpp
   // 递增
@@ -61,6 +63,6 @@ PIPE_V
 
 ```cpp
 vector_int8_t dst;
-int8_t value;
+int8_t value = 0;
 asc_arange(dst, value);
 ```

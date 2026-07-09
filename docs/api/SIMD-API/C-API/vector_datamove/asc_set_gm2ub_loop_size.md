@@ -8,6 +8,8 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/vector_datamove/vector_datamove.h"`。
+
 将数据从Global Memory (GM)搬运到Unified Buffer (UB)时，通过调用该接口设置数据搬运流程中的循环次数。
 
 以源操作数搬运场景为例，如下图所示。
@@ -45,6 +47,6 @@ PIPE_S
 asc_set_gm2ub_loop_size(2, 2);
 asc_set_gm2ub_loop1_stride(96, 128);
 asc_set_gm2ub_loop2_stride(192, 288);
-asc_copy_gm2ub_align(dst, src, 2, 48 * sizeof(int8_t), 0, 0, false, 0, 0, 0);
+asc_copy_gm2ub_align(dst, src, 2, 48 * sizeof(int8_t), 0, 0, false, 0, 48, 48);
 asc_set_gm2ub_loop_size(1, 1);
 ```

@@ -26,7 +26,7 @@
 #include "../../common/hcomm_inner_def.h"
 
 namespace AscendC {
-constexpr uint32_t ROCE_SQ_DOORBELL_TYPE = 2;
+constexpr uint32_t ROCE_SQ_DOORBELL_TYPE = 21;
 constexpr uint32_t ROCE_INIT_SQ_DB_SGIT_IDX = 1;
 constexpr uint32_t ROCE_CQE_POS = 128;
 constexpr uint32_t ROCE_DB_POS = 192;
@@ -40,31 +40,38 @@ public:
     __aicore__ inline int32_t Init(__ubuf__ uint8_t* buff, uint32_t len);
     template <typename T>
     __aicore__ inline int32_t Init(const LocalTensor<T>& buff, uint32_t len);
-    template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
-        auto const &config = URMA_DEFAULT_CFG>
+    template <
+        bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
+        auto const& config = URMA_DEFAULT_CFG>
     __aicore__ inline int32_t WriteNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
-    template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
-        auto const &config = URMA_DEFAULT_CFG>
+    template <
+        bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
+        auto const& config = URMA_DEFAULT_CFG>
     __aicore__ inline int32_t ReadNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
-    template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
-        auto const &config = URMA_DEFAULT_CFG>
-    __aicore__ inline int32_t WriteWithNotifyNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len,
-        GM_ADDR notifyAddr, uint64_t notifyVal);
+    template <
+        bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
+        auto const& config = URMA_DEFAULT_CFG>
+    __aicore__ inline int32_t WriteWithNotifyNbi(
+        ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal);
     template <pipe_t pipe = PIPE_S>
     __aicore__ inline int32_t Commit(ChannelHandle channel);
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Drain(ChannelHandle channel);
 
 private:
+    __aicore__ inline void FillCtrlSeg(__ubuf__ RoceWqeEntry *wqePtr, uint32_t sqHead, uint32_t sqDepth);
+    __aicore__ inline void FillTaskSeg(
+        __ubuf__ RoceWqeEntry *wqePtr, GM_ADDR dst, uint64_t len, uint32_t opType, uint32_t rKey, uint32_t lKey);
+    __aicore__ inline void FillDataSeg(__ubuf__ RoceWqeEntry *wqePtr, GM_ADDR src, uint64_t len, uint32_t lKey);
+    __aicore__ inline void WriteInvalidWqebb(__gm__ uint8_t* sqAddr, uint32_t sqHead, uint32_t sqDepth);
+    __aicore__ inline int32_t MakeWqe(
+        __gm__ ChannelEntity* chnlPtr, GM_ADDR dst, GM_ADDR src, uint64_t len, uint32_t opType, uint32_t sqHead,
+        uint32_t sqDepth);
     template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3>
-    __aicore__ inline int32_t PostSend(
-        ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, uint32_t opType);
-    template <pipe_t pipe>
+    __aicore__ inline int32_t PostSend(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, uint32_t opType);
+    __aicore__ inline uint64_t GetDbValue(uint32_t qpn, uint8_t mtuShift);
     __aicore__ inline void KnockDoorBell(__gm__ ChannelEntity* chnlPtr, uint32_t sqHead);
     __aicore__ inline int32_t PollCq(__gm__ ChannelEntity* chnlPtr, uint32_t expectIdx);
-    __aicore__ inline int32_t MakeWqe(__gm__ ChannelEntity* chnlPtr, GM_ADDR dst, GM_ADDR src, uint64_t len,
-        uint32_t opType, uint32_t sqHead, uint32_t sqDepth);
-    __aicore__ inline uint64_t GetDbValue(uint32_t qpn);
 
 private:
     LocalTensor<uint8_t> wqeUB_;

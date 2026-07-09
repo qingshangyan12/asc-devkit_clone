@@ -1,16 +1,28 @@
 # ReadGmByPassDCache\(ISASI\)<a name="ZH-CN_TOPIC_0000002327311338"></a>
 
-## 产品支持情况<a name="section1550532418810"></a>
+## 产品支持情况
 
-| 产品 | 是否支持 |
-| :----------------------- | :------: |
-|<cann-filter npu-type="950">Ascend 950PR/Ascend 950DT| √</cann-filter>|
-|<cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品| √</cann-filter>|
-|<cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品| √</cann-filter>|
-|<cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品| x</cann-filter>|
-|<cann-filter npu-type="310p">Atlas 推理系列产品AI Core| x</cann-filter>|
-|<cann-filter npu-type="310p">Atlas 推理系列产品Vector Core| x</cann-filter>|
-|<cann-filter npu-type="910">Atlas 训练系列产品| x</cann-filter>|
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -52,20 +64,17 @@ __aicore__ inline T ReadGmByPassDCache(__gm__ T* addr)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-标量单元连续读取相同GM地址时，会长期占用总线（Bus），导致其他核无法向该地址写入数据，进而引发系统卡死。在此场景下，建议在标量读指令后插入若干空操作指令（Nop）释放总线，插入Nop指令的数量可按"需同步的核数×200"估算（如4个核时建议插入800条）。
+无
 
 ## 调用示例<a name="section6191129670"></a>
 
 ```cpp
-__gm__ int32_t *addr = const_cast<__gm__ int32_t *>(srcGlobal.GetPhyAddr());
-int32_t value = AscendC::ReadGmByPassDCache<int32_t>(addr);
-
-// 通过Scalar读写相同GM时，需要让读操作，空出总线，避免长时占用。
-int target = -1;
-while (target != 0) {
-     target = ReadGmByPassDCache(addr);
-     Nop<800>();
-}
+__gm__ T* srcAddr = const_cast<__gm__ T*>(srcGlobal.GetPhyAddr());
+T value = AscendC::ReadGmByPassDCache<T>(srcAddr);
+// 同步指令：用于阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可通过参数控制）执行结束
+AscendC::DataSyncBarrier<AscendC::MemDsbT::DDR>(); // DDR，等待GM访问指令
+__gm__ T* dstAddr = const_cast<__gm__ T*>(dstGlobal.GetPhyAddr());
+AscendC::WriteGmByPassDCache<T>(dstAddr, value + ADD_VALUE);
 ```
 
-完整样例请参考[GmByPassDCache类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/09_scalar_computation/gm_by_pass_dcache)。
+完整样例请参考[GmByPassDCache类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/09_utils/gm_by_pass_dcache)。

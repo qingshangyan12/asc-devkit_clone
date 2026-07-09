@@ -14,6 +14,8 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 L0C Buffer到Global Memory搬运支持不量化输出、float到half或bfloat16_t的直接转换输出，以及配合标量或张量量化参数的随路量化输出。随路Relu、通道拆分和量化舍入方式通过`CopyL0C2GMTrait`配置。`Mmad`与`Fixpipe`细粒度并行相关的`unitFlag`通过`FixpipeParams`配置。
 
+接口支持batch模式。batch模式用于一次完成多块矩阵计算结果的搬运。Layout在原矩阵Layout最外层增加Batch维度。源张量为`NZ`格式，分形固定为16×16，可通过`MakeFrameLayout<NZLayoutPtn>(batch, m, n)`构造。目的张量可通过`MakeFrameLayout<NDLayoutPtn>(batch, m, n)`、`MakeFrameLayout<DNLayoutPtn>(batch, m, n)`、`MakeFrameLayout<NDExtLayoutPtn>(batch, m, n)`、`MakeFrameLayout<DNExtLayoutPtn>(batch, m, n)`或`MakeFrameLayout<NZLayoutPtn, DstType>(batch, m, n)`构造。`NZ`格式可通过模板参数`DstType`指定目的数据类型，`C0`默认为16；
+
 随路量化、随路Relu、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径如下图所示。图中的F32到F16、F32到BF16为非量化模式，仅进行cast。其余路径为不量化、随路scalar或tensor量化模式。
 
 针对Ascend 950PR/Ascend 950DT：
@@ -148,7 +150,7 @@ L0C Buffer到Global Memory搬运根据是否传入量化参数自动选择量化
 ## 约束说明
 
 - 源矩阵`NZ`格式，地址要求64字节对齐。目的矩阵`DN`或`ND`格式时，地址要求1字节对齐，`NZ`格式时，地址要求32字节对齐。
-- 目的矩阵为NZ输出时，要求N方向大小为16的倍数，使能`enableChannelSplit`且输出类型为`float`时，N方向大小需要为8的倍数。
+- 目的矩阵为`NZ`输出时，N方向大小需要为16的倍数；`b8`类型通道合并场景为32的倍数，`float`使能`enableChannelSplit`通道拆分场景为8的倍数。
 - tensor量化参数张量应位于L1 Buffer，元素类型为`uint64_t`，地址要求32字节对齐。详情参见[随路量化](关键特性说明/quant_pre.md)。
 - 使能`unitFlag`时，需要配合`Mmad`同时使能。
 - 使用`RoundMode::HYBRID`时，源类型必须为`float`，目的类型必须为`hifloat8_t`。
@@ -157,7 +159,7 @@ L0C Buffer到Global Memory搬运根据是否传入量化参数自动选择量化
 
 ## 关键特性
 
-L0C Buffer到Global Memory搬运涉及[随路量化](关键特性说明/quant_pre.md)、[随路Relu](关键特性说明/relu_pre.md)、[F32 Channel Split](关键特性说明/f32_channel_split.md)和[Int8 Channel Merge](关键特性说明/int8_channel_merge.md)等关键特性。
+L0C Buffer到Global Memory搬运涉及[随路量化](关键特性说明/quant_pre.md)、[随路Relu](关键特性说明/relu_pre.md)、[F32 Channel Split](关键特性说明/f32_channel_split.md)、[Int8 Channel Merge](关键特性说明/int8_channel_merge.md)和[batch搬运](关键特性说明/batch_copy.md)等关键特性。
 
 ## 调用示例
 
@@ -212,5 +214,32 @@ __aicore__ inline void CopyL0CToGM()
 
     auto atom = MakeCopy(CopyL0C2GM{}).with(FixpipeParams{});
     Copy(atom, gm, l0c, quant);
+}
+```
+
+### batch模式输出
+
+```cpp
+#include "tensor_api/tensor.h"
+
+using namespace AscendC::Te;
+
+__aicore__ inline void CopyBatchL0CToGM(__gm__ half* gmAddr)
+{
+    constexpr uint32_t srcBatch = 3;
+    constexpr uint32_t dstBatch = 9;
+    constexpr uint32_t m = 32;
+    constexpr uint32_t n = 64;
+
+    __cc__ float l0cBuf[srcBatch * m * n];
+
+    auto l0c = MakeTensor(MakeMemPtr(l0cBuf), MakeFrameLayout<NZLayoutPtn>(srcBatch, m, n));
+    auto gm = MakeTensor(MakeMemPtr(gmAddr), MakeFrameLayout<NDExtLayoutPtn>(dstBatch, m, n));
+
+    auto atom = MakeCopy(CopyL0C2GM{}).with(FixpipeParams{});
+    for (uint32_t i = 0; i < dstBatch / srcBatch; ++i) {
+        auto gmSlice = gm.Slice(MakeCoord(i * srcBatch, MakeCoord(0, 0)), MakeShape(srcBatch, MakeShape(m, n)));
+        Copy(atom, gmSlice, l0c);
+    }
 }
 ```

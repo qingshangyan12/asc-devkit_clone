@@ -218,7 +218,6 @@
     ```
     // Declare a AI CPU kernel function in .asc file
     extern __global__ __aicpu__ uint32_t hello_world(void *args);// OK
-    }
     ```
 
 -   **\_\_inline\_\_**
@@ -286,7 +285,7 @@
 
 -   \_\_simd\_vf\_\_
 
-    函数标记宏，用于标记SIMD VF入口函数，函数无返回值。使用[asc\_vf\_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/asc_vf_call.md)调用SIMD VF入口函数，启动VF子任务。
+    函数标记宏，用于标记SIMD VF入口函数，函数无返回值。使用[asc\_vf\_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md)调用SIMD VF入口函数，启动VF子任务。
 
     ```
     __simd_vf__ inline void KernelAdd(__ubuf__ float* x, __ubuf__ float* y, __ubuf__ float* z)
@@ -296,7 +295,7 @@
 
     -   支持指针传参（Pass-by-Pointer），指针变量必须用\_\_ubuf\_\_地址空间限定符修饰。
     -   不支持引用传参（Pass-by-Reference）。
-    -   不支持函数指针传参，函数对象。
+    -   不支持函数指针传参。
 
         \_\_simd\_vf\_\_使用的示例如下：
 
@@ -315,7 +314,7 @@
                 AscendC::Reg::LoadAlign(srcReg, input + i * oneRepeatSize);
                 AscendC::Reg::Adds(dstReg, srcReg, 1.0f, maskReg);
                 // store data from RegTensor to UB.
-                AscendC::Reg::StoreAlign(output + i * one_repeat_size, dstReg, maskReg);
+                AscendC::Reg::StoreAlign(output + i * oneRepeatSize, dstReg, maskReg);
             }
         }
         ```
@@ -556,7 +555,7 @@ __ubuf__ int * __gm__ ptr;
 <a name="table169229153513"></a>
 <table><thead align="left"><tr id="row769289183515"><th class="cellrowborder" valign="top" width="15.988401159884011%" id="mcps1.1.4.1.1"><p id="p1669269163510"><a name="p1669269163510"></a><a name="p1669269163510"></a>变量名</p>
 </th>
-<th class="cellrowborder" valign="top" width="25.977402259774017%" id="mcps1.1.4.1.2"><p id="p116921597358"><a name="p116921597358"></a><a name="p116921597358"></a>对应API</p>
+<th class="cellrowborder" valign="top" width="25.977402259774017%" id="mcps1.1.4.1.2"><p id="p116921597358"><a name="p116921597358"></a><a name="p116921597358"></a>相关API</p>
 </th>
 <th class="cellrowborder" valign="top" width="58.03419658034197%" id="mcps1.1.4.1.3"><p id="p14692294358"><a name="p14692294358"></a><a name="p14692294358"></a>功能</p>
 </th>
@@ -566,37 +565,27 @@ __ubuf__ int * __gm__ ptr;
 </td>
 <td class="cellrowborder" valign="top" width="25.977402259774017%" headers="mcps1.1.4.1.2 "><p id="p369213993514"><a name="p369213993514"></a><a name="p369213993514"></a>GetBlockNum</p>
 </td>
-<td class="cellrowborder" valign="top" width="58.03419658034197%" headers="mcps1.1.4.1.3 "><p id="p969217912357"><a name="p969217912357"></a><a name="p969217912357"></a>当前任务配置的核数，用于代码内部的多核逻辑控制等。</p>
+<td class="cellrowborder" valign="top" width="58.03419658034197%" headers="mcps1.1.4.1.3 "><p id="p969217912357"><a name="p969217912357"></a><a name="p969217912357"></a>当前任务配置的核数，用于代码内部的多核逻辑控制等。<br>内置变量block_num的值与通过相关API GetBlockNum获取的值保持一致。</p>
 </td>
 </tr>
 <tr id="row1669214993515"><td class="cellrowborder" valign="top" width="15.988401159884011%" headers="mcps1.1.4.1.1 "><p id="p1769219913351"><a name="p1769219913351"></a><a name="p1769219913351"></a>block_idx</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.977402259774017%" headers="mcps1.1.4.1.2 "><p id="p116921990355"><a name="p116921990355"></a><a name="p116921990355"></a>GetBlockIdx</p>
 </td>
-<td class="cellrowborder" valign="top" width="58.03419658034197%" headers="mcps1.1.4.1.3 "><p id="p169211933512"><a name="p169211933512"></a><a name="p169211933512"></a>当前核的索引，用于代码内部的多核逻辑控制及多核偏移量计算等。</p>
-</td>
-</tr>
-<tr id="rowSubBlockNum"><td class="cellrowborder" valign="top" width="15.988401159884011%" headers="mcps1.1.4.1.1 "><p id="pSubBlockNum"><a name="pSubBlockNum"></a><a name="pSubBlockNum"></a>sub_block_num</p>
-</td>
-<td class="cellrowborder" valign="top" width="25.977402259774017%" headers="mcps1.1.4.1.2 "><p id="pGetSubBlockNum"><a name="pGetSubBlockNum"></a><a name="pGetSubBlockNum"></a>GetSubBlockNum</p>
-</td>
-<td class="cellrowborder" valign="top" width="58.03419658034197%" headers="mcps1.1.4.1.3 "><p id="pSubBlockNumDesc"><a name="pSubBlockNumDesc"></a><a name="pSubBlockNumDesc"></a>当前任务配置的子块（SubBlock）数量，仅在Mix场景（__mix__编程模式）下的Vector核上有效，用于确定AIV核在组合内的并行粒度。</p>
-</td>
-</tr>
-<tr id="rowSubBlockIdx"><td class="cellrowborder" valign="top" width="15.988401159884011%" headers="mcps1.1.4.1.1 "><p id="pSubBlockIdx"><a name="pSubBlockIdx"></a><a name="pSubBlockIdx"></a>sub_block_idx</p>
-</td>
-<td class="cellrowborder" valign="top" width="25.977402259774017%" headers="mcps1.1.4.1.2 "><p id="pGetSubBlockIdx"><a name="pGetSubBlockIdx"></a><a name="pGetSubBlockIdx"></a>GetSubBlockIdx</p>
-</td>
-<td class="cellrowborder" valign="top" width="58.03419658034197%" headers="mcps1.1.4.1.3 "><p id="pSubBlockIdxDesc"><a name="pSubBlockIdxDesc"></a><a name="pSubBlockIdxDesc"></a>当前子块（SubBlock）的索引，仅在Mix场景（__mix__编程模式）下的Vector核上有效。在Mix场景中，AIV核的逻辑位置由block_idx和sub_block_idx共同确定。</p>
+<td class="cellrowborder" valign="top" width="58.03419658034197%" headers="mcps1.1.4.1.3 "><p id="p169211933512"><a name="p169211933512"></a><a name="p169211933512"></a>当前核的索引，用于代码内部的多核逻辑控制及多核偏移量计算等。<br>注意，内置变量block_idx的值与通过相关API GetBlockIdx获取的值在部分场景下并不一致，具体说明及场景示例请参考下文描述。</p>
 </td>
 </tr>
 </tbody>
 </table>
 通常，建议用户使用内置变量对应的API获取所需值，不建议用户直接使用内置变量。因为内置变量反映的是单个硬件资源的配置信息，对于软件栈整合硬件资源、扩展硬件的功能，内置变量的值与实际语义可能不符。
 
-例如，在Atlas 推理系列产品中，当启用KERNEL_TYPE_MIX_VECTOR_CORE时，算子会同时运行在AI Core和Vector Core上。此时，block_idx在这两种核心上都是从0开始计数，用户无法直接通过block_idx来切分数据和控制多核逻辑。而GetBlockIdx在Vector Core上对block_idx增加偏移量（AI Core的block_num），从而保证返回的值能够正确反映多核环境下的实际逻辑。
-
 在Mix场景（使用`__mix__`函数执行空间限定符）下，Vector核（AIV）的逻辑位置需要通过block_idx和sub_block_idx共同确定：`logic_idx = block_idx * sub_block_num + sub_block_idx`。其中block_idx标识当前组合在整个grid中的位置，sub_block_idx标识当前AIV在组合内的位置。开发者应使用GetBlockIdx和GetSubBlockIdx API组合获取完整的逻辑位置信息，而非直接使用内置变量。
+
+**示例：**
+
+例如，在任务配置的核数为3（block_num = 3）的场景下，当使用`__mix__(1, 2)`作为函数执行空间限定符时，任务会启动3个Cube Core和6个Vector Core，内置变量block_idx在6个Vector Core上的取值分别为：0、0、1、1、2、2，即位于同一核上的两个Vector Core取值相同，而GetBlockIdx API获取的值分别为：0、1、2、3、4、5，两者并不相同。在3个Cube Core上两者的取值相同，均为：0、1、2。
+
+例如，在Atlas 推理系列产品中，当启用KERNEL_TYPE_MIX_VECTOR_CORE时，算子会同时运行在AI Core和Vector Core上。此时，block_idx在这两种核心上都是从0开始计数，用户无法直接通过block_idx来切分数据和控制多核逻辑。而GetBlockIdx在Vector Core上对block_idx增加偏移量（AI Core的block_num），从而保证返回的值能够正确反映多核环境下的实际逻辑。
 
 ## 核函数配置<a name="section97005415463"></a>
 
@@ -612,13 +601,13 @@ __ubuf__ int * __gm__ ptr;
     >[!NOTE]说明 
     >numBlocks是逻辑核的概念，取值范围为\[1,65535\]。为了充分利用硬件资源，一般设置为物理核的核数或其倍数。
     >- 对于耦合模式和分离模式，numBlocks在运行时的意义和设置规则有一些区别，具体说明如下：
-    >    - 耦合模式：由于其Vector、Cube单元是集成在一起的，numBlocks用于设置启动多个AI Core核实例执行，不区分Vector、Cube。AI Core的核数可以通过[GetCoreNumAiv](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetCoreNumAiv.md)或者[GetCoreNumAic](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetCoreNumAic.md)获取。
+    >    - 耦合模式：由于其Vector、Cube单元是集成在一起的，numBlocks用于设置启动多个AI Core核实例执行，不区分Vector、Cube。AI Core的核数可以通过[GetCoreNumAiv](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/平台信息获取/PlatformAscendC/GetCoreNumAiv.md)或者[GetCoreNumAic](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/平台信息获取/PlatformAscendC/GetCoreNumAic.md)获取。
     >    - 分离模式
     >        - 针对仅包含Vector计算的算子，numBlocks用于设置启动多少个Vector（AIV）实例执行，比如某款AI处理器上有40个Vector核，建议设置为40。
     >        - 针对仅包含Cube计算的算子，numBlocks用于设置启动多少个Cube（AIC）实例执行，比如某款AI处理器上有20个Cube核，建议设置为20。
     >        - 针对Vector/Cube融合计算的算子，启动时，按照AIV和AIC组合启动，numBlocks用于设置启动多少个组合执行，比如某款AI处理器上有40个Vector核和20个Cube核，一个组合是2个Vector核和1个Cube核，建议设置为20，此时会启动20个组合，即40个Vector核和20个Cube核。**注意：该场景下，设置的numBlocks逻辑核的核数不能超过物理核（2个Vector核和1个Cube核组合为1个物理核）的核数。**
-    >        - AIC/AIV的核数分别通过[GetCoreNumAic](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetCoreNumAic.md)和[GetCoreNumAiv](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetCoreNumAiv.md)接口获取。
-    >- 如果开发者使用了Device资源限制特性，那么算子设置的numBlocks不应超过[PlatformAscendC](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/PlatformAscendC.md)提供核数的API（GetCoreNum/GetCoreNumAic/GetCoreNumAiv等）返回的核数。例如，使用aclrtSetStreamResLimit设置Stream级别的Vector核数为8，那么GetCoreNumAiv接口返回值为8，针对Vector算子设置的numBlocks不应超过8，否则会抢占其他Stream的资源，导致资源限制失效。
+    >        - AIC/AIV的核数分别通过[GetCoreNumAic](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/平台信息获取/PlatformAscendC/GetCoreNumAic.md)和[GetCoreNumAiv](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/平台信息获取/PlatformAscendC/GetCoreNumAiv.md)接口获取。
+    >- 如果开发者使用了Device资源限制特性，那么算子设置的numBlocks不应超过[PlatformAscendC](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/平台信息获取/PlatformAscendC/PlatformAscendC.md)提供核数的API（GetCoreNum/GetCoreNumAic/GetCoreNumAiv等）返回的核数。例如，使用aclrtSetStreamResLimit设置Stream级别的Vector核数为8，那么GetCoreNumAiv接口返回值为8，针对Vector算子设置的numBlocks不应超过8，否则会抢占其他Stream的资源，导致资源限制失效。
 
 -   dynUBufSize：Dynamic Unified Buffer Size，是配置UB动态内存分配的空间的大小（仅限UB，不包括L1等），单位为Byte，默认设置为0；
 -   stream：类型为aclrtStream，stream用于维护一些异步操作的执行顺序，确保按照应用程序中的代码调用顺序在device上执行，默认设置为nullptr。stream创建等管理接口请参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。

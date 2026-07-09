@@ -252,7 +252,7 @@ bank冲突主要可以分为以下三种场景：
 
 >[!NOTE]说明 
 >通过msProf工具可以进行资源冲突占比的相关性能数据采集。
->工具的具体使用方法和资源冲突占比文件性能数据文件说明请参考[《算子开发工具用户指南》](https://hiascend.com/document/redirect/CannCommercialToolOpDev)。
+>工具的具体使用方法和资源冲突占比文件性能数据文件说明请参考[《msOpProf用户指南》](https://gitcode.com/Ascend/msopprof/blob/master/docs/zh/user_guide/msopprof_user_guide.md)。
 
 ## 如何避免bank冲突<a name="section12501642143515"></a>
 
@@ -371,3 +371,5 @@ bank冲突主要可以分为以下三种场景：
     </tr>
     </tbody>
     </table>
+
+更多的UB Bank冲突场景分析可参考[bank冲突分析样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/05_best_practices/04_memory_access/bank_conflict_ub)。

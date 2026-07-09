@@ -53,7 +53,9 @@ inline float scalblnf(float x, int64_t n)
 
 ## 约束说明
 
-无
+<!-- npu="950" id7 -->
+针对Ascend 950PR/Ascend 950DT，本接口不支持Subnormal场景：本接口内部实现使用到了除法运算符，由于除法运算符不支持Subnormal场景，在极少数场景下内部计算的除法结果为Subnormal数据，导致本接口最终结果为0。
+<!-- end id7 -->
 
 ## 需要包含的头文件
 
@@ -68,29 +70,29 @@ inline float scalblnf(float x, int64_t n)
 - SIMT编程场景：
 
     ```
-    __global__ __launch_bounds__(256) void compute_scalblnf(float *result, const int *n, const float *x, uint32_t count)
+    __global__ __launch_bounds__(256) void compute_scalblnf(float *result, const int64_t *n, const float *x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= count) {
             return;
         }
-        result[idx] = scalblnf(x[idx], static_cast<int64_t>(n[idx]));
+        result[idx] = scalblnf(x[idx], n[idx]);
     }
     ```
 
 - SIMD与SIMT混合编程场景：
 
     ```
-    __simt_vf__ __launch_bounds__(256) inline void compute_scalblnf_vf(__gm__ float *result, __gm__ const int *n, __gm__ const float *x, uint32_t count)
+    __simt_vf__ __launch_bounds__(256) inline void compute_scalblnf_vf(__gm__ float *result, __gm__ const int64_t *n, __gm__ const float *x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= count) {
             return;
         }
-        result[idx] = scalblnf(x[idx], static_cast<int64_t>(n[idx]));
+        result[idx] = scalblnf(x[idx], n[idx]);
     }
 
-    __global__ __vector__ void run_scalblnf(__gm__ float *result, __gm__ const int *n, __gm__ const float *x, uint32_t count)
+    __global__ __vector__ void run_scalblnf(__gm__ float *result, __gm__ const int64_t *n, __gm__ const float *x, uint32_t count)
     {
         asc_vf_call<compute_scalblnf_vf>(dim3(256), result, n, x, count);
     }

@@ -9,21 +9,21 @@
 */
 
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)  
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
-#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
-#endif     
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#endif
 
 #ifndef INCLUDE_C_API_SYNC_SYNC_H
 #define INCLUDE_C_API_SYNC_SYNC_H
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
-#include "../../../impl/c_api/instr_impl/npu_arch_2201/sync_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/sync_impl.h"
 
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
-#include "../../../impl/c_api/instr_impl/npu_arch_3510/sync_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/sync_impl.h"
 
 #endif
 
@@ -43,19 +43,27 @@ __aicore__ inline void asc_sync();
 
 #define asc_sync_block_arrive(pipe, flag_id) asc_sync_block_arrive_impl((pipe), (flag_id))
 
+#define asc_sync_subblock_arrive(pipe, flag_id) asc_sync_subblock_arrive_impl((pipe), (flag_id))
+
+#define asc_sync_inter_arrive(pipe, flag_id) asc_sync_inter_arrive_impl((pipe), (flag_id))
+
 #define asc_sync_data_barrier(arg) asc_sync_data_barrier_impl((arg))
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
-#define asc_sync_block_wait(pipe, flagID) wait_flag_dev((flagID))
+#define asc_sync_subblock_wait(pipe, flag_id) wait_flag_dev((pipe), (flag_id))
 
-#define asc_sync_inter_wait(pipe, flagID) wait_flag_dev((flagID))
+#define asc_sync_block_wait(pipe, flag_id) wait_flag_dev((flag_id))
+
+#define asc_sync_inter_wait(pipe, flag_id) wait_flag_dev((flag_id))
 
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 #define asc_sync_intra_arrive(pipe, sync_id) set_intra_block((pipe), (sync_id))
 
 #define asc_sync_intra_wait(pipe, sync_id) wait_intra_block((pipe), (sync_id))
+
+#define asc_sync_subblock_wait(pipe, flag_id) wait_flag_dev((pipe), (flag_id))
 
 #define asc_sync_inter_wait(pipe, flag_id) wait_flag_dev((pipe), (flag_id))
 
@@ -74,7 +82,7 @@ enum ascMutexExecuteMode {
 
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
-#endif    
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#endif

@@ -22,7 +22,7 @@
 #include "../utility/forward.h"
 #include "../type_traits/decay.h"
 #include "../type_traits/enable_if.h"
-#include "../type_traits/Int.h"
+#include "../type_traits/integral_constant.h"
 #include "../type_traits/is_same.h"
 #include "../type_traits/remove_const.h"
 #include "../type_traits/remove_cv.h"
@@ -153,12 +153,12 @@ template <typename T>
 struct unwrap_refwrapper {
     using type = T;
 };
- 
+
 template <typename T>
 struct unwrap_refwrapper<std::reference_wrapper<T>> {
     using type = T&;
 };
- 
+
 template <typename T>
 using unwrap_decay_t = typename unwrap_refwrapper<decay_t<T>>::type;
 
@@ -168,7 +168,7 @@ ASCENDC_HOST_AICORE inline constexpr tuple<unwrap_decay_t<Tps>...> make_tuple(Tp
     tuple_static_assert<0, Tps...>();
     return tuple<unwrap_decay_t<Tps>...>(forward<Tps>(args)...);
 }
- 
+
 // tie
 template <typename ...Tps>
 ASCENDC_HOST_AICORE inline constexpr tuple<Tps& ...> tie(Tps& ...args) noexcept
