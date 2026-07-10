@@ -13,7 +13,7 @@ printf("fmt string %d", 0x123);
 ```
 
 >[!NOTE]说明
->printf接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需关闭打印功能。具体方法请参考[printf](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/调测接口/printf-290.md)。
+>printf接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需关闭打印功能。具体方法请参考[printf](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/Utils-API/调测接口/printf-290.md)。
 
 ## SIMD编程通过DumpTensor打印进行调试<a name="section16452184823718"></a>
 
