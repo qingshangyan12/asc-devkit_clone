@@ -67,7 +67,7 @@ HcclResult GetGraphModeBuffers(
     HcclComm comm, ChannelHandle channelHandle, const char* inputBuffTag, const char* outputBuffTag,
     ChannelInfo& channel);
 HcclResult HcclGetCcuKernel(
-    HcclComm comm, AlgResourceRequest& resRequest, std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost);
+    HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest, std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost);
 
 HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest);
 
