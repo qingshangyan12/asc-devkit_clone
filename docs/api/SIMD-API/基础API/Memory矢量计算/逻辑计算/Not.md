@@ -78,22 +78,34 @@ $dst_i = \sim src_i$
 ## 数据类型
 
 <!-- npu="950" id10 -->
+<!-- npu="950" id1 -->
 - 针对Ascend 950PR/Ascend 950DT，T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float、int64_t、uint64_t。数据类型int8_t、uint8_t、int64_t、uint64_t仅支持tensor前n个数据计算接口。
+<!-- end id1 -->
 <!-- end id10 -->
 <!-- npu="A3" id11 -->
+<!-- npu="A3" id2 -->
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T支持的数据类型为：int16_t、uint16_t。
+<!-- end id2 -->
 <!-- end id11 -->
 <!-- npu="910b" id12 -->
+<!-- npu="910b" id3 -->
 - 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，T支持的数据类型为：int16_t、uint16_t。
+<!-- end id3 -->
 <!-- end id12 -->
 <!-- npu="310b" id13 -->
+<!-- npu="310b" id4 -->
 - 针对Atlas 200I/500 A2 推理产品，T支持的数据类型为：int16_t、uint16_t。
+<!-- end id4 -->
 <!-- end id13 -->
 <!-- npu="310p" id14 -->
+<!-- npu="310p" id5 -->
 - 针对Atlas 推理系列产品AI Core，T支持的数据类型为：int16_t、uint16_t。
+<!-- end id5 -->
 <!-- end id14 -->
 <!-- npu="910" id15 -->
+<!-- npu="910" id6 -->
 - 针对Atlas 训练系列产品，T支持的数据类型为：int16_t、uint16_t。
+<!-- end id6 -->
 <!-- end id15 -->
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -107,10 +119,14 @@ $dst_i = \sim src_i$
 <!-- npu="A3,910b" id18 -->
 - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
   <!-- npu="A3" id19 -->
+  <!-- npu="A3" id7 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  <!-- end id7 -->
   <!-- end id19 -->
   <!-- npu="910b" id20 -->
+  <!-- npu="910b" id8 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  <!-- end id8 -->
   <!-- end id20 -->
 <!-- end id18 -->
 

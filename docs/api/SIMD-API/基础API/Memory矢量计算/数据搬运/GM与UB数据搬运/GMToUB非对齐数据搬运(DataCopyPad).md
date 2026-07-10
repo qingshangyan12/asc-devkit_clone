@@ -4,13 +4,13 @@
 
 | 产品 | 不支持数据搬运模式mode的原型 | 支持数据搬运模式mode的原型 |
 | :--- | :---: | :---: |
-|<cann-filter npu-type="950"> Ascend 950PR/Ascend 950DT | √ | √ </cann-filter>|
-|<cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ | x </cann-filter>|
-|<cann-filter npu-type="910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ | x </cann-filter>|
-|<cann-filter npu-type="310b"> Atlas 200I/500 A2 推理产品 | √ | x </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品AI Core | x | x </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | x | x </cann-filter>|
-|<cann-filter npu-type="910"> Atlas 训练系列产品 | x | x </cann-filter>|
+|<!-- npu="950" id10 -->Ascend 950PR/Ascend 950DT | √ | √<!-- end id10 -->|
+|<!-- npu="A3" id11 -->Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ | x<!-- end id11 -->|
+|<!-- npu="910b" id12 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ | x<!-- end id12 -->|
+|<!-- npu="310b" id13 -->Atlas 200I/500 A2 推理产品 | √ | x<!-- end id13 -->|
+|<!-- npu="310p" id14 -->Atlas 推理系列产品AI Core | x | x<!-- end id14 -->|
+|<!-- npu="310p" id15 -->Atlas 推理系列产品Vector Core | x | x<!-- end id15 -->|
+|<!-- npu="910" id16 -->Atlas 训练系列产品 | x | x<!-- end id16 -->|
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -20,14 +20,14 @@
 
 当每个搬运的数据块长度（blockLen）非32字节对齐时，每一个数据块都需要填充数据至32字节对齐。
 
-<cann-filter npu-type="950">特别地，针对Ascend 950PR/Ascend 950DT，支持Compact模式，该模式支持单个数据块非32字节对齐，将所有数据块合并成一个连续数据块，在该数据块右侧填充数据至32字节对齐。</cann-filter>
+<!-- npu="950" id17 -->特别地，针对Ascend 950PR/Ascend 950DT，支持Compact模式，该模式支持单个数据块非32字节对齐，将所有数据块合并成一个连续数据块，在该数据块右侧填充数据至32字节对齐。<!-- end id17 -->
 
 具体支持的数据通路为（以[逻辑位置TPosition](../../../数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
     - GM -> VECIN
     - GM -> VECOUT
-    - <cann-filter npu-type="950">GM -> VECCALC（仅Ascend 950PR/Ascend 950DT支持）</cann-filter>
+    - <!-- npu="950" id18 -->GM -> VECCALC（仅Ascend 950PR/Ascend 950DT支持）<!-- end id18 -->
 
 填充的数据有两种配置方式：
 
@@ -43,17 +43,17 @@
     __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
     ```
 
-<cann-filter npu-type="950">
-
+<!-- npu="950" id1 -->
+<!-- npu="950" id21 -->
 - 支持配置设置数据搬运模式mode（仅Ascend 950PR/Ascend 950DT支持）
+<!-- end id21 -->
 
     ```cpp
     // 该函数原型仅支持Ascend 950PR/Ascend 950DT
     template <typename T, PaddingMode mode = PaddingMode::Normal>
     __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
     ```
-
-</cann-filter>
+<!-- end id1 -->
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
@@ -122,9 +122,10 @@
 
         ![](../../../../../figures/datacopypad2.png)
 
-    <cann-filter npu-type="950">
-
-    - 示例3：负stride重复搬运场景（仅Ascend 950PR/Ascend 950DT支持）
+    <!-- npu="950" id2 -->
+<!-- npu="950" id22 -->
+- 示例3：负stride重复搬运场景（仅Ascend 950PR/Ascend 950DT支持）
+<!-- end id22 -->
 
         blockLen为48，每个连续传输数据块包含48字节；srcStride为-48，表示源操作数中前一个数据块**结束地址**与后一个数据块**起始地址**的差值为-48字节（一个连续数据块长度为48字节），相当于每次传输的连续数据块都是同一块；dstStride为1，表示目的操作数相邻数据块之间间隔1个dataBlock。
 
@@ -133,16 +134,16 @@
         blockLen+leftPadding+rightPadding不满足32字节对齐，leftPadding/rightPadding不为0：若isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
 
         ![](../../../../../figures/datacopypad.png)
+<!-- end id2 -->
 
-    </cann-filter>
-
+<!-- npu="950" id23 -->
 - 搬运模式的配置示例（仅Ascend 950PR/Ascend 950DT支持）
+<!-- end id23 -->
 
     下面通过两个示例展示Ascend 950PR/Ascend 950DT上Normal和Compact两种搬运模式的区别。
 
-    <cann-filter npu-type="950">
-
-    - 示例1：Normal模式
+    <!-- npu="950" id3 -->
+- 示例1：Normal模式
 
         blockLen为48，每个连续传输数据块包含48字节；srcStride为0，源操作数的逻辑位置为GM，srcStride的单位为字节，即源操作数相邻数据块之间紧密排列；dstStride为0，目的操作数的逻辑位置为VECIN/VECOUT，dstStride的单位为DataBlock（32字节），目的操作数相邻数据块之间无间隔，注意数据块包含leftPadding/rightPadding数据。
 
@@ -155,34 +156,33 @@
         blockLen * blockCount + leftPadding + rightPadding满足32字节对齐，isPad为false，左右两侧填充的数据值会默认为随机值，否则为paddingValue。此处示例中，leftPadding为0，rightPadding为16，在最后一个数据块右侧填充16字节。目的操作数的总长度为160字节。
 
         ![](../../../../../figures/paddingMode.png)
-
-    </cann-filter>
+<!-- end id3 -->
 
 ## 数据类型<a name="section4219135304818"></a>
 
-<cann-filter npu-type="950">
-
+<!-- npu="950" id4 -->
+<!-- npu="950" id24 -->
 - Ascend 950PR/Ascend 950DT，支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、double、complex64。
+<!-- end id24 -->
+<!-- end id4 -->
 
-</cann-filter>
-
-<cann-filter npu-type="A3">
-
+<!-- npu="A3" id5 -->
+<!-- npu="A3" id25 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。
+<!-- end id25 -->
+<!-- end id5 -->
 
-</cann-filter>
-
-<cann-filter npu-type="910b">
-
+<!-- npu="910b" id6 -->
+<!-- npu="910b" id26 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。
+<!-- end id26 -->
+<!-- end id6 -->
 
-</cann-filter>
-
-<cann-filter npu-type="310b">
-
+<!-- npu="310b" id7 -->
+<!-- npu="310b" id27 -->
 - Atlas 200I/500 A2 推理产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
-
-</cann-filter>
+<!-- end id27 -->
+<!-- end id7 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -191,15 +191,17 @@
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - 结构体DataCopyPadExtParams的参数取值范围需要考虑不要超过UB空间大小。
-- <cann-filter npu-type = "A3,910b">当DataCopyExtParams结构体参数blockCount、blockLen任意一个值为0时，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
-  - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
-  - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
-</cann-filter>
-<cann-filter npu-type="950">
+- <!-- npu="A3,910b" id19 -->当DataCopyExtParams结构体参数blockCount、blockLen任意一个值为0时，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
+  <!-- npu="A3" id28 -->
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品<!-- end id19 -->
+  <!-- end id28 -->
+  - <!-- npu="910b" id20 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品<!-- end id20 -->
 
+<!-- npu="950" id8 -->
+<!-- npu="950" id29 -->
 - 针对Ascend 950PR/Ascend 950DT，若PaddingMode为Compact模式，则参数dstStride、leftPadding、rightPadding无效。
-
-</cann-filter>
+<!-- end id29 -->
+<!-- end id8 -->
 
 - 位于Global Memory的源地址必须1字节对齐，位于Unified Buffer的目的地址必须32字节对齐。
 - leftPadding、rightPadding所占字节数均不能超过32B。
@@ -216,13 +218,12 @@
     | srcStride | [0, 2^32 - 1] |
     | dstStride | [0, 2^32 - 1] |
 
-    <cann-filter npu-type="950">
-
-     > [!NOTE]说明
+    <!-- npu="950" id9 -->
+> [!NOTE]说明
      > 特别地，针对Ascend 950PR/Ascend 950DT，srcStride和dstStride的数据类型和取值范围如下：
      > - srcStride：数据类型为int64_t，取值范围为[-blockLen, 2^40-1]。当srcStride = -blockLen时，表示每次传输的连续数据块均为同一块，即重复搬运第一个数据块。
      > - dstStride：数据类型为int64_t，取值范围为[0, 65535]。
-    </cann-filter>
+<!-- end id9 -->
 
 ## 调用示例<a name="section177231425115410"></a>
 
@@ -257,7 +258,9 @@
     AscendC::DataCopyPad(srcLocal, srcGlobal, copyParams, padParams);
     ```
 
+<!-- npu="950" id30 -->
 - 场景3：使用Compact模式进行紧凑填充（仅支持Ascend 950PR/Ascend 950DT）
+<!-- end id30 -->
 
     ```cpp
     // DataCopyExtParams参数：blockCount=3, blockLen=24*sizeof(half), srcBlkStride=0, srcRepStride=0, reserved=0
@@ -273,7 +276,9 @@
     AscendC::DataCopyPad<T, AscendC::PaddingMode::Compact>(srcLocal, srcGlobal, copyParams, padParams);
     ```
 
+<!-- npu="950" id31 -->
 - 场景4：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）
+<!-- end id31 -->
 
     ```cpp
     // Compact模式：每次内层循环搬运80B后填充16B使其96字节对齐。
@@ -287,7 +292,9 @@
     AscendC::ResetLoopModePara(AscendC::DataCopyMVType::OUT_TO_UB);
     ```
 
+<!-- npu="950" id32 -->
 - 场景5：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）
+<!-- end id32 -->
 
     ```cpp
     // Normal模式：每个block搬运40B后填充24B使其64字节对齐。
@@ -301,7 +308,9 @@
     AscendC::ResetLoopModePara(AscendC::DataCopyMVType::OUT_TO_UB);
     ```
 
+<!-- npu="950" id33 -->
 - 场景6：五维数据搬运（仅支持Ascend 950PR/Ascend 950DT）
+<!-- end id33 -->
 
     ```cpp
     // Global Memory[2, 4, 3, 128, 126]int8 -> Unified Buffer[512, 128]int8

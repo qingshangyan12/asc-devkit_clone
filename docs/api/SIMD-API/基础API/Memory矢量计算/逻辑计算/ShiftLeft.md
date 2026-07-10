@@ -111,31 +111,47 @@ dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/T
 ### scalarValue取值说明
 
 <!-- npu="950" id9 -->
+<!-- npu="950" id1 -->
 - 针对Ascend 950PR/Ascend 950DT，scalarValue的取值应大于等于0，如果左移的位数大于src数据类型位宽，dst的全部元素被赋值为0。
+<!-- end id1 -->
 <!-- end id9 -->
 <!-- npu="A3" id10 -->
+<!-- npu="A3" id2 -->
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，当src为uint16_t或int16_t类型时，scalarValue的取值范围为[0, 16]；当src为uint32_t或int32_t类型时，scalarValue的取值范围为[0, 32]。
+<!-- end id2 -->
 <!-- end id10 -->
 <!-- npu="910b" id11 -->
+<!-- npu="910b" id3 -->
 - 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，当src为uint16_t或int16_t类型时，scalarValue的取值范围为[0, 16]；当src为uint32_t或int32_t类型时，scalarValue的取值范围为[0, 32]。
+<!-- end id3 -->
 <!-- end id11 -->
 <!-- npu="310b" id12 -->
+<!-- npu="310b" id4 -->
 - 针对Atlas 200I/500 A2 推理产品，当src为uint16_t或int16_t类型时，scalarValue的取值范围为[0, 16]；当src为uint32_t或int32_t类型时，scalarValue的取值范围为[0, 32]。
+<!-- end id4 -->
 <!-- end id12 -->
 
 ## 数据类型
 
 <!-- npu="950" id13 -->
+<!-- npu="950" id5 -->
 - 针对Ascend 950PR/Ascend 950DT，T和U支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。数据类型int8_t、uint8_t、int64_t、uint64_t仅支持tensor前n个数据计算接口。
+<!-- end id5 -->
 <!-- end id13 -->
 <!-- npu="A3" id14 -->
+<!-- npu="A3" id6 -->
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T和U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
+<!-- end id6 -->
 <!-- end id14 -->
 <!-- npu="910b" id15 -->
+<!-- npu="910b" id7 -->
 - 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，T和U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
+<!-- end id7 -->
 <!-- end id15 -->
 <!-- npu="310b" id16 -->
+<!-- npu="310b" id8 -->
 - 针对Atlas 200I/500 A2 推理产品，T和U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
+<!-- end id8 -->
 <!-- end id16 -->
 
 ## 返回值说明<a name="section194321251175110"></a>
@@ -149,10 +165,14 @@ dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/T
 <!-- npu="A3,910b" id17 -->
 - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
   <!-- npu="A3" id18 -->
+  <!-- npu="A3" id9 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  <!-- end id9 -->
   <!-- end id18 -->
   <!-- npu="910b" id19 -->
+  <!-- npu="910b" id10 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  <!-- end id10 -->
   <!-- end id19 -->
 <!-- end id17 -->
 

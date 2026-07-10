@@ -184,16 +184,24 @@ hRepeat = 2；vRepeat = 2；mask = 128；vROffset = 128。
 ### sharedTmpBuffer空间说明
 
 <!-- npu="950" id10 -->
+<!-- npu="950" id1 -->
 - 针对Ascend 950PR/Ascend 950DT，不需要分配临时空间。
+<!-- end id1 -->
 <!-- end id10 -->
 <!-- npu="A3" id11 -->
+<!-- npu="A3" id2 -->
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，需要保证至少分配了src0.GetSize() * 32 + src1.GetSize() * 32字节的空间。
+<!-- end id2 -->
 <!-- end id11 -->
 <!-- npu="910b" id12 -->
+<!-- npu="910b" id3 -->
 - 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，需要保证至少分配了src0.GetSize() * 32 + src1.GetSize() * 32字节的空间。
+<!-- end id3 -->
 <!-- end id12 -->
 <!-- npu="310p" id13 -->
+<!-- npu="310p" id4 -->
 - 针对Atlas 推理系列产品AI Core，需要保证至少分配了src0OffsetLocal.GetSize() * sizeof(uint32_t)字节的空间。
+<!-- end id4 -->
 <!-- end id13 -->
 
 ## 数据类型
