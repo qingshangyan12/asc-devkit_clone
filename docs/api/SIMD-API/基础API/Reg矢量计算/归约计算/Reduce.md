@@ -105,7 +105,7 @@ __simd_callee__ inline void Reduce(S& dstReg, V srcReg, MaskReg mask)
 - 对于归约求最小值，当所有元素均不参与计算时，将该数据类型的最大值写入dstReg，当存在多个最小值时，会将第一个最小值的索引保存在dstReg中，min\(-0, +0\) = -0。
 - 当归约求最小值或者归约求最大值时，源操作数的数据类型和目的操作数相同。
 - mask为空场景及异常值处理参考[mask为空与srcReg异常值处理规则](#mask为空与srcReg异常值处理规则)。
-- 指令内累加顺序采用二叉树累加方式，规则参考[ReduceType::SUM累加顺序](#ReduceSum累加顺序)。
+- 指令内累加顺序采用二叉树累加方式，规则参考[ReduceType::SUM累加顺序](#ReduceType::SUM累加顺序)。
 
 ## 关键特性<a name="zh-cn_topic_0000002537812548_section18972943153217"></a>
 
@@ -137,7 +137,7 @@ uint16_t realIndex = *reinterpret_cast<uint16_t*>(&maxIndex);
 
 ![reg_reduce_sum](../../../../figures/reg_reduce_sum.png)
 
-### ReduceType::SUM累加顺序<a name="ReduceSum累加顺序"></a>
+### ReduceType::SUM累加顺序<a name="ReduceType::SUM累加顺序"></a>
 
 以二叉树累加的方式计算源操作数srcReg内有效元素的数据总和。
 
@@ -150,7 +150,7 @@ uint16_t realIndex = *reinterpret_cast<uint16_t*>(&maxIndex);
 **图1** reg_reduce_index<a name="zh-cn_topic_0000002537812548_fig1630121573314"></a>  
 ![reg_reduce_index](../../../../figures/reg_reduce_index.png "reg_reduce_index")
 
-### mask为空与srcReg异常值处理规则<a name="mask为空与srcReg异常值处理规则"></a>
+### mask为空与srcReg异常值处理规则
 
 - 对于归约求数据总和，当所有元素均不参与计算时，将目的操作数数据类型的0写入dstReg。
 - 对于归约求最大值，当所有元素均不参与计算时，将该数据类型的最小值写入dstReg。
