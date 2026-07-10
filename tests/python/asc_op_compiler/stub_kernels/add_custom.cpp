@@ -10,6 +10,7 @@
  * Function : z = x + y
  * This sample is a very basic sample that implements vector add on Ascend plaform.
  */
+#include "../../../api/basic_api/ascendc_header_checker/simd_vf_debug/simd_vf_debug_test_prelude.h"
 #include "kernel_operator.h"
 #include "include/adv_api/matmul/matmul_intf.h"
 using namespace AscendC;
