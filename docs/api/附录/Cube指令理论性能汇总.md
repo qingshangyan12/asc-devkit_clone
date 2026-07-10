@@ -89,7 +89,7 @@ $$
 - $bandwidth$：搬运的带宽，每个cycle能够搬运的数据量大小，单位为Byte/cycle。
 - $\Delta T$：搬运过程中的带宽延迟等额外开销，不同搬运指令的参考值不相同。
 
-注意，下列表格中展示的理论性能为搬运带宽${bandwidth}$，未考虑额外开销$\Delta T$。
+注意，下列表格中展示的理论性能为搬运带宽$bandwidth$，未考虑额外开销$\Delta T$。
 
 <!-- npu="A3,910b" id7 -->
 **表3** 矩阵计算搬入类指令理论性能说明（[NPU架构版本2201](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="table1877123827121"></a>  
@@ -178,7 +178,7 @@ $$
 - $bandwidth$：搬运的带宽，每个cycle能够搬运的数据量大小，单位为Byte/cycle。
 - $\Delta T$：搬运过程中的带宽延迟等额外开销，不同搬运指令的参考值不相同。
 
-注意，下列表格中展示的理论性能为搬运带宽${bandwidth}$，未考虑额外开销$\Delta T$。
+注意，下列表格中展示的理论性能为搬运带宽$bandwidth$，未考虑额外开销$\Delta T$。
 
 矩阵计算搬出类指令及其随路功能的详细介绍可参考[L0C到GM数据搬运（DataCopy）](../SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬出/L0C到GM数据搬运（DataCopy）.md)、[L0C到GM数据搬运（Fixpipe）](../SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬出/L0C到GM数据搬运（Fixpipe）.md)以及相同目录下的其他通路对应资料。以下为理论性能说明列表：
 
