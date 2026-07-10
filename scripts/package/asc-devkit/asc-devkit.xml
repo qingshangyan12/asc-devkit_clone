@@ -75,6 +75,12 @@
         <path value="$(TARGET_ENV)/devlib/linux"/>
         <path value="$(TARGET_ENV)/devlib/linux/x86_64"/>
         <path value="$(TARGET_ENV)/devlib/linux/aarch64"/>
+        <path value="opp"/>
+        <path value="opp/built-in"/>
+        <path value="opp/built-in/op_impl"/>
+        <path value="opp/built-in/op_impl/aicpu"/>
+        <path value="opp/built-in/op_impl/aicpu/kernel"/>
+        <path value="opp/built-in/op_impl/aicpu/config"/>
     </dir_info>
     <file_info copy_type="delivery" src_path="asc-devkit" dst_path="share/info/asc-devkit" install_path="share/info/asc-devkit" install_type="all">
         <file value="script" install_mod="550" entity="true"/>
@@ -151,6 +157,19 @@
 
     <file_info value="acl_rtc" copy_type="delivery" src_path="lib/host" dst_path="$(TARGET_ENV)/bin" install_path="$(TARGET_ENV)/bin">
         <file value="ascendc_pack_kernel" install_mod="550"/>
+    </file_info>
+
+    <file_info value="mc2_lib64" copy_type="delivery" src_path="$(TARGET_ENV)/lib64" dst_path="$(TARGET_ENV)/lib64" install_path="$(TARGET_ENV)/lib64" install_type="all" install_mod="440" optional="true">
+        <file value="libmc2_client.so" file_type="shared"/>
+        <file value="libmc2_compat.so" file_type="shared"/>
+    </file_info>
+
+    <file_info value="mc2_device" copy_type="delivery" src_path="opp/built-in/op_impl/aicpu/kernel" dst_path="opp/built-in/op_impl/aicpu/kernel" install_path="opp/built-in/op_impl/aicpu/kernel" install_type="all" install_mod="440" optional="true">
+        <file value="mc2_server.tar.gz"/>
+    </file_info>
+
+    <file_info value="mc2_json" copy_type="delivery" src_path="opp/built-in/op_impl/aicpu/config" dst_path="opp/built-in/op_impl/aicpu/config" install_path="opp/built-in/op_impl/aicpu/config" install_type="all" install_mod="440" optional="true">
+        <file value="libmc2_server.json"/>
     </file_info>
 
     <file_info copy_type="delivery" src_path="lib/device" dst_path="$(TARGET_ENV)/lib64/device/lib64" install_path="$(TARGET_ENV)/lib64/device/lib64" pkg_feature="filter_florence">
