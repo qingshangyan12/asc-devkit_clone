@@ -56,6 +56,7 @@ extern "C" {
 // 兼容性处理
 uint64_t __attribute__((weak)) HcommGetProfilingSysCycleTime();
 HcclResult __attribute__((weak)) HcclDfxRegOpInfo(HcclComm comm, void* dfxOpInfo);
+HcclResult __attribute__((weak)) HcclDfxRegOpInfoByCommId(char* commId, void* dfxOpInfo);
 HcclResult __attribute__((weak)) HcclProfilingReportOp(HcclComm comm, uint64_t beginTime);
 HcclResult __attribute__((weak)) HcclReportAicpuKernel(HcclComm comm, uint64_t beginTime, char* kernelName);
 
@@ -427,28 +428,6 @@ HcclResult HcclExecOp(
         getAlgResRet, resCtxSequence, isResourceReused, param.ctxSize);
     CHK_RET(getAlgResRet);
 
-    // Op注册
-    HcclDfxOpInfo hcclDfxOpInfo{};
-    hcclDfxOpInfo.opMode = static_cast<u32>(param.opMode);
-    hcclDfxOpInfo.opType = static_cast<u32>(param.opType);
-    hcclDfxOpInfo.reduceOp = static_cast<u32>(param.reduceType);
-    hcclDfxOpInfo.dataType = GetHcclDfxOpInfoDataType(param);
-
-    // rankSize获取指定算子的dataCount
-    u32 userRankSize{0};
-    CHK_RET(HcclGetRankSize(comm, &userRankSize));
-    hcclDfxOpInfo.dataCount = GetHcclDfxOpInfoDataCount(param, userRankSize);
-    hcclDfxOpInfo.root = param.root;
-    hcclDfxOpInfo.engine = param.engine;
-    hcclDfxOpInfo.cpuTsThread = cpuTsThread;
-    hcclDfxOpInfo.cpuWaitAicpuNotifyIdx = HOST_WAIT_AICPU_NOTIFYIDX;
-    s32 sRet = strncpy_s(hcclDfxOpInfo.algTag, ALG_TAG_LENGTH, param.algTag, ALG_TAG_LENGTH);
-    CHK_PRT_RET(
-        sRet != EOK, HCCL_ERROR("%s call strncpy_s failed, param.algTag %s,  return %d.", __func__, param.algTag, sRet),
-        HCCL_E_MEMORY);
-    HcclDfxOpInfo* tempOp = &hcclDfxOpInfo;
-
-    CHK_RET(HcclDfxRegOpInfo(comm, static_cast<void*>(tempOp)));
     ThreadHandle exportedCpuTsThread;
     ThreadHandle mainThread;
     u32 notifyNumOnMainThread;
@@ -1349,7 +1328,7 @@ HcclResult HcclAllocAlgResourceCcu(
     resCtxHost->notifyNumPerThread = resRequest.notifyNumPerThread;
     CHK_RET(HcclGetThread(comm, param, resRequest, resCtxHost));
     CHK_RET(HcclGetChannelForCcu(comm, param, resRequest));
-    CHK_RET(HcclGetCcuKernel(comm, resRequest, resCtxHost));
+    CHK_RET(HcclGetCcuKernel(comm, param, resRequest, resCtxHost));
     return HCCL_SUCCESS;
 #endif
 }
@@ -1390,10 +1369,11 @@ HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam& param, AlgResource
 }
 
 HcclResult HcclGetCcuKernel(
-    HcclComm comm, AlgResourceRequest& resRequest, std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
+    HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest, std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
 {
 #if !MC2_CLIENT_ENABLE_CCU
     (void)comm;
+    (void)param;
     (void)resRequest;
     (void)resCtxHost;
     HCCL_ERROR("[HcclGetCcuKernel] CCU kernel registration is not supported by mc2_client.");
@@ -1419,6 +1399,30 @@ HcclResult HcclGetCcuKernel(
 
     CHK_PRT_RET(resRequest.ccuKernelInfos.empty(),
         HCCL_ERROR("[HcclGetCcuKernel] no kernel to register!"), HCCL_E_INTERNAL);
+    
+    // Op注册
+    HcclDfxOpInfo hcclDfxOpInfo{};
+    hcclDfxOpInfo.opMode = static_cast<u32>(param.opMode);
+    hcclDfxOpInfo.opType = static_cast<u32>(param.opType);
+    hcclDfxOpInfo.reduceOp = static_cast<u32>(param.reduceType);
+    hcclDfxOpInfo.dataType = GetHcclDfxOpInfoDataType(param);
+
+    // rankSize获取指定算子的dataCount
+    u32 userRankSize{0};
+    CHK_RET(HcclGetRankSize(comm, &userRankSize));
+    // hcclDfxOpInfo.dataCount = GetHcclDfxOpInfoDataCount(param, userRankSize);
+    hcclDfxOpInfo.root = param.root;
+    hcclDfxOpInfo.engine = param.engine;
+    hcclDfxOpInfo.cpuTsThread = cpuTsThread;
+    hcclDfxOpInfo.cpuWaitAicpuNotifyIdx = HOST_WAIT_AICPU_NOTIFYIDX;
+    s32 sRet = strncpy_s(hcclDfxOpInfo.algTag, ALG_TAG_LENGTH, param.algTag, ALG_TAG_LENGTH);
+    CHK_PRT_RET(
+        sRet != EOK, HCCL_ERROR("%s call strncpy_s failed, param.algTag %s,  return %d.", __func__, param.algTag, sRet),
+        HCCL_E_MEMORY);
+    HcclDfxOpInfo* tempOp = &hcclDfxOpInfo;
+
+    CHK_RET(HcclDfxRegOpInfoByCommId(const_cast<char *>(param.commName), static_cast<void*>(tempOp)));
+    HCCL_INFO("[HcclGetCcuKernel] RegisterCcuDfxOpInfo success.");
 
     // 按照resgroup进行注册
     u32 currentResGroup = 0;
