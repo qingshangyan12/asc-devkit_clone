@@ -56,7 +56,7 @@ L0C Buffer到Unified Buffer搬运支持不量化输出、`float`到`half`或`bfl
 
 ## 参数说明
 
-**表 1**  `Copy`接口参数说明
+**表1**  `Copy`接口参数说明
 
 |参数名|输入/输出|描述|
 |--------|--------|--------|
@@ -66,7 +66,7 @@ L0C Buffer到Unified Buffer搬运支持不量化输出、`float`到`half`或`bfl
 |quant|输入|可选量化参数。传入`uint64_t`时表示scalar量化参数，传入张量时表示tensor量化参数，张量位于L1 Buffer，元素类型为`uint64_t`。|
 |fixpipeParams|输入|可选搬运参数，类型为`FixpipeParams`，通过`atomCopy`的`with`接口绑定到搬运原子对象，未绑定时使用默认值。|
 
-**表 2**  `MakeCopy`接口参数说明
+**表2**  `MakeCopy`接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
@@ -86,7 +86,7 @@ struct CopyL0C2UBTrait {
 };
 ```
 
-**表 3**  `CopyL0C2UBTrait`成员说明
+**表3**  `CopyL0C2UBTrait`成员说明
 
 |成员|默认值|描述|
 |--------|--------|--------|
@@ -122,7 +122,7 @@ struct FixpipeParams {
 };
 ```
 
-**表 4**  `FixpipeParams`成员说明
+**表4**  `FixpipeParams`成员说明
 
 |成员|默认值|描述|
 |--------|--------|--------|
@@ -133,7 +133,7 @@ struct FixpipeParams {
 
 L0C Buffer到Unified Buffer搬运根据是否传入量化参数自动选择量化模式。
 
-**表 5**  数据类型说明
+**表5**  数据类型说明
 
 |源张量类型（L0C Buffer）|目的张量类型（Unified Buffer）|调用形式|说明|
 |--------|--------|--------|--------|

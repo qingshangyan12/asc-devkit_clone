@@ -39,7 +39,7 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 ## 参数说明
 
-**表 1**  Copy接口参数说明
+**表1**  Copy接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
@@ -47,7 +47,7 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 | dst | 输出 | 目的张量，存储位置为`Location::BIAS`，数据格式为ND。 |
 | src | 输入 | 源张量，存储位置为`Location::L1`，数据格式为ND。 |
 
-**表 2**  MakeCopy接口参数说明
+**表2**  MakeCopy接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
@@ -58,7 +58,7 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 支持的目的张量和源张量的数据类型组合如下：
 
-**表 3**  支持的数据类型组合
+**表3**  支持的数据类型组合
 
 | 目的张量数据类型 | 源张量数据类型 |
 | :--- | :--- |
@@ -119,7 +119,7 @@ __aicore__ inline void CopyBatchL1ToBTExample()
     constexpr uint32_t n = 15;
 
     // batch模式下源/目的张量列方向Shape需按C0_SIZE（32Byte）对齐，
-    // 分别向上对齐到 C0_ELEMENT<srcType> 和 C0_ELEMENT<dstType>。
+    // 分别向上对齐到C0_ELEMENT<srcType> 和C0_ELEMENT<dstType>。
     constexpr uint32_t srcN = Std::ceil_align(n, Std::Int<C0_ELEMENT<SrcType>>{});
     constexpr uint32_t dstN = Std::ceil_align(n, Std::Int<C0_ELEMENT<DstType>>{});
 
