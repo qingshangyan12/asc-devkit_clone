@@ -8,7 +8,7 @@ Int8 Channel Merge：当目标数据类型为`int8_t`或`uint8_t`时，NZ输出�
 
 Int8 Channel Merge：当目标数据类型为`int8_t`，M为32，N为48时，硬件会将N方向上前两个16×16分形矩阵合并成一个16×32分形矩阵，剩余的一个16×16分形矩阵保持不变并输出。
 
-**图 1**  Int8 Channel Merge示意图
+**图1**  Int8 Channel Merge示意图
 
 ![Int8 Channel Merge示意图](../../../../../figures/Fixpipe_Int8_Channel_Merge.png)
 

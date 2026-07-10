@@ -24,13 +24,13 @@ C = A * B + Bias
 
 Mmad的矩阵乘加关系可参考下图：
 
-**图 1**  Mmad矩阵乘加公式
+**图1**  Mmad矩阵乘加公式
 
 ![Mmad矩阵乘加公式](../../../../figures/mmad_formula.png)
 
 `Mmad`使用显式传入的`MmadAtom`配置矩阵计算功能。左矩阵A、右矩阵B、结果矩阵C的图示说明如下：
 
-**图 2**  Mmad矩阵布局
+**图2**  Mmad矩阵布局
 
 ![Mmad矩阵布局](../../../../figures/mmad_matrix_layout.png)
 
@@ -140,7 +140,7 @@ Mmad的矩阵乘加关系可参考下图：
 - 开启`unitFlag`功能时，需要结果矩阵C搬出接口的`FixpipeParams::unitFlag`与`Mmad`计算的`MmadParams::unitFlag`参数配合设置。
 - 当M、K、N不是16的倍数时，硬件仍以16×16分形块组织数据，尾块中的无效数据会占用分形块空间但不参与有效计算。有效数据与无效数据排布方式如下图所示：
 
-**图 3**  尾块有效数据排布
+**图3**  尾块有效数据排布
 
 ![尾块有效数据排布](../../../../figures/mmad_tail_valid_data.png)
 
@@ -152,7 +152,7 @@ Mmad的矩阵乘加关系可参考下图：
 
 连续两次`Mmad`沿K方向累加时，通常需要关注中间结果的写读依赖。同步优化的阈值关系可参考下图：
 
-**图 4**  PipeBarrier阈值关系
+**图4**  PipeBarrier阈值关系
 
 ![PipeBarrier阈值关系](../../../../figures/mmad_pipebarrier_threshold.png)
 
