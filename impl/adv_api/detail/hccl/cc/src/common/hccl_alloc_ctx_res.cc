@@ -864,5 +864,3 @@ HcclResult CcuSelectAlg(
 
     return HCCL_SUCCESS;
 }
-
-#endif
