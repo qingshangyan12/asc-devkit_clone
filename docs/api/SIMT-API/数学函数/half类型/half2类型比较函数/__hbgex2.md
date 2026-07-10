@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
@@ -33,8 +45,57 @@ bool __hbgex2(half2 x, half2 y)
 
 比较输入各分量是否均满足第一个数大于或等于第二个数的结果。
 
--   true：各分量均满足第一个数大于或等于第二个数。
--   false：任一分量不满足第一个数大于或等于第二个数。任一输入的分量为nan，该分量的比较结果为false。
+<table>
+  <tr>
+    <th>x值</th>
+    <th>y值</th>
+    <th>返回值</th>
+  </tr>
+  <tr>
+    <td colspan="2">任一分量为nan</td>
+    <td>false</td>
+  </tr>
+  <tr>
+    <td>(±0, ±0)</td>
+    <td>(±0, ±0)</td>
+    <td>true</td>
+  </tr>
+  <tr>
+    <td>(inf, inf)</td>
+    <td>(正常值, 正常值)</td>
+    <td>true</td>
+  </tr>
+  <tr>
+    <td>(-inf, -inf)</td>
+    <td>(正常值, 正常值)</td>
+    <td>false</td>
+  </tr>
+  <tr>
+    <td>(正常值, 正常值)</td>
+    <td>(inf, inf)</td>
+    <td>false</td>
+  </tr>
+  <tr>
+    <td>(正常值, 正常值)</td>
+    <td>(-inf, -inf)</td>
+    <td>true</td>
+  </tr>
+  <tr>
+    <td>(inf, inf)</td>
+    <td>(inf, inf)</td>
+    <td>true</td>
+  </tr>
+  <tr>
+    <td>(inf, inf)</td>
+    <td>(-inf, -inf)</td>
+    <td>true</td>
+  </tr>
+  <tr>
+    <td>(-inf, -inf)</td>
+    <td>(-inf, -inf)</td>
+    <td>true</td>
+  </tr>
+</table>
 
 ## 约束说明
 
@@ -86,4 +147,3 @@ bool __hbgex2(half2 x, half2 y)
         asc_vf_call<simt_hbgex2>(dim3(1024), (__gm__ half2*)x, (__gm__ half2*)y, dst, input_total_length);
     }
     ```
-

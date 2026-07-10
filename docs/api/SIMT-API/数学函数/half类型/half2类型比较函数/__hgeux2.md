@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
@@ -31,8 +43,17 @@ half2 __hgeux2(half2 x, half2 y)
 
 ## 返回值说明
 
--   比较输入数据各分量是否满足第一个数大于或等于第二个数的结果：满足时对应结果为1.0，不满足时对应结果为0.0。
--   任一输入的分量为nan时，该分量的比较结果为1.0。
+比较输入数据各分量是否满足第一个数大于或等于第二个数的结果：满足时对应结果为1，不满足时对应结果为0。特殊值如下：
+
+| x分量 | y分量 | 返回值（对应分量） |
+| --- | --- | --- |
+| nan | 任意值 | 1 |
+| 任意值 | nan | 1 |
+| ±0 | ±0 | 1 |
+| inf | inf | 1 |
+| inf | -inf | 1 |
+| -inf | inf | 0 |
+| -inf | -inf | 1 |
 
 ## 约束说明
 
@@ -85,4 +106,3 @@ half2 __hgeux2(half2 x, half2 y)
         asc_vf_call<simt_hgeux2>(dim3(1024), (__gm__ half2*)x, (__gm__ half2*)y, (__gm__ half2*)dst, input_total_length);
     }
     ```
-

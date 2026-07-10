@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
@@ -30,11 +42,17 @@ inline int __float_as_int(const float x)
 
 ## 返回值说明
 
-输入的浮点数中的位重新解释成的有符号整数。特别场景说明如下：
+输入的浮点数中的位重新解释成的有符号整数。特殊值如下：
 
--   当x为nan时，返回值为2143289344。
--   当x为inf时，返回值为2139095040。
--   当x为-inf时，返回值为-8388608。
+| x值 | 返回值 |
+|---|---|
+| 0 | 0 |
+| -0 | ASCRT_MIN_VAL_S |
+| nan | 2143289344 |
+| inf | ASCRT_INT32_INF_S |
+| -inf | -8388608 |
+| ASCRT_MAX_NORMAL_F | 2139095039 |
+| -ASCRT_MAX_NORMAL_F | -8388609 |
 
 ## 约束说明
 
@@ -69,4 +87,3 @@ inline int __float_as_int(const float x)
         dst[idx] = __float_as_int(x[idx]);
     }
     ```
-
