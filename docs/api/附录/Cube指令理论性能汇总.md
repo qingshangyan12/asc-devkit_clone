@@ -31,8 +31,8 @@ $$
 关键变量及常量说明：
 
 - $m, n, k$：mmad入参实际计算的大小。
-- ${ceil_m}, {ceil_n}, {ceil_k}$：$m, n, k$ 根据分型大小向上对齐后的值。
-- ${cube_m}, {cube_n}, {cube_k}$：硬件真实并行度。
+- $ceil_m, ceil_n, ceil_k$：$m, n, k$ 根据分型大小向上对齐后的值。
+- $cube_m, cube_n, cube_k$：硬件真实并行度。
 - $k_0$：L0 Buffer上最小分型K方向大小。
 - $\Delta t$：头开销cycle数。
 
@@ -85,8 +85,8 @@ $$
 
 关键变量及常量说明：
 
-- ${data\_size}$：搬运的数据总量，单位为Byte。
-- ${bandwidth}$：搬运的带宽，每个cycle能够搬运的数据量大小，单位为Byte/cycle。
+- $data\_size$：搬运的数据总量，单位为Byte。
+- $bandwidth$：搬运的带宽，每个cycle能够搬运的数据量大小，单位为Byte/cycle。
 - $\Delta T$：搬运过程中的带宽延迟等额外开销，不同搬运指令的参考值不相同。
 
 注意，下列表格中展示的理论性能为搬运带宽${bandwidth}$，未考虑额外开销$\Delta T$。
@@ -143,10 +143,10 @@ $$
 
 关键变量及常量说明：
 
-- ${data\_size}$：搬运左/右矩阵的数据总量，单位为Byte。
-- ${scale\_data\_size}$：搬运scale矩阵的数据总量，单位为Byte。
-- ${bandwidth}$：搬运左/右矩阵的带宽，单位为Byte/cycle。
-- ${bandwidth\_mx}$：搬运scale矩阵的带宽，单位为Byte/cycle。
+- $data\_size$：搬运左/右矩阵的数据总量，单位为Byte。
+- $scale\_data\_size$：搬运scale矩阵的数据总量，单位为Byte。
+- $bandwidth$：搬运左/右矩阵的带宽，单位为Byte/cycle。
+- $bandwidth\_mx$：搬运scale矩阵的带宽，单位为Byte/cycle。
 - $\Delta T$：搬运过程中的带宽延迟等额外开销。
 
 [LoadData_3D](../SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/LoadData_3D.md)指令的理论性能与参数相关，相关参数说明见[LoadData3DParamsV2结构体内参数说明](../SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/LoadData_3D.md#zh-cn_topic_0000002512171652_table193501032193419)，理论性能说明见下表：
@@ -174,8 +174,8 @@ $$
 
 关键变量及常量说明：
 
-- ${data\_size}$：搬运的数据总量，单位为Byte。
-- ${bandwidth}$：搬运的带宽，每个cycle能够搬运的数据量大小，单位为Byte/cycle。
+- $data\_size$：搬运的数据总量，单位为Byte。
+- $bandwidth$：搬运的带宽，每个cycle能够搬运的数据量大小，单位为Byte/cycle。
 - $\Delta T$：搬运过程中的带宽延迟等额外开销，不同搬运指令的参考值不相同。
 
 注意，下列表格中展示的理论性能为搬运带宽${bandwidth}$，未考虑额外开销$\Delta T$。
