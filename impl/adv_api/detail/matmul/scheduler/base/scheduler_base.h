@@ -76,7 +76,7 @@ public:
             "Neither Norm nor IBShareNorm can be enabled simultaneously!");
         MATMUL_MODULE(MatmulShapeTiling)->SetTiling(cubeTiling);
         MATMUL_MODULE(MatmulShapeTiling)->template CheckTiling<SrcAT, L0cT>();
-        auto& var = MATMUL_PARAM_VAR;
+        auto& var = MATMUL_CONST_PARAM_VAR;
         var.tpipe_ = tpipe;
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3002)
@@ -130,12 +130,11 @@ public:
         MATMUL_MODULE(MatmulQuantProcessor)->Init(tiling.GetBaseN());
 #if __NPU_ARCH__ == 5102
         if constexpr (IsSameTypeV<SrcAT, half> && IsSameTypeV<SrcBT, half> && IsTypeOneOfV<DstT, half, bfloat16_t>) {
-            constexpr float FIX_VAL_RECIPROCAL = 1.0f / (1 << 16);
+            constexpr float FIX_VAL_RECIPROCAL = 1.0f;
             const uint64_t quantScalar =
                 static_cast<const uint64_t>(*reinterpret_cast<const int32_t*>(&FIX_VAL_RECIPROCAL));
             MATMUL_MODULE(MatmulQuantProcessor)->SetQuantScalar(quantScalar);
         }
-
         if constexpr (IsDecompMode<MM_CFG>()) {
             InitQtableProcessor();
         }
