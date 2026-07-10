@@ -30,7 +30,7 @@
 
     ```cpp
     template <ReduceType reduceType, typename T, typename U, bool isSetMask = true>
-    __aicore__ inline void ReducePairElem(const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint64_t mask[],const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
+    __aicore__ inline void ReducePairElem(const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
     ```
 
 - `mask`连续模式：
@@ -154,12 +154,18 @@
 - 示例结果
 
     > 输入数据src_gm：
-    > > [1, 1, 1, -1, 2, 2, -1, 2,
-    > >  3, 3, 3, -1, 4, 4, -2, 4,
-    > >  ....
-    > > ]
-    >
+
+    ```plain
+    [1, 1, 1, -1, 2, 2, -1, 2,
+     3, 3, 3, -1, 4, 4, -2, 4,
+     ....
+    ]
+    ```
+
     > 输出数据dst_gm：
-    > > [2, 0, 4, 1, 6, 2, 8, 2,
-    > >  ....
-    > > ]
+    
+    ```plain
+    [2, 0, 4, 1, 6, 2, 8, 2,
+    ....
+    ]
+    ```
