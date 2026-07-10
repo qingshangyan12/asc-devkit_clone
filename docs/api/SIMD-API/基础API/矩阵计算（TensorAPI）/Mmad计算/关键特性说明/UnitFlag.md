@@ -33,7 +33,7 @@ Mmad和Copy接口设置unitFlag值为2/3后，系统会启动单元标志位。
 
 在调用Mmad接口时，需要通过[SetMMColumnMajor/SetMMRowMajor](../../../矩阵计算（ISASI）/矩阵计算/寄存器配置说明/SetMMColumnMajor-SetMMRowMajor.md)接口设置Mmad的计算方向。当Fixpipe使能了NZ2ND或ChannelMerge等layout变换时，需将Mmad的计算方向设置为N方向优先，即调用`SetMMRowMajor`。反之，若未使用这些特性，则应将计算方向设置为M方向优先，即调用`SetMMColumnMajor`。
 
-**图 1**  Mmad和Fixpipe同时沿M方向写/读
+**图1**  Mmad和Fixpipe同时沿M方向写/读
 
 ![Mmad-Fixpipe读写示意图](../../../../../figures/mmad_unitflag.png)
 

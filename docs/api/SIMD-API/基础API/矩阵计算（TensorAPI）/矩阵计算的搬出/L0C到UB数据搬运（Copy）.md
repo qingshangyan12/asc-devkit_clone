@@ -18,7 +18,7 @@ L0C Buffer到Unified Buffer搬运支持不量化输出、`float`到`half`或`bfl
 
 随路量化、随路Relu、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径如下图所示。图中的F32到F16、F32到BF16为非量化模式，仅进行cast。其余路径为不量化、随路scalar或tensor量化模式。针对Ascend 950PR/Ascend 950DT，还支持NZ2DN随路格式转换。
 
-**图 1**  L0C2UB流程图
+**图1**  L0C2UB流程图
 
 ![L0C2UB流程图](../../../../figures/l0c2ub_flowchart.png)
 
