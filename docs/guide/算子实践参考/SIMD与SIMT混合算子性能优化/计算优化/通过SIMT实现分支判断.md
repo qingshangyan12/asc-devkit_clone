@@ -55,65 +55,67 @@ SIMT线程层次结构为：
 
 【反例】
 
-基于SIMD RegBase的floor\_mod算子实现：对应样例中的场景1（SCENARIO\_NUM=1）。该场景使用DataCopy完成GM与UB之间的数据搬运，在UB上使用RegBase VF函数实现计算。由于SIMD无法直接通过普通if else语句表达逐元素分支判断，因此需要使用多个Reg矢量计算API完成符号比较、条件组合和结果选择，相关代码如下。
+基于SIMD RegBase的floor\_mod算子实现：对应样例中的场景1（SCENARIO\_NUM=1）。该场景使用 `asc_copy_gm2ub_align` 和 `asc_copy_ub2gm_align` 完成GM与UB之间的数据搬运，在UB上使用SIMD VF函数实现计算。由于SIMD无法直接通过普通if else语句表达逐元素分支判断，因此需要使用多个矢量计算API完成符号比较、条件组合和结果选择，相关代码如下。
 
 ```cpp
-template <typename T>
-__simd_vf__ inline void floor_mod_simd(__ubuf__ T* zAddr, __ubuf__ T* xAddr, __ubuf__ T* yAddr, const uint32_t count)
+__simd_vf__ inline void floor_mod_simd(
+    __ubuf__ int32_t* zAddr, __ubuf__ int32_t* xAddr, __ubuf__ int32_t* yAddr, const uint32_t count)
 {
-    constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(T);
-    uint16_t loopTimes = AscendC::CeilDivision(count, oneRepeatSize);
-    AscendC::Reg::RegTensor<T> xValue;
-    AscendC::Reg::RegTensor<T> yValue;
-    AscendC::Reg::RegTensor<T> modValue;
-    AscendC::Reg::RegTensor<T> tempValue;
-    AscendC::Reg::RegTensor<T> defaultValue;
-    AscendC::Reg::RegTensor<T> signValue;
+    constexpr uint32_t oneRepeatSize = asc_get_vf_len() / sizeof(int32_t);
+    uint16_t loopTimes = DivCeil(count, oneRepeatSize);
+    vector_int32_t xValue;
+    vector_int32_t yValue;
+    vector_int32_t modValue;
+    vector_int32_t tempValue;
+    vector_int32_t defaultValue;
+    vector_int32_t signValue;
 
-    AscendC::Reg::MaskReg mask;
-    AscendC::Reg::MaskReg selectMask;
-    AscendC::Reg::MaskReg adjustMask;
+    vector_bool mask;
+    vector_bool selectMask;
+    vector_bool adjustMask;
     uint32_t maskCount = count;
 
-    AscendC::Reg::Duplicate(defaultValue, T(-1));
-    AscendC::Reg::Duplicate(signValue, FMOD_B32_SIGN);
+    asc_duplicate_scalar(defaultValue, int32_t(-1));
+    asc_duplicate_scalar(signValue, static_cast<int32_t>(FMOD_B32_SIGN));
 
     for (uint16_t i = 0; i < loopTimes; i++) {
-        mask = AscendC::Reg::UpdateMask<T>(maskCount);
-        AscendC::Reg::LoadAlign(xValue, xAddr + i * oneRepeatSize);
-        AscendC::Reg::LoadAlign(yValue, yAddr + i * oneRepeatSize);
+        mask = asc_update_mask_b32(maskCount);
+        asc_loadalign(xValue, xAddr + i * oneRepeatSize);
+        asc_loadalign(yValue, yAddr + i * oneRepeatSize);
 
-        AscendC::Reg::Div(tempValue, xValue, yValue, mask);
-        AscendC::Reg::Mul(tempValue, yValue, tempValue, mask);
-        AscendC::Reg::Sub(modValue, xValue, tempValue, mask);
+        AscendC::Reg::Div(
+            reinterpret_cast<AscendC::Reg::RegTensor<int32_t>&>(tempValue),
+            reinterpret_cast<AscendC::Reg::RegTensor<int32_t>&>(xValue),
+            reinterpret_cast<AscendC::Reg::RegTensor<int32_t>&>(yValue),
+            reinterpret_cast<AscendC::Reg::MaskReg&>(mask));
+        asc_mul(tempValue, yValue, tempValue, mask);
+        asc_sub(modValue, xValue, tempValue, mask);
 
-        AscendC::Reg::Compares<T, AscendC::CMPMODE::NE>(selectMask, yValue, T(0), mask);
-        AscendC::Reg::Select(tempValue, modValue, defaultValue, selectMask);
+        asc_ne_scalar(selectMask, yValue, int32_t(0), mask);
+        asc_select(tempValue, modValue, defaultValue, selectMask);
 
-        AscendC::Reg::Add(modValue, tempValue, yValue, mask);
-        AscendC::Reg::Compares<T, AscendC::CMPMODE::NE>(adjustMask, tempValue, T(0), mask);
-        AscendC::Reg::And(xValue, tempValue, signValue, mask);
-        AscendC::Reg::And(yValue, yValue, signValue, mask);
-        AscendC::Reg::Compare<T, AscendC::CMPMODE::NE>(selectMask, xValue, yValue, mask);
-        AscendC::Reg::MaskAnd(adjustMask, selectMask, adjustMask, mask);
-        AscendC::Reg::Select(modValue, modValue, tempValue, adjustMask);
-        AscendC::Reg::StoreAlign(zAddr + i * oneRepeatSize, modValue, mask);
+        asc_add(modValue, tempValue, yValue, mask);
+        asc_ne_scalar(adjustMask, tempValue, int32_t(0), mask);
+        asc_and(xValue, tempValue, signValue, mask);
+        asc_and(yValue, yValue, signValue, mask);
+        asc_ne(selectMask, xValue, yValue, mask);
+        asc_and(adjustMask, selectMask, adjustMask, mask);
+        asc_select(modValue, modValue, tempValue, adjustMask);
+        asc_storealign(zAddr + i * oneRepeatSize, modValue, mask);
     }
 }
 ```
 
 【正例】
 
-基于SIMT的floor\_mod算子实现：对应样例中的场景3（SCENARIO\_NUM=3）。该场景同样使用DataCopy完成GM与UB之间的数据搬运，在UB上采用SIMT编程方式实现计算过程，通过if else语句完成分支判断，代码如下所示。
+基于SIMT的floor\_mod算子实现：对应样例中的场景3（SCENARIO\_NUM=3）。该场景同样使用连续搬运接口完成GM与UB之间的数据搬运，在UB上采用SIMT编程方式实现计算过程，通过if else语句完成分支判断，代码如下所示。
 
 ```cpp
-template <typename T>
 __simt_vf__ inline void floor_mod_simt_contiguous(
-    __ubuf__ T* x, __ubuf__ T* y, __ubuf__ T* z, uint32_t inputTotalLength)
+    __ubuf__ int32_t* x, __ubuf__ int32_t* y, __ubuf__ int32_t* z, uint32_t inputTotalLength)
 {
-    for (uint32_t index = static_cast<uint32_t>(threadIdx.x); index < inputTotalLength;
-         index += static_cast<uint32_t>(blockDim.x)) {
-        T yValue = y[index];
+    for (uint32_t index = threadIdx.x; index < inputTotalLength; index += blockDim.x) {
+        int32_t yValue = y[index];
         const auto rem = x[index] % yValue;
         bool signsDiffer = ((rem < 0) != (yValue < 0));
         if (signsDiffer && (rem != 0)) {
@@ -127,7 +129,7 @@ __simt_vf__ inline void floor_mod_simt_contiguous(
 
 【性能对比】
 
-在核数相同、输入输出规格相同、均使用DataCopy完成GM与UB之间数据搬运的情况下，对比场景1和场景3的性能数据如下。
+在核数相同、输入输出规格相同、均使用连续搬运接口完成GM与UB之间数据搬运的情况下，对比场景1和场景3的性能数据如下。
 
 | 场景 | 实现方式 | 核数 | Task Duration\(μs\) | aiv\_vec\_time\(μs\) | aiv\_vec\_ratio | aiv\_mte2\_time\(μs\) | aiv\_mte2\_ratio |
 |:---|:---|:---:|---:|---:|---:|---:|---:|
