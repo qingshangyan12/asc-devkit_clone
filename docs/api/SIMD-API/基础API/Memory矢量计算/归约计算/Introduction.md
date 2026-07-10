@@ -12,11 +12,8 @@
 | [GetReduceRepeatSumSpr(ISASI)](./寄存器辅助接口/GetReduceRepeatSumSpr(ISASI).md) | 获取`ReduceSum`接口的计算结果。 | 1 element |
 | [GetReduceRepeatMaxMinSpr(ISASI)](./寄存器辅助接口/GetReduceRepeatMaxMinSpr(ISASI).md) | 获取调用`ReduceRepeat<MAX/MIN>`时所有repeat内的最值及其索引，或获取调用`ReduceMax`、`ReduceMin`得到的最值。 | 1 element (1 index) |
 
-<!-- npu="A3,910b" id2 --> <!-- end id2 -->
 
-<!-- npu="A3" id1 -->
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、
-<!-- end id1 --><!-- npu="910b" id3 -->Atlas A2 训练系列产品/Atlas A2 推理系列产品，在使用归约计算接口时，有如下使用建议。 <!-- end id3 -->
+针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品，在使用归约计算接口时，有如下使用建议。
 
 - `ReduceDataBlock`
   - **推荐使用场景**：

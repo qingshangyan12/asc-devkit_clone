@@ -88,7 +88,7 @@ def Duplicate(scalarValue, dst, count):
 | ------ | ------ | ------ |
 | dst | 输出 | 目的操作数，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT（存储位置为Unified Buffer）。LocalTensor的起始地址需要按照32字节对齐。|
 | scalarValue | 输入 | 被复制的源操作数，数据类型需与dst中元素的数据类型保持一致。|
-|<!-- npu="950" id13 --> src | 输入| 源操作数，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>数据类型需与dst中元素的数据类型保持一致。<br>当传入该参数时，会将src[0]复制多次并填充到向量中。<!-- end id13 -->|
+|src | 输入| 源操作数，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>数据类型需与dst中元素的数据类型保持一致。<br>当传入该参数时，会将src[0]复制多次并填充到向量中。|
 | count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。|
 | mask/mask[] | 输入 | mask用于控制每次迭代内参与计算的元素。<br>设置详见[掩码操作](../掩码操作/掩码操作.md)。 |
 | repeatTime | 输入 | 指令迭代次数，每次迭代完成8个DataBlock的数据收集，取值范围：repeatTime∈[0,255]。|
@@ -130,9 +130,9 @@ Atlas 训练系列产品，支持的数据类型为：int16_t、uint16_t、half�
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 <!-- npu="A3,910b" id12 -->
 - repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。该约束适用于以下型号。
-<!-- npu="A3" id8 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-<!-- end id8 -->
+  <!-- npu="A3" id8 -->
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  <!-- end id8 -->
   <!-- npu="910b" id9 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
   <!-- end id9 -->

@@ -164,12 +164,12 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 | src0数据类型 | src1Pattern数据类型 | dst数据类型 |
 | --- | --- | --- |
-|<!-- npu="950" id13 --> int8_t | uint8_t | int8_t <!-- end id13 -->|
-|<!-- npu="950" id14 --> uint8_t | uint8_t | uint8_t <!-- end id14 -->|
+| int8_t | uint8_t | int8_t | 
+| uint8_t | uint8_t | uint8_t | 
 | int16_t | uint16_t | int16_t |
 | uint16_t | uint16_t | uint16_t |
 | half | uint16_t | half |
-|<!-- npu="950,A3,910b" id15 --> bfloat16_t | uint16_t | bfloat16_t <!-- end id15 -->|
+| bfloat16_t | uint16_t | bfloat16_t |
 | int32_t | uint32_t | int32_t |
 | uint32_t | uint32_t | uint32_t |
 | float | uint32_t | float |

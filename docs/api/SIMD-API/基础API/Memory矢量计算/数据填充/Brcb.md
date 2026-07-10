@@ -114,9 +114,9 @@ Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t�
 - 不支持源操作数与目的操作数使用同一块内存地址。
 <!-- npu="A3,910b" id8 -->
 - repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。该约束适用于以下型号。
-<!-- npu="A3" id5 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-<!-- end id5 -->
+  <!-- npu="A3" id5 -->
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  <!-- end id5 -->
   <!-- npu="910b" id6 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
   <!-- end id6 -->
