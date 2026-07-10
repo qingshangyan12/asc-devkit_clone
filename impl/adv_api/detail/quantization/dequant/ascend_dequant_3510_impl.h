@@ -122,18 +122,18 @@ __simd_vf__ inline void DequantPerchannelVFImpl(
 #endif
 
             Reg::Mul(f32vreg, f32vreg, scaleB32Vreg, preg);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+            if constexpr (SupportType<dstT, half>()) {
+#else
             if constexpr (SupportType<dstT, bfloat16_t, half>()) {
+#endif
                 Reg::Cast<dstT, float, LayoutZMrgZRndRSatS>(b16vreg, f32vreg, preg);
                 Reg::StoreAlign<dstT, Reg::StoreDist::DIST_PACK_B32>(
                     dstUb + i * dstInner + j * sregLower, b16vreg, preg);
             } else { // out is fp32
-#endif
                 Reg::StoreAlign<float, Reg::StoreDist::DIST_NORM_B32>(
                     dstUb + i * dstInner + j * sregLower, f32vreg, preg);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
             }
-#endif
         }
     }
 }
@@ -220,31 +220,31 @@ __aicore__ inline void DequantPertensorImpl(
 template <typename scaleT>
 __simd_callee__ inline void LoadPerTokenScale(__ubuf__ scaleT* addr, Reg::RegTensor<scaleT>& vreg)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    if constexpr (SupportType<scaleT, half>()) {
+#else
     if constexpr (SupportType<scaleT, half, bfloat16_t>()) {
+#endif
         Reg::LoadAlign<scaleT, Reg::LoadDist::DIST_BRC_B16>(vreg, addr);
     } else {
-#endif
         Reg::LoadAlign<scaleT, Reg::LoadDist::DIST_BRC_B32>(vreg, addr);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
     }
-#endif
 }
 
 template <typename dstT>
 __simd_callee__ inline void StoreRes(__ubuf__ dstT* dstAddr, Reg::RegTensor<float>& vreg, Reg::MaskReg& preg)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    if constexpr (SupportType<dstT, half>()) {
+#else
     if constexpr (SupportType<dstT, half, bfloat16_t>()) {
+#endif
         Reg::RegTensor<dstT> tempVreg;
         Reg::Cast<dstT, float, LayoutZMrgZRndRSatS>(tempVreg, vreg, preg);
         Reg::StoreAlign<dstT, Reg::StoreDist::DIST_PACK_B32>(dstAddr, tempVreg, preg);
     } else {
-#endif
         Reg::StoreAlign<dstT, Reg::StoreDist::DIST_NORM_B32>(dstAddr, vreg, preg);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
     }
-#endif
 }
 
 template <typename dstT, typename srcT, typename scaleT, const AscendDeQuantConfig& config>
@@ -267,16 +267,16 @@ __simd_vf__ inline void DeQuantPerTokenForS32VF(
             preg = Reg::UpdateMask<uint32_t>(sreg);
             Reg::LoadAlign<int32_t, Reg::LoadDist::DIST_NORM>(srcVreg, srcUb + i * para.n + j * vecLen);
             Reg::Cast<float, int32_t, MrgZRndA>(f32Vreg, srcVreg, preg);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+            if constexpr (SupportType<scaleT, half>()) {
+#else
             if constexpr (SupportType<scaleT, half, bfloat16_t>()) {
+#endif
                 Reg::Cast<float, scaleT, layoutZMrgZ>(scaleF32Vreg, scaleVreg, preg);
                 Reg::Mul<float, Reg::MaskMergeMode::ZEROING>(f32Vreg, f32Vreg, scaleF32Vreg, preg);
             } else {
-#endif
                 Reg::Mul<float, Reg::MaskMergeMode::ZEROING>(f32Vreg, f32Vreg, scaleVreg, preg);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
             }
-#endif
             StoreRes<dstT>(dstUb + i * para.n + j * vecLen, f32Vreg, preg);
         }
     }
@@ -312,16 +312,16 @@ __simd_vf__ inline void DeQuantPerTokenForF32VF(
         for (uint16_t j = 0; j < repeat; ++j) {
             preg = Reg::UpdateMask<uint32_t>(sreg);
             Reg::LoadAlign<float, Reg::LoadDist::DIST_NORM>(srcVreg, srcUb + i * para.n + j * vecLen);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+            if constexpr (SupportType<scaleT, half>()) {
+#else
             if constexpr (SupportType<scaleT, half, bfloat16_t>()) {
+#endif
                 Reg::Cast<float, scaleT, layoutZMrgZ>(scaleF32Vreg, scaleVreg, preg);
                 Reg::Mul<float, Reg::MaskMergeMode::ZEROING>(f32Vreg, srcVreg, scaleF32Vreg, preg);
             } else {
-#endif
                 Reg::Mul<float, Reg::MaskMergeMode::ZEROING>(f32Vreg, srcVreg, scaleVreg, preg);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
             }
-#endif
             StoreRes<dstT>(dstUb + i * para.n + j * vecLen, f32Vreg, preg);
         }
     }
@@ -345,8 +345,11 @@ __simd_callee__ inline void GetPerGroupScale(
 {
     // use vgather to get perGroup scale/offset
     uint32_t groupSize = para.groupSize;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    if constexpr (SupportType<T, half>()) {
+#else
     if constexpr (SupportType<T, half, bfloat16_t>()) {
+#endif
         Reg::MaskReg preg = Reg::CreateMask<uint16_t, Reg::MaskPattern::ALL>();
         Reg::RegTensor<int16_t> vci_vreg;
         Reg::RegTensor<uint16_t> index_vreg;
@@ -356,7 +359,6 @@ __simd_callee__ inline void GetPerGroupScale(
         Reg::Div(index_vreg, (Reg::RegTensor<uint16_t>&)vci_vreg, gsize_vreg, preg);
         Reg::Gather(scaleReg, scaleUb, index_vreg, preg);
     } else {
-#endif
         Reg::MaskReg preg = Reg::CreateMask<uint32_t, Reg::MaskPattern::ALL>();
         Reg::RegTensor<int32_t> vci_vreg;
         Reg::RegTensor<uint32_t> index_vreg;
@@ -365,9 +367,7 @@ __simd_callee__ inline void GetPerGroupScale(
         Reg::Arange(vci_vreg, static_cast<int32_t>(start));
         Reg::Div(index_vreg, (Reg::RegTensor<uint32_t>&)vci_vreg, gsize_vreg, preg);
         Reg::Gather(scaleReg, scaleUb, index_vreg, preg);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
     }
-#endif
 }
 
 template <typename dstT, typename srcT, typename scaleT, const AscendDeQuantConfig& config>
@@ -389,32 +389,32 @@ __simd_vf__ inline void DeQuantPerGroupForColS32VF(
     Reg::RegTensor<scaleT> scaleVreg;
     Reg::RegTensor<float> scaleF32Vreg;
     Reg::RegTensor<scaleT> zeroVreg;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    if constexpr (SupportType<scaleT, half>()) {
+#else
     if constexpr (SupportType<scaleT, half, bfloat16_t>()) {
+#endif
         Reg::MaskReg b16FullPreg = Reg::CreateMask<uint16_t, Reg::MaskPattern::ALL>();
         Reg::Duplicate(zeroVreg, static_cast<scaleT>(0), b16FullPreg);
     } else {
-#endif
         Reg::MaskReg b32FullPreg = Reg::CreateMask<uint32_t, Reg::MaskPattern::ALL>();
         Reg::Duplicate(zeroVreg, static_cast<scaleT>(0), b32FullPreg);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
     }
-#endif
     for (uint16_t i = 0; i < static_cast<uint16_t>(rowNum); ++i) {
         sreg = para.n;
         for (uint16_t j = 0; j < repeat; ++j) {
             preg = Reg::UpdateMask<uint32_t>(sreg);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+            if constexpr (SupportType<scaleT, half>()) {
+#else
             if constexpr (SupportType<scaleT, half, bfloat16_t>()) {
+#endif
                 GetPerGroupScale<scaleT>(scaleUb + i * scaleK, j * vecLen, para, config, oriScaleVreg);
                 Reg::Interleave(scaleVreg, tempVreg, oriScaleVreg, zeroVreg);
                 Reg::Cast<float, scaleT, layoutZMrgZ>(scaleF32Vreg, scaleVreg, preg);
             } else {
-#endif
                 GetPerGroupScale<scaleT>(scaleUb + i * scaleK, j * vecLen, para, config, scaleF32Vreg);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
             }
-#endif
             Reg::LoadAlign<int32_t, Reg::LoadDist::DIST_NORM>(srcVreg, srcUb + i * para.n + j * vecLen);
             Reg::Cast<float, int32_t, MrgZRndA>(f32Vreg, srcVreg, preg);
             Reg::Mul<float, Reg::MaskMergeMode::ZEROING>(f32Vreg, f32Vreg, scaleF32Vreg, preg);
@@ -453,32 +453,32 @@ __simd_vf__ inline void DeQuantPerGroupForColF32VF(
     Reg::RegTensor<float> scaleF32Vreg;
     Reg::RegTensor<dstT> dstVreg;
     Reg::RegTensor<scaleT> zeroVreg;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    if constexpr (SupportType<scaleT, half>()) {
+#else
     if constexpr (SupportType<scaleT, half, bfloat16_t>()) {
+#endif
         Reg::MaskReg b16FullPreg = Reg::CreateMask<uint16_t, Reg::MaskPattern::ALL>();
         Reg::Duplicate(zeroVreg, static_cast<scaleT>(0), b16FullPreg);
     } else {
-#endif
         Reg::MaskReg b32FullPreg = Reg::CreateMask<uint32_t, Reg::MaskPattern::ALL>();
         Reg::Duplicate(zeroVreg, static_cast<scaleT>(0), b32FullPreg);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
     }
-#endif
     for (uint16_t i = 0; i < static_cast<uint16_t>(rowNum); ++i) {
         uint32_t sreg = para.n;
         for (uint16_t j = 0; j < repeat; ++j) {
             preg = Reg::UpdateMask<uint32_t>(sreg);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+            if constexpr (SupportType<scaleT, half>()) {
+#else
             if constexpr (SupportType<scaleT, half, bfloat16_t>()) {
+#endif
                 GetPerGroupScale<scaleT>(scaleUb + i * scaleK, j * vecLen, para, config, oriScaleVreg);
                 Reg::Interleave(scaleVreg, tempVreg, oriScaleVreg, zeroVreg);
                 Reg::Cast<float, scaleT, layoutZMrgZ>(scaleF32Vreg, scaleVreg, preg);
             } else {
-#endif
                 GetPerGroupScale<scaleT>(scaleUb + i * scaleK, j * vecLen, para, config, scaleF32Vreg);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
             }
-#endif
             Reg::LoadAlign<float, Reg::LoadDist::DIST_NORM>(srcVreg, srcUb + i * para.n + j * vecLen);
             Reg::Mul<float, Reg::MaskMergeMode::ZEROING>(f32Vreg, srcVreg, scaleF32Vreg, preg);
             StoreRes<dstT>(dstUb + i * para.n + j * vecLen, f32Vreg, preg);
@@ -511,16 +511,16 @@ __simd_callee__ inline void DeQuantPerGroupForRowTailBlock(
     for (uint16_t i = 0; i < tailRow; ++i) {
         uint32_t sreg = n;
         for (uint16_t j = 0; j < repeat; ++j) {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+            if constexpr (SupportType<scaleT, half>()) {
+#else
             if constexpr (SupportType<scaleT, half, bfloat16_t>()) {
+#endif
                 Reg::LoadAlign<scaleT, Reg::LoadDist::DIST_UNPACK_B16>(scaleVreg, scaleUb + j * vecLen);
                 Reg::Cast<float, scaleT, layoutZMrgZ>(f32ScaleVreg, scaleVreg, b32FullPreg);
             } else {
-#endif
                 Reg::LoadAlign<scaleT, Reg::LoadDist::DIST_NORM>(f32ScaleVreg, scaleUb + j * vecLen);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
             }
-#endif
             preg = Reg::UpdateMask<uint32_t>(sreg);
             Reg::LoadAlign<srcT, Reg::LoadDist::DIST_NORM>(srcVreg, srcUb + i * n + j * vecLen);
             if constexpr (SupportType<srcT, int32_t>()) {
@@ -553,17 +553,17 @@ __simd_vf__ inline void DeQuantPerGroupForRowVF(
         for (uint16_t j = 0; j < static_cast<uint16_t>(para.groupSize); ++j) {
             uint32_t sreg = para.n;
             for (uint16_t k = 0; k < repeat; ++k) {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                if constexpr (SupportType<scaleT, half>()) {
+#else
                 if constexpr (SupportType<scaleT, half, bfloat16_t>()) {
+#endif
                     Reg::LoadAlign<scaleT, Reg::LoadDist::DIST_UNPACK_B16>(
                         scaleVreg, scaleUb + i * para.n + k * vecLen);
                     Reg::Cast<float, scaleT, layoutZMrgZ>(f32ScaleVreg, scaleVreg, b32FullPreg);
                 } else {
-#endif
                     Reg::LoadAlign<scaleT, Reg::LoadDist::DIST_NORM>(f32ScaleVreg, scaleUb + i * para.n + k * vecLen);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
                 }
-#endif
                 preg = Reg::UpdateMask<uint32_t>(sreg);
                 Reg::LoadAlign<srcT, Reg::LoadDist::DIST_NORM>(
                     srcVreg, srcUb + (i * para.groupSize + j) * para.n + k * vecLen);
@@ -649,7 +649,13 @@ __aicore__ inline void AscendDequantImpl(
     CheckTensorPosition(scaleTensor, "scaleTensor", "VECIN, VECOUT, VECCALC");
     CheckTensorPosition(offsetTensor, "offsetTensor", "VECIN, VECOUT, VECCALC");
     static_assert(SupportType<srcT, int32_t, float>(), "AscendDequant only support int32_t/float input dtype");
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    static_assert(
+        SupportType<dstT, half, float>(), "AscendDequant only support half/float output dtype for l300/l311");
+    static_assert(
+        SupportType<scaleT, half, float>(),
+        "AscendDequant only support half/float scaleT dtype for l300/l311");
+#else
     static_assert(
         SupportType<dstT, bfloat16_t, half, float>(), "AscendDequant only support bfloat16_t/half/float output dtype");
     static_assert(
