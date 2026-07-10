@@ -64,6 +64,7 @@ if(NOT "${DPRODUCT_SIDE}" STREQUAL "device")
     DESTINATION ${INSTALL_LIBRARY_DIR}/asc/impl/adv_api/detail
     ${INSTALL_OPTIONAL} COMPONENT asc-devkit FILES_MATCHING
     PATTERN "*.h"
+    PATTERN "hccl" EXCLUDE
     PATTERN "CMakeLists.txt" EXCLUDE)
 
   # copy tiling to asc impl
@@ -78,7 +79,8 @@ if(NOT "${DPRODUCT_SIDE}" STREQUAL "device")
   install(
     DIRECTORY ${ASCENDC_INCLUDE_DIR}/adv_api/
     DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/
-    ${INSTALL_OPTIONAL} COMPONENT asc-devkit)
+    ${INSTALL_OPTIONAL} COMPONENT asc-devkit
+    REGEX "hccl/internal" EXCLUDE)
 
   # generate softlink
   configure_file(${ASCENDC_ADV_API_CMAKE_DIR}/kernel_headers.cmake
