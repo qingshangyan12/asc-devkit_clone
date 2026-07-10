@@ -34,7 +34,6 @@ public:
     template<typename DstRegType, typename SrcRegType, typename T, typename U, typename S>
     __simd_vf__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, S value, uint32_t dataSize)
     {
-        uint32_t sreg = static_cast<uint32_t>(dataSize);
         constexpr uint32_t oneRepSize = static_cast<uint32_t>(asc_get_vf_len() / sizeof(T));
         uint16_t repeat = static_cast<uint16_t>((dataSize + oneRepSize - 1) / oneRepSize);
 

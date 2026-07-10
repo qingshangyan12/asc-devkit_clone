@@ -32,9 +32,8 @@ template<typename CalcFunc, typename TraitType>
 class DualVF {
 public:
     template<typename RegType, typename T>
-    __simd_vf__ inline static void Run(__ubuf__ T* dst0, __ubuf__ T* dst1, __ubuf__ T* src0, __ubuf__ T* src1, const uint32_t dataSize)
+    __simd_vf__ inline static void Run(__ubuf__ T* dst0, __ubuf__ T* dst1, __ubuf__ T* src0, __ubuf__ T* src1, uint32_t dataSize)
     {
-        uint32_t sreg = static_cast<uint32_t>(dataSize);
         constexpr uint32_t oneRepSize = static_cast<uint32_t>(asc_get_vf_len() / sizeof(T));
         uint16_t repeat = static_cast<uint16_t>((dataSize + oneRepSize - 1) / oneRepSize);
 

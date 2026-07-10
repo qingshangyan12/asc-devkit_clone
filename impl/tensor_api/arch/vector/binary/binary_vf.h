@@ -32,9 +32,8 @@ template<typename CalcFunc, typename TraitType>
 class BinaryVF {
 public:
     template<typename RegType, typename T>
-    __simd_vf__ inline static void Run(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const uint32_t dataSize)
+    __simd_vf__ inline static void Run(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, uint32_t dataSize)
     {
-        uint32_t sreg = static_cast<uint32_t>(dataSize);
         constexpr uint32_t oneRepSize = static_cast<uint32_t>(asc_get_vf_len() / sizeof(T));
         uint16_t repeat = static_cast<uint16_t>((dataSize + oneRepSize - 1) / oneRepSize);
 
@@ -42,7 +41,7 @@ public:
         RegType reg_src0;
         RegType reg_src1;
         RegType reg_dst;
-        
+
         for (uint16_t i = 0; i < repeat; ++i) {
             vmask = Inst::UpdateMask::template Run<uint32_t>(dataSize);
             asc_loadalign(reg_src0, src0 + i * oneRepSize);
