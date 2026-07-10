@@ -10,7 +10,7 @@
 
 需要包含的头文件为：#include "tensor_api/tensor.h"。
 
-MakeFrameLayout用于根据标准分形排布模式构造带类型信息的Layout对象。该接口接收矩阵的行数、列数，结合指定的LayoutPattern（排布模式）和LayoutTrait（布局特征参数）计算Shape和Stride，构造Layout对象。
+MakeFrameLayout用于根据标准分形排布模式构造带布局特征信息的Layout对象。该接口接收矩阵的行数、列数，结合指定的LayoutPattern（排布模式）和LayoutTrait（布局特征参数）计算Shape和Stride，构造Layout对象。
 
 LayoutPattern决定数据在内存中的分形排列方式，不同存储位置间的搬运和计算操作要求源/目的张量满足特定的LayoutPattern组合。
 
@@ -23,9 +23,9 @@ __aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args)
 
 ### LayoutTrait的指定方式
 
-LayoutTrait用于指定数据类型和C0维度基数。MakeFrameLayout支持以下四种传递方式：
+LayoutTrait用于指定C0维度基数。MakeFrameLayout支持以下四种传递方式：
 
-1. **LayoutTraitDefault<T>**：指定数据类型T，C0自动计算。
+1. **LayoutTraitDefault<T>**：使用数据类型T计算C0，LayoutTrait本身不保存数据类型。
    ```cpp
    MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n)
    ```
@@ -40,11 +40,10 @@ LayoutTrait用于指定数据类型和C0维度基数。MakeFrameLayout支持以�
    MakeFrameLayout<NDLayoutPtn>(m, n)
    ```
 
-4. **自定义Trait传入**：传入一个自定义的Trait类型。适用于需要显式描述数据类型、C0大小或其他布局特征，且现有默认Trait、_C0或固定默认Trait都无法满足需求的场景。自定义Trait需要满足底层布局推导所要求的类型约定。
+4. **自定义Trait传入**：传入一个自定义的Trait类型。适用于需要显式描述C0大小或其他布局特征，且现有默认Trait、_C0或固定默认Trait都无法满足需求的场景。自定义Trait需要满足底层布局推导所要求的类型约定。
    ```cpp
    struct MyLayoutTrait {
-       using DataType = float;
-       static constexpr auto C0_SIZE = Std::Int<16>{};
+       static constexpr auto C0_ELEMENT = Std::Int<16>{};
    };
 
    MakeFrameLayout<NZLayoutPtn, MyLayoutTrait>(m, n)
@@ -91,8 +90,7 @@ auto l1TensorC0 = MakeTensor(MakeMemPtr<Location::L1>(l1Addr), layoutC0);
 
 // 自定义Trait构造
 struct MyLayoutTrait {
-    using DataType = float;
-    static constexpr auto C0_SIZE = Std::Int<16>{};
+    static constexpr auto C0_ELEMENT = Std::Int<16>{};
 };
 auto layoutCustom = MakeFrameLayout<NZLayoutPtn, MyLayoutTrait>(m, n);
 ```

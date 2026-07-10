@@ -170,7 +170,7 @@ struct InferLayoutPattern<Shape<Row, Column>, Stride<RowStride, ColumnStride>>
 template <typename Pattern, typename C0 = _1>
 struct BuildInferredLayoutTrait {
     using type = Std::conditional_t<Std::is_same_v<Pattern, Std::ignore_t>,
-        Std::ignore_t, LayoutTrait<Std::ignore_t, C0>>;
+        Std::ignore_t, LayoutTrait<C0>>;
 };
 
 template <typename ShapeType, typename StrideType>

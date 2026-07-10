@@ -38,7 +38,7 @@ using namespace AscendC::Te;
 
 using LayoutType = decltype(MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(16, 16));
 using Trait = GetLayoutTrait<LayoutType>;
-// Trait = LayoutTraitDefault<float>
+// Trait = LayoutTrait<_8>
 
 using PlainLayout = decltype(MakeLayout(MakeShape(16, 16), MakeStride(16, 1)));
 using PlainTrait = GetLayoutTrait<PlainLayout>;

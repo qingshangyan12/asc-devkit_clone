@@ -61,7 +61,7 @@ auto layout1 = MakePatternLayout<NZLayoutPtn, LayoutTraitDefault<>>(
 );
 
 // 示例2：构造带ND布局模式的Layout
-auto layout2 = MakePatternLayout<NDLayoutPtn, LayoutTrait<Std::ignore_t, _1>>(
+auto layout2 = MakePatternLayout<NDLayoutPtn, LayoutTrait<_1>>(
     MakeShape(32, 64),
     MakeStride(64, 1)
 );

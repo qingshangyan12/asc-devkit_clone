@@ -127,6 +127,12 @@ TEST_F(Tensor_Api_Frame_Layout, BatchFrameLayoutTraitForms)
     auto nzLayoutWithTrait = MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(2, 32, 64);
     auto nzLayoutWithDataType = MakeFrameLayout<NZLayoutPtn, float>(2, 32, 64);
     auto znLayoutWithC0 = MakeFrameLayout<ZNLayoutPtn, 8>(2, 32, 64);
+    using NzTraitWithDefault = GetLayoutTrait<decltype(nzLayoutWithTrait)>;
+    using NzTraitWithDataType = GetLayoutTrait<decltype(nzLayoutWithDataType)>;
+    static_assert(AscendC::Std::is_same_v<NzTraitWithDefault, LayoutTrait<_8>>,
+        "LayoutTraitDefault<T> should only be used to infer C0.");
+    static_assert(AscendC::Std::is_same_v<NzTraitWithDataType, LayoutTrait<_8>>,
+        "Data type argument should only be used to infer C0.");
 
     EXPECT_EQ(AscendC::Std::get<0>(GetShape(ndLayout)), 2);
     EXPECT_EQ(AscendC::Std::get<0>(GetStride(ndLayout)), 128);
@@ -295,7 +301,7 @@ TEST_F(Tensor_Api_Frame_Layout, OtherGroupDefaultTrait)
     auto nzLayout = MakeFrameLayout<NZLayoutPtn>(32, 64);
     auto znLayout = MakeFrameLayout<ZNLayoutPtn>(32, 64);
     auto zzLayout = MakeFrameLayout<ZZLayoutPtn>(32, 64);
-    auto nnLayout = MakeFrameLayout<NNLayoutPtn, LayoutTrait<fp8_e8m0_t, _2>>(16, 32);
+    auto nnLayout = MakeFrameLayout<NNLayoutPtn, LayoutTrait<_2>>(16, 32);
 
     EXPECT_EQ(AscendC::Std::get<0>(GetShape<0>(nzLayout)), 16);
     EXPECT_EQ(AscendC::Std::get<1>(GetShape<0>(nzLayout)), 2);
