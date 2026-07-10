@@ -100,7 +100,7 @@ __simd_callee__ inline void ReduceDataBlock(U& dstReg, U srcReg, MaskReg mask)
 
 ## 关键特性<a name="zh-cn_topic_0000002568852247_section18972943153217"></a>
 
-### ReduceType::SUM累加顺序<a name="ReduceType::SUM累加顺序"></a>
+### ReduceType::SUM累加顺序<a id="ReduceType::SUM累加顺序"></a>
 
 以二叉树累加的方式计算每个DataBlock内的和。
 
@@ -113,7 +113,7 @@ __simd_callee__ inline void ReduceDataBlock(U& dstReg, U srcReg, MaskReg mask)
 **图1** ReduceDataBlock示意图<a name="zh-cn_topic_0000002568852247_fig10524085414"></a>  
 ![ReduceDataBlock示意图](../../../../figures/reg_reduce_datablock_index.png "ReduceDataBlock示意图")
 
-### mask为空与srcReg异常值处理规则
+### mask为空与srcReg异常值处理规则<a id="mask为空与srcReg异常值处理规则"></a>
 
 - 对于归约求数据总和，当DataBlock中的元素均不参与计算时，将目的操作数数据类型的0写入dstReg。
 - 对于归约求最大值，当DataBlock中的元素均不参与计算时，将该数据类型的最小值写入dstReg。
