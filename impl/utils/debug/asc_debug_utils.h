@@ -309,7 +309,7 @@ __aicore__ static __attribute__((noinline)) void AscVFDebugInitUb()
 __aicore__ static __attribute__((noinline)) void AscVFDebugTransferUb()
 {
 #if !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 && \
-    !defined(__ASC_DISABLE_RESERVED_UBUF__) && defined(ASCENDC_SIMD_VF_DEBUG)
+    !defined(__ASC_DISABLE_RESERVED_UBUF__)
     if (g_sysPrintFifoSpace != nullptr) {
         pipe_barrier(PIPE_ALL);
         asc_vf_debug_ub2gm();
