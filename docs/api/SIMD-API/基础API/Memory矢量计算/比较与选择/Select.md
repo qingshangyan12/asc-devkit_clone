@@ -178,36 +178,36 @@ Kirin 9030，支持模式0、1、2。
 ## 数据类型
 
 - T支持的数据类型为：
-    <!-- npu="950" id25 -->
-Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t/uint8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float/complex32/int64_t/uint64_t/complex64。其中，int8\_t/uint8\_t/complex32/int64\_t/uint64\_t/complex64数据类型仅支持tensor前n个数据计算接口。
-    <!-- end id25 -->
+  <!-- npu="950" id25 -->
+  - Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t/uint8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float/complex32/int64_t/uint64_t/complex64。其中，int8\_t/uint8\_t/complex32/int64\_t/uint64\_t/complex64数据类型仅支持tensor前n个数据计算接口。
+  <!-- end id25 -->
     
-    <!-- npu="A3" id26 -->
-Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half/float。
-    <!-- end id26 -->
+  <!-- npu="A3" id26 -->
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half/float。
+  <!-- end id26 -->
     
-    <!-- npu="910b" id27 -->
-Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half/float。
-    <!-- end id27 -->
+  <!-- npu="910b" id27 -->
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half/float。
+  <!-- end id27 -->
     
-    <!-- npu="310b" id28 -->
-Atlas 200I/500 A2 推理产品，支持的数据类型为：half/float。
-    <!-- end id28 -->
+  <!-- npu="310b" id28 -->
+  - Atlas 200I/500 A2 推理产品，支持的数据类型为：half/float。
+  <!-- end id28 -->
     
-    <!-- npu="310p" id29 -->
-Atlas 推理系列产品AI Core，支持的数据类型为：half/float。
-    <!-- end id29 -->
+  <!-- npu="310p" id29 -->
+  - Atlas 推理系列产品AI Core，支持的数据类型为：half/float。
+  <!-- end id29 -->
     
-    <!-- npu="910" id30 -->
-Atlas 训练系列产品，支持的数据类型为：half/float。
-    <!-- end id30 -->
+  <!-- npu="910" id30 -->
+  - Atlas 训练系列产品，支持的数据类型为：half/float。
+  <!-- end id30 -->
     
-    <!-- npu="x90" id31 -->
-Kirin X90，支持的数据类型为：int8_t/uint8_t/int16_t/uint16_t/half/int32_t/uint32_t/float。
-    <!-- end id31 -->
+  <!-- npu="x90" id31 -->
+  - Kirin X90，支持的数据类型为：int8_t/uint8_t/int16_t/uint16_t/half/int32_t/uint32_t/float。
+  <!-- end id31 -->
     
-    <!-- npu="9030" id32 -->
-Kirin 9030，支持的数据类型为：int8_t/uint8_t/int16_t/uint16_t/half/int32_t/uint32_t/float。
+  <!-- npu="9030" id32 -->
+  - Kirin 9030，支持的数据类型为：int8_t/uint8_t/int16_t/uint16_t/half/int32_t/uint32_t/float。
     <!-- end id32 -->
 
 - U支持的数据类型为：uint8_t、uint16_t、uint32_t、uint64_t。

@@ -43,7 +43,7 @@
 - Unified Buffer -> Global Memory
     - VECOUT -> GM
     <!-- npu="310p" id1 -->
-CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
+    - CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
     <!-- end id1 -->
 
 ## 函数原型<a name="section1954364615315"></a>
