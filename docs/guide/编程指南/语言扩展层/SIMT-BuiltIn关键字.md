@@ -9,7 +9,7 @@
 <a name="table121121062614"></a>
 | 函数执行空间限定符 | 执行空间（Host） | 执行空间（Device） | 允许调用函数空间（Host） | 允许调用函数空间（Device） |
 | --- | --- | --- | --- | --- |
-| \_\_host\_\_， 无限定符 | √ | x | √ | x |
+| \_\_host\_\_，无限定符 | √ | x | √ | x |
 | \_\_aicore\_\_ | x | √ | x | √ |
 | \_\_global\_\_ | x | √ | √ | x |
 
@@ -37,7 +37,7 @@
 -   动态内存通过以下方式申请使用：
 
     ```
-    extern __ubuf__ half dynamicBuf[]; 
+    extern __ubuf__ half dynamicBuf[];
     ```
 
     动态内存的实际内存大小需要在核函数启动时配置，具体内容请参考[核函数配置](#section97005415463)。
@@ -149,10 +149,10 @@
 | signed short (16bit) | short2 | short3 | short4 |
 | unsigned int | uint2 | uint3 | uint4 |
 | signed int | int2 | int3 | int4 |
-| 无符号的长整型 (64bit) | ulonglong2 | ulonglong3 | ulonglong4 |
-| 有符号的长整型 (64bit) | longlong2 | longlong3 | longlong4 |
-| 无符号的长整型 (32bit) | ulong2 | ulong3 | ulong4 |
-| 有符号的长整型 (32bit) | long2 | long3 | long4 |
+| 无符号的长整型(64bit) | ulonglong2 | ulonglong3 | ulonglong4 |
+| 有符号的长整型(64bit) | longlong2 | longlong3 | longlong4 |
+| 无符号的长整型(32bit) | ulong2 | ulong3 | ulong4 |
+| 有符号的长整型(32bit) | long2 | long3 | long4 |
 | 浮点型，1符号位，2指数位，1尾数位 | float4_e2m1x2_t | - | - |
 | 浮点型，1符号位，1指数位，2尾数位 | float4_e1m2x2_t | - | - |
 | 浮点型，1符号位，4指数位，3尾数位 | float8_e4m3x2_t | - | - |
@@ -217,11 +217,13 @@ SIMT编程提供了一系列运算符，用于执行数学运算。以下是支�
 | 逻辑运算符 | ! | √ | √ | √ | x | x |
 | 条件运算符 | a ? b : c | √ | √ | √ | √ | x |
 
+> **约束说明**：除法运算符（/）当前不支持Subnormal（指数位全为0，且尾数位不全为0，表示接近零的极小值）输入，当输入为Subnormal值时会被刷为0。
+
 运算符使用示例如下所示：
 
 ```
 // 加法运算
-res[idx] = x[idx] + y[idx]; 
+res[idx] = x[idx] + y[idx];
 
 // 取反运算
 x[idx] = (-x[idx]);
@@ -274,7 +276,7 @@ add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, 
 
 在执行函数之前，会先对上述配置参数进行校验。如果blocks\_per\_grid或threads\_per\_block超出设备的最大允许规模，或dyn\_ubuf\_size超过分配静态内存后剩余的可用共享内存，该函数将会执行失败。
 
-一个核函数所使用的寄存器数量会显著影响常驻线程束的数量。核函数使用的寄存器数量通过 \_\_launch\_bounds\_\_\(\) 限定符或 \_\_maxnreg\_\_\(\) 限定符指定。
+一个核函数所使用的寄存器数量会显著影响常驻线程束的数量。核函数使用的寄存器数量通过 \_\_launch\_bounds\_\_\(\)限定符或 \_\_maxnreg\_\_\(\)限定符指定。
 
 使用上述两个可选配置的限定符时，请注意如下约束：
 -   \_\_launch\_bounds\_\_或\_\_maxnreg\_\_只能在\_\_global\_\_函数中使用。
@@ -283,9 +285,9 @@ add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, 
 在多线程并发执行时，每个线程使用较少的寄存器可以让更多的线程驻留在AI处理器上。因此，编译器会采用启发式算法，将寄存器溢出（register spilling）和指令数量控制在最低水平，同时尽量减少寄存器的使用量。应用程序可以通过在\_\_global\_\_函数定义中使用\_\_launch\_bounds\_\_\(\)限定符来限制启动边界（launch bounds），提供附加信息辅助编译器优化这一过程，这属于可选配置。
 
 -   \_\_launch\_bounds\_\_\(N\) <a name="li23861114618"></a>
-  
+
     函数标记宏，在核函数上可选配置，用于指定核函数启动的最大线程数。最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表，寄存器用于存储线程中的局部变量，若局部变量的个数超出寄存器个数，容易出现栈溢出等问题。建议最大线程数与启动核函数时的dim3线程数保持一致。
-    
+
     **表5**  \_\_launch\_bounds\_\_的Thread数量与每个Thread可用寄存器数
 
     <a name="table1715318510594"></a>
