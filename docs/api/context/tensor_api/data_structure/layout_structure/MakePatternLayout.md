@@ -12,7 +12,7 @@
 
 MakePatternLayout用于根据Shape、Stride、LayoutPattern和TraitType构造带布局模式信息的Layout对象。
 
-与[MakeLayout](./MakeLayout.md)相比，MakePatternLayout除了保存Shape和Stride外，还会在Layout类型中附加布局模式LayoutPattern和Trait信息。
+与[MakeLayout](./MakeLayout.md)相比，MakePatternLayout除了保存Shape和Stride外，还会在Layout类型中附加布局模式LayoutPattern和TraitType信息。TraitType用于记录布局构造和格式检查所需的C0维度基数，不作为Tensor的数据类型来源。
 
 ## 函数原型
 
@@ -28,7 +28,7 @@ __aicore__ inline constexpr auto MakePatternLayout(const ShapeType& shape, const
 | 参数名称 | 类型 | 描述 |
 | :------- | :--- | :--- |
 | LayoutPattern | 输入 | 布局模式类型，用于标记Layout的格式信息。 |
-| TraitType | 输入 | 布局trait类型，用于标记元素类型、C0粒度等附加属性。 |
+| TraitType | 输入 | 布局trait类型，用于记录C0维度基数。 |
 | ShapeType | 输入 | shape的类型，要求为元组(tuple)类型。 |
 | StrideType | 输入 | stride的类型，要求为元组(tuple)类型。 |
 
@@ -47,7 +47,7 @@ __aicore__ inline constexpr auto MakePatternLayout(const ShapeType& shape, const
 
 - shape和stride必须满足Layout构造要求，即都为元组类型。
 - LayoutPattern应为合法的布局模式类型，例如NZLayoutPtn、ZNLayoutPtn、NDLayoutPtn、DNLayoutPtn等。
-- TraitType应与LayoutPattern及后续使用场景匹配，否则可能导致后续格式检查或路由失败。
+- TraitType应包含C0_ELEMENT成员，且C0_ELEMENT应与Shape和Stride中表达的C0维度一致，否则可能导致后续格式检查或路由失败。
 
 ## 调用示例
 
