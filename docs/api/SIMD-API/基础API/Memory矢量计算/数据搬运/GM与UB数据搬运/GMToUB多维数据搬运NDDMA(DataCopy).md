@@ -71,7 +71,7 @@
 | 参数名 | 描述 |
 | :--- | :--- |
 | loopInfo | 每维进行搬运的信息，类型为NdDmaLoopInfo&lt;dim&gt;。<br>NdDmaLoopInfo结构中数组类型的参数，其数组索引值对应实际维度信息，索引0 - 4对应1 - 5维。具体参数介绍可参考[表5](#table_nddma_5)。 |
-| constantValue | 数据类型为T的数值，当存在维度左右Padding，且不使能NearestValueMode时，该值将作为Padding值填充。<br>当数据类型为b64时，参数constantValue的值应为0。 |
+| constantValue | 数据类型为T的数值，当存在维度左右Padding，且不使能NearestValueMode时，该值将作为Padding值填充。<br>当数据类型为b64时，参数constantValue的值应为0。<br>注：该参数不支持fp4×2_e2m1_t、fp4×2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t数据类型。 |
 
 **表5**  NdDmaLoopInfo结构体参数定义<a name="table_nddma_5"></a>
 
@@ -122,6 +122,8 @@ Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。
     ![](../../../../../figures/nddma_padding_2d.png)
 
 - 该接口通过NDDMA进行数据搬运，对应的NDDMA Cache大小为32KB，在使用DataCopy接口进行数据搬运前，需要使用NdDmaDci接口刷新缓存，否则多核场景下读写同一块Global Memory地址可能会导致部分核读取数据错误。
+
+- 参数constantValue不支持fp4×2_e2m1_t、fp4×2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t数据类型。
 
 ## 调用示例<a name="section122101199486"></a>
 
