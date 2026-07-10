@@ -1,12 +1,12 @@
 /**
- * Copyright (c) 2025 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
- * Please refer to the License for details. You may not use this file except in compliance with the License.
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
- * See LICENSE in the root of the software repository for the full text of the License.
- */
+* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
 
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
 #error "sys_var.h cannot be used with compile flag --enable-simt enabled."
@@ -67,59 +67,28 @@ __aicore__ inline int64_t asc_get_system_cycle();
 
 __aicore__ inline void asc_set_ctrl(uint64_t config);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-
 __aicore__ inline int64_t asc_get_ffts_base_addr();
-
 __aicore__ inline int64_t asc_get_core_id();
-
 __aicore__ inline uint64_t asc_get_overflow_status();
-
 __aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset);
-
 __aicore__ inline int64_t asc_get_program_counter();
-
 __aicore__ inline void asc_get_arch_ver(uint32_t& core_version);
-
 [[deprecated("NOTICE: asc_get_ar_spr is deprecated. "
-             "Please use asc_get_squeeze_status instead.")]] __aicore__ inline int64_t
-asc_get_ar_spr();
-
+             "Please use asc_get_squeeze_status instead.")]]
+__aicore__ inline int64_t asc_get_ar_spr();
 __aicore__ inline void asc_set_ffts_base_addr(uint64_t config);
-
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-
 __aicore__ inline constexpr int64_t asc_get_vf_len();
-
-__aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset);
-
-__aicore__ inline void asc_get_arch_ver(uint32_t& core_version);
-
-__aicore__ inline int64_t asc_get_core_id();
-
 __aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config);
-
 __aicore__ inline void asc_set_l3d_rpt_b(uint64_t config);
-
 __aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config);
-
 __aicore__ inline void asc_set_l13d_padding(uint64_t config);
-
 __aicore__ inline void asc_set_l13d_padding(half config);
-
 __aicore__ inline void asc_set_l13d_padding(int16_t config);
-
 __aicore__ inline void asc_set_l13d_padding(uint16_t config);
-
 __aicore__ inline void asc_set_l12l0_padding_val(uint64_t config);
-
 __aicore__ inline void asc_set_l0c2gm_quant_post(uint64_t config);
-
 __aicore__ inline void asc_set_l0c2gm_relu_alpha(uint64_t config);
-
 __aicore__ inline int64_t asc_get_squeeze_status();
-
-#endif
 
 #endif
 
