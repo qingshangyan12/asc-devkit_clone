@@ -288,7 +288,7 @@ PER\_TOKEN/PER\_GROUP b8/float4场景的计算逻辑如下：
 <tr id="row13892205418504"><td class="cellrowborder" valign="top" width="19.259999999999998%" headers="mcps1.2.3.1.1 "><p id="p10892554165011"><a name="p10892554165011"></a><a name="p10892554165011"></a>policy</p>
 </td>
 <td class="cellrowborder" valign="top" width="80.74%" headers="mcps1.2.3.1.2 "><p id="p10892185420508"><a name="p10892185420508"></a><a name="p10892185420508"></a>量化策略配置参数，枚举类型，可取值如下：</p>
-<a name="screen191844253917"></a><a name="screen191844253917"></a><pre class="screen" codetype="Cpp" id="screen191844253917">enum class AscendQuantPolicy : int32_t {
+<a name="screen191844253917"></a><a name="screen191844253917"></a><pre class="screen" codetype="Cpp" id="screen191844253917">enum class AscendAntiQuantPolicy : int32_t {
         PER_TENSOR, // 预留参数，暂不支持
         PER_CHANNEL, // 预留参数，暂不支持
         PER_TOKEN, // 配置为PER_TOKEN场景
@@ -544,7 +544,7 @@ PER\_TOKEN/PER\_GROUP b8/float4场景的计算逻辑如下：
 </td>
 <td class="cellrowborder" valign="top" width="72.34723472347235%" headers="mcps1.2.4.1.3 "><p id="p6205129543"><a name="p6205129543"></a><a name="p6205129543"></a>临时缓存。</p>
 <p id="p1120549049"><a name="p1120549049"></a><a name="p1120549049"></a><span id="zh-cn_topic_0000001530181537_ph173308471594_7"><a name="zh-cn_topic_0000001530181537_ph173308471594_7"></a><a name="zh-cn_topic_0000001530181537_ph173308471594_7"></a><span id="zh-cn_topic_0000001530181537_ph9902231466_7"><a name="zh-cn_topic_0000001530181537_ph9902231466_7"></a><a name="zh-cn_topic_0000001530181537_ph9902231466_7"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816_7"><a name="zh-cn_topic_0000001530181537_ph1782115034816_7"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816_7"></a>类型为<a href="LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
-<p id="p62051192418"><a name="p62051192418"></a><a name="p62051192418"></a>临时空间大小BufferSize的获取方式请参考<a href="GetAscendQuantMaxMinTmpSize.md">GetAscendQuantMaxMinTmpSize</a>。</p>
+<p id="p62051192418"><a name="p62051192418"></a><a name="p62051192418"></a>临时空间大小BufferSize的获取方式请参考<a href="GetAscendAntiQuantMaxMinTmpSize.md">GetAscendAntiQuantMaxMinTmpSize</a>。</p>
 <p id="p152052091048"><a name="p152052091048"></a><a name="p152052091048"></a><span id="ph142051991410"><a name="ph142051991410"></a><a name="ph142051991410"></a>Ascend 950PR/Ascend 950DT</span>，支持的数据类型为：uint8_t。</p>
 </td>
 </tr>
