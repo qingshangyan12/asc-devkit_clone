@@ -103,7 +103,7 @@
 
 <cann-filter npu-type = "950">
 
-Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。
+Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。其中b8数据类型不支持：fp4×2_e2m1_t、fp4×2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t。
 
 </cann-filter>
 
