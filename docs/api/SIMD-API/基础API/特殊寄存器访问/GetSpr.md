@@ -97,6 +97,8 @@ __aicore__ inline void Process()
     __ubuf__ float* xAddr = reinterpret_cast<__ubuf__ float*>(xLocal.GetPhyAddr());
     __ubuf__ float* yAddr = reinterpret_cast<__ubuf__ float*>(yLocal.GetPhyAddr());
     constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
+    AscendC::SetFlag<AscendC::HardEvent::V_S>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::V_S>(EVENT_ID0);
     uint16_t repeatTimes = DivCeil(256, oneRepeatSize);
 
     asc_vf_call<SqueezeVF<float>>(xAddr, yAddr, repeatTimes, oneRepeatSize);
@@ -104,8 +106,8 @@ __aicore__ inline void Process()
     // 可通过printf打印
     AscendC::printf("arNum的值为:%lld\n", arNum);
 
-    AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
-    AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+    AscendC::SetFlag<AscendC::HardEvent::S_MTE3>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::S_MTE3>(EVENT_ID0);
     AscendC::DataCopy(yGm, yLocal, 64);
 }
 ```
