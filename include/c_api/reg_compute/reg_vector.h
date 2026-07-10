@@ -549,25 +549,25 @@ __simd_callee__ inline void asc_unsqueeze(vector_uint32_t& dst, vector_bool mask
 __simd_callee__ inline void asc_unsqueeze(vector_int32_t& dst, vector_bool mask);
 
 // ==========asc_arange(int8_t/int16_t/int32_t/half/float)==========
-__simd_callee__ inline void asc_arange(vector_int8_t& dst, int8_t index);
+__simd_callee__ inline void asc_arange(vector_int8_t& dst, int8_t value);
 
-__simd_callee__ inline void asc_arange(vector_int16_t& dst, int16_t index);
+__simd_callee__ inline void asc_arange(vector_int16_t& dst, int16_t value);
 
-__simd_callee__ inline void asc_arange(vector_int32_t& dst, int32_t index);
+__simd_callee__ inline void asc_arange(vector_int32_t& dst, int32_t value);
 
-__simd_callee__ inline void asc_arange(vector_half& dst, half index);
+__simd_callee__ inline void asc_arange(vector_half& dst, half value);
 
-__simd_callee__ inline void asc_arange(vector_float& dst, float index);
+__simd_callee__ inline void asc_arange(vector_float& dst, float value);
 
-__simd_callee__ inline void asc_arange_descend(vector_int8_t& dst, int8_t index);
+__simd_callee__ inline void asc_arange_descend(vector_int8_t& dst, int8_t value);
 
-__simd_callee__ inline void asc_arange_descend(vector_int16_t& dst, int16_t index);
+__simd_callee__ inline void asc_arange_descend(vector_int16_t& dst, int16_t value);
 
-__simd_callee__ inline void asc_arange_descend(vector_int32_t& dst, int32_t index);
+__simd_callee__ inline void asc_arange_descend(vector_int32_t& dst, int32_t value);
 
-__simd_callee__ inline void asc_arange_descend(vector_half& dst, half index);
+__simd_callee__ inline void asc_arange_descend(vector_half& dst, half value);
 
-__simd_callee__ inline void asc_arange_descend(vector_float& dst, float index);
+__simd_callee__ inline void asc_arange_descend(vector_float& dst, float value);
 
 // ==========asc_cumulative_histogram/asc_frequency_histogram==========
 __simd_callee__ inline void asc_cumulative_histogram_bin0(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
@@ -579,11 +579,11 @@ __simd_callee__ inline void asc_frequency_histogram_bin0(vector_uint16_t& dst, v
 __simd_callee__ inline void asc_frequency_histogram_bin1(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
 
 // ==========asc_update_mask==========
-__simd_callee__ inline vector_bool asc_update_mask_b8(uint32_t& scalar);
+__simd_callee__ inline vector_bool asc_update_mask_b8(uint32_t& value);
 
-__simd_callee__ inline vector_bool asc_update_mask_b16(uint32_t& scalar);
+__simd_callee__ inline vector_bool asc_update_mask_b16(uint32_t& value);
 
-__simd_callee__ inline vector_bool asc_update_mask_b32(uint32_t& scalar);
+__simd_callee__ inline vector_bool asc_update_mask_b32(uint32_t& value);
 
 // ==========asc_sqrt(half/float)==========
 __simd_callee__ inline void asc_sqrt(vector_half& dst, vector_half src, vector_bool mask);
@@ -957,6 +957,10 @@ __simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_half src0, vec
 __simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
 __simd_callee__ inline void asc_exp_sub_v2(vector_float& dst, vector_half src0, vector_half src1, vector_bool mask);
+
+[[deprecated("NOTICE: asc_exp_sub_v2 in this parameter list is deprecated. "
+             "Please use asc_exp_sub instead.")]]
+__simd_callee__ inline void asc_exp_sub_v2(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
 // ==========asc_ln(half/float)==========
 __simd_callee__ inline void asc_ln(vector_half& dst, vector_half src, vector_bool mask);
