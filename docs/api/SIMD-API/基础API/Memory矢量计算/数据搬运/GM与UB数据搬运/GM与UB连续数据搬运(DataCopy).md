@@ -4,13 +4,27 @@
 
 | 产品 | 是否支持 |
 | :--- | :---: |
-|<cann-filter npu-type="950"> Ascend 950PR/Ascend 950DT | √ </cann-filter>|
-|<cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter>|
-|<cann-filter npu-type="910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter>|
-|<cann-filter npu-type="310b"> Atlas 200I/500 A2 推理产品 | √ </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品AI Core | √ </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | √ </cann-filter>|
-|<cann-filter npu-type="910"> Atlas 训练系列产品 | √ </cann-filter>|
+|<!-- npu="950" id1 -->
+Ascend 950PR/Ascend 950DT | √
+<!-- end id1 -->|
+|<!-- npu="A3" id2 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √
+<!-- end id2 -->|
+|<!-- npu="910b" id3 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √
+<!-- end id3 -->|
+|<!-- npu="310b" id4 -->
+Atlas 200I/500 A2 推理产品 | √
+<!-- end id4 -->|
+|<!-- npu="310p" id5 -->
+Atlas 推理系列产品AI Core | √
+<!-- end id5 -->|
+|<!-- npu="310p" id6 -->
+Atlas 推理系列产品Vector Core | √
+<!-- end id6 -->|
+|<!-- npu="910" id7 -->
+Atlas 训练系列产品 | √
+<!-- end id7 -->|
 
 ## 功能说明<a name="section474617392321"></a>
 
@@ -24,7 +38,9 @@
     - GM -> VECIN
 - Unified Buffer -> Global Memory
     - VECOUT -> GM
-    - <cann-filter npu-type="310p">CO2 -> GM（仅Atlas 推理系列产品AI Core支持）</cann-filter>
+    <!-- npu="310p" id8 -->
+CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
+<!-- end id8 -->
 
 ## 函数原型<a name="section1954364615315"></a>
 
@@ -67,47 +83,33 @@
 
 源操作数和目的操作数支持的数据类型保持一致，Global Memory -> Unified Buffer和Unified Buffer -> Global Memory两个数据通路对同一产品支持的数据类型相同，具体如下：
 
-<cann-filter npu-type="950">
-
+<!-- npu="950" id9 -->
 - Ascend 950PR/Ascend 950DT，支持的数据类型为：b8、b16、b32、b64。
+<!-- end id9 -->
 
-</cann-filter>
-
-<cann-filter npu-type="A3">
-
+<!-- npu="A3" id10 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。
+<!-- end id10 -->
 
-</cann-filter>
-
-<cann-filter npu-type="910b">
-
+<!-- npu="910b" id11 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。
+<!-- end id11 -->
 
-</cann-filter>
-
-<cann-filter npu-type="310b">
-
+<!-- npu="310b" id12 -->
 - Atlas 200I/500 A2 推理产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。
+<!-- end id12 -->
 
-</cann-filter>
-
-<cann-filter npu-type="310p">
-
+<!-- npu="310p" id13 -->
 - Atlas 推理系列产品AI Core，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float、int64_t、uint64_t、double。
+<!-- end id13 -->
 
-</cann-filter>
-
-<cann-filter npu-type="310p">
-
+<!-- npu="310p" id14 -->
 - Atlas 推理系列产品Vector Core，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float、int64_t、uint64_t、double。
+<!-- end id14 -->
 
-</cann-filter>
-
-<cann-filter npu-type="910">
-
+<!-- npu="910" id15 -->
 - Atlas 训练系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float、int64_t、uint64_t、double。
-
-</cann-filter>
+<!-- end id15 -->
 
 ## 返回值说明<a name="section44801012174220"></a>
 
@@ -121,15 +123,13 @@
 
     ![](../../../../../figures/datacopy_address_overlap_sync_diagram.png)
 
-<cann-filter npu-type="910b,A3">
-
+<!-- npu="910b,A3" id16 -->
 - 针对如下产品型号：
     - Atlas A2 训练系列产品/Atlas A2 推理系列产品
     - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 
     在跨卡通信算子开发场景，DataCopy类接口支持跨卡数据搬运，仅支持HCCS物理链路，不支持其他通路；开发者开发过程中，需要关注涉及卡间通信的物理通路，可通过`npu-smi info -t topo`命令查询HCCS物理链路。
-
-</cann-filter>
+<!-- end id16 -->
 
 ## 调用示例<a name="section122101199486"></a>
 
