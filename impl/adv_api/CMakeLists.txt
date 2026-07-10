@@ -80,7 +80,7 @@ if(NOT "${DPRODUCT_SIDE}" STREQUAL "device")
     DIRECTORY ${ASCENDC_INCLUDE_DIR}/adv_api/
     DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/
     ${INSTALL_OPTIONAL} COMPONENT asc-devkit
-    PATTERN "hccl" EXCLUDE)
+    REGEX "hccl/internal" EXCLUDE)
 
   # generate softlink
   configure_file(${ASCENDC_ADV_API_CMAKE_DIR}/kernel_headers.cmake
