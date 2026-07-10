@@ -13,6 +13,7 @@
 
 import os
 import numpy as np
+import argparse
 
 
 def nd_to_nz_for_matrix_a(data_nd):
@@ -71,7 +72,7 @@ def nd_to_nz_for_matrix_b(data_nd):
     return data_nz
 
 
-def gen_golden_data_simple():
+def gen_golden_data_simple(scenarioNum=1):
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
 
@@ -90,11 +91,20 @@ def gen_golden_data_simple():
     # 计算golden数据（使用ND格式计算）
     golden = (np.matmul(x1_nd.astype(np.float32), x2_nd.astype(np.float32))).astype(np.float32)
     
-    # 保存NZ格式的输入数据
-    x1_nz.tofile("./input/input_x.bin")
-    x2_nz.tofile("./input/input_y.bin")
+    if scenarioNum == 1:
+        # 保存NZ格式的输入数据
+        x1_nz.tofile("./input/input_x.bin")
+        x2_nz.tofile("./input/input_y.bin")
+    else:
+        x1_nd.tofile("./input/input_x.bin")
+        x2_nd.tofile("./input/input_y.bin")
+    print("x1_nz", x1_nz)
+    print("x2_nz", x2_nz)
     golden.tofile("./output/golden.bin")
 
 
 if __name__ == "__main__":
-    gen_golden_data_simple()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-scenarioNum', type=int, default=1, choices=[1, 2])
+    args = parser.parse_args()
+    gen_golden_data_simple(args.scenarioNum)
