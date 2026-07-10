@@ -5730,8 +5730,9 @@ __aicore__ inline void asc_bitsort_sync(
 
 // ==========asc_mrgsort4(half/float)==========
 __aicore__ inline void asc_mrgsort4(
-    __ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1,
-    uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+    __ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat,
+    uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3,
+    bool if_exhausted_suspension, uint8_t valid_bit)
 {
     asc_mrgsort4_impl(
         dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
@@ -5739,8 +5740,9 @@ __aicore__ inline void asc_mrgsort4(
 }
 
 __aicore__ inline void asc_mrgsort4_sync(
-    __ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1,
-    uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+    __ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat,
+    uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3,
+    bool if_exhausted_suspension, uint8_t valid_bit)
 {
     asc_mrgsort4_sync_impl(
         dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
@@ -5748,8 +5750,9 @@ __aicore__ inline void asc_mrgsort4_sync(
 }
 
 __aicore__ inline void asc_mrgsort4(
-    __ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1,
-    uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+    __ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat,
+    uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3,
+    bool if_exhausted_suspension, uint8_t valid_bit)
 {
     asc_mrgsort4_impl(
         dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
@@ -5757,8 +5760,9 @@ __aicore__ inline void asc_mrgsort4(
 }
 
 __aicore__ inline void asc_mrgsort4_sync(
-    __ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1,
-    uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+    __ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat,
+    uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3,
+    bool if_exhausted_suspension, uint8_t valid_bit)
 {
     asc_mrgsort4_sync_impl(
         dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
