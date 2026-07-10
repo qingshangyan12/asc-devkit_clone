@@ -48,7 +48,7 @@ function parseReadmeTree() {
 
   const rawEntries = []
   for (const line of lines) {
-    const m = line.match(/^(\s*)-\s+\[([^\]]+)\]\(([^)]+\.md)\)/)
+    const m = line.match(/^(\s*)-\s+\[([^\]]+)\]\((.+?\.md)\)/)
     if (!m) continue
     const indent = m[1].length
     const text = m[2].replace(/\\([\\`*_{}[\]()#+\-.!|~&<>])/g, '$1')
@@ -82,24 +82,28 @@ function parseReadmeTree() {
 
 function collectRawSections(nodes, vpApiDir) {
   const rawSections = []
+  const htmlToSecIdMap = {}
   let secCounter = 0
   let allCss = ''
   function walk(nodeList) {
     for (const node of nodeList) {
       const htmlRel = node.mdPath.replace(/\.md$/, '.html')
+      const normalizedRel = htmlRel.replace(/\\/g, '/')
       const htmlPath = path.join(vpApiDir, htmlRel)
       if (fs.existsSync(htmlPath)) {
         try {
           const parts = extractContent(htmlPath)
           if (!allCss && parts.css) allCss = parts.css
+          const secId = 'sec-' + secCounter
           rawSections.push({
             text: node.text,
             depth: node.depth,
             rawContent: parts.content,
-            relPath: htmlRel,
+            relPath: normalizedRel,
             htmlDir: path.dirname(htmlPath),
-            secId: 'sec-' + secCounter,
+            secId: secId,
           })
+          htmlToSecIdMap[normalizedRel] = secId
           secCounter++
         } catch (err) {
           console.warn('[gen-pdf]   skipping tree node ' + htmlRel + ': ' + err.message)
@@ -113,7 +117,7 @@ function collectRawSections(nodes, vpApiDir) {
     }
   }
   walk(nodes)
-  return { rawSections, allCss }
+  return { rawSections, allCss, htmlToSecIdMap }
 }
 
 function extractContent(htmlPath) {
@@ -195,6 +199,55 @@ function cleanContent(content, chipFilter) {
   return content
 }
 
+function fixInternalLinks(content, sourceRelPath, htmlToSecIdMap) {
+  return content.replace(/<a\s+([^>]*)>/gi, (fullMatch, attrs) => {
+    const hrefMatch = attrs.match(/href="([^"]*)"/i)
+    if (!hrefMatch) return fullMatch
+    const href = hrefMatch[1]
+
+    if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('mailto:')) {
+      return fullMatch
+    }
+
+    if (href.startsWith('#')) {
+      return fullMatch
+    }
+
+    let decoded
+    try {
+      decoded = decodeURIComponent(href)
+    } catch {
+      return fullMatch
+    }
+
+    const srcDir = sourceRelPath.includes('/') ? sourceRelPath.substring(0, sourceRelPath.lastIndexOf('/')) : ''
+    const parts = srcDir ? srcDir.split('/') : []
+    const targetParts = decoded.split('/')
+    const resolved = []
+    for (const part of parts) {
+      resolved.push(part)
+    }
+    for (const part of targetParts) {
+      if (part === '..') {
+        resolved.pop()
+      } else if (part && part !== '.') {
+        resolved.push(part)
+      }
+    }
+    const normalizedKey = resolved.join('/')
+
+    const targetSecId = htmlToSecIdMap[normalizedKey]
+    if (targetSecId) {
+      const newHref = '#' + targetSecId
+      const newAttrs = attrs.replace(/href="[^"]*"/i, 'href="' + newHref + '"')
+      return '<a ' + newAttrs + '>'
+    }
+
+    const newAttrs = attrs.replace(/href="[^"]*"/i, '')
+    return '<a ' + newAttrs + '>'
+  })
+}
+
 function escapeHtml(text) {
   return text
     .replace(/&/g, '&amp;')
@@ -207,10 +260,13 @@ function buildTocHtml(sections, pageNumbers) {
   const items = sections.map((s, i) => {
     const indent = (s.depth || 0) * 1.2
     const pageStr = pageNumbers ? String(pageNumbers[i] || '—') : '···'
+    const boldStyle = (s.depth || 0) === 0 ? ' font-weight:bold;' : ''
     return '<li class="toc-entry" data-sec="' + s.secId + '" style="margin-left:' + indent + 'em;">' +
-      '<a href="#' + s.secId + '">' + escapeHtml(s.text) + '</a>' +
-      '<span class="pdf-toc-pagenum">' + pageStr + '</span>' +
-      '</li>'
+      '<a href="#' + s.secId + '" class="toc-link" style="' + boldStyle + '">' +
+      '<span class="toc-text">' + escapeHtml(s.text) + '</span>' +
+      '<span class="toc-dots"></span>' +
+      '<span class="toc-page">' + pageStr + '</span>' +
+      '</a></li>'
   }).join('\n')
 
   return '<div class="pdf-toc">\n' +
@@ -301,11 +357,12 @@ async function injectMathJax(page) {
   await new Promise(resolve => setTimeout(resolve, 500))
 }
 
-async function renderBatchedPdf(browser, allCss, sections, options) {
+async function renderBatchedPdf(browser, allCss, sections, anchorToSecIdMap, options) {
   const BATCH_SIZE = 300
   const { PDFDocument } = require('pdf-lib')
   const mergedDoc = await PDFDocument.create()
   const sectionPageMap = {}
+  const allContentLinks = []
 
   const sharedCss = allCss + '\n' +
     '@page { size: A4; margin: 15mm 15mm 20mm 15mm; }\n' +
@@ -330,6 +387,23 @@ async function renderBatchedPdf(browser, allCss, sections, options) {
     const batch = sections.slice(start, end)
     console.log('[gen-pdf]   Render batch ' + (Math.floor(start / BATCH_SIZE) + 1) + ': sections ' + start + '-' + (end - 1))
 
+    const referencedSecIds = new Set()
+    for (const s of batch) {
+      const hrefRe = /href="#(sec-\d+)"/g
+      let m
+      while ((m = hrefRe.exec(s.content)) !== null) {
+        referencedSecIds.add(m[1])
+      }
+    }
+    const existingSecIds = new Set(batch.map(s => s.secId))
+    const missingSecIds = [...referencedSecIds].filter(id => !existingSecIds.has(id))
+    if (missingSecIds.length > 0) {
+      console.log('[gen-pdf]     Injecting ' + missingSecIds.length + ' cross-batch anchors: ' + missingSecIds.slice(0, 5).join(',') + (missingSecIds.length > 5 ? ' ...' : ''))
+    }
+    const anchorHtml = missingSecIds.length > 0
+      ? '\n' + missingSecIds.map(id => '<a id="' + id + '" style="position:absolute;left:-9999px;top:0"></a>').join('\n')
+      : ''
+
     const batchHtml = '<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n<meta charset="utf-8">\n<style>\n' +
       sharedCss + '\n</style>\n</head>\n<body>\n' +
       batch.map((s, i) => {
@@ -341,12 +415,46 @@ async function renderBatchedPdf(browser, allCss, sections, options) {
           '<div class="pdf-section-header">' + s.relPath + '</div>\n' +
           '<article class="markdown-body">' + body + '</article>\n</div>'
       }).join('\n') +
-      '\n</body>\n</html>'
+      anchorHtml + '\n</body>\n</html>'
 
     const page = await browser.newPage()
     try {
       await page.setContent(batchHtml, { waitUntil: 'load', timeout: 300000 })
       await injectMathJax(page)
+
+      const linkPositions = await page.evaluate(() => {
+        const links = []
+        const allA = document.querySelectorAll('a[href^="#sec-"]')
+        for (const a of allA) {
+          const href = a.getAttribute('href')
+          if (!href || !href.startsWith('#sec-')) continue
+          const rect = a.getBoundingClientRect()
+          links.push({
+            secId: href.substring(1),
+            top: rect.top,
+            height: rect.height,
+          })
+        }
+        return links
+      })
+
+      const ptPerPx = 72 / 96
+      const marginTopPt = 15 * 72 / 25.4
+      const pageHeightPt = 842
+      const contentHeightPt = pageHeightPt - marginTopPt - (20 * 72 / 25.4)
+      const contentHeightPx = contentHeightPt * 96 / 72
+
+      for (const lp of linkPositions) {
+        const batchPageIdx = Math.floor(lp.top / contentHeightPx)
+        const localPx = lp.top - batchPageIdx * contentHeightPx
+        const yPtFromTop = marginTopPt + localPx * ptPerPx
+        allContentLinks.push({
+          secId: lp.secId,
+          mergedPageIndex: globalPageOffset + batchPageIdx,
+          yPtFromTop: yPtFromTop,
+          heightPx: lp.height,
+        })
+      }
 
       const pdfData = await page.pdf({
         format: 'A4',
@@ -380,47 +488,56 @@ async function renderBatchedPdf(browser, allCss, sections, options) {
     }
   }
 
-  return { mergedDoc, sectionPageMap, totalPages: globalPageOffset }
+  return { mergedDoc, sectionPageMap, totalPages: globalPageOffset, allContentLinks }
+}
+
+async function renderTitlePdf(browser, pdfTitle) {
+  const title = pdfTitle || 'Ascend C API 完整文档'
+  const html = '<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n<meta charset="utf-8">\n<style>\n' +
+    '@page { size: A4; margin: 15mm 15mm 20mm 15mm; }\n' +
+    'body { margin: 0; padding: 0; }\n' +
+    '.pdf-title { font-size: 28px; text-align: center; margin: 200px 0 50px; font-family: sans-serif; }\n' +
+    '</style>\n</head>\n<body>\n' +
+    '<div class="pdf-title">' + escapeHtml(title) + '</div>\n' +
+    '</body>\n</html>'
+
+  const page = await browser.newPage()
+  try {
+    await page.setContent(html, { waitUntil: 'load', timeout: 300000 })
+    const pdfData = await page.pdf({
+      format: 'A4',
+      margin: { top: '15mm', bottom: '20mm', left: '15mm', right: '15mm' },
+      printBackground: true,
+      timeout: 300000,
+    })
+    const { PDFDocument } = require('pdf-lib')
+    const titleDoc = await PDFDocument.load(pdfData)
+    return { titleDoc, pageCount: titleDoc.getPageCount() }
+  } finally {
+    await page.close()
+  }
 }
 
 async function renderTocPdf(browser, allCss, sections, pageNumbers, pdfTitle) {
-  const title = pdfTitle || 'Ascend C API 完整文档'
   const tocHtml = buildTocHtml(sections, pageNumbers)
   const html = '<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n<meta charset="utf-8">\n<style>\n' +
     allCss + '\n' +
     '@page { size: A4; margin: 15mm 15mm 20mm 15mm; }\n' +
     'body { margin: 0; padding: 0; }\n' +
-    '.pdf-title { font-size: 28px; text-align: center; margin: 200px 0 50px; font-family: sans-serif; page-break-after: always; }\n' +
-    '.pdf-toc{page-break-after:always;padding:0 20px;}' +
+    '.pdf-toc{padding:0 20px;}' +
     '.pdf-toc-title{font-size:24px;text-align:center;margin:30px 0 20px;font-weight:bold;font-family:sans-serif;}' +
-    '.pdf-toc-list{list-style:none;padding:0;margin:0;font-size:11px;line-height:1.6;font-family:sans-serif;}' +
-    '.pdf-toc-list li{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}' +
-    '.pdf-toc-list a{text-decoration:none;color:#333;}' +
-    '.pdf-toc-pagenum{float:right;color:#666;font-variant-numeric:tabular-nums;margin-left:8px;}' +
+    '.pdf-toc-list{list-style:none;padding:0;margin:0;font-size:12px;line-height:1.8;font-family:sans-serif;}' +
+    '.pdf-toc-list li{overflow:hidden;}' +
+    '.toc-link{display:flex;align-items:baseline;text-decoration:none;color:#1a73e8;}' +
+    '.toc-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}' +
+    '.toc-dots{flex:1;border-bottom:1px dotted #999;margin:0 4px;min-width:20px;}' +
+    '.toc-page{white-space:nowrap;color:#333;font-variant-numeric:tabular-nums;}' +
     '</style>\n</head>\n<body>\n' +
-    '<div class="pdf-title">' + escapeHtml(title) + '</div>\n' +
     tocHtml + '\n</body>\n</html>'
 
   const page = await browser.newPage()
   try {
     await page.setContent(html, { waitUntil: 'load', timeout: 300000 })
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    const tocPositions = await page.evaluate(() => {
-      const positions = []
-      const entries = document.querySelectorAll('.toc-entry')
-      for (const entry of entries) {
-        const rect = entry.getBoundingClientRect()
-        positions.push({
-          secId: entry.dataset.sec || '',
-          top: rect.top + window.scrollY,
-          bottom: rect.bottom + window.scrollY,
-          height: rect.height,
-        })
-      }
-      return positions
-    })
-
     const pdfData = await page.pdf({
       format: 'A4',
       margin: { top: '15mm', bottom: '20mm', left: '15mm', right: '15mm' },
@@ -429,38 +546,144 @@ async function renderTocPdf(browser, allCss, sections, pageNumbers, pdfTitle) {
     })
     const { PDFDocument } = require('pdf-lib')
     const tocDoc = await PDFDocument.load(pdfData)
-    return { tocDoc, pageCount: tocDoc.getPageCount(), tocPositions }
+    return { tocDoc, pageCount: tocDoc.getPageCount() }
   } finally {
     await page.close()
   }
 }
 
-async function addTocLinkAnnotations(mergedDoc, tocPositions, sectionPageMap, tocPageCount) {
+async function collectTocPositions(browser, allCss, sections, pageNumbers, tocPageCount) {
+  const ptPerPx = 72 / 96
+  const marginTopPt = 15 * 72 / 25.4
+  const marginBottomPt = 20 * 72 / 25.4
+  const contentHeightPt = 842 - marginTopPt - marginBottomPt
+  const contentHeightPx = contentHeightPt * 96 / 72
+  const entryHeightPx = 21.6
+  const titleHeightPx = 30 + 24 * 96 / 72 + 20
+
+  const firstPageEntries = Math.floor((contentHeightPx - titleHeightPx) / entryHeightPx)
+  const otherPageEntries = Math.floor(contentHeightPx / entryHeightPx)
+
+  const tocCss = '@page { size: A4; margin: 15mm 15mm 20mm 15mm; }' +
+    'body { margin: 0; padding: 0; }' +
+    '.pdf-toc{padding:0 20px;}' +
+    '.pdf-toc-title{font-size:24px;text-align:center;margin:30px 0 20px;font-weight:bold;font-family:sans-serif;}' +
+    '.pdf-toc-list{list-style:none;padding:0;margin:0;font-size:12px;line-height:1.8;font-family:sans-serif;}' +
+    '.pdf-toc-list li{overflow:hidden;}' +
+    '.toc-link{display:flex;align-items:baseline;text-decoration:none;color:#1a73e8;}' +
+    '.toc-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}' +
+    '.toc-dots{flex:1;border-bottom:1px dotted #999;margin:0 4px;min-width:20px;}' +
+    '.toc-page{white-space:nowrap;color:#333;font-variant-numeric:tabular-nums;}'
+
+  const allEntries = []
+  const pPage = await browser.newPage()
+  try {
+    let secIdx = 0
+    for (let p = 0; p < tocPageCount; p++) {
+      const maxEntries = p === 0 ? firstPageEntries : otherPageEntries
+      let pageSections = sections.slice(secIdx, secIdx + maxEntries)
+      let pageNums = pageNumbers.slice(secIdx, secIdx + maxEntries)
+
+      let actualCount = pageSections.length
+      for (let attempt = 0; attempt < 3 && pageSections.length > 0; attempt++) {
+        let pageHtml = '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><style>' +
+          allCss + '\n' + tocCss + '</style></head><body>'
+
+        if (p === 0) {
+          pageHtml += '<div class="pdf-toc"><div class="pdf-toc-title">\u76EE\u5F55</div>'
+        } else {
+          pageHtml += '<div class="pdf-toc">'
+        }
+
+        pageHtml += '<ul class="pdf-toc-list">'
+        for (let i = 0; i < pageSections.length; i++) {
+          const s = pageSections[i]
+          const indent = (s.depth || 0) * 1.2
+          const pageStr = pageNums ? String(pageNums[i] || '\u2014') : '\u00B7\u00B7\u00B7'
+          const boldStyle = (s.depth || 0) === 0 ? ' font-weight:bold;' : ''
+          pageHtml += '<li class="toc-entry" data-sec="' + s.secId + '" style="margin-left:' + indent + 'em;">' +
+            '<a href="#' + s.secId + '" class="toc-link" style="' + boldStyle + '">' +
+            '<span class="toc-text">' + escapeHtml(s.text) + '</span>' +
+            '<span class="toc-dots"></span>' +
+            '<span class="toc-page">' + pageStr + '</span>' +
+            '</a></li>'
+        }
+        pageHtml += '</ul></div></body></html>'
+
+        await pPage.setContent(pageHtml, { waitUntil: 'load', timeout: 300000 })
+        await pPage.emulateMediaType('print')
+        await new Promise(resolve => setTimeout(resolve, 500))
+
+        if (attempt === 0) {
+          const pdfCheck = await pPage.pdf({
+            format: 'A4',
+            margin: { top: '15mm', bottom: '20mm', left: '15mm', right: '15mm' },
+            printBackground: true,
+            timeout: 300000,
+          })
+          const { PDFDocument: PDFTmp } = require('pdf-lib')
+          const checkDoc = await PDFTmp.load(pdfCheck)
+          if (checkDoc.getPageCount() <= 1) break
+          pageSections = pageSections.slice(0, pageSections.length - 1)
+          pageNums = pageNums.slice(0, pageNums.length - 1)
+          actualCount = pageSections.length
+          continue
+        }
+        break
+      }
+
+      const positions = await pPage.evaluate(() => {
+        const results = []
+        const entries = document.querySelectorAll('.toc-entry')
+        for (const entry of entries) {
+          const rect = entry.getBoundingClientRect()
+          results.push({
+            secId: entry.dataset.sec || '',
+            top: rect.top,
+            height: rect.height,
+          })
+        }
+        return results
+      })
+
+      for (const pos of positions) {
+        const yFromTopPt = marginTopPt + pos.top * ptPerPx
+        allEntries.push({
+          secId: pos.secId,
+          tocPageIndex: p + 1,
+          yFromTop: yFromTopPt,
+          height: pos.height,
+        })
+      }
+
+      secIdx += actualCount
+    }
+  } finally {
+    await pPage.close()
+  }
+
+  return allEntries
+}
+
+async function addTocLinkAnnotations(mergedDoc, tocEntries, sectionPageMap) {
   const { PDFName, PDFNumber } = require('pdf-lib')
   const context = mergedDoc.context
   const pages = mergedDoc.getPages()
+  const entryHeightPt = 21.6 * 72 / 96
 
-  const pageHeightPt = 842
-  const marginTopPt = 15 * 72 / 25.4
-  const contentHeightPt = pageHeightPt - marginTopPt - (20 * 72 / 25.4)
-  const pxPerPt = 96 / 72
-  const contentHeightPx = contentHeightPt * pxPerPt
-  const ptPerPx = 72 / 96
-
-  for (const pos of tocPositions) {
-    const secId = pos.secId
+  for (const entry of tocEntries) {
+    const secId = entry.secId
     const targetPageNum = sectionPageMap[secId]
     if (targetPageNum === undefined || targetPageNum === null) continue
 
     const targetPageIndex = targetPageNum - 1
     if (targetPageIndex < 0 || targetPageIndex >= pages.length) continue
 
-    const tocPageIndex = 1 + Math.floor(pos.top / contentHeightPx)
+    const tocPageIndex = entry.tocPageIndex
     if (tocPageIndex < 0 || tocPageIndex >= pages.length) continue
 
-    const localPx = pos.top - (tocPageIndex - 1) * contentHeightPx
-    const yPtFromTop = localPx * ptPerPx
-    const yPtFromBottom = 842 - marginTopPt - yPtFromTop - pos.height * ptPerPx
+    const yPtFromTop = entry.yFromTop
+    const yPtFromBottom = 842 - yPtFromTop - entryHeightPt
 
     const targetPage = pages[targetPageIndex]
     const dest = context.obj([
@@ -474,7 +697,7 @@ async function addTocLinkAnnotations(mergedDoc, tocPositions, sectionPageMap, to
     const linkAnnot = context.obj({
       Type: 'Annot',
       Subtype: 'Link',
-      Rect: [30, yPtFromBottom, 550, yPtFromBottom + pos.height * ptPerPx],
+      Rect: [30, yPtFromBottom, 550, yPtFromBottom + entryHeightPt],
       Dest: dest,
       Border: [0, 0, 0],
     })
@@ -489,7 +712,207 @@ async function addTocLinkAnnotations(mergedDoc, tocPositions, sectionPageMap, to
   }
 }
 
-async function buildOutlineForMergedPdf(mergedDoc, sections, sectionPageMap, tocPageCount) {
+function decodePdfDestName(name) {
+  if (!name || !name.includes('#')) return name
+  let decoded = ''
+  let i = 0
+  while (i < name.length) {
+    if (name[i] === '#' && i + 2 < name.length) {
+      const hex = name.substring(i + 1, i + 3)
+      if (/^[0-9A-Fa-f]{2}$/.test(hex)) {
+        const byte = parseInt(hex, 16)
+        decoded += String.fromCharCode(byte)
+        i += 3
+        continue
+      }
+    }
+    decoded += name[i]
+    i++
+  }
+  try {
+    return decodeURIComponent(decoded)
+  } catch {
+    return decoded
+  }
+}
+
+function fixContentLinkAnnotations(mergedDoc, sectionPageMap, anchorToSecIdMap) {
+  const { PDFName, PDFNumber, PDFArray } = require('pdf-lib')
+  const context = mergedDoc.context
+  const pages = mergedDoc.getPages()
+
+  const decodedMap = {}
+  for (const [key, val] of Object.entries(anchorToSecIdMap)) {
+    decodedMap[key] = val
+    const decoded = decodePdfDestName(key)
+    if (decoded !== key) decodedMap[decoded] = val
+  }
+
+  let fixedCount = 0
+  let notFoundCount = 0
+  let totalAnnots = 0
+  let namedDestCount = 0
+
+  for (let i = 0; i < pages.length; i++) {
+    const pg = pages[i]
+    const annotsRaw = pg.node.get(PDFName.of('Annots'))
+    if (!annotsRaw) continue
+
+    let annotsArray
+    try {
+      annotsArray = context.lookup(annotsRaw) || annotsRaw
+    } catch {
+      annotsArray = annotsRaw
+    }
+
+    if (!annotsArray || typeof annotsArray.size !== 'function') continue
+
+    for (let j = 0; j < annotsArray.size(); j++) {
+      let annot
+      try {
+        const annotRef = annotsArray.get(j)
+        annot = context.lookup(annotRef) || annotRef
+      } catch { continue }
+
+      if (!annot || typeof annot.get !== 'function') continue
+
+      totalAnnots++
+
+      const subtype = annot.get(PDFName.of('Subtype'))
+      if (!subtype) continue
+      const subStr = subtype.asString()
+      if (subStr !== 'Link' && subStr !== '/Link') continue
+
+      const dest = annot.get(PDFName.of('Dest'))
+      if (!dest) continue
+
+      if (!(dest instanceof PDFName)) continue
+      namedDestCount++
+
+      let destName = dest.asString()
+      if (destName.startsWith('/')) destName = destName.substring(1)
+
+      let targetSecId = null
+
+      if (destName.startsWith('sec-')) {
+        targetSecId = destName
+      } else {
+        targetSecId = decodedMap[destName] || decodedMap[decodePdfDestName(destName)] || null
+      }
+
+      if (!targetSecId) {
+        notFoundCount++
+        continue
+      }
+
+      const targetPageNum = sectionPageMap[targetSecId]
+      if (targetPageNum === undefined || targetPageNum === null) {
+        notFoundCount++
+        continue
+      }
+
+      const targetPageIndex = targetPageNum - 1
+      if (targetPageIndex < 0 || targetPageIndex >= pages.length) {
+        notFoundCount++
+        continue
+      }
+
+      const targetPage = pages[targetPageIndex]
+      const newDest = context.obj([
+        targetPage.ref,
+        PDFName.of('XYZ'),
+        PDFNumber.of(0),
+        PDFNumber.of(800),
+        PDFNumber.of(0),
+      ])
+
+      annot.delete(PDFName.of('Dest'))
+      annot.set(PDFName.of('Dest'), newDest)
+      fixedCount++
+    }
+  }
+
+  console.log('[gen-pdf]     Scanned ' + totalAnnots + ' annotations, ' + namedDestCount + ' named dests, fixed ' + fixedCount + ', ' + notFoundCount + ' unresolvable')
+}
+
+function addContentLinkAnnotations(mergedDoc, allContentLinks, sectionPageMap, titlePageCount) {
+  const { PDFName, PDFNumber } = require('pdf-lib')
+  const context = mergedDoc.context
+  const pages = mergedDoc.getPages()
+  const pageHeightPt = 842
+
+  let addedCount = 0
+  let skippedCount = 0
+
+  const existingAnnotsByPage = new Map()
+  for (let i = 0; i < pages.length; i++) {
+    const pg = pages[i]
+    const annotsRaw = pg.node.get(PDFName.of('Annots'))
+    if (annotsRaw) {
+      let arr
+      try { arr = context.lookup(annotsRaw) || annotsRaw; } catch { arr = annotsRaw; }
+      if (arr && typeof arr.size === 'function') {
+        existingAnnotsByPage.set(i, arr)
+      }
+    }
+  }
+
+  for (const link of allContentLinks) {
+    const targetPageNum = sectionPageMap[link.secId]
+    if (targetPageNum === undefined || targetPageNum === null) {
+      skippedCount++
+      continue
+    }
+
+    const targetPageIndex = targetPageNum - 1
+    if (targetPageIndex < 0 || targetPageIndex >= pages.length) {
+      skippedCount++
+      continue
+    }
+
+    const srcPageIndex = link.mergedPageIndex + titlePageCount
+    if (srcPageIndex < 0 || srcPageIndex >= pages.length) {
+      skippedCount++
+      continue
+    }
+
+    const srcPage = pages[srcPageIndex]
+    const targetPage = pages[targetPageIndex]
+
+    const yPtFromBottom = pageHeightPt - link.yPtFromTop - link.heightPx * 72 / 96
+
+    const dest = context.obj([
+      targetPage.ref,
+      PDFName.of('XYZ'),
+      PDFNumber.of(0),
+      PDFNumber.of(800),
+      PDFNumber.of(0),
+    ])
+
+    const linkAnnot = context.obj({
+      Type: 'Annot',
+      Subtype: 'Link',
+      Rect: [30, yPtFromBottom, 550, yPtFromBottom + link.heightPx * 72 / 96],
+      Dest: dest,
+      Border: [0, 0, 0],
+    })
+
+    const linkRef = context.register(linkAnnot)
+
+    let annotsArray = existingAnnotsByPage.get(srcPageIndex)
+    if (!annotsArray) {
+      annotsArray = context.obj([])
+      srcPage.node.set(PDFName.of('Annots'), annotsArray)
+      existingAnnotsByPage.set(srcPageIndex, annotsArray)
+    }
+    annotsArray.push(linkRef)
+    addedCount++
+  }
+
+  return addedCount
+}
+
+async function buildOutlineForMergedPdf(mergedDoc, sections, sectionPageMap, tocPageCount, titlePageCount) {
   const { PDFName, PDFHexString, PDFNumber, PDFDict, PDFArray } = require('pdf-lib')
   const context = mergedDoc.context
   const pages = mergedDoc.getPages()
@@ -577,6 +1000,9 @@ async function buildOutlineForMergedPdf(mergedDoc, sections, sectionPageMap, toc
 
   if (rootItems.length === 0) return
 
+  const tocItem = createOutlineItem('\u76EE\u5F55', titlePageCount)
+  rootItems.unshift(tocItem)
+
   linkSiblings(rootItems)
 
   const outlinesDict = PDFDict.withContext(context)
@@ -625,7 +1051,42 @@ function cleanOutputDir() {
   }
 }
 
-async function generateAllApiPdf(browser, allCss, rawSections, chipFilter) {
+function isSectionNotSupported(rawContent, chipFilter) {
+  if (chipFilter === 'all') return false
+
+  const supportIdx = rawContent.indexOf('<h2>产品支持情况')
+  if (supportIdx === -1) return false
+
+  const supportSection = rawContent.substring(supportIdx, supportIdx + 5000)
+
+  const nextH2Idx = supportSection.indexOf('<h2', 4)
+  const sectionEnd = nextH2Idx > 0 ? supportIdx + nextH2Idx : supportIdx + 5000
+  const supportBlock = rawContent.substring(supportIdx, sectionEnd)
+
+  const blockRegex = /<!--\s*npu\s*=\s*"([^"]*)"\s+\w+\s*-->([\s\S]*?)<!--\s*end\s+\w+\s*-->/gi
+  let match
+  let foundForChip = false
+  let hasSupport = false
+
+  while ((match = blockRegex.exec(supportBlock)) !== null) {
+    const npuType = match[1]
+    const innerContent = match[2]
+    const npuValues = npuType.split(',').map(s => s.trim())
+
+    if (npuValues.includes(chipFilter)) {
+      foundForChip = true
+      if (innerContent.includes('支持') && !innerContent.includes('不支持')) {
+        hasSupport = true
+      }
+    }
+  }
+
+  if (!foundForChip) return false
+
+  return !hasSupport
+}
+
+async function generateAllApiPdf(browser, allCss, rawSections, chipFilter, htmlToSecIdMap) {
   const chipOpt = CHIP_FILTER_OPTIONS.find(o => o.value === chipFilter)
   const chipDisplayName = chipOpt ? chipOpt.label : chipFilter
   const pdfFileName = chipFilter === 'all' ? 'ALL-API.pdf' : 'ALL-API-' + chipFilter + '.pdf'
@@ -633,35 +1094,54 @@ async function generateAllApiPdf(browser, allCss, rawSections, chipFilter) {
 
   console.log('[gen-pdf] Generating ' + pdfFileName + ' (filter=' + chipFilter + ')...')
 
+  let skippedCount = 0
   const sections = rawSections.map(rs => {
+    if (isSectionNotSupported(rs.rawContent, chipFilter)) {
+      skippedCount++
+      return null
+    }
     const cleaned = cleanContent(rs.rawContent, chipFilter)
     const fixed = fixImagePaths(cleaned, rs.htmlDir)
+    const linked = fixInternalLinks(fixed, rs.relPath, htmlToSecIdMap)
     return {
       text: rs.text,
       depth: rs.depth,
-      content: fixed,
+      content: linked,
       relPath: rs.relPath,
       secId: rs.secId,
     }
-  }).filter(s => s.content.trim().length > 0)
+  }).filter(s => s !== null && s.content.trim().length > 0)
 
   if (sections.length === 0) {
     console.warn('[gen-pdf]   No content after chip filtering for ' + chipFilter + ', skipping')
     return null
   }
 
-  console.log('[gen-pdf]   ' + sections.length + '/' + rawSections.length + ' sections have content')
+  const anchorToSecIdMap = {}
+  for (const s of sections) {
+    const idRe = /\bid="([^"]*)"/gi
+    let m
+    while ((m = idRe.exec(s.content)) !== null) {
+      anchorToSecIdMap[m[1]] = s.secId
+    }
+  }
+
+  console.log('[gen-pdf]   ' + sections.length + '/' + rawSections.length + ' sections have content (' + skippedCount + ' skipped by chip support)')
 
   console.log('[gen-pdf]   Step 1: Batch rendering content sections...')
-  const { mergedDoc, sectionPageMap, totalPages } = await renderBatchedPdf(browser, allCss, sections)
-  console.log('[gen-pdf]     Content rendered: ' + totalPages + ' pages')
+  const { mergedDoc, sectionPageMap, totalPages, allContentLinks } = await renderBatchedPdf(browser, allCss, sections, anchorToSecIdMap)
+  console.log('[gen-pdf]     Content rendered: ' + totalPages + ' pages, ' + allContentLinks.length + ' content links collected')
 
-  console.log('[gen-pdf]   Step 2: Rendering placeholder TOC...')
-  const { tocDoc: placeholderTocDoc, pageCount: tocPageCount, tocPositions } =
+  console.log('[gen-pdf]   Step 2: Rendering title page...')
+  const { titleDoc, pageCount: titlePageCount } = await renderTitlePdf(browser, pdfTitle)
+  console.log('[gen-pdf]     Title pages: ' + titlePageCount)
+
+  console.log('[gen-pdf]   Step 3: Rendering placeholder TOC (for page count)...')
+  const { pageCount: tocPageCount } =
     await renderTocPdf(browser, allCss, sections, sections.map(() => 1), pdfTitle)
   console.log('[gen-pdf]     TOC pages: ' + tocPageCount)
 
-  const titleOffset = 1 + tocPageCount
+  const titleOffset = titlePageCount + tocPageCount
   const adjustedPageMap = {}
   for (const [secId, pageNum] of Object.entries(sectionPageMap)) {
     adjustedPageMap[secId] = pageNum + titleOffset
@@ -671,29 +1151,44 @@ async function generateAllApiPdf(browser, allCss, rawSections, chipFilter) {
     return p !== undefined ? p : null
   })
 
-  console.log('[gen-pdf]   Step 3: Rendering final TOC...')
+  console.log('[gen-pdf]   Step 4: Rendering final TOC...')
   const { tocDoc: finalTocDoc } = await renderTocPdf(browser, allCss, sections, finalPageNumbers, pdfTitle)
 
-  console.log('[gen-pdf]   Step 4: Merging TOC + content...')
+  console.log('[gen-pdf]   Step 5: Collecting TOC entry positions (page-by-page)...')
+  const tocEntries = await collectTocPositions(browser, allCss, sections, finalPageNumbers, tocPageCount)
+  console.log('[gen-pdf]     Collected ' + tocEntries.length + ' entries')
+
+  console.log('[gen-pdf]   Step 6: Merging title + TOC + content...')
   const { PDFDocument } = require('pdf-lib')
   const tocPages = await mergedDoc.copyPages(finalTocDoc, Array.from({ length: finalTocDoc.getPageCount() }, (_, i) => i))
   for (let i = tocPages.length - 1; i >= 0; i--) {
     mergedDoc.insertPage(0, tocPages[i])
   }
+  const titlePages = await mergedDoc.copyPages(titleDoc, Array.from({ length: titleDoc.getPageCount() }, (_, i) => i))
+  for (let i = titlePages.length - 1; i >= 0; i--) {
+    mergedDoc.insertPage(0, titlePages[i])
+  }
 
-  console.log('[gen-pdf]   Step 5: Adding TOC link annotations...')
-  await addTocLinkAnnotations(mergedDoc, tocPositions, adjustedPageMap, tocPageCount)
+  console.log('[gen-pdf]   Step 7: Adding TOC link annotations...')
+  await addTocLinkAnnotations(mergedDoc, tocEntries, adjustedPageMap)
 
-  console.log('[gen-pdf]   Step 6: Building outline bookmarks...')
+  console.log('[gen-pdf]   Step 7b: Fixing content link annotations (Named Dest -> Direct Dest)...')
+  fixContentLinkAnnotations(mergedDoc, adjustedPageMap, anchorToSecIdMap)
+
+  console.log('[gen-pdf]   Step 7c: Adding cross-batch content link annotations...')
+  const crossBatchAdded = addContentLinkAnnotations(mergedDoc, allContentLinks, adjustedPageMap, titlePageCount + tocPageCount)
+  console.log('[gen-pdf]     Added ' + crossBatchAdded + ' cross-batch content links')
+
+  console.log('[gen-pdf]   Step 8: Building outline bookmarks...')
   let outlineFailed = false
   try {
-    await buildOutlineForMergedPdf(mergedDoc, sections, adjustedPageMap, tocPageCount)
+    await buildOutlineForMergedPdf(mergedDoc, sections, adjustedPageMap, tocPageCount, titlePageCount)
   } catch (outlineErr) {
     console.warn('[gen-pdf]     Outline build failed (non-fatal): ' + outlineErr.message)
     outlineFailed = true
   }
 
-  console.log('[gen-pdf]   Step 7: Saving ' + pdfFileName + '...')
+  console.log('[gen-pdf]   Step 9: Saving ' + pdfFileName + '...')
   let pdfBytes
   try {
     pdfBytes = await mergedDoc.save()
@@ -714,7 +1209,7 @@ async function generateAllApiPdf(browser, allCss, rawSections, chipFilter) {
   const pdfPath = path.join(outDir, pdfFileName)
   fs.writeFileSync(pdfPath, pdfBytes)
   const sizeMB = (fs.statSync(pdfPath).size / (1024 * 1024)).toFixed(1)
-  console.log('[gen-pdf]   OK ' + pdfFileName + ' (' + sizeMB + ' MB, ' + (totalPages + tocPageCount + 1) + ' pages)')
+  console.log('[gen-pdf]   OK ' + pdfFileName + ' (' + sizeMB + ' MB, ' + (totalPages + titlePageCount + tocPageCount) + ' pages)')
 
   return pdfFileName
 }
@@ -758,7 +1253,7 @@ async function main() {
   }
 
   console.log('[gen-pdf] Extracting raw content from tree (' + tree.length + ' root nodes)...')
-  const { rawSections, allCss } = collectRawSections(tree, apiDir)
+  const { rawSections, allCss, htmlToSecIdMap } = collectRawSections(tree, apiDir)
   if (rawSections.length === 0) {
     console.warn('[gen-pdf] No sections extracted, exiting')
     process.exit(0)
@@ -788,7 +1283,7 @@ async function main() {
     await Promise.all(browserQueues.map(async (queue, bi) => {
       for (const chipFilter of queue) {
         try {
-          const pdfFile = await generateAllApiPdf(browsers[bi], allCss, rawSections, chipFilter)
+          const pdfFile = await generateAllApiPdf(browsers[bi], allCss, rawSections, chipFilter, htmlToSecIdMap)
           if (pdfFile) {
             const key = chipFilter === 'all' ? '__ALL__' : '__' + chipFilter + '__'
             manifest[key] = pdfFile
