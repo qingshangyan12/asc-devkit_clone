@@ -10,7 +10,7 @@
 
 在非昇腾设备上，开发者可以利用CPU仿真环境先行进行算子开发和测试，并在准备就绪后，利用昇腾设备进行加速计算。在[编译与运行](../../编译与运行/编译与运行.md)章节，我们已经介绍了算子Kernel程序NPU域的编译运行。相比于NPU域的算子运行逻辑，CPU域调试将算子Kernel程序以Host程序的形式进行编译，此时算子Kernel程序链接CPU调测库，执行编译生成的可执行文件，可以完成算子CPU域的运行验证。CPU侧的运行程序，通过GDB通用调试工具进行单步调试，可以精准验证程序执行流程是否符合预期。
 
-**图1**  CPU域和NPU域的核函数运行逻辑对比<a name="fig39851716019"></a>  
+**图1**  CPU域和NPU域的核函数运行逻辑对比<a name="fig39851716019"></a>
 ![](../../../figures/CPU域和NPU域的核函数运行逻辑对比.png "CPU域和NPU域的核函数运行逻辑对比")
 
 推荐使用CMake编译方式，可在最小化修改的情况下快速开启CPU域孪生调试功能。
@@ -35,7 +35,7 @@
 
     其他CMakeLists.txt项目配置[通过CMake编译](../../编译与运行/算子编译/AI-Core算子编译基本用法.md#ZH-CN_TOPIC_0000002428982142)进行编写。
 
->[!NOTE] 说明 
+>[!NOTE] 说明
 >为了实现CPU域与NPU域代码归一，框架在CPU域中仅对部分acl接口进行适配，开发者在使用CPU域调测功能时，仅支持使用如下acl接口，并且不支持用户自行链接**ascendcl库**：
 >- 有实际功能接口，支持CPU域调用
 >    - aclDataTypeSize、aclFloat16ToFloat、aclFloatToFloat16。
@@ -50,30 +50,30 @@
 
 > [!CAUTION] 注意
 > 在CPU孪生调试模式下，编译器不识别Ascend C提供的[SIMD-BuiltIn关键字](../../语言扩展层/SIMD-BuiltIn关键字.md)及[SIMT-BuiltIn关键字](../../语言扩展层/SIMT-BuiltIn关键字.md)，包括
-> - **函数执行空间限定符**：如 `__aicore__`、`__global__`、`__host__` 等;
-> - **函数标记宏**：如 `__simd_vf__`、`__simd_callee__`、`__simt_vf__` 等；
-> - **地址空间限定符**：如 `__gm__` 、`__ubuf__` 等。
+> - **函数执行空间限定符**：如`__aicore__`、`__global__`、`__host__`等;
+> - **函数标记宏**：如`__simd_vf__`、`__simd_callee__`、`__simt_vf__`等；
+> - **地址空间限定符**：如`__gm__` 、`__ubuf__`等。
 >
 > 这些关键字与Device侧执行强相关，在CPU孪生调试模式下无需实际生效，因此系统框架将这些关键字定义为空。
 > 由于这种置空处理，**仅通过BuiltIn关键字区分的函数签名将被视为相同**，会导致重定义编译错误。
-> 
+>
 > 典型问题场景包括：
 > 1. **Device侧函数与Host侧函数同名**
-> 
+>
 > <blockquote>
-> 如下例中，`add` 函数仅通过 `__aicore__` 区分运行域，在CPU孪生调试模式下两个声明将冲突：
+> 如下例中，`add`函数仅通过`__aicore__`区分运行域，在CPU孪生调试模式下两个声明将冲突：
 > 	<pre><code class="language-asc">__aicore__ inline void add(int x, int y);  // Device侧
 > void add(int x, int y);                    // Host侧（等同于 __host__）</code></pre>
 > </blockquote>
 >
 > 2. **参数类型仅有地址空间限定符不同**
-> 
+>
 > <blockquote>
 > 如下例中，两个Device侧函数仅在指针的地址空间限定符上不同：
 > 	<pre><code class="language-asc">__aicore__ inline void process(__gm__ void* data, int size);
 > __aicore__ inline void process(__ubuf__ void* data, int size); </code></pre>
 > </blockquote>
-> 
+>
 > **在孪生调试场景下需特别注意**：请勿定义仅依赖BuiltIn关键字来区分的函数。
 
 ## gdb调试<a name="section13838280458"></a>
@@ -127,7 +127,7 @@
 
     ```
     (gdb) info inferiors
-      Num  Description 
+      Num  Description
     * 1    process 19613
       2    process 19626
     ```
@@ -168,6 +168,6 @@ quit
 在代码中直接编写printf\(...\)来观察数值的输出。样例代码如下：
 
 ```
-printf("xLocal size: %d\n", xLocal.GetSize()); 
+printf("xLocal size: %d\n", xLocal.GetSize());
 printf("tileLength: %d\n", tileLength);
 ```

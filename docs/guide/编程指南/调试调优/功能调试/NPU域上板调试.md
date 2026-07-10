@@ -6,14 +6,14 @@ NPU域上板调试手段主要包含上板数据打印、msSanitizer内存异常
 
 printf主要用于打印标量和字符串信息，SIMT编程及SIMD编程均支持。
 
-printf示例如下，printf接口的使用说明和具体约束请参考[printf](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/Utils-API/调测接口/printf-290.md)。
+printf示例如下，printf接口的使用说明和具体约束请参考[printf](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/调测接口/printf-290.md)。
 
 ```
 printf("fmt string %d", 0x123);
 ```
 
 >[!NOTE]说明
->printf接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需关闭打印功能。具体方法请参考[printf](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/Utils-API/调测接口/printf-290.md)。
+>printf接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需关闭打印功能。具体方法请参考[printf](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/调测接口/printf-290.md)。
 
 ## SIMD编程通过DumpTensor打印进行调试<a name="section16452184823718"></a>
 
@@ -23,7 +23,7 @@ DumpTensor是SIMD编程场景独有的打印功能，用于NPU域上板打印指
 
 在算子kernel侧实现代码中需要输出日志信息的地方调用DumpTensor接口打印相关内容。
 
-如下所示，srcLocal表示待打印的Tensor；5表示用户的自定义附加信息，比如当前的代码行号；dataLen表示元素个数。DumpTensor接口的使用说明和具体约束请参考[DumpTensor](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md)。
+如下所示，srcLocal表示待打印的Tensor；5表示用户的自定义附加信息，比如当前的代码行号；dataLen表示元素个数。DumpTensor接口的使用说明和具体约束请参考[DumpTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md)。
 
 ```
 DumpTensor(srcLocal,5, dataLen);
@@ -46,7 +46,7 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
 ```
 
 > [!NOTE] 说明
-> DumpTensor接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需关闭打印功能。具体方法请参考[DumpTensor](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md)。
+> DumpTensor接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需关闭打印功能。具体方法请参考[DumpTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md)。
 
 ## 使用msSanitizer工具进行异常检测<a name="section931475414217"></a>
 
@@ -57,11 +57,11 @@ msSanitizer工具是基于AI处理器的异常检测工具，包含了单算子�
 -   未初始化检测：工具可以协助用户定位由于内存未初始化可能导致的脏数据读取问题。
 -   同步检测：工具可以协助用户定位由于前序算子中的未配对同步指令导致的后续算子同步失败的问题。
 
-具体使用方法请参考[《算子开发工具用户指南》](https://hiascend.com/document/redirect/CannCommercialToolOpDev)。
+具体使用方法请参考[《msSanitizer用户指南》](https://gitcode.com/Ascend/mssanitizer/blob/master/docs/zh/user_guide/mssanitizer_user_guide.md)。
 
 **异常检测程序编译**
 ```shell
-// bisheng编译时 增加sanitizer命令行
+// bisheng编译时增加sanitizer命令行
 bisheng add_custom.asc -o add_custom --sanitizer -lineinfo
 ```
 **异常检测工具的使用**
@@ -92,7 +92,7 @@ msDebug是一款面向昇腾设备的算子调试工具，用于调试NPU侧运�
 
 #### 调试程序编译
 ```shell
-// bisheng编译时 增加debug命令行
+// bisheng编译时增加debug命令行
 bisheng add_custom.asc -o add_custom  -O0 -g
 ```
 #### 调试程序运行
@@ -139,7 +139,7 @@ Breakpoint 1: where = device_debugdata`_ZN17MatmulLeakyKernelIDhDhffE7CopyOutEj_
 (msdebug) s
 Process 177943 stopped
 [Switching to focus on Kernel matmul_leakyrelu_custom, CoreId 44, Type aiv]
-* thread #1, name = 'matmul_leakyrelu', stop reason = step over   //   通过回显可查看pc的位置，表示单步成功 
+* thread #1, name = 'matmul_leakyrelu', stop reason = step over   //   通过回显可查看pc的位置，表示单步成功
     frame #0: 0x000000000000f048 device_debugdata`_ZN17MatmulLeakyKernelIDhDhffE10CalcOffsetEiiRK11TCubeTilingRiS4_S4_S4__mix_aiv(this=0x0000000000217b60, blockIdx=0, usedCoreNum=2, tiling=0x0000000000217e28, offsetA=0x00000000002175c8, offsetB=0x00000000002175c4, offsetC=0x00000000002175c0, offsetBias=0x00000000002175bc) at matmul_leakyrelu_kernel.cpp:130:18
    127      offsetA = mCoreIndx * tiling.Ka * tiling.singleCoreM;
    128      offsetB = nCoreIndx * tiling.singleCoreN;
@@ -169,4 +169,4 @@ export ASCEND_DUMP_PATH=./
 ```shell
 msdebug --core output2/extra-info/data-dump/0/xxx.core add_custom
 ```
-更多详细信息可以参考[《算子调试（msDebug）》](https://hiascend.com/document/redirect/mindstudio-op-msdebug)。
+更多详细信息可以参考[《msDebug用户指南》](https://gitcode.com/Ascend/msdebug/blob/master/docs/zh/user_guide/msdebug_user_guide.md)。
