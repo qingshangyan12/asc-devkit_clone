@@ -4,13 +4,13 @@
 
 | 产品 | 是否支持  |
 | :----------------------- | :------: |
-| <cann-filter npu-type="950"><term>Ascend 950PR/Ascend 950DT</term> | √</cann-filter> |
-| <cann-filter npu-type="A3"><term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> | x</cann-filter> |
-| <cann-filter npu-type="910b"><term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> | x</cann-filter> |
-| <cann-filter npu-type="310b"><term>Atlas 200I/500 A2 推理产品</term> | x</cann-filter> |
-| <cann-filter npu-type="310p"><term>Atlas 推理系列产品AI Core</term> | x</cann-filter> |
-| <cann-filter npu-type="310p"><term>Atlas 推理系列产品Vector Core</term> | x</cann-filter> |
-| <cann-filter npu-type="910"><term>Atlas 训练系列产品</term> | x</cann-filter> |
+| <!-- npu="950" id1 --><term>Ascend 950PR/Ascend 950DT</term> | √ |
+| <!-- npu="A3" id2 --><term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> | x |
+| <!-- npu="910b" id3 --><term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> | x |
+| <!-- npu="310b" id4 --><term>Atlas 200I/500 A2 推理产品</term> | x |
+| <!-- npu="310p" id5 --><term>Atlas 推理系列产品AI Core</term> | x |
+| <!-- npu="310p" id6 --><term>Atlas 推理系列产品Vector Core</term> | x |
+| <!-- npu="910" id7 --><term>Atlas 训练系列产品</term> | x |
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
