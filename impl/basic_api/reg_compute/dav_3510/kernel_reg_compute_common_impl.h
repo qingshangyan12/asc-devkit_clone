@@ -139,8 +139,9 @@ __simd_callee__ inline void TraitTwoToTraitOneTmpl(T& dstReg, U& srcReg)
         (RegTensor<ShortType>&)srcReg.reg[1]);
 }
 
+// b32->b16 and b16->b8
 template <RegLayout layoutMode>
-__simd_callee__ inline void AdjustMaskRatio2(MaskReg& dstMask, MaskReg& srcMask)
+__simd_callee__ inline void AdjustMaskUpRatio2(MaskReg& dstMask, MaskReg& srcMask)
 {
     if constexpr (layoutMode == RegLayout::ZERO) {
         ppack(dstMask, srcMask, HILO_LOWEST);
@@ -149,8 +150,20 @@ __simd_callee__ inline void AdjustMaskRatio2(MaskReg& dstMask, MaskReg& srcMask)
     }
 }
 
+// b16->b32 and b8->b16
 template <RegLayout layoutMode>
-__simd_callee__ inline void AdjustMaskRatio4(MaskReg& dstMask, MaskReg& srcMask)
+__simd_callee__ inline void AdjustMaskDownRatio2(MaskReg& dstMask, MaskReg& srcMask)
+{
+    if constexpr (layoutMode == RegLayout::ZERO) {
+        punpack(dstMask, srcMask, HILO_LOWEST);
+    } else {
+        punpack(dstMask, srcMask, HILO_HIGHEST);
+    }
+}
+
+// b32->b8
+template <RegLayout layoutMode>
+__simd_callee__ inline void AdjustMaskUpRatio4(MaskReg& dstMask, MaskReg& srcMask)
 {
     MaskReg tmp;
     if constexpr (layoutMode == RegLayout::ZERO) {
@@ -168,19 +181,39 @@ __simd_callee__ inline void AdjustMaskRatio4(MaskReg& dstMask, MaskReg& srcMask)
     }
 }
 
+// b8->b32
+template <RegLayout layoutMode>
+__simd_callee__ inline void AdjustMaskDownRatio4(MaskReg& dstMask, MaskReg& srcMask)
+{
+    MaskReg tmp;
+    if constexpr (layoutMode == RegLayout::ZERO) {
+        punpack(tmp, srcMask, HILO_LOWEST);
+        punpack(dstMask, tmp, HILO_LOWEST);
+    } else if constexpr (layoutMode == RegLayout::ONE) {
+        punpack(tmp, srcMask, HILO_LOWEST);
+        punpack(dstMask, tmp, HILO_HIGHEST);
+    } else if constexpr (layoutMode == RegLayout::TWO) {
+        punpack(tmp, srcMask, HILO_HIGHEST);
+        punpack(dstMask, tmp, HILO_LOWEST);
+    } else {
+        punpack(tmp, srcMask, HILO_HIGHEST);
+        punpack(dstMask, tmp, HILO_HIGHEST);
+    }
+}
+
 template <typename T, typename U = DefaultType, RegLayout srcLayout = RegLayout::ZERO>
 __simd_callee__ inline void AdjustMaskForCastMerge(MaskReg& dstMask, MaskReg& srcMask)
 {
     if constexpr (std::is_same_v<U, DefaultType>) {
         dstMask = srcMask;
     } else if constexpr (sizeof(U) / sizeof(T) == 2) {
-        AdjustMaskRatio2<srcLayout>(dstMask, srcMask);
+        AdjustMaskUpRatio2<srcLayout>(dstMask, srcMask);
     } else if constexpr (sizeof(U) / sizeof(T) == 4) {
-        AdjustMaskRatio4<srcLayout>(dstMask, srcMask);
+        AdjustMaskUpRatio4<srcLayout>(dstMask, srcMask);
     } else if constexpr (sizeof(T) / sizeof(U) == 2) {
-        AdjustMaskRatio2<srcLayout>(dstMask, srcMask);
+        AdjustMaskDownRatio2<srcLayout>(dstMask, srcMask);
     } else if constexpr (sizeof(T) / sizeof(U) == 4) {
-        AdjustMaskRatio4<srcLayout>(dstMask, srcMask);
+        AdjustMaskDownRatio4<srcLayout>(dstMask, srcMask);
     } else {
         dstMask = srcMask;
     }
