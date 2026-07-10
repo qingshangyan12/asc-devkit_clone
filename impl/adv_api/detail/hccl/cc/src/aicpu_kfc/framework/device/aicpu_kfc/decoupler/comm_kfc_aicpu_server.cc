@@ -490,6 +490,10 @@ HcclResult CommKfcAicpuServer::FormatOpParamFromMsg(
         CHK_PTR_NULL(baseParam);
         stream = baseParam->stream;
     }
+    HCCL_ERROR("[AICPU KFC diag] FormatOpParamFromMsg: baseOpParamSize=%zu, msgCommType=%u, repeatIdx=%u, "
+               "resourceType=%u, opParamSize=%zu.",
+               execCtx.baseOpParam.size(), static_cast<u32>(msg.commType.prepareType),
+               repeatIdx, static_cast<u32>(execCtx.resourceType), opParam.size());
     return FormatOpenOpParamDataFromMsg(
         execCtx.baseOpParam, msg, extMsg, rankNum_, repeatIdx, stream, opParam);
 }
