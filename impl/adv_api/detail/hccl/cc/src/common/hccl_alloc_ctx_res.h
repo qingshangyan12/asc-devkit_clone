@@ -24,6 +24,7 @@
 
 #include <vector>
 #include <memory>
+#include <string>
 
 using namespace mc2_ops_hccl;
 
@@ -57,7 +58,7 @@ struct Mc2ServerCfg {
 struct Mc2InitTilingInner {
     uint32_t version;   // ccu & alltoall (暂定version 为 原本的version + 1)
     uint32_t mc2HcommCnt;
-    uint32_t offset[MAX_OP_NUM];
+    uint32_t offset[MAX_CC_TILING_NUM];
     uint8_t debugMode;
     uint8_t preparePosition;
     uint16_t queueNum;
@@ -94,7 +95,7 @@ struct OpResCtx {
     uint64_t workSpaceSize;
     uint64_t rankId;
     uint64_t rankSize;
-    AlgInfo algInfo[MAX_OP_NUM];
+    AlgInfo algInfo[MAX_CC_TILING_NUM];
 
     // for ccu
     uint64_t xnAddr;  // xn寄存器起始地址
@@ -137,59 +138,95 @@ static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
     {"CcuHalfAll2AllVMesh1D", CcuHalfAll2AllVMesh1D}
 };
 
-HcclResult CheckInputParam(const HcclComm comm, const void* mc2Tiling, const aclrtStream stream);
-
-HcclResult HcclGetTilingList(const void *mc2Tiling, const void *p[], uint32_t &cnt);
-
-HcclResult CheckIsReduce(const Mc2CcTilingInner *ccTiling, bool *isReduce);
-
-HcclResult ObtainCommEngine(const void *ccTilingList[], uint32_t tilingNum, uint8_t &commEngine);
-
-// 构建 opResCtx 基础字段并获取 Token
-HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string &ctxTag, u32 rankSize, u32 userRank, OpResCtx &opResCtx);
-
-HcclResult HcclAllocOpResCtx(HcclComm comm, const std::string &ctxTag, const std::vector<OpParam> &opParamVec, void* mc2Tiling, const void *ccTilingList[], void** opResCtxPtr);
-
-//AllToAll适配AllToAllV
-HcclResult ConvertAlltoAllParam(const u64 recvCount, const u32 rankSize, std::vector<u64> &sdispls, std::vector<u64> &rdispls);
-
-HcclResult PrepareOpsCommParam(const std::string &tag, OpParam &param);
-
-HcclResult PrintOpsCommParam(OpParam &param);
-
-HcclResult PrepareParamForAllGather(HcclComm comm, const std::string &tag, const Mc2CcTilingInner *ccTiling, OpParam &param);
-
-HcclResult PrepareParamForAllReduce(HcclComm comm, const std::string &tag, const Mc2CcTilingInner *ccTiling, OpParam &param);
-
-HcclResult PrepareParamForReduceScatter(HcclComm comm, const std::string &tag, const Mc2CcTilingInner *ccTiling, OpParam &param);
-
-HcclResult PrepareParamForAlltoAll(HcclComm comm, const std::string &tag, const Mc2CcTilingInner *ccTiling, OpParam &param);
-
-HcclResult PrepareParamForAlltoAllV(HcclComm comm, const std::string &tag, const Mc2CcTilingInner *ccTiling, OpParam &param);
-
 typedef HcclResult (*OpParamPrepareFunc)(
     HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& param);
 
-HcclResult PrepareOpParams(HcclComm comm,const std::string &tag, const Mc2CcTilingInner *ccTiling, OpParam &opParam);
+CommEngine OpExecuteConfigToCommEngine(uint8_t commEngine);
 
-HcclResult InitOpParamByTiling(HcclComm comm, void *stream, const std::string &tag, const Mc2CcTilingInner *ccTiling, OpParam &opParam);
+HcclResult CheckInputParam(const HcclComm comm, const void* mc2Tiling, const aclrtStream stream);
 
-HcclResult SelectAlgAndPrepareEngine(HcclComm comm, OpParam &opParam, std::string &algName, std::unique_ptr<TopoInfoWithNetLayerDetails> &topoInfo);
+HcclResult HcclGetTilingList(const void* mc2Tiling, const void* p[], uint32_t& cnt);
 
-HcclResult HandleSingleRankAndCommMode(HcclComm comm, OpParam &opParam, bool &skipGetRes);
+HcclResult CheckIsReduce(const Mc2CcTilingInner* ccTiling, bool* isReduce);
 
-HcclResult GetOpParamResCtx(HcclComm comm, const std::string &algName, OpParam &opParam, TopoInfoWithNetLayerDetails *topoInfo, void **resCtxOut);
+HcclResult CheckCommEngine(const void* ccTilingList[], uint32_t tilingNum);
 
-HcclResult GetCcuOpParamResCtx(HcclComm comm, const std::string &algName, OpParam &opParam, TopoInfoWithNetLayerDetails *topoInfo, OpResCtx &opResCtx, void **resCtxOut);
+HcclResult ObtainCommEngine(const void* ccTilingList[], uint32_t tilingNum, uint8_t& commEngine);
 
-HcclResult GetOpParam(HcclComm comm, void* stream, const std::string &tag, const Mc2CcTilingInner *ccTiling, OpParam &opParam);
+// 构建 opResCtx 基础字段
+HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSize, u32 userRank, OpResCtx& opResCtx);
 
-// 用户自定义校验函数，由用户提供实现（仅声明，不提供默认实现）。
-// 返回HCCL_SUCCESS表示CCU执行条件满足，否则表示不满足，将打印警告日志。
-// 参数：ccTiling - 特定的tiling对象，tilingIndex - 当前tiling索引
-HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner *ccTiling, uint32_t tilingIndex);
+HcclResult HcclAllocOpResCtx(
+    HcclComm comm, const std::string& ctxTag, const std::vector<OpParam>& opParamVec, void* mc2Tiling,
+    const void* ccTilingList[], void** opResCtxPtr);
+
+// AllToAll适配AllToAllV
+HcclResult ConvertAlltoAllParam(
+    const u64 recvCount, const u32 rankSize, std::vector<u64>& sdispls, std::vector<u64>& rdispls);
+
+HcclResult PrepareOpsCommParam(const std::string& tag, OpParam& param);
+
+HcclResult PrintOpsCommParam(OpParam& param);
+
+HcclResult PrepareParamForAllGather(
+    HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& param);
+
+HcclResult PrepareParamForAllReduce(
+    HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& param);
+
+HcclResult PrepareParamForReduceScatter(
+    HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& param);
+
+HcclResult PrepareParamForAlltoAll(
+    HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& param);
+
+HcclResult PrepareParamForAlltoAllV(
+    HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& param);
+
+HcclResult PrepareOpParams(HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& opParam);
+
+HcclResult InitOpParamByTiling(
+    HcclComm comm, void* stream, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& opParam);
+
+HcclResult PrepareTopoInfoForOp(
+    HcclComm comm, OpParam& opParam, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo);
+
+HcclResult PrepareEngineForAlg(OpParam& opParam, const std::string& algName);
+
+std::unique_ptr<InsCollAlgBase> GetAlgExecutorForOp(const OpParam& opParam, const std::string& algName);
+
+HcclResult CheckForcedAlgResource(
+    HcclComm comm, const OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo, const std::string& algName);
+
+bool GetForcedAlgName(const Mc2CcTilingInner* ccTiling, std::string& algName);
+
+HcclResult TryForcedAlgAndPrepareEngine(
+    HcclComm comm, const Mc2CcTilingInner* ccTiling, OpParam& opParam, std::string& algName,
+    std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo, bool& forcedAlgAccepted);
+
+HcclResult SelectAlgAndPrepareEngine(
+    HcclComm comm, OpParam& opParam, std::string& algName, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo);
+
+HcclResult FillOpParamAlgName(OpParam& opParam, const std::string& algName);
+
+HcclResult HandleSingleRankAndCommMode(HcclComm comm, OpParam& opParam, bool& skipGetRes);
+
+HcclResult GetOpParamResCtx(
+    HcclComm comm, const std::string& algName, OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo,
+    void** resCtxOut);
+
+HcclResult GetCcuOpParamResCtx(
+    HcclComm comm, const std::string& algName, OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo,
+    OpResCtx& opResCtx, void** resCtxOut);
+
+HcclResult GetOpParam(
+    HcclComm comm, void* stream, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& opParam);
+
+HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex);
 
 // CCU路径逐算子：算法选择 + 资源准备（参照GetOpParam形式）
-HcclResult CcuSelectAlg(HcclComm comm, void *stream, const std::string topoTag[], const void *ccTilingList[], uint32_t tilingNum, void *mc2Tiling, OpResCtx &opResCtx);
+HcclResult CcuSelectAlg(
+    HcclComm comm, void* stream, const std::string topoTag[], const void* ccTilingList[], uint32_t tilingNum,
+    void* mc2Tiling, OpResCtx& opResCtx);
 
 #endif
