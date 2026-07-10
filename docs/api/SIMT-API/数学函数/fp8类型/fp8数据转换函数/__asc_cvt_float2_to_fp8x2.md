@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
@@ -32,11 +44,27 @@ inline __asc_fp8x2_storage_t __asc_cvt_float2_to_fp8x2(const float2 x, const __a
 
 ## 返回值说明
 
-输入的两个分量遵循CAST\_RINT模式，根据指定的8位浮点数类型和指定的饱和模式，转换成的\_\_asc\_fp8x2\_storage\_t类型数据。
+输入的两个分量遵循CAST\_RINT模式，根据指定的8位浮点数类型和指定的饱和模式，转换成的\_\_asc\_fp8x2\_storage\_t类型数据。本接口受全局饱和模式影响，特殊值如下：
 
--   float8\_e4m3\_t数据类型没有inf值，非饱和模式下输入超出该类型所能表示的范围时，其溢出结果为nan，饱和模式下溢出结果为该类型表示的最大值或最小值。
--   float8\_e5m2\_t类型则有inf值，非饱和模式下输入超出该类型所能表示的范围，转换结果为对应符号的inf值，饱和模式下溢出结果为该类型表示的最大值或最小值。
--   饱和模式下，对于float8\_e5m2\_t和float8\_e4m3\_t数据类型，当寄存器CTRL\[50\]=0时，nan值会被转换为0，当寄存器CTRL\[50\]=1时，nan值被转化为fp8类型下的nan值。CTRL寄存器值可通过[GetCtrlSpr\(ISASI\)](../../../../SIMD-API/基础API/特殊寄存器访问/GetCtrlSpr(ISASI).md)接口获取。
+-   fp8_interpretation参数为__ASC_E4M3时：
+
+    | 各分量输入 | 非饱和模式返回值 | 饱和模式返回值 |
+    |---|---|---|
+    | ±0 | ±0 | ±0 |
+    | nan | nan | +0 |
+    | ±inf | nan | ±448 |
+    | 超出float8_e4m3_t范围的正值 | nan | 448 |
+    | 超出float8_e4m3_t范围的负值 | nan | -448 |
+
+-   fp8_interpretation的参数为__ASC_E5M2时：
+
+    | 各分量输入 | 非饱和模式返回值 | 饱和模式返回值 |
+    |---|---|---|
+    | ±0 | ±0 | ±0 |
+    | nan | nan | +0 |
+    | ±inf | ±inf | ±57344 |
+    | 超出float8_e5m2_t范围的正值 | inf | 57344 |
+    | 超出float8_e5m2_t范围的负值 | -inf | -57344 |
 
 ## 约束说明
 
