@@ -118,77 +118,57 @@
 
 ### mask/mask[]参数说明
 
-<cann-filter npu-type = "950">
-
+<!-- npu="950" id1 -->
 - 针对Ascend 950PR/Ascend 950DT，设置有效。
+<!-- end id1 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "A3">
-
+<!-- npu="A3" id2 -->
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，保留参数，设置无效。
+<!-- end id2 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "910b">
-
+<!-- npu="910b" id3 -->
 - 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，保留参数，设置无效。
+<!-- end id3 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "310b">
-
+<!-- npu="310b" id4 -->
 - 针对Atlas 200I/500 A2 推理产品，设置有效。
+<!-- end id4 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "310p">
-
+<!-- npu="310p" id5 -->
 - 针对Atlas 推理系列产品AI Core，保留参数，设置无效。
-
-</cann-filter>
+<!-- end id5 -->
 
 ## 数据类型
 
-<cann-filter npu-type = "950">
-
+<!-- npu="950" id6 -->
 - 针对Ascend 950PR/Ascend 950DT
     - T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double（只支持CMPMODE::EQ）。
     - U支持的数据类型为：uint8_t。
+<!-- end id6 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "A3">
-
+<!-- npu="A3" id7 -->
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品
     - T支持的数据类型为：half（所有CMPMODE都支持）、float（所有CMPMODE都支持）、int32_t（只支持CMPMODE::EQ）。
     - U支持的数据类型为：uint8_t。
+<!-- end id7 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "910b">
-
+<!-- npu="910b" id8 -->
 - 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品
     - T支持的数据类型为：half（所有CMPMODE都支持）、float（所有CMPMODE都支持）、int32_t（只支持CMPMODE::EQ）。
     - U支持的数据类型为：uint8_t。
+<!-- end id8 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "310b">
-
+<!-- npu="310b" id9 -->
 - 针对Atlas 200I/500 A2 推理产品
     - T支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
     - U支持的数据类型为：uint8_t。
+<!-- end id9 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "310p">
-
+<!-- npu="310p" id10 -->
 - 针对Atlas 推理系列产品AI Core
     - T支持的数据类型为：half、float。
     - U支持的数据类型为：uint8_t。
-
-</cann-filter>
+<!-- end id10 -->
 
 ## 返回值说明<a name="section128671456102513"></a>
 
@@ -201,9 +181,9 @@
 - dst按照小端顺序排序成二进制结果，对应src0中相应位置的数据比较结果。
 
 - **使用tensor前n个数据参与计算的接口，设置count时，需要保证count个元素所占空间256字节对齐。**
-<cann-filter npu-type = "950">
+<!-- npu="950" id11 -->
 - 针对Ascend 950PR/Ascend 950DT，int8\_t/uint8\_t/uint64\_t/int64\_t/double数据类型仅支持tensor前n个数据计算接口，double只支持CMPMODE::EQ。
-</cann-filter>
+<!-- end id11 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

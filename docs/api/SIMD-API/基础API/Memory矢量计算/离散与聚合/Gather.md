@@ -113,15 +113,25 @@ def Gather(src, dst, count, srcOffset, srcBaseAddr):
 
 ## 数据类型
 
-<cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
+<!-- npu="950" id5 -->
+Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。
+<!-- end id5 -->
 
-<cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。</cann-filter>
+<!-- npu="A3" id6 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+<!-- end id6 -->
 
-<cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。</cann-filter>
+<!-- npu="910b" id7 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+<!-- end id7 -->
 
-<cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。</cann-filter>
+<!-- npu="310b" id8 -->
+Atlas 200I/500 A2 推理产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
+<!-- end id8 -->
 
-<cann-filter npu-type="310p">Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。</cann-filter>
+<!-- npu="310p" id9 -->
+Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
+<!-- end id9 -->
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
@@ -130,30 +140,52 @@ def Gather(src, dst, count, srcOffset, srcBaseAddr):
 - srcOffset的取值要求如下：
   - 取值应保证src元素类型位宽对齐。
   - 偏移地址后不能超出UB大小数据的范围。
-<cann-filter npu-type="950,310b">
-  - 针对以下型号，地址偏移的取值范围：当操作数为8位时，取值范围为[0, 2^16-1]；当操作数为16位时，取值范围为[0, 2^17-1]，当操作数为32位或者64位时，不能超出uint32_t的范围。
-    - <cann-filter npu-type="950">Ascend 950PR/Ascend 950DT</cann-filter>
-    - <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品</cann-filter>
-</cann-filter>
-<cann-filter npu-type="A3,910b,310p">
-  - 针对以下型号，地址偏移的取值范围：不能超出uint32_t的范围。
-    - <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
-    - <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
-    - <cann-filter npu-type="310p">Atlas 推理系列产品AI Core</cann-filter>
-</cann-filter>
+<!-- npu="950,310b" id1 -->
+- 针对以下型号，地址偏移的取值范围：当操作数为8位时，取值范围为[0, 2^16-1]；当操作数为16位时，取值范围为[0, 2^17-1]，当操作数为32位或者64位时，不能超出uint32_t的范围。
+    - <!-- npu="950" id10 -->
+Ascend 950PR/Ascend 950DT
+<!-- end id10 -->
+    - <!-- npu="310b" id11 -->
+Atlas 200I/500 A2 推理产品
+<!-- end id11 -->
+<!-- end id1 -->
+<!-- npu="A3,910b,310p" id2 -->
+- 针对以下型号，地址偏移的取值范围：不能超出uint32_t的范围。
+    - <!-- npu="A3" id12 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- end id12 -->
+    - <!-- npu="910b" id13 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品
+<!-- end id13 -->
+    - <!-- npu="310p" id14 -->
+Atlas 推理系列产品AI Core
+<!-- end id14 -->
+<!-- end id2 -->
 - repeatTime取值范围：repeatTime∈[0,255]。
-<cann-filter npu-type="950,310b">
+<!-- npu="950,310b" id3 -->
 - 针对以下型号，当操作数为**8位**时，每次迭代完成**4个DataBlock**的数据收集；其他情况下，每次迭代完成8个DataBlock的数据收集。
-  - <cann-filter npu-type="950">Ascend 950PR/Ascend 950DT</cann-filter>
-  - <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品</cann-filter>
-</cann-filter>
-<cann-filter npu-type="A3,910b,310p">
+  - <!-- npu="950" id15 -->
+Ascend 950PR/Ascend 950DT
+<!-- end id15 -->
+  - <!-- npu="310b" id16 -->
+Atlas 200I/500 A2 推理产品
+<!-- end id16 -->
+<!-- end id3 -->
+<!-- npu="A3,910b,310p" id4 -->
 - 针对以下型号，每次迭代完成8个DataBlock的数据收集。
-  - <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
-  - <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
-  - <cann-filter npu-type="310p">Atlas 推理系列产品AI Core</cann-filter>
-</cann-filter>
-- <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，int8\_t、uint8\_t数据类型仅支持tensor前n个数据计算接口。</cann-filter>
+  - <!-- npu="A3" id17 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- end id17 -->
+  - <!-- npu="910b" id18 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品
+<!-- end id18 -->
+  - <!-- npu="310p" id19 -->
+Atlas 推理系列产品AI Core
+<!-- end id19 -->
+<!-- end id4 -->
+- <!-- npu="950" id20 -->
+针对Ascend 950PR/Ascend 950DT，int8\_t、uint8\_t数据类型仅支持tensor前n个数据计算接口。
+<!-- end id20 -->
 
 ## 调用示例<a name="section11276201527"></a>
 

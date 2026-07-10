@@ -4,13 +4,27 @@
 
 | 产品 | 是否支持 |
 | --- | --- |
-| <cann-filter npu-type="950">Ascend 950PR/Ascend 950DT | √ </cann-filter>|
-| <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter>|
-| <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter>|
-| <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品 | √ </cann-filter>|
-| <cann-filter npu-type="310p">Atlas 推理系列产品AI Core | √ </cann-filter>|
-| <cann-filter npu-type="310p">Atlas 推理系列产品Vector Core | x </cann-filter>|
-| <cann-filter npu-type="910">Atlas 训练系列产品 | √ </cann-filter>|
+| <!-- npu="950" id7 -->
+Ascend 950PR/Ascend 950DT | √
+<!-- end id7 -->|
+| <!-- npu="A3" id8 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √
+<!-- end id8 -->|
+| <!-- npu="910b" id9 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √
+<!-- end id9 -->|
+| <!-- npu="310b" id10 -->
+Atlas 200I/500 A2 推理产品 | √
+<!-- end id10 -->|
+| <!-- npu="310p" id11 -->
+Atlas 推理系列产品AI Core | √
+<!-- end id11 -->|
+| <!-- npu="310p" id12 -->
+Atlas 推理系列产品Vector Core | x
+<!-- end id12 -->|
+| <!-- npu="910" id13 -->
+Atlas 训练系列产品 | √
+<!-- end id13 -->|
 
 ## 功能说明
 
@@ -73,12 +87,24 @@
 
 支持的数据类型如下：
 
-- <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT，支持half、float、int64_t、uint64_t。</cann-filter>
-- <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持half、float。</cann-filter>
-- <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持half、float。</cann-filter>
-- <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品，支持half、float。</cann-filter>
-- <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core，支持half、float。</cann-filter>
-- <cann-filter npu-type = "910">Atlas 训练系列产品，支持half。</cann-filter>
+- <!-- npu="950" id14 -->
+Ascend 950PR/Ascend 950DT，支持half、float、int64_t、uint64_t。
+<!-- end id14 -->
+- <!-- npu="A3" id15 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持half、float。
+<!-- end id15 -->
+- <!-- npu="910b" id16 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持half、float。
+<!-- end id16 -->
+- <!-- npu="310b" id17 -->
+Atlas 200I/500 A2 推理产品，支持half、float。
+<!-- end id17 -->
+- <!-- npu="310p" id18 -->
+Atlas 推理系列产品AI Core，支持half、float。
+<!-- end id18 -->
+- <!-- npu="910" id19 -->
+Atlas 训练系列产品，支持half。
+<!-- end id19 -->
 
 ## 返回值说明
 
@@ -90,15 +116,19 @@
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
 - 需要使用`sharedTmpBuffer`的情况下，支持`dst`与`sharedTmpBuffer`地址重叠（通常情况下`dst`比`sharedTmpBuffer`所需的空间要小），此时`sharedTmpBuffer`必须满足所需空间要求，详情请参考[关键特性说明](#关键特性说明)。
 
-<cann-filter npu-type = "A3,910b">
-
+<!-- npu="A3,910b" id6 -->
 - 针对如下型号，当`mask=0`或`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为`NOP`（空操作）。
-  - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
-  - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
+  - <!-- npu="A3" id20 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- end id20 -->
+  - <!-- npu="910b" id21 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品
+<!-- end id21 -->
+<!-- end id6 -->
 
-</cann-filter>
-
-- <cann-filter npu-type = "950">针对Ascend 950PR/Ascend 950DT，`int64_t`/`uint64_t`数据类型仅支持tensor前n个数据计算接口。</cann-filter>
+- <!-- npu="950" id22 -->
+针对Ascend 950PR/Ascend 950DT，`int64_t`/`uint64_t`数据类型仅支持tensor前n个数据计算接口。
+<!-- end id22 -->
 - `srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
 <!-- npu="950,910,310p,310b" id1 -->
 - 针对以下型号，模板参数`isSetMask`参数不生效，保持默认值即可：
@@ -143,12 +173,24 @@
 
 **不同硬件形态对应的`ReduceSum`相加方式如下：**
 
-- <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT，采用方式二。</cann-filter>
-- <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，tensor前n个数据计算接口采用方式一，tensor高维切分计算接口采用方式二。</cann-filter>
-- <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，tensor前n个数据计算接口采用方式一，tensor高维切分计算接口采用方式二。</cann-filter>
-- <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品，采用方式二。</cann-filter>
-- <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core，采用方式二。</cann-filter>
-- <cann-filter npu-type = "910">Atlas 训练系列产品，采用方式二。</cann-filter>
+- <!-- npu="950" id23 -->
+Ascend 950PR/Ascend 950DT，采用方式二。
+<!-- end id23 -->
+- <!-- npu="A3" id24 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，tensor前n个数据计算接口采用方式一，tensor高维切分计算接口采用方式二。
+<!-- end id24 -->
+- <!-- npu="910b" id25 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，tensor前n个数据计算接口采用方式一，tensor高维切分计算接口采用方式二。
+<!-- end id25 -->
+- <!-- npu="310b" id26 -->
+Atlas 200I/500 A2 推理产品，采用方式二。
+<!-- end id26 -->
+- <!-- npu="310p" id27 -->
+Atlas 推理系列产品AI Core，采用方式二。
+<!-- end id27 -->
+- <!-- npu="910" id28 -->
+Atlas 训练系列产品，采用方式二。
+<!-- end id28 -->
 
 ## 调用示例
 

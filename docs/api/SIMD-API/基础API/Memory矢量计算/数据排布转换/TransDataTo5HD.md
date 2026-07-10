@@ -108,19 +108,29 @@ TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1H
 
 ## 数据类型
 
-<cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。</cann-filter>
+<!-- npu="950" id1 -->
+Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+<!-- end id1 -->
 
-<cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。</cann-filter>
+<!-- npu="A3" id2 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
+<!-- end id2 -->
 
-<cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。</cann-filter>
+<!-- npu="910b" id3 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
+<!-- end id3 -->
 
-<cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。</cann-filter>
+<!-- npu="310b" id4 -->
+Atlas 200I/500 A2 推理产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
+<!-- end id4 -->
 
-<cann-filter npu-type="310p">Atlas 推理系列产品AI Core，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。</cann-filter>
+<!-- npu="310p" id5 -->
+Atlas 推理系列产品AI Core，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
+<!-- end id5 -->
 
-<cann-filter npu-type="910">Atlas 训练系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half。</cann-filter>
-
-
+<!-- npu="910" id6 -->
+Atlas 训练系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half。
+<!-- end id6 -->
 
 ## 约束说明<a name="zh-cn_topic_0000001521260417_section633mcpsimp"></a>
 

@@ -62,35 +62,25 @@
     - 6：10001000…1000 \# 每个repeat内每四个元素取第四个元素
     - 7：11111111…1111 \# 每个repeat内取全部元素
 
-    <cann-filter npu-type="950">
+    <!-- npu="950" id1 -->
+Ascend 950PR/Ascend 950DT，支持模式1-7。
+<!-- end id1 -->
 
-    Ascend 950PR/Ascend 950DT，支持模式1-7。
+    <!-- npu="A3" id2 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持模式1-7。
+<!-- end id2 -->
 
-    </cann-filter>
+    <!-- npu="910b" id3 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持模式1-7。
+<!-- end id3 -->
 
-    <cann-filter npu-type="A3">
+    <!-- npu="310p" id4 -->
+Atlas 推理系列产品AI Core，支持模式1-6。
+<!-- end id4 -->
 
-    Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持模式1-7。
-
-    </cann-filter>
-
-    <cann-filter npu-type="910b">
-
-    Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持模式1-7。
-
-    </cann-filter>
-
-    <cann-filter npu-type="310p">
-
-    Atlas 推理系列产品AI Core，支持模式1-6。
-
-    </cann-filter>
-
-    <cann-filter npu-type="310b">
-
-    Atlas 200I/500 A2 推理产品，支持模式1-7。
-
-    </cann-filter>
+    <!-- npu="310b" id5 -->
+Atlas 200I/500 A2 推理产品，支持模式1-7。
+<!-- end id5 -->
 
 - 用户自定义模式：对应函数原型中src1Pattern的数据类型为LocalTensor，迭代间间隔由src1RepeatStride决定， 迭代内src1Pattern连续消耗。
 
@@ -103,35 +93,25 @@ GatherMask接口计算过程如下图所示，参数设置为：mask=70，repeat
 - 配置方式二：总的数据计算量为mask个元素。mask配置为总的数据计算量。
 repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决定。
 
-    <cann-filter npu-type = "950">
+    <!-- npu="950" id6 -->
+Ascend 950PR/Ascend 950DT，支持配置方式一。
+<!-- end id6 -->
 
-    Ascend 950PR/Ascend 950DT，支持配置方式一。
+    <!-- npu="A3" id7 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持配置方式一。
+<!-- end id7 -->
 
-    </cann-filter>
+    <!-- npu="910b" id8 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持配置方式一。
+<!-- end id8 -->
 
-    <cann-filter npu-type = "A3">
+    <!-- npu="310b" id9 -->
+Atlas 200I/500 A2 推理产品，支持配置方式一。
+<!-- end id9 -->
 
-    Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持配置方式一。
-
-    </cann-filter>
-
-    <cann-filter npu-type = "910b">
-
-    Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持配置方式一。
-
-    </cann-filter>
-
-    <cann-filter npu-type = "310b">
-
-    Atlas 200I/500 A2 推理产品，支持配置方式一。
-
-    </cann-filter>
-
-    <cann-filter npu-type = "310p">
-
-    Atlas 推理系列产品AI Core，支持配置方式二。
-    
-    </cann-filter>
+    <!-- npu="310p" id10 -->
+Atlas 推理系列产品AI Core，支持配置方式二。
+<!-- end id10 -->
 
 图1采用内置固定模式2进行计算，每个repeat取奇数索引元素。
 
@@ -141,21 +121,17 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 ![](../../../../figures/GatherMask1.png)
 
-<cann-filter npu-type = "950,A3,910b,310b,310p">
-
+<!-- npu="950,A3,910b,310b,310p" id11 -->
 **图2**  GatherMask用户自定义模式计算示意图（配置方式一）
 
 ![](../../../../figures/GatherMask2.png)
+<!-- end id11 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "310p">
-
+<!-- npu="310p" id12 -->
 **图3**  GatherMask用户自定义模式计算示意图（配置方式二）
 
 ![](../../../../figures/GatherMask3.png)
-
-</cann-filter>
+<!-- end id12 -->
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -210,12 +186,18 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 | src0数据类型 | src1Pattern数据类型 | dst数据类型 |
 | --- | --- | --- |
-|<cann-filter npu-type = "950"> int8_t | uint8_t | int8_t </cann-filter>|
-|<cann-filter npu-type = "950"> uint8_t | uint8_t | uint8_t </cann-filter>|
+|<!-- npu="950" id13 -->
+int8_t | uint8_t | int8_t
+<!-- end id13 -->|
+|<!-- npu="950" id14 -->
+uint8_t | uint8_t | uint8_t
+<!-- end id14 -->|
 | int16_t | uint16_t | int16_t |
 | uint16_t | uint16_t | uint16_t |
 | half | uint16_t | half |
-|<cann-filter npu-type = "950,A3,910b"> bfloat16_t | uint16_t | bfloat16_t </cann-filter>|
+|<!-- npu="950,A3,910b" id15 -->
+bfloat16_t | uint16_t | bfloat16_t
+<!-- end id15 -->|
 | int32_t | uint32_t | int32_t |
 | uint32_t | uint32_t | uint32_t |
 | float | uint32_t | float |

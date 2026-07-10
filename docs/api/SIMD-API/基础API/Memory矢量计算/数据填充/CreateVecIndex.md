@@ -107,13 +107,21 @@ def CreateVecIndex(dst, firstValue, count):
 
 ## 数据类型
 
-<cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、int16_t、half、int32_t、float、int64_t。</cann-filter>
+<!-- npu="950" id4 -->
+Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、int16_t、half、int32_t、float、int64_t。
+<!-- end id4 -->
 
-<cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int16_t、half、int32_t、float。</cann-filter>
+<!-- npu="A3" id5 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int16_t、half、int32_t、float。
+<!-- end id5 -->
 
-<cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int16_t、half、int32_t、float。</cann-filter>
+<!-- npu="910b" id6 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int16_t、half、int32_t、float。
+<!-- end id6 -->
 
-<cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品，支持的数据类型为：int16_t、half、int32_t、float。</cann-filter>
+<!-- npu="310b" id7 -->
+Atlas 200I/500 A2 推理产品，支持的数据类型为：int16_t、half、int32_t、float。
+<!-- end id7 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -123,24 +131,19 @@ def CreateVecIndex(dst, firstValue, count):
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 - firstValue需保证不超出dst中元素数据类型对应的大小范围。
-<cann-filter npu-type="A3,910b">
+<!-- npu="A3,910b" id1 -->
 - repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。该约束适用于以下型号。
-<cann-filter npu-type="A3">
+<!-- npu="A3" id8 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- end id1 -->
+  <!-- npu="910b" id2 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+<!-- end id2 -->
+<!-- end id8 -->
 
-  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-
-  </cann-filter>
-  <cann-filter npu-type="910b">
-
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-
-  </cann-filter>
-</cann-filter>
-
-<cann-filter npu-type="950">
-
+<!-- npu="950" id3 -->
 - 针对Ascend 950PR/Ascend 950DT，int8_t/int64_t数据类型仅支持tensor前n个数据计算接口。
-</cann-filter>
+<!-- end id3 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

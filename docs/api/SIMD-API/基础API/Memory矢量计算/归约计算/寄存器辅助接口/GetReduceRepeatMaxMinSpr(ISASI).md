@@ -4,13 +4,27 @@
 
 | 产品 | 是否支持 |
 | --- | --- |
-| <cann-filter npu-type="950">Ascend 950PR/Ascend 950DT | x </cann-filter>|
-| <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter>|
-| <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter>|
-| <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品 | x </cann-filter>|
-| <cann-filter npu-type="310p">Atlas 推理系列产品AI Core | √ </cann-filter>|
-| <cann-filter npu-type="310p">Atlas 推理系列产品Vector Core | x </cann-filter>|
-| <cann-filter npu-type="910">Atlas 训练系列产品 | x </cann-filter>|
+| <!-- npu="950" id8 -->
+Ascend 950PR/Ascend 950DT | x
+<!-- end id8 -->|
+| <!-- npu="A3" id9 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √
+<!-- end id9 -->|
+| <!-- npu="910b" id10 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √
+<!-- end id10 -->|
+| <!-- npu="310b" id11 -->
+Atlas 200I/500 A2 推理产品 | x
+<!-- end id11 -->|
+| <!-- npu="310p" id12 -->
+Atlas 推理系列产品AI Core | √
+<!-- end id12 -->|
+| <!-- npu="310p" id13 -->
+Atlas 推理系列产品Vector Core | x
+<!-- end id13 -->|
+| <!-- npu="910" id14 -->
+Atlas 训练系列产品 | x
+<!-- end id14 -->|
 
 ## 功能说明
 
@@ -20,39 +34,31 @@
 
 ## 函数原型
 
-<cann-filter npu-type="A3,910b">
-
+<!-- npu="A3,910b" id1 -->
 - 获取调用[ReduceRepeat<MAX/MIN>](../ReduceRepeat.md)时所有repeat内的最值及其索引，或获取调用[ReduceMax](../ReduceMax.md)/[ReduceMin](../ReduceMin.md)得到的最值（此时获取的索引不准确）。该函数原型仅支持如下型号：
 
-    <cann-filter npu-type="A3">
+    <!-- npu="A3" id15 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- end id1 -->
 
-    - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-
-    </cann-filter>
-
-    <cann-filter npu-type="910b">
-
-    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-
-    </cann-filter>
+    <!-- npu="910b" id2 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+<!-- end id2 -->
 
     ```cpp
     template <typename T>
     __aicore__ inline void GetReduceRepeatMaxMinSpr(T &maxMinValue, T &maxMinIndex)
     ```
-    
-</cann-filter>
+<!-- end id15 -->
 
-<cann-filter npu-type="310p">
-
+<!-- npu="310p" id3 -->
 - 获取调用[ReduceRepeat<MAX/MIN>](../ReduceRepeat.md)时所有repeat内的最值，或获取调用[ReduceMax](../ReduceMax.md)/[ReduceMin](../ReduceMin.md)得到的最值。该函数原型仅支持Atlas 推理系列产品AI Core。
 
     ```cpp
     template <typename T>
     __aicore__ inline void GetReduceRepeatMaxMinSpr(T &maxMinValue)
     ```
-
-</cann-filter>
+<!-- end id3 -->
 
 ## 参数说明
 
@@ -91,11 +97,14 @@
 
 1. 调用`ReduceRepeat<MAX>`后，所有repeat内的最大值及索引。
 
-    <cann-filter npu-type="A3,910b">
-
-    - 针对如下型号：
-      - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
-      - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
+    <!-- npu="A3,910b" id4 -->
+- 针对如下型号：
+      - <!-- npu="A3" id16 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- end id16 -->
+      - <!-- npu="910b" id17 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品
+<!-- end id17 -->
 
       ```cpp
       AscendC::LocalTensor<float> src;
@@ -106,12 +115,10 @@
       AscendC::ReduceRepeat<AscendC::ReduceType::MAX>(dst, src, mask, 1, 1, 1, 8);
       AscendC::GetReduceRepeatMaxMinSpr<float>(val, idx); // 保证和ReduceRepeat的调用次序，而且要配对调用
       ```
+<!-- end id4 -->
 
-    </cann-filter>
-
-    <cann-filter npu-type="310p">
-
-    - 针对Atlas 推理系列产品AI Core：
+    <!-- npu="310p" id5 -->
+- 针对Atlas 推理系列产品AI Core：
 
         ```cpp
         AscendC::LocalTensor<float> src;
@@ -121,16 +128,18 @@
         float val = 0;   // 最大值
         AscendC::GetReduceRepeatMaxMinSpr<float>(val); // 保证和ReduceRepeat的调用次序，而且要配对调用
         ```
-
-    </cann-filter>
+<!-- end id5 -->
 
 2. 调用`ReduceMax`后，获取最大值。
 
-    <cann-filter npu-type = "A3,910b">
-
-    - 针对如下型号，`GetReduceRepeatMaxMinSpr`仅用于获取最大值，不能用于获取`ReduceMax`对应的准确索引。
-      - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
-      - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
+    <!-- npu="A3,910b" id6 -->
+- 针对如下型号，`GetReduceRepeatMaxMinSpr`仅用于获取最大值，不能用于获取`ReduceMax`对应的准确索引。
+      - <!-- npu="A3" id18 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- end id18 -->
+      - <!-- npu="910b" id19 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品
+<!-- end id19 -->
 
       ```cpp
       AscendC::LocalTensor<float> src;
@@ -142,12 +151,10 @@
       float idx = 0;   // 不用于获取ReduceMax对应的准确索引
       AscendC::GetReduceRepeatMaxMinSpr<float>(val, idx); // 保证和ReduceMax的调用次序，而且要配对调用
       ```
+<!-- end id6 -->
 
-    </cann-filter>
-
-    <cann-filter npu-type="310p">
-
-    - 针对Atlas 推理系列产品AI Core版本，可在调用`ReduceMax`后直接调用`GetReduceRepeatMaxMinSpr`指令获取最大值。
+    <!-- npu="310p" id7 -->
+- 针对Atlas 推理系列产品AI Core版本，可在调用`ReduceMax`后直接调用`GetReduceRepeatMaxMinSpr`指令获取最大值。
 
         ```cpp
         AscendC::LocalTensor<float> src;
@@ -158,5 +165,4 @@
         float val = 0;   // 最大值
         AscendC::GetReduceRepeatMaxMinSpr<float>(val); // 保证和ReduceMax的调用次序，而且要配对调用
         ```
-
-    </cann-filter>
+<!-- end id7 -->

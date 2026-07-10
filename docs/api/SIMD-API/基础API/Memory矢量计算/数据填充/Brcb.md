@@ -110,15 +110,21 @@ __aicore__ inline void Brcb(const LocalTensor<T>& dst, const LocalTensor<T>& src
 
 ## 数据类型
 
-<cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
+<!-- npu="950" id4 -->
+Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。
+<!-- end id4 -->
 
-<cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。</cann-filter>
+<!-- npu="A3" id5 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+<!-- end id5 -->
 
-<cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。</cann-filter>
+<!-- npu="910b" id6 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+<!-- end id6 -->
 
-<cann-filter npu-type="310p">Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。</cann-filter>
-
-
+<!-- npu="310p" id7 -->
+Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
+<!-- end id7 -->
 
 ## 返回值说明<a name="section459672612511"></a>
 
@@ -128,24 +134,20 @@ __aicore__ inline void Brcb(const LocalTensor<T>& dst, const LocalTensor<T>& src
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 - 不支持源操作数与目的操作数使用同一块内存地址。
-<cann-filter npu-type="A3,910b">
+<!-- npu="A3,910b" id1 -->
 - repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。该约束适用于以下型号。
-<cann-filter npu-type="A3">
-
-  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-
-  </cann-filter>
-  <cann-filter npu-type="910b">
-
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-
-  </cann-filter>
-</cann-filter>
+<!-- npu="A3" id8 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- end id1 -->
+  <!-- npu="910b" id2 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+<!-- end id2 -->
+<!-- end id8 -->
 
 - BrcbRepeatParams结构体内参数dstBlkStride不支持设置为0，若设置成0可能产生未定义行为。
-<cann-filter npu-type="310p"> 
+<!-- npu="310p" id3 -->
 - 针对Atlas 推理系列产品AI Core，使用时需要预留8KB的Unified Buffer空间，作为接口的临时数据存放区。
-</cann-filter>
+<!-- end id3 -->
 
 ## 关键特性说明
 

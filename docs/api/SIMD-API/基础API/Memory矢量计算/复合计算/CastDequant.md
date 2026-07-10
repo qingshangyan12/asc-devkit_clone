@@ -126,8 +126,7 @@
 
 ## 数据类型
 
-<cann-filter npu-type="950">
-
+<!-- npu="950" id1 -->
 **表**  Ascend 950PR/Ascend 950DT支持的数据类型组合情况
 
 | src数据类型 | dst数据类型 |
@@ -135,11 +134,9 @@
 | int32_t     | half        |
 | int16_t     | int8_t      |
 | int16_t     | uint8_t     |
+<!-- end id1 -->
 
-</cann-filter>
-
-<cann-filter npu-type="A3">
-
+<!-- npu="A3" id2 -->
 **表**  Atlas A3 训练系列产品/Atlas A3 推理系列产品支持的数据类型组合情况
 
 | src数据类型 | dst数据类型 |
@@ -147,11 +144,9 @@
 | int32_t     | half        |
 | int16_t     | int8_t      |
 | int16_t     | uint8_t     |
+<!-- end id2 -->
 
-</cann-filter>
-
-<cann-filter npu-type="910b">
-
+<!-- npu="910b" id3 -->
 **表**  Atlas A2 训练系列产品/Atlas A2 推理系列产品支持的数据类型组合情况
 
 | src数据类型 | dst数据类型 |
@@ -159,19 +154,16 @@
 | int32_t     | half        |
 | int16_t     | int8_t      |
 | int16_t     | uint8_t     |
+<!-- end id3 -->
 
-</cann-filter>
-
-<cann-filter npu-type="310b">
-
+<!-- npu="310b" id4 -->
 **表**  Atlas 推理系列产品AI Core支持的数据类型组合情况
 
 | src数据类型 | dst数据类型 |
 | :---------- | :---------- |
 | int16_t     | int8_t      |
 | int16_t     | uint8_t     |
-
-</cann-filter>
+<!-- end id4 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

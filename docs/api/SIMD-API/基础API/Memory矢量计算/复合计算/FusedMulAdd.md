@@ -103,17 +103,25 @@ $$
 
 ## 数据类型
 
-<cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，支持的数据类型为：half、bfloat16_t、float、int64_t、uint64_t。</cann-filter>
+<!-- npu="950" id1 -->
+Ascend 950PR/Ascend 950DT，支持的数据类型为：half、bfloat16_t、float、int64_t、uint64_t。
+<!-- end id1 -->
 
-<cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half、float。</cann-filter>
+<!-- npu="A3" id2 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half、float。
+<!-- end id2 -->
 
-<cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half、float。</cann-filter>
+<!-- npu="910b" id3 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half、float。
+<!-- end id3 -->
 
-<cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品，支持的数据类型为：half、float。</cann-filter>
+<!-- npu="310b" id4 -->
+Atlas 200I/500 A2 推理产品，支持的数据类型为：half、float。
+<!-- end id4 -->
 
-<cann-filter npu-type="310p">Atlas 推理系列产品AI Core，支持的数据类型为：half、float。</cann-filter>
-
-
+<!-- npu="310p" id5 -->
+Atlas 推理系列产品AI Core，支持的数据类型为：half、float。
+<!-- end id5 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -126,7 +134,9 @@ $$
 - FusedMulAdd指令实际使用会受到bank冲突影响。
 
     地址不重叠场景下，无法在一拍读取dst、src0、src1三块不同地址下的数据，因此只能达到一半的理论并行度，理论并行度将在原有基础上减半；在地址重叠场景下，则保持原有理论并行度。
-- <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，uint64\_t/int64\_t数据类型仅支持tensor前n个数据计算接口。</cann-filter>
+- <!-- npu="950" id6 -->
+针对Ascend 950PR/Ascend 950DT，uint64\_t/int64\_t数据类型仅支持tensor前n个数据计算接口。
+<!-- end id6 -->
 
 ## 调用示例<a name="section837496171220"></a>
 

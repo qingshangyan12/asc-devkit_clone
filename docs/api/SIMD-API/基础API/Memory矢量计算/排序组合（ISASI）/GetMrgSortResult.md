@@ -51,24 +51,29 @@
 
 头文件路径为：`"basic_api/kernel_operator_proposal_intf.h"`
 
-<cann-filter npu-type="950,A3,910b,310b">
-
+<!-- npu="950,A3,910b,310b" id1 -->
 - GetMrgSortResult接口需与[MrgSort](MrgSort.md)接口配合使用。当MrgSort接口中的ifExhaustedSuspension参数设置为true时，若某个输入队列中的数据耗尽，MrgSort会停止执行。此时，可调用GetMrgSortResult接口来获取4个队列里已经处理过的数据个数。
 
     以上说明适用于如下型号：
 
-    <cann-filter npu-type="950">Ascend 950PR/Ascend 950DT<br></cann-filter>
+    <!-- npu="950" id3 -->
+Ascend 950PR/Ascend 950DT<br>
+<!-- end id3 -->
 
-    <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品<br></cann-filter>
+    <!-- npu="A3" id4 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>
+<!-- end id4 -->
 
-    <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品<br></cann-filter>
+    <!-- npu="910b" id5 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品<br>
+<!-- end id5 -->
 
-    <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品<br></cann-filter>
+    <!-- npu="310b" id6 -->
+Atlas 200I/500 A2 推理产品<br>
+<!-- end id6 -->
+<!-- end id1 -->
 
-</cann-filter>
-
-<cann-filter npu-type="310p">
-
+<!-- npu="310p" id2 -->
 - 获取MrgSort已经处理过的队列里的Region Proposal个数，并依次存储在四个出参中。
 
     配合[MrgSort4指令](MrgSort4.md)使用，获取MrgSort4指令处理过的队列里的Region Proposal个数。使用时，需要将MrgSort4中的MrgSort4Info.ifExhaustedSuspension参数配置为true，该配置模式下某条队列耗尽后，MrgSort4指令即停止。
@@ -76,8 +81,7 @@
     以上说明适用于如下型号：
 
     Atlas 推理系列产品AI Core
-
-</cann-filter>
+<!-- end id2 -->
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

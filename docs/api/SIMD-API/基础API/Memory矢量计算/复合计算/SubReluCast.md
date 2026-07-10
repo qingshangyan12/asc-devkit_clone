@@ -104,8 +104,7 @@ $$
 
 ## 数据类型
 
-<cann-filter npu-type="950">
-
+<!-- npu="950" id1 -->
 **表**  Ascend 950PR/Ascend 950DT数据类型组合情况
 
 | src0、src1数据类型 | dst数据类型 |
@@ -115,11 +114,9 @@ $$
 | float              | half        |
 | int64_t            | float       |
 | int64_t            | int32_t     |
+<!-- end id1 -->
 
-</cann-filter>
-
-<cann-filter npu-type="A3">
-
+<!-- npu="A3" id2 -->
 **表**  Atlas A3 训练系列产品/Atlas A3 推理系列产品数据类型组合情况
 
 | src0、src1数据类型 | dst数据类型 |
@@ -127,11 +124,9 @@ $$
 | half               | int8_t      |
 | int16_t            | int8_t      |
 | float              | half        |
+<!-- end id2 -->
 
-</cann-filter>
-
-<cann-filter npu-type="910b">
-
+<!-- npu="910b" id3 -->
 **表**  Atlas A2 训练系列产品/Atlas A2 推理系列产品数据类型组合情况
 
 | src0、src1数据类型 | dst数据类型 |
@@ -139,22 +134,18 @@ $$
 | half               | int8_t      |
 | int16_t            | int8_t      |
 | float              | half        |
+<!-- end id3 -->
 
-</cann-filter>
-
-<cann-filter npu-type="310b">
-
+<!-- npu="310b" id4 -->
 **表**  Atlas 200I/500 A2 推理产品数据类型组合情况
 
 | src0、src1数据类型 | dst数据类型 |
 | :----------------- | :---------- |
 | half               | int8_t      |
 | float              | half        |
+<!-- end id4 -->
 
-</cann-filter>
-
-<cann-filter npu-type="310p">
-
+<!-- npu="310p" id5 -->
 **表**  Atlas 推理系列产品AI Core数据类型组合情况
 
 | src0、src1数据类型 | dst数据类型 |
@@ -162,8 +153,7 @@ $$
 | half               | int8_t      |
 | int16_t            | int8_t      |
 | float              | half        |
-
-</cann-filter>
+<!-- end id5 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -174,7 +164,9 @@ $$
 - 地址对齐约束参考[地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 - 操作数地址重叠约束请参考[地址重叠约束](../../../通用说明和约束.md#section668772811100)。
 - 本指令涉及精度转换，转换规则参考[精度转换规则](../../数据结构/precision_conversion.md)。
-- <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，int64\_t数据类型仅支持tensor前n个数据计算接口。</cann-filter>
+- <!-- npu="950" id6 -->
+针对Ascend 950PR/Ascend 950DT，int64\_t数据类型仅支持tensor前n个数据计算接口。
+<!-- end id6 -->
 
 ## 调用示例<a name="section837496171220"></a>
 

@@ -4,13 +4,27 @@
 
 | 产品 | 不支持enableSmallC0模式的原型 | 支持enableSmallC0模式的原型 |
 | :--- | :---: | :---: |
-|<cann-filter npu-type="950"> Ascend 950PR/Ascend 950DT | √ | √ </cann-filter>|
-|<cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ | x </cann-filter>|
-|<cann-filter npu-type="910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ | x </cann-filter>|
-|<cann-filter npu-type="310b"> Atlas 200I/500 A2 推理产品 | x | x </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品AI Core | √ | x </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | x | x </cann-filter>|
-|<cann-filter npu-type="910"> Atlas 训练系列产品 | x | x </cann-filter>|
+|<!-- npu="950" id7 -->
+Ascend 950PR/Ascend 950DT | √ | √
+<!-- end id7 -->|
+|<!-- npu="A3" id8 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ | x
+<!-- end id8 -->|
+|<!-- npu="910b" id9 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ | x
+<!-- end id9 -->|
+|<!-- npu="310b" id10 -->
+Atlas 200I/500 A2 推理产品 | x | x
+<!-- end id10 -->|
+|<!-- npu="310p" id11 -->
+Atlas 推理系列产品AI Core | √ | x
+<!-- end id11 -->|
+|<!-- npu="310p" id12 -->
+Atlas 推理系列产品Vector Core | x | x
+<!-- end id12 -->|
+|<!-- npu="910" id13 -->
+Atlas 训练系列产品 | x | x
+<!-- end id13 -->|
 
 ## 功能说明<a name="section12840195813362"></a>
 
@@ -32,8 +46,7 @@
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
     ```
 
-<cann-filter npu-type="950">
-
+<!-- npu="950" id1 -->
 - 支持enableSmallC0模式（仅Ascend 950PR/Ascend 950DT支持）
 
     ```cpp
@@ -41,8 +54,7 @@
     template <typename T, bool enableSmallC0 = false>
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
     ```
-
-</cann-filter>
+<!-- end id1 -->
 
 ## 参数说明<a name="section1251613311396"></a>
 
@@ -95,29 +107,21 @@ enableSmallC0开启模式下的ND2NZ转换示意图如下：
 
 ## 数据类型<a name="section4219135304818"></a>
 
-<cann-filter npu-type="950">
-
+<!-- npu="950" id2 -->
 - Ascend 950PR/Ascend 950DT，支持的数据类型为：bool、int8_t、uint8_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32。
+<!-- end id2 -->
 
-</cann-filter>
-
-<cann-filter npu-type="A3">
-
+<!-- npu="A3" id3 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+<!-- end id3 -->
 
-</cann-filter>
-
-<cann-filter npu-type="910b">
-
+<!-- npu="910b" id4 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+<!-- end id4 -->
 
-</cann-filter>
-
-<cann-filter npu-type="310p">
-
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
-
-</cann-filter>
+<!-- end id5 -->
 
 ## 返回值说明<a name="section446456163012"></a>
 
@@ -141,11 +145,9 @@ enableSmallC0开启模式下的ND2NZ转换示意图如下：
     | dstNzNStride | [1, 16384] |
     | dstNzMatrixStride | [1, 65535] |
 
-<cann-filter npu-type="310p">
-
+<!-- npu="310p" id6 -->
 - 针对Atlas 推理系列产品AI Core，需要预留8KB的Unified Buffer空间，作为接口的临时数据存放区。
-
-</cann-filter>
+<!-- end id6 -->
 
 ## 调用示例<a name="section10309141400"></a>
 

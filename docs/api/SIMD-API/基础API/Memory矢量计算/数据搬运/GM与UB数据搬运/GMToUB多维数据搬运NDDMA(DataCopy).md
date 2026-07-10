@@ -4,13 +4,27 @@
 
 | 产品 | 是否支持  |
 | :----------------------- | :------: |
-|<cann-filter npu-type="950"> Ascend 950PR/Ascend 950DT | √ </cann-filter>|
-|<cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x </cann-filter>|
-|<cann-filter npu-type="910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x </cann-filter>|
-|<cann-filter npu-type="310b"> Atlas 200I/500 A2 推理产品 | x </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品AI Core | x </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | x </cann-filter>|
-|<cann-filter npu-type="910"> Atlas 训练系列产品 | x </cann-filter>|
+|<!-- npu="950" id2 -->
+Ascend 950PR/Ascend 950DT | √
+<!-- end id2 -->|
+|<!-- npu="A3" id3 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x
+<!-- end id3 -->|
+|<!-- npu="910b" id4 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x
+<!-- end id4 -->|
+|<!-- npu="310b" id5 -->
+Atlas 200I/500 A2 推理产品 | x
+<!-- end id5 -->|
+|<!-- npu="310p" id6 -->
+Atlas 推理系列产品AI Core | x
+<!-- end id6 -->|
+|<!-- npu="310p" id7 -->
+Atlas 推理系列产品Vector Core | x
+<!-- end id7 -->|
+|<!-- npu="910" id8 -->
+Atlas 训练系列产品 | x
+<!-- end id8 -->|
 
 ## 功能说明<a name="section474617392321"></a>
 
@@ -101,11 +115,9 @@
 
 源操作数和目的操作数支持的数据类型保持一致。
 
-<cann-filter npu-type = "950">
-
+<!-- npu="950" id1 -->
 Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。
-
-</cann-filter>
+<!-- end id1 -->
 
 ## 返回值说明<a name="section7607175220218"></a>
 

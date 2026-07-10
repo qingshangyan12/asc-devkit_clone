@@ -103,15 +103,25 @@ $$
 
 ## 数据类型
 
-<cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，支持的数据类型为：int16_t、half、float、int64_t、uint64_t。</cann-filter>
+<!-- npu="950" id1 -->
+Ascend 950PR/Ascend 950DT，支持的数据类型为：int16_t、half、float、int64_t、uint64_t。
+<!-- end id1 -->
 
-<cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int16_t、half、float。</cann-filter>
+<!-- npu="A3" id2 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int16_t、half、float。
+<!-- end id2 -->
 
-<cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int16_t、half、float。</cann-filter>
+<!-- npu="910b" id3 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int16_t、half、float。
+<!-- end id3 -->
 
-<cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品，支持的数据类型为：half、float。</cann-filter>
+<!-- npu="310b" id4 -->
+Atlas 200I/500 A2 推理产品，支持的数据类型为：half、float。
+<!-- end id4 -->
 
-<cann-filter npu-type="310p">Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、half、float。</cann-filter>
+<!-- npu="310p" id5 -->
+Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、half、float。
+<!-- end id5 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -121,7 +131,9 @@ $$
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#section668772811100)。
-- <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，int64\_t、uint64\_t数据类型仅支持tensor前n个数据计算接口。</cann-filter>
+- <!-- npu="950" id6 -->
+针对Ascend 950PR/Ascend 950DT，int64\_t、uint64\_t数据类型仅支持tensor前n个数据计算接口。
+<!-- end id6 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

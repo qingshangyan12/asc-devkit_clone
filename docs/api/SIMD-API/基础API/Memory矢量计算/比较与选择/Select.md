@@ -73,41 +73,29 @@
 
     ![](../../../../figures/select_mode2.png)
 
-<cann-filter npu-type = "950">
-
+<!-- npu="950" id1 -->
 Ascend 950PR/Ascend 950DT，支持模式0、1、2。
+<!-- end id1 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "A3">
-
+<!-- npu="A3" id2 -->
 Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持模式0、1、2。
+<!-- end id2 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "910b">
-
+<!-- npu="910b" id3 -->
 Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持模式0、1、2。
+<!-- end id3 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "310b">
-
+<!-- npu="310b" id4 -->
 Atlas 200I/500 A2 推理产品，支持模式0、1、2。
+<!-- end id4 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "310p">
-
+<!-- npu="310p" id5 -->
 Atlas 推理系列产品AI Core，支持模式0、1、2。
+<!-- end id5 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "910">
-
+<!-- npu="910" id6 -->
 Atlas 训练系列产品，仅支持模式0。
-
-</cann-filter>
+<!-- end id6 -->
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -199,17 +187,29 @@ Atlas 训练系列产品，仅支持模式0。
 ## 数据类型
 
 - T支持的数据类型为：
-    - <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t/uint8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float/complex32/int64_t/uint64_t/complex64。</cann-filter>
+    - <!-- npu="950" id9 -->
+Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t/uint8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float/complex32/int64_t/uint64_t/complex64。
+<!-- end id9 -->
     
-    - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half/float。</cann-filter>
+    - <!-- npu="A3" id10 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half/float。
+<!-- end id10 -->
     
-    - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half/float。</cann-filter>
+    - <!-- npu="910b" id11 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half/float。
+<!-- end id11 -->
     
-    - <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品，支持的数据类型为：half/float。</cann-filter>
+    - <!-- npu="310b" id12 -->
+Atlas 200I/500 A2 推理产品，支持的数据类型为：half/float。
+<!-- end id12 -->
     
-    - <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core，支持的数据类型为：half/float。</cann-filter>
+    - <!-- npu="310p" id13 -->
+Atlas 推理系列产品AI Core，支持的数据类型为：half/float。
+<!-- end id13 -->
     
-    - <cann-filter npu-type = "910">Atlas 训练系列产品，支持的数据类型为：half/float。</cann-filter>
+    - <!-- npu="910" id14 -->
+Atlas 训练系列产品，支持的数据类型为：half/float。
+<!-- end id14 -->
     
     
 
@@ -225,21 +225,23 @@ Atlas 训练系列产品，仅支持模式0。
 
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
 
-<cann-filter npu-type = "950">
-
+<!-- npu="950" id7 -->
 - 针对Ascend 950PR/Ascend 950DT，int8\_t/uint8\_t/complex32/int64\_t/uint64\_t/complex64数据类型仅支持tensor前n个数据计算接口。
+<!-- end id7 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "910b，A3，310p">
-  
+<!-- npu="910b，A3，310p" id8 -->
 - 针对如下型号，对于模式1和模式2，使用时需要预留8KB的Unified Buffer空间，作为接口的临时数据存放区：
 
-    - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
-    - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
-    - <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core</cann-filter>
-
- </cann-filter>
+    - <!-- npu="A3" id15 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- end id15 -->
+    - <!-- npu="910b" id16 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品
+<!-- end id16 -->
+    - <!-- npu="310p" id17 -->
+Atlas 推理系列产品AI Core
+<!-- end id17 -->
+<!-- end id8 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

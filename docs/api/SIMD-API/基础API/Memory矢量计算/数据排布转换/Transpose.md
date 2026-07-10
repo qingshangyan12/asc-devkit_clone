@@ -119,8 +119,7 @@ dst_nchw = np.transpose(src_nhwc, axes=(0,3,1,2))
 | wSize | w轴长度。默认值为0。<br/>•二维矩阵数据块转置，固定传入16。<br/>•[N,C,H,W]与[N,H,W,C]数据格式互相转换，取值范围：hSize \* wSize ∈[0, 4095]，hSize \* wSize \* sizeof(T)需要保证32B对齐。 |
 | transposeType | 数据排布及reshape的类型，类型为TransposeType枚举类。默认值为TRANSPOSE_ND2ND_B16。<pre>enum class TransposeType : uint8_t {<br/>    TRANSPOSE_TYPE_NONE,           // API不做任何处理<br/>    TRANSPOSE_NZ2ND_0213,          // 当前不支持<br/>    TRANSPOSE_NZ2NZ_0213,          // 当前不支持<br/>    TRANSPOSE_NZ2NZ_012_WITH_N,    // 当前不支持<br/>    TRANSPOSE_NZ2ND_012_WITH_N,    // 当前不支持<br/>    TRANSPOSE_NZ2ND_012_WITHOUT_N, // 当前不支持<br/>    TRANSPOSE_NZ2NZ_012_WITHOUT_N, // 当前不支持<br/>    TRANSPOSE_ND2ND_ONLY,          // 当前不支持<br/>    TRANSPOSE_ND_UB_GM,            // 当前不支持<br/>    TRANSPOSE_GRAD_ND_UB_GM,       // 当前不支持<br/>    TRANSPOSE_ND2ND_B16,           // [16,16]二维矩阵转置<br/>    TRANSPOSE_NCHW2NHWC,           // [N,C,H,W]-&gt;[N,H,W,C]，<br/>    TRANSPOSE_NHWC2NCHW            // [N,H,W,C]-&gt;[N,C,H,W]<br/>};</pre> |
 
-<cann-filter npu-type="950">
-
+<!-- npu="950" id1 -->
 **表**  Ascend 950PR/Ascend 950DT sharedTmpBuffer所需的内存<a id="table4"></a>
 
 | transposeType | sharedTmpBuffer所需的大小 |
@@ -128,11 +127,9 @@ dst_nchw = np.transpose(src_nhwc, axes=(0,3,1,2))
 | TRANSPOSE_ND2ND_B16 | 不需要临时Buffer。 |
 | TRANSPOSE_NCHW2NHWC | 临时Buffer的大小按照下述计算规则（伪代码）进行计算。<pre>auto h0 = 16; // 当数据类型的位宽为8时，h0 = 32；其他情况下，h0 = 16<br/>auto w0 = 32 / sizeof(type);  // type代表数据类型<br/>auto tmpBufferSize = (cSize + 2)  * h0 \* w0 \* sizeof(type);</pre> |
 | TRANSPOSE_NHWC2NCHW | 临时Buffer的大小按照下述计算规则（伪代码）进行计算。<pre>auto h0 = 16; // 当数据类型的位宽为8时，h0 = 32；其他情况下，h0 = 16<br/>auto w0 = 32 / sizeof(type);  // type代表数据类型<br/>auto tmpBufferSize = (cSize \* 2 + 1) \* h0 \* w0 \* sizeof(type);</pre> |
+<!-- end id1 -->
 
-</cann-filter>
-
-<cann-filter npu-type="A3">
-
+<!-- npu="A3" id2 -->
 **表**  Atlas A3 训练系列产品/Atlas A3 推理系列产品sharedTmpBuffer所需的内存<a id="table4"></a>
 
 | transposeType | sharedTmpBuffer所需的大小 |
@@ -140,11 +137,9 @@ dst_nchw = np.transpose(src_nhwc, axes=(0,3,1,2))
 | TRANSPOSE_ND2ND_B16 | 不需要临时Buffer。 |
 | TRANSPOSE_NCHW2NHWC | 临时Buffer的大小按照下述计算规则（伪代码）进行计算。<pre>auto h0 = 16; // 当数据类型的位宽为8时，h0 = 32；其他情况下，h0 = 16<br/>auto w0 = 32 / sizeof(type);  // type代表数据类型<br/>auto tmpBufferSize = (cSize + 2)  * h0 \* w0 \* sizeof(type);</pre> |
 | TRANSPOSE_NHWC2NCHW | 临时Buffer的大小按照下述计算规则（伪代码）进行计算。<pre>auto h0 = 16; // 当数据类型的位宽为8时，h0 = 32；其他情况下，h0 = 16<br/>auto w0 = 32 / sizeof(type);  // type代表数据类型<br/>auto tmpBufferSize = (cSize \* 2 + 1) \* h0 \* w0 \* sizeof(type);</pre> |
+<!-- end id2 -->
 
-</cann-filter>
-
-<cann-filter npu-type="910b">
-
+<!-- npu="910b" id3 -->
 **表**  Atlas A2 训练系列产品/Atlas A2 推理系列产品sharedTmpBuffer所需的内存<a id="table4"></a>
 
 | transposeType | sharedTmpBuffer所需的大小 |
@@ -152,21 +147,17 @@ dst_nchw = np.transpose(src_nhwc, axes=(0,3,1,2))
 | TRANSPOSE_ND2ND_B16 | 不需要临时Buffer。 |
 | TRANSPOSE_NCHW2NHWC | 临时Buffer的大小按照下述计算规则（伪代码）进行计算。<pre>auto h0 = 16; // 当数据类型的位宽为8时，h0 = 32；其他情况下，h0 = 16<br/>auto w0 = 32 / sizeof(type);  // type代表数据类型<br/>auto tmpBufferSize = (cSize + 2)  * h0 \* w0 \* sizeof(type);</pre> |
 | TRANSPOSE_NHWC2NCHW | 临时Buffer的大小按照下述计算规则（伪代码）进行计算。<pre>auto h0 = 16; // 当数据类型的位宽为8时，h0 = 32；其他情况下，h0 = 16<br/>auto w0 = 32 / sizeof(type);  // type代表数据类型<br/>auto tmpBufferSize = (cSize \* 2 + 1) \* h0 \* w0 \* sizeof(type);</pre> |
+<!-- end id3 -->
 
-</cann-filter>
-
-<cann-filter npu-type="310b">
-
+<!-- npu="310b" id4 -->
 **表**  Atlas 200I/500 A2 推理产品sharedTmpBuffer所需的内存<a id="table4"></a>
 
 | transposeType | sharedTmpBuffer所需的大小 |
 | :-- | :-- |
 | TRANSPOSE_ND2ND_B16 | 不需要临时Buffer。 |
+<!-- end id4 -->
 
-</cann-filter>
-
-<cann-filter npu-type="310p">
-
+<!-- npu="310p" id5 -->
 **表**  Atlas 推理系列产品AI Core sharedTmpBuffer所需的内存<a id="table4"></a>
 
 | transposeType | sharedTmpBuffer所需的大小 |
@@ -174,51 +165,76 @@ dst_nchw = np.transpose(src_nhwc, axes=(0,3,1,2))
 | TRANSPOSE_ND2ND_B16 | 不需要临时Buffer。 |
 | TRANSPOSE_NCHW2NHWC | 不需要临时Buffer。 |
 | TRANSPOSE_NHWC2NCHW | 不需要临时Buffer。 |
-
-</cann-filter>
+<!-- end id5 -->
 
 ## 数据类型
 
 - 普通转置：
 
-  <cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，操作数支持的数据类型为：int16_t、uint16_t、half。</cann-filter>
+  <!-- npu="950" id6 -->
+Ascend 950PR/Ascend 950DT，操作数支持的数据类型为：int16_t、uint16_t、half。
+<!-- end id6 -->
 
-  <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，操作数支持的数据类型为：int16_t、uint16_t、half。</cann-filter>
+  <!-- npu="A3" id7 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，操作数支持的数据类型为：int16_t、uint16_t、half。
+<!-- end id7 -->
 
-  <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，操作数支持的数据类型为：int16_t、uint16_t、half。</cann-filter>
+  <!-- npu="910b" id8 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，操作数支持的数据类型为：int16_t、uint16_t、half。
+<!-- end id8 -->
 
-  <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品，操作数支持的数据类型为：int16_t、uint16_t、half。</cann-filter>
+  <!-- npu="310b" id9 -->
+Atlas 200I/500 A2 推理产品，操作数支持的数据类型为：int16_t、uint16_t、half。
+<!-- end id9 -->
 
-  <cann-filter npu-type="310p">Atlas 推理系列产品AI Core，操作数支持的数据类型为：int16_t、uint16_t、half。</cann-filter>
+  <!-- npu="310p" id10 -->
+Atlas 推理系列产品AI Core，操作数支持的数据类型为：int16_t、uint16_t、half。
+<!-- end id10 -->
 
-  <cann-filter npu-type="910">Atlas 训练系列产品，操作数支持的数据类型为：int16_t、uint16_t、half。</cann-filter>
-
-
+  <!-- npu="910" id11 -->
+Atlas 训练系列产品，操作数支持的数据类型为：int16_t、uint16_t、half。
+<!-- end id11 -->
 
 - 增强转置：
   - transposeType为TRANSPOSE\_ND2ND\_B16：
 
-    <cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，操作数支持的数据类型为：int16_t、uint16_t、half。</cann-filter>
+    <!-- npu="950" id12 -->
+Ascend 950PR/Ascend 950DT，操作数支持的数据类型为：int16_t、uint16_t、half。
+<!-- end id12 -->
 
-    <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，操作数支持的数据类型为：uint16_t。</cann-filter>
+    <!-- npu="A3" id13 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，操作数支持的数据类型为：uint16_t。
+<!-- end id13 -->
 
-    <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，操作数支持的数据类型为：uint16_t。</cann-filter>
+    <!-- npu="910b" id14 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，操作数支持的数据类型为：uint16_t。
+<!-- end id14 -->
 
-    <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品，操作数支持的数据类型为：uint16_t。</cann-filter>
+    <!-- npu="310b" id15 -->
+Atlas 200I/500 A2 推理产品，操作数支持的数据类型为：uint16_t。
+<!-- end id15 -->
 
-    <cann-filter npu-type="310p">Atlas 推理系列产品AI Core，操作数支持的数据类型为：uint16_t。</cann-filter>
+    <!-- npu="310p" id16 -->
+Atlas 推理系列产品AI Core，操作数支持的数据类型为：uint16_t。
+<!-- end id16 -->
 
   - transposeType为TRANSPOSE\_NCHW2NHWC或TRANSPOSE\_NHWC2NCHW：
 
-    <cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，操作数支持的数据类型为：int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int4x2_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32。</cann-filter>
+    <!-- npu="950" id17 -->
+Ascend 950PR/Ascend 950DT，操作数支持的数据类型为：int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int4x2_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32。
+<!-- end id17 -->
 
-    <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，操作数支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。</cann-filter>
+    <!-- npu="A3" id18 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，操作数支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
+<!-- end id18 -->
 
-    <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，操作数支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。</cann-filter>
+    <!-- npu="910b" id19 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，操作数支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
+<!-- end id19 -->
 
-    <cann-filter npu-type="310p">Atlas 推理系列产品AI Core，操作数支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。</cann-filter>
-
-
+    <!-- npu="310p" id20 -->
+Atlas 推理系列产品AI Core，操作数支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
+<!-- end id20 -->
 
 ## 返回值说明
 

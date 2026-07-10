@@ -120,8 +120,7 @@ enum class RoundMode {
 
 不同数据类型转换支持的舍入模式不同，可参考[精度转换规则](../../数据结构/precision_conversion.md)。
 
-<cann-filter npu-type="950">
-
+<!-- npu="950" id1 -->
 **表**  Ascend 950PR/Ascend 950DT支持的数据类型组合情况
 
 | src数据类型 | dst数据类型 | 支持的roundMode |
@@ -190,11 +189,9 @@ enum class RoundMode {
 | double | int64_t | CAST_TRUNC |
 | complex64 | complex32 | CAST_RINT/CAST_FLOOR/CAST_CEIL/CAST_ROUND/CAST_TRUNC/CAST_ODD/CAST_NONE |
 | complex64 | complex64 | CAST_RINT/CAST_FLOOR/CAST_CEIL/CAST_ROUND/CAST_TRUNC |
+<!-- end id1 -->
 
-</cann-filter>
-
-<cann-filter npu-type="A3">
-
+<!-- npu="A3" id2 -->
 **表**  Atlas A3 训练系列产品/Atlas A3 推理系列产品支持的数据类型组合情况
 
 | src数据类型 | dst数据类型 | 支持的roundMode |
@@ -224,11 +221,9 @@ enum class RoundMode {
 | float | int64_t | CAST_RINT/CAST_FLOOR/CAST_CEIL/CAST_ROUND/CAST_TRUNC |
 | int64_t | int32_t | CAST_NONE |
 | int64_t | float | CAST_RINT/CAST_FLOOR/CAST_CEIL/CAST_ROUND/CAST_TRUNC |
+<!-- end id2 -->
 
-</cann-filter>
-
-<cann-filter npu-type="910b">
-
+<!-- npu="910b" id3 -->
 **表**  Atlas A2 训练系列产品/Atlas A2 推理系列产品支持的数据类型组合情况
 
 | src数据类型 | dst数据类型 | 支持的roundMode |
@@ -258,11 +253,9 @@ enum class RoundMode {
 | float | int64_t | CAST_RINT/CAST_FLOOR/CAST_CEIL/CAST_ROUND/CAST_TRUNC |
 | int64_t | int32_t | CAST_NONE |
 | int64_t | float | CAST_RINT/CAST_FLOOR/CAST_CEIL/CAST_ROUND/CAST_TRUNC |
+<!-- end id3 -->
 
-</cann-filter>
-
-<cann-filter npu-type="310b">
-
+<!-- npu="310b" id4 -->
 **表**  Atlas 200I/500 A2 推理产品支持的数据类型组合情况
 
 | src数据类型 | dst数据类型 | 支持的roundMode |
@@ -290,11 +283,9 @@ enum class RoundMode {
 | float | int64_t | CAST_RINT/CAST_FLOOR/CAST_CEIL/CAST_ROUND/CAST_TRUNC |
 | int64_t | int32_t | CAST_NONE |
 | int64_t | float | CAST_RINT/CAST_FLOOR/CAST_CEIL/CAST_ROUND/CAST_TRUNC |
+<!-- end id4 -->
 
-</cann-filter>
-
-<cann-filter npu-type="310p">
-
+<!-- npu="310p" id5 -->
 **表**  Atlas 推理系列产品AI Core支持的数据类型组合情况
 
 | src数据类型 | dst数据类型 | 支持的roundMode |
@@ -313,11 +304,9 @@ enum class RoundMode {
 | int32_t | float | CAST_NONE |
 | float | half | CAST_ODD/CAST_NONE |
 | float | int64_t | CAST_RINT/CAST_FLOOR/CAST_CEIL/CAST_ROUND/CAST_TRUNC |
+<!-- end id5 -->
 
-</cann-filter>
-
-<cann-filter npu-type="910">
-
+<!-- npu="910" id6 -->
 **表**  Atlas 训练系列产品支持的数据类型组合情况
 
 | src数据类型 | dst数据类型 | 支持的roundMode |
@@ -332,8 +321,7 @@ enum class RoundMode {
 | int32_t | float | CAST_NONE |
 | float | half | CAST_ODD/CAST_NONE |
 | float | int64_t | CAST_RINT/CAST_FLOOR/CAST_CEIL/CAST_ROUND/CAST_TRUNC |
-
-</cann-filter>
+<!-- end id6 -->
 
 ## 返回值说明
 
@@ -348,7 +336,9 @@ enum class RoundMode {
 - 当dst或src为int4b\_t时，由于一个int4b\_t只占半个字节，故申请Tensor空间时，只需申请相同数量的int8\_t数据空间的一半。host侧目前暂不支持int4b\_t，故在申请int4b\_t类型的tensor时，应先申请一个类型为int8\_t的tensor，再用Reinterpretcast接口转化为int4b\_t类型的tensor，接着调用Cast指令。
 - 当dst或src为int4b\_t时，tensor高维切分计算接口的连续模式的mask与tensor前n个数据计算接口的count必须为偶数；对于tensor高维切分计算接口的逐bit模式，对应同一字节的相邻两个比特位的数值必须一致，即0-1位数值一致，2-3位数值一致，4-5位数值一致，以此类推。
 - int32\_t到half数据类型的转换，设置舍入模式无效，需要与[SetDeqScale](寄存器配置说明/SetDeqScale.md)接口配合使用。
-- <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，complex32/complex64/double数据类型仅支持tensor前n个数据计算接口。</cann-filter>
+- <!-- npu="950" id7 -->
+针对Ascend 950PR/Ascend 950DT，complex32/complex64/double数据类型仅支持tensor前n个数据计算接口。
+<!-- end id7 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
