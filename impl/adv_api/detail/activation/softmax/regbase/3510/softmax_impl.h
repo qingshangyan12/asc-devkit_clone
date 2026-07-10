@@ -124,7 +124,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNZVFImpl(
             LoadE2B<float>(sumVreg, workUb + i * DEFAULT_BLK_NUM);
             Reg::Div(dstVreg, tmpVreg, sumVreg, pregCnt);
             if constexpr (isLog) {
-                Reg::Ln(dstVreg, dstVreg, pregCnt);
+                Reg::Log10(dstVreg, dstVreg, pregCnt);
             }
             StoreIfNeedCast<T1>(dstUb + i * FLOAT_REPEAT_SIZE + j * dataBlock, dstVreg, pregCnt);
         }
@@ -265,7 +265,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNZWithTailVFImpl(
             LoadE2B<float>(sumVreg, workUb + i * DEFAULT_BLK_NUM);
             Reg::Div(dstVreg, tmpVreg, sumVreg, pregCnt);
             if constexpr (isLog) {
-                Reg::Ln(dstVreg, dstVreg, pregCnt);
+                Reg::Log10(dstVreg, dstVreg, pregCnt);
             }
             StoreIfNeedCast<T1>(dstUb + i * FLOAT_REPEAT_SIZE + j * dataBlock, dstVreg, pregCnt);
         }
@@ -277,8 +277,8 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNZWithTailVFImpl(
         LoadE2B<float>(sumVreg, workUb + i * DEFAULT_BLK_NUM);
         Reg::MaskAnd(pregOneBlk, pregkTail, pregCnt, pregFull);
         Reg::Div(dstVreg, tmpVreg, sumVreg, pregOneBlk);
-if constexpr (isLog) {
-                Reg::Ln(dstVreg, dstVreg, pregOneBlk);
+        if constexpr (isLog) {
+                Reg::Log10(dstVreg, dstVreg, pregOneBlk);
             }
         StoreIfNeedCast<T1>(dstUb + i * FLOAT_REPEAT_SIZE + kRepeatTimes * dataBlock, dstVreg, pregOneBlk);
     }
@@ -409,7 +409,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNDVFImpl(
                 Reg::LoadAlign(tmpVreg, workUb + i * srcK + j * FLOAT_REPEAT_SIZE);
                 Reg::Div(dstVreg, tmpVreg, sumVreg, pregFull);
                 if constexpr (isLog) {
-                    Reg::Ln(dstVreg, dstVreg, pregFull);
+                    Reg:Log10(dstVreg, dstVreg, pregFull);
                 }
                 StoreIfNeedCast<T1>(dstUb + i * srcK + j * FLOAT_REPEAT_SIZE, dstVreg, pregFull);
             }
@@ -528,7 +528,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNDWithTailVFImpl(
                 Reg::LoadAlign(tmpVreg, workUb + i * srcK + j * FLOAT_REPEAT_SIZE);
                 Reg::Div(dstVreg, tmpVreg, sumVreg, pregCnt);
                 if constexpr (isLog) {
-                    Reg::Ln(dstVreg, dstVreg, pregCnt);
+                    Reg::Log10(dstVreg, dstVreg, pregCnt);
                 }
                 StoreIfNeedCast<T1>(dstUb + i * srcK + j * FLOAT_REPEAT_SIZE, dstVreg, pregCnt);
             }
@@ -651,7 +651,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDForBlkVFImpl
             Reg::MaskAnd(pregDst, pregCnt, pregOut, pregFull);
             Reg::Div(dstVreg, tmpVreg, sumVreg, pregDst);
             if constexpr (isLog) {
-                Reg::Ln(dstVreg, dstVreg, pregDst);
+                Reg::Log10(dstVreg, dstVreg, pregDst);
             }
             StoreIfNeedCast<T1>(dstUb + i * srcK * factorRow, dstVreg, pregDst);
         }
@@ -827,7 +827,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDAlignedWithB
             Reg::MaskAnd(pregDst, pregCnt, pregOut, pregFull);
             Reg::Div(dstVreg, tmpVreg, sumVreg, pregDst);
             if constexpr (isLog) {
-                Reg::Ln(dstVreg, dstVreg, pregDst);
+                Reg::Log10(dstVreg, dstVreg, pregDst);
             }
             StoreIfNeedCast<T1>(dstUb + i * srcK * factorRow, dstVreg, pregDst);
         }
@@ -932,7 +932,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SingleSoftMaxGenericNDVFImpl(
             Reg::LoadAlign(tmpVreg, workUb + i * srcK);
             Reg::Div(dstVreg, tmpVreg, sumVreg, pregCnt);
             if constexpr (isLog) {
-                Reg::Ln(dstVreg, dstVreg, pregCnt);
+                Reg::Log10(dstVreg, dstVreg, pregCnt);
             }
             StoreIfNeedCast<T1>(dstUb + i * srcK, dstVreg, pregCnt);
         }
