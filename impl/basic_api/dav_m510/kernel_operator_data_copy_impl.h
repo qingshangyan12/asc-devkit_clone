@@ -176,12 +176,11 @@ __aicore__ inline void CopyCbufToUbuf(__ubuf__ T* dst, __cbuf__ T* src, const ui
 // L1 -> BT: copy_cbuf_to_bt          Note: Only support half + float + int32_t
 template <typename T>
 __aicore__ inline void CopyCbufToBt(uint64_t dst, __cbuf__ T* src, const uint16_t convControl,
-    const uint16_t blockCount, const uint16_t blockLen, const uint16_t srcStride, const uint16_t dstStride)
+    const uint16_t blockCount, const uint16_t blockLen, const uint16_t srcStride, const uint16_t dstStride, const uint8_t fixVal)
 {
     if constexpr(std::is_same<T, bfloat16_t>::value || std::is_same<T, float>::value
         || std::is_same<T, int32_t>::value || std::is_same<T, half>::value) {
         if (convControl == 2) {
-            constexpr uint8_t fixVal = 16;
             copy_cbuf_to_bt(dst, src, convControl, blockCount, blockLen, srcStride, dstStride, fixVal);
             return;
         }
@@ -685,7 +684,7 @@ __aicore__ inline __in_pipe__(MTE1) __out_pipe__(MTE1) void DataCopyL12BTImpl(
     const uint64_t dst, __cbuf__ T *src, const uint16_t isEnableConv, const DataCopyParams &intriParams)
 {
     CopyCbufToBt(dst, src, isEnableConv, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride,
-        intriParams.dstStride);
+        intriParams.dstStride, intriParams.fixShiftVal);
 }
 
 template <typename T, typename U>

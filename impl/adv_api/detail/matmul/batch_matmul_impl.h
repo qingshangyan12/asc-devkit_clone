@@ -157,6 +157,18 @@ public:
             ->Schedule(
                 ubCmatrix, enPartialSum, enAtomic, enSequentialWrite, matrixStrideA, matrixStrideB, matrixStrideC);
     }
+
+#if __NPU_ARCH__ == 5102
+    __aicore__ inline void SetFixShiftValue(uint8_t value)
+    {
+        MATMUL_PARAM_VAR.fixShiftVal = value;
+    }
+    __aicore__ inline uint8_t GetFixShiftValue() const
+    {
+        return MATMUL_PARAM_VAR.fixShiftVal;
+    }
+#endif
+
 };
 
 } // namespace AscendC
