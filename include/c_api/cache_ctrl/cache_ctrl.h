@@ -21,13 +21,9 @@
 #define INCLUDE_C_API_CACHE_CTRL_CACHE_CTRL_H
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-
 #include "impl/c_api/instr_impl/npu_arch_2201/cache_ctrl_impl.h"
-
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-
 #include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl.h"
-
 #endif
 
 __aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len);
