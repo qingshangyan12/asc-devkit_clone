@@ -16,6 +16,24 @@ find_package(ASC REQUIRED)
 project(ge_torchair LANGUAGES ASC CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+execute_process(
+    COMMAND ${CMAKE_CXX_COMPILER} -print-file-name=libgcc.a
+    OUTPUT_VARIABLE LIBGCC_PATH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    RESULT_VARIABLE GCC_QUERY_RESULT
+)
+if(NOT GCC_QUERY_RESULT EQUAL 0 OR NOT EXISTS "${LIBGCC_PATH}")
+    message(FATAL_ERROR "Failed to locate libgcc.a using ${CMAKE_CXX_COMPILER}")
+endif()
+
+get_filename_component(LIBGCC_PATH "${LIBGCC_PATH}" REALPATH)
+string(REGEX REPLACE "/lib/gcc/.*$" "" GCC_TOOLCHAIN_ROOT "${LIBGCC_PATH}")
+if("${GCC_TOOLCHAIN_ROOT}" STREQUAL "${LIBGCC_PATH}")
+    message(FATAL_ERROR "Failed to derive GCC toolchain root from ${LIBGCC_PATH}")
+endif()
+message(STATUS "GCC toolchain root: ${GCC_TOOLCHAIN_ROOT}")
+
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 
 if (DEFINED ENV{ASCEND_HOME_PATH})
@@ -25,7 +43,8 @@ else ()
 endif()
 
 execute_process(
-    COMMAND ${CMAKE_COMMAND} -E env TORCH_DEVICE_BACKEND_AUTOLOAD=0
+    COMMAND ${CMAKE_COMMAND} -E env ASCEND_SLOG_PRINT_TO_STDOUT=0
+            TORCH_DEVICE_BACKEND_AUTOLOAD=0
             ${Python3_EXECUTABLE} -c "import torch; print(torch.utils.cmake_prefix_path)"
     OUTPUT_STRIP_TRAILING_WHITESPACE
     OUTPUT_VARIABLE TORCH_CMAKE_PREFIX_PATH
@@ -63,4 +82,10 @@ target_link_libraries(ascendc_ops PRIVATE
     gert
     ${TORCH_LIBRARIES}
     -Wl,--as-needed
+)
+
+target_compile_options(ascendc_ops PRIVATE
+    ${TORCH_CXX_FLAGS}
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
+    $<$<COMPILE_LANGUAGE:ASC>:--gcc-toolchain=${GCC_TOOLCHAIN_ROOT}>
 )
