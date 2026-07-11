@@ -16,6 +16,7 @@ bash scripts/run_presmoke.sh
 
 默认行为：
 
+- 启动时执行 `pip3 install -r .devcontainer/requirements.txt`。
 - `ARCH=dav-2201`，对应 910B。
 - `MODES=npu`。
 - `NPU_CARDS=auto`，优先检测可见的 `/dev/davinci*` 卡并并行运行。
@@ -146,6 +147,9 @@ CPU 模式的默认并行度根据主机 CPU 数计算，不针对特定机器�
 - `FINAL_REPORT.md`：包含失败和重试结果的简要汇总。
 - `ALL_CASE_TIMINGS.tsv`：每个 case 的耗时、NPU 等待时间、步骤详情和实际执行命令。
 - `FAILURES.tsv`：主运行中的失败或跳过结果，以及重试结果。
+
+多卡运行使用的 `.workspaces` 仅用于隔离各卡的编译产物。最终报告生成后，该临时目录会自动删除，
+不属于 CI 归档内容。
 
 ## 固定顺序
 

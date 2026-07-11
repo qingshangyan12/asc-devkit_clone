@@ -16,6 +16,7 @@ bash scripts/run_presmoke.sh
 
 Default behavior:
 
+- Run `pip3 install -r .devcontainer/requirements.txt` at startup.
 - `ARCH=dav-2201`, for 910B.
 - `MODES=npu`.
 - `NPU_CARDS=auto`, detect visible `/dev/davinci*` cards and run them in parallel.
@@ -146,6 +147,9 @@ The orchestrator writes:
 - `FINAL_REPORT.md`: concise summary with failures and retry results.
 - `ALL_CASE_TIMINGS.tsv`: per-case timing, NPU wait, step details, and executed commands.
 - `FAILURES.tsv`: failed or skipped primary results plus retry outcome.
+
+The `.workspaces` directory used to isolate per-card build artifacts exists only during a multi-card run. It is
+removed after the final reports are written and is not part of the CI artifacts.
 
 ## Fixed Schedule
 
