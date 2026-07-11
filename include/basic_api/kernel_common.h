@@ -35,7 +35,7 @@
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
 #include "kernel_operator_swap_mem_intf.h"
 #include "kernel_operator_sys_var_intf.h"
-#include "kernel_tensor_base.h"
+#include "../../impl/basic_api/kernel_tensor_base.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
