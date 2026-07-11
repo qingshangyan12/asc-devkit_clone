@@ -268,18 +268,18 @@ __aicore__ inline void TPipeBase::AuxShareBufStart(
         // Record the maximum allocated address.
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
         g_tpipeImpl.shareBufPool_.maxAddr[pos] = this->g_tpipeImpl.bufPool_[hardU8].maxAddr;
-        g_tpipeImpl.bufPool_[hardU8].maxAddr = g_tpipeImpl.shareBufPool_.start[pos];  // Reset resource start position.
+        g_tpipeImpl.bufPool_[hardU8].maxAddr = g_tpipeImpl.shareBufPool_.start[pos]; // Reset resource start position.
 #else
         g_tpipeImpl.shareBufPool_.maxAddr[pos] = Internal::g_tPipeAddrBufPool[hardU8];
-        Internal::g_tPipeAddrBufPool[hardU8] = g_tpipeImpl.shareBufPool_.start[pos];  // Reset resource start position.
+        Internal::g_tPipeAddrBufPool[hardU8] = g_tpipeImpl.shareBufPool_.start[pos]; // Reset resource start position.
 #endif
     }
 
     if (mode == 1 && subBlockIdx == 1) {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
-        this->g_tpipeImpl.bufPool_[hardU8].maxAddr += shareLens[pos] / HALF_FACTOR;  // Reset resource start position.
+        this->g_tpipeImpl.bufPool_[hardU8].maxAddr += shareLens[pos] / HALF_FACTOR; // Reset resource start position.
 #else
-        Internal::g_tPipeAddrBufPool[hardU8] += shareLens[pos] / HALF_FACTOR;  // Reset resource start position.
+        Internal::g_tPipeAddrBufPool[hardU8] += shareLens[pos] / HALF_FACTOR; / Reset resource start position.
 #endif
     }
 

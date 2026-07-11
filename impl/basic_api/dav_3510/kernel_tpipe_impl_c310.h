@@ -315,7 +315,6 @@ __aicore__ inline bool TPipe::InitBuffer(T& que, uint8_t num, uint32_t len)
             KERNEL_LOG(KERNEL_ERROR, "curPoolAddr is %d, limits is %d", curPoolAddr, bufferInitLen.at(pool));
         });
         Internal::g_tPipeAddrBufPool[static_cast<uint8_t>(pool)] = curPoolAddr;
-
         this->g_tpipeImpl.curBufSize_ += num;
         ASCENDC_ASSERT((this->g_tpipeImpl.curBufSize_ < QBUF_MAX_LEN), {
             KERNEL_LOG(KERNEL_ERROR, "buffer size is %d, limits is %d", this->g_tpipeImpl.curBufSize_, QBUF_MAX_LEN);
