@@ -311,6 +311,50 @@ class RunnerPoolTest(unittest.TestCase):
             self.assertEqual(result.status, "PASS")
             self.assertTrue((c.build_dir / "custom_opp_test.run").exists())
 
+    def test_pipeline_cleans_case_runner_artifacts_after_success(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            c = source_cell(
+                root,
+                "case",
+                "case",
+                commands=[
+                    Command("rm -rf build_npu", "clean"),
+                    Command("mkdir -p build_npu && touch build_npu/artifact", "build"),
+                    Command(":", "run"),
+                    Command(":", "verify"),
+                ],
+            )
+
+            result = run_cells_pipeline_with_options(
+                [c], PipelineOptions(root / "logs", timeout=1, keep_artifacts=False, jobs=1, npu_slots=1)
+            )
+
+            self.assertEqual(result.results[0].status, "PASS")
+            self.assertFalse(c.build_dir.exists())
+
+    def test_pipeline_cleans_case_runner_artifacts_after_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            c = source_cell(
+                root,
+                "case",
+                "case",
+                commands=[
+                    Command("rm -rf build_npu", "clean"),
+                    Command("mkdir -p build_npu && touch build_npu/artifact", "build"),
+                    Command("false", "run"),
+                    Command(":", "verify"),
+                ],
+            )
+
+            result = run_cells_pipeline_with_options(
+                [c], PipelineOptions(root / "logs", timeout=1, keep_artifacts=False, jobs=1, npu_slots=1)
+            )
+
+            self.assertEqual(result.results[0].status, "FAIL")
+            self.assertFalse(c.build_dir.exists())
+
     def test_pipeline_keeps_build_workers_running_while_npu_slot_is_busy(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

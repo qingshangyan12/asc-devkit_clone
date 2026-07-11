@@ -148,8 +148,9 @@ The orchestrator writes:
 - `ALL_CASE_TIMINGS.tsv`: per-case timing, NPU wait, step details, and executed commands.
 - `FAILURES.tsv`: failed or skipped primary results plus retry outcome.
 
-The `.workspaces` directory used to isolate per-card build artifacts exists only during a multi-card run. It is
-removed after the final reports are written and is not part of the CI artifacts.
+After each run, the orchestrator retains summaries, JUnit, TSV files, per-card metadata, machine-readable reports,
+and case/stage logs. Multi-card `.workspaces`, scheduling `.plan`, runtime `.state`, shard `.locks`, and case build
+artifacts are removed automatically and are not part of the CI artifacts.
 
 ## Fixed Schedule
 

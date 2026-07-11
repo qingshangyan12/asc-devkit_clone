@@ -148,7 +148,8 @@ CPU 模式的默认并行度根据主机 CPU 数计算，不针对特定机器�
 - `ALL_CASE_TIMINGS.tsv`：每个 case 的耗时、NPU 等待时间、步骤详情和实际执行命令。
 - `FAILURES.tsv`：主运行中的失败或跳过结果，以及重试结果。
 
-多卡运行使用的 `.workspaces` 仅用于隔离各卡的编译产物。最终报告生成后，该临时目录会自动删除，
+每轮执行完成后，编排器会保留汇总、JUnit、TSV、每卡元信息、机器可读报告以及 case/stage 日志。
+多卡 `.workspaces`、调度 `.plan`、运行状态 `.state`、分片 `.locks` 和 case build 产物会自动删除，
 不属于 CI 归档内容。
 
 ## 固定顺序
