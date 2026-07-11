@@ -78,6 +78,14 @@ if(NOT "${DPRODUCT_SIDE}" STREQUAL "device")
   install(
     DIRECTORY ${ASCENDC_INCLUDE_DIR}/adv_api/
     DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/
+    ${INSTALL_OPTIONAL} COMPONENT asc-devkit
+    REGEX "hccl/internal" EXCLUDE)
+
+  install(
+    FILES
+      ${ASCENDC_INCLUDE_DIR}/adv_api/hccl/internal/hccl_msg.h
+      ${ASCENDC_INCLUDE_DIR}/adv_api/hccl/internal/hccl_tiling_msg.h
+    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/hccl/internal
     ${INSTALL_OPTIONAL} COMPONENT asc-devkit)
 
   # generate softlink
