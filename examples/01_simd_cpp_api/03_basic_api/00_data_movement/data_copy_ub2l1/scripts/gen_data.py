@@ -53,8 +53,6 @@ def gen_golden_data_simple(scenarioNum=1):
     else:
         x1_nd.tofile("./input/input_x.bin")
         x2_nd.tofile("./input/input_y.bin")
-    print("x1_nz", x1_nz)
-    print("x2_nz", x2_nz)
     golden.tofile("./output/golden.bin")
 
 
