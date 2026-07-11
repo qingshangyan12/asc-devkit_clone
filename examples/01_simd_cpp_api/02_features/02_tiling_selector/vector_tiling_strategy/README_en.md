@@ -4,7 +4,7 @@
 
 This sample uses two one-dimensional Tensors as inputs for addition. It introduces a multi-core Tiling split strategy for vector computing. The strategy calculates different inter-core and intra-core split parameters based on the input data volume. It distributes data across multiple AI Cores as evenly as possible to improve multi-core computing efficiency.
 
-The sample uses 8 AI Cores. The main tile data volume in each core is 3200 `half` elements, which equals 200 DataBlocks. Use the CMake build parameter `SCENARIO_NUM` to select a data volume scenario.
+The sample uses 8 Cores. The main tile data volume in each core is 3200 `half` elements, which equals 200 DataBlocks. Use the CMake build parameter `SCENARIO_NUM` to select a data volume scenario.
 
 ## Supported Products and CANN Software Versions
 
@@ -31,7 +31,7 @@ The sample uses 8 AI Cores. The main tile data volume in each core is 3200 `half
 
 This sample adds two one-dimensional Tensors. The compute logic is `z = x + y`. Use the CMake build parameter `SCENARIO_NUM` to select a data volume scenario. Each scenario maps to a different Tiling split scenario. All scenarios use the ND data format. The input and output data type is `half`. The kernel function name is `add_custom`.
 
-The sample uses 8 AI Cores. The main tile data volume is 3200 `half` elements. The main tile (`MAIN_TILE_LENGTH`) is the maximum data volume that one operation can process based on the available Unified Buffer (UB) space. It meets 32-byte alignment.
+The sample uses 8 Cores. The main tile data volume is 3200 `half` elements. The main tile (`MAIN_TILE_LENGTH`) is the maximum data volume that one operation can process based on the available Unified Buffer (UB) space. It meets 32-byte alignment.
 
 **Scenario 0: Main Tiles Only**
 
