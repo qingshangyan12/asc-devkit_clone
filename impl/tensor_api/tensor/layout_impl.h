@@ -169,6 +169,144 @@ __aicore__ inline constexpr decltype(auto) RemoveBatchDim(const LayoutType& layo
     return MakePatternLayout<PatternType, TraitType>(Get<1>(layout.Shape()), Get<1>(layout.Stride()));
 }
 
+// ===== Squeeze =====
+
+// IsInPack: true if I appears in the size_t parameter pack.
+template <size_t I, size_t... Dims>
+struct IsInPack : Std::false_type {};
+template <size_t I, size_t Head, size_t... Tail>
+struct IsInPack<I, Head, Tail...>
+    : Std::conditional_t<Head == I, Std::true_type, IsInPack<I, Tail...>> {};
+template <size_t I, size_t... Dims>
+constexpr bool IsInPackV = IsInPack<I, Dims...>::value;
+
+// IsSqueezeMark: a pattern position marked for squeeze (Std::Int<1>, i.e. _1).
+template <typename T>
+struct IsSqueezeMark : Std::is_same<Std::remove_cvref_t<T>, Std::Int<1>> {};
+template <typename T>
+constexpr bool IsSqueezeMarkV = IsSqueezeMark<Std::remove_cvref_t<T>>::value;
+
+// DimsMask: keep mask (true = keep axis). keep[I] = !((I in SqueezeDims) && IsOne<shape[I]>).
+template <typename Shape, typename DimsSeq, typename IdxSeq>
+struct DimsMaskImpl;
+template <typename Shape, size_t... Dims, size_t... Is>
+struct DimsMaskImpl<Shape, Std::index_sequence<Dims...>, Std::index_sequence<Is...>> {
+    using type = Std::IntegerSequence<bool,
+        (!(IsInPackV<Is, Dims...> && IsOneV<typename Std::tuple_element<Is, Shape>::type>))...>;
+};
+template <typename Shape, size_t... Dims>
+using DimsMask = typename DimsMaskImpl<Shape, Std::index_sequence<Dims...>,
+    Std::make_index_sequence<Std::tuple_size_v<Shape>>>::type;
+
+// PatternMask: keep mask (true = keep axis). keep[I] = !(IsSqueezeMark<pattern[I]> && IsOne<shape[I]>).
+template <typename Shape, typename Pattern, typename IdxSeq>
+struct PatternMaskImpl;
+template <typename Shape, typename Pattern, size_t... Is>
+struct PatternMaskImpl<Shape, Pattern, Std::index_sequence<Is...>> {
+    using type = Std::IntegerSequence<bool,
+        (!(IsSqueezeMarkV<typename Std::tuple_element<Is, Pattern>::type> &&
+         IsOneV<typename Std::tuple_element<Is, Shape>::type>))...>;
+};
+template <typename Shape, typename Pattern>
+using PatternMask = typename PatternMaskImpl<Shape, Pattern,
+    Std::make_index_sequence<Std::tuple_size_v<Shape>>>::type;
+
+// After squeezing, if a single nested tuple remains (e.g. squeezing a batch=1 axis leaves
+// ((M,K))), promote that inner tuple to be the layout, dropping the redundant outer wrapper.
+// A lone scalar axis (e.g. (M)) is left as-is since it cannot be unwrapped further.
+template <typename ShapeT, typename StrideT>
+__aicore__ inline constexpr auto MakeSqueezedLayout(const ShapeT& shape, const StrideT& stride)
+{
+    if constexpr (Std::tuple_size_v<ShapeT> == 1 &&
+        Std::is_tuple_v<Std::remove_cvref_t<typename Std::tuple_element<0, ShapeT>::type>>) {
+        return MakeLayout(Get<0>(shape), Get<0>(stride));
+    } else {
+        return MakeLayout(shape, stride);
+    }
+}
+
+// Squeeze (mode 1): drop axes (by index) whose compile-time size is 1; non-one axes are kept (no error).
+template <size_t... SqueezeDims, typename LayoutType,
+    typename = Std::enable_if_t<IsLayoutV<LayoutType> && (sizeof...(SqueezeDims) > 0)>>
+__aicore__ inline constexpr auto SqueezeLayout(const LayoutType& layout)
+{
+    using Shape = Std::remove_cvref_t<decltype(layout.Shape())>;
+    using Mask = DimsMask<Shape, SqueezeDims...>;
+    using KeepSeq = typename KeepIndexSeqFromSeq<Mask>::type;
+    return MakeSqueezedLayout(SelectBySeq<KeepSeq>(layout.Shape()), SelectBySeq<KeepSeq>(layout.Stride()));
+}
+
+// ---- Recursive pattern squeeze (mode 2) ----
+// The pattern is isomorphic to the shape. At every nesting level we recurse into tuple positions,
+// drop leaf positions marked _1 whose size is 1, then unwrap a lone remaining element one layer.
+// This removes inner 1-axes too (e.g. (1,(1,(x,y)))->(x,y), ((1,x),(1,y))->(x,y)) and collapses
+// repeated single-nesting (((x,y))->(x,y)). Each helper returns a pair Std::tuple<shapeNode, strideNode>.
+
+template <typename S, typename D, typename P>
+__aicore__ inline constexpr auto SqueezeRecTupleLevel(const S& s, const D& d, const P& p);
+
+// Transform one node: recurse when the pattern node is a tuple, otherwise keep the leaf as-is
+// (the parent level decides whether to drop this leaf via its keep-mask).
+template <typename SNode, typename DNode, typename PNode>
+__aicore__ inline constexpr auto SqueezeRecNode(const SNode& s, const DNode& d, const PNode& p)
+{
+    if constexpr (Std::is_tuple_v<Std::remove_cvref_t<PNode>>) {
+        return SqueezeRecTupleLevel(s, d, p);
+    } else {
+        return Std::make_tuple(s, d);
+    }
+}
+
+// Unwrap a single-element (shape,stride) tuple pair one layer; the lone element becomes the node.
+template <typename S, typename D>
+__aicore__ inline constexpr auto SqueezeUnwrap(const S& s, const D& d)
+{
+    if constexpr (Std::tuple_size_v<Std::remove_cvref_t<S>> == 1) {
+        return Std::make_tuple(Get<0>(s), Get<0>(d));
+    } else {
+        return Std::make_tuple(s, d);
+    }
+}
+
+template <typename S, typename D, typename P, size_t... Is>
+__aicore__ inline constexpr auto SqueezeRecTupleLevelImpl(const S& s, const D& d, const P& p,
+    Std::index_sequence<Is...>)
+{
+    // Transform each child (recurse tuple positions, keep leaves); arity is preserved.
+    auto tShape = Std::make_tuple(Get<0>(SqueezeRecNode(Get<Is>(s), Get<Is>(d), Get<Is>(p)))...);
+    auto tStride = Std::make_tuple(Get<1>(SqueezeRecNode(Get<Is>(s), Get<Is>(d), Get<Is>(p)))...);
+    // Drop leaf positions marked _1 whose original size is 1 (PatternMask keeps everything else).
+    using Mask = PatternMask<Std::remove_cvref_t<S>, Std::remove_cvref_t<P>>;
+    using KeepSeq = typename KeepIndexSeqFromSeq<Mask>::type;
+    return SqueezeUnwrap(SelectBySeq<KeepSeq>(tShape), SelectBySeq<KeepSeq>(tStride));
+}
+
+template <typename S, typename D, typename P>
+__aicore__ inline constexpr auto SqueezeRecTupleLevel(const S& s, const D& d, const P& p)
+{
+    return SqueezeRecTupleLevelImpl(s, d, p,
+        Std::make_index_sequence<Std::tuple_size_v<Std::remove_cvref_t<S>>>{});
+}
+
+// Squeeze (mode 2): recursively drop positions marked _1 (when size is 1) in an isomorphic pattern.
+template <typename Pattern, typename LayoutType,
+    typename = Std::enable_if_t<IsLayoutV<LayoutType> && Std::is_tuple_v<Std::remove_cvref_t<Pattern>>>>
+__aicore__ inline constexpr auto SqueezeLayout(const LayoutType& layout, const Pattern& pattern)
+{
+    using Shape = Std::remove_cvref_t<decltype(layout.Shape())>;
+    static_assert(IsSameStructureV<Pattern, Shape>,
+        "Squeeze pattern must be isomorphic to the layout shape.");
+    auto pr = SqueezeRecTupleLevel(layout.Shape(), layout.Stride(), pattern);
+    auto outShape = Get<0>(pr);
+    auto outStride = Get<1>(pr);
+    // The top level must stay a tuple for MakeLayout; wrap a lone scalar back into a 1-tuple.
+    if constexpr (Std::is_tuple_v<Std::remove_cvref_t<decltype(outShape)>>) {
+        return MakeLayout(outShape, outStride);
+    } else {
+        return MakeLayout(Std::make_tuple(outShape), Std::make_tuple(outStride));
+    }
+}
+
 } // namespace Te
 } // namespace AscendC
 
