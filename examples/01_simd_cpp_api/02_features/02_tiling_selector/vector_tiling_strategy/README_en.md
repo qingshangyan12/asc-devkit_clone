@@ -4,7 +4,7 @@
 
 This sample uses two one-dimensional Tensors as inputs for addition. It introduces a multi-core Tiling split strategy for vector computing. The strategy calculates different inter-core and intra-core split parameters based on the input data volume. It distributes data across multiple AI Cores as evenly as possible to improve multi-core computing efficiency.
 
-The sample uses 8 AI Cores. The main tile data volume in each core is 3200 `half` elements, which equals 200 DataBlocks. Use the CMake build parameter `SCENARIO_NUM` to select a data volume scenario.
+The sample uses 8 Cores. The main tile data volume in each core is 3200 `half` elements, which equals 200 DataBlocks. Use the CMake build parameter `SCENARIO_NUM` to select a data volume scenario.
 
 ## Supported Products and CANN Software Versions
 
@@ -31,7 +31,7 @@ The sample uses 8 AI Cores. The main tile data volume in each core is 3200 `half
 
 This sample adds two one-dimensional Tensors. The compute logic is `z = x + y`. Use the CMake build parameter `SCENARIO_NUM` to select a data volume scenario. Each scenario maps to a different Tiling split scenario. All scenarios use the ND data format. The input and output data type is `half`. The kernel function name is `add_custom`.
 
-The sample uses 8 AI Cores. The main tile data volume is 3200 `half` elements. The main tile (`MAIN_TILE_LENGTH`) is the maximum data volume that one operation can process based on the available Unified Buffer (UB) space. It meets 32-byte alignment.
+The sample uses 8 Cores. The main tile data volume is 3200 `half` elements. The main tile (`mainTileLength`) is the maximum data volume that one operation can process based on the available Unified Buffer (UB) space. It meets 32-byte alignment.
 
 **Scenario 0: Main Tiles Only**
 
@@ -113,42 +113,58 @@ The Tiling calculation process of this sample is as follows. The host side recei
    totalLengthAligned = AlignUp(totalLength, alignNum);
    ```
 
-2. Allocate the same number of main tiles, `MAIN_TILE_LENGTH`, to all cores.
+2. Allocate the same number of main tiles, `mainTileLength`, to all cores.
 
    ```cpp
-   mainTileNum = totalLengthAligned / (numBlocks * MAIN_TILE_LENGTH);
-   mainTileRemainder = totalLengthAligned % (numBlocks * MAIN_TILE_LENGTH);
+   mainTileNum = totalLengthAligned / (numBlocks * mainTileLength);
+   mainTileRemainder = totalLengthAligned % (numBlocks * mainTileLength);
    ```
 
-   At this point, each core processes at least `mainTileNum * MAIN_TILE_LENGTH` elements. `mainTileRemainder` indicates the remaining data volume after main tile allocation.
-
-3. Allocate `mainTileRemainder` to all cores as equal-length DataBlock tail blocks.
+   At this point, each core processes at least `mainTileNum * mainTileLength` elements. `mainTileRemainder` indicates the remaining data volume after main tile allocation. If `mainTileRemainder` is 0, select the main-tiles-only scenario and finish the Tiling calculation.
 
    ```cpp
-   tailBlockNumEachCore = mainTileRemainder / (numBlocks * alignNum);
-   formerCoreRemainder = mainTileRemainder % (numBlocks * alignNum);
-   baseLength = mainTileNum * MAIN_TILE_LENGTH + tailBlockNumEachCore * alignNum;
-   ```
-
-   `baseLength` indicates the base data volume processed by each core. `formerCoreRemainder` indicates the remaining data volume that must be allocated to the first several cores after each core receives equal-length DataBlock tail blocks.
-
-4. Allocate the remaining DataBlocks to the first several former cores.
-
-   ```cpp
-   if (formerCoreRemainder == 0) {
-       formerNum = numBlocks;
-       formerLength = baseLength;
-       tailNum = 0;
-       tailLength = 0;
-   } else {
-       formerNum = formerCoreRemainder / alignNum;
-       formerLength = baseLength + alignNum;
-       tailNum = numBlocks - formerNum;
-       tailLength = baseLength;
+   if (mainTileRemainder == 0) {
+       // Use MainTileOnlyTiling.
+       return;
    }
    ```
 
-   If `formerCoreRemainder == 0`, no tail core exists, and all cores process `baseLength` elements. If `formerCoreRemainder != 0`, `formerNum` indicates the number of former cores. The first `formerNum` cores process `formerLength` elements. `tailNum` indicates the number of tail cores, and the remaining cores process `tailLength` elements.
+3. If `mainTileRemainder` is not 0, allocate it to all cores as equal-length DataBlock tail blocks.
+
+   ```cpp
+   tailBlockNumEachCore = mainTileRemainder / (numBlocks * alignNum);
+   remainingTailLength = mainTileRemainder % (numBlocks * alignNum);
+   baseLength = mainTileNum * mainTileLength + tailBlockNumEachCore * alignNum;
+   ```
+
+   `baseLength` indicates the base data volume processed by each core. `remainingTailLength` indicates the number of elements that remain unallocated after each core receives equal-length DataBlock tail blocks. Its value is an integer multiple of `alignNum`.
+
+4. Check for the main-tile-with-tail-block scenario. If `remainingTailLength` is 0, all cores receive equal-length tail blocks, and this scenario is selected.
+
+   ```cpp
+   if (remainingTailLength == 0) {
+       // Use MainTileWithTailBlockTiling.
+       return;
+   }
+   ```
+
+5. If `remainingTailLength` is not 0, allocate the remaining DataBlocks to the first several former cores and calculate the data lengths of former and tail cores.
+
+   ```cpp
+   formerNum = remainingTailLength / alignNum;
+   formerLength = baseLength + alignNum;
+   tailLength = baseLength;
+   ```
+
+6. Check for the main-tile-with-tail-core scenario. If `tailBlockNumEachCore` is 0, tail cores contain only main tiles, and this scenario is selected. Otherwise, select the tail-block-and-tail-core scenario.
+
+   ```cpp
+   if (tailBlockNumEachCore == 0) {
+       // Use MainTileWithTailCoreTiling.
+   } else {
+       // Use TailBlockAndTailCoreTiling.
+   }
+   ```
 
 ## Build and Run
 

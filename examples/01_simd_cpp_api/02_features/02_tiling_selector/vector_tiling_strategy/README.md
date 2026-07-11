@@ -4,7 +4,7 @@
 
 本样例以两个一维Tensor相加为例，介绍矢量计算多核Tiling切分策略。该策略根据输入数据量计算不同的核间和核内切分参数，使数据在多个AI Core之间尽量均衡分配，从而充分利用多核计算能力实现高效计算。
 
-样例固定使用8个AI Core，核内主块数据量为3200个`half`元素（即200个DataBlock），通过CMake编译参数`SCENARIO_NUM`选择不同数据量场景。
+样例固定使用8个核，核内主块数据量为3200个`half`元素（即200个DataBlock），通过CMake编译参数`SCENARIO_NUM`选择不同数据量场景。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -31,7 +31,7 @@
 
 本样例实现两个一维Tensor相加，计算逻辑为`z = x + y`。样例通过CMake编译参数`SCENARIO_NUM`选择不同数据量场景，对应不同的Tiling切分场景，所有场景数据格式为ND，输入输出均为`half`类型，核函数名为`add_custom`。
 
-样例固定使用8个AI Core，主块数据量为3200个`half`元素，其中“主块”（`MAIN_TILE_LENGTH`）是用户基于UB可用空间确定的一次可以处理的最大数据量，且满足32字节对齐。
+样例固定使用8个核，主块数据量为3200个`half`元素，其中“主块”（`mainTileLength`）是用户基于UB可用空间确定的一次可以处理的最大数据量，且满足32字节对齐。
 
 <a name="scenario0-main-tile-only"></a>
 
@@ -121,42 +121,58 @@
    totalLengthAligned = AlignUp(totalLength, alignNum);
    ```
 
-2. 先在所有核上分配相同数量的主块`MAIN_TILE_LENGTH`。
+2. 先在所有核上分配相同数量的主块`mainTileLength`。
 
    ```cpp
-   mainTileNum = totalLengthAligned / (numBlocks * MAIN_TILE_LENGTH);
-   mainTileRemainder = totalLengthAligned % (numBlocks * MAIN_TILE_LENGTH);
+   mainTileNum = totalLengthAligned / (numBlocks * mainTileLength);
+   mainTileRemainder = totalLengthAligned % (numBlocks * mainTileLength);
    ```
 
-   此时每个核至少处理`mainTileNum * MAIN_TILE_LENGTH`个元素，`mainTileRemainder`表示完成主块分配后的剩余数据量。
-
-3. `mainTileRemainder`再按DataBlock给所有核补齐等长尾块。
+   此时每个核至少处理`mainTileNum * mainTileLength`个元素，`mainTileRemainder`表示完成主块分配后的剩余数据量。当`mainTileRemainder`为0时，进入主块均分场景并结束Tiling计算。
 
    ```cpp
-   tailBlockNumEachCore = mainTileRemainder / (numBlocks * alignNum);
-   formerCoreRemainder = mainTileRemainder % (numBlocks * alignNum);
-   baseLength = mainTileNum * MAIN_TILE_LENGTH + tailBlockNumEachCore * alignNum;
-   ```
-
-   `baseLength`表示每个核处理的基础数据量。`formerCoreRemainder`表示每核补齐等长DataBlock尾块后，剩余需要分给前若干个核的数据量。
-
-4. 最后剩余的DataBlock分给前若干个整核。
-
-   ```cpp
-   if (formerCoreRemainder == 0) {
-       formerNum = numBlocks;
-       formerLength = baseLength;
-       tailNum = 0;
-       tailLength = 0;
-   } else {
-       formerNum = formerCoreRemainder / alignNum;
-       formerLength = baseLength + alignNum;
-       tailNum = numBlocks - formerNum;
-       tailLength = baseLength;
+   if (mainTileRemainder == 0) {
+       // 使用MainTileOnlyTiling。
+       return;
    }
    ```
 
-   `formerCoreRemainder == 0`时不存在尾核，所有核都处理`baseLength`个元素。`formerCoreRemainder != 0`时，`formerNum`表示整核数量，前`formerNum`个核处理`formerLength`个元素；`tailNum`表示尾核数量，剩余核处理`tailLength`个元素。
+3. `mainTileRemainder`不为0时，再按DataBlock给所有核补齐等长尾块。
+
+   ```cpp
+   tailBlockNumEachCore = mainTileRemainder / (numBlocks * alignNum);
+   remainingTailLength = mainTileRemainder % (numBlocks * alignNum);
+   baseLength = mainTileNum * mainTileLength + tailBlockNumEachCore * alignNum;
+   ```
+
+   `baseLength`表示每个核处理的基础数据量。`remainingTailLength`表示每核补齐等长DataBlock尾块后尚未分配的元素数量，其值为`alignNum`的整数倍。
+
+4. 判断主块-尾块场景。当`remainingTailLength`为0时，表示所有核均分到等长尾块，进入主块-尾块场景。
+
+   ```cpp
+   if (remainingTailLength == 0) {
+       // 使用MainTileWithTailBlockTiling。
+       return;
+   }
+   ```
+
+5. `remainingTailLength`不为0时，将最后剩余的DataBlock分给前若干个整核，并计算整核和尾核的数据长度。
+
+   ```cpp
+   formerNum = remainingTailLength / alignNum;
+   formerLength = baseLength + alignNum;
+   tailLength = baseLength;
+   ```
+
+6. 判断主块-尾核场景。`tailBlockNumEachCore`为0时，尾核内只包含主块，进入主块-尾核场景；否则，进入尾块-尾核场景。
+
+   ```cpp
+   if (tailBlockNumEachCore == 0) {
+       // 使用MainTileWithTailCoreTiling。
+   } else {
+       // 使用TailBlockAndTailCoreTiling。
+   }
+   ```
 
 ## 编译运行
 
