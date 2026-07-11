@@ -227,26 +227,48 @@ def run_cells_pipeline_with_options(
     cells: Iterable[Cell], options: PipelineOptions
 ) -> RunCellsResult:
     cells_list = list(cells)
-    if options.jobs <= 1:
-        npu_pool = NpuSlotPool(options.npu_slots)
-        results = [
-            run_cell_with_options(
-                cell,
-                RunOptions(
-                    options.log_dir,
-                    options.timeout,
-                    options.cpu_run_timeout,
-                    options.keep_artifacts,
-                    npu_pool.gate,
-                ),
+    try:
+        if options.jobs <= 1:
+            npu_pool = NpuSlotPool(options.npu_slots)
+            results = [
+                run_cell_with_options(
+                    cell,
+                    RunOptions(
+                        options.log_dir,
+                        options.timeout,
+                        options.cpu_run_timeout,
+                        options.keep_artifacts,
+                        npu_pool.gate,
+                    ),
+                )
+                for cell in cells_list
+            ]
+            return RunCellsResult(
+                results, NpuStats(slots=options.npu_slots, queue_model="serial")
             )
-            for cell in cells_list
-        ]
-        return RunCellsResult(
-            results, NpuStats(slots=options.npu_slots, queue_model="serial")
-        )
 
-    return _PipelineExecutor(cells_list, options).run()
+        return _PipelineExecutor(cells_list, options).run()
+    finally:
+        cleanup_run_artifacts(cells_list, options.log_dir, options.keep_artifacts)
+
+
+def cleanup_run_artifacts(cells: Iterable[Cell], log_dir: Path, keep_artifacts: bool) -> None:
+    if keep_artifacts:
+        return
+    for cell in cells:
+        if cell.example.source != "case-runner":
+            shutil.rmtree(cell.build_dir, ignore_errors=True)
+            continue
+        cleanup_commands = [command for command in cell.commands if command.kind == "clean"]
+        if not cleanup_commands:
+            shutil.rmtree(cell.build_dir, ignore_errors=True)
+            continue
+        log_file = log_dir / f"{safe_log_name(cell.example.rel_path)}__{cell.mode}.log"
+        with log_file.open("a", encoding="utf-8", errors="replace") as log:
+            for command in cleanup_commands:
+                log.write(f"\n[CLEANUP] $ {command.raw}\n")
+                rc = _run_command(command, cell.example.path, log, timeout=60)
+                log.write(f"[CLEANUP] rc={rc}\n")
 
 
 class _PipelineExecutor:

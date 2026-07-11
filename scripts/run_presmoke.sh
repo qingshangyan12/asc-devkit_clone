@@ -77,8 +77,24 @@ cleanup_multi_card_workspaces() {
     log "multi_card_workspace_cleanup_done path=$workspace_root"
 }
 
-cleanup_runtime() {
+cleanup_transient_run_artifacts() {
     cleanup_multi_card_workspaces
+    local found=0
+    [[ -d "$OUT_ROOT/.plan" ]] && found=1
+    [[ -d "$OUT_ROOT/.state" ]] && found=1
+    if find "$OUT_ROOT" -mindepth 2 -maxdepth 2 -type d -name '.locks' -print -quit | grep -q .; then
+        found=1
+    fi
+    (( found == 1 )) || return 0
+
+    log "transient_artifact_cleanup_start root=$OUT_ROOT"
+    rm -rf -- "$OUT_ROOT/.plan" "$OUT_ROOT/.state"
+    find "$OUT_ROOT" -mindepth 2 -maxdepth 2 -type d -name '.locks' -exec rm -rf -- {} +
+    log "transient_artifact_cleanup_done root=$OUT_ROOT"
+}
+
+cleanup_runtime() {
+    cleanup_transient_run_artifacts
     cleanup_lock
 }
 
@@ -735,7 +751,7 @@ main() {
     fi
     retry_timeouts
     write_final_report
-    cleanup_multi_card_workspaces
+    cleanup_transient_run_artifacts
     local effective_rc
     effective_rc="$(cat "$OUT_ROOT/effective_rc.txt" 2>/dev/null || echo 1)"
     log "presmoke_done out_root=$OUT_ROOT effective_rc=$effective_rc"

@@ -421,6 +421,9 @@ EOF
             self.assertTrue((root / "out/full_card1/results/report.json").exists())
             self.assertTrue((root / "out/full_card2/results/report.json").exists())
             self.assertFalse((root / "out/.workspaces").exists())
+            self.assertFalse((root / "out/.plan").exists())
+            self.assertFalse((root / "out/.state").exists())
+            self.assertFalse((root / "out/full_card0/.locks").exists())
             self.assertIn("multi_card_workspace_cleanup_done", result.stdout)
             self.assertIn("multi_card_start cards=0 1 2 cases=5", result.stdout)
             self.assertIn(
@@ -460,6 +463,9 @@ EOF
             workspace = root / "out/.workspaces/card_0"
             workspace.mkdir(parents=True)
             (workspace / "build.bin").write_text("temporary", encoding="utf-8")
+            (root / "out/.plan").mkdir()
+            (root / "out/.state").mkdir()
+            (root / "out/full_card0/.locks").mkdir(parents=True)
             env = self.base_env(
                 root,
                 PROJECT_ROOT=str(root),
@@ -474,6 +480,9 @@ EOF
             self.assertEqual(result.returncode, 1)
             self.assertTrue((root / "out/FINAL_REPORT.md").exists())
             self.assertFalse((root / "out/.workspaces").exists())
+            self.assertFalse((root / "out/.plan").exists())
+            self.assertFalse((root / "out/.state").exists())
+            self.assertFalse((root / "out/full_card0/.locks").exists())
             self.assertIn("multi_card_workspace_cleanup_done", result.stdout)
 
     def test_auto_npu_cards_prefers_davinci_devices_over_npu_smi(self) -> None:
