@@ -13,6 +13,18 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="${PROJECT_ROOT:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
+
+if command -v update-alternatives >/dev/null 2>&1 \
+    && [[ -x /usr/bin/gcc-13 ]] \
+    && [[ -x /usr/bin/g++-13 ]]; then
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 10
+    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 10
+    update-alternatives --config gcc <<< '1'
+    update-alternatives --config g++ <<< '1'
+fi
+
+pip3 install -r "${PROJECT_ROOT}/.devcontainer/requirements.txt"
+
 ASCEND_HOME_DIR="${ASCEND_HOME_DIR:-/usr/local/Ascend/ascend-toolkit/latest}"
 ARCH="${ARCH:-dav-2201}"
 MODES="${MODES:-${MODE:-npu}}"
@@ -56,11 +68,25 @@ cleanup_lock() {
     rm -rf "$LOCK_DIR"
 }
 
+cleanup_multi_card_workspaces() {
+    [[ "$MULTI_CARD_WORKSPACE_MODE" == "copy" ]] || return 0
+    local workspace_root="$OUT_ROOT/.workspaces"
+    [[ -d "$workspace_root" ]] || return 0
+    log "multi_card_workspace_cleanup_start path=$workspace_root"
+    rm -rf -- "$workspace_root"
+    log "multi_card_workspace_cleanup_done path=$workspace_root"
+}
+
+cleanup_runtime() {
+    cleanup_multi_card_workspaces
+    cleanup_lock
+}
+
 acquire_lock() {
     mkdir -p "$(dirname "$LOCK_DIR")"
     if mkdir "$LOCK_DIR" 2>/dev/null; then
         echo "$$" > "$LOCK_DIR/pid"
-        trap cleanup_lock EXIT
+        trap cleanup_runtime EXIT
         return
     fi
 
@@ -73,7 +99,7 @@ acquire_lock() {
     rm -rf "$LOCK_DIR"
     mkdir "$LOCK_DIR"
     echo "$$" > "$LOCK_DIR/pid"
-    trap cleanup_lock EXIT
+    trap cleanup_runtime EXIT
 }
 
 source_cann() {
@@ -709,6 +735,7 @@ main() {
     fi
     retry_timeouts
     write_final_report
+    cleanup_multi_card_workspaces
     local effective_rc
     effective_rc="$(cat "$OUT_ROOT/effective_rc.txt" 2>/dev/null || echo 1)"
     log "presmoke_done out_root=$OUT_ROOT effective_rc=$effective_rc"

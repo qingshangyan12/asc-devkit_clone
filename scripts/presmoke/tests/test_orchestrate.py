@@ -33,9 +33,9 @@ class OrchestrateShellTest(unittest.TestCase):
 
     def copy_orchestrate_fixture(self, root: Path) -> Path:
         project_root = Path(__file__).resolve().parents[3]
-        script = root / "scripts/run_presmoke_v2.sh"
+        script = root / "scripts/run_presmoke.sh"
         script.parent.mkdir(parents=True)
-        shutil.copy(project_root / "scripts/run_presmoke_v2.sh", script)
+        shutil.copy(project_root / "scripts/run_presmoke.sh", script)
         script.chmod(0o755)
 
         presmoke_pkg = root / "scripts/presmoke"
@@ -45,6 +45,12 @@ class OrchestrateShellTest(unittest.TestCase):
 
         fake_bin = root / "bin"
         fake_bin.mkdir()
+        fake_pip = fake_bin / "pip3"
+        fake_pip.write_text(
+            "#!/usr/bin/env bash\nprintf '%s\\n' \"$@\" > \"${PIP_CAPTURE:-/dev/null}\"\n",
+            encoding="utf-8",
+        )
+        fake_pip.chmod(0o755)
         fake_python = fake_bin / "python3"
         fake_python.write_text(
             """#!/usr/bin/env bash
@@ -232,6 +238,28 @@ EOF
             self.assertIn(f"out_root={root / 'presmoke_reports' / 'presmoke_dav-2201_'}", result.stdout)
             self.assertFalse((root / "presmoke_results").exists())
 
+    def test_installs_devcontainer_requirements_before_presmoke(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            requirements = root / ".devcontainer/requirements.txt"
+            requirements.parent.mkdir()
+            requirements.write_text("", encoding="utf-8")
+            script = self.copy_orchestrate_fixture(root)
+            capture = root / "pip_args.txt"
+            env = self.base_env(
+                root,
+                PROJECT_ROOT=str(root),
+                OUT_ROOT=str(root / "out"),
+                ASCEND_OPP_PATH=str(root / "opp"),
+                PIP_CAPTURE=str(capture),
+                NPU_CARDS="0",
+            )
+
+            result = subprocess.run(["bash", str(script), "--dry-run"], text=True, capture_output=True, env=env)
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(capture.read_text(encoding="utf-8").splitlines(), ["install", "-r", str(requirements)])
+
     def test_cpu_mode_uses_default_schedule(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -368,7 +396,8 @@ EOF
             self.assertTrue((root / "out/full_card0/results/report.json").exists())
             self.assertTrue((root / "out/full_card1/results/report.json").exists())
             self.assertTrue((root / "out/full_card2/results/report.json").exists())
-            self.assertTrue((root / "out/.workspaces/card_0/scripts/run_presmoke_v2.sh").exists())
+            self.assertFalse((root / "out/.workspaces").exists())
+            self.assertIn("multi_card_workspace_cleanup_done", result.stdout)
             self.assertIn("multi_card_start cards=0 1 2 cases=5", result.stdout)
             self.assertIn(
                 f"project_root={root / 'out/.workspaces/card_0'}",
@@ -381,6 +410,29 @@ EOF
             self.assertIn("filters=case/b case/e", (root / "out/full_card1/run_env.txt").read_text(encoding="utf-8"))
             self.assertIn("filters=case/c", (root / "out/full_card2/run_env.txt").read_text(encoding="utf-8"))
             self.assertIn("Cases: total=5 pass=5 fail=0 skip=0", result.stdout)
+
+    def test_failed_run_cleans_temporary_workspaces(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            script = self.copy_orchestrate_fixture(root)
+            workspace = root / "out/.workspaces/card_0"
+            workspace.mkdir(parents=True)
+            (workspace / "build.bin").write_text("temporary", encoding="utf-8")
+            env = self.base_env(
+                root,
+                PROJECT_ROOT=str(root),
+                OUT_ROOT=str(root / "out"),
+                ASCEND_OPP_PATH=str(root / "opp"),
+                PRESMOKE_STUB_RC="1",
+                NPU_CARDS="0",
+            )
+
+            result = subprocess.run(["bash", str(script)], text=True, capture_output=True, env=env, check=False)
+
+            self.assertEqual(result.returncode, 1)
+            self.assertTrue((root / "out/FINAL_REPORT.md").exists())
+            self.assertFalse((root / "out/.workspaces").exists())
+            self.assertIn("multi_card_workspace_cleanup_done", result.stdout)
 
     def test_auto_npu_cards_prefers_davinci_devices_over_npu_smi(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
