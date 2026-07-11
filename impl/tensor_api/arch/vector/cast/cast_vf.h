@@ -137,10 +137,9 @@ template<typename CalcFunc, typename TraitType, typename WidthCategory>
 class CastVF {
 public:
     template<typename DstRegType, typename SrcRegType, typename T, typename U>
-    __simd_vf__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, int32_t repeat, int32_t oneRepSize,
-        uint32_t dataSize)
+    __simd_vf__ inline static void Run(__ubuf__ T* dst, __ubuf__ U* src, const uint32_t dataSize)
     {
-        using greaterType = Std::conditional_t<(sizeof(dstType) > sizeof(srcType)), dstType, srcType>;
+        using greaterType = Std::conditional_t<(sizeof(T) > sizeof(U)), T, U>;
         constexpr uint32_t oneRepSize = static_cast<uint32_t>(asc_get_vf_len() / sizeof(greaterType));
         uint16_t repeat = static_cast<uint16_t>((dataSize + oneRepSize - 1) / oneRepSize);
 
@@ -166,7 +165,7 @@ public:
         using DstRegType = typename VectorTypeTransform::template Get<dstType>;
         using SrcRegType = typename VectorTypeTransform::template Get<srcType>;
 
-        uint32_t dstSize = dst.Size();
+        const uint32_t dstSize = dst.Size();
 
         constexpr bool src_eq_dst = (sizeof(dstType) == sizeof(srcType));     // 1:1: float<->int32, half<->int16
         constexpr bool dst_2x_src = (sizeof(dstType) == 2 * sizeof(srcType)); // 1:2: half->float, int16->int32
@@ -181,7 +180,7 @@ public:
                             Std::conditional_t<dst_4x_src, CastWidthDst4xSrc, CastWidthSrc4xDst>>>>;
 
         CastVF<CalcFunc, TraitType, WidthCategory>::template Run<DstRegType, SrcRegType>(
-            dst.Data().Get(), src.Data().Get(), repeat, oneRepSize, dstSize);
+            dst.Data().Get(), src.Data().Get(), dstSize);
     }
 };
 
