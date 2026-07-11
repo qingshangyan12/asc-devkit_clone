@@ -73,7 +73,7 @@ struct MakeNzFrameLayout {
     }
 };
 
-struct MakeNDExtFrameLayout {
+struct MakeNDExtFrameLayout {   // Shape = ((1, M), (1, N))
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto Make(T row, U column) {
         auto shape = MakeShape(MakeShape(_1{}, row), MakeShape(_1{}, column));
@@ -88,7 +88,7 @@ struct MakeNDExtFrameLayout {
     }
 };
 
-struct MakeNDFrameLayout {
+struct MakeNDFrameLayout {  //Shape = (M, N)
     template <typename TraitType, typename T, typename U>
     __aicore__ inline static auto Make(T row, U column) {
         auto shape = MakeShape(row, column);
