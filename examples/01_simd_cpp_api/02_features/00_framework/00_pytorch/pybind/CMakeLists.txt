@@ -17,25 +17,39 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+execute_process(
+    COMMAND ${CMAKE_CXX_COMPILER} -print-file-name=libgcc.a
+    OUTPUT_VARIABLE LIBGCC_PATH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    RESULT_VARIABLE GCC_QUERY_RESULT
+)
+if(NOT GCC_QUERY_RESULT EQUAL 0 OR NOT EXISTS "${LIBGCC_PATH}")
+    message(FATAL_ERROR "Failed to locate libgcc.a using ${CMAKE_CXX_COMPILER}")
+endif()
+
+get_filename_component(LIBGCC_PATH "${LIBGCC_PATH}" REALPATH)
+string(REGEX REPLACE "/lib/gcc/.*$" "" GCC_TOOLCHAIN_ROOT "${LIBGCC_PATH}")
+if("${GCC_TOOLCHAIN_ROOT}" STREQUAL "${LIBGCC_PATH}")
+    message(FATAL_ERROR "Failed to derive GCC toolchain root from ${LIBGCC_PATH}")
+endif()
+message(STATUS "GCC toolchain root: ${GCC_TOOLCHAIN_ROOT}")
+
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 
 execute_process(
-    COMMAND ${Python3_EXECUTABLE} -c
-            [=[
-import importlib.util
-print(importlib.util.find_spec('torch').submodule_search_locations[0] + '/share/cmake')
-]=]
+    COMMAND ${CMAKE_COMMAND} -E env
+            ASCEND_SLOG_PRINT_TO_STDOUT=0
+            ${Python3_EXECUTABLE} -c "import torch; print(torch.utils.cmake_prefix_path)"
     OUTPUT_STRIP_TRAILING_WHITESPACE
     OUTPUT_VARIABLE TORCH_CMAKE_PREFIX_PATH
 )
 find_package(Torch REQUIRED HINTS ${TORCH_CMAKE_PREFIX_PATH})
 
 execute_process(
-    COMMAND ${Python3_EXECUTABLE} -c
-            [=[
-import importlib.util
-print(importlib.util.find_spec('torch_npu').submodule_search_locations[0])
-]=]
+    COMMAND ${CMAKE_COMMAND} -E env
+            ASCEND_SLOG_PRINT_TO_STDOUT=0
+            ${Python3_EXECUTABLE} -c "import os, torch_npu; print(os.path.dirname(torch_npu.__file__))"
     OUTPUT_STRIP_TRAILING_WHITESPACE
     OUTPUT_VARIABLE TORCH_NPU_PATH
 )
@@ -43,11 +57,9 @@ set(TORCH_NPU_INCLUDE_DIRS ${TORCH_NPU_PATH}/include)
 set(TORCH_NPU_LIBRARIES ${TORCH_NPU_PATH}/lib)
 
 execute_process(
-    COMMAND ${Python3_EXECUTABLE} -c
-            [=[
-import importlib.util
-print(importlib.util.find_spec('pybind11').submodule_search_locations[0] + '/share/cmake/pybind11')
-]=]
+    COMMAND ${CMAKE_COMMAND} -E env
+            ASCEND_SLOG_PRINT_TO_STDOUT=0
+            ${Python3_EXECUTABLE} -c "import pybind11; print(pybind11.get_cmake_dir())"
     OUTPUT_STRIP_TRAILING_WHITESPACE
     OUTPUT_VARIABLE PYBIND11_CMAKE_PREFIX_PATH
 )
@@ -71,7 +83,12 @@ target_link_directories(ascendc_ops PRIVATE
     ${TORCH_NPU_LIBRARIES}
 )
 
+target_link_options(ascendc_ops PRIVATE
+    --gcc-toolchain=${GCC_TOOLCHAIN_ROOT}
+)
+
 target_compile_options(ascendc_ops PRIVATE
     ${TORCH_CXX_FLAGS}
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
+    $<$<COMPILE_LANGUAGE:ASC>:--gcc-toolchain=${GCC_TOOLCHAIN_ROOT}>
 )
