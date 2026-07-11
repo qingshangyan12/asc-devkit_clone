@@ -279,7 +279,7 @@ __aicore__ inline void TPipeBase::AuxShareBufStart(
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
         this->g_tpipeImpl.bufPool_[hardU8].maxAddr += shareLens[pos] / HALF_FACTOR; // Reset resource start position.
 #else
-        Internal::g_tPipeAddrBufPool[hardU8] += shareLens[pos] / HALF_FACTOR; / Reset resource start position.
+        Internal::g_tPipeAddrBufPool[hardU8] += shareLens[pos] / HALF_FACTOR; // Reset resource start position.
 #endif
     }
 
