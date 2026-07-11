@@ -84,6 +84,18 @@ __aicore__ inline constexpr auto Capacity(const LayoutType& layout);
 template <typename Tensor, typename Coord, typename Info>
 __aicore__ inline constexpr decltype(auto) Slice(Tensor&& tensor, const Coord& coord, const Info& info);
 
+template <size_t... SqueezeDims, typename T, typename Enable>
+__aicore__ inline constexpr auto Squeeze(const T& x);
+
+template <typename Pattern, typename T, typename Enable>
+__aicore__ inline constexpr auto Squeeze(const T& x, const Pattern& pattern);
+
+template <size_t... SqueezeDims, typename T, typename Enable>
+__aicore__ inline constexpr auto Squeeze(const T& x);
+
+template <typename Pattern, typename T, typename Enable>
+__aicore__ inline constexpr auto Squeeze(const T& x, const Pattern& pattern);
+
 template <typename LayoutPattern, typename TraitType, typename... Args>
 __aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args);
 
