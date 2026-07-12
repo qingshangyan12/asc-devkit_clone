@@ -64,6 +64,21 @@ log() {
     printf '[%s] %s\n' "$(date_iso)" "$*" | tee -a "$STATUS_FILE"
 }
 
+copy_ci_run_log() {
+    local source_log="$SCRIPT_DIR/run_test.log"
+    local target_log="$PROJECT_ROOT/run_test.log"
+    [[ -f "$source_log" ]] || return 0
+
+    local attempt
+    for ((attempt = 0; attempt < 20; attempt++)); do
+        if grep -qE 'execute samples (success|failed)' "$source_log"; then
+            break
+        fi
+        sleep 0.1
+    done
+    cp -f -- "$source_log" "$target_log" || true
+}
+
 cleanup_lock() {
     rm -rf "$LOCK_DIR"
 }
@@ -761,6 +776,7 @@ main() {
     else
         echo "execute samples failed" >&2
     fi
+    copy_ci_run_log
     exit "$effective_rc"
 }
 

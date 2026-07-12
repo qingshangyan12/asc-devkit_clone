@@ -238,6 +238,32 @@ EOF
             self.assertIn(f"out_root={root / 'presmoke_reports' / 'presmoke_dav-2201_'}", result.stdout)
             self.assertFalse((root / "presmoke_results").exists())
 
+    def test_copies_ci_run_log_to_project_root(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            script = self.copy_orchestrate_fixture(root)
+            env = self.base_env(
+                root,
+                PROJECT_ROOT=str(root),
+                OUT_ROOT=str(root / "out"),
+                ASCEND_OPP_PATH=str(root / "opp"),
+                NPU_CARDS="0",
+            )
+            command = f'bash "{script}" 2>&1 | tee "{script.parent / "run_test.log"}"'
+
+            result = subprocess.run(
+                ["bash", "-o", "pipefail", "-c", command],
+                text=True,
+                capture_output=True,
+                env=env,
+                check=False,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            copied_log = root / "run_test.log"
+            self.assertTrue(copied_log.exists())
+            self.assertIn("execute samples success", copied_log.read_text(encoding="utf-8"))
+
     def test_installs_devcontainer_requirements_before_presmoke(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
