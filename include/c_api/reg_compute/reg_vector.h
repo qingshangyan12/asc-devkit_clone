@@ -8,6 +8,10 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "reg_vector.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
@@ -1265,7 +1269,7 @@ __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint32_t** src_a
 __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ float** src_array);
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
-#endif   
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#endif

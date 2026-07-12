@@ -8,6 +8,10 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "reg_store.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #ifndef INCLUDE_C_API_REG_COMPUTE_REG_STORE_H
 #define INCLUDE_C_API_REG_COMPUTE_REG_STORE_H
 
@@ -714,7 +718,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  int32_t*& dst,
 
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  uint32_t*& dst, vector_store_unalign& src0,
     vector_uint32_t src1, uint32_t count);
-    
+
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  int64_t*& dst, vector_store_unalign& src0,
     vector_int64_t src1, uint32_t count);
 
@@ -768,7 +772,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  uint16_t* dst,
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  int32_t* dst, vector_store_unalign& src0, vector_int32_t src1);
 
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  uint32_t* dst, vector_store_unalign& src0, vector_uint32_t src1);
-    
+
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  int64_t* dst, vector_store_unalign& src0, vector_int64_t src1);
 
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  half* dst, vector_store_unalign& src0, vector_half src1);
@@ -1072,7 +1076,7 @@ __simd_callee__ inline void asc_store(__ubuf__  int64_t* dst, vector_int64_t src
 // ==========asc_store(with count)(int8/uint8/e2m1/e1m2/e8m0/e5m2/e4m3fn/int16/uint16/half/bfloat16/int32/uint32/float/int64)============
 __simd_callee__ inline void asc_store(__ubuf__  int8_t* dst, vector_int8_t src, uint32_t count);
 
-__simd_callee__ inline void asc_store(__ubuf__  uint8_t* dst, vector_uint8_t src, uint32_t count);  
+__simd_callee__ inline void asc_store(__ubuf__  uint8_t* dst, vector_uint8_t src, uint32_t count);
 
 __simd_callee__ inline void asc_store(__ubuf__  int16_t* dst, vector_int16_t src, uint32_t count);
 

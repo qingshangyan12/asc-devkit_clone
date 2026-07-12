@@ -8,6 +8,10 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "reg_load.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #ifndef INCLUDE_C_API_REG_COMPUTE_REG_LOAD_H
 #define INCLUDE_C_API_REG_COMPUTE_REG_LOAD_H
 
@@ -182,7 +186,7 @@ __simd_callee__ inline void asc_gather_datablock(vector_uint32_t& dst, __ubuf__ 
 
 __simd_callee__ inline void asc_gather_datablock(vector_int64_t& dst, __ubuf__  int64_t* src,
     vector_uint32_t index);
-    
+
 __simd_callee__ inline void asc_gather_datablock(vector_uint64_t& dst, __ubuf__  uint64_t* src,
     vector_uint32_t index);
 
