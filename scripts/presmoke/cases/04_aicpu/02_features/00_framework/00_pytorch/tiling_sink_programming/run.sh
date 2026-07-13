@@ -23,9 +23,22 @@ case_build() {
 
 case_run() {
     mkdir -p "$BUILD_DIR"
-    presmoke_clear_plog
-    (cd "$CASE_DIR" && ASCEND_GLOBAL_LOG_LEVEL=1 soc_version=$SOC_VERSION bash -lc 'python3 test_add_custom_tiling_sink.py')
-    presmoke_verify_tiling_sink_task_log 'GenerateTaskForSinkOp:Node [AddCustomTilingSink, AddCustomTilingSink] starts to generate tasks for the tiling sink, sk_flag [0].'
+    local sink_log_pattern
+    sink_log_pattern='GenerateTaskForSinkOp:Node [AddCustomTilingSink, AddCustomTilingSink] starts to generate tasks'
+    sink_log_pattern+=' for the tiling sink, sk_flag [0].'
+    local case_pid case_rc=0
+    (
+        cd "$CASE_DIR"
+        exec env \
+            ASCEND_GLOBAL_LOG_LEVEL=1 \
+            soc_version=$SOC_VERSION bash -lc 'exec python3 test_add_custom_tiling_sink.py'
+    ) &
+    case_pid=$!
+    wait "$case_pid" || case_rc=$?
+    if (( case_rc != 0 )); then
+        return "$case_rc"
+    fi
+    presmoke_verify_tiling_sink_task_log_for_pid "$case_pid" "$sink_log_pattern"
 }
 
 case_verify() {
