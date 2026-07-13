@@ -33,7 +33,7 @@ Global Memory（GM）与Unified Buffer（UB）之间的数据搬运提供了多�
 - Unified Buffer -> Global Memory
     - VECOUT -> GM
     <!-- npu="310p" id1 -->
-CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
+    - CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
     <!-- end id1 -->
 
 搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[GM与UB连续数据搬运(DataCopy)](../Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB连续数据搬运(DataCopy).md)。
@@ -67,7 +67,7 @@ src和dst分别为源操作数和目的操作数；count为连续搬运的元素
 - Unified Buffer -> Global Memory
     - VECOUT -> GM
     <!-- npu="310p" id2 -->
-CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
+    - CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
     <!-- end id2 -->
 
 搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[GM与UB高维切分数据搬运(DataCopy)](../Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB高维切分数据搬运(DataCopy).md)。
@@ -99,7 +99,7 @@ src和dst分别为源操作数和目的操作数；repeatParams为DataCopyParams
 - Unified Buffer -> Global Memory
     - VECOUT -> GM
     <!-- npu="310p" id3 -->
-CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
+    - CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
     <!-- end id3 -->
 
 搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[GM与UB切片数据搬运(DataCopy)](../Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB切片数据搬运(DataCopy).md)。
@@ -158,7 +158,7 @@ src和dst分别为源操作数和目的操作数；intriParams为Nd2NzParams类�
 - Unified Buffer -> Global Memory
     - VECOUT -> GM
     <!-- npu="310p" id5 -->
-CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
+    - CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
     <!-- end id5 -->
 
 搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[UB->GM随路转换NZ2ND搬运(DataCopy)](../Memory矢量计算/数据搬运/GM与UB数据搬运/UBToGM随路转换NZ2ND搬运(DataCopy).md)。
@@ -210,7 +210,7 @@ src和dst分别为源操作数和目的操作数；params为NdDmaParams类型的
     - GM -> VECIN
     - GM -> VECOUT
     <!-- npu="950" id7 -->
-GM -> VECCALC（仅Ascend 950PR/Ascend 950DT支持）
+    - GM -> VECCALC（仅Ascend 950PR/Ascend 950DT支持）
     <!-- end id7 -->
 
 搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[GM -> UB非对齐数据搬运(DataCopyPad)](../Memory矢量计算/数据搬运/GM与UB数据搬运/GMToUB非对齐数据搬运(DataCopyPad).md)。

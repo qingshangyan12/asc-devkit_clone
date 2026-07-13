@@ -88,13 +88,13 @@ __aicore__ constexpr inline U Cast(T bVal)
 - 支持的操作数数据类型如下：
 
   <!-- npu="950" id5 -->
-Ascend 950PR/Ascend 950DT，支持fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、bfloat16_t。
+  - Ascend 950PR/Ascend 950DT，支持fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、bfloat16_t。
   <!-- end id5 -->
   <!-- npu="A3" id6 -->
-Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持bfloat16_t。
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持bfloat16_t。
   <!-- end id6 -->
   <!-- npu="910b" id7 -->
-Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持bfloat16_t。
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持bfloat16_t。
   <!-- end id7 -->
 
 <!-- npu="950" id8 -->
