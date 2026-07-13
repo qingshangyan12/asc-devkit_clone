@@ -18,9 +18,9 @@ constexpr uint32_t A2AV_SEND_OFFSET_IDX = 2;
 constexpr uint32_t A2AV_RECV_OFFSET_IDX = 3;
 constexpr int A2AV_OUTPUT_XN_ID = 0;
 constexpr int A2AV_TOKEN_XN_ID = 1;
-constexpr int A2AV_PRE_SYNC_CKE_IDX = 0;
-constexpr int A2AV_POST_SYNC_CKE_IDX = 1;
-constexpr uint16_t A2AV_POST_SYNC_BIT = 1 << 5;
+constexpr int A2AV_POST_SYNC_CKE_IDX = 0;
+constexpr int A2AV_OUTPUT_CKE_IDX = 1;
+constexpr int A2AV_TOKEN_CKE_IDX = 2;
 
 CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
                                    ccu::Variable srcOffset, ccu::Variable dstOffset, ccu::Variable extAddr,
@@ -66,6 +66,8 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
         channelIdx++;
     }
 
+    const uint16_t selfBit = 1 << rankId;
+    const uint16_t allOtherBit = ((1 << rankSize) - 1) & (~selfBit);
     channelIdx = 0;
     for (uint32_t peerId = 0; peerId < rankSize; peerId++) {
         if (peerId == rankId) {
@@ -74,15 +76,15 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
         ccu::Variable peerRecvBase;
         peerRecvBase = outputAddr + extArgs[peerId * A2AV_EXT_FIELD_NUM + A2AV_RECV_OFFSET_IDX];
         ccu::WriteVariableWithNotify(channels[channelIdx], peerRecvBase,
-            A2AV_OUTPUT_XN_ID, A2AV_PRE_SYNC_CKE_IDX, 1 << A2AV_OUTPUT_XN_ID);
+            A2AV_OUTPUT_XN_ID, A2AV_OUTPUT_CKE_IDX, selfBit);
         ccu::WriteVariableWithNotify(channels[channelIdx], tokenInfo,
-            A2AV_TOKEN_XN_ID, A2AV_PRE_SYNC_CKE_IDX, 1 << A2AV_TOKEN_XN_ID);
+            A2AV_TOKEN_XN_ID, A2AV_TOKEN_CKE_IDX, selfBit);
         channelIdx++;
     }
 
-    const uint16_t preSyncBit = (1 << A2AV_OUTPUT_XN_ID) | (1 << A2AV_TOKEN_XN_ID);
     for (uint32_t i = 0; i < channelCount; i++) {
-        ccu::NotifyWait(channels[i], A2AV_PRE_SYNC_CKE_IDX, preSyncBit);
+        ccu::NotifyWait(channels[i], A2AV_OUTPUT_CKE_IDX, allOtherBit);
+        ccu::NotifyWait(channels[i], A2AV_TOKEN_CKE_IDX, allOtherBit);
     }
 
     for (uint32_t rankIdx = 0; rankIdx < rankSize; rankIdx++) {
@@ -122,10 +124,10 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
     }
 
     for (uint32_t i = 0; i < channelCount; i++) {
-        ccu::NotifyRecord(channels[i], A2AV_POST_SYNC_CKE_IDX, A2AV_POST_SYNC_BIT);
+        ccu::NotifyRecord(channels[i], A2AV_POST_SYNC_CKE_IDX, selfBit);
     }
     for (uint32_t i = 0; i < channelCount; i++) {
-        ccu::NotifyWait(channels[i], A2AV_POST_SYNC_CKE_IDX, A2AV_POST_SYNC_BIT);
+        ccu::NotifyWait(channels[i], A2AV_POST_SYNC_CKE_IDX, allOtherBit);
     }
     return CCU_SUCCESS;
 }
