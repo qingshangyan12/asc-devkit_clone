@@ -12,6 +12,10 @@
 set -euo pipefail
 
 CASE_REL=01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_high_performance
+SKIP_REASON='The execution time in CPU mode is too long and needs to be skipped'
+
+SKIP_MODES=(cpu)
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../../../_case_entry.sh"
 presmoke_case_init "$CASE_REL"
