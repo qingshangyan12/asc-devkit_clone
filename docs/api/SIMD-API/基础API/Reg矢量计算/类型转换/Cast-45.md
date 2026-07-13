@@ -23,7 +23,6 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
-- BS9SX2A AI处理器：支持
 
 
 ## 功能说明<a name="section618mcpsimp"></a>
