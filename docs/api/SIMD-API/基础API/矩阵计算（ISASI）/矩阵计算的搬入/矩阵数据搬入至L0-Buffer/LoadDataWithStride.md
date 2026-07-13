@@ -109,14 +109,14 @@ __aicore__ inline void LoadDataWithStride(const LocalTensor<T>& dst, const Local
 本接需与SetLoadDataRepeatWithStride接口配合使用，展示代码示例片段：
 
 ```cpp
-// Load3Dv2指令完成img2col的过程，可知 img2col后A矩阵高度为ho * wo,根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：A矩阵的高度为CeilAlign(k, fractalShape[0])；img2col后A矩阵宽度为ci * kh * kw，代入kh=1，kw=1，可知A矩阵的宽度为CeilAlign(m, fractalShape[1])。最后，配置loadDataParams.enTranspose = true，将整个A 矩阵转置并且将其中每一个分形转置。
+// LoadDataWithStride指令完成img2col的过程，可知 img2col后A矩阵高度为ho * wo,根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：A矩阵的高度为CeilAlign(k, fractalShape[0])；img2col后A矩阵宽度为ci * kh * kw，代入kh=1，kw=1，可知A矩阵的宽度为CeilAlign(m, fractalShape[1])。最后，配置loadDataParams.enTranspose = true，将整个A 矩阵转置并且将其中每一个分形转置。
 AscendC::LoadData3DParamsV2<T> loadDataParams;
 
 // 设置loadDataParams相关参数
 ...
 
-// 使用SetLoadDataRepeat接口，设置LoadDataWithStride接口的repeat参数
-AscendC::LoadDataRepeatParam repeatParams;
+// 使用SetLoadDataRepeatWithStride接口，设置LoadDataWithStride接口的repeat参数
+AscendC::LoadDataRepeatParamWithStride repeatParams;
 repeatParams.repeatTime = 1;  // height/width方向上的迭代次数
 repeatParams.repeatStride = 1;  // height/width方向上前后迭代起始位置的距离
 repeatParams.repeatMode = 0;  // 迭代方向：0：迭代沿height; 1：迭代沿width
