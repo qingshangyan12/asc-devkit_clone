@@ -18,6 +18,7 @@ import numpy as np
 
 
 def gen_golden_data_simple():
+
     src_shape = [4, 256]
     src_dtype = np.float32
     mask_shape = [4, 32]
@@ -42,7 +43,7 @@ def gen_golden_data_simple():
     elif src_shape[1] < mask_shape[1]:
         mask = np.random.randint(0, 2, mask_shape).astype(mask_dtype)
         mask.tofile("./input/input_mask.bin")
-        mask = mask[:, : src_shape[1]]
+        mask = mask[:, :src_shape[1]]
         golden = src * mask
     elif ceil(src_shape[1] / 8) * 8 == mask_shape[1]:
         mask = np.random.randint(1, 255, mask_shape).astype(mask_dtype)
@@ -54,7 +55,7 @@ def gen_golden_data_simple():
                 value = bin(mask[i][j])[2:]
                 value = list("0" * (8 - len(value)) + value)[::-1]
                 line.extend(value)
-            result.extend(line[: src_shape[1]])
+            result.extend(line[:src_shape[1]])
 
         index = 0
         temp = np.zeros(params[0]).astype(mask_dtype)
@@ -73,7 +74,7 @@ def gen_golden_data_simple():
                 value = bin(mask[i][j])[2:]
                 value = list("0" * (8 - len(value)) + value)[::-1]
                 line.extend(value)
-            result.extend(line[: src_shape[1]])
+            result.extend(line[:src_shape[1]])
 
         index = 0
         temp = np.zeros(src_shape).astype(mask_dtype)
@@ -89,7 +90,6 @@ def gen_golden_data_simple():
 
     src.tofile("./input/input_src.bin")
     golden.tofile("./output/golden.bin")
-
 
 if __name__ == "__main__":
     gen_golden_data_simple()

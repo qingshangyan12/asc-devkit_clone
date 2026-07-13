@@ -16,7 +16,6 @@ import os
 import numpy as np
 import ml_dtypes
 
-
 def gen_golden_data():
     m = 32
     n = 128
