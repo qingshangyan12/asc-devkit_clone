@@ -47,6 +47,8 @@ export PRESMOKE_ARCH=dav-2201
 export PRESMOKE_MODE=npu
 presmoke_run_command() {{
     if [[ "$1" == "make" ]]; then
+        [[ "${{PRESMOKE_MAKE_JOBS:-}}" == "16" ]] || return 71
+        [[ "${{CMAKE_BUILD_PARALLEL_LEVEL:-}}" == "16" ]] || return 72
         if ! mkdir {active} 2>/dev/null; then
             touch {collision}
             return 70

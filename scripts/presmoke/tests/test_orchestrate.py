@@ -438,6 +438,45 @@ EOF
             )
             self.assertIn("Cases: total=5 pass=5 fail=0 skip=0", result.stdout)
 
+    def test_matching_fixed_shards_override_dynamic_balancing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            script = self.copy_orchestrate_fixture(root)
+            shards = root / "scripts/presmoke/schedules/shards/dav-2201_npu_3cards"
+            shards.mkdir(parents=True)
+            (shards / "card_0.txt").write_text("case/e\n", encoding="utf-8")
+            (shards / "card_1.txt").write_text("case/d\ncase/c\n", encoding="utf-8")
+            (shards / "card_2.txt").write_text("case/b\ncase/a\n", encoding="utf-8")
+            env = self.base_env(
+                root,
+                PROJECT_ROOT=str(root),
+                OUT_ROOT=str(root / "out"),
+                ASCEND_OPP_PATH=str(root / "opp"),
+            )
+
+            result = subprocess.run(
+                ["bash", str(script)],
+                text=True,
+                capture_output=True,
+                env=env,
+                check=False,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("multi_card_fixed_shards", result.stdout)
+            self.assertIn(
+                "filters=case/e",
+                (root / "out/full_card0/run_env.txt").read_text(encoding="utf-8"),
+            )
+            self.assertIn(
+                "filters=case/d case/c",
+                (root / "out/full_card1/run_env.txt").read_text(encoding="utf-8"),
+            )
+            self.assertIn(
+                "filters=case/b case/a",
+                (root / "out/full_card2/run_env.txt").read_text(encoding="utf-8"),
+            )
+
     def test_build_only_uses_single_run_and_forwards_stage(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

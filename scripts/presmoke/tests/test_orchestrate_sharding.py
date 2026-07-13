@@ -122,6 +122,34 @@ class OrchestrateShardingTest(unittest.TestCase):
         self.assertNotEqual(assignments["case/a"], assignments["case/b"])
         self.assertIn(assignments["case/c"], {"0", "1"})
 
+    def test_fixed_shards_map_logical_shards_to_detected_cards(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            report = write_plan_report(root, ["case/a", "case/b", "case/c"])
+            shards = root / "shards"
+            shards.mkdir()
+            (shards / "card_0.txt").write_text("case/b\ncase/a\n", encoding="utf-8")
+            (shards / "card_1.txt").write_text("case/c\n", encoding="utf-8")
+
+            assignments = shard_examples(report, ["4", "6"], fixed_shards=shards)
+
+        self.assertEqual(
+            assignments,
+            [("4", "case/b"), ("4", "case/a"), ("6", "case/c")],
+        )
+
+    def test_fixed_shards_reject_incomplete_case_coverage(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            report = write_plan_report(root, ["case/a", "case/b"])
+            shards = root / "shards"
+            shards.mkdir()
+            (shards / "card_0.txt").write_text("case/a\n", encoding="utf-8")
+            (shards / "card_1.txt").write_text("", encoding="utf-8")
+
+            with self.assertRaisesRegex(ValueError, "missing planned cases.*case/b"):
+                shard_examples(report, ["0", "1"], fixed_shards=shards)
+
 
 def write_plan_report(root: Path, examples: list[str]) -> Path:
     report = root / "report.json"
