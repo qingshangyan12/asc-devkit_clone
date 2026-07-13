@@ -1,6 +1,6 @@
 # Presmoke Watch Entry
 
-`scripts/run_presmoke.sh` is the CI and manual watch entry. It runs one full 910B or 950 presmoke round, writes archiveable reports, and can retry timeout cases on other cards.
+`scripts/run_presmoke_v2.sh` is the new CI and manual watch entry. It runs one full 910B or 950 presmoke round, writes archiveable reports, and can retry timeout cases on other cards.
 
 For direct Python CLI experiments, use `PYTHONPATH=scripts PRESMOKE_PROJECT_ROOT=$PWD python3 -m presmoke ...`.
 
@@ -11,7 +11,7 @@ Before a full watch run, the orchestrator removes all entries under the active C
 Run with defaults. This is the shortest command and is intended to be compatible with the old `run_presmoke.sh` caller contract:
 
 ```bash
-bash scripts/run_presmoke.sh
+bash scripts/run_presmoke_v2.sh
 ```
 
 Default behavior:
@@ -31,25 +31,38 @@ Default behavior:
 Check which cases would run without executing them:
 
 ```bash
-bash scripts/run_presmoke.sh --dry-run
+bash scripts/run_presmoke_v2.sh --dry-run
+```
+
+Run only the build stage, without run or verify. This mode uses one workspace and preserves build artifacts:
+
+```bash
+bash scripts/run_presmoke_v2.sh --stages build
+```
+
+Build one case only:
+
+```bash
+bash scripts/run_presmoke_v2.sh --stages build \
+  --exact-filter 01_simd_cpp_api/01_utilities/02_dump/simple_dump
 ```
 
 Run 910B on a specific card:
 
 ```bash
-NPU_CARDS=7 PRIMARY_CARD=7 bash scripts/run_presmoke.sh
+NPU_CARDS=7 PRIMARY_CARD=7 bash scripts/run_presmoke_v2.sh
 ```
 
 Run 950:
 
 ```bash
-ARCH=dav-3510 PRIMARY_CARD=0 bash scripts/run_presmoke.sh
+ARCH=dav-3510 PRIMARY_CARD=0 bash scripts/run_presmoke_v2.sh
 ```
 
 Run one case:
 
 ```bash
-bash scripts/run_presmoke.sh \
+bash scripts/run_presmoke_v2.sh \
   --filter 01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_unitflag
 ```
 
@@ -58,19 +71,19 @@ Write reports to a specific directory:
 ```bash
 OUT_ROOT=/tmp/presmoke_910b_card7 \
 PRIMARY_CARD=7 \
-bash scripts/run_presmoke.sh
+bash scripts/run_presmoke_v2.sh
 ```
 
 Run CPU mode explicitly. CPU mode is not the default:
 
 ```bash
-MODES=cpu bash scripts/run_presmoke.sh
+MODES=cpu bash scripts/run_presmoke_v2.sh
 ```
 
 Increase CPU run timeout for slow CPU-mode cases:
 
 ```bash
-MODES=cpu CPU_RUN_TIMEOUT=1800 bash scripts/run_presmoke.sh
+MODES=cpu CPU_RUN_TIMEOUT=1800 bash scripts/run_presmoke_v2.sh
 ```
 
 ## CI Commands
@@ -82,7 +95,7 @@ PROJECT_ROOT=/path/to/asc-devkit \
 ARCH=dav-2201 \
 PRIMARY_CARD=7 \
 RETRY_CARDS="0 1 2 3 4 5 6" \
-bash scripts/run_presmoke.sh
+bash scripts/run_presmoke_v2.sh
 ```
 
 950:
@@ -91,19 +104,19 @@ bash scripts/run_presmoke.sh
 PROJECT_ROOT=/path/to/asc-devkit \
 ARCH=dav-3510 \
 PRIMARY_CARD=0 \
-bash scripts/run_presmoke.sh
+bash scripts/run_presmoke_v2.sh
 ```
 
 950 dry-run:
 
 ```bash
-ARCH=dav-3510 PRIMARY_CARD=0 bash scripts/run_presmoke.sh --dry-run
+ARCH=dav-3510 PRIMARY_CARD=0 bash scripts/run_presmoke_v2.sh --dry-run
 ```
 
 910B dry-run:
 
 ```bash
-ARCH=dav-2201 PRIMARY_CARD=7 bash scripts/run_presmoke.sh --dry-run
+ARCH=dav-2201 PRIMARY_CARD=7 bash scripts/run_presmoke_v2.sh --dry-run
 ```
 
 ## Parameters

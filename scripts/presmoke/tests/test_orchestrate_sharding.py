@@ -22,6 +22,23 @@ from presmoke.orchestrate_report import shard_examples
 
 
 class OrchestrateShardingTest(unittest.TestCase):
+    def test_custom_op_dependents_and_parallel_package_stay_on_one_card(self) -> None:
+        dependency_group = [
+            "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclnn_invocation",
+            "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclop_invocation",
+            "01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin",
+            "04_aicpu/02_features/00_framework/00_pytorch/tiling_sink_programming",
+            "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/parallel_ops_package",
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            report = write_plan_report(root, [*dependency_group, "case/a", "case/b", "case/c"])
+            assignments = dict(
+                (example, card) for card, example in shard_examples(report, ["0", "1", "2"])
+            )
+
+        self.assertEqual(len({assignments[example] for example in dependency_group}), 1)
+
     def test_sharding_keeps_same_source_case_on_one_card(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

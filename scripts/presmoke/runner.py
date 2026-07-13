@@ -24,7 +24,7 @@ import time
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Dict, Iterable, Iterator, List, Optional, Union
+from typing import Callable, Iterable, Iterator, List, Optional, Union
 
 from .model import Cell, Command, NpuStats, RunCellsResult, RunResult, StepResult
 
@@ -33,6 +33,28 @@ NpuGate = Callable[[Callable[[], int]], tuple[int, float]]
 
 PRESERVE_BUILD_ARTIFACT_CASES = {
     "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op",
+}
+PARALLEL_OPS_PACKAGE_CASE = (
+    "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/parallel_ops_package"
+)
+CUSTOM_OP_CASE = "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op"
+CUSTOM_OP_STATIC_LIB_CASE = (
+    "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op_static_lib"
+)
+CUSTOM_OP_DEPENDENT_CASES = {
+    "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclnn_invocation",
+    "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclop_invocation",
+    "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin",
+    "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom",
+    "01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin",
+    "04_aicpu/02_features/00_framework/00_pytorch/tiling_sink_programming",
+}
+RUN_AFTER_CASES = {
+    PARALLEL_OPS_PACKAGE_CASE: CUSTOM_OP_DEPENDENT_CASES | {CUSTOM_OP_CASE},
+}
+BUILD_AFTER_CASES = {
+    CUSTOM_OP_CASE: {CUSTOM_OP_STATIC_LIB_CASE},
+    **{dependent: {CUSTOM_OP_CASE} for dependent in CUSTOM_OP_DEPENDENT_CASES},
 }
 CPU_RUN_TIMEOUT = 300
 
@@ -68,6 +90,7 @@ class PipelineOptions:
     jobs: int = 1
     npu_slots: int = 1
     cpu_run_slots: Optional[int] = None
+    stages: str = "all"
 
 
 @dataclass(frozen=True)
@@ -228,6 +251,8 @@ def run_cells_pipeline_with_options(
 ) -> RunCellsResult:
     cells_list = list(cells)
     try:
+        if options.stages == "build":
+            return run_build_only(cells_list, options)
         if options.jobs <= 1:
             npu_pool = NpuSlotPool(options.npu_slots)
             results = [
@@ -246,10 +271,29 @@ def run_cells_pipeline_with_options(
             return RunCellsResult(
                 results, NpuStats(slots=options.npu_slots, queue_model="serial")
             )
-
         return _PipelineExecutor(cells_list, options).run()
     finally:
-        cleanup_run_artifacts(cells_list, options.log_dir, options.keep_artifacts)
+        keep_artifacts = options.keep_artifacts or options.stages == "build"
+        cleanup_run_artifacts(cells_list, options.log_dir, keep_artifacts)
+
+
+def run_build_only(cells: List[Cell], options: PipelineOptions) -> RunCellsResult:
+    def build(cell: Cell) -> RunResult:
+        return run_cell_stage(
+            cell,
+            StageRunOptions(
+                options.log_dir,
+                options.timeout,
+                options.cpu_run_timeout,
+                keep_artifacts=True,
+                stage_name="build",
+            ),
+            commands=build_stage_commands(cell.commands),
+        ).result
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=options.jobs) as executor:
+        results = list(executor.map(build, cells))
+    return RunCellsResult(results, NpuStats(slots=0, queue_model="build-only"))
 
 
 def cleanup_run_artifacts(cells: Iterable[Cell], log_dir: Path, keep_artifacts: bool) -> None:
@@ -288,7 +332,11 @@ class _PipelineExecutor:
         self.results: List[RunResult] = []
         self.results_lock = threading.Lock()
         self.npu_stats = _NpuPipelineStats(self.run_slots, queue_model)
-        self.source_locks = _SourceCaseLockPool()
+        self.planned_keys = {cell.key for cell in cells}
+        self.completed_keys: set[str] = set()
+        self.deferred_items: List[tuple[_PipelineItem, set[str]]] = []
+        self.dependency_lock = threading.Lock()
+        self.dependency_condition = threading.Condition(self.dependency_lock)
 
     @staticmethod
     def _start_threads(
@@ -313,8 +361,15 @@ class _PipelineExecutor:
         self.start_threads(npu_threads, verify_threads)
         try:
             self.run_build_workers()
-            self.ready.join()
-            self.verify_ready.join()
+            while True:
+                self.ready.join()
+                self.verify_ready.join()
+                with self.dependency_lock:
+                    deferred = bool(self.deferred_items)
+                if self.ready.unfinished_tasks == 0 and self.verify_ready.unfinished_tasks == 0:
+                    if deferred:
+                        raise RuntimeError("presmoke case dependency cannot be satisfied")
+                    break
         finally:
             self.stop_threads(npu_threads, verify_threads)
         return RunCellsResult(self.results, self.npu_stats.snapshot())
@@ -322,30 +377,60 @@ class _PipelineExecutor:
     def append_result(self, result: RunResult) -> None:
         with self.results_lock:
             self.results.append(result)
+        ready_items: List[_PipelineItem] = []
+        result_key = f"{result.example}|{result.arch}|{result.mode}"
+        with self.dependency_condition:
+            self.completed_keys.add(result_key)
+            pending: List[tuple[_PipelineItem, set[str]]] = []
+            for item, required_keys in self.deferred_items:
+                if required_keys <= self.completed_keys:
+                    ready_items.append(item)
+                else:
+                    pending.append((item, required_keys))
+            self.deferred_items = pending
+            self.dependency_condition.notify_all()
+        for item in ready_items:
+            self.ready.put(item)
+
+    def required_keys(self, cell: Cell) -> set[str]:
+        required_cases = RUN_AFTER_CASES.get(cell.example.rel_path, set())
+        required_keys = {f"{case}|{cell.arch}|{cell.mode}" for case in required_cases}
+        return required_keys & self.planned_keys
+
+    def wait_for_build_dependencies(self, cell: Cell) -> None:
+        required_cases = BUILD_AFTER_CASES.get(cell.example.rel_path, set())
+        required_keys = {
+            f"{case}|{cell.arch}|{cell.mode}" for case in required_cases
+        } & self.planned_keys
+        with self.dependency_condition:
+            while not required_keys <= self.completed_keys:
+                self.dependency_condition.wait()
 
     def build_worker(self, cell: Cell) -> None:
-        source_lock = self.source_locks.acquire(cell)
-        try:
-            item = run_cell_stage(
-                cell,
-                StageRunOptions(
-                    self.options.log_dir,
-                    self.options.timeout,
-                    self.options.cpu_run_timeout,
-                    keep_artifacts=True,
-                    stage_name="build",
-                ),
-                commands=build_stage_commands(cell.commands),
-            )
-            item.source_lock = source_lock
-            if item.result.status == "PASS":
+        self.wait_for_build_dependencies(cell)
+        item = run_cell_stage(
+            cell,
+            StageRunOptions(
+                self.options.log_dir,
+                self.options.timeout,
+                self.options.cpu_run_timeout,
+                keep_artifacts=True,
+                stage_name="build",
+            ),
+            commands=build_stage_commands(cell.commands),
+        )
+        if item.result.status == "PASS":
+            required_keys = self.required_keys(cell)
+            with self.dependency_lock:
+                if required_keys <= self.completed_keys:
+                    enqueue = True
+                else:
+                    self.deferred_items.append((item, required_keys))
+                    enqueue = False
+            if enqueue:
                 self.ready.put(item)
-            else:
-                self.append_result(item.result)
-                release_item_source_lock(item)
-        except BaseException:
-            source_lock.release()
-            raise
+        else:
+            self.append_result(item.result)
 
     def npu_worker(self, slot_idx: int) -> None:
         while True:
@@ -355,11 +440,7 @@ class _PipelineExecutor:
             try:
                 if item is None:
                     return
-                try:
-                    self.finish_npu_item(item, slot_idx)
-                except BaseException:
-                    release_item_source_lock(item)
-                    raise
+                self.finish_npu_item(item, slot_idx)
             finally:
                 self.ready.task_done()
 
@@ -376,7 +457,6 @@ class _PipelineExecutor:
             self.verify_ready.put(item)
         else:
             self.append_result(result)
-            release_item_source_lock(item)
 
     def verify_worker(self) -> None:
         while True:
@@ -391,10 +471,6 @@ class _PipelineExecutor:
                     keep_artifacts=self.options.keep_artifacts,
                 )
                 self.append_result(result)
-                release_item_source_lock(item)
-            except BaseException:
-                release_item_source_lock(item)
-                raise
             finally:
                 self.verify_ready.task_done()
 
@@ -458,19 +534,6 @@ class _NpuPipelineStats:
         )
 
 
-class _SourceCaseLockPool:
-    def __init__(self) -> None:
-        self._guard = threading.Lock()
-        self._locks: Dict[str, threading.Lock] = {}
-
-    def acquire(self, cell: Cell) -> threading.Lock:
-        key = str(cell.example.path)
-        with self._guard:
-            lock = self._locks.setdefault(key, threading.Lock())
-        lock.acquire()
-        return lock
-
-
 @dataclass
 class _PipelineItem:
     cell: Cell
@@ -479,19 +542,10 @@ class _PipelineItem:
     log_file: Path
     started: float
     ready_at: float = 0.0
-    source_lock: Optional[threading.Lock] = None
 
     def __post_init__(self) -> None:
         if not self.ready_at:
             self.ready_at = time.monotonic()
-
-
-def release_item_source_lock(item: _PipelineItem) -> None:
-    if item.source_lock is None:
-        return
-    source_lock = item.source_lock
-    item.source_lock = None
-    source_lock.release()
 
 
 def run_cell_stage(

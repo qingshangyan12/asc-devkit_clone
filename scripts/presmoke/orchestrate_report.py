@@ -31,6 +31,16 @@ _XML_INVALID_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
 _JUNIT_LOG_TAIL_BYTES = 100_000
 LOG = logging.getLogger(__name__)
 
+CUSTOM_OP_DEPENDENCY_GROUP = {
+    "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclnn_invocation",
+    "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclop_invocation",
+    "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin",
+    "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom",
+    "01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin",
+    "04_aicpu/02_features/00_framework/00_pytorch/tiling_sink_programming",
+    "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/parallel_ops_package",
+}
+
 
 @dataclass(frozen=True)
 class MarkdownRenderContext:
@@ -309,7 +319,12 @@ def group_examples_by_source_case(
 ) -> dict[str, list[str]]:
     groups: dict[str, list[str]] = {}
     for example in examples:
-        groups.setdefault(source_case.get(example, example), []).append(example)
+        group = (
+            "__custom_op_dependency_group__"
+            if example in CUSTOM_OP_DEPENDENCY_GROUP
+            else source_case.get(example, example)
+        )
+        groups.setdefault(group, []).append(example)
     return groups
 
 

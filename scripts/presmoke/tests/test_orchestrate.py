@@ -33,9 +33,9 @@ class OrchestrateShellTest(unittest.TestCase):
 
     def copy_orchestrate_fixture(self, root: Path) -> Path:
         project_root = Path(__file__).resolve().parents[3]
-        script = root / "scripts/run_presmoke.sh"
+        script = root / "scripts/run_presmoke_v2.sh"
         script.parent.mkdir(parents=True)
-        shutil.copy(project_root / "scripts/run_presmoke.sh", script)
+        shutil.copy(project_root / "scripts/run_presmoke_v2.sh", script)
         script.chmod(0o755)
 
         presmoke_pkg = root / "scripts/presmoke"
@@ -58,6 +58,7 @@ fi
 shift 2
 results=""
 dry_run=0
+stages="all"
 filters=()
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -67,6 +68,14 @@ while [[ $# -gt 0 ]]; do
             ;;
         --dry-run)
             dry_run=1
+            shift
+            ;;
+        --stages)
+            stages="$2"
+            shift 2
+            ;;
+        --stages=*)
+            stages="${1#--stages=}"
             shift
             ;;
         --filter)
@@ -96,6 +105,7 @@ run_file="$(dirname "$results")/run_env.txt"
     echo "device=${ASCEND_RT_VISIBLE_DEVICES:-}"
     printf 'filters=%s\\n' "${filters[*]:-}"
     echo "dry_run=$dry_run"
+    echo "stages=$stages"
 } > "$run_file"
 if [[ "$dry_run" == "1" ]]; then
 cat > "$results/report.json" <<'JSON'
@@ -395,7 +405,6 @@ EOF
             self.assertFalse((root / "out/.workspaces").exists())
             self.assertFalse((root / "out/.plan").exists())
             self.assertFalse((root / "out/.state").exists())
-            self.assertFalse((root / "out/full_card0/.locks").exists())
             self.assertIn("multi_card_workspace_cleanup_done", result.stdout)
             self.assertIn("multi_card_start cards=0 1 2 cases=5", result.stdout)
             self.assertIn(
@@ -428,6 +437,53 @@ EOF
             )
             self.assertIn("Cases: total=5 pass=5 fail=0 skip=0", result.stdout)
 
+    def test_build_only_uses_single_workspace_and_forwards_stage(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            script = self.copy_orchestrate_fixture(root)
+            env = self.base_env(
+                root,
+                PROJECT_ROOT=str(root),
+                OUT_ROOT=str(root / "out"),
+                ASCEND_OPP_PATH=str(root / "opp"),
+            )
+
+            result = subprocess.run(
+                ["bash", str(script), "--stages", "build"],
+                text=True,
+                capture_output=True,
+                env=env,
+                check=False,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue((root / "out/full_card0").exists())
+            self.assertFalse((root / "out/full_multi").exists())
+            run_env = (root / "out/full_card0/run_env.txt").read_text(encoding="utf-8")
+            self.assertIn("stages=build", run_env)
+
+    def test_explicit_all_stages_keeps_multi_card_execution(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            script = self.copy_orchestrate_fixture(root)
+            env = self.base_env(
+                root,
+                PROJECT_ROOT=str(root),
+                OUT_ROOT=str(root / "out"),
+                ASCEND_OPP_PATH=str(root / "opp"),
+            )
+
+            result = subprocess.run(
+                ["bash", str(script), "--stages", "all"],
+                text=True,
+                capture_output=True,
+                env=env,
+                check=False,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("multi_card_start cards=0 1 2 cases=5", result.stdout)
+
     def test_failed_run_cleans_temporary_workspaces(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -437,7 +493,6 @@ EOF
             (workspace / "build.bin").write_text("temporary", encoding="utf-8")
             (root / "out/.plan").mkdir()
             (root / "out/.state").mkdir()
-            (root / "out/full_card0/.locks").mkdir(parents=True)
             env = self.base_env(
                 root,
                 PROJECT_ROOT=str(root),
@@ -454,7 +509,6 @@ EOF
             self.assertFalse((root / "out/.workspaces").exists())
             self.assertFalse((root / "out/.plan").exists())
             self.assertFalse((root / "out/.state").exists())
-            self.assertFalse((root / "out/full_card0/.locks").exists())
             self.assertIn("multi_card_workspace_cleanup_done", result.stdout)
 
     def test_auto_npu_cards_prefers_davinci_devices_over_npu_smi(self) -> None:
