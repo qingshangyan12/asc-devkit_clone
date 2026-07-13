@@ -285,6 +285,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         KERNEL_LOG(KERNEL_INFO, "ApiClient do ccu prepare repeatIdx = %d, globalCurResId_ = %d.", i, globalCurResId_);
 
         ccuParam_.repeatIndex = i;
+        ccuParam_.alltoallvCnt = globalCurResId_;
 
         if (workingFlag_) {
             CcuPrepareForOp(handleId);
@@ -460,6 +461,7 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CommitMsg(HcclHandle handleId)
 {
     ccuParam_.repeatIndex = handleCommitCnt_[handleId];
+    ccuParam_.alltoallvCnt = globalCurResId_;
     if (workingFlag_) {
         CcuPrepareForOp(handleId);
         CcuSendMsg(globalCurResId_);
