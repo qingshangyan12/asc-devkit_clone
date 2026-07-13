@@ -8,6 +8,10 @@ This sample uses matrix transpose to describe memory access optimization in Asce
 
 - Ascend 950PR/Ascend 950DT
 
+## Supported CANN Version
+
+- CANN 9.1.0
+
 ## Directory Structure
 
 ```text
