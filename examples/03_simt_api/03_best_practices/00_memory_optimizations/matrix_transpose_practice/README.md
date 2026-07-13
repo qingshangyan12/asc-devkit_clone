@@ -109,7 +109,7 @@ uint32_t index = x_index + width * y_index;              // 61 + 1024 * 66
 **核心实现**：将矩阵视为一维数组，按一维线性地址访问input和output，使GM访存保持连续。Case 0每个Thread Block启动2048个线程，Case 1每个Thread Block启动1024个线程。
 
 ```cpp
-__global__ __launch_bounds__(THREADS_PER_BLOCK) void copy_kernel(float *output, const float *input, uint32_t elements)
+__global__ __launch_bounds__(THREADS_PER_BLOCK) void copy_kernel(float* output, const float* input, uint32_t elements)
 {
     uint32_t tid = blockIdx.x * blockDim.x + threadIdx.x;
     uint32_t stride = gridDim.x * blockDim.x;
