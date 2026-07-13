@@ -7,9 +7,9 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
-#include <thread>
-#include "securec.h"
 #include "k3_pvwrap.h"
+#include "securec.h"
+#include <thread>
 
 uint64_t g_k3CtrlValue = 0;
 
@@ -38,7 +38,6 @@ bool pv_reg_write(uint32_t reg_type, uint32_t reg_id, svOpenArrayHandle buf, uin
     }
     return true;
 }
-
 bool pv_mem_read(
     uint32_t mem_type, uint64_t addr, uint64_t size, svOpenArrayHandle buf, uint32_t sub_core_id, uint32_t core_id)
 {

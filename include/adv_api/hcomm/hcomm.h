@@ -22,7 +22,6 @@
 
 #include "kernel_basic_intf.h"
 #include "hcomm_common.h"
-
 #include "../../../impl/adv_api/detail/hcomm/impl/hcomm_impl_def.h"
 
 namespace AscendC {
