@@ -109,7 +109,7 @@ Except for Task Duration, all other metrics are averages across all thread block
 **Core Implementation**: Treat the matrix as a 1D array and access input and output by linear addresses, keeping GM accesses contiguous. Case 0 launches 2048 threads per thread block, and Case 1 launches 1024 threads per thread block.
 
 ```cpp
-__global__ __launch_bounds__(THREADS_PER_BLOCK) void copy_kernel(float *output, const float *input, uint32_t elements)
+__global__ __launch_bounds__(THREADS_PER_BLOCK) void copy_kernel(float* output, const float* input, uint32_t elements)
 {
     uint32_t tid = blockIdx.x * blockDim.x + threadIdx.x;
     uint32_t stride = gridDim.x * blockDim.x;
