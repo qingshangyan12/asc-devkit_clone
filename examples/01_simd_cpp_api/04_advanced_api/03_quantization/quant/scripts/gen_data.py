@@ -16,7 +16,6 @@ import os
 import numpy as np
 import sys
 
-
 def gen_golden_data_simple(npu_arch):
     shape = [1024]
 
@@ -32,7 +31,6 @@ def gen_golden_data_simple(npu_arch):
     os.makedirs("output", exist_ok=True)
     src.tofile("./input/input.bin")
     golden.tofile("./output/golden.bin")
-
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

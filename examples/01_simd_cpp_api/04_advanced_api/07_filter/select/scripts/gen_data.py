@@ -32,6 +32,5 @@ def gen_golden_data_simple():
     mask.tofile("./input/maskinput.bin")
     golden.tofile("./output/golden.bin")
 
-
 if __name__ == "__main__":
     gen_golden_data_simple()
