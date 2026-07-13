@@ -8,6 +8,10 @@ This example uses matrix transpose to demonstrate memory access optimization str
 
 - Ascend 950PR/Ascend 950DT
 
+## Supported CANN Software Version
+
+- \> CANN 9.0.0
+
 ## Directory Structure
 
 ```text
