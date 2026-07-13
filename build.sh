@@ -13,7 +13,7 @@ set -e
 
 SUPPORTED_SHORT_OPTS=("h" "j" "t" "p" "f")
 SUPPORTED_LONG_OPTS=(
-    "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "adv_test_two" "arm_test" "basic_test_one" "basic_test_two" "basic_test_three" "basic_test_four" "basic_test_five" "build-type" "extra-cmake-args" "changed_file" "enable-sign" "sign-script"
+    "help" "cov" "cache" "pkg" "pkg-type" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "adv_test_two" "arm_test" "basic_test_one" "basic_test_two" "basic_test_three" "basic_test_four" "basic_test_five" "build-type" "extra-cmake-args" "changed_file" "enable-sign" "sign-script"
 )
 
 CURRENT_DIR=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
@@ -24,6 +24,8 @@ USER_ID=$(id -u)
 CPU_NUM=$(($(cat /proc/cpuinfo | grep "^processor" | wc -l)))
 THREAD_NUM=32
 BUILD_TYPE="Release"
+PACKAGE_TYPE="run"
+PACKAGE_TYPE_SET="false"
 ENABLE_BUILD_DEVICE=ON
 USE_CXX11_ABI=0
 CMAKE_TOOLCHAIN_FILE_VAL=""
@@ -49,6 +51,7 @@ usage() {
         echo "Package Build Options:"
         echo $dotted_line
         echo "    --pkg                Compile run package"
+        echo "    --pkg-type=<TYPE>    Specify package type (TYPE options: run/rpm/deb), Default: run"
         echo "    -p, --cann_path      Set the cann package installation directory, eg: /usr/local/Ascend/cann"
         echo "    -j                   Compile thread nums, default is 32, eg: -j 8"
         echo "    --cann_3rd_lib_path  Set the path for third-party library dependencies, eg: ./build"
@@ -56,6 +59,8 @@ usage() {
         echo $dotted_line
         echo "Examples:"
         echo "    bash build.sh --pkg -j 8"
+        echo "    bash build.sh --pkg --pkg-type=rpm -j 8"
+        echo "    bash build.sh --pkg --pkg-type=deb -j 8"
         echo "    bash build.sh --pkg --asan -j 32"
         return
         ;;
@@ -112,6 +117,7 @@ usage() {
   echo "    --basic_test_four     Build and run the basic_four part of unit tests"
   echo "    --basic_test_five     Build and run the basic_five part of unit tests"
   echo "    --pkg                Compile run package"
+  echo "    --pkg-type=<TYPE>    Specify package type (TYPE options: run/rpm/deb), Default: run"
   echo "    --cann_3rd_lib_path  Set the path for third-party library dependencies, eg: ./build"
   echo "    --cov                Enable code coverage for unit tests"
   echo "    --asan               Enable ASAN (address Sanitizer)"
@@ -347,6 +353,20 @@ check_param_test_build_type() {
   fi
 }
 
+check_param_pkg_type() {
+  if [[ "$PACKAGE_TYPE" != "run" && "$PACKAGE_TYPE" != "rpm" && "$PACKAGE_TYPE" != "deb" ]]; then
+    log "[ERROR] --pkg-type must be run, rpm or deb."
+    exit 1
+  fi
+}
+
+check_param_pkg_type_usage() {
+  if [[ "$PACKAGE_TYPE_SET" == "true" && "$PKG" != "true" ]]; then
+    log "[ERROR] --pkg-type must be used with --pkg."
+    exit 1
+  fi
+}
+
 check_param_cov() {
   if [[ "$COV" == "true" && "$TEST" != "all" ]]; then
     log "[ERROR] --cov must be used with test(-t, --test)."
@@ -445,6 +465,19 @@ set_options() {
       PKG="true"
       check_param_test_pkg
       shift
+      ;;
+    --pkg-type=*)
+      PACKAGE_TYPE="${1#*=}"
+      PACKAGE_TYPE_SET="true"
+      check_param_pkg_type
+      shift
+      ;;
+    --pkg-type)
+      require_option_value "$1" "$2"
+      PACKAGE_TYPE="$2"
+      PACKAGE_TYPE_SET="true"
+      check_param_pkg_type
+      shift 2
       ;;
     --extra-cmake-args=*)
       local cmake_args="${1#*=}"
@@ -579,10 +612,33 @@ function build()
 }
 
 function build_package(){
-  CUSTOM_OPTION="${CUSTOM_OPTION} -DENABLE_TEST=OFF -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DENABLE_BUILD_DEVICE=${ENABLE_BUILD_DEVICE}"
+  CUSTOM_OPTION="${CUSTOM_OPTION} -DENABLE_TEST=OFF -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DENABLE_BUILD_DEVICE=${ENABLE_BUILD_DEVICE} -DPACKAGE_TYPE=${PACKAGE_TYPE}"
   cmake_config
   build package
-  cp ${BUILD_DIR}/_CPack_Packages/makeself_staging/*.run ${OUTPUT_DIR}
+  collect_package_artifacts
+}
+
+function collect_package_artifacts()
+{
+  local package_ext="${PACKAGE_TYPE}"
+  local copied=false
+  local pkg_file=""
+
+  while IFS= read -r pkg_file; do
+    if [ -f "${pkg_file}" ]; then
+      if [ "$(realpath "${pkg_file}")" = "$(realpath -m "${OUTPUT_DIR}/$(basename "${pkg_file}")")" ]; then
+        copied=true
+        continue
+      fi
+      cp -f "${pkg_file}" "${OUTPUT_DIR}/"
+      copied=true
+    fi
+  done < <(find "${BUILD_DIR}" "${OUTPUT_DIR}" -type f -name "*.${package_ext}" 2>/dev/null)
+
+  if [ "${copied}" != "true" ]; then
+    log "[ERROR] No ${PACKAGE_TYPE} package was found after build."
+    exit 1
+  fi
 }
 
 function build_test() {
@@ -672,6 +728,7 @@ set_ci_mode() {
 main() {
   check_param_with_help "$@"
   set_options "$@"
+  check_param_pkg_type_usage
 
   set_env
 
