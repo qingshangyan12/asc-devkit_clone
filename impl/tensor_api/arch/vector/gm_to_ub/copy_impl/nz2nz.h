@@ -27,13 +27,29 @@
 namespace AscendC {
 namespace Te {
 
-class CopyGmToUbufAlignV2NZ : public CopyGmToUbufAlignV2Common {
+class CopyGmToUbufAlignV2NZ : private CopyGmToUbufAlignV2Common {
 public:
     template <const CopyGM2UBTrait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
     {
+        DataCopyImpl<trait, T, U>(dst, src);
+    }
+
+private:
+    template <const CopyGM2UBTrait& trait, typename T, typename U>
+    __aicore__ inline static constexpr void CheckTemplate()
+    {
+        CheckLayoutPattern<U, T>();
+        CheckDataType::CheckGm2UBDataType<T, U>();
+    }
+
+    template <const CopyGM2UBTrait& trait, typename T, typename U>
+    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src)
+    {
         using SrcType = typename U::elementType;
         using DstType = typename T::elementType;
+
+        CheckTemplate<trait, T, U>();
 
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
