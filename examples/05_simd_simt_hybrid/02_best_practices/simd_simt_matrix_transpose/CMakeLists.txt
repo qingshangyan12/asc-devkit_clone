@@ -14,11 +14,11 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-set(SCENARIO_NUM "7" CACHE STRING "Case type to run (0-7)")
+set(SCENARIO_NUM "4" CACHE STRING "Case type to run (0-4)")
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU ARCH, e.g. dav-3510")
 
-if(NOT SCENARIO_NUM MATCHES "^[0-7]$")
-    message(FATAL_ERROR "SCENARIO_NUM must be one of 0, 1, 2, 3, 4, 5, 6, 7.")
+if(NOT SCENARIO_NUM MATCHES "^[0-4]$")
+    message(FATAL_ERROR "SCENARIO_NUM must be one of 0, 1, 2, 3, 4.")
 endif()
 
 add_executable(matrix_transpose
@@ -29,8 +29,15 @@ target_compile_definitions(matrix_transpose PRIVATE
     SCENARIO_NUM=${SCENARIO_NUM}
 )
 
+# ======================================================================================
+# NPU 编译选项配置
+#
+# 说明：
+#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
+#   - `--cce-res-usage`用于输出寄存器和栈等编译资源信息，便于分析资源使用。
+# ======================================================================================
 target_compile_options(matrix_transpose PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --cce-res-usage>
 )
 
 target_link_libraries(matrix_transpose PRIVATE
