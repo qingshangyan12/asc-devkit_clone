@@ -51,9 +51,9 @@ ccu::Func AlltoAllMesh1DFunc([](ccu::Variable inputAddr, ccu::Variable outputAdd
                             sliceSize, goSize1, goSize2, goSize3, goSize4, g_currentKfcArg);
 });
 
-// new---20260603
-static CcuResult ParseKernelArg(KfcServerContext &ctx)
+static CcuResult ParseKernelArg(KfcServerContext &ctx, CcuKernelArgKfcServer *kernelArg)
 {
+    ctx.arg = kernelArg;
     return CCU_SUCCESS;
 }
 
@@ -223,6 +223,24 @@ void LoadFuncParamFromMemory(ccu::Variable &paramAddr, ccu::Array<ccu::Variable>
     ccu::Load(addr, param, CCU_PARAM_NUM_PER_DIE);
 }
 
+static void DispatchKfcSubKernel(ccu::Array<ccu::Variable> &param, CcuKernelArg &arg, KfcServerContext &ctx)
+{
+    if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
+        CcuAlltoAllVMesh1DKernel(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token,
+                                 param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
+                                 param[HBM_PARAM_IDX_9], ctx.arg->channels, ctx.arg->channelCount,
+                                 static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
+        return;
+    }
+
+    if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALL) {
+        CcuAlltoAllMesh1DKernel(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token,
+                                param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
+                                param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
+                                param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_10], arg);
+    }
+}
+
 void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
 {
     HCCL_INFO("[KfcServerGenCircularQueue] KfcServerGenCircularQueue start");
@@ -272,32 +290,22 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
         LoadFuncParamFromMemory(paramAddr, param, ctx);
         HCCL_INFO("[KfcServerGenCircularQueue] LoadFuncParamFromMemory finished.");
 
-        MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
-        HCCL_INFO("[KfcServerGenCircularQueue] MissionPreSync finished.");
-
-        ccu::Variable opType;
-        opType = param[HBM_PARAM_IDX_0];
-        CCU_IF(opType == AlgorithmType::CcuAlltoAllMesh1D) {
-            CcuAlltoAllMesh1DKernel(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
-                                    param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
-                                    param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9],
-                                    param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11], arg);
-            HCCL_INFO("[KfcServerGenCircularQueue] CcuAlltoAllMesh1DKernel finished.");
-            /*
-            ccu::CallFunc<AlltoAllMesh1DFunc>(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
-                                              param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
-                                              param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9],
-                                              param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11]);
-            HCCL_INFO("[KfcServerGenCircularQueue] CcuAlltoAllMesh1DKernel finished.");
-            */
+        CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) {
+            repeatCond = 1;
         }
+        CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64) {
+            MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
+            HCCL_INFO("[KfcServerGenCircularQueue] MissionPreSync finished.");
 
-        MissionPostSync(ctx);
-        HCCL_INFO("[KfcServerGenCircularQueue] MissionPostSync finished.");
+            DispatchKfcSubKernel(param, arg, ctx);
 
-        // Set本轮完成信号
-        SetTurnEndSig(recordAddr, turnEndSig, ctx);
-        HCCL_INFO("[KfcServerGenCircularQueue] SetTurnEndSig finished.");
+            MissionPostSync(ctx);
+            HCCL_INFO("[KfcServerGenCircularQueue] MissionPostSync finished.");
+
+            // Set本轮完成信号
+            SetTurnEndSig(recordAddr, turnEndSig, ctx);
+            HCCL_INFO("[KfcServerGenCircularQueue] SetTurnEndSig finished.");
+        }
 
         waitAddr += ckeSize;
         recordAddr += ckeSize;
@@ -334,11 +342,12 @@ void SlaveKfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
         // 读取本轮参数
         LoadFuncParamFromMemory(paramAddr, param, ctx);
 
-        ccu::Variable argHandle;
-        CcuAlltoAllMesh1DKernel(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
-                                param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
-                                param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9],
-                                param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11], arg);
+        CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) {
+            repeatCond = 1;
+        }
+        CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64) {
+            DispatchKfcSubKernel(param, arg, ctx);
+        }
         /*
         ccu::CallFunc<AlltoAllMesh1DFunc>(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
                                             param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
@@ -355,9 +364,10 @@ void SlaveKfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
 // ============================================================================
 CcuResult CcuKfcServerKernel(CcuKernelArg arg)
 {
+    auto *kernelArg = static_cast<CcuKernelArgKfcServer *>(arg);
     KfcServerContext ctx;
     HCCL_INFO("[CcuKernelKfcServer] KfcServer run");
-    CCU_CHK_RET(ParseKernelArg(ctx));
+    CCU_CHK_RET(ParseKernelArg(ctx, kernelArg));
     HCCL_INFO("[CcuKernelKfcServer] ParseKernelArg finish");
     CCU_CHK_RET(InitResource(ctx));
     HCCL_INFO("[CcuKernelKfcServer] InitResource finish");
