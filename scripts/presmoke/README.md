@@ -1,6 +1,6 @@
 # Presmoke 看护入口
 
-`scripts/run_presmoke_v2.sh` 是新版 CI 和人工看护入口。该脚本会执行一轮完整的 910B 或 950 presmoke，生成可归档报告，并支持将超时用例切换到其他卡上重试。
+`scripts/run_presmoke.sh` 是 CI 和人工看护入口。该脚本会执行一轮完整的 910B 或 950 presmoke，生成可归档报告，并支持将超时用例切换到其他卡上重试。
 
 如需直接调试 Python CLI，可以使用 `PYTHONPATH=scripts PRESMOKE_PROJECT_ROOT=$PWD python3 -m presmoke ...`。
 
@@ -11,7 +11,7 @@
 使用默认参数运行。该命令最短，并保持与旧 `run_presmoke.sh` 调用方约定兼容：
 
 ```bash
-bash scripts/run_presmoke_v2.sh
+bash scripts/run_presmoke.sh
 ```
 
 默认行为：
@@ -31,38 +31,38 @@ bash scripts/run_presmoke_v2.sh
 只查看计划运行哪些用例，不实际执行：
 
 ```bash
-bash scripts/run_presmoke_v2.sh --dry-run
+bash scripts/run_presmoke.sh --dry-run
 ```
 
 只执行编译阶段，不执行 run 和 verify。该模式使用单个工作目录并保留编译产物：
 
 ```bash
-bash scripts/run_presmoke_v2.sh --stages build
+bash scripts/run_presmoke.sh --stages build
 ```
 
 只编译指定用例：
 
 ```bash
-bash scripts/run_presmoke_v2.sh --stages build \
+bash scripts/run_presmoke.sh --stages build \
   --exact-filter 01_simd_cpp_api/01_utilities/02_dump/simple_dump
 ```
 
 指定 910B 的某张卡运行：
 
 ```bash
-NPU_CARDS=7 PRIMARY_CARD=7 bash scripts/run_presmoke_v2.sh
+NPU_CARDS=7 PRIMARY_CARD=7 bash scripts/run_presmoke.sh
 ```
 
 运行 950：
 
 ```bash
-ARCH=dav-3510 PRIMARY_CARD=0 bash scripts/run_presmoke_v2.sh
+ARCH=dav-3510 PRIMARY_CARD=0 bash scripts/run_presmoke.sh
 ```
 
 运行单个用例：
 
 ```bash
-bash scripts/run_presmoke_v2.sh \
+bash scripts/run_presmoke.sh \
   --filter 01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_unitflag
 ```
 
@@ -71,19 +71,19 @@ bash scripts/run_presmoke_v2.sh \
 ```bash
 OUT_ROOT=/tmp/presmoke_910b_card7 \
 PRIMARY_CARD=7 \
-bash scripts/run_presmoke_v2.sh
+bash scripts/run_presmoke.sh
 ```
 
 显式运行 CPU 模式。CPU 模式不是默认模式：
 
 ```bash
-MODES=cpu bash scripts/run_presmoke_v2.sh
+MODES=cpu bash scripts/run_presmoke.sh
 ```
 
 CPU 模式用例较慢时，可以提高 CPU run 超时时间：
 
 ```bash
-MODES=cpu CPU_RUN_TIMEOUT=1800 bash scripts/run_presmoke_v2.sh
+MODES=cpu CPU_RUN_TIMEOUT=1800 bash scripts/run_presmoke.sh
 ```
 
 ## CI 命令
@@ -95,7 +95,7 @@ PROJECT_ROOT=/path/to/asc-devkit \
 ARCH=dav-2201 \
 PRIMARY_CARD=7 \
 RETRY_CARDS="0 1 2 3 4 5 6" \
-bash scripts/run_presmoke_v2.sh
+bash scripts/run_presmoke.sh
 ```
 
 950：
@@ -104,19 +104,19 @@ bash scripts/run_presmoke_v2.sh
 PROJECT_ROOT=/path/to/asc-devkit \
 ARCH=dav-3510 \
 PRIMARY_CARD=0 \
-bash scripts/run_presmoke_v2.sh
+bash scripts/run_presmoke.sh
 ```
 
 950 dry-run：
 
 ```bash
-ARCH=dav-3510 PRIMARY_CARD=0 bash scripts/run_presmoke_v2.sh --dry-run
+ARCH=dav-3510 PRIMARY_CARD=0 bash scripts/run_presmoke.sh --dry-run
 ```
 
 910B dry-run：
 
 ```bash
-ARCH=dav-2201 PRIMARY_CARD=7 bash scripts/run_presmoke_v2.sh --dry-run
+ARCH=dav-2201 PRIMARY_CARD=7 bash scripts/run_presmoke.sh --dry-run
 ```
 
 ## 参数
