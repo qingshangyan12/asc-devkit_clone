@@ -110,7 +110,7 @@ __aicore__ inline void HcommImpl<COMM_PROTOCOL_ROCE>::FillDataSeg(__ubuf__ RoceW
     constexpr uint32_t ROCE_1825_WQE_LKEY_MASK = 0x3fffffffU;     // data seg le_key key[29:0]
     wqePtr->data.vaLocal = HtoNLL((uint64_t)src);
     wqePtr->data.rLen = HtoNL((uint32_t)len);
-    wqePtr->data.leKey = HtoNL((lKey & ROCE_1825_WQE_LKEY_MASK) | ROCE_1825_WQE_NEXT_SGE_INVALID);
+    wqePtr->data.leKey = HtoNL((lKey & (~ROCE_1825_WQE_NEXT_SGE_INVALID)) | ROCE_1825_WQE_NEXT_SGE_INVALID);
 }
 
 // Pre-mark the next WQEBB owner byte as invalid so the hardware stops there until the following WQE is
