@@ -23,7 +23,8 @@ This example introduces how to use DataCopy to transfer input data from GM (Glob
 │   ├── data_utils.h                   // Data read/write functions
 │   ├── CMakeLists.txt                 // cmake build file
 │   ├── data_copy_gm2l1.asc            // Ascend C example implementation & invocation example
-│   └── README.md                      // Example description document
+│   ├── README.md                      // Chinese example documentation
+│   └── README_en.md                   // English example documentation
 ```
 
 ## Detailed Scenario Description
