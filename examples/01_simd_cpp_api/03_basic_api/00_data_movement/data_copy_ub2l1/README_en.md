@@ -84,7 +84,7 @@ Execute the following steps in the sample root directory to build and run the sa
   Execute the following commands in the sample directory:
   ```bash
   mkdir -p build && cd build;                                               # Create and enter the build directory
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=1 ..;make -j;    # Build project, default npu mode, Scenario 2 (ND2NZ)
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=1 ..;make -j;    # Build project, default npu mode, Scenario 1
   python3 ../scripts/gen_data.py --scenarioNum=1                            # Generate test input data (must match the build scenario)
   ./demo                                                                    # Run the compiled executable
   ```
