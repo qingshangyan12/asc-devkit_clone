@@ -12,10 +12,8 @@ repos:
     rev: v4.6.0
     hooks:
       - id: trailing-whitespace
-        files: ^(tests/api/c_api/|include/adv_api/|include/basic_api/|impl/c_api/instr_impl/npu_arch_3510/|include/c_api/|impl/adv_api/(?!detail/(matmul|hccl)/))
         exclude: \.md$
       - id: end-of-file-fixer
-        files: ^(tests/api/c_api/|include/adv_api/|include/basic_api/|impl/c_api/instr_impl/npu_arch_3510/|include/c_api/|impl/adv_api/(?!detail/(matmul|hccl)/))
         exclude: \.md$
       - id: check-yaml
         args: ["--allow-multiple-documents"]
@@ -32,7 +30,7 @@ repos:
       - id: clang-format
         types_or: [file]
         files: \.(c|h|cpp|hpp|cc|hh|cxx|hxx|asc)$
-        exclude: ^(tests/python/aclrt_launch_kernel/stub_files/|impl/|include/(?!adv_api/))
+        exclude: ^(tests/python/aclrt_launch_kernel/stub_files/|include/(?!adv_api/))
         args:
           - "--style=file"
           - "--verbose"
