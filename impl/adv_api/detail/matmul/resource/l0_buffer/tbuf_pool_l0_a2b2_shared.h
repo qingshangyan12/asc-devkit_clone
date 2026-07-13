@@ -49,7 +49,11 @@ public:
 
     __aicore__ inline TBufPoolL0& Allocate()
     {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Lock<PIPE_MTE1>(this->GetL0MutexID(gA2B2DBFlag_));
+#else
         WaitFlag<HardEvent::M_MTE1>(gA2B2DBFlag_ & 0x1);
+#endif
         return *this;
     }
 
@@ -80,13 +84,31 @@ public:
         return tempTensor;
     }
 
-    __aicore__ inline void EnQue() { SetFlag<HardEvent::MTE1_M>(gA2B2DBFlag_ & 0x1); }
+    __aicore__ inline void EnQue()
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Unlock<PIPE_MTE1>(this->GetL0MutexID(gA2B2DBFlag_));
+#else
+        SetFlag<HardEvent::MTE1_M>(gA2B2DBFlag_ & 0x1);
+#endif
+    }
 
-    __aicore__ inline void DeQue() { WaitFlag<HardEvent::MTE1_M>(gA2B2DBFlag_ & 0x1); }
+    __aicore__ inline void DeQue()
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Lock<PIPE_M>(this->GetL0MutexID(gA2B2DBFlag_));
+#else
+        WaitFlag<HardEvent::MTE1_M>(gA2B2DBFlag_ & 0x1);
+#endif
+    }
 
     __aicore__ inline void Free()
     {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Unlock<PIPE_M>(this->GetL0MutexID(gA2B2DBFlag_));
+#else
         SetFlag<HardEvent::M_MTE1>(gA2B2DBFlag_ & 0x1);
+#endif
         ++gA2B2DBFlag_;
     }
 };
