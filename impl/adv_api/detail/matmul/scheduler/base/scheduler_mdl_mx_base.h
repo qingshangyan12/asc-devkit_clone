@@ -376,9 +376,15 @@ protected:
         bool cmatrixSource;
         bool cmatrixInitVal;
         BASE_MODULE::UpdateMmadComputeParams(kInnerStartIdx, sL0CInit, cmatrixSource, cmatrixInitVal);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Lock<PIPE_M>(GetMutexID<MatmulMutexResource::L0>(MATMUL_MODULE(TBufPoolL0)->GetPingPongFlag()));
+#endif
         MATMUL_MODULE(MmadCompute)
             ->Compute(
                 cMatrix, a2, b2, madM, madK, madN, isATranspose, isBTranspose, unitFlag, cmatrixSource, cmatrixInitVal);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Unlock<PIPE_M>(GetMutexID<MatmulMutexResource::L0>(MATMUL_MODULE(TBufPoolL0)->GetPingPongFlag()));
+#endif
     }
 
     __aicore__ inline LocalTensor<SrcA2T> SplitA(
@@ -390,10 +396,18 @@ protected:
         int32_t kL0Len = CeilAlign(MATMUL_MODULE(KLoop)->GetBaseShape(), MX_BASEK_FACTOR);
         if (!(MATMUL_MODULE(TBufPoolL0)->template Hit<TPosition::A2>(posA))) {
             LocalTensor<SrcA2T> a2 = MATMUL_MODULE(TBufPoolL0)->template GetBuffer<TPosition::A2, SrcA2T>();
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Lock<PIPE_MTE1>(GetMutexID<MatmulMutexResource::L0>(
+                GetL0PingPongFlag<TPosition::A2, A_TYPE, MM_CFG>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
             MATMUL_MODULE(LoadToA2)->Load(
                 a2, a1, aL0Params.axisL1Len, aL0Params.kAxisL1Len, aL0Params.axisL0Len, kL0Len, aL0Params.axisL1Offset,
                 aL0Params.kAxisL1Offset, isATranspose, scaleA1, aL0Params.kAuxMatrixL1Len, aL0Params.kAuxMatrixL1Offset,
                 aL0Params.auxMatrixL1Offset);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Unlock<PIPE_MTE1>(GetMutexID<MatmulMutexResource::L0>(
+                GetL0PingPongFlag<TPosition::A2, A_TYPE, MM_CFG>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
             return a2;
         } else {
             return MATMUL_MODULE(TBufPoolL0)->template GetBuffer<TPosition::A2, SrcA2T>();
@@ -409,10 +423,18 @@ protected:
         int32_t kL0Len = CeilAlign(MATMUL_MODULE(KLoop)->GetBaseShape(), MX_BASEK_FACTOR);
         if (!(MATMUL_MODULE(TBufPoolL0)->template Hit<TPosition::B2>(posB))) {
             LocalTensor<SrcB2T> b2 = MATMUL_MODULE(TBufPoolL0)->template GetBuffer<TPosition::B2, SrcB2T>();
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Lock<PIPE_MTE1>(GetMutexID<MatmulMutexResource::L0>(
+                GetL0PingPongFlag<TPosition::B2, A_TYPE, MM_CFG>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
             MATMUL_MODULE(LoadToB2)->Load(
                 b2, b1, bL0Params.axisL1Len, bL0Params.kAxisL1Len, bL0Params.axisL0Len, kL0Len, bL0Params.axisL1Offset,
                 bL0Params.kAxisL1Offset, isBTranspose, scaleB1, bL0Params.kAuxMatrixL1Len, bL0Params.kAuxMatrixL1Offset,
                 bL0Params.auxMatrixL1Offset);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Unlock<PIPE_MTE1>(GetMutexID<MatmulMutexResource::L0>(
+                GetL0PingPongFlag<TPosition::B2, A_TYPE, MM_CFG>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
             return b2;
         } else {
             return MATMUL_MODULE(TBufPoolL0)->template GetBuffer<TPosition::B2, SrcB2T>();

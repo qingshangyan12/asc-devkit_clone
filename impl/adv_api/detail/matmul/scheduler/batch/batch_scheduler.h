@@ -100,7 +100,9 @@ public:
                 auto a1 = MATMUL_MODULE(BatchCopyCubeInA)->AllocTensor();
                 auto b1 = MATMUL_MODULE(BatchCopyCubeInB)->AllocTensor();
                 event_t eventIDMte2ToMte1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_MTE1));
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
                 event_t eventIDMToMte1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::M_MTE1));
+#endif
                 auto batchLoop = MATMUL_MODULE(BatchLoop);
                 for (batchLoop->SplitStart(); !batchLoop->SplitEnd(); batchLoop->SplitNext()) {
                     uint32_t outerIdxA;
@@ -126,8 +128,10 @@ public:
                             MATMUL_MODULE(CubeOutBuffer)->AllocTensor();
                             ComputeBatch(a1, b1, bias, enPartialSum, ctx);
                             BatchScheduler::GetBatchResultImpl(dst, ctx, enAtomic, enSequentialWrite);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
                             SetFlag<HardEvent::M_MTE1>(eventIDMToMte1);
                             WaitFlag<HardEvent::M_MTE1>(eventIDMToMte1);
+#endif
                         }
                         EndIterate();
                     }
@@ -141,7 +145,9 @@ public:
                     LocalTensor<TransAT> a1;
                     LocalTensor<TransBT> b1;
                     event_t eventIDMte2ToMte1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_MTE1));
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
                     event_t eventIDMToMte1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::M_MTE1));
+#endif
                     auto splitIdxA = batchLoop->template GetSplitIndex<InputTypeTag::A>();
                     auto splitIdxB = batchLoop->template GetSplitIndex<InputTypeTag::B>();
                     MATMUL_MODULE(BatchCopyCubeInA)
@@ -164,8 +170,10 @@ public:
                             MATMUL_MODULE(CubeOutBuffer)->AllocTensor();
                             ComputeBatch(a1, b1, bias, enPartialSum, ctx);
                             BatchScheduler::GetBatchResultImpl(dst, ctx, enAtomic, enSequentialWrite);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
                             SetFlag<HardEvent::M_MTE1>(eventIDMToMte1);
                             WaitFlag<HardEvent::M_MTE1>(eventIDMToMte1);
+#endif
                         }
                         EndIterate();
                     }
@@ -354,16 +362,32 @@ private:
         int32_t nL0DBLoop = MATMUL_MODULE(MLoop)->GetL0DBLoopNum();
 
         LocalTensor<TransBT> b2 = MATMUL_MODULE(TBufPoolL0)->template GetBuffer<TPosition::B2, TransBT>();
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Lock<PIPE_MTE1>(GetMutexID<MatmulMutexResource::L0>(
+            GetL0PingPongFlag<TPosition::B2, A_TYPE, MM_CFG>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
         MATMUL_MODULE(LoadToB2)->Load(
             b2, b1[ctx.offsetB], ctx.bL0Params.axisL1Len, ctx.bL0Params.kAxisL1Len, ctx.bL0Params.axisL0Len, computeK,
             ctx.bL0Params.axisL1Offset, bKL1Offset, MATMUL_MODULE(MatmulShapeInfo)->IsTransposeB());
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Unlock<PIPE_MTE1>(GetMutexID<MatmulMutexResource::L0>(
+            GetL0PingPongFlag<TPosition::B2, A_TYPE, MM_CFG>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
         int32_t axisL1DbOffset = ctx.aL0Params.axisL1Offset;
         for (int32_t idx = 0; idx < nL0DBLoop; ++idx) {
             auto& bufferPool = MATMUL_MODULE(TBufPoolL0)->Allocate();
             LocalTensor<TransAT> a2 = bufferPool.template GetBuffer<TPosition::A2, TransAT>();
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Lock<PIPE_MTE1>(
+                GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::A2, A_TYPE, MM_CFG>(bufferPool)));
+#endif
             MATMUL_MODULE(LoadToA2)->Load(
                 a2, a1[ctx.offsetA], ctx.aL0Params.axisL1Len, ctx.aL0Params.kAxisL1Len, ctx.aL0Params.axisL0Len,
                 computeK, axisL1DbOffset, aKL1Offset, MATMUL_MODULE(MatmulShapeInfo)->IsTransposeA());
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Unlock<PIPE_MTE1>(
+                GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::A2, A_TYPE, MM_CFG>(bufferPool)));
+#endif
 
             bufferPool.EnQue();
             bufferPool.DeQue();
@@ -371,6 +395,9 @@ private:
             bool cmatrixInitVal;
             bool cmatrixSource;
             BASE_MODULE::UpdateMmadComputeParams(sL0CInit, cmatrixSource, cmatrixInitVal);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Lock<PIPE_M>(GetMutexID<MatmulMutexResource::L0>(bufferPool.GetPingPongFlag()));
+#endif
             MATMUL_MODULE(MmadCompute)
                 ->Compute(
                     MATMUL_MODULE(CubeOutBuffer)
@@ -380,6 +407,9 @@ private:
                     a2, b2, ctx.aL0Params.axisL0Len, computeK, ctx.bL0Params.axisL0Len,
                     MATMUL_MODULE(MatmulShapeInfo)->IsTransposeA(), MATMUL_MODULE(MatmulShapeInfo)->IsTransposeB(),
                     MATMUL_MODULE(MatmulUnitFlag)->GetUnitFlag(sL0CLast), cmatrixSource, cmatrixInitVal, false);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Unlock<PIPE_M>(GetMutexID<MatmulMutexResource::L0>(bufferPool.GetPingPongFlag()));
+#endif
             bufferPool.Free();
             axisL1DbOffset += MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseM();
         }
@@ -395,17 +425,33 @@ private:
         int32_t mL0DbLoop = MATMUL_MODULE(NLoop)->GetL0DBLoopNum();
 
         LocalTensor<TransAT> a2 = MATMUL_MODULE(TBufPoolL0)->template GetBuffer<TPosition::A2, TransAT>();
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Lock<PIPE_MTE1>(GetMutexID<MatmulMutexResource::L0>(
+            GetL0PingPongFlag<TPosition::A2, A_TYPE, MM_CFG>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
         MATMUL_MODULE(LoadToA2)->Load(
             a2, a1[ctx.offsetA], ctx.aL0Params.axisL1Len, ctx.aL0Params.kAxisL1Len, ctx.aL0Params.axisL0Len, computeK,
             ctx.aL0Params.axisL1Offset, aKL1Offset, MATMUL_MODULE(MatmulShapeInfo)->IsTransposeA());
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Unlock<PIPE_MTE1>(GetMutexID<MatmulMutexResource::L0>(
+            GetL0PingPongFlag<TPosition::A2, A_TYPE, MM_CFG>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
 
         int32_t axisL1DbOffset = ctx.bL0Params.axisL1Offset;
         for (int32_t idx = 0; idx < mL0DbLoop; ++idx) {
             auto& bufferPool = MATMUL_MODULE(TBufPoolL0)->Allocate();
             LocalTensor<TransBT> b2 = bufferPool.template GetBuffer<TPosition::B2, TransBT>();
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Lock<PIPE_MTE1>(
+                GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::B2, A_TYPE, MM_CFG>(bufferPool)));
+#endif
             MATMUL_MODULE(LoadToB2)->Load(
                 b2, b1[ctx.offsetB], ctx.bL0Params.axisL1Len, ctx.bL0Params.kAxisL1Len, ctx.bL0Params.axisL0Len,
                 computeK, axisL1DbOffset, bKL1Offset, MATMUL_MODULE(MatmulShapeInfo)->IsTransposeB());
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Unlock<PIPE_MTE1>(
+                GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::B2, A_TYPE, MM_CFG>(bufferPool)));
+#endif
 
             bufferPool.EnQue();
             bufferPool.DeQue();
@@ -419,6 +465,9 @@ private:
             bool cmatrixSource;
             bool cmatrixInitVal;
             BASE_MODULE::UpdateMmadComputeParams(sL0CInit, cmatrixSource, cmatrixInitVal);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Lock<PIPE_M>(GetMutexID<MatmulMutexResource::L0>(bufferPool.GetPingPongFlag()));
+#endif
             MATMUL_MODULE(MmadCompute)
                 ->Compute(
                     MATMUL_MODULE(CubeOutBuffer)
@@ -428,6 +477,9 @@ private:
                     a2, b2, ctx.aL0Params.axisL0Len, computeK, ctx.bL0Params.axisL0Len,
                     MATMUL_MODULE(MatmulShapeInfo)->IsTransposeA(), MATMUL_MODULE(MatmulShapeInfo)->IsTransposeB(),
                     MATMUL_MODULE(MatmulUnitFlag)->GetUnitFlag(sL0CLast), cmatrixSource, cmatrixInitVal, false);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Unlock<PIPE_M>(GetMutexID<MatmulMutexResource::L0>(bufferPool.GetPingPongFlag()));
+#endif
             bufferPool.Free();
             axisL1DbOffset += MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseN();
             MATMUL_MODULE(BiasScheduler)->Free();

@@ -1,19 +1,20 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
  * \file tbuf_pool_l0_cache.h
  * \brief
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message("impl/adv_api/detail/matmul/resource/l0_buffer/tbuf_pool_l0_cache.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message( \
+    "impl/adv_api/detail/matmul/resource/l0_buffer/tbuf_pool_l0_cache.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_RESOURCE_L0_BUFFER_TBUF_POOL_L0_CACHE_H__
 #endif
@@ -33,11 +34,11 @@ namespace Detail {
     TBufPoolL0 is only for internal usage, does not support extension or customized specialization!
 */
 template <typename IMPL, typename A_TYPE, typename B_TYPE, const auto& MM_CFG>
-class TBufPoolL0<IMPL, A_TYPE, B_TYPE, MM_CFG,
-    enable_if_t<!MatmulFeatureTrait<MM_CFG>::IsNeedUB() && (DoMatmulMDL(MM_CFG) ||
-    isNormEnableScheduler<A_TYPE, MM_CFG>) && IsL0Cache<A_TYPE, MM_CFG>()>>
-    : public TBufPoolL0Base<IMPL, A_TYPE, B_TYPE, MM_CFG>
-{
+class TBufPoolL0<
+    IMPL, A_TYPE, B_TYPE, MM_CFG,
+    enable_if_t<
+        !MatmulFeatureTrait<MM_CFG>::IsNeedUB() && (DoMatmulMDL(MM_CFG) || isNormEnableScheduler<A_TYPE, MM_CFG>) &&
+        IsL0Cache<A_TYPE, MM_CFG>()>> : public TBufPoolL0Base<IMPL, A_TYPE, B_TYPE, MM_CFG> {
 public:
     using BASE_MODULE = AscendC::Impl::Detail::TBufPoolL0Base<IMPL, A_TYPE, B_TYPE, MM_CFG>;
     __aicore__ inline TBufPoolL0() = default;
@@ -70,7 +71,8 @@ public:
     }
 
     template <TPosition Pos>
-    __aicore__ inline bool Hit(uint32_t pos = 0) {
+    __aicore__ inline bool Hit(uint32_t pos = 0)
+    {
         bool hit = false;
         if constexpr (Pos == TPosition::A2) {
             bool hitPingCache = pos == l0aPingCachedPos_;
@@ -112,17 +114,30 @@ public:
         return hit;
     }
 
-    __aicore__ inline void ResetCache() {
+    __aicore__ inline void ResetCache()
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
         WaitFlag<HardEvent::M_MTE1>(0); // To solve sync problem between multi objects, need to wait pingpong here
         SetFlag<HardEvent::M_MTE1>(0);
         WaitFlag<HardEvent::M_MTE1>(1);
         SetFlag<HardEvent::M_MTE1>(1);
+#endif
         l0aPingPongFlag_ = 1;
         l0bPingPongFlag_ = 1;
         l0aPingCachedPos_ = -1;
         l0aPongCachedPos_ = -1;
         l0bPingCachedPos_ = -1;
         l0bPongCachedPos_ = -1;
+    }
+
+    template <TPosition Pos>
+    __aicore__ inline uint16_t GetPingPongFlag() const
+    {
+        if constexpr (Pos == TPosition::A2) {
+            return l0aPingPongFlag_;
+        } else {
+            return l0bPingPongFlag_;
+        }
     }
 
 private:
@@ -132,12 +147,11 @@ private:
     int32_t l0aPongCachedPos_{-1};
     int32_t l0bPingCachedPos_{-1};
     int32_t l0bPongCachedPos_{-1};
-
 };
 
-}  // namespace Detail
-}  // namespace Impl
-}  // namespace AscendC
+} // namespace Detail
+} // namespace Impl
+} // namespace AscendC
 #endif // IMPL_MATMUL_RESOURCE_L0_BUFFER_TBUF_POOL_L0_CACHE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_RESOURCE_L0_BUFFER_TBUF_POOL_L0_CACHE_H__)

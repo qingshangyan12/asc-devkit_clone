@@ -133,8 +133,10 @@ private:
         auto kAxisL1Len = CeilAlign(singleCoreK, BLOCK_CUBE);
         MATMUL_MODULE(LoadToB2)->Prepare(isBTranspose, kAxisL1Len);
         MATMUL_MODULE(CopyCubeInB)->AwaitLoadData();
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
         WaitFlag<HardEvent::M_MTE1>(0);
         WaitFlag<HardEvent::M_MTE1>(1);
+#endif
         auto baseN = MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseN();
         auto baseK = MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK();
         auto l0bStride = baseN * baseK;
@@ -149,20 +151,28 @@ private:
                 auto& bufferPool = MATMUL_MODULE(TBufPoolL0)->template Allocate<true>();
                 LocalTensor<TransT> b2 = bufferPool.template GetBuffer<TPosition::B2, TransT, true>(subBlockIdx);
                 b2 = b2[offset];
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+                Mutex::Lock<PIPE_MTE1>(GetMutexID<MatmulMutexResource::L0>(subBlockIdx));
+#endif
                 MATMUL_MODULE(LoadToB2)->Load(
                     b2, b1, singleCoreN, kAxisL1Len, baseUseN,
                     MATMUL_MODULE(KLoop)->template GetBaseShape<IS_INTRA_BLOCK>(), axisL1Offset, kAxisL1Offset,
                     isBTranspose);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+                Mutex::Unlock<PIPE_MTE1>(GetMutexID<MatmulMutexResource::L0>(subBlockIdx));
+#endif
                 offset += l0bStride;
                 axisL1Offset += baseN;
                 kAxisL1Offset += baseK;
             } while (MATMUL_MODULE(KLoop)->template OuterEnd<IS_INTRA_BLOCK>());
         } while (MATMUL_MODULE(NLoop)->template OuterEnd<false, IS_INTRA_BLOCK>());
         MATMUL_MODULE(CopyCubeInB)->ClearLoadData(b1);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
         SetFlag<HardEvent::MTE1_M>(3);
         WaitFlag<HardEvent::MTE1_M>(3);
         SetFlag<HardEvent::M_MTE1>(0);
         SetFlag<HardEvent::M_MTE1>(1);
+#endif
     }
 
     template <bool IS_INTRA_BLOCK = false>
@@ -212,9 +222,17 @@ private:
             // Split
             auto& bufferPool = MATMUL_MODULE(TBufPoolL0)->Allocate();
             LocalTensor<TransT> a2 = bufferPool.template GetBuffer<TPosition::A2, TransT>();
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Lock<PIPE_MTE1>(
+                GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::A2, A_TYPE, MM_CFG>(bufferPool)));
+#endif
             MATMUL_MODULE(LoadToA2)->Load(
                 a2, a1, aL0Params.axisL1Len, aL0Params.kAxisL1Len, aL0Params.axisL0Len, kL0Len, aL0Params.axisL1Offset,
                 aL0Params.kAxisL1Offset, isATranspose);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Unlock<PIPE_MTE1>(
+                GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::A2, A_TYPE, MM_CFG>(bufferPool)));
+#endif
             auto kTotalIter = MATMUL_MODULE(KLoop)->template GetTotalIter<IS_INTRA_BLOCK>();
             int32_t posB =
                 (kOuterIdx + MATMUL_MODULE(NLoop)->GetInnerIdx() * kTotalIter) % (tiling.GetStepN() * kTotalIter);
@@ -232,11 +250,17 @@ private:
             bool cmatrixSource;
             bool cmatrixInitVal;
             BASE_MODULE::UpdateBiasParams(IS_INTRA_BLOCK, sL0CInit, cmatrixSource, cmatrixInitVal, isBias);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Lock<PIPE_M>(GetMutexID<MatmulMutexResource::L0>(bufferPool.GetPingPongFlag()));
+#endif
             MATMUL_MODULE(MmadCompute)
                 ->Compute(
                     MATMUL_MODULE(CubeOutBuffer)->GetTensor(), a2, b2, aL0Params.axisL0Len, kL0Len, bL0Params.axisL0Len,
                     isATranspose, MATMUL_MODULE(MatmulShapeInfo)->template IsTransposeB<IS_INTRA_BLOCK>(), unitFlag,
                     cmatrixSource, cmatrixInitVal, isBias);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Unlock<PIPE_M>(GetMutexID<MatmulMutexResource::L0>(bufferPool.GetPingPongFlag()));
+#endif
             bufferPool.Free();
             if constexpr (!IS_INTRA_BLOCK) {
                 MATMUL_MODULE(BiasScheduler)->Free();

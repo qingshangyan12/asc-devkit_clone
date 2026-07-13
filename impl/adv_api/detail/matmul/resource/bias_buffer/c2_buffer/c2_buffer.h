@@ -54,16 +54,33 @@ public:
 
     __aicore__ inline LocalTensor<L0cT> Allocate()
     {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
         WaitFlag<HardEvent::M_MTE1>(EVENT_ID2);
+#endif
         LocalTensor<L0cT> biasC2 = biasBuf_.Get<L0cT>();
         return biasC2;
     }
 
-    __aicore__ inline void Free() { SetFlag<HardEvent::M_MTE1>(EVENT_ID2); }
+    __aicore__ inline void Free()
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
+        SetFlag<HardEvent::M_MTE1>(EVENT_ID2);
+#endif
+    }
 
-    __aicore__ inline void EnQue() { SetFlag<HardEvent::MTE1_M>(EVENT_ID2); }
+    __aicore__ inline void EnQue()
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
+        SetFlag<HardEvent::MTE1_M>(EVENT_ID2);
+#endif
+    }
 
-    __aicore__ inline void DeQue() { WaitFlag<HardEvent::MTE1_M>(EVENT_ID2); }
+    __aicore__ inline void DeQue()
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
+        WaitFlag<HardEvent::MTE1_M>(EVENT_ID2);
+#endif
+    }
 
 private:
     TBuf<TPosition::C2> biasBuf_;

@@ -89,6 +89,8 @@ public:
      */
     __aicore__ inline void ResetCache() {};
 
+    __aicore__ inline uint16_t GetPingPongFlag() const { return 0; }
+
     /**
      * @description: Put tensor to buffer que
      * @return: void
