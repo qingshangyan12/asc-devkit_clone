@@ -11,7 +11,6 @@
 #include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_kfc_server.h"
 #include "ccu_variable_dl.hpp"
-#include "ccu_func_dl.hpp"
 #include "mc2_type.h"
 #include "hccl_alloc_ctx_res.h"
 
@@ -19,8 +18,6 @@ namespace mc2_ops_hccl {
 
 using namespace hcomm;
 using namespace std;
-
-static CcuKernelArg g_currentKfcArg = nullptr;
 
 const uint32_t HBM_PARAM_IDX_0 = 0;
 const uint32_t HBM_PARAM_IDX_1 = 1;
@@ -42,14 +39,17 @@ const uint32_t DIE1_ID = 1;
 constexpr const char* DIE1_START_SIG = "Die1StartSig";
 constexpr const char* DIE1_END_SIG = "Die1EndSig";
 
-ccu::Func AlltoAllMesh1DFunc([](ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
-                                 ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
-                                 ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
-                                 ccu::Variable goSize3, ccu::Variable goSize4) {
-    HCCL_INFO("[CcuKernelKfcServer] start ccuFunc AlltoAllMesh1DFunc!");
-    CcuAlltoAllMesh1DKernel(inputAddr, outputAddr, tokenInfo, srcStride, srcOffset, dstOffset,
-                            sliceSize, goSize1, goSize2, goSize3, goSize4, g_currentKfcArg);
-});
+static CcuKernelArg UnwrapKfcRegisterArg(CcuKernelArg arg)
+{
+    auto *registerArg = static_cast<CcuKernelRegisterArgWrapper*>(arg);
+    if (registerArg != nullptr && registerArg->argNum == 1 &&
+        registerArg->magic == CCU_KERNEL_REGISTER_ARG_MAGIC) {
+        HCCL_INFO("[CcuKernelKfcServer] unwrap register arg: wrapper[%p], realKernelArg[%p]",
+            registerArg, registerArg->realKernelArg);
+        return static_cast<CcuKernelArg>(registerArg->realKernelArg);
+    }
+    return arg;
+}
 
 // new---20260603
 static CcuResult ParseKernelArg(KfcServerContext &ctx)
@@ -226,7 +226,6 @@ void LoadFuncParamFromMemory(ccu::Variable &paramAddr, ccu::Array<ccu::Variable>
 void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
 {
     HCCL_INFO("[KfcServerGenCircularQueue] KfcServerGenCircularQueue start");
-    g_currentKfcArg = arg;
     
     // 存放《控制repeat循环执行的条件》的寄存器
     ccu::Variable repeatCond;
@@ -355,6 +354,7 @@ void SlaveKfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
 // ============================================================================
 CcuResult CcuKfcServerKernel(CcuKernelArg arg)
 {
+    arg = UnwrapKfcRegisterArg(arg);
     KfcServerContext ctx;
     HCCL_INFO("[CcuKernelKfcServer] KfcServer run");
     CCU_CHK_RET(ParseKernelArg(ctx));

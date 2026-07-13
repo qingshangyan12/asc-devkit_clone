@@ -1468,11 +1468,29 @@ HcclResult HcclGetCcuKernel(
                 continue;
             }
 
-            HCCL_INFO("[HcclGetCcuKernel] registering kernel[%u]: kernelFuncName[%s]", i, kernelInfo.kernelFuncName);
+            auto *kernelArgBase = static_cast<CcuKernelArgBase*>(kernelInfo.kernelArg);
+            ChannelHandle firstChannel = 0;
+            uint32_t channelCount = 0;
+            if (kernelArgBase != nullptr) {
+                channelCount = kernelArgBase->channelCount;
+                firstChannel = channelCount > 0 ? kernelArgBase->channels[0] : 0;
+            }
+            HCCL_INFO("[HcclGetCcuKernel] registering kernel[%u]: kernelFuncName[%s], kernelArg[%p], "
+                "channelCount[%u], firstChannel[%llu]",
+                i, kernelInfo.kernelFuncName, kernelInfo.kernelArg, channelCount, firstChannel);
             CcuKernelHandle kernelHandle;
+            CcuKernelRegisterArgWrapper kfcRegisterArg;
+            void *registerKernelArg = kernelInfo.kernelArg;
+            if (strcmp(kernelInfo.kernelFuncName, "CcuKernelKfcServer") == 0) {
+                kfcRegisterArg.realKernelArg = kernelInfo.kernelArg;
+                registerKernelArg = &kfcRegisterArg;
+                HCCL_INFO("[HcclGetCcuKernel] use KFC register wrapper: wrapper[%p], argNum[%u], "
+                    "magic[0x%x], realKernelArg[%p]",
+                    registerKernelArg, kfcRegisterArg.argNum, kfcRegisterArg.magic, kfcRegisterArg.realKernelArg);
+            }
             CcuResult regRet = HcommCcuKernelRegister(insHandle, kernelInfo.kernelFuncName,
                                                       reinterpret_cast<void*>(kernelInfo.kernelFunc),
-                                                      kernelInfo.kernelArg, &kernelHandle);
+                                                      registerKernelArg, &kernelHandle);
             if (regRet != CCU_SUCCESS) {
                 HCCL_ERROR("ccu kernel register failed for kernel[%u][%s]: ccuRet -> %d", i, kernelInfo.kernelFuncName, regRet);
                 return ConvertCcuToHccl(regRet);

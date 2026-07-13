@@ -288,6 +288,14 @@ struct CcuKernelArgBase {
     uint32_t      channelCount;
 };
 
+constexpr uint32_t CCU_KERNEL_REGISTER_ARG_MAGIC = 0x4b465353U; // "KFSS"
+
+struct CcuKernelRegisterArgWrapper {
+    uint32_t argNum = 1;
+    void *realKernelArg = nullptr;
+    uint32_t magic = CCU_KERNEL_REGISTER_ARG_MAGIC;
+};
+
 // ccu kernel register所需信息
 struct CcuKernelInfo {
     // kernel资源组序号，group号不同时，资源复用
