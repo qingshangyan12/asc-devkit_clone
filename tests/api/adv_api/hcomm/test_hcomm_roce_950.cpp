@@ -97,12 +97,11 @@ private:
 TEST_F(HcommRoCETestSuite, Init_ReadNbi_Drain)
 {
     Hcomm<AscendC::COMM_PROTOCOL_ROCE> hcomm;
-    EXPECT_EQ(hcomm.Init((__ubuf__ uint8_t *)(addr_), ROCE_INVALID_TMP_BUF_SIZE), AscendC::HCOMM_FAILED);
-    EXPECT_EQ(hcomm.Init((__ubuf__ uint8_t *)(addr_), ROCE_VALID_TMP_BUF_SIZE), 0);
+    EXPECT_EQ(hcomm.Init((__ubuf__ uint8_t*)(addr_), ROCE_INVALID_TMP_BUF_SIZE), AscendC::HCOMM_FAILED);
+    EXPECT_EQ(hcomm.Init((__ubuf__ uint8_t*)(addr_), ROCE_VALID_TMP_BUF_SIZE), 0);
     ChannelHandle channelHandle = reinterpret_cast<ChannelHandle>(&channel_);
-    int32_t ret
-        = hcomm.ReadNbi(channelHandle, reinterpret_cast<GM_ADDR>(0x110),
-            reinterpret_cast<GM_ADDR>(0x220), ROCE_TRANSFER_SIZE);
+    int32_t ret = hcomm.ReadNbi(
+        channelHandle, reinterpret_cast<GM_ADDR>(0x110), reinterpret_cast<GM_ADDR>(0x220), ROCE_TRANSFER_SIZE);
     EXPECT_EQ(ret, 0);
     ret = hcomm.Drain(channelHandle);
     EXPECT_EQ(ret, 0);
@@ -114,11 +113,11 @@ TEST_F(HcommRoCETestSuite, Init_WriteNbi_Drain)
     EXPECT_EQ(hcomm.Init(tempTensor_, ROCE_INVALID_TMP_BUF_SIZE), AscendC::HCOMM_FAILED);
     EXPECT_EQ(hcomm.Init(tempTensor_, ROCE_VALID_TMP_BUF_SIZE), 0);
     ChannelHandle channelHandle = reinterpret_cast<ChannelHandle>(&channel_);
-    int32_t ret = hcomm.WriteNbi<false>(channelHandle,
-        reinterpret_cast<GM_ADDR>(0x220), reinterpret_cast<GM_ADDR>(0x110), ROCE_TRANSFER_SIZE);
+    int32_t ret = hcomm.WriteNbi<false>(
+        channelHandle, reinterpret_cast<GM_ADDR>(0x220), reinterpret_cast<GM_ADDR>(0x110), ROCE_TRANSFER_SIZE);
     EXPECT_EQ(ret, 0);
-    ret = hcomm.WriteNbi<false>(channelHandle,
-        reinterpret_cast<GM_ADDR>(0x220), reinterpret_cast<GM_ADDR>(0x110), ROCE_TRANSFER_SIZE);
+    ret = hcomm.WriteNbi<false>(
+        channelHandle, reinterpret_cast<GM_ADDR>(0x220), reinterpret_cast<GM_ADDR>(0x110), ROCE_TRANSFER_SIZE);
     EXPECT_EQ(ret, 0);
     ret = hcomm.Commit(channelHandle);
     EXPECT_EQ(ret, 0);
@@ -131,8 +130,8 @@ TEST_F(HcommRoCETestSuite, Init_WriteWithNotifyNbi)
     Hcomm<AscendC::COMM_PROTOCOL_ROCE> hcomm;
     EXPECT_EQ(hcomm.Init(tempTensor_, ROCE_VALID_TMP_BUF_SIZE), 0);
     ChannelHandle channelHandle = reinterpret_cast<ChannelHandle>(&channel_);
-    int32_t ret = hcomm.WriteWithNotifyNbi<false>(channelHandle,
-        reinterpret_cast<GM_ADDR>(0x220), reinterpret_cast<GM_ADDR>(0x110), ROCE_TRANSFER_SIZE,
+    int32_t ret = hcomm.WriteWithNotifyNbi<false>(
+        channelHandle, reinterpret_cast<GM_ADDR>(0x220), reinterpret_cast<GM_ADDR>(0x110), ROCE_TRANSFER_SIZE,
         reinterpret_cast<GM_ADDR>(0x310), ROCE_NOTIFY_SIZE);
     EXPECT_EQ(ret, -1);
 }
