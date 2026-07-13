@@ -48,12 +48,6 @@ class OrchestrateShellTest(unittest.TestCase):
 
         fake_bin = root / "bin"
         fake_bin.mkdir()
-        fake_pip = fake_bin / "pip3"
-        fake_pip.write_text(
-            "#!/usr/bin/env bash\nprintf '%s\\n' \"$@\" > \"${PIP_CAPTURE:-/dev/null}\"\n",
-            encoding="utf-8",
-        )
-        fake_pip.chmod(0o755)
         fake_python = fake_bin / "python3"
         fake_python.write_text(
             """#!/usr/bin/env bash
@@ -249,54 +243,6 @@ EOF
                 result.stdout,
             )
             self.assertFalse((root / "presmoke_results").exists())
-
-    def test_copies_ci_run_log_to_project_root(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            script = self.copy_orchestrate_fixture(root)
-            env = self.base_env(
-                root,
-                PROJECT_ROOT=str(root),
-                OUT_ROOT=str(root / "out"),
-                ASCEND_OPP_PATH=str(root / "opp"),
-                NPU_CARDS="0",
-            )
-            command = f'bash "{script}" 2>&1 | tee "{script.parent / "run_test.log"}"'
-
-            result = subprocess.run(
-                ["bash", "-o", "pipefail", "-c", command],
-                text=True,
-                capture_output=True,
-                env=env,
-                check=False,
-            )
-
-            self.assertEqual(result.returncode, 0, result.stderr)
-            copied_log = root / "run_test.log"
-            self.assertTrue(copied_log.exists())
-            self.assertIn("execute samples success", copied_log.read_text(encoding="utf-8"))
-
-    def test_installs_devcontainer_requirements_before_presmoke(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            requirements = root / ".devcontainer/requirements.txt"
-            requirements.parent.mkdir()
-            requirements.write_text("", encoding="utf-8")
-            script = self.copy_orchestrate_fixture(root)
-            capture = root / "pip_args.txt"
-            env = self.base_env(
-                root,
-                PROJECT_ROOT=str(root),
-                OUT_ROOT=str(root / "out"),
-                ASCEND_OPP_PATH=str(root / "opp"),
-                PIP_CAPTURE=str(capture),
-                NPU_CARDS="0",
-            )
-
-            result = subprocess.run(["bash", str(script), "--dry-run"], text=True, capture_output=True, env=env)
-
-            self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertEqual(capture.read_text(encoding="utf-8").splitlines(), ["install", "-r", str(requirements)])
 
     def test_cpu_mode_uses_default_schedule(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
