@@ -98,7 +98,7 @@ __aicore__ constexpr inline U Cast(T bVal)
   <!-- end id7 -->
 
 <!-- npu="950" id8 -->
-fp4x2_e1m2_t和fp4x2_e2m1_t类型为了满足1byte数据大小，构造时由两个四位标量数据拼接生成。转换时，被转换的是fp4x2_e1m2_t和fp4x2_e2m1_t标量数据中低位4bit的值，即[0:3]位。
+- fp4x2_e1m2_t和fp4x2_e2m1_t类型为了满足1byte数据大小，构造时由两个四位标量数据拼接生成。转换时，被转换的是fp4x2_e1m2_t和fp4x2_e2m1_t标量数据中低位4bit的值，即[0:3]位。
 <!-- end id8 -->
 
 - 支持的返回值数据类型为float。
