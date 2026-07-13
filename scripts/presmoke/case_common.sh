@@ -336,7 +336,11 @@ _presmoke_ensure_custom_op_package() {
     fi
 
     (cd "$build_dir" && presmoke_run_command "${cmake_args[@]}")
-    (cd "$build_dir" && presmoke_run_command make -j binary package)
+    (
+        cd "$build_dir"
+        PRESMOKE_MAKE_JOBS=16 CMAKE_BUILD_PARALLEL_LEVEL=16 \
+            presmoke_run_command make -j binary package
+    )
 
     local packages=("$build_dir"/custom_opp_*.run)
     if [[ ! -f "${packages[0]}" ]]; then

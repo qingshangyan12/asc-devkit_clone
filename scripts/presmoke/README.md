@@ -137,6 +137,7 @@ ARCH=dav-2201 PRIMARY_CARD=7 bash scripts/run_presmoke.sh --dry-run
 | `CPU_RUN_TIMEOUT` | `300` | CPU run 命令超时时间，单位秒。CPU-only 验证较慢时可调大。 |
 | `SCHEDULE` | `fixed` | 用例提交顺序。看护运行建议使用 `fixed`。 |
 | `SCHEDULE_FILE` | 内置文件 | 可选的固定顺序覆盖文件。 |
+| `SCHEDULE_REPORT` | 空 | 可选的历史报告或 `ALL_CASE_TIMINGS.tsv`。显式设置时，多卡分片根据该报告重新计算，不使用内置固定分片。 |
 | `OUT_ROOT` | `presmoke_reports/presmoke_<arch>_<timestamp>` | CI 归档使用的输出目录。 |
 | `MODES` | `npu` | Presmoke 运行模式。 |
 | `MODE` | 未设置 | 仅当 `MODES` 未设置时使用的别名，例如 `MODE=cpu`。 |
@@ -144,6 +145,44 @@ ARCH=dav-2201 PRIMARY_CARD=7 bash scripts/run_presmoke.sh --dry-run
 CPU 调试模式需要显式开启。使用 `MODES=cpu` 或 `MODE=cpu`；默认看护路径仍为 `npu`。CPU 模式默认不使用 NPU fixed schedule，除非显式提供 `SCHEDULE_FILE`。
 
 CPU 模式的默认并行度根据主机 CPU 数计算，不针对特定机器写死。例如，192 CPU 主机会解析为 `JOBS=48`、`MAKE_JOBS=4`、`CPU_RUN_SLOTS=192`；88 CPU 主机会解析为 `JOBS=22`、`MAKE_JOBS=4`、`CPU_RUN_SLOTS=88`。
+
+## 多卡分片与执行模型
+
+NPU 全量运行采用“一次规划、多卡分片、每卡独立流水执行、最终统一汇总”的模型：
+
+1. `NPU_CARDS=auto` 优先扫描 `/dev/davinci*`，扫描不到时回退到 `npu-smi`，再无法检测时使用 `PRIMARY_CARD`。
+2. 编排器先执行一次 dry-run，得到经过架构、模式、schedule 和 skip 规则筛选后的完整 case 列表。
+3. 如果存在与架构、模式和卡数匹配的内置固定分片，且未显式设置 `SCHEDULE_REPORT`，编排器直接使用该分片。否则分片器读取历史 `build`、`run`、`verify` 耗时，模拟每张卡的流水线完成时间；缺少阶段耗时时，退化为按总耗时做最长任务优先的贪心均衡。
+4. 每张卡启动一个独立 runner。该 runner 使用 `JOBS` 个 build worker、`NPU_SLOTS` 个 NPU run worker 和 `JOBS` 个 verify worker；默认 `NPU_SLOTS=1`，即每张卡只保留一条 NPU FIFO 执行队列。
+5. 所有卡结束后合并每卡报告。全量 elapsed time 由最早开始时间到最晚结束时间计算，因此分片目标是让各卡预计耗时和结束时间尽量接近，而不是让 case 数量完全相同。
+
+以下情况强制使用单轮执行，不进行多卡分片：`--dry-run`、`--filter`、`--exact-filter`、`--exclude` 和 `--stages build`。
+
+多卡运行根据主机 CPU 数计算每卡可用 CPU：`ceil(CPU(s) / card_count)`，再为每张卡独立解析 `JOBS`、`MAKE_JOBS` 和 `CPU_RUN_SLOTS`。显式设置这些变量时，显式值优先。
+
+`custom_op` 算子包的 `make -j binary package` 固定使用 16 路编译，优先缩短全量运行的自定义算子包编译关键路径；同一分片中的其他 case 继续使用按每卡 CPU 数计算的 `MAKE_JOBS`。
+
+为了避免自定义算子包的安装和消费跨卡冲突，以下 case 作为一个不可拆分的分片组，始终分配到同一张卡：
+
+```text
+custom_op_static_lib
+└── custom_op
+    ├── aclnn_invocation
+    ├── aclop_invocation
+    ├── onnx_plugin
+    ├── tensorflow_builtin
+    ├── tensorflow_custom
+    └── tiling_sink_programming
+
+以上依赖任务结束
+└── parallel_ops_package
+```
+
+`custom_op_static_lib` 或 `custom_op` 失败时，其硬依赖 case 会标记为 `SKIP: prerequisite failed`，不会继续执行命令。`parallel_ops_package` 可以提前 build，但 run 必须等待 `custom_op` 及其依赖 case 全部结束。其他 case（包括同一 source case 的不同 scenario）可以独立分配到不同卡。
+
+分片计划写入 `presmoke_reports/<run>/.plan/shards.tsv` 和 `.plan/shards/card_<id>.txt`；这些临时计划会在最终报告生成后自动清理。每张卡的实际 case、阶段耗时和起止时间保存在 `full_card<id>/results/report.json` 中，可用于检查多卡负载和结束时间是否均衡。
+
+910B 8 卡看护的固定分片位于 `scripts/presmoke/schedules/shards/dav-2201_npu_8cards/card_<index>.txt`。文件只保存逻辑 shard 和 case 的对应关系，不保存或提交历史耗时 TSV。运行时逻辑 shard 按顺序映射到实际检测到的卡号，并严格校验 planned case 是否恰好出现一次；case 新增、删除、重复或遗漏都会快速失败。显式设置 `SCHEDULE_REPORT` 可绕过固定分片并根据指定报告重新计算。
 
 ## 报告
 
@@ -174,7 +213,7 @@ CPU 模式的默认并行度根据主机 CPU 数计算，不针对特定机器�
 这些顺序会保留自定义算子依赖约束：
 
 - `custom_op_static_lib` 在 `custom_op` 之前运行。
-- `parallel_ops_package` 在 `custom_op_static_lib` 之后运行。
+- `parallel_ops_package` 的 run 在 `custom_op` 及其依赖用例全部结束后运行。
 - `aclnn`、`aclop`、`onnx`、`tensorflow` 和 `tiling_sink` 在 `custom_op` 之后运行。
 
 不在 schedule 文件中的新增 case 会追加到末尾，然后再次强制应用自定义算子依赖顺序。

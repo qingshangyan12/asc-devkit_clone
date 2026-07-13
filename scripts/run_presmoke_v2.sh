@@ -383,6 +383,12 @@ write_multi_card_shards() {
     elif [[ "$JOBS" =~ ^[0-9]+$ ]]; then
         shard_args+=(--jobs "$JOBS")
     fi
+    local fixed_shards_dir
+    fixed_shards_dir="${SCRIPT_DIR}/presmoke/schedules/shards/${ARCH}_${MODES}_${#cards[@]}cards"
+    if [[ -z "$SCHEDULE_REPORT" && -d "$fixed_shards_dir" ]]; then
+        log "multi_card_fixed_shards dir=$fixed_shards_dir"
+        shard_args+=(--fixed-shards "$fixed_shards_dir")
+    fi
     shard_args+=(--cards "${cards[@]}")
 
     rm -rf "$shards_dir"

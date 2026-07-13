@@ -99,6 +99,7 @@ def shard_examples(
     schedule_report: Path | None = None,
     excludes: set[str] | None = None,
     jobs: int | None = None,
+    fixed_shards: Path | None = None,
 ) -> list[tuple[str, str]]:
     examples = [
         example
@@ -107,6 +108,8 @@ def shard_examples(
     ]
     if not cards or not examples:
         return []
+    if fixed_shards is not None:
+        return load_fixed_shards(examples, cards, fixed_shards)
 
     schedule_report = schedule_report or builtin_timing_report(report_path)
     stage_timings = (
@@ -145,6 +148,44 @@ def shard_examples(
     for card in cards:
         for example in interleave_group_examples(card_groups[card], order_index):
             assignments.append((card, example))
+    return assignments
+
+
+def load_fixed_shards(
+    examples: list[str], cards: list[str], shard_dir: Path
+) -> list[tuple[str, str]]:
+    assignments: list[tuple[str, str]] = []
+    assigned_examples: set[str] = set()
+    duplicate_examples: set[str] = set()
+    for index, card in enumerate(cards):
+        shard_file = shard_dir / f"card_{index}.txt"
+        if not shard_file.is_file():
+            raise ValueError(f"fixed shard file is missing: {shard_file}")
+        for raw_line in shard_file.read_text(encoding="utf-8").splitlines():
+            example = raw_line.strip()
+            if not example or example.startswith("#"):
+                continue
+            if example in assigned_examples:
+                duplicate_examples.add(example)
+            assigned_examples.add(example)
+            assignments.append((card, example))
+
+    planned_examples = set(examples)
+    missing_examples = [
+        example for example in examples if example not in assigned_examples
+    ]
+    extra_examples = sorted(assigned_examples - planned_examples)
+    errors = []
+    if missing_examples:
+        errors.append("missing planned cases: " + ", ".join(missing_examples))
+    if extra_examples:
+        errors.append("unplanned cases: " + ", ".join(extra_examples))
+    if duplicate_examples:
+        errors.append("duplicate cases: " + ", ".join(sorted(duplicate_examples)))
+    if errors:
+        raise ValueError(
+            f"fixed shard coverage mismatch in {shard_dir}: " + "; ".join(errors)
+        )
     return assignments
 
 
@@ -1152,6 +1193,7 @@ def main() -> int:
     shard_parser.add_argument("--schedule-report", type=Path)
     shard_parser.add_argument("--exclude", action="append", default=[])
     shard_parser.add_argument("--jobs", type=int)
+    shard_parser.add_argument("--fixed-shards", type=Path)
     status_parser = subparsers.add_parser("retry-status")
     status_parser.add_argument("report", type=Path)
     report_parser = subparsers.add_parser("write-final-report")
@@ -1173,6 +1215,7 @@ def main() -> int:
             args.schedule_report,
             set(args.exclude),
             jobs=args.jobs,
+            fixed_shards=args.fixed_shards,
         ):
             LOG.info("%s\t%s", card, example)
     elif args.command == "retry-status":
