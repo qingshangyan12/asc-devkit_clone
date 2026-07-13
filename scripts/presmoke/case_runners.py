@@ -53,6 +53,7 @@ class RunnerInfo:
     skip: bool
     skip_reason: str
     skip_modes: List[str]
+    skip_archs: List[str]
     confidence: str
     reasons: List[str]
 
@@ -109,6 +110,7 @@ def load_runner_info(
         skip=bool(info.get("skip")),
         skip_reason=info.get("skip_reason") or "explicit skip",
         skip_modes=list(info.get("skip_modes", [])),
+        skip_archs=list(info.get("skip_archs", [])),
         confidence=info.get("confidence", ""),
         reasons=list(info.get("reasons", [])),
     )
@@ -152,7 +154,8 @@ def append_confidence_suggestion(context: CaseRunnerContext, info: RunnerInfo) -
 
 
 def mode_supported(context: CaseRunnerContext, info: RunnerInfo, mode: str) -> bool:
-    if mode in info.skip_modes:
+    skip_active = not info.skip_archs or context.arch in info.skip_archs
+    if skip_active and mode in info.skip_modes:
         context.skipped.append(
             RunResult(
                 info.rel_path,
