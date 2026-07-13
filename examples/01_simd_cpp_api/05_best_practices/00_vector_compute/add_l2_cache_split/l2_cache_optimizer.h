@@ -21,8 +21,7 @@ constexpr int64_t L2_TILE_THRESHOLD = 100 * 1024 * 1024;
 
 class L2CacheOptimizer {
 public:
-    __aicore__ inline L2CacheOptimizer(int64_t totalLen, int64_t blockNum)
-        : totalLen_(totalLen), blockNum_(blockNum)
+    __aicore__ inline L2CacheOptimizer(int64_t totalLen, int64_t blockNum) : totalLen_(totalLen), blockNum_(blockNum)
     {
         int64_t totalByteSize = totalLen * sizeof(half) * 3;
         if (totalByteSize <= L2_TILE_THRESHOLD) {
@@ -49,10 +48,7 @@ public:
         return (tileIdx == tileNum_ - 1) ? tailTileLen_ : baseTileLen_;
     }
 
-    __aicore__ inline int64_t GetBlockOffset(int64_t tileIdx)
-    {
-        return tileIdx * baseTileLen_;
-    }
+    __aicore__ inline int64_t GetBlockOffset(int64_t tileIdx) { return tileIdx * baseTileLen_; }
 
 private:
     int64_t totalLen_;
