@@ -79,7 +79,7 @@ repeatParams.repeatTime = 1;  // height/width方向上的迭代次数
 repeatParams.repeatStride = 1;  // height/width方向上前后迭代起始位置的距离
 repeatParams.repeatMode = 0;  // 迭代方向：0：迭代沿height; 1：迭代沿width
 repeatParams.dstStride = CeilDivision(m, fractalShape[0]);  // 输出矩阵K轴方向偏移
-AscendC::SetLoadDataRepeat(repeatParams);
+AscendC::SetLoadDataRepeatWithStride(repeatParams);
 
 AscendC::LoadDataWithStride(a2Local, a1Local, loadDataParams);
 ```

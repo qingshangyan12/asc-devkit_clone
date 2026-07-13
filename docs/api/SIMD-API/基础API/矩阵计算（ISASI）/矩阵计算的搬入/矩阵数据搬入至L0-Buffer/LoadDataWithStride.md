@@ -34,13 +34,9 @@
 
 头文件路径为：`"basic_api/kernel_operator_mm_intf.h"`。
 
-本接口本质上实现功能和[LoadData_3D](./LoadData_3D.md)接口一致，用于将NC1HWC0格式的Feature Map完成Image to Column展开，然后再从展开后的二维矩阵中选取指定数据块搬入对应内存位置。与LoadData_3D接口的差异在于，本接口仅支持Ascend 950PR/Ascend 950DT产品，支持配置输出矩阵K轴方向偏移量dstStride的能力且必须配置该参数，调用之前必须使用辅助配置接口[SetLoadDataRepeatWithStride](../辅助配置接口/SetLoadDataRepeatWithStride.md)配置dstStride参数。此外，相比于LoadData_3D，本接口内部不包含针对其他芯片版本的兼容性实现，减少了兼容造成的额外开销，性能表现有所优化。功能示意图请参考[图1](#zh-cn_topic_0000002512171652_fig54450833726)。
+本接口本质上实现功能和[LoadData（卷积数据搬运）](./LoadData_3D.md)接口一致，用于将NC1HWC0格式的Feature Map完成Image to Column展开，然后再从展开后的二维矩阵中选取指定数据块搬入对应内存位置。与LoadData（卷积数据搬运）接口的差异在于，本接口仅支持Ascend 950PR/Ascend 950DT产品，支持配置输出矩阵K轴方向偏移量dstStride的能力且必须配置该参数，调用之前必须使用辅助配置接口[SetLoadDataRepeatWithStride](../辅助配置接口/SetLoadDataRepeatWithStride.md)配置dstStride参数。此外，相比于LoadData（卷积数据搬运），本接口内部不包含针对其他芯片版本的兼容性实现，减少了兼容造成的额外开销，性能表现有所优化。
 
 LoadDataWithStride支持的数据通路为：L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer。
-
-**图1** LoadData to L0A Buffer功能示意图<a id="zh-cn_topic_0000002512171652_fig54450833726"></a>  
-
-![](../../../../../figures/load3d_l1tol0a_demo.png "LoadData-to-L0A Buffer功能示意图")
 
 ## 函数原型<a id="section82039854412"></a>
 
@@ -92,12 +88,6 @@ __aicore__ inline void LoadDataWithStride(const LocalTensor<T>& dst, const Local
 | filterSizeH | 是否在filterH的基础上将卷积核height增加256个元素。true，增加；false，不增加。默认为false。 |
 | fMatrixCtrl | 表示LoadData（卷积数据搬运） v2指令从左矩阵还是右矩阵获取FeatureMap的属性描述，与SetFmatrix配合使用，默认值为false。当前只支持设置为false。<br>&nbsp;&nbsp;&bull; true：从右矩阵中获取FeatureMap的属性描述；<br>&nbsp;&nbsp;&bull; false：从左矩阵中获取FeatureMap的属性描述。 |
 
-## 数据类型<a id="section4219135304818"></a>
-
-- 数据通路为L1 Buffer(A1)->L0A Buffer(A2)时，支持数据类型为：int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t、int32_t、uint32_t、float。
-
-- 数据通路为L1 Buffer(B1)->L0B Buffer(B2)时，支持数据类型为：half、bfloat16_t、int32_t、uint32_t、float。
-
 ## 返回值说明<a id="section4219135304919"></a>
 
 无
@@ -106,10 +96,27 @@ __aicore__ inline void LoadDataWithStride(const LocalTensor<T>& dst, const Local
 
 - 非转置场景下，L1 Buffer-\>L0B Buffer通路不支持。L1 Buffer-\>L0B Buffer通路下会自动进行转置，不需要配置enTranspose，此时enTranspose参数无效。
 - 当目的地址位于L0A Buffer/L0B Buffer时，地址必须512字节对齐。当源地址位于L1 Buffer时，地址必须32字节对齐。
-- 当l1H、l1W、channelSize、kExtension、mExtension中的任意一个值为0时，该指令不会被执行。
 - 当filterW为0且filterSizeW为false，或者当filterH为0且filterSizeH为false时，该指令不会被执行。
 - 必须使用辅助配置接口[SetLoadDataRepeatWithStride](../辅助配置接口/SetLoadDataRepeatWithStride.md)配置dstStride参数。
 
 ## 调用示例<a id="section14867162784812"></a>
 
-无
+本接需与SetLoadDataRepeatWithStride接口配合使用，展示代码示例片段：
+
+```cpp
+// Load3Dv2指令完成img2col的过程，可知 img2col后A矩阵高度为ho * wo,根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：A矩阵的高度为CeilAlign(k, fractalShape[0])；img2col后A矩阵宽度为ci * kh * kw，代入kh=1，kw=1，可知A矩阵的宽度为CeilAlign(m, fractalShape[1])。最后，配置loadDataParams.enTranspose = true，将整个A 矩阵转置并且将其中每一个分形转置。
+AscendC::LoadData3DParamsV2<T> loadDataParams;
+
+// 设置loadDataParams相关参数
+...
+
+// 使用SetLoadDataRepeat接口，设置LoadDataWithStride接口的repeat参数
+AscendC::LoadDataRepeatParam repeatParams;
+repeatParams.repeatTime = 1;  // height/width方向上的迭代次数
+repeatParams.repeatStride = 1;  // height/width方向上前后迭代起始位置的距离
+repeatParams.repeatMode = 0;  // 迭代方向：0：迭代沿height; 1：迭代沿width
+repeatParams.dstStride = CeilDivision(m, fractalShape[0]);  // 输出矩阵K轴方向偏移
+AscendC::SetLoadDataRepeatWithStride(repeatParams);
+
+AscendC::LoadDataWithStride(a2Local, a1Local, loadDataParams);
+```
