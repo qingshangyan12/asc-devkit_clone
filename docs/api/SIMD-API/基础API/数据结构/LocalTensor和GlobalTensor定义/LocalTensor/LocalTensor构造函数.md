@@ -28,27 +28,27 @@
 
 ### 是否支持静态Tensor编程
 
-<!-- npu="950" id1 -->
+<!-- npu="950" id8 -->
 - Ascend 950PR/Ascend 950DT：支持
-<!-- end id1 -->
-<!-- npu="A3" id2 -->
+<!-- end id8 -->
+<!-- npu="A3" id9 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
-<!-- end id2 -->
-<!-- npu="910b" id3 -->
+<!-- end id9 -->
+<!-- npu="910b" id10 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
-<!-- end id3 -->
-<!-- npu="310b" id4 -->
+<!-- end id10 -->
+<!-- npu="310b" id11 -->
 - Atlas 200I/500 A2 推理产品：不支持
-<!-- end id4 -->
-<!-- npu="310p" id5 -->
+<!-- end id11 -->
+<!-- npu="310p" id12 -->
 - Atlas 推理系列产品AI Core：支持
-<!-- end id5 -->
-<!-- npu="310p" id6 -->
+<!-- end id12 -->
+<!-- npu="310p" id13 -->
 - Atlas 推理系列产品Vector Core：支持
-<!-- end id6 -->
-<!-- npu="910" id7 -->
+<!-- end id13 -->
+<!-- npu="910" id14 -->
 - Atlas 训练系列产品：不支持
-<!-- end id7 -->
+<!-- end id14 -->
 
 
 ## 功能说明<a name="section618mcpsimp"></a>
