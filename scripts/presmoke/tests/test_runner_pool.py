@@ -116,6 +116,74 @@ class RunnerPoolTest(unittest.TestCase):
         self.assertEqual(by_name[custom_op.example.rel_path].status, "PASS")
         self.assertEqual(by_name[aclnn.example.rel_path].status, "PASS")
 
+    def test_custom_op_failure_skips_dependents_without_running_them(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            dependent_started = root / "dependent.started"
+            custom_op = cell(
+                root,
+                "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op",
+                commands=[Command("false", "build")],
+            )
+            tiling_sink = cell(
+                root,
+                "04_aicpu/02_features/00_framework/00_pytorch/tiling_sink_programming",
+                commands=[Command(f"touch {dependent_started}", "build")],
+            )
+
+            run = run_cells_pipeline_with_options(
+                [custom_op, tiling_sink],
+                PipelineOptions(
+                    root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1
+                ),
+            )
+            dependent_was_started = dependent_started.exists()
+
+        by_name = {result.example: result for result in run.results}
+        self.assertEqual(by_name[custom_op.example.rel_path].status, "FAIL")
+        self.assertEqual(by_name[tiling_sink.example.rel_path].status, "SKIP")
+        self.assertIn(
+            "prerequisite failed", by_name[tiling_sink.example.rel_path].reason
+        )
+        self.assertFalse(dependent_was_started)
+
+    def test_parallel_package_runs_after_failed_dependents_are_skipped(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            parallel_started = root / "parallel.started"
+            custom_op = cell(
+                root,
+                "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op",
+                commands=[Command("false", "build")],
+            )
+            aclnn = cell(
+                root,
+                "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclnn_invocation",
+                commands=[Command("false", "build")],
+            )
+            parallel_ops = cell(
+                root,
+                "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/parallel_ops_package",
+                commands=[
+                    Command(":", "build"),
+                    Command(f"touch {parallel_started}", "run"),
+                ],
+            )
+
+            run = run_cells_pipeline_with_options(
+                [parallel_ops, aclnn, custom_op],
+                PipelineOptions(
+                    root / "logs", timeout=1, keep_artifacts=True, jobs=3, npu_slots=1
+                ),
+            )
+            parallel_was_started = parallel_started.exists()
+
+        by_name = {result.example: result for result in run.results}
+        self.assertEqual(by_name[custom_op.example.rel_path].status, "FAIL")
+        self.assertEqual(by_name[aclnn.example.rel_path].status, "SKIP")
+        self.assertEqual(by_name[parallel_ops.example.rel_path].status, "PASS")
+        self.assertTrue(parallel_was_started)
+
     def test_parallel_ops_package_waits_only_for_custom_op_dependents(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

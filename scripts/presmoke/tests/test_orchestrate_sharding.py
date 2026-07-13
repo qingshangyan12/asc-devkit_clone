@@ -24,6 +24,8 @@ from presmoke.orchestrate_report import shard_examples
 class OrchestrateShardingTest(unittest.TestCase):
     def test_custom_op_dependents_and_parallel_package_stay_on_one_card(self) -> None:
         dependency_group = [
+            "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op_static_lib",
+            "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op",
             "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclnn_invocation",
             "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclop_invocation",
             "01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin",
