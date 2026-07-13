@@ -16,7 +16,6 @@ bash scripts/run_presmoke.sh
 
 默认行为：
 
-- 启动时执行 `pip3 install -r .devcontainer/requirements.txt`。
 - `ARCH=dav-2201`，对应 910B。
 - `MODES=npu`。
 - `NPU_CARDS=auto`，优先检测可见的 `/dev/davinci*` 卡并并行运行。

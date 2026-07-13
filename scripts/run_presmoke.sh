@@ -14,17 +14,6 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="${PROJECT_ROOT:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
 
-if command -v update-alternatives >/dev/null 2>&1 \
-    && [[ -x /usr/bin/gcc-13 ]] \
-    && [[ -x /usr/bin/g++-13 ]]; then
-    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 10
-    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 10
-    update-alternatives --config gcc <<< '1'
-    update-alternatives --config g++ <<< '1'
-fi
-
-pip3 install -r "${PROJECT_ROOT}/.devcontainer/requirements.txt"
-
 ASCEND_HOME_DIR="${ASCEND_HOME_DIR:-/usr/local/Ascend/ascend-toolkit/latest}"
 ARCH="${ARCH:-dav-2201}"
 MODES="${MODES:-${MODE:-npu}}"
@@ -62,21 +51,6 @@ date_iso() {
 
 log() {
     printf '[%s] %s\n' "$(date_iso)" "$*" | tee -a "$STATUS_FILE"
-}
-
-copy_ci_run_log() {
-    local source_log="$SCRIPT_DIR/run_test.log"
-    local target_log="$PROJECT_ROOT/run_test.log"
-    [[ -f "$source_log" ]] || return 0
-
-    local attempt
-    for ((attempt = 0; attempt < 20; attempt++)); do
-        if grep -qE 'execute samples (success|failed)' "$source_log"; then
-            break
-        fi
-        sleep 0.1
-    done
-    cp -f -- "$source_log" "$target_log" || true
 }
 
 cleanup_lock() {
@@ -776,7 +750,6 @@ main() {
     else
         echo "execute samples failed" >&2
     fi
-    copy_ci_run_log
     exit "$effective_rc"
 }
 
