@@ -19,7 +19,6 @@ This example implements data transfer from UB (Unified Buffer) to L1 (L1 Buffer)
 │   ├── CMakeLists.txt                    // Build configuration file
 │   ├── data_utils.h                      // Data read/write functions
 │   ├── data_copy_ub2l1.asc               // Ascend C example implementation & invocation example
-│   ├── run.sh                            // One-click build and run script
 │   └── README.md                         // Example description document
 ```
 
