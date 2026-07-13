@@ -33,9 +33,13 @@
   | 场景 | SCENARIO_NUM | 搬运接口 | 输入数据格式 | 说明 |
   |------|-------------|---------|------------|------|
   | 连续搬运 | 1 | `DataCopy(dst, src, DataCopyParams)` | NZ | UB→L1 数据内容不变，输入需预先转为NZ格式 |
-  | 随路ND2NZ搬运 | 2 | `DataCopy(dst, src, Nd2NzParams)` | ND | UB→L1 搬运时硬件随路完成ND→NZ格式转换 |
+  | 随路ND2NZ搬运 | 2 | `DataCopy(dst, src, DataCopyParams)` 逐列块 | ND | UB→L1 搬运时逐C0列块搬运，手动完成ND→NZ格式转换 |
 
   接口资料参考[UBToL1连续数据搬运](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/UBToL1连续数据搬运（DataCopy）.md)和[UBToL1随路转换-ND2NZ搬运](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/UBToL1随路转换-ND2NZ搬运（DataCopy）.md)。
+
+- 关于场景2实现方案的说明：
+  
+  场景2未直接使用 `DataCopy(dst, src, Nd2NzParams)` 接口，而是用 `DataCopy(dst, src, DataCopyParams)` 逐C0列块搬运来等效实现ND2NZ。因为`DataCopy(dst, src, Nd2NzParams)` 接口为软件仿真实现，硬件本身不支持该能力，如果有业务场景需要，推荐用户根据自身业务场景设计UB->L1的ND2NZ搬运方案。
 
 - 样例规格：
   <table>
@@ -48,7 +52,7 @@
 
 - 样例实现：
   1. AIV核：将数据从GM（Global Memory）搬运到UB（Unified Buffer）。两种场景下GM中的数据排布不同：场景1为NZ格式（分形间列主序、分形内行主序，由 `gen_data.py` 预转换）；场景2为ND格式（原始行主序，无需预转换）。
-  2. AIV核：将数据从UB搬运到L1（L1 Buffer）。场景1使用连续搬运 `DataCopy(dst, src, DataCopyParams)`，UB→L1 数据内容不变，L1中即为NZ格式；场景2使用Nd2NzParams随路转换 `DataCopy(dst, src, Nd2NzParams)`，搬运时由硬件完成ND→NZ格式转换，L1中结果与场景1一致。两种场景到达L1后的数据排布相同，后续计算流程完全一致。
+  2. AIV核：将数据从UB搬运到L1（L1 Buffer）。场景1使用连续搬运 `DataCopy(dst, src, DataCopyParams)`，UB→L1 数据内容不变，L1中即为NZ格式；场景2使用 `DataCopy(dst, src, DataCopyParams)` 逐C0列块搬运，手动完成ND→NZ格式转换，L1中结果与场景1一致。两种场景到达L1后的数据排布相同，后续计算流程完全一致。
   3. AIC核：调用基础API LoadData将数据从L1搬运到L0A Buffer与L0B Buffer。
   4. AIC核：调用基础API Mmad进行矩阵乘计算。
   5. AIC核：调用基础API Fixpipe将数据从L0C Buffer搬运到GM（Global Memory）。

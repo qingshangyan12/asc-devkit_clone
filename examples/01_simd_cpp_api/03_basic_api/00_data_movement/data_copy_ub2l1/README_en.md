@@ -33,9 +33,20 @@ This example implements data transfer from UB (Unified Buffer) to L1 (L1 Buffer)
   | Scenario | SCENARIO_NUM | Transfer API | Input Format | Description |
   |----------|-------------|--------------|--------------|-------------|
   | Continuous transfer | 1 | `DataCopy(dst, src, DataCopyParams)` | NZ | UB→L1 data content unchanged, input must be pre-converted to NZ format |
-  | Inline ND2NZ transfer | 2 | `DataCopy(dst, src, Nd2NzParams)` | ND | Hardware completes ND→NZ format conversion during UB→L1 transfer |
+  | Inline ND2NZ transfer | 2 | `DataCopy(dst, src, DataCopyParams)` per C0 column block | ND | UB→L1 transfer via per-C0-column-block copy, manually completing ND→NZ format conversion |
 
   Refer to [UBToL1 Continuous Data Transfer](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/UBToL1连续数据搬运（DataCopy）.md) and [UBToL1 Inline ND2NZ Transfer](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/UBToL1随路转换-ND2NZ搬运（DataCopy）.md) for API documentation.
+
+- Notes on Scenario 2 implementation:
+
+  Scenario 2 does not directly use the `DataCopy(dst, src, Nd2NzParams)` API. Instead, it uses `DataCopy(dst, src, DataCopyParams)` to transfer per C0 column blocks, equivalently implementing ND2NZ. The reasons are as follows:
+
+  - **TPipe dependency**: With `ENABLE_CV_COMM_VIA_SSBUF` enabled, the `Nd2NzParams` API in the SSBUF path internally calls `PopStackBuffer` to pop a temporary buffer from TPipe-managed UB space for `TransND2NZ` conversion, requiring `GetTPipePtr()` to be non-null, i.e., `TPipe` must be declared and UB memory managed via `InitBuffer`. This example uses the static Tensor model (raw-address LocalTensor) without introducing TPipe.
+  - **Memory overlap**: Under the static Tensor model, UB data starts at address 0, while the temporary buffer from `PopStackBuffer` starts at `queEndAddress` (0 when no InitBuffer is called), overlapping with the source data and causing `TransND2NZ` to read and write the same memory, corrupting data. On Ascend 950, `TOTAL_UB_SIZE == TMP_UB_OFFSET == 248KB`, making it impossible to avoid overlap by adjusting static addresses.
+  - **Pipeline synchronization**: The SSBUF path of `Nd2NzParams` executes `TransND2NZ` on the V pipeline, requiring the caller to manually add `MTE2_V` pipeline synchronization, which the API does not handle automatically and is easy to miss.
+  - **Simulation limitation**: The NPU simulation (sim) mode does not model V pipeline timing precisely enough; `MTE2_V` synchronization does not fully take effect in sim mode, causing precision verification failure in sim mode.
+
+  The per-column-block approach calls `CopyUbufToCbuf` (SSBUF hardware channel, MTE3 pipeline only) for each `DataCopy`, without going through `PopStackBuffer` or involving the V pipeline. Therefore, it requires no TPipe, has no memory overlap risk, needs no additional pipeline synchronization, and passes sim mode correctly.
 
 - Example specifications:
   <table>
@@ -48,7 +59,7 @@ This example implements data transfer from UB (Unified Buffer) to L1 (L1 Buffer)
 
 - Example implementation:
   1. AIV core: Transfers data from GM (Global Memory) to UB (Unified Buffer). The data layout in GM differs between the two scenarios: Scenario 1 uses NZ format (fractal column-major, intra-fractal row-major, pre-converted by `gen_data.py`); Scenario 2 uses ND format (native row-major, no pre-conversion needed).
-  2. AIV core: Transfers data from UB to L1 (L1 Buffer). Scenario 1 uses continuous transfer `DataCopy(dst, src, DataCopyParams)`, where UB→L1 data content is unchanged and L1 holds NZ format; Scenario 2 uses Nd2NzParams inline conversion `DataCopy(dst, src, Nd2NzParams)`, where hardware completes ND→NZ format conversion during transfer, and the L1 result is identical to Scenario 1. Both scenarios produce the same data layout in L1, and the subsequent computation flow is identical.
+  2. AIV core: Transfers data from UB to L1 (L1 Buffer). Scenario 1 uses continuous transfer `DataCopy(dst, src, DataCopyParams)`, where UB→L1 data content is unchanged and L1 holds NZ format; Scenario 2 uses `DataCopy(dst, src, DataCopyParams)` per C0 column block to manually complete ND→NZ format conversion, and the L1 result is identical to Scenario 1. Both scenarios produce the same data layout in L1, and the subsequent computation flow is identical.
   3. AIC core: Calls the basic API LoadData to transfer data from L1 to L0A Buffer and L0B Buffer.
   4. AIC core: Calls the basic API Mmad to perform matrix multiplication computation.
   5. AIC core: Calls the basic API Fixpipe to transfer data from L0C Buffer to GM (Global Memory).
