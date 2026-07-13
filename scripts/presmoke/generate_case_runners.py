@@ -48,7 +48,8 @@ TILING_SINK_PROGRAMMING_CASE = (
     "04_aicpu/02_features/00_framework/00_pytorch/tiling_sink_programming"
 )
 TILING_SINK_GENERATE_TASK_PATTERN_PREFIX = (
-    "GenerateTaskForSinkOp:Node [AddCustomTilingSink, AddCustomTilingSink] starts to generate tasks"
+    "GenerateTaskForSinkOp:Node [AddCustomTilingSink, AddCustomTilingSink] "
+    "starts to generate tasks"
 )
 TILING_SINK_GENERATE_TASK_PATTERN_SUFFIX = " for the tiling sink, sk_flag [0]."
 TILING_SINK_GENERATE_TASK_PATTERN = (

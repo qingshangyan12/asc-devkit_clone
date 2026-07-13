@@ -413,8 +413,13 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         self.assertIn("ASCEND_GLOBAL_LOG_LEVEL=1", script)
         self.assertIn("python3 test_add_custom_tiling_sink.py", script)
         self.assertIn("case_pid=$!", script)
-        self.assertIn('presmoke_verify_tiling_sink_task_log_for_pid "$case_pid"', script)
-        self.assertIn("GenerateTaskForSinkOp:Node [AddCustomTilingSink, AddCustomTilingSink]", script)
+        self.assertIn(
+            'presmoke_verify_tiling_sink_task_log_for_pid "$case_pid"', script
+        )
+        self.assertIn(
+            "GenerateTaskForSinkOp:Node [AddCustomTilingSink, AddCustomTilingSink]",
+            script,
+        )
         self.assertIn("for the tiling sink, sk_flag [0].", script)
 
     def test_tiling_sink_log_verification_only_reads_target_pid(self) -> None:
@@ -428,7 +433,9 @@ class GenerateCaseRunnersTest(unittest.TestCase):
             log_root = Path(tmp) / "ascend/log"
             debug_plog = log_root / "debug/plog"
             debug_plog.mkdir(parents=True)
-            (debug_plog / "plog-111_20260713120000.log").write_text(marker, encoding="utf-8")
+            (debug_plog / "plog-111_20260713120000.log").write_text(
+                marker, encoding="utf-8"
+            )
             script = f"""
 source {case_common}
 PRESMOKE_ASCEND_LOG_ROOT={log_root}
@@ -440,7 +447,9 @@ presmoke_verify_tiling_sink_task_log_for_pid 222 '{marker}'
             )
             self.assertNotEqual(result.returncode, 0)
 
-            (debug_plog / "plog-222_20260713120001.log").write_text(marker, encoding="utf-8")
+            (debug_plog / "plog-222_20260713120001.log").write_text(
+                marker, encoding="utf-8"
+            )
             result = subprocess.run(
                 ["bash", "-c", script], text=True, capture_output=True, check=False
             )
