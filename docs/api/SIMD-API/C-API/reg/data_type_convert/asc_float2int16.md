@@ -2,9 +2,9 @@
 
 ## 产品支持情况
 
-| 产品     | 是否支持 |
-| ----------- | :----: |
-| Ascend 950PR/Ascend 950DT | √ |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
 
 ## 功能说明
 
@@ -14,50 +14,50 @@
 
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](../data_type_convert/rounding_mode.md)。
 
-由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个VL大小的数据分为两部分，根据不同接口选取索引0或者索引1。
+由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个VL大小的数据分为两部分，根据不同接口选择数据写入索引为奇数的位置或偶数的位置。
 
 ## 函数原型
 
 ```cpp
-// RINT舍入模式，非饱和模式，数据写入索引为0的位置
+// RINT舍入模式，非饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2int16_rn(vector_int16_t& dst, vector_float src, vector_bool mask)
-// RINT舍入模式，饱和模式，数据写入索引为0的位置
+// RINT舍入模式，饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2int16_rn_sat(vector_int16_t& dst, vector_float src, vector_bool mask)
-// RINT舍入模式，非饱和模式，数据写入索引为1的位置
+// RINT舍入模式，非饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2int16_rn_v2(vector_int16_t& dst, vector_float src, vector_bool mask)
-// RINT舍入模式，饱和模式，数据写入索引为1的位置
+// RINT舍入模式，饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2int16_rn_sat_v2(vector_int16_t& dst, vector_float src, vector_bool mask)
-// ROUND舍入模式，非饱和模式，数据写入索引为0的位置
+// ROUND舍入模式，非饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2int16_rna(vector_int16_t& dst, vector_float src, vector_bool mask)
-// ROUND舍入模式，饱和模式，数据写入索引为0的位置
+// ROUND舍入模式，饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2int16_rna_sat(vector_int16_t& dst, vector_float src, vector_bool mask)
-// ROUND舍入模式，非饱和模式，数据写入索引为1的位置
+// ROUND舍入模式，非饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2int16_rna_v2(vector_int16_t& dst, vector_float src, vector_bool mask)
-// ROUND舍入模式，饱和模式，数据写入索引为1的位置
+// ROUND舍入模式，饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2int16_rna_sat_v2(vector_int16_t& dst, vector_float src, vector_bool mask)
-// FLOOR舍入模式，非饱和模式，数据写入索引为0的位置
+// FLOOR舍入模式，非饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2int16_rd(vector_int16_t& dst, vector_float src, vector_bool mask)
-// FLOOR舍入模式，饱和模式，数据写入索引为0的位置
+// FLOOR舍入模式，饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2int16_rd_sat(vector_int16_t& dst, vector_float src, vector_bool mask)
-// FLOOR舍入模式，非饱和模式，数据写入索引为1的位置
+// FLOOR舍入模式，非饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2int16_rd_v2(vector_int16_t& dst, vector_float src, vector_bool mask)
-// FLOOR舍入模式，饱和模式，数据写入索引为1的位置
+// FLOOR舍入模式，饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2int16_rd_sat_v2(vector_int16_t& dst, vector_float src, vector_bool mask)
-// CEIL舍入模式，非饱和模式，数据写入索引为0的位置
+// CEIL舍入模式，非饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2int16_ru(vector_int16_t& dst, vector_float src, vector_bool mask)
-// CEIL舍入模式，饱和模式，数据写入索引为0的位置
+// CEIL舍入模式，饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2int16_ru_sat(vector_int16_t& dst, vector_float src, vector_bool mask)
-// CEIL舍入模式，非饱和模式，数据写入索引为1的位置
+// CEIL舍入模式，非饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2int16_ru_v2(vector_int16_t& dst, vector_float src, vector_bool mask)
-// CEIL舍入模式，饱和模式，数据写入索引为1的位置
+// CEIL舍入模式，饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2int16_ru_sat_v2(vector_int16_t& dst, vector_float src, vector_bool mask)
-// TRUNC舍入模式，非饱和模式，数据写入索引为0的位置
+// TRUNC舍入模式，非饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2int16_rz(vector_int16_t& dst, vector_float src, vector_bool mask)
-// TRUNC舍入模式，饱和模式，数据写入索引为0的位置
+// TRUNC舍入模式，饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2int16_rz_sat(vector_int16_t& dst, vector_float src, vector_bool mask)
-// TRUNC舍入模式，非饱和模式，数据写入索引为1的位置
+// TRUNC舍入模式，非饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2int16_rz_v2(vector_int16_t& dst, vector_float src, vector_bool mask)
-// TRUNC舍入模式，饱和模式，数据写入索引为1的位置
+// TRUNC舍入模式，饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2int16_rz_sat_v2(vector_int16_t& dst, vector_float src, vector_bool mask)
 ```
 
@@ -81,6 +81,8 @@ PIPE_V
 
 ## 约束说明
 
+- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
+- 当数据写入目的操作数索引为奇数的位置，索引为偶数位置的数值置零。反之亦然。
 - 开启饱和模式和非饱和模式时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../../sys_var/asc_set_ctrl.md)。
 
 ## 调用示例

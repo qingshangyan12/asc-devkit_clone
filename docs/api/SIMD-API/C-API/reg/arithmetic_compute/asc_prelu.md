@@ -2,15 +2,15 @@
 
 ## 产品支持情况
 
-| 产品                  | 是否支持  |
-|:-------------------------| :------: |
-| Ascend 950PR/Ascend 950DT | √ |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
 
 ## 功能说明
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
-源操作数src0大于0的情况下直接将src0写入目的操作数dst，否则将src0 * src1的结果写入dst。计算公式如下：
+该接口用于实现PReLU（Parametric ReLU）激活函数：源操作数src0大于0的情况下直接将src0写入目的操作数dst，否则将src0 * src1的结果写入dst。计算公式如下：
 
 $$
 dst_i = (src0_i > 0) ? src0_i : src0_i * src1_i
