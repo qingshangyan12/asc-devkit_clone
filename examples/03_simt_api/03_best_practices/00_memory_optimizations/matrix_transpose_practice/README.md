@@ -3,7 +3,7 @@
 
 ## 概述
 
-本样例以矩阵转置为例，介绍Ascend C SIMT编程方式下的访存优化思路。样例包含一维连续复制基线，以及一系列逐步优化的转置核函数：从直接全局内存转置出发，引入UB中转与分块、对比按切分后的tile分组启动Thread Block与固定Thread Block数两种映射方式、观察2048线程配置下的寄存器溢出、通过UB padding消除bank冲突，最后借助double buffer去除循环尾部同步，完整呈现SIMT矩阵转置的调优路径。
+本样例以矩阵转置为例，介绍Ascend C SIMT编程方式下的访存优化思路。样例包含一维连续复制基线，以及一系列逐步优化的转置核函数：从直接全局内存转置出发，引入UB中转与分块、对比按切分后的tile分组启动Thread Block与固定Thread Block数两种映射方式、观察2048线程配置下的寄存器溢出、通过UB padding消除bank冲突，最后借助双缓冲去除循环尾部同步，完整呈现SIMT矩阵转置的调优路径。
 
 ## 支持的产品
 
@@ -59,7 +59,7 @@
 | 4    | `transpose_ub_2tile_kernel`       | `core`            | 2048               | Thread Block数固定为硬件vector core数，单个Thread Block循环处理多个tile分组 |
 | 5    | `transpose_ub_kernel`             | `core`            | 1024               | 改为1024线程，单个Thread Block循环处理多个32×32的tile                      |
 | 6    | `transpose_ub_pad_kernel`         | `core`            | 1024               | UB tile增加2列padding，消除转置读阶段的bank冲突                             |
-| 7    | `transpose_ub_pad_db_kernel`      | `core`            | 1024               | double buffer轮换，去除循环尾部同步                                         |
+| 7    | `transpose_ub_pad_db_kernel`      | `core`            | 1024               | 双缓冲轮换，去除循环尾部同步                                         |
 
 其中 `core`为硬件vector core数，通过 `aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)`在运行时查询获得。`tiles`为总tile数 `(W/32) × (H/32)`，1024×1024时为1024。
 
@@ -341,14 +341,14 @@ asc_syncthreads();
 
 ---
 
-### Case 7：UB中转转置+padding+double buffer，去除循环尾部同步（1024线程）
+### Case 7：UB中转转置+padding+双缓冲，去除循环尾部同步（1024线程）
 
 **优化目标**：去除Case 6每轮循环末尾的 `asc_syncthreads()`，减少同步开销。
 
 **核心实现**：Case 6每轮循环包含两次同步：load后一次，保证tile写满后再按转置方向读出；store后一次，保证转置读取完成后再进入下一轮load，避免下一轮load覆盖仍在被读取的tile。本版本使用两份带padding的UB tile，按 `cnt`轮换：下一轮load写入另一份buffer，不会覆盖当前轮正在被读取的buffer，因此可安全去除尾部同步，每轮仅保留一次同步。
 
 ```cpp
-__ubuf__ float tile[2][TILE_DIM][TILE_PAD_STRIDE]; // double buffer：轮换buffer，去除尾部同步
+__ubuf__ float tile[2][TILE_DIM][TILE_PAD_STRIDE]; // 双缓冲：轮换缓冲区，去除尾部同步
 uint32_t cnt = 0;
 for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x) {
     ...
@@ -367,9 +367,9 @@ for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x)
 
 **分析**：
 
-相对Case 6的15.152μs，去除每轮循环末尾的同步后Task Duration降至12.074μs，下降约20%。在1024×1024矩阵、64个Thread Block的配置下，每个Thread Block需要循环处理16个tile，double buffer相当于每个Thread Block减少16次Thread Block内同步。该方法的代价是额外占用一份UB tile（共两份32×34），但未引入寄存器溢出。Case 7是本样例中耗时最低的SIMT转置版本，相对Case 0复制基线（6.262μs）约为1.9倍。
+相对Case 6的15.152μs，去除每轮循环末尾的同步后Task Duration降至12.074μs，下降约20%。在1024×1024矩阵、64个Thread Block的配置下，每个Thread Block需要循环处理16个tile，双缓冲相当于每个Thread Block减少16次Thread Block内同步。该方法的代价是额外占用一份UB tile（共两份32×34），但未引入寄存器溢出。Case 7是本样例中耗时最低的SIMT转置版本，相对Case 0复制基线（6.262μs）约为1.9倍。
 
-Case 6与Case 7的仿真指令流水图分别如图7、图8所示。Case 6每轮循环受尾部 `asc_syncthreads()` 约束，当前轮的写回必须全部完成后才能进入下一轮，下一轮load前的运算与GM读取只能串行等待。Case 7借助double buffer轮换两份UB tile，去除尾部同步后，当前轮的GM写回与下一轮load前的运算、以及下一轮的GM读取重叠执行，load与compute之间的串行等待被压缩。这也是Task Duration相对Case 6进一步下降的主要原因。
+Case 6与Case 7的仿真指令流水图分别如图7、图8所示。Case 6每轮循环受尾部 `asc_syncthreads()` 约束，当前轮的写回必须全部完成后才能进入下一轮，下一轮load前的运算与GM读取只能串行等待。Case 7借助双缓冲轮换两份UB tile，去除尾部同步后，当前轮的GM写回与下一轮load前的运算、以及下一轮的GM读取重叠执行，load与compute之间的串行等待被压缩。这也是Task Duration相对Case 6进一步下降的主要原因。
 
 **图7　Case 6仿真指令流水图**
 <img src="./figures/case6_trace.png">
@@ -403,7 +403,7 @@ Case 6与Case 7的仿真指令流水图分别如图7、图8所示。Case 6每轮
 
 分块后需要先确定Thread Block到tile的映射方式。按切分后的tile分组启动Thread Block实现简单，但当tile数远大于硬件vector core数时，会带来额外的启动和调度开销；将Thread Block数固定为硬件vector core数，并在kernel内循环处理多个tile，可以降低这部分开销。线程数也不能只参考连续搬运场景，高线程数会限制每个线程可使用的寄存器数量，索引逻辑变复杂后可能出现寄存器溢出，需要结合 `--cce-res-usage`和实测耗时选择。
 
-当GM访问已经转为连续后，瓶颈会转移到UB访问和同步。转置读UB时，如果按列访问32×32的tile，容易出现bank冲突，可以通过padding改变UB物理布局；循环中的同步也需要结合数据覆盖关系判断是否必要，double buffer可以在不覆盖当前读取数据的前提下减少一次同步。
+当GM访问已经转为连续后，瓶颈会转移到UB访问和同步。转置读UB时，如果按列访问32×32的tile，容易出现bank冲突，可以通过padding改变UB物理布局；循环中的同步也需要结合数据覆盖关系判断是否必要，双缓冲可以在不覆盖当前读取数据的前提下减少一次同步。
 
 ## 编译运行
 
