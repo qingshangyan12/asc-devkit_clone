@@ -6,25 +6,25 @@
 ## 产品支持情况<a name="section17196114513104"></a>
 
 <!-- npu="950" id17 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR/Ascend 950DT：支持，该接口生效
 <!-- end id17 -->
 <!-- npu="A3" id18 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持，该接口生效
 <!-- end id18 -->
 <!-- npu="910b" id19 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持，仅保证编译兼容，实际功能不生效
 <!-- end id19 -->
 <!-- npu="310b" id20 -->
-- Atlas 200I/500 A2 推理产品：支持
+- Atlas 200I/500 A2 推理产品：支持，仅保证编译兼容，实际功能不生效
 <!-- end id20 -->
 <!-- npu="310p" id21 -->
-- Atlas 推理系列产品AI Core：支持
+- Atlas 推理系列产品AI Core：支持，仅保证编译兼容，实际功能不生效
 <!-- end id21 -->
 <!-- npu="310p" id22 -->
-- Atlas 推理系列产品Vector Core：支持
+- Atlas 推理系列产品Vector Core：支持，仅保证编译兼容，实际功能不生效
 <!-- end id22 -->
 <!-- npu="910" id23 -->
-- Atlas 训练系列产品：支持
+- Atlas 训练系列产品：支持，仅保证编译兼容，实际功能不生效
 <!-- end id23 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
