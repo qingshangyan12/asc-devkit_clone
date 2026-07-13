@@ -306,7 +306,12 @@ __aicore__ inline void scalar_printf_impl(
     DumpType debugType, __gm__ const char* fmt, __gm__ const char* dumphead, Args&&... args)
 {}
 
+__aicore__ inline void enable_asc_diagnostics() {}
+
+} // namespace __asc_aicore
+
 using namespace __asc_aicore;
+#endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_AICORE_PRINTF_IMPL__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
