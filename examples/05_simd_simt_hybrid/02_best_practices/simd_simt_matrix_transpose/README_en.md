@@ -233,6 +233,8 @@ In Case 2, the UB tile array is stored in row-major order. According to the low-
 
 As shown in Figure 6, Case 3 adds 8 columns of padding to the UB tile array, changing each row from 32 elements to 40 elements. The row stride of 40 float elements is 160B, which corresponds to 20 subbanks. When the same column is read in the transpose direction, elements in adjacent rows are staggered by a stride of 20 subbanks in the physical UB address space. The accesses of 32 threads are no longer concentrated on subbanks with the same subbank ID in the same bank group, which reduces subbank conflicts during the transpose read phase.
 
+Note that the 32x40 layout is a tradeoff for SIMD and SIMT hybrid programming after considering the alignment requirements of MTE movement. Unlike the 32x34 layout formed by adding 2 columns of padding in a pure SIMT scenario, the 32x40 layout may still have a small number of subbank conflicts. However, its conflict intensity is much lower than that of the unpadded 32x32 layout.
+
 **Figure 6: Case 3 tile layout in UB**
 <img src="./figures/case3_bank.png">
 

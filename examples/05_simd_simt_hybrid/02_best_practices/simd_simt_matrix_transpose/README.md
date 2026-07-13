@@ -233,6 +233,8 @@ Case 2中UB的tile数组按照行优先存储。按照地址低位交织规则�
 
 如图6所示，Case 3中对UB中的tile数组增加8列padding，由每行32个元素改为40个元素。每行40个float的行跨度为160B，对应20个subbank；转置读同一列时，相邻行元素在UB物理地址上按20个subbank的跨度错开，32个线程的访问不再集中到相同bank group的同一编号subbank，从而降低转置读阶段的subbank冲突。
 
+需要注意的是，32×40布局是SIMD与SIMT混合编程场景下结合MTE搬运对齐要求后的折中选择。与纯SIMT场景下增加2列padding形成32×34布局不同，32×40布局仍可能存在少量subbank冲突，但冲突强度已经明显低于未padding的32×32布局。
+
 **图6　Case3 tile在UB上的排布示意图**
 <img src="./figures/case3_bank.png">
 
