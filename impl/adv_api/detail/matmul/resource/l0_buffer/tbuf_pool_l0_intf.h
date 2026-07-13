@@ -88,6 +88,7 @@ public:
      * @return: void
      */
     __aicore__ inline void ResetCache() {};
+    __aicore__ inline void ResetCacheState() {};
 
     /**
      * @description: Put tensor to buffer que

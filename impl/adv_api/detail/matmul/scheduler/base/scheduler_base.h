@@ -168,7 +168,11 @@ public:
         MATMUL_MODULE(CopyCubeInA)->Destroy();
         MATMUL_MODULE(CopyCubeInB)->Destroy();
         MATMUL_MODULE(BiasScheduler)->End();
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        MATMUL_MODULE(TBufPoolL0)->ResetCacheState();
+#elif defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
         MATMUL_MODULE(TBufPoolL0)->ResetCache();
+#endif
         MATMUL_MODULE(CubeOutBuffer)->Destroy();
         MATMUL_MODULE(MatmulQuantProcessor)->Destroy();
         if constexpr (MatmulFeatureTrait<MM_CFG>::IsSupportUBToL1Singleshape()) {

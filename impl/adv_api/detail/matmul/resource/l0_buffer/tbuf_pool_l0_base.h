@@ -60,11 +60,24 @@ public:
 
     __aicore__ inline void SetDBFlag(bool isL0Db = true) { useL0PingPong_ = static_cast<uint16_t>(isL0Db); }
 
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+    __aicore__ inline MutexID GetL0MutexID(uint16_t flag) const
+    {
+        constexpr MutexID l0PingMutexId = 28;
+        constexpr MutexID l0PongMutexId = 29;
+        return ((flag & 0x1) == 0) ? l0PingMutexId : l0PongMutexId;
+    }
+#endif
+
     template <bool IS_INTRA_BLOCK = false>
     __aicore__ inline TBufPoolL0Base& Allocate()
     {
         if constexpr (!IS_INTRA_BLOCK) {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Lock<PIPE_MTE1>(GetL0MutexID(l0PingPongFlag_));
+#else
             WaitFlag<HardEvent::M_MTE1>(l0PingPongFlag_);
+#endif
         }
         return *this;
     }
@@ -108,14 +121,33 @@ public:
     }
 
     __aicore__ inline void ResetCache() {}
+    __aicore__ inline void ResetCacheState() {}
 
-    __aicore__ inline void EnQue() { SetFlag<HardEvent::MTE1_M>(l0PingPongFlag_); }
+    __aicore__ inline void EnQue()
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Unlock<PIPE_MTE1>(GetL0MutexID(l0PingPongFlag_));
+#else
+        SetFlag<HardEvent::MTE1_M>(l0PingPongFlag_);
+#endif
+    }
 
-    __aicore__ inline void DeQue() { WaitFlag<HardEvent::MTE1_M>(l0PingPongFlag_); }
+    __aicore__ inline void DeQue()
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Lock<PIPE_M>(GetL0MutexID(l0PingPongFlag_));
+#else
+        WaitFlag<HardEvent::MTE1_M>(l0PingPongFlag_);
+#endif
+    }
 
     __aicore__ inline void Free()
     {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Unlock<PIPE_M>(GetL0MutexID(l0PingPongFlag_));
+#else
         SetFlag<HardEvent::M_MTE1>(l0PingPongFlag_);
+#endif
         l0PingPongFlag_ = useL0PingPong_ - l0PingPongFlag_;
     }
 
