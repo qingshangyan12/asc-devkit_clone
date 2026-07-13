@@ -73,7 +73,9 @@ class RunnerPoolTest(unittest.TestCase):
 
             run = run_cells_pipeline_with_options(
                 [static_lib, custom_op],
-                PipelineOptions(root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1),
+                PipelineOptions(
+                    root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1
+                ),
             )
 
         by_name = {result.example: result for result in run.results}
@@ -105,7 +107,9 @@ class RunnerPoolTest(unittest.TestCase):
 
             run = run_cells_pipeline_with_options(
                 [custom_op, aclnn],
-                PipelineOptions(root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1),
+                PipelineOptions(
+                    root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1
+                ),
             )
 
         by_name = {result.example: result for result in run.results}
@@ -155,7 +159,9 @@ class RunnerPoolTest(unittest.TestCase):
 
             run = run_cells_pipeline_with_options(
                 [parallel_ops, dependent, unrelated],
-                PipelineOptions(root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1),
+                PipelineOptions(
+                    root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1
+                ),
             )
 
         by_name = {result.example: result for result in run.results}
@@ -163,7 +169,9 @@ class RunnerPoolTest(unittest.TestCase):
         self.assertEqual(by_name[unrelated.example.rel_path].status, "PASS")
         self.assertEqual(by_name[parallel_ops.example.rel_path].status, "PASS")
 
-    def test_parallel_ops_package_waits_for_custom_op_when_dependents_are_absent(self) -> None:
+    def test_parallel_ops_package_waits_for_custom_op_when_dependents_are_absent(
+        self,
+    ) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             custom_finished = root / "custom.finished"
@@ -188,7 +196,9 @@ class RunnerPoolTest(unittest.TestCase):
 
             run = run_cells_pipeline_with_options(
                 [parallel_ops, custom_op],
-                PipelineOptions(root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1),
+                PipelineOptions(
+                    root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1
+                ),
             )
 
         self.assertEqual([result.status for result in run.results], ["PASS", "PASS"])
@@ -528,7 +538,10 @@ class RunnerPoolTest(unittest.TestCase):
             )
 
             result = run_cells_pipeline_with_options(
-                [c], PipelineOptions(root / "logs", timeout=1, keep_artifacts=False, jobs=1, npu_slots=1)
+                [c],
+                PipelineOptions(
+                    root / "logs", timeout=1, keep_artifacts=False, jobs=1, npu_slots=1
+                ),
             )
 
             self.assertEqual(result.results[0].status, "PASS")
@@ -550,7 +563,10 @@ class RunnerPoolTest(unittest.TestCase):
             )
 
             result = run_cells_pipeline_with_options(
-                [c], PipelineOptions(root / "logs", timeout=1, keep_artifacts=False, jobs=1, npu_slots=1)
+                [c],
+                PipelineOptions(
+                    root / "logs", timeout=1, keep_artifacts=False, jobs=1, npu_slots=1
+                ),
             )
 
             self.assertEqual(result.results[0].status, "FAIL")

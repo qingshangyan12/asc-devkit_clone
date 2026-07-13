@@ -296,14 +296,18 @@ def run_build_only(cells: List[Cell], options: PipelineOptions) -> RunCellsResul
     return RunCellsResult(results, NpuStats(slots=0, queue_model="build-only"))
 
 
-def cleanup_run_artifacts(cells: Iterable[Cell], log_dir: Path, keep_artifacts: bool) -> None:
+def cleanup_run_artifacts(
+    cells: Iterable[Cell], log_dir: Path, keep_artifacts: bool
+) -> None:
     if keep_artifacts:
         return
     for cell in cells:
         if cell.example.source != "case-runner":
             shutil.rmtree(cell.build_dir, ignore_errors=True)
             continue
-        cleanup_commands = [command for command in cell.commands if command.kind == "clean"]
+        cleanup_commands = [
+            command for command in cell.commands if command.kind == "clean"
+        ]
         if not cleanup_commands:
             shutil.rmtree(cell.build_dir, ignore_errors=True)
             continue
@@ -366,9 +370,14 @@ class _PipelineExecutor:
                 self.verify_ready.join()
                 with self.dependency_lock:
                     deferred = bool(self.deferred_items)
-                if self.ready.unfinished_tasks == 0 and self.verify_ready.unfinished_tasks == 0:
+                if (
+                    self.ready.unfinished_tasks == 0
+                    and self.verify_ready.unfinished_tasks == 0
+                ):
                     if deferred:
-                        raise RuntimeError("presmoke case dependency cannot be satisfied")
+                        raise RuntimeError(
+                            "presmoke case dependency cannot be satisfied"
+                        )
                     break
         finally:
             self.stop_threads(npu_threads, verify_threads)
