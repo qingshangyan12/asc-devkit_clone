@@ -96,7 +96,6 @@ __aicore__ inline void LoadDataWithStride(const LocalTensor<T>& dst, const Local
 
 - 非转置场景下，L1 Buffer-\>L0B Buffer通路不支持。L1 Buffer-\>L0B Buffer通路下会自动进行转置，不需要配置enTranspose，此时enTranspose参数无效。
 - 当目的地址位于L0A Buffer/L0B Buffer时，地址必须512字节对齐。当源地址位于L1 Buffer时，地址必须32字节对齐。
-- 当filterW为0且filterSizeW为false，或者当filterH为0且filterSizeH为false时，该指令不会被执行。
 - 必须使用辅助配置接口[SetLoadDataRepeatWithStride](../辅助配置接口/SetLoadDataRepeatWithStride.md)配置dstStride参数。
 
 ## 调用示例<a id="section14867162784812"></a>
