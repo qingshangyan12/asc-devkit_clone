@@ -142,12 +142,16 @@ Case 0在保持GM连续读取的同时，直接把数据写入转置后的输出
 ```cpp
 __ubuf__ float tile[TILES_PER_BLOCK][TILE_DIM][TILE_DIM];
 
-copy_gm_tile_to_ub(&tile[local_tile][0][0], input + tile_offset, width);
-sync_mte2_to_v();
+asc_copy_gm2ub_align(&tile[local_tile][0][0], input + tile_offset, TILE_DIM,
+                     TILE_ROW_BYTES, 0, 0, false, 0, width * sizeof(float),
+                     TILE_ROW_BYTES);
+asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 asc_vf_call<simt_store_2tile>(dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1),
                               output, &tile[0][0][0], width, height, tiles_x,
                               tile_base, total_tiles);
-sync_v_to_mte2();
+asc_sync_notify(PIPE_V, PIPE_MTE2, EVENT_ID0);
+asc_sync_wait(PIPE_V, PIPE_MTE2, EVENT_ID0);
 ```
 
 **性能数据**：
@@ -173,12 +177,16 @@ uint32_t loop_start = block_idx * TILES_PER_BLOCK;
 uint32_t loop_step = block_num * TILES_PER_BLOCK;
 
 for (uint32_t tile_base = loop_start; tile_base < total_tiles; tile_base += loop_step) {
-    copy_gm_tile_to_ub(&tile[local_tile][0][0], input + tile_offset, width);
-    sync_mte2_to_v();
+    asc_copy_gm2ub_align(&tile[local_tile][0][0], input + tile_offset, TILE_DIM,
+                         TILE_ROW_BYTES, 0, 0, false, 0, width * sizeof(float),
+                         TILE_ROW_BYTES);
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_vf_call<simt_store_2tile>(dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1),
                                   output, &tile[0][0][0], width, height, tiles_x,
                                   tile_base, total_tiles);
-    sync_v_to_mte2();
+    asc_sync_notify(PIPE_V, PIPE_MTE2, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE2, EVENT_ID0);
 }
 ```
 
@@ -243,8 +251,9 @@ constexpr int TILE_PAD = 8;                          // 混合MTE搬运要求32B
 constexpr int TILE_PAD_STRIDE = TILE_DIM + TILE_PAD;
 __ubuf__ float tile[TILES_PER_BLOCK][TILE_DIM][TILE_PAD_STRIDE];
 
-copy_gm_tile_to_ub(dst + local_tile * TILE_PAD_ELEMENTS, input + tile_offset, width,
-                   TILE_PAD_STRIDE * sizeof(float));
+asc_copy_gm2ub_align(dst + local_tile * TILE_PAD_ELEMENTS, input + tile_offset,
+                     TILE_DIM, TILE_ROW_BYTES, 0, 0, false, 0,
+                     width * sizeof(float), TILE_PAD_STRIDE * sizeof(float));
 
 output[x_index + y_index * height] =
     tile[local_tile * TILE_PAD_ELEMENTS + tx * TILE_PAD_STRIDE + ty];
