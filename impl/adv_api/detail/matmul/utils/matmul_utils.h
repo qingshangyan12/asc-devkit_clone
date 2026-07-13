@@ -567,6 +567,32 @@ enum class PolicyType {
     MATMUL_LOWER_TRIANGULAR = 3,
 };
 
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+enum class MatmulMutexResource : uint8_t {
+    L0 = 0,
+    BIAS = 1,
+};
+
+template <MatmulMutexResource RESOURCE>
+__aicore__ inline constexpr MutexID GetMutexID(uint16_t flag = 0)
+{
+    constexpr MutexID l0PingMutexId = 28;
+    constexpr MutexID l0PongMutexId = 29;
+    constexpr MutexID biasMutexId = 30;
+    if constexpr (RESOURCE == MatmulMutexResource::L0) {
+        return ((flag & 0x1) == 0) ? l0PingMutexId : l0PongMutexId;
+    } else {
+        return biasMutexId;
+    }
+}
+
+template <TPosition Pos, typename TBUF_POOL>
+__aicore__ inline uint16_t GetL0PingPongFlag(const TBUF_POOL& pool)
+{
+    return pool.template GetPingPongFlag<Pos>();
+}
+#endif
+
 template <const auto& MM_CFG>
 constexpr bool IsKdimReorderLoad = ToMatmulConfig(MM_CFG).enableKdimReorderLoad;
 

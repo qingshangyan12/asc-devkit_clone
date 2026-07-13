@@ -88,7 +88,13 @@ public:
     {
         if (BASE_MODULE::enableBias_ && MATMUL_MODULE(KLoop)->GetOuterIdx() == 0) {
             auto biasC2 = MATMUL_MODULE(C2Buffer)->Allocate();
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Lock<PIPE_MTE1>(GetMutexID<MatmulMutexResource::BIAS>());
+#endif
             MATMUL_MODULE(LoadBias2C2)->Load(biasC2, biasC1[srcOffset], dataLen);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Unlock<PIPE_MTE1>(GetMutexID<MatmulMutexResource::BIAS>());
+#endif
             MATMUL_MODULE(C2Buffer)->EnQue();
             MATMUL_MODULE(C2Buffer)->DeQue();
         }
