@@ -161,7 +161,7 @@ The orchestrator writes:
 - `FAILURES.tsv`: failed or skipped primary results plus retry outcome.
 
 After each run, the orchestrator retains summaries, JUnit, TSV files, per-card metadata, machine-readable reports,
-and case/stage logs. Multi-card `.workspaces`, scheduling `.plan`, runtime `.state`, shard `.locks`, and case build
+and case/stage logs. Scheduling `.plan`, runtime `.state`, shard `.locks`, and case build
 artifacts are removed automatically and are not part of the CI artifacts.
 
 ## Fixed Schedule

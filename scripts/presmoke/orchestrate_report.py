@@ -94,10 +94,8 @@ def list_examples(report_path: Path) -> list[str]:
 def shard_examples(
     report_path: Path,
     cards: list[str],
-    manifest_path: Path | None = None,
     schedule_report: Path | None = None,
     excludes: set[str] | None = None,
-    keep_source_groups: bool = True,
     jobs: int | None = None,
 ) -> list[tuple[str, str]]:
     examples = [
@@ -108,7 +106,6 @@ def shard_examples(
     if not cards or not examples:
         return []
 
-    source_case = load_source_case_map(manifest_path) if keep_source_groups else {}
     schedule_report = schedule_report or builtin_timing_report(report_path)
     stage_timings = (
         load_pipeline_stage_seconds(schedule_report) if schedule_report else {}
@@ -117,14 +114,13 @@ def shard_examples(
         return shard_examples_by_pipeline_makespan(
             examples,
             cards,
-            source_case,
             stage_timings,
             resolve_shard_jobs(report_path, jobs),
         )
 
     weights = load_duration_seconds(schedule_report)
     default_weight = default_duration_weight(weights, examples)
-    groups = group_examples_by_source_case(examples, source_case)
+    groups = group_examples_for_sharding(examples)
     order_index = {example: index for index, example in enumerate(examples)}
     group_items = []
     for source, group_examples in groups.items():
@@ -153,11 +149,10 @@ def shard_examples(
 def shard_examples_by_pipeline_makespan(
     examples: list[str],
     cards: list[str],
-    source_case: dict[str, str],
     stage_timings: dict[str, tuple[float, float, float]],
     jobs: int,
 ) -> list[tuple[str, str]]:
-    groups = group_examples_by_source_case(examples, source_case)
+    groups = group_examples_for_sharding(examples)
     order_index = {example: index for index, example in enumerate(examples)}
     default_timing = default_stage_timing(stage_timings, examples)
     group_items = []
@@ -303,26 +298,13 @@ def resolve_shard_jobs(report_path: Path, jobs: int | None) -> int:
         return 1
 
 
-def load_source_case_map(manifest_path: Path | None) -> dict[str, str]:
-    if manifest_path is None or not manifest_path.exists():
-        return {}
-    data = json.loads(manifest_path.read_text(encoding="utf-8"))
-    return {
-        str(item.get("case")): str(item.get("source_case") or item.get("case"))
-        for item in data
-        if item.get("case")
-    }
-
-
-def group_examples_by_source_case(
-    examples: list[str], source_case: dict[str, str]
-) -> dict[str, list[str]]:
+def group_examples_for_sharding(examples: list[str]) -> dict[str, list[str]]:
     groups: dict[str, list[str]] = {}
     for example in examples:
         group = (
             "__custom_op_dependency_group__"
             if example in CUSTOM_OP_DEPENDENCY_GROUP
-            else source_case.get(example, example)
+            else example
         )
         groups.setdefault(group, []).append(example)
     return groups
@@ -1165,10 +1147,8 @@ def main() -> int:
     shard_parser = subparsers.add_parser("shard-examples")
     shard_parser.add_argument("report", type=Path)
     shard_parser.add_argument("--cards", nargs="+", required=True)
-    shard_parser.add_argument("--manifest", type=Path)
     shard_parser.add_argument("--schedule-report", type=Path)
     shard_parser.add_argument("--exclude", action="append", default=[])
-    shard_parser.add_argument("--split-source-groups", action="store_true")
     shard_parser.add_argument("--jobs", type=int)
     status_parser = subparsers.add_parser("retry-status")
     status_parser.add_argument("report", type=Path)
@@ -1188,10 +1168,8 @@ def main() -> int:
         for card, example in shard_examples(
             args.report,
             args.cards,
-            args.manifest,
             args.schedule_report,
             set(args.exclude),
-            keep_source_groups=not args.split_source_groups,
             jobs=args.jobs,
         ):
             LOG.info("%s\t%s", card, example)

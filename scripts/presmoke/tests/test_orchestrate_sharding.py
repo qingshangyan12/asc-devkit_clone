@@ -32,34 +32,37 @@ class OrchestrateShardingTest(unittest.TestCase):
         ]
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            report = write_plan_report(root, [*dependency_group, "case/a", "case/b", "case/c"])
+            report = write_plan_report(
+                root, [*dependency_group, "case/a", "case/b", "case/c"]
+            )
             assignments = dict(
-                (example, card) for card, example in shard_examples(report, ["0", "1", "2"])
+                (example, card)
+                for card, example in shard_examples(report, ["0", "1", "2"])
             )
 
         self.assertEqual(len({assignments[example] for example in dependency_group}), 1)
 
-    def test_sharding_keeps_same_source_case_on_one_card(self) -> None:
+    def test_sharding_can_split_same_source_case_across_cards(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            report = write_plan_report(root, ["case/a", "case/b", "case/c", "case/d"])
-            manifest = root / "manifest.json"
-            manifest.write_text(
-                json.dumps(
-                    [
-                        {"case": "case/a", "source_case": "case/source"},
-                        {"case": "case/b", "source_case": "case/source"},
-                    ]
-                ),
-                encoding="utf-8",
+            report = write_plan_report(
+                root,
+                [
+                    "case/source__scenario_1",
+                    "case/source__scenario_2",
+                    "case/c",
+                    "case/d",
+                ],
             )
 
             assignments = dict(
-                (example, card)
-                for card, example in shard_examples(report, ["0", "1"], manifest)
+                (example, card) for card, example in shard_examples(report, ["0", "1"])
             )
 
-        self.assertEqual(assignments["case/a"], assignments["case/b"])
+        self.assertNotEqual(
+            assignments["case/source__scenario_1"],
+            assignments["case/source__scenario_2"],
+        )
 
     def test_sharding_uses_duration_report_to_balance_cards(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -116,55 +119,6 @@ class OrchestrateShardingTest(unittest.TestCase):
 
         self.assertNotEqual(assignments["case/a"], assignments["case/b"])
         self.assertIn(assignments["case/c"], {"0", "1"})
-
-    def test_sharding_interleaves_same_card_source_groups(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            report = write_plan_report(
-                root, ["case/a1", "case/a2", "case/b1", "case/b2"]
-            )
-            manifest = root / "manifest.json"
-            manifest.write_text(
-                json.dumps(
-                    [
-                        {"case": "case/a1", "source_case": "case/a"},
-                        {"case": "case/a2", "source_case": "case/a"},
-                        {"case": "case/b1", "source_case": "case/b"},
-                        {"case": "case/b2", "source_case": "case/b"},
-                    ]
-                ),
-                encoding="utf-8",
-            )
-
-            assignments = [
-                example for _, example in shard_examples(report, ["0"], manifest)
-            ]
-
-        self.assertEqual(assignments, ["case/a1", "case/b1", "case/a2", "case/b2"])
-
-    def test_sharding_can_split_source_groups_for_isolated_workspaces(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            report = write_plan_report(root, ["case/a1", "case/a2"])
-            manifest = root / "manifest.json"
-            manifest.write_text(
-                json.dumps(
-                    [
-                        {"case": "case/a1", "source_case": "case/a"},
-                        {"case": "case/a2", "source_case": "case/a"},
-                    ]
-                ),
-                encoding="utf-8",
-            )
-
-            assignments = dict(
-                (example, card)
-                for card, example in shard_examples(
-                    report, ["0", "1"], manifest, keep_source_groups=False
-                )
-            )
-
-        self.assertNotEqual(assignments["case/a1"], assignments["case/a2"])
 
 
 def write_plan_report(root: Path, examples: list[str]) -> Path:

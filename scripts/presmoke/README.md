@@ -161,7 +161,7 @@ CPU 模式的默认并行度根据主机 CPU 数计算，不针对特定机器�
 - `FAILURES.tsv`：主运行中的失败或跳过结果，以及重试结果。
 
 每轮执行完成后，编排器会保留汇总、JUnit、TSV、每卡元信息、机器可读报告以及 case/stage 日志。
-多卡 `.workspaces`、调度 `.plan`、运行状态 `.state`、分片 `.locks` 和 case build 产物会自动删除，
+调度 `.plan`、运行状态 `.state`、分片 `.locks` 和 case build 产物会自动删除，
 不属于 CI 归档内容。
 
 ## 固定顺序
