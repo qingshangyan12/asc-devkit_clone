@@ -105,21 +105,6 @@ __aicore__ inline void TPipe::Init()
     g_lastTpipeInitPos = get_pc();
 #endif
     ResetPool();
-    // for matmul macro, set flag M_MTE1 at the begining of operator, and also wait flag at the end.
-    // matmul macro only use M_MTE1 event id 0 1 currently.
-    if ASCEND_IS_AIC {
-        auto enQueEvtID = this->AllocEventID<HardEvent::M_MTE1>();
-        ASCENDC_ASSERT((enQueEvtID == 0), { KERNEL_LOG(KERNEL_ERROR, "enQueEvtID should be 0"); });
-        SetFlag<HardEvent::M_MTE1>(static_cast<event_t>(enQueEvtID));
-        enQueEvtID = this->AllocEventID<HardEvent::M_MTE1>();
-        ASCENDC_ASSERT((enQueEvtID == 1), { KERNEL_LOG(KERNEL_ERROR, "enQueEvtID should be 1"); });
-        SetFlag<HardEvent::M_MTE1>(static_cast<event_t>(enQueEvtID));
-        // For load Bias
-        enQueEvtID = this->AllocEventID<HardEvent::M_MTE1>();
-        ASCENDC_ASSERT((enQueEvtID == 2), { KERNEL_LOG(KERNEL_ERROR, "enQueEvtID should be 2"); });
-
-        SetFlag<HardEvent::M_MTE1>(static_cast<event_t>(enQueEvtID));
-    }
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     for (int32_t i = 0; i < static_cast<int32_t>(Hardware::MAX); i++) {
         SetBufferCtx((Hardware)i, &g_tpipeImpl.bufPoolBaseAddr_[i]);
@@ -802,13 +787,6 @@ __aicore__ inline void TPipe::DestroyWithoutPipeAll()
                 ptr->freeBufEvtID = INVALID_TEVENTID;
             }
         }
-        WaitFlag<HardEvent::M_MTE1>(0);
-        ReleaseEventID<HardEvent::M_MTE1>(0);
-        WaitFlag<HardEvent::M_MTE1>(1);
-        ReleaseEventID<HardEvent::M_MTE1>(1);
-        // For Bias
-        WaitFlag<HardEvent::M_MTE1>(2);
-        ReleaseEventID<HardEvent::M_MTE1>(2);
     }
     Internal::g_bufId = 0;
 }

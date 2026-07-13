@@ -133,8 +133,7 @@ private:
         auto kAxisL1Len = CeilAlign(singleCoreK, BLOCK_CUBE);
         MATMUL_MODULE(LoadToB2)->Prepare(isBTranspose, kAxisL1Len);
         MATMUL_MODULE(CopyCubeInB)->AwaitLoadData();
-        WaitFlag<HardEvent::M_MTE1>(0);
-        WaitFlag<HardEvent::M_MTE1>(1);
+        WaitPreSplitBL0Ready();
         auto baseN = MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseN();
         auto baseK = MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK();
         auto l0bStride = baseN * baseK;
@@ -159,10 +158,35 @@ private:
             } while (MATMUL_MODULE(KLoop)->template OuterEnd<IS_INTRA_BLOCK>());
         } while (MATMUL_MODULE(NLoop)->template OuterEnd<false, IS_INTRA_BLOCK>());
         MATMUL_MODULE(CopyCubeInB)->ClearLoadData(b1);
+        ReleasePreSplitBL0();
+    }
+
+    __aicore__ inline void WaitPreSplitBL0Ready()
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Lock<PIPE_MTE1>(MATMUL_MODULE(TBufPoolL0)->GetL0MutexID(0));
+        Mutex::Lock<PIPE_MTE1>(MATMUL_MODULE(TBufPoolL0)->GetL0MutexID(1));
+#else
+        WaitFlag<HardEvent::M_MTE1>(0);
+        WaitFlag<HardEvent::M_MTE1>(1);
+#endif
+    }
+
+    __aicore__ inline void ReleasePreSplitBL0()
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Unlock<PIPE_MTE1>(MATMUL_MODULE(TBufPoolL0)->GetL0MutexID(0));
+        Mutex::Unlock<PIPE_MTE1>(MATMUL_MODULE(TBufPoolL0)->GetL0MutexID(1));
+        Mutex::Lock<PIPE_M>(MATMUL_MODULE(TBufPoolL0)->GetL0MutexID(0));
+        Mutex::Unlock<PIPE_M>(MATMUL_MODULE(TBufPoolL0)->GetL0MutexID(0));
+        Mutex::Lock<PIPE_M>(MATMUL_MODULE(TBufPoolL0)->GetL0MutexID(1));
+        Mutex::Unlock<PIPE_M>(MATMUL_MODULE(TBufPoolL0)->GetL0MutexID(1));
+#else
         SetFlag<HardEvent::MTE1_M>(3);
         WaitFlag<HardEvent::MTE1_M>(3);
         SetFlag<HardEvent::M_MTE1>(0);
         SetFlag<HardEvent::M_MTE1>(1);
+#endif
     }
 
     template <bool IS_INTRA_BLOCK = false>
