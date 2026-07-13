@@ -2,24 +2,17 @@
 
 ## 产品支持情况
 
-| 产品                  | 是否支持  |
-|:-------------------------| :------: |
-| Ascend 950PR/Ascend 950DT | √ |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
 
 ## 功能说明
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
-按元素执行Leaky ReLU（Leaky Rectified Linear Unit）操作。Leaky ReLU带泄露性整流函数是一种人工神经网络中常用的激活函数，其数学表达式为：
+该接口用于按元素执行Leaky ReLU(Leaky Rectified Linear Unit)操作：当源操作数中某元素大于0时，直接将该元素写入目的操作数；否则将该元素乘以标量值value后写入目的操作数。计算公式如下：
 
-$$
-f(x_i) =
-\begin{cases}
-x_i &  \text{if } x_i ≥ \text{ }0  \\
-                                   \\
-ax_i &  \text{if } x_i < \text{ }0 \\
-\end{cases}
-$$
+$$dst_i = \begin{cases} src_i & src_i > 0 \\ src_i \times value & src_i \leq 0 \end{cases}$$
 
 ## 函数原型
 

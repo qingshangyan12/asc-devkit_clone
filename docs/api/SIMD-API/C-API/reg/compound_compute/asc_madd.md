@@ -2,18 +2,18 @@
 
 ## 产品支持情况
 
-| 产品         | 是否支持 |
-| :-----------------------| :-----:|
-| Ascend 950PR/Ascend 950DT | √ |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
 
 ## 功能说明
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
-madd（multiply-add），对源操作数执行逐元素乘法和加法。计算公式如下：
+madd（multiply-add），该接口用于完成dst与src0逐元素相乘再加src1的融合乘加运算，根据mask将计算结果写回dst。计算公式如下：
 
 $$
-dst_i = src0_i \times dst_i + src1_i
+dst_i = dst_i \times src0_i + src1_i
 $$
 
 ## 函数原型
@@ -53,6 +53,7 @@ vector_half dst;
 vector_half src0;
 vector_half src1;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
+asc_loadalign(dst, dst_addr);   // dst_addr是外部输入的UB内存空间地址。
 asc_loadalign(src0, src0_addr); // src0_addr是外部输入的UB内存空间地址。
 asc_loadalign(src1, src1_addr); // src1_addr是外部输入的UB内存空间地址。
 asc_madd(dst, src0, src1, mask);
