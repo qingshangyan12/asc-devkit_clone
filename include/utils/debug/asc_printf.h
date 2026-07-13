@@ -63,22 +63,23 @@ __aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
 #else
 namespace __asc_aicore {
 template <class... Args>
-__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args) {}
+__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
+{}
 template <class... Args>
-__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args) {}
+__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
+{}
 } // namespace __asc_aicore
 #endif // (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
 #endif
 
 namespace __asc_simd_vf {
 template <class... Args>
-__ASC_USE_RESERVED_UBUF__(3510,
-    "printf is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510, "printf is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void printf(__ubuf__ const char* fmt, Args&&... args)
 {
     printf_impl(fmt, args...);
 }
-}
+} // namespace __asc_simd_vf
 #endif
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_PRINTF_H__)

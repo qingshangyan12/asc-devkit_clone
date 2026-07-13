@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
  * \file sys_constants.h
@@ -79,7 +79,8 @@ constexpr uint64_t ASC_L0B_SIZE = 32 * 1024;
 constexpr uint64_t ASC_L0C_SIZE = 64 * 1024;
 constexpr uint64_t ASC_BT_SIZE = 1 * 1024;
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-constexpr uint64_t ASC_UB_SIZE = 248 * 1024 + __ASC_DISABLE_VF_STACK_RESERVD_UBUF_SIZE + __ASC_DISABLE_VF_STACK_RESERVD_UBUF_SIZE;
+constexpr uint64_t ASC_UB_SIZE =
+    248 * 1024 + __ASC_DISABLE_VF_STACK_RESERVD_UBUF_SIZE + __ASC_DISABLE_VF_STACK_RESERVD_UBUF_SIZE;
 constexpr uint64_t ASC_L1_SIZE = 512 * 1024;
 constexpr uint64_t ASC_L0A_SIZE = 64 * 1024;
 constexpr uint64_t ASC_L0B_SIZE = 64 * 1024;
