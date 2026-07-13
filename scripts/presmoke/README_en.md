@@ -16,7 +16,6 @@ bash scripts/run_presmoke.sh
 
 Default behavior:
 
-- Run `pip3 install -r .devcontainer/requirements.txt` at startup.
 - `ARCH=dav-2201`, for 910B.
 - `MODES=npu`.
 - `NPU_CARDS=auto`, detect visible `/dev/davinci*` cards and run them in parallel.
