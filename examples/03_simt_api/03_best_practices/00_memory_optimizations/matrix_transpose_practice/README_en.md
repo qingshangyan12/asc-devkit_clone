@@ -12,9 +12,9 @@ This example uses matrix transpose to demonstrate memory access optimization str
 
 ```text
 ├── matrix_transpose_practice
-│   ├── figures                          // Image resources for README
-│   ├── CMakeLists.txt                   // Build project file
-│   ├── matrix_transpose.asc    // SIMT matrix transpose optimization path implementation
+│   ├── figures                     // Image resources for README
+│   ├── CMakeLists.txt              // Build project file
+│   ├── matrix_transpose.asc        // SIMT matrix transpose optimization path implementation
 │   └── README.md
 ```
 
@@ -102,7 +102,7 @@ Except for Task Duration, all other metrics are averages across all thread block
 
 **Optimization Goal**: Measure the pure contiguous GM read/write data transfer capacity on the current hardware, as the performance upper bound that subsequent transpose implementations can approach.
 
-**Core Implementation**: Treat the matrix as a 1D array, with all threads performing contiguous reads and contiguous writes in a grid-stride manner. Case 0 launches 2048 threads per thread block, and Case 1 launches 1024 threads per thread block.
+**Core Implementation**: Treat the matrix as a 1D array and access input and output by linear addresses, keeping GM accesses contiguous. Case 0 launches 2048 threads per thread block, and Case 1 launches 1024 threads per thread block.
 
 ```cpp
 __global__ __launch_bounds__(THREADS_PER_BLOCK) void copy_kernel(float *output, const float *input, uint32_t elements)
@@ -161,11 +161,11 @@ Case 2 keeps the GM read contiguous while writing data directly to the transpose
 
 ---
 
-### Case 3: UB Staging Transpose, Each Thread Block Processes Two 32x32 Tiles (2048 Threads)
+### Case 3: UB Staging Transpose, Each Thread Block Processes Two 32x32 Tiles
 
 **Optimization Goal**: Introduce UB and tiling, converting the non-contiguous global memory write of Case 2 into UB-internal access, so that both GM read and write become contiguous again. This case sets the thread block count according to the number of partitioned tiles, with each thread block processing two 32x32 tiles.
 
-**Core Implementation**: The matrix is partitioned into 32x32 tiles, with the total tile count `tiles=(W/32)x(H/32)`. In this case, each thread block launches 2048 threads and can process two tiles at the same time, so the thread block count is set to `blocks_per_grid=ceil(tiles / 2)`. The thread configuration is `dim3(32,64,1)`, where `threadIdx.y=0..31` processes the first tile and `threadIdx.y=32..63` processes the second tile; the code obtains the tile index handled by the current thread within the thread block via `local_tile=threadIdx.y>>5`, and the in-tile row index via `ty=threadIdx.y&31`. Threads first write the tile into UB in the original layout, and after `asc_syncthreads()` synchronization, read it from UB in the transpose direction and write it back to GM contiguously.
+**Core Implementation**: The matrix is partitioned into 32x32 tiles, with the total tile count `tiles=(W/32)x(H/32)`. In this case, each thread block launches 2048 threads and can process two tiles at the same time, so the thread block count is set to `blocks_per_grid=ceil(tiles / 2)`. The thread configuration is `dim3(32,64,1)`, where `threadIdx.y=0..31` processes the first tile and `threadIdx.y=32..63` processes the second tile; the code obtains the tile index handled by the current thread within the thread block via `local_tile=threadIdx.y>>5`, and the in-tile row index via `ty=threadIdx.y&31`. Threads first write the tile into UB in the original layout, and after [`asc_syncthreads()`](../../../../../docs/api/SIMT-API/同步与内存栅栏/同步接口/asc_syncthreads.md) synchronization, read it from UB in the transpose direction and write it back to GM contiguously.
 
 The core idea of UB staging is shown in the figure below: in the GM read phase, the tile is contiguously loaded into UB row by row according to the input matrix layout; in the GM write-back phase, the output tile coordinates are swapped so that the same Warp writes out one row of the output matrix. The originally non-contiguous GM write is transferred to a transpose-direction read within UB.
 
@@ -208,7 +208,7 @@ Case 3 converts the non-contiguous GM write into a UB-internal transpose read th
 
 ---
 
-### Case 4: UB Staging Transpose, Fixed Thread Block Count, Two 32x32 Tiles per Iteration (2048 Threads)
+### Case 4: UB Staging Transpose, Fixed Thread Block Count, Two 32x32 Tiles per Iteration
 
 **Optimization Goal**: Change the thread block count of Case 3 from the tile group count after partitioning to the hardware vector core count, with each thread block processing multiple tile groups in a loop, and observe register usage under the 2048-thread configuration.
 
@@ -241,7 +241,7 @@ This output indicates that Case 4 already has register spill. Both Case 4 and Ca
 
 ---
 
-### Case 5: UB Staging Transpose, Fixed Thread Block Count (1024 Threads)
+### Case 5: UB Staging Transpose, Fixed Thread Block Count
 
 **Optimization Goal**: Switch to 1024 threads, adjusting the per-iteration granularity to one 32x32 tile, establishing the baseline configuration for subsequent optimizations.
 
@@ -270,7 +270,7 @@ In the current configuration, register spill has been eliminated and thread bloc
 
 ---
 
-### Case 6: UB Staging Transpose + Padding (1024 Threads, Resident Scheduling)
+### Case 6: UB Staging Transpose + Padding
 
 **Optimization Goal**: Based on Case 5, eliminate bank conflicts during the transpose read phase through UB padding.
 
@@ -283,9 +283,9 @@ In the current configuration, register spill has been eliminated and thread bloc
 
 The following uses the UB partitioning rules of Ascend 950PR/Ascend 950DT as an example to explain how bank conflicts arise in this example, and the theoretical conflict intensity differences between Case 5 and Case 6.
 
-The bank partitioning in UB is shown in the figure below. The total UB size is 256KB, divided into 16 banks (each bank 512 rows x 32B = 16KB); these 16 banks are further organized into 8 bank groups, with each bank group containing 2 banks (bank i and bank i+8 belong to bank group i, that is, `bank_group_id=bank_id%8`). In SIMT programming mode, each bank is further divided into 4 subbanks, with each subbank having a width of 8B.
+The bank partitioning in UB is shown in the figure below. The total UB size is 256KB, divided into 16 banks; these 16 banks are further organized into 8 bank groups, with each bank group containing 2 banks. In SIMT programming mode, each bank is further divided into 4 subbanks, with each subbank having a width of 8B.
 
-In SIMT scenarios, multiple threads in the same Warp may access UB concurrently within the same UB access instruction. When the accessed data belongs to subbanks with the same index in the same bank group, the hardware cannot process all requests in one cycle, so the requests must queue, forming subbank conflicts and increasing access latency. If the accessed data belongs to the same 8B address range in the same row of the same subbank, the hardware merges these requests and no subbank conflict is formed.
+In SIMT scenarios, the bank conflicts discussed in this example are more fine-grained subbank conflicts. Multiple threads in the same Warp may access UB concurrently within the same UB access instruction. When the accessed data belongs to subbanks with the same index in the same bank group, the hardware cannot process all requests in one cycle, so the requests must queue, forming subbank conflicts and increasing access latency. If the accessed data belongs to the same 8B address range in the same row of the same subbank, the hardware merges these requests and no subbank conflict is formed.
 
 **Figure 3: UB bank structure**
 
@@ -304,13 +304,13 @@ The main subbank conflict types in SIMT programming are as follows:
 
 In Case 5, the tile array in UB is stored in row-major order. According to the low-bit address interleaving rule, the first row of the tile array covers bank0 through bank3, the second row covers bank4 through bank7, the third row covers bank8 through bank11, and the remaining rows follow the same pattern. Each row of 32 float elements spans exactly 4 banks. In Case 5, one Warp of threads reads one column of the tile and writes it back to GM output; when accessing UB, the 32 threads concentrate on subbank 0 in two bank groups, which is a read-read conflict scenario.
 
-**Figure 5: Case 5 bank conflict during transpose read**
+**Figure 5: Case 5 tile layout in UB**
 
 <img src="./figures/case5_bank.png">
 
 In Case 6, two columns of padding are added to the tile array in UB, changing from 32 elements per row to 34 elements per row. The layout in UB is shown in the figure below. Since each row has 34 elements, the row stride becomes 17 subbanks, so elements in the same column are staggered across different subbanks. When Case 6 accesses UB, the accesses from 32 threads are distributed across each subbank of each bank group. In other words, each subbank is accessed by only one thread under the same access instruction, avoiding the read-read conflict described above.
 
-**Figure 6: Case 6 UB bank layout after padding**
+**Figure 6: Case 6 tile layout in UB**
 
 <img src="./figures/case6_bank.png">
 
@@ -375,8 +375,6 @@ The simulation instruction pipeline diagrams of Case 6 and Case 7 are shown in F
 
 <img src="./figures/case7_trace.png">
 
----
-
 ## Performance Comparison Summary
 
 ### Ascend 950PR Performance Data
@@ -424,7 +422,7 @@ Run the following steps in the root directory of this example to build and execu
   SCENARIO_NUM=7                                                                     # Select the execution scenario, options 0-7
   mkdir -p build && cd build;                                                        # Create and enter the build directory
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # Build the project
-  ./matrix_transpose 1024                                                   # Run the example
+  ./matrix_transpose                                                        # Run the example
   ```
 
   The first argument of the program is the square matrix side length, which must be an integer multiple of 32.
@@ -450,9 +448,7 @@ Use the `msOpProf` tool to collect detailed performance data:
 msopprof ./matrix_transpose   # Analyze case performance
 ```
 
-After the command completes, a folder named `OPPROF_{timestamp}_XXX` is generated in the output directory, where the `Task Duration(μs)` column in `OpBasicInfo.csv` is the metric used in the performance tables of this README.
-
-The performance data folder structure example is as follows:
+After the command completes, a folder named `OPPROF_{timestamp}_XXX` is generated in the output directory. The performance data folder structure example is as follows:
 
 ```text
 ├── dump                       // Raw performance data
