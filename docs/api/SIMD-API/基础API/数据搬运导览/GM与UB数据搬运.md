@@ -32,7 +32,9 @@ Global Memory（GM）与Unified Buffer（UB）之间的数据搬运提供了多�
     - GM -> VECIN
 - Unified Buffer -> Global Memory
     - VECOUT -> GM
-    - <cann-filter npu-type="310p">CO2 -> GM（仅Atlas 推理系列产品AI Core支持）</cann-filter>
+    <!-- npu="310p" id1 -->
+CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
+    <!-- end id1 -->
 
 搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[GM与UB连续数据搬运(DataCopy)](../Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB连续数据搬运(DataCopy).md)。
 
@@ -64,7 +66,9 @@ src和dst分别为源操作数和目的操作数；count为连续搬运的元素
     - GM -> VECIN
 - Unified Buffer -> Global Memory
     - VECOUT -> GM
-    - <cann-filter npu-type="310p">CO2 -> GM（仅Atlas 推理系列产品AI Core支持）</cann-filter>
+    <!-- npu="310p" id2 -->
+CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
+    <!-- end id2 -->
 
 搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[GM与UB高维切分数据搬运(DataCopy)](../Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB高维切分数据搬运(DataCopy).md)。
 
@@ -94,7 +98,9 @@ src和dst分别为源操作数和目的操作数；repeatParams为DataCopyParams
     - GM -> VECIN
 - Unified Buffer -> Global Memory
     - VECOUT -> GM
-    - <cann-filter npu-type="310p">CO2 -> GM（仅Atlas 推理系列产品AI Core支持）</cann-filter>
+    <!-- npu="310p" id3 -->
+CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
+    <!-- end id3 -->
 
 搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[GM与UB切片数据搬运(DataCopy)](../Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB切片数据搬运(DataCopy).md)。
 
@@ -134,16 +140,14 @@ src和dst分别为源操作数和目的操作数；intriParams为Nd2NzParams类�
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
     ```
 
-<cann-filter npu-type="950">
-
+<!-- npu="950" id4 -->
 - 支持enableSmallC0模式（仅Ascend 950PR/Ascend 950DT支持）
 
     ```cpp
     template <typename T, bool enableSmallC0 = false>
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
     ```
-
-</cann-filter>
+<!-- end id4 -->
 
 ## UB -> GM随路转换NZ2ND搬运(DataCopy)<a name="ZH-CN_TOPIC_0000002391805265"></a>
 
@@ -153,7 +157,9 @@ src和dst分别为源操作数和目的操作数；intriParams为Nd2NzParams类�
 
 - Unified Buffer -> Global Memory
     - VECOUT -> GM
-    - <cann-filter npu-type="310p">CO2 -> GM（仅Atlas 推理系列产品AI Core支持）</cann-filter>
+    <!-- npu="310p" id5 -->
+CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
+    <!-- end id5 -->
 
 搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[UB->GM随路转换NZ2ND搬运(DataCopy)](../Memory矢量计算/数据搬运/GM与UB数据搬运/UBToGM随路转换NZ2ND搬运(DataCopy).md)。
 
@@ -194,14 +200,18 @@ src和dst分别为源操作数和目的操作数；params为NdDmaParams类型的
 
 该接口提供将数据从Global Memory非对齐搬运至Unified Buffer的功能，可以根据开发者的需要自行填充数据。当每个搬运的数据块长度（blockLen）非32字节对齐时，每一个数据块都需要填充数据至32字节对齐。
 
-<cann-filter npu-type="950">特别地，针对Ascend 950PR/Ascend 950DT，支持Compact模式，该模式支持单个数据块非32字节对齐，将所有数据块合并成一个连续数据块，在该数据块右侧填充数据至32字节对齐。</cann-filter>
+<!-- npu="950" id6 -->
+特别地，针对Ascend 950PR/Ascend 950DT，支持Compact模式，该模式支持单个数据块非32字节对齐，将所有数据块合并成一个连续数据块，在该数据块右侧填充数据至32字节对齐。
+<!-- end id6 -->
 
 具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
     - GM -> VECIN
     - GM -> VECOUT
-    - <cann-filter npu-type="950">GM -> VECCALC（仅Ascend 950PR/Ascend 950DT支持）</cann-filter>
+    <!-- npu="950" id7 -->
+GM -> VECCALC（仅Ascend 950PR/Ascend 950DT支持）
+    <!-- end id7 -->
 
 搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[GM -> UB非对齐数据搬运(DataCopyPad)](../Memory矢量计算/数据搬运/GM与UB数据搬运/GMToUB非对齐数据搬运(DataCopyPad).md)。
 
@@ -214,16 +224,14 @@ src和dst分别为源操作数和目的操作数；dataCopyParams为DataCopyExtP
     __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
     ```
 
-<cann-filter npu-type="950">
-
+<!-- npu="950" id8 -->
 - 支持配置设置数据搬运模式mode（仅Ascend 950PR/Ascend 950DT支持）
 
     ```cpp
     template <typename T, PaddingMode mode = PaddingMode::Normal>
     __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
     ```
-
-</cann-filter>
+<!-- end id8 -->
 
 ## UB -> GM非对齐数据搬运(DataCopyPad)<a name="ZH-CN_TOPIC_0000001894460502"></a>
 
@@ -248,13 +256,11 @@ src和dst分别为源操作数和目的操作数；dataCopyParams为DataCopyExtP
     __aicore__ inline void DataCopyPad(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams)
     ```
 
-<cann-filter npu-type="950">
-
+<!-- npu="950" id9 -->
 - 支持配置设置数据搬运模式mode（仅Ascend 950PR/Ascend 950DT支持）
 
     ```cpp
     template <typename T, PaddingMode mode = PaddingMode::Normal>
     __aicore__ inline void DataCopyPad(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams)
     ```
-
-</cann-filter>
+<!-- end id9 -->
