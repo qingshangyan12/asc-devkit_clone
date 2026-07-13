@@ -136,9 +136,8 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_Read)
 
     AscendC::Hcomm<AscendC::COMM_PROTOCOL_UBC_CTP> hcomm;
     EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
-    int32_t ret =
-        hcomm.ReadNbi(channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x5008), reinterpret_cast<GM_ADDR>(0x3008),
-            URMA_TRANSFER_SIZE);
+    int32_t ret = hcomm.ReadNbi(
+        channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x5008), reinterpret_cast<GM_ADDR>(0x3008), URMA_TRANSFER_SIZE);
     EXPECT_EQ(ret, 0);
     channel.CompleteCurrentSq();
     ret = hcomm.Drain(channel.GetHandle());
