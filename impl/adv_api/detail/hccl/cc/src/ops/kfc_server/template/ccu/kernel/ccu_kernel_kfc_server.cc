@@ -366,7 +366,7 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
     CCU_CHK_RET(CompArgs(ctx));
     HCCL_INFO("[CcuKernelKfcServer] CompArgs finish");
     HCCL_INFO("[GenCircularQueue] KfcServer start");
-    KfcServerGenCircularQueue(arg, ctx);
+    // KfcServerGenCircularQueue(arg, ctx);
     CCU_IF(ctx.missionIndex == 0) {
         KfcServerGenCircularQueue(arg, ctx);
     } CCU_ELSE {
