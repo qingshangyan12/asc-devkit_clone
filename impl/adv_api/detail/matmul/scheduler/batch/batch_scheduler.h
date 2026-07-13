@@ -100,7 +100,9 @@ public:
                 auto a1 = MATMUL_MODULE(BatchCopyCubeInA)->AllocTensor();
                 auto b1 = MATMUL_MODULE(BatchCopyCubeInB)->AllocTensor();
                 event_t eventIDMte2ToMte1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_MTE1));
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
                 event_t eventIDMToMte1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::M_MTE1));
+#endif
                 auto batchLoop = MATMUL_MODULE(BatchLoop);
                 for (batchLoop->SplitStart(); !batchLoop->SplitEnd(); batchLoop->SplitNext()) {
                     uint32_t outerIdxA;
@@ -126,8 +128,10 @@ public:
                             MATMUL_MODULE(CubeOutBuffer)->AllocTensor();
                             ComputeBatch(a1, b1, bias, enPartialSum, ctx);
                             BatchScheduler::GetBatchResultImpl(dst, ctx, enAtomic, enSequentialWrite);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
                             SetFlag<HardEvent::M_MTE1>(eventIDMToMte1);
                             WaitFlag<HardEvent::M_MTE1>(eventIDMToMte1);
+#endif
                         }
                         EndIterate();
                     }
@@ -141,7 +145,9 @@ public:
                     LocalTensor<TransAT> a1;
                     LocalTensor<TransBT> b1;
                     event_t eventIDMte2ToMte1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_MTE1));
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
                     event_t eventIDMToMte1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::M_MTE1));
+#endif
                     auto splitIdxA = batchLoop->template GetSplitIndex<InputTypeTag::A>();
                     auto splitIdxB = batchLoop->template GetSplitIndex<InputTypeTag::B>();
                     MATMUL_MODULE(BatchCopyCubeInA)
@@ -164,8 +170,10 @@ public:
                             MATMUL_MODULE(CubeOutBuffer)->AllocTensor();
                             ComputeBatch(a1, b1, bias, enPartialSum, ctx);
                             BatchScheduler::GetBatchResultImpl(dst, ctx, enAtomic, enSequentialWrite);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
                             SetFlag<HardEvent::M_MTE1>(eventIDMToMte1);
                             WaitFlag<HardEvent::M_MTE1>(eventIDMToMte1);
+#endif
                         }
                         EndIterate();
                     }
