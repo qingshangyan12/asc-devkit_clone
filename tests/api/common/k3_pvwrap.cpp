@@ -10,7 +10,12 @@
 #include "k3_pvwrap.h"
 #include "securec.h"
 #include <thread>
+
 uint64_t g_k3CtrlValue = 0;
+
+namespace {
+constexpr uint32_t K3_CTRL_REG_ID = 3;
+} // namespace
 
 void pv_init(int pv_mode, int hijack, int bLoadInstByPvwrapSelf, const char* out_dir, uint32_t core_id) {}
 void pv_launch_sub_core(uint64_t pc, const char* bin_file, uint32_t sub_core_id, uint32_t core_id) {}
@@ -21,14 +26,14 @@ void set_read_record() {}
 
 bool pv_reg_read(uint32_t reg_type, uint32_t reg_id, svOpenArrayHandle buf, uint32_t sub_core_id, uint32_t core_id)
 {
-    if (reg_id == 3 && reg_type == 1) { // only when reg_type is SPR then update the CTRL register
+    if (reg_id == K3_CTRL_REG_ID && reg_type == 1) { // only when reg_type is SPR then update the CTRL register
         *reinterpret_cast<uint64_t*>(buf) = g_k3CtrlValue;
     }
     return true;
 }
 bool pv_reg_write(uint32_t reg_type, uint32_t reg_id, svOpenArrayHandle buf, uint32_t sub_core_id, uint32_t core_id)
 {
-    if (reg_id == 3 && reg_type == 1) { // only when reg_type is SPR then update the CTRL register
+    if (reg_id == K3_CTRL_REG_ID && reg_type == 1) { // only when reg_type is SPR then update the CTRL register
         g_k3CtrlValue = *(reinterpret_cast<uint64_t*>(buf));
     }
     return true;
