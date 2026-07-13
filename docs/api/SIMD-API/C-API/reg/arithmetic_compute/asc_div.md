@@ -2,9 +2,9 @@
 
 ## 产品支持情况
 
-| 产品 | 是否支持  |
-| :-----------| :------: |
-| Ascend 950PR/Ascend 950DT | √ |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
 
 ## 功能说明
 
@@ -13,7 +13,7 @@
 按元素求商。计算公式如下：
 
 $$
-dst_i = src0_i ÷ src1_i
+dst_i = src0_i \div src1_i
 $$
 
 ## 函数原型
@@ -42,6 +42,8 @@ __simd_callee__ inline void asc_div(vector_float& dst, vector_float src0, vector
 PIPE_V
 
 ## 约束说明
+
+- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
 
 - 注意除0错误。
 

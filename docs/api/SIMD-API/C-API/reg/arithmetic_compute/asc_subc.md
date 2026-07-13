@@ -2,31 +2,27 @@
 
 ## 产品支持情况
 
-| 产品         | 是否支持 |
-| :-----------------------| :-----:|
-| Ascend 950PR/Ascend 950DT | √ |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
 
 ## 功能说明
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
-根据mask对源操作数src0、src1以及进位数据carry_src进行按元素相减的操作，将结果写入目的操作数dst。
-src0、src1、carry_src相减时如果产生借位，在carry中对应位置每4bit的最低位写0，否则写1。
-
-计算公式如下：
+根据mask，对源操作数src0、src1及输入进位carry_src进行按元素求和操作，i为元素索引，相加结果写入dst，同时将每个元素的进位结果写入carry。计算公式如下：
 
 $$
-dst_i = src0_i - src1_i - carry_src_i
+\{dst0_i, dst1_i\} = src0_i - src1_i - carry\_src_i
 $$
 
-carry输出借位值示例说明：
+Carry flag（进位标志）用于表示加法进位或者减法无借位，若src0，src1，carry_src输入按位相加后最高位有进位，在carry（存放进位的掩码寄存器）中对应位置每4bit设置1，否则写0。
 
-| 数据类型 | 是否借位 | 示例说明 |
-| -------- | -------- | ------------------------ |
-| uint32_t | 不产生借位 | src0_i = 5, src1_i = 2, carry_src_i = 1 <br> dst_i = src0_i - src1_i - carry_src_i = 2 <br> carry中对应位置4bit的最低位写1：carry_i = 1 |
-| uint32_t | 产生借位 | src0_i = 5, src1_i = 7, carry_src_i = 1 <br> dst_i = src0_i - src1_i - carry_src_i = -3 <br> carry中对应位置4bit的最低位写0：carry_i = 0 |
-| int32_t | 不产生借位 | src0_i = 5, src1_i = 2, carry_src_i = 1 <br> dst_i = src0_i - src1_i - carry_src_i = 2 <br> carry中对应位置4bit的最低位写1：carry_i = 1 |
-| int32_t | 产生借位 | src0_i = 5, src1_i = -7, carry_src_i = 1 <br> dst_i = src0_i - src1_i - carry_src_i = 11 <br> carry中对应位置4bit的最低位写0：carry_i = 0 |
+![](../../../../figures/asc_subc_1.png)
+
+以int64_t类型数据计算-1 + 8 = 7为例，asc_sub/asc_subc接口的适用场景如下图：
+
+![](../../../../figures/asc_subc_2.png)
 
 ## 函数原型
 
@@ -58,7 +54,9 @@ PIPE_V
 
 ## 约束说明
 
-无
+- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
+
+- 运算输出完整计算结果（包含进位位），硬件不会对输出进行饱和或截断。
 
 ## 调用示例
 

@@ -2,9 +2,9 @@
 
 ## 产品支持情况
 
-|产品|是否支持|
-| :------------ | :------------: |
-| Ascend 950PR/Ascend 950DT | √ |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
 
 ## 功能说明
 
@@ -23,14 +23,17 @@
 
 ## 函数原型
 
+- 递增模式
   ```cpp
-  // 递增模式
   __simd_callee__ inline void asc_arange(vector_int8_t& dst, int8_t value)
   __simd_callee__ inline void asc_arange(vector_int16_t& dst, int16_t value)
   __simd_callee__ inline void asc_arange(vector_half& dst, half value)
   __simd_callee__ inline void asc_arange(vector_int32_t& dst, int32_t value)
   __simd_callee__ inline void asc_arange(vector_float& dst, float value)
-  // 递减模式
+  ```
+
+- 递减模式
+  ```cpp
   __simd_callee__ inline void asc_arange_descend(vector_int8_t& dst, int8_t value)
   __simd_callee__ inline void asc_arange_descend(vector_int16_t& dst, int16_t value)
   __simd_callee__ inline void asc_arange_descend(vector_half& dst, half value)
@@ -57,7 +60,7 @@ PIPE_V
 
 ## 约束说明
 
-无
+对于整型数据类型，如果生成的索引发生溢出，结果将环绕。
 
 ## 调用示例
 

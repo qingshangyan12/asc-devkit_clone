@@ -2,41 +2,42 @@
 
 ## 产品支持情况
 
-| 产品     | 是否支持 |
-| ----------- | :----: |
-| Ascend 950PR/Ascend 950DT | √ |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
 
 ## 功能说明
 
 头文件路径：`"c_api/reg_compute/reg_convert.h"`。
 
-将vector_half类型的源操作数以256B为单位分为两部分，读取其中一部分元素，将其转换成vector_int32_t类型写入目的操作数，并支持多种舍入模式。
+将half类型数据转为int32_t类型，并支持多种舍入模式。
 
 关于舍入模式的详细说明，请参见[舍入模式](../data_type_convert/rounding_mode.md)。
 
-以asc_half2int32_rd接口为例：
-
-- asc_half2int32_rd：将源操作数的上半部分写入目的操作数。
-
-- asc_half2int32_rd_v2：将源操作数的下半部分写入目的操作数。
+由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个VL大小的数据分为两部分，根据不同接口选择输入数据索引为奇数的位置或偶数的位置。
 
 ## 函数原型
 
 ```cpp
-// FLOOR舍入模式
+// FLOOR舍入模式，数据读取索引为偶数的位置
 __simd_callee__ inline void asc_half2int32_rd(vector_int32_t& dst, vector_half src, vector_bool mask)
+// FLOOR舍入模式，数据读取索引为奇数的位置
 __simd_callee__ inline void asc_half2int32_rd_v2(vector_int32_t& dst, vector_half src, vector_bool mask)
-// RINT舍入模式
+// RINT舍入模式，数据读取索引为偶数的位置
 __simd_callee__ inline void asc_half2int32_rn(vector_int32_t& dst, vector_half src, vector_bool mask)
+// RINT舍入模式，数据读取索引为奇数的位置
 __simd_callee__ inline void asc_half2int32_rn_v2(vector_int32_t& dst, vector_half src, vector_bool mask)
-// ROUND舍入模式
+// ROUND舍入模式，数据读取索引为偶数的位置
 __simd_callee__ inline void asc_half2int32_rna(vector_int32_t& dst, vector_half src, vector_bool mask)
+// ROUND舍入模式，数据读取索引为奇数的位置
 __simd_callee__ inline void asc_half2int32_rna_v2(vector_int32_t& dst, vector_half src, vector_bool mask)
-// CEIL舍入模式
+// CEIL舍入模式，数据读取索引为偶数的位置
 __simd_callee__ inline void asc_half2int32_ru(vector_int32_t& dst, vector_half src, vector_bool mask)
+// CEIL舍入模式，数据读取索引为奇数的位置
 __simd_callee__ inline void asc_half2int32_ru_v2(vector_int32_t& dst, vector_half src, vector_bool mask)
-// TRUNC舍入模式
+// TRUNC舍入模式，数据读取索引为偶数的位置
 __simd_callee__ inline void asc_half2int32_rz(vector_int32_t& dst, vector_half src, vector_bool mask)
+// TRUNC舍入模式，数据读取索引为奇数的位置
 __simd_callee__ inline void asc_half2int32_rz_v2(vector_int32_t& dst, vector_half src, vector_bool mask)
 ```
 
@@ -60,7 +61,7 @@ PIPE_V
 
 ## 约束说明
 
-- 开启饱和模式和非饱和模式时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../../sys_var/asc_set_ctrl.md)。
+- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
 
 ## 调用示例
 

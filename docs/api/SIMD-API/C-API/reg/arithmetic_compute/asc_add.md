@@ -2,15 +2,13 @@
 
 ## 产品支持情况
 
-| 产品         | 是否支持 |
-| :-----------------------| :-----:|
-| Ascend 950PR/Ascend 950DT | √ |
+- Ascend 950PR/Ascend 950DT：支持
 
 ## 功能说明
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
-按照元素对应位置执行矢量加法运算，i为元素索引。计算过程为ZEROING模式（未被mask掩码的元素在目的操作数中置0）。当输入src0和src1转换为uint32_t类型时，相加超出uint32_t的最大值时，执行带进位的加法运算，在dst的对应位置上，每4个比特位写入1，否则写入0。
+按照元素对应位置执行矢量加法运算，i为元素索引。计算过程为ZEROING模式（未被mask掩码的元素在目的操作数中置0）。
 
 计算公式如下：
 
@@ -18,10 +16,16 @@ $$
 dst_i = src0_i + src1_i
 $$
 
+执行带进位的加法运算时，可以在进位输出（掩码寄存器）中标记每次加法是否产生进位，若src0，src1输入按位相加后最高位有进位，在dst0中对应位置每4bit的最低位写1，否则写0。
+
+![](../../../../figures/asc_add.png)
+
+输出dst0适用场景请参考[asc_addc功能说明](asc_addc.md#功能说明)。
+
 ## 函数原型
 
+- 不带进位数据的接口
 ```cpp
-// 不带进位的矢量加法
 __simd_callee__ inline void asc_add(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
 __simd_callee__ inline void asc_add(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
 __simd_callee__ inline void asc_add(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
@@ -31,7 +35,10 @@ __simd_callee__ inline void asc_add(vector_float& dst, vector_float src0, vector
 __simd_callee__ inline void asc_add(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
 __simd_callee__ inline void asc_add(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
 __simd_callee__ inline void asc_add(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-// 带进位的矢量加法
+```
+
+- 带进位数据的接口
+```cpp
 __simd_callee__ inline void asc_add(vector_bool& dst0, vector_int32_t& dst1, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
 __simd_callee__ inline void asc_add(vector_bool& dst0, vector_uint32_t& dst1, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
 ```
@@ -59,8 +66,16 @@ PIPE_V
 
 ## 约束说明
 
-- 带进位的加法运算仅支持int32_t和uint32_t类型。
-- 带进位的加法运算需手动调用，接口内部不支持自动识别触发。
+- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
+
+- 不带进位数据的接口
+
+  默认执行非饱和运算，此时相同位宽的有符号和无符号数据类型硬件实现完全相同。
+
+- 带进位数据的接口
+  - 仅支持int32_t和uint32_t类型。
+  - 需手动调用，接口内部不支持自动识别触发。
+  - 运算输出完整计算结果（包含进位位），硬件不会对输出进行饱和或截断。
 
 ## 调用示例
 
