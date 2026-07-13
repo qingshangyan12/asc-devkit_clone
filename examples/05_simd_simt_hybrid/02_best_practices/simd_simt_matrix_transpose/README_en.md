@@ -10,7 +10,7 @@ This sample uses matrix transpose to describe memory access optimization in Asce
 
 ## Supported CANN Version
 
-- CANN 9.1.0
+- CANN >= 9.1.0
 
 ## Directory Structure
 
