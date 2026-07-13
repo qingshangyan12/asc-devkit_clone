@@ -57,7 +57,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 | ---------- | ---------- | ---------- |
 | dst | 输出 | 目的操作数，类型为GlobalTensor，存储位置为Global Memory，地址需要1字节对齐。 |
 | src | 输入 | 源操作数，类型为LocalTensor，存储位置为L1 Buffer，地址需要32字节对齐。 |
-| count | 输入 | 参与搬运的元素个数。count \* sizeof(T)需要32字节对齐，若未对齐，则搬运量会向下取整到32字节对齐。 |
+| count | 输入 | 参与搬运的元素个数。<br>**注：count * sizeof(T)需要32字节对齐，若未对齐，搬运量会向下取整到32字节对齐。** |
 
 以half数据类型为例，源操作数的shape为1 \* 128。当count = 128时，[图1](#zh-cn_topic_0000002540198372_fig826614454819)将源操作数中128个元素连续搬运至目的操作数。
 
