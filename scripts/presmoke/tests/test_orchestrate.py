@@ -405,11 +405,12 @@ EOF
             self.assertFalse((root / "out/.workspaces").exists())
             self.assertFalse((root / "out/.plan").exists())
             self.assertFalse((root / "out/.state").exists())
-            self.assertIn("multi_card_workspace_cleanup_done", result.stdout)
             self.assertIn("multi_card_start cards=0 1 2 cases=5", result.stdout)
             self.assertIn(
-                f"project_root={root / 'out/.workspaces/card_0'}",
-                (root / "out/full_card0/meta.txt").read_text(encoding="utf-8"),
+                f"project_root={root}",
+                (root / "out/full_card0/meta.txt")
+                .read_text(encoding="utf-8")
+                .splitlines(),
             )
             self.assertIn(
                 "device=0",
@@ -437,7 +438,7 @@ EOF
             )
             self.assertIn("Cases: total=5 pass=5 fail=0 skip=0", result.stdout)
 
-    def test_build_only_uses_single_workspace_and_forwards_stage(self) -> None:
+    def test_build_only_uses_single_run_and_forwards_stage(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             script = self.copy_orchestrate_fixture(root)
@@ -484,13 +485,11 @@ EOF
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("multi_card_start cards=0 1 2 cases=5", result.stdout)
 
-    def test_failed_run_cleans_temporary_workspaces(self) -> None:
+    def test_failed_run_cleans_transient_plan_and_state(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             script = self.copy_orchestrate_fixture(root)
-            workspace = root / "out/.workspaces/card_0"
-            workspace.mkdir(parents=True)
-            (workspace / "build.bin").write_text("temporary", encoding="utf-8")
+            (root / "out").mkdir()
             (root / "out/.plan").mkdir()
             (root / "out/.state").mkdir()
             env = self.base_env(
@@ -502,14 +501,18 @@ EOF
                 NPU_CARDS="0",
             )
 
-            result = subprocess.run(["bash", str(script)], text=True, capture_output=True, env=env, check=False)
+            result = subprocess.run(
+                ["bash", str(script)],
+                text=True,
+                capture_output=True,
+                env=env,
+                check=False,
+            )
 
             self.assertEqual(result.returncode, 1)
             self.assertTrue((root / "out/FINAL_REPORT.md").exists())
-            self.assertFalse((root / "out/.workspaces").exists())
             self.assertFalse((root / "out/.plan").exists())
             self.assertFalse((root / "out/.state").exists())
-            self.assertIn("multi_card_workspace_cleanup_done", result.stdout)
 
     def test_auto_npu_cards_prefers_davinci_devices_over_npu_smi(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
