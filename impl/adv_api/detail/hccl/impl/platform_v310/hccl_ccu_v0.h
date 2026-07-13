@@ -378,10 +378,10 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
             }
             
             for (uint32_t j = 0; j < rankNum; j += MAX_DCCI_CNT / sizeof(uint64_t)) {
-                FlushDataCache(&allToAllVParam_[handleId].sendCounts + j);
-                FlushDataCache(&allToAllVParam_[handleId].sdispls + j);
-                FlushDataCache(&allToAllVParam_[handleId].recvCounts + j);
-                FlushDataCache(&allToAllVParam_[handleId].rdispls + j);
+                FlushDataCache(allToAllVParam_[handleId].sendCounts + j);
+                FlushDataCache(allToAllVParam_[handleId].sdispls + j);
+                FlushDataCache(allToAllVParam_[handleId].recvCounts + j);
+                FlushDataCache(allToAllVParam_[handleId].rdispls + j);
             }
         } else if (commonPrepareParam.commType.prepareType == HcclCMDType::HCCL_CMD_HALF_ALLTOALLV) {
             handleParamGM_[handleId].wParamExt.sendOffsets = commonPrepareParam.wParamExt.sendOffsets;
