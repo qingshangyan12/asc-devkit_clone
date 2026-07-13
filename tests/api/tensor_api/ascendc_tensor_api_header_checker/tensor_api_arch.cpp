@@ -18,29 +18,29 @@
 
 static void test_host_tensor_api_arch_cube_mmad_op()
 {
-    using AscendC::Te::MmadTraitDefault;
     using AscendC::Te::MmadOperation;
+    using AscendC::Te::MmadTraitDefault;
 }
 
 static void test_host_tensor_api_arch_cube_copy_op()
 {
     using AscendC::Te::CopyGM2L1;
-    using AscendC::Te::CopyL12UB;
-    using AscendC::Te::CopyL12L0B;
-    using AscendC::Te::CopyL12L0A;
-    using AscendC::Te::CopyL12L0ScaleA;
-    using AscendC::Te::CopyL12L0ScaleB;
-    using AscendC::Te::CopyL12FB;
-    using AscendC::Te::CopyL12BT;
     using AscendC::Te::CopyL0C2GM;
     using AscendC::Te::CopyL0C2GMWith;
     using AscendC::Te::CopyL0C2UB;
     using AscendC::Te::CopyL0C2UBWith;
+    using AscendC::Te::CopyL12BT;
+    using AscendC::Te::CopyL12FB;
+    using AscendC::Te::CopyL12L0A;
+    using AscendC::Te::CopyL12L0B;
+    using AscendC::Te::CopyL12L0ScaleA;
+    using AscendC::Te::CopyL12L0ScaleB;
+    using AscendC::Te::CopyL12UB;
 }
 
 static void test_host_tensor_api_arch_vector_copy_op()
 {
     using AscendC::Te::CopyGM2UB;
-    using AscendC::Te::CopyUB2L1;
     using AscendC::Te::CopyUB2GM;
+    using AscendC::Te::CopyUB2L1;
 }

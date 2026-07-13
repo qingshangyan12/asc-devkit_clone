@@ -23,6 +23,6 @@ static void test_host_tensor_api_algorithm_copy()
 
 static void test_host_tensor_api_algorithm_mmad()
 {
-    using AscendC::Te::Mmad;
     using AscendC::Te::MakeMmad;
+    using AscendC::Te::Mmad;
 }

@@ -17,12 +17,12 @@
 
 static void test_host_tensor_api_atom_copy_atom()
 {
-    using AscendC::Te::CopyTraits;
     using AscendC::Te::CopyAtom;
+    using AscendC::Te::CopyTraits;
 }
 
 static void test_host_tensor_api_atom_mmad_atom()
 {
-    using AscendC::Te::MmadTraits;
     using AscendC::Te::MmadAtom;
+    using AscendC::Te::MmadTraits;
 }
