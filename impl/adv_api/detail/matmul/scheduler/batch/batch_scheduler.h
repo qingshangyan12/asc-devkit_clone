@@ -100,7 +100,13 @@ public:
                 auto a1 = MATMUL_MODULE(BatchCopyCubeInA)->AllocTensor();
                 auto b1 = MATMUL_MODULE(BatchCopyCubeInB)->AllocTensor();
                 event_t eventIDMte2ToMte1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_MTE1));
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+                constexpr MutexID mutexIdMToMte1Ping = 28;
+                constexpr MutexID mutexIdMToMte1Pong = 29;
+                uint8_t mutexIdMToMte1Index = 0;
+#else
                 event_t eventIDMToMte1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::M_MTE1));
+#endif
                 auto batchLoop = MATMUL_MODULE(BatchLoop);
                 for (batchLoop->SplitStart(); !batchLoop->SplitEnd(); batchLoop->SplitNext()) {
                     uint32_t outerIdxA;
@@ -125,9 +131,20 @@ public:
                         while (BASE_MODULE::MoveNext()) { // iterate
                             MATMUL_MODULE(CubeOutBuffer)->AllocTensor();
                             ComputeBatch(a1, b1, bias, enPartialSum, ctx);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+                            MutexID syncIdMToMte1List[2] = {mutexIdMToMte1Ping, mutexIdMToMte1Pong};
+                            MutexID syncIdMToMte1 = syncIdMToMte1List[mutexIdMToMte1Index];
+                            mutexIdMToMte1Index = 1 - mutexIdMToMte1Index;
+                            Mutex::Lock<PIPE_M>(syncIdMToMte1);
+                            BatchScheduler::GetBatchResultImpl(dst, ctx, enAtomic, enSequentialWrite);
+                            Mutex::Unlock<PIPE_M>(syncIdMToMte1);
+                            Mutex::Lock<PIPE_MTE1>(syncIdMToMte1);
+                            Mutex::Unlock<PIPE_MTE1>(syncIdMToMte1);
+#else
                             BatchScheduler::GetBatchResultImpl(dst, ctx, enAtomic, enSequentialWrite);
                             SetFlag<HardEvent::M_MTE1>(eventIDMToMte1);
                             WaitFlag<HardEvent::M_MTE1>(eventIDMToMte1);
+#endif
                         }
                         EndIterate();
                     }
@@ -141,7 +158,13 @@ public:
                     LocalTensor<TransAT> a1;
                     LocalTensor<TransBT> b1;
                     event_t eventIDMte2ToMte1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_MTE1));
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+                    constexpr MutexID mutexIdMToMte1Ping = 28;
+                    constexpr MutexID mutexIdMToMte1Pong = 29;
+                    uint8_t mutexIdMToMte1Index = 0;
+#else
                     event_t eventIDMToMte1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::M_MTE1));
+#endif
                     auto splitIdxA = batchLoop->template GetSplitIndex<InputTypeTag::A>();
                     auto splitIdxB = batchLoop->template GetSplitIndex<InputTypeTag::B>();
                     MATMUL_MODULE(BatchCopyCubeInA)
@@ -163,9 +186,20 @@ public:
                         while (BASE_MODULE::MoveNext()) { // iterate
                             MATMUL_MODULE(CubeOutBuffer)->AllocTensor();
                             ComputeBatch(a1, b1, bias, enPartialSum, ctx);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+                            MutexID syncIdMToMte1 =
+                                (mutexIdMToMte1Index == 0) ? mutexIdMToMte1Ping : mutexIdMToMte1Pong;
+                            mutexIdMToMte1Index = 1 - mutexIdMToMte1Index;
+                            Mutex::Lock<PIPE_M>(syncIdMToMte1);
+                            BatchScheduler::GetBatchResultImpl(dst, ctx, enAtomic, enSequentialWrite);
+                            Mutex::Unlock<PIPE_M>(syncIdMToMte1);
+                            Mutex::Lock<PIPE_MTE1>(syncIdMToMte1);
+                            Mutex::Unlock<PIPE_MTE1>(syncIdMToMte1);
+#else
                             BatchScheduler::GetBatchResultImpl(dst, ctx, enAtomic, enSequentialWrite);
                             SetFlag<HardEvent::M_MTE1>(eventIDMToMte1);
                             WaitFlag<HardEvent::M_MTE1>(eventIDMToMte1);
+#endif
                         }
                         EndIterate();
                     }
