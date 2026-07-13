@@ -361,6 +361,21 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
     return HCOMM_SUCCESS;
 }
 
+__aicore__ inline void HcommImpl<COMM_PROTOCOL_UBC_CTP>::UpdateCqState(
+    __gm__ ChannelEntity* channelEntity, const CqContext& cqCtx, __gm__ uint32_t* tailAddr, uint32_t curTail)
+{
+    // update CQ tail
+    st_dev(curTail, tailAddr, 0);
+
+    // ring CQ doorbell
+    st_dev(curTail & 0xFFFFFFU, (__gm__ uint32_t*)cqCtx.contextInfo.ubJfc.dbVa, 0);
+
+    // update WQ tail
+    auto sqCtx = channelEntity->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
+    __gm__ uint32_t* sqTailAddr = reinterpret_cast<__gm__ uint32_t*>(sqCtx.contextInfo.ubJfs.tailAddr);
+    st_dev(curTail, sqTailAddr, 0);
+}
+
 __aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCq(ChannelHandle channel, uint32_t expectIdx)
 {
     if (expectIdx == 0) {
@@ -413,16 +428,7 @@ __aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCq(ChannelHandl
     }
 #endif
 
-    // update CQ tail
-    st_dev(curTail, tailAddr, 0);
-
-    // ring CQ doorbell
-    st_dev(curTail & 0xFFFFFFU, (__gm__ uint32_t*)cqCtx.contextInfo.ubJfc.dbVa, 0);
-
-    // update WQ tail
-    auto sqCtx = channelEntity->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
-    __gm__ uint32_t* sqTailAddr = reinterpret_cast<__gm__ uint32_t*>(sqCtx.contextInfo.ubJfs.tailAddr);
-    st_dev(curTail, sqTailAddr, 0);
+    UpdateCqState(channelEntity, cqCtx, tailAddr, curTail);
     return HCOMM_SUCCESS;
 }
 
