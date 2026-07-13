@@ -12,6 +12,11 @@
  * \file kernel_operator_vec_binary_intf.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "kernel_operator_vec_binary_intf.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_INTF_H__
@@ -723,7 +728,7 @@ __aicore__ inline void SubRelu(const LocalTensor<T>& dst, const LocalTensor<T>& 
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T>
-__aicore__ inline void Prelu(const LocalTensor<T>& dst, const LocalTensor<T> &src0, 
+__aicore__ inline void Prelu(const LocalTensor<T>& dst, const LocalTensor<T> &src0,
     const LocalTensor<T> &src1, const uint32_t count);
 
 /* **************************************************************************************************
@@ -755,12 +760,12 @@ __aicore__ inline void Mull(const LocalTensor<T>& dst0, const LocalTensor<T>& ds
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T>
-__aicore__ inline void AbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &src0, 
+__aicore__ inline void AbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &src0,
     const LocalTensor<T> &src1, const uint32_t count);
 
 // FusedAbsSub has been updated, please use AbsSub instead.
 template <typename T>
-__aicore__ inline void FusedAbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &src0, 
+__aicore__ inline void FusedAbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &src0,
     const LocalTensor<T> &src1, const uint32_t count);
 
 /* **************************************************************************************************
@@ -775,12 +780,12 @@ __aicore__ inline void FusedAbsSub(const LocalTensor<T> &dst, const LocalTensor<
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T, typename U>
-__aicore__ inline void ExpSub(const LocalTensor<T> &dst, const LocalTensor<U> &src0, 
+__aicore__ inline void ExpSub(const LocalTensor<T> &dst, const LocalTensor<U> &src0,
     const LocalTensor<U> &src1, const uint32_t count);
 
 // FusedExpSub has been updated, please use ExpSub instead.
 template <typename T, typename U>
-__aicore__ inline void FusedExpSub(const LocalTensor<T> &dst, const LocalTensor<U> &src0, 
+__aicore__ inline void FusedExpSub(const LocalTensor<T> &dst, const LocalTensor<U> &src0,
     const LocalTensor<U> &src1, const uint32_t count);
 
 }  // namespace AscendC

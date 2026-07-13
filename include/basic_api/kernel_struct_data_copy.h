@@ -12,6 +12,11 @@
  * \file kernel_struct_data_copy.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "kernel_struct_data_copy.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_DATA_COPY_H__
@@ -111,7 +116,7 @@ struct MultiCopyParams  {
     T constantValue;
 };
 
-template <typename T, uint8_t dim>  
+template <typename T, uint8_t dim>
 using NdDmaParams = MultiCopyParams<T, dim>;
 
 struct DataCopyEnhancedParams {

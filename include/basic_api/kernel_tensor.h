@@ -12,6 +12,11 @@
  * \file kernel_tensor.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "kernel_tensor.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TENSOR_H__
@@ -293,7 +298,7 @@ public:
     template <class DataType, uint32_t tileSize> LocalTensor<DataType> __aicore__ inline Alloc();
     template <class DataType> LocalTensor<DataType> __aicore__ inline Alloc(uint32_t tileSize);
     template <class DataType> LocalTensor<DataType> __aicore__ inline Alloc();
-    template <class DataType, typename LayoutType> typename Std::enable_if<is_layout_v<LayoutType>, LocalTensor<DataType>>::type 
+    template <class DataType, typename LayoutType> typename Std::enable_if<is_layout_v<LayoutType>, LocalTensor<DataType>>::type
     __aicore__ inline Alloc(const LayoutType& layout);
 
 private:

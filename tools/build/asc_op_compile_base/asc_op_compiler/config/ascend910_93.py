@@ -15,13 +15,25 @@ ArchRuntimeConfig ascend910_93
 
 from asc_op_compile_base.asc_op_compiler.config.run_settings import RuntimeConfig
 from asc_op_compile_base.asc_op_compiler.generator.initialize import InitializerConfig
-from asc_op_compile_base.asc_op_compiler.generator.compile_info_generator import CompileInfoGeneratorConfig
-from asc_op_compile_base.asc_op_compiler.generator.tiling_info_generator import TilingInfoGeneratorConfig
-from asc_op_compile_base.asc_op_compiler.generator.code_generator import CodeGeneratorConfig
+from asc_op_compile_base.asc_op_compiler.generator.compile_info_generator import (
+    CompileInfoGeneratorConfig,
+)
+from asc_op_compile_base.asc_op_compiler.generator.tiling_info_generator import (
+    TilingInfoGeneratorConfig,
+)
+from asc_op_compile_base.asc_op_compiler.generator.code_generator import (
+    CodeGeneratorConfig,
+)
 from asc_op_compile_base.asc_op_compiler.generator.op_compiler import OpCompilerConfig
-from asc_op_compile_base.asc_op_compiler.generator.kernel_compiler import KernelCompilerConfig
+from asc_op_compile_base.asc_op_compiler.generator.kernel_compiler import (
+    KernelCompilerConfig,
+)
 from asc_op_compile_base.asc_op_compiler.generator.cmd_compiler import CmdCompilerConfig
-from asc_op_compile_base.asc_op_compiler.ascendc_constants import PreCompileType, CompileType, IsolationMacroType
+from asc_op_compile_base.asc_op_compiler.ascendc_constants import (
+    PreCompileType,
+    CompileType,
+    IsolationMacroType,
+)
 
 
 class ArchRuntimeConfig(RuntimeConfig):
@@ -48,13 +60,13 @@ class ArchRuntimeConfig(RuntimeConfig):
         with_time_stamp_static = True
         tiling_format = "uint64"
         macro_def = [
-            "defined(__DAV_C220_CUBE__)", 
-            "false", 
-            "false", 
-            "false", 
-            "true", 
+            "defined(__DAV_C220_CUBE__)",
             "false",
-            ]
+            "false",
+            "false",
+            "true",
+            "false",
+        ]
         need_const_tiling_qualifier = False
 
         # Code Generator Config
@@ -170,4 +182,3 @@ class ArchRuntimeConfig(RuntimeConfig):
             kernel_compile_config,
             cmd_compiler_config,
         )
-

@@ -15,6 +15,7 @@ target_include_directories(intf_llt_pub_basic INTERFACE)
 target_compile_definitions(intf_llt_pub_basic INTERFACE
     CFG_BUILD_DEBUG
     _GLIBCXX_USE_CXX11_ABI=0
+    $<$<BOOL:${ENABLE_GCOV}>:ENABLE_GCOV>
 )
 
 target_compile_options(intf_llt_pub_basic INTERFACE
@@ -58,9 +59,9 @@ if (NOT EXISTS "${KERNEL_TILING_FILE}")
         DEPENDS ${GEN_TILING_SCRIPT} ${TILING_DEF_DIR}
         COMMENT "Generating kernel tiling configuration header"
     )
-    add_custom_target(generate_kernel_headers ALL	 
-        DEPENDS ${KERNEL_TILING_FILE}	 
-        COMMENT "Ensuring kernel headers are generated"	 
+    add_custom_target(generate_kernel_headers ALL
+        DEPENDS ${KERNEL_TILING_FILE}
+        COMMENT "Ensuring kernel headers are generated"
     )
     set_source_files_properties(
         ${KERNEL_TILING_FILE}
