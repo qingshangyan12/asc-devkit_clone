@@ -34,7 +34,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_mm_intf.h"`。
 
-本接口本质上实现功能和[LoadData_3D](./LoadData_3D.md)接口一致，用于将NC1HWC0格式的Feature Map完成Image to Column展开，然后再从展开后的二维矩阵中选取指定数据块搬入对应内存位置。与LoadData_3D接口的差异在于，本接口需要配置dstStride参数，即调用之前必须使用辅助配置接口[SetLoadDataRepeatWithStride](../辅助配置接口/SetLoadDataRepeatWithStride.md)配置dstStride参数。功能示意图请参考[图1](#zh-cn_topic_0000002512171652_fig54450833726)。
+本接口本质上实现功能和[LoadData_3D](./LoadData_3D.md)接口一致，用于将NC1HWC0格式的Feature Map完成Image to Column展开，然后再从展开后的二维矩阵中选取指定数据块搬入对应内存位置。与LoadData_3D接口的差异在于，本接口仅支持Ascend 950PR/Ascend 950DT产品，支持配置输出矩阵K轴方向偏移量dstStride的能力且必须配置该参数，调用之前必须使用辅助配置接口[SetLoadDataRepeatWithStride](../辅助配置接口/SetLoadDataRepeatWithStride.md)配置dstStride参数。此外，相比于LoadData_3D，本接口内部不包含针对其他芯片版本的兼容性实现，减少了兼容造成的额外开销，性能表现有所优化。功能示意图请参考[图1](#zh-cn_topic_0000002512171652_fig54450833726)。
 
 LoadDataWithStride支持的数据通路为：L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer。
 
@@ -55,7 +55,7 @@ __aicore__ inline void LoadDataWithStride(const LocalTensor<T>& dst, const Local
 
 | 参数名称 | 含义 |
 | -------- | ---- |
-| T | 源操作数和目的操作数的数据类型。<br>&nbsp;&nbsp;&bull; 数据通路为L1 Buffer(A1)->L0A Buffer(A2)时，支持数据类型为：int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t、int32_t、uint32_t、float。<br>&nbsp;&nbsp;&bull; 数据通路为L1 Buffer(B1)->L0B Buffer(B2)时，支持数据类型为：half、bfloat16_t、int32_t、uint32_t、float。 |
+| T | 源操作数和目的操作数的数据类型。<br>&nbsp;&nbsp;&bull; 数据通路为L1 Buffer(TPosition::A1)->L0A Buffer(TPosition::A2)时，支持数据类型为：int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t、int32_t、uint32_t、float。<br>&nbsp;&nbsp;&bull; 数据通路为L1 Buffer(TPosition::B1)->L0B Buffer(TPosition::B2)时，支持数据类型为：half、bfloat16_t、int32_t、uint32_t、float。 |
 | defaultConfig | 控制是否在接口内部设置相关属性。 IsResetLoad3dConfig类型。IsResetLoad3dConfig结构定义如下：<br><pre>struct IsResetLoad3dConfig {<br>   bool isSetFMatrix = true;<br>   bool isSetPadding = true;<br>};</pre>isSetFMatrix配置为true，表示在接口内部设置FeatureMap的属性描述（包括l1H、l1W、padList，参数介绍参考[表3](#table193501032193419)）；设置为false，表示该接口传入的FeatureMap的属性描述不生效，开发者需要通过[SetFmatrix](../辅助配置接口/SetFmatrix.md)进行设置。<br>isSetPadding配置为true，表示在接口内部设置Pad属性描述（即padValue参数，参数介绍参考[表3](#table193501032193419)）；设置为false，表示该接口传入的Pad属性不生效，开发者需要通过[SetLoadDataPaddingValue](../辅助配置接口/SetLoadDataPaddingValue.md)进行设置。<br>该参数的默认值如下：<br><pre>constexpr IsResetLoad3dConfig IS_RESER_LOAD3D_DEFAULT_CONFIG = {true, true};</pre>特性细节可参考：[Feature Map、Pad属性描述寄存器设置](./LoadData_3D.md#zh-cn_topic_0000002512171652_section1881795134015)。 |
 | U | LoadData3DParamsV2中padValue的数据类型。<br>当dst、src使用基础数据类型时，U和dst、src的数据类型T需保持一致，否则编译失败。<br>最后一个模板参数仅用于上述数据类型检查，用户无需关注。 |
 

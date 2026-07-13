@@ -77,7 +77,9 @@ $$
 
 ## 矩阵计算搬入类指令理论性能汇总
 
-以下为数据搬运指令占用cycle数的理论计算公式：
+以下内容为矩阵计算搬入类指令在L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer、L1 Buffer->L0A_MX Buffer、L1 Buffer->L0B_MX Buffer、L1 Buffer->BiasTable Buffer、L1 Buffer->Fixpipe Buffer多条数据搬运通路下的理论性能汇总说明。
+
+数据搬运指令占用cycle数的理论计算公式：
 
 $$
 {cycles} = {data\_size} / {bandwidth} + \Delta T
@@ -108,13 +110,13 @@ $$
 
 **表4** LoadData_3D指令理论性能说明（[NPU架构版本2201](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="table1877123821113"></a>  
 
-| strideW的取值 | 卷积核在H方向滑动的行数 | L1 Buffer->L0A Buffer带宽（单位：Byte/cycle） | L1 Buffer->L0B Buffer带宽（单位：Byte/cycle） |
+| strideW的取值 | 卷积核在H方向滑动的行数n | L1 Buffer->L0A Buffer带宽（单位：Byte/cycle） | L1 Buffer->L0B Buffer带宽（单位：Byte/cycle） |
 | --- | --- | --- | --- |
 | 1 | 1 | 256 | 128 |
-| 1 | 大于1 | $\frac{512}{n+2}$（最小不会低于32） | $\frac{512}{n+4}$（最小不会低于$\frac{512}{16+2}$） |
-| 2、4、8 | 1 | $\frac{512}{(strideW \times 2)}$（最小不会低于32） | $\frac{512}{(strideW \times 2 + 2)}$（最小不会低于$\frac{512}{16+2}$） |
-| 2、4、8 | 大于1 | $\frac{512}{(strideW \times 2 + n)}$（最小不会低于32） | $\frac{512}{(strideW \times 2 + 2 + n)}$（最小不会低于$\frac{512}{16+2}$） |
-| 大于1，且不等于2、4、8 | 任意值 | 32 | $\frac{512}{16+2}$ |
+| 1 | 大于1 | $\left[\frac{512}{n+2}\right]$（最小不会低于32） | $\left[\frac{512}{n+4}\right]$（最小不会低于$\left[\frac{512}{16+2}\right]$） |
+| 2、4、8 | 1 | $\left[\frac{512}{(strideW \times 2)}\right]$（最小不会低于32） | $\left[\frac{512}{(strideW \times 2 + 2)}\right]$（最小不会低于$\left[\frac{512}{16+2}\right]$） |
+| 2、4、8 | 大于1 | $\left[\frac{512}{(strideW \times 2 + n)}\right]$（最小不会低于32） | $\left[\frac{512}{(strideW \times 2 + 2 + n)}\right]$（最小不会低于$\left[\frac{512}{16+2}\right]$） |
+| 大于1，且不等于2、4、8 | 任意值 | 32 | $\left[\frac{512}{16+2}\right]$ |
 <!-- end id7 -->
 
 <!-- npu="950" id8 -->
@@ -149,16 +151,16 @@ $$
 - $bandwidth\_mx$：搬运scale矩阵的带宽，单位为Byte/cycle。
 - $\Delta T$：搬运过程中的带宽延迟等额外开销。
 
-[LoadData_3D](../SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/LoadData_3D.md)指令的理论性能与参数相关，相关参数说明见[LoadData3DParamsV2结构体内参数说明](../SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/LoadData_3D.md#zh-cn_topic_0000002512171652_table193501032193419)，理论性能说明见下表：
+[LoadData_3D](../SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/LoadData_3D.md)和[LoadDataWithStride](../SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/LoadDataWithStride.md)指令的理论性能与参数相关，相关参数说明见[LoadData3DParamsV2结构体内参数说明](../SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/LoadData_3D.md#zh-cn_topic_0000002512171652_table193501032193419)。此外，LoadDataWithStride接口相比于LoadData_3D接口，内部不包含针对其他芯片版本的兼容性实现，减少了兼容造成的额外开销，性能表现有所优化。两个接口的理论性能说明见下表：
 
-**表6** LoadData_3D理论性能说明（[NPU架构版本3510](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="table1877123821313"></a>  
+**表6** LoadData_3D和LoadDataWithStride理论性能说明（[NPU架构版本3510](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)）<a id="table1877123821313"></a>  
 
-| strideW的取值 | 卷积核在H方向滑动的行数 | L1 Buffer->L0A Buffer带宽（单位：Byte/cycle） | L1 Buffer->L0B Buffer带宽（单位：Byte/cycle） |
+| strideW的取值 | 卷积核在H方向滑动的行数n | L1 Buffer->L0A Buffer带宽（单位：Byte/cycle） | L1 Buffer->L0B Buffer带宽（单位：Byte/cycle） |
 | --- | --- | --- | --- |
 | 1 | 1 | 256 | 256 |
-| 1 | 大于1 | $\frac{512}{n+2}$（最小不会低于32） | $\frac{512}{n+2}$（最小不会低于32） |
-| 2、4、8 | 1 | $\frac{512}{(strideW \times 2)}$（最小不会低于32） | $\frac{512}{(strideW \times 2)}$（最小不会低于32） |
-| 2、4、8 | 大于1 | $\frac{512}{(strideW \times 2 + n)}$（最小不会低于32） | $\frac{512}{(strideW \times 2 + n)}$（最小不会低于32） |
+| 1 | 大于1 | $\left[\frac{512}{n+2}\right]$（最小不会低于32） | $\left[\frac{512}{n+2}\right]$（最小不会低于32） |
+| 2、4、8 | 1 | $\left[\frac{512}{(strideW \times 2)}\right]$（最小不会低于32） | $\left[\frac{512}{(strideW \times 2)}\right]$（最小不会低于32） |
+| 2、4、8 | 大于1 | $\left[\frac{512}{(strideW \times 2 + n)}\right]$（最小不会低于32） | $\left[\frac{512}{(strideW \times 2 + n)}\right]$（最小不会低于32） |
 | 大于1，且不等于2、4、8 | 任意值 | 32 | 32 |
 
 [LoadDataWithStride](../SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/LoadDataWithStride.md)接口的性能可参考[表6](#table1877123821313)所示的LoadData_3D接口性能。
@@ -166,7 +168,9 @@ $$
 
 ## 矩阵计算搬出类指令理论性能汇总
 
-以下为数据搬运指令占用cycle数的理论计算公式：
+以下内容为矩阵计算搬出类指令在L0C Buffer->L1 Buffer和L0C Buffer->Unified Buffer两条数据搬运通路下的理论性能汇总说明。
+
+数据搬运指令占用cycle数的理论计算公式：
 
 $$
 {cycles} = {data\_size} / {bandwidth} + \Delta T
@@ -237,7 +241,7 @@ $$
 | L0C Buffer->L1 Buffer | int32_t | (V)REQ8 | NZ2DN + srcNzC0Stride = 1 | int8_t/uint8_t | 64 | 64 |
 | L0C Buffer->L1 Buffer | int32_t | (V)REQ8 | NZ2DN + srcNzC0Stride > 1 | int8_t/uint8_t | 16 | 16 |
 | L0C Buffer->Unified Buffer（开启[双目标模式](../SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬出/关键特性说明/L0C-Buffer到UB双目标模式.md)） | float | NoQuant | NZ2NZ | float | 32 + 32 | 128 + 128 |
-| L0C Buffer->Unified Buffer（开启[双目标模式](../SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬出/关键特性说明/L0C-Buffer到UB双目标模式.md)） | float | NoQuant | NZ2ND | float | 32 + 32 | 128 + 128 |
+| L0C Buffer->Unified Buffer（开启双目标模式） | float | NoQuant | NZ2ND | float | 32 + 32 | 128 + 128 |
 | L0C Buffer->Unified Buffer | float | NoQuant/(V)QF322F32_PRE | NZ2NZ | float | 32 | 128 |
 | L0C Buffer->Unified Buffer | float | NoQuant/(V)QF322F32_PRE | NZ2NZ + Channel Split | float | 32 | 128 |
 | L0C Buffer->Unified Buffer | float | NoQuant/(V)QF322F32_PRE | NZ2ND | float | 32 | 128 |
@@ -278,5 +282,4 @@ $$
 
 注：srcNzC0Stride为启用NZ2DN功能需配置的参数之一，参数详细介绍请参考[NZ2DN关键特性说明](../SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬出/关键特性说明/NZ2DN.md)。
 <!-- end id10 -->
-
 <!-- end id1 -->
