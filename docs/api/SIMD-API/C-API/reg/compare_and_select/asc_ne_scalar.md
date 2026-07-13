@@ -2,15 +2,43 @@
 
 ## 产品支持情况
 
-| 产品         | 是否支持 |
-| :-----------------------| :-----:|
-| Ascend 950PR/Ascend 950DT | √ |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
+<!-- npu="x90" id8 -->
+- Kirin X90：不支持
+<!-- end id8 -->
+<!-- npu="9030" id9 -->
+- Kirin 9030：不支持
+<!-- end id9 -->
 
 ## 功能说明
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
-src中的每个元素逐个与标量value比较大小，如果src_i != value，则输出结果dst对应比特位为1，否则为0。
+`src` 中的每个元素逐个与标量 `value` 比较是否不相等，如果 `src_i != value`，则输出结果 `dst` 对应比特位为1，否则为0，每个元素的比较结果占一个bit。`dst` 为掩码寄存器，按掩码 `mask` 指示参与计算的元素。
+
+$$
+dst_i = (src_i \neq value)
+$$
 
 ## 函数原型
 
@@ -27,6 +55,7 @@ __simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_bfloat16_t sr
 ```
 ## 参数说明
 
+*表 1* 参数说明
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（掩码寄存器）。 |
@@ -36,9 +65,26 @@ __simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_bfloat16_t sr
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
+
+## 数据类型
+
+
+| 输入A类型 | 输入B类型/标量类型 | 输出类型 |
+|---|---|---|
+| uint8_t | uint8_t | bool |
+| int8_t | int8_t | bool |
+| uint16_t | uint16_t | bool |
+| int16_t | int16_t | bool |
+| uint32_t | uint32_t | bool |
+| int32_t | int32_t | bool |
+| half | half | bool |
+| float | float | bool |
+| bfloat16_t | bfloat16_t | bool |
+
+
 ## 返回值说明
 
-无
+无返回值。
 
 ## 流水类型
 
@@ -46,7 +92,24 @@ PIPE_V
 
 ## 约束说明
 
-无
+- mask未筛选的元素在输出中置零。
+- 浮点数据类型比较，涉及 `NaN` 时比较结果为0。
+
+## 理论性能
+
+
+| 输入类型 | 输出类型 | 理论并行度(element/cycle) |
+|---|---|---|
+| int8_t | bool | 256 |
+| uint8_t | bool | 256 |
+| int16_t | bool | 128 |
+| uint16_t | bool | 128 |
+| half | bool | 128 |
+| bfloat16_t | bool | 128 |
+| int32_t | bool | 64 |
+| uint32_t | bool | 64 |
+| float | bool | 64 |
+
 
 ## 调用示例
 
