@@ -374,7 +374,8 @@ CcuResult HcommCcuKernelRegisterStart(CcuInsHandle insHandle) {
     return CCU_SUCCESS;
 }
 
-CcuResult HcommCcuKernelRegister(CcuInsHandle insHandle, const char *kernelFuncName, const void *kernelFunc, const void *kernelArg, CcuKernelHandle *kernelHandle) {
+CcuResult HcommCcuKernelRegister(CcuInsHandle insHandle, uint32_t dieId, const char *kernelFuncName,
+    const void *kernelFunc, const void **kernelArgs, uint32_t argNum, CcuKernelHandle *kernelHandle) {
     return CCU_SUCCESS;
 }
 
