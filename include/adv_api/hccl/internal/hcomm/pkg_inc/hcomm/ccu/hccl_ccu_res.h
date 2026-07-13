@@ -23,9 +23,9 @@ extern HcclResult HcclCommQueryCcuIns(HcclComm comm,
 
 extern CcuResult HcommCcuKernelRegisterStart(CcuInsHandle insHandle);
 
-extern CcuResult HcommCcuKernelRegister(CcuInsHandle insHandle,
+extern CcuResult HcommCcuKernelRegister(CcuInsHandle insHandle, uint32_t dieId, 
     const char *kernelFuncName, const void *kernelFunc,
-    const void *kernelArg, CcuKernelHandle *kernelHandle);
+    const void *kernelArg, uint32_t argNum, CcuKernelHandle *kernelHandle);
 
 extern CcuResult HcommCcuKernelRegisterEnd(CcuInsHandle insHandle);
 

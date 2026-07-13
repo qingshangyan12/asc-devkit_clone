@@ -1470,9 +1470,11 @@ HcclResult HcclGetCcuKernel(
 
             HCCL_INFO("[HcclGetCcuKernel] registering kernel[%u]: kernelFuncName[%s]", i, kernelInfo.kernelFuncName);
             CcuKernelHandle kernelHandle;
-            CcuResult regRet = HcommCcuKernelRegister(insHandle, kernelInfo.kernelFuncName,
+            constexpr uint32_t dieId = 0; // 预留接口，暂无含义
+            constexpr uint32_t kernelArgNum = 1;
+            CcuResult regRet = HcommCcuKernelRegister(insHandle, dieId, kernelInfo.kernelFuncName,
                                                       reinterpret_cast<void*>(kernelInfo.kernelFunc),
-                                                      kernelInfo.kernelArg, &kernelHandle);
+                                                      kernelInfo.kernelArg, kernelArgNum, &kernelHandle);
             if (regRet != CCU_SUCCESS) {
                 HCCL_ERROR("ccu kernel register failed for kernel[%u][%s]: ccuRet -> %d", i, kernelInfo.kernelFuncName, regRet);
                 return ConvertCcuToHccl(regRet);
