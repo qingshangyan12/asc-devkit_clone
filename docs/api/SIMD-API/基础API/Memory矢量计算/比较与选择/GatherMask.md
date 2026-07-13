@@ -39,35 +39,25 @@
     - 6：10001000…1000 \# 每个repeat内每四个元素取第四个元素
     - 7：11111111…1111 \# 每个repeat内取全部元素
 
-    <cann-filter npu-type="950">
-
+    <!-- npu="950" id8 -->
     Ascend 950PR/Ascend 950DT，支持模式1-7。
+    <!-- end id8 -->
 
-    </cann-filter>
-
-    <cann-filter npu-type="A3">
-
+    <!-- npu="A3" id9 -->
     Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持模式1-7。
+    <!-- end id9 -->
 
-    </cann-filter>
-
-    <cann-filter npu-type="910b">
-
+    <!-- npu="910b" id10 -->
     Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持模式1-7。
+    <!-- end id10 -->
 
-    </cann-filter>
-
-    <cann-filter npu-type="310p">
-
+    <!-- npu="310p" id11 -->
     Atlas 推理系列产品AI Core，支持模式1-6。
+    <!-- end id11 -->
 
-    </cann-filter>
-
-    <cann-filter npu-type="310b">
-
+    <!-- npu="310b" id12 -->
     Atlas 200I/500 A2 推理产品，支持模式1-7。
-
-    </cann-filter>
+    <!-- end id12 -->
 
 - 用户自定义模式：对应函数原型中src1Pattern的数据类型为LocalTensor，迭代间间隔由src1RepeatStride决定，迭代内src1Pattern连续消耗。
 
@@ -80,35 +70,25 @@ GatherMask接口计算过程如下图所示，参数设置为：mask=70，repeat
 - 配置方式二：总的数据计算量为mask个元素。mask配置为总的数据计算量。
 repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决定。
 
-    <cann-filter npu-type = "950">
-
+    <!-- npu="950" id13 -->
     Ascend 950PR/Ascend 950DT，支持配置方式一。
+    <!-- end id13 -->
 
-    </cann-filter>
-
-    <cann-filter npu-type = "A3">
-
+    <!-- npu="A3" id14 -->
     Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持配置方式一。
+    <!-- end id14 -->
 
-    </cann-filter>
-
-    <cann-filter npu-type = "910b">
-
+    <!-- npu="910b" id15 -->
     Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持配置方式一。
+    <!-- end id15 -->
 
-    </cann-filter>
-
-    <cann-filter npu-type = "310b">
-
+    <!-- npu="310b" id16 -->
     Atlas 200I/500 A2 推理产品，支持配置方式一。
+    <!-- end id16 -->
 
-    </cann-filter>
-
-    <cann-filter npu-type = "310p">
-
+    <!-- npu="310p" id17 -->
     Atlas 推理系列产品AI Core，支持配置方式二。
-    
-    </cann-filter>
+    <!-- end id17 -->
 
 图1采用内置固定模式2进行计算，每个repeat取奇数索引元素。
 
@@ -118,21 +98,17 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 ![](../../../../figures/GatherMask1.png)
 
-<cann-filter npu-type = "950,A3,910b,310b,310p">
-
+<!-- npu="950,A3,910b,310b,310p" id18 -->
 **图2**  GatherMask用户自定义模式计算示意图（配置方式一）
 
 ![](../../../../figures/GatherMask2.png)
+<!-- end id18 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "310p">
-
+<!-- npu="310p" id19 -->
 **图3**  GatherMask用户自定义模式计算示意图（配置方式二）
 
 ![](../../../../figures/GatherMask3.png)
-
-</cann-filter>
+<!-- end id19 -->
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -183,19 +159,85 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 ## 数据类型
 
-**表4**  数据类型组合情况
+<!-- npu="950" id20 -->
+
+**表**  Ascend 950PR/Ascend 950DT数据类型组合情况
 
 | src0数据类型 | src1Pattern数据类型 | dst数据类型 |
 | --- | --- | --- |
-|<cann-filter npu-type = "950"> int8_t | uint8_t | int8_t </cann-filter>|
-|<cann-filter npu-type = "950"> uint8_t | uint8_t | uint8_t </cann-filter>|
+| int8_t | uint8_t | int8_t |
+| uint8_t | uint8_t | uint8_t |
 | int16_t | uint16_t | int16_t |
 | uint16_t | uint16_t | uint16_t |
 | half | uint16_t | half |
-|<cann-filter npu-type = "950,A3,910b"> bfloat16_t | uint16_t | bfloat16_t </cann-filter>|
+| bfloat16_t | uint16_t | bfloat16_t |
 | int32_t | uint32_t | int32_t |
 | uint32_t | uint32_t | uint32_t |
 | float | uint32_t | float |
+
+<!-- end id20 -->
+
+<!-- npu="A3" id21 -->
+
+**表**  Atlas A3 训练系列产品/Atlas A3 推理系列产品数据类型组合情况
+
+| src0数据类型 | src1Pattern数据类型 | dst数据类型 |
+| --- | --- | --- |
+| int16_t | uint16_t | int16_t |
+| uint16_t | uint16_t | uint16_t |
+| half | uint16_t | half |
+| bfloat16_t | uint16_t | bfloat16_t |
+| int32_t | uint32_t | int32_t |
+| uint32_t | uint32_t | uint32_t |
+| float | uint32_t | float |
+
+<!-- end id21 -->
+
+<!-- npu="910b" id22 -->
+
+**表**  Atlas A2 训练系列产品/Atlas A2 推理系列产品数据类型组合情况
+
+| src0数据类型 | src1Pattern数据类型 | dst数据类型 |
+| --- | --- | --- |
+| int16_t | uint16_t | int16_t |
+| uint16_t | uint16_t | uint16_t |
+| half | uint16_t | half |
+| bfloat16_t | uint16_t | bfloat16_t |
+| int32_t | uint32_t | int32_t |
+| uint32_t | uint32_t | uint32_t |
+| float | uint32_t | float |
+
+<!-- end id22 -->
+
+<!-- npu="310b" id23 -->
+
+**表**  Atlas 200I/500 A2 推理产品数据类型组合情况
+
+| src0数据类型 | src1Pattern数据类型 | dst数据类型 |
+| --- | --- | --- |
+| int16_t | uint16_t | int16_t |
+| uint16_t | uint16_t | uint16_t |
+| half | uint16_t | half |
+| int32_t | uint32_t | int32_t |
+| uint32_t | uint32_t | uint32_t |
+| float | uint32_t | float |
+
+<!-- end id23 -->
+
+<!-- npu="310p" id24 -->
+
+**表**  Atlas 推理系列产品AI Core数据类型组合情况
+
+| src0数据类型 | src1Pattern数据类型 | dst数据类型 |
+| --- | --- | --- |
+| int16_t | uint16_t | int16_t |
+| uint16_t | uint16_t | uint16_t |
+| half | uint16_t | half |
+| int32_t | uint32_t | int32_t |
+| uint32_t | uint32_t | uint32_t |
+| float | uint32_t | float |
+
+<!-- end id24 -->
 
 ## 返回值说明<a name="section198548421851"></a>
 
@@ -211,11 +253,11 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 - 若调用该接口前为Counter模式，在调用该接口后需要显式设置回Counter模式（接口内部执行结束后会设置为Normal模式）。
 
-<!-- npu="950" id8 -->
+<!-- npu="950" id25 -->
 - 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT：
   - 内置固定模式占用8KB Unified Buffer临时空间。
   - 用户自定义模式不涉及8KB Unified Buffer临时空间的占用。
-<!-- end id8 -->
+<!-- end id25 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

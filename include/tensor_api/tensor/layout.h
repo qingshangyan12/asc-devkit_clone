@@ -8,6 +8,9 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "layout.h cannot be used with compile flag --enable-simt enabled."
+#endif
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
@@ -48,7 +51,7 @@ __aicore__ inline constexpr auto MakeLayout(const T& shape, const U& stride);
 template <typename T>
 __aicore__ inline constexpr auto MakeLayout(const T& shape);
 
-template <typename T, typename Shape, typename Stride> 
+template <typename T, typename Shape, typename Stride>
 __aicore__ inline constexpr auto Crd2Idx(const T& coord, const Shape& shape, const Stride& stride);
 
 template <size_t I, typename Tuple, typename Enable>
