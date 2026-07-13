@@ -32,6 +32,8 @@ _JUNIT_LOG_TAIL_BYTES = 100_000
 LOG = logging.getLogger(__name__)
 
 CUSTOM_OP_DEPENDENCY_GROUP = {
+    "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op_static_lib",
+    "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op",
     "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclnn_invocation",
     "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclop_invocation",
     "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin",

@@ -338,6 +338,7 @@ class _PipelineExecutor:
         self.npu_stats = _NpuPipelineStats(self.run_slots, queue_model)
         self.planned_keys = {cell.key for cell in cells}
         self.completed_keys: set[str] = set()
+        self.completed_status: dict[str, str] = {}
         self.deferred_items: List[tuple[_PipelineItem, set[str]]] = []
         self.dependency_lock = threading.Lock()
         self.dependency_condition = threading.Condition(self.dependency_lock)
@@ -390,6 +391,7 @@ class _PipelineExecutor:
         result_key = f"{result.example}|{result.arch}|{result.mode}"
         with self.dependency_condition:
             self.completed_keys.add(result_key)
+            self.completed_status[result_key] = result.status
             pending: List[tuple[_PipelineItem, set[str]]] = []
             for item, required_keys in self.deferred_items:
                 if required_keys <= self.completed_keys:
@@ -406,17 +408,26 @@ class _PipelineExecutor:
         required_keys = {f"{case}|{cell.arch}|{cell.mode}" for case in required_cases}
         return required_keys & self.planned_keys
 
-    def wait_for_build_dependencies(self, cell: Cell) -> None:
+    def wait_for_build_dependencies(self, cell: Cell) -> List[str]:
         required_cases = BUILD_AFTER_CASES.get(cell.example.rel_path, set())
-        required_keys = {
-            f"{case}|{cell.arch}|{cell.mode}" for case in required_cases
-        } & self.planned_keys
+        case_keys = {case: f"{case}|{cell.arch}|{cell.mode}" for case in required_cases}
+        required_keys = set(case_keys.values()) & self.planned_keys
         with self.dependency_condition:
             while not required_keys <= self.completed_keys:
                 self.dependency_condition.wait()
+            return sorted(
+                case
+                for case, key in case_keys.items()
+                if key in required_keys and self.completed_status.get(key) != "PASS"
+            )
 
     def build_worker(self, cell: Cell) -> None:
-        self.wait_for_build_dependencies(cell)
+        failed_dependencies = self.wait_for_build_dependencies(cell)
+        if failed_dependencies:
+            self.append_result(
+                dependency_skip_result(cell, self.options.log_dir, failed_dependencies)
+            )
+            return
         item = run_cell_stage(
             cell,
             StageRunOptions(
@@ -511,6 +522,31 @@ class _PipelineExecutor:
             thread.join()
         for thread in verify_threads:
             thread.join()
+
+
+def dependency_skip_result(
+    cell: Cell, log_dir: Path, failed_dependencies: List[str]
+) -> RunResult:
+    reason = "prerequisite failed: " + ", ".join(failed_dependencies)
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_file = log_dir / f"{safe_log_name(cell.example.rel_path)}__{cell.mode}.log"
+    log_file.write_text(
+        f"example={cell.example.rel_path}\n"
+        f"arch={cell.arch}\n"
+        f"mode={cell.mode}\n\n"
+        f"SKIP: {reason}\n",
+        encoding="utf-8",
+    )
+    return RunResult(
+        example=cell.example.rel_path,
+        arch=cell.arch,
+        mode=cell.mode,
+        status="SKIP",
+        reason=reason,
+        rc=0,
+        log_file=str(log_file),
+        source=cell.example.source,
+    )
 
 
 class _NpuPipelineStats:

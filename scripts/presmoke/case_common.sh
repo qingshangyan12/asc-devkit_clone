@@ -256,12 +256,49 @@ presmoke_repair_custom_op_package_headers() {
     done < <(presmoke_custom_op_dynamic_dirs)
 }
 
+presmoke_custom_op_lock_dir() {
+    local lock_root opp_path lock_key
+    lock_root="${PRESMOKE_LOCK_ROOT:-/tmp/asc-devkit-presmoke-locks}"
+    opp_path="$(presmoke_opp_path)"
+    if command -v sha256sum >/dev/null 2>&1; then
+        lock_key="$(printf '%s' "$opp_path" | sha256sum | awk '{print $1}')"
+    elif command -v shasum >/dev/null 2>&1; then
+        lock_key="$(printf '%s' "$opp_path" | shasum -a 256 | awk '{print $1}')"
+    else
+        lock_key="$(printf '%s' "$opp_path" | cksum | awk '{print $1}')"
+    fi
+    printf '%s/%s/custom_op_package.lock\n' "$lock_root" "$lock_key"
+}
+
+presmoke_with_directory_lock() {
+    local lock_dir="$1"
+    shift
+    local lock_pid rc
+    mkdir -p "$(dirname "$lock_dir")"
+
+    while ! mkdir "$lock_dir" 2>/dev/null; do
+        lock_pid="$(cat "$lock_dir/pid" 2>/dev/null || true)"
+        if [[ "$lock_pid" =~ ^[0-9]+$ ]] && ! kill -0 "$lock_pid" 2>/dev/null; then
+            rm -rf "$lock_dir"
+            continue
+        fi
+        sleep 0.1
+    done
+
+    printf '%s\n' "${BASHPID:-$$}" > "$lock_dir/pid"
+    rc=0
+    "$@" || rc=$?
+    rm -rf "$lock_dir"
+    return "$rc"
+}
+
 presmoke_ensure_custom_op_package() {
     if [[ "${PRESMOKE_CUSTOM_OP_AUTO_INSTALL:-1}" == "0" ]]; then
         echo "PRESMOKE_CUSTOM_OP_AUTO_INSTALL=0; custom_op package auto-install skipped" >&2
         return 0
     fi
-    _presmoke_ensure_custom_op_package
+    presmoke_with_directory_lock \
+        "$(presmoke_custom_op_lock_dir)" _presmoke_ensure_custom_op_package
 }
 
 _presmoke_ensure_custom_op_package() {

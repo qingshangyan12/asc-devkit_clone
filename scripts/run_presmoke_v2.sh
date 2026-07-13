@@ -365,14 +365,6 @@ plan_examples_for_sharding() {
     run_python_module presmoke.orchestrate_report list-examples "$plan_dir/results/report.json"
 }
 
-is_multi_card_setup_example() {
-    case "$1" in
-        01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op_static_lib) return 0 ;;
-        01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op) return 0 ;;
-        *) return 1 ;;
-    esac
-}
-
 write_multi_card_shards() {
     local shards_dir="$1"
     shift
@@ -390,12 +382,6 @@ write_multi_card_shards() {
         shard_args+=(--jobs "$MULTI_CARD_SHARD_JOBS")
     elif [[ "$JOBS" =~ ^[0-9]+$ ]]; then
         shard_args+=(--jobs "$JOBS")
-    fi
-    local example
-    if (( ${#setup_examples[@]} > 0 )); then
-        for example in "${setup_examples[@]}"; do
-            shard_args+=(--exclude "$example")
-        done
     fi
     shard_args+=(--cards "${cards[@]}")
 
@@ -415,8 +401,6 @@ run_multi_card_presmoke() {
     shift
     local cards=()
     local examples=()
-    local setup_examples=()
-    local shard_examples=()
     local card example
     while IFS= read -r card; do
         [[ -n "$card" ]] && cards+=("$card")
@@ -424,11 +408,6 @@ run_multi_card_presmoke() {
     while IFS= read -r example; do
         [[ -n "$example" ]] || continue
         examples+=("$example")
-        if is_multi_card_setup_example "$example"; then
-            setup_examples+=("$example")
-        else
-            shard_examples+=("$example")
-        fi
     done < <(plan_examples_for_sharding "$@")
     if [[ "${#examples[@]}" -eq 0 ]]; then
         log "multi_card_skip no_planned_cases"
@@ -443,15 +422,6 @@ run_multi_card_presmoke() {
     IFS=$'\t' read -r shard_jobs shard_make_jobs shard_cpu_run_slots shard_per_card_cpus <<< "$shard_parallel"
     log "multi_card_shard_parallel per_card_cpus=$shard_per_card_cpus" \
         "jobs=$shard_jobs make_jobs=$shard_make_jobs cpu_run_slots=$shard_cpu_run_slots"
-    if [[ "${#setup_examples[@]}" -gt 0 ]]; then
-        local setup_args=()
-        for example in "${setup_examples[@]}"; do
-            setup_args+=(--exact-filter "$example")
-        done
-        log "multi_card_setup_start card=${cards[0]} count=${#setup_examples[@]}"
-        run_presmoke "full_card${cards[0]}_setup" "${cards[0]}" "${setup_args[@]}" "$@"
-        log "multi_card_setup_done card=${cards[0]} count=${#setup_examples[@]}"
-    fi
     local shards_dir="$OUT_ROOT/.plan/shards"
     MULTI_CARD_SHARD_JOBS="$shard_jobs" write_multi_card_shards "$shards_dir" "${cards[@]}"
 
