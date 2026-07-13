@@ -993,9 +993,13 @@ HcclResult HcclGetThread(
         }
     } else {
         ThreadHandle thread;
-        // host模式下，将主流封装为thread，并创建主流上的notify
-        CHK_RET(
-            HcclThreadAcquireWithStream(comm, param.engine, param.stream, resRequest.notifyNumOnMainThread, &thread));
+        if (param.engine == COMM_ENGINE_CCU && param.isKfc) {
+            CHK_RET(HcclThreadAcquire(comm, param.engine, 1, resRequest.notifyNumOnMainThread, &thread));
+        } else {
+            // host模式下，将主流封装为thread，并创建主流上的notify
+            CHK_RET(HcclThreadAcquireWithStream(
+                comm, param.engine, param.stream, resRequest.notifyNumOnMainThread, &thread));
+        }
         resCtxHost->threads.push_back(thread);
         u32 maxNotifyNum = 0;
         for (u32 i = 0; i < resRequest.notifyNumPerThread.size(); i++) {
