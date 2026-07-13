@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example uses matrix transpose to demonstrate memory access optimization strategies in the Ascend C SIMT programming model. The example includes a 1D contiguous copy baseline and a series of progressively optimized transpose kernels: starting from direct global memory transpose, it introduces UB staging and tiling, compares two mapping strategies (launching thread blocks per tile group versus fixing the thread block count to the hardware vector core count), observes register spill under the 2048-thread configuration, eliminates bank conflicts through UB padding, and finally uses double buffer to remove the trailing synchronization in the loop. This presents the complete tuning path for SIMT matrix transpose.
+This example uses matrix transpose to demonstrate memory access optimization strategies in the Ascend C SIMT programming model. The example includes a 1D contiguous copy baseline and a series of progressively optimized transpose kernels: starting from direct global memory transpose, it introduces UB staging and tiling, compares two mapping strategies (launching thread blocks per tile group versus fixing the thread block count to the hardware vector core count), observes register spill under the 2048-thread configuration, eliminates bank conflicts through UB padding, and finally uses double buffering to remove the trailing synchronization in the loop. This presents the complete tuning path for SIMT matrix transpose.
 
 ## Supported Products
 
@@ -341,14 +341,14 @@ Compared to 23.912μs in Case 5, padding reduces Task Duration to 15.152μs, a d
 
 ---
 
-### Case 7: UB Staging Transpose + Padding + Double Buffer, Removing Trailing Synchronization (1024 Threads)
+### Case 7: UB Staging Transpose + Padding + Double Buffering, Removing Trailing Synchronization (1024 Threads)
 
 **Optimization Goal**: Remove the `asc_syncthreads()` at the end of each loop iteration in Case 6, reducing synchronization overhead.
 
 **Core Implementation**: Each loop iteration in Case 6 has two synchronizations: one after load, to ensure the tile is fully written before reading in the transpose direction; and one after store, to ensure the transpose read is complete before entering the next load, preventing the next load from overwriting the tile still being read. This version uses two padded UB tiles, rotated by `cnt`: the next load writes to the other buffer, which does not overwrite the buffer being read in the current iteration, so the trailing synchronization can be safely removed, keeping only one synchronization per iteration.
 
 ```cpp
-__ubuf__ float tile[2][TILE_DIM][TILE_PAD_STRIDE]; // double buffer: rotate buffers and remove trailing synchronization
+__ubuf__ float tile[2][TILE_DIM][TILE_PAD_STRIDE]; // two-buffer rotation: rotate buffers and remove trailing synchronization
 uint32_t cnt = 0;
 for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x) {
     ...
@@ -367,9 +367,9 @@ for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x)
 
 **Analysis**:
 
-Compared to 15.152μs in Case 6, after removing the synchronization at the end of each loop iteration, Task Duration drops to 12.074μs, a decrease of approximately 20%. Under the 1024x1024 matrix and 64 thread block configuration, each thread block needs to loop over 16 tiles, so double buffer is equivalent to each thread block reducing 16 thread block synchronizations. The cost of this method is an extra UB tile (two 32x34 tiles in total), but it does not introduce register spill. Case 7 is the lowest-latency SIMT transpose version in this example, approximately 1.9x the Case 0 copy baseline (6.262μs).
+Compared to 15.152μs in Case 6, after removing the synchronization at the end of each loop iteration, Task Duration drops to 12.074μs, a decrease of approximately 20%. Under the 1024x1024 matrix and 64 thread block configuration, each thread block needs to loop over 16 tiles, so double buffering is equivalent to each thread block reducing 16 thread block synchronizations. The cost of this method is an extra UB tile (two 32x34 tiles in total), but it does not introduce register spill. Case 7 is the lowest-latency SIMT transpose version in this example, approximately 1.9x the Case 0 copy baseline (6.262μs).
 
-The simulation instruction pipeline diagrams of Case 6 and Case 7 are shown in Figure 7 and Figure 8, respectively. In Case 6, each loop iteration is constrained by the trailing `asc_syncthreads()`: the write-back of the current iteration must fully complete before the next iteration can start, so the computation before the next load and the GM read of the next iteration can only wait serially. In Case 7, by rotating two UB tiles with double buffer and removing the trailing synchronization, the GM write-back of the current iteration overlaps with the computation before the next load and the GM read of the next iteration, compressing the serial wait between load and compute. This is also the main reason why Task Duration drops further relative to Case 6.
+The simulation instruction pipeline diagrams of Case 6 and Case 7 are shown in Figure 7 and Figure 8, respectively. In Case 6, each loop iteration is constrained by the trailing `asc_syncthreads()`: the write-back of the current iteration must fully complete before the next iteration can start, so the computation before the next load and the GM read of the next iteration can only wait serially. In Case 7, by rotating two UB tiles through double buffering and removing the trailing synchronization, the GM write-back of the current iteration overlaps with the computation before the next load and the GM read of the next iteration, compressing the serial wait between load and compute. This is also the main reason why Task Duration drops further relative to Case 6.
 
 **Figure 7: Case 6 simulation instruction pipeline diagram**
 
@@ -405,7 +405,7 @@ When tuning memory-access operators, it is recommended to first use contiguous c
 
 After tiling, the thread block to tile mapping strategy must first be determined. Launching thread blocks per tile group is simple to implement, but when the tile count is much larger than the hardware vector core count, it introduces extra launch and scheduling overhead; fixing the thread block count to the hardware vector core count and looping over multiple tiles inside the kernel can reduce this overhead. The thread count should not be based only on the contiguous transfer scenario, since a high thread count limits the number of registers available per thread. Once the index logic becomes complex, register spill may occur, and the choice should be made combining `--cce-res-usage` and measured latency.
 
-Once GM access has become contiguous, the bottleneck shifts to UB access and synchronization. When reading UB in the transpose direction, accessing a 32x32 tile by column is prone to bank conflicts, which can be addressed by padding to change the UB physical layout. Synchronization in the loop should also be judged for necessity based on data coverage relationships; double buffer can reduce one synchronization provided that the data being read is not overwritten.
+Once GM access has become contiguous, the bottleneck shifts to UB access and synchronization. When reading UB in the transpose direction, accessing a 32x32 tile by column is prone to bank conflicts, which can be addressed by padding to change the UB physical layout. Synchronization in the loop should also be judged for necessity based on data coverage relationships; double buffering can reduce one synchronization provided that the data being read is not overwritten.
 
 ## Build and Run
 
