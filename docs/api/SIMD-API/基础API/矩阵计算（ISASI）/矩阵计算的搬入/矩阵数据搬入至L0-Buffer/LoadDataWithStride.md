@@ -51,7 +51,7 @@ __aicore__ inline void LoadDataWithStride(const LocalTensor<T>& dst, const Local
 
 | 参数名称 | 含义 |
 | -------- | ---- |
-| T | 源操作数和目的操作数的数据类型。<br>&nbsp;&nbsp;&bull; 数据通路为L1 Buffer(TPosition::A1)->L0A Buffer(TPosition::A2)时，支持数据类型为：int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t、int32_t、uint32_t、float。<br>&nbsp;&nbsp;&bull; 数据通路为L1 Buffer(TPosition::B1)->L0B Buffer(TPosition::B2)时，支持数据类型为：half、bfloat16_t、int32_t、uint32_t、float。 |
+| T | 源操作数和目的操作数的数据类型。支持的数据类型请参考[数据类型](#section4219135304818)。 |
 | defaultConfig | 控制是否在接口内部设置相关属性。 IsResetLoad3dConfig类型。IsResetLoad3dConfig结构定义如下：<br><pre>struct IsResetLoad3dConfig {<br>   bool isSetFMatrix = true;<br>   bool isSetPadding = true;<br>};</pre>isSetFMatrix配置为true，表示在接口内部设置FeatureMap的属性描述（包括l1H、l1W、padList，参数介绍参考[表3](#table193501032193419)）；设置为false，表示该接口传入的FeatureMap的属性描述不生效，开发者需要通过[SetFmatrix](../辅助配置接口/SetFmatrix.md)进行设置。<br>isSetPadding配置为true，表示在接口内部设置Pad属性描述（即padValue参数，参数介绍参考[表3](#table193501032193419)）；设置为false，表示该接口传入的Pad属性不生效，开发者需要通过[SetLoadDataPaddingValue](../辅助配置接口/SetLoadDataPaddingValue.md)进行设置。<br>该参数的默认值如下：<br><pre>constexpr IsResetLoad3dConfig IS_RESER_LOAD3D_DEFAULT_CONFIG = {true, true};</pre>特性细节可参考：[Feature Map、Pad属性描述寄存器设置](./LoadData_3D.md#zh-cn_topic_0000002512171652_section1881795134015)。 |
 | U | LoadData3DParamsV2中padValue的数据类型。<br>当dst、src使用基础数据类型时，U和dst、src的数据类型T需保持一致，否则编译失败。<br>最后一个模板参数仅用于上述数据类型检查，用户无需关注。 |
 
@@ -87,6 +87,12 @@ __aicore__ inline void LoadDataWithStride(const LocalTensor<T>& dst, const Local
 | filterSizeW | 是否在filterW的基础上将卷积核width增加256个元素。true，增加；false，不增加。默认为false。 |
 | filterSizeH | 是否在filterH的基础上将卷积核height增加256个元素。true，增加；false，不增加。默认为false。 |
 | fMatrixCtrl | 表示LoadData（卷积数据搬运） v2指令从左矩阵还是右矩阵获取FeatureMap的属性描述，与SetFmatrix配合使用，默认值为false。当前只支持设置为false。<br>&nbsp;&nbsp;&bull; true：从右矩阵中获取FeatureMap的属性描述；<br>&nbsp;&nbsp;&bull; false：从左矩阵中获取FeatureMap的属性描述。 |
+
+## 数据类型<a id="section4219135304818"></a>
+
+- 数据通路为L1 Buffer(TPosition::A1)->L0A Buffer(TPosition::A2)时，支持数据类型为：int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t、int32_t、uint32_t、float。
+
+- 数据通路为L1 Buffer(TPosition::B1)->L0B Buffer(TPosition::B2)时，支持数据类型为：half、bfloat16_t、int32_t、uint32_t、float。
 
 ## 返回值说明<a id="section4219135304919"></a>
 
