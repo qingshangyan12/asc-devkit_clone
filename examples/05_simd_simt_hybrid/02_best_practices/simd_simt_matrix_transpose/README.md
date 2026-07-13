@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例以矩阵转置为例，介绍Ascend C SIMD与SIMT混合编程方式下的访存优化思路。样例从直接全局内存转置出发，引入MTE搬运、UB中转与32×32分块，对比按tile分组启动Thread Block与固定Thread Block数两种映射方式，通过UB padding降低bank冲突，最后借助double buffer使MTE2搬运流水和SIMT VF流水并行，呈现SIMD与SIMT混合矩阵转置的调优路径。
+本样例以矩阵转置为例，介绍Ascend C SIMD与SIMT混合编程方式下的访存优化思路。样例从直接全局内存转置出发，引入MTE搬运、UB中转与32×32分块，对比按tile分组启动Thread Block与固定Thread Block数两种映射方式，通过UB padding降低bank冲突，最后借助双缓冲（Double Buffer）使MTE2搬运流水和SIMT VF流水并行，呈现SIMD与SIMT混合矩阵转置的调优路径。
 
 ## 支持的产品
 
@@ -55,7 +55,7 @@
 | 1    | `transpose_ub_2tile_kernel`    | `ceil(tiles / 2)` | 2048               | 引入MTE搬运、UB中转和32×32分块，按tile分组数量设置Thread Block数          |
 | 2    | `transpose_ub_2tile_kernel`    | `core`            | 2048               | Thread Block数固定为硬件vector core数，单个Thread Block循环处理多个tile组 |
 | 3    | `transpose_ub_pad_kernel`      | `core`            | 2048               | UB tile增加8列padding，降低转置读阶段的bank冲突                           |
-| 4    | `transpose_ub_pad_kernel`      | `core`            | 2048               | double buffer轮换，使MTE2搬运流水和SIMT VF流水并行                        |
+| 4    | `transpose_ub_pad_kernel`      | `core`            | 2048               | 双缓冲轮换，使MTE2搬运流水和SIMT VF流水并行                               |
 
 其中 `core`为硬件vector core数，通过 `aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)`在运行时查询获得。本样例中的性能数据基于 `core=64` 的测试环境采集得到。`tiles`为总tile数 `(W/32) × (H/32)`；处理1024×1024矩阵时，矩阵会被划分为32×32个tile，因此 `tiles=1024`。
 
@@ -262,17 +262,17 @@ Case 3只在Case 2基础上改变UB物理布局，不改变GM读写坐标和Thre
 
 ---
 
-### Case 4：MTE搬入UB后转置写回+padding+double buffer
+### Case 4：MTE搬入UB后转置写回+padding+双缓冲
 
-**优化目标**：在Case 3的基础上，通过两份padded UB buffer和双event id，使MTE2搬运流水和SIMT VF流水并行。
+**优化目标**：在Case 3的基础上，通过两份padded UB缓冲区和双event id，使MTE2搬运流水和SIMT VF流水并行。
 
 **核心实现**：
 
-- 使用两份buffer，每份buffer包含两个32×40 padded tile。
-- 两份buffer分别绑定 `EVENT_ID0`和 `EVENT_ID1`。
+- 使用两份缓冲区，每份缓冲区包含两个32×40 padded tile。
+- 两份缓冲区分别绑定 `EVENT_ID0`和 `EVENT_ID1`。
 - 先搬入第一组tile填充流水。
-- 循环中先为下一组tile发起MTE2搬入，再对当前buffer调用SIMT VF处理。
-- 当前buffer的VF处理完成后通知MTE2该buffer可复用。
+- 循环中先为下一组tile发起MTE2搬入，再对当前缓冲区调用SIMT VF处理。
+- 当前缓冲区的VF处理完成后通知MTE2该缓冲区可复用。
 
 ```cpp
 __ubuf__ float tile[2][TILES_PER_BLOCK][TILE_DIM][TILE_PAD_STRIDE];
@@ -316,7 +316,7 @@ for (uint32_t next_tile_base = curr_tile_base + loop_step; curr_tile_base < tota
 
 **分析**：
 
-Case 4通过double buffer提供物理隔离，避免MTE2写入覆盖SIMT VF正在读取的UB区域；通过双event id分别管理两份buffer的生命周期，将单buffer中的“MTE2搬完再VF、VF完再下一轮MTE2”的串行屏障，调整为相邻轮次之间的流水重叠。相比Case 3，Task Duration从11.856μs降低到8.950μs，耗时下降约24.5%。相比Case 0直接GM转置，Task Duration从36.140μs降低到8.950μs，整体性能提升约4.04倍。
+Case 4通过双缓冲提供物理隔离，避免MTE2写入覆盖SIMT VF正在读取的UB区域；通过双event id分别管理两份缓冲区的生命周期，将单缓冲中的“MTE2搬完再VF、VF完再下一轮MTE2”的串行屏障，调整为相邻轮次之间的流水重叠。相比Case 3，Task Duration从11.856μs降低到8.950μs，耗时下降约24.5%。相比Case 0直接GM转置，Task Duration从36.140μs降低到8.950μs，整体性能提升约4.04倍。
 
 ---
 
@@ -348,7 +348,7 @@ $$
 T_{theory} = \frac{8.39MB}{1.6TB/s} \approx 5.243μs
 $$
 
-Case 0距离理论下限较远，主要原因是转置写回导致同一Warp内相邻线程写地址跨行分散，GM写无法形成理想连续访问。Case 1通过UB中转把非连续访问转移到UB内部，GM侧访问连续性改善，但按tile分组启动512个Thread Block，调度开销较高。Case 2固定Thread Block数后减少了启动和调度开销，但转置读UB仍存在bank冲突。Case 3通过32×40的UB padding降低bank冲突后，耗时明显下降。Case 4进一步使用double buffer，使MTE2搬运流水和SIMT VF流水并行，Task Duration接近理论下限，但仍高于5.243μs，主要来自UB读写、MTE与V之间的同步、`asc_vf_call`调用开销、地址计算以及流水无法完全并行等非GM带宽开销。
+Case 0距离理论下限较远，主要原因是转置写回导致同一Warp内相邻线程写地址跨行分散，GM写无法形成理想连续访问。Case 1通过UB中转把非连续访问转移到UB内部，GM侧访问连续性改善，但按tile分组启动512个Thread Block，调度开销较高。Case 2固定Thread Block数后减少了启动和调度开销，但转置读UB仍存在bank冲突。Case 3通过32×40的UB padding降低bank冲突后，耗时明显下降。Case 4进一步使用双缓冲，使MTE2搬运流水和SIMT VF流水并行，Task Duration接近理论下限，但仍高于5.243μs，主要来自UB读写、MTE与V之间的同步、`asc_vf_call`调用开销、地址计算以及流水无法完全并行等非GM带宽开销。
 
 ## 调优建议
 
@@ -356,7 +356,7 @@ Case 0距离理论下限较远，主要原因是转置写回导致同一Warp内�
 
 分块后需要先确定Thread Block到tile的映射方式。按切分后的tile分组启动Thread Block实现简单，但当tile数远大于硬件vector core数时，会带来额外的启动和调度开销；将Thread Block数固定为硬件vector core数，并在kernel内循环处理多个tile组，可以降低这部分开销。线程数和单个Thread Block处理的tile数量需要结合寄存器、栈和实测耗时判断。
 
-当GM访问已经转为连续后，瓶颈会转移到UB访问和流水同步。转置读UB时，如果按列访问32×32的tile，容易出现bank冲突，可以通过padding改变UB物理布局；在SIMD与SIMT混合编程中还需要满足MTE搬运的对齐要求，因此本样例采用32×40的padded tile。在此基础上，double buffer通过两份UB buffer轮换，使当前buffer进入SIMT VF流水处理的同时，另一份buffer可由MTE2流水搬入下一批数据，从而实现MTE2搬运流水和SIMT VF流水并行，隐藏部分搬运开销。
+当GM访问已经转为连续后，瓶颈会转移到UB访问和流水同步。转置读UB时，如果按列访问32×32的tile，容易出现bank冲突，可以通过padding改变UB物理布局；在SIMD与SIMT混合编程中还需要满足MTE搬运的对齐要求，因此本样例采用32×40的padded tile。在此基础上，双缓冲通过两份UB缓冲区轮换，使当前缓冲区进入SIMT VF流水处理的同时，另一份缓冲区可由MTE2流水搬入下一批数据，从而实现MTE2搬运流水和SIMT VF流水并行，隐藏部分搬运开销。
 
 ## 编译运行
 
