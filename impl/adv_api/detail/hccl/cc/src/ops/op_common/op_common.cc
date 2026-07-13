@@ -1430,11 +1430,7 @@ HcclResult HcclGetCcuKernel(
     resCtxHost->ccuKernels.resize(totalKernelNum);
 
     while (currentResGroup <= maxResGroup) {
-        HCCL_INFO("[HcclWrapper-DEBUG] Calling HcommCcuKernelRegisterStart...");
-
         CcuResult regStartRet = HcommCcuKernelRegisterStart(insHandle);
-        HCCL_INFO("[HcclWrapper-DEBUG] HcommCcuKernelRegisterStart returned: %d", regStartRet);
-
         if (regStartRet != CCU_SUCCESS) {
             HCCL_ERROR("ccu kernel register start failed: ccuRet -> %d", regStartRet);
             return ConvertCcuToHccl(regStartRet);
