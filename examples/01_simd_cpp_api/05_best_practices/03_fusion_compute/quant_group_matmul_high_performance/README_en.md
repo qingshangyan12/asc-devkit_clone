@@ -466,7 +466,7 @@ Perform the following steps in the root directory of this sample to compile and 
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Operation mode: NPU operation, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 training series products/Atlas A2 inference series products and Atlas A3 training series products/Atlas A3 inference series products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
 
--Execution results
+- Execution results
   The execution results are as follows, indicating that the accuracy comparison is successful.
   ```bash
   test pass!

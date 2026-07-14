@@ -406,7 +406,7 @@ Ascend 950PR chip performance data:
 |------|------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
 | Basic API MxMatmul | 681.056 | 32 | 679.99 | 640.16 | 0.941 | 62.824 | 0.092 | 312.728 | 0.46 | 588.736 | 0.866 | 32.422 | 0.048 |
 
-It can be seen that this example has reached `94.1%` of theoretical peak performance (that is, `aic_mac_ratio` in the table).
+Cube computation accounts for `94.1%` of the AI Core time in this example (that is, `aic_mac_ratio` in the table).
 
 ### Cube Computation Performance Analysis
 
@@ -533,29 +533,34 @@ test pass!
 
 ### Introduction to the msOpProf Tool
 
-Use the `msOpProf` tool to obtain detailed performance data:
+msOpProf is a single-operator performance analysis tool with two usage modes: `msopprof` and `msopprof simulator`. It helps users identify anomalies in operator memory, code, and instructions for comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and file types (executables or operator binary `.o` files).
 
-```bash
-msopprof ./demo
-```
+- On-device performance collection
+
+    On-device performance collection directly measures the operator's execution time on the Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
+
+    Run msopprof on the `demo` executable for operator tuning:
+    ```
+    msopprof ./demo
+    ```
 
     - Performance data description  
       After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
 
       ```bash
-      ├──dump                       # Raw performance data, no user attention needed
-      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle ratio
-      ├──L2Cache.csv                # L2 Cache hit rate, affects MTE2, suggests reasonable data transfer logic to increase hit rate
-      ├──Memory.csv                 # UB, L1 and main memory read/write bandwidth rate
-      ├──MemoryL0.csv               # L0A, L0B, and L0C read/write bandwidth rate
-      ├──MemoryUB.csv               # Vector and Scalar to UB read/write bandwidth rate
-      ├──OpBasicInfo.csv            # Operator basic information
-      ├──PipeUtilization.csv        # Computation unit and transfer unit time and ratio
-      ├──ResourceConflictRatio.csv  # Bank group, bank conflict and resource conflict ratio on UB in all instructions
+      ├──dump                       # Raw performance data; users do not need to inspect it
+      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
+      ├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
+      ├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
+      ├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
+      ├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
+      ├──OpBasicInfo.csv            # Basic operator information
+      ├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
+      ├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
       └──visualize_data.bin         # MindStudio Insight presentation file
       ```
 
-View the specific performance analysis results:
+View the detailed performance analysis results:
 
 ```bash
 cat ./OPPROF_*/PipeUtilization.csv

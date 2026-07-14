@@ -106,8 +106,8 @@ The Matmul part of this example uses the same optimization methods as the [Matmu
 | Case | Optimization Method | Description |
 |------|---------|------|
 | [Case 1](../../01_matrix_compute/matmul_high_performance/README_en.md#case-1-single-core-tiling-optimization-single_core_tiling) | Single-core Tiling optimization | Optimize base block parameters, reduce memory-to-computation ratio |
-| [Case 2](../../01_matrix_compute/matmul_high_performance/README_en.md#case-2-multi-core-splitting-2x12-multi_core_split_2_12) | Multi-core splitting 2x12 | Introduce multi-core parallel computation, balanced load distribution |
-| [Case 3](../../01_matrix_compute/matmul_high_performance/README_en.md#case-3-multi-core-splitting-4x6-multi_core_split_4_6) | Multi-core splitting 4x6 | Optimize multi-core splitting strategy, 512B address alignment, reduce same-address access |
+| [Case 2](../../01_matrix_compute/matmul_high_performance/README_en.md#case-2-multi-core-split-2x12-multi_core_split_2_12) | Multi-core splitting 2x12 | Introduce multi-core parallel computation, balanced load distribution |
+| [Case 3](../../01_matrix_compute/matmul_high_performance/README_en.md#case-3-multi-core-split-4x6-multi_core_split_4_6) | Multi-core splitting 4x6 | Optimize multi-core splitting strategy, 512B address alignment, reduce same-address access |
 | [Case 4](../../01_matrix_compute/matmul_high_performance/README_en.md#case-4-multi-core-using-mdl-template-multi_core_mdl) | Multi-core using MDL template | Enable L1 multi-block cache, large packet transfer, reduce MTE2 loop transfer count |
 
 #### Gelu Optimization Methods
@@ -283,7 +283,7 @@ AscendC::DataCopyPad<float>(cGM[gmOffset], geluOutUB, copyOutParams);
 
 **Performance Data**
 
-> The following data is based on msopprof tool measurement, taking the median of 5 runs. Matrix specifications M=4096, K=1024, N=1536(A2)/N=1024(950PR), input data type float16, output data type float32.
+> The following data is based on msOpProf tool measurement, taking the median of 5 runs. Matrix specifications M=8192, K=8192, N=8192, input data type float16, output data type float32.
 
 ##### Atlas A2 Training Series Chip
 
@@ -315,9 +315,9 @@ This indicates that when using CV fusion, AIV Vector computation time is basical
 
 The figure below shows the pipeline parallel execution process of AIC and AIV in the Scenario 1 (CV Fusion-GM Relay) scenario. The AIC side completes Matmul computation and writes results to GM through Fixpipe, while the AIV side reads data from GM to complete GELU computation, both in pipeline parallelism at (baseM × baseN) block granularity:
 
-> 💡 The msOpProf tool requires the CANN commercial or community edition. For details, see the [msOpProf Tool Installation Guide](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md). The pipeline diagram was collected on device with `msopprof --aic-metrics=PipeTimeline ./demo`.
-
 ![Scenario1 CV Fusion-GM Relay Pipeline Parallelism](figures/CVParallell_L0C_GM_UB.png)
+
+> 💡 The msOpProf tool requires the CANN commercial or community edition. For details, see the [msOpProf Tool Installation Guide](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md). The pipeline diagram was collected on device with `msopprof --aic-metrics=PipeTimeline ./demo`.
 
 **Reason for Significant MTE2 Time Reduction:**
 
@@ -372,7 +372,7 @@ AscendC::DataCopyPad<float>(cGM[mBlockIdx * baseM * N + nBlockIdx * baseN + loca
 
 **Performance Data**
 
-> The following data is based on msopprof tool measurement, taking the median of 5 runs. Matrix specifications M=4096, K=1024, N=1024, input data type float16, output data type float32.
+> The following data is based on msOpProf tool measurement, taking the median of 5 runs. Matrix specifications M=8192, K=8192, N=8192, input data type float16, output data type float32.
 
 ##### Ascend 950PR Chip
 
@@ -483,25 +483,31 @@ AscendC::DumpTensor(yLocal, 1, 16);
 
 ### Introduction to the msOpProf Tool
 
-Use the `msOpProf` tool to obtain detailed performance data:
+`msOpProf` is a single-operator performance analysis tool. It offers two usage methods: `msopprof` and `msopprof simulator`. The tool helps users identify anomalies in operator memory, operator code, and operator instructions, enabling comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and different file types (executables or operator binary `.o` files).
 
-```bash
-msopprof ./demo   # Analyze example performance
-```
+- On-device performance collection
+
+    On-device performance collection directly measures the execution time of an operator on an Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
+
+    Run operator tuning on the executable demo with `msopprof`:
+
+    ```
+    msopprof ./demo
+    ```
 
     - Performance data description  
       After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
 
       ```bash
-      ├──dump                       # Raw performance data, no user attention needed
-      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle ratio
-      ├──L2Cache.csv                # L2 Cache hit rate, affects MTE2, suggests reasonable data transfer logic to increase hit rate
-      ├──Memory.csv                 # UB, L1 and main memory read/write bandwidth rate
-      ├──MemoryL0.csv               # L0A, L0B, and L0C read/write bandwidth rate
-      ├──MemoryUB.csv               # Vector and Scalar to UB read/write bandwidth rate
-      ├──OpBasicInfo.csv            # Operator basic information
-      ├──PipeUtilization.csv        # Computation unit and transfer unit time and ratio
-      ├──ResourceConflictRatio.csv  # Bank group, bank conflict and resource conflict ratio on UB in all instructions
+      ├──dump                       # Raw performance data; users do not need to inspect it
+      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
+      ├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
+      ├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
+      ├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
+      ├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
+      ├──OpBasicInfo.csv            # Basic operator information
+      ├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
+      ├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
       └──visualize_data.bin         # MindStudio Insight presentation file
       ```
 

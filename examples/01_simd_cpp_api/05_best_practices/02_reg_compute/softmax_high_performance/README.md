@@ -78,7 +78,7 @@ $$
 | 字段名 | 字段含义 |
 |:---:|:---|
 | aiv_total_cycle | vector单算子端到端cycle数。 |
-| aiv_vec_raito | vector类型指令在端到端耗时中比率。 |
+| aiv_vec_ratio | vector类型指令在端到端耗时中比率。 |
 
 **说明**：
 1. 本例针对单核Softmax内VF性能优化详解，当前不考虑多核切分、数据搬运、DoubleBuffer等因素影响。

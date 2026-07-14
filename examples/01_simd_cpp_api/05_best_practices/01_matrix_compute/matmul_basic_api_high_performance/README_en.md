@@ -153,7 +153,7 @@ if ((kOffsetInChunkA + 1) == stepKa) {
 
 #### 3. Multi-Core Parallel Splitting
 
-Split the matrix evenly along M/N directions to multiple cores for parallel computation. The 4×6 splitting strategy (4 blocks in M direction, 6 blocks in N direction, 24 cores total) satisfies 512B address alignment and reduces same-address access conflicts:
+Split the matrix evenly along the M/N directions for parallel computation across multiple cores. On Atlas A2/A3 (`dav-2201`), use a 4×6 splitting strategy (4 blocks in the M direction and 6 blocks in the N direction, 24 cores in total) to satisfy 512B address alignment and reduce same-address access conflicts. On Ascend 950PR/Ascend 950DT (`dav-3510`), use a 32-core split (see the performance data section below):
 
 ```cpp
 constexpr uint32_t mIter = DivCeil(M, singleCoreM);
@@ -392,6 +392,30 @@ Ascend 950PR Chip (baseM=256, baseN=256):
 
 $$Total Read Data = \left(\frac{N}{baseN} \times M \times K + \frac{M}{baseM} \times K \times N\right) \times sizeof(half) = (32 \times 8192 \times 8192 + 32 \times 8192 \times 8192) \times 2B = 8GB$$
 
+**Theoretical MTE2 Duration**:
+
+Atlas A2 Training Series Chip: The peak L2 Cache bandwidth is approximately 5 TB/s, and the HBM bandwidth is approximately 1.8 TB/s. Data is first read from HBM and subsequently read from the L2 Cache.
+
+$$Total\ Data\ First\ Read\ from\ HBM = M \times K \times sizeof(half) + K \times N \times sizeof(half) = 256MB$$
+
+$$Theoretical\ MTE2\ Duration = \frac{Data\ Read\ from\ HBM}{1.8TB/s} + \frac{Data\ Read\ from\ L2Cache}{5TB/s}$$
+
+MTE2 duration error:
+
+$$MTE2\ Duration\ Error = \frac{3487.068 - 2672.44}{2672.44} = 30.48\%$$
+
+The current MTE2 duration differs significantly from the theoretical value because the actual chip has only 192 MB of L2 Cache and the current L2 Cache splitting strategy is relatively simple. In addition, when MTE2 performs an ND2NZ transfer, where GM data uses the ND layout and must be converted from ND to NZ while being transferred to L1, the L2 Cache bandwidth decreases. Users can further optimize the L2 Cache splitting strategy to improve MTE2 bandwidth.
+
+Ascend 950PR Chip: The peak L2 Cache bandwidth is approximately 5 TB/s, and the HBM bandwidth is approximately 1.6 TB/s.
+
+$$Theoretical\ MTE2\ Duration = \frac{Data\ Read\ from\ HBM}{1.6TB/s} + \frac{Data\ Read\ from\ L2Cache}{5TB/s}$$
+
+MTE2 duration error:
+
+$$MTE2\ Duration\ Error = \frac{1874.267 - 1832.10}{1832.10} = 2.30\%$$
+
+Compared with the Atlas A2 Training Series Chip, the Ascend 950PR Chip transfers data more efficiently and achieves higher MTE2 bandwidth utilization.
+
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
@@ -437,7 +461,7 @@ Run the following steps in the root directory of this example to build and run t
   | Option | Values | Description |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`, `dav-3510` | NPU hardware architecture: dav-2201 corresponds to A2/A3, dav-3510 corresponds to Ascend 950PR |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`, `dav-3510` | NPU hardware architecture: dav-2201 corresponds to A2/A3, dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `1`, `2` | Scenario number: 1=L2Cache splitting disabled, 2=L2Cache splitting enabled |
 
 - Execution results
@@ -477,26 +501,31 @@ AscendC::DumpTensor(cLocal, baseM * baseN);
 
 ## Performance Debugging
 
-### msOpProf Tool Introduction
+### Introduction to the msOpProf Tool
 
-Use the `msOpProf` tool to obtain detailed performance data:
+msOpProf is a single-operator performance analysis tool with two usage modes: `msopprof` and `msopprof simulator`. It helps users identify anomalies in operator memory, code, and instructions for comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and file types (executables or operator binary `.o` files).
 
-```bash
-msopprof ./demo   # Analyze example performance
-```
+- On-device performance collection
+
+    On-device performance collection directly measures the operator's execution time on the Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
+
+    Run msopprof on the `demo` executable for operator tuning:
+    ```
+    msopprof ./demo
+    ```
 
     - Performance data description
       After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
 
       ```bash
-      ├──dump                       # Raw performance data, no user attention needed
-      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle ratio
-      ├──L2Cache.csv                # L2 Cache hit rate, affects MTE2, suggests reasonable data transfer logic to increase hit rate
-      ├──Memory.csv                 # UB, L1 and main memory read/write bandwidth rate
-      ├──MemoryL0.csv               # L0A, L0B, and L0C read/write bandwidth rate
-      ├──MemoryUB.csv               # Vector and Scalar to UB read/write bandwidth rate
-      ├──OpBasicInfo.csv            # Operator basic information
-      ├──PipeUtilization.csv        # Computation unit and transfer unit time and ratio
-      ├──ResourceConflictRatio.csv  # Bank group, bank conflict and resource conflict ratio on UB in all instructions
+      ├──dump                       # Raw performance data; users do not need to inspect it
+      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
+      ├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
+      ├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
+      ├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
+      ├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
+      ├──OpBasicInfo.csv            # Basic operator information
+      ├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
+      ├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
       └──visualize_data.bin         # MindStudio Insight presentation file
       ```

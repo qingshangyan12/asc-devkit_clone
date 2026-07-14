@@ -236,6 +236,16 @@ The input shapes for each scenario are shown in [Table 2](#table2). This section
 - scaleA input shape is `[scaleK/2, m, 2]`, scaleB input shape is `[scaleK/2, n, 2]`.
 - A matrix m direction transfers extra dirty data exceeding 1 fractal, `MmadMx` needs to set `mmadParams.m = CeilAlign(m, fractalShape[0] * fractalNum)`, `Fixpipe` skips results from invalid fractals during transfer out.
 
+<div align="center">
+  <img src="figures/whole_process/B4_A_scaleA_trans_KM.png" width="1000"><br>
+  Figure 3: Scenario 2 MX matrix multiplication GM -> L1 -> L0A / L0A_MX flow diagram
+</div>
+
+<div align="center">
+  <img src="figures/whole_process/B4_B_scaleB_trans_KN.png" width="1000"><br>
+  Figure 4: Scenario 2 MX matrix multiplication GM -> L1 -> L0B / L0B_MX flow diagram
+</div>
+
 **Scenario 3: FP8 data type input, isAtranspose=false, isBtranspose=true**
 
 Similar to scenario 1, but data type is FP8.
@@ -243,6 +253,16 @@ Similar to scenario 1, but data type is FP8.
 - A and B matrix L1 -> L0 transfers both do not need transpose, `LoadData2DParamsV2` `ifTranspose = false`.
 - scaleA input shape is `[m, scaleK]`, scaleB input shape is `[n, scaleK]`.
 - In FP8 data type, when A matrix non-transposed input `[m, k]` and B matrix transposed input `[n, k]`, k is in col direction. `DataCopy` only aligns k direction to 32B. Need to flush k direction tail data to 0 on L1 to prevent dirty data from participating in computation.
+
+<div align="center">
+  <img src="figures/whole_process/B8_A_scaleA_.png" width="1000"><br>
+  Figure 5: Scenario 3 MX matrix multiplication GM -> L1 -> L0A / L0A_MX flow diagram
+</div>
+
+<div align="center">
+  <img src="figures/whole_process/B8_B_scaleB_NK.png" width="1000"><br>
+  Figure 6: Scenario 3 MX matrix multiplication GM -> L1 -> L0B / L0B_MX flow diagram
+</div>
 
 **Scenario 4: FP8 data type input, isAtranspose=true, isBtranspose=false**
 
@@ -253,6 +273,16 @@ Similar to scenario 2, but data type is FP8.
 - A matrix m direction transfers extra dirty data exceeding 1 fractal, `MmadMx` needs to set `mmadParams.m = CeilAlign(m, fractalShape[0] * fractalNum)`.
 - When A matrix transposed input `[k, m]` and B matrix non-transposed input `[k, n]`, both need to flush remaining dirty data in k direction to 0 on L1.
 
+<div align="center">
+  <img src="figures/whole_process/B8_A_scaleA_trans_KM.png" width="1000"><br>
+  Figure 7: Scenario 4 MX matrix multiplication GM -> L1 -> L0A / L0A_MX flow diagram
+</div>
+
+<div align="center">
+  <img src="figures/whole_process/B8_B_scaleB_trans_KN.png" width="1000"><br>
+  Figure 8: Scenario 4 MX matrix multiplication GM -> L1 -> L0B / L0B_MX flow diagram
+</div>
+
 **Scenario 5: FP4 data type input, isAtranspose=true, isBtranspose=false**
 
 - A matrix transposed input `[k, m]`, L1 -> L0A needs transpose, uses for loop to call `LoadData` for transfer.
@@ -260,6 +290,16 @@ Similar to scenario 2, but data type is FP8.
 - B matrix non-transposed input `[k, n]`, L1 -> L0B needs transpose, single call `LoadData` for transfer, `LoadData2DParamsV2` `ifTranspose = true`.
 - scaleA input shape is `[scaleK/2, m, 2]`, scaleB input shape is `[scaleK/2, n, 2]`.
 - Both A and B matrices need to flush remaining dirty data in k direction to 0 on L1.
+
+<div align="center">
+  <img src="figures/whole_process/B4_A_scaleA_for_trans_KM.png" width="1000"><br>
+  Figure 9: Scenario 5 MX matrix multiplication GM -> L1 -> L0A / L0A_MX flow diagram
+</div>
+
+<div align="center">
+  <img src="figures/whole_process/B4_B_scaleB_trans_KN.png" width="1000"><br>
+  Figure 10: Scenario 5 MX matrix multiplication GM -> L1 -> L0B / L0B_MX flow diagram
+</div>
 
 **Scenario 6: FP8 data type input, isAtranspose=true, isBtranspose=false**
 
@@ -269,6 +309,16 @@ Similar to scenario 5, but data type is FP8.
 - B matrix non-transposed input `[k, n]`, L1 -> L0B needs transpose, single call `LoadData` for transfer, `LoadData2DParamsV2` `ifTranspose = true`.
 - scaleA input shape is `[scaleK/2, m, 2]`, scaleB input shape is `[scaleK/2, n, 2]`.
 - Both A and B matrices need to flush remaining dirty data in k direction to 0 on L1.
+
+<div align="center">
+  <img src="figures/whole_process/B8_A_scaleA_for_trans_KM.png" width="1000"><br>
+  Figure 11: Scenario 6 MX matrix multiplication GM -> L1 -> L0A / L0A_MX flow diagram
+</div>
+
+<div align="center">
+  <img src="figures/whole_process/B8_B_scaleB_trans_KN.png" width="1000"><br>
+  Figure 12: Scenario 6 MX matrix multiplication GM -> L1 -> L0B / L0B_MX flow diagram
+</div>
 
 ### 3. Parameter Description
 
@@ -319,7 +369,7 @@ The subsequent code and parameter descriptions repeatedly use fractal, alignment
   </tr>
 </table>
 
-- `CeilAlign`: Ceiling alignment operation. For example, when `m = 30`, `CeilAlign(30, 16) = 32`.
+- `CeilAlign`: Ceiling alignment operation. For example, when `m = 30`, `CeilAlign(30, 16) = 32`, meaning that the m-axis is aligned to 16 and its aligned length is 32.
 
 ```cpp
 __aicore__ inline uint16_t CeilAlign(uint16_t size, uint16_t alignValue) {
@@ -328,7 +378,7 @@ __aicore__ inline uint16_t CeilAlign(uint16_t size, uint16_t alignValue) {
 ```
 
 - `CeilDivision`: Ceiling division, generally used to compute loop counts after ceiling alignment.
-- `mAlignValue`: m axis aligns to `mAlignValue`. Similarly `nAlignValue`, `kAlignValue`.
+- `mAlignValue`: m axis aligns to `mAlignValue`. For example, when `mAlignValue = 16`, the m axis is aligned to 16. Similarly `nAlignValue`, `kAlignValue`.
 - `mAlignL1` and `mAlignL0`: Aligned values of m axis when A matrix is on L1 and L0A respectively. Similarly `kaAlignL1`, `kaAlignL0`, `nAlignL1`, `nAlignL0`, `kbAlignL1`, `kbAlignL0`.
 
 
@@ -1168,16 +1218,18 @@ Run the following steps in the root directory of this example to build and run t
   python3 -m pip install ml_dtypes==0.2.0 en_dtypes==0.0.4
   ```
 
+  If the preceding dependencies are not installed, the script cannot correctly generate FP4/FP8 input data and ground truth data, which may cause accuracy verification to fail.
+
 - Run the example
 
   Run the following commands in the example directory.
   ```bash
   SCENARIO_NUM=1
-  mkdir -p build && cd build;
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;
-  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM
-  ./demo
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin
+  mkdir -p build && cd build;      # Create and enter the build directory
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;    # Build the project, default NPU mode
+  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # Generate test input data
+  ./demo                           # Run the generated executable and execute the example
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # Verify that the output is correct and confirm the algorithm logic
   ```
   To use CPU debug or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
 

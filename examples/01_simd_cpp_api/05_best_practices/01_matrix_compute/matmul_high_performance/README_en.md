@@ -574,30 +574,30 @@ Perform the following steps in the root directory of this sample to compile and 
 
 ## Performance Analysis
 
-### msOpProf tool introduction
-The msOpProf tool is a single operator performance analysis tool. Contains two usage methods: msopprof and msopprof simulator. This tool assists users in locating exceptions in operator memory, operator code, and operator instructions, and achieves comprehensive operator tuning. Currently, performance data collection and automatic analysis are supported based on different operating modes (board or simulation) and different file formats (executable files or operator binary .o files).
+### Introduction to the msOpProf Tool
+msOpProf is a single-operator performance analysis tool with two usage modes: `msopprof` and `msopprof simulator`. It helps users identify anomalies in operator memory, code, and instructions for comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and file types (executables or operator binary `.o` files).
 
-- On-board performance collection
+- On-device performance collection
 
-    Through on-board performance collection, the running time on the operator's Ascend AI processor can be directly measured. This method is suitable for quickly locating operator performance problems in the board environment.
+    On-device performance collection directly measures the operator's execution time on the Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
 
-    Operator tuning is performed through msopprof based on the executable file demo:
+    Run msopprof on the `demo` executable for operator tuning:
     ```
     msopprof ./demo
     ```
 
-    - Description of performance data
-      After the command is completed, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. An example of the performance data folder structure is as follows:
+    - Performance data description
+      After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
 
       ```bash
-      ├──dump                       # Raw performance data, users do not need to pay attention
-      ├──ArithmeticUtilization.csv  # Cube/vector instruction cycle proportion
-      ├──L2Cache.csv                # L2 Cache hit rate affects MTE2. It is recommended to rationally plan data transfer logic to increase the hit rate.
-      ├──Memory.csv                 # UB, L1 and main memory read and write bandwidth rates
-      ├──MemoryL0.csv               # L0A, L0B, and L0C read and write bandwidth rates
-      ├──MemoryUB.csv               # Read and write bandwidth rates from Vector and Scalar to UB
-      ├──OpBasicInfo.csv            # Basic information about operators
-      ├──PipeUtilization.csv        # Collect the time consumption and proportion of computing units and handling units
-      ├──ResourceConflictRatio.csv  # The proportion of bank group, bank conflict and resource conflict rate on UB among all instructions
-      └──visualize_data.bin         # MindStudio Insight presentation files
+      ├──dump                       # Raw performance data; users do not need to inspect it
+      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
+      ├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
+      ├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
+      ├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
+      ├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
+      ├──OpBasicInfo.csv            # Basic operator information
+      ├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
+      ├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
+      └──visualize_data.bin         # MindStudio Insight presentation file
       ```

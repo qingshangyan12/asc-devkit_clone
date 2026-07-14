@@ -63,6 +63,7 @@ $$
 
 ## Version Overview
 
+**Table 1 Performance and Optimization Description for Each Version**
 | Version | API Type | Characteristics | Performance (Converted Vector Instruction Cost) |
 |:---:|:---|:---|:---:|
 | **Case 0** | MemBase | Baseline version, all computation in a single loop | 44113 cycles |

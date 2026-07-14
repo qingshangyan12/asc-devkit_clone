@@ -39,8 +39,8 @@ This example demonstrates how to use the `clock()` interface in SIMT programming
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center">gather</td></tr>
   <tr><td align="center"></td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td rowspan="2" align="center">Example Input</td><td align="center">input</td><td align="center">[100000]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td align="center">index</td><td align="center">[8192]</td><td align="center">int32_t</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">Example Output</td><td align="center">output</td><td align="center">[8192]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">index</td><td align="center">[12288]</td><td align="center">int32_t</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">Example Output</td><td align="center">output</td><td align="center">[12288]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">simt_gather</td></tr>
   </table>
 
