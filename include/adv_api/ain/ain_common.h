@@ -85,6 +85,34 @@ enum AinMemoryOrder {
     AIN_MEMORY_ORDER_DEFAULT
 };
 
+constexpr uint32_t AIN_URMA_ODR_SHIFT = 0U;
+constexpr uint32_t AIN_URMA_FENCE_SHIFT = 3U;
+constexpr uint32_t AIN_URMA_SE_SHIFT = 4U;
+constexpr uint32_t AIN_URMA_CQE_SHIFT = 5U;
+constexpr uint32_t AIN_URMA_INLINE_EN_SHIFT = 6U;
+
+// 默认配置为AIN_URMA_ODR_STRONG | AIN_URMA_FENCE_ON | AIN_URMA_SE_OFF | AIN_URMA_CQE_ON | AIN_URMA_INLINE_EN_OFF
+constexpr uint32_t AIN_URMA_DEFAULT_CONFIG = (5U << AIN_URMA_ODR_SHIFT) | (1U << AIN_URMA_FENCE_SHIFT) |
+                                             (0U << AIN_URMA_SE_SHIFT) | (1U << AIN_URMA_CQE_SHIFT) |
+                                             (0U << AIN_URMA_INLINE_EN_SHIFT);
+
+constexpr uint32_t AIN_URMA_ODR_UNORDERED = 0U << AIN_URMA_ODR_SHIFT;
+constexpr uint32_t AIN_URMA_ODR_RELAXED = 3U << AIN_URMA_ODR_SHIFT;
+constexpr uint32_t AIN_URMA_ODR_STRONG = 5U << AIN_URMA_ODR_SHIFT;
+constexpr uint32_t AIN_URMA_FENCE_OFF = 0U << AIN_URMA_FENCE_SHIFT;
+constexpr uint32_t AIN_URMA_FENCE_ON = 1U << AIN_URMA_FENCE_SHIFT;
+constexpr uint32_t AIN_URMA_SE_OFF = 0U << AIN_URMA_SE_SHIFT;
+constexpr uint32_t AIN_URMA_SE_ON = 1U << AIN_URMA_SE_SHIFT;
+constexpr uint32_t AIN_URMA_CQE_OFF = 0U << AIN_URMA_CQE_SHIFT;
+constexpr uint32_t AIN_URMA_CQE_ON = 1U << AIN_URMA_CQE_SHIFT;
+constexpr uint32_t AIN_URMA_INLINE_EN_OFF = 0U << AIN_URMA_INLINE_EN_SHIFT;
+constexpr uint32_t AIN_URMA_INLINE_EN_ON = 1U << AIN_URMA_INLINE_EN_SHIFT;
+
+template <uint32_t flags = AIN_URMA_DEFAULT_CONFIG>
+struct AinUrmaConfig {
+    static constexpr uint32_t value = flags;
+};
+
 } // namespace AscendC
 
 #endif // INCLUDE_ADV_API_AIN_AIN_COMMON_H

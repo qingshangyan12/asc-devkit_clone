@@ -59,6 +59,31 @@ struct AinIsSame { static constexpr bool value = false; };
 template <typename T>
 struct AinIsSame<T, T> { static constexpr bool value = true; };
 
+template <typename Config>
+struct AinUrmaWqeConfig;
+
+template <uint32_t flags>
+struct AinUrmaWqeConfig<AinUrmaConfig<flags>> {
+    static constexpr uint32_t valueMask = 0x7FU;
+    static_assert((flags & ~valueMask) == 0U, "Invalid Ain URMA config flags");
+
+    static constexpr uint32_t odr = (flags >> AIN_URMA_ODR_SHIFT) & 0x7U;
+    static constexpr uint32_t fence = (flags >> AIN_URMA_FENCE_SHIFT) & 0x1U;
+    static constexpr uint32_t se = (flags >> AIN_URMA_SE_SHIFT) & 0x1U;
+    static constexpr uint32_t cqe = (flags >> AIN_URMA_CQE_SHIFT) & 0x1U;
+    static constexpr uint32_t inlineEn = (flags >> AIN_URMA_INLINE_EN_SHIFT) & 0x1U;
+
+    static_assert(odr == 0U || odr == 3U || odr == 5U, "Invalid Ain URMA odr");
+
+    inline static constexpr UrmaWqeEntry value = {
+        .odr = odr,
+        .fence = fence,
+        .se = se,
+        .cqe = cqe,
+        .inlineEn = inlineEn,
+    };
+};
+
 template <unsigned commEngineMask>
 AIN_DEVICE Ain::Ain(AinDevComm devComm, int contextIndex)
     : devComm_(reinterpret_cast<uint64_t>(devComm)), contextIndex_(contextIndex) {}
@@ -78,16 +103,18 @@ AIN_DEVICE void Ain::flush()
     }
 }
 
-template <typename RemoteAction, typename LocalAction, typename DescriptorUbuf>
+template <typename RemoteAction, typename LocalAction, typename DescriptorUbuf, typename Config>
 AIN_DEVICE void Ain::put(AinTeam team, uint32_t peer, AinCommSymWindow dstWin, uint64_t dstOffset,
                          AinCommSymWindow srcWin, uint64_t srcOffset, uint64_t bytes, RemoteAction remoteAction,
-                         LocalAction localAction, const DescriptorUbuf &ubuf, AinCommitFlags commitFlags)
+                         LocalAction localAction, const DescriptorUbuf &ubuf, AinCommitFlags commitFlags,
+                         Config config)
 {
     static_assert(!AinIsSame<DescriptorUbuf, AinDescriptorUbufNone>::value,
                   "put requires a valid DescriptorUbuf; AinDescriptorUbufNone is not allowed");
     (void)team;
     (void)remoteAction;
     (void)localAction;
+    (void)config;
     hcomm_.Init(ubuf.addr, ubuf.bytes);
 
     uint32_t dstWinIdx = decode_window(dstWin);
@@ -103,20 +130,23 @@ AIN_DEVICE void Ain::put(AinTeam team, uint32_t peer, AinCommSymWindow dstWin, u
         channelEntity->localBufferAddr[srcWinIdx].bufferInfo.rma.addr + srcOffset);
 
     if (commitFlags == AIN_COMMIT_DELAYED) {
-        hcomm_.WriteNbi<false>(channel, remoteAddr, localAddr, bytes);
+        hcomm_.template WriteNbi<false, PIPE_S, PIPE_MTE3, AinUrmaWqeConfig<Config>::value>(
+            channel, remoteAddr, localAddr, bytes);
     } else {
-        hcomm_.WriteNbi(channel, remoteAddr, localAddr, bytes);
+        hcomm_.template WriteNbi<true, PIPE_S, PIPE_MTE3, AinUrmaWqeConfig<Config>::value>(
+            channel, remoteAddr, localAddr, bytes);
     }
 }
 
-template <typename DescriptorUbuf>
+template <typename DescriptorUbuf, typename Config>
 AIN_DEVICE void Ain::get(AinTeam team, uint32_t peer, AinCommSymWindow dstWin, uint64_t dstOffset,
                          AinCommSymWindow srcWin, uint64_t srcOffset, uint64_t bytes, const DescriptorUbuf &ubuf,
-                         AinCommitFlags commitFlags)
+                         AinCommitFlags commitFlags, Config config)
 {
     static_assert(!AinIsSame<DescriptorUbuf, AinDescriptorUbufNone>::value,
                   "get requires a valid DescriptorUbuf; AinDescriptorUbufNone is not allowed");
     (void)team;
+    (void)config;
     hcomm_.Init(ubuf.addr, ubuf.bytes);
 
     uint32_t dstWinIdx = decode_window(dstWin);
@@ -132,9 +162,11 @@ AIN_DEVICE void Ain::get(AinTeam team, uint32_t peer, AinCommSymWindow dstWin, u
         channelEntity->localBufferAddr[srcWinIdx].bufferInfo.rma.addr + srcOffset);
 
     if (commitFlags == AIN_COMMIT_DELAYED) {
-        hcomm_.ReadNbi<false>(channel, remoteAddr, localAddr, bytes);
+        hcomm_.template ReadNbi<false, PIPE_S, PIPE_MTE3, AinUrmaWqeConfig<Config>::value>(
+            channel, remoteAddr, localAddr, bytes);
     } else {
-        hcomm_.ReadNbi(channel, remoteAddr, localAddr, bytes);
+        hcomm_.template ReadNbi<true, PIPE_S, PIPE_MTE3, AinUrmaWqeConfig<Config>::value>(
+            channel, remoteAddr, localAddr, bytes);
     }
 }
 

@@ -70,11 +70,12 @@ public:
      * @note Requires a valid DescriptorUbuf; AinDescriptorUbufNone is rejected at compile time.
      */
     template <typename RemoteAction = AinRemoteNone, typename LocalAction = AinLocalNone,
-              typename DescriptorUbuf = AinDescriptorUbuf>
+              typename DescriptorUbuf = AinDescriptorUbuf, typename Config = AinUrmaConfig<>>
     AIN_DEVICE void put(AinTeam team, uint32_t peer, AinCommSymWindow dstWin, uint64_t dstOffset,
                         AinCommSymWindow srcWin, uint64_t srcOffset, uint64_t bytes,
                         RemoteAction remoteAction = AinRemoteNone{}, LocalAction localAction = AinLocalNone{},
-                        const DescriptorUbuf &ubuf = DescriptorUbuf{}, AinCommitFlags commitFlags = AIN_COMMIT_IMMED);
+                        const DescriptorUbuf &ubuf = DescriptorUbuf{}, AinCommitFlags commitFlags = AIN_COMMIT_IMMED,
+                        Config config = Config{});
 
     /*!
      * @brief Issue a one-sided read (get) of len bytes from a remote peer's window into a local window.
@@ -90,11 +91,11 @@ public:
      * @param [in] commitFlags: AIN_COMMIT_IMMED to ring the doorbell now, AIN_COMMIT_DELAYED to batch.
      * @note Requires a valid DescriptorUbuf; AinDescriptorUbufNone is rejected at compile time.
      */
-    template <typename DescriptorUbuf = AinDescriptorUbuf>
+    template <typename DescriptorUbuf = AinDescriptorUbuf, typename Config = AinUrmaConfig<>>
     AIN_DEVICE void get(AinTeam team, uint32_t peer, AinCommSymWindow dstWin, uint64_t dstOffset,
                         AinCommSymWindow srcWin, uint64_t srcOffset, uint64_t bytes,
                         const DescriptorUbuf &ubuf = DescriptorUbuf{},
-                        AinCommitFlags commitFlags = AIN_COMMIT_IMMED);
+                        AinCommitFlags commitFlags = AIN_COMMIT_IMMED, Config config = Config{});
 
     uint64_t devComm_;
 
