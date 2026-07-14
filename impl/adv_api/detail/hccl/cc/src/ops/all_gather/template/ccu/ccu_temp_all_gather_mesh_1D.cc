@@ -46,6 +46,7 @@ HcclResult CcuTempAllGatherMesh1D::CalcRes(
     // 创建每个kernel的ctxArg，放入kernelInfo, 然后将kernelinfo放入resourceRequest.ccuKernelInfos
     CcuKernelInfo kernelInfo;
 
+    strcpy(kernelInfo.kernelFuncName, "CcuKernelAllGatherMesh1D");
     kernelInfo.creator = [](const hcomm::CcuKernelArg& arg) { return std::make_unique<CcuKernelAllGatherMesh1D>(arg); };
 
     std::vector<HcclChannelDesc> channelDescs;
