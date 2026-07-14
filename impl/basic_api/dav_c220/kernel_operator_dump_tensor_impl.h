@@ -148,7 +148,7 @@ __aicore__ constexpr inline Internal::DumpTensorDataType GetTensorDataType()
 template <class... Args>
 __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
-    __asc_aicore::printf_impl(fmt, args...);
+    __asc_aicore::printf(fmt, args...);
 }
 
 __aicore__ inline void DumpTimeStampImpl(uint32_t descId)

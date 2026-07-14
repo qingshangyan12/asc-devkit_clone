@@ -141,7 +141,7 @@ __aicore__ inline uint32_t GetStringLength(__gm__ const char* s)
 template <class... Args>
 __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
-    __asc_aicore::printf_impl(fmt, args...);
+    __asc_aicore::printf(fmt, args...);
 }
 
 __aicore__ inline void EnablePrintf()
