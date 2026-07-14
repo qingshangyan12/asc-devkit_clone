@@ -10,7 +10,6 @@
 
 set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_kfc_server.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_mesh1d.cc
 )
 
 target_sources(mc2_client PRIVATE
