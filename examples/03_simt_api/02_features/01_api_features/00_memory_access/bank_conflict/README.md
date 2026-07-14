@@ -19,7 +19,8 @@
 │   ├── figures              // README中的图片资源
 │   ├── bank_conflict.asc    // SIMT UB Bank冲突样例实现
 │   ├── CMakeLists.txt       // cmake编译文件
-│   └── README.md
+│   ├── README.md            // 样例说明文档
+│   └── README_en.md         // 样例说明文档
 ```
 
 ## 样例描述
@@ -52,7 +53,6 @@ Host侧构造输入数组并拷贝到GM，kernel先将输入数据从GM搬入UB�
 SIMT场景下，同一个Warp内的多个线程可能在同一条UB访问指令中同时访问UB；当这些访问数据属于同一个bank group的相同编号的subbank资源时，例如同时访问bank0和bank8的subbank2，硬件无法在一个周期内处理全部请求，需要排队等待，从而形成subbank冲突并增加访问延迟；如果这些访问数据属于同一个subbank的同一行内的8B地址范围，硬件会将这些请求合并处理，不会形成subbank冲突。
 
 **图 1**  bank结构示意图
-
 ![](./figures/bank结构示意图.png)
 
 ### 地址编码规则
@@ -60,7 +60,6 @@ SIMT场景下，同一个Warp内的多个线程可能在同一条UB访问指令�
 UB地址采用低位交织，如下图所示，连续地址按32B粒度映射到bank0到bank15：第1个32B地址段映射到bank0，第2个映射到bank1，依次类推；第16个映射到bank15，第17个映射回bank0的下一行。
 
 **图 2**  bank内存排布示意图
-
 ![](./figures/bank内存排布示意图.png)
 
 SIMT编程方式下subbank冲突主要有以下几种：
