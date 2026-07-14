@@ -37,7 +37,7 @@
 - 当GM上地址addr已经在DCache缓存并且其对应的Cache Line标记为“脏”（dirty，表示该数据已被修改但尚未写回到GM）时，开发者应该在WriteGmByPassDCache接口之前调用[DataCacheCleanAndInvalid](../缓存控制/DataCacheCleanAndInvalid.md)接口将addr对应的Cache Line立即写回GM，否则WriteGmByPassDCache接口写入addr的数据后续可能被DCache缓存中的脏数据覆盖。
 - DataCacheCleanAndInvalid接口与WriteGmByPassDCache接口向GM写数据时硬件不能保证两个接口的执行顺序，因此开发者应该在WriteGmByPassDCache接口之前调用[DataSyncBarrier](../同步控制/核内同步/DataSyncBarrier(ISASI).md)接口进行前述两个接口间的同步，否则WriteGmByPassDCache接口写入addr的数据依然可能被DCache缓存中的脏数据覆盖。
 
-根据以上的描述，建议开发者在使用WriteGmByPassDCache接口时采用如下代码片段：
+根据以上的描述，为了简化编程（开发者无需关心addr是否在DCache缓存以及是否被标记为“脏”），建议开发者在使用WriteGmByPassDCache接口时采用如下代码片段：
 
     ```cpp
     AscendC::GlobalTensor<T> global; // global为addr对应的GlobalTensor
