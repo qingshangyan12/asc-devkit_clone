@@ -10,7 +10,7 @@
 
 头文件路径为：`"tensor_api/tensor.h"`。
 
-GetLayoutTrait用于从Layout类型中提取其LayoutTrait类型信息。
+GetLayoutTrait用于从Layout类型中提取其LayoutTrait类型信息。LayoutTrait记录布局使用的C0维度基数，不作为Tensor的数据类型来源。
 
 ## 函数原型
 
@@ -38,7 +38,7 @@ using namespace AscendC::Te;
 
 using LayoutType = decltype(MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(16, 16));
 using Trait = GetLayoutTrait<LayoutType>;
-// Trait = LayoutTraitDefault<float>
+// Trait = LayoutTrait<float, _8>
 
 using PlainLayout = decltype(MakeLayout(MakeShape(16, 16), MakeStride(16, 1)));
 using PlainTrait = GetLayoutTrait<PlainLayout>;
