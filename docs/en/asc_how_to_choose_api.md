@@ -46,8 +46,8 @@ graph TD
     B -->|Familiar with SIMT, discrete vector operators| F[SIMT API]
     C -->|Discrete vector operators| F
     C -->|Prefer pointer programming| P[SIMD C API]
-    C -->|Prefer C++ Tensor programming & independent synchronization/memory management| I[Basic API]
-    C -->|Prefer C++ Tensor programming & automatic synchronization/memory management| J[Tpipe/Tque Framework Programming API]
+    C -->|"Prefer C++ Tensor programming & independent synchronization/memory management"| I[Basic API]
+    C -->|"Prefer C++ Tensor programming & automatic synchronization/memory management"| J["Tpipe/Tque Framework Programming API"]
 
     D -->|Reuse common algorithms, generalization priority| K[High-level API]
     D -->|Typical operators, high performance in specific scenarios| L[Operator Template Library]
