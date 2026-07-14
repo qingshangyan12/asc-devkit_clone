@@ -57,7 +57,7 @@ uint32_t GetNormalizeMinTmpSize(const uint32_t aLength, const uint32_t rLengthWi
 } // namespace
 
 void GetNormalizeMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSizeU, const uint32_t typeSizeT, const bool isReuseSource,
+    const AscendC::Shape& srcShape, const uint32_t typeSizeU, const uint32_t typeSizeT, const bool isReuseSource,
     const bool isComputeRstd, const bool isOnlyOutput, uint32_t& maxValue, uint32_t& minValue)
 {
     (void)isReuseSource;

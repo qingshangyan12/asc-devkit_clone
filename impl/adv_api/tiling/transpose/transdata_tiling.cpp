@@ -13,7 +13,6 @@
 #include <cstdint>
 #include <algorithm>
 
-#include "graph/tensor.h"
 #include "../../detail/host_log.h"
 #include "../../../../include/utils/tiling/platform/platform_ascendc.h"
 namespace AscendC {
@@ -94,7 +93,7 @@ bool GenerateNcdhwToFractalZ3DShapeInfo(
 }
 
 bool GenerateShapeInfo(
-    const TransDataConfig& config, const ge::Shape& srcShape, const ge::Shape& dstShape, ge::DataType type,
+    const TransDataConfig& config, const AscendC::Shape& srcShape, const AscendC::Shape& dstShape, AscendC::DataType type,
     TmpTransDataParams& param)
 {
     (void)type;
@@ -176,12 +175,12 @@ int32_t GetTmpBufferSize(const TransDataConfig& config, const TmpTransDataParams
 } // namespace
 
 bool GetTransDataMaxMinTmpSize(
-    const platform_ascendc::PlatformAscendC& platform, const ge::Shape& srcShape, const ge::Shape& dstShape,
-    const ge::DataType dataType, const TransDataConfig& config, uint32_t& maxValue, uint32_t& minValue)
+    const platform_ascendc::PlatformAscendC& platform, const AscendC::Shape& srcShape, const AscendC::Shape& dstShape,
+    const AscendC::DataType dataType, const TransDataConfig& config, uint32_t& maxValue, uint32_t& minValue)
 {
     ASCENDC_HOST_ASSERT(
-        dataType == ge::DataType::DT_FLOAT16 || dataType == ge::DataType::DT_BF16 ||
-            dataType == ge::DataType::DT_UINT16 || dataType == ge::DataType::DT_INT16,
+        dataType == AscendC::DataType::DT_FLOAT16 || dataType == AscendC::DataType::DT_BF16 ||
+            dataType == AscendC::DataType::DT_UINT16 || dataType == AscendC::DataType::DT_INT16,
         return false,
         "[TransData][GetTransDataMaxMinTmpSize] it only supports DT_FLOAT16/DT_BF16/DT_UINT16/DT_INT16 data type");
 

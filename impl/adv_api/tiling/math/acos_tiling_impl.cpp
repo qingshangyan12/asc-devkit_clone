@@ -16,7 +16,6 @@
 
 #include <cstdint>
 
-#include "graph/tensor.h"
 #include "../../detail/host_log.h"
 namespace AscendC {
 namespace {
@@ -43,7 +42,7 @@ void GetAcosTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCo
 }
 
 void GetAcosMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    const AscendC::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
     uint32_t& minValue)
 {
     (void)isReuseSource;

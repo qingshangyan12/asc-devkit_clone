@@ -15,7 +15,7 @@
 #ifndef LIB_PAD_BROADCAST_TILING_H
 #define LIB_PAD_BROADCAST_TILING_H
 
-#include "graph/tensor.h"
+#include "include/adv_api/utils/types.h"
 #include "tiling/platform/platform_ascendc.h"
 namespace AscendC {
 /*
@@ -30,7 +30,7 @@ namespace AscendC {
  * @return min temporary local space size
  */
 void GetBroadCastMaxMinTmpSize(
-    const platform_ascendc::PlatformAscendC& ascendcPlatform, const ge::Shape& srcShape, const ge::Shape& dstShape,
+    const platform_ascendc::PlatformAscendC& ascendcPlatform, const AscendC::Shape& srcShape, const AscendC::Shape& dstShape,
     uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
 } // namespace AscendC
 #endif // LIB_PAD_BROADCAST_TILING_H

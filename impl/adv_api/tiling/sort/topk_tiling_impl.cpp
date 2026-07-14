@@ -507,7 +507,7 @@ bool GetTopKMaxMinTmpSize(
 
 bool GetTopKMaxMinTmpSize(
     const int32_t inner, const int32_t outter, const int32_t k, const bool isReuseSource, const bool isInitIndex,
-    enum TopKMode mode, const bool isLargest, ge::DataType dataType, const TopKConfig& config, uint32_t& maxValue,
+    enum TopKMode mode, const bool isLargest, AscendC::DataType dataType, const TopKConfig& config, uint32_t& maxValue,
     uint32_t& minValue)
 {
     platform_ascendc::PlatformAscendC* platform = platform_ascendc::PlatformAscendCManager::GetInstance();
@@ -523,7 +523,7 @@ bool GetTopKMaxMinTmpSize(
         (1 <= k) && (k <= inner), return false,
         "The value of k must be greater than or equal to 1 and less than or equal to inner.");
 
-    std::map<ge::DataType, uint32_t> supportTypes = {
+    std::map<AscendC::DataType, uint32_t> supportTypes = {
         {ge::DT_INT8, TOPK_RADIX_B8_SIZE},   {ge::DT_UINT8, TOPK_RADIX_B8_SIZE},
         {ge::DT_INT16, TOPK_RADIX_B16_SIZE}, {ge::DT_UINT16, TOPK_RADIX_B16_SIZE},
         {ge::DT_INT32, TOPK_RADIX_B32_SIZE}, {ge::DT_UINT32, TOPK_RADIX_B32_SIZE},
@@ -531,7 +531,7 @@ bool GetTopKMaxMinTmpSize(
         {ge::DT_FLOAT, TOPK_RADIX_B32_SIZE}, {ge::DT_FLOAT16, TOPK_RADIX_B16_SIZE},
         {ge::DT_BF16, TOPK_RADIX_B16_SIZE},
     };
-    std::set<ge::DataType> twiddleTypes = {ge::DT_INT8,  ge::DT_INT16,   ge::DT_INT32, ge::DT_INT64,
+    std::set<AscendC::DataType> twiddleTypes = {ge::DT_INT8,  ge::DT_INT16,   ge::DT_INT32, ge::DT_INT64,
                                            ge::DT_FLOAT, ge::DT_FLOAT16, ge::DT_BF16};
 
     auto typeSizeData = supportTypes.find(dataType);
@@ -564,7 +564,7 @@ bool GetTopKMaxMinTmpSize(
     uint32_t maxSortMem = 0;
     if (config.sorted) {
         std::vector<int64_t> shapeDims = {1, k};
-        auto srcShape = ge::Shape(shapeDims);
+        auto srcShape = AscendC::Shape(shapeDims);
         auto indexType = ge::DT_INT32;
         SortConfig sortConfig;
         sortConfig.isDescend = true;

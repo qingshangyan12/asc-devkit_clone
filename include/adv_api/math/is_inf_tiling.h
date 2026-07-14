@@ -15,7 +15,7 @@
 #ifndef LIB_MATH_ISINF_TILING_H
 #define LIB_MATH_ISINF_TILING_H
 
-#include "graph/tensor.h"
+#include "include/adv_api/utils/types.h"
 #include "tiling/platform/platform_ascendc.h"
 namespace AscendC {
 /*!
@@ -30,7 +30,7 @@ namespace AscendC {
  * \param [out] minValue, minimum temporary space required
  */
 void GetIsInfMaxMinTmpSize(
-    const platform_ascendc::PlatformAscendC& ascendcPlatform, const ge::Shape& srcShape, const uint32_t typeSize,
+    const platform_ascendc::PlatformAscendC& ascendcPlatform, const AscendC::Shape& srcShape, const uint32_t typeSize,
     const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
 
 /*!

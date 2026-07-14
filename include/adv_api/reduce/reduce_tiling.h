@@ -21,8 +21,7 @@
 #ifndef LIB_REDUCE_REDUCE_TILING_H
 #define LIB_REDUCE_REDUCE_TILING_H
 #include <cstdint>
-#include "graph/types.h"
-#include "graph/tensor.h"
+#include "include/adv_api/utils/types.h"
 
 namespace AscendC {
 /*
@@ -65,7 +64,7 @@ enum class ReducePattern : uint32_t {
  * \param [out] minValue, minimum temporary space required
  */
 void GetReduceProdMaxMinTmpSize(
-    const ge::Shape& srcShape, const ge::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
+    const AscendC::Shape& srcShape, const AscendC::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
     bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
 
 /*!
@@ -81,7 +80,7 @@ void GetReduceProdMaxMinTmpSize(
  * \param [out] minValue, minimum temporary space required
  */
 void GetReduceSumMaxMinTmpSize(
-    const ge::Shape& srcShape, const ge::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
+    const AscendC::Shape& srcShape, const AscendC::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
     bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
 
 /*!
@@ -97,7 +96,7 @@ void GetReduceSumMaxMinTmpSize(
  * \param [out] minValue, minimum temporary space required
  */
 void GetReduceMeanMaxMinTmpSize(
-    const ge::Shape& srcShape, const ge::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
+    const AscendC::Shape& srcShape, const AscendC::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
     bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
 
 /*!
@@ -113,7 +112,7 @@ void GetReduceMeanMaxMinTmpSize(
  * \param [out] minValue, minimum temporary space required
  */
 void GetReduceMaxMaxMinTmpSize(
-    const ge::Shape& srcShape, const ge::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
+    const AscendC::Shape& srcShape, const AscendC::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
     bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
 
 /*!
@@ -129,7 +128,7 @@ void GetReduceMaxMaxMinTmpSize(
  * \param [out] minValue, minimum temporary space required
  */
 void GetReduceMinMaxMinTmpSize(
-    const ge::Shape& srcShape, const ge::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
+    const AscendC::Shape& srcShape, const AscendC::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
     bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
 
 /*!
@@ -145,7 +144,7 @@ void GetReduceMinMaxMinTmpSize(
  * \param [out] minValue, minimum temporary space required
  */
 void GetReduceAnyMaxMinTmpSize(
-    const ge::Shape& srcShape, const ge::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
+    const AscendC::Shape& srcShape, const AscendC::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
     bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
 
 /*!
@@ -161,7 +160,7 @@ void GetReduceAnyMaxMinTmpSize(
  * \param [out] minValue, minimum temporary space required
  */
 void GetReduceAllMaxMinTmpSize(
-    const ge::Shape& srcShape, const ge::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
+    const AscendC::Shape& srcShape, const AscendC::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
     bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
 } // namespace AscendC
 #endif // LIB_REDUCE_REDUCE_TILING_H

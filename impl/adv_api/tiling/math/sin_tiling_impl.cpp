@@ -14,7 +14,6 @@
  */
 #include <cstdint>
 #include <vector>
-#include "graph/tensor.h"
 #include "../../detail/host_log.h"
 #include "../../../../include/adv_api/math/sin_tiling.h"
 #include "../../../../include/utils/tiling/platform/platform_ascendc.h"
@@ -35,7 +34,7 @@ void GetSinTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCou
     maxLiveNodeCount = (typeSize == sizeof(float)) ? SIN_FLOAT_NOREUSE_CALC_FAC : SIN_HALF_CALC_FAC;
 }
 
-inline uint32_t GetSinMaxTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource)
+inline uint32_t GetSinMaxTmpSize(const AscendC::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource)
 {
     std::vector<int64_t> shapeDims = srcShape.GetDims();
     uint32_t inputSize = 1;
@@ -54,7 +53,7 @@ inline uint32_t GetSinMaxTmpSize(const ge::Shape& srcShape, const uint32_t typeS
     return inputSize * calcFactor * typeSize;
 }
 
-inline uint32_t GetSinMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource)
+inline uint32_t GetSinMinTmpSize(const AscendC::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource)
 {
     (void)(srcShape);
     (void)(isReuseSource);
@@ -70,7 +69,7 @@ inline uint32_t GetSinMinTmpSize(const ge::Shape& srcShape, const uint32_t typeS
 }
 
 void GetSinMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    const AscendC::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
     uint32_t& minValue)
 {
     uint32_t max = GetSinMaxTmpSize(srcShape, typeSize, isReuseSource);
@@ -103,7 +102,7 @@ void GetSinTmpBufferFactorSize(
 }
 
 void GetSinMaxMinTmpSize(
-    const SinConfig& config, const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource,
+    const SinConfig& config, const AscendC::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource,
     uint32_t& maxValue, uint32_t& minValue)
 {
     (void)typeSize;

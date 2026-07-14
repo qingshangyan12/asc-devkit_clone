@@ -13,7 +13,6 @@
  * \brief
  */
 #include "../../../../include/adv_api/math/fmod_tiling.h"
-#include "graph/tensor.h"
 #include "../../detail/host_log.h"
 #include "../../../../include/adv_api/math/trunc_tiling.h"
 
@@ -37,7 +36,7 @@ inline uint32_t GetFmodMinTmpSize(const uint32_t typeSize, const uint8_t truncCa
 } // namespace
 
 void GetFmodMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    const AscendC::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
     uint32_t& minValue)
 {
     (void)isReuseSource;

@@ -13,7 +13,6 @@
  * \brief
  */
 #include <cstdint>
-#include "graph/tensor.h"
 #include "../../detail/host_log.h"
 #include "../../../../include/utils/tiling/platform/platform_ascendc.h"
 #include "../../../../include/adv_api/math/hypot_tiling.h"
@@ -48,7 +47,7 @@ inline uint32_t GetHypotMinTmpSize(const uint32_t typeSize)
 } // namespace
 
 void GetHypotMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    const AscendC::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
     uint32_t& minValue)
 {
     (void)isReuseSource;

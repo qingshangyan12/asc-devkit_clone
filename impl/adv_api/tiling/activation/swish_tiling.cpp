@@ -14,11 +14,10 @@
  */
 #include "../../../../include/adv_api/activation/swish_tiling.h"
 #include <cstdint>
-#include "graph/tensor.h"
 
 namespace AscendC {
 void GetSwishTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    const AscendC::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
     uint32_t& minValue)
 {
     (void)srcShape;

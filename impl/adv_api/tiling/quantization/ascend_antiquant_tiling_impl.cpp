@@ -12,8 +12,6 @@
  * \file ascend_antiquant_tiling_impl.cpp
  * \brief
  */
-#include "graph/tensor.h"
-#include "graph/types.h"
 #include "../../../../include/adv_api/quantization/ascend_antiquant_tiling.h"
 #include "../../detail/host_log.h"
 #include "../../../../include/utils/tiling/platform/platform_ascendc.h"
@@ -26,7 +24,7 @@ constexpr uint32_t ASCEND_ANTIQUANT_SINGLE_N_SIZE = 64;
 constexpr uint32_t ASCEND_ANTIQUANT_TPM_N_SIZE = 80;
 constexpr uint32_t ASCEND_ANTIQUANT_ALIGN_K_SIZE = 32;
 
-inline uint32_t GetAscendAntiQuantTmpSizeOfFp4(const ge::Shape& scaleShape, bool isTranspose)
+inline uint32_t GetAscendAntiQuantTmpSizeOfFp4(const AscendC::Shape& scaleShape, bool isTranspose)
 {
     auto shapeDims = scaleShape.GetDims();
     uint32_t scaleSize = 1;
@@ -41,7 +39,7 @@ inline uint32_t GetAscendAntiQuantTmpSizeOfFp4(const ge::Shape& scaleShape, bool
     }
 }
 
-uint32_t GetScaleSize(const ge::Shape& scaleShape)
+uint32_t GetScaleSize(const AscendC::Shape& scaleShape)
 {
     auto shapeDims = scaleShape.GetDims();
     uint32_t scaleSize = 1;
@@ -52,8 +50,8 @@ uint32_t GetScaleSize(const ge::Shape& scaleShape)
 }
 
 void CheckAntiQuantHostCommon(
-    const char* apiName, const char* hostFuncName, const ge::Shape& srcShape, bool isTranspose,
-    ge::DataType inputDataType)
+    const char* apiName, const char* hostFuncName, const AscendC::Shape& srcShape, bool isTranspose,
+    AscendC::DataType inputDataType)
 {
     ASCENDC_HOST_ASSERT(
         srcShape.GetShapeSize() > 0, return, "[%s][%s] Input Shape size must be greater than 0.", apiName,
@@ -70,8 +68,8 @@ void CheckAntiQuantHostCommon(
 } // namespace
 
 uint32_t GetAscendAntiQuantMaxTmpSize(
-    const ge::Shape& srcShape, const ge::Shape& scaleShape, bool isTranspose, ge::DataType inputDataType,
-    ge::DataType outputDataType)
+    const AscendC::Shape& srcShape, const AscendC::Shape& scaleShape, bool isTranspose, AscendC::DataType inputDataType,
+    AscendC::DataType outputDataType)
 {
     CheckAntiQuantHostCommon("AscendAntiQuant", "GetAscendAntiQuantMaxTmpSize", srcShape, isTranspose, inputDataType);
 #if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
@@ -107,8 +105,8 @@ uint32_t GetAscendAntiQuantMaxTmpSize(
 }
 
 uint32_t GetAscendAntiQuantMinTmpSize(
-    const ge::Shape& srcShape, const ge::Shape& scaleShape, bool isTranspose, ge::DataType inputDataType,
-    ge::DataType outputDataType)
+    const AscendC::Shape& srcShape, const AscendC::Shape& scaleShape, bool isTranspose, AscendC::DataType inputDataType,
+    AscendC::DataType outputDataType)
 {
     CheckAntiQuantHostCommon("AscendAntiQuant", "GetAscendAntiQuantMinTmpSize", srcShape, isTranspose, inputDataType);
 #if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
@@ -144,8 +142,8 @@ uint32_t GetAscendAntiQuantMinTmpSize(
 }
 
 void GetAscendAntiQuantTmpBufferFactorSize(
-    const ge::Shape& srcShape, const ge::Shape& scaleShape, bool isTranspose, ge::DataType inputDataType,
-    ge::DataType outputDataType, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
+    const AscendC::Shape& srcShape, const AscendC::Shape& scaleShape, bool isTranspose, AscendC::DataType inputDataType,
+    AscendC::DataType outputDataType, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
 {
     extraBuf = 0;
     maxLiveNodeCount = 0;
@@ -169,8 +167,8 @@ void GetAscendAntiQuantTmpBufferFactorSize(
 }
 
 void GetAscendAntiQuantMaxMinTmpSize(
-    const ge::Shape& srcShape, const ge::Shape& scaleShape, bool isTranspose, ge::DataType inputDataType,
-    ge::DataType outputDataType, uint32_t& maxValue, uint32_t& minValue)
+    const AscendC::Shape& srcShape, const AscendC::Shape& scaleShape, bool isTranspose, AscendC::DataType inputDataType,
+    AscendC::DataType outputDataType, uint32_t& maxValue, uint32_t& minValue)
 {
     CheckAntiQuantHostCommon(
         "AscendAntiQuant", "GetAscendAntiQuantMaxMinTmpSize", srcShape, isTranspose, inputDataType);

@@ -37,7 +37,7 @@ static constexpr const char LOG_SOFTMAX_GET_MAX[] = "GetLogSoftMaxMaxTmpSize";
 static constexpr const char LOG_SOFTMAX_GET_MIN[] = "GetLogSoftMaxMinTmpSize";
 static constexpr const char LOG_SOFTMAX_TILING[] = "LogSoftMaxTilingFunc";
 
-inline std::vector<uint32_t> GetLastAxisShapeND(const ge::Shape srcShape)
+inline std::vector<uint32_t> GetLastAxisShapeND(const AscendC::Shape srcShape)
 {
     std::vector<uint32_t> ret;
     std::vector<int64_t> shapeDims = srcShape.GetDims();
@@ -68,7 +68,7 @@ inline void AdjustToBasicBlockBaseM(uint32_t& baseM, const uint32_t srcM, const 
     }
 }
 
-uint32_t GetLogSoftMaxMaxTmpSize(const ge::Shape srcShape, const uint32_t dataTypeSize, UNUSED const bool isReuseSource)
+uint32_t GetLogSoftMaxMaxTmpSize(const AscendC::Shape srcShape, const uint32_t dataTypeSize, UNUSED const bool isReuseSource)
 {
     HighLevelApiCheck::SrcShapeSizeVerifyingParameters<LOG_SOFTMAX_GET_MAX>(srcShape.GetShapeSize(), dataTypeSize);
     HighLevelApiCheck::ShapeLastAxisAlignVerifyingParameters<LOG_SOFTMAX_GET_MAX>(
@@ -100,7 +100,7 @@ uint32_t GetLogSoftMaxMaxTmpSize(const ge::Shape srcShape, const uint32_t dataTy
     return needSize * SOFTMAX_FLOAT_SIZE;
 }
 
-uint32_t GetLogSoftMaxMinTmpSize(const ge::Shape srcShape, const uint32_t dataTypeSize, UNUSED const bool isReuseSource)
+uint32_t GetLogSoftMaxMinTmpSize(const AscendC::Shape srcShape, const uint32_t dataTypeSize, UNUSED const bool isReuseSource)
 {
     HighLevelApiCheck::SrcShapeSizeVerifyingParameters<LOG_SOFTMAX_GET_MIN>(srcShape.GetShapeSize(), dataTypeSize);
     HighLevelApiCheck::ShapeLastAxisAlignVerifyingParameters<LOG_SOFTMAX_GET_MIN>(
@@ -133,7 +133,7 @@ uint32_t GetLogSoftMaxMinTmpSize(const ge::Shape srcShape, const uint32_t dataTy
 }
 
 void LogSoftMaxTilingFunc(
-    const ge::Shape srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize,
+    const AscendC::Shape srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize,
     optiling::LogSoftMaxTiling& softmaxTiling)
 {
     HighLevelApiCheck::SrcShapeSizeVerifyingParameters<LOG_SOFTMAX_TILING>(srcShape.GetShapeSize(), dataTypeSize);
@@ -182,7 +182,7 @@ void LogSoftMaxTilingFunc(
 }
 
 void LogSoftMaxTilingFunc(
-    const ge::Shape srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize,
+    const AscendC::Shape srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize,
     AscendC::tiling::LogSoftMaxTiling& softmaxTiling)
 {
     optiling::LogSoftMaxTiling tiling;

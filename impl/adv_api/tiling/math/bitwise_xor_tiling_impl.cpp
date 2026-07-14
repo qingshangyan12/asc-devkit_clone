@@ -16,7 +16,6 @@
 #include "../../../../include/adv_api/math/bitwise_xor_tiling.h"
 #include "../../../../include/utils/tiling/platform/platform_ascendc.h"
 #include "../../detail/host_log.h"
-#include "graph/tensor.h"
 #include "../../detail/api_check/host_apicheck.h"
 
 namespace AscendC {
@@ -41,7 +40,7 @@ uint32_t GetBitwiseXorMinTmpSize(const NpuArch npuArch, const uint32_t typeSize)
 }
 } // namespace
 void GetBitwiseXorMaxMinTmpSize(
-    const platform_ascendc::PlatformAscendC& ascendcPlatform, const ge::Shape& srcShape, const uint32_t typeSize,
+    const platform_ascendc::PlatformAscendC& ascendcPlatform, const AscendC::Shape& srcShape, const uint32_t typeSize,
     const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 {
     (void)isReuseSource;

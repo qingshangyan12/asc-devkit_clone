@@ -47,7 +47,7 @@ inline bool CheckBasicBlockShape(const uint32_t originalBLength, const uint32_t 
 }
 
 bool CheckShape(
-    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t typeSize,
+    const AscendC::Shape& srcShape, const AscendC::Shape& originSrcShape, const uint32_t typeSize,
     const bool isBasicBlock = false)
 {
     std::vector<int64_t> shapeDims = srcShape.GetDims();
@@ -74,7 +74,7 @@ bool CheckShape(
 }
 
 uint32_t GetBatchNormMaxTmpSize(
-    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t typeSize, const bool isReuseSource,
+    const AscendC::Shape& srcShape, const AscendC::Shape& originSrcShape, const uint32_t typeSize, const bool isReuseSource,
     const bool isBasicBlock)
 {
     (void)typeSize;
@@ -96,7 +96,7 @@ uint32_t GetBatchNormMaxTmpSize(
 }
 
 uint32_t GetBatchNormMinTmpSize(
-    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t typeSize, const bool isReuseSource,
+    const AscendC::Shape& srcShape, const AscendC::Shape& originSrcShape, const uint32_t typeSize, const bool isReuseSource,
     const bool isBasicBlock)
 {
     (void)isReuseSource;
@@ -125,7 +125,7 @@ uint32_t GetBatchNormMinTmpSize(
 } // namespace
 
 bool GetBatchNormMaxMinTmpSize(
-    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t typeSize, const bool isReuseSource,
+    const AscendC::Shape& srcShape, const AscendC::Shape& originSrcShape, const uint32_t typeSize, const bool isReuseSource,
     uint32_t& maxValue, uint32_t& minValue, const bool isBasicBlock)
 {
     std::vector<int64_t> shapeDims = srcShape.GetDims();
@@ -143,7 +143,7 @@ bool GetBatchNormMaxMinTmpSize(
 }
 
 bool GetBatchNormNDTilingInfo(
-    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize,
+    const AscendC::Shape& srcShape, const AscendC::Shape& originSrcShape, const uint32_t stackBufferByteSize,
     const uint32_t typeSize, const bool isReuseSource, optiling::BatchNormTiling& tilling, const bool isBasicBlock)
 {
     constexpr uint32_t halfBlockNumber = 16;
@@ -229,7 +229,7 @@ bool GetBatchNormNDTilingInfo(
 }
 
 bool GetBatchNormNDTilingInfo(
-    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize,
+    const AscendC::Shape& srcShape, const AscendC::Shape& originSrcShape, const uint32_t stackBufferByteSize,
     const uint32_t typeSize, const bool isReuseSource, AscendC::tiling::BatchNormTiling& tilling,
     const bool isBasicBlock)
 {

@@ -16,7 +16,6 @@
 
 #include <cstdint>
 
-#include "graph/tensor.h"
 #include "../../detail/host_log.h"
 namespace AscendC {
 namespace {
@@ -39,7 +38,7 @@ inline uint32_t GetAxpyMinTmpSize(const uint32_t typeSize)
 } // namespace
 
 void GetAxpyMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    const AscendC::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
     uint32_t& minValue)
 {
     (void)isReuseSource;
