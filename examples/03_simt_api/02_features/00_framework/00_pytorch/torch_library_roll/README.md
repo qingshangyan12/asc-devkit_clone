@@ -42,14 +42,11 @@
   <table border="2" align="center">
   <caption>表1：RollCustom样例规格描述</caption>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">RollCustom</td></tr>
-  </tr>
   <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">input</td><td align="center">[8,2048]</td><td align="center">float32</td><td align="center">ND</td></tr>
   <tr><td align="center">shifts</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
   <tr><td align="center">dims</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
-  </tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">output</td><td align="center">[8,2048]</td><td align="center">float32</td><td align="center">ND</td></tr>
-  </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">roll_custom</td></tr>
   </table>
 
@@ -114,7 +111,7 @@
 
 - 配置环境变量  
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

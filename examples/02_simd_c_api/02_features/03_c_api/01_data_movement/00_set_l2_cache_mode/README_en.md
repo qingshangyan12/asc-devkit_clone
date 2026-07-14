@@ -2,7 +2,7 @@
 
 ## Overview
 
-When MTE2 moves data from Global Memory (GM) to Unified Buffer (UB), the `l2_cache_mode` parameter of the `asc_copy_gm2ub_align` interface (this sample uses [pointer-based C programming](https://gitcode.com/cann/asc-devkit/tree/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程)) can explicitly configure the L2 Cache management strategy. This sample describes how to select the appropriate L2 Cache mode to optimize MTE2 data movement performance for **reuse data** and **streaming data** scenarios, and how to improve the L2 Cache hit rate through tiling strategies when L2 Cache is enabled.
+When MTE2 moves data from Global Memory (GM) to Unified Buffer (UB), the `l2_cache_mode` parameter of the `asc_copy_gm2ub_align` interface (this sample uses [pointer-based C programming](https://gitcode.com/cann/asc-devkit/tree/master/docs/zh/guide/编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程)) can explicitly configure the L2 Cache management strategy. This sample describes how to select the appropriate L2 Cache mode to optimize MTE2 data movement performance for **reuse data** and **streaming data** scenarios, and how to improve the L2 Cache hit rate through tiling strategies when L2 Cache is enabled.
 
 - **Reuse Data Scenario (data needs to be read multiple times)**
   - Case1: Repeat the entire block 4 times, `l2_cache_mode=0` (NORMAL) — the entire block far exceeds the L2 capacity, hit rate is extremely low, demonstrating the performance bottleneck without tiling.
@@ -34,7 +34,7 @@ When MTE2 moves data from Global Memory (GM) to Unified Buffer (UB), the `l2_cac
 
 ## Sample Description
 
-The C-API GM→UB data movement interface uses the `l2_cache_mode` parameter to control how the data being moved is managed in the L2 Cache. For details on the values and their meanings, see the [asc_copy_gm2ub_align](https://gitcode.com/cann/asc-devkit/tree/master/docs/api/SIMD-API/C-API/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md) interface documentation.
+The C-API GM→UB data movement interface uses the `l2_cache_mode` parameter to control how the data being moved is managed in the L2 Cache. For details on the values and their meanings, see the [asc_copy_gm2ub_align](https://gitcode.com/cann/asc-devkit/tree/master/docs/zh/api/SIMD-API/C-API/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md) interface documentation.
 
 Based on the two scenarios described above, this sample designs 4 Cases for comparison and verification:
 
@@ -52,8 +52,8 @@ The performance data in this section is collected on Ascend 950 series products.
 
 Different performance collection commands are used to obtain different performance metrics:
 
-- `msprof ./demo` — Collects AI Core instruction-level latency and ratios (MTE2/MTE3/Vector), corresponding to **Table 1**.
-- `msprof --ai-core=on --aic-metrics=L2Cache ./demo` — Collects L2 Cache read/write hit and miss counts, corresponding to **Table 2**.
+- `msopprof ./demo` — Collects AI Core instruction-level latency and ratios (MTE2/MTE3/Vector), corresponding to **Table 1**.
+- `msopprof --ai-core=on --aic-metrics=L2Cache ./demo` — Collects L2 Cache read/write hit and miss counts, corresponding to **Table 2**.
 
 **Table 1** AI Core Performance Metrics Description
 
@@ -300,29 +300,31 @@ In the sample root directory, perform the following steps to build and run the s
 
 - Performance profiling
 
-  Use the `msprof` tool to obtain detailed performance data:
+  Use the `msopprof` tool to obtain detailed performance data:
 
   ```bash
-  msprof ./demo                                              # Collect MTE2/MTE3/Vector performance data. See Table 1 for field descriptions.
-  msprof --ai-core=on --aic-metrics=L2Cache ./demo           # Collect L2 Cache performance data. See Table 2 for field descriptions.
+  msopprof ./demo                                              # Collect MTE2/MTE3/Vector performance data. See Table 1 for field descriptions.
+  msopprof --ai-core=on --aic-metrics=L2Cache ./demo           # Collect L2 Cache performance data. See Table 2 for field descriptions.
   ```
 
-  After collection, a `PROF_`-prefixed directory is generated in the current directory. The performance summary file is located in the `mindstudio_profiler_output` directory.
+  After collection, a `OPPROF_{timestamp}_XXX`-prefixed directory is generated in the current directory.
 
-  ```txt
-  PROF_xxxx_XXXXXX
-  ├── device_{id}
-  ├── host
-  ├── mindstudio_profiler_log
-  └── mindstudio_profiler_output
-      ├── msprof_*.json
-      ├── op_summary_*.csv
-      └── README.txt
+  ```bash
+  ├──dump
+  ├──ArithmeticUtilization.csv
+  ├──L2Cache.csv
+  ├──Memory.csv
+  ├──MemoryL0.csv
+  ├──MemoryUB.csv
+  ├──OpBasicInfo.csv
+  ├──PipeUtilization.csv
+  ├──ResourceConflictRatio.csv
+  └──visualize_data.bin
   ```
 
   To view the specific performance analysis results:
 
   ```bash
   # View Task Duration and other data
-  cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
+  cat ./PROF_*/PipeUtilization.csv
   ```

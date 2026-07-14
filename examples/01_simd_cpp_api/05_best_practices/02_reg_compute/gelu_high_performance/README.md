@@ -238,7 +238,7 @@ __aicore__ inline void GeluCompute(
 
 **Profiling 数据抓取**：
 
-使用 `msprof` 工具对 Case 0 进行性能采集，关键指标如下：
+使用 `msOpProf` 工具对 Case 0 进行性能采集，关键指标如下：
 
 | 指标 | 数值 | 占比 |
 |:---|:---|:---|
@@ -272,19 +272,19 @@ __aicore__ inline void GeluCompute(
 
 | 关键字/概念 | 含义 | 详细文档 |
 |:---|:---|:---|
-| `__simd_vf__` | VF 函数声明修饰符，表示该函数运行在 VF（Vector Function）执行域 | [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
-| `__ubuf__` | UB 地址空间限定符，标记指针指向 UB 内存区域 | [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
-| `RegTensor<T>` | 寄存器级 Tensor 对象，数据驻留在向量寄存器中（区别于驻留 UB 的 `LocalTensor`） | [RegTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/RegTensor.md) |
-| `MaskReg` | 向量掩码寄存器，控制每次计算参与运算的元素数量 | [MaskReg](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md) |
-| `LoadAlign` | 连续对齐搬运，将数据从 UB 加载到寄存器 | [连续对齐搬入](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/连续对齐搬入（LoadAlign）.md) |
-| `StoreAlign` | 连续对齐搬运，将数据从寄存器写回 UB | [连续对齐搬出](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/连续对齐搬出（StoreAlign）.md) |
-| `asc_vf_call` | VF 函数调用入口，在核函数中调用 VF 函数 | [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
-| `UpdateMask` | 根据剩余元素数更新掩码寄存器 | [UpdateMask](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md) |
+| `__simd_vf__` | VF 函数声明修饰符，表示该函数运行在 VF（Vector Function）执行域 | [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
+| `__ubuf__` | UB 地址空间限定符，标记指针指向 UB 内存区域 | [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
+| `RegTensor<T>` | 寄存器级 Tensor 对象，数据驻留在向量寄存器中（区别于驻留 UB 的 `LocalTensor`） | [RegTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/RegTensor.md) |
+| `MaskReg` | 向量掩码寄存器，控制每次计算参与运算的元素数量 | [MaskReg](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md) |
+| `LoadAlign` | 连续对齐搬运，将数据从 UB 加载到寄存器 | [连续对齐搬入](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/连续对齐搬入（LoadAlign）.md) |
+| `StoreAlign` | 连续对齐搬运，将数据从寄存器写回 UB | [连续对齐搬出](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/连续对齐搬出（StoreAlign）.md) |
+| `asc_vf_call` | VF 函数调用入口，在核函数中调用 VF 函数 | [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
+| `UpdateMask` | 根据剩余元素数更新掩码寄存器 | [UpdateMask](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md) |
 
 **原理解析**：
 
-RegBase API 提供寄存器级别的向量计算接口，配合 [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) 调用 VF 函数，可实现 VF 融合。VF 融合的核心优势：
-- 在 VF 函数内，数据从 UB 加载到寄存器后，所有中间计算均在寄存器中完成，仅需一次 [LoadAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/连续对齐搬入（LoadAlign）.md) 和一次 [StoreAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/连续对齐搬出（StoreAlign）.md)，消除中间结果的 Load/Store 开销
+RegBase API 提供寄存器级别的向量计算接口，配合 [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) 调用 VF 函数，可实现 VF 融合。VF 融合的核心优势：
+- 在 VF 函数内，数据从 UB 加载到寄存器后，所有中间计算均在寄存器中完成，仅需一次 [LoadAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/连续对齐搬入（LoadAlign）.md) 和一次 [StoreAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/连续对齐搬出（StoreAlign）.md)，消除中间结果的 Load/Store 开销
 - 支持 VF 双发特性，常规计算指令并行度可达 512 bytes/cycle，指令发射效率（IPC）大幅提升
 
 ```
@@ -639,7 +639,7 @@ $$
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](https://gitcode.com/cann/asc-devkit/blob/master/docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -687,27 +687,36 @@ $$
 
 ### 性能分析
 
-使用 `msprof` 工具获取详细性能数据：
+### msOpProf工具介绍
+msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
 
-```bash
-msprof ./demo   # 分析性能
-```
+- 上板性能采集
 
-当前目录下会生成PROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件
+    通过上板性能采集，可以直接测定算子昇腾AI处理器上的运行时间。该方式适合在板环境中快速定位算子性能问题。
 
-```bash
-PROF_xxxx_XXXXXX
-├── device_{id}
-└── host
-└── mindstudio_profiler_log
-└── mindstudio_profiler_output    # 保存Host和各个Device的性能数据汇总
-    ├── msprof_*.json
-    ├── xx_*.csv
-    └── README.txt
-```
+    基于可执行文件demo通过msopprof执行算子调优：
+    ```
+    msopprof ./demo
+    ```
+
+    - 性能数据说明  
+      命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
+
+      ```bash
+      ├──dump                       # 原始的性能数据，用户无需关注
+      ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
+      ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
+      ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
+      ├──OpBasicInfo.csv            # 算子基础信息
+      ├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
+      ├──ResourceConflictRatio.csv  # UB上的bank group、bank conflict和资源冲突率在所有指令中的占比
+      └──visualize_data.bin         # MindStudio Insight呈现文件
+      ```
 
 查看具体的性能分析结果：
 ```bash
 # 查看Task Duration 以及各项数据
-cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```

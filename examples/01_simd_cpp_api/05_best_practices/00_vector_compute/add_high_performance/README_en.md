@@ -541,7 +541,7 @@ The table below shows performance data comparison for this example running on As
 | 4 | Double buffer | 64 | 21760 | 247.665 | 10.976 | 4.965 | NA | 1.712 | 4960.2x |
 | 5 | L2 Cache bypass | 64 | 21760 | 182.04 | 10.997 | 4.965 | NA | 2.256 | 6748.4x |
 
-The main reason `dataCopyLen` is increased on Ascend 950 Series is that UB capacity increases from 192KB to 256KB. In double buffer scenarios, this example needs to simultaneously place `x/y/z` Ping-Pong totaling 6 buffer blocks, so single block available space can be approximated as `UBSIZE/6`:
+The main reason `dataCopyLen` is increased on Ascend 950 Series is that UB capacity increases. In double buffer scenarios, this example needs to simultaneously place `x/y/z` Ping-Pong totaling 6 buffer blocks, so single block available space can be approximated as `UBSIZE/6`:
 - Atlas A2/A3 Series: `192KB / 6 = 32KB`, corresponding to `32KB / 2B = 16384` `half` elements
 - Ascend 950 Series: `256KB / 6 ≈ 42.67KB`, corresponding to approximately `21840` `half` elements
 
@@ -586,7 +586,7 @@ $$
   - `6`: Double buffer + L2Cache bypass + Bank Conflict avoidance
 
 - Configure environment variables  
-  Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -631,26 +631,30 @@ $$
 
 ## Performance Analysis
 
-Use the `msprof` tool to obtain detailed performance data:
+Use the `msOpProf` tool to obtain detailed performance data:
 
 ```bash
-msprof ./demo   # Analyze performance
+msopprof ./demo   # Analyze performance
 ```
 
-A PROF_ prefixed folder is generated in the current directory. The `mindstudio_profiler_output` directory stores Host and Device performance data summaries. Performance data analysis is recommended to view files in this directory.
+    - Performance data description  
+      After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
 
-```bash
-PROF_xxxx_XXXXXX
-├── device_{id}
-└── host
-└── mindstudio_profiler_log
-└── mindstudio_profiler_output    # Stores Host and Device performance data summaries
-    ├── msprof_*.json
-    ├── xx_*.csv
-    └── README.txt
-```
+      ```bash
+      ├──dump                       # Raw performance data, no user attention needed
+      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle ratio
+      ├──L2Cache.csv                # L2 Cache hit rate, affects MTE2, suggests reasonable data transfer logic to increase hit rate
+      ├──Memory.csv                 # UB, L1 and main memory read/write bandwidth rate
+      ├──MemoryL0.csv               # L0A, L0B, and L0C read/write bandwidth rate
+      ├──MemoryUB.csv               # Vector and Scalar to UB read/write bandwidth rate
+      ├──OpBasicInfo.csv            # Operator basic information
+      ├──PipeUtilization.csv        # Computation unit and transfer unit time and ratio
+      ├──ResourceConflictRatio.csv  # Bank group, bank conflict and resource conflict ratio on UB in all instructions
+      └──visualize_data.bin         # MindStudio Insight presentation file
+      ```
 View the specific performance analysis results:
-```
+
+```bash
 # View Task Duration and various data
-cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
+cat ./OPPROF_*/PipeUtilization*.csv
 ```

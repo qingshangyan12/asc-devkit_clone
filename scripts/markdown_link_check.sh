@@ -63,7 +63,7 @@ download_lychee_archive() {
     if [ -n "${MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL:-}" ]; then
         archive_url="$MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL"
     else
-        archive_url="https://gh.llkk.cc/https://github.com/lycheeverse/lychee/releases/download/lychee-v{version}/lychee-{target}.tar.gz"
+        archive_url="https://cann-3rd.obs.cn-north-4.myhuaweicloud.com/lychee-v{version}/lychee-{target}.tar.gz"
     fi
     version_placeholder="{version}"
     target_placeholder="{target}"
@@ -758,9 +758,9 @@ def markdown_inline_link_targets(text):
 
 
 def source_area(path):
-    if path.startswith("docs/api/"):
+    if path.startswith("docs/zh/api/"):
         return "api"
-    if path.startswith("docs/guide/"):
+    if path.startswith("docs/zh/guide/"):
         return "guide"
     if path.startswith("examples/"):
         return "examples"

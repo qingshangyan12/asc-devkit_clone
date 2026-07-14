@@ -39,17 +39,17 @@ Sample running parameters: This sample uses 8 cores to complete the computation,
 
 The Add operator's computation logic follows the three-stage pipeline structure of "load-compute-store":
 
-1. Load input data x and y from [GM](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor简介.md) (Global Memory, the external global memory of the chip) to [UB](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md) (Unified Buffer, the dedicated on-chip cache for vector computation);
+1. Load input data x and y from [GM](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor简介.md) (Global Memory, the external global memory of the chip) to [UB](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md) (Unified Buffer, the dedicated on-chip cache for vector computation);
 2. Execute vector addition on xLocal and yLocal on UB, storing the result in zLocal;
 3. Store the computation result from UB back to GM.
 
 **Prerequisites**:
 
-- [GM (Global Memory)](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor简介.md): The global storage external to the AI Core, accessed via [GlobalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor简介.md), with large capacity but slower access speed.
-- [UB (Unified Buffer)](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md): The dedicated on-chip cache for vector computation inside the AI Core, accessed via [LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md), with limited capacity but fast access speed.
-- [DataCopy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB连续数据搬运(DataCopy).md): The API used for data transfer between GM and UB, with the transfer direction determined by the parameter order.
-- [PipeBarrier](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md): Pipeline synchronization barrier, ensuring data transfer completes before subsequent operations to avoid read/write conflicts.
-- `block_idx`: A built-in variable representing the current core's index (equivalent to [GetBlockIdx()](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/工具接口/系统资源与变量/GetBlockIdx.md)), used for data partitioning in multi-core parallel computation.
+- [GM (Global Memory)](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor简介.md): The global storage external to the AI Core, accessed via [GlobalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor简介.md), with large capacity but slower access speed.
+- [UB (Unified Buffer)](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md): The dedicated on-chip cache for vector computation inside the AI Core, accessed via [LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md), with limited capacity but fast access speed.
+- [DataCopy](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB连续数据搬运(DataCopy).md): The API used for data transfer between GM and UB, with the transfer direction determined by the parameter order.
+- [PipeBarrier](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md): Pipeline synchronization barrier, ensuring data transfer completes before subsequent operations to avoid read/write conflicts.
+- `block_idx`: A built-in variable representing the current core's index (equivalent to [GetBlockIdx()](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/工具接口/系统资源与变量/GetBlockIdx.md)), used for data partitioning in multi-core parallel computation.
 
 The core code is as follows:
 
@@ -119,7 +119,7 @@ For the complete performance tuning process, please refer to the [Add Performanc
 
 This interface provides formatted output functionality for CPU/NPU domain debugging scenarios.
 
-Call the [printf](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/调试接口/上板打印/printf.md) interface at the location in the operator kernel-side implementation code where log information needs to be output.
+Call the [printf](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/调试接口/上板打印/printf.md) interface at the location in the operator kernel-side implementation code where log information needs to be output.
 
 Example:
 
@@ -131,9 +131,9 @@ AscendC::printf("add blockIdx=%d\n", AscendC::GetBlockIdx());
 
 ### DumpTensor
 
-For operators developed based on operator projects, this interface can be used to Dump the contents of a specified [LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md). It also supports printing custom additional information (only uint32\_t data type information is supported), such as printing the current line number.
+For operators developed based on operator projects, this interface can be used to Dump the contents of a specified [LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md). It also supports printing custom additional information (only uint32\_t data type information is supported), such as printing the current line number.
 
-Call the [DumpTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md) interface at the location in the operator kernel-side implementation code where Tensor data needs to be printed. Example:
+Call the [DumpTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md) interface at the location in the operator kernel-side implementation code where Tensor data needs to be printed. Example:
 
 ```cpp
 // Vector computation: z = x + y
@@ -145,50 +145,43 @@ AscendC::DumpTensor(zLocal, 1, 32);
 
 ## Performance Debugging
 
-Use the `msprof` tool to obtain detailed performance data:
+Use the `msOpProf` tool to obtain detailed performance data:
 
 ```bash
-msprof ./demo   # Analyze performance
+msopprof ./demo   # Analyze performance
 ```
 
-A PROF_-prefix folder will be generated in the current directory. The `mindstudio_profiler_output` directory contains aggregated performance data for the Host and each Device. For performance data analysis, it is recommended to view the files in this directory:
+    - Performance data description  
+      After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
 
-```bash
-PROF_xxxx_XXXXXX
-├── device_{id}
-├── host
-├── mindstudio_profiler_log
-└── mindstudio_profiler_output    # Aggregated performance data for Host and each Device
-    ├── msprof_*.json
-    ├── xx_*.csv
-    └── README.txt
-```
+      ```bash
+      ├──dump                       # Raw performance data, no user attention needed
+      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle ratio
+      ├──L2Cache.csv                # L2 Cache hit rate, affects MTE2, suggests reasonable data transfer logic to increase hit rate
+      ├──Memory.csv                 # UB, L1 and main memory read/write bandwidth rate
+      ├──MemoryL0.csv               # L0A, L0B, and L0C read/write bandwidth rate
+      ├──MemoryUB.csv               # Vector and Scalar to UB read/write bandwidth rate
+      ├──OpBasicInfo.csv            # Operator basic information
+      ├──PipeUtilization.csv        # Computation unit and transfer unit time and ratio
+      ├──ResourceConflictRatio.csv  # Bank group, bank conflict and resource conflict ratio on UB in all instructions
+      └──visualize_data.bin         # MindStudio Insight presentation file
+      ```
 
 View specific performance analysis results:
 
 ```bash
 # View Task Duration and various metrics
-cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
+cat ./OPPROF_*/PipeUtilization*.csv
 ```
 
-Core analysis file descriptions:
-
-| File Name | Hardware Metrics Analyzed |
-|:---|:---|
-| PipeUtilization.csv | Computation unit and transfer unit time and ratio |
-| Memory.csv | UB, L1, and main storage read/write bandwidth rates |
-| MemoryUB.csv | Vector and Scalar to UB read/write bandwidth rates |
-| L2Cache.csv | L2 Cache hit rate |
-| ResourceConflictRatio.csv | Bank Group, Bank Conflict, and resource conflict rate on UB |
-
-For more msProf tool usage, please refer to the [MindStudio tool](https://www.hiascend.com/document/redirect/CannCommercialToolOpDev) operator tuning (msProf) content.
+For more msOpProf tool usage, please refer to the [MindStudio tool](https://www.hiascend.com/document/redirect/CannCommercialToolOpDev) operator tuning (msOpProf) content.
 
 ## Compilation and Execution
 
 Execute the following steps in the root directory of this sample to compile and execute the sample.
 
 - Configure Environment Variables
-  Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
+  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

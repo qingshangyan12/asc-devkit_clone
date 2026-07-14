@@ -238,7 +238,7 @@ Based on Case 0 Profiling data, the core performance bottlenecks of the current 
 
 **Profiling Data Collection**:
 
-Use the `msprof` tool to collect performance data for Case 0. Key metrics:
+Use the `msOpProf` tool to collect performance data for Case 0. Key metrics:
 
 | Metric | Value | Ratio |
 |:---|:---|:---|
@@ -270,8 +270,8 @@ Use the `msprof` tool to collect performance data for Case 0. Key metrics:
 
 **Principle Analysis**:
 
-RegBase API provides register-level vector computation interfaces. Combined with [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) to call VF functions, VF fusion can be achieved. Core advantages of VF fusion:
-- Within a VF function, after data is loaded from UB to registers, all intermediate computations are completed within registers, requiring only one [LoadAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/连续对齐搬入（LoadAlign）.md) and one [StoreAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/连续对齐搬出（StoreAlign）.md), eliminating Load/Store overhead for intermediate results
+RegBase API provides register-level vector computation interfaces. Combined with [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) to call VF functions, VF fusion can be achieved. Core advantages of VF fusion:
+- Within a VF function, after data is loaded from UB to registers, all intermediate computations are completed within registers, requiring only one [LoadAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/连续对齐搬入（LoadAlign）.md) and one [StoreAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/连续对齐搬出（StoreAlign）.md), eliminating Load/Store overhead for intermediate results
 - Supports VF dual-issue feature, standard computation instruction parallelism can reach 512 bytes/cycle, instruction dispatch efficiency (IPC) is significantly improved
 
 ```
@@ -611,7 +611,7 @@ Run the following steps in the root directory of this example to build and run t
 
 - Configure environment variables
 
-  Configure environment variables based on the [installation method](https://gitcode.com/cann/asc-devkit/blob/master/docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -659,27 +659,30 @@ Run the following steps in the root directory of this example to build and run t
 
 ### Performance Analysis
 
-Use the `msprof` tool to obtain detailed performance data:
+Use the `msOpProf` tool to obtain detailed performance data:
 
 ```bash
-msprof ./demo   # Analyze performance
+msopprof ./demo   # Analyze performance
 ```
 
-A PROF_ prefixed folder is generated in the current directory. The `mindstudio_profiler_output` directory stores Host and Device performance data summaries. Performance data analysis is recommended to view files in this directory.
+    - Performance data description  
+      After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
 
-```bash
-PROF_xxxx_XXXXXX
-├── device_{id}
-└── host
-└── mindstudio_profiler_log
-└── mindstudio_profiler_output    # Stores Host and Device performance data summaries
-    ├── msprof_*.json
-    ├── xx_*.csv
-    └── README.txt
-```
+      ```bash
+      ├──dump                       # Raw performance data, no user attention needed
+      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle ratio
+      ├──L2Cache.csv                # L2 Cache hit rate, affects MTE2, suggests reasonable data transfer logic to increase hit rate
+      ├──Memory.csv                 # UB, L1 and main memory read/write bandwidth rate
+      ├──MemoryL0.csv               # L0A, L0B, and L0C read/write bandwidth rate
+      ├──MemoryUB.csv               # Vector and Scalar to UB read/write bandwidth rate
+      ├──OpBasicInfo.csv            # Operator basic information
+      ├──PipeUtilization.csv        # Computation unit and transfer unit time and ratio
+      ├──ResourceConflictRatio.csv  # Bank group, bank conflict and resource conflict ratio on UB in all instructions
+      └──visualize_data.bin         # MindStudio Insight presentation file
+      ```
 
 View the specific performance analysis results:
 ```bash
 # View Task Duration and various data
-cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
+cat ./OPPROF_*/PipeUtilization*.csv
 ```

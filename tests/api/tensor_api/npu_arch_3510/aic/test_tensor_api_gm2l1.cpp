@@ -16,7 +16,7 @@
 #include <string>
 #include <cxxabi.h>
 #include "mockcpp/mockcpp.hpp"
-#include "tensor_api/stub/cce_stub.h"
+#include "c_api/stub/cce_stub.h"
 #include "include/tensor_api/tensor.h"
 
 class Tensor_Api_Cube_Copy_3510 : public testing::Test {
@@ -350,6 +350,12 @@ TEST_GM2L1_BATCH(uint32_t, ND2Zn, NDExt, ZN, 2, 32, 64)
 // DN -> ZN batched.
 TEST_GM2L1_BATCH(half, DN2Zn, DNExt, ZN, 3, 32, 64)
 TEST_GM2L1_BATCH(uint32_t, DN2Zn, DNExt, ZN, 2, 32, 64)
+
+// NZ -> NZ batched.
+TEST_GM2L1_BATCH(half, Nz2Nz, NZ, NZ, 3, 32, 64)
+
+// ZN -> ZN batched.
+TEST_GM2L1_BATCH(half, Zn2Zn, ZN, ZN, 3, 32, 64)
 
 // ND2ND
 // constraint: col small to big: dst column stride % 32B = 0, col same: no constraint

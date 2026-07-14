@@ -8,6 +8,9 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "sys_var.h cannot be used with compile flag --enable-simt enabled."
+#endif
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
@@ -39,6 +42,27 @@ __aicore__ inline int64_t asc_get_ctrl();
 
 __aicore__ inline int64_t asc_get_block_num();
 
+/*
+ * @ingroup SysVar
+ * @brief：Get the index of the current running block
+ * @return：The index of the current running block
+ */
+__aicore__ inline int64_t asc_get_block_idx();
+
+/*
+ * @ingroup SysVar
+ * @brief：Get the number of Cube Cores (AIC) or Vector Cores (AIV) on an AI Core in split mode
+ * @return：The number of sub-blocks on the AI Core
+ */
+__aicore__ inline int64_t asc_get_sub_block_num();
+
+/*
+ * @ingroup SysVar
+ * @brief：Get the ID of the Vector Core on an AI Core
+ * @return：The Vector Core ID
+ */
+__aicore__ inline int64_t asc_get_sub_block_id();
+
 __aicore__ inline int64_t asc_get_system_cycle();
 
 __aicore__ inline void asc_set_ctrl(uint64_t config);
@@ -49,15 +73,9 @@ __aicore__ inline int64_t asc_get_ffts_base_addr();
 
 __aicore__ inline int64_t asc_get_core_id();
 
-__aicore__ inline int64_t asc_get_block_idx();
-
 __aicore__ inline uint64_t asc_get_overflow_status();
 
 __aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset);
-
-__aicore__ inline int64_t asc_get_sub_block_num();
-
-__aicore__ inline int64_t asc_get_sub_block_id();
 
 __aicore__ inline int64_t asc_get_program_counter();
 

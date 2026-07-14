@@ -12,10 +12,8 @@ repos:
     rev: v4.6.0
     hooks:
       - id: trailing-whitespace
-        files: ^(tests/api/c_api/|include/adv_api/|include/basic_api/|impl/c_api/instr_impl/npu_arch_3510/|include/c_api/|impl/adv_api/(?!detail/(matmul|hccl)/))
         exclude: \.md$
       - id: end-of-file-fixer
-        files: ^(tests/api/c_api/|include/adv_api/|include/basic_api/|impl/c_api/instr_impl/npu_arch_3510/|include/c_api/|impl/adv_api/(?!detail/(matmul|hccl)/))
         exclude: \.md$
       - id: check-yaml
         args: ["--allow-multiple-documents"]
@@ -32,11 +30,27 @@ repos:
       - id: clang-format
         types_or: [file]
         files: \.(c|h|cpp|hpp|cc|hh|cxx|hxx|asc)$
-        exclude: ^(tests/python/aclrt_launch_kernel/stub_files/|impl/|include/(?!adv_api/))
+        exclude: ^(tests/python/aclrt_launch_kernel/stub_files/|include/(?!adv_api/))
         args:
           - "--style=file"
           - "--verbose"
           - "-i"
+
+  # Python 代码检查
+  - repo: https://gitcode.com/gh_mirrors/ru/ruff-pre-commit
+    rev: v0.14.14
+    hooks:
+      - id: ruff-check
+        # 临时忽略存量问题，按目录治理后逐项移除。
+        args:
+          - "--output-format"
+          - "github"
+          - "--fix"
+          - "--extend-ignore"
+          - "E402,E711,E712,E721,F401,F403,F405,F811,F821,F841,F523,E741,F601"
+        types: [python]
+      - id: ruff-format
+        types: [python]
 
   # OAT 合规性检查 (Open Source Audit Tool)
   - repo: local
