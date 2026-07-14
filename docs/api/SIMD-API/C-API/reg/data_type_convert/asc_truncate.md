@@ -1,7 +1,6 @@
 # asc_trunc / asc_rint / asc_round / asc_floor / asc_ceil
 
 ## 产品支持情况
-## 产品支持情况
 
 <!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持

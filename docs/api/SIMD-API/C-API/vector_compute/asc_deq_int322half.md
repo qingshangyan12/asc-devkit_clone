@@ -2,7 +2,6 @@
 # asc_deq_int322half
 
 ## 产品支持情况
-## 产品支持情况
 
 <!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：不支持
