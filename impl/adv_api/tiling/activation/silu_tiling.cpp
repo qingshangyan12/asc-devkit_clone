@@ -13,12 +13,11 @@
  * \brief
  */
 #include <cstdint>
-#include "graph/tensor.h"
 #include "../../../../include/adv_api/activation/silu_tiling.h"
 
 namespace AscendC {
 void GetSiluTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    const AscendC::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
     uint32_t& minValue)
 {
     (void)srcShape;

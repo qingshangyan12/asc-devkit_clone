@@ -17,7 +17,6 @@
 
 #include <set>
 
-#include "graph/tensor.h"
 #include "register/tilingdata_base.h"
 #include "../../detail/api_check/host_apicheck.h"
 
@@ -31,14 +30,14 @@ static constexpr const char GELU_GET_MAX[] = "GetGeluMaxTmpSize";
 static constexpr const char GELU_GET_MIN[] = "GetGeluMinTmpSize";
 static constexpr const char GELU_GET_MAX_MIN[] = "GetGeluMaxMinTmpSize";
 
-uint32_t GetGeluMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize)
+uint32_t GetGeluMinTmpSize(const AscendC::Shape& srcShape, const uint32_t typeSize)
 {
     HighLevelApiCheck::SrcShapeSizeVerifyingParameters<GELU_GET_MIN>(srcShape.GetShapeSize(), typeSize);
     HighLevelApiCheck::TypeSizeVerifyingParameters<GELU_GET_MIN>(typeSize, SUPPORT_TYPESIZE);
     return GELU_THREE_TIMES * GELU_ONE_REPEAT_BYTE_SIZE;
 }
 
-uint32_t GetGeluMaxTmpSize(const ge::Shape& srcShape, const uint32_t typeSize)
+uint32_t GetGeluMaxTmpSize(const AscendC::Shape& srcShape, const uint32_t typeSize)
 {
     HighLevelApiCheck::SrcShapeSizeVerifyingParameters<GELU_GET_MAX>(srcShape.GetShapeSize(), typeSize);
     HighLevelApiCheck::TypeSizeVerifyingParameters<GELU_GET_MAX>(typeSize, SUPPORT_TYPESIZE);
@@ -54,7 +53,7 @@ uint32_t GetGeluMaxTmpSize(const ge::Shape& srcShape, const uint32_t typeSize)
     return minValue > maxValue ? minValue : maxValue;
 }
 
-void GetGeluMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue)
+void GetGeluMaxMinTmpSize(const AscendC::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue)
 {
     HighLevelApiCheck::SrcShapeSizeVerifyingParameters<GELU_GET_MAX_MIN>(srcShape.GetShapeSize(), typeSize);
     HighLevelApiCheck::TypeSizeVerifyingParameters<GELU_GET_MAX_MIN>(typeSize, SUPPORT_TYPESIZE);

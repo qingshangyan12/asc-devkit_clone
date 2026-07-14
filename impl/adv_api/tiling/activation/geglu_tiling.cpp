@@ -17,7 +17,6 @@
 #include <cstdint>
 #include <set>
 
-#include "graph/tensor.h"
 #include "../../detail/host_log.h"
 #include "../../detail/api_check/host_apicheck.h"
 namespace AscendC {
@@ -45,7 +44,7 @@ inline uint32_t GetGeGLUMinTmpSize(const uint32_t typeSize)
 } // namespace
 
 void GetGeGLUMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    const AscendC::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
     uint32_t& minValue)
 {
     HighLevelApiCheck::SrcShapeSizeVerifyingParameters<GE_GELU_GET_MAX_MIN>(srcShape.GetShapeSize(), typeSize);

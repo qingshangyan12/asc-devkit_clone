@@ -16,7 +16,7 @@
 #ifndef LIB_MATH_BITWISE_XOR_TILING_H
 #define LIB_MATH_BITWISE_XOR_TILING_H
 
-#include "graph/tensor.h"
+#include "utils/types.h"
 #include "tiling/platform/platform_ascendc.h"
 namespace AscendC {
 /*!
@@ -31,7 +31,7 @@ namespace AscendC {
  * \param [out] minValue, minimum temporary space required
  */
 void GetBitwiseXorMaxMinTmpSize(
-    const platform_ascendc::PlatformAscendC& ascendcPlatform, const ge::Shape& srcShape, const uint32_t typeSize,
+    const platform_ascendc::PlatformAscendC& ascendcPlatform, const AscendC::Shape& srcShape, const uint32_t typeSize,
     const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
 
 /*!

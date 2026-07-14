@@ -24,7 +24,7 @@ constexpr uint32_t LAYERNORM_GRAD_BETA_FLOAT_SIZE = 4;
 constexpr uint32_t LAYERNORM_GRAD_BETA_SRC_DIM_NUM = 4;
 
 void CheckLayerNormGradBetaHostCommon(
-    const char* apiName, const char* hostFuncName, const ge::Shape& srcShape, const uint32_t typeSize)
+    const char* apiName, const char* hostFuncName, const AscendC::Shape& srcShape, const uint32_t typeSize)
 {
     ASCENDC_HOST_ASSERT(
         typeSize == LAYERNORM_GRAD_BETA_HALF_SIZE || typeSize == LAYERNORM_GRAD_BETA_FLOAT_SIZE, return,
@@ -39,7 +39,7 @@ void CheckLayerNormGradBetaHostCommon(
     return;
 }
 
-uint32_t GetLayerNormGradBetaMaxTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource)
+uint32_t GetLayerNormGradBetaMaxTmpSize(const AscendC::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource)
 {
     (void)(isReuseSource);
     std::vector<int64_t> shapeDims = srcShape.GetDims();
@@ -58,7 +58,7 @@ uint32_t GetLayerNormGradBetaMaxTmpSize(const ge::Shape& srcShape, const uint32_
     return LAYERNORM_GRAD_BETA_TWO_BUF_NUM * inputSize;
 }
 
-uint32_t GetLayerNormGradBetaMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource)
+uint32_t GetLayerNormGradBetaMinTmpSize(const AscendC::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource)
 {
     (void)(isReuseSource);
     std::vector<int64_t> shapeDims = srcShape.GetDims();
@@ -98,7 +98,7 @@ void SetLayerNormGradBetaNDTilingInfo(
 } // namespace
 
 void GetLayerNormGradBetaMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    const AscendC::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
     uint32_t& minValue)
 {
     CheckLayerNormGradBetaHostCommon("LayerNormGradBeta", "GetLayerNormGradBetaMaxMinTmpSize", srcShape, typeSize);
@@ -107,7 +107,7 @@ void GetLayerNormGradBetaMaxMinTmpSize(
 }
 
 void GetLayerNormGradBetaNDTilingInfo(
-    const ge::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
+    const AscendC::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
     optiling::LayerNormGradBetaTiling& tiling)
 {
     CheckLayerNormGradBetaHostCommon("LayerNormGradBeta", "GetLayerNormGradBetaNDTilingInfo", srcShape, typeSize);
@@ -174,7 +174,7 @@ void GetLayerNormGradBetaNDTilingInfo(
 }
 
 void GetLayerNormGradBetaNDTilingInfo(
-    const ge::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
+    const AscendC::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
     AscendC::tiling::LayerNormGradBetaTiling& tiling)
 {
     optiling::LayerNormGradBetaTiling tilingData;

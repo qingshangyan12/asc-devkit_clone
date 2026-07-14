@@ -16,7 +16,6 @@
 
 #include <cstdint>
 
-#include "graph/tensor.h"
 #include "../../detail/host_log.h"
 #include "../../../../include/utils/tiling/platform/platform_ascendc.h"
 namespace AscendC {
@@ -39,7 +38,7 @@ inline uint32_t GetAscendQuantMaxTmpSize(const uint32_t inputSize)
 inline uint32_t GetAscendQuantMinTmpSize() { return ASCEND_QUANT_TWO_TIMES * ASCEND_QUANT_ONE_REPEAT_BYTE_SIZE; }
 
 void CheckQuantHostCommon(
-    const char* apiName, const char* hostFuncName, const ge::Shape& srcShape, const uint32_t typeSize)
+    const char* apiName, const char* hostFuncName, const AscendC::Shape& srcShape, const uint32_t typeSize)
 {
     ASCENDC_HOST_ASSERT(
         srcShape.GetShapeSize() > 0, return, "[%s][%s] Input Shape size must be greater than 0.", apiName,
@@ -61,7 +60,7 @@ void GetAscendQuantTmpBufferFactorSize(uint32_t& maxLiveNodeCount, uint32_t& ext
 }
 
 void GetAscendQuantMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue)
+    const AscendC::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue)
 {
     CheckQuantHostCommon("AscendQuant", "GetAscendQuantMaxMinTmpSize", srcShape, typeSize);
     maxValue = GetAscendQuantMaxTmpSize(srcShape.GetShapeSize());

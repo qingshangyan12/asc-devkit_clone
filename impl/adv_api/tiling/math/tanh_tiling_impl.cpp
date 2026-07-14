@@ -14,7 +14,6 @@
  */
 #include <cstdint>
 #include "../../detail/host_log.h"
-#include "graph/tensor.h"
 #include "../../../../include/adv_api/math/tanh_tiling.h"
 
 namespace AscendC {
@@ -38,7 +37,7 @@ inline uint32_t GetTanhMinTmpSize(const uint32_t typeSize)
 } // namespace
 
 void GetTanhMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    const AscendC::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
     uint32_t& minValue)
 {
     (void)isReuseSource;

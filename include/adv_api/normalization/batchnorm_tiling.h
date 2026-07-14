@@ -9,7 +9,7 @@
  */
 #ifndef LIB_NORMALIZATION_BATCHNORM_TILING_H
 #define LIB_NORMALIZATION_BATCHNORM_TILING_H
-#include "graph/tensor.h"
+#include "utils/types.h"
 #include "batchnorm_tilingdata.h"
 #include "kernel_tiling/kernel_tiling.h"
 namespace AscendC {
@@ -30,7 +30,7 @@ namespace AscendC {
            if src shape is illeagl for basic block, it will return false.
  */
 bool GetBatchNormMaxMinTmpSize(
-    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t typeSize, const bool isReuseSource,
+    const AscendC::Shape& srcShape, const AscendC::Shape& originSrcShape, const uint32_t typeSize, const bool isReuseSource,
     uint32_t& maxValue, uint32_t& minValue, const bool isBasicBlock = false);
 
 /*!
@@ -50,11 +50,11 @@ bool GetBatchNormMaxMinTmpSize(
    if src shape and origin src shape is illeagl or input stackBufferByteSize is not big enough, it will return false.
  */
 bool GetBatchNormNDTilingInfo(
-    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize,
+    const AscendC::Shape& srcShape, const AscendC::Shape& originSrcShape, const uint32_t stackBufferByteSize,
     const uint32_t typeSize, const bool isReuseSource, optiling::BatchNormTiling& tilling,
     const bool isBasicBlock = false);
 bool GetBatchNormNDTilingInfo(
-    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize,
+    const AscendC::Shape& srcShape, const AscendC::Shape& originSrcShape, const uint32_t stackBufferByteSize,
     const uint32_t typeSize, const bool isReuseSource, AscendC::tiling::BatchNormTiling& tilling,
     const bool isBasicBlock = false);
 } // namespace AscendC

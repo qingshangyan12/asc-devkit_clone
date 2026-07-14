@@ -70,7 +70,7 @@ void GetDigammaTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNod
 }
 
 void GetDigammaMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    const AscendC::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
     uint32_t& minValue)
 {
     const uint32_t inputSize = srcShape.GetShapeSize();
