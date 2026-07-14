@@ -39,13 +39,13 @@
 
 根据以上的描述，为了简化编程（开发者无需关心addr是否在DCache缓存以及是否被标记为“脏”），建议开发者在使用WriteGmByPassDCache接口时采用如下代码片段：
 
-    ```cpp
-    AscendC::GlobalTensor<T> global; // global为addr对应的GlobalTensor
-    AscendC::DataCacheCleanAndInvalid<T, AscendC::CacheLine::SINGLE_CACHE_LINE, AscendC::DcciDst::CACHELINE_OUT>(global);
-    // 保证WriteGmByPassDCache接口向addr写入value之前，DCache缓存中的脏数据已经写回GM。
-    AscendC::DataSyncBarrier<AscendC::MemDsbT::DDR>();
-    AscendC::WriteGmByPassDCache<T>(addr, value);
-    ```
+```cpp
+AscendC::GlobalTensor<T> global; // global为addr对应的GlobalTensor
+AscendC::DataCacheCleanAndInvalid<T, AscendC::CacheLine::SINGLE_CACHE_LINE, AscendC::DcciDst::CACHELINE_OUT>(global);
+// 保证WriteGmByPassDCache接口向addr写入value之前，DCache缓存中的脏数据已经写回GM。
+AscendC::DataSyncBarrier<AscendC::MemDsbT::DDR>();
+AscendC::WriteGmByPassDCache<T>(addr, value);
+```
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
