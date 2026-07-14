@@ -33,6 +33,7 @@
 对于Ascend 950PR/Ascend 950DT产品：
 - 该接口仅对asc_copy_gm2ub_align接口有效。
 - fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t类型的数据需转换成int8_t类型后再调用本接口。
+<!-- end id4 -->
 
 ## 函数原型
 
@@ -73,4 +74,3 @@ PIPE_S
 asc_set_copy_pad_val(0);
 asc_copy_gm2ub_align(dst, src, 2, 48 * sizeof(int8_t), 0, 0, true, 0, 0, 0);
 ```
-<!-- end id4 -->
