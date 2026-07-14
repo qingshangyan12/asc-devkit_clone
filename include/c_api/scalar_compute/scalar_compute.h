@@ -54,6 +54,7 @@ __aicore__ inline void asc_store_dev(__gm__ int32_t* addr, int32_t value);
 __aicore__ inline void asc_store_dev(__gm__ uint32_t* addr, uint32_t value);
 __aicore__ inline void asc_store_dev(__gm__ int64_t* addr, int64_t value);
 __aicore__ inline void asc_store_dev(__gm__ uint64_t* addr, uint64_t value);
+namespace __asc_aicore {
 __aicore__ inline int32_t asc_atomic_add(__gm__ int32_t* address, int32_t val);
 __aicore__ inline uint32_t asc_atomic_add(__gm__ uint32_t* address, uint32_t val);
 __aicore__ inline float asc_atomic_add(__gm__ float* address, float val);
@@ -101,7 +102,6 @@ __aicore__ inline uint64_t asc_atomic_inc(__gm__ uint64_t* address, uint64_t val
 __aicore__ inline uint32_t asc_atomic_dec(__gm__ uint32_t* address, uint32_t val);
 __aicore__ inline uint64_t asc_atomic_dec(__gm__ uint64_t* address, uint64_t val);
 }
-namespace __asc_aicore {
 
 #endif
 

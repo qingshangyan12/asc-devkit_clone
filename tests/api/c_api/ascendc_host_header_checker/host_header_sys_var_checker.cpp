@@ -12,33 +12,33 @@
 
 static void test_host_c_api_sys_var_0()
 {
-    (void)static_cast<int64_t(*)()>(&asc_get_ar_spr);
-    (void)static_cast<void(*)(uint32_t&)>(&asc_get_arch_ver);
-    (void)static_cast<int64_t(*)()>(&asc_get_block_idx);
-    (void)static_cast<int64_t(*)()>(&asc_get_block_num);
-    (void)static_cast<int64_t(*)()>(&asc_get_core_id);
-    (void)static_cast<int64_t(*)()>(&asc_get_ctrl);
-    (void)static_cast<int64_t(*)()>(&asc_get_ffts_base_addr);
-    (void)static_cast<uint64_t(*)()>(&asc_get_overflow_status);
-    (void)static_cast<uint64_t(*)(uint64_t)>(&asc_get_phy_buf_addr);
-    (void)static_cast<int64_t(*)()>(&asc_get_phy_stack_base);
-    (void)static_cast<int64_t(*)()>(&asc_get_program_counter);
-    (void)static_cast<int64_t(*)()>(&asc_get_smmu_tag_version);
-    (void)static_cast<int64_t(*)()>(&asc_get_squeeze_status);
-    (void)static_cast<int64_t(*)()>(&asc_get_status);
-    (void)static_cast<int64_t(*)()>(&asc_get_sub_block_id);
-    (void)static_cast<int64_t(*)()>(&asc_get_sub_block_num);
-    (void)static_cast<int64_t(*)()>(&asc_get_sys_virtual_base);
-    (void)static_cast<int64_t(*)()>(&asc_get_system_cycle);
-    (void)static_cast<int64_t(*)()>(&asc_get_vf_len);
-    (void)static_cast<void(*)(uint64_t)>(&asc_set_ctrl);
-    (void)static_cast<void(*)(uint64_t)>(&asc_set_ffts_base_addr);
-    (void)static_cast<void(*)(uint64_t)>(&asc_set_gm2l1_nz_para);
-    (void)static_cast<void(*)(uint64_t)>(&asc_set_l0c2gm_channel_para);
-    (void)static_cast<void(*)(uint64_t)>(&asc_set_l0c2gm_quant_post);
-    (void)static_cast<void(*)(uint64_t)>(&asc_set_l0c2gm_relu_alpha);
-    (void)static_cast<void(*)(uint64_t)>(&asc_set_l12l0_padding_val);
-    (void)static_cast<void(*)(uint64_t)>(&asc_set_l13d_padding);
-    (void)static_cast<void(*)(uint64_t)>(&asc_set_l3d_rpt_b);
+    using ::asc_get_ar_spr;
+    using ::asc_get_arch_ver;
+    using ::asc_get_block_idx;
+    using ::asc_get_block_num;
+    using ::asc_get_core_id;
+    using ::asc_get_ctrl;
+    using ::asc_get_ffts_base_addr;
+    using ::asc_get_overflow_status;
+    using ::asc_get_phy_buf_addr;
+    using ::asc_get_phy_stack_base;
+    using ::asc_get_program_counter;
+    using ::asc_get_smmu_tag_version;
+    using ::asc_get_squeeze_status;
+    using ::asc_get_status;
+    using ::asc_get_sub_block_id;
+    using ::asc_get_sub_block_num;
+    using ::asc_get_sys_virtual_base;
+    using ::asc_get_system_cycle;
+    using ::asc_get_vf_len;
+    using ::asc_set_ctrl;
+    using ::asc_set_ffts_base_addr;
+    using ::asc_set_gm2l1_nz_para;
+    using ::asc_set_l0c2gm_channel_para;
+    using ::asc_set_l0c2gm_quant_post;
+    using ::asc_set_l0c2gm_relu_alpha;
+    using ::asc_set_l12l0_padding_val;
+    using ::asc_set_l13d_padding;
+    using ::asc_set_l3d_rpt_b;
 }
 

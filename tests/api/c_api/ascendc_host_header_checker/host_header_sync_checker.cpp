@@ -12,9 +12,9 @@
 
 static void test_host_c_api_sync_0()
 {
-    (void)static_cast<void(*)()>(&asc_sync);
-    (void)static_cast<void(*)(int)>(&asc_sync_mte2);
-    (void)static_cast<void(*)(int)>(&asc_sync_mte3);
-    (void)static_cast<void(*)()>(&asc_sync_vec);
+    using ::asc_sync;
+    using ::asc_sync_mte2;
+    using ::asc_sync_mte3;
+    using ::asc_sync_vec;
 }
 

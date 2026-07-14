@@ -12,15 +12,15 @@
 
 static void test_host_c_api_cache_ctrl_0()
 {
-    (void)static_cast<void(*)(__gm__ uint64_t* int64_t)>(&asc_datacache_preload);
-    (void)static_cast<void(*)()>(&asc_dcci_entire_all);
-    (void)static_cast<void(*)()>(&asc_dcci_entire_atomic);
-    (void)static_cast<void(*)()>(&asc_dcci_entire_out);
-    (void)static_cast<void(*)()>(&asc_dcci_entire_ub);
-    (void)static_cast<void(*)(__gm__ void*)>(&asc_dcci_single);
-    (void)static_cast<void(*)()>(&asc_dci);
-    (void)static_cast<int64_t(*)()>(&asc_get_icache_preload_status);
-    (void)static_cast<void(*)(const void* int64_t)>(&asc_icache_preload);
-    (void)static_cast<void(*)(__ubuf__ void*)>(&asc_ub_dcci_single);
+    using ::asc_datacache_preload;
+    using ::asc_dcci_entire_all;
+    using ::asc_dcci_entire_atomic;
+    using ::asc_dcci_entire_out;
+    using ::asc_dcci_entire_ub;
+    using __asc_aicore::asc_dcci_single;
+    using ::asc_dci;
+    using ::asc_get_icache_preload_status;
+    using ::asc_icache_preload;
+    using ::asc_ub_dcci_single;
 }
 
