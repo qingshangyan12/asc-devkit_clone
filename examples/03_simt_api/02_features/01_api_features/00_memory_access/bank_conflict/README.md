@@ -19,7 +19,8 @@
 │   ├── figures              // README中的图片资源
 │   ├── bank_conflict.asc    // SIMT UB Bank冲突样例实现
 │   ├── CMakeLists.txt       // cmake编译文件
-│   └── README.md
+│   ├── README.md
+│   └── README_en.md
 ```
 
 ## 样例描述
