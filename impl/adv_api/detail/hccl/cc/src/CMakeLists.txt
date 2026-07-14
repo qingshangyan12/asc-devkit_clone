@@ -54,14 +54,13 @@ set(INCLUDE_LIST
     #${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/ccu
     #${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/ccu/kernel
 
-    #${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather
-    #${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/executor
-    #${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/selector
-    #${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template
-    #${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/aicpu
-    #${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/aiv
-    #${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/ccu
-    #${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/ccu/kernel
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/executor
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/selector
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/aicpu
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/ccu
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/ccu/kernel
 
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/executor
