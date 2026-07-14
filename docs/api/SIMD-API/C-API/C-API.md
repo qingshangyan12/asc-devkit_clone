@@ -129,9 +129,9 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_copy_gm2l0b](cube_datamove/asc_copy_gm2l0b.md)                                                                         | 将GM中的数据搬运到L0B中。 | 
 | [asc_copy_gm2l1](cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_arch_2201.md)                                                  | 将GM中的数据搬运到L1中。|
 | [asc_copy_gm2l1_nd2nz](cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz.md)                                                                  | 将GM中的数据搬运到L1中。|
-| <cann-filter npu_type = "950"> [asc_copy_gm2l1_align](cube_datamove/asc_copy_gm2l1_align.md)                                | 将GM中的数据padding后搬运到L1中。</cann-filter> |
-| <cann-filter npu_type = "950"> [asc_copy_gm2l1](cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_arch_3510.md)                   | 将GM中的数据搬运到L1中。</cann-filter> |
-| <cann-filter npu_type = "950"> [asc_copy_gm2l1_dn2nz](cube_datamove/asc_copy_gm2l1_dn2nz.md)                                | 将GM中的数据搬运到L1中，在此过程中执行DN->NZ/NCHW->NC1HWC0/NCHW->C1HWNC0操作。 </cann-filter> |
+|<!-- npu="950" id1 -->  [asc_copy_gm2l1_align](cube_datamove/asc_copy_gm2l1_align.md)<!-- end id1 --> 将GM中的数据padding后搬运到L1中。 |
+|<!-- npu="950" id2 -->  [asc_copy_gm2l1](cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_arch_3510.md)<!-- end id2 --> 将GM中的数据搬运到L1中。 |
+|<!-- npu="950" id3 -->  [asc_copy_gm2l1_dn2nz](cube_datamove/asc_copy_gm2l1_dn2nz.md)<!-- end id3 --> 将GM中的数据搬运到L1中，在此过程中执行DN->NZ/NCHW->NC1HWC0/NCHW->C1HWNC0操作。  |
 | [asc_copy_l12gm](cube_datamove/asc_copy_l12gm.md)                                                                           | 将数据从L1搬运到GM。 |
 | [asc_copy_l0c2gm](cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm.md)                                                                            | 将L0C中的数据搬运到GM中。 |
 | [asc_copy_l0c2ub](cube_datamove/asc_copy_l0c2ub.md)                                                                         | 将L0C中的数据搬运到UB中。 |
@@ -145,7 +145,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_copy_l12bt](cube_datamove/asc_copy_l12bt/asc_copy_l12bt.md)                                                                              | 将MMAD指令的Bias数据从L1 Buffer搬运到BiasTable Buffer中。 |
 | [asc_copy_l12fb](cube_datamove/asc_copy_l12fb/asc_copy_l12fb.md)                                                                              | 将数据从L1 Buffer搬运到Fixpipe Buffer中，Fixpipe Buffer用于存放量化参数。 |
 | [asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)                                                                            | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0A Buffer里。 |
-| <cann-filter npu_type = "950"> [asc_copy_l12ub](cube_datamove/asc_copy_l12ub.md)                                            | 将数据从L1 Buffer搬运到Unified Buffer中。</cann-filter> |
+|<!-- npu="950" id4 -->  [asc_copy_l12ub](cube_datamove/asc_copy_l12ub.md)<!-- end id4 --> 将数据从L1 Buffer搬运到Unified Buffer中。 |
 | [asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)                                                                            | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0B Buffer里。 |
 | [asc_copy_l12l0c](cube_datamove/asc_copy_l12l0c.md)                                                                         | 将矩阵由L1 Buffer搬运到L0C Buffer中。 |
 | [asc_copy_l12l0b_sparse](cube_datamove/asc_copy_l12l0b_sparse.md)                                                           | 用于搬运存放在L1 Buffer里的512B大小的稠密权重矩阵到L0B Buffer里，同时读取128B大小的索引矩阵用于稠密矩阵的稀疏化。 |
@@ -153,8 +153,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_copy_l12l0a_trans](cube_datamove/asc_copy_l12l0a_trans.md)                                                             | 该接口实现带转置的2D格式数据从L1 Buffer到L0A Buffer的加载。 |
 | [asc_set_l0c_copy_params](cube_datamove/asc_set_l0c_copy_params.md)                                                         | DataCopy（CO1->GM、CO1->A1）过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。 |
 | [asc_set_l0c_copy_prequant](cube_datamove/asc_set_l0c_copy_prequant.md)                                                     | 数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的标量量化参数。 |
-| <cann-filter npu_type = "950"> [asc_copy_l12l0a_mx](cube_datamove/asc_copy_l12l0a_mx.md)                                    | 将Mx scale矩阵从L1 Buffer搬运到L0A Buffer。</cann-filter> |
-| <cann-filter npu_type = "950"> [asc_copy_l12l0b_mx](cube_datamove/asc_copy_l12l0b_mx.md)                                    | 将Mx scale矩阵从L1 Buffer搬运到L0B Buffer。</cann-filter> |
+|<!-- npu="950" id5 -->  [asc_copy_l12l0a_mx](cube_datamove/asc_copy_l12l0a_mx.md)<!-- end id5 --> 将Mx scale矩阵从L1 Buffer搬运到L0A Buffer。 |
+|<!-- npu="950" id6 -->  [asc_copy_l12l0b_mx](cube_datamove/asc_copy_l12l0b_mx.md)<!-- end id6 --> 将Mx scale矩阵从L1 Buffer搬运到L0B Buffer。 |
 | [asc_set_l13d_padding](cube_datamove/asc_set_l13d_padding.md)                                                               | 设置Pad属性描述，用于在调用asc_copy_l12l0a接口时配置填充数值。 |
 | [asc_set_l13d_fmatrix](cube_datamove/asc_set_l13d_fmatrix.md)                                                               | 设置Feature map属性描述，用于在调用[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口时配置填充数值。从左矩阵获取FeatureMap的属性时使用该接口。|
 | [asc_set_l13d_fmatrix_b](cube_datamove/asc_set_l13d_fmatrix_b.md)                                                           | 设置Feature map属性描述，用于在调用[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口时配置填充数值。从右矩阵获取FeatureMap的属性时使用该接口。|
@@ -214,8 +214,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_set_mmad_direction_m](cube_compute/asc_set_mmad_direction_m.md)| 设置mmad计算时优先通过M/N中的M方向生成结果，然后通过N方向产生结果，M为矩阵的行，N为矩阵的列。 |
 | [asc_set_mmad_direction_n](cube_compute/asc_set_mmad_direction_n.md)| 设置mmad计算时优先通过M/N中的N方向生成结果，然后通过M方向产生结果，M为矩阵的行，N为矩阵的列。 |
 | [asc_enable_hf32_trans](cube_compute/asc_enable_hf32_trans.md)| 设置HF32模式取整方式，需要先使用asc_enable_hf32开启HF32取整模式。 |
-| <cann-filter npu_type = "950"> [asc_enable_hif8](cube_compute/asc_enable_hif8.md) | 用于设置Mmad计算开启HiF8模式，开启该模式后L0A Buffer/L0B Buffer中的8bit数据将在参与矩阵乘法运算前被转化为hifloat8_t类型数据。 </cann-filter> |
-| <cann-filter npu_type = "950"> [asc_enable_fp8](cube_compute/asc_enable_fp8.md) | 用于设置Mmad计算开启FP8模式，开启该模式后L0A Buffer/L0B Buffer中的FP8数据在参与Mmad计算之前不会被转化为hifloat8_t类型数据。 </cann-filter> |
+|<!-- npu="950" id7 -->  [asc_enable_hif8](cube_compute/asc_enable_hif8.md)<!-- end id7 --> 用于设置Mmad计算开启HiF8模式，开启该模式后L0A Buffer/L0B Buffer中的8bit数据将在参与矩阵乘法运算前被转化为hifloat8_t类型数据。  |
+|<!-- npu="950" id8 -->  [asc_enable_fp8](cube_compute/asc_enable_fp8.md)<!-- end id8 --> 用于设置Mmad计算开启FP8模式，开启该模式后L0A Buffer/L0B Buffer中的FP8数据在参与Mmad计算之前不会被转化为hifloat8_t类型数据。  |
 | [asc_mmad](cube_compute/asc_mmad.md) | 完成矩阵乘加操作。 |
 | [asc_mmad_sparse](cube_compute/asc_mmad_sparse.md) | 完成矩阵乘加操作，传入的左矩阵A为稀疏矩阵，右矩阵B为稠密矩阵。 |
 | [asc_set_fp32_mode](cube_compute/asc_set_fp32_mode.md) | 用于设置Mmad计算开启FP32模式，开启该模式后L0A Buffer/L0B Buffer中的FP32数据在参与Mmad计算之前不做舍入处理。 |
@@ -232,8 +232,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 |   API名称   |   说明   |
 |----------|-----------|
-| <cann-filter npu_type = "950"> [asc_unlock](sync/asc_unlock.md)| 释放缓存。</cann-filter> |
-| <cann-filter npu_type = "950"> [asc_lock](sync/asc_lock.md)| 用于AI Core内部异步流水线同步的接口。</cann-filter> |
+|<!-- npu="950" id9 -->  [asc_unlock](sync/asc_unlock.md)<!-- end id9 --> 释放缓存。 |
+|<!-- npu="950" id10 -->  [asc_lock](sync/asc_lock.md)<!-- end id10 --> 用于AI Core内部异步流水线同步的接口。 |
 | [asc_sync_notify](sync/asc_sync_notify.md)| 设置同步标志。 |
 | [asc_sync_wait](sync/asc_sync_wait.md)| 等待同步标志。 |
 | [asc_sync_pipe](sync/asc_sync_pipe.md)| 等待指定流水线操作完成。 |
@@ -244,8 +244,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_sync_data_barrier](sync/asc_sync_data_barrier.md) | 用于阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可以通过参数控制）执行结束。 |
 | [asc_sync_block_arrive](sync/asc_sync_block_arrive.md) | 该指令用于发送同步信息数据到核间同步寄存器，设置同步点。 |
 | [asc_sync_block_wait](sync/asc_sync_block_wait.md) | 和[asc_sync_block_arrive](sync/asc_sync_block_arrive.md)配合使用（通过flag_id关联），用于等待所有同步对象到达flag_id对应的同步点。 |
-| <cann-filter npu_type = "950"> [asc_sync_intra_wait](sync/asc_sync_intra_wait.md)| 等待核间同步寄存器同步标志。 </cann-filter> |
-| <cann-filter npu_type = "950"> [asc_sync_intra_arrive](sync/asc_sync_intra_arrive.md)| 向核间同步寄存器发送同步信号。 </cann-filter> |
+|<!-- npu="950" id11 -->  [asc_sync_intra_wait](sync/asc_sync_intra_wait.md)<!-- end id11 --> 等待核间同步寄存器同步标志。  |
+|<!-- npu="950" id12 -->  [asc_sync_intra_arrive](sync/asc_sync_intra_arrive.md)<!-- end id12 --> 向核间同步寄存器发送同步信号。  |
 | [asc_sync_inter_arrive](sync/asc_sync_inter_arrive.md)| 和[asc_sync_inter_wait](sync/asc_sync_inter_wait.md)配合使用（通过flag_id关联），用于组间block的信号同步。|
 | [asc_sync_inter_wait](sync/asc_sync_inter_wait.md)| 等待block内同步标志。|
 | [asc_sync_subblock_arrive](sync/asc_sync_subblock_arrive.md)| 和[asc_sync_subblock_wait](sync/asc_sync_subblock_wait.md)配合使用（通过flag_id关联），用于组内subblock间的信号同步。 |
@@ -275,10 +275,10 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_get_status](sys_var/asc_get_status.md) | 获取状态信息。 |
 | [asc_get_sys_virtual_base](sys_var/asc_get_sys_virtual_base.md) | 获取系统虚拟基地址。 |
 | [asc_get_vf_len](sys_var/asc_get_vf_len.md) | 获取Tensor位宽VL（Vector Length）的大小。 |
-| <cann-filter npu_type = "950"> [asc_set_gm2l1_nz_para](sys_var/asc_set_gm2l1_nz_para.md) | 设置MTE2_NZ_PARA寄存器的值。</cann-filter> |
-| <cann-filter npu_type = "950"> [asc_set_l12l0_padding_val](sys_var/asc_set_l12l0_padding_val.md) | 设置PADDING_B寄存器的值。</cann-filter> |
-| <cann-filter npu_type = "950"> [asc_set_l0c2gm_quant_post](sys_var/asc_set_l0c2gm_quant_post.md) | 设置QUANT_POST寄存器的值。</cann-filter> |
-| <cann-filter npu_type = "950"> [asc_set_l0c2gm_relu_alpha](sys_var/asc_set_l0c2gm_relu_alpha.md) | 设置RELU_ALPHA寄存器的值。</cann-filter> |
+|<!-- npu="950" id13 -->  [asc_set_gm2l1_nz_para](sys_var/asc_set_gm2l1_nz_para.md)<!-- end id13 --> 设置MTE2_NZ_PARA寄存器的值。 |
+|<!-- npu="950" id14 -->  [asc_set_l12l0_padding_val](sys_var/asc_set_l12l0_padding_val.md)<!-- end id14 --> 设置PADDING_B寄存器的值。 |
+|<!-- npu="950" id15 -->  [asc_set_l0c2gm_quant_post](sys_var/asc_set_l0c2gm_quant_post.md)<!-- end id15 --> 设置QUANT_POST寄存器的值。 |
+|<!-- npu="950" id16 -->  [asc_set_l0c2gm_relu_alpha](sys_var/asc_set_l0c2gm_relu_alpha.md)<!-- end id16 --> 设置RELU_ALPHA寄存器的值。 |
 | [asc_set_l0c2gm_channel_para](sys_var/asc_set_l0c2gm_channel_para.md) | 对通道步长参数的专用寄存器的比特位进行设置。 |
 | [asc_set_l3d_rpt_b](sys_var/asc_set_l3d_rpt_b.md) | 用于设置接口asc_copy_l12l0a、asc_copy_l12l0b的2D格式搬运的repeat参数。|
 
@@ -291,7 +291,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 |----------|-----------|
 | [asc_datacache_preload](cache_ctrl/asc_datacache_preload.md)| 从源地址所在的特定GM地址预加载数据到Data Cache中。 |
 | [asc_dcci](cache_ctrl/asc_dcci.md) | 用于刷新Cache，保证Cache的一致性。 |
-| <cann-filter npu_type = "950"> [asc_dci](cache_ctrl/asc_dci.md) | 数据缓存失效，使整个数据缓存无效化。</cann-filter>|
+|<!-- npu="950" id17 -->  [asc_dci](cache_ctrl/asc_dci.md)<!-- end id17 --> 数据缓存失效，使整个数据缓存无效化。|
 | [asc_get_icache_preload_status](cache_ctrl/asc_get_icache_preload_status.md) | 获取ICache的Preload的状态。 |
 | [asc_icache_preload](cache_ctrl/asc_icache_preload.md) | 从指令所在DDR地址预加载数据到对应的cacheline中。 |
 
@@ -320,7 +320,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_set_atomic_min_int8](simd_atomic/asc_set_atomic_min.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int8_t数据与GM中已有数据进行逐元素比较，并将最小值写入GM。 |
 | [asc_set_atomic_min_int16](simd_atomic/asc_set_atomic_min.md) | 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int16_t数据与GM中已有数据进行逐元素比较，并将最小值写入GM。 |
 | [asc_set_store_atomic_config_v1](simd_atomic/asc_set_store_atomic_config_v1.md)| 设置原子操作启用位与原子操作类型的值，适用于Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品。 |
-| <cann-filter npu_type = "950" > [asc_set_store_atomic_config_v2（废弃）](simd_atomic/asc_set_store_atomic_config_v2_deprecated.md)| 设置原子操作启用位与原子操作类型的值，适用于Ascend 950PR/Ascend 950DT。</cann-filter>|
+|<!-- npu="950" id18 -->  [asc_set_store_atomic_config_v2（废弃）](simd_atomic/asc_set_store_atomic_config_v2_deprecated.md)<!-- end id18 --> 设置原子操作启用位与原子操作类型的值，适用于Ascend 950PR/Ascend 950DT。|
 | [asc_get_store_atomic_config](simd_atomic/asc_get_store_atomic_config.md)| 获取原子操作启用位与原子操作类型的值。 |
 | [asc_set_atomic_none](simd_atomic/asc_set_atomic_none.md) | 清空原子操作的状态。 |
 
@@ -330,7 +330,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 |----------|-----------|
 | [asc_init](misc/asc_init.md)| 初始化NPU状态。 |
 
-<cann-filter npu_type = "950" >
+<!-- npu="950" id19 -->
 
 ## Reg数据搬运
 
@@ -352,6 +352,8 @@ Reg数据搬运类API，单独使用时可以引入reg_load.h，此类API列表�
 | [asc_storealign](reg/reg_store/asc_storealign/asc_storealign.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，并支持多种搬出模式。 |
 | [asc_storeunalign](reg/reg_store/asc_storeunalign.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。 |
 | [asc_storeunalign_postupdate](reg/reg_store/asc_storeunalign_postupdate.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。 |
+
+<!-- end id19 -->
 
 ## Reg矢量计算
 
@@ -485,4 +487,4 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 | [asc_update_mask](reg/reg_vector/asc_update_mask.md) | 根据value大小生成对应的掩码寄存器中的值。 |
 | [asc_xor](reg/reg_vector/asc_xor.md) | 根据mask对输入的src0、src1按元素异或（^）进行操作，将结果写入dst。 |
 
-</cann-filter>
+

@@ -2,11 +2,15 @@
 
 ## 产品支持情况
 
-| 产品 | 是否支持  |
-| :-----------| :------: |
-|<cann-filter npu_type = "950"> Ascend 950PR/Ascend 950DT | √</cann-filter> |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 |    √     |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 |    √     |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id3 -->
 
 ## 功能说明
 
@@ -25,11 +29,8 @@ Scalar单元访问Global Memory，首先会访问每个核内的Data Cache，因
 
 Scalar单元访问UB数据时，该接口需配合[asc_set_ctrl()](../sys_var/asc_set_ctrl.md)接口使用，将CTRL[49]设置为1'b1，开启datacache模式。
 
-<cann-filter npu_type = "950">
-
+<!-- npu="950" id4 -->
 针对Ascend 950PR/Ascend 950DT，不支持asc_dcci_entire_ub接口。
-
-</cann-filter>
 
 ## 函数原型
 
@@ -77,3 +78,4 @@ for (int i = 0; i < 16; i++) {
 // 由于首地址64B对齐，调用asc_dcci_single指令后，数据会立刻刷新到Global Memory
 asc_dcci_single(reinterpret_cast<__gm__ uint64_t*>(x_gm));
 ```
+<!-- end id4 -->

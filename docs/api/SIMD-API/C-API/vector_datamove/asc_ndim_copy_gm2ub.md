@@ -2,9 +2,9 @@
 
 ## 产品支持情况
 
-| 产品 | 是否支持  |
-| :----------------------- | :------: |
-| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
 
 ## 功能说明
 
@@ -42,7 +42,6 @@
 
 - 2D BroadCast场景
 ![ ](../figures/asc_ndim_copy_gm2ub典型使用场景：2D_BroadCast场景.png)
-
 
 ## 函数原型
 

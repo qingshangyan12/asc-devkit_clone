@@ -2,9 +2,9 @@
 
 ## 产品支持情况
 
-| 产品 | 是否支持 |
-| :-----------| :------: |
-| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
 
 ## 功能说明
 
@@ -31,7 +31,6 @@ __aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config)
 | :-------     | :---- |
 | CHANNEL_PARA[48-0]    |  保留位，设置无效  | 
 | CHANNEL_PARA[63-48]    |  表示loop0源步长，单位为C0_SIZE。当开启NZ2DN模式时有效，且不能为0。  | 
-
 
 ## 返回值说明
 
