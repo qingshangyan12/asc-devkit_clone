@@ -398,4 +398,3 @@ static void test_host_c_api_vector_compute_11()
     using ::asc_vdeq_int162b8_l;
     using ::asc_vdeq_int162b8_l_sync;
 }
-

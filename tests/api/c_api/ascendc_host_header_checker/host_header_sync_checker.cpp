@@ -17,4 +17,3 @@ static void test_host_c_api_sync_0()
     using ::asc_sync_mte3;
     using ::asc_sync_vec;
 }
-

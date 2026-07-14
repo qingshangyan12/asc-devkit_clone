@@ -677,4 +677,3 @@ static void test_host_c_api_reg_compute_19()
     using ::asc_update_mask_b8;
     using ::asc_xor;
 }
-
