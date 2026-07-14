@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include "include/adv_api/utils/types.h"
 #include "../../../../include/adv_api/reduce/reduce_tiling.h"
 #include "../../../../include/utils/tiling/platform/platform_ascendc.h"
 
@@ -15,7 +16,6 @@
 #include <cstdint>
 #include <algorithm>
 
-#include "graph/tensor.h"
 #include "../../detail/host_log.h"
 namespace AscendC {
 namespace {
@@ -27,7 +27,7 @@ constexpr uint32_t INT32_TYPE_SIZE = 4;
 constexpr uint32_t ALLOWED_SHAPE_DIM = 2;
 constexpr uint32_t B32_ELEM_NUM_PER_REPEAT = 64;
 
-uint32_t GetTypeSize(const ge::DataType dataType)
+uint32_t GetTypeSize(const AscendC::TensorDataType dataType)
 {
     if (dataType == ge::DT_FLOAT) {
         return FLOAT_TYPE_SIZE;
@@ -78,7 +78,7 @@ inline void CheckParams(
 } // namespace
 
 inline void GetReduceCommonMaxMinTmpSize(
-    const ge::Shape& srcShape, const ge::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
+    const AscendC::TensorShape& srcShape, const AscendC::TensorDataType dataType, ReducePattern pattern, bool isSrcInnerPad,
     bool isReuseSource, uint32_t& maxValue, uint32_t& minValue, bool isBinaryAdd, std::string apiName,
     std::string funcName)
 {
@@ -119,7 +119,7 @@ inline void GetReduceCommonMaxMinTmpSize(
 }
 
 inline void GetReduceSumMeanCommonTmpSize(
-    const ge::Shape& srcShape, ReducePattern pattern, bool isSrcInnerPad, bool isReuseSource, uint32_t& maxValue,
+    const AscendC::TensorShape& srcShape, ReducePattern pattern, bool isSrcInnerPad, bool isReuseSource, uint32_t& maxValue,
     uint32_t& minValue, std::string apiName, std::string funcName)
 {
     std::vector<int64_t> shapeDims = srcShape.GetDims();
@@ -153,7 +153,7 @@ inline void GetReduceSumMeanCommonTmpSize(
 }
 
 inline void GetReduceAnyAllCommonTmpSize(
-    const ge::Shape& srcShape, ReducePattern pattern, bool isSrcInnerPad, bool isReuseSource, uint32_t& maxValue,
+    const AscendC::TensorShape& srcShape, ReducePattern pattern, bool isSrcInnerPad, bool isReuseSource, uint32_t& maxValue,
     uint32_t& minValue, std::string apiName, std::string funcName)
 {
     std::vector<int64_t> shapeDims = srcShape.GetDims();
@@ -179,7 +179,7 @@ inline void GetReduceAnyAllCommonTmpSize(
 }
 
 void GetReduceProdMaxMinTmpSize(
-    const ge::Shape& srcShape, const ge::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
+    const AscendC::TensorShape& srcShape, const AscendC::TensorDataType dataType, ReducePattern pattern, bool isSrcInnerPad,
     bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 {
     ASCENDC_HOST_ASSERT(
@@ -212,7 +212,7 @@ void GetReduceProdMaxMinTmpSize(
 }
 
 void GetReduceMaxMaxMinTmpSize(
-    const ge::Shape& srcShape, const ge::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
+    const AscendC::TensorShape& srcShape, const AscendC::TensorDataType dataType, ReducePattern pattern, bool isSrcInnerPad,
     bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 {
     platform_ascendc::PlatformAscendC* platform = platform_ascendc::PlatformAscendCManager::GetInstance();
@@ -238,7 +238,7 @@ void GetReduceMaxMaxMinTmpSize(
 }
 
 void GetReduceMinMaxMinTmpSize(
-    const ge::Shape& srcShape, const ge::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
+    const AscendC::TensorShape& srcShape, const AscendC::TensorDataType dataType, ReducePattern pattern, bool isSrcInnerPad,
     bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 {
     platform_ascendc::PlatformAscendC* platform = platform_ascendc::PlatformAscendCManager::GetInstance();
@@ -264,7 +264,7 @@ void GetReduceMinMaxMinTmpSize(
 }
 
 void GetReduceAnyMaxMinTmpSize(
-    const ge::Shape& srcShape, const ge::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
+    const AscendC::TensorShape& srcShape, const AscendC::TensorDataType dataType, ReducePattern pattern, bool isSrcInnerPad,
     bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 {
     ASCENDC_HOST_ASSERT(
@@ -282,7 +282,7 @@ void GetReduceAnyMaxMinTmpSize(
 }
 
 void GetReduceAllMaxMinTmpSize(
-    const ge::Shape& srcShape, const ge::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
+    const AscendC::TensorShape& srcShape, const AscendC::TensorDataType dataType, ReducePattern pattern, bool isSrcInnerPad,
     bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 {
     ASCENDC_HOST_ASSERT(
@@ -300,7 +300,7 @@ void GetReduceAllMaxMinTmpSize(
 }
 
 void GetReduceSumMaxMinTmpSize(
-    const ge::Shape& srcShape, const ge::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
+    const AscendC::TensorShape& srcShape, const AscendC::TensorDataType dataType, ReducePattern pattern, bool isSrcInnerPad,
     bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 {
     platform_ascendc::PlatformAscendC* platform = platform_ascendc::PlatformAscendCManager::GetInstance();
@@ -323,7 +323,7 @@ void GetReduceSumMaxMinTmpSize(
 }
 
 void GetReduceMeanMaxMinTmpSize(
-    const ge::Shape& srcShape, const ge::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
+    const AscendC::TensorShape& srcShape, const AscendC::TensorDataType dataType, ReducePattern pattern, bool isSrcInnerPad,
     bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 {
     ASCENDC_HOST_ASSERT(

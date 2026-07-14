@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include "include/adv_api/utils/types.h"
 #include "../../../../include/adv_api/normalization/layernorm_tiling.h"
 #include <cmath>
 #include "../../../../include/adv_api/normalization/normalize_tiling.h"
@@ -36,7 +37,7 @@ constexpr uint32_t LAYERNORM_FOLD_NUM = 2;
 constexpr uint32_t LAYERNORM_SRC_DIM_NUM = 4;
 
 void CheckLayerNormHostCommon(
-    const char* apiName, const char* hostFuncName, const ge::Shape& srcShape, const uint32_t typeSize)
+    const char* apiName, const char* hostFuncName, const AscendC::TensorShape& srcShape, const uint32_t typeSize)
 {
     ASCENDC_HOST_ASSERT(
         srcShape.GetShapeSize() > 0, return, "[%s][%s] Input Shape size must be greater than 0.", apiName,
@@ -51,7 +52,7 @@ void CheckLayerNormHostCommon(
     return;
 }
 
-uint32_t GetLayerNormMaxTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource)
+uint32_t GetLayerNormMaxTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource)
 {
     std::vector<int64_t> shapeDims = srcShape.GetDims();
     const uint32_t bLength = static_cast<uint32_t>(shapeDims[0]);
@@ -72,7 +73,7 @@ uint32_t GetLayerNormMaxTmpSize(const ge::Shape& srcShape, const uint32_t typeSi
     return LAYERNORM_THREE_TIMES * inputLen + LAYERNORM_TWO_TIMES * mvTmpLen;
 }
 
-uint32_t GetLayerNormMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource)
+uint32_t GetLayerNormMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource)
 {
     std::vector<int64_t> shapeDims = srcShape.GetDims();
     const uint32_t bLength = static_cast<uint32_t>(shapeDims[0]);
@@ -94,7 +95,7 @@ uint32_t GetLayerNormMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSi
 }
 
 void GetLayerNormNDTilingInfoImpl(
-    const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
+    const AscendC::TensorShape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
     optiling::LayerNormTiling& tiling)
 {
     std::vector<int64_t> shapeDims = srcShape.GetDims();
@@ -187,7 +188,7 @@ void GetLayerNormNDTilingInfoImpl(
 }
 
 void GetLayerNormNDTilingInfoImpl(
-    const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
+    const AscendC::TensorShape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
     AscendC::tiling::LayerNormTiling& tiling)
 {
     optiling::LayerNormTiling tilingData;
@@ -197,7 +198,7 @@ void GetLayerNormNDTilingInfoImpl(
 } // namespace
 
 void GetLayerNormMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
     uint32_t& minValue)
 {
     CheckLayerNormHostCommon("LayerNorm", "GetLayerNormMaxMinTmpSize", srcShape, typeSize);
@@ -206,7 +207,7 @@ void GetLayerNormMaxMinTmpSize(
 }
 
 void GetLayerNormNDTillingInfo(
-    const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
+    const AscendC::TensorShape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
     optiling::LayerNormTiling& tilling)
 {
     CheckLayerNormHostCommon("LayerNorm", "GetLayerNormNDTillingInfo", srcShape, typeSize);
@@ -214,7 +215,7 @@ void GetLayerNormNDTillingInfo(
 }
 
 void GetLayerNormNDTilingInfo(
-    const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
+    const AscendC::TensorShape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
     optiling::LayerNormTiling& tiling)
 {
     CheckLayerNormHostCommon("LayerNorm", "GetLayerNormNDTilingInfo", srcShape, typeSize);
@@ -222,7 +223,7 @@ void GetLayerNormNDTilingInfo(
 }
 
 void GetLayerNormNDTilingInfo(
-    const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
+    const AscendC::TensorShape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
     AscendC::tiling::LayerNormTiling& tiling)
 {
     CheckLayerNormHostCommon("LayerNorm", "GetLayerNormNDTilingInfo", srcShape, typeSize);
@@ -230,7 +231,7 @@ void GetLayerNormNDTilingInfo(
 }
 
 void GetWelfordUpdateMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSizeT, const uint32_t typeSizeU, const bool isReuseSource,
+    const AscendC::TensorShape& srcShape, const uint32_t typeSizeT, const uint32_t typeSizeU, const bool isReuseSource,
     const bool isInplace, uint32_t& maxValue, uint32_t& minValue)
 {
     (void)isInplace;
@@ -263,7 +264,7 @@ void GetWelfordUpdateMaxMinTmpSize(
 }
 
 void GetLayerNormMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, const bool isComputeRstd,
+    const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, const bool isComputeRstd,
     const bool isOnlyOutput, uint32_t& maxValue, uint32_t& minValue)
 {
     ASCENDC_HOST_ASSERT(typeSize != 0, return, "typeSize can not be 0!");
@@ -321,7 +322,7 @@ void GetLayerNormMaxMinTmpSize(
 }
 
 void GetLayerNormNDTilingInfo(
-    const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
+    const AscendC::TensorShape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
     const bool isComputeRstd, optiling::LayerNormSeparateTiling& tiling)
 {
     (void)isReuseSource;
@@ -434,7 +435,7 @@ void GetLayerNormNDTilingInfo(
 }
 
 void GetLayerNormNDTilingInfo(
-    const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
+    const AscendC::TensorShape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
     const bool isComputeRstd, AscendC::tiling::LayerNormSeparateTiling& tiling)
 {
     optiling::LayerNormSeparateTiling tilingData;

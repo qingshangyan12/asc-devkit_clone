@@ -10,7 +10,7 @@
 
 #include <inttypes.h>
 #include <algorithm>
-#include "graph/tensor.h"
+#include "include/adv_api/utils/types.h"
 #include "debug/stub_util.h"
 namespace {
 const int64_t UNKNOWN_DIM_SIZE = -1;

@@ -9,7 +9,7 @@
  */
 #ifndef LIB_NORMALIZATION_BATCHNORM_TILING_INTF_H
 #define LIB_NORMALIZATION_BATCHNORM_TILING_INTF_H
-#include "graph/tensor.h"
+#include "include/adv_api/utils/types.h"
 #include "batchnorm_tiling.h"
 namespace AscendC {
 [[deprecated(__FILE__ " is deprecated, please use batchnorm_tiling.h instead!")]]

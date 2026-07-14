@@ -12,8 +12,7 @@
 
 #include <cstdint>
 
-#include "graph/tensor.h"
-#include "graph/types.h"
+#include "include/adv_api/utils/types.h"
 #include "tiling/platform/platform_ascendc.h"
 #include "sort_utils_constants.h"
 
@@ -55,7 +54,7 @@ struct SortConfig {
 #endif
 
 void GetSortMaxMinTmpSize(
-    const ge::Shape& srcShape, ge::DataType valueType, ge::DataType indexType, bool isReuseSource,
+    const AscendC::TensorShape& srcShape, AscendC::TensorDataType valueType, AscendC::TensorDataType indexType, bool isReuseSource,
     const SortConfig& config, uint32_t& maxValue, uint32_t& minValue);
 
 } // namespace AscendC
