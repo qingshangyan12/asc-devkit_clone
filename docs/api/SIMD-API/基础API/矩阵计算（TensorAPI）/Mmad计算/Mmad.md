@@ -2,9 +2,9 @@
 
 ## 产品支持情况
 
-| 产品 | 不传bias | 传入bias |
-| :--- | :------: | :-----: |
-| Ascend 950PR/Ascend 950DT | √ | √ |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
 
 ## 功能说明
 
