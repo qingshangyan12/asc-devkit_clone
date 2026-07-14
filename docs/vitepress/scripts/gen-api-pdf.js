@@ -80,7 +80,7 @@ function parseReadmeTree() {
   return root.items
 }
 
-function collectRawSections(nodes, vpApiDir) {
+function collectRawSections(nodes, vpApiDir, distApiDir) {
   const rawSections = []
   const htmlToSecIdMap = {}
   let secCounter = 0
@@ -94,11 +94,16 @@ function collectRawSections(nodes, vpApiDir) {
         try {
           const parts = extractContent(htmlPath)
           if (!allCss && parts.css) allCss = parts.css
+          let content = parts.content
+          if (distApiDir) {
+            const distHtmlPath = path.join(distApiDir, htmlRel)
+            content = injectIdsFromDist(content, distHtmlPath)
+          }
           const secId = 'sec-' + secCounter
           rawSections.push({
             text: node.text,
             depth: node.depth,
-            rawContent: parts.content,
+            rawContent: content,
             relPath: normalizedRel,
             htmlDir: path.dirname(htmlPath),
             secId: secId,
@@ -136,6 +141,101 @@ function extractContent(htmlPath) {
   }
 
   return { css, content }
+}
+
+const VP_STRUCTURAL_IDS = new Set([
+  'app', 'check-dark-mode', 'check-mac-os', 'VPContent', 'VPSidebarNav',
+  'main-nav-aria-label', 'sidebar-aria-label', 'doc-outline-aria-label',
+  'doc-footer-aria-label',
+])
+
+function extractDistIds(distHtml) {
+  const ids = []
+  const articleMatch = distHtml.match(/<article[^>]*class="[^"]*markdown-body[^"]*"[^>]*>([\s\S]*?)<\/article>/i)
+  const content = articleMatch ? articleMatch[1] : distHtml
+  const idRe = /\bid="([^"]+)"/gi
+  let m
+  while ((m = idRe.exec(content)) !== null) {
+    const idVal = m[1]
+    if (!VP_STRUCTURAL_IDS.has(idVal)) {
+      ids.push(idVal)
+    }
+  }
+  return ids
+}
+
+function injectIdsFromDist(sourceContent, distHtmlPath) {
+  if (!fs.existsSync(distHtmlPath)) return sourceContent
+
+  let distHtml
+  try {
+    distHtml = fs.readFileSync(distHtmlPath, 'utf-8')
+  } catch {
+    return sourceContent
+  }
+
+  const distIds = extractDistIds(distHtml)
+  if (distIds.length === 0) return sourceContent
+
+  const sourceIdSet = new Set()
+  const srcIdRe = /\bid="([^"]+)"/gi
+  let sm
+  while ((sm = srcIdRe.exec(sourceContent)) !== null) {
+    sourceIdSet.add(sm[1])
+  }
+
+  const srcNameSet = new Set()
+  const srcNameRe = /<a\s+name="([^"]+)"\s*><\/a>/gi
+  let nm
+  while ((nm = srcNameRe.exec(sourceContent)) !== null) {
+    srcNameSet.add(nm[1])
+  }
+
+  let result = sourceContent
+
+  result = result.replace(/<a\s+name="([^"]+)"\s*><\/a>/gi, (match, nameVal) => {
+    if (sourceIdSet.has(nameVal)) return match
+    return '<span id="' + nameVal + '"></span>'
+  })
+
+  const missingIds = distIds.filter(id => !sourceIdSet.has(id) && !srcNameSet.has(id))
+  if (missingIds.length === 0) return result
+
+  const headingIdMap = {}
+  const headingRegex = /<h([1-6])(\s[^>]*)?>([\s\S]*?)<\/h\1>/gi
+  let hm
+  while ((hm = headingRegex.exec(distHtml)) !== null) {
+    const attrs = hm[2] || ''
+    const idMatch = attrs.match(/\bid="([^"]+)"/i)
+    const headingText = hm[3].replace(/<[^>]+>/g, '').replace(/[\u200A\u200B\u200C\u200D\uFEFF]/g, '').trim()
+    if (idMatch && headingText) {
+      headingIdMap[headingText] = idMatch[1]
+    }
+  }
+
+  let headingInjected = 0
+  result = result.replace(/<h([1-6])(\s[^>]*)?>([\s\S]*?)<\/h\1>/gi, (match, level, attrs, content) => {
+    attrs = attrs || ''
+    if (/\bid\s*=\s*["']/i.test(attrs)) return match
+    const text = content.replace(/<[^>]+>/g, '').replace(/[\u200A\u200B\u200C\u200D\uFEFF]/g, '').trim()
+    if (!text || !headingIdMap[text]) return match
+    const idVal = headingIdMap[text]
+    if (!missingIds.includes(idVal)) return match
+    headingInjected++
+    return '<h' + level + attrs + ' id="' + idVal + '">' + content + '</h' + level + '>'
+  })
+
+  const stillMissingIds = missingIds.filter(id => {
+    const idCheckRe = new RegExp('\\bid="' + id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '"')
+    return !idCheckRe.test(result)
+  })
+
+  if (stillMissingIds.length > 0) {
+    const injectHtml = stillMissingIds.map(id => '<span id="' + id + '"></span>').join('\n')
+    result += '\n' + injectHtml
+  }
+
+  return result
 }
 
 function fixImagePaths(content, htmlDir) {
@@ -220,9 +320,17 @@ function fixInternalLinks(content, sourceRelPath, htmlToSecIdMap) {
       return fullMatch
     }
 
+    let pathPart = decoded
+    let fragment = ''
+    const hashIdx = decoded.indexOf('#')
+    if (hashIdx >= 0) {
+      pathPart = decoded.substring(0, hashIdx)
+      fragment = decoded.substring(hashIdx + 1)
+    }
+
     const srcDir = sourceRelPath.includes('/') ? sourceRelPath.substring(0, sourceRelPath.lastIndexOf('/')) : ''
     const parts = srcDir ? srcDir.split('/') : []
-    const targetParts = decoded.split('/')
+    const targetParts = pathPart.split('/')
     const resolved = []
     for (const part of parts) {
       resolved.push(part)
@@ -238,7 +346,7 @@ function fixInternalLinks(content, sourceRelPath, htmlToSecIdMap) {
 
     const targetSecId = htmlToSecIdMap[normalizedKey]
     if (targetSecId) {
-      const newHref = '#' + targetSecId
+      const newHref = fragment ? '#' + fragment : '#' + targetSecId
       const newAttrs = attrs.replace(/href="[^"]*"/i, 'href="' + newHref + '"')
       return '<a ' + newAttrs + '>'
     }
@@ -387,21 +495,28 @@ async function renderBatchedPdf(browser, allCss, sections, anchorToSecIdMap, opt
     const batch = sections.slice(start, end)
     console.log('[gen-pdf]   Render batch ' + (Math.floor(start / BATCH_SIZE) + 1) + ': sections ' + start + '-' + (end - 1))
 
-    const referencedSecIds = new Set()
+    const referencedAnchorIds = new Set()
     for (const s of batch) {
-      const hrefRe = /href="#(sec-\d+)"/g
+      const hrefRe = /href="#([^"]+)"/g
       let m
       while ((m = hrefRe.exec(s.content)) !== null) {
-        referencedSecIds.add(m[1])
+        referencedAnchorIds.add(m[1])
       }
     }
-    const existingSecIds = new Set(batch.map(s => s.secId))
-    const missingSecIds = [...referencedSecIds].filter(id => !existingSecIds.has(id))
-    if (missingSecIds.length > 0) {
-      console.log('[gen-pdf]     Injecting ' + missingSecIds.length + ' cross-batch anchors: ' + missingSecIds.slice(0, 5).join(',') + (missingSecIds.length > 5 ? ' ...' : ''))
+    const existingAnchorIds = new Set(batch.map(s => s.secId))
+    for (const s of batch) {
+      const idRe = /\bid="([^"]+)"/gi
+      let im
+      while ((im = idRe.exec(s.content)) !== null) {
+        existingAnchorIds.add(im[1])
+      }
     }
-    const anchorHtml = missingSecIds.length > 0
-      ? '\n' + missingSecIds.map(id => '<a id="' + id + '" style="position:absolute;left:-9999px;top:0"></a>').join('\n')
+    const missingAnchorIds = [...referencedAnchorIds].filter(id => !existingAnchorIds.has(id))
+    if (missingAnchorIds.length > 0) {
+      console.log('[gen-pdf]     Injecting ' + missingAnchorIds.length + ' cross-batch anchors: ' + missingAnchorIds.slice(0, 5).join(',') + (missingAnchorIds.length > 5 ? ' ...' : ''))
+    }
+    const anchorHtml = missingAnchorIds.length > 0
+      ? '\n' + missingAnchorIds.map(id => '<a id="' + id + '" style="position:absolute;left:-9999px;top:0"></a>').join('\n')
       : ''
 
     const batchHtml = '<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n<meta charset="utf-8">\n<style>\n' +
@@ -424,13 +539,14 @@ async function renderBatchedPdf(browser, allCss, sections, anchorToSecIdMap, opt
 
       const linkPositions = await page.evaluate(() => {
         const links = []
-        const allA = document.querySelectorAll('a[href^="#sec-"]')
+        const allA = document.querySelectorAll('a[href^="#"]')
         for (const a of allA) {
           const href = a.getAttribute('href')
-          if (!href || !href.startsWith('#sec-')) continue
+          if (!href || href === '#' || href.length < 2) continue
+          const anchorId = href.substring(1)
           const rect = a.getBoundingClientRect()
           links.push({
-            secId: href.substring(1),
+            anchorId: anchorId,
             top: rect.top,
             height: rect.height,
           })
@@ -449,7 +565,7 @@ async function renderBatchedPdf(browser, allCss, sections, anchorToSecIdMap, opt
         const localPx = lp.top - batchPageIdx * contentHeightPx
         const yPtFromTop = marginTopPt + localPx * ptPerPx
         allContentLinks.push({
-          secId: lp.secId,
+          anchorId: lp.anchorId,
           mergedPageIndex: globalPageOffset + batchPageIdx,
           yPtFromTop: yPtFromTop,
           heightPx: lp.height,
@@ -835,7 +951,7 @@ function fixContentLinkAnnotations(mergedDoc, sectionPageMap, anchorToSecIdMap) 
   console.log('[gen-pdf]     Scanned ' + totalAnnots + ' annotations, ' + namedDestCount + ' named dests, fixed ' + fixedCount + ', ' + notFoundCount + ' unresolvable')
 }
 
-function addContentLinkAnnotations(mergedDoc, allContentLinks, sectionPageMap, titlePageCount) {
+function addContentLinkAnnotations(mergedDoc, allContentLinks, sectionPageMap, anchorToSecIdMap, titlePageCount) {
   const { PDFName, PDFNumber } = require('pdf-lib')
   const context = mergedDoc.context
   const pages = mergedDoc.getPages()
@@ -858,7 +974,11 @@ function addContentLinkAnnotations(mergedDoc, allContentLinks, sectionPageMap, t
   }
 
   for (const link of allContentLinks) {
-    const targetPageNum = sectionPageMap[link.secId]
+    let targetSecId = link.anchorId
+    if (!targetSecId.startsWith('sec-')) {
+      targetSecId = anchorToSecIdMap[targetSecId] || targetSecId
+    }
+    const targetPageNum = sectionPageMap[targetSecId]
     if (targetPageNum === undefined || targetPageNum === null) {
       skippedCount++
       continue
@@ -872,6 +992,11 @@ function addContentLinkAnnotations(mergedDoc, allContentLinks, sectionPageMap, t
 
     const srcPageIndex = link.mergedPageIndex + titlePageCount
     if (srcPageIndex < 0 || srcPageIndex >= pages.length) {
+      skippedCount++
+      continue
+    }
+
+    if (srcPageIndex === targetPageIndex) {
       skippedCount++
       continue
     }
@@ -1176,7 +1301,7 @@ async function generateAllApiPdf(browser, allCss, rawSections, chipFilter, htmlT
   fixContentLinkAnnotations(mergedDoc, adjustedPageMap, anchorToSecIdMap)
 
   console.log('[gen-pdf]   Step 7c: Adding cross-batch content link annotations...')
-  const crossBatchAdded = addContentLinkAnnotations(mergedDoc, allContentLinks, adjustedPageMap, titlePageCount + tocPageCount)
+  const crossBatchAdded = addContentLinkAnnotations(mergedDoc, allContentLinks, adjustedPageMap, anchorToSecIdMap, titlePageCount + tocPageCount)
   console.log('[gen-pdf]     Added ' + crossBatchAdded + ' cross-batch content links')
 
   console.log('[gen-pdf]   Step 8: Building outline bookmarks...')
@@ -1252,8 +1377,16 @@ async function main() {
     process.exit(0)
   }
 
+  const distApiDir = path.resolve(root, 'docs', '.vitepress', 'dist', 'api')
+  const hasDist = fs.existsSync(distApiDir)
+  if (hasDist) {
+    console.log('[gen-pdf] Found dist directory for id injection: ' + distApiDir)
+  } else {
+    console.log('[gen-pdf] Dist directory not found, skipping id injection from dist')
+  }
+
   console.log('[gen-pdf] Extracting raw content from tree (' + tree.length + ' root nodes)...')
-  const { rawSections, allCss, htmlToSecIdMap } = collectRawSections(tree, apiDir)
+  const { rawSections, allCss, htmlToSecIdMap } = collectRawSections(tree, apiDir, hasDist ? distApiDir : null)
   if (rawSections.length === 0) {
     console.warn('[gen-pdf] No sections extracted, exiting')
     process.exit(0)
