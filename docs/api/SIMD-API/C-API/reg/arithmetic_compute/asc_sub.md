@@ -18,11 +18,11 @@ $$
 dst_i = src0_i - src1_i
 $$
 
-执行带借位的减法运算时，可以在借位输出（掩码寄存器）中标记每次减法是否产生借位，若src0，src1输入按位相加后最高位有借位，在dst0中对应位置每4bit的最低位写1，否则写0。
+执行带借位的减法运算时，可以在借位输出（掩码寄存器）中标记每次减法是否产生借位，若src0，src1输入按位相加后最高位有借位，在carry中对应位置每4bit的最低位写1，否则写0。
 
-![](../../../../figures/asc_sub.png)
+![](../../figures/asc_sub.png)
 
-输出dst0适用场景请参考[asc_subc功能说明](asc_subc.md#功能说明)。
+输出carry适用场景请参考[asc_subc功能说明](asc_subc.md#功能说明)。
 
 ## 函数原型
 
@@ -51,13 +51,19 @@ $$
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| carry | 输出 | 目的借位值（掩码寄存器）。 |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。 |
-| src0 | 输入 | 源操作数0（矢量数据寄存器）。 |
-| src1 | 输入 | 源操作数1（矢量数据寄存器）。 |
-| mask | 输入 | 源操作数掩码（掩码寄存器）。用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| carry | 输出 | 目的借位值（掩码寄存器）。<br>类型为[vector\_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
+| dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| src0 | 输入 | 源操作数0（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| src1 | 输入 | 源操作数1（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| mask | 输入 | 源操作数掩码（掩码寄存器）。用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。<br>类型为[vector\_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
+## 数据类型
+
+- 不带进位数据的接口
+目的操作数和源操作数的数据类型需要保持一致。支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+
+- 带进位数据的接口
+目的操作数和源操作数的数据类型需要保持一致。支持的数据类型为：int32_t、uint32_t。
 
 ## 返回值说明
 

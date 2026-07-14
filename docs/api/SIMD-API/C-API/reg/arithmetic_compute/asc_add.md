@@ -16,11 +16,11 @@ $$
 dst_i = src0_i + src1_i
 $$
 
-执行带进位的加法运算时，可以在进位输出（掩码寄存器）中标记每次加法是否产生进位，若src0，src1输入按位相加后最高位有进位，在dst0中对应位置每4bit的最低位写1，否则写0。
+执行带进位的加法运算时，可以在进位输出（掩码寄存器）中标记每次加法是否产生进位，若src0，src1输入按位相加后最高位有进位，在carry中对应位置每4bit的最低位写1，否则写0。
 
-![](../../../../figures/asc_add.png)
+![](../../figures/asc_add.png)
 
-输出dst0适用场景请参考[asc_addc功能说明](asc_addc.md#功能说明)。
+输出carry适用场景请参考[asc_addc功能说明](asc_addc.md#功能说明)。
 
 ## 函数原型
 
@@ -39,20 +39,19 @@ __simd_callee__ inline void asc_add(vector_bfloat16_t& dst, vector_bfloat16_t sr
 
 - 带进位数据的接口
 ```cpp
-__simd_callee__ inline void asc_add(vector_bool& dst0, vector_int32_t& dst1, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_add(vector_bool& dst0, vector_uint32_t& dst1, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
+__simd_callee__ inline void asc_add(vector_bool& carry, vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
+__simd_callee__ inline void asc_add(vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
 ```
 
 ## 参数说明
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| dst| 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| dst0| 输出 | 目的操作数（掩码寄存器）。用来存储加法计算后的进位数据。<br>类型为[vector\_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
-| dst1| 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| src0 | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| src1 | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。<br>类型为[vector\_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
+| carry | 输出 | 目的借位值（掩码寄存器）。<br>类型为[vector\_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
+| dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| src0 | 输入 | 源操作数0（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| src1 | 输入 | 源操作数1（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| mask | 输入 | 源操作数掩码（掩码寄存器）。用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。<br>类型为[vector\_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
 
 ## 数据类型
 
@@ -88,9 +87,11 @@ PIPE_V
 
 ```cpp
 vector_half dst;
-vector_half src0, src1;
+vector_half src0;
+vector_half src1;
+vector_bool mask = asc_create_mask_b16(PAT_ALL);
 asc_loadalign(src0, src0_addr); // src0_addr是外部输入的UB内存空间地址。
 asc_loadalign(src1, src1_addr); // src1_addr是外部输入的UB内存空间地址。
-vector_bool mask = asc_create_mask_b16(PAT_ALL);
+// mask为源操作数掩码
 asc_add(dst, src0, src1, mask);
 ```
