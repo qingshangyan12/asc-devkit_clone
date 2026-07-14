@@ -2,25 +2,13 @@
 
 ## 产品支持情况
 
-<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
-<!-- end id1 -->
-<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
-<!-- end id2 -->
-<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
-<!-- end id3 -->
-<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
-<!-- end id4 -->
-<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
-<!-- end id5 -->
-<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
-<!-- end id6 -->
 
 ## 功能说明
 
@@ -44,11 +32,10 @@ half2 __hcmadd(const half2 x, const half2 y, const half2 z)
 
 ## 返回值说明
 
-输入数据视为复数，执行复数乘加运算的结果。对于输入x、y、z的结果如下：
+输入数据视为复数，执行复数乘加运算的结果。对于输入a、b、c：
 
-| 实部结果 | 虚部结果 |
-| --- | --- |
-| __hfma(-x.y, y.y, __hfma(x.x, y.x, z.x)) | __hfma(x.y, y.x, __hfma(x.x, y.y, z.y)) |
+-   实部的结果为：\_\_hfma\(-a.y, b.y, \_\_hfma\(a.x, b.x, c.x\)\)。
+-   虚部的结果为：\_\_hfma\( a.y, b.x, \_\_hfma\(a.x, b.y, c.y\)\)。
 
 ## 约束说明
 
@@ -102,3 +89,4 @@ half2 __hcmadd(const half2 x, const half2 y, const half2 z)
         asc_vf_call<simt_hcmadd>(dim3(1024), (__gm__ half2*)x, (__gm__ half2*)y, (__gm__ half2*)z, (__gm__ half2*)dst, input_total_length);
     }
     ```
+

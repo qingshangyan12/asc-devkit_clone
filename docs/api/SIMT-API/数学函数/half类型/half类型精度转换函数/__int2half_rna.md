@@ -2,25 +2,13 @@
 
 ## 产品支持情况
 
-<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
-<!-- end id1 -->
-<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
-<!-- end id2 -->
-<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
-<!-- end id3 -->
-<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
-<!-- end id4 -->
-<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
-<!-- end id5 -->
-<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
-<!-- end id6 -->
 
 ## 功能说明
 
@@ -42,14 +30,7 @@ inline half __int2half_rna(const int x)
 
 ## 返回值说明
 
-输入遵循CAST\_ROUND模式转换成的half类型数据。特殊值如下：
-
-| x值 | 返回值 |
-| --- | --- |
-| 0 | 0 |
-| ±2049 | ±2050 |
-| x>ASCRT\_MAX\_NORMAL\_FP16 | inf |
-| x<-ASCRT\_MAX\_NORMAL\_FP16 | -inf |
+输入遵循CAST\_ROUND模式转换成的half类型数据。
 
 ## 约束说明
 
@@ -84,3 +65,4 @@ inline half __int2half_rna(const int x)
         dst[idx] = __int2half_rna(x[idx]);
     }
     ```
+

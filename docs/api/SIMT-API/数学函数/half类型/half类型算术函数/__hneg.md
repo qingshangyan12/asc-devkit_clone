@@ -2,25 +2,13 @@
 
 ## 产品支持情况
 
-<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
-<!-- end id1 -->
-<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
-<!-- end id2 -->
-<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
-<!-- end id3 -->
-<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
-<!-- end id4 -->
-<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
-<!-- end id5 -->
-<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
-<!-- end id6 -->
 
 ## 功能说明
 
@@ -47,7 +35,7 @@ half __hneg(const half x)
 | x值 | 非饱和模式返回值 | 饱和模式返回值 |
 | --- | --- | --- |
 | ±0 | ∓0 | ∓0 |
-| ±inf | ∓inf | ∓ASCRT\_MAX\_NORMAL\_FP16 |
+| ±inf | ∓inf | ∓ASCRT_MAX_NORMAL_FP16 |
 | nan | nan | 0 |
 
 ## 约束说明
@@ -83,3 +71,4 @@ half __hneg(const half x)
         dst[idx] = __hneg(x[idx]);
     }
     ```
+

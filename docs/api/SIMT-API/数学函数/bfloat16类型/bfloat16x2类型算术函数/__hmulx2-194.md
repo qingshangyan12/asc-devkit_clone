@@ -2,25 +2,13 @@
 
 ## 产品支持情况
 
-<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
-<!-- end id1 -->
-<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
-<!-- end id2 -->
-<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
-<!-- end id3 -->
-<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
-<!-- end id4 -->
-<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
-<!-- end id5 -->
-<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
-<!-- end id6 -->
 
 ## 功能说明
 
@@ -45,52 +33,11 @@ bfloat16x2_t __hmulx2(const bfloat16x2_t x, const bfloat16x2_t y)
 
 输入数据各分量相乘的结果。相乘的分量x和y满足：
 
-<table>
-  <thead>
-    <tr>
-      <th>x分量值</th>
-      <th>y分量值</th>
-      <th>返回值</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>±0</td>
-      <td>±0</td>
-      <td>±0（符号由x和y符号异或决定）</td>
-    </tr>
-    <tr>
-      <td>±0</td>
-      <td>±inf</td>
-      <td>nan</td>
-    </tr>
-    <tr>
-      <td>±inf</td>
-      <td>±0</td>
-      <td>nan</td>
-    </tr>
-    <tr>
-      <td>±inf</td>
-      <td>±inf</td>
-      <td>±inf（符号由x和y符号异或决定）</td>
-    </tr>
-    <tr>
-      <td colspan="2">x，y任意一个为nan</td>
-      <td>nan</td>
-    </tr>
-    <tr>
-      <td>ASCRT_MAX_NORMAL_BF16</td>
-      <td>大于1的正数</td>
-      <td>inf</td>
-    </tr>
-    <tr>
-      <td>-ASCRT_MAX_NORMAL_BF16</td>
-      <td>大于1的正数</td>
-      <td>-inf</td>
-    </tr>
-  </tbody>
-</table>
-
+-   当输入和结果都不为nan时，x\*y的符号为x和y符号的异或。
+-   x为非0值，y为±inf时，返回值符号由x和y的符号异或决定，值为inf。
+-   x为±0，y为±inf时，返回值为nan。
+-   x为±0，y为有限值时，返回值符号由x和y的符号异或决定，值为0。
+-   x，y任意一个为nan时，返回值为nan。
 
 ## 约束说明
 
@@ -143,3 +90,4 @@ bfloat16x2_t __hmulx2(const bfloat16x2_t x, const bfloat16x2_t y)
         asc_vf_call<simt_hmulx2>(dim3(1024), (__gm__ bfloat16x2_t*)x, (__gm__ bfloat16x2_t*)y, (__gm__ bfloat16x2_t*)dst, input_total_length);
     }
     ```
+

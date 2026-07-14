@@ -2,29 +2,17 @@
 
 ## 产品支持情况
 
-<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
-<!-- end id1 -->
-<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
-<!-- end id2 -->
-<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
-<!-- end id3 -->
-<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
-<!-- end id4 -->
-<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
-<!-- end id5 -->
-<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
-<!-- end id6 -->
 
 ## 功能说明
 
-将浮点数转换为半精度浮点数，并遵循CAST\_ROUND模式，返回转换后的值。
+饱和模式下，将浮点数转换为半精度浮点数，并遵循CAST\_ROUND模式，返回转换后的值。
 
 ## 函数原型
 
@@ -42,17 +30,7 @@ inline half __float2half_rna_sat(const float x)
 
 ## 返回值说明
 
-将输入遵循CAST\_ROUND模式转换成的半精度浮点数。特殊值如下：
-
-| x值 | 返回值 |
-| --- | --- |
-| 0 | 0 |
-| -0 | -0 |
-| nan | 0 |
-| inf | ASCRT\_MAX\_NORMAL\_FP16 |
-| -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
-| x>ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
-| x<-ASCRT\_MAX\_NORMAL\_FP16 | -ASCRT\_MAX\_NORMAL\_FP16 |
+饱和模式下将输入遵循CAST\_ROUND模式转换成的半精度浮点数。
 
 ## 约束说明
 
@@ -79,3 +57,4 @@ SIMT编程场景由于无法设置CTRL寄存器，本接口的饱和模式不生
         dst[idx] = __float2half_rna_sat(x[idx]);
     }
     ```
+

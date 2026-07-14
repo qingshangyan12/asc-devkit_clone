@@ -2,25 +2,13 @@
 
 ## 产品支持情况
 
-<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
-<!-- end id1 -->
-<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
-<!-- end id2 -->
-<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
-<!-- end id3 -->
-<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
-<!-- end id4 -->
-<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
-<!-- end id5 -->
-<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
-<!-- end id6 -->
 
 ## 功能说明
 
@@ -43,42 +31,14 @@ half2 __hmaxx2_nan(const half2 x, const half2 y)
 
 ## 返回值说明
 
-输入数据各分量的最大值。特殊值如下：
+输入数据各分量的最大值。比较的分量a和b满足：
 
-<table>
-  <tr>
-    <th>x分量</th>
-    <th>y分量</th>
-    <th>返回值（对应分量）</th>
-  </tr>
-  <tr>
-    <td>±0</td>
-    <td>±0</td>
-    <td>0</td>
-  </tr>
-  <tr>
-    <td colspan="2">x或y为nan</td>
-    <td>nan</td>
-  </tr>
-  <tr>
-    <td colspan="2">x或y为inf</td>
-    <td>inf</td>
-  </tr>
-  <tr>
-    <td>-inf</td>
-    <td>有限值</td>
-    <td>有限值</td>
-  </tr>
-  <tr>
-    <td>有限值</td>
-    <td>-inf</td>
-    <td>有限值</td>
-  </tr>
-  <tr>
-    <td colspan="2">x=y=-inf</td>
-    <td>-inf</td>
-  </tr>
-</table>
+-   a为+0，b为-0时，返回a。
+-   a为-0，b为+0时，返回b。
+-   a，b任意一个为nan时，返回值为nan。
+-   a，b任意一个为inf时，返回值为inf。
+-   a为-inf时，返回值为b。
+-   b为-inf时，返回值为a。
 
 ## 约束说明
 
@@ -131,3 +91,4 @@ half2 __hmaxx2_nan(const half2 x, const half2 y)
         asc_vf_call<simt_hmaxx2_nan>(dim3(1024), (__gm__ half2*)x, (__gm__ half2*)y, (__gm__ half2*)dst, input_total_length);
     }
     ```
+
