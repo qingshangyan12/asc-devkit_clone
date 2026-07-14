@@ -16,11 +16,16 @@ constexpr uint32_t A2AV_EXT_FIELD_NUM = 4;
 constexpr uint32_t A2AV_SEND_SIZE_IDX = 0;
 constexpr uint32_t A2AV_SEND_OFFSET_IDX = 2;
 constexpr uint32_t A2AV_RECV_OFFSET_IDX = 3;
-constexpr int A2AV_OUTPUT_XN_ID = 0;
-constexpr int A2AV_TOKEN_XN_ID = 1;
-constexpr int A2AV_POST_SYNC_CKE_IDX = 0;
-constexpr int A2AV_OUTPUT_CKE_IDX = 1;
-constexpr int A2AV_TOKEN_CKE_IDX = 2;
+// XN 窗口编号必须与框架分配、与定长 all_to_all / hccl _v 保持一致：
+// 0=INPUT, 1=OUTPUT, 2=TOKEN。TOKEN 必须是 2，否则远端寻址凭证读错窗口 -> Local Access Error。
+// INPUT 窗口本 kernel 不直接从对端读取（本地 input 由 inputAddr 参数给出），故不定义 INPUT_XN_ID。
+constexpr int A2AV_OUTPUT_XN_ID = 1;
+constexpr int A2AV_TOKEN_XN_ID = 2;
+// 前同步用一个 CKE(=0)，用窗口位区分是哪个窗口到达；后同步用 CKE(=1)。
+// 后同步 bit 与 hccl _v 保持一致(1<<1)，不要用定长 sibling 的 1<<5。
+constexpr int A2AV_PRE_SYNC_CKE_IDX = 0;
+constexpr int A2AV_POST_SYNC_CKE_IDX = 1;
+constexpr int A2AV_POST_SYNC_BIT = 1;
 
 CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
                                    ccu::Variable srcOffset, ccu::Variable dstOffset, ccu::Variable extAddr,
@@ -57,8 +62,8 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
         channelIdx++;
     }
 
-    const uint16_t selfBit = 1 << rankId;
-    const uint16_t allOtherBit = ((1 << rankSize) - 1) & (~selfBit);
+    // 前同步：把本 rank 为每个对端准备的接收基地址(outputAddr + recvOffset)和 token 写到对端，
+    // 通知位用窗口位区分(OUTPUT/TOKEN)，与定长 all_to_all / hccl _v 的同步模型一致。
     channelIdx = 0;
     for (uint32_t peerId = 0; peerId < rankSize; peerId++) {
         if (peerId == rankId) {
@@ -67,15 +72,15 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
         ccu::Variable peerRecvBase;
         peerRecvBase = outputAddr + extArgs[peerId * A2AV_EXT_FIELD_NUM + A2AV_RECV_OFFSET_IDX];
         ccu::WriteVariableWithNotify(channels[channelIdx], peerRecvBase,
-            A2AV_OUTPUT_XN_ID, A2AV_OUTPUT_CKE_IDX, selfBit);
+            A2AV_OUTPUT_XN_ID, A2AV_PRE_SYNC_CKE_IDX, 1 << A2AV_OUTPUT_XN_ID);
         ccu::WriteVariableWithNotify(channels[channelIdx], tokenInfo,
-            A2AV_TOKEN_XN_ID, A2AV_TOKEN_CKE_IDX, selfBit);
+            A2AV_TOKEN_XN_ID, A2AV_PRE_SYNC_CKE_IDX, 1 << A2AV_TOKEN_XN_ID);
         channelIdx++;
     }
 
+    const uint16_t preAllBit = (1 << A2AV_OUTPUT_XN_ID) | (1 << A2AV_TOKEN_XN_ID);
     for (uint32_t i = 0; i < channelCount; i++) {
-        ccu::NotifyWait(channels[i], A2AV_OUTPUT_CKE_IDX, allOtherBit);
-        ccu::NotifyWait(channels[i], A2AV_TOKEN_CKE_IDX, allOtherBit);
+        ccu::NotifyWait(channels[i], A2AV_PRE_SYNC_CKE_IDX, preAllBit);
     }
 
     for (uint32_t rankIdx = 0; rankIdx < rankSize; rankIdx++) {
@@ -97,29 +102,35 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
         }
     }
 
+    // 数据搬运：每个 rank 使用独立的 event 位，末尾统一 EventWait，
+    // 与定长 all_to_all / hccl _v 一致；避免复用同一 bit 造成的串行/误同步。
+    const uint16_t doneAllBit = (1 << rankSize) - 1;
     channelIdx = 0;
     for (uint32_t rankIdx = 0; rankIdx < rankSize; rankIdx++) {
         const uint32_t extBase = rankIdx * A2AV_EXT_FIELD_NUM;
+        CCU_IF(extArgs[extBase + A2AV_SEND_SIZE_IDX] == 0) { // 该 rank 无数据，直接置完成位
+            ccu::EventRecord(event, 1 << rankIdx);
+        }
         CCU_IF(extArgs[extBase + A2AV_SEND_SIZE_IDX] != 0) {
             if (rankIdx == rankId) {
-                ccu::LocalCopy(localDst, src[rankIdx], extArgs[extBase + A2AV_SEND_SIZE_IDX], event, 1);
-                ccu::EventWait(event, 1);
+                ccu::LocalCopy(localDst, src[rankIdx], extArgs[extBase + A2AV_SEND_SIZE_IDX], event, 1 << rankIdx);
             } else {
                 ccu::Write(channels[channelIdx], dst[rankIdx], src[rankIdx],
-                    extArgs[extBase + A2AV_SEND_SIZE_IDX], event, 1);
-                ccu::EventWait(event, 1);
+                    extArgs[extBase + A2AV_SEND_SIZE_IDX], event, 1 << rankIdx);
             }
         }
         if (rankIdx != rankId) {
             channelIdx++;
         }
     }
+    ccu::EventWait(event, doneAllBit);
 
+    // 后同步
     for (uint32_t i = 0; i < channelCount; i++) {
-        ccu::NotifyRecord(channels[i], A2AV_POST_SYNC_CKE_IDX, selfBit);
+        ccu::NotifyRecord(channels[i], A2AV_POST_SYNC_CKE_IDX, 1 << A2AV_POST_SYNC_BIT);
     }
     for (uint32_t i = 0; i < channelCount; i++) {
-        ccu::NotifyWait(channels[i], A2AV_POST_SYNC_CKE_IDX, allOtherBit);
+        ccu::NotifyWait(channels[i], A2AV_POST_SYNC_CKE_IDX, 1 << A2AV_POST_SYNC_BIT);
     }
     return CCU_SUCCESS;
 }
