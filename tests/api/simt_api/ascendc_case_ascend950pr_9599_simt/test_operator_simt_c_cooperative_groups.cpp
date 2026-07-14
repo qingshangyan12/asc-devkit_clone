@@ -611,8 +611,103 @@ TEST_F(CooperativeGroupsTestsuite, ValidThreadBlockTileSizeTraitsTest)
     EXPECT_TRUE(_is_valid_thread_block_tile_size<8>::value);
     EXPECT_TRUE(_is_valid_thread_block_tile_size<16>::value);
     EXPECT_TRUE(_is_valid_thread_block_tile_size<32>::value);
+    EXPECT_TRUE(_is_valid_thread_block_tile_size<64>::value);
+    EXPECT_TRUE(_is_valid_thread_block_tile_size<128>::value);
+    EXPECT_TRUE(_is_valid_thread_block_tile_size<256>::value);
+    EXPECT_TRUE(_is_valid_thread_block_tile_size<512>::value);
+    EXPECT_TRUE(_is_valid_thread_block_tile_size<1024>::value);
+    EXPECT_TRUE(_is_valid_thread_block_tile_size<2048>::value);
     EXPECT_FALSE(_is_valid_thread_block_tile_size<3>::value);
-    EXPECT_FALSE(_is_valid_thread_block_tile_size<64>::value);
+    EXPECT_FALSE(_is_valid_thread_block_tile_size<4096>::value);
+}
+
+TEST_F(CooperativeGroupsTestsuite, MultiWarpThreadBlockTileSizeTraitsTest)
+{
+    EXPECT_FALSE(_is_multi_warp_thread_block_tile<32>::value);
+    EXPECT_TRUE(_is_multi_warp_thread_block_tile<64>::value);
+    EXPECT_TRUE(_is_multi_warp_thread_block_tile<128>::value);
+    EXPECT_TRUE(_is_multi_warp_thread_block_tile<256>::value);
+    EXPECT_TRUE(_is_multi_warp_thread_block_tile<512>::value);
+    EXPECT_TRUE(_is_multi_warp_thread_block_tile<1024>::value);
+    EXPECT_TRUE(_is_multi_warp_thread_block_tile<2048>::value);
+}
+
+TEST_F(CooperativeGroupsTestsuite, MultiWarpThreadBlockTileMetadataTest)
+{
+    SimtDimGuard guard(cce::dim3(2048u, 1u, 1u), cce::dim3(130u, 0u, 0u));
+    block_tile_memory<2048> memory{};
+    thread_block block = this_thread_block(memory);
+    auto tile64 = tiled_partition<64>(block);
+
+    EXPECT_NE(block._get_tile_memory(), nullptr);
+    EXPECT_EQ(tile64.size(), 64ull);
+    EXPECT_EQ(tile64.num_threads(), 64ull);
+    EXPECT_EQ(tile64.thread_rank(), 2ull);
+    EXPECT_EQ(tile64.meta_group_rank(), 2u);
+    EXPECT_EQ(tile64.meta_group_size(), 32u);
+}
+
+TEST_F(CooperativeGroupsTestsuite, MultiWarpThreadBlockTileSyncLocationMappingTest)
+{
+    SimtDimGuard guard(cce::dim3(2048u, 1u, 1u), cce::dim3(0u, 0u, 0u));
+    block_tile_memory<2048> memory{};
+    thread_block block = this_thread_block(memory);
+    auto* scratch = reinterpret_cast<details::multi_warp_scratch*>(&memory);
+
+    EXPECT_EQ(tiled_partition<64>(block).get_sync_location(), &scratch->barriers[0]);
+    EXPECT_EQ(tiled_partition<128>(block).get_sync_location(), &scratch->barriers[1]);
+    EXPECT_EQ(tiled_partition<256>(block).get_sync_location(), &scratch->barriers[2]);
+    EXPECT_EQ(tiled_partition<512>(block).get_sync_location(), &scratch->barriers[3]);
+    EXPECT_EQ(tiled_partition<1024>(block).get_sync_location(), &scratch->barriers[4]);
+}
+
+TEST_F(CooperativeGroupsTestsuite, NestedMultiWarpThreadBlockTileMetadataTest)
+{
+    SimtDimGuard guard(cce::dim3(2048u, 1u, 1u), cce::dim3(700u, 0u, 0u));
+    block_tile_memory<2048> memory{};
+    thread_block block = this_thread_block(memory);
+    auto largeTile = tiled_partition<512>(block);
+    auto smallTile = tiled_partition<128>(largeTile);
+    thread_block_tile<128, void> smallTileVoid = smallTile;
+
+    EXPECT_EQ(largeTile.thread_rank(), 188ull);
+    EXPECT_EQ(largeTile.meta_group_rank(), 1u);
+    EXPECT_EQ(largeTile.meta_group_size(), 4u);
+    EXPECT_EQ(smallTile.thread_rank(), 60ull);
+    EXPECT_EQ(smallTile.meta_group_rank(), 1u);
+    EXPECT_EQ(smallTile.meta_group_size(), 4u);
+    EXPECT_EQ(smallTileVoid.meta_group_rank(), smallTile.meta_group_rank());
+    EXPECT_EQ(smallTileVoid.meta_group_size(), smallTile.meta_group_size());
+    EXPECT_NE(smallTileVoid._get_tile_memory(), nullptr);
+}
+
+TEST_F(CooperativeGroupsTestsuite, MultiWarpThreadBlockTile2048ShflTest)
+{
+    SimtDimGuard guard(cce::dim3(2048u, 1u, 1u), cce::dim3(0u, 0u, 0u));
+    block_tile_memory<2048> memory{};
+    thread_block block = this_thread_block(memory);
+    auto tile2048 = tiled_partition<2048>(block);
+
+    EXPECT_EQ(tile2048.size(), 2048ull);
+    EXPECT_EQ(tile2048.num_threads(), 2048ull);
+    EXPECT_EQ(tile2048.meta_group_rank(), 0u);
+    EXPECT_EQ(tile2048.meta_group_size(), 1u);
+    EXPECT_EQ(tile2048.shfl(123u, 0), 123u);
+}
+
+TEST_F(CooperativeGroupsTestsuite, MultiWarpBarrierHelpersTest)
+{
+    details::multi_warp_scratch::barrier_t barrier{};
+    EXPECT_EQ(details::get_group_mask(0u, 2u), 0x00000003u);
+    EXPECT_EQ(details::get_group_mask(64u, 2u), 0x0000000Cu);
+    EXPECT_EQ(details::get_group_mask(1024u, 32u), 0xFFFFFFFFu);
+
+    barrier.arrived[0] = 0x00000002u;
+    EXPECT_TRUE(details::sync_warps_arrive(&barrier, 0u, 2u));
+    EXPECT_EQ(barrier.arrived[0], 0x00000003u);
+    details::sync_warps_release(&barrier, 0u, 2u);
+    EXPECT_EQ(barrier.arrived[0], 0x00000000u);
+    details::sync_warps_wait(&barrier, 0u, 2u);
 }
 
 TEST_F(CooperativeGroupsTestsuite, ThreadBlockTileBaseBuildMaskTest)
