@@ -2,9 +2,15 @@
 
 ## 产品支持情况
 
-| 产品         | 是否支持 |
-| :-----------------------| :-----:|
-| Ascend 950PR/Ascend 950DT | √ |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
 
 ## 功能说明
 
@@ -53,8 +59,8 @@ __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)
 | ------ | -------- |
 | VEC_STORE | SIMD_VF函数内矢量写UB流水线。<br>对应寄存器到UB的搬运指令，例如[asc_store](../reg_store/asc_store.md)。 |
 | VEC_LOAD | SIMD_VF函数内矢量读UB流水线。<br>对应UB到寄存器的搬运指令，例如[asc_load](../reg_load/asc_load.md)。 |
-| SCALAR_STORE | SIMD_VF函数内标量写UB流水线。<br>对应标量写入UB的指令，例如[asc_duplicate_scalar](../data_fill/asc_duplicate_scalar.md)。 |
-| SCALAR_LOAD | SIMD_VF函数内标量读UB流水线。<br>对应UB读取标量的指令。 |
+| SCALAR_STORE | SIMD_VF函数内标量写UB流水线。 |
+| SCALAR_LOAD | SIMD_VF函数内标量读UB流水线。 |
 | VEC_ALL | SIMD_VF函数内所有矢量读写UB流水线。 |
 | SCALAR_ALL | SIMD_VF函数内所有标量读写UB流水线。 |
 
@@ -62,13 +68,13 @@ __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)
 
 无
 
-## 流水类型
-
-PIPE_S
-
 ## 约束说明
 
-无
+- 读写依赖的场景下，如果读指令和写指令使用的寄存器相同，会触发寄存器保序，指令将会按照代码顺序执行，无需额外插入同步指令。
+- 冗余的同步指令会导致性能下降，可以通过外提出循环或者循环切分避免多次调用同步指令。
+- 当UB数据存在依赖时，才需要插入同步，判断是否有依赖取决于指令读写的内存是否有重叠。部分搬运指令读写内存的模式如下：
+    - [asc_gather](../reg_load/asc_gather.md)/[asc_scatter](../reg_store/asc_scatter.md)/[asc_gather_datablock](../reg_load/asc_gather_datablock.md)等指令取决于index地址偏移；
+    - [asc_loadalign_brc_ele](../reg_load/asc_loadalign_brc_elem.md)单条指令读32B数据后将第一个元素进行广播；
 
 ## 调用示例
 

@@ -2,9 +2,15 @@
 
 ## 产品支持情况
 
-|产品|是否支持|
-| :------------ | :------------: |
-| Ascend 950PR/Ascend 950DT | √ |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
 
 ## 功能说明
 
@@ -12,38 +18,38 @@
 
 将int8_t类型数据转换为half类型。
 
-由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个VL大小的数据分为两部分，根据不同接口选取索引0或者索引1。
+由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个VL大小的数据分为两部分，根据不同接口选择输入数据索引为奇数的位置或偶数的位置。
 
 ## 函数原型
 
 ```cpp
-// 选取索引0的位置
+// 选取索引为偶数的位置
 __simd_callee__ inline void asc_int82half(vector_half& dst, vector_int8_t src, vector_bool mask)
-// 选取索引1的位置
+// 选取索引为奇数的位置
 __simd_callee__ inline void asc_int82half_v2(vector_half& dst, vector_int8_t src, vector_bool mask)
 ```
 
 ## 参数说明
 
-|参数名|输入/输出|描述|
-| ------------ | ------------ | ------------ |
-| dst        | 输出    | 目的操作数（矢量数据寄存器）。 |
-| src        | 输入    | 源操作数（矢量数据寄存器）。 |
-| mask       | 输入    | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| src | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| mask | 输入 | 源操作数元素操作的有效指示。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
+## 数据类型
+
+| dst | src |
+| --- | --- |
+| half | int8_t |
 
 ## 返回值说明
 
 无
 
-## 流水类型
-
-PIPE_V
-
 ## 约束说明
 
-无
+- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
 
 ## 调用示例
 

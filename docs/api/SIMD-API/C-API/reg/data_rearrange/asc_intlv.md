@@ -2,9 +2,15 @@
 
 ## 产品支持情况
 
-|产品|是否支持|
-| :------------ | :------------: |
-| Ascend 950PR/Ascend 950DT | √ |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
 
 ## 功能说明
 
@@ -39,26 +45,29 @@
 
 ## 参数说明
 
-| 参数名       | 输入/输出 | 描述                |
-| --------- | ----- | ----------------- |
-| dst0       | 输出    | 目的操作数（矢量数据寄存器或掩码寄存器）。 |
-| dst1       | 输出    | 目的操作数（矢量数据寄存器或掩码寄存器）。 |
-| src0       | 输入    | 源操作数（矢量数据寄存器）。 |
-| src1       | 输入    | 源操作数（矢量数据寄存器）。 |
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| dst0 | 输出 | 目的操作数（矢量数据寄存器或掩码寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)或[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| dst1 | 输出 | 目的操作数（矢量数据寄存器或掩码寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)或[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| src0 | 输入 | 源操作数（矢量数据寄存器或掩码寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)或[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| src1 | 输入 | 源操作数（矢量数据寄存器或掩码寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)或[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
+## 数据类型
+
+目的操作数与源操作数的数据类型需要保持一致。
+- 操作数为矢量数据寄存器时支持的数据类型为：int8_t、uint8_t、fp8_e5m2_t、fp8_e4m3fn_t、hifloat8_t、fp8_e8m0_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+- 操作数为掩码寄存器时支持的数据类型为：bool。
 
 ## 返回值说明
 
 无
 
-## 流水类型
-
-PIPE_V
-
 ## 约束说明
 
-无
+- src0、src1、dst0、dst1的数据类型需要保持一致。
+- src0和src1可以为同一个矢量数据寄存器。
+- dst0和dst1不能为同一个矢量数据寄存器。
+- 允许源操作数和目的操作数为同一个矢量数据寄存器或掩码寄存器，例如asc_intlv(src0, src1, src0, src1)。
 
 ## 调用示例
 
