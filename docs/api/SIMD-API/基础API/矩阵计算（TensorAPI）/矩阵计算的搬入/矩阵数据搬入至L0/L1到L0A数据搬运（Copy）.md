@@ -2,17 +2,35 @@
 
 ## 产品支持情况
 
-| 产品 | 是否支持 |
-| :--- | :------: |
-| Ascend 950PR/Ascend 950DT | √ |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
 
 ## 功能说明
 
-头文件路径为：`"tensor_api/tensor.h"`。
+头文件路径为：`tensor_api/tensor.h`。
 
 Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的左矩阵数据搬运到L0A Buffer。
 
-该通路以512 Byte数据分形为基本搬运单位。不同数据类型对应的分形矩阵形态如下：
+该通路以512Byte数据分形为基本搬运单位。不同数据类型对应的分形矩阵形态如下：
 
 | 数据位宽 | 分形矩阵形态 |
 | :--- | :--- |
@@ -80,8 +98,8 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 ## 约束说明
 
-- 目的地址位于L0A Buffer时，起始地址需要满足512 Byte对齐要求。
-- 源地址位于L1 Buffer时，起始地址需要满足32 Byte对齐要求。
+- 目的地址位于L0A Buffer时，起始地址需要满足512Byte对齐要求。
+- 源地址位于L1 Buffer时，起始地址需要满足32Byte对齐要求。
 - 特殊数据类型约束：L1 Buffer到L0A Buffer通路使能转置时，即`ZN2NZ`，支持的数据类型约束如下：
   - b32数据类型要求源矩阵Shape在K轴方向16对齐。
   - b8数据类型要求源矩阵Shape在M轴方向32对齐。
@@ -96,7 +114,7 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 **图1**  非转置搬运示意图
 
-![](../../../../../figures/notranspose.png)
+![非转置搬运示意图](../../../../../figures/notranspose.png)
 
 ### 转置搬运
 
@@ -108,25 +126,25 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 **图2**  b4转置搬运示意图
 
-![](../../../../../figures/transpose_b4.png)
+![b4转置搬运示意图](../../../../../figures/transpose_b4.png)
 
 #### b8转置搬运
 
 **图3**  b8转置搬运示意图
 
-![](../../../../../figures/transpose_b8.png)
+![b8转置搬运示意图](../../../../../figures/transpose_b8.png)
 
 #### b16转置搬运
 
 **图4**  b16转置搬运示意图
 
-![](../../../../../figures/transpose_b16.png)
+![b16转置搬运示意图](../../../../../figures/transpose_b16.png)
 
 #### b32转置搬运
 
 **图5**  b32转置搬运示意图
 
-![](../../../../../figures/transpose_b32.png)
+![b32转置搬运示意图](../../../../../figures/transpose_b32.png)
 
 ### Batch搬运
 
