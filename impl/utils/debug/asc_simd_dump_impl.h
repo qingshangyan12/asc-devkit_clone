@@ -118,8 +118,10 @@ __ASC_USE_RESERVED_UBUF__(
     3510, "asc_dump_reg is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void asc_dump_reg(U& input, uint32_t desc, uint32_t dump_size)
 {
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     enable_asc_diagnostics();
     asc_dump_impl_reg<DumpTensorPosition::REG, T>(input, desc, dump_size);
+#endif
 }
 
 template <typename T>
@@ -127,24 +129,30 @@ __ASC_USE_RESERVED_UBUF__(
     3510, "asc_dump_ubuf is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dump_size)
 {
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     enable_asc_diagnostics();
     asc_dump_impl<DumpTensorPosition::UB, T>(input, desc, dump_size);
+#endif
 }
 
 template <typename T, typename U>
 __ASC_USE_RESERVED_UBUF__(3510, "asc_dump is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void asc_dump(U& input, uint32_t desc, uint32_t dump_size)
 {
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     enable_asc_diagnostics();
     asc_dump_impl_reg<DumpTensorPosition::REG, T>(input, desc, dump_size);
+#endif
 }
 
 template <typename T>
 __ASC_USE_RESERVED_UBUF__(3510, "asc_dump is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t dump_size)
 {
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     enable_asc_diagnostics();
     asc_dump_impl<DumpTensorPosition::UB, T>(input, desc, dump_size);
+#endif
 }
 } // namespace __asc_simd_vf
 

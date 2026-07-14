@@ -76,7 +76,11 @@ __simd_callee__ constexpr inline uint32_t get_vf_debug_reserved_ub_size()
 
 __simd_callee__ inline uint64_t get_vf_debug_reserved_ub_addr()
 {
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     return static_cast<uint64_t>(get_shmem_sz()) - get_vf_debug_reserved_ub_size();
+#else
+    return 0;
+#endif
 }
 
 __simd_callee__ __ubuf__ inline BlockVFBufInfo* get_printf_ubuf_addr(uint64_t addr, uint16_t blockIdx = 0)
