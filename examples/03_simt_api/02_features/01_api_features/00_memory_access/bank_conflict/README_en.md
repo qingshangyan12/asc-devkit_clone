@@ -19,8 +19,8 @@ This example introduces UB bank conflicts that may occur when multiple threads i
 │   ├── figures              // Image resources for README
 │   ├── bank_conflict.asc    // SIMT UB Bank conflict example implementation
 │   ├── CMakeLists.txt       // CMake build file
-│   ├── README.md
-│   └── README_en.md
+│   ├── README.md            // Example documentation
+│   └── README_en.md         // Example documentation
 ```
 
 ## Example Description
@@ -29,7 +29,7 @@ This example introduces UB bank conflicts that may occur when multiple threads i
 
 This example is used to verify UB bank conflict behavior when multiple threads in the same Warp access UB in Ascend C SIMT programming. The example uses the compile-time parameter `SCENARIO_NUM` to select different cases and construct typical access patterns, including same-address merge, cross-subbank distributed access, same 8B-range merge in contiguous float access, same-subbank different-row conflicts, and same-index subbank conflicts within the same bank group.
 
-On the Host side, the input array is constructed and copied to GM. The kernel first moves input data from GM to UB, then repeatedly reads data according to the UB address pattern of the current case, and uses [`clock()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/调测接口/clock.md) to count the cycles spent reading UB data.
+On the Host side, the input array is constructed and copied to GM. The kernel first moves input data from GM to UB, then repeatedly reads data according to the UB address pattern of the current case, and uses [`clock()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/Utils-API/调测接口/clock.md) to count the cycles spent reading UB data.
 
 ### Example Specifications
 
@@ -53,7 +53,6 @@ Taking Ascend 950PR/Ascend 950DT as an example, the following figure shows the U
 In SIMT scenarios, multiple threads in the same Warp may access UB at the same time in one UB access instruction. When the accessed data belongs to subbank resources with the same index in the same bank group, for example, subbank2 in bank0 and subbank2 in bank8, the hardware cannot process all requests in one cycle, so the requests need to wait in sequence, forming subbank conflicts and increasing access latency. If the accessed data belongs to the same 8B address range in the same row of the same subbank, the hardware merges these requests, and no subbank conflict is formed.
 
 **Figure 1** Bank structure
-
 ![](./figures/bank结构示意图.png)
 
 ### Address Encoding Rules
@@ -61,7 +60,6 @@ In SIMT scenarios, multiple threads in the same Warp may access UB at the same t
 UB addresses use low-bit interleaving. As shown in the following figure, consecutive addresses are mapped to bank0 through bank15 at 32B granularity: the first 32B address segment maps to bank0, the second maps to bank1, and so on. The 16th segment maps to bank15, and the 17th segment maps back to the next row of bank0.
 
 **Figure 2** Bank memory layout
-
 ![](./figures/bank内存排布示意图.png)
 
 The main subbank conflict types in SIMT programming are as follows:
@@ -186,7 +184,7 @@ __aicore__ inline uint32_t get_ub_index_device(uint32_t thread_id)
 
 The accesses of 32 threads cover a continuous 256B region and are distributed to 4 subbanks in 8 bank groups at 8B granularity. Under the same UB access instruction, each subbank in each bank group is accessed by only one thread. Therefore, this case can be used as a conflict-free access baseline. The access pattern is shown below:
 
-![](./figures/case2.png)
+![](./figures/case1.png)
 
 **Performance Data**:
 
@@ -217,7 +215,7 @@ __aicore__ inline uint32_t get_ub_index_device(uint32_t thread_id)
 
 In this case, the 32 threads read `ub[0]` through `ub[31]`. For the float type, `ub[0]` and `ub[1]` are in the same 8B range in the same row of the same subbank, `ub[2]` and `ub[3]` are in the same 8B range in the same row of the next subbank, and so on. The accesses of every adjacent two threads can be merged according to the same 8B range. The access pattern is shown below:
 
-![](./figures/case1.png)
+![](./figures/case2.png)
 
 **Performance Data**:
 
