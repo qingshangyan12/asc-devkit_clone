@@ -10,17 +10,17 @@
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
-根据mask，对源操作数src0、src1及输入进位carry_src进行按元素求和操作，i为元素索引，相加结果写入dst，同时将每个元素的进位结果写入carry。计算公式如下：
+根据mask，对源操作数src0、src1及输入进位carry_src进行按元素求差操作，i为元素索引，相减结果写入dst，同时将每个元素的进位结果写入carry。计算公式如下：
 
 $$
 \{dst0_i, dst1_i\} = src0_i - src1_i - carry\_src_i
 $$
 
-Carry flag（进位标志）用于表示加法进位或者减法无借位，若src0，src1，carry_src输入按位相加后最高位有进位，在carry（存放进位的掩码寄存器）中对应位置每4bit设置1，否则写0。
+Carry flag（进位标志）用于表示加法进位或者减法无借位，若src0，src1，carry_src输入按位相减后最高位有借位，在carry（存放借位的掩码寄存器）中对应位置每4bit设置1，否则写0。
 
 ![](../../../../figures/asc_subc_1.png)
 
-以int64_t类型数据计算-1 + 8 = 7为例，asc_sub/asc_subc接口的适用场景如下图：
+以int64_t类型数据计算-1 - 8 = -9为例，asc_sub/asc_subc接口的适用场景如下图：
 
 ![](../../../../figures/asc_subc_2.png)
 
