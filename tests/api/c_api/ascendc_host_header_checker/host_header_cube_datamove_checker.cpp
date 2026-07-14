@@ -103,4 +103,3 @@ static void test_host_c_api_cube_datamove_2()
     using ::asc_set_l13d_rpt;
     using ::asc_set_l13d_size;
 }
-

@@ -41,4 +41,3 @@ static void test_host_c_api_sys_var_0()
     using ::asc_set_l13d_padding;
     using ::asc_set_l3d_rpt_b;
 }
-

@@ -42,4 +42,3 @@ static void test_host_c_api_vector_datamove_0()
     using ::asc_set_ub2gm_loop2_stride;
     using ::asc_set_ub2gm_loop_size;
 }
-

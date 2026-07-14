@@ -12,17 +12,6 @@
 
 static void test_host_c_api_scalar_compute_0()
 {
-    using __asc_aicore::asc_atomic_add;
-    using __asc_aicore::asc_atomic_and;
-    using __asc_aicore::asc_atomic_cas;
-    using __asc_aicore::asc_atomic_dec;
-    using __asc_aicore::asc_atomic_exch;
-    using __asc_aicore::asc_atomic_inc;
-    using __asc_aicore::asc_atomic_max;
-    using __asc_aicore::asc_atomic_min;
-    using __asc_aicore::asc_atomic_or;
-    using __asc_aicore::asc_atomic_sub;
-    using __asc_aicore::asc_atomic_xor;
     using ::asc_clear_nthbit;
     using ::asc_clz;
     using ::asc_ffs;
@@ -36,5 +25,15 @@ static void test_host_c_api_scalar_compute_0()
     using ::asc_sflbits;
     using ::asc_store_dev;
     using ::asc_zero_bits_cnt;
+    using __asc_aicore::asc_atomic_add;
+    using __asc_aicore::asc_atomic_and;
+    using __asc_aicore::asc_atomic_cas;
+    using __asc_aicore::asc_atomic_dec;
+    using __asc_aicore::asc_atomic_exch;
+    using __asc_aicore::asc_atomic_inc;
+    using __asc_aicore::asc_atomic_max;
+    using __asc_aicore::asc_atomic_min;
+    using __asc_aicore::asc_atomic_or;
+    using __asc_aicore::asc_atomic_sub;
+    using __asc_aicore::asc_atomic_xor;
 }
-
