@@ -28,19 +28,10 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
                                    ccu::Variable goSize4, const ChannelHandle channels[], uint32_t channelCount,
                                    uint32_t rankSize, uint32_t rankId)
 {
-    CcuKernelCtxBase ctx;
-    ctx.resourceAllocated = false;
-    ctx.moConfig.msInterleave = 0;
-    ctx.moConfig.loopCount = 0;
-    ctx.moConfig.memSlice = 0;
-    ctx.moRes.eventCount = 0;
-    ctx.moRes.bufCount = 0;
-    ctx.enginePool = 0;
-    GroupOpSizeVars localTailGoSize;
-    localTailGoSize.addrOffset = goSize1;
-    localTailGoSize.loopParam = goSize2;
-    localTailGoSize.parallelParam = goSize3;
-    localTailGoSize.residual = goSize4;
+    (void)goSize1;
+    (void)goSize2;
+    (void)goSize3;
+    (void)goSize4;
 
     std::vector<ccu::Variable> output(rankSize);
     std::vector<ccu::Variable> token(rankSize);
@@ -111,7 +102,8 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
         const uint32_t extBase = rankIdx * A2AV_EXT_FIELD_NUM;
         CCU_IF(extArgs[extBase + A2AV_SEND_SIZE_IDX] != 0) {
             if (rankIdx == rankId) {
-                GroupCopy(ctx, localDst, src[rankIdx], localTailGoSize);
+                ccu::LocalCopy(localDst, src[rankIdx], extArgs[extBase + A2AV_SEND_SIZE_IDX], event, 1);
+                ccu::EventWait(event, 1);
             } else {
                 ccu::Write(channels[channelIdx], dst[rankIdx], src[rankIdx],
                     extArgs[extBase + A2AV_SEND_SIZE_IDX], event, 1);
