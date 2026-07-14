@@ -121,7 +121,7 @@ AscendC::LocalTensor<half> a2LocalPong(AscendC::TPosition::A2, L0_PINGPONG_BYTES
 
 | 事件类型 | 方向 | 用途 | flag 编号 |
 |---------|------|------|----------|
-| [MTE2_MTE1](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md) | 正向 | L1 数据就绪通知，DataCopyIn 通知 DataLoad 可读取 | 0/1: A1 Ping/Pong; 2/3: B1 Ping/Pong |
+| [MTE2_MTE1](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md) | 正向 | L1 数据就绪通知，DataCopyIn 通知 DataLoad 可读取 | 0/1: A1 Ping/Pong; 2/3: B1 Ping/Pong |
 | [MTE1_MTE2](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md) | 反向 | L1 缓冲区释放通知，DataLoad 通知 DataCopyIn 可写入 | 同上 |
 | [MTE1_M](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md) | 正向 | L0 数据就绪通知，DataLoad 通知 Compute 可计算 | mte1DBFlag (0/1 交替) |
 | [M_MTE1](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md) | 反向 | L0 缓冲区释放通知，Compute 通知 DataLoad 可写入 | mte1DBFlag (0/1 交替) |
@@ -485,7 +485,7 @@ $$MTE2耗时误差 = \frac{1874.267 - 1832.10}{1832.10} = 2.30\%$$
 AscendC::printf("matmul blockIdx=%d\n", AscendC::GetBlockIdx());
 ```
 
-> [!CAUTION]注意 
+> [!CAUTION]注意
 >printf（PRINTF）接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC\_DUMP=0的方式关闭打印功能。
 
 ### DumpTensor
@@ -498,7 +498,7 @@ AscendC::printf("matmul blockIdx=%d\n", AscendC::GetBlockIdx());
 AscendC::DumpTensor(cLocal, baseM * baseN);
 ```
 
-> [!CAUTION]注意 
+> [!CAUTION]注意
 >DumpTensor接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC\_DUMP=0来关闭打印功能。
 
 ## 性能调试
