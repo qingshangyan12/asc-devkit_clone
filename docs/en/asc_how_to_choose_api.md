@@ -39,18 +39,18 @@ The following decision flowchart helps you quickly locate the most suitable API 
 
 ```mermaid
 graph TD
-    A[**Ascend C Operator Development**] --> B[**1. Ease of use priority, performance insensitive**]
-    A --> C[**2. Extreme performance priority**]
-    A --> D[**3. Balance performance and ease of use**]
-    B -->|Other operator types| E[**SIMD C API**<br>(with sync suffix computation interface)]
-    B -->|Familiar with SIMT, discrete vector operators| F[**SIMT API**]
+    A[Ascend C Operator Development] --> B[1. Ease of use priority, performance insensitive]
+    A --> C[2. Extreme performance priority]
+    A --> D[3. Balance performance and ease of use]
+    B -->|Other operator types| E[SIMD C API<br>(with sync suffix computation interface)]
+    B -->|Familiar with SIMT, discrete vector operators| F[SIMT API]
     C -->|Discrete vector operators| F
-    C -->|Prefer **pointer programming**| P[**SIMD C API**]
-    C -->|Prefer **C++ Tensor programming & independent synchronization/memory management**| I[**Basic API**]
-    C -->|Prefer **C++ Tensor programming & automatic synchronization/memory management**| J[**Tpipe/Tque Framework Programming API**]
+    C -->|Prefer pointer programming| P[SIMD C API]
+    C -->|Prefer C++ Tensor programming & independent synchronization/memory management| I[Basic API]
+    C -->|Prefer C++ Tensor programming & automatic synchronization/memory management| J[Tpipe/Tque Framework Programming API]
 
-    D -->|Reuse common algorithms, generalization priority| K[**High-level API**]
-    D -->|Typical operators, high performance in specific scenarios| L[**Operator Template Library**]
+    D -->|Reuse common algorithms, generalization priority| K[High-level API]
+    D -->|Typical operators, high performance in specific scenarios| L[Operator Template Library]
 ```
 
 You can also refer to the following key dimensions for quick decision-making:
