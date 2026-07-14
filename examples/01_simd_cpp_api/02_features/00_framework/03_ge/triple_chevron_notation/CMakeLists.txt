@@ -25,9 +25,6 @@ configure_file("${OP_PROTO_HEADER_SOURCE_FILE}" "${CUSTOM_OP_INCLUDE_DIR}/add_cu
 add_library(add_custom_op SHARED
     add_custom.asc
 )
-target_compile_options(add_custom_op PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
-)
 target_compile_definitions(add_custom_op PRIVATE _GLIBCXX_USE_CXX11_ABI=0)
 target_include_directories(add_custom_op PRIVATE
     "$ENV{ASCEND_HOME_PATH}/include"
@@ -38,9 +35,6 @@ target_link_libraries(add_custom_op PRIVATE
     ascendcl
     ascendc_runtime
     lowering
-    register
-    gert
-    dl
     -Wl,--as-needed
 )
 set_target_properties(add_custom_op PROPERTIES

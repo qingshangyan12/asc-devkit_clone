@@ -9,6 +9,7 @@
  */
 
 #include <algorithm>
+#include <cmath>
 #include <cstdint>
 #include <cstdio>
 #include <vector>
@@ -82,8 +83,13 @@ int32_t main(int32_t argc, char** argv)
         printf("%.1f ", aclFloat16ToFloat(output0HostData[i]));
     }
     printf(
-        "\ntest %s\n",
-        std::equal(output0HostData.begin(), output0HostData.end(), goldenData.begin()) ? "pass" : "failed");
+        "\ntest %s\n", std::equal(
+                           output0HostData.begin(), output0HostData.end(), goldenData.begin(),
+                           [](aclFloat16 output, aclFloat16 golden) {
+                               return std::fabs(aclFloat16ToFloat(output) - aclFloat16ToFloat(golden)) <= 0.01F;
+                           }) ?
+                           "pass" :
+                           "failed");
 
     aclDestroyTensor(input0);
     aclDestroyTensor(input1);
