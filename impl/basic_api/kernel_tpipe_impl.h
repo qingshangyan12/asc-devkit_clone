@@ -98,35 +98,6 @@ __aicore__ inline void TPipe::Init()
     g_lastTpipeInitPos = get_pc();
 #endif
     ResetPool();
-    // for matmul macro, set flag M_MTE1 at the begining of operator, and also wait flag at the end.
-    // matmul macro only use M_MTE1 event id 0 1 currently.
-#if __NPU_ARCH__ == 2201
-    if ASCEND_IS_AIC {
-        auto enQueEvtID = this->AllocEventID<HardEvent::M_MTE1>();
-        ASCENDC_DEBUG_ASSERT((enQueEvtID == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "enQueEvtID should be 0"));
-        SetFlag<HardEvent::M_MTE1>(static_cast<event_t>(enQueEvtID));
-        enQueEvtID = this->AllocEventID<HardEvent::M_MTE1>();
-        ASCENDC_DEBUG_ASSERT((enQueEvtID == 1), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "enQueEvtID should be 1"));
-        SetFlag<HardEvent::M_MTE1>(static_cast<event_t>(enQueEvtID));
-        // For load Bias
-        enQueEvtID = this->AllocEventID<HardEvent::M_MTE1>();
-        ASCENDC_DEBUG_ASSERT((enQueEvtID == 2), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "enQueEvtID should be 2"));
-
-        SetFlag<HardEvent::M_MTE1>(static_cast<event_t>(enQueEvtID));
-    }
-#elif __NPU_ARCH__ == 3002 || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
-    auto enQueEvtID = this->AllocEventID<HardEvent::M_MTE1>();
-    ASCENDC_DEBUG_ASSERT((enQueEvtID == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "enQueEvtID should be 0"));
-    SetFlag<HardEvent::M_MTE1>(static_cast<event_t>(enQueEvtID));
-
-    enQueEvtID = this->AllocEventID<HardEvent::M_MTE1>();
-    ASCENDC_DEBUG_ASSERT((enQueEvtID == 1), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "enQueEvtID should be 1"));
-    SetFlag<HardEvent::M_MTE1>(static_cast<event_t>(enQueEvtID));
-    // For load Bias
-    enQueEvtID = this->AllocEventID<HardEvent::M_MTE1>();
-    ASCENDC_DEBUG_ASSERT((enQueEvtID == 2), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "enQueEvtID should be 2"));
-    SetFlag<HardEvent::M_MTE1>(static_cast<event_t>(enQueEvtID));
-#endif
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     auto bufferInitLen = ConstDefiner::Instance().bufferInitLen;
@@ -580,25 +551,6 @@ __aicore__ inline void TPipe::DestroyWithoutPipeAll()
             ptr->freeBufEvtID = INVALID_TEVENTID;
         }
     }
-    // for matmul macro, release M_MTE1 0 1 event id.
-#if __NPU_ARCH__ == 2201
-    if ASCEND_IS_AIC {
-        WaitFlag<HardEvent::M_MTE1>(0);
-        ReleaseEventID<HardEvent::M_MTE1>(0);
-        WaitFlag<HardEvent::M_MTE1>(1);
-        ReleaseEventID<HardEvent::M_MTE1>(1);
-        // For Bias
-        WaitFlag<HardEvent::M_MTE1>(2);
-        ReleaseEventID<HardEvent::M_MTE1>(2);
-    }
-#elif __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
-    WaitFlag<HardEvent::M_MTE1>(0);
-    ReleaseEventID<HardEvent::M_MTE1>(0);
-    WaitFlag<HardEvent::M_MTE1>(1);
-    ReleaseEventID<HardEvent::M_MTE1>(1);
-    WaitFlag<HardEvent::M_MTE1>(2);
-    ReleaseEventID<HardEvent::M_MTE1>(2);
-#endif
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 5102
     Internal::g_bufId = 0;
 #endif
