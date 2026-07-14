@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>设计理念分析 · reg_compute 问题与 TensorAPI 解法</title>
+<style>
+  :root {
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2128; --text:#e6edf3; --muted:#8b949e;
+    --accent:#58a6ff; --green:#3fb950; --warn:#d29922; --red:#f85149; --purple:#bc8cff;
+    --border:#30363d; --code:#0b0e14; --radius:10px;
+    --mono:"JetBrains Mono","Cascadia Code",Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  *{box-sizing:border-box} html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.75;font-size:15.5px}
+  .wrap{display:grid;grid-template-columns:270px 1fr;max-width:1500px;margin:0 auto}
+  nav{position:sticky;top:0;height:100vh;overflow-y:auto;padding:24px 16px;border-right:1px solid var(--border);background:var(--panel)}
+  nav h2{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:0 0 12px}
+  nav a{display:block;color:var(--muted);text-decoration:none;padding:5px 10px;border-radius:6px;font-size:13.5px}
+  nav a:hover{background:var(--panel2);color:var(--text)}
+  nav a.sub{padding-left:20px;font-size:12.5px}
+  main{padding:36px 44px 100px}
+  .hero{margin-bottom:36px}
+  .kicker{color:var(--accent);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+  h1{font-size:32px;line-height:1.3;margin:8px 0}
+  .lead{color:var(--muted);font-size:16px;max-width:920px}
+  h2.sec{font-size:22px;border-bottom:1px solid var(--border);padding-bottom:8px;margin:48px 0 16px}
+  h2.sec .n{color:var(--accent);margin-right:8px}
+  h3{font-size:17px;color:#fff;margin:24px 0 8px}
+  h4{font-size:14px;color:var(--accent);margin:16px 0 6px;text-transform:uppercase;letter-spacing:.04em}
+  p{margin:10px 0}
+  .pill{display:inline-block;background:var(--panel2);border:1px solid var(--border);border-radius:999px;padding:2px 9px;font-size:11.5px;color:var(--muted);margin:0 4px 4px 0;font-family:var(--mono)}
+  pre{background:var(--code);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;overflow-x:auto;font-size:12.5px;line-height:1.55;margin:12px 0}
+  pre code{font-family:var(--mono);color:#c9d1d9;white-space:pre}
+  .tok-c{color:#6e7681;font-style:italic}.tok-k{color:#ff7b72}.tok-t{color:#7ee787}.tok-f{color:#d2a8ff}.tok-s{color:#a5d6ff}.tok-w{color:#ffa657}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px}
+  th,td{border:1px solid var(--border);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:var(--panel2)}
+  tr:nth-child(even) td{background:rgba(255,255,255,.015)}
+  .concept{background:linear-gradient(135deg,rgba(88,166,255,.08),rgba(188,140,255,.06));border:1px solid rgba(88,166,255,.25);border-radius:var(--radius);padding:14px 18px;margin:14px 0}
+  .concept b{color:var(--accent)}
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+  .box{border-radius:var(--radius);padding:14px 16px;border:1px solid var(--border)}
+  .box.bad{background:rgba(248,81,73,.06);border-color:rgba(248,81,73,.3)}
+  .box.good{background:rgba(63,185,80,.06);border-color:rgba(63,185,80,.3)}
+  .box h5{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+  .box.bad h5{color:var(--red)} .box.good h5{color:var(--green)}
+  .arrow{text-align:center;color:var(--muted);font-size:20px;margin:6px 0}
+  .callout{border-left:3px solid var(--accent);background:var(--panel);padding:12px 16px;margin:14px 0;border-radius:0 8px 8px 0}
+  .callout.purple{border-color:var(--purple)}
+  .layer-stack{margin:16px 0}
+  .layer{display:grid;grid-template-columns:100px 1fr;gap:12px;margin:6px 0;align-items:stretch}
+  .layer .lbl{text-align:right;padding-top:12px;color:var(--muted);font-family:var(--mono);font-size:12px}
+  .layer .blk{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:10px 14px}
+  .ok{color:var(--green)} .part{color:var(--warn)} .no{color:var(--red)}
+  footer{border-top:1px solid var(--border);margin-top:48px;padding-top:16px;color:var(--muted);font-size:12.5px}
+  @media(max-width:960px){.wrap{grid-template-columns:1fr}.compare{grid-template-columns:1fr}nav{position:static;height:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <h2>目录</h2>
+  <a href="#intro">概述</a>
+  <a href="#paradigm">两种范式</a>
+  <a href="#axioms">TensorAPI 设计公理</a>
+  <a href="#p1" class="sub">① 正交性</a>
+  <a href="#p2" class="sub">② 统一访问</a>
+  <a href="#p3" class="sub">③ 标签分发</a>
+  <a href="#p4" class="sub">④ 策略对象</a>
+  <a href="#p5" class="sub">⑤ 分层与 OCP</a>
+  <a href="#p6" class="sub">⑥ 形式契约</a>
+  <a href="#problems">reg_compute 六大病灶</a>
+  <a href="#pipeline">完整流水线对比</a>
+  <a href="#matrix">理念 → 解法对照表</a>
+  <a href="#honest">诚实边界</a>
+</nav>
+
+<main>
+<header class="hero" id="intro">
+  <div class="kicker">AscendC · 设计理念报告</div>
+  <h1>basic_api/reg_compute 的问题本质<br/>与 TensorAPI 接口设计如何回应</h1>
+  <p class="lead">
+    本文从<strong>软件设计理念</strong>（非单纯 bug 列表）出发，解释旧 <code>reg_compute</code> 为何难以学习、扩展与组合；
+    再用<strong>概念 + 真实代码</strong>说明新 TensorAPI（<code>AscendC::Te</code>）如何用 Tag × Trait × Verb × Operand 重构这一领域。
+  </p>
+  <span class="pill">22 intf headers</span>
+  <span class="pill">39 load/store APIs</span>
+  <span class="pill">Tag × Trait × Verb</span>
+  <span class="pill">CuTe-inspired</span>
+</header>
+
+<!-- Paradigm -->
+<section id="paradigm">
+  <h2 class="sec"><span class="n">0</span>两种 API 范式：指令投影 vs 形式化 DSL</h2>
+  <div class="compare">
+    <div class="box bad">
+      <h5>旧 reg_compute — 指令投影型 API</h5>
+      <p>把硬件指令手册<strong>直接投影</strong>到 C++ 命名空间：每个变体一个顶层函数，配置塞进模板参数。</p>
+      <pre><code><span class="tok-k">namespace</span> Reg {
+  <span class="tok-f">Add</span>&lt;T, ZEROING&gt;(dst, s0, s1, mask);
+  <span class="tok-f">LoadAlign</span>&lt;T, DIST_NORM&gt;(dst, ub);
+  <span class="tok-f">LoadAlign</span>(mask, ub, offset); <span class="tok-c">// 同名异义!</span>
+}</code></pre>
+      <p class="muted">本质：扁平符号表，无统一代数结构。</p>
+    </div>
+    <div class="box good">
+      <h5>新 TensorAPI — 嵌入式 DSL</h5>
+      <p>操作 = <strong>Tag（做什么）× Trait（怎么做）× Verb（执行）× Operand（对谁）</strong>，四层可组合。</p>
+      <pre><code><span class="tok-k">namespace</span> Te {
+  <span class="tok-f">Compute</span>(<span class="tok-f">MakeVec</span>(vec::Add{}), dst, s0, s1, mask);
+  <span class="tok-f">Load</span>(<span class="tok-f">MakeLoad</span>(load::UbAlign{}), dst, ub);
+}</code></pre>
+      <p class="muted">本质：可推理、可扩展的形式系统。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Axioms -->
+<section id="axioms">
+  <h2 class="sec"><span class="n">1</span>TensorAPI 的六条设计公理</h2>
+  <div class="layer-stack">
+    <div class="layer"><div class="lbl">Operand</div><div class="blk"><code>MakeRegTensor</code> / <code>MakeMaskReg</code> — 操作数工厂（对称 <code>MakeTensor</code>）</div></div>
+    <div class="layer"><div class="lbl">Verb</div><div class="blk"><code>Compute</code> / <code>Load</code> / <code>Store</code> / <code>Copy</code> — 固定动词表</div></div>
+    <div class="layer"><div class="lbl">Factory</div><div class="blk"><code>MakeVec</code> / <code>MakeLoad</code> — 构造可复用策略对象（Atom）</div></div>
+    <div class="layer"><div class="lbl">Trait</div><div class="blk"><code>VecTrait</code> / <code>RegLoadTrait</code> — 正交编译期配置</div></div>
+    <div class="layer"><div class="lbl">Tag</div><div class="blk"><code>vec::Add</code> / <code>load::UbAlign</code> — 空 struct，指令族标识</div></div>
+    <div class="layer"><div class="lbl">Inst</div><div class="blk"><code>Inst::Add::Run</code> → <code>asc_add</code> — 硬件绑定，arch 可替换</div></div>
+  </div>
+</section>
+
+<!-- Problem 1 Orthogonality -->
+<section id="p1">
+  <h2 class="sec"><span class="n">①</span>正交性：维度纠缠 vs 维度分离</h2>
+  <div class="concept"><b>理念</b>：独立设计维度应自由组合。若每个组合对应一个符号，API 空间按笛卡尔积爆炸，且无法证明完备性。</div>
+
+  <h3>旧 API：LoadAlign 把 5 个维度绑在一个名字上</h3>
+  <pre><code><span class="tok-c">// kernel_reg_compute_datacopy_intf.h — 39 个重载，节选</span>
+<span class="tok-k">template</span> &lt;<span class="tok-k">typename</span> T, <span class="tok-t">LoadDist</span> dist, <span class="tok-k">typename</span> U&gt;
+<span class="tok-k">void</span> <span class="tok-f">LoadAlign</span>(U&amp; dstReg, __ubuf__ T* srcAddr);                    <span class="tok-c">// vld</span>
+
+<span class="tok-k">template</span> &lt;<span class="tok-k">typename</span> T, <span class="tok-t">PostLiteral</span> postMode, <span class="tok-t">LoadDist</span> dist, <span class="tok-k">typename</span> U&gt;
+<span class="tok-k">void</span> <span class="tok-f">LoadAlign</span>(U&amp; dstReg, __ubuf__ T*&amp; srcAddr, <span class="tok-t">int32_t</span> stride);  <span class="tok-c">// vld+post</span>
+
+<span class="tok-k">template</span> &lt;<span class="tok-t">MaskDist</span> dist, <span class="tok-k">typename</span> T&gt;
+<span class="tok-k">void</span> <span class="tok-f">LoadAlign</span>(<span class="tok-t">MaskReg</span>&amp; mask, __ubuf__ T* srcAddr);             <span class="tok-c">// pld — 完全不同语义!</span></code></pre>
+  <p>维度：指令族 × LoadDist × PostMode × 单/双寄存器 × 操作数类型 —— 全部折叠进 <code>LoadAlign</code>。</p>
+
+  <h3>新 API：维度外置到 Tag 与 Trait</h3>
+  <pre><code><span class="tok-c">// load_trait.h — 正交维度各自独立</span>
+<span class="tok-k">struct</span> <span class="tok-t">RegLoadTrait</span> {
+    Reg::LoadDist dist = Reg::LoadDist::DIST_NORM;  <span class="tok-c">// 维度 1</span>
+    PostMode post = PostMode::NORMAL;               <span class="tok-c">// 维度 2</span>
+    RegWidth width = RegWidth::SINGLE;              <span class="tok-c">// 维度 3</span>
+    AddrMode addr = AddrMode::DIRECT;               <span class="tok-c">// 维度 4</span>
+};
+
+<span class="tok-c">// 动词固定，变体由 tag + trait 表达</span>
+<span class="tok-f">Load</span>(<span class="tok-f">MakeLoad</span>(load::UbAlign{}, trait), dst, ubPtr);
+<span class="tok-f">LoadMask</span>(<span class="tok-f">MakeLoad</span>(load::MaskAlign{}, trait), mask, ubPtr); <span class="tok-c">// 规划：拆分异义</span></code></pre>
+
+  <h3>向量计算：N 个算子 → 1 个动词</h3>
+  <div class="compare">
+    <div class="box bad">
+      <pre><code><span class="tok-c">// 每个算子一个顶层函数</span>
+Reg::<span class="tok-f">Add</span>(dst, s0, s1, mask);
+Reg::<span class="tok-f">Sub</span>(dst, s0, s1, mask);
+Reg::<span class="tok-f">Mul</span>(dst, s0, s1, mask);
+<span class="tok-c">// ... 50+ 同类函数</span></code></pre>
+    </div>
+    <div class="box good">
+      <pre><code><span class="tok-c">// 一个消除器 + N 个 tag</span>
+<span class="tok-f">Compute</span>(<span class="tok-f">MakeVec</span>(vec::Add{}), dst, s0, s1, mask);
+<span class="tok-f">Compute</span>(<span class="tok-f">MakeVec</span>(vec::Sub{}), dst, s0, s1, mask);
+<span class="tok-f">Compute</span>(<span class="tok-f">MakeVec</span>(vec::Mul{}), dst, s0, s1, mask);</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- Problem 2 UAP -->
+<section id="p2">
+  <h2 class="sec"><span class="n">②</span>统一访问原则：动词碎裂 vs 三段式</h2>
+  <div class="concept"><b>理念</b>（Bertrand Meyer · UAP）：同一抽象层级的同类操作，应有且仅有一种访问路径。</div>
+
+  <p>旧 API 中「UB ↔ 寄存器」至少有四套入口，语义相近但名字不同：</p>
+  <table>
+    <thead><tr><th>旧符号</th><th>实际含义</th><th>问题</th></tr></thead>
+    <tbody>
+      <tr><td><code>LoadAlign</code></td><td>对齐 UB → Reg</td><td>intf 声明名</td></tr>
+      <tr><td><code>DataCopy</code></td><td>对齐 UB ↔ Reg</td><td>测试/impl 实际用名，intf 未声明</td></tr>
+      <tr><td><code>Load</code></td><td>通用 load</td><td>与 LoadAlign 并存</td></tr>
+      <tr><td><code>LoadUnAlign</code></td><td>非对齐 load</td><td>又一套动词</td></tr>
+    </tbody>
+  </table>
+
+  <div class="compare">
+    <div class="box bad">
+      <h5>旧 — 多入口、无统一形状</h5>
+      <pre><code>Reg::<span class="tok-f">LoadAlign</span>&lt;half&gt;(vA, ubPtr);
+Reg::<span class="tok-f">DataCopy</span>(vA, ubPtr);       <span class="tok-c">// 影子 API</span>
+Reg::<span class="tok-f">Add</span>&lt;half, ZEROING&gt;(dst, a, b, m);
+Reg::<span class="tok-f">Move</span>&lt;half, MERGING&gt;(dst, src, m);</code></pre>
+    </div>
+    <div class="box good">
+      <h5>新 — 全栈同一形状</h5>
+      <pre><code><span class="tok-f">Load</span>(<span class="tok-f">MakeLoad</span>(load::UbAlign{}), vA, ubPtr);
+<span class="tok-f">Compute</span>(<span class="tok-f">MakeVec</span>(vec::Add{}), dst, a, b, m);
+<span class="tok-f">Store</span>(<span class="tok-f">MakeStore</span>(load::UbStoreAlign{}), ubPtr, dst, m);
+<span class="tok-c">// 全局侧同样：Copy(MakeCopy(...), dst, src)</span></code></pre>
+    </div>
+  </div>
+  <p>管道 <code>Load → Compute → Store</code> 可读，与全局 <code>Copy → Mmad → Copy</code> 同构。</p>
+</section>
+
+<!-- Problem 3 Tag dispatch -->
+<section id="p3">
+  <h2 class="sec"><span class="n">③</span>标签分发：同名异义 vs 编译期类型路由</h2>
+  <div class="concept"><b>理念</b>：一个符号应只有一个指称（denotation）。用参数类型猜语义是 ad-hoc 多态，不可形式化。</div>
+
+  <h3>旧 API 的 LoadAlign 同名异义</h3>
+  <pre><code><span class="tok-c">// 第一参数是 RegTensor → 向量寄存器加载 (vld)</span>
+<span class="tok-f">LoadAlign</span>(dstReg, srcAddr);
+
+<span class="tok-c">// 第一参数是 MaskReg → 掩码寄存器加载 (pld) — 动词相同，语义跃迁</span>
+<span class="tok-f">LoadAlign</span>(mask, srcAddr, offset);</code></pre>
+
+  <h3>新 API：动词按操作数类型拆分 + Tag 路由</h3>
+  <pre><code><span class="tok-c">// arch/vector/load_op.h — 空 struct 作 phantom type</span>
+<span class="tok-k">namespace</span> load { <span class="tok-k">struct</span> <span class="tok-t">UbAlign</span> {}; <span class="tok-k">struct</span> <span class="tok-t">MaskAlign</span> {}; }
+
+<span class="tok-c">// 编译期链：MakeLoad(tag) → LoadAtom&lt;tag&gt; → Inst::UbAlign::Run → asc_loadalign</span>
+<span class="tok-f">Load</span>(<span class="tok-f">MakeLoad</span>(load::UbAlign{}),  regDst, ub);   <span class="tok-c">// RegTensor 路径</span>
+<span class="tok-f">LoadMask</span>(<span class="tok-f">MakeLoad</span>(load::MaskAlign{}), mask, ub); <span class="tok-c">// MaskReg 路径（规划）</span></code></pre>
+
+  <h3>向量域：flat 命名空间中的 And 歧义</h3>
+  <table>
+    <thead><tr><th>旧 <code>Reg::And</code></th><th>出现位置</th><th>实际操作对象</th></tr></thead>
+    <tbody>
+      <tr><td><code>And(dst, s0, s1, mask)</code></td><td>vec_binary_intf</td><td>RegTensor 位运算</td></tr>
+      <tr><td><code>And(dst, s0, s1, mask)</code></td><td>maskreg_intf</td><td>MaskReg 位运算</td></tr>
+    </tbody>
+  </table>
+  <pre><code><span class="tok-c">// 新：分域命名空间，同名绝不跨域</span>
+Te::vec::And{}    <span class="tok-c">→ Compute(MakeVec(vec::And{}), ...)</span>
+Te::mask::And{}   <span class="tok-c">→ mask 子域独立动词（规划）</span></code></pre>
+</section>
+
+<!-- Problem 4 Strategy -->
+<section id="p4">
+  <h2 class="sec"><span class="n">④</span>策略对象：匿名调用 vs 可复用 Atom</h2>
+  <div class="concept"><b>理念</b>（Strategy / Command 模式）：将「请求」封装为对象，使发送者与执行者解耦；配置应可独立于执行存在。</div>
+
+  <div class="compare">
+    <div class="box bad">
+      <h5>旧 — 每次调用重新「解析」模板实例</h5>
+      <pre><code><span class="tok-k">for</span> (...) {
+  Reg::<span class="tok-f">Add</span>&lt;half, ZEROING&gt;(dst, a, b, mask);
+  <span class="tok-c">// 无法提取可复用配置</span>
+  <span class="tok-c">// 无法 template&lt;class Op&gt; 泛型</span>
+}</code></pre>
+    </div>
+    <div class="box good">
+      <h5>新 — Atom 是编译期策略对象</h5>
+      <pre><code><span class="tok-k">constexpr</span> <span class="tok-k">auto</span> addAtom =
+    <span class="tok-f">MakeVec</span>(vec::Add{});
+<span class="tok-k">for</span> (...) {
+  <span class="tok-f">Compute</span>(addAtom, dst, a, b, mask);
+}
+
+<span class="tok-c">// 泛型 kernel</span>
+<span class="tok-k">template</span>&lt;<span class="tok-k">typename</span> Op&gt;
+<span class="tok-k">void</span> <span class="tok-f">Elt</span>(...) {
+  <span class="tok-f">Compute</span>(<span class="tok-f">MakeVec</span>(Op{}), dst, a, b, mask);
+}</code></pre>
+    </div>
+  </div>
+
+  <h3>Trait 收敛：消灭 4 种 mode 写法</h3>
+  <pre><code><span class="tok-c">// 旧 — 同一概念 4 种表达（binary_intf）</span>
+<span class="tok-f">Add</span>&lt;T, <span class="tok-t">MaskMergeMode</span> mode, U&gt;(...)     <span class="tok-c">// MaskMergeMode mode</span>
+<span class="tok-f">Div</span>&lt;T, <span class="tok-k">auto</span> mode, U&gt;(...)             <span class="tok-c">// auto mode（可扩 SpecificMode*）</span>
+<span class="tok-f">Cast</span>&lt;..., <span class="tok-k">const</span> CastTrait&amp;, ...&gt;(...) <span class="tok-c">// CastTrait</span>
+
+<span class="tok-c">// 新 — 统一 VecTrait 对象</span>
+<span class="tok-f">MakeVec</span>(vec::Add{});
+<span class="tok-f">MakeVec</span>(vec::Add{}, VecTrait{MaskMergeMode::MERGING});</code></pre>
+</section>
+
+<!-- Problem 5 Layering OCP -->
+<section id="p5">
+  <h2 class="sec"><span class="n">⑤</span>分层解耦与开闭原则</h2>
+  <div class="concept"><b>理念</b>（OCP）：对扩展开放、对修改关闭。架构差异应隔离在 Inst 层，不应污染公开 intf。</div>
+
+  <h3>旧 API：层次坍塌</h3>
+  <pre><code><span class="tok-c">// struct_intf.h — 类型定义层直接 #include arch 实现</span>
+<span class="tok-k">#if</span> (__NPU_ARCH__ == 3510)
+  <span class="tok-k">#include</span> <span class="tok-s">"dav_3510/kernel_reg_compute_datatype_impl.h"</span>
+<span class="tok-k">#elif</span> (__NPU_ARCH__ == 5102)
+  <span class="tok-k">#include</span> <span class="tok-s">"dav_m510/..."</span>
+<span class="tok-c">// ... 6 套 arch 复制，105+ impl 文件</span>
+
+<span class="tok-c">// vec_binary_intf_impl.h — 路由又一层 #if</span>
+<span class="tok-k">#if</span> __NPU_ARCH__ == 3003
+  <span class="tok-k">#include</span> <span class="tok-s">"dav_l300/.../vec_binary_impl.h"</span>
+<span class="tok-k">#else</span>
+  <span class="tok-k">#include</span> <span class="tok-s">"dav_3510/.../vec_binary_impl.h"</span></code></pre>
+
+  <h3>新 API：四层 + 注册宏扩展</h3>
+  <pre><code><span class="tok-c">// 扩展新算子 = 2 步，不改 Compute 签名</span>
+<span class="tok-c">// 1) vec_op.h 声明</span>
+<span class="tok-k">struct</span> <span class="tok-t">Relu</span>;
+
+<span class="tok-c">// 2) vec_atom_impl.h 一行注册</span>
+<span class="tok-f">ASCENDC_TE_REGISTER_VEC_OP</span>(Relu, Relu, 1);
+
+<span class="tok-c">// Inst 层 arch 路由（if constexpr CURRENT_ARCH_VERSION）</span>
+<span class="tok-k">if constexpr</span> (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
+    asc_add(...);
+}</code></pre>
+
+  <h3>友好 static_assert 替代晦涩模板报错</h3>
+  <pre><code><span class="tok-k">template</span> &lt;<span class="tok-k">typename</span> Op&gt; <span class="tok-k">struct</span> <span class="tok-t">VecInstOf</span> {
+    <span class="tok-f">static_assert</span>(<span class="tok-k">sizeof</span>(Op)==0,
+      <span class="tok-s">"Tag not wired. Add ASCENDC_TE_REGISTER_VEC_OP(...)."</span>);
+};
+
+<span class="tok-f">static_assert</span>(<span class="tok-k">sizeof</span>...(Rest) == arity + 1,
+  <span class="tok-s">"operand count mismatch: arity sources + one mask."</span>);</code></pre>
+</section>
+
+<!-- Problem 6 Contract -->
+<section id="p6">
+  <h2 class="sec"><span class="n">⑥</span>形式契约：零文档 vs 文档即 API</h2>
+  <div class="concept"><b>理念</b>：API 不仅是签名，还应包含前置/后置条件、操作数约定、扩展配方——否则是 tacit knowledge，不可教、不可验证。</div>
+
+  <div class="compare">
+    <div class="box bad">
+      <h5>旧 — 22 个 intf，@brief 几乎全部为空</h5>
+      <pre><code><span class="tok-c">/* !</span>
+<span class="tok-c"> * \file kernel_reg_compute_vec_binary_intf.h</span>
+<span class="tok-c"> * \brief          ← 空</span>
+<span class="tok-c"> */</span>
+
+<span class="tok-c">// Move 默认 MERGING，Add 默认 ZEROING — 无注释</span>
+<span class="tok-f">Move</span>&lt;T, <span class="tok-t">MaskMergeMode</span>::<span class="tok-w">MERGING</span>&gt;(dst, src, mask);
+<span class="tok-f">Add</span>&lt;T, <span class="tok-t">MaskMergeMode</span>::<span class="tok-w">ZEROING</span>&gt;(dst, s0, s1, mask);</code></pre>
+    </div>
+    <div class="box good">
+      <h5>新 — vector_compute.h 自说明</h5>
+      <pre><code><span class="tok-c">// Operand convention:</span>
+<span class="tok-c">//   dst first, then source register(s),</span>
+<span class="tok-c">//   then the predicate mask register.</span>
+<span class="tok-c">//</span>
+<span class="tok-c">// Three ways to use:</span>
+<span class="tok-c">//   1) Compute(MakeVec(vec::Add{}), ...)</span>
+<span class="tok-c">//   2) template&lt;typename Op&gt; Elt(...)</span>
+<span class="tok-c">//   3) Add(dst, s0, s1, mask)  // sugar</span>
+
+<span class="tok-c">// MERGING 显式传入，默认 ZEROING 写在 VecTrait</span>
+VecTrait{mrg: MaskMergeMode::MERGING}</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- Six diseases summary -->
+<section id="problems">
+  <h2 class="sec"><span class="n">2</span>reg_compute 六大设计理念病灶（总表）</h2>
+  <table>
+    <thead><tr><th>病灶</th><th>设计理念层面</th><th>代码症状</th><th>TensorAPI 回应</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>组合爆炸</b></td>
+        <td>违反正交性</td>
+        <td>39 个 LoadAlign 重载；50+ 个 vec 顶层函数</td>
+        <td>Tag × Trait；单一 Verb</td>
+      </tr>
+      <tr>
+        <td><b>动词碎裂</b></td>
+        <td>违反 UAP</td>
+        <td>Load / LoadAlign / DataCopy / LoadUnAlign 并存</td>
+        <td>Load / Store / Compute 动词表</td>
+      </tr>
+      <tr>
+        <td><b>同名异义</b></td>
+        <td>指称语义分裂</td>
+        <td>LoadAlign(Reg) vs LoadAlign(Mask)；And 跨 vec/mask</td>
+        <td>动词拆分 + vec::/mask::/load:: 分域</td>
+      </tr>
+      <tr>
+        <td><b>默认陷阱</b></td>
+        <td>缺乏规范语义</td>
+        <td>Move 默认 MERGING，Add 默认 ZEROING</td>
+        <td>VecTrait 统一；MERGING 显式传</td>
+      </tr>
+      <tr>
+        <td><b>不可组合</b></td>
+        <td>无策略对象</td>
+        <td>无法泛型 <code>template&lt;Op&gt;</code>；循环内无法复用配置</td>
+        <td>MakeVec → Atom → Compute</td>
+      </tr>
+      <tr>
+        <td><b>封闭世界</b></td>
+        <td>违反 OCP</td>
+        <td>加算子改 intf + 每 arch 复制 impl</td>
+        <td>REGISTER 宏；Inst 层 arch 路由</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- Pipeline -->
+<section id="pipeline">
+  <h2 class="sec"><span class="n">3</span>完整流水线：概念 + 代码对照</h2>
+  <p>任务：<code>dst = a + b - c</code>（256B 寄存器 tile，带尾块 mask）</p>
+
+  <h3>旧 reg_compute 写法</h3>
+  <pre><code><span class="tok-k">using namespace</span> AscendC::Reg;
+RegTensor&lt;<span class="tok-t">half</span>&gt; vA, vB, vC, vDst;
+MaskReg mask = <span class="tok-f">UpdateMask</span>&lt;<span class="tok-t">half</span>&gt;(elemCount);
+
+<span class="tok-f">DataCopy</span>(vA, ubA);              <span class="tok-c">// 影子 API，intf 未声明</span>
+<span class="tok-f">DataCopy</span>(vB, ubB);
+<span class="tok-f">DataCopy</span>(vC, ubC);
+
+<span class="tok-f">Add</span>&lt;<span class="tok-t">half</span>, <span class="tok-t">MaskMergeMode</span>::ZEROING&gt;(vDst, vA, vB, mask);
+<span class="tok-f">Sub</span>&lt;<span class="tok-t">half</span>, <span class="tok-t">MaskMergeMode</span>::ZEROING&gt;(vDst, vDst, vC, mask);
+
+<span class="tok-f">DataCopy</span>(ubDst, vDst, mask);</code></pre>
+
+  <h3>新 TensorAPI 写法</h3>
+  <pre><code><span class="tok-k">using namespace</span> AscendC::Te;
+
+<span class="tok-k">auto</span> vA   = <span class="tok-f">MakeRegTensor</span>&lt;<span class="tok-t">half</span>&gt;();     <span class="tok-c">// 操作数工厂</span>
+<span class="tok-k">auto</span> vB   = <span class="tok-f">MakeRegTensor</span>&lt;<span class="tok-t">half</span>&gt;();
+<span class="tok-k">auto</span> vC   = <span class="tok-f">MakeRegTensor</span>&lt;<span class="tok-t">half</span>&gt;();
+<span class="tok-k">auto</span> vDst = <span class="tok-f">MakeRegTensor</span>&lt;<span class="tok-t">half</span>&gt;();
+<span class="tok-k">auto</span> mask = <span class="tok-f">MakeMaskReg</span>&lt;<span class="tok-t">half</span>&gt;(elemCount);
+
+<span class="tok-f">Load</span>(<span class="tok-f">MakeLoad</span>(load::UbAlign{}), vA, ubA);   <span class="tok-c">// 动词 + tag</span>
+<span class="tok-f">Load</span>(<span class="tok-f">MakeLoad</span>(load::UbAlign{}), vB, ubB);
+<span class="tok-f">Load</span>(<span class="tok-f">MakeLoad</span>(load::UbAlign{}), vC, ubC);
+
+<span class="tok-f">Compute</span>(<span class="tok-f">MakeVec</span>(vec::Add{}), vDst, vA, vB, mask);
+<span class="tok-f">Compute</span>(<span class="tok-f">MakeVec</span>(vec::Sub{}), vDst, vDst, vC, mask);
+
+<span class="tok-f">Store</span>(<span class="tok-f">MakeStore</span>(load::UbStoreAlign{}), ubDst, vDst, mask);</code></pre>
+
+  <h3>兼容层：旧代码零改动</h3>
+  <pre><code><span class="tok-c">// kernel_reg_compute_te_intf.h — 薄适配</span>
+<span class="tok-k">template</span>&lt;...&gt; <span class="tok-k">void</span> <span class="tok-f">Add</span>(Dst&amp; dst, Src0&amp; s0, Src1&amp; s1, MaskT&amp; mask) {
+    Te::<span class="tok-f">Compute</span>(Te::<span class="tok-f">MakeVec</span>(Te::vec::Add{}), dst, s0, s1, mask);
+}
+<span class="tok-k">template</span>&lt;...&gt; <span class="tok-k">void</span> <span class="tok-f">DataCopy</span>(Dst&amp; dst, __ubuf__ T* src) {
+    Te::<span class="tok-f">Load</span>(Te::<span class="tok-f">MakeLoad</span>(Te::load::UbAlign{}), dst, src);
+}</code></pre>
+  <div class="callout purple">
+    <b>迁移哲学</b>：旧符号保留为<strong>语法糖适配器</strong>，语义统一走 Te 层——避免双轨永久并存，但允许渐进替换。
+  </div>
+</section>
+
+<!-- Matrix -->
+<section id="matrix">
+  <h2 class="sec"><span class="n">4</span>设计理念 → TensorAPI 解法对照矩阵</h2>
+  <table>
+    <thead>
+      <tr><th>设计理念</th><th>reg_compute 违背点</th><th>TensorAPI 机制</th><th>代码锚点</th><th>状态</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>正交性</td><td>维度绑在重载名上</td><td>Tag + Trait 分离</td><td><code>load_trait.h</code></td><td class="part">契约已定义，Load 待扩展</td></tr>
+      <tr><td>统一访问</td><td>Load/DataCopy/LoadAlign</td><td>Load/Store/Compute 动词</td><td><code>reg_load.h</code></td><td class="ok">MVP 已实现</td></tr>
+      <tr><td>标签分发</td><td>LoadAlign 同名异义</td><td>Load vs LoadMask 拆分</td><td><code>load_op.h</code></td><td class="part">设计完成，LoadMask 待做</td></tr>
+      <tr><td>策略对象</td><td>匿名模板调用</td><td>VecAtom / LoadAtom</td><td><code>vec_atom_impl.h</code></td><td class="ok">已实现</td></tr>
+      <tr><td>开闭原则</td><td>改 intf 加重载</td><td>REGISTER 宏</td><td><code>ASCENDC_TE_REGISTER_VEC_OP</code></td><td class="ok">已实现</td></tr>
+      <tr><td>形式契约</td><td>@brief 为空</td><td>头文件自文档化</td><td><code>vector_compute.h</code></td><td class="part">部分完成</td></tr>
+      <tr><td>信息隐藏</td><td>RegTensor 泄漏 reg[]</td><td>MakeRegTensor 工厂</td><td><code>reg_tensor.h</code></td><td class="part">工厂有，类型未重建</td></tr>
+      <tr><td>规范语义</td><td>Move/Add 默认相反</td><td>VecTrait 单一公理</td><td><code>VecTrait{mrg}</code></td><td class="ok">已实现</td></tr>
+      <tr><td>可组合性</td><td>动词不统一</td><td>Load→Compute→Store 管道</td><td>全文示例</td><td class="ok">已实现</td></tr>
+      <tr><td>零成本抽象</td><td>—</td><td>constexpr + 全内联</td><td>Inst::Run → asc_*</td><td class="ok">设计目标</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- Honest -->
+<section id="honest">
+  <h2 class="sec"><span class="n">5</span>诚实边界：理念正确 ≠ 全面替换</h2>
+  <div class="callout">
+    TensorAPI 给出了<strong>正确的形式系统公理</strong>，但当前实现仍是 <strong>MVP</strong>：
+    Compute 域 ~11 个 tag；Load/Store 仅 UbAlign 基本路径；Reduce/Cast/Fused/Mask 运算域尚未迁移。
+    旧 <code>kernel_reg_compute_*_intf.h</code> 仍是生产主路径。
+  </div>
+  <table>
+    <thead><tr><th>层次</th><th>结论</th></tr></thead>
+    <tbody>
+      <tr><td><b>设计公理</b></td><td class="ok">已建立，与 Copy/Mmad 全局侧一致</td></tr>
+      <tr><td><b>向量 Compute</b></td><td class="ok">已验证范式，可扩展</td></tr>
+      <tr><td><b>Load/Store</b></td><td class="part">Trait 契约 + MVP；39 接口中 ~5% 落地</td></tr>
+      <tr><td><b>RegTensor 抽象</b></td><td class="no">仍 alias 旧类型，长期需重建</td></tr>
+      <tr><td><b>全量替换</b></td><td class="no">需 P1–P6 分期完成</td></tr>
+    </tbody>
+  </table>
+  <p><b>一句话</b>：reg_compute 的问题是<strong>缺少可推理的代数结构</strong>；TensorAPI 用 Tag×Trait×Verb 给出了这个结构——接下来要做的是<strong>用结构覆盖全部领域</strong>，而非停在 MVP。</p>
+</section>
+
+<footer>
+  设计理念分析报告 · basic_api/reg_compute × TensorAPI ·
+  代码路径：<code>C:\work_for_code_7_4\code_7_4_master\asc-devkit</code> ·
+  生成于 2026-07-13 · 自包含 HTML
+</footer>
+</main>
+</div>
+</body>
+</html>

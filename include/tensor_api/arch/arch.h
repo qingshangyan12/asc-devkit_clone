@@ -23,6 +23,9 @@
 #include "tensor_api/arch/cube/mmad_op.h"
 #include "tensor_api/arch/cube/copy_op.h"
 #include "tensor_api/arch/vector/copy_op.h"
+#include "tensor_api/arch/vector/vec_op.h"
+#include "tensor_api/arch/vector/load_op.h"
+#include "tensor_api/arch/vector/load_trait.h"
 
 #endif // INCLUDE_TENSOR_API_ARCH_ARCH_H
 

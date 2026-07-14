@@ -23,6 +23,8 @@
 
 #include "tensor_api/atom/cube/copy_atom.h"
 #include "tensor_api/atom/cube/mmad_atom.h"
+#include "tensor_api/atom/vector/vec_atom.h"
+#include "tensor_api/atom/vector/reg_load_atom.h"
 
 #endif // INCLUDE_TENSOR_API_ATOM_ATOM_H
 

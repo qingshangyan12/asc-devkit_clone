@@ -769,7 +769,7 @@ __simd_callee__ inline void asc_muls(vector_half& dst, vector_float src, float v
 
 __simd_callee__ inline void asc_muls_v2(vector_half& dst, vector_float src, float value, vector_bool mask);
 
-// ==========asc_add(u8/s8/u16/s18/u32/s32)=========
+// ==========asc_add(u8/s8/u16/s16/u32/s32)=========
 __simd_callee__ inline void asc_add(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask);
 
 __simd_callee__ inline void asc_add(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask);
@@ -792,7 +792,7 @@ __simd_callee__ inline void asc_add(vector_bool& dst0, vector_int32_t& dst1, vec
 
 __simd_callee__ inline void asc_add(vector_bool& dst0, vector_uint32_t& dst1, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
-// // ==========asc_addc(uint32_t/int32_t)==========
+// ==========asc_addc(uint32_t/int32_t)==========
 __simd_callee__ inline void asc_addc(vector_bool& dst0, vector_uint32_t& dst1,
     vector_uint32_t src0, vector_uint32_t src1, vector_bool src2, vector_bool mask);
 
