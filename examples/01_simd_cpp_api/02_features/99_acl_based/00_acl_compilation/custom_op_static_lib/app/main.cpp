@@ -9,6 +9,7 @@
  */
 
 #include <algorithm>
+#include <cmath>
 #include <cstdint>
 #include <cstdio>
 #include <vector>
@@ -26,6 +27,21 @@
             fprintf(stderr, "[ERROR] %s failed at %s:%d, ret=%d\n", #expr, __FILE__, __LINE__, __code); \
         }                                                                                               \
     } while (0)
+
+bool VerifyResult(const std::vector<aclFloat16>& outputData, const std::vector<aclFloat16>& goldenData)
+{
+    if (outputData.size() != goldenData.size()) {
+        return false;
+    }
+
+    constexpr float tolerance = 2e-3F;
+    return std::equal(
+        outputData.begin(), outputData.end(), goldenData.begin(), [](aclFloat16 output, aclFloat16 golden) {
+            const float outputValue = aclFloat16ToFloat(output);
+            const float goldenValue = aclFloat16ToFloat(golden);
+            return std::fabs(outputValue - goldenValue) <= tolerance;
+        });
+}
 
 int32_t main(int32_t argc, char** argv)
 {
@@ -57,10 +73,10 @@ int32_t main(int32_t argc, char** argv)
         shape.data(), shape.size(), ACL_FLOAT16, nullptr, 0, ACL_FORMAT_ND, shape.data(), shape.size(),
         output0DeviceMem);
 
-    std::vector<aclFloat16> input0HostData(elementCount, aclFloatToFloat16(1.0));
-    std::vector<aclFloat16> input1HostData(elementCount, aclFloatToFloat16(2.0));
+    std::vector<aclFloat16> input0HostData(elementCount, aclFloatToFloat16(1.1));
+    std::vector<aclFloat16> input1HostData(elementCount, aclFloatToFloat16(2.2));
     std::vector<aclFloat16> output0HostData(elementCount, aclFloatToFloat16(0.0));
-    std::vector<aclFloat16> goldenData(elementCount, aclFloatToFloat16(3.0));
+    std::vector<aclFloat16> goldenData(elementCount, aclFloatToFloat16(3.3));
 
     CHECK_ACL(aclrtMemcpy(input0DeviceMem, bufferSize, input0HostData.data(), bufferSize, ACL_MEMCPY_HOST_TO_DEVICE));
     CHECK_ACL(aclrtMemcpy(input1DeviceMem, bufferSize, input1HostData.data(), bufferSize, ACL_MEMCPY_HOST_TO_DEVICE));
@@ -81,9 +97,7 @@ int32_t main(int32_t argc, char** argv)
     for (int64_t i = 0; i < previewCount; i++) {
         printf("%.1f ", aclFloat16ToFloat(output0HostData[i]));
     }
-    printf(
-        "\ntest %s\n",
-        std::equal(output0HostData.begin(), output0HostData.end(), goldenData.begin()) ? "pass" : "failed");
+    printf("\ntest %s\n", VerifyResult(output0HostData, goldenData) ? "pass" : "failed");
 
     aclDestroyTensor(input0);
     aclDestroyTensor(input1);
