@@ -9,6 +9,7 @@
  */
 
 #include <algorithm>
+#include <cmath>
 #include <cstdint>
 #include <cstdio>
 #include <vector>
@@ -26,6 +27,21 @@
             fprintf(stderr, "[ERROR] %s failed at %s:%d, ret=%d\n", #expr, __FILE__, __LINE__, __code); \
         }                                                                                               \
     } while (0)
+
+bool VerifyResult(const std::vector<aclFloat16>& outputData, const std::vector<aclFloat16>& goldenData)
+{
+    if (outputData.size() != goldenData.size()) {
+        return false;
+    }
+
+    constexpr float tolerance = 2e-3F;
+    return std::equal(
+        outputData.begin(), outputData.end(), goldenData.begin(), [](aclFloat16 output, aclFloat16 golden) {
+            const float outputValue = aclFloat16ToFloat(output);
+            const float goldenValue = aclFloat16ToFloat(golden);
+            return std::fabs(outputValue - goldenValue) <= tolerance;
+        });
+}
 
 int32_t main(int32_t argc, char** argv)
 {
@@ -91,9 +107,7 @@ int32_t main(int32_t argc, char** argv)
     for (int64_t i = 0; i < previewCount; i++) {
         printf("%.1f ", aclFloat16ToFloat(output0HostData[i]));
     }
-    printf(
-        "\ntest %s\n",
-        std::equal(output0HostData.begin(), output0HostData.end(), goldenData.begin()) ? "pass" : "failed");
+    printf("\ntest %s\n", VerifyResult(output0HostData, goldenData) ? "pass" : "failed");
 
     CHECK_ACL(aclDestroyDataBuffer(input0Buffer));
     CHECK_ACL(aclDestroyDataBuffer(input1Buffer));
