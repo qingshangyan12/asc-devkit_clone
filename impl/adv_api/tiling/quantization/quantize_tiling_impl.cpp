@@ -13,9 +13,9 @@
  * \brief
  */
 
+#include "../../../../include/adv_api/utils/types.h"
 #include <cstdint>
 
-#include "graph/tensor.h"
 #include "../../detail/host_log.h"
 #include "../../../../include/adv_api/quantization/quantize_tiling.h"
 namespace AscendC {
@@ -41,7 +41,7 @@ void GetQuantizeTmpBufferFactorSize(uint32_t& maxLiveNodeCount, uint32_t& extraB
 }
 
 void GetQuantizeMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue)
+    const AscendC::TensorShape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue)
 {
     (void)typeSize;
     const uint32_t inputSize = srcShape.GetShapeSize();
