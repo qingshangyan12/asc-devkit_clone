@@ -17,10 +17,9 @@ static void test_host_c_api_cache_ctrl_0()
     using ::asc_dcci_entire_atomic;
     using ::asc_dcci_entire_out;
     using ::asc_dcci_entire_ub;
-    using __asc_aicore::asc_dcci_single;
     using ::asc_dci;
     using ::asc_get_icache_preload_status;
     using ::asc_icache_preload;
     using ::asc_ub_dcci_single;
+    using __asc_aicore::asc_dcci_single;
 }
-

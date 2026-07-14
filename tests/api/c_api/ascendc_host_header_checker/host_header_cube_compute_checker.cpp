@@ -33,4 +33,3 @@ static void test_host_c_api_cube_compute_0()
     using ::asc_set_mmad_direction_m;
     using ::asc_set_mmad_direction_n;
 }
-
