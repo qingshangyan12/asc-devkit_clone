@@ -17,6 +17,7 @@
 
 #include "asc_simd_debug_traits.h"
 
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
 namespace AscendC {
 namespace Internal {
 
@@ -27,5 +28,6 @@ struct SimdVfDebugTraits<SimdVfDebugTag> {
 
 } // namespace Internal
 } // namespace AscendC
+#endif
 
 #endif // IMPL_UTILS_DEBUG_ASC_SIMD_DEBUG_ENABLE_H
