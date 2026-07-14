@@ -30,6 +30,8 @@
 
 ## 功能说明
 
+头文件路径为：`"utils/debug/asc_printf.h"`。
+
 本接口提供SIMD和SIMT编程调试场景下的格式化输出功能。
 
 在算子Kernel侧的实现代码中，需要输出日志信息时，调用printf接口打印相关内容。
@@ -67,7 +69,7 @@ __simd_callee__ inline void printf( const __ubuf__ char* fmt, Args&&... args)
 ## 约束说明
 
 -   本接口不支持打印除换行符之外的其他转义字符。
--   SIMT中printf功能需要占用额外的Global Memory空间用于数据缓存，缓存空间大小默认为2MB。您可以通过acl.json中的"simt\_printf\_fifo\_size"字段进行配置，配置范围最小为1MB，最大为64MB。当打印数据量较大时，建议增加缓存空间。
+-   SIMT中printf功能需要占用额外的Global Memory空间用于数据缓存，缓存空间大小默认为2MB。您可以通过[acl.json](https://hiascend.com/document/redirect/CannCommunityruntimeapiaclinit)中的"simt\_printf\_fifo\_size"字段进行配置，配置范围最小为1MB，最大为64MB。当打印数据量较大时，建议增加缓存空间。
 -   在SIMT中调用printf接口，会占用SIMT栈空间，请控制每次printf打印的数据量，防止SIMT栈溢出。
 -   使用printf接口会增加算子运行时间，请控制打印数据量，避免算子超时。建议在代码中判断线程ID，仅在部分线程中打印调试信息，减少重复内容的打印，更有利于调试。
 -   SIMD场景下，单次调用本接口打印的数据总量不可超过打印大小限制，默认为32KB。使用时应注意，如果超出这个限制，则数据不会被打印。您可以通过acl.json中的"simd\_printf\_fifo\_size\_per\_core"字段进行配置，配置范围最小为1KB，最大为64MB。当打印数据量较大时，建议增加缓存空间。pytorch调用和算子入图场景暂不支持该配置。
@@ -160,7 +162,6 @@ simd vf: int=1, uint=2, float=5.000000, string=AscendC
 ## SIMT示例
 
 ```
-#include "kernel_operator.h"
 #include "simt_api/asc_simt.h"
 #include "utils/debug/asc_printf.h"
 
