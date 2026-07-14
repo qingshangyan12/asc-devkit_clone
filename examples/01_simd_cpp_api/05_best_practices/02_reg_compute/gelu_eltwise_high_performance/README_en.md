@@ -98,7 +98,9 @@ __simd_vf__ inline static void GeluEltwiseBasic(
     AscendC::Reg::RegTensor<float> xReg, yReg;
 
     for (uint16_t i = 0; i < loopNum; ++i) {
-        mask = AscendC::Reg::UpdateMask<float>(n);
+        // Case 0 (scenarioNum == 0) uses a fixed VL32 mask (32 float elements, 128-byte parallelism);
+        // only non-Case 0 uses UpdateMask<float>(n) to update the mask based on the remaining element count
+        mask = AscendC::Reg::CreateMask<float, AscendC::Reg::MaskPattern::VL32>();
         // Gelu computation
         AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
         AscendC::Reg::Mul(yReg, xReg, xReg, mask);
@@ -576,6 +578,8 @@ Run the following steps in the root directory of this example to build and run t
 
 ### Performance Analysis
 
+### Introduction to the msOpProf Tool
+
 Use the `msOpProf` tool to obtain detailed performance data:
 
 ```bash
@@ -601,5 +605,5 @@ msopprof ./demo   # Analyze performance
 View the specific performance analysis results:
 ```bash
 # View Task Duration and various data
-cat ./OPPROF_*/PipeUtilization*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```

@@ -110,8 +110,8 @@ Physical Address                               Pipeline
   |  B:CopyGM2L1 / ScaleB:CopyGM2L1   MTE2
   v
   L1
-  |  A:CopyL10L0A / ScaleA:CopyL10L0ScaleA        MTE1
-  |  B:CopyL10L0B / ScaleB:CopyL10L0ScaleB        MTE1
+  |  A:CopyL12L0A / ScaleA:CopyL12L0ScaleA        MTE1
+  |  B:CopyL12L0B / ScaleB:CopyL12L0ScaleB        MTE1
   v
   L0A / L0B / L0ScaleA / L0ScaleB
   |
@@ -153,8 +153,8 @@ MxMatmul input is not two-way but four-way: A, B, ScaleA, ScaleB. Therefore each
 |------|----------|-----------|---------|
 | A | `Copy` | `[singleCoreM, singleCoreK]` | `[baseM, stepK * baseK]` |
 | B | `Copy` | `[singleCoreN, singleCoreK]` | `[baseN, stepK * baseK]` |
-| ScaleA | `Copy` | `[singleCoreM, singleCoreSK]` | `[baseM, scaleFactorK * stepK * baseK]` |
-| ScaleB | `Copy` | `[singleCoreN, singleCoreSK]` | `[baseN, scaleFactorK * stepK * baseK]` |
+| ScaleA | `Copy` | `[singleCoreM, singleCoreSK]` | `[baseM, scaleFactorK * stepK * baseSK]` |
+| ScaleB | `Copy` | `[singleCoreN, singleCoreSK]` | `[baseN, scaleFactorK * stepK * baseSK]` |
 
 Through `stepK=2`, transfer `stepK * baseM * baseK` A matrix data and `stepK * baseN * baseK` B matrix data at once, reducing transfer instruction count and improving GM to L1 transfer efficiency.
 
@@ -166,7 +166,7 @@ Taking A matrix data transfer as example, `Copy` transfers `stepK` K direction b
 AscendC::Te::Copy(gm2L1Atom, l1TensorAPing, a.Slice(AscendC::Te::MakeCoord(mBlockIdx * baseM, dataNextKChunkIdx * baseK), AscendC::Te::MakeShape(curM, stepCurK)));
 ```
 
-Taking ScaleA matrix data transfer as example, `Copy` transfers `scaleFactorK * stepK` K direction base blocks at once, each base block being `baseM * baseK`:
+Taking ScaleA matrix data transfer as example, `Copy` transfers `scaleFactorK * stepK` K direction base blocks at once, each base block being `baseM * baseSK` (where `baseSK = align_even(ceil(baseK / 32))`):
 
 ```cpp
 AscendC::Te::Copy(gm2L1Atom, l1TensorAsPing, as.Slice(AscendC::Te::MakeCoord(mBlockIdx * baseM, scaleNextKChunkIdx * baseScaleK), AscendC::Te::MakeShape(curM, stepCurScaleK)));
@@ -482,6 +482,8 @@ test pass!
 
 ### NPU Mode Performance Analysis
 
+### Introduction to the msOpProf Tool
+
 Use the `msOpProf` tool to obtain detailed NPU mode runtime performance data:
 
 ```bash
@@ -507,5 +509,5 @@ msopprof ./demo
 View the specific performance analysis results:
 
 ```bash
-cat ./OPPROF_*/PipeUtilization*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```

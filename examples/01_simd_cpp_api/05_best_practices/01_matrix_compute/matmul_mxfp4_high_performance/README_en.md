@@ -256,6 +256,8 @@ Run the following steps in the root directory of this example to build and run t
 
 ## Performance Analysis
 
+### Introduction to the msOpProf Tool
+
 Use the `msOpProf` tool to obtain detailed performance data:
 
 ```bash
@@ -282,5 +284,5 @@ View the specific performance analysis results:
 
 ```bash
 # View Task Duration and various data
-cat ./OPPROF_*/PipeUtilization*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```

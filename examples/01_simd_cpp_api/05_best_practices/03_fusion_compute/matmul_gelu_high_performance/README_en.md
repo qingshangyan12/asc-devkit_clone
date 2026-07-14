@@ -315,6 +315,8 @@ This indicates that when using CV fusion, AIV Vector computation time is basical
 
 The figure below shows the pipeline parallel execution process of AIC and AIV in the Scenario 1 (CV Fusion-GM Relay) scenario. The AIC side completes Matmul computation and writes results to GM through Fixpipe, while the AIV side reads data from GM to complete GELU computation, both in pipeline parallelism at (baseM × baseN) block granularity:
 
+> 💡 The msOpProf tool requires the CANN commercial or community edition. For details, see the [msOpProf Tool Installation Guide](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md). The pipeline diagram was collected on device with `msopprof --aic-metrics=PipeTimeline ./demo`.
+
 ![Scenario1 CV Fusion-GM Relay Pipeline Parallelism](figures/CVParallell_L0C_GM_UB.png)
 
 **Reason for Significant MTE2 Time Reduction:**
@@ -404,7 +406,7 @@ Run the following steps in the root directory of this example to build and run t
 
 - Configure environment variables
 
-  Configure environment variables based on the [installation method](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -465,7 +467,7 @@ AscendC::printf("matmul blockIdx=%d\n", AscendC::GetBlockIdx());
 
 ### DumpTensor
 
-For operators developed based on operator projects, this interface can be used to dump the content of specified LocalTensors. It also supports printing custom additional information (only uint32\_t data type information is supported), such as printing the current line number.
+For operators developed based on operator projects, this interface can be used to dump the content of a specified [LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md). It also supports printing custom additional information (only uint32\_t data type information is supported), such as printing the current line number.
 
 Call the DumpTensor interface in the operator kernel implementation code where Tensor data needs to be printed. Example:
 
@@ -475,9 +477,11 @@ AscendC::Div(yLocal, xLocal, yLocal, n);
 AscendC::DumpTensor(yLocal, 1, 16);
 ```
 
-> **Notice:** The DumpTensor interface printing functionality will impact actual operator running performance and is typically used during the debugging phase. Developers can disable printing by setting ASCENDC_DUMP=0 as needed.
+> **Notice:** The [DumpTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md) interface printing functionality will impact actual operator running performance and is typically used during the debugging phase. Developers can disable printing by setting ASCENDC_DUMP=0 as needed.
 
 ## Performance Debugging
+
+### Introduction to the msOpProf Tool
 
 Use the `msOpProf` tool to obtain detailed performance data:
 
@@ -504,5 +508,5 @@ msopprof ./demo   # Analyze example performance
 View the specific performance analysis results:
 ```bash
 # View Task Duration and various data
-cat ./OPPROF_*/PipeUtilization*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```

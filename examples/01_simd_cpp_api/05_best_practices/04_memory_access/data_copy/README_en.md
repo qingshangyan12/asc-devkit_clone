@@ -424,7 +424,7 @@ Run the following steps in the root directory of this example to build and run t
   Example:
 
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCOPY_DST=$COPY_DST -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..
   make -j
   ```
 
@@ -468,5 +468,5 @@ Run the following steps in the root directory of this example to build and run t
 
   ```bash
   # View Task Duration and various data
-  cat ./OPPROF_*/PipeUtilization*.csv
+  cat ./OPPROF_*/PipeUtilization.csv
   ```

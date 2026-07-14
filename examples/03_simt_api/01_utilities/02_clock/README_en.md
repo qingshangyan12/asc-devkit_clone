@@ -106,5 +106,5 @@ Run the following steps in the root directory of this example to build and execu
 
   ```text
   simt_gather execute cycle : 3479
-  test pass!
+  [Success] Case accuracy is verification passed.
   ```

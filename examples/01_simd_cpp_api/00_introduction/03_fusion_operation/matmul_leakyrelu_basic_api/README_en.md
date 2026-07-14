@@ -97,7 +97,7 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
       >
       > Synchronization Mechanism Description:
       > - **Intra-core Synchronization**: [SetFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md)/[WaitFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md) are used for dependency synchronization between different pipeline engines within the same core, such as notifying MTE1 that it can start transferring after MTE2 completes
-      > - **Inter-core Synchronization**: [CrossCoreSetFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreSetFlag(ISASI).md)/[CrossCoreWaitFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreSetFlag(ISASI).md) are used for dependency synchronization between different cores, such as notifying Vector cores that they can start reading data after Cube core completes computation
+      > - **Inter-core Synchronization**: [CrossCoreSetFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreSetFlag(ISASI).md)/[CrossCoreWaitFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreWaitFlag(ISASI).md) are used for dependency synchronization between different cores, such as notifying Vector cores that they can start reading data after Cube core completes computation
 
       **1) Data Flow Path**
 
@@ -253,7 +253,7 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
           ```
 
       2. **Vector Core Computation Phase**:
-          - **Inter-core Synchronization**: Vector cores use [CrossCoreWaitFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreSetFlag(ISASI).md) (inter-core synchronization flag wait, blocks until the flag is set) to wait for Cube core to complete Fixpipe writeback, ensuring LeakyRelu starts only after Matmul computation completes
+          - **Inter-core Synchronization**: Vector cores use [CrossCoreWaitFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreWaitFlag(ISASI).md) (inter-core synchronization flag wait, blocks until the flag is set) to wait for Cube core to complete Fixpipe writeback, ensuring LeakyRelu starts only after Matmul computation completes
           - **LocalTensor Creation**: Use UB allocator to create [LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md) at the VECCALC position to carry the half-block result processed by the current Vector core
           - **GM → UB**: Use [DataCopyPad](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GMToUB非对齐数据搬运(DataCopyPad).md) (data transfer between GM and UB with padding) to transfer Matmul results to UB. Each Vector core processes baseM/2×baseN data
           - **UB Computation**: Use [LeakyRelu](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Memory矢量计算/基础算术/LeakyRelu.md) (LeakyReLU activation function, negative values are multiplied by negativeSlope) to execute activation computation, with negative values multiplied by 0.001
@@ -432,7 +432,7 @@ Execute the following steps in the root directory of this example to compile and
 
 - Configure Environment Variables
 
-  Configure the environment variables according to the [installation method](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/quick_start.md#prepare&install) of the CANN development kit package in the current environment.
+  Configure the environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit package in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -494,7 +494,7 @@ The following table details each step of the Cube core and Vector core operation
 
 | Stage | Data Flow/Behavior | Implementation Purpose/Reason |
 |:---|:---|:---|
-| Inter-core Synchronization | [CrossCoreWaitFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreSetFlag(ISASI).md) waits for Cube core Fixpipe to complete | Blocks until Cube core notifies data is ready, ensuring complete Matmul results are read |
+| Inter-core Synchronization | [CrossCoreWaitFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreWaitFlag(ISASI).md) waits for Cube core Fixpipe to complete | Blocks until Cube core notifies data is ready, ensuring complete Matmul results are read |
 | Initialization | Use UB allocator to allocate [LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md) at VECCALC position | Allocates UB buffer for GM→UB transfer and Vector computation |
 | GM → UB | [DataCopyPad](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GMToUB非对齐数据搬运(DataCopyPad).md) transfers Matmul results from GM to UB, each Vector core reads baseM/2×baseN rows | Vector cores read Matmul results written back by Cube cores from GM, each Vector core processes half-block data |
 | UB Computation | [LeakyRelu](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Memory矢量计算/基础算术/LeakyRelu.md) executes activation computation, negative values are multiplied by 0.001 | Applies LeakyRelu activation function to Matmul results, completing fusion computation |
@@ -543,6 +543,8 @@ AscendC::DumpTensor(zLocal, 1, 16);
 
 ## Performance Debugging
 
+### Introduction to the msOpProf Tool
+
 Use the `msOpProf` tool to obtain detailed performance data:
 
 ```bash
@@ -569,5 +571,5 @@ View specific performance analysis results:
 
 ```bash
 # View Task Duration and various data
-cat ./OPPROF_*/PipeUtilization*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```

@@ -189,6 +189,8 @@ AscendC::DumpTensor(yLocal, 0, 16);
 
 ## Performance Debugging
 
+### Introduction to the msOpProf Tool
+
 Use the `msOpProf` tool to obtain detailed performance data:
 
 ```bash
@@ -215,7 +217,7 @@ View specific performance analysis results:
 
 ```bash
 # View Task Duration and various data
-cat ./OPPROF_*/PipeUtilization*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```
 
 ## Directory Structure

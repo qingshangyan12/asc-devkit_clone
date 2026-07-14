@@ -114,6 +114,8 @@ for (uint32_t i = 0; i < curLen; i++) {
 
 ---
 
+## Intermediate Performance Optimization
+
 ### Case 1: Single-Core Vector Version
 
 **Implementation**: Refer to `KernelAdd::ProcessSingle()` function implementation
@@ -349,6 +351,8 @@ UB Memory Allocation (Double Buffer):
 - Double buffer benefits are limited, indicating the bottleneck is in transfer speed itself
 - Can try L2 Cache optimization to improve transfer efficiency
 ---
+
+## Advanced Performance Refinement
 
 ### Case 5: Double Buffer + L2 Cache Bypass
 
@@ -629,7 +633,40 @@ $$
   test pass!
   ```
 
-## Performance Analysis
+
+## Function debugging
+
+### printf
+
+This interface provides formatted output function in CPU domain/NPU domain debugging scenarios.
+
+In the implementation code on the operator kernel side, call the [printf](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/调试接口/上板打印/printf.md) interface to print relevant content.
+
+Examples are as follows:
+
+```cpp
+AscendC::printf("add blockIdx=%d\n", AscendC::GetBlockIdx());
+```
+
+> **Note:** The printing function of the printf (PRINTF) interface will have a certain impact on the actual performance of the operator and is usually used during the debugging phase. Developers can turn off the printing function as needed by setting `ASCENDC_DUMP=0`.
+
+### DumpTensor
+
+For operators developed based on the operator project, you can use this interface Dump to specify the contents of [LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md). It also supports printing of customized additional information (only uint32\_t data type information is supported), such as printing the current line number, etc.
+
+In the operator kernel side implementation code, where Tensor data needs to be printed, call the [DumpTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md) interface to print relevant content. An example is as follows:
+
+```cpp
+// Vector calculation: z = x + y
+AscendC::Add(zLocal, xLocal, yLocal, blockLength);
+AscendC::DumpTensor(zLocal, 1, 32);
+```
+
+> **Note:** The printing function of the DumpTensor interface will have a certain impact on the actual performance of the operator and is usually used during the debugging phase. Developers can turn off the printing function by setting `ASCENDC_DUMP=0` as needed.
+
+## Performance Debugging
+
+### Introduction to the msOpProf Tool
 
 Use the `msOpProf` tool to obtain detailed performance data:
 
@@ -656,5 +693,5 @@ View the specific performance analysis results:
 
 ```bash
 # View Task Duration and various data
-cat ./OPPROF_*/PipeUtilization*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```

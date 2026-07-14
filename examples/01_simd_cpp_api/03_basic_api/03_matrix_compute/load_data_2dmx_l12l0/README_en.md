@@ -1094,6 +1094,62 @@ AscendC::LoadData(b2Local, b1Local, scaleB1Local, loadDataParams, loadMxDataPara
 ```
 
 
+
+### 7. Matrix multiplication (`MmadMx`)
+
+The MX matrix multiplication formula is `C = (scaleA ⊗ A) * (scaleB ⊗ B)`. The `MmadMx` interface will automatically complete the broadcast multiplication of the left/right matrix and the corresponding scale matrix. Every 32 elements in the K direction share a quantization factor.
+
+**Key configuration**
+
+- `mmadParams.k` is set to `alignK = CeilAlign(k, 64) = 128` to meet the requirement of 64 alignment in k direction for the `MmadMx` interface in MX matrix multiplication. This constraint comes from the MX matrix multiplied by the k-direction scale granularity: every 64 k elements correspond to 2 scale factors, `scaleK = CeilDivision(k, 64) * 2`; the m/n direction does not need to be aligned by 64.
+- `mmadParams.cmatrixInitVal = true` means initializing the C matrix.
+- In scenario 2/4, when A matrix is ​​transposed and inputs `[k, m]` and `LoadData` is called in a single time, more than one fractal is moved in the m direction. Therefore, `mmadParams.m` is set to `CeilAlign(m, fractalShape[0] * fractalNum)`, allowing the multi-moved fractals to participate in the calculation, and the results corresponding to the invalid fractals will be skipped when `Fixpipe` is subsequently moved out.
+- `mmadParams.m = m` in the remaining scenes. Scenario 5/6 Although the A matrix also transposes the input, the for loop method has avoided moving more than one fractal of dirty data in the m direction.
+
+```cpp
+AscendC::MmadParams mmadParams;
+if constexpr (scenarioNum == 2 || scenarioNum == 4) {
+    // Mmad defaults to aligning the m axis to 16, but due to the A transposition process, the m axis is aligned to fractalShape[0]*fractalNum,
+    // Here, align according to fractalShape[0] * fractalNum, so that multiple fractals can participate in the calculation.
+    // The results corresponding to invalid fractals will be skipped when Fixpipe moves out later.
+    mmadParams.m = CeilAlign(m, fractalShape[0] * fractalNum);
+} else {
+    mmadParams.m = m;
+}
+mmadParams.n = n;
+// MX matrix multiplication requires the k direction to be aligned by 64.
+mmadParams.k = alignK;
+//Initialize the C matrix.
+mmadParams.cmatrixInitVal = true;
+AscendC::MmadMx(c1Local, a2Local, b2Local, mmadParams);
+```
+
+### 8. L0C to GM (`Fixpipe`)
+
+`FixpipeParamsArch3510` is a Fixpipe parameter structure dedicated to the dav-3510 architecture. `CO2Layout` is set to `ROW_MAJOR` to indicate that the output is in row-major ND format.
+
+**Key configuration**
+
+- `fixpipeParams.nSize = n`, `fixpipeParams.mSize = m`, only move out of the C matrix effective area.
+- `fixpipeParams.dstStride = n`, represents the starting address offset of adjacent rows in the target ND matrix.
+- The `fixpipeParams.srcStride` unit is an element and represents the starting address offset of adjacent Z layouts in the source Nz matrix.
+- In scenario 2/4, the m alignment value of `srcStride` needs to be consistent with that of `MmadMx`, so take `CeilAlign(m, fractalShape[0] * fractalNum)`.
+- `srcStride = CeilAlign(m, fractalShape[0])` in the remaining scenes.
+
+```cpp
+AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
+fixpipeParams.nSize = n;
+fixpipeParams.mSize = m;
+if constexpr (scenarioNum == 2 || scenarioNum == 4){
+    // Scenario 2/4: Single call of A matrix transpose input [k, m], moving more dirty data in the m direction than 1 fractal
+    fixpipeParams.srcStride = CeilAlign(m, fractalShape[0] * fractalNum);
+} else {
+    fixpipeParams.srcStride = CeilAlign(m, fractalShape[0]);
+}
+fixpipeParams.dstStride = n;
+AscendC::Fixpipe<U, U, AscendC::CFG_ROW_MAJOR>(cGM, c1Local, fixpipeParams);
+```
+
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and run the example.
@@ -1121,7 +1177,7 @@ Run the following steps in the root directory of this example to build and run t
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;
   python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM
   ./demo
-  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin output/golden.bin
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin
   ```
   To use CPU debug or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
 

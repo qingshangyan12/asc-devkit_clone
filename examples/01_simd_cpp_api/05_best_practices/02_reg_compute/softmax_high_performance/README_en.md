@@ -384,5 +384,5 @@ Use the `msOpProf` tool to obtain detailed performance data:
 
 ```bash
 msopprof ./demo
-cat ./OPPROF_*/PipeUtilization*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```

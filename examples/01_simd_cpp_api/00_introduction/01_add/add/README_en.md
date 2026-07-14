@@ -145,6 +145,8 @@ AscendC::DumpTensor(zLocal, 1, 32);
 
 ## Performance Debugging
 
+### Introduction to the msOpProf Tool
+
 Use the `msOpProf` tool to obtain detailed performance data:
 
 ```bash
@@ -171,7 +173,7 @@ View specific performance analysis results:
 
 ```bash
 # View Task Duration and various metrics
-cat ./OPPROF_*/PipeUtilization*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```
 
 For more msOpProf tool usage, please refer to the [MindStudio tool](https://www.hiascend.com/document/redirect/CannCommercialToolOpDev) operator tuning (msOpProf) content.

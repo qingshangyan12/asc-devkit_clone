@@ -503,7 +503,7 @@ T_{\text{base}} = \frac{M \times N}{128 \times 1.65 \times 10^9 \times 64}
                 \approx 4.965\mu s
 $$
 
-The measured `aiv_vec_time` is `9.14μs`. The gap from the 4.965μs theoretical value comes from two叠加 factors: (1) V_STORE stride=145 increments the starting bank by +1 each time, and after multiple loop iterations it still lands on the same bank as V_LOAD, which cannot be perfectly staggered row by row with buffer offset alone; (2) vloop dual-issue, where the issue slots cannot always form the ideal "current round store + next round load" combination every cycle, causing conflicts. This example primarily demonstrates how to solve NZ write-write conflicts. The end-to-end Task Duration is already dominated by MTE2/MTE3 (`aiv_mte2_ratio` as high as 96.7%), with vec time not on the critical path.
+The measured `aiv_vec_time` is `9.14μs`. The gap from the 4.965μs theoretical value comes from two combined factors: (1) V_STORE stride=145 increments the starting bank by +1 each time, and after multiple loop iterations it still lands on the same bank as V_LOAD, which cannot be perfectly staggered row by row with buffer offset alone; (2) vloop dual-issue, where the issue slots cannot always form the ideal "current round store + next round load" combination every cycle, causing conflicts. This example primarily demonstrates how to solve NZ write-write conflicts. The end-to-end Task Duration is already dominated by MTE2/MTE3 (`aiv_mte2_ratio` as high as 96.7%), with vec time not on the critical path.
 
 ### Optimization Summary
 
@@ -560,6 +560,8 @@ The measured `aiv_vec_time` is `9.14μs`. The gap from the 4.965μs theoretical 
 
 ## Performance Analysis
 
+### Introduction to the msOpProf Tool
+
 Use the `msOpProf` tool to obtain detailed performance data:
 
 ```bash
@@ -585,5 +587,5 @@ msopprof ./demo
 View the specific performance analysis results:
 
 ```bash
-cat ./OPPROF_*/PipeUtilization*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```
