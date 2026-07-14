@@ -6,7 +6,7 @@ HCCL算法分析器用于在离线环境中模拟HCCL算法的运行，验证算
 
 ## 原理介绍
 
-![](../../../docs/figures/algorithm_analyzer/introduction-theory.png)
+![](../../../docs/zh/figures/algorithm_analyzer/introduction-theory.png)
 
 **几个关键点：**
 
@@ -26,7 +26,7 @@ HCCL算法分析器用于在离线环境中模拟HCCL算法的运行，验证算
 
 一个算法checker用例分为5个步骤，如下图所示。接下来依次介绍每个步骤的写法，以适应不同的算子需求。最后介绍出现问题之后，如何借助checker工具进行问题定位。
 
-![](../../../docs/figures/algorithm_analyzer/compile_testcase_1.png)
+![](../../../docs/zh/figures/algorithm_analyzer/compile_testcase_1.png)
 
 ### LLT用例各步骤详解
 
@@ -34,7 +34,7 @@ HCCL算法分析器用于在离线环境中模拟HCCL算法的运行，验证算
 
    - **TopoMeta结构体介绍**
 
-     ![](../../../docs/figures/algorithm_analyzer/compile_testcase_2.png)
+     ![](../../../docs/zh/figures/algorithm_analyzer/compile_testcase_2.png)
 
      checker使用TopoMeta来表示一个拓扑结构，TopoMeta是一个三层vector结构。
 
@@ -52,17 +52,17 @@ HCCL算法分析器用于在离线环境中模拟HCCL算法的运行，验证算
 
      1. 指定超节点个数、服务器个数、每个服务器的卡数，然后利用提供的GenTopoMeta函数来生成，适用于对称拓扑场景。
 
-        ![](../../../docs/figures/algorithm_analyzer/compile_testcase_3.png)
+        ![](../../../docs/zh/figures/algorithm_analyzer/compile_testcase_3.png)
 
      2. 对超节点、服务器、卡数等完全定制，适用对称和非对称拓扑场景，如下图所示。
 
-        ![](../../../docs/figures/algorithm_analyzer/compile_testcase_4.png)
+        ![](../../../docs/zh/figures/algorithm_analyzer/compile_testcase_4.png)
 
    - **模型初始化**
 
      传入生成的TopoMeta并指定仿真的设备类型
 
-     ![](../../../docs/figures/algorithm_analyzer/compile_testcase_5.png)
+     ![](../../../docs/zh/figures/algorithm_analyzer/compile_testcase_5.png)
 
 #### 算子参数设置
 
@@ -75,7 +75,7 @@ HCCL算法分析器用于在离线环境中模拟HCCL算法的运行，验证算
     - dataType：对应recvCount数量的数据类型
 
     如果是其他算子或用户自定义算子场景，需要根据算子所需参数进行设置。
-    ![](../../../docs/figures/algorithm_analyzer/compile_testcase_5-1.png)
+    ![](../../../docs/zh/figures/algorithm_analyzer/compile_testcase_5-1.png)
 
 - 设置环境变量
 
@@ -90,7 +90,7 @@ HCCL算法分析器用于在离线环境中模拟HCCL算法的运行，验证算
 #### 算子执行流程
 
 如下图所示，以多线程的方式运行单算子的流程
-![](../../../docs/figures/algorithm_analyzer/compile_testcase_6.png)
+![](../../../docs/zh/figures/algorithm_analyzer/compile_testcase_6.png)
 
 1. 构造算子入参。
    
@@ -120,7 +120,7 @@ HCCL算法分析器用于在离线环境中模拟HCCL算法的运行，验证算
 
 用例较多，仅需执行某个用例时，修改main.cc中用例名称即可。
 
-![](../../../docs/figures/algorithm_analyzer/compile_testcase_7.png)
+![](../../../docs/zh/figures/algorithm_analyzer/compile_testcase_7.png)
 
 ## 用例编译、执行
 
@@ -138,7 +138,7 @@ bash build.sh
 
 用例执行结果如下所示：
 
-![](../../../docs/figures/algorithm_analyzer/result_1.png)
+![](../../../docs/zh/figures/algorithm_analyzer/result_1.png)
 
 各字段含义如下：
 
@@ -231,15 +231,15 @@ struct SrcBufDes {
 
 1.  初始状态，有Rank0与Rank1两个Rank，有Input，Output两种内存类型。
 
-    ![](../../../docs/figures/algorithm_analyzer/allgather.png)
+    ![](../../../docs/zh/figures/algorithm_analyzer/allgather.png)
 
 2.  状态一动作：将rank0的Input，偏移地址20，大小为30的数据块搬运到rank0的Output，偏移地址为35结果：在rank0的Output上产生了一个语义块，记录了本次搬运的信息。
 
-    ![](../../../docs/figures/algorithm_analyzer/allgather-0.png)
+    ![](../../../docs/zh/figures/algorithm_analyzer/allgather-0.png)
 
 3.  状态二动作：将rank1的Input，偏移地址70，大小为15的数据块搬运到rank0的Output，偏移地址为50结果：目的内存与现有的语义块有重叠，需要对现有的语义块进行拆分，产生两条语义块。
 
-    ![](../../../docs/figures/algorithm_analyzer/allgather-1.png)
+    ![](../../../docs/zh/figures/algorithm_analyzer/allgather-1.png)
 
 #### 结果校验<a name="zh-cn_topic_0000002306468780_section1791912221916"></a>
 
@@ -249,11 +249,11 @@ struct SrcBufDes {
 
 -   **正确场景：**
 
-    ![](../../../docs/figures/algorithm_analyzer/allgather-2.png)
+    ![](../../../docs/zh/figures/algorithm_analyzer/allgather-2.png)
 
 -   **错误场景：**
 
-    ![](../../../docs/figures/algorithm_analyzer/allgather-3.png)
+    ![](../../../docs/zh/figures/algorithm_analyzer/allgather-3.png)
 
 #### 定位思路<a name="zh-cn_topic_0000002306468780_section193706117214"></a>
 
