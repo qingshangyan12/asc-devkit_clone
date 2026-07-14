@@ -28,8 +28,7 @@
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
-根据mask对源操作数src0、src1进行按元素相减的操作，将结果写入目的操作数dst。
-源操作数为uint32_t或int32_t时，提供带借位数据的接口，src0、src1相减时如果产生借位，在carry中对应位置每4bit的最低位写0，否则写1。
+按照元素对应位置执行矢量减法运算，i为元素索引。计算过程为ZEROING模式（未被mask掩码的元素在目的操作数中置0）。
 
 计算公式如下：
 
@@ -37,14 +36,11 @@ $$
 dst_i = src0_i - src1_i
 $$
 
-carry输出借位值示例说明：
+执行带借位的减法运算时，可以在借位输出（掩码寄存器）中标记每次减法是否产生借位，若src0，src1输入按位相加后最高位有借位，在carry中对应位置每4bit的最低位写1，否则写0。
 
-| 数据类型  | 是否借位 | 示例说明 |
-| :----- | :------- | :------- |
-| uint32_t数据类型 | 不产生借位 | src0_i = 5, src1_i = 2 <br> dst_i = src0_i - src1_i = 3 <br> carry中对应位置4bit的最低位写1：carry_i = 1 |
-| uint32_t数据类型 | 产生借位 | src0_i = 5, src1_i = 7 <br> dst_i = src0_i - src1_i = -2 <br> carry中对应位置4bit的最低位写0：carry_i = 0 |
-| int32_t数据类型 | 不产生借位 | src0_i = 5, src1_i = 2 <br> dst_i = src0_i - src1_i = 3 <br> carry中对应位置4bit的最低位写1：carry_i = 1 |
-| int32_t数据类型 | 产生借位 | src0_i = 5, src1_i = -7 <br> dst_i = src0_i - src1_i = 12 <br> carry中对应位置4bit的最低位写0：carry_i = 0 |
+![](../../figures/asc_sub.png)
+
+输出carry适用场景请参考[asc_subc功能说明](asc_subc.md#功能说明)。
 
 ## 函数原型
 
@@ -73,13 +69,19 @@ carry输出借位值示例说明：
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| carry | 输出 | 目的借位值（掩码寄存器）。 |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。 |
-| src0 | 输入 | 源操作数0（矢量数据寄存器）。 |
-| src1 | 输入 | 源操作数1（矢量数据寄存器）。 |
-| mask | 输入 | 源操作数掩码（掩码寄存器）。用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| carry | 输出 | 目的借位值（掩码寄存器）。<br>类型为[vector\_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
+| dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| src0 | 输入 | 源操作数0（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| src1 | 输入 | 源操作数1（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| mask | 输入 | 源操作数掩码（掩码寄存器）。用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。<br>类型为[vector\_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
+## 数据类型
+
+- 不带进位数据的接口
+目的操作数和源操作数的数据类型需要保持一致。支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+
+- 带进位数据的接口
+目的操作数和源操作数的数据类型需要保持一致。支持的数据类型为：int32_t、uint32_t。
 
 ## 返回值说明
 
@@ -91,7 +93,16 @@ PIPE_V
 
 ## 约束说明
 
-无
+- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
+
+- 不带借位数据的接口
+
+  默认执行非饱和运算，此时相同位宽的有符号和无符号数据类型硬件实现完全相同。
+
+- 带借位数据的接口
+  - 仅支持int32_t和uint32_t类型。
+  - 需手动调用，接口内部不支持自动识别触发。
+  - 运算输出完整计算结果（包含借位位），硬件不会对输出进行饱和或截断。
 
 ## 调用示例
 

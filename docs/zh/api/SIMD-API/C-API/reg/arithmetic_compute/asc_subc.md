@@ -28,23 +28,19 @@
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
-根据mask对源操作数src0、src1以及进位数据carry_src进行按元素相减的操作，将结果写入目的操作数dst。
-src0、src1、carry_src相减时如果产生借位，在carry中对应位置每4bit的最低位写0，否则写1。
-
-计算公式如下：
+根据mask，对源操作数src0、src1及输入进位carry_src进行按元素求差操作，i为元素索引，相减结果写入dst，同时将每个元素的进位结果写入carry。计算公式如下：
 
 $$
-dst_i = src0_i - src1_i - carry_src_i
+\{carry_i, dst_i\} = src0_i - src1_i - carry\_src_i
 $$
 
-carry输出借位值示例说明：
+Carry flag（进位标志）用于表示加法进位或者减法无借位，若src0，src1，carry_src输入按位相减后最高位有借位，在carry（存放借位的掩码寄存器）中对应位置每4bit设置1，否则写0。
 
-| 数据类型 | 是否借位 | 示例说明 |
-| -------- | -------- | ------------------------ |
-| uint32_t | 不产生借位 | src0_i = 5, src1_i = 2, carry_src_i = 1 <br> dst_i = src0_i - src1_i - carry_src_i = 2 <br> carry中对应位置4bit的最低位写1：carry_i = 1 |
-| uint32_t | 产生借位 | src0_i = 5, src1_i = 7, carry_src_i = 1 <br> dst_i = src0_i - src1_i - carry_src_i = -3 <br> carry中对应位置4bit的最低位写0：carry_i = 0 |
-| int32_t | 不产生借位 | src0_i = 5, src1_i = 2, carry_src_i = 1 <br> dst_i = src0_i - src1_i - carry_src_i = 2 <br> carry中对应位置4bit的最低位写1：carry_i = 1 |
-| int32_t | 产生借位 | src0_i = 5, src1_i = -7, carry_src_i = 1 <br> dst_i = src0_i - src1_i - carry_src_i = 11 <br> carry中对应位置4bit的最低位写0：carry_i = 0 |
+![](../../figures/asc_subc_1.png)
+
+以int64_t类型数据计算-1 - 8 = -9为例，asc_sub/asc_subc接口的适用场景如下图：
+
+![](../../figures/asc_subc_2.png)
 
 ## 函数原型
 
@@ -57,14 +53,16 @@ __simd_callee__ inline void asc_subc(vector_bool& carry, vector_int32_t& dst, ve
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| carry | 输出 | 目的借位值（掩码寄存器）。 |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。 |
-| src0 | 输入 | 源操作数0（矢量数据寄存器）。 |
-| src1 | 输入 | 源操作数1（矢量数据寄存器）。 |
-| carry_src | 输入 | 源借位值（矢量数据寄存器）。 |
-| mask | 输入 | 源操作数掩码（掩码寄存器）。用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| carry | 输出 | 目的借位值（掩码寄存器）。<br>类型为[vector\_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
+| dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| src0 | 输入 | 源操作数0（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| src1 | 输入 | 源操作数1（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| carry_src | 输入 | 源借位值（矢量数据寄存器）。<br>类型为[vector\_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
+| mask | 输入 | 源操作数掩码（掩码寄存器）。用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。<br>类型为[vector\_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
+## 数据类型
+
+目的操作数和源操作数的数据类型需要保持一致。支持的数据类型为：int32_t、uint32_t。
 
 ## 返回值说明
 
@@ -76,7 +74,9 @@ PIPE_V
 
 ## 约束说明
 
-无
+- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
+
+- 运算输出完整计算结果（包含进位位），硬件不会对输出进行饱和或截断。
 
 ## 调用示例
 

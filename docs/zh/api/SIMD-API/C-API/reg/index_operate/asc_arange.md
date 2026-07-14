@@ -39,16 +39,21 @@
 以int16_t数据类型，起始值value=10为例：
 递增索引为{10, 11, 12, 13, ... 135, 136, 137},递减索引为{137, 136, 135, 134, ... 12, 11, 10}。
 
+![](../../figures/asc_arange.png)
+
 ## 函数原型
 
+- 递增模式
   ```cpp
-  // 递增模式
   __simd_callee__ inline void asc_arange(vector_int8_t& dst, int8_t value)
   __simd_callee__ inline void asc_arange(vector_int16_t& dst, int16_t value)
   __simd_callee__ inline void asc_arange(vector_half& dst, half value)
   __simd_callee__ inline void asc_arange(vector_int32_t& dst, int32_t value)
   __simd_callee__ inline void asc_arange(vector_float& dst, float value)
-  // 递减模式
+  ```
+
+- 递减模式
+  ```cpp
   __simd_callee__ inline void asc_arange_descend(vector_int8_t& dst, int8_t value)
   __simd_callee__ inline void asc_arange_descend(vector_int16_t& dst, int16_t value)
   __simd_callee__ inline void asc_arange_descend(vector_half& dst, half value)
@@ -60,10 +65,12 @@
 
 | 参数名       | 输入/输出 | 描述                |
 | --------- | ----- | ----------------- |
-| dst       | 输出    | 目的操作数（矢量数据寄存器）。 |
+| dst       | 输出    | 目的操作数（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
 | value     | 输入    | 源操作数（标量）。 |
 
-矢量数据寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
+## 数据类型
+
+目的操作数和源操作数的数据类型需要保持一致。支持的数据类型为：int8_t、int16_t、half、int132_t、float  。
 
 ## 返回值说明
 
@@ -75,7 +82,7 @@ PIPE_V
 
 ## 约束说明
 
-无
+对于整型数据类型，如果生成的索引发生溢出，结果将环绕。
 
 ## 调用示例
 
