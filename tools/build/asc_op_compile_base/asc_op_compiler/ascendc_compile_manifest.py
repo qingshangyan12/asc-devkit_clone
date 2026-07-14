@@ -69,16 +69,14 @@ class OpCompileManifestRecorder:
                 "macros": [],
                 "undef_macros": [],
                 "options": [],
-                "mllvm_options": [],
-                "raw_options": []
+                "mllvm_options": []
             }
         }
 
     def enable_super_kernel_sub_combine(self, record_only=False):
         self.is_super_kernel_sub_combine = True
         self.super_kernel_record_only = record_only
-        self.manifest["workflow"] = "super_kernel_sub_combine"
-        self.manifest["super_kernel_sub_combine"] = {
+        combine_info = {
             "compile_options_delta": {
                 "add": self._empty_compile_option_section(),
                 "remove": self._empty_compile_option_section()
@@ -88,10 +86,16 @@ class OpCompileManifestRecorder:
                 "super_kernel": ""
             },
             "split_count": 0,
-            "bindings": []
+            "bindings": {
+                "tiling_key": {}
+            }
+        }
+        self.manifest.setdefault("features", {})["super_kernel"] = {
+            "enable_super_kernel": True,
+            "super_kernel_sub_combine": combine_info
         }
         if record_only:
-            self.manifest["super_kernel_sub_combine"]["record_only"] = True
+            combine_info["record_only"] = True
 
     def start(self, op_info: OpInfo, origin_func_name: str, cce_file: str, kernel_meta_dir: str):
         self.reset()
@@ -154,8 +158,7 @@ class OpCompileManifestRecorder:
             "macros": compile_option_info["macros"],
             "undef_macros": compile_option_info["undef_macros"],
             "options": compile_option_info["options"],
-            "mllvm_options": compile_option_info["mllvm_options"],
-            "raw_options": compile_option_info["raw_options"]
+            "mllvm_options": compile_option_info["mllvm_options"]
         }
 
     def record_wrapper_body(self, compile_info: CompileInfo, role="normal"):
@@ -199,7 +202,7 @@ class OpCompileManifestRecorder:
             return
         kernel_name = self.manifest.get("basic_info", {}).get("kernel_name", "")
         try:
-            combine_info = self.manifest["super_kernel_sub_combine"]
+            combine_info = self._get_super_kernel_sub_combine()
             combine_info["compile_options_delta"] = {
                 "add": self._compile_option_tuple_difference(super_compile_options, normal_compile_options),
                 "remove": self._compile_option_tuple_difference(normal_compile_options, super_compile_options)
@@ -221,9 +224,12 @@ class OpCompileManifestRecorder:
             "macros": [],
             "undef_macros": [],
             "options": [],
-            "mllvm_options": [],
-            "raw_options": []
+            "mllvm_options": []
         }
+
+    def _get_super_kernel_sub_combine(self):
+        return self.manifest.get("features", {}).get("super_kernel", {}).get(
+            "super_kernel_sub_combine", {})
 
     def _compile_option_tuple_difference(self, lhs, rhs):
         if lhs is None:
@@ -255,7 +261,7 @@ class OpCompileManifestRecorder:
                 self._warning(kernel_name, "record sk bind source did not find SK_BIND declarations")
             split_counts = {len(binding["split_symbols"]) for binding in self.pending_bindings}
             if len(split_counts) == 1:
-                self.manifest["super_kernel_sub_combine"]["split_count"] = split_counts.pop()
+                self._get_super_kernel_sub_combine()["split_count"] = split_counts.pop()
             elif split_counts:
                 self._warning(kernel_name, "record sk bind found inconsistent split counts")
         except Exception as err:
@@ -706,7 +712,7 @@ class OpCompileManifestRecorder:
     def _record_synthetic_sk_bind(self):
         if self.pending_bindings:
             return
-        combine_info = self.manifest.get("super_kernel_sub_combine", {})
+        combine_info = self._get_super_kernel_sub_combine()
         normal_attribute = combine_info.get("kernel_attributes", {}).get("normal", "")
         super_attribute = combine_info.get("kernel_attributes", {}).get("super_kernel", "")
         records = []
@@ -720,7 +726,7 @@ class OpCompileManifestRecorder:
             records.append(record)
         if not records:
             self._warning(self.manifest.get("basic_info", {}).get("kernel_name", ""),
-                          "record-only super kernel workflow did not find normal kernel symbols")
+                          "record-only super kernel recording did not find normal kernel symbols")
             return
 
         lines = ['#include "kernel_operator.h"\n']
@@ -745,7 +751,7 @@ class OpCompileManifestRecorder:
         combine_info["split_count"] = 3
 
     def _finalize_super_kernel_bindings(self):
-        combine_info = self.manifest.get("super_kernel_sub_combine", {})
+        combine_info = self._get_super_kernel_sub_combine()
         kernel_name = self.manifest.get("basic_info", {}).get("kernel_name", "")
         if not self.pending_bindings:
             self._warning(kernel_name, "record sk bind has no symbol bindings")
@@ -792,7 +798,13 @@ class OpCompileManifestRecorder:
                 "super_kernel_symbol": super_symbol,
                 "split_symbols": list(pending["split_symbols"])
             })
-        combine_info["bindings"] = bindings
+        bindings_by_tiling_key = {}
+        for binding in bindings:
+            tiling_key = binding.pop("tiling_key")
+            bindings_by_tiling_key.setdefault(tiling_key, []).append(binding)
+        combine_info["bindings"] = {
+            "tiling_key": bindings_by_tiling_key
+        }
 
     def update_kernel_type_info_from_compile_options(self, compile_info):
         if compile_info is None or getattr(compile_info, "no_set_kernel_type", False) is not True:
@@ -846,7 +858,7 @@ class OpCompileManifestRecorder:
     def _core_options_has_auto_gen_suffix(core_options, suffix):
         if not isinstance(core_options, dict):
             return False
-        for option_group in ("macros", "raw_options"):
+        for option_group in ("macros",):
             for option in core_options.get(option_group, []):
                 macro_name, macro_value = OpCompileManifestRecorder._split_macro_option(option)
                 if macro_name.startswith("auto_gen_") and macro_value.endswith(suffix):
@@ -1133,8 +1145,7 @@ class OpCompileManifestRecorder:
             "macros": macros,
             "undef_macros": undef_macros,
             "options": filtered_options,
-            "mllvm_options": mllvm_options,
-            "raw_options": compile_options
+            "mllvm_options": mllvm_options
         }
 
     @staticmethod
