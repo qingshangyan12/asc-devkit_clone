@@ -1,7 +1,6 @@
 # asc_copy_l12l0b_trans
 
 ## 产品支持情况
-## 产品支持情况
 
 <!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：不支持
