@@ -11,6 +11,11 @@
 #ifndef INCLUDE_C_API_UTILS_C_API_ENUM_H
 #define INCLUDE_C_API_UTILS_C_API_ENUM_H
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#endif
+
 #include <cstdint>
 
 enum acs_load_l2_cache_type : uint8_t {
@@ -22,11 +27,11 @@ enum acs_load_l2_cache_type : uint8_t {
     ASC_NOTALLOC_DROP = 6
 };
 
-enum acs_store_l2_cache_type : uint8_t {
-    ASC_NORMAL_FIRST_VICTIM = 0,
-    ASC_NORMAL_LAST_VICTIM = 1,
-    ASC_NORMAL_PERSISTENT = 2,
-    ASC_NOTALLPC_CLEAN = 4
-};
+// enum acs_store_l2_cache_type : uint8_t {
+//     ASC_NORMAL_FIRST_VICTIM = 0,
+//     ASC_NORMAL_LAST_VICTIM = 1,
+//     ASC_NORMAL_PERSISTENT = 2,
+//     ASC_NOTALLPC_CLEAN = 4
+// };
 
 #endif
