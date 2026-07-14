@@ -8,6 +8,10 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "reg_vector.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
@@ -70,30 +74,67 @@
  */
 #define asc_mem_bar mem_bar
 
-// ==========asc_create_iter_reg(b8/b16/b32)=========
-__simd_callee__ inline iter_reg asc_create_iter_reg_b32(uint32_t offset);
+// ==========asc_create_addr_reg(b8/b16/b32)=========
+__simd_callee__ inline addr_reg asc_create_addr_reg_b32(uint32_t offset);
 
-__simd_callee__ inline iter_reg asc_create_iter_reg_b16(uint32_t offset);
+__simd_callee__ inline addr_reg asc_create_addr_reg_b16(uint32_t offset);
 
-__simd_callee__ inline iter_reg asc_create_iter_reg_b8(uint32_t offset);
+__simd_callee__ inline addr_reg asc_create_addr_reg_b8(uint32_t offset);
 
-__simd_callee__ inline iter_reg asc_create_iter_reg_b32(uint32_t offset0, uint32_t offset1);
+__simd_callee__ inline addr_reg asc_create_addr_reg_b32(uint32_t offset0, uint32_t offset1);
 
-__simd_callee__ inline iter_reg asc_create_iter_reg_b16(uint32_t offset0, uint32_t offset1);
+__simd_callee__ inline addr_reg asc_create_addr_reg_b16(uint32_t offset0, uint32_t offset1);
 
-__simd_callee__ inline iter_reg asc_create_iter_reg_b8(uint32_t offset0, uint32_t offset1);
+__simd_callee__ inline addr_reg asc_create_addr_reg_b8(uint32_t offset0, uint32_t offset1);
 
-__simd_callee__ inline iter_reg asc_create_iter_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2);
+__simd_callee__ inline addr_reg asc_create_addr_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2);
 
-__simd_callee__ inline iter_reg asc_create_iter_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2);
+__simd_callee__ inline addr_reg asc_create_addr_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2);
 
-__simd_callee__ inline iter_reg asc_create_iter_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2);
+__simd_callee__ inline addr_reg asc_create_addr_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2);
 
-__simd_callee__ inline iter_reg asc_create_iter_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
+__simd_callee__ inline addr_reg asc_create_addr_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
 
-__simd_callee__ inline iter_reg asc_create_iter_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
+__simd_callee__ inline addr_reg asc_create_addr_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
 
-__simd_callee__ inline iter_reg asc_create_iter_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
+__simd_callee__ inline addr_reg asc_create_addr_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
+
+// ==========asc_create_iter_reg (deprecated, please use asc_create_addr_reg instead)=========
+[[deprecated("NOTICE: asc_create_iter_reg_b32 is deprecated. Please use asc_create_addr_reg_b32 instead.")]]
+__simd_callee__ inline addr_reg asc_create_iter_reg_b32(uint32_t offset);
+
+[[deprecated("NOTICE: asc_create_iter_reg_b16 is deprecated. Please use asc_create_addr_reg_b16 instead.")]]
+__simd_callee__ inline addr_reg asc_create_iter_reg_b16(uint32_t offset);
+
+[[deprecated("NOTICE: asc_create_iter_reg_b8 is deprecated. Please use asc_create_addr_reg_b8 instead.")]]
+__simd_callee__ inline addr_reg asc_create_iter_reg_b8(uint32_t offset);
+
+[[deprecated("NOTICE: asc_create_iter_reg_b32 is deprecated. Please use asc_create_addr_reg_b32 instead.")]]
+__simd_callee__ inline addr_reg asc_create_iter_reg_b32(uint32_t offset0, uint32_t offset1);
+
+[[deprecated("NOTICE: asc_create_iter_reg_b16 is deprecated. Please use asc_create_addr_reg_b16 instead.")]]
+__simd_callee__ inline addr_reg asc_create_iter_reg_b16(uint32_t offset0, uint32_t offset1);
+
+[[deprecated("NOTICE: asc_create_iter_reg_b8 is deprecated. Please use asc_create_addr_reg_b8 instead.")]]
+__simd_callee__ inline addr_reg asc_create_iter_reg_b8(uint32_t offset0, uint32_t offset1);
+
+[[deprecated("NOTICE: asc_create_iter_reg_b32 is deprecated. Please use asc_create_addr_reg_b32 instead.")]]
+__simd_callee__ inline addr_reg asc_create_iter_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2);
+
+[[deprecated("NOTICE: asc_create_iter_reg_b16 is deprecated. Please use asc_create_addr_reg_b16 instead.")]]
+__simd_callee__ inline addr_reg asc_create_iter_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2);
+
+[[deprecated("NOTICE: asc_create_iter_reg_b8 is deprecated. Please use asc_create_addr_reg_b8 instead.")]]
+__simd_callee__ inline addr_reg asc_create_iter_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2);
+
+[[deprecated("NOTICE: asc_create_iter_reg_b32 is deprecated. Please use asc_create_addr_reg_b32 instead.")]]
+__simd_callee__ inline addr_reg asc_create_iter_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
+
+[[deprecated("NOTICE: asc_create_iter_reg_b16 is deprecated. Please use asc_create_addr_reg_b16 instead.")]]
+__simd_callee__ inline addr_reg asc_create_iter_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
+
+[[deprecated("NOTICE: asc_create_iter_reg_b8 is deprecated. Please use asc_create_addr_reg_b8 instead.")]]
+__simd_callee__ inline addr_reg asc_create_iter_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
 
 // ==========asc_relu(half/int32_t/float)==========
 __simd_callee__ inline void asc_relu(vector_half& dst, vector_half src, vector_bool mask);
@@ -1010,6 +1051,10 @@ __simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_float src0, ve
 
 __simd_callee__ inline void asc_exp_sub_v2(vector_float& dst, vector_half src0, vector_half src1, vector_bool mask);
 
+[[deprecated("NOTICE: asc_exp_sub_v2 in this parameter list is deprecated. "
+             "Please use asc_exp_sub instead.")]]
+__simd_callee__ inline void asc_exp_sub_v2(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
+
 // ==========asc_ln(half/float)==========
 __simd_callee__ inline void asc_ln(vector_half& dst, vector_half src, vector_bool mask);
 
@@ -1224,7 +1269,7 @@ __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint32_t** src_a
 __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ float** src_array);
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
-#endif   
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#endif

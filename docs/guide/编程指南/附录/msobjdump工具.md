@@ -14,18 +14,30 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品：支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：支持
+<!-- end id6 -->
 
 ## 工具安装<a name="section2423188195113"></a>
 
 1.  安装msobjdump工具。
 
-    工具跟随CANN软件包发布（参考[环境准备](../../入门教程/环境准备.md)完成CANN安装），其路径默认为“\$\{INSTALL\_DIR\}/tools/msobjdump”，其中\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。以root用户安装为例，安装后文件默认存储路径为：/usr/local/Ascend/cann。
+    工具跟随CANN软件包发布（参考[环境准备](../../入门教程/环境准备.md)完成CANN安装），其路径默认为`${INSTALL_DIR}/tools/msobjdump`，其中`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。以root用户安装为例，安装后文件默认存储路径为：/usr/local/Ascend/cann。
 
 2.  设置环境变量。
     -   root用户安装Ascend-cann-toolkit包时

@@ -21,7 +21,7 @@ def discover_examples(examples_root: Path) -> List[Path]:
     examples: List[Path] = []
     for readme in examples_root.rglob("README.md"):
         text = readme.read_text(encoding="utf-8", errors="ignore")
-        if "## 编译运行" in text:
+        if "## 编译运行" in text or "## 运行方式" in text:
             examples.append(readme.parent)
     return sorted(examples, key=lambda p: p.relative_to(examples_root).as_posix())
 
@@ -38,7 +38,9 @@ def filter_examples(
     result: List[Path] = []
     for path in paths:
         text = path.as_posix()
-        exact_match = any(text == term or text.endswith(f"/{term}") for term in exact_include_terms)
+        exact_match = any(
+            text == term or text.endswith(f"/{term}") for term in exact_include_terms
+        )
         if exact_include_terms and not exact_match:
             continue
         if include_terms and not any(term in text for term in include_terms):

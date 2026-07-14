@@ -14,8 +14,8 @@ reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对�
 
 该接口每调用一次接口会更新目的操作数在UB上的地址。
 
-需要先调用下列接口之一后，再调用本接口。
-- [asc_storeunalign_postupdate](./asc_storeunalign_postupdate.md)使用uint32_t作为存储偏移量的接口。
+需要先调用下列接口后，再调用本接口。
+- [asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)使用uint32_t作为存储偏移量的接口。
 
 搬运原理如下：
 记目的操作数的起始地址为dst_start，结束地址为dst_end，尾块元素个数为unalign_count = (dst_end - dst_end / 32 * 32) / sizeof(T)。
@@ -56,7 +56,7 @@ __simd_callee__ inline void asc_storeunalign_post_postupdate(__ubuf__  int64_t*&
 | src | 输入 | 非对齐寄存器，用于保存非对齐数据，长度32B。 |
 | offset | 输入 | 目的操作数结束地址的偏移，单位为元素个数。 |
 
-非对齐寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)。
+非对齐寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 
@@ -69,7 +69,7 @@ PIPE_V
 ## 约束说明
 
 - 该接口中的dst不需要32B对齐，但数据类型为T的dst需要sizeof(T) Byte对齐。
-- 调用本接口之前，需要调用[asc_storeunalign_postupdate](./asc_storeunalign_postupdate.md)使用uint32_t作为存储偏移量的接口，且本接口与前序接口的非对齐寄存器要保持一致。
+- 调用本接口之前，需要调用[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)使用uint32_t作为存储偏移量的接口，且本接口与前序接口的非对齐寄存器要保持一致。
 
 ## 调用示例
 

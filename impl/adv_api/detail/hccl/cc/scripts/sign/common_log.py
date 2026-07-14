@@ -14,10 +14,13 @@ import inspect
 import logging
 from functools import partial
 
-logging.basicConfig(format='[%(asctime)s] [%(levelname)s] [%(pathname)s] [line:%(lineno)d] %(message)s',
-                    level=logging.INFO)
+logging.basicConfig(
+    format="[%(asctime)s] [%(levelname)s] [%(pathname)s] [line:%(lineno)d] %(message)s",
+    level=logging.INFO,
+)
 
 THIS_FILE_NAME = __file__
+
 
 def cilog_get_timestamp():
     """
@@ -28,9 +31,10 @@ def cilog_get_timestamp():
     修改记录：1.日期    : 2012年7月25日
                 修改内容: 创建函数
     """
-    
-    return time.strftime("%Y-%m-%d %H:%M:%S",time.localtime())
-         
+
+    return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
+
 def cilog_print_element(cilog_element):
     """
     功能描述：以指定格式输出
@@ -40,20 +44,22 @@ def cilog_print_element(cilog_element):
     修改记录：1.日期    : 2012年7月25日
                 修改内容: 创建函数
     """
-    print("["+cilog_element+"]", end=' ')
+    print("[" + cilog_element + "]", end=" ")
     return
-                
+
+
 def cilog_logmsg(log_level, filename, line_no, log_msg, *log_paras):
     log_timestamp = cilog_get_timestamp()
-    
+
     cilog_print_element(log_timestamp)
     cilog_print_element(log_level)
     cilog_print_element(filename)
     cilog_print_element(str(line_no))
-        
+
     print(log_msg % log_paras[0])
-    
+
     return
+
 
 def cilog_error(filename, log_msg, *log_paras):
     """
@@ -69,7 +75,8 @@ def cilog_error(filename, log_msg, *log_paras):
     line_no = inspect.currentframe().f_back.f_lineno
     cilog_logmsg("ERROR", filename, line_no, log_msg, log_paras)
     return
-    
+
+
 def cilog_warning(filename, log_msg, *log_paras):
     """
     功能描述：WARNING级别的log打印
@@ -84,7 +91,8 @@ def cilog_warning(filename, log_msg, *log_paras):
     line_no = inspect.currentframe().f_back.f_lineno
     cilog_logmsg("WARNING", filename, line_no, log_msg, log_paras)
     return
-    
+
+
 def cilog_info(filename, log_msg, *log_paras):
     """
     功能描述：INFO级别的log打印
@@ -109,6 +117,6 @@ def auto_fill_filename(func):
 
 if __name__ == "__main__":
     i = 0
-    while i<3:
+    while i < 3:
         cilog_error(THIS_FILE_NAME, "%s say %s %d times", "I", "Hello world", i)
-        i+=1
+        i += 1

@@ -86,7 +86,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 | ---------- | ---------- | ---------- |
 | dst | 输出 | 目的操作数，类型为GlobalTensor，数据格式为NZ、ND格式，ND地址要求满足1字节对齐，NZ地址需要满足32字节对齐。 |
 | src | 输入 | 源操作数，类型为LocalTensor，支持的物理地址为L0C Buffer（TPosition为CO1），为Mmad接口计算的结果。数据格式为NZ格式，地址需要满足64字节对齐。 |
-| intriParams | 输入 | 搬运参数，类型为[DataCopyCO12DstParams](#zh-cn_topic_0000002542828493_table35908519282)。 <br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
+| intriParams | 输入 | 搬运参数，类型为[DataCopyCO12DstParams](#zh-cn_topic_0000002542828493_table35908519282)。 <br>具体定义请参考`${INSTALL_DIR}/asc/include/basic_api/interface/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
 
 **表3** DataCopyCO12DstParams结构体参数定义<a id="zh-cn_topic_0000002542828493_table35908519282"></a>
 
@@ -198,14 +198,14 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
     {
         return (numerator + denominator - 1) / denominator * denominator;
     }
-    // 将GM中的量化数据(quantAlphaGM)拷贝到C1（quantAlphaTensor）
+    // 将GM中的量化数据(quantAlphaGM)拷贝到L1 Buffer（C1）中的quantAlphaTensor
     uint16_t burstLen = CeilAlign(n * sizeof(uint64_t), 128) / AscendC::ONE_BLK_SIZE;
     AscendC::DataCopyParams intriParams{ 1, burstLen, 0, 0 };
     AscendC::DataCopy(quantAlphaTensor, quantAlphaGM, intriParams);
-    // 设置同步，确保量化数据拷贝到C1后，执行后续DataCopy指令
+    // 设置同步，确保量化数据拷贝到L1 Buffer（C1）后，执行后续DataCopy指令
     AscendC::SetFlag<AscendC::HardEvent::MTE2_FIX>(EVENT_ID0);
     AscendC::WaitFlag<AscendC::HardEvent::MTE2_FIX>(EVENT_ID0);
-    // 将C1中的量化数据（quantAlphaTensor）拷贝到C2PIPE2GM（fbTensor）
+    // 将L1 Buffer（C1）中的量化数据（quantAlphaTensor）拷贝到Fixpipe Buffer（C2PIPE2GM）中的fbTensor
     uint16_t fbufBurstLen = CeilAlign(deqDataSize, 128) / 128;
     AscendC::DataCopyParams dataCopyParams(1, fbufBurstLen, 0, 0);
     AscendC::DataCopy(fbTensor, quantAlphaTensor, dataCopyParams);

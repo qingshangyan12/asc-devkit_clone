@@ -331,7 +331,7 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量
-  
+
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
 
   ```bash
@@ -372,7 +372,7 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 msopprof ./matrix_transpose   # 分析case的性能
 ```
 
-命令完成后，会在默认目录下生成以"OPPROF_{timestamp}_XXX"命名的文件夹,性能数据文件夹结构示例如下：
+命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹，性能数据文件夹结构示例如下：
 
 ```text
 ├──dump                       # 原始的性能数据，用户无需关注
