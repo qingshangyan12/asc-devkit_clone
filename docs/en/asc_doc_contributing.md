@@ -6,11 +6,11 @@ The Ascend C documentation system consists of five core documents. Developers ca
 
 | Document | Content | Directory |
 |----------|---------|-----------|
-| Getting Started Tutorial | Ascend C overview, environment setup, quick-start hands-on (HelloWorld, first operator) | `docs/guide/入门教程` |
-| Programming Guide | Programming models, programming paradigms, compilation & execution, hardware architecture, advanced programming | `docs/guide/编程指南` |
-| API Reference Manual | Interface parameters, constraints, examples, API associations | `docs/api/` |
-| Operator Practice Reference | Operator implementation, performance optimization, tuning cases | `docs/guide/算子实践参考/` |
-| Cross-generation Migration & Compatibility Guide | API compatibility strategies, architecture change mappings, migration steps | `docs/guide/跨代迁移兼容性指南/` |
+| Getting Started Tutorial | Ascend C overview, environment setup, quick-start hands-on (HelloWorld, first operator) | `docs/zh/guide/入门教程` |
+| Programming Guide | Programming models, programming paradigms, compilation & execution, hardware architecture, advanced programming | `docs/zh/guide/编程指南` |
+| API Reference Manual | Interface parameters, constraints, examples, API associations | `docs/zh/api/` |
+| Operator Practice Reference | Operator implementation, performance optimization, tuning cases | `docs/zh/guide/算子实践参考/` |
+| Cross-generation Migration & Compatibility Guide | API compatibility strategies, architecture change mappings, migration steps | `docs/zh/guide/跨代迁移兼容性指南/` |
 
 Before reading this document, ensure you have a basic understanding of the Ascend AI processor hardware architecture. New developers are recommended to start with the Getting Started Tutorial; developers with prior experience should read the Ascend C Programming Guide.
 
@@ -638,6 +638,6 @@ The sample repository (`asc-devkit/examples/`) is not part of the documentation 
 - Community code of conduct and CLA signing: [cann-community](https://gitcode.com/cann/community)
 - Issue and PR process: See [Submit Issue / Handle Issue Tasks](https://gitcode.com/cann/community#提交Issue/处理Issue任务)
 - API code contribution guides:
-  - Advanced API: [asc_adv_api_contributing.md](./asc_adv_api_contributing.md)
-  - Basic API: [asc_basic_api_contributing.md](./asc_basic_api_contributing.md)
-  - C API: [asc_c_api_contributing.md](./asc_c_api_contributing.md)
+  - Advanced API: [asc_adv_api_contributing.md](../zh/asc_adv_api_contributing.md)
+  - Basic API: [asc_basic_api_contributing.md](../zh/asc_basic_api_contributing.md)
+  - C API: [asc_c_api_contributing.md](../zh/asc_c_api_contributing.md)
