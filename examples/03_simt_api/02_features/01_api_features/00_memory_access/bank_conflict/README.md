@@ -19,7 +19,8 @@
 │   ├── figures              // README中的图片资源
 │   ├── bank_conflict.asc    // SIMT UB Bank冲突样例实现
 │   ├── CMakeLists.txt       // cmake编译文件
-│   └── README.md
+│   ├── README.md            // 样例说明文档
+│   └── README_en.md         // 样例说明文档
 ```
 
 ## 样例描述
@@ -28,7 +29,7 @@
 
 本样例用于验证Ascend C SIMT编程方式下同一个Warp内多个线程访问UB时的bank冲突现象。样例通过编译期参数`SCENARIO_NUM`选择不同case，构造同地址合并、跨subbank分散访问、连续float访问中的同一8B范围合并、同subbank不同行冲突，以及同一bank group内同编号subbank冲突等典型访问模式。
 
-Host侧构造输入数组并拷贝到GM，kernel先将输入数据从GM搬入UB，再按照当前case对应的UB地址模式重复读取数据，并使用[`clock()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/调测接口/clock.md)统计读取UB数据的cycles。
+Host侧构造输入数组并拷贝到GM，kernel先将输入数据从GM搬入UB，再按照当前case对应的UB地址模式重复读取数据，并使用[`clock()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/Utils-API/调测接口/clock.md)统计读取UB数据的cycles。
 
 ### 样例规格
 
@@ -52,7 +53,6 @@ Host侧构造输入数组并拷贝到GM，kernel先将输入数据从GM搬入UB�
 SIMT场景下，同一个Warp内的多个线程可能在同一条UB访问指令中同时访问UB；当这些访问数据属于同一个bank group的相同编号的subbank资源时，例如同时访问bank0和bank8的subbank2，硬件无法在一个周期内处理全部请求，需要排队等待，从而形成subbank冲突并增加访问延迟；如果这些访问数据属于同一个subbank的同一行内的8B地址范围，硬件会将这些请求合并处理，不会形成subbank冲突。
 
 **图 1**  bank结构示意图
-
 ![](./figures/bank结构示意图.png)
 
 ### 地址编码规则
@@ -60,7 +60,6 @@ SIMT场景下，同一个Warp内的多个线程可能在同一条UB访问指令�
 UB地址采用低位交织，如下图所示，连续地址按32B粒度映射到bank0到bank15：第1个32B地址段映射到bank0，第2个映射到bank1，依次类推；第16个映射到bank15，第17个映射回bank0的下一行。
 
 **图 2**  bank内存排布示意图
-
 ![](./figures/bank内存排布示意图.png)
 
 SIMT编程方式下subbank冲突主要有以下几种：
@@ -95,13 +94,13 @@ for (uint32_t i = 0; i < REPEAT_TIMES; ++i) {
 
 **表 2**  Case实现说明
 
-| Case | 场景描述 | 预期访问特征 |
-| --- | --- | --- |
-| Case 0 | 同一Warp的线程读同一个地址 | 同地址请求合并 |
-| Case 1 | 跨subbank访问 | 32个线程访问8个bank group的不同subbank，作为无冲突基线 |
-| Case 2 | 同一Warp的线程连续访问相邻float元素 | 相邻两个线程访问同一8B范围，硬件可合并处理 |
-| Case 3 | 访问同一bank的同subbank不同行 | 32个线程访问同一bank、同一subbank的不同行，形成subbank冲突 |
-| Case 4 | 访问同bank group的同编号subbank | 32个线程访问同一bank group内相同编号的两个subbank，形成subbank冲突 |
+| Case   | 场景描述                            | 预期访问特征                                                       |
+| ------ | ----------------------------------- | ------------------------------------------------------------------ |
+| Case 0 | 同一Warp的线程读同一个地址          | 同地址请求合并                                                     |
+| Case 1 | 跨subbank访问                       | 32个线程访问8个bank group的不同subbank，作为无冲突基线             |
+| Case 2 | 同一Warp的线程连续访问相邻float元素 | 相邻两个线程访问同一8B范围，硬件可合并处理                         |
+| Case 3 | 访问同一bank的同subbank不同行       | 32个线程访问同一bank、同一subbank的不同行，形成subbank冲突         |
+| Case 4 | 访问同bank group的同编号subbank     | 32个线程访问同一bank group内相同编号的两个subbank，形成subbank冲突 |
 
 ### 数据切分与线程块布局
 
@@ -302,14 +301,13 @@ Case 0和Case 2用于说明可合并访问不会形成subbank冲突，Case 1作�
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
 
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
-
   > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
-
+  >
 - 样例执行
 
   在本样例目录下执行如下命令。
@@ -320,15 +318,15 @@ Case 0和Case 2用于说明可合并访问不会形成subbank冲突，Case 1作�
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;  # 编译工程
   ./demo                               # 执行样例
   ```
-
 - 编译选项说明
 
-  | 选项 | 可选值 | 说明 |
-  | --- | --- | --- |
+  | 选项                        | 可选值       | 说明                                                       |
+  | --------------------------- | ------------ | ---------------------------------------------------------- |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT） |
-  | `SCENARIO_NUM` | `0`-`4` | 样例类型，默认为0 |
+  | `SCENARIO_NUM`            | `0`-`4`  | 样例类型，默认为0                                          |
 
   执行结果如下，说明精度对比成功。
+
 
   ```text
   [Success] Case accuracy verification passed.
