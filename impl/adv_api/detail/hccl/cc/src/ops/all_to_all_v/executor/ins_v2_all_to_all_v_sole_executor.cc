@@ -424,6 +424,6 @@ HcclResult InsV2AlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::FastLaunch(
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALL, CcuAlltoAllMesh1D, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
         CcuTempAlltoAllMesh1D);
 
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALLV, CcuAlltoAllVMesh1D, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
-        CcuTempAlltoAllMesh1D);
+// 注意：HCCL_CMD_ALLTOALLV + CcuAlltoAllVMesh1D 的注册已迁移到
+// ins_all_to_all_v_sole_executor.cc（配套 CcuTempAlltoAllVMesh1D 变长搬运模板）。
 }  // namespace mc2_ops_hccl
