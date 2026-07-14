@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include "../../../../include/adv_api/utils/types.h"
 #include "../../../../include/adv_api/normalization/rmsnorm_tiling.h"
 
 #include "../../detail/host_log.h"
@@ -44,7 +45,7 @@ inline uint32_t AlignToBlock(const uint32_t inputValue, const uint32_t typeSize)
     return (inputValue + alignUnit - 1) / alignUnit * alignUnit;
 }
 
-uint32_t GetRmsNormMaxTmpSize(const ge::Shape& srcShape, const uint32_t typeSize)
+uint32_t GetRmsNormMaxTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize)
 {
     std::vector<int64_t> shapeDims = srcShape.GetDims();
     const uint32_t bLength = static_cast<uint32_t>(shapeDims[B_INDEX]);
@@ -71,7 +72,7 @@ uint32_t GetRmsNormMaxTmpSize(const ge::Shape& srcShape, const uint32_t typeSize
 }
 
 // for RmsNorm, if use dst as tmp buffer then min-tmp-size is size of reduceHlength, which is bLength*sLength
-uint32_t GetRmsNormMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isBasicBlock = false)
+uint32_t GetRmsNormMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isBasicBlock = false)
 {
     (void)isBasicBlock;
     std::vector<int64_t> shapeDims = srcShape.GetDims();
@@ -101,7 +102,7 @@ inline bool RmsNormCheckBasicBlockShape(const uint32_t bLength, const uint32_t s
 }
 
 bool RmsNormCheckShape(
-    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t typeSize,
+    const AscendC::TensorShape& srcShape, const AscendC::TensorShape& originSrcShape, const uint32_t typeSize,
     const bool isBasicBlock = false)
 {
     std::vector<int64_t> shapeDims = srcShape.GetDims();
@@ -137,7 +138,7 @@ bool RmsNormCheckShape(
 } // namespace
 
 bool GetRmsNormMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue, const bool isBasicBlock)
+    const AscendC::TensorShape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue, const bool isBasicBlock)
 {
     std::vector<int64_t> shapeDims = srcShape.GetDims();
     const uint32_t bLength = static_cast<uint32_t>(shapeDims[B_INDEX]);
@@ -153,7 +154,7 @@ bool GetRmsNormMaxMinTmpSize(
 }
 
 bool GetRmsNormTilingInfo(
-    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize,
+    const AscendC::TensorShape& srcShape, const AscendC::TensorShape& originSrcShape, const uint32_t stackBufferByteSize,
     const uint32_t typeSize, optiling::RmsNormTiling& tiling, const bool isBasicBlock)
 {
     if (!RmsNormCheckShape(srcShape, originSrcShape, typeSize, isBasicBlock)) {
@@ -215,7 +216,7 @@ bool GetRmsNormTilingInfo(
 }
 
 bool GetRmsNormTilingInfo(
-    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize,
+    const AscendC::TensorShape& srcShape, const AscendC::TensorShape& originSrcShape, const uint32_t stackBufferByteSize,
     const uint32_t typeSize, AscendC::tiling::RmsNormTiling& tiling, const bool isBasicBlock)
 {
     optiling::RmsNormTiling tilingData;
