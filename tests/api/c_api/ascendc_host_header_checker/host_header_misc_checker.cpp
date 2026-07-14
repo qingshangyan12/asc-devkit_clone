@@ -12,6 +12,6 @@
 
 static void test_host_c_api_misc_0()
 {
-    (void)static_cast<void(*)()>(&asc_init);
+    using ::asc_init;
 }
 

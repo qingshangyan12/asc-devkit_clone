@@ -12,25 +12,25 @@
 
 static void test_host_c_api_cube_compute_0()
 {
-    (void)static_cast<void(*)()>(&asc_enable_fp8);
-    (void)static_cast<void(*)()>(&asc_enable_hf32);
-    (void)static_cast<void(*)(uint32_t)>(&asc_enable_hf32_trans);
-    (void)static_cast<void(*)()>(&asc_enable_hif8);
-    (void)static_cast<uint64_t(*)()>(&asc_get_l0c2gm_prequant);
-    (void)static_cast<uint64_t(*)()>(&asc_get_l0c2gm_relu);
-    (void)static_cast<uint64_t(*)()>(&asc_get_l0c2gm_unitflag);
-    (void)static_cast<void(*)(__cc__ float* __ca__ bfloat16_t* __cb__ bfloat16_t* uint16_t uint16_t uint16_t uint8_t bool bool bool)>(&asc_mmad);
-    (void)static_cast<void(*)(__cc__ float* __ca__ fp4x2_e1m2_t* __cb__ fp4x2_e1m2_t* uint16_t uint16_t uint16_t uint8_t bool bool bool)>(&asc_mmad_mx);
-    (void)static_cast<void(*)(__cc__ float* __ca__ fp4x2_e1m2_t* __cb__ fp4x2_e1m2_t* uint16_t uint16_t uint16_t uint8_t bool bool bool)>(&asc_mmad_mx_sync);
-    (void)static_cast<void(*)(__cc__ int32_t* __ca__ int4b_t* __cb__ int4b_t* uint16_t uint16_t uint16_t uint8_t bool bool bool)>(&asc_mmad_s4);
-    (void)static_cast<void(*)(__cc__ int32_t* __ca__ int4b_t* __cb__ int4b_t* uint16_t uint16_t uint16_t uint8_t bool bool bool)>(&asc_mmad_s4_sync);
-    (void)static_cast<void(*)(__cc__ int32_t* __ca__ int8_t* __cb__ int8_t* uint16_t uint16_t uint16_t uint8_t bool bool)>(&asc_mmad_sparse);
-    (void)static_cast<void(*)(__cc__ int32_t* __ca__ int8_t* __cb__ int8_t* uint16_t uint16_t uint16_t uint8_t bool bool)>(&asc_mmad_sparse_sync);
-    (void)static_cast<void(*)(__cc__ float* __ca__ bfloat16_t* __cb__ bfloat16_t* uint16_t uint16_t uint16_t uint8_t bool bool bool)>(&asc_mmad_sync);
-    (void)static_cast<void(*)()>(&asc_set_fp32_mode);
-    (void)static_cast<void(*)(uint64_t uint64_t bool)>(&asc_set_l0c2gm_config);
-    (void)static_cast<void(*)(uint64_t uint64_t uint64_t)>(&asc_set_l0c2gm_nz2nd);
-    (void)static_cast<void(*)()>(&asc_set_mmad_direction_m);
-    (void)static_cast<void(*)()>(&asc_set_mmad_direction_n);
+    using ::asc_enable_fp8;
+    using ::asc_enable_hf32;
+    using ::asc_enable_hf32_trans;
+    using ::asc_enable_hif8;
+    using ::asc_get_l0c2gm_prequant;
+    using ::asc_get_l0c2gm_relu;
+    using ::asc_get_l0c2gm_unitflag;
+    using ::asc_mmad;
+    using ::asc_mmad_mx;
+    using ::asc_mmad_mx_sync;
+    using ::asc_mmad_s4;
+    using ::asc_mmad_s4_sync;
+    using ::asc_mmad_sparse;
+    using ::asc_mmad_sparse_sync;
+    using ::asc_mmad_sync;
+    using ::asc_set_fp32_mode;
+    using ::asc_set_l0c2gm_config;
+    using ::asc_set_l0c2gm_nz2nd;
+    using ::asc_set_mmad_direction_m;
+    using ::asc_set_mmad_direction_n;
 }
 
