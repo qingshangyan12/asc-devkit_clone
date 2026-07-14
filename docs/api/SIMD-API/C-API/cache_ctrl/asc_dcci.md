@@ -1,6 +1,7 @@
 # asc_dcci
 
 ## 产品支持情况
+## 产品支持情况
 
 <!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
@@ -11,24 +12,18 @@
 <!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
 <!-- end id3 -->
-<!-- npu="310b" id5 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品AI Core：不支持
-<!-- end id6 -->
-<!-- npu="310p" id7 -->
 - Atlas 推理系列产品Vector Core：不支持
-<!-- end id7 -->
-<!-- npu="910" id8 -->
+<!-- end id6 -->
+<!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
-<!-- end id8 -->
-<!-- npu="x90" id9 -->
-- Kirin X90：不支持
-<!-- end id9 -->
-<!-- npu="9030" id10 -->
-- Kirin 9030：不支持
-<!-- end id10 -->
+<!-- end id7 -->
 
 ## 功能说明
 
@@ -49,9 +44,9 @@ Scalar单元访问Global Memory，首先会访问每个核内的Data Cache，因
 
 Scalar单元访问UB数据时，该接口需配合[asc_set_ctrl()](../sys_var/asc_set_ctrl.md)接口使用，将CTRL[49]设置为1'b1，开启datacache模式。
 
-<!-- npu="950" id4 -->
+<!-- npu="950" id8 -->
 针对Ascend 950PR/Ascend 950DT，不支持asc_dcci_entire_ub接口。
-<!-- end id4 -->
+<!-- end id8 -->
 
 ## 函数原型
 
