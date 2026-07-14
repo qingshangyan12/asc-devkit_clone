@@ -6,7 +6,7 @@ The HCCL algorithm analyzer simulates HCCL algorithm execution in an offline env
 
 ## Principle Introduction
 
-![](../../../docs/figures/algorithm_analyzer/introduction-theory.png)
+![](../../../docs/zh/figures/algorithm_analyzer/introduction-theory.png)
 
 **Key Points:**
 
@@ -26,7 +26,7 @@ Follow the environment preparation, source code download, compilation, and insta
 
 An algorithm checker test case consists of 5 steps, as shown below. The following sections describe how to write each step to accommodate different operator requirements. Finally, it explains how to use the checker tool for issue diagnosis.
 
-![](../../../docs/figures/algorithm_analyzer/compile_testcase_1.png)
+![](../../../docs/zh/figures/algorithm_analyzer/compile_testcase_1.png)
 
 ### LLT Test Case Step Details
 
@@ -34,7 +34,7 @@ An algorithm checker test case consists of 5 steps, as shown below. The followin
 
    - **TopoMeta Structure Introduction**
 
-     ![](../../../docs/figures/algorithm_analyzer/compile_testcase_2.png)
+     ![](../../../docs/zh/figures/algorithm_analyzer/compile_testcase_2.png)
 
      The checker uses TopoMeta to represent a topology. TopoMeta is a three-layer vector structure.
 
@@ -52,17 +52,17 @@ An algorithm checker test case consists of 5 steps, as shown below. The followin
 
      1. Specify the number of super nodes, servers, and cards per server, then use the provided GenTopoMeta function to generate it. This applies to symmetric topology scenarios.
 
-        ![](../../../docs/figures/algorithm_analyzer/compile_testcase_3.png)
+        ![](../../../docs/zh/figures/algorithm_analyzer/compile_testcase_3.png)
 
      2. Fully customize super nodes, servers, and card counts. This applies to both symmetric and asymmetric topology scenarios, as shown below.
 
-        ![](../../../docs/figures/algorithm_analyzer/compile_testcase_4.png)
+        ![](../../../docs/zh/figures/algorithm_analyzer/compile_testcase_4.png)
 
    - **Model Initialization**
 
      Pass in the generated TopoMeta and specify the device type for simulation.
 
-     ![](../../../docs/figures/algorithm_analyzer/compile_testcase_5.png)
+     ![](../../../docs/zh/figures/algorithm_analyzer/compile_testcase_5.png)
 
 #### Operator Parameter Settings
 
@@ -75,7 +75,7 @@ An algorithm checker test case consists of 5 steps, as shown below. The followin
     - dataType: The data type corresponding to recvCount.
 
      For other operators or custom operator scenarios, set parameters according to the operator requirements.
-     ![](../../../docs/figures/algorithm_analyzer/compile_testcase_5-1.png)
+     ![](../../../docs/zh/figures/algorithm_analyzer/compile_testcase_5-1.png)
 
 - Set Environment Variables
 
@@ -90,7 +90,7 @@ An algorithm checker test case consists of 5 steps, as shown below. The followin
 #### Operator Execution Flow
 
 As shown below, run the single operator flow in a multi-threaded manner.
-![](../../../docs/figures/algorithm_analyzer/compile_testcase_6.png)
+![](../../../docs/zh/figures/algorithm_analyzer/compile_testcase_6.png)
 
 1. Construct operator input parameters.
    
@@ -120,7 +120,7 @@ The final step of a single test case execution is to clean up simulation model r
 
 When there are many test cases and you only need to execute one, modify the test case name in main.cc.
 
-![](../../../docs/figures/algorithm_analyzer/compile_testcase_7.png)
+![](../../../docs/zh/figures/algorithm_analyzer/compile_testcase_7.png)
 
 ## Test Case Compilation and Execution
 
@@ -138,7 +138,7 @@ bash build.sh
 
 Test case execution results are shown below:
 
-![](../../../docs/figures/algorithm_analyzer/result_1.png)
+![](../../../docs/zh/figures/algorithm_analyzer/result_1.png)
 
 The meaning of each field:
 
@@ -231,15 +231,15 @@ The following example explains what semantic calculation is.
 
 1.  Initial state: There are two Ranks, Rank0 and Rank1, with two memory types, Input and Output.
 
-    ![](../../../docs/figures/algorithm_analyzer/allgather.png)
+    ![](../../../docs/zh/figures/algorithm_analyzer/allgather.png)
 
 2.  State one action: Transfer the data block from rank0's Input with offset address 20 and size 30 to rank0's Output with offset address 35. Result: A semantic block is generated on rank0's Output, recording this transfer information.
 
-    ![](../../../docs/figures/algorithm_analyzer/allgather-0.png)
+    ![](../../../docs/zh/figures/algorithm_analyzer/allgather-0.png)
 
 3.  State two action: Transfer the data block from rank1's Input with offset address 70 and size 15 to rank0's Output with offset address 50. Result: The destination memory overlaps with an existing semantic block, requiring the existing semantic block to be split, generating two semantic blocks.
 
-    ![](../../../docs/figures/algorithm_analyzer/allgather-1.png)
+    ![](../../../docs/zh/figures/algorithm_analyzer/allgather-1.png)
 
 #### Result Validation<a name="en-us_topic_0000002306468780_section1791912221916"></a>
 
@@ -249,11 +249,11 @@ The following example uses 2-rank AllGather to illustrate normal and abnormal sc
 
 -   **Correct Scenario:**
 
-    ![](../../../docs/figures/algorithm_analyzer/allgather-2.png)
+    ![](../../../docs/zh/figures/algorithm_analyzer/allgather-2.png)
 
 -   **Error Scenario:**
 
-    ![](../../../docs/figures/algorithm_analyzer/allgather-3.png)
+    ![](../../../docs/zh/figures/algorithm_analyzer/allgather-3.png)
 
 #### Diagnosis Approach<a name="en-us_topic_0000002306468780_section193706117214"></a>
 
