@@ -1340,6 +1340,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ uint16_t* dst, __gm__ uint1
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
                                                 uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 __aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
+                                            uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
                                                 uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 __aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
@@ -1894,7 +1895,6 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint
 __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t m_start_position, uint32_t k_start_position,
                                         uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 // ==========asc_copy_l12l0b_trans, bfloat16_t/fp8_e4m3fn_t/fp8_e5m2_t/half/float/hifloat8_t/int32_t/int8_t/uint32_t/uint8_t/fp4x2_e1m2_t/fp4x2_e2m1_t/int4b_t==========
-                                            uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
 #endif
 
