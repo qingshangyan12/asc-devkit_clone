@@ -319,7 +319,7 @@ AscendC::DataCopyPad<float>(cGM[gmOffset], geluOutUB, copyOutParams);
 
 ![Scenario1 CV融合-GM中转流水并行](figures/CVParallell_L0C_GM_UB.png)
 
-> 💡 使用 msProf 工具需安装 CANN 商用/社区版，详细信息可参考[msOpProf工具安装指南](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md)。流水图基于msOpProf工具上板获取，获取命令：`msopprof --aic-metrics=PipeTimeline ./demo`
+> 💡 使用 msOpProf 工具需安装 CANN 商用/社区版，详细信息可参考[msOpProf工具安装指南](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md)。流水图基于msOpProf工具上板获取，获取命令：`msopprof --aic-metrics=PipeTimeline ./demo`
 
 **MTE2时间显著减少的原因：**
 
@@ -502,7 +502,7 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
     msopprof ./demo
     ```
 
-    - 性能数据说明  
+    - 性能数据说明
       命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
 
       ```bash

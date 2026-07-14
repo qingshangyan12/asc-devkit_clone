@@ -212,7 +212,7 @@ Ascend 950 系列按 GM 带宽约 1.6TB/s 估算，理论耗时约 188.74μs。�
 
 ### 优化点3：重复搬运与 L2Cache 复用
 
-**实现方式**：重复搬运场景在同一数据规模下执行多轮 GM 读取，使用 `msprof --ai-core=on --aic-metrics=L2Cache` 采集 L2Cache 读命中和 miss allocate 数据。
+**实现方式**：重复搬运场景在同一数据规模下执行多轮 GM 读取，使用 `msopprof --ai-core=on --aic-metrics=L2Cache` 采集 L2Cache 读命中和 miss allocate 数据。
 
 整块重复搬运时，`RepeatCopy(0, n, 4)` 表示 `nStart=0`、`nCount=N`、`repeatTimes=4`，每轮都按完整 N 方向读取同一块数据。A2/A3 的 L2Cache 大小为 192MB，950PR 的 L2Cache 大小为 128MB。本样例单个 `M * N` 矩阵大小约为 301.99MB，整块重复搬运时单轮工作集大于 L2Cache 容量，容易发生写替换，导致 L2Cache 命中率较低。
 
@@ -414,7 +414,7 @@ for (uint32_t mBlockIdx = 0; mBlockIdx < fullMBlockCount; mBlockIdx++) {
   SCENARIO_NUM=1 ASC_ARCH=dav-2201
   COPY_DST=UB
   mkdir -p build && cd build
-  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCOPY_DST=$COPY_DST -DCMAKE_ASC_ARCHITECTURES=$ASC_ARCH ..;make -j; 
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCOPY_DST=$COPY_DST -DCMAKE_ASC_ARCHITECTURES=$ASC_ARCH ..;make -j;
   python3 ../scripts/gen_data.py -scenarioNum $SCENARIO_NUM -copyDst $COPY_DST -arch $ASC_ARCH
   ./demo
   ```
@@ -448,7 +448,7 @@ for (uint32_t mBlockIdx = 0; mBlockIdx < fullMBlockCount; mBlockIdx++) {
   msopprof --ai-core=on --aic-metrics=L2Cache ./demo    # L2Cache 相关场景使用
   ```
 
-    - 性能数据说明  
+    - 性能数据说明
       命令完成后，会在默认目录下生成以"OPPROF_{timestamp}_XXX"命名的文件夹,性能数据文件夹结构示例如下：
 
       ```bash

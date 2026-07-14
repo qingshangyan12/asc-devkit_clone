@@ -50,7 +50,7 @@ This example uses Add computation to demonstrate the compilation, execution, res
 
 Run the following steps in the root directory of this example to build and execute the program.
 
-- Configure Environment Variables  
+- Configure Environment Variables
   Configure environment variables based on the [installation method](../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -114,4 +114,4 @@ After execution, view the instruction pipeline diagram through the following met
 
 - **MindStudio Insight**: Open `visualize_data.bin` for visual presentation.
 
-  For more details, refer to the msOpProf tool usage: [MindStudio Tool Tuning (msProf) Quick Start](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/quick_start/msopprof_quick_start.md).
+  For more details, refer to the msOpProf tool usage: [MindStudio Tool Tuning (msOpProf) Quick Start](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/quick_start/msopprof_quick_start.md).

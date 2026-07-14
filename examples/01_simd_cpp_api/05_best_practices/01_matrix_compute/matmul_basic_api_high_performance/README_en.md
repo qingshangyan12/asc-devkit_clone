@@ -459,7 +459,7 @@ AscendC::DumpTensor(cLocal, baseM * baseN);
 
 ## Performance Debugging
 
-### msProf Tool Introduction
+### msOpProf Tool Introduction
 
 Use the `msOpProf` tool to obtain detailed performance data:
 
@@ -467,7 +467,7 @@ Use the `msOpProf` tool to obtain detailed performance data:
 msopprof ./demo   # Analyze example performance
 ```
 
-    - Performance data description  
+    - Performance data description
       After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
 
       ```bash

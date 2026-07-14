@@ -222,7 +222,7 @@ run_msprof() {
         python3 ../scripts/gen_data.py || return 1
     fi
 
-    msprof op ./demo || return 1
+    msopprof ./demo || return 1
 
     if [ -f "../scripts/verify_result.py" ]; then
         python3 ../scripts/verify_result.py output/output.bin output/golden.bin || return 1

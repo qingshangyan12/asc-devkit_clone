@@ -58,7 +58,7 @@
 
 在本样例根目录下执行如下步骤，编译并执行程序。
 
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，配置环境变量。
 
   > 💡 使用 msOpProf 工具需安装 CANN 商用/社区版，详细信息可参考[msOpProf工具安装指南](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md)。
@@ -128,4 +128,4 @@ OPPROF_{timestamp}_XXX/
 
 - **MindStudio Insight**：打开`visualize_data.bin`或`trace.json`进行可视化呈现。
 
-  更多详细内容可以查看msOpProf工具使用方式，[MindStudio工具调优（msProf）快速入门](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/quick_start/msopprof_quick_start.md)。
+  更多详细内容可以查看msOpProf工具使用方式，[MindStudio工具调优（msOpProf）快速入门](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/quick_start/msopprof_quick_start.md)。

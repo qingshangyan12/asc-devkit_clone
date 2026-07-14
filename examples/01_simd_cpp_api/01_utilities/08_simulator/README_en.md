@@ -57,7 +57,7 @@ Run the following steps in the root directory of this example to build and run t
 - Configure environment variables
   Configure environment variables based on the [installation method](../../../../docs/quick_start.md#prepare&install) of the CANN development kit on the current environment.
 
-  > To use the msOpProf tool, install CANN commercial/community edition. For details, refer to [msProf Tool Installation Guide](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md).
+  > To use the msOpProf tool, install CANN commercial/community edition. For details, refer to [msOpProf Tool Installation Guide](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md).
 
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -124,4 +124,4 @@ After execution, view the instruction pipeline diagram through the following met
 
 - **MindStudio Insight**: Open `visualize_data.bin` or `trace.json` for visual presentation.
 
-  For more details, refer to the msProf tool usage: [MindStudio Tool Tuning (msProf) Quick Start](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/quick_start/msopprof_quick_start.md).
+  For more details, refer to the msOpProf tool usage: [MindStudio Tool Tuning (msOpProf) Quick Start](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/quick_start/msopprof_quick_start.md).
