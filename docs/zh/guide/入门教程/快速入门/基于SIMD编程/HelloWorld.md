@@ -51,7 +51,9 @@
 
     > [!NOTE] 说明
     >- 该样例支持如下型号：
+    >    <!-- npu="950" id3 -->
     >    - Ascend 950PR/Ascend 950DT
+    >    <!-- end id3 -->
     >    <!-- npu="A3" id1 -->
     >    - Atlas A3 训练系列产品/Atlas A3 推理系列产品
     >    <!-- end id1 -->

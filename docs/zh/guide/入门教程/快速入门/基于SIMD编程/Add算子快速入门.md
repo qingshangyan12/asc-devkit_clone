@@ -111,7 +111,9 @@
       ```
       > [!NOTE] 说明
       > - 该样例支持以下型号：
+      >     <!-- npu="950" id1 -->
       >     - Ascend 950PR/Ascend 950DT
+      >     <!-- end id1 -->
       >     - Atlas A3训练系列产品/Atlas A3推理系列产品
       >     - Atlas A2训练系列产品/Atlas A2推理系列产品
       > - SIMD算子的Kernel函数需要额外修饰符，[`__vector__`](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md)修饰符表明该算子仅在向量计算单元上执行。
