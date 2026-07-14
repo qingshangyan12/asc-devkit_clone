@@ -11,7 +11,7 @@
 | [03_simt_api](./03_simt_api) | Ascend C SIMT编程样例，覆盖入门、调试工具、核心特性和实践参考 |
 | [04_aicpu](./04_aicpu) | Ascend C AICPU编程样例，覆盖入门和功能特性 |
 | [05_simd_simt_hybrid](./05_simd_simt_hybrid) | Ascend C SIMD与SIMT混合编程样例，覆盖入门和高性能优化样例 | 
-| [05_simd_simt_hybri1d](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/guide/编程指南/编程模型/AI-Core-SIMT编程test/编程示例.md)
+| [05_simd_simt_hybri1d](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/guide/编程指南/编程模型/AI-Core-SIMT编程test1/编程示例.md)
 
 ## npu-arch编译选项说明
 
