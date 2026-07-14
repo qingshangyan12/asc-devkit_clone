@@ -45,6 +45,9 @@ def Duplicate(scalarValue, dst, count):
     for i in range(count):     
         dst[i] = scalarValue
 ```
+<!-- npu="950" id26 -->
+针对Ascend 950PR/Ascend 950DT，为方便开发者使用，tensor前n个数据计算接口同时也支持直接传入LocalTensor，此时会将LocalTensor的第一个元素复制多次并填充到向量中。
+<!-- end id26 -->
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -57,7 +60,7 @@ def Duplicate(scalarValue, dst, count):
 
 <!-- npu="950" id10 -->
 
-- tensor前n个数据计算，源操作数为Tensor
+- tensor前n个数据计算，源操作数为LocalTensor
 
     ```cpp
     // 该函数原型，仅支持Ascend 950PR/Ascend 950DT。
@@ -92,7 +95,7 @@ def Duplicate(scalarValue, dst, count):
 **表2**  接口参数说明
 | 参数说明 | 输入/输出 | 含义 |
 | ------ | ------ | ------ |
-| dst | 输出 | 目的操作数，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT（存储位置为Unified Buffer）。LocalTensor的起始地址需要按照32字节对齐。|
+| dst | 输出 | 目的操作数，类型为LocalTensor，存储位置为UB（TPosition为VECIN/VECCALC/VECOUT）。LocalTensor的起始地址需要按照32字节对齐。|
 | scalarValue | 输入 | 被复制的源操作数，数据类型需与dst中元素的数据类型保持一致。|
 |<!-- npu="950" id11 --> src | 输入| 源操作数，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>数据类型需与dst中元素的数据类型保持一致。<br>当传入该参数时，会将src[0]复制多次并填充到向量中。<!-- end id11 -->|
 | count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。|

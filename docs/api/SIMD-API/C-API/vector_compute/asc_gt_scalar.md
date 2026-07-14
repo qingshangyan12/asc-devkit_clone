@@ -9,6 +9,8 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/vector_compute/vector_compute.h"`。
+
 src中的每个元素逐个与标量value比较大小，如果某个位置上的元素大于value，则输出结果dst上的对应比特位为1，否则为0。
 
 ## 函数原型
@@ -62,10 +64,10 @@ __ubuf__ uint8_t dst[total_length / 8];
 __ubuf__ half src[total_length];
 half scalar = 20;
 uint8_t repeat = 1;
-uint8_t dst_block_stride = 1;
-uint8_t src_block_stride = 1;
-uint8_t dst_repeat_stride = 8;
-uint8_t src_repeat_stride = 8;
+uint16_t dst_block_stride = 1;
+uint16_t src_block_stride = 1;
+uint16_t dst_repeat_stride = 8;
+uint16_t src_repeat_stride = 8;
 …… // 数据搬运及同步操作
 asc_gt_scalar(dst, src, scalar, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
 …… // 同步操作

@@ -39,15 +39,14 @@
 | 公共状态 | 初始化[用于AddDeqRelu/CastDequant/Cast的s322fp16场景的scale量化参数](../../Memory矢量计算/类型转换/寄存器配置说明/SetDeqScale.md#func1)为1。 |
 | 公共状态 | 初始化[CTRL寄存器](../../特殊寄存器访问/SetCtrlSpr(ISASI).md#tab-950)中除`CTRL[48]`以外的比特位为默认值。 |
 | 公共状态 | 初始化[原子操作开启位与原子操作类型](../../原子操作/SetStoreAtomicConfig(ISASI).md)，为无效的原子操作类型。 |
-| AIC | 初始化[Load3D接口调用时Pad填充的数值](../../矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/SetLoadDataPaddingValue.md#功能说明)为0。 |
-| AIC | 初始化[使用Load3D时A1/B1的边界值](../../矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/SetLoadDataBoundary.md#功能说明)为0，表示无边界。 |
+| AIC | 初始化[LoadData（卷积数据搬运）接口调用时Pad填充的数值](../../矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/SetLoadDataPaddingValue.md#功能说明)为0。 |
+| AIC | 初始化[使用LoadData（卷积数据搬运）时A1/B1的边界值](../../矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/SetLoadDataBoundary.md#功能说明)为0，表示无边界。 |
 | AIV | 将[Mask](../../Memory矢量计算/SIMD计算说明/掩码/概述.md)配置为全1，表示所有数都参与计算。 |
 | AIV | [重置loop mode的参数](../../Memory矢量计算/数据搬运/GM与UB数据搬运/寄存器配置说明/ResetLoopModePara.md)。 |
 
 **各产品实际执行的初始化项如下：**
 
-<cann-filter npu-type = "950">
-
+<!-- npu="950" id8 -->
 **表1** 针对Ascend 950PR/Ascend 950DT本接口执行的初始化项
 
 | 状态类别 | 初始化内容 |
@@ -57,49 +56,42 @@
 | 公共状态 | 用于AddDeqRelu/CastDequant/Cast的s322fp16场景的scale量化参数 |
 | 公共状态 | CTRL寄存器 |
 | 公共状态 | 原子操作开启位与原子操作类型 |
-| AIC | Load3D接口调用时Pad填充的数值 |
+| AIC | LoadData（卷积数据搬运）接口调用时Pad填充的数值 |
 | AIV | Mask |
 | AIV | loop mode的参数 |
+<!-- end id8 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "A3">
-
+<!-- npu="A3" id9 -->
 **表2** 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品本接口执行的初始化项
 
 | 状态类别 | 初始化内容 |
 | ---- | ---- |
 | 公共状态 | 原子累加状态 |
 | 公共状态 | Mask工作模式 |
-| AIC | Load3D接口调用时Pad填充的数值 |
-| AIC | 使用Load3D时A1/B1的边界值 |
+| AIC | LoadData（卷积数据搬运）接口调用时Pad填充的数值 |
+| AIC | 使用LoadData（卷积数据搬运）时A1/B1的边界值 |
 | AIV | Mask |
+<!-- end id9 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "910b">
-
+<!-- npu="910b" id10 -->
 **表3** 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品本接口执行的初始化项
 
 | 状态类别 | 初始化内容 |
 | ---- | ---- |
 | 公共状态 | 原子累加状态 |
 | 公共状态 | Mask工作模式 |
-| AIC | Load3D接口调用时Pad填充的数值 |
-| AIC | 使用Load3D时A1/B1的边界值 |
+| AIC | LoadData（卷积数据搬运）接口调用时Pad填充的数值 |
+| AIC | 使用LoadData（卷积数据搬运）时A1/B1的边界值 |
 | AIV | Mask |
+<!-- end id10 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "310p">
-
+<!-- npu="310p" id11 -->
 **表4** 针对Atlas 推理系列产品AI Core和Atlas 推理系列产品Vector Core本接口执行的初始化项
 
 | 状态类别 | 初始化内容 |
 | ---- | ---- |
 | 公共状态 | 原子累加状态 |
-
-</cann-filter>
+<!-- end id11 -->
 
 ## 函数原型
 

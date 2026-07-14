@@ -54,14 +54,14 @@ int32_t main(int argc, char const *argv[])
 -   编译hello\_world.aicpu时，通过-I指定依赖头文件所在路径；通过--cce-aicpu-laicpu\_api为Device链接依赖的库libaicpu\_api.a，通过--cce-aicpu-L指定libaicpu\_api.a的库路径。
 -   编译main.asc时，通过--npu-arch编译选项指定对应的架构版本号。
 
-$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。以root用户安装为例，安装后文件默认存储路径为：/usr/local/Ascend/cann。
+`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。以root用户安装为例，安装后文件默认存储路径为：/usr/local/Ascend/cann。
 
 各产品型号对应的架构版本号请通过[对应关系表](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。
 
 ```
-$bisheng -O2 hello_world.aicpu --cce-aicpu-L${INSTALL_DIR}/lib64/device/lib64 --cce-aicpu-laicpu_api -I${INSTALL_DIR}/include/ascendc/aicpu_api -c -o hello_world.aicpu.o
-$bisheng --npu-arch=dav-2201 main.asc -c -o main.asc.o
-$bisheng hello_world.aicpu.o main.asc.o -o demo
+bisheng -O2 hello_world.aicpu --cce-aicpu-L${INSTALL_DIR}/lib64/device/lib64 --cce-aicpu-laicpu_api -I${INSTALL_DIR}/asc/include/aicpu_api -c -o hello_world.aicpu.o
+bisheng --npu-arch=dav-2201 main.asc -c -o main.asc.o
+bisheng hello_world.aicpu.o main.asc.o -o demo
 ```
 
 上文我们通过一个入门示例介绍了使用bisheng命令行编译生成可执行文件的示例。除此之外，使用bisheng命令行也支持编译生成AI CPU算子的动态库与静态库，用户可在asc代码中通过内核调用符<<<...\>\>\>调用AI CPU算子的核函数，并在编译asc代码源文件生成可执行文件的时候，链接AI CPU动态库或者静态库，注意：若单独编译AI CPU算子代码生成动态库、静态库时，需要手动链接[表2](AI-Core算子编译基本用法.md#table201231542115513)。

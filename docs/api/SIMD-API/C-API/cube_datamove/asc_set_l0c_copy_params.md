@@ -8,7 +8,10 @@
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √    |
 
 ## 功能说明
-DataCopy（CO1->GM、CO1->A1）过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。
+
+头文件路径：`"c_api/cube_datamove/cube_datamove.h"`。
+
+DataCopy从L0C Buffer搬运到Global Memory或L1 Buffer过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。
 
 ## 函数原型
 

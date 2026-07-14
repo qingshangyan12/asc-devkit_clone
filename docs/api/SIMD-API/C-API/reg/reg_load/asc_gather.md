@@ -8,6 +8,8 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/reg_compute/reg_load.h"`。
+
 根据索引位置index将源操作数src按元素收集到目的操作数dst中。
 
 ![asc_gather](../../figures/asc_gather.png)
@@ -72,7 +74,7 @@
     | src | 输入 | 源操作数（矢量数据寄存器）。 |
     | index | 输入 | 数据索引（矢量数据寄存器）。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)。
+矢量数据寄存器和掩码寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 

@@ -2,9 +2,27 @@
 
 ## 产品支持情况
 
-| 产品 | 是否支持 |
-| :--- | :------: |
-| Ascend 950PR/Ascend 950DT | √ |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
 
 ## 功能说明
 
@@ -20,28 +38,26 @@ MakeMemPtr提供三种调用形式：
 
 ## 函数原型
 
-    - 指定物理位置和数据类型，根据原始地址构造：
+- 指定物理位置和数据类型，根据原始地址构造：
 
-    ```cpp
-    template <typename Hardware, typename DataType, typename Addr,
-        EnableMakePtrByTrait<Hardware, Addr> Enable>
-    __aicore__ inline constexpr auto MakeMemPtr(Addr addr)
-    ```
+  ```cpp
+  template <typename Hardware, typename DataType, typename Addr, EnableMakePtrByTrait<Hardware, Addr> Enable>
+  __aicore__ inline constexpr auto MakeMemPtr(Addr addr)
+  ``` 
 
-    - 指定物理位置，从已有迭代器构造：
+- 指定物理位置，从已有迭代器构造：
 
-    ```cpp
-    template <typename Hardware, typename Iterator,
-        EnableMakeHardwarePtr<Hardware, Iterator> Enable>
-    __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
-    ```
+  ```cpp
+  template <typename Hardware, typename Iterator, EnableMakeHardwarePtr<Hardware, Iterator> Enable>
+  __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
+  ```
 
-    - 从已有迭代器中自动推导物理位置：
+- 从已有迭代器中自动推导物理位置：
 
-    ```cpp
-    template <typename Iterator, EnableMakePtrByIter<Iterator> Enable>
-    __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
-    ```
+  ```cpp
+  template <typename Iterator, EnableMakePtrByIter<Iterator> Enable>
+  __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
+  ```
 
 ## 参数说明
 
@@ -66,14 +82,14 @@ MakeMemPtr提供三种调用形式：
 | :--- | :---: | :--- |
 | Hardware | 输入 | 物理存储位置类型。 |
 | DataType | 输入 | 数据类型。 |
-| Addr | 输入 | 原始地址类型。 |
+| Addr | 输入 | 偏移量数值的类型。 |
 | Iterator | 输入 | 迭代器类型或已有指针适配器类型。 |
 
 **表3** 参数说明
 
 | 参数名 | 类型 | 描述 |
 | :--- | :---: | :--- |
-| addr | 输入 | 原始地址或地址偏移量。 |
+| addr | 输入 | 地址偏移量，即相对于基地址的偏移大小。 |
 | iterator | 输入 | 已有的硬件地址迭代器或指针适配器对象。 |
 
 ## 返回值说明
@@ -81,7 +97,7 @@ MakeMemPtr提供三种调用形式：
 返回HardwareMemPtr<PtrPattern, Pointer>类型的指针适配器对象，其中：
 
 - PtrPattern表示指定或推导得到的物理位置；
-- Pointer表示对应地址空间下的指针类型，例如__gm__ float*、__cbuf__ half*等。
+- Pointer表示对应地址空间下的指针类型，例如__gm__ float*、\_\_cbuf_\_ half*等。
 
 ## 约束说明
 

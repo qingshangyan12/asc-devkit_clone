@@ -29,9 +29,9 @@
 
 本接口提供对输出矩阵的所有值采用同一系数进行量化或反量化的功能，即整个C矩阵对应一个量化参数，量化参数的shape为\[1\]。
 
-Matmul反量化场景：在Matmul计算时，左、右矩阵的输入为int8\_t或int4b\_t类型，输出为half类型；或者左、右矩阵的输入为int8\_t类型，输出为int8\_t类型。该场景下，输出C矩阵的数据从CO1搬出到Global Memory时，会执行反量化操作，将最终结果反量化为对应的half或int8\_t类型。
+Matmul反量化场景：在Matmul计算时，左、右矩阵的输入为int8\_t或int4b\_t类型，输出为half类型；或者左、右矩阵的输入为int8\_t类型，输出为int8\_t类型。该场景下，输出C矩阵的数据从L0C Buffer（CO1）搬出到Global Memory时，会执行反量化操作，将最终结果反量化为对应的half或int8\_t类型。
 
-Matmul量化场景：在Matmul计算时，左、右矩阵的输入为half或bfloat16\_t类型，输出为int8\_t类型。该场景下，输出C矩阵的数据从CO1搬出到Global Memory时，会执行量化操作，将最终结果量化为int8\_t类型。
+Matmul量化场景：在Matmul计算时，左、右矩阵的输入为half或bfloat16\_t类型，输出为int8\_t类型。该场景下，输出C矩阵的数据从L0C Buffer（CO1）搬出到Global Memory时，会执行量化操作，将最终结果量化为int8\_t类型。
 
 ## 函数原型
 
@@ -69,7 +69,7 @@ __aicore__ inline void SetQuantScalar(const uint64_t quantScalar)
 
 ## 约束说明
 
-需与[SetDequantType](../Matmul-Tiling侧接口/Matmul-Tiling类/SetDequantType.md)保持一致。
+需与[SetDequantType](../Matmul-Tiling类/SetDequantType.md)保持一致。
 
 本接口必须在[Iterate](Iterate.md)或者[IterateAll](IterateAll.md)前调用。
 

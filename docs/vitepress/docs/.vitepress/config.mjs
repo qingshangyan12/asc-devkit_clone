@@ -610,7 +610,7 @@ function balanceDivTags(html) {
 
           html = html.replace(
             /href="https:\/\/gitcode\.com\/cann\/asc-devkit\/blob\/master\/docs\/(api|guide)\/([^"]+)\.md(#[^"]*)?"/gi,
-            (_, type, path, hash) => `href="/${type}/${path}${hash || ''}"`
+            (_, type, path, hash) => `href="/${type}/${path}.html${hash || ''}"`
           )
 
           html = balanceDivTags(html)
@@ -646,7 +646,7 @@ function balanceDivTags(html) {
     code = code.replace(/href="\/\/pagefind/g, 'href="/pagefind')
     code = code.replace(/<body\b/, '<body data-pagefind-body')
     return code.replace(
-      /<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<[^>]+>|[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]+/g,
+      /<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<pre[\s\S]*?<\/pre>|<code[\s\S]*?<\/code>|<[^>]+>|[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]+/g,
       m => m.startsWith('<') ? m : m.replace(/(.)(?=.)/g, '$1\u200A')
     )
   },
@@ -692,6 +692,17 @@ function balanceDivTags(html) {
           },
         },
       }),
+    }, {
+      name: 'patch-vpsidebar-item-depth',
+      enforce: 'pre',
+      transform(code, id) {
+        if (!id.includes('VPSidebarItem') || !id.includes('vitepress')) return null
+        let result = code
+        result = result.replace('depth < 5', 'true')
+        result = result.replace('props.depth + 2 === 7', 'props.depth + 2 >= 7')
+        if (result === code) return null
+        return result
+      },
     }],
     vue: {
       template: {
@@ -728,7 +739,7 @@ function balanceDivTags(html) {
     },
 
     footer: {
-      message: '免责声明：本站内容由 <a href="https://gitcode.com/cann/asc-devkit/" target="_blank">asc-devkit</a> 仓 master 分支自动编译生成，属于持续开发版本，可能存在缺陷，仅供预览与参考。如需稳定及商用资料，请查阅官方 <a href="https://www.hiascend.com/zh/document" target="_blank">昇腾社区</a>。',	    
+      message: '免责声明：本站内容由 <a href="https://gitcode.com/cann/asc-devkit/" target="_blank">asc-devkit</a> 仓 master 分支自动编译生成，属于持续开发版本，可能存在缺陷，仅供预览与参考。如需稳定及商用资料，请查阅官方 <a href="https://www.hiascend.com/zh/document" target="_blank">昇腾社区</a>。',
       copyright: 'Copyright Huawei Technologies Co., Ltd.',
     },
   },

@@ -8,7 +8,7 @@
 <!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
 <!-- end id2 -->
-<!-- npu="910b" id3  -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
@@ -104,6 +104,7 @@ __simd_vf__ inline void MulAddDstVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, _
         mask = AscendC::Reg::UpdateMask<T>(count);
         AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
         AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);
+        AscendC::Reg::LoadAlign(dstReg, dstAddr + i * oneRepeatSize);
         AscendC::Reg::MulAddDst(dstReg, srcReg0, srcReg1, mask);
         AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
     }

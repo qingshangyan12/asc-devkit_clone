@@ -2,15 +2,27 @@
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
-| 产品 | 是否支持  |
-| :----------------------- | :------: |
-| <cann-filter npu-type="950"><term>Ascend 950PR/Ascend 950DT</term> | √</cann-filter> |
-| <cann-filter npu-type="A3"><term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> | x</cann-filter> |
-| <cann-filter npu-type="910b"><term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> | x</cann-filter> |
-| <cann-filter npu-type="310b"><term>Atlas 200I/500 A2 推理产品</term> | x</cann-filter> |
-| <cann-filter npu-type="310p"><term>Atlas 推理系列产品AI Core</term> | x</cann-filter> |
-| <cann-filter npu-type="310p"><term>Atlas 推理系列产品Vector Core</term> | x</cann-filter> |
-| <cann-filter npu-type="910"><term>Atlas 训练系列产品</term> | x</cann-filter> |
+<!-- npu="950" id8 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id8 -->
+<!-- npu="A3" id9 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id9 -->
+<!-- npu="910b" id10 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id10 -->
+<!-- npu="310b" id11 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id11 -->
+<!-- npu="310p" id12 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id12 -->
+<!-- npu="310p" id13 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id13 -->
+<!-- npu="910" id14 -->
+- Atlas 训练系列产品：不支持
+<!-- end id14 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -82,7 +94,7 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 
 ## 调用示例<a name="section1227835243314"></a>
 
-- SetLoopModePara使能loop mode，Normal模式
+- SetLoopModePara使能loop mode，Compact模式
 
     ```cpp
     // 场景4：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）。
@@ -97,7 +109,7 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
     AscendC::ResetLoopModePara(AscendC::DataCopyMVType::OUT_TO_UB);
     ```
 
-- SetLoopModePara使能loop mode，Compact模式
+- SetLoopModePara使能loop mode，Normal模式
 
     ```cpp
     // 场景5：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）。
@@ -139,7 +151,7 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
     AscendC::DataCopyExtParams copyParams{
         64,  // blockCount=64（第3维搬运64次）
         126,  // blockLen=126（第4维搬运126字节，padding到128）
-        0, 0, 0  // srcStride/dstStride=0
+        0, 0, 0  // srcStride=0, dstStride=0, rsv=0
     };
     AscendC::DataCopyPadExtParams<int8_t> padParams{true, 0, 0, 0};
 

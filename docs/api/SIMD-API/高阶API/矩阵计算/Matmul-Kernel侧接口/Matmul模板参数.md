@@ -39,7 +39,7 @@
 
 <a id="matmul-callback-func"></a>
 
--   MatmulCallBackFunc回调函数信息（可选），用于配置左右矩阵从GM拷贝到A1/B1、计算结果从CO1拷贝到GM的自定义函数。当前支持如下产品型号：
+-   MatmulCallBackFunc回调函数信息（可选），用于配置A矩阵从GM拷贝到L1 Buffer（A1）、B矩阵从GM拷贝到L1 Buffer（B1）、计算结果从L0C Buffer（CO1）拷贝到GM的自定义函数。当前支持如下产品型号：
 
     <!-- npu="950" id12 -->
     Ascend 950PR/Ascend 950DT
@@ -77,9 +77,9 @@
 
 ## 函数原型
 
+Matmul模板参数如下：
 ```
 template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE = C_TYPE, const auto& MM_CFG = CFG_NORM, class MM_CB = MatmulCallBackFunc<nullptr, nullptr, nullptr>, MATMUL_POLICY_DEFAULT_OF(MatmulPolicy)>
-using Matmul = AscendC::MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>;
 ```
 
 -   A\_TYPE、B\_TYPE、C\_TYPE类型信息通过[MatmulType](Matmul使用说明.md#table1188045714378)来定义。
@@ -112,7 +112,7 @@ using Matmul = AscendC::MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM
 <a name="table7939847143412"></a>
 | 参数 | 数据类型 | 说明 |
 | --- | --- | --- |
-| M, N, Ka, Kb,<br><br>singleCoreM, singleCoreN, singleCoreK,<br><br>baseM, baseN, baseK,<br><br>depthA1, depthB1,<br><br>stepM， stepN，stepKa，stepKb,<br><br>isBias,<br><br>transLength,<br><br>iterateOrder,<br><br>dbL0A, dbL0B,<br><br>dbL0C,<br><br>shareMode,<br><br>shareL1Size,<br><br>shareL0CSize,<br><br>shareUbSize,<br><br>batchM,<br><br>batchN,<br><br>singleBatchM,<br><br>singleBatchN,<br><br>mxTypePara | int32_t | 与[TCubeTiling](../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md)结构体中各同名参数含义一致。本结构体中的参数是常量化后的常数值。 |
+| M, N, Ka, Kb,<br><br>singleCoreM, singleCoreN, singleCoreK,<br><br>baseM, baseN, baseK,<br><br>depthA1, depthB1,<br><br>stepM， stepN，stepKa，stepKb,<br><br>isBias,<br><br>transLength,<br><br>iterateOrder,<br><br>dbL0A, dbL0B,<br><br>dbL0C,<br><br>shareMode,<br><br>shareL1Size,<br><br>shareL0CSize,<br><br>shareUbSize,<br><br>batchM,<br><br>batchN,<br><br>singleBatchM,<br><br>singleBatchN,<br><br>mxTypePara | int32_t | 与[TCubeTiling](../Matmul-Tiling类/TCubeTiling结构体.md)结构体中各同名参数含义一致。本结构体中的参数是常量化后的常数值。 |
 | cfg | [MatmulConfig](MatmulConfig.md#table1761013213153) | Matmul模板的参数配置。 |
 
 ## 返回值说明

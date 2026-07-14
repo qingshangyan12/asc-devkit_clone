@@ -7,23 +7,26 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
- 
 
-#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)  
-#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
-#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
-#endif     
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "cache_ctrl.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#endif
 
 #ifndef INCLUDE_C_API_CACHE_CTRL_CACHE_CTRL_H
 #define INCLUDE_C_API_CACHE_CTRL_CACHE_CTRL_H
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
-#include "../../../impl/c_api/instr_impl/npu_arch_2201/cache_ctrl_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/cache_ctrl_impl.h"
 
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
-#include "../../../impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl.h"
 
 #endif
 
@@ -55,7 +58,7 @@ __aicore__ inline void asc_dci();
 
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
-#endif    
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#endif

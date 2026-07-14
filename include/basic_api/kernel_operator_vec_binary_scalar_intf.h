@@ -12,6 +12,11 @@
  * \file kernel_operator_vec_binary_scalar_intf.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "kernel_operator_vec_binary_scalar_intf.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_SCALAR_INTF_H__
@@ -681,12 +686,12 @@ __aicore__ inline void Ors(const U& dst, const S& src0, const V& src1, const int
  * @param [in] src1 input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
-template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, 
+template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType,
     const BinaryConfig &config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
 __aicore__ inline void MulsCast(const T2 &dst, const T3 &src0, const T4 &src1, const uint32_t count);
 
 // FusedMulsCast has been updated, please use MulsCast instead.
-template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, 
+template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType,
     const BinaryConfig &config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
 __aicore__ inline void FusedMulsCast(const T2 &dst, const T3 &src0, const T4 &src1, const uint32_t count);
 

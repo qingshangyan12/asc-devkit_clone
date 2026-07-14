@@ -13,6 +13,7 @@
 #include <vector>
 #define private public
 #include "kernel_operator.h"
+#include "hcomm/hcomm.h"
 
 using namespace AscendC;
 
@@ -276,4 +277,100 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_InitLocalTensor)
     EXPECT_EQ(hcomm.Commit(channel.GetHandle()), AscendC::HCOMM_SUCCESS);
     channel.CompleteCurrentSq();
     EXPECT_EQ(hcomm.Drain(channel.GetHandle()), AscendC::HCOMM_SUCCESS);
+}
+
+// Dump helpers: nullptr early-return guards.
+// These guards are never reached through the normal send path, so exercise them directly.
+TEST_F(HcommUrmaTestSuite, Aiv_Urma_DumpHelpers_Nullptr)
+{
+    AscendC::HcommUrmaDumpWqeCtx(nullptr, sizeof(uint8_t));
+    AscendC::HcommUrmaDumpCqeCtx(nullptr);
+    AscendC::HcommUrmaDumpSgeCtx(nullptr, nullptr, sizeof(uint8_t));
+    AscendC::HcommUrmaDumpAmoCtx(nullptr, sizeof(uint32_t));
+
+    // sqeCtx non-null but sgeAddr null still hits the guard
+    std::vector<uint8_t> sqeBuf(sizeof(AscendC::HcommUrmaSqeCtx), 0);
+    auto* sqe = reinterpret_cast<__ubuf__ AscendC::HcommUrmaSqeCtx*>(sqeBuf.data());
+    AscendC::HcommUrmaDumpSgeCtx(sqe, nullptr, sizeof(uint8_t));
+}
+
+// Dump helpers: full function bodies.
+// HcommUrmaDumpCqeCtx is otherwise unreachable in UT_TEST mode because PollCq's polling
+// loop (the only caller) is compiled out under UT_TEST.
+TEST_F(HcommUrmaTestSuite, Aiv_Urma_DumpHelpers_Valid)
+{
+    // CQE dump: full body over a zero-initialized valid CQE
+    AscendC::HcommUrmaJfcCqeCtx cqe = {};
+    AscendC::HcommUrmaDumpCqeCtx(reinterpret_cast<__ubuf__ AscendC::HcommUrmaJfcCqeCtx*>(&cqe));
+
+    // Notify dump: full body over a zero-initialized valid notify ctx
+    AscendC::HcommUrmaNotifyCtx notify = {};
+    AscendC::HcommUrmaDumpNotifyCtx(reinterpret_cast<__ubuf__ AscendC::HcommUrmaNotifyCtx*>(&notify));
+
+    // SGE dump: drive the loop body with sgeNum > 0 and a matching SGE array
+    constexpr uint32_t sgeNum = 2;
+    std::vector<uint8_t> buf(sizeof(AscendC::HcommUrmaSqeCtx) + sgeNum * sizeof(AscendC::HcommUrmaSgeCtx), 0);
+    auto* sqe = reinterpret_cast<__ubuf__ AscendC::HcommUrmaSqeCtx*>(buf.data());
+    sqe->sgeNum = sgeNum;
+    auto* sgeAddr = reinterpret_cast<__ubuf__ uint8_t*>(buf.data() + sizeof(AscendC::HcommUrmaSqeCtx));
+    AscendC::HcommUrmaDumpSgeCtx(sqe, sgeAddr, sizeof(uint8_t));
+
+    // WQE dump with WRITE_WITH_NOTIFY opcode: covers the notify branch inside HcommUrmaDumpWqeCtx
+    constexpr uint32_t wqeBufSize =
+        sizeof(AscendC::HcommUrmaSqeCtx) + sizeof(AscendC::HcommUrmaNotifyCtx) + sizeof(AscendC::HcommUrmaSgeCtx);
+    std::vector<uint8_t> wqeBuf(wqeBufSize, 0);
+    auto* wqe = reinterpret_cast<__ubuf__ AscendC::HcommUrmaSqeCtx*>(wqeBuf.data());
+    wqe->opcode = static_cast<uint32_t>(AscendC::HcommUrmaOpCode::WRITE_WITH_NOTIFY);
+    wqe->sgeNum = 1;
+    AscendC::HcommUrmaDumpWqeCtx(wqe, sizeof(uint8_t));
+}
+
+// Dump AMO ctx: FAA opcode path
+TEST_F(HcommUrmaTestSuite, Aiv_Urma_DumpAmoCtx_FAA)
+{
+    // FAA uses atomicLen to determine data size (uint32_t or uint64_t)
+    // amoDataAddr = sqeCtx + sizeof(HcommUrmaSqeCtx) + sizeof(HcommUrmaSgeCtx)
+    constexpr uint32_t amoBufSize =
+        sizeof(AscendC::HcommUrmaSqeCtx) + sizeof(AscendC::HcommUrmaSgeCtx) + sizeof(uint64_t);
+    std::vector<uint8_t> buf(amoBufSize, 0);
+    auto* sqe = reinterpret_cast<__ubuf__ AscendC::HcommUrmaSqeCtx*>(buf.data());
+    sqe->opcode = static_cast<uint32_t>(AscendC::HcommUrmaOpCode::FAA);
+
+    // Test uint32_t atomicLen
+    uint32_t* amoData32 =
+        reinterpret_cast<uint32_t*>(buf.data() + sizeof(AscendC::HcommUrmaSqeCtx) + sizeof(AscendC::HcommUrmaSgeCtx));
+    *amoData32 = 0x12345678;
+    AscendC::HcommUrmaDumpAmoCtx(sqe, sizeof(uint32_t));
+
+    // Test uint64_t atomicLen
+    uint64_t* amoData64 =
+        reinterpret_cast<uint64_t*>(buf.data() + sizeof(AscendC::HcommUrmaSqeCtx) + sizeof(AscendC::HcommUrmaSgeCtx));
+    *amoData64 = 0x12345678ABCDEF00ULL;
+    AscendC::HcommUrmaDumpAmoCtx(sqe, sizeof(uint64_t));
+}
+
+// Dump AMO ctx: CAS opcode path
+TEST_F(HcommUrmaTestSuite, Aiv_Urma_DumpAmoCtx_CAS)
+{
+    // CAS reads two values: swapValue and condValue
+    // amoDataAddr = sqeCtx + sizeof(HcommUrmaSqeCtx) + sizeof(HcommUrmaSgeCtx)
+    constexpr uint32_t amoBufSize =
+        sizeof(AscendC::HcommUrmaSqeCtx) + sizeof(AscendC::HcommUrmaSgeCtx) + 2 * sizeof(uint64_t);
+    std::vector<uint8_t> buf(amoBufSize, 0);
+    auto* sqe = reinterpret_cast<__ubuf__ AscendC::HcommUrmaSqeCtx*>(buf.data());
+    sqe->opcode = static_cast<uint32_t>(AscendC::HcommUrmaOpCode::CAS);
+
+    // Test uint32_t atomicLen: swapValue at offset 0, condValue at offset atomicLen
+    uint32_t* amoData32 =
+        reinterpret_cast<uint32_t*>(buf.data() + sizeof(AscendC::HcommUrmaSqeCtx) + sizeof(AscendC::HcommUrmaSgeCtx));
+    amoData32[0] = 0xDEADBEEF; // swapValue
+    amoData32[1] = 0xCAFEBABE; // condValue
+    AscendC::HcommUrmaDumpAmoCtx(sqe, sizeof(uint32_t));
+
+    // Test uint64_t atomicLen: swapValue at offset 0, condValue at offset atomicLen
+    uint64_t* amoData64 =
+        reinterpret_cast<uint64_t*>(buf.data() + sizeof(AscendC::HcommUrmaSqeCtx) + sizeof(AscendC::HcommUrmaSgeCtx));
+    amoData64[0] = 0xAAAABBBBCCCCDDDDEULL; // swapValue
+    amoData64[1] = 0x1111222233334444FULL; // condValue
+    AscendC::HcommUrmaDumpAmoCtx(sqe, sizeof(uint64_t));
 }

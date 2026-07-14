@@ -30,7 +30,7 @@
 
 为提升对不规则内存地址的处理能力，Reg矢量计算支持在数据搬运过程中对非32字节对齐的地址进行访问，降低非对齐访问带来的性能开销。StoreUnAlign能够实现数据从[RegTensor](../寄存器数据类型/RegTensor.md)连续搬运至非对齐Unified Buffer（UB），利用非对齐寄存器UnalignRegForStore作为临时缓存区，暂存跨对齐边界的数据，从而实现高效的连续非对齐数据传输。
 
-非对齐搬运接口有：PostUpdate扩展搬运接口、使用[AddrReg](../寄存器数据类型/AddrReg.md)寄存器存储偏移量接口、使用AR寄存器存储偏移量接口。
+非对齐搬运接口有：PostUpdate扩展搬运接口、使用[AddrReg](../寄存器数据类型/AddrReg.md)寄存器存储偏移量接口、使用[AR寄存器](../比较与选择/Squeeze.md)存储偏移量接口。
 
 RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体支持情况如下：
 
@@ -43,7 +43,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-非对齐寄存器UnalignRegForStore作为临时缓存区，用于暂存跨对齐边界的数据，从而实现高效的连续非对齐数据传输。在写非对齐地址前，应该先调用StoreUnAlign，再调用UnalignRegForStore进行后处理，处理非32字节对齐的尾块数据。
+非对齐寄存器UnalignRegForStore作为临时缓存区，用于暂存跨对齐边界的数据，从而实现高效的连续非对齐数据传输。在写非对齐地址前，应该先调用StoreUnAlign，再调用StoreUnAlignPost进行后处理，处理非32字节对齐的尾块数据。
 
 - PostUpdate扩展搬运接口
 
@@ -65,7 +65,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
     __simd_callee__ inline void StoreUnAlignPost(__ubuf__ T*& dstAddr, UnalignRegForStore& ureg, AddrReg& areg)
     ```
 
-- 使用AR寄存器存储偏移量接口：配合Squeeze使用，Squeeze会存储有效元素的总字节数到AR特殊寄存器，使用此接口会将AR寄存器中有效元素个数作为存储偏移量。
+- 使用AR寄存器存储偏移量接口：配合[Squeeze](../比较与选择/Squeeze.md)使用，Squeeze会存储有效元素的总字节数到AR特殊寄存器，使用此接口会将AR寄存器中有效元素个数作为存储偏移量。
 
     ```cpp
     template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE, typename U>
@@ -92,8 +92,8 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 | dstAddr | 输入/输出 | 目的操作数，UB起始地址，不需要32字节对齐。 |
 | srcReg | 输入 | 源操作数，类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
 | ureg | 输入/输出 | 非对齐寄存器，UnalignRegForStore类型，用于存储非32字节对齐的数据，寄存器大小为32字节。 |
-| postUpdateStride | 输入 | 地址更新步长，uint32_t类型，单位：元素个数。根据postMode的取值有两种情况：<br>&bull; POST_MODE_NORMAL：不支持。<br>&bull; POST_MODE_UPDATE：实际搬运UB起始地址为srcAddr，搬运后执行地址更新srcAddr += postUpdateStride。 |
-| areg | 输入 | 地址偏移寄存器，AddrReg类型，需要在搬运前调用CreateAddrReg设定地址偏移量，实际搬运UB地址为dstAddr+ 寄存器中存储的偏移量。 |
+| postUpdateStride | 输入 | 地址更新步长，uint32_t类型，单位：元素个数。根据postMode的取值有两种情况：<br>&bull; POST_MODE_NORMAL：不支持。<br>&bull; POST_MODE_UPDATE：实际搬运UB起始地址为dstAddr，搬运后执行地址更新dstAddr += postUpdateStride。 |
+| areg | 输入 | 地址偏移寄存器，AddrReg类型，需要在搬运前调用CreateAddrReg设定地址偏移量，实际搬运UB地址为dstAddr + 寄存器中存储的偏移量。 |
 
 ## 数据类型
 
@@ -170,26 +170,26 @@ PostUpdate扩展搬运接口POST\_MODE\_UPDATE模式示例片段如下：
 template <typename T>
 __simd_vf__ inline void LoadUnAlignVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t postUpdateStride, uint16_t repeatTimes)
 {
-    AscendC::Reg::RegTensor<T> srcReg;
-    AscendC::Reg::UnalignRegForLoad ureg0;
-    AscendC::Reg::UnalignRegForStore ureg1;
+    AscendC::Reg::RegTensor<T> dstReg;
+    AscendC::Reg::UnalignRegForLoad ureg1;
+    AscendC::Reg::UnalignRegForStore ureg2;
     // 非对齐搬入初始化，只需在迭代开始前调用一次。
-    AscendC::Reg::LoadUnAlignPre(ureg0, srcAddr);
+    AscendC::Reg::LoadUnAlignPre(ureg1, srcAddr);
     for (uint16_t i = 0; i < repeatTimes; ++i) {
-        AscendC::Reg::LoadUnAlign(srcReg, ureg0, srcAddr, postUpdateStride);
-        AscendC::Reg::StoreUnAlign(dstAddr, srcReg, ureg1, postUpdateStride);
+        AscendC::Reg::LoadUnAlign(dstReg, ureg1, srcAddr, postUpdateStride);
+        AscendC::Reg::StoreUnAlign(dstAddr, dstReg, ureg2, postUpdateStride);
     }
     // 非对齐搬出后处理，只需在迭代结束后调用一次。
-    AscendC::Reg::StoreUnAlignPost(dstAddr, ureg1, 0);
+    AscendC::Reg::StoreUnAlignPost(dstAddr, ureg2, 0);
 }
 ```
 
 具体的搬运步骤如下：
 
 1.  非对齐搬入初始化：更新ureg1 = [1, 2, 3, 4]。
-2.  非对齐搬入：tmpReg =[5, 6, 7, ... , 68]，tmpReg部分数据和ureg1数据写入dstReg = [1, 2, 3, ... , 64]，更新ureg1 = [61, 62, 63, ... , 68]。
+2.  非对齐搬入：tmpReg = [5, 6, 7, ... , 68]，tmpReg部分数据和ureg1数据写入dstReg = [1, 2, 3, ... , 64]，更新ureg1 = [61, 62, 63, ... , 68]。
 3.  非对齐搬出：dstReg部分数据[1, 2, 3, ... , 60]写入UB地址48 ~ 288，更新ureg2 = [61, 62, 63, 64]。
-4.  非对齐搬入：tmpReg = [69, 70, 71, ... ,128]，tmpReg数据和ureg1部分数据写入dstReg = [65, 66 67, ... , 128]。
+4.  非对齐搬入：tmpReg = [69, 70, 71, ... ,128]，tmpReg数据和ureg1部分数据写入dstReg = [65, 66, 67, ... , 128]。
 5.  非对齐搬出：ureg2数据[61, 62, 63, 64]和dstReg部分数据[65, 66, 67, ... ,124]写入UB地址288 ~ 544，更新ureg2 = [125, 126, 127, 128]。
 6.  非对齐搬出后处理：将ureg2中缓存的数据[125, 126, 127, 128]写入UB地址544 ~ 560。
 
@@ -221,7 +221,7 @@ __simd_vf__ inline void LoadUnAlignVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, 
         AscendC::Reg::UnalignRegForLoad ureg0;
         AscendC::Reg::UnalignRegForStore ureg1;
         AscendC::Reg::AddrReg aReg;
-        for (uint16_t i = 0; i < (uint16_t)repeatTimes; ++i) {
+        for (uint16_t i = 0; i < repeatTimes; ++i) {
             aReg = AscendC::Reg::CreateAddrReg<T>(i, oneRepeatSize);
             AscendC::Reg::LoadUnAlignPre(ureg0, srcAddr, aReg);
             AscendC::Reg::LoadUnAlign(srcReg, ureg0, srcAddr, aReg, 0);

@@ -2,17 +2,33 @@
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
-| 产品 | 不支持enableSmallC0模式的原型 | 支持enableSmallC0模式的原型 |
-| :--- | :---: | :---: |
-|<cann-filter npu-type="950"> Ascend 950PR/Ascend 950DT | √ | √ </cann-filter>|
-|<cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ | x </cann-filter>|
-|<cann-filter npu-type="910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ | x </cann-filter>|
-|<cann-filter npu-type="310b"> Atlas 200I/500 A2 推理产品 | x | x </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品AI Core | √ | x </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | x | x </cann-filter>|
-|<cann-filter npu-type="910"> Atlas 训练系列产品 | x | x </cann-filter>|
-|<cann-filter npu-type="x90"> Kirin X90 | x | x </cann-filter>|
-|<cann-filter npu-type="9030"> Kirin 9030 | x | x </cann-filter>|
+<!-- npu="950" id16 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id16 -->
+<!-- npu="A3" id17 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id17 -->
+<!-- npu="910b" id18 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id18 -->
+<!-- npu="310b" id19 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id19 -->
+<!-- npu="310p" id20 -->
+- Atlas 推理系列产品AI Core：支持
+<!-- end id20 -->
+<!-- npu="310p" id21 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id21 -->
+<!-- npu="910" id22 -->
+- Atlas 训练系列产品：不支持
+<!-- end id22 -->
+<!-- npu="x90" id23 -->
+- Kirin X90：不支持
+<!-- end id23 -->
+<!-- npu="9030" id24 -->
+- Kirin 9030：不支持
+<!-- end id24 -->
 
 ## 功能说明<a name="section12840195813362"></a>
 
@@ -34,8 +50,7 @@
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
     ```
 
-<cann-filter npu-type="950">
-
+<!-- npu="950" id1 -->
 - 支持enableSmallC0模式（仅Ascend 950PR/Ascend 950DT支持）
 
     ```cpp
@@ -43,8 +58,7 @@
     template <typename T, bool enableSmallC0 = false>
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
     ```
-
-</cann-filter>
+<!-- end id1 -->
 
 ## 参数说明<a name="section1251613311396"></a>
 
@@ -61,7 +75,7 @@
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为[LocalTensor](../../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md)。 |
 | src | 输入 | 源操作数，类型为[GlobalTensor](../../../数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor简介.md)。 |
-| intriParams | 输入 | 搬运参数，类型为Nd2NzParam，具体参数请参考[表3](#table_nd2nz_3)。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
+| intriParams | 输入 | 搬运参数，类型为Nd2NzParam，具体参数请参考[表3](#table_nd2nz_3)。<br>具体定义请参考`${INSTALL_DIR}/asc/include/basic_api/interface/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
 
 **表3**  Nd2NzParams结构体参数定义<a name="table_nd2nz_3"></a>
 
@@ -97,29 +111,21 @@ enableSmallC0开启模式下的ND2NZ转换示意图如下：
 
 ## 数据类型<a name="section4219135304818"></a>
 
-<cann-filter npu-type="950">
-
+<!-- npu="950" id2 -->
 - Ascend 950PR/Ascend 950DT，支持的数据类型为：bool、int8_t、uint8_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32。
+<!-- end id2 -->
 
-</cann-filter>
-
-<cann-filter npu-type="A3">
-
+<!-- npu="A3" id3 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+<!-- end id3 -->
 
-</cann-filter>
-
-<cann-filter npu-type="910b">
-
+<!-- npu="910b" id4 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+<!-- end id4 -->
 
-</cann-filter>
-
-<cann-filter npu-type="310p">
-
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
-
-</cann-filter>
+<!-- end id5 -->
 
 ## 返回值说明<a name="section446456163012"></a>
 
@@ -143,26 +149,24 @@ enableSmallC0开启模式下的ND2NZ转换示意图如下：
     | dstNzNStride | [1, 16384] |
     | dstNzMatrixStride | [1, 65535] |
 
-<cann-filter npu-type="310p">
-
+<!-- npu="310p" id6 -->
 - 针对Atlas 推理系列产品AI Core，需要预留8KB的Unified Buffer空间，作为接口的临时数据存放区。
-
-</cann-filter>
+<!-- end id6 -->
 
 ## 调用示例<a name="section10309141400"></a>
 
 intriParams参数解析请参考[图1](#fig128961542184620)。
 
 ```cpp
-// srcLocal为half类型的L1 Buffer空间上的LocalTensor，srcGlobal为half类型的GlobalTensor。
+// dstLocal为half类型的Unified Buffer上的LocalTensor，srcGlobal为half类型的GlobalTensor。
 AscendC::Nd2NzParams intriParams{1, 32, 32, 0, 32, 32, 1, 0};
 // Global Memory -> Local Memory
-AscendC::DataCopy(srcLocal, srcGlobal, intriParams);
+AscendC::DataCopy(dstLocal, srcGlobal, intriParams);
 ```
 
 结果示例：
 
 ```text
 输入数据(srcGlobal): [1 2 3 ... 1024]
-输出数据(dstGlobal):[1 2 ... 15 16 33 34 ... 47 48 65 66 ... 79 80 97 98 ... 111 112 ... 1009 1010... 1023 1024]
+输出数据(dstLocal):[1 2 ... 15 16 33 34 ... 47 48 65 66 ... 79 80 97 98 ... 111 112 ... 1009 1010... 1023 1024]
 ```

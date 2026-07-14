@@ -8,6 +8,8 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/reg_compute/reg_store.h"`。
+
 reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。
 
 该接口使用uint32_t作为存储偏移量，不改变源操作数在UB上的地址，每次循环的调用都需要用户手动更新目的操作数在UB上的地址。
@@ -43,7 +45,7 @@ __simd_callee__ inline void asc_storeunalign(__ubuf__ int4b_t* dst, vector_store
 | src1 | 输入 | 源操作数（矢量数据寄存器）。 |
 | count | 输入 | 存储搬运的个数。 |
 
-矢量数据寄存器和非对齐寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)。
+矢量数据寄存器和非对齐寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 
@@ -56,7 +58,7 @@ PIPE_V
 ## 约束说明
 
 - 该接口中的dst不需要32B对齐。
-- 调用该接口之后，需要调用[asc_storeunalign_post](./asc_storeunalign_post.md)处理非对齐搬出的尾块。
+- 调用该接口之后，需要调用[asc_storeunalign_post](asc_storeunalign_post.md)处理非对齐搬出的尾块。
 
 ## 调用示例
 

@@ -26,7 +26,7 @@
 
 ## 功能说明<a name="section11971757181915"></a>
 
-头文件路径为：`"basic\_api/kernel\_operator\_sys\_var\_intf.h"`。
+头文件路径为：`"basic_api/kernel_operator_sys_var_intf.h"`。
 
 获取指定特殊寄存器的值。当前支持[表SpecialPurposeReg模板参数说明](#table37531617424)。
 
@@ -61,7 +61,7 @@ __aicore__ inline int64_t GetSpr()
 
 ## 约束说明<a name="section162221734202016"></a>
 
-本接口只能在VF函数外调用，命名空间为AscendC::Reg，函数标记符为\_\_aicore\_\_。
+本接口只能在VF函数外调用，命名空间为AscendC，函数标记符为\_\_aicore\_\_。
 
 ## 调用示例<a name="section849174212202"></a>
 
@@ -69,13 +69,13 @@ __aicore__ inline int64_t GetSpr()
 
 ```cpp
 template <typename T>
-__simd_vf__ inline void SqueezeVF(ubuf T* xAddr, ubuf T* yAddr, uint32_t repeatTimes, uint32_t oneRepeatSize)
+__simd_vf__ inline void SqueezeVF(__ubuf__ T* xAddr, __ubuf__ T* yAddr, uint32_t repeatTimes, uint32_t oneRepeatSize)
 {
     AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::M4>();
-    AscendC::Reg::RegTensor xReg;
-    AscendC::Reg::RegTensor yReg;
+    AscendC::Reg::RegTensor<T> xReg;
+    AscendC::Reg::RegTensor<T> yReg;
     AscendC::Reg::UnalignRegForStore ureg;
-    AscendC::Reg::ClearSprAscendC::SpecialPurposeReg::AR();
+    AscendC::Reg::ClearSpr<AscendC::SpecialPurposeReg::AR>();
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         AscendC::Reg::LoadAlign<T, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(xReg, xAddr, oneRepeatSize);
         AscendC::Reg::Squeeze<T, AscendC::Reg::GatherMaskMode::STORE_REG>(yReg, xReg, mask);
@@ -84,11 +84,11 @@ __simd_vf__ inline void SqueezeVF(ubuf T* xAddr, ubuf T* yAddr, uint32_t repeatT
     AscendC::Reg::StoreUnAlignPost(yAddr, ureg);
 }
 
-aicore inline void Process()
+__aicore__ inline void Process()
 {
-    AscendC::LocalMemAllocatorAscendC::Hardware::UB ubAllocator;
-    AscendC::LocalTensor xLocal = ubAllocator.Alloc<float, 256>();
-    AscendC::LocalTensor yLocal = ubAllocator.Alloc<float, 64>();
+    AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
+    AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, 256>();
+    AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, 64>();
 
     AscendC::DataCopy(xLocal, xGm, 256);
     AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
@@ -100,10 +100,14 @@ aicore inline void Process()
     uint16_t repeatTimes = DivCeil(256, oneRepeatSize);
 
     asc_vf_call<SqueezeVF<float>>(xAddr, yAddr, repeatTimes, oneRepeatSize);
+    AscendC::SetFlag<AscendC::HardEvent::V_S>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::V_S>(EVENT_ID0);
     int64_t arNum = AscendC::GetSpr<AscendC::SpecialPurposeReg::AR>();
+    // 可通过printf打印
+    AscendC::printf("arNum的值为:%lld\n", arNum);
 
-    AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
-    AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+    AscendC::SetFlag<AscendC::HardEvent::S_MTE3>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::S_MTE3>(EVENT_ID0);
     AscendC::DataCopy(yGm, yLocal, 64);
 }
 ```
@@ -113,5 +117,5 @@ aicore inline void Process()
 ```cpp
 输入256个float的数据(xLocal): [1.0 1.0 1.0 ... ] // 数据为全1.0的数
 输入64个float的数据(yLocal): [1.0 1.0 1.0 ... ] // 数据为全1.0的数
-arNum的值为256
+arNum的值为:256
 ```

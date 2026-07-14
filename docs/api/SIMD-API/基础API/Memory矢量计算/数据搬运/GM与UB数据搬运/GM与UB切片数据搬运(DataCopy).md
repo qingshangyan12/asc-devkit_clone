@@ -2,15 +2,27 @@
 
 ## 产品支持情况<a name="zh-cn_topic_0000002565968945_section796754519912"></a>
 
-| 产品 | 是否支持  |
-| :----------------------- | :------: |
-|<cann-filter npu-type="950"> Ascend 950PR/Ascend 950DT | √ </cann-filter>|
-|<cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter>|
-|<cann-filter npu-type="910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter>|
-|<cann-filter npu-type="310b"> Atlas 200I/500 A2 推理产品 | x </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品AI Core | √ </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | x </cann-filter>|
-|<cann-filter npu-type="910"> Atlas 训练系列产品 | x </cann-filter>|
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
 
 ## 功能说明<a name="zh-cn_topic_0000002565968945_section106841136114319"></a>
 
@@ -24,7 +36,9 @@
     - GM -> VECIN
 - Unified Buffer -> Global Memory
     - VECOUT -> GM
-    - <cann-filter npu-type="310p">CO2 -> GM（仅Atlas 推理系列产品AI Core支持）</cann-filter>
+    <!-- npu="310p" id8 -->
+    - CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
+    <!-- end id8 -->
 
 ## 函数原型<a name="zh-cn_topic_0000002565968945_section82039854412"></a>
 
@@ -60,18 +74,18 @@
 | dst | 输出 | 目的操作数。<br>&bull;类型为[LocalTensor](../../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md)时，存储位置为Unified Buffer，目的地址需要32字节对齐。<br>&bull;类型为[GlobalTensor](../../../数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor简介.md)时，存储位置为Global Memory，目的地址需要1字节对齐。 |
 | src | 输入 | 源操作数。<br>&bull;类型为GlobalTensor时，存储位置为Global Memory，源地址需要1字节对齐。<br>&bull;类型为LocalTensor时，存储位置为Unified Buffer，源地址需要32字节对齐。 |
 | dstSliceInfo | 输入 | 目的操作数切片信息，类型为SliceInfo。通过该参数可以配置切片的起始和终止元素个数、间隔、长度等信息。<br>SliceInfo参数说明请参考[表3](#table_slice_3)。 |
-| srcSliceInfo | 输入 | 源操作数切片信息，类型为SliceInfo。通过该参数可以配置切片的起始和终止元素个数、间隔、长度等信息。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。<br>SliceInfo参数说明请参考[表3](#table_slice_3)。 |
+| srcSliceInfo | 输入 | 源操作数切片信息，类型为SliceInfo。通过该参数可以配置切片的起始和终止元素个数、间隔、长度等信息。<br>具体定义请参考`${INSTALL_DIR}/asc/include/basic_api/interface/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。<br>SliceInfo参数说明请参考[表3](#table_slice_3)。 |
 | dimValue | 输入 | 操作数维度信息，默认值为1。 |
 
 **表3**  SliceInfo结构体参数定义<a name="table_slice_3"></a>
 
 | 参数名 | 描述 |
 | :--- | :--- |
-| startIndex | 切片的起始元素位置，数据类型为uint16_t，单位是元素个数。 |
-| endIndex | 切片的终止元素位置，数据类型为uint16_t，单位是元素个数。 |
-| stride | 切片的间隔元素个数，数据类型为uint16_t。 |
-| burstLen | 横向切片，每一片数据的长度，仅在dimValue = 1时生效，超出1维的情况下，必须配置为1，不支持配置成其他值。数据类型为uint16_t，单位：datablock（32B）。<br>例如，srcSliceInfo的List为 {{16, 70, 7, 3, 87},  {0, 2, 1, 1, 3}}，{16, 70, 7, 3, 87}表示第一维的切片信息，burstLen设置为3，表示一个切片数据段大小为3个datablock；{0, 2, 1, 1, 3}为第二维的切片信息，burstLen仅能设置为1。 |
-| shapeValue | 当前维度的原始长度。数据类型为uint16_t，单位为元素个数。 |
+| startIndex | 切片的起始元素位置，数据类型为uint32_t，单位是元素个数。 |
+| endIndex | 切片的终止元素位置，数据类型为uint32_t，单位是元素个数。 |
+| stride | 切片的间隔元素个数，数据类型为uint32_t。 |
+| burstLen | 横向切片，每一片数据的长度，仅在dimValue = 1时生效，超出1维的情况下，必须配置为1，不支持配置成其他值。数据类型为uint32_t，单位：datablock（32B）。<br>例如，srcSliceInfo的List为 {{16, 70, 7, 3, 87},  {0, 2, 1, 1, 3}}，{16, 70, 7, 3, 87}表示第一维的切片信息，burstLen设置为3，表示一个切片数据段大小为3个datablock；{0, 2, 1, 1, 3}为第二维的切片信息，burstLen仅能设置为1。 |
+| shapeValue | 当前维度的原始长度。数据类型为uint32_t，单位为元素个数。 |
 
 如[图1](#fig1196816115710)所示，以float数据类型为例，切片搬运接口能从shape为3\*87的源操作中，选取四个不连续的横向切片搬运到目的操作数中，下面结合图示对SliceInfo结构体参数进行解析：
 
@@ -133,29 +147,29 @@
 
 源操作数和目的操作数支持的数据类型保持一致，Global Memory -> Unified Buffer和Unified Buffer -> Global Memory两个数据通路的数据类型支持情况相同，具体如下：
 
-<cann-filter npu-type="950">
+<!-- npu="950" id9 -->
 
 - Ascend 950PR/Ascend 950DT：bool、int8_t、uint8_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、double、complex64。
 
-</cann-filter>
+<!-- end id9 -->
 
-<cann-filter npu-type="A3">
+<!-- npu="A3" id10 -->
 
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
 
-</cann-filter>
+<!-- end id10 -->
 
-<cann-filter npu-type="910b">
+<!-- npu="910b" id11 -->
 
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
 
-</cann-filter>
+<!-- end id11 -->
 
-<cann-filter npu-type="310p">
+<!-- npu="310p" id12 -->
 
 - Atlas 推理系列产品AI Core：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
 
-</cann-filter>
+<!-- end id12 -->
 
 ## 返回值说明
 

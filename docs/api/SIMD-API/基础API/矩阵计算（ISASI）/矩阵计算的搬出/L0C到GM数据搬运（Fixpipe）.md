@@ -136,7 +136,7 @@
 | deqScalar | 可选输入 | scalar量化参数，表示单个scale值，quantPre量化模式为[随路量化](./关键特性说明/随路量化.md)时需要设置该参数。支持的数据类型为`uint64_t`。 |
 | [reluEn](./关键特性说明/随路ReLU.md) | 可选输入 | 是否开启NormReLU的开关：<br>&nbsp;&nbsp;&bull; `false`：不开启NormReLU功能， 默认为`false`；<br>&nbsp;&nbsp;&bull; `true`：开启NormReLU功能。 |
 | unitFlag | 可选输入 | unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&nbsp;&nbsp;&bull; 0（2'b00）：不开启unitFlag；<br>&nbsp;&nbsp;&bull; 2（2'b10）：开启unitFlag，硬件执行完指令之后，不复位单元标记位；<br>&nbsp;&nbsp;&bull; 3（2'b11）：开启unitFlag，硬件执行完指令之后，复位单元标记位。<br>开启该功能时，须将Mmad指令和Fixpipe指令的unitFlag值设置为2或3。<br>参数设置方案和特性细节可参考：Mmad计算中关键特性说明的[UnitFlag](../Mmad计算/关键特性说明/UnitFlag.md)章节。 |
-| params | 可选输入 | 用于选择和配置不同的随路格式转换（NZ2ZN/NZ2ND/NZ2DN），该参数为TransformParams类型的结构体。TransformParams结构体是一个基于模板参数的类型选择器，用于在编译时根据定义FixpipeParamsArch3510搬运参数时使用的模板参数，自动选择对应的参数类型。<br><pre>template \<CO2Layout format\><br>struct TransformParams {};<br>template \<\><br>struct TransformParams\<CO2Layout::NZ\> {<br>    \_\_aicore\_\_ inline TransformParams(){};<br>    using PARAMS = uint8_t;<br>};<br>template \<\><br>struct TransformParams\<CO2Layout::ROW_MAJOR\> {<br>    \_\_aicore\_\_ inline TransformParams(){};<br>    using PARAMS = Nz2NdParams;<br>};<br>template \<\><br>struct TransformParams\<CO2Layout::COLUMN_MAJOR\> {<br>    \_\_aicore\_\_ inline TransformParams(){};<br>    using PARAMS = Nz2DnParams;<br>};</pre><br>CO2Layout布局类型为ROW_MAJOR时， 该指令被定义为从L0C Buffer到目标位置的数据移动，并附带NZ2ND转换，结构体参数如下：<br><pre>struct Nz2NdParams {<br>    uint16_t ndNum = 1;<br>    uint16_t srcNdStride = 0;<br>    uint32_t dstNdStride = 0; <br>};</pre>&nbsp;&nbsp;&bull; ndNum：源NZ矩阵的数目，也就是传输ND矩阵的数目，取值范围为ndNum∈[0, 65535]。**注：ndNum=0表示不执行搬运，该接口将被视为NOP（空操作）。**<br>&nbsp;&nbsp;&bull; srcNdStride：不同NZ矩阵起始地址之间的间隔，取值范围为srcNdStride∈[0, 65535]，单位为C0_SIZE。当ndNum配置为1时，srcNdStride配置为0即可，不生效。<br>&nbsp;&nbsp;&bull; dstNdStride：目的相邻ND矩阵起始地址之间的偏移，取值范围为dstNdStride∈[1, 2^32 -1]，单位为element。当ndNum配置为1时，dstNdStride配置为0即可，不生效。<br><br>CO2Layout布局类型为COLUMN_MAJOR时， 该指令被定义为从L0C Buffer到目标位置的数据移动，并附带NZ2DN转换，结构体参数如下：<br><pre>struct Nz2DnParams {<br>    uint16_t dnNum = 1;<br>    uint16_t srcNzMatrixStride = 0;<br>    uint32_t dstDnMatrixStride = 0;<br>    uint16_t srcNzC0Stride = 0; <br>};</pre>&nbsp;&nbsp;&bull; dnNum：传输DN矩阵的数目，取值范围为dnNum∈[0, 65535]。**注：dnNum=0表示不执行搬运，该接口将被视为NOP（空操作）。**<br>&nbsp;&nbsp;&bull; srcNzMatrixStride：不同源NZ矩阵的偏移（头与头），取值范围srcNzMatrixStride∈[0, 65535]，单位C0_SIZE。当dnNum配置为1时，srcNzMatrixStride配置为0即可，不生效。<br>&nbsp;&nbsp;&bull; dstDnMatrixStride：目的相邻ND矩阵起始地址之间的偏移，取值范围dstDnMatrixStride∈[0, 2^32 -1]，单位element。当dnNum配置为1时，dstDnMatrixStride配置为0即可，不生效。<br>&nbsp;&nbsp;&bull; srcNzC0Stride：源矩阵NZ分形中相邻行的地址偏移（头与头），取值范围srcNzC0Stride∈[0, 65535]，单位C0_SIZE。当启用NZ2DN时，srcNzC0Stride不能为0。<br><br>CO2Layout布局类型为NZ时，为普通搬运DMA模式，表示从L0C Buffer到目标位置的正常数据移动。 |
+| params | 可选输入 | 用于选择和配置不同的随路格式转换（NZ2NZ/NZ2ND/NZ2DN），该参数为TransformParams类型的结构体。TransformParams结构体是一个基于模板参数的类型选择器，用于在编译时根据定义FixpipeParamsArch3510搬运参数时使用的模板参数，自动选择对应的参数类型。<br><pre>template \<CO2Layout format\><br>struct TransformParams {};<br>template \<\><br>struct TransformParams\<CO2Layout::NZ\> {<br>    \_\_aicore\_\_ inline TransformParams(){};<br>    using PARAMS = uint8_t;<br>};<br>template \<\><br>struct TransformParams\<CO2Layout::ROW_MAJOR\> {<br>    \_\_aicore\_\_ inline TransformParams(){};<br>    using PARAMS = Nz2NdParams;<br>};<br>template \<\><br>struct TransformParams\<CO2Layout::COLUMN_MAJOR\> {<br>    \_\_aicore\_\_ inline TransformParams(){};<br>    using PARAMS = Nz2DnParams;<br>};</pre><br>CO2Layout布局类型为ROW_MAJOR时， 该指令被定义为从L0C Buffer到目标位置的数据移动，并附带NZ2ND转换，结构体参数如下：<br><pre>struct Nz2NdParams {<br>    uint16_t ndNum = 1;<br>    uint16_t srcNdStride = 0;<br>    uint32_t dstNdStride = 0; <br>};</pre>&nbsp;&nbsp;&bull; ndNum：源NZ矩阵的数目，也就是传输ND矩阵的数目，取值范围为ndNum∈[0, 65535]。**注：ndNum=0表示不执行搬运，该接口将被视为NOP（空操作）。**<br>&nbsp;&nbsp;&bull; srcNdStride：不同NZ矩阵起始地址之间的间隔，取值范围为srcNdStride∈[0, 65535]，单位为C0_SIZE。当ndNum配置为1时，srcNdStride配置为0即可，不生效。<br>&nbsp;&nbsp;&bull; dstNdStride：目的相邻ND矩阵起始地址之间的偏移，取值范围为dstNdStride∈[1, 2^32 -1]，单位为element。当ndNum配置为1时，dstNdStride配置为0即可，不生效。<br><br>CO2Layout布局类型为COLUMN_MAJOR时， 该指令被定义为从L0C Buffer到目标位置的数据移动，并附带NZ2DN转换，结构体参数如下：<br><pre>struct Nz2DnParams {<br>    uint16_t dnNum = 1;<br>    uint16_t srcNzMatrixStride = 0;<br>    uint32_t dstDnMatrixStride = 0;<br>    uint16_t srcNzC0Stride = 0; <br>};</pre>&nbsp;&nbsp;&bull; dnNum：传输DN矩阵的数目，取值范围为dnNum∈[0, 65535]。**注：dnNum=0表示不执行搬运，该接口将被视为NOP（空操作）。**<br>&nbsp;&nbsp;&bull; srcNzMatrixStride：不同源NZ矩阵的偏移（头与头），取值范围srcNzMatrixStride∈[0, 65535]，单位C0_SIZE。当dnNum配置为1时，srcNzMatrixStride配置为0即可，不生效。<br>&nbsp;&nbsp;&bull; dstDnMatrixStride：目的相邻ND矩阵起始地址之间的偏移，取值范围dstDnMatrixStride∈[0, 2^32 -1]，单位element。当dnNum配置为1时，dstDnMatrixStride配置为0即可，不生效。<br>&nbsp;&nbsp;&bull; srcNzC0Stride：源矩阵NZ分形中相邻行的地址偏移（头与头），取值范围srcNzC0Stride∈[0, 65535]，单位C0_SIZE。当启用NZ2DN时，srcNzC0Stride不能为0。<br><br>CO2Layout布局类型为NZ时，为普通搬运DMA模式，表示从L0C Buffer到目标位置的正常数据移动。 |
 | dualDstCtrl | 可选输入 | 此参数仅在L0C Buffer到Unified Buffer通路下有效。 |
 | subBlockId | 可选输入 | 此参数仅在L0C Buffer到Unified Buffer通路下有效。 |
 | [isChannelSplit](./关键特性说明/F32-Channel-Split.md) | 可选输入 | 是否开启通道拆分的功能。默认为false，不开启该功能。仅在src和dst都为float时才能开启通道拆分，且不能同时开启ChannelSplit和NZ2ND/NZ2DN功能。 |
@@ -169,7 +169,7 @@
 | quantPre | 输入 | QuantMode_t是一个枚举类型，用于控制量化模式，默认值为QuantMode_t::NoQuant，即不开启量化功能。QuantMode_t取值如下：<br>&nbsp;&nbsp;&bull; NoQuant，不开启量化功能；<br>&nbsp;&nbsp;&bull; F322F16，float cast成half，cast mode为CAST_RINT模式；<br>&nbsp;&nbsp;&bull; F322BF16，float cast成bfloat16_t，cast mode为CAST_RINT模式；<br>&nbsp;&nbsp;&bull; DEQF16，int32_t量化成half，scalar量化；<br>&nbsp;&nbsp;&bull; VDEQF16，int32_t量化成half，tensor量化；<br>&nbsp;&nbsp;&bull; QF322B8_PRE，float量化成uint8_t/int8_t，scalar量化；<br>&nbsp;&nbsp;&bull; VQF322B8_PRE，float量化成uint8_t/int8_t，tensor量化；<br>&nbsp;&nbsp;&bull; REQ8，int32_t量化成uint8_t/int8_t，scalar量化；<br>&nbsp;&nbsp;&bull; VREQ8，int32_t量化成uint8_t/int8_t，tensor量化。 |
 | deqScalar | 输入 | scalar量化参数，表示单个scale值，quantPre量化模式为scalar量化时需要设置该参数。支持的数据类型为uint64_t。 |
 | ndNum | 输入 | 源NZ矩阵的数目，也就是传输ND矩阵的数目，取值范围为ndNum∈[1, 65535]。 |
-| srcNdStride | 输入 | 不同NZ矩阵起始地址之间的间隔，取值范围为srcNdStride∈[1, 512]，单位为数据块（16 \* C0_Size）。当ndNum配置为1时，srcNdStride配置为0即可，不生效。 |
+| srcNdStride | 输入 | 不同NZ矩阵起始地址之间的间隔。当ndNum大于1时，取值范围为srcNdStride∈[1, 512]；当ndNum配置为1时，srcNdStride可配置为0，此时不生效。单位为数据块（16 \* C0_Size）。 |
 | dstNdStride | 输入 | 目的相邻ND矩阵起始地址之间的偏移，取值范围为dstNdStride∈[1, 65535]，单位为element。当ndNum配置为1时，dstNdStride配置为0即可，不生效。 |
 | reluEn | 输入 | 是否开启ReLU的开关：<br>&nbsp;&nbsp;&bull; false：不开启ReLU功能；<br>&nbsp;&nbsp;&bull; true：开启ReLU功能。 |
 | unitFlag | 输入 | unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出，该功能不适用于在L0C Buffer累加的场景。取值说明如下：<br>&nbsp;&nbsp;&bull; 0（2'b00）：不开启unitFlag；<br>&nbsp;&nbsp;&bull; 2（2'b10）：开启unitFlag，硬件执行完指令之后，不会设置寄存器；<br>&nbsp;&nbsp;&bull; 3（2'b11）：开启unitFlag，硬件执行完指令之后，会将unitFlag关闭。 |
@@ -245,11 +245,11 @@
 - 源矩阵NZ格式地址要求64字节对齐，目的矩阵ND格式地址要求满足1字节对齐，NZ格式地址需要满足32字节对齐。
 - 当搬出的mSize、nSize或者ndNum中的任意一个值为0时，该指令不会被执行。ndNum=0时会报warning。
 - cbufWorkspace量化Tensor位于L1 Buffer，地址要求32字节对齐。
-- 量化和ReLU参数不能为Inf/NaN和非规格化数。
+- 量化和ReLU参数不能为inf/nan和非规格化数。
 - 目标数据不能有重叠。如果对目的地址有重叠写入，硬件不会报告任何警告和错误，也不保证重叠数据的写入顺序。
 - unitFlag特性开启需要配合Mmad同时开启。
 <!-- npu="950" id28 -->
-- 当启用NZ2DN且srcNzC0Stride不等于1时，不能同时开启unitflag。
+- 当启用NZ2DN且srcNzC0Stride不等于1时，不能同时开启unitFlag。
 <!-- end id28 -->
 <!-- npu="A3,910b" id27 -->
 - 针对如下产品型号，特殊值/边界值约束说明如下：
@@ -259,10 +259,10 @@
     <!-- npu="910b" id26 -->
     Atlas A2 训练系列产品/Atlas A2 推理系列产品
     <!-- end id26 -->
-    对于浮点类型Inf/NaN输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式：
+    对于浮点类型inf/nan输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式：
 
-    - 非饱和模式：CTRL\[48\]设置成1'b1，Inf/NaN保持原输出。
-    - 饱和模式：CTRL\[48\]设置成1'b0，Inf输出会被饱和为±MAX，NaN输出会被饱和为0。
+    - 非饱和模式：CTRL\[48\]设置成1'b1，inf/nan保持原输出。
+    - 饱和模式：CTRL\[48\]设置成1'b0，inf输出会被饱和为±MAX，nan输出会被饱和为0。
 
         ```cpp
         // 设置CTRL[48]为0，开启浮点数饱和模式
@@ -274,12 +274,12 @@
 <!-- npu="950" id29 -->
 - Ascend 950PR/Ascend 950DT特殊值/边界值约束说明：
 
-    对于浮点类型Inf/NaN输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式；
+    对于浮点类型inf/nan输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式；
 
     对于fp8\_e4m3fn\_t类型，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行更精细的设置；
 
-    - 非饱和模式：CTRL\[48\]设置成1'b1，Inf/NaN保持原输出。对于fp8\_e4m3fn\_t类型，若结果的绝对值为Inf或大于fp8\_e4m3fn\_t的最大规格化值，则输出结果为NaN。
-    - 饱和模式：CTRL\[48\]设置成1'b0，Inf输出会被饱和为±MAX， NaN输出会被饱和为0。对于fp8\_e4m3fn\_t类型，当CTRL\[50\]设置成1'b0时，NaN被转换为零，当CTRL\[50\]设置成1'b1时，NaN保持不变，若结果的绝对值为Inf或大于fp8\_e4m3fn\_t的最大规格化值，则结果为最大规格化值。
+    - 非饱和模式：CTRL\[48\]设置成1'b1，inf/nan保持原输出。对于fp8\_e4m3fn\_t类型，若结果的绝对值为inf或大于fp8\_e4m3fn\_t的最大规格化值，则输出结果为nan。
+    - 饱和模式：CTRL\[48\]设置成1'b0，inf输出会被饱和为±MAX， nan输出会被饱和为0。对于fp8\_e4m3fn\_t类型，当CTRL\[50\]设置成1'b0时，nan被转换为零，当CTRL\[50\]设置成1'b1时，nan保持不变，若结果的绝对值为inf或大于fp8\_e4m3fn\_t的最大规格化值，则结果为最大规格化值。
 
         ```cpp
         // 设置CTRL[48]为0，开启浮点数饱和模式

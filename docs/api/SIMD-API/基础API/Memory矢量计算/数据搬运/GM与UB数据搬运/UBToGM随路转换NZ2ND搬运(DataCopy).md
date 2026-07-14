@@ -2,15 +2,27 @@
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
-| 产品 | 是否支持 |
-| :--- | :---: |
-|<cann-filter npu-type="950"> Ascend 950PR/Ascend 950DT | √ </cann-filter>|
-|<cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter>|
-|<cann-filter npu-type="910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter>|
-|<cann-filter npu-type="310b"> Atlas 200I/500 A2 推理产品 | x </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品AI Core | √ </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | x </cann-filter>|
-|<cann-filter npu-type="910"> Atlas 训练系列产品 | x </cann-filter>|
+<!-- npu="950" id13 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id13 -->
+<!-- npu="A3" id14 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id14 -->
+<!-- npu="910b" id15 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id15 -->
+<!-- npu="310b" id16 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id16 -->
+<!-- npu="310p" id17 -->
+- Atlas 推理系列产品AI Core：支持
+<!-- end id17 -->
+<!-- npu="310p" id18 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id18 -->
+<!-- npu="910" id19 -->
+- Atlas 训练系列产品：不支持
+<!-- end id19 -->
 
 ## 功能说明<a name="section12840195813362"></a>
 
@@ -22,7 +34,9 @@
 
 - Unified Buffer -> Global Memory
     - VECOUT -> GM
-    - <cann-filter npu-type="310p">CO2 -> GM（仅Atlas 推理系列产品AI Core支持）</cann-filter>
+    <!-- npu="310p" id1 -->
+    - CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
+    <!-- end id1 -->
 
 ## 函数原型<a name="section1792117555586"></a>
 
@@ -45,7 +59,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为[GlobalTensor](../../../数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor简介.md)。 |
 | src | 输入 | 源操作数，类型为[LocalTensor](../../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md)。 |
-| intriParams | 输入 | 搬运参数，类型为Nz2NdParamsFul，具体参数请参考[表3](#table_nz2nd_3)。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
+| intriParams | 输入 | 搬运参数，类型为Nz2NdParamsFull，具体参数请参考[表3](#table_nz2nd_3)。<br>具体定义请参考`${INSTALL_DIR}/asc/include/basic_api/interface/kernel_struct_data_copy.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。 |
 
 **表3**  Nz2NdParamsFull结构体内参数定义<a name="table_nz2nd_3"></a>
 
@@ -87,29 +101,21 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 ## 数据类型<a name="section4219135304818"></a>
 
-<cann-filter npu-type="950">
-
+<!-- npu="950" id2 -->
 - Ascend 950PR/Ascend 950DT，支持的数据类型为：bool、int8_t、uint8_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、double、complex64。
+<!-- end id2 -->
 
-</cann-filter>
-
-<cann-filter npu-type="A3">
-
+<!-- npu="A3" id3 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+<!-- end id3 -->
 
-</cann-filter>
-
-<cann-filter npu-type="910b">
-
+<!-- npu="910b" id4 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+<!-- end id4 -->
 
-</cann-filter>
-
-<cann-filter npu-type="310p">
-
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core，支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
-
-</cann-filter>
+<!-- end id5 -->
 
 ## 返回值说明<a name="section129001927113216"></a>
 
@@ -137,15 +143,15 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 intriParams参数解析请参考[图1](#fig15851251122815)。
 
 ```cpp
-// dstLocal为half类型的LocalTensor，dstGlobal为half类型的GlobalTensor。
+// srcLocal为half类型的LocalTensor，dstGlobal为half类型的GlobalTensor。
 AscendC::Nz2NdParamsFull intriParams{1, 32, 32, 1, 32, 32, 1};
 // Local Memory -> Global Memory
-AscendC::DataCopy(dstGlobal, dstLocal, intriParams);
+AscendC::DataCopy(dstGlobal, srcLocal, intriParams);
 ```
 
 结果示例：
 
 ```text
-输入数据(srcGlobal): [1 2 3 ... 1024]
+输入数据(srcLocal): [1 2 3 ... 1024]
 输出数据(dstGlobal):[1 2 ... 15 16 513 514 ... 527 528 17 18 ... 31 32 529 530 ... 543 544 ...497 498 ...  511 512  1009 1010... 1023 1024]
 ```

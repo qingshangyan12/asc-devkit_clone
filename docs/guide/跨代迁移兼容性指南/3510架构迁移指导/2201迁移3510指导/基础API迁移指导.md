@@ -42,10 +42,10 @@
     constexpr uint32_t xAddr = 0;
     constexpr uint32_t yAddr = xAddr + DATA_COUNT * sizeof(half);
 
-    // 核函数入口：使用__vector__显式声明Vector核函数，搭配静态Tensor方式编程
+    // 核函数入口：使用__vector__显式声明Vector核函数，搭配C++ Tensor方式编程
     __vector__ __global__ void ln_custom(__gm__ uint8_t* src, __gm__ uint8_t* dst)
     {
-        // 静态Tensor需要手动调用InitSocState初始化全局状态寄存器
+        // C++ Tensor需要手动调用InitSocState初始化全局状态寄存器
         AscendC::InitSocState();
 
         AscendC::GlobalTensor<half> srcGlobal;
@@ -53,7 +53,7 @@
         srcGlobal.SetGlobalBuffer((__gm__ half*)src, DATA_COUNT);
         dstGlobal.SetGlobalBuffer((__gm__ half*)dst, DATA_COUNT);
 
-        // 直接构造指定地址和存储位置的LocalTensor（静态Tensor方式）
+        // 直接构造指定地址和存储位置的LocalTensor（C++ Tensor方式）
         AscendC::LocalTensor<half> srcLocal(AscendC::TPosition::VECCALC, xAddr, DATA_COUNT);
         AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::VECCALC, yAddr, DATA_COUNT);
 
@@ -147,12 +147,12 @@
 
 -   **不支持SetLoadDataBoundary接口。**
 
-    **说明**：3510架构硬件删除了L1 Buffer的边界值设定相关寄存器，不再支持SetLoadDataBoundary接口。该接口用于设置Load3D时L1 Buffer的边界值。如果指令在处理源操作数时，源操作数在L1 Buffer上的地址超出设置的边界，则会从L1 Buffer的起始地址开始读取数据。设置为0表示无边界，可以使用整个L1 Buffer。
+    **说明**：3510架构硬件删除了L1 Buffer的边界值设定相关寄存器，不再支持SetLoadDataBoundary接口。该接口用于设置LoadData（卷积数据搬运）时L1 Buffer的边界值。如果指令在处理源操作数时，源操作数在L1 Buffer上的地址超出设置的边界，则会从L1 Buffer的起始地址开始读取数据。设置为0表示无边界，可以使用整个L1 Buffer。
 
     **兼容方案**：
 
     -   [NPU架构版本2201](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)的接口参数boundaryValue设置为0时与3510架构版本等价。
-    -   如果需要在L1 Buffer上循环读取操作数，需要将对应的Load3D接口手动拆分成多条指令，手动绕回。具体代码可参考[SetLoadDataBoundary兼容性样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/06_compatibility_guide/set_loaddata_boundary)。
+    -   如果需要在L1 Buffer上循环读取操作数，需要将对应的LoadData（卷积数据搬运）接口手动拆分成多条指令，手动绕回。具体代码可参考[SetLoadDataBoundary兼容性样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/06_compatibility_guide/set_loaddata_boundary)。
 
     ![](../../../figures/1_zn.png)
 
@@ -309,7 +309,7 @@
             auto gmB = bGlobal[offsetB];
             auto gmC = cGlobal[offsetC];
 
-            AscendC::MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL> mm;
+            AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL> mm;
             mm.SetSubBlockIdx(0);
             mm.Init(&tiling, pipe);
             mm.SetTensorA(gmA, false);

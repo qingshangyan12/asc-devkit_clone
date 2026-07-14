@@ -30,8 +30,8 @@
 
 StoreAlign能够实现数据从[RegTensor](../寄存器数据类型/RegTensor.md)连续搬运至Unified Buffer（UB），支持单搬出模式和双搬出模式：
 
-- 单搬入模式：从UB读取VL数据量，搬入到一个RegTensor（VL）中。
-- 双搬入模式：从UB读取2*VL数据量，交错搬运，将偶数索引和奇数索引的元素分别搬入两个RegTensor（2\*VL）中。
+- 单搬出模式：将一个RegTensor（VL）中的VL数据量搬出至UB。
+- 双搬出模式：将两个RegTensor(2*VL)的数据交错搬出至UB，偶数索引和奇数索引的元素分别来自两个RegTensor。
 
 连续对齐搬运有三类接口：普通搬运接口、PostUpdate扩展搬运接口、使用AddrReg寄存器存储偏移量接口。
 
@@ -104,10 +104,10 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 | 参数名 | 输入/输出 | 描述 |
 |-----|-----|-----|
-| dstAddr | 输入/输出 | 目的操作数，UB起始地址，需要32B对齐。 |
+| dstAddr | 输入/输出 | 目的操作数，UB起始地址。 |
 | srcReg | 输入 | 源操作数，类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
-| postUpdateStride | 输入 | 地址更新步长，int32_t类型，单位：元素个数。postUpdateStride * sizeof(T)的对齐约束请参考[表3 StoreDist参数说明（单搬出模式）](#表3-StoreDist参数说明（单搬出模式）)。根据postMode的取值有两种情况：<br>&bull; POST_MODE_NORMAL：不支持。<br>&bull; POST_MODE_UPDATE：实际搬运UB起始地址为srcAddr，搬运后执行地址更新 srcAddr += postUpdateStride。 |
-| offset | 输入 | 地址偏移寄存器，AddrReg类型。需要在搬运前调用CreateAddrReg设定地址偏移量，实际搬运UB地址为srcAddr + 寄存器中存储的偏移量。AddrReg寄存器中存储的偏移量 * sizeof(T)的对齐约束请参考[表3 StoreDist参数说明（单搬出模式）](#表3-StoreDist参数说明（单搬出模式）)。|
+| postUpdateStride | 输入 | 地址更新步长，int32_t类型，单位：元素个数。postUpdateStride * sizeof(T)的对齐约束请参考[表3 StoreDist参数说明（单搬出模式）](#表3-StoreDist参数说明（单搬出模式）)。根据postMode的取值有两种情况：<br>&bull; POST_MODE_NORMAL：不支持。<br>&bull; POST_MODE_UPDATE：实际搬运UB起始地址为dstAddr，搬运后执行地址更新dstAddr += postUpdateStride。 |
+| offset | 输入 | 地址偏移寄存器，AddrReg类型。需要在搬运前调用CreateAddrReg设定地址偏移量，实际搬运UB地址为dstAddr + 寄存器中存储的偏移量。AddrReg寄存器中存储的偏移量 * sizeof(T)的对齐约束请参考[表3 StoreDist参数说明（单搬出模式）](#表3-StoreDist参数说明（单搬出模式）)。|
 | mask | 输入 | 源操作数元素操作的有效指示，详细说明请参考[MaskReg](../寄存器数据类型/MaskReg.md)。 |
 
 <a id="表3-StoreDist参数说明（单搬出模式）"></a>
@@ -131,9 +131,9 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 | 参数名 | 描述 |
 |-----|-----|
-| T | 源操作数的数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
+| T | 目的操作数的数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 | dist | 搬运模式，StoreDist类型。具体参数说明请参考[表6 StoreDist参数说明（双搬出模式）](#表6-StoreDist参数说明（双搬出模式）)。 |
-| U | 目的操作数的RegTensor类型。例如RegTensor\<half>，由编译器自动推导，用户不需要手动填写。 |
+| U | 源操作数的RegTensor类型。例如RegTensor\<half>，由编译器自动推导，用户不需要手动填写。 |
 
 **表 5**  参数说明（双搬出模式）
 
@@ -142,7 +142,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 | dstAddr | 输入/输出 | 目的操作数，UB起始地址。 |
 | srcReg0 | 输入 | 第一个源操作数，类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
 | srcReg1 | 输入 | 第二个源操作数，类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
-| offset | 输入 | 地址偏移量，AddrReg类型。需要在搬运前调用CreateAddrReg设定地址偏移量，实际搬运UB地址为srcAddr + offset存储的偏移量，搬运后地址不会更新。AddrReg寄存器中存储的偏移量*sizeof(T)需要32字节对齐。 |
+| offset | 输入 | 地址偏移量，AddrReg类型。需要在搬运前调用CreateAddrReg设定地址偏移量，实际搬运UB地址为dstAddr + offset存储的偏移量，搬运后地址不会更新。AddrReg寄存器中存储的偏移量*sizeof(T)需要32字节对齐。 |
 | mask | 输入 | 源操作数元素操作的有效指示，详细说明请参考[MaskReg](../寄存器数据类型/MaskReg.md)。 |
 
 <a id="表6-StoreDist参数说明（双搬出模式）"></a>
@@ -194,6 +194,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 - 单搬入/单搬出模式：普通搬运接口
 
     ```cpp
+    template <typename T>
     __simd_vf__ inline void ComputeMode01(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t dstSize, uint16_t oneRepeatSize, uint16_t repeatTimes)
     {
         AscendC::Reg::RegTensor<T> dstReg;
@@ -209,6 +210,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 - 单搬入/单搬出模式：PostUpdate扩展搬运接口
 
     ```cpp
+    template <typename T>
     __simd_vf__ inline void ComputeMode02(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t dstSize, uint16_t oneRepeatSize, uint16_t repeatTimes)
     {
         AscendC::Reg::RegTensor<T> dstReg;
@@ -224,6 +226,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 - 单搬入/单搬出模式：使用AddrReg存储偏移量
 
     ```cpp
+    template <typename T>
     __simd_vf__ inline void ComputeMode03(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t oneRepeatSize, uint16_t repeatTimes)
     {
         AscendC::Reg::RegTensor<T> dstReg;
@@ -237,16 +240,17 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
     }
     ```
 
-- 双搬入/双搬出模式：普通搬运接口，需要配合CreateAddrReg接口使用
+- 双搬入/双搬出模式：普通搬运接口
 
     ```cpp
+    template <typename T>
     __simd_vf__ inline void ComputeMode04(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t oneRepeatSize, uint16_t repeatTimes)
     {
         AscendC::Reg::RegTensor<T> srcReg0;
         AscendC::Reg::RegTensor<T> srcReg1;
         AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<uint8_t, AscendC::Reg::MaskPattern::ALL>();
         for (uint16_t i = 0; i < repeatTimes; ++i) {
-            AscendC::Reg::LoadAlign<T, AscendC::Reg::LoadDist::DIST_DINTLV_B8>(srcReg0, srcAddr + i * oneRepeatSize);
+            AscendC::Reg::LoadAlign<T, AscendC::Reg::LoadDist::DIST_DINTLV_B8>(srcReg0, srcReg1, srcAddr + i * oneRepeatSize);
             AscendC::Reg::StoreAlign<T, AscendC::Reg::StoreDist::DIST_INTLV_B8>(dstAddr + i * oneRepeatSize, srcReg0, srcReg1, mask);
         }
     }
@@ -255,6 +259,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 - 双搬入/双搬出模式：使用AddrReg存储偏移量，需要配合CreateAddrReg接口使用
 
     ```cpp
+    template <typename T>
     __simd_vf__ inline void ComputeMode05(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t oneRepeatSize, uint16_t repeatTimes)
     {
         AscendC::Reg::RegTensor<T> srcReg0;

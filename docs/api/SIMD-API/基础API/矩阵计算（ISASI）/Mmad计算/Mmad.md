@@ -158,16 +158,16 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
 | fm | 输入 | 源操作数，左矩阵A，类型为LocalTensor，支持的物理存储位置为L0A Buffer（TPosition: A2）。<br>LocalTensor的起始地址需要按照512字节对齐。 |
 | filter | 输入 | 源操作数，右矩阵B，类型为LocalTensor，支持的物理存储位置为L0B Buffer（TPosition: B2）。<br>LocalTensor的起始地址需要按照512字节对齐。 |
 | bias | 输入 | 源操作数，Bias矩阵，类型为LocalTensor，支持的物理存储位置为BT Buffer（TPosition:C2）。<br>LocalTensor的起始地址需要按照64字节对齐。 |
-| mmadParams | 输入 | 矩阵乘相关参数。<br>该参数类型的具体定义请参考\$\{INSTALL_DIR\}/include/ascendc/basic_api/interface/kernel_struct_mm.h，\$\{INSTALL_DIR\}请替换为CANN软件安装后文件存储路径。<br>MmadParams参数说明请参考[表4](#zh_cn_topic_mmad_section4_table4)。 |
+| mmadParams | 输入 | 矩阵乘相关参数。<br>该参数类型的具体定义请参考`${INSTALL_DIR}/asc/include/basic_api/interface/kernel_struct_mm.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。<br>MmadParams参数说明请参考[表4](#zh_cn_topic_mmad_section4_table4)。 |
 
 **表4** MmadParams结构体内参数说明<a id="zh_cn_topic_mmad_section4_table4"></a>
 
 | 参数名称 | 含义 |
 | --- | --- |
-| m | 左矩阵Height，取值范围：m∈[0，4095]。默认值为0。 |
-| n | 右矩阵Width，取值范围：n∈[0，4095]。默认值为0。 |
-| k | 左矩阵Width、右矩阵Height，取值范围：k∈[0，4095]。默认值为0。 |
-| cmatrixInitVal | 是否开启C矩阵默认初始化清零操作。默认值true。<br>&nbsp;&nbsp;&bull; true：C矩阵默认初始化为0；<br>&nbsp;&nbsp;&bull; false：C矩阵不进行默认操作，通过设置cmatrixSource参数进行初始化。 |
+| m | 左矩阵Height，取值范围：m∈[0, 4095]。默认值为0。 |
+| n | 右矩阵Width，取值范围：n∈[0, 4095]。默认值为0。 |
+| k | 左矩阵Width、右矩阵Height，取值范围：k∈[0, 4095]。默认值为0。 |
+| cmatrixInitVal | 是否开启C矩阵默认初始化清零操作。默认值为 true。<br>&nbsp;&nbsp;&bull; true：C矩阵默认初始化为0；<br>&nbsp;&nbsp;&bull; false：C矩阵不进行默认操作，通过设置cmatrixSource参数进行初始化。 |
 | cmatrixSource | 配置C矩阵初始值是否来源于BT Buffer。默认值为false。<br>&nbsp;&nbsp;&bull; false：不对L0C Buffer进行初始化操作；<br>&nbsp;&nbsp;&bull; true：使用BT Buffer(TPosition:C2)的数据对L0C Buffer进行初始化操作。<br><br>Atlas 训练系列产品，仅支持配置为false。<br><br>Atlas 推理系列产品AI Core，仅支持配置为false。<br><br>Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持配置为true/false。<br><br>Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持配置为true/false。<br><br>Atlas 200I/500 A2 推理产品，支持配置为true/false。<br><br>Ascend 950PR/Ascend 950DT，支持配置为true/false。<br><br>Kirin X90仅支持配置为false。<br><br>Kirin 9030仅支持配置为false。<br><br>注意：带Bias输入的接口配置该参数无效，会根据bias输入的位置来判断C矩阵初始值是否来源于BT Buffer。 |
 | isBias | 该参数废弃，新开发内容不要使用该参数。如果需要累加初始矩阵，请使用带Bias的接口来实现；也可以通过cmatrixInitVal和cmatrixSource参数配置C矩阵的初始值来源来实现。推荐使用带Bias的接口，相比于配置cmatrixInitVal和cmatrixSource参数更加简单方便。<br><br>配置是否需要累加初始矩阵，默认值为false，取值说明如下：<br>&nbsp;&nbsp;&bull; false：矩阵乘，无需累加初始矩阵，C = A \* B。<br>&nbsp;&nbsp;&bull; true：矩阵乘加，需要累加初始矩阵，C += A \* B。 |
 | disableGemv | M=1时，该参数用来配置Mmad计算是否开启[GEMV](关键特性说明/GEMV.md#ZH-CN_TOPIC_0000002538231187)模式。<br>&nbsp;&nbsp;&bull; false：开启GEMV模式。<br>&nbsp;&nbsp;&bull; true：关闭GEMV模式。<br><br>该参数仅支持如下型号：<br><br>Ascend 950PR/Ascend 950DT |
@@ -279,12 +279,12 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 约束说明
 
-- 结果矩阵C只支持位于CO1（存储位置为L0C Buffer），左矩阵A只支持位于A2（存储位置为L0A Buffer），右矩阵B只支持位于B2（存储位置为L0B Buffer）。
+- 结果矩阵C只支持位于L0C Buffer（CO1），左矩阵A只支持位于L0A Buffer（A2），右矩阵B只支持位于L0B Buffer（B2）。
 - 当M、K、N中的任意一个值为0时，表示指令不会执行，该接口将被视为NOP（空操作）。
 - 当M = 1时，会默认开启GEMV（General Matrix-Vector Multiplication）功能。在这种情况下，Mmad API从L0A Buffer读取数据时，会以ND格式进行读取，而不会将其视为ZZ或NZ格式。所以此时左矩阵需要直接按照ND格式进行排布（[GEMV特性说明](关键特性说明/GEMV.md#ZH-CN_TOPIC_0000002538231187)）。要注意的是，开启GEMV的情况下，A矩阵的起始地址仍要求512字节对齐。<!-- npu="950" id29 -->针对Ascend 950PR/Ascend 950DT产品，可以通过设置MmadParams的disableGemv参数为true，将该功能关闭。<!-- end id29 -->
 - 一般来说，一次Mmad计算至少完成一次A(16\*16\*half) \* B(16\*16\*half)数据块计算。但实际计算时M、K、N有效值可能不是16的倍数，从而有部分数据为无效数据。以M=30，K=70，N=40为例来介绍无效数据与有效数据的排布方式。
 
-    数据为half类型，当M=30，K=70，N=40的时候，A2（L0A Buffer）中有2x5个16x16矩阵，B2（L0B Buffer）中有5x3个16x16矩阵，CO1（L0C Buffer）中有2x3个16x16矩阵。在这种场景下M、K和N都不是16的倍数，A2中右下角的矩阵实际有效的数据只有14x6个，但是也需要占一个16x16矩阵的空间，其他无效数据在计算中会被忽略。一个16x16分形的数据块中，无效数据与有效数据排布的方式示意如下：
+    数据为half类型，当M=30，K=70，N=40的时候，L0A Buffer（A2）中有2x5个16x16矩阵，L0B Buffer（B2）中有5x3个16x16矩阵，L0C Buffer（CO1）中有2x3个16x16矩阵。在这种场景下M、K和N都不是16的倍数，A2中右下角的矩阵实际有效的数据只有14x6个，但是也需要占一个16x16矩阵的空间，其他无效数据在计算中会被忽略。一个16x16分形的数据块中，无效数据与有效数据排布的方式示意如下：
 
     ![有效数据相乘示意图](../../../../figures/mmad_validshape_demo.png)
 
@@ -316,10 +316,10 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 - **特殊值/边界值约束说明**
 
-  对于浮点类型INF/NaN输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数计算时的饱和模式：
+  对于浮点类型inf/nan输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数计算时的饱和模式：
 
-  - 非饱和模式：CTRL\[48\]设置成1'b1，INF/NaN保持原输出。
-  - 饱和模式：CTRL\[48\]设置成1'b0，INF输出会被饱和为±MAX，NaN输出会被饱和为0。
+  - 非饱和模式：CTRL\[48\]设置成1'b1，inf/nan保持原输出。
+  - 饱和模式：CTRL\[48\]设置成1'b0，inf输出会被饱和为±MAX，nan输出会被饱和为0。
 
     ```cpp
     // 设置CTRL[48]为0，开启浮点数计算饱和模式

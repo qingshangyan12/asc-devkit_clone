@@ -9,6 +9,8 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/cube_datamove/cube_datamove.h"`。
+
 该接口实现带转置的2D格式数据从L1 Buffer到L0A Buffer的加载。
 
 下面通过示例来讲解接口功能和关键参数：下文图中一个N形或者一个Z形代表一个分形。
@@ -115,7 +117,7 @@ PIPE_MTE1
 // 设置源操作数和目的操作数，total_length指参与计算的数据长度
 constexpr uint64_t total_length = 512;
 __cbuf__ int32_t src[total_length];
-__cb__ int32_t dst[total_length];
+__ca__ int32_t dst[total_length];
 
 // 设置搬运过程中的配置
 uint8_t n = 64;
@@ -125,7 +127,7 @@ uint16_t index_id = 0;
 uint16_t src_stride = 1;
 uint16_t dst_gap = 1;
 bool enable_addr_decrement = false;
-uint64_t dst_frac_gap = 0;
+uint16_t dst_frac_gap = 0;
 
 // 搬运过程
 asc_copy_l12l0a_trans(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);

@@ -135,7 +135,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 | DIST_BLK | 读取一个DataBlock（32B），并广播到VL。 | 32 |
 | DIST_E2B_B16 | 加载(VL/DataBlock)个B16的数据，并将每个元素（16bit）广播到一个DataBlock（32B）中。 | VL/16 |
 | DIST_E2B_B32 | 加载(VL/DataBlock)个B32的数据，并将每个元素（32bit）广播到一个DataBlock（32B）中。 | VL/8 |
-| DIST_UNPACK_B32 | 解压缩模式，按无符号整型u32加载VL/2数据量，每个元素后会补1个值为0元素，即unpack到VL。<br>例如VL=256B：<br>src: [0x00000000, 0x00000001, 0x00000002, ..., 0x000003F, ...]。<br>dst: [0x00000000, 0x00000000, 0x00000001, 0x00000000, ..., 0x0000003F, 0x00000000]。 | min(32, VL/2) |
+| DIST_UNPACK_B32 | 解压缩模式，按无符号整型u32加载VL/2数据量，每个元素后会补1个值为0元素，即unpack到VL。<br>例如VL=256B：<br>src: [0x00000000, 0x00000001, 0x00000002, ..., 0x000003F, ...]。<br>dst: [0x00000000, 0x00000000, 0x00000001, 0x00000000, ..., 0x0000001F, 0x00000000]。 | min(32, VL/2) |
 | DIST_UNPACK4_B8 | 解压缩模式，按无符号整型u8加载VL/4数据量，unpack到VL，每个元素后会补3个值为0的元素。<br>例如VL=256B：<br>src: [0x00, 0x01, 0x02, 0x03, ..., 0xFF, ...]。<br>dst: [0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,..., 0x3F, 0x00, 0x00, 0x00]。 | min(32, VL/4) |
 
 **表 4**  模板参数说明（双搬入模式）
@@ -206,6 +206,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 - 单搬入/单搬出模式：普通搬运接口
 
     ```cpp
+    template <typename T>
     __simd_vf__ inline void ComputeMode01(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t dstSize, uint16_t oneRepeatSize, uint16_t repeatTimes)
     {
         AscendC::Reg::RegTensor<T> dstReg;
@@ -221,6 +222,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 - 单搬入/单搬出模式：PostUpdate扩展搬运接口
 
     ```cpp
+    template <typename T>
     __simd_vf__ inline void ComputeMode02(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t dstSize, uint16_t oneRepeatSize, uint16_t repeatTimes)
     {
         AscendC::Reg::RegTensor<T> dstReg;
@@ -236,6 +238,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 - 单搬入/单搬出模式：使用AddrReg存储偏移量
 
     ```cpp
+    template <typename T>
     __simd_vf__ inline void ComputeMode03(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t oneRepeatSize, uint16_t repeatTimes)
     {
         AscendC::Reg::RegTensor<T> dstReg;
@@ -252,13 +255,14 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 - 双搬入/双搬出模式：普通搬运接口
 
     ```cpp
+    template <typename T>
     __simd_vf__ inline void ComputeMode04(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t oneRepeatSize, uint16_t repeatTimes)
     {
         AscendC::Reg::RegTensor<T> srcReg0;
         AscendC::Reg::RegTensor<T> srcReg1;
         AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T>();
         for (uint16_t i = 0; i < repeatTimes; ++i) {
-            AscendC::Reg::LoadAlign<T, AscendC::Reg::LoadDist::DIST_DINTLV_B8>(srcReg0, srcAddr + i * oneRepeatSize);
+            AscendC::Reg::LoadAlign<T, AscendC::Reg::LoadDist::DIST_DINTLV_B8>(srcReg0, srcReg1, srcAddr + i * oneRepeatSize);
             AscendC::Reg::StoreAlign<T, AscendC::Reg::StoreDist::DIST_INTLV_B8>(dstAddr + i * oneRepeatSize, srcReg0, srcReg1, mask);
         }
     }
@@ -267,6 +271,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 - 双搬入/双搬出模式：使用AddrReg存储偏移量，需要配合CreateAddrReg接口使用
 
     ```cpp
+    template <typename T>
     __simd_vf__ inline void ComputeMode05(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t oneRepeatSize, uint16_t repeatTimes)
     {
         AscendC::Reg::RegTensor<T> srcReg0;

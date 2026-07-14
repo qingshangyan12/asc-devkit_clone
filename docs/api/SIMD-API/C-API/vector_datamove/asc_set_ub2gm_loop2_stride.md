@@ -8,6 +8,8 @@
 
 ## 功能说明
 
+头文件路径：`"c_api/vector_datamove/vector_datamove.h"`。
+
 将数据从Unified Buffer (UB)搬运到Global Memory (GM)时，通过调用该接口设置外层循环中源操作数在相邻迭代间的数据块间隔，以及目的操作数在相邻迭代间的数据块间隔。
 
 以源操作数搬运场景为例，如下图所示。
@@ -51,6 +53,6 @@ uint64_t loop2_dst_stride = 288;
 asc_set_ub2gm_loop_size(loop1_size, loop2_size);
 asc_set_ub2gm_loop1_stride(loop1_src_stride, loop1_dst_stride);
 asc_set_ub2gm_loop2_stride(loop2_src_stride, loop2_dst_stride);
-asc_copy_ub2gm_align(dst, src, 2, 48 * sizeof(int8_t), 0, 0, 0);
+asc_copy_ub2gm_align(dst, src, 2, 48 * sizeof(int8_t), 0, 48, 48);
 asc_set_ub2gm_loop_size(1, 1);
 ```

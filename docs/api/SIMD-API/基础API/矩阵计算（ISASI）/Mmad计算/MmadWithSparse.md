@@ -107,16 +107,16 @@ __aicore__ inline void MmadWithSparse(const LocalTensor<T>& dst, const LocalTens
 | dst | 输出 | 目的操作数，结果矩阵C，类型为LocalTensor，支持的物理存储位置为L0C Buffer（TPosition:CO1）。<br>LocalTensor的起始地址需要256个元素（1024字节）对齐。 |
 | fm | 输入 | 源操作数，左矩阵A，类型为LocalTensor，支持的物理存储位置为L0A Buffer（TPosition: A2）。<br>LocalTensor的起始地址需要512字节对齐。 |
 | filter | 输入 | 源操作数，右矩阵B，类型为LocalTensor，支持的物理存储位置为L0B Buffer（TPosition:B2）。<br>LocalTensor的起始地址需要512字节对齐。 |
-| mmadParams | 输入 | 矩阵乘相关参数，类型为MmadParams。<br>具体定义请参考\$\{INSTALL_DIR\}/include/ascendc/basic_api/interface/kernel_struct_mm.h，\$\{INSTALL_DIR\}请替换为CANN软件安装后文件存储路径。<br>参数说明请参考[表5](#zh_cn_topic_mmadsparse_section5_table5)。 |
+| mmadParams | 输入 | 矩阵乘相关参数，类型为MmadParams。<br>具体定义请参考`${INSTALL_DIR}/asc/include/basic_api/interface/kernel_struct_mm.h`，`${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。<br>参数说明请参考[表5](#zh_cn_topic_mmadsparse_section5_table5)。 |
 
 **表5** MmadParams结构体内参数说明（Sparse场景）<a id="zh_cn_topic_mmadsparse_section5_table5"></a>
 
 | 参数名称 | 含义 |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| m | 左矩阵Height，取值范围：m∈[0，4095]。默认值为0。 |
-| n | 右矩阵Width，取值范围：n∈[0，4095]。默认值为0。 |
-| k | 左矩阵Width、右矩阵Height，取值范围：k∈[0，4095]。默认值为0。 |
-| cmatrixInitVal | 是否开启C矩阵默认初始化清零操作。默认值true。<br>&nbsp;&nbsp;&bull; true：C矩阵默认初始化为0；<br>&nbsp;&nbsp;&bull; false：C矩阵不进行默认操作，通过设置cmatrixSource参数进行初始化。 |
+| m | 左矩阵Height，取值范围：m∈[0, 4095]。默认值为0。 |
+| n | 右矩阵Width，取值范围：n∈[0, 4095]。默认值为0。 |
+| k | 左矩阵Width、右矩阵Height，取值范围：k∈[0, 4095]。默认值为0。 |
+| cmatrixInitVal | 是否开启C矩阵默认初始化清零操作。默认值为 true。<br>&nbsp;&nbsp;&bull; true：C矩阵默认初始化为0；<br>&nbsp;&nbsp;&bull; false：C矩阵不进行默认操作，通过设置cmatrixSource参数进行初始化。 |
 | cmatrixSource | 配置C矩阵初始值是否来源于BT Buffer。默认值为false。<br>&nbsp;&nbsp;&bull; false：不对L0C Buffer进行初始化操作；<br>&nbsp;&nbsp;&bull; true：使用BT Buffer（TPosition:C2）的数据对L0C Buffer进行初始化操作。<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持配置为true/false。<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持配置为true/false。<br>Atlas 200I/500 A2 推理产品，支持配置为true/false。<br>注意：带Bias输入的接口配置该参数无效，会根据Bias输入的位置来判断C矩阵初始值是否来源于BT Buffer。 |
 | isBias | 该参数废弃，新开发内容不要使用该参数。如果需要累加初始矩阵，请使用带Bias的接口来实现；也可以通过cmatrixInitVal和cmatrixSource参数配置C矩阵的初始值来源来实现。推荐使用带Bias的接口，相比于配置cmatrixInitVal和cmatrixSource参数更加简单方便。<br>配置是否需要累加初始矩阵，默认值为false，取值说明如下：<br>&nbsp;&nbsp;&bull; false：矩阵乘，无需累加初始矩阵，C = A \* B。<br>&nbsp;&nbsp;&bull; true：矩阵乘加，需要累加初始矩阵，C += A \* B。 |
 | unitFlag | unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&nbsp;&nbsp;&bull; 0（2'b00）：不开启unitFlag；<br>&nbsp;&nbsp;&bull; 2（2'b10）：开启unitFlag，硬件执行完指令之后，不复位单元标记位；<br>&nbsp;&nbsp;&bull; 3（2'b11）：开启unitFlag，硬件执行完指令之后，复位单元标记位。<br>开启该功能时，须将Mmad指令和Fixpipe指令的unitFlag值设置为2或3。<br>该参数仅支持如下型号：<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品；<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品。<br>参数设置方案和特性细节可参考：[UnitFlag](关键特性说明/UnitFlag.md#ZH-CN_TOPIC_00000025690709788)。 |
@@ -174,8 +174,8 @@ AscendC::SetFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
 AscendC::WaitFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
 
 // mmad需要指定矩阵的维度进行计算
-uint32 m = 128;
-uint32 k = 64;
-uint32 n = 128;
+uint32_t m = 128;
+uint32_t k = 64;
+uint32_t n = 128;
 AscendC::MmadWithSparse(c1Local, a2Local, b2Local, { m, n, k, false, 0, false, false, false });
 ```
