@@ -49,16 +49,7 @@ static __attribute__((noinline)) __SIMT_DEVICE_FUNCTIONS_DECL__ void printf(cons
 #include "../../../impl/utils/debug/asc_aicore_printf_impl.h"
 namespace __asc_aicore {
 template <class... Args>
-__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
-{
-    printf_impl(fmt, args...);
-}
-
-template <class... Args>
-__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
-{
-    printf_impl(fmt, args...);
-}
+__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args);
 } // namespace __asc_aicore
 #else
 namespace __asc_aicore {

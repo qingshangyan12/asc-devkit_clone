@@ -33,7 +33,7 @@ __BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_dumpWorkspaceReserved;
 template <class... Args>
 __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {
-    __asc_aicore::printf_impl(fmt, args...);
+    __asc_aicore::printf(fmt, args...);
 }
 
 } // namespace AscendC
