@@ -985,7 +985,7 @@ def handle_sk_codegen_options(compile_info: CompileInfo, infered_info_from_ifile
 
 
 def gen_op_stub_kernel_func(compile_info: CompileInfo, op_info: OpInfo, compile_option_tuple,
-                               tiling_info: TilingInfo, distinct_tag, kernel_meta_dir):
+                               tiling_info: TilingInfo, distinct_tag, kernel_meta_dir, wrapper_role="normal"):
     # generate kernel fun for ffts_addr, overflow, workspace
     msg_info = "<{}> <{}> generate kernel stub start".format(compile_info.op_type, compile_info.tiling_key_list)
     LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
@@ -1000,7 +1000,7 @@ def gen_op_stub_kernel_func(compile_info: CompileInfo, op_info: OpInfo, compile_
         gen_meta_info_section(compile_info, op_info)
     workspace_idx = gen_kernel_fun(compile_info, compile_info.origin_func_name, op_info, tiling_info,
         compile_option_tuple)
-    OpCompileManifestRecorder().record_wrapper_body(compile_info)
+    OpCompileManifestRecorder().record_wrapper_body(compile_info, wrapper_role)
 
     msg_info = "<{}> <{}> generate kernel stub end".format(compile_info.op_type, compile_info.tiling_key_list)
     LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
@@ -1197,6 +1197,37 @@ def compile_sk_bind(compile_info: CompileInfo, compile_info_origin: CompileInfo,
     return sk_bind_dst_file
 
 
+def record_super_kernel_sub_combine_without_compile(super_compile_info: CompileInfo,
+                                                    normal_compile_info: CompileInfo,
+                                                    super_compile_options: CompileOptionTuple,
+                                                    normal_compile_options: CompileOptionTuple,
+                                                    op_info: OpInfo, tiling_info: TilingInfo,
+                                                    infered_info_from_ifile: InferChannelParamsFromIFile,
+                                                    distinct_tag: str, kernel_meta_dir: str):
+    try:
+        global_var_storage.set_variable("ascendc_enable_super_kernel", True)
+        global_ascendc_kernel_feature_manager.init_available_and_enable_features()
+        super_compile_info.raw_tiling_key_kernel_type = copy.deepcopy(
+            super_compile_info.tiling_key_kernel_type)
+        handle_sk_codegen_options(super_compile_info, infered_info_from_ifile)
+        workspace_idx = gen_op_stub_kernel_func(
+            super_compile_info, op_info, super_compile_options, tiling_info,
+            distinct_tag, kernel_meta_dir, "super_kernel")
+        handle_compile_options(
+            super_compile_info, super_compile_options, tiling_info, workspace_idx)
+        OpCompileManifestRecorder().record_super_kernel_sub_combine(
+            super_compile_info, normal_compile_info,
+            super_compile_options, normal_compile_options, None)
+    except Exception as err:
+        CommonUtility.print_compile_log(
+            op_info.kernel_name,
+            "record-only super kernel resource generation failed, reason is: {}".format(err),
+            AscendCLogLevel.LOG_WARNING)
+    finally:
+        global_var_storage.set_variable("ascendc_enable_super_kernel", False)
+        global_ascendc_kernel_feature_manager.init_available_and_enable_features()
+
+
 def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo, compile_option_tuple,
                            infered_info_from_ifile: InferChannelParamsFromIFile, extend_options: dict):
     value_depend_dict = extend_options.get("valueDepend")
@@ -1327,11 +1358,20 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
 
     compile_info_origin = CompileInfo()
     compile_option_tuple_origin = None
-    if get_context().get_addition("super_kernel_sub_combine") is True and \
-        global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+    context = get_context()
+    record_super_kernel_only = context is not None and \
+        context.get_addition("super_kernel_sub_combine_record_only") is True
+    is_super_kernel_sub_combine = get_context().get_addition("super_kernel_sub_combine") is True and \
+        global_var_storage.get_variable("ascendc_enable_super_kernel") is True
+    if is_super_kernel_sub_combine:
         global_var_storage.set_variable("ascendc_sk_double_compile", True)
         compile_info_origin = copy.deepcopy(compile_info)
         compile_option_tuple_origin = copy.deepcopy(compile_option_tuple)
+        manifest_recorder.enable_super_kernel_sub_combine()
+    elif record_super_kernel_only:
+        compile_info_origin = copy.deepcopy(compile_info)
+        compile_option_tuple_origin = copy.deepcopy(compile_option_tuple)
+        manifest_recorder.enable_super_kernel_sub_combine(record_only=True)
 
     # dump ktype handle 
     compile_info.raw_tiling_key_kernel_type = copy.deepcopy(compile_info.tiling_key_kernel_type)
@@ -1339,8 +1379,9 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
     handle_sk_codegen_options(compile_info, infered_info_from_ifile)
 
     # stub kernel func generation
+    wrapper_role = "super_kernel" if is_super_kernel_sub_combine else "normal"
     workspace_idx = gen_op_stub_kernel_func(compile_info, op_info, compile_option_tuple, tiling_info, distinct_tag,
-                                       kernel_meta_dir)
+                                       kernel_meta_dir, wrapper_role)
     # handle compile options
     handle_compile_options(compile_info, compile_option_tuple, tiling_info, workspace_idx)
 
@@ -1351,8 +1392,7 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
     link_kernel_obj(compile_info, op_info, tiling_info)
 
     # aclnn sk combine compile workflow
-    if get_context().get_addition("super_kernel_sub_combine") is True and \
-        global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+    if is_super_kernel_sub_combine:
         # reset sk opt
         global_var_storage.set_variable("ascendc_enable_super_kernel", False)
         global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", True)
@@ -1370,6 +1410,9 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
 
         # compile_sk_bind
         sk_bind_dst_file = compile_sk_bind(compile_info, compile_info_origin, compile_option_tuple, kernel_meta_dir)
+        manifest_recorder.record_super_kernel_sub_combine(
+            compile_info, compile_info_origin, compile_option_tuple, compile_option_tuple_origin,
+            os.path.join(kernel_meta_dir, "sk_bind.cpp"))
 
         # link norm.o and sk.o and sk_bind.o
         link_sk_norm_combine(compile_info.dst_file, compile_info_origin.dst_file, sk_bind_dst_file,
@@ -1382,6 +1425,11 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
     # generate opinfo json
     _json_post_process(compile_info, op_info, tiling_info, input_gen_placehoder, \
                        output_gen_placehoder, compile_log_path)
+    if record_super_kernel_only:
+        record_super_kernel_sub_combine_without_compile(
+            compile_info_origin, compile_info, compile_option_tuple_origin,
+            compile_option_tuple, op_info, tiling_info, infered_info_from_ifile,
+            distinct_tag, kernel_meta_dir)
     if not global_var_storage.get_variable("ascendc_compile_debug_config"):
         tiling_info.remove_file()
         CommonUtility.remove_temp_file(compile_info.gen_kernel_func_file)
@@ -1390,7 +1438,10 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         "compile Ascend C operator {} success".format(op_info.op_type), AscendCLogLevel.LOG_INFO)
     msg_info = "<{}> <{}> compile op end".format(compile_info.op_type, compile_info.tiling_key_list)
     LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
-    manifest_recorder.write(compile_info, tiling_info, compile_option_tuple)
+    if is_super_kernel_sub_combine:
+        manifest_recorder.write(compile_info_origin, tiling_info, compile_option_tuple_origin)
+    else:
+        manifest_recorder.write(compile_info, tiling_info, compile_option_tuple)
 
 
 def compile_op(cce_file: str, origin_func_name: str, op_info: OpInfo, compile_options: list = None,
@@ -1421,6 +1472,17 @@ def compile_op(cce_file: str, origin_func_name: str, op_info: OpInfo, compile_op
     _add_op_compile_options_by_customized_json(op_compile_option, compile_option_tuple)
 
     compile_option_tuple.compile_options = compile_pre_process(op_info, compile_option_tuple.compile_options)
+
+    # Temporary recorder-only override for validating super-kernel manifest resources.
+    context = get_context()
+    if context is not None:
+        context.add_addition("super_kernel_sub_combine", True)
+        context.add_addition("super_kernel_sub_combine_record_only", True)
+        context.add_addition("super_kernel_sub_info", {
+            "enable_super_kernel": True,
+            "super_kernel_options": "",
+            "super_kernel_sub_loc": "middle"
+        })
 
     DFXSectionGenerator().dfx_info_reset(op_info)
 

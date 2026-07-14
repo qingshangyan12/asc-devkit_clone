@@ -49,6 +49,10 @@ class OpCompileManifestRecorder:
         self.kernel_meta_dir = None
         self.compile_log_path = None
         self.use_compile_options_from_log = False
+        self.is_super_kernel_sub_combine = False
+        self.super_kernel_record_only = False
+        self.compile_records = []
+        self.pending_bindings = []
         self.manifest = {
             "version": MANIFEST_VERSION,
             "basic_info": {},
@@ -69,6 +73,25 @@ class OpCompileManifestRecorder:
                 "raw_options": []
             }
         }
+
+    def enable_super_kernel_sub_combine(self, record_only=False):
+        self.is_super_kernel_sub_combine = True
+        self.super_kernel_record_only = record_only
+        self.manifest["workflow"] = "super_kernel_sub_combine"
+        self.manifest["super_kernel_sub_combine"] = {
+            "compile_options_delta": {
+                "add": self._empty_compile_option_section(),
+                "remove": self._empty_compile_option_section()
+            },
+            "kernel_attributes": {
+                "normal": "",
+                "super_kernel": ""
+            },
+            "split_count": 0,
+            "bindings": []
+        }
+        if record_only:
+            self.manifest["super_kernel_sub_combine"]["record_only"] = True
 
     def start(self, op_info: OpInfo, origin_func_name: str, cce_file: str, kernel_meta_dir: str):
         self.reset()
@@ -135,10 +158,10 @@ class OpCompileManifestRecorder:
             "raw_options": compile_option_info["raw_options"]
         }
 
-    def record_wrapper_body(self, compile_info: CompileInfo):
+    def record_wrapper_body(self, compile_info: CompileInfo, role="normal"):
         if self.kernel_meta_dir is None or compile_info is None:
             return
-        wrapper_body_file = self._get_wrapper_body_filename()
+        wrapper_body_file = self._get_wrapper_body_filename(role)
         if wrapper_body_file is None:
             return
         wrapper_body_path = os.path.join(self.kernel_meta_dir, wrapper_body_file)
@@ -151,19 +174,114 @@ class OpCompileManifestRecorder:
                 CommonUtility.print_compile_log(compile_info.kernel_name, \
                     "record wrapper body did not find source include line", \
                     AscendCLogLevel.LOG_WARNING)
-            wrapper_body_lines, inserted = self._insert_kernel_type_placeholder(wrapper_body_lines)
-            if not inserted:
-                CommonUtility.print_compile_log(compile_info.kernel_name, \
-                    "record wrapper body did not find kernel function declaration", \
-                    AscendCLogLevel.LOG_WARNING)
+            if role == "normal":
+                wrapper_body_lines, inserted = self._insert_kernel_type_placeholder(wrapper_body_lines)
+                if not inserted:
+                    CommonUtility.print_compile_log(compile_info.kernel_name, \
+                        "record wrapper body did not find kernel function declaration", \
+                        AscendCLogLevel.LOG_WARNING)
             with open(wrapper_body_path, 'w') as fd:
                 fd.writelines(wrapper_body_lines)
             os.chmod(wrapper_body_path, stat.S_IRUSR + stat.S_IWUSR + stat.S_IRGRP + stat.S_IROTH)
-            self.manifest.setdefault("artifacts", {})["wrapper_body"] = wrapper_body_file
+            artifact_name = "super_kernel_wrapper_body" if role == "super_kernel" else "wrapper_body"
+            self.manifest.setdefault("artifacts", {})[artifact_name] = wrapper_body_file
         except Exception as err:
             CommonUtility.print_compile_log(compile_info.kernel_name, \
                 "record wrapper body failed, reason is: {}".format(err), \
                 AscendCLogLevel.LOG_WARNING)
+
+    def record_super_kernel_sub_combine(self, super_compile_info: CompileInfo,
+                                        normal_compile_info: CompileInfo,
+                                        super_compile_options: CompileOptionTuple,
+                                        normal_compile_options: CompileOptionTuple,
+                                        sk_bind_source_path):
+        if not self.is_super_kernel_sub_combine:
+            return
+        kernel_name = self.manifest.get("basic_info", {}).get("kernel_name", "")
+        try:
+            combine_info = self.manifest["super_kernel_sub_combine"]
+            combine_info["compile_options_delta"] = {
+                "add": self._compile_option_tuple_difference(super_compile_options, normal_compile_options),
+                "remove": self._compile_option_tuple_difference(normal_compile_options, super_compile_options)
+            }
+            combine_info["kernel_attributes"] = {
+                "normal": str(getattr(normal_compile_info, "global_kernel_attribute", "")),
+                "super_kernel": str(getattr(super_compile_info, "global_kernel_attribute", ""))
+            }
+            if sk_bind_source_path:
+                self._record_sk_bind_source(sk_bind_source_path)
+        except Exception as err:
+            self._warning(kernel_name, "record super kernel sub combine failed, reason is: {}".format(err))
+
+    @staticmethod
+    def _empty_compile_option_section():
+        return {
+            "include_paths": [],
+            "include_files": [],
+            "macros": [],
+            "undef_macros": [],
+            "options": [],
+            "mllvm_options": [],
+            "raw_options": []
+        }
+
+    def _compile_option_tuple_difference(self, lhs, rhs):
+        if lhs is None:
+            return self._empty_compile_option_section()
+        lhs_compile_options = self._to_jsonable_list(getattr(lhs, "compile_options", []))
+        rhs_compile_options = self._to_jsonable_list(getattr(rhs, "compile_options", [])) if rhs else []
+        raw_options = self._subtract_options(lhs_compile_options, rhs_compile_options)
+        result = self._categorize_compile_options(raw_options)
+        lhs_mllvm_options = self._to_jsonable_list(getattr(lhs, "mllvm_options", []))
+        rhs_mllvm_options = self._to_jsonable_list(getattr(rhs, "mllvm_options", [])) if rhs else []
+        result["mllvm_options"].extend(self._subtract_options(lhs_mllvm_options, rhs_mllvm_options))
+        return result
+
+    def _record_sk_bind_source(self, source_path):
+        sk_bind_file = self._get_sk_bind_filename()
+        if sk_bind_file is None or not source_path:
+            return
+        kernel_name = self.manifest.get("basic_info", {}).get("kernel_name", "")
+        destination = os.path.join(self.kernel_meta_dir, sk_bind_file)
+        try:
+            with open(source_path, 'r') as fd:
+                content = fd.read()
+            with open(destination, 'w') as fd:
+                fd.write(content)
+            os.chmod(destination, stat.S_IRUSR + stat.S_IWUSR + stat.S_IRGRP + stat.S_IROTH)
+            self.manifest.setdefault("artifacts", {})["sk_bind"] = sk_bind_file
+            self.pending_bindings = self._parse_sk_bind_source(content)
+            if not self.pending_bindings:
+                self._warning(kernel_name, "record sk bind source did not find SK_BIND declarations")
+            split_counts = {len(binding["split_symbols"]) for binding in self.pending_bindings}
+            if len(split_counts) == 1:
+                self.manifest["super_kernel_sub_combine"]["split_count"] = split_counts.pop()
+            elif split_counts:
+                self._warning(kernel_name, "record sk bind found inconsistent split counts")
+        except Exception as err:
+            self._warning(kernel_name, "record sk bind source failed, reason is: {}".format(err))
+
+    @staticmethod
+    def _parse_sk_bind_source(content):
+        bindings = []
+        pattern = re.compile(r"^\s*SK_BIND\((?P<args>.*)\);\s*$")
+        for line in content.splitlines():
+            match = pattern.match(line)
+            if match is None:
+                continue
+            args = [arg.strip() for arg in match.group("args").split(',')]
+            if len(args) < 3:
+                continue
+            bindings.append({
+                "normal_symbol": args[0],
+                "super_kernel_symbol": args[2],
+                "split_symbols": args[3:]
+            })
+        return bindings
+
+    @staticmethod
+    def _warning(kernel_name, message):
+        CommonUtility.print_compile_log(kernel_name, message, AscendCLogLevel.LOG_WARNING)
 
     def record_tiling_struct(self, tiling_data_file_path):
         if self.kernel_meta_dir is None:
@@ -266,6 +384,10 @@ class OpCompileManifestRecorder:
             self.update_basic_info(compile_info=compile_info, tiling_info=tiling_info)
             if not self.update_compile_options_from_log() and compile_option_tuple is not None:
                 self.update_compile_options(compile_option_tuple)
+            if self.is_super_kernel_sub_combine:
+                if self.super_kernel_record_only:
+                    self._record_synthetic_sk_bind()
+                self._finalize_super_kernel_bindings()
             self.update_kernel_type_info_from_compile_options(compile_info)
             with open(self.manifest_path, 'w') as fd:
                 json.dump(self.manifest, fd, indent=2, sort_keys=True)
@@ -399,11 +521,19 @@ class OpCompileManifestRecorder:
             return ""
         return os.path.basename(os.path.normpath(str(cce_file)))
 
-    def _get_wrapper_body_filename(self):
+    def _get_wrapper_body_filename(self, role="normal"):
         op_name = self.manifest.get("basic_info", {}).get("op_name")
         if not op_name:
             return None
+        if role == "super_kernel":
+            return "{}_super_kernel_wrapper_body.cpp".format(op_name)
         return "{}_wrapper_body.cpp".format(op_name)
+
+    def _get_sk_bind_filename(self):
+        op_name = self.manifest.get("basic_info", {}).get("op_name")
+        if not op_name:
+            return None
+        return "{}_sk_bind.cpp".format(op_name)
 
     def _get_tiling_struct_filename(self):
         op_name = self.manifest.get("basic_info", {}).get("op_name")
@@ -534,8 +664,14 @@ class OpCompileManifestRecorder:
         compile_cmds = self._get_compile_stage_cmds()
         if not compile_cmds:
             return False
-        compile_records = [self._parse_compile_cmd(cmd) for cmd in compile_cmds]
-        compile_records = [record for record in compile_records if record["tiling_key"] is not None]
+        self.compile_records = [self._parse_compile_cmd(cmd) for cmd in compile_cmds]
+        if self.super_kernel_record_only:
+            for record in self.compile_records:
+                if record["role"] == "super_kernel":
+                    record["role"] = "normal"
+        compile_records = [record for record in self.compile_records if record["tiling_key"] is not None]
+        if self.is_super_kernel_sub_combine:
+            compile_records = [record for record in compile_records if record["role"] == "normal"]
         if not compile_records:
             return False
         common_raw_options = self._common_options([record["raw_options"] for record in compile_records])
@@ -566,6 +702,97 @@ class OpCompileManifestRecorder:
             "by_tiling_key": by_tiling_key
         }
         return True
+
+    def _record_synthetic_sk_bind(self):
+        if self.pending_bindings:
+            return
+        combine_info = self.manifest.get("super_kernel_sub_combine", {})
+        normal_attribute = combine_info.get("kernel_attributes", {}).get("normal", "")
+        super_attribute = combine_info.get("kernel_attributes", {}).get("super_kernel", "")
+        records = []
+        seen = set()
+        for record in self.compile_records:
+            normal_symbol = record.get("kernel_symbol", "")
+            identity = (normal_symbol, record.get("tiling_key"), record.get("core_type"), record.get("arch"))
+            if record.get("role") != "normal" or not normal_symbol or identity in seen:
+                continue
+            seen.add(identity)
+            records.append(record)
+        if not records:
+            self._warning(self.manifest.get("basic_info", {}).get("kernel_name", ""),
+                          "record-only super kernel workflow did not find normal kernel symbols")
+            return
+
+        lines = ['#include "kernel_operator.h"\n']
+        for record in records:
+            normal_symbol = record["kernel_symbol"]
+            super_symbol = normal_symbol + "_middle"
+            split_symbols = [super_symbol + "_split{}".format(index) for index in range(1, 4)]
+            lines.append('extern "C" {} void {}();\n'.format(normal_attribute, normal_symbol))
+            lines.append('extern "C" {} void {}();\n'.format(super_attribute, super_symbol))
+            for split_symbol in split_symbols:
+                lines.append('extern "C" {} void {}();\n'.format(super_attribute, split_symbol))
+            lines.append("SK_BIND({}, 0, {}, {});\n".format(
+                normal_symbol, super_symbol, ", ".join(split_symbols)))
+
+        sk_bind_file = self._get_sk_bind_filename()
+        destination = os.path.join(self.kernel_meta_dir, sk_bind_file)
+        with open(destination, 'w') as fd:
+            fd.writelines(lines)
+        os.chmod(destination, stat.S_IRUSR + stat.S_IWUSR + stat.S_IRGRP + stat.S_IROTH)
+        self.manifest.setdefault("artifacts", {})["sk_bind"] = sk_bind_file
+        self.pending_bindings = self._parse_sk_bind_source("".join(lines))
+        combine_info["split_count"] = 3
+
+    def _finalize_super_kernel_bindings(self):
+        combine_info = self.manifest.get("super_kernel_sub_combine", {})
+        kernel_name = self.manifest.get("basic_info", {}).get("kernel_name", "")
+        if not self.pending_bindings:
+            self._warning(kernel_name, "record sk bind has no symbol bindings")
+        normal_records = {
+            record["kernel_symbol"]: record
+            for record in self.compile_records
+            if record["role"] == "normal" and record["kernel_symbol"]
+        }
+        super_records = {
+            record["kernel_symbol"]: record
+            for record in self.compile_records
+            if record["role"] == "super_kernel" and record["kernel_symbol"]
+        }
+        pending_by_normal = {
+            binding["normal_symbol"]: binding for binding in self.pending_bindings
+        }
+        ordered_normal_symbols = []
+        for record in self.compile_records:
+            normal_symbol = record["kernel_symbol"]
+            if record["role"] == "normal" and normal_symbol in pending_by_normal and \
+                    normal_symbol not in ordered_normal_symbols:
+                ordered_normal_symbols.append(normal_symbol)
+        for normal_symbol in pending_by_normal:
+            if normal_symbol not in ordered_normal_symbols:
+                ordered_normal_symbols.append(normal_symbol)
+
+        bindings = []
+        for normal_symbol in ordered_normal_symbols:
+            pending = pending_by_normal[normal_symbol]
+            super_symbol = pending["super_kernel_symbol"]
+            normal_record = normal_records.get(normal_symbol)
+            super_record = super_records.get(super_symbol)
+            if normal_record is None or super_record is None:
+                self._warning(kernel_name, "record sk bind did not match normal and super kernel compile commands")
+            elif (normal_record["tiling_key"], normal_record["core_type"], normal_record["arch"]) != \
+                    (super_record["tiling_key"], super_record["core_type"], super_record["arch"]):
+                self._warning(kernel_name, "record sk bind matched compile commands with inconsistent identity")
+            identity = normal_record or super_record or {}
+            bindings.append({
+                "tiling_key": identity.get("tiling_key", ""),
+                "core_type": identity.get("core_type", ""),
+                "arch": identity.get("arch", ""),
+                "normal_symbol": normal_symbol,
+                "super_kernel_symbol": super_symbol,
+                "split_symbols": list(pending["split_symbols"])
+            })
+        combine_info["bindings"] = bindings
 
     def update_kernel_type_info_from_compile_options(self, compile_info):
         if compile_info is None or getattr(compile_info, "no_set_kernel_type", False) is not True:
@@ -691,8 +918,37 @@ class OpCompileManifestRecorder:
             "tiling_key": self._get_tiling_key(raw_options),
             "core_type": self._get_core_type(tokens),
             "arch": self._get_arch(tokens),
+            "input_path": self._get_compile_input(tokens),
+            "role": self._get_compile_role(tokens),
+            "kernel_symbol": self._get_auto_gen_kernel_symbol(raw_options),
             "raw_options": raw_options
         }
+
+    @staticmethod
+    def _get_compile_input(tokens):
+        for token in tokens:
+            if OpCompileManifestRecorder._is_compile_input(token):
+                return token
+        return ""
+
+    @staticmethod
+    def _get_compile_role(tokens):
+        compile_input = os.path.basename(OpCompileManifestRecorder._get_compile_input(tokens))
+        if compile_input == "sk_bind.cpp":
+            return "bind"
+        if compile_input.endswith("_norm_kernel.cpp"):
+            return "normal"
+        if compile_input.endswith("_kernel.cpp"):
+            return "super_kernel"
+        return "normal"
+
+    @staticmethod
+    def _get_auto_gen_kernel_symbol(options):
+        for option in options:
+            macro_name, macro_value = OpCompileManifestRecorder._split_macro_option(option)
+            if macro_name.startswith("auto_gen_") and macro_value:
+                return macro_value
+        return ""
 
     @staticmethod
     def _extract_compile_options(tokens):
