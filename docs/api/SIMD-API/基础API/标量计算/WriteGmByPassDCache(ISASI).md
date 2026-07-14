@@ -46,6 +46,7 @@ AscendC::DataCacheCleanAndInvalid<T, AscendC::CacheLine::SINGLE_CACHE_LINE, Asce
 AscendC::DataSyncBarrier<AscendC::MemDsbT::DDR>();
 AscendC::WriteGmByPassDCache<T>(addr, value);
 ```
+
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
