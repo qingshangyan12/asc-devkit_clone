@@ -77,6 +77,8 @@ __aicore__ inline void AssembleHcclMsgExtForCCU(
     KERNEL_LOG(
         KERNEL_INFO, "ApiClient AssembleHcclMsgExtForCCU ccuParam.ccuMsgExt:0x%llx, ccuMsgExt:0x%llx",
         reinterpret_cast<uint64_t>(ccuParam.ccuMsgExt), reinterpret_cast<uint64_t>(ccuMsgExt));
+    AscendC::PRINTF("ApiClient AssembleHcclMsgExtForCCU ccuParam.ccuMsgExt:0x%llx, ccuMsgExt:0x%llx",
+        reinterpret_cast<uint64_t>(ccuParam.ccuMsgExt), reinterpret_cast<uint64_t>(ccuMsgExt));
 
     for (uint32_t i = 0U; i < ccuParam.rankNum; ++i) {
         uint64_t sendSize = allToAllVParam->sendCounts[i] * dataSize;
@@ -87,11 +89,14 @@ __aicore__ inline void AssembleHcclMsgExtForCCU(
         KERNEL_LOG(
             KERNEL_INFO, "ApiClient ccuMsgExt rankIndex:%u, sendSize:%d, sendOffset:%d, recvOffset:%d", i,
             ccuMsgExt[i].sendSize, ccuMsgExt[i].sendOffset, ccuMsgExt[i].recvOffset);
+        AscendC::PRINTF("ApiClient ccuMsgExt rankIndex:%u, sendSize:%d, sendOffset:%d, recvOffset:%d", i,
+            ccuMsgExt[i].sendSize, ccuMsgExt[i].sendOffset, ccuMsgExt[i].recvOffset);
     }
 
     uint32_t tmpCnt = (sizeof(CCUMsgExt) * ccuParam.rankNum) / MAX_DCCI_CNT;
     uint32_t copyCnt = (sizeof(CCUMsgExt) * ccuParam.rankNum) % MAX_DCCI_CNT ? tmpCnt + 1 : tmpCnt;
     KERNEL_LOG(KERNEL_INFO, "ApiClient AssembleHcclMsgExtForCCU tmpCnt:%d, copyCnt:%d", tmpCnt, copyCnt);
+    AscendC::PRINTF("ApiClient AssembleHcclMsgExtForCCU tmpCnt:%d, copyCnt:%d", tmpCnt, copyCnt);
 
     GlobalTensor<int64_t> globalHcclMsgArea;
     uint64_t tmpSize = 0;
@@ -135,6 +140,7 @@ __aicore__ inline void CalcGoSize(uint64_t sliceSize, uint64_t loopCount, uint64
     uint64_t n = (sliceSize - m * loopSize) / ccuMemsliceSize;
     uint64_t p = sliceSize - m * loopSize - n * ccuMemsliceSize;
     KERNEL_LOG(KERNEL_INFO, "ApiClient CalcGoSize loopSize:%d, m:%d, n:%d, p:%d", loopSize, m, n, p);
+    AscendC::PRINTF("ApiClient CalcGoSize loopSize:%d, m:%d, n:%d, p:%d", loopSize, m, n, p);
 
     goSize[0] = loopSize * m;
     goSize[1] = m;
