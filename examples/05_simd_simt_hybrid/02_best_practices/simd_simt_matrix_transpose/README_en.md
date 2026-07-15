@@ -59,41 +59,6 @@ This sample constructs an optimization path through five cases. The kernel, Thre
 
 Here, `core` is the hardware vector core count. The runtime queries this value by using `aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)`. The performance data in this sample was collected in a test environment where `core=64`. `tiles` is the total tile count `(W/32) x (H/32)`. When processing a 1024x1024 matrix, the matrix is divided into 32x32 tiles, so `tiles=1024`.
 
-#### Thread Block to Tile Mapping
-
-Starting from Case 1, the matrix is processed in 32x32 tiles. The left side of the following figure shows a 1024x1024 matrix divided into 32x32 tiles. The right side shows the thread mapping inside one 32x32 tile. The in-tile column index is denoted by `tx`, and the in-tile row index is denoted by `ty`.
-
-**Figure 1: Thread Block to tile mapping**
-
-<img src="./figures/block_mapping.png" width="60%">
-
-Taking the green element in the figure as a reference, its input coordinates in GM can be derived from the tile coordinates and the local coordinates inside the tile.
-
-- The tile coordinates of the green element are `(2, 1)`. For a 1024x1024 matrix, `tiles_x = 1024 / 32 = 32`. Therefore, `tile_id = 2 * 32 + 1 = 65`.
-- The local coordinates of the green element inside the tile are `(2, 29)`, corresponding to `ty = 2` and `tx = 29`.
-
-Substitute these values into the coordinate computation:
-
-```cpp
-uint32_t tile_y = tile_id / tiles_x;                     // 65 / 32 = 2
-uint32_t tile_x = tile_id - tile_y * tiles_x;             // 65 - 2 * 32 = 1
-uint32_t x_index = tile_x * TILE_DIM + tx;                // 1 * 32 + 29 = 61
-uint32_t y_index = tile_y * TILE_DIM + ty;                // 2 * 32 + 2  = 66
-uint32_t index = x_index + width * y_index;              // 61 + 1024 * 66
-```
-
-Therefore, the input element coordinates processed by this thread in GM are `input[66,61]`.
-
-#### SIMD and SIMT Hybrid Data Flow
-
-In Case 1 and later transpose paths, the Vector-side MTE2 moves data from GM to UB. Then `asc_vf_call` invokes a SIMT VF function to complete SIMT thread-level transpose and write the result to the UB output buffer. Finally, MTE3 continuously stores the UB output buffer to GM.
-
-The core idea of UB staging is shown in the following figure. In the GM read phase, the kernel loads data into the UB input buffer continuously along the row direction of the input matrix. The SIMT VF reads the input buffer in the transpose direction and writes the output buffer along the row direction of the output matrix. Then MTE3 continuously stores the output buffer to GM. The original non-contiguous GM write is moved to transpose-direction access inside UB.
-
-**Figure 2: UB staging transpose data flow**
-
-<img src="./figures/ub_transpose_dataflow.png" width="60%">
-
 ### Performance Metrics
 
 | Metric | Description |
@@ -139,23 +104,20 @@ Case 0 keeps GM reads contiguous and writes data directly to the transposed outp
 
 **Optimization Goal**: Introduce MTE movement, UB staging, and 32x32 tiling. This converts the non-contiguous global memory write in Case 0 into UB access and makes GM reads and writes as contiguous as possible. This case sets the Thread Block count by tile groups. Each Thread Block processes two 32x32 tiles.
 
-**Core Implementation**: The matrix is divided into 32x32 tiles. The total tile count is `tiles=(W/32) x (H/32)`. In this case, each Thread Block launches 2048 threads and can process two tiles at the same time. Therefore, the Thread Block count is set to `ceil(tiles / 2)`. The Vector-side MTE2 continuously loads each tile into `in_tile` along the row direction of the input matrix. The SIMT VF reads `in_tile` in the transpose direction and continuously writes `out_tile`. Finally, MTE3 continuously stores `out_tile` to GM along the row direction of the output matrix.
+**Core Implementation**: The matrix is divided into 32x32 tiles. The total tile count is `tiles=(W/32) x (H/32)`. In this case, each Thread Block launches 2048 threads and can process two tiles at the same time. Therefore, the Thread Block count is set to `ceil(tiles / 2)`. The data path is as follows: MTE2 moves GM data to the UB input buffer, the SIMT VF performs transpose in UB and writes the UB output buffer, and then MTE3 continuously stores the UB output buffer back to GM.
 
 ```cpp
 __ubuf__ float in_tile[TILES_PER_BLOCK][TILE_DIM][TILE_DIM];
-__ubuf__ float out_tile[TILES_PER_BLOCK][TILE_DIM][TILE_PAD_STRIDE];
+__ubuf__ float out_tile[TILES_PER_BLOCK][TILE_DIM][TILE_DIM];
 
 copy_gm_2tile_to_ub(&in_tile[0][0][0], input, width, tiles_x, tile_base, total_tiles);
-asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+...
 asc_vf_call<simt_transpose_2tile>(dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1),
                                   &out_tile[0][0][0], &in_tile[0][0][0],
                                   tile_base, total_tiles);
-asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+...
 copy_ub_2tile_to_gm(output, &out_tile[0][0][0], height, tiles_x, tile_base, total_tiles);
-asc_sync_notify(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
-asc_sync_wait(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
+...
 ```
 
 **Performance Data**:
@@ -182,16 +144,13 @@ uint32_t loop_step = block_num * TILES_PER_BLOCK;
 
 for (uint32_t tile_base = loop_start; tile_base < total_tiles; tile_base += loop_step) {
     copy_gm_2tile_to_ub(&in_tile[0][0][0], input, width, tiles_x, tile_base, total_tiles);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    ...
     asc_vf_call<simt_transpose_2tile>(dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1),
                                       &out_tile[0][0][0], &in_tile[0][0][0],
                                       tile_base, total_tiles);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    ...
     copy_ub_2tile_to_gm(output, &out_tile[0][0][0], height, tiles_x, tile_base, total_tiles);
-    asc_sync_notify(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
+    ...
 }
 ```
 
@@ -215,61 +174,55 @@ Case 2 fixes the Thread Block count to the hardware vector core count. Compared 
 
 - The Thread Block layout and tile mapping are the same as those in Case 2.
 - Each Thread Block still processes two 32x32 tiles per iteration.
-- The physical layout of both `in_tile` and `out_tile` changes from 32x32 to 32x40.
+- The physical layout of `in_tile` changes from 32x32 to 32x40.
+- `out_tile` still uses a contiguous 32x32 layout. The SIMT VF writes it continuously along the output tile row direction, and MTE3 then stores it continuously to GM.
 - The SIMT VF still processes only the valid 32x32 data.
+
+On Ascend 950PR/Ascend 950DT, UB is divided into 16 banks and organized as 8 bank groups. In SIMT programming mode, each bank is further divided into 4 subbanks. If multiple threads in the same Warp access subbanks with the same subbank ID in the same bank group in one UB access instruction, the hardware queues the requests. This causes a subbank conflict and increases access latency.
+
+**Figure 1: UB bank structure**
+
+<img src="./figures/bank结构示意图.png">
+
+In SIMT programming, this sample mainly involves two types of subbank conflicts:
+
+- **Write-write conflict**: Multiple write operations access subbanks with the same subbank ID in the same bank group at the same time.
+- **Read-read conflict**: Multiple read operations access subbanks with the same subbank ID in the same bank group at the same time.
+
+For detailed address low-bit interleaving rules and conflict scenarios, see the [bank_conflict sample](https://gitcode.com/cann/asc-devkit/blob/master/examples/03_simt_api/02_features/01_api_features/00_memory_access/bank_conflict/README.md).
+
+In Case 2, the UB `in_tile` array is stored in row-major order. According to the low-bit interleaving rule, the first row of `in_tile` covers bank0 through bank3, the second row covers bank4 through bank7, the third row covers bank8 through bank11, and the remaining rows follow the same pattern. Each row has 32 float elements and exactly spans 4 banks. As shown in Figure 3, the figure shows how the first 12 rows of the tile array are placed in UB. The first element of each row is marked in blue. During SIMT VF transpose, threads in one Warp read one column of `in_tile`. During the UB access, 32 threads are concentrated on subbank0 in two bank groups, which is a read-read conflict. `out_tile` is written continuously along the output tile row direction, so memory access merging can reduce write overhead. Therefore, `out_tile` does not need padding.
+
+**Figure 3: Case 2 tile layout in UB**
+
+<img src="./figures/case2_bank.png">
 
 In SIMT scenarios, a common way to handle bank conflicts during transpose access to UB is to add padding in the column direction of the tile. This padding makes elements in the same column staggered in the physical UB address space. For a 32x32 float tile, adding one subbank width, that is, 2 columns of padding, forms a 32x34 UB layout and avoids subbank conflicts.
 
 In SIMD and SIMT hybrid programming, the Vector-side MTE moves data into UB. When MTE moves a padded two-dimensional array, the address stride between adjacent rows in UB also needs to meet the alignment requirement. The row stride of a 32x34 layout is `34 * sizeof(float) = 136B`, which does not meet the 32B alignment requirement. Therefore, this sample sets the padding column count to 8 and uses a 32x40 layout. The row stride is `40 * sizeof(float) = 160B`, which staggers UB bank accesses and meets the row stride alignment requirement for MTE movement.
 
-The following uses the UB partitioning rules of Ascend 950PR/Ascend 950DT as a reference to describe how bank conflicts occur in this sample. It also compares the theoretical conflict intensity of the 32x32, 32x34, and 32x40 UB layouts.
+As shown in Figure 4, Case 3 adds 8 columns of padding to the UB tile array, changing each row from 32 elements to 40 elements. The row stride of 40 float elements is 160B, which corresponds to 20 subbanks. When the same column is accessed in the transpose direction, elements in adjacent rows are staggered by a stride of 20 subbanks in the physical UB address space. The accesses of 32 threads are no longer concentrated on subbanks with the same subbank ID in the same bank group, which reduces subbank conflicts during the SIMT VF transpose access phase.
 
-The total UB size is 256 KB and is divided into 16 banks. These 16 banks are further organized into 8 bank groups. Each bank group contains 2 banks. In SIMT programming mode, each bank is divided into 4 subbanks, and each subbank has a width of 8B. The bank conflict in this sample refers to finer-grained subbank conflicts. Multiple threads in the same Warp may access UB at the same time in one UB access instruction. If these accesses belong to subbank resources with the same subbank ID in the same bank group, the hardware cannot process all requests in one cycle. The requests must wait in a queue, which forms a subbank conflict and increases access latency. If these accesses belong to the same 8B address range in the same subbank row, the hardware merges the requests and no subbank conflict occurs.
+Note that the 32x40 layout is a tradeoff for SIMD and SIMT hybrid programming after considering the alignment requirements of MTE movement. Unlike the 32x34 layout formed by adding 2 columns of padding in a SIMT scenario, the 32x40 layout may still have a small number of subbank conflicts. However, its conflict intensity is much lower than that of the unpadded 32x32 layout.
 
-**Figure 3: UB bank structure**
-<img src="./figures/bank结构示意图.png">
+**Figure 4: Case 3 tile layout in UB**
 
-**Low-bit interleaving is used for addresses:** As shown in the following figure, contiguous addresses in UB are mapped to bank0 through bank15 at a granularity of 32B. The first 32B address segment is mapped to bank0, the second segment is mapped to bank1, and so on. The 16th segment is mapped to bank15, and the 17th segment is mapped back to the next row of bank0.
-
-**Figure 4: UB address low-bit interleaving layout**
-<img src="./figures/bank内存排布示意图.png">
-
-Subbank conflicts in SIMT programming mainly include the following types:
-
-- **Write-write conflict**: Multiple write operations try to access subbanks with the same subbank ID in the same bank group at the same time.
-- **Read-read conflict**: Multiple read operations try to access subbanks with the same subbank ID in the same bank group at the same time.
-
-In Case 2, the UB `in_tile` array is stored in row-major order. According to the low-bit interleaving rule, the first row of `in_tile` covers bank0 through bank3, the second row covers bank4 through bank7, the third row covers bank8 through bank11, and the remaining rows follow the same pattern. Each row has 32 float elements and exactly spans 4 banks. As shown in Figure 5, the figure shows how the first 12 rows of the tile array are placed in UB. The first element of each row is marked in blue. During SIMT VF transpose, threads in one Warp read one column of `in_tile`. During the UB access, 32 threads are concentrated on subbank0 in two bank groups, which is a read-read conflict. At the same time, the SIMT VF writes `out_tile` along the output tile row direction. Therefore, `out_tile` also uses a padded layout to avoid introducing new UB write-write conflicts in the output phase.
-
-**Figure 5: Case 2 tile layout in UB**
-<img src="./figures/case2_bank.png">
-
-As shown in Figure 6, Case 3 adds 8 columns of padding to the UB tile array, changing each row from 32 elements to 40 elements. The row stride of 40 float elements is 160B, which corresponds to 20 subbanks. When the same column is accessed in the transpose direction, elements in adjacent rows are staggered by a stride of 20 subbanks in the physical UB address space. The accesses of 32 threads are no longer concentrated on subbanks with the same subbank ID in the same bank group, which reduces subbank conflicts during the SIMT VF transpose access phase.
-
-Note that the 32x40 layout is a tradeoff for SIMD and SIMT hybrid programming after considering the alignment requirements of MTE movement. Unlike the 32x34 layout formed by adding 2 columns of padding in a pure SIMT scenario, the 32x40 layout may still have a small number of subbank conflicts. However, its conflict intensity is much lower than that of the unpadded 32x32 layout.
-
-**Figure 6: Case 3 tile layout in UB**
 <img src="./figures/case3_bank.png">
 
 ```cpp
 constexpr int TILE_PAD = 8;                          // The hybrid MTE movement requires 32B alignment, so a 32x40 UB layout is used.
 constexpr int TILE_PAD_STRIDE = TILE_DIM + TILE_PAD;
 __ubuf__ float in_tile[TILES_PER_BLOCK][TILE_DIM][TILE_PAD_STRIDE];
-__ubuf__ float out_tile[TILES_PER_BLOCK][TILE_DIM][TILE_PAD_STRIDE];
+__ubuf__ float out_tile[TILES_PER_BLOCK][TILE_DIM][TILE_DIM];
 
 copy_gm_2tile_to_padded_ub(&in_tile[0][0][0], input, width, tiles_x,
                            tile_base, total_tiles);
-asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-
-out_tile[local_tile * TILE_PAD_ELEMENTS + ty * TILE_PAD_STRIDE + tx] =
+...
+out_tile[local_tile * TILE_ELEMENTS + ty * TILE_DIM + tx] =
     in_tile[local_tile * TILE_PAD_ELEMENTS + tx * TILE_PAD_STRIDE + ty];
-asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-
+...
 copy_ub_2tile_to_gm(output, &out_tile[0][0][0], height, tiles_x, tile_base, total_tiles);
-asc_sync_notify(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
-asc_sync_wait(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
+...
 ```
 
 **Performance Data**:
@@ -286,11 +239,11 @@ Case 3 changes only the physical UB layout based on Case 2. It does not change G
 
 ### Case 4: MTE Moves Data to UB Before Transpose Write-Back with Padding and Double Buffer
 
-**Optimization Goal**: Use two padded UB input/output buffers and two event IDs on top of Case 3, so that the MTE2 load, SIMT VF transpose, and MTE3 store pipelines run in parallel.
+**Optimization Goal**: Use two UB input/output buffers and two event IDs on top of Case 3, so that the MTE2 load, SIMT VF transpose, and MTE3 store pipelines run in parallel.
 
 **Core Implementation**:
 
-- Use two input buffers and two output buffers. Each buffer contains two 32x40 padded tiles.
+- Use two input buffers and two output buffers. Each input buffer contains two 32x40 padded tiles, and each output buffer contains two contiguous 32x32 tiles.
 - Use `EVENT_ID0` and `EVENT_ID1` to manage the lifecycle of the two buffers.
 - First move the first tile group into UB to fill the pipeline.
 - In the loop, start MTE2 movement for the next tile group, and then call the SIMT VF to process the current input/output buffers.
@@ -298,59 +251,26 @@ Case 3 changes only the physical UB layout based on Case 2. It does not change G
 
 ```cpp
 __ubuf__ float in_tile[2][TILES_PER_BLOCK][TILE_DIM][TILE_PAD_STRIDE];
-__ubuf__ float out_tile[2][TILES_PER_BLOCK][TILE_DIM][TILE_PAD_STRIDE];
+__ubuf__ float out_tile[2][TILES_PER_BLOCK][TILE_DIM][TILE_DIM];
 
-uint32_t curr_buffer = 0;
-uint32_t curr_event = EVENT_ID0;
-uint32_t pending_mte3 = 0;
-
-asc_sync_notify(PIPE_V, PIPE_MTE2, EVENT_ID0);
-asc_sync_notify(PIPE_V, PIPE_MTE2, EVENT_ID1);
-
-asc_sync_wait(PIPE_V, PIPE_MTE2, curr_event);
 copy_gm_2tile_to_padded_ub(&in_tile[curr_buffer][0][0][0], input, width, tiles_x,
                            curr_tile_base, total_tiles);
-asc_sync_notify(PIPE_MTE2, PIPE_V, curr_event);
+...
 
 for (uint32_t next_tile_base = curr_tile_base + loop_step; curr_tile_base < total_tiles;
      next_tile_base += loop_step) {
-    uint32_t next_buffer = curr_buffer ^ 1;
-    uint32_t next_event = (next_buffer == 0) ? EVENT_ID0 : EVENT_ID1;
-    if (next_tile_base < total_tiles) {
-        asc_sync_wait(PIPE_V, PIPE_MTE2, next_event);
-        copy_gm_2tile_to_padded_ub(&in_tile[next_buffer][0][0][0], input, width, tiles_x,
-                                   next_tile_base, total_tiles);
-        asc_sync_notify(PIPE_MTE2, PIPE_V, next_event);
-    }
-
-    uint32_t curr_mask = 1u << curr_buffer;
-    asc_sync_wait(PIPE_MTE2, PIPE_V, curr_event);
-    if ((pending_mte3 & curr_mask) != 0) {
-        asc_sync_wait(PIPE_MTE3, PIPE_V, curr_event);
-        pending_mte3 &= ~curr_mask;
-    }
+    ...
+    copy_gm_2tile_to_padded_ub(&in_tile[next_buffer][0][0][0], input, width, tiles_x,
+                               next_tile_base, total_tiles);
+    ...
     asc_vf_call<simt_transpose_2tile_pad>(dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1),
                                           &out_tile[curr_buffer][0][0][0],
                                           &in_tile[curr_buffer][0][0][0],
                                           curr_tile_base, total_tiles);
-    asc_sync_notify(PIPE_V, PIPE_MTE2, curr_event);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, curr_event);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, curr_event);
+    ...
     copy_ub_2tile_to_gm(output, &out_tile[curr_buffer][0][0][0], height, tiles_x,
                         curr_tile_base, total_tiles);
-    asc_sync_notify(PIPE_MTE3, PIPE_V, curr_event);
-    pending_mte3 |= curr_mask;
-
-    curr_buffer = next_buffer;
-    curr_event = next_event;
-    curr_tile_base = next_tile_base;
-}
-
-if ((pending_mte3 & 1u) != 0) {
-    asc_sync_wait(PIPE_MTE3, PIPE_V, EVENT_ID0);
-}
-if ((pending_mte3 & 2u) != 0) {
-    asc_sync_wait(PIPE_MTE3, PIPE_V, EVENT_ID1);
+    ...
 }
 ```
 
@@ -402,7 +322,7 @@ When tuning memory access operators, first use the most direct implementation to
 
 After tiling, determine the mapping from Thread Blocks to tiles. Launching Thread Blocks by tile groups is simple. However, when the tile count is much larger than the hardware vector core count, this method introduces extra launch and scheduling overhead. Fixing the Thread Block count to the hardware vector core count and processing multiple tile groups in a loop inside the kernel can reduce this overhead. The thread count and the number of tiles processed by each Thread Block need to be evaluated together with register usage, stack usage, and measured latency.
 
-After GM accesses become contiguous, the bottleneck moves to UB access and pipeline synchronization. When a 32x32 tile is accessed by column during transpose access to UB, bank conflicts can occur. Padding can change the physical UB layout. In SIMD and SIMT hybrid programming, the layout also needs to meet the alignment requirements of MTE movement. Therefore, this sample uses a 32x40 padded tile for both the input buffer and the output buffer. On this basis, double buffering rotates two UB input/output buffer groups. When the current buffer group enters the SIMT VF transpose and MTE3 store pipelines, the MTE2 pipeline can load the next batch of data into the other buffer group. This runs the MTE2 load, SIMT VF transpose, and MTE3 store pipelines in parallel and hides part of the movement overhead.
+After GM accesses become contiguous, the bottleneck moves to UB access and pipeline synchronization. When a 32x32 input tile is accessed by column during transpose access to UB, bank conflicts can occur. Padding can change the physical UB layout. In SIMD and SIMT hybrid programming, the layout also needs to meet the alignment requirements of MTE movement. Therefore, the input buffer in this sample uses a 32x40 padded tile. The output buffer is written continuously along the output tile row direction, so a contiguous 32x32 layout is sufficient. On this basis, double buffering rotates two UB input/output buffer groups. When the current buffer group enters the SIMT VF transpose and MTE3 store pipelines, the MTE2 pipeline can load the next batch of data into the other buffer group. This runs the MTE2 load, SIMT VF transpose, and MTE3 store pipelines in parallel and hides part of the movement overhead.
 
 ## Build and Run
 
@@ -410,7 +330,7 @@ In the sample root directory, perform the following steps to build and run the s
 
 - Configure environment variables.
 
-  Configure environment variables according to the [installation method](../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit package in the current environment.
+  Configure environment variables for the CANN development kit package in the current environment by referring to [Environment Variable Configuration](../../../../docs/en/quick_start.md#cann-env-setup).
 
   ```bash
   source ${install_path}/cann/set_env.sh
