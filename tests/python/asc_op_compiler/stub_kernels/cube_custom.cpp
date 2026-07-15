@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+#include "../../../api/basic_api/ascendc_header_checker/simd_vf_debug/simd_vf_debug_test_prelude.h"
 #include "kernel_operator.h"
 
 constexpr int32_t BUFFER_NUM = 2;
