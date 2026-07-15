@@ -63,7 +63,7 @@
 | 1 | 调用接口设置 | [asc_create_mask](../addr_reg_compute/asc_create_mask.md) | 可以设置参数指定mask的模式，即指定哪些位置的元素参与计算。 |
 | 2 | 调用接口设置 | [asc_update_mask](../addr_reg_compute/asc_update_mask.md) |&bull; 在循环外调用时设置固定的mask，mask表示在一次循环计算中前count个元素参与计算，每次以循环计算均使用此mask。<br>&bull; 在循环内调用时，表示计算中前count个元素参与计算，每次循环mask会自动更新。|
 | 3 | 从Unified Buffer搬入 | [asc_loadalign_postupdate](../reg_load/asc_loadalign_postupdate.md) | 将掩码从UB搬入掩码寄存器。 |
-| 4 | 从矢量数据寄存器搬入 | [asc_copy](../addr_reg_compute/asc_copy.md) | 从RegTensor搬运Mask到MaskReg。 |
+| 4 | 从矢量数据寄存器搬入 | [asc_copy](../addr_reg_compute/asc_copy.md) | 从矢量数据寄存器搬运至掩码寄存器。 |
 
 **注意：**
 MaskReg寄存器数量上限为8。超出限制上限的寄存器数据会写入预留的8K UB内存中，可能会引起性能劣化。编译器会自动复用生命周期结束的寄存器和预留内存，若寄存器与预留内存均存在可用空间，将优先复用寄存器。
