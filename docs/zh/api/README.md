@@ -763,7 +763,6 @@
         -   [调试接口](SIMD-API/基础API/调试接口/调试接口.md)
             -   [上板打印](SIMD-API/基础API/调试接口/上板打印/上板打印.md)
                 -   [DumpTensor](SIMD-API/基础API/调试接口/上板打印/DumpTensor.md)
-                -   [printf](SIMD-API/基础API/调试接口/上板打印/printf.md)
                 -   [DumpAccChkPoint](SIMD-API/基础API/调试接口/上板打印/DumpAccChkPoint.md)
                 -   [PrintTimeStamp](SIMD-API/基础API/调试接口/上板打印/PrintTimeStamp.md)
 
