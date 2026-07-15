@@ -27,7 +27,7 @@ struct KfcAllGatherMesh1DContext : CcuKernelCtxBase {
     std::vector<ccu::Variable> output;
     std::vector<ccu::Variable> token;
     ccu::Variable offset;
-    GroupOpSizeVars goSize;
+    ccu::Variable sliceSize;
 };
 
 static CcuResult InitResource(KfcAllGatherMesh1DContext &ctx)
@@ -54,17 +54,13 @@ static CcuResult InitResource(KfcAllGatherMesh1DContext &ctx)
 }
 
 static CcuResult LoadArgs(KfcAllGatherMesh1DContext &ctx, ccu::Variable inputAddr, ccu::Variable outputAddr,
-                          ccu::Variable tokenInfo, ccu::Variable offset, ccu::Variable goSize1,
-                          ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable goSize4)
+                          ccu::Variable tokenInfo, ccu::Variable offset, ccu::Variable sliceSize)
 {
     ctx.input = inputAddr;
     ctx.output[ctx.rankId] = outputAddr;
     ctx.token[ctx.rankId] = tokenInfo;
     ctx.offset = offset;
-    ctx.goSize.addrOffset = goSize1;
-    ctx.goSize.loopParam = goSize2;
-    ctx.goSize.parallelParam = goSize3;
-    ctx.goSize.residual = goSize4;
+    ctx.sliceSize = sliceSize;
 
     return CCU_SUCCESS;
 }
@@ -105,6 +101,7 @@ static CcuResult DoAllGather(KfcAllGatherMesh1DContext &ctx)
 
     src.addr = ctx.input;
     src.token = ctx.token[ctx.rankId];
+    ccu::Event event;
 
     uint32_t dstId = 0;
     uint32_t curId = 0;
@@ -122,14 +119,24 @@ static CcuResult DoAllGather(KfcAllGatherMesh1DContext &ctx)
         }
     }
 
-    CCU_CHK_RET(GroupBroadcast(ctx, ctx.channels, ctx.channelCount, localDst, dst, src, ctx.goSize));
+    ccu::LocalCopy(localDst, src, ctx.sliceSize, event, 1);
+    ccu::EventWait(event, 1);
+
+    uint32_t channelIdx = 0;
+    for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
+        if (rankIdx == ctx.rankId) {
+            continue;
+        }
+        ccu::Write(ctx.channels[channelIdx], dst[channelIdx], src, ctx.sliceSize, event, 1);
+        ccu::EventWait(event, 1);
+        channelIdx++;
+    }
     return CCU_SUCCESS;
 }
 
 CcuResult CcuKfcAllGatherMesh1DKernel(ccu::Variable inputAddr, ccu::Variable outputAddr,
                                       ccu::Variable tokenInfo, ccu::Variable offset,
-                                      ccu::Variable goSize1, ccu::Variable goSize2,
-                                      ccu::Variable goSize3, ccu::Variable goSize4,
+                                      ccu::Variable sliceSize,
                                       const ChannelHandle channels[], uint32_t channelCount,
                                       uint32_t rankSize, uint32_t rankId)
 {
@@ -147,7 +154,7 @@ CcuResult CcuKfcAllGatherMesh1DKernel(ccu::Variable inputAddr, ccu::Variable out
     ctx.enginePool = 0;
 
     CCU_CHK_RET(InitResource(ctx));
-    CCU_CHK_RET(LoadArgs(ctx, inputAddr, outputAddr, tokenInfo, offset, goSize1, goSize2, goSize3, goSize4));
+    CCU_CHK_RET(LoadArgs(ctx, inputAddr, outputAddr, tokenInfo, offset, sliceSize));
     CCU_CHK_RET(PreSync(ctx));
     CCU_CHK_RET(DoAllGather(ctx));
     CCU_CHK_RET(PostSync(ctx));
