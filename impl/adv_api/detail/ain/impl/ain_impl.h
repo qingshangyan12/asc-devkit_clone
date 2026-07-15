@@ -28,75 +28,88 @@
 
 namespace AscendC {
 
-static AIN_DEVICE AinTeam AinTeamWorld(AinDevComm devComm)
+AIN_DEVICE AinCommSymWindow GetWindowPtr(
+    const hcomm::HcommTeam* team, 
+    const hcomm::HcommWindow& win,
+    uint32_t memberId,
+    uint64_t offset,
+    uint64_t bytes)
 {
-    __gm__ HcclDevComm* hcclDevComm = reinterpret_cast<__gm__ HcclDevComm*>(devComm);
-    AinTeam team;
-    team.nRanks = hcclDevComm->rankSize;
-    team.rank = hcclDevComm->rankId;
-    team.stride = 1;
-    return team;
+    CommMem* mem = &win.mems[memberId];
+    uint64_t memHandle = (uint64_t)mem->addr + offset;
+    return (AinCommSymWindow)memHandle;
 }
 
 template <unsigned commEngineMask>
-AIN_DEVICE Ain::Ain(AinDevComm devComm, int contextIndex)
-    : devComm_(reinterpret_cast<uint64_t>(devComm)), contextIndex_(contextIndex)
+AIN_DEVICE Ain::Ain(int contextIndex)
 {}
 
 AIN_DEVICE Ain::~Ain() {}
 
-AIN_DEVICE void Ain::flush()
+AIN_DEVICE void Ain::flush(AinTeam team)
 {
-    __gm__ HcclDevComm* hcclDevComm = reinterpret_cast<__gm__ HcclDevComm*>(devComm_);
-    uint32_t myRank = hcclDevComm->rankId;
-    uint32_t rankSize = hcclDevComm->rankSize;
-    AivRes* aivRes = reinterpret_cast<AivRes*>(hcclDevComm->AivRes);
+    auto hcommTeam = reinterpret_cast<hcomm::HcommTeam*>(reinterpret_cast<uint64_t>(team));
+    uint32_t rankSize = hcommTeam->memberNum;
+    uint32_t myRank = hcommTeam->selfMemberId;
 
-    for (uint32_t i = 0; i < rankSize; ++i) {
+    for (uint32_t i = 0; i < rankSize; i++) {
         if (i == myRank) {
             continue;
         }
-        ChannelHandle channel = aivRes->entity[i][0];
+        ChannelHandle channel = hcommTeam->channels[i][0];
         hcomm_.Drain(channel);
     }
 }
 
 template <typename RemoteAction, typename LocalAction, typename DescriptorUbuf>
 AIN_DEVICE void Ain::put(
-    AinTeam team, uint32_t peer, AinCommSymWindow dstWin, uint64_t dstOffset, AinCommSymWindow srcWin,
-    uint64_t srcOffset, uint64_t bytes, RemoteAction remoteAction, LocalAction localAction, const DescriptorUbuf& ubuf,
-    AinCommitFlags commitFlags)
+    AinTeam team, 
+    uint32_t peer, 
+    AinCommSymWindow dstWin, uint64_t dstOffset, 
+    AinCommSymWindow srcWin, uint64_t srcOffset, 
+    uint64_t bytes, 
+    RemoteAction remoteAction, LocalAction localAction, 
+    const DescriptorUbuf& ubuf,
+    AinCommitFlags commitFlags
+)
 {
     static_assert(
         !IsSameType<DescriptorUbuf, AinDescriptorUbufNone>::value,
-        "put requires a valid DescriptorUbuf; AinDescriptorUbufNone is not allowed");
-    (void)team;
-    (void)remoteAction;
+        "put requires a valid DescriptorUbuf; AinDescriptorUbufNone is not allowed"
+    );
     (void)localAction;
     hcomm_.Init(ubuf.addr, ubuf.bytes);
 
-    __gm__ SymmetricWindow* dstSymWin = reinterpret_cast<__gm__ SymmetricWindow*>(reinterpret_cast<uint64_t>(dstWin));
-    __gm__ SymmetricWindow* srcSymWin = reinterpret_cast<__gm__ SymmetricWindow*>(reinterpret_cast<uint64_t>(srcWin));
-    __gm__ HcclDevComm* hcclDevComm = reinterpret_cast<__gm__ HcclDevComm*>(devComm_);
-    AivRes* aivRes = reinterpret_cast<AivRes*>(hcclDevComm->AivRes);
-    // Each rank currently has only one channel, so channel index 0 is used by default.
-    ChannelHandle channel = aivRes->entity[peer][0];
+    auto hcommTeam = reinterpret_cast<hcomm::HcommTeam*>(reinterpret_cast<uint64_t>(team));
+    auto srcSymWin = reinterpret_cast<hcomm::HcommWindow*>(reinterpret_cast<uint64_t>(srcWin));
+    auto dstSymWin = reinterpret_cast<hcomm::HcommWindow*>(reinterpret_cast<uint64_t>(dstWin));
 
-    auto remoteAddr =
-        reinterpret_cast<__gm__ uint8_t*>(reinterpret_cast<uintptr_t>(dstSymWin->remoteMems[peer].addr) + dstOffset);
-    auto localAddr = reinterpret_cast<__gm__ uint8_t*>(reinterpret_cast<uintptr_t>(srcSymWin->userVa) + srcOffset);
+    auto remoteAddr = reinterpret_cast<__gm__ uint8_t*>(GetWindowPtr(hcommTeam, *dstSymWin, peer, dstOffset, bytes));
+    auto localAddr = reinterpret_cast<__gm__ uint8_t*>(GetWindowPtr(hcommTeam, *srcSymWin, hcommTeam->selfMemberId, srcOffset, bytes));
+
+    ChannelHandle channel = hcommTeam->channels[peer][0];
 
     if (commitFlags == AIN_COMMIT_DELAYED) {
         hcomm_.WriteNbi<false>(channel, remoteAddr, localAddr, bytes);
     } else {
         hcomm_.WriteNbi(channel, remoteAddr, localAddr, bytes);
     }
+
+    if constexpr (!IsSameType<RemoteAction, AinRemoteNone>::value) {
+        this->signal(team, peer, remoteAction, ubuf, commitFlags);
+    }
 }
 
 template <typename DescriptorUbuf>
 AIN_DEVICE void Ain::get(
-    AinTeam team, uint32_t peer, AinCommSymWindow dstWin, uint64_t dstOffset, AinCommSymWindow srcWin,
-    uint64_t srcOffset, uint64_t bytes, const DescriptorUbuf& ubuf, AinCommitFlags commitFlags)
+    AinTeam team, 
+    uint32_t peer, 
+    AinCommSymWindow dstWin, uint64_t dstOffset, 
+    AinCommSymWindow srcWin, uint64_t srcOffset, 
+    uint64_t bytes, 
+    const DescriptorUbuf& ubuf, 
+    AinCommitFlags commitFlags
+)
 {
     static_assert(
         !IsSameType<DescriptorUbuf, AinDescriptorUbufNone>::value,
@@ -104,16 +117,15 @@ AIN_DEVICE void Ain::get(
     (void)team;
     hcomm_.Init(ubuf.addr, ubuf.bytes);
 
-    __gm__ SymmetricWindow* dstSymWin = reinterpret_cast<__gm__ SymmetricWindow*>(reinterpret_cast<uint64_t>(dstWin));
-    __gm__ SymmetricWindow* srcSymWin = reinterpret_cast<__gm__ SymmetricWindow*>(reinterpret_cast<uint64_t>(srcWin));
-    __gm__ HcclDevComm* hcclDevComm = reinterpret_cast<__gm__ HcclDevComm*>(devComm_);
-    AivRes* aivRes = reinterpret_cast<AivRes*>(hcclDevComm->AivRes);
-    // Each rank currently has only one channel, so channel index 0 is used by default.
-    ChannelHandle channel = aivRes->entity[peer][0];
+    auto hcommTeam = reinterpret_cast<hcomm::HcommTeam*>(reinterpret_cast<uint64_t>(team));
+    auto srcSymWin = reinterpret_cast<hcomm::HcommWindow*>(reinterpret_cast<uint64_t>(srcWin));
+    auto dstSymWin = reinterpret_cast<hcomm::HcommWindow*>(reinterpret_cast<uint64_t>(dstWin));
 
-    auto remoteAddr = reinterpret_cast<__gm__ uint8_t*>(reinterpret_cast<uintptr_t>(dstSymWin->userVa) + dstOffset);
-    auto localAddr =
-        reinterpret_cast<__gm__ uint8_t*>(reinterpret_cast<uintptr_t>(srcSymWin->remoteMems[peer].addr) + srcOffset);
+    auto remoteAddr = reinterpret_cast<__gm__ uint8_t*>(GetWindowPtr(hcommTeam, *dstSymWin, peer, dstOffset, bytes));
+    auto localAddr = reinterpret_cast<__gm__ uint8_t*>(GetWindowPtr(hcommTeam, *srcSymWin, hcommTeam->selfMemberId, srcOffset, bytes));
+
+    ChannelHandle channel = hcommTeam->channels[peer][0];
+
     if (commitFlags == AIN_COMMIT_DELAYED) {
         hcomm_.ReadNbi<false>(channel, remoteAddr, localAddr, bytes);
     } else {
@@ -121,20 +133,26 @@ AIN_DEVICE void Ain::get(
     }
 }
 
+
 template <typename T>
-AIN_DEVICE AinSignalDescriptor GetSignalDescriptor(const Ain& ain, T action)
+AIN_DEVICE AinSignalDescriptor GetSignalDescriptor(T action)
 {
-    (void)ain;
     AinSignalDescriptor desc{};
-    desc.type = AIN_SIGNAL_TYPE_INDEXED;
-    desc.indexedSignal.signalId = action.signalId;
+    if constexpr (IsSameType<T, AinVASignalInc>::value || IsSameType<T, AinVASignalAdd>::value) {
+        desc.signalOffset = action.signalOffset;
+        // desc.signalWindow = reinterpret_cast<hcomm::HcommWindow*>(reinterpret_cast<uint64_t>(action.signalWindow)); 
+        desc.signalWindow = action.signalWindow;
+    } else {
+        desc.signalOffset = action.signalId * sizeof(uint64_t);        
+    }    
     return desc;
 }
 
 template <typename T>
 AIN_DEVICE uint64_t GetSignalOpArg(T action)
 {
-    if constexpr (IsSameType<T, AinSignalInc>::value) {
+    if constexpr (IsSameType<T, AinSignalInc>::value ||
+        IsSameType<T, AinVASignalInc>::value) {
         return 1;
     } else {
         return action.value;
@@ -149,50 +167,71 @@ AIN_DEVICE void Ain::signal(AinTeam team, uint32_t peer, RemoteAction action, co
         "signal requires a valid DescriptorUbuf; AinDescriptorUbufNone is not allowed");
     hcomm_.Init(ubuf.addr, ubuf.bytes);
 
-    AinSignalDescriptor signalDesc = GetSignalDescriptor(*this, action);
+    // auto hcommTeam = reinterpret_cast<__gm__ hcomm::HcommTeam*>(team);
+    auto hcommTeam = reinterpret_cast<hcomm::HcommTeam*>(reinterpret_cast<uint64_t>(team));
+
+    ChannelHandle channel = hcommTeam->channels[peer][0];
+
+    AinSignalDescriptor signalDesc = GetSignalDescriptor(action);
     uint64_t signalOpArg = GetSignalOpArg(action);
 
-    auto hcclDevComm = reinterpret_cast<__gm__ HcclDevComm*>(devComm_);
-    auto aivRes = reinterpret_cast<AivRes*>(reinterpret_cast<uint64_t>(hcclDevComm->AivRes));
-    ChannelHandle channel = aivRes->entity[peer][0];
+    AinCommSymWindow remoteAddr;
+    if (signalDesc.signalWindow == nullptr) {
+        remoteAddr = GetWindowPtr(hcommTeam, hcommTeam->workspace.window, peer, signalDesc.signalOffset, sizeof(uint64_t));
+    } else {
+        auto signalWindow = reinterpret_cast<hcomm::HcommWindow*>(reinterpret_cast<uint64_t>(signalDesc.signalWindow));
+        remoteAddr = GetWindowPtr(hcommTeam, *signalWindow, peer, signalDesc.signalOffset, sizeof(uint64_t));
+    }
+    auto remoteSignal = reinterpret_cast<__gm__ uint8_t*>(remoteAddr);
 
-    uint64_t signalOffset = signalDesc.indexedSignal.signalId * sizeof(uint64_t);
-    auto remoteSignal = reinterpret_cast<__gm__ uint8_t*>(
-        reinterpret_cast<uintptr_t>(aivRes->symMemPool) + signalOffset);
-
-    auto amoSignalId = aivRes->ainWorldBarrier.signal0 + team.rank;
-    uint64_t amoOffset = amoSignalId * sizeof(uint64_t);
-    auto amoSignal = reinterpret_cast<__gm__ uint8_t*>(
-        reinterpret_cast<uintptr_t>(aivRes->ainSignalShadows) + amoOffset);
+    auto amoBase = hcommTeam->workspace.shadowMem.addr;
+    uint64_t amoOffset =
+        (hcommTeam->workspace.signalCount + hcommTeam->workspace.counterCount + hcommTeam->selfMemberId) * sizeof(uint64_t);
+    auto amoSignal = reinterpret_cast<__gm__ uint8_t*>(reinterpret_cast<uintptr_t>(amoBase) + amoOffset);
     
     if (commitFlags == AIN_COMMIT_DELAYED) {
-        hcomm_.WriteNbi<false>(channel, remoteSignal, amoSignal, sizeof(uint64_t));
+        hcomm_.AtomicFAA<uint64_t, false>(channel, remoteSignal, amoSignal, signalOpArg);
     } else {
-        hcomm_.WriteNbi(channel, remoteSignal, amoSignal, sizeof(uint64_t));
+        hcomm_.AtomicFAA(channel, remoteSignal, amoSignal, signalOpArg);
     }
 }
 
-AIN_DEVICE uint64_t Ain::readSignal(AinSignal signalId, uint32_t bits, AinMemoryOrder order) const
+AIN_DEVICE uint64_t Ain::readSignal(AinTeam team, AinSignal signalId, uint32_t bits, AinMemoryOrder order) const
 {
     (void)order;
-    auto hcclDevComm = reinterpret_cast<__gm__ HcclDevComm*>(devComm_);
-    auto aivRes = reinterpret_cast<AivRes*>(reinterpret_cast<uint64_t>(hcclDevComm->AivRes));
+    auto hcommTeam = reinterpret_cast<hcomm::HcommTeam*>(reinterpret_cast<uint64_t>(team));
     uint64_t signalOffset = signalId * sizeof(uint64_t);
-    __gm__ uint64_t* ptr = reinterpret_cast<__gm__ uint64_t*>(
-        reinterpret_cast<uintptr_t>(aivRes->symMemPool) + signalOffset);
+    AinCommSymWindow signalAddr = GetWindowPtr(
+        hcommTeam, hcommTeam->workspace.window, hcommTeam->selfMemberId, signalOffset, sizeof(uint64_t));
+    __gm__ uint64_t* ptr = reinterpret_cast<__gm__ uint64_t*>(signalAddr);
     uint64_t mask = bits >= 64U ? UINT64_MAX : ((1ULL << bits) - 1ULL);
     uint64_t got = ld_dev(ptr, 0);
     return mask & got;
 }
 
-AIN_DEVICE void Ain::waitSignal(AinSignal signalId, uint64_t least, uint32_t bits, AinMemoryOrder order) const
+// AIN_DEVICE uint64_t Ain::readSignal(
+//     AinTeam team, AinCommSymWindow signalWin, uint64_t signalOffset, uint32_t bits, AinMemoryOrder order) const
+// {
+//     (void)order;
+//     auto hcommTeam = reinterpret_cast<hcomm::HcommTeam*>(reinterpret_cast<uint64_t>(team));
+//     auto signalWindow = reinterpret_cast<hcomm::HcommWindow*>(signalWin);
+//     AinCommSymWindow signalAddr = GetWindowPtr(
+//         hcommTeam, signalWin, hcommTeam->selfMemberId, signalOffset, sizeof(uint64_t));
+//     __gm__ uint64_t* ptr = reinterpret_cast<__gm__ uint64_t*>(signalAddr);
+//     uint64_t mask = bits >= 64U ? UINT64_MAX : ((1ULL << bits) - 1ULL);
+//     uint64_t got = ld_dev(ptr, 0);
+//     return mask & got;
+// }
+
+AIN_DEVICE void Ain::waitSignal(
+    AinTeam team, AinSignal signalId, uint64_t least, uint32_t bits, AinMemoryOrder order) const
 {
     (void)order;
-    auto hcclDevComm = reinterpret_cast<__gm__ HcclDevComm*>(devComm_);
-    auto aivRes = reinterpret_cast<AivRes*>(reinterpret_cast<uint64_t>(hcclDevComm->AivRes));
+    auto hcommTeam = reinterpret_cast<hcomm::HcommTeam*>(reinterpret_cast<uint64_t>(team));
     uint64_t signalOffset = signalId * sizeof(uint64_t);
-    __gm__ uint64_t* ptr = reinterpret_cast<__gm__ uint64_t*>(
-        reinterpret_cast<uintptr_t>(aivRes->symMemPool) + signalOffset);
+    AinCommSymWindow signalAddr = GetWindowPtr(
+        hcommTeam, hcommTeam->workspace.window, hcommTeam->selfMemberId, signalOffset, sizeof(uint64_t));
+    __gm__ uint64_t* ptr = reinterpret_cast<__gm__ uint64_t*>(signalAddr);
     uint64_t mask = bits >= 64U ? UINT64_MAX : ((1ULL << bits) - 1ULL);
     while (true) {
         uint64_t got = ld_dev(ptr, 0);
@@ -202,13 +241,32 @@ AIN_DEVICE void Ain::waitSignal(AinSignal signalId, uint64_t least, uint32_t bit
     }
 }
 
-AIN_DEVICE __gm__ uint64_t* Ain::getSignalShadowPtr(AinSignal signalId) const
+// AIN_DEVICE void Ain::waitSignal(
+//     AinTeam team, AinCommSymWindow signalWin, uint64_t signalOffset,
+//     uint64_t least, uint32_t bits, AinMemoryOrder order) const
+// {
+//     (void)order;
+//     auto hcommTeam = reinterpret_cast<hcomm::HcommTeam*>(reinterpret_cast<uint64_t>(team));
+//     auto signalWindow = reinterpret_cast<hcomm::HcommWindow*>(signalWin);
+//     AinCommSymWindow signalAddr = GetWindowPtr(
+//         hcommTeam, signalWindow, hcommTeam->selfMemberId, signalOffset, sizeof(uint64_t));    
+//     __gm__ uint64_t* ptr = reinterpret_cast<__gm__ uint64_t*>(signalAddr);
+//     uint64_t mask = bits >= 64U ? UINT64_MAX : ((1ULL << bits) - 1ULL);
+//     while (true) {
+//         uint64_t got = ld_dev(ptr, 0);
+//         if (least <= (got & mask)) {
+//             break;
+//         }
+//     }
+// }
+
+AIN_DEVICE __gm__ uint64_t* Ain::getSignalShadowPtr(AinTeam team, AinSignal signalId) const
 {
-    auto hcclDevComm = reinterpret_cast<__gm__ HcclDevComm*>(devComm_);
-    auto aivRes = reinterpret_cast<AivRes*>(reinterpret_cast<uint64_t>(hcclDevComm->AivRes));
+    auto hcommTeam = reinterpret_cast<hcomm::HcommTeam*>(reinterpret_cast<uint64_t>(team));
+    auto signalShadow = hcommTeam->workspace.shadowMem.addr;
     uint64_t signalOffset = signalId * sizeof(uint64_t);
     return reinterpret_cast<__gm__ uint64_t*>(
-        reinterpret_cast<uintptr_t>(aivRes->ainSignalShadows) + signalOffset);
+        reinterpret_cast<uintptr_t>(signalShadow) + signalOffset);
 }
 
 }  // namespace AscendC

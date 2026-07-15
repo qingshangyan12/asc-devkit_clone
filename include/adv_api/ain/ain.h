@@ -22,11 +22,10 @@
 
 #include "../hcomm/hcomm.h"
 #include "ain_common.h"
+#include "hcomm_res.h"
 #include "../../../impl/adv_api/detail/ain/impl/barrier_impl_def.h"
 
 namespace AscendC {
-
-static AIN_DEVICE AinTeam AinTeamWorld(AinDevComm devComm);
 
 /*!
  * @class Ain
@@ -43,13 +42,13 @@ public:
      * @param [in] contextIndex: Index of the communication context to operate on.
      */
     template <unsigned commEngineMask = AIN_MASK_ALL>
-    AIN_DEVICE Ain(AinDevComm devComm, int contextIndex);
+    AIN_DEVICE Ain(int contextIndex = 0);
     AIN_DEVICE ~Ain();
 
     /*!
      * @brief Drain every peer channel in the communication table.
      */
-    AIN_DEVICE void flush();
+    AIN_DEVICE void flush(AinTeam team);
 
     /*!
      * @brief Issue a one-sided write (put) from a local window to a remote peer's window.
@@ -78,29 +77,30 @@ public:
         AinCommitFlags commitFlags = AIN_COMMIT_IMMED);
 
     AIN_DEVICE uint64_t
-    readSignal(AinSignal signalId, uint32_t bits, AinMemoryOrder order = AIN_MEMORY_ORDER_DEFAULT) const;
+    readSignal(AinTeam team, AinSignal signalId, uint32_t bits, AinMemoryOrder order = AIN_MEMORY_ORDER_DEFAULT) const;
 
     AIN_DEVICE void waitSignal(
-        AinSignal signalId, uint64_t least, uint32_t bits, AinMemoryOrder order = AIN_MEMORY_ORDER_DEFAULT) const;
+        AinTeam team, AinSignal signalId, uint64_t least, uint32_t bits, AinMemoryOrder order = AIN_MEMORY_ORDER_DEFAULT) const;
 
-    AIN_DEVICE __gm__ uint64_t* getSignalShadowPtr(AinSignal signalId) const;
-
-    uint64_t devComm_ = 0;
+    AIN_DEVICE __gm__ uint64_t* getSignalShadowPtr(AinTeam team, AinSignal signalId) const;
 
 private:
     int contextIndex_ = 0;
     AscendC::Hcomm<AscendC::CommProtocol::COMM_PROTOCOL_UBC_CTP> hcomm_;
 };
 
-class AinBarrierSession : AinBarrierSessionImpl {
+class AinBarrierSession {
 public:
-    AIN_DEVICE AinBarrierSession(Ain* ain, AinTeamTagWorld, uint32_t index);
+    AIN_DEVICE AinBarrierSession(Ain* ain, AinTeam team, uint32_t index);
 
     template <typename DescriptorUbuf = AinDescriptorUbuf>
     AIN_DEVICE void sync(AinMemoryOrder order, const DescriptorUbuf& ubuf = DescriptorUbuf{});
     template <typename DescriptorUbuf = AinDescriptorUbuf>
     AIN_DEVICE int32_t
     sync(AinMemoryOrder order, uint64_t timeoutCycles, const DescriptorUbuf& ubuf = DescriptorUbuf{});
+
+private:
+    AinBarrierSessionImpl barrierImpl_;
 };
 
 } // namespace AscendC

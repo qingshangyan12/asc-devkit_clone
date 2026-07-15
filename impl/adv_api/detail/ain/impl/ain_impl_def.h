@@ -28,68 +28,48 @@
 #include <cstdint>
 #include "../../../../basic_api/kernel_utils.h"
 
-namespace AscendC {
+// typedef enum {
+//     COMM_MEM_TYPE_INVALID = -1,
+//     COMM_MEM_TYPE_DEVICE = 0,
+//     COMM_MEM_TYPE_HOST = 1,
+// } CommMemType;
+
+// typedef struct {
+//     CommMemType type;
+//     void *addr;
+//     uint64_t size;
+// } CommMem;
+
+namespace hcomm {
 
 typedef struct {
-    uint32_t signal0;
-    uint32_t reserved;
-} HcclAinBarrierHandle;
+    CommAbiHeader header;
+    uint64_t memsNum;
+    CommMem *mems; // 长度是memberNum
+    uint64_t reserved[6];
+} HcommWindow;
 
 typedef struct {
-    CommAbiHeader abiHeader;
-    ChannelHandle** entity;
-    uint32_t* entityNumPerRank;
-    uint32_t ainSignalCount;
-    uint32_t ainCounterCount;
-    uint64_t* ainSignalShadows;
-    HcclAinBarrierHandle ainWorldBarrier;
-    HcclAinBarrierHandle ainRailBarrier;
-    HcclAinBarrierHandle ainCustomBarrier;
-    uint64_t* symMemPool;
-    uint8_t reserved[256];
-} AivRes;
+    HcommWindow window; // 内部实际是ComMem[merberNum], 如果memberId是selfMemberId，则是本地内存，否则是远端内存
+    CommMem     shadowMem; // 申请一块(signalCount + counterCount + barrierCount) * sizeof(uint64_t) * memberNum的device侧内存
+    uint32_t signalCount;   // 在创建team的时候，申请一块(signalCount + counterCount + barrierCount) * sizeof(uint64_t) * memberNum的device侧内存
+    uint32_t counterCount;
+    uint32_t barrierCount;
+    uint64_t workspaceSize; // (signalCount + counterCount + barrierCount) * sizeof(uint64_t) * memberNum
+    uint64_t reserved[6];
+} HcommTeamWorkSpace;
 
 typedef struct {
-    CommAbiHeader abiHeader;
-    uint32_t rankSize;
-    uint32_t rankId;
-    void* AicpuRes;
-    void* AivRes;
-    void* HostDpuRes;
-    void* CcuRes;
-    uint8_t reserved[256];
-} HcclDevComm;
-
-enum class SymmetricMemoryMode { HCCS = 0, URMA = 1 };
-
-typedef enum {
-    COMM_MEM_TYPE_INVALID = -1,
-    COMM_MEM_TYPE_DEVICE = 0,
-    COMM_MEM_TYPE_HOST = 1,
-} CommMemType;
-
-typedef struct {
-    CommMemType type;
-    void *addr;
-    uint64_t size;
-} CommMem;
-
-struct SymmetricWindow {
-    void* userVa;
-    size_t userSize;
-
-    void* baseVa;
-    size_t alignedHeapOffset;
-    size_t alignedSize;
-    uint32_t localRank;
-    uint32_t rankSize;
-    size_t stride;
-    void* paHandle;
-    SymmetricMemoryMode mode;
-    CommMem* remoteMems;
-    uint32_t remoteMemNum;
-    void* devWin;
-};
+    CommAbiHeader header;
+    CommEngine engine;             /* COMM_ENGINE_AICPU_TS / CCU 等 */
+    uint32_t memberNum;
+    uint32_t selfMemberId;
+    uint64_t **channels;            // 2维数组，第一维长度是teamMemberNums，第二维长度是每个成员的channel数量channelNumPerMember
+    uint64_t *channelNumPerMember;   //长度为memberNum，表示每个成员的channel数量
+    uint32_t *worldTeamIds;
+    HcommTeamWorkSpace workspace;
+    uint64_t reserved[6];
+} HcommTeam;
 
 enum AinSignalType {
     AIN_SIGNAL_TYPE_NONE,
@@ -97,17 +77,20 @@ enum AinSignalType {
     AIN_SIGNAL_TYPE_INDEXED,
 };
 
-typedef struct {
-    AinSignalType type;
-    union {
-        struct {
-        } vaSignal;
+} // namespace hcomm
 
-        struct {
-            AinSignal signalId;
-        } indexedSignal;
-    };
+namespace AscendC {
+
+enum class SymmetricMemoryMode { HCCS = 0, URMA = 1 };
+
+typedef struct {
+    uint64_t signalOffset;
+    AinCommSymWindow signalWindow = nullptr;
 } AinSignalDescriptor;
+
+typedef struct {
+    AinSignal signalId;
+} AinBarrierSignalInc;
 
 }  // namespace AscendC
 

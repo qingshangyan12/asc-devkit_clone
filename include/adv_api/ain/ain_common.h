@@ -32,8 +32,8 @@ namespace AscendC {
 
 typedef uint32_t AinSignal;
 
-using AinDevComm = __gm__ void*;
 using AinCommSymWindow = __gm__ void*;
+using AinTeam = __gm__ void*;
 
 struct AinTeamTagWorld {};
 struct AinTeamTagRail {};
@@ -44,12 +44,12 @@ struct AinTeamTagRail {};
  * nRanks is the number of ranks in the team, rank is the local rank within the team,
  * stride is the interval used to index the rank list, and ranks points to the rank list.
  */
-typedef struct {
-    uint32_t nRanks;
-    uint32_t rank;
-    uint32_t stride;
-    void* ranks;
-} AinTeam;
+// typedef struct {
+//     uint32_t nRanks;
+//     uint32_t rank;
+//     uint32_t stride;
+//     void* ranks;
+// } AinTeam;
 
 /*!
  * @brief Placeholder tag for "no remote action" in the put primitive.
@@ -97,6 +97,17 @@ typedef struct {
 typedef struct {
     AinSignal signalId;
 } AinSignalInc;
+
+typedef struct {
+    AinCommSymWindow signalWindow;
+    AinSignal signalOffset;
+    uint64_t value;
+} AinVASignalAdd;
+
+typedef struct {
+    AinCommSymWindow signalWindow;
+    AinSignal signalOffset;
+} AinVASignalInc;
 
 } // namespace AscendC
 
