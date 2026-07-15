@@ -58,17 +58,17 @@ LayoutTrait用于指定C0维度基数。MakeFrameLayout支持以下四种传递�
    MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n)
    ```
 
-2. **_C0**：直接指定C0维度的元素个数，数据类型为[Std::Int](../../../../../Utils-API/CPP标准库/类型特性/integral_constant.md)。_C0是`Std::Int<C0>`的简写形式。
+2. **C0常量类型**：直接指定C0维度的元素个数。`_8`、`_16`等类型是[Std::Int](../../../../../Utils-API/CPP标准库/类型特性/integral_constant.md)的简写形式，例如`_16`表示`Std::Int<16>`。
    ```cpp
    MakeFrameLayout<NZLayoutPtn, _16>(m, n)
    ```
 
-3. **不传入Trait**：在分形构造和Trait无关，或C0取固定值的场景下，不传入Trait，内部根据LayoutPattern查找对应的默认Trait。这样的分形有NDLayoutPtn、DNLayoutPtn、DNExtLayoutPtn、NDExtLayoutPtn、ScaleANDLayoutPtn、ScaleADNLayoutPtn、ScaleBNDLayoutPtn、ScaleBDNLayoutPtn。
+3. **省略第二个模板参数**：在分形构造不需要用户指定C0，或C0由布局模式固定的场景下，可以只传入LayoutPattern。此时接口会根据LayoutPattern使用内置的C0取值。这样的分形有NDLayoutPtn、DNLayoutPtn、DNExtLayoutPtn、NDExtLayoutPtn、ScaleANDLayoutPtn、ScaleADNLayoutPtn、ScaleBNDLayoutPtn、ScaleBDNLayoutPtn。
    ```cpp
    MakeFrameLayout<NDLayoutPtn>(m, n)
    ```
 
-4. **自定义Trait传入**：传入一个自定义的Trait类型。适用于需要显式描述C0大小，且`LayoutTraitDefault<T>`、`_C0`或LayoutPattern对应默认Trait都无法满足需求的场景。自定义Trait需要提供`C0_ELEMENT`成员。
+4. **自定义Trait类型**：当根据数据类型推导C0、直接传入C0常量类型、省略第二个模板参数这三种方式都无法表达目标布局时，可以传入自定义Trait类型。自定义Trait需要提供`C0_ELEMENT`成员，用于表示C0维度的元素个数。
    ```cpp
    struct MyLayoutTrait {
        static constexpr auto C0_ELEMENT = Std::Int<16>{};
@@ -84,7 +84,7 @@ LayoutTrait用于指定C0维度基数。MakeFrameLayout支持以下四种传递�
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
 | LayoutPattern | 输入 | 布局模式模板参数。支持的LayoutPattern及数据排布格式见[Layout和层次化表述法](Layout和层次化表述法.md)。 |
-| TraitType | 输入 | 布局特征类型，默认内部根据LayoutPattern自动推导。支持上述四种传递方式。 |
+| TraitType | 输入 | 第二个模板参数，用于描述C0取值。可传入`LayoutTraitDefault<T>`、C0常量类型、带`C0_ELEMENT`成员的自定义Trait类型或具体数据类型；省略时接口按LayoutPattern使用内置的C0取值。 |
 | Args | 输入 | 构造参数。常见为矩阵的行数m和列数n；Batch模式为batch、m、n。各LayoutPattern的构造参数数量可能不同。 |
 
 ## 返回值说明
@@ -111,7 +111,7 @@ auto gmTensor = MakeTensor(MakeMemPtr<Location::GM>(gmAddr), layoutGM);
 auto layoutL1 = MakeFrameLayout<NZLayoutPtn, float>(m, n);
 auto l1Tensor = MakeTensor(MakeMemPtr<Location::L1>(l1Addr), layoutL1);
 
-// 使用默认Trait构造NZ布局
+// 省略第二个模板参数构造NZ布局
 auto layoutNZ = MakeFrameLayout<NZLayoutPtn>(m, n);
 auto l1TensorNZ = MakeTensor(MakeMemPtr<Location::L1>(l1Addr), layoutNZ);
 
