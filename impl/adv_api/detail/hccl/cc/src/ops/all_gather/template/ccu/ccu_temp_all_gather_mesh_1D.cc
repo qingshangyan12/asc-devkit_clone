@@ -88,6 +88,29 @@ HcclResult CcuTempAllGatherMesh1D::CalcRes(
 HcclResult CcuTempAllGatherMesh1D::KernelRun(
     const OpParam& param, const TemplateDataParams& templateDataParams, TemplateResource& templateResource)
 {
+    buffInfo_ = templateDataParams.buffInfo;
+
+    uint64_t inputAddr = PointerToAddr(buffInfo_.inputPtr) + buffInfo_.inBuffBaseOff;
+    uint64_t outputAddr = PointerToAddr(buffInfo_.outputPtr) + buffInfo_.outBuffBaseOff;
+    uint64_t token;
+    CHK_RET(GetToken(buffInfo_, token));
+
+    uint32_t rankId = mySubCommRank_;
+    uint64_t offset = rankId * templateDataParams.outputSliceStride;
+    uint64_t sliceSize = templateDataParams.sliceSize;
+
+    HcclDataType dataType = param.DataDes.dataType;
+    uint64_t dataTypeSize = DATATYPE_SIZE_TABLE[dataType];
+    uint64_t dataCount = sliceSize / dataTypeSize;
+    if (dataCount == 0) {
+        HCCL_INFO("[CcuTempAllGatherMesh1D] DataCount == 0, Template Run Ends.");
+        return HcclResult::HCCL_SUCCESS;
+    }
+
+    CcuKernelSubmitInfo submitInfo;
+    CHK_RET(FillCachedArgs(submitInfo, inputAddr, outputAddr, token, offset, sliceSize));
+    templateResource.submitInfos.push_back(submitInfo);
+
     // Disabled: the old direct-launch path depends on CcuTaskArgAllGatherMesh1D and
     // ccu_kernel_all_gather_mesh1d.cc. AllGather CCU currently launches through KFC Server only.
     //
@@ -121,11 +144,7 @@ HcclResult CcuTempAllGatherMesh1D::KernelRun(
     //
     // return HcclResult::HCCL_SUCCESS;
 
-    (void)param;
-    (void)templateDataParams;
-    (void)templateResource;
-    HCCL_ERROR("[CcuTempAllGatherMesh1D] direct CCU launch is disabled; use KFC Server launch instead.");
-    return HCCL_E_NOT_SUPPORT;
+    return HcclResult::HCCL_SUCCESS;
 }
 
 u64 CcuTempAllGatherMesh1D::CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType)
