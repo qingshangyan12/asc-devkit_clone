@@ -50,9 +50,9 @@
 
 > [!CAUTION] 注意
 > 在CPU孪生调试模式下，编译器不识别Ascend C提供的[SIMD-BuiltIn关键字](../../语言扩展层/SIMD-BuiltIn关键字.md)及[SIMT-BuiltIn关键字](../../语言扩展层/SIMT-BuiltIn关键字.md)，包括
-> - **函数执行空间限定符**：如`__aicore__`、`__global__`、`__host__`等;
-> - **函数标记宏**：如`__simd_vf__`、`__simd_callee__`、`__simt_vf__`等；
-> - **地址空间限定符**：如`__gm__` 、`__ubuf__`等。
+> - **函数执行空间限定符**：如 `__aicore__`、`__global__`、`__host__` 等;
+> - **函数标记宏**：如 `__simd_vf__`、`__simd_callee__`、`__simt_vf__` 等；
+> - **地址空间限定符**：如 `__gm__` 、`__ubuf__` 等。
 >
 > 这些关键字与Device侧执行强相关，在CPU孪生调试模式下无需实际生效，因此系统框架将这些关键字定义为空。
 > 由于这种置空处理，**仅通过BuiltIn关键字区分的函数签名将被视为相同**，会导致重定义编译错误。
@@ -61,7 +61,7 @@
 > 1. **Device侧函数与Host侧函数同名**
 >
 > <blockquote>
-> 如下例中，`add`函数仅通过`__aicore__`区分运行域，在CPU孪生调试模式下两个声明将冲突：
+> 如下例中，`add` 函数仅通过 `__aicore__` 区分运行域，在CPU孪生调试模式下两个声明将冲突：
 > 	<pre><code class="language-asc">__aicore__ inline void add(int x, int y);  // Device侧
 > void add(int x, int y);                    // Host侧（等同于 __host__）</code></pre>
 > </blockquote>
