@@ -85,7 +85,7 @@ $$
   - 连续调用建议不超过4次，否则可能导致保留站拥塞
   - preload是异步指令，可与后续计算/访存重叠
 
-## 性能观察
+## 性能测试数据与分析
 
 通过`msprof`运行后，可以对比两个核函数的执行时间：
 - `kernel_no_preload`：DCache miss率高，Scalar读延迟大
@@ -93,22 +93,30 @@ $$
 
 ### 性能对比数据
 
-以下性能数据在**Atlas A2/A3系列产品（dav-2201架构）**上采集，为排除单次执行的随机波动，取5次独立运行的平均值。**DataCachePreload可将间接索引场景的端到端耗时加速1.64倍。**
+以下性能数据为排除单次执行的随机波动，取5次独立运行的平均值。
+
+#### Atlas A2/A3系列产品（dav-2201架构）
 
 | 指标 | kernel_no_preload | kernel_with_preload | 优化效果 |
 |------|------------------|---------------------|---------|
 | **Task Duration (us)** | 44.000 | 26.760 | **加速1.64x** |
-| **aiv_total_cycles** | 78,230 | 47,189 | **降低39.7%** |
 | **aiv_scalar_time (us)** | 41.942 | 24.622 | **降低41.3%** |
 | **aiv_scalar_ratio** | 96.5% | 93.9% | Scalar仍为主要瓶颈 |
 
+#### Ascend 950系列产品（dav-3510架构）
+
+| 指标 | kernel_no_preload | kernel_with_preload | 优化效果 |
+|------|------------------|---------------------|---------|
+| **Task Duration (us)** | 72.897 | 42.051 | **加速1.73x** |
+| **aiv_scalar_time (us)** | 70.230 | 39.242 | **降低44.1%** |
+| **aiv_scalar_ratio** | 97.7% | 95.7% | Scalar仍为主要瓶颈 |
+
 > **指标说明：**
 > - **Task Duration**：核函数端到端执行耗时，是最直观的性能指标
-> - **aiv_total_cycles**：Vector核心的总周期数，反映硬件层面的计算+访存开销
 > - **aiv_scalar_time**：Scalar单元耗时，间接索引场景下Scalar访存是主要瓶颈
 > - **aiv_scalar_ratio**：Scalar耗时占总时间的比例，用于定位性能瓶颈所在
 
-#### 5次独立运行详细数据
+#### 5次独立运行详细数据（Atlas A2/A3系列产品）
 
 | 执行次数 | no_preload Duration(us) | with_preload Duration(us) | 加速比 |
 |---------|------------------------|--------------------------|--------|
@@ -119,9 +127,20 @@ $$
 | 第5次 | 43.840 | 26.260 | 1.67x |
 | **平均** | **44.000** | **26.760** | **1.64x** |
 
+#### 5次独立运行详细数据（Ascend 950系列产品）
+
+| 执行次数 | no_preload Duration(us) | with_preload Duration(us) | 加速比 |
+|---------|------------------------|--------------------------|--------|
+| 第1次 | 72.773 | 42.396 | 1.72x |
+| 第2次 | 73.002 | 41.780 | 1.75x |
+| 第3次 | 73.046 | 42.002 | 1.74x |
+| 第4次 | 73.130 | 42.032 | 1.74x |
+| 第5次 | 72.535 | 42.043 | 1.73x |
+| **平均** | **72.897** | **42.051** | **1.73x** |
+
 ### 分析结论
 
-**DataCachePreload在Atlas A2/A3系列产品上有显著优化效果**，`kernel_with_preload`的Task Duration、aiv_total_cycles、aiv_scalar_time均明显低于`kernel_no_preload`。在间接索引（随机跳转）场景下，通过DataCachePreload将下一轮数据提前加载到DCache，**可有效隐藏Scalar访存延迟，实现约1.64倍的性能加速**。
+**DataCachePreload在Atlas A2/A3系列和Ascend 950系列产品上均有显著优化效果**，`kernel_with_preload`的Task Duration、aiv_scalar_time均明显低于`kernel_no_preload`。在间接索引（随机跳转）场景下，通过DataCachePreload将下一轮数据提前加载到DCache，**可有效隐藏Scalar访存延迟，实现约1.64倍（Atlas A2/A3）和约1.73倍（Ascend 950）的性能加速**。
 
 ## 编译运行
 
