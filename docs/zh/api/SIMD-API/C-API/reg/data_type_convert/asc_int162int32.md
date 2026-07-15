@@ -28,47 +28,80 @@
 
 头文件路径：`"c_api/reg_compute/reg_convert.h"`。
 
-将int16_t类型数据转换为int32_t类型。
+将src中int16_t类型的元素转换为int32_t类型，并将结果写入dst。转换过程将16位有符号整数通过符号位扩展为32位有符号整数（sign extension）。
 
-由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个VL大小的数据分为两部分，根据不同接口选取索引0或者索引1。
+由于源操作数和目的操作数位宽比为1:2，每两个int16_t类型的元素中选择一个进行类型转换。asc_int162int32选择第1个元素参与转换，asc_int162int32_v2选择第2个元素参与转换。
+
+- asc_int162int32：取src的偶数索引元素（layout=0，即索引0, 2, 4, ...）进行符号扩展，mask每2bit为一组、仅组内LSB为1时选取对应位置的int16_t元素。
+
+    ```python
+    # layout = 0，选取第1个（偶数索引）元素，符号位扩展
+    dst[0:64] = src[0:128:2].astype(int32)
+    ```
+
+- asc_int162int32_v2：取src的奇数索引元素（layout=1，即索引1, 3, 5, ...）进行符号扩展，mask每2bit为一组、仅组内LSB为1时选取对应位置的int16_t元素。
+
+    ```python
+    # layout = 1，选取第2个（奇数索引）元素，符号位扩展
+    dst[0:64] = src[1:128:2].astype(int32)
+    ```
 
 ## 函数原型
 
-```cpp
-// 选取索引0的位置
-__simd_callee__ inline void asc_int162int32(vector_int32_t& dst, vector_int16_t src, vector_bool mask)
-// 选取索引1的位置
-__simd_callee__ inline void asc_int162int32_v2(vector_int32_t& dst, vector_int16_t src, vector_bool mask)
-```
+- 选择第1个int16_t元素转换
+
+    ```cpp
+    __simd_callee__ inline void asc_int162int32(vector_int32_t& dst, vector_int16_t src, vector_bool mask)
+    ```
+
+- 选择第2个int16_t元素转换
+
+    ```cpp
+    __simd_callee__ inline void asc_int162int32_v2(vector_int32_t& dst, vector_int16_t src, vector_bool mask)
+    ```
 
 ## 参数说明
 
-|参数名|输入/输出|描述|
-| ------------ | ------------ | ------------ |
-| dst        | 输出    | 目的操作数（矢量数据寄存器）。 |
-| src        | 输入    | 源操作数（矢量数据寄存器）。 |
-| mask       | 输入    | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+**表1**  参数说明
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_int32_t](../reg_data_types/data_type_definition.md#矢量数据寄存器)。 |
+| src | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_int16_t](../reg_data_types/data_type_definition.md#矢量数据寄存器)。 |
+| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。对应位置为1的元素参与类型转换。 |
+
+## 数据类型
+
+**表2**  数据类型
+
+| src | dst |
+| --- | --- |
+| int16_t | int32_t |
 
 ## 返回值说明
 
 无
 
-## 流水类型
-
-PIPE_V
-
 ## 约束说明
 
-无
+dst中未被mask筛选的位置被置为0。
 
 ## 调用示例
 
 ```cpp
-vector_int16_t src;
-vector_int32_t dst;
-vector_bool mask = asc_create_mask_b16(PAT_ALL);
-asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
-asc_int162int32(dst, src, mask);
+constexpr uint32_t one_repeat_size = 256 / sizeof(int16_t);
+uint32_t total_length = 256;
+uint32_t repeat_time = total_length / one_repeat_size;
+__simd_vf__ inline void int162int32_vf(__ubuf__ int32_t* dst_addr, __ubuf__ int16_t* src_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
+{
+    vector_int32_t dst;
+    vector_int16_t src;
+    vector_bool mask;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        mask = asc_update_mask_b16(count);
+        asc_loadalign(src, src_addr + i * one_repeat_size);
+        asc_int162int32(dst, src, mask);
+        asc_storealign(dst_addr + i * one_repeat_size, dst, mask);
+    }
+}
 ```
