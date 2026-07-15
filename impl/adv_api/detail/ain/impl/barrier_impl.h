@@ -29,50 +29,50 @@
 namespace AscendC {
 
 AIN_DEVICE AinBarrierSession::AinBarrierSession(
-    Ain* ain, AinTeamTagWorld, uint32_t index)
+    Ain* ain, AinTeam team, uint32_t index)
 {
-    auto devComm = reinterpret_cast<__gm__ HcclDevComm*>(ain->devComm_);
-    auto aivRes = reinterpret_cast<AivRes*>(reinterpret_cast<uint64_t>(devComm->AivRes));
-    this->ain = ain;
-    this->team = AinTeamWorld(devComm);
-    this->handle = aivRes->ainWorldBarrier;
-    this->index = index;
-    this->signal = this->handle.signal0 + index * this->team.nRanks;
+    barrierImpl_.ain = ain;
+    barrierImpl_.team = team;
+    barrierImpl_.index = index;
+    auto hcommTeam = reinterpret_cast<hcomm::HcommTeam*>(reinterpret_cast<uint64_t>(team));
+    barrierImpl_.signal = hcommTeam->workspace.signalCount + hcommTeam->workspace.counterCount +
+        index * hcommTeam->memberNum;
 }
 
 template<typename DescriptorUbuf>
 AIN_DEVICE void AinBarrierSession::sync(AinMemoryOrder order, const DescriptorUbuf& ubuf) {
-    this->template syncInternal<false>(order, 0, ubuf);
+    barrierImpl_.template syncImpl<false>(order, 0, ubuf);
 }
 
 template<typename DescriptorUbuf>
 AIN_DEVICE int32_t AinBarrierSession::sync(AinMemoryOrder order, uint64_t timeoutCycles, const DescriptorUbuf& ubuf) {
-    return this->template syncInternal<true>(order, timeoutCycles, ubuf);
+    return barrierImpl_.template syncImpl<true>(order, timeoutCycles, ubuf);
 }
 
 template<bool EnableTimeout, typename DescriptorUbuf>
-AIN_DEVICE int32_t AinBarrierSessionImpl::syncInternal(AinMemoryOrder order, uint64_t timeoutCycles, 
+AIN_DEVICE int32_t AinBarrierSessionImpl::syncImpl(AinMemoryOrder order, uint64_t timeoutCycles, 
     const DescriptorUbuf& ubuf)
 {
+    auto hcommTeam = reinterpret_cast<hcomm::HcommTeam*>(reinterpret_cast<uint64_t>(this->team));
     uint64_t startCycle;
     if constexpr (EnableTimeout) {
         startCycle = AscendC::GetSystemCycle();
     }
 
-    for (int32_t i = 0; i < this->team.nRanks - 1; ++i) {
-        int peer = 1 + this->team.rank + i;
-        if (this->team.nRanks <= peer) {
-            peer -= this->team.nRanks;
+    for (int32_t i = 0; i < hcommTeam->memberNum - 1; ++i) {
+        int peer = 1 + hcommTeam->selfMemberId + i;
+        if (hcommTeam->memberNum <= peer) {
+            peer -= hcommTeam->memberNum;
         }
         
-        this->ain->signal(this->team, peer, AinSignalInc{this->signal + this->team.rank}, ubuf);
+        this->ain->signal(this->team, peer, AinSignalInc{this->signal + hcommTeam->selfMemberId}, ubuf);
 
-        __gm__ uint32_t* shadowPtr = (__gm__ uint32_t*)this->ain->getSignalShadowPtr(this->signal + peer);
+        __gm__ uint32_t* shadowPtr = (__gm__ uint32_t*)this->ain->getSignalShadowPtr(this->team, this->signal + peer);
         uint32_t waitVal = ++(*shadowPtr);
 
         if constexpr (EnableTimeout) {
             while (true) {
-                uint64_t got = this->ain->readSignal(this->signal + peer, 32);
+                uint64_t got = this->ain->readSignal(this->team, this->signal + peer, 32);
                 if (got >= waitVal) {
                     break;
                 }
@@ -82,7 +82,7 @@ AIN_DEVICE int32_t AinBarrierSessionImpl::syncInternal(AinMemoryOrder order, uin
                 }
             }
         } else {
-            this->ain->waitSignal(this->signal + peer, waitVal, 32);
+            this->ain->waitSignal(this->team, this->signal + peer, waitVal, 32);
         }
     }
     
