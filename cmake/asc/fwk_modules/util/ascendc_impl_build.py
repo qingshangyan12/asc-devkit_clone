@@ -515,10 +515,6 @@ src_ini_config.get(sub_sections, "kernel_dir"), src_ini_config.get(sub_sections,
             attrval = self.attr_val.get(attr).get('defaultValue')
             if attrval is not None:
                 optional = True
-                if type == "bool":
-                    attrval = attrval.capitalize()
-                elif type == "str":
-                    attrval = "\"" + attrval + "\""
                 self.argsdefv.append(attrval)
                 continue
             if optional:
