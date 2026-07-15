@@ -226,6 +226,8 @@ void LoadFuncParamFromMemory(ccu::Variable &paramAddr, ccu::Array<ccu::Variable>
 static void DispatchKfcSubKernel(ccu::Array<ccu::Variable> &param, CcuKernelArg &arg, KfcServerContext &ctx)
 {
     if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
+        HCCL_INFO("[A2AV_DBG] dispatch ALLTOALLV: rankSize[%u], rankId[%u], channelCount[%u]",
+            static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->channelCount);
         CcuAlltoAllVMesh1DKernel(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token,
                                  param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
                                  param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
