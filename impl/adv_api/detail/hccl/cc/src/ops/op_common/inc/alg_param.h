@@ -29,6 +29,7 @@
 namespace mc2_ops_hccl {
 
 constexpr uint64_t UB_MAX_DATA_SIZE = 256 * 1024 * 1024; // Byte, UB协议一次传输的最大size
+constexpr uint64_t AICPU_ALIGN_SIZE = 4096;
 
 constexpr uint32_t DATATYPE_SIZE_TABLE[HCCL_DATA_TYPE_RESERVED] = {
     sizeof(int8_t),
@@ -167,6 +168,7 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
     bool is2DieFullMesh{false};
     bool level0PcieMix{false};
     bool level0BigClosRange{false};
+    bool level2Uboe{false};
     u32 topoInstDetailsOfLayerSize = 0;
     Level0MeshType level0MeshType;
     NetLayerDetails netLayerDetails;
@@ -199,6 +201,7 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream << is2DieFullMesh;
         binaryStream << level0PcieMix;
         binaryStream << level0BigClosRange;
+        binaryStream << level2Uboe;
         binaryStream << topoInstDetailsOfLayerSize;
         binaryStream << level0MeshType;
         binaryStream << netLayerDetails.netLayerNum;
@@ -245,6 +248,7 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream >> is2DieFullMesh;
         binaryStream >> level0PcieMix;
         binaryStream >> level0BigClosRange;
+        binaryStream >> level2Uboe;
         binaryStream >> topoInstDetailsOfLayerSize;
         binaryStream >> level0MeshType;
         binaryStream >> netLayerDetails.netLayerNum;
