@@ -3,7 +3,7 @@
 
 ## 概述
 
-本样例以矩阵转置为例，介绍Ascend C SIMT编程方式下的访存优化思路。样例包含一维连续复制基线，以及一系列逐步优化的转置核函数：从直接全局内存转置出发，引入UB中转与分块、对比按切分后的tile分组启动Thread Block与固定Thread Block数两种映射方式、观察2048线程配置下的寄存器溢出、通过UB padding消除bank冲突，最后借助双缓冲去除循环尾部同步，完整呈现SIMT矩阵转置的调优路径。
+本样例以矩阵转置为例，介绍Ascend C SIMT编程方式下的访存优化思路。首先，通过一维连续复制建立GM连续读写的性能基线，并用直接全局内存转置暴露非连续写带来的主要开销；然后，引入UB中转与32×32分块，将非连续GM写转移为UB内转置访问；接着，对比按tile分组启动线程块（Thread Block）与固定Thread Block数两种映射方式，并结合2048线程配置下的寄存器溢出分析线程数选择；随后，通过UB padding消除转置读阶段的bank冲突；最终，借助双缓冲去除循环尾部同步，完整呈现SIMT矩阵转置的调优路径。
 
 ## 支持的产品
 
@@ -239,7 +239,7 @@ asc_syncthreads();
 
 **分析**：
 
-Case 4将Thread Block数固定为硬件vector core数。相比Case 3启动512个Thread Block的写法，Case 4需要启动和调度的线程块数量更少，Task Duration由28.190μs降至27.113μs。增加 `--cce-res-usage`编译选项后，可以在编译日志中看到寄存器和栈的使用情况，Case 4的输出如下：
+Case 4将Thread Block数固定为硬件vector core数。相比Case 3启动512个Thread Block的写法，Case 4需要启动和调度的线程块数量更少，Task Duration由28.190μs降至27.113μs。增加 `--cce-res-usage` 编译选项后，可以在编译日志中看到寄存器和栈的使用情况，Case 4的输出如下：
 
 ```text
 [BISHENG] Function properties for _Z25transpose_ub_2tile_kernelPfPKfjjj_simt_entry: Stack size: 24 bytes, Used register number: 16
@@ -291,31 +291,26 @@ asc_syncthreads();
 
 下面以Ascend 950PR/Ascend 950DT的UB划分规则为例，说明本样例中bank冲突是如何产生的，以及Case 5和Case 6理论上的冲突强度差异。
 
-UB中的bank划分如下图所示。UB总大小256KB，划分为16个bank；这16个bank进一步组织为8个bank group，每个bank group包含2个bank。在SIMT编程模式下，每个bank又会被划分为4个subbank，每个subbank的宽度为8B。
+UB中的bank划分如下图所示。Ascend 950PR/Ascend 950DT的UB划分为16个bank，并组织为8个bank group；SIMT编程模式下，每个bank进一步划分为4个subbank。若同一个Warp内多个线程在同一条UB访问指令中访问同一个bank group的相同编号subbank，硬件需要排队处理，从而形成subbank冲突并增加访问延迟。
 
-SIMT场景下，本样例所说的bank冲突指的是更细粒度的subbank冲突。同一个Warp内的多个线程可能在同一条UB访问指令中同时访问UB；当这些访问数据属于同一个bank group的相同编号的subbank资源时，硬件无法在一个周期内处理全部请求，需要排队等待，从而形成subbank冲突并增加访问延迟；如果这些访问数据属于同一个subbank的同一行内的8B地址范围，硬件会将这些请求合并处理，不会形成subbank冲突。
+SIMT编程方式下，bank冲突为更细粒度的subbank冲突，主要有以下两类：
+
+- **写写冲突**：多个写操作同时访问同一个bank group的相同编号subbank。
+- **读读冲突**：多个读操作同时访问同一个bank group的相同编号subbank。
+
+详细的UB地址低位交织规则以及冲突场景可参考[bank_conflict样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/03_simt_api/02_features/01_api_features/00_memory_access/bank_conflict)。
 
 **图3　UB bank结构示意图**
 <img src="./figures/bank结构示意图.png">
 
-**地址采用低位交织：** 如下图所示，UB内连续地址按32B粒度映射到bank0～bank15：第1个32B地址段映射到bank0，第2个映射到bank1，依次类推；第16个映射到bank15，第17个映射回bank0的下一行。
-
-**图4　UB地址低位交织排布示意图**
-<img src="./figures/bank内存排布示意图.png">
-
-SIMT编程方式下subbank冲突主要有以下几种：
-
-- **写写冲突**：多个写操作同时尝试访问同一个bank group的相同编号的subbank。
-- **读读冲突**：多个读操作同时尝试访问同一个bank group的相同编号的subbank。
-
 Case 5中UB的tile数组按照行优先存储。按照地址低位交织规则，tile数组的第一行刚好覆盖bank0～bank3，第二行覆盖bank4～bank7，第三行覆盖bank8～bank11，其余行依次类推。每行32个float数据会恰好跨越4个bank存储。Case 5中，一个Warp的线程会读取tile的一列元素写回GM输出；访问UB时，32个线程会集中访问两个bank group的subbank0，属于读读冲突场景。
 
-**图5　Case5 tile在UB上的排布示意图**
+**图4　Case5 tile在UB上的排布示意图**
 <img src="./figures/case5_bank.png">
 
 Case 6中对UB中的tile数组增加两列padding，由每行32个元素改为34个元素，其在UB上的排列如下图所示。由于每行有34个元素，行跨度变为17个subbank，同一列元素会错开排布到不同的subbank。Case 6访问UB时，32个线程的访问会分布到各个bank group的每个subbank中，即同一条访问指令下每个subbank仅有一个线程访问，从而避免上述读读冲突。
 
-**图6　Case6 tile在UB上的排布示意图**
+**图5　Case6 tile在UB上的排布示意图**
 <img src="./figures/case6_bank.png">
 
 ```cpp
@@ -369,12 +364,12 @@ for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x)
 
 相对Case 6的15.152μs，去除每轮循环末尾的同步后Task Duration降至12.074μs，下降约20%。在1024×1024矩阵、64个Thread Block的配置下，每个Thread Block需要循环处理16个tile，双缓冲相当于每个Thread Block减少16次Thread Block内同步。该方法的代价是额外占用一份UB tile（共两份32×34），但未引入寄存器溢出。Case 7是本样例中耗时最低的SIMT转置版本，相对Case 0复制基线（6.262μs）约为1.9倍。
 
-Case 6与Case 7的仿真指令流水图分别如图7、图8所示。Case 6每轮循环受尾部 `asc_syncthreads()` 约束，当前轮的写回必须全部完成后才能进入下一轮，下一轮load前的运算与GM读取只能串行等待。Case 7借助双缓冲轮换两份UB tile，去除尾部同步后，当前轮的GM写回与下一轮load前的运算、以及下一轮的GM读取重叠执行，load与compute之间的串行等待被压缩。这也是Task Duration相对Case 6进一步下降的主要原因。
+Case 6与Case 7的仿真指令流水图分别如图6、图7所示。Case 6每轮循环受尾部 `asc_syncthreads()` 约束，当前轮的写回必须全部完成后才能进入下一轮，下一轮load前的运算与GM读取只能串行等待。Case 7借助双缓冲轮换两份UB tile，去除尾部同步后，当前轮的GM写回与下一轮load前的运算、以及下一轮的GM读取重叠执行，load与compute之间的串行等待被压缩。这也是Task Duration相对Case 6进一步下降的主要原因。
 
-**图7　Case 6仿真指令流水图**
+**图6　Case 6仿真指令流水图**
 <img src="./figures/case6_trace.png">
 
-**图8　Case 7仿真指令流水图**
+**图7　Case 7仿真指令流水图**
 <img src="./figures/case7_trace.png">
 
 ## 性能对比总结
@@ -401,7 +396,7 @@ Case 6与Case 7的仿真指令流水图分别如图7、图8所示。Case 6每轮
 
 访存类算子调优时，建议先用连续复制确认当前规模下的GM搬运上限，再用最直接的实现暴露主要差距。本样例中，直接转置与复制基线的差距主要来自非连续GM写，因此优化方向不是增加计算并行度，而是重排访存：以32×32的tile为单位连续读入UB，在UB内完成转置方向读取，再按输出矩阵行方向连续写回GM。
 
-分块后需要先确定Thread Block到tile的映射方式。按切分后的tile分组启动Thread Block实现简单，但当tile数远大于硬件vector core数时，会带来额外的启动和调度开销；将Thread Block数固定为硬件vector core数，并在kernel内循环处理多个tile，可以降低这部分开销。线程数也不能只参考连续搬运场景，高线程数会限制每个线程可使用的寄存器数量，索引逻辑变复杂后可能出现寄存器溢出，需要结合 `--cce-res-usage`和实测耗时选择。
+分块后需要先确定Thread Block到tile的映射方式。按切分后的tile分组启动Thread Block实现简单，但当tile数远大于硬件vector core数时，会带来额外的启动和调度开销；将Thread Block数固定为硬件vector core数，并在kernel内循环处理多个tile，可以降低这部分开销。线程数也不能只参考连续搬运场景，高线程数会限制每个线程可使用的寄存器数量，索引逻辑变复杂后可能出现寄存器溢出，需要结合 `--cce-res-usage` 和实测耗时选择。
 
 当GM访问已经转为连续后，瓶颈会转移到UB访问和同步。转置读UB时，如果按列访问32×32的tile，容易出现bank冲突，可以通过padding改变UB物理布局；循环中的同步也需要结合数据覆盖关系判断是否必要，双缓冲可以在不覆盖当前读取数据的前提下减少一次同步。
 
@@ -437,6 +432,8 @@ Case 6与Case 7的仿真指令流水图分别如图7、图8所示。Case 6每轮
   | --------------------------- | ------------ | ---------------------------------------------------------- |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT） |
   | `SCENARIO_NUM`            | `0`-`7`  | 样例类型，默认为7                                          |
+
+  - `--cce-res-usage`用于输出寄存器和栈等编译资源信息，便于分析资源使用。
 
   执行结果如下，说明精度对比成功。
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example uses matrix transpose to demonstrate memory access optimization strategies in the Ascend C SIMT programming model. The example includes a 1D contiguous copy baseline and a series of progressively optimized transpose kernels: starting from direct global memory transpose, it introduces UB staging and tiling, compares two mapping strategies (launching thread blocks per tile group versus fixing the thread block count to the hardware vector core count), observes register spill under the 2048-thread configuration, eliminates bank conflicts through UB padding, and finally uses double buffering to remove the trailing synchronization in the loop. This presents the complete tuning path for SIMT matrix transpose.
+This example uses matrix transpose to demonstrate memory access optimization strategies in the Ascend C SIMT programming model. First, it establishes a GM contiguous read/write baseline with 1D contiguous copy and uses direct global memory transpose to expose the main cost of non-contiguous writes. Then, it introduces UB staging and 32x32 tiling to move the non-contiguous GM write into a transpose-direction UB access. Next, it compares launching Thread Blocks per tile group with fixing the Thread Block count to the hardware vector core count, and analyzes thread count selection through register spill under the 2048-thread configuration. After that, it eliminates bank conflicts during the transpose read phase through UB padding. Finally, it uses double buffering to remove the trailing synchronization in the loop, presenting the complete tuning path for SIMT matrix transpose.
 
 ## Supported Products
 
@@ -287,34 +287,28 @@ In the current configuration, register spill has been eliminated and thread bloc
 
 The following uses the UB partitioning rules of Ascend 950PR/Ascend 950DT as an example to explain how bank conflicts arise in this example, and the theoretical conflict intensity differences between Case 5 and Case 6.
 
-The bank partitioning in UB is shown in the figure below. The total UB size is 256KB, divided into 16 banks; these 16 banks are further organized into 8 bank groups, with each bank group containing 2 banks. In SIMT programming mode, each bank is further divided into 4 subbanks, with each subbank having a width of 8B.
+The bank partitioning in UB is shown in the figure below. The UB of Ascend 950PR/Ascend 950DT is divided into 16 banks and organized as 8 bank groups; in SIMT programming mode, each bank is further divided into 4 subbanks. If multiple threads in the same Warp access subbanks with the same index in the same bank group within one UB access instruction, the hardware needs to queue these requests, forming subbank conflicts and increasing access latency.
 
-In SIMT scenarios, the bank conflicts discussed in this example are more fine-grained subbank conflicts. Multiple threads in the same Warp may access UB concurrently within the same UB access instruction. When the accessed data belongs to subbanks with the same index in the same bank group, the hardware cannot process all requests in one cycle, so the requests must queue, forming subbank conflicts and increasing access latency. If the accessed data belongs to the same 8B address range in the same row of the same subbank, the hardware merges these requests and no subbank conflict is formed.
+In SIMT programming, bank conflicts are more fine-grained subbank conflicts, mainly including the following two types:
+
+- **Write-write conflict**: Multiple write operations access subbanks with the same index in the same bank group at the same time.
+- **Read-read conflict**: Multiple read operations access subbanks with the same index in the same bank group at the same time.
+
+For detailed low-bit UB address interleaving rules and conflict scenarios, see the [bank_conflict example](https://gitcode.com/cann/asc-devkit/blob/master/examples/03_simt_api/02_features/01_api_features/00_memory_access/bank_conflict).
 
 **Figure 3: UB bank structure**
 
 <img src="./figures/bank结构示意图.png">
 
-**Low-bit interleaving is used for addresses:** As shown in the figure below, consecutive UB addresses are mapped to bank0 through bank15 at 32B granularity. The first 32B address segment maps to bank0, the second maps to bank1, and so on; the 16th maps to bank15, and the 17th maps back to the next row of bank0.
-
-**Figure 4: UB low-bit interleaved address layout**
-
-<img src="./figures/bank内存排布示意图.png">
-
-The main subbank conflict types in SIMT programming are as follows:
-
-- **Write-Write Conflict**: Multiple write operations simultaneously attempt to access subbanks with the same index in the same bank group.
-- **Read-Read Conflict**: Multiple read operations simultaneously attempt to access subbanks with the same index in the same bank group.
-
 In Case 5, the tile array in UB is stored in row-major order. According to the low-bit address interleaving rule, the first row of the tile array covers bank0 through bank3, the second row covers bank4 through bank7, the third row covers bank8 through bank11, and the remaining rows follow the same pattern. Each row of 32 float elements spans exactly 4 banks. In Case 5, one Warp of threads reads one column of the tile and writes it back to GM output; when accessing UB, the 32 threads concentrate on subbank 0 in two bank groups, which is a read-read conflict scenario.
 
-**Figure 5: Case 5 tile layout in UB**
+**Figure 4: Case 5 tile layout in UB**
 
 <img src="./figures/case5_bank.png">
 
 In Case 6, two columns of padding are added to the tile array in UB, changing from 32 elements per row to 34 elements per row. The layout in UB is shown in the figure below. Since each row has 34 elements, the row stride becomes 17 subbanks, so elements in the same column are staggered across different subbanks. When Case 6 accesses UB, the accesses from 32 threads are distributed across each subbank of each bank group. In other words, each subbank is accessed by only one thread under the same access instruction, avoiding the read-read conflict described above.
 
-**Figure 6: Case 6 tile layout in UB**
+**Figure 5: Case 6 tile layout in UB**
 
 <img src="./figures/case6_bank.png">
 
@@ -369,13 +363,13 @@ for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x)
 
 Compared to 15.152μs in Case 6, after removing the synchronization at the end of each loop iteration, Task Duration drops to 12.074μs, a decrease of approximately 20%. Under the 1024x1024 matrix and 64 thread block configuration, each thread block needs to loop over 16 tiles, so double buffering is equivalent to each thread block reducing 16 thread block synchronizations. The cost of this method is an extra UB tile (two 32x34 tiles in total), but it does not introduce register spill. Case 7 is the lowest-latency SIMT transpose version in this example, approximately 1.9x the Case 0 copy baseline (6.262μs).
 
-The simulation instruction pipeline diagrams of Case 6 and Case 7 are shown in Figure 7 and Figure 8, respectively. In Case 6, each loop iteration is constrained by the trailing `asc_syncthreads()`: the write-back of the current iteration must fully complete before the next iteration can start, so the computation before the next load and the GM read of the next iteration can only wait serially. In Case 7, by rotating two UB tiles through double buffering and removing the trailing synchronization, the GM write-back of the current iteration overlaps with the computation before the next load and the GM read of the next iteration, compressing the serial wait between load and compute. This is also the main reason why Task Duration drops further relative to Case 6.
+The simulation instruction pipeline diagrams of Case 6 and Case 7 are shown in Figure 6 and Figure 7, respectively. In Case 6, each loop iteration is constrained by the trailing `asc_syncthreads()`: the write-back of the current iteration must fully complete before the next iteration can start, so the computation before the next load and the GM read of the next iteration can only wait serially. In Case 7, by rotating two UB tiles through double buffering and removing the trailing synchronization, the GM write-back of the current iteration overlaps with the computation before the next load and the GM read of the next iteration, compressing the serial wait between load and compute. This is also the main reason why Task Duration drops further relative to Case 6.
 
-**Figure 7: Case 6 simulation instruction pipeline diagram**
+**Figure 6: Case 6 simulation instruction pipeline diagram**
 
 <img src="./figures/case6_trace.png">
 
-**Figure 8: Case 7 simulation instruction pipeline diagram**
+**Figure 7: Case 7 simulation instruction pipeline diagram**
 
 <img src="./figures/case7_trace.png">
 
@@ -437,6 +431,8 @@ Run the following steps in the root directory of this example to build and execu
   | --------------------------- | ----------- | ------------------------------------------------------------------ |
   | `CMAKE_ASC_ARCHITECTURES`   | `dav-3510`  | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
   | `SCENARIO_NUM`              | `0`-`7`     | Example type, default is 7                                         |
+
+  - `--cce-res-usage` outputs compilation resource information such as register and stack usage, making resource usage easier to analyze.
 
   The following output indicates that the accuracy verification is successful.
 
