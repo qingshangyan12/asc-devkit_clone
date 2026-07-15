@@ -133,7 +133,8 @@ TEST_F(Tensor_Api_Frame_Layout, BatchFrameLayoutTraitForms)
     using NzCompatTrait = GetLayoutTrait<decltype(nzLayoutWithCompatTrait)>;
     static_assert(NzTraitWithDefault::C0_ELEMENT == _8{}, "LayoutTraitDefault<T> should only be used to infer C0.");
     static_assert(NzTraitWithDataType::C0_ELEMENT == _8{}, "Data type argument should only be used to infer C0.");
-    static_assert(AscendC::Std::is_same_v<NzCompatTrait, LayoutTrait<float, _8>>,
+    static_assert(
+        AscendC::Std::is_same_v<NzCompatTrait, LayoutTrait<float, _8>>,
         "LayoutTrait<T, C0> should remain source-compatible.");
     static_assert(NzCompatTrait::C0_ELEMENT == _8{}, "LayoutTrait<T, C0> should use C0 as layout trait.");
 
