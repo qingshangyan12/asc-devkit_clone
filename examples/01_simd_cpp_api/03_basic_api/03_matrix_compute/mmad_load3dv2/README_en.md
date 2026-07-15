@@ -93,9 +93,9 @@ Run the following steps in the root directory of this example to build and run t
 
   | Option | Values | Description |
   |--------|--------|-------------|
-| `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim`, `cpu` | Run mode: NPU execution, NPU simulation, CPU debug |
-| `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2/A3 training and inference products; dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
-| `SCENARIO_NUM` | `1`, `2`, `3`, `4` (default), `5` | Scenario number |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim`, `cpu` | Run mode: NPU execution, NPU simulation, CPU debug |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2/A3 training and inference products; dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
+  | `SCENARIO_NUM` | `1`, `2`, `3`, `4` (default), `5` | Scenario number |
 
 - Execution result
 

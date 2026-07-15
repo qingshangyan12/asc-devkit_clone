@@ -45,7 +45,7 @@ The hash table insertion process involves multiple pieces of information, such a
 
 `Bucket` is the target memory structure that actually stores key-value pairs in the hash table. Here, `key` stores the key, `value` stores the corresponding value, `state` is used to synchronize key write status, and `flag` is used to control bucket write permission.
 
-```C++
+```cpp
 struct Bucket {
     int64_t key;            // Key
     uint32_t state;         // Key value write status flag
@@ -56,7 +56,7 @@ struct Bucket {
 
 `KeyValueData` is used to encapsulate the data of key-value pairs to be inserted, including input keys, input values, value dimension, and the number of key-value pairs.
 
-```C++
+```cpp
 struct KeyValueData {
     int64_t* keys;       // Input keys
     float* values;       // Input values
@@ -70,7 +70,7 @@ struct KeyValueData {
 
 `HashTableContext` stores the parameters of the hash table itself, including the hash table base address, capacity, and bucket size. Its interfaces are used to compute bucket addresses and find and occupy target buckets. When writing values, the `insert` function reads the corresponding input values through the `KeyValueData` parameter.
 
-```C++
+```cpp
 struct HashTableContext {
     uint8_t* table_addr;     // Hash table base address
     uint32_t capacity;       // Hash table capacity

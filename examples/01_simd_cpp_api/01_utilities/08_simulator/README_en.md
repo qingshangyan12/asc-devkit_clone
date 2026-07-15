@@ -104,12 +104,12 @@ msopprof simulator --soc-version=<soc_version> ./demo
 > Please obtain the AI ​​processor model `<soc_version>` through the following methods:
 >
 >- Atlas A2 training series products/Atlas A2 inference series products
-> - For the above product models: Execute the `npu-smi info` command on the server where the Ascend AI processor is installed to query and obtain the **Name** information. The actual configuration value is AscendName. For example, the value of **Name** is xxxyy, and the actual configuration value is Ascendxxxyy.
+>   - For the above product models: Execute the `npu-smi info` command on the server where the Ascend AI processor is installed to query and obtain the **Name** information. The actual configuration value is AscendName. For example, the value of **Name** is xxxyy, and the actual configuration value is Ascendxxxyy.
 >
 
 > - Ascend 950PR/Ascend 950DT
 > - Atlas A3 training series products/Atlas A3 inference series products
-> - For the above product models, execute the `npu-smi info -t board -i <id> -c <chip_id>` command on the server where the Ascend AI processor is installed to query and obtain the **Chip Name** and **NPU Name** information. The actual configuration value is Chip Name_NPU Name. For example, the value of **Chip Name** is Ascendxxx, the value of **NPU Name** is 1234, and the actual configuration value is Ascendxxx_1234.
+>   - For the above product models, execute the `npu-smi info -t board -i <id> -c <chip_id>` command on the server where the Ascend AI processor is installed to query and obtain the **Chip Name** and **NPU Name** information. The actual configuration value is Chip Name_NPU Name. For example, the value of **Chip Name** is Ascendxxx, the value of **NPU Name** is 1234, and the actual configuration value is Ascendxxx_1234.
 >
 > Among them, `id` is the device ID, and the NPU ID found through the `npu-smi info -l` command is the device ID; `chip_id` is the chip ID, and the Chip ID found out through the `npu-smi info -m` command is the chip ID.
 

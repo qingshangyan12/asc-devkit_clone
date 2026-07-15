@@ -45,7 +45,7 @@ Hash Table是一种高效的数据结构，它通过一个哈希函数将“键�
 
 `Bucket`是哈希表中实际存储键值对的目标内存结构，其中`key`存储键，`value`存储对应的值，`state`用于同步key写入状态，`flag`用于控制桶写权限。
 
-```C++
+```cpp
 struct Bucket {
     int64_t key;            // 键
     uint32_t state;         // key值写入状态标记
@@ -56,7 +56,7 @@ struct Bucket {
 
 `KeyValueData`用于封装待插入键值对信息，包括输入key、输入value、value维度和键值对数量。
 
-```C++
+```cpp
 struct KeyValueData {
     int64_t* keys;       // 输入key
     float* values;       // 输入value
@@ -70,7 +70,7 @@ struct KeyValueData {
 
 `HashTableContext`保存哈希表自身参数，包括哈希表首地址、容量和桶大小，用于计算桶地址、查找并占用目标桶；写入value时，`insert`函数通过`KeyValueData`入参读取对应的输入value。
 
-```C++
+```cpp
 struct HashTableContext {
     uint8_t* table_addr;     // 哈希表首地址
     uint32_t capacity;       // 哈希表容量
