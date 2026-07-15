@@ -3,7 +3,7 @@
 
 ## 概述
 
-本样例以矩阵转置为例，介绍Ascend C SIMD与SIMT混合编程方式下的访存优化思路。样例从直接全局内存转置出发，引入MTE搬运、UB中转与32×32分块，对比按tile分组启动Thread Block与固定Thread Block数两种映射方式，通过UB padding降低bank冲突，最后借助双缓冲使MTE2搬入、SIMT VF转置和MTE3搬出流水并行，呈现SIMD与SIMT混合矩阵转置的调优路径。
+本样例以矩阵转置为例，介绍Ascend C SIMD与SIMT混合编程方式下的访存优化思路。样例从直接全局内存转置出发，引入MTE搬运、UB中转与32×32分块，对比按tile分组启动Thread Block与固定Thread Block数两种映射方式，通过UB padding降低bank冲突，最后借助双缓冲使MTE2搬入、SIMT VF转置和MTE3搬出流水并行，呈现SIMD与SIMT混合矩阵转置的调优路径。本样例与SIMT场景下的[matrix_transpose_practice样例](https://gitcode.com/cann/asc-devkit/tree/matrix_transpose/examples/03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice)功能相同，可用于对比SIMD与SIMT混合场景和SIMT场景在矩阵转置访存优化路径上的差异。
 
 ## 支持的产品
 
@@ -162,7 +162,7 @@ for (uint32_t tile_base = loop_start; tile_base < total_tiles; tile_base += loop
 
 **分析**：
 
-Case 2将Thread Block数固定为硬件vector core数。相比Case 1按tile分组启动512个Thread Block的写法，Case 2需要启动和调度的线程块数量更少，Task Duration从23.374μs降低到18.734μs，耗时下降约19.9%。后续版本继续沿用2048线程、每轮两个tile的路径，把优化重点转向UB访问开销。
+Case 2将Thread Block数固定为硬件vector core数。相比Case 1按tile分组启动512个Thread Block的写法，Case 2需要启动和调度的线程块数量更少，Task Duration从23.374μs降低到18.734μs，耗时下降约19.9%。在SIMD与SIMT混合场景下，降低Thread Block数不会改变SIMT VF内部的转置逻辑，也不会引入额外的SIMT线程侧计算复杂度；与SIMT场景不同，本Case未观察到寄存器溢出。后续版本继续沿用2048线程、每轮两个tile的路径，把优化重点转向UB访问开销。
 
 ---
 
