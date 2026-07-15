@@ -47,7 +47,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_custom</td></tr>
   </table>
 
-  样例为纯Cube矩阵计算场景，固定按2个Cube核生成tiling。在本样例规格下，tiling结果会把`M = 512`按2个核均分，每个核处理`singleCoreM = 256`，`singleCoreN = 512`，`singleCoreKa = singleCoreKb = 128`。
+  样例为纯Cube矩阵计算场景，固定按2个Cube核生成tiling。在本样例规格下，tiling结果会把`M = 512`按2个核均分，每个核处理`singleCoreM = 256`、`singleCoreN = 512`、`singleCoreK = 128`。原始K维对应`tiling.Ka = tiling.Kb = 128`。
 
 - 样例实现：
   - Tiling生成流程
@@ -87,7 +87,7 @@
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

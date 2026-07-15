@@ -39,6 +39,8 @@
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">fill</td></tr>
 </table>
 
+> **说明：** 规格表中的 x、y 仅用于端到端流程占位（生成输入文件与 golden），核函数实际不读取这两个 GM 输入，而是使用 `Fill` 接口构造全 1 矩阵参与 `Mmad` 计算，因此 x、y 的取值不影响计算结果。
+
 ### 样例实现
 
   1. 首先初始化 L0A Buffer 和 L0B Buffer，不同硬件架构方式不一样：
@@ -53,7 +55,7 @@
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

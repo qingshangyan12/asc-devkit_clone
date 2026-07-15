@@ -215,7 +215,7 @@ UB 的 16 个 bank group 各自可以并行接收写入；地址按 32B 一块�
 
 **实现方式**：编译时 `-DSCENARIO_NUM=2`。
 
-在 Case 1 紧凑排放的基础上，**将 `dstNzC0Stride` 从 `tileH` 调整为 `tileH + 1`**，相当于 `nzBuf` 多申请一行空间，让向量写落点便能在不同 bank group 间轮转。
+在 Case 1 紧凑排放的基础上，**将 `dstNzC0Stride` 从 `tileH` 调整为 `tileH + 1`**，相当于 `nzBuf` 多申请一行空间，让向量写落点能在不同 bank group 间轮转。
 
 **关键代码**：
 
@@ -386,7 +386,7 @@ for (uint16_t k = 0; k < vecsPerRow; ++k) {
 
 **实现方式**：编译时 `-DSCENARIO_NUM=2`。
 
-在 Case 1 紧凑排放的基础上，**将 `dstNzC0Stride` 从 `tileH` 调整为 `tileH + 1`**，相当于 `nzBuf` 多申请一行空间，让向量写落点便能在不同 bank group 间轮转。
+在 Case 1 紧凑排放的基础上，**将 `dstNzC0Stride` 从 `tileH` 调整为 `tileH + 1`**，相当于 `nzBuf` 多申请一行空间，让向量写落点能在不同 bank group 间轮转。
 
 **关键代码**：
 
@@ -503,7 +503,7 @@ T_{\text{base}} = \frac{M \times N}{128 \times 1.65 \times 10^9 \times 64}
                 \approx 4.965\mu s
 $$
 
-实测 `aiv_vec_time` 为 `9.14μs`，与 4.965μs 理论值的差距来自两个叠加因素：(1) V_STORE stride=145 每次起始 bank +1，多轮循环后还会与V_LOAD落至一个bank，仅靠 buffer 偏移无法逐行完美错开；(2) vloop 指令双发，发射槽位不是每个 cycle 都能凑出"本轮 store + 下一轮 load"的理想组合，带来冲突。本样例主在演示如何解决 NZ 写的写写冲突，端到端 Task Duration 已被 MTE2/MTE3 主导（`aiv_mte2_ratio`高达96.7%），vec 时间不在关键路径上。
+实测 `aiv_vec_time` 为 `9.14μs`，与 4.965μs 理论值的差距来自两个叠加因素：(1) V_STORE stride=145 每次起始 bank +1，多轮循环后还会与V_LOAD落至一个bank，仅靠 buffer 偏移无法逐行完美错开；(2) vloop 指令双发，发射槽位不是每个 cycle 都能凑出"本轮 store + 下一轮 load"的理想组合，带来冲突。本样例主要演示如何解决 NZ 写的写写冲突，端到端 Task Duration 已被 MTE2/MTE3 主导（`aiv_mte2_ratio`高达96.7%），vec 时间不在关键路径上。
 
 ### 优化要点总结
 
@@ -517,7 +517,7 @@ $$
 ## 编译运行
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -560,27 +560,36 @@ $$
 
 ## 性能分析
 
-使用 `msprof` 工具获取详细性能数据：
+### msOpProf工具介绍
+msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
 
-```bash
-msprof ./demo
-```
+- 上板性能采集
 
-当前目录下会生成 `PROF_` 前缀的文件夹，`mindstudio_profiler_output` 目录保存 Host 和各 Device 的性能数据汇总：
+    通过上板性能采集，可以直接测定算子昇腾AI处理器上的运行时间。该方式适合在板环境中快速定位算子性能问题。
 
-```text
-PROF_xxxx_XXXXXX
-├── device_{id}
-└── host
-└── mindstudio_profiler_log
-└── mindstudio_profiler_output    # 保存 Host 和各 Device 的性能数据汇总
-    ├── msprof_*.json
-    ├── xx_*.csv
-    └── README.txt
-```
+    基于可执行文件demo通过msopprof执行算子调优：
+    ```
+    msopprof ./demo
+    ```
+
+    - 性能数据说明  
+      命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
+
+      ```bash
+      ├──dump                       # 原始的性能数据，用户无需关注
+      ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
+      ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
+      ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
+      ├──OpBasicInfo.csv            # 算子基础信息
+      ├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
+      ├──ResourceConflictRatio.csv  # UB上的bank group、bank conflict和资源冲突率在所有指令中的占比
+      └──visualize_data.bin         # MindStudio Insight呈现文件
+      ```
 
 查看具体的性能分析结果：
 
 ```bash
-cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```

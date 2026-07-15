@@ -42,7 +42,7 @@
 
   `alignas`的几条限制：
 
-  - **只能放大，不能缩小**：`alignas(N)`中的`N`必须≥类型的默认`alignof`，即所有字段`alignof`的最大值，否则编译器会忽略或报错。
+  - **只能放大，不能缩小**：`alignas(N)`中的`N`必须大于等于类型的默认`alignof`，即所有字段`alignof`的最大值，否则编译器会忽略或报错。
   - **取值必须是2的幂**：`alignas(N)`中的`N`必须是2的幂。
   - **会同步抬升sizeof**：`sizeof`必须是`alignof`的整数倍，所以放大`alignof`时，`sizeof`会向上进位。
 
@@ -114,11 +114,11 @@
   |      Task Duration(μs)      | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。          |
   |      aiv_total_cycles       | Task在 Vector Core上执行所消耗的CPU周期（Cycle）总数。          |
 
-  除 Task Duration 外，本例中其余指标均展示的为所有 block 上性能指标的平均值。
+  除 Task Duration 外，本例中其余指标均展示的是所有 block 上性能指标的平均值。
 
 - 性能数据
 
-  |       TData       | Task Duration(us) | aiv_total_cycles |
+  |       TData       | Task Duration(μs) | aiv_total_cycles |
   | :---------------: | :---------------: | :--------------: |
   |      Align4       |     27889.33      |   46005213.32    |
   |     Misalign4     |     81223.02      |   134028903.60   |
@@ -139,7 +139,7 @@
 
   本次所有测试用例的总搬运数据量统一为512MiB，更宽的访存指令，总体耗时更少，搬运效率更高。将各对照组对齐前后的耗时差异汇总如下：
 
-  | 结构体大小                  | 对齐Task Duration(us) | 非对齐Task Duration(us)  | 非对齐Task Duration/对齐Task Duration |
+  | 结构体大小                  | 对齐Task Duration(μs) | 非对齐Task Duration(μs)  | 非对齐Task Duration/对齐Task Duration |
   | :------------------------: | :-------------------: | :---------------------: | :---------: |
   | 4B (4×u8)                  | 27889.33 (alignof=4)  | 81223.02 (alignof=1)    | **2.91x**   |
   | 4B (2×u16)                 | 27833.56 (alignof=4)  | 46656.61 (alignof=2)    | **1.68x**   |
@@ -166,7 +166,7 @@
 ## 编译运行
 
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -199,13 +199,13 @@
 
 ## 性能数据获取
 
-  使用 `msprof` 工具获取单个组件上的性能数据：
+  使用 `msOpProf` 工具获取单个组件上的性能数据：
 
   ```bash
-  msprof op ./demo   # 分析样例的性能
+  msopprof ./demo   # 分析样例的性能
   ```
 
-  命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
+  命令完成后，会在默认目录下生成以"OPPROF_{timestamp}_XXX"命名的文件夹,性能数据文件夹结构示例如下：
 
   ```text
   ├──dump                       # 原始的性能数据，用户无需关注

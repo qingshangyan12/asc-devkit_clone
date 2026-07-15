@@ -35,7 +35,7 @@
   <tr><td rowspan="4" align="center">样例输入</td></tr>
   <tr><td align="center">x4</td><td align="center">[256, 256]</td><td align="center">int4b_t</td><td align="center">ND</td></tr>
   <tr><td align="center">y4</td><td align="center">[256, 256]</td><td align="center">int4b_t</td><td align="center">ND</td></tr>
-  <tr><td align="center">tiling</td><td align="center">[1, 64]</td><td align="center">int32_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">tiling</td><td align="center">[1, 32]</td><td align="center">int32_t</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[256, 256]</td><td align="center">int32_t</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_s4</td></tr>
   </table>
@@ -51,7 +51,7 @@
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

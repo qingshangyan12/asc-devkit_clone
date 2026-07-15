@@ -32,6 +32,68 @@ presmoke_mode() {
     printf '%s\n' "${PRESMOKE_MODE:-npu}"
 }
 
+presmoke_werror_enabled() {
+    case "${PRESMOKE_WERROR:-}" in
+        1|true|TRUE|yes|YES|on|ON) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+presmoke_cmake_is_configure_command() {
+    local arg
+    for arg in "$@"; do
+        case "$arg" in
+            --build|--install|--open|--workflow|-E) return 1 ;;
+        esac
+    done
+    return 0
+}
+
+presmoke_cmake_has_cache_arg() {
+    local key="$1"
+    shift
+    local arg
+    for arg in "$@"; do
+        [[ "$arg" == "-D${key}="* ]] && return 0
+    done
+    return 1
+}
+
+presmoke_werror_cmake_args() {
+    presmoke_werror_enabled || return 0
+    printf '%s\n' "-DCMAKE_ASC_FLAGS=-Werror"
+}
+
+presmoke_append_werror_flag() {
+    local value="${1:-}"
+    if [[ -z "$value" ]]; then
+        printf '%s\n' "-Werror"
+        return
+    fi
+    case " $value " in
+        *" -Werror "*) printf '%s\n' "$value" ;;
+        *) printf '%s\n' "$value -Werror" ;;
+    esac
+}
+
+cmake() {
+    local extra=()
+    if presmoke_werror_enabled && presmoke_cmake_is_configure_command "$@"; then
+        presmoke_cmake_has_cache_arg "CMAKE_ASC_FLAGS" "$@" || extra+=("-DCMAKE_ASC_FLAGS=-Werror")
+        CFLAGS="$(presmoke_append_werror_flag "${CFLAGS:-}")" \
+        CXXFLAGS="$(presmoke_append_werror_flag "${CXXFLAGS:-}")" \
+        command cmake "$@" "${extra[@]}"
+        return
+    fi
+    command cmake "$@" "${extra[@]}"
+}
+
+export -f presmoke_werror_enabled
+export -f presmoke_cmake_is_configure_command
+export -f presmoke_cmake_has_cache_arg
+export -f presmoke_append_werror_flag
+export -f cmake
+
 presmoke_soc_version() {
     if [[ -n "${PRESMOKE_SOC_VERSION:-}" ]]; then
         printf '%s\n' "$PRESMOKE_SOC_VERSION"
@@ -64,7 +126,11 @@ presmoke_case_init() {
         RUN_MODE_ARG="-DCMAKE_ASC_RUN_MODE=$MODE"
     fi
     BUILD_DIR="$(presmoke_build_dir "$CASE_DIR")"
+    TORCH_DEVICE_BACKEND_AUTOLOAD="${TORCH_DEVICE_BACKEND_AUTOLOAD:-0}"
+    ASCEND_SLOG_PRINT_TO_STDOUT="${PRESMOKE_ASCEND_SLOG_PRINT_TO_STDOUT:-0}"
     export CASE_DIR MODE ARCH SOC_VERSION RUN_MODE_ARG BUILD_DIR
+    export TORCH_DEVICE_BACKEND_AUTOLOAD
+    export ASCEND_SLOG_PRINT_TO_STDOUT
 }
 
 run_in_build_dir() {
@@ -106,56 +172,43 @@ presmoke_ascend_log_root() {
     printf '%s\n' "${PRESMOKE_ASCEND_LOG_ROOT:-$HOME/ascend/log}"
 }
 
-presmoke_clear_plog() {
-    local log_root
-    log_root="$(presmoke_ascend_log_root)"
-    rm -rf "$log_root/debug/plog" "$log_root/run/plog" 2>/dev/null || true
-    mkdir -p "$log_root/debug/plog" "$log_root/run/plog"
-}
+presmoke_verify_tiling_sink_task_log_for_pid() {
+    local pid="$1"
+    local pattern="$2"
+    local timeout="${PRESMOKE_PLOG_FLUSH_TIMEOUT:-10}"
+    local log_root deadline plog_dir plog_file
+    local -a plog_files=()
 
-presmoke_verify_tiling_sink_task_log() {
-    local pattern="$1"
-    local debug_plog
-    debug_plog="$(presmoke_ascend_log_root)/debug/plog"
-    if [[ ! -d "$debug_plog" ]]; then
-        echo "tiling sink plog directory not found: $debug_plog" >&2
+    if [[ ! "$pid" =~ ^[0-9]+$ ]]; then
+        echo "invalid tiling sink process id: $pid" >&2
         return 1
     fi
-    if grep -R -F -n -- "$pattern" "$debug_plog" >&2; then
-        echo "tiling sink task generation log matched" >&2
-        return 0
-    fi
-    echo "tiling sink task generation log not found: $pattern" >&2
-    echo "searched directory: $debug_plog" >&2
-    find "$debug_plog" -type f 2>/dev/null | sed 's#^#plog file: #' >&2 || true
-    return 1
-}
 
-presmoke_with_lock() {
-    local name="$1"
-    shift
-    local root lock_parent lock_dir lock_pid
-    root="$(presmoke_project_root)"
-    lock_parent="${PRESMOKE_LOCK_DIR:-$root/.presmoke_locks}"
-    lock_dir="$lock_parent/$name.lock"
-    mkdir -p "$lock_parent"
-
-    while ! mkdir "$lock_dir" 2>/dev/null; do
-        if [[ -f "$lock_dir/pid" ]]; then
-            lock_pid="$(cat "$lock_dir/pid" 2>/dev/null || true)"
-            if [[ -n "$lock_pid" ]] && ! kill -0 "$lock_pid" 2>/dev/null; then
-                rm -rf "$lock_dir"
-                continue
-            fi
+    log_root="$(presmoke_ascend_log_root)"
+    deadline=$((SECONDS + timeout))
+    while true; do
+        plog_files=()
+        for plog_dir in "$log_root/debug/plog" "$log_root/run/plog"; do
+            [[ -d "$plog_dir" ]] || continue
+            while IFS= read -r -d '' plog_file; do
+                plog_files+=("$plog_file")
+            done < <(find "$plog_dir" -maxdepth 1 -type f -name "plog-${pid}_*.log" -print0 2>/dev/null)
+        done
+        if ((${#plog_files[@]} > 0)) && grep -F -n -- "$pattern" "${plog_files[@]}" >&2; then
+            echo "tiling sink task generation log matched for pid $pid" >&2
+            return 0
         fi
-        sleep 1
+        ((SECONDS >= deadline)) && break
+        sleep 0.2
     done
 
-    echo "$$" > "$lock_dir/pid"
-    local rc=0
-    "$@" || rc=$?
-    rm -rf "$lock_dir"
-    return "$rc"
+    echo "tiling sink task generation log not found for pid $pid: $pattern" >&2
+    if ((${#plog_files[@]} == 0)); then
+        echo "no PID-specific plog found under: $log_root" >&2
+    else
+        printf 'searched plog file: %s\n' "${plog_files[@]}" >&2
+    fi
+    return 1
 }
 
 presmoke_opp_path() {
@@ -203,15 +256,52 @@ presmoke_repair_custom_op_package_headers() {
     done < <(presmoke_custom_op_dynamic_dirs)
 }
 
+presmoke_custom_op_lock_dir() {
+    local lock_root opp_path lock_key
+    lock_root="${PRESMOKE_LOCK_ROOT:-/tmp/asc-devkit-presmoke-locks}"
+    opp_path="$(presmoke_opp_path)"
+    if command -v sha256sum >/dev/null 2>&1; then
+        lock_key="$(printf '%s' "$opp_path" | sha256sum | awk '{print $1}')"
+    elif command -v shasum >/dev/null 2>&1; then
+        lock_key="$(printf '%s' "$opp_path" | shasum -a 256 | awk '{print $1}')"
+    else
+        lock_key="$(printf '%s' "$opp_path" | cksum | awk '{print $1}')"
+    fi
+    printf '%s/%s/custom_op_package.lock\n' "$lock_root" "$lock_key"
+}
+
+presmoke_with_directory_lock() {
+    local lock_dir="$1"
+    shift
+    local lock_pid rc
+    mkdir -p "$(dirname "$lock_dir")"
+
+    while ! mkdir "$lock_dir" 2>/dev/null; do
+        lock_pid="$(cat "$lock_dir/pid" 2>/dev/null || true)"
+        if [[ "$lock_pid" =~ ^[0-9]+$ ]] && ! kill -0 "$lock_pid" 2>/dev/null; then
+            rm -rf "$lock_dir"
+            continue
+        fi
+        sleep 0.1
+    done
+
+    printf '%s\n' "${BASHPID:-$$}" > "$lock_dir/pid"
+    rc=0
+    "$@" || rc=$?
+    rm -rf "$lock_dir"
+    return "$rc"
+}
+
 presmoke_ensure_custom_op_package() {
     if [[ "${PRESMOKE_CUSTOM_OP_AUTO_INSTALL:-1}" == "0" ]]; then
         echo "PRESMOKE_CUSTOM_OP_AUTO_INSTALL=0; custom_op package auto-install skipped" >&2
         return 0
     fi
-    presmoke_with_lock "custom_op_package" _presmoke_ensure_custom_op_package_locked
+    presmoke_with_directory_lock \
+        "$(presmoke_custom_op_lock_dir)" _presmoke_ensure_custom_op_package
 }
 
-_presmoke_ensure_custom_op_package_locked() {
+_presmoke_ensure_custom_op_package() {
     local root custom_case_dir build_dir state_dir stamp arch mode package
     root="$(presmoke_project_root)"
     custom_case_dir="$root/examples/01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op"
@@ -237,7 +327,7 @@ _presmoke_ensure_custom_op_package_locked() {
         rm -f "$stamp"
     fi
 
-    local cmake_args=(cmake .. "-DCMAKE_ASC_ARCHITECTURES=$arch")
+    local cmake_args=(cmake ..)
     if [[ -n "${NLOHMANN_JSON_URL:-}" ]]; then
         cmake_args+=("-DNLOHMANN_JSON_URL=$NLOHMANN_JSON_URL")
     fi
@@ -246,7 +336,11 @@ _presmoke_ensure_custom_op_package_locked() {
     fi
 
     (cd "$build_dir" && presmoke_run_command "${cmake_args[@]}")
-    (cd "$build_dir" && presmoke_run_command make -j binary package)
+    (
+        cd "$build_dir"
+        PRESMOKE_MAKE_JOBS=16 CMAKE_BUILD_PARALLEL_LEVEL=16 \
+            presmoke_run_command make -j binary package
+    )
 
     local packages=("$build_dir"/custom_opp_*.run)
     if [[ ! -f "${packages[0]}" ]]; then

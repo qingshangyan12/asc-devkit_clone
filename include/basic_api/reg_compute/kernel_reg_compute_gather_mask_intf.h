@@ -13,6 +13,10 @@
  * \brief
  */
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "kernel_reg_compute_gather_mask_intf.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_GATHER_MASK_INTF_H__
@@ -33,9 +37,6 @@ template <typename T = DefaultType, typename U>
 __simd_callee__ inline void Unsqueeze(U& dstReg, MaskReg& mask);
 
 template <SpecialPurposeReg spr>
-__aicore__ inline int64_t GetSpr();
-
-template <SpecialPurposeReg spr>
 __simd_callee__ inline void ClearSpr();
 
 template <typename T = DefaultType, typename U = DefaultType, typename S, typename V>
@@ -43,11 +44,10 @@ __simd_callee__ inline void Gather(S& dstReg, S& srcReg, V& indexReg);
 } // namespace Reg
 } // namespace AscendC
 
-#include "../../impl/basic_api/reg_compute/kernel_reg_compute_gather_mask_intf_impl.h"
+#include "../../../impl/basic_api/reg_compute/kernel_reg_compute_gather_mask_intf_impl.h"
 #endif // ASCENDC_MODULE_REG_COMPUTE_COPY_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_GATHER_MASK_INTF_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_GATHER_MASK_INTF_H__
 #endif
-

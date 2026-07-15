@@ -1,13 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
-
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /* !
  * \file data_utils.h
@@ -16,12 +15,29 @@
 
 #ifndef DATA_UTILS_H
 #define DATA_UTILS_H
+#ifdef ASCENDC_CPU_DEBUG
+#include "tiling/platform/platform_ascendc.h"
+#endif
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fstream>
 
 #define ERROR_LOG(fmt, args...) fprintf(stdout, "[ERROR]  " fmt "\n", ##args)
+
+static inline void InitCpuDebugPlatform()
+{
+#if defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510))
+#if __NPU_ARCH__ == 2201
+    const char* socVersion = "Ascend910B1";
+#elif __NPU_ARCH__ == 3510
+    const char* socVersion = "Ascend950PR_9589";
+#endif
+    if (platform_ascendc::PlatformAscendCManager::GetInstance(socVersion) == nullptr) {
+        ERROR_LOG("Failed to initialize CPU debug platform for %s.", socVersion);
+    }
+#endif
+}
 
 bool ReadFile(const std::string& filePath, size_t& fileSize, void* buffer, size_t bufferSize)
 {

@@ -22,10 +22,10 @@
 #ifndef IMPL_INDEX_ARITHPROGRESSION_ARITHPROGRESSION_COMMON_IMPL_H
 #define IMPL_INDEX_ARITHPROGRESSION_ARITHPROGRESSION_COMMON_IMPL_H
 
-#include "kernel_basic_intf.h"
-#include "kernel_tensor.h"
-#include "kernel_utils.h"
-#include "kernel_log.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
+#include "../../../../basic_api/kernel_utils.h"
+#include "../../../../basic_api/kernel_log.h"
 #ifdef ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_check/index/arithprogression/arithprogression_check.h"
 #endif // ASCENDC_CPU_DEBUG
@@ -93,8 +93,7 @@ __aicore__ inline void ArithProgressionImpl(
             for (int i = 0; i < DEFAULT_BLK_NUM - 1; i++) {
                 Adds<T, false>(
                     dstLocal[(i + 1) * BLOCK_NUM], dstLocal[i * BLOCK_NUM],
-                    GetArithProgressionStep<T>(diffValue, BLOCK_NUM), MASK_PLACEHOLDER,
-                    (uint16_t)1, addsParamsStride1);
+                    GetArithProgressionStep<T>(diffValue, BLOCK_NUM), MASK_PLACEHOLDER, (uint16_t)1, addsParamsStride1);
                 PipeBarrier<PIPE_V>();
             }
             int32_t repeat = count / REPEAT_NUM;
@@ -105,8 +104,8 @@ __aicore__ inline void ArithProgressionImpl(
             for (int i = 0; i < repeat - 1; i++) {
                 Adds<T, false>(
                     dstLocal[(i + 1) * REPEAT_NUM], dstLocal[i * REPEAT_NUM],
-                    GetArithProgressionStep<T>(diffValue, REPEAT_NUM), MASK_PLACEHOLDER,
-                    (uint16_t)1, addsParamsStride8);
+                    GetArithProgressionStep<T>(diffValue, REPEAT_NUM), MASK_PLACEHOLDER, (uint16_t)1,
+                    addsParamsStride8);
                 PipeBarrier<PIPE_V>();
             }
             if (tail > 0) {
@@ -115,8 +114,8 @@ __aicore__ inline void ArithProgressionImpl(
                 PipeBarrier<PIPE_V>();
                 Adds<T, false>(
                     dstLocal[repeat * REPEAT_NUM], dstLocal[(repeat - 1) * REPEAT_NUM],
-                    GetArithProgressionStep<T>(diffValue, REPEAT_NUM), MASK_PLACEHOLDER,
-                    (uint16_t)1, addsParamsStride8);
+                    GetArithProgressionStep<T>(diffValue, REPEAT_NUM), MASK_PLACEHOLDER, (uint16_t)1,
+                    addsParamsStride8);
                 PipeBarrier<PIPE_V>();
             }
         } else {
@@ -128,8 +127,7 @@ __aicore__ inline void ArithProgressionImpl(
             for (int i = 0; i < repeat - 1; i++) {
                 Adds<T, false>(
                     dstLocal[(i + 1) * BLOCK_NUM], dstLocal[i * BLOCK_NUM],
-                    GetArithProgressionStep<T>(diffValue, BLOCK_NUM), MASK_PLACEHOLDER,
-                    (uint16_t)1, addsParamsStride1);
+                    GetArithProgressionStep<T>(diffValue, BLOCK_NUM), MASK_PLACEHOLDER, (uint16_t)1, addsParamsStride1);
                 PipeBarrier<PIPE_V>();
             }
         }

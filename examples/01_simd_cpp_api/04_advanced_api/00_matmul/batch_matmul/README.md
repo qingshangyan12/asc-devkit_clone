@@ -31,15 +31,14 @@
 - 样例功能：  
   调用Matmul高阶API，实现批量处理3组Matmul计算，每组对BSNGD格式的A、B矩阵分别做矩阵乘和加bias偏置。
 
-  BSNGD格式具体可参考[IterateBatch](../../../../../docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/IterateBatch.md)中对该数据排布的介绍。
+  BSNGD格式具体可参考[IterateBatch](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/IterateBatch.md)中对该数据排布的介绍。
 
 - 样例规格：   
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="6" align="center">BatchMatmulCustom</td></tr>
-  <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td><td align="center">layout</td></tr>
+  <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td><td align="center">layout</td></tr>
   <tr><td align="center">a</td><td align="center">[2, 32, 1, 3, 64]</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td><td align="center">BSNGD</td></tr>
   <tr><td align="center">b</td><td align="center">[2, 256, 1, 3, 64]</td><td align="center">half</td><td align="center">ND</td><td align="center">true</td><td align="center">BSNGD</td></tr>
-  <tr><td align="center">bias</td><td align="center">[2, 1, 1, 3, 256]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td><td align="center">-</td></tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[2, 32, 1, 3, 256]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td><td align="center">BSNGD</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="6" align="center">batch_matmul_custom</td></tr>
   </table>
@@ -68,7 +67,7 @@
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

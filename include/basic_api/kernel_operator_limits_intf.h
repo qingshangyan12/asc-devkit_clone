@@ -12,6 +12,11 @@
  * \file kernel_operator_limits_intf.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "kernel_operator_limits_intf.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_LIMITS_INTF_H__
@@ -20,11 +25,11 @@
 #ifndef ASCENDC_KERNEL_OPERATOR_LIMITS_INTF_H
 #define ASCENDC_KERNEL_OPERATOR_LIMITS_INTF_H
 
-#include "kernel_macros.h"
+#include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
 #include "kernel_operator_vec_duplicate_intf.h"
-#include "utils/kernel_utils_ceil_oom_que.h"
-#include "utils/kernel_utils_struct_norm_sort.h"
+#include "../../impl/basic_api/utils/kernel_utils_ceil_oom_que.h"
+#include "../../impl/basic_api/utils/kernel_utils_struct_norm_sort.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -62,7 +67,7 @@ public:
             return GetScalarBitcodeValue<uint16_t, T>(0x7BFFu);
         } else if constexpr (AscendC::Std::is_same<T, float>::value) {
             return GetScalarBitcodeValue<uint32_t, T>(0x7F7FFFFFu);
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)            
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
         } else if constexpr (AscendC::Std::is_same<T, bfloat16_t>::value) {
             return GetScalarBitcodeValue<uint16_t, T>(0x7F7Fu);
 #endif
@@ -144,7 +149,7 @@ public:
 #else
         static_assert(
             SupportType<T, half, float>(), "current data type is not supported on current device!");
-#endif    
+#endif
         if constexpr (AscendC::Std::is_same<T, half>::value) {
             return GetScalarBitcodeValue<uint16_t, T>(0x7C00u);
         } else if constexpr (AscendC::Std::is_same<T, float>::value) {
@@ -186,7 +191,7 @@ public:
 #else
         static_assert(
             SupportType<T, half, float>(), "current data type is not supported on current device!");
-#endif 
+#endif
         if constexpr (AscendC::Std::is_same<T, half>::value) {
             return GetScalarBitcodeValue<uint16_t, T>(0x7E00u);
         } else if constexpr (AscendC::Std::is_same<T, float>::value) {
@@ -228,7 +233,7 @@ public:
 #else
         static_assert(
             SupportType<T, half, float>(), "current data type is not supported on current device!");
-#endif    
+#endif
         if constexpr (AscendC::Std::is_same<T, half>::value) {
             return GetScalarBitcodeValue<uint16_t, T>(0x0001u);
         } else if constexpr (AscendC::Std::is_same<T, float>::value) {

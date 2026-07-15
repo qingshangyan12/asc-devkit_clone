@@ -66,9 +66,11 @@
 
 ## 编译运行
 
-- 配置环境变量
 在本样例根目录下执行如下步骤，编译并执行样例。
-  请根据当前环境上CANN开发套件包的[安装方式](https://gitcode.com/cann/asc-devkit/blob/master/docs/quick_start.md#prepare&install)，配置环境变量。
+
+- 配置环境变量
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
+
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -78,6 +80,7 @@
 - 样例执行
 
   在本样例目录下执行如下命令。
+
   ```bash
   mkdir -p build && cd build;                                               # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;                      # 编译工程
@@ -94,6 +97,7 @@
 
 - 执行结果
   最终执行结果如下，说明精度对比成功。
+
   ```bash
   test pass!
   ```

@@ -75,7 +75,7 @@ $$
 
 ### 实现要点
 
-本样例将 tiling 参数统一在 `matmul_mx.h` 中编译期确定，通过模板常量 `CONSTANT_CFG` 传给 `MatmulImpl`：
+本样例将 tiling 参数统一在 `matmul_mx.h` 中编译期确定，通过模板常量 `CONSTANT_CFG` 传给 `Matmul`：
 
 ```cpp
 constexpr static auto CONSTANT_CFG = GetMxConstantCFG<aType, bType, cType, EnableScaleCache>();
@@ -177,7 +177,7 @@ Case1/Case2 在 scale 侧的差异主要体现在“单次搬运粒度与搬运�
 | Case 1 | 750.219 | 32 | 749.13 | 660.15 | 0.881 | 258.354 | 0.345 | 437.64 | 0.584 | 753.906 | 0.982 | 33.257 | 0.044 |
 | Case 2 | 693.283 | 32 | 692.34 | 641.444 | 0.926 | 241.563 | 0.349 | 428.914 | 0.62 | 612.536 | 0.885 | 33.965 | 0.049 |
 
-可以看到，Case 2 已达到理论性能峰值的 `92.6%`（即表中的`aic_mac_ratio`）。
+可以看到，Case 2 的 Cube 计算时间占比（即表中的`aic_mac_ratio`）达到 `92.6%`。
 
 ### Case 2 收益（相对 Case 1）
 
@@ -185,8 +185,8 @@ Case1/Case2 在 scale 侧的差异主要体现在“单次搬运粒度与搬运�
 
 - 端到端时延：`750.219 -> 693.283 μs`，减少 `56.936 μs`，收益 `7.59%`。
 - MTE2 绝对耗时：`753.906 -> 612.536 μs`，减少 `141.370 μs`，收益 `18.75%`。
-- MTE2 占比：`0.982 -> 0.885`，下降 `9.7%`。
-- MAC 占比：`0.881 -> 0.926`，提升 `4.5%`。
+- MTE2 占比：`0.982 -> 0.885`，下降 `9.7` 个百分点。
+- MAC 占比：`0.881 -> 0.926`，提升 `4.5` 个百分点。
 
 **调优 Tips**：
 > MX Matmul 的关键差异在于 `scale` 与 A/B 的搬运可解耦；当 `aic_mte2_ratio` 偏高时，优先通过 `mxTypePara` 调整 `scale` 搬运比例以提升 L1 复用、减少重复 GM->L1 搬运。
@@ -215,7 +215,7 @@ Case 1/Case 2 的 `aic_mac_time` 分别为 `660.150 μs` / `641.444 μs`，相�
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -242,7 +242,7 @@ Case 1/Case 2 的 `aic_mac_time` 分别为 `660.150 μs` / `641.444 μs`，相�
 
   编译选项说明：
 
-  | 参数 | 可选值 | 说明 |
+  | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `SCENARIO_NUM` | `1` / `2` | 1: 常量化tiling + scale同步搬运；2: 常量化tiling + scale多搬运 |
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）/ `sim` | 运行模式：NPU运行、NPU仿真 |
@@ -257,28 +257,37 @@ Case 1/Case 2 的 `aic_mac_time` 分别为 `660.150 μs` / `641.444 μs`，相�
 
 ## 性能分析
 
-使用 `msprof` 工具获取详细性能数据：
+### msOpProf工具介绍
+msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
 
-```bash
-msprof ./demo   # 分析性能
-```
+- 上板性能采集
 
-当前目录下会生成PROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件
+    通过上板性能采集，可以直接测定算子昇腾AI处理器上的运行时间。该方式适合在板环境中快速定位算子性能问题。
 
-```bash
-PROF_xxxx_XXXXXX
-├── device_{id}
-└── host
-└── mindstudio_profiler_log
-└── mindstudio_profiler_output    # 保存Host和各个Device的性能数据汇总
-    ├── msprof_*.json
-    ├── xx_*.csv
-    └── README.txt
-```
+    基于可执行文件demo通过msopprof执行算子调优：
+    ```
+    msopprof ./demo
+    ```
+
+    - 性能数据说明  
+      命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
+
+      ```bash
+      ├──dump                       # 原始的性能数据，用户无需关注
+      ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
+      ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
+      ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
+      ├──OpBasicInfo.csv            # 算子基础信息
+      ├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
+      ├──ResourceConflictRatio.csv  # UB上的bank group、bank conflict和资源冲突率在所有指令中的占比
+      └──visualize_data.bin         # MindStudio Insight呈现文件
+      ```
 
 查看具体的性能分析结果：
 
-```
+```bash
 # 查看Task Duration 以及各项数据
-cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```

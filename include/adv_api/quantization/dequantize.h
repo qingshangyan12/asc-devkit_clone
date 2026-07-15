@@ -1,17 +1,21 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /* !
  * \file dequantize.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "dequantize.h cannot be used with compile flag --enable-simt enabled."
+#endif
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
@@ -43,7 +47,7 @@ namespace AscendC {
  * \param [in] srcTensor: Input src localTensor.
  * \param [in] scale: Input scale.
  * \param [in] offset: Reserved input offset.
- * \param [in] sharedTmpBufferï¼?extra temporary shared space used for intermediate values among calculation process,
+ * \param [in] sharedTmpBufferï¿½?extra temporary shared space used for intermediate values among calculation process,
  *             whose required space size should refer to corresponding tiling API, which is defined at
  *             ascend_dequant_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
  *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
@@ -51,9 +55,9 @@ namespace AscendC {
  * \param [in] params: DequantizeParams with m, n, groupSize to describe the calculation process like above.
  */
 template <const DequantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void Dequantize(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
-    const ScaleT& scale, const OffsetT& offset, const LocalTensor<uint8_t>& sharedTmpBuffer,
-    const DequantizeParams& params)
+__aicore__ inline void Dequantize(
+    const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const DequantizeParams& params)
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     DequantizeImpl<config>(dstTensor, srcTensor, scale, offset, sharedTmpBuffer, params);
@@ -78,11 +82,12 @@ __aicore__ inline void Dequantize(const LocalTensor<DstT>& dstTensor, const Loca
  * \param [in] params: DequantizeParams with m, n, groupSize to describe the calculation process like above.
  */
 template <const DequantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-__aicore__ inline void Dequantize(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
-    const ScaleT& scale, const OffsetT& offset, const DequantizeParams& params)
+__aicore__ inline void Dequantize(
+    const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset,
+    const DequantizeParams& params)
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
-    DequantizeImpl<config>(dstTensor, srcTensor, scale, offset, params); 
+    DequantizeImpl<config>(dstTensor, srcTensor, scale, offset, params);
 #endif
 }
 #pragma end_pipe

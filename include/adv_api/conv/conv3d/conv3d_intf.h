@@ -1,17 +1,21 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
  * \file conv3d_intf.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "conv3d_intf.h cannot be used with compile flag --enable-simt enabled."
+#endif
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
@@ -20,7 +24,7 @@
 #ifndef ADV_API_CONV_CONV3D_CONV3D_INTF_H
 #define ADV_API_CONV_CONV3D_CONV3D_INTF_H
 
-#include "kernel_utils.h"
+#include "../../../../impl/basic_api/kernel_utils.h"
 #include "../../../../impl/adv_api/detail/conv/conv3d/conv3d_util.h"
 #include "../../../../impl/adv_api/detail/conv/conv3d/conv3d_common_func.h"
 #include "../../../../impl/adv_api/detail/conv/common/conv_forward_common_func.h"
@@ -50,14 +54,13 @@ public:
     constexpr static auto formatType = Config::formatA;
 
 public:
-    __aicore__ inline Conv3dIntf()
-    {}
+    __aicore__ inline Conv3dIntf() {}
 
     /**
-    * @brief Initialize the convolution with tiling parameters
-    * @param cubeTiling Pointer to tiling parameters
-    */
-    __aicore__ inline void Init(const void *__restrict cubeTiling)
+     * @brief Initialize the convolution with tiling parameters
+     * @param cubeTiling Pointer to tiling parameters
+     */
+    __aicore__ inline void Init(const void* __restrict cubeTiling)
     {
         using local = typename Ext::Init;
         if constexpr (CONV_CHECK_FUN(local, ConvApiFunc, this, cubeTiling)) {
@@ -66,10 +69,10 @@ public:
     }
 
     /**
-    * @brief Set input tensor
-    * @param input Global tensor containing input data
-    */
-    __aicore__ inline void SetInput(const AscendC::GlobalTensor<InputT> &input)
+     * @brief Set input tensor
+     * @param input Global tensor containing input data
+     */
+    __aicore__ inline void SetInput(const AscendC::GlobalTensor<InputT>& input)
     {
         using local = typename Ext::SetInput;
         if constexpr (CONV_CHECK_FUN(local, ConvApiFunc, this, input)) {
@@ -78,10 +81,10 @@ public:
     }
 
     /**
-    * @brief Set weight tensor
-    * @param weight Global tensor containing weight data
-    */
-    __aicore__ inline void SetWeight(const AscendC::GlobalTensor<WeightT> &weight)
+     * @brief Set weight tensor
+     * @param weight Global tensor containing weight data
+     */
+    __aicore__ inline void SetWeight(const AscendC::GlobalTensor<WeightT>& weight)
     {
         using local = typename Ext::SetWeight;
         if constexpr (CONV_CHECK_FUN(local, ConvApiFunc, this, weight)) {
@@ -90,10 +93,10 @@ public:
     }
 
     /**
-    * @brief Set bias tensor
-    * @param bias Global tensor containing bias data
-    */
-    __aicore__ inline void SetBias(const AscendC::GlobalTensor<BiasT> &bias)
+     * @brief Set bias tensor
+     * @param bias Global tensor containing bias data
+     */
+    __aicore__ inline void SetBias(const AscendC::GlobalTensor<BiasT>& bias)
     {
         using local = typename Ext::SetBias;
         if constexpr (CONV_CHECK_FUN(local, ConvApiFunc, this, bias)) {
@@ -102,11 +105,11 @@ public:
     }
 
     /**
-    * @brief Set single output shape for 2D-like convolution
-    * @param singleCo Single output channel dimension
-    * @param singleDo Single output depth dimension
-    * @param singleM Single M dimension (height*width)
-    */
+     * @brief Set single output shape for 2D-like convolution
+     * @param singleCo Single output channel dimension
+     * @param singleDo Single output depth dimension
+     * @param singleM Single M dimension (height*width)
+     */
     __aicore__ inline void SetSingleOutputShape(uint64_t singleCo, uint64_t singleDo, uint64_t singleM)
     {
         using local = typename Ext::SetSingleOutputShape;
@@ -116,10 +119,10 @@ public:
     }
 
     /**
-    * @brief Set input start position for 2D-like convolution
-    * @param diStartPos Starting position in depth dimension
-    * @param mStartPos Starting position in M dimension (height*width)
-    */
+     * @brief Set input start position for 2D-like convolution
+     * @param diStartPos Starting position in depth dimension
+     * @param mStartPos Starting position in M dimension (height*width)
+     */
     __aicore__ inline void SetInputStartPosition(int64_t diStartPos, int64_t mStartPos)
     {
         using local = typename Ext::SetInputStartPosition;
@@ -129,13 +132,13 @@ public:
     }
 
     /**
-    * @brief Iterate through all convolution operations
-    * @tparam This template parameter is not enabled, reserved parameter
-    * @param output Output tensor
-    * @param enPartialSum Enable partial sum accumulation
-    */
+     * @brief Iterate through all convolution operations
+     * @tparam This template parameter is not enabled, reserved parameter
+     * @param output Output tensor
+     * @param enPartialSum Enable partial sum accumulation
+     */
     template <bool sync = true>
-    __aicore__ inline void IterateAll(const AscendC::GlobalTensor<OutputT> &output, bool enPartialSum = false)
+    __aicore__ inline void IterateAll(const AscendC::GlobalTensor<OutputT>& output, bool enPartialSum = false)
     {
         using local = typename Ext::IterateAll;
         if constexpr (CONV_CHECK_FUN_TEMPLATE(local, ConvApiFunc, sync, this, output, enPartialSum)) {
@@ -144,8 +147,8 @@ public:
     }
 
     /**
-    * @brief End the convolution operation and clean up resources
-    */
+     * @brief End the convolution operation and clean up resources
+     */
     __aicore__ inline void End()
     {
         using local = typename Ext::End;
@@ -166,7 +169,7 @@ private:
     }
 
     template <bool sync = true>
-    __aicore__ inline void GetTensorC(const AscendC::GlobalTensor<OutputT> &output, bool enSequentialWrite = false)
+    __aicore__ inline void GetTensorC(const AscendC::GlobalTensor<OutputT>& output, bool enSequentialWrite = false)
     {
         using local = typename Ext::GetTensorC;
         if constexpr (CONV_CHECK_FUN_TEMPLATE(local, ConvApiFunc, sync, this, output, enSequentialWrite)) {
@@ -226,7 +229,7 @@ private:
     }
 };
 
-}  // namespace Conv3dApi
+} // namespace Conv3dApi
 
 #endif // ADV_API_CONV_CONV3D_CONV3D_INTF_H
 

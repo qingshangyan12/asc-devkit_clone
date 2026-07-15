@@ -12,6 +12,11 @@
  * \file kernel_struct_fixpipe.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "kernel_struct_fixpipe.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_FIXPIPE_H__
@@ -20,8 +25,8 @@
 #ifndef ASCENDC_MODULE_STRUCT_FIXPIPE_H
 #define ASCENDC_MODULE_STRUCT_FIXPIPE_H
 
-#include "kernel_macros.h"
-#include "utils/kernel_utils_struct_dma_params.h"
+#include "../../impl/basic_api/kernel_macros.h"
+#include "../../impl/basic_api/utils/kernel_utils_struct_dma_params.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -204,8 +209,8 @@ struct FixpipeParamsArch3510 {
 template <CO2Layout format = CO2Layout::ROW_MAJOR>
 struct FixpipeParamsC310 : FixpipeParamsArch3510<format> {
     __aicore__ FixpipeParamsC310() : FixpipeParamsArch3510<format>() {}
-    
-    __aicore__ FixpipeParamsC310(const uint16_t nSizeIn, const uint16_t mSizeIn, 
+
+    __aicore__ FixpipeParamsC310(const uint16_t nSizeIn, const uint16_t mSizeIn,
                                 const uint16_t srcStrideIn, const uint32_t dstStrideIn)
         : FixpipeParamsArch3510<format>(nSizeIn, mSizeIn, srcStrideIn, dstStrideIn) {}
 };

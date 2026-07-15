@@ -12,6 +12,11 @@
  * \file kernel_operator_mm_intf.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "kernel_operator_mm_intf.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_INTF_H__
@@ -19,13 +24,13 @@
 #ifndef ASCENDC_MODULE_OPERATOR_MM_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_MM_INTERFACE_H
 
-#include "kernel_macros.h"
-#include "common_types.h"
-#include "kernel_operator_mm_base_impl.h"
+#include "../../impl/basic_api/kernel_macros.h"
+#include "../../impl/basic_api/common_types.h"
+#include "../../impl/basic_api/kernel_operator_mm_base_impl.h"
 #include "kernel_struct_mm.h"
 #include "kernel_tensor.h"
-#include "utils/kernel_utils_constants.h"
-#include "utils/kernel_utils_macros.h"
+#include "../../impl/basic_api/utils/kernel_utils_constants.h"
+#include "../../impl/basic_api/utils/kernel_utils_macros.h"
 
 #include "kernel_operator_mm_bitmode_intf.h"
 
@@ -99,10 +104,7 @@ __aicore__ inline void LoadData(
 template <typename T, typename U>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<U>& src, const LoadData2DParamsV2& loadDataParams,
-    const Nd2NzParamsV2& nd2nzParams)
-{
-    LoadDataImpl(dst, src, loadDataParams, nd2nzParams);
-}
+    const Nd2NzParamsV2& nd2nzParams);
 #endif
 
 /* **************************************************************************************************

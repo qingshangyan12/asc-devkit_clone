@@ -14,17 +14,17 @@
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-        "impl/basic_api/kernel_operator_vec_transpose_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_vec_transpose_intf.h\"\" and use public functions or variables defined in interface headers files.")
+    "impl/basic_api/kernel_operator_vec_transpose_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_vec_transpose_intf.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_TRANSPOSE_INTF_IMPL_H__
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_TRANSPOSE_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_TRANSPOSE_INTERFACE_IMPL_H
-#include "kernel_tensor.h"
-#include "kernel_tpipe.h"
+#include "../../include/basic_api/kernel_tensor.h"
+#include "../../include/basic_api/kernel_tpipe.h"
 #include "kernel_check.h"
 #include "kernel_npu_debug.h"
-#include "kernel_struct_transpose.h"
+#include "../../include/basic_api/kernel_struct_transpose.h"
 #include "mstx_local_tensor_info.h"
 
 #if __NPU_ARCH__ == 1001
@@ -174,9 +174,9 @@ __aicore__ inline void TransDataTo5HD(
 #if ASCENDC_CPU_DEBUG
     for (int8_t i = 0; i < NCHW_CONV_ADDR_LIST_SIZE; i++) {
         uint64_t dstAddr =
-            (uint8_t*)dstList[i] - (uint8_t*)(GetBaseAddrCpu(int8_t(AscendC::TPosition(TPosition::VECIN))));
+            (uint8_t*)dstList[i] - (uint8_t*)(GetTPipePtr()->GetBaseAddr(int8_t(AscendC::TPosition(TPosition::VECIN))));
         uint64_t srcAddr =
-            (uint8_t*)srcList[i] - (uint8_t*)(GetBaseAddrCpu(int8_t(AscendC::TPosition(TPosition::VECIN))));
+            (uint8_t*)srcList[i] - (uint8_t*)(GetTPipePtr()->GetBaseAddr(int8_t(AscendC::TPosition(TPosition::VECIN))));
         ASCENDC_DEBUG_ASSERT(
             (dstAddr % ONE_BLK_SIZE == 0),
             KERNEL_LOG_INTERNAL(
@@ -293,7 +293,7 @@ __aicore__ inline __in_pipe__(S) __out_pipe__(V) void TransDataTo5HD(
         src.SetValue(i, srcAddrConfig);
     }
 
-    event_t eventIdSToV = static_cast<event_t>(FetchEventID<HardEvent::S_V>());
+    event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
     SetFlag<HardEvent::S_V>(eventIdSToV);
     WaitFlag<HardEvent::S_V>(eventIdSToV);
     TransDataTo5HDVldVaRegImpl<T>(

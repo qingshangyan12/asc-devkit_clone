@@ -54,8 +54,8 @@ $$
 |------|------|----------|------|------|
 | A | `[M, K]` | `fp4x2_e1m2_t` | ND | 左矩阵，每个字节打包 2 个 fp4 元素 |
 | ScaleA | `[M, scaleK]` | `fp8_e8m0_t` | ND | A 矩阵的缩放因子，A矩阵在K 方向每 32 个元素共享一个 scale |
-| B | `[N, K]` | `fp4x2_e1m2_t` | ND | 右矩阵，按 `[N, K]` 形式输入 kernel |
-| ScaleB | `[N, scaleK]` | `fp8_e8m0_t` | ND | B 矩阵的缩放因子，B矩阵在K 方向每 32 个元素共享一个 scale |
+| B | `[N, K]` | `fp4x2_e1m2_t` | DN | 右矩阵，按 `[N, K]` 形式输入 kernel |
+| ScaleB | `[N, scaleK]` | `fp8_e8m0_t` | DN | B 矩阵的缩放因子，B矩阵在K 方向每 32 个元素共享一个 scale |
 | C | `[M, N]` | `bfloat16_t` | ND | 输出矩阵 |
 
 其中：
@@ -110,8 +110,8 @@ $$
   |  B:CopyGM2L1 / ScaleB:CopyGM2L1   MTE2
   v
   L1
-  |  A:CopyL10L0A / ScaleA:CopyL10L0ScaleA        MTE1
-  |  B:CopyL10L0B / ScaleB:CopyL10L0ScaleB        MTE1
+  |  A:CopyL12L0A / ScaleA:CopyL12L0ScaleA        MTE1
+  |  B:CopyL12L0B / ScaleB:CopyL12L0ScaleB        MTE1
   v
   L0A / L0B / L0ScaleA / L0ScaleB
   |
@@ -140,7 +140,7 @@ Total blocks = 4 * 8 = 32
 对应的核索引计算如下：
 
 ```cpp
-constexpr uint32_t mIter = AscendC::DivCeil(M, singleCoreM);
+constexpr uint32_t mIter = DivCeil(M, singleCoreM);
 uint32_t mIterIdx = AscendC::GetBlockIdx() % mIter;
 uint32_t nIterIdx = AscendC::GetBlockIdx() / mIter;
 ```
@@ -153,7 +153,7 @@ MxMatmul 的输入不是两路，而是四路：A、B、ScaleA、ScaleB。因此
 |------|----------|-----------|---------|
 | A | `Copy` | `[singleCoreM, singleCoreK]` | `[baseM, stepK * baseK]` |
 | B | `Copy` | `[singleCoreN, singleCoreK]` | `[baseN, stepK * baseK]` |
-| ScaleA | `Copy` | `[singleCoreM, singleCoreSK]` | `[baseM, scaleFactorK * stepK * baseK]` |
+| ScaleA | `Copy` | `[singleCoreM, singleCoreSK]` | `[baseM, scaleFactorK * stepK * baseSK]` |
 | ScaleB | `Copy` | `[singleCoreN, singleCoreSK]` | `[baseN, scaleFactorK * stepK * baseK]` |
 
 通过 `stepK=2` 一次搬入 `stepK * baseM * baseK` 的 A 矩阵数据 和 `stepK * baseN * baseK` 的 B 矩阵数据，减少搬运指令数量，提高 GM 到 L1 的搬运效率。
@@ -166,7 +166,7 @@ scale 的搬运粒度由 `scaleFactorK=4` 控制，一次搬入 `scaleFactorK * 
 AscendC::Te::Copy(gm2L1Atom, l1TensorAPing, a.Slice(AscendC::Te::MakeCoord(mBlockIdx * baseM, dataNextKChunkIdx * baseK), AscendC::Te::MakeShape(curM, stepCurK)));
 ```
 
-以 ScaleA 矩阵数据搬运为例。`Copy` 一次搬入 `scaleFactorK * stepK` 个 K 方向 base 块，每个base块为 `baseM * baseK`：
+以 ScaleA 矩阵数据搬运为例。`Copy` 一次搬入 `scaleFactorK * stepK` 个 K 方向 base 块，每个base块为 `baseM * baseSK`（其中 `baseSK = align_even(ceil(baseK / 32))`）：
 
 ```cpp
 AscendC::Te::Copy(gm2L1Atom, l1TensorAsPing, as.Slice(AscendC::Te::MakeCoord(mBlockIdx * baseM, scaleNextKChunkIdx * baseScaleK), AscendC::Te::MakeShape(curM, stepCurScaleK)));
@@ -217,7 +217,7 @@ Cube                                               | Mmad Ping ---|   | Mmad Pon
 L0C->GM                                                           | Copy L0C to GM ---
 ```
 
-图中横线长度只用于表达不同阶段耗时可能不同，并不代表实测比例；真实耗时需要以 `msprof` 采集结果为准。
+图中横线长度只用于表达不同阶段耗时可能不同，并不代表实测比例；真实耗时需要以 `msopprof` 采集结果为准。
 
 在 K 循环中，当前 K block 进入 Cube 计算时，下一批 A/B/ScaleA/ScaleB 可以提前发起搬运。Ping 和 Pong 交替使用，生产者和消费者通过事件同步确认缓冲区是否可写、数据是否可读。
 
@@ -227,7 +227,7 @@ L0C->GM                                                           | Copy L0C to 
 
 ```text
 for nBlock in N blocks:
-  for nBlock in M blocks:
+  for mBlock in M blocks:
     for kBlock in K blocks:
         Copy(A block, ScaleA block)
         Copy(B block, ScaleB block)
@@ -360,7 +360,7 @@ Ascend 950PR 芯片性能数据如下：
 |------|------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
 | Tensor API MxMatmul | 682.316 | 32 | 681.54 | 640.591 | 0.94 | 63.466 | 0.093 | 315.894 | 0.464 | 589.308 | 0.865 | 31.646 | 0.046 |
 
-可以看到，本样例已达到理论性能峰值的 `94.0%`（即表中的`aic_mac_ratio`）。
+可以看到，本样例的 Cube 计算时间占比（即表中的`aic_mac_ratio`）达到 `94.0%`。
 
 ### Cube计算性能分析
 
@@ -370,9 +370,9 @@ Cube 理论运算时间 $T_{cube}$ 为：
 
 $$T_{cube} = \frac{M \times N \times K}{16 \times 64 \times 16 \times 1.65 \times 10^9 \times \text{核数}} = \frac{8192 \times 8192 \times 8192}{16384 \times 1.65 \times 10^9 \times 32} = 635.5 μs$$
 
-从表中可以看出 `aic_mac_time` 为 `640.16 μs`，相对理论值 `635.5 μs`，误差 $E_{cube}$ 为：
+从表中可以看出 `aic_mac_time` 为 `640.591 μs`，相对理论值 `635.5 μs`，误差 $E_{cube}$ 为：
 
-$$E_{cube} = \frac{T_{actual} - T_{cube}}{T_{cube}} = \frac{640.16 - 635.5}{635.5} = 0.73 \%$$
+$$E_{cube} = \frac{T_{actual} - T_{cube}}{T_{cube}} = \frac{640.591 - 635.5}{635.5} = 0.80 \%$$
 
 ### MTE2 带宽分析
 
@@ -386,7 +386,7 @@ $$E_{cube} = \frac{T_{actual} - T_{cube}}{T_{cube}} = \frac{640.16 - 635.5}{635.
 MxFP4 Matmul 还包含两路 ScaleA/ScaleB 输入，K 方向每 32 个元素共享一个 scale，因此 `scaleK = K/32`：
 
 - ScaleA 形状 `[M, scaleK]`，按 M 方向切成 `M/baseM` 个行块，每个 ScaleA 行块参与 N 方向 `N/baseN` 个输出块的计算
-- ScaleB 形状 `[scaleK, N]`，按 N 方向切成 `N/baseN` 个列块，每个 ScaleB 列块参与 M 方向 `M/baseM` 个输出块的计算
+- ScaleB 形状 `[N, scaleK]`，按 N 方向切成 `N/baseN` 个列块，每个 ScaleB 列块参与 M 方向 `M/baseM` 个输出块的计算
 
 由于 L1/L2Cache 容量有限，无法缓存所有输入数据，同一数据块会被多次从 HBM 搬运到 L2Cache/L1，导致数据重复搬运。
 
@@ -424,7 +424,7 @@ $$T_{MTE2} = \frac{D_{HBM}}{1.6TB/s} + \frac{D_{L2Cache}}{5TB/s} = \frac{68MB}{1
 
 MTE2 耗时误差 $E_{MTE2}$ 为：
 
-$$E_{MTE2} = \frac{T_{actual} - T_{MTE2}}{T_{MTE2}} = \frac{588.736μs - 453.9μs}{453.9μs} = 29.7\%$$
+$$E_{MTE2} = \frac{T_{actual} - T_{MTE2}}{T_{MTE2}} = \frac{589.308μs - 453.9μs}{453.9μs} = 29.8\%$$
 
 Ascend 950PR中 L2Cache 大小为 128MB，无法缓存所有输入数据，部分数据在搬运时会发生 L2Cache miss，需要从 HBM 获取。用户可进一步优化 L2Cache 切分策略以提高 MTE2 带宽。
 
@@ -440,7 +440,7 @@ python3 -m pip install ml_dtypes==0.2.0 en_dtypes==0.0.4
 
 ### 配置环境变量
 
-请根据当前环境上 CANN 开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量，**当前仅支持使用[CANN master](../../../../../docs/quick_start.md#下载-cann-master)**。
+请根据当前环境上 CANN 开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量，**当前仅支持使用[CANN master](../../../../../docs/zh/quick_start.md#下载-cann-master)**。
 
 ```bash
 source ${install_path}/cann/set_env.sh
@@ -484,27 +484,36 @@ test pass!
 
 ### NPU模式性能分析
 
-使用 `msprof` 工具获取NPU模式运行时详细的性能数据：
+### msOpProf工具介绍
+msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
 
-```bash
-msprof ./demo
-```
+- 上板性能采集
 
-当前目录下会生成 PROF_ 前缀的文件夹，`mindstudio_profiler_output` 目录保存性能数据汇总，性能数据分析推荐查看该目录下文件：
+    通过上板性能采集，可以直接测定算子昇腾AI处理器上的运行时间。该方式适合在板环境中快速定位算子性能问题。
 
-```bash
-PROF_xxxx_XXXXXX
-├── device_{id}
-├── host
-├── mindstudio_profiler_log
-└── mindstudio_profiler_output
-    ├── msprof_*.json
-    ├── xx_*.csv
-    └── README.txt
-```
+    基于可执行文件demo通过msopprof执行算子调优：
+    ```
+    msopprof ./demo
+    ```
+
+    - 性能数据说明  
+      命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
+
+      ```bash
+      ├──dump                       # 原始的性能数据，用户无需关注
+      ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
+      ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
+      ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
+      ├──OpBasicInfo.csv            # 算子基础信息
+      ├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
+      ├──ResourceConflictRatio.csv  # UB上的bank group、bank conflict和资源冲突率在所有指令中的占比
+      └──visualize_data.bin         # MindStudio Insight呈现文件
+      ```
 
 查看具体的性能分析结果：
 
 ```bash
-cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```

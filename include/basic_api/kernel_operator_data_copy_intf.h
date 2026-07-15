@@ -12,6 +12,11 @@
  * \file kernel_operator_data_copy_intf.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "kernel_operator_data_copy_intf.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_INTF_H__
@@ -19,11 +24,11 @@
 #ifndef ASCENDC_MODULE_OPERATOR_DATA_COPY_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_DATA_COPY_INTERFACE_H
 
-#include "kernel_macros.h"
-#include "common_types.h"
+#include "../../impl/basic_api/kernel_macros.h"
+#include "../../impl/basic_api/common_types.h"
 #include "kernel_struct_data_copy.h"
-#include "utils/kernel_utils_macros.h"
-#include "utils/kernel_utils_struct_confusion_pad.h"
+#include "../../impl/basic_api/utils/kernel_utils_macros.h"
+#include "../../impl/basic_api/utils/kernel_utils_struct_confusion_pad.h"
 #include "kernel_tensor.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1

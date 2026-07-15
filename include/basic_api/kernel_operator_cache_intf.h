@@ -12,6 +12,11 @@
  * \file kernel_operator_cache_intf.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "kernel_operator_cache_intf.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_CACHE_INTF_H__
@@ -21,8 +26,8 @@
 #ifndef ASCENDC_MODULE_OPERATOR_CACHE_INTF_H
 #define ASCENDC_MODULE_OPERATOR_CACHE_INTF_H
 
-#include "kernel_macros.h"
-#include "kernel_reg.h"
+#include "../../impl/basic_api/kernel_macros.h"
+#include "../../impl/basic_api/kernel_reg.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>

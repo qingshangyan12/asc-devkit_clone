@@ -12,6 +12,11 @@
  * \file algorithm.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "algorithm.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #ifndef AICORE_UTILS_STD_ALGORITHM_H
 #define AICORE_UTILS_STD_ALGORITHM_H
 
@@ -21,8 +26,8 @@
 
 namespace AscendC {
 namespace Std {
-template <typename T, typename U> ASCENDC_HOST_AICORE inline constexpr auto min(const T& src0, const U& src1);
-template <typename T, typename U> ASCENDC_HOST_AICORE inline constexpr auto max(const T& src0, const U& src1);
+template <typename T, typename U> __host__ __aicore__ inline constexpr auto min(const T& src0, const U& src1);
+template <typename T, typename U> __host__ __aicore__ inline constexpr auto max(const T& src0, const U& src1);
 }
 }
 

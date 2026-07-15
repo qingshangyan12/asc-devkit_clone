@@ -12,6 +12,11 @@
  * \file kernel_struct_proposal.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "kernel_struct_proposal.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_PROPOSAL_H__
@@ -20,7 +25,7 @@
 #ifndef ASCENDC_MODULE_STRUCT_PROPOSAL_H
 #define ASCENDC_MODULE_STRUCT_PROPOSAL_H
 
-#include "utils/kernel_utils_constants.h"
+#include "../../impl/basic_api/utils/kernel_utils_constants.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>

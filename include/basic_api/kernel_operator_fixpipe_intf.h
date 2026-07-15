@@ -12,6 +12,11 @@
  * \file kernel_operator_fixpipe_intf.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "kernel_operator_fixpipe_intf.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_FIXPIPE_INTF_H__
@@ -19,10 +24,10 @@
 #ifndef ASCENDC_MODULE_OPERATOR_FIXPIPE_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_FIXPIPE_INTERFACE_H
 
-#include "kernel_macros.h"
+#include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_struct_fixpipe.h"
 #include "kernel_tensor.h"
-#include "utils/kernel_utils_macros.h"
+#include "../../impl/basic_api/utils/kernel_utils_macros.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>

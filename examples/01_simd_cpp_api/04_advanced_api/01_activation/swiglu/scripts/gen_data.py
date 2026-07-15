@@ -31,9 +31,10 @@ def gen_golden_data_simple():
     golden = np.zeros([32]).astype(dtype)
     golden = src0 * src1 / (1 + np.exp(-1 * src1))
     golden = golden.astype(dtype)
-    
+
     os.makedirs("output", exist_ok=True)
     golden.tofile("./output/golden.bin")
+
 
 if __name__ == "__main__":
     gen_golden_data_simple()

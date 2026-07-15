@@ -12,6 +12,11 @@
  * \file kernel_tpipe.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "kernel_tpipe.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_H__
@@ -20,15 +25,15 @@
 #ifndef ASCENDC_KERNEL_QUEUE_H
 #define ASCENDC_KERNEL_QUEUE_H
 
-#include "kernel_macros.h"
-#include "common_types.h"
+#include "../../impl/basic_api/kernel_macros.h"
+#include "../../impl/basic_api/common_types.h"
 #include "kernel_common.h"
-#include "kernel_event.h"
+#include "../../impl/basic_api/kernel_event.h"
 #include "kernel_tensor.h"
-#include "kernel_tensor_base.h"
-#include "kernel_tpipe_base.h"
-#include "utils/kernel_utils_ceil_oom_que.h"
-#include "utils/kernel_utils_constants.h"
+#include "../../impl/basic_api/kernel_tensor_base.h"
+#include "../../impl/basic_api/kernel_tpipe_base.h"
+#include "../../impl/basic_api/utils/kernel_utils_ceil_oom_que.h"
+#include "../../impl/basic_api/utils/kernel_utils_constants.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -401,8 +406,13 @@ private:                                                                        
 
 class TPipe : public TPipeBase {
 public:
+#if defined(__NPU_ARCH__)
     __aicore__ inline TPipe();
     __aicore__ inline ~TPipe();
+#else
+    __aicore__ inline TPipe(){}
+    __aicore__ inline ~TPipe(){}
+#endif
     __aicore__ inline void Init();
     template <class T> __aicore__ inline bool InitBuffer(T& que, uint8_t num, uint32_t len);
     template <class T, class U, class V, class... Addrs>

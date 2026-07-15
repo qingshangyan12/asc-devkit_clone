@@ -72,7 +72,7 @@
 在本样例根目录下执行如下步骤，编译并执行算子。
 
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -82,9 +82,9 @@
 - 配置日志环境变量（仅NPU模式）
   本样例支持通过环境变量控制日志输出行为（以下环境变量仅在NPU模式下生效）：
   ```bash
-  export ASCEND_PROCESS_LOG_PATH=./log        // 日志落盘路径
-  export ASCEND_SLOG_PRINT_TO_STDOUT=1        // 控制日志是否打印到屏幕（1：开启，0：关闭）
-  export ASCEND_GLOBAL_LOG_LEVEL=1            // 控制日志级别
+  export ASCEND_PROCESS_LOG_PATH=./log        # 日志落盘路径
+  export ASCEND_SLOG_PRINT_TO_STDOUT=1        # 控制日志是否打印到屏幕（1：开启，0：关闭）
+  export ASCEND_GLOBAL_LOG_LEVEL=1            # 控制日志级别
   ```
 
   > 注意：

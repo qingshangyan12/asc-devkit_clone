@@ -118,7 +118,7 @@
   </table>
 - 约束说明：
   * indices：indices的前batch_dims维必须与input的前batch_dims维相同，即indices.shape[0:batch_dims] = input.shape[0:batch_dims]
-  * axis：收集维度axis不能小于batch_dims，且不能超过input的维度数，即batch_dims <= axis < input.rank
+  * axis：收集维度axis不能小于batch_dims，且必须小于input的维度数，即batch_dims <= axis < input.rank
   * batch_dims：批量维度数不能超过input和indices中较小的维度数，即0 <= batch_dims <= min(input.rank, indices.rank)
   * output.shape：input.shape[:axis] + indices.shape[batch_dims:] + input.shape[axis+1:]
   * 样例实现中，axis和batch_dims也支持传入负值，并会在计算前转换为对应的非负维度索引
@@ -140,7 +140,7 @@
 在本样例根目录下执行如下步骤，编译并执行算子。
 
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

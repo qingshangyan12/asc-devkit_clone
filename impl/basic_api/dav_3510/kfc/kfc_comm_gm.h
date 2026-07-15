@@ -1,40 +1,41 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
- 
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
 /*!
  * \file kfc_comm_gm.h
  * \brief
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message("impl/basic_api/dav_3510/kfc/kfc_comm_gm.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message( \
+    "impl/basic_api/dav_3510/kfc/kfc_comm_gm.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tpipe.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_GM_H__
 #endif
 #ifndef KFC_COMM_GM_H
 #define KFC_COMM_GM_H
- 
-#include "kernel_common.h"
-#include "dav_3510/kernel_operator_common_impl.h"
-#include "dav_3510/kernel_operator_set_atomic_impl.h"
-#include "dav_3510/kernel_tpipe_impl_c310.h"
+
+#include "../../../../include/basic_api/kernel_common.h"
+#include "../kernel_operator_common_impl.h"
+#include "../kernel_operator_set_atomic_impl.h"
+#include "../kernel_tpipe_impl_c310.h"
 #include "kfc_log.h"
-#include "kernel_tpipe.h"
+#include "../../../../include/basic_api/kernel_tpipe.h"
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_H__
 #endif
-#include "kernel_operator_block_sync_intf.h"
- 
+#include "../../../../include/basic_api/kernel_operator_block_sync_intf.h"
+
 namespace AscendC {
 #define MSG_POS __gm__
- 
+
 __aicore__ inline void Barrier()
 {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -43,15 +44,15 @@ __aicore__ inline void Barrier()
     __asm__ __volatile__("");
 #endif
 }
- 
+
 enum class KFC_Enum : uint16_t {
     SERVICE_ID_MASK = 0xFF00,
     SERVICE_ID_SCM = 0x0100,
     SCMFUN_GM2L1,
     SCMFUN_GM2L1ND2NZ,
     SERVICE_ID_MATMUL = 0x0300,
-    MMFUN_MASK = 0x0380,     // Indicates that Iterate needs to be invoked.
-    MMFUN_ITERATE = 0x0380,  // Iterate and IterateAll occupy 2 bits to save the cost of judgment.
+    MMFUN_MASK = 0x0380,    // Indicates that Iterate needs to be invoked.
+    MMFUN_ITERATE = 0x0380, // Iterate and IterateAll occupy 2 bits to save the cost of judgment.
     MMFUN_ITERATE_ALL = 0x0381,
     MMFUN_INIT = 0x0301,
     MMFUN_GET_TENSOR_C,
@@ -75,12 +76,12 @@ enum class KFC_Enum : uint16_t {
     SERVICE_BALANCE = 0xfe00,
     SERVICE_ID_NONE = 0xff00
 };
- 
+
 enum class MSG_STATE : uint8_t {
     STATE_INVALID,
     STATE_SET,
 };
- 
+
 // The message length is 128 bytes and must be 512 bytes aligned.
 // Therefore, MAX_MSG_COUNT must be an integer multiple of 8.
 #ifdef __MIX_CORE_AIC_RATION__
@@ -115,9 +116,9 @@ struct SuperKernelWaitEventCnt {
 #endif
 
 struct TilingInfo {
-    GM_ADDR tilingAddr;  // the GM address of the tiling.
+    GM_ADDR tilingAddr; // the GM address of the tiling.
 };
- 
+
 struct MatmulOrgShape {
     uint32_t orgM;
     uint32_t orgN;
@@ -125,7 +126,7 @@ struct MatmulOrgShape {
     uint32_t orgKb;
     uint32_t orgKc;
 };
- 
+
 #ifdef __MSTX_DFX_REPORT__
 struct MstxCrossRecord {
     uint64_t addr;
@@ -135,7 +136,7 @@ struct MstxCrossRecord {
     bool isMerge;
 };
 #endif
- 
+
 struct MatmulConfigParams {
     // offset->8
     uint32_t enAtomic : 8;
@@ -158,13 +159,13 @@ struct MatmulConfigParams {
     uint32_t waitIterateAll : 1;
     uint32_t waitIterateBatch : 1;
     uint32_t iterateFakeMsg : 1;
- 
+
     uint32_t singleM;
     uint32_t singleN;
     uint32_t singleK;
     uint32_t sizeAmatrix;
     uint32_t sizeBmatrix;
- 
+
     uint64_t aAddr;
     uint64_t bAddr;
     uint64_t cAddr;
@@ -172,7 +173,7 @@ struct MatmulConfigParams {
     uint64_t quantAddr; // 64 bytes
     uint32_t quantSize;
     uint32_t quantMode;
-    uint64_t quantScalar;        // 80 bytes
+    uint64_t quantScalar; // 80 bytes
     uint32_t batchA;
     uint32_t batchB;
     uint32_t matrixStrideA;
@@ -183,7 +184,7 @@ struct MatmulConfigParams {
     uint32_t reserved0;
     uint64_t dataPtr; // 120 bytes
 };
- 
+
 struct Conv3DBpInputConfigParams {
     uint32_t enAtomic : 8;
     uint32_t enSequentialWrite : 1;
@@ -195,23 +196,23 @@ struct Conv3DBpInputConfigParams {
     uint32_t setSingleShape : 1;
     uint32_t setStartIdx : 1;
     uint32_t enPartialSum : 1;
- 
+
     uint32_t singleShapeN;
     uint32_t singleShapeD;
     uint32_t curDinStartIdx;
- 
+
     uint32_t singleShapeM;
     uint32_t singleShapeK;
- 
+
     uint64_t weightAddr;
     uint64_t outBackpropAddr;
     uint64_t outputAddr;
- 
+
     int32_t curHoStartIdx;
     uint32_t res;
     uint32_t res1[16];
 };
- 
+
 struct Conv3DBpFilterConfigParams {
     uint32_t enAtomic : 8;
     uint32_t enSequentialWrite : 1;
@@ -222,41 +223,41 @@ struct Conv3DBpFilterConfigParams {
     uint32_t isFirstIter : 1;
     uint32_t waitIterateAll : 1;
     uint32_t enPartialSum : 1;
- 
+
     uint32_t singleShapeM;
     uint32_t singleShapeN;
     uint32_t singleShapeK;
- 
+
     uint64_t fmapAddr;
     uint64_t outBackpropAddr;
     uint64_t outputAddr;
- 
+
     uint32_t curHoStartIdx;
     uint32_t fmapSize;
     uint32_t outBackpropSize;
     uint32_t res;
- 
+
     uint32_t res1[16];
 };
- 
+
 struct Conv3DForwardConfigParams {
-    uint32_t enAtomic: 8; // for enable atomic add
-    uint32_t enSequentialWrite: 1;
-    uint32_t enSetTensorFmap: 1; // for enable SetTensorFmap intf
-    uint32_t enSetTensorWeight: 1; // for enable SetTensorWeight intf
-    uint32_t enSetTensorBias: 1; // for enable SetTensorBias intf
-    uint32_t sync: 1; // for control sync aic/aiv
-    uint32_t enSetSingleOutputShape: 1; // for enable SetSingleOutputShape intf
-    uint32_t enSetFmapStartPosition: 1; // for enable SetFmapStartPosition intf
-    uint32_t waitIterateAll: 1;
-    uint32_t enPartialSum: 1; // for part of results of L0C write to gm
+    uint32_t enAtomic : 8; // for enable atomic add
+    uint32_t enSequentialWrite : 1;
+    uint32_t enSetTensorFmap : 1;        // for enable SetTensorFmap intf
+    uint32_t enSetTensorWeight : 1;      // for enable SetTensorWeight intf
+    uint32_t enSetTensorBias : 1;        // for enable SetTensorBias intf
+    uint32_t sync : 1;                   // for control sync aic/aiv
+    uint32_t enSetSingleOutputShape : 1; // for enable SetSingleOutputShape intf
+    uint32_t enSetFmapStartPosition : 1; // for enable SetFmapStartPosition intf
+    uint32_t waitIterateAll : 1;
+    uint32_t enPartialSum : 1; // for part of results of L0C write to gm
     uint32_t fmapSize;
- 
+
     uint64_t fmapAddr;
     uint64_t weightAddr;
     uint64_t biasAddr;
     uint64_t outputAddr;
- 
+
     uint32_t weightSize;
     uint32_t biasSize;
     uint32_t singleCoreBatch;
@@ -269,41 +270,32 @@ struct Conv3DForwardConfigParams {
     uint32_t ciStartPos;
     uint32_t res[10]; // Reserved，for 120Byte ailgn
 };
- 
+
 struct MatmulUserDefInfo {
     uint64_t tilingPtr;
 };
- 
+
 constexpr uint16_t KFC_MSG_BYTE_OFFSET = 16;
 // AIC->AIV, set the event count.
-__aicore__ inline uint16_t KfcMsgGetEvtCnt(uint32_t flag)
-{
-    return flag & 0x00007fff;
-}
+__aicore__ inline uint16_t KfcMsgGetEvtCnt(uint32_t flag) { return flag & 0x00007fff; }
 // AIV->AIC, set the instance ID
-__aicore__ inline uint16_t KfcMsgGetInstID(uint32_t flag)
-{
-    return flag & 0x000000ff;
-}
+__aicore__ inline uint16_t KfcMsgGetInstID(uint32_t flag) { return flag & 0x000000ff; }
 __aicore__ inline KFC_Enum KfcMsgGetFunID(uint32_t flag)
 {
     return static_cast<KFC_Enum>((flag & 0xffff0000) >> KFC_MSG_BYTE_OFFSET);
 }
-__aicore__ inline uint32_t KfcMsgGetState(uint32_t flag)
-{
-    return (flag & 0x00008000);
-}
+__aicore__ inline uint32_t KfcMsgGetState(uint32_t flag) { return (flag & 0x00008000); }
 __aicore__ inline uint32_t KfcMsgMakeFlag(KFC_Enum funID, uint16_t instID)
 {
     return (((static_cast<uint16_t>(funID) << KFC_MSG_BYTE_OFFSET) + 0x8000) + (instID));
 }
- 
+
 // Currently, the maximum message size is 64 bytes, which is the same as the size of a CacheLine.
 struct KfcMsg {
     uint32_t head = 0;
     int32_t ubAddr = -1;
     union {
-        uint8_t buffer[120];  // Used for customizing and formatting messages
+        uint8_t buffer[120]; // Used for customizing and formatting messages
         TilingInfo tilingInfo;
         MatmulConfigParams body;
         MatmulOrgShape orgShape;
@@ -323,26 +315,26 @@ struct MsgMatmulCnt {
     uint32_t res;
     uint8_t buffer[56];
 };
- 
+
 struct QuitCnt {
     int32_t head;
     uint32_t res;
     uint8_t buffer[56];
 };
- 
+
 struct MmTaskCnt {
     uint32_t head;
     uint32_t res;
     uint8_t buffer[56];
 };
- 
+
 struct MsgGroupSync {
     int32_t syncCount; // current sync aiv number
     uint8_t res[28];
     uint32_t allNumber; // aiv number in one group
     uint8_t buffer[28];
 };
- 
+
 struct MsgGroupSyncAux {
     // for reliable and dfx
     int32_t curNumber; // number of aiv has been in group
@@ -350,12 +342,9 @@ struct MsgGroupSyncAux {
     uint32_t idField; // curBlockID << 16 + groupID
     uint8_t buffer[28];
 };
- 
-__aicore__ inline constexpr int AlignTo32(int size)
-{
-    return (size + ALIGN_SIZE - 1) / ALIGN_SIZE * ALIGN_SIZE;
-}
- 
+
+__aicore__ inline constexpr int AlignTo32(int size) { return (size + ALIGN_SIZE - 1) / ALIGN_SIZE * ALIGN_SIZE; }
+
 struct SysWorkspaceDesc {
     KfcMsg kfcMsg[MAX_AIV_NUM * BIDIRECTION_NUM * MAX_MSG_COUNT * MIX_COEFFICIENT];
     MsgMatmulCnt cntMsg[MAX_AIV_NUM * MIX_COEFFICIENT][MAX_MATMUL_OBJ];
@@ -366,15 +355,19 @@ struct SysWorkspaceDesc {
     MsgGroupSync groupSyncMsg[MAX_GROUP_ID];
     MsgGroupSyncAux groupSyncAuxMsg[MAX_GROUP_ID];
 };
- 
+
 __aicore__ inline void ClearWorkspaceImpl(__gm__ uint8_t* workspace)
 {
+    if (GetBlockIdxImpl() >= MAX_AIV_NUM) {
+        // the kfc does nothing with the block idx out of mix_aic_num.
+        return;
+    }
     // v0 清除  vec0: 0~size;v1 清除 vec1:size1 ~ size2; v2 清除 vec3:size2 ~ size3
     constexpr uint32_t size = BIDIRECTION_NUM * MAX_MSG_COUNT * AlignTo32(sizeof(KfcMsg));
     constexpr uint32_t sizeUbmsg = AlignTo32(sizeof(MsgUBAvailable));
-    constexpr uint32_t offsetUbMsg = MAX_AIV_NUM * BIDIRECTION_NUM * MAX_MSG_COUNT *
-        MIX_COEFFICIENT * AlignTo32(sizeof(KfcMsg)) + MAX_AIV_NUM * MIX_COEFFICIENT *
-        MAX_MATMUL_OBJ * AlignTo32(sizeof(MsgMatmulCnt));
+    constexpr uint32_t offsetUbMsg =
+        MAX_AIV_NUM * BIDIRECTION_NUM * MAX_MSG_COUNT * MIX_COEFFICIENT * AlignTo32(sizeof(KfcMsg)) +
+        MAX_AIV_NUM * MIX_COEFFICIENT * MAX_MATMUL_OBJ * AlignTo32(sizeof(MsgMatmulCnt));
     constexpr uint32_t block = size / 2048;
     uint32_t ubOffset11 = 0;
     uint32_t msgOffset11 = 0;
@@ -387,26 +380,26 @@ __aicore__ inline void ClearWorkspaceImpl(__gm__ uint8_t* workspace)
         (__gm__ uint8_t*)(workspace + offsetUbMsg + (sizeUbmsg + ubOffset11) * GetBlockIdxImpl());
 
 #if ASCENDC_CPU_DEBUG
-    auto ubMsg = reinterpret_cast<__ubuf__ uint64_t *>(GetBaseAddrCpu((int8_t)TPosition::VECIN) +
-                TOTAL_UB_SIZE - sizeof(KfcMsg));
+    auto ubMsg = reinterpret_cast<__ubuf__ uint64_t*>(
+        GetTPipePtr()->GetBaseAddr((int8_t)TPosition::VECIN) + TOTAL_UB_SIZE - sizeof(KfcMsg));
 #else
-    auto ubMsg = reinterpret_cast<__ubuf__ uint64_t *>(0);
+    auto ubMsg = reinterpret_cast<__ubuf__ uint64_t*>(0);
 #endif
     for (int i = 0; i < 16; i++) {
         *(ubMsg + i) = 0;
     };
-    
+
     // 硬件时间类型需修改为 S_MTE3
     SetFlag<HardEvent::S_MTE3>(EVENT_ID0);
     WaitFlag<HardEvent::S_MTE3>(EVENT_ID0);
- 
+
     for (size_t i = 0; i < block; i++) {
         // 第四参数：blockCount: 16 ; 第五参数： burstLength: 128; 第七参数: dstStride: 128
-        copy_ubuf_to_gm_align_v2((__gm__ void *)msgStartAddr, (__ubuf__ void *)ubMsg, 0, 16, 128, 0, 128, 0);
+        copy_ubuf_to_gm_align_v2((__gm__ void*)msgStartAddr, (__ubuf__ void*)ubMsg, 0, 16, 128, 0, 128, 0);
         msgStartAddr += 2048;
     }
-    
-    copy_ubuf_to_gm_align_v2((__gm__ void *)ubMsgStartAddr, (__ubuf__ void *)ubMsg, 0, 1, sizeUbmsg, 0, 0, 0);
+
+    copy_ubuf_to_gm_align_v2((__gm__ void*)ubMsgStartAddr, (__ubuf__ void*)ubMsg, 0, 1, sizeUbmsg, 0, 0, 0);
     PipeBarrier<PIPE_ALL>();
 }
 __aicore__ inline GM_ADDR GetMsgHead(GM_ADDR workspace, int i)
@@ -417,18 +410,18 @@ __aicore__ inline GM_ADDR GetMsgHead(GM_ADDR workspace, int i)
     //  MSG1 AIV0<--AIC0   GetBlockIdx()=0,  GetSubBlockIdx()=0,
     //  MSG2 AIV1-->AIC0   GetBlockIdx()=0,  GetSubBlockIdx()=1,
     //  MSG3 AIV1<--AIC0   GetBlockIdx()=0,  GetSubBlockIdx()=1,
- 
-    ASCENDC_ASSERT((i >= 0 && i < MIX_NUM),
-                   { KERNEL_LOG(KERNEL_ERROR, "input i is %d, which should be in range [0, %d)", i, MIX_NUM); });
-    ASCENDC_ASSERT((workspace != nullptr),
-                   { KERNEL_LOG(KERNEL_ERROR, "workspace can not be nullptr"); });
- 
-    auto ptr = reinterpret_cast<__gm__ struct SysWorkspaceDesc *>(workspace);
+
+    ASCENDC_ASSERT((i >= 0 && i < MIX_NUM), {
+        KERNEL_LOG(KERNEL_ERROR, "input i is %d, which should be in range [0, %d)", i, MIX_NUM);
+    });
+    ASCENDC_ASSERT((workspace != nullptr), { KERNEL_LOG(KERNEL_ERROR, "workspace can not be nullptr"); });
+
+    auto ptr = reinterpret_cast<__gm__ struct SysWorkspaceDesc*>(workspace);
     // Initialize based on the input i value on AIC.
     auto flatBlockID = get_block_idx() * MAX_BLOCK_AIV_NUM + i;
     return reinterpret_cast<GM_ADDR>(&ptr->kfcMsg[flatBlockID * BIDIRECTION_NUM * MAX_MSG_COUNT]);
 }
- 
+
 __aicore__ inline GM_ADDR GetUBMapAddr(GM_ADDR workspace, int i = 0)
 {
     // Retrieve the corresponding UB mapped address
@@ -437,51 +430,49 @@ __aicore__ inline GM_ADDR GetUBMapAddr(GM_ADDR workspace, int i = 0)
     //  AIV0   0~256K
     //  AIV1   256K ~ 512K
     //  ...
-    ASCENDC_ASSERT((workspace != nullptr),
-                   { KERNEL_LOG(KERNEL_ERROR, "workspace can not be nullptr"); });
- 
+    ASCENDC_ASSERT((workspace != nullptr), { KERNEL_LOG(KERNEL_ERROR, "workspace can not be nullptr"); });
+
     auto flatBlockID = get_block_idx() * MAX_BLOCK_AIV_NUM + i;
-    auto ptr = reinterpret_cast<__gm__ struct SysWorkspaceDesc *>(workspace);
+    auto ptr = reinterpret_cast<__gm__ struct SysWorkspaceDesc*>(workspace);
     return reinterpret_cast<GM_ADDR>(ptr->ubMap[flatBlockID]);
 }
- 
+
 __aicore__ inline GM_ADDR GetMatmulIncAddr(GM_ADDR workspace, uint32_t flatBlockID, uint32_t instID)
 {
     // Maximum MAX_MATMUL_OBJ Matmul objects can be created
-    ASCENDC_ASSERT((instID < MAX_MATMUL_OBJ),
-                   { KERNEL_LOG(KERNEL_ERROR, "instID i is %d, max matmul num is %d", instID, MAX_MATMUL_OBJ); });
-    ASCENDC_ASSERT((workspace != nullptr),
-                   { KERNEL_LOG(KERNEL_ERROR, "workspace can not be nullptr"); });
-    auto ptr = reinterpret_cast<__gm__ struct SysWorkspaceDesc *>(workspace);
+    ASCENDC_ASSERT((instID < MAX_MATMUL_OBJ), {
+        KERNEL_LOG(KERNEL_ERROR, "instID i is %d, max matmul num is %d", instID, MAX_MATMUL_OBJ);
+    });
+    ASCENDC_ASSERT((workspace != nullptr), { KERNEL_LOG(KERNEL_ERROR, "workspace can not be nullptr"); });
+    auto ptr = reinterpret_cast<__gm__ struct SysWorkspaceDesc*>(workspace);
     return reinterpret_cast<GM_ADDR>(&(ptr->cntMsg[flatBlockID][instID]));
 }
- 
+
 __aicore__ inline GM_ADDR GetUBAvailableAddr(GM_ADDR workspace, uint32_t i = 0)
 {
     ASSERT(workspace != nullptr);
     auto flatBlockID = get_block_idx() * MAX_BLOCK_AIV_NUM + i;
-    auto ptr = reinterpret_cast<__gm__ struct SysWorkspaceDesc *>(workspace);
+    auto ptr = reinterpret_cast<__gm__ struct SysWorkspaceDesc*>(workspace);
     return reinterpret_cast<GM_ADDR>(&(ptr->ubMsg[flatBlockID]));
 }
- 
-__aicore__ inline __gm__ KfcMsg *AllocMessageImpl(
-    __gm__ KfcMsg *&msgSendHead, uint8_t &msgSendPos, __gm__ KfcMsg *&msgSendStart)
+
+__aicore__ inline __gm__ KfcMsg* AllocMessageImpl(
+    __gm__ KfcMsg*& msgSendHead, uint8_t& msgSendPos, __gm__ KfcMsg*& msgSendStart)
 {
     auto msg = msgSendHead;
-    ASCENDC_ASSERT((msgSendHead != nullptr),
-                   { KERNEL_LOG(KERNEL_ERROR, "msgSendHead can not be nullptr"); });
-    ASCENDC_ASSERT((msgSendStart != nullptr),
-                   { KERNEL_LOG(KERNEL_ERROR, "msgSendStart can not be nullptr"); });
+    ASCENDC_ASSERT((msgSendHead != nullptr), { KERNEL_LOG(KERNEL_ERROR, "msgSendHead can not be nullptr"); });
+    ASCENDC_ASSERT((msgSendStart != nullptr), { KERNEL_LOG(KERNEL_ERROR, "msgSendStart can not be nullptr"); });
     if constexpr (KFC_APPLY_MSG) {
-        dcci(reinterpret_cast<__gm__ int64_t *>(msg), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+        dcci(reinterpret_cast<__gm__ int64_t*>(msg), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
         while (static_cast<bool>(KfcMsgGetState(msg->head))) {
             Barrier();
-            dcci(reinterpret_cast<__gm__ int64_t *>(msg), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+            dcci(reinterpret_cast<__gm__ int64_t*>(msg), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
             Barrier();
         }
     }
-    ASCENDC_ASSERT((!KfcMsgGetState(msg->head)),
-                   { KERNEL_LOG(KERNEL_ERROR, "message state is %u, which should be 0", KfcMsgGetState(msg->head)); });
+    ASCENDC_ASSERT((!KfcMsgGetState(msg->head)), {
+        KERNEL_LOG(KERNEL_ERROR, "message state is %u, which should be 0", KfcMsgGetState(msg->head));
+    });
     msgSendPos++;
     if (msgSendPos >= MAX_MSG_COUNT) {
         msgSendPos = 0;
@@ -491,26 +482,24 @@ __aicore__ inline __gm__ KfcMsg *AllocMessageImpl(
     }
     return msg;
 }
- 
-__aicore__ inline __gm__ KfcMsg *RcvMessageImpl(
-    __gm__ KfcMsg *&msgRcvHead, uint8_t &msgRcvPos, __gm__ KfcMsg *&msgRcvStart)
+
+__aicore__ inline __gm__ KfcMsg* RcvMessageImpl(
+    __gm__ KfcMsg*& msgRcvHead, uint8_t& msgRcvPos, __gm__ KfcMsg*& msgRcvStart)
 {
     // The size of a single cacheline is 64 bytes.
     // only a single cacheline needs to be updated because runtime can ensure message alignment
-    ASCENDC_ASSERT((msgRcvHead != nullptr),
-                   { KERNEL_LOG(KERNEL_ERROR, "msgRcvHead can not be nullptr"); });
-    ASCENDC_ASSERT((msgRcvStart != nullptr),
-                   { KERNEL_LOG(KERNEL_ERROR, "msgRcvStart can not be nullptr"); });
+    ASCENDC_ASSERT((msgRcvHead != nullptr), { KERNEL_LOG(KERNEL_ERROR, "msgRcvHead can not be nullptr"); });
+    ASCENDC_ASSERT((msgRcvStart != nullptr), { KERNEL_LOG(KERNEL_ERROR, "msgRcvStart can not be nullptr"); });
     ASCENDC_ASSERT((msgRcvPos >= 0 && msgRcvPos <= MAX_MSG_COUNT), {
         KERNEL_LOG(KERNEL_ERROR, "msgRcvPos is %d, which should be in range of [0, %d]", msgRcvPos, MAX_MSG_COUNT);
     });
     __gm__ KfcMsg* msg = msgRcvHead;
     Barrier();
-    dcci(reinterpret_cast<__gm__ int64_t *>(msg), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+    dcci(reinterpret_cast<__gm__ int64_t*>(msg), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
     Barrier();
- 
+
     dc_preload((__gm__ uint64_t*)msg, int64_t(0));
- 
+
 #ifdef __MSTX_DFX_REPORT__
     MstxCrossRecord record = {
         .addr = reinterpret_cast<uint64_t>(msg),
@@ -520,7 +509,7 @@ __aicore__ inline __gm__ KfcMsg *RcvMessageImpl(
     };
     __mstx_dfx_report_stub(1, sizeof(MstxCrossRecord), &record);
 #endif
- 
+
     if (!(static_cast<bool>(KfcMsgGetState(msg->head)))) {
         return nullptr;
     }
@@ -533,31 +522,30 @@ __aicore__ inline __gm__ KfcMsg *RcvMessageImpl(
     }
     return msg;
 }
- 
-__aicore__ inline void FreeMessageImpl(__gm__ KfcMsg *msg)
+
+__aicore__ inline void FreeMessageImpl(__gm__ KfcMsg* msg)
 {
-    ASCENDC_ASSERT((msg != nullptr),
-                   { KERNEL_LOG(KERNEL_ERROR, "msg can not be nullptr"); });
+    ASCENDC_ASSERT((msg != nullptr), { KERNEL_LOG(KERNEL_ERROR, "msg can not be nullptr"); });
     __asm__ __volatile__("" ::: "memory");
-    *(reinterpret_cast<__gm__ uint64_t *>(msg)) = 0;
+    *(reinterpret_cast<__gm__ uint64_t*>(msg)) = 0;
     Barrier();
-    dcci(reinterpret_cast<__gm__ int64_t *>(msg), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
+    dcci(reinterpret_cast<__gm__ int64_t*>(msg), cache_line_t::SINGLE_CACHE_LINE, dcci_dst_t::CACHELINE_OUT);
     Barrier();
 }
- 
-__aicore__ inline void RollBackMsgImpl(__gm__ KfcMsg *&msgRcvHead, uint8_t &msgRcvPos)
+
+__aicore__ inline void RollBackMsgImpl(__gm__ KfcMsg*& msgRcvHead, uint8_t& msgRcvPos)
 {
     if (msgRcvPos == 0) {
         msgRcvPos = MAX_MSG_COUNT;
-        msgRcvHead = msgRcvHead + MAX_MSG_COUNT -1;
+        msgRcvHead = msgRcvHead + MAX_MSG_COUNT - 1;
     } else {
         msgRcvPos--;
         msgRcvHead--;
     }
 }
- 
-}  // namespace AscendC
-#endif  // __KFC_COMM_GM_H__
+
+} // namespace AscendC
+#endif // __KFC_COMM_GM_H__
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_GM_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KFC_COMM_GM_H__

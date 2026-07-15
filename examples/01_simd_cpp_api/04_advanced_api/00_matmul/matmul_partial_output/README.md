@@ -12,7 +12,7 @@ Matmul高阶API实现开启Partial Output功能的样例。Partial Output功能�
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -26,7 +26,7 @@ Matmul高阶API实现开启Partial Output功能的样例。Partial Output功能�
   mkdir -p build && cd build;    # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py    # 生成测试输入数据
-  ./demo                        #; 执行编译生成的可执行程序，执行样例
+  ./demo                        # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin    # 验证输出结果是否正确，确认算法逻辑正确
   ```
 

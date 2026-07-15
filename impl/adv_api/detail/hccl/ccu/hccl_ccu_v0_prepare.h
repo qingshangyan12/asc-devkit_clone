@@ -34,8 +34,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     AssembleHcclMsgExtForCCU(ccuParam_, commParam, allToAllVParam);
 
     uint64_t loopCount = 8;
-    auto dataSlice = ((allToAllVParam->sendCounts[ccuParam_.rankId]) * DATA_TYPE_MAP[commParam->dataType]) %
-        CCU_MAX_COMM_DATA;
+    auto dataSlice =
+        ((allToAllVParam->sendCounts[ccuParam_.rankId]) * DATA_TYPE_MAP[commParam->dataType]) % CCU_MAX_COMM_DATA;
     CalcGoSize(dataSlice, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[5]);
     xnData_[9] = reinterpret_cast<uint64_t>(ccuParam_.ccuMsgExt) + CCU_MSG_EXT_RANK_OFFSET * ccuParam_.alltoallvCnt++;
     return;
@@ -77,17 +77,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[8] = commParam->wParamExt.remoteWinOffset;           // 8 is index of xnData
     uint64_t sliceSize = commParam->count;
 
-    uint64_t loopSize = loopCount * CCU_MEMSLICE_SIZE;
-    uint64_t m = sliceSize / loopSize;
-    uint64_t n = (sliceSize - m * loopSize) / CCU_MEMSLICE_SIZE;
-    uint64_t p = sliceSize - m * loopSize - n * CCU_MEMSLICE_SIZE;
-
-    auto dataSize = DATA_TYPE_MAP[static_cast<uint64_t>(commParam->dataType)];
-
     xnData_[3] = commParam->wParamExt.sendOffsets; // 3 is index of xnData
-    xnData_[4] = loopSize * m;                     // 4 is index of xnData
-    xnData_[5] = m;                                // 5 is index of xnData
-    CalcLoopGroupParam(xnData_, m, n, p);
+    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[4]);
 }
 
 template <const auto& config>

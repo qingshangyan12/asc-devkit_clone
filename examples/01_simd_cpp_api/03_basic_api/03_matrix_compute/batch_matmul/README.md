@@ -108,26 +108,26 @@ nd2nzA1Params.dstNzMatrixStride = aSizeAlignL0;
 
 ### L1 -> L0A / L0B搬运和矩阵乘Mmad循环执行B次
 
-for循环B次，每次从L1 -> L0A / L0B搬运每个batch的A、B矩阵，Mmad指令每次计算一对A、B矩阵乘的结果。
+for循环B次，每次从L1 -> L0A / L0B搬运每个batch的A、B矩阵，Mmad指令每次计算一对A、B矩阵乘的结果，存储到L0C的相应位置上，待循环结束后将L0C上的完整结果搬出到GM。
 
 ```cpp
 for (int32_t batchIndex = 0; batchIndex < B; batchIndex++) {
-        SplitA(a1Local[batchIndex * aSizeAlignL0]);
-        SplitBTranspose(b1Local[batchIndex * bSizeAlignL0]);
-        AscendC::SetFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
-        AscendC::WaitFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
+    SplitA(a1Local[batchIndex * aSizeAlignL0], a2Local);
+    SplitBTranspose(b1Local[batchIndex * bSizeAlignL0], b2Local);
+    AscendC::SetFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
 
-        Compute(batchIndex, c1Local);
-        AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);
-        AscendC::WaitFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);
+    AscendC::MmadParams params;
+    params.m = m;
+    params.n = n;
+    params.k = k;
+    AscendC::Mmad(
+        co1Local[batchIndex * CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape[0])], a2Local, b2Local,
+        params);
+
+    AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);
 }
-```
-
-for循环计算得到每个batch的矩阵计算结果，存储到L0C的相应位置上，待循环结束后将L0C上的完整结果搬出到GM。
-
-```cpp
-AscendC::Mmad(c1Local[batchIndex * CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape[0])],
-              a2Local, b2Local, mmadParams);
 ```
 
 ### 矩阵批量搬出
@@ -163,7 +163,7 @@ fixpipeParams.srcNdStride = (CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape
 在本样例根目录下执行如下步骤，编译并执行算子。
 
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

@@ -139,7 +139,7 @@ Total blocks = 4 * 8 = 32
 对应的核索引计算如下：
 
 ```cpp
-constexpr uint32_t mIter = AscendC::DivCeil(M, singleCoreM);
+constexpr uint32_t mIter = DivCeil(M, singleCoreM);
 uint32_t mIterIdx = AscendC::GetBlockIdx() % mIter;
 uint32_t nIterIdx = AscendC::GetBlockIdx() / mIter;
 
@@ -166,7 +166,7 @@ scale 的搬运粒度由 `scaleFactorKa=4`、`scaleFactorKb=4` 控制，一次�
 以 A 侧为例，`DataCopyInA` 使用 `Nd2NzParams` 一次搬入 `stepKa` 个 K 方向 base 块，每个base块为`baseM * baseK`：
 
 ```cpp
-constexpr uint32_t packedStepK = AscendC::DivCeil(baseK * stepKa, 2);
+constexpr uint32_t packedStepK = DivCeil(baseK * stepKa, 2);
 AscendC::Nd2NzParams nd2nzA1Params;
 nd2nzA1Params.ndNum = 1;
 nd2nzA1Params.nValue = curM;
@@ -180,7 +180,7 @@ AscendC::DataCopy(a1Local, aGM[kChunkIdx * baseK + mBlockIdx * K * baseM], nd2nz
 scale 侧按 b16 搬运。由于 `Mmad` 读取数据时的最小分形需要 K 方向连续，对应地 scale 数据在 K 方向必须满足 2Byte 连续，因此使用 b16类型搬运以确保数据布局正确：
 
 ```cpp
-constexpr uint32_t stepScaleK = AscendC::DivCeil(baseK * stepKa * scaleFactorKa, SCALE_CEIL_NUMBER);
+constexpr uint32_t stepScaleK = DivCeil(baseK * stepKa * scaleFactorKa, SCALE_CEIL_NUMBER);
 AscendC::Dn2NzParams dn2nzParams;
 dn2nzParams.dValue = curM;
 dn2nzParams.nValue = stepScaleK / 2;
@@ -256,7 +256,7 @@ Cube                                               | Mmad Ping ---|   | Mmad Pon
 Fixpipe                                                           | fixpipe C ---
 ```
 
-图中横线长度只用于表达不同阶段耗时可能不同，并不代表实测比例；真实耗时需要以 `msprof` 采集结果为准。
+图中横线长度只用于表达不同阶段耗时可能不同，并不代表实测比例；真实耗时需要以 `msopprof` 采集结果为准。
 
 在 K 循环中，当前 K block 进入 Cube 计算时，下一批 A/B/scaleA/scaleB 可以提前发起搬运。Ping 和 Pong 交替使用，生产者和消费者通过事件同步确认缓冲区是否可写、数据是否可读。
 
@@ -266,7 +266,7 @@ Fixpipe                                                           | fixpipe C --
 
 ```text
 for nBlock in N blocks:
-  for nBlock in M blocks:
+  for mBlock in M blocks:
     for kBlock in K blocks:
         LoadData(A block, scaleA block)
         LoadData(B block, scaleB block)
@@ -409,7 +409,7 @@ Ascend 950PR 芯片性能数据如下：
 |------|------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
 | 基础 API MxMatmul | 681.056 | 32 | 679.99 | 640.16 | 0.941 | 62.824 | 0.092 | 312.728 | 0.46 | 588.736 | 0.866 | 32.422 | 0.048 |
 
-可以看到，本样例已达到理论性能峰值的 `94.1%`（即表中的`aic_mac_ratio`）。
+可以看到，本样例的 Cube 计算时间占 AI Core 时间的比例（即表中的`aic_mac_ratio`）达到 `94.1%`。
 
 ### Cube计算性能分析
 
@@ -435,7 +435,7 @@ $$E_{cube} = \frac{T_{actual} - T_{cube}}{T_{cube}} = \frac{640.16 - 635.5}{635.
 MxFP4 Matmul 还包含两路 scale 输入，K 方向每 32 个元素共享一个 scale，因此 `scaleK = K/32`：
 
 - scaleA 形状 `[M, scaleK]`，按 M 方向切成 `M/baseM` 个行块，每个 scaleA 行块参与 N 方向 `N/baseN` 个输出块的计算
-- scaleB 形状 `[scaleK, N]`，按 N 方向切成 `N/baseN` 个列块，每个 scaleB 列块参与 M 方向 `M/baseM` 个输出块的计算
+- scaleB 形状 `[N, scaleK]`，按 N 方向切成 `N/baseN` 个列块，每个 scaleB 列块参与 M 方向 `M/baseM` 个输出块的计算
 
 由于 L1/L2Cache 容量有限，无法缓存所有输入数据，同一数据块会被多次从 HBM 搬运到 L2Cache/L1，导致数据重复搬运。
 
@@ -489,7 +489,7 @@ python3 -m pip install ml_dtypes==0.2.0 en_dtypes==0.0.4
 
 ### 配置环境变量
 
-请根据当前环境上 CANN 开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+请根据当前环境上 CANN 开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
 
 
 ```bash
@@ -534,27 +534,36 @@ test pass!
 
 ### 性能分析
 
-使用 `msprof` 工具获取详细性能数据：
+### msOpProf工具介绍
+msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
 
-```bash
-msprof ./demo
-```
+- 上板性能采集
 
-当前目录下会生成 PROF_ 前缀的文件夹，`mindstudio_profiler_output` 目录保存性能数据汇总，性能数据分析推荐查看该目录下文件：
+    通过上板性能采集，可以直接测定算子昇腾AI处理器上的运行时间。该方式适合在板环境中快速定位算子性能问题。
 
-```bash
-PROF_xxxx_XXXXXX
-├── device_{id}
-├── host
-├── mindstudio_profiler_log
-└── mindstudio_profiler_output
-    ├── msprof_*.json
-    ├── xx_*.csv
-    └── README.txt
-```
+    基于可执行文件demo通过msopprof执行算子调优：
+    ```
+    msopprof ./demo
+    ```
+
+    - 性能数据说明  
+      命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
+
+      ```bash
+      ├──dump                       # 原始的性能数据，用户无需关注
+      ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
+      ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
+      ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
+      ├──OpBasicInfo.csv            # 算子基础信息
+      ├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
+      ├──ResourceConflictRatio.csv  # UB上的bank group、bank conflict和资源冲突率在所有指令中的占比
+      └──visualize_data.bin         # MindStudio Insight呈现文件
+      ```
 
 查看具体的性能分析结果：
 
 ```bash
-cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```

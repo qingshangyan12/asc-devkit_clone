@@ -114,6 +114,8 @@ for (uint32_t i = 0; i < curLen; i++) {
 
 ---
 
+## 中级性能优化
+
 ### Case 1: 单核向量版本
 
 **实现方式**：参考 `KernelAdd::ProcessSingle()` 函数实现
@@ -350,6 +352,8 @@ UB内存分配（双缓冲）：
 - 可尝试L2 Cache优化来提升搬运效率
 ---
 
+## 高阶性能打磨
+
 ### Case 5: 双缓冲 + L2 Cache bypass
 
 **实现方式**：参考 `KernelAdd::ProcessDoubleBufferL2Bypass()` 函数实现（在该函数内部先设置 `SetL2CacheHint(CACHE_MODE_DISABLE)`，再调用 `ProcessDoubleBuffer()`）
@@ -417,7 +421,7 @@ yGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
 
 // 优化后的地址布局（避免Bank Conflict）
 static constexpr uint32_t xAddrPingBC = 0;
-static constexpr uint32_t yAddrPingBC = BANK_CONFLICT_DATA_COPY_LEN * sizeof(half);
+static constexpr uint32_t yAddrPingBC = BANK_CONFLICT_DATA_COPY_LEN * sizeof(half);  // 错开256B；注意：sizeof(half)=2B，float场景需调整为sizeof(float)
 static constexpr uint32_t xAddrPongBC = MAX_DATA_COPY_LEN * sizeof(half) * 2;
 static constexpr uint32_t yAddrPongBC = xAddrPongBC + BANK_CONFLICT_DATA_COPY_LEN * sizeof(half);
 static constexpr uint32_t zAddrPingBC = MAX_DATA_COPY_LEN * sizeof(half) * 4;
@@ -479,8 +483,8 @@ static constexpr uint32_t zAddrPongBC = zAddrPingBC + BANK_CONFLICT_DATA_COPY_LE
 > 3. Bank Conflict优化对vector-bound场景收益明显
 
 **最终性能总结**：
-- 相比基准Case 0：性能提升 **6711倍**（1239689.1μs → 184.52μs）
-- 相比单核向量Case 1：性能提升 **37.3倍**（6909.6μs → 184.52μs）
+- 相比基准Case 0：性能提升 **6718.5倍**（1239689.1μs → 184.52μs）
+- 相比单核向量Case 1：性能提升 **37.4倍**（6909.6μs → 184.52μs）
 
 
 ---
@@ -497,8 +501,8 @@ static constexpr uint32_t zAddrPongBC = zAddrPingBC + BANK_CONFLICT_DATA_COPY_LE
 | 2 | 多核均匀切分 | 48 | 4096 | 306.58 | 15.885 | 5.904 | 1.2457 | NA | 4043.6x |
 | 3 | 增大搬运粒度 | 48 | 16384 | 268.5 | 12.845 | 5.904 | 1.4560 | NA | 4617.1x |
 | 4 | 双缓冲 | 48 | 16384 | 264.02 | 12.846 | 5.904 | NA | 1.6072 | 4695.4x |
-| 5 | L2 Cache bypass | 48 | 16384 | 187.68 | 12.846 | 5.904 | NA | 2.2755 | 6612.2x |
-| 6 | Bank Conflict优化 | 48 | 16256 | 184.52 | 6.954 | 5.904 | NA | 2.3456 | 6710.7x |
+| 5 | L2 Cache bypass | 48 | 16384 | 187.68 | 12.846 | 5.904 | NA | 2.2755 | 6605.3x |
+| 6 | Bank Conflict优化 | 48 | 16256 | 184.52 | 6.954 | 5.904 | NA | 2.3456 | 6718.5x |
 
 表中的“理论vector耗时”表示在当前核数配置下，仅考虑Vector计算本身时的理论执行时间。本样例的性能数据在Atlas A2训练系列产品上运行，该处理器每cycle处理128个half数据，主频为1.85GHz。理论vector耗时的计算公式为
 $$
@@ -510,7 +514,7 @@ $$
 T_{\text{theory}} = \frac{8192 \times 8192}{128 \times 1.85 \times 10^9 \times 48} = \frac{67108864}{1.13664 \times 10^{13}} \approx 5.904 \times 10^{-6} \text{ s} = 5.904 \text{ μs}
 $$
 
-可以看到 Case 6 的 aiv_vec_time 为 6.954 μs，已经很接近 48 核场景下的理论耗时。
+可以看到 Case 6 的 aiv_vec_time 为 6.954 μs，已经很接近 Atlas A2训练系列48核场景下的理论耗时。
 
 Case 0-3 未开启双缓冲，数据搬运串行执行，使用读带宽衡量性能。从 Case 4 开始开启双缓冲，此时 mte2 利用率较高，读写行为并行发生，因此读写混合带宽按总读写数据量除以 $T_{mte2}$ 进行估算。其中，读带宽的计算公式为：
 $$
@@ -553,7 +557,7 @@ $$
 | 4 | 双缓冲 | 64 | 21760 | 247.665 | 10.976 | 4.965 | NA | 1.712 | 4960.2x |
 | 5 | L2 Cache bypass | 64 | 21760 | 182.04 | 10.997 | 4.965 | NA | 2.256 | 6748.4x |
 
-Ascend 950系列上 `dataCopyLen` 增大的主要原因是UB容量由192KB提升至256KB。本样例在双缓冲场景下需要同时放置 `x/y/z` 的 Ping-Pong 共6块缓冲区，因此单块可用空间可近似表示为 `UBSIZE/6`：
+Ascend 950系列上 `dataCopyLen` 增大的主要原因是UB容量增大。本样例在双缓冲场景下需要同时放置 `x/y/z` 的 Ping-Pong 共6块缓冲区，因此单块可用空间可近似表示为 `UBSIZE/6`：
 - Atlas A2/A3 系列：`192KB / 6 = 32KB`，对应 `32KB / 2B = 16384` 个`half`
 - Ascend 950系列：`256KB / 6 ≈ 42.67KB`，对应约 `21840` 个`half`
 
@@ -603,7 +607,7 @@ Ascend 950系列未达到理论vector耗时峰值的原因如下：
   - `6`: 双缓冲 + L2Cache bypass + 避免Bank Conflict
 
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -646,28 +650,69 @@ Ascend 950系列未达到理论vector耗时峰值的原因如下：
   test pass!
   ```
 
-## 性能分析
+## 功能调试
 
-使用 `msprof` 工具获取详细性能数据：
+### printf
 
-```bash
-msprof ./demo   # 分析性能
+该接口提供CPU域/NPU域调试场景下的格式化输出功能。
+
+在算子kernel侧实现代码中需要输出日志信息的地方调用[printf](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/调试接口/上板打印/printf.md)接口打印相关内容。
+
+示例如下：
+
+```cpp
+AscendC::printf("add blockIdx=%d\n", AscendC::GetBlockIdx());
 ```
 
-当前目录下会生成PROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件
+> **注意：** printf（PRINTF）接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置`ASCENDC_DUMP=0`的方式关闭打印功能。
 
-```bash
-PROF_xxxx_XXXXXX
-├── device_{id}
-└── host
-└── mindstudio_profiler_log
-└── mindstudio_profiler_output    # 保存Host和各个Device的性能数据汇总
-    ├── msprof_*.json
-    ├── xx_*.csv
-    └── README.txt
+### DumpTensor
+
+基于算子工程开发的算子，可以使用该接口Dump指定[LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md)的内容。同时支持打印自定义的附加信息（仅支持uint32\_t数据类型的信息），比如打印当前行号等。
+
+在算子kernel侧实现代码中需要打印Tensor数据的地方调用[DumpTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md)接口打印相关内容。样例如下：
+
+```cpp
+// 向量计算: z = x + y
+AscendC::Add(zLocal, xLocal, yLocal, blockLength);
+AscendC::DumpTensor(zLocal, 1, 32);
 ```
+
+> **注意：** DumpTensor接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置`ASCENDC_DUMP=0`来关闭打印功能。
+
+## 性能调试
+
+### msOpProf工具介绍
+msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
+
+- 上板性能采集
+
+    通过上板性能采集，可以直接测定算子昇腾AI处理器上的运行时间。该方式适合在板环境中快速定位算子性能问题。
+
+    基于可执行文件demo通过msopprof执行算子调优：
+    ```
+    msopprof ./demo
+    ```
+
+    - 性能数据说明  
+      命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
+
+      ```bash
+      ├──dump                       # 原始的性能数据，用户无需关注
+      ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
+      ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
+      ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
+      ├──OpBasicInfo.csv            # 算子基础信息
+      ├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
+      ├──ResourceConflictRatio.csv  # UB上的bank group、bank conflict和资源冲突率在所有指令中的占比
+      └──visualize_data.bin         # MindStudio Insight呈现文件
+      ```
+
 查看具体的性能分析结果：
-```
+
+```bash
 # 查看Task Duration 以及各项数据
-cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```

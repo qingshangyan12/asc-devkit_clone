@@ -41,7 +41,7 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
   </table>
 - 样例实现： 
   - Kernel关键步骤
-    - 创建Matmul对象，数据类型为按照SCENARIO_NUM设置为各种fp8数据类型。
+    - 创建Matmul对象，数据类型按照SCENARIO_NUM设置为hifloat8或各种fp8数据类型。
       ```cpp
       #if SCENARIO_NUM == 1
       MatmulFp8Kernel<fp8_e4m3fn_t, fp8_e4m3fn_t, float, float> MatmulFp8Kernel;
@@ -69,7 +69,7 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

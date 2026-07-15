@@ -46,7 +46,7 @@ def gen_golden_data_simple():
 
     for i in range(shape - count):
         golden[count + i] = 0
-    
+
     os.makedirs("input", exist_ok=True)
     src0.tofile("./input/input_src0.bin")
     src1.tofile("./input/input_src1.bin")
@@ -54,6 +54,7 @@ def gen_golden_data_simple():
     tiling.tofile("./input/input_tiling.bin")
     os.makedirs("output", exist_ok=True)
     golden.tofile("./output/golden.bin")
+
 
 if __name__ == "__main__":
     gen_golden_data_simple()

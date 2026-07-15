@@ -26,11 +26,11 @@ For users without NPU devices, you can use the NPU computing resources provided 
 
 1. Go to the open source repository Gitcode page and click the "`Cloud Development`" button. Log in with a verified Huawei Cloud account. If not registered or verified, follow the page prompts to register and verify.
 
-   <p align="center"><img src="../figures/cloudIDE.png" alt="Cloud Platform" width="750px" height="90px"></p>
+   <p align="center"><img src="../zh/figures/cloudIDE.png" alt="Cloud Platform" width="750px" height="90px"></p>
 
 2. Follow the page prompts to create and start the cloud development environment. Click "`Connect > WebIDE or Visual Studio Code`" to enter the cloud development environment. Open source project resources are in the `/mnt/workspace` directory by default.
 
-   <p align="center"><img src="../figures/webIDE.png" alt="Cloud Platform" width="1000px" height="150px"></p>
+   <p align="center"><img src="../zh/figures/webIDE.png" alt="Cloud Platform" width="1000px" height="150px"></p>
 
 > [!NOTE] Usage Instructions
 >
@@ -106,7 +106,7 @@ For users with NPU devices, you can use the CANN official Docker image for devel
 
 For users with NPU devices, we recommend using DevContainer for ecosystem developer contribution.
 
-DevContainer is based on VS Code Dev Containers. It automatically builds a consistent containerized development environment through `.devcontainer` configuration in the repository. It has built-in `conda`, `Python` and other development toolchains. It shares device access with the host's NPU driver, suitable for scenarios that require compiling source code, running UT, and contributing code to this repository. For detailed instructions, refer to [`.devcontainer/README.md`](../.devcontainer/README.md).
+DevContainer is based on VS Code Dev Containers. It automatically builds a consistent containerized development environment through `.devcontainer` configuration in the repository. It has built-in `conda`, `Python` and other development toolchains. It shares device access with the host's NPU driver, suitable for scenarios that require compiling source code, running UT, and contributing code to this repository. For detailed instructions, refer to [`.devcontainer/README_en.md`](../../.devcontainer/README_en.md).
 
 > [!NOTE] Usage Instructions
 > DevContainer only mounts the host's NPU driver (read-only). **CANN toolkit and ops packages need to be manually installed after container starts**. Refer to [Download and Install CANN Package](#📥-download-and-install-cann-package).

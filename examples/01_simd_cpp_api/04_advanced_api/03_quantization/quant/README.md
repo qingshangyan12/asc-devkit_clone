@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于[AscendQuant](../../../../../docs/api/SIMD-API/高阶API/量化操作/AscendQuant.md)高阶API实现量化计算，用于将高精度数据转换为低精度数据以减少存储和计算开销。样例展示了将float类型输入数据通过scale缩放和offset偏移，量化为int8_t类型输出的过程。在950上兼容AscendQuant接口的前提下，推荐优先使用[Quantize](../../../../../docs/api/SIMD-API/高阶API/量化操作/Quantize.md)接口，该接口可通过统一的结构体配置，适配各类量化场景。
+本样例基于[AscendQuant](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/高阶API/量化操作/AscendQuant.md)高阶API实现量化计算，用于将高精度数据转换为低精度数据以减少存储和计算开销。样例展示了将float类型输入数据通过scale缩放和offset偏移，量化为int8_t类型输出的过程。在950上兼容AscendQuant接口的前提下，推荐优先使用[Quantize](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/高阶API/量化操作/Quantize.md)接口，该接口可通过统一的结构体配置，适配各类量化场景。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -52,7 +52,7 @@
   本样例实现了固定shape输入inputGm[1，1024]，量化参数scale=2.0、offset=0.9。本样例为PER_TENSOR场景（按张量量化），将float数据类型量化为int8_t数据类型。
 
   - Kernel实现  
-    计算逻辑是：Ascend C提供的矢量。计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用AscendQuant（A2A3）或Quantize（950系列）高阶API接口完成量化计算，得到最终结果，再搬出到外部存储上。
+    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用AscendQuant（A2A3）或Quantize（950系列）高阶API接口完成量化计算，得到最终结果，再搬出到外部存储上。
 
   - Tiling实现  
     QuantCustom样例的tiling实现流程如下：首先获取AscendQuant或Quantize接口能完成计算所需最大/最小临时空间大小，使用最小临时空间，然后根据输入长度dataLength确定所需tiling参数。
@@ -64,7 +64,7 @@
 
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

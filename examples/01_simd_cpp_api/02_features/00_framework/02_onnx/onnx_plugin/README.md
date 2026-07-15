@@ -1,4 +1,4 @@
-# 自定义样例工程+onnx模型调用样例
+# 自定义算子工程+ONNX模型调用样例
 
 ## 概述
 
@@ -36,7 +36,7 @@
   在本样例根目录下执行如下步骤，编译并执行样例。
   - 编译、打包和部署自定义样例工程
 
-    运行此样例前，需先进入[自定义样例工程样例](../../../99_acl_based/00_acl_compilation/custom_op)目录完成编译、打包和部署。
+    运行此样例前，需先进入[自定义算子工程样例](../../../99_acl_based/00_acl_compilation/custom_op)目录完成编译、打包和部署。
 
 - 安装onnx
 
@@ -46,7 +46,7 @@
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

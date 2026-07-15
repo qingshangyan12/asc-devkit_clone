@@ -12,6 +12,11 @@
  * \file kernel_operator_group_barrier_intf.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "kernel_operator_group_barrier_intf.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_GROUP_BARRIER_INTF_H__
@@ -22,9 +27,9 @@
 #define ASCENDC_MODULE_OPERATOR_GROUP_BARRIER_INTERFACE_H
 #include "kernel_tensor.h"
 #if __NPU_ARCH__ == 2201
-#include "dav_c220/core_mng/roc/kernel_operator_cube_group_info.h"
+#include "../../../../impl/basic_api/dav_c220/core_mng/roc/kernel_operator_cube_group_info.h"
 #elif __NPU_ARCH__ == 3510
-#include "dav_3510/core_mng/roc/kernel_operator_cube_group_info.h"
+#include "../../../../impl/basic_api/dav_3510/core_mng/roc/kernel_operator_cube_group_info.h"
 #endif
 namespace AscendC {
 template <PipeMode pipeMode>

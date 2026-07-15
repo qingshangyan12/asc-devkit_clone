@@ -56,7 +56,7 @@
     - 创建`matmul_tiling::MultiCoreMatmulTiling`对象`tilingApi`，用于生成多核Matmul所需的tiling参数。
     - `SetDim(2)`表示tiling侧配置2个AIV逻辑核参与Matmul计算发起。
     - `SetAType`、`SetBType`、`SetCType`、`SetBiasType`分别设置A、B、C、Bias的数据来源位置、数据格式和数据类型；其中C类型设置为`VECIN`，便于后续执行LeakyRelu激活。
-    - `SetOrgShape(M, N, K)`设置原始完整矩阵形状，`SetShape(M, N, K)`设置本次实际参与Matmul计算的`M, N, K方向的大小（单位为元素）`。
+    - `SetOrgShape(M, N, K)`设置原始完整矩阵形状，`SetShape(M, N, K)`设置本次实际参与Matmul计算的`M`、`N`、`K`方向的大小（单位为元素）。
     - `EnableBias(true)`表示Matmul计算带Bias输入。
     - `SetFixSplit(128, 64, 128)`固定Matmul基础分块大小。
     - `SetBufferSpace(-1, -1, ubSize - usedUb)`设置Matmul可使用的L1/L0C/UB空间大小。L1和L0C传入`-1`表示使用当前AI处理器对应buffer的默认大小；`usedUb = baseM * baseN * sizeof(float)`用于扣除LeakyRelu需要使用的一块UB缓存。
@@ -116,13 +116,13 @@
       uint16_t dstGap;      // 目的操作数相邻连续数据块的间隔，单位为DataBlock（32字节）
   };
   ```
-  本样例搬出C矩阵分块时使用`{tiling.baseM, tiling.baseN * sizeof(float) / AscendC::DEFAULT_C0_SIZE, 0, (tiling.N - tiling.baseN) * sizeof(float) / AscendC::DEFAULT_C0_SIZE}`。其中，`blockCount`表示按`baseM`行搬运，`blockLen`表示每行搬运`baseN`个C矩阵元素对应的数据量；`dstGap`表示目的端相邻行之间跨过的元素间隔，用于将`baseM * baseN`分块写回到完整`M * N`矩阵的对应列范围。
+  本样例搬出C矩阵分块时使用`{tiling.baseM, tiling.baseN * sizeof(float) / AscendC::DEFAULT_C0_SIZE, 0, (tiling.N - tiling.baseN) * sizeof(float) / AscendC::DEFAULT_C0_SIZE}`。其中，`blockCount`表示按`baseM`行搬运，`blockLen`表示每行搬运`baseN`个C矩阵元素对应的数据量；`dstGap`表示目的端相邻行之间的间隔（单位为DataBlock），用于将`baseM * baseN`分块写回到完整`M * N`矩阵的对应列范围。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
