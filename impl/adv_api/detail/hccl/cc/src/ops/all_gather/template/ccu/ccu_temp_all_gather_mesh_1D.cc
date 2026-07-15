@@ -107,7 +107,8 @@ HcclResult CcuTempAllGatherMesh1D::KernelRun(
         return HcclResult::HCCL_SUCCESS;
     }
 
-    CcuKernelSubmitInfo submitInfo;
+    CcuKernelSubmitInfo submitInfo{};
+    submitInfo.kernelHandle = templateResource.ccuKernels[0];
     CHK_RET(FillCachedArgs(submitInfo, inputAddr, outputAddr, token, offset, sliceSize));
     templateResource.submitInfos.push_back(submitInfo);
 
