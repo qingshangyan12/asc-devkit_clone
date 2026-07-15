@@ -85,7 +85,7 @@
     | :----- | :------- | :------- |
     | dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
     | src | 输入 | 源操作数（矢量）的起始地址。 |
-    | index | 输入 | 数据索引（矢量数据寄存器），dst中每个元素在UB中相对于src的索引位置。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+    | index | 输入 | 数据索引（矢量数据寄存器），dst中每个元素在UB中相对于src的索引位置。单位是元素个数，每个元素的源地址为index * sizeof(data\_type) + src。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
     | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。<br>类型为[vector\_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
 
 - 收集矢量数据寄存器中的元素
@@ -94,7 +94,7 @@
     | :----- | :------- | :------- |
     | dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
     | src | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-    | index | 输入 | 数据索引（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+    | index | 输入 | 数据索引（矢量数据寄存器）。单位是元素个数，每个元素来源为src[index]。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
 
 ## 数据类型
 
@@ -122,7 +122,20 @@
 
 - 收集矢量数据寄存器中的元素
 
-目的操作数和源操作数的数据类型需要保持一致。支持的数据类型为：int8_t、uint8_t、fp8_e4m3fn_t、fp8_e5m2_t、fp8_e8m0_t、hifloat8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t。
+| 目的操作数 | 源操作数 | 数据索引 |
+|-----|-----|-----|
+| int8_t | int8_t | uint8_t |
+| uint8_t | uint8_t | uint8_t |
+| fp8_e4m3fn_t | fp8_e4m3fn_t | uint8_t |
+| fp8_e5m2_t | fp8_e5m2_t | uint8_t |
+| fp8_e8m0_t | fp8_e8m0_t | uint8_t |
+| hifloat8_t | hifloat8_t | uint8_t |
+| int16_t | int16_t | uint16_t |
+| uint16_t | uint16_t | uint16_t |
+| half | half | uint16_t |
+| bfloat16_t | bfloat16_t | uint16_t |
+| int32_t | int32_t | uint32_t |
+| uint32_t | uint32_t | uint32_t |
 
 ## 返回值说明
 
@@ -138,7 +151,7 @@ PIPE_V
 
     - 源操作数在UB中的起始地址需要32B对齐。
 
-    - 对于mask未筛选的元素，对应的地址不会触发任何地址溢出异常，同时dst中对应的元素将被置零。
+    - 对于mask筛选需要搬运的元素，对应的地址需要在UB有效范围内；对于mask未筛选的元素，对应的地址不会触发任何地址越界异常，同时dst中对应的元素将被置零。
 
     - 当src的数据类型为b8数据类型，dst为b16数据类型，这种情况下目的操作数的低8位与源操作数相同，高8位自动补0。例如src为int8_t数据类型：
 
@@ -154,7 +167,7 @@ PIPE_V
 
 - 收集矢量数据寄存器中的元素
 
-    src为矢量数据寄存器类型，位宽是固定的VL,存储的元素个数固定。如果index中索引值超出当前矢量数据寄存器中能存储的最大元素个数时，按照如下方式处理：设定当前矢量数据寄存器所能存储的最大数据元素个数为vl_length, index中索引值为i，索引值更新为i % vl_length。
+    src为矢量数据寄存器类型，位宽是固定的VL，存储的元素个数固定。如果index中索引值超出当前矢量数据寄存器中能存储的最大元素个数时，按照如下方式处理：设定当前矢量数据寄存器所能存储的最大数据元素个数为vl_length, index中索引值为i，索引值更新为i % vl_length。
 
 ## 调用示例
 

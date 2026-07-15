@@ -84,7 +84,7 @@
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
 | src | 输入 | 源操作数（矢量）的起始地址。 |
-| index | 输入 | dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| index | 输入 | dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐。单位是元素个数，每个元素的源地址为index * sizeof(data\_type) + src。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。<br>类型为[vector\_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
 
 ## 数据类型
