@@ -51,9 +51,9 @@ auto batchLayout = MakeFrameLayout<LayoutPattern, TraitType>(batch, m, n);
 
 ### LayoutTrait的指定方式
 
-LayoutTrait用于指定数据类型和C0维度基数。MakeFrameLayout支持以下四种传递方式：
+LayoutTrait用于指定C0维度基数。MakeFrameLayout支持以下四种传递方式：
 
-1. **LayoutTraitDefault<T>**：指定数据类型T，C0自动计算。
+1. **LayoutTraitDefault<T>**：根据数据类型T自动计算C0。T仅参与C0推导，不作为LayoutTrait中的数据类型信息保存。
    ```cpp
    MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n)
    ```
@@ -63,20 +63,21 @@ LayoutTrait用于指定数据类型和C0维度基数。MakeFrameLayout支持以�
    MakeFrameLayout<NZLayoutPtn, _16>(m, n)
    ```
 
-3. **不传入Trait**：在分形构造和Trait无关，或Trait值固定的场景下，不传入Trait，内部根据LayoutPattern查找对应的默认Trait。这样的分形有NDLayoutPtn、DNLayoutPtn、DNExtLayoutPtn、NDExtLayoutPtn、ScaleANDLayoutPtn、ScaleADNLayoutPtn、ScaleBNDLayoutPtn、ScaleBDNLayoutPtn。
+3. **不传入Trait**：在分形构造和Trait无关，或C0取固定值的场景下，不传入Trait，内部根据LayoutPattern查找对应的默认Trait。这样的分形有NDLayoutPtn、DNLayoutPtn、DNExtLayoutPtn、NDExtLayoutPtn、ScaleANDLayoutPtn、ScaleADNLayoutPtn、ScaleBNDLayoutPtn、ScaleBDNLayoutPtn。
    ```cpp
    MakeFrameLayout<NDLayoutPtn>(m, n)
    ```
 
-4. **自定义Trait传入**：传入一个自定义的Trait类型。适用于需要显式描述数据类型、C0大小或其他布局特征，且现有默认Trait、_C0或固定默认Trait都无法满足需求的场景。自定义Trait需要满足底层布局推导所要求的类型约定。
+4. **自定义Trait传入**：传入一个自定义的Trait类型。适用于需要显式描述C0大小，且`LayoutTraitDefault<T>`、`_C0`或LayoutPattern对应默认Trait都无法满足需求的场景。自定义Trait需要提供`C0_ELEMENT`成员。
    ```cpp
    struct MyLayoutTrait {
-       using type = float;
        static constexpr auto C0_ELEMENT = Std::Int<16>{};
    };
 
    MakeFrameLayout<NZLayoutPtn, MyLayoutTrait>(m, n)
    ```
+
+为兼容已有代码，也支持`LayoutTrait<T, C0>`写法，其中T仅用于保持源码兼容，实际LayoutTrait只使用C0作为布局特征。
 
 ## 参数说明
 
@@ -95,7 +96,7 @@ LayoutTrait用于指定数据类型和C0维度基数。MakeFrameLayout支持以�
 - LayoutPattern必须是已支持的排布模式之一，不支持的模式会触发编译期报错。
 - 构造参数的个数和含义由LayoutPattern决定。常见二维场景传入(m, n)即可。
 - Batch模式传入(batch, m, n)，其中m和n表示单个矩阵的行数和列数，batch表示连续排布的矩阵个数。
-- TraitType必须为整型常量、TraitType类型或具体数据类型，不支持的类型会触发编译期报错。
+- TraitType必须为整型常量、带`C0_ELEMENT`成员的Trait类型或具体数据类型，不支持的类型会触发编译期报错。传入具体数据类型时，该类型仅用于推导C0；Tensor的真实数据类型由`MakeTensor`绑定的内存指针类型决定。
 
 ## 调用示例
 
@@ -120,7 +121,6 @@ auto l1TensorC0 = MakeTensor(MakeMemPtr<Location::L1>(l1Addr), layoutC0);
 
 // 自定义Trait构造
 struct MyLayoutTrait {
-    using type = float;
     static constexpr auto C0_ELEMENT = Std::Int<16>{};
 };
 auto layoutCustom = MakeFrameLayout<NZLayoutPtn, MyLayoutTrait>(m, n);
