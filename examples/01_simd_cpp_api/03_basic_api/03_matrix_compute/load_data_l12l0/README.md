@@ -1,5 +1,6 @@
 # load_data_l12l0样例
 
+
 ## 概述
 
 本样例展示B4 / B8 / B16 / B32输入数据类型下，A / B矩阵从GM到L1、L1到L0、矩阵乘和结果搬出的完整流程。
@@ -1301,7 +1302,7 @@ fixpipeParams.dstNdStride = 0;
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

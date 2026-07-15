@@ -806,10 +806,9 @@ REGISTER_TILING_DEFAULT"
             CommonUtility.run_cmd_inner(
                 pre_compile_cmd, CompileStage.PRECOMPILE, compile_log_path
             )
-            with (
-                open(dis_i_file_cube, "r") as f_cube,
-                open(dis_i_file_vec, "r") as f_vec,
-            ):
+            with open(dis_i_file_cube, "r") as f_cube, open(
+                dis_i_file_vec, "r"
+            ) as f_vec:
                 cube_content = f_cube.read()
                 vec_content = f_vec.read()
             # merge sub core .i file in dst_i_file

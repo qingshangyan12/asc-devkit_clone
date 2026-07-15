@@ -758,9 +758,9 @@ def markdown_inline_link_targets(text):
 
 
 def source_area(path):
-    if path.startswith("docs/api/"):
+    if path.startswith("docs/zh/api/"):
         return "api"
-    if path.startswith("docs/guide/"):
+    if path.startswith("docs/zh/guide/"):
         return "guide"
     if path.startswith("examples/"):
         return "examples"
@@ -890,6 +890,9 @@ for source in scan_files:
 
             target_kind = source_area(target_path)
             if target_kind is None or target_kind == source_kind:
+                continue
+
+            if source_kind == "examples" and target_kind in ("api", "guide"):
                 continue
 
             errors.append(
@@ -1254,6 +1257,18 @@ for source in scan_files:
                 continue
 
             branch, target_path = parsed
+            if source.startswith("examples/") and target_path.startswith("docs/"):
+                parsed_url = urlparse(target.strip().strip("<>").strip("\"'"))
+                suffix = f"?{parsed_url.query}" if parsed_url.query else ""
+                if parsed_url.fragment:
+                    suffix += f"#{parsed_url.fragment}"
+                relative_target = posixpath.relpath(target_path, posixpath.dirname(source))
+                errors.append(
+                    f"{source}:{line_number}: examples link to same-repository docs must use a relative path: "
+                    f"{target} -> {relative_target}{suffix}"
+                )
+                continue
+
             is_added_line = (
                 added_line_map == "all"
                 or (added_line_map is not None and line_number in added_line_map.get(source, set()))

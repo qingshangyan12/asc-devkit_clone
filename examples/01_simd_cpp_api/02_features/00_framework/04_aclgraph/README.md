@@ -20,12 +20,12 @@ ACLGraph 可以先捕获指定流上的一组运行时任务，再将这些任�
 
 ```text
 ├── 04_aclgraph
-│   ├── figures                 // 图示
+│   ├── figures                        // 图示
 │   │   ├── single_stream_capture.png  // 单流捕获流程图
 │   │   └── double_stream_capture.png  // 双流捕获流程图
-│   ├── CMakeLists.txt          // 编译工程
-│   ├── add.asc                 // Ascend C核函数实现和ACLGraph捕获调用样例
-│   └── README.md               // 样例说明文档
+│   ├── CMakeLists.txt                 // 编译工程
+│   ├── add.asc                        // Ascend C核函数实现和ACLGraph捕获调用样例
+│   └── README.md                      // 样例说明文档
 ```
 
 ## 场景详细说明
@@ -111,7 +111,7 @@ for (int i = 0; i < 5; ++i) {
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
 
   ```bash
   source ${install_path}/cann/set_env.sh

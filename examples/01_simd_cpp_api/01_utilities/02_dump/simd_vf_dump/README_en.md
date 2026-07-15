@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example introduces the usage of the asc_dump series APIs on the simd_vf side. In vector functions, APIs such as `asc_dump_ubuf`, `asc_dump_reg`, and `asc_dump` enable visual printing of UB and register data. The kernel function reads input data from a binary file, performs Adds computation, writes output data, and verifies by comparing the output against ground truth.
+This example introduces the usage of the asc_dump series APIs on the simd_vf side. In vector functions, APIs such as `asc_dump_ubuf`, `asc_dump_reg`, and `asc_dump` enable visual printing of UB and register data. On the host side, `ReadFile` and `WriteFile` read and write binary data. The kernel reads input data from GM, performs Adds computation, and writes the result back to GM. The result is then verified by comparing the output against the ground truth.
 
 ## Supported Products and CANN Software Versions
 
@@ -56,7 +56,7 @@ This example introduces the usage of the asc_dump series APIs on the simd_vf sid
 Run the following steps in the root directory of this example to build and run the example.
 
 - Configure environment variables
-  Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

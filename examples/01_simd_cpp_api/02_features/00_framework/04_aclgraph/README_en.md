@@ -20,12 +20,12 @@ This example uses the Add operator to show how to capture Ascend C `<<<>>>` kern
 
 ```text
 ├── 04_aclgraph
-│   ├── figures                 // Diagrams
+│   ├── figures                        // Diagrams
 │   │   ├── single_stream_capture.png  // Single-stream capture flowchart
 │   │   └── double_stream_capture.png  // Double-stream capture flowchart
-│   ├── CMakeLists.txt          // Build project
-│   ├── add.asc                 // Ascend C kernel implementation and ACLGraph capture invocation example
-│   └── README.md               // Example documentation
+│   ├── CMakeLists.txt                 // Build project
+│   ├── add.asc                        // Ascend C kernel implementation and ACLGraph capture invocation example
+│   └── README.md                      // Example documentation
 ```
 
 ## Scenario Details
@@ -112,7 +112,7 @@ The example also calls `aclmdlRIDebugJsonPrint` to output the captured task info
 
 - Configure environment variables
 
-  Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
 
   ```bash
   source ${install_path}/cann/set_env.sh
