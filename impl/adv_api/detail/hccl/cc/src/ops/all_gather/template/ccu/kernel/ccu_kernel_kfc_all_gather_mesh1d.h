@@ -16,8 +16,7 @@ namespace mc2_ops_hccl {
 
 CcuResult CcuKfcAllGatherMesh1DKernel(ccu::Variable inputAddr, ccu::Variable outputAddr,
                                       ccu::Variable tokenInfo, ccu::Variable offset,
-                                      ccu::Variable goSize1, ccu::Variable goSize2,
-                                      ccu::Variable goSize3, ccu::Variable goSize4,
+                                      ccu::Variable sliceSize,
                                       const ChannelHandle channels[], uint32_t channelCount,
                                       uint32_t rankSize, uint32_t rankId);
 
