@@ -59,6 +59,10 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
         if (peerId == rankId) {
             continue;
         }
+        HCCL_INFO("[A2AV_DBG] chan setup: peerId[%u] channelIdx[%u] channelHandle[%lu] "
+            "OUTPUT_XN_ID[%d] TOKEN_XN_ID[%d]",
+            peerId, channelIdx, static_cast<uint64_t>(channels[channelIdx]),
+            A2AV_OUTPUT_XN_ID, A2AV_TOKEN_XN_ID);
         output[peerId] = ccu::GetResByChannel<ccu::Variable>(channels[channelIdx], A2AV_OUTPUT_XN_ID);
         token[peerId] = ccu::GetResByChannel<ccu::Variable>(channels[channelIdx], A2AV_TOKEN_XN_ID);
         channelIdx++;
@@ -73,6 +77,11 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
         }
         ccu::Variable peerRecvBase;
         peerRecvBase = outputAddr + extArgs[peerId * A2AV_EXT_FIELD_NUM + A2AV_RECV_OFFSET_IDX];
+        HCCL_INFO("[A2AV_DBG] preSync write: peerId[%u] channelIdx[%u] channelHandle[%lu] "
+            "writeOutXn[%d] writeTokenXn[%d] preSyncCke[%d] outBit[%d] tokenBit[%d]",
+            peerId, channelIdx, static_cast<uint64_t>(channels[channelIdx]),
+            A2AV_OUTPUT_XN_ID, A2AV_TOKEN_XN_ID, A2AV_PRE_SYNC_CKE_IDX,
+            1 << A2AV_OUTPUT_XN_ID, 1 << A2AV_TOKEN_XN_ID);
         ccu::WriteVariableWithNotify(channels[channelIdx], peerRecvBase,
             A2AV_OUTPUT_XN_ID, A2AV_PRE_SYNC_CKE_IDX, 1 << A2AV_OUTPUT_XN_ID);
         ccu::WriteVariableWithNotify(channels[channelIdx], tokenInfo,
@@ -82,8 +91,12 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
 
     const uint16_t preAllBit = (1 << A2AV_OUTPUT_XN_ID) | (1 << A2AV_TOKEN_XN_ID);
     for (uint32_t i = 0; i < channelCount; i++) {
+        HCCL_INFO("[A2AV_DBG] preSync wait: i[%u] channelHandle[%lu] preSyncCke[%d] waitBit[%u]",
+            i, static_cast<uint64_t>(channels[i]), A2AV_PRE_SYNC_CKE_IDX,
+            static_cast<uint32_t>(preAllBit));
         ccu::NotifyWait(channels[i], A2AV_PRE_SYNC_CKE_IDX, preAllBit);
     }
+    HCCL_INFO("[A2AV_DBG] preSync done: passed all NotifyWait");
 
     for (uint32_t rankIdx = 0; rankIdx < rankSize; rankIdx++) {
         const uint32_t extBase = rankIdx * A2AV_EXT_FIELD_NUM;
