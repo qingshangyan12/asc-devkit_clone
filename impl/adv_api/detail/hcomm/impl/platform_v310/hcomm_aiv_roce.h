@@ -107,7 +107,6 @@ __aicore__ inline void HcommImpl<COMM_PROTOCOL_ROCE>::FillDataSeg(__ubuf__ RoceW
     uint64_t len, uint32_t lKey)
 {
     constexpr uint32_t ROCE_1825_WQE_NEXT_SGE_INVALID = 1U << 31; // data seg le_key L bit
-    constexpr uint32_t ROCE_1825_WQE_LKEY_MASK = 0x3fffffffU;     // data seg le_key key[29:0]
     wqePtr->data.vaLocal = HtoNLL((uint64_t)src);
     wqePtr->data.rLen = HtoNL((uint32_t)len);
     wqePtr->data.leKey = HtoNL((lKey & (~ROCE_1825_WQE_NEXT_SGE_INVALID)) | ROCE_1825_WQE_NEXT_SGE_INVALID);
@@ -273,7 +272,7 @@ __aicore__ inline void HcommImpl<COMM_PROTOCOL_ROCE>::KnockDoorBell(__gm__ Chann
         chnlPtr->sqContextAddr->contextInfo.roceSq.mtuShift);
     KERNEL_LOG(KERNEL_INFO, "Hcomm KnockDoorBell: dbValue = %llu\n", dbValue);
     __gm__ uint64_t* dbHwAddr = reinterpret_cast<__gm__ uint64_t*>(chnlPtr->sqContextAddr->contextInfo.roceSq.dbHwVa);
-    uint64_t dbFinalVal = dbValue | 
+    uint64_t dbFinalVal = dbValue |
         ((((uint64_t)(sqHead) >> ROCE_1825_SQ_DB_PI_HIGH_SHIFT) & 0xffULL) << ROCE_1825_SQ_DB_PI_FIELD_SHIFT);
     st_dev(dbFinalVal, dbHwAddr, 0);
     KERNEL_LOG(KERNEL_INFO, "Hcomm KnockDoorBell: write hw db ok, hwDbVal = %llu\n", dbFinalVal);
