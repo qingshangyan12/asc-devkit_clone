@@ -74,7 +74,7 @@ $Layout = L = (d_0, d_1, \dots, d_n):(s_0, s_1, \dots, s_n)$
 
 $Coordinate = \vec{c} = (c_0, c_1, \dots, c_n)$
 
-$Crd2Idx(\vec{c}) = \sum_{i=0}^{n} (S_i * C_i) = (S_0, S_1, \dots, S_n) * \begin{pmatrix} C_0 \\ C_1 \\ \vdots \\ C_n \end{pmatrix}$
+$Crd2Idx(\vec{c}) = \sum_{i=0}^{n} (s_i * c_i) = (s_0, s_1, \dots, s_n) * \begin{pmatrix} c_0 \\ c_1 \\ \vdots \\ c_n \end{pmatrix}$
 
 $Crd2Idx(x)=Crd2Idx(delinearize(c, (d_0, d_1, \dots, d_n))) = Crd2Idx(\vec{c})$
 
@@ -86,7 +86,7 @@ delinearize ( c, (d_0, d_1, \dots, d_n)) =
 c \bmod d_0 \\ 
 (c // d_0) \bmod d_1 \\ 
 \dots \\ 
-\left( c \Big/ \left( \prod_{i=0}^{n-1} d_i \right) \right) \bmod d_n 
+\left( c // \left( \prod_{i=0}^{n-1} d_i \right) \right) \bmod d_n
 \end{bmatrix}
 $
 
