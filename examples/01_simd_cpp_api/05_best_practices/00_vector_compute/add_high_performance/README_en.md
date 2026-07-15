@@ -657,7 +657,7 @@ The reasons why the Ascend 950 Series does not reach the theoretical vector dura
 
 This interface provides formatted output function in CPU domain/NPU domain debugging scenarios.
 
-In the implementation code on the operator kernel side, call the [printf](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/调试接口/上板打印/printf.md) interface to print relevant content.
+In the implementation code on the operator kernel side, call the [printf](../../../../../docs/zh/api/SIMD-API/基础API/调试接口/上板打印/printf.md) interface to print relevant content.
 
 Examples are as follows:
 
@@ -669,9 +669,9 @@ AscendC::printf("add blockIdx=%d\n", AscendC::GetBlockIdx());
 
 ### DumpTensor
 
-For operators developed based on the operator project, you can use this interface Dump to specify the contents of [LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md). It also supports printing of customized additional information (only uint32\_t data type information is supported), such as printing the current line number, etc.
+For operators developed based on the operator project, you can use this interface Dump to specify the contents of [LocalTensor](../../../../../docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md). It also supports printing of customized additional information (only uint32\_t data type information is supported), such as printing the current line number, etc.
 
-In the operator kernel side implementation code, where Tensor data needs to be printed, call the [DumpTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md) interface to print relevant content. An example is as follows:
+In the operator kernel side implementation code, where Tensor data needs to be printed, call the [DumpTensor](../../../../../docs/zh/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md) interface to print relevant content. An example is as follows:
 
 ```cpp
 // Vector calculation: z = x + y

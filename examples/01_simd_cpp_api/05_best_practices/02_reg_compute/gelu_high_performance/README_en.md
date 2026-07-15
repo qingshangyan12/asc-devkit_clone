@@ -272,19 +272,19 @@ Use the `msOpProf` tool to collect performance data for Case 0. Key metrics:
 
 | Keyword/Concept | Meaning | Detailed Documentation |
 |:---|:---|:---|
-| `__simd_vf__` | VF function declaration modifier, indicating that the function runs in the VF (Vector Function) execution domain | [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
-| `__ubuf__` | UB address-space qualifier, indicating that the pointer points to a UB memory region | [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
-| `RegTensor<T>` | Register-level Tensor object whose data resides in vector registers (unlike `LocalTensor`, whose data resides in UB) | [RegTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/RegTensor.md) |
-| `MaskReg` | Vector mask register that controls the number of elements participating in each computation | [MaskReg](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md) |
-| `LoadAlign` | Contiguous aligned transfer that loads data from UB into registers | [Contiguous Aligned Load](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/连续对齐搬入（LoadAlign）.md) |
-| `StoreAlign` | Contiguous aligned transfer that writes data from registers back to UB | [Contiguous Aligned Store](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/连续对齐搬出（StoreAlign）.md) |
-| `asc_vf_call` | VF function call entry point used to invoke a VF function from a kernel function | [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
-| `UpdateMask` | Updates the mask register based on the number of remaining elements | [UpdateMask](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md) |
+| `__simd_vf__` | VF function declaration modifier, indicating that the function runs in the VF (Vector Function) execution domain | [asc_vf_call](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
+| `__ubuf__` | UB address-space qualifier, indicating that the pointer points to a UB memory region | [asc_vf_call](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
+| `RegTensor<T>` | Register-level Tensor object whose data resides in vector registers (unlike `LocalTensor`, whose data resides in UB) | [RegTensor](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/RegTensor.md) |
+| `MaskReg` | Vector mask register that controls the number of elements participating in each computation | [MaskReg](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md) |
+| `LoadAlign` | Contiguous aligned transfer that loads data from UB into registers | [Contiguous Aligned Load](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/连续对齐搬入（LoadAlign）.md) |
+| `StoreAlign` | Contiguous aligned transfer that writes data from registers back to UB | [Contiguous Aligned Store](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/连续对齐搬出（StoreAlign）.md) |
+| `asc_vf_call` | VF function call entry point used to invoke a VF function from a kernel function | [asc_vf_call](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
+| `UpdateMask` | Updates the mask register based on the number of remaining elements | [UpdateMask](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md) |
 
 **Principle Analysis**:
 
-RegBase API provides register-level vector computation interfaces. Combined with [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) to call VF functions, VF fusion can be achieved. Core advantages of VF fusion:
-- Within a VF function, after data is loaded from UB to registers, all intermediate computations are completed within registers, requiring only one [LoadAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/连续对齐搬入（LoadAlign）.md) and one [StoreAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/连续对齐搬出（StoreAlign）.md), eliminating Load/Store overhead for intermediate results
+RegBase API provides register-level vector computation interfaces. Combined with [asc_vf_call](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) to call VF functions, VF fusion can be achieved. Core advantages of VF fusion:
+- Within a VF function, after data is loaded from UB to registers, all intermediate computations are completed within registers, requiring only one [LoadAlign](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/连续对齐搬入（LoadAlign）.md) and one [StoreAlign](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/连续对齐搬出（StoreAlign）.md), eliminating Load/Store overhead for intermediate results
 - Supports VF dual-issue feature, standard computation instruction parallelism can reach 512 bytes/cycle, instruction dispatch efficiency (IPC) is significantly improved
 
 ```
@@ -639,7 +639,7 @@ Run the following steps in the root directory of this example to build and run t
 
 - Configure environment variables
 
-  Configure environment variables based on the [installation method](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
