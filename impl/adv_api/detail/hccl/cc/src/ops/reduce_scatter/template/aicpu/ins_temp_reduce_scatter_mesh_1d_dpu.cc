@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+
 #include "ins_temp_reduce_scatter_mesh_1d_dpu.h"
 
 namespace mc2_ops_hccl {
@@ -52,8 +53,9 @@ u64 InsTempReduceScatterMesh1dDpu::CalcScratchMultiple(BufferType inBufferType, 
 }
 
 // ! 基本编码完成，剩余数据序列化
-HcclResult InsTempReduceScatterMesh1dDpu::KernelRun(
-    const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource)
+HcclResult InsTempReduceScatterMesh1dDpu::KernelRun(const OpParam& param,
+                                                    const TemplateDataParams& tempAlgParams,
+                                                    TemplateResource& templateResource)
 {
     threadNum_ = templateResource.threads.size();
     processSize_ = tempAlgParams.sliceSize;
@@ -67,12 +69,12 @@ HcclResult InsTempReduceScatterMesh1dDpu::KernelRun(
 
     // 转换成eager-mode，保障AICPU指令下发执行完成
     if (HcommBatchModeEnd(param.algTag) != HCCL_SUCCESS) {
-        HCCL_ERROR("failed set eager mode, tag is %s.", param.algTag);
+        HCCL_ERROR("[InsTempReduceScatterMesh1dDpu] failed set eager mode, tag is %s.", param.algTag);
         return HCCL_E_INTERNAL;
     }
 
     if (HcommThreadSynchronize(templateResource.threads[0]) != 0) {
-        HCCL_ERROR("HcommThreadSynchronize failed");
+        HCCL_ERROR("[InsTempReduceScatterMesh1dDpu] HcommThreadSynchronize failed");
         return HCCL_E_INTERNAL;
     }
 
@@ -84,28 +86,27 @@ HcclResult InsTempReduceScatterMesh1dDpu::KernelRun(
     dpuRunInfo.subCommRanks = subCommRanks_;
     u32 sendMsgId = 0;
     auto dpuRunInfoSeqData = dpuRunInfo.Serialize();
-    if (HcommSendRequest(
-            reinterpret_cast<uint64_t>(templateResource.npu2DpuShmemPtr), param.algTag,
-            static_cast<void*>(dpuRunInfoSeqData.data()), dpuRunInfoSeqData.size(), &sendMsgId) != 0) {
-        HCCL_ERROR("HcommSendRequest failed");
+    if (HcommSendRequest(reinterpret_cast<uint64_t>(templateResource.npu2DpuShmemPtr), param.algTag,
+        static_cast<void*>(dpuRunInfoSeqData.data()), dpuRunInfoSeqData.size(), &sendMsgId) != 0) {
+        HCCL_ERROR("[InsTempReduceScatterMesh1dDpu] HcommSendRequest failed");
         return HCCL_E_INTERNAL;
     }
-    HCCL_INFO("HcommSendRequest run over, sendMsgId[%u]", sendMsgId);
+    HCCL_INFO("[InsTempReduceScatterMesh1dDpu] HcommSendRequest run over, sendMsgId[%u]", sendMsgId);
     // 等待DPU数据传输，然后回写结果回来
     void* recvData = nullptr;
     u32 recvMsgId = 0;
     if (HcommWaitResponse(reinterpret_cast<uint64_t>(templateResource.dpu2NpuShmemPtr), recvData, 0, &recvMsgId) != 0) {
-        HCCL_ERROR("HcommWaitResponse failed");
+        HCCL_ERROR("[InsTempReduceScatterMesh1dDpu] HcommWaitResponse failed");
         return HCCL_E_INTERNAL;
     }
     // 将执行模式转换回到batch
     if (HcommBatchModeStart(param.algTag) != HCCL_SUCCESS) {
-        HCCL_ERROR("failed set eager mode, tag is %s.", param.algTag);
+        HCCL_ERROR("[InsTempReduceScatterMesh1dDpu] failed set eager mode, tag is %s.", param.algTag);
         return HCCL_E_INTERNAL;
     }
-    HCCL_INFO("HcommWaitResponse run over, recvMsgId[%u]", recvMsgId);
+    HCCL_INFO("[InsTempReduceScatterMesh1dDpu] HcommWaitResponse run over, recvMsgId[%u]", recvMsgId);
     if (recvMsgId != sendMsgId) {
-        HCCL_ERROR("recvMsgId[%u] not equal to sendMsgId[%u]", recvMsgId, sendMsgId);
+        HCCL_ERROR("[InsTempReduceScatterMesh1dDpu] recvMsgId[%u] not equal to sendMsgId[%u]", recvMsgId, sendMsgId);
         return HCCL_E_INTERNAL;
     }
     CHK_RET(PostLocalReduce(tempAlgParams, templateResource.threads));
@@ -143,30 +144,27 @@ HcclResult InsTempReduceScatterMesh1dDpu::DPUKernelRun(
         // 在 HcclBuffer 上进行 ReduceScatter 操作
         // 由于进程只能访问远端的HcclBuffer，所以只能通过write的方式将自己userIn上的数据写到远端HcclBuffer上
         for (u32 repeatIdx = 0; repeatIdx < tempAlgParams.repeatNum; repeatIdx++) {
-            // 在reduce_scatter_op.cc的创建channels的环节中获取到了remote的HcclBuff的地址
             void* remoteCclBuffAddr = linkSend.remoteCclMem.addr;
-            // 在接收的时候接收源应该是远端地址，但是由于rs的mesh算法用的是write，所以rx不用care
             DataSlice rxSrcSlice = DataSlice(
                 tempAlgParams.buffInfo.inputPtr,
                 tempAlgParams.buffInfo.inBuffBaseOff + repeatIdx * tempAlgParams.inputRepeatStride +
                     myAlgRank * tempAlgParams.inputSliceStride,
-                tempAlgParams.sliceSize, tempAlgParams.count); // 接收源
+                tempAlgParams.sliceSize, tempAlgParams.count);
             DataSlice rxDstSlice = DataSlice(
                 tempAlgParams.buffInfo.hcclBuff.addr,
                 tempAlgParams.buffInfo.hcclBuffBaseOff + repeatIdx * tempAlgParams.outputRepeatStride +
                     rankIdx * tempAlgParams.outputSliceStride,
-                tempAlgParams.sliceSize, tempAlgParams.count); // 接收目标
-
+                tempAlgParams.sliceSize, tempAlgParams.count);
             DataSlice txSrcSlice = DataSlice(
                 tempAlgParams.buffInfo.inputPtr,
                 tempAlgParams.buffInfo.inBuffBaseOff + rankIdx * tempAlgParams.inputSliceStride +
                     repeatIdx * tempAlgParams.inputRepeatStride,
-                tempAlgParams.sliceSize, tempAlgParams.count); // 发送源
+                tempAlgParams.sliceSize, tempAlgParams.count);
             DataSlice txDstSlice = DataSlice(
                 remoteCclBuffAddr,
                 tempAlgParams.buffInfo.hcclBuffBaseOff + myAlgRank * tempAlgParams.outputSliceStride +
                     repeatIdx * tempAlgParams.outputRepeatStride,
-                tempAlgParams.sliceSize, tempAlgParams.count); // 发送目标
+                tempAlgParams.sliceSize, tempAlgParams.count);
 
             rxSrcSlices.push_back(rxSrcSlice);
             rxDstSlices.push_back(rxDstSlice);
@@ -174,7 +172,6 @@ HcclResult InsTempReduceScatterMesh1dDpu::DPUKernelRun(
             txDstSlices.push_back(txDstSlice);
         }
         SendRecvInfo sendRecvInfo{{linkSend, linkRecv}, {{txSrcSlices, txDstSlices}, {rxSrcSlices, rxDstSlices}}};
-
         CHK_PRT_RET(
             SendRecvWrite(sendRecvInfo), HCCL_ERROR("[InsTempReduceScatterMesh1dDpu] RunReduceScatter Send failed"),
             HcclResult::HCCL_E_INTERNAL);
@@ -241,4 +238,4 @@ HcclResult InsTempReduceScatterMesh1dDpu::PostLocalReduce(
 #ifndef AICPU_COMPILE
 REGISTER_TEMPLATE_V2("InsTempReduceScatterMesh1dDpu", InsTempReduceScatterMesh1dDpu);
 #endif
-} // namespace mc2_ops_hccl
+} // namespace Hccl

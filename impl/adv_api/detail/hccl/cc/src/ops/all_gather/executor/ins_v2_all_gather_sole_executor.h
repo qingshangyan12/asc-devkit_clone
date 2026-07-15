@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+
 #ifndef HCCLV2_INS_V2_ALL_GATHER_SOLE_EXECUTOR_H
 #define HCCLV2_INS_V2_ALL_GATHER_SOLE_EXECUTOR_H
 
@@ -35,6 +36,6 @@ protected:
     std::vector<std::map<u32, std::vector<ChannelInfo>>> remoteRankToChannelInfo_;
     std::vector<ThreadHandle> threads_;
 };
-} // namespace mc2_ops_hccl
+}
 
 #endif

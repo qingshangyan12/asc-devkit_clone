@@ -12,6 +12,12 @@
 
 #include "log.h"
 
+#define CANN_VERSION_VAL(M, m, p) ((M) * 10000000 + (m) * 100000 + (p) * 1000)
+#define CANN_VERSION_3(M, m, p) (CANN_VERSION_VAL(M, m, p))
+#define CANN_VERSION_4(M, m, p, b) (CANN_VERSION_VAL(M, m, p) - 200 + (b))
+#define CANN_VERSION_PICK(_1, _2, _3, _4, NAME, ...) NAME
+#define CANN_VERSION(...) CANN_VERSION_PICK(__VA_ARGS__, CANN_VERSION_4, CANN_VERSION_3)(__VA_ARGS__)
+
 #ifdef __cplusplus
 extern "C" {
 #endif

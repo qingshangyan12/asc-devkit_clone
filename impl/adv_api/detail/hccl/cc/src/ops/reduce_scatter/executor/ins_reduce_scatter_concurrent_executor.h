@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+
 #ifndef HCCLV2_INS_V2_REDUCE_SCATTER_CONCURRENT_EXECUTOR_H
 #define HCCLV2_INS_V2_REDUCE_SCATTER_CONCURRENT_EXECUTOR_H
 
@@ -57,6 +58,6 @@ private:
         const u64 dataOffset, const u64 dataCountforTemp, const u64 maxCountPerLoop,
         TemplateDataParams& tempAlgParams) const;
 };
-} // namespace mc2_ops_hccl
+}
 
 #endif

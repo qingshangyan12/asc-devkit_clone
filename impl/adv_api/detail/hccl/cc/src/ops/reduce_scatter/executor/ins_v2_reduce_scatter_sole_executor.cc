@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+
 #include "ins_v2_reduce_scatter_sole_executor.h"
 #include "ins_temp_reduce_scatter_mesh_1D.h"
 #include "ins_temp_reduce_scatter_nhr.h"
@@ -46,8 +47,8 @@ HcclResult InsV2ReduceScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes
     // 构建template
     std::shared_ptr<InsAlgTemplate> algTemplate =
         std::make_shared<InsAlgTemplate>(param, topoInfo->userRank, algHierarchyInfo.infos[0]);
-    // 调用计算资源的函数
-    algTemplate->CalcRes(comm, param, topoInfo, resourceRequest);
+    // 调用计算资源的函数 InsReduceScatterNHR 在计算资源时按照channels取最大，实际使用资源由SetchannelsPerRank使能
+    CHK_RET(algTemplate->CalcRes(comm, param, topoInfo, resourceRequest));
     return HCCL_SUCCESS;
 }
 
@@ -66,16 +67,16 @@ HcclResult InsV2ReduceScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchest
     dataCount_ = param.DataDes.count;
     strideCount_ = param.DataDes.strideCount;
     dataType_ = param.DataDes.dataType;
-    dataTypeSize_ = DATATYPE_SIZE_TABLE[param.DataDes.dataType];
+    dataTypeSize_ =  DATATYPE_SIZE_TABLE[param.DataDes.dataType];
+    // 对dataTypeSize是否为0进行校验
+    CHK_PRT_RET(dataTypeSize_ == 0,
+	    HCCL_ERROR("[InsV2ReduceScatterSoleExecutor][Orchestrate] dataTypeSize is 0"), HCCL_E_INTERNAL);
     dataSize_ = dataCount_ * dataTypeSize_;
 
     HcclResult ret = OrchestrateLoop(param, resCtx);
-    CHK_PRT_RET(
-        ret != HCCL_SUCCESS,
-        HCCL_ERROR(
-            "[InsV2ReduceScatterSoleExecutor][Orchestrate]errNo[0x%016llx] Reduce scatter excutor kernel run failed",
-            HCCL_ERROR_CODE(ret)),
-        ret);
+    CHK_PRT_RET(ret != HCCL_SUCCESS,
+        HCCL_ERROR("[InsV2ReduceScatterSoleExecutor][Orchestrate]errNo[0x%016llx] Reduce scatter executor kernel run failed",
+            HCCL_ERROR_CODE(ret)), ret);
     return HcclResult::HCCL_SUCCESS;
 }
 
@@ -108,12 +109,20 @@ HcclResult InsV2ReduceScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchest
     // 构建template
     std::shared_ptr<InsAlgTemplate> algTemplate =
         std::make_shared<InsAlgTemplate>(param, resCtx.topoInfo.userRank, resCtx.algHierarchyInfo.infos[0]);
-    u32 templateScratchMultiplier =
-        algTemplate->CalcScratchMultiple(tempAlgParams.buffInfo.inBuffType, tempAlgParams.buffInfo.outBuffType);
+    u32 templateScratchMultiplier = algTemplate->CalcScratchMultiple(tempAlgParams.buffInfo.inBuffType,
+                                                                     tempAlgParams.buffInfo.outBuffType);
+    if (param.engine == CommEngine::COMM_ENGINE_AICPU_TS && std::string(param.algName) != "InsReduceScatterNHR") {
+        algTemplate->SetchannelsPerRank(templateAlgRes.channels);
+    }
+
     // 计算最小传输大小
     u64 maxDataSizePerLoop = 0;
     maxTmpMemSize_ = tempAlgParams.buffInfo.hcclBuff.size;
-    u64 transportBoundDataSize = UB_MAX_DATA_SIZE;
+    if (param.engine != COMM_ENGINE_AIV) {
+        maxTmpMemSize_ = maxTmpMemSize_ - 1 * 1024 * 1024;
+    }
+    u64 transportBoundDataSize = (param.engine == CommEngine::COMM_ENGINE_AICPU_TS) ?
+        maxTmpMemSize_ : UB_MAX_DATA_SIZE;
     HCCL_INFO("[InsV2ReduceScatterSoleExecutor]maxTmpMemSize_ [%u]", maxTmpMemSize_);
     if (templateScratchMultiplier != 0) {
         u64 scratchBoundDataSize =
@@ -280,4 +289,4 @@ REGISTER_EXEC_V2(
     TopoMatch1D, CcuTempReduceScatterNhrMultiJettyMem2Mem1D);
 #endif
 
-} // namespace mc2_ops_hccl
+}

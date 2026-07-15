@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+
 #ifndef HCCLV2_INS_ALL_GATHER_CONCURR_EXECUTOR_H
 #define HCCLV2_INS_ALL_GATHER_CONCURR_EXECUTOR_H
 
@@ -64,6 +65,6 @@ private:
     std::vector<CcuKernelHandle> tmp0CcuKernels_;
     std::vector<CcuKernelHandle> tmp1CcuKernels_;
 };
-} // namespace mc2_ops_hccl
+}
 
 #endif // HCCLV2_INS_ALL_GATHER_CONCURR_EXECUTOR_H

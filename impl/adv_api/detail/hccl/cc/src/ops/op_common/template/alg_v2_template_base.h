@@ -10,41 +10,38 @@
 #ifndef ALG_V2_TEMPLATE_BASE
 #define ALG_V2_TEMPLATE_BASE
 
-#include <vector>
-#include <memory>
-#include "template_utils.h"
-#include "alg_template_base.h"
+#include "common_alg_template_base.h"
 
 namespace mc2_ops_hccl {
 
-class InsAlgTemplateBase {
+class InsAlgTemplateBase : public CommonAlgTemplateBase {
 public:
     explicit InsAlgTemplateBase(){};
     explicit InsAlgTemplateBase(
         const OpParam& param, const u32 rankId, // 传通信域的rankId，userRank
         const std::vector<std::vector<u32>>& subCommRanks);
 
-    virtual ~InsAlgTemplateBase();
+    ~InsAlgTemplateBase() override;
 
-    virtual std::string Describe() const = 0;
+    std::string Describe() const override = 0;
 
     // 将原来的 InsQuePtr替换为ThreadHandle, 将tempLinks换位channels
-    virtual HcclResult KernelRun(
-        const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource);
-    virtual HcclResult FastLaunch(const OpParam& param, const TemplateFastLaunchCtx& tempFastLaunchCtx);
+    HcclResult KernelRun(
+        const OpParam& param, const TemplateDataParams& tempAlgParams, TemplateResource& templateResource) override;
+    HcclResult FastLaunch(const OpParam& param, const TemplateFastLaunchCtx& tempFastLaunchCtx) override;
 
     virtual HcclResult DPUKernelRun(
         const TemplateDataParams& tempAlgParam, const std::map<u32, std::vector<ChannelInfo>>& channels,
         const u32 myRank, const std::vector<std::vector<uint32_t>>& subCommRanks);
 
     // calculate resources
-    virtual HcclResult CalcRes(
+    HcclResult CalcRes(
         HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
-        AlgResourceRequest& resourceRequest);
-    virtual HcclResult GetRes(AlgResourceRequest& resourceRequest) const;
-    virtual u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType);
+        AlgResourceRequest& resourceRequest) override;
+    HcclResult GetRes(AlgResourceRequest& resourceRequest) const override;
+    u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
 
-    virtual u64 GetThreadNum() const;
+    u64 GetThreadNum() const override;
 
     virtual void GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMainToSub) = 0;
 

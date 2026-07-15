@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+
 #ifndef INS_TEMP_REDUCE_SCATTER_1D_DPU
 #define INS_TEMP_REDUCE_SCATTER_1D_DPU
 
@@ -35,12 +36,10 @@ public:
     }
 
     // 现在的RunAsync就是之前的GenExtIns
-    HcclResult KernelRun(
-        const OpParam& param, const TemplateDataParams& tempAlgParams,
-        const TemplateResource& templateResource) override;
-    HcclResult CalcRes(
-        HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
-        AlgResourceRequest& resourceRequest) override;
+    HcclResult KernelRun(const OpParam& param,
+                        const TemplateDataParams& tempAlgParams,
+                        TemplateResource& templateResource) override;
+    HcclResult CalcRes(HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo, AlgResourceRequest& resourceRequest) override;
     u64 CalcScratchMultiple(BufferType inBufferType, BufferType outBufferType) override;
     HcclResult DPUKernelRun(
         const TemplateDataParams& tempAlgParams, const std::map<u32, std::vector<ChannelInfo>>& channels,
@@ -55,5 +54,5 @@ private:
     u64 processSize_{0};
 };
 
-} // namespace mc2_ops_hccl
-#endif // OPEN_HCCL_INS_TEMP_REDUCE_SCATTER_MESH_1D_DPU
+} // namespace Hccl
+#endif //OPEN_HCCL_INS_TEMP_REDUCE_SCATTER_MESH_1D_DPU

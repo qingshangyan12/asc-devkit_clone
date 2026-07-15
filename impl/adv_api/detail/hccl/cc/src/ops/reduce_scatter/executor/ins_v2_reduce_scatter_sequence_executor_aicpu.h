@@ -24,24 +24,22 @@ public:
 
     HcclResult Orchestrate(const OpParam& param, const AlgResourceCtxSerializable& resCtx) override;
 
-    HcclResult CalcRes(
-        HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    /* *************** 资源计算 *************** */
+
+    HcclResult CalcRes(HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
         const AlgHierarchyInfoForAllLevel& algHierarchyInfo, AlgResourceRequest& resourceRequest) override;
 
-    HcclResult CalcAlgHierarchyInfo(
-        HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo, AlgHierarchyInfoForAllLevel& algHierarchyInfo) override;
-
+    HcclResult CalcAlgHierarchyInfo(HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo,
+                                    AlgHierarchyInfoForAllLevel& algHierarchyInfo) override;
 protected:
-    HcclResult OrchestrateLoop(const OpParam& param, const AlgResourceCtxSerializable& resCtx);
-    HcclResult InitCommInfo(
-        const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
-        const AlgHierarchyInfoForAllLevel& algHierarchyInfo);
-    void GenInterTemplateParams(
-        TemplateDataParams& tempAlgParamsInter, const u64 processedDataCount, const u64 currDataCount,
-        const u64 loop) const;
-    void GenIntraTemplateParams(
-        TemplateDataParams& tempAlgParamsIntra, const u64 processedDataCount, const u64 currDataCount,
-        const u64 loop) const;
+    /* *************** 算法编排 *************** */
+    HcclResult OrchestrateLoop(const OpParam &param, const AlgResourceCtxSerializable& resCtx);
+    HcclResult InitCommInfo(const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+                            const AlgHierarchyInfoForAllLevel& algHierarchyInfo);
+    void GenInterTemplateParams(TemplateDataParams &tempAlgParamsInter, const u64 processedDataCount,
+        const u64 currDataCount, const u64 loop) const;
+    void GenIntraTemplateParams(TemplateDataParams &tempAlgParamsIntra, const u64 processedDataCount,
+        const u64 currDataCount, const u64 loop) const;
     template <typename InsAlgTemplate>
     HcclResult GenTempResource(
         const AlgResourceCtxSerializable& resCtx, const u32 channelLevelIdx,
@@ -57,6 +55,6 @@ protected:
     std::vector<std::map<u32, std::vector<ChannelInfo>>> remoteRankToChannelInfo_;
     std::vector<ThreadHandle> threads_;
 };
-} // namespace mc2_ops_hccl
+}
 
-#endif // HCCLV2_INS_V2_REDUCE_SCATTER_SEQUENCE_EXECUTOR_AICPU_H
+#endif
