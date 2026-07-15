@@ -4,7 +4,7 @@
 
 This example uses Gelu computation to introduce RegBase vector performance tuning methods. The example demonstrates performance benefits from enabling VF fusion and loop unrolling.
 
-> **Prerequisite Reading**: [Gelu Operator Introduction Example](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/00_introduction/04_reg_compute/gelu/README.md). This example performs performance optimization based on the introduction example. It is recommended to read the introduction example first to understand basic concepts.
+> **Prerequisite Reading**: [Gelu Operator Introduction Example](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/00_introduction/04_reg_compute/gelu/README_en.md). This example performs performance optimization based on the introduction example. It is recommended to read the introduction example first to understand basic concepts.
 
 **Optimization Path**:
 - Case 0: Gelu without VF fusion enabled (baseline)
@@ -267,6 +267,19 @@ Use the `msOpProf` tool to collect performance data for Case 0. Key metrics:
 | Performance Characteristics | Large per-step Load/Store overhead, low IPC | Only 1 Load + 1 Store, supports dual-issue, high IPC |
 
 > **Selection Recommendation**: When computation steps are numerous (≥3 steps) and intermediate results do not need to be written back to UB, prioritize RegBase + VF fusion to significantly reduce UB read/write count and utilize dual-issue feature to improve IPC.
+
+**Key RegBase API Concepts**:
+
+| Keyword/Concept | Meaning | Detailed Documentation |
+|:---|:---|:---|
+| `__simd_vf__` | VF function declaration modifier, indicating that the function runs in the VF (Vector Function) execution domain | [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
+| `__ubuf__` | UB address space qualifier, marking that the pointer points to a UB memory region | [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
+| `RegTensor<T>` | Register-level Tensor object whose data resides in vector registers, different from `LocalTensor` whose data resides in UB | [RegTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/RegTensor.md) |
+| `MaskReg` | Vector mask register, controlling the number of elements participating in each computation | [MaskReg](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md) |
+| `LoadAlign` | Continuous aligned transfer that loads data from UB to registers | [Continuous Aligned Load](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/连续对齐搬入（LoadAlign）.md) |
+| `StoreAlign` | Continuous aligned transfer that writes data from registers back to UB | [Continuous Aligned Store](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/连续对齐搬出（StoreAlign）.md) |
+| `asc_vf_call` | VF function call entry used to invoke a VF function from the kernel function | [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
+| `UpdateMask` | Updates the mask register according to the number of remaining elements | [UpdateMask](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md) |
 
 **Principle Analysis**:
 
@@ -659,13 +672,20 @@ Run the following steps in the root directory of this example to build and run t
 
 ### Performance Analysis
 
-Use the `msOpProf` tool to obtain detailed performance data:
+### msOpProf Tool Introduction
 
-```bash
-msopprof ./demo   # Analyze performance
-```
+The msOpProf tool is a single-operator performance analysis tool. It provides two usage modes: `msopprof` and `msopprof simulator`. This tool helps users locate exceptions in operator memory, operator code, and operator instructions, enabling comprehensive operator tuning. It currently supports performance data collection and automatic analysis based on different run modes (on-board execution or simulation) and different file formats (executable files or operator binary `.o` files).
 
-    - Performance data description  
+- On-board performance collection
+
+    On-board performance collection directly measures the execution time of an operator on an Ascend AI Processor. This mode is suitable for quickly locating operator performance issues in an on-board environment.
+
+    Run operator tuning through `msopprof` based on the executable file `demo`:
+    ```
+    msopprof ./demo
+    ```
+
+    - Performance data description
       After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
 
       ```bash
