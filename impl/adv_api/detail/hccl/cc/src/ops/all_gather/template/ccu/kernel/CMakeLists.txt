@@ -10,7 +10,8 @@
 set(src_list
     # Non-Mesh1D AllGather CCU kernels are kept here for later recovery. Do not build them before KFC Mesh1D is verified.
     # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_all_gather_mesh1d_mem2mem.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_all_gather_mesh1d.cc
+    # Disabled: the legacy direct-launch Mesh1D kernel uses old hcomm::CcuKernelArg/CcuKernelAlgBase APIs.
+    # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_all_gather_mesh1d.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_kfc_all_gather_mesh1d.cc
     # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_all_gather_nhr1d_mem2mem.cc
     # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_all_gather_2dies_mesh1d_mem2mem.cc
