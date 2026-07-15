@@ -25,7 +25,7 @@ constexpr uint64_t INVALID_U64 = UINT64_MAX;
 constexpr uint32_t CCU_PARAM_NUM_PER_DIE = 32;
 constexpr uint32_t CCU_PARAM_NUM_MAX     = CCU_PARAM_NUM_PER_DIE * 2;
 constexpr uint32_t CCU_ONE_PARAM_SIZE    = 8;
-constexpr uint32_t CCU_TASK_NUM_MAX      = 64;
+constexpr uint32_t CCU_TASK_NUM_MAX      = 1;
 
 
 // new---20260603
