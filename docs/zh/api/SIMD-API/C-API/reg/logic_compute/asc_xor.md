@@ -91,7 +91,6 @@ __simd_vf__ inline void xor_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src0_
     vector_int8_t src0;
     vector_int8_t src1;
     vector_bool mask;
-    addr_reg addr_reg;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         mask = asc_update_mask_b8(count);
         asc_loadalign(src0, src0_addr + i * one_repeat_size);
@@ -112,12 +111,11 @@ __simd_vf__ inline void xor_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_a
 {
     vector_int8_t src;
     vector_bool dst;
-    vector_bool mask;
-    vector_bool mask0 = asc_create_mask_b16(PAT_ALL);
-    vector_bool mask1 = asc_create_mask_b16(PAT_ALLF);
+    vector_bool mask = asc_create_mask_b8(PAT_ALL);
+    vector_bool mask0 = asc_create_mask_b8(PAT_ALL);
+    vector_bool mask1 = asc_create_mask_b8(PAT_ALLF);
     asc_xor(dst, mask0, mask1, mask);
     for (uint16_t i = 0; i < repeat_time; ++i) {
-        mask = asc_update_mask_b8(count);
         asc_loadalign(src, src_addr + i * one_repeat_size);
         asc_add_scalar(src, src, 0, dst);
         asc_storealign(dst_addr + i * one_repeat_size, src, mask);

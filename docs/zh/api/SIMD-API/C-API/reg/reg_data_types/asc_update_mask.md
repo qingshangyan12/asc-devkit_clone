@@ -71,9 +71,9 @@ __simd_vf__ inline void update_mask_vf(__ubuf__ float* dst_addr, __ubuf__ float*
     vector_float src0;
     vector_float src1;
     vector_float dst;
-    addr_reg addr_reg;
+    vector_bool mask;
     for (uint16_t i = 0; i < repeat_time; ++i) {
-        vector_bool mask = asc_update_mask_b32(count);
+        mask = asc_update_mask_b32(count);
         asc_loadalign_postupdate(src0, src0_addr, one_repeat_size);
         asc_loadalign_postupdate(src1, src1_addr, one_repeat_size);
         asc_add(dst, src0, src1, mask);

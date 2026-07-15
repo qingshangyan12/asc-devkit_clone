@@ -93,7 +93,6 @@ __simd_vf__ inline void eq_scalar_vf(__ubuf__ half* dst_addr, __ubuf__ half* src
     vector_half src;
     vector_bool dst;
     vector_bool mask;
-    addr_reg addr_reg;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         mask = asc_update_mask_b16(count);
         asc_loadalign_postupdate(src, src_addr, one_repeat_size);
