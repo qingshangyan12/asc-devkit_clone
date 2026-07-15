@@ -21,6 +21,7 @@
 #include "sal.h"
 #include "executor_base.h"
 #include "template_utils.h"
+#include "order_preserved_common.h"
 
 namespace mc2_ops_hccl {
 
@@ -46,11 +47,32 @@ public:
     HcclResult SetTempFastLaunchAddr(
         TemplateFastLaunchCtx& tempFastLaunchCtx, void* inputPtr, void* outputPtr, const HcclMem& hcclBuff) const;
 
-    HcclResult RestoreChannelMap(
+    virtual HcclResult RestoreChannelMap(
         const AlgResourceCtxSerializable& resCtx,
         std::vector<std::map<u32, std::vector<ChannelInfo>>>& rankIdToChannelInfo) const;
 
+#ifndef AICPU_COMPILE
+    HcclResult FastLaunchSaveCtxTwoTemplate(const OpParam& param, const u32 threadNum, const u32 ccuKernelNum,
+                                            const std::vector<ThreadHandle>& threads,
+                                            const std::vector<u32>& ccuKernelNumList,
+                                            const std::vector<std::vector<CcuKernelSubmitInfo>>& submitInfosList,
+                                            u32 notifyNumOnMainThread) const;
+#endif
+
 protected:
+    void SetOrderPreservedBaseParams(const OrderPreservedBaseParams& params)
+    {
+        myRank_ = params.myRank;
+        rankSize_ = params.rankSize;
+        devType_ = params.devType;
+        dataCount_ = params.dataCount;
+        dataTypeSize_ = params.dataTypeSize;
+        dataSize_ = params.dataSize;
+        dataType_ = params.dataType;
+        reduceOp_ = params.reduceOp;
+        maxTmpMemSize_ = params.maxTmpMemSize;
+    }
+
     // CollAlg base params
     u32 myRank_ = INVALID_VALUE_RANKID;
     u32 rankSize_ = 0;

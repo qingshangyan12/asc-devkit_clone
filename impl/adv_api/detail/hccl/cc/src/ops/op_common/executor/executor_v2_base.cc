@@ -61,4 +61,60 @@ HcclResult InsCollAlgBase::FastLaunch(const OpParam& param, const CcuFastLaunchC
     HCCL_ERROR("[InsCollAlgBase] Unsupported interface of InsCollAlgBase::FastLaunch!");
     return HcclResult::HCCL_E_INTERNAL;
 }
+
+#ifndef AICPU_COMPILE
+HcclResult InsCollAlgBase::FastLaunchSaveCtxTwoTemplate(const OpParam& param, const u32 threadNum,
+    const u32 ccuKernelNum, const std::vector<ThreadHandle>& threads, const std::vector<u32>& ccuKernelNumList,
+    const std::vector<std::vector<CcuKernelSubmitInfo>>& submitInfosList, u32 notifyNumOnMainThread) const
+{
+    if (param.opMode == OpMode::OFFLOAD) {
+        return HCCL_SUCCESS;
+    }
+    u64 size = CcuFastLaunchCtx::GetCtxSize(threadNum, ccuKernelNum);
+    void* ctxPtr = nullptr;
+    HCCL_INFO("[InsCollAlgBase][FastLaunchSaveCtxTwoTemplate] Tag[%s], size[%llu]", param.fastLaunchTag, size);
+    CHK_RET(HcclEngineCtxCreate(param.hcclComm, param.fastLaunchTag, CommEngine::COMM_ENGINE_CCU, size, &ctxPtr));
+
+    CcuFastLaunchCtx* ccuFastLaunchCtx = reinterpret_cast<CcuFastLaunchCtx*>(ctxPtr);
+    CHK_SAFETY_FUNC_RET(strcpy_s(ccuFastLaunchCtx->algName, sizeof(ccuFastLaunchCtx->algName), param.algName));
+    HCCL_INFO("[InsCollAlgBase][FastLaunchSaveCtxTwoTemplate] algName[%s]", ccuFastLaunchCtx->algName);
+
+    ccuFastLaunchCtx->threadNum = threadNum;
+    ccuFastLaunchCtx->notifyNumOnMainThread = notifyNumOnMainThread;
+    ThreadHandle* threadHandles = ccuFastLaunchCtx->GetThreadHandlePtr();
+    for (u32 i = 0; i < threadNum; i++) {
+        threadHandles[i] = threads[i];
+    }
+
+    for (u32 templateIdx = 0; templateIdx < ccuKernelNumList.size(); templateIdx++) {
+        ccuFastLaunchCtx->ccuKernelNum[templateIdx] = ccuKernelNumList[templateIdx];
+    }
+
+    constexpr u32 INTRA_0 = 0;
+    constexpr u32 INTER_1 = 1;
+    constexpr u32 INTER_0 = 2;
+    constexpr u32 INTRA_1 = 3;
+    constexpr u32 INTRA = 0;
+    constexpr u32 INTER = 1;
+    constexpr u32 KERNEL_PARALLEL_NUM = 4;
+    u32 kernelIdx = 0;
+    CcuKernelSubmitInfo* kernelSubmitInfos = ccuFastLaunchCtx->GetCcuKernelSubmitInfoPtr();
+    for (u32 i = 0; i < ccuKernelNumList[INTRA_0]; i++) {
+        kernelSubmitInfos[kernelIdx++] = submitInfosList[INTRA][i];
+    }
+    for (u32 i = 0; i < ccuKernelNumList[INTER_1]; i++) {
+        kernelSubmitInfos[kernelIdx++] = submitInfosList[INTER][i];
+    }
+    if (ccuKernelNumList.size() == KERNEL_PARALLEL_NUM) {
+        for (u32 i = ccuKernelNumList[INTER_1]; i < ccuKernelNumList[INTER_0] + ccuKernelNumList[INTER_1]; i++) {
+            kernelSubmitInfos[kernelIdx++] = submitInfosList[INTER][i];
+        }
+        for (u32 i = ccuKernelNumList[INTRA_0]; i < ccuKernelNumList[INTRA_1] + ccuKernelNumList[INTRA_0]; i++) {
+            kernelSubmitInfos[kernelIdx++] = submitInfosList[INTRA][i];
+        }
+    }
+
+    return HCCL_SUCCESS;
+}
+#endif
 } // namespace mc2_ops_hccl

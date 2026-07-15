@@ -23,6 +23,8 @@ namespace mc2_ops_hccl {
 
 #define UINT32_MAX (4294967295U)
 constexpr u32 INVALID_U32 = UINT32_MAX;
+constexpr u32 MAX_JETTY_NUM = 4;
+constexpr u32 SMALL_SIZE_512KB = 512 * 1024;
 
 constexpr s32 INVALID_RANKID = INT32_MAX;
 
@@ -34,6 +36,8 @@ struct SliceInfo {
 using RankSliceInfo = std::vector<std::vector<SliceInfo>>;
 
 enum class BufferType { INPUT = 0, OUTPUT = 1, HCCL_BUFFER = 2, DEFAULT };
+
+enum class BatchSendRecvOpType { RECORD = 0, SEND = 1, RECV = 2, FENCE = 3, DEFAULT };
 
 struct DataSlice {
     void* addr_ = nullptr;
@@ -153,6 +157,41 @@ struct BuffInfo {
     u64 hcclBuffBaseOff = 0;
 };
 
+struct StepSliceInfo {
+    BuffInfo buffInfo;
+    std::vector<std::vector<u64>> stepCount;
+    std::vector<std::vector<u64>> stepSliceSize;
+    std::vector<u64> stepInputSliceStride;
+    std::vector<u64> stepOutputSliceStride;
+    std::vector<std::vector<u64>> inputOmniPipeSliceStride;
+    std::vector<std::vector<u64>> outputOmniPipeSliceStride;
+
+    std::vector<char> Serialize() const
+    {
+        BinaryStream binaryStream;
+        binaryStream << stepCount;
+        binaryStream << stepSliceSize;
+        binaryStream << stepInputSliceStride;
+        binaryStream << stepOutputSliceStride;
+        binaryStream << inputOmniPipeSliceStride;
+        binaryStream << outputOmniPipeSliceStride;
+        std::vector<char> result;
+        binaryStream.Dump(result);
+        return result;
+    }
+
+    void DeSerialize(std::vector<char>& data)
+    {
+        BinaryStream binaryStream(data);
+        binaryStream >> stepCount;
+        binaryStream >> stepSliceSize;
+        binaryStream >> stepInputSliceStride;
+        binaryStream >> stepOutputSliceStride;
+        binaryStream >> inputOmniPipeSliceStride;
+        binaryStream >> outputOmniPipeSliceStride;
+    }
+};
+
 struct TemplateFastLaunchCtx {
     BuffInfo buffInfo;
     std::vector<ThreadHandle> threads;
@@ -170,6 +209,7 @@ struct TemplateDataParams {
     u64 outputRepeatStride{0};
     u64 tailSize{0};
     bool enableRemoteMemAccess{false};
+    bool supportSymmetricMemory{false};
     u64 processedDataCount{0};
     u64 root{0};
     HcclDataType dataType{HCCL_DATA_TYPE_INT8};
@@ -181,6 +221,11 @@ struct TemplateDataParams {
     std::vector<u64> recvCounts;
     std::vector<u64> sdispls;
     std::vector<u64> rdispls;
+    StepSliceInfo stepSliceInfo;
+    BatchSendRecvOpType opType{BatchSendRecvOpType::DEFAULT};
+    StepSliceInfo omniReadDstStepSliceInfo;
+    bool omniLastStepRead_ = false;
+    u64 localCopyFlag{0};
 
     std::vector<char> Serialize() const
     {
@@ -195,6 +240,7 @@ struct TemplateDataParams {
         binaryStream << outputRepeatStride;
         binaryStream << tailSize;
         binaryStream << enableRemoteMemAccess;
+        binaryStream << supportSymmetricMemory;
         binaryStream << allRankSliceSize;
         binaryStream << allRankDispls;
         binaryStream << sendCounts;
@@ -204,6 +250,11 @@ struct TemplateDataParams {
         binaryStream << allRankProcessedDataCount;
         binaryStream << root;
         binaryStream << dataType;
+        binaryStream << stepSliceInfo.Serialize();
+        binaryStream << opType;
+        binaryStream << omniReadDstStepSliceInfo.Serialize();
+        binaryStream << omniLastStepRead_;
+        binaryStream << localCopyFlag;
         std::vector<char> result;
         binaryStream.Dump(result);
         return result;
@@ -222,6 +273,7 @@ struct TemplateDataParams {
         binaryStream >> outputRepeatStride;
         binaryStream >> tailSize;
         binaryStream >> enableRemoteMemAccess;
+        binaryStream >> supportSymmetricMemory;
         binaryStream >> allRankSliceSize;
         binaryStream >> allRankDispls;
         binaryStream >> sendCounts;
@@ -231,6 +283,15 @@ struct TemplateDataParams {
         binaryStream >> allRankProcessedDataCount;
         binaryStream >> root;
         binaryStream >> dataType;
+        std::vector<char> stepSliceInfoData;
+        binaryStream >> stepSliceInfoData;
+        stepSliceInfo.DeSerialize(stepSliceInfoData);
+        binaryStream >> opType;
+        std::vector<char> omniReadDstStepSliceInfoData;
+        binaryStream >> omniReadDstStepSliceInfoData;
+        omniReadDstStepSliceInfo.DeSerialize(omniReadDstStepSliceInfoData);
+        binaryStream >> omniLastStepRead_;
+        binaryStream >> localCopyFlag;
     }
 };
 
@@ -377,6 +438,8 @@ HcclResult CalcDataSplitByPortGroupZAxisDetour(
     const u64 totalDataCount, const u64 dataTypeSize, const std::vector<ChannelInfo>& channels,
     std::vector<u64>& elemCountOut, std::vector<u64>& sizeOut, std::vector<u64>& elemOffset,
     const u32 level0ChannelNumPerRank, const u32 level1ChannelNumPerRank, const float level0DataRatio = 0.5f);
+
+bool IsAllConnetedWithTopo(const TopoInfoWithNetLayerDetails* topoInfo, const u32 netLayer, const CommTopo topoType);
 
 } // namespace mc2_ops_hccl
 #endif

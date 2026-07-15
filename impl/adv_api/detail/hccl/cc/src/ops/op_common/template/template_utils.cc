@@ -135,4 +135,30 @@ HcclResult CalcDataSplitByPortGroupZAxisDetour(
 
     return HcclResult::HCCL_SUCCESS;
 }
+
+bool IsAllConnetedWithTopo(const TopoInfoWithNetLayerDetails* topoInfo, const u32 netLayer, const CommTopo topoType)
+{
+    CHK_PRT_RET(topoInfo->netLayerDetails.localNetInsSizeOfLayer.size() <= netLayer,
+        HCCL_WARNING("[BaseSelector][IsLayerAllConnetedWithTopo] localNetInsSizeOfLayer size[%zu] <= netLayer[%u]",
+            topoInfo->netLayerDetails.localNetInsSizeOfLayer.size(), netLayer),
+        false);
+    u32 localRankSize = topoInfo->netLayerDetails.localNetInsSizeOfLayer[netLayer];
+
+    CHK_PRT_RET(topoInfo->topoInstDetailsOfLayer.size() <= netLayer,
+        HCCL_WARNING("[BaseSelector][IsLayerAllConnetedWithTopo] topoInstDetailsOfLayer size[%zu] <= netLayer[%u]",
+            topoInfo->topoInstDetailsOfLayer.size(), netLayer),
+        false);
+
+    auto rankNumForTopoTypeItr = topoInfo->topoInstDetailsOfLayer[netLayer].rankNumForTopoType.find(topoType);
+    if (rankNumForTopoTypeItr == topoInfo->topoInstDetailsOfLayer[netLayer].rankNumForTopoType.end()) {
+        return false;
+    }
+
+    for (auto topoRankNum : rankNumForTopoTypeItr->second) {
+        if (topoRankNum == localRankSize) {
+            return true;
+        }
+    }
+    return false;
+}
 } // namespace mc2_ops_hccl
