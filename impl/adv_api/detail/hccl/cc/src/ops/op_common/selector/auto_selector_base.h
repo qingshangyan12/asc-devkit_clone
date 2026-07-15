@@ -20,8 +20,8 @@ namespace mc2_ops_hccl {
 
 constexpr uint64_t SMALL_COUNT_512KB = 512 * 1024;   // Byte, UB协议一次传输的最大size
 constexpr uint64_t LARGE_COUNT_1024KB = 1024 * 1024; // Byte, 可掩盖多mission尾块开销
+constexpr u64 AIV_MAX_PER_RANK_DATA_SIZE = 8 * 1024 * 1024;
 
-constexpr int RANK_SIZE_EIGHT = 8;
 constexpr u32 CCU_MS_MODE = 2;
 constexpr double DEFAULT_RANK_SIZE = 8.0;
 constexpr u64 RS_2D_SMALL_DATA_SIZE = 1024 * 1024;
@@ -113,4 +113,13 @@ inline bool Is64BitDataType(const HcclDataType dataType)
 }
 
 } // namespace mc2_ops_hccl
+
+#define HCCL_AIV_NOT_MATCH_LOG(opParam, BASE_LOG, fmt, ...) \
+    do { \
+        BASE_LOG(fmt, ##__VA_ARGS__); \
+        if ((opParam).opExecuteConfig == mc2_ops_hccl::OpExecuteConfig::AIV_ONLY) { \
+            HCCL_ERROR("Failed to select AIV algorithm while configured as AIV_ONLY. " fmt, ##__VA_ARGS__); \
+        } \
+    } while (0)
+
 #endif

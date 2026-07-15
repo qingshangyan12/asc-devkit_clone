@@ -154,9 +154,13 @@ const bool& GetExternalInputInterSuperPodRetryEnable();
 
 const bool& GetExternalInputHcclEnableEntryLog();
 
+const u8& GetExternalInputHcclDeterministic();
+
 const std::map<HcclCMDType, std::vector<HcclAlgoType>> GetExternalInputHcclAlgoConfigAllType();
 
 bool GetExternalInputExecTimeout(double& execTimeOut);
+
+bool GetExternalInputTaskExceptionEnable();
 
 bool RunIndependentOpExpansion(DevType deviceType);
 } // namespace mc2_ops_hccl

@@ -10,6 +10,7 @@
 set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/alg_data_trans_wrapper.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/dpu_alg_data_trans_wrapper.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/dpu_alg_nhr_opt_wrapper.cc
 )
 
 target_sources(mc2_client PRIVATE

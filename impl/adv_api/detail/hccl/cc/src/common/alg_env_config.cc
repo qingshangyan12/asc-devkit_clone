@@ -111,6 +111,11 @@ bool GetExternalInputExecTimeout(double& execTimeOut)
     return true;
 }
 
+bool GetExternalInputTaskExceptionEnable()
+{
+    return true;
+}
+
 /* 入口 */
 HcclResult InitEnvConfig()
 {
@@ -969,6 +974,11 @@ const bool& GetExternalInputInterSuperPodRetryEnable()
 }
 
 const bool& GetExternalInputHcclEnableEntryLog() { return g_algEnvConfig.enableEntryLog; }
+
+const u8& GetExternalInputHcclDeterministic()
+{
+    return g_algEnvConfig.hcclDeterministic;
+}
 
 bool RunIndependentOpExpansion(DevType deviceType)
 {
