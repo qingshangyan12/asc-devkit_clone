@@ -342,7 +342,7 @@ ofstream AclnnOpGenerator::AclnnOpGenHeaderFileStart(string& fileName, string& m
 {
     ofstream outfile(fileName);
     chmod(fileName.c_str(), S_IRUSR | S_IWUSR);
-    outfile << "\n/*\n * calution: this file was generated automaticlly donot change it.\n*/\n\n";
+    outfile << "\n/*\n * calution: this file was generated automatically do not change it.\n*/\n\n";
     std::string name = GenerateMacros(macroNmae);
     if (version != 0U) {
         string decName = name + "_V" + std::to_string(version) + "_H_\n";
@@ -1070,7 +1070,7 @@ void AclnnOpGenerator::AclnnOpGenCodeFunAttrComment(
 void AclnnOpGenerator::AclnnOpGenCodeRunForWSFunComment(
     OpDef& opDef, OpDefName& opdefName, ofstream& outfile, uint32_t version) const
 {
-    outfile << "/* funtion: " << opdefName.prefixName << "GetWorkspaceSize\n * parameters :\n";
+    outfile << "/* function: " << opdefName.prefixName << "GetWorkspaceSize\n * parameters :\n";
     AclnnOpGenCodeFunInputComment(opDef.GetInputs(), opDef.GetOutputs(), opdefName, outfile, version);
     AclnnOpGenCodeFunAttrComment(opDef.GetAttrs(), opdefName.attrsName, outfile, version);
     AclnnOpGenCodeFunOutputComment(
@@ -1081,7 +1081,7 @@ void AclnnOpGenerator::AclnnOpGenCodeRunForWSFunComment(
 
 void AclnnOpGenerator::AclnnOpGenCodeRunWithWSFunComment(string& prefixName, ofstream& outfile) const
 {
-    outfile << "/* funtion: " << prefixName << "\n * parameters :\n";
+    outfile << "/* function: " << prefixName << "\n * parameters :\n";
     outfile << " * workspace : workspace memory addr(input).\n";
     outfile << " * workspaceSize : size of workspace(input).\n";
     outfile << " * executor : executor context(input).\n";
@@ -2687,8 +2687,8 @@ void AclnnOpGenerator::AclnnOpGenCodeRunUnContWithWorkspaceImpl(
                 << indent << "    const std::string value = std::to_string(workspaceSize);\n"
                 << indent << "    const std::string requiredSize = std::to_string(inContWorkspaceSize);\n"
                 << indent << "    const std::string reason = std::string(\"The passed workspace size \") + value +\n"
-                << indent << "        \" does not meet the workspace size \" + requiredSize +\n"
-                << indent << "        \" actually required by the AutoContiguous() function\";\n"
+                << indent << "        \" does not meet the minimum workspace size \" + requiredSize +\n"
+                << indent << "        \" actually required by the AutoContiguous API\";\n"
                 << indent << "    const std::vector<const char*> msgKey = {\"value\", \"paraName\", \"reason\"};\n"
                 << indent
                 << "    const std::vector<const char*> msgValue = {value.c_str(), \"workspaceSize\", "

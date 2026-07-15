@@ -1,5 +1,6 @@
 # Transpose Class Example
 
+
 ## Overview
 
 This example implements data transpose functionality based on the Transpose and TransDataTo5HD interfaces, detailing the usage in three scenarios: normal transpose, enhanced transpose, and 5HD format conversion. It covers three types of data conversion requirements: (1) transposing 16*16 2D matrix data blocks, (2) converting between [N,C,H,W] and [N,H,W,C] 4D matrix formats, and (3) converting NCHW format to NC1HWC0 format.
@@ -68,7 +69,7 @@ This example implements data transpose functionality based on the Transpose and 
 
 Run the following steps in the root directory of this example to build and run the example.
 - Configure environment variables
-  Configure environment variables according to the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

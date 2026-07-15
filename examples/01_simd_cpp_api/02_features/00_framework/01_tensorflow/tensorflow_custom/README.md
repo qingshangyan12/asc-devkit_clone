@@ -53,7 +53,7 @@
     > [!NOTE]注意
     > 需适配插件代码，路径为： `examples/01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op/framework/tf_plugin/tensorflow_add_custom_plugin.cc`，需修改插件代码中的TensorFlow调用算子名称OriginOpType为"AddCustom"，如下所示：
     >
-    > ```cc
+    > ```cpp
     > REGISTER_CUSTOM_OP("AddCustom")
     >   .FrameworkType(TENSORFLOW)      // type: TENSORFLOW
     >   .OriginOpType("AddCustom")      // name in tf module
@@ -66,7 +66,7 @@
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

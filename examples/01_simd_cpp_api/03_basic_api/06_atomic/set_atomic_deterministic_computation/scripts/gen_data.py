@@ -35,18 +35,18 @@ def gen_golden_data():
     input_z = np.array([z] * data_size, dtype=input_type)
 
     # 证明浮点数累加不具备交换律
-    left =  (input_x + input_y) + input_z
+    left = (input_x + input_y) + input_z
     right = input_x + (input_y + input_z)
 
     # 预期输出数据
-    golden = np.array([right[0]+input_gm[0]] * data_size, dtype=output_type)
+    golden = np.array([right[0] + input_gm[0]] * data_size, dtype=output_type)
 
     # 用于核间同步，在多个核之间共享的gm，gm必须初始为0
     input_sync = np.zeros(256, dtype=sync_type)
     # 创建目录
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
-    
+
     # 保存数据
     input_x.tofile("./input/input_x.bin")
     input_y.tofile("./input/input_y.bin")
@@ -55,6 +55,6 @@ def gen_golden_data():
     input_gm.tofile("./input/input_gm.bin")
     input_sync.tofile("./input/input_sync.bin")
 
-    
+
 if __name__ == "__main__":
     gen_golden_data()

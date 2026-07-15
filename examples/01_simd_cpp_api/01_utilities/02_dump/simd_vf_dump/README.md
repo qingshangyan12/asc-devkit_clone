@@ -1,5 +1,6 @@
 # SimdVF Dump接口功能说明
 
+
 ## 概述
 
 本样例介绍simd_vf侧asc_dump系列接口使用方法，在vector函数中通过`asc_dump_ubuf`、`asc_dump_reg`、`asc_dump`等接口实现UB和寄存器数据的可视化打印。Host侧通过`ReadFile`/`WriteFile`完成二进制数据的读写，核函数从GM读取输入数据，执行Adds计算后将结果写回GM，通过比较输出与真值进行校验。
@@ -56,7 +57,7 @@
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
