@@ -199,7 +199,7 @@ function cleanContent(content, chipFilter) {
   return content
 }
 
-function fixInternalLinks(content, sourceRelPath, htmlToSecIdMap) {
+function fixInternalLinks(content, sourceRelPath, htmlToSecIdMap, fragmentLinks, fragmentCounter, currentSecId) {
   return content.replace(/<a\s+([^>]*)>/gi, (fullMatch, attrs) => {
     const hrefMatch = attrs.match(/href="([^"]*)"/i)
     if (!hrefMatch) return fullMatch
@@ -210,6 +210,19 @@ function fixInternalLinks(content, sourceRelPath, htmlToSecIdMap) {
     }
 
     if (href.startsWith('#')) {
+      let samePageFragment
+      try {
+        samePageFragment = decodeURIComponent(href.substring(1))
+      } catch {
+        samePageFragment = href.substring(1)
+      }
+      if (samePageFragment && currentSecId) {
+        const key = currentSecId + '_f' + (fragmentCounter[currentSecId] = (fragmentCounter[currentSecId] || 0) + 1)
+        fragmentLinks[key] = { secId: currentSecId, fragment: samePageFragment }
+        const newHref = '#' + key
+        const newAttrs = attrs.replace(/href="[^"]*"/i, 'href="' + newHref + '"')
+        return '<a ' + newAttrs + '>'
+      }
       return fullMatch
     }
 
@@ -220,9 +233,21 @@ function fixInternalLinks(content, sourceRelPath, htmlToSecIdMap) {
       return fullMatch
     }
 
+    let fragment = ''
+    let pathPart = decoded
+    const hashIdx = decoded.indexOf('#')
+    if (hashIdx >= 0) {
+      fragment = decoded.substring(hashIdx + 1)
+      pathPart = decoded.substring(0, hashIdx)
+    }
+
+    if (!pathPart || pathPart === '.' || pathPart === './') {
+      return fullMatch
+    }
+
     const srcDir = sourceRelPath.includes('/') ? sourceRelPath.substring(0, sourceRelPath.lastIndexOf('/')) : ''
     const parts = srcDir ? srcDir.split('/') : []
-    const targetParts = decoded.split('/')
+    const targetParts = pathPart.split('/')
     const resolved = []
     for (const part of parts) {
       resolved.push(part)
@@ -238,6 +263,13 @@ function fixInternalLinks(content, sourceRelPath, htmlToSecIdMap) {
 
     const targetSecId = htmlToSecIdMap[normalizedKey]
     if (targetSecId) {
+      if (fragment) {
+        const key = targetSecId + '_f' + (fragmentCounter[targetSecId] = (fragmentCounter[targetSecId] || 0) + 1)
+        fragmentLinks[key] = { secId: targetSecId, fragment: fragment }
+        const newHref = '#' + key
+        const newAttrs = attrs.replace(/href="[^"]*"/i, 'href="' + newHref + '"')
+        return '<a ' + newAttrs + '>'
+      }
       const newHref = '#' + targetSecId
       const newAttrs = attrs.replace(/href="[^"]*"/i, 'href="' + newHref + '"')
       return '<a ' + newAttrs + '>'
@@ -322,6 +354,168 @@ function extractOutlinePageList(batchDoc) {
   return result
 }
 
+function extractNamedDests(batchDoc) {
+  const { PDFName, PDFRef, PDFDict, PDFArray, PDFString, PDFHexString } = require('pdf-lib')
+  const context = batchDoc.context
+  const pages = batchDoc.getPages()
+  const result = {}
+
+  function resolvePageIndex(pageRef) {
+    if (!(pageRef instanceof PDFRef)) return -1
+    for (let i = 0; i < pages.length; i++) {
+      if (pages[i].ref.objectNumber === pageRef.objectNumber) return i
+    }
+    return -1
+  }
+
+  function parseDestArray(destArray) {
+    try {
+      if (typeof destArray.size !== 'function' || destArray.size() < 4) return null
+      const pageRef = destArray.get(0)
+      let pageIndex = -1
+      try {
+        const resolved = context.lookup(pageRef)
+        if (resolved) {
+          for (let i = 0; i < pages.length; i++) {
+            if (pages[i].node === resolved || (pages[i].ref && pageRef.objectNumber === pages[i].ref.objectNumber)) {
+              pageIndex = i
+              break
+            }
+          }
+        }
+      } catch {}
+      if (pageIndex < 0) pageIndex = resolvePageIndex(pageRef)
+      if (pageIndex < 0) return null
+      let yPt = 800
+      try {
+        const yObj = destArray.get(3)
+        if (yObj && typeof yObj.asNumber === 'function') yPt = yObj.asNumber()
+      } catch {}
+      return { pageIndex, yPt }
+    } catch { return null }
+  }
+
+  function extractNameValue(nameObj) {
+    try {
+      if (nameObj instanceof PDFString) return nameObj.asString()
+      if (nameObj instanceof PDFHexString) return nameObj.decodeText()
+      if (nameObj instanceof PDFName) {
+        let s = nameObj.asString()
+        return s.startsWith('/') ? s.substring(1) : s
+      }
+    } catch {}
+    return null
+  }
+
+  function walkFlatDestsDict(destsDict) {
+    if (!destsDict || !(destsDict instanceof PDFDict)) return
+    for (const key of destsDict.keys()) {
+      const name = extractNameValue(key)
+      if (!name) continue
+      const val = destsDict.get(key)
+      let destObj
+      try { destObj = context.lookup(val) || val } catch { destObj = val }
+      let destArray = destObj
+      if (destObj instanceof PDFDict) {
+        const d = destObj.get(PDFName.of('D'))
+        if (d) try { destArray = context.lookup(d) || d } catch { continue }
+      }
+      if (destArray && typeof destArray.size === 'function') {
+        const parsed = parseDestArray(destArray)
+        if (parsed && !result[name]) result[name] = parsed
+      }
+    }
+  }
+
+  function walkNameTree(dict) {
+    if (!dict || !(dict instanceof PDFDict)) return
+
+    const kids = dict.get(PDFName.of('Kids'))
+    if (kids) {
+      let kidsArray
+      try { kidsArray = context.lookup(kids) || kids } catch { return }
+      if (kidsArray && typeof kidsArray.size === 'function') {
+        for (let i = 0; i < kidsArray.size(); i++) {
+          let kid
+          try { kid = context.lookup(kidsArray.get(i)) } catch { continue }
+          if (kid) walkNameTree(kid)
+        }
+      }
+    }
+
+    const names = dict.get(PDFName.of('Names'))
+    if (names) {
+      let namesArray
+      try { namesArray = context.lookup(names) || names } catch { return }
+      if (namesArray && typeof namesArray.size === 'function') {
+        for (let i = 0; i < namesArray.size() - 1; i += 2) {
+          let nameObj
+          try { nameObj = context.lookup(namesArray.get(i)) || namesArray.get(i) } catch { continue }
+          let destObj
+          try { destObj = context.lookup(namesArray.get(i + 1)) || namesArray.get(i + 1) } catch { continue }
+
+          const name = extractNameValue(nameObj)
+          if (!name) continue
+
+          let destArray = destObj
+          if (destObj instanceof PDFDict) {
+            const d = destObj.get(PDFName.of('D'))
+            if (d) try { destArray = context.lookup(d) || d } catch { continue }
+          }
+
+          if (destArray && typeof destArray.size === 'function') {
+            const parsed = parseDestArray(destArray)
+            if (parsed && !result[name]) result[name] = parsed
+          }
+        }
+      }
+    }
+  }
+
+  try {
+    const destsRef = batchDoc.catalog.get(PDFName.of('Dests'))
+    if (destsRef) {
+      let destsObj
+      try { destsObj = context.lookup(destsRef) || destsRef } catch { destsObj = destsRef }
+      if (destsObj instanceof PDFDict) {
+        const hasKids = destsObj.get(PDFName.of('Kids'))
+        const hasNames = destsObj.get(PDFName.of('Names'))
+        if (hasKids || hasNames) {
+          walkNameTree(destsObj)
+        } else {
+          walkFlatDestsDict(destsObj)
+        }
+      }
+    }
+  } catch {}
+
+  try {
+    const namesRef = batchDoc.catalog.get(PDFName.of('Names'))
+    if (namesRef) {
+      let namesDict
+      try { namesDict = context.lookup(namesRef) || namesRef } catch { return result }
+      if (namesDict instanceof PDFDict) {
+        const dRef = namesDict.get(PDFName.of('Dests'))
+        if (dRef) {
+          let dDict
+          try { dDict = context.lookup(dRef) || dRef } catch { return result }
+          if (dDict instanceof PDFDict) {
+            const hasKids = dDict.get(PDFName.of('Kids'))
+            const hasNames = dDict.get(PDFName.of('Names'))
+            if (hasKids || hasNames) {
+              walkNameTree(dDict)
+            } else {
+              walkFlatDestsDict(dDict)
+            }
+          }
+        }
+      }
+    }
+  } catch {}
+
+  return result
+}
+
 async function injectMathJax(page) {
   const mathjaxPath = path.resolve(root, 'node_modules', 'mathjax-full', 'es5', 'tex-svg.js')
   if (!fs.existsSync(mathjaxPath)) {
@@ -362,7 +556,7 @@ async function renderBatchedPdf(browser, allCss, sections, anchorToSecIdMap, opt
   const { PDFDocument } = require('pdf-lib')
   const mergedDoc = await PDFDocument.create()
   const sectionPageMap = {}
-  const allContentLinks = []
+  const destCoordMap = {}
 
   const sharedCss = allCss + '\n' +
     '@page { size: A4; margin: 15mm 15mm 20mm 15mm; }\n' +
@@ -387,21 +581,28 @@ async function renderBatchedPdf(browser, allCss, sections, anchorToSecIdMap, opt
     const batch = sections.slice(start, end)
     console.log('[gen-pdf]   Render batch ' + (Math.floor(start / BATCH_SIZE) + 1) + ': sections ' + start + '-' + (end - 1))
 
-    const referencedSecIds = new Set()
+    const referencedIds = new Set()
     for (const s of batch) {
-      const hrefRe = /href="#(sec-\d+)"/g
+      const hrefRe = /href="#(sec-\d+(?:_f\d+)?)"/g
       let m
       while ((m = hrefRe.exec(s.content)) !== null) {
-        referencedSecIds.add(m[1])
+        referencedIds.add(m[1])
       }
     }
-    const existingSecIds = new Set(batch.map(s => s.secId))
-    const missingSecIds = [...referencedSecIds].filter(id => !existingSecIds.has(id))
-    if (missingSecIds.length > 0) {
-      console.log('[gen-pdf]     Injecting ' + missingSecIds.length + ' cross-batch anchors: ' + missingSecIds.slice(0, 5).join(',') + (missingSecIds.length > 5 ? ' ...' : ''))
+    const existingIds = new Set(batch.map(s => s.secId))
+    for (const s of batch) {
+      const idRe = /\bid="(sec-\d+(?:_f\d+)?)"/gi
+      let idM
+      while ((idM = idRe.exec(s.content)) !== null) {
+        existingIds.add(idM[1])
+      }
     }
-    const anchorHtml = missingSecIds.length > 0
-      ? '\n' + missingSecIds.map(id => '<a id="' + id + '" style="position:absolute;left:-9999px;top:0"></a>').join('\n')
+    const missingIds = [...referencedIds].filter(id => !existingIds.has(id))
+    if (missingIds.length > 0) {
+      console.log('[gen-pdf]     Injecting ' + missingIds.length + ' cross-batch anchors: ' + missingIds.slice(0, 5).join(',') + (missingIds.length > 5 ? ' ...' : ''))
+    }
+    const anchorHtml = missingIds.length > 0
+      ? '\n' + missingIds.map(id => '<a id="' + id + '" style="position:absolute;left:-9999px;top:0"></a>').join('\n')
       : ''
 
     const batchHtml = '<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n<meta charset="utf-8">\n<style>\n' +
@@ -422,40 +623,6 @@ async function renderBatchedPdf(browser, allCss, sections, anchorToSecIdMap, opt
       await page.setContent(batchHtml, { waitUntil: 'load', timeout: 300000 })
       await injectMathJax(page)
 
-      const linkPositions = await page.evaluate(() => {
-        const links = []
-        const allA = document.querySelectorAll('a[href^="#sec-"]')
-        for (const a of allA) {
-          const href = a.getAttribute('href')
-          if (!href || !href.startsWith('#sec-')) continue
-          const rect = a.getBoundingClientRect()
-          links.push({
-            secId: href.substring(1),
-            top: rect.top,
-            height: rect.height,
-          })
-        }
-        return links
-      })
-
-      const ptPerPx = 72 / 96
-      const marginTopPt = 15 * 72 / 25.4
-      const pageHeightPt = 842
-      const contentHeightPt = pageHeightPt - marginTopPt - (20 * 72 / 25.4)
-      const contentHeightPx = contentHeightPt * 96 / 72
-
-      for (const lp of linkPositions) {
-        const batchPageIdx = Math.floor(lp.top / contentHeightPx)
-        const localPx = lp.top - batchPageIdx * contentHeightPx
-        const yPtFromTop = marginTopPt + localPx * ptPerPx
-        allContentLinks.push({
-          secId: lp.secId,
-          mergedPageIndex: globalPageOffset + batchPageIdx,
-          yPtFromTop: yPtFromTop,
-          heightPx: lp.height,
-        })
-      }
-
       const pdfData = await page.pdf({
         format: 'A4',
         margin: { top: '15mm', bottom: '20mm', left: '15mm', right: '15mm' },
@@ -466,6 +633,14 @@ async function renderBatchedPdf(browser, allCss, sections, anchorToSecIdMap, opt
 
       const batchDoc = await PDFDocument.load(pdfData)
       const batchPages = batchDoc.getPageCount()
+
+      const batchDests = extractNamedDests(batchDoc)
+      for (const [name, coord] of Object.entries(batchDests)) {
+        destCoordMap[name] = {
+          pageIndex: coord.pageIndex + globalPageOffset,
+          yPt: coord.yPt,
+        }
+      }
 
       const outlinePages = extractOutlinePageList(batchDoc)
 
@@ -488,7 +663,7 @@ async function renderBatchedPdf(browser, allCss, sections, anchorToSecIdMap, opt
     }
   }
 
-  return { mergedDoc, sectionPageMap, totalPages: globalPageOffset, allContentLinks }
+  return { mergedDoc, sectionPageMap, totalPages: globalPageOffset, destCoordMap }
 }
 
 async function renderTitlePdf(browser, pdfTitle) {
@@ -665,7 +840,7 @@ async function collectTocPositions(browser, allCss, sections, pageNumbers, tocPa
   return allEntries
 }
 
-async function addTocLinkAnnotations(mergedDoc, tocEntries, sectionPageMap) {
+async function addTocLinkAnnotations(mergedDoc, tocEntries, sectionPageMap, destCoordMap) {
   const { PDFName, PDFNumber } = require('pdf-lib')
   const context = mergedDoc.context
   const pages = mergedDoc.getPages()
@@ -686,11 +861,16 @@ async function addTocLinkAnnotations(mergedDoc, tocEntries, sectionPageMap) {
     const yPtFromBottom = 842 - yPtFromTop - entryHeightPt
 
     const targetPage = pages[targetPageIndex]
+    let yPt = 800
+    const coord = destCoordMap[secId]
+    if (coord && coord.yPt !== undefined) {
+      yPt = coord.yPt
+    }
     const dest = context.obj([
       targetPage.ref,
       PDFName.of('XYZ'),
       PDFNumber.of(0),
-      PDFNumber.of(800),
+      PDFNumber.of(yPt),
       PDFNumber.of(0),
     ])
 
@@ -736,7 +916,7 @@ function decodePdfDestName(name) {
   }
 }
 
-function fixContentLinkAnnotations(mergedDoc, sectionPageMap, anchorToSecIdMap) {
+function fixContentLinkAnnotations(mergedDoc, sectionPageMap, anchorToSecIdMap, destCoordMap) {
   const { PDFName, PDFNumber, PDFArray } = require('pdf-lib')
   const context = mergedDoc.context
   const pages = mergedDoc.getPages()
@@ -792,9 +972,31 @@ function fixContentLinkAnnotations(mergedDoc, sectionPageMap, anchorToSecIdMap) 
       let destName = dest.asString()
       if (destName.startsWith('/')) destName = destName.substring(1)
 
+      const coord = destCoordMap[destName] || destCoordMap[decodePdfDestName(destName)] || null
+      if (coord) {
+        const targetPageIndex = coord.pageIndex
+        if (targetPageIndex >= 0 && targetPageIndex < pages.length) {
+          const targetPage = pages[targetPageIndex]
+          const newDest = context.obj([
+            targetPage.ref,
+            PDFName.of('XYZ'),
+            PDFNumber.of(0),
+            PDFNumber.of(coord.yPt),
+            PDFNumber.of(0),
+          ])
+          annot.delete(PDFName.of('Dest'))
+          annot.set(PDFName.of('Dest'), newDest)
+          fixedCount++
+          continue
+        }
+      }
+
       let targetSecId = null
 
-      if (destName.startsWith('sec-')) {
+      const aliasMatch = destName.match(/^(sec-\d+)_f\d+$/)
+      if (aliasMatch) {
+        targetSecId = aliasMatch[1]
+      } else if (destName.startsWith('sec-')) {
         targetSecId = destName
       } else {
         targetSecId = decodedMap[destName] || decodedMap[decodePdfDestName(destName)] || null
@@ -835,84 +1037,11 @@ function fixContentLinkAnnotations(mergedDoc, sectionPageMap, anchorToSecIdMap) 
   console.log('[gen-pdf]     Scanned ' + totalAnnots + ' annotations, ' + namedDestCount + ' named dests, fixed ' + fixedCount + ', ' + notFoundCount + ' unresolvable')
 }
 
-function addContentLinkAnnotations(mergedDoc, allContentLinks, sectionPageMap, titlePageCount) {
-  const { PDFName, PDFNumber } = require('pdf-lib')
-  const context = mergedDoc.context
-  const pages = mergedDoc.getPages()
-  const pageHeightPt = 842
-
-  let addedCount = 0
-  let skippedCount = 0
-
-  const existingAnnotsByPage = new Map()
-  for (let i = 0; i < pages.length; i++) {
-    const pg = pages[i]
-    const annotsRaw = pg.node.get(PDFName.of('Annots'))
-    if (annotsRaw) {
-      let arr
-      try { arr = context.lookup(annotsRaw) || annotsRaw; } catch { arr = annotsRaw; }
-      if (arr && typeof arr.size === 'function') {
-        existingAnnotsByPage.set(i, arr)
-      }
-    }
-  }
-
-  for (const link of allContentLinks) {
-    const targetPageNum = sectionPageMap[link.secId]
-    if (targetPageNum === undefined || targetPageNum === null) {
-      skippedCount++
-      continue
-    }
-
-    const targetPageIndex = targetPageNum - 1
-    if (targetPageIndex < 0 || targetPageIndex >= pages.length) {
-      skippedCount++
-      continue
-    }
-
-    const srcPageIndex = link.mergedPageIndex + titlePageCount
-    if (srcPageIndex < 0 || srcPageIndex >= pages.length) {
-      skippedCount++
-      continue
-    }
-
-    const srcPage = pages[srcPageIndex]
-    const targetPage = pages[targetPageIndex]
-
-    const yPtFromBottom = pageHeightPt - link.yPtFromTop - link.heightPx * 72 / 96
-
-    const dest = context.obj([
-      targetPage.ref,
-      PDFName.of('XYZ'),
-      PDFNumber.of(0),
-      PDFNumber.of(800),
-      PDFNumber.of(0),
-    ])
-
-    const linkAnnot = context.obj({
-      Type: 'Annot',
-      Subtype: 'Link',
-      Rect: [30, yPtFromBottom, 550, yPtFromBottom + link.heightPx * 72 / 96],
-      Dest: dest,
-      Border: [0, 0, 0],
-    })
-
-    const linkRef = context.register(linkAnnot)
-
-    let annotsArray = existingAnnotsByPage.get(srcPageIndex)
-    if (!annotsArray) {
-      annotsArray = context.obj([])
-      srcPage.node.set(PDFName.of('Annots'), annotsArray)
-      existingAnnotsByPage.set(srcPageIndex, annotsArray)
-    }
-    annotsArray.push(linkRef)
-    addedCount++
-  }
-
-  return addedCount
+function addContentLinkAnnotations(mergedDoc, allContentLinks, sectionPageMap, titlePageCount, destCoordMap) {
+  return 0
 }
 
-async function buildOutlineForMergedPdf(mergedDoc, sections, sectionPageMap, tocPageCount, titlePageCount) {
+async function buildOutlineForMergedPdf(mergedDoc, sections, sectionPageMap, tocPageCount, titlePageCount, destCoordMap) {
   const { PDFName, PDFHexString, PDFNumber, PDFDict, PDFArray } = require('pdf-lib')
   const context = mergedDoc.context
   const pages = mergedDoc.getPages()
@@ -928,13 +1057,18 @@ async function buildOutlineForMergedPdf(mergedDoc, sections, sectionPageMap, toc
     return hex
   }
 
-  function createOutlineItem(title, pageIndex) {
+  function createOutlineItem(title, pageIndex, secId) {
     const pageRef = pages[pageIndex].ref
+    let yPt = 800
+    const coord = destCoordMap[secId]
+    if (coord && coord.yPt !== undefined) {
+      yPt = coord.yPt
+    }
     const destArray = PDFArray.withContext(context)
     destArray.push(pageRef)
     destArray.push(PDFName.of('XYZ'))
     destArray.push(PDFNumber.of(0))
-    destArray.push(PDFNumber.of(800))
+    destArray.push(PDFNumber.of(yPt))
     destArray.push(PDFNumber.of(0))
 
     const itemDict = PDFDict.withContext(context)
@@ -973,7 +1107,7 @@ async function buildOutlineForMergedPdf(mergedDoc, sections, sectionPageMap, toc
     const pageIndex = globalPageNum - 1
     if (pageIndex < 0 || pageIndex >= pages.length) continue
 
-    const item = createOutlineItem(sec.text, pageIndex)
+    const item = createOutlineItem(sec.text, pageIndex, sec.secId)
 
     while (stack.length > 0 && stack[stack.length - 1].depth >= sec.depth) {
       const popped = stack.pop()
@@ -1000,7 +1134,7 @@ async function buildOutlineForMergedPdf(mergedDoc, sections, sectionPageMap, toc
 
   if (rootItems.length === 0) return
 
-  const tocItem = createOutlineItem('\u76EE\u5F55', titlePageCount)
+  const tocItem = createOutlineItem('\u76EE\u5F55', titlePageCount, null)
   rootItems.unshift(tocItem)
 
   linkSiblings(rootItems)
@@ -1095,6 +1229,8 @@ async function generateAllApiPdf(browser, allCss, rawSections, chipFilter, htmlT
   console.log('[gen-pdf] Generating ' + pdfFileName + ' (filter=' + chipFilter + ')...')
 
   let skippedCount = 0
+  const fragmentLinks = {}
+  const fragmentCounter = {}
   const sections = rawSections.map(rs => {
     if (isSectionNotSupported(rs.rawContent, chipFilter)) {
       skippedCount++
@@ -1102,7 +1238,7 @@ async function generateAllApiPdf(browser, allCss, rawSections, chipFilter, htmlT
     }
     const cleaned = cleanContent(rs.rawContent, chipFilter)
     const fixed = fixImagePaths(cleaned, rs.htmlDir)
-    const linked = fixInternalLinks(fixed, rs.relPath, htmlToSecIdMap)
+    const linked = fixInternalLinks(fixed, rs.relPath, htmlToSecIdMap, fragmentLinks, fragmentCounter, rs.secId)
     return {
       text: rs.text,
       depth: rs.depth,
@@ -1124,13 +1260,66 @@ async function generateAllApiPdf(browser, allCss, rawSections, chipFilter, htmlT
     while ((m = idRe.exec(s.content)) !== null) {
       anchorToSecIdMap[m[1]] = s.secId
     }
+    const nameRe = /\bname="([^"]*)"/gi
+    while ((m = nameRe.exec(s.content)) !== null) {
+      if (!anchorToSecIdMap[m[1]]) {
+        anchorToSecIdMap[m[1]] = s.secId
+      }
+    }
+  }
+
+  const secFragmentAliases = {}
+  for (const [compoundKey, info] of Object.entries(fragmentLinks)) {
+    if (!secFragmentAliases[info.secId]) secFragmentAliases[info.secId] = []
+    secFragmentAliases[info.secId].push({ compoundKey, fragment: info.fragment })
+  }
+
+  let injectedById = 0
+  let injectedByHeading = 0
+  for (const s of sections) {
+    const aliases = secFragmentAliases[s.secId]
+    if (!aliases) continue
+
+    const fragmentGroups = {}
+    for (const alias of aliases) {
+      if (!fragmentGroups[alias.fragment]) fragmentGroups[alias.fragment] = []
+      fragmentGroups[alias.fragment].push(alias)
+    }
+
+    for (const [fragment, groupAliases] of Object.entries(fragmentGroups)) {
+      const escapedFragment = fragment.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      const allIds = groupAliases.map(a => '<a id="' + a.compoundKey + '"></a>').join('')
+
+      const idRe = new RegExp('(<[^>]+\\bid="' + escapedFragment + '"[^>]*>)', 'i')
+      if (idRe.test(s.content)) {
+        s.content = s.content.replace(idRe, allIds + '$1')
+        for (const alias of groupAliases) {
+          anchorToSecIdMap[alias.compoundKey] = s.secId
+          injectedById++
+        }
+      } else {
+        const headingRe = new RegExp('(<h[1-6][^>]*>)(' + escapedFragment + ')(?=<a\\s|</h[1-6]>)', 'i')
+        if (headingRe.test(s.content)) {
+          s.content = s.content.replace(headingRe, '$1' + allIds + '$2')
+          for (const alias of groupAliases) {
+            anchorToSecIdMap[alias.compoundKey] = s.secId
+            injectedByHeading++
+          }
+        }
+      }
+    }
+  }
+
+  const aliasCount = Object.keys(fragmentLinks).length
+  if (aliasCount > 0) {
+    console.log('[gen-pdf]   Injected ' + aliasCount + ' fragment alias anchors across ' + Object.keys(secFragmentAliases).length + ' sections (' + injectedById + ' by id, ' + injectedByHeading + ' by heading)')
   }
 
   console.log('[gen-pdf]   ' + sections.length + '/' + rawSections.length + ' sections have content (' + skippedCount + ' skipped by chip support)')
 
   console.log('[gen-pdf]   Step 1: Batch rendering content sections...')
-  const { mergedDoc, sectionPageMap, totalPages, allContentLinks } = await renderBatchedPdf(browser, allCss, sections, anchorToSecIdMap)
-  console.log('[gen-pdf]     Content rendered: ' + totalPages + ' pages, ' + allContentLinks.length + ' content links collected')
+  const { mergedDoc, sectionPageMap, totalPages, destCoordMap } = await renderBatchedPdf(browser, allCss, sections, anchorToSecIdMap)
+  console.log('[gen-pdf]     Content rendered: ' + totalPages + ' pages, ' + Object.keys(destCoordMap).length + ' named dests extracted')
 
   console.log('[gen-pdf]   Step 2: Rendering title page...')
   const { titleDoc, pageCount: titlePageCount } = await renderTitlePdf(browser, pdfTitle)
@@ -1145,6 +1334,13 @@ async function generateAllApiPdf(browser, allCss, rawSections, chipFilter, htmlT
   const adjustedPageMap = {}
   for (const [secId, pageNum] of Object.entries(sectionPageMap)) {
     adjustedPageMap[secId] = pageNum + titleOffset
+  }
+  const adjustedDestCoordMap = {}
+  for (const [name, coord] of Object.entries(destCoordMap)) {
+    adjustedDestCoordMap[name] = {
+      pageIndex: coord.pageIndex + titleOffset,
+      yPt: coord.yPt,
+    }
   }
   const finalPageNumbers = sections.map(s => {
     const p = adjustedPageMap[s.secId]
@@ -1170,19 +1366,19 @@ async function generateAllApiPdf(browser, allCss, rawSections, chipFilter, htmlT
   }
 
   console.log('[gen-pdf]   Step 7: Adding TOC link annotations...')
-  await addTocLinkAnnotations(mergedDoc, tocEntries, adjustedPageMap)
+  await addTocLinkAnnotations(mergedDoc, tocEntries, adjustedPageMap, adjustedDestCoordMap)
 
   console.log('[gen-pdf]   Step 7b: Fixing content link annotations (Named Dest -> Direct Dest)...')
-  fixContentLinkAnnotations(mergedDoc, adjustedPageMap, anchorToSecIdMap)
+  fixContentLinkAnnotations(mergedDoc, adjustedPageMap, anchorToSecIdMap, adjustedDestCoordMap)
 
-  console.log('[gen-pdf]   Step 7c: Adding cross-batch content link annotations...')
-  const crossBatchAdded = addContentLinkAnnotations(mergedDoc, allContentLinks, adjustedPageMap, titlePageCount + tocPageCount)
-  console.log('[gen-pdf]     Added ' + crossBatchAdded + ' cross-batch content links')
+  console.log('[gen-pdf]   Step 7c: Checking cross-batch content link annotations...')
+  const crossBatchAdded = addContentLinkAnnotations(mergedDoc, [], adjustedPageMap, titlePageCount + tocPageCount, adjustedDestCoordMap)
+  console.log('[gen-pdf]     Cross-batch links handled by fixContentLinkAnnotations')
 
   console.log('[gen-pdf]   Step 8: Building outline bookmarks...')
   let outlineFailed = false
   try {
-    await buildOutlineForMergedPdf(mergedDoc, sections, adjustedPageMap, tocPageCount, titlePageCount)
+    await buildOutlineForMergedPdf(mergedDoc, sections, adjustedPageMap, tocPageCount, titlePageCount, adjustedDestCoordMap)
   } catch (outlineErr) {
     console.warn('[gen-pdf]     Outline build failed (non-fatal): ' + outlineErr.message)
     outlineFailed = true
