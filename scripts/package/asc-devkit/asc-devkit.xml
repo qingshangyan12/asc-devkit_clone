@@ -88,40 +88,38 @@
     </file_info>
     <file_info copy_type="delivery" src_path="lib/host/asc/impl" dst_path="$(TARGET_ENV)/asc/impl" install_path="$(TARGET_ENV)/asc/impl" install_type="all">
         <file value="utils" install_mod="550" entity="true"/>
-        <file value="basic_api" install_mod="550" entity="true" optional="true"/>
-        <file value="simt_api" install_mod="550" entity="true" optional="true"/>
+        <file value="basic_api" install_mod="550" entity="true"/>
+        <file value="simt_api" install_mod="550" entity="true"/>
         <file value="c_api" install_mod="550" entity="true"/>
-        <file value="tensor_api" install_mod="550" entity="true"/>
     </file_info>
     <file_info copy_type="delivery" src_path="lib/host/asc/impl/adv_api" dst_path="$(TARGET_ENV)/asc/impl/adv_api" install_path="$(TARGET_ENV)/asc/impl/adv_api" install_type="all">
-        <file value="detail" install_softlink="$(TARGET_ENV)/ascendc/include/highlevel_api/impl" install_mod="550" entity="true" optional="true"/>
-        <file value="tiling" install_mod="550" entity="true" optional="true"/>
+        <file value="detail" install_softlink="$(TARGET_ENV)/ascendc/include/highlevel_api/impl" install_mod="550" entity="true"/>
+        <file value="tiling" install_mod="550" entity="true"/>
     </file_info>
 
     <file_info copy_type="delivery" src_path="lib/host/asc/include/adv_api" dst_path="$(TARGET_ENV)/asc/include/adv_api/hccl" install_path="$(TARGET_ENV)/asc/include/adv_api/hccl" install_type="all">
-        <file value="internal" install_softlink="$(TARGET_ENV)/pkg_inc/asc/hccl/internal" install_mod="550" entity="true" optional="true"/>
+        <file value="internal" install_softlink="$(TARGET_ENV)/pkg_inc/asc/hccl/internal" install_mod="550" entity="true"/>
     </file_info>
 
     <file_info copy_type="delivery" src_path="lib/host/asc/include" dst_path="$(TARGET_ENV)/asc/include" install_path="$(TARGET_ENV)/asc/include" install_type="all">
-        <file value="interface" install_softlink="$(TARGET_ENV)/ascendc/include/basic_api/interface;$(TARGET_ENV)/tikcpp/tikcfw/interface;$(TARGET_ENV)/include/ascendc/basic_api/interface" install_mod="550" entity="true" optional="true"/>
-        <file value="kernel_operator.h" install_softlink="$(TARGET_ENV)/ascendc/include/basic_api/kernel_operator.h;$(TARGET_ENV)/tikcpp/tikcfw/kernel_operator.h;$(TARGET_ENV)/include/ascendc/basic_api/kernel_operator.h" install_mod="550" entity="true" optional="true"/>
-        <file value="basic_api" install_mod="550" entity="true" optional="true"/>
-        <file value="aicpu_api" install_softlink="$(TARGET_ENV)/ascendc/include/aicpu_api;$(TARGET_ENV)/include/ascendc/aicpu_api" install_mod="550" entity="true" optional="true"/>
-        <file value="simt_api" install_mod="550" entity="true" optional="true"/>
+        <file value="interface" install_softlink="$(TARGET_ENV)/ascendc/include/basic_api/interface;$(TARGET_ENV)/tikcpp/tikcfw/interface;$(TARGET_ENV)/include/ascendc/basic_api/interface" install_mod="550" entity="true"/>
+        <file value="kernel_operator.h" install_softlink="$(TARGET_ENV)/ascendc/include/basic_api/kernel_operator.h;$(TARGET_ENV)/tikcpp/tikcfw/kernel_operator.h;$(TARGET_ENV)/include/ascendc/basic_api/kernel_operator.h" install_mod="550" entity="true"/>
+        <file value="basic_api" install_mod="550" entity="true"/>
+        <file value="aicpu_api" install_softlink="$(TARGET_ENV)/ascendc/include/aicpu_api;$(TARGET_ENV)/include/ascendc/aicpu_api" install_mod="550" entity="true"/>
+        <file value="simt_api" install_mod="550" entity="true"/>
         <file value="c_api" install_mod="550" entity="true"/>
-        <file value="tensor_api" install_mod="550" entity="true"/>
         <file value="tiling" install_mod="550"/>
-        <file value="adv_api" install_mod="550" entity="true" optional="true"/>
+        <file value="adv_api" install_mod="550" entity="true"/>
         <file value="utils" install_softlink="$(TARGET_ENV)/tikcpp/tikcfw/include/utils;$(TARGET_ENV)/include/ascendc/include/utils" install_mod="550" entity="true"/>
     </file_info>
 
     <file_info copy_type="delivery" src_path="lib/host/ascendc/include/highlevel_api" dst_path="$(TARGET_ENV)/ascendc/include/highlevel_api" install_path="$(TARGET_ENV)/ascendc/include/highlevel_api" install_type="all">
-        <file value="kernel_tiling" install_softlink="$(TARGET_ENV)/tikcpp/tikcfw/kernel_tiling;$(TARGET_ENV)/include/ascendc/highlevel_api/kernel_tiling;$(TARGET_ENV)/include/kernel_tiling" install_mod="550" entity="true" optional="true"/>
+        <file value="kernel_tiling" install_softlink="$(TARGET_ENV)/tikcpp/tikcfw/kernel_tiling;$(TARGET_ENV)/include/ascendc/highlevel_api/kernel_tiling;$(TARGET_ENV)/include/kernel_tiling" install_mod="550" entity="true"/>
     </file_info>
 
     <file_info copy_type="delivery" src_path="lib/host/ascendc/include/basic_api" dst_path="$(TARGET_ENV)/ascendc/include/basic_api" install_path="$(TARGET_ENV)/ascendc/include/basic_api" install_type="all">
-        <file value="impl" install_softlink="$(TARGET_ENV)/tikcpp/tikcfw/impl" install_mod="550" entity="true" optional="true"/>
-        <file value="op_frame" install_softlink="$(TARGET_ENV)/tikcpp/tikcfw/op_frame" install_mod="550" entity="true" optional="true"/>
+        <file value="impl" install_softlink="$(TARGET_ENV)/tikcpp/tikcfw/impl" install_mod="550" entity="true"/>
+        <file value="op_frame" install_softlink="$(TARGET_ENV)/tikcpp/tikcfw/op_frame" install_mod="550" entity="true"/>
     </file_info>
 
     <file_info copy_type="delivery" src_path="lib/host/ascendc/include/highlevel_api/utils/log" dst_path="$(TARGET_ENV)/ascendc/include/highlevel_api/utils/log" install_path="$(TARGET_ENV)/ascendc/include/highlevel_api/utils/log" install_type="all">
@@ -129,7 +127,7 @@
     </file_info>
 
     <file_info value="tikcpp_tiling_libs" copy_type="delivery" src_path="lib/host/tiling" dst_path="$(TARGET_ENV)/lib64" install_path="$(TARGET_ENV)/lib64" install_type="all" install_mod="440" feature="ascendc">
-        <file value="libtiling_api.a" file_type="static" pkg_feature="filter_as31xm1_device" optional="true"/>
+        <file value="libtiling_api.a" file_type="static" pkg_feature="filter_as31xm1_device"/>
     </file_info>
 
     <file_info value="devlib_tiling_libs_x86_64" copy_type="delivery" src_path="" dst_path="$(TARGET_ENV)/devlib/linux/x86_64" install_path="$(TARGET_ENV)/devlib/linux/x86_64" install_type="all" install_mod="440" feature="ascendc">
@@ -157,7 +155,7 @@
     </file_info>
 
     <file_info copy_type="delivery" src_path="lib/device" dst_path="$(TARGET_ENV)" install_path="$(TARGET_ENV)/lib64/device/lib64" pkg_feature="filter_florence">
-        <file value="libaicpu_api.a" file_type="static" optional="true"/>
+        <file value="libaicpu_api.a" file_type="static"/>
     </file_info>
 
     <file_info value="ascendc_scripts" copy_type="delivery" src_path="lib/host" dst_path="$(TARGET_ENV)" install_path="tools/ascendc_tools" install_mod="550" feature="ascendc">
