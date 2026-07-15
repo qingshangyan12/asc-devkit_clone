@@ -26,30 +26,22 @@
 #define AIN_DEVICE __attribute__((always_inline)) __aicore__ __inline__
 #endif
 
-#define AIN_MASK_ALL 0u
-
 namespace AscendC {
 
+/*!
+ * @brief Signal id, i.e. index into the team workspace signal region.
+ */
 typedef uint32_t AinSignal;
 
-using AinDevComm = __gm__ void*;
+/*!
+ * @brief Opaque handle to a symmetric communication window.
+ */
 using AinCommSymWindow = __gm__ void*;
 
-struct AinTeamTagWorld {};
-struct AinTeamTagRail {};
-
 /*!
- * @brief Describes the communication team used by Ain interfaces.
- *
- * nRanks is the number of ranks in the team, rank is the local rank within the team,
- * stride is the interval used to index the rank list, and ranks points to the rank list.
+ * @brief Opaque handle to a communication team.
  */
-typedef struct {
-    uint32_t nRanks;
-    uint32_t rank;
-    uint32_t stride;
-    void* ranks;
-} AinTeam;
+using AinTeam = __gm__ void*;
 
 /*!
  * @brief Placeholder tag for "no remote action" in the put primitive.
@@ -87,15 +79,24 @@ enum AinCommitFlags {
     AIN_COMMIT_DELAYED = (1 << 0) /*!< Assemble the WQE only; caller drains later through flush(). */
 };
 
-enum AinMemoryOrder { AIN_MEMORY_ORDER_DEFAULT };
+/*!
+ * @brief Memory ordering for signal read/wait operations.
+ */
+enum AinMemoryOrder { AIN_MEMORY_ORDER_RELAX };
 
+/*!
+ * @brief Signal action that atomically adds a custom value to a remote signal.
+ */
 typedef struct {
-    AinSignal signalId;
-    uint64_t value;
+    AinSignal signalId; /*!< Target signal id. */
+    uint64_t value;     /*!< Value to add. */
 } AinSignalAdd;
 
+/*!
+ * @brief Signal action that atomically increments a remote signal by 1.
+ */
 typedef struct {
-    AinSignal signalId;
+    AinSignal signalId; /*!< Target signal id. */
 } AinSignalInc;
 
 } // namespace AscendC
