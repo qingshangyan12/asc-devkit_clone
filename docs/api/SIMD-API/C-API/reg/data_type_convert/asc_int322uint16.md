@@ -45,7 +45,7 @@
 ## 函数原型
 
 ```cpp
-// 非饱和模式，数据写入索引为偶数的位置
+// 非饱和模式，写入目的操作数的上半部分
 __simd_callee__ inline void asc_int322uint16(vector_uint16_t& dst, vector_int32_t src, vector_bool mask)
 // 饱和模式，写入目的操作数的上半部分
 __simd_callee__ inline void asc_int322uint16_sat(vector_uint16_t& dst, vector_int32_t src, vector_bool mask)

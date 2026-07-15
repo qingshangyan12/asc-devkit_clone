@@ -76,8 +76,8 @@ PIPE_V
 
 | 输入类型 | 输出类型 | 理论并行度(element/cycle) |
 |---|---|---|
-| `half` | `half` | 128 |
-| `float` | `float` | 64 |
+| half | half | 128 |
+| float | float | 64 |
 
 ## 调用示例
 
