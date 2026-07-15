@@ -46,6 +46,8 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
     ccu::Event event;
 
     const uint32_t extArgNum = rankSize * A2AV_EXT_FIELD_NUM;
+    HCCL_INFO("[A2AV_DBG] kernel enter: rankSize[%u], rankId[%u], channelCount[%u], extArgNum[%u]",
+        rankSize, rankId, channelCount, extArgNum);
     ccu::Array<ccu::Variable> extArgs(extArgNum);
     ccu::Load(extAddr, extArgs, extArgNum);
 
