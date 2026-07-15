@@ -334,6 +334,11 @@ __aicore__ inline void asc_copy_gm2ub_align_sync_impl(__ubuf__ fp8_e5m2_t* dst, 
     asc_sync_post_process();
 }
 
+#define asc_copy_gm2ub_align(dst, src, n_burst, len_burst, left_padding_num,\
+    right_padding_num, enable_constant_pad, l2_cache_mode, src_stride, dst_stride)\
+    asc_copy_gm2ub_align(dst, src, n_burst, len_burst, left_padding_num,\
+    right_padding_num, enable_constant_pad, (acs_load_l2_cache_type)l2_cache_mode, src_stride, dst_stride)
+
 #undef ASC_C_API_DEFAULT_ZERO_VALUE
 #undef ASC_C_API_DEFAULT_NBURST
 
