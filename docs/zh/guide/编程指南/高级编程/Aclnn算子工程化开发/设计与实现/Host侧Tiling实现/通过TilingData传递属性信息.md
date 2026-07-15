@@ -1,0 +1,189 @@
+# 通过TilingData传递属性信息
+
+算子属性在Host侧保存，Kernel不能直接读取。属性需要参与Kernel计算时，Host侧Tiling函数先从`RuntimeAttrs`读取属性值，再把Kernel真正需要的数据写入TilingData，由框架传到Kernel侧。
+
+本文以LeakyReluCustom的`negative_slope`属性为例，说明从原型声明、Host侧读取到Kernel侧使用的完整流程。TilingData的基础定义和写入方法见[基本流程](./基本流程.md)。
+
+完整可编译样例见[LeakyReluCustom](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op)。
+
+## 1. 属性传递流程
+
+属性传递包含四个环节：
+
+```text
+OpDef声明属性
+    -> TilingFunc按声明顺序读取属性
+    -> 写入TilingData字段
+    -> Kernel解析TilingData并使用字段
+```
+
+只有Kernel需要使用的结果才写入TilingData。如果属性只影响Host侧的切分、Block数量或TilingKey，Host侧完成计算后传递最终运行参数即可，不需要原样传递属性。
+
+## 2. 在算子原型中声明属性
+
+LeakyReluCustom的计算语义如下：
+
+```text
+y = x,                    x >= 0
+y = negative_slope * x,   x < 0
+```
+
+在算子原型中将`negative_slope`声明为可选浮点属性，默认值为`0.0f`：
+
+```cpp
+this->Attr("negative_slope")
+    .AttrType(OPTIONAL)
+    .Float(0.0f);
+```
+
+`OPTIONAL`表示调用算子时可以不显式传入该属性；未传入时，使用`Float(0.0f)`设置的默认值。属性在原型中的声明位置和基础用法见[算子原型定义](../算子原型定义.md)；`AttrType`以及`Bool`、`Float`、`Int`等属性类型接口的参数和默认值约束见[OpAttrDef](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/原型注册与管理/OpAttrDef/OpAttrDef-272.md)。
+
+## 3. 在TilingData中增加字段
+
+使用标准C++语法定义TilingData时，直接增加与Kernel侧使用类型一致的字段：
+
+```cpp
+#ifndef LEAKY_RELU_CUSTOM_TILING_H
+#define LEAKY_RELU_CUSTOM_TILING_H
+#include <cstdint>
+
+struct LeakyReluCustomTilingData {
+    uint32_t totalLength;
+    uint32_t tileNum;
+    float negativeSlope;
+};
+
+#endif // LEAKY_RELU_CUSTOM_TILING_H
+```
+
+TilingData字段保存的是传给Kernel的数据，不要求与属性同名。建议使用能直接表达Kernel用途的名称，并选择大小固定、可直接复制的字段类型，例如整数、浮点数、布尔值或定长数组；不要使用指针、引用或动态容器。
+
+## 4. Host侧读取属性并写入TilingData
+
+`context->GetAttrs()`返回本次调用的属性列表。`GetAttrPointer<T>(index)`通过属性在列表中的位置读取对应的值，`index`按照原型中`Attr`的声明顺序从0开始编号。本例只声明了`negative_slope`一个属性，因此将它的索引定义为0。
+
+```cpp
+namespace optiling {
+constexpr uint32_t NUM_BLOCKS = 8;
+constexpr uint32_t TILE_NUM = 16;
+constexpr size_t NEGATIVE_SLOPE_INDEX = 0;
+
+static ge::graphStatus TilingFunc(gert::TilingContext* context)
+{
+    LeakyReluCustomTilingData* tiling =
+        context->GetTilingData<LeakyReluCustomTilingData>();
+    uint32_t totalLength =
+        context->GetInputShape(0)->GetOriginShape().GetShapeSize();
+
+    const gert::RuntimeAttrs* attrs = context->GetAttrs();
+    const float* negativeSlope =
+        attrs->GetAttrPointer<float>(NEGATIVE_SLOPE_INDEX);
+    if (negativeSlope == nullptr) {
+        return ge::GRAPH_FAILED;
+    }
+
+    context->SetBlockDim(NUM_BLOCKS);
+    tiling->totalLength = totalLength;
+    tiling->tileNum = TILE_NUM;
+    tiling->negativeSlope = *negativeSlope;
+
+    size_t* currentWorkspace = context->GetWorkspaceSizes(1);
+    currentWorkspace[0] = 0;
+    return ge::GRAPH_SUCCESS;
+}
+} // namespace optiling
+```
+
+即使属性在原型中定义了默认值，读取后仍建议判空，避免索引、类型或工程版本不匹配时直接解引用无效指针。
+
+### 4.1 属性类型对应关系
+
+`GetAttrPointer<T>`的模板参数需要与原型声明的属性类型一致。
+
+| 原型属性接口 | Host侧读取类型 | 适合写入TilingData的类型 |
+|---|---|---|
+| `.Bool(...)` | `bool` | `bool`或明确宽度的整数 |
+| `.Float(...)` | `float` | `float` |
+| `.Int(...)` | 与接口约定一致的整数类型 | 按Kernel需求检查范围后转换 |
+
+属性读取类型不匹配会导致数据解析错误。整数属性转换成`uint32_t`等更窄类型前，需要检查负数和溢出范围。
+
+### 4.2 多属性场景
+
+假设原型按以下顺序声明两个属性：
+
+```cpp
+this->Attr("axis").AttrType(REQUIRED).Int();
+this->Attr("keep_dims").AttrType(OPTIONAL).Bool(false);
+```
+
+Host侧对应使用索引0和1：
+
+```cpp
+const gert::RuntimeAttrs* attrs = context->GetAttrs();
+const int64_t* axis = attrs->GetAttrPointer<int64_t>(0);
+const bool* keepDims = attrs->GetAttrPointer<bool>(1);
+if (axis == nullptr || keepDims == nullptr) {
+    return ge::GRAPH_FAILED;
+}
+```
+
+新增、删除或调整属性顺序时，需要同步检查所有`GetAttrPointer(index)`调用。建议为索引定义具名常量，避免在Tiling函数中散落数字。
+
+## 5. Kernel侧使用属性
+
+Kernel入口解析TilingData后，将属性字段传给Kernel实现类：
+
+```cpp
+extern "C" __global__ __aicore__ void leaky_relu_custom(
+    __gm__ uint8_t* x, __gm__ uint8_t* y,
+    __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
+{
+    REGISTER_TILING_DEFAULT(LeakyReluCustomTilingData);
+    GET_TILING_DATA(tilingData, tiling);
+
+    KernelLeakyRelu<STATIC_TILE_LENGTH> op;
+    op.Init(x, y, tilingData.totalLength, tilingData.tileNum,
+            tilingData.negativeSlope);
+    op.Process();
+}
+```
+
+`Init`把`negativeSlope`保存为Kernel类成员。配套样例使用`Maxs`、`Mins`、`Muls`和`Add`组合实现LeakyRelu：
+
+```cpp
+float inputVal = 0.0f;
+
+AscendC::Maxs(tmpTensor1, xLocal, inputVal, tileLength);
+AscendC::Mins(tmpTensor2, xLocal, inputVal, tileLength);
+AscendC::Muls(
+    tmpTensor2, tmpTensor2, this->negativeSlope, tileLength);
+AscendC::Add(yLocal, tmpTensor1, tmpTensor2, tileLength);
+```
+
+上述计算等价于：
+
+```text
+tmpTensor1 = max(x, 0)
+tmpTensor2 = min(x, 0) * negativeSlope
+y = tmpTensor1 + tmpTensor2
+```
+
+计算完成后再按Kernel基本流程把`yLocal`写回GlobalMemory。示例中的属性值只在`Init`时读取一次，不在Tile循环中重复解析TilingData。
+
+如果某个属性只用于Host侧选择TilingKey，例如根据`algorithm`属性选择不同Kernel分支，则可以直接调用`context->SetTilingKey(...)`，不再额外增加TilingData字段。分支组织方法见[多分支策略](../多分支策略.md)。
+
+## 6. 使用约束
+
+1. `GetAttrPointer(index)`的索引与`OpDef`中的属性声明顺序一致，从0开始。
+2. `GetAttrPointer<T>`的类型必须与属性实际类型一致，使用前检查返回指针。
+3. 只向TilingData写入Kernel需要的数据；字符串、动态容器和大数组不适合作为TilingData字段。
+4. Host侧转换整数类型时检查符号和取值范围。
+5. Host和Kernel侧引用同一份TilingData定义，并保持字段类型和布局一致。
+
+## 7. 相关文档
+
+- [算子原型定义](../算子原型定义.md)：声明属性及默认值。
+- [Host侧Tiling实现](./基本流程.md)：定义和写入TilingData。
+- [Kernel侧算子实现](../Kernel侧算子实现/基本流程.md)：注册、解析并使用TilingData。
+- [多分支策略](../多分支策略.md)：使用属性选择TilingKey或Kernel模板分支。
