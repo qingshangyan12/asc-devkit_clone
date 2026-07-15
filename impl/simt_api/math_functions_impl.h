@@ -1078,6 +1078,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float expm1f(float x) { return expf(x) - 1
         int32_t f32_exp_val = exponent >> 23;            \
         uint32_t man_u32 = u32 & 0x007fffff;             \
         float f32_man_u32 = static_cast<float>(man_u32); \
+        /* 23: number of mantissa bits */                \
         f32_man_u32 = f32_man_u32 / (1 << 23);           \
         if (f32_exp_val == 0) {                          \
             if (f32_man_u32 < 0.5f) {                    \
