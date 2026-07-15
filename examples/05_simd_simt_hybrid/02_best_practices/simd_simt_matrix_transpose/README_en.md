@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample uses matrix transpose to describe memory access optimization in Ascend C SIMD and SIMT hybrid programming. The sample starts from direct global memory (GM) transpose. It then introduces Memory Transfer Engine (MTE) movement, Unified Buffer (UB) staging, and 32x32 tiling. It compares two Thread Block mapping methods: launching Thread Blocks by tile groups and fixing the Thread Block count. It reduces bank conflicts by using UB padding. Finally, it uses double buffering to run the MTE2 load, SIMT Vector Function (VF) transpose, and MTE3 store pipelines in parallel. This path shows the tuning process for SIMD and SIMT hybrid matrix transpose.
+This sample uses matrix transpose to describe memory access optimization in Ascend C SIMD and SIMT hybrid programming. The sample starts from direct global memory (GM) transpose. It then introduces Memory Transfer Engine (MTE) movement, Unified Buffer (UB) staging, and 32x32 tiling. It compares two Thread Block mapping methods: launching Thread Blocks by tile groups and fixing the Thread Block count. It reduces bank conflicts by using UB padding. Finally, it uses double buffering to run the MTE2 load, SIMT Vector Function (VF) transpose, and MTE3 store pipelines in parallel. This path shows the tuning process for SIMD and SIMT hybrid matrix transpose. This sample has the same function as the [matrix_transpose_practice sample](https://gitcode.com/cann/asc-devkit/tree/matrix_transpose/examples/03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice) in SIMT scenarios, and can be used to compare the matrix transpose memory access optimization paths in SIMD and SIMT hybrid scenarios and SIMT scenarios.
 
 ## Supported Products
 
@@ -162,7 +162,7 @@ for (uint32_t tile_base = loop_start; tile_base < total_tiles; tile_base += loop
 
 **Analysis**:
 
-Case 2 fixes the Thread Block count to the hardware vector core count. Compared with Case 1, which launches 512 Thread Blocks by tile groups, Case 2 launches and schedules fewer Thread Blocks. Task Duration decreases from 23.374μs to 18.734μs, a latency reduction of about 19.9%. Later versions continue to use 2048 threads and two tiles per iteration. The optimization focus then moves to UB access overhead.
+Case 2 fixes the Thread Block count to the hardware vector core count. Compared with Case 1, which launches 512 Thread Blocks by tile groups, Case 2 launches and schedules fewer Thread Blocks. Task Duration decreases from 23.374μs to 18.734μs, a latency reduction of about 19.9%. In SIMD and SIMT hybrid scenarios, reducing the Thread Block count does not change the transpose logic inside the SIMT VF, and does not introduce extra SIMT-side compute complexity. Unlike the SIMT scenario, this case does not show register spilling. Later versions continue to use 2048 threads and two tiles per iteration. The optimization focus then moves to UB access overhead.
 
 ---
 
