@@ -10,8 +10,8 @@
 |:---|:---:|:---|:---|
 | Case 0 | 0 | SIMT直接访问GM | 数据访问和计算均通过SIMT实现，SIMT线程直接访问GM，作为纯SIMT实现的对照组。 |
 | Case 1 | 1 | SIMD RegBase | 数据访问和计算均通过SIMD实现，基于RegBase实现FloorMod计算，作为纯SIMD实现的对照组。 |
-| Case 2 | 2 | SIMT非连续访问UB | 基于SIMD DataCopy接口将GM连续搬运到UB，SIMT每个线程处理一段连续元素，但Warp内相邻线程访问不连续。 |
-| Case 3 | 3 | SIMT连续访问UB | 基于SIMD DataCopy接口将GM连续搬运到UB，调整SIMT线程映射，使Warp内相邻线程访问连续地址。 |
+| Case 2 | 2 | SIMT非连续访问UB | 基于搬运接口将GM连续搬运到UB，SIMT每个线程处理一段连续元素，但Warp内相邻线程访问不连续。 |
+| Case 3 | 3 | SIMT连续访问UB | 基于搬运接口将GM连续搬运到UB，调整SIMT线程映射，使Warp内相邻线程访问连续地址。 |
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -93,102 +93,20 @@ $$
 **关键代码**：
 
 ```cpp
-__aicore__ inline void ProcessGmSimt()
-{
-    asc_vf_call<floor_mod_simt_gm_contiguous<T>>(
-        dim3(THREAD_COUNT), const_cast<__gm__ T*>(xGm.GetPhyAddr()),
-        const_cast<__gm__ T*>(yGm.GetPhyAddr()), const_cast<__gm__ T*>(zGm.GetPhyAddr()),
-        DataLenPerCore);
-}
-
 __simt_vf__ inline void floor_mod_simt_gm_contiguous(
-    __gm__ T* x, __gm__ T* y, __gm__ T* z, uint32_t inputTotalLength)
+    __gm__ int32_t* x, __gm__ int32_t* y, __gm__ int32_t* z, uint32_t inputTotalLength)
 {
-    for (uint32_t index = static_cast<uint32_t>(threadIdx.x); index < inputTotalLength;
-         index += static_cast<uint32_t>(blockDim.x)) {
-        T yValue = y[index];
+    for (uint32_t index = blockIdx.x * blockDim.x + threadIdx.x; index < inputTotalLength;
+         index += gridDim.x * blockDim.x) {
+        int32_t yValue = y[index];
         const auto rem = x[index] % yValue;
         bool signsDiffer = ((rem < 0) != (yValue < 0));
-        z[index] = (signsDiffer && (rem != 0)) ? rem + yValue : rem;
+        if (signsDiffer && (rem != 0)) {
+            z[index] = rem + yValue;
+        } else {
+            z[index] = rem;
+        }
     }
-}
-```
-
-**性能数据**：
-
-| Case | 实现方式 | 核数 | Task Duration(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
-|:---|:---|:---:|---:|---:|---:|---:|---:|---:|---:|
-| 0 | SIMT直接访问GM | 64 | 867.222 | 863.175 | 0.996 | 0.005 | 0.000 | 0.003 | 0.000 |
-
-**性能数据分析**：
-
-- 该Case的 `aiv_mte2_time` 和 `aiv_mte3_time` 接近0，说明数据读写没有走MTE2/MTE3的GM->UB/UB->GM搬运路径。
-- `Task Duration` 为 **867.222μs**，其中 `aiv_vec_time` 为 **863.175μs**，`aiv_vec_ratio` 达到 **0.996**，耗时主要集中在SIMT内部的GM读写和FloorMod计算上。
-
-**原理说明**：
-
-SIMT线程直接访问GM时，每个线程在计算过程中都需要从GM读取 `x`、`y`，并将结果写回GM，访问效率低，且数据搬运与计算耦合在同一段SIMT线程中，无法并行搬运和计算流水。
-
-本样例的输入、输出在GM上是连续排布的二维ND数据，适合使用连续块搬运。后续实现中引入SIMD编程范式中的DataCopy接口，GM->UB和UB->GM搬运使用DataCopy完成，搬运由MTE执行，可以按较大的连续数据块把GM数据搬入UB，再将UB中结果连续写回GM。相比SIMT线程逐元素直接访问GM，这种方式内存访问效率更高，也能并行化数据搬运和计算流水。
-
-**下一步优化方向**：
-
-当前Case作为纯SIMT直接访问GM的基准Case，用于展示纯SIMT实现样例的性能数据；下一步将引入SIMD/RegBase实现，使用连续DataCopy完成GM->UB和UB->GM搬运，并基于RegBase实现FloorMod计算，从而展示纯SIMD实现时样例的性能数据。
-
-### Case 1：SIMD RegBase计算
-
-**实现方式**：参考 `floor_mod_simd()` 函数实现。
-
-该实现使用DataCopy完成GM与UB之间的数据搬运，并在RegBase VF函数中通过 `LoadAlign` 将UB数据加载到寄存器，执行 `Div`、`Mul`、`Sub`、`Compare`、`Select` 等向量指令，最后通过 `StoreAlign` 写回UB。计算和搬运过程均通过SIMD实现。
-
-**关键代码**：
-
-```cpp
-__aicore__ inline void CopyIn(
-    uint32_t tileIdx, uint32_t count, AscendC::LocalTensor<T>& xLocal, AscendC::LocalTensor<T>& yLocal)
-{
-    uint32_t tileOffset = tileIdx * TileLength;
-    AscendC::DataCopy(xLocal, xGm[tileOffset], count);
-    AscendC::DataCopy(yLocal, yGm[tileOffset], count);
-}
-// SIMD Compute(UB)
-template <typename T>
-__simd_vf__ inline void floor_mod_simd(
-    __ubuf__ T* zAddr, __ubuf__ T* xAddr, __ubuf__ T* yAddr, const uint32_t count)
-{
-    constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(T);
-    uint16_t loopTimes = DivCeil(count, oneRepeatSize);
-    AscendC::Reg::RegTensor<T> xValue, yValue, modValue, tempValue, defaultValue, signValue;
-    AscendC::Reg::MaskReg mask, selectMask, adjustMask;
-    uint32_t maskCount = count;
-
-    AscendC::Reg::Duplicate(defaultValue, T(-1));
-    AscendC::Reg::Duplicate(signValue, FMOD_B32_SIGN);
-
-    for (uint16_t i = 0; i < loopTimes; i++) {
-        mask = AscendC::Reg::UpdateMask<T>(maskCount);
-        AscendC::Reg::LoadAlign(xValue, xAddr + i * oneRepeatSize);
-        AscendC::Reg::LoadAlign(yValue, yAddr + i * oneRepeatSize);
-        AscendC::Reg::Div(tempValue, xValue, yValue, mask);
-        AscendC::Reg::Mul(tempValue, yValue, tempValue, mask);
-        AscendC::Reg::Sub(modValue, xValue, tempValue, mask);
-        AscendC::Reg::Compares<T, AscendC::CMPMODE::NE>(selectMask, yValue, T(0), mask);
-        AscendC::Reg::Select(tempValue, modValue, defaultValue, selectMask);
-        AscendC::Reg::Add(modValue, tempValue, yValue, mask);
-        AscendC::Reg::Compares<T, AscendC::CMPMODE::NE>(adjustMask, tempValue, T(0), mask);
-        AscendC::Reg::And(xValue, tempValue, signValue, mask);
-        AscendC::Reg::And(yValue, yValue, signValue, mask);
-        AscendC::Reg::Compare<T, AscendC::CMPMODE::NE>(selectMask, xValue, yValue, mask);
-        AscendC::Reg::MaskAnd(adjustMask, selectMask, adjustMask, mask);
-        AscendC::Reg::Select(modValue, modValue, tempValue, adjustMask);
-        AscendC::Reg::StoreAlign(zAddr + i * oneRepeatSize, modValue, mask);
-    }
-}
-
-__aicore__ inline void CopyOut(uint32_t tileIdx, uint32_t count, AscendC::LocalTensor<T>& zLocal)
-{
-    uint32_t tileOffset = tileIdx * TileLength;
-    AscendC::DataCopy(zGm[tileOffset], zLocal, count);
 }
 ```
 
@@ -196,13 +114,98 @@ __aicore__ inline void CopyOut(uint32_t tileIdx, uint32_t count, AscendC::LocalT
 
 | Case | 实现方式 | 核数 | Task Duration(μs) | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
 |:---|:---|:---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 1 | SIMD RegBase | 64 | 532.144 | 531.270 | 523.082 | 0.985 | 3.544 | 0.007 | 237.127 | 0.446 | 55.417 | 0.104 |
+| 0 | SIMT直接访问GM | 64 | 810.809 | 810.040 | 806.258 | 0.995 | 0.854 | 0.001 | 0.004 | 0.000 | 0.001 | 0.000 |
 
 **性能数据分析**：
 
-- 相比Case 0，Case 1引入DataCopy完成GM->UB/UB->GM搬运，`Task Duration` 从 **867.222μs** 降到 **532.144μs**，端到端耗时下降 **38.6%**。
-- `Task Duration` 为 **532.144μs**，其中 `aiv_vec_time` 为 **523.082μs**，`aiv_vec_ratio` 达到 **98.5%**，说明耗时主要集中在 RegBase 向量计算路径上。
-- `aiv_mte2_ratio` 为 **44.6%**，`aiv_mte3_ratio` 为 **10.4%**，搬运耗时可以与计算过程形成一定重叠；当前主要瓶颈不是GM搬运过程，而是 FloorMod 计算本身的向量指令执行。
+- 该Case的 `aiv_mte2_time` 和 `aiv_mte3_time` 接近0，说明数据读写没有走MTE2/MTE3的GM->UB/UB->GM搬运路径。
+- `Task Duration` 为 **810.809μs**，其中 `aiv_vec_time` 为 **806.258μs**，`aiv_vec_ratio` 达到 **0.995**，耗时主要集中在SIMT内部的GM读写和FloorMod计算上。
+
+**原理说明**：
+
+SIMT线程直接访问GM时，每个线程在计算过程中都需要从GM读取 `x`、`y`，并将结果写回GM，访问效率低，且数据搬运与计算耦合在同一段SIMT线程中，无法并行搬运和计算流水。
+
+本样例的输入、输出在GM上是连续排布的二维ND数据，适合使用连续块搬运。后续实现中通过 `asc_copy_gm2ub_align` 和 `asc_copy_ub2gm_align` 完成GM->UB和UB->GM搬运，搬运由MTE执行，可以按较大的连续数据块把GM数据搬入UB，再将UB中结果连续写回GM。相比SIMT线程逐元素直接访问GM，这种方式内存访问效率更高，也能并行化数据搬运和计算流水。
+
+**下一步优化方向**：
+
+当前Case作为纯SIMT直接访问GM的基准Case，用于展示纯SIMT实现样例的性能数据；下一步将引入SIMD实现，使用搬运接口完成GM->UB和UB->GM搬运，并基于RegBase实现FloorMod计算，从而展示纯SIMD实现时样例的性能数据。
+
+### Case 1：SIMD RegBase计算
+
+**实现方式**：参考 `floor_mod_simd()` 函数实现。
+
+该实现使用 `asc_copy_gm2ub_align` 和 `asc_copy_ub2gm_align` 完成GM与UB之间的数据搬运，并在SIMD VF函数中通过 `asc_loadalign` 将UB数据加载到向量寄存器，执行 `Div`、`asc_mul`、`asc_sub`、`asc_ne`、`asc_select` 等向量指令，最后通过 `asc_storealign` 写回UB。计算和搬运过程均通过SIMD实现。
+
+**关键代码**：
+
+```cpp
+__aicore__ inline void process_tiles(
+    __gm__ int32_t* x, __gm__ int32_t* y, __gm__ int32_t* z, uint32_t computeMode)
+{
+    ...
+    for (uint32_t tileIdx = 0; tileIdx < TILE_NUM_PER_CORE; ++tileIdx) {
+        uint32_t tileOffset = tileIdx * TILE_LENGTH;
+        ...
+
+        asc_copy_gm2ub_align(xLocal, xGm + tileOffset, 1, tileBytes, 0, 0, false, CACHE_MODE_DISABLE, 0, 0);
+        asc_copy_gm2ub_align(yLocal, yGm + tileOffset, 1, tileBytes, 0, 0, false, CACHE_MODE_DISABLE, 0, 0);
+        ...
+        asc_vf_call<floor_mod_simd>(zLocal, xLocal, yLocal, TILE_LENGTH);
+        ...
+        asc_copy_ub2gm_align(zGm + tileOffset, zLocal, 1, tileBytes, 0, 0, 0);
+    }
+    ...
+}
+
+__simd_vf__ inline void floor_mod_simd(
+    __ubuf__ int32_t* zAddr, __ubuf__ int32_t* xAddr, __ubuf__ int32_t* yAddr, const uint32_t count)
+{
+    constexpr uint32_t oneRepeatSize = asc_get_vf_len() / sizeof(int32_t);
+    uint16_t loopTimes = DivCeil(count, oneRepeatSize);
+    vector_int32_t xValue, yValue, modValue, tempValue, defaultValue, signValue;
+    vector_bool mask, selectMask, adjustMask;
+    uint32_t maskCount = count;
+
+    asc_duplicate_scalar(defaultValue, int32_t(-1));
+    asc_duplicate_scalar(signValue, static_cast<int32_t>(FMOD_B32_SIGN));
+
+    for (uint16_t i = 0; i < loopTimes; i++) {
+        mask = asc_update_mask_b32(maskCount);
+        asc_loadalign(xValue, xAddr + i * oneRepeatSize);
+        asc_loadalign(yValue, yAddr + i * oneRepeatSize);
+        AscendC::Reg::Div(
+            reinterpret_cast<AscendC::Reg::RegTensor<int32_t>&>(tempValue),
+            reinterpret_cast<AscendC::Reg::RegTensor<int32_t>&>(xValue),
+            reinterpret_cast<AscendC::Reg::RegTensor<int32_t>&>(yValue),
+            reinterpret_cast<AscendC::Reg::MaskReg&>(mask));
+        asc_mul(tempValue, yValue, tempValue, mask);
+        asc_sub(modValue, xValue, tempValue, mask);
+        asc_ne_scalar(selectMask, yValue, int32_t(0), mask);
+        asc_select(tempValue, modValue, defaultValue, selectMask);
+        asc_add(modValue, tempValue, yValue, mask);
+        asc_ne_scalar(adjustMask, tempValue, int32_t(0), mask);
+        asc_and(xValue, tempValue, signValue, mask);
+        asc_and(yValue, yValue, signValue, mask);
+        asc_ne(selectMask, xValue, yValue, mask);
+        asc_and(adjustMask, selectMask, adjustMask, mask);
+        asc_select(modValue, modValue, tempValue, adjustMask);
+        asc_storealign(zAddr + i * oneRepeatSize, modValue, mask);
+    }
+}
+```
+
+**性能数据**：
+
+| Case | 实现方式 | 核数 | Task Duration(μs) | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
+|:---|:---|:---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | SIMD RegBase | 64 | 531.730 | 530.620 | 522.296 | 0.984 | 2.838 | 0.005 | 220.462 | 0.415 | 52.065 | 0.098 |
+
+**性能数据分析**：
+
+- 相比Case 0，Case 1引入MTE搬运完成GM->UB/UB->GM搬运，`Task Duration` 从 **810.809μs** 降到 **531.730μs**，端到端耗时下降 **34.4%**。
+- `Task Duration` 为 **531.730μs**，其中 `aiv_vec_time` 为 **522.296μs**，`aiv_vec_ratio` 达到 **98.4%**，说明耗时主要集中在 RegBase 向量计算路径上。
+- `aiv_mte2_ratio` 为 **41.5%**，`aiv_mte3_ratio` 为 **9.8%**，搬运耗时可以与计算过程形成一定重叠；当前主要瓶颈不是GM搬运过程，而是 FloorMod 计算本身的向量指令执行。
 
 **原理说明**：
 
@@ -212,39 +215,50 @@ FloorMod 计算不仅包含取余，还需要根据余数和除数的符号关�
 
 **下一步优化方向**：
 
-当前Case作为SIMD RegBase计算的基准Case，用于展示纯SIMD实现时样例的性能数据；下一步将在保留连续DataCopy搬运方式的基础上，使用SIMT优化Vector计算部分。
+当前Case作为SIMD计算的基准Case，用于展示纯SIMD实现时样例的性能数据；下一步将在保留连续GM<->UB搬运方式的基础上，使用SIMT优化Vector计算部分。
 
 ### Case 2：SIMT非连续访问UB
 
 **实现方式**：参考 `floor_mod_simt_non_contiguous()` 函数实现。
 
-该实现先通过DataCopy将GM中的 `x` 和 `y` 连续搬运到UB，然后采用SIMT编程方式实现计算过程，通过if else语句完成分支判断。每个线程处理一段连续的8个元素，同一个Warp内相邻线程访问的地址并不连续：
+该实现先通过 `asc_copy_gm2ub_align` 将GM中的 `x` 和 `y` 连续搬运到UB，然后采用SIMT编程方式实现计算过程，通过if else语句完成分支判断。每个线程处理一段连续的8个元素，同一个Warp内相邻线程访问的地址并不连续：
 
 **关键代码**：
 
 ```cpp
-// 单tile核心流程：CopyIn(GM->UB) -> SIMT Compute(UB) -> CopyOut(UB->GM)
-__aicore__ inline void CopyIn(
-    uint32_t tileIdx, uint32_t count, AscendC::LocalTensor<T>& xLocal, AscendC::LocalTensor<T>& yLocal)
+__aicore__ inline void process_tiles(
+    __gm__ int32_t* x, __gm__ int32_t* y, __gm__ int32_t* z, uint32_t computeMode)
 {
-    uint32_t tileOffset = tileIdx * TileLength;
-    AscendC::DataCopy(xLocal, xGm[tileOffset], count);
-    AscendC::DataCopy(yLocal, yGm[tileOffset], count);
+    ...
+    for (uint32_t tileIdx = 0; tileIdx < TILE_NUM_PER_CORE; ++tileIdx) {
+        uint32_t tileOffset = tileIdx * TILE_LENGTH;
+        constexpr uint32_t tileBytes = TILE_LENGTH * sizeof(int32_t);
+        ...
+
+        asc_sync_wait(PIPE_V, PIPE_MTE2, eventId);
+        asc_copy_gm2ub_align(xLocal, xGm + tileOffset, 1, tileBytes, 0, 0, false, CACHE_MODE_DISABLE, 0, 0);
+        asc_copy_gm2ub_align(yLocal, yGm + tileOffset, 1, tileBytes, 0, 0, false, CACHE_MODE_DISABLE, 0, 0);
+        ...
+
+        asc_vf_call<floor_mod_simt_non_contiguous>(dim3(THREAD_COUNT), xLocal, yLocal, zLocal, TILE_LENGTH);
+        asc_sync_data_barrier(mem_dsb_t::DSB_UB);
+        ...
+        asc_copy_ub2gm_align(zGm + tileOffset, zLocal, 1, tileBytes, 0, 0, 0);
+    }
+    ...
 }
 
-// SIMT Compute(UB)
-template <typename T, uint32_t TileLength>
 __simt_vf__ inline void floor_mod_simt_non_contiguous(
-    __ubuf__ T* x, __ubuf__ T* y, __ubuf__ T* z, uint32_t inputTotalLength)
+    __ubuf__ int32_t* x, __ubuf__ int32_t* y, __ubuf__ int32_t* z, uint32_t inputTotalLength)
 {
-    constexpr uint32_t elems_per_thread = TileLength / THREAD_COUNT;
+    constexpr uint32_t elems_per_thread = TILE_LENGTH / THREAD_COUNT;
     uint32_t tid = threadIdx.x;
     for (uint32_t i = 0; i < elems_per_thread; i++) {
         uint32_t index = tid * elems_per_thread + i;
         if (index >= inputTotalLength) {
             break;
         }
-        T yValue = y[index];
+        int32_t yValue = y[index];
         auto rem = x[index] % yValue;
         bool signsDiffer = ((rem < 0) != (yValue < 0));
         if (signsDiffer && (rem != 0)) {
@@ -254,25 +268,19 @@ __simt_vf__ inline void floor_mod_simt_non_contiguous(
         }
     }
 }
-
-__aicore__ inline void CopyOut(uint32_t tileIdx, uint32_t count, AscendC::LocalTensor<T>& zLocal)
-{
-    uint32_t tileOffset = tileIdx * TileLength;
-    AscendC::DataCopy(zGm[tileOffset], zLocal, count);
-}
 ```
 
 **性能数据**：
 
-| Case | 实现方式 | 核数 | Task Duration(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
-|:---|:---|:---:|---:|---:|---:|---:|---:|---:|---:|
-| 2 | SIMT非连续访问UB | 64 | 542.492 | 507.571 | 0.937 | 534.293 | 0.986 | 41.851 | 0.077 |
+| Case | 实现方式 | 核数 | Task Duration(μs) | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
+|:---|:---|:---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 2 | SIMT非连续访问UB | 64 | 539.328 | 538.250 | 504.561 | 0.937 | 2.938 | 0.005 | 530.529 | 0.986 | 42.139 | 0.078 |
 
 **性能数据分析**：
 
-- 相比Case 0，Case 2使用DataCopy完成GM->UB/UB->GM连续搬运，`Task Duration` 从 **867.222μs** 降到 **542.492μs**，端到端耗时下降 **37.4%**，说明引入UB中转后，直接GM访问带来的开销被明显缓解。
-- 相比Case 1，Case 2的 `aiv_vec_time` 从 **523.082μs** 降到 **507.571μs**，下降 **3.0%**，说明使用SIMT表达FloorMod的逐元素计算后，计算侧有一定收益。
-- 但Case 2的 `Task Duration` 比Case 1增加 **1.9%**，端到端没有取得优化收益。主要原因是 `aiv_mte2_time` 从Case 1的 **237.127μs** 增加到 **534.293μs**，增加 **125.3%**；`aiv_mte2_ratio` 也达到 **0.986**。
+- 相比Case 0，Case 2使用搬运接口完成GM->UB/UB->GM搬运，`Task Duration` 从 **810.809μs** 降到 **539.328μs**，端到端耗时下降 **33.5%**，说明引入UB中转后，直接GM访问带来的开销被明显缓解。
+- 相比Case 1，Case 2的 `aiv_vec_time` 从 **522.296μs** 降到 **504.561μs**，下降 **3.4%**，说明使用SIMT表达FloorMod的逐元素计算后，计算侧有一定收益。
+- 但Case 2的 `Task Duration` 比Case 1增加 **1.4%**，端到端没有取得优化收益。主要原因是 `aiv_mte2_time` 从Case 1的 **220.462μs** 增加到 **530.529μs**，增加 **140.6%**；`aiv_mte2_ratio` 也达到 **0.986**。
 
 **原理说明**：
 
@@ -288,33 +296,41 @@ Ascend 950PR/950DT的UB划分为16个bank、组织为8个bank group，每个bank
 
 **下一步优化方向**：
 
-Case 2虽然用SIMT改善了FloorMod的计算表达，但非连续UB访问把MTE2搬运时间显著拉长，导致端到端性能反而比纯SIMD RegBase实现更差。下一步将在保留 DataCopy连续搬运和SIMT计算表达的基础上，调整线程到数据的映射关系，把“每个线程处理一整段连续数据”改成“同一轮迭代中Warp内相邻线程访问连续元素”，使相邻线程落入同一条32B bank行，由一次行读取同时服务多个线程，提升UB访问效率。
+Case 2虽然用SIMT改善了FloorMod的计算表达，但非连续UB访问把MTE2搬运时间显著拉长，导致端到端性能反而比纯SIMD实现更差。下一步将在保留连续GM<->UB搬运和SIMT计算表达的基础上，调整线程到数据的映射关系，把“每个线程处理一整段连续数据”改成“同一轮迭代中Warp内相邻线程访问连续元素”，使相邻线程落入同一条32B bank行，由一次行读取同时服务多个线程，提升UB访问效率。
 
 ### Case 3：SIMT连续访问UB
 
 **实现方式**：参考 `floor_mod_simt_contiguous()` 函数实现。
 
-该实现同样通过DataCopy将GM中的 `x` 和 `y` 连续搬运到UB，但改变SIMT线程映射方式，让同一个Warp内相邻线程访问相邻元素：
+该实现同样通过 `asc_copy_gm2ub_align` 将GM中的 `x` 和 `y` 连续搬运到UB，但改变SIMT线程映射方式，让同一个Warp内相邻线程访问相邻元素：
 
 **关键代码**：
 
 ```cpp
-// 单tile核心流程：CopyIn(GM->UB) -> SIMT Compute(UB) -> CopyOut(UB->GM)
-__aicore__ inline void CopyIn(
-    uint32_t tileIdx, uint32_t count, AscendC::LocalTensor<T>& xLocal, AscendC::LocalTensor<T>& yLocal)
+__aicore__ inline void process_tiles(
+    __gm__ int32_t* x, __gm__ int32_t* y, __gm__ int32_t* z, uint32_t computeMode)
 {
-    uint32_t tileOffset = tileIdx * TileLength;
-    AscendC::DataCopy(xLocal, xGm[tileOffset], count);
-    AscendC::DataCopy(yLocal, yGm[tileOffset], count);
+    ...
+    for (uint32_t tileIdx = 0; tileIdx < TILE_NUM_PER_CORE; ++tileIdx) {
+        uint32_t tileOffset = tileIdx * TILE_LENGTH;
+        ...
+
+        asc_copy_gm2ub_align(xLocal, xGm + tileOffset, 1, tileBytes, 0, 0, false, CACHE_MODE_DISABLE, 0, 0);
+        asc_copy_gm2ub_align(yLocal, yGm + tileOffset, 1, tileBytes, 0, 0, false, CACHE_MODE_DISABLE, 0, 0);
+        ...
+        asc_vf_call<floor_mod_simt_contiguous>(dim3(THREAD_COUNT), xLocal, yLocal, zLocal, TILE_LENGTH);
+        asc_sync_data_barrier(mem_dsb_t::DSB_UB);
+        ...
+        asc_copy_ub2gm_align(zGm + tileOffset, zLocal, 1, tileBytes, 0, 0, 0);
+    }
+    ...
 }
-// SIMT Compute(UB)
-template <typename T>
+
 __simt_vf__ inline void floor_mod_simt_contiguous(
-    __ubuf__ T* x, __ubuf__ T* y, __ubuf__ T* z, uint32_t inputTotalLength)
+    __ubuf__ int32_t* x, __ubuf__ int32_t* y, __ubuf__ int32_t* z, uint32_t inputTotalLength)
 {
-    for (uint32_t index = static_cast<uint32_t>(threadIdx.x); index < inputTotalLength;
-         index += static_cast<uint32_t>(blockDim.x)) {
-        T yValue = y[index];
+    for (uint32_t index = threadIdx.x; index < inputTotalLength; index += blockDim.x) {
+        int32_t yValue = y[index];
         const auto rem = x[index] % yValue;
         bool signsDiffer = ((rem < 0) != (yValue < 0));
         if (signsDiffer && (rem != 0)) {
@@ -324,26 +340,20 @@ __simt_vf__ inline void floor_mod_simt_contiguous(
         }
     }
 }
-
-__aicore__ inline void CopyOut(uint32_t tileIdx, uint32_t count, AscendC::LocalTensor<T>& zLocal)
-{
-    uint32_t tileOffset = tileIdx * TileLength;
-    AscendC::DataCopy(zGm[tileOffset], zLocal, count);
-}
 ```
 
 **性能数据**：
 
-| Case | 实现方式 | 核数 | Task Duration(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
-|:---|:---|:---:|---:|---:|---:|---:|---:|---:|---:|
-| 3 | SIMT连续访问UB | 64 | **457.402** | **319.948** | 0.701 | 437.758 | 0.959 | 110.623 | 0.242 |
+| Case | 实现方式 | 核数 | Task Duration(μs) | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
+|:---|:---|:---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 3 | SIMT连续访问UB | 64 | **460.065** | 459.020 | **310.659** | 0.677 | 2.957 | 0.006 | 434.321 | 0.946 | 98.705 | 0.215 |
 
 **性能数据分析**：
 
-- 相比Case 2，Case 3仍然使用DataCopy完成GM->UB/UB->GM连续搬运，但把线程映射调整为Warp内相邻线程访问相邻元素，`Task Duration` 从 **542.492μs** 降到 **457.402μs**，端到端耗时下降 **15.7%**。
-- 相比Case 1，Case 3的 `Task Duration` 下降 **14.0%**。
-- `aiv_vec_time` 从Case 2的 **507.571μs** 降到 **319.948μs**，下降 **37.0%**。Case 3让Warp内相邻线程访问相邻元素，32个相邻线程落入连续的几条32B bank行，每条行一次读取即可同时服务该行内的多个线程，UB访问被合并、所需拍数减少；
-- `aiv_mte2_time` 从Case 2的 **534.293μs** 降到 **437.758μs**，下降 **18.1%**，说明连续访问已经缓解了SIMT计算阶段对MTE2的UB资源干扰；但 `aiv_mte2_ratio` 仍达到 **0.959**，说明当前主要瓶颈已经转移到MTE2搬运通路。
+- 相比Case 2，Case 3仍然使用搬运接口完成GM->UB/UB->GM搬运，但把线程映射调整为Warp内相邻线程访问相邻元素，`Task Duration` 从 **539.328μs** 降到 **460.065μs**，端到端耗时下降 **14.7%**。
+- 相比Case 1，Case 3的 `Task Duration` 下降 **13.5%**。
+- `aiv_vec_time` 从Case 2的 **504.561μs** 降到 **310.659μs**，下降 **38.4%**。Case 3让Warp内相邻线程访问相邻元素，32个相邻线程落入连续的几条32B bank行，每条行一次读取即可同时服务该行内的多个线程，UB访问被合并、所需拍数减少；
+- `aiv_mte2_time` 从Case 2的 **530.529μs** 降到 **434.321μs**，下降 **18.1%**，说明连续访问已经缓解了SIMT计算阶段对MTE2的UB资源干扰；但 `aiv_mte2_ratio` 仍达到 **0.946**，说明当前主要瓶颈已经转移到MTE2搬运通路。
 
 ## 性能对比总结
 
@@ -353,18 +363,18 @@ __aicore__ inline void CopyOut(uint32_t tileIdx, uint32_t count, AscendC::LocalT
 
 | Case | 实现方式 | 核数 | Task Duration(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio | 主要瓶颈 |
 |:---|:---|:---:|---:|---:|---:|---:|---:|---:|---:|:---|
-| 0 | SIMT直接访问GM | 64 | 867.222 | 863.175 | 0.996 | 0.005 | 0.000 | 0.003 | 0.000 | SIMT直接访问GM |
-| 1 | SIMD RegBase | 64 | 532.144 | 523.082 | 0.985 | 237.127 | 0.446 | 55.417 | 0.104 | Vec bound |
-| 2 | SIMT非连续访问UB | 64 | 542.492 | 507.571 | 0.937 | 534.293 | 0.986 | 41.851 | 0.077 | 跨bank行访问UB |
-| 3 | SIMT连续访问UB | 64 | **457.402** | **319.948** | 0.701 | 437.758 | 0.959 | 110.623 | 0.242 | MTE2 bound |
+| 0 | SIMT直接访问GM | 64 | 810.809 | 806.258 | 0.995 | 0.004 | 0.000 | 0.001 | 0.000 | SIMT直接访问GM |
+| 1 | SIMD RegBase | 64 | 531.730 | 522.296 | 0.984 | 220.462 | 0.415 | 52.065 | 0.098 | Vec bound |
+| 2 | SIMT非连续访问UB | 64 | 539.328 | 504.561 | 0.937 | 530.529 | 0.986 | 42.139 | 0.078 | 跨bank行访问UB |
+| 3 | SIMT连续访问UB | 64 | **460.065** | **310.659** | 0.677 | 434.321 | 0.946 | 98.705 | 0.215 | MTE2 bound |
 
 ### 优化要点总结
 
 | 优化手段 | 核心原理 | 样例体现 |
 |:---|:---|:---|
-| 使用SIMD处理连续数据搬运 | SIMT直接访问GM时，访问粒度和缓存路径可能导致带宽利用率低；先用DataCopy连续搬入UB，再由SIMT访问UB，可提升访问效率 | Case 3相比Case 0端到端耗时下降47.3% |
-| 使用SIMT处理分支判断 | 对带条件修正的逐元素计算，SIMD RegBase需要用多条Compare/Select/Mask指令表达分支，依赖链较长；SIMT可在线程内直接表达 `%` 和条件判断，减少向量掩码拼接分支逻辑的开销 | Case 2相比Case 1的 `aiv_vec_time` 下降3.0%；在连续访问后，Case 3相比Case 2的 `aiv_vec_time` 下降37.0% |
-| 调整线程映射使Warp内连续访问UB | UB按16 bank/8 bank group组织、每bank行32B，硬件每拍每个bank group读/写一行；让同一Warp内相邻线程访问相邻元素、落入同一条32B bank行，可由一次行读取同时服务多个线程，比“单个线程内部连续、相邻线程跨32B行”更高效 | Case 3将 `tid*8+i` 改为 `tid+i*1024` 形态，相比Case 2端到端耗时下降15.7% |
+| 使用SIMD处理连续数据搬运 | SIMT直接访问GM时，访问粒度和缓存路径可能导致带宽利用率低；先通过搬运接口搬入UB，再由SIMT访问UB，可提升访问效率 | Case 3相比Case 0端到端耗时下降43.3% |
+| 使用SIMT处理分支判断 | 对带条件修正的逐元素计算，SIMD RegBase需要用多条Compare/Select/Mask指令表达分支，依赖链较长；SIMT可在线程内直接表达 `%` 和条件判断，减少向量掩码拼接分支逻辑的开销 | Case 2相比Case 1的 `aiv_vec_time` 下降3.4%；在连续访问后，Case 3相比Case 2的 `aiv_vec_time` 下降38.4% |
+| 调整线程映射使Warp内连续访问UB | UB按16 bank/8 bank group组织、每bank行32B，硬件每拍每个bank group读/写一行；让同一Warp内相邻线程访问相邻元素、落入同一条32B bank行，可由一次行读取同时服务多个线程，比“单个线程内部连续、相邻线程跨32B行”更高效 | Case 3将 `tid*8+i` 改为 `tid+i*1024` 形态，相比Case 2端到端耗时下降14.7% |
 
 ---
 
