@@ -28,39 +28,70 @@
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
-矢量解包操作。对于无符号整型，将源操作数中低半部分或高半部分的元素以高位填0扩充位宽的方式写入目标操作数，对于有符号整型，将源操作数中低半部分或高半部分元素以保持符号位扩展位宽的方式写入目标操作数，对于布尔矢量，将源操作数中低半部分或高半部分的元素，保持其真值并维持原有的顺序，写入目标操作数。
+将src中低半部分或高半部分的元素以扩充位宽的方式写入dst，支持：
+
+- asc_unpack_lower：取src的低半部分（LOWER），每个元素高位填0扩充位宽后写入dst。
+- asc_unpack_upper：取src的高半部分（HIGHER），每个元素高位填0扩充位宽后写入dst。
+
+不同数据类型的扩充方式：
+- 无符号整型：高位填0扩充。例如vector_uint8_t到vector_uint16_t，src中每个uint8_t元素高位补0扩展为uint16_t。
+- 有符号整型：保持符号位扩充。例如vector_int8_t到vector_int16_t，src中每个int8_t元素按符号位扩展为int16_t。
+- bool类型（掩码寄存器）：将每bit展开为2bit，高位填0。
+
+矢量数据寄存器unpack流程如下图：
+
+![](../../figures/capi_unpack_reg.png)
+
+掩码数据寄存器unpack流程如下图：
+
+![](../../figures/capi_unpack_reg.png)
 
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_unpack_upper(vector_uint16_t& dst, vector_uint8_t src)
-__simd_callee__ inline void asc_unpack_lower(vector_uint16_t& dst, vector_uint8_t src)
-__simd_callee__ inline void asc_unpack_upper(vector_int16_t& dst, vector_int8_t src)
-__simd_callee__ inline void asc_unpack_lower(vector_int16_t& dst, vector_int8_t src)
-__simd_callee__ inline void asc_unpack_upper(vector_uint32_t& dst, vector_uint16_t src)
-__simd_callee__ inline void asc_unpack_lower(vector_uint32_t& dst, vector_uint16_t src)
-__simd_callee__ inline void asc_unpack_upper(vector_int32_t& dst, vector_int16_t src)
-__simd_callee__ inline void asc_unpack_lower(vector_int32_t& dst, vector_int16_t src)
-__simd_callee__ inline void asc_unpack_upper(vector_bool& dst, vector_bool src)
-__simd_callee__ inline void asc_unpack_lower(vector_bool& dst, vector_bool src)
-```
+- 解压缩低位
+
+    ```cpp
+    __simd_callee__ inline void asc_unpack_lower(vector_uint16_t& dst, vector_uint8_t src)
+    __simd_callee__ inline void asc_unpack_lower(vector_int16_t& dst, vector_int8_t src)
+    __simd_callee__ inline void asc_unpack_lower(vector_uint32_t& dst, vector_uint16_t src)
+    __simd_callee__ inline void asc_unpack_lower(vector_int32_t& dst, vector_int16_t src)
+    __simd_callee__ inline void asc_unpack_lower(vector_bool& dst, vector_bool src)
+    ```
+
+- 解压缩高位
+
+    ```cpp
+    __simd_callee__ inline void asc_unpack_upper(vector_uint16_t& dst, vector_uint8_t src)
+    __simd_callee__ inline void asc_unpack_upper(vector_int16_t& dst, vector_int8_t src)
+    __simd_callee__ inline void asc_unpack_upper(vector_uint32_t& dst, vector_uint16_t src)
+    __simd_callee__ inline void asc_unpack_upper(vector_int32_t& dst, vector_int16_t src)
+    __simd_callee__ inline void asc_unpack_upper(vector_bool& dst, vector_bool src)
+    ```
 
 ## 参数说明
 
-| 参数名  | 输入/输出 | 描述 |
-| :----- | :------- | :------- |
-| dst | 输出 | 目的操作数（矢量数据寄存器/掩码寄存器）。 |
-| src | 输入 | 源操作数（矢量数据寄存器/掩码寄存器）。 |
+**表1**  参数说明
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| src | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+
+## 数据类型
+
+**表2**  数据类型
+
+| src | dst |
+| --- | --- |
+| uint8_t | uint16_t |
+| int8_t | int16_t |
+| uint16_t | uint32_t |
+| int16_t | int32_t |
+| bool | bool |
 
 ## 返回值说明
 
 无
-
-## 流水类型
-
-PIPE_V
 
 ## 约束说明
 
@@ -68,9 +99,44 @@ PIPE_V
 
 ## 调用示例
 
-```cpp
-vector_uint16_t dst;
-vector_uint8_t src;
-asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
-asc_unpack_upper(dst, src);
-```
+- 对矢量数据寄存器操作
+
+    ```cpp
+    constexpr uint32_t one_src_repeat_size = 256 / sizeof(uint16_t);
+    constexpr uint32_t one_dst_repeat_size = 256 / sizeof(uint32_t);
+    uint32_t total_length = 256;
+    uint32_t repeat_time = total_length / one_src_repeat_size;
+    __simd_vf__ inline void unpack_vf(__ubuf__ uint32_t* dst_addr, __ubuf__ uint16_t* src_addr, uint32_t count, uint32_t one_src_repeat_size, uint32_t one_dst_repeat_size, uint16_t repeat_time)
+    {
+        vector_uint16_t dst;
+        vector_uint16_t src;
+        vector_bool mask = asc_create_mask_b32(PAT_ALL);
+        for (uint16_t i = 0; i < repeat_time; ++i) {
+            asc_loadalign(src, src_addr + i * one_src_repeat_size);
+            asc_unpack_lower(dst, src);
+            asc_storealign(dst_addr + i * one_dst_repeat_size, dst, mask);
+        }
+    }
+    ```
+
+- 对掩码寄存器操作
+
+    ```cpp
+    constexpr uint32_t one_repeat_size = 256 / sizeof(uint32_t);
+    uint32_t total_length = 256;
+    uint32_t repeat_time = total_length / one_repeat_size;
+    __simd_vf__ inline void unpack_vf(__ubuf__ uint32_t* dst_addr, __ubuf__ uint32_t* src_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
+    {
+        vector_uint32_t src;
+        vector_bool mask0 = asc_create_mask_b32(PAT_ALL);
+        vector_bool mask1;
+        vector_bool mask2;
+        asc_unpack_lower(mask1, mask0);
+        for (uint16_t i = 0; i < repeat_time; ++i) {
+            mask2 = asc_update_mask_b8(count);
+            asc_loadalign(src, src_addr + i * one_repeat_size);
+            asc_add_scalar(src, src, 0, mask1);
+            asc_storealign(dst_addr + i * one_repeat_size, dst, mask2);
+        }
+    }
+    ```
