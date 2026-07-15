@@ -213,7 +213,7 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_set_va_reg_impl.h"
 
 // ==========asc_update_addr_reg(b8/b16/b32)=========
-#define ASC_DEFINE_UPDATE_ADDR_REG_API(bxx)                                                                                \
+#define ASC_DEFINE_UPDATE_ADDR_REG_API(bxx)                                                                         \
     __simd_callee__ inline addr_reg asc_update_addr_reg_##bxx(uint32_t offset)                                      \
     {                                                                                                               \
         return asc_update_addr_reg_##bxx##_impl(offset);                                                            \
