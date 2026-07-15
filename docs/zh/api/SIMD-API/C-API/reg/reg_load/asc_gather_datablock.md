@@ -29,6 +29,9 @@
 头文件路径：`"c_api/reg_compute/reg_load.h"`。
 
 给定源操作数在UB中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
+
+![](../../figures/asc_gather_datablock.png)
+
 ## 函数原型
 
 - 支持掩码控制，允许选择性收集数据
@@ -79,12 +82,58 @@
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。 |
+| dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
 | src | 输入 | 源操作数（矢量）的起始地址。 |
-| index | 输入 | dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐。 |
-| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| index | 输入 | dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐。单位是元素个数，每个元素的源地址为index * sizeof(data\_type) + src。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。<br>类型为[vector\_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
+## 数据类型
+
+- 支持掩码控制，允许选择性收集数据
+
+| 目的操作数 | 源操作数 | 数据索引 |
+|-----|-----|-----|
+| int4x2_t | int4b_t | uint32_t |
+| int8_t | int8_t | uint32_t |
+| uint8_t | uint8_t | uint32_t |
+| fp4x2_e2m1_t | fp4x2_e2m1_t | uint32_t |
+| fp4x2_e1m2_t | fp4x2_e1m2_t | uint32_t |
+| hifloat8_t | hifloat8_t | uint32_t |
+| fp8_e8m0_t | fp8_e8m0_t | uint32_t |
+| fp8_e5m2_t | fp8_e5m2_t | uint32_t |
+| fp8_e4m3fn_t | fp8_e4m3fn_t | uint32_t |
+| int16_t | int16_t | uint32_t |
+| uint16_t | uint16_t | uint32_t |
+| half | half | uint32_t |
+| bfloat16_t | bfloat16_t | uint32_t |
+| int32_t | int32_t | uint32_t |
+| uint32_t | uint32_t | uint32_t |
+| float | float | uint32_t |
+| int64_t | int64_t | uint32_t |
+| uint64_t | uint64_t | uint32_t |
+
+- 无掩码控制，默认收集所有索引对应的数据块
+
+| 目的操作数 | 源操作数 | 数据索引 |
+|-----|-----|-----|
+| int4x2_t | int4b_t | uint32_t |
+| int8_t | int8_t | uint32_t |
+| uint8_t | uint8_t | uint32_t |
+| fp4x2_e2m1_t | fp4x2_e2m1_t | uint32_t |
+| fp4x2_e1m2_t | fp4x2_e1m2_t | uint32_t |
+| hifloat8_t | hifloat8_t | uint32_t |
+| fp8_e8m0_t | fp8_e8m0_t | uint32_t |
+| fp8_e5m2_t | fp8_e5m2_t | uint32_t |
+| fp8_e4m3fn_t | fp8_e4m3fn_t | uint32_t |
+| int16_t | int16_t | uint32_t |
+| uint16_t | uint16_t | uint32_t |
+| half | half | uint32_t |
+| bfloat16_t | bfloat16_t | uint32_t |
+| int32_t | int32_t | uint32_t |
+| uint32_t | uint32_t | uint32_t |
+| float | float | uint32_t |
+| int64_t | int64_t | uint32_t |
+| uint64_t | uint64_t | uint32_t |
 
 ## 返回值说明
 
