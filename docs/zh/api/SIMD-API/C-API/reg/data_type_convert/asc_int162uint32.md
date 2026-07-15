@@ -89,19 +89,20 @@ dst中未被mask筛选的位置被置为0。
 ## 调用示例
 
 ```cpp
-constexpr uint32_t one_repeat_size = 256 / sizeof(int16_t);
+constexpr uint32_t one_src_repeat_size = 256 / sizeof(int16_t);
+constexpr uint32_t one_dst_repeat_size = 256 / sizeof(uint32_t);
 uint32_t total_length = 256;
-uint32_t repeat_time = total_length / one_repeat_size;
-__simd_vf__ inline void int162uint32_vf(__ubuf__ uint32_t* dst_addr, __ubuf__ int16_t* src_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
+uint32_t repeat_time = total_length / one_src_repeat_size;
+__simd_vf__ inline void int162uint32_vf(__ubuf__ uint32_t* dst_addr, __ubuf__ int16_t* src_addr, uint32_t count, uint32_t one_src_repeat_size, uint32_t one_dst_repeat_size, uint16_t repeat_time)
 {
     vector_uint32_t dst;
     vector_int16_t src;
     vector_bool mask;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         mask = asc_update_mask_b16(count);
-        asc_loadalign(src, src_addr + i * one_repeat_size);
+        asc_loadalign(src, src_addr + i * one_src_repeat_size);
         asc_int162uint32(dst, src, mask);
-        asc_storealign(dst_addr + i * one_repeat_size, dst, mask);
+        asc_storealign(dst_addr + i * one_dst_repeat_size, dst, mask);
     }
 }
 ```
