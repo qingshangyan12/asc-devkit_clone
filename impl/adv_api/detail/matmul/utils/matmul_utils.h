@@ -143,7 +143,7 @@ struct GetMmDstType<bfloat16_t> {
 #endif
 
 #if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
-    (__NPU_ARCH__ == 3510) 
+    (__NPU_ARCH__ == 3510)
 template <>
 struct GetMmDstType<int4b_t> {
     using Type = int32_t;

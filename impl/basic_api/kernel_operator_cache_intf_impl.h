@@ -46,7 +46,7 @@ namespace AscendC {
 template <typename T>
 __aicore__ inline void DataCachePreload(const GlobalTensor<uint64_t> &src, const T cacheOffset)
 {
-#if (__NPU_ARCH__ == 3510) 
+#if (__NPU_ARCH__ == 3510)
     DataCachePreloadImpl((__gm__ uint64_t*)src.GetPhyAddr(), cacheOffset);
 #else
     DataCachePreloadImpl(src, cacheOffset);

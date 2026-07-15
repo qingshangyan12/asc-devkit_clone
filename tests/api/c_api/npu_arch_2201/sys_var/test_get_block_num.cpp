@@ -13,7 +13,7 @@
 #include "tests/api/c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 
-class TestGetBlockNum : public testing::Test { 
+class TestGetBlockNum : public testing::Test {
 protected:
     void SetUp() {}
     void TearDown() {}
@@ -27,7 +27,7 @@ int64_t get_block_num_Stub() {
 
 TEST_F(TestGetBlockNum, c_api_asc_get_block_num_Succ)
 {
-    MOCKER_CPP(get_block_num, int64_t(void)) 
+    MOCKER_CPP(get_block_num, int64_t(void))
             .times(1)
             .will(invoke(get_block_num_Stub));
     asc_get_block_num();

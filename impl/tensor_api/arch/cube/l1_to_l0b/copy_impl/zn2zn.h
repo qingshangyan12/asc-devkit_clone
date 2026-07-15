@@ -79,11 +79,11 @@ private:
         uint16_t mStartPosition = 0;
         uint16_t kStartPosition = 0;
         auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstNoBatchLayout);
-        auto kStep = Get<0>(dstLayout.Shape()) * 
+        auto kStep = Get<0>(dstLayout.Shape()) *
                      GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstNoBatchLayout);
         // Zn -> Zn
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
- 	    auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcNoBatchLayout) / STRIDE_UNIT;
+        auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcNoBatchLayout) / STRIDE_UNIT;
         auto dstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstNoBatchLayout) / STRIDE_UNIT;
         LoadCbufToCb::LoadData<false>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
     }

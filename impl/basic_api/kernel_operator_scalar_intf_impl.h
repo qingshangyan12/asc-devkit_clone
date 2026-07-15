@@ -87,7 +87,7 @@ __aicore__ inline U ScalarCast(T valueIn)
     return ScalarCastImpl<T, U, roundMode>(valueIn);
 }
 
-#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) 
+#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510)
 template <typename T>
 __aicore__ inline void WriteGmByPassDCache(__gm__ T* addr, T value)
 {

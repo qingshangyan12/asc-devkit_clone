@@ -373,7 +373,7 @@ public:
         cpuL0C = new uint8_t[bufferInitLen.at(Hardware::L0C)];
         cpuBIAS = new uint8_t[bufferInitLen.at(Hardware::BIAS)];
         cpuFIXBUF = new uint8_t[bufferInitLen.at(Hardware::FIXBUF)];
-#if (__NPU_ARCH__ == 3510) 
+#if (__NPU_ARCH__ == 3510)
         cpuSSbuf = nullptr;
         if (g_kernelMode != KernelMode::MIX_MODE) {
             cpuUB = new uint8_t[bufferInitLen.at(Hardware::UB)];

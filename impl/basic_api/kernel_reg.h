@@ -472,7 +472,7 @@ __aicore__ inline void SetAippFunctionsImpl9(AippInputFormat format, AippParams<
 template <typename T>
 __aicore__ inline void SetAippFunctionsImpl18(AippParams<T>& config)
 {
-#if __NPU_ARCH__ != 3002 
+#if __NPU_ARCH__ != 3002
     return;
 #endif
     float dtcVarCh0f = static_cast<float>(config.dtcParams.dtcVarCh0);
@@ -489,7 +489,7 @@ __aicore__ inline void SetAippFunctionsImpl18(AippParams<T>& config)
 template <typename T>
 __aicore__ inline void SetAippFunctionsImpl19(AippParams<T>& config)
 {
-#if __NPU_ARCH__ != 3002 
+#if __NPU_ARCH__ != 3002
     return;
 #endif
     float dtcVarCh2f = static_cast<float>(config.dtcParams.dtcVarCh2);
@@ -501,7 +501,7 @@ __aicore__ inline void SetAippFunctionsImpl19(AippParams<T>& config)
 template <typename T>
 __aicore__ inline void SetAippFunctionsImpl20(AippParams<T>& config)
 {
-#if __NPU_ARCH__ != 3002 
+#if __NPU_ARCH__ != 3002
     return;
 #endif
     float dtcMeanCh0f = static_cast<float>(config.dtcParams.dtcMeanCh0 * 1.0f);
@@ -519,7 +519,7 @@ __aicore__ inline void SetAippFunctionsImpl20(AippParams<T>& config)
 template <typename T>
 __aicore__ inline void SetAippFunctionsImpl21(AippParams<T>& config)
 {
-#if __NPU_ARCH__ != 3002 
+#if __NPU_ARCH__ != 3002
     return;
 #endif
     float dtcMeanCh2f = static_cast<float>(config.dtcParams.dtcMeanCh2 * 1.0f);

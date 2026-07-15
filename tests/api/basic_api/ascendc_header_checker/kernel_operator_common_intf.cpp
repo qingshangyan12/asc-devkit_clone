@@ -56,7 +56,7 @@ extern "C" __global__ __aicore__ void KernelTestCheckLocalMemoryIA1() {
     AscendC::CheckLocalMemoryIA(checkParams);
 }
 
-#if (__NPU_ARCH__ == 3510) 
+#if (__NPU_ARCH__ == 3510)
 // template <SpecialPurposeReg spr>
 // __aicore__ inline int64_t GetSpr();
 extern "C" __global__ __aicore__ void KernelTestGetSpr1() {

@@ -142,7 +142,7 @@ __aicore__ inline uint32_t DataCopyGetPhyStartIndex(
     return phyStartIndex;
 }
 
-#if (__NPU_ARCH__ == 3510) 
+#if (__NPU_ARCH__ == 3510)
 template <typename T, bool enableSmallC0 = false>
 __aicore__ inline void DataCopyGM2L1ND2NZ(const LocalTensor<T>& dst, const GlobalTensor<T>& src,
     const Nd2NzParams& intriParams)

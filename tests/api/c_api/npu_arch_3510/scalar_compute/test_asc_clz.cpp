@@ -13,7 +13,7 @@
 #include "tests/api/c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 
-class TestClz : public testing::Test { 
+class TestClz : public testing::Test {
 protected:
     void SetUp() {}
     void TearDown() {}
@@ -28,7 +28,7 @@ int64_t clz_Stub(uint64_t value_in) {
 TEST_F(TestClz, c_api_asc_clz_Succ)
 {
     uint64_t input = 1;
-    MOCKER_CPP(clz, int64_t(uint64_t)) 
+    MOCKER_CPP(clz, int64_t(uint64_t))
             .times(1)
             .will(invoke(clz_Stub));
     asc_clz(input);

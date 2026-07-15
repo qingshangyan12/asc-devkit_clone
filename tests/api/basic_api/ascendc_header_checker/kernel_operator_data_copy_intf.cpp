@@ -30,7 +30,7 @@ extern "C" __global__ __aicore__ void KernelTestDataCopy2() {
     AscendC::DataCopy(dst, src, intriParams);
 }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) 
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002)
 // __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const Nd2NzParams& intriParams);
 extern "C" __global__ __aicore__ void KernelTestDataCopy3() {
     AscendC::LocalTensor<float> dst;
@@ -40,7 +40,7 @@ extern "C" __global__ __aicore__ void KernelTestDataCopy3() {
 }
 #endif
 
-#if (__NPU_ARCH__ == 3510) 
+#if (__NPU_ARCH__ == 3510)
 // __aicore__ inline __inout_pipe__(MTE2) void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Dn2NzParams& intriParams);
 extern "C" __global__ __aicore__ void KernelTestDataCopy4() {
     AscendC::LocalTensor<float> dst;
@@ -96,7 +96,7 @@ extern "C" __global__ __aicore__ void KernelTestCopy2() {
     AscendC::Copy(dst, src, mask, repeatTime, repeatParams);
 }
 
-#if (__NPU_ARCH__ == 3510) 
+#if (__NPU_ARCH__ == 3510)
 // __aicore__ inline __inout_pipe__(V) void Copy(const LocalTensor<T> &dst, const LocalTensor<T> &src, const uint32_t count);
 extern "C" __global__ __aicore__ void KernelTestCopy3() {
     AscendC::LocalTensor<float> dst;
@@ -330,7 +330,7 @@ extern "C" __global__ __aicore__ void KernelTestSetPadValue1() {
     AscendC::SetPadValue(paddingValue);
 }
 
-#if (__NPU_ARCH__ == 3510) 
+#if (__NPU_ARCH__ == 3510)
 // __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const GlobalTensor<T> &src, const MultiCopyParams<T, dim> &params);
 extern "C" __global__ __aicore__ void KernelTestDataCopy26() {
     AscendC::LocalTensor<float> dst;

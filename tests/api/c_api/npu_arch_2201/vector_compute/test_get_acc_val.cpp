@@ -13,7 +13,7 @@
 #include "tests/api/c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 
-class TestGetAccVal : public testing::Test { 
+class TestGetAccVal : public testing::Test {
 protected:
     void SetUp() {}
     void TearDown() {}
@@ -27,7 +27,7 @@ int64_t get_acc_val_Stub() {
 
 TEST_F(TestGetAccVal, c_api_asc_get_acc_val_Succ)
 {
-    MOCKER_CPP(get_acc_val, int64_t(void)) 
+    MOCKER_CPP(get_acc_val, int64_t(void))
             .times(1)
             .will(invoke(get_acc_val_Stub));
     asc_get_acc_val();

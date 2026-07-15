@@ -13,7 +13,7 @@
 #include "tests/api/c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 
-class TestINITINSTR : public testing::Test { 
+class TestINITINSTR : public testing::Test {
 protected:
     void SetUp() {}
     void TearDown() {}
@@ -26,7 +26,7 @@ void asc_init_Stub() {
 
 TEST_F(TestINITINSTR, c_api_asc_init_Succ)
 {
-    MOCKER_CPP(set_atomic_none) 
+    MOCKER_CPP(set_atomic_none)
             .times(1)
             .will(invoke(asc_init_Stub));
     asc_init();

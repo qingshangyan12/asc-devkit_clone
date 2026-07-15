@@ -79,4 +79,3 @@ TEST(TestSysConstants, PublicConstantsMatchArch)
 }
 
 } // namespace
-

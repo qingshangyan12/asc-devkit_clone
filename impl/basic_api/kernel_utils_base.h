@@ -82,7 +82,7 @@ public:
         } else {
             set_vector_mask(static_cast<uint64_t>(-1), static_cast<uint64_t>(-1));
         }
-    #elif (__NPU_ARCH__ == 3510) 
+    #elif (__NPU_ARCH__ == 3510)
         set_mask_norm();
         Internal::g_deqValue = static_cast<half>(1);
         uint64_t prevCtrl = get_ctrl() & 0x1000000000000;

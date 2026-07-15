@@ -49,7 +49,7 @@ __aicore__ inline void BilinearInterpolationCheck(const LocalTensor<T> &src0, co
     uint32_t sharedTmpBufferSize = sharedTmpBuffer.GetSize();
 #if __NPU_ARCH__ == 2201
     uint32_t expectedTmpBufferSize = (src0.GetSize() + src1.GetSize()) * 32;
-#elif (__NPU_ARCH__ == 3510) 
+#elif (__NPU_ARCH__ == 3510)
     uint32_t expectedTmpBufferSize = 0;
 #else
     uint32_t expectedTmpBufferSize = src0Offset.GetSize() * sizeof(uint32_t);

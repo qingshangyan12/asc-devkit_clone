@@ -28,7 +28,7 @@ namespace Impl {
 namespace Detail {
 
 #if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
-    (__NPU_ARCH__ == 3510) 
+    (__NPU_ARCH__ == 3510)
 const static uint8_t FIX_PIPE_UNIT_FLAG = 3;
 
 template <class A_TYPE, class C_TYPE, const auto& MM_CFG, FixpipeParamsType version>

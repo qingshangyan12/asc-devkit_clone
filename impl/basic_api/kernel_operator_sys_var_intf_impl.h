@@ -41,7 +41,7 @@
 #include "dav_l311/kernel_operator_sys_var_impl.h"
 #endif
 
-#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) 
+#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510)
 #ifdef __SUPER_KERNEL_DYNAMIC_BLOCK_NUM__
 __BLOCK_LOCAL__ __inline__ uint32_t g_super_kernel_dynamic_block_num;
 #endif

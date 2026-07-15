@@ -267,7 +267,7 @@ __aicore__ inline void asc_mmad_sync(__cc__ int32_t* c_matrix, __ca__ int8_t* a_
 __aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ hifloat8_t* a_matrix, __cb__ hifloat8_t* b_matrix,
                                         uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag,
                                         bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
-        
+
 __aicore__ inline void asc_mmad_sync(__cc__ float* c_matrix, __ca__ hifloat8_t* a_matrix, __cb__ hifloat8_t* b_matrix,
                                              uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag,
                                              bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);

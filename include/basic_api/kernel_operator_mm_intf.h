@@ -88,7 +88,7 @@ template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParamsV2& loadDataParams);
 
-#if (__NPU_ARCH__ == 3510) 
+#if (__NPU_ARCH__ == 3510)
 template <typename T, typename U = T>
 __aicore__ inline void LoadData(
     const LocalTensor<U>& dst, const LocalTensor<T>& src, const LocalTensor<fp8_e8m0_t>& srcMx,

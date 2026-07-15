@@ -136,7 +136,7 @@ __aicore__ inline void IBSet(const GlobalTensor<int32_t> &gmWorkspace,
 {
     int32_t blockNum = GetBlockNum();
 #if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
-#if (__NPU_ARCH__ != 5102) 
+#if (__NPU_ARCH__ != 5102)
     if ASCEND_IS_AIC {
         return;
     }
@@ -231,7 +231,7 @@ __aicore__ inline void SyncAll(const GlobalTensor<int32_t> &gmWorkspace,
 #endif
 }
 
-#if (__NPU_ARCH__ == 3510) 
+#if (__NPU_ARCH__ == 3510)
 template<bool isAIVOnly, const SyncAllConfig& config>
 __aicore__ inline void SyncAll()
 {
@@ -257,7 +257,7 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
     WaitEventImpl<modeId, pipe>(flagId);
 }
 
-#if (__NPU_ARCH__ == 3510) 
+#if (__NPU_ARCH__ == 3510)
 template <pipe_t pipe, uint8_t subBlockSyncMode = 2>
 __aicore__ inline void NotifyEvent(uint16_t flagId)
 {
