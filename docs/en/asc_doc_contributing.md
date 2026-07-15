@@ -38,7 +38,7 @@ If you find that certain content is missing or incomplete in the documentation (
 
 If you have practical experience with Ascend C operator performance optimization to share:
 
-1. Refer to existing tuning case structures under `算子实践参考/优秀实践/` 
+1. Refer to existing tuning case structures under `算子实践参考/优秀实践/`
 2. Write documentation following the "Performance Optimization Case Writing Convention" in this guide
 3. Submit a PR
 
