@@ -18,7 +18,6 @@
 #ifndef ASCENDC_CPU_DEBUG
 #include "impl/utils/debug/asc_debug_utils.h"
 
-#if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #if __NPU_ARCH__ == 2002
 #include "impl/utils/debug/npu_arch_2002/asc_aicore_printf_utils.h"
 #elif __NPU_ARCH__ == 2201
@@ -30,6 +29,7 @@
 #endif
 
 namespace __asc_aicore {
+#if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T>
 __aicore__ inline void set_scalar_param(__gm__ uint8_t* paramAddr, uint32_t paramIdx, T scalar)
 {
@@ -276,8 +276,6 @@ inline __aicore__ void printf_impl_assert_msg(
     set_ctrl(ctrlValue);
 #endif
 }
-
-} // namespace __asc_aicore
 #else
 template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args) {}
@@ -293,6 +291,7 @@ inline __aicore__ void printf_impl_assert_msg(
     const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line, const __gm__ char* __function,
     const __gm__ char* fmt, Args&&... args) {}
 #endif
+} // namespace __asc_aicore
 #else
 #include <cstdio>
 namespace __asc_aicore {
