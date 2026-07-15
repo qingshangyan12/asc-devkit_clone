@@ -16,6 +16,7 @@
 #define IMPL_UTILS_DEBUG_ASC_AICORE_PRINTF_IMPL_H
 
 #ifndef ASCENDC_CPU_DEBUG
+#if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #include "impl/utils/debug/asc_debug_utils.h"
 
 #if __NPU_ARCH__ == 2002
@@ -277,6 +278,13 @@ inline __aicore__ void printf_impl_assert_msg(
 }
 
 } // namespace __asc_aicore
+#else
+template <class... Args>
+__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args) {}
+
+template <class... Args>
+__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args) {}
+#endif
 #else
 #include <cstdio>
 namespace __asc_aicore {
