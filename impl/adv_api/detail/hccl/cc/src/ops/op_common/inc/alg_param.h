@@ -29,6 +29,7 @@
 namespace mc2_ops_hccl {
 
 constexpr uint64_t UB_MAX_DATA_SIZE = 256 * 1024 * 1024; // Byte, UB协议一次传输的最大size
+constexpr uint64_t AICPU_ALIGN_SIZE = 4096;
 
 constexpr u32 HCCL_LOGIC_TOPO_LEVEL_NUM = 4; // HCCL逻辑拓扑层级最多4级
 
