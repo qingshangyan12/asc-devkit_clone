@@ -26,10 +26,6 @@
 
 #include "tensor_api/algorithm/copy.h"
 #include "tensor_api/algorithm/mmad.h"
-#include "tensor_api/algorithm/vector_compute.h"
-#include "tensor_api/algorithm/reg_load.h"
-#include "tensor_api/algorithm/mask_ops.h"
-#include "tensor_api/reg/reg_tensor.h"
 #include "tensor_api/arch/arch.h"
 #include "tensor_api/atom/atom.h"
 #include "tensor_api/tensor/layout.h"

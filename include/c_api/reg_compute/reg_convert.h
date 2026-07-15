@@ -202,7 +202,7 @@ __simd_callee__ inline void asc_half2int8_rna_v2(vector_int8_t& dst, vector_half
 
 __simd_callee__ inline void asc_half2int8_rna_sat_v2(vector_int8_t& dst, vector_half src, vector_bool mask);
 
-// ==========asc_half2hif8(rh/rna)==========
+// ==========asc_half2int8(rh/rna)==========
 __simd_callee__ inline void asc_half2hif8_rh(vector_hifloat8_t& dst, vector_half src, vector_bool mask);
 
 __simd_callee__ inline void asc_half2hif8_rh_sat(vector_hifloat8_t& dst, vector_half src, vector_bool mask);
