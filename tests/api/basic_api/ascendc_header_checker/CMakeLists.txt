@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.16)
 project(HeaderChecker)
 
 set(INCLUDE_PATHS ${ASCENDC_DIR})
+set(SIMD_VF_DEBUG_TEST_PRELUDE
+    ${CMAKE_CURRENT_SOURCE_DIR}/simd_vf_debug/simd_vf_debug_test_prelude.h)
 
 if (TARGET tikcfw_headers)
     message(STATUS "tikcfw_headers target exists, gathering its include dirs")
@@ -157,7 +159,7 @@ function(create_check_targets NPU_MODE MODE_SUFFIX MODE_DEFINES)
 
             add_custom_target(${TARGET_NAME}
                 COMMAND ${COMPILER} ${COMPILER_FLAGS} ${INC_FLAGS} ${ALL_DEFINES}
-                    -fsyntax-only ${TEST_FILE} ${ARCH_FLAG}
+                    -include ${SIMD_VF_DEBUG_TEST_PRELUDE} -fsyntax-only ${TEST_FILE} ${ARCH_FLAG}
                 COMMENT "Checking (${COMPILER_TYPE})${MODE_SUFFIX} ${CONFIG_NAME} ${REL_TEST_FILE}"
                 VERBATIM
                 USES_TERMINAL
