@@ -623,8 +623,9 @@ HcclResult ParseIntraLinkType()
     // 只配置了roce的环境变量
     if (intraPcieEnv == "EmptyString" && intraRoceEnv != "EmptyString") {
         if (intraRoce == 0) { // roce环境变量值为0，报错
-            HCCL_ERROR("[Parse][IntraLinkType]only set HCCL_INTRA_ROCE_ENABLE, and the val is zero, pls set "
-                       "HCCL_INTRA_PCIE_ENABLE");
+            HCCL_ERROR(
+                "[Parse][IntraLinkType]only set HCCL_INTRA_ROCE_ENABLE, and the val is zero, pls set "
+                "HCCL_INTRA_PCIE_ENABLE");
             return HCCL_E_PARA;
         } else { // roce环境变量值为1，走roce
             intraPcie = 0;
@@ -638,8 +639,9 @@ HcclResult ParseIntraLinkType()
     // 只配置了pcie的环境变量
     if (intraPcieEnv != "EmptyString" && intraRoceEnv == "EmptyString") {
         if (intraPcie == 0) { // pcie环境变量值为0，报错
-            HCCL_ERROR("[Parse][IntraLinkType]only set HCCL_INTRA_PCIE_ENABLE, and the val is zero, pls set "
-                       "HCCL_INTRA_ROCE_ENABLE");
+            HCCL_ERROR(
+                "[Parse][IntraLinkType]only set HCCL_INTRA_PCIE_ENABLE, and the val is zero, pls set "
+                "HCCL_INTRA_ROCE_ENABLE");
             return HCCL_E_PARA;
         }
         HCCL_RUN_INFO(
@@ -969,6 +971,8 @@ const bool& GetExternalInputInterSuperPodRetryEnable()
 }
 
 const bool& GetExternalInputHcclEnableEntryLog() { return g_algEnvConfig.enableEntryLog; }
+
+const u8& GetExternalInputHcclDeterministic() { return g_algEnvConfig.hcclDeterministic; }
 
 bool RunIndependentOpExpansion(DevType deviceType)
 {

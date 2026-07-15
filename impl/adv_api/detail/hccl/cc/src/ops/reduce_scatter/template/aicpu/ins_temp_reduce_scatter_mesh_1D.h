@@ -34,8 +34,7 @@ public:
     }
 
     HcclResult KernelRun(
-        const OpParam& param, const TemplateDataParams& tempAlgParams,
-        const TemplateResource& templateResource) override;
+        const OpParam& param, const TemplateDataParams& tempAlgParams, TemplateResource& templateResource) override;
     HcclResult CalcRes(
         HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
         AlgResourceRequest& resourceRequest) override;
@@ -52,13 +51,8 @@ protected:
     HcclResult RunReduceScatter(
         const std::map<u32, std::vector<ChannelInfo>>& channels, const std::vector<ThreadHandle>& threads,
         const TemplateDataParams& tempAlgParam);
-    virtual HcclResult CalcDataSplitByPortGroup(
-        const u64 totalDataCount, const u64 dataTypeSize, const std::vector<ChannelInfo>& channels,
-        std::vector<u64>& elemCountOut, std::vector<u64>& sizeOut, std::vector<u64>& elemOffset);
-    virtual HcclResult SetchannelsPerRank(const std::map<u32, std::vector<ChannelInfo>>& channels);
     u64 processSize_{0};
     u64 count_{0};
-    u32 channelsPerRank_{1};
     std::vector<u64> elemCountOut_;
     std::vector<u64> sizeOut_;
     std::vector<u64> elemOffset_;

@@ -24,6 +24,8 @@ public:
 
     HcclResult Orchestrate(const OpParam& param, const AlgResourceCtxSerializable& resCtx) override;
 
+    /* *************** 资源计算 *************** */
+
     HcclResult CalcRes(
         HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
         const AlgHierarchyInfoForAllLevel& algHierarchyInfo, AlgResourceRequest& resourceRequest) override;
@@ -32,6 +34,7 @@ public:
         HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo, AlgHierarchyInfoForAllLevel& algHierarchyInfo) override;
 
 protected:
+    /* *************** 算法编排 *************** */
     HcclResult OrchestrateLoop(const OpParam& param, const AlgResourceCtxSerializable& resCtx);
     HcclResult InitCommInfo(
         const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
@@ -59,4 +62,4 @@ protected:
 };
 } // namespace mc2_ops_hccl
 
-#endif // HCCLV2_INS_V2_REDUCE_SCATTER_SEQUENCE_EXECUTOR_AICPU_H
+#endif

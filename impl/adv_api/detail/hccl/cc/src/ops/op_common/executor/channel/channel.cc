@@ -663,6 +663,14 @@ HcclResult CalcChannelRequestNHRWithPriorityTopo(
     return HCCL_SUCCESS;
 }
 
+HcclResult CalcChannelRequestNhrMultiJetty(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels, bool isIsolation)
+{
+    (void)isIsolation;
+    return CalcChannelRequestNhr(comm, param, topoInfo, subcommInfo, channels);
+}
+
 HcclResult CreateChannelRequestByRankId(
     HcclComm comm, const OpParam& param, u32 myRank, u32 remoteRank, std::vector<HcclChannelDesc>& channels,
     u32 channelRepeatNum)

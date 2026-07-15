@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+
 #ifndef HCCLV2_INS_V2_REDUCE_SCATTER_SOLE_EXECUTOR_H
 #define HCCLV2_INS_V2_REDUCE_SCATTER_SOLE_EXECUTOR_H
 
@@ -33,7 +34,7 @@ public:
         HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo, AlgHierarchyInfoForAllLevel& algHierarchyInfo) override;
 
 #ifndef AICPU_COMPILE
-    HcclResult FastLaunch(const OpParam& param, const CcuFastLaunchCtx* resCtx) override;
+    HcclResult FastLaunch(const OpParam& param, const CcuFastLaunchCtx* fastLaunchCtx) override;
     HcclResult FastLaunchSaveCtx(const OpParam& param, const TemplateResource& templateAlgRes);
 #endif
 

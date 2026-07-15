@@ -32,19 +32,14 @@ public:
         return info;
     }
     HcclResult KernelRun(
-        const OpParam& param, const TemplateDataParams& tempAlgParams,
-        const TemplateResource& templateResource) override;
+        const OpParam& param, const TemplateDataParams& tempAlgParams, TemplateResource& templateResource) override;
     HcclResult CalcRes(
         HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
         AlgResourceRequest& resourceRequest) override;
-    virtual HcclResult GetRes(AlgResourceRequest& resourceRequest) const;
+    HcclResult GetRes(AlgResourceRequest& resourceRequest) const override;
 
     u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
-    virtual u64 GetThreadNum() const;
-    virtual HcclResult CalcDataSplitByPortGroup(
-        const u64 totalDataCount, const u64 dataTypeSize, const std::vector<ChannelInfo>& channels,
-        std::vector<u64>& elemCountOut, std::vector<u64>& sizeOut, std::vector<u64>& elemOffset);
-    virtual HcclResult SetchannelsPerRank(const std::map<u32, std::vector<ChannelInfo>>& channels);
+    u64 GetThreadNum() const override;
     void GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMianToSub) override;
     void GetNotifyIdxSubToMain(std::vector<u32>& notifyIdxSubToMain) override;
 
@@ -56,9 +51,8 @@ protected:
     TemplateDataParams tempAlgParams_;
     u64 inputOffset_{0};
     u64 outputOffset_{0};
-    void* inputSymWindow_{nullptr};
-    void* outputSymWindow_{nullptr};
-    u32 channelsPerRank_{1};
+    void* inputSymWindow_;
+    void* outputSymWindow_;
 };
 
 } // namespace mc2_ops_hccl

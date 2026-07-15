@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+
 #ifndef INS_TEMP_REDUCE_SCATTER_AICPU_REDUCE_NHR_H
 #define INS_TEMP_REDUCE_SCATTER_AICPU_REDUCE_NHR_H
 
@@ -37,8 +38,7 @@ public:
         AlgResourceRequest& resourceRequest) override;
     HcclResult GetRes(AlgResourceRequest& resourceRequest) const override;
     HcclResult KernelRun(
-        const OpParam& param, const TemplateDataParams& tempAlgParams,
-        const TemplateResource& templateResource) override;
+        const OpParam& param, const TemplateDataParams& tempAlgParams, TemplateResource& templateResource) override;
     u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
     u64 GetThreadNum() const override;
 
@@ -55,6 +55,7 @@ private:
     HcclResult LocalCopyToOutput(const std::vector<ThreadHandle>& threads, u32 sliceIdx);
     TemplateDataParams tempAlgParams_;
     std::map<u32, std::vector<ChannelInfo>> channels_;
+    bool isDmaRead_{false};
 };
 
 } // namespace mc2_ops_hccl

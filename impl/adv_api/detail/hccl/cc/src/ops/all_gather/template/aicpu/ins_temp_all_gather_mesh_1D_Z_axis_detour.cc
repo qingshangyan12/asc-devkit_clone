@@ -94,7 +94,7 @@ HcclResult InsTempAllGatherMesh1D1DZAxisDetour::SetchannelsPerRank(
 }
 
 std::vector<ChannelInfo> InsTempAllGatherMesh1D1DZAxisDetour::PrepareMergedChannels(
-    const std::map<u32, std::vector<ChannelInfo>>& channels)
+    const std::map<u32, std::vector<ChannelInfo>>& channels) const
 {
     std::vector<ChannelInfo> mergedChannels;
     auto& ranks = subCommRanks_[COMM_LEVEL0];
@@ -176,7 +176,7 @@ void InsTempAllGatherMesh1D1DZAxisDetour::BuildDataSlicesForChannel(
 HcclResult InsTempAllGatherMesh1D1DZAxisDetour::ExecuteSendRecvForChannel(
     u32 threadIdx, bool dmaRead, const std::vector<ThreadHandle>& threads, const ChannelInfo& linkRemote,
     const std::vector<DataSlice>& txSrcSlicesAll, const std::vector<DataSlice>& txDstSlicesAll,
-    const std::vector<DataSlice>& rxSrcSlicesAll, const std::vector<DataSlice>& rxDstSlicesAll)
+    const std::vector<DataSlice>& rxSrcSlicesAll, const std::vector<DataSlice>& rxDstSlicesAll) const
 {
     TxRxSlicesList sendRecvSlicesList({txSrcSlicesAll, txDstSlicesAll}, {rxSrcSlicesAll, rxDstSlicesAll});
     TxRxChannels sendRecvChannels(linkRemote, linkRemote);
@@ -270,7 +270,7 @@ HcclResult InsTempAllGatherMesh1D1DZAxisDetour::LocalDataCopy(const std::vector<
 }
 
 HcclResult InsTempAllGatherMesh1D1DZAxisDetour::KernelRun(
-    const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource)
+    const OpParam& param, const TemplateDataParams& tempAlgParams, TemplateResource& templateResource)
 {
     enableRemoteMemAccess_ = tempAlgParams.enableRemoteMemAccess;
     HCCL_INFO("[InsTempAllGatherMesh1D1DZAxisDetour] Run start");

@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+
 #ifndef HCCLV2_INS_V2_REDUCE_SCATTER_PARALLEL_EXECUTOR_H
 #define HCCLV2_INS_V2_REDUCE_SCATTER_PARALLEL_EXECUTOR_H
 
@@ -49,23 +50,24 @@ private:
         InsAlgTemplate1& tempAlgInter);
     void GenTemplateAlgParamsIntra0(
         const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset,
-        const u64 dataCountPerLoopAixs0, std::vector<u64>& scratchOffVec,
+        const u64 dataCountPerLoopAxis0, std::vector<u64>& scratchOffVec,
         TemplateDataParams& tempAlgParamsIntra0) const;
     void GenTemplateAlgParamsIntra1(
         const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset,
-        const u64 dataCountPerLoopAixs1, std::vector<u64>& scratchOffVec,
+        const u64 dataCountPerLoopAxis1, std::vector<u64>& scratchOffVec,
         TemplateDataParams& tempAlgParamsIntra1) const;
     void GenTemplateAlgParamsInter0(
         const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset,
-        const u64 dataCountPerLoopAixs0, std::vector<u64>& scratchOffVec,
+        const u64 dataCountPerLoopAxis0, std::vector<u64>& scratchOffVec,
         TemplateDataParams& tempAlgParamsInter0) const;
     void GenTemplateAlgParamsInter1(
         const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset,
-        const u64 dataCountPerLoopAixs1, std::vector<u64>& scratchOffVec,
+        const u64 dataCountPerLoopAxis1, std::vector<u64>& scratchOffVec,
         TemplateDataParams& tempAlgParamsInter1) const;
     void GetParallelDataSplit(std::vector<float>& splitDataSize) const;
     HcclResult PrepareResForTemplate(const InsAlgTemplate0& tempAlgIntra, const InsAlgTemplate1& tempAlgInter);
     uint64_t GetRankSize(const std::vector<std::vector<u32>>& subCommRanks) const;
+    CommEngine engine_{CommEngine::COMM_ENGINE_AICPU};
 
     uint64_t rankSizeLevel0_{0};
     uint64_t rankSizeLevel1_{0};
@@ -88,6 +90,7 @@ private:
     std::map<u32, std::vector<ChannelInfo>> interChannelMap_;
     std::vector<ThreadHandle> threads_;
     std::vector<std::map<u32, std::vector<ChannelInfo>>> remoteRankToChannelInfo_;
+    double multipleDimensionSplitRatio_{0.8};
 };
 
 } // namespace mc2_ops_hccl
