@@ -149,6 +149,7 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     }
     if (param.supportSymmetricMemory) {
         maxDataSizePerLoop = dataSize_;
+        tempAlgParams.supportSymmetricMemory = true;
     }
     u64 maxCountPerLoop = maxDataSizePerLoop / dataTypeSize_;
     // 计算loopTimes

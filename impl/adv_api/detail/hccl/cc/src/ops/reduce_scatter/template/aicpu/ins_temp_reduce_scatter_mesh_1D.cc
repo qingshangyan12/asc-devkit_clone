@@ -37,7 +37,7 @@ HcclResult InsTempReduceScatterMesh1D::CalcRes(
     if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && !topoInfo->level0PcieMix) {
         std::vector<HcclChannelDesc> myChannelDescs;
         CHK_RET(CalcChannelRequestMesh1DWithPriorityTopo(
-            comm, param, topoInfo, subCommRanks_, myChannelDescs, CommTopo::COMM_TOPO_CLOS));
+            comm, param, topoInfo, subCommRanks_, myChannelDescs, CommTopo::COMM_TOPO_1DMESH));
         for (auto channel : myChannelDescs) {
             if (channel.channelProtocol == COMM_PROTOCOL_UBC_CTP) {
                 level0Channels.push_back(channel);
@@ -237,9 +237,10 @@ HcclResult InsTempReduceScatterMesh1D::RunReduceScatter(
                 txSrcSlices.push_back(txSrcSlice);
                 txDstSlices.push_back(txDstSlice);
             }
-            SendRecvInfo sendRecvInfo{{linkSend, linkRecv}, {{txSrcSlices, txDstSlices}, {rxSrcSlices, rxDstSlices}}};
+            SendRecvInfo sendRecvInfo{
+                {linkSend, linkRecv}, {{txSrcSlices, txDstSlices}, {rxSrcSlices, rxDstSlices}}, dataType_};
             CHK_PRT_RET(
-                SendRecvWrite(sendRecvInfo, threads[queIdx]),
+                SendRecvBatchWrite(sendRecvInfo, threads[queIdx]),
                 HCCL_ERROR("[InsTempReduceScatterMesh1D] RunReduceScatter Send failed"), HcclResult::HCCL_E_INTERNAL);
             queIdx++;
         }
