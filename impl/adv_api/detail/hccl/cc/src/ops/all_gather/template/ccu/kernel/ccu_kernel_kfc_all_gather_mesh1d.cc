@@ -14,8 +14,9 @@ namespace mc2_ops_hccl {
 
 constexpr int AG_OUTPUT_XN_ID = 1;
 constexpr int AG_TOKEN_XN_ID = 2;
-constexpr int AG_CKE_IDX_0 = 0;
-constexpr int AG_POST_SYNC_ID = 3;
+constexpr int AG_POST_SYNC_CKE_IDX = 0;
+constexpr int AG_OUTPUT_CKE_IDX = 1;
+constexpr int AG_TOKEN_CKE_IDX = 2;
 
 struct KfcAllGatherMesh1DContext : CcuKernelCtxBase {
     const ChannelHandle *channels{nullptr};
@@ -67,27 +68,33 @@ static CcuResult LoadArgs(KfcAllGatherMesh1DContext &ctx, ccu::Variable inputAdd
 
 static CcuResult PreSync(KfcAllGatherMesh1DContext &ctx)
 {
+    const uint16_t selfBit = 1 << ctx.rankId;
+    const uint16_t allOtherBit = ((1 << ctx.rankSize) - 1) & (~selfBit);
+
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
         CCU_CHK_RET(ccu::WriteVariableWithNotify(ctx.channels[i], ctx.output[ctx.rankId],
-            AG_OUTPUT_XN_ID, AG_CKE_IDX_0, 1 << AG_OUTPUT_XN_ID));
+            AG_OUTPUT_XN_ID, AG_OUTPUT_CKE_IDX, selfBit));
         CCU_CHK_RET(ccu::WriteVariableWithNotify(ctx.channels[i], ctx.token[ctx.rankId],
-            AG_TOKEN_XN_ID, AG_CKE_IDX_0, 1 << AG_TOKEN_XN_ID));
+            AG_TOKEN_XN_ID, AG_TOKEN_CKE_IDX, selfBit));
     }
 
-    uint32_t allBit = (1 << AG_OUTPUT_XN_ID) | (1 << AG_TOKEN_XN_ID);
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
-        CCU_CHK_RET(ccu::NotifyWait(ctx.channels[i], AG_CKE_IDX_0, allBit));
+        CCU_CHK_RET(ccu::NotifyWait(ctx.channels[i], AG_OUTPUT_CKE_IDX, allOtherBit));
+        CCU_CHK_RET(ccu::NotifyWait(ctx.channels[i], AG_TOKEN_CKE_IDX, allOtherBit));
     }
     return CCU_SUCCESS;
 }
 
 static CcuResult PostSync(KfcAllGatherMesh1DContext &ctx)
 {
+    const uint16_t selfBit = 1 << ctx.rankId;
+    const uint16_t allOtherBit = ((1 << ctx.rankSize) - 1) & (~selfBit);
+
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
-        ccu::NotifyRecord(ctx.channels[i], AG_CKE_IDX_0, 1 << AG_POST_SYNC_ID);
+        ccu::NotifyRecord(ctx.channels[i], AG_POST_SYNC_CKE_IDX, selfBit);
     }
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
-        ccu::NotifyWait(ctx.channels[i], AG_CKE_IDX_0, 1 << AG_POST_SYNC_ID);
+        ccu::NotifyWait(ctx.channels[i], AG_POST_SYNC_CKE_IDX, allOtherBit);
     }
     return CCU_SUCCESS;
 }
@@ -119,18 +126,19 @@ static CcuResult DoAllGather(KfcAllGatherMesh1DContext &ctx)
         }
     }
 
-    ccu::LocalCopy(localDst, src, ctx.sliceSize, event, 1);
-    ccu::EventWait(event, 1);
+    uint16_t eventMask = 1 << ctx.rankId;
+    ccu::LocalCopy(localDst, src, ctx.sliceSize, event, 1 << ctx.rankId);
 
     uint32_t channelIdx = 0;
     for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
         if (rankIdx == ctx.rankId) {
             continue;
         }
-        ccu::Write(ctx.channels[channelIdx], dst[channelIdx], src, ctx.sliceSize, event, 1);
-        ccu::EventWait(event, 1);
+        eventMask |= 1 << rankIdx;
+        ccu::Write(ctx.channels[channelIdx], dst[channelIdx], src, ctx.sliceSize, event, 1 << rankIdx);
         channelIdx++;
     }
+    ccu::EventWait(event, eventMask);
     return CCU_SUCCESS;
 }
 
