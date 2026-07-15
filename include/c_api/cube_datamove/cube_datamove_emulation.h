@@ -738,42 +738,42 @@ __aicore__ inline void asc_copy_l12l0b_sync(
  */
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
-    uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2dn);
+    uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
-    uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2dn);
+    uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
-    uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2dn);
+    uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
-    uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2dn);
+    uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
-    uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2dn);
+    uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split,
-    bool enable_nz2dn);
+    bool enable_nz2nd);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ int16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split,
-    bool enable_nz2dn);
+    bool enable_nz2nd);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split,
-    bool enable_nz2dn);
+    bool enable_nz2nd);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
-    uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2dn);
+    uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd);
 
 /**
  * @ingroup CubeDataMove
@@ -1563,132 +1563,132 @@ __aicore__ inline void asc_copy_l12gm_sync(
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode,
+    uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode,
     bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad,
     bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_ctrl, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
-    bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode,
+    bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode,
     uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_ctrl, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
-    bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode,
+    bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode,
     uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_ctrl, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
-    bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode,
+    bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode,
     uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ fp8_e4m3fn_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode,
+    uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode,
     bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad,
     bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ fp8_e4m3fn_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode,
+    uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode,
     bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad,
     bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ fp8_e5m2_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode,
+    uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode,
     bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad,
     bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ fp8_e5m2_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode,
+    uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode,
     bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad,
     bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ hifloat8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode,
+    uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode,
     bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad,
     bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ hifloat8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode,
+    uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode,
     bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad,
     bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_ctrl, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
-    bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode,
+    bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode,
     uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_ctrl, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
-    bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode,
+    bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode,
     uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ bfloat16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode,
+    uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode,
     bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad,
     bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode,
+    uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode,
     bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad,
     bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode,
+    uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode,
     bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad,
     bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_ctrl, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
-    bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode,
+    bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode,
     uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ void* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_ctrl, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
-    bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode,
+    bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode,
     uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(
     __gm__ void* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_ctrl, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
-    bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode,
+    bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode,
     uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2l1_sync(
     __cbuf__ void* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_ctrl, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
-    bool enable_channel_split, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode,
+    bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode,
     bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad,
     bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2l1_sync(
     __cbuf__ void* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_ctrl, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
-    bool enable_channel_split, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode,
+    bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode,
     bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad,
     bool enable_broadcast, bool enable_nz2dn);
 
@@ -1725,126 +1725,126 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
 __aicore__ inline void asc_copy_l0c2ub_sync(
     __ubuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag,
-    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode,
+    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode,
     uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant,
     bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2ub_sync(
     __ubuf__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag,
-    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode,
+    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode,
     uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant,
     bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2ub_sync(
     __ubuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag,
-    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode,
+    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode,
     uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant,
     bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2ub_sync(
     __ubuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode,
+    uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode,
     bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad,
     bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2ub_sync(
     __ubuf__ fp8_e4m3fn_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag,
-    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode,
+    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode,
     uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant,
     bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2ub_sync(
     __ubuf__ fp8_e4m3fn_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag,
-    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode,
+    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode,
     uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant,
     bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2ub_sync(
     __ubuf__ fp8_e5m2_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag,
-    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode,
+    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode,
     uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant,
     bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2ub_sync(
     __ubuf__ fp8_e5m2_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag,
-    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode,
+    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode,
     uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant,
     bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2ub_sync(
     __ubuf__ hifloat8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag,
-    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode,
+    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode,
     uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant,
     bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2ub_sync(
     __ubuf__ hifloat8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag,
-    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode,
+    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode,
     uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant,
     bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2ub_sync(
     __ubuf__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode,
+    uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode,
     bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad,
     bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2ub_sync(
     __ubuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode,
+    uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode,
     bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad,
     bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2ub_sync(
     __ubuf__ bfloat16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag,
-    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode,
+    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode,
     uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant,
     bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2ub_sync(
     __ubuf__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag,
-    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode,
+    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode,
     uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant,
     bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2ub_sync(
     __ubuf__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag,
-    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode,
+    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode,
     uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant,
     bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2ub_sync(
     __ubuf__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode,
+    uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode,
     bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad,
     bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2ub_sync(
     __ubuf__ void* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode,
+    uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode,
     bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad,
     bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2ub_sync(
     __ubuf__ void* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag, uint64_t quant_pre_mode,
-    uint8_t relu_pre_mode, bool split_en, bool enable_nz2dn, uint64_t quant_post_mode, uint8_t relu_post_mode,
+    uint8_t relu_pre_mode, bool split_en, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode,
     bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad,
     bool enable_broadcast, bool enable_nz2dn);
 
