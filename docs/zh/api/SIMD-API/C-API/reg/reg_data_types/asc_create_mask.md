@@ -88,10 +88,7 @@ vector_bool，掩码寄存器。
 ## 调用示例
 
 ```cpp
-constexpr uint32_t one_repeat_size = 256 / sizeof(half);
-uint32_t total_length = 256;
-uint32_t repeat_time = total_length / one_repeat_size;
-__simd_vf__ inline void creat_mask_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
+__simd_vf__ inline void create_mask_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_half dst;
     vector_half src;

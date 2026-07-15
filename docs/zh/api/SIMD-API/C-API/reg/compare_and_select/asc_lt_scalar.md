@@ -75,7 +75,7 @@ __simd_callee__ inline void asc_lt_scalar(vector_bool& dst, vector_float src, fl
 
 ## 返回值说明
 
-无
+无返回值
 
 ## 约束说明
 
@@ -84,11 +84,7 @@ dst中未被mask筛选的位置被置为0。
 ## 调用示例
 
 ```cpp
-constexpr uint32_t one_repeat_size = 256 / sizeof(half);
-constexpr uint32_t one_block_size = 32;
-uint32_t total_length = 256;
-uint32_t repeat_time = total_length / one_repeat_size;
-__simd_vf__ inline void eq_scalar_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, half value, uint32_t count, uint32_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
+__simd_vf__ inline void lt_scalar_vf(__ubuf__ uint16_t* dst_addr, __ubuf__ half* src_addr, half value, uint32_t count, uint32_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
 {
     vector_half src;
     vector_bool dst;

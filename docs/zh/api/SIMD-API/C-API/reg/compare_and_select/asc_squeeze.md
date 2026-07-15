@@ -66,7 +66,7 @@ __simd_callee__ inline void asc_squeeze(vector_float& dst, vector_float src, vec
 
 ## 返回值说明
 
-无
+无返回值
 
 ## 约束说明
 
@@ -75,9 +75,6 @@ dst中未被mask筛选的位置被置为0。
 ## 调用示例
 
 ```cpp
-constexpr uint32_t one_repeat_size = 256 / sizeof(int8_t);
-uint32_t total_length = 256;
-uint32_t repeat_time = total_length / one_repeat_size;
 __simd_vf__ inline void squeeze_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_int8_t dst;
@@ -85,7 +82,7 @@ __simd_vf__ inline void squeeze_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* s
     vector_bool mask;
     addr_reg addr_reg;
     for (uint16_t i = 0; i < repeat_time; ++i) {
-        addr_reg = asc_create_addr_reg_b8(one_repeat_size);
+        addr_reg = asc_update_addr_reg_b8(one_repeat_size);
         mask = asc_update_mask_b8(count);
         asc_loadalign(src, src_addr, addr_reg);
         asc_squeeze(dst, src, mask);
