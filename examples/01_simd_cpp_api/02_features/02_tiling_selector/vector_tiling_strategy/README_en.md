@@ -19,12 +19,12 @@ The sample uses 8 AI Cores. The main tile data volume in each core is 3200 `half
 ```text
 ├── vector_tiling_strategy
 │   ├── scripts
-│   │   ├── gen_data.py          // Generates input data and golden data.
-│   │   └── verify_result.py     // Verifies the output result.
-│   ├── CMakeLists.txt           // Build project file.
+│   │   ├── gen_data.py            // Generates input data and golden data.
+│   │   └── verify_result.py       // Verifies the output result.
+│   ├── CMakeLists.txt             // Build project file.
 │   ├── vector_tiling_strategy.asc // Ascend C sample implementation and invocation sample.
-│   ├── data_utils.h             // Data read and write functions.
-│   └── README.md                // Sample description document.
+│   ├── data_utils.h               // Data read and write functions.
+│   └── README.md                  // Sample description document.
 ```
 
 ## Scenario Details

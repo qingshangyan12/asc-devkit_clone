@@ -230,12 +230,12 @@ cat ./OPPROF_*/PipeUtilization.csv
 ``` 
 ├── gelu
 │   ├── scripts
-│   │   ├── gen_data.py     // Input data and golden data generation script
+│   │   ├── gen_data.py      // Input data and golden data generation script
 │   │   └── verify_result.py // Output result and golden data verification script
-│   ├── CMakeLists.txt      // Build project file
-│   ├── data_utils.h        // Data read/write functions
-│   ├── gelu.asc            // Ascend C example implementation & calling example
-│   └── README.md           // Example documentation
+│   ├── CMakeLists.txt       // Build project file
+│   ├── data_utils.h         // Data read/write functions
+│   ├── gelu.asc             // Ascend C example implementation & calling example
+│   └── README.md            // Example documentation
 ```
 
 ## Build and Run

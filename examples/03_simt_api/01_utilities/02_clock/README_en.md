@@ -17,7 +17,7 @@ This example demonstrates how to use the `clock()` interface in SIMT programming
 ```text
 ├── 02_clock
 │   ├── CMakeLists.txt         // CMake build file
-│   ├── clock.asc             // Ascend C operator implementation with clock timestamp invocation example
+│   ├── clock.asc              // Ascend C operator implementation with clock timestamp invocation example
 │   └── README.md
 ```
 

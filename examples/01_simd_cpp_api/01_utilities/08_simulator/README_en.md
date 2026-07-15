@@ -16,11 +16,11 @@ This sample uses MatmulLeakyRelu fusion computing as a carrier to demonstrate th
 
 ```
 ├── 08_simulator
-│ ├── CMakeLists.txt // Compile project files
-│ ├── data_utils.h // Data reading and writing auxiliary functions
-│ ├── README.md // Sample description
-│ ├── scripts // Input data generation and result verification scripts
-│ └── simulator.asc // Ascend C sample implementation and Host side calling sample
+│   ├── CMakeLists.txt          // Compile project files
+│   ├── data_utils.h            // Data reading and writing auxiliary functions
+│   ├── README.md               // Sample description
+│   ├── scripts                 // Input data generation and result verification scripts
+│   └── simulator.asc           // Ascend C sample implementation and Host side calling sample
 ```
 
 ## Sample description
@@ -117,11 +117,11 @@ After the command is completed, a folder named `OPPROF_{timestamp}_XXX` will be 
 
 ```
 OPPROF_{timestamp}_XXX/
-├── dump // Raw performance data, users do not need to pay attention
+├── dump                    // Raw performance data, users do not need to pay attention
 └── simulator
-    ├── core*.veccore*/ // Simulation instruction flow chart file for each vector core
-    ├── trace.json // Simulation flowchart and hotspot function visual presentation file
-    └── visualize_data.bin // MindStudio Insight presentation file
+    ├── core*.veccore*/     // Simulation instruction flow chart file for each vector core
+    ├── trace.json          // Simulation flowchart and hotspot function visual presentation file
+    └── visualize_data.bin  // MindStudio Insight presentation file
 ```
 
 After execution, you can view the instruction flow chart in the following ways:
