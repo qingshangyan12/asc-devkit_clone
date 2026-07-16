@@ -3,7 +3,7 @@
 
 ## 概述
 
-本样例以矩阵转置为例，介绍Ascend C SIMD与SIMT混合编程方式下的访存优化思路。样例从直接全局内存转置出发，引入MTE搬运、UB中转与32×32分块，对比按tile分组启动Thread Block与固定Thread Block数两种映射方式，通过UB padding降低bank冲突，最后借助双缓冲使MTE2搬入、SIMT VF转置和MTE3搬出流水并行，呈现SIMD与SIMT混合矩阵转置的调优路径。本样例与SIMT场景下的[matrix_transpose_practice样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice)功能相同，可用于对比SIMD与SIMT混合场景和SIMT场景在矩阵转置访存优化路径上的差异。
+本样例基于SIMT场景下的[matrix_transpose_practice样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice)，采用SIMD与SIMT混合编程对自定义transpose算子进行进一步优化，通过混合编程中的MTE搬运与SIMT计算并行，提高矩阵转置性能。为了展示逐步优化过程，本样例从直接全局内存转置出发，引入MTE搬运、UB中转与32×32分块，对比按tile分组启动Thread Block与固定Thread Block数两种映射方式，通过UB padding降低bank冲突，最后借助双缓冲使MTE2搬入、SIMT VF转置和MTE3搬出流水并行，呈现SIMD与SIMT混合矩阵转置的调优路径。
 
 ## 支持的产品
 
@@ -314,7 +314,7 @@ $$
 T_{theory} = \frac{8.39MB}{1.6TB/s} \approx 5.243μs
 $$
 
-Case 0距离理论下限较远，主要原因是转置写回导致同一Warp内相邻线程写地址跨行分散，GM写无法形成理想连续访问。Case 1通过UB中转把非连续访问转移到UB内部，GM侧访问连续性改善，但按tile分组启动512个Thread Block，调度开销较高。Case 2固定Thread Block数后减少了启动和调度开销，但SIMT VF转置访问UB仍存在bank冲突。Case 3通过32×40的UB padding降低bank冲突后，耗时明显下降。Case 4进一步使用双缓冲，使MTE2搬入、SIMT VF转置和MTE3搬出流水并行，Task Duration接近理论下限，但仍高于5.243μs，主要来自UB读写、MTE与V之间的同步、`asc_vf_call`调用开销、地址计算以及流水无法完全并行等非GM带宽开销。
+Case 0距离理论下限较远，主要原因是转置写回导致同一Warp内相邻线程写地址跨行分散，GM写无法形成理想连续访问。Case 1通过UB中转把非连续访问转移到UB内部，GM侧访问连续性改善，但按tile分组启动512个Thread Block，调度开销较高。Case 2固定Thread Block数后减少了启动和调度开销，但SIMT VF转置访问UB仍存在bank冲突。Case 3通过32×40的UB padding降低bank冲突后，耗时明显下降。Case 4进一步使用双缓冲，使MTE2搬入、SIMT VF转置和MTE3搬出流水并行，Task Duration降低到6.824μs，对应等效GM读写带宽约1.23TB/s，约达到Ascend 950PR理论GM峰值带宽1.6TB/s的76.8%。该结果已经接近理论带宽上限，但仍高于5.243μs的理论耗时下限，主要来自UB读写、MTE与V之间的同步、`asc_vf_call`调用开销、地址计算以及流水无法完全并行等非GM带宽开销。这些开销属于当前实现路径下暂无明显进一步优化手段的部分。
 
 ## 调优建议
 
