@@ -487,19 +487,22 @@ presmoke_verify_tiling_sink_task_log_for_pid 222 '{marker}'
                 "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom"
             )
         )
-        reason, modes = explicit_skip_config(
-            "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom"
+        reason, modes, archs = explicit_skip_config(
+            "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom",
+            "dav-2201",
         )
         self.assertIn("TensorFlow 2.6.5", reason)
         self.assertEqual(modes, ["npu"])
-        reason, modes = explicit_skip_config(
-            "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin"
+        reason, modes, archs = explicit_skip_config(
+            "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin",
+            "dav-2201",
         )
         self.assertEqual(modes, ["npu"])
 
     def test_matmul_l2cache_skip_config(self) -> None:
-        reason, modes = explicit_skip_config(
-            "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_l2cache"
+        reason, modes, archs = explicit_skip_config(
+            "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_l2cache",
+            "dav-2201",
         )
         self.assertIn("308M", reason)
         self.assertEqual(modes, ["cpu"])
