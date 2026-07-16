@@ -19,6 +19,7 @@
 
 #ifndef INCLUDE_C_API_SYS_VAR_SYS_VAR_H
 #define INCLUDE_C_API_SYS_VAR_SYS_VAR_H
+#include "c_api/utils/union.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
