@@ -57,8 +57,8 @@
         MOCK_COPY_GM2UB_ALIGN(cce_name, data_type);                                                           \
         c_api_name(                                                                                           \
             dst, src, static_cast<uint16_t>(1), static_cast<uint32_t>(44), static_cast<uint8_t>(0),           \
-            static_cast<uint8_t>(0), false, static_cast<uint8_t>(0), static_cast<uint64_t>(0),                \
-            static_cast<uint32_t>(0));                                                                        \
+            static_cast<uint8_t>(0), false, asc_load_l2_cache_type::NORMAL_FIRST_VICTIM,                      \
+            static_cast<uint64_t>(0), static_cast<uint32_t>(0));                                              \
         GlobalMockObject::verify();                                                                           \
     }                                                                                                         \
                                                                                                               \
