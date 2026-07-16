@@ -24,7 +24,7 @@
 
 ## 功能说明
 
-`thread_block_tile`组内线程的数据交换接口，不通过共享内存实现直接读取组内指定线程的寄存器中的值。
+`thread_block_tile`组内线程的数据交换接口，用于获取组内指定rank线程输入的`var`值。
 
 ## 函数原型
 
@@ -49,7 +49,8 @@ T shfl(T var, int src_rank) const
 
 ## 约束说明
 
-无
+- 当`thread_block_tile`的模板参数`Size`大于32时，即`Size`为64、128、256、512、1024、2048的跨Warp协作组场景，`T`的大小不能超过8字节。
+- 当`thread_block_tile`的模板参数`Size`大于32时，即跨Warp协作组场景，必须保证调用`shfl()`的线程所在Warp内所有线程均处于活跃状态。
 
 ## 调用示例
 

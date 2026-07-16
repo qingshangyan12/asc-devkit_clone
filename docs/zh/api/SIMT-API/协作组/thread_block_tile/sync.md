@@ -42,7 +42,8 @@ void sync() const
 
 ## 约束说明
 
-无
+- 必须保证`thread_block_tile`组内所有线程都能执行到同一个`sync()`调用，否则会导致卡死。
+- 当`thread_block_tile`的模板参数`Size`大于32且小于2048时，即`Size`为64、128、256、512、1024的跨Warp协作组场景，`sync()`同步当前`thread_block_tile`组内所有线程；当`Size`等于2048时，`sync()`同步整个线程块内所有线程。
 
 ## 调用示例
 

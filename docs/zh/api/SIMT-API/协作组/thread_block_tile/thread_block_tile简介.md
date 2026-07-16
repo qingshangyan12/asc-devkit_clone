@@ -1,6 +1,6 @@
 # thread_block_tile简介
 
-`thread_block_tile`是一个模板类，用于管理指定大小的线程子组。
+`thread_block_tile`是一个模板类，用于管理指定大小的线程子组。当`thread_block_tile`的模板参数`Size`小于等于32时，`thread_block_tile`作用于单Warp内的线程子组；当模板参数`Size`大于32时，`thread_block_tile`为跨Warp线程子组，当前支持的跨Warp大小为64、128、256、512、1024、2048。
 
 > [!CAUTION]注意 
 > SIMT架构不支持独立线程调度，一个Warp内的各协作组间应避免存在数据依赖，否则可能出现卡死的情况。
@@ -26,3 +26,23 @@ int all(int predicate) const;
 unsigned int ballot(int predicate) const;
 unsigned long long size() const;
 ```
+
+## 接口支持范围
+
+**表1**  `thread_block_tile`接口支持范围
+
+| 接口 | `Size <= 32`（单Warp内线程子组） | `Size > 32`（跨Warp线程子组） |
+| --- | --- | --- |
+| `sync()` | 支持 | 支持 |
+| `thread_rank()` | 支持 | 支持 |
+| `num_threads()` | 支持 | 支持 |
+| `size()` | 支持 | 支持 |
+| `meta_group_rank()` | 支持 | 支持 |
+| `meta_group_size()` | 支持 | 支持 |
+| `shfl()` | 支持 | 支持 |
+| `any()` | 支持 | 支持 |
+| `all()` | 支持 | 支持 |
+| `ballot()` | 支持 | 不支持 |
+| `shfl_up()` | 支持 | 不支持 |
+| `shfl_down()` | 支持 | 不支持 |
+| `shfl_xor()` | 支持 | 不支持 |
