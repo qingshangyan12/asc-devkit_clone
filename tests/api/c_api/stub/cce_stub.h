@@ -15,7 +15,7 @@
 #ifndef ULL
 #define ULL unsigned long long
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3510)
+#if defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1)
 using vector_uint8_t = uint8_t;
 using vector_uint16_t = uint8_t;
 using vector_uint32_t = uint8_t;

@@ -18,6 +18,7 @@
 
 #endif
 
+#if !defined(ASCENDC_CPU_DEBUG) || (ASCENDC_CPU_DEBUG != 1)
 using vector_uint8_t = vector_u8;
 using vector_uint16_t = vector_u16;
 using vector_uint32_t = vector_u32;
@@ -41,5 +42,6 @@ using vector_load_unalign = vector_align;
 using addr_reg = vector_address;
 // iter_reg has been deprecated, please use addr_reg instead.
 using iter_reg [[deprecated("iter_reg has been deprecated, please use addr_reg instead.")]] = addr_reg;
+#endif
 
 #endif
