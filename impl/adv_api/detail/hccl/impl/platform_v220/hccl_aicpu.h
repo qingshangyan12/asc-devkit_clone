@@ -154,6 +154,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
     queueNum_ = initTilingPtr->queueNum;
     devType_ = initTilingPtr->devType;
     tilingBaseAddr_ = reinterpret_cast<uint64_t>(initTiling);
+    KERNEL_LOG(KERNEL_INFO, "[A2AV_DBG] InitV2 queueNum=%u devType=%u debugMode=%u tilingBase=%lu",
+               queueNum_, devType_, debugMode_, tilingBaseAddr_);
 
     hcclContext_ = (__gm__ HcclCombineOpParam*)context;
     ASCENDC_HCCL_API_ASSERT(

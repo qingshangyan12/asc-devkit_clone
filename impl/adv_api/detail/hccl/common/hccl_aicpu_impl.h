@@ -77,6 +77,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
     } else {
         workingFlag_ = (GetBlockIdx() == config.blockId);
     }
+    KERNEL_LOG(KERNEL_INFO, "[A2AV_DBG] InitWorkingFlag coreType=%d blockIdx=%ld subBlockIdx=%ld "
+               "config.type=%u config.blockId=%ld workingFlag=%u",
+               g_coreType, GetBlockIdx(), GetSubBlockIdx(),
+               static_cast<uint8_t>(config.type), config.blockId, workingFlag_);
 }
 
 template <const auto& config>
@@ -94,6 +98,12 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
         msgAddr = (msgAddr & (~((uint64_t)0x1ff))) + 0x200;
     }
     hcclMsgArea_ = reinterpret_cast<__gm__ HcclMsgArea*>(msgAddr);
+    KERNEL_LOG(KERNEL_INFO, "[A2AV_DBG] InitInner msgArea=%p singleMsg=%p commitTurnCnt=%p finishedTurnCnt=%p "
+               "paramExtMsgList=%p HCCL_MSG_CNT=%u",
+               hcclMsgArea_, &hcclMsgArea_->commMsg.singleMsg,
+               &hcclMsgArea_->commMsg.singleMsg.commitTurnCnt[0],
+               &hcclMsgArea_->commMsg.singleMsg.finishedTurnCnt[0],
+               &hcclMsgArea_->commMsg.singleMsg.paramExtMsgList[0], HCCL_MSG_CNT);
     for (uint32_t i = 0U; i < HCCL_MAX_HANDLE_ID; ++i) {
         handleIdMsgPosition_[i] = -1;
     }
@@ -120,6 +130,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
         HCCL_CHECK_RESTART(hcclMsgArea_, return);
         FlushDataCache(hcclSendMsg);
     } while (debugMode_ != HCCL_ONLY_COMPUTE && hcclSendMsg->addMsg.v0Msg.valid == HCCL_MSG_VALID_MASK);
+    KERNEL_LOG(KERNEL_INFO, "[A2AV_DBG] SendMsg DONE queId=%u msgPos=%u valid=0x%x",
+               queId, curMsgPosition_[queId], hcclSendMsg->addMsg.v0Msg.valid);
     KERNEL_LOG(KERNEL_INFO, "Hccl send msg[%u] is available now.", curMsgPosition_[queId]);
     if (srcGroupID < 0) {
         uint64_t tiling = 0UL;
@@ -153,6 +165,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
         HCCL_CHECK_RESTART(hcclMsgArea_, return);
         FlushDataCache(hcclSendMsg);
     } while ((debugMode_ != HCCL_ONLY_COMPUTE) && (hcclSendMsg->valid == HCCL_MSG_VALID_MASK));
+    KERNEL_LOG(KERNEL_INFO, "[A2AV_DBG] SendExtMsg DONE msgPos=%u extValid=0x%x",
+               curMsgPosition_[0U], hcclSendMsg->valid);
     KERNEL_LOG(KERNEL_INFO, "Hccl send extMsg[%u] is available now.", curMsgPosition_[0U]);
     uint32_t rankNum = GetRankDim();
     AssembleHcclMsgExt(param, rankNum, hcclSendMsg);
@@ -203,8 +217,12 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::SetCommitTurnCntToGm(
     uint8_t msgPos, uint64_t turnCnt, HcclHandle handleId)
 {
+    KERNEL_LOG(KERNEL_INFO, "[A2AV_DBG] SetCommit entry msgPos=%u turnCnt=%lu handleId=%d queueNum=%u workingFlag=%u",
+               msgPos, turnCnt, handleId, queueNum_, workingFlag_);
     handleIdCommitTurnCnt_[handleId] += turnCnt;
     if (queueNum_ != 0U || !workingFlag_) {
+        KERNEL_LOG(KERNEL_INFO, "[A2AV_DBG] SetCommit SKIP msgPos=%u reason: queueNum=%u workingFlag=%u",
+                   msgPos, queueNum_, workingFlag_);
         return;
     }
 
@@ -219,6 +237,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
     commitGM->cnt = handleIdCommitTurnCnt_[handleId];
     commitGM->valid = COMMIT_VALID_MASK;
     FlushDataCache(commitGM);
+    KERNEL_LOG(KERNEL_INFO, "[A2AV_DBG] SetCommit WROTE msgPos=%u commitAddr=%p commitCnt=%lu valid=%u",
+               msgPos, commitGM, commitGM->cnt, commitGM->valid);
     if (workingFlag_) {
         __gm__ TurnCnt* apiInfo = &(hcclMsgArea_->apiStats.commitStats[handleId2CmdType_[handleId]]);
         FlushDataCache(apiInfo);
@@ -263,6 +283,12 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, co
         handleId < HCCL_MAX_HANDLE_ID, { return INVALID_HANDLE_ID; },
         "Call Prepare[%d] failed, Prepare interface call num is[%d], expected no more than[%d].",
         static_cast<int32_t>(param.commType.prepareType), handleId + 1, HCCL_MAX_HANDLE_ID);
+    KERNEL_LOG(KERNEL_INFO, "[A2AV_DBG] Prepare entry handleId=%d prepareType=%u queId=%u curMsgPos=%u "
+               "queueNum=%u workingFlag=%u commit=%d repeat=%u",
+               handleId, static_cast<uint32_t>(param.commType.prepareType),
+               (queueNum_ == 0U ? 0U : static_cast<uint16_t>(param.dataType)),
+               curMsgPosition_[(queueNum_ == 0U ? 0U : static_cast<uint16_t>(param.dataType))],
+               queueNum_, workingFlag_, commit, param.repeat);
     if (param.commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
         SendMsgToServer(param.paramExt);
     }
@@ -272,6 +298,9 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, co
     handleIdRepeat_[handleId] = param.repeat;
     handleId2CmdType_[handleId] = static_cast<uint8_t>(param.commType.prepareType);
     if constexpr (commit) {
+        KERNEL_LOG(KERNEL_INFO, "[A2AV_DBG] Prepare commit branch handleId=%d msgPos=%u turnCnt=%lu stepCnt=%u",
+                   handleId, curMsgPosition_[(queueNum_ == 0U ? 0U : static_cast<uint16_t>(param.dataType))],
+                   param.repeat * GetStepCntsPerRepeatByHandle(handleId), GetStepCntsPerRepeatByHandle(handleId));
         SetCommitTurnCntToGm(curMsgPosition_[queId], param.repeat * GetStepCntsPerRepeatByHandle(handleId), handleId);
     }
     ++(curMsgPosition_[queId]);
