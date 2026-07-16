@@ -85,7 +85,6 @@ $$
 | `BLOCK_DIM` | 64 |
 | `THREAD_COUNT` | 512 |
 | `WARP_SIZE` | 32 |
-| `PROFILE_REPEAT_TIMES` | 默认30，`run.sh`采集性能时设置为1 |
 
 ## 样例实现
 
@@ -290,7 +289,6 @@ public:
   |:---|:---|:---|
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构，对应 Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `0`、`1` | Case编号：0=SIMT Warp直接写value，1=MTE task queue搬运value |
-  | `PROFILE_REPEAT_TIMES` | 正整数 | 单次进程中重复执行`insert_or_assign`的次数。对比脚本设置为1，使msOpProf采集一次完整insert路径。 |
 
 - 执行结果
 
@@ -302,24 +300,24 @@ public:
 
 ### 性能分析
 
-使用msOpProf获取性能数据。对比脚本会先执行一次样例并检查`Verification PASSED`，确认结果正确后再通过`msopprof`命令采集目标kernel性能数据。
+使用msOpProf获取性能数据。对比脚本会先执行一次样例并检查`Verification PASSED`，确认结果正确后再通过`msprof op`命令采集目标kernel性能数据。
 
 Case 0测试方式如下：
 
 ```bash
-cmake -DSCENARIO_NUM=0 -DPROFILE_REPEAT_TIMES=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
+cmake -DSCENARIO_NUM=0 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
 make -j
 ./hash_table_mte_queue 128
-msopprof ./hash_table_mte_queue 128
+msprof op ./hash_table_mte_queue 128
 ```
 
 Case 1测试方式如下：
 
 ```bash
-cmake -DSCENARIO_NUM=1 -DPROFILE_REPEAT_TIMES=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
+cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
 make -j
 ./hash_table_mte_queue 128
-msopprof ./hash_table_mte_queue 128
+msprof op ./hash_table_mte_queue 128
 ```
 
 当前目录下会生成`OPPROF_`前缀的文件夹，保存当前kernel的性能分析数据。

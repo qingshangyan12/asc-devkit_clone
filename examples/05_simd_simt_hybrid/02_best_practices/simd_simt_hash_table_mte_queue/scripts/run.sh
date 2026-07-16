@@ -22,7 +22,7 @@ run_case() {
     local build_dir="${BUILD_ROOT}/scenario_${scenario}"
 
     rm -rf "${build_dir}"
-    cmake -S "${SAMPLE_DIR}" -B "${build_dir}" -DSCENARIO_NUM="${scenario}" -DPROFILE_REPEAT_TIMES=1
+    cmake -S "${SAMPLE_DIR}" -B "${build_dir}" -DSCENARIO_NUM="${scenario}"
     cmake --build "${build_dir}" -j
 
     for dim in "${DIMS[@]}"; do
@@ -38,7 +38,7 @@ run_case() {
 
         (
             cd "${run_dir}"
-            msopprof "${build_dir}/hash_table_mte_queue" "${dim}" 2>&1 |
+            msprof op "${build_dir}/hash_table_mte_queue" "${dim}" 2>&1 |
                 tee "${log_file}"
         )
         if [[ "${scenario}" == "0" ]]; then

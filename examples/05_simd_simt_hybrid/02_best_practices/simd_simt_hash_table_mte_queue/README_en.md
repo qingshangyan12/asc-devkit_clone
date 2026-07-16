@@ -85,7 +85,6 @@ The sample parameters are as follows:
 | `BLOCK_DIM` | 64 |
 | `THREAD_COUNT` | 512 |
 | `WARP_SIZE` | 32 |
-| `PROFILE_REPEAT_TIMES` | The default value is 30. `run.sh` sets it to 1 when collecting performance data. |
 
 ## Sample Implementation
 
@@ -290,7 +289,6 @@ In the sample root directory, perform the following steps to compile and run the
   |:---|:---|:---|
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture, which corresponds to Ascend 950PR/Ascend 950DT. |
   | `SCENARIO_NUM` | `0`, `1` | Case number: 0 = direct value writes by a SIMT Warp; 1 = value movement by an MTE task queue. |
-  | `PROFILE_REPEAT_TIMES` | Positive integer | Number of times that `insert_or_assign` is repeatedly run in a single process. The comparison script sets this option to 1 so that msOpProf collects one complete insert path. |
 
 - Execution result
 
@@ -302,24 +300,24 @@ In the sample root directory, perform the following steps to compile and run the
 
 ### Performance Analysis
 
-Use msOpProf to obtain performance data. The comparison script first runs the sample and checks `Verification PASSED`. After confirming that the result is correct, the script collects target kernel performance data by the `msopprof` command.
+Use msOpProf to obtain performance data. The comparison script first runs the sample and checks `Verification PASSED`. After confirming that the result is correct, the script collects target kernel performance data by the `msprof op` command.
 
 The Case 0 test method is as follows:
 
 ```bash
-cmake -DSCENARIO_NUM=0 -DPROFILE_REPEAT_TIMES=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
+cmake -DSCENARIO_NUM=0 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
 make -j
 ./hash_table_mte_queue 128
-msopprof ./hash_table_mte_queue 128
+msprof op ./hash_table_mte_queue 128
 ```
 
 The Case 1 test method is as follows:
 
 ```bash
-cmake -DSCENARIO_NUM=1 -DPROFILE_REPEAT_TIMES=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
+cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
 make -j
 ./hash_table_mte_queue 128
-msopprof ./hash_table_mte_queue 128
+msprof op ./hash_table_mte_queue 128
 ```
 
 A directory with the `OPPROF_` prefix is generated in the current directory to store performance analysis data of the current kernel.
