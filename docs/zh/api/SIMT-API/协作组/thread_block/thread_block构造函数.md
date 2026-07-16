@@ -32,9 +32,28 @@
 thread_block this_thread_block()
 ```
 
+```c++
+template <unsigned int MaxBlockSize>
+thread_block this_thread_block(block_tile_memory<MaxBlockSize>& scratch)
+```
+
+```c++
+template <unsigned int MaxBlockSize>
+thread_block this_thread_block(__ubuf__ block_tile_memory<MaxBlockSize>& scratch)
+```
+
+```c++
+template <unsigned int MaxBlockSize>
+thread_block this_thread_block(__gm__ block_tile_memory<MaxBlockSize>& scratch)
+```
+
 ## 参数说明
 
-无
+**表1**  参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| scratch | 输入 | 用于为`thread_block`携带跨Warp临时存储。纯SIMT编程场景传入`block_tile_memory`对象；SIMD与SIMT混合编程场景传入`__ubuf__`或`__gm__`地址空间的`block_tile_memory`对象表达式。 |
 
 ## 返回值说明
 
@@ -42,8 +61,31 @@ thread_block this_thread_block()
 
 ## 约束说明
 
-无
+- `MaxBlockSize`必须大于0且小于等于2048，并且必须是32的整数倍。
+- 线程块实际启动线程数不能超过`MaxBlockSize`。
 
 ## 调用示例
 
-参考[调用示例](sync.md#调用示例)
+```c++
+using namespace cooperative_groups;
+__global__ void simt_kernel(...)
+{
+    ...
+    block_tile_memory<2048> scratch;
+    thread_block block = this_thread_block(scratch);
+    ...
+}
+```
+
+```c++
+using namespace cooperative_groups;
+__simt_vf__ inline void simt_kernel(__gm__ block_tile_memory<2048>* gm_scratch)
+{
+    ...
+    __ubuf__ unsigned char ub_storage[sizeof(block_tile_memory<2048>)];
+    auto ub_scratch = reinterpret_cast<__ubuf__ block_tile_memory<2048>*>(ub_storage);
+    thread_block ub_block = this_thread_block(*ub_scratch);
+    thread_block gm_block = this_thread_block(*gm_scratch);
+    ...
+}
+```
