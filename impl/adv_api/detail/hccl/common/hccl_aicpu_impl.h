@@ -97,6 +97,12 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
     for (uint32_t i = 0U; i < HCCL_MAX_HANDLE_ID; ++i) {
         handleIdMsgPosition_[i] = -1;
     }
+    for (uint32_t i = 0U; i < HCCL_MSG_CNT; ++i) {
+        hcclMsgArea_->commMsg.singleMsg.commitTurnCnt[i].cnt = 0;
+        hcclMsgArea_->commMsg.singleMsg.finishedTurnCnt[i].cnt = 0;
+        FlushDataCache(&hcclMsgArea_->commMsg.singleMsg.commitTurnCnt[i]);
+        FlushDataCache(&hcclMsgArea_->commMsg.singleMsg.finishedTurnCnt[i]);
+    }
     InitWorkingFlag();
     curVersion_ = version;
 }
@@ -209,10 +215,6 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
     }
 
     __gm__ TurnCnt* commitGM = hcclMsgArea_->commMsg.singleMsg.commitTurnCnt + msgPos;
-    do {
-        HCCL_CHECK_RESTART(hcclMsgArea_, return);
-        FlushDataCache(commitGM);
-    } while ((debugMode_ != HCCL_ONLY_COMPUTE) && (commitGM->cnt >= handleIdCommitTurnCnt_[handleId]));
     KERNEL_LOG(
         KERNEL_INFO, "Block idx[%d] write commit turn cnt[%lu].", DEFAULT_CFG.blockId,
         handleIdCommitTurnCnt_[handleId]);
