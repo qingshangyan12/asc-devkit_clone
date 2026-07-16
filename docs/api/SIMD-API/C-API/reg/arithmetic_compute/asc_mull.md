@@ -16,7 +16,7 @@
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
-该接口根据mask对输入数据src0、src1按元素相乘操作，将乘法结果的低位部分写入dst0，溢出（高位）部分写入dst1。计算公式如下：
+该接口根据mask对输入数据src0、src1按元素相乘操作，将乘法结果的低位部分写入dst0，溢出（高位）部分写入dst1。计算公式及图示如下：
   
   $$dst0_i = (src0_i \times src1_i) mod 2^{bit}$$
   
@@ -24,7 +24,7 @@
   
 其中，bit表示操作数的位宽bit数。
 
-![asc_mull示例](../../figures/asc_mull示例.png)
+![asc_mull示例](../../figures/asc_mull.png)
 
 ## 函数原型
 
