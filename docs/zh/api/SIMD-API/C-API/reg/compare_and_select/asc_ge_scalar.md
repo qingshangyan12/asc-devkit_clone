@@ -32,7 +32,7 @@ ge（greater than or equal to），对源操作数执行逐元素比较。对于
 
 计算公式如下：
 $$
-dst_i = src_i >= value
+dst_i = (src_i \geq value)
 $$
 
 ## 函数原型
@@ -51,6 +51,7 @@ __simd_callee__ inline void asc_ge_scalar(vector_bool& dst, vector_float src, fl
 
 ## 参数说明
 
+*表 1* 参数说明
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（掩码寄存器）。 |
@@ -60,9 +61,25 @@ __simd_callee__ inline void asc_ge_scalar(vector_bool& dst, vector_float src, fl
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
 
+
+## 数据类型
+
+| 输入A类型 | 输入B类型/标量类型 | 输出类型 |
+|---|---|---|
+| uint8_t | uint8_t | bool |
+| int8_t | int8_t | bool |
+| uint16_t | uint16_t | bool |
+| int16_t | int16_t | bool |
+| half | half | bool |
+| bfloat16_t | bfloat16_t | bool |
+| uint32_t | uint32_t | bool |
+| int32_t | int32_t | bool |
+| float | float | bool |
+
+
 ## 返回值说明
 
-无
+无返回值。
 
 ## 流水类型
 
@@ -70,7 +87,23 @@ PIPE_V
 
 ## 约束说明
 
-无
+- mask未筛选的元素在输出中置零。
+- 浮点数据类型比较，涉及 `NaN` 时比较结果为0。
+
+## 理论性能
+
+
+| 输入类型 | 输出类型 | 理论并行度(element/cycle) |
+|---|---|---|
+| int8_t | bool | 256 |
+| uint8_t | bool | 256 |
+| int16_t | bool | 128 |
+| uint16_t | bool | 128 |
+| half | bool | 128 |
+| bfloat16_t | bool | 128 |
+| int32_t | bool | 64 |
+| uint32_t | bool | 64 |
+| float | bool | 64 |
 
 ## 调用示例
 
