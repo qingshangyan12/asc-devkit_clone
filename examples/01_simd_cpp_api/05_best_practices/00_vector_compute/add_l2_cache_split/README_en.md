@@ -277,7 +277,7 @@ L2Cache r/w mixed bandwidth is approximately 7 TB/s, while GM bandwidth is appro
 
 - The positive example incurs 3 × `PipeBarrier<PIPE_ALL>` synchronization overhead
 - L2Cache hit rate, although improved (0.94% vs 0.71%), remains low in absolute terms — this is inherent to the streaming access pattern of Add operations where data is read only once; cache hits only occur during recursive/repeated access
-- The positive example's MTE2 bandwidth (57.9 GB/s) still falls short of L2Cache theoretical bandwidth, limited by MTE2 pipeline depth and block dimensionality
+- The MTE2 engine's own bandwidth ceiling is far below L2Cache theoretical bandwidth
 
 ## Principle Illustration
 
