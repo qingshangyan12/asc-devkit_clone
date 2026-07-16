@@ -245,6 +245,33 @@ function fixInternalLinks(content, sourceRelPath, htmlToSecIdMap, fragmentLinks,
       return fullMatch
     }
 
+    if (decoded.startsWith('/')) {
+      if (decoded.startsWith('/guide/')) {
+        let externalUrl = 'https://asc.gitcode.com' + decoded
+        if (fragment) externalUrl += '#' + fragment
+        const newAttrs = attrs.replace(/href="[^"]*"/i, 'href="' + externalUrl + '"')
+        return '<a ' + newAttrs + '>'
+      }
+      if (decoded.startsWith('/api/')) {
+        const apiRelativePath = decoded.substring('/api/'.length)
+        const targetSecId = htmlToSecIdMap[apiRelativePath]
+        if (targetSecId) {
+          if (fragment) {
+            const key = targetSecId + '_f' + (fragmentCounter[targetSecId] = (fragmentCounter[targetSecId] || 0) + 1)
+            fragmentLinks[key] = { secId: targetSecId, fragment: fragment }
+            const newHref = '#' + key
+            const newAttrs = attrs.replace(/href="[^"]*"/i, 'href="' + newHref + '"')
+            return '<a ' + newAttrs + '>'
+          }
+          const newHref = '#' + targetSecId
+          const newAttrs = attrs.replace(/href="[^"]*"/i, 'href="' + newHref + '"')
+          return '<a ' + newAttrs + '>'
+        }
+      }
+      const newAttrs = attrs.replace(/href="[^"]*"/i, '')
+      return '<a ' + newAttrs + '>'
+    }
+
     const srcDir = sourceRelPath.includes('/') ? sourceRelPath.substring(0, sourceRelPath.lastIndexOf('/')) : ''
     const parts = srcDir ? srcDir.split('/') : []
     const targetParts = pathPart.split('/')
@@ -572,7 +599,8 @@ async function renderBatchedPdf(browser, allCss, sections, anchorToSecIdMap, opt
     '.pdf-h4{font-size:1em;margin:1.12em 0;font-weight:bold}' +
     '.pdf-h5{font-size:.83em;margin:1.5em 0;font-weight:bold}' +
     '.pdf-h6{font-size:.75em;margin:1.67em 0;font-weight:bold}' +
-    '.pdf-tree-heading{border-bottom:1px solid #ddd;padding-bottom:.3em;margin-top:1em;}'
+    '.pdf-tree-heading{border-bottom:1px solid #ddd;padding-bottom:.3em;margin-top:1em;}' +
+    '.markdown-body a[href^="https://"] { color: #1a73e8; text-decoration: underline; }'
 
   let globalPageOffset = 0
 
