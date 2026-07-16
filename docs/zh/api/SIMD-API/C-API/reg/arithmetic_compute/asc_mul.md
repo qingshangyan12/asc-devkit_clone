@@ -63,10 +63,6 @@ __simd_callee__ inline void asc_mul(vector_float& dst, vector_float src0, vector
 
 无
 
-## 流水类型
-
-PIPE_V
-
 ## 约束说明
 
 - mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。

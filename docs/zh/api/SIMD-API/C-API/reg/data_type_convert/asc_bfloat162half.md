@@ -75,10 +75,6 @@ __simd_callee__ inline void asc_bfloat162half_rz_sat(vector_half& dst, vector_bf
 
 无
 
-## 流水类型
-
-PIPE_V
-
 ## 约束说明
 
 - mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
