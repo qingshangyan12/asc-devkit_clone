@@ -118,7 +118,8 @@ enum BinaryMetaType { // function level TLV type
     B_TYPE_DEBUG_INFO = 1,
     B_TYPE_DYNAMIC_PARAM = 2,
     B_TYPE_OPTIONAL_PARAM = 3,
-    B_TYPE_SK_INFO = 5
+    B_TYPE_SK_INFO = 5,
+    B_TYPE_TILING_PARAM_INFO = 30
 };
 
 struct BaseTlv {  // definition of TLV head
@@ -147,6 +148,14 @@ struct BinaryMetaOptionalParam {
     BaseTlv head;
     uint16_t optionalInputMode; // For optional inputs, placeholder publication is required.
     uint16_t optionalOutputMode; // For optional inputs, placeholder publication is required.
+};
+
+struct BinaryMetaTilingParam {
+    BaseTlv head;
+    uint32_t version;
+    uint32_t paramIndex;
+    uint32_t offset;
+    uint32_t size;
 };
 
 struct BinaryMetaAscFeature {
