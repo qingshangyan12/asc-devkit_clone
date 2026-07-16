@@ -24,7 +24,7 @@
 
 ## 功能说明
 
-`tiled_partition` API用于将一个线程组划分为多个更小、固定大小的子组，以便线程在以更精细的粒度上进行协作。提供模板和非模板两个版本的接口，分别用于编译时确定划分大小以及运行时确定划分大小的场景。
+`tiled_partition` API用于将一个线程组划分为多个更小、固定大小的子组，以便线程在以更精细的粒度上进行协作。提供模板和非模板两个版本的接口，分别用于编译时确定划分大小以及运行时确定划分大小的场景。模板版本支持创建跨Warp的`thread_block_tile`。
 
 ## 函数原型
 
@@ -67,8 +67,31 @@ coalesced_group tiled_partition(const coalesced_group& parent, unsigned int tile
 
 ## 约束说明
 
-- `Size`必须是$2^n$，并且必须小于等于32（warpSize），当前可选值范围：1、2、4、8、16、32。
+- 模板版本中，`Size`必须是$2^n$，当前可选值范围：1、2、4、8、16、32、64、128、256、512、1024、2048。
+- 非模板版本仅支持创建`Size <= 32`的子组。
+- 当要创建跨Warp的`thread_block_tile`时，用户需在UB上创建`block_tile_memory`作为临时存储，并通过`this_thread_block(scratch)`创建父`thread_block`。
 - 对于模板版本的接口，父组中的线程数必须能被`Size`整除。并且如果父组是`thread_block_tile`，则`Size`必须小于父组大小。
+
+## block_tile_memory
+
+`block_tile_memory`用于为跨Warp的`thread_block_tile`提供组内同步和跨Warp通信所需的临时存储，可通过带`scratch`参数的`this_thread_block`接口传入。
+
+```c++
+template <unsigned int MaxBlockSize = 1024>
+struct block_tile_memory
+```
+
+**表3**  `block_tile_memory`模板参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| MaxBlockSize | 输入 | 当前线程块中需要支持的最大线程数，默认值为1024。 |
+
+`block_tile_memory`约束如下：
+
+- `MaxBlockSize`必须大于0且小于等于2048。
+- `MaxBlockSize`必须是Warp大小32的整数倍。
+- 线程块实际启动线程数不能超过`MaxBlockSize`。
 
 ## 调用示例
 
@@ -81,6 +104,9 @@ coalesced_group tiled_partition(const coalesced_group& parent, unsigned int tile
         ...
         thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
+        __ubuf__ block_tile_memory<2048> scratch;
+        thread_block block_with_memory = this_thread_block(scratch);
+        auto tile64 = tiled_partition<64>(block_with_memory);
         ...
     }
     ```
@@ -94,6 +120,9 @@ coalesced_group tiled_partition(const coalesced_group& parent, unsigned int tile
         ...
         thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
+        __ubuf__ block_tile_memory<2048> scratch;
+        thread_block block_with_memory = this_thread_block(scratch);
+        auto tile64 = tiled_partition<64>(block_with_memory);
         ...
     }
     ```

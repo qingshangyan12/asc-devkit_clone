@@ -32,9 +32,18 @@
 thread_block this_thread_block()
 ```
 
+```c++
+template <unsigned int MaxBlockSize>
+thread_block this_thread_block(__ubuf__ block_tile_memory<MaxBlockSize>& scratch)
+```
+
 ## 参数说明
 
-无
+**表1**  参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| scratch | 输入 | 用于为`thread_block`携带跨Warp临时存储。 |
 
 ## 返回值说明
 
@@ -42,8 +51,18 @@ thread_block this_thread_block()
 
 ## 约束说明
 
-无
+- `MaxBlockSize`必须大于0且小于等于2048，并且必须是32的整数倍。
+- 线程块实际启动线程数不能超过`MaxBlockSize`。
 
 ## 调用示例
 
-参考[调用示例](sync.md#调用示例)
+```c++
+using namespace cooperative_groups;
+__global__ void simt_kernel(...)
+{
+    ...
+    __ubuf__ block_tile_memory<2048> scratch;
+    thread_block block = this_thread_block(scratch);
+    ...
+}
+```
