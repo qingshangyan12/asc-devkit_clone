@@ -30,7 +30,7 @@ repos:
       - id: clang-format
         types_or: [file]
         files: \.(c|h|cpp|hpp|cc|hh|cxx|hxx|asc)$
-        exclude: ^(tests/python/aclrt_launch_kernel/stub_files/|include/utils/)
+        exclude: ^(tests/python/aclrt_launch_kernel/stub_files/|include/utils/|impl/adv_api/detail/matmul|impl/basic_api/dav_m510)
         args:
           - "--style=file"
           - "--verbose"
