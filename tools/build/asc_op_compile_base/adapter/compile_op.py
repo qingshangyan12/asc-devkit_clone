@@ -549,6 +549,48 @@ def gen_meta_info_section(compile_info, op_info):
     global_var_storage.set_variable("ascendc_meta_info", section_var)
 
 
+def _get_tiling_size_expression(compile_info: CompileInfo, tiling_info: TilingInfo, tiling_key: str):
+    tiling_struct_map = getattr(compile_info, "tiling_key_struct_map", {}) or {}
+    tiling_struct = tiling_struct_map.get(tiling_key)
+    if tiling_struct is None:
+        tiling_struct = (getattr(tiling_info, "tiling_key_struct_map", {}) or {}).get(tiling_key)
+    if tiling_struct:
+        return "sizeof({})".format(tiling_struct)
+
+    tiling_size = (getattr(tiling_info, "tiling_key_data_size", {}) or {}).get(
+        tiling_key, getattr(tiling_info, "default_tiling_size", 0))
+    if not isinstance(tiling_size, int) or tiling_size <= 0 or tiling_size > 0xFFFFFFFF:
+        return None
+    return str(tiling_size)
+
+
+def gen_tiling_param_meta_section(compile_info: CompileInfo, tiling_info: TilingInfo):
+    if tiling_info.static_shape_flag:
+        return
+
+    tiling_param_index = getattr(DFXSectionGenerator(), "param_to_index", {}).get("tiling")
+    if tiling_param_index is None:
+        return
+
+    section_var = global_var_storage.get_variable("ascendc_meta_info")
+    for tiling_key_value in compile_info.tiling_key_list:
+        tiling_key = str(tiling_key_value)
+        tiling_size = _get_tiling_size_expression(compile_info, tiling_info, tiling_key)
+        if tiling_size is None:
+            continue
+        variable_name = "{}_tiling_param_{}_section".format(compile_info.kernel_name, tiling_key)
+        runtime_kernel_name = "{}_{}".format(compile_info.kernel_name, tiling_key)
+        section_var += "\n#if {} == {}UL\n".format(TILING_KEY_MACRO, tiling_key)
+        section_var += "static const struct BinaryMetaTilingParam {} __attribute__ ".format(variable_name)
+        section_var += "((used, section (\".ascend.meta.{}\"))) = ".format(runtime_kernel_name)
+        section_var += "{{B_TYPE_TILING_PARAM_INFO, "
+        section_var += "sizeof(BinaryMetaTilingParam) - sizeof(BaseTlv)}, "
+        section_var += "1, {}, {}, {}}};\n".format(
+            tiling_param_index, tiling_param_index * 8, tiling_size)
+        section_var += "#endif\n"
+    global_var_storage.set_variable("ascendc_meta_info", section_var)
+
+
 def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
                     tiling_info: TilingInfo, compile_option_tuple):
     compile_options = compile_option_tuple.compile_options
@@ -1020,6 +1062,7 @@ def gen_op_stub_kernel_func(compile_info: CompileInfo, op_info: OpInfo, compile_
         gen_meta_info_section(compile_info, op_info)
     workspace_idx = gen_kernel_fun(compile_info, compile_info.origin_func_name, op_info, tiling_info,
         compile_option_tuple)
+    gen_tiling_param_meta_section(compile_info, tiling_info)
 
     msg_info = "<{}> <{}> generate kernel stub end".format(compile_info.op_type, compile_info.tiling_key_list)
     LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)

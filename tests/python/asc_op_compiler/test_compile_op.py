@@ -1051,6 +1051,33 @@ class TestCompileOp(unittest.TestCase):
                 cfg.current()["tir.op_debug_config"] = ["oom"]
                 gen_meta_info_section(compile_info, op_info)
 
+    def test_gen_tiling_param_meta_section(self):
+        compile_info = CompileInfo()
+        compile_info.kernel_name = "AddCustom_ab1b6750d7f510985325b603cb06dc8b"
+        compile_info.tiling_key_list = ["1", "2"]
+        compile_info.tiling_key_struct_map = {"1": "AddCustomTilingData"}
+
+        tiling_info = TilingInfo()
+        tiling_info.static_shape_flag = False
+        tiling_info.tiling_key_data_size = {"2": 64}
+        DFXSectionGenerator().param_to_index = {"tiling": 4}
+        global_var_storage.set_variable("ascendc_meta_info", "")
+
+        gen_tiling_param_meta_section(compile_info, tiling_info)
+        section = global_var_storage.get_variable("ascendc_meta_info")
+        self.assertIn("B_TYPE_TILING_PARAM_INFO", section)
+        self.assertIn(".ascend.meta.AddCustom_ab1b6750d7f510985325b603cb06dc8b_1", section)
+        self.assertIn(".ascend.meta.AddCustom_ab1b6750d7f510985325b603cb06dc8b_2", section)
+        self.assertIn("sizeof(BinaryMetaTilingParam) - sizeof(BaseTlv)}, 1, 4, 32,", section)
+        self.assertIn("1, 4, 32, sizeof(AddCustomTilingData)", section)
+        self.assertIn("1, 4, 32, 64", section)
+        self.assertEqual(section.count("BinaryMetaTilingParam"), 4)
+
+        tiling_info.static_shape_flag = True
+        global_var_storage.set_variable("ascendc_meta_info", "unchanged")
+        gen_tiling_param_meta_section(compile_info, tiling_info)
+        self.assertEqual(global_var_storage.get_variable("ascendc_meta_info"), "unchanged")
+
     def test_gen_kernel_fun(self):
         SetCurrentSocInfo("Ascend910B1")
         cce_file = os.path.join(
