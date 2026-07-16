@@ -199,7 +199,7 @@
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim`、`cpu` | 运行模式：NPU 运行、NPU 仿真、CPU 调试 |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU 仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`（默认） | NPU 架构，对应 Ascend 950PR / Ascend 950DT |
   | `SCENARIO_NUM` | `1`（默认）、`2` | 场景编号：1 = int8_t 输入，2 = bfloat16_t 输入 |
 

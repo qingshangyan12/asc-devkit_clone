@@ -117,14 +117,19 @@ __aicore__ inline void s2_compute_mmad(
     uint16_t right_width  = N;
     uint8_t  unit_flag    = 0;
     bool     disable_gemv = true;
+    bool     c_matrix_source   = false;
+    bool     c_matrix_init_val = true;
 
     asc_mmad(c_matrix, a_matrix, b_matrix,
              left_height, n_dim, right_width, unit_flag,
-             disable_gemv, true, true);
+             disable_gemv, c_matrix_source, c_matrix_init_val);
+    
+    c_matrix_source   = false;
+    c_matrix_init_val = false;
 
     asc_mmad(c_matrix, a_matrix, b_matrix,
              left_height, n_dim, right_width, unit_flag,
-             disable_gemv, false, false);
+             disable_gemv, c_matrix_source, c_matrix_init_val);
 
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
 }
