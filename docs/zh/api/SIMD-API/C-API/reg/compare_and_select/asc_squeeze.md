@@ -30,7 +30,7 @@
 
 将src中被mask选择的有效元素依次复制到dst中，有效元素在dst中从低到高连续排列，剩余位置元素置为0。
 
-配合asc_squeeze_with_status使用时，底层使用MODE_STORED，会将有效元素的总字节数存入AR特殊寄存器，后续可配合asc_clear_ar_spr清除AR寄存器。
+本接口不会将有效数据大小保存至AR寄存器，如果想将有效数据大小保存至AR寄存器，请参考[asc_squeeze_with_status](asc_squeeze_with_status.md)。
 
 ## 函数原型
 
@@ -58,7 +58,7 @@ __simd_callee__ inline void asc_squeeze(vector_float& dst, vector_float src, vec
 | --- | --- | --- |
 | dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。mask中为True的位置对应的src元素会被提取到dst中。 |
+| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
 
 ## 数据类型
 

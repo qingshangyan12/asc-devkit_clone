@@ -34,7 +34,8 @@
 - b16模式：每次处理128个元素。
 - b32模式：每次处理64个元素。
 
-图 1  asc_update_mask更新流程
+**图1**  asc_update_mask更新流程
+
 ![asc_update_mask更新流程](../../figures/capi_update_mask.png)
 
 ## 函数原型

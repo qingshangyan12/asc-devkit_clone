@@ -42,13 +42,13 @@ __simd_callee__ inline void asc_round(vector_float& dst, vector_float src, vecto
 
 ## 参数说明
 
-**表 1**  参数说明
+**表1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br>类型为vector_data_type，data_type的取值范围：half、bfloat16_t、float。 |
-| src | 输入 | 源操作数。<br>类型为vector_data_type，data_type的取值范围：half、bfloat16_t、float。 |
-| mask | 输入 | 源操作数元素操作的有效指示。<br>类型为vector_bool。 |
+| dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| src | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
 
 ## 数据类型
 

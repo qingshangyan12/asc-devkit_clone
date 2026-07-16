@@ -81,38 +81,38 @@ dst中未被mask筛选的位置被置为0。
 
 - 对矢量数据寄存器操作
 
-```cpp
-__simd_vf__ inline void xor_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src0_addr, __ubuf__ int8_t* src1_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
-{
-    vector_int8_t dst;
-    vector_int8_t src0;
-    vector_int8_t src1;
-    vector_bool mask;
-    for (uint16_t i = 0; i < repeat_time; ++i) {
-        mask = asc_update_mask_b8(count);
-        asc_loadalign(src0, src0_addr + i * one_repeat_size);
-        asc_loadalign(src1, src1_addr + i * one_repeat_size);
-        asc_xor(dst, src0, src1, mask);
-        asc_storealign(dst_addr + i * one_repeat_size, dst, mask);
+    ```cpp
+    __simd_vf__ inline void xor_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src0_addr, __ubuf__ int8_t* src1_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
+    {
+        vector_int8_t dst;
+        vector_int8_t src0;
+        vector_int8_t src1;
+        vector_bool mask;
+        for (uint16_t i = 0; i < repeat_time; ++i) {
+            mask = asc_update_mask_b8(count);
+            asc_loadalign(src0, src0_addr + i * one_repeat_size);
+            asc_loadalign(src1, src1_addr + i * one_repeat_size);
+            asc_xor(dst, src0, src1, mask);
+            asc_storealign(dst_addr + i * one_repeat_size, dst, mask);
+        }
     }
-}
-```
+    ```
 
 - 对掩码寄存器操作
 
-```cpp
-__simd_vf__ inline void xor_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
-{
-    vector_int8_t src;
-    vector_bool dst;
-    vector_bool mask = asc_create_mask_b8(PAT_ALL);
-    vector_bool mask0 = asc_create_mask_b8(PAT_ALL);
-    vector_bool mask1 = asc_create_mask_b8(PAT_ALLF);
-    asc_xor(dst, mask0, mask1, mask);
-    for (uint16_t i = 0; i < repeat_time; ++i) {
-        asc_loadalign(src, src_addr + i * one_repeat_size);
-        asc_add_scalar(src, src, 0, dst);
-        asc_storealign(dst_addr + i * one_repeat_size, src, mask);
+    ```cpp
+    __simd_vf__ inline void xor_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
+    {
+        vector_int8_t src;
+        vector_bool dst;
+        vector_bool mask = asc_create_mask_b8(PAT_ALL);
+        vector_bool mask0 = asc_create_mask_b8(PAT_ALL);
+        vector_bool mask1 = asc_create_mask_b8(PAT_ALLF);
+        asc_xor(dst, mask0, mask1, mask);
+        for (uint16_t i = 0; i < repeat_time; ++i) {
+            asc_loadalign(src, src_addr + i * one_repeat_size);
+            asc_add_scalar(src, src, 0, dst);
+            asc_storealign(dst_addr + i * one_repeat_size, src, mask);
+        }
     }
-}
-```
+    ```

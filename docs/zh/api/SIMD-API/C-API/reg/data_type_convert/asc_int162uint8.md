@@ -30,7 +30,7 @@
 
 将src中int16_t类型的元素转换为uint8_t类型，并将结果写入dst。支持非饱和与饱和两种模式。
 
-由于src和dst位宽比为2:1（int16_t为16bit、uint8_t为8bit），dst中每2个uint8_t位置为一组，各组内只有1个位置有效。
+由于src和dst位宽比为2:1，dst中每2个uint8_t位置为一组，各组内只有1个位置有效。
 
 - asc_int162uint8：非饱和模式，结果写入dst各组内第0个位置，直接截断。mask每2bit为一组，仅组内LSB为1时选取对应位置的int16_t元素。
 
@@ -48,7 +48,7 @@
     dst[1:256:2] = src[0:128].astype(uint8)
     ```
 
-- asc_int162uint8_sat：饱和模式，超出[0, 255]范围的值钳位到边界。RegLayout::ZERO，结果写入dst各组内第0个位置。mask每2bit为一组、仅组内LSB为1时选取对应位置的int16_t元素。
+- asc_int162uint8_sat：饱和模式，超出[0, 255]范围的值钳位到边界。结果写入dst各组内第0个位置。mask每2bit为一组，仅组内LSB为1时选取对应位置的int16_t元素。
 
     ```python
     # 饱和模式，钳位到[0, 255]
@@ -58,7 +58,7 @@
     dst[0:256:2] = src_clamped[0:128].astype(uint8)
     ```
 
-- asc_int162uint8_sat_v2：饱和模式，超出[0, 255]范围的值钳位到边界。RegLayout::ONE，结果写入dst各组内第1个位置。mask每2bit为一组、仅组内LSB为1时选取对应位置的int16_t元素。
+- asc_int162uint8_sat_v2：饱和模式，超出[0, 255]范围的值钳位到边界。结果写入dst各组内第1个位置。mask每2bit为一组，仅组内LSB为1时选取对应位置的int16_t元素。
 
     ```python
     # 饱和模式，钳位到[0, 255]

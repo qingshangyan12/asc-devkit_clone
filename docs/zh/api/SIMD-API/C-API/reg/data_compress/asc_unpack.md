@@ -40,12 +40,14 @@
 
 矢量数据寄存器unpack流程如图1所示：
 
-图 1  矢量数据寄存器unpack流程
+**图1**  矢量数据寄存器unpack流程
+
 ![矢量数据寄存器unpack流程](../../figures/capi_unpack_reg.png)
 
 掩码数据寄存器unpack流程如图2所示：
 
-图 2  掩码数据寄存器unpack流程
+**图2**  掩码数据寄存器unpack流程
+
 ![掩码数据寄存器unpack流程](../../figures/capi_unpack_mask.png)
 
 ## 函数原型

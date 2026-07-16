@@ -32,17 +32,17 @@
 
 由于源操作数和目的操作数位宽比为1:2，每两个hifloat8_t类型的元素中选择一个进行类型转换。asc_hif82half选择第1个元素参与转换，asc_hif82half_v2选择第2个元素参与转换。
 
-- asc_hif82half：取src的偶数索引元素（layout=0，即索引0, 2, 4, ...）进行转换，mask每bit为1时选取对应位置的hifloat8_t元素。
+- asc_hif82half：取src的偶数索引元素（索引0, 2, 4, ...）进行转换，mask每bit为1时选取对应位置的hifloat8_t元素。
 
     ```python
-    # layout = 0，选取第1个（偶数索引）元素
+    # 选取第1个（偶数索引）元素
     dst[0:128] = src[0:256:2].astype(float16)
     ```
 
-- asc_hif82half_v2：取src的奇数索引元素（layout=1，即索引1, 3, 5, ...）进行转换，mask每bit为1时选取对应位置的hifloat8_t元素。
+- asc_hif82half_v2：取src的奇数索引元素（索引1, 3, 5, ...）进行转换，mask每bit为1时选取对应位置的hifloat8_t元素。
 
     ```python
-    # layout = 1，选取第2个（奇数索引）元素
+    # 选取第2个（奇数索引）元素
     dst[0:128] = src[1:256:2].astype(float16)
     ```
 

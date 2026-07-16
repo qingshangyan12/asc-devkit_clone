@@ -31,38 +31,38 @@
 将src中int16_t类型的元素转换为half类型（16位浮点数），并将结果写入dst。源操作数和目的操作数位宽相同（均为16bit），转换后元素数量不变。支持5种舍入模式：
 
 - rd：向负无穷方向舍入。总是向下取整。
-- rn：四舍六入五成双舍入（Banker's Rounding）。当小数部分为0.5时，舍入到最近的偶数。
+- rn：四舍六入五成双舍入。当小数部分为0.5时，舍入到最近的偶数。
 - rna：四舍五入舍入。小数部分≥0.5时向上舍入，<0.5时向下舍入。
 - ru：向正无穷方向舍入。总是向上取整。
 - rz：向零方向舍入。直接截断小数部分。
 
 ## 函数原型
 
-- 向下舍入（rd）
+- 向负无穷方向舍入（rd）
 
     ```cpp
     __simd_callee__ inline void asc_int162half_rd(vector_half& dst, vector_int16_t src, vector_bool mask)
     ```
 
-- 就近舍入（rn）
+- 四舍六入五成双舍入（rn）
 
     ```cpp
     __simd_callee__ inline void asc_int162half_rn(vector_half& dst, vector_int16_t src, vector_bool mask)
     ```
 
-- 就近舍入到偶数（rna）
+- 四舍五入舍入（rna）
 
     ```cpp
     __simd_callee__ inline void asc_int162half_rna(vector_half& dst, vector_int16_t src, vector_bool mask)
     ```
 
-- 向上舍入（ru）
+- 向正无穷方向舍入（ru）
 
     ```cpp
     __simd_callee__ inline void asc_int162half_ru(vector_half& dst, vector_int16_t src, vector_bool mask)
     ```
 
-- 向零舍入（rz）
+- 向零方向舍入（rz）
 
     ```cpp
     __simd_callee__ inline void asc_int162half_rz(vector_half& dst, vector_int16_t src, vector_bool mask)
@@ -76,7 +76,7 @@
 | --- | --- | --- |
 | dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_half](../reg_data_types/data_type_definition.md#矢量数据寄存器)。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_int16_t](../reg_data_types/data_type_definition.md#矢量数据寄存器)。 |
-| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。对应位置为1的元素参与类型转换。 |
+| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
 
 ## 数据类型
 
