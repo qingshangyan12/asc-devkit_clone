@@ -24,7 +24,7 @@
 
 ## 功能说明
 
-`thread_block_tile`不提供默认构造函数，可通过`tiled_partition`接口从另一个协作组中划分得到。
+`thread_block_tile`不提供默认构造函数，可通过`tiled_partition`接口从另一个协作组中划分得到。当`thread_block_tile`的模板参数`Size`大于32时，即创建跨Warp `thread_block_tile`时，父`thread_block`必须通过带`scratch`参数的`this_thread_block`创建，其中`scratch`为用户提供的[block_tile_memory](../tiled_partition.md#block_tile_memory)对象表达式。
 
 ## 函数原型
 
@@ -48,7 +48,11 @@ thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
 
 ## 约束说明
 
-- `Size`必须是$2^n$，并且必须小于等于32（warpSize），当前可选值范围：1、2、4、8、16、32。
+- `Size`必须是$2^n$，当前可选值范围：1、2、4、8、16、32、64、128、256、512、1024、2048。
+- 当`thread_block_tile`的模板参数`Size`大于32时，即`Size`为64、128、256、512、1024、2048的跨Warp协作组场景，必须使用`block_tile_memory`创建父`thread_block`。
+- 纯SIMT编程场景下，用于创建父`thread_block`的`block_tile_memory`对象必须位于Global Memory或UB，不能是在栈空间中创建的对象。
+- 当`thread_block_tile`的模板参数`Size`大于32时，支持的成员函数为`sync()`、`thread_rank()`、`num_threads()`、`size()`、`meta_group_rank()`、`meta_group_size()`、`shfl()`、`any()`、`all()`。
+- 对于模板版本的接口，父组中的线程数必须能被`Size`整除。并且如果父组是`thread_block_tile`，则`Size`必须小于父组大小。
 
 ## 调用示例
 
@@ -56,13 +60,18 @@ thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
 
     ```c++
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel(block_tile_memory<1024>* scratch)
     {
         ...
+        // 创建Size<=32的thread_block_tile
         thread_block block = this_thread_block();
         thread_block_tile<32> tile32 = tiled_partition<32>(block);              // 按照32个线程为一组划分thread_block
         auto tile32_auto = tiled_partition<32>(block);                          // 建议使用auto管理返回对象
         thread_block_tile<4, thread_block> tile4 = tiled_partition<4>(block);   // 按照4个线程为一组划分thread_block，对象类型中保留父组信息
+
+        // 创建Size>32的thread_block_tile
+        thread_block block_with_memory = this_thread_block(*scratch);
+        auto tile64 = tiled_partition<64>(block_with_memory);                   // 按照64个线程为一组划分thread_block
         ...
     }
     ```
@@ -71,13 +80,22 @@ thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
 
     ```c++
     using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
+    __simt_vf__ inline void simt_kernel(__gm__ block_tile_memory<1024>* gm_scratch)
     {
         ...
+        // 创建Size<=32的thread_block_tile
         thread_block block = this_thread_block();
         thread_block_tile<32> tile32 = tiled_partition<32>(block);              // 按照32个线程为一组划分thread_block
         auto tile32_auto = tiled_partition<32>(block);                          // 建议使用auto管理返回对象
         thread_block_tile<4, thread_block> tile4 = tiled_partition<4>(block);   // 按照4个线程为一组划分thread_block，对象类型中保留父组信息
+
+        // 创建Size>32的thread_block_tile
+        __ubuf__ unsigned char ub_storage[sizeof(block_tile_memory<1024>)];
+        auto ub_scratch = reinterpret_cast<__ubuf__ block_tile_memory<1024>*>(ub_storage);
+        thread_block ub_block = this_thread_block(*ub_scratch);
+        auto ub_tile64 = tiled_partition<64>(ub_block);                         // 使用UB临时存储划分thread_block
+        thread_block gm_block = this_thread_block(*gm_scratch);
+        auto gm_tile64 = tiled_partition<64>(gm_block);                         // 使用Global Memory临时存储划分thread_block
         ...
     }
     ```
