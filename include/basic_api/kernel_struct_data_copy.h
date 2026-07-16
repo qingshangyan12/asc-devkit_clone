@@ -109,7 +109,11 @@ using NdDmaLoopInfo = MultiCopyLoopInfo<dim>;
 template <typename T, uint8_t dim>
 struct MultiCopyParams {
     MultiCopyLoopInfo<dim> loopInfo;
-    T constantValue;
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+    typename GetPadValueType<T>::Type constantValue = 0;
+#else
+    T constantValue = 0;
+#endif
 };
 
 template <typename T, uint8_t dim>
