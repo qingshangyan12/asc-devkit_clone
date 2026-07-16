@@ -12,6 +12,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
+#include <fstream>
 #include <vector>
 
 #include "aclnn/aclnn_base.h"
@@ -28,13 +29,23 @@
         }                                                                                               \
     } while (0)
 
+bool ReadFile(const char* filePath, void* data, size_t size)
+{
+    std::ifstream file(filePath, std::ios::binary);
+    if (!file || !file.read(static_cast<char*>(data), size)) {
+        fprintf(stderr, "[ERROR] Failed to read %s\n", filePath);
+        return false;
+    }
+    return true;
+}
+
 bool VerifyResult(const std::vector<aclFloat16>& outputData, const std::vector<aclFloat16>& goldenData)
 {
     if (outputData.size() != goldenData.size()) {
         return false;
     }
 
-    constexpr float tolerance = 2e-3F;
+    constexpr float tolerance = 0;
     return std::equal(
         outputData.begin(), outputData.end(), goldenData.begin(), [](aclFloat16 output, aclFloat16 golden) {
             const float outputValue = aclFloat16ToFloat(output);
@@ -45,15 +56,24 @@ bool VerifyResult(const std::vector<aclFloat16>& outputData, const std::vector<a
 
 int32_t main(int32_t argc, char** argv)
 {
+    const std::vector<int64_t> shape = {8, 2048};
+    const int64_t elementCount = shape[0] * shape[1];
+    const size_t bufferSize = elementCount * sizeof(aclFloat16);
+    std::vector<aclFloat16> input0HostData(elementCount);
+    std::vector<aclFloat16> input1HostData(elementCount);
+    std::vector<aclFloat16> output0HostData(elementCount, aclFloatToFloat16(0.0));
+    std::vector<aclFloat16> goldenData(elementCount);
+    if (!ReadFile("input/input0.bin", input0HostData.data(), bufferSize) ||
+        !ReadFile("input/input1.bin", input1HostData.data(), bufferSize) ||
+        !ReadFile("output/golden.bin", goldenData.data(), bufferSize)) {
+        return 1;
+    }
+
     const int32_t deviceId = 0;
     aclrtStream stream = nullptr;
     CHECK_ACL(aclnnInit(nullptr));
     CHECK_ACL(aclrtSetDevice(deviceId));
     CHECK_ACL(aclrtCreateStream(&stream));
-
-    const std::vector<int64_t> shape = {8, 2048};
-    const int64_t elementCount = shape[0] * shape[1];
-    const size_t bufferSize = elementCount * sizeof(aclFloat16);
 
     void* input0DeviceMem = nullptr;
     CHECK_ACL(aclrtMalloc(&input0DeviceMem, bufferSize, ACL_MEM_MALLOC_HUGE_FIRST));
@@ -72,11 +92,6 @@ int32_t main(int32_t argc, char** argv)
     aclTensor* output0 = aclCreateTensor(
         shape.data(), shape.size(), ACL_FLOAT16, nullptr, 0, ACL_FORMAT_ND, shape.data(), shape.size(),
         output0DeviceMem);
-
-    std::vector<aclFloat16> input0HostData(elementCount, aclFloatToFloat16(1.0));
-    std::vector<aclFloat16> input1HostData(elementCount, aclFloatToFloat16(2.0));
-    std::vector<aclFloat16> output0HostData(elementCount, aclFloatToFloat16(0.0));
-    std::vector<aclFloat16> goldenData(elementCount, aclFloatToFloat16(3.0));
 
     CHECK_ACL(aclrtMemcpy(input0DeviceMem, bufferSize, input0HostData.data(), bufferSize, ACL_MEMCPY_HOST_TO_DEVICE));
     CHECK_ACL(aclrtMemcpy(input1DeviceMem, bufferSize, input1HostData.data(), bufferSize, ACL_MEMCPY_HOST_TO_DEVICE));
