@@ -28,7 +28,7 @@
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
-对AR特殊寄存器进行清零操作。AR寄存器用于配合[asc_squeeze_with_status](../reg_vector/asc_squeeze_with_status.md)使用：当调用asc_squeeze_with_status时，有效元素的总字节数会被存入AR寄存器；在下次使用asc_squeeze_with_status之前，可调用asc_clear_ar_spr将AR寄存器清零。
+对AR特殊寄存器进行清零操作。AR寄存器用于配合[asc_squeeze_with_status](../compare_and_select/asc_squeeze_with_status.md)使用：当调用asc_squeeze_with_status时，有效元素的总字节数会被存入AR寄存器；在下次使用asc_squeeze_with_status之前，可调用asc_clear_ar_spr将AR寄存器清零。
 
 ## 函数原型
 
@@ -38,11 +38,11 @@ __simd_callee__ inline void asc_clear_ar_spr()
 
 ## 参数说明
 
-无
+无参数
 
 ## 返回值说明
 
-无
+无返回值
 
 ## 约束说明
 
@@ -51,10 +51,7 @@ __simd_callee__ inline void asc_clear_ar_spr()
 ## 调用示例
 
 ```cpp
-constexpr uint32_t one_repeat_size = 256 / sizeof(half);
-uint32_t total_length = 256;
-uint32_t repeat_time = total_length / one_repeat_size;
-__simd_vf__ inline void creat_mask_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
+__simd_vf__ inline void clear_ar_spr_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_half dst;
     vector_half src;

@@ -38,13 +38,15 @@
 - 有符号整型：保持符号位扩充。例如vector_int8_t到vector_int16_t，src中每个int8_t元素按符号位扩展为int16_t。
 - bool类型（掩码寄存器）：将每bit展开为2bit，高位填0。
 
-矢量数据寄存器unpack流程如下图：
+矢量数据寄存器unpack流程如图1所示：
 
-![](../../figures/capi_unpack_reg.png)
+图 1  矢量数据寄存器unpack流程
+![矢量数据寄存器unpack流程](../../figures/capi_unpack_reg.png)
 
-掩码数据寄存器unpack流程如下图：
+掩码数据寄存器unpack流程如图2所示：
 
-![](../../figures/capi_unpack_reg.png)
+图 2  掩码数据寄存器unpack流程
+![掩码数据寄存器unpack流程](../../figures/capi_unpack_mask.png)
 
 ## 函数原型
 
@@ -91,7 +93,7 @@
 
 ## 返回值说明
 
-无
+无返回值
 
 ## 约束说明
 
@@ -102,11 +104,7 @@
 - 对矢量数据寄存器操作
 
     ```cpp
-    constexpr uint32_t one_src_repeat_size = 256 / sizeof(uint16_t);
-    constexpr uint32_t one_dst_repeat_size = 256 / sizeof(uint32_t);
-    uint32_t total_length = 256;
-    uint32_t repeat_time = total_length / one_src_repeat_size;
-    __simd_vf__ inline void unpack_vf(__ubuf__ uint32_t* dst_addr, __ubuf__ uint16_t* src_addr, uint32_t count, uint32_t one_src_repeat_size, uint32_t one_dst_repeat_size, uint16_t repeat_time)
+    __simd_vf__ inline void unpack_vf(__ubuf__ uint32_t* dst_addr, __ubuf__ uint16_t* src_addr, uint32_t one_src_repeat_size, uint32_t one_dst_repeat_size, uint16_t repeat_time)
     {
         vector_uint32_t dst;
         vector_uint16_t src;
@@ -122,9 +120,6 @@
 - 对掩码寄存器操作
 
     ```cpp
-    constexpr uint32_t one_repeat_size = 256 / sizeof(uint32_t);
-    uint32_t total_length = 256;
-    uint32_t repeat_time = total_length / one_repeat_size;
     __simd_vf__ inline void unpack_vf(__ubuf__ uint32_t* dst_addr, __ubuf__ uint32_t* src_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
     {
         vector_uint32_t src;

@@ -92,7 +92,7 @@
 
 ## 返回值说明
 
-无
+无返回值
 
 ## 约束说明
 
@@ -112,19 +112,16 @@
 - 当操作数类型为b32时，RegTensor的一个数据块大小为8B，每个bit经过broadcast成4bit后变为32B，即一个MaskReg（32B）。此外，一个RegTensor有256B/8B = 32个数据块，偏移量offset取值范围为[0, 31]。
 
 **图 1**  矢量寄存器复制到掩码寄存器（uint16_t）<a id="fig-maskgen-b16"></a>  
-![](../../figures/capi_copy_reg2mask_b16.png)
+![矢量寄存器复制到掩码寄存器（uint16_t）](../../figures/capi_copy_reg2mask_b16.png)
 
 **图 2**  矢量寄存器复制到掩码寄存器（uint32_t）<a id="fig-maskgen-b32"></a>  
-![](../../figures/capi_copy_reg2mask_b32.png)
+![矢量寄存器复制到掩码寄存器（uint32_t）](../../figures/capi_copy_reg2mask_b32.png)
 
 ## 调用示例
 
 - 矢量数据寄存器复制到矢量数据寄存器
 
 ```cpp
-constexpr uint32_t one_repeat_size = 256 / sizeof(half);
-uint32_t total_length = 256;
-uint32_t repeat_time = total_length / one_repeat_size;
 __simd_vf__ inline void copy_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_half dst;
@@ -142,17 +139,14 @@ __simd_vf__ inline void copy_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr
 - 掩码寄存器复制到掩码寄存器
 
 ```cpp
-constexpr uint32_t one_block_size = 256 / sizeof(half);
-uint32_t total_length = 256;
-uint32_t repeat_time = total_length / one_block_size;
-__simd_vf__ inline void copy_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, uint32_t count, uint32_t one_block_size, uint16_t repeat_time)
+__simd_vf__ inline void copy_mask_vf(__ubuf__ uint32_t* dst_addr, __ubuf__ uint32_t* src_addr, uint32_t count, uint32_t one_block_size, uint16_t repeat_time)
 {
     vector_bool dst;
     vector_bool src;
     vector_bool mask;
     for (uint16_t i = 0; i < repeat_time; ++i) {
         mask = asc_update_mask_b16(count);
-        asc_loadalign_postupdate(src, src_addr, one_block_size);
+        asc_loadalign_postupdate(src, src_addr);
         asc_copy(dst, src, mask);
         asc_storealign_postupdate(dst_addr, dst, one_block_size);
     }
@@ -162,9 +156,9 @@ __simd_vf__ inline void copy_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr
 - 矢量寄存器复制到掩码寄存器
 
 ```cpp
-__simd_vf__ inline void copy_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr)
+__simd_vf__ inline void copy_vector_to_mask_vf(__ubuf__ uint16_t* dst_addr, __ubuf__ uint16_t* src_addr)
 {
-    vector_half src;
+    vector_uint16_t src;
     vector_bool mask;
     asc_loadalign(src, src_addr);
     asc_copy(mask, src, 0);

@@ -34,7 +34,8 @@
 - b16模式：每次处理128个元素。
 - b32模式：每次处理64个元素。
 
-![](../../figures/capi_update_mask.png)
+图 1  asc_update_mask更新流程
+![asc_update_mask更新流程](../../figures/capi_update_mask.png)
 
 ## 函数原型
 
@@ -63,9 +64,6 @@ vector_bool，掩码寄存器。
 ## 调用示例
 
 ```cpp
-constexpr uint32_t one_repeat_size = 256 / sizeof(float);
-uint32_t total_length = 255;
-uint32_t repeat_time = (total_length + one_repeat_size - 1) / one_repeat_size;
 __simd_vf__ inline void update_mask_vf(__ubuf__ float* dst_addr, __ubuf__ float* src0_addr, __ubuf__ float* src1_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_float src0;

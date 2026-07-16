@@ -28,9 +28,10 @@
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
-将src0和src1中的元素解交织存入dst0和dst1中。解交织操作的流程如下图所示，每个方格代表一个数据类型为int8_t的元素：
+将src0和src1中的元素解交织存入dst0和dst1中。解交织操作的流程如图1所示，每个方格代表一个数据类型为int8_t的元素：
 
-![](../../figures/capi_deintlv_reg.png)
+图 1  解交织操作流程
+![解交织操作流程](../../figures/capi_deintlv_reg.png)
 
 ## 函数原型
 
@@ -77,7 +78,7 @@
 
 ## 返回值说明
 
-无
+无返回值
 
 ## 约束说明
 
@@ -89,9 +90,6 @@
 ## 调用示例
 
 ```cpp
-constexpr uint32_t one_repeat_size = 256 / sizeof(half);
-uint32_t total_length = 256;
-uint32_t repeat_time = total_length / one_repeat_size;
 __simd_vf__ inline void deintlv_vf(__ubuf__ half* dst0_addr, __ubuf__ half* dst1_addr, __ubuf__ half* src0_addr, __ubuf__ half* src1_addr, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_half dst0;

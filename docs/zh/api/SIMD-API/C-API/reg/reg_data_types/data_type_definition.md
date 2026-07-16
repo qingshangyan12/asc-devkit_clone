@@ -50,8 +50,9 @@
 
 掩码寄存器的类型为vector_bool，用于矢量计算中筛选参与计算的元素，其位宽为VL/8（即256/8=32字节=256bit）。当搬运掩码寄存器时，ubuf中地址偏移单位为字节。
 
-如下图所示，当操作数类型为b8时，每一个element对应1bit mask；当操作数类型为b16时，每一个element对应2bit mask，且仅2bit中的最低位是有效的；当操作数类型为b32时，每一个element对应4bit mask，且仅4bit中的最低位是有效的。
+如图1所示，当操作数类型为b8时，每一个element对应1bit mask；当操作数类型为b16时，每一个element对应2bit mask，且仅2bit中的最低位是有效的；当操作数类型为b32时，每一个element对应4bit mask，且仅4bit中的最低位是有效的。
 
+图 1  掩码寄存器
 ![掩码寄存器](../../figures/capi_mask.png)
 
 掩码寄存器设置支持多种灵活配置方式，可根据实际计算场景选择不同设置方式，以满足不同计算场景的需求。具体设置方式如下表所示：
@@ -60,10 +61,10 @@
 
 | 编号 | 设置方式 | 涉及接口 | 说明 |
 | :-- | :------------ | :------------ | :------------ |
-| 1 | 调用接口设置 | [asc_create_mask](../addr_reg_compute/asc_create_mask.md) | 可以设置参数指定mask的模式，即指定哪些位置的元素参与计算。 |
-| 2 | 调用接口设置 | [asc_update_mask](../addr_reg_compute/asc_update_mask.md) |&bull; 在循环外调用时设置固定的mask，mask表示在一次循环计算中前count个元素参与计算，每次以循环计算均使用此mask。<br>&bull; 在循环内调用时，表示计算中前count个元素参与计算，每次循环mask会自动更新。|
+| 1 | 调用接口设置 | [asc_create_mask](asc_create_mask.md) | 可以设置参数指定mask的模式，即指定哪些位置的元素参与计算。 |
+| 2 | 调用接口设置 | [asc_update_mask](asc_update_mask.md) |&bull; 在循环外调用时设置固定的mask，mask表示在一次循环计算中前count个元素参与计算，每次以循环计算均使用此mask。<br>&bull; 在循环内调用时，表示计算中前count个元素参与计算，每次循环mask会自动更新。|
 | 3 | 从Unified Buffer搬入 | [asc_loadalign_postupdate](../reg_load/asc_loadalign_postupdate.md) | 将掩码从UB搬入掩码寄存器。 |
-| 4 | 从矢量数据寄存器搬入 | [asc_copy](../addr_reg_compute/asc_copy.md) | 从矢量数据寄存器搬运至掩码寄存器。 |
+| 4 | 从矢量数据寄存器搬入 | [asc_copy](../reg_load/asc_copy.md) | 从矢量数据寄存器搬运至掩码寄存器。 |
 
 **注意：**
 MaskReg寄存器数量上限为8。超出限制上限的寄存器数据会写入预留的8K UB内存中，可能会引起性能劣化。编译器会自动复用生命周期结束的寄存器和预留内存，若寄存器与预留内存均存在可用空间，将优先复用寄存器。
@@ -80,9 +81,6 @@ vector_load_unalign寄存器和vector_store_unalign寄存器的数量上限均�
 ### 调用示例
 
 ```cpp
-constexpr uint32_t one_repeat_size = 256 / sizeof(int8_t); // VL / sizeof(T)
-uint32_t total_length = 255;
-uint32_t repeat_time = (total_length + one_repeat_size - 1) / one_repeat_size;
 __simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, uint32_t count,
     uint32_t one_repeat_size, uint16_t repeat_time)
 {
@@ -104,7 +102,7 @@ __simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_a
 
 ## 地址寄存器
 
-地址寄存器的数据类型为addr_reg，用于存储地址偏移量。addr_reg通过[asc_create_addr_reg](../addr_reg_compute/asc_create_addr_reg.md)初始化，然后在循环之中使用addr_reg存储地址偏移量。addr_reg在每层循环中根据所设置的步长进行自增。
+地址寄存器的数据类型为addr_reg，用于存储地址偏移量。addr_reg通过[asc_update_addr_reg](asc_update_addr_reg.md)初始化，然后在循环之中使用addr_reg存储地址偏移量。addr_reg在每层循环中根据所设置的步长进行自增。
 
 addr_reg的地址计算公式为：offset = Σ(index_i × stride_i)，其中index_i为第i层循环的迭代变量，stride_i为第i层循环的步长。
 
@@ -119,9 +117,6 @@ addr_reg的地址计算公式为：offset = Σ(index_i × stride_i)，其中inde
 
 - 单参数版本
     ```cpp
-    constexpr uint32_t one_repeat_size = 256 / sizeof(int8_t); // VL / sizeof(T)
-    uint32_t total_length = 256;
-    uint32_t repeat_time = total_length / one_repeat_size;
     __simd_vf__ inline void add_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src0_addr, __ubuf__ int8_t* src1_addr, uint32_t count,
         uint32_t one_repeat_size, uint16_t repeat_time)
     {
@@ -131,7 +126,7 @@ addr_reg的地址计算公式为：offset = Σ(index_i × stride_i)，其中inde
         vector_bool mask;
         addr_reg addr_reg;
         for (uint16_t i = 0; i < repeat_time; ++i) {
-            addr_reg = asc_create_addr_reg_b8(one_repeat_size); // 通过初始化addr_reg，每一次循环，地址偏移one_repeat_size
+            addr_reg = asc_update_addr_reg_b8(one_repeat_size); // 通过初始化addr_reg，每一次循环，地址偏移one_repeat_size
             mask = asc_update_mask_b8(count);
             asc_loadalign(src0, src0_addr, addr_reg);
             asc_loadalign(src1, src1_addr, addr_reg);
@@ -159,7 +154,7 @@ addr_reg的地址计算公式为：offset = Σ(index_i × stride_i)，其中inde
             for (uint16_t c = 0; c < C; c++) {
                 for (uint16_t h = 0; h < H; h++) {
                     for (uint16_t w = 0; w < W; w++) {
-                        a_reg = asc_create_addr_reg_b32(n_stride, c_stride, h_stride, w_stride);
+                        a_reg = asc_update_addr_reg_b32(n_stride, c_stride, h_stride, w_stride);
                         asc_loadalign(src_reg, src_addr, a_reg);
                         asc_add(dst_reg, src_reg, src_reg, mask);
                         asc_storealign(dst_addr, dst_reg, a_reg, mask);

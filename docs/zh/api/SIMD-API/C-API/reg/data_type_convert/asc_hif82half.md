@@ -80,7 +80,7 @@
 
 ## 返回值说明
 
-无
+无返回值
 
 ## 约束说明
 
@@ -89,10 +89,6 @@ dst中未被mask筛选的位置被置为0。
 ## 调用示例
 
 ```cpp
-constexpr uint32_t one_src_repeat_size = 256 / sizeof(hifloat8_t);
-constexpr uint32_t one_dst_repeat_size = 256 / sizeof(half);
-uint32_t total_length = 256;
-uint32_t repeat_time = total_length / one_src_repeat_size;
 __simd_vf__ inline void hif82half_vf(__ubuf__ half* dst_addr, __ubuf__ hifloat8_t* src_addr, uint32_t count, uint32_t one_src_repeat_size, uint32_t one_dst_repeat_size, uint16_t repeat_time)
 {
     vector_half dst;

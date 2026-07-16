@@ -56,7 +56,7 @@ __simd_callee__ inline void asc_ceil(vector_float& dst, vector_float src, vector
 
 ## 返回值说明
 
-无
+无返回值
 
 ## 约束说明
 
@@ -65,9 +65,6 @@ __simd_callee__ inline void asc_ceil(vector_float& dst, vector_float src, vector
 ## 调用示例
 
 ```cpp
-constexpr uint32_t one_repeat_size = 256 / sizeof(half);
-uint32_t total_length = 256;
-uint32_t repeat_time = total_length / one_repeat_size;
 __simd_vf__ inline void ceil_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_half dst;

@@ -71,7 +71,7 @@ __simd_callee__ inline void asc_xor(vector_bool& dst, vector_bool src0, vector_b
 
 ## 返回值说明
 
-无
+无返回值
 
 ## 约束说明
 
@@ -82,9 +82,6 @@ dst中未被mask筛选的位置被置为0。
 - 对矢量数据寄存器操作
 
 ```cpp
-constexpr uint32_t one_repeat_size = 256 / sizeof(int8_t);
-uint32_t total_length = 256;
-uint32_t repeat_time = total_length / one_repeat_size;
 __simd_vf__ inline void xor_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src0_addr, __ubuf__ int8_t* src1_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_int8_t dst;
@@ -104,9 +101,6 @@ __simd_vf__ inline void xor_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src0_
 - 对掩码寄存器操作
 
 ```cpp
-constexpr uint32_t one_repeat_size = 256 / sizeof(int8_t);
-uint32_t total_length = 256;
-uint32_t repeat_time = total_length / one_repeat_size;
 __simd_vf__ inline void xor_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_int8_t src;

@@ -29,11 +29,11 @@
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
 将dst中数据根据mask进行解压缩。解压缩方式：dst中第0个元素置为0，dst中的第i个元素等于mask中从第0个到第(i-1)个元素中1的数量。mask最高位被忽略不参与统计。
-具体算法如下图所示，dst的首位为0，后续mask[i]对应mask值为1时，dstReg[i]的值为dst[i-1] + 1；mask[i]对应mask值为0时，dst[i]的值为dst[i-1]。
+具体算法如图1所示，dst的首位为0，后续mask[i]对应mask值为1时，dstReg[i]的值为dst[i-1] + 1；mask[i]对应mask值为0时，dst[i]的值为dst[i-1]。
 
-unsqueeze流程如下图：
+图 1  unsqueeze流程
 
-![](../../figures/capi_unsqueeze.png)
+![unsqueeze流程](../../figures/capi_unsqueeze.png)
 
 ## 函数原型
 
@@ -61,7 +61,7 @@ __simd_callee__ inline void asc_unsqueeze(vector_uint32_t& dst, vector_bool mask
 
 ## 返回值说明
 
-无
+无返回值
 
 ## 约束说明
 
@@ -70,9 +70,6 @@ __simd_callee__ inline void asc_unsqueeze(vector_uint32_t& dst, vector_bool mask
 ## 调用示例
 
 ```cpp
-constexpr uint32_t one_repeat_size = 256 / sizeof(int8_t);
-uint32_t total_length = 256;
-uint32_t repeat_time = total_length / one_repeat_size;
 __simd_vf__ inline void unsqueeze_vf(__ubuf__ int8_t* dst_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
 {
     vector_int8_t dst;
