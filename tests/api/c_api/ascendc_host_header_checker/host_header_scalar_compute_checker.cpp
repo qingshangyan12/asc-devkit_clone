@@ -8,6 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include "tests/api/c_api/stub/cce_stub.h"
+
 #include "c_api/scalar_compute/scalar_compute.h"
 
 static void test_host_c_api_scalar_compute_0()
