@@ -1,8 +1,8 @@
-# asc_copy_gm2l1 Example
+# data_copy_gm2l1 Example
 
 ## Overview
 
-This example shows how to use the Ascend C API to move input data from GM (Global Memory) to the L1 Buffer. It supports NZ, ND, and DN input formats and vector-quantization parameter movement. After the input is moved, the example performs L1-to-L0 movement, matrix multiplication, and L0C-to-GM result writeback.
+This example shows how to use the Ascend C C API to move input data from GM (Global Memory) to the L1 Buffer. It supports NZ, ND, and DN input formats and vector-quantization parameter movement. After the input is moved, the example performs L1-to-L0 movement, matrix multiplication, and L0C-to-GM result writeback.
 
 This example supports Ascend 950PR/Ascend 950DT (`dav-3510`) only. It supports NPU execution and NPU simulation; CPU debug mode is not provided.
 
@@ -15,21 +15,21 @@ This example supports Ascend 950PR/Ascend 950DT (`dav-3510`) only. It supports N
 ## Directory Structure
 
 ```
-├── asc_copy_gm2l1
+├── data_copy_gm2l1
 │   ├── figures                        // Illustrations
 │   ├── scripts
 │   │   ├── gen_data.py                // Generates input and golden data
 │   │   └── verify_result.py           // Verifies that output matches the golden data
 │   ├── data_utils.h                   // Data input/output helpers
 │   ├── CMakeLists.txt                 // CMake build file
-│   ├── asc_copy_gm2l1.asc             // C API implementation and launcher
-│   ├── README.md                       // Chinese example documentation
-│   └── README_en.md                    // English example documentation
+│   ├── data_copy_gm2l1.asc            // C API implementation and launcher
+│   ├── README.md                      // Chinese example documentation
+│   └── README_en.md                   // English example documentation
 ```
 
 ## Detailed Scenario Description
 
-Use the `SCENARIO_NUM` build parameter to select an input scenario. The meaning of each value is shown below. All scenarios use the same matrix multiplication shape: [M, K, N] = [128, 128, 256]. The kernel is named `asc_copy_gm2l1`.
+Use the `SCENARIO_NUM` build parameter to select an input scenario. The meaning of each value is shown below. All scenarios use the same matrix multiplication shape: [M, K, N] = [128, 128, 256]. The kernel is named `data_copy_gm2l1`.
 
 <table>
 <caption style="font-weight: normal;">
@@ -52,7 +52,7 @@ All device-side movement and compute use asynchronous C API calls. `asc_sync_not
 - Implementation: Use `asc_copy_gm2l1` to move the NZ input data from GM to L1
 - Description: The inputs are already in NZ format, so no format conversion is required
 <p align="center">
-  <img src="figures/asc_copy_gm2l1_nz2nz.png" width="800">
+  <img src="figures/data_copy_gm2l1_nz2nz.png" width="800">
 </p>
 
 **Scenario 2: ND input, half input type**
@@ -62,7 +62,7 @@ All device-side movement and compute use asynchronous C API calls. `asc_sync_not
 - Implementation: Configure ND2NZ parameters with `asc_set_gm2l1_nz_para`, then use `asc_copy_gm2l1_nd2nz` to move ND input data from GM to L1 and convert it to NZ
 - Description: The ND inputs are converted to NZ during the movement
 <p align="center">
-  <img src="figures/asc_copy_gm2l1_nd2nz.png" width="800">
+  <img src="figures/data_copy_gm2l1_nd2nz.png" width="800">
 </p>
 
 **Scenario 3: DN input, half input type (Ascend 950PR/Ascend 950DT only)**
@@ -72,7 +72,7 @@ All device-side movement and compute use asynchronous C API calls. `asc_sync_not
 - Implementation: Configure DN2NZ parameters with `asc_set_gm2l1_nz_para`, then use `asc_copy_gm2l1_dn2nz` to move DN input data from GM to L1 and convert it to NZ
 - Description: The DN inputs are converted to NZ during the movement
 <p align="center">
-  <img src="figures/asc_copy_gm2l1_dn2nz.png" width="800">
+  <img src="figures/data_copy_gm2l1_dn2nz.png" width="800">
 </p>
 
 **Scenario 4: ND input, half input type, vector quantization enabled**

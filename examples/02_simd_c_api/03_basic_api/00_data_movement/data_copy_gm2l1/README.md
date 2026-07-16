@@ -1,8 +1,8 @@
-# asc_copy_gm2l1样例
+# data_copy_gm2l1样例
 
 ## 概述
 
-本样例介绍如何使用 Ascend C API 将输入数据从 GM（Global Memory）搬运到 L1（L1 Buffer），支持多种输入格式（NZ、ND、DN）和向量量化参数搬入等功能。数据搬入后，样例继续完成 L1 到 L0 的搬运、矩阵乘计算和 L0C 到 GM 的结果写回。
+本样例介绍如何使用 Ascend C C API 将输入数据从 GM（Global Memory）搬运到 L1（L1 Buffer），支持多种输入格式（NZ、ND、DN）和向量量化参数搬入等功能。数据搬入后，样例继续完成 L1 到 L0 的搬运、矩阵乘计算和 L0C 到 GM 的结果写回。
 
 本样例仅支持 Ascend 950PR/Ascend 950DT（`dav-3510`），支持 NPU 运行和 NPU 仿真模式，不提供 CPU Debug 模式。
 
@@ -15,21 +15,21 @@
 ## 目录结构介绍
 
 ```
-├── asc_copy_gm2l1
+├── data_copy_gm2l1
 │   ├── figures                        // 图示
 │   ├── scripts
 │   │   ├── gen_data.py                // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py           // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── data_utils.h                   // 数据读入写出函数
 │   ├── CMakeLists.txt                 // cmake编译文件
-│   ├── asc_copy_gm2l1.asc             // C API样例实现及调用代码
-│   ├── README.md                       // 样例说明文档
-│   └── README_en.md                    // 英文样例说明文档
+│   ├── data_copy_gm2l1.asc            // C API样例实现及调用代码
+│   ├── README.md                      // 中文样例说明文档
+│   └── README_en.md                   // 英文样例说明文档
 ```
 
 ## 场景详细说明
 
-本样例通过编译参数 `SCENARIO_NUM` 选择不同的输入场景，`SCENARIO_NUM` 不同取值对应的含义如下表所示。所有场景基于相同的矩阵乘规格：[M, K, N] = [128, 128, 256]，核函数名为 `asc_copy_gm2l1`。
+本样例通过编译参数 `SCENARIO_NUM` 选择不同的输入场景，`SCENARIO_NUM` 不同取值对应的含义如下表所示。所有场景基于相同的矩阵乘规格：[M, K, N] = [128, 128, 256]，核函数名为 `data_copy_gm2l1`。
 
 <table>
 <caption style="font-weight: normal;">
@@ -43,7 +43,7 @@
 
 `SCENARIO_NUM` 由 CMake 作为编译期宏传入；Kernel 使用 `if constexpr` 选择对应场景。切换场景后需要重新执行 CMake 和编译。
 
-设备侧搬运和计算均使用异步 C API，通过 `asc_sync_notify` 和 `asc_sync_wait` 建立 `MTE2→MTE1→M→FIX` 的必要依赖；场景 4 还使用 `MTE2→FIX` 保证量化参数就绪，并在量化参数从 L1 搬运到 Fixpipe Buffer 后通过 `asc_sync_pipe(PIPE_FIX)` 等待该搬运完成，再执行最终 Fixpipe 搬出；不使用 `PIPE_ALL` 同步。
+设备侧搬运和计算均使用C API 异步接口，通过 `asc_sync_notify` 和 `asc_sync_wait` 建立 `MTE2→MTE1→M→FIX` 的必要依赖；场景 4 还使用 `MTE2→FIX` 保证量化参数就绪，并在量化参数从 L1 搬运到 Fixpipe Buffer 后通过 `asc_sync_pipe(PIPE_FIX)` 等待该搬运完成，最终执行 Fixpipe 搬出；不使用 `PIPE_ALL` 同步。
 
 **场景1：输入格式NZ，输入数据类型half**
 
@@ -52,7 +52,7 @@
 - 实现：使用 `asc_copy_gm2l1` 将 NZ 格式的输入数据从 GM 搬运到 L1
 - 说明：输入数据为 NZ 格式，直接搬运到 L1，无需格式转换
 <p align="center">
-  <img src="figures/asc_copy_gm2l1_nz2nz.png" width="800">
+  <img src="figures/data_copy_gm2l1_nz2nz.png" width="800">
 </p>
 
 **场景2：输入格式ND，输入数据类型half**
@@ -62,7 +62,7 @@
 - 实现：使用 `asc_set_gm2l1_nz_para` 配置 ND2NZ 参数，再使用 `asc_copy_gm2l1_nd2nz` 将 ND 格式的输入数据从 GM 搬运到 L1，并转换为 NZ 格式
 - 说明：输入数据为 ND 格式，在搬运过程中自动转换为 NZ 格式
 <p align="center">
-  <img src="figures/asc_copy_gm2l1_nd2nz.png" width="800">
+  <img src="figures/data_copy_gm2l1_nd2nz.png" width="800">
 </p>
 
 **场景3：输入格式DN，输入数据类型half（仅Ascend 950PR/Ascend 950DT支持）**
@@ -72,7 +72,7 @@
 - 实现：使用 `asc_set_gm2l1_nz_para` 配置 DN2NZ 参数，再使用 `asc_copy_gm2l1_dn2nz` 将 DN 格式的输入数据从 GM 搬运到 L1，并转换为 NZ 格式
 - 说明：输入数据为 DN 格式，在搬运过程中自动转换为 NZ 格式
 <p align="center">
-  <img src="figures/asc_copy_gm2l1_dn2nz.png" width="800">
+  <img src="figures/data_copy_gm2l1_dn2nz.png" width="800">
 </p>
 
 **场景4：输入格式ND，输入数据类型half，使能Vector量化**
