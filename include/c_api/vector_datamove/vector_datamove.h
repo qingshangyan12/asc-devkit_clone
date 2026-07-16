@@ -320,7 +320,7 @@ __aicore__ inline void asc_copy_gm2ub_align(
 
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint16_t n_burst, uint32_t len_burst,
-    uint8_t left_padding_num, uint8_t right_padding_num, asc_load_l2_cache_type enable_constant_pad, uint8_t l2_cache_mode,
+    uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_type l2_cache_mode,
     uint64_t src_stride, uint32_t dst_stride);
 
 [[deprecated("NOTICE: asc_copy_gm2ub_align the uint8_t l2_cache_mode parameter is deprecated. "
@@ -481,12 +481,12 @@ __aicore__ inline void asc_copy_ub2gm_align(
     asc_store_l2_cache_type l2_cache_mode, uint64_t dst_stride, uint32_t src_stride);
 
 __aicore__ inline void asc_copy_ub2gm_align(
-    __gm__ half* dst, __ubuf__ half* src, uint16_t n_burst, uint32_t len_burst,
-    asc_store_l2_cache_type l2_cache_mode, uint64_t dst_stride, uint32_t src_stride);
+    __gm__ half* dst, __ubuf__ half* src, uint16_t n_burst, uint32_t len_burst, asc_store_l2_cache_type l2_cache_mode,
+    uint64_t dst_stride, uint32_t src_stride);
 
 __aicore__ inline void asc_copy_ub2gm_align(
-    __gm__ float* dst, __ubuf__ float* src, uint16_t n_burst, uint32_t len_burst,
-    asc_store_l2_cache_type l2_cache_mode, uint64_t dst_stride, uint32_t src_stride);
+    __gm__ float* dst, __ubuf__ float* src, uint16_t n_burst, uint32_t len_burst, asc_store_l2_cache_type l2_cache_mode,
+    uint64_t dst_stride, uint32_t src_stride);
 
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ hifloat8_t* dst, __ubuf__ hifloat8_t* src, uint16_t n_burst, uint32_t len_burst,

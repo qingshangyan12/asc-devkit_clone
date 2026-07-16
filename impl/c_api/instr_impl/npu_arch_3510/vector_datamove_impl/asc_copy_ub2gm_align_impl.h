@@ -39,8 +39,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_v2(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst,
-            static_cast<uint8_t>(l2_cache_mode), dst_stride, src_stride);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst, static_cast<uint8_t>(l2_cache_mode),
+            dst_stride, src_stride);
     }
 }
 
@@ -73,8 +73,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_v2(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst,
-            static_cast<uint8_t>(l2_cache_mode), dst_stride, src_stride);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst, static_cast<uint8_t>(l2_cache_mode),
+            dst_stride, src_stride);
     }
 }
 
@@ -107,8 +107,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_v2(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst,
-            static_cast<uint8_t>(l2_cache_mode), dst_stride, src_stride);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst, static_cast<uint8_t>(l2_cache_mode),
+            dst_stride, src_stride);
     }
 }
 
@@ -141,8 +141,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_v2(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst,
-            static_cast<uint8_t>(l2_cache_mode), dst_stride, src_stride);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst, static_cast<uint8_t>(l2_cache_mode),
+            dst_stride, src_stride);
     }
 }
 
@@ -175,8 +175,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_v2(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst,
-            static_cast<uint8_t>(l2_cache_mode), dst_stride, src_stride);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst, static_cast<uint8_t>(l2_cache_mode),
+            dst_stride, src_stride);
     }
 }
 
@@ -209,8 +209,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_v2(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst,
-            static_cast<uint8_t>(l2_cache_mode), dst_stride, src_stride);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst, static_cast<uint8_t>(l2_cache_mode),
+            dst_stride, src_stride);
     }
 }
 
@@ -238,13 +238,13 @@ __aicore__ inline void asc_copy_ub2gm_align_sync_impl(__gm__ int32_t* dst, __ubu
 }
 
 __aicore__ inline void asc_copy_ub2gm_align_impl(
-    __gm__ half* dst, __ubuf__ half* src, uint16_t n_burst, uint32_t len_burst,
-    asc_store_l2_cache_type l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+    __gm__ half* dst, __ubuf__ half* src, uint16_t n_burst, uint32_t len_burst, asc_store_l2_cache_type l2_cache_mode,
+    uint64_t dst_stride, uint32_t src_stride)
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_v2(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst,
-            static_cast<uint8_t>(l2_cache_mode), dst_stride, src_stride);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst, static_cast<uint8_t>(l2_cache_mode),
+            dst_stride, src_stride);
     }
 }
 
@@ -272,13 +272,13 @@ __aicore__ inline void asc_copy_ub2gm_align_sync_impl(__gm__ half* dst, __ubuf__
 }
 
 __aicore__ inline void asc_copy_ub2gm_align_impl(
-    __gm__ float* dst, __ubuf__ float* src, uint16_t n_burst, uint32_t len_burst,
-    asc_store_l2_cache_type l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
+    __gm__ float* dst, __ubuf__ float* src, uint16_t n_burst, uint32_t len_burst, asc_store_l2_cache_type l2_cache_mode,
+    uint64_t dst_stride, uint32_t src_stride)
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_v2(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst,
-            static_cast<uint8_t>(l2_cache_mode), dst_stride, src_stride);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst, static_cast<uint8_t>(l2_cache_mode),
+            dst_stride, src_stride);
     }
 }
 
@@ -311,8 +311,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_v2(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst,
-            static_cast<uint8_t>(l2_cache_mode), dst_stride, src_stride);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst, static_cast<uint8_t>(l2_cache_mode),
+            dst_stride, src_stride);
     }
 }
 
@@ -345,8 +345,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_v2(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst,
-            static_cast<uint8_t>(l2_cache_mode), dst_stride, src_stride);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst, static_cast<uint8_t>(l2_cache_mode),
+            dst_stride, src_stride);
     }
 }
 
@@ -379,8 +379,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_v2(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst,
-            static_cast<uint8_t>(l2_cache_mode), dst_stride, src_stride);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst, static_cast<uint8_t>(l2_cache_mode),
+            dst_stride, src_stride);
     }
 }
 
@@ -414,8 +414,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_v2(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst,
-            static_cast<uint8_t>(l2_cache_mode), dst_stride, src_stride);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, n_burst, len_burst, static_cast<uint8_t>(l2_cache_mode),
+            dst_stride, src_stride);
     }
 }
 

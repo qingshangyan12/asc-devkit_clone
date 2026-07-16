@@ -56,7 +56,7 @@
         uint8_t loop0_lp_count = static_cast<uint64_t>(6);                                                             \
         uint8_t loop0_rp_count = static_cast<uint64_t>(7);                                                             \
         bool padding_mode = static_cast<uint64_t>(1);                                                                  \
-        asc_load_l2_cache_type cache_mode = asc_load_l2_cache_type::NOTALLOC_DROP;                                                                 \
+        asc_load_l2_cache_type cache_mode = asc_load_l2_cache_type::NOTALLOC_DROP;                                     \
                                                                                                                        \
         MOCKER_CPP(                                                                                                    \
             cce_name, void(                                                                                            \
