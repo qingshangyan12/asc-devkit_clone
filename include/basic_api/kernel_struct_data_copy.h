@@ -12,11 +12,6 @@
  * \file kernel_struct_data_copy.h
  * \brief
  */
-
-#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-#error "kernel_struct_data_copy.h cannot be used with compile flag --enable-simt enabled."
-#endif
-
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_STRUCT_DATA_COPY_H__
@@ -113,7 +108,11 @@ using NdDmaLoopInfo = MultiCopyLoopInfo<dim>;
 template <typename T, uint8_t dim>
 struct MultiCopyParams  {
     MultiCopyLoopInfo<dim> loopInfo;
-    T constantValue;
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+    typename GetPadValueType<T>::Type constantValue = 0;
+#else
+    T constantValue = 0;
+#endif
 };
 
 template <typename T, uint8_t dim>
