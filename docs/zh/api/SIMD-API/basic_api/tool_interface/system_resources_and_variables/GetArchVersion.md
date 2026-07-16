@@ -46,10 +46,6 @@ __aicore__ inline void GetArchVersion(uint32_t& coreVersion)
 
 无
 
-## 约束说明
-
-架构版本号为十六进制编码，建议使用十六进制格式（如`%x`）输出查看，或者自行转换成十六进制数。
-
 ## 调用示例
 
 如下样例通过调用`GetArchVersion`接口获取AI处理器的架构版本号。
@@ -57,5 +53,19 @@ __aicore__ inline void GetArchVersion(uint32_t& coreVersion)
 ```cpp
 uint32_t coreVersion = 0;
 AscendC::GetArchVersion(coreVersion);
-AscendC::printf("core version is %x", coreVersion); //需用%x将其打印成十六进制数
+AscendC::printf("core version is %u", coreVersion);
 ```
+
+不同型号服务器有不同的架构版本号取值，如下所示：
+<!-- npu="950" id9 -->
+- Ascend 950PR/Ascend 950DT：3510
+<!-- end id9 -->
+<!-- npu="A3,910b" id10 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：2201
+<!-- end id10 -->
+<!-- npu="910b" id11 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：2201
+<!-- end id11 -->
+<!-- npu="310p" id8 -->
+- Atlas 推理系列产品AI Core：2002
+<!-- end id8 -->
