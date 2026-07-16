@@ -9,209 +9,72 @@
 -->
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vitepress'
 
 const route = useRoute()
-const loading = ref(false)
-const progress = ref('')
 const isApiPage = computed(() => route.path.startsWith('/api/'))
 
-function getFilterVersion() {
+const manifest = ref(null)
+const manifestLoaded = ref(false)
+const toast = ref('')
+
+async function loadManifest() {
+  if (manifestLoaded.value) return
   try {
-    return localStorage.getItem('cann-filter-selection') || 'all'
+    const resp = await fetch('/api-pdf/manifest.json')
+    if (resp.ok) {
+      manifest.value = await resp.json()
+    }
   } catch {
-    return 'all'
+    // manifest not available
   }
+  manifestLoaded.value = true
 }
 
-function filterNpuComments(src, version) {
-  const tokenRegex = /<!--\s*(?:npu\s*=\s*"([^"]*)"\s+(\w+)|end\s+(\w+))\s*-->/g
-  if (version === 'all') {
-    return src.replace(tokenRegex, '')
+onMounted(() => {
+  if (isApiPage.value) {
+    loadManifest()
   }
-  const parts = []
-  const stack = []
-  let lastIdx = 0
-  let match
-  while ((match = tokenRegex.exec(src)) !== null) {
-    const pos = match.index
-    const npuType = match[1]
-    const openId = match[2]
-    const closeId = match[3]
-    const before = src.slice(lastIdx, pos)
-    const suppressed = stack.length > 0 && !stack[stack.length - 1].include
-    if (!suppressed) parts.push(before)
-    lastIdx = pos + match[0].length
-    if (closeId) {
-      if (stack.length > 0 && stack[stack.length - 1].id === closeId) {
-        stack.pop()
-      }
-    } else if (npuType && openId) {
-      const types = npuType.split(',').map(s => s.trim())
-      stack.push({ id: openId, include: types.includes(version) })
-    }
+})
+
+function handlePreview() {
+  if (!manifestLoaded.value) {
+    toast.value = '正在加载 PDF 索引...'
+    loadManifest().then(doOpen)
+    return
   }
-  if (stack.length === 0 || stack[stack.length - 1].include) {
-    parts.push(src.slice(lastIdx))
-  }
-  return parts.join('')
+  doOpen()
 }
 
-function filterContentByVersion(content, version) {
-  const htmlBlockRegex = /<p>\s*CANNFILTER_DIV_([A-Za-z0-9_,]+)_OPEN\s*<\/p>([\s\S]*?)<p>\s*CANNFILTER_DIV_\1_CLOSE\s*<\/p>/g
-  const plainBlockRegex = /CANNFILTER_DIV_([A-Za-z0-9_,]+)_OPEN[ \t]*\n?([\s\S]*?)CANNFILTER_DIV_\1_CLOSE/g
+function doOpen() {
+  if (!manifest.value) return
 
-  content = filterNpuComments(content, version)
-  content = filterCannFilterTags(content, version)
-
-  if (version === 'all') {
-    content = content.replace(htmlBlockRegex, '$2')
-    content = content.replace(plainBlockRegex, '$2')
-  } else {
-    content = content.replace(htmlBlockRegex, (match, ver, inner) => ver === version ? inner : '')
-    content = content.replace(plainBlockRegex, (match, ver, inner) => ver === version ? inner : '')
-  }
-
-  content = content.replace(/<term\b[^>]*>([\s\S]*?)<\/term>/gi, '$1')
-  content = content.replace(/<ph\b[^>]*>([\s\S]*?)<\/ph>/gi, '$1')
-  content = content.replace(/<__gm__\b[^>]*>([\s\S]*?)<\/__gm__>/gi, '$1')
-  content = content.replace(/<__ubuf__\b[^>]*>([\s\S]*?)<\/__ubuf__>/gi, '$1')
-  return content
-}
-
-function filterCannFilterTags(src, version) {
-  const tagRegex = /<(\/?)(cann-filter)((?:\s[^>]*)?)>/gi
-  const stack = []
-  const parts = []
-  let lastIdx = 0
-  let match
-  while ((match = tagRegex.exec(src)) !== null) {
-    const pos = match.index
-    const isClose = match[1] === '/'
-    const attrs = match[3]
-    const before = src.slice(lastIdx, pos)
-    const suppress = stack.length > 0 && stack[stack.length - 1]
-
-    if (isClose) {
-      if (stack.length > 0) {
-        stack.pop()
-      }
-      if (!suppress) {
-        const curSuppress = stack.length > 0 && stack[stack.length - 1]
-        if (!curSuppress) parts.push(before)
-      }
-      lastIdx = pos + match[0].length
-    } else {
-      if (!suppress) parts.push(before)
-      const attrMatch = attrs.match(/npu[_-]type\s*=\s*"([^"]+)"/i)
-      if (attrMatch && version !== 'all') {
-        const types = attrMatch[1].split(',').map(s => s.trim())
-        const include = types.includes(version)
-        stack.push(!include)
-      } else {
-        stack.push(false)
-      }
-      lastIdx = pos + match[0].length
-    }
-  }
-  parts.push(src.slice(lastIdx))
-  const result = parts.join('')
-  return result.replace(/<\/?cann-filter\b[^>]*>/gi, '')
-}
-
-function timestamp() {
-  const now = new Date()
-  const y = now.getFullYear()
-  const m = String(now.getMonth() + 1).padStart(2, '0')
-  const d = String(now.getDate()).padStart(2, '0')
-  const h = String(now.getHours()).padStart(2, '0')
-  const min = String(now.getMinutes()).padStart(2, '0')
-  const s = String(now.getSeconds()).padStart(2, '0')
-  return y + m + d + '-' + h + min + s
-}
-
-function downloadBlob(blob, filename) {
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = filename
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
-  URL.revokeObjectURL(url)
-}
-
-async function handleDownload() {
-  const version = getFilterVersion()
-  const versionLabel = version === 'all' ? 'all' : ('v' + version)
-
-  loading.value = true
-  progress.value = '下载数据中...'
-
+  let chipFilter = 'all'
   try {
-    const resp = await fetch('/api-source/bundle.json')
-    if (!resp.ok) throw new Error(`Bundle not found (HTTP ${resp.status})`)
+    chipFilter = localStorage.getItem('cann-filter-selection') || 'all'
+  } catch {}
 
-    const total = Number(resp.headers.get('content-length') || '0')
-    const reader = resp.body.getReader()
-    const chunks = []
-    let received = 0
+  const key = chipFilter === 'all' ? '__ALL__' : '__' + chipFilter + '__'
+  const pdfFile = manifest.value[key]
 
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      chunks.push(value)
-      received += value.length
-      if (total > 0) {
-        progress.value = `下载中 ${Math.round(received / total * 100)}%`
-      }
-    }
-
-    progress.value = '解析数据中...'
-    const rawBlob = new Blob(chunks)
-    const text = await rawBlob.text()
-    const bundle = JSON.parse(text)
-
-    const entries = Object.entries(bundle)
-    const fileTotal = entries.length
-    if (fileTotal === 0) {
-      console.error('No source files in bundle')
-      return
-    }
-
-    progress.value = '打包中 0%'
-    const JSZip = (await import('jszip')).default
-    const zip = new JSZip()
-    let processed = 0
-
-    for (const [relPath, content] of entries) {
-      const filtered = filterContentByVersion(content, version)
-      zip.file(relPath, filtered)
-      processed++
-      if (processed % 100 === 0) {
-        const pct = Math.round(processed / fileTotal * 100)
-        progress.value = `打包中 ${pct}%`
-        await new Promise(r => setTimeout(r, 0))
-      }
-    }
-
-    progress.value = '生成 ZIP...'
-    const blob = await zip.generateAsync({ type: 'blob' })
-    const ts = timestamp()
-    downloadBlob(blob, 'AscendC-API_' + versionLabel + '_' + ts + '.zip')
-    progress.value = ''
-  } catch (err) {
-    console.error('Download failed:', err)
-    progress.value = `失败: ${err.message}`
-    setTimeout(() => {
-      if (progress.value.startsWith('失败:')) {
-        progress.value = ''
-      }
-    }, 5000)
-  } finally {
-    loading.value = false
+  if (pdfFile) {
+    window.open('/api-pdf/' + encodeURIComponent(pdfFile), '_blank')
+    toast.value = ''
+    return
   }
+
+  const allPdf = manifest.value['__ALL__']
+  if (allPdf) {
+    window.open('/api-pdf/' + encodeURIComponent(allPdf), '_blank')
+    toast.value = ''
+    return
+  }
+
+  toast.value = '当前无对应 PDF 文件'
+  setTimeout(() => {
+    if (toast.value.startsWith('当前无')) toast.value = ''
+  }, 3000)
 }
 </script>
 
@@ -219,13 +82,10 @@ async function handleDownload() {
   <div v-if="isApiPage" class="api-download-wrapper">
     <button
       class="api-download-btn"
-      :class="{ loading }"
-      :disabled="loading"
-      :title="loading ? progress : '下载全部 API Markdown'"
-      @click="handleDownload"
+      :title="'预览完整 API PDF'"
+      @click="handlePreview"
     >
       <svg
-        v-if="!loading"
         width="20"
         height="20"
         viewBox="0 0 24 24"
@@ -235,13 +95,13 @@ async function handleDownload() {
         stroke-linecap="round"
         stroke-linejoin="round"
       >
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-        <polyline points="7 10 12 15 17 10" />
-        <line x1="12" y1="15" x2="12" y2="3" />
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="9" y1="13" x2="15" y2="13" />
+        <line x1="9" y1="17" x2="15" y2="17" />
       </svg>
-      <span v-else class="spinner" />
     </button>
-    <div v-if="progress" class="download-progress" :class="{ error: progress.startsWith('失败:') }">{{ progress }}</div>
+    <div v-if="toast" class="download-progress">{{ toast }}</div>
   </div>
 </template>
 
@@ -272,29 +132,10 @@ async function handleDownload() {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.api-download-btn:hover:not(:disabled) {
+.api-download-btn:hover {
   border-color: var(--vp-c-brand-1);
   color: var(--vp-c-brand-1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.api-download-btn:disabled {
-  cursor: wait;
-  opacity: 0.8;
-}
-
-.api-download-btn.loading {
-  border-color: var(--vp-c-brand-1);
-  color: var(--vp-c-brand-1);
-}
-
-.spinner {
-  width: 18px;
-  height: 18px;
-  border: 2px solid var(--vp-c-divider);
-  border-top-color: var(--vp-c-brand-1);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
 }
 
 .download-progress {
@@ -305,14 +146,5 @@ async function handleDownload() {
   padding: 2px 8px;
   border-radius: 4px;
   border: 1px solid var(--vp-c-divider);
-}
-
-.download-progress.error {
-  color: var(--vp-c-danger-1);
-  border-color: var(--vp-c-danger-1);
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
 }
 </style>
