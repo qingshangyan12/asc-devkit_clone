@@ -36,9 +36,9 @@
     - 带mask：将src中被mask筛选的bit复制到dst。对于b8模式，mask的每个bit控制src的一个bit；对于b16模式，mask的每2bit为一组、仅LSB控制src的一个bit；对于b32模式，mask的每4bit为一组、仅LSB控制src的一个bit。
     - 不带mask：将src的所有bit复制到dst。
 
-- 矢量寄存器复制到掩码寄存器：
-    - 数据类型为uint16_t时，RegTensor（256B）分成16个数据块（16B），用户通过参数可选择某一个数据块，数据块的每个bit broadcast成2bit后变为32B，即输出的mask。
-    - 数据类型为b32时，RegTensor（256B）分成32个数据块（8B），用户通过参数可选择某一个数据块，数据块的每个bit broadcast成4bit后变为32B，即输出的mask。
+- 矢量数据寄存器复制到掩码寄存器：
+    - 数据类型为uint16_t时，矢量数据寄存器（256B）分成16个数据块（16B），用户通过参数可选择某一个数据块，数据块的每个bit broadcast成2bit后变为32B，即输出的mask。
+    - 数据类型为uint32_t时，矢量数据寄存器（256B）分成32个数据块（8B），用户通过参数可选择某一个数据块，数据块的每个bit broadcast成4bit后变为32B，即输出的mask。
     
     具体搬运原理请参考[关键特性说明](#关键特性说明)。
 
@@ -65,7 +65,7 @@
     __simd_callee__ inline void asc_copy(vector_bool& dst, vector_bool src)
     ```
 
-- 矢量寄存器复制到掩码寄存器
+- 矢量数据寄存器复制到掩码寄存器
 
     ```cpp
     __simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint16_t src, int16_t part)
@@ -85,10 +85,9 @@
 
 ## 数据类型
 
-目的操作数与源操作数的数据类型需要保持一致。
-- 矢量寄存器间复制支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
-- Mask寄存器间复制支持的数据类型为：bool。
-- Mask寄存器部分复制支持src的数据类型为：uint16_t、uint32_t。
+- 矢量数据寄存器复制到矢量数据寄存器：目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+- 掩码寄存器复制到掩码寄存器：目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：bool。
+- 矢量数据寄存器复制到掩码寄存器：目的操作数支持的数据类型为：bool，源操作数支持的数据类型为：uint16_t、uint32_t。
 
 ## 返回值说明
 
@@ -153,7 +152,7 @@
     }
     ```
 
-- 矢量寄存器复制到掩码寄存器
+- 矢量数据寄存器复制到掩码寄存器
 
     ```cpp
     __simd_vf__ inline void copy_vector_to_mask_vf(__ubuf__ uint16_t* dst_addr, __ubuf__ uint16_t* src_addr)

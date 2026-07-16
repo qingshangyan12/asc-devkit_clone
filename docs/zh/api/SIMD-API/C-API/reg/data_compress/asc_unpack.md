@@ -122,18 +122,16 @@
 - 对掩码寄存器操作
 
     ```cpp
-    __simd_vf__ inline void unpack_vf(__ubuf__ uint32_t* dst_addr, __ubuf__ uint32_t* src_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
+    __simd_vf__ inline void unpack_vf(__ubuf__ uint8_t* dst_addr, __ubuf__ uint8_t* src_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
     {
         vector_uint32_t src;
-        vector_bool mask0 = asc_create_mask_b32(PAT_ALL);
+        vector_bool mask0 = asc_create_mask_b8(PAT_ALL);
         vector_bool mask1;
-        vector_bool mask2;
         asc_unpack_lower(mask1, mask0);
         for (uint16_t i = 0; i < repeat_time; ++i) {
-            mask2 = asc_update_mask_b8(count);
             asc_loadalign(src, src_addr + i * one_repeat_size);
             asc_add_scalar(src, src, 0, mask1);
-            asc_storealign(dst_addr + i * one_repeat_size, src, mask2);
+            asc_storealign(dst_addr + i * one_repeat_size, src, mask1);
         }
     }
     ```

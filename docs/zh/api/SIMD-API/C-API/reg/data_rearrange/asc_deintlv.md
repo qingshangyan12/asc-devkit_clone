@@ -28,11 +28,11 @@
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
-将src0和src1中的元素解交织存入dst0和dst1中。解交织操作的流程如图1所示，每个方格代表一个数据类型为int8_t的元素：
+将src0和src1中的元素解交织存入dst0和dst1中。以int8_t数据类型为例，asc_deintlv的实现流程如图1所示：
 
-**图1**  解交织操作流程
+**图1**  解交织实现流程
 
-![解交织操作流程](../../figures/capi_deintlv_reg.png)
+![解交织实现流程](../../figures/capi_deintlv_reg.png)
 
 ## 函数原型
 
@@ -64,7 +64,7 @@
 
 ## 参数说明
 
-**表1**  参数说明
+**表1**  参数说明（操作数为矢量数据寄存器）
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -73,9 +73,20 @@
 | src0 | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
 | src1 | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
 
+**表2**  参数说明（操作数为掩码寄存器）
+
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| dst0 | 输出 | 目的操作数（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
+| dst1 | 输出 | 目的操作数（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
+| src0 | 输入 | 源操作数（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
+| src1 | 输入 | 源操作数（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
+
 ## 数据类型
 
-目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：bool、int8_t、uint8_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+- 操作数为矢量数据寄存器：目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：int8_t、uint8_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+
+- 操作数为掩码寄存器：目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：bool。
 
 ## 返回值说明
 
@@ -84,8 +95,8 @@
 ## 约束说明
 
 - src0、src1、dst0、dst1的数据类型需要保持一致。
-- src0和src1可以为同一个RegTensor。
-- dst0和dst1不能为同一个RegTensor。
+- src0和src1可以为同一个矢量数据寄存器。
+- dst0和dst1不能为同一个矢量数据寄存器。
 - 允许源操作数和目的操作数为同一个矢量数据寄存器，例如asc_deintlv(src0, src1, src0, src1)。
 
 ## 调用示例
