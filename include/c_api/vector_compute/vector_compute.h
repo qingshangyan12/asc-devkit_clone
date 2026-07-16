@@ -19,6 +19,7 @@
 
 #ifndef INCLUDE_C_API_VECTOR_COMPUTE_VECTOR_COMPUTE_H
 #define INCLUDE_C_API_VECTOR_COMPUTE_VECTOR_COMPUTE_H
+#include "c_api/utils/union.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "impl/c_api/instr_impl/npu_arch_2201/vector_compute_impl.h"
