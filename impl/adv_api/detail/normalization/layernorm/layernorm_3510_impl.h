@@ -284,10 +284,6 @@ __aicore__ inline void LayerNormImpl(
         varianceLocal = output1;
     }
 
-    uint32_t tempOffset = CeilDivision(para.aLength, 8) * 8;
-    // prevent buffer overlaps, reserve space from tempOffset onwards
-    LocalTensor<float> workLocal = workLocalBegin[tempOffset];
-
     ComputeMeanVariance<T>(outputMean, varianceLocal, inputX, output, para, tiling, sregLower);
 
     NormalizePara nlPara{para.aLength, tiling.rLength, para.rLengthWithPadding};
@@ -296,7 +292,7 @@ __aicore__ inline void LayerNormImpl(
     if constexpr (config.isOutputRstd) {
         rstdLocal = output1;
     } else {
-        rstdLocal = workLocalBegin[tempOffset];
+        rstdLocal = workLocalBegin;
     }
 
     if constexpr (!config.isNoBeta && !config.isNoGamma) {
