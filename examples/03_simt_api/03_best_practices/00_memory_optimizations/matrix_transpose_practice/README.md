@@ -1,5 +1,4 @@
-# MatrixTranspose SIMT访存优化路径样例
-
+# Matrix Transpose性能调优样例
 
 ## 概述
 
@@ -59,7 +58,7 @@
 | 4    | `transpose_ub_2tile_kernel`       | `core`            | 2048               | Thread Block数固定为硬件vector core数，单个Thread Block循环处理多个tile分组 |
 | 5    | `transpose_ub_kernel`             | `core`            | 1024               | 改为1024线程，单个Thread Block循环处理多个32×32的tile                      |
 | 6    | `transpose_ub_pad_kernel`         | `core`            | 1024               | UB tile增加2列padding，消除转置读阶段的bank冲突                             |
-| 7    | `transpose_ub_pad_db_kernel`      | `core`            | 1024               | 双缓冲轮换，去除循环尾部同步                                         |
+| 7    | `transpose_ub_pad_db_kernel`      | `core`            | 1024               | 双缓冲轮换，去除循环尾部同步                                                |
 
 其中 `core`为硬件vector core数，通过 `aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)`在运行时查询获得。`tiles`为总tile数 `(W/32) × (H/32)`，1024×1024时为1024。
 
@@ -173,7 +172,7 @@ Case 2在保持GM连续读取的同时，直接把数据写入转置后的输出
 
 **优化目标**：引入UB与分块，将Case 2的非连续全局内存写转换为UB内访问，使全局内存读写均恢复连续；本Case按切分后的tile数量设置Thread Block数，每个Thread Block处理两个32×32的tile。
 
-**核心实现**：将矩阵划分为32×32的tile，总tile数为 `tiles=(W/32)×(H/32)`。本Case中每个Thread Block启动2048个线程，可同时处理两个tile，因此Thread Block数量设置为 `blocks_per_grid=ceil(tiles / 2)`。线程配置参数为 `dim3(32,64,1)`，其中 `threadIdx.y=0..31`的线程处理第一个tile，`threadIdx.y=32..63`的线程处理第二个tile；代码通过 `local_tile=threadIdx.y>>5`得到当前线程在Thread Block内负责的tile编号，通过 `ty=threadIdx.y&31`得到tile内行索引。线程先将tile按原布局写入UB，经 [`asc_syncthreads()`](../../../../../docs/api/SIMT-API/同步与内存栅栏/同步接口/asc_syncthreads.md) 同步后，再按转置方向从UB读出并连续写回GM。
+**核心实现**：将矩阵划分为32×32的tile，总tile数为 `tiles=(W/32)×(H/32)`。本Case中每个Thread Block启动2048个线程，可同时处理两个tile，因此Thread Block数量设置为 `blocks_per_grid=ceil(tiles / 2)`。线程配置参数为 `dim3(32,64,1)`，其中 `threadIdx.y=0..31`的线程处理第一个tile，`threadIdx.y=32..63`的线程处理第二个tile；代码通过 `local_tile=threadIdx.y>>5`得到当前线程在Thread Block内负责的tile编号，通过 `ty=threadIdx.y&31`得到tile内行索引。线程先将tile按原布局写入UB，经 [`asc_syncthreads()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMT-API/同步与内存栅栏/同步接口/asc_syncthreads.md) 同步后，再按转置方向从UB读出并连续写回GM。
 
 UB中转的核心思想如下图所示：GM读取阶段按输入矩阵行方向连续搬入UB；GM写回阶段交换输出tile坐标，使同一个Warp写出输出矩阵的一行。原本非连续的GM写被转移为UB内转置方向读取。
 
@@ -301,17 +300,14 @@ SIMT编程方式下，bank冲突为更细粒度的subbank冲突，主要有以�
 详细的UB地址低位交织规则以及冲突场景可参考[bank_conflict样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/03_simt_api/02_features/01_api_features/00_memory_access/bank_conflict)。
 
 **图3　UB bank结构示意图**
-<img src="./figures/bank结构示意图.png">
 
 Case 5中UB的tile数组按照行优先存储。按照地址低位交织规则，tile数组的第一行刚好覆盖bank0～bank3，第二行覆盖bank4～bank7，第三行覆盖bank8～bank11，其余行依次类推。每行32个float数据会恰好跨越4个bank存储。Case 5中，一个Warp的线程会读取tile的一列元素写回GM输出；访问UB时，32个线程会集中访问两个bank group的subbank0，属于读读冲突场景。
 
 **图4　Case5 tile在UB上的排布示意图**
-<img src="./figures/case5_bank.png">
 
 Case 6中对UB中的tile数组增加两列padding，由每行32个元素改为34个元素，其在UB上的排列如下图所示。由于每行有34个元素，行跨度变为17个subbank，同一列元素会错开排布到不同的subbank。Case 6访问UB时，32个线程的访问会分布到各个bank group的每个subbank中，即同一条访问指令下每个subbank仅有一个线程访问，从而避免上述读读冲突。
 
 **图5　Case6 tile在UB上的排布示意图**
-<img src="./figures/case6_bank.png">
 
 ```cpp
 constexpr int TILE_PAD = 2;                          // Case6/7的UB padding列数（32x34）
@@ -367,10 +363,8 @@ for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x)
 Case 6与Case 7的仿真指令流水图分别如图6、图7所示。Case 6每轮循环受尾部 `asc_syncthreads()` 约束，当前轮的写回必须全部完成后才能进入下一轮，下一轮load前的运算与GM读取只能串行等待。Case 7借助双缓冲轮换两份UB tile，去除尾部同步后，当前轮的GM写回与下一轮load前的运算、以及下一轮的GM读取重叠执行，load与compute之间的串行等待被压缩。这也是Task Duration相对Case 6进一步下降的主要原因。
 
 **图6　Case 6仿真指令流水图**
-<img src="./figures/case6_trace.png">
 
 **图7　Case 7仿真指令流水图**
-<img src="./figures/case7_trace.png">
 
 ## 性能对比总结
 
@@ -405,7 +399,7 @@ Case 6与Case 7的仿真指令流水图分别如图6、图7所示。Case 6每轮
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量
-  
+
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
 
   ```bash
@@ -433,10 +427,10 @@ Case 6与Case 7的仿真指令流水图分别如图6、图7所示。Case 6每轮
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT） |
   | `SCENARIO_NUM`            | `0`-`7`  | 样例类型，默认为7                                          |
 
+
   - `--cce-res-usage`用于输出寄存器和栈等编译资源信息，便于分析资源使用。
 
   执行结果如下，说明精度对比成功。
-
 
   ```text
   [Success] Case accuracy verification passed.
