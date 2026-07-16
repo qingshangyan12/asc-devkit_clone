@@ -56,14 +56,14 @@ __simd_callee__ inline void asc_reduce_sum_datablock(vector_int32_t& dst, vector
 ## 数据类型
 
 
-| 输入A类型 | 输入B类型/标量类型 | 输出类型 |
-|---|---|---|
-| half | — | half |
-| float | — | float |
-| uint16_t | — | uint32_t |
-| int16_t | — | int32_t |
-| uint32_t | — | uint32_t |
-| int32_t | — | int32_t |
+| src | dst |
+|---|---|
+| half | half |
+| float | float |
+| uint16_t | uint32_t |
+| int16_t | int32_t |
+| uint32_t | uint32_t |
+| int32_t | int32_t |
 
 
 ## 返回值说明

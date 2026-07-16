@@ -63,7 +63,7 @@ __simd_callee__ inline void asc_ne_scalar(vector_bool& dst, vector_bfloat16_t sr
 ## 数据类型
 
 
-| 输入A类型 | 输入B类型/标量类型 | 输出类型 |
+| src | value | dst |
 |---|---|---|
 | uint8_t | uint8_t | bool |
 | int8_t | int8_t | bool |
@@ -87,7 +87,7 @@ PIPE_V
 ## 约束说明
 
 - mask未筛选的元素在输出中置零。
-- 浮点数据类型比较，涉及 `NaN` 时比较结果为0。
+- 浮点数据类型比较，涉及 `NaN` 时比较结果为1。
 
 ## 理论性能
 

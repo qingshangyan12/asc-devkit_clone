@@ -64,7 +64,7 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_float src, fl
 ## 数据类型
 
 
-| 输入A类型 | 输入B类型/标量类型 | 输出类型 |
+| src | value | dst |
 |---|---|---|
 | uint8_t | uint8_t | bool |
 | int8_t | int8_t | bool |
