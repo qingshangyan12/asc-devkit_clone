@@ -1,9 +1,9 @@
-# MatrixTranspose SIMD与SIMT混合访存优化路径样例
+# SIMD与SIMT混合编程Matrix Transpose性能调优样例
 
 
 ## 概述
 
-本样例以矩阵转置为例，介绍Ascend C SIMD与SIMT混合编程方式下的访存优化思路。样例从直接全局内存转置出发，引入MTE搬运、UB中转与32×32分块，对比按tile分组启动Thread Block与固定Thread Block数两种映射方式，通过UB padding降低bank冲突，最后借助双缓冲使MTE2搬入、SIMT VF转置和MTE3搬出流水并行，呈现SIMD与SIMT混合矩阵转置的调优路径。本样例与SIMT场景下的[matrix_transpose_practice样例](https://gitcode.com/cann/asc-devkit/tree/matrix_transpose/examples/03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice)功能相同，可用于对比SIMD与SIMT混合场景和SIMT场景在矩阵转置访存优化路径上的差异。
+本样例以矩阵转置为例，介绍Ascend C SIMD与SIMT混合编程方式下的访存优化思路。样例从直接全局内存转置出发，引入MTE搬运、UB中转与32×32分块，对比按tile分组启动Thread Block与固定Thread Block数两种映射方式，通过UB padding降低bank冲突，最后借助双缓冲使MTE2搬入、SIMT VF转置和MTE3搬出流水并行，呈现SIMD与SIMT混合矩阵转置的调优路径。本样例与SIMT场景下的[matrix_transpose_practice样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice)功能相同，可用于对比SIMD与SIMT混合场景和SIMT场景在矩阵转置访存优化路径上的差异。
 
 ## 支持的产品
 
