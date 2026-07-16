@@ -1,4 +1,4 @@
-# asc_copy_gm2l1样例
+# data_copy_gm2l1样例
 
 ## 概述
 
@@ -15,21 +15,21 @@
 ## 目录结构介绍
 
 ```
-├── asc_copy_gm2l1
+├── data_copy_gm2l1
 │   ├── figures                        // 图示
 │   ├── scripts
 │   │   ├── gen_data.py                // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py           // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── data_utils.h                   // 数据读入写出函数
 │   ├── CMakeLists.txt                 // cmake编译文件
-│   ├── asc_copy_gm2l1.asc             // C API样例实现及调用代码
+│   ├── data_copy_gm2l1.asc            // C API样例实现及调用代码
 │   ├── README.md                       // 样例说明文档
 │   └── README_en.md                    // 英文样例说明文档
 ```
 
 ## 场景详细说明
 
-本样例通过编译参数 `SCENARIO_NUM` 选择不同的输入场景，`SCENARIO_NUM` 不同取值对应的含义如下表所示。所有场景基于相同的矩阵乘规格：[M, K, N] = [128, 128, 256]，核函数名为 `asc_copy_gm2l1`。
+本样例通过编译参数 `SCENARIO_NUM` 选择不同的输入场景，`SCENARIO_NUM` 不同取值对应的含义如下表所示。所有场景基于相同的矩阵乘规格：[M, K, N] = [128, 128, 256]，核函数名为 `data_copy_gm2l1`。
 
 <table>
 <caption style="font-weight: normal;">
@@ -52,7 +52,7 @@
 - 实现：使用 `asc_copy_gm2l1` 将 NZ 格式的输入数据从 GM 搬运到 L1
 - 说明：输入数据为 NZ 格式，直接搬运到 L1，无需格式转换
 <p align="center">
-  <img src="figures/asc_copy_gm2l1_nz2nz.png" width="800">
+  <img src="figures/data_copy_gm2l1_nz2nz.png" width="800">
 </p>
 
 **场景2：输入格式ND，输入数据类型half**
@@ -62,7 +62,7 @@
 - 实现：使用 `asc_set_gm2l1_nz_para` 配置 ND2NZ 参数，再使用 `asc_copy_gm2l1_nd2nz` 将 ND 格式的输入数据从 GM 搬运到 L1，并转换为 NZ 格式
 - 说明：输入数据为 ND 格式，在搬运过程中自动转换为 NZ 格式
 <p align="center">
-  <img src="figures/asc_copy_gm2l1_nd2nz.png" width="800">
+  <img src="figures/data_copy_gm2l1_nd2nz.png" width="800">
 </p>
 
 **场景3：输入格式DN，输入数据类型half（仅Ascend 950PR/Ascend 950DT支持）**
@@ -72,7 +72,7 @@
 - 实现：使用 `asc_set_gm2l1_nz_para` 配置 DN2NZ 参数，再使用 `asc_copy_gm2l1_dn2nz` 将 DN 格式的输入数据从 GM 搬运到 L1，并转换为 NZ 格式
 - 说明：输入数据为 DN 格式，在搬运过程中自动转换为 NZ 格式
 <p align="center">
-  <img src="figures/asc_copy_gm2l1_dn2nz.png" width="800">
+  <img src="figures/data_copy_gm2l1_dn2nz.png" width="800">
 </p>
 
 **场景4：输入格式ND，输入数据类型half，使能Vector量化**
