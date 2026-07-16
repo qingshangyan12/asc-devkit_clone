@@ -47,6 +47,8 @@ __simd_callee__ inline void asc_float2int32_rz_sat(vector_int32_t& dst, vector_f
 
 ## 参数说明
 
+**表1**  参数说明
+
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
@@ -55,9 +57,11 @@ __simd_callee__ inline void asc_float2int32_rz_sat(vector_int32_t& dst, vector_f
 
 ## 数据类型
 
-| dst | src |
+**表2**  数据类型
+
+| src | dst |
 | --- | --- |
-| int32_t | float |
+| float | int32_t |
 
 ## 返回值说明
 

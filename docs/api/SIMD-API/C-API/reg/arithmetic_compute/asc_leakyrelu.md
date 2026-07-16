@@ -23,11 +23,13 @@ $$dst_i = \begin{cases} src_i & src_i > 0 \\ src_i \times value & src_i \leq 0 \
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_leakyrelu(vector_float& dst, vector_float src, float value, vector_bool mask)
 __simd_callee__ inline void asc_leakyrelu(vector_half& dst, vector_half src, half value, vector_bool mask)
+__simd_callee__ inline void asc_leakyrelu(vector_float& dst, vector_float src, float value, vector_bool mask)
 ```
 
 ## 参数说明
+
+**表1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
