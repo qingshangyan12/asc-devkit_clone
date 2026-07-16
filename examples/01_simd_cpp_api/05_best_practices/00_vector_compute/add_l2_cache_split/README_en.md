@@ -5,7 +5,7 @@
 This sample demonstrates the performance impact of the **L2 Cache tiling** strategy using vector addition as an example. By comparing two implementations — **without tiling (negative example)** and **with tiling (positive example)** — it shows how L2 Cache tiling improves data transfer efficiency when data volume exceeds L2 Cache capacity.
 
 **Key differences**:
-- **Negative example (nosplit)**: Data is evenly partitioned by core count. Each core processes a fixed-size data block. When the total data exceeds L2 Cache size, core accesses cannot hit the L2 Cache, causing frequent GM reads/writes and becoming the performance bottleneck.
+- **Negative example (nosplit)**: Data is evenly partitioned by core count. Each core processes a fixed-size data block. When the total data exceeds L2 Cache size, the L2Cache hit rate is low (the Cache only retains the most recently accessed data; previously accessed data is evicted), causing subsequent accesses to reload from GM, leading to cache misses and becoming the performance bottleneck.
 - **Positive example (split)**: Global tiling is performed based on L2 Cache capacity. The total data is split into multiple tiles that each fit within L2 Cache. All cores collaboratively process the first tile, then move on to the next. Data reuse can directly read from L2 Cache, improving bandwidth utilization.
 
 ## Supported Products and CANN Versions
@@ -25,7 +25,11 @@ This sample demonstrates the performance impact of the **L2 Cache tiling** strat
 │   ├── l2_cache_optimizer.h         // L2 Cache tiling optimizer
 │   ├── add_l2cache_split.asc        // Positive example: with L2 Cache tiling
 │   ├── add_l2cache_nosplit.asc      // Negative example: without L2 Cache tiling
-│   └── README.md                    // Sample documentation
+│   ├── scripts
+│   │   ├── gen_data.py              // Generate test data
+│   │   └── verify_result.py         // Verify computation results
+│   ├── README.md                    // Sample documentation (Chinese)
+│   └── README_en.md                 // Sample documentation (English)
 ```
 
 ## Sample Description
@@ -40,11 +44,11 @@ $$
   z = x + y
 $$
 
-  - x: input, length 40000000, data type half (~76 MB);
-  - y: input, length 40000000, data type half (~76 MB);
-  - z: output, length 40000000, data type half (~76 MB);
+  - x: input, length 40000000, data type half (40000000 × 2B = 80000000B, i.e., 76.29 MiB);
+  - y: input, length 40000000, data type half (40000000 × 2B = 80000000B, i.e., 76.29 MiB);
+  - z: output, length 40000000, data type half (40000000 × 2B = 80000000B, i.e., 76.29 MiB);
 
-  Total data size is \( 40000000 \times 2B \times 3 = 240MB \), which exceeds the Atlas A2 series L2 Cache capacity (192 MB) — a typical scenario that triggers L2 Cache tiling.
+  Total data size is 40000000 × 2B × 3 = 240000000B (i.e., 228.88 MiB), which exceeds the Atlas A2 series L2 Cache capacity (192 MiB) — a typical scenario that triggers L2 Cache tiling.
 
 ## Core Implementation Comparison
 
@@ -56,8 +60,8 @@ $$
 | Data view | Each core independently processes a fixed segment | All 20 cores collaboratively process the same tile, batch by batch |
 | L2Cache awareness | Not aware of L2Cache capacity | Aware via `L2CacheOptimizer` |
 | Core utilization | All 20 cores active | All 20 cores active (participate in every tile) |
-| L2Cache hit | All cores access non-overlapping data simultaneously; total exceeds L2Cache → **Cache miss** | ~33 MB per tile fits in L2Cache; next-round access hits → **Cache hit** |
-| Instantaneous L2Cache pressure | 240 MB (20 cores × 12 MB/core) | 33 MB (1 tile × 3 tensors × 2 B) |
+| L2Cache hit | All cores access non-overlapping data simultaneously; total exceeds L2Cache → **Cache miss** | 100 MiB per tile (controlled by L2_TILE_THRESHOLD=100×1024²) fits in L2Cache; next-round access hits → **Cache hit** |
+| Instantaneous L2Cache working set | 240000000B/228.88 MiB (20 cores × 40000000/20 × 3 × 2B) | up to 100 MiB (controlled by L2_TILE_THRESHOLD=100×1024², total data per tile) |
 
 ### Negative Example Key Code (add_l2cache_nosplit.asc)
 
@@ -108,8 +112,10 @@ for (int64_t tileIdx = 0; tileIdx < l2Opt.GetTileNum(); tileIdx++) {
 
 ### L2CacheOptimizer Splitting Logic
 
+> Note: `L2_TILE_THRESHOLD = 100 × 1024² = 100 MiB` is an example threshold. Different hardware has different L2Cache sizes (e.g., Atlas A2 is 192 MiB, Ascend 950 series may be larger). Adjust this value based on your target hardware. It is recommended to set the threshold slightly below the actual L2Cache capacity to leave headroom for other data.
+
 ```cpp
-constexpr int64_t L2_TILE_THRESHOLD = 100 * 1024 * 1024; // 100 MB threshold
+constexpr int64_t L2_TILE_THRESHOLD = 100 * 1024 * 1024; // 100 MiB threshold, adjust for actual L2Cache size on target hardware
 
 L2CacheOptimizer(int64_t totalLen, int64_t blockNum) {
     int64_t totalByteSize = totalLen * sizeof(half) * 3;
@@ -224,7 +230,7 @@ The following data is aggregated from `PipeUtilization.csv` (20 cores per-core) 
 | aiv_write_hit_rate | 1.6% | **2.6%** |
 | aiv_read_hit_rate | 0.60% | **0.72%** |
 | aiv_total_hit_rate | 0.71% | **0.94%** |
-| Instantaneous L2Cache data volume | 240 MB (20 cores × 12 MB/core) | 33 MB (1 tile × 3 tensors × 2 B) |
+| Instantaneous L2Cache working set | 240000000B/228.88 MiB (20 cores × 40000000/20 × 3 × 2B) | up to 100 MiB (controlled by L2_TILE_THRESHOLD=100×1024², total data per tile) |
 
 **Table 3 MTE2 Effective Bandwidth Per-Core Comparison (PipeUtilization blk0)**
 
@@ -238,7 +244,7 @@ The following data is aggregated from `PipeUtilization.csv` (20 cores per-core) 
 
 **1. MTE2 transfer efficiency is the key differentiator**
 
-In the negative example, 20 cores each process independent data. At any moment, L2Cache bears 240 MB of data pressure, exceeding the 192 MB capacity, causing frequent cache misses requiring GM re-reads. The positive example splits data into 3 tiles based on L2Cache capacity, each tile approximately 33 MB (`100MB threshold / 3`), fitting entirely in L2Cache:
+In the negative example, 20 cores each process independent data. At any moment, the L2Cache working set is 240000000B (228.88 MiB), exceeding the 192 MiB capacity, causing frequent cache misses requiring GM re-reads. The positive example splits data into 3 tiles based on L2Cache capacity, each tile up to 100 MiB (total size of x, y, z three tensor data per tile = L2_TILE_THRESHOLD), fitting entirely in L2Cache:
 
 - Positive example L2Cache hit rate (0.94%) is 32% higher than the negative example (0.71%)
 - MTE2 effective bandwidth improves from 41.3 GB/s to 57.9 GB/s (+40%)

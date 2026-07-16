@@ -5,7 +5,7 @@
 本样例以向量加法为例，展示 **L2 Cache切分**（L2 Cache Tiling）策略对性能的影响。通过对比 **未开启切分（反例）** 与 **开启切分（正例）** 两种实现，展示当数据量超过L2 Cache容量时，L2 Cache切分策略如何提升数据搬运效率。
 
 **核心差异**：
-- **反例（nosplit）**：按核数均匀切分数据，每个核处理固定大小的数据块。当总数据量超过L2 Cache大小时，各核访问数据无法命中L2 Cache，导致频繁的GM读写，成为性能瓶颈。
+- **反例（nosplit）**：按核数均匀切分数据，每个核处理固定大小的数据块。当总数据量超过L2 Cache大小时，各核访问数据L2 Cache命中率较低（Cache 中仅保留最近访问的数据，之前的数据被逐出（eviction）），导致后续访问时需要从GM重新加载，引发 Cache miss，成为性能瓶颈。
 - **正例（split）**：基于L2 Cache容量进行全局Tiling，将总数据切分为多个能完整放入L2 Cache的Tile，所有核先共同处理第一个Tile，再处理下一个Tile。使得数据复用时可直接从L2 Cache读取，提升带宽利用率。
 
 ## 本样例支持的产品及CANN软件版本
@@ -25,7 +25,11 @@
 │   ├── l2_cache_optimizer.h         // L2 Cache切分优化器
 │   ├── add_l2cache_split.asc        // 正例：开启L2 Cache切分
 │   ├── add_l2cache_nosplit.asc      // 反例：未开启L2 Cache切分
-│   └── README.md                    // 样例说明文档
+│   ├── scripts
+│   │   ├── gen_data.py              // 生成测试数据
+│   │   └── verify_result.py         // 验证计算结果
+│   ├── README.md                    // 样例说明文档（中文）
+│   └── README_en.md                 // 样例说明文档（英文）
 ```
 
 ## 样例描述
@@ -40,11 +44,11 @@ $$
   z = x + y
 $$
 
-  - x：输入，长度为40000000，数据类型为half（约76MB）；
-  - y：输入，长度为40000000，数据类型为half（约76MB）；
-  - z：输出，长度为40000000，数据类型为half（约76MB）；
+  - x：输入，长度为40000000，数据类型为half（40000000 × 2B = 80000000B，即 76.29MiB）。
+  - y：输入，长度为40000000，数据类型为half（40000000 × 2B = 80000000B，即 76.29MiB）。
+  - z：输出，长度为40000000，数据类型为half（40000000 × 2B = 80000000B，即 76.29MiB）。
 
-  三份数据总大小为 \( 40000000 \times 2B \times 3 = 240MB \)，超过Atlas A2系列L2 Cache容量（192MB），触发L2 Cache切分的典型场景。
+  三份数据总大小为 40000000 × 2B × 3 = 240000000B（即 228.88MiB），超过Atlas A2系列L2 Cache容量（192MiB），可采用L2 Cache切分策略进行性能优化。
 
 ## 核心实现对比
 
@@ -56,8 +60,8 @@ $$
 | 数据视图 | 每个核独立处理整段数据的固定一段 | 所有20核协同处理同一Tile，按Tile分批 |
 | 数据总量感知 | 不感知L2Cache容量 | 通过 `L2CacheOptimizer` 感知L2Cache容量 |
 | 核利用率 | 20核全部工作 | 20核全部工作（每个Tile中均参与） |
-| L2Cache命中 | 所有核同时访问不重叠数据，总数据超出L2Cache → **Cache miss** | 每Tile约33MB放入L2Cache，下一轮访问命中 → **Cache hit** |
-| 单时刻L2Cache压力 | 240MB（20核 × 12MB/核） | 33MB（1个Tile × 3 tensors × 2B） |
+| L2Cache命中 | 所有核同时访问不重叠数据，总数据超出L2Cache → **Cache miss** | 每Tile 100MiB（由L2_TILE_THRESHOLD=100×1024²控制）放入L2Cache，下一轮访问命中 → **Cache hit** |
+| 单时刻L2Cache数据量 | 240000000B/228.88MiB（20核 × 40000000/20 × 3 × 2B） | 最大100MiB（由L2_TILE_THRESHOLD=100×1024²控制，1个Tile总数据量） |
 
 ### 反例关键代码（add_l2cache_nosplit.asc）
 
@@ -108,8 +112,10 @@ for (int64_t tileIdx = 0; tileIdx < l2Opt.GetTileNum(); tileIdx++) {
 
 ### L2CacheOptimizer 切分逻辑
 
+> 注：`L2_TILE_THRESHOLD = 100 × 1024² = 100MiB` 是示例阈值，不同硬件L2Cache容量不同（如Atlas A2为192MiB，Ascend 950系列可能更大），使用者可根据目标硬件调整该值。阈值建议设置为略小于实际L2Cache容量，为其他数据留出余量。
+
 ```cpp
-constexpr int64_t L2_TILE_THRESHOLD = 100 * 1024 * 1024; // 100MB阈值
+constexpr int64_t L2_TILE_THRESHOLD = 100 * 1024 * 1024; // 100MiB阈值，不同硬件L2Cache大小不同，可根据实际情况调整
 
 L2CacheOptimizer(int64_t totalLen, int64_t blockNum) {
     int64_t totalByteSize = totalLen * sizeof(half) * 3;
@@ -149,7 +155,7 @@ L2CacheOptimizer(int64_t totalLen, int64_t blockNum) {
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU运行、CPU调试、NPU仿真 |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认） | 运行模式：NPU运行 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU架构：dav-2201 对应 Atlas A2/A3 系列，dav-3510 对应 Ascend 950 系列 |
 
 - 生成测试数据并运行
@@ -224,7 +230,7 @@ OPPROF_<timestamp>/
 | aiv_write_hit_rate | 1.6% | **2.6%** |
 | aiv_read_hit_rate | 0.60% | **0.72%** |
 | aiv_total_hit_rate | 0.71% | **0.94%** |
-| 单时刻L2Cache数据量 | 240MB（20核 × 12MB/核） | 33MB（1个Tile × 3 tensors × 2B） |
+| 单时刻L2Cache工作集 | 240000000B/228.88MiB（20核 × 40000000/20 × 3 × 2B） | 最大100MiB（由L2_TILE_THRESHOLD=100×1024²控制，1个Tile总数据量） |
 
 **表3 MTE2有效带宽逐核对比（PipeUtilization blk0）**
 
@@ -238,7 +244,7 @@ OPPROF_<timestamp>/
 
 **1. MTE2搬运效率是核心差异**
 
-反例中20个核各自处理独立数据，同时刻L2Cache承受240MB数据压力，超出192MB容量，频繁触发Cache miss重读GM。正例将数据按L2Cache容量切为3个Tile，每Tile约33MB（`100MB阈值 / 3`），完整放入L2Cache：
+反例中20个核各自处理独立数据，同时刻L2Cache工作集为240000000B（228.88MiB），超出192MiB容量，频繁触发Cache miss重读GM。正例将数据按L2Cache容量切为3个Tile，每Tile最大100MiB（1个Tile的x、y、z三份数据总大小 = L2_TILE_THRESHOLD），完整放入L2Cache：
 
 - 正例 L2Cache 命中率（0.94%）比反例（0.71%）高 32%
 - MTE2 有效带宽从 41.3 GB/s 提升至 57.9 GB/s（+40%）
@@ -254,7 +260,7 @@ OPPROF_<timestamp>/
 
 三个Tile之间通过 `PipeBarrier<PIPE_ALL>()` 同步后依次处理，所有20核均参与每个Tile。Tile 2 数据量较小但因同步开销，单核 aiv_time 仍约163 μs。总 aiv_time 取所有核中最慢核的累积时间（即约215 μs）。
 
-**3. 反例的 L2Cache 颠簸机制**
+**3. 反例的 L2Cache Thrashing 机制**
 
 反例中 `LOOP_COUNT=2` 将同一份数据重复计算两次（模拟训练中 data reuse 场景）。每次迭代核内 `TILE_NUM=2` 交替处理前后两段数据：
 
@@ -263,7 +269,7 @@ OPPROF_<timestamp>/
 第二轮: [Tile0 → Tile1]  → 回到 Tile0 时 L2Cache 中已是 Tile1，Cache miss
 ```
 
-`PipeBarrier` 确保 tile 间同步后数据一致性正确，但第二轮中 Tile0 数据必须从 GM 重新加载。所有20核同时忙，造成 L2Cache 颠簸。
+`PipeBarrier` 确保 tile 间同步后数据一致性正确，但第二轮中 Tile0 数据必须从 GM 重新加载。所有20核同时忙，造成 L2Cache Thrashing。
 
 **4. 理论加速来源**
 
