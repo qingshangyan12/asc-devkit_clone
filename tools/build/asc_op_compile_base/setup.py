@@ -46,7 +46,7 @@ setup(
     ],
     packages=find_packages(),
     package_data={
-        'asc_op_compile_base.asc_platform': [shared_library_path],
+        "asc_op_compile_base.asc_platform": [shared_library_path],
     },
     include_package_data=True,
 )
