@@ -473,6 +473,11 @@ function sync_utils_from_asc_devkit()
   mkdir -p "${CURRENT_DIR}/impl" "${CURRENT_DIR}/include"
   cp -a "${tmp_dir}/impl/utils" "${CURRENT_DIR}/impl/"
   cp -a "${tmp_dir}/include/utils" "${CURRENT_DIR}/include/"
+
+  local utils_cmake="${CURRENT_DIR}/impl/utils/CMakeLists.txt"
+  if [[ -f "${utils_cmake}" ]]; then
+    sed -i '/add_dependencies(kernel_tiling_headers template_argument tiling_log_target)/,+3d' "${utils_cmake}"
+  fi
 )
 
 function clean()
