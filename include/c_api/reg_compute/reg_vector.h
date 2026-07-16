@@ -19,6 +19,7 @@
 
 #ifndef INCLUDE_C_API_REG_COMPUTE_REG_VECTOR_H
 #define INCLUDE_C_API_REG_COMPUTE_REG_VECTOR_H
+#include "impl/utils/common_types.h"
 #include "c_api/utils/union.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
