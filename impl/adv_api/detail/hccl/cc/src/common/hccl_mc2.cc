@@ -409,6 +409,28 @@ CcuResult CcuKernelLaunch(HcclComm comm, void *opResCtx)
     CHK_PRT_RET(resourceCtx.kfcServerArgSize != 0U && resourceCtx.kfcServerArgs.empty(),
         HCCL_ERROR("invalid kfcServerArgs, kfcServerArgSize[%u].", resourceCtx.kfcServerArgSize), CCU_E_PTR);
 
+    if (resourceCtx.kfcServerArgs.size() >= 6U) {
+        HCCL_INFO("[CcuKernelLaunch] HcommCcuKernelLaunch args: "
+                  "threadHandle[0x%llx], kernelHandle[0x%llx], argSize[%u], "
+                  "xnAddr[0x%llx], ckeAddr[0x%llx], dieNum[%llu], missionNum[%llu], "
+                  "missionIndex[%llu], token[%llu]",
+                  static_cast<unsigned long long>(threadHandle),
+                  static_cast<unsigned long long>(kernelHandle),
+                  resourceCtx.kfcServerArgSize,
+                  static_cast<unsigned long long>(resourceCtx.kfcServerArgs[0]),
+                  static_cast<unsigned long long>(resourceCtx.kfcServerArgs[1]),
+                  static_cast<unsigned long long>(resourceCtx.kfcServerArgs[2]),
+                  static_cast<unsigned long long>(resourceCtx.kfcServerArgs[3]),
+                  static_cast<unsigned long long>(resourceCtx.kfcServerArgs[4]),
+                  static_cast<unsigned long long>(resourceCtx.kfcServerArgs[5]));
+    } else {
+        HCCL_INFO("[CcuKernelLaunch] HcommCcuKernelLaunch args: "
+                  "threadHandle[0x%llx], kernelHandle[0x%llx], argSize[%u], kfcServerArgsSize[%zu]",
+                  static_cast<unsigned long long>(threadHandle),
+                  static_cast<unsigned long long>(kernelHandle),
+                  resourceCtx.kfcServerArgSize,
+                  resourceCtx.kfcServerArgs.size());
+    }
     HCCL_INFO("[CcuKernelLaunch]Start HcommCcuKernelLaunch.");
     const void *kfcArgs = resourceCtx.kfcServerArgs.empty() ? nullptr :
         static_cast<const void *>(resourceCtx.kfcServerArgs.data());
