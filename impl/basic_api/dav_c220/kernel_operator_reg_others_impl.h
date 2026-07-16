@@ -149,7 +149,7 @@ __aicore__ inline int64_t Clz(uint64_t in) { return clz(in); }
 
 __aicore__ inline uint64_t FakeOverFlowStatus1() { return fake_overflow_status_1(); }
 
-__aicore__ inline int64_t GetArchVer() { return get_arch_ver(); }
+__aicore__ inline int64_t GetArchVer() { return 2201; }
 
 __aicore__ inline int64_t GetConditionFlag() { return get_condition_flag(); }
 

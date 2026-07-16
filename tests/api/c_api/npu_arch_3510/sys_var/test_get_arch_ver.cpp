@@ -9,8 +9,6 @@
  */
 
 #include <gtest/gtest.h>
-#include <mockcpp/mockcpp.hpp>
-#include "c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 
 class TestSysVarGetArchVer : public testing::Test {
@@ -21,11 +19,8 @@ protected:
 
 TEST_F(TestSysVarGetArchVer, get_arch_ver_Succ)
 {
-    MOCKER(get_arch_ver, int64_t(void)).times(1).will(returnValue(int64_t(0x123456789ABCDEF0)));
-
     uint32_t core_version = 0;
     asc_get_arch_ver(core_version);
 
-    uint32_t expectedValue = 0x678;
-    EXPECT_EQ(expectedValue, core_version);
+    EXPECT_EQ(core_version, 3510U);
 }
