@@ -306,7 +306,8 @@ __aicore__ inline void scalar_printf_impl(
     DumpType debugType, __gm__ const char* fmt, __gm__ const char* dumphead, Args&&... args)
 {}
 
-__aicore__ inline void enable_asc_diagnostics() {}
+__aicore__ inline void enable_asc_diagnostics()
+{}
 
 } // namespace __asc_aicore
 
