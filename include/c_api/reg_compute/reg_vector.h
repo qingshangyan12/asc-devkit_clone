@@ -20,7 +20,9 @@
 #ifndef INCLUDE_C_API_REG_COMPUTE_REG_VECTOR_H
 #define INCLUDE_C_API_REG_COMPUTE_REG_VECTOR_H
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
+#endif
 
 /*
  *   asc_create_mask_b8(pat_mode);

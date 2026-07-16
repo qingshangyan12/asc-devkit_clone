@@ -20,7 +20,9 @@
 #ifndef INCLUDE_C_API_REG_COMPUTE_REG_CONVERT_H
 #define INCLUDE_C_API_REG_COMPUTE_REG_CONVERT_H
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
+#endif
 
 // ==========asc_float2half(rd/ru/rz/rn/rna)==========
 __simd_callee__ inline void asc_float2half_rd(vector_half& dst, vector_float src, vector_bool mask);
