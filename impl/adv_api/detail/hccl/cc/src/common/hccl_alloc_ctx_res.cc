@@ -142,7 +142,14 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSi
     opResCtx.xnAddr = reinterpret_cast<uint64_t>(comParamPtr);
     opResCtx.ckeAddr = reinterpret_cast<uint64_t>(comSyncPtr);
 
-    HCCL_INFO("[AllocCcuOpResCtx]workspace[%p], comParam[%p], comSync[%p]", workspacePtr, comParamPtr, comSyncPtr);
+    HCCL_INFO("[AllocCcuOpResCtx] workspace[%p], workspaceSize[%llu], "
+              "comParam[%p], comParamBufSize[%llu], comSync[%p], comSyncBufSize[%llu], "
+              "rankId[%u], rankSize[%u], xnAddr[0x%llx], ckeAddr[0x%llx]",
+              workspacePtr, Hccl::MC2_WORKSPACE_SIZE,
+              comParamPtr, comParamBufSize, comSyncPtr, comSyncBufSize,
+              userRank, rankSize,
+              static_cast<unsigned long long>(opResCtx.xnAddr),
+              static_cast<unsigned long long>(opResCtx.ckeAddr));
 
     return HCCL_SUCCESS;
 }
@@ -654,6 +661,16 @@ static HcclResult AcquireAlgResources(
             static_cast<uint64_t>(0), // token 占位符，后续在 GetAlgResCcu 中更新
         };
         resCtxHost->kfcServerArgSize = 6;
+        HCCL_INFO("[AcquireAlgResources] kfcServerArgs generated: "
+                  "argSize[%u], xnAddr[0x%llx], ckeAddr[0x%llx], dieNum[%llu], "
+                  "missionNum[%llu], missionIndex[%llu], token[%llu]",
+                  resCtxHost->kfcServerArgSize,
+                  static_cast<unsigned long long>(resCtxHost->kfcServerArgs[0]),
+                  static_cast<unsigned long long>(resCtxHost->kfcServerArgs[1]),
+                  static_cast<unsigned long long>(resCtxHost->kfcServerArgs[2]),
+                  static_cast<unsigned long long>(resCtxHost->kfcServerArgs[3]),
+                  static_cast<unsigned long long>(resCtxHost->kfcServerArgs[4]),
+                  static_cast<unsigned long long>(resCtxHost->kfcServerArgs[5]));
 
         CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
         opParam.resCtx = *resCtxOut;
