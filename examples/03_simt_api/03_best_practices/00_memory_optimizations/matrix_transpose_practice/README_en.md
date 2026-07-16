@@ -19,7 +19,8 @@ This example uses matrix transpose to demonstrate memory access optimization str
 │   ├── figures                     // Image resources for README
 │   ├── CMakeLists.txt              // Build project file
 │   ├── matrix_transpose.asc        // SIMT matrix transpose optimization path implementation
-│   └── README.md
+│   ├── README.md
+│   └── README_en.md
 ```
 
 ## Example Description
@@ -136,7 +137,7 @@ With the GM peak bandwidth of Ascend 950PR estimated at 1.6TB/s, the theoretical
 
 $$T_{theory} = \frac{8.39MB}{1.6TB/s} \approx 5.243μs$$
 
-The Task Duration of Case 0 is 6.262μs, corresponding to a read/write mixed bandwidth of approximately 1.34TB/s, reaching approximately 83.7% of the theoretical peak bandwidth. The Task Duration of Case 1 is 8.649μs, corresponding to a read/write mixed bandwidth of approximately 0.97TB/s, reaching approximately 60.6% of the theoretical peak bandwidth. In this no-synchronization transfer scenario, the 2048-thread configuration is closer to the hardware contiguous transfer upper bound. Subsequent transpose cases, in addition to completing coordinate swapping, also introduce UB access and synchronization overhead, so the contiguous copy latency can serve as the performance upper bound reference for matrix transpose optimization.
+The Task Duration of Case 0 is 6.262μs, corresponding to a read/write mixed bandwidth of approximately 1.34TB/s, reaching approximately 83.7% of the theoretical peak bandwidth. The Task Duration of Case 1 is 8.649μs, corresponding to a read/write mixed bandwidth of approximately 0.97TB/s, reaching approximately 60.6% of the theoretical peak bandwidth. In this contiguous read/write transfer scenario, the 2048-thread configuration is closer to the hardware contiguous transfer upper bound. The main reason why the theoretical peak bandwidth is not reached is that the actual duration includes Task scheduling and other compute instruction overhead in addition to data read/write itself. These non-transfer overheads reduce the effective bandwidth. When the thread count is smaller, each thread performs more iterations, so the extra overhead accounts for a larger proportion and bandwidth utilization is lower. Subsequent transpose cases, in addition to completing coordinate swapping, also introduce UB access and synchronization overhead, so the contiguous copy latency can serve as the performance upper bound reference for matrix transpose optimization.
 
 ---
 
@@ -395,10 +396,11 @@ The simulation instruction pipeline diagrams of Case 6 and Case 7 are shown in F
 
 ## Tuning Recommendations
 
-1. **Establish a copy baseline first**: When analyzing the performance of memory-access operators, measure the copy scenario latency first, then compare the actual operator performance against it.
-2. **Prioritize GM memory access contiguity**: Matrix transpose computation is minimal; end-to-end latency is primarily affected by the read/write memory access pattern.
-3. **Use UB staging to improve write-back patterns**: When direct transpose causes non-contiguous GM writes, transfer non-contiguous access to the UB side in exchange for contiguous GM read/write.
-4. **Continue analyzing UB Bank conflicts**: After GM memory coalescing, UB bank conflicts during the transpose read phase may become the next bottleneck. Adjust the physical UB layout through padding or similar methods to prevent concurrent threads in the same Warp from concentrating their accesses on the same bank resources.
+When tuning memory-access operators, use contiguous copy first to confirm the GM transfer upper bound at the current data scale, and then use the most direct implementation to expose the main performance gap. In this example, the gap between direct transpose and the copy baseline mainly comes from non-contiguous GM writes. Therefore, the optimization direction is not to increase compute parallelism, but to reorganize memory access: contiguously load data into UB by 32x32 tiles, read data in the transpose direction within UB, and then write data back contiguously by rows of the output matrix.
+
+After tiling, first determine the mapping from Thread Blocks to tiles. Launching Thread Blocks by partitioned tile groups is simple, but when the tile count is much larger than the hardware vector core count, it introduces extra launch and scheduling overhead. Fixing the Thread Block count to the hardware vector core count and processing multiple tiles in a loop inside the kernel can reduce this overhead. The thread count cannot be selected only according to the contiguous transfer scenario. A high thread count limits the number of registers available to each thread. When the index logic becomes more complex, register spill may occur, so select the thread count based on both `--cce-res-usage` and measured latency.
+
+After GM access becomes contiguous, the bottleneck shifts to UB access and synchronization. When UB is read in the transpose direction, column-wise access to a 32x32 tile can easily cause bank conflicts. Padding can change the physical UB layout. Synchronization in the loop also needs to be judged based on data overwrite relationships. Double buffering can reduce one synchronization without overwriting data that is still being read.
 
 ## Build and Run
 

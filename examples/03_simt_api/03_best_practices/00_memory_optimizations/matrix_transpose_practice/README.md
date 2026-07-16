@@ -19,7 +19,8 @@
 │   ├── figures                     // README中的图片资源
 │   ├── CMakeLists.txt              // 编译工程文件
 │   ├── matrix_transpose.asc        // SIMT矩阵转置优化路径实现
-│   └── README.md
+│   ├── README.md
+│   └── README_en.md
 ```
 
 ## 样例描述
@@ -301,13 +302,19 @@ SIMT编程方式下，bank冲突为更细粒度的subbank冲突，主要有以�
 
 **图3　UB bank结构示意图**
 
+<img src="./figures/bank结构示意图.png">
+
 Case 5中UB的tile数组按照行优先存储。按照地址低位交织规则，tile数组的第一行刚好覆盖bank0～bank3，第二行覆盖bank4～bank7，第三行覆盖bank8～bank11，其余行依次类推。每行32个float数据会恰好跨越4个bank存储。Case 5中，一个Warp的线程会读取tile的一列元素写回GM输出；访问UB时，32个线程会集中访问两个bank group的subbank0，属于读读冲突场景。
 
 **图4　Case5 tile在UB上的排布示意图**
 
+<img src="./figures/case5_bank.png">
+
 Case 6中对UB中的tile数组增加两列padding，由每行32个元素改为34个元素，其在UB上的排列如下图所示。由于每行有34个元素，行跨度变为17个subbank，同一列元素会错开排布到不同的subbank。Case 6访问UB时，32个线程的访问会分布到各个bank group的每个subbank中，即同一条访问指令下每个subbank仅有一个线程访问，从而避免上述读读冲突。
 
 **图5　Case6 tile在UB上的排布示意图**
+
+<img src="./figures/case6_bank.png">
 
 ```cpp
 constexpr int TILE_PAD = 2;                          // Case6/7的UB padding列数（32x34）
@@ -364,7 +371,11 @@ Case 6与Case 7的仿真指令流水图分别如图6、图7所示。Case 6每轮
 
 **图6　Case 6仿真指令流水图**
 
+<img src="./figures/case6_trace.png">
+
 **图7　Case 7仿真指令流水图**
+
+<img src="./figures/case7_trace.png">
 
 ## 性能对比总结
 
