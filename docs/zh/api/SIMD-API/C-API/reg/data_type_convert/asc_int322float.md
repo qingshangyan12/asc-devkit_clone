@@ -63,7 +63,7 @@ __simd_callee__ inline void asc_int322float_rz(vector_float& dst, vector_int32_t
 ## 数据类型
 
 
-| 输入类型 | 输出类型 |
+| src | dst |
 |---|---|
 | int32_t | float |
 

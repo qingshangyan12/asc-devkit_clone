@@ -62,9 +62,9 @@ __simd_callee__ inline void asc_int322int64_v2(vector_int64_t& dst, vector_int32
 ## 数据类型
 
 
-| 输入A类型 | 输入B类型/标量类型 | 输出类型 |
-|---|---|---|
-| int32_t | 不涉及 | int64_t |
+| src | dst |
+|---|---|
+| int32_t | int64_t |
 
 
 ## 返回值说明
