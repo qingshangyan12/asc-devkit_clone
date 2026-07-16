@@ -99,6 +99,7 @@ __aicore__ inline void copy_gm_to_cbuf_v2_stub(
     EXPECT_EQ(n_burst, static_cast<uint32_t>(33));
     EXPECT_EQ(len_burst, static_cast<uint32_t>(44));
     EXPECT_EQ(pad_func_mode, static_cast<uint8_t>(55));
+    EXPECT_EQ(l2_cache_ctl, static_cast<uint8_t>(0));
     EXPECT_EQ(src_stride, static_cast<uint64_t>(66));
     EXPECT_EQ(dst_stride, static_cast<uint64_t>(77));
 }
