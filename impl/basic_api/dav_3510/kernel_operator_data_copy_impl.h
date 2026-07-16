@@ -1605,12 +1605,13 @@ __aicore__ inline MultiCopyLoopInfo<actualDim> BuildLoopInfoByFuseAxis(const Mul
 
 template <typename T, uint8_t dim, const NdDmaConfig& config>
 __aicore__ inline void DataCopyWithNDDMAB64Impl(
-    __ubuf__ T* dst, __gm__ T* src, const MultiCopyLoopInfo<dim>& params, const T constValue, const uint8_t cacheMode);
+    __ubuf__ T* dst, __gm__ T* src, const MultiCopyLoopInfo<dim>& params,
+    const typename GetPadValueType<T>::Type constValue, const uint8_t cacheMode);
 
 template <typename T, uint8_t dim, const NdDmaConfig& config>
 __aicore__ inline void DataCopyWithNDDMAImpl(
-    __ubuf__ T* dst, __gm__ T* src, const MultiCopyLoopInfo<dim>& params, const T constValue,
-    const uint8_t cacheMode = 0)
+    __ubuf__ T* dst, __gm__ T* src, const MultiCopyLoopInfo<dim>& params,
+    const typename GetPadValueType<T>::Type constValue, const uint8_t cacheMode = 0)
 {
     static_assert(dim <= 5, "nddma only support dim <= 5");
     static_assert(
@@ -1683,7 +1684,8 @@ __aicore__ inline void DataCopyWithNDDMAImpl(
 
 template <typename T, uint8_t dim, const NdDmaConfig& config>
 __aicore__ inline void DataCopyWithNDDMAB64Impl(
-    __ubuf__ T* dst, __gm__ T* src, const MultiCopyLoopInfo<dim>& params, const T constValue, const uint8_t cacheMode)
+    __ubuf__ T* dst, __gm__ T* src, const MultiCopyLoopInfo<dim>& params,
+    const typename GetPadValueType<T>::Type constValue, const uint8_t cacheMode)
 {
     static_assert(!config.isNearestValueMode, "nddma b64 only supports constant value mode");
     ASCENDC_ASSERT((constValue == 0), { KERNEL_LOG(KERNEL_ERROR, "nddma b64 only support const pad value 0"); });
