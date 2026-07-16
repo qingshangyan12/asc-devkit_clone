@@ -43,6 +43,7 @@ __simd_callee__ inline void asc_reduce_min_datablock(vector_float& dst, vector_f
 
 ## 参数说明
 
+*表 1* 参数说明
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量数据寄存器）。 |
@@ -51,9 +52,15 @@ __simd_callee__ inline void asc_reduce_min_datablock(vector_float& dst, vector_f
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
 
+
+## 数据类型
+
+目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float
+
+
 ## 返回值说明
 
-无
+无返回值。
 
 ## 流水类型
 
@@ -61,7 +68,23 @@ PIPE_V
 
 ## 约束说明
 
-无
+- 在比较中，遵循 min(-0, +0) = -0
+- 找到源操作数中每个DataBlock内的最小值，连续写入到目的操作数，目的操作数中的其它元素置0
+- 未被mask选中的元素被视为最大值（浮点数为+INF），如果一个DataBlock中所有元素都未被mask选中，+INF将被填充到目的操作数的指定位置
+- 仅输出最值，不输出index下标
+
+## 理论性能
+
+
+| 输入类型 | 输出类型 | 理论并行度(element/cycle) |
+|---|---|---|
+| int16_t | int16_t | 128 |
+| uint16_t | uint16_t | 128 |
+| half | half | 128 |
+| int32_t | int32_t | 64 |
+| uint32_t | uint32_t | 64 |
+| float | float | 64 |
+
 
 ## 调用示例
 
