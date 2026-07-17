@@ -48,7 +48,7 @@ __simd_callee__ inline vector_bool asc_update_mask_b32(uint32_t& value)
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -56,7 +56,7 @@ __simd_callee__ inline vector_bool asc_update_mask_b32(uint32_t& value)
 
 ## 返回值说明
 
-vector_bool，掩码寄存器。 
+vector_bool，掩码寄存器。
 
 ## 约束说明
 

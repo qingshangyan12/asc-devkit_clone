@@ -30,31 +30,17 @@
 
 将src中hifloat8_t数据类型的元素转换为half数据类型，并将结果写入dst。
 
-由于源操作数和目的操作数位宽比为1:2，每两个hifloat8_t类型的元素中选择一个进行类型转换。asc_hif82half选择第1个元素参与转换，asc_hif82half_v2选择第2个元素参与转换。
-
-- asc_hif82half：取src的偶数索引元素（索引0, 2, 4, ...）进行转换，mask每bit为1时选取对应位置的hifloat8_t元素。
-
-    ```python
-    # 选取第1个（偶数索引）元素
-    dst[0:128] = src[0:256:2].astype(float16)
-    ```
-
-- asc_hif82half_v2：取src的奇数索引元素（索引1, 3, 5, ...）进行转换，mask每bit为1时选取对应位置的hifloat8_t元素。
-
-    ```python
-    # 选取第2个（奇数索引）元素
-    dst[0:128] = src[1:256:2].astype(float16)
-    ```
+由于源操作数和目的操作数位宽比为1:2，每两个hifloat8_t类型的元素中选择一个进行类型转换。
 
 ## 函数原型
 
-- 选择第1个hifloat8_t元素转换
+- 取src的偶数索引元素（索引0, 2, 4, ...）进行转换，mask每bit为1时选取对应位置的hifloat8_t元素。
 
     ```cpp
     __simd_callee__ inline void asc_hif82half(vector_half& dst, vector_hifloat8_t src, vector_bool mask)
     ```
 
-- 选择第2个hifloat8_t元素转换
+- 取src的奇数索引元素（索引1, 3, 5, ...）进行转换，mask每bit为1时选取对应位置的hifloat8_t元素。
 
     ```cpp
     __simd_callee__ inline void asc_hif82half_v2(vector_half& dst, vector_hifloat8_t src, vector_bool mask)
@@ -62,17 +48,17 @@
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_half](../reg_data_types/data_type_definition.md#矢量数据寄存器)。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_hifloat8_t](../reg_data_types/data_type_definition.md#矢量数据寄存器)。 |
-| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。对应位置为1的元素参与类型转换。 |
+| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
 ## 数据类型
 
-**表2**  数据类型
+**表2** 数据类型
 
 | src | dst |
 | --- | --- |
@@ -80,11 +66,11 @@
 
 ## 返回值说明
 
-无返回值
+无
 
 ## 约束说明
 
-dst中未被mask筛选的位置被置为0。
+mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
 
 ## 调用示例
 

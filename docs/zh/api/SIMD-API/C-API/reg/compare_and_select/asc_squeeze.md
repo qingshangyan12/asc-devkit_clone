@@ -52,13 +52,13 @@ __simd_callee__ inline void asc_squeeze(vector_float& dst, vector_float src, vec
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
+| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
 ## 数据类型
 
@@ -66,8 +66,7 @@ __simd_callee__ inline void asc_squeeze(vector_float& dst, vector_float src, vec
 
 ## 返回值说明
 
-无返回值
-
+无
 ## 约束说明
 
 dst中未被mask筛选的位置被置为0。

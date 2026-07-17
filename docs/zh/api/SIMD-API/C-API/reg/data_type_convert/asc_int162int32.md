@@ -28,33 +28,19 @@
 
 头文件路径：`"c_api/reg_compute/reg_convert.h"`。
 
-将src中int16_t类型的元素转换为int32_t类型，并将结果写入dst。转换过程将16位有符号整数通过符号位扩展为32位有符号整数（sign extension）。
+将src中int16_t类型的元素转换为int32_t类型，并将结果写入dst。
 
-由于源操作数和目的操作数位宽比为1:2，每两个int16_t类型的元素中选择一个进行类型转换。asc_int162int32选择第1个元素参与转换，asc_int162int32_v2选择第2个元素参与转换。
-
-- asc_int162int32：取src的偶数索引元素（索引0, 2, 4, ...）进行符号扩展，mask每2bit为一组、仅组内LSB为1时选取对应位置的int16_t元素。
-
-    ```python
-    # 选取第1个（偶数索引）元素，符号位扩展
-    dst[0:64] = src[0:128:2].astype(int32)
-    ```
-
-- asc_int162int32_v2：取src的奇数索引元素（索引1, 3, 5, ...）进行符号扩展，mask每2bit为一组、仅组内LSB为1时选取对应位置的int16_t元素。
-
-    ```python
-    # 选取第2个（奇数索引）元素，符号位扩展
-    dst[0:64] = src[1:128:2].astype(int32)
-    ```
+由于源操作数和目的操作数位宽比为1:2，每两个int16_t类型的元素中选择一个进行类型转换。
 
 ## 函数原型
 
-- 选择第1个int16_t元素转换
+- 取src的偶数索引元素（索引0, 2, 4, ...）进行转换，mask每2bit为一组、仅组内LSB为1时选取对应位置的int16_t元素。
 
     ```cpp
     __simd_callee__ inline void asc_int162int32(vector_int32_t& dst, vector_int16_t src, vector_bool mask)
     ```
 
-- 选择第2个int16_t元素转换
+- 取src的奇数索引元素（索引1, 3, 5, ...）进行转换，mask每2bit为一组、仅组内LSB为1时选取对应位置的int16_t元素。
 
     ```cpp
     __simd_callee__ inline void asc_int162int32_v2(vector_int32_t& dst, vector_int16_t src, vector_bool mask)
@@ -62,17 +48,17 @@
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_int32_t](../reg_data_types/data_type_definition.md#矢量数据寄存器)。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_int16_t](../reg_data_types/data_type_definition.md#矢量数据寄存器)。 |
-| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。对应位置为1的元素参与类型转换。 |
+| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
 ## 数据类型
 
-**表2**  数据类型
+**表2** 数据类型
 
 | src | dst |
 | --- | --- |
@@ -80,11 +66,11 @@
 
 ## 返回值说明
 
-无返回值
+无
 
 ## 约束说明
 
-dst中未被mask筛选的位置被置为0。
+mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
 
 ## 调用示例
 

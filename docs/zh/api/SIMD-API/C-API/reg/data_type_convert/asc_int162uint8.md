@@ -32,71 +32,45 @@
 
 由于src和dst位宽比为2:1，dst中每2个uint8_t位置为一组，各组内只有1个位置有效。
 
-- asc_int162uint8：非饱和模式，结果写入dst各组内第0个位置，直接截断。mask每2bit为一组，仅组内LSB为1时选取对应位置的int16_t元素。
-
-    ```python
-    # 结果写入dst各组内第0个位置
-    dst[:] = 0
-    dst[0:256:2] = src[0:128].astype(uint8)
-    ```
-
-- asc_int162uint8_v2：非饱和模式，结果写入dst各组内第1个位置，直接截断。mask每2bit为一组，仅组内LSB为1时选取对应位置的int16_t元素。
-
-    ```python
-    # 结果写入dst各组内第1个位置
-    dst[:] = 0
-    dst[1:256:2] = src[0:128].astype(uint8)
-    ```
-
-- asc_int162uint8_sat：饱和模式，超出[0, 255]范围的值钳位到边界。结果写入dst各组内第0个位置。mask每2bit为一组，仅组内LSB为1时选取对应位置的int16_t元素。
-
-    ```python
-    # 饱和模式，钳位到[0, 255]
-    src_clamped = src.clamp(0, 255)
-    # 结果写入dst各组内第0个位置
-    dst[:] = 0
-    dst[0:256:2] = src_clamped[0:128].astype(uint8)
-    ```
-
-- asc_int162uint8_sat_v2：饱和模式，超出[0, 255]范围的值钳位到边界。结果写入dst各组内第1个位置。mask每2bit为一组，仅组内LSB为1时选取对应位置的int16_t元素。
-
-    ```python
-    # 饱和模式，钳位到[0, 255]
-    src_clamped = src.clamp(0, 255)
-    # 结果写入dst各组内第1个位置
-    dst[:] = 0
-    dst[1:256:2] = src_clamped[0:128].astype(uint8)
-    ```
-
 ## 函数原型
 
-- 非饱和模式
+- 非饱和模式，结果写入dst各组内第0个位置，直接截断。mask每2bit为一组，仅组内LSB为1时选取对应位置的int16_t元素。
 
     ```cpp
     __simd_callee__ inline void asc_int162uint8(vector_uint8_t& dst, vector_int16_t src, vector_bool mask)
+    ```
+
+- 非饱和模式，结果写入dst各组内第1个位置，直接截断。mask每2bit为一组，仅组内LSB为1时选取对应位置的int16_t元素。
+
+    ```cpp
     __simd_callee__ inline void asc_int162uint8_v2(vector_uint8_t& dst, vector_int16_t src, vector_bool mask)
     ```
 
-- 饱和模式
+- 饱和模式，超出[0, 255]范围的值钳位到边界。结果写入dst各组内第0个位置。mask每2bit为一组，仅组内LSB为1时选取对应位置的int16_t元素。
 
     ```cpp
     __simd_callee__ inline void asc_int162uint8_sat(vector_uint8_t& dst, vector_int16_t src, vector_bool mask)
+    ```
+
+- 饱和模式，超出[0, 255]范围的值钳位到边界。结果写入dst各组内第1个位置。mask每2bit为一组，仅组内LSB为1时选取对应位置的int16_t元素
+
+    ```cpp
     __simd_callee__ inline void asc_int162uint8_sat_v2(vector_uint8_t& dst, vector_int16_t src, vector_bool mask)
     ```
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_uint8_t](../reg_data_types/data_type_definition.md#矢量数据寄存器)。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_int16_t](../reg_data_types/data_type_definition.md#矢量数据寄存器)。 |
-| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。对应位置为1的元素参与类型转换。 |
+| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
 ## 数据类型
 
-**表2**  数据类型
+**表2** 数据类型
 
 | src | dst |
 | --- | --- |
@@ -104,11 +78,11 @@
 
 ## 返回值说明
 
-无返回值
+无
 
 ## 约束说明
 
-dst中未被mask筛选的位置被置为0。
+mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
 
 ## 调用示例
 

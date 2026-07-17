@@ -33,11 +33,11 @@ asc_xor支持两种接口：
 - 对矢量数据寄存器操作：
     根据mask对矢量数据寄存器src0和src1进行按位异或（^）操作，将结果写入dst。未被mask筛选的位置被置为0。
 - 对掩码寄存器操作：
-    根据mask对两个掩码寄存器src0和src进行按位异或（^）操作，将结果写入dst。
+    根据mask对两个掩码寄存器src0和src进行按位异或（^）操作，将结果写入dst。未被mask筛选的位置被置为0。
 
 ## 函数原型
 
-- 对矢量数据寄存器操作
+- 操作数为矢量数据寄存器
 
 ```cpp
 __simd_callee__ inline void asc_xor(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
@@ -48,7 +48,7 @@ __simd_callee__ inline void asc_xor(vector_int32_t& dst, vector_int32_t src0, ve
 __simd_callee__ inline void asc_xor(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
 ```
 
-- 对掩码寄存器操作
+- 操作数为掩码寄存器
 
 ```cpp
 __simd_callee__ inline void asc_xor(vector_bool& dst, vector_bool src0, vector_bool src1, vector_bool mask)
@@ -56,22 +56,35 @@ __simd_callee__ inline void asc_xor(vector_bool& dst, vector_bool src0, vector_b
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明（操作数为矢量数据寄存器）
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
 | src0 | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
 | src1 | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
+| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+
+**表1** 参数说明（操作数为掩码寄存器）
+
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| dst | 输出 | 目的操作数（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#矢量数据寄存器)。 |
+| src0 | 输入 | 源操作数（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#矢量数据寄存器)。 |
+| src1 | 输入 | 源操作数（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#矢量数据寄存器)。 |
+| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。mask用于指示在计算过程中哪些bit参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的bit在输出中置零。 |
 
 ## 数据类型
 
-目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t。
+目的操作数与源操作数的数据类型需要保持一致。
+
+- 操作数为矢量数据寄存器：支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t。
+
+- 操作数为掩码寄存器：支持的数据类型为：bool。
 
 ## 返回值说明
 
-无返回值
+无
 
 ## 约束说明
 

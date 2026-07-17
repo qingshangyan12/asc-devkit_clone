@@ -35,47 +35,21 @@
 - b16模式：每2个bit为一组对应一个16bit元素（共128元素）。
 - b32模式：每4个bit为一组对应一个32bit元素（共64元素）。
 
-**图1**  asc_create_mask原理
+**图1** asc_create_mask原理
 
 ![asc_create_mask原理](../../figures/capi_create_mask.png)
 
 ## 函数原型
 
 ```cpp
-/*
-*   asc_create_mask_b8(pat_mode);
-*   asc_create_mask_b16(pat_mode);
-*   asc_create_mask_b32(pat_mode);
-*
-*   The parameter pat_mode is defined as follows:
-*
-*    PAT_ALL, // All elements are set to True
-*    PAT_VL1, // The lowest element is set to True
-*    PAT_VL2, // The lowest 2 elements are set to True
-*    PAT_VL3, // The lowest 3 elements are set to True
-*    PAT_VL4, // The lowest 4 elements are set to True
-*    PAT_VL8, // The lowest 8 elements are set to True
-*    PAT_VL16, // The lowest 16 elements are set to True
-*    PAT_VL32, // The lowest 32 elements are set to True
-*    PAT_VL64, // The lowest 64 elements are set to True
-*    PAT_VL128, // The lowest 128 elements are set to True
-*    PAT_M3, // Multiples of 3 elements are set to True
-*    PAT_M4, // Multiples of 4 elements are set to True
-*    PAT_H, // The lowest half elements are set to True
-*    PAT_Q, // The lowest quarter elements are set to True
-*    PAT_ALLF = 15 // All elements are set to False
-*
-*   usage example:
-*       vector_bool mask = asc_create_mask_b8(PAT_VL1);
-*/
-#define asc_create_mask_b8 pset_b8
-#define asc_create_mask_b16 pset_b16
-#define asc_create_mask_b32 pset_b32
+asc_create_mask_b8(pat_mode);
+asc_create_mask_b16(pat_mode);
+asc_create_mask_b32(pat_mode);
 ```
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
