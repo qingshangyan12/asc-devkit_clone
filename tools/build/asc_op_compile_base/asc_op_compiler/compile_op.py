@@ -354,11 +354,18 @@ the superkernel cannot be integrated with the operator.",
     aicore_num = get_context().get_addition("_op_aicore_num")
     vectorcore_num = get_context().get_addition("_op_vectorcore_num")
     if aicore_num is not None and vectorcore_num is not None:
-        js["platformInfo"] = {
-            "cubeCoreCnt": int(aicore_num),
-            "vectorCoreCnt": int(vectorcore_num),
-        }
-
+        deterministic_level = get_current_build_config("deterministic_level")
+        if deterministic_level is not None:
+            js["platformInfo"] = {
+                "cubeCoreCnt": int(aicore_num), 
+                "vectorCoreCnt": int(vectorcore_num), 
+                "deterministicLevel": int(deterministic_level)
+            }
+        else:
+            js["platformInfo"] = {
+                "cubeCoreCnt": int(aicore_num), 
+                "vectorCoreCnt": int(vectorcore_num)
+            }
     # set tilingdata of mc2 operator when online static compile
     if (
         tiling_info.static_shape_flag is True
