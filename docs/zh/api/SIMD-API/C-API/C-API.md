@@ -513,4 +513,4 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 |枚举类名|说明|
 |-----------------------|-----------------------|
 | [asc_load_l2_cache_mode](enum/asc_load_l2_cache_mode.md) | 表示数据从GM搬运到UB时的L2 cache策略。 |
-| [asc_load_l2_cache_mode](enum/asc_store_l2_cache_mode.md) | 表示数据从UB搬运到GM时的L2 cache策略。 |
+| [asc_store_l2_cache_mode](enum/asc_store_l2_cache_mode.md) | 表示数据从UB搬运到GM时的L2 cache策略。 |
