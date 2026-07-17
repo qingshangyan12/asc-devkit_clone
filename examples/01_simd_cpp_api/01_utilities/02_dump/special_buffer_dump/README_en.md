@@ -1,4 +1,4 @@
-# HiFloat8 Quantized Matrix Multiplication Sample
+# Special Buffer DumpTensor API Description
 
 ## Overview
 

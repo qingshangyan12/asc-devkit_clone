@@ -1,4 +1,4 @@
-# HiFloat8量化矩阵乘算子样例
+# 特殊Buffer DumpTensor接口功能说明
 
 ## 概述
 
