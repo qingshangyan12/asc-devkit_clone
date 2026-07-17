@@ -128,7 +128,7 @@
     ```
     (gdb) info inferiors
       Num  Description 
-      * 1    process 19613
+    * 1    process 19613
       2    process 19626
     ```
 
