@@ -68,6 +68,12 @@ public:
 
     __aicore__ inline void ResetCache() {}
 
+    template <TPosition Pos>
+    __aicore__ inline uint16_t GetPingPongFlag() const
+    {
+        return 0;
+    }
+
     __aicore__ inline void EnQue() {}
 
     __aicore__ inline void DeQue() {}
