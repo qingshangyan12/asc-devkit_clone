@@ -25,7 +25,7 @@ __aicore__ inline void asc_copy_l0c2l1_impl(
     __cbuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
     bool nz2nd_en, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op,
-    uint8_t eltwise_antq_en, bool c0_pad_en)
+    bool eltwise_antq_en, bool c0_pad_en)
 {
     if ASC_IS_AIC {
         copy_matrix_cc_to_cbuf(
@@ -41,7 +41,7 @@ __aicore__ inline void asc_copy_l0c2l1_impl(
     __cbuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
     bool nz2nd_en, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op,
-    uint8_t eltwise_antq_en, bool c0_pad_en)
+    bool eltwise_antq_en, bool c0_pad_en)
 {
     if ASC_IS_AIC {
         copy_matrix_cc_to_cbuf(
@@ -57,7 +57,7 @@ __aicore__ inline void asc_copy_l0c2l1_impl(
     __cbuf__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre,
     bool channel_split, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op,
-    uint8_t eltwise_antq_en, bool c0_pad_en)
+    bool eltwise_antq_en, bool c0_pad_en)
 {
     if ASC_IS_AIC {
         copy_matrix_cc_to_cbuf(
@@ -73,7 +73,7 @@ __aicore__ inline void asc_copy_l0c2l1_impl(
     __cbuf__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
     bool nz2nd_en, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op,
-    uint8_t eltwise_antq_en, bool c0_pad_en)
+    bool eltwise_antq_en, bool c0_pad_en)
 {
     if ASC_IS_AIC {
         copy_matrix_cc_to_cbuf(
@@ -89,7 +89,7 @@ __aicore__ inline void asc_copy_l0c2l1_impl(
     __cbuf__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
     bool nz2nd_en, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op,
-    uint8_t eltwise_antq_en, bool c0_pad_en)
+    bool eltwise_antq_en, bool c0_pad_en)
 {
     if ASC_IS_AIC {
         copy_matrix_cc_to_cbuf(
@@ -105,7 +105,7 @@ __aicore__ inline void asc_copy_l0c2l1_impl(
     __cbuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre,
     bool channel_split, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op,
-    uint8_t eltwise_antq_en, bool c0_pad_en)
+    bool eltwise_antq_en, bool c0_pad_en)
 {
     if ASC_IS_AIC {
         copy_matrix_cc_to_cbuf(
@@ -121,7 +121,7 @@ __aicore__ inline void asc_copy_l0c2l1_impl(
     __cbuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre,
     bool channel_split, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op,
-    uint8_t eltwise_antq_en, bool c0_pad_en)
+    bool eltwise_antq_en, bool c0_pad_en)
 {
     if ASC_IS_AIC {
         copy_matrix_cc_to_cbuf(
@@ -137,7 +137,7 @@ __aicore__ inline void asc_copy_l0c2l1_impl(
     __cbuf__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre,
     bool channel_split, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op,
-    uint8_t eltwise_antq_en, bool c0_pad_en)
+    bool eltwise_antq_en, bool c0_pad_en)
 {
     if ASC_IS_AIC {
         copy_matrix_cc_to_cbuf(
