@@ -37,7 +37,7 @@
 -   动态内存通过以下方式申请使用：
 
     ```
-    extern __ubuf__ half dynamicBuf[];
+    extern __ubuf__ half dynamicBuf[]; 
     ```
 
     动态内存的实际内存大小需要在核函数启动时配置，具体内容请参考[核函数配置](#section97005415463)。
@@ -223,7 +223,7 @@ SIMT编程提供了一系列运算符，用于执行数学运算。以下是支�
 
 ```
 // 加法运算
-res[idx] = x[idx] + y[idx];
+res[idx] = x[idx] + y[idx]; 
 
 // 取反运算
 x[idx] = (-x[idx]);
@@ -283,11 +283,10 @@ add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, 
 -   同一函数不能同时配置\_\_launch\_bounds\_\_和\_\_maxnreg\_\_。
 
 在多线程并发执行时，每个线程使用较少的寄存器可以让更多的线程驻留在AI处理器上。因此，编译器会采用启发式算法，将寄存器溢出（register spilling）和指令数量控制在最低水平，同时尽量减少寄存器的使用量。应用程序可以通过在\_\_global\_\_函数定义中使用\_\_launch\_bounds\_\_\(\)限定符来限制启动边界（launch bounds），提供附加信息辅助编译器优化这一过程，这属于可选配置。
-
 -   \_\_launch\_bounds\_\_\(N\) <a name="li23861114618"></a>
-
+  
     函数标记宏，在核函数上可选配置，用于指定核函数启动的最大线程数。最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表，寄存器用于存储线程中的局部变量，若局部变量的个数超出寄存器个数，容易出现栈溢出等问题。建议最大线程数与启动核函数时的dim3线程数保持一致。
-
+    
     **表5**  \_\_launch\_bounds\_\_的Thread数量与每个Thread可用寄存器数
 
     <a name="table1715318510594"></a>
