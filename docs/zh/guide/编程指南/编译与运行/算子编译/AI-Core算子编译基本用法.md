@@ -127,12 +127,15 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 >    <!-- npu="910b" id2 -->
 >    Atlas A2 训练系列产品/Atlas A2 推理系列产品  
 >    <!-- end id2 -->
+>
 >    <!-- npu="310b" id3 -->
 >    Atlas 200I/500 A2 推理产品  
 >    <!-- end id3 -->
+>
 >    <!-- npu="310p" id4 -->
 >    Atlas 推理系列产品  
 >    <!-- end id4 -->
+>
 >    <!-- npu="910" id5 -->
 >    Atlas 训练系列产品<br><br> 
 >    <!-- end id5 -->

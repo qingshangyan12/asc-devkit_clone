@@ -61,12 +61,15 @@ optype_collector工具用于采集内置/自定义算子包中指定AI处理器�
     >    <!-- npu="910b" id4 -->
     >    Atlas A2 训练系列产品/Atlas A2 推理系列产品  
     >    <!-- end id4 -->
+    >
     >    <!-- npu="310b" id5 -->
     >    Atlas 200I/500 A2 推理产品  
     >    <!-- end id5 -->
+    >
     >    <!-- npu="310p" id6 -->
     >    Atlas 推理系列产品  
     >    <!-- end id6 -->
+    >
     >    <!-- npu="910" id7 -->
     >    Atlas 训练系列产品<br><br> 
     >    <!-- end id7 -->
