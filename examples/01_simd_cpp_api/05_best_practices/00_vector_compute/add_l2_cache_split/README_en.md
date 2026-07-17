@@ -2,11 +2,18 @@
 
 ## Overview
 
-This sample demonstrates the performance impact of the **L2 Cache tiling** strategy using vector addition as an example. By comparing two implementations — **without tiling (negative example)** and **with tiling (positive example)** — it shows how L2 Cache tiling improves data transfer efficiency when data volume exceeds L2 Cache capacity.
+This sample demonstrates the performance impact of the **L2 Cache tiling** strategy using vector addition as an example. By comparing two implementations — **without tiling (negative example)** and **with tiling (positive example)** — it shows how L2 Cache tiling improves data transfer efficiency when data volume exceeds the L2 Cache capacity (assuming the AI processor's L2 Cache size is 192 MiB).
 
 **Key differences**:
 - **Negative example (nosplit)**: Data is evenly partitioned by core count. Each core processes a fixed-size data block. When the total data exceeds L2 Cache size, the L2Cache hit rate is low (the Cache only retains the most recently accessed data; previously accessed data is evicted), causing subsequent accesses to reload from GM, leading to cache misses and becoming the performance bottleneck.
+
+**Figure 1** Without L2 Cache Tiling (Negative Example)
+![](../../../../../docs/zh/guide/figures/未使能L2-Cache切分.png "Without L2-Cache Tiling")
+
 - **Positive example (split)**: Global tiling is performed based on L2 Cache capacity. The total data is split into multiple tiles that each fit within L2 Cache. All cores collaboratively process the first tile, then move on to the next. Data reuse can directly read from L2 Cache, improving bandwidth utilization.
+
+**Figure 2** With L2 Cache Tiling (Positive Example)
+![](../../../../../docs/zh/guide/figures/使能L2-Cache切分.png "With L2-Cache Tiling")
 
 ## Supported Products and CANN Versions
 

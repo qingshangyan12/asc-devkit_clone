@@ -2,11 +2,18 @@
 
 ## 概述
 
-本样例以向量加法为例，展示 **L2 Cache切分**（L2 Cache Tiling）策略对性能的影响。通过对比 **未开启切分（反例）** 与 **开启切分（正例）** 两种实现，展示当数据量超过L2 Cache容量时，L2 Cache切分策略如何提升数据搬运效率。
+本样例以向量加法为例，展示 **L2 Cache切分**（L2 Cache Tiling）策略对性能的影响。通过对比 **未开启切分（反例）** 与 **开启切分（正例）** 两种实现（假设，AI处理器的L2 Cache大小为192MB），展示当数据量超过L2 Cache容量时，L2 Cache切分策略如何提升数据搬运效率。
 
 **核心差异**：
 - **反例（nosplit）**：按核数均匀切分数据，每个核处理固定大小的数据块。当总数据量超过L2 Cache大小时，各核访问数据L2 Cache命中率较低（Cache 中仅保留最近访问的数据，之前的数据被逐出（eviction）），导致后续访问时需要从GM重新加载，引发 Cache miss，成为性能瓶颈。
+
+**图1**  未开启L2 Cache切分<a name="fig126831114552"></a>
+![](../../../../../docs/zh/guide/figures/未使能L2-Cache切分.png "未开启L2-Cache切分")
+
 - **正例（split）**：基于L2 Cache容量进行全局Tiling，将总数据切分为多个能完整放入L2 Cache的Tile，所有核先共同处理第一个Tile，再处理下一个Tile。使得数据复用时可直接从L2 Cache读取，提升带宽利用率。
+
+**图2**  开启L2 Cache切分<a name="fig1623673819553"></a>
+![](../../../../../docs/zh/guide/figures/使能L2-Cache切分.png "开启L2-Cache切分")
 
 ## 本样例支持的产品及CANN软件版本
 
