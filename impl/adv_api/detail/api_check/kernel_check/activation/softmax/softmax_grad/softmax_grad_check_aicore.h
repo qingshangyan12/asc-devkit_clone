@@ -41,10 +41,10 @@ public:
         const SoftMaxShapeInfo& softmaxShapeInfo)
     {
         CheckTensorPos<float>(
-            sharedTmpBuffer, Hardware::UB, "sharedTmpBuffer", "VECIN / VECCALC / VECOUT", "SoftmaxGrad");
-        CheckTensorPos<T>(dstTensor, Hardware::UB, "dstTensor", "VECIN / VECCALC / VECOUT", "SoftmaxGrad");
-        CheckTensorPos<T>(gradTensor, Hardware::UB, "gradTensor", "VECIN / VECCALC / VECOUT", "SoftmaxGrad");
-        CheckTensorPos<T>(srcTensor, Hardware::UB, "srcTensor", "VECIN / VECCALC / VECOUT", "SoftmaxGrad");
+            sharedTmpBuffer, Hardware::UB, "sharedTmpBuffer", "VECIN/VECCALC/VECOUT", "SoftmaxGrad");
+        CheckTensorPos<T>(dstTensor, Hardware::UB, "dstTensor", "VECIN/VECCALC/VECOUT", "SoftmaxGrad");
+        CheckTensorPos<T>(gradTensor, Hardware::UB, "gradTensor", "VECIN/VECCALC/VECOUT", "SoftmaxGrad");
+        CheckTensorPos<T>(srcTensor, Hardware::UB, "srcTensor", "VECIN/VECCALC/VECOUT", "SoftmaxGrad");
         ASCENDC_ASSERT((softmaxShapeInfo.srcK * sizeof(T) % ONE_BLK_SIZE == 0), {
             KERNEL_LOG(KERNEL_ERROR, "srcK should be 32B aligned, current srcK is %u", softmaxShapeInfo.srcK);
         });
