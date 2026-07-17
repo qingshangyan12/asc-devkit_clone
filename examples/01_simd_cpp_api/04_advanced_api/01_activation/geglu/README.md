@@ -60,7 +60,7 @@
 </div>
 
 - 样例实现：  
-  本样例中实现的是固定shape为输入src[1,1024]、src1[1,1024]，输出dst[1,024]的geglu_custom样例。
+  本样例中实现的是固定shape为输入src[1,1024]、src1[1,1024]，输出dst[1,1024]的geglu_custom样例。
 
   - Kernel实现  
     核心计算步骤：将输入数据搬入后，调用 `AscendC::GeGLU` 完成GeGLU门控激活计算，再将结果搬出。
@@ -75,7 +75,7 @@
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

@@ -257,7 +257,7 @@ In the sample root directory, perform the following steps to compile and run the
 
 - Configure environment variables.
 
-  Configure environment variables based on the [installation method](../../../../docs/quick_start.md#prepare&install) of the CANN development kit package in the current environment.
+  Configure environment variables based on the [installation method](../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit package in the current environment.
 
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -302,7 +302,7 @@ In the sample root directory, perform the following steps to compile and run the
 
 ### Performance Analysis
 
-Use msOpProf to obtain performance data. The comparison script first runs the sample and checks `Verification PASSED`. After confirming that the result is correct, the script collects target kernel performance data by the `msprof op` command.
+Use msOpProf to obtain performance data. The comparison script first runs the sample and checks `Verification PASSED`. After confirming that the result is correct, the script collects target kernel performance data by the `msopprof` command.
 
 The Case 0 test method is as follows:
 
@@ -310,7 +310,7 @@ The Case 0 test method is as follows:
 cmake -DSCENARIO_NUM=0 -DPROFILE_REPEAT_TIMES=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
 make -j
 ./hash_table_mte_queue 128
-msprof op ./hash_table_mte_queue 128
+msopprof ./hash_table_mte_queue 128
 ```
 
 The Case 1 test method is as follows:
@@ -319,7 +319,7 @@ The Case 1 test method is as follows:
 cmake -DSCENARIO_NUM=1 -DPROFILE_REPEAT_TIMES=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
 make -j
 ./hash_table_mte_queue 128
-msprof op ./hash_table_mte_queue 128
+msopprof ./hash_table_mte_queue 128
 ```
 
 A directory with the `OPPROF_` prefix is generated in the current directory to store performance analysis data of the current kernel.

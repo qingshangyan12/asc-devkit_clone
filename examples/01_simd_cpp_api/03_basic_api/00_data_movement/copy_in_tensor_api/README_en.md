@@ -1,5 +1,6 @@
 # Copy API and Matmul with Bias Example Based on Tensor API
 
+
 ## Overview
 
 This example implements dynamic shape matrix multiplication with Bias based on the Tensor API programming approach, demonstrating the usage of Copy (GM to L1, L1 to L0) transpose and non-transpose scenarios and Mmad (matrix multiply-add) Tensor APIs. It supports selecting the transpose mode and data type through the build-time parameter SCENARIO_NUM. Shape parameters are dynamically passed at runtime through the MatmulTiling structure.
@@ -154,7 +155,7 @@ This example implements dynamic shape matrix multiplication with Bias based on t
 Run the following steps in the root directory of this example to build and run it.
 
 - Configure environment variables
-  Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit on the current environment. **Currently only [CANN master](../../../../../docs/quick_start.md#下载-cann-master) is supported.**
+  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit on the current environment. **Currently only [CANN master](../../../../../docs/zh/quick_start.md#下载-cann-master) is supported.**
 
   ```bash
   source ${install_path}/cann/set_env.sh

@@ -45,7 +45,7 @@ Hash Table是一种高效的数据结构，它通过一个哈希函数将“键�
 
 `Bucket`是哈希表中实际存储键值对的目标内存结构，其中`key`存储键，`value`存储对应的值，`state`用于同步key写入状态，`flag`用于控制桶写权限。
 
-```C++
+```cpp
 struct Bucket {
     int64_t key;            // 键
     uint32_t state;         // key值写入状态标记
@@ -56,7 +56,7 @@ struct Bucket {
 
 `KeyValueData`用于封装待插入键值对信息，包括输入key、输入value、value维度和键值对数量。
 
-```C++
+```cpp
 struct KeyValueData {
     int64_t* keys;       // 输入key
     float* values;       // 输入value
@@ -70,7 +70,7 @@ struct KeyValueData {
 
 `HashTableContext`保存哈希表自身参数，包括哈希表首地址、容量和桶大小，用于计算桶地址、查找并占用目标桶；写入value时，`insert`函数通过`KeyValueData`入参读取对应的输入value。
 
-```C++
+```cpp
 struct HashTableContext {
     uint8_t* table_addr;     // 哈希表首地址
     uint32_t capacity;       // 哈希表容量
@@ -89,11 +89,11 @@ SIMT能够通过大量线程的并发执行实现高效处理大批数据，但�
 
 ### 多线程写冲突问题
 
-在多线程操作同一块内存时，资源冲突问题在所难免。当两个线程插入的key产生哈希冲突时，多个线程会尝试向桶数组的同一位置写入数据，因此需要确保仅有一个线程能够获得桶的写入权限。程序实现时，在Bucket结构体中添加一个标记位“flag”，用于标记当前桶的写入权限，线程通过原子指令[`asc_atomic_cas()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/原子操作/asc_atomic_cas.md)修改flag来获取桶的写入权限。
+在多线程操作同一块内存时，资源冲突问题在所难免。当两个线程插入的key产生哈希冲突时，多个线程会尝试向桶数组的同一位置写入数据，因此需要确保仅有一个线程能够获得桶的写入权限。程序实现时，在Bucket结构体中添加一个标记位“flag”，用于标记当前桶的写入权限，线程通过原子指令[`asc_atomic_cas()`](../../../../../../docs/zh/api/SIMT-API/原子操作/asc_atomic_cas.md)修改flag来获取桶的写入权限。
 
 ### 核间数据同步问题
 
-当发生哈希冲突时，线程需要判断当前桶中存储的key是否与待插入的key相同，这要求当前线程能够读取其他线程写入的数据，并确保数据的完整性。程序实现时，在Bucket结构体中添加一个标记位“state”，用于标识key值的写入状态。写线程中在写入key后将state标记位置1，并在二者之间调用[`asc_threadfence()`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/同步与内存栅栏/内存栅栏接口/asc_threadfence.md)接口，确保当state被设置为1时，key的写入操作已经完成。读线程中，通过while循环轮询state值，直到state被设置为1，然后再读取key值。
+当发生哈希冲突时，线程需要判断当前桶中存储的key是否与待插入的key相同，这要求当前线程能够读取其他线程写入的数据，并确保数据的完整性。程序实现时，在Bucket结构体中添加一个标记位“state”，用于标识key值的写入状态。写线程中在写入key后将state标记位置1，并在二者之间调用[`asc_threadfence()`](../../../../../../docs/zh/api/SIMT-API/同步与内存栅栏/内存栅栏接口/asc_threadfence.md)接口，确保当state被设置为1时，key的写入操作已经完成。读线程中，通过while循环轮询state值，直到state被设置为1，然后再读取key值。
 
 ## 算子描述
 
@@ -124,7 +124,7 @@ SIMT能够通过大量线程的并发执行实现高效处理大批数据，但�
 
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

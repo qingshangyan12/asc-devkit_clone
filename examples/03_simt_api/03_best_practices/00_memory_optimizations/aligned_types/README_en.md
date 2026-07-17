@@ -166,7 +166,7 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
 ## Build and Run
 
 - Configure Environment Variables  
-  Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -199,10 +199,10 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
 
 ## Performance Data Collection
 
-  Use the `msprof` tool to collect performance data on a single component:
+  Use the `msOpProf` tool to collect performance data on a single component:
 
   ```bash
-  msprof op ./demo   # Analyze example performance
+  msopprof ./demo   # Analyze example performance
   ```
 
   After the command completes, a folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The performance data folder structure example is as follows:
