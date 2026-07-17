@@ -468,3 +468,31 @@ PERF_LOOPS=1000 the copy is only 0.07-0.70% of measured time (from silicon t1/t2
 subtracts the copy baseline anyway => BUFFER_NUM=2 would not move aiv_vec (already ~100%).
 A REAL operator (1 compute pass/tile) WOULD need ping-pong — cf. `examples/.../10_math/erf/erf.asc`
 which uses `BUFFER_NUM = 2`. If we ship an ndtri example, it should ping-pong like erf.
+
+### F27 — PIPELINE: depth-1 serializes MTE2->V->MTE3; our 100% aiv_vec HIDES the stall
+Wrapper `TQue` depth is 1 => strictly serial per tile; **V idles during MTE2 and MTE3.**
+Our aiv_vec ~100% does NOT prove a stall-free pipeline — `PERF_LOOPS=1000` amortizes the copy to
+0.07-0.70% of measured time (silicon t1/t2), AND the metric subtracts the copy baseline. Both erase
+exactly the stall.
+**Instruction count (counted from source, not guessed):** ~**71 vector instrs per 64-elem repeat**
+= 31 direct Reg:: calls + 19 FmaStep x2 (Duplicate+MulDstAdd) + LoadAlign + StoreAlign.
+Breakdown: Adds4 Mul4 Duplicate7 Div2 Muls2 Sub1 Min1 Ln1 Sqrt1 Neg1 Select6 Abs1 + 38 (FmaStep).
+Per 8192-elem tile: ~9088 vector instrs, moving 32KB in + 32KB out.
+**Back-of-envelope (assumes ~1 instr/cyc, ~64B/cyc MTE — NOT measured):**
+```
+compute ~9088 cyc | copy ~1024 cyc -> copy/compute ~11%
+single-buffered (serial) : aiv_vec ~90%   <- RIGHT ON THE BAR
+ping-pong (BUFFER_NUM=2) : aiv_vec ~100%  (copy hidden under compute)
+```
+=> A REAL one-pass ndtri operator would sit ~90% single-buffered — uncomfortably tight. Ping-pong
+   buys the headroom. ndtri is compute-heavy enough (~71 instr / 256B) to stay vector-bound, but an
+   11% serialization penalty does not vanish.
+**Does NOT affect the deliverable's graded number:** the API has no data movement (LocalTensor in, UB
+already loaded). Spec grades 作为vector类高阶API实现Vector Bound = the API's COMPUTE, and the
+1000x-loop-minus-baseline metric is deliberately built to isolate that. Overlap is the caller's job.
+**BUT:** if we ship `examples/.../10_math/ndtri/`, it MUST ping-pong like `erf.asc` (BUFFER_NUM=2),
+else we'd demo a pattern that stalls ~10%.
+**Also noted:** 26 of the ~71 instrs are `Duplicate` of loop-INVARIANT constants. If the compiler
+hoists them out of the repeat loop the inner loop drops to ~45 instrs (-36%); if register pressure
+blocks hoisting they stay. FMA path (Duplicate+MulDstAdd) costs the SAME 2 instrs as Mul+Adds but
+gives 1 rounding instead of 2 => strictly better; keep it. Worth checking the generated asm someday.
