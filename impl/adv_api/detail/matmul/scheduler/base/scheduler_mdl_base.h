@@ -241,9 +241,17 @@ protected:
     {
         if constexpr (DoMatmulSpecialMDL(MM_CFG) || MatmulFeatureTrait<MM_CFG>().IsSupportMNL0DB()) {
             LocalTensor<TransAT> a2 = MATMUL_MODULE(TBufPoolL0)->template GetBuffer<TPosition::A2, TransAT>();
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Lock<PIPE_MTE1>(
+                GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::A2>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
             MATMUL_MODULE(LoadToA2)->Load(
                 a2, a1, aL0Params.axisL1Len, aL0Params.kAxisL1Len, aL0Params.axisL0Len,
                 MATMUL_MODULE(KLoop)->GetBaseShape(), aL0Params.axisL1Offset, aL0Params.kAxisL1Offset, isATranspose);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Unlock<PIPE_MTE1>(
+                GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::A2>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
             return a2;
         } else {
             auto posA = MATMUL_MODULE(MLoop)->GetInnerIdx() * MATMUL_MODULE(KLoop)->GetTotalIter() +
@@ -252,9 +260,17 @@ protected:
             // Split
             if (!(MATMUL_MODULE(TBufPoolL0)->template Hit<TPosition::A2>(posA))) {
                 LocalTensor<TransAT> a2 = MATMUL_MODULE(TBufPoolL0)->template GetBuffer<TPosition::A2, TransAT>();
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+                Mutex::Lock<PIPE_MTE1>(
+                    GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::A2>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
                 MATMUL_MODULE(LoadToA2)->Load(
                     a2, a1, aL0Params.axisL1Len, aL0Params.kAxisL1Len, aL0Params.axisL0Len, kL0Len,
                     aL0Params.axisL1Offset, aL0Params.kAxisL1Offset, isATranspose);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+                Mutex::Unlock<PIPE_MTE1>(
+                    GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::A2>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
                 return a2;
             } else {
                 return MATMUL_MODULE(TBufPoolL0)->template GetBuffer<TPosition::A2, TransAT>();
@@ -268,9 +284,17 @@ protected:
         if constexpr (DoMatmulSpecialMDL(MM_CFG) || MatmulFeatureTrait<MM_CFG>().IsSupportMNL0DB()) {
             LocalTensor<TransBT> b2 = MATMUL_MODULE(TBufPoolL0)->template GetBuffer<TPosition::B2, TransBT>();
             // Split b2
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Lock<PIPE_MTE1>(
+                GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::B2>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
             MATMUL_MODULE(LoadToB2)->Load(
                 b2, b1, bL0Params.axisL1Len, bL0Params.kAxisL1Len, bL0Params.axisL0Len,
                 MATMUL_MODULE(KLoop)->GetBaseShape(), bL0Params.axisL1Offset, bL0Params.kAxisL1Offset, isBTranspose);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+            Mutex::Unlock<PIPE_MTE1>(
+                GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::B2>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
             return b2;
         } else {
             auto posB = MATMUL_MODULE(NLoop)->GetInnerIdx() * MATMUL_MODULE(KLoop)->GetTotalIter() +
@@ -279,10 +303,18 @@ protected:
             if constexpr (HasSparseIndex<B_TYPE>()) {
                 if (!(MATMUL_MODULE(TBufPoolL0)->template Hit<TPosition::B2>(posB))) {
                     LocalTensor<TransBT> b2 = MATMUL_MODULE(TBufPoolL0)->template GetBuffer<TPosition::B2, TransBT>();
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+                    Mutex::Lock<PIPE_MTE1>(GetMutexID<MatmulMutexResource::L0>(
+                        GetL0PingPongFlag<TPosition::B2>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
                     MATMUL_MODULE(LoadToB2)->Load(
                         b2, b1, bL0Params.axisL1Len, bL0Params.kAxisL1Len, bL0Params.axisL0Len,
                         MATMUL_MODULE(KLoop)->GetBaseShape(), bL0Params.axisL1Offset, bL0Params.kAxisL1Offset,
                         isBTranspose, MATMUL_MODULE(CopyCubeInB)->GetSparseIndex());
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+                    Mutex::Unlock<PIPE_MTE1>(GetMutexID<MatmulMutexResource::L0>(
+                        GetL0PingPongFlag<TPosition::B2>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
                     return b2;
                 } else {
                     return MATMUL_MODULE(TBufPoolL0)->template GetBuffer<TPosition::B2, TransBT>();
@@ -290,10 +322,18 @@ protected:
             } else {
                 if (!(MATMUL_MODULE(TBufPoolL0)->template Hit<TPosition::B2>(posB))) {
                     LocalTensor<TransBT> b2 = MATMUL_MODULE(TBufPoolL0)->template GetBuffer<TPosition::B2, TransBT>();
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+                    Mutex::Lock<PIPE_MTE1>(GetMutexID<MatmulMutexResource::L0>(
+                        GetL0PingPongFlag<TPosition::B2>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
                     MATMUL_MODULE(LoadToB2)->Load(
                         b2, b1, bL0Params.axisL1Len, bL0Params.kAxisL1Len, bL0Params.axisL0Len,
                         MATMUL_MODULE(KLoop)->GetBaseShape(), bL0Params.axisL1Offset, bL0Params.kAxisL1Offset,
                         isBTranspose);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+                    Mutex::Unlock<PIPE_MTE1>(GetMutexID<MatmulMutexResource::L0>(
+                        GetL0PingPongFlag<TPosition::B2>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
                     return b2;
                 } else {
                     return MATMUL_MODULE(TBufPoolL0)->template GetBuffer<TPosition::B2, TransBT>();
@@ -315,6 +355,10 @@ protected:
         bool cmatrixSource;
         bool cmatrixInitVal;
         UpdateMmadComputeParams(kInnerStartIdx, sL0CInit, cmatrixSource, cmatrixInitVal);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Lock<PIPE_M>(
+            GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::B2>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
         if constexpr (HasSparseIndex<B_TYPE>()) {
             MATMUL_MODULE(MmadCompute)
                 ->template Compute<true>(
@@ -326,6 +370,10 @@ protected:
                     cMatrix, a2, b2, madM, madK, madN, isATranspose, isBTranspose, unitFlag, cmatrixSource,
                     cmatrixInitVal);
         }
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+        Mutex::Unlock<PIPE_M>(
+            GetMutexID<MatmulMutexResource::L0>(GetL0PingPongFlag<TPosition::B2>(*MATMUL_MODULE(TBufPoolL0))));
+#endif
     }
 
     __aicore__ inline void ResetCopyInBuffer()

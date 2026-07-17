@@ -49,7 +49,9 @@ public:
 
     __aicore__ inline TBufPoolL0& Allocate()
     {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
         WaitFlag<HardEvent::M_MTE1>(gA2B2DBFlag_ & 0x1);
+#endif
         return *this;
     }
 
@@ -80,13 +82,31 @@ public:
         return tempTensor;
     }
 
-    __aicore__ inline void EnQue() { SetFlag<HardEvent::MTE1_M>(gA2B2DBFlag_ & 0x1); }
+    template <TPosition Pos>
+    __aicore__ inline uint16_t GetPingPongFlag() const
+    {
+        return gA2B2DBFlag_;
+    }
 
-    __aicore__ inline void DeQue() { WaitFlag<HardEvent::MTE1_M>(gA2B2DBFlag_ & 0x1); }
+    __aicore__ inline void EnQue()
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
+        SetFlag<HardEvent::MTE1_M>(gA2B2DBFlag_ & 0x1);
+#endif
+    }
+
+    __aicore__ inline void DeQue()
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
+        WaitFlag<HardEvent::MTE1_M>(gA2B2DBFlag_ & 0x1);
+#endif
+    }
 
     __aicore__ inline void Free()
     {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
         SetFlag<HardEvent::M_MTE1>(gA2B2DBFlag_ & 0x1);
+#endif
         ++gA2B2DBFlag_;
     }
 };

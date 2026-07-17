@@ -64,7 +64,9 @@ public:
     __aicore__ inline TBufPoolL0Base& Allocate()
     {
         if constexpr (!IS_INTRA_BLOCK) {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
             WaitFlag<HardEvent::M_MTE1>(l0PingPongFlag_);
+#endif
         }
         return *this;
     }
@@ -109,13 +111,31 @@ public:
 
     __aicore__ inline void ResetCache() {}
 
-    __aicore__ inline void EnQue() { SetFlag<HardEvent::MTE1_M>(l0PingPongFlag_); }
+    template <TPosition Pos>
+    __aicore__ inline uint16_t GetPingPongFlag() const
+    {
+        return l0PingPongFlag_;
+    }
 
-    __aicore__ inline void DeQue() { WaitFlag<HardEvent::MTE1_M>(l0PingPongFlag_); }
+    __aicore__ inline void EnQue()
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
+        SetFlag<HardEvent::MTE1_M>(l0PingPongFlag_);
+#endif
+    }
+
+    __aicore__ inline void DeQue()
+    {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
+        WaitFlag<HardEvent::MTE1_M>(l0PingPongFlag_);
+#endif
+    }
 
     __aicore__ inline void Free()
     {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ != 3510
         SetFlag<HardEvent::M_MTE1>(l0PingPongFlag_);
+#endif
         l0PingPongFlag_ = useL0PingPong_ - l0PingPongFlag_;
     }
 
