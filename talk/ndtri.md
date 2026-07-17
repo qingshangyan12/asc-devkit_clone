@@ -348,3 +348,29 @@ the UNMODIFIED harness should build -> drops our DataCopyPad/DataCopyExtParams h
 restores `Reg::FusedMulDstAdd` (our repo's name, absent in 9.0.1) so sim code matches repo code.
 **Caveat:** beta.3 != whatever GA 9.1 the user's silicon runs. Treat as closer-but-not-identical;
 silicon remains the source of truth for both precision and perf.
+
+### F19 — **CORRECTION to F17: the "9.0.1 hacks" are NOT 9.0.1-specific** (verified on 9.1.0-beta.3)
+Pulled `ascendai/cann:9.1.0-beta.3-950-openeuler24.03-py3.12-devel` (22GB, container `cann91`).
+Empirical build test on 9.1-beta.3:
+```
+harness-native form (4-field DataCopyExtParams, 3-arg DataCopyPad) : FAILS to build
+our form (5-field DataCopyExtParams, 4-arg DataCopyPad)            : BUILDS
+```
+=> 9.1-beta.3 has the **SAME** DataCopy API as 9.0.1: `DataCopyExtParams` has ONLY a 5-field ctor
+   (count,len,srcStride,dstStride,rsv); `DataCopyPad(LocalTensor dst, GlobalTensor src, ...)` is 4-arg only.
+=> **The official self_test_case harness compiles on NEITHER 9.0.1 nor 9.1-beta.3.** It must target GA 9.1
+   or an internal build. My earlier "ndtri_silicon.asc is the 9.1-native one" assumption was WRONG —
+   that variant is now deleted; ONE file (`talk/sim_check/ndtri.asc`) builds on both.
+=> `Reg::FusedMulDstAdd` does NOT exist in 9.0.1 OR 9.1-beta.3 — only `Reg::MulDstAdd`. Our repo's
+   erf_3510_impl.h uses FusedMulDstAdd => **our repo master is NEWER than CANN 9.1.0-beta.3.**
+**Open for silicon:** if the user's GA 9.1 device rejects the 5-field form, flip to the harness's
+4-field/3-arg form — compute is unaffected, only the 3 DataCopyPad call sites change.
+
+### F20 — OUR standalone test (`talk/sim_check/`) — self-contained, no competition repo needed
+```
+talk/sim_check/{CMakeLists.txt, data_utils.h, ndtri.asc, gen_data.py, run.sh}
+  ./run.sh sim|npu [--perf|--perf-only]
+```
+Ours vs official run.sh (deliberate): sweeps ALL shapes per invocation; does NOT hard-block perf on
+non-npu; prints a paste-ready summary; surfaces the RV_VLN inf/nan flag (F16) when raised.
+Env overrides: `SHAPES="1 32 1023 2048"`, `PERF_SIZES="1024 ... 65536"`.
