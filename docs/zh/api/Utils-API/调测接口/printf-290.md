@@ -91,6 +91,10 @@ __simd_callee__ inline void printf( const __ubuf__ char* fmt, Args&&... args)
     __ubuf__ const char* fmt = "simd vf: int=%d, uint=%u, float=%f, string=%s\n";
     ```
 
+-   在`simd_vf`场景下，每个AIV核在单次`asc_vf_call`执行期间使用2KB预留空间记录调测数据。同一次`asc_vf_call`中的所有`simd_vf`的`printf`和`asc_dump`调用共享该预留空间；`asc_vf_call`结束时，调测数据统一搬运到当前核的Global Memory打印缓冲区，下一次`asc_vf_call`开始时重新清空。不同AIV核分别使用各自的预留空间。
+-   在`simd_vf`场景下，同一次`asc_vf_call`中的所有`printf`和`asc_dump`调用会累计占用上述预留空间。除格式字符串和参数外，管理信息和对齐数据也会占用预留空间，因此实际可打印的内容小于2KB。存在多次调用时，请控制所有调用的数据总量，避免超出预留空间容量。
+-   `simd_vf`调测接口不会检查上述预留空间是否越界。超过限制可能越界写入预留空间，导致打印结果异常，并可能影响算子执行。
+
 ## 需要包含的头文件
 
 使用该接口需要包含"utils/debug/asc\_printf.h"头文件。
