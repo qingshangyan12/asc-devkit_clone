@@ -151,8 +151,8 @@
 | signed int | int2 | int3 | int4 |
 | 无符号的长整型(64bit) | ulonglong2 | ulonglong3 | ulonglong4 |
 | 有符号的长整型(64bit) | longlong2 | longlong3 | longlong4 |
-| 无符号的长整型(32bit) | ulong2 | ulong3 | ulong4 |
-| 有符号的长整型(32bit) | long2 | long3 | long4 |
+| 无符号的长整型(64bit) | ulong2 | ulong3 | ulong4 |
+| 有符号的长整型(64bit) | long2 | long3 | long4 |
 | 浮点型，1符号位，2指数位，1尾数位 | float4_e2m1x2_t | - | - |
 | 浮点型，1符号位，1指数位，2尾数位 | float4_e1m2x2_t | - | - |
 | 浮点型，1符号位，4指数位，3尾数位 | float8_e4m3x2_t | - | - |
