@@ -333,3 +333,18 @@ mul-by-mask. Clamp Ln input as belt-and-braces.
 - Example under `examples/.../10_math/ndtri/` — required, or is the self_test_case sufficient? (交付件 lists
   功能测试代码; erf has both.) Presmoke case registration needed (`scripts/presmoke/cases/.../10_math/erf`)?
 - fp32 only per task doc — but erf/digamma support half via Cast. Add half opportunistically or refuse?
+
+### F18 — CANN **9.1.0 IS public — as BETA** (checked 2026-07-17, Docker Hub `ascendai/cann`)
+462 tags. No GA 9.1.0 exists; every 9.1 tag is `-beta.N`. **950 + devel images DO exist publicly:**
+```
+ascendai/cann:9.1.0-beta.3-950-openeuler24.03-py3.12-devel   updated 2026-07-03  ~11.8GB  amd64,arm64
+ascendai/cann:9.1.0-beta.3-950-ubuntu22.04-py3.12-devel      updated 2026-07-03  ~11.7GB  amd64,arm64
+ascendai/cann:9.1.0-beta.1-950-openeuler24.03-py3.12-devel   updated 2026-05-28  ~10.0GB  amd64,arm64
+```
+Host is arm64 / container aarch64 -> **arm64 variant matches, pullable.**
+Current container `catlass950` = `9.0.1-950-openeuler24.03-py3.10` (GA).
+**Why upgrading matters:** harness requires >=9.1.0 and does NOT compile on 9.0.1 (F17). On 9.1-beta.3
+the UNMODIFIED harness should build -> drops our DataCopyPad/DataCopyExtParams hacks, and likely
+restores `Reg::FusedMulDstAdd` (our repo's name, absent in 9.0.1) so sim code matches repo code.
+**Caveat:** beta.3 != whatever GA 9.1 the user's silicon runs. Treat as closer-but-not-identical;
+silicon remains the source of truth for both precision and perf.
