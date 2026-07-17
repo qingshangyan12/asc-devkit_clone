@@ -496,3 +496,22 @@ else we'd demo a pattern that stalls ~10%.
 hoists them out of the repeat loop the inner loop drops to ~45 instrs (-36%); if register pressure
 blocks hoisting they stay. FMA path (Duplicate+MulDstAdd) costs the SAME 2 instrs as Mul+Adds but
 gives 1 rounding instead of 2 => strictly better; keep it. Worth checking the generated asm someday.
+
+### F28 — THREE measurement flaws inherited from the official harness (all fixed)
+1. **48s per perf point = REBUILD, not kernel.** The harness bakes `SIZE`/`TEST_MODE` in as `-D`
+   compile-time constants (`constexpr uint32_t TOTAL_LENGTH = SIZE;`, `#if TEST_MODE == 1`), so every
+   size AND every mode forces a full cmake+bisheng rebuild (perf = 2 rebuilds/size). Kernel itself is
+   ~0.6us. **FIX: size/mode/perfLoops are now RUNTIME argv** -> `./demo <size> <mode> <loops>`, ONE build.
+2. **"wall time" was process wall** (~7s at N=1) = aclInit + sim model startup, independent of N.
+   FIX: `demo` now times ONLY launch->sync via `gettimeofday` (NOT <chrono>: device pass has no std::)
+   and prints `kernel time: X us`. In **sim** that is still ~21s of SOFTWARE MODEL, so run.sh labels it
+   `simwall=...s (SIM MODEL, not device time)` — never quote sim time as perf. Real device: microseconds.
+3. **aiv_vec ~100% is DEGENERATE, not impressive.** `aiv_vec = vec_time/(t3-t2)`: mode2 and mode3 do
+   IDENTICAL copies so they cancel in the subtraction, and `PERF_LOOPS=1000` makes copy 1/1000 of a
+   tile anyway => the ratio is FORCED to ~100% **at every size**; it cannot distinguish 1k from 128k.
+   It measures "is NdtriCompute pure vector work?" (yes) and says NOTHING about the pipeline (F27).
+   **FIX: `PERF_LOOPS` is now a runtime knob.** `PERF_LOOPS=1 ./run.sh npu --perf-only` = real
+   single-pass operator: copy is no longer amortised, the depth-1 MTE2->V->MTE3 stall shows up, and the
+   number actually varies with size. Use 1000 to satisfy the spec gate; use 1 to learn the truth.
+Reference (user's silicon): N=1024, t2=583.08us over 1000 passes -> **~0.58us/pass, ~0.57ns/element**.
+Simulator is ~40,000x slower than the chip.
