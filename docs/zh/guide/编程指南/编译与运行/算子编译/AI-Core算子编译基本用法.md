@@ -100,7 +100,7 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 | 选项 | 是否必需 | 说明 |
 |------|----------|------|
 | -help | 否 | 查看帮助。 |
-| --npu-arch | 是 | 编译时指定的AI处理器架构，取值为dav-&lt;arch-version&gt;，其中&lt;arch-version&gt;为NPU架构版本号，各产品型号对应的架构版本号请通过[对应关系表](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。 |
+| --npu-arch | 是 | 编译时指定的AI处理器架构，取值为dav-&lt;arch-version&gt;，其中&lt;arch-version&gt;为NPU架构版本号，各产品型号对应的架构版本号请通过[对应关系表](../../语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)进行查询。 |
 | --npu-soc | 否 | 编译时指定的AI处理器型号，npu-soc和npu-arch同时配置时，优先采用npu-arch的配置。AI处理器型号的获取方式请参考[下方说明](#note-reference)。 |
 | -x | 否 | 指定编译语言,如：-x asc,表示指定为Ascend C编程语言。 |
 | -o &lt;file&gt; | 否 | 指定输出文件的名称和位置。 |
@@ -115,7 +115,7 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 | --run-mode=sim | 否 | sim模式：链接时用户添加仿真模式对应的实现库，实现代码在仿真模式下运行，可以查看仿真相关日志，方便用户性能调试。 |
 | --enable-simt | 否 | SIMT编程场景，指定SIMT方式编译。 |
 | --cce-disable-asc-reserved-ubuf | 否 | 禁用Ascend C接口使用预留UB空间。开启后，依赖预留UB空间的Ascend C接口在对应芯片架构下不可用，使用时编译报错。使用预留UB空间的API列表参考：[使用预留UB空间的API](../../编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md#使用预留ub空间的api范围)。由于同一API使用预留UB空间的情况在不同NPU架构下有差异，开启该编译选项后，需要手动调整API调用方式或替换为不依赖预留UB空间的实现，才能完成兼容性迁移。 |
-| --cce-disable-vf-stack-reserved-ubuf | 否 | 禁用SIMD VF栈预留的UB空间。开启后，编译器不再预留该部分UB空间，该空间可作为普通UB空间使用。针对 [NPU架构版本2201](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)，此编译选项无实际效果；针对 [NPU架构版本3510](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)，此编译选项生效，当用户使用此编译选项后，编译器将无法使用预留的UB空间进行寄存器溢出的缓存，需要用户保证寄存器不溢出。 |
+| --cce-disable-vf-stack-reserved-ubuf | 否 | 禁用SIMD VF栈预留的UB空间。开启后，编译器不再预留该部分UB空间，该空间可作为普通UB空间使用。针对 [NPU架构版本2201](../../语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)，此编译选项无实际效果；针对 [NPU架构版本3510](../../语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)，此编译选项生效，当用户使用此编译选项后，编译器将无法使用预留的UB空间进行寄存器溢出的缓存，需要用户保证寄存器不溢出。 |
 
 更多的编译命令和用法可以参见[《毕昇编译器用户指南》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)。
 

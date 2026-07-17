@@ -1149,7 +1149,7 @@ __global__ __mix__ void mix_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 > 同一接口若提供多个重载原型，可能只有部分原型会使用UB预留空间。
 
 <!-- npu="A3,910b" id5 -->
-**表5**  针对 [NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)，使用预留UB空间的API范围
+**表5**  针对 [NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)，使用预留UB空间的API范围
 
 | API类别 | API名 |
 | --- | --- |
@@ -1158,7 +1158,7 @@ __global__ __mix__ void mix_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 <!-- end id5 -->
 
 <!-- npu="950" id6 -->
-**表6**  针对 [NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)，使用预留UB空间的API范围
+**表6**  针对 [NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)，使用预留UB空间的API范围
 
 | API类别 | API名 |
 | --- | --- |
