@@ -114,7 +114,7 @@
 源操作数和目的操作数支持的数据类型保持一致。
 
 <!-- npu="950" id1 -->
-Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。
+Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。其中b8数据类型不支持：fp4×2_e2m1_t、fp4×2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t。
 <!-- end id1 -->
 
 ## 返回值说明<a name="section7607175220218"></a>
