@@ -35,7 +35,7 @@
 
     其他CMakeLists.txt项目配置[通过CMake编译](../../编译与运行/算子编译/AI-Core算子编译基本用法.md#ZH-CN_TOPIC_0000002428982142)进行编写。
 
->[!NOTE] 说明  
+>[!NOTE] 说明 
 >为了实现CPU域与NPU域代码归一，框架在CPU域中仅对部分acl接口进行适配，开发者在使用CPU域调测功能时，仅支持使用如下acl接口，并且不支持用户自行链接**ascendcl库**：
 >- 有实际功能接口，支持CPU域调用
 >    - aclDataTypeSize、aclFloat16ToFloat、aclFloatToFloat16。
@@ -56,10 +56,10 @@
 >
 > 这些关键字与Device侧执行强相关，在CPU孪生调试模式下无需实际生效，因此系统框架将这些关键字定义为空。
 > 由于这种置空处理，**仅通过BuiltIn关键字区分的函数签名将被视为相同**，会导致重定义编译错误。
->  
+> 
 > 典型问题场景包括：
 > 1. **Device侧函数与Host侧函数同名**
->  
+> 
 > <blockquote>
 > 如下例中，`add` 函数仅通过 `__aicore__` 区分运行域，在CPU孪生调试模式下两个声明将冲突：
 > 	<pre><code class="language-asc">__aicore__ inline void add(int x, int y);  // Device侧
@@ -67,13 +67,13 @@
 > </blockquote>
 >
 > 2. **参数类型仅有地址空间限定符不同**
->  
+> 
 > <blockquote>
 > 如下例中，两个Device侧函数仅在指针的地址空间限定符上不同：
 > 	<pre><code class="language-asc">__aicore__ inline void process(__gm__ void* data, int size);
 > __aicore__ inline void process(__ubuf__ void* data, int size); </code></pre>
 > </blockquote>
->  
+> 
 > **在孪生调试场景下需特别注意**：请勿定义仅依赖BuiltIn关键字来区分的函数。
 
 ## gdb调试<a name="section13838280458"></a>
@@ -127,7 +127,7 @@
 
     ```
     (gdb) info inferiors
-      Num  Description  
+      Num  Description 
     * 1    process 19613
       2    process 19626
     ```

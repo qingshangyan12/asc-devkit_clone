@@ -92,7 +92,7 @@ uint32_t thread_num = 1024;
 asc_vf_call<function_name>(dim3(thread_num), arg1, arg2, ...);
 ```
 
-> [!NOTE]说明  
+> [!NOTE]说明 
 > 与SIMT编程场景中在核函数调用符内配置线程数不同，混合编程场景中SIMT线程配置通过asc_vf_call接口的第一个参数配置。
 
 SIMT VF函数有以下约束：
