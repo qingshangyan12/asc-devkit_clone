@@ -112,6 +112,10 @@ __simd_callee__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t 
 -   使用该接口时，在每个核上dump的数据总量不能超过1M，请开发者自行控制打印的内容数据量，超出则不会打印。
 -   在计算数据量时，若dump的总长度未对齐，需要考虑padding数据的影响。当进行非对齐dump时，如果实际dump的元素长度不满足32字节对齐，系统会自动在其末尾补充一定数量的padding数据，以满足对齐要求。
 
+-   在`simd_vf`场景下，每个AIV核在单次`asc_vf_call`执行期间使用一块默认大小为2KB的UB暂存区。同一次`asc_vf_call`中的所有`simd_vf` `asc_dump`和`printf`调用共享该暂存区；`asc_vf_call`结束时，暂存数据统一搬运到当前核的Global Memory打印缓冲区，下一次`asc_vf_call`开始时重新清空。不同AIV核分别使用各自的UB暂存区。
+-   在`simd_vf`场景下，同一次`asc_vf_call`中的所有`asc_dump`和`printf`调用会累计占用上述UB暂存区。除实际dump数据外，管理信息和对齐数据也会占用空间，因此实际可dump的数据量小于2KB。存在多次调用时，请控制所有调用的数据总量，避免超出暂存区容量。
+-   `simd_vf`调测接口不会检查上述UB暂存区是否越界。超过限制可能越界写入保留UB空间，导致打印结果异常，并可能影响算子执行。
+
 ## 调用示例
 
 ```
