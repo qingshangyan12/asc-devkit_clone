@@ -111,6 +111,7 @@ PIPE_MTE3
 - src的起始地址要求32字节对齐。
 - 如果需要执行多条asc_copy_ub2gm_align指令，且asc_copy_ub2gm_align指令的目的地址存在重叠，需要插入同步指令，保证多个asc_copy_ub2gm_align指令的串行化，防止出现异常数据。
 - left_padding_num、right_padding_num的字节数均不能超过32Bytes。
+- 该接口的各参数取值均应在对应参数规定的取值范围内，且搬运涉及的UB空间不得超过[可用UB容量](../../通用说明和约束.md#存储单元说明)。
 
 ## 调用示例
 
