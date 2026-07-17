@@ -148,8 +148,8 @@ public:
     static __aicore__ inline void Lock(MutexID id)
     {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-        ASCENDC_ASSERT((id <= MAX_MUTEXID), {
-            KERNEL_LOG(KERNEL_ERROR, "For Mutex::Lock current id is %u, max MutexID is %u", id, MAX_MUTEXID);
+        ASCENDC_ASSERT((id <= MAX_TBUFID), {
+            KERNEL_LOG(KERNEL_ERROR, "For Mutex::Lock current id is %u, max MutexID is %u", id, MAX_TBUFID);
         });
         GetBufInternal<pipe, 0>(id);
 #endif
@@ -159,8 +159,8 @@ public:
     static __aicore__ inline void Unlock(MutexID id)
     {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-        ASCENDC_ASSERT((id <= MAX_MUTEXID), {
-            KERNEL_LOG(KERNEL_ERROR, "For Mutex::Unlock current id is %u, max MutexID is %u", id, MAX_MUTEXID);
+        ASCENDC_ASSERT((id <= MAX_TBUFID), {
+            KERNEL_LOG(KERNEL_ERROR, "For Mutex::Unlock current id is %u, max MutexID is %u", id, MAX_TBUFID);
         });
         RlsBufInternal<pipe, 0>(id);
 #endif
