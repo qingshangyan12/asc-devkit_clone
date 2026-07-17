@@ -87,6 +87,7 @@ class CompileInfo:
             False  # used to judge super kernel compile or sub super kernel compile
         )
         self.max_tiling_size: int = 0
+        self.static_compile_tiling_size: int = 0
         self.tiling_and_dfx_utils_file: str = (
             ""  # used when tling struct is not register
         )

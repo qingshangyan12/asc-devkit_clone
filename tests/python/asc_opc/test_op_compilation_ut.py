@@ -1249,6 +1249,53 @@ class TestOpCompilationUt(unittest.TestCase):
             "End to execute ============ test_copy_compile_res_files_to_output_ut ============"
         )
 
+    def test_copy_compile_res_files_publishes_static_compile_directory(self):
+        with tempfile.TemporaryDirectory() as root:
+            kernel_meta = os.path.join(root, "kernel_meta")
+            output = os.path.join(root, "output")
+            resource_dir = os.path.join(
+                kernel_meta, "static_compile", "Add_x", "resources", "src"
+            )
+            os.makedirs(resource_dir)
+            os.makedirs(output)
+            json_path = os.path.join(kernel_meta, "Add_x.json")
+            with open(json_path, "w", encoding="utf-8") as file_obj:
+                json.dump(
+                    {"binFileName": "Add_x", "binFileSuffix": ".o"}, file_obj
+                )
+            with open(os.path.join(kernel_meta, "Add_x.o"), "wb") as file_obj:
+                file_obj.write(b"binary")
+            with open(
+                os.path.join(kernel_meta, "static_compile", "Add_x", "op_resource.json"),
+                "w",
+                encoding="utf-8",
+            ) as file_obj:
+                file_obj.write("{}")
+            with open(os.path.join(resource_dir, "kernel.cpp"), "w", encoding="utf-8") as file_obj:
+                file_obj.write("kernel")
+
+            post_compilation = PostCompilation(
+                {"output": output}, "false", "false", "0"
+            )
+            post_compilation.copy_compile_res_files_to_output(json_path)
+            self.assertTrue(
+                os.path.isfile(
+                    os.path.join(output, "static_compile", "Add_x", "op_resource.json")
+                )
+            )
+            self.assertTrue(
+                os.path.isfile(
+                    os.path.join(
+                        output,
+                        "static_compile",
+                        "Add_x",
+                        "resources",
+                        "src",
+                        "kernel.cpp",
+                    )
+                )
+            )
+
     def test_check_simplifiedkey_ut(self):
         logger.debug(
             "Start to execute ============ test_check_simplifiedkey_ut ============"

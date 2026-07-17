@@ -14,9 +14,263 @@ import copy
 import hashlib
 import json
 import os
+import re
 import shutil
 import tempfile
 from pathlib import PurePosixPath
+
+
+def parse_compile_option_macros(compile_options):
+    """Return stable, typed macro definitions from compiler -D options."""
+    macros = []
+    seen = {}
+    for option in compile_options:
+        if not isinstance(option, str) or not option.startswith("-D") or len(option) == 2:
+            continue
+        definition = option[2:]
+        name, separator, value = definition.partition("=")
+        if not name:
+            continue
+        value = value if separator else "1"
+        previous = seen.get(name)
+        if previous is not None:
+            if previous != value:
+                raise ValueError(
+                    f"compile macro {name} has conflicting values {previous} and {value}"
+                )
+            continue
+        if name.startswith("DTYPE_") or name.startswith("ORIG_DTYPE_"):
+            kind = "dtype"
+        elif name.startswith("FORMAT_") or name.startswith("ORIG_FORMAT_"):
+            kind = "format"
+        else:
+            kind = "compile"
+        seen[name] = value
+        macros.append({"name": name, "value": value, "kind": kind})
+    return macros
+
+
+def collect_kernel_symbols(metadata, linked_symbols=None):
+    """Collect actual exported symbols without making tiling keys registry keys."""
+    symbols = []
+    seen = set()
+
+    def add(value):
+        if isinstance(value, str) and value and value not in seen:
+            seen.add(value)
+            symbols.append(value)
+
+    for symbol in linked_symbols or []:
+        add(symbol)
+    if not isinstance(metadata, dict):
+        return symbols
+    add(metadata.get("kernelName"))
+    for item in metadata.get("kernelList", []):
+        if isinstance(item, dict):
+            add(item.get("kernelName"))
+
+    def collect_function_names(value):
+        if isinstance(value, dict):
+            add(value.get("func_name"))
+            for child in value.values():
+                collect_function_names(child)
+        elif isinstance(value, list):
+            for child in value:
+                collect_function_names(child)
+
+    collect_function_names(metadata.get("sub_operator_kernel_name", {}))
+    return symbols
+
+
+def collect_local_include_files(source_path):
+    """Collect the quoted-include closure that lives under the source directory."""
+    source_path = os.path.realpath(source_path)
+    source_root = os.path.dirname(source_path)
+    visited = {source_path}
+    result = []
+
+    def visit(path):
+        try:
+            with open(path, "r", encoding="utf-8") as file_obj:
+                content = file_obj.read()
+        except UnicodeDecodeError:
+            return
+        for include in re.findall(r'^\s*#\s*include\s*"([^"]+)"', content, re.MULTILINE):
+            candidate = os.path.realpath(os.path.join(os.path.dirname(path), include))
+            try:
+                inside_root = os.path.commonpath([source_root, candidate]) == source_root
+            except ValueError:
+                inside_root = False
+            if not inside_root or not os.path.isfile(candidate) or candidate in visited:
+                continue
+            visited.add(candidate)
+            logical_path = os.path.relpath(candidate, source_root).replace(os.sep, "/")
+            result.append((candidate, logical_path))
+            visit(candidate)
+
+    visit(source_path)
+    return result
+
+
+def resolve_symbol_tiling_sizes(symbols, tiling_keys, tiling_key_data_size, fallback_size):
+    """Resolve per-symbol ABI byte sizes while keeping lookup symbol-based."""
+    if not isinstance(fallback_size, int) or fallback_size <= 0:
+        raise ValueError("fallback tiling size must be a positive integer")
+    keys = sorted((str(key) for key in tiling_keys), key=len, reverse=True)
+    result = {}
+    for symbol in symbols:
+        size = fallback_size
+        for key in keys:
+            if symbol.endswith("_" + key) or ("_" + key + "_") in symbol:
+                candidate = tiling_key_data_size.get(key)
+                if isinstance(candidate, int) and candidate > 0:
+                    size = candidate
+                    break
+        result[symbol] = size
+    return result
+
+
+def static_tiling_template_text(dynamic_header):
+    """Add a constant-tiling override while preserving dynamic DFX/OOM code."""
+    if not isinstance(dynamic_header, str) or not dynamic_header:
+        raise ValueError("dynamic tiling header must be non-empty text")
+    class_names = [
+        name
+        for name in re.findall(r"InitTilingData<([A-Za-z_][A-Za-z0-9_:]*)>", dynamic_header)
+        if name not in {"T", "tiling_struct", "tiling_type"}
+    ]
+    if not class_names:
+        raise ValueError("cannot determine top-level tiling type from dynamic header")
+    class_name = class_names[0]
+    marker = "@@STATIC_VALUE_tiling_data@@"
+    slash = "\\"
+    override = "\n" + "\n".join(
+        [
+            "#ifdef CONST_TILING",
+            "#ifdef GET_TILING_DATA",
+            "#undef GET_TILING_DATA",
+            "#endif",
+            f"#define GET_TILING_DATA(tiling_data, tiling_arg) {slash}",
+            f"    REGISTER_TILINGDATA_SIZE({class_name}, __COUNTER__); {slash}",
+            f"    {marker} {slash}",
+            f"    static constexpr {class_name} tiling_data = {slash}",
+            f"        convert_from_bytes<{class_name}>(__ascendc_arr_##tiling_data);",
+            "#endif",
+            "",
+        ]
+    )
+    final_endif = dynamic_header.rfind("#endif")
+    if final_endif < 0:
+        raise ValueError("dynamic tiling header has no closing #endif")
+    return dynamic_header[:final_endif] + override + dynamic_header[final_endif:]
+
+
+def portable_wrapper_text(wrapper_text, original_source_path):
+    if not isinstance(wrapper_text, str):
+        raise ValueError("wrapper source must be text")
+    if not isinstance(original_source_path, str) or not original_source_path:
+        raise ValueError("original source path must be non-empty")
+    absolute_include = f'#include "{original_source_path}"'
+    if absolute_include not in wrapper_text:
+        return wrapper_text
+    return wrapper_text.replace(
+        absolute_include,
+        f'#include "{os.path.basename(original_source_path)}"',
+        1,
+    )
+
+
+def super_kernel_build_extension(
+    *,
+    normal_output,
+    sk_symbol,
+    sk_argv,
+    sk_inputs,
+    bind_argv,
+    bind_input,
+    output_prefix,
+):
+    """Build the optional SK graph appended after the normal base compile."""
+    sk_output = output_prefix + ".sk.o"
+    split_outputs = [output_prefix + f".sk_split{index}.o" for index in range(1, 4)]
+    archive_output = output_prefix + ".sk.a"
+    bind_output = output_prefix + ".sk_bind.o"
+    merged_output = output_prefix + ".sk_merged.o"
+    final_output = output_prefix + ".static_with_sk.o"
+    steps = [
+        {
+            "id": "compile_static_sk",
+            "kind": "compile",
+            "backend": "bisheng",
+            "argv": list(sk_argv),
+            "depends_on": ["compile_static_normal"],
+            "inputs": list(sk_inputs),
+            "outputs": [sk_output],
+        }
+    ]
+    for index, split_output in enumerate(split_outputs, 1):
+        steps.append(
+            {
+                "id": f"split_static_sk_{index}",
+                "kind": "objcopy",
+                "argv": [
+                    f"--redefine-sym={sk_symbol}={sk_symbol}_split{index}",
+                    "${artifact." + sk_output + "}",
+                    "${artifact." + split_output + "}",
+                ],
+                "depends_on": ["compile_static_sk"],
+                "inputs": [sk_output],
+                "outputs": [split_output],
+            }
+        )
+    steps.extend(
+        [
+            {
+                "id": "archive_static_sk",
+                "kind": "archive",
+                "argv": ["rcs", "${artifact." + archive_output + "}"]
+                + ["${artifact." + path + "}" for path in [sk_output] + split_outputs],
+                "depends_on": [f"split_static_sk_{index}" for index in range(1, 4)],
+                "inputs": [sk_output] + split_outputs,
+                "outputs": [archive_output],
+            },
+            {
+                "id": "compile_static_sk_bind",
+                "kind": "compile",
+                "backend": "bisheng",
+                "argv": list(bind_argv),
+                "depends_on": ["compile_static_normal"],
+                "inputs": [bind_input],
+                "outputs": [bind_output],
+            },
+            {
+                "id": "link_static_sk_objects",
+                "kind": "link",
+                "argv": [
+                    "-r", "-o", "${artifact." + merged_output + "}",
+                    "${artifact." + normal_output + "}",
+                    "${artifact." + bind_output + "}",
+                    "${artifact." + archive_output + "}",
+                ],
+                "depends_on": ["archive_static_sk", "compile_static_sk_bind"],
+                "inputs": [normal_output, bind_output, archive_output],
+                "outputs": [merged_output],
+            },
+            {
+                "id": "link_static_sk_final",
+                "kind": "link",
+                "argv": [
+                    "-m", "aicorelinux", "-Ttext=0",
+                    "${artifact." + merged_output + "}", "-static", "-o",
+                    "${artifact." + final_output + "}", "-q",
+                ],
+                "depends_on": ["link_static_sk_objects"],
+                "inputs": [merged_output],
+                "outputs": [final_output],
+            },
+        ]
+    )
+    return {"super_kernel": {"steps": steps}}
 
 
 def _sha256_file(path):
@@ -221,4 +475,3 @@ def generate_static_compile_resources(
     finally:
         if stage_dir and os.path.isdir(stage_dir):
             shutil.rmtree(stage_dir)
-

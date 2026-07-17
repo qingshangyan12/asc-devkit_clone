@@ -185,6 +185,78 @@ class TestCompileOp(unittest.TestCase):
             "ascendc_tiling_no_register", False
         )
 
+    def test_emit_static_compile_resources_uses_symbol_and_acl_tiling_abi(self):
+        with TemporaryDirectory() as root:
+            binary = os.path.join(root, "Add_x.o")
+            source = os.path.join(root, "add.cpp")
+            wrapper = os.path.join(root, "Add_x_kernel.cpp")
+            tiling_header = os.path.join(root, "Add_x_tiling_data.h")
+            metadata = os.path.join(root, "Add_x.json")
+            for path, content in (
+                (binary, b"dynamic"),
+                (source, b"source"),
+                (wrapper, b"wrapper"),
+            ):
+                with open(path, "wb") as file_obj:
+                    file_obj.write(content)
+            with open(tiling_header, "w", encoding="utf-8") as file_obj:
+                file_obj.write(
+                    "#ifndef T\n#define T\nclass AddTiling {};\n"
+                    "#define GET_TILING_DATA(v, p) InitTilingData<AddTiling>(p, &v)\n#endif\n"
+                )
+            with open(metadata, "w", encoding="utf-8") as file_obj:
+                json.dump({"kernelList": [{"kernelName": "actual_7"}]}, file_obj)
+
+            info = CompileInfo()
+            info.dst_file = binary
+            info.src_file = source
+            info.gen_kernel_func_file = wrapper
+            info.kernel_name = "Add_x"
+            info.origin_func_name = "Add"
+            info.tiling_key_list = ["7"]
+            info.tiling_key_kernel_type = {
+                "7": KernelMetaType.KERNEL_TYPE_AIV_ONLY
+            }
+            info.global_kernel_symbols = []
+            info.static_compile_tiling_size = 64
+            tiling = mock.Mock(
+                static_shape_flag=False,
+                tiling_data_file_path=tiling_header,
+                tiling_key_data_size={"7": 32},
+                tiling_data_size=0,
+            )
+            options = mock.Mock(
+                compile_options=["-DDTYPE_X=half", "-DFORMAT_X=FORMAT_ND"],
+                mllvm_options=[],
+            )
+            op_info = mock.Mock(op_type="Add")
+            with mock.patch.object(
+                compile_op_module,
+                "gen_compile_cmd_v220",
+                return_value=["bisheng", "-c", "source", "-o", "output"],
+            ), mock.patch.object(
+                compile_op_module, "generate_static_compile_resources", return_value="ok"
+            ) as generate, mock.patch.object(
+                compile_op_module.CommonUtility, "get_chip_version", return_value="c220"
+            ):
+                self.assertEqual(
+                    compile_op_module._emit_static_compile_resources(
+                        info, op_info, tiling, options, 4, root
+                    ),
+                    "ok",
+                )
+            kernel = generate.call_args.kwargs["kernels"][0]
+            self.assertEqual(kernel["kernel_name"], "actual_7")
+            self.assertEqual(kernel["static_targets"][0]["parameter_index"], 5)
+            self.assertEqual(kernel["static_targets"][0]["byte_size"], 32)
+            self.assertEqual(kernel["macros"][0]["kind"], "dtype")
+            self.assertNotIn("dfx", json.dumps(kernel).lower())
+            self.assertNotIn("oom", json.dumps(kernel).lower())
+            self.assertEqual(
+                kernel["build"]["base"]["steps"][0]["id"],
+                "compile_static_normal",
+            )
+
     def test_decode_mode(self):
         mode1 = decode_mode(10)
         mode2 = decode_mode(3)
