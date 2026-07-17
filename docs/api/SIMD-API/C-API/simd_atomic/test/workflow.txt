@@ -1,0 +1,528 @@
+================================================================================
+工作流：C-API 文档编写
+================================================================================
+
+## 一、概述
+
+本工作流用于在现有 C-API 文档和基础API文档的基础上，生成标准化、格式统一的
+C-API 参考文档。工作流以单个 C-API 接口文件为输入，自动定位其对应的基础API
+文档，结合两者内容，运用 write-doc skill 的模板规范和格式规则，生成新的
+C-API 文档（{原文件名}_test.md），输出到原 C-API 文件所在目录。
+
+### 输入
+- 一个 C-API 接口文档文件路径（.md）
+- 示例：asc-devkit_3082\docs\api\SIMD-API\C-API\simd_atomic\asc_set_atomic_min.md
+
+### 输出
+- 新建文件：{原C-API文件名去掉.md}_test.md，放在原C-API文件同目录下
+- 示例：asc-devkit_3082\docs\api\SIMD-API\C-API\simd_atomic\asc_set_atomic_min_test.md
+
+
+================================================================================
+## 二、关键路径
+================================================================================
+
+以下路径为工作流中使用的核心路径（均相对于仓库根目录或使用绝对路径）：
+
+1. C-API 文档根目录：
+   C:\Users\chenh\Desktop\gitCode\c_api\0714\asc-devkit_3082\docs\api\SIMD-API\C-API\
+
+2. 基础API 文档根目录：
+   C:\Users\chenh\Desktop\gitCode\c_api\0714\asc-devkit_3082\docs\api\SIMD-API\基础API\
+
+3. write-doc skill 目录：
+   C:\Users\chenh\Desktop\gitCode\c_api\ascendc-skills\skills\docs\write-doc\
+
+4. write-doc skill 参考文件：
+   - 模板：C:\Users\chenh\Desktop\gitCode\c_api\ascendc-skills\skills\docs\write-doc\references\template.md
+   - 架构映射：C:\Users\chenh\Desktop\gitCode\c_api\ascendc-skills\skills\docs\write-doc\references\npu_arch.md
+   - 技能说明：C:\Users\chenh\Desktop\gitCode\c_api\ascendc-skills\skills\docs\write-doc\SKILL.md
+
+5. 输出目录：原 C-API 文件所在目录
+
+
+================================================================================
+## 三、工作步骤总览
+================================================================================
+
+步骤1：读取并解析输入 C-API 文档
+步骤2：查找对应的基础API文档
+步骤3：加载 write-doc skill 参考文件
+步骤4：交叉比对，生成新 C-API 文档内容
+步骤5：写入 _test.md 文件
+步骤6：质量校验
+
+
+================================================================================
+## 四、详细步骤
+================================================================================
+
+### 步骤1：读取并解析输入 C-API 文档
+
+1.1 读取用户指定的 C-API 接口文件（.md），完整获取其内容。
+
+1.2 从文档中解析提取以下关键信息：
+    - API 名称：文档标题（如 # asc_set_atomic_min → API 名为 asc_set_atomic_min）
+    - 产品支持情况：各产品的支持/不支持状态
+    - 功能说明：接口声明文件路径、核心功能描述、实现原理/公式
+    - 函数原型：所有重载的函数签名
+    - 参数说明：模板参数表、运行参数表
+    - 数据类型支持：各产品支持的数据类型
+    - 返回值说明
+    - 流水类型（如 PIPE_S、PIPE_V 等）
+    - 资源占用情况
+    - 约束说明：产品专属约束、通用约束
+    - 调用示例：各产品的代码示例和结果说明
+
+1.3 记录原 C-API 文件的完整路径和所在目录，用于后续输出。
+
+
+------------------------------------------------------------------------
+### 步骤2：查找对应的基础API文档
+
+2.1 名称转换规则（C-API名 → 基础API名）：
+
+    将 C-API 的 snake_case 名称转换为 PascalCase，去除 asc_ 前缀。
+
+    转换方法：
+    a) 去除 "asc_" 前缀
+    b) 将剩余部分按 "_" 分割
+    c) 每段首字母大写后拼接
+
+    示例：
+    - asc_set_atomic_add  → SetAtomicAdd
+    - asc_set_atomic_min  → SetAtomicMin
+    - asc_set_atomic_max  → SetAtomicMax
+    - asc_atomic_add      → AtomicAdd
+    - asc_atomic_sub      → AtomicSub
+    - asc_atomic_cas      → AtomicCas
+    - asc_atomic_exch     → AtomicExch
+    - asc_set_atomic_none → SetAtomicNone（注意：实际对应 DisableDmaAtomic，见特殊映射）
+
+2.2 搜索策略（按优先级依次尝试）：
+
+    策略A：精确匹配
+    - 在基础API根目录下递归搜索文件名为 "{PascalName}.md" 的文件
+    - 示例：搜索 "SetAtomicAdd.md"
+
+    策略B：ISASI 后缀匹配
+    - 搜索文件名为 "{PascalName}(ISASI).md" 的文件
+    - 示例：搜索 "SetAtomicMin(ISASI).md"
+
+    策略C：特殊名称映射表（已知的不一致映射）
+
+    | C-API 名称              | 基础API 文档名              |
+    |------------------------|----------------------------|
+    | asc_set_atomic_none    | DisableDmaAtomic           |
+    | asc_set_store_atomic_config_v1 | SetStoreAtomicConfig(ISASI) |
+    | asc_set_store_atomic_config_v2_deprecated | SetStoreAtomicConfig(ISASI) |
+    | asc_get_store_atomic_config | GetStoreAtomicConfig(ISASI) |
+
+    策略D：模糊搜索
+    - 在基础API根目录下递归搜索文件内容包含 PascalName 关键词的 .md 文件
+    - 使用 grep/glob 工具在基础API目录中搜索
+
+    策略E：目录定位
+    - 根据C-API所在子目录推断基础API所在子目录：
+      C-API\simd_atomic\      → 基础API\原子操作\
+      C-API\scalar_compute\   → 基础API\标量计算\
+      C-API\simd_atomic\atomic\ → 基础API\原子操作\
+      C-API\cache_ctrl\       → 基础API\缓存控制\
+      （其他目录按类似规则推断）
+    - 在推断的基础API子目录中执行策略A-D
+
+2.3 如果找到对应基础API文档：
+    - 读取其完整内容
+    - 解析提取各章节信息，用于步骤4的交叉比对
+
+2.4 如果未找到对应基础API文档：
+    - 记录"未找到对应基础API文档"
+    - 工作流继续，步骤4仅基于原C-API文档和skill模板生成内容
+    - 在输出文档中对应缺失信息处标记 <TODO>
+
+
+------------------------------------------------------------------------
+### 步骤3：加载 write-doc skill 参考文件
+
+3.1 读取 skill 的 SKILL.md：
+    路径：C:\Users\chenh\Desktop\gitCode\c_api\ascendc-skills\skills\docs\write-doc\SKILL.md
+    - 获取完整的工作流程说明、格式规范、禁止行为清单
+
+3.2 读取模板文件 template.md：
+    路径：C:\Users\chenh\Desktop\gitCode\c_api\ascendc-skills\skills\docs\write-doc\references\template.md
+    - 获取文档骨架结构，确定章节顺序和格式
+
+3.3 读取架构映射文件 npu_arch.md：
+    路径：C:\Users\chenh\Desktop\gitCode\c_api\ascendc-skills\skills\docs\write-doc\references\npu_arch.md
+    - 获取芯片版本、npu-type、版本号的映射关系
+
+3.4 提取 skill 中的核心格式规则（详见第五章"文档生成规则"）。
+
+
+------------------------------------------------------------------------
+### 步骤4：交叉比对，生成新 C-API 文档内容
+
+基于以下三个信息源生成新文档：
+  ① 原 C-API 文档（主要来源，提供 asc_ 接口原型、c_api 头文件路径、调用示例）
+  ② 基础API 文档（参考来源，补充产品支持、数据类型、约束说明等信息）
+  ③ write-doc skill 模板和规则（格式标准，规范章节结构、注释块、编号等）
+
+4.1 确定输出文档结构（遵循 template.md 的章节顺序）：
+
+    # {API_NAME}
+
+    ## 产品支持情况
+    ## 功能说明
+    ## 函数原型
+    ## 参数说明
+    ## 数据类型支持
+    ## 返回值说明
+    ## 流水类型
+    ## 资源占用情况
+    ## 约束说明
+    ## 调用示例
+
+4.2 逐章节生成内容（详见第五章"文档生成规则"）。
+
+4.3 核心原则：
+    - C-API 特有内容保持不变：asc_ 前缀的函数名、c_api/ 头文件路径、
+      asc_ 风格的调用示例代码
+    - 从基础API文档补充缺失信息：如果原C-API文档中某些章节不完整，
+      参考基础API文档对应章节补充（需将基础API的函数名/头文件路径等
+      转换为C-API风格）
+    - 严格遵循 skill 的注释块格式规则
+
+
+------------------------------------------------------------------------
+### 步骤5：写入 _test.md 文件
+
+5.1 确定输出文件路径：
+    - 取原 C-API 文件路径
+    - 将文件名中的 ".md" 替换为 "_test.md"
+    - 示例：
+      原：...\C-API\simd_atomic\asc_set_atomic_min.md
+      新：...\C-API\simd_atomic\asc_set_atomic_min_test.md
+
+5.2 将步骤4生成的完整文档内容写入该文件。
+
+5.3 确认文件已成功写入。
+
+
+------------------------------------------------------------------------
+### 步骤6：质量校验
+
+按照第六章"验收标准"逐项检查输出文档，确保格式合规、内容完整。
+
+
+================================================================================
+## 五、文档生成规则（基于 write-doc skill）
+================================================================================
+
+以下规则提取自 write-doc skill 的 SKILL.md，适配到 C-API 文档场景。
+
+### 5.0 总体原则
+
+- 输出文档以原 C-API 文档为基础，通过基础API文档交叉校验和补充
+- C-API 风格保持不变：函数名用 asc_ 前缀，头文件用 c_api/ 路径，
+  示例代码用 asc_ 函数调用
+- 缺失信息统一写 <TODO>（禁止使用 TODO、待补充、待确认）
+- 全文使用 HTML 注释块区分产品内容，禁止使用 <cann-filter> 标签
+
+### 5.1 注释块格式规范
+
+- 开标签：<!-- npu="{npu-type}" id{N} -->
+- 闭标签：<!-- end id{N} -->
+- id{N} 在整篇文档内唯一递增（id1、id2、id3……），跨章节连续编号
+- 每个 npu 取值为单个合法值（950、A3、910b、310b、310p、910、x90、9030）
+- 不允许逗号分隔组合
+- 当多个产品内容完全相同时，仍为每个产品各建一个注释块
+- "产品支持情况"章节中产品名已在 bullet 中体现，无需额外描述
+- 其余章节注释块内需在开标签后紧跟产品描述（如"针对Ascend 950PR/Ascend 950DT："）
+
+### 5.2 产品与架构映射表
+
+| 芯片版本                               | npu-type | 版本号 |
+|---------------------------------------|----------|--------|
+| Ascend 950PR/Ascend 950DT            | 950      | 3510   |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | A3       | 2201   |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | 910b     | 2201   |
+| Atlas 200I/500 A2 推理产品             | 310b     | 2201   |
+| Atlas 推理系列产品 AI Core             | 310p     | 2201   |
+| Atlas 推理系列产品 Vector Core         | 310p     | 2201   |
+| Atlas 训练系列产品                     | 910      | 2201   |
+| Kirin X90                             | x90      | 3510   |
+| Kirin 9030                            | 9030     | 3510   |
+
+注意：Vector Core 与 AI Core 共用 npu-type "310p"，但各占一个注释块。
+
+### 5.3 各章节生成规则
+
+#### 5.3.1 产品支持情况
+
+- 章节不使用表格，改为注释块包裹的列表，每个产品一个注释块
+- 产品顺序固定（按上方映射表顺序，共9个产品）
+- 列表项格式：- {产品名}：支持  或  - {产品名}：不支持
+- 产品名严格按映射表中的写法
+- 产品支持状态判定优先级：
+  1. 以原C-API文档的产品支持情况为准
+  2. 若原C-API文档缺少某产品，参考基础API文档补充
+  3. 若两者均无该产品信息，根据头文件架构宏保护判断
+  4. 无法确认时写 <TODO>
+- 允许按优先级分批交付：首次仅输出三个核心芯片版本
+  （950、A3、910b），其余产品暂不生成，id重新连续编号
+
+#### 5.3.2 功能说明
+
+- 接口声明文件：使用原C-API文档中的头文件路径（c_api/ 路径）
+  - 如果原C-API文档缺失，从头文件或基础API文档推断（将 basic_api/ 路径
+    转换为 c_api/ 路径）
+  - 无法确认时写 <TODO>
+- 核心功能：使用原C-API文档的描述
+  - 若不完整，参考基础API文档的"功能说明"章节补充
+  - 注意将基础API中的函数名/术语转换为C-API对应表述
+- 实现原理/公式：优先使用原C-API文档内容
+  - 若缺失，参考基础API文档补充
+  - 优先使用 LaTeX 公式，清理失效图片和无效链接
+- 产品差异信息用注释块包裹（如某产品不支持的通路说明）
+
+#### 5.3.3 函数原型
+
+- 使用原C-API文档中的函数原型（asc_ 前缀的函数签名）
+- 按各支持产品用注释块包裹拆分
+- 如果各产品函数原型相同，每个支持产品各一个注释块，内容相同
+- 如果原C-API文档未按产品拆分，按 skill 规范补充注释块
+- 不支持的产品不写注释块
+
+#### 5.3.4 参数说明
+
+- 使用 **表 1**  模板参数说明 和 **表 2**  参数说明 区分
+- 以原C-API文档参数表为主
+- 若原C-API文档参数说明为"无"，则保持"无"
+- 若原C-API文档缺失，参考基础API文档参数表补充
+  （注意基础API使用模板参数T，C-API使用具体类型重载，需适配转换）
+- 模板参数 T 等类型参数只保留语义描述，不展开类型列表
+- 按产品 npu 拆分注释块（如有产品差异）
+
+#### 5.3.5 数据类型支持
+
+- 以原C-API文档的"数据类型支持"章节为主
+- 参考基础API文档的"数据类型"章节交叉校验
+- 按各产品 npu 拆分注释块
+- 如果原C-API文档使用描述式写法（如"支持int8_t、int16_t..."），
+  保持该写法
+- 如果基础API文档使用表格写法，可参考但不强制转换
+
+#### 5.3.6 返回值说明
+
+- 以原C-API文档为准
+- 无返回值写"无"
+- 有返回值说明含义、取值范围
+
+#### 5.3.7 流水类型
+
+- 以原C-API文档为准（如 PIPE_S、PIPE_V 等）
+- 若原C-API文档缺失，从头文件 __inout_pipe__ 或 #pragma begin_pipe 提取
+- 无法识别时写：未从公开函数原型中直接识别到流水类型。
+- 此章节不使用注释块，直接平铺内容
+
+#### 5.3.8 资源占用情况
+
+- 以原C-API文档为准
+- 保持三条 bullet：
+  - 临时空间占用
+  - 同步资源占用
+  - 资源占用与参数/数据量关系
+- 若原C-API文档缺失，根据接口性质判断（设置类接口通常不占用临时空间
+  和同步资源）
+- 此章节不使用注释块，直接平铺内容
+
+#### 5.3.9 约束说明
+
+- 产品专属约束与通用约束严格分离：
+  - 产品专属约束写在注释块内，格式统一为单条 bullet
+    （如：- 针对Ascend 950PR/Ascend 950DT：支持的数据通路为UB/L0C Buffer->GM。）
+  - 通用约束写在注释块外，紧跟最后一个产品注释块闭标签之后
+- 以原C-API文档约束说明为主
+- 参考基础API文档约束说明交叉校验和补充：
+  - 基础API文档中提到的 DisableDmaAtomic 对应 C-API 的 asc_set_atomic_none
+  - 基础API文档中提到的 SetAtomicType 对应 C-API 的相关设置接口
+  - 需将基础API中的函数引用转换为C-API对应函数引用
+- 产品支持情况中标注"不支持"的产品，不得出现对应的约束注释块
+
+#### 5.3.10 调用示例
+
+- 以原C-API文档的调用示例为主（保持 asc_ 函数调用风格）
+- 参考基础API文档的调用示例交叉校验：
+  - 检查示例逻辑是否正确
+  - 检查是否覆盖各支持产品
+  - 可参考基础API示例的注释说明补充C-API示例的注释
+- 按各支持产品 npu 拆分注释块
+- 包含以下要素：
+  - 代码示例（带注释说明场景和关键参数）
+  - 结果示例（输入输出数据展示）
+  - 完整样例链接（如有真实路径则填入，否则写 <TODO>）
+- 不支持的产品不写注释块
+
+
+================================================================================
+## 六、验收标准
+================================================================================
+
+生成的新 C-API 文档（_test.md）需满足以下全部条件：
+
+### 格式合规
+- [ ] 文档结构严格遵循 template.md 的章节顺序
+- [ ] 全文使用注释块（<!-- npu="..." idN --> / <!-- end idN -->）区分产品，
+      不出现 <cann-filter> 标签或 npu-type/npu-arch 属性
+- [ ] 所有注释块 npu 值为合法单值（950、A3、910b、310b、310p、910、x90、9030）
+- [ ] id{N} 在整篇文档内唯一，跨章节连续编号，开闭标签一一配对
+- [ ] 产品支持情况章节产品顺序固定，使用"支持/不支持"措辞，禁止 √/x 或表格
+- [ ] 产品支持情况中标注"不支持"的产品，其他章节无对应注释块
+- [ ] 无产品差异的章节（功能说明、返回值说明、流水类型、资源占用情况）
+      不使用注释块，直接平铺内容
+
+### 内容完整
+- [ ] 所有缺失项使用 <TODO>（不使用 TODO、待补充、待确认）
+- [ ] 接口声明文件为 c_api/ 路径（非 basic_api/ 路径）
+- [ ] 函数原型使用 asc_ 前缀的函数签名
+- [ ] 调用示例使用 asc_ 风格的函数调用
+- [ ] 约束说明中引用的接口名已转换为 C-API 对应名称
+- [ ] 无失效链接、无效图片、臆造内容
+
+### 交叉校验
+- [ ] 产品支持情况已与基础API文档交叉校验（如基础API存在）
+- [ ] 数据类型支持已与基础API文档交叉校验
+- [ ] 约束说明已与基础API文档交叉校验
+- [ ] 基础API文档中的有效信息已尽可能融入新文档
+
+### 输出正确
+- [ ] 输出文件名为 {原文件名}_test.md
+- [ ] 输出文件位于原 C-API 文件同目录下
+- [ ] 文件已成功写入，内容完整无截断
+
+
+================================================================================
+## 七、特殊映射规则汇总
+================================================================================
+
+### 7.1 函数名映射（C-API → 基础API）
+
+| C-API 函数名                    | 基础API 函数名               |
+|--------------------------------|-----------------------------|
+| asc_set_atomic_add             | SetAtomicAdd                |
+| asc_set_atomic_min             | SetAtomicMin                |
+| asc_set_atomic_max             | SetAtomicMax                |
+| asc_set_atomic_none            | DisableDmaAtomic            |
+| asc_set_store_atomic_config_v1 | SetStoreAtomicConfig        |
+| asc_get_store_atomic_config    | GetStoreAtomicConfig        |
+| asc_atomic_add                 | AtomicAdd                   |
+| asc_atomic_sub                 | AtomicSub（可能不存在）       |
+| asc_atomic_min                 | AtomicMin                   |
+| asc_atomic_max                 | AtomicMax                   |
+| asc_atomic_cas                 | AtomicCas                   |
+| asc_atomic_exch                | AtomicExch                  |
+| asc_atomic_and                 | AtomicAnd（可能不存在）       |
+| asc_atomic_or                  | AtomicOr（可能不存在）        |
+| asc_atomic_xor                 | AtomicXor（可能不存在）       |
+| asc_atomic_inc                 | AtomicInc（可能不存在）       |
+| asc_atomic_dec                 | AtomicDec（可能不存在）       |
+
+### 7.2 头文件路径映射
+
+| C-API 头文件                          | 基础API 头文件                                |
+|--------------------------------------|----------------------------------------------|
+| c_api/atomic/atomic.h                | basic_api/kernel_operator_set_atomic_intf.h  |
+| c_api/scalar_compute/scalar_compute.h | basic_api/kernel_operator_scalar_intf.h     |
+| c_api/cache_ctrl/...                 | basic_api/kernel_operator_cache_intf.h       |
+| （其他按类似规则推断）                  |                                              |
+
+### 7.3 接口引用映射（约束说明/调用示例中的交叉引用）
+
+| 基础API 接口引用         | C-API 对应引用              |
+|------------------------|----------------------------|
+| DisableDmaAtomic       | asc_set_atomic_none        |
+| SetAtomicType          | （C-API中通过具体设置接口替代）|
+| DataCacheCleanAndInvalid | asc_dcci                 |
+| DataCachePreload       | asc_dcache_preload         |
+| SetFlag/WaitFlag       | asc_set_flag/asc_wait_flag  |
+| PipeBarrier            | asc_sync_pipe              |
+| SyncAll                | asc_sync_all               |
+| DataCopy               | asc_copy_ub2gm 等           |
+
+### 7.4 目录映射（C-API子目录 → 基础API子目录）
+
+| C-API 子目录           | 基础API 子目录       |
+|-----------------------|---------------------|
+| C-API\simd_atomic\    | 基础API\原子操作\    |
+| C-API\simd_atomic\atomic\ | 基础API\原子操作\ |
+| C-API\scalar_compute\ | 基础API\标量计算\    |
+| C-API\cache_ctrl\     | 基础API\缓存控制\    |
+| C-API\struct\         | 基础API\数据结构\    |
+| （其他按类似规则推断）  |                     |
+
+
+================================================================================
+## 八、工作流执行示例
+================================================================================
+
+### 示例：以 asc_set_atomic_min.md 为输入
+
+输入：asc-devkit_3082\docs\api\SIMD-API\C-API\simd_atomic\atomic\asc_set_atomic_min.md
+
+步骤1：读取并解析该文件，提取API名 asc_set_atomic_min，各章节内容。
+
+步骤2：名称转换：asc_set_atomic_min → SetAtomicMin
+       搜索基础API目录：
+       - 策略A：搜索 SetAtomicMin.md → 未找到
+       - 策略B：搜索 SetAtomicMin(ISASI).md → 找到！
+         路径：基础API\原子操作\SetAtomicMin(ISASI).md
+       读取该基础API文档内容。
+
+步骤3：加载 write-doc skill 的 SKILL.md、template.md、npu_arch.md。
+
+步骤4：交叉比对生成新文档：
+       - 产品支持情况：原C-API有3个产品（950/A3/910b），基础API有7个产品。
+         以C-API为准，保留3个产品支持。如需扩展可参考基础API补充。
+       - 功能说明：保持C-API的接口声明文件和描述，参考基础API校验。
+       - 函数原型：保持C-API的 asc_set_atomic_min_xxx() 系列函数。
+       - 参数说明：保持"无"。
+       - 数据类型支持：保持C-API的描述，参考基础API校验数据类型列表。
+       - 返回值说明：保持"无"。
+       - 流水类型：保持 PIPE_S。
+       - 资源占用情况：保持原有三条 bullet。
+       - 约束说明：保持C-API约束，将基础API中 DisableDmaAtomic 引用
+         转换为 asc_set_atomic_none 引用。
+       - 调用示例：保持C-API的 asc_ 风格示例代码。
+
+步骤5：写入文件：
+       asc-devkit_3082\docs\api\SIMD-API\C-API\simd_atomic\atomic\asc_set_atomic_min_test.md
+
+步骤6：按验收标准逐项检查。
+
+
+================================================================================
+## 九、注意事项
+================================================================================
+
+1. 基础API文档可能不存在对应文件（如 AtomicSub.md 缺失）。
+   此时工作流仍继续，仅基于原C-API文档和skill模板生成，缺失信息标记 <TODO>。
+
+2. 基础API文档和C-API文档的产品支持范围可能不同。
+   以C-API文档为准，基础API文档仅作参考。
+
+3. 基础API文档使用 AscendC:: 命名空间和模板参数风格，
+   C-API文档使用 asc_ 前缀和具体类型重载风格。
+   生成的新文档必须保持 C-API 风格。
+
+4. 基础API文档的调用示例使用 AscendC::DataCopy、AscendC::LocalTensor 等，
+   不可直接复制到C-API文档中。C-API文档的示例使用 asc_copy_ub2gm、
+   __ubuf__ 等C-API风格语法。
+
+5. 注释块的 id 编号在整篇文档内必须唯一且连续。
+   如果裁剪了产品（如仅保留3个核心产品），id 需重新从 id1 开始连续编号。
+
+6. 如原C-API文档已有完整的、符合skill规范的格式，
+   新文档应保持原有格式，仅通过基础API文档补充缺失信息或修正不一致之处。
+
+================================================================================
+```
