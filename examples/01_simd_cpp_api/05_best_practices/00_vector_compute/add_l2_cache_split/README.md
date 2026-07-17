@@ -195,7 +195,7 @@ OPPROF_<timestamp>/
 
 ### 性能指标说明
 
-本节性能数据在Atlas A2训练系列产品上运行得到，CANN 版本为 CANN 9.1.0。关键指标定义如下：
+本节性能数据分别在Atlas A2训练系列和Ascend 950系列产品上运行得到，CANN 版本为 CANN 9.1.0。关键指标定义如下：
 
 | 字段名 | 字段含义 | 来源文件 |
 |:---:|:---|:---|
@@ -208,6 +208,8 @@ OPPROF_<timestamp>/
 | aiv_vec_time(μs) | vec类型指令耗时（向量计算） | PipeUtilization.csv |
 | aiv_write_hit_rate(%) | L2Cache写命中率 | L2Cache.csv |
 | aiv_read_hit_rate(%) | L2Cache读命中率 | L2Cache.csv |
+| aiv_gm_to_ub_bw(GB/s) | GM→UB平均有效带宽（3510平台mte2搬运效率指标） | Memory.csv |
+| GM_to_UB_datas(KB) | 每核GM→UB搬运数据量 | Memory.csv |
 
 ### 实测性能数据（Atlas A2训练系列）
 
@@ -239,6 +241,59 @@ OPPROF_<timestamp>/
 | aiv_mte2_active_bw | 41.3 GB/s | **57.9 GB/s** |
 | aiv_mte2_time (blk0) | 361.2 μs | 128.8 μs |
 | aiv_mte2_ratio (blk0) | 89.0% | 84.8% |
+
+### 实测性能数据（Ascend 950系列）
+
+以下数据采集自 Ascend 950 系列（dav-3510, 28核），CANN 版本为 CANN 9.1.0，使用 `msopprof` 采集并汇总得到。
+
+> 注：3510 平台 msopprof 的 `PipeUtilization.csv` **不直接提供** `aiv_mte2_time` 和 `aiv_mte3_time` 字段，mte2/mte3 指标需从 `Memory.csv` 的 `aiv_gm_to_ub_bw`（GM→UB有效带宽）和 `aiv_mte2_ratio` 获取。
+
+**表1 整体性能汇总**
+
+| 指标 | 反例（nosplit） | 正例（split） | 加速比 | 数据来源 |
+|:---|---:|---:|---:|:---|
+| Task Duration(μs) | 309.1 | **149.3** | **2.07x** | OpBasicInfo.csv |
+| aiv_time(μs) | 300.0 | 145.7 | 2.06x | PipeUtilization.csv |
+| aiv_vec_time(μs) | 29.8 | 14.9 | 2.00x | PipeUtilization.csv |
+| aiv_gm_to_ub_bw(GB/s) | 35.6 | 36.6 | +3% | Memory.csv |
+| aiv_mte2_ratio | 88.3% | 87.8% | — | Memory.csv |
+| GM_to_UB_datas(KB/核) | 11193 | 5597 | — | Memory.csv |
+
+**表2 L2Cache命中率对比（逐核平均值）**
+
+| 指标 | 反例（nosplit） | 正例（split） | 数据来源 |
+|:---|---:|---:|:---|
+| aiv_write_hit_rate | 32.29% | 20.04% | L2Cache.csv |
+| aiv_read_hit_rate | ~0% | ~0% | L2Cache.csv |
+
+**表3 计算单元利用率（逐核平均值）**
+
+| 指标 | 反例（nosplit） | 正例（split） | 数据来源 |
+|:---|---:|---:|:---|
+| aiv_vec_ratio | 10.1% | 10.5% | ArithmeticUtilization.csv |
+
+**3510平台性能差异分析**
+
+**1. 数据搬运量与加速来源**
+
+nosplit 每核读入 11193KB（x+y 各占一半），split 每核读入 5597KB——恰好为前者一半。原因：nosplit 的 `LOOP_COUNT=2` 导致同一份数据被读入两次，而 split 每核只处理一轮。`aiv_gm_to_ub_bw`（有效带宽）两者几乎相同（~36 GB/s），说明带宽不是瓶颈——加速纯粹来自**搬运数据量减半**。
+
+**2. mte2 占比主导性**
+
+mte2 指令占比在 3510 上仍占绝对主导（nosplit 88.3%, split 87.8%），与 A2 平台趋势一致。Add 是 I/O-bound 操作，向量计算仅占 ~10%。
+
+**3. L2Cache 命中率解读差异**
+
+3510 的 `L2Cache.csv` 与 A2 格式不同，区分 close/far hit。read_hit_rate 为 ~0%，因为 Add 的流式访问每个地址只读一次，无复用；write_hit_rate（nosplit 32.29% > split 20.04%）看似反常——nosplit 写命中率更高却更慢。这是因为 LOOP_COUNT=2 重复写相同地址时 profiler 将其计为"命中"，但这些 hits 实际仍触发写分配（write-allocate），并未真正节省带宽。
+
+**4. 与 A2 平台对比**
+
+| 平台 | 核数 | Task Duration 提升 | gm_to_ub_bw 差异 |
+|------|------|-------------------|-------------------|
+| Atlas A2 (2201) | 20核 | 1.85x | +40%（41.3→57.9 GB/s） |
+| Ascend 950 (3510) | 28核 | 2.07x | +3%（35.6→36.6 GB/s） |
+
+在 A2 上 L2Cache 切分同时提升了有效带宽（表明数据能命中 L2Cache 通道），而在 3510 上带宽几乎不变——说明加速完全来自搬运量减半而非带宽变化。两种平台的加速路径不同，但最终结论一致：L2Cache 切分能有效减少不必要的数据搬运。
 
 ### 性能差异分析
 

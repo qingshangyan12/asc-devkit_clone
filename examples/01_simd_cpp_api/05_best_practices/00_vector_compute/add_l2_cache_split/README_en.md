@@ -195,7 +195,7 @@ OPPROF_<timestamp>/
 
 ### Performance Metrics
 
-The performance data below was collected on the Atlas A2 Training Series with CANN 9.1.0. Key metrics are defined as follows:
+The performance data below was collected on the Atlas A2 Training Series and Ascend 950 Series with CANN 9.1.0. Key metrics are defined as follows:
 
 | Field | Meaning | Source File |
 |:---:|:---|:---|
@@ -208,6 +208,8 @@ The performance data below was collected on the Atlas A2 Training Series with CA
 | aiv_vec_time(μs) | vec instruction time (vector computation) | PipeUtilization.csv |
 | aiv_write_hit_rate(%) | L2Cache write hit rate | L2Cache.csv |
 | aiv_read_hit_rate(%) | L2Cache read hit rate | L2Cache.csv |
+| aiv_gm_to_ub_bw(GB/s) | GM→UB average effective bandwidth (mte2 transfer efficiency metric on 3510) | Memory.csv |
+| GM_to_UB_datas(KB) | GM→UB data volume per core | Memory.csv |
 
 ### Measured Performance Data (Atlas A2 Training Series)
 
@@ -239,6 +241,59 @@ The following data is aggregated from `PipeUtilization.csv` (20 cores per-core) 
 | aiv_mte2_active_bw | 41.3 GB/s | **57.9 GB/s** |
 | aiv_mte2_time (blk0) | 361.2 μs | 128.8 μs |
 | aiv_mte2_ratio (blk0) | 89.0% | 84.8% |
+
+### Measured Performance Data (Ascend 950 Series)
+
+The following data was collected on the Ascend 950 Series (dav-3510, 28 cores) with CANN 9.1.0, aggregated from `msopprof` profiling results.
+
+> Note: On the 3510 platform, `PipeUtilization.csv` does **not** directly provide `aiv_mte2_time` and `aiv_mte3_time` fields. mte2/mte3 metrics should be obtained from `Memory.csv` via `aiv_gm_to_ub_bw` (GM→UB effective bandwidth) and `aiv_mte2_ratio`.
+
+**Table 1 Overall Performance Summary**
+
+| Metric | Negative (nosplit) | Positive (split) | Speedup | Source |
+|:---|---:|---:|---:|:---|
+| Task Duration(μs) | 309.1 | **149.3** | **2.07x** | OpBasicInfo.csv |
+| aiv_time(μs) | 300.0 | 145.7 | 2.06x | PipeUtilization.csv |
+| aiv_vec_time(μs) | 29.8 | 14.9 | 2.00x | PipeUtilization.csv |
+| aiv_gm_to_ub_bw(GB/s) | 35.6 | 36.6 | +3% | Memory.csv |
+| aiv_mte2_ratio | 88.3% | 87.8% | — | Memory.csv |
+| GM_to_UB_datas(KB/core) | 11193 | 5597 | — | Memory.csv |
+
+**Table 2 L2Cache Hit Rate Comparison (Per-Core Average)**
+
+| Metric | Negative (nosplit) | Positive (split) | Source |
+|:---|---:|---:|:---|
+| aiv_write_hit_rate | 32.29% | 20.04% | L2Cache.csv |
+| aiv_read_hit_rate | ~0% | ~0% | L2Cache.csv |
+
+**Table 3 Compute Unit Utilization (Per-Core Average)**
+
+| Metric | Negative (nosplit) | Positive (split) | Source |
+|:---|---:|---:|:---|
+| aiv_vec_ratio | 10.1% | 10.5% | ArithmeticUtilization.csv |
+
+**3510 Platform Performance Analysis**
+
+**1. Data Transfer Volume and Speedup Source**
+
+In the negative example, each core reads 11193 KB (x+y combined), while the positive example reads 5597 KB — exactly half. The reason: `LOOP_COUNT=2` in the negative example causes the same data to be read twice, whereas the positive example processes only one round per core. `aiv_gm_to_ub_bw` (effective bandwidth) is nearly identical for both (~36 GB/s), indicating bandwidth is not the bottleneck — the speedup comes purely from **halving the transferred data volume**.
+
+**2. mte2 Remains Dominant**
+
+mte2 instruction ratio on the 3510 still dominates (negative 88.3%, positive 87.8%), consistent with the A2 platform. Add is an I/O-bound operation; vector computation accounts for only ~10%.
+
+**3. L2Cache Hit Rate Interpretation**
+
+On the 3510, `L2Cache.csv` has a different format than A2, distinguishing close/far hits. `read_hit_rate` is ~0% because Add's streaming access reads each address only once with no reuse. `write_hit_rate` (negative 32.29% > positive 20.04%) appears counterintuitive — the negative example has a higher write hit rate yet worse performance. This is because `LOOP_COUNT=2` writes the same addresses repeatedly, and the profiler counts these as "hits" even though they still trigger write-allocation and do not actually save bandwidth.
+
+**4. Cross-Platform Comparison (A2 vs 3510)**
+
+| Platform | Cores | Task Duration Speedup | gm_to_ub_bw Difference |
+|------|------|-------------------|-------------------|
+| Atlas A2 (2201) | 20 | 1.85x | +40% (41.3→57.9 GB/s) |
+| Ascend 950 (3510) | 28 | 2.07x | +3% (35.6→36.6 GB/s) |
+
+On A2, L2Cache tiling simultaneously improves effective bandwidth (indicating data can hit the L2Cache path), while on 3510, bandwidth is virtually unchanged — the speedup stems entirely from reducing transferred data volume rather than bandwidth improvement. The acceleration paths differ across platforms, but the conclusion is consistent: L2Cache tiling effectively reduces unnecessary data transfer.
 
 ### Performance Analysis
 
