@@ -1206,6 +1206,32 @@ extern "C" {
 #endif // __cplusplus
 int32_t HcommFlush() { return HCCL_E_NOT_SUPPORT; }
 
+int32_t HcommBatchTransferOnThread(ThreadHandle thread, ChannelHandle channel,
+    const HcommBatchTransferDesc *transferDescs, uint32_t transferDescNum)
+{
+    HCCL_DEBUG("[%s] thread[0x%llx], channel[0x%llx], transferDescNum[%u].", __func__, thread, channel, transferDescNum);
+    CHK_PTR_NULL(transferDescs);
+    Thread *const threadPtr = reinterpret_cast<Thread *>(thread);
+    CHK_PTR_NULL(threadPtr);
+    AddThread(thread);
+    HcclResult ret = HCCL_SUCCESS;
+    if (threadPtr->IsDeviceA5()) {
+        auto *const ubTransportLitePtr = reinterpret_cast<Hccl::UbTransportLiteImpl *>(channel);
+        CHK_PTR_NULL(ubTransportLitePtr);
+        auto *const streamLitePtr = static_cast<Hccl::StreamLite *>(threadPtr->GetStreamLitePtr());
+        CHK_PTR_NULL(streamLitePtr);
+        ret = ubTransportLitePtr->ExecuteBatchTransfer(streamLitePtr, transferDescs, transferDescNum);
+    } else {
+        HCCL_ERROR("[%s] Does not support this interface on non-A5 device.", __func__);
+        return HCCL_E_NOT_SUPPORT;
+    }
+    CHK_PRT_RET(ret != HCCL_SUCCESS,
+        HCCL_ERROR("[%s] BatchTransferAsync failed.", __func__), ret);
+
+    HCCL_INFO("[%s] SUCCESS. transferDescNum[%u].", __func__, transferDescNum);
+    return ret;
+}
+
 int32_t HcommChannelFenceOnThread(ThreadHandle thread, ChannelHandle channel)
 {
     HCCL_DEBUG("[%s] thread[0x%llx], channel[0x%llx].", __func__, thread, channel);
@@ -1219,8 +1245,6 @@ int32_t HcommChannelFenceOnThread(ThreadHandle thread, ChannelHandle channel)
 
     return HCCL_SUCCESS;
 }
-
-int32_t HcommChannelFence(ChannelHandle channel)
 {
     HCCL_DEBUG("[%s] channel[0x%llx].", __func__, channel);
     return HCCL_E_NOT_SUPPORT;

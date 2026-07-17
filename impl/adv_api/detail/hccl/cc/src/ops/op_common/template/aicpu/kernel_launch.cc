@@ -19,6 +19,7 @@
 #include "kernel_launch.h"
 #include "hcomm_diag_dl.h"
 #include "hcomm_device_profiling_dl.h"
+#include "alg_data_trans_wrapper.h"
 #include <unordered_map>
 #include <shared_mutex>
 #include <atomic>
@@ -318,6 +319,7 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
         }
         // 获取Device测主thread
         ThreadHandle thread = resCtx.threads[0];
+        CHK_RET(mc2_ops_hccl::InitHcommBatchTransferOnThreadSupported(resCtx.isHcommBatchTransferOnThreadSupported));
         if (HcommBatchModeStart(param->algTag) != HCCL_SUCCESS) {
             HCCL_ERROR("failed set batch mode, tag is %s.", param->algTag);
             return 1;
