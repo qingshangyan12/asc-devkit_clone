@@ -4,11 +4,13 @@
 
 本样例介绍如何使用xmake的Ascend C toolchain构建并运行Add算子。样例通过`xmake.lua`直接声明`ascendc`工具链，使用`xmake`完成编译，使用`xmake run xmake_add`运行可执行程序。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+| 产品 | CANN软件版本 |
+| ---- | ------------ |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -25,43 +27,41 @@
 
   Add计算公式：
 
-  ```python
+  ```text
   z = x + y
   ```
 
 - 样例实现：
 
-  - Kernel实现
-    将Global Memory上的输入数据搬运到Local Memory，执行Add计算后再搬回Global Memory。
+  - Kernel实现：
 
-  - 调用实现
-    Host侧生成固定输入数据，使用内核调用符`<<<>>>`调用核函数，并在结果拷回后完成精度校验。
+    每个Block将Global Memory上的输入数据搬运到Unified Buffer，执行Add计算后再将结果搬回Global Memory。数据搬运与计算阶段之间调用`asc_sync`完成流水同步。
+
+  - 调用实现：
+
+    Host侧在同一个`add.asc`文件中生成固定输入数据，使用内核调用符`<<<>>>`调用核函数，并在结果拷回后完成精度校验。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
+- 安装xmake
+
+  本样例要求xmake版本不低于3.0.9。执行以下命令安装xmake，其他安装方式请参考[xmake安装说明](https://xmake.io/zh/guide/quick-start.html#安装)。
+
+  ```bash
+  curl -fsSL https://xmake.io/shget.text | bash
+  ```
+
 - 配置环境变量
 
-  请确保当前环境已安装xmake（版本要求 >= 3.0.9），且xmake可使用`ascendc` toolchain。请根据当前环境上CANN开发套件包的安装方式配置环境变量，确保xmake可以通过`ASCEND_HOME_PATH`或`ASCEND_TOOLKIT_HOME`找到CANN SDK。
-
-  默认路径，root用户安装CANN软件包时，可执行：
-
-  ```bash
-  source /usr/local/Ascend/cann/set_env.sh
-  ```
-
-  默认路径，非root用户安装CANN软件包时，可执行：
-
-  ```bash
-  source $HOME/Ascend/cann/set_env.sh
-  ```
-
-  指定路径install_path安装CANN软件包时，可执行：
+  请根据当前环境中CANN Toolkit的安装方式配置环境变量，确保xmake可以通过`ASCEND_HOME_PATH`或`ASCEND_TOOLKIT_HOME`找到CANN Toolkit。
 
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
+
+  > **说明：** `${install_path}`为CANN Toolkit安装目录，未指定安装目录时默认安装至`/usr/local/Ascend`目录。
 
 - 样例执行
 
@@ -85,6 +85,6 @@
 
   执行结果如下，说明精度对比成功。
 
-  ```bash
+  ```text
   test pass!
   ```
