@@ -87,6 +87,22 @@ preflight() { # returns non-zero on a FATAL problem -> abort before wasting buil
     return 0
 }
 
+prof_clean() { rm -rf ./build/PROF_* ./build/*.csv 2>/dev/null; }
+
+prof_run() { # run demo under msprof; FAIL loudly instead of letting extract read a stale CSV
+    prof_clean
+    local out
+    if [ "$MODE" = "npu" ]; then out=$(cd build && msprof --application=./demo --output=./ 2>&1)
+    else out=$(cd build && msprof op simulator --application=./demo 2>&1); fi
+    if ! find ./build -name "op_summary_*.csv" 2>/dev/null | grep -q .; then
+        echo "  !! msprof produced NO op_summary CSV — the kernel likely crashed. Output:"
+        echo "$out" | tail -12 | sed 's/^/     /'
+        return 1
+    fi
+    [ "$VERBOSE" = "1" ] && echo "$out" | tail -5 | sed 's/^/     /'
+    return 0
+}
+
 extract() { # $1=field   -> newest op_summary_*.csv under build/
     local csv
     csv=$(find ./build -type f -name "op_summary_*.csv" -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
@@ -138,14 +154,12 @@ run_perf() {
     for n in $PERF_SIZES; do
         build 2 "$n" || { fail=1; continue; }
         (cd build && python3 ../scripts/gen_data.py "$n" >/dev/null 2>&1)
-        if [ "$MODE" = "npu" ]; then (cd build && msprof --application=./demo --output=./ >/dev/null 2>&1)
-        else (cd build && msprof op simulator --application=./demo >/dev/null 2>&1); fi
+        prof_run || { echo "  size=$n  FAIL (baseline TEST_MODE=2)"; fail=1; continue; }
         local t1; t1=$(extract "aiv_time")
 
         build 3 "$n" || { fail=1; continue; }
         (cd build && python3 ../scripts/gen_data.py "$n" >/dev/null 2>&1)
-        if [ "$MODE" = "npu" ]; then (cd build && msprof --application=./demo --output=./ >/dev/null 2>&1)
-        else (cd build && msprof op simulator --application=./demo >/dev/null 2>&1); fi
+        prof_run || { echo "  size=$n  FAIL (compute TEST_MODE=3)"; fail=1; continue; }
         local t2 ct; t2=$(extract "aiv_time"); ct=$(extract "aiv_vec_time")
 
         local ratio

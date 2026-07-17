@@ -412,3 +412,44 @@ User ran `VERBOSE=1 ./run.sh npu` on real hw box: `ASCEND_HOME_PATH=/root/Ascend
    -> `preflight || exit 1`. Fatal: cmake/python3/scipy/numpy missing, set_env.sh not sourced,
    any required file missing. `npu-smi` NOT fatal (absent on PATH in many containers even when the
    NPU works — user's box has no npu-smi but bisheng builds fine).
+
+### F24 — **SILICON RESULTS** (user's box, GA CANN 9.1.0, 2026-07-17) — precision CONFIRMED, perf ~100%
+**FUNCTIONAL on real 950PR silicon — BIT-IDENTICAL to both simulators:**
+```
+size=1     0.000e+00  0/1     PASS
+size=32    3.607e-05  0/32    PASS
+size=1023  4.035e-05  0/1023  PASS
+size=2048  4.478e-05  0/2048  PASS
+```
+Same digits as 9.0.1 sim (F15) and 9.1-beta.3 sim (F21). => **Algorithm fully confirmed on hardware.**
+双万分之一 met with ~2.2x margin. No RV_VLN flag reported on silicon (F16 may be sim-only diagnostics —
+still unconfirmed since our sample DOES include boundary pts and the flag did NOT appear in the npu log).
+
+**PERF (aiv_vec, need >=90%):**
+```
+size=1024   100.01%   (t1=4.09  t2=583.08    vec=579.058)
+size=4096   100.0 %   (t1=4.67  t2=2198.25   vec=2193.688)
+size=8192   100.02%   (t1=6.21  t2=4351.94   vec=4346.639)
+size=16384   99.99%   (t1=7.57  t2=8659.8    vec=8651.702)
+size=32768  100.0 %   (t1=11.77 t2=17276.39  vec=17264.136)
+size=65536  NODATA    (t1=18.34 t2=18.34 vec=0.0)  <- see F25
+```
+**~100% aiv_vec on 5/6 sizes — the branchless design delivers exactly what F14 predicted.** Slight >100%
+readings are formula artifact (vec_time vs the approximate t2-t1 subtraction); read as "fully vec-bound".
+
+### F25 — 64k FAILED: whole-tensor-in-UB exceeds the 248KB UB. Wrapper now TILES.
+`TOTAL_UB_SIZE = 248*1024` for `__NPU_ARCH__==3510` (`impl/basic_api/utils/kernel_utils_constants.h:165`).
+The official harness wrapper (and mine, copied from it) does `InitBuffer(q, 1, alignLength*sizeof(T))`
+for BOTH in and out => needs **N*4*2 bytes**:
+```
+N=16384 -> 128KB fits | N=32768 -> 256KB (at/over limit, still ran) | N=65536 -> 512KB EXCEEDS -> crash
+```
+=> demo crashed at 64k, msprof wrote no CSV, and my `extract` silently read the **STALE mode-2 CSV**
+   => t1==t2, vec=0 => "NODATA". TWO bugs of mine: no tiling, and stale-CSV masking a crash.
+**NOTE the official harness CANNOT do its own required 64k perf size** — its README says
+单核处理，数据一次性搬入UB (whole tensor into UB at once), which caps at N=32768 on a 248KB UB.
+Spec demands perf at 64k. That is an inconsistency in THEIR harness, not in the API.
+**FIX (ours):** wrapper tiles at `TILE_ELEMS=8192` (8192*4*2 = 64KB, N-independent footprint).
+Ndtri is compute-only on LocalTensor — data movement is the CALLER's job, so tiling belongs in the
+wrapper, NOT in the API. run.sh now `prof_clean`s PROF_* before each msprof run and FAILS LOUDLY if no
+CSV is produced, instead of reading a stale one.
