@@ -553,3 +553,20 @@ UB: 2 queues x 2 buf x 32KB = 128KB, fits the 248KB UB.
 - `iCache 100% hit`, `Scalar 1.8%` — no icache thrash, negligible scalar overhead. Good.
 - Consistency check: 0.57 ns/elem (from N=1024 t2=583us/1000 passes) x 131072 = 74.7us ~= 128,892 cyc
   @ ~1.7GHz = 75.8us. The two independent measurements agree.
+
+### F31 — **PING-PONG CONFIRMED ON SILICON: 82.3% -> 98%** (single-pass, N=128k, PERF_LOOPS=1)
+Predicted 98.7%, measured **98%**. The cycle model from F30 is now validated end-to-end:
+```
+BEFORE  128,892 cyc = MTE2 14,744 + V 106,083 + MTE3 8,065     -> aiv_vec 82.3%
+AFTER   ~107,509 cyc = V 106,083 + fill 922 + drain 504         -> aiv_vec 98.7% (measured 98%)
+        wall 1.20x faster (predicted 1.22x)
+```
+**Residual ~2% = pipeline fill/drain**: the FIRST tile's MTE2 (~922 cyc) and the LAST tile's MTE3
+(~504 cyc) have nothing to overlap with. Irreducible at 16 tiles — NOT a bug, not worth chasing.
+Shrinking TILE_ELEMS would shave it (4096 -> ~99.3%, 2048 -> ~99.7%) but trades against per-tile
+scalar/loop overhead. 98% is far past the 90% gate.
+**SIGNIFICANCE: we now clear 90% on the HONEST metric (PERF_LOOPS=1, real single-pass operator),**
+not merely on the spec's degenerate PERF_LOOPS=1000 metric that reports ~100% for anything.
+That is a much stronger claim than the original "100%".
+=> Perf story is CLOSED: spec gate ~100% (PERF_LOOPS=1000) AND real single-pass 98% (PERF_LOOPS=1).
+=> Any shipped example MUST keep BUFFER_NUM=2; without it a real operator sits at 82%.
