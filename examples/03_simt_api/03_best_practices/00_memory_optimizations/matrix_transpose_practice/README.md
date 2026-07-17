@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例以矩阵转置为例，介绍Ascend C SIMT编程方式下的访存优化思路。首先，通过一维连续复制建立GM连续读写的性能基线，并用直接全局内存转置暴露非连续写带来的主要开销；然后，引入UB中转与32×32分块，将非连续GM写转移为UB内转置访问；接着，对比按tile分组启动线程块（Thread Block）与固定Thread Block数两种映射方式，并结合2048线程配置下的寄存器溢出分析线程数选择；随后，通过UB padding消除转置读阶段的bank冲突；最终，借助双缓冲去除循环尾部同步，完整呈现SIMT矩阵转置的调优路径。
+本样例以矩阵转置为例，介绍Ascend C SIMT编程方式下的访存优化思路。首先，通过一维连续复制建立GM连续读写的性能基线，并用直接全局内存转置暴露非连续写带来的主要开销；然后，引入UB中转与32×32分块，将非连续GM写转移为UB内转置访问；接着，对比按tile分组启动线程块（Thread Block）与固定线程块数两种配置方式，并结合2048线程配置下的寄存器溢出分析线程数选择；随后，通过UB padding消除转置读阶段的bank冲突；最终，借助双缓冲去除循环尾部同步，完整呈现SIMT矩阵转置的调优路径。
 
 ## 支持的产品
 
@@ -55,7 +55,7 @@
 | 0    | `copy_kernel`                     | `core`            | 2048               | 建立连续读写的耗时基线                                                      |
 | 1    | `copy_kernel`                     | `core`            | 1024               | 仅降低线程数，与Case 5、Case 6、Case 7的启动配置一致                        |
 | 2    | `transpose_naive_kernel`          | `core`            | 2048               | 直接在GM中完成转置                                                          |
-| 3    | `transpose_ub_2tile_naive_kernel` | `ceil(tiles / 2)` | 2048               | 引入UB与32×32分块，按切分后的tile数量设置Thread Block数                    |
+| 3    | `transpose_ub_2tile_naive_kernel` | `ceil(tiles / 2)` | 2048               | 引入UB与32×32的tile分块，按切分后的tile数量设置Thread Block数              |
 | 4    | `transpose_ub_2tile_kernel`       | `core`            | 2048               | Thread Block数固定为硬件vector core数，单个Thread Block循环处理多个tile分组 |
 | 5    | `transpose_ub_kernel`             | `core`            | 1024               | 改为1024线程，单个Thread Block循环处理多个32×32的tile                      |
 | 6    | `transpose_ub_pad_kernel`         | `core`            | 1024               | UB tile增加2列padding，消除转置读阶段的bank冲突                             |
@@ -128,7 +128,7 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void copy_kernel(float* output, 
 
 **分析**：
 
-Case 0/1只执行连续读写，不涉及坐标交换、UB中转和Thread Block内同步，主要用于实测当前硬件在该数据规模下的GM连续搬运能力。1024×1024的float矩阵复制需要从GM读取4MB数据并写回4MB数据，读写总数据量为：
+Case 0/1只执行连续读写，不涉及坐标交换、UB中转和Thread Block内同步，主要用于实测当前硬件在该数据规模下的GM连续搬运能力。1024×1024的float矩阵复制需要从GM读取4MB数据并写入4MB数据，读写总数据量为：
 
 $$
 D = 1024 \times 1024 \times 4B \times 2 = 8.39MB
@@ -165,7 +165,7 @@ output[col * height + row] = input[i];
 
 **分析**：
 
-Case 2在保持GM连续读取的同时，直接把数据写入转置后的输出位置，导致同一Warp内相邻线程的写地址分布到输出矩阵的不同行。相比Case 0的连续复制基线，Task Duration从6.262μs增加到36.337μs，约为复制基线的5.8倍。由于矩阵转置本身计算量很小，这一差距主要来自GM非连续写。后续优化需要把非连续访问从GM转移到UB，使GM读写转变为连续访问模式。
+Case 2在保持GM连续读取的同时，直接将数据写入转置后的输出位置，导致同一Warp内相邻线程的写地址分布到输出矩阵的不同行。相比Case 0的连续复制基线，Task Duration从6.262μs增加到36.337μs，约为复制基线的5.8倍。由于矩阵转置本身计算量很小，这一差距主要来自GM非连续写。后续优化需要将非连续访问从GM转移到UB，使GM读写转变为连续访问模式。
 
 ---
 
@@ -173,15 +173,15 @@ Case 2在保持GM连续读取的同时，直接把数据写入转置后的输出
 
 **优化目标**：引入UB与分块，将Case 2的非连续全局内存写转换为UB内访问，使全局内存读写均恢复连续；本Case按切分后的tile数量设置Thread Block数，每个Thread Block处理两个32×32的tile。
 
-**核心实现**：将矩阵划分为32×32的tile，总tile数为 `tiles=(W/32)×(H/32)`。本Case中每个Thread Block启动2048个线程，可同时处理两个tile，因此Thread Block数量设置为 `blocks_per_grid=ceil(tiles / 2)`。线程配置参数为 `dim3(32,64,1)`，其中 `threadIdx.y=0..31`的线程处理第一个tile，`threadIdx.y=32..63`的线程处理第二个tile；代码通过 `local_tile=threadIdx.y>>5`得到当前线程在Thread Block内负责的tile编号，通过 `ty=threadIdx.y&31`得到tile内行索引。线程先将tile按原布局写入UB，经 [`asc_syncthreads()`](../../../../../docs/zh/api/SIMT-API/同步与内存栅栏/同步接口/asc_syncthreads.md) 同步后，再按转置方向从UB读出并连续写回GM。
+**核心实现**：将矩阵划分为32×32的tile，总tile数为 `tiles=(W/32)×(H/32)`。本Case中每个Thread Block启动2048个线程，可同时处理两个tile，因此Thread Block数量设置为 `blocks_per_grid=ceil(tiles / 2)`。线程配置参数为 `dim3(32,64,1)`，其中 `threadIdx.y=0..31`的线程处理第一个tile，`threadIdx.y=32..63`的线程处理第二个tile；代码通过 `local_tile=threadIdx.y>>5`得到当前线程在Thread Block内负责的tile编号，通过 `ty=threadIdx.y&31`得到tile内行索引。线程先将tile按原布局写入UB，经 [`asc_syncthreads()`](../../../../../docs/zh/api/SIMT-API/同步与内存栅栏/同步接口/asc_syncthreads.md) 同步后，再按转置方向从UB读取并连续写入GM。
 
-UB中转的核心思想如下图所示：GM读取阶段按输入矩阵行方向连续搬入UB；GM写回阶段交换输出tile坐标，使同一个Warp写出输出矩阵的一行。原本非连续的GM写被转移为UB内转置方向读取。
+UB中转的核心思想如下图所示：GM读取阶段按输入矩阵行方向连续读取至UB；GM写入阶段交换输出tile坐标，使同一个Warp向输出矩阵的一行写入数据。原本非连续的GM写被转移为UB内转置方向读取。
 
 **图2　Case 3 UB中转转置数据流向示意图**
 
 <img src="./figures/case3.png" width="60%">
 
-Case 2的直接逐元素写回需要交换行列坐标，输出地址会沿列方向跨行分散，这是直接全局内存转置的主要问题。引入分块后，处理粒度从单个元素变为局部tile：线程先按输入矩阵的行方向把tile连续读入UB，再从UB中按转置方向取数，最后按输出矩阵的行方向连续写回GM。这样，转置带来的不连续访问被限制在UB内部，GM读写都保持连续访问模式。
+Case 2的直接逐元素写入需要交换行列坐标，输出地址会沿列方向跨行分散，这是直接全局内存转置的主要问题。引入分块后，处理粒度从单个元素变为局部tile：线程先按输入矩阵的行方向将tile连续读入UB，再从UB中按转置方向读取数据，最后按输出矩阵的行方向连续写入GM。这样，转置带来的不连续访问被限制在UB内部，GM读写都保持连续访问模式。
 
 tile大小选为32×32，是因为 `threadIdx.x`方向的32个线程可以对应tile内一行元素，使一个Warp的GM读写访问覆盖32个连续float；同时32×32的tile含1024个元素，便于在1024线程配置下由一个Thread Block处理一个tile，或在2048线程配置下由一个Thread Block处理两个tile。
 
@@ -220,7 +220,7 @@ Case 3通过UB中转把非连续GM写转换为UB内转置读取，Task Duration�
 
 **优化目标**：将Case 3的线程块数量从切分后的tile分组数改为硬件vector core数，每个Thread Block通过循环处理多个tile分组，并观察2048线程配置下的寄存器使用情况。
 
-**核心实现**：每个Thread Block启动2048个线程，配置参数为 `dim3(32,64,1)`。循环每轮会同时处理两个连续的32×32的tile：`threadIdx.y=0..31`的线程处理第一个tile，`threadIdx.y=32..63`的线程处理第二个tile；下一轮按 `gridDim.x*2`跳到后续tile分组。
+**核心实现**：每个Thread Block启动2048个线程，配置参数为 `dim3(32,64,1)`。循环每轮会同时处理两个连续的32×32的tile：`threadIdx.y=0..31`的线程处理第一个tile，`threadIdx.y=32..63`的线程处理第二个tile；下一轮按 `gridDim.x*2`处理后续tile分组。
 
 ```cpp
 __ubuf__ float tile[TILES_PER_BLOCK][TILE_DIM][TILE_DIM];
@@ -239,13 +239,13 @@ asc_syncthreads();
 
 **分析**：
 
-Case 4将Thread Block数固定为硬件vector core数。相比Case 3启动512个Thread Block的写法，Case 4需要启动和调度的线程块数量更少，Task Duration由28.190μs降至27.113μs。增加 `--cce-res-usage` 编译选项后，可以在编译日志中看到寄存器和栈的使用情况，Case 4的输出如下：
+Case 4将Thread Block数固定为硬件vector core数。相比Case 3启动512个Thread Block的实现，Case 4需要启动和调度的线程块数量更少，Task Duration由28.190μs降至27.113μs。增加 `--cce-res-usage` 编译选项后，可以在编译日志中查看寄存器和栈的使用情况，Case 4的输出如下：
 
 ```text
 [BISHENG] Function properties for _Z25transpose_ub_2tile_kernelPfPKfjjj_simt_entry: Stack size: 24 bytes, Used register number: 16
 ```
 
-该输出说明Case 4已经出现寄存器溢出。Case 4与Case 3同为2048线程配置，但Case 4将Thread Block数固定为硬件vector core数后，需要在kernel内部通过循环处理多个tile分组，索引更新逻辑比Case 3更复杂，需要维护的中间变量更多；同时 `__launch_bounds__(2048)`限制了每个线程最多可使用16个寄存器，寄存器不足后部分变量会落到栈上，引入额外访存。寄存器溢出会抵消固定Thread Block数带来的收益，Case 5改用1024线程配置，让一个Thread Block每轮只处理一个tile，先消除寄存器溢出。
+该输出说明Case 4已经出现寄存器溢出。Case 4与Case 3同为2048线程配置，但Case 4将Thread Block数固定为硬件vector core数后，需要在kernel内部通过循环处理多个tile分组，索引更新逻辑比Case 3更复杂，需要维护的中间变量更多；同时 `__launch_bounds__(2048)`限制了每个线程最多可使用16个寄存器，寄存器不足后部分变量会落到栈上，引入额外访存。寄存器溢出会抵消固定Thread Block数带来的收益，Case 5改用1024线程配置，使一个Thread Block每轮只处理一个tile，先消除寄存器溢出。
 
 ---
 
@@ -253,7 +253,7 @@ Case 4将Thread Block数固定为硬件vector core数。相比Case 3启动512个
 
 **优化目标**：改为1024线程，将单轮处理粒度调整为一个32×32的tile，确定后续优化的基础配置。
 
-**核心实现**：在Case 4的基础上改为每个Thread Block启动1024个线程，配置参数为 `dim3(32,32,1)`。一个32×32的tile包含1024个元素，因此一个Thread Block在循环每轮正好处理一个tile；下一轮按 `gridDim.x`跳到后续tile。
+**核心实现**：在Case 4的基础上改为每个Thread Block启动1024个线程，配置参数为 `dim3(32,32,1)`。一个32×32的tile包含1024个元素，因此一个Thread Block在循环每轮恰好处理一个tile；下一轮按 `gridDim.x`处理后续tile。
 
 ```cpp
 __ubuf__ float tile[TILE_DIM][TILE_DIM];
@@ -274,7 +274,7 @@ asc_syncthreads();
 
 改为1024线程后，Stack size归零，没有寄存器溢出现象，Task Duration为23.912μs，优于Case 4的2048线程版本，说明1024线程更适合该转置实现。此时aiv_time已经接近Task Duration，线程块启动和调度开销占比已经较小；相对Case 2的直接转置（36.337μs），UB中转将非连续全局内存写转换为UB内访问，配合固定Thread Block数的循环处理方式，耗时下降约34%。
 
-在当前配置下，寄存器溢出已经消除，Thread Block启动和调度开销占比也较小，下一步需要关注UB内部访问开销。写回阶段需要按转置方向读取 `tile[tx][ty]`，也就是按列访问32×32的UB tile，容易产生bank冲突，因此后续需要优先解决转置读阶段的UB bank冲突问题。
+在当前配置下，寄存器溢出已经消除，Thread Block启动和调度开销占比也较小，下一步需要关注UB内部访问开销。GM写入阶段需要按转置方向读取 `tile[tx][ty]`，即按列访问32×32的UB tile，容易产生bank冲突，因此后续需要优先解决转置读阶段的UB bank冲突问题。
 
 ---
 
@@ -286,7 +286,7 @@ asc_syncthreads();
 
 - GM到UB阶段与Case 5完全一致。
 - 差异只在UB布局，从32×32改成32×34。
-- 同步后，从UB写回GM与Case 5完全一致。
+- 同步后，从UB写入GM与Case 5完全一致。
 - 该版本没有改变算法路径，也没有改变Thread Block和线程切分，只是调整了UB中的物理布局。
 
 下面以Ascend 950PR/Ascend 950DT的UB划分规则为例，说明本样例中bank冲突是如何产生的，以及Case 5和Case 6理论上的冲突强度差异。
@@ -304,7 +304,7 @@ SIMT编程方式下，bank冲突为更细粒度的subbank冲突，主要有以�
 
 <img src="./figures/bank结构示意图.png">
 
-Case 5中UB的tile数组按照行优先存储。按照地址低位交织规则，tile数组的第一行刚好覆盖bank0～bank3，第二行覆盖bank4～bank7，第三行覆盖bank8～bank11，其余行依次类推。每行32个float数据会恰好跨越4个bank存储。Case 5中，一个Warp的线程会读取tile的一列元素写回GM输出；访问UB时，32个线程会集中访问两个bank group的subbank0，属于读读冲突场景。
+Case 5中UB的tile数组按照行优先存储。按照地址低位交织规则，tile数组的第一行刚好覆盖bank0～bank3，第二行覆盖bank4～bank7，第三行覆盖bank8～bank11，其余行依次类推。每行32个float数据会恰好跨越4个bank存储。Case 5中，一个Warp的线程会读取tile的一列元素并写入GM输出矩阵；访问UB时，32个线程会集中访问两个bank group的subbank0，属于读读冲突场景。
 
 **图4　Case5 tile在UB上的排布示意图**
 
@@ -335,7 +335,7 @@ asc_syncthreads();
 
 **分析**：
 
-相对Case 5的23.912μs，padding将Task Duration降至15.152μs，下降约37%。该优化仅调整UB物理布局，不改变GM读写坐标和算法路径，说明转置读阶段的bank冲突是Case 5的主要瓶颈。消除bank冲突后，每轮循环仍保留load后和store后两次同步，同步开销成为后续可压缩的部分。
+相对Case 5的23.912μs，padding将Task Duration降至15.152μs，下降约37%。该优化仅调整UB物理布局，不改变GM读写坐标和算法路径，说明转置读阶段的bank冲突是Case 5的主要瓶颈。消除bank冲突后，每轮循环仍保留数据加载后和GM写入后两次同步，后续可进一步降低同步开销。
 
 ---
 
@@ -343,7 +343,7 @@ asc_syncthreads();
 
 **优化目标**：去除Case 6每轮循环末尾的 `asc_syncthreads()`，减少同步开销。
 
-**核心实现**：Case 6每轮循环包含两次同步：load后一次，保证tile写满后再按转置方向读出；store后一次，保证转置读取完成后再进入下一轮load，避免下一轮load覆盖仍在被读取的tile。本版本使用两份带padding的UB tile，按 `cnt`轮换：下一轮load写入另一份buffer，不会覆盖当前轮正在被读取的buffer，因此可安全去除尾部同步，每轮仅保留一次同步。
+**核心实现**：Case 6每轮循环包含两次同步：数据加载到UB后进行一次同步，确保当前tile全部写入UB后再执行转置方向读取；数据写入GM后进行一次同步，确保当前tile的转置读取完成后再进入下一轮数据加载，避免下一轮数据加载覆盖仍在被读取的UB tile。本版本使用两份带padding的UB tile，并按 `cnt`选择当前轮使用的buffer。去除循环尾部同步后，当前轮GM写入阶段可以与下一轮数据加载前的地址计算及GM读取阶段重叠执行，因此每轮仅需保留数据加载后的同步。
 
 ```cpp
 __ubuf__ float tile[2][TILE_DIM][TILE_PAD_STRIDE]; // 双缓冲：轮换缓冲区，去除尾部同步
@@ -351,7 +351,7 @@ uint32_t cnt = 0;
 for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x) {
     ...
     tile[cnt][ty][tx] = input[x_index + y_index * width];
-    asc_syncthreads(); // 保留load后的同步
+    asc_syncthreads(); // 保留数据加载后的同步
     output[x_index + y_index * height] = tile[cnt][tx][ty];
     cnt ^= 1; // 切换到下一份buffer
 }
@@ -367,7 +367,7 @@ for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x)
 
 相对Case 6的15.152μs，去除每轮循环末尾的同步后Task Duration降至12.074μs，下降约20%。在1024×1024矩阵、64个Thread Block的配置下，每个Thread Block需要循环处理16个tile，双缓冲相当于每个Thread Block减少16次Thread Block内同步。该方法的代价是额外占用一份UB tile（共两份32×34），但未引入寄存器溢出。Case 7是本样例中耗时最低的SIMT转置版本，相对Case 0复制基线（6.262μs）约为1.9倍。
 
-Case 6与Case 7的仿真指令流水图分别如图6、图7所示。Case 6每轮循环受尾部 `asc_syncthreads()` 约束，当前轮的写回必须全部完成后才能进入下一轮，下一轮load前的运算与GM读取只能串行等待。Case 7借助双缓冲轮换两份UB tile，去除尾部同步后，当前轮的GM写回与下一轮load前的运算、以及下一轮的GM读取重叠执行，load与compute之间的串行等待被压缩。这也是Task Duration相对Case 6进一步下降的主要原因。
+Case 6与Case 7的仿真指令流水图分别如图6、图7所示，其中耗时最多的SIMT_LDG和SIMT_STG分别为SIMT编程模式下从GM读取数据和向GM写入数据的指令。Case 6每轮循环受尾部 `asc_syncthreads()` 约束，当前轮GM写入阶段完成后才能进入下一轮循环，下一轮数据加载前的地址计算与GM读取阶段需要串行执行。Case 7通过双缓冲轮换两份UB tile，去除尾部同步后，当前轮GM写入阶段可与下一轮数据加载前的地址计算以及GM读取阶段重叠执行，减少数据加载阶段与地址计算阶段之间的同步等待。因此，Case 7的Task Duration相对Case 6进一步下降。
 
 **图6　Case 6仿真指令流水图**
 
@@ -399,7 +399,7 @@ Case 6与Case 7的仿真指令流水图分别如图6、图7所示。Case 6每轮
 
 ## 调优建议
 
-访存类算子调优时，建议先用连续复制确认当前规模下的GM搬运上限，再用最直接的实现暴露主要差距。本样例中，直接转置与复制基线的差距主要来自非连续GM写，因此优化方向不是增加计算并行度，而是重排访存：以32×32的tile为单位连续读入UB，在UB内完成转置方向读取，再按输出矩阵行方向连续写回GM。
+访存类算子调优时，建议先用连续复制确认当前规模下的GM搬运上限，再用最直接的实现暴露主要差距。本样例中，直接转置与复制基线的差距主要来自非连续GM写，因此优化方向不是增加计算并行度，而是重排访存：以32×32的tile为单位连续读入UB，在UB内完成转置方向读取，再按输出矩阵行方向连续写入GM。
 
 分块后需要先确定Thread Block到tile的映射方式。按切分后的tile分组启动Thread Block实现简单，但当tile数远大于硬件vector core数时，会带来额外的启动和调度开销；将Thread Block数固定为硬件vector core数，并在kernel内循环处理多个tile，可以降低这部分开销。线程数也不能只参考连续搬运场景，高线程数会限制每个线程可使用的寄存器数量，索引逻辑变复杂后可能出现寄存器溢出，需要结合 `--cce-res-usage` 和实测耗时选择。
 
@@ -429,8 +429,6 @@ Case 6与Case 7的仿真指令流水图分别如图6、图7所示。Case 6每轮
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # 编译工程
   ./matrix_transpose                                                        # 执行样例
   ```
-
-  程序第一个参数为方阵边长，必须为32的整数倍。
 - 编译选项说明
 
   | 选项                        | 可选值       | 说明                                                       |
@@ -469,3 +467,30 @@ msopprof ./matrix_transpose   # 分析case的性能
 ├── ResourceConflictRatio.csv  // UB bank group、bank conflict和资源冲突率
 └── visualize_data.bin         // MindStudio Insight呈现文件
 ```
+
+## 仿真调优
+
+可以使用 `msopprof simulator` 进行仿真性能分析，生成可视化的指令流水图等信息。命令如下：
+
+```bash
+SCENARIO_NUM=7                                                                     # 选择执行场景，可选0-7
+mkdir -p build && cd build;                                                        # 创建并进入build目录
+cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # 编译工程
+msopprof simulator --soc-version=<soc_version> ./matrix_transpose
+```
+
+> 使用仿真调优功能前，需要在 `CMakeLists.txt` 中添加 `-g` 编译选项，用于生成调试信息，使仿真器能够采集指令流水图。`soc_version` 获取方式及仿真调优其他说明可参考[仿真调优样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/01_utilities/07_simulator)。
+
+命令完成后，会在当前目录下生成以 `OPPROF_{timestamp}_XXX` 命名的文件夹，产物结构如下：
+
+```text
+OPPROF_{timestamp}_XXX/
+├── dump                    // 原始性能数据，用户无需关注
+└── simulator
+    ├── core*.veccore*/     // 各向量核的仿真指令流水图文件
+    └── visualize_data.bin  // MindStudio Insight呈现文件
+```
+
+执行后，可以在 **MindStudio Insight** 中打开 `visualize_data.bin` 查看可视化指令流水图。
+
+更多 `msOpProf` 工具使用方法，请参见[MindStudio工具调优（msOpProf）快速入门](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/quick_start/msopprof_quick_start.md)。

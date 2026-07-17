@@ -56,7 +56,7 @@ This example constructs an optimization path through 8 cases. The kernel, thread
 | 0 | `copy_kernel` | `core` | 2048 | Establish a latency baseline for contiguous read/write |
 | 1 | `copy_kernel` | `core` | 1024 | Only reduce the thread count, matching the launch configuration of Case 5, Case 6, and Case 7 |
 | 2 | `transpose_naive_kernel` | `core` | 2048 | Directly perform transpose in GM |
-| 3 | `transpose_ub_2tile_naive_kernel` | `ceil(tiles / 2)` | 2048 | Introduce UB and 32x32 tiling, setting the thread block count according to the number of partitioned tiles |
+| 3 | `transpose_ub_2tile_naive_kernel` | `ceil(tiles / 2)` | 2048 | Introduce UB and 32x32 tile-based tiling, setting the thread block count according to the number of partitioned tiles |
 | 4 | `transpose_ub_2tile_kernel` | `core` | 2048 | Thread block count fixed to the hardware vector core count, with each thread block looping over multiple tile groups |
 | 5 | `transpose_ub_kernel` | `core` | 1024 | Switch to 1024 threads, with each thread block looping over multiple 32x32 tiles |
 | 6 | `transpose_ub_pad_kernel` | `core` | 1024 | Add 2 columns of padding to the UB tile, eliminating bank conflicts during the transpose read phase |
@@ -172,13 +172,13 @@ Case 2 keeps the GM read contiguous while writing data directly to the transpose
 
 **Core Implementation**: The matrix is partitioned into 32x32 tiles, with the total tile count `tiles=(W/32)x(H/32)`. In this case, each thread block launches 2048 threads and can process two tiles at the same time, so the thread block count is set to `blocks_per_grid=ceil(tiles / 2)`. The thread configuration is `dim3(32,64,1)`, where `threadIdx.y=0..31` processes the first tile and `threadIdx.y=32..63` processes the second tile; the code obtains the tile index handled by the current thread within the thread block via `local_tile=threadIdx.y>>5`, and the in-tile row index via `ty=threadIdx.y&31`. Threads first write the tile into UB in the original layout, and after [`asc_syncthreads()`](../../../../../docs/zh/api/SIMT-API/同步与内存栅栏/同步接口/asc_syncthreads.md) synchronization, read it from UB in the transpose direction and write it back to GM contiguously.
 
-The core idea of UB staging is shown in the figure below: in the GM read phase, the tile is contiguously loaded into UB row by row according to the input matrix layout; in the GM write-back phase, the output tile coordinates are swapped so that the same Warp writes out one row of the output matrix. The originally non-contiguous GM write is transferred to a transpose-direction read within UB.
+The core idea of UB staging is shown in the figure below: in the GM read phase, the tile is contiguously loaded into UB row by row according to the input matrix layout; in the GM writing phase, the output tile coordinates are swapped so that the same Warp writes one row of the output matrix. The originally non-contiguous GM write is transferred to a transpose-direction read within UB.
 
 **Figure 2: Case 3 UB staging transpose data flow**
 
 <img src="./figures/case3.png" width="60%">
 
-The direct element-wise write-back in Case 2 needs to swap row and column coordinates, so output addresses stride across rows by column. This is the main issue with direct global memory transpose. After tiling, the processing granularity changes from a single element to a local tile: threads first contiguously load the tile into UB row by row according to the input matrix layout, then read from UB in the transpose direction, and finally write back to GM contiguously row by row according to the output matrix layout. This confines the non-contiguous access introduced by transpose to within UB, while GM read and write both maintain contiguous access patterns.
+The direct element-wise GM write in Case 2 needs to swap row and column coordinates, so output addresses stride across rows by column. This is the main issue with direct global memory transpose. After tiling, the processing granularity changes from a single element to a local tile: threads first contiguously load the tile into UB row by row according to the input matrix layout, then read from UB in the transpose direction, and finally write to GM contiguously row by row according to the output matrix layout. This confines the non-contiguous access introduced by transpose to within UB, while GM read and write both maintain contiguous access patterns.
 
 The tile size is chosen as 32x32 because the 32 threads in the `threadIdx.x` direction can correspond to one row of elements within the tile, so that GM read/write access of one Warp covers 32 contiguous floats. At the same time, a 32x32 tile contains 1024 elements, making it convenient for one thread block to process one tile under the 1024-thread configuration, or two tiles under the 2048-thread configuration.
 
@@ -217,7 +217,7 @@ Case 3 converts the non-contiguous GM write into a UB-internal transpose read th
 
 **Optimization Goal**: Change the thread block count of Case 3 from the tile group count after partitioning to the hardware vector core count, with each thread block processing multiple tile groups in a loop, and observe register usage under the 2048-thread configuration.
 
-**Core Implementation**: Each thread block launches 2048 threads with configuration `dim3(32,64,1)`. Each loop iteration processes two contiguous 32x32 tiles simultaneously: `threadIdx.y=0..31` processes the first tile, and `threadIdx.y=32..63` processes the second tile; the next iteration jumps to the subsequent tile group by `gridDim.x*2`.
+**Core Implementation**: Each thread block launches 2048 threads with configuration `dim3(32,64,1)`. Each loop iteration processes two contiguous 32x32 tiles simultaneously: `threadIdx.y=0..31` processes the first tile, and `threadIdx.y=32..63` processes the second tile; the next iteration processes the subsequent tile group by `gridDim.x*2`.
 
 ```cpp
 __ubuf__ float tile[TILES_PER_BLOCK][TILE_DIM][TILE_DIM];
@@ -250,7 +250,7 @@ This output indicates that Case 4 already has register spill. Both Case 4 and Ca
 
 **Optimization Goal**: Switch to 1024 threads, adjusting the per-iteration granularity to one 32x32 tile, establishing the baseline configuration for subsequent optimizations.
 
-**Core Implementation**: Based on Case 4, each thread block launches 1024 threads with configuration `dim3(32,32,1)`. One 32x32 tile contains 1024 elements, so one thread block processes exactly one tile per loop iteration; the next iteration jumps to the subsequent tile by `gridDim.x`.
+**Core Implementation**: Based on Case 4, each thread block launches 1024 threads with configuration `dim3(32,32,1)`. One 32x32 tile contains 1024 elements, so one thread block processes exactly one tile per loop iteration; the next iteration processes the subsequent tile by `gridDim.x`.
 
 ```cpp
 __ubuf__ float tile[TILE_DIM][TILE_DIM];
@@ -271,7 +271,7 @@ asc_syncthreads();
 
 After switching to 1024 threads, the Stack size drops to zero and there is no longer spill. Task Duration is 23.912μs, better than the 2048-thread version of Case 4, indicating that 1024 threads is more suitable for this transpose implementation. At this point aiv_time is already close to Task Duration, and thread block launch and scheduling overhead accounts for a small share. Compared to the direct transpose of Case 2 (36.337μs), UB staging converts the non-contiguous global memory write into UB-internal access, and combined with the loop processing of a fixed thread block count, latency decreases by approximately 34%.
 
-In the current configuration, register spill has been eliminated and thread block launch and scheduling overhead already accounts for a small share, so the next issue to focus on is the UB-internal access overhead. During the write-back phase, the kernel needs to read `tile[tx][ty]` in the transpose direction, that is, access the 32x32 UB tile by column. This is prone to bank conflicts, so subsequent optimization should first address UB bank conflicts during the transpose read phase.
+In the current configuration, register spill has been eliminated and thread block launch and scheduling overhead already accounts for a small share, so the next issue to focus on is the UB-internal access overhead. During the GM writing phase, the kernel needs to read `tile[tx][ty]` in the transpose direction, that is, access the 32x32 UB tile by column. This is prone to bank conflicts, so subsequent optimization should first address UB bank conflicts during the transpose read phase.
 
 ---
 
@@ -283,7 +283,7 @@ In the current configuration, register spill has been eliminated and thread bloc
 
 - The GM-to-UB phase is identical to Case 5.
 - The only difference is the UB layout, changed from 32x32 to 32x34.
-- After synchronization, the UB-to-GM write-back is identical to Case 5.
+- After synchronization, the UB-to-GM writing path is identical to Case 5.
 - This version does not change the algorithm path, nor the thread block and thread partitioning; it only adjusts the physical layout in UB.
 
 The following uses the UB partitioning rules of Ascend 950PR/Ascend 950DT as an example to explain how bank conflicts arise in this example, and the theoretical conflict intensity differences between Case 5 and Case 6.
@@ -301,7 +301,7 @@ For detailed low-bit UB address interleaving rules and conflict scenarios, see t
 
 <img src="./figures/bank结构示意图.png">
 
-In Case 5, the tile array in UB is stored in row-major order. According to the low-bit address interleaving rule, the first row of the tile array covers bank0 through bank3, the second row covers bank4 through bank7, the third row covers bank8 through bank11, and the remaining rows follow the same pattern. Each row of 32 float elements spans exactly 4 banks. In Case 5, one Warp of threads reads one column of the tile and writes it back to GM output; when accessing UB, the 32 threads concentrate on subbank 0 in two bank groups, which is a read-read conflict scenario.
+In Case 5, the tile array in UB is stored in row-major order. According to the low-bit address interleaving rule, the first row of the tile array covers bank0 through bank3, the second row covers bank4 through bank7, the third row covers bank8 through bank11, and the remaining rows follow the same pattern. Each row of 32 float elements spans exactly 4 banks. In Case 5, one Warp of threads reads one column of the tile and writes it to the GM output matrix; when accessing UB, the 32 threads concentrate on subbank 0 in two bank groups, which is a read-read conflict scenario.
 
 **Figure 4: Case 5 tile layout in UB**
 
@@ -332,7 +332,7 @@ asc_syncthreads();
 
 **Analysis**:
 
-Compared to 23.912μs in Case 5, padding reduces Task Duration to 15.152μs, a decrease of approximately 37%. This optimization only adjusts the UB physical layout, without changing the GM read/write coordinates or the algorithm path, indicating that bank conflicts during the transpose read phase are the main bottleneck of Case 5. After eliminating bank conflicts, each loop iteration still retains two synchronizations, after load and after store. The synchronization overhead becomes the next compressible part.
+Compared to 23.912μs in Case 5, padding reduces Task Duration to 15.152μs, a decrease of approximately 37%. This optimization only adjusts the UB physical layout, without changing the GM read/write coordinates or the algorithm path, indicating that bank conflicts during the transpose read phase are the main bottleneck of Case 5. After eliminating bank conflicts, each loop iteration still retains two synchronizations, one after data loading and one after GM writing. The synchronization overhead can be further reduced.
 
 ---
 
@@ -340,7 +340,7 @@ Compared to 23.912μs in Case 5, padding reduces Task Duration to 15.152μs, a d
 
 **Optimization Goal**: Remove the `asc_syncthreads()` at the end of each loop iteration in Case 6, reducing synchronization overhead.
 
-**Core Implementation**: Each loop iteration in Case 6 has two synchronizations: one after load, to ensure the tile is fully written before reading in the transpose direction; and one after store, to ensure the transpose read is complete before entering the next load, preventing the next load from overwriting the tile still being read. This version uses two padded UB tiles, rotated by `cnt`: the next load writes to the other buffer, which does not overwrite the buffer being read in the current iteration, so the trailing synchronization can be safely removed, keeping only one synchronization per iteration.
+**Core Implementation**: Each loop iteration in Case 6 has two synchronizations: one after data loading into UB, to ensure that the current tile is fully written to UB before the transpose-direction read starts; and one after GM writing, to ensure that the transpose read of the current tile is complete before the next data loading phase starts. This prevents the next data loading phase from overwriting the UB tile that is still being read. This version uses two padded UB tiles and selects the buffer for the current iteration by `cnt`. After the trailing synchronization is removed, the GM writing phase of the current iteration can overlap with the address computation before data loading and the GM read phase of the next iteration. Therefore, only the synchronization after data loading is retained in each iteration.
 
 ```cpp
 __ubuf__ float tile[2][TILE_DIM][TILE_PAD_STRIDE]; // two-buffer rotation: rotate buffers and remove trailing synchronization
@@ -348,7 +348,7 @@ uint32_t cnt = 0;
 for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x) {
     ...
     tile[cnt][ty][tx] = input[x_index + y_index * width];
-    asc_syncthreads(); // Keep the synchronization after load
+    asc_syncthreads(); // Keep the synchronization after data loading
     output[x_index + y_index * height] = tile[cnt][tx][ty];
     cnt ^= 1; // Switch to the next buffer
 }
@@ -364,7 +364,7 @@ for (uint32_t tile_id = blockIdx.x; tile_id < total_tiles; tile_id += gridDim.x)
 
 Compared to 15.152μs in Case 6, after removing the synchronization at the end of each loop iteration, Task Duration drops to 12.074μs, a decrease of approximately 20%. Under the 1024x1024 matrix and 64 thread block configuration, each thread block needs to loop over 16 tiles, so double buffering is equivalent to each thread block reducing 16 thread block synchronizations. The cost of this method is an extra UB tile (two 32x34 tiles in total), but it does not introduce register spill. Case 7 is the lowest-latency SIMT transpose version in this example, approximately 1.9x the Case 0 copy baseline (6.262μs).
 
-The simulation instruction pipeline diagrams of Case 6 and Case 7 are shown in Figure 6 and Figure 7, respectively. In Case 6, each loop iteration is constrained by the trailing `asc_syncthreads()`: the write-back of the current iteration must fully complete before the next iteration can start, so the computation before the next load and the GM read of the next iteration can only wait serially. In Case 7, by rotating two UB tiles through double buffering and removing the trailing synchronization, the GM write-back of the current iteration overlaps with the computation before the next load and the GM read of the next iteration, compressing the serial wait between load and compute. This is also the main reason why Task Duration drops further relative to Case 6.
+The simulation instruction pipeline diagrams of Case 6 and Case 7 are shown in Figure 6 and Figure 7, respectively. The most time-consuming instructions, SIMT_LDG and SIMT_STG, are the instructions for reading data from GM and writing data to GM in SIMT programming mode. In Case 6, each loop iteration is constrained by the trailing `asc_syncthreads()`. The next iteration can start only after the GM writing phase of the current iteration is complete, so the address computation before data loading and the GM read phase of the next iteration must execute serially. In Case 7, double buffering rotates two UB tiles and removes the trailing synchronization. As a result, the GM writing phase of the current iteration can overlap with the address computation before data loading and the GM read phase of the next iteration, reducing the synchronization wait between the data loading phase and the address computation phase. Therefore, the Task Duration of Case 7 further decreases compared with Case 6.
 
 **Figure 6: Case 6 simulation instruction pipeline diagram**
 
@@ -396,7 +396,7 @@ The simulation instruction pipeline diagrams of Case 6 and Case 7 are shown in F
 
 ## Tuning Recommendations
 
-When tuning memory-access operators, use contiguous copy first to confirm the GM transfer upper bound at the current data scale, and then use the most direct implementation to expose the main performance gap. In this example, the gap between direct transpose and the copy baseline mainly comes from non-contiguous GM writes. Therefore, the optimization direction is not to increase compute parallelism, but to reorganize memory access: contiguously load data into UB by 32x32 tiles, read data in the transpose direction within UB, and then write data back contiguously by rows of the output matrix.
+When tuning memory-access operators, use contiguous copy first to confirm the GM transfer upper bound at the current data scale, and then use the most direct implementation to expose the main performance gap. In this example, the gap between direct transpose and the copy baseline mainly comes from non-contiguous GM writes. Therefore, the optimization direction is not to increase compute parallelism, but to reorganize memory access: contiguously load data into UB by 32x32 tiles, read data in the transpose direction within UB, and then write data to GM contiguously by rows of the output matrix.
 
 After tiling, first determine the mapping from Thread Blocks to tiles. Launching Thread Blocks by partitioned tile groups is simple, but when the tile count is much larger than the hardware vector core count, it introduces extra launch and scheduling overhead. Fixing the Thread Block count to the hardware vector core count and processing multiple tiles in a loop inside the kernel can reduce this overhead. The thread count cannot be selected only according to the contiguous transfer scenario. A high thread count limits the number of registers available to each thread. When the index logic becomes more complex, register spill may occur, so select the thread count based on both `--cce-res-usage` and measured latency.
 
@@ -424,8 +424,6 @@ Run the following steps in the root directory of this example to build and execu
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # Build the project
   ./matrix_transpose                                                        # Run the example
   ```
-
-  The first argument of the program is the square matrix side length, which must be an integer multiple of 32.
 
 - Build Options Description
 
@@ -464,3 +462,30 @@ After the command completes, a folder named `OPPROF_{timestamp}_XXX` is generate
 ├── ResourceConflictRatio.csv  # UB bank group, bank conflict, and resource conflict ratio
 └── visualize_data.bin         # MindStudio Insight presentation file
 ```
+
+## Simulation Tuning
+
+Use `msopprof simulator` to perform simulation performance analysis and generate visualized instruction pipeline diagrams. The commands are as follows:
+
+```bash
+SCENARIO_NUM=7                                                                     # Select the execution scenario, options 0-7
+mkdir -p build && cd build;                                                        # Create and enter the build directory
+cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # Build the project
+msopprof simulator --soc-version=<soc_version> ./matrix_transpose
+```
+
+> Before using simulation tuning, add the `-g` compilation option to `CMakeLists.txt` to generate debug information. This allows the simulator to collect instruction pipeline diagrams. For how to obtain `soc_version` and for more simulation tuning information, see the [simulator sample](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/01_utilities/07_simulator).
+
+After the command completes, a folder named `OPPROF_{timestamp}_XXX` is generated in the current directory. The artifact structure is as follows:
+
+```text
+OPPROF_{timestamp}_XXX/
+├── dump                    // Raw performance data, which does not require user attention
+└── simulator
+    ├── core*.veccore*/     // Simulation instruction pipeline diagram files of each vector core
+    └── visualize_data.bin  // MindStudio Insight presentation file
+```
+
+After the command completes, open `visualize_data.bin` in **MindStudio Insight** to view the visualized instruction pipeline diagrams.
+
+For more information about how to use `msOpProf`, see [MindStudio Tool Tuning (msOpProf) Quick Start](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/quick_start/msopprof_quick_start.md).
