@@ -804,7 +804,8 @@ __aicore__ inline void FixpipeL0C2UBImpl(
     */
     if (IsScalarQuantMode(intriParams.quantPre)) {
         // deq factor of uint64 bits describe: bits[31:13] is deq value of fp32
-        SetDeqScalarDepOnMode<config>(intriParams.quantPre, intriParams.deqScalar, intriParams.fixShiftVal); // float32->uint64_t
+        SetDeqScalarDepOnMode<config>(
+            intriParams.quantPre, intriParams.deqScalar, intriParams.fixShiftVal); // float32->uint64_t
     }
     if (intriParams.preReluMode == ReluMode::NORMAL_RELU || intriParams.preReluMode == ReluMode::NO_RELU) {
         PipeBarrier<PIPE_FIX>();
