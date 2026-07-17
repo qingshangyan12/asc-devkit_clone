@@ -582,6 +582,54 @@ BINARY_SCALAR_OP_LEVEL2_IMPL(ShiftRightImpl, ShiftRights, int16_t)
 BINARY_SCALAR_OP_LEVEL2_IMPL(ShiftRightImpl, ShiftRights, uint32_t)
 BINARY_SCALAR_OP_LEVEL2_IMPL(ShiftRightImpl, ShiftRights, int32_t)
 
+/* **************************************************************************************************
+ * FusedMulsCast                                            *
+ * ************************************************************************************************* */
+// FusedMulsCast::Level 2
+
+template <typename T, typename U>
+__simd_vf__ inline void FusedMulsCastImpl(__ubuf__ T* dst, __ubuf__ U* src0, __ubuf__ U* src1, const uint32_t calCount)
+{
+    static_assert(
+        SupportType<Tuple<T, U>, Tuple<half, float>>(),
+        "Failed to check dtype in "
+        "FusedMulsCast, current api support dtype combination is src : float, dst: half, scalar: float.");
+    constexpr uint32_t sregLower = static_cast<uint32_t>(VECTOR_REG_WIDTH / sizeof(U));
+    const uint16_t repeatTime = static_cast<uint16_t>(CeilDivision(calCount, sregLower));
+    uint32_t sreg = static_cast<uint32_t>(calCount);
+    U scalar = src1[0];
+    Reg::RegTensor<T> vDstReg;
+    Reg::RegTensor<U> vSrcReg;
+    Reg::MaskReg mask;
+    for (uint16_t i = 0; i < repeatTime; ++i) {
+        mask = Reg::UpdateMask<U>(sreg);
+        Reg::DataCopy(vSrcReg, src0 + i * sregLower);
+        Reg::FusedMulsCast(vDstReg, vSrcReg, scalar, mask);
+        Reg::DataCopy<T, Reg::StoreDist::DIST_PACK_B32>(dst + i * sregLower, vDstReg, mask);
+    }
+}
+
+template <typename T, typename U>
+__simd_vf__ inline void FusedMulsCastImpl(__ubuf__ T* dst, __ubuf__ U* src, U scalar, const uint32_t calCount)
+{
+    static_assert(
+        SupportType<Tuple<T, U>, Tuple<half, float>>(),
+        "Failed to check dtype in "
+        "FusedMulsCast, current api support dtype combination is src : float, dst: half, scalar: float.");
+    constexpr uint32_t sregLower = static_cast<uint32_t>(VECTOR_REG_WIDTH / sizeof(U));
+    const uint16_t repeatTime = static_cast<uint16_t>(CeilDivision(calCount, sregLower));
+    uint32_t sreg = static_cast<uint32_t>(calCount);
+    Reg::RegTensor<T> vDstReg;
+    Reg::RegTensor<U> vSrcReg;
+    Reg::MaskReg mask;
+    for (uint16_t i = 0; i < repeatTime; ++i) {
+        mask = Reg::UpdateMask<U>(sreg);
+        Reg::DataCopy(vSrcReg, src + i * sregLower);
+        Reg::FusedMulsCast(vDstReg, vSrcReg, scalar, mask);
+        Reg::DataCopy<T, Reg::StoreDist::DIST_PACK_B32>(dst + i * sregLower, vDstReg, mask);
+    }
+}
+
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_BINARY_SCALAR_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_SCALAR_IMPL_H__)
