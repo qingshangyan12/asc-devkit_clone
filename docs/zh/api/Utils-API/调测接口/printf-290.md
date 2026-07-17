@@ -157,7 +157,7 @@ simd vf: int=1, uint=2, float=5.000000, string=AscendC
 ......
 ```
 
-## SIMT示例
+## SIMT VF调用示例
 
 ```
 #include "kernel_operator.h"
