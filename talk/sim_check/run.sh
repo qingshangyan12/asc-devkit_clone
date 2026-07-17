@@ -25,12 +25,52 @@ case "$MODE" in
   *) echo "usage: $0 <sim|npu|cpu> [--perf|--perf-only]"; exit 1;;
 esac
 
+VERBOSE="${VERBOSE:-0}"
+LOG=$PWD/build.log
+
 build() { # $1=test_mode  $2=size
     mkdir -p build && cd build
-    cmake -DCMAKE_ASC_RUN_MODE="$MODE" -DCMAKE_ASC_ARCHITECTURES="$ARCH" \
-          -DTEST_MODE="$1" -DSIZE="$2" .. >/dev/null 2>&1 || { echo "cmake FAILED"; cd ..; return 1; }
-    make -j >/dev/null 2>&1 || { echo "build FAILED"; cd ..; return 1; }
+    echo "  [build] cmake -DCMAKE_ASC_RUN_MODE=$MODE -DCMAKE_ASC_ARCHITECTURES=$ARCH -DTEST_MODE=$1 -DSIZE=$2 .."
+    if [ "$VERBOSE" = "1" ]; then
+        cmake -DCMAKE_ASC_RUN_MODE="$MODE" -DCMAKE_ASC_ARCHITECTURES="$ARCH" \
+              -DTEST_MODE="$1" -DSIZE="$2" .. 2>&1 | tee "$LOG"
+        local rc=${PIPESTATUS[0]}
+        [ $rc -ne 0 ] && { echo "  !! cmake FAILED (rc=$rc)"; cd ..; return 1; }
+        make -j 2>&1 | tee -a "$LOG"
+        rc=${PIPESTATUS[0]}
+        [ $rc -ne 0 ] && { echo "  !! make FAILED (rc=$rc)"; cd ..; return 1; }
+    else
+        # quiet, but ALWAYS surface errors on failure — never swallow them
+        if ! cmake -DCMAKE_ASC_RUN_MODE="$MODE" -DCMAKE_ASC_ARCHITECTURES="$ARCH" \
+                   -DTEST_MODE="$1" -DSIZE="$2" .. >"$LOG" 2>&1; then
+            echo "  !! cmake FAILED — last 30 lines (full log: $LOG):"
+            tail -30 "$LOG" | sed 's/^/     /'
+            cd ..; return 1
+        fi
+        if ! make -j >"$LOG" 2>&1; then
+            echo "  !! make FAILED — errors (full log: $LOG):"
+            grep -E "error:|Error|undefined|No such file" "$LOG" | head -15 | sed 's/^/     /'
+            [ -s "$LOG" ] || echo "     (log empty)"
+            cd ..; return 1
+        fi
+    fi
+    echo "  [build] ok -> $(cd "$OLDPWD/build" 2>/dev/null || true; ls -la demo 2>/dev/null | awk '{print $5" bytes"}')"
     cd ..
+}
+
+preflight() {
+    echo "=========== PREFLIGHT ==========="
+    echo "  mode=$MODE arch=$ARCH  shapes=[$SHAPES]"
+    echo "  cmake   : $(command -v cmake || echo 'MISSING')"
+    echo "  python3 : $(command -v python3 || echo 'MISSING')"
+    echo "  scipy   : $(python3 -c 'import scipy;print(scipy.__version__)' 2>&1 | head -1)"
+    echo "  ASCEND_HOME_PATH=${ASCEND_HOME_PATH:-<unset — did you source set_env.sh?>}"
+    echo "  CANN    : $(cat ${ASCEND_HOME_PATH:-/nonexistent}/*/version.info 2>/dev/null | grep -m1 Version= || echo '? (ASCEND_HOME_PATH unset or layout differs)')"
+    [ "$MODE" = "npu" ] && { echo "  npu-smi : $(command -v npu-smi || echo 'MISSING')"; npu-smi info 2>&1 | head -3 | sed 's/^/     /'; }
+    for f in CMakeLists.txt data_utils.h ndtri.asc scripts/gen_data.py; do
+        [ -f "$f" ] || echo "  !! MISSING FILE: $f"
+    done
+    echo
 }
 
 extract() { # $1=field   -> newest op_summary_*.csv under build/
@@ -56,9 +96,13 @@ run_func() {
     local fail=0
     for n in $SHAPES; do
         build 1 "$n" || { fail=1; continue; }
-        (cd build && python3 ../scripts/gen_data.py "$n" >/dev/null 2>&1)
+        if ! (cd build && python3 ../scripts/gen_data.py "$n" >"$LOG.gen" 2>&1); then
+            echo "  size=$n  !! gen_data FAILED:"; tail -12 "$LOG.gen" | sed 's/^/     /'; fail=1; continue
+        fi
+        [ "$VERBOSE" = "1" ] && grep gen_data "$LOG.gen" | sed 's/^/     /'
         local out
         out=$(cd build && ./demo 2>&1)
+        [ "$VERBOSE" = "1" ] && echo "$out" | sed 's/^/     /'
         local line
         line=$(echo "$out" | grep -E "max rel err" | head -1)
         if echo "$out" | grep -q "test pass!"; then
@@ -105,11 +149,13 @@ except Exception: print('NaN')")
     return $fail
 }
 
+preflight
 rc=0
 case "$FLAG" in
     --perf-only) run_perf || rc=1 ;;
     --perf)      run_func || rc=1; run_perf || rc=1 ;;
     *)           run_func || rc=1 ;;
 esac
+[ $rc -ne 0 ] && echo "  (re-run with VERBOSE=1 ./run.sh $MODE $FLAG   for full cmake/make/demo output; full log: $LOG)"
 echo "=========== $([ $rc -eq 0 ] && echo 'ALL PASS' || echo 'FAILURES — see above') ==========="
 exit $rc
