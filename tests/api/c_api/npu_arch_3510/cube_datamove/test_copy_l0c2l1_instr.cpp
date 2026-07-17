@@ -30,7 +30,7 @@
         uint16_t m_size_in, uint32_t dst_stride_in, uint16_t src_stride_in, uint8_t clip_relu_pre_in,                \
         uint8_t unit_flag_mode_in, QuantMode_t quant_pre_in, uint8_t relu_pre_in, bool channel_split_in,             \
         bool nz2nd_en_in, QuantMode_post quant_post_in, uint8_t relu_post_in, bool clip_relu_post_in,                \
-        uint8_t eltwise_op_in, uint8_t eltwise_antq_en_in, bool c0_pad_en_in)                                        \
+        uint8_t eltwise_op_in, bool eltwise_antq_en_in, bool c0_pad_en_in)                                           \
     {                                                                                                                \
         __cbuf__ dst_data_type* dst = reinterpret_cast<__cbuf__ dst_data_type*>(1);                                  \
         __cc__ src_data_type* src = reinterpret_cast<__cc__ src_data_type*>(2);                                      \
@@ -49,7 +49,7 @@
         uint8_t relu_post = 14;                                                                                      \
         bool clip_relu_post = true;                                                                                  \
         uint8_t eltwise_op = 15;                                                                                     \
-        uint8_t eltwise_antq_en = 15;                                                                                \
+        bool eltwise_antq_en = true;                                                                                 \
         bool c0_pad_en = true;                                                                                       \
                                                                                                                      \
         EXPECT_EQ(dst, dst_in);                                                                                      \
@@ -93,7 +93,7 @@
         uint8_t relu_post = 14;                                                                                      \
         bool clip_relu_post = true;                                                                                  \
         uint8_t eltwise_op = 15;                                                                                     \
-        uint8_t eltwise_antq_en = 15;                                                                                \
+        bool eltwise_antq_en = true;                                                                                 \
         bool c0_pad_en = true;                                                                                       \
                                                                                                                      \
         c_api_name(                                                                                                  \
