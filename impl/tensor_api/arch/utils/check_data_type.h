@@ -258,8 +258,7 @@ public:
                 Std::tuple<__ubuf__ fp4x2_e2m1_t, __gm__ fp4x2_e2m1_t>,
                 Std::tuple<__ubuf__ fp8_e5m2_t, __gm__ fp8_e5m2_t>,
                 Std::tuple<__ubuf__ fp8_e4m3fn_t, __gm__ fp8_e4m3fn_t>,
-                Std::tuple<__ubuf__ hifloat8_t, __gm__ hifloat8_t>
-                >,
+                Std::tuple<__ubuf__ hifloat8_t, __gm__ hifloat8_t>>,
             "The data type is not supported.");
 #endif
     }
@@ -283,8 +282,7 @@ public:
                 Std::tuple<__gm__ fp4x2_e2m1_t, __ubuf__ fp4x2_e2m1_t>,
                 Std::tuple<__gm__ fp8_e5m2_t, __ubuf__ fp8_e5m2_t>,
                 Std::tuple<__gm__ fp8_e4m3fn_t, __ubuf__ fp8_e4m3fn_t>,
-                Std::tuple<__gm__ hifloat8_t, __ubuf__ hifloat8_t>
-                >,
+                Std::tuple<__gm__ hifloat8_t, __ubuf__ hifloat8_t>>,
             "The data type is not supported.");
 #endif
     }
@@ -299,22 +297,16 @@ public:
         static_assert(
             Std::is_one_of_v<
                 Std::tuple<dstDataType, srcDataType>, Std::tuple<__cbuf__ half, __ubuf__ half>,
-                Std::tuple<__cbuf__ bfloat16_t, __ubuf__ bfloat16_t>,
-                Std::tuple<__cbuf__ float, __ubuf__ float>,
-                Std::tuple<__cbuf__ int8_t, __ubuf__ int8_t>,
-                Std::tuple<__cbuf__ uint8_t, __ubuf__ uint8_t>,
-                Std::tuple<__cbuf__ int16_t, __ubuf__ int16_t>,
-                Std::tuple<__cbuf__ uint16_t, __ubuf__ uint16_t>,
-                Std::tuple<__cbuf__ int32_t, __ubuf__ int32_t>,
-                Std::tuple<__cbuf__ uint32_t, __ubuf__ uint32_t>,
-                Std::tuple<__cbuf__ int64_t, __ubuf__ int64_t>,
-                Std::tuple<__cbuf__ uint64_t, __ubuf__ uint64_t>,
+                Std::tuple<__cbuf__ bfloat16_t, __ubuf__ bfloat16_t>, Std::tuple<__cbuf__ float, __ubuf__ float>,
+                Std::tuple<__cbuf__ int8_t, __ubuf__ int8_t>, Std::tuple<__cbuf__ uint8_t, __ubuf__ uint8_t>,
+                Std::tuple<__cbuf__ int16_t, __ubuf__ int16_t>, Std::tuple<__cbuf__ uint16_t, __ubuf__ uint16_t>,
+                Std::tuple<__cbuf__ int32_t, __ubuf__ int32_t>, Std::tuple<__cbuf__ uint32_t, __ubuf__ uint32_t>,
+                Std::tuple<__cbuf__ int64_t, __ubuf__ int64_t>, Std::tuple<__cbuf__ uint64_t, __ubuf__ uint64_t>,
                 Std::tuple<__cbuf__ fp4x2_e1m2_t, __ubuf__ fp4x2_e1m2_t>,
                 Std::tuple<__cbuf__ fp4x2_e2m1_t, __ubuf__ fp4x2_e2m1_t>,
                 Std::tuple<__cbuf__ fp8_e5m2_t, __ubuf__ fp8_e5m2_t>,
                 Std::tuple<__cbuf__ fp8_e4m3fn_t, __ubuf__ fp8_e4m3fn_t>,
-                Std::tuple<__cbuf__ hifloat8_t, __ubuf__ hifloat8_t>
-                >,
+                Std::tuple<__cbuf__ hifloat8_t, __ubuf__ hifloat8_t>>,
             "The data type is not supported.");
 #endif
     }
