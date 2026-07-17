@@ -1,0 +1,17 @@
+===================================
+OAT Scan Result Summary
+===================================
+Scan Time: 2026-07-17 11:16:35
+Project: asc-devkit
+Files Checked: 13926
+Runs Aggregated: 10
+
+-----------------------------------
+Invalid File Type Total Count: 0
+
+-----------------------------------
+License Header Invalid Total Count: 0
+
+-----------------------------------
+Copyright Header Invalid Total Count: 0
+===================================

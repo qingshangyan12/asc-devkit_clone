@@ -1,0 +1,8 @@
+[OAT] OpenHarmony OSS Audit Tool - Python Edition
+[OAT] Scanning: /Users/wyn/Downloads/asc-devkit-master/asc-devkit
+[OAT] Found 924 files to scan.
+[OAT] Using 32 worker threads (cpu_count=10).
+[OAT] Progress: 100/924[OAT] Progress: 200/924[OAT] Progress: 300/924[OAT] Progress: 400/924[OAT] Progress: 500/924[OAT] Progress: 600/924[OAT] Progress: 700/924[OAT] Progress: 800/924[OAT] Progress: 900/924[OAT] Progress: 924/924
+[OAT] Report written to: /Users/wyn/Downloads/asc-devkit-master/asc-devkit/oat_reports/run.msqe3k/PlainReport_asc-devkit.txt
+[OAT] Scan complete in 10.3s. Issues found: 0
+[OAT] No compliance issues found.
