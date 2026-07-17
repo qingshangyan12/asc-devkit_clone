@@ -17,7 +17,9 @@ MODE="${1:-sim}"
 FLAG="${2:-}"
 ARCH="dav-3510"
 SHAPES="${SHAPES:-1 32 1023 2048}"
-PERF_SIZES="${PERF_SIZES:-1024 4096 8192 16384 32768 65536}"
+# 1024 = small-shape / launch-overhead end; 65536 = the size the untiled wrapper died on;
+# 131072 = 512KB, 2x the whole 248KB UB — proves the tiled wrapper is size-independent.
+PERF_SIZES="${PERF_SIZES:-1024 65536 131072}"
 THRESHOLD=90
 
 case "$MODE" in
@@ -130,15 +132,18 @@ run_func() {
             echo "  size=$n  !! gen_data FAILED:"; tail -12 "$LOG.gen" | sed 's/^/     /'; fail=1; continue
         fi
         [ "$VERBOSE" = "1" ] && grep gen_data "$LOG.gen" | sed 's/^/     /'
-        local out
+        local out t0 t1 wall
+        t0=$(date +%s.%N)
         out=$(cd build && ./demo 2>&1)
+        t1=$(date +%s.%N)
+        wall=$(awk "BEGIN{printf \"%.2f\", $t1-$t0}")
         [ "$VERBOSE" = "1" ] && echo "$out" | sed 's/^/     /'
         local line
         line=$(echo "$out" | grep -E "max rel err" | head -1)
         if echo "$out" | grep -q "test pass!"; then
-            printf "  size=%-6s PASS   %s\n" "$n" "${line:-}"
+            printf "  size=%-7s PASS   wall=%7ss   %s\n" "$n" "$wall" "${line:-}"
         else
-            printf "  size=%-6s FAIL   %s\n" "$n" "${line:-$(echo "$out" | tail -1)}"
+            printf "  size=%-7s FAIL   wall=%7ss   %s\n" "$n" "$wall" "${line:-$(echo "$out" | tail -1)}"
             fail=1
         fi
         # surface the Ln inf/nan hardware flag if the device raises it (open question F16)
@@ -152,6 +157,8 @@ run_perf() {
     [ "$MODE" != "npu" ] && echo "  WARNING: $MODE perf is INDICATIVE ONLY — acceptance requires -r npu on silicon."
     local fail=0
     for n in $PERF_SIZES; do
+        local w0 w1 wall
+        w0=$(date +%s.%N)
         build 2 "$n" || { fail=1; continue; }
         (cd build && python3 ../scripts/gen_data.py "$n" >/dev/null 2>&1)
         prof_run || { echo "  size=$n  FAIL (baseline TEST_MODE=2)"; fail=1; continue; }
@@ -161,6 +168,7 @@ run_perf() {
         (cd build && python3 ../scripts/gen_data.py "$n" >/dev/null 2>&1)
         prof_run || { echo "  size=$n  FAIL (compute TEST_MODE=3)"; fail=1; continue; }
         local t2 ct; t2=$(extract "aiv_time"); ct=$(extract "aiv_vec_time")
+        w1=$(date +%s.%N); wall=$(awk "BEGIN{printf \"%.1f\", $w1-$w0}")
 
         local ratio
         ratio=$(python3 -c "
@@ -172,7 +180,15 @@ except Exception: print('NaN')")
         [ "$ratio" = "NaN" ] && verdict="NODATA"
         [ "$ratio" != "NaN" ] && [ "$(python3 -c "print(1 if float('$ratio')<$THRESHOLD else 0)")" = "1" ] && verdict="FAIL"
         [ "$verdict" != "PASS" ] && fail=1
-        printf "  size=%-6s %-6s aiv_vec=%-7s%%  (t1=%s t2=%s vec=%s)\n" "$n" "$verdict" "$ratio" "$t1" "$t2" "$ct"
+        # per-element device compute time, so sizes are comparable: (t2-t1)/PERF_LOOPS/n
+        local per_elem
+        per_elem=$(python3 -c "
+try:
+    d=(float('$t2')-float('$t1'))/1000.0/$n*1e3   # us -> ns per element per pass
+    print(f'{d:.3f}')
+except Exception: print('NA')")
+        printf "  size=%-7s %-6s aiv_vec=%-7s%%  wall=%5ss  %sns/elem  (t1=%s t2=%s vec=%s)\n" \
+               "$n" "$verdict" "$ratio" "$wall" "$per_elem" "$t1" "$t2" "$ct"
     done
     return $fail
 }
