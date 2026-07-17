@@ -55,7 +55,8 @@ private:
         auto srcLayout = src.Layout();
 
         uint16_t blockCount = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-        uint32_t blockLen = GetTotalColumnShape(srcLayout) * GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(srcLayout) * sizeof(SrcType);
+        uint32_t blockLen =
+            GetTotalColumnShape(srcLayout) * GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(srcLayout) * sizeof(SrcType);
         int64_t srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) * sizeof(SrcType);
         int64_t dstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) * sizeof(DstType);
 

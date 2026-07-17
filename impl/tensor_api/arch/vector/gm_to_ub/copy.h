@@ -56,12 +56,10 @@ private:
         static_assert(Std::is_same_v<srcTPos, Location::GM>, "When Copy tensor from GM to UB, src tensor must on GM");
         using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
-        using CopyGM2UBImpl =
-            typename CopyGM2UBRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
+        using CopyGM2UBImpl = typename CopyGM2UBRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyGM2UBImpl::template Run<trait, T, U>(dst, src);
     }
 };
-
 
 } // namespace Te
 } // namespace AscendC
