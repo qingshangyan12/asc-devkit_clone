@@ -10,45 +10,14 @@
 
     **表1** 产品型号和NPU架构版本的对应关系
 
-    <a name="table65291052154114"></a>
-    <table><thead align="left"><tr id="row1852915527411"><th class="cellrowborder" valign="top" width="49.59%" id="mcps1.2.3.1.1"><p id="p12529952134112"><a name="p12529952134112"></a><a name="p12529952134112"></a><span id="ph5758231184918"><a name="ph5758231184918"></a><a name="ph5758231184918"></a>AI处理器</span>型号</p>
-    </th>
-    <th class="cellrowborder" valign="top" width="50.41%" id="mcps1.2.3.1.2"><p id="p252955211411"><a name="p252955211411"></a><a name="p252955211411"></a>__NPU_ARCH__</p>
-    </th>
-    </tr>
-    </thead>
-    <tbody><tr id="row1986372151716"><td class="cellrowborder" valign="top" width="49.59%" headers="mcps1.2.3.1.1 "><p id="p2864142161711"><a name="p2864142161711"></a><a name="p2864142161711"></a><span id="ph2272194216543"><a name="ph2272194216543"></a><a name="ph2272194216543"></a>Ascend 950PR/Ascend 950DT</span></p>
-    </td>
-    <td class="cellrowborder" valign="top" width="50.41%" headers="mcps1.2.3.1.2 "><p id="p5880145213281"><a name="p5880145213281"></a><a name="p5880145213281"></a>3510</p>
-    </td>
-    </tr>
-    <tr id="row75292521412"><td class="cellrowborder" valign="top" width="49.59%" headers="mcps1.2.3.1.1 "><p id="p052935264116"><a name="p052935264116"></a><a name="p052935264116"></a><span id="ph85291852104120"><a name="ph85291852104120"></a><a name="ph85291852104120"></a><term id="zh-cn_topic_0000001312391781_term1253731311225"><a name="zh-cn_topic_0000001312391781_term1253731311225"></a><a name="zh-cn_topic_0000001312391781_term1253731311225"></a>Atlas A3 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term131434243115"><a name="zh-cn_topic_0000001312391781_term131434243115"></a><a name="zh-cn_topic_0000001312391781_term131434243115"></a>Atlas A3 推理系列产品</term></span></p>
-    </td>
-    <td class="cellrowborder" valign="top" width="50.41%" headers="mcps1.2.3.1.2 "><p id="p11529165254118"><a name="p11529165254118"></a><a name="p11529165254118"></a>2201</p>
-    </td>
-    </tr>
-    <tr id="row1652910526411"><td class="cellrowborder" valign="top" width="49.59%" headers="mcps1.2.3.1.1 "><p id="p45291152194112"><a name="p45291152194112"></a><a name="p45291152194112"></a><span id="ph25291652164115"><a name="ph25291652164115"></a><a name="ph25291652164115"></a><term id="zh-cn_topic_0000001312391781_term11962195213215"><a name="zh-cn_topic_0000001312391781_term11962195213215"></a><a name="zh-cn_topic_0000001312391781_term11962195213215"></a>Atlas A2 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term184716139811"><a name="zh-cn_topic_0000001312391781_term184716139811"></a><a name="zh-cn_topic_0000001312391781_term184716139811"></a>Atlas A2 推理系列产品</term></span></p>
-    </td>
-    <td class="cellrowborder" valign="top" width="50.41%" headers="mcps1.2.3.1.2 "><p id="p65291452164116"><a name="p65291452164116"></a><a name="p65291452164116"></a>2201</p>
-    </td>
-    </tr>
-    <tr id="row155291352204114"><td class="cellrowborder" valign="top" width="49.59%" headers="mcps1.2.3.1.1 "><p id="p115291852144111"><a name="p115291852144111"></a><a name="p115291852144111"></a><span id="ph11529115214412"><a name="ph11529115214412"></a><a name="ph11529115214412"></a><term id="zh-cn_topic_0000001312391781_term354143892110"><a name="zh-cn_topic_0000001312391781_term354143892110"></a><a name="zh-cn_topic_0000001312391781_term354143892110"></a>Atlas 200I/500 A2 推理产品</term></span></p>
-    </td>
-    <td class="cellrowborder" valign="top" width="50.41%" headers="mcps1.2.3.1.2 "><p id="p17530185224119"><a name="p17530185224119"></a><a name="p17530185224119"></a>3002</p>
-    </td>
-    </tr>
-    <tr id="row1353025204112"><td class="cellrowborder" valign="top" width="49.59%" headers="mcps1.2.3.1.1 "><p id="p153075220411"><a name="p153075220411"></a><a name="p153075220411"></a><span id="ph1653025204119"><a name="ph1653025204119"></a><a name="ph1653025204119"></a><term id="zh-cn_topic_0000001312391781_term4363218112215"><a name="zh-cn_topic_0000001312391781_term4363218112215"></a><a name="zh-cn_topic_0000001312391781_term4363218112215"></a>Atlas 推理系列产品</term></span></p>
-    </td>
-    <td class="cellrowborder" valign="top" width="50.41%" headers="mcps1.2.3.1.2 "><p id="p85307521410"><a name="p85307521410"></a><a name="p85307521410"></a>2002</p>
-    </td>
-    </tr>
-    <tr id="row653005218416"><td class="cellrowborder" valign="top" width="49.59%" headers="mcps1.2.3.1.1 "><p id="p053055274116"><a name="p053055274116"></a><a name="p053055274116"></a><span id="ph7530652174110"><a name="ph7530652174110"></a><a name="ph7530652174110"></a><term id="zh-cn_topic_0000001312391781_term71949488213"><a name="zh-cn_topic_0000001312391781_term71949488213"></a><a name="zh-cn_topic_0000001312391781_term71949488213"></a>Atlas 训练系列产品</term></span></p>
-    </td>
-    <td class="cellrowborder" valign="top" width="50.41%" headers="mcps1.2.3.1.2 "><p id="p155301052144110"><a name="p155301052144110"></a><a name="p155301052144110"></a>1001</p>
-    </td>
-    </tr>
-    </tbody>
-    </table>
+    | AI处理器型号 | __NPU_ARCH__ |
+|--------------|--------------|
+| Ascend 950PR/Ascend 950DT | 3510 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | 2201 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | 2201 |
+| Atlas 200I/500 A2 推理产品 | 3002 |
+| Atlas 推理系列产品 | 2002 |
+| Atlas 训练系列产品 | 1001 |
 
     以下为通过\_\_NPU\_ARCH\_\_控制在不同AI处理器上算子输出值舍入模式的示例。
 
@@ -333,55 +302,16 @@ AI Core具备多级独立片上存储，各个地址空间独立编址，具备�
 
 **表2**  地址空间映射关系
 
-<a name="table425403455214"></a>
-<table><thead align="left"><tr id="row027120348524"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p1227193465211"><a name="p1227193465211"></a><a name="p1227193465211"></a>地址空间限定符</p>
-</th>
-<th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.2"><p id="p327111349525"><a name="p327111349525"></a><a name="p327111349525"></a>AI Core物理存储空间</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row162721534115215"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p92721034185210"><a name="p92721034185210"></a><a name="p92721034185210"></a>__gm__</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p10272143417521"><a name="p10272143417521"></a><a name="p10272143417521"></a>设备侧内存GM</p>
-</td>
-</tr>
-<tr id="row72726341527"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p4272634135214"><a name="p4272634135214"></a><a name="p4272634135214"></a>__ubuf__</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1427214347521"><a name="p1427214347521"></a><a name="p1427214347521"></a>Vector Unified Buffer</p>
-</td>
-</tr>
-<tr id="row62721334195214"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p182722346528"><a name="p182722346528"></a><a name="p182722346528"></a>__ca__</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p102721034145219"><a name="p102721034145219"></a><a name="p102721034145219"></a>Cube L0A Buffer</p>
-</td>
-</tr>
-<tr id="row182721834175211"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p14272434145216"><a name="p14272434145216"></a><a name="p14272434145216"></a>__cb__</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p327293455219"><a name="p327293455219"></a><a name="p327293455219"></a>Cube L0B Buffer</p>
-</td>
-</tr>
-<tr id="row1027253413523"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p12272434195211"><a name="p12272434195211"></a><a name="p12272434195211"></a>__cc__</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p1927223411527"><a name="p1927223411527"></a><a name="p1927223411527"></a>Cube L0C Buffer</p>
-</td>
-</tr>
-<tr id="row2272034135217"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p92721347529"><a name="p92721347529"></a><a name="p92721347529"></a>__cbuf__</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p727233495213"><a name="p727233495213"></a><a name="p727233495213"></a>Cube L1 Buffer</p>
-</td>
-</tr>
-<tr id="row14137103317189"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p4798642111813"><a name="p4798642111813"></a><a name="p4798642111813"></a>__fbuf__</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p117981342201811"><a name="p117981342201811"></a><a name="p117981342201811"></a>Fixpipe Buffer</p>
-</td>
-</tr>
-<tr id="row127473841817"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p14798942101818"><a name="p14798942101818"></a><a name="p14798942101818"></a>__ssbuf__</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p07981642171819"><a name="p07981642171819"></a><a name="p07981642171819"></a>SSBuffer</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 地址空间限定符 | AI Core物理存储空间 |
+|----------------|---------------------|
+| __gm__ | 设备侧内存GM |
+| __ubuf__ | Vector Unified Buffer |
+| __ca__ | Cube L0A Buffer |
+| __cb__ | Cube L0B Buffer |
+| __cc__ | Cube L0C Buffer |
+| __cbuf__ | Cube L1 Buffer |
+| __fbuf__ | Fixpipe Buffer |
+| __ssbuf__ | SSBuffer |
 
 地址空间限定符可以在变量声明中使用，用于指定对象分配的区域。如果对象的类型被地址空间名称限定，那么该对象将被分配在指定的地址空间中。同样地，对于指针，指向的类型可以通过地址空间进行限定，以指示所指向的对象所在的地址空间。
 
@@ -488,95 +418,22 @@ __ubuf__ int * __gm__ ptr;
 
 ## 内置常量<a name="section784531219338"></a>
 
-<a name="table878553753515"></a>
-<table><thead align="left"><tr id="row578553718354"><th class="cellrowborder" valign="top" width="16.14838516148385%" id="mcps1.1.4.1.1"><p id="p1378573713352"><a name="p1378573713352"></a><a name="p1378573713352"></a>常量名</p>
-</th>
-<th class="cellrowborder" valign="top" width="25.847415258474154%" id="mcps1.1.4.1.2"><p id="p1378553763512"><a name="p1378553763512"></a><a name="p1378553763512"></a>取值</p>
-</th>
-<th class="cellrowborder" valign="top" width="58.00419958004199%" id="mcps1.1.4.1.3"><p id="p127858377356"><a name="p127858377356"></a><a name="p127858377356"></a>功能</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row15785103718358"><td class="cellrowborder" valign="top" width="16.14838516148385%" headers="mcps1.1.4.1.1 "><p id="p1678553710357"><a name="p1678553710357"></a><a name="p1678553710357"></a>constexpr int32_t g_coreType</p>
-</td>
-<td class="cellrowborder" valign="top" width="25.847415258474154%" headers="mcps1.1.4.1.2 "><a name="ul107856379351"></a><a name="ul107856379351"></a><ul id="ul107856379351"><li>AscendC::AIC</li><li>AscendC::AIV</li></ul>
-</td>
-<td class="cellrowborder" valign="top" width="58.00419958004199%" headers="mcps1.1.4.1.3 "><p id="p778516378353"><a name="p778516378353"></a><a name="p778516378353"></a>常量值由框架自动设置，AIC核下，配置为AscendC::AIC，AIV核下，配置为AscendC::AIV。</p>
-<p id="p278616379351"><a name="p278616379351"></a><a name="p278616379351"></a>可以通过对该常量值的判断，来实现了AIV与AIC核代码的区分和隔离。功能等同于直接使用ASCEND_IS_AIV、ASCEND_IS_AIC。</p>
-</td>
-</tr>
-<tr><td class="cellrowborder" valign="top" width="16.14838516148385%" headers="mcps1.1.4.1.1 "><p>constexpr uint64_t ASC_UB_SIZE</p>
-</td>
-<td class="cellrowborder" valign="top" width="25.847415258474154%" headers="mcps1.1.4.1.2 "><p>取值由当前AI处理器决定，若该AI处理器不存在这块空间，则默认配置为0。</p>
-</td>
-<td class="cellrowborder" valign="top" width="58.00419958004199%" headers="mcps1.1.4.1.3 "><p>表示当前AI处理器架构下Unified Buffer（UB）的容量，可用于编译期获取UB资源大小。</p>
-</td>
-</tr>
-<tr><td class="cellrowborder" valign="top" width="16.14838516148385%" headers="mcps1.1.4.1.1 "><p>constexpr uint64_t ASC_L1_SIZE</p>
-</td>
-<td class="cellrowborder" valign="top" width="25.847415258474154%" headers="mcps1.1.4.1.2 "><p>取值由当前AI处理器决定，若该AI处理器不存在这块空间，则默认配置为0。</p>
-</td>
-<td class="cellrowborder" valign="top" width="58.00419958004199%" headers="mcps1.1.4.1.3 "><p>表示当前AI处理器架构下L1 Buffer的容量，可用于编译期获取L1 Buffer大小。</p>
-</td>
-</tr>
-<tr><td class="cellrowborder" valign="top" width="16.14838516148385%" headers="mcps1.1.4.1.1 "><p>constexpr uint64_t ASC_L0A_SIZE</p>
-</td>
-<td class="cellrowborder" valign="top" width="25.847415258474154%" headers="mcps1.1.4.1.2 "><p>取值由当前AI处理器决定，若该AI处理器不存在这块空间，则默认配置为0。</p>
-</td>
-<td class="cellrowborder" valign="top" width="58.00419958004199%" headers="mcps1.1.4.1.3 "><p>表示当前AI处理器架构下L0A Buffer的容量，可用于编译期获取L0A Buffer大小。</p>
-</td>
-</tr>
-<tr><td class="cellrowborder" valign="top" width="16.14838516148385%" headers="mcps1.1.4.1.1 "><p>constexpr uint64_t ASC_L0B_SIZE</p>
-</td>
-<td class="cellrowborder" valign="top" width="25.847415258474154%" headers="mcps1.1.4.1.2 "><p>取值由当前AI处理器决定，若该AI处理器不存在这块空间，则默认配置为0。</p>
-</td>
-<td class="cellrowborder" valign="top" width="58.00419958004199%" headers="mcps1.1.4.1.3 "><p>表示当前AI处理器架构下L0B Buffer的容量，可用于编译期获取L0B Buffer大小。</p>
-</td>
-</tr>
-<tr><td class="cellrowborder" valign="top" width="16.14838516148385%" headers="mcps1.1.4.1.1 "><p>constexpr uint64_t ASC_L0C_SIZE</p>
-</td>
-<td class="cellrowborder" valign="top" width="25.847415258474154%" headers="mcps1.1.4.1.2 "><p>取值由当前AI处理器决定，若该AI处理器不存在这块空间，则默认配置为0。</p>
-</td>
-<td class="cellrowborder" valign="top" width="58.00419958004199%" headers="mcps1.1.4.1.3 "><p>表示当前AI处理器架构下L0C Buffer的容量，可用于编译期获取L0C资源大小。</p>
-</td>
-</tr>
-<tr><td class="cellrowborder" valign="top" width="16.14838516148385%" headers="mcps1.1.4.1.1 "><p>constexpr uint64_t ASC_BT_SIZE</p>
-</td>
-<td class="cellrowborder" valign="top" width="25.847415258474154%" headers="mcps1.1.4.1.2 "><p>取值由当前AI处理器决定，若该AI处理器不存在这块空间，则默认配置为0。</p>
-</td>
-<td class="cellrowborder" valign="top" width="58.00419958004199%" headers="mcps1.1.4.1.3 "><p>表示当前AI处理器架构下BiasTable Buffer的容量，可用于编译期获取BiasTable资源大小。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 常量名 | 取值 | 功能 |
+|--------|------|------|
+| constexpr int32_t g_coreType | AscendC::AIC<br>AscendC::AIV | 常量值由框架自动设置，AIC核下，配置为AscendC::AIC，AIV核下，配置为AscendC::AIV。可以通过对该常量值的判断，来实现了AIV与AIC核代码的区分和隔离。功能等同于直接使用ASCEND_IS_AIV、ASCEND_IS_AIC。 |
+| constexpr uint64_t ASC_UB_SIZE | 取值由当前AI处理器决定，若该AI处理器不存在这块空间，则默认配置为0。 | 表示当前AI处理器架构下Unified Buffer（UB）的容量，可用于编译期获取UB资源大小。 |
+| constexpr uint64_t ASC_L1_SIZE | 取值由当前AI处理器决定，若该AI处理器不存在这块空间，则默认配置为0。 | 表示当前AI处理器架构下L1 Buffer的容量，可用于编译期获取L1 Buffer大小。 |
+| constexpr uint64_t ASC_L0A_SIZE | 取值由当前AI处理器决定，若该AI处理器不存在这块空间，则默认配置为0。 | 表示当前AI处理器架构下L0A Buffer的容量，可用于编译期获取L0A Buffer大小。 |
+| constexpr uint64_t ASC_L0B_SIZE | 取值由当前AI处理器决定，若该AI处理器不存在这块空间，则默认配置为0。 | 表示当前AI处理器架构下L0B Buffer的容量，可用于编译期获取L0B Buffer大小。 |
+| constexpr uint64_t ASC_L0C_SIZE | 取值由当前AI处理器决定，若该AI处理器不存在这块空间，则默认配置为0。 | 表示当前AI处理器架构下L0C Buffer的容量，可用于编译期获取L0C资源大小。 |
+| constexpr uint64_t ASC_BT_SIZE | 取值由当前AI处理器决定，若该AI处理器不存在这块空间，则默认配置为0。 | 表示当前AI处理器架构下BiasTable Buffer的容量，可用于编译期获取BiasTable资源大小。 |
 
 ## 内置变量<a name="section199434523343"></a>
 
-<a name="table169229153513"></a>
-<table><thead align="left"><tr id="row769289183515"><th class="cellrowborder" valign="top" width="15.988401159884011%" id="mcps1.1.4.1.1"><p id="p1669269163510"><a name="p1669269163510"></a><a name="p1669269163510"></a>变量名</p>
-</th>
-<th class="cellrowborder" valign="top" width="25.977402259774017%" id="mcps1.1.4.1.2"><p id="p116921597358"><a name="p116921597358"></a><a name="p116921597358"></a>相关API</p>
-</th>
-<th class="cellrowborder" valign="top" width="58.03419658034197%" id="mcps1.1.4.1.3"><p id="p14692294358"><a name="p14692294358"></a><a name="p14692294358"></a>功能</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row06921195350"><td class="cellrowborder" valign="top" width="15.988401159884011%" headers="mcps1.1.4.1.1 "><p id="p156921796359"><a name="p156921796359"></a><a name="p156921796359"></a>block_num</p>
-</td>
-<td class="cellrowborder" valign="top" width="25.977402259774017%" headers="mcps1.1.4.1.2 "><p id="p369213993514"><a name="p369213993514"></a><a name="p369213993514"></a>GetBlockNum</p>
-</td>
-<td class="cellrowborder" valign="top" width="58.03419658034197%" headers="mcps1.1.4.1.3 "><p id="p969217912357"><a name="p969217912357"></a><a name="p969217912357"></a>当前任务配置的核数，用于代码内部的多核逻辑控制等。<br>内置变量block_num的值与通过相关API GetBlockNum获取的值保持一致。</p>
-</td>
-</tr>
-<tr id="row1669214993515"><td class="cellrowborder" valign="top" width="15.988401159884011%" headers="mcps1.1.4.1.1 "><p id="p1769219913351"><a name="p1769219913351"></a><a name="p1769219913351"></a>block_idx</p>
-</td>
-<td class="cellrowborder" valign="top" width="25.977402259774017%" headers="mcps1.1.4.1.2 "><p id="p116921990355"><a name="p116921990355"></a><a name="p116921990355"></a>GetBlockIdx</p>
-</td>
-<td class="cellrowborder" valign="top" width="58.03419658034197%" headers="mcps1.1.4.1.3 "><p id="p169211933512"><a name="p169211933512"></a><a name="p169211933512"></a>当前核的索引，用于代码内部的多核逻辑控制及多核偏移量计算等。<br>注意，内置变量block_idx的值与通过相关API GetBlockIdx获取的值在部分场景下并不一致，具体说明及场景示例请参考下文描述。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 变量名 | 相关API | 功能 |
+|-------|---------|------|
+| block_num | GetBlockNum | 当前任务配置的核数，用于代码内部的多核逻辑控制等。内置变量block_num的值与通过相关API GetBlockNum获取的值保持一致。 |
+| block_idx | GetBlockIdx | 当前核的索引，用于代码内部的多核逻辑控制及多核偏移量计算等。注意，内置变量block_idx的值与通过相关API GetBlockIdx获取的值在部分场景下并不一致，具体说明及场景示例请参考下文描述。 |
 通常，建议用户使用内置变量对应的API获取所需值，不建议用户直接使用内置变量。因为内置变量反映的是单个硬件资源的配置信息，对于软件栈整合硬件资源、扩展硬件的功能，内置变量的值与实际语义可能不符。
 
 在Mix场景（使用`__mix__`函数执行空间限定符）下，Vector核（AIV）的逻辑位置需要通过block_idx和sub_block_idx共同确定：`logic_idx = block_idx * sub_block_num + sub_block_idx`。其中block_idx标识当前组合在整个grid中的位置，sub_block_idx标识当前AIV在组合内的位置。开发者应使用GetBlockIdx和GetSubBlockIdx API组合获取完整的逻辑位置信息，而非直接使用内置变量。

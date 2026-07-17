@@ -101,7 +101,7 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 |------|----------|------|
 | -help | 否 | 查看帮助。 |
 | --npu-arch | 是 | 编译时指定的AI处理器架构，取值为dav-&lt;arch-version&gt;，其中&lt;arch-version&gt;为NPU架构版本号，各产品型号对应的架构版本号请通过[对应关系表](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。 |
-| --npu-soc | 否 | 编译时指定的AI处理器型号，npu-soc和npu-arch同时配置时，优先采用npu-arch的配置。AI处理器的型号请通过如下方式获取：<br>针对如下产品：在安装AI处理器的服务器执行**npu-smi info**命令进行查询，获取**Name**信息。实际配置值为AscendName，例如**Name**取值为*xxxyy*，实际配置值为Ascend*xxxyy*。<br>- Atlas A2 训练系列产品/Atlas A2 推理系列产品<br>- Atlas 200I/500 A2 推理产品<br>- Atlas 推理系列产品<br>- Atlas 训练系列产品<br>针对如下产品，在安装AI处理器的服务器执行**npu-smi info -t board -i** *id* **-c** *chip_id*命令进行查询，获取**Chip Name**和**NPU Name**信息，实际配置值为Chip Name_NPU Name。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。其中：<br>id：设备id，通过npu-smi info -l命令查出的NPU ID即为设备id。<br>chip_id：芯片id，通过npu-smi info -m命令查出的Chip ID即为芯片id。<br>- Ascend 950PR/Ascend 950DT<br>- Atlas A3 训练系列产品/Atlas A3 推理系列产品 |
+| --npu-soc | 否 | 编译时指定的AI处理器型号，npu-soc和npu-arch同时配置时，优先采用npu-arch的配置。AI处理器型号的获取方式请参考[下方说明](#note-reference)。 |
 | -x | 否 | 指定编译语言,如：-x asc,表示指定为Ascend C编程语言。 |
 | -o &lt;file&gt; | 否 | 指定输出文件的名称和位置。 |
 | -c | 否 | 编译生成目标文件。 |
@@ -118,6 +118,32 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 | --cce-disable-vf-stack-reserved-ubuf | 否 | 禁用SIMD VF栈预留的UB空间。开启后，编译器不再预留该部分UB空间，该空间可作为普通UB空间使用。针对 [NPU架构版本2201](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)，此编译选项无实际效果；针对 [NPU架构版本3510](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)，此编译选项生效，当用户使用此编译选项后，编译器将无法使用预留的UB空间进行寄存器溢出的缓存，需要用户保证寄存器不溢出。 |
 
 更多的编译命令和用法可以参见[《毕昇编译器用户指南》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)。
+
+<a id="note-reference"></a>
+
+>[!NOTE]说明 
+><!-- npu="910b,910,310p,310b" id3 -->
+>- 针对如下产品：在安装AI处理器的服务器执行npu-smi info命令进行查询，获取Name信息。实际配置值为AscendName，例如Name取值为xxxyy，实际配置值为Ascendxxxyy。<br><br>
+>    <!-- npu="910b" id4 -->
+>    Atlas A2 训练系列产品/Atlas A2 推理系列产品  
+>    <!-- end id4 -->
+>    <!-- npu="310b" id5 -->
+>    Atlas 200I/500 A2 推理产品  
+>    <!-- end id5 -->
+>    <!-- npu="310p" id6 -->
+>    Atlas 推理系列产品  
+>    <!-- end id6 -->
+>    <!-- npu="910" id7 -->
+>    Atlas 训练系列产品<br><br> 
+>    <!-- end id7 -->
+><!-- end id3 -->
+><!-- npu="A3" id1 -->
+>- 针对<term>Atlas A3 训练系列产品</term>/<term>Atlas A3 推理系列产品</term>，在安装AI处理器的服务器执行npu-smi info -t board -i id -c chip_id命令进行查询，获取Chip Name和NPU Name信息，实际配置值为Chip Name_NPU Name。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。其中：<br>id：设备id，通过npu-smi info -l命令查出的NPU ID即为设备id。<br> chip_id：芯片id，通过npu-smi info -m命令查出的Chip ID即为芯片id。<br><br>
+><!-- end id1 -->
+><!-- npu="950" id2 -->
+>- 针对Ascend 950PR/Ascend 950DT，在安装AI处理器的服务器执行npu-smi info -t board -i id命令进行查询，获取Chip Name和NPU Name信息，实际配置值为Chip Name_NPU Name。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。<br> 其中：id为设备id，通过npu-smi info -l命令查出的NPU ID即为设备id。
+><!-- end id2 -->
+
 
 ## CMake方式编译<a name="ZH-CN_TOPIC_0000002428982142"></a>
 
