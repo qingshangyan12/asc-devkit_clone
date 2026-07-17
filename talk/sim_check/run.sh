@@ -58,19 +58,33 @@ build() { # $1=test_mode  $2=size
     cd ..
 }
 
-preflight() {
+preflight() { # returns non-zero on a FATAL problem -> abort before wasting builds
+    local fatal=0
     echo "=========== PREFLIGHT ==========="
     echo "  mode=$MODE arch=$ARCH  shapes=[$SHAPES]"
-    echo "  cmake   : $(command -v cmake || echo 'MISSING')"
-    echo "  python3 : $(command -v python3 || echo 'MISSING')"
-    echo "  scipy   : $(python3 -c 'import scipy;print(scipy.__version__)' 2>&1 | head -1)"
-    echo "  ASCEND_HOME_PATH=${ASCEND_HOME_PATH:-<unset — did you source set_env.sh?>}"
-    echo "  CANN    : $(cat ${ASCEND_HOME_PATH:-/nonexistent}/*/version.info 2>/dev/null | grep -m1 Version= || echo '? (ASCEND_HOME_PATH unset or layout differs)')"
-    [ "$MODE" = "npu" ] && { echo "  npu-smi : $(command -v npu-smi || echo 'MISSING')"; npu-smi info 2>&1 | head -3 | sed 's/^/     /'; }
+    command -v cmake   >/dev/null || { echo "  !! cmake MISSING";   fatal=1; }
+    command -v python3 >/dev/null || { echo "  !! python3 MISSING"; fatal=1; }
+    echo "  cmake   : $(command -v cmake 2>/dev/null || echo MISSING)"
+    echo "  python3 : $(command -v python3 2>/dev/null || echo MISSING)"
+    if ! python3 -c 'import scipy, numpy' 2>/dev/null; then
+        echo "  !! scipy/numpy MISSING — needed for the golden (pip install scipy)"; fatal=1
+    else
+        echo "  scipy   : $(python3 -c 'import scipy;print(scipy.__version__)' 2>/dev/null)"
+    fi
+    echo "  ASCEND_HOME_PATH=${ASCEND_HOME_PATH:-<unset — source set_env.sh>}"
+    [ -z "${ASCEND_HOME_PATH:-}" ] && { echo "  !! set_env.sh not sourced"; fatal=1; }
+    echo "  CANN    : $(cat ${ASCEND_HOME_PATH:-/nonexistent}/*/version.info 2>/dev/null | grep -m1 Version= || echo '?')"
+    # npu-smi is a convenience probe only — absent inside many containers even when the NPU works.
+    [ "$MODE" = "npu" ] && {
+        if command -v npu-smi >/dev/null; then npu-smi info 2>&1 | head -3 | sed 's/^/     npu-smi: /'
+        else echo "     npu-smi: not on PATH (not fatal — only a probe; the runtime is what matters)"; fi
+    }
     for f in CMakeLists.txt data_utils.h ndtri.asc scripts/gen_data.py; do
-        [ -f "$f" ] || echo "  !! MISSING FILE: $f"
+        [ -f "$f" ] || { echo "  !! MISSING FILE: $f"; fatal=1; }
     done
     echo
+    [ $fatal -ne 0 ] && { echo "PREFLIGHT FAILED — fix the !! items above. Not building."; return 1; }
+    return 0
 }
 
 extract() { # $1=field   -> newest op_summary_*.csv under build/
@@ -149,7 +163,7 @@ except Exception: print('NaN')")
     return $fail
 }
 
-preflight
+preflight || exit 1
 rc=0
 case "$FLAG" in
     --perf-only) run_perf || rc=1 ;;

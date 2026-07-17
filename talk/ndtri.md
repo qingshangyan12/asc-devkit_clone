@@ -391,3 +391,24 @@ contains boundary/out-of-domain points: raised for size=32/1023/2048 (gen_data i
 when size>=16), NOT raised for size=1 (single deep-tail point p=1e-37 -> Ln arg finite).
 => Confirms the diagnosis: the flag is caused by Ln() on discarded p<=0 / NaN lanes, nothing else.
 => Still OPEN whether it sets a sticky status on real silicon. Watch for it in the npu run.
+
+### F22 — **GA CANN 9.1.0 BUILDS OUR KERNEL** (user's device, 2026-07-17) — F19 concern RESOLVED
+User ran `VERBOSE=1 ./run.sh npu` on real hw box: `ASCEND_HOME_PATH=/root/Ascend/cann-9.1.0`,
+`Version=9.1.0` (GA, not beta). Result:
+```
+/root/Ascend/cann-9.1.0/bin/bisheng -DSIZE=2048 -DTEST_MODE=1 -std=c++17 --npu-arch=dav-3510 ...
+[100%] Built target demo      [build] ok -> 383232 bytes
+```
+=> **The 5-field DataCopyExtParams / 4-arg DataCopyPad form builds on 9.0.1, 9.1-beta.3 AND GA 9.1.0.**
+   No need to flip to the harness's 4-field/3-arg form. ONE `ndtri.asc` covers every CANN we've seen.
+   (Still unexplained: what CANN the official harness's own 4-field form targets. Not our problem.)
+=> `Reg::MulDstAdd` + `Reg::Compares` + `Reg::Min` all fine on GA 9.1.0.
+
+### F23 — run.sh bugs found by the user's first real run (both mine, both fixed)
+1. **gen_data.py path**: repo had `talk/sim_check/gen_data.py` but run.sh calls `../scripts/gen_data.py`.
+   (Worked in my containers only because I `docker cp`'d it INTO `scripts/`.) -> moved to
+   `talk/sim_check/scripts/gen_data.py`. Layout now matches the harness convention.
+2. **preflight detected the missing file but did not abort** -> built 4x and failed 4x anyway.
+   -> `preflight || exit 1`. Fatal: cmake/python3/scipy/numpy missing, set_env.sh not sourced,
+   any required file missing. `npu-smi` NOT fatal (absent on PATH in many containers even when the
+   NPU works — user's box has no npu-smi but bisheng builds fine).
