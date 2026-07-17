@@ -17,6 +17,7 @@ import numpy as np
 
 TOTAL_LEN = 40000000
 
+
 def gen_golden_data_simple():
     input_x = np.random.uniform(1, 100, [TOTAL_LEN]).astype(np.float16)
     input_y = np.random.uniform(1, 100, [TOTAL_LEN]).astype(np.float16)
