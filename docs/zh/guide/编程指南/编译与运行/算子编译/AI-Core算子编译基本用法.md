@@ -122,7 +122,7 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 <a id="note-reference"></a>
 
 >[!NOTE]说明 
-><!-- npu="910b,910,310p,310b" id3 -->
+><!-- npu="910b,910,310p,310b" id1 -->
 >- 针对如下产品：在安装AI处理器的服务器执行npu-smi info命令进行查询，获取Name信息。实际配置值为AscendName，例如Name取值为xxxyy，实际配置值为Ascendxxxyy。<br><br>
 >    <!-- npu="910b" id4 -->
 >    Atlas A2 训练系列产品/Atlas A2 推理系列产品  
@@ -136,13 +136,13 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 >    <!-- npu="910" id7 -->
 >    Atlas 训练系列产品<br><br> 
 >    <!-- end id7 -->
-><!-- end id3 -->
-><!-- npu="A3" id1 -->
->- 针对<term>Atlas A3 训练系列产品</term>/<term>Atlas A3 推理系列产品</term>，在安装AI处理器的服务器执行npu-smi info -t board -i id -c chip_id命令进行查询，获取Chip Name和NPU Name信息，实际配置值为Chip Name_NPU Name。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。其中：<br>id：设备id，通过npu-smi info -l命令查出的NPU ID即为设备id。<br> chip_id：芯片id，通过npu-smi info -m命令查出的Chip ID即为芯片id。<br><br>
 ><!-- end id1 -->
-><!-- npu="950" id2 -->
->- 针对Ascend 950PR/Ascend 950DT，在安装AI处理器的服务器执行npu-smi info -t board -i id命令进行查询，获取Chip Name和NPU Name信息，实际配置值为Chip Name_NPU Name。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。<br> 其中：id为设备id，通过npu-smi info -l命令查出的NPU ID即为设备id。
+><!-- npu="A3" id2 -->
+>- 针对<term>Atlas A3 训练系列产品</term>/<term>Atlas A3 推理系列产品</term>，在安装AI处理器的服务器执行npu-smi info -t board -i id -c chip_id命令进行查询，获取Chip Name和NPU Name信息，实际配置值为Chip Name_NPU Name。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。其中：<br>id：设备id，通过npu-smi info -l命令查出的NPU ID即为设备id。<br> chip_id：芯片id，通过npu-smi info -m命令查出的Chip ID即为芯片id。<br><br>
 ><!-- end id2 -->
+><!-- npu="950" id3 -->
+>- 针对Ascend 950PR/Ascend 950DT，在安装AI处理器的服务器执行npu-smi info -t board -i id命令进行查询，获取Chip Name和NPU Name信息，实际配置值为Chip Name_NPU Name。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。<br> 其中：id为设备id，通过npu-smi info -l命令查出的NPU ID即为设备id。
+><!-- end id3 -->
 
 
 ## CMake方式编译<a name="ZH-CN_TOPIC_0000002428982142"></a>
@@ -242,7 +242,7 @@ add_executable(demo
      # 关闭所有算子的printf打印功能
      bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> -DASCENDC_DUMP=0
      ```
- <!-- npu="910b,310p" id8 -->
+ <!-- npu="910b,310p" id4 -->
  -   **ASCENDC\_DEBUG** 用于控制Ascend C API的调测开关，默认开关关闭；增加该编译宏后，表示开关打开，此时接口内部的assert校验生效，校验不通过会有assert日志打屏。开启该功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。示例如下：
      ```shell
      bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> -DASCENDC_DEBUG
@@ -254,9 +254,9 @@ add_executable(demo
      <!-- npu="910b" id10 -->
      Atlas A2 训练系列产品/Atlas A2 推理系列产品
      <!-- end id10 -->
- <!-- end id8 -->
+ <!-- end id4 -->
 
- <!-- npu="950" id11 -->
+ <!-- npu="950" id5 -->
  -   **ENABLE\_CV\_COMM\_VIA\_SSBUF** 用于控制是否使用SSBuffer以及UB到L1 Buffer的硬通道，在涉及CV通信（AIC和AIV）或使用数据搬运API时需关注此选项。开启该选项可以提高相关API的性能或拓展使用更多功能。默认开关关闭；设置为true后，表示开关打开。示例如下：
      ```shell
      bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> -DENABLE_CV_COMM_VIA_SSBUF=true
@@ -264,12 +264,12 @@ add_executable(demo
      仅在Ascend 950PR/Ascend 950DT支持该选项。
      -   从其它硬件平台移植到此平台的算子，开关默认关闭以保持兼容性。
      -   在该平台新开发的算子，以下场景需要打开：使用矩阵计算Matmul高阶API，且使用SetTensorScaleA等接口，这些接口属于Ascend 950PR/Ascend 950DT新增的功能，其内部实现使用了SSBuffer；使用DataCopy接口从UB拷贝数据到L1 Buffer。
- <!-- end id11 -->
+ <!-- end id5 -->
 
- <!-- npu="950" id12 -->
+ <!-- npu="950" id6 -->
  -   **NO\_OVERLAP\_IN\_MULTI\_REPEAT**
   该编译选项用于在没有地址重叠的情况下移除不必要的内存同步指令，以提升性能。针对Ascend 950PR/Ascend 950DT，使用基础API的高维切分计算API时，默认会插入内存同步指令以确保在地址重叠等复杂场景下的数据正确性，但这些同步指令会带来性能开销。在追求极致性能的场景下，如果您可以确定代码在任何情况下都不会发生内存重叠，可以使用此选项。
- <!-- end id12 -->
+ <!-- end id6 -->
 
 
 ### 内置链接库<a name="section57020345148"></a>
