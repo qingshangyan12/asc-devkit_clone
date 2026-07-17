@@ -86,6 +86,7 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ float* dst, __ubuf__ float* s
 ```
 
 - **以下函数原型已废弃，请使用asc_store_l2_cache_mode类型的枚举值进行L2 Cache管理策略配置。**
+
 ```cpp
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ int8_t* dst, __ubuf__ int8_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ uint8_t* dst, __ubuf__ uint8_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
@@ -113,7 +114,7 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ float* dst, __ubuf__ float* s
 | size | 输入 | 搬运数据大小（字节）。 |
 | n_burst | 输入 | 待搬运的连续传输数据块个数。取值范围：[1, 4095]。 |
 | len_burst | 输入 | 待搬运的每个连续传输数据块的长度，单位为字节。取值范围：[1, 2097151]。 |
-| l2_cache_mode | 输入 | [asc_store_l2_cache_mode](../enum/asc_store_l2_cache_mode.md)类型的枚举值，配置数据在L2 Cache中的管理策略。 |
+| l2_cache_mode | 输入 | [asc_store_l2_cache_mode](../../enum/asc_store_l2_cache_mode.md)类型的枚举值，配置数据在L2 Cache中的管理策略。 |
 | dst_stride | 输入 | 目的操作数相邻连续数据块的间隔（前面一个数据块的头与后面一个数据块的头的间隔）。<br>单位为字节。 |
 | src_stride | 输入 | 源操作数相邻连续数据块的间隔（前面一个数据块的头与后面一个数据块的头的间隔）。<br>单位为字节。 |
 
