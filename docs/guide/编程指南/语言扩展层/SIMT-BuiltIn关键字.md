@@ -37,7 +37,7 @@
 -   动态内存通过以下方式申请使用：
 
     ```
-    extern __ubuf__ half dynamicBuf[]; 
+    extern __ubuf__ half dynamicBuf[];  
     ```
 
     动态内存的实际内存大小需要在核函数启动时配置，具体内容请参考[核函数配置](#section97005415463)。
@@ -224,7 +224,7 @@ SIMT编程提供了一系列运算符，用于执行数学运算。以下是支�
 res[idx] = x[idx] + y[idx]; 
 
 // 取反运算
-x[idx] = (-x[idx]);
+x[idx] = (-x[idx]); 
 
 // 比较运算
 if (x[idx] > y[idx]) {
