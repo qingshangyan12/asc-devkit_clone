@@ -124,6 +124,7 @@ PIPE_MTE2
 - 如果需要执行多条asc_ndim_copy_gm2ub指令，且asc_ndim_copy_gm2ub指令的目的地址存在重叠，需要插入同步指令，保证多个asc_ndim_copy_gm2ub指令的串行化，防止出现异常数据。
 - 一条指令所能获取的所有数据的地址范围宽度不能超过40位（1TB），即：源操作数的i维大小为（loopi_lp_size + loopi_size + loopi_rp_size - 1） * loop0_src_stride，目的操作数的i维大小为：（loopi_lp_size + loopi_size + loopi_rp_size - 1） * loop0_dst_stride，所有的维度的大小加起来不超过2^40位。
 - 当每维的loopi_dst_stride为升序序列，则不同循环间的地址空间不能交织或重叠。
+- 该接口的各参数取值均应在对应参数规定的取值范围内，且搬运涉及的UB空间不得超过[可用UB容量](../../通用说明和约束.md#存储单元说明)。
 
 ## 调用示例
 
