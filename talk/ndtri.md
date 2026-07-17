@@ -527,3 +527,29 @@ this was the official run.sh's dead-code branch, never functional). Perf REQUIRE
 fails loudly there instead of reading a stale CSV and printing a fake ratio.
 Dropped the `ns/elem` column (derived noise). Perf line now shows real `kernel=` (launch->sync of the
 mode-3 run) alongside the raw `aiv: t1/t2/vec`.
+
+### F30 — **REAL single-pass aiv_vec = 82.3%, BELOW the 90% bar.** Ping-pong added. (silicon msprof)
+User's msprof dump, N=131072 single-pass (PERF_LOOPS=1), BUFFER_NUM=1. Recovered total cycles from
+MTE2's active rate and cross-checked against MTE3 + Scalar to 6 decimals (both reproduce exactly):
+```
+total kernel   128,892 cyc
+  MTE2 active   14,744 cyc  11.4%   (18 instrs = 16 tiles + 2)
+  MTE3 active    8,065 cyc   6.3%
+  Scalar         2,281 cyc   1.8%   (725 instrs, loop overhead — small, fine)
+  => Vector    106,083 cyc  82.3%   <- THE REAL aiv_vec
+  V blocked on copy 22,809 cyc (17.7%)  <- depth-1 serialisation MTE2->V->MTE3
+```
+Run identified from `Vector Read UB = 2048 requests` -> 2048 repeats x 64 = 131072 elements.
+**So F27's ~90% estimate was OPTIMISTIC; reality is 82.3% -> would FAIL a real single-pass gate.**
+The PERF_LOOPS=1000 spec metric structurally CANNOT see this (amortises copy to 0.1%) — which is
+exactly why it reports ~100% at every size (F28.3).
+**FIX: BUFFER_NUM=2 ping-pong** — MTE2 fetches tile N+1 while V computes tile N, hiding 22,809 cyc
+under 106,083 cyc of compute => aiv_vec ~100%, ~1.22x wall speedup.
+UB: 2 queues x 2 buf x 32KB = 128KB, fits the 248KB UB.
+**Other numbers from the dump, all benign:**
+- `L2 Cache Read hit 0% (0/4097)` — elementwise streaming, zero reuse. Expected, unavoidable, harmless.
+- `GM read/write 6.25 GB/s` each — this is ONE core; the kernel is COMPUTE-bound (MTE2 active only
+  11.4%), so bandwidth is not the limit. `UB Read GM peak 3.83%` confirms memory is nowhere near saturated.
+- `iCache 100% hit`, `Scalar 1.8%` — no icache thrash, negligible scalar overhead. Good.
+- Consistency check: 0.57 ns/elem (from N=1024 t2=583us/1000 passes) x 131072 = 74.7us ~= 128,892 cyc
+  @ ~1.7GHz = 75.8us. The two independent measurements agree.
