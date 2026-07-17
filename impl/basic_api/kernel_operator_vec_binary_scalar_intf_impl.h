@@ -1934,7 +1934,7 @@ __aicore__ inline void MulsCast(const T2& dst, const T3& src0, const T4& src1, c
 {
     using ActualT = typename T2::PrimType;
     CheckTensorPos<ActualT>(dst, Hardware::UB, "dst", "VECIN/VECCALC/VECOUT", "MulsCast");
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
     static_assert(!TypeUtils::IsInnerDefaultType<T3, T4>(), "One of src0 and src1 should be Tensor");
     static_assert(TypeUtils::IsLocalTensorType<T2>());
     static_assert(SupportType<typename T2::PrimType, half>());
@@ -1992,7 +1992,7 @@ template <typename T0, typename T1, const BinaryConfig& config, typename T2, typ
 __aicore__ inline void FusedMulsCast(const T2& dst, const T3& src0, const T4& src1, const uint32_t count)
 {
     using ActualT = typename T2::PrimType;
-    CheckTensorPos<ActualT>(dst, Hardware::UB, "dst", "VECIN/VECCALC/VECOUT", "FusedMulsCast");
+    CheckTensorPos<ActualT>(dst, Hardware::UB, "dst", "VECIN / VECCALC / VECOUT", "FusedMulsCast");
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     static_assert(!TypeUtils::IsInnerDefaultType<T3, T4>(), "One of src0 and src1 should be Tensor");
     static_assert(TypeUtils::IsLocalTensorType<T2>());

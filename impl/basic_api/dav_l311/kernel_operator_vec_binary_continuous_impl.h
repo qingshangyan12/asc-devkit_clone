@@ -158,6 +158,95 @@ BINARY_OP_CONTINUOUS_IMPL(OrImpl, Or, int16_t)
 BINARY_OP_CONTINUOUS_IMPL(OrImpl, Or, uint16_t)
 BINARY_OP_CONTINUOUS_IMPL(OrImpl, Or, int32_t)
 BINARY_OP_CONTINUOUS_IMPL(OrImpl, Or, uint32_t)
+
+/* **************************************************************************************************
+ * Prelu                                             *
+ * ************************************************************************************************* */
+// Prelu::Level 2
+template <typename T>
+__simd_vf__ inline void PreluImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const uint32_t calCount)
+{
+    static_assert(
+        SupportType<T, half, float>(), "Failed to check dtype in Prelu, current api support "
+                                       "dtype is half, float.");
+    constexpr uint32_t sregLower = static_cast<uint32_t>(GetVecLen() / sizeof(T));
+    const uint16_t repeatTime = static_cast<uint16_t>(CeilDivision(calCount, sregLower));
+    uint32_t sreg = static_cast<uint32_t>(calCount);
+    Reg::RegTensor<T> vDstReg0;
+    Reg::RegTensor<T> vSrcReg0;
+    Reg::RegTensor<T> vSrcReg1;
+    Reg::MaskReg mask;
+    for (uint16_t i = 0; i < repeatTime; ++i) {
+        mask = Reg::UpdateMask<T>(sreg);
+        Reg::LoadAlign(vSrcReg0, src0 + i * sregLower);
+        Reg::LoadAlign(vSrcReg1, src1 + i * sregLower);
+        Reg::Prelu(vDstReg0, vSrcReg0, vSrcReg1, mask);
+        Reg::StoreAlign(dst + i * sregLower, vDstReg0, mask);
+    }
+}
+
+/* **************************************************************************************************
+ * FusedAbsSub                                            *
+ * ************************************************************************************************* */
+// FusedAbsSub::Level 2
+template <typename T>
+__simd_vf__ inline void FusedAbsSubImpl(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, const uint32_t calCount)
+{
+    static_assert(
+        SupportType<T, half, float>(), "Failed to check dtype in FusedAbsSub, current api support "
+                                       "dtype is src and dst both: half, float.");
+    constexpr uint32_t sregLower = static_cast<uint32_t>(GetVecLen() / sizeof(T));
+    const uint16_t repeatTime = static_cast<uint16_t>(CeilDivision(calCount, sregLower));
+    uint32_t sreg = static_cast<uint32_t>(calCount);
+    Reg::RegTensor<T> vDstReg0;
+    Reg::RegTensor<T> vSrcReg0;
+    Reg::RegTensor<T> vSrcReg1;
+    Reg::MaskReg mask;
+    for (uint16_t i = 0; i < repeatTime; ++i) {
+        mask = Reg::UpdateMask<T>(sreg);
+        Reg::LoadAlign(vSrcReg0, src0 + i * sregLower);
+        Reg::LoadAlign(vSrcReg1, src1 + i * sregLower);
+        Reg::FusedAbsSub(vDstReg0, vSrcReg0, vSrcReg1, mask);
+        Reg::StoreAlign(dst + i * sregLower, vDstReg0, mask);
+    }
+}
+
+/* **************************************************************************************************
+ * FusedExpSub                                        *
+ * ************************************************************************************************* */
+// FusedExpSub::Level 2
+template <typename T, typename U>
+__simd_vf__ inline void FusedExpSubImpl(__ubuf__ T* dst, __ubuf__ U* src0, __ubuf__ U* src1, const uint32_t calCount)
+{
+    static_assert(
+        SupportType<Tuple<T, U>, Tuple<float, half>, Tuple<float, float>>(),
+        "Failed to check dtype in "
+        "FusedExpSub, current api support dtype combination is src : half / float, dst: float.");
+    constexpr uint32_t sregLower = static_cast<uint32_t>(GetVecLen() / sizeof(float));
+    const uint16_t repeatTime = static_cast<uint16_t>(CeilDivision(calCount, sregLower));
+    uint32_t sreg = static_cast<uint32_t>(calCount);
+    Reg::RegTensor<T> vDstReg0;
+    Reg::RegTensor<U> vSrcReg0;
+    Reg::RegTensor<U> vSrcReg1;
+    Reg::MaskReg mask;
+    if constexpr (IsSameType<U, half>::value) {
+        for (uint16_t i = 0; i < repeatTime; ++i) {
+            mask = Reg::UpdateMask<T>(sreg);
+            Reg::LoadAlign<U, Reg::LoadDist::DIST_UNPACK_B16>(vSrcReg0, src0 + i * sregLower);
+            Reg::LoadAlign<U, Reg::LoadDist::DIST_UNPACK_B16>(vSrcReg1, src1 + i * sregLower);
+            Reg::FusedExpSub(vDstReg0, vSrcReg0, vSrcReg1, mask);
+            Reg::StoreAlign(dst + i * sregLower, vDstReg0, mask);
+        }
+    } else if constexpr (IsSameType<U, float>::value) {
+        for (uint16_t i = 0; i < repeatTime; ++i) {
+            mask = Reg::UpdateMask<T>(sreg);
+            Reg::LoadAlign(vSrcReg0, src0 + i * sregLower);
+            Reg::LoadAlign(vSrcReg1, src1 + i * sregLower);
+            Reg::FusedExpSub(vDstReg0, vSrcReg0, vSrcReg1, mask);
+            Reg::StoreAlign(dst + i * sregLower, vDstReg0, mask);
+        }
+    }
+}
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_BINARY_CONTINUOUS_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_CONTINUOUS_IMPL_H__)
