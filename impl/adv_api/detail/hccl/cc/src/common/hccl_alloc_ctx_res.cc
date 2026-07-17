@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "hccl_alloc_ctx_res.h"
+#include "adapter_acl.h"
 
 using namespace mc2_ops_hccl;
 using namespace hcomm::CcuRep;
@@ -19,6 +20,32 @@ std::unordered_map<HcclCMDType, OpParamPrepareFunc> opParamPrepareFuncMap = {
     {HcclCMDType::HCCL_CMD_ALLTOALL, PrepareParamForAlltoAll},
     {HcclCMDType::HCCL_CMD_ALLTOALLV, PrepareParamForAlltoAllV},
 };
+
+namespace {
+HcclResult AllocCcuComSyncLikeLegacy(uint64_t size, void** ptr)
+{
+    CHK_PTR_NULL(ptr);
+
+    aclrtMallocAttrValue moduleIdValue{};
+    moduleIdValue.moduleId = HCCL;
+    aclrtMallocAttribute attrs{};
+    attrs.attr = ACL_RT_MEM_ATTR_MODULE_ID;
+    attrs.value = moduleIdValue;
+    aclrtMallocConfig cfg{};
+    cfg.attrs = &attrs;
+    cfg.numAttrs = 1;
+
+    aclError ret = aclrtMallocWithCfg(ptr, size, ACL_MEM_TYPE_HIGH_BAND_WIDTH, &cfg);
+    CHK_PRT_RET(
+        ret != ACL_SUCCESS || *ptr == nullptr,
+        HCCL_ERROR(
+            "[AllocCcuComSyncLikeLegacy] aclrtMallocWithCfg failed, ret[%d], size[%llu], ptr[%p]",
+            ret, size, *ptr),
+        HCCL_E_RUNTIME);
+    HCCL_INFO("[AllocCcuComSyncLikeLegacy] ret[%d], size[%llu], ptr[%p]", ret, size, *ptr);
+    return HCCL_SUCCESS;
+}
+} // namespace
 
 CommEngine OpExecuteConfigToCommEngine(uint8_t commEngine)
 {
@@ -125,7 +152,6 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSi
 
     std::string tagWorkspace = ctxTag + "_ccu_workspace";
     std::string tagComParam = ctxTag + "_ccu_comParam";
-    std::string tagComSync = ctxTag + "_ccu_comSync";
 
     void* workspacePtr = nullptr;
     void* comParamPtr = nullptr;
@@ -133,7 +159,8 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSi
 
     CHK_RET(HcclEngineCtxCreate(comm, tagWorkspace.c_str(), COMM_ENGINE_AIV, Hccl::MC2_WORKSPACE_SIZE, &workspacePtr));
     CHK_RET(HcclEngineCtxCreate(comm, tagComParam.c_str(), COMM_ENGINE_AIV, comParamBufSize, &comParamPtr));
-    CHK_RET(HcclEngineCtxCreate(comm, tagComSync.c_str(), COMM_ENGINE_AIV, comSyncBufSize, &comSyncPtr));
+    // Experimental path: allocate comSync like the legacy DevBuffer/HrtMalloc(HBM) flow to validate CCU write access.
+    CHK_RET(AllocCcuComSyncLikeLegacy(comSyncBufSize, &comSyncPtr));
 
     opResCtx.workSpace = reinterpret_cast<uint64_t>(workspacePtr);
     opResCtx.workSpaceSize = Hccl::MC2_WORKSPACE_SIZE;
