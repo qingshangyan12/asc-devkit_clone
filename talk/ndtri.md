@@ -453,3 +453,18 @@ Spec demands perf at 64k. That is an inconsistency in THEIR harness, not in the 
 Ndtri is compute-only on LocalTensor — data movement is the CALLER's job, so tiling belongs in the
 wrapper, NOT in the API. run.sh now `prof_clean`s PROF_* before each msprof run and FAILS LOUDLY if no
 CSV is produced, instead of reading a stale one.
+
+### F26 — tiled wrapper VERIFIED in sim, incl. tile-boundary cases (9.1-beta.3)
+```
+size=1      0.000e+00  PASS
+size=1023   4.035e-05  PASS   <- identical to pre-tiling => tiling transparent for N < TILE_ELEMS
+size=8192   4.604e-05  PASS   <- exactly one tile
+size=8193   4.604e-05  PASS   <- 2 tiles, 2nd tile = 1 element (off-by-one trap)
+size=20000  4.611e-05  PASS   <- 2 full tiles + 3616 ragged
+```
+UB footprint now constant 64KB regardless of N => 64k (and beyond) is unblocked.
+NOTE `TQue` depth is 1 (no ping-pong), inherited from the official harness. Deliberate: with
+PERF_LOOPS=1000 the copy is only 0.07-0.70% of measured time (from silicon t1/t2), and the metric
+subtracts the copy baseline anyway => BUFFER_NUM=2 would not move aiv_vec (already ~100%).
+A REAL operator (1 compute pass/tile) WOULD need ping-pong — cf. `examples/.../10_math/erf/erf.asc`
+which uses `BUFFER_NUM = 2`. If we ship an ndtri example, it should ping-pong like erf.
