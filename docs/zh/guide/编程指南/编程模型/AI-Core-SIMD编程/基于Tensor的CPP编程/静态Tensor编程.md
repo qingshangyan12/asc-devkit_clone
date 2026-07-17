@@ -184,6 +184,7 @@
 
 ## 支持的API范围<a name="section2633193623711"></a>
 
+<!-- npu="310p" id3 -->
 **表1**  针对Atlas 推理系列产品AI Core，支持的API范围
 
 <a name="table56285428438"></a>
@@ -291,7 +292,9 @@
 </tr>
 </tbody>
 </table>
+<!-- end id3 -->
 
+<!-- npu="910b" id4 -->
 **表2**  针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的API范围
 
 <a name="table1842818536431"></a>
@@ -492,7 +495,9 @@
 </tr>
 </tbody>
 </table>
+<!-- end id4 -->
 
+<!-- npu="A3" id5 -->
 **表3**  针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的API范围
 
 <a name="table167051848128"></a>
@@ -706,7 +711,9 @@
 </tr>
 </tbody>
 </table>
+<!-- end id5 -->
 
+<!-- npu="950" id6 -->
 **表4**  针对Ascend 950PR/Ascend 950DT，支持的API范围
 
 <a name="table1798673512413"></a>
@@ -920,6 +927,7 @@
 </tr>
 </tbody>
 </table>
+<!-- end id6 -->
 
 ## 使用预留UB空间的API范围<a name="section_reserved_ubuf_api"></a>
 

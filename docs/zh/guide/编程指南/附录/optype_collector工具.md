@@ -55,14 +55,28 @@ optype_collector工具用于采集内置/自定义算子包中指定AI处理器�
 
 -   配置说明如下：
 
-    >[!NOTE]说明
-    > - 针对如下产品：在安装AI处理器的服务器执行npu-smi info命令进行查询，获取Name信息。实际配置值为AscendName，例如Name取值为xxxyy，实际配置值为Ascendxxxyy。<br><br>
+    >[!NOTE]说明 
+    ><!-- npu="910b,910,310p,310b" id3 -->
+    >- 针对如下产品：在安装AI处理器的服务器执行npu-smi info命令进行查询，获取Name信息。实际配置值为AscendName，例如Name取值为xxxyy，实际配置值为Ascendxxxyy。<br><br>
+    >    <!-- npu="910b" id4 -->
     >    Atlas A2 训练系列产品/Atlas A2 推理系列产品  
+    >    <!-- end id4 -->
+    >    <!-- npu="310b" id5 -->
     >    Atlas 200I/500 A2 推理产品  
+    >    <!-- end id5 -->
+    >    <!-- npu="310p" id6 -->
     >    Atlas 推理系列产品  
-    >    Atlas 训练系列产品<br><br>
-    > - 针对<term>Atlas A3 训练系列产品</term>/<term>Atlas A3 推理系列产品</term>，在安装AI处理器的服务器执行npu-smi info -t board -i id -c chip_id命令进行查询，获取Chip Name和NPU Name信息，实际配置值为Chip Name_NPU Name。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。其中：<br>id：设备id，通过npu-smi info -l命令查出的NPU ID即为设备id。<br> chip_id：芯片id，通过npu-smi info -m命令查出的Chip ID即为芯片id。<br><br>
-    > - 针对Ascend 950PR/Ascend 950DT，在安装AI处理器的服务器执行npu-smi info -t board -i id命令进行查询，获取Chip Name和NPU Name信息，实际配置值为Chip Name_NPU Name。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。<br> 其中：id为设备id，通过npu-smi info -l命令查出的NPU ID即为设备id。
+    >    <!-- end id6 -->
+    >    <!-- npu="910" id7 -->
+    >    Atlas 训练系列产品<br><br> 
+    >    <!-- end id7 -->
+    ><!-- end id3 -->
+    ><!-- npu="A3" id1 -->
+    >- 针对<term>Atlas A3 训练系列产品</term>/<term>Atlas A3 推理系列产品</term>，在安装AI处理器的服务器执行npu-smi info -t board -i id -c chip_id命令进行查询，获取Chip Name和NPU Name信息，实际配置值为Chip Name_NPU Name。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。其中：<br>id：设备id，通过npu-smi info -l命令查出的NPU ID即为设备id。<br> chip_id：芯片id，通过npu-smi info -m命令查出的Chip ID即为芯片id。<br><br>
+    ><!-- end id1 -->
+    ><!-- npu="950" id2 -->
+    >- 针对Ascend 950PR/Ascend 950DT，在安装AI处理器的服务器执行npu-smi info -t board -i id命令进行查询，获取Chip Name和NPU Name信息，实际配置值为Chip Name_NPU Name。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。<br> 其中：id为设备id，通过npu-smi info -l命令查出的NPU ID即为设备id。
+    ><!-- end id2 -->
 
 -   **输出内置算子OpType清单的命令**
 

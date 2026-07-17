@@ -6,18 +6,26 @@
 
 -   **\_\_NPU\_ARCH\_\_**
 
-    \_\_NPU\_ARCH\_\_是Device侧AI Core代码中的预处理宏，用于标识AI处理器的架构版本。该宏由四位数字组成，其中前三位数字用于标识AI Core的IP核\(Intellectual Property Core\)类型，第四位数字标识该AI Core同一个IP核的配置版本。通过该宏，开发者可以针对不同AI处理器，差异化进行代码适配和优化。产品型号和NPU架构版本的对应关系如下表所示：
+    \_\_NPU\_ARCH\_\_是Device侧AI Core代码中的预处理宏，用于标识AI处理器的架构版本。该宏由四位数字组成，其中前三位数字用于标识AI Core的IP核\(Intellectual Property Core\)类型，第四位数字标识该AI Core同一个IP核的配置版本。通过该宏，开发者可以针对不同AI处理器，差异化进行代码适配和优化。产品型号和NPU架构版本的对应关系如下：
 
-    **表1** 产品型号和NPU架构版本的对应关系
-
-    | AI处理器型号 | __NPU_ARCH__ |
-|--------------|--------------|
-| Ascend 950PR/Ascend 950DT | 3510 |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | 2201 |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | 2201 |
-| Atlas 200I/500 A2 推理产品 | 3002 |
-| Atlas 推理系列产品 | 2002 |
-| Atlas 训练系列产品 | 1001 |
+    <!-- npu="950" id1 -->
+    - Ascend 950PR/Ascend 950DT：3510
+    <!-- end id1 -->
+    <!-- npu="A3" id2 -->
+    - Atlas A3 训练系列产品/Atlas A3 推理系列产品：2201
+    <!-- end id2 -->
+    <!-- npu="910b" id3 -->
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品：2201
+    <!-- end id3 -->
+    <!-- npu="310b" id4 -->
+    - Atlas 200I/500 A2 推理产品：3002
+    <!-- end id4 -->
+    <!-- npu="310p" id5 -->
+    - Atlas 推理系列产品：2002
+    <!-- end id5 -->
+    <!-- npu="910" id6 -->
+    - Atlas 训练系列产品：1001
+    <!-- end id6 -->
 
     以下为通过\_\_NPU\_ARCH\_\_控制在不同AI处理器上算子输出值舍入模式的示例。
 
@@ -442,7 +450,9 @@ __ubuf__ int * __gm__ ptr;
 
 例如，在任务配置的核数为3（block_num = 3）的场景下，当使用`__mix__(1, 2)`作为函数执行空间限定符时，任务会启动3个Cube Core和6个Vector Core，内置变量block_idx在6个Vector Core上的取值分别为：0、0、1、1、2、2，即位于同一核上的两个Vector Core取值相同，而GetBlockIdx API获取的值分别为：0、1、2、3、4、5，两者并不相同。在3个Cube Core上两者的取值相同，均为：0、1、2。
 
+<!-- npu="310p" id7 -->
 例如，在Atlas 推理系列产品中，当启用KERNEL_TYPE_MIX_VECTOR_CORE时，算子会同时运行在AI Core和Vector Core上。此时，block_idx在这两种核心上都是从0开始计数，用户无法直接通过block_idx来切分数据和控制多核逻辑。而GetBlockIdx在Vector Core上对block_idx增加偏移量（AI Core的block_num），从而保证返回的值能够正确反映多核环境下的实际逻辑。
+<!-- end id7 -->
 
 ## 核函数配置<a name="section97005415463"></a>
 
