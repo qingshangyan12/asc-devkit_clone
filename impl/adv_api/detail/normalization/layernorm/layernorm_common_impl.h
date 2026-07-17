@@ -497,8 +497,8 @@ __aicore__ inline void WelfordUpdateImpl(
          (TPosition)inputX.GetPosition() == TPosition::VECCALC),
         {
             KERNEL_LOG(
-                KERNEL_ERROR, "Failed to check tensor position of input in WelfordUpdate, support positions are VECIN, "
-                              "VECOUT, VECCALC.");
+                KERNEL_ERROR, "Failed to check tensor position of input in WelfordUpdate, support positions are "
+                              "UB(VECIN/VECOUT/VECCALC).");
         });
     ASCENDC_ASSERT((para.abLength <= inputX.GetSize()), {
         KERNEL_LOG(
