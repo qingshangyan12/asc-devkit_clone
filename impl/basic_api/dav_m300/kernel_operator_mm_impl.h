@@ -305,7 +305,10 @@ __aicore__ inline void LoadData3DV2L12UBCal(
     __ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams)
 {
     ASCENDC_ASSERT(
-        (false), { KERNEL_LOG(KERNEL_ERROR, "unsupported loaddata_3d_v2 from A1/B1 to UB on current device"); });
+        (false), {
+            KERNEL_LOG(KERNEL_ERROR,
+                "unsupported loaddata_3d_v2 from L1 Buffer(A1/B1) to UB on current device");
+        });
 }
 
 template <>
@@ -313,7 +316,9 @@ __aicore__ inline void LoadData3DV2L12L0BCal(
     __cb__ uint8_t* dst, __cbuf__ uint8_t* src, const LoadData3DParamsV2Pro& loadDataParams)
 {
     ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported loaddata_3d_v2 load uint8_t dtype from A1/B1 to B2 on current device");
+        KERNEL_LOG(KERNEL_ERROR,
+            "unsupported loaddata_3d_v2 load uint8_t dtype from L1 Buffer(A1/B1) to L0B Buffer(B2) "
+            "on current device");
     });
 }
 
@@ -322,7 +327,9 @@ __aicore__ inline void LoadData3DV2L12L0BCal(
     __cb__ int8_t* dst, __cbuf__ int8_t* src, const LoadData3DParamsV2Pro& loadDataParams)
 {
     ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported loaddata_3d_v2 load int8_t dtype from A1/B1 to B2 on current device");
+        KERNEL_LOG(KERNEL_ERROR,
+            "unsupported loaddata_3d_v2 load int8_t dtype from L1 Buffer(A1/B1) to L0B Buffer(B2) "
+            "on current device");
     });
 }
 
