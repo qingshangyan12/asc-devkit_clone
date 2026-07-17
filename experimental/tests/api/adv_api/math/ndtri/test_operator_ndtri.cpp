@@ -10,6 +10,11 @@
 
 #include <gtest/gtest.h>
 #include "kernel_operator.h"
+// Ndtri lives under experimental/ and is therefore NOT pulled in by kernel_api.h. Include it
+// directly; tests/api/adv_api/CMakeLists.txt adds ${ASCENDC_DIR}/experimental/include to the
+// header search path. On promotion into the main tree this include can be dropped in favour of
+// registering "math/ndtri.h" in include/adv_api/kernel_api.h.
+#include "adv_api/math/ndtri.h"
 
 using namespace std;
 using namespace AscendC;

@@ -31,6 +31,8 @@ set(ASCENDC_TEST_HEADER_FILES
     ../common
     matmul/utils
     ${ASCENDC_DIR}
+    # experimental/ mirrors the main tree; needed until Ndtri is promoted into include/adv_api
+    ${ASCENDC_DIR}/experimental/include
     ${ASCENDC_DIR}/include
     ${ASCENDC_DIR}/include/adv_api
     ${ASCENDC_DIR}/include/basic_api
@@ -294,6 +296,7 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     math/cos/test_operator_cos_c310.cpp
     math/cumsum/test_operator_cumsum.cpp
     math/erf/test_operator_erf.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../experimental/tests/api/adv_api/math/ndtri/test_operator_ndtri.cpp
     math/fmod/test_operator_fmod.cpp
     math/hypot/test_operator_hypot.cpp
     math/log/test_operator_log.cpp
