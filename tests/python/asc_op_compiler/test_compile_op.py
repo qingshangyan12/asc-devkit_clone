@@ -1078,6 +1078,28 @@ class TestCompileOp(unittest.TestCase):
         gen_tiling_param_meta_section(compile_info, tiling_info)
         self.assertEqual(global_var_storage.get_variable("ascendc_meta_info"), "unchanged")
 
+    def test_gen_bin_id_meta_section(self):
+        compile_info = CompileInfo()
+        compile_info.kernel_name = "AddCustom_ab1b6750d7f510985325b603cb06dc8b"
+        compile_info.tiling_key_list = ["1", "2"]
+        digest = "000102030405060708090a0b0c0d0e0f" \
+                 "101112131415161718191a1b1c1d1e1f"
+        recorder = OpCompileManifestRecorder()
+        recorder.reset()
+        recorder.manifest["binary"]["bin_id"] = digest
+        global_var_storage.set_variable("ascendc_meta_info", "")
+
+        gen_bin_id_meta_section(compile_info)
+
+        section = global_var_storage.get_variable("ascendc_meta_info")
+        self.assertEqual(section.count("BinaryMetaBinId"), 4)
+        self.assertEqual(section.count("B_TYPE_BIN_ID_INFO"), 2)
+        self.assertIn(".ascend.meta.AddCustom_ab1b6750d7f510985325b603cb06dc8b_1", section)
+        self.assertIn(".ascend.meta.AddCustom_ab1b6750d7f510985325b603cb06dc8b_2", section)
+        self.assertIn("sizeof(BinaryMetaBinId) - sizeof(BaseTlv)}, 1", section)
+        self.assertIn("0x00, 0x01, 0x02", section)
+        self.assertIn("0x1d, 0x1e, 0x1f", section)
+
     def test_gen_kernel_fun(self):
         SetCurrentSocInfo("Ascend910B1")
         cce_file = os.path.join(

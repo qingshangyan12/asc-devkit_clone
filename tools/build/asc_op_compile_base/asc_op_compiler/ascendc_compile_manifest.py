@@ -26,7 +26,8 @@ from .ascendc_constants import CompileOptionTuple
 from .get_op_tiling import OpInfo, TilingInfo
 from .global_storage import global_var_storage
 
-MANIFEST_VERSION = '1.0'
+MANIFEST_VERSION = '2.0'
+BIN_ID_DOMAIN = 'ascendc-bin-id-v1\0'
 CANN_PATH_PLACEHOLDER = '{CANN_PATH_PLACEHOLDER}'
 SRC_FILE_PLACEHOLDER = '{SRC_FILE_PLACEHOLDER}'
 KERNEL_TYPE_PLACEHOLDER = '{kernel_type_placeholder}'
@@ -53,23 +54,30 @@ class OpCompileManifestRecorder:
         self.super_kernel_record_only = False
         self.compile_records = []
         self.pending_bindings = []
+        self.binary_common_raw_options = []
+        self.by_tiling_key_compile_options = {}
+        self.tiling_struct_info = {
+            "default": "",
+            "by_tiling_key": {},
+            "sources": []
+        }
+        self.kernel_type_info = {
+            "default": "",
+            "by_tiling_key": {}
+        }
         self.manifest = {
             "version": MANIFEST_VERSION,
             "basic_info": {},
             "artifacts": {},
-            "tiling_struct_info": {
-                "default": "",
-                "by_tiling_key": {},
-                "sources": []
-            },
             "compile_options": {
-                "source": "compile_option_tuple",
-                "include_paths": [],
-                "include_files": [],
-                "macros": [],
-                "undef_macros": [],
-                "options": [],
-                "mllvm_options": []
+                "common": self._empty_compile_option_section()
+            },
+            "binary": {
+                "bin_id": "",
+                "soc_version": "",
+                "source_hash": "",
+                "source_hash_scope": "entry",
+                "kernels": {}
             }
         }
 
@@ -113,6 +121,7 @@ class OpCompileManifestRecorder:
             "origin_func_name": origin_func_name,
             "soc_version": self._get_soc_version()
         })
+        self.manifest["binary"]["soc_version"] = self._get_soc_version()
 
     def set_compile_log_path(self, compile_log_path):
         self.compile_log_path = compile_log_path
@@ -136,6 +145,7 @@ class OpCompileManifestRecorder:
             else:
                 self.manifest["basic_info"].pop("tiling_key_group_map", None)
             self.manifest["basic_info"].update(basic_info)
+            self.manifest["binary"]["soc_version"] = basic_info["soc_version"]
             self.set_compile_log_path(compile_info.compile_log_path)
         if tiling_info is not None:
             self.manifest["basic_info"].update({
@@ -151,15 +161,53 @@ class OpCompileManifestRecorder:
         compile_option_info = self._categorize_compile_options(raw_compile_options)
         compile_option_info["source"] = "compile_option_tuple"
         compile_option_info["mllvm_options"].extend(raw_mllvm_options)
-        self.manifest["compile_options"] = {
-            "source": compile_option_info["source"],
-            "include_paths": compile_option_info["include_paths"],
-            "include_files": compile_option_info["include_files"],
-            "macros": compile_option_info["macros"],
-            "undef_macros": compile_option_info["undef_macros"],
-            "options": compile_option_info["options"],
-            "mllvm_options": compile_option_info["mllvm_options"]
+        compile_option_info.pop("source", None)
+        self.manifest["compile_options"] = {"common": compile_option_info}
+
+    def prepare_binary_identity(self, compile_info: CompileInfo,
+                                compile_option_tuple: CompileOptionTuple):
+        if self.manifest.get("binary", {}).get("bin_id"):
+            return self.manifest["binary"]["bin_id"]
+        if compile_info is None or compile_option_tuple is None:
+            return ""
+        source_path = getattr(compile_info, "src_file", "")
+        try:
+            with open(source_path, 'rb') as fd:
+                source_hash = hashlib.sha256(fd.read()).hexdigest()
+        except Exception as err:
+            self._mark_incomplete("compute entry source hash failed: {}".format(err))
+            return ""
+
+        self.binary_common_raw_options = self._clean_compile_options_for_manifest(
+            self._to_jsonable_list(compile_option_tuple.compile_options))
+        common = self._categorize_compile_options(self.binary_common_raw_options)
+        common["mllvm_options"].extend(
+            self._to_jsonable_list(compile_option_tuple.mllvm_options))
+        identity = {
+            "source_hash": source_hash,
+            "common_compile_options": common
         }
+        canonical_identity = json.dumps(
+            identity, sort_keys=True, separators=(',', ':'), ensure_ascii=False)
+        bin_id = hashlib.sha256(
+            (BIN_ID_DOMAIN + canonical_identity).encode('utf-8')).hexdigest()
+        self.manifest["compile_options"] = {"common": common}
+        self.manifest["binary"].update({
+            "bin_id": bin_id,
+            "soc_version": self._get_soc_version(),
+            "source_hash": source_hash,
+            "source_hash_scope": "entry"
+        })
+        return bin_id
+
+    def get_bin_id(self):
+        return self.manifest.get("binary", {}).get("bin_id", "")
+
+    def _mark_incomplete(self, reason):
+        self.manifest["record_status"] = "incomplete"
+        reasons = self.manifest.setdefault("record_errors", [])
+        if reason not in reasons:
+            reasons.append(reason)
 
     def record_wrapper_body(self, compile_info: CompileInfo, role="normal"):
         if self.kernel_meta_dir is None or compile_info is None:
@@ -317,11 +365,7 @@ class OpCompileManifestRecorder:
 
     def record_tiling_struct_info(self, tiling_key_struct_map=None, default_tiling_struct=None, source=None,
                                   tiling_key_list=None, tiling_key_group_map=None):
-        tiling_struct_info = self.manifest.setdefault("tiling_struct_info", {
-            "default": "",
-            "by_tiling_key": {},
-            "sources": []
-        })
+        tiling_struct_info = self.tiling_struct_info
         if default_tiling_struct is not None:
             tiling_struct_info["default"] = str(default_tiling_struct)
         by_tiling_key = tiling_struct_info.setdefault("by_tiling_key", {})
@@ -354,10 +398,7 @@ class OpCompileManifestRecorder:
 
     def record_kernel_type_info(self, tiling_key_kernel_type=None, default_kernel_type=None,
                                 tiling_key_list=None, tiling_key_group_map=None):
-        kernel_type_info = self.manifest.setdefault("kernel_type_info", {
-            "default": "",
-            "by_tiling_key": {}
-        })
+        kernel_type_info = self.kernel_type_info
         if default_kernel_type is not None:
             kernel_type_info["default"] = self._normalize_kernel_type(default_kernel_type)
 
@@ -388,13 +429,25 @@ class OpCompileManifestRecorder:
             return
         try:
             self.update_basic_info(compile_info=compile_info, tiling_info=tiling_info)
-            if not self.update_compile_options_from_log() and compile_option_tuple is not None:
-                self.update_compile_options(compile_option_tuple)
+            if compile_info is not None:
+                self.record_tiling_struct_info(
+                    getattr(compile_info, "tiling_key_struct_map", None),
+                    getattr(compile_info, "default_tiling_struct", None),
+                    tiling_key_list=getattr(compile_info, "tiling_key_list", None),
+                    tiling_key_group_map=getattr(compile_info, "tiling_key_group_map", None))
+            if not self.get_bin_id() and compile_option_tuple is not None:
+                self.prepare_binary_identity(compile_info, compile_option_tuple)
+            self.update_compile_options_from_log()
+            self.update_kernel_type_info_from_compile_options(compile_info)
+            self._finalize_binary_kernels()
             if self.is_super_kernel_sub_combine:
                 if self.super_kernel_record_only:
                     self._record_synthetic_sk_bind()
                 self._finalize_super_kernel_bindings()
-            self.update_kernel_type_info_from_compile_options(compile_info)
+            if not self.get_bin_id():
+                self._mark_incomplete("binary identity is missing")
+            if not self.manifest.get("binary", {}).get("kernels"):
+                self._mark_incomplete("binary kernel records are missing")
             with open(self.manifest_path, 'w') as fd:
                 json.dump(self.manifest, fd, indent=2, sort_keys=True)
                 fd.write('\n')
@@ -680,34 +733,88 @@ class OpCompileManifestRecorder:
             compile_records = [record for record in compile_records if record["role"] == "normal"]
         if not compile_records:
             return False
-        common_raw_options = self._common_options([record["raw_options"] for record in compile_records])
+        common_raw_options = self.binary_common_raw_options
+        if not common_raw_options:
+            common_raw_options = self._common_options(
+                [record["raw_options"] for record in compile_records])
+            self.manifest["compile_options"] = {
+                "common": self._categorize_compile_options(common_raw_options)
+            }
         by_tiling_key = {}
-        core_types = []
         for record in compile_records:
             tiling_key = record["tiling_key"]
             core_type = record["core_type"]
-            core_types.append(core_type)
-            tiling_info = by_tiling_key.setdefault(tiling_key, {
-                "cores": {},
-                "is_mix_compile": False
-            })
+            tiling_info = by_tiling_key.setdefault(tiling_key, {"cores": {}})
             raw_options = self._subtract_options(record["raw_options"], common_raw_options)
             compile_option_info = self._categorize_compile_options(raw_options)
-            compile_option_info["arch"] = record["arch"]
+            common_mllvm = self.manifest.get("compile_options", {}).get(
+                "common", {}).get("mllvm_options", [])
+            compile_option_info["mllvm_options"] = self._subtract_options(
+                compile_option_info["mllvm_options"], common_mllvm)
             tiling_info["cores"][core_type] = compile_option_info
-            tiling_info["is_mix_compile"] = len(tiling_info["cores"]) > 1
-
-        core_types = self._unique_keep_order(core_types)
-        self.manifest["compile_options"] = {
-            "source": "compile_log",
-            "stage": "CompileStage.COMPILE",
-            "compile_count": len(compile_records),
-            "is_mix_compile": len(core_types) > 1,
-            "core_types": core_types,
-            "common": self._categorize_compile_options(common_raw_options),
-            "by_tiling_key": by_tiling_key
-        }
+            record["compile_options"] = compile_option_info
+        self.by_tiling_key_compile_options = by_tiling_key
         return True
+
+    @staticmethod
+    def _normalize_kernel_symbol(symbol):
+        return re.sub(r"_(?:mix_aic|mix_aiv)$", "", str(symbol or ""))
+
+    def _resolve_kernel_type(self, tiling_key):
+        return self.kernel_type_info.get("by_tiling_key", {}).get(
+            tiling_key, self.kernel_type_info.get("default", ""))
+
+    def _resolve_tiling_struct(self, tiling_key):
+        return self.tiling_struct_info.get("by_tiling_key", {}).get(
+            tiling_key, self.tiling_struct_info.get("default", ""))
+
+    def _finalize_binary_kernels(self):
+        binary = self.manifest.setdefault("binary", {})
+        kernels = {}
+        normal_records = []
+        for record in self.compile_records:
+            if record.get("tiling_key") is None or record.get("role") == "bind":
+                continue
+            if self.is_super_kernel_sub_combine and record.get("role") != "normal":
+                continue
+            normal_records.append(record)
+        for record in normal_records:
+            symbol = record.get("kernel_symbol", "")
+            kernel_name = self._normalize_kernel_symbol(symbol)
+            tiling_key = record.get("tiling_key", "")
+            core_type = record.get("core_type", "")
+            if not kernel_name or core_type not in ("aic", "aiv"):
+                self._mark_incomplete(
+                    "compile record has invalid kernel symbol or core type")
+                continue
+            kernel_type = self._resolve_kernel_type(tiling_key)
+            tiling_struct = self._resolve_tiling_struct(tiling_key)
+            if not kernel_type or not tiling_struct:
+                self._mark_incomplete(
+                    "kernel {} lacks kernel type or tiling struct".format(kernel_name))
+            kernel = kernels.setdefault(kernel_name, {
+                "tiling_key": tiling_key,
+                "kernel_type": kernel_type,
+                "tiling_struct": tiling_struct,
+                "cores": {}
+            })
+            shared_identity = (kernel["tiling_key"], kernel["kernel_type"], kernel["tiling_struct"])
+            if shared_identity != (tiling_key, kernel_type, tiling_struct):
+                self._mark_incomplete(
+                    "normalized kernel {} has inconsistent shared metadata".format(kernel_name))
+                continue
+            core = {
+                "arch": record.get("arch", ""),
+                "compile_options": record.get(
+                    "compile_options", self._empty_compile_option_section())
+            }
+            if core_type in kernel["cores"] and kernel["cores"][core_type] != core:
+                self._mark_incomplete(
+                    "normalized kernel {} has conflicting {} options".format(
+                        kernel_name, core_type))
+                continue
+            kernel["cores"][core_type] = core
+        binary["kernels"] = kernels
 
     def _record_synthetic_sk_bind(self):
         if self.pending_bindings:
@@ -792,6 +899,7 @@ class OpCompileManifestRecorder:
             identity = normal_record or super_record or {}
             bindings.append({
                 "tiling_key": identity.get("tiling_key", ""),
+                "kernel_name": self._normalize_kernel_symbol(normal_symbol),
                 "core_type": identity.get("core_type", ""),
                 "arch": identity.get("arch", ""),
                 "normal_symbol": normal_symbol,
@@ -809,8 +917,7 @@ class OpCompileManifestRecorder:
     def update_kernel_type_info_from_compile_options(self, compile_info):
         if compile_info is None or getattr(compile_info, "no_set_kernel_type", False) is not True:
             return
-        compile_options = self.manifest.get("compile_options", {})
-        by_tiling_key = compile_options.get("by_tiling_key", {})
+        by_tiling_key = self.by_tiling_key_compile_options
         if not by_tiling_key:
             return
         tiling_key_kernel_type = self._infer_kernel_type_info_from_compile_options(by_tiling_key)

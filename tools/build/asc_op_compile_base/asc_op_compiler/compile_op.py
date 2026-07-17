@@ -571,6 +571,25 @@ def gen_tiling_param_meta_section(compile_info: CompileInfo, tiling_info: Tiling
     global_var_storage.set_variable("ascendc_meta_info", section_var)
 
 
+def gen_bin_id_meta_section(compile_info: CompileInfo):
+    bin_id = OpCompileManifestRecorder().get_bin_id()
+    if len(bin_id) != 64 or re.fullmatch(r"[0-9a-f]{64}", bin_id) is None:
+        return
+    digest = ["0x{}".format(bin_id[index:index + 2]) for index in range(0, len(bin_id), 2)]
+    section_var = global_var_storage.get_variable("ascendc_meta_info")
+    for tiling_key_value in compile_info.tiling_key_list:
+        tiling_key = str(tiling_key_value)
+        variable_name = "{}_bin_id_{}_section".format(compile_info.kernel_name, tiling_key)
+        runtime_kernel_name = "{}_{}".format(compile_info.kernel_name, tiling_key)
+        section_var += "\n#if {} == {}UL\n".format(TILING_KEY_MACRO, tiling_key)
+        section_var += "static const struct BinaryMetaBinId {} __attribute__ ".format(variable_name)
+        section_var += "((used, section (\".ascend.meta.{}\"))) = ".format(runtime_kernel_name)
+        section_var += "{{B_TYPE_BIN_ID_INFO, sizeof(BinaryMetaBinId) - sizeof(BaseTlv)}, 1, "
+        section_var += "{{{}}}}};\n".format(", ".join(digest))
+        section_var += "#endif\n"
+    global_var_storage.set_variable("ascendc_meta_info", section_var)
+
+
 def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
                     tiling_info: TilingInfo, compile_option_tuple):
     compile_options = compile_option_tuple.compile_options
@@ -1043,6 +1062,7 @@ def gen_op_stub_kernel_func(compile_info: CompileInfo, op_info: OpInfo, compile_
     workspace_idx = gen_kernel_fun(compile_info, compile_info.origin_func_name, op_info, tiling_info,
         compile_option_tuple)
     gen_tiling_param_meta_section(compile_info, tiling_info)
+    gen_bin_id_meta_section(compile_info)
     OpCompileManifestRecorder().record_wrapper_body(compile_info, wrapper_role)
 
     msg_info = "<{}> <{}> generate kernel stub end".format(compile_info.op_type, compile_info.tiling_key_list)
@@ -1398,6 +1418,8 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
             "compile_info.tiling_key_struct_map",
             tiling_key_list=compile_info.tiling_key_list,
             tiling_key_group_map=compile_info.tiling_key_group_map)
+
+    manifest_recorder.prepare_binary_identity(compile_info, compile_option_tuple)
 
     compile_info_origin = CompileInfo()
     compile_option_tuple_origin = None

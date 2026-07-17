@@ -11,6 +11,7 @@
 # ----------------------------------------------------------------------------------------------------------
 
 import json
+import hashlib
 import os
 import sys
 import unittest
@@ -43,6 +44,10 @@ class TestAscendcCompileManifest(unittest.TestCase):
         compile_info.code_channel = 0
         compile_info.tiling_key_list = ["20", "21"]
         compile_info.tiling_key_group_map = {}
+        compile_info.tiling_key_struct_map = {
+            "20": "TestTilingData20",
+            "21": "TestTilingData21"
+        }
         compile_info.compile_log_path = log_path
         compile_info.no_set_kernel_type = True
         return compile_info
@@ -76,7 +81,7 @@ class TestAscendcCompileManifest(unittest.TestCase):
     def _tiling_info():
         return SimpleNamespace(static_shape_flag=True, tiling_key=20, block_num=20)
 
-    def test_normal_compile_keeps_existing_manifest_shape(self):
+    def test_normal_compile_records_manifest_v2_binary(self):
         with TemporaryDirectory() as temp_dir:
             kernel_name = "TestOp_normal"
             source_path = os.path.join(temp_dir, "test_op.cpp")
@@ -103,11 +108,64 @@ extern \"C\" __global__ [aicore] void auto_gen_test_op_kernel() {{}}
             self.assertNotIn("features", manifest)
             self.assertNotIn("super_kernel_sub_combine", manifest)
             self.assertNotIn('"raw_options"', json.dumps(manifest))
+            self.assertEqual(manifest["version"], "2.0")
+            self.assertNotIn("kernel_type_info", manifest)
+            self.assertNotIn("tiling_struct_info", manifest)
+            self.assertNotIn("by_tiling_key", manifest["compile_options"])
+            self.assertEqual(manifest["compile_options"]["common"]["macros"], ["BASE=1"])
+            binary = manifest["binary"]
+            self.assertRegex(binary["bin_id"], r"^[0-9a-f]{64}$")
+            self.assertRegex(binary["source_hash"], r"^[0-9a-f]{64}$")
+            self.assertEqual(binary["source_hash_scope"], "entry")
+            self.assertEqual(binary["soc_version"], "Ascend910B")
+            self.assertEqual(set(binary["kernels"]), {"normal_symbol"})
+            kernel = binary["kernels"]["normal_symbol"]
+            self.assertEqual(kernel["tiling_key"], "20")
+            self.assertEqual(kernel["kernel_type"], "KERNEL_TYPE_AIV_ONLY")
+            self.assertEqual(kernel["tiling_struct"], "TestTilingData20")
+            self.assertEqual(set(kernel["cores"]), {"aiv"})
             self.assertEqual(set(manifest["artifacts"]), {"wrapper_body"})
             with open(os.path.join(temp_dir, manifest["artifacts"]["wrapper_body"]), 'r') as fd:
                 wrapper_body = fd.read()
             self.assertIn("{SRC_FILE_PLACEHOLDER}", wrapper_body)
             self.assertIn("{kernel_type_placeholder}", wrapper_body)
+
+    def test_bin_id_uses_entry_source_and_common_options_only(self):
+        with TemporaryDirectory() as temp_dir:
+            source_path = os.path.join(temp_dir, "test_op.cpp")
+            wrapper_path = os.path.join(temp_dir, "test_op_kernel.cpp")
+            log_path = os.path.join(temp_dir, "compile.log")
+            self._write(source_path, "void test_op() {}\n")
+            compile_info = self._compile_info(
+                "TestOp_identity", source_path, wrapper_path, log_path)
+            options = CompileOptionTuple(
+                ["-DBASE=1", "-I/include/path"], ["-mllvm-option"])
+
+            recorder = OpCompileManifestRecorder()
+            recorder.start(self._op_info("TestOp_identity"), "test_op", source_path, temp_dir)
+            first_bin_id = recorder.prepare_binary_identity(compile_info, options)
+            source_hash = hashlib.sha256(b"void test_op() {}\n").hexdigest()
+            self.assertEqual(recorder.manifest["binary"]["source_hash"], source_hash)
+
+            global_var_storage.set_variable("ascendc_short_soc_version", "Ascend950")
+            recorder.reset()
+            recorder.start(self._op_info("TestOp_identity"), "test_op", source_path, temp_dir)
+            second_bin_id = recorder.prepare_binary_identity(compile_info, options)
+            self.assertEqual(first_bin_id, second_bin_id)
+            self.assertEqual(recorder.manifest["binary"]["soc_version"], "Ascend950")
+
+            recorder.reset()
+            recorder.start(self._op_info("TestOp_identity"), "test_op", source_path, temp_dir)
+            changed_options_bin_id = recorder.prepare_binary_identity(
+                compile_info, CompileOptionTuple(
+                    ["-DBASE=2", "-I/include/path"], ["-mllvm-option"]))
+            self.assertNotEqual(first_bin_id, changed_options_bin_id)
+
+            self._write(source_path, "void test_op() { int changed = 1; }\n")
+            recorder.reset()
+            recorder.start(self._op_info("TestOp_identity"), "test_op", source_path, temp_dir)
+            changed_source_bin_id = recorder.prepare_binary_identity(compile_info, options)
+            self.assertNotEqual(first_bin_id, changed_source_bin_id)
 
     def test_super_kernel_sub_combine_records_delta_artifacts_and_bindings(self):
         with TemporaryDirectory() as temp_dir:
@@ -126,22 +184,22 @@ extern \"C\" __global__ [aicore] void auto_gen_test_op_kernel() {{}}
 """.format(source_path))
 
             sk_bind_source = """#include \"kernel_operator.h\"
-SK_BIND(norm_aiv_21, 7, sk_aiv_21, sk_aiv_21_split1, sk_aiv_21_split2, sk_aiv_21_split3);
-SK_BIND(norm_aic_20, 7, sk_aic_20, sk_aic_20_split1, sk_aic_20_split2, sk_aic_20_split3);
-SK_BIND(norm_aiv_20, 7, sk_aiv_20, sk_aiv_20_split1, sk_aiv_20_split2, sk_aiv_20_split3);
+SK_BIND(norm_21, 7, sk_21, sk_21_split1, sk_21_split2, sk_21_split3);
+SK_BIND(norm_20_mix_aic, 7, sk_20_mix_aic, sk_20_mix_aic_split1, sk_20_mix_aic_split2, sk_20_mix_aic_split3);
+SK_BIND(norm_20_mix_aiv, 7, sk_20_mix_aiv, sk_20_mix_aiv_split1, sk_20_mix_aiv_split2, sk_20_mix_aiv_split3);
 """
             self._write(sk_bind_path, sk_bind_source)
 
             commands = [
-                self._compile_command(super_wrapper, "dav-c220-cube", "sk_aic_20", "20",
+                self._compile_command(super_wrapper, "dav-c220-cube", "sk_20_mix_aic", "20",
                                       "-D__ASCENDC_ENABLE_SUPER_KERNEL__"),
-                self._compile_command(super_wrapper, "dav-c220-vec", "sk_aiv_20", "20",
+                self._compile_command(super_wrapper, "dav-c220-vec", "sk_20_mix_aiv", "20",
                                       "-D__ASCENDC_ENABLE_SUPER_KERNEL__"),
-                self._compile_command(super_wrapper, "dav-c220-vec", "sk_aiv_21", "21",
+                self._compile_command(super_wrapper, "dav-c220-vec", "sk_21", "21",
                                       "-D__ASCENDC_ENABLE_SUPER_KERNEL__"),
-                self._compile_command(normal_wrapper, "dav-c220-cube", "norm_aic_20", "20"),
-                self._compile_command(normal_wrapper, "dav-c220-vec", "norm_aiv_20", "20"),
-                self._compile_command(normal_wrapper, "dav-c220-vec", "norm_aiv_21", "21"),
+                self._compile_command(normal_wrapper, "dav-c220-cube", "norm_20_mix_aic", "20"),
+                self._compile_command(normal_wrapper, "dav-c220-vec", "norm_20_mix_aiv", "20"),
+                self._compile_command(normal_wrapper, "dav-c220-vec", "norm_21", "21"),
                 "bisheng -c -DBASE=1 -D__ASCENDC_ENABLE_SUPER_KERNEL__ {} "
                 "--cce-aicore-arch=dav-c220-cube -DTILING_KEY_VAR=0 -o sk_bind.o".format(sk_bind_path)
             ]
@@ -174,17 +232,17 @@ SK_BIND(norm_aiv_20, 7, sk_aiv_20, sk_aiv_20_split1, sk_aiv_20_split2, sk_aiv_20
             self.assertNotIn('"raw_options"', json.dumps(manifest))
             super_kernel = manifest["features"]["super_kernel"]
             self.assertTrue(super_kernel["enable_super_kernel"])
-            self.assertEqual(manifest["compile_options"]["compile_count"], 3)
-            self.assertNotIn("0", manifest["compile_options"]["by_tiling_key"])
-            self.assertEqual(set(manifest["compile_options"]["by_tiling_key"]), {"20", "21"})
-            self.assertEqual(set(manifest["compile_options"]["by_tiling_key"]["20"]["cores"]), {"aic", "aiv"})
-            aic_macros = manifest["compile_options"]["by_tiling_key"]["20"]["cores"]["aic"]["macros"]
-            self.assertIn("auto_gen_test_op_kernel=norm_aic_20", aic_macros)
+            self.assertEqual(manifest["compile_options"]["common"]["macros"],
+                             ["BASE=1", "WORKSPACE_PARAM_OFFSET=10", "ONE_CORE_DUMP_SIZE=1024"])
+            kernels = manifest["binary"]["kernels"]
+            self.assertEqual(set(kernels), {"norm_20", "norm_21"})
+            self.assertEqual(set(kernels["norm_20"]["cores"]), {"aic", "aiv"})
+            aic_macros = kernels["norm_20"]["cores"]["aic"]["compile_options"]["macros"]
+            self.assertIn("auto_gen_test_op_kernel=norm_20_mix_aic", aic_macros)
             self.assertNotIn("__ASCENDC_ENABLE_SUPER_KERNEL__", aic_macros)
-            self.assertEqual(manifest["kernel_type_info"]["by_tiling_key"]["20"],
-                             "KERNEL_TYPE_MIX_AIC_1_2")
-            self.assertEqual(manifest["kernel_type_info"]["by_tiling_key"]["21"],
-                             "KERNEL_TYPE_AIV_ONLY")
+            self.assertEqual(kernels["norm_20"]["kernel_type"], "KERNEL_TYPE_MIX_AIC_1_2")
+            self.assertEqual(kernels["norm_20"]["tiling_struct"], "TestTilingData20")
+            self.assertEqual(kernels["norm_21"]["kernel_type"], "KERNEL_TYPE_AIV_ONLY")
 
             artifacts = manifest["artifacts"]
             self.assertEqual(set(artifacts), {"wrapper_body", "super_kernel_wrapper_body", "sk_bind"})
@@ -217,10 +275,11 @@ SK_BIND(norm_aiv_20, 7, sk_aiv_20, sk_aiv_20_split1, sk_aiv_20_split2, sk_aiv_20
             self.assertEqual(list(bindings), ["20", "21"])
             self.assertEqual([item["core_type"] for item in bindings["20"]], ["aic", "aiv"])
             self.assertEqual(bindings["21"][0]["core_type"], "aiv")
-            self.assertEqual(bindings["20"][0]["normal_symbol"], "norm_aic_20")
-            self.assertEqual(bindings["20"][0]["super_kernel_symbol"], "sk_aic_20")
+            self.assertEqual(bindings["20"][0]["kernel_name"], "norm_20")
+            self.assertEqual(bindings["20"][0]["normal_symbol"], "norm_20_mix_aic")
+            self.assertEqual(bindings["20"][0]["super_kernel_symbol"], "sk_20_mix_aic")
             self.assertEqual(bindings["20"][0]["split_symbols"],
-                             ["sk_aic_20_split1", "sk_aic_20_split2", "sk_aic_20_split3"])
+                             ["sk_20_mix_aic_split1", "sk_20_mix_aic_split2", "sk_20_mix_aic_split3"])
 
     def test_super_kernel_record_only_uses_normal_compile_log(self):
         with TemporaryDirectory() as temp_dir:
@@ -261,11 +320,12 @@ extern \"C\" __attribute__((aligned(512))) [aicore] void auto_gen_test_op_kernel
                 manifest = json.load(fd)
             combine = manifest["features"]["super_kernel"]["super_kernel_sub_combine"]
             self.assertTrue(combine["record_only"])
-            self.assertEqual(manifest["compile_options"]["compile_count"], 1)
+            self.assertEqual(set(manifest["binary"]["kernels"]), {"normal_symbol"})
             self.assertEqual(combine["split_count"], 3)
             self.assertEqual(combine["bindings"], {
                 "tiling_key": {
                     "20": [{
+                        "kernel_name": "normal_symbol",
                         "core_type": "aiv",
                         "arch": "dav-c220-vec",
                         "normal_symbol": "normal_symbol",

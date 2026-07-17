@@ -119,7 +119,8 @@ enum BinaryMetaType { // function level TLV type
     B_TYPE_DYNAMIC_PARAM = 2,
     B_TYPE_OPTIONAL_PARAM = 3,
     B_TYPE_SK_INFO = 5,
-    B_TYPE_TILING_PARAM_INFO = 30
+    B_TYPE_TILING_PARAM_INFO = 30,
+    B_TYPE_BIN_ID_INFO = 31
 };
 
 struct BaseTlv {  // definition of TLV head
@@ -156,6 +157,12 @@ struct BinaryMetaTilingParam {
     uint32_t paramIndex;
     uint32_t offset;
     uint32_t size;
+};
+
+struct BinaryMetaBinId {
+    BaseTlv head;
+    uint32_t version;
+    uint8_t digest[32];
 };
 
 struct BinaryMetaAscFeature {
