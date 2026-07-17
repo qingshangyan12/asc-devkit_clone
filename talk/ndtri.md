@@ -374,3 +374,20 @@ talk/sim_check/{CMakeLists.txt, data_utils.h, ndtri.asc, gen_data.py, run.sh}
 Ours vs official run.sh (deliberate): sweeps ALL shapes per invocation; does NOT hard-block perf on
 non-npu; prints a paste-ready summary; surfaces the RV_VLN inf/nan flag (F16) when raised.
 Env overrides: `SHAPES="1 32 1023 2048"`, `PERF_SIZES="1024 ... 65536"`.
+
+### F21 — 9.1.0-beta.3 sim results are **BIT-IDENTICAL to 9.0.1** (2026-07-17)
+`./run.sh sim` in container `cann91` (CANN 9.1.0-beta.3, numpy 2.5.0 / scipy 1.18.0):
+```
+size=1     0.000e+00  0/1     PASS
+size=32    3.607e-05  0/32    PASS
+size=1023  4.035e-05  0/1023  PASS
+size=2048  4.478e-05  0/2048  PASS      -> ALL PASS
+```
+Identical to the 9.0.1 run (F15) to every digit => **the arithmetic is stable across CANN versions**;
+the Reg:: op semantics/precision did not change between 9.0.1 and 9.1-beta.3. Raises confidence that
+GA 9.1 on silicon will match, though silicon remains the source of truth.
+**RV_VLN inf/nan flag (F16) reproduces on 9.1** — and correlates EXACTLY with whether the sample
+contains boundary/out-of-domain points: raised for size=32/1023/2048 (gen_data includes the 8 edges
+when size>=16), NOT raised for size=1 (single deep-tail point p=1e-37 -> Ln arg finite).
+=> Confirms the diagnosis: the flag is caused by Ln() on discarded p<=0 / NaN lanes, nothing else.
+=> Still OPEN whether it sets a sticky status on real silicon. Watch for it in the npu run.
