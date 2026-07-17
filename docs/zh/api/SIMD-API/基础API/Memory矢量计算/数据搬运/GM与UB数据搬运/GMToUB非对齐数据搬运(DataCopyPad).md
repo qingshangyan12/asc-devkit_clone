@@ -255,6 +255,7 @@
 - leftPadding、rightPadding所占字节数均不能超过32B。
 - blockLen必须是sizeof\(T\)的整数倍。
 - 结构体DataCopyPadExtParams的参数paddingValue数据类型和源操作数保持一致。当数据类型为b64时，paddingValue只能设置为0。
+- paddingValue不支持fp4×2_e2m1_t、fp4×2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t数据类型。
 - DataCopyExtParams结构体参数的值需在取值范围内：
 
     **表5**  DataCopyExtParams结构体参数取值范围

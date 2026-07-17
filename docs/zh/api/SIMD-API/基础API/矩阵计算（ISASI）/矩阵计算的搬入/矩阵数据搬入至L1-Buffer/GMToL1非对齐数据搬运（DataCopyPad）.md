@@ -112,6 +112,7 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - leftPadding、rightPadding的字节数均不能超过32字节。
+- paddingValue不支持fp4×2_e2m1_t、fp4×2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t数据类型。
 
 ## 调用示例<a name="section177231425115410"></a>
 

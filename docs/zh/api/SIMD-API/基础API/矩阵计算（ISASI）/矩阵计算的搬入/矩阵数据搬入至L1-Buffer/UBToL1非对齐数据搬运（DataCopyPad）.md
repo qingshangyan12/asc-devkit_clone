@@ -125,6 +125,7 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型�
 <!-- npu="950" id11 -->
 - 特别地，针对Ascend 950PR/Ascend 950DT，设置srcStride和dstStride参数时，数据类型为int64_t，取值范围为[0, 65535]。
 <!-- end id11 -->
+- paddingValue不支持fp4×2_e2m1_t、fp4×2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t数据类型。
 
 ## 调用示例<a name="section177231425115410"></a>
 
