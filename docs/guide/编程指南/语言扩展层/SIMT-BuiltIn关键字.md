@@ -285,7 +285,7 @@ add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, 
 -   \_\_launch\_bounds\_\_\(N\) <a name="li23861114618"></a>
   
     函数标记宏，在核函数上可选配置，用于指定核函数启动的最大线程数。最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表，寄存器用于存储线程中的局部变量，若局部变量的个数超出寄存器个数，容易出现栈溢出等问题。建议最大线程数与启动核函数时的dim3线程数保持一致。
-         
+    
     **表5**  \_\_launch\_bounds\_\_的Thread数量与每个Thread可用寄存器数
 
     <a name="table1715318510594"></a>
