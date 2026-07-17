@@ -152,7 +152,7 @@ void WaitTurnStartSig(const ccu::Variable &hbmSigAddr, ccu::Variable &turnStartS
         ccu::Load(hbmSigAddr, turnStartSig);     // 循环读HBM对应地址的信号到Xn，直到Xn中的信号值为1
     }
     turnStartSig = 0;                       // reset Xn
-    ccu::Store(turnStartSig, hbmSigAddr);        // reset HBM
+    // ccu::Store(turnStartSig, hbmSigAddr);        // reset HBM
     /*
     CCU_IF (ctx.dieNum == SINGLE_DIE) {
         // 单Die场景：等待HBM中的信号
