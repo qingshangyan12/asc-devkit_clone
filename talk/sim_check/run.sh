@@ -1,6 +1,10 @@
 #!/bin/bash
 # Our standalone ndtri test. Self-contained — does NOT need the cann-ops-competitions repo.
 #
+# Run ONE test directly, no sweep, no rebuild (size/mode/loops are runtime args):
+#   cd build && python3 ../scripts/gen_data.py 2048 && ./demo 2048 1
+#   ./demo <size> <mode 1|2|3> [loops]     1=precision 2=copy-baseline 3=compute-loop
+#
 #   ./run.sh sim              functional sweep on the simulator
 #   ./run.sh npu              functional sweep on silicon
 #   ./run.sh npu --perf       functional sweep + aiv_vec perf sweep (silicon)
@@ -100,6 +104,7 @@ prof_run() { # $1=size $2=mode $3=loops. FAIL loudly instead of letting extract 
     local out
     if [ "$MODE" = "npu" ]; then out=$(cd build && msprof --application="./demo $1 $2 $3" --output=./ 2>&1)
     else out=$(cd build && msprof op simulator --application="./demo $1 $2 $3" 2>&1); fi
+    KERNEL_US=$(echo "$out" | sed -n 's/^kernel time: \([0-9.]*\) us/\1/p' | head -1)
     if ! find ./build -name "op_summary_*.csv" 2>/dev/null | grep -q .; then
         echo "  !! msprof produced NO op_summary CSV — the kernel likely crashed. Output:"
         echo "$out" | tail -12 | sed 's/^/     /'
@@ -146,7 +151,7 @@ run_func() {
         local tcol=""
         if [ "$MODE" = "npu" ] && [ -n "$kus" ]; then
             # real device: launch->sync is genuinely the kernel (+ ~us of launch overhead)
-            tcol=$(awk "BEGIN{printf \"kernel=%9.1f us %7.2f ns/elem\", $kus, $kus*1000/$n}")
+            tcol=$(awk "BEGIN{printf \"kernel=%9.1f us\", $kus}")
         elif [ -n "$kus" ]; then
             # sim: the 950PR simulator is a SOFTWARE cycle model. launch->sync is ~21s of model
             # startup + software execution regardless of N — it measures the simulator, NOT the chip.
@@ -170,7 +175,8 @@ run_perf() {
     [ "$PERF_LOOPS" = "1000" ] && echo "  NOTE: at PERF_LOOPS=1000 the copies cancel in (t3-t2) and are 1/1000 of a tile, so aiv_vec is"
     [ "$PERF_LOOPS" = "1000" ] && echo "        ~100% at EVERY size by construction. It measures compute purity, NOT the pipeline."
     [ "$PERF_LOOPS" = "1000" ] && echo "        For real single-pass behaviour: PERF_LOOPS=1 ./run.sh $MODE --perf-only"
-    [ "$MODE" != "npu" ] && echo "  WARNING: $MODE perf is INDICATIVE ONLY — acceptance requires -r npu on silicon."
+    [ "$MODE" != "npu" ] && echo "  WARNING: sim perf does NOT work (msprof op simulator emits no op_summary CSV)."
+    [ "$MODE" != "npu" ] && echo "           Perf requires -r npu on silicon. This will fail loudly rather than fake a number."
     local fail=0
     for n in $PERF_SIZES; do
         (cd build && python3 ../scripts/gen_data.py "$n" >/dev/null 2>&1)
@@ -190,15 +196,13 @@ except Exception: print('NaN')")
         [ "$ratio" = "NaN" ] && verdict="NODATA"
         [ "$ratio" != "NaN" ] && [ "$(python3 -c "print(1 if float('$ratio')<$THRESHOLD else 0)")" = "1" ] && verdict="FAIL"
         [ "$verdict" != "PASS" ] && fail=1
-        # per-element device compute time, so sizes are comparable: (t2-t1)/PERF_LOOPS/n
-        local per_elem
-        per_elem=$(python3 -c "
-try:
-    d=(float('$t2')-float('$t1'))/$PERF_LOOPS/$n*1e3   # us -> ns per element per compute pass
-    print(f'{d:.3f}')
-except Exception: print('NA')")
-        printf "  size=%-7s %-6s aiv_vec=%-7s%%  %8s ns/elem  (aiv t1=%s t2=%s vec=%s)\n" \
-               "$n" "$verdict" "$ratio" "$per_elem" "$t1" "$t2" "$ct"
+        local ktxt="-"
+        if [ -n "${KERNEL_US:-}" ]; then
+            if [ "$MODE" = "npu" ]; then ktxt=$(awk "BEGIN{printf \"%.0fus\", $KERNEL_US}")
+            else ktxt=$(awk "BEGIN{printf \"%.1fs(sim)\", $KERNEL_US/1e6}"); fi
+        fi
+        printf "  size=%-7s %-6s aiv_vec=%-7s%%  kernel=%-10s  aiv: t1=%s t2=%s vec=%s\n" \
+               "$n" "$verdict" "$ratio" "$ktxt" "$t1" "$t2" "$ct"
     done
     return $fail
 }

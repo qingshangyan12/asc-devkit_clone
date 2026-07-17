@@ -515,3 +515,15 @@ gives 1 rounding instead of 2 => strictly better; keep it. Worth checking the ge
    number actually varies with size. Use 1000 to satisfy the spec gate; use 1 to learn the truth.
 Reference (user's silicon): N=1024, t2=583.08us over 1000 passes -> **~0.58us/pass, ~0.57ns/element**.
 Simulator is ~40,000x slower than the chip.
+
+### F29 — single-run usage + sim perf is genuinely unavailable
+Since size/mode/loops are runtime args (F28), a one-off run needs NO rebuild and NO sweep:
+```
+cd build && python3 ../scripts/gen_data.py 2048 && ./demo 2048 1
+./demo <size> <mode 1|2|3> [loops]     # 1=precision 2=copy-baseline 3=compute-loop
+```
+`msprof op simulator` produces NO `op_summary_*.csv` -> **sim perf does not work at all** (confirmed;
+this was the official run.sh's dead-code branch, never functional). Perf REQUIRES `-r npu`. run.sh now
+fails loudly there instead of reading a stale CSV and printing a fake ratio.
+Dropped the `ns/elem` column (derived noise). Perf line now shows real `kernel=` (launch->sync of the
+mode-3 run) alongside the raw `aiv: t1/t2/vec`.
