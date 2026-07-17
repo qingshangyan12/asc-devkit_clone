@@ -38,7 +38,7 @@ public:
         const LocalTensor<T>& outputPdX, const LocalTensor<T>& resForGamma, const LocalTensor<T>& inputDy,
         const LocalTensor<T>& inputX, const LocalTensor<T>& inputVariance, const LocalTensor<T>& inputMean,
         const LocalTensor<T>& inputGamma, LocalTensor<uint8_t>& sharedTmpBuffer, T epsilon, LayerNormGradTiling& tiling,
-        const LayerNormGradShapeInfo& shapeInfo = {}){};
+        const LayerNormGradShapeInfo& shapeInfo = {}) {};
 };
 
 } // namespace HighLevelApiCheck

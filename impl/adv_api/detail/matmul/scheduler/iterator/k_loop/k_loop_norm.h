@@ -110,7 +110,7 @@ public:
 
     __aicore__ inline bool LastOuterIter() const { return outerIdx_ + 1 == kIter_; }
 
-    __aicore__ inline void InnerStart(){};
+    __aicore__ inline void InnerStart() {};
 
     __aicore__ inline bool InnerNext() { return false; }
 

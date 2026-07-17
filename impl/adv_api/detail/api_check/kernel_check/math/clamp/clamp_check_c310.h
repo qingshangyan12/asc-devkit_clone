@@ -36,7 +36,7 @@ public:
 public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer,
-        const T scalar, const uint32_t count){};
+        const T scalar, const uint32_t count) {};
 };
 
 template <typename T, bool isReuseSource = false>
@@ -48,7 +48,7 @@ public:
 public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer,
-        const T scalar, const uint32_t count){};
+        const T scalar, const uint32_t count) {};
 };
 
 template <typename T, typename U, typename S, bool isReuseSource = false>

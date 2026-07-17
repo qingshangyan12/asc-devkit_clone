@@ -149,7 +149,8 @@ HcclResult CheckCommEngine(const void* ccTilingList[], uint32_t tilingNum)
 {
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
-        if (ccTiling->commEngine != static_cast<uint8_t>(COMM_ENGINE_AICPU) && ccTiling->commEngine != static_cast<uint8_t>(COMM_ENGINE_CPU)) {
+        if (ccTiling->commEngine != static_cast<uint8_t>(COMM_ENGINE_AICPU) &&
+            ccTiling->commEngine != static_cast<uint8_t>(COMM_ENGINE_CPU)) {
             HCCL_ERROR("Invalid commEngine %u.", ccTiling->commEngine);
             return HCCL_E_NOT_SUPPORT;
         }
@@ -479,8 +480,7 @@ HcclResult InitOpParamByTiling(
     return HCCL_SUCCESS;
 }
 
-HcclResult PrepareTopoInfoForOp(
-    HcclComm comm, OpParam& opParam, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo)
+HcclResult PrepareTopoInfoForOp(HcclComm comm, OpParam& opParam, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo)
 {
     opParam.hcclComm = comm;
     CHK_RET(HcclGetOpExpansionMode(comm, opParam));
@@ -539,8 +539,7 @@ HcclResult CheckForcedAlgResource(
     CHK_PRT_RET(
         ret != HCCL_SUCCESS,
         HCCL_WARNING(
-            "[MC2_FORCE_ALG] fallback, CalcRes failed, algName[%s], ret[%d].", algName.c_str(),
-            static_cast<int>(ret)),
+            "[MC2_FORCE_ALG] fallback, CalcRes failed, algName[%s], ret[%d].", algName.c_str(), static_cast<int>(ret)),
         HCCL_E_NOT_SUPPORT);
     return HCCL_SUCCESS;
 }
@@ -596,8 +595,7 @@ HcclResult TryForcedAlgAndPrepareEngine(
 
     algName = forcedAlgName;
     forcedAlgAccepted = true;
-    HCCL_INFO(
-        "[MC2_FORCE_ALG] accepted, opType[%u], algName[%s].", static_cast<u32>(opParam.opType), algName.c_str());
+    HCCL_INFO("[MC2_FORCE_ALG] accepted, opType[%u], algName[%s].", static_cast<u32>(opParam.opType), algName.c_str());
     return HCCL_SUCCESS;
 }
 

@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
  * \file load_to_l0a_intf.h
@@ -14,7 +14,8 @@
  */
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message("impl/adv_api/detail/matmul/stage/split/load_to_l0a/load_to_l0a_intf.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message( \
+    "impl/adv_api/detail/matmul/stage/split/load_to_l0a/load_to_l0a_intf.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/matmul/matmul.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_STAGE_SPLIT_LOAD_TO_L0A_LOAD_TO_L0A_INTF_H__
 #endif
@@ -35,10 +36,10 @@ namespace Detail {
     LoadToL0A is only for internal usage, does not support extension or customized specialization!
 */
 template <typename IMPL, typename A_TYPE, const auto& MM_CFG, typename = void>
-class LoadToL0A
-{
+class LoadToL0A {
     using A_T = typename A_TYPE::T;
     using AuxDtype = decltype(GetAuxDataType<A_TYPE>());
+
 public:
     __aicore__ inline LoadToL0A() = default;
     __aicore__ inline ~LoadToL0A() = default;
@@ -75,15 +76,15 @@ public:
      * @param: aAuxL1KOffset: Offset of the basic block relative to the original auxiliary matrix in the k direction
      * @return: void
      */
-    __aicore__ inline void Load(const LocalTensor<A_T> &l0A, const LocalTensor<A_T> &l1A,
-    uint16_t aL1M, uint16_t aL1K, uint16_t madM, uint16_t madK, uint16_t aL1MOffset, uint16_t aL1KOffset,
-    bool isATranspose, const LocalTensor<AuxDtype> &l1AAuxMatrix = {}, uint16_t aAuxL1K = 0,
-    uint16_t aAuxL1KOffset = 0) const {};
+    __aicore__ inline void Load(
+        const LocalTensor<A_T>& l0A, const LocalTensor<A_T>& l1A, uint16_t aL1M, uint16_t aL1K, uint16_t madM,
+        uint16_t madK, uint16_t aL1MOffset, uint16_t aL1KOffset, bool isATranspose,
+        const LocalTensor<AuxDtype>& l1AAuxMatrix = {}, uint16_t aAuxL1K = 0, uint16_t aAuxL1KOffset = 0) const {};
 };
 
-}  // namespace Detail
-}  // namespace Impl
-}  // namespace AscendC
+} // namespace Detail
+} // namespace Impl
+} // namespace AscendC
 #endif
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_STAGE_SPLIT_LOAD_TO_L0A_LOAD_TO_L0A_INTF_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

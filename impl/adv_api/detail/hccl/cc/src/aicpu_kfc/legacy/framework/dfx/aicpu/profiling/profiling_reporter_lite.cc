@@ -11,15 +11,12 @@
 #include "profiling_reporter_lite.h"
 
 namespace Hccl {
-ProfilingReporterLite::ProfilingReporterLite(MirrorTaskManagerLite *mirrorTaskMgrLite,
-                                             ProfilingHandlerLite *profilingHandlerLite, [[maybe_unused]] bool isIndop)
+ProfilingReporterLite::ProfilingReporterLite(
+    MirrorTaskManagerLite* mirrorTaskMgrLite, ProfilingHandlerLite* profilingHandlerLite, [[maybe_unused]] bool isIndop)
     : mirrorTaskMgrLite_(mirrorTaskMgrLite), profilingHandlerLite_(profilingHandlerLite)
-{
-}
+{}
 
-ProfilingReporterLite::~ProfilingReporterLite()
-{
-}
+ProfilingReporterLite::~ProfilingReporterLite() {}
 
 HcclResult ProfilingReporterLite::Init()
 {
@@ -30,21 +27,19 @@ HcclResult ProfilingReporterLite::Init()
         HCCL_ERROR("[ProfilingReporterLite][Init] mirrorTaskMgrLite or profilingHandlerLite is nullptr.");
         return HCCL_E_PTR;
     }
-    mirrorTaskMgrLite_->RegFullyCallBack([this]() {
-        ReportAllTasks();
-    });
+    mirrorTaskMgrLite_->RegFullyCallBack([this]() { ReportAllTasks(); });
     initializedFlag_ = true;
     return HCCL_SUCCESS;
 }
 
 /*
-*  (*currQueue) == Queue<std::unique_ptr<TaskInfo>> = QUEUE
-*  QUEUE.Begin() =std::shared_ptr<Iterator<unique_ptr<taskInfo>>
-*  *QUEUE.Begin() = Iterator<unique_ptr<taskInfo>
-*  *(*QUEUE.Begin()) = unique_ptr<taskInfo>
-*  *(*(*QUEUE.Begin())) = taskInfo;
-*  taskInfo.push_back((*(*((*currQueue).Begin())));
-*/
+ *  (*currQueue) == Queue<std::unique_ptr<TaskInfo>> = QUEUE
+ *  QUEUE.Begin() =std::shared_ptr<Iterator<unique_ptr<taskInfo>>
+ *  *QUEUE.Begin() = Iterator<unique_ptr<taskInfo>
+ *  *(*QUEUE.Begin()) = unique_ptr<taskInfo>
+ *  *(*(*QUEUE.Begin())) = taskInfo;
+ *  taskInfo.push_back((*(*((*currQueue).Begin())));
+ */
 // 所有的迭代器都是make_shared 永不为空  底层修改之后 需求再看下
 void ProfilingReporterLite::ReportAllTasksLog()
 {
@@ -53,7 +48,7 @@ void ProfilingReporterLite::ReportAllTasksLog()
     }
     for (auto it = mirrorTaskMgrLite_->Begin(); it != mirrorTaskMgrLite_->End(); ++it) {
         u32 streamId = it->first;
-        Queue<std::unique_ptr<TaskInfo>> *currQueue = it->second.queue.get();
+        Queue<std::unique_ptr<TaskInfo>>* currQueue = it->second.queue.get();
         if (currQueue == nullptr || currQueue->Begin() == nullptr || currQueue->Tail() == nullptr) {
             continue;
         }
@@ -62,7 +57,9 @@ void ProfilingReporterLite::ReportAllTasksLog()
             if (*(*logIter) == nullptr) {
                 continue;
             }
-            if (!logAll && *logIter == *lastPoses_[streamId]) { //  找到旧 Tail 位置后设为 logAll=true，continue 跳过该位置，后续全打印
+            if (!logAll &&
+                *logIter ==
+                    *lastPoses_[streamId]) { //  找到旧 Tail 位置后设为 logAll=true，continue 跳过该位置，后续全打印
                 logAll = true;
                 continue;
             }
@@ -84,13 +81,12 @@ void ProfilingReporterLite::ReportAllTasks()
         return;
     }
 
-    std::vector<TaskInfo *> taskInfo;
+    std::vector<TaskInfo*> taskInfo;
     taskInfo.reserve(8192);
     for (auto it = mirrorTaskMgrLite_->Begin(); it != mirrorTaskMgrLite_->End(); ++it) {
-        u32                               streamId  = it->first;
-        Queue<std::unique_ptr<TaskInfo>> *currQueue = it->second.queue.get();
-        if (currQueue == nullptr || (*(*(currQueue->Begin()))) == nullptr
-            || (*(*(currQueue->Tail()))) == nullptr) {
+        u32 streamId = it->first;
+        Queue<std::unique_ptr<TaskInfo>>* currQueue = it->second.queue.get();
+        if (currQueue == nullptr || (*(*(currQueue->Begin()))) == nullptr || (*(*(currQueue->Tail()))) == nullptr) {
             HCCL_WARNING("[ProfilingReporterLite][ReportAllTasks] currQueue is nullptr, continue to next task.");
             continue;
         }
@@ -109,16 +105,13 @@ void ProfilingReporterLite::ReportAllTasks()
     ProfilingHandlerLite::GetInstance().ReportHcclTaskDetails(taskInfo);
 }
 
-void ProfilingReporterLite::UpdateProfStat(void) const
-{
-    ProfilingHandlerLite::GetInstance().UpdateProfSwitch();
-}
+void ProfilingReporterLite::UpdateProfStat(void) const { ProfilingHandlerLite::GetInstance().UpdateProfSwitch(); }
 
 void ProfilingReporterLite::UpdateAllLastPos()
 {
     for (auto it = mirrorTaskMgrLite_->Begin(); it != mirrorTaskMgrLite_->End(); ++it) {
-        u32                               streamId  = it->first;
-        Queue<std::unique_ptr<TaskInfo>> *currQueue = it->second.queue.get(); // 一旦有streamid 必有queue 必不为空
+        u32 streamId = it->first;
+        Queue<std::unique_ptr<TaskInfo>>* currQueue = it->second.queue.get(); // 一旦有streamid 必有queue 必不为空
 
         auto endPos = currQueue->Tail();
         lastPoses_[streamId] = endPos;

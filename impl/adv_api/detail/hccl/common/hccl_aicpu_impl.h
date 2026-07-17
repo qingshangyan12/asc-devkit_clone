@@ -276,7 +276,7 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, co
     }
     ++(curMsgPosition_[queId]);
     ASCENDC_HCCL_API_ASSERT(
-        curMsgPosition_[queId] < HCCL_MSG_CNT, {  return INVALID_HANDLE_ID; },
+        curMsgPosition_[queId] < HCCL_MSG_CNT, { return INVALID_HANDLE_ID; },
         "Message amount exceeds the maximum value when prepare.");
     return handleId;
 }

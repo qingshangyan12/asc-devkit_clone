@@ -43,7 +43,7 @@ constexpr NormalizeConfig NLCFG_NOGAMMA = GetNormalizeConfig(false, true);
 
 constexpr NormalizeConfig NLCFG_NOOPT = GetNormalizeConfig(true, true);
 
-};     // namespace AscendC
+}; // namespace AscendC
 #endif // LIB_NORMALIZATION_NORMALIZE_CONFIG_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NORMALIZATION_NORMALIZE_NORMALIZE_CONFIG_H__)
