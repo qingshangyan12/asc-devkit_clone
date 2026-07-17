@@ -32,7 +32,7 @@ public:
 public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
-        const TransDataParams<U, S>& params){};
+        const TransDataParams<U, S>& params) {};
 };
 
 } // namespace HighLevelApiCheck

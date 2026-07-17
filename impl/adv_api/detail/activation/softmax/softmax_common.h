@@ -144,7 +144,7 @@ __aicore__ inline void UnaryComputeWithSpecialMask(
     }
 }
 
-};     // namespace AscendC
+}; // namespace AscendC
 #endif // IMPL_ACTIVATION_SOFTMAX_SOFTMAX_COMMON_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAX_COMMON_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

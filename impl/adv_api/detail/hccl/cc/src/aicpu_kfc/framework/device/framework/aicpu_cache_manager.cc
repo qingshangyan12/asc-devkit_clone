@@ -1064,9 +1064,9 @@ HcclResult AicpuCacheManager::PrepareUserMemRanges(
                             }
                         }
                     } // curReq.isValid
-                }     // Each TransportRequest
-            }         // Each SingleSubCommTransport
-        }             // Each LevelNSubCommTransport
+                } // Each TransportRequest
+            } // Each SingleSubCommTransport
+        } // Each LevelNSubCommTransport
     }
 
     // 打印debug信息

@@ -81,7 +81,8 @@ template <typename T, bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const
 __aicore__ inline int32_t Hcomm<commProtocol>::AtomicCAS(
     ChannelHandle channel, GM_ADDR dst, GM_ADDR fetchAddr, T compareVal, T swapVal)
 {
-    return impl_.template AtomicCAS<T, commit, commitPipe, reqPipe, config>(channel, dst, fetchAddr, compareVal, swapVal);
+    return impl_.template AtomicCAS<T, commit, commitPipe, reqPipe, config>(
+        channel, dst, fetchAddr, compareVal, swapVal);
 }
 
 template <CommProtocol commProtocol>

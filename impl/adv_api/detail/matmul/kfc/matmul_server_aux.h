@@ -257,7 +257,7 @@ public:
             !ToMatmulConfig(MM_CFG).enableMixDualMaster &&
             "SetWorkspace not support when enableMixDualMaster is enabled");
     }
-    __aicore__ inline void End(){};
+    __aicore__ inline void End() {};
     __aicore__ inline void SetHF32(bool enableHF32 = false, int32_t transMode = 0)
     {
         if constexpr (ToMatmulConfig(MM_CFG).enableMixDualMaster) {
@@ -335,7 +335,7 @@ public:
 #endif
         }
     }
-    __aicore__ inline void WaitIterateAll(){};
+    __aicore__ inline void WaitIterateAll() {};
     template <bool sync = true, bool doPad = false>
     __aicore__ inline void GetTensorC(
         const LocalTensor<DstT>& c, uint8_t enAtomic = 0, bool enSequentialWrite = false, uint32_t height = 0,

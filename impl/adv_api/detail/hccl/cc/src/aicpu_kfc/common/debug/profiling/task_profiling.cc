@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include <securec.h>
 #include "command_handle.h"
 #include "profiling_manager.h"
@@ -21,9 +21,7 @@ TaskProfiling::TaskProfiling(u32 deviceLogicId_, u32 localRank_, bool profilingO
     : ProfilerBase(deviceLogicId_), localRank_(localRank_), profilingOn_(profilingOn)
 {}
 
-TaskProfiling::~TaskProfiling()
-{
-}
+TaskProfiling::~TaskProfiling() {}
 
 u64 TaskProfiling::TimestampNanosecond() const
 {
@@ -33,7 +31,7 @@ u64 TaskProfiling::TimestampNanosecond() const
     return static_cast<u64>(ts.tv_sec * MULTIPLIER_S2NS + ts.tv_nsec);
 }
 
-double TaskProfiling::GetTaskTime(TaskType taskType, const TaskData &taskData) const
+double TaskProfiling::GetTaskTime(TaskType taskType, const TaskData& taskData) const
 {
     double estimatedUs = DURATION_INIT_VALUE;
     double fixedUs = DURATION_INIT_VALUE;
@@ -42,16 +40,16 @@ double TaskProfiling::GetTaskTime(TaskType taskType, const TaskData &taskData) c
         case TaskType::TASK_SDMA:
             /* * 统一按照PCIe的带宽来计算, SDMA的固定开销按照0.6us(<512KB), 1.5us(>512KB)计算
                 PCIe DMA实测带宽为19.3GB */
-            fixedUs = (taskData.DMA.size > DURATION_SDMA_FIXED_THRESHOLD) ? DURATION_SDMA_FIXED_THRESHOLD_ABOVE
-                                                                          : DURATION_SDMA_FIXED_THRESHOLD_BELOW;
+            fixedUs = (taskData.DMA.size > DURATION_SDMA_FIXED_THRESHOLD) ? DURATION_SDMA_FIXED_THRESHOLD_ABOVE :
+                                                                            DURATION_SDMA_FIXED_THRESHOLD_BELOW;
             estimatedUs = (taskData.DMA.size / DURATION_SDMA_BANDWIDTH_MB) + fixedUs;
             break;
 
         case TaskType::TASK_REDUCE_INLINE:
             /* * 统一按照PCIe的带宽来计算, SDMA的固定开销按照0.6us(<512KB), 1.5us(>512KB)计算
                 PCIe DMA实测带宽为19.3GB */
-            fixedUs = (taskData.DMA.size > DURATION_SDMA_FIXED_THRESHOLD) ? DURATION_SDMA_FIXED_THRESHOLD_ABOVE
-                                                                          : DURATION_SDMA_FIXED_THRESHOLD_BELOW;
+            fixedUs = (taskData.DMA.size > DURATION_SDMA_FIXED_THRESHOLD) ? DURATION_SDMA_FIXED_THRESHOLD_ABOVE :
+                                                                            DURATION_SDMA_FIXED_THRESHOLD_BELOW;
             estimatedUs = (taskData.Reduce.size / DURATION_SDMA_BANDWIDTH_MB) + fixedUs;
             break;
 
@@ -93,13 +91,13 @@ ProfTaskType TaskProfiling::GetProfTaskType(TaskType taskType) const
             break;
         case TaskType::TASK_REDUCE_INLINE:
         case TaskType::TASK_REDUCE_TBE:
-            type = (taskType == TaskType::TASK_REDUCE_INLINE) ? (ProfTaskType::TASK_REDUCE_INLINE)
-                                                              : (ProfTaskType::TASK_REDUCE_TBE);
+            type = (taskType == TaskType::TASK_REDUCE_INLINE) ? (ProfTaskType::TASK_REDUCE_INLINE) :
+                                                                (ProfTaskType::TASK_REDUCE_TBE);
             break;
         case TaskType::TASK_NOTIFY_RECORD:
         case TaskType::TASK_NOTIFY_WAIT:
-            type = (taskType == TaskType::TASK_NOTIFY_RECORD) ? (ProfTaskType::TASK_NOTIFY_RECORD)
-                                                              : (ProfTaskType::TASK_NOTIFY_WAIT);
+            type = (taskType == TaskType::TASK_NOTIFY_RECORD) ? (ProfTaskType::TASK_NOTIFY_RECORD) :
+                                                                (ProfTaskType::TASK_NOTIFY_WAIT);
             break;
         default:
             break;
@@ -130,7 +128,7 @@ uint32_t TaskProfiling::GetTaskRole(TaskType taskType) const
     }
 }
 
-void TaskProfiling::GetTaskData(TaskType taskType, const TaskData &taskData, struct MsprofHcclInfo &taskInfo)
+void TaskProfiling::GetTaskData(TaskType taskType, const TaskData& taskData, struct MsprofHcclInfo& taskInfo)
 {
     switch (taskType) {
         case TaskType::TASK_SDMA:
@@ -152,32 +150,30 @@ void TaskProfiling::GetTaskData(TaskType taskType, const TaskData &taskData, str
     }
 }
 
-void TaskProfiling::GetSdmaTaskData(TaskType taskType, const TaskData &taskData,
-        struct MsprofHcclInfo &taskInfo) const
+void TaskProfiling::GetSdmaTaskData(TaskType taskType, const TaskData& taskData, struct MsprofHcclInfo& taskInfo) const
 {
     taskInfo.srcAddr = static_cast<const u64>(reinterpret_cast<const uintptr_t>(taskData.DMA.src));
     taskInfo.dstAddr = static_cast<const u64>(reinterpret_cast<const uintptr_t>(taskData.DMA.dst));
     taskInfo.dataSize = static_cast<u64>(taskData.DMA.size);
     taskInfo.notifyID = taskData.DMA.notifyID;
     taskInfo.linkType = static_cast<u32>(taskData.DMA.linkType);
-    taskInfo.remoteRank = (taskData.DMA.remoteUserRank == INVALID_VALUE_RANKID) ?
-        localRank_ : taskData.DMA.remoteUserRank;
+    taskInfo.remoteRank =
+        (taskData.DMA.remoteUserRank == INVALID_VALUE_RANKID) ? localRank_ : taskData.DMA.remoteUserRank;
     taskInfo.transportType = GetTransportType(taskType);
     taskInfo.role = GetTaskRole(taskType);
     taskInfo.durationEstimated = GetTaskTime(taskData.taskType, taskData);
     taskInfo.ctxId = taskData.DMA.ctxId;
 }
 
-void TaskProfiling::GetRdmaTaskData(TaskType taskType, const TaskData &taskData,
-        struct MsprofHcclInfo &taskInfo) const
+void TaskProfiling::GetRdmaTaskData(TaskType taskType, const TaskData& taskData, struct MsprofHcclInfo& taskInfo) const
 {
     taskInfo.srcAddr = static_cast<const u64>(reinterpret_cast<const uintptr_t>(taskData.DMA.src));
     taskInfo.dstAddr = static_cast<const u64>(reinterpret_cast<const uintptr_t>(taskData.DMA.dst));
     taskInfo.dataSize = static_cast<u64>(taskData.DMA.size);
     taskInfo.notifyID = taskData.DMA.notifyID;
     taskInfo.linkType = static_cast<u32>(taskData.DMA.linkType);
-    taskInfo.remoteRank = (taskData.DMA.remoteUserRank == INVALID_VALUE_RANKID) ?
-        localRank_ : taskData.DMA.remoteUserRank;
+    taskInfo.remoteRank =
+        (taskData.DMA.remoteUserRank == INVALID_VALUE_RANKID) ? localRank_ : taskData.DMA.remoteUserRank;
     taskInfo.transportType = GetTransportType(taskType);
     taskInfo.role = GetTaskRole(taskType);
     taskInfo.rdmaType = static_cast<u32>(taskData.DMA.rdmaType);
@@ -185,8 +181,8 @@ void TaskProfiling::GetRdmaTaskData(TaskType taskType, const TaskData &taskData,
     taskInfo.ctxId = taskData.DMA.ctxId;
 }
 
-void TaskProfiling::GetReduceTaskData(TaskType taskType, const TaskData &taskData,
-        struct MsprofHcclInfo &taskInfo) const
+void TaskProfiling::GetReduceTaskData(
+    TaskType taskType, const TaskData& taskData, struct MsprofHcclInfo& taskInfo) const
 {
     taskInfo.srcAddr = static_cast<const u64>(reinterpret_cast<const uintptr_t>(taskData.DMA.src));
     taskInfo.dstAddr = static_cast<const u64>(reinterpret_cast<const uintptr_t>(taskData.DMA.dst));
@@ -201,8 +197,8 @@ void TaskProfiling::GetReduceTaskData(TaskType taskType, const TaskData &taskDat
     taskInfo.ctxId = taskData.Reduce.ctxId;
 }
 
-void TaskProfiling::GetNotifyTaskData(TaskType taskType, const TaskData &taskData,
-        struct MsprofHcclInfo &taskInfo) const
+void TaskProfiling::GetNotifyTaskData(
+    TaskType taskType, const TaskData& taskData, struct MsprofHcclInfo& taskInfo) const
 {
     taskInfo.notifyID = taskData.Notify.notifyID;
     taskInfo.stage = taskData.Notify.stage;
@@ -213,18 +209,14 @@ void TaskProfiling::GetNotifyTaskData(TaskType taskType, const TaskData &taskDat
     taskInfo.ctxId = taskData.Notify.ctxId;
 }
 
-HcclResult TaskProfiling::Run(const StepData &stepData)
-{
-    return HCCL_SUCCESS;
-}
+HcclResult TaskProfiling::Run(const StepData& stepData) { return HCCL_SUCCESS; }
 
-HcclResult TaskProfiling::Run(const TaskData &taskData, bool isCapture)
+HcclResult TaskProfiling::Run(const TaskData& taskData, bool isCapture)
 {
     HCCLReportData hcclReportData{};
-    auto &profilingManager = hccl::ProfilingManager::Instance();
+    auto& profilingManager = hccl::ProfilingManager::Instance();
     HcclResult is_subscribe = profilingManager.GetAddtionInfoState();
-    if (is_subscribe && GetWorkflowMode() == HcclWorkflowMode::HCCL_WORKFLOW_MODE_OP_BASE &&
-    !isCapture) {
+    if (is_subscribe && GetWorkflowMode() == HcclWorkflowMode::HCCL_WORKFLOW_MODE_OP_BASE && !isCapture) {
         return HCCL_SUCCESS;
     }
     std::unique_lock<std::mutex> lock(mutex_);
@@ -238,7 +230,7 @@ HcclResult TaskProfiling::Run(const TaskData &taskData, bool isCapture)
         hcclReportData.groupName = "unknown";
         hcclReportData.profInfo.workFlowMode = 0;
     } else {
-        StreamRecordInfo &streamInfo = streamRecordInfoMap_[deviceLogicId_][taskData.streamID];
+        StreamRecordInfo& streamInfo = streamRecordInfoMap_[deviceLogicId_][taskData.streamID];
         hcclReportData.tag = streamInfo.tag;
         hcclReportData.profInfo.planeID = streamInfo.planeId;
         hcclReportData.groupName = tagGroupMap_[deviceLogicId_][hcclReportData.tag];
@@ -259,75 +251,71 @@ HcclResult TaskProfiling::Run(const TaskData &taskData, bool isCapture)
     hcclReportData.profInfo.groupName =
         hrtMsprofGetHashId(hcclReportData.groupName.c_str(), hcclReportData.groupName.length());
 
-    HCCL_DEBUG("ReportMsprofData:streamID[%u] tag[%s][%llu] group[%s][%llu]", taskData.streamID,
-        hcclReportData.tag.c_str(), hcclReportData.profInfo.cclTag, hcclReportData.groupName.c_str(),
-        hcclReportData.profInfo.groupName);
+    HCCL_DEBUG(
+        "ReportMsprofData:streamID[%u] tag[%s][%llu] group[%s][%llu]", taskData.streamID, hcclReportData.tag.c_str(),
+        hcclReportData.profInfo.cclTag, hcclReportData.groupName.c_str(), hcclReportData.profInfo.groupName);
 
     DumpReportDataInfo(hcclReportData.type, hcclReportData.profInfo);
     CHK_RET(ReportMsprofData(hcclReportData));
     return HCCL_SUCCESS;
 }
 
-HcclResult TaskProfiling::Run(const std::string &opName, const std::string &tag) const
-{
-    return HCCL_SUCCESS;
-}
+HcclResult TaskProfiling::Run(const std::string& opName, const std::string& tag) const { return HCCL_SUCCESS; }
 
-HcclResult TaskProfiling::Save(u32 captureStreamID, u32 streamID, u32 taskID, TaskType &taskType, const TaskParaReduce &paraReduce)
+HcclResult TaskProfiling::Save(
+    u32 captureStreamID, u32 streamID, u32 taskID, TaskType& taskType, const TaskParaReduce& paraReduce)
 {
     TaskData taskData(captureStreamID, taskID, taskType, paraReduce);
     Run(taskData, true);
     return HCCL_SUCCESS;
 }
 
-HcclResult TaskProfiling::Save(u32 &streamID, u32 &taskID, TaskType &taskType, const TaskParaReduce &paraReduce)
+HcclResult TaskProfiling::Save(u32& streamID, u32& taskID, TaskType& taskType, const TaskParaReduce& paraReduce)
 {
     TaskData taskData(streamID, taskID, taskType, paraReduce);
     Run(taskData);
     return HCCL_SUCCESS;
 }
 
-HcclResult TaskProfiling::Save(u32 captureStreamID, u32 streamID, u32 taskID, TaskType &taskType, const TaskParaDMA &paraDMA)
+HcclResult TaskProfiling::Save(
+    u32 captureStreamID, u32 streamID, u32 taskID, TaskType& taskType, const TaskParaDMA& paraDMA)
 {
     TaskData taskData(captureStreamID, taskID, taskType, paraDMA);
     Run(taskData, true);
     return HCCL_SUCCESS;
 }
 
-HcclResult TaskProfiling::Save(u32 &streamID, u32 &taskID, TaskType &taskType, const TaskParaDMA &paraDMA)
+HcclResult TaskProfiling::Save(u32& streamID, u32& taskID, TaskType& taskType, const TaskParaDMA& paraDMA)
 {
     TaskData taskData(streamID, taskID, taskType, paraDMA);
     Run(taskData);
     return HCCL_SUCCESS;
 }
 
-HcclResult TaskProfiling::Save(u32 captureStreamID, u32 streamID, u32 taskID, TaskType &taskType, const TaskParaNotify &paraNotify)
+HcclResult TaskProfiling::Save(
+    u32 captureStreamID, u32 streamID, u32 taskID, TaskType& taskType, const TaskParaNotify& paraNotify)
 {
     TaskData taskData(captureStreamID, taskID, taskType, paraNotify);
     Run(taskData, true);
     return HCCL_SUCCESS;
 }
 
-HcclResult TaskProfiling::Save(u32 &streamID, u32 &taskID, TaskType &taskType, const TaskParaNotify &paraNotify)
+HcclResult TaskProfiling::Save(u32& streamID, u32& taskID, TaskType& taskType, const TaskParaNotify& paraNotify)
 {
     TaskData taskData(streamID, taskID, taskType, paraNotify);
     Run(taskData);
     return HCCL_SUCCESS;
 }
 
-HcclResult TaskProfiling::Save(u32 captureStreamID, u32 streamID, u32 taskID)
-{
-    return HCCL_SUCCESS;
-}
+HcclResult TaskProfiling::Save(u32 captureStreamID, u32 streamID, u32 taskID) { return HCCL_SUCCESS; }
 
-HcclResult TaskProfiling::Save(u32 captureStreamID, u32 streamID, u32 taskID, const TaskParaAiv &paraAiv)
+HcclResult TaskProfiling::Save(u32 captureStreamID, u32 streamID, u32 taskID, const TaskParaAiv& paraAiv)
 {
     HCCLReportData hcclReportData{};
-    auto &profilingManager = hccl::ProfilingManager::Instance();
+    auto& profilingManager = hccl::ProfilingManager::Instance();
     HcclResult is_subscribe = profilingManager.GetAddtionInfoState();
     bool isCapture = (captureStreamID != streamID);
-    if (is_subscribe && GetWorkflowMode() == HcclWorkflowMode::HCCL_WORKFLOW_MODE_OP_BASE &&
-        !isCapture) {
+    if (is_subscribe && GetWorkflowMode() == HcclWorkflowMode::HCCL_WORKFLOW_MODE_OP_BASE && !isCapture) {
         return HCCL_SUCCESS;
     }
     std::unique_lock<std::mutex> lock(mutex_);
@@ -342,7 +330,7 @@ HcclResult TaskProfiling::Save(u32 captureStreamID, u32 streamID, u32 taskID, co
         hcclReportData.groupName = "unknown";
         hcclReportData.profInfo.workFlowMode = 0;
     } else {
-        StreamRecordInfo &streamInfo = streamRecordInfoMap_[deviceLogicId_][streamID];
+        StreamRecordInfo& streamInfo = streamRecordInfoMap_[deviceLogicId_][streamID];
         hcclReportData.tag = streamInfo.tag;
         hcclReportData.profInfo.planeID = streamInfo.planeId;
         hcclReportData.groupName = tagGroupMap_[deviceLogicId_][hcclReportData.tag];
@@ -364,28 +352,25 @@ HcclResult TaskProfiling::Save(u32 captureStreamID, u32 streamID, u32 taskID, co
     hcclReportData.profInfo.groupName =
         hrtMsprofGetHashId(hcclReportData.groupName.c_str(), hcclReportData.groupName.length());
 
-    HCCL_DEBUG("ReportMsprofData:streamID[%u] tag[%s][%llu] group[%s][%llu]", captureStreamID,
-        hcclReportData.tag.c_str(), hcclReportData.profInfo.cclTag, hcclReportData.groupName.c_str(),
-        hcclReportData.profInfo.groupName);
+    HCCL_DEBUG(
+        "ReportMsprofData:streamID[%u] tag[%s][%llu] group[%s][%llu]", captureStreamID, hcclReportData.tag.c_str(),
+        hcclReportData.profInfo.cclTag, hcclReportData.groupName.c_str(), hcclReportData.profInfo.groupName);
 
     DumpReportDataInfo(hcclReportData.type, hcclReportData.profInfo);
     CHK_RET(ReportMsprofData(hcclReportData));
     return HCCL_SUCCESS;
 }
 
-HcclResult TaskProfiling::Save(u32 streamID, u32 taskID, const TaskParaAiv &paraAiv)
+HcclResult TaskProfiling::Save(u32 streamID, u32 taskID, const TaskParaAiv& paraAiv)
 {
     return Save(streamID, streamID, taskID, paraAiv);
 }
 
-HcclResult TaskProfiling::Save(u32 &streamID, u32 &taskID)
-{
-    return HCCL_SUCCESS;
-}
+HcclResult TaskProfiling::Save(u32& streamID, u32& taskID) { return HCCL_SUCCESS; }
 
-HcclResult TaskProfiling::SaveToLog(const TaskParaHost &paraHost)
+HcclResult TaskProfiling::SaveToLog(const TaskParaHost& paraHost)
 {
-    auto &profilingManager = hccl::ProfilingManager::Instance();
+    auto& profilingManager = hccl::ProfilingManager::Instance();
     HcclResult is_subscribe = profilingManager.GetAddtionInfoState();
     if (is_subscribe) {
         return HCCL_SUCCESS;
@@ -405,63 +390,40 @@ HcclResult TaskProfiling::SaveToLog(const TaskParaHost &paraHost)
         bandWidth /= BytetoGB;
     }
 
-    HCCL_INFO("[profiling][host TCP/RDMA] tag[%s], streamId[%u], taskId[%u], bandWidth[%f GB / s]",
-        tag.c_str(),
-        streamID,
-        taskID,
-        bandWidth);
+    HCCL_INFO(
+        "[profiling][host TCP/RDMA] tag[%s], streamId[%u], taskId[%u], bandWidth[%f GB / s]", tag.c_str(), streamID,
+        taskID, bandWidth);
 
     return HCCL_SUCCESS;
 }
 
-void TaskProfiling::DumpReportDataInfo(uint32_t type, const MsprofHcclInfo &profInfo)
+void TaskProfiling::DumpReportDataInfo(uint32_t type, const MsprofHcclInfo& profInfo)
 {
     HCCL_DEBUG(
-        "[DumpReportDataInfo] type[%u], itemId[%llu], cclTag[%llu], groupName[%llu], localRank[%u], remoteRank[%u], " \
-        "rankSize[%u], workFlowMode[%u], planeID[%u], ctxId[%u], notifyID[%llu], stage[%u], role[%u], " \
-        "durationEstimated[%f], srcAddr[%llu], dstAddr[%llu], dataSize[%llu Byte], opType[%u], dataType[%u], linkType[%u], " \
+        "[DumpReportDataInfo] type[%u], itemId[%llu], cclTag[%llu], groupName[%llu], localRank[%u], remoteRank[%u], "
+        "rankSize[%u], workFlowMode[%u], planeID[%u], ctxId[%u], notifyID[%llu], stage[%u], role[%u], "
+        "durationEstimated[%f], srcAddr[%llu], dstAddr[%llu], dataSize[%llu Byte], opType[%u], dataType[%u], "
+        "linkType[%u], "
         "transportType[%u], rdmaType[%u]",
-        type,
-        profInfo.itemId,
-        profInfo.cclTag,
-        profInfo.groupName,
-        profInfo.localRank,
-        profInfo.remoteRank,
-        profInfo.rankSize,
-        profInfo.workFlowMode,
-        profInfo.planeID,
-        profInfo.ctxId,
-        profInfo.notifyID,
-        profInfo.stage,
-        profInfo.role,
-        profInfo.durationEstimated,
-        profInfo.srcAddr,
-        profInfo.dstAddr,
-        profInfo.dataSize,
-        profInfo.opType,
-        profInfo.dataType,
-        profInfo.linkType,
-        profInfo.transportType,
-        profInfo.rdmaType);
+        type, profInfo.itemId, profInfo.cclTag, profInfo.groupName, profInfo.localRank, profInfo.remoteRank,
+        profInfo.rankSize, profInfo.workFlowMode, profInfo.planeID, profInfo.ctxId, profInfo.notifyID, profInfo.stage,
+        profInfo.role, profInfo.durationEstimated, profInfo.srcAddr, profInfo.dstAddr, profInfo.dataSize,
+        profInfo.opType, profInfo.dataType, profInfo.linkType, profInfo.transportType, profInfo.rdmaType);
 
     return;
 }
 
-HcclResult TaskProfiling::ReportMsprofData(HCCLReportData &hcclReportData)
+HcclResult TaskProfiling::ReportMsprofData(HCCLReportData& hcclReportData)
 {
     int32_t cb_ret;
-    auto &profilingManager = hccl::ProfilingManager::Instance();
-    cb_ret = profilingManager.CallMsprofReportAdditionInfo(static_cast<uint32_t>(ProfTaskType::TASK_HCCL_INFO),
-        hcclReportData.ts,
-        &hcclReportData.profInfo,
+    auto& profilingManager = hccl::ProfilingManager::Instance();
+    cb_ret = profilingManager.CallMsprofReportAdditionInfo(
+        static_cast<uint32_t>(ProfTaskType::TASK_HCCL_INFO), hcclReportData.ts, &hcclReportData.profInfo,
         sizeof(hcclReportData.profInfo));
     CHK_PRT_RET((cb_ret != 0), HCCL_ERROR("[TaskProfiling] ReportData profiling failed."), HCCL_E_PARA);
 
     return HCCL_SUCCESS;
 }
 
-HcclResult TaskProfiling::Flush()
-{
-    return HCCL_SUCCESS;
-}
-}  // namespace hccl
+HcclResult TaskProfiling::Flush() { return HCCL_SUCCESS; }
+} // namespace hccl

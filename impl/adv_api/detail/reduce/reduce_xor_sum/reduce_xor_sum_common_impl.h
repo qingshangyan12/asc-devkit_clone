@@ -45,7 +45,7 @@ constexpr uint32_t REDUCE_XOR_SUM_NOREUSE_CALC_PROC = 3U;
 } // namespace
 
 struct ReduceXorSumParam {
-    __aicore__ ReduceXorSumParam(){};
+    __aicore__ ReduceXorSumParam() {};
     LocalTensor<int16_t> tmpTensor1;
     LocalTensor<int16_t> tmpTensor2;
     LocalTensor<int16_t> tmpTensor3;

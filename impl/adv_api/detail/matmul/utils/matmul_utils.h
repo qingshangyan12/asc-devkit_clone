@@ -547,12 +547,12 @@ __aicore__ inline void CopyTiling(const __gm__ TCubeTiling* gmCubeTiling, TCubeT
 }
 #endif
 template <typename A_TYPE, const auto& MM_CFG>
-constexpr bool isNormEnableScheduler = DoMatmulNorm(MM_CFG) && (A_TYPE::layout == LayoutMode::NONE) &&
-                                       !ToMatmulConfig(MM_CFG).intraBlockPartSum;
+constexpr bool isNormEnableScheduler =
+    DoMatmulNorm(MM_CFG) && (A_TYPE::layout == LayoutMode::NONE) && !ToMatmulConfig(MM_CFG).intraBlockPartSum;
 
 template <typename A_TYPE, const auto& MM_CFG>
-constexpr bool isNormDisableScheduler = DoMatmulNorm(MM_CFG) && ((A_TYPE::layout != LayoutMode::NONE) ||
-                                                                 ToMatmulConfig(MM_CFG).intraBlockPartSum);
+constexpr bool isNormDisableScheduler =
+    DoMatmulNorm(MM_CFG) && ((A_TYPE::layout != LayoutMode::NONE) || ToMatmulConfig(MM_CFG).intraBlockPartSum);
 
 template <const auto& MM_CFG>
 constexpr bool IsBasicBlockEnable = DoMatmulBasicBlock(MM_CFG) || DoMatmulSpecialBasicBlock(MM_CFG);

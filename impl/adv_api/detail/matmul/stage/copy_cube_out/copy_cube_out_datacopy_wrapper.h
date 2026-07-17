@@ -125,8 +125,8 @@ public:
     }
 
     // trans nz buffer to nd buffer
-    __ASC_USE_RESERVED_UBUF__(3510,
-        "Matmul is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+    __ASC_USE_RESERVED_UBUF__(
+        3510, "Matmul is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
     __aicore__ inline auto TransNZ2NDByVec(
         const LocalTensor<DstT>& trans, const LocalTensor<DstT>& localBuf, int32_t blockHigh, int32_t blockWidth,
         int32_t baseHeight, int32_t baseWidth, int32_t baseBlockWidth)
@@ -261,8 +261,8 @@ private:
              static_cast<uint16_t>(baseWidth / GetBlockCount())});
     }
 
-    __ASC_USE_RESERVED_UBUF__(3510,
-        "Matmul is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+    __ASC_USE_RESERVED_UBUF__(
+        3510, "Matmul is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
     __aicore__ inline void TransNZ2NDByVecDstB8(
         const LocalTensor<DstT>& trans, const LocalTensor<DstT>& localBuf, int32_t blockHigh, int32_t blockWidth,
         int32_t baseHeight, int32_t baseWidth, int32_t baseBlockWidth)
@@ -319,8 +319,8 @@ private:
         }
     }
 
-    __ASC_USE_RESERVED_UBUF__(3510,
-        "Matmul is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+    __ASC_USE_RESERVED_UBUF__(
+        3510, "Matmul is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
     __aicore__ inline void TransNZ2NDByVecDstNotB8(
         const LocalTensor<DstT>& trans, const LocalTensor<DstT>& localBuf, int32_t blockHigh, int32_t blockWidth,
         int32_t baseHeight, int32_t baseWidth, int32_t baseBlockWidth)
@@ -443,8 +443,8 @@ private:
     template <bool isDstB8>
     __aicore__ inline auto CopyTrans2GMByVecByLineUnalign(
         const GlobalTensor<DstT>& gm, const LocalTensor<DstT>& trans, int32_t baseHeight, int32_t baseWidth,
-        int32_t baseBlockHeight, int32_t baseBlockWidth, int32_t blockLen, int32_t blockCount, int32_t offset)
-        -> enable_if_t<isDstB8, void>
+        int32_t baseBlockHeight, int32_t baseBlockWidth, int32_t blockLen, int32_t blockCount,
+        int32_t offset) -> enable_if_t<isDstB8, void>
     {
         LocalTensor<uint16_t> transAligin =
             MATMUL_MODULE(LocalWorkspace)
@@ -498,8 +498,8 @@ private:
     template <bool isDstB8>
     __aicore__ inline auto CopyTrans2GMByVecByLineUnalign(
         const GlobalTensor<DstT>& gm, const LocalTensor<DstT>& trans, int32_t baseHeight, int32_t baseWidth,
-        int32_t baseBlockHeight, int32_t baseBlockWidth, int32_t blockLen, int32_t blockCount, int32_t offset)
-        -> enable_if_t<!isDstB8, void>
+        int32_t baseBlockHeight, int32_t baseBlockWidth, int32_t blockLen, int32_t blockCount,
+        int32_t offset) -> enable_if_t<!isDstB8, void>
     {
         LocalTensor<DstT> transAligin = MATMUL_MODULE(LocalWorkspace)
                                             ->template GetWorkspaceWithOffset<ToMatmulConfig(MM_CFG).enableUBReuse>(0)

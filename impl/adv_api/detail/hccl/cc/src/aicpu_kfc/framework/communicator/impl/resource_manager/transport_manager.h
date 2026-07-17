@@ -61,7 +61,7 @@ struct TransportData {
           inputMem(inputMem),
           outputMem(outputMem),
           supportDataReceivedAck(supportDataReceivedAck),
-          remoteSocketPort(remoteSocketPort){};
+          remoteSocketPort(remoteSocketPort) {};
 
     bool operator==(const TransportData& that) const
     {

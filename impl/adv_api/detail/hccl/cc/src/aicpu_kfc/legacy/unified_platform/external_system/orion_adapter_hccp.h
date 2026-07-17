@@ -624,7 +624,7 @@ using RaUbGetTpInfoParam = struct RaUbGetTpInfoParamDef {
 
     explicit RaUbGetTpInfoParamDef() = default;
     RaUbGetTpInfoParamDef(const IpAddress& locAddr, const IpAddress& rmtAddr, TpProtocol tpProtocol)
-        : locAddr(locAddr), rmtAddr(rmtAddr), tpProtocol(tpProtocol){};
+        : locAddr(locAddr), rmtAddr(rmtAddr), tpProtocol(tpProtocol) {};
 
     std::string Describe() const
     {
