@@ -495,7 +495,7 @@ __simd_vf__ inline void ReduceRAConcatVFImpl(
     uint32_t mainR, uint32_t tailR)
 {
     // Process RegTraitNumTwo
-    constexpr uint16_t vlSize = SupportBytes<T, 8>()? (GetVecLen() / sizeof(float)) : ((GetVecLen() / sizeof(T)));
+    constexpr uint16_t vlSize = SupportBytes<T, 8>() ? (GetVecLen() / sizeof(float)) : (GetVecLen() / sizeof(T));
     uint16_t needInplaceAdd = tailR > 0 ? 1 : 0;
     // Process vlSize axisA each time
     uint32_t processA = dimA;
