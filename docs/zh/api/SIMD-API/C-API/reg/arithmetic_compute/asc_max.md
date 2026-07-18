@@ -50,6 +50,8 @@ __simd_callee__ inline void asc_max(vector_bfloat16_t& dst, vector_bfloat16_t sr
 
 ## 参数说明
 
+**表1** 参数说明
+
 | 参数名  | 输入/输出 | 描述                             |
 |:-----| :--- |:-------------------------------|
 | dst  | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。                 |

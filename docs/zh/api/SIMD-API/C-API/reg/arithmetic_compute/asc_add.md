@@ -65,6 +65,8 @@ __simd_callee__ inline void asc_add(vector_bool& carry, vector_uint32_t& dst, ve
 
 ## 参数说明
 
+**表1** 参数说明
+
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | carry | 输出 | 目的进位值（掩码寄存器）。<br>类型为[vector\_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
