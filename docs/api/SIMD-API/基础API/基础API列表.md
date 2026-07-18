@@ -309,7 +309,7 @@
 | 接口名 | 功能描述 |
 | --- | --- |
 | [连续对齐搬入（LoadAlign）](Reg矢量计算/Reg数据搬入/LoadAlign_continuous.md) | LoadAlign能够实现数据从Unified Buffer（UB）连续搬运至RegTensor。支持单搬入模式和双搬入模式。 |
-| [非连续对齐搬入（LoadAlign）](Reg矢量计算/Reg数据搬入/非LoadAlign_continuous.md) | LoadAlign能够实现数据从Unified Buffer（UB）非连续搬运至RegTensor，以DataBlock为单位。 |
+| [非连续对齐搬入（LoadAlign）](Reg矢量计算/Reg数据搬入/LoadAlign_noncontinuous.md) | LoadAlign能够实现数据从Unified Buffer（UB）非连续搬运至RegTensor，以DataBlock为单位。 |
 | [连续非对齐搬入（LoadUnAlign）](Reg矢量计算/Reg数据搬入/LoadUnAlign_continuous.md) | LoadUnAlign能够实现数据从非对齐的Unified Buffer（UB）连续搬运至RegTensor，利用非对齐寄存器UnalignRegForLoad作为临时缓存区，暂存跨对齐边界的数据，从而实现高效的连续非对齐数据传输。 |
 | [MaskReg搬入（LoadAlign）](Reg矢量计算/Reg数据搬入/LoadAlign_MaskReg.md) | LoadAlign能够实现数据从Unified Buffer（UB）搬运至MaskReg。 |
 | [MaskReg搬入（MaskGenWithRegTensor）](Reg矢量计算/Reg数据搬入/MaskGenWithRegTensor_MaskReg.md) | MaskGenWithRegTensor能够实现数据从RegTensor搬运至MaskReg。 |
