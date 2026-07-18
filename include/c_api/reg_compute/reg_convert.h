@@ -23,8 +23,9 @@
 #include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 #include "c_api/utils/union.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_type.h"
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
 
