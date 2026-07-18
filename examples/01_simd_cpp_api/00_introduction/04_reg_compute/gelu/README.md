@@ -51,10 +51,10 @@ $$
 **前置说明**：
 
 - **内存层级与数据通路**：Ascend C 编程涉及的核心内存层级包括 GM（全局内存，位于芯片外部，容量大但访问延迟高）、UB（片上统一缓冲区，位于芯片内部，访问延迟低）和寄存器（最靠近计算单元，延迟最低但容量最小）。数据需逐级搬运：GM → UB → 寄存器 → UB → GM。
-- **同步机制**：由于数据搬运和计算由不同硬件单元异步执行，需要通过 [SetFlag/WaitFlag](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md) 机制进行流水同步。`SetFlag` 在某一硬件单元完成操作后写入事件标志，`WaitFlag` 让后续硬件单元等待该事件完成后再开始执行，从而保证数据依赖关系的正确性。本样例中使用了两种事件：
+- **同步机制**：由于数据搬运和计算由不同硬件单元异步执行，需要通过 [SetFlag/WaitFlag](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag_WaitFlag_ISASI.md) 机制进行流水同步。`SetFlag` 在某一硬件单元完成操作后写入事件标志，`WaitFlag` 让后续硬件单元等待该事件完成后再开始执行，从而保证数据依赖关系的正确性。本样例中使用了两种事件：
   - `MTE2_V`：表示 MTE2（内存搬运引擎）完成 GM→UB 搬运后，V（向量计算单元）再开始读取 UB 数据
   - `V_MTE3`：表示 V 完成计算后，MTE3（回写引擎）再将 UB 结果写回 GM
-- [PipeBarrier](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md) 用于等待本核所有流水阶段全部完成后再退出 kernel，确保数据写回完成。
+- [PipeBarrier](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier_ISASI.md) 用于等待本核所有流水阶段全部完成后再退出 kernel，确保数据写回完成。
 - **RegBase 编程范式**：与传统 MemBase（基于 [LocalTensor](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md) + Compute API）不同，RegBase 通过 [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/SIMD-API/基础API/Reg矢量计算/asc_vf_call.md) 调用 VF 函数，在函数内使用 [RegTensor](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/RegTensor.md)（寄存器张量）完成计算。VF 函数以 `__simd_vf__` 声明，参数和局部变量通过 `__ubuf__` 标记 UB 地址空间。VF 函数内数据通过 [LoadAlign](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬入.md)（UB→寄存器）和 [StoreAlign](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬出.md)（寄存器→UB）搬运，使用 [MaskReg](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md)（掩码寄存器）控制每次计算的元素数量，通过 [UpdateMask](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/SIMD-API/基础API/Reg矢量计算/MaskReg计算/MoveMask.md) 根据剩余元素数更新掩码。优势是中间结果可暂存在寄存器，减少 UB 读写次数。
 
 **核心代码示例**：
@@ -144,7 +144,7 @@ __global__ __vector__ void gelu_custom(__gm__ uint8_t* x, __gm__ uint8_t* y)
 | 寄存器计算 | 通过 [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/SIMD-API/基础API/Reg矢量计算/asc_vf_call.md) 调用 `GeluVfMethod2`，在 VF 函数内完成 [LoadAlign](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬入.md) → 多步 Reg 计算 → [StoreAlign](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬出.md) | RegBase API 在寄存器级别执行计算，延迟最低；GELU 公式需分解为 Mul/Muls/Add/Exp/Adds/Div 共 8 步逐步完成 |
 | V_MTE3 同步 | `SetFlag<HardEvent::V_MTE3>` + `WaitFlag<HardEvent::V_MTE3>` | 寄存器计算由 V 流水异步执行，必须等待计算完成后 MTE3 引擎才能将 UB 结果写回 GM，否则会写出不完整的计算结果 |
 | UB → GM 搬出 | 调用 `DataCopy` 将结果从 UB 搬运回 GM | 将计算结果从片上缓存写回全局内存，供后续使用 |
-| 流水同步 | [PipeBarrier](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md)`<PIPE_ALL>()` | 等待本核所有流水阶段（MTE2/V/MTE3）全部完成后再退出 kernel，确保数据写回完成 |
+| 流水同步 | [PipeBarrier](https://gitcode.com/cann/asc-devkit/blob/9.1.0/docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier_ISASI.md)`<PIPE_ALL>()` | 等待本核所有流水阶段（MTE2/V/MTE3）全部完成后再退出 kernel，确保数据写回完成 |
 
 ## 可优化方向分析
 
