@@ -182,7 +182,8 @@ def portable_wrapper_text(wrapper_text, original_source_path):
 
 def super_kernel_build_extension(
     *,
-    normal_output,
+    normal_relocatable,
+    normal_link_dependency,
     sk_symbol,
     sk_argv,
     sk_inputs,
@@ -203,7 +204,7 @@ def super_kernel_build_extension(
             "kind": "compile",
             "backend": "bisheng",
             "argv": list(sk_argv),
-            "depends_on": ["link_static_normal"],
+            "depends_on": [normal_link_dependency],
             "inputs": list(sk_inputs),
             "outputs": [sk_output],
         }
@@ -239,7 +240,7 @@ def super_kernel_build_extension(
                 "kind": "compile",
                 "backend": "bisheng",
                 "argv": list(bind_argv),
-                "depends_on": ["link_static_normal"],
+                "depends_on": [normal_link_dependency],
                 "inputs": [bind_input],
                 "outputs": [bind_output],
             },
@@ -248,12 +249,16 @@ def super_kernel_build_extension(
                 "kind": "link",
                 "argv": [
                     "-r", "-o", "${artifact." + merged_output + "}",
-                    "${artifact." + normal_output + "}",
+                    "${artifact." + normal_relocatable + "}",
                     "${artifact." + bind_output + "}",
                     "${artifact." + archive_output + "}",
                 ],
-                "depends_on": ["archive_static_sk", "compile_static_sk_bind"],
-                "inputs": [normal_output, bind_output, archive_output],
+                "depends_on": [
+                    "archive_static_sk",
+                    "compile_static_sk_bind",
+                    "compile_static_normal",
+                ],
+                "inputs": [normal_relocatable, bind_output, archive_output],
                 "outputs": [merged_output],
             },
             {

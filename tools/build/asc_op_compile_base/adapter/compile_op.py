@@ -2027,7 +2027,8 @@ def _emit_static_compile_resources(
                     "${artifact." + bind_output + "}",
                 )
                 build["extensions"] = super_kernel_build_extension(
-                    normal_output=output_logical,
+                    normal_relocatable=relocatable_logical,
+                    normal_link_dependency="link_static_normal",
                     sk_symbol=sk_symbol,
                     sk_argv=sk_argv,
                     sk_inputs=[sk_wrapper_logical, source_logical, tiling_logical],

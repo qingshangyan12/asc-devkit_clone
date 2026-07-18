@@ -49,7 +49,8 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
 
     def test_builds_optional_super_kernel_extension_from_launch_context(self):
         extension = super_kernel_build_extension(
-            normal_output="artifacts/normal.o",
+            normal_relocatable="intermediates/normal.rel.o",
+            normal_link_dependency="link_static_normal",
             sk_symbol="add_sk",
             sk_argv=["-c", "-D__SUPER_KERNEL_STATIC_BLOCK_NUM__=${launch.block_dim}"],
             sk_inputs=["resources/src/sk.cpp", "resources/include/tiling.h"],
@@ -65,10 +66,19 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         self.assertIn("${launch.block_dim}", " ".join(steps[0]["argv"]))
         self.assertEqual(steps[0]["depends_on"], ["link_static_normal"])
         self.assertEqual(steps[5]["depends_on"], ["link_static_normal"])
-        self.assertNotIn(
-            "compile_static_normal",
-            [dependency for step in steps for dependency in step["depends_on"]],
+        self.assertEqual(
+            steps[6]["inputs"],
+            [
+                "intermediates/normal.rel.o",
+                "artifacts/add.sk_bind.o",
+                "artifacts/add.sk.a",
+            ],
         )
+        self.assertIn(
+            "${artifact.intermediates/normal.rel.o}", steps[6]["argv"]
+        )
+        self.assertNotIn("${artifact.artifacts/normal.o}", steps[6]["argv"])
+        self.assertIn("compile_static_normal", steps[6]["depends_on"])
         self.assertEqual(steps[-1]["outputs"], ["artifacts/add.static_with_sk.o"])
 
     def test_rewrites_only_the_original_source_include_for_portability(self):
