@@ -17,22 +17,7 @@
 - 对于矢量计算API，若接口调用的传入参数`count`或`repeatTime`取值为0，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作），但相较于不调用会有额外性能耗时。
 
 <!-- npu="950" id5 -->
-针对Ascend 950PR/Ascend 950DT：<br>Memory矢量计算API主要由Reg矢量计算API实现，这类Memory矢量计算API不涉及理论性能。数据搬运类、排序组合类、标量计算类、工具接口类的指令理论性能汇总请参考表1-表2。
-
-**表1**  数据搬运类指令理论性能汇总
-
-| 接口 | 输入数据类型 | 输出数据类型 | 理论并行度（element/cycle） |
-| --- | --- | --- | --- |
-| DataCopy（UB2UB） | b8 | b8 | 256 |
-| DataCopy（UB2UB） | b16 | b16 | 128 |
-| DataCopy（UB2UB） | b32 | b32 | 64 |
-| DataCopy（UB2UB） | b64 | b64 | 32 |
-
-**表1**  排序组合类指令理论性能汇总
-
-| 接口 | 理论并行度（Bytes/instruction） |
-| --- | --- |
-| Transpose（普通转置） | 256 |
+针对Ascend 950PR/Ascend 950DT：<br>Memory矢量计算API主要由Reg矢量计算API实现，这类Memory矢量计算API不涉及理论性能。标量计算类、工具接口类的指令理论性能汇总请参考表1-表2。
 
 **表1**  标量计算类指令理论性能汇总
 
