@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
+#warning                                                                                                               \
     "impl/tensor_api/arch/vector/ub_to_l1/copy_impl/nd2nd.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -35,6 +35,7 @@ public:
         DataCopyImpl<trait, T, U>(dst, src);
     }
 
+
 private:
     template <const CopyUB2L1Trait& trait, typename T, typename U>
     __aicore__ inline static constexpr void CheckTemplate()
@@ -56,12 +57,14 @@ private:
 
         uint16_t blockCount = GetTotalRowShape(srcLayout);
         uint32_t blockLen = Std::ceil_division(GetTotalColumnShape(srcLayout), C0_ELEMENT<SrcType>);
-        int64_t srcStride = Std::ceil_division(
-            GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) - GetTotalColumnShape(srcLayout),
-            C0_ELEMENT<SrcType>);
-        int64_t dstStride = Std::ceil_division(
-            GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) - GetTotalColumnShape(srcLayout),
-            C0_ELEMENT<DstType>);
+        int64_t srcStride =
+            Std::ceil_division(GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) -
+                                   GetTotalColumnShape(srcLayout),
+                               C0_ELEMENT<SrcType>);
+        int64_t dstStride =
+            Std::ceil_division(GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) -
+                                   GetTotalColumnShape(srcLayout),
+                               C0_ELEMENT<DstType>);
 
         EmitCopy(dst, src, blockCount, blockLen, srcStride, dstStride);
     }
