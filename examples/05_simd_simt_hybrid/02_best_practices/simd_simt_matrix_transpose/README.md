@@ -92,7 +92,7 @@ output[col * height + row] = input[i];
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | :----------------: | :-----------: | :--------------: | :---------------: | :-----------: | :------------------: | :--------------: |
-|       36.215       |    33.627    |     55484.7     |      33.181      |     0.987     |        0.434        |      0.013      |
+|       36.263       |    33.620    |     55473.1     |      33.209      |     0.988     |        0.399        |      0.012      |
 
 **分析**：
 
@@ -115,20 +115,21 @@ uint32_t loop_end = loop_start + TILES_PER_BLOCK;
 
 // Case 1按tile分组启动Thread Block，每个Thread Block只处理当前分配到的两个tile。
 for (uint32_t tile_base = loop_start; tile_base < loop_end && tile_base < total_tiles; tile_base += loop_step) {
+    asc_lock(PIPE_MTE2, SINGLE_BUFFER_MUTEX);
     copy_gm_2tile_to_ub(&in_tile[0][0][0], input, width, tiles_x, tile_base, total_tiles);
+    asc_unlock(PIPE_MTE2, SINGLE_BUFFER_MUTEX);
+
     // MTE2搬入完成后，SIMT VF读取UB输入buffer。
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_lock(PIPE_V, SINGLE_BUFFER_MUTEX);
     asc_vf_call<simt_transpose_2tile>(dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1),
                                       &out_tile[0][0][0], &in_tile[0][0][0],
                                       tile_base, total_tiles);
+    asc_unlock(PIPE_V, SINGLE_BUFFER_MUTEX);
+
     // SIMT VF写完输出buffer后，MTE3将结果搬回GM。
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_lock(PIPE_MTE3, SINGLE_BUFFER_MUTEX);
     copy_ub_2tile_to_gm(output, &out_tile[0][0][0], height, tiles_x, tile_base, total_tiles);
-    // MTE3搬出完成后，本轮UB buffer可进入下一轮MTE2搬入。
-    asc_sync_notify(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
+    asc_unlock(PIPE_MTE3, SINGLE_BUFFER_MUTEX);
 }
 ```
 
@@ -136,11 +137,11 @@ for (uint32_t tile_base = loop_start; tile_base < loop_end && tile_base < total_
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | :----------------: | :-----------: | :--------------: | :---------------: | :-----------: | :------------------: | :--------------: |
-|       23.374       |     2.292     |      3781.8      |       1.445       |     0.633     |        0.207        |      0.088      |
+|       23.732       |     2.286     |      3772.6      |       1.454       |     0.638     |        0.198        |      0.085      |
 
 **分析**：
 
-Case 1通过UB中转把非连续GM写转换为UB内转置访问，Task Duration从Case 0的36.215μs降至23.374μs，耗时下降约35.5%。该版本按tile分组数量启动Thread Block，1024×1024矩阵共有1024个tile，对应512个Thread Block，明显超过硬件vector core数。额外的线程块启动和调度开销会反映到Task Duration中，因此下一步优先优化Thread Block到tile的映射。
+Case 1通过UB中转把非连续GM写转换为UB内转置访问，Task Duration从Case 0的36.263μs降至23.732μs，耗时下降约34.6%。该版本按tile分组数量启动Thread Block，1024×1024矩阵共有1024个tile，对应512个Thread Block，明显超过硬件vector core数。额外的线程块启动和调度开销会反映到Task Duration中，因此下一步优先优化Thread Block到tile的映射。
 
 ---
 
@@ -156,20 +157,21 @@ uint32_t loop_step = block_num * TILES_PER_BLOCK;
 
 // Case 2固定Thread Block数，每个Thread Block按gridDim.x步长循环处理多个tile组。
 for (uint32_t tile_base = loop_start; tile_base < total_tiles; tile_base += loop_step) {
+    asc_lock(PIPE_MTE2, SINGLE_BUFFER_MUTEX);
     copy_gm_2tile_to_ub(&in_tile[0][0][0], input, width, tiles_x, tile_base, total_tiles);
+    asc_unlock(PIPE_MTE2, SINGLE_BUFFER_MUTEX);
+
     // MTE2搬入完成后，SIMT VF读取UB输入buffer。
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_lock(PIPE_V, SINGLE_BUFFER_MUTEX);
     asc_vf_call<simt_transpose_2tile>(dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1),
                                       &out_tile[0][0][0], &in_tile[0][0][0],
                                       tile_base, total_tiles);
+    asc_unlock(PIPE_V, SINGLE_BUFFER_MUTEX);
+
     // SIMT VF写完输出buffer后，MTE3将结果搬回GM。
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_lock(PIPE_MTE3, SINGLE_BUFFER_MUTEX);
     copy_ub_2tile_to_gm(output, &out_tile[0][0][0], height, tiles_x, tile_base, total_tiles);
-    // MTE3搬出完成后，本轮UB buffer可进入下一轮MTE2搬入。
-    asc_sync_notify(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
+    asc_unlock(PIPE_MTE3, SINGLE_BUFFER_MUTEX);
 }
 ```
 
@@ -177,11 +179,11 @@ for (uint32_t tile_base = loop_start; tile_base < total_tiles; tile_base += loop
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | :----------------: | :-----------: | :--------------: | :---------------: | :-----------: | :------------------: | :--------------: |
-|       18.734       |    17.553    |     28961.7     |      11.602      |     0.661     |        0.880        |      0.050      |
+|       18.697       |    17.484    |     28849.4     |      11.559      |     0.661     |        0.846        |      0.048      |
 
 **分析**：
 
-Case 2将Thread Block数固定为硬件vector core数。相比Case 1按tile分组启动512个Thread Block的写法，Case 2需要启动和调度的线程块数量更少，Task Duration从23.374μs降低到18.734μs，耗时下降约19.9%。在SIMD与SIMT混合编程场景下，降低Thread Block数不会改变SIMT VF内部的转置逻辑，也不会引入额外的SIMT线程侧计算复杂度；与SIMT场景不同，本Case未观察到寄存器溢出。后续版本继续沿用2048线程、每轮两个tile的路径，把优化重点转向UB访问开销。
+Case 2将Thread Block数固定为硬件vector core数。相比Case 1按tile分组启动512个Thread Block的写法，Case 2需要启动和调度的线程块数量更少，Task Duration从23.732μs降低到18.697μs，耗时下降约21.2%。在SIMD与SIMT混合编程场景下，降低Thread Block数不会改变SIMT VF内部的转置逻辑，也不会引入额外的SIMT线程侧计算复杂度；与SIMT场景不同，本Case未观察到寄存器溢出。后续版本继续沿用2048线程、每轮两个tile的路径，把优化重点转向UB访问开销。
 
 ---
 
@@ -238,21 +240,22 @@ uint32_t loop_step = block_num * TILES_PER_BLOCK;
 
 // Case 3沿用固定Thread Block数和循环处理方式，仅将输入tile换成32×40 padded布局。
 for (uint32_t tile_base = loop_start; tile_base < total_tiles; tile_base += loop_step) {
+    asc_lock(PIPE_MTE2, SINGLE_BUFFER_MUTEX);
     copy_gm_2tile_to_padded_ub(&in_tile[0][0][0], input, width, tiles_x, tile_base, total_tiles);
+    asc_unlock(PIPE_MTE2, SINGLE_BUFFER_MUTEX);
+
     // MTE2搬入完成后，SIMT VF按32×40 padded布局读取UB输入buffer。
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_lock(PIPE_V, SINGLE_BUFFER_MUTEX);
     asc_vf_call<simt_transpose_2tile_pad>(dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1),
                                           &out_tile[0][0][0], &in_tile[0][0][0],
                                           tile_base, total_tiles);
     // simt_transpose_2tile_pad内部按32×40物理布局读取输入tile，按32×32连续布局写入输出tile。
     ...
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_unlock(PIPE_V, SINGLE_BUFFER_MUTEX);
+
+    asc_lock(PIPE_MTE3, SINGLE_BUFFER_MUTEX);
     copy_ub_2tile_to_gm(output, &out_tile[0][0][0], height, tiles_x, tile_base, total_tiles);
-    // 单buffer复用前，等待MTE3搬出完成。
-    asc_sync_notify(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
+    asc_unlock(PIPE_MTE3, SINGLE_BUFFER_MUTEX);
 }
 ```
 
@@ -260,85 +263,54 @@ for (uint32_t tile_base = loop_start; tile_base < total_tiles; tile_base += loop
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | :----------------: | :-----------: | :--------------: | :---------------: | :-----------: | :------------------: | :--------------: |
-|       11.617       |    10.420    |     17192.8     |       4.465       |     0.429     |        0.877        |      0.084      |
+|       11.596       |    10.459    |     17258.2     |       4.465       |     0.427     |        0.853        |      0.081      |
 
 **分析**：
 
-Case 3只在Case 2基础上改变UB物理布局，不改变GM读写坐标和Thread Block到tile的映射方式。相比Case 2，Task Duration从18.734μs降低到11.617μs，耗时下降约38.0%。该结果说明GM访存连续化和固定Thread Block数之后，SIMT VF转置访问UB阶段的bank冲突已经成为主要瓶颈之一。
+Case 3只在Case 2基础上改变UB物理布局，不改变GM读写坐标和Thread Block到tile的映射方式。相比Case 2，Task Duration从18.697μs降低到11.596μs，耗时下降约38.0%。该结果说明GM访存连续化和固定Thread Block数之后，SIMT VF转置访问UB阶段的bank冲突已经成为主要瓶颈之一。
 
 ---
 
 ### Case 4：MTE搬入UB后转置写回+padding+双缓冲
 
-**优化目标**：在Case 3的基础上，通过两份UB输入/输出缓冲区和双event id，使MTE2搬入、SIMT VF转置和MTE3搬出流水并行。
+**优化目标**：在Case 3的基础上，通过两份UB输入/输出缓冲区和多组mutex id，使MTE2搬入、SIMT VF转置和MTE3搬出流水并行。
 
 **核心实现**：
 
 - 使用两份输入缓冲区和两份输出缓冲区；输入缓冲区使用32×40 padded tile，输出缓冲区使用32×32连续tile。
-- 两份缓冲区分别使用 `EVENT_ID0`和 `EVENT_ID1`管理生命周期。
-- 先搬入第一组tile填充流水。
-- 循环中先为下一组tile发起MTE2搬入，再对当前输入/输出缓冲区调用SIMT VF处理。
-- SIMT VF完成后释放当前输入缓冲区，并通知MTE3搬出当前输出缓冲区。
+- 输入缓冲区和输出缓冲区分别使用不同的 `mutex_id` 管理生命周期。
+- SIMT VF等待当前输入buffer搬入完成；复用输出buffer前等待其上一次MTE3搬出完成。
 
 ```cpp
 __ubuf__ float in_tile[2][TILES_PER_BLOCK][TILE_DIM][TILE_PAD_STRIDE];
 __ubuf__ float out_tile[2][TILES_PER_BLOCK][TILE_DIM][TILE_DIM];
-uint32_t curr_buffer = 0;
-uint32_t curr_event = EVENT_ID0;
 uint32_t loop_count = 0;
 
-// 初始化两个event，允许MTE2写入两组输入buffer。
-asc_sync_notify(PIPE_V, PIPE_MTE2, EVENT_ID0);
-asc_sync_notify(PIPE_V, PIPE_MTE2, EVENT_ID1);
+for (uint32_t tile_base = curr_tile_base; tile_base < total_tiles; tile_base += loop_step) {
+    uint32_t curr_buffer = loop_count & 1;
+    uint8_t input_mutex = DB_INPUT_MUTEX_BASE + static_cast<uint8_t>(curr_buffer);
+    uint8_t output_mutex = DB_OUTPUT_MUTEX_BASE + static_cast<uint8_t>(curr_buffer);
 
-// 先搬入第一组tile填充流水线。
-asc_sync_wait(PIPE_V, PIPE_MTE2, curr_event);
-copy_gm_2tile_to_padded_ub(&in_tile[curr_buffer][0][0][0], input, width, tiles_x,
-                           curr_tile_base, total_tiles);
-asc_sync_notify(PIPE_MTE2, PIPE_V, curr_event);
+    asc_lock(PIPE_MTE2, input_mutex);
+    copy_gm_2tile_to_padded_ub(&in_tile[curr_buffer][0][0][0], input, width, tiles_x,
+                               tile_base, total_tiles);
+    asc_unlock(PIPE_MTE2, input_mutex);
 
-for (uint32_t next_tile_base = curr_tile_base + loop_step; curr_tile_base < total_tiles;
-     next_tile_base += loop_step) {
-    // curr_buffer用于SIMT VF转置和MTE3搬出，next_buffer用于下一轮MTE2搬入。
-    uint32_t next_buffer = curr_buffer ^ 1;
-    uint32_t next_event = (next_buffer == 0) ? EVENT_ID0 : EVENT_ID1;
-
-    if (next_tile_base < total_tiles) {
-        asc_sync_wait(PIPE_V, PIPE_MTE2, next_event);
-        copy_gm_2tile_to_padded_ub(&in_tile[next_buffer][0][0][0], input, width, tiles_x,
-                                   next_tile_base, total_tiles);
-        asc_sync_notify(PIPE_MTE2, PIPE_V, next_event);
-    }
-
-    asc_sync_wait(PIPE_MTE2, PIPE_V, curr_event);
-    // 第三轮开始复用同一个输出buffer，需要先等待该buffer上一次MTE3搬出完成。
-    if (loop_count >= 2) {
-        asc_sync_wait(PIPE_MTE3, PIPE_V, curr_event);
-    }
-    // 当前输入buffer准备好后，在当前输出buffer中生成转置后的连续tile。
+    // SIMT VF等待当前输入buffer搬入完成；复用输出buffer前等待其上一次MTE3搬出完成。
+    asc_lock(PIPE_V, input_mutex);
+    asc_lock(PIPE_V, output_mutex);
     asc_vf_call<simt_transpose_2tile_pad>(dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1),
                                           &out_tile[curr_buffer][0][0][0],
                                           &in_tile[curr_buffer][0][0][0],
-                                          curr_tile_base, total_tiles);
-    asc_sync_notify(PIPE_V, PIPE_MTE2, curr_event);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, curr_event);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, curr_event);
+                                          tile_base, total_tiles);
+    asc_unlock(PIPE_V, input_mutex);
+    asc_unlock(PIPE_V, output_mutex);
+
+    asc_lock(PIPE_MTE3, output_mutex);
     copy_ub_2tile_to_gm(output, &out_tile[curr_buffer][0][0][0], height, tiles_x,
-                        curr_tile_base, total_tiles);
-    asc_sync_notify(PIPE_MTE3, PIPE_V, curr_event);
+                        tile_base, total_tiles);
+    asc_unlock(PIPE_MTE3, output_mutex);
     ++loop_count;
-
-    curr_buffer = next_buffer;
-    curr_event = next_event;
-    curr_tile_base = next_tile_base;
-}
-
-// 只等待已经发起过的MTE3，避免等待没有notify过的event。
-if (loop_count > 0) {
-    asc_sync_wait(PIPE_MTE3, PIPE_V, EVENT_ID0);
-}
-if (loop_count > 1) {
-    asc_sync_wait(PIPE_MTE3, PIPE_V, EVENT_ID1);
 }
 ```
 
@@ -346,15 +318,15 @@ if (loop_count > 1) {
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | :----------------: | :-----------: | :--------------: | :---------------: | :-----------: | :------------------: | :--------------: |
-|       6.824       |     5.621     |      9275.0      |       4.319       |     0.769     |        0.965        |      0.171      |
+|       6.831       |     5.679     |      9369.6      |       4.334       |     0.764     |        0.904        |      0.159      |
 
 **分析**：
 
-Case 4通过双缓冲避免MTE2写入覆盖SIMT VF正在读取的输入缓冲区，也避免SIMT VF写入覆盖MTE3正在搬出的输出缓冲区；通过双event id分别管理两组输入/输出缓冲区的生命周期，将单缓冲中的“MTE2搬入、SIMT VF转置、MTE3搬出”串行屏障，调整为相邻轮次之间的流水重叠。相比Case 3，Task Duration从11.617μs降低到6.824μs，耗时下降约41.3%。相比Case 0直接GM转置，Task Duration从36.215μs降低到6.824μs，整体性能提升约5.31倍。
+Case 4通过双缓冲避免MTE2写入覆盖SIMT VF正在读取的输入缓冲区，也避免SIMT VF写入覆盖MTE3正在搬出的输出缓冲区；通过多组mutex id分别管理两组输入/输出缓冲区的生命周期，将单缓冲中的“MTE2搬入、SIMT VF转置、MTE3搬出”串行屏障，调整为相邻轮次之间的流水重叠。相比Case 3，Task Duration从11.596μs降低到6.831μs，耗时下降约41.1%。相比Case 0直接GM转置，Task Duration从36.263μs降低到6.831μs，整体性能提升约5.31倍。
 
-Case 3与Case 4的仿真指令流水图分别如图5、图6所示。从图5可以看到，Case 3使用单buffer串行处理每组tile。MTE2搬入完成后需要通过 `WAIT_FLAG` 等待SIMT VF读取，SIMT VF完成后再等待MTE3搬出，MTE3搬出结束后才能复用同一组UB buffer进入下一轮MTE2搬入。因此MTE2、SIMT VF和MTE3三个流水之间存在明显的串行等待，SIMT VF执行间隔中会出现较多由搬运和同步带来的空隙。
+Case 3与Case 4的仿真指令流水图分别如图5、图6所示。从图5可以看到，Case 3使用单buffer串行处理每组tile。MTE2搬入完成后，SIMT VF需要等待输入buffer可读；SIMT VF完成后，MTE3才能搬出输出buffer；MTE3搬出结束后才能复用同一组UB buffer进入下一轮MTE2搬入。因此MTE2、SIMT VF和MTE3三个流水之间存在明显的串行等待，SIMT VF执行间隔中会出现较多由搬运和同步带来的空隙。
 
-从图6可以看到，Case 4采用双缓冲后，当前buffer进行SIMT VF转置和MTE3搬出的同时，另一组buffer可以提前发起下一组tile的MTE2搬入。MTE2、SIMT VF和MTE3在相邻轮次之间形成重叠。因此Case 4能够隐藏部分MTE搬运和同步开销，Task Duration进一步降低。图中仍然存在少量等待，主要来自首个tile组预搬入时没有前一轮SIMT VF/MTE3可重叠、最后一组tile的MTE3搬出需要等待完成，以及同一输出buffer再次被SIMT VF写入前必须等待前序MTE3搬出完成。
+从图6可以看到，Case 4采用双缓冲后，当前buffer进行SIMT VF转置和MTE3搬出的同时，另一组buffer可以提前发起下一组tile的MTE2搬入。MTE2、SIMT VF和MTE3在相邻轮次之间形成重叠。因此Case 4能够隐藏部分MTE搬运和同步开销，Task Duration进一步降低。图中仍然存在少量等待，主要用于保护buffer复用和跨流水数据依赖。
 
 **图5　Case 3仿真指令流水图**
 
@@ -372,13 +344,13 @@ Case 3与Case 4的仿真指令流水图分别如图5、图6所示。从图5可�
 
 | Case | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | ---- | :----------------: | :-----------: | :--------------: | :---------------: | :-----------: | :------------------: | :--------------: |
-| 0    |       36.215       |    33.627    |     55484.7     |      33.181      |     0.987     |        0.434        |      0.013      |
-| 1    |       23.374       |     2.292     |      3781.8      |       1.445       |     0.633     |        0.207        |      0.088      |
-| 2    |       18.734       |    17.553    |     28961.7     |      11.602      |     0.661     |        0.880        |      0.050      |
-| 3    |       11.617       |    10.420    |     17192.8     |       4.465       |     0.429     |        0.877        |      0.084      |
-| 4    |       6.824       |     5.621     |      9275.0      |       4.319       |     0.769     |        0.965        |      0.171      |
+| 0    |       36.263       |    33.620    |     55473.1     |      33.209      |     0.988     |        0.399        |      0.012      |
+| 1    |       23.732       |     2.286     |      3772.6      |       1.454       |     0.638     |        0.198        |      0.085      |
+| 2    |       18.697       |    17.484    |     28849.4     |      11.559      |     0.661     |        0.846        |      0.048      |
+| 3    |       11.596       |    10.459    |     17258.2     |       4.465       |     0.427     |        0.853        |      0.081      |
+| 4    |       6.831       |     5.679     |      9369.6      |       4.334       |     0.764     |        0.904        |      0.159      |
 
-转置主路径Case 0 -> Case 1 -> Case 2 -> Case 3 -> Case 4，Task Duration由36.215μs依次降至23.374μs、18.734μs、11.617μs、6.824μs。Case 4相对Case 0直接GM转置提升约5.31倍。
+转置主路径Case 0 -> Case 1 -> Case 2 -> Case 3 -> Case 4，Task Duration由36.263μs依次降至23.732μs、18.697μs、11.596μs、6.831μs。Case 4相对Case 0直接GM转置提升约5.31倍。
 
 矩阵转置需要从GM读取完整输入矩阵，并向GM写回完整输出矩阵。对于1024×1024的float矩阵，理想情况下GM读写总数据量为：
 
@@ -392,7 +364,7 @@ $$
 T_{theory} = \frac{8.39MB}{1.6TB/s} \approx 5.243μs
 $$
 
-Case 0距离理论下限较远，主要原因是转置写回导致同一Warp内相邻线程写地址跨行分散，GM写无法形成理想连续访问。Case 1通过UB中转把非连续访问转移到UB内部，GM侧访问连续性改善，但按tile分组启动512个Thread Block，调度开销较高。Case 2固定Thread Block数后减少了启动和调度开销，但SIMT VF转置访问UB仍存在bank冲突。Case 3通过32×40的UB padding降低bank冲突后，耗时明显下降。Case 4进一步使用双缓冲，使MTE2搬入、SIMT VF转置和MTE3搬出流水并行，Task Duration降低到6.824μs，对应等效GM读写带宽约1.23TB/s，约达到Ascend 950PR理论GM峰值带宽1.6TB/s的76.8%。该结果已经接近理论带宽上限，但仍高于5.243μs的理论耗时下限，主要来自UB读写、MTE与V之间的同步、`asc_vf_call`调用开销、地址计算以及流水无法完全并行等非GM带宽开销。这些开销属于当前实现路径下暂无明显进一步优化手段的部分。
+Case 0距离理论下限较远，主要原因是转置写回导致同一Warp内相邻线程写地址跨行分散，GM写无法形成理想连续访问。Case 1通过UB中转把非连续访问转移到UB内部，GM侧访问连续性改善，但按tile分组启动512个Thread Block，调度开销较高。Case 2固定Thread Block数后减少了启动和调度开销，但SIMT VF转置访问UB仍存在bank冲突。Case 3通过32×40的UB padding降低bank冲突后，耗时明显下降。Case 4进一步使用双缓冲，使MTE2搬入、SIMT VF转置和MTE3搬出流水并行，Task Duration降低到6.831μs，对应等效GM读写带宽约1.23TB/s，约达到Ascend 950PR理论GM峰值带宽1.6TB/s的76.8%。该结果已经接近理论带宽上限，但仍高于5.243μs的理论耗时下限，主要来自UB读写、MTE与V之间的同步、`asc_vf_call`调用开销、地址计算以及流水无法完全并行等非GM带宽开销。这些开销属于当前实现路径下暂无明显进一步优化手段的部分。
 
 ## 调优建议
 
@@ -450,10 +422,10 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
 
   通过上板性能采集，可以直接测定算子昇腾AI处理器上的运行时间。该方式适合在板环境中快速定位算子性能问题。
 
-  基于可执行文件demo通过msopprof执行算子调优：
+  基于可执行文件matrix_transpose通过msopprof执行算子调优：
 
   ```
-  msopprof ./demo
+  msopprof ./matrix_transpose
   ```
 
   - 性能数据说明
@@ -472,36 +444,36 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
     └──visualize_data.bin         # MindStudio Insight呈现文件
     ```
 
-查看具体的性能分析结果：
+  查看具体的性能分析结果：
 
-```bash
-# 查看Task Duration 以及各项数据
-cat ./OPPROF_*/PipeUtilization.csv
-```
+  ```bash
+  # 查看Task Duration 以及各项数据
+  cat ./OPPROF_*/PipeUtilization.csv
+  ```
+- 仿真性能采集
 
-## 仿真调优
+  可以使用 `msopprof simulator` 进行仿真性能分析，生成可视化的指令流水图等信息。命令如下：
 
-可以使用 `msopprof simulator` 进行仿真性能分析，生成可视化的指令流水图等信息。命令如下：
+  ```bash
+  SCENARIO_NUM=4                                                                     # 选择执行场景，可选0-4
+  mkdir -p build && cd build;                                                        # 创建并进入build目录
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # 编译工程
+  msopprof simulator --soc-version=<soc_version> ./matrix_transpose
+  ```
 
-```bash
-SCENARIO_NUM=4                                                                     # 选择执行场景，可选0-4
-mkdir -p build && cd build;                                                        # 创建并进入build目录
-cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # 编译工程
-msopprof simulator --soc-version=<soc_version> ./matrix_transpose
-```
+  > 使用仿真调优功能前，需要在 `CMakeLists.txt` 中添加 `-g` 编译选项，用于生成调试信息，使仿真器能够采集指令流水图。`soc_version` 获取方式及仿真调优其他说明可参考[仿真调优样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/01_utilities/08_simulator)。
+  >
 
-> 使用仿真调优功能前，需要在 `CMakeLists.txt` 中添加 `-g` 编译选项，用于生成调试信息，使仿真器能够采集指令流水图。`soc_version` 获取方式及仿真调优其他说明可参考[仿真调优样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/01_utilities/08_simulator)。
+  命令完成后，会在当前目录下生成以 `OPPROF_{timestamp}_XXX` 命名的文件夹，产物结构如下：
 
-命令完成后，会在当前目录下生成以 `OPPROF_{timestamp}_XXX` 命名的文件夹，产物结构如下：
+  ```text
+  OPPROF_{timestamp}_XXX/
+  ├── dump                    // 原始性能数据，用户无需关注
+  └── simulator
+      ├── core*.veccore*/     // 各向量核的仿真指令流水图文件
+      └── visualize_data.bin  // MindStudio Insight呈现文件
+  ```
 
-```text
-OPPROF_{timestamp}_XXX/
-├── dump                    // 原始性能数据，用户无需关注
-└── simulator
-    ├── core*.veccore*/     // 各向量核的仿真指令流水图文件
-    └── visualize_data.bin  // MindStudio Insight呈现文件
-```
-
-执行后，可以在 **MindStudio Insight** 中打开 `visualize_data.bin` 查看可视化指令流水图。
+  执行后，可以在 **MindStudio Insight** 中打开 `visualize_data.bin` 查看可视化指令流水图。
 
 更多 `msOpProf` 工具使用方法，请参见[MindStudio工具调优（msOpProf）快速入门](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/quick_start/msopprof_quick_start.md)。
