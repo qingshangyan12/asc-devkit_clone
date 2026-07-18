@@ -288,8 +288,6 @@ public:
     }
 
     template <typename T, typename U>
-    __aicore__ inline static constexpr void CheckUB2GMDataType()
-    template <typename T, typename U>
     __aicore__ inline static constexpr void CheckUB2UBDataType()
     {
         using srcDataType = typename U::elementType;
