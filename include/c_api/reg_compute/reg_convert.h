@@ -23,9 +23,7 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_type.h"
 #include "c_api/utils/union.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
-#endif
 
 // ==========asc_float2half(rd/ru/rz/rn/rna)==========
 __simd_callee__ inline void asc_float2half_rd(vector_half& dst, vector_float src, vector_bool mask);
@@ -119,8 +117,10 @@ __simd_callee__ inline void asc_half2bfloat16_rna(vector_bfloat16_t& dst, vector
 __simd_callee__ inline void asc_half2bfloat16_ru(vector_bfloat16_t& dst, vector_half src, vector_bool mask);
 
 __simd_callee__ inline void asc_half2bfloat16_rz(vector_bfloat16_t& dst, vector_half src, vector_bool mask);
+#endif
 
 // ==========asc_e4m32float==========
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_e4m32float(vector_float& dst, vector_fp8_e4m3fn_t src, vector_bool mask);
 
 __simd_callee__ inline void asc_e4m32float_v2(vector_float& dst, vector_fp8_e4m3fn_t src, vector_bool mask);
@@ -230,13 +230,17 @@ __simd_callee__ inline void asc_half2hif8_rna_sat(vector_hifloat8_t& dst, vector
 __simd_callee__ inline void asc_half2hif8_rna_v2(vector_hifloat8_t& dst, vector_half src, vector_bool mask);
 
 __simd_callee__ inline void asc_half2hif8_rna_sat_v2(vector_hifloat8_t& dst, vector_half src, vector_bool mask);
+#endif
 
 // ==========asc_bfloat162float==========
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162float(vector_float& dst, vector_bfloat16_t src, vector_bool mask);
 
 __simd_callee__ inline void asc_bfloat162float_v2(vector_float& dst, vector_bfloat16_t src, vector_bool mask);
+#endif
 
 // ==========asc_int4x22bfloat16==========
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_int4x22bfloat16(vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask);
 
 __simd_callee__ inline void asc_int4x22bfloat16_v2(vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask);
@@ -280,8 +284,10 @@ __simd_callee__ inline void asc_bfloat162int32_rn_sat(vector_int32_t& dst, vecto
 __simd_callee__ inline void asc_bfloat162int32_rn_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask);
 
 __simd_callee__ inline void asc_bfloat162int32_rn_sat_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask);
+#endif
 
 // ==========asc_bfloat162int32_rna==========
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162int32_rna(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask);
 
 __simd_callee__ inline void asc_bfloat162int32_rna_sat(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask);
@@ -289,8 +295,10 @@ __simd_callee__ inline void asc_bfloat162int32_rna_sat(vector_int32_t& dst, vect
 __simd_callee__ inline void asc_bfloat162int32_rna_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask);
 
 __simd_callee__ inline void asc_bfloat162int32_rna_sat_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask);
+#endif
 
 // ==========asc_bfloat162int32_rd==========
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162int32_rd(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask);
 
 __simd_callee__ inline void asc_bfloat162int32_rd_sat(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask);
@@ -298,8 +306,10 @@ __simd_callee__ inline void asc_bfloat162int32_rd_sat(vector_int32_t& dst, vecto
 __simd_callee__ inline void asc_bfloat162int32_rd_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask);
 
 __simd_callee__ inline void asc_bfloat162int32_rd_sat_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask);
+#endif
 
 // ==========asc_bfloat162int32_ru==========
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162int32_ru(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask);
 
 __simd_callee__ inline void asc_bfloat162int32_ru_sat(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask);
@@ -307,8 +317,10 @@ __simd_callee__ inline void asc_bfloat162int32_ru_sat(vector_int32_t& dst, vecto
 __simd_callee__ inline void asc_bfloat162int32_ru_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask);
 
 __simd_callee__ inline void asc_bfloat162int32_ru_sat_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask);
+#endif
 
 // ==========asc_bfloat162int32_rz==========
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162int32_rz(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask);
 
 __simd_callee__ inline void asc_bfloat162int32_rz_sat(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask);
@@ -400,9 +412,11 @@ __simd_callee__ inline void asc_uint322uint8_sat_v4(vector_uint8_t& dst, vector_
 __simd_callee__ inline void asc_hif82half(vector_half& dst, vector_hifloat8_t src, vector_bool mask);
 
 __simd_callee__ inline void asc_hif82half_v2(vector_half& dst, vector_hifloat8_t src, vector_bool mask);
+#endif
 
 // ==========asc_half2int4x2==========
 // rd - sat:dis/en - v1 v2 v3 v4
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_half2int4x2_rd(vector_int4x2_t& dst, vector_half src, vector_bool mask);
 
 __simd_callee__ inline void asc_half2int4x2_rd_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask);
@@ -418,8 +432,10 @@ __simd_callee__ inline void asc_half2int4x2_rd_sat_v3(vector_int4x2_t& dst, vect
 __simd_callee__ inline void asc_half2int4x2_rd_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask);
 
 __simd_callee__ inline void asc_half2int4x2_rd_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask);
+#endif
 
 // ru - sat:dis/en - v1 v2 v3 v4
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_half2int4x2_ru(vector_int4x2_t& dst, vector_half src, vector_bool mask);
 
 __simd_callee__ inline void asc_half2int4x2_ru_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask);
@@ -435,8 +451,10 @@ __simd_callee__ inline void asc_half2int4x2_ru_sat_v3(vector_int4x2_t& dst, vect
 __simd_callee__ inline void asc_half2int4x2_ru_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask);
 
 __simd_callee__ inline void asc_half2int4x2_ru_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask);
+#endif
 
 // rz - sat:dis/en - v1 v2 v3 v4
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_half2int4x2_rz(vector_int4x2_t& dst, vector_half src, vector_bool mask);
 
 __simd_callee__ inline void asc_half2int4x2_rz_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask);
@@ -452,8 +470,10 @@ __simd_callee__ inline void asc_half2int4x2_rz_sat_v3(vector_int4x2_t& dst, vect
 __simd_callee__ inline void asc_half2int4x2_rz_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask);
 
 __simd_callee__ inline void asc_half2int4x2_rz_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask);
+#endif
 
 // rn - sat:dis/en - v1 v2 v3 v4
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_half2int4x2_rn(vector_int4x2_t& dst, vector_half src, vector_bool mask);
 
 __simd_callee__ inline void asc_half2int4x2_rn_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask);
@@ -469,8 +489,10 @@ __simd_callee__ inline void asc_half2int4x2_rn_sat_v3(vector_int4x2_t& dst, vect
 __simd_callee__ inline void asc_half2int4x2_rn_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask);
 
 __simd_callee__ inline void asc_half2int4x2_rn_sat_v4(vector_int4x2_t& dst, vector_half src, vector_bool mask);
+#endif
 
 // rna - sat:dis/en - v1 v2 v3 v4
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_half2int4x2_rna(vector_int4x2_t& dst, vector_half src, vector_bool mask);
 
 __simd_callee__ inline void asc_half2int4x2_rna_sat(vector_int4x2_t& dst, vector_half src, vector_bool mask);
@@ -867,8 +889,10 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rz_v3(
 
 __simd_callee__ inline void asc_bfloat162e2m1x2_rz_v4(
     vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask);
+#endif
 
 // ==========asc_float2hif8_rh/rna)==========
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_float2hif8_rh_sat(vector_hifloat8_t& dst, vector_float src, vector_bool mask);
 
 __simd_callee__ inline void asc_float2hif8_rh(vector_hifloat8_t& dst, vector_float src, vector_bool mask);
@@ -974,8 +998,10 @@ __simd_callee__ inline void asc_e2m1x22bfloat16_v2(vector_bfloat16_t& dst, vecto
 __simd_callee__ inline void asc_e2m1x22bfloat16_v3(vector_bfloat16_t& dst, vector_fp4x2_e2m1_t src, vector_bool mask);
 
 __simd_callee__ inline void asc_e2m1x22bfloat16_v4(vector_bfloat16_t& dst, vector_fp4x2_e2m1_t src, vector_bool mask);
+#endif
 
 // ==========asc_bfloat162e1m2x2_rd/rn/rna/ru/rz)==========
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162e1m2x2_rd(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask);
 
 __simd_callee__ inline void asc_bfloat162e1m2x2_rd_v2(
@@ -1030,8 +1056,10 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rz_v3(
 
 __simd_callee__ inline void asc_bfloat162e1m2x2_rz_v4(
     vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask);
+#endif
 
 // ==========asc_e1m2x22bfloat16==========
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_e1m2x22bfloat16(vector_bfloat16_t& dst, vector_fp4x2_e1m2_t src, vector_bool mask);
 
 __simd_callee__ inline void asc_e1m2x22bfloat16_v2(vector_bfloat16_t& dst, vector_fp4x2_e1m2_t src, vector_bool mask);
@@ -1074,9 +1102,11 @@ __simd_callee__ inline void asc_half2float(vector_float& dst, vector_half src, v
 
 __simd_callee__ inline void asc_half2float_v2(vector_float& dst, vector_half src, vector_bool mask);
 
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+
 #endif
