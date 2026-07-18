@@ -14,10 +14,10 @@
  * Declares asynchronous primitives for moving matrix data among Global Memory,
  * L1 / L0A / L0B / L0C, Bias Table (BT), Fixpipe Buffer (FB), Unified Buffer (UB),
  * and image-to-CBUF paths.
- * @par Related header
- * Soft-emulation / usability wrappers (*_sync, size overloads) are declared in
- * cube_datamove_functions.h and are NOT native INTRI instructions.
- * @see docs/zh/api/SIMD-API/C-API/cube_datamove/
+ * @par Related headers
+ * - cube_datamove.h — umbrella that includes this file and cube_datamove_functions.h
+ * - cube_datamove_functions.h — soft-emulation / usability wrappers (*_sync, size
+ *   overloads); NOT native INTRI instructions
  */
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
 #error "cube_datamove_intrinsics.h cannot be used with compile flag --enable-simt enabled."

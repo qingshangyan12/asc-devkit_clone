@@ -17,9 +17,10 @@
  *   - synchronized variants (*_sync)
  *   - compact size-based overloads (..., uint32_t size)
  * - For performance-critical device code, use the corresponding asynchronous
- *   native APIs in cube_datamove_functions.h.
- * @see cube_datamove_functions.h
- * @see docs/zh/api/SIMD-API/C-API/cube_datamove/
+ *   native APIs in cube_datamove_intrinsics.h.
+ * @par Related headers
+ * - cube_datamove.h — umbrella that includes cube_datamove_intrinsics.h and this file
+ * - cube_datamove_intrinsics.h — native asynchronous INTRI instructions
  */
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
 #error "cube_datamove_functions.h cannot be used with compile flag --enable-simt enabled."
@@ -62,7 +63,7 @@
  * @param[in]  enable_f_matrix_ctrl (3D) Use configured F-matrix sideband.
  * @param[in]  channel_size        (3D) Channel size for the Load3D transfer.
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  * @note Configure Load3D sideband via asc_set_l13d_* before 3D overloads when required.
  */
@@ -127,7 +128,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
  * @param[in]  enable_f_matrix_ctrl (3D) Use configured F-matrix sideband.
  * @param[in]  channel_size        (3D) Channel size for the Load3D transfer.
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  */
 __aicore__ inline void asc_copy_l12l0b_sync(
@@ -167,7 +168,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
  * @param[in]  value   Scalar fill pattern (typed value or uint32_t bit pattern).
  * @param[in]  config  Fill extent / control (asc_fill_value_config).
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  */
 __aicore__ inline void asc_fill_l0a_sync(__ca__ half* dst, half value, const asc_fill_value_config& config);
@@ -203,7 +204,7 @@ __aicore__ inline void asc_fill_l0a_sync(__ca__ bfloat16_t* dst, bfloat16_t valu
  * @param[in]  value   Scalar fill pattern (typed value or uint32_t bit pattern).
  * @param[in]  config  Fill extent / control (asc_fill_value_config).
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  */
 __aicore__ inline void asc_fill_l1_sync(__cbuf__ half* dst, half value, const asc_fill_value_config& config);
@@ -247,7 +248,7 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ bfloat16_t* dst, uint32_t value
  * @param[in]  src_gap_size   Gap between consecutive source bursts.
  * @param[in]  dst_gap_size   Gap between consecutive destination bursts.
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  * @param[in] size  Byte / element count for the compact size overload.
  */
@@ -266,7 +267,7 @@ __aicore__ inline void asc_copy_l12fb_sync(__fbuf__ void* dst, __cbuf__ void* sr
  * @param[in]  source_gap     Gap between consecutive source bursts.
  * @param[in]  dst_gap        Gap between consecutive destination bursts.
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  * @param[in] size  Byte / element count for the compact size overload.
  */
@@ -283,7 +284,7 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void* src, uin
  * @param[in]  value   Scalar fill pattern (typed value or uint32_t bit pattern).
  * @param[in]  config  Fill extent / control (asc_fill_value_config).
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  */
 __aicore__ inline void asc_fill_l0b_sync(__cb__ half* dst, half value, const asc_fill_value_config& config);
@@ -327,7 +328,7 @@ __aicore__ inline void asc_fill_l0b_sync(__cb__ float* dst, uint32_t value, cons
  * @param[in]  src_gap      Gap between consecutive source bursts.
  * @param[in]  dst_gap      Gap between consecutive destination bursts.
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  * @note Size-based overloads for these modes live in cube_datamove_functions.h.
  * @param[in] size  Byte / element count for the compact size overload.
@@ -378,7 +379,7 @@ __aicore__ inline void asc_copy_gm2l1_pad8_sync(__cbuf__ void* dst, __gm__ void*
  * @param[in]  dst_nz_n_stride       Destination NZ N stride.
  * @param[in]  dst_nz_matrix_stride  Destination stride between NZ matrices.
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  */
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
@@ -436,7 +437,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
  * @param[in]  src_stride   (typed 2D) Source stride between iterations.
  * @param[in]  dst_gap      (typed 2D) Destination gap between iterations.
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  * @note Compact (..., uint32_t size) overloads are in cube_datamove_functions.h.
  * @param[in] size  Byte / element count for the compact size overload.
@@ -480,7 +481,7 @@ __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void* dst, __gm__ void* src,
  * @param[in]  src_stride  Source stride between iterations.
  * @param[in]  dst_gap     Destination gap between iterations.
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  */
 __aicore__ inline void asc_copy_gm2l0a_sync(
@@ -519,7 +520,7 @@ __aicore__ inline void asc_copy_gm2l0a_sync(
  * @param[in]  src_stride  Source stride between iterations.
  * @param[in]  dst_gap     Destination gap between iterations.
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  */
 __aicore__ inline void asc_copy_gm2l0b_sync(
@@ -560,7 +561,7 @@ __aicore__ inline void asc_copy_gm2l0b_sync(
  * @param[in]  enable_addr_decrement  Enable address decrement mode when present.
  * @param[in]  dst_frac_gap           Destination fractal gap when present.
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  */
 __aicore__ inline void asc_copy_l12l0a_trans_sync(
@@ -637,7 +638,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(
  * @param[in]  start_index  Starting index into the sparse table.
  * @param[in]  repeat       Iteration count.
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  */
 __aicore__ inline void asc_copy_l12l0b_sparse_sync(
@@ -656,7 +657,7 @@ __aicore__ inline void asc_copy_l12l0b_sparse_sync(
  * @param[in]  dst_frac_gap           Destination fractal gap when present.
  * @param[in]  src_frac_gap           Source fractal gap when present (arch-specific).
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  */
 __aicore__ inline void asc_copy_l12l0b_trans_sync(
@@ -735,7 +736,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(
  * @param[in]  channel_split     Enable channel-split layout.
  * @param[in]  nz2nd_en          Enable NZ->ND conversion on store.
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  * @note Pre-configure related fixpipe state via asc_set_l0c_* / lrelu alpha when needed.
  */
@@ -787,7 +788,7 @@ __aicore__ inline void asc_copy_l0c2gm_sync(
  * @param[in]  m_size     Source size along M.
  * @param[in]  ...        Destination / source strides and fixpipe controls as per overload.
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  */
 __aicore__ inline void asc_copy_l0c2l1_sync(
@@ -837,7 +838,7 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
  * @param[in]  src  Source image address in GM / reserved encoding as per overload.
  * @param[in]  ...  Image geometry / stride controls as per overload.
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  */
 __aicore__ inline void asc_load_image_to_cbuf_sync(
@@ -857,7 +858,7 @@ __aicore__ inline void asc_load_image_to_cbuf_sync(
  * @param[in]  src  Source address in GM (__gm__).
  * @param[in]  ...  Align / loop / stride / pad parameters as per overload.
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  * @note Related loop/pad sideband is configured by asc_set_gm2l1_*.
  */
@@ -966,7 +967,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
  * @param[in]  src  Source DN address in GM (__gm__).
  * @param[in]  ...  DN shape / stride / NZ destination stride parameters as per overload.
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  */
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
@@ -1153,7 +1154,7 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(
  * @param[in]  src_stride  Source stride.
  * @param[in]  dst_stride  Destination stride.
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  */
 __aicore__ inline void asc_copy_l12l0a_mx_sync(
@@ -1374,7 +1375,7 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(
  * @param[in]  src_stride  Source stride.
  * @param[in]  dst_stride  Destination stride.
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  */
 __aicore__ inline void asc_copy_l12l0b_mx_sync(
@@ -1506,7 +1507,7 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ float* src, ui
  * @param[in]  src  Source address in L1 (__cbuf__).
  * @param[in]  ...  Burst / stride controls as per overload.
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  */
 __aicore__ inline void asc_copy_l12ub_sync(
@@ -1520,7 +1521,7 @@ __aicore__ inline void asc_copy_l12ub_sync(
  * @param[in]  src  Source address in L1 (__cbuf__).
  * @param[in]  ...  Shape / stride controls as per overload.
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  */
 __aicore__ inline void asc_copy_l12l0c_sync(
@@ -1557,7 +1558,7 @@ __aicore__ inline void asc_copy_l12l0c_sync(
  * @param[in]  src  Source address in L1 (__cbuf__).
  * @param[in]  ...  Burst / stride controls as per overload.
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  */
 __aicore__ inline void asc_copy_l12gm_sync(
@@ -1722,7 +1723,7 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
  * @param[in]  enable_broadcast    Enable broadcast.
  * @param[in]  enable_nz2dn        Enable NZ2DN (alias on some overloads).
  * @note Soft-emulation / usability wrapper — NOT a native cube INTRI instruction.
- *       Prefer the matching async API in cube_datamove_functions.h for performance-critical paths.
+ *       Prefer the matching async API in cube_datamove_intrinsics.h for performance-critical paths.
  * @return None.
  */
 __aicore__ inline void asc_copy_l0c2ub_sync(
