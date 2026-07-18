@@ -91,12 +91,11 @@ __simd_vf__ inline void half2int16_vf(__ubuf__ int16_t* dst_addr, __ubuf__ half*
 {
     vector_half src;
     vector_int16_t dst;
-    vector_bool mask;
+    vector_bool mask = asc_create_mask_b16(PAT_ALL);
     for (uint16_t i = 0; i < repeat_time; ++i) {
-        mask = asc_update_mask_b16(count);
         asc_loadalign_postupdate(src, src_addr, one_repeat_size);
         asc_half2int16_rn(dst, src, mask);
-        asc_storealign_postupdate(dst_addr, dst, one_block_size);
+        asc_storealign_postupdate(dst_addr, dst, one_block_size, mask);
     }
 }
 ```

@@ -78,7 +78,7 @@ __simd_vf__ inline void sqrt_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr
         mask = asc_update_mask_b16(count);
         asc_loadalign_postupdate(src, src_addr, one_repeat_size);
         asc_sqrt(dst, src, mask);
-        asc_storealign_postupdate(dst_addr, dst, one_block_size);
+        asc_storealign_postupdate(dst_addr, dst, one_block_size, mask);
     }
 }
 ```

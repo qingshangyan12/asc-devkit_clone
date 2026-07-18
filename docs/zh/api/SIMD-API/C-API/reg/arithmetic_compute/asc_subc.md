@@ -34,7 +34,7 @@ $$
 \{carry_i, dst_i\} = src0_i - src1_i - carry\_src_i
 $$
 
-Carry flag（进位标志）用于表示加法进位或者减法无借位，若src0，src1，carry_src输入按位相减后最高位有借位，在carry（存放借位的掩码寄存器）中对应位置每4bit设置1，否则写0。
+Carry flag（进位/借位标志）用于表示加法进位或者减法无借位，若src0，src1，carry_src输入按位相减后最高位有借位，在carry（存放借位的掩码寄存器）中对应位置每4bit设置0，否则写1。
 
 ![](../../figures/asc_subc_1.png)
 
@@ -59,7 +59,7 @@ __simd_callee__ inline void asc_subc(vector_bool& carry, vector_int32_t& dst, ve
 | dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
 | src0 | 输入 | 源操作数0（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
 | src1 | 输入 | 源操作数1（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| carry_src | 输入 | 源借位值（矢量数据寄存器）。<br>类型为[vector\_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
+| carry_src | 输入 | 源借位值（掩码寄存器）。<br>类型为[vector\_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器）。用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。<br>类型为[vector\_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
 
 ## 数据类型
@@ -91,7 +91,7 @@ __simd_vf__ inline void subc_vf(__ubuf__ int32_t* dst_addr, __ubuf__ int32_t* sr
         asc_loadalign_postupdate(src0, src0_addr, one_repeat_size);
         asc_loadalign_postupdate(src1, src1_addr, one_repeat_size);
         asc_subc(carry, dst, src0, src1, carry_src, mask);
-        asc_storealign_postupdate(dst_addr, dst, one_block_size);
+        asc_storealign_postupdate(dst_addr, dst, one_block_size, mask);
     }
 }
 ```

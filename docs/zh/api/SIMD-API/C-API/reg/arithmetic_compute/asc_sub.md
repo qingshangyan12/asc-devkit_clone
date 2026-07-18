@@ -36,7 +36,7 @@ $$
 dst_i = src0_i - src1_i
 $$
 
-执行带借位的减法运算时，可以在借位输出（掩码寄存器）中标记每次减法是否产生借位，若src0，src1输入按位相减后最高位有借位，在carry中对应位置每4bit的最低位写1，否则写0。
+执行带借位的减法运算时，可以在借位输出（掩码寄存器）中标记每次减法是否产生借位，若src0，src1输入按位相减后最高位有借位，在carry中对应位置每4bit的最低位写0，否则写1。
 
 ![](../../figures/asc_sub.png)
 
@@ -116,7 +116,7 @@ __simd_vf__ inline void sub_vf(__ubuf__ half* dst_addr, __ubuf__ half* src0_addr
         asc_loadalign_postupdate(src0, src0_addr, one_repeat_size);
         asc_loadalign_postupdate(src1, src1_addr, one_repeat_size);
         asc_sub(dst, src0, src1, mask);
-        asc_storealign_postupdate(dst_addr, dst, one_block_size);
+        asc_storealign_postupdate(dst_addr, dst, one_block_size, mask);
     }
 }
 ```
