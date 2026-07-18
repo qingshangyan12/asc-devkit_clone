@@ -34,20 +34,7 @@ public:
     template <typename T, typename U, typename... Params>
     __aicore__ inline static void DataCopy(const T& dst, const U& src, const Params&... params)
     {
-        using srcType = typename U::elementType;
-        if constexpr (sizeof(srcType) == 1) {
-            CopyUbufToUbuf((__ubuf__ uint8_t*)(dst.Data().Get()), (__ubuf__ uint8_t*)(src.Data().Get()), params...);
-        } else if constexpr (sizeof(srcType) == 2) {
-            CopyUbufToUbuf((__ubuf__ uint16_t*)(dst.Data().Get()), (__ubuf__ uint16_t*)(src.Data().Get()), params...);
-        } else if constexpr (sizeof(srcType) == 4) {
-            CopyUbufToUbuf((__ubuf__ uint32_t*)(dst.Data().Get()), (__ubuf__ uint32_t*)(src.Data().Get()), params...);
-        } else if constexpr (sizeof(srcType) == 8) {
-            CopyUbufToUbuf((__ubuf__ uint32_t*)(dst.Data().Get()), (__ubuf__ uint32_t*)(src.Data().Get()), params...);
-        } else {
-            static_assert(
-                sizeof(srcType) == 1 || sizeof(srcType) == 2 || sizeof(srcType) == 4 || sizeof(srcType) == 8,
-                "Unsupported data type size for CopyUbufToUbuf");
-        }
+        CopyUbufToUbuf(dst.Data().Get(), src.Data().Get(), params...);
     }
 
 private:
