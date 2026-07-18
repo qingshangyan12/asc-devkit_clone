@@ -16,7 +16,7 @@
  * and image-to-CBUF paths.
  * @par Related header
  * Soft-emulation / usability wrappers (*_sync, size overloads) are declared in
- * cube_datamove_emulation.h and are NOT native INTRI instructions.
+ * cube_datamove_functions.h and are NOT native INTRI instructions.
  * @see docs/zh/api/SIMD-API/C-API/cube_datamove/
  */
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
@@ -348,7 +348,7 @@ __aicore__ inline void asc_fill_l0b(__cb__ float* dst, uint32_t value, const asc
  * @param[in]  src_gap      Gap between consecutive source bursts.
  * @param[in]  dst_gap      Gap between consecutive destination bursts.
  * @return None.
- * @note Size-based overloads for these modes live in cube_datamove_emulation.h.
+ * @note Size-based overloads for these modes live in cube_datamove_functions.h.
  */
 __aicore__ inline void asc_copy_gm2l1_pad1(
     __cbuf__ void* dst, __gm__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap);
@@ -444,7 +444,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
  * @param[in]  src_stride   (typed 2D) Source stride between iterations.
  * @param[in]  dst_gap      (typed 2D) Destination gap between iterations.
  * @return None.
- * @note Compact (..., uint32_t size) overloads are in cube_datamove_emulation.h.
+ * @note Compact (..., uint32_t size) overloads are in cube_datamove_functions.h.
  */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride,
@@ -1889,9 +1889,6 @@ __aicore__ inline void asc_copy_l0c2ub(
 
 #endif
 
-#ifndef ASCENDC_CUBE_DATAMOVE_SKIP_EMULATION_INCLUDE
-#include "cube_datamove_emulation.h"
-#endif
 
 #endif
 
