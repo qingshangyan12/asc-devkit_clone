@@ -19,7 +19,9 @@
 #include "c_api/utils/union.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_type.h"
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl.h"
+#endif
 
 // ==========源操作数为起初地址，目的数为寄存器=========
 // ==========asc_gather(u8/s8/half/u16/s16/float/u32/s32/bf16/e4m3/e5m2/e8m0)=========
