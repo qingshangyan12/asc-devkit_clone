@@ -225,7 +225,7 @@ In SIMD and SIMT hybrid programming, MTE moves data into UB. When MTE moves a pa
 
 As shown in Figure 4, Case 3 adds 8 columns of padding to the UB tile array, changing each row from 32 elements to 40 elements. The row stride of 40 float elements is 160B, which corresponds to 20 subbanks. When the same column is accessed in the transpose direction, elements in adjacent rows are staggered by a stride of 20 subbanks in the physical UB address space. The accesses of 32 threads are no longer concentrated on subbanks with the same subbank ID in the same bank group, which reduces subbank conflicts during the SIMT VF transpose access phase.
 
-Note that the 32x40 layout is a tradeoff for SIMD and SIMT hybrid programming after considering the alignment requirements of MTE movement. Unlike the 32x34 layout formed by adding 2 columns of padding in a SIMT scenario, the 32x40 layout may still have a small number of subbank conflicts. However, its conflict intensity is much lower than that of the unpadded 32x32 layout.
+Note that the 32x40 layout is a tradeoff for SIMD and SIMT hybrid programming after considering the alignment requirements of MTE movement. Unlike the 32x34 layout formed by adding 2 columns of padding in a SIMT scenario, the 32x40 layout may still have a small number of subbank conflicts. However, its conflict intensity is much lower than that of the 32x32 layout without padding.
 
 **Figure 4: Case 3 tile layout in UB**
 
