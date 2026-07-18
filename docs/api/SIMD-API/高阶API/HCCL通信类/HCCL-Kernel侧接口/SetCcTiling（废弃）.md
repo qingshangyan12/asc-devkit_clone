@@ -40,6 +40,6 @@ __aicore__ inline int32_t SetCcTiling(__gm__ void *ccOpTilingData)
 
 -   参数相同的同一种通信算法在调用Prepare接口前只需要调用一次本接口，否则需要多次调用本接口。
 -   同一种通信算法只支持设置一个ccOpTilingData地址；对于同一种通信算法，重复调用本接口会覆盖该通信算法的ccOpTilingData地址。
--   若调用本接口，必须与传initTiling地址的[Init](Init（废弃）.md)接口配合使用，且Init接口在本接口前被调用。
+-   若调用本接口，必须与传initTiling地址的[Init](Init_deprecated.md)接口配合使用，且Init接口在本接口前被调用。
 -   若调用本接口，必须使用标准C++语法定义TilingData结构体的开发方式。
 

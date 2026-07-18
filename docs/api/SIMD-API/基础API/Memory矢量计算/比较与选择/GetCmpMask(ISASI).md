@@ -29,9 +29,9 @@
 
 头文件路径为：`"basic_api/kernel_operator_vec_cmpsel_intf.h"`。
 
-此接口用于获取[Compare（结果存入寄存器）](Compare（结果存入寄存器）.md)指令的比较结果。
+此接口用于获取[Compare（结果存入寄存器）](Compare_store_to_register.md)指令的比较结果。
 
-[Compare（结果存入寄存器）](Compare（结果存入寄存器）.md)指令会将比较后的结果写入CmpMask寄存器中，使用GetCmpMask接口可以获取到CmpMask寄存器的值从而得到Compare的结果。
+[Compare（结果存入寄存器）](Compare_store_to_register.md)指令会将比较后的结果写入CmpMask寄存器中，使用GetCmpMask接口可以获取到CmpMask寄存器的值从而得到Compare的结果。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -52,7 +52,7 @@ __aicore__ inline void GetCmpMask(const LocalTensor<T>& dst)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | [Compare（结果存入寄存器）](Compare（结果存入寄存器）.md)指令的比较结果。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要16字节对齐。 |
+| dst | 输出 | [Compare（结果存入寄存器）](Compare_store_to_register.md)指令的比较结果。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要16字节对齐。 |
 
 ## 数据类型
 
@@ -68,7 +68,7 @@ dst的空间大小不能少于128字节。
 
 ## 调用示例<a name="section837496171220"></a>
 
-[Compare（结果存入寄存器）](Compare（结果存入寄存器）.md)指令的结果使用uint8\_t类型数据存储，因此dstLocal使用uint8\_t类型。完整的示例参考[Compare类样例](https://gitcode.com/cann/asc-devkit/tree/9.1.0/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/compare)。
+[Compare（结果存入寄存器）](Compare_store_to_register.md)指令的结果使用uint8\_t类型数据存储，因此dstLocal使用uint8\_t类型。完整的示例参考[Compare类样例](https://gitcode.com/cann/asc-devkit/tree/9.1.0/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/compare)。
 
 ```cpp
 AscendC::LocalTensor<float> src0Local;

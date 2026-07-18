@@ -159,12 +159,12 @@ template <typename T> struct is_tensorTrait
     <td class="cellrowborder" valign="top" width="63.31%" headers="mcps1.2.3.1.2 "><p id="p286711411582"><a name="p286711411582"></a><a name="p286711411582"></a>Gather、Gatherb、Scatter</p>
     </td>
     </tr>
-    <tr id="row673710289580"><td class="cellrowborder" valign="top" width="36.69%" headers="mcps1.2.3.1.1 "><p id="p773717281588"><a name="p773717281588"></a><a name="p773717281588"></a>基础API&gt;矢量计算&gt;数据重排（ISASI）</p>
+    <tr id="row673710289580"><td class="cellrowborder" valign="top" width="36.69%" headers="mcps1.2.3.1.1 "><p id="p773717281588"><a name="p773717281588"></a><a name="p773717281588"></a>基础API&gt;矢量计算&gt;data_rearrange_ISASI</p>
     </td>
     <td class="cellrowborder" valign="top" width="63.31%" headers="mcps1.2.3.1.2 "><p id="p1473732895810"><a name="p1473732895810"></a><a name="p1473732895810"></a>Interleave、DeInterleave</p>
     </td>
     </tr>
-    <tr id="row49061051165820"><td class="cellrowborder" valign="top" width="36.69%" headers="mcps1.2.3.1.1 "><p id="p490625113583"><a name="p490625113583"></a><a name="p490625113583"></a>基础API&gt;矢量计算&gt;排序组合（ISASI）</p>
+    <tr id="row49061051165820"><td class="cellrowborder" valign="top" width="36.69%" headers="mcps1.2.3.1.1 "><p id="p490625113583"><a name="p490625113583"></a><a name="p490625113583"></a>基础API&gt;矢量计算&gt;sort_and_merge_ISASI</p>
     </td>
     <td class="cellrowborder" valign="top" width="63.31%" headers="mcps1.2.3.1.2 "><p id="p490655195819"><a name="p490655195819"></a><a name="p490655195819"></a>ProposalConcat、ProposalExtract、RpSort16、MrgSort4、Sort32</p>
     </td>

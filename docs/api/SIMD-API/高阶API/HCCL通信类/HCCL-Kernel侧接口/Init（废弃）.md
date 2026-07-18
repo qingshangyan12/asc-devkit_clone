@@ -38,7 +38,7 @@ __aicore__ inline void Init(GM_ADDR context, __gm__ void *initTiling = nullptr)
 
 ## 约束说明
 
--   若调用本接口时传入initTiling参数，则必须与[SetCcTiling](SetCcTiling（废弃）.md)接口配合使用。
+-   若调用本接口时传入initTiling参数，则必须与[SetCcTiling](SetCcTiling_deprecated.md)接口配合使用。
 -   同一个程序中不能同时调用传入可选参数initTiling的接口和不传入可选参数initTiling的接口，推荐使用传入initTiling参数的调用方式。
 -   若调用本接口时传入initTiling参数，必须使用标准C++语法定义TilingData结构体的开发方式。
 -   本接口不支持使用相同的context初始化多个HCCL对象。每个HCCL对象都应获取其自身的通信上下文。
