@@ -39,5 +39,5 @@ target_compile_definitions(demo PRIVATE
 )
 
 target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} -I/usr/local/Ascend/cann-9.1.0/x86_64-linux/asc>
 )
