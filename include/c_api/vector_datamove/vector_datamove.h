@@ -20,6 +20,7 @@
 #ifndef INCLUDE_C_API_VECTOR_DATAMOVE_VECTOR_DATAMOVE_H
 #define INCLUDE_C_API_VECTOR_DATAMOVE_VECTOR_DATAMOVE_H
 #include "impl/utils/common_types.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 #include "c_api/utils/union.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
