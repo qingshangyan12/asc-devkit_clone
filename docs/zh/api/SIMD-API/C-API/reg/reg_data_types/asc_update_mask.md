@@ -65,7 +65,7 @@ vector_bool，掩码寄存器。
 ## 调用示例
 
 ```cpp
-__simd_vf__ inline void update_mask_vf(__ubuf__ float* dst_addr, __ubuf__ float* src0_addr, __ubuf__ float* src1_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
+__simd_vf__ inline void update_mask_vf(__ubuf__ float* dst_addr, __ubuf__ float* src0_addr, __ubuf__ float* src1_addr, uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_float src0;
     vector_float src1;

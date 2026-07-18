@@ -42,7 +42,7 @@ __simd_callee__ inline vector_bool asc_get_mask_spr_b32()
 
 ## 参数说明
 
-无参数
+无
 
 ## 返回值说明
 
@@ -55,7 +55,7 @@ vector_bool，掩码寄存器。
 ## 调用示例
 
 ```cpp
-__simd_vf__ inline void add_vf(__ubuf__ int16_t* dst_addr, __ubuf__ int16_t* src_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
+__simd_vf__ inline void add_vf(__ubuf__ int16_t* dst_addr, __ubuf__ int16_t* src_addr, uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_int16_t src;
     vector_int16_t dst;

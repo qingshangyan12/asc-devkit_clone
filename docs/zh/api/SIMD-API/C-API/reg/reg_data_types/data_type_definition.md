@@ -34,10 +34,10 @@
 
 | 位宽 | 矢量数据寄存器类型 |
 | --- | --- |
-| b8 | vector_int8_t/vector_uint8_t/vector_int4x2_t/vector_fp4x2_e2m1_t/vector_fp4x2_e1m2_t/vector_hifloat8_t/vector_fp8_e4m3fn_t/vector_fp8_e5m2_t/vector_fp8_e8m0_t |
-| b16 | vector_int16_t/vector_uint16_t/vector_half/vector_bfloat16_t |
-| b32 | vector_int32_t/vector_uint32_t/vector_float |
-| b64 | vector_int64_t/vector_uint64_t |
+| b8 | vector_int8_t、vector_uint8_t、vector_int4x2_t、vector_fp4x2_e2m1_t、vector_fp4x2_e1m2_t、vector_hifloat8_t、vector_fp8_e4m3fn_t、vector_fp8_e5m2_t、vector_fp8_e8m0_t |
+| b16 | vector_int16_t、vector_uint16_t、vector_half、vector_bfloat16_t |
+| b32 | vector_int32_t、vector_uint32_t、vector_float |
+| b64 | vector_int64_t、vector_uint64_t |
 
 **注意：**
 - vector_int4x2_t、vector_fp4x2_e2m1_t、vector_fp4x2_e1m2_t这三个矢量数据类型在内存中的排布需要将两个元素打包为一个字节的存储单元。
@@ -82,8 +82,7 @@ vector_load_unalign寄存器和vector_store_unalign寄存器的数量上限均�
 ### 调用示例
 
 ```cpp
-__simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, uint32_t count,
-    uint32_t one_repeat_size, uint16_t repeat_time)
+__simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_int8_t src;
     vector_int8_t dst;
@@ -119,7 +118,7 @@ addr_reg的地址计算公式为：offset = Σ(index_i × stride_i)，其中inde
 - 单参数版本
     ```cpp
     __simd_vf__ inline void add_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src0_addr, __ubuf__ int8_t* src1_addr, uint32_t count,
-        uint32_t one_repeat_size, uint16_t repeat_time)
+        uint16_t one_repeat_size, uint16_t repeat_time)
     {
         vector_int8_t src0;
         vector_int8_t src1;
