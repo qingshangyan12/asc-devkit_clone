@@ -568,8 +568,8 @@ class OpCompilation:
                         CompileParam.EXTRA_SETTINGS, None
                     ),
                     OpcOptions.DETERMINISTIC_LEVEL: op.get(
- 	                    OpcOptions.DETERMINISTIC_LEVEL, ""
- 	                ),
+                        OpcOptions.DETERMINISTIC_LEVEL, ""
+                    ),
                 }
                 deterministic = self.__opc_compile_args.get(OpcOptions.DETERMINISTIC)
                 if deterministic is None:

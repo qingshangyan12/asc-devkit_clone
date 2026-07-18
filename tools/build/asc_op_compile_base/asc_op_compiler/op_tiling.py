@@ -381,7 +381,9 @@ def do_op_tiling(
     enable_deterministic = get_current_build_config("enable_deterministic_mode")
     extra_params = {"op_name": op_name, "deterministic": enable_deterministic}
 
-    deterministic_level = _safe_int_conversion(get_current_build_config("deterministic_level"))
+    deterministic_level = _safe_int_conversion(
+        get_current_build_config("deterministic_level")
+    )
     if deterministic_level != -1:
         extra_params["deterministic_level"] = deterministic_level
 
