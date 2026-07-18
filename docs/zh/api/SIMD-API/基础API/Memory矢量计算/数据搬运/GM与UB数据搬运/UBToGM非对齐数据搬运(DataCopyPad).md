@@ -169,6 +169,7 @@
 
 - 位于Unified Buffer的源地址必须32字节对齐，位于Global Memory的目的地址必须1字节对齐。
 - paddingValue不支持fp4×2_e2m1_t、fp4×2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t数据类型。
+- 当isPad = true时，填充值不能为hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t数据类型。
 - DataCopyExtParams结构体参数的值需在取值范围内：
 
     **表4**  DataCopyExtParams结构体参数取值范围

@@ -117,6 +117,8 @@
 Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。
 <!-- end id1 -->
 
+不支持fp4×2_e2m1_t、fp4×2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t数据类型。
+
 ## 返回值说明<a name="section7607175220218"></a>
 
 无
