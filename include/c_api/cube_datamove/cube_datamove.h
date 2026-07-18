@@ -31,8 +31,8 @@
 #ifndef INCLUDE_C_API_CUBE_DATAMOVE_CUBE_DATAMOVE_H
 #define INCLUDE_C_API_CUBE_DATAMOVE_CUBE_DATAMOVE_H
 
-#include "include/c_api/cube_datamove/cube_datamove_intrinsics.h"
-#include "include/c_api/cube_datamove/cube_datamove_functions.h"
+#include "cube_datamove_intrinsics.h"
+#include "cube_datamove_functions.h"
 
 #endif
 
