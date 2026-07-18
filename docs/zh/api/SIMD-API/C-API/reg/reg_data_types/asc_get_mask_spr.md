@@ -42,7 +42,7 @@ __simd_callee__ inline vector_bool asc_get_mask_spr_b32()
 
 ## 参数说明
 
-无参数
+无
 
 ## 返回值说明
 
