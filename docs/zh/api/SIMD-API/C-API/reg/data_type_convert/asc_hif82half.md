@@ -52,17 +52,9 @@
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_half](../reg_data_types/data_type_definition.md#矢量数据寄存器)。 |
-| src | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_hifloat8_t](../reg_data_types/data_type_definition.md#矢量数据寄存器)。 |
-| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
-
-## 数据类型
-
-**表2** 数据类型
-
-| src | dst |
-| --- | --- |
-| hifloat8_t | half |
+| dst | 输出 | 目的操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#矢量数据寄存器)）。 |
+| src | 输入 | 源操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#矢量数据寄存器)）。 |
+| mask | 输入 | 源操作数元素操作的有效指示（[掩码寄存器](../reg_data_types/data_type_definition.md#掩码寄存器)）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
 ## 返回值说明
 

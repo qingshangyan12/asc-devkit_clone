@@ -93,27 +93,15 @@
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| src | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| dst | 输出 | 目的操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#矢量数据寄存器)）。 |
+| src | 输入 | 源操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#矢量数据寄存器)）。 |
 
 **表2** 参数说明（操作数为掩码寄存器）
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
-| src | 输入 | 源操作数（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
-
-## 数据类型
-
-**表3** 数据类型
-
-| src | dst |
-| --- | --- |
-| uint8_t | uint16_t |
-| int8_t | int16_t |
-| uint16_t | uint32_t |
-| int16_t | int32_t |
-| bool | bool |
+| dst | 输出 | 目的操作数（[掩码寄存器](../reg_data_types/data_type_definition.md#掩码寄存器)）。 |
+| src | 输入 | 源操作数（[掩码寄存器](../reg_data_types/data_type_definition.md#掩码寄存器)）。 |
 
 ## 返回值说明
 

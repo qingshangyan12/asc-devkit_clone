@@ -78,31 +78,25 @@
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| src | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中保持原值。 |
+| dst | 输出 | 目的操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#矢量数据寄存器)）。 |
+| src | 输入 | 源操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#矢量数据寄存器)）。 |
+| mask | 输入 | 源操作数元素操作的有效指示（[掩码寄存器](../reg_data_types/data_type_definition.md#掩码寄存器)）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中保持原值。 |
 
 **表2** 参数说明（掩码寄存器复制到掩码寄存器）
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
-| src | 输入 | 源操作数（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器) |
-| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。mask用于指示在计算过程中哪些bit参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的bit在输出中置零。 |
+| dst | 输出 | 目的操作数（[掩码寄存器](../reg_data_types/data_type_definition.md#掩码寄存器)）。 |
+| src | 输入 | 源操作数（[掩码寄存器](../reg_data_types/data_type_definition.md#掩码寄存器)）。 |
+| mask | 输入 | 源操作数元素操作的有效指示（[掩码寄存器](../reg_data_types/data_type_definition.md#掩码寄存器)）。mask用于指示在计算过程中哪些bit参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的bit在输出中置零。 |
 
 **表3** 参数说明（矢量数据寄存器复制到掩码寄存器）
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
-| src | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| dst | 输出 | 目的操作数（[掩码寄存器](../reg_data_types/data_type_definition.md#掩码寄存器)）。 |
+| src | 输入 | 源操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#矢量数据寄存器)）。 |
 | part | 输入 | part决定了src中需要搬运的数据块，具体描述请参考[关键特性说明](#关键特性说明)。<br>&bull; 当数据类型为uint16_t，part∈[0, 15]。<br>&bull; 当数据类型为uint32_t，part∈[0, 31]。 |
-
-## 数据类型
-
-- 矢量数据寄存器复制到矢量数据寄存器：目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
-- 掩码寄存器复制到掩码寄存器：目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：bool。
-- 矢量数据寄存器复制到掩码寄存器：目的操作数支持的数据类型为：bool，源操作数支持的数据类型为：uint16_t、uint32_t。
 
 ## 返回值说明
 
@@ -118,7 +112,7 @@
 
 **针对于矢量数据寄存器复制到掩码寄存器：**
 
-由[掩码寄存器原理](../reg_data_types/data_type_definition.md#掩码寄存器)可知，当操作数类型为b16时，每一个element对应2bit的掩码寄存器，且仅2bit中的最低位是有效的；当操作数类型为b32时，每一个element对应4bit的掩码寄存器，且仅4bit中的最低位是有效的。
+由[掩码寄存器](../reg_data_types/data_type_definition.md#掩码寄存器)原理可知，当操作数类型为b16时，每一个element对应2bit的掩码寄存器，且仅2bit中的最低位是有效的；当操作数类型为b32时，每一个element对应4bit的掩码寄存器，且仅4bit中的最低位是有效的。
 
 搬运原理如[图1](#fig-maskgen-b16)、[图2](#fig-maskgen-b32)所示。
 
