@@ -18,8 +18,8 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_type.h"
 #include "c_api/utils/union.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl.h"
+
 #endif
 
 //==============asc_scatter=============
@@ -1013,6 +1013,7 @@ __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int8_t* dst, vector_s
 
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint8_t* dst, vector_store_unalign src, int32_t offset);
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp4x2_e2m1_t* dst, vector_store_unalign src, int32_t offset);
 
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp4x2_e1m2_t* dst, vector_store_unalign src, int32_t offset);
@@ -1026,6 +1027,7 @@ __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp8_e5m2_t* dst, vect
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp8_e4m3fn_t* dst, vector_store_unalign src, int32_t offset);
 
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ hifloat8_t* dst, vector_store_unalign src, int32_t offset);
+#endif
 
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int16_t* dst, vector_store_unalign src, int32_t offset);
 
@@ -1033,7 +1035,9 @@ __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint16_t* dst, vector
 
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ half* dst, vector_store_unalign src, int32_t offset);
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ bfloat16_t* dst, vector_store_unalign src, int32_t offset);
+#endif
 
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int32_t* dst, vector_store_unalign src, int32_t offset);
 
@@ -1048,6 +1052,7 @@ __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int8_t* dst, vector_s
 
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint8_t* dst, vector_store_unalign src);
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp4x2_e2m1_t* dst, vector_store_unalign src);
 
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp4x2_e1m2_t* dst, vector_store_unalign src);
@@ -1059,6 +1064,7 @@ __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp8_e8m0_t* dst, vect
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp8_e5m2_t* dst, vector_store_unalign src);
 
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ fp8_e4m3fn_t* dst, vector_store_unalign src);
+#endif
 
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int16_t* dst, vector_store_unalign src);
 
@@ -1066,7 +1072,9 @@ __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint16_t* dst, vector
 
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ half* dst, vector_store_unalign src);
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ bfloat16_t* dst, vector_store_unalign src);
+#endif
 
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int32_t* dst, vector_store_unalign src);
 
@@ -1081,6 +1089,7 @@ __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int8_t* dst, vector_s
 
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint8_t* dst, vector_store_unalign src, addr_reg offset);
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_storeunalign_post(
     __ubuf__ fp4x2_e2m1_t* dst, vector_store_unalign src, addr_reg offset);
 
@@ -1097,6 +1106,7 @@ __simd_callee__ inline void asc_storeunalign_post(
     __ubuf__ fp8_e4m3fn_t* dst, vector_store_unalign src, addr_reg offset);
 
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ hifloat8_t* dst, vector_store_unalign src, addr_reg offset);
+#endif
 
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int16_t* dst, vector_store_unalign src, addr_reg offset);
 
@@ -1104,7 +1114,9 @@ __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint16_t* dst, vector
 
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ half* dst, vector_store_unalign src, addr_reg offset);
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ bfloat16_t* dst, vector_store_unalign src, addr_reg offset);
+#endif
 
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int32_t* dst, vector_store_unalign src, addr_reg offset);
 
@@ -1121,6 +1133,7 @@ __simd_callee__ inline void asc_storeunalign_post_postupdate(
 __simd_callee__ inline void asc_storeunalign_post_postupdate(
     __ubuf__ uint8_t*& dst, vector_store_unalign src, int32_t offset);
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_storeunalign_post_postupdate(
     __ubuf__ fp4x2_e2m1_t*& dst, vector_store_unalign src, int32_t offset);
 
@@ -1141,6 +1154,7 @@ __simd_callee__ inline void asc_storeunalign_post_postupdate(
 
 __simd_callee__ inline void asc_storeunalign_post_postupdate(
     __ubuf__ hifloat8_t*& dst, vector_store_unalign src, int32_t offset);
+#endif
 
 __simd_callee__ inline void asc_storeunalign_post_postupdate(
     __ubuf__ int16_t*& dst, vector_store_unalign src, int32_t offset);
@@ -1151,8 +1165,10 @@ __simd_callee__ inline void asc_storeunalign_post_postupdate(
 __simd_callee__ inline void asc_storeunalign_post_postupdate(
     __ubuf__ half*& dst, vector_store_unalign src, int32_t offset);
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_storeunalign_post_postupdate(
     __ubuf__ bfloat16_t*& dst, vector_store_unalign src, int32_t offset);
+#endif
 
 __simd_callee__ inline void asc_storeunalign_post_postupdate(
     __ubuf__ int32_t*& dst, vector_store_unalign src, int32_t offset);
@@ -1307,4 +1323,3 @@ __simd_callee__ inline void asc_storealign_pack_quarter_postupdate(
 __simd_callee__ inline void asc_storealign_pack_quarter_postupdate(
     __ubuf__ float*& dst_align32b, vector_float src, int32_t offset, vector_bool mask);
 
-#endif

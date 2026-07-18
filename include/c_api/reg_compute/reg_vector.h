@@ -23,9 +23,7 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_type.h"
 #include "c_api/utils/union.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
-#endif
 
 /*
  *   asc_create_mask_b8(pat_mode);
@@ -1412,9 +1410,11 @@ __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int32_t** src_ar
 __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint32_t** src_array);
 
 __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ float** src_array);
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+
 #endif

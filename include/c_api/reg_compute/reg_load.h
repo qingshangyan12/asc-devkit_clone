@@ -18,8 +18,8 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_type.h"
 #include "c_api/utils/union.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl.h"
+
 #endif
 
 // ==========源操作数为起初地址，目的数为寄存器=========
@@ -1433,6 +1433,7 @@ __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf
 
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf__ uint8_t* src);
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf__ fp4x2_e2m1_t* src);
 
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf__ fp4x2_e1m2_t* src);
@@ -1446,6 +1447,7 @@ __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf__ fp8_e4m3fn_t* src);
 
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf__ hifloat8_t* src);
+#endif
 
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf__ int16_t* src);
 
@@ -1453,7 +1455,9 @@ __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf
 
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf__ half* src);
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf__ bfloat16_t* src);
+#endif
 
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf__ int32_t* src);
 
@@ -1467,6 +1471,7 @@ __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf
 
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf__ uint8_t* src, addr_reg offset);
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf__ fp4x2_e2m1_t* src, addr_reg offset);
 
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset);
@@ -1480,6 +1485,7 @@ __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset);
 
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf__ hifloat8_t* src, addr_reg offset);
+#endif
 
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf__ int16_t* src, addr_reg offset);
 
@@ -1487,7 +1493,9 @@ __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf
 
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf__ half* src, addr_reg offset);
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf__ bfloat16_t* src, addr_reg offset);
+#endif
 
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst, __ubuf__ int32_t* src, addr_reg offset);
 
@@ -2659,4 +2667,3 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock_postupdate(
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock_postupdate(
     vector_float& dst, __ubuf__ float*& src, int32_t offset);
 
-#endif
