@@ -82,8 +82,7 @@ vector_load_unalign寄存器和vector_store_unalign寄存器的数量上限均�
 ### 调用示例
 
 ```cpp
-__simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, uint32_t count,
-    uint32_t one_repeat_size, uint16_t repeat_time)
+__simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_int8_t src;
     vector_int8_t dst;
@@ -119,7 +118,7 @@ addr_reg的地址计算公式为：offset = Σ(index_i × stride_i)，其中inde
 - 单参数版本
     ```cpp
     __simd_vf__ inline void add_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src0_addr, __ubuf__ int8_t* src1_addr, uint32_t count,
-        uint32_t one_repeat_size, uint16_t repeat_time)
+        uint16_t one_repeat_size, uint16_t repeat_time)
     {
         vector_int8_t src0;
         vector_int8_t src1;

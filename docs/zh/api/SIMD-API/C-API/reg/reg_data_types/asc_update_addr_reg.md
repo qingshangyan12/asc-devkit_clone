@@ -100,7 +100,7 @@
 ## 调用示例
 
 ```cpp
-__simd_vf__ inline void update_addr_reg_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, uint32_t one_repeat_size, uint16_t repeat_time)
+__simd_vf__ inline void update_addr_reg_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_half data;
     vector_bool mask = asc_create_mask_b16(PAT_ALL);

@@ -38,7 +38,7 @@ __simd_callee__ inline void asc_clear_ar_spr()
 
 ## 参数说明
 
-无参数
+无
 
 ## 返回值说明
 
