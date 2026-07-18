@@ -19,6 +19,7 @@
 
 #ifndef INCLUDE_C_API_SYNC_SYNC_H
 #define INCLUDE_C_API_SYNC_SYNC_H
+#include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "impl/c_api/instr_impl/npu_arch_2201/sync_impl.h"
@@ -62,11 +63,11 @@ __aicore__ inline void asc_sync();
 
 #define asc_sync_intra_wait(pipe, sync_id) wait_intra_block((pipe), (sync_id))
 
-#define asc_sync_subblock_wait(pipe, flag_id) wait_flag_dev((pipe), (flag_id))
+#define asc_sync_subblock_wait(pipe, flag_id) wait_flag_dev((flag_id))
 
-#define asc_sync_inter_wait(pipe, flag_id) wait_flag_dev((pipe), (flag_id))
+#define asc_sync_inter_wait(pipe, flag_id) wait_flag_dev((flag_id))
 
-#define asc_sync_block_wait(pipe, flag_id) wait_flag_dev((pipe), (flag_id))
+#define asc_sync_block_wait(pipe, flag_id) wait_flag_dev((flag_id))
 
 enum ascMutexExecuteMode {
     ASC_LOCK_BLOCK = 0,    // Block the execution of the pipeline indicated by pipe (Default).
