@@ -90,21 +90,13 @@ __simd_callee__ inline void asc_gather(vector_half& dst, vector_half src, vector
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_gather(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_uint16_t index);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_gather(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_uint8_t index);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_gather(vector_hifloat8_t& dst, vector_hifloat8_t src, vector_uint8_t index);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_gather(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_uint8_t index);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_gather(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_uint8_t index);
 #endif
 
@@ -223,29 +215,17 @@ __simd_callee__ inline void asc_loadalign(vector_uint8_t& dst, __ubuf__ uint8_t*
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign(vector_int4x2_t& dst, __ubuf__ int4b_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src);
 #endif
 
@@ -275,29 +255,17 @@ __simd_callee__ inline void asc_loadalign_brc(vector_uint8_t& dst, __ubuf__ uint
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc(vector_int4x2_t& dst, __ubuf__ int4b_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src);
 #endif
 
@@ -323,29 +291,17 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_uint8_t& dst, __ubuf__
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_upsample(vector_int4x2_t& dst, __ubuf__ int4b_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_upsample(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src);
 #endif
 
@@ -365,29 +321,17 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_uint8_t& dst, __ubuf
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_downsample(vector_int4x2_t& dst, __ubuf__ int4b_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_downsample(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src);
 #endif
 
@@ -407,29 +351,17 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_uint8_t& dst, __ubuf__ u
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack(vector_int4x2_t& dst, __ubuf__ int4b_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src);
 #endif
 
@@ -624,29 +556,17 @@ __simd_callee__ inline void asc_loadalign(vector_uint8_t& dst, __ubuf__ uint8_t*
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset);
 #endif
 
@@ -676,29 +596,17 @@ __simd_callee__ inline void asc_loadalign_brc(vector_uint8_t& dst, __ubuf__ uint
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset);
 #endif
 
@@ -730,13 +638,9 @@ __simd_callee__ inline void asc_loadalign_upsample(
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_upsample(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset);
 #endif
 
@@ -769,13 +673,9 @@ __simd_callee__ inline void asc_loadalign_downsample(
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_downsample(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset);
 #endif
 
@@ -802,29 +702,17 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_uint8_t& dst, __ubuf__ u
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset);
 #endif
 
@@ -1032,13 +920,9 @@ __simd_callee__ inline void asc_loadalign_postupdate(
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_postupdate(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t*& src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_postupdate(vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_postupdate(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t*& src, int32_t offset);
 #endif
 
@@ -1753,45 +1637,25 @@ __simd_callee__ inline void asc_load(vector_int64_t& dst, __ubuf__ int64_t* src)
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_load(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_load(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_load(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_load(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_load(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_load(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_load(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_load(vector_int4x2_t& dst, __ubuf__ int4b_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign(vector_int4x2_t& dst, __ubuf__ int4b_t* src, addr_reg offset);
 #endif
 
@@ -1801,17 +1665,11 @@ __simd_callee__ inline void asc_loadalign(vector_int8_t& dst, __ubuf__ int8_t* s
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, addr_reg offset);
 #endif
 
@@ -1837,13 +1695,9 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst, __ubuf__ float* src
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc(vector_int4x2_t& dst, __ubuf__ int4b_t* src, addr_reg offset);
 #endif
 
@@ -1853,17 +1707,11 @@ __simd_callee__ inline void asc_loadalign_brc(vector_int8_t& dst, __ubuf__ int8_
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, addr_reg offset);
 #endif
 
@@ -1904,13 +1752,9 @@ __simd_callee__ inline void asc_loadalign_upsample(
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_upsample(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_upsample(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, addr_reg offset);
 #endif
 
@@ -1943,13 +1787,9 @@ __simd_callee__ inline void asc_loadalign_downsample(
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_downsample(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, addr_reg offset);
 #endif
 
@@ -2013,13 +1853,9 @@ __simd_callee__ inline void asc_loadalign_deintlv(
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack(vector_int4x2_t& dst, __ubuf__ int4b_t* src, addr_reg offset);
 #endif
 
@@ -2029,17 +1865,11 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_int8_t& dst, __ubuf__ in
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, addr_reg offset);
 #endif
 
@@ -2276,29 +2106,17 @@ __simd_callee__ inline void asc_loadalign_brc_elem(vector_uint8_t& dst, __ubuf__
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_int4x2_t& dst, __ubuf__ int4b_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src);
 #endif
 
@@ -2330,13 +2148,9 @@ __simd_callee__ inline void asc_loadalign_brc_elem(
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset);
 #endif
 
@@ -2382,13 +2196,9 @@ __simd_callee__ inline void asc_loadalign_brc_elem(
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc_elem(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, addr_reg offset);
 #endif
 
@@ -2415,29 +2225,17 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_uint8_t& dst, __ubuf__ 
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_int4x2_t& dst, __ubuf__ int4b_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src);
 #endif
 
@@ -2447,29 +2245,17 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_uint8_t& dst, __ubuf__ 
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, int32_t offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset);
 #endif
 
@@ -2492,13 +2278,9 @@ __simd_callee__ inline void asc_loadalign_unpack4(
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, addr_reg offset);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, addr_reg offset);
 #endif
 
@@ -2509,29 +2291,17 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_uint8_t& dst, __u
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_int4x2_t& dst, __ubuf__ int4b_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src);
 #endif
 
