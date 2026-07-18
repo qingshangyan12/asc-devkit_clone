@@ -399,10 +399,12 @@ the superkernel cannot be integrated with the operator.",
     if aicore_num is not None and vectorcore_num is not None:
         js["platformInfo"] = {
             "cubeCoreCnt": int(aicore_num),
-            "vectorCoreCnt": int(vectorcore_num)
+            "vectorCoreCnt": int(vectorcore_num),
         }
         has_platformInfo = True
-    deterministic_level = _safe_int_conversion(get_current_build_config("deterministic_level"))
+    deterministic_level = _safe_int_conversion(
+        get_current_build_config("deterministic_level")
+    )
     if deterministic_level != -1:
         if not has_platformInfo:
             js["platformInfo"] = {}
