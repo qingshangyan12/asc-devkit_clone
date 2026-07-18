@@ -494,7 +494,13 @@ __simd_vf__ inline void ReduceRAConcatVFImpl(
     __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, __ubuf__ T* tmpAddr, uint32_t dimA, uint32_t dimR, uint16_t foldTime,
     uint32_t mainR, uint32_t tailR)
 {
-    constexpr uint16_t vlSize = GetVecLen() / sizeof(T);
+    if constexpr (SupportBytes<T, 8>()) {
+        // Process RegTraitNumTwo
+        constexpr uint16_t vlSize = GetVecLen() / sizeof(float);
+    } else {
+        constexpr uint16_t vlSize = GetVecLen() / sizeof(T);
+    }
+    
     uint16_t needInplaceAdd = tailR > 0 ? 1 : 0;
     // Process vlSize axisA each time
     uint32_t processA = dimA;
