@@ -24,7 +24,9 @@
 #include "c_api/utils/union.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_type.h"
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
+#endif
 /*
  *   asc_create_mask_b8(pat_mode);
  *   asc_create_mask_b16(pat_mode);
