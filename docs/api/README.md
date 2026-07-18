@@ -135,7 +135,7 @@
             -   [L1与Fixpipe-Buffer数据搬运](SIMD-API/基础API/数据搬运导览/L1与Fixpipe-Buffer数据搬运.md)
             -   [L1与BiasTable-Buffer数据搬运](SIMD-API/基础API/数据搬运导览/L1与BiasTable-Buffer数据搬运.md)
 
-        -   [cube_compute_ISASI](SIMD-API/基础API/cube_compute_ISASI/cube_compute_ISASI.md)
+        -   [矩阵计算（ISASI）](SIMD-API/基础API/cube_compute_ISASI/cube_compute_ISASI.md)
             -   [概述](SIMD-API/基础API/cube_compute_ISASI/概述/概述.md)
                 -   [矩阵计算单元](SIMD-API/基础API/cube_compute_ISASI/概述/矩阵计算单元.md)
                 -   [矩阵计算流程](SIMD-API/基础API/cube_compute_ISASI/概述/矩阵计算流程.md)
@@ -431,7 +431,7 @@
                 -   [CreateVecIndex](SIMD-API/基础API/Memory矢量计算/数据填充/CreateVecIndex.md)
                 -   [VectorPadding\(ISASI\)](SIMD-API/基础API/Memory矢量计算/数据填充/VectorPadding_ISASI.md)
 
-            -   [sort_and_merge_ISASI](SIMD-API/基础API/Memory矢量计算/sort_and_merge_ISASI/sort_and_merge_ISASI.md)
+            -   [排序组合（ISASI）](SIMD-API/基础API/Memory矢量计算/sort_and_merge_ISASI/sort_and_merge_ISASI.md)
                 -   [ProposalConcat](SIMD-API/基础API/Memory矢量计算/sort_and_merge_ISASI/ProposalConcat.md)
                 -   [ProposalExtract](SIMD-API/基础API/Memory矢量计算/sort_and_merge_ISASI/ProposalExtract.md)
                 -   [RpSort16](SIMD-API/基础API/Memory矢量计算/sort_and_merge_ISASI/RpSort16.md)
@@ -451,7 +451,7 @@
                 -   [SetVectorMask](SIMD-API/基础API/Memory矢量计算/掩码操作/SetVectorMask.md)
                 -   [ResetMask](SIMD-API/基础API/Memory矢量计算/掩码操作/ResetMask.md)
 
-            -   [data_rearrange_ISASI](SIMD-API/基础API/Memory矢量计算/data_rearrange_ISASI/data_rearrange_ISASI.md)
+            -   [数据重排（ISASI）](SIMD-API/基础API/Memory矢量计算/data_rearrange_ISASI/data_rearrange_ISASI.md)
                 -   [Interleave](SIMD-API/基础API/Memory矢量计算/data_rearrange_ISASI/Interleave.md)
                 -   [DeInterleave](SIMD-API/基础API/Memory矢量计算/data_rearrange_ISASI/DeInterleave.md)
 
@@ -809,7 +809,7 @@
                 -   [GetSubBlockNum\(ISASI\)](SIMD-API/基础API/工具接口/系统资源与变量/GetSubBlockNum_ISASI.md)
                 -   [GetSubBlockIdx\(ISASI\)](SIMD-API/基础API/工具接口/系统资源与变量/GetSubBlockIdx_ISASI.md)
 
-        -   [cube_group_mgmt_ISASI](SIMD-API/基础API/cube_group_mgmt_ISASI/cube_group_mgmt_ISASI.md)
+        -   [Cube分组管理（ISASI）](SIMD-API/基础API/cube_group_mgmt_ISASI/cube_group_mgmt_ISASI.md)
             -   [CubeResGroupHandle](SIMD-API/基础API/cube_group_mgmt_ISASI/CubeResGroupHandle/CubeResGroupHandle.md)
                 -   [CubeResGroupHandle使用说明](SIMD-API/基础API/cube_group_mgmt_ISASI/CubeResGroupHandle/CubeResGroupHandle使用说明.md)
                 -   [CubeResGroupHandle构造函数](SIMD-API/基础API/cube_group_mgmt_ISASI/CubeResGroupHandle/CubeResGroupHandle构造函数.md)
