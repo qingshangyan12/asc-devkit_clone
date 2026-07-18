@@ -46,20 +46,20 @@ jobs:
           source /home/jenkins/Ascend/cann/bin/setenv.bash
           set +e
           if [ "$TARGET_BRANCH" = "master" ] || [ "$TARGET_BRANCH" == "9.1.0-beta.2" ]; then
-              bash build.sh --${task_name} --cov --cann_3rd_lib_path="/home/jenkins/opensource" -f "pr_filelist.txt"
+              bash build.sh --${{ inputs.ut_type }} --cov --cann_3rd_lib_path="/home/jenkins/opensource" -f "pr_filelist.txt"
           elif [ "$TARGET_BRANCH" = "exp/kadc" ]; then
               echo "not need run ut"
               exit 0
           elif [ "$TARGET_BRANCH" = "feature/tensor_api_from_9.0.0" ]; then
-            if [ "${task_name}" = "basic_test_three" ] || [ "${task_name}" == "basic_test_two" ] || [ "${task_name}" == "basic_test_one" ]; then
-              bash build.sh --${task_name} --cann_3rd_lib_path="/home/jenkins/opensource"
+            if [ "${{ inputs.ut_type }}" = "basic_test_three" ] || [ "${{ inputs.ut_type }}" == "basic_test_two" ] || [ "${{ inputs.ut_type }}" == "basic_test_one" ]; then
+              bash build.sh --${{ inputs.ut_type }} --cann_3rd_lib_path="/home/jenkins/opensource"
             else
               echo "not need run ut"
               exit 0
             fi
           else
-            if [ "${task_name}" = "basic_test_three" ] || [ "${task_name}" == "basic_test_two" ] || [ "${task_name}" == "basic_test_one" ] || [ "${task_name}" == "adv_test" ]; then
-              bash build.sh --${GE_ST_RT2} --cov --cann_3rd_lib_path="/home/jenkins/opensource"
+            if [ "${{ inputs.ut_type }}" = "basic_test_three" ] || [ "${{ inputs.ut_type }}" == "basic_test_two" ] || [ "${{ inputs.ut_type }}" == "basic_test_one" ] || [ "${{ inputs.ut_type }}" == "adv_test" ]; then
+              bash build.sh --${{ inputs.ut_type }} --cov --cann_3rd_lib_path="/home/jenkins/opensource"
             else
               echo "not need run ut"
               exit 0
@@ -99,7 +99,11 @@ jobs:
           artifact-path: |
             ${{ steps.process_checkout.outputs.path }}/${{ inputs.ut_package }}
           object-prefix: ${{ env.obs_path }}/
-    if: "${{ default() }}"
+    if: ${{ inputs.type != 'UT_Test_arm' }}
     runs-on: [dedicate-hosted, x64, xlarge]
+    container:
+      image: swr.cn-north-4.myhuaweicloud.com/ci_cann/${{ inputs.image_version }}
+    if: ${{ inputs.type = 'UT_Test_arm' }}
+    runs-on: [dedicate-hosted, arm, xlarge]
     container:
       image: swr.cn-north-4.myhuaweicloud.com/ci_cann/${{ inputs.image_version }}
