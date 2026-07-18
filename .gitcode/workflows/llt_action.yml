@@ -51,14 +51,14 @@ jobs:
               echo "not need run ut"
               exit 0
           elif [ "$TARGET_BRANCH" = "feature/tensor_api_from_9.0.0" ]; then
-            if [ "${{ inputs.ut_type }}" = "basic_test_three" ] || [ "${{ inputs.ut_type }}" == "basic_test_two" ] || [ "${{ inputs.ut_type }}" == "basic_test_one" ]; then
+            if [ "${{ inputs.ut_type }}" = "UT_Test_basic_test_three" ] || [ "${{ inputs.ut_type }}" == "UT_Test_basic_test_two" ] || [ "${{ inputs.ut_type }}" == "UT_Test_basic_test_one" ]; then
               bash build.sh --${{ inputs.ut_type }} --cann_3rd_lib_path="/home/jenkins/opensource"
             else
               echo "not need run ut"
               exit 0
             fi
           else
-            if [ "${{ inputs.ut_type }}" = "basic_test_three" ] || [ "${{ inputs.ut_type }}" == "basic_test_two" ] || [ "${{ inputs.ut_type }}" == "basic_test_one" ] || [ "${{ inputs.ut_type }}" == "adv_test" ]; then
+            if [ "${{ inputs.ut_type }}" = "UT_Test_basic_test_three" ] || [ "${{ inputs.ut_type }}" == "UT_Test_basic_test_two" ] || [ "${{ inputs.ut_type }}" == "UT_Test_basic_test_one" ] || [ "${{ inputs.ut_type }}" == "UT_Test_adv_test*" ]; then
               bash build.sh --${{ inputs.ut_type }} --cov --cann_3rd_lib_path="/home/jenkins/opensource"
             else
               echo "not need run ut"
