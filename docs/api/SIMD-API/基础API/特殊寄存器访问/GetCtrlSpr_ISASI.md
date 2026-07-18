@@ -1,4 +1,4 @@
-# ResetCtrlSpr(ISASI)
+# GetCtrlSpr(ISASI)
 
 ## 产品支持情况
 
@@ -6,10 +6,10 @@
 - Ascend 950PR/Ascend 950DT：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
@@ -28,15 +28,13 @@
 
 头文件路径为：`"basic_api/kernel_operator_common_intf.h"`。
 
-对CTRL寄存器（控制寄存器）的特定比特位做重置。由模板参数\[startBit, endBit\]指定的比特位重置为默认值，默认值参考[表 常用CTRL寄存器比特位说明](SetCtrlSpr(ISASI).md#tab-950)。
-
-$\text{CTRL}[\,\text{startBit} : \text{endBit}\,] \leftarrow \text{defaultCtrl}[\,\text{startBit} : \text{endBit}\,]$
+读取CTRL寄存器（控制寄存器）特定比特位上的值。
 
 ## 函数原型
 
 ```cpp
 template <int8_t startBit, int8_t endBit>
-__aicore__ static inline void ResetCtrlSpr()
+__aicore__ static inline int64_t GetCtrlSpr()
 ```
 
 ## 参数说明
@@ -50,24 +48,24 @@ __aicore__ static inline void ResetCtrlSpr()
 
 ## 数据类型
 
-本接口为寄存器访问接口，不涉及张量数据类型操作。
+本接口为寄存器访问接口，不涉及张量数据类型操作。返回值类型固定为int64_t。
 
 ## 返回值说明
 
-无
+CTRL寄存器对应比特位上的值。
 
 ## 约束说明
 
-仅支持CTRL[8:6]、CTRL[10:9]、CTRL[48]、CTRL[50]、CTRL[53]、CTRL[59]、CTRL[60]比特位，各比特位的说明请参考[SetCtrlSpr(ISASI)参数说明](./SetCtrlSpr(ISASI).md#参数说明)。
+- startBit和endBit的取值范围为[0, 63]。
+- startBit小于等于endBit。
+- 各比特位的说明请参考[SetCtrlSpr(ISASI)参数说明](./SetCtrlSpr_ISASI.md#参数说明)。
 
 ## 调用示例
 
-如下示例中重置CTRL[48]比特位，开启饱和模式。
+如下为读取CTRL[48]比特位数值的示例。
 
 ```cpp
-AscendC::SetCtrlSpr<48, 48>(1);
-...
-AscendC::ResetCtrlSpr<48, 48>();
+int64_t valueCtrlAfterSet = AscendC::GetCtrlSpr<48, 48>();
 ```
 
 更多示例请参考[CtrlSpr样例](https://gitcode.com/cann/asc-devkit/tree/9.1.0/examples/01_simd_cpp_api/03_basic_api/09_utils/ctrl_spr)。

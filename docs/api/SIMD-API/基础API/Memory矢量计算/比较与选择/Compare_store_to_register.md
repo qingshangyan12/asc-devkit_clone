@@ -29,7 +29,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_vec_cmpsel_intf.h"`。
 
-逐元素比较两个tensor大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。计算结果存入CmpMask 128bit寄存器中，可用于后续Select计算，也可使用[GetCmpMask](GetCmpMask(ISASI).md)接口获取寄存器保存的数据。
+逐元素比较两个tensor大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。计算结果存入CmpMask 128bit寄存器中，可用于后续Select计算，也可使用[GetCmpMask](GetCmpMask_ISASI.md)接口获取寄存器保存的数据。
 
 接口支持多种比较模式：
 

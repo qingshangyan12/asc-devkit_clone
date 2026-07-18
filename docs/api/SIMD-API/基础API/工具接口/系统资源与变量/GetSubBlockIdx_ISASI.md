@@ -46,7 +46,7 @@ __aicore__ inline int64_t GetSubBlockIdx()
 
 返回逻辑AI Core上Cube Core（AIC）或者Vector Core（AIV）的逻辑索引。
 
-SubBlockIdx的取值范围为\[0, SubBlockNum\)，SubBlockNum可以通过[GetSubBlockNum](GetSubBlockNum(ISASI).md)获取。
+SubBlockIdx的取值范围为\[0, SubBlockNum\)，SubBlockNum可以通过[GetSubBlockNum](GetSubBlockNum_ISASI.md)获取。
 
 ## 约束说明
 

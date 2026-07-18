@@ -57,7 +57,7 @@ hRepeat = 2；vRepeat = 2；mask = 128；vROffset = 128。
 
     总共hRepeat \* vRepeat次迭代，每个迭代从输入的src0Offset读取8个偏移值，每个偏移值指向src0的一个DataBlock起始地址。
 
-    调用[Gatherb](../离散与聚合/Gatherb(ISASI).md)接口，Gatherb接口接受输入张量（src0）、DataBlock偏移张量（src0Offset），根据src0Offset将输入张量src0按DataBlock（32Bytes）收集到临时张量（sharedTmpBuffer）中。
+    调用[Gatherb](../离散与聚合/Gatherb_ISASI.md)接口，Gatherb接口接受输入张量（src0）、DataBlock偏移张量（src0Offset），根据src0Offset将输入张量src0按DataBlock（32Bytes）收集到临时张量（sharedTmpBuffer）中。
 
     该步骤处理过程如下：
 

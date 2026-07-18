@@ -1,4 +1,4 @@
-# ReleaseMutexID \(ISASI\)<a name="ZH-CN_TOPIC_0000002406521145"></a>
+# AllocMutexID \(ISASI\)<a name="ZH-CN_TOPIC_0000002352639064"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -24,33 +24,33 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
-## 功能说明<a name="section1386110162210"></a>
+## 功能说明<a name="section618mcpsimp"></a>
 
 头文件路径为：`"basic_api/kernel_common.h"`。
 
-从框架释放一个MutexID，与[AllocMutexID](AllocMutexID-(ISASI).md)配合使用。
+从框架获取并占用一个MutexID，与[ReleaseMutexID](ReleaseMutexID_ISASI.md)配合使用，管理MutexID的获取和释放。获取的MutexID可以传入[Mutex::Lock](Mutex_ISASI/Lock.md)/[Mutex::Unlock](Mutex_ISASI/Unlock.md)接口使用，此时Mutex::Lock/Unlock可以与TQue等其他接口配合使用。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline void ReleaseMutexID(MutexID id)
+__aicore__ inline MutexID AllocMutexID()
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表1**  参数说明
-
-| 参数名 | 输入/输出 | 描述 |
-| --- | --- | --- |
-| id | 输入 | MutexID类型，应传入调用AllocMutexID获得的MutexID。 |
+无
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-无
+返回MutexID，其类型定义如下，每个ID表示一个Mutex锁。
+
+```cpp
+using MutexID = uint8_t;
+```
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-MutexID有数量限制，使用结束后应立即调用[ReleaseMutexID](ReleaseMutexID-(ISASI).md)释放，防止MutexID耗尽。
+MutexID有数量限制，使用结束后应立即调用[ReleaseMutexID](ReleaseMutexID_ISASI.md)释放，防止MutexID耗尽。
 
 ## 调用示例<a name="section837496171220"></a>
 

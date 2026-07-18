@@ -77,7 +77,7 @@ __aicore__ static inline void SetCtrlSpr(int64_t value)
 | --- | --- | --- | --- |
 | CTRL[48] | 用于控制浮点数计算和浮点数精度转换时的饱和模式。<br>&bull; 1'b0：饱和模式，inf输出会被饱和为±MAX， NaN输出会被饱和为0；<br>&bull; 1'b1：非饱和模式，inf/NaN保持原输出。<br><br>该控制位仅支持如下数据类型：<br>&bull; 浮点数计算时支持half、bfloat16_t数据类型；<br>&bull; 浮点数精度转换时支持如下数据类型：half、bfloat16_t。 | 1'b0 | 不涉及 |
 
-**注：针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，推荐使用[SetSaturationFlag](./SetSaturationFlag(ISASI).md)和[GetSaturationFlag](./GetSaturationFlag(ISASI).md)来设置和获取CTRL[48]以控制饱和模式。**
+**注：针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，推荐使用[SetSaturationFlag](./SetSaturationFlag_ISASI.md)和[GetSaturationFlag](./GetSaturationFlag_ISASI.md)来设置和获取CTRL[48]以控制饱和模式。**
 
 <!-- end id11 -->
 
@@ -89,7 +89,7 @@ __aicore__ static inline void SetCtrlSpr(int64_t value)
 | --- | --- | --- | --- |
 | CTRL[48] | 用于控制浮点数计算和浮点数精度转换时的饱和模式。<br>&bull; 1'b0：饱和模式，inf输出会被饱和为±MAX， NaN输出会被饱和为0；<br>&bull; 1'b1：非饱和模式，inf/NaN保持原输出。<br><br>该控制位仅支持如下数据类型：<br>&bull; 浮点数计算时支持half、bfloat16_t数据类型；<br>&bull; 浮点数精度转换时支持如下数据类型：half、bfloat16_t。 | 1'b0 | 不涉及 |
 
-**注：针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，推荐使用[SetSaturationFlag](./SetSaturationFlag(ISASI).md)和[GetSaturationFlag](./GetSaturationFlag(ISASI).md)来设置和获取CTRL[48]以控制饱和模式。**
+**注：针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，推荐使用[SetSaturationFlag](./SetSaturationFlag_ISASI.md)和[GetSaturationFlag](./GetSaturationFlag_ISASI.md)来设置和获取CTRL[48]以控制饱和模式。**
 
 <!-- end id12 -->
 
@@ -132,8 +132,8 @@ __aicore__ static inline void SetCtrlSpr(int64_t value)
   - [SetAtomicType](../原子操作/SetAtomicType.md)
   - [DisableDmaAtomic](../原子操作/DisableDmaAtomic.md)
   - [SetAtomicAdd](../原子操作/SetAtomicAdd.md)
-  - [SetAtomicMax](../原子操作/SetAtomicMax(ISASI).md)
-  - [SetAtomicMin](../原子操作/SetAtomicMin(ISASI).md)
+  - [SetAtomicMax](../原子操作/SetAtomicMax_ISASI.md)
+  - [SetAtomicMin](../原子操作/SetAtomicMin_ISASI.md)
 <!-- end id17 -->
 
 ## 调用示例

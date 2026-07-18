@@ -78,7 +78,7 @@ __aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTens
 
 - 该接口仅适用于Mix算子场景，且仅支持Cube核数与Vector核数比例为**1:2**的配置。在该场景下，subBlockId仅支持取值**0**或**1**。
 
-- 如果需要执行多个DataCopyL1ToUB指令，且DataCopyL1ToUB的目的地址存在重叠，需要通过调用[PipeBarrier\(ISASI\)](../../同步控制/核内同步/PipeBarrier(ISASI).md)来插入同步指令，保证多个DataCopyL1ToUB指令的串行化，防止出现异常数据。
+- 如果需要执行多个DataCopyL1ToUB指令，且DataCopyL1ToUB的目的地址存在重叠，需要通过调用[PipeBarrier\(ISASI\)](../../同步控制/核内同步/PipeBarrier_ISASI.md)来插入同步指令，保证多个DataCopyL1ToUB指令的串行化，防止出现异常数据。
 
 ## 调用示例
 

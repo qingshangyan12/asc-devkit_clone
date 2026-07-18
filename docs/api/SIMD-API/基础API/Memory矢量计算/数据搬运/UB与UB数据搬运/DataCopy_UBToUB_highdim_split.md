@@ -72,7 +72,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 下面的样例通过两个示例展示连续搬运和非连续搬运的使用方式。
 
-针对连续搬运场景，推荐使用[UB与UB连续数据搬运\(DataCopy\)](UBToUB连续数据搬运(DataCopy).md#ZH-CN_TOPIC_0000002382908021)，以下示例仅展示高维切分数据搬运接口具有连续搬运能力。
+针对连续搬运场景，推荐使用[UB与UB连续数据搬运\(DataCopy\)](DataCopy_UBToUB_continuous.md#ZH-CN_TOPIC_0000002382908021)，以下示例仅展示高维切分数据搬运接口具有连续搬运能力。
 
 - 示例1：连续搬运
 

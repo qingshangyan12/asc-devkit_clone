@@ -138,21 +138,21 @@
 ### 数据搬运
 | 接口名 | 功能描述 |
 | --- | --- |
-| [GM与UB连续数据搬运(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB连续数据搬运(DataCopy).md) | 支持Global Memory与Unified Buffer之间的连续数据搬运，数据在传输过程中保持原始格式和内容不变。 |
-| [GM与UB高维切分数据搬运(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB高维切分数据搬运(DataCopy).md) | 支持Global Memory与Unified Buffer之间的高维切分数据搬运，数据在传输过程中保持原始格式和内容不变。 |
-| [GM与UB切片数据搬运(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB切片数据搬运(DataCopy).md) | 该接口为软仿接口，从易用性角度出发进行设计，支持数据的切片搬运，提取多维Tensor数据的子集进行搬运。 |
-| [GMToUB随路转换ND2NZ搬运(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/GMToUB随路转换ND2NZ搬运(DataCopy).md) | 该接口为软仿接口，从易用性角度出发进行设计，支持在从Global Memory到Unified Buffer的数据搬运过程中进行ND到NZ格式的转换。 |
-| [UBToGM随路转换NZ2ND搬运(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/UBToGM随路转换NZ2ND搬运(DataCopy).md) | 该接口为软仿接口，从易用性角度出发进行设计，支持在从Unified Buffer到Global Memory的数据搬运过程中进行NZ到ND格式的转换。 |
-| [GMToUB多维数据搬运NDDMA(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/GMToUB多维数据搬运NDDMA(DataCopy).md) | 多维数据搬运接口，相比于基础数据搬运接口，可更加自由配置搬入的维度信息以及对应的Stride。 |
-| [GMToUB非对齐数据搬运(DataCopyPad)](Memory矢量计算/数据搬运/GM与UB数据搬运/GMToUB非对齐数据搬运(DataCopyPad).md) | 该接口提供将数据从Global Memory非对齐搬运至Unified Buffer的功能，可以根据开发者的需要自行填充数据。 |
-| [UBToGM非对齐数据搬运(DataCopyPad)](Memory矢量计算/数据搬运/GM与UB数据搬运/UBToGM非对齐数据搬运(DataCopyPad).md) | 该接口提供将数据从Unified Buffer非对齐搬运至Global Memory的功能。 |
-| [SetPadValue(ISASI)](Memory矢量计算/数据搬运/GM与UB数据搬运/寄存器配置说明/SetPadValue(ISASI).md) | 从Global Memory将数据非对齐搬运至Unified Buffer时，可根据开发者的需要自行填充数据。SetPadValue用于设置DataCopyPad需要填充的数值。 |
+| [GM与UB连续数据搬运(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMToUB_continuous.md) | 支持Global Memory与Unified Buffer之间的连续数据搬运，数据在传输过程中保持原始格式和内容不变。 |
+| [GM与UB高维切分数据搬运(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMToUB_highdim_split.md) | 支持Global Memory与Unified Buffer之间的高维切分数据搬运，数据在传输过程中保持原始格式和内容不变。 |
+| [GM与UB切片数据搬运(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMToUB_slice.md) | 该接口为软仿接口，从易用性角度出发进行设计，支持数据的切片搬运，提取多维Tensor数据的子集进行搬运。 |
+| [GMToUB随路转换ND2NZ搬运(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMToUB_ND2NZ.md) | 该接口为软仿接口，从易用性角度出发进行设计，支持在从Global Memory到Unified Buffer的数据搬运过程中进行ND到NZ格式的转换。 |
+| [UBToGM随路转换NZ2ND搬运(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_UBToGM_NZ2ND.md) | 该接口为软仿接口，从易用性角度出发进行设计，支持在从Unified Buffer到Global Memory的数据搬运过程中进行NZ到ND格式的转换。 |
+| [GMToUB多维数据搬运NDDMA(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMToUB_NDDMA.md) | 多维数据搬运接口，相比于基础数据搬运接口，可更加自由配置搬入的维度信息以及对应的Stride。 |
+| [GMToUB非对齐数据搬运(DataCopyPad)](Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopyPad_GMToUB.md) | 该接口提供将数据从Global Memory非对齐搬运至Unified Buffer的功能，可以根据开发者的需要自行填充数据。 |
+| [UBToGM非对齐数据搬运(DataCopyPad)](Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopyPad_UBToGM.md) | 该接口提供将数据从Unified Buffer非对齐搬运至Global Memory的功能。 |
+| [SetPadValue(ISASI)](Memory矢量计算/数据搬运/GM与UB数据搬运/寄存器配置说明/SetPadValue_ISASI.md) | 从Global Memory将数据非对齐搬运至Unified Buffer时，可根据开发者的需要自行填充数据。SetPadValue用于设置DataCopyPad需要填充的数值。 |
 | [SetLoopModePara](Memory矢量计算/数据搬运/GM与UB数据搬运/寄存器配置说明/SetLoopModePara.md) | DataCopy、DataCopyPad过程中通过该接口使能loop mode并且设置loop mode的参数，在数据搬运结束后通过ResetLoopModePara重置loop mode的参数。 |
 | [ResetLoopModePara](Memory矢量计算/数据搬运/GM与UB数据搬运/寄存器配置说明/ResetLoopModePara.md) | 重置loop mode的参数。与SetLoopModePara搭配使用，在使能loop mode并且设置loop mode的参数的数据搬运场景下，数据搬运结束后需要调用该函数来重置loop mode参数。 |
-| [UBToUB连续数据搬运(DataCopy)](Memory矢量计算/数据搬运/UB与UB数据搬运/UBToUB连续数据搬运(DataCopy).md) | 支持Unified Buffer与Unified Buffer之间的连续数据搬运，数据在传输过程中保持原始格式和内容不变。 |
-| [UBToUB高维切分数据搬运(DataCopy)](Memory矢量计算/数据搬运/UB与UB数据搬运/UBToUB高维切分数据搬运(DataCopy).md) | 支持Unified Buffer与Unified Buffer之间的高维切分数据搬运，数据在传输过程中保持原始格式和内容不变。 |
-| [UBToUB连续数据搬运(Copy)](Memory矢量计算/数据搬运/UB与UB数据搬运/UBToUB连续数据搬运(Copy).md) | 支持Unified Buffer和Unified Buffer之间的连续数据搬运，数据搬运时格式和内容保持不变。 |
-| [UBToUB掩码式高维数据搬运(Copy)](Memory矢量计算/数据搬运/UB与UB数据搬运/UBToUB掩码式高维数据搬运(Copy).md) | 支持Unified Buffer和Unified Buffer之间的数据搬运，数据搬运时格式和内容保持不变，支持mask操作和DataBlock间隔操作。 |
+| [UBToUB连续数据搬运(DataCopy)](Memory矢量计算/数据搬运/UB与UB数据搬运/DataCopy_UBToUB_continuous.md) | 支持Unified Buffer与Unified Buffer之间的连续数据搬运，数据在传输过程中保持原始格式和内容不变。 |
+| [UBToUB高维切分数据搬运(DataCopy)](Memory矢量计算/数据搬运/UB与UB数据搬运/DataCopy_UBToUB_highdim_split.md) | 支持Unified Buffer与Unified Buffer之间的高维切分数据搬运，数据在传输过程中保持原始格式和内容不变。 |
+| [UBToUB连续数据搬运(Copy)](Memory矢量计算/数据搬运/UB与UB数据搬运/Copy_UBToUB_continuous.md) | 支持Unified Buffer和Unified Buffer之间的连续数据搬运，数据搬运时格式和内容保持不变。 |
+| [UBToUB掩码式高维数据搬运(Copy)](Memory矢量计算/数据搬运/UB与UB数据搬运/Copy_UBToUB_mask_highdim_split.md) | 支持Unified Buffer和Unified Buffer之间的数据搬运，数据搬运时格式和内容保持不变，支持mask操作和DataBlock间隔操作。 |
 
 ### 基础算术
 | 接口名 | 功能描述 |
@@ -164,16 +164,16 @@
 | [Sqrt](Memory矢量计算/基础算术/Sqrt.md) | Sqrt属于单目矢量类计算接口，负责将输入的tensor按元素做开方。 |
 | [Rsqrt](Memory矢量计算/基础算术/Rsqrt.md) | Rsqrt属于单目矢量类计算接口，负责将输入的tensor按元素进行开方后取倒数运算。 |
 | [Relu](Memory矢量计算/基础算术/Relu.md) | Relu属于单目矢量类计算接口，负责将输入的tensor按元素做ReLU（Rectified Linear Unit）计算。 |
-| [Neg(ISASI)](Memory矢量计算/基础算术/Neg(ISASI).md) | 按元素进行取相反数操作。 |
+| [Neg(ISASI)](Memory矢量计算/基础算术/Neg_ISASI.md) | 按元素进行取相反数操作。 |
 | [Add](Memory矢量计算/基础算术/Add.md) | Add属于双目矢量类计算接口，负责将输入的两个tensor按元素求和。 |
 | [Sub](Memory矢量计算/基础算术/Sub.md) | Sub属于双目矢量类计算接口，负责将输入的两个tensor按元素求差。 |
 | [Mul](Memory矢量计算/基础算术/Mul.md) | Mul属于双目矢量类计算接口，负责将输入的两个tensor按元素求积。 |
 | [Div](Memory矢量计算/基础算术/Div.md) | Div属于双目矢量类计算接口，负责将输入的两个tensor按元素求商。 |
 | [Max](Memory矢量计算/基础算术/Max.md) | Max属于双目矢量类计算接口，负责将输入的两个tensor按元素求最大值。 |
 | [Min](Memory矢量计算/基础算术/Min.md) | Min属于双目矢量类计算接口，负责将输入的两个tensor按元素求最小值。 |
-| [BilinearInterpolation(ISASI)](Memory矢量计算/基础算术/BilinearInterpolation(ISASI).md) | BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭代+垂直迭代的双层循环完成乘累加运算，适用于非规则数据访问+权重乘加的向量运算场景（数据Gather+Multiply+Reduce）。 |
-| [Prelu(ISASI)](Memory矢量计算/基础算术/Prelu(ISASI).md) | 源操作数src0大于0的情况下直接将src0写入目的操作数dst，否则将源操作数src0 * src1的结果写入dst。 |
-| [Mull(ISASI)](Memory矢量计算/基础算术/Mull(ISASI).md) | 对前count个输入数据src0、src1按元素相乘操作，将结果写入dst0Local，溢出部分写入dst1Local。 |
+| [BilinearInterpolation(ISASI)](Memory矢量计算/基础算术/BilinearInterpolation_ISASI.md) | BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭代+垂直迭代的双层循环完成乘累加运算，适用于非规则数据访问+权重乘加的向量运算场景（数据Gather+Multiply+Reduce）。 |
+| [Prelu(ISASI)](Memory矢量计算/基础算术/Prelu_ISASI.md) | 源操作数src0大于0的情况下直接将src0写入目的操作数dst，否则将源操作数src0 * src1的结果写入dst。 |
+| [Mull(ISASI)](Memory矢量计算/基础算术/Mull_ISASI.md) | 对前count个输入数据src0、src1按元素相乘操作，将结果写入dst0Local，溢出部分写入dst1Local。 |
 | [Adds](Memory矢量计算/基础算术/Adds.md) | Adds属于双目标量类计算接口，输入为一个矢量tensor和一个标量scalar，Adds负责将矢量tensor内的每个元素与标量进行求和。 |
 | [Adds（灵活标量位置）](Memory矢量计算/基础算术/Adds_flexible_scalar.md) | 提供灵活标量位置的接口，支持标量在前和标量在后两种场景。其中标量输入支持配置LocalTensor单点元素。 |
 | [Muls](Memory矢量计算/基础算术/Muls.md) | Muls属于双目标量类计算接口，输入为一个矢量tensor和一个标量scalar，Muls负责将矢量tensor内的每个元素与标量进行求积。 |
@@ -213,9 +213,9 @@
 | [MulCast](Memory矢量计算/复合计算/MulCast.md) | 按元素求积，并根据源操作数和目的操作数Tensor的数据类型进行精度转换。 |
 | [FusedMulAdd](Memory矢量计算/复合计算/FusedMulAdd.md) | 按元素将src0和dst相乘并加上src1，最终结果存放入dst。 |
 | [MulAddRelu](Memory矢量计算/复合计算/MulAddRelu.md) | 按元素将src0和dst相乘并加上src1，再进行Relu计算（结果和0对比取较大值），最终结果存放进dst中。 |
-| [AbsSub(ISASI)](Memory矢量计算/复合计算/AbsSub(ISASI).md) | 将src0Local与src1相减再求绝对值，并将计算结果写入dst。 |
-| [ExpSub(ISASI)](Memory矢量计算/复合计算/ExpSub(ISASI).md) | src0与src1相减，将差值作为指数计算自然常数e的幂次，并将计算结果写入dst。 |
-| [MulsCast(ISASI)](Memory矢量计算/复合计算/MulsCast(ISASI).md) | 将矢量源操作数前count个数据与标量相乘再按照CAST_ROUND模式转换成half类型，并将计算结果写入dst，此接口支持标量在前和标量在后两种场景。 |
+| [AbsSub(ISASI)](Memory矢量计算/复合计算/AbsSub_ISASI.md) | 将src0Local与src1相减再求绝对值，并将计算结果写入dst。 |
+| [ExpSub(ISASI)](Memory矢量计算/复合计算/ExpSub_ISASI.md) | src0与src1相减，将差值作为指数计算自然常数e的幂次，并将计算结果写入dst。 |
+| [MulsCast(ISASI)](Memory矢量计算/复合计算/MulsCast_ISASI.md) | 将矢量源操作数前count个数据与标量相乘再按照CAST_ROUND模式转换成half类型，并将计算结果写入dst，此接口支持标量在前和标量在后两种场景。 |
 
 ### 比较与选择
 | 接口名 | 功能描述 |
@@ -224,8 +224,8 @@
 | [Compare（结果存入寄存器）](Memory矢量计算/比较与选择/Compare_store_to_register.md) | 逐元素比较两个tensor大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。计算结果存入CmpMask 128bit寄存器中，可用于后续Select计算，也可使用GetCmpMask接口获取寄存器保存的数据。 |
 | [Compares](Memory矢量计算/比较与选择/Compares.md) | 逐元素比较一个tensor中的元素和另一个Scalar的大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。 |
 | [Compares（灵活标量位置）](Memory矢量计算/比较与选择/Compares_flexible_scalar.md) | 提供灵活标量位置的接口，支持标量在前和标量在后两种场景。其中标量输入支持配置LocalTensor单点元素。 |
-| [GetCmpMask(ISASI)](Memory矢量计算/比较与选择/GetCmpMask(ISASI).md) | 此接口用于获取Compare（结果存入寄存器）指令的比较结果。 |
-| [SetCmpMask(ISASI)](Memory矢量计算/比较与选择/SetCmpMask(ISASI).md) | 设置比较寄存器的值，配合不传入mask参数的Select接口使用，根据不同的selMode传入不同的数据。 |
+| [GetCmpMask(ISASI)](Memory矢量计算/比较与选择/GetCmpMask_ISASI.md) | 此接口用于获取Compare（结果存入寄存器）指令的比较结果。 |
+| [SetCmpMask(ISASI)](Memory矢量计算/比较与选择/SetCmpMask_ISASI.md) | 设置比较寄存器的值，配合不传入mask参数的Select接口使用，根据不同的selMode传入不同的数据。 |
 | [Select](Memory矢量计算/比较与选择/Select.md) | 给定两个源操作数src0和src1，根据selMask（用于选择的Mask掩码）的比特位值选取元素，得到目的操作数dst。选择规则为：当selMask的比特位是1时，从src0中选取；比特位是0时从src1选取。 |
 | [Select（灵活标量位置）](Memory矢量计算/比较与选择/Select_flexible_scalar.md) | 给定两个源操作数src0和src1，根据selMask（用于选择的Mask掩码）的比特位值选取元素，得到目的操作数dst。选择的规则为：当selMask的比特位是1时，从src0中选取，比特位是0时从src1选取。 |
 | [GatherMask](Memory矢量计算/比较与选择/GatherMask.md) | 以**内置固定模式**或者**用户自定义输入的Tensor**数值对应的二进制为gather mask（数据收集的掩码），从源操作数中选取元素写入目的操作数中。1为选取，0为不选取。 |
@@ -235,7 +235,7 @@
 | --- | --- |
 | [SetDeqScale](Memory矢量计算/类型转换/寄存器配置说明/SetDeqScale.md) | 本接口用于设置DEQSCALE寄存器的值，DEQSCALE寄存器位宽为64bit，用于Vector计算单元上的量化计算，寄存器中存放的参数在不同场景下的含义不同。 |
 | [Cast](Memory矢量计算/类型转换/Cast.md) | 根据源操作数和目的操作数tensor的数据类型进行精度转换。 |
-| [Truncate(ISASI)](Memory矢量计算/类型转换/Truncate(ISASI).md) | 将源操作数的浮点数元素截断到整数位，同时源操作数的数据类型保持不变。 |
+| [Truncate(ISASI)](Memory矢量计算/类型转换/Truncate_ISASI.md) | 将源操作数的浮点数元素截断到整数位，同时源操作数的数据类型保持不变。 |
 
 ### 归约计算
 | 接口名 | 功能描述 |
@@ -246,8 +246,8 @@
 | [ReduceMax](Memory矢量计算/归约计算/ReduceMax.md) | `ReduceMax`接口用于从所有输入数据中找出最大值和最大值索引。 |
 | [ReduceMin](Memory矢量计算/归约计算/ReduceMin.md) | `ReduceMin`接口用于从所有输入数据中找出最小值和最小值索引。 |
 | [ReduceSum](Memory矢量计算/归约计算/ReduceSum.md) | `ReduceSum`接口对所有输入数据进行求和。 |
-| [GetReduceRepeatSumSpr(ISASI)](Memory矢量计算/归约计算/寄存器辅助接口/GetReduceRepeatSumSpr(ISASI).md) | 获取ReduceSum接口的计算结果，仅支持tensor前n个数据连续计算接口使用。计算结果以全局变量形式存储，可以随时调用获取。 |
-| [GetReduceRepeatMaxMinSpr(ISASI)](Memory矢量计算/归约计算/寄存器辅助接口/GetReduceRepeatMaxMinSpr(ISASI).md) | 本接口用于获取调用ReduceRepeat时所有repeat内的最值及其索引，或获取调用ReduceMax/ReduceMin得到的最值。计算结果以全局变量形式存储，可以随时调用获取。 |
+| [GetReduceRepeatSumSpr(ISASI)](Memory矢量计算/归约计算/寄存器辅助接口/GetReduceRepeatSumSpr_ISASI.md) | 获取ReduceSum接口的计算结果，仅支持tensor前n个数据连续计算接口使用。计算结果以全局变量形式存储，可以随时调用获取。 |
+| [GetReduceRepeatMaxMinSpr(ISASI)](Memory矢量计算/归约计算/寄存器辅助接口/GetReduceRepeatMaxMinSpr_ISASI.md) | 本接口用于获取调用ReduceRepeat时所有repeat内的最值及其索引，或获取调用ReduceMax/ReduceMin得到的最值。计算结果以全局变量形式存储，可以随时调用获取。 |
 
 ### 数据排布转换
 | 接口名 | 功能描述 |
@@ -261,7 +261,7 @@
 | [Duplicate](Memory矢量计算/数据填充/Duplicate.md) | Duplicate接口将一个变量或立即数复制多次并填充到向量中。 |
 | [Brcb](Memory矢量计算/数据填充/Brcb.md) | Brcb接口对输入数据，每一次取输入张量中的8个数进行填充操作，将每个数填充到结果张量的一个DataBlock（32字节）中。 |
 | [CreateVecIndex](Memory矢量计算/数据填充/CreateVecIndex.md) | CreateVecIndex接口创建指定起始值的向量索引。 |
-| [VectorPadding(ISASI)](Memory矢量计算/数据填充/VectorPadding(ISASI).md) | 根据padMode（pad模式）与padSide（pad方向）对源操作数按照datablock进行填充操作。 |
+| [VectorPadding(ISASI)](Memory矢量计算/数据填充/VectorPadding_ISASI.md) | 根据padMode（pad模式）与padSide（pad方向）对源操作数按照datablock进行填充操作。 |
 
 ### sort_and_merge_ISASI
 | 接口名 | 功能描述 |
@@ -278,8 +278,8 @@
 | 接口名 | 功能描述 |
 | --- | --- |
 | [Gather](Memory矢量计算/离散与聚合/Gather.md) | Gather接口接受输入张量（src）、地址偏移张量（srcOffset）和基地址（srcBaseAddr），根据基地址和地址偏移量确定输入张量的索引，将输入张量中对应元素收集到结果张量（dst）中。 |
-| [Gatherb(ISASI)](Memory矢量计算/离散与聚合/Gatherb(ISASI).md) | Gatherb接口接受输入张量（src）、DataBlock偏移张量（offset），根据索引位置将输入张量按DataBlock（32字节）收集到结果张量（dst）中。 |
-| [Scatter(ISASI)](Memory矢量计算/离散与聚合/Scatter(ISASI).md) | 给定一个连续的输入张量和一个目的地址偏移张量，Scatter指令根据偏移地址生成新的结果张量后将输入张量分散到结果张量中。 |
+| [Gatherb(ISASI)](Memory矢量计算/离散与聚合/Gatherb_ISASI.md) | Gatherb接口接受输入张量（src）、DataBlock偏移张量（offset），根据索引位置将输入张量按DataBlock（32字节）收集到结果张量（dst）中。 |
+| [Scatter(ISASI)](Memory矢量计算/离散与聚合/Scatter_ISASI.md) | 给定一个连续的输入张量和一个目的地址偏移张量，Scatter指令根据偏移地址生成新的结果张量后将输入张量分散到结果张量中。 |
 
 ### 掩码操作
 | 接口名 | 功能描述 |
@@ -448,13 +448,13 @@
 | 接口名 | 功能描述 |
 | --- | --- |
 | [LocalMemBar](Reg矢量计算/同步控制/LocalMemBar.md) | Reg矢量计算宏函数内不同流水线之间的同步指令。该同步指令指定src源流水线和dst目的流水线，目的流水线将等待源流水线上所有指令完成才进行执行。读写场景下，当读指令使用的寄存器和写指令使用的寄存器相同时，可以触发寄存器保序，指令将会按照代码顺序执行，不需要插入同步指令，而当使用的寄存器不同时，如果要确保读写指令顺序执行，则需要插入同步指令，写写场景同理。 |
-| [AllocMutexID (ISASI)](同步控制/核内同步/AllocMutexID-(ISASI).md) | 从框架获取并占用一个MutexID，与ReleaseMutexID配合使用，管理MutexID的获取和释放。获取的MutexID可以传入Mutex接口使用，此时Mutex可以与TQue等其他接口配合使用。 |
-| [DataSyncBarrier(ISASI)](同步控制/核内同步/DataSyncBarrier(ISASI).md) | 阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可通过参数控制）执行结束，用于解决Scalar的内存依赖。 |
-| [PipeBarrier(ISASI)](同步控制/核内同步/PipeBarrier(ISASI).md) | 完成同一流水线内的同步控制，用于在同一流水线内部约束执行顺序。其作用是，保证前序指令中所有数据的读写工作全部完成，后序指令才能执行。 |
-| [ReleaseMutexID (ISASI)](同步控制/核内同步/ReleaseMutexID-(ISASI).md) | 从框架释放一个MutexID，与AllocMutexID配合使用。 |
-| [SetFlag/WaitFlag(ISASI)](同步控制/核内同步/SetFlag-WaitFlag(ISASI).md) | SetFlag/WaitFlag接口用于核内多流水间的同步。 |
-| [CrossCoreSetFlag(ISASI)](同步控制/核间同步/CrossCoreSetFlag(ISASI).md) | 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，使用时需传入核间同步的标记ID（flagId），每个ID对应一个用于控制同步的计数器。CrossCoreSetFlag接口用于通知调度模块“本核的pipe流水任务已经完成”，CrossCoreWaitFlag接口用于阻塞后续指令下发，直到所有相关核均完成同步后方可解除阻塞。 |
-| [CrossCoreWaitFlag(ISASI)](同步控制/核间同步/CrossCoreWaitFlag(ISASI).md) | 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，具体功能请参考[CrossCoreSetFlag](同步控制/核间同步/CrossCoreSetFlag(ISASI).md)。 |
+| [AllocMutexID (ISASI)](同步控制/核内同步/AllocMutexID_ISASI.md) | 从框架获取并占用一个MutexID，与ReleaseMutexID配合使用，管理MutexID的获取和释放。获取的MutexID可以传入Mutex接口使用，此时Mutex可以与TQue等其他接口配合使用。 |
+| [DataSyncBarrier(ISASI)](同步控制/核内同步/DataSyncBarrier_ISASI.md) | 阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可通过参数控制）执行结束，用于解决Scalar的内存依赖。 |
+| [PipeBarrier(ISASI)](同步控制/核内同步/PipeBarrier_ISASI.md) | 完成同一流水线内的同步控制，用于在同一流水线内部约束执行顺序。其作用是，保证前序指令中所有数据的读写工作全部完成，后序指令才能执行。 |
+| [ReleaseMutexID (ISASI)](同步控制/核内同步/ReleaseMutexID_ISASI.md) | 从框架释放一个MutexID，与AllocMutexID配合使用。 |
+| [SetFlag/WaitFlag(ISASI)](同步控制/核内同步/SetFlag_WaitFlag_ISASI.md) | SetFlag/WaitFlag接口用于核内多流水间的同步。 |
+| [CrossCoreSetFlag(ISASI)](同步控制/核间同步/CrossCoreSetFlag_ISASI.md) | 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，使用时需传入核间同步的标记ID（flagId），每个ID对应一个用于控制同步的计数器。CrossCoreSetFlag接口用于通知调度模块“本核的pipe流水任务已经完成”，CrossCoreWaitFlag接口用于阻塞后续指令下发，直到所有相关核均完成同步后方可解除阻塞。 |
+| [CrossCoreWaitFlag(ISASI)](同步控制/核间同步/CrossCoreWaitFlag_ISASI.md) | 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，具体功能请参考[CrossCoreSetFlag](同步控制/核间同步/CrossCoreSetFlag_ISASI.md)。 |
 
 ### 系统变量访问
 | 接口名 | 功能描述 |
@@ -481,8 +481,8 @@
 | [Cast（float转bfloat16_t）](标量计算/Cast_float_to_bfloat16.md) | float类型标量数据转换成bfloat16_t类型标量数据。 |
 | [Cast（多类型转float）](标量计算/Cast_multi_type_to_float.md) | 该接口将输入数据转换为float类型。 |
 | [Nop](标量计算/Nop.md) | 用户输入延迟的个数，实现延迟若干个cycle。 |
-| [WriteGmByPassDCache(ISASI)](标量计算/WriteGmByPassDCache(ISASI).md) | 不经过DCache向GM地址上写数据。 |
-| [ReadGmByPassDCache(ISASI)](标量计算/ReadGmByPassDCache(ISASI).md) | 不经过DCache从GM地址上读数据。 |
+| [WriteGmByPassDCache(ISASI)](标量计算/WriteGmByPassDCache_ISASI.md) | 不经过DCache向GM地址上写数据。 |
+| [ReadGmByPassDCache(ISASI)](标量计算/ReadGmByPassDCache_ISASI.md) | 不经过DCache从GM地址上读数据。 |
 
 ## 资源管理
 | 接口名 | 功能描述 |
@@ -519,8 +519,8 @@
 | --- | --- |
 | [DataCachePreload](缓存控制/DataCachePreload.md) | 从源地址所在的特定GM地址预加载数据到DCache中，每次调用只能预加载一个Cache Line大小的数据。 |
 | [DataCacheCleanAndInvalid](缓存控制/DataCacheCleanAndInvalid.md) | 在AI Core内部，Scalar单元和DMA单元都可能对GM进行访问。 |
-| [ICachePreLoad(ISASI)](缓存控制/ICachePreLoad(ISASI).md) | 开发者手动调用ICachePreLoad接口，能够从指令所在GM地址预加载指令到ICache中。 |
-| [GetICachePreloadStatus(ISASI)](缓存控制/GetICachePreloadStatus(ISASI).md) | GetICachePreloadStatus为调试接口，在ICachePreLoad后调用，用于获取ICache的PreLoad的状态：当返回值为0时，说明ICache的PreLoad已完成；当返回值为1时，说明ICache的PreLoad未完成。 |
+| [ICachePreLoad(ISASI)](缓存控制/ICachePreLoad_ISASI.md) | 开发者手动调用ICachePreLoad接口，能够从指令所在GM地址预加载指令到ICache中。 |
+| [GetICachePreloadStatus(ISASI)](缓存控制/GetICachePreloadStatus_ISASI.md) | GetICachePreloadStatus为调试接口，在ICachePreLoad后调用，用于获取ICache的PreLoad的状态：当返回值为0时，说明ICache的PreLoad已完成；当返回值为1时，说明ICache的PreLoad未完成。 |
 
 ## 原子操作
 | 接口名 | 功能描述 |
@@ -528,10 +528,10 @@
 | [SetAtomicAdd](原子操作/SetAtomicAdd.md) | 对后续目的地址为GM的数据搬运开启原子累加。原子累加过程：将待拷贝的内容和GM已有内容进行求和，然后将求和结果写入GM。SetAtomicAdd接口可通过模板参数设定不同的累加数据类型。 |
 | [SetAtomicType](原子操作/SetAtomicType.md) | 通过设置模板参数来设定原子操作不同的数据类型。 |
 | [DisableDmaAtomic](原子操作/DisableDmaAtomic.md) | 关闭数据搬运随路原子操作功能，后续执行数据搬运时，GM中原始数据将被新搬运数据完全覆盖。 |
-| [SetAtomicMax(ISASI)](原子操作/SetAtomicMax(ISASI).md) | 设置后续搬运到GM的数据是否执行原子比较：将待拷贝的内容和GM已有内容进行比较，然后将最大值写入GM。SetAtomicMax接口可通过设置模板参数来设定不同的数据类型。 |
-| [SetAtomicMin(ISASI)](原子操作/SetAtomicMin(ISASI).md) | 设置后续搬运到GM的数据是否执行原子比较：将待拷贝的内容和GM已有内容进行比较，然后将最小值写入GM。SetAtomicMin接口可通过设置模板参数来设定不同的数据类型。 |
-| [SetStoreAtomicConfig(ISASI)](原子操作/SetStoreAtomicConfig(ISASI).md) | 设置原子操作开启位与原子操作类型。 |
-| [GetStoreAtomicConfig(ISASI)](原子操作/GetStoreAtomicConfig(ISASI).md) | 获取原子操作开启位与原子操作类型的值。 |
+| [SetAtomicMax(ISASI)](原子操作/SetAtomicMax_ISASI.md) | 设置后续搬运到GM的数据是否执行原子比较：将待拷贝的内容和GM已有内容进行比较，然后将最大值写入GM。SetAtomicMax接口可通过设置模板参数来设定不同的数据类型。 |
+| [SetAtomicMin(ISASI)](原子操作/SetAtomicMin_ISASI.md) | 设置后续搬运到GM的数据是否执行原子比较：将待拷贝的内容和GM已有内容进行比较，然后将最小值写入GM。SetAtomicMin接口可通过设置模板参数来设定不同的数据类型。 |
+| [SetStoreAtomicConfig(ISASI)](原子操作/SetStoreAtomicConfig_ISASI.md) | 设置原子操作开启位与原子操作类型。 |
+| [GetStoreAtomicConfig(ISASI)](原子操作/GetStoreAtomicConfig_ISASI.md) | 获取原子操作开启位与原子操作类型的值。 |
 | [AtomicAdd](原子操作/AtomicAdd.md) | 调用该接口后，可在指定GM地址上进行原子加操作。 |
 | [AtomicMin](原子操作/AtomicMin.md) | 调用该接口后，可在指定GM地址上进行原子比较取小操作。 |
 | [AtomicMax](原子操作/AtomicMax.md) | 调用该接口后，可在指定GM地址上进行原子取大操作。 |
@@ -548,7 +548,7 @@
 | [ascendc_assert](调试接口/异常检测/ascendc_assert.md) | ascendc_assert提供了一种在CPU/NPU域实现断言功能的接口。当断言条件不满足时，系统会输出断言信息并格式化打印在屏幕上。 |
 | [assert](调试接口/异常检测/assert.md) | 该接口实现CPU/NPU域assert断言功能。算子执行中，如果assert内部条件判断不为真，则输出assert条件并将输入的信息格式化打印在屏幕上。 |
 | [Trap](调试接口/异常检测/Trap.md) | 在Kernel侧调用，NPU模式下会中断AI Core的运行，CPU模式下等同于assert。可用于Kernel侧异常场景的调试。 |
-| [CheckLocalMemoryIA(ISASI)](调试接口/异常检测/CheckLocalMemoryIA(ISASI).md) | check设定范围内的UB读写行为，如果有设定范围的读写行为则会出现EXCEPTION报错，无设定范围的读写行为则不会报错。 |
+| [CheckLocalMemoryIA(ISASI)](调试接口/异常检测/CheckLocalMemoryIA_ISASI.md) | check设定范围内的UB读写行为，如果有设定范围的读写行为则会出现EXCEPTION报错，无设定范围的读写行为则不会报错。 |
 | [GmAlloc](调试接口/CPU孪生调试/GmAlloc.md) | 进行核函数的CPU侧运行验证时，用于创建共享内存：在/tmp目录下创建一个共享文件，并返回该文件的映射指针。 |
 | [ICPU_RUN_KF](调试接口/CPU孪生调试/ICPU_RUN_KF.md) | 进行核函数的CPU侧运行验证时，CPU调测总入口，完成CPU侧的算子程序调用。 |
 | [ICPU_SET_TILING_KEY](调试接口/CPU孪生调试/ICPU_SET_TILING_KEY.md) | 用于指定本次CPU调测使用的tilingKey。调测执行时，将只执行算子核函数中该tilingKey对应的分支。 |
@@ -577,14 +577,14 @@
 | [GetRuntimeUBSize](工具接口/系统资源与变量/GetRuntimeUBSize.md) | 获取运行时UB空间的大小，单位为Byte。开发者根据UB的大小来计算循环次数等参数值。 |
 | [GetVecLen](工具接口/系统资源与变量/GetVecLen.md) | 获取RegTensor位宽VL（Vector Length）的大小。 |
 | [GetSsbufBaseAddr](工具接口/系统资源与变量/GetSsbufBaseAddr.md) | 该接口用于获取SSBuffer的基地址。 |
-| [GetSystemCycle(ISASI)](工具接口/系统资源与变量/GetSystemCycle(ISASI).md) | 获取系统计数器当前的cycle值。通过计算代码段前后cycle值的差值，可得到代码段消耗的系统cycle数，再通过换算即可获得代码段的执行时间。 |
+| [GetSystemCycle(ISASI)](工具接口/系统资源与变量/GetSystemCycle_ISASI.md) | 获取系统计数器当前的cycle值。通过计算代码段前后cycle值的差值，可得到代码段消耗的系统cycle数，再通过换算即可获得代码段的执行时间。 |
 | [GetBlockNum](工具接口/系统资源与变量/GetBlockNum.md) | 获取当前任务配置的逻辑AI Core的数量，用于代码内部的多核逻辑控制等。 |
 | [GetBlockIdx](工具接口/系统资源与变量/GetBlockIdx.md) | 获取当前逻辑AI Core的索引，用于代码内部的多核逻辑控制及多核偏移量计算等。 |
 | [GetDataBlockSizeInBytes](工具接口/系统资源与变量/GetDataBlockSizeInBytes.md) | 获取当前芯片版本一个DataBlock的大小，单位为Byte。 |
 | [GetArchVersion](工具接口/系统资源与变量/GetArchVersion.md) | 获取当前AI处理器架构版本号。 |
-| [GetProgramCounter(ISASI)](工具接口/系统资源与变量/GetProgramCounter(ISASI).md) | 获取程序计数器的值，以追踪当前程序执行的位置。 |
-| [GetSubBlockNum(ISASI)](工具接口/系统资源与变量/GetSubBlockNum(ISASI).md) | 在分离模式架构下，获取当前配置中，一个逻辑AI Core上Cube Core（AIC）或者Vector Core（AIV）的数量。 |
-| [GetSubBlockIdx(ISASI)](工具接口/系统资源与变量/GetSubBlockIdx(ISASI).md) | 在分离模式架构下，获取逻辑AI Core上Cube Core（AIC）或者Vector Core（AIV）的逻辑索引。 |
+| [GetProgramCounter(ISASI)](工具接口/系统资源与变量/GetProgramCounter_ISASI.md) | 获取程序计数器的值，以追踪当前程序执行的位置。 |
+| [GetSubBlockNum(ISASI)](工具接口/系统资源与变量/GetSubBlockNum_ISASI.md) | 在分离模式架构下，获取当前配置中，一个逻辑AI Core上Cube Core（AIC）或者Vector Core（AIV）的数量。 |
+| [GetSubBlockIdx(ISASI)](工具接口/系统资源与变量/GetSubBlockIdx_ISASI.md) | 在分离模式架构下，获取逻辑AI Core上Cube Core（AIC）或者Vector Core（AIV）的逻辑索引。 |
 
 ## cube_group_mgmt_ISASI
 | 接口名 | 功能描述 |
@@ -622,8 +622,8 @@
 ## 特殊寄存器访问
 | 接口名 | 功能描述 |
 | --- | --- |
-| [SetCtrlSpr(ISASI)](特殊寄存器访问/SetCtrlSpr(ISASI).md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |
-| [GetCtrlSpr(ISASI)](特殊寄存器访问/GetCtrlSpr(ISASI).md) | 读取CTRL寄存器（控制寄存器）特定比特位上的值。 |
-| [ResetCtrlSpr(ISASI)](特殊寄存器访问/ResetCtrlSpr(ISASI).md) | 重置CTRL寄存器（控制寄存器）的特定比特位。 |
-| [GetSaturationFlag(ISASI)](特殊寄存器访问/GetSaturationFlag(ISASI).md) | 获取计算/精度转换时饱和模式的开启状态。 |
-| [SetSaturationFlag(ISASI)](特殊寄存器访问/SetSaturationFlag(ISASI).md) | 设置饱和开关的标志位，以控制计算/精度转换时饱和模式的开启与关闭。 |
+| [SetCtrlSpr(ISASI)](特殊寄存器访问/SetCtrlSpr_ISASI.md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |
+| [GetCtrlSpr(ISASI)](特殊寄存器访问/GetCtrlSpr_ISASI.md) | 读取CTRL寄存器（控制寄存器）特定比特位上的值。 |
+| [ResetCtrlSpr(ISASI)](特殊寄存器访问/ResetCtrlSpr_ISASI.md) | 重置CTRL寄存器（控制寄存器）的特定比特位。 |
+| [GetSaturationFlag(ISASI)](特殊寄存器访问/GetSaturationFlag_ISASI.md) | 获取计算/精度转换时饱和模式的开启状态。 |
+| [SetSaturationFlag(ISASI)](特殊寄存器访问/SetSaturationFlag_ISASI.md) | 设置饱和开关的标志位，以控制计算/精度转换时饱和模式的开启与关闭。 |

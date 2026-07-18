@@ -28,7 +28,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_common_intf.h"`。
 
-获取原子操作开启位与原子操作类型的值，详细说明见[表1](SetStoreAtomicConfig(ISASI).md#table622mcpsimp)。
+获取原子操作开启位与原子操作类型的值，详细说明见[表1](SetStoreAtomicConfig_ISASI.md#table622mcpsimp)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -51,7 +51,7 @@ __aicore__ inline void GetStoreAtomicConfig(uint16_t& atomicType, uint16_t& atom
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-此接口需要与[SetStoreAtomicConfig\(ISASI\)](SetStoreAtomicConfig(ISASI).md)配合使用，用以获取原子操作开启位与原子操作类型的值。
+此接口需要与[SetStoreAtomicConfig\(ISASI\)](SetStoreAtomicConfig_ISASI.md)配合使用，用以获取原子操作开启位与原子操作类型的值。
 
 ## 调用示例<a name="section837496171220"></a>
 

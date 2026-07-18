@@ -58,7 +58,7 @@ __aicore__ inline int64_t GetSystemCycle()
 
 ## 约束说明
 
-该接口属于PIPE\_S流水，若需要测试其他流水的指令时间，需要在调用该接口前通过[PipeBarrier](../../同步控制/核内同步/PipeBarrier(ISASI).md)插入对应流水的同步，具体请参考[调用示例](#example2)。
+该接口属于PIPE\_S流水，若需要测试其他流水的指令时间，需要在调用该接口前通过[PipeBarrier](../../同步控制/核内同步/PipeBarrier_ISASI.md)插入对应流水的同步，具体请参考[调用示例](#example2)。
 
 ## 调用示例
 

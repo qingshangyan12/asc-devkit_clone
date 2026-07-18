@@ -44,7 +44,7 @@
 
 ## 函数原型<a name="section1954364615315"></a>
 
-接口同时支持非连续搬运和连续搬运，对于连续搬运场景，推荐使用[GM与UB连续数据搬运\(DataCopy\)](GM与UB连续数据搬运(DataCopy).md)。
+接口同时支持非连续搬运和连续搬运，对于连续搬运场景，推荐使用[GM与UB连续数据搬运\(DataCopy\)](DataCopy_GMToUB_continuous.md)。
 
 - Global Memory -> Unified Buffer
 
@@ -87,7 +87,7 @@
 
 下面的样例通过两个示例展示连续搬运和非连续搬运的使用方式。
 
-针对连续搬运场景，推荐使用[GM与UB连续数据搬运\(DataCopy\)](GM与UB连续数据搬运(DataCopy).md)，以下示例仅展示高维切分数据搬运接口具有连续搬运能力。
+针对连续搬运场景，推荐使用[GM与UB连续数据搬运\(DataCopy\)](DataCopy_GMToUB_continuous.md)，以下示例仅展示高维切分数据搬运接口具有连续搬运能力。
 
 - 示例1：连续搬运
 
@@ -176,7 +176,7 @@
     | srcGap | [0, 65535] |
     | dstGap | [0, 65535] |
 
-- 如果需要执行多个DataCopy指令，且DataCopy的目的地址存在重叠，需要通过调用[PipeBarrier(ISASI)](../../../同步控制/核内同步/PipeBarrier(ISASI).md)来插入同步指令，保证多个DataCopy指令的串行化，防止出现异常数据。如下图左侧示意图，执行两个DataCopy指令，搬运的目的Global Memory地址存在重叠，两条搬运指令之间需要通过调用PipeBarrier<PIPE_MTE3>()添加MTE3搬出流水的同步；如下图右侧示意图所示，搬运的目的地址Unified Buffer存在重叠，两条搬运指令之间需要调用PipeBarrier<PIPE_MTE2>()添加MTE2搬入流水的同步。
+- 如果需要执行多个DataCopy指令，且DataCopy的目的地址存在重叠，需要通过调用[PipeBarrier(ISASI)](../../../同步控制/核内同步/PipeBarrier_ISASI.md)来插入同步指令，保证多个DataCopy指令的串行化，防止出现异常数据。如下图左侧示意图，执行两个DataCopy指令，搬运的目的Global Memory地址存在重叠，两条搬运指令之间需要通过调用PipeBarrier<PIPE_MTE3>()添加MTE3搬出流水的同步；如下图右侧示意图所示，搬运的目的地址Unified Buffer存在重叠，两条搬运指令之间需要调用PipeBarrier<PIPE_MTE2>()添加MTE2搬入流水的同步。
 
     ![](../../../../../figures/datacopy_address_overlap_sync_diagram.png)
 
