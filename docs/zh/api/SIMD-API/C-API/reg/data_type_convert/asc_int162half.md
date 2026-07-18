@@ -28,39 +28,22 @@
 
 头文件路径：`"c_api/reg_compute/reg_convert.h"`。
 
-将src中int16_t类型的元素转换为half类型（16位浮点数），并将结果写入dst。源操作数和目的操作数位宽相同（均为16bit），转换后元素数量不变。支持5种舍入模式，关于舍入模式的详细说明请参见[舍入模式与饱和模式](rounding_mode.md)。
+将src中int16_t类型的元素转换为half类型（16位浮点数），并将结果写入dst。源操作数和目的操作数位宽相同，转换后元素数量不变。支持5种舍入模式，关于舍入模式的详细说明请参见[舍入模式与饱和模式](rounding_mode.md)。
 
 ## 函数原型
 
-- 向负无穷方向舍入（rd）
-
-    ```cpp
-    __simd_callee__ inline void asc_int162half_rd(vector_half& dst, vector_int16_t src, vector_bool mask)
-    ```
-
-- 四舍六入五成双舍入（rn）
-
-    ```cpp
-    __simd_callee__ inline void asc_int162half_rn(vector_half& dst, vector_int16_t src, vector_bool mask)
-    ```
-
-- 四舍五入舍入（rna）
-
-    ```cpp
-    __simd_callee__ inline void asc_int162half_rna(vector_half& dst, vector_int16_t src, vector_bool mask)
-    ```
-
-- 向正无穷方向舍入（ru）
-
-    ```cpp
-    __simd_callee__ inline void asc_int162half_ru(vector_half& dst, vector_int16_t src, vector_bool mask)
-    ```
-
-- 向零方向舍入（rz）
-
-    ```cpp
-    __simd_callee__ inline void asc_int162half_rz(vector_half& dst, vector_int16_t src, vector_bool mask)
-    ```
+```cpp
+// 向负无穷方向舍入（rd）
+__simd_callee__ inline void asc_int162half_rd(vector_half& dst, vector_int16_t src, vector_bool mask)
+// 四舍六入五成双舍入（rn）
+__simd_callee__ inline void asc_int162half_rn(vector_half& dst, vector_int16_t src, vector_bool mask)
+// 四舍五入舍入（rna）
+__simd_callee__ inline void asc_int162half_rna(vector_half& dst, vector_int16_t src, vector_bool mask)
+// 向正无穷方向舍入（ru）
+__simd_callee__ inline void asc_int162half_ru(vector_half& dst, vector_int16_t src, vector_bool mask)
+// 向零方向舍入（rz）
+__simd_callee__ inline void asc_int162half_rz(vector_half& dst, vector_int16_t src, vector_bool mask)
+```
 
 ## 参数说明
 
@@ -68,17 +51,11 @@
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_half](../reg_data_types/data_type_definition.md#矢量数据寄存器)。 |
-| src | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_int16_t](../reg_data_types/data_type_definition.md#矢量数据寄存器)。 |
-| mask | 输入 | 源操作数元素操作的有效指示（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| dst | 输出 | 目的操作数（矢量数据寄存器）。 |
+| src | 输入 | 源操作数（矢量数据寄存器）。 |
+| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
-## 数据类型
-
-**表2** 数据类型
-
-| src | dst |
-| --- | --- |
-| int16_t | half |
+矢量数据寄存器和掩码寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 

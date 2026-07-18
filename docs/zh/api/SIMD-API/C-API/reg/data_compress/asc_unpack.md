@@ -55,37 +55,27 @@
 
 - 操作数为矢量数据寄存器
 
-    - 解压缩低位
-
-        ```cpp
-        __simd_callee__ inline void asc_unpack_lower(vector_uint16_t& dst, vector_uint8_t src)
-        __simd_callee__ inline void asc_unpack_lower(vector_int16_t& dst, vector_int8_t src)
-        __simd_callee__ inline void asc_unpack_lower(vector_uint32_t& dst, vector_uint16_t src)
-        __simd_callee__ inline void asc_unpack_lower(vector_int32_t& dst, vector_int16_t src)
-        ```
-
-    - 解压缩高位
-
-        ```cpp
-        __simd_callee__ inline void asc_unpack_upper(vector_uint16_t& dst, vector_uint8_t src)
-        __simd_callee__ inline void asc_unpack_upper(vector_int16_t& dst, vector_int8_t src)
-        __simd_callee__ inline void asc_unpack_upper(vector_uint32_t& dst, vector_uint16_t src)
-        __simd_callee__ inline void asc_unpack_upper(vector_int32_t& dst, vector_int16_t src)
-        ```
+    ```cpp
+    // 解压缩低位
+    __simd_callee__ inline void asc_unpack_lower(vector_uint16_t& dst, vector_uint8_t src)
+    __simd_callee__ inline void asc_unpack_lower(vector_int16_t& dst, vector_int8_t src)
+    __simd_callee__ inline void asc_unpack_lower(vector_uint32_t& dst, vector_uint16_t src)
+    __simd_callee__ inline void asc_unpack_lower(vector_int32_t& dst, vector_int16_t src)
+    // 解压缩高位
+    __simd_callee__ inline void asc_unpack_upper(vector_uint16_t& dst, vector_uint8_t src)
+    __simd_callee__ inline void asc_unpack_upper(vector_int16_t& dst, vector_int8_t src)
+    __simd_callee__ inline void asc_unpack_upper(vector_uint32_t& dst, vector_uint16_t src)
+    __simd_callee__ inline void asc_unpack_upper(vector_int32_t& dst, vector_int16_t src)
+    ```
 
 - 操作数为掩码寄存器
 
-    - 解压缩低位
-
-        ```cpp
-        __simd_callee__ inline void asc_unpack_lower(vector_bool& dst, vector_bool src)
-        ```
-
-    - 解压缩高位
-
-        ```cpp
-        __simd_callee__ inline void asc_unpack_upper(vector_bool& dst, vector_bool src)
-        ```
+    ```cpp
+    // 解压缩低位
+    __simd_callee__ inline void asc_unpack_lower(vector_bool& dst, vector_bool src)
+    // 解压缩高位
+    __simd_callee__ inline void asc_unpack_upper(vector_bool& dst, vector_bool src)
+    ```
 
 ## 参数说明
 
@@ -93,27 +83,15 @@
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| src | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| dst | 输出 | 目的操作数（矢量数据寄存器）。 |
+| src | 输入 | 源操作数（矢量数据寄存器）。 |
 
 **表2** 参数说明（操作数为掩码寄存器）
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
-| src | 输入 | 源操作数（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
-
-## 数据类型
-
-**表3** 数据类型
-
-| src | dst |
-| --- | --- |
-| uint8_t | uint16_t |
-| int8_t | int16_t |
-| uint16_t | uint32_t |
-| int16_t | int32_t |
-| bool | bool |
+| dst | 输出 | 目的操作数（掩码寄存器）。 |
+| src | 输入 | 源操作数（掩码寄存器）。 |
 
 ## 返回值说明
 

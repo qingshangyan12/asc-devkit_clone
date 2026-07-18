@@ -52,13 +52,10 @@ __simd_callee__ inline void asc_unsqueeze(vector_uint32_t& dst, vector_bool mask
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输入/输出 | 源操作数和目的操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| mask | 输入 | 源操作数（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。mask用于提供dst解压缩信息。 |
+| dst | 输入/输出 | 源操作数和目的操作数（矢量数据寄存器）。 |
+| mask | 输入 | 源操作数（掩码寄存器），用于提供dst解压缩信息。 |
 
-## 数据类型
-
-dst支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t。mask支持的数据类型为：bool。
-
+矢量数据寄存器和掩码寄存器的详细说明请参见[data_type_definition.md](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 
