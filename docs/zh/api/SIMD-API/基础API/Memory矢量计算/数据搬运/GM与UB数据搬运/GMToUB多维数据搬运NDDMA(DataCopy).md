@@ -114,10 +114,8 @@
 源操作数和目的操作数支持的数据类型保持一致。
 
 <!-- npu="950" id1 -->
-Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。
+Ascend 950PR/Ascend 950DT支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、double、complex64。
 <!-- end id1 -->
-
-不支持fp4×2_e2m1_t、fp4×2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t数据类型。
 
 ## 返回值说明<a name="section7607175220218"></a>
 
@@ -134,8 +132,6 @@ Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。
     ![](../../../../../figures/nddma_padding_2d.png)
 
 - 该接口通过NDDMA进行数据搬运，对应的NDDMA Cache大小为32KB，在使用DataCopy接口进行数据搬运前，需要使用NdDmaDci接口刷新缓存，否则多核场景下读写同一块Global Memory地址可能会导致部分核读取数据错误。
-
-- constantValue不支持fp4×2_e2m1_t、fp4×2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t数据类型。
 
 ## 调用示例<a name="section122101199486"></a>
 
