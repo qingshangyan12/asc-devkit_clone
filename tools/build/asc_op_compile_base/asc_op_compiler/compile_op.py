@@ -356,16 +356,16 @@ the superkernel cannot be integrated with the operator.",
 
     aicore_num = get_context().get_addition("_op_aicore_num")
     vectorcore_num = get_context().get_addition("_op_vectorcore_num")
-    has_platformInfo = False
+    has_platform_info = False
     if aicore_num is not None and vectorcore_num is not None:
         js["platformInfo"] = {
             "cubeCoreCnt": int(aicore_num),
             "vectorCoreCnt": int(vectorcore_num),
         }
-        has_platformInfo = True
+        has_platform_info = True
     deterministic_level = get_current_build_config_int("deterministic_level")
     if deterministic_level != -1:
-        if not has_platformInfo:
+        if not has_platform_info:
             js["platformInfo"] = {}
         js["platformInfo"]["deterministicLevel"] = int(deterministic_level)
 
