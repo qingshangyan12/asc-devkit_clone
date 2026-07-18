@@ -322,7 +322,7 @@
 | 接口名 | 功能描述 |
 | --- | --- |
 | [连续对齐搬出（StoreAlign）](Reg矢量计算/Reg数据搬出/StoreAlign_continuous.md) | StoreAlign能够实现数据从RegTensor连续搬运至Unified Buffer（UB），支持单搬出模式和双搬出模式。 |
-| [非连续对齐搬出（StoreAlign）](Reg矢量计算/Reg数据搬出/非StoreAlign_continuous.md) | StoreAlign能够实现数据从RegTensor非连续搬运至Unified Buffer（UB），以DataBlock为单位。 |
+| [非连续对齐搬出（StoreAlign）](Reg矢量计算/Reg数据搬出/StoreAlign_noncontinuous.md) | StoreAlign能够实现数据从RegTensor非连续搬运至Unified Buffer（UB），以DataBlock为单位。 |
 | [连续非对齐搬出（StoreUnAlign）](Reg矢量计算/Reg数据搬出/StoreUnAlign_continuous.md) | StoreUnAlign能够实现数据从RegTensor连续搬运至非对齐Unified Buffer（UB），利用非对齐寄存器UnalignRegForStore作为临时缓存区，暂存跨对齐边界的数据，从而实现高效的连续非对齐数据传输。 |
 | [MaskReg搬出（StoreAlign）](Reg矢量计算/Reg数据搬出/StoreAlign_MaskReg.md) | StoreAlign能够实现数据从MaskReg搬运至Unified Buffer（UB）。 |
 | [MaskReg非对齐搬出（StoreUnAlign）](Reg矢量计算/Reg数据搬出/StoreUnAlign_MaskReg.md) | StoreUnAlign能够实现数据从MaskReg连续搬运至非对齐Unified Buffer（UB），利用非对齐寄存器UnalignRegForStore作为临时缓存区。 |

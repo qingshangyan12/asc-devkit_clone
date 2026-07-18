@@ -486,7 +486,7 @@
 
             -   [Reg数据搬出](SIMD-API/基础API/Reg矢量计算/Reg数据搬出/Reg数据搬出.md)
                 -   [连续对齐搬出（StoreAlign）](SIMD-API/基础API/Reg矢量计算/Reg数据搬出/StoreAlign_continuous.md)
-                -   [非连续对齐搬出（StoreAlign）](SIMD-API/基础API/Reg矢量计算/Reg数据搬出/非StoreAlign_continuous.md)
+                -   [非连续对齐搬出（StoreAlign）](SIMD-API/基础API/Reg矢量计算/Reg数据搬出/StoreAlign_noncontinuous.md)
                 -   [连续非对齐搬出（StoreUnAlign）](SIMD-API/基础API/Reg矢量计算/Reg数据搬出/StoreUnAlign_continuous.md)
                 -   [MaskReg搬出（StoreAlign）](SIMD-API/基础API/Reg矢量计算/Reg数据搬出/StoreAlign_MaskReg.md)
                 -   [MaskReg非对齐搬出（StoreUnAlign）](SIMD-API/基础API/Reg矢量计算/Reg数据搬出/StoreUnAlign_MaskReg.md)
