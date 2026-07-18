@@ -18,8 +18,8 @@
  * \file copy.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_COPY_H
-#define IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_COPY_H
+#ifndef IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_UB_COPY_H
+#define IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_UB_COPY_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
 #include "impl/tensor_api/atom/copy_traits_impl.h"
@@ -46,13 +46,13 @@ public:
     }
 
 private:
-    template <const CopyUB2UBTrait& trait = DEFAULT_COPY_GM_TO_UB_TRAIT, typename T, typename U>
+    template <const CopyUB2UBTrait& trait = DEFAULT_COPY_UB_TO_UB_TRAIT, typename T, typename U>
     __aicore__ inline static void DataCopyImpl(const T& dst, const U& src)
     {
         using dstTPos = GetMemLocation<T>;
         using srcTPos = GetMemLocation<U>;
-        static_assert(Std::is_same_v<dstTPos, Location::UB>, "When Copy tensor from GM to UB, dst tensor must on UB");
-        static_assert(Std::is_same_v<srcTPos, Location::GM>, "When Copy tensor from GM to UB, src tensor must on GM");
+        static_assert(Std::is_same_v<dstTPos, Location::UB>, "When Copy tensor from UB to UB, dst tensor must on UB");
+        static_assert(Std::is_same_v<srcTPos, Location::UB>, "When Copy tensor from UB to UB, src tensor must on UB");
         using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
         using CopyUB2UBImpl =
@@ -65,7 +65,7 @@ private:
 } // namespace Te
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_COPY_H
+#endif // IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_UB_COPY_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

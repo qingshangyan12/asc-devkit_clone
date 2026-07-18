@@ -10,7 +10,7 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
-    "impl/tensor_api/arch/vector/gm_to_ub/copy_impl/zn2zn.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
+    "impl/tensor_api/arch/vector/ub_to_ub/copy_impl/zn2zn.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
@@ -19,10 +19,10 @@
  * \file zn2zn.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_COPY_IMPL_ZN2ZN_H
-#define IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_COPY_IMPL_ZN2ZN_H
+#ifndef IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_UB_COPY_IMPL_ZN2ZN_H
+#define IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_UB_COPY_IMPL_ZN2ZN_H
 
-#include "impl/tensor_api/arch/vector/gm_to_ub/copy_impl/data_copy.h"
+#include "impl/tensor_api/arch/vector/ub_to_ub/copy_impl/data_copy.h"
 
 namespace AscendC {
 namespace Te {
@@ -40,7 +40,7 @@ private:
     __aicore__ inline static constexpr void CheckTemplate()
     {
         CheckLayoutPattern<U, T>();
-        CheckDataType::CheckGm2UBDataType<T, U>();
+        CheckDataType::CheckUB2UBDataType<T, U>();
     }
 
     template <const CopyUB2UBTrait& trait, typename T, typename U>
@@ -68,7 +68,7 @@ private:
 } // namespace Te
 } // namespace AscendC
 
-#endif // IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_COPY_IMPL_ZN2ZN_H
+#endif // IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_UB_COPY_IMPL_ZN2ZN_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
