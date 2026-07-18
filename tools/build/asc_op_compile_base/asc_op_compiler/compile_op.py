@@ -350,7 +350,7 @@ the superkernel cannot be integrated with the operator.",
     into superkernel",
                 AscendCLogLevel.LOG_INFO,
             )
-
+    
     def _safe_int_conversion(value, default=-1):
         if value is None:
             return default
@@ -362,16 +362,18 @@ the superkernel cannot be integrated with the operator.",
 
     aicore_num = get_context().get_addition("_op_aicore_num")
     vectorcore_num = get_context().get_addition("_op_vectorcore_num")
-    has_platformInfo = False
+    has_platform_info = False
     if aicore_num is not None and vectorcore_num is not None:
         js["platformInfo"] = {
             "cubeCoreCnt": int(aicore_num),
-            "vectorCoreCnt": int(vectorcore_num)
+            "vectorCoreCnt": int(vectorcore_num),
         }
-        has_platformInfo = True
-    deterministic_level = _safe_int_conversion(get_current_build_config("deterministic_level"))
+        has_platform_info = True
+    deterministic_level = _safe_int_conversion(
+        get_current_build_config("deterministic_level")
+    )
     if deterministic_level != -1:
-        if not has_platformInfo:
+        if not has_platform_info:
             js["platformInfo"] = {}
         js["platformInfo"]["deterministicLevel"] = int(deterministic_level)
 

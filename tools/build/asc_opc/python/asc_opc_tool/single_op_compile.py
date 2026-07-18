@@ -368,7 +368,7 @@ class SingleOpCompile:
             "enable_vector_core": enable_vector_core,
             "enable_super_kernel": op_relocatable_bin,
         }
- 	 
+
         if deterministic_level != "":
             build_config_kwargs["deterministic_level"] = deterministic_level
             logger.debug("deterministic_level is {}".format(deterministic_level))
