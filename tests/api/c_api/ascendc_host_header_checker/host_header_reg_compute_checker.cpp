@@ -110,9 +110,6 @@ static void test_host_c_api_reg_compute_2()
     using ::asc_update_addr_reg_b16;
     using ::asc_update_addr_reg_b32;
     using ::asc_update_addr_reg_b8;
-    using ::asc_update_iter_reg_b16;
-    using ::asc_update_iter_reg_b32;
-    using ::asc_update_iter_reg_b8;
 }
 
 static void test_host_c_api_reg_compute_3()
