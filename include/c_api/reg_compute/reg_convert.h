@@ -838,9 +838,7 @@ __simd_callee__ inline void asc_float2int16_rz_sat_v2(vector_int16_t& dst, vecto
 // ==========asc_bfloat162e2m1x2_rd/rn/rna/ru/rz)==========
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162e2m1x2_rd(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162e2m1x2_rd_v2(
     vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask);
 
@@ -849,13 +847,9 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rd_v3(
 
 __simd_callee__ inline void asc_bfloat162e2m1x2_rd_v4(
     vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162e2m1x2_rn(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162e2m1x2_rn_v2(
     vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask);
 
@@ -864,13 +858,9 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rn_v3(
 
 __simd_callee__ inline void asc_bfloat162e2m1x2_rn_v4(
     vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162e2m1x2_rna(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162e2m1x2_rna_v2(
     vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask);
 
@@ -879,13 +869,9 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rna_v3(
 
 __simd_callee__ inline void asc_bfloat162e2m1x2_rna_v4(
     vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162e2m1x2_ru(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162e2m1x2_ru_v2(
     vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask);
 
@@ -894,13 +880,9 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_ru_v3(
 
 __simd_callee__ inline void asc_bfloat162e2m1x2_ru_v4(
     vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162e2m1x2_rz(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162e2m1x2_rz_v2(
     vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask);
 
@@ -1023,9 +1005,7 @@ __simd_callee__ inline void asc_e2m1x22bfloat16_v4(vector_bfloat16_t& dst, vecto
 // ==========asc_bfloat162e1m2x2_rd/rn/rna/ru/rz)==========
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162e1m2x2_rd(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162e1m2x2_rd_v2(
     vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask);
 
@@ -1034,13 +1014,9 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rd_v3(
 
 __simd_callee__ inline void asc_bfloat162e1m2x2_rd_v4(
     vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162e1m2x2_rn(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162e1m2x2_rn_v2(
     vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask);
 
@@ -1049,13 +1025,9 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rn_v3(
 
 __simd_callee__ inline void asc_bfloat162e1m2x2_rn_v4(
     vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162e1m2x2_rna(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162e1m2x2_rna_v2(
     vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask);
 
@@ -1064,13 +1036,9 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rna_v3(
 
 __simd_callee__ inline void asc_bfloat162e1m2x2_rna_v4(
     vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162e1m2x2_ru(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162e1m2x2_ru_v2(
     vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask);
 
@@ -1079,13 +1047,9 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_ru_v3(
 
 __simd_callee__ inline void asc_bfloat162e1m2x2_ru_v4(
     vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162e1m2x2_rz(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask);
-#endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __simd_callee__ inline void asc_bfloat162e1m2x2_rz_v2(
     vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask);
 
