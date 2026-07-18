@@ -257,11 +257,11 @@ stages:
           -
             name: ut_report
             identifier: ut-report
-            uses: tanghaoran7/.gitcode/actions/ut-cov-report@master
+            uses: cann/.gitcode/actions/ut-cov-report@master
             with:
               workspace: ${{ steps.process_checkout.outputs.path }}
               cov_mode: "report"
-              ut_field: "ops-math"
+              ut_field: "asc-devkit"
               modules: "ophost opapi kernel opgraph"
               source_branch: ${{ env.SOURCE_BRANCH }}
               target_branch: ${{ env.TARGET_BRANCH }}
