@@ -114,7 +114,6 @@
 | 数据搬运 | DataCopyPad(GM->UB) | AIV | PIPE_MTE2 |
 | 数据搬运 | DataCopyPad(UB->GM) | AIV | PIPE_MTE3 |
 | 数据搬运 | DataCopy(UB->UB) | AIV | PIPE_V |
-| 数据搬运 | DataCopy(UB->L1) | AIV | <!-- npu="950" id6 -->针对Ascend 950PR/Ascend 950DT：<br>PIPE_MTE3。<br><!-- end id6 --> |
 | 数据搬运 | Copy | AIV | PIPE_V |
 
 **表2**  Cube API流水类型汇总
@@ -131,6 +130,7 @@
 | LoadDataWithSparse(L1->L0) | AIC | PIPE_MTE1 |
 | DataCopy(L1->BT) | AIC | PIPE_MTE1 |
 | DataCopy(L1->FB) | AIC | PIPE_FIX |
+| DataCopyPad(UB->L1) | AIC | <!-- npu="950" id6 -->针对Ascend 950PR/Ascend 950DT：<br>PIPE_MTE3。<br><!-- end id6 --><!-- npu="A3" id7 -->针对Atlas A3 训练系列产品/Atlas A3 推理系列产品：<br>PIPE_MTE3、PIPE_MTE2。<br><!-- end id7 --><!-- npu="910b" id8 -->针对Atlas A2 训练系列产品/Atlas A2 推理系列产品：<br>PIPE_MTE3、PIPE_MTE2。<br><!-- end id8 --> |
 | Fill(L1) | AIC | PIPE_MTE2 |
 | Fill(L0) | AIC | PIPE_MTE1 |
 | SetFmatrix | AIC | PIPE_S |
