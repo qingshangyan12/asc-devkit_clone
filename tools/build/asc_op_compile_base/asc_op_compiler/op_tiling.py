@@ -30,7 +30,10 @@ from asc_op_compile_base.common.context import get_context as get_op_context
 from asc_op_compile_base.common.context.op_info import OpInfo
 from asc_op_compile_base.common.context import op_context
 from asc_op_compile_base.common.context.op_context import OpContext
-from asc_op_compile_base.common.buildcfg import get_current_build_config
+from asc_op_compile_base.common.buildcfg import (
+    get_current_build_config,
+    get_current_build_config_int,
+)
 
 BANK_CACHE = ""
 
@@ -369,19 +372,10 @@ def do_op_tiling(
     else:
         op_name = ""
 
-    def _safe_int_conversion(value, default=-1):
-        if value is None:
-            return default
-        clean_value = str(value).strip()
-        try:
-            return int(clean_value)
-        except (ValueError, TypeError):
-            return default
-
     enable_deterministic = get_current_build_config("enable_deterministic_mode")
     extra_params = {"op_name": op_name, "deterministic": enable_deterministic}
 
-    deterministic_level = _safe_int_conversion(get_current_build_config("deterministic_level"))
+    deterministic_level = get_current_build_config_int("deterministic_level")
     if deterministic_level != -1:
         extra_params["deterministic_level"] = deterministic_level
 

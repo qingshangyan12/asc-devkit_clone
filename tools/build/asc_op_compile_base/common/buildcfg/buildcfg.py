@@ -144,6 +144,18 @@ def get_current_build_config(key="all"):
     return get_config_value(key, cur_conf)
 
 
+def get_current_build_config_int(key, default=-1):
+    """Get current build configuration and convert it to int."""
+    value = get_current_build_config(key)
+    if value is None:
+        return default
+    clean_value = str(value).strip()
+    try:
+        return int(clean_value)
+    except (ValueError, TypeError):
+        return default
+
+
 def get_default_build_config(key="all"):
     """Get the default build configuration."""
     config_dict = cce_default_static_build_config

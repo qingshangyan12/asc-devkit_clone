@@ -25,7 +25,10 @@ import sys
 import struct
 from asc_op_compile_base.common.ccec import CCECInfo
 from asc_op_compile_base.asc_op_compiler.cce_runtime import tvm_callback_cce_postproc
-from asc_op_compile_base.common.buildcfg import get_current_build_config
+from asc_op_compile_base.common.buildcfg import (
+    get_current_build_config,
+    get_current_build_config_int,
+)
 from asc_op_compile_base.common.platform.platform_info import get_soc_spec, set_soc_spec
 from asc_op_compile_base.common.error_mgr import (
     raise_tbe_python_err,
@@ -351,15 +354,6 @@ the superkernel cannot be integrated with the operator.",
                 AscendCLogLevel.LOG_INFO,
             )
 
-    def _safe_int_conversion(value, default=-1):
-        if value is None:
-            return default
-        clean_value = str(value).strip()
-        try:
-            return int(clean_value)
-        except (ValueError, TypeError):
-            return default
-
     aicore_num = get_context().get_addition("_op_aicore_num")
     vectorcore_num = get_context().get_addition("_op_vectorcore_num")
     has_platformInfo = False
@@ -369,7 +363,7 @@ the superkernel cannot be integrated with the operator.",
             "vectorCoreCnt": int(vectorcore_num)
         }
         has_platformInfo = True
-    deterministic_level = _safe_int_conversion(get_current_build_config("deterministic_level"))
+    deterministic_level = get_current_build_config_int("deterministic_level")
     if deterministic_level != -1:
         if not has_platformInfo:
             js["platformInfo"] = {}
