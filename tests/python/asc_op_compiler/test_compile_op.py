@@ -252,10 +252,39 @@ class TestCompileOp(unittest.TestCase):
             self.assertEqual(kernel["macros"][0]["kind"], "dtype")
             self.assertNotIn("dfx", json.dumps(kernel).lower())
             self.assertNotIn("oom", json.dumps(kernel).lower())
+            base_steps = kernel["build"]["base"]["steps"]
+            self.assertEqual(len(base_steps), 2)
+            self.assertEqual(base_steps[0]["id"], "compile_static_normal")
             self.assertEqual(
-                kernel["build"]["base"]["steps"][0]["id"],
-                "compile_static_normal",
+                base_steps[0]["outputs"], ["intermediates/actual_7.rel.o"]
             )
+            self.assertEqual(
+                base_steps[1],
+                {
+                    "id": "link_static_normal",
+                    "kind": "link",
+                    "argv": [
+                        "-m",
+                        "aicorelinux",
+                        "-Ttext=0",
+                        "${artifact.intermediates/actual_7.rel.o}",
+                        "-static",
+                        "-o",
+                        "${artifact.artifacts/actual_7.o}",
+                        "-q",
+                    ],
+                    "depends_on": ["compile_static_normal"],
+                    "inputs": ["intermediates/actual_7.rel.o"],
+                    "outputs": ["artifacts/actual_7.o"],
+                },
+            )
+            artifact_outputs = [
+                output
+                for step in base_steps
+                for output in step["outputs"]
+                if output.startswith("artifacts/")
+            ]
+            self.assertEqual(artifact_outputs, ["artifacts/actual_7.o"])
 
     def test_decode_mode(self):
         mode1 = decode_mode(10)

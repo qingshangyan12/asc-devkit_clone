@@ -2,27 +2,31 @@
 # coding=utf-8
 
 import hashlib
+import importlib.util
 import json
 import os
-import sys
 import tempfile
 import unittest
 
 FILE_PATH = os.path.dirname(os.path.realpath(__file__))
 TOP_PATH = os.path.join(FILE_PATH, "../../../")
-FRAMEWORK_PATH = os.path.join(TOP_PATH, "tools/build/asc_op_compile_base/")
-sys.path.insert(0, FRAMEWORK_PATH)
-
-from adapter.static_compile_resource_generator import (
-    collect_kernel_symbols,
-    collect_local_include_files,
-    generate_static_compile_resources,
-    parse_compile_option_macros,
-    portable_wrapper_text,
-    resolve_symbol_tiling_sizes,
-    static_tiling_template_text,
-    super_kernel_build_extension,
+MODULE_PATH = os.path.join(
+    TOP_PATH,
+    "tools/build/asc_op_compile_base/adapter/static_compile_resource_generator.py",
 )
+MODULE_SPEC = importlib.util.spec_from_file_location(
+    "adapter_static_compile_resource_generator", MODULE_PATH
+)
+MODULE = importlib.util.module_from_spec(MODULE_SPEC)
+MODULE_SPEC.loader.exec_module(MODULE)
+generate_static_compile_resources = MODULE.generate_static_compile_resources
+collect_kernel_symbols = MODULE.collect_kernel_symbols
+collect_local_include_files = MODULE.collect_local_include_files
+parse_compile_option_macros = MODULE.parse_compile_option_macros
+portable_wrapper_text = MODULE.portable_wrapper_text
+resolve_symbol_tiling_sizes = MODULE.resolve_symbol_tiling_sizes
+static_tiling_template_text = MODULE.static_tiling_template_text
+super_kernel_build_extension = MODULE.super_kernel_build_extension
 
 
 class TestStaticCompileResourceGenerator(unittest.TestCase):
@@ -59,6 +63,12 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             ["compile", "objcopy", "objcopy", "objcopy", "archive", "compile", "link", "link"],
         )
         self.assertIn("${launch.block_dim}", " ".join(steps[0]["argv"]))
+        self.assertEqual(steps[0]["depends_on"], ["link_static_normal"])
+        self.assertEqual(steps[5]["depends_on"], ["link_static_normal"])
+        self.assertNotIn(
+            "compile_static_normal",
+            [dependency for step in steps for dependency in step["depends_on"]],
+        )
         self.assertEqual(steps[-1]["outputs"], ["artifacts/add.static_with_sk.o"])
 
     def test_rewrites_only_the_original_source_include_for_portability(self):

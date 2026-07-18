@@ -1913,8 +1913,10 @@ def _emit_static_compile_resources(
             architecture, kernel_type = _static_resource_arch_and_type(
                 compile_info, tiling_key
             )
-            output_name = re.sub(r"[^A-Za-z0-9_.-]", "_", symbol) + ".o"
+            output_stem = re.sub(r"[^A-Za-z0-9_.-]", "_", symbol)
+            output_name = output_stem + ".o"
             output_logical = "artifacts/" + output_name
+            relocatable_logical = "intermediates/" + output_stem + ".rel.o"
             argv = _static_resource_compile_argv(
                 compile_info,
                 compile_option_tuple,
@@ -1923,7 +1925,7 @@ def _emit_static_compile_resources(
                 symbol,
                 "${resource." + wrapper_logical + "}",
                 "${resource." + tiling_logical + "}",
-                "${artifact." + output_logical + "}",
+                "${artifact." + relocatable_logical + "}",
             )
             build = {
                 "base": {
@@ -1935,8 +1937,21 @@ def _emit_static_compile_resources(
                             "argv": argv,
                             "depends_on": [],
                             "inputs": [wrapper_logical, source_logical, tiling_logical],
+                            "outputs": [relocatable_logical],
+                        },
+                        {
+                            "id": "link_static_normal",
+                            "kind": "link",
+                            "argv": [
+                                "-m", "aicorelinux", "-Ttext=0",
+                                "${artifact." + relocatable_logical + "}",
+                                "-static", "-o",
+                                "${artifact." + output_logical + "}", "-q",
+                            ],
+                            "depends_on": ["compile_static_normal"],
+                            "inputs": [relocatable_logical],
                             "outputs": [output_logical],
-                        }
+                        },
                     ]
                 }
             }

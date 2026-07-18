@@ -64,6 +64,12 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             ["compile", "objcopy", "objcopy", "objcopy", "archive", "compile", "link", "link"],
         )
         self.assertIn("${launch.block_dim}", " ".join(steps[0]["argv"]))
+        self.assertEqual(steps[0]["depends_on"], ["link_static_normal"])
+        self.assertEqual(steps[5]["depends_on"], ["link_static_normal"])
+        self.assertNotIn(
+            "compile_static_normal",
+            [dependency for step in steps for dependency in step["depends_on"]],
+        )
         self.assertEqual(steps[-1]["outputs"], ["artifacts/add.static_with_sk.o"])
 
     def test_rewrites_only_the_original_source_include_for_portability(self):

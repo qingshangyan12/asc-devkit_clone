@@ -203,7 +203,7 @@ def super_kernel_build_extension(
             "kind": "compile",
             "backend": "bisheng",
             "argv": list(sk_argv),
-            "depends_on": ["compile_static_normal"],
+            "depends_on": ["link_static_normal"],
             "inputs": list(sk_inputs),
             "outputs": [sk_output],
         }
@@ -239,7 +239,7 @@ def super_kernel_build_extension(
                 "kind": "compile",
                 "backend": "bisheng",
                 "argv": list(bind_argv),
-                "depends_on": ["compile_static_normal"],
+                "depends_on": ["link_static_normal"],
                 "inputs": [bind_input],
                 "outputs": [bind_output],
             },
