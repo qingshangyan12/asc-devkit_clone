@@ -34,7 +34,7 @@ $$
 \{carry_i, dst_i\} = src0_i - src1_i - carry\_src_i
 $$
 
-Carry flag（进位/借位标志）用于表示加法进位或者减法无借位，若src0，src1，carry_src输入按位相减后最高位有借位，在carry（存放借位的掩码寄存器）中对应位置每4bit设置0，否则写1。
+Carry flag（进位/借位标志）用于表示加法进位或者减法无借位，若src0，src1，carry_src输入按位相减后最高位有借位，在carry（存放借位的掩码寄存器）中对应位置每4bit的最低位写0，否则写1。
 
 ![](../../figures/asc_subc_1.png)
 
