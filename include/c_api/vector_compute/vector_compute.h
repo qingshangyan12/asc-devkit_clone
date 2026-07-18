@@ -19,11 +19,15 @@
 
 #ifndef INCLUDE_C_API_VECTOR_COMPUTE_VECTOR_COMPUTE_H
 #define INCLUDE_C_API_VECTOR_COMPUTE_VECTOR_COMPUTE_H
+#include "impl/utils/common_types.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
+#include "c_api/utils/union.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "impl/c_api/instr_impl/npu_arch_2201/vector_compute_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
+
 #endif
 
 __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int8_t** src_array);
@@ -163,41 +167,18 @@ __aicore__ inline void asc_brcb_sync(
     __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint16_t dst_block_stride, uint16_t dst_repeat_stride,
     uint8_t repeat);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-
 // ==========asc_bitsort(half/float)==========
 __aicore__ inline void asc_bitsort(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat);
-
 __aicore__ inline void asc_bitsort_sync(
     __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat);
-
 __aicore__ inline void asc_bitsort(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, int32_t repeat);
-
 __aicore__ inline void asc_bitsort_sync(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, int32_t repeat);
-
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-
-__aicore__ inline void asc_bitsort(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat);
-
-__aicore__ inline void asc_bitsort_sync(
-    __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat);
-
-__aicore__ inline void asc_bitsort(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, int32_t repeat);
-
-__aicore__ inline void asc_bitsort_sync(
-    __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, int32_t repeat);
-
 // ==========asc_transpose(int16_t/uint16_t)==========
 __aicore__ inline void asc_transpose(__ubuf__ int16_t* dst, __ubuf__ int16_t* src);
-
 __aicore__ inline void asc_transpose_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src);
-
 __aicore__ inline void asc_transpose(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src);
-
 __aicore__ inline void asc_transpose_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src);
-
-#endif
 
 // ==========asc_datablock_reduce(half/float)==========
 __aicore__ inline void asc_datablock_reduce_sum(
@@ -441,6 +422,7 @@ __aicore__ inline void asc_eq_sync(
     uint8_t src1_repeat_stride);
 
 // ==========asc_bfloat162float==========
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __aicore__ inline void asc_bfloat162float(
     __ubuf__ float* dst, __ubuf__ bfloat16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
@@ -448,8 +430,10 @@ __aicore__ inline void asc_bfloat162float(
 __aicore__ inline void asc_bfloat162float(__ubuf__ float* dst, __ubuf__ bfloat16_t* src, uint32_t count);
 
 __aicore__ inline void asc_bfloat162float_sync(__ubuf__ float* dst, __ubuf__ bfloat16_t* src, uint32_t count);
+#endif
 
 // ==========asc_bfloat162int32==========
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __aicore__ inline void asc_bfloat162int32_rna(
     __ubuf__ int32_t* dst, __ubuf__ bfloat16_t* src, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
@@ -489,8 +473,10 @@ __aicore__ inline void asc_bfloat162int32_rz(
 __aicore__ inline void asc_bfloat162int32_rz(__ubuf__ int32_t* dst, __ubuf__ bfloat16_t* src, uint32_t count);
 
 __aicore__ inline void asc_bfloat162int32_rz_sync(__ubuf__ int32_t* dst, __ubuf__ bfloat16_t* src, uint32_t count);
+#endif
 
 // ==========asc_float2bfloat16==========
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __aicore__ inline void asc_float2bfloat16_rn(
     __ubuf__ bfloat16_t* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
@@ -530,6 +516,7 @@ __aicore__ inline void asc_float2bfloat16_rz(
 __aicore__ inline void asc_float2bfloat16_rz(__ubuf__ bfloat16_t* dst, __ubuf__ float* src, uint32_t count);
 
 __aicore__ inline void asc_float2bfloat16_rz_sync(__ubuf__ bfloat16_t* dst, __ubuf__ float* src, uint32_t count);
+#endif
 
 // ==========asc_float2float==========
 __aicore__ inline void asc_float2float_rn(
@@ -721,6 +708,7 @@ __aicore__ inline void asc_half2float(__ubuf__ float* dst, __ubuf__ half* src, u
 __aicore__ inline void asc_half2float_sync(__ubuf__ float* dst, __ubuf__ half* src, uint32_t count);
 
 // ==========asc_half2int4==========
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __aicore__ inline void asc_half2int4(
     __ubuf__ int4b_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
@@ -768,6 +756,7 @@ __aicore__ inline void asc_half2int4_rz(
 __aicore__ inline void asc_half2int4_rz(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count);
 
 __aicore__ inline void asc_half2int4_rz_sync(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count);
+#endif
 
 // ==========asc_half2int8==========
 __aicore__ inline void asc_half2int8(
@@ -941,12 +930,14 @@ __aicore__ inline void asc_duplicate(__ubuf__ uint16_t* dst, uint16_t src, uint3
 
 __aicore__ inline void asc_duplicate_sync(__ubuf__ uint16_t* dst, uint16_t src, uint32_t count);
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __aicore__ inline void asc_duplicate(
     __ubuf__ bfloat16_t* dst, bfloat16_t src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride);
 
 __aicore__ inline void asc_duplicate(__ubuf__ bfloat16_t* dst, bfloat16_t src, uint32_t count);
 
 __aicore__ inline void asc_duplicate_sync(__ubuf__ bfloat16_t* dst, bfloat16_t src, uint32_t count);
+#endif
 
 __aicore__ inline void asc_duplicate(
     __ubuf__ float* dst, float src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride);
@@ -1721,6 +1712,7 @@ __aicore__ inline void asc_deq_int162b8_l(
 __aicore__ inline void asc_deq_int162b8_l_sync(__ubuf__ uint8_t* dst, __ubuf__ int16_t* src, uint32_t count);
 
 // ==========asc_int42half==========
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __aicore__ inline void asc_int42half(
     __ubuf__ half* dst, __ubuf__ int4b_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint8_t dst_repeat_stride, uint8_t src_repeat_stride);
@@ -1728,6 +1720,7 @@ __aicore__ inline void asc_int42half(
 __aicore__ inline void asc_int42half(__ubuf__ half* dst, __ubuf__ int4b_t* src, uint32_t count);
 
 __aicore__ inline void asc_int42half_sync(__ubuf__ half* dst, __ubuf__ int4b_t* src, uint32_t count);
+#endif
 
 // ==========asc_int82half==========
 __aicore__ inline void asc_int82half(
@@ -1867,6 +1860,7 @@ __aicore__ inline void asc_gather(
 __aicore__ inline void asc_gather_sync(
     __ubuf__ half* dst, __ubuf__ half* src, __ubuf__ uint32_t* src_offset, uint32_t count);
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __aicore__ inline void asc_gather(
     __ubuf__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
     uint8_t repeat);
@@ -1876,6 +1870,7 @@ __aicore__ inline void asc_gather(
 
 __aicore__ inline void asc_gather_sync(
     __ubuf__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count);
+#endif
 
 __aicore__ inline void asc_gather(
     __ubuf__ int32_t* dst, __ubuf__ int32_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
@@ -1908,14 +1903,6 @@ __aicore__ inline void asc_gather_sync(
     __ubuf__ float* dst, __ubuf__ float* src, __ubuf__ uint32_t* src_offset, uint32_t count);
 
 // ==========asc_transpose(int16_t/uint16_t)==========
-__aicore__ inline void asc_transpose(__ubuf__ int16_t* dst, __ubuf__ int16_t* src);
-
-__aicore__ inline void asc_transpose_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src);
-
-__aicore__ inline void asc_transpose(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src);
-
-__aicore__ inline void asc_transpose_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src);
-
 // ==========asc_and(int16_t/uint16_t)==========
 __aicore__ inline void asc_and(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride,
@@ -2699,4 +2686,5 @@ __aicore__ inline void asc_squeeze(
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+
 #endif
