@@ -16,11 +16,11 @@
 #define INCLUDE_C_API_REG_COMPUTE_REG_LOAD_H
 #include "impl/utils/common_types.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_type.h"
 #include "c_api/utils/union.h"
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_type.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl.h"
-
 #endif
 
 // ==========源操作数为起初地址，目的数为寄存器=========
@@ -2589,3 +2589,6 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock_postupdate(
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock_postupdate(
     vector_float& dst, __ubuf__ float*& src, int32_t offset);
 
+
+
+#endif
