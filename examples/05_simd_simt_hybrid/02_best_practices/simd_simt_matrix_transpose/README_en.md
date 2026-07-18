@@ -93,7 +93,7 @@ output[col * height + row] = input[i];
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|      36.215       |    33.627    |     55484.7      |      33.181      |     0.987     |        0.434        |      0.013       |
+|      36.263       |    33.620    |     55473.1      |      33.209      |     0.988     |        0.399        |      0.012       |
 
 **Analysis**:
 
@@ -116,20 +116,21 @@ uint32_t loop_end = loop_start + TILES_PER_BLOCK;
 
 // Case 1 launches Thread Blocks by tile group. Each Thread Block processes only its two assigned tiles.
 for (uint32_t tile_base = loop_start; tile_base < loop_end && tile_base < total_tiles; tile_base += loop_step) {
+    asc_lock(PIPE_MTE2, SINGLE_BUFFER_MUTEX);
     copy_gm_2tile_to_ub(&in_tile[0][0][0], input, width, tiles_x, tile_base, total_tiles);
+    asc_unlock(PIPE_MTE2, SINGLE_BUFFER_MUTEX);
+
     // After MTE2 load is complete, the SIMT VF reads the UB input buffer.
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_lock(PIPE_V, SINGLE_BUFFER_MUTEX);
     asc_vf_call<simt_transpose_2tile>(dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1),
                                       &out_tile[0][0][0], &in_tile[0][0][0],
                                       tile_base, total_tiles);
+    asc_unlock(PIPE_V, SINGLE_BUFFER_MUTEX);
+
     // After the SIMT VF writes the output buffer, MTE3 stores the result back to GM.
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_lock(PIPE_MTE3, SINGLE_BUFFER_MUTEX);
     copy_ub_2tile_to_gm(output, &out_tile[0][0][0], height, tiles_x, tile_base, total_tiles);
-    // After MTE3 store is complete, this UB buffer can enter the next MTE2 load.
-    asc_sync_notify(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
+    asc_unlock(PIPE_MTE3, SINGLE_BUFFER_MUTEX);
 }
 ```
 
@@ -137,11 +138,11 @@ for (uint32_t tile_base = loop_start; tile_base < loop_end && tile_base < total_
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|      23.374       |    2.292     |      3781.8      |      1.445       |     0.633     |        0.207        |      0.088       |
+|      23.732       |    2.286     |      3772.6      |      1.454       |     0.638     |        0.198        |      0.085       |
 
 **Analysis**:
 
-Case 1 uses UB staging to convert non-contiguous GM writes into transpose access inside UB. Task Duration decreases from 36.215μs in Case 0 to 23.374μs, a latency reduction of about 35.5%. This version launches Thread Blocks by tile groups. A 1024x1024 matrix contains 1024 tiles, which correspond to 512 Thread Blocks. This count is much larger than the hardware vector core count. Extra Thread Block launch and scheduling overhead is reflected in Task Duration. Therefore, the next step optimizes the mapping from Thread Blocks to tiles.
+Case 1 uses UB staging to convert non-contiguous GM writes into transpose access inside UB. Task Duration decreases from 36.263μs in Case 0 to 23.732μs, a latency reduction of about 34.6%. This version launches Thread Blocks by tile groups. A 1024x1024 matrix contains 1024 tiles, which correspond to 512 Thread Blocks. This count is much larger than the hardware vector core count. Extra Thread Block launch and scheduling overhead is reflected in Task Duration. Therefore, the next step optimizes the mapping from Thread Blocks to tiles.
 
 ---
 
@@ -157,20 +158,21 @@ uint32_t loop_step = block_num * TILES_PER_BLOCK;
 
 // Case 2 fixes the Thread Block count. Each Thread Block loops over multiple tile groups by gridDim.x.
 for (uint32_t tile_base = loop_start; tile_base < total_tiles; tile_base += loop_step) {
+    asc_lock(PIPE_MTE2, SINGLE_BUFFER_MUTEX);
     copy_gm_2tile_to_ub(&in_tile[0][0][0], input, width, tiles_x, tile_base, total_tiles);
+    asc_unlock(PIPE_MTE2, SINGLE_BUFFER_MUTEX);
+
     // After MTE2 load is complete, the SIMT VF reads the UB input buffer.
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_lock(PIPE_V, SINGLE_BUFFER_MUTEX);
     asc_vf_call<simt_transpose_2tile>(dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1),
                                       &out_tile[0][0][0], &in_tile[0][0][0],
                                       tile_base, total_tiles);
+    asc_unlock(PIPE_V, SINGLE_BUFFER_MUTEX);
+
     // After the SIMT VF writes the output buffer, MTE3 stores the result back to GM.
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_lock(PIPE_MTE3, SINGLE_BUFFER_MUTEX);
     copy_ub_2tile_to_gm(output, &out_tile[0][0][0], height, tiles_x, tile_base, total_tiles);
-    // After MTE3 store is complete, this UB buffer can enter the next MTE2 load.
-    asc_sync_notify(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
+    asc_unlock(PIPE_MTE3, SINGLE_BUFFER_MUTEX);
 }
 ```
 
@@ -178,11 +180,11 @@ for (uint32_t tile_base = loop_start; tile_base < total_tiles; tile_base += loop
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|      18.734       |    17.553    |     28961.7      |      11.602      |     0.661     |        0.880        |      0.050       |
+|      18.697       |    17.484    |     28849.4      |      11.559      |     0.661     |        0.846        |      0.048       |
 
 **Analysis**:
 
-Case 2 fixes the Thread Block count to the hardware vector core count. Compared with Case 1, which launches 512 Thread Blocks by tile groups, Case 2 launches and schedules fewer Thread Blocks. Task Duration decreases from 23.374μs to 18.734μs, a latency reduction of about 19.9%. In SIMD and SIMT hybrid programming scenarios, reducing the Thread Block count does not change the transpose logic inside the SIMT VF, and does not introduce extra SIMT-side compute complexity. Unlike the SIMT scenario, this case does not show register spilling. Later versions continue to use 2048 threads and two tiles per iteration. The optimization focus then moves to UB access overhead.
+Case 2 fixes the Thread Block count to the hardware vector core count. Compared with Case 1, which launches 512 Thread Blocks by tile groups, Case 2 launches and schedules fewer Thread Blocks. Task Duration decreases from 23.732μs to 18.697μs, a latency reduction of about 21.2%. In SIMD and SIMT hybrid programming scenarios, reducing the Thread Block count does not change the transpose logic inside the SIMT VF, and does not introduce extra SIMT-side compute complexity. Unlike the SIMT scenario, this case does not show register spilling. Later versions continue to use 2048 threads and two tiles per iteration. The optimization focus then moves to UB access overhead.
 
 ---
 
@@ -239,21 +241,22 @@ uint32_t loop_step = block_num * TILES_PER_BLOCK;
 
 // Case 3 keeps the fixed Thread Block count and loop mapping. It only changes the input tile to a 32x40 padded layout.
 for (uint32_t tile_base = loop_start; tile_base < total_tiles; tile_base += loop_step) {
+    asc_lock(PIPE_MTE2, SINGLE_BUFFER_MUTEX);
     copy_gm_2tile_to_padded_ub(&in_tile[0][0][0], input, width, tiles_x, tile_base, total_tiles);
+    asc_unlock(PIPE_MTE2, SINGLE_BUFFER_MUTEX);
+
     // After MTE2 load is complete, the SIMT VF reads the UB input buffer in the 32x40 padded layout.
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_lock(PIPE_V, SINGLE_BUFFER_MUTEX);
     asc_vf_call<simt_transpose_2tile_pad>(dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1),
                                           &out_tile[0][0][0], &in_tile[0][0][0],
                                           tile_base, total_tiles);
     // Inside simt_transpose_2tile_pad, the input tile is read as 32x40 and the output tile is written as 32x32.
     ...
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_unlock(PIPE_V, SINGLE_BUFFER_MUTEX);
+
+    asc_lock(PIPE_MTE3, SINGLE_BUFFER_MUTEX);
     copy_ub_2tile_to_gm(output, &out_tile[0][0][0], height, tiles_x, tile_base, total_tiles);
-    // Before reusing the single buffer, wait for MTE3 store to complete.
-    asc_sync_notify(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
+    asc_unlock(PIPE_MTE3, SINGLE_BUFFER_MUTEX);
 }
 ```
 
@@ -261,85 +264,54 @@ for (uint32_t tile_base = loop_start; tile_base < total_tiles; tile_base += loop
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|      11.617       |    10.420    |     17192.8      |      4.465       |     0.429     |        0.877        |      0.084       |
+|      11.596       |    10.459    |     17258.2      |      4.465       |     0.427     |        0.853        |      0.081       |
 
 **Analysis**:
 
-Case 3 changes only the physical UB layout based on Case 2. It does not change GM read/write coordinates or the mapping from Thread Blocks to tiles. Compared with Case 2, Task Duration decreases from 18.734μs to 11.617μs, a latency reduction of about 38.0%. This result shows that after GM accesses become contiguous and the Thread Block count is fixed, bank conflicts during SIMT VF transpose access to UB become one of the main bottlenecks.
+Case 3 changes only the physical UB layout based on Case 2. It does not change GM read/write coordinates or the mapping from Thread Blocks to tiles. Compared with Case 2, Task Duration decreases from 18.697μs to 11.596μs, a latency reduction of about 38.0%. This result shows that after GM accesses become contiguous and the Thread Block count is fixed, bank conflicts during SIMT VF transpose access to UB become one of the main bottlenecks.
 
 ---
 
 ### Case 4: MTE Moves Data to UB Before Transpose Write-Back with Padding and Double Buffer
 
-**Optimization Goal**: Use two UB input/output buffers and two event IDs on top of Case 3, so that the MTE2 load, SIMT VF transpose, and MTE3 store pipelines run in parallel.
+**Optimization Goal**: Use two UB input/output buffers and multiple mutex IDs on top of Case 3, so that the MTE2 load, SIMT VF transpose, and MTE3 store pipelines run in parallel.
 
 **Core Implementation**:
 
 - Use two input buffers and two output buffers. Each input buffer contains two 32x40 padded tiles, and each output buffer contains two contiguous 32x32 tiles.
-- Use `EVENT_ID0` and `EVENT_ID1` to manage the lifecycle of the two buffers.
-- First move the first tile group into UB to fill the pipeline.
-- In the loop, start MTE2 movement for the next tile group, and then call the SIMT VF to process the current input/output buffers.
-- After SIMT VF processing is complete, release the current input buffer and use MTE3 to store the current output buffer.
+- Use different `mutex_id` values to manage the lifecycles of the input buffers and output buffers.
+- The SIMT VF waits for the current input buffer to be loaded. Before an output buffer is reused, the SIMT VF waits for the previous MTE3 store on that output buffer to complete.
 
 ```cpp
 __ubuf__ float in_tile[2][TILES_PER_BLOCK][TILE_DIM][TILE_PAD_STRIDE];
 __ubuf__ float out_tile[2][TILES_PER_BLOCK][TILE_DIM][TILE_DIM];
-uint32_t curr_buffer = 0;
-uint32_t curr_event = EVENT_ID0;
 uint32_t loop_count = 0;
 
-// Initialize two events to allow MTE2 to write to both input buffers.
-asc_sync_notify(PIPE_V, PIPE_MTE2, EVENT_ID0);
-asc_sync_notify(PIPE_V, PIPE_MTE2, EVENT_ID1);
+for (uint32_t tile_base = curr_tile_base; tile_base < total_tiles; tile_base += loop_step) {
+    uint32_t curr_buffer = loop_count & 1;
+    uint8_t input_mutex = DB_INPUT_MUTEX_BASE + static_cast<uint8_t>(curr_buffer);
+    uint8_t output_mutex = DB_OUTPUT_MUTEX_BASE + static_cast<uint8_t>(curr_buffer);
 
-// Move the first tile group into UB to fill the pipeline.
-asc_sync_wait(PIPE_V, PIPE_MTE2, curr_event);
-copy_gm_2tile_to_padded_ub(&in_tile[curr_buffer][0][0][0], input, width, tiles_x,
-                           curr_tile_base, total_tiles);
-asc_sync_notify(PIPE_MTE2, PIPE_V, curr_event);
+    asc_lock(PIPE_MTE2, input_mutex);
+    copy_gm_2tile_to_padded_ub(&in_tile[curr_buffer][0][0][0], input, width, tiles_x,
+                               tile_base, total_tiles);
+    asc_unlock(PIPE_MTE2, input_mutex);
 
-for (uint32_t next_tile_base = curr_tile_base + loop_step; curr_tile_base < total_tiles;
-     next_tile_base += loop_step) {
-    // curr_buffer is used by SIMT VF transpose and MTE3 store. next_buffer is used by the next MTE2 load.
-    uint32_t next_buffer = curr_buffer ^ 1;
-    uint32_t next_event = (next_buffer == 0) ? EVENT_ID0 : EVENT_ID1;
-
-    if (next_tile_base < total_tiles) {
-        asc_sync_wait(PIPE_V, PIPE_MTE2, next_event);
-        copy_gm_2tile_to_padded_ub(&in_tile[next_buffer][0][0][0], input, width, tiles_x,
-                                   next_tile_base, total_tiles);
-        asc_sync_notify(PIPE_MTE2, PIPE_V, next_event);
-    }
-
-    asc_sync_wait(PIPE_MTE2, PIPE_V, curr_event);
-    // From the third iteration, wait for the previous MTE3 store before reusing the same output buffer.
-    if (loop_count >= 2) {
-        asc_sync_wait(PIPE_MTE3, PIPE_V, curr_event);
-    }
-    // After the current input buffer is ready, generate contiguous transposed tiles in the current output buffer.
+    // The SIMT VF waits for the current input buffer. It also waits before reusing an output buffer.
+    asc_lock(PIPE_V, input_mutex);
+    asc_lock(PIPE_V, output_mutex);
     asc_vf_call<simt_transpose_2tile_pad>(dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1),
                                           &out_tile[curr_buffer][0][0][0],
                                           &in_tile[curr_buffer][0][0][0],
-                                          curr_tile_base, total_tiles);
-    asc_sync_notify(PIPE_V, PIPE_MTE2, curr_event);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, curr_event);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, curr_event);
+                                          tile_base, total_tiles);
+    asc_unlock(PIPE_V, input_mutex);
+    asc_unlock(PIPE_V, output_mutex);
+
+    asc_lock(PIPE_MTE3, output_mutex);
     copy_ub_2tile_to_gm(output, &out_tile[curr_buffer][0][0][0], height, tiles_x,
-                        curr_tile_base, total_tiles);
-    asc_sync_notify(PIPE_MTE3, PIPE_V, curr_event);
+                        tile_base, total_tiles);
+    asc_unlock(PIPE_MTE3, output_mutex);
     ++loop_count;
-
-    curr_buffer = next_buffer;
-    curr_event = next_event;
-    curr_tile_base = next_tile_base;
-}
-
-// Wait only for MTE3 events that have been issued.
-if (loop_count > 0) {
-    asc_sync_wait(PIPE_MTE3, PIPE_V, EVENT_ID0);
-}
-if (loop_count > 1) {
-    asc_sync_wait(PIPE_MTE3, PIPE_V, EVENT_ID1);
 }
 ```
 
@@ -347,15 +319,15 @@ if (loop_count > 1) {
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|       6.824       |    5.621     |      9275.0      |      4.319       |     0.769     |        0.965        |      0.171       |
+|       6.831       |    5.679     |      9369.6      |      4.334       |     0.764     |        0.904        |      0.159       |
 
 **Analysis**:
 
-Case 4 uses double buffering to provide physical isolation. This avoids MTE2 writes overwriting the input buffer that the SIMT VF is reading. It also avoids SIMT VF writes overwriting the output buffer that MTE3 is storing. Two event IDs manage the lifecycle of the two input/output buffer groups separately. The single-buffer serial barrier sequence of MTE2 load, SIMT VF transpose, and MTE3 store is changed into pipeline overlap between adjacent iterations. Compared with Case 3, Task Duration decreases from 11.617μs to 6.824μs, a latency reduction of about 41.3%. Compared with direct GM transpose in Case 0, Task Duration decreases from 36.215μs to 6.824μs, improving overall performance by about 5.31x.
+Case 4 uses double buffering to provide physical isolation. This avoids MTE2 writes overwriting the input buffer that the SIMT VF is reading. It also avoids SIMT VF writes overwriting the output buffer that MTE3 is storing. Multiple mutex IDs manage the lifecycles of the two input/output buffer groups separately. The single-buffer serial barrier sequence of MTE2 load, SIMT VF transpose, and MTE3 store is changed into pipeline overlap between adjacent iterations. Compared with Case 3, Task Duration decreases from 11.596μs to 6.831μs, a latency reduction of about 41.1%. Compared with direct GM transpose in Case 0, Task Duration decreases from 36.263μs to 6.831μs, improving overall performance by about 5.31x.
 
-Figure 5 and Figure 6 show the simulated instruction timelines of Case 3 and Case 4. Figure 5 shows that Case 3 uses a single buffer to process each tile group serially. After the MTE2 load is complete, `WAIT_FLAG` is required before the SIMT VF reads the data. After the SIMT VF finishes, MTE3 stores the result. Only after MTE3 completes can the same UB buffer be reused by the next MTE2 load. Therefore, the MTE2, SIMT VF, and MTE3 pipelines have clear serial waits. The gaps between SIMT VF executions mainly come from data movement and synchronization.
+Figure 5 and Figure 6 show the simulated instruction timelines of Case 3 and Case 4. Figure 5 shows that Case 3 uses a single buffer to process each tile group serially. After the MTE2 load is complete, the SIMT VF must wait until the input buffer is readable. After the SIMT VF finishes, MTE3 can store the output buffer. Only after MTE3 completes can the same UB buffer be reused by the next MTE2 load. Therefore, the MTE2, SIMT VF, and MTE3 pipelines have clear serial waits. The gaps between SIMT VF executions mainly come from data movement and synchronization.
 
-Figure 6 shows that Case 4 uses double buffering to overlap adjacent iterations. While the current buffer is processed by the SIMT VF and MTE3, the other buffer can start the next MTE2 load in advance. MTE2, SIMT VF, and MTE3 overlap across adjacent iterations. `WAIT_FLAG` mainly protects buffer reuse and cross-pipeline data dependencies. It no longer splits each iteration into full serial load, compute, and store stages. Therefore, Case 4 hides part of the MTE movement and synchronization overhead, further reducing Task Duration. The remaining waits mainly come from the first tile group pre-load having no previous SIMT VF or MTE3 work to overlap with, the final MTE3 store needing to complete, and the required wait before the SIMT VF writes the same output buffer again while its previous MTE3 store is still in progress.
+Figure 6 shows that Case 4 uses double buffering to overlap adjacent iterations. While the current buffer is processed by the SIMT VF and MTE3, the other buffer can start the next MTE2 load in advance. MTE2, SIMT VF, and MTE3 overlap across adjacent iterations. Therefore, Case 4 hides part of the MTE movement and synchronization overhead, further reducing Task Duration. The remaining waits mainly protect buffer reuse and cross-pipeline data dependencies.
 
 **Figure 5: Simulated instruction timeline of Case 3**
 
@@ -375,13 +347,13 @@ The following table shows the performance data of each case when processing a 10
 
 | Case | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | ---- | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-| 0    |      36.215       |    33.627    |     55484.7      |      33.181      |     0.987     |        0.434        |      0.013       |
-| 1    |      23.374       |    2.292     |      3781.8      |      1.445       |     0.633     |        0.207        |      0.088       |
-| 2    |      18.734       |    17.553    |     28961.7      |      11.602      |     0.661     |        0.880        |      0.050       |
-| 3    |      11.617       |    10.420    |     17192.8      |      4.465       |     0.429     |        0.877        |      0.084       |
-| 4    |       6.824       |    5.621     |      9275.0      |      4.319       |     0.769     |        0.965        |      0.171       |
+| 0    |      36.263       |    33.620    |     55473.1      |      33.209      |     0.988     |        0.399        |      0.012       |
+| 1    |      23.732       |    2.286     |      3772.6      |      1.454       |     0.638     |        0.198        |      0.085       |
+| 2    |      18.697       |    17.484    |     28849.4      |      11.559      |     0.661     |        0.846        |      0.048       |
+| 3    |      11.596       |    10.459    |     17258.2      |      4.465       |     0.427     |        0.853        |      0.081       |
+| 4    |       6.831       |    5.679     |      9369.6      |      4.334       |     0.764     |        0.904        |      0.159       |
 
-The main transpose path is Case 0 -> Case 1 -> Case 2 -> Case 3 -> Case 4. Task Duration decreases from 36.215μs to 23.374μs, 18.734μs, 11.617μs, and 6.824μs. Compared with direct GM transpose in Case 0, Case 4 improves performance by about 5.31x.
+The main transpose path is Case 0 -> Case 1 -> Case 2 -> Case 3 -> Case 4. Task Duration decreases from 36.263μs to 23.732μs, 18.697μs, 11.596μs, and 6.831μs. Compared with direct GM transpose in Case 0, Case 4 improves performance by about 5.31x.
 
 Matrix transpose needs to read the complete input matrix from GM and write the complete output matrix back to GM. For a 1024x1024 float matrix, the ideal total GM read/write data volume is:
 
@@ -395,7 +367,7 @@ $$
 T_{theory} = \frac{8.39MB}{1.6TB/s} \approx 5.243μs
 $$
 
-Case 0 is far from the theoretical lower bound. The main reason is that transpose write-back makes write addresses of adjacent threads in the same Warp stride across rows, so GM writes cannot form ideal contiguous accesses. Case 1 uses UB staging to move non-contiguous access into UB, improving access continuity on the GM side. However, it launches 512 Thread Blocks by tile groups, which causes high scheduling overhead. Case 2 fixes the Thread Block count and reduces launch and scheduling overhead, but SIMT VF transpose access to UB still has bank conflicts. Case 3 uses 32x40 UB padding to reduce bank conflicts, so latency decreases significantly. Case 4 further uses double buffering to run the MTE2 load, SIMT VF transpose, and MTE3 store pipelines in parallel. Task Duration decreases to 6.824μs, corresponding to an equivalent GM read/write bandwidth of about 1.23TB/s, or about 76.8% of the 1.6TB/s theoretical GM peak bandwidth of Ascend 950PR. This result is close to the theoretical bandwidth limit, but still higher than the theoretical latency lower bound of 5.243μs. The remaining gap mainly comes from non-GM-bandwidth overheads, including UB reads and writes, synchronization between MTE and V, `asc_vf_call` overhead, address calculation, and incomplete pipeline parallelism. These overheads currently have no clear further optimization method in this implementation path.
+Case 0 is far from the theoretical lower bound. The main reason is that transpose write-back makes write addresses of adjacent threads in the same Warp stride across rows, so GM writes cannot form ideal contiguous accesses. Case 1 uses UB staging to move non-contiguous access into UB, improving access continuity on the GM side. However, it launches 512 Thread Blocks by tile groups, which causes high scheduling overhead. Case 2 fixes the Thread Block count and reduces launch and scheduling overhead, but SIMT VF transpose access to UB still has bank conflicts. Case 3 uses 32x40 UB padding to reduce bank conflicts, so latency decreases significantly. Case 4 further uses double buffering to run the MTE2 load, SIMT VF transpose, and MTE3 store pipelines in parallel. Task Duration decreases to 6.831μs, corresponding to an equivalent GM read/write bandwidth of about 1.23TB/s, or about 76.8% of the 1.6TB/s theoretical GM peak bandwidth of Ascend 950PR. This result is close to the theoretical bandwidth limit, but still higher than the theoretical latency lower bound of 5.243μs. The remaining gap mainly comes from non-GM-bandwidth overheads, including UB reads and writes, synchronization between MTE and V, `asc_vf_call` overhead, address calculation, and incomplete pipeline parallelism. These overheads currently have no clear further optimization method in this implementation path.
 
 ## Tuning Recommendations
 
