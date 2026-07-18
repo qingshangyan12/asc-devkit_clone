@@ -156,7 +156,7 @@
 
 - 支持掩码控制，允许选择性收集数据
     ```cpp
-    __simd_vf__ inline void half2uint8_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, __ubuf__ uint32_t* index_addr, uint32_t count, uint32_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
+    __simd_vf__ inline void gather_datablock_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, __ubuf__ uint32_t* index_addr, uint32_t count, uint32_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
     {
         vector_int8_t dst;
         vector_uint32_t index;
@@ -171,7 +171,7 @@
     ```
 - 无掩码控制，默认收集所有索引对应的数据块
     ```cpp
-    __simd_vf__ inline void half2uint8_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, __ubuf__ uint32_t* index_addr, uint32_t count, uint32_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
+    __simd_vf__ inline void gather_datablock_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, __ubuf__ uint32_t* index_addr, uint32_t count, uint32_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
     {
         vector_int8_t dst;
         vector_uint32_t index;

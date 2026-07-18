@@ -85,7 +85,7 @@
 ## 调用示例
 
 ```cpp
-__simd_vf__ inline void sqrt_vf(__ubuf__ int8_t* dst_addr, int8_t value)
+__simd_vf__ inline void arrange_vf(__ubuf__ int8_t* dst_addr, int8_t value)
 {
     vector_int8_t dst;
     asc_arange(dst, value);

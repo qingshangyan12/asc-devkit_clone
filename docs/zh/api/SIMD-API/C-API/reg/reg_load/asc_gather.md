@@ -178,7 +178,7 @@
 - 收集UB中的元素
 
     ```cpp
-    __simd_vf__ inline void half2uint8_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, __ubuf__ uint16_t* index_addr, uint32_t count, uint32_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
+    __simd_vf__ inline void gather_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, __ubuf__ uint16_t* index_addr, uint32_t count, uint32_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
     {
         vector_half dst;
         vector_uint16_t index;
@@ -195,7 +195,7 @@
 - 收集矢量数据寄存器中的元素
 
     ```cpp
-    __simd_vf__ inline void half2uint8_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, __ubuf__ uint16_t* index_addr, uint32_t count, uint32_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
+    __simd_vf__ inline void gather_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, __ubuf__ uint16_t* index_addr, uint32_t count, uint32_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
     {
         vector_half dst;
         vector_half src;
