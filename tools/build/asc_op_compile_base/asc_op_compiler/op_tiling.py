@@ -143,6 +143,16 @@ else:
     _CUSTOM_TILING_PATH_DEFAULT = os.path.join("op_impl", "custom", tiling_cust_path)
 
 
+def _safe_int_conversion(value, default=-1):
+    if value is None:
+        return default
+    clean_value = str(value).strip()
+    try:
+        return int(clean_value)
+    except (ValueError, TypeError):
+        return default
+
+
 def _get_default_optiling_pathlist():
     default_custom_tiling_full_path_list = []
     vendor_list = []
@@ -369,19 +379,12 @@ def do_op_tiling(
     else:
         op_name = ""
 
-    def _safe_int_conversion(value, default=-1):
-        if value is None:
-            return default
-        clean_value = str(value).strip()
-        try:
-            return int(clean_value)
-        except (ValueError, TypeError):
-            return default
-
     enable_deterministic = get_current_build_config("enable_deterministic_mode")
     extra_params = {"op_name": op_name, "deterministic": enable_deterministic}
 
-    deterministic_level = _safe_int_conversion(get_current_build_config("deterministic_level"))
+    deterministic_level = _safe_int_conversion(
+        get_current_build_config("deterministic_level")
+    )
     if deterministic_level != -1:
         extra_params["deterministic_level"] = deterministic_level
 
