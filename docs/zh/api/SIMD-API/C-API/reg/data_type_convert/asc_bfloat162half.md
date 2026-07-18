@@ -87,9 +87,16 @@ __simd_callee__ inline void asc_bfloat162half_rz_sat(vector_half& dst, vector_bf
 ## 调用示例
 
 ```cpp
-vector_bfloat16_t src;
-vector_half dst;
-vector_bool mask = asc_create_mask_b16(PAT_ALL);
-asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
-asc_bfloat162half_rn(dst, src, mask);
+__simd_vf__ inline void bfloat162half_vf(__ubuf__ half* dst_addr, __ubuf__ bfloat16_t* src_addr, uint32_t count, uint32_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
+{
+    vector_bfloat16_t src;
+    vector_half dst;
+    vector_bool mask;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        mask = asc_update_mask_b16(count);
+        asc_loadalign_postupdate(src, src_addr, one_repeat_size);
+        asc_bfloat162half_rn(dst, src, mask);
+        asc_storealign_postupdate(dst_addr, dst, one_block_size);
+    }
+}
 ```

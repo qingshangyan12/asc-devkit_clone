@@ -79,14 +79,19 @@ __simd_callee__ inline void asc_addc(vector_bool& carry, vector_int32_t& dst, ve
 ## 调用示例
 
 ```cpp
-vector_bool carry;
-vector_uint32_t dst;
-vector_uint32_t src0;
-vector_uint32_t src1;
-vector_bool carry_src = asc_create_mask_b32(PAT_ALLF);
-vector_bool mask = asc_create_mask_b32(PAT_ALL);
-asc_loadalign(src0, src0_addr); // src0_addr是外部输入的UB内存空间地址。
-asc_loadalign(src1, src1_addr); // src1_addr是外部输入的UB内存空间地址。
-// mask为源操作数掩码
-asc_addc(carry, dst, src0, src1, carry_src, mask);
+__simd_vf__ inline void addc_vf(__ubuf__ int32_t* dst_addr, __ubuf__ int32_t* src0_addr, __ubuf__ int32_t* src1_addr, vector_bool carry_src, uint32_t count, uint32_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
+{
+    vector_int32_t src0;
+    vector_int32_t src1;
+    vector_int32_t dst;
+    vector_bool carry;
+    vector_bool mask;
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        mask = asc_update_mask_b32(count);
+        asc_loadalign_postupdate(src0, src0_addr, one_repeat_size);
+        asc_loadalign_postupdate(src1, src1_addr, one_repeat_size);
+        asc_addc(carry, dst, src0, src1, carry_src, mask);
+        asc_storealign_postupdate(dst_addr, dst, one_block_size);
+    }
+}
 ```

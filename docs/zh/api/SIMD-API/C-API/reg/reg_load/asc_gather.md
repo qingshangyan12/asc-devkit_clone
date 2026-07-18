@@ -178,21 +178,35 @@
 - 收集UB中的元素
 
     ```cpp
-    vector_half dst;
-    __ubuf__ half* src = (__ubuf__ half*)asc_get_phy_buf_addr(0);
-    vector_uint16_t index;
-    vector_bool mask = asc_create_mask_b16(PAT_ALL);
-    asc_loadalign(index, index_addr); // index_addr是外部输入的UB内存空间地址。
-    asc_gather(dst, src, index, mask);
+    __simd_vf__ inline void half2uint8_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, __ubuf__ uint16_t* index_addr, uint32_t count, uint32_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
+    {
+        vector_half dst;
+        vector_uint16_t index;
+        vector_bool mask;
+        for (uint16_t i = 0; i < repeat_time; ++i) {
+            mask = asc_update_mask_b16(count);
+            asc_loadalign_postupdate(index, index_addr, one_repeat_size);
+            asc_gather(dst, src_addr, index, mask);
+            asc_storealign_postupdate(dst_addr, dst, one_block_size);
+        }
+    }
     ```
 
 - 收集矢量数据寄存器中的元素
 
     ```cpp
-    vector_half dst;
-    vector_half src;
-    vector_uint16_t index;
-    asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
-    asc_loadalign(index, index_addr); // index_addr是外部输入的UB内存空间地址。
-    asc_gather(dst, src, index);
+    __simd_vf__ inline void half2uint8_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, __ubuf__ uint16_t* index_addr, uint32_t count, uint32_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
+    {
+        vector_half dst;
+        vector_half src;
+        vector_uint16_t index;
+        vector_bool mask;
+        for (uint16_t i = 0; i < repeat_time; ++i) {
+            mask = asc_update_mask_b16(count);
+            asc_loadalign_postupdate(src, src_addr, one_repeat_size);
+            asc_loadalign_postupdate(index, index_addr, one_repeat_size);
+            asc_gather(dst, src, index, mask);
+            asc_storealign_postupdate(dst_addr, dst, one_block_size);
+        }
+    }
     ```

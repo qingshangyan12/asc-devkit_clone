@@ -156,18 +156,29 @@
 
 - 支持掩码控制，允许选择性收集数据
     ```cpp
-    vector_int8_t dst;
-    __ubuf__ int8_t* src = (__ubuf__ int8_t*)asc_get_phy_buf_addr(0);
-    vector_uint32_t index;
-    vector_bool mask = asc_create_mask_b8(PAT_ALL);
-    asc_loadalign(index, index_addr); // index_addr是外部输入的UB内存空间地址。
-    asc_gather_datablock(dst, src, index, mask);
+    __simd_vf__ inline void half2uint8_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, __ubuf__ uint32_t* index_addr, uint32_t count, uint32_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
+    {
+        vector_int8_t dst;
+        vector_uint32_t index;
+        vector_bool mask;
+        for (uint16_t i = 0; i < repeat_time; ++i) {
+            mask = asc_update_mask_b8(count);
+            asc_loadalign_postupdate(index, index_addr, one_repeat_size);
+            asc_gather_datablock(dst, src_addr, index, mask);
+            asc_storealign_postupdate(dst_addr, dst, one_block_size);
+        }
+    }
     ```
 - 无掩码控制，默认收集所有索引对应的数据块
     ```cpp
-    vector_int8_t dst;
-    __ubuf__ int8_t* src = (__ubuf__ int8_t*)asc_get_phy_buf_addr(0);
-    vector_uint32_t index;
-    asc_loadalign(index, index_addr); // index_addr是外部输入的UB内存空间地址。
-    asc_gather_datablock(dst, src, index);
+    __simd_vf__ inline void half2uint8_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, __ubuf__ uint32_t* index_addr, uint32_t count, uint32_t one_repeat_size, uint16_t one_block_size, uint16_t repeat_time)
+    {
+        vector_int8_t dst;
+        vector_uint32_t index;
+        for (uint16_t i = 0; i < repeat_time; ++i) {
+            asc_loadalign_postupdate(index, index_addr, one_repeat_size);
+            asc_gather_datablock(dst, src_addr, index);
+            asc_storealign_postupdate(dst_addr, dst, one_block_size);
+        }
+    }
     ```
