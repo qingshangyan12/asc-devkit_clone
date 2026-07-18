@@ -96,7 +96,7 @@
 | dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
 
-**表1** 参数说明（操作数为掩码寄存器）
+**表2** 参数说明（操作数为掩码寄存器）
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -105,14 +105,14 @@
 
 ## 数据类型
 
-**表2** 数据类型
+**表3** 数据类型
 
 | src | dst |
 | --- | --- |
-| uint8_t | bool |
-| int8_t | bool |
-| uint16_t | bool |
-| int16_t | bool |
+| uint8_t | uint16_t |
+| int8_t | int16_t |
+| uint16_t | uint32_t |
+| int16_t | int32_t |
 | bool | bool |
 
 ## 返回值说明
@@ -146,7 +146,7 @@
     ```cpp
     __simd_vf__ inline void unpack_vf(__ubuf__ uint8_t* dst_addr, __ubuf__ uint8_t* src_addr, uint32_t count, uint32_t one_repeat_size, uint16_t repeat_time)
     {
-        vector_uint32_t src;
+        vector_uint8_t src;
         vector_bool mask0 = asc_create_mask_b8(PAT_ALL);
         vector_bool mask1;
         asc_unpack_lower(mask1, mask0);

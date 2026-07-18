@@ -29,7 +29,7 @@
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
 将dst中数据根据mask进行解压缩。解压缩方式：dst中第0个元素置为0，dst中的第i个元素等于mask中从第0个到第(i-1)个元素中1的数量。mask最高位被忽略不参与统计。
-具体算法如图1所示，dst的首位为0，后续mask[i]对应mask值为1时，dstReg[i]的值为dst[i-1] + 1；mask[i]对应mask值为0时，dst[i]的值为dst[i-1]。
+具体算法如图1所示，dst的首位为0，后续mask[i]对应mask值为1时，dst[i]的值为dst[i-1] + 1；mask[i]对应mask值为0时，dst[i]的值为dst[i-1]。
 
 **图1** unsqueeze流程
 
@@ -52,22 +52,12 @@ __simd_callee__ inline void asc_unsqueeze(vector_uint32_t& dst, vector_bool mask
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| mask | 输入 | 源操作数（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
+| dst | 输入/输出 | 源操作数和目的操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+| mask | 输入 | 源操作数（掩码寄存器）。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。mask用于提供dst解压缩信息。 |
 
 ## 数据类型
 
-目的操作数支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t。源操作数支持的数据类型为：bool。
-**表2** 数据类型
-
-| src | dst |
-| --- | --- |
-| bool | int8_t |
-| bool | uint8_t |
-| bool | int16_t |
-| bool | uint16_t |
-| bool | int32_t |
-| bool | uint32_t |
+dst支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t。mask支持的数据类型为：bool。
 
 
 ## 返回值说明
