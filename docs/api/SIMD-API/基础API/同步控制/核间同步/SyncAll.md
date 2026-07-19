@@ -155,7 +155,6 @@ SyncAll硬件同步和软件同步接口的内部实现不同，约束条件也�
     - ubWorkspace申请的空间大小要求大于等于GetBlockNum()*32Bytes。
     - 在纯Vector算子场景中，若所有AIV核默认参与同步，推荐采用性能更优的硬件同步接口；若需指定部分AIV核参与同步，则应使用软件同步接口，并通过入参usedCores完成配置。
     - usedCores传入数值不能超过算子调用时指定的逻辑AI Core中AIV的数量：GetBlockNum()*GetTaskRatio()，不传此参数表示全核软同步。
-    - <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，SyncAll软同步接口内部实现中标量单元连续读取相同GM地址时用于进行多核同步，会造成Bus被长期占用，导致其他核无法访问该GM，导致多核读同一GM出现卡死现象。若需要Polling，建议在该使用接口间，增加Nop指令，指令量建议为800个，一般为需要同步的核数 * 200。</cann-filter>
     
 - 硬件同步接口约束：
     - 使用硬同步接口时，需根据场景使用合适的核函数修饰符：
