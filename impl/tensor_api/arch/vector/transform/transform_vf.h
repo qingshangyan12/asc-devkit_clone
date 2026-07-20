@@ -28,9 +28,9 @@ namespace AscendC {
 namespace Te {
 
 template<typename CalcFunc, typename TraitType>
-class Transform2VF {
+class Transform2Reg {
 private:
-    using Sets = Transform2VFSet<CalcFunc, TraitType>;
+    using Sets = Transform2RegSet<CalcFunc, TraitType>;
     using transformSet = typename Sets::transformSet;
 
     template <typename Input>
@@ -38,11 +38,12 @@ private:
 
 public:
     template<typename... Args>
-    __aicore__ inline static void Run(const Args&... args) {
+    __simd_callee__ inline static void Run(Args&... args) {
         using func = Find<CalcFunc>;
         func::Run(args...);
     }
 };
+
 
 }
 }

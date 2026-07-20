@@ -29,40 +29,13 @@ namespace AscendC {
 namespace Te {
 
 template<typename CalcFunc, typename TraitType>
-class BinaryVF {
-public:
-    template<typename RegType, typename T>
-    __simd_vf__ inline static void Run(__ubuf__ T* dst, __ubuf__ T* src0, __ubuf__ T* src1, uint32_t dataSize)
-    {
-        constexpr uint32_t oneRepSize = static_cast<uint32_t>(asc_get_vf_len() / sizeof(T));
-        uint16_t repeat = static_cast<uint16_t>((dataSize + oneRepSize - 1) / oneRepSize);
-
-        vector_bool vmask;
-        RegType reg_src0;
-        RegType reg_src1;
-        RegType reg_dst;
-
-        for (uint16_t i = 0; i < repeat; ++i) {
-            vmask = Inst::UpdateMask::template Run<uint32_t>(dataSize);
-            asc_loadalign(reg_src0, src0 + i * oneRepSize);
-            asc_loadalign(reg_src1, src1 + i * oneRepSize);
-            CalcFunc::template Run<RegType>(reg_dst, reg_src0, reg_src1, vmask);
-            asc_storealign(dst + i * oneRepSize, reg_dst, vmask);
-        }
-    }
-};
-
-template<typename CalcFunc, typename TraitType>
-class Transform2BinaryVF {
+class Transform2BinaryReg {
 public:
     template<typename T, typename U, typename V>
-    __aicore__ inline static void Run(const T& dst, const U& src0, const V& src1)
+    __simd_callee__ inline static void Run(T& dst, U& src0, V& src1, vector_bool mask)
     {
-        using type = GetAttributeElementType<typename T::elementType*>;
-        using RegType = typename VectorTypeTransform::template Get<type>;
-        uint32_t dataSize = dst.Size();
-        
-        BinaryVF<CalcFunc, TraitType>::template Run<RegType, type>(dst.Data().Get(), src0.Data().Get(), src1.Data().Get(), dataSize);
+        CalcFunc::template Run<T>(dst, src0, src1, mask);
+        // asc_add(dst, src0, src1, mask);
     }
 };
 
