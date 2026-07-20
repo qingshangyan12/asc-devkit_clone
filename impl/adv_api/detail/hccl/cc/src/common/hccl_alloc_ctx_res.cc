@@ -135,6 +135,14 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSi
     CHK_RET(HcclEngineCtxCreate(comm, tagComParam.c_str(), COMM_ENGINE_AIV, comParamBufSize, &comParamPtr));
     CHK_RET(HcclEngineCtxCreate(comm, tagComSync.c_str(), COMM_ENGINE_AIV, comSyncBufSize, &comSyncPtr));
 
+    uint64_t ckeTokenInfo = hcomm::CcuRep::GetTokenInfo(
+        reinterpret_cast<uint64_t>(comSyncPtr), comSyncBufSize);
+    HCCL_INFO(
+        "[CcuTokenTrace][ComSync] ckeAddr[0x%llx], size[%llu], token[0x%llx]",
+        reinterpret_cast<unsigned long long>(comSyncPtr),
+        static_cast<unsigned long long>(comSyncBufSize),
+        static_cast<unsigned long long>(ckeTokenInfo));
+
     opResCtx.workSpace = reinterpret_cast<uint64_t>(workspacePtr);
     opResCtx.workSpaceSize = Hccl::MC2_WORKSPACE_SIZE;
     opResCtx.rankId = userRank;
