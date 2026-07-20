@@ -108,11 +108,14 @@ jobs:
     runs-on: [dedicate-hosted, '${{ jobs.ut.outputs.host_type }}', xlarge]
     container:
       image: swr.cn-north-4.myhuaweicloud.com/ci_cann/${{ inputs.image_version }}
-    # if: ${{ inputs.type != 'UT_Test_arm' }}
-    # runs-on: [dedicate-hosted, x64, xlarge]
-    # container:
-    #   image: swr.cn-north-4.myhuaweicloud.com/ci_cann/${{ inputs.image_version }}
-    # if: ${{ inputs.type }}
-    # runs-on: [dedicate-hosted, arm, xlarge]
-    # container:
-    #   image: swr.cn-north-4.myhuaweicloud.com/ci_cann/${{ inputs.image_version }}
+  JOB_2:
+          name: static check
+          select: selected_by_default
+          needs: []
+          steps:
+            -
+              name: 执行shell
+              run: echo '${{ jobs.ut.outputs.host_type }}
+          if: "${{ default() }}"
+          runs-on:
+          - default
