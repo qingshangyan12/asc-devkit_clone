@@ -306,9 +306,9 @@
 
             -   [数据搬运](SIMD-API/基础API/Memory矢量计算/数据搬运/数据搬运.md)
                 -   [GM与UB数据搬运](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB数据搬运.md)
-                    -   [GM与UB连续数据搬运(DataCopy)](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMToUB_continuous.md)
-                    -   [GM与UB高维切分数据搬运(DataCopy)](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMToUB_highdim_split.md)
-                    -   [GM与UB切片数据搬运(DataCopy)](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMToUB_slice.md)
+                    -   [GM与UB连续数据搬运(DataCopy)](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMAndUB_continuous.md)
+                    -   [GM与UB高维切分数据搬运(DataCopy)](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMAndUB_highdim_split.md)
+                    -   [GM与UB切片数据搬运(DataCopy)](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMAndUB_slice.md)
                     -   [GMToUB随路转换ND2NZ搬运(DataCopy)](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMToUB_ND2NZ.md)
                     -   [UBToGM随路转换NZ2ND搬运(DataCopy)](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_UBToGM_NZ2ND.md)
                     -   [GMToUB多维数据搬运NDDMA(DataCopy)](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMToUB_NDDMA.md)

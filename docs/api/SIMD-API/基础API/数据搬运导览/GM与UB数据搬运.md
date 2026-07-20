@@ -36,7 +36,7 @@ Global Memory（GM）与Unified Buffer（UB）之间的数据搬运提供了多�
     - CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
     <!-- end id1 -->
 
-搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[GM与UB连续数据搬运(DataCopy)](../Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMToUB_continuous.md)。
+搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[GM与UB连续数据搬运(DataCopy)](../Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMAndUB_continuous.md)。
 
 src和dst分别为源操作数和目的操作数；count为连续搬运的元素个数。
 
@@ -70,7 +70,7 @@ src和dst分别为源操作数和目的操作数；count为连续搬运的元素
     - CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
     <!-- end id2 -->
 
-搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[GM与UB高维切分数据搬运(DataCopy)](../Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMToUB_highdim_split.md)。
+搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[GM与UB高维切分数据搬运(DataCopy)](../Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMAndUB_highdim_split.md)。
 
 src和dst分别为源操作数和目的操作数；repeatParams为DataCopyParams类型的搬运参数，通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。
 
@@ -102,7 +102,7 @@ src和dst分别为源操作数和目的操作数；repeatParams为DataCopyParams
     - CO2 -> GM（仅Atlas 推理系列产品AI Core支持）
     <!-- end id3 -->
 
-搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[GM与UB切片数据搬运(DataCopy)](../Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMToUB_slice.md)。
+搬运的数据用于[矢量计算](../Memory矢量计算/Memory矢量计算.md)，具体的接口请参考：[GM与UB切片数据搬运(DataCopy)](../Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMAndUB_slice.md)。
 
 src和dst分别为源操作数和目的操作数；dstSliceInfo和srcSliceInfo分别为目的和源操作数的切片信息，类型为SliceInfo；dimValue为操作数维度信息。
 

@@ -159,7 +159,7 @@ template <typename T> struct is_tensorTrait
     <td class="cellrowborder" valign="top" width="63.31%" headers="mcps1.2.3.1.2 "><p id="p286711411582"><a name="p286711411582"></a><a name="p286711411582"></a>Gather、Gatherb、Scatter</p>
     </td>
     </tr>
-    <tr id="row673710289580"><td class="cellrowborder" valign="top" width="36.69%" headers="mcps1.2.3.1.1 "><p id="p773717281588"><a name="p773717281588"></a><a name="p773717281588"></a>基础API&gt;矢量计算&gt;data_rearrange_ISASI</p>
+    <tr id="row673710289580"><td class="cellrowborder" valign="top" width="36.69%" headers="mcps1.2.3.1.1 "><p id="p773717281588"><a name="p773717281588"></a><a name="p773717281588"></a>基础API基础API&gt;矢量计算&gt;data_rearrange_ISASIgt;矢量计算基础API&gt;矢量计算&gt;data_rearrange_ISASIgt;数据重排（ISASI）</p>
     </td>
     <td class="cellrowborder" valign="top" width="63.31%" headers="mcps1.2.3.1.2 "><p id="p1473732895810"><a name="p1473732895810"></a><a name="p1473732895810"></a>Interleave、DeInterleave</p>
     </td>

@@ -20,7 +20,7 @@
 | [complex32/complex64](数据结构/辅助数据结构/complex32-complex64.md) | 复数类型，complex32实部和虚部都是half类型位宽32位，complex64实部和虚部都是float类型位宽64位。 |
 | [TPosition](数据结构/辅助数据结构/TPosition.md) | 用一种抽象的逻辑位置（TPosition）来表达各级别的存储，代替片上物理存储的概念。主要类型包括：VECIN、VECOUT、VECCALC、A1、A2、B1、B2、CO1、CO2。 |
 
-## cube_compute_ISASI
+## 矩阵计算（ISASI）
 
 ### 矩阵数据搬入至L0-Buffer
 
@@ -101,7 +101,7 @@
 | [SetFixPipeClipRelu](cube_compute_ISASI/矩阵计算的搬出/寄存器配置说明/SetFixPipeClipRelu.md) | DataCopy数据搬运（L0C-\>GM）过程中进行随路量化后，通过调用该接口设置ClipReLU操作的最大值。 |
 | [SetFixPipeAddr](cube_compute_ISASI/矩阵计算的搬出/寄存器配置说明/SetFixPipeAddr.md) | DataCopy数据搬运（L0C-\>GM）过程中进行随路量化后，通过调用该接口设置Elementwise操作时LocalTensor的地址。 |
 
-## cube_compute_TensorAPI
+## 矩阵计算（TensorAPI）
 
 ### 矩阵数据搬入至L1
 
@@ -138,9 +138,9 @@
 ### 数据搬运
 | 接口名 | 功能描述 |
 | --- | --- |
-| [GM与UB连续数据搬运(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMToUB_continuous.md) | 支持Global Memory与Unified Buffer之间的连续数据搬运，数据在传输过程中保持原始格式和内容不变。 |
-| [GM与UB高维切分数据搬运(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMToUB_highdim_split.md) | 支持Global Memory与Unified Buffer之间的高维切分数据搬运，数据在传输过程中保持原始格式和内容不变。 |
-| [GM与UB切片数据搬运(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMToUB_slice.md) | 该接口为软仿接口，从易用性角度出发进行设计，支持数据的切片搬运，提取多维Tensor数据的子集进行搬运。 |
+| [GM与UB连续数据搬运(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMAndUB_continuous.md) | 支持Global Memory与Unified Buffer之间的连续数据搬运，数据在传输过程中保持原始格式和内容不变。 |
+| [GM与UB高维切分数据搬运(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMAndUB_highdim_split.md) | 支持Global Memory与Unified Buffer之间的高维切分数据搬运，数据在传输过程中保持原始格式和内容不变。 |
+| [GM与UB切片数据搬运(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMAndUB_slice.md) | 该接口为软仿接口，从易用性角度出发进行设计，支持数据的切片搬运，提取多维Tensor数据的子集进行搬运。 |
 | [GMToUB随路转换ND2NZ搬运(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMToUB_ND2NZ.md) | 该接口为软仿接口，从易用性角度出发进行设计，支持在从Global Memory到Unified Buffer的数据搬运过程中进行ND到NZ格式的转换。 |
 | [UBToGM随路转换NZ2ND搬运(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_UBToGM_NZ2ND.md) | 该接口为软仿接口，从易用性角度出发进行设计，支持在从Unified Buffer到Global Memory的数据搬运过程中进行NZ到ND格式的转换。 |
 | [GMToUB多维数据搬运NDDMA(DataCopy)](Memory矢量计算/数据搬运/GM与UB数据搬运/DataCopy_GMToUB_NDDMA.md) | 多维数据搬运接口，相比于基础数据搬运接口，可更加自由配置搬入的维度信息以及对应的Stride。 |
@@ -263,7 +263,7 @@
 | [CreateVecIndex](Memory矢量计算/数据填充/CreateVecIndex.md) | CreateVecIndex接口创建指定起始值的向量索引。 |
 | [VectorPadding(ISASI)](Memory矢量计算/数据填充/VectorPadding_ISASI.md) | 根据padMode（pad模式）与padSide（pad方向）对源操作数按照datablock进行填充操作。 |
 
-### sort_and_merge_ISASI
+### 排序组合（ISASI）
 | 接口名 | 功能描述 |
 | --- | --- |
 | [ProposalConcat](Memory矢量计算/sort_and_merge_ISASI/ProposalConcat.md) | 将连续元素合入Region Proposal内对应位置，每次迭代会将16个连续元素合入到16个Region Proposals的对应位置里。 |
@@ -289,7 +289,7 @@
 | [SetVectorMask](Memory矢量计算/掩码操作/SetVectorMask.md) | 本接口用于在矢量计算时设置mask。 |
 | [ResetMask](Memory矢量计算/掩码操作/ResetMask.md) | 恢复mask的值为默认值（全1），表示矢量计算中每次迭代内的所有元素都将参与运算。 |
 
-### data_rearrange_ISASI
+### 数据重排（ISASI）
 | 接口名 | 功能描述 |
 | --- | --- |
 | [Interleave](Memory矢量计算/data_rearrange_ISASI/Interleave.md) | 给定源操作数src0和src1，将src0和src1中的元素交织存入结果操作数dst0和dst1中。 |
@@ -586,7 +586,7 @@
 | [GetSubBlockNum(ISASI)](工具接口/系统资源与变量/GetSubBlockNum_ISASI.md) | 在分离模式架构下，获取当前配置中，一个逻辑AI Core上Cube Core（AIC）或者Vector Core（AIV）的数量。 |
 | [GetSubBlockIdx(ISASI)](工具接口/系统资源与变量/GetSubBlockIdx_ISASI.md) | 在分离模式架构下，获取逻辑AI Core上Cube Core（AIC）或者Vector Core（AIV）的逻辑索引。 |
 
-## cube_group_mgmt_ISASI
+## Cube分组管理（ISASI）
 | 接口名 | 功能描述 |
 | --- | --- |
 | [CreateCubeResGroup](cube_group_mgmt_ISASI/CubeResGroupHandle/CreateCubeResGroup.md) | 快速创建CubeResGroupHandle对象，内部完成消息队列空间和同步事件分配。推荐使用该接口，避免使用CubeResGroupHandle的构造函数创建对象，出现不同对象的消息队列空间冲突、同步事件错误等情况。 |

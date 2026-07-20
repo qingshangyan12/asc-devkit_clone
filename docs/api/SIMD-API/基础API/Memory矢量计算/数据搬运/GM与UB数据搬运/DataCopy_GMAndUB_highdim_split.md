@@ -44,7 +44,7 @@
 
 ## 函数原型<a name="section1954364615315"></a>
 
-接口同时支持非连续搬运和连续搬运，对于连续搬运场景，推荐使用[GM与UB连续数据搬运\(DataCopy\)](DataCopy_GMToUB_continuous.md)。
+接口同时支持非连续搬运和连续搬运，对于连续搬运场景，推荐使用[GM与UB连续数据搬运\(DataCopy\)](DataCopy_GMAndUB_continuous.md)。
 
 - Global Memory -> Unified Buffer
 
@@ -87,7 +87,7 @@
 
 下面的样例通过两个示例展示连续搬运和非连续搬运的使用方式。
 
-针对连续搬运场景，推荐使用[GM与UB连续数据搬运\(DataCopy\)](DataCopy_GMToUB_continuous.md)，以下示例仅展示高维切分数据搬运接口具有连续搬运能力。
+针对连续搬运场景，推荐使用[GM与UB连续数据搬运\(DataCopy\)](DataCopy_GMAndUB_continuous.md)，以下示例仅展示高维切分数据搬运接口具有连续搬运能力。
 
 - 示例1：连续搬运
 
