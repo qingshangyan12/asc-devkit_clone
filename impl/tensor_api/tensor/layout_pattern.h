@@ -48,7 +48,7 @@ ASCENDC_HOST_AICORE inline constexpr auto MakePatternLayout(const ShapeType& sha
 }
 
 template <typename LayoutPattern, typename TraitType, typename Batch, typename LayoutType>
-__aicore__ inline constexpr auto MakeBatchPatternLayout(const Batch& batch, const LayoutType& layout)
+ASCENDC_HOST_AICORE inline constexpr auto MakeBatchPatternLayout(const Batch& batch, const LayoutType& layout)
 {
     return MakePatternLayout<LayoutPattern, TraitType>(
         MakeShape(batch, layout.Shape()), MakeStride(layout.Capacity(), layout.Stride()));
@@ -56,7 +56,7 @@ __aicore__ inline constexpr auto MakeBatchPatternLayout(const Batch& batch, cons
 
 struct MakeNzFrameLayout {
     template <typename TraitType, typename T, typename U>
-    __aicore__ inline static auto Make(T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(T row, U column)
     {
         constexpr auto c0Ele = TraitType::C0_ELEMENT;
         auto shape = MakeShape(
@@ -70,7 +70,7 @@ struct MakeNzFrameLayout {
     }
 
     template <typename TraitType, typename Batch, typename T, typename U>
-    __aicore__ inline static auto Make(Batch batch, T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(Batch batch, T row, U column)
     {
         return MakeBatchPatternLayout<NZLayoutPtn, TraitType>(batch, Make<TraitType>(row, column));
     }
@@ -78,7 +78,7 @@ struct MakeNzFrameLayout {
 
 struct MakeNDExtFrameLayout {
     template <typename TraitType, typename T, typename U>
-    __aicore__ inline static auto Make(T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(T row, U column)
     {
         auto shape = MakeShape(MakeShape(_1{}, row), MakeShape(_1{}, column));
         auto stride = MakeStride(MakeStride(_0{}, column), MakeStride(_0{}, _1{}));
@@ -87,7 +87,7 @@ struct MakeNDExtFrameLayout {
     }
 
     template <typename TraitType, typename Batch, typename T, typename U>
-    __aicore__ inline static auto Make(Batch batch, T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(Batch batch, T row, U column)
     {
         return MakeBatchPatternLayout<NDExtLayoutPtn, TraitType>(batch, Make<TraitType>(row, column));
     }
@@ -95,7 +95,7 @@ struct MakeNDExtFrameLayout {
 
 struct MakeNDFrameLayout {
     template <typename TraitType, typename T, typename U>
-    __aicore__ inline static auto Make(T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(T row, U column)
     {
         auto shape = MakeShape(row, column);
         auto stride = MakeStride(column, _1{});
@@ -104,7 +104,7 @@ struct MakeNDFrameLayout {
     }
 
     template <typename TraitType, typename Batch, typename T, typename U>
-    __aicore__ inline static auto Make(Batch batch, T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(Batch batch, T row, U column)
     {
         return MakeBatchPatternLayout<NDLayoutPtn, TraitType>(batch, Make<TraitType>(row, column));
     }
@@ -112,7 +112,7 @@ struct MakeNDFrameLayout {
 
 struct MakeZnFrameLayout {
     template <typename TraitType, typename T, typename U>
-    __aicore__ inline static auto Make(T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(T row, U column)
     {
         constexpr auto c0Ele = TraitType::C0_ELEMENT;
         auto shape = MakeShape(
@@ -126,7 +126,7 @@ struct MakeZnFrameLayout {
     }
 
     template <typename TraitType, typename Batch, typename T, typename U>
-    __aicore__ inline static auto Make(Batch batch, T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(Batch batch, T row, U column)
     {
         return MakeBatchPatternLayout<ZNLayoutPtn, TraitType>(batch, Make<TraitType>(row, column));
     }
@@ -134,7 +134,7 @@ struct MakeZnFrameLayout {
 
 struct MakeDNFrameLayout {
     template <typename TraitType, typename T, typename U>
-    __aicore__ inline static auto Make(T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(T row, U column)
     {
         auto shape = MakeShape(row, column);
         auto stride = MakeStride(_1{}, row);
@@ -143,7 +143,7 @@ struct MakeDNFrameLayout {
     }
 
     template <typename TraitType, typename Batch, typename T, typename U>
-    __aicore__ inline static auto Make(Batch batch, T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(Batch batch, T row, U column)
     {
         return MakeBatchPatternLayout<DNLayoutPtn, TraitType>(batch, Make<TraitType>(row, column));
     }
@@ -151,7 +151,7 @@ struct MakeDNFrameLayout {
 
 struct MakeDNExtFrameLayout {
     template <typename TraitType, typename T, typename U>
-    __aicore__ inline static auto Make(T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(T row, U column)
     {
         auto shape = MakeShape(MakeShape(_1{}, row), MakeShape(_1{}, column));
         auto stride = MakeStride(MakeStride(_0{}, _1{}), MakeStride(_0{}, row));
@@ -160,7 +160,7 @@ struct MakeDNExtFrameLayout {
     }
 
     template <typename TraitType, typename Batch, typename T, typename U>
-    __aicore__ inline static auto Make(Batch batch, T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(Batch batch, T row, U column)
     {
         return MakeBatchPatternLayout<DNExtLayoutPtn, TraitType>(batch, Make<TraitType>(row, column));
     }
@@ -168,7 +168,7 @@ struct MakeDNExtFrameLayout {
 
 struct MakeZzFrameLayout {
     template <typename TraitType, typename T, typename U>
-    __aicore__ inline static auto Make(T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(T row, U column)
     {
         constexpr auto c0Ele = TraitType::C0_ELEMENT;
         auto shape = MakeShape(
@@ -182,7 +182,7 @@ struct MakeZzFrameLayout {
     }
 
     template <typename TraitType, typename Batch, typename T, typename U>
-    __aicore__ inline static auto Make(Batch batch, T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(Batch batch, T row, U column)
     {
         return MakeBatchPatternLayout<ZZLayoutPtn, TraitType>(batch, Make<TraitType>(row, column));
     }
@@ -190,7 +190,7 @@ struct MakeZzFrameLayout {
 
 struct MakeNnFrameLayout {
     template <typename TraitType, typename T, typename U>
-    __aicore__ inline static auto Make(T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(T row, U column)
     {
         constexpr auto c0Ele = TraitType::C0_ELEMENT;
         static_assert(c0Ele == 2, "NnLayoutPtn only supports fp8_e8m0_t and ShapeColumn0 as 2.");
@@ -204,7 +204,7 @@ struct MakeNnFrameLayout {
     }
 
     template <typename TraitType, typename Batch, typename T, typename U>
-    __aicore__ inline static auto Make(Batch batch, T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(Batch batch, T row, U column)
     {
         return MakeBatchPatternLayout<NNLayoutPtn, TraitType>(batch, Make<TraitType>(row, column));
     }
@@ -212,7 +212,7 @@ struct MakeNnFrameLayout {
 
 struct MakeScaleANDFrameLayout {
     template <typename TraitType, typename T, typename U>
-    __aicore__ inline static auto Make(T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(T row, U column)
     {
         constexpr auto c0Ele = TraitType::C0_ELEMENT;
         static_assert(c0Ele == 2, "ScaleANDLayoutPtn only supports fp8_e8m0_t and ShapeColumn0 as 2.");
@@ -223,7 +223,7 @@ struct MakeScaleANDFrameLayout {
     }
 
     template <typename TraitType, typename Batch, typename T, typename U>
-    __aicore__ inline static auto Make(Batch batch, T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(Batch batch, T row, U column)
     {
         return MakeBatchPatternLayout<ScaleANDLayoutPtn, TraitType>(batch, Make<TraitType>(row, column));
     }
@@ -231,7 +231,7 @@ struct MakeScaleANDFrameLayout {
 
 struct MakeScaleADNFrameLayout {
     template <typename TraitType, typename T, typename U>
-    __aicore__ inline static auto Make(T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(T row, U column)
     {
         constexpr auto c0Ele = TraitType::C0_ELEMENT;
         static_assert(c0Ele == 2, "ScaleADNLayoutPtn only supports fp8_e8m0_t and ShapeColumn0 as 2.");
@@ -242,7 +242,7 @@ struct MakeScaleADNFrameLayout {
     }
 
     template <typename TraitType, typename Batch, typename T, typename U>
-    __aicore__ inline static auto Make(Batch batch, T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(Batch batch, T row, U column)
     {
         return MakeBatchPatternLayout<ScaleADNLayoutPtn, TraitType>(batch, Make<TraitType>(row, column));
     }
@@ -250,7 +250,7 @@ struct MakeScaleADNFrameLayout {
 
 struct MakeScaleBNDFrameLayout {
     template <typename TraitType, typename T, typename U>
-    __aicore__ inline static auto Make(T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(T row, U column)
     {
         constexpr auto c0Ele = TraitType::C0_ELEMENT;
         static_assert(c0Ele == 2, "ScaleBNDLayoutPtn only supports fp8_e8m0_t and ShapeColumn0 as 2.");
@@ -261,7 +261,7 @@ struct MakeScaleBNDFrameLayout {
     }
 
     template <typename TraitType, typename Batch, typename T, typename U>
-    __aicore__ inline static auto Make(Batch batch, T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(Batch batch, T row, U column)
     {
         return MakeBatchPatternLayout<ScaleBNDLayoutPtn, TraitType>(batch, Make<TraitType>(row, column));
     }
@@ -269,7 +269,7 @@ struct MakeScaleBNDFrameLayout {
 
 struct MakeScaleBDNFrameLayout {
     template <typename TraitType, typename T, typename U>
-    __aicore__ inline static auto Make(T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(T row, U column)
     {
         auto shape = MakeShape(MakeShape(_1{}, row), MakeShape(_1{}, column));
         auto stride = MakeStride(MakeStride(_0{}, _1{}), MakeStride(_0{}, row));
@@ -278,7 +278,7 @@ struct MakeScaleBDNFrameLayout {
     }
 
     template <typename TraitType, typename Batch, typename T, typename U>
-    __aicore__ inline static auto Make(Batch batch, T row, U column)
+    ASCENDC_HOST_AICORE inline static auto Make(Batch batch, T row, U column)
     {
         return MakeBatchPatternLayout<ScaleBDNLayoutPtn, TraitType>(batch, Make<TraitType>(row, column));
     }

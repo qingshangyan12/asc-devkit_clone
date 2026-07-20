@@ -91,10 +91,10 @@ template <typename Tensor, typename Coord, typename Info>
 __aicore__ inline constexpr decltype(auto) Slice(Tensor&& tensor, const Coord& coord, const Info& info);
 
 template <typename LayoutPattern, typename TraitType, typename... Args>
-__aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args);
+ASCENDC_HOST_AICORE inline constexpr decltype(auto) MakeFrameLayout(const Args&... args);
 
 template <typename LayoutPattern, size_t C0Element, typename... Args>
-__aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args);
+ASCENDC_HOST_AICORE inline constexpr decltype(auto) MakeFrameLayout(const Args&... args);
 
 template <size_t... SqueezeDims, typename T, typename Enable>
 __aicore__ inline constexpr auto Squeeze(const T& x);
