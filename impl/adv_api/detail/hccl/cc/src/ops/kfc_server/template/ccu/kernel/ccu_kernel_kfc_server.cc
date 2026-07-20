@@ -226,17 +226,17 @@ void LoadFuncParamFromMemory(ccu::Variable &paramAddr, ccu::Array<ccu::Variable>
 
 static void DispatchKfcSubKernel(ccu::Array<ccu::Variable> &param, CcuKernelArg &arg, KfcServerContext &ctx)
 {
-    if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
-        CcuAlltoAllVMesh1DKernel(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token,
-                                 param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
-                                 param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
-                                 param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
-                                 ctx.arg->channels, ctx.arg->channelCount,
-                                 static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
-        return;
-    }
+    // if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
+    //     CcuAlltoAllVMesh1DKernel(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token,
+    //                              param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
+    //                              param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
+    //                              param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
+    //                              ctx.arg->channels, ctx.arg->channelCount,
+    //                              static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
+    //     return;
+    // }
 
-    if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALL) {
+    if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALL || ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
         CcuAlltoAllMesh1DKernel(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token,
                                 param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
                                 param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
