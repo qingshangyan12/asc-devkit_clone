@@ -31,7 +31,7 @@ namespace Te {
 
 // layout construction
 template <typename LayoutPattern, typename TraitType, typename ShapeType, typename StrideType>
-__aicore__ inline constexpr auto MakePatternLayout(const ShapeType& shape, const StrideType& stride);
+ASCENDC_HOST_AICORE inline constexpr auto MakePatternLayout(const ShapeType& shape, const StrideType& stride);
 
 template <typename... Ts>
 ASCENDC_HOST_AICORE inline constexpr Shape<Ts...> MakeShape(const Ts&... t);
@@ -49,10 +49,13 @@ template <typename T, typename U>
 ASCENDC_HOST_AICORE inline constexpr auto MakeLayout(const T& shape, const U& stride);
 
 template <typename T>
-__aicore__ inline constexpr auto MakeLayout(const T& shape);
+ASCENDC_HOST_AICORE inline constexpr auto MakeLayout(const T& shape);
 
 template <typename T, typename Shape, typename Stride>
-__aicore__ inline constexpr auto Crd2Idx(const T& coord, const Shape& shape, const Stride& stride);
+ASCENDC_HOST_AICORE inline constexpr auto Crd2Idx(const T& coord, const Shape& shape, const Stride& stride);
+
+template <typename T, typename LayoutType, typename Enable>
+ASCENDC_HOST_AICORE inline constexpr auto Crd2Idx(const T& coord, const LayoutType& layout);
 
 template <size_t I, typename Tuple, typename Enable>
 ASCENDC_HOST_AICORE inline constexpr auto Get(Tuple&& t);
@@ -64,7 +67,10 @@ template <typename Tuple, typename Enable>
 ASCENDC_HOST_AICORE inline constexpr auto Get(Tuple&& t);
 
 template <size_t... Is, typename LayoutType, typename Enable>
-__aicore__ inline constexpr auto Cosize(const LayoutType& layout);
+ASCENDC_HOST_AICORE inline constexpr auto Coshape(const LayoutType& layout);
+
+template <size_t... Is, typename LayoutType, typename Enable>
+ASCENDC_HOST_AICORE inline constexpr auto Cosize(const LayoutType& layout);
 
 template <size_t... Is, typename LayoutType, typename Enable>
 ASCENDC_HOST_AICORE inline constexpr auto Rank(const LayoutType& layout);

@@ -41,7 +41,7 @@ struct ScaleBNDLayoutPtn {};
 struct ScaleBDNLayoutPtn {};
 
 template <typename LayoutPattern, typename TraitType, typename ShapeType, typename StrideType>
-__aicore__ inline constexpr auto MakePatternLayout(const ShapeType& shape, const StrideType& stride)
+ASCENDC_HOST_AICORE inline constexpr auto MakePatternLayout(const ShapeType& shape, const StrideType& stride)
 {
     using LayoutT = Layout<ShapeType, StrideType, Std::tuple<LayoutPattern, TraitType>>;
     return LayoutT(shape, stride);

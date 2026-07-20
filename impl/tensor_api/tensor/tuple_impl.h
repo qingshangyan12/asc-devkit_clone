@@ -34,7 +34,8 @@ ASCENDC_HOST_AICORE inline constexpr auto TupleApply(T&& t, F&& f, G&& g, Std::i
 }
 
 template <typename T0, typename T1, typename F, typename G, size_t... I>
-__aicore__ inline constexpr auto TupleApply(T0&& t0, T1&& t1, F&& f, G&& g, Std::index_sequence<I...>)
+ASCENDC_HOST_AICORE inline constexpr auto TupleApply(
+    T0&& t0, T1&& t1, F&& f, G&& g, Std::index_sequence<I...>)
 {
     return g(f(Std::get<I>(static_cast<T0&&>(t0)), Std::get<I>(static_cast<T1&&>(t1)))...);
 }
@@ -50,7 +51,7 @@ ASCENDC_HOST_AICORE inline constexpr auto TransformApply(T&& t, F&& f, G&& g)
 }
 
 template <typename T0, typename T1, typename F, typename G>
-__aicore__ inline constexpr auto TransformApply(T0&& t0, T1&& t1, F&& f, G&& g)
+ASCENDC_HOST_AICORE inline constexpr auto TransformApply(T0&& t0, T1&& t1, F&& f, G&& g)
 {
     if constexpr (Std::is_tuple_v<Std::remove_cvref_t<T0>>) {
         return TupleApply(static_cast<T0&&>(t0), static_cast<T1&&>(t1), f, g, tuple_sequence<T0>{});
