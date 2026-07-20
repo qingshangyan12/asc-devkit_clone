@@ -7,11 +7,11 @@ SIMD与SIMT混合编程适用于同一个Kernel中同时需要向量化计算能
 
 SIMD与SIMT混合编程是基于SIMD编程和SIMT编程的高阶编程方式，相关样例主要分布在以下路径：
 
-- `examples/05_simd_simt_hybrid`路径下提供混合编程入门样例，以及使用SIMD和SIMT协同进行性能优化的样例。
+- `examples/05_simd_simt_hybrid`路径下提供混合编程入门样例、维测样例，以及使用SIMD和SIMT协同进行性能优化的样例。
 - 由于混合编程的Kernel入口与SIMD编程方式一致，端到端维测相关样例可参考`examples/01_simd_cpp_api`路径下的样例。
 - 混合编程通过启动SIMT VF实现SIMT线程级操作，SIMT VF相关的重点特性、维测和性能优化样例可参考`examples/03_simt_api`路径下的样例。
 
-后文将分别介绍混合编程场景下涉及到introduction、utilities、features和best_practices样例。
+后文将分别介绍混合编程场景下涉及到introduction、trouble_shooting、utilities、features和best_practices样例。
 
 ## introduction
 
@@ -20,6 +20,14 @@ SIMD与SIMT混合编程是基于SIMD编程和SIMT编程的高阶编程方式，�
 | 样例名 | 样例描述 |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
 | simd_simt_gather_and_adds | 基于SIMD与SIMT混合编程实现Gather和Adds融合计算，展示使用SIMT处理离散访存、使用SIMD处理连续向量计算的基本写法，以及核函数和VF函数的定义与调用方式。样例链接：[simd_simt_gather_and_adds](./00_introduction/simd_simt_gather_and_adds)。 |
+
+## trouble_shooting
+
+[01_trouble_shooting](./01_trouble_shooting)是SIMD与SIMT混合编程场景的问题定位参考目录，该目录下包含以下样例。
+
+| 样例名 | 样例描述 |
+| ------------------------------------------------------------ | ---------------------------------------------------- |
+| simd_simt_ub_usage_limit | 展示混合编程场景下UB静态内存、动态内存、Data Cache预留空间和越界问题定位方法。样例链接：[simd_simt_ub_usage_limit](./01_trouble_shooting/simd_simt_ub_usage_limit)。 |
 
 ## utilities
 

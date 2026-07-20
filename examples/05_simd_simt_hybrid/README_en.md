@@ -6,11 +6,11 @@ SIMD and SIMT hybrid programming applies to scenarios where the same kernel need
 
 SIMD and SIMT hybrid programming is an advanced programming mode based on SIMD programming and SIMT programming. Related samples are mainly distributed in the following paths:
 
-- The `examples/05_simd_simt_hybrid` path provides introductory hybrid programming samples and samples that use SIMD and SIMT together for performance optimization.
+- The `examples/05_simd_simt_hybrid` path provides introductory hybrid programming samples, troubleshooting samples, and samples that use SIMD and SIMT together for performance optimization.
 - Because the kernel entry of hybrid programming is consistent with the SIMD programming mode, end-to-end profiling and debugging samples can refer to the samples under `examples/01_simd_cpp_api`.
 - Hybrid programming starts SIMT VF functions to implement SIMT thread-level operations. Key features, profiling/debugging, and performance optimization samples related to SIMT VF can refer to samples under `examples/03_simt_api`.
 
-The following sections introduce the introduction, utilities, features, and best_practices samples involved in hybrid programming scenarios.
+The following sections introduce the introduction, trouble_shooting, utilities, features, and best_practices samples involved in hybrid programming scenarios.
 
 ## introduction
 
@@ -19,6 +19,14 @@ The following sections introduce the introduction, utilities, features, and best
 | Sample Name | Sample Description |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
 | simd_simt_gather_and_adds | Implements fused Gather and Adds computation based on SIMD and SIMT hybrid programming. It demonstrates the basic method of using SIMT for irregular memory access and SIMD for continuous vector computation, as well as the definition and invocation of kernel functions and VF functions. Sample link: [simd_simt_gather_and_adds](./00_introduction/simd_simt_gather_and_adds). |
+
+## trouble_shooting
+
+[01_trouble_shooting](./01_trouble_shooting) is the troubleshooting reference directory for SIMD and SIMT hybrid programming. It contains the following samples.
+
+| Sample Name | Sample Description |
+| ------------------------------------------------------------ | ---------------------------------------------------- |
+| simd_simt_ub_usage_limit | Demonstrates UB static memory, dynamic memory, Data Cache reservation, and out-of-bounds troubleshooting in hybrid programming. Sample link: [simd_simt_ub_usage_limit](./01_trouble_shooting/simd_simt_ub_usage_limit). |
 
 ## utilities
 
