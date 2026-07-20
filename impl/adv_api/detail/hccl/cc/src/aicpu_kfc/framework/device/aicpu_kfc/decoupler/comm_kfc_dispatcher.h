@@ -12,10 +12,15 @@
 
 #include <hccl/base.h>
 
+namespace Hccl {
+class AicpuTimingRecorder;
+}
+
 class CommKfcDispatcher {
 public:
     ~CommKfcDispatcher() = default;
     static u32 Run(void* args[], u32 ctxNum);
+    static u32 Run(void* args[], u32 ctxNum, Hccl::AicpuTimingRecorder& timingRecorder);
 };
 
 #endif // HCCL_COMM_KFC_DISPATCHER_H
