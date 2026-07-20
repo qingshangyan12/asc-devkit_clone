@@ -60,6 +60,8 @@ private:
         const T& dst, const U& src, uint16_t mStartPosition, uint16_t kStartPosition, uint8_t mStep, uint8_t kStep,
         int16_t srcStride, uint16_t dstStride)
     {
+        ASCENDC_DEBUG_ASSERT((mStep % mStepMinVal == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check mStep in CopyL12L0B NZ2ZN B8/B4 split path, mStep should be divisible by split step."));
         uint16_t nLoop = mStep / mStepMinVal;
         mStep = mStepMinVal;
         for (uint16_t idx = 0; idx < nLoop; ++idx) {
@@ -86,6 +88,12 @@ private:
         auto kStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
         // Nz -> Zn
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) % STRIDE_UNIT == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src stride in CopyL12L0B NZ2ZN B8/B4 path, source column stride should be divisible by STRIDE_UNIT."));
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) % STRIDE_UNIT == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst stride in CopyL12L0B NZ2ZN B8/B4 path, destination row stride should be divisible by STRIDE_UNIT."));
         auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / STRIDE_UNIT;
         auto dstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) / STRIDE_UNIT;
         if (n1 < FRACTAL_FIXED) {

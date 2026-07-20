@@ -58,6 +58,12 @@ private:
             // Next three parameters are in unit of 32B
             blockLen = Std::ceil_division(GetTotalColumnShape(srcLayout), C0_ELEMENT<SRC_TYPE>);
 
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) >= GetTotalColumnShape(srcLayout)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyUB2L1 ND path, source row stride should be no less than source column shape."));
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) >= GetTotalColumnShape(srcLayout)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyUB2L1 ND path, destination row stride should be no less than source column shape."));
             srcStride = Std::ceil_division(
                 GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) - GetTotalColumnShape(srcLayout),
                 C0_ELEMENT<SRC_TYPE>);
@@ -70,6 +76,12 @@ private:
             // Next three parameters are in unit of 32B
             blockLen = Std::ceil_division(GetTotalRowShape(srcLayout), C0_ELEMENT<SRC_TYPE>);
 
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) >= GetTotalRowShape(srcLayout)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyUB2L1 DN path, source column stride should be no less than source row shape."));
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) >= GetTotalRowShape(srcLayout)),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyUB2L1 DN path, destination column stride should be no less than source row shape."));
             srcStride = Std::ceil_division(
                 (GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) - GetTotalRowShape(srcLayout)),
                 C0_ELEMENT<SRC_TYPE>);
@@ -83,6 +95,14 @@ private:
             // note: C0_Byte_Size == 32B
             blockLen = GetTotalRowShape(srcLayout);
 
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) % C0_ELEMENT<SRC_TYPE> == 0 &&
+                GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / C0_ELEMENT<SRC_TYPE> >= blockLen),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyUB2L1 NZ path, source column stride should be divisible by C0 and no less than blockLen in C0 units."));
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) % C0_ELEMENT<DST_TYPE> == 0 &&
+                GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) / C0_ELEMENT<DST_TYPE> >= blockLen),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyUB2L1 NZ path, destination column stride should be divisible by C0 and no less than blockLen in C0 units."));
             srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / C0_ELEMENT<SRC_TYPE> - blockLen;
             dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) / C0_ELEMENT<DST_TYPE> - blockLen;
 
@@ -92,6 +112,14 @@ private:
             // note: C0_Byte_Size == 32B
             blockLen = GetTotalColumnShape(srcLayout);
 
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) % C0_ELEMENT<SRC_TYPE> == 0 &&
+                GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) / C0_ELEMENT<SRC_TYPE> >= blockLen),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyUB2L1 ZN path, source row stride should be divisible by C0 and no less than blockLen in C0 units."));
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) % C0_ELEMENT<DST_TYPE> == 0 &&
+                GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) / C0_ELEMENT<DST_TYPE> >= blockLen),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyUB2L1 ZN path, destination row stride should be divisible by C0 and no less than blockLen in C0 units."));
             srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) / C0_ELEMENT<SRC_TYPE> - blockLen;
             dstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) / C0_ELEMENT<DST_TYPE> - blockLen;
 

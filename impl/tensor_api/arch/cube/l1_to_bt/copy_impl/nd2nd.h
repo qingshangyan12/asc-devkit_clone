@@ -93,6 +93,10 @@ private:
             blockLen = Std::ceil_align(blockLen, 2);
         }
 
+        ASCENDC_DEBUG_ASSERT((srcRow >= srcCol), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src stride in CopyL12BT ND path, source row stride should be no less than source column shape."));
+        ASCENDC_DEBUG_ASSERT((dstRow >= srcCol), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst stride in CopyL12BT ND path, destination row stride should be no less than source column shape."));
         uint16_t srcStride = (srcRow - srcCol) / C0_ELEMENT<srcType>;
         uint16_t dstStride = Std::ceil_align((dstRow - srcCol) / C0_ELEMENT<dstType>, 2);
         CopyL12BTInstr::DataCopy(dst, src, convControl, blockCount, blockLen, srcStride, dstStride);
@@ -150,6 +154,10 @@ private:
         if constexpr (IsOneOfAttrV<srcType, float, int32_t>) {
             blockLen = Std::ceil_align(blockLen, 2);
         }
+        ASCENDC_DEBUG_ASSERT((srcBatchStride >= matrixElems), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src stride in CopyL12BT batch path, source batch stride should be no less than one matrix element count."));
+        ASCENDC_DEBUG_ASSERT((dstBatchStride >= matrixElems), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst stride in CopyL12BT batch path, destination batch stride should be no less than one matrix element count."));
         uint16_t srcStride = (srcBatchStride - matrixElems) / C0_ELEMENT<srcType>;
         uint16_t dstStride = Std::ceil_align((dstBatchStride - matrixElems) / C0_ELEMENT<dstType>, 2);
 

@@ -53,6 +53,24 @@ private:
     template <const MmadTrait& trait, typename T, typename U, typename S, typename Params>
     __aicore__ inline static void MmadImpl(const T& dst, const U& fm, const S& filter, const Params& params)
     {
+        ASCENDC_DEBUG_ASSERT((GetTotalRowShape(fm.Layout()) == GetTotalRowShape(dst.Layout())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check fm shape in Mmad, fm row shape should be equal to dst row shape."));
+        ASCENDC_DEBUG_ASSERT((GetTotalColumnShape(filter.Layout()) == GetTotalColumnShape(dst.Layout())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check filter shape in Mmad, filter column shape should be equal to dst column shape."));
+        ASCENDC_DEBUG_ASSERT((GetTotalColumnShape(fm.Layout()) == GetTotalRowShape(filter.Layout())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check fm and filter shape in Mmad, fm column shape should be equal to filter row shape."));
+        ASCENDC_DEBUG_ASSERT((params.m <= GetTotalRowShape(dst.Layout())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.m in Mmad, MmadParams.m should be no greater than dst row shape."));
+        ASCENDC_DEBUG_ASSERT((params.n <= GetTotalColumnShape(dst.Layout())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.n in Mmad, MmadParams.n should be no greater than dst column shape."));
+        ASCENDC_DEBUG_ASSERT((params.k <= GetTotalColumnShape(fm.Layout()) &&
+            params.k <= GetTotalRowShape(filter.Layout())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.k in Mmad, MmadParams.k should be no greater than fm column shape and filter row shape."));
         if constexpr (trait.mmadType == MmadType::NORMAL) {
             CheckTemplateForNormal<trait, T, U, S>();
             MmadInstr::Mmad(
