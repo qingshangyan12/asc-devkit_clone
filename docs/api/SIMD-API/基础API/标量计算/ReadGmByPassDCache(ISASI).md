@@ -118,11 +118,4 @@ __aicore__ inline T ReadGmByPassDCache(__gm__ T* addr)
 ```
 __gm__ int32_t *addr = const_cast<__gm__ int32_t *>(srcGlobal.GetPhyAddr());
 int32_t value = AscendC::ReadGmByPassDCache<int32_t>(addr);
-
-// 通过Scalar读写相同GM时，需要让读操作，空出总线，避免长时占用
-int target = -1;
-while (target != 0) {
-     target = ReadGmByPassDCache(addr);
-     Nop<800>();
-}
 ```
