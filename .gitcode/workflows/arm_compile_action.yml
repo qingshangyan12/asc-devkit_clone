@@ -56,7 +56,7 @@ jobs:
         with:
           workspace: ${{ steps.process_checkout.outputs.path }}
       - name: upload
-        uses: obs-uploadx
+        uses: obs-upload
         with:
           endpoint: "https://obs.cn-north-4.myhuaweicloud.com"
           bucket: "ascend-ci"
