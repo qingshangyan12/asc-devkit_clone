@@ -121,7 +121,8 @@ __aicore__ inline void HcommUrmaDumpAmoCtx(__ubuf__ HcommUrmaSqeCtx* sqeCtx, uin
     }
 }
 
-__aicore__ inline void HcommUrmaDumpSgeCtx(__ubuf__ HcommUrmaSqeCtx* sqeCtx, __ubuf__ uint8_t* sgeAddr, uint32_t atomicLen)
+__aicore__ inline void HcommUrmaDumpSgeCtx(
+    __ubuf__ HcommUrmaSqeCtx* sqeCtx, __ubuf__ uint8_t* sgeAddr, uint32_t atomicLen)
 {
     if (sqeCtx == nullptr || sgeAddr == nullptr) {
         KERNEL_LOG(KERNEL_INFO, "Hcomm URMA WQE: nullptr pointer \n");
@@ -295,7 +296,8 @@ __aicore__ inline void HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCqWhenSqOverflow(
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, HcommUrmaOpCode opCode, auto const& config, typename T>
 __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
-    ChannelHandle channel, GM_ADDR remoteAddr, GM_ADDR localAddr, uint64_t len, GM_ADDR notifyAddr, const UdmaParams<T>& params)
+    ChannelHandle channel, GM_ADDR remoteAddr, GM_ADDR localAddr, uint64_t len, GM_ADDR notifyAddr,
+    const UdmaParams<T>& params)
 {
     (void)commitPipe;
     (void)reqPipe;
@@ -464,7 +466,8 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::AtomicFAA(
         "AtomicFAA only supports int32_t, uint32_t, int64_t, uint64_t"
     );
     UdmaParams<T> params{addVal, 0};
-    return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::FAA, config>(channel, dst, fetchAddr, sizeof(T), nullptr, params);
+    return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::FAA, config>(
+        channel, dst, fetchAddr, sizeof(T), nullptr, params);
 }
 
 template <typename T, bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const& config>
@@ -477,7 +480,8 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::AtomicCAS(
         "AtomicCAS only supports int32_t, uint32_t, int64_t, uint64_t"
     );
     UdmaParams<T> params{swapVal, compareVal};
-    return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::CAS, config>(channel, dst, fetchAddr, sizeof(T), nullptr, params);
+    return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::CAS, config>(
+        channel, dst, fetchAddr, sizeof(T), nullptr, params);
 }
 
 template <pipe_t pipe>
