@@ -37,19 +37,12 @@ public:
 
 private:
     template <const CopyUB2L1Trait& trait, typename T, typename U>
-    __aicore__ inline static constexpr void CheckTemplate()
-    {
-        CheckLayoutPattern<U, T>();
-        CheckDataType::CheckUB2L1DataType<T, U>();
-    }
-
-    template <const CopyUB2L1Trait& trait, typename T, typename U>
     __aicore__ inline static void DataCopyImpl(const T& dst, const U& src)
     {
         using SrcType = typename U::elementType;
         using DstType = typename T::elementType;
 
-        CheckTemplate<trait, T, U>();
+        static_assert(Std::is_same_v<SrcType, DstType>, "SrcType must be the same with DstType");
 
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
