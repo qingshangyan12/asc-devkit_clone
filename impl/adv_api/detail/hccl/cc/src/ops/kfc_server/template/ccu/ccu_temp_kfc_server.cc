@@ -36,6 +36,12 @@ void InheritKfcServerKernelArg(const CcuKernelInfo &srcKernel, CcuKernelInfo &ds
         kfcArg->loadFromMem = false;
         kfcArg->opParam = param;
         kfcArg->subCommRanks = subCommRanks;
+    } else if (srcName == "CcuReduceScatterMesh1DMem2MemKernel" || param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
+        kfcArg->rankSize = subCommRanks[0].size();
+        kfcArg->rankId = rankId;
+        kfcArg->loadFromMem = false;
+        kfcArg->opParam = param;
+        kfcArg->subCommRanks = subCommRanks;
     } else {
         HCCL_WARNING("[InheritKfcServerKernelArg] unknown src kernel type[%s], no attributes inherited", srcName.c_str());
     }

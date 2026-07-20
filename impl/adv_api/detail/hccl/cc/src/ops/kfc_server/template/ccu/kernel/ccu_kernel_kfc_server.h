@@ -19,7 +19,7 @@
 #include "ccu_kernel_alg_base.h"
 #include "../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d.h"
 #include "../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_v_mesh1d.h"
-
+#include "../../../reduce_scatter/template/ccu/kernel/ccu_kernel_reduce_scatter_mesh1d_mem2mem.h"
 namespace mc2_ops_hccl {
 constexpr uint64_t INVALID_U64 = UINT64_MAX;
 constexpr uint32_t CCU_PARAM_NUM_PER_DIE = 32;
