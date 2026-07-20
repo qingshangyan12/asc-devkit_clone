@@ -48,9 +48,9 @@ __aicore__ inline void HcommUrmaFillNotifyCtx(
 }
 
 template <HcommUrmaOpCode opCode, auto const& config, typename T>
-__aicore__ inline void HcommUrmaFillSqeCtx(__ubuf__ HcommUrmaSqeCtx* sqeCtx, __gm__ uint8_t* remoteAddr,
-    const SqContext& sqCtx, const RegedBufferEntity& remoteMemInfo, uint32_t curHead, GM_ADDR notifyAddr = nullptr,
-    T value = 0)
+__aicore__ inline void HcommUrmaFillSqeCtx(
+    __ubuf__ HcommUrmaSqeCtx* sqeCtx, __gm__ uint8_t* remoteAddr, const SqContext& sqCtx,
+    const RegedBufferEntity& remoteMemInfo, uint32_t curHead, GM_ADDR notifyAddr = nullptr, T value = 0)
 {
     sqeCtx->opcode = static_cast<uint32_t>(opCode);
     sqeCtx->flag = (config.odr & 0x7U) | ((config.fence & 0x1U) << 3U) | ((config.se & 0x1U) << 4U) |
@@ -105,18 +105,16 @@ __aicore__ inline void HcommUrmaDumpAmoCtx(__ubuf__ HcommUrmaSqeCtx* sqeCtx, uin
     auto opcode = sqeCtx->opcode;
     if (opcode == static_cast<uint32_t>(HcommUrmaOpCode::FAA)) {
         __ubuf__ uint8_t* amoDataAddr = (__ubuf__ uint8_t*)sqeCtx + sizeof(HcommUrmaSqeCtx) + sizeof(HcommUrmaSgeCtx);
-        uint64_t addValue = (atomicLen == sizeof(uint32_t))
-            ? static_cast<uint64_t>(*(__ubuf__ uint32_t*)amoDataAddr)
-            : *(__ubuf__ uint64_t*)amoDataAddr;
+        uint64_t addValue = (atomicLen == sizeof(uint32_t)) ? static_cast<uint64_t>(*(__ubuf__ uint32_t*)amoDataAddr) :
+                                                              *(__ubuf__ uint64_t*)amoDataAddr;
         KERNEL_LOG(KERNEL_INFO, "Hcomm URMA SGE: addValue:0x%llx \n", addValue);
     } else if (opcode == static_cast<uint32_t>(HcommUrmaOpCode::CAS)) {
         __ubuf__ uint8_t* amoDataAddr = (__ubuf__ uint8_t*)sqeCtx + sizeof(HcommUrmaSqeCtx) + sizeof(HcommUrmaSgeCtx);
-        uint64_t swapValue = (atomicLen == sizeof(uint32_t))
-            ? static_cast<uint64_t>(*(__ubuf__ uint32_t*)amoDataAddr)
-            : *(__ubuf__ uint64_t*)amoDataAddr;
-        uint64_t condValue = (atomicLen == sizeof(uint32_t))
-            ? static_cast<uint64_t>(*(__ubuf__ uint32_t*)(amoDataAddr + atomicLen))
-            : *(__ubuf__ uint64_t*)(amoDataAddr + atomicLen);
+        uint64_t swapValue = (atomicLen == sizeof(uint32_t)) ? static_cast<uint64_t>(*(__ubuf__ uint32_t*)amoDataAddr) :
+                                                               *(__ubuf__ uint64_t*)amoDataAddr;
+        uint64_t condValue = (atomicLen == sizeof(uint32_t)) ?
+                                 static_cast<uint64_t>(*(__ubuf__ uint32_t*)(amoDataAddr + atomicLen)) :
+                                 *(__ubuf__ uint64_t*)(amoDataAddr + atomicLen);
         KERNEL_LOG(KERNEL_INFO, "Hcomm URMA SGE: condValue:0x%llx, swapValue:0x%llx \n", condValue, swapValue);
     }
 }
@@ -346,10 +344,10 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
     AscendC::GlobalTensor<uint32_t> sqeGlobal;
     sqeGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqeAddr);
 
-    constexpr uint32_t wqeBbCnt = (
-        opCode == HcommUrmaOpCode::WRITE_WITH_NOTIFY || opCode == HcommUrmaOpCode::FAA ||
-        opCode == HcommUrmaOpCode::CAS
-    ) ? 2U : 1U;
+    constexpr uint32_t wqeBbCnt = (opCode == HcommUrmaOpCode::WRITE_WITH_NOTIFY || opCode == HcommUrmaOpCode::FAA ||
+                                   opCode == HcommUrmaOpCode::CAS) ?
+                                      2U :
+                                      1U;
     SyncAction<HardEvent::S_MTE3>();
 
     DataCopy(sqeGlobal, wqeItem_, wqeSize * wqeBbCnt / sizeof(uint32_t));
@@ -382,8 +380,8 @@ __aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCq(ChannelHandl
     uint32_t cqeSize = cqCtx.contextInfo.ubJfc.cqeSize;
     uint32_t cqDepth = cqCtx.contextInfo.ubJfc.cqDepth;
     __ubuf__ HcommUrmaJfcCqeCtx* cqeUb = (__ubuf__ HcommUrmaJfcCqeCtx*)cqeItem_.GetPhyAddr();
-    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA PollCq enter expectIdx=%u curTail=%u cqDepth=%u \n",
-        expectIdx, curTail, cqDepth);
+    KERNEL_LOG(
+        KERNEL_INFO, "Hcomm URMA PollCq enter expectIdx=%u curTail=%u cqDepth=%u \n", expectIdx, curTail, cqDepth);
 #if defined(UT_TEST)
     curTail = expectIdx;
 #else
@@ -461,10 +459,9 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::AtomicFAA(
     ChannelHandle channel, GM_ADDR dst, GM_ADDR fetchAddr, T addVal)
 {
     static_assert(
-        std::is_same<T, int32_t>::value || std::is_same<T, uint32_t>::value ||
-        std::is_same<T, int64_t>::value || std::is_same<T, uint64_t>::value,
-        "AtomicFAA only supports int32_t, uint32_t, int64_t, uint64_t"
-    );
+        std::is_same<T, int32_t>::value || std::is_same<T, uint32_t>::value || std::is_same<T, int64_t>::value ||
+            std::is_same<T, uint64_t>::value,
+        "AtomicFAA only supports int32_t, uint32_t, int64_t, uint64_t");
     UdmaParams<T> params{addVal, 0};
     return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::FAA, config>(
         channel, dst, fetchAddr, sizeof(T), nullptr, params);
@@ -475,10 +472,9 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::AtomicCAS(
     ChannelHandle channel, GM_ADDR dst, GM_ADDR fetchAddr, T compareVal, T swapVal)
 {
     static_assert(
-        std::is_same<T, int32_t>::value || std::is_same<T, uint32_t>::value ||
-        std::is_same<T, int64_t>::value || std::is_same<T, uint64_t>::value,
-        "AtomicCAS only supports int32_t, uint32_t, int64_t, uint64_t"
-    );
+        std::is_same<T, int32_t>::value || std::is_same<T, uint32_t>::value || std::is_same<T, int64_t>::value ||
+            std::is_same<T, uint64_t>::value,
+        "AtomicCAS only supports int32_t, uint32_t, int64_t, uint64_t");
     UdmaParams<T> params{swapVal, compareVal};
     return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::CAS, config>(
         channel, dst, fetchAddr, sizeof(T), nullptr, params);
