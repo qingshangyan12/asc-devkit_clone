@@ -118,3 +118,14 @@ jobs:
     if: "${{ default() }}"
     runs-on:
     - default
+  JOB_3:
+    name: eeecho
+    needs: [JOB_2]
+    steps:
+      -
+        name: 1
+        run: |
+          echo '${{ jobs.host_type.outputs.host_type }}'
+    if: "${{ default() }}"
+    runs-on:
+    - default
