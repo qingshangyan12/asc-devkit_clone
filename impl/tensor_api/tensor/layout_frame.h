@@ -115,7 +115,7 @@ public:
 };
 
 template <typename LayoutPattern, typename TraitType = Std::ignore_t, typename... Args>
-__aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args) {
+ASCENDC_HOST_AICORE inline constexpr decltype(auto) MakeFrameLayout(const Args&... args) {
     using Trait = typename TraitConversion<LayoutPattern, TraitType>::type;
     using LayoutMaker = typename LayoutFormatSet::template Get<LayoutPattern>;
     static_assert(!Std::is_same_v<LayoutMaker, Std::ignore_t>, "Unsupported layout pattern.");
@@ -123,14 +123,14 @@ __aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args) 
 }
 
 template <typename LayoutPattern, size_t C0Element, typename... Args>
-__aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args) {
+ASCENDC_HOST_AICORE inline constexpr decltype(auto) MakeFrameLayout(const Args&... args) {
     return MakeFrameLayout<LayoutPattern, Std::Int<C0Element>>(args...);
 }
 
 template <typename LayoutPattern, typename TraitType = LayoutTraitDefault<>>
 struct FrameLayoutFormat {
     template <typename... Args>
-    __aicore__ inline constexpr decltype(auto) operator()(const Args&... args) {
+    ASCENDC_HOST_AICORE inline constexpr decltype(auto) operator()(const Args&... args) {
         return MakeFrameLayout<LayoutPattern, TraitType>(args...);
     }
 };

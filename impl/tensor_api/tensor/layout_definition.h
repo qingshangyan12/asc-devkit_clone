@@ -30,7 +30,7 @@ namespace AscendC {
 namespace Te {
 
 template <typename T, typename U, typename S>
-__aicore__ inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S& stride);
+ASCENDC_HOST_AICORE inline constexpr auto Crd2Idx(const T& coord, const U& shape, const S& stride);
 
 // struct layout
 template <typename... Shapes>
@@ -59,17 +59,17 @@ public:
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Capacity() const
+    ASCENDC_HOST_AICORE inline constexpr decltype(auto) Capacity() const
     {
         return GetCapacity(Shape<I...>(), Stride<I...>());
     }
 
-    __aicore__ inline constexpr decltype(auto) layout()
+    ASCENDC_HOST_AICORE inline constexpr decltype(auto) layout()
     {
         return *this;
     }
 
-    __aicore__ inline constexpr decltype(auto) layout() const
+    ASCENDC_HOST_AICORE inline constexpr decltype(auto) layout() const
     {
         return *this;
     }
@@ -99,7 +99,7 @@ public:
     }
 
     template <typename S>
-    __aicore__ inline constexpr auto operator()(const S& coord) const
+    ASCENDC_HOST_AICORE inline constexpr auto operator()(const S& coord) const
     {
         return Crd2Idx(coord, Shape(), Stride());
     }
@@ -112,19 +112,19 @@ public:
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Size() const
+    ASCENDC_HOST_AICORE inline constexpr decltype(auto) Size() const
     {
         return TupleSize<I...>(Shape());
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Get()
+    ASCENDC_HOST_AICORE inline constexpr decltype(auto) Get()
     {
         return Te::Get<I...>(static_cast<Std::tuple<T, U>&>(*this));
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Get() const
+    ASCENDC_HOST_AICORE inline constexpr decltype(auto) Get() const
     {
         return Te::Get<I...>(static_cast<const Std::tuple<T, U>&>(*this));
     }
