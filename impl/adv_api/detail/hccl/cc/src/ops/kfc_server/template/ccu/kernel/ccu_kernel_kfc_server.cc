@@ -152,7 +152,7 @@ void WaitTurnStartSig(const ccu::Variable &hbmSigAddr, ccu::Variable &turnStartS
         ccu::Load(hbmSigAddr, turnStartSig);     // 循环读HBM对应地址的信号到Xn，直到Xn中的信号值为1
     }
     turnStartSig = 0;                       // reset Xn
-    ccu::Store(turnStartSig, hbmSigAddr);        // reset HBM
+    ccu::Store(hbmSigAddr, turnStartSig);        // reset HBM
     /*
     CCU_IF (ctx.dieNum == SINGLE_DIE) {
         // 单Die场景：等待HBM中的信号
@@ -161,7 +161,7 @@ void WaitTurnStartSig(const ccu::Variable &hbmSigAddr, ccu::Variable &turnStartS
             ccu::Load(hbmSigAddr, turnStartSig);     // 循环读HBM对应地址的信号到Xn，直到Xn中的信号值为1
         }
         turnStartSig = 0;                       // reset Xn
-        ccu::Store(turnStartSig, hbmSigAddr);        // reset HBM
+        ccu::Store(hbmSigAddr, turnStartSig);        // reset HBM
     } CCU_ELSE {
         // 双Die场景
         if (getDieId == DIE0_ID) {
@@ -171,7 +171,7 @@ void WaitTurnStartSig(const ccu::Variable &hbmSigAddr, ccu::Variable &turnStartS
                 ccu::Load(hbmSigAddr, turnStartSig);     // 循环读HBM对应地址的信号到Xn，直到Xn中的信号值为1
             }
             turnStartSig = 0;                       // reset Xn
-            ccu::Store(turnStartSig, hbmSigAddr);        // reset HBM
+            ccu::Store(hbmSigAddr, turnStartSig);        // reset HBM
             ccu::EventRecord(ctx.importDieSig, 1);       // 开始给Die1发开始信号
         } else if (getDieId == DIE1_ID) {
             // 双Die场景Die1：等待Die0的信号 
@@ -184,17 +184,17 @@ void WaitTurnStartSig(const ccu::Variable &hbmSigAddr, ccu::Variable &turnStartS
 void SetTurnEndSig(const ccu::Variable &hbmSigAddr, const ccu::Variable &turnEndSig, KfcServerContext &ctx)
 {
     const uint32_t getDieId = 1;    // TODO GetDieId()
-    Store(turnEndSig, hbmSigAddr);
+    ccu::Store(hbmSigAddr, turnEndSig);
     /*
     CCU_IF (ctx.dieNum == SINGLE_DIE) {
         // 单Die场景：Set本轮完成信号到HBM
-        Store(turnEndSig, hbmSigAddr);
+        ccu::Store(hbmSigAddr, turnEndSig);
     } CCU_ELSE {
         // 双Die场景
         if (getDieId == DIE0_ID) {
             // 双Die场景Die0，等待Die1执行完成信号，然后Set本轮完成信号到HBM
             ccu::EventWait(ctx.exportDieSig, 1);            // 会自动reset CKE
-            ccu::Store(turnEndSig, hbmSigAddr);
+            ccu::Store(hbmSigAddr, turnEndSig);
         } else if (getDieId == DIE1_ID) {
             // 双Die场景Die1：通知Die0执行完成
             ccu::EventRecord(ctx.importDieSig, 1);
