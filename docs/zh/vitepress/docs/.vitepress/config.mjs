@@ -12,6 +12,7 @@ import { defineConfig } from 'vitepress'
 import { existsSync, readFileSync, copyFileSync, cpSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { load as cheerioLoad } from 'cheerio'
+import { execSync } from 'node:child_process'
 import { pagefindPlugin } from 'vitepress-plugin-pagefind'
 
 const docsRoot = resolve(import.meta.dirname, '..')
@@ -646,6 +647,16 @@ function balanceDivTags(html) {
     code = code.replace(/href="\/\/pagefind/g, 'href="/pagefind')
     code = code.replace(/<body\b/, '<body data-pagefind-body')
     return code
+  },
+
+  async buildEnd(siteConfig) {
+    const distDir = resolve(docsRoot, '.vitepress', 'dist')
+    const scriptPath = resolve(import.meta.dirname, 'build-cjk-index.mjs')
+    try {
+      execSync(`node "${scriptPath}" "${distDir}"`, { stdio: 'inherit' })
+    } catch (e) {
+      console.warn('[cjk-index] Failed to build CJK search index:', e.message)
+    }
   },
 
   vite: {
