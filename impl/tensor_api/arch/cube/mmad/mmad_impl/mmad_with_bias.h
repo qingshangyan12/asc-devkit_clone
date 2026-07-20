@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_ARCH_CUBE_MMAD_MMAD_IMPL_MMAD_WITH_BIAS_H
 
 #include "impl/tensor_api/arch/cube/mmad/mmad_impl/instruction.h"
+#include "kernel_npu_debug.h"
 
 namespace AscendC {
 namespace Te {
@@ -54,6 +55,27 @@ private:
     __aicore__ inline static void MmadImpl(
         const T& dst, const U& fm, const S& filter, const V& bias, const Params& params)
     {
+        ASCENDC_DEBUG_ASSERT((GetTotalRowShape(fm.Layout()) == GetTotalRowShape(dst.Layout())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check fm shape in Mmad with bias, fm row shape should be equal to dst row shape."));
+        ASCENDC_DEBUG_ASSERT((GetTotalColumnShape(filter.Layout()) == GetTotalColumnShape(dst.Layout())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check filter shape in Mmad with bias, filter column shape should be equal to dst column shape."));
+        ASCENDC_DEBUG_ASSERT((GetTotalColumnShape(fm.Layout()) == GetTotalRowShape(filter.Layout())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check fm and filter shape in Mmad with bias, fm column shape should be equal to filter row shape."));
+        ASCENDC_DEBUG_ASSERT((params.m <= GetTotalRowShape(dst.Layout())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.m in Mmad with bias, MmadParams.m should be no greater than dst row shape."));
+        ASCENDC_DEBUG_ASSERT((params.n <= GetTotalColumnShape(dst.Layout())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.n in Mmad with bias, MmadParams.n should be no greater than dst column shape."));
+        ASCENDC_DEBUG_ASSERT((params.k <= GetTotalColumnShape(fm.Layout()) &&
+            params.k <= GetTotalRowShape(filter.Layout())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.k in Mmad with bias, MmadParams.k should be no greater than fm column shape and filter row shape."));
+        ASCENDC_DEBUG_ASSERT((params.n <= GetTotalColumnShape(bias.Layout())),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.n in Mmad with bias, MmadParams.n should be no greater than bias column shape."));
         if constexpr (trait.mmadType == MmadType::NORMAL) {
             CheckTemplateForNormal<trait, T, U, S, V>();
         } else if constexpr (trait.mmadType == MmadType::MX) {
