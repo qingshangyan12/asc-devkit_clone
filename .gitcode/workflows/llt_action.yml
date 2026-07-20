@@ -125,7 +125,7 @@ jobs:
       -
         name: 1
         run: |
-          echo '${{ jobs.host_type.outputs.host_type }}'
+          echo '${{ jobs.JOB_2.outputs.host_type }}'
     if: "${{ default() }}"
     runs-on:
     - default
