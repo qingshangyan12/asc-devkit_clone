@@ -13,4 +13,5 @@ set(UT_COMMON_INCLUDE_LIST
 )
 
 add_subdirectory(common/prepare_ut_env)
+add_subdirectory(common/timing_stat)
 add_subdirectory(../st/algorithm ${CMAKE_CURRENT_BINARY_DIR}/algorithm)

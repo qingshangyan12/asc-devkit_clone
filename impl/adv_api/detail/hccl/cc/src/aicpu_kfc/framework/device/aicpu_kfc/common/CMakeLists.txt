@@ -10,5 +10,6 @@
 if(TARGET mc2_server)
     add_mc2_server_ccl_object(mc2_server_aicpu_kfc_common
         ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_kfc_utils.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/timing_stat.cc
     )
 endif()
