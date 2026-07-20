@@ -4,7 +4,8 @@
 
 【描述】SIMT编程模式下，一个Warp内的多个线程可能在同一条UB访问指令中同时访问UB。对于使用UB中转做转置、重排等操作的算子，即使GM读写已经连续，仍需要分析UB访问模式，避免UB内部访问成为新的性能瓶颈。
 
-下图为UB bank结构示意图。<!-- npu="950" id1 -->Ascend 950PR/Ascend 950DT<!-- end id1 -->的UB划分为16个bank，并组织为8个bank group；SIMT编程模式下，每个bank进一步划分为4个subbank。若同一个Warp内多个线程在同一条UB访问指令中访问同一个bank group的相同编号subbank，硬件需要排队处理，从而形成subbank冲突并增加访问延迟。
+<!-- npu="950" id1 -->
+下图为UB bank结构示意图。Ascend 950PR/Ascend 950DT的UB划分为16个bank，并组织为8个bank group；SIMT编程模式下，每个bank进一步划分为4个subbank。若同一个Warp内多个线程在同一条UB访问指令中访问同一个bank group的相同编号subbank，硬件需要排队处理，从而形成subbank冲突并增加访问延迟。
 
 **图 1** bank结构示意图
 ![img](../../../figures/bank结构示意图.png "bank结构示意图")
@@ -15,7 +16,9 @@ SIMT编程方式下，bank冲突为更细粒度的subbank冲突，主要有以�
 - **读读冲突**：多个读操作同时访问同一个bank group的相同编号subbank。
 
 详细的UB地址低位交织规则以及冲突场景可参考[bank_conflict样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/03_simt_api/02_features/01_api_features/00_memory_access/bank_conflict)。
+<!-- end id1 -->
 
+<!-- npu="950" id2 -->
 【样例介绍】以[矩阵转置](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice)为例，输入矩阵shape为1024×1024，数据类型为`float`。样例采用32×32的tile。当前基础配置中，Thread Block数量固定为硬件vector core数，每个Thread Block启动1024个线程，循环处理多个32×32 tile。全局访存合并版本先用UB暂存tile，使GM读写尽量保持连续；在此基础上，避免UB Bank冲突版本通过给UB tile增加padding，调整转置读阶段的UB行跨度，减少同一个Warp内线程集中访问相同subbank资源。
 
 【反例】矩阵转置使用UB做中转，转置读阶段产生较严重bank冲突。
@@ -84,5 +87,6 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void transpose_ub_pad_kernel(flo
 |      15.152      |   13.641    |     22507.6      |     13.176      |     0.966     |        0.453        |      0.033      |
 
 从Task Duration看，增加padding后的执行耗时为15.152μs，相比未加padding的UB中转版本23.912μs，下降约36.6%。这说明在GM读写已经连续的前提下，UB内部的bank冲突仍会影响算子端到端耗时；通过将UB tile从32×32调整为32×34，列方向访问被分散到各个bank group的不同subbank上，避免了上述读读冲突，因此算子的整体运行时间进一步下降。
+<!-- end id2 -->
 
 【总结】当SIMT算子已经通过UB中转解决GM非连续访问后，应继续分析UB访问是否会产生bank冲突。若同一个Warp沿列方向访问二维UB数组，且行跨度容易让访问集中到相同bank资源，可以通过增加padding、调整行跨度或重新排布数据来避免bank冲突。
