@@ -55,10 +55,9 @@ private:
         auto srcLayout = src.Layout();
 
         uint16_t blockCount = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-        uint32_t blockLen =
-            GetTotalColumnShape(srcLayout) * GetElement<AttrInfo::Shape, AttrInfo::Row, 0>(srcLayout) * sizeof(SrcType);
-        int64_t srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) * sizeof(SrcType);
-        int64_t dstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) * sizeof(DstType);
+        uint32_t blockLen = GetTotalColumnShape(srcLayout);
+        int64_t srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) / C0_ELEMENT<SrcType> - blockLen;
+        int64_t dstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) / C0_ELEMENT<DstType> - blockLen;
 
         EmitCopy(dst, src, blockCount, blockLen, srcStride, dstStride);
     }

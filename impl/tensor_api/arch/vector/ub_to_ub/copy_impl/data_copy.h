@@ -36,24 +36,7 @@ protected:
     __aicore__ inline static void EmitCopy(
         const T& dst, const U& src, uint16_t blockCount, uint32_t blockLen, int64_t srcStride, int64_t dstStride)
     {
-        using SrcType = typename U::elementType;
-        using DstType = typename T::elementType;
-
-        if constexpr (IsB4Type<SrcType>) {
-            blockLen = blockLen >> 1;
-            srcStride = srcStride >> 1;
-        }
-
-        if constexpr (IsB4Type<DstType>) {
-            dstStride = dstStride >> 1;
-        }
-
-        // Convert from bytes to 32B units for asc_copy_ub2ub
-        uint16_t blockLenIn32B = static_cast<uint16_t>(blockLen >> 5);
-        uint16_t srcStrideIn32B = static_cast<uint16_t>(srcStride >> 5);
-        uint16_t dstStrideIn32B = static_cast<uint16_t>(dstStride >> 5);
-
-        CopyUbufToUbufInstr::DataCopy(dst, src, blockCount, blockLenIn32B, srcStrideIn32B, dstStrideIn32B);
+        CopyUbufToUbufInstr::DataCopy(dst, src, blockCount, blockLen, srcStride, dstStride);
     }
 };
 

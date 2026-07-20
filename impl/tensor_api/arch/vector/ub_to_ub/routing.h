@@ -18,7 +18,7 @@
 /*!
  * \file routing.h
  * \brief
-  */
+ */
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_UB_ROUTING_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_UB_ROUTING_H
 
