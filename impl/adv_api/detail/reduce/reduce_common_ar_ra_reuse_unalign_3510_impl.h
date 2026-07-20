@@ -44,7 +44,8 @@ __simd_callee__ inline void ReduceRAReuseSourceUnAlignedFoldOne(
         Reg::LoadUnAlign(vreg1, uSrc, ((__ubuf__ T*&)newSrc), dimA);
         // L1
         Binaryfunc(vreg0, vreg0, vreg1, maskMain);
-        StoreUnAlign((__ubuf__ T*&)dstAddr, vreg0, uDst, postUpdateStrideMain);
+        Reg::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg0, uDst, postUpdateStrideMain);
+        Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
     }
     newSrc = src + static_cast<uint64_t>((loopANum - 1) * vlSize * dtypeSize);
     // L0
@@ -54,7 +55,7 @@ __simd_callee__ inline void ReduceRAReuseSourceUnAlignedFoldOne(
     Reg::LoadUnAlign(vreg1, uSrc, ((__ubuf__ T*&)newSrc), dimA);
     // L1
     Binaryfunc(vreg0, vreg0, vreg1, maskTail);
-    StoreUnAlign((__ubuf__ T*&)dstAddr, vreg0, uDst, postUpdateStrideTail);
+    Reg::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg0, uDst, postUpdateStrideTail);
     Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
 }
 
@@ -86,7 +87,8 @@ __simd_callee__ inline void ReduceRAReuseSourceUnAlignedFoldTwo(
         Binaryfunc(vreg1, vreg1, vreg3, maskMain);
         // L2
         Binaryfunc(vreg0, vreg0, vreg1, maskMain);
-        StoreUnAlign((__ubuf__ T*&)dstAddr, vreg0, uDst, postUpdateStrideMain);
+        Reg::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg0, uDst, postUpdateStrideMain);
+        Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
     }
     newSrc = src + static_cast<uint64_t>((loopANum - 1) * vlSize * dtypeSize);
     // L0
@@ -103,7 +105,7 @@ __simd_callee__ inline void ReduceRAReuseSourceUnAlignedFoldTwo(
     Binaryfunc(vreg1, vreg1, vreg3, maskTail);
     // L2
     Binaryfunc(vreg0, vreg0, vreg1, maskTail);
-    StoreUnAlign((__ubuf__ T*&)dstAddr, vreg0, uDst, postUpdateStrideTail);
+    Reg::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg0, uDst, postUpdateStrideTail);
     Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
 }
 template <class T, const Reg::RegTrait& Trait, auto Binaryfunc>
@@ -143,6 +145,7 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedB64VF(
                 Reg::LoadUnAlign(vregTail, vUregTail, ((__ubuf__ T*&)hoistTailAddr), postUpdateStrideMain);
                 Binaryfunc(vregMain, vregMain, vregTail, maskMain);
                 Reg::StoreUnAlign(((__ubuf__ T*&)hoistMainReuseAddr), vregMain, uDst, postUpdateStrideMain);
+                Reg::StoreUnAlignPost(((__ubuf__ T*&)hoistMainReuseAddr), uDst, 0);
             }
             Reg::LoadUnAlign(vregMain, vUregMain, ((__ubuf__ T*&)hoistMainAddr), postUpdateStrideTail);
             Reg::LoadUnAlign(vregTail, vUregTail, ((__ubuf__ T*&)hoistTailAddr), postUpdateStrideTail);
@@ -206,7 +209,8 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedB64VF(
                 Binaryfunc(vreg1, vreg1, vreg3, maskMain);
                 // L3
                 Binaryfunc(vreg0, vreg0, vreg1, maskMain);
-                StoreUnAlign((__ubuf__ T*&)dst, vreg0, uDst, postUpdateStrideMain);
+                Reg::StoreUnAlign((__ubuf__ T*&)dst, vreg0, uDst, postUpdateStrideMain);
+                Reg::StoreUnAlignPost((__ubuf__ T*&)dst, uDst, 0);
             }
             dst = newSrcTail;
             // L0
@@ -236,7 +240,7 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedB64VF(
             Binaryfunc(vreg1, vreg1, vreg3, maskTail);
             // L3
             Binaryfunc(vreg0, vreg0, vreg1, maskTail);
-            StoreUnAlign((__ubuf__ T*&)dst, vreg0, uDst, postUpdateStrideTail);
+            Reg::StoreUnAlign((__ubuf__ T*&)dst, vreg0, uDst, postUpdateStrideTail);
             Reg::StoreUnAlignPost((__ubuf__ T*&)dst, uDst, 0);
         }
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
@@ -262,6 +266,7 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedB64VF(
             Reg::LoadUnAlignPre(uSrc, ((__ubuf__ T*&)srcAddr));
             Reg::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T*&)srcAddr), postUpdateStrideMain);
             Reg::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg0, uDst, postUpdateStrideMain);
+            Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
         }
         Reg::LoadUnAlignPre(uSrc, ((__ubuf__ T*&)srcAddr));
         Reg::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T*&)srcAddr), postUpdateStrideTail);
@@ -327,6 +332,7 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedVF(
                 Reg::LoadUnAlign(vregTail, vUregTail, ((__ubuf__ T*&)hoistTailAddr), postUpdateStrideMain);
                 Binaryfunc(vregMain, vregMain, vregTail, maskMain);
                 Reg::StoreUnAlign(((__ubuf__ T*&)hoistMainReuseAddr), vregMain, uDst, postUpdateStrideMain);
+                Reg::StoreUnAlignPost(((__ubuf__ T*&)hoistMainReuseAddr), uDst, 0);
             }
             Reg::LoadUnAlign(vregMain, vUregMain, ((__ubuf__ T*&)hoistMainAddr), postUpdateStrideTail);
             Reg::LoadUnAlign(vregTail, vUregTail, ((__ubuf__ T*&)hoistTailAddr), postUpdateStrideTail);
@@ -423,7 +429,8 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedVF(
                 Binaryfunc(vreg1, vreg1, vreg3, maskMain);
                 // L4
                 Binaryfunc(vreg0, vreg0, vreg1, maskMain);
-                StoreUnAlign((__ubuf__ T*&)dst, vreg0, uDst, postUpdateStrideMain);
+                Reg::StoreUnAlign((__ubuf__ T*&)dst, vreg0, uDst, postUpdateStrideMain);
+                Reg::StoreUnAlignPost((__ubuf__ T*&)dst, uDst, 0);
             }
             dst = newSrcTail;
             // L0
@@ -478,7 +485,7 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedVF(
             Binaryfunc(vreg1, vreg1, vreg3, maskTail);
             // L4
             Binaryfunc(vreg0, vreg0, vreg1, maskTail);
-            StoreUnAlign((__ubuf__ T*&)dst, vreg0, uDst, postUpdateStrideTail);
+            Reg::StoreUnAlign((__ubuf__ T*&)dst, vreg0, uDst, postUpdateStrideTail);
             Reg::StoreUnAlignPost((__ubuf__ T*&)dst, uDst, 0);
         }
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
@@ -528,7 +535,8 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedVF(
             Binaryfunc(vreg1, vreg1, vreg3, maskMain);
             // L3
             Binaryfunc(vreg0, vreg0, vreg1, maskMain);
-            StoreUnAlign((__ubuf__ T*&)dstAddr, vreg0, uDst, postUpdateStrideMain);
+            Reg::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg0, uDst, postUpdateStrideMain);
+            Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
         }
         newSrc = src + static_cast<uint64_t>((loopANum - 1) * vlSize * dtypeSize);
         // L0
@@ -558,7 +566,7 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedVF(
         Binaryfunc(vreg1, vreg1, vreg3, maskTail);
         // L3
         Binaryfunc(vreg0, vreg0, vreg1, maskTail);
-        StoreUnAlign((__ubuf__ T*&)dstAddr, vreg0, uDst, postUpdateStrideTail);
+        Reg::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg0, uDst, postUpdateStrideTail);
         Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
     }
 
@@ -568,6 +576,7 @@ __simd_vf__ inline void ReduceRAReuseSourceUnAlignedVF(
             Reg::LoadUnAlignPre(uSrc, ((__ubuf__ T*&)srcAddr));
             Reg::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T*&)srcAddr), postUpdateStrideMain);
             Reg::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg0, uDst, postUpdateStrideMain);
+            Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
         }
         Reg::LoadUnAlignPre(uSrc, ((__ubuf__ T*&)srcAddr));
         Reg::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T*&)srcAddr), postUpdateStrideTail);
@@ -630,9 +639,9 @@ __simd_callee__ inline void ReduceARCastfoldZeroUnAligned(
             Reducefunc(vreg1Cast, vreg0Cast, fullMask);
             Reg::Cast<T, U, ReduceOpInternal::CastTraitF16B8>(vreg1, vreg1Cast, fullMask);
         }
-        StoreUnAlign((__ubuf__ T*&)dstAddr, vreg1, uDst, 1);
+        Reg::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg1, uDst, 1);
+        Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
     }
-    Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
 }
 
 template <class T, const Reg::RegTrait& Trait, auto Binaryfunc, auto Reducefunc>
@@ -731,9 +740,9 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedB64VF(
                 Binaryfunc(vreg1, vreg1, vreg3, fullMask);
                 // L3
                 Binaryfunc(vreg0, vreg0, vreg1, fullMask);
-                StoreUnAlign((__ubuf__ T*&)dst, vreg0, uDst, vlSize);
+                Reg::StoreUnAlign((__ubuf__ T*&)dst, vreg0, uDst, vlSize);
+                Reg::StoreUnAlignPost((__ubuf__ T*&)dst, uDst, 0);
             }
-            Reg::StoreUnAlignPost((__ubuf__ T*&)dst, uDst, 0);
         }
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
     }
@@ -760,9 +769,9 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedB64VF(
             } else {
                 Reducefunc(vreg2, vreg0, fullMask);
             }
-            StoreUnAlign((__ubuf__ T*&)dstAddr, vreg2, uDst, 1);
+            Reg::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg2, uDst, 1);
+            Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
         }
-        Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
     }
 
     for (uint16_t i = 0; i < foldTwo; i++) {
@@ -790,9 +799,9 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedB64VF(
             } else {
                 Reducefunc(vreg2, vreg0, fullMask);
             }
-            StoreUnAlign((__ubuf__ T*&)dstAddr, vreg2, uDst, 1);
+            Reg::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg2, uDst, 1);
+            Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
         }
-        Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
     }
 
     // Reduce to 1
@@ -814,8 +823,8 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedB64VF(
                 Reg::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T*&)newSrc), vlSize);
                 Reducefunc(vreg1, vreg0, mask);
                 Reg::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg1, uDst, 1);
+                Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
             }
-            Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
         }
     }
 }
@@ -969,9 +978,9 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedVF(
                 Binaryfunc(vreg1, vreg1, vreg3, fullMask);
                 // L3
                 Binaryfunc(vreg0, vreg0, vreg1, fullMask);
-                StoreUnAlign((__ubuf__ T*&)dst, vreg0, uDst, vlSize);
+                Reg::StoreUnAlign((__ubuf__ T*&)dst, vreg0, uDst, vlSize);
+                Reg::StoreUnAlignPost((__ubuf__ T*&)dst, uDst, 0);
             }
-            Reg::StoreUnAlignPost((__ubuf__ T*&)dst, uDst, 0);
         }
         Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
     }
@@ -998,9 +1007,9 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedVF(
             } else {
                 Reducefunc(vreg2, vreg0, fullMask);
             }
-            StoreUnAlign((__ubuf__ T*&)dstAddr, vreg2, uDst, 1);
+            Reg::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg2, uDst, 1);
+            Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
         }
-        Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
     }
 
     for (uint16_t i = 0; i < foldTwo; i++) {
@@ -1028,9 +1037,9 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedVF(
             } else {
                 Reducefunc(vreg2, vreg0, fullMask);
             }
-            StoreUnAlign((__ubuf__ T*&)dstAddr, vreg2, uDst, 1);
+            Reg::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg2, uDst, 1);
+            Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
         }
-        Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
     }
 
     for (uint16_t i = 0; i < foldThree; i++) {
@@ -1067,9 +1076,9 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedVF(
             } else {
                 Reducefunc(vreg2, vreg0, fullMask);
             }
-            StoreUnAlign((__ubuf__ T*&)dstAddr, vreg2, uDst, 1);
+            Reg::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg2, uDst, 1);
+            Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
         }
-        Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
     }
 
     // Reduce to 1
@@ -1089,8 +1098,8 @@ __simd_vf__ inline void ReduceAROverVLReuseSourceUnAlignedVF(
                 Reg::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T*&)newSrc), vlSize);
                 Reducefunc(vreg1, vreg0, fullMask);
                 Reg::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg1, uDst, 1);
+                Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
             }
-            Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
         }
     }
 }
@@ -1139,9 +1148,9 @@ __simd_vf__ inline void CastReduceARUnAligned(__ubuf__ T* dstAddr, __ubuf__ T* s
                 Reg::Cast<U, T, CastTraitUppper>(vreg0CastB32, vreg0, mask);
                 Reducefunc(vreg1CastB32, vreg0CastB32, mask);
                 Reg::Cast<T, U, CastTraitLower>(vreg1, vreg1CastB32, mask);
-                StoreUnAlign((__ubuf__ T*&)dstAddr, vreg1, uDst, 1);
+                Reg::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg1, uDst, 1);
+                Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
             }
-            Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
         } else if constexpr (SupportBytes<T, 1>()) {
             Reg::RegTensor<T, Trait> vreg0;
             Reg::RegTensor<T, Trait> vreg1;
@@ -1158,9 +1167,9 @@ __simd_vf__ inline void CastReduceARUnAligned(__ubuf__ T* dstAddr, __ubuf__ T* s
                 Reg::Cast<U, T, CastTraitUppper>(vreg0CastB16, vreg0, mask);
                 Reducefunc(vreg1CastB16, vreg0CastB16, mask);
                 Reg::Cast<T, U, CastTraitLower>(vreg1, vreg1CastB16, mask);
-                StoreUnAlign((__ubuf__ T*&)dstAddr, vreg1, uDst, 1);
+                Reg::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg1, uDst, 1);
+                Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
             }
-            Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
         }
     } else {
         if constexpr (SupportBytes<T, 2>()) {
@@ -1189,9 +1198,9 @@ __simd_vf__ inline void CastReduceARUnAligned(__ubuf__ T* dstAddr, __ubuf__ T* s
                 Reg::Cast<U, T, CastTraitUppper>(vreg0CastB32, vreg2, fullMask);
                 Reducefunc(vreg1CastB32, vreg0CastB32, fullMask);
                 Reg::Cast<T, U, CastTraitLower>(vreg1, vreg1CastB32, fullMask);
-                StoreUnAlign((__ubuf__ T*&)dstAddr, vreg1, uDst, 1);
+                Reg::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg1, uDst, 1);
+                Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
             }
-            Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
         } else if constexpr (SupportBytes<T, 1>()) {
             Reg::RegTensor<T, Trait> vreg0;
             Reg::RegTensor<T, Trait> vreg1;
@@ -1218,9 +1227,9 @@ __simd_vf__ inline void CastReduceARUnAligned(__ubuf__ T* dstAddr, __ubuf__ T* s
                 Reg::Cast<U, T, CastTraitUppper>(vreg0CastB16, vreg2, fullMask);
                 Reducefunc(vreg1CastB16, vreg0CastB16, fullMask);
                 Reg::Cast<T, U, CastTraitLower>(vreg1, vreg1CastB16, fullMask);
-                StoreUnAlign((__ubuf__ T*&)dstAddr, vreg1, uDst, 1);
+                Reg::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg1, uDst, 1);
+                Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
             }
-            Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
         }
     }
 }
@@ -1239,9 +1248,9 @@ __simd_vf__ inline void ReduceARReuseSourceUnAlignedVF(
     for (uint16_t loopA = 0; loopA < static_cast<uint16_t>(dimA); loopA++) {
         Reg::LoadUnAlign(vreg0, uSrc, ((__ubuf__ T*&)srcAddr), dimR);
         Reducefunc(vreg1, vreg0, mask);
-        StoreUnAlign((__ubuf__ T*&)dstAddr, vreg1, uDst, 1);
+        Reg::StoreUnAlign((__ubuf__ T*&)dstAddr, vreg1, uDst, 1);
+        Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
     }
-    Reg::StoreUnAlignPost((__ubuf__ T*&)dstAddr, uDst, 0);
 }
 
 template <class T, const Reg::RegTrait& Trait, auto Binaryfunc, auto Reducefunc>
