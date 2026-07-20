@@ -41,7 +41,7 @@ Use the `SCENARIO_NUM` build parameter to select a scenario. Every scenario uses
 
 `SCENARIO_NUM` is passed by CMake as a compile-time macro. The kernel selects the corresponding scenario with `if constexpr`; rerun CMake and rebuild after changing the scenario.
 
-The device-side flow is as follows. Each K chunk follows `GM→L1 (MTE2)→L0A/L0B (MTE1)→Mmad (M)`. `MTE1→MTE2` and `M→MTE1` protect L1, L0A, and L0B reuse for the next chunk. The final Fixpipe writeback only waits on `M→FIX` after Mmad completes; no `PIPE_ALL` synchronization is used.
+The device-side flow is as follows. Each K chunk follows `GM→L1 (MTE2)→L0A/L0B (MTE1)→Mmad (M)`. `MTE1→MTE2` and `M→MTE1` protect L1, L0A, and L0B reuse for the next chunk. The final Fixpipe writeback waits on `M→FIX` after Mmad completes. `asc_sync_pipe(PIPE_ALL)` is called at the end of the kernel to ensure that all pipelines complete.
 
 **Scenario 1: int8 input, scalar dequantization, and ND half output**
 
