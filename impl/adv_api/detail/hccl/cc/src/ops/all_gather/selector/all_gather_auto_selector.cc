@@ -20,14 +20,16 @@ SelectorStatus AllGatherAutoSelector::SelectCcuMsAlgo(
 {
     HCCL_DEBUG("[AllGatherAutoSelector][%s] start, topoInfo topoLevelNums[%u]", __func__, topoInfo->topoLevelNums);
     (void)configAlgMap;
-    (void)opParam;
-
-    // Temporary KFC convergence: only enable single-level Mesh1D before UBX/NHR/multilevel CCU paths are verified.
+    // Temporary KFC convergence: only enable single-level Mesh1D Mem2Mem before other CCU paths are verified.
     if (topoInfo->topoLevelNums > 1 || topoInfo->level0Topo != Level0Shape::MESH_1D) {
         HCCL_DEBUG("[AllGatherAutoSelector] only single level MESH_1D is supported for ccu_ms mode.");
         return SelectorStatus::NOT_MATCH;
     }
-    selectAlgName = "CcuAllGatherMesh1D";
+    if (IsInputOutputOverlap(opParam)) {
+        HCCL_WARNING("[Algo][AllGatherAutoSelector] ccu_ms does not support inplace allgather.");
+        return SelectorStatus::NOT_MATCH;
+    }
+    selectAlgName = "CcuAllGatherMesh1DMem2Mem";
     HCCL_DEBUG("[AllGatherAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
     return SelectorStatus::MATCH;
 }
@@ -36,15 +38,18 @@ SelectorStatus AllGatherAutoSelector::SelectMeshAlgo(
     const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName) const
 {
     HCCL_DEBUG("[AllGatherAutoSelector][%s] start", __func__);
-    (void)opParam;
-    // Temporary KFC convergence: keep ccu_ms selection on Mesh1D and do not restore UBX/concurrent choices yet.
+    // Temporary KFC convergence: keep ccu_ms selection on Mesh1D Mem2Mem only.
     if (topoInfo->level0Topo != Level0Shape::MESH_1D) {
         HCCL_DEBUG(
             "[AllGatherAutoSelector] Level0Topo[%u] is not supported for ccu_ms mode, reset to default.",
             topoInfo->level0Topo);
         return SelectorStatus::NOT_MATCH;
     }
-    selectAlgName = "CcuAllGatherMesh1D";
+    if (IsInputOutputOverlap(opParam)) {
+        HCCL_WARNING("[Algo][AllGatherAutoSelector] ccu_ms does not support inplace allgather.");
+        return SelectorStatus::NOT_MATCH;
+    }
+    selectAlgName = "CcuAllGatherMesh1DMem2Mem";
     HCCL_DEBUG("[AllGatherAutoSelector][%s] Algo match[%s]", __func__, selectAlgName.c_str());
     return SelectorStatus::MATCH;
 }
@@ -64,7 +69,7 @@ SelectorStatus AllGatherAutoSelector::SelectCcuScheduleLevel0Algo(
     const TopoInfoWithNetLayerDetails* topoInfo, std::string& selectAlgName, const u64 dataSize) const
 {
     (void)dataSize;
-    // Temporary KFC convergence: route only regular Mesh1D to CcuAllGatherMesh1D; mem2mem/2die variants stay disabled.
+    // Temporary KFC convergence: route only regular Mesh1D to the KFC Mem2Mem implementation.
     if (topoInfo->level0Topo != Level0Shape::MESH_1D ||
         topoInfo->level0MeshType == Level0MeshType::TWO_DIE_NOT_REGULAR) {
         HCCL_DEBUG(
@@ -73,7 +78,7 @@ SelectorStatus AllGatherAutoSelector::SelectCcuScheduleLevel0Algo(
         return SelectorStatus::NOT_MATCH;
     }
 
-    selectAlgName = "CcuAllGatherMesh1D";
+    selectAlgName = "CcuAllGatherMesh1DMem2Mem";
     HCCL_DEBUG("[AllGatherAutoSelector][%s] Algo match[%s]", __func__, selectAlgName.c_str());
     return SelectorStatus::MATCH;
 }
@@ -86,6 +91,10 @@ SelectorStatus AllGatherAutoSelector::SelectCcuScheduleAlgo(
     (void)configAlgMap;
     u64 perDataSize = DATATYPE_SIZE_TABLE[opParam.DataDes.dataType];
     u64 dataSize = opParam.DataDes.count * perDataSize;
+    if (IsInputOutputOverlap(opParam)) {
+        HCCL_WARNING("[Algo][AllGatherAutoSelector] ccu schedule does not support inplace allgather.");
+        return SelectorStatus::NOT_MATCH;
+    }
     if (topoInfo->topoLevelNums > 1) {
         // Temporary KFC convergence: multilevel NHR/parallel CCU variants are not selected until they are re-registered.
         HCCL_DEBUG("[AllGatherAutoSelector] multi-level topo is not supported for ccu schedule mode.");
