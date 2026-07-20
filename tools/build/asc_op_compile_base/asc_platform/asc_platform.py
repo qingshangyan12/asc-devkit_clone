@@ -17,6 +17,12 @@ class AscPlatform:
     _lib = None
 
     @staticmethod
+    def get_lib():
+        if AscPlatform._lib is None:
+            AscPlatform._initial_lib()
+        return AscPlatform._lib
+
+    @staticmethod
     def _initial_lib():
         lib_path = os.path.join(os.path.dirname(__file__), "libasc_platform.so")
         AscPlatform._lib = ctypes.cdll.LoadLibrary(lib_path)
@@ -69,12 +75,6 @@ class AscPlatform:
 
         AscPlatform._lib.ASCSetCoreNumByCoreType.argtypes = [ctypes.c_char_p]
         AscPlatform._lib.ASCSetCoreNumByCoreType.restype = ctypes.c_bool
-
-    @staticmethod
-    def get_lib():
-        if AscPlatform._lib is None:
-            AscPlatform._initial_lib()
-        return AscPlatform._lib
 
 
 def _init_soc_spec(soc_version, core_type, aicore_num=None, l1_fusion_flag=None):
