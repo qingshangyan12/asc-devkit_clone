@@ -8,4 +8,5 @@
 
 | 目录名称  | 功能描述 |
 | --------- | --------- |
+| [00_data_movement](./00_data_movement) | 数据搬运相关C API样例 |
 | [03_matrix_compute](./03_matrix_compute) | 本样例路径以Mmad等算子为示例，展示了矩阵计算接口的使用。|
