@@ -101,45 +101,9 @@ static uint64_t GetTokenFromBuffInfo(void* bufferAddr, uint64_t bufferSize)
             bufferAddr, bufferSize, token);
         return token;
     }
-    
+
     HCCL_WARNING("[GetTokenFromBuffInfo] buffer not available, using default token=0");
     return 0;
-}
-
-static HcclResult UpdateCcuCtxTokenOnReuse(HcclComm comm, void *ctx, uint64_t ctxSize,
-    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
-{
-    if (ctxSize == 0) {
-        return HCCL_SUCCESS;
-    }
-    
-    // 从旧 ctx 反序列化获取完整数据
-    auto *ctxRaw = static_cast<char *>(ctx);
-    std::vector<char> seq(ctxRaw, ctxRaw + ctxSize);
-    AlgResourceCtxSerializable tempCtx;
-    tempCtx.DeSerialize(seq);
-    
-    // 用 resCtxHost 中已设置的 kfcServerArgs（含占位符）覆盖旧数据
-    tempCtx.kfcServerArgs = resCtxHost->kfcServerArgs;
-    tempCtx.kfcServerArgSize = resCtxHost->kfcServerArgSize;
-    
-    // 从 cclBuffer 获取 token 并更新第6个字段（而非 push_back，保证序列化大小一致）
-    void *cclBufferAddr = nullptr;
-    uint64_t cclBufferSize = 0;
-    if (HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize) == HCCL_SUCCESS) {
-        uint64_t token = GetTokenFromBuffInfo(cclBufferAddr, cclBufferSize);
-        if (tempCtx.kfcServerArgs.size() >= 6U) {
-            tempCtx.kfcServerArgs[5] = token;  // 更新占位符为真实 token
-            HCCL_INFO("[UpdateCcuCtxTokenOnReuse] token[%llu] updated at kfcServerArgs[5]", token);
-        }
-        
-        // 序列化大小不变（都是6个元素），可以安全更新
-        std::vector<char> updatedSeq = tempCtx.Serialize();
-        memcpy_s(ctx, ctxSize, updatedSeq.data(), updatedSeq.size());
-    } else {
-        HCCL_WARNING("[UpdateCcuCtxTokenOnReuse] HcclGetHcclBuffer failed, token remains 0");
-    }
-    return HCCL_SUCCESS;
 }
 
 // 检查非对称拓扑支持情况
@@ -776,9 +740,15 @@ HcclResult HcclGetAlgRes(
             isResourceReused = true;
             *resCtxSequence = ctx;
             param.ctxSize = size;
-            
+
             if (param.engine == COMM_ENGINE_CCU) {
-                CHK_RET(UpdateCcuCtxTokenOnReuse(comm, ctx, size, resCtxHost));
+                // token 现已从 workSpace 在 AcquireAlgResources 中计算并填充到 resCtxHost->kfcServerArgs[5]
+                // 资源复用路径下，旧 ctx 中的 token 无法被正确更新（workSpace 可能已变化）
+                // 直接报错，强制走资源重建路径以保证 token 正确
+                HCCL_ERROR("[HcclGetAlgRes] CCU resource reuse hit, but UpdateCcuCtxTokenOnReuse was removed. "
+                           "Old ctx cannot be safely reused with new workSpace-based token strategy. "
+                           "Please investigate if reuse is expected.");
+                return HCCL_E_INTERNAL;
             }
             return HCCL_SUCCESS;
         }
@@ -1338,17 +1308,13 @@ HcclResult HcclAllocAlgResourceCcu(
     CHK_RET(HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize));
     // CCL IN使用所有的CCL Buffer，这个其实就是scratch buffer
     resCtxHost->cclMem = HcclMem{HCCL_MEM_TYPE_DEVICE, cclBufferAddr, cclBufferSize};
-    
-    // 在确保 cclMem 可用的前提下，获取 token 并更新 kfcServerArgs 的第6个字段（占位符）
-    uint64_t token = GetTokenFromBuffInfo(cclBufferAddr, cclBufferSize);
-    if (resCtxHost->kfcServerArgs.size() >= 6U) {
-        resCtxHost->kfcServerArgs[5] = token;  // 更新占位符为真实 token
-        HCCL_INFO("[HcclAllocAlgResourceCcu] token[%llu] updated at kfcServerArgs[5]", token);
-    } else {
-        HCCL_WARNING("[HcclAllocAlgResourceCcu] kfcServerArgs size[%zu] < 6, cannot update token",
-            resCtxHost->kfcServerArgs.size());
-    }
-    
+
+    // token 已在 AcquireAlgResources 中从 workSpace 计算并填充到 kfcServerArgs[5]
+    // 参照 legacy mc2_compont.cpp：token 来源应为 workSpace，而非 cclBuffer
+    // 此处仅打印验证，不再从 cclBuffer 重新查询覆盖
+    HCCL_INFO("[HcclAllocAlgResourceCcu] token[%llu] kept from workSpace at kfcServerArgs[5]",
+        resCtxHost->kfcServerArgs.size() >= 6U ? resCtxHost->kfcServerArgs[5] : 0ULL);
+
     resCtxHost->notifyNumOnMainThread = resRequest.notifyNumOnMainThread;
     resCtxHost->slaveThreadNum = resRequest.slaveThreadNum;
     resCtxHost->notifyNumPerThread = resRequest.notifyNumPerThread;

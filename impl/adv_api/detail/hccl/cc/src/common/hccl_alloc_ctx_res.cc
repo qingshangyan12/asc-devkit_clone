@@ -679,13 +679,24 @@ static HcclResult AcquireAlgResources(
         CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
     }
     if (opParam.engine == COMM_ENGINE_CCU) {
-        // 填充 kfcServerArgs 的所有6个字段（最后一个为 token 占位符，后续更新）
+        // 参照 legacy mc2_compont.cpp：token 应从 workSpace 获取，而非 cclBuffer
+        // legacy: tokenInfo = CcuRep::GetTokenInfo(workspaceBuffer->GetAddr(), workspaceBuffer->GetSize());
+        uint64_t token = 0;
+        if (opResCtx.workSpace != 0) {
+            token = GetTokenInfo(opResCtx.workSpace, opResCtx.workSpaceSize);
+            HCCL_INFO("[AcquireAlgResources] Get token from workSpace[0x%llx], size[%llu], token[%llu]",
+                static_cast<unsigned long long>(opResCtx.workSpace),
+                static_cast<unsigned long long>(opResCtx.workSpaceSize),
+                static_cast<unsigned long long>(token));
+        } else {
+            HCCL_WARNING("[AcquireAlgResources] workSpace is 0, token remains 0");
+        }
         resCtxHost->kfcServerArgs = {
             opResCtx.xnAddr,          opResCtx.ckeAddr,
             static_cast<uint64_t>(1), // dieNum
             static_cast<uint64_t>(1), // missionNum
             static_cast<uint64_t>(0), // missionIndex
-            static_cast<uint64_t>(0), // token 占位符，后续在 GetAlgResCcu 中更新
+            token,                    // 从 workSpace 计算得到的真实 token
         };
         resCtxHost->kfcServerArgSize = 6;
         HCCL_INFO("[AcquireAlgResources] kfcServerArgs generated: "
