@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例使用Ascend C C API将矩阵数据从UB（Unified Buffer）搬运到L1（L1 Buffer），随后完成L1到L0的数据搬运、Mmad矩阵乘计算和Fixpipe结果写回。样例仅支持Ascend 950PR/Ascend 950DT（`dav-3510`），支持NPU运行和NPU仿真模式。
+本样例使用Ascend C C API将矩阵数据从UB（Unified Buffer）搬运到L1（L1 Buffer），随后完成L1到L0A和L0B的数据搬运、Mmad矩阵乘计算和Fixpipe结果写回。样例仅支持Ascend 950PR/Ascend 950DT（`dav-3510`），支持NPU运行和NPU仿真模式。
 
 ## 本样例支持的产品和CANN软件版本
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example uses the Ascend C C API to move matrix data from UB (Unified Buffer) to L1 (L1 Buffer), then performs L1-to-L0 movement, Mmad matrix multiplication, and Fixpipe result writeback. It supports Ascend 950PR/Ascend 950DT (`dav-3510`) only and provides NPU execution and NPU simulation modes.
+This example uses the Ascend C C API to move matrix data from UB (Unified Buffer) to L1 (L1 Buffer), then performs L1-to-L0A and L1-to-L0B movement, Mmad matrix multiplication, and Fixpipe result writeback. It supports Ascend 950PR/Ascend 950DT (`dav-3510`) only and provides NPU execution and NPU simulation modes.
 
 ## Supported Products and CANN Versions
 
