@@ -173,8 +173,8 @@
 | short3、 ushort3、 short4、 ushort4 | 8 | 8 |
 | int2、 uint2 | 8 | 8 |
 | int3、 uint3、 int4、 uint4 | 16 | 16 |
-| long2、 ulong2 | 8 | 8 |
-| long3、 ulong3、 long4、 ulong4 | 16 | 16 |
+| long2、 ulong2 | 16 | 16 |
+| long3、 ulong3、 long4、 ulong4 | 32 | 32 |
 | longlong2、 ulonglong2 | 16 | 16 |
 | longlong3、 ulonglong3、 longlong4、 ulonglong4 | 32 | 32 |
 | float2 | 8 | 8 |
