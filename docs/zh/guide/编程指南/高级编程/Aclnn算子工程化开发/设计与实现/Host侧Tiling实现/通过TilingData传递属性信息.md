@@ -2,9 +2,7 @@
 
 算子属性在Host侧保存，Kernel不能直接读取。属性需要参与Kernel计算时，Host侧Tiling函数先从`RuntimeAttrs`读取属性值，再把Kernel真正需要的数据写入TilingData，由框架传到Kernel侧。
 
-本文以LeakyReluCustom的`negative_slope`属性为例，说明从原型声明、Host侧读取到Kernel侧使用的完整流程。TilingData的基础定义和写入方法见[基本流程](./基本流程.md)。
-
-完整可编译样例见[LeakyReluCustom](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op)。
+本文以LeakyReluCustom的`negative_slope`属性为例，介绍如何通过TilingData将属性从Host侧传递至Kernel侧，包括在算子原型中声明属性、在Host侧读取属性并写入TilingData，以及在Kernel侧从TilingData中读取并使用该属性。TilingData的基础定义和写入方法见[基本流程](./基本流程.md)。
 
 ## 1. 属性传递流程
 
@@ -173,15 +171,7 @@ y = tmpTensor1 + tmpTensor2
 
 如果某个属性只用于Host侧选择TilingKey，例如根据`algorithm`属性选择不同Kernel分支，则可以直接调用`context->SetTilingKey(...)`，不再额外增加TilingData字段。分支组织方法见[多分支策略](../多分支策略.md)。
 
-## 6. 使用约束
-
-1. `GetAttrPointer(index)`的索引与`OpDef`中的属性声明顺序一致，从0开始。
-2. `GetAttrPointer<T>`的类型必须与属性实际类型一致，使用前检查返回指针。
-3. 只向TilingData写入Kernel需要的数据；字符串、动态容器和大数组不适合作为TilingData字段。
-4. Host侧转换整数类型时检查符号和取值范围。
-5. Host和Kernel侧引用同一份TilingData定义，并保持字段类型和布局一致。
-
-## 7. 相关文档
+## 6. 相关文档
 
 - [算子原型定义](../算子原型定义.md)：声明属性及默认值。
 - [Host侧Tiling实现](./基本流程.md)：定义和写入TilingData。
