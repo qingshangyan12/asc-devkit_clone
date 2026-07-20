@@ -34,25 +34,13 @@ namespace AscendC {
 namespace Te {
 
 template<typename CalcFunc, typename TraitType>
-struct Transform2VFSet {
+struct Transform2RegSet {
     using binarySet = Std::tuple<Inst::Add, Inst::Sub, Inst::Madd, Inst::And, Inst::Select, Inst::AbsSub, Inst::Min, Inst::Max,
         Inst::Or, Inst::Mul, Inst::ExpSubEven, Inst::ExpSubOdd, Inst::ShiftLeft, Inst::ShiftRight, Inst::Div, Inst::Xor, Inst::Prelu>;
-    using castSet = Std::tuple<Inst::Cast, Inst::Ceil, Inst::Rint, Inst::Round, Inst::Trunc>;
-    using binaryScalarSet = Std::tuple<Inst::MulScalar, Inst::AddScalar, Inst::MaxScalar, Inst::MinScalar,
-        Inst::ShiftLeftScalar, Inst::ShiftRightScalar, Inst::MulsEven, Inst::MulsOdd>;
-    using unarySet = Std::tuple<Inst::Not, Inst::Ln, Inst::Abs, Inst::Sqrt, Inst::Exp>;
-    using axpySet = Std::tuple<Inst::Axpy>;
-    using dualSet = Std::tuple<Inst::Mull>;
 
     using transformSet = TupleMap<
-        Std::tuple<binarySet, Transform2BinaryVF<CalcFunc, TraitType>>,
-        Std::tuple<castSet, Transform2CastInstMatch<CalcFunc, TraitType>>,
-        Std::tuple<binaryScalarSet, Transform2BinaryScalarVF<CalcFunc, TraitType>>,
-        Std::tuple<unarySet, Transform2UnaryVF<CalcFunc, TraitType>>,
-        Std::tuple<axpySet, Transform2AxpyVF<CalcFunc, TraitType>>,
-        Std::tuple<dualSet, Transform2DualVF<CalcFunc, TraitType>>>;
+        Std::tuple<binarySet, Transform2BinaryReg<CalcFunc, TraitType>>>;
 };
-
 }
 }
 

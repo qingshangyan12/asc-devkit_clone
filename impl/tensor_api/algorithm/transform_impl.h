@@ -28,9 +28,9 @@ namespace AscendC {
 namespace Te {
 
 template<typename CalcFunc, typename TraitType = Std::ignore_t, typename... Args>
-__aicore__ inline void Transform(const Args&... args)
+__simd_callee__ inline void Transform(Args&... args)
 {
-    Transform2VF<CalcFunc, TraitType>::template Run(args...);
+    Transform2Reg<CalcFunc, TraitType>::template Run(args...);
 }
 
 }
