@@ -49,6 +49,7 @@ __simd_callee__ inline void asc_max_scalar(vector_bfloat16_t& dst, vector_bfloat
   ```
 ## 参数说明
 
+**表 1** 参数说明
 | 参数名       | 输入/输出 | 描述               |
 | --------- | ----- | ---------------- |
 | dst       | 输出    | 目的操作数（矢量数据寄存器）。            |
@@ -57,6 +58,12 @@ __simd_callee__ inline void asc_max_scalar(vector_bfloat16_t& dst, vector_bfloat
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
+
+
+## 数据类型
+
+目的操作数、源操作数与标量的数据类型需要保持一致。支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float
+
 
 ## 返回值说明
 
@@ -68,7 +75,24 @@ PIPE_V
 
 ## 约束说明
 
-无
+- 输入`src`为-0、`value`为+0的情况下，输出`dst`为 +0。
+- mask未筛选的元素在输出中置零。
+
+## 理论性能
+
+
+| 输入类型 | 输出类型 | 理论并行度(element/cycle) |
+|---|---|---|
+| int8_t | int8_t | 256 |
+| uint8_t | uint8_t | 256 |
+| int16_t | int16_t | 128 |
+| uint16_t | uint16_t | 128 |
+| half | half | 128 |
+| bfloat16_t | bfloat16_t | 128 |
+| int32_t | int32_t | 64 |
+| uint32_t | uint32_t | 64 |
+| float | float | 64 |
+
 
 ## 调用示例
 
