@@ -55,11 +55,15 @@ private:
         auto srcLayout = src.Layout();
 
         uint16_t blockCount = GetTotalRowShape(srcLayout);
-        uint32_t blockLen = GetTotalColumnShape(srcLayout) * sizeof(SrcType);
-        int64_t srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) * sizeof(SrcType);
-        int64_t dstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) * sizeof(DstType);
+        uint32_t blockLen = Std::ceil_division(GetTotalColumnShape(srcLayout), C0_ELEMENT<SrcType>);
+        int64_t srcStride = Std::ceil_division(
+            GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) - GetTotalColumnShape(srcLayout),
+            C0_ELEMENT<SrcType>);
+        int64_t dstStride = Std::ceil_division(
+            GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) - GetTotalColumnShape(srcLayout),
+            C0_ELEMENT<DstType>);
 
-        EmitCopy(dst, src, blockCount, blockLen, srcStride, dstStride);
+        CopyUbufToUbufInstr::DataCopy(dst, src, blockCount, blockLen, srcStride, dstStride);
     }
 };
 
