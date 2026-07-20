@@ -114,7 +114,7 @@ __aicore__ inline void CosRound(
     /*
     k=round(x/π + 1/2), x0=x-kπ, x0 belongs to [-π, 0], (x0 + π/2) belongs to [-π/2, π/2]
     π=π_0+π_1+π_2+π_3+π_4 achieve final precision compensation.
-    Final solution�?
+    Final solution�?
     k = round(x * invpi + 1/2)
     x -= k * pi_0
     x -= k * pi_1
@@ -308,6 +308,7 @@ __aicore__ inline void CosImpl(
     SetMaskNorm();
     ResetMask();
 }
+
 
 template <typename T, bool isReuseSource = false>
 __aicore__ inline void CosImpl(
