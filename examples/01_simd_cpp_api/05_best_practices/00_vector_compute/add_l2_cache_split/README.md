@@ -87,7 +87,6 @@ for (int32_t i = 0; i < LOOP_COUNT; i++) {
         for (int64_t k = 0; k < totalBlocks; k++) {
             DataCopy x, DataCopy y, Add, DataCopy z
         }
-        PipeBarrier<PIPE_ALL>();  // tile间同步
     }
 }
 ```
@@ -112,8 +111,6 @@ for (int64_t tileIdx = 0; tileIdx < l2Opt.GetTileNum(); tileIdx++) {
     for (int64_t i = 0; i < totalBlocks; i++) {
         DataCopy x, DataCopy y, Add, DataCopy z
     }
-
-    PipeBarrier<PIPE_ALL>();  // 所有核同步后再进入下一Tile
 }
 ```
 
