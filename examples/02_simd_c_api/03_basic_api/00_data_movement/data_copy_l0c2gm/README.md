@@ -41,7 +41,7 @@ data_copy_l0c2gm
 
 `SCENARIO_NUM`由CMake作为编译期宏传入，内核通过`if constexpr`选择对应场景。切换场景后需要重新执行CMake并编译。
 
-设备侧数据流如下：每个K轴分块按照`GM→L1（MTE2）→L0（MTE1）→Mmad（M）`执行；`MTE1→MTE2`和`M→MTE1`仅用于保护下一轮分块对L1/L0的复用。最终仅建立`M→FIX`依赖，使Fixpipe在Mmad完成后搬出L0C结果，不使用`PIPE_ALL`同步。
+设备侧数据流如下：每个K轴分块按照`GM→L1（MTE2）→L0A/L0B（MTE1）→Mmad（M）`执行；`MTE1→MTE2`和`M→MTE1`仅用于保护下一轮分块对L1、L0A和L0B的复用。最终仅建立`M→FIX`依赖，使Fixpipe在Mmad完成后搬出L0C结果，不使用`PIPE_ALL`同步。
 
 **场景1：int8输入、标量反量化并输出ND half**
 

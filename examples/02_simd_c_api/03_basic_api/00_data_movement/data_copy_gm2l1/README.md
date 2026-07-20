@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍如何使用Ascend C C API将输入数据从GM（Global Memory）搬运到L1（L1 Buffer），支持多种输入格式（Nz、ND、DN）和向量量化参数搬入等功能。数据搬入后，样例继续完成L1到L0的搬运、矩阵乘计算和L0C到GM的结果写回。
+本样例介绍如何使用Ascend C C API将输入数据从GM（Global Memory）搬运到L1（L1 Buffer），支持多种输入格式（Nz、ND、DN）和向量量化参数搬入等功能。数据搬入后，样例继续完成L1到L0A和L0B的搬运、矩阵乘计算和L0C到GM的结果写回。
 
 本样例仅支持Ascend 950PR/Ascend 950DT（`dav-3510`），支持NPU运行和NPU仿真模式，不提供CPU Debug模式。
 

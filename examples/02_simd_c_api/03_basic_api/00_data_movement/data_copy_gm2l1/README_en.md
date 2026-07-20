@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example shows how to use the Ascend C C API to move input data from GM (Global Memory) to the L1 Buffer. It supports Nz, ND, and DN input formats and vector-quantization parameter movement. After the input is moved, the example performs L1-to-L0 movement, matrix multiplication, and L0C-to-GM result writeback.
+This example shows how to use the Ascend C C API to move input data from GM (Global Memory) to the L1 Buffer. It supports Nz, ND, and DN input formats and vector-quantization parameter movement. After the input is moved, the example performs L1-to-L0A and L1-to-L0B movement, matrix multiplication, and L0C-to-GM result writeback.
 
 This example supports Ascend 950PR/Ascend 950DT (`dav-3510`) only. It supports NPU execution and NPU simulation; CPU debug mode is not provided.
 
