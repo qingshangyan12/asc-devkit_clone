@@ -47,7 +47,7 @@ REGISTER_TILING_DATA_CLASS(MatmulCustom, MatmulCustomTilingData)
 本例固定A为`[512, 128]`、B为`[128, 512]`，输出C为`[512, 512]`。A、B使用`float16`，C使用`float`，矩阵均为ND格式。
 
 ```cpp
-#include "../../op_kernel/matmul_custom/matmul_custom_tiling.h"
+#include "../op_kernel/matmul_custom_tiling.h"
 #include "register/op_def_registry.h"
 #include "tiling/tiling_api.h"
 
@@ -222,15 +222,6 @@ Host侧`SetAType`、`SetBType`和`SetCType`配置的位置、format、dtype，�
 
 不同高阶API的必选配置、支持dtype和workspace要求不同。本文只展示工程接入方式，具体参数以对应API接口约束为准。
 
-## 6. 使用约束
-
-1. Host和Kernel侧使用同一份TilingData定义，保持字段布局一致。
-2. 使用`TILING_DATA_FIELD_DEF_STRUCT`时，嵌套类型和外层TilingData都需要采用配套的宏定义方式。
-3. 使用宏定义方式时，Host侧调用`SaveToBuffer`完成序列化。
-4. 检查`GetTiling`返回值，失败时不要继续启动Kernel。
-5. Host侧高阶Tiling配置需要与Kernel侧高阶API模板参数保持一致。
-6. 根据高阶API要求设置系统workspace和用户workspace总大小。
-
-## 7. 相关文档
+## 6. 相关文档
 
 - [Host侧Tiling实现](./基本流程.md)：普通TilingData和Tiling函数的基本流程。

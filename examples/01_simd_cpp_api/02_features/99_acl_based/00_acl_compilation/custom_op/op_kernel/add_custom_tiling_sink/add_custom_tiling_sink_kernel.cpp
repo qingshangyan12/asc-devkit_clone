@@ -51,6 +51,8 @@ public:
 
             AscendC::Add(zLocal, xLocal, yLocal, tileLength);
 
+            AscendC::DumpTensor(zLocal, 111, 32);
+
             if (i != this->tileNum - 1) {
                 AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
             }
