@@ -102,9 +102,11 @@ static void PreSync(AlltoAllMesh1DContext &ctx)
     }
 
     uint32_t allBit = (1 << OUTPUT_XN_ID) | (1 << TOKEN_XN_ID);
+    HCCL_INFO("[A2A_DBG] PreSync before NotifyWait, allBit[%u]", allBit);
     for (uint32_t i = 0; i < arg->channelCount; i++) {
         ccu::NotifyWait(arg->channels[i], CKE_IDX_0, allBit);
     }
+    HCCL_INFO("[A2A_DBG] PreSync after NotifyWait (passed)");
     HCCL_INFO("[CcuKernelAlltoAllMesh1D] AlltoAllMesh1D PreSync end.");
 }
 
@@ -117,9 +119,11 @@ static void PostSync(AlltoAllMesh1DContext &ctx)
     for (uint32_t i = 0; i < arg->channelCount; i++) {
         ccu::NotifyRecord(arg->channels[i], CKE_IDX_1, postBit);
     }
+    HCCL_INFO("[A2A_DBG] PostSync before NotifyWait, postBit[%u]", postBit);
     for (uint32_t i = 0; i < arg->channelCount; i++) {
         ccu::NotifyWait(arg->channels[i], CKE_IDX_1, postBit);
     }
+    HCCL_INFO("[A2A_DBG] PostSync after NotifyWait (passed)");
     HCCL_INFO("[CcuKernelAlltoAllMesh1D] AlltoAllMesh1D PostSync end.");
 }
 
@@ -153,6 +157,7 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
     uint16_t allBit = ((1 << arg->rankSize) - 1) & (~(1 << arg->rankId)); // 仅rankid位为0，其他位为1，代表远端准备好了
 
     if (arg->loadFromMem) {
+        HCCL_INFO("[A2A_DBG] DoAlltoAll branch A (loadFromMem=true)");
         for(uint64_t r = 0; r < arg->rankSize; r++) {
             if (r == arg->rankId) {
                 ccu::LocalCopy(localDst, src[r], ctx.sliceSize, ctx.event, 1 << r);
@@ -163,8 +168,11 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
             }
         }
         // 等读完所有对端
+        HCCL_INFO("[A2A_DBG] branch A before EventWait, mask[%u]", (unsigned)((1 << arg->rankSize) - 1));
         ccu::EventWait(ctx.event, (1 << arg->rankSize) - 1);
+        HCCL_INFO("[A2A_DBG] branch A after EventWait (passed)");
     } else {
+        HCCL_INFO("[A2A_DBG] DoAlltoAll branch B (loadFromMem=false)");
         for(uint64_t r = 0; r < arg->rankSize; r++) {
             if (r != arg->rankId) {
                 ccu::Write(arg->channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1 << r);
@@ -172,7 +180,9 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
             }
         }
         GroupCopy(ctx, localDst, src[arg->rankId], ctx.goSize);
+        HCCL_INFO("[A2A_DBG] branch B before EventWait, allBit[%u]", (unsigned)allBit);
         ccu::EventWait(ctx.event, allBit);
+        HCCL_INFO("[A2A_DBG] branch B after EventWait (passed)");
     }
 
     return CCU_SUCCESS;
@@ -200,6 +210,9 @@ CcuResult CcuAlltoAllMesh1DKernel(ccu::Variable inputAddr, ccu::Variable outputA
     ctx.enginePool = 0;
 
     HCCL_INFO("[CcuKernelAlltoAllMesh1D] AlltoAllMesh1D run");
+    HCCL_INFO("[A2A_DBG] enter: rankSize[%llu] rankId[%u] channelCount[%u] loadFromMem[%d]",
+              (unsigned long long)kernelArg->rankSize, kernelArg->rankId,
+              kernelArg->channelCount, (int)kernelArg->loadFromMem);
     CCU_CHK_RET(ParseKernelArg(ctx, kernelArg));
     HCCL_INFO("[CcuKernelAlltoAllMesh1D] finish ParseKernelArg!");
     CCU_CHK_RET(InitResource(ctx));
