@@ -212,9 +212,9 @@ SIMT VF内访问UB时的bank冲突为更细粒度的subbank冲突，主要有以
 
 详细的地址低位交织规则以及冲突场景可参考[bank_conflict样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/03_simt_api/02_features/01_api_features/00_memory_access/bank_conflict)。
 
-Case 2中UB的 `in_tile`数组按照行优先存储。按照地址低位交织规则，`in_tile`数组的第一行刚好覆盖bank0～bank3，第二行覆盖bank4～bank7，第三行覆盖bank8～bank11，其余行依次类推。每行32个float数据会恰好跨越4个bank存储。如图3所示，图中展示了tile数组前12行元素在UB上的排布，每行第一个元素用蓝色进行标记。SIMT VF转置时，一个Warp的线程会读取 `in_tile`的一列元素；访问UB时，32个线程会集中访问两个bank group的subbank0，属于读读冲突场景。`out_tile`按输出tile行方向连续写入，可通过访存合并降低写入开销，因此不需要增加padding。
+Case 2中UB的 `in_tile`数组按照行优先存储。按照地址低位交织规则，`in_tile`数组的第一行刚好覆盖bank0～bank3，第二行覆盖bank4～bank7，第三行覆盖bank8～bank11，其余行依次类推。每行32个float数据会恰好跨越4个bank存储。如图2所示，图中展示了tile数组前12行元素在UB上的排布，每行第一个元素用蓝色进行标记。SIMT VF转置时，一个Warp的线程会读取 `in_tile`的一列元素；访问UB时，32个线程会集中访问两个bank group的subbank0，属于读读冲突场景。`out_tile`按输出tile行方向连续写入，可通过访存合并降低写入开销，因此不需要增加padding。
 
-**图3　Case2 tile在UB上的排布示意图**
+**图2　Case 2 tile在UB上的排布示意图**
 
 <img src="./figures/case2_bank.png">
 
@@ -222,11 +222,11 @@ SIMT场景下，处理转置访问UB的bank冲突通常会在tile的列方向增
 
 SIMD与SIMT混合编程场景下，UB数据由MTE搬入。MTE搬运带padding的二维数组时，还需要考虑UB中相邻行的地址跨度对齐。32×34布局的行跨度为 `34 * sizeof(float) = 136B`，不满足32B对齐；因此本样例将padding列数设为8，使用32×40布局，行跨度为 `40 * sizeof(float) = 160B`，既能错开UB bank访问，也满足MTE搬运对UB行跨度的对齐要求。
 
-如图4所示，Case 3中对UB中的tile数组增加8列padding，由每行32个元素改为40个元素。每行40个float的行跨度为160B，对应20个subbank；转置访问同一列时，相邻行元素在UB物理地址上按20个subbank的跨度错开，32个线程的访问不再集中到相同bank group的同一编号subbank，从而降低SIMT VF转置访问阶段的subbank冲突。
+如图3所示，Case 3中对UB中的tile数组增加8列padding，由每行32个元素改为40个元素。每行40个float的行跨度为160B，对应20个subbank；转置访问同一列时，相邻行元素在UB物理地址上按20个subbank的跨度错开，32个线程的访问不再集中到相同bank group的同一编号subbank，从而降低SIMT VF转置访问阶段的subbank冲突。
 
 需要注意的是，32×40布局是SIMD与SIMT混合编程场景下结合MTE搬运对齐要求后的折中选择。与SIMT场景下增加2列padding形成32×34布局不同，32×40布局仍可能存在少量subbank冲突，但冲突强度已经明显低于未padding的32×32布局。
 
-**图4　Case3 tile在UB上的排布示意图**
+**图3　Case 3 tile在UB上的排布示意图**
 
 <img src="./figures/case3_bank.png">
 
@@ -320,15 +320,15 @@ for (uint32_t tile_base = curr_tile_base; tile_base < total_tiles; tile_base += 
 
 Case 4通过双缓冲避免MTE2写入覆盖SIMT VF正在读取的输入缓冲区，也避免SIMT VF写入覆盖MTE3正在搬出的输出缓冲区；通过多组mutex id分别管理两组输入/输出缓冲区的生命周期，将单缓冲中的“MTE2搬入、SIMT VF转置、MTE3搬出”串行屏障，调整为相邻轮次之间的流水重叠。相比Case 3，Task Duration从11.596μs降低到6.831μs，耗时下降约41.1%。相比Case 0直接GM转置，Task Duration从36.263μs降低到6.831μs，整体性能提升约5.31倍。
 
-Case 3与Case 4的仿真指令流水图分别如图5、图6所示。从图5可以看到，Case 3使用单buffer串行处理每组tile。MTE2搬入完成后，SIMT VF需要等待输入buffer可读；SIMT VF完成后，MTE3才能搬出输出buffer；MTE3搬出结束后才能复用同一组UB buffer进入下一轮MTE2搬入。因此MTE2、SIMT VF和MTE3三个流水之间存在明显的串行等待，SIMT VF执行间隔中会出现较多由搬运和同步带来的空隙。
+Case 3与Case 4的仿真指令流水图分别如图4、图5所示。从图4可以看到，Case 3使用单buffer串行处理每组tile。MTE2搬入完成后，SIMT VF需要等待输入buffer可读；SIMT VF完成后，MTE3才能搬出输出buffer；MTE3搬出结束后才能复用同一组UB buffer进入下一轮MTE2搬入。因此MTE2、SIMT VF和MTE3三个流水之间存在明显的串行等待，SIMT VF执行间隔中会出现较多由搬运和同步带来的空隙。
 
-从图6可以看到，Case 4采用双缓冲后，当前buffer进行SIMT VF转置和MTE3搬出的同时，另一组buffer可以提前发起下一组tile的MTE2搬入。MTE2、SIMT VF和MTE3在相邻轮次之间形成重叠。因此Case 4能够隐藏部分MTE搬运和同步开销，Task Duration进一步降低。图中仍然存在少量等待，主要用于保护buffer复用和跨流水数据依赖。
+从图5可以看到，Case 4采用双缓冲后，当前buffer进行SIMT VF转置和MTE3搬出的同时，另一组buffer可以提前发起下一组tile的MTE2搬入。MTE2、SIMT VF和MTE3在相邻轮次之间形成重叠。因此Case 4能够隐藏部分MTE搬运和同步开销，Task Duration进一步降低。图中仍然存在少量等待，主要用于保护buffer复用和跨流水数据依赖。
 
-**图5　Case 3仿真指令流水图**
+**图4　Case 3仿真指令流水图**
 
 <img src="./figures/case3_trace.png">
 
-**图6　Case 4仿真指令流水图**
+**图5　Case 4仿真指令流水图**
 
 <img src="./figures/case4_trace.png">
 
@@ -416,7 +416,7 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
 
 - 上板性能采集
 
-  通过上板性能采集，可以直接测定算子昇腾AI处理器上的运行时间。该方式适合在板环境中快速定位算子性能问题。
+  通过上板性能采集，可以直接测定算子在昇腾AI处理器上的运行时间。该方式适合在板环境中快速定位算子性能问题。
 
   基于可执行文件matrix_transpose通过msopprof执行算子调优：
 
@@ -425,7 +425,7 @@ msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulat
   ```
 
   - 性能数据说明
-    命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
+    命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹，性能数据文件夹结构示例如下：
 
     ```bash
     ├──dump                       # 原始的性能数据，用户无需关注
