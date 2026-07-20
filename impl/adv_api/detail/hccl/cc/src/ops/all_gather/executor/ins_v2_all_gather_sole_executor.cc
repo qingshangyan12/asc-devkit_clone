@@ -12,9 +12,10 @@
 #include "ins_temp_all_gather_mesh_1D.h"
 #include "ins_temp_all_gather_nhr.h"
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
-// Non-Mesh1D CCU templates are kept for later recovery. They are not included before KFC Mesh1D is verified.
+// Legacy direct-launch/non-Mem2Mem templates are kept for recovery; KFC Mem2Mem is the active CCU path.
 // #include "ccu_temp_all_gather_mesh_1D_mem2mem.h"
-#include "ccu_temp_all_gather_mesh_1D.h"
+// #include "ccu_temp_all_gather_mesh_1D.h"
+#include "ccu_temp_kfc_all_gather_mesh_1D_mem2mem.h"
 // #include "ccu_temp_all_gather_nhr_1D_mem2mem.h"
 // #include "ccu_temp_all_gather_2dies_mesh_1d_mem2mem.h"
 // #include "ccu_temp_all_gather_2dies_mesh_1D.h"
@@ -195,14 +196,15 @@ REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherNHR, InsV2AllGatherSoleExecutor, TopoMatch1D, InsTempAllGatherNHR);
 
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
-// Non-Mesh1D CCU registrations are kept for later recovery. Do not register them before KFC Mesh1D is verified.
-// REGISTER_EXEC_V2(
-//     HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherMesh1DMem2Mem, InsV2AllGatherSoleExecutor, TopoMatch1D,
-//     CcuTempAllGatherMesh1DMem2Mem);
-
+// The legacy direct-launch Mem2Mem template is kept in source but is not registered in the KFC path.
 REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherMesh1D, InsV2AllGatherSoleExecutor, TopoMatch1D,
-    CcuTempAllGatherMesh1D);
+    HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherMesh1DMem2Mem, InsV2AllGatherSoleExecutor, TopoMatch1D,
+    CcuTempKfcAllGatherMesh1DMem2Mem);
+
+// Disabled: CcuKernelKfcServer dispatches one AllGather sub-kernel by opType, now the Mem2Mem implementation.
+// REGISTER_EXEC_V2(
+//     HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherMesh1D, InsV2AllGatherSoleExecutor, TopoMatch1D,
+//     CcuTempAllGatherMesh1D);
 
 // REGISTER_EXEC_V2(
 //     HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherNHR1DMem2Mem, InsV2AllGatherSoleExecutor, TopoMatch1D,
