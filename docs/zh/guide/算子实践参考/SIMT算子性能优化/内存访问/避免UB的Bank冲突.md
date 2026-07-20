@@ -15,7 +15,7 @@ SIMT编程方式下，bank冲突为更细粒度的subbank冲突，主要有以�
 - **写写冲突**：多个写操作同时访问同一个bank group的相同编号subbank。
 - **读读冲突**：多个读操作同时访问同一个bank group的相同编号subbank。
 
-详细的UB地址低位交织规则以及冲突场景可参考[bank_conflict样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/03_simt_api/02_features/01_api_features/00_memory_access/bank_conflict)。
+详细的UB地址低位交织规则以及冲突场景可参考[bank_conflict样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/02_features/01_api_features/00_memory_access/bank_conflict)。
 <!-- end id1 -->
 
 <!-- npu="950" id2 -->
