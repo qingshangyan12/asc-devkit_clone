@@ -88,12 +88,18 @@ private:
                 "Unsupported layout type combination for DataCopyUB2GM");
         }
         if constexpr (IsB4Type<SRC_TYPE>) {
+            ASCENDC_DEBUG_ASSERT((blockLen % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src shape in CopyUB2GM fp4 path, source copy length should be divisible by 2 before b4 conversion."));
+            ASCENDC_DEBUG_ASSERT((srcStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyUB2GM fp4 path, source stride should be divisible by 2 before b4 conversion."));
             // move fp4 as b8, need to be divided by 2
             blockLen = blockLen >> 1;
             srcStride = srcStride >> 1;
         }
 
         if constexpr (IsB4Type<DST_TYPE>) {
+            ASCENDC_DEBUG_ASSERT((dstStride % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyUB2GM fp4 path, destination stride should be divisible by 2 before b4 conversion."));
             dstStride = dstStride >> 1;
         }
 

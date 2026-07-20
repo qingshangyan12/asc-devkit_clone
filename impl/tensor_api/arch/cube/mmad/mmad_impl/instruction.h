@@ -61,6 +61,14 @@ private:
         if ASCEND_IS_AIV {
             return;
         }
+        ASCENDC_DEBUG_ASSERT((m <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.m in MmadInstr, MmadParams.m should be no greater than 4095."));
+        ASCENDC_DEBUG_ASSERT((n <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.n in MmadInstr, MmadParams.n should be no greater than 4095."));
+        ASCENDC_DEBUG_ASSERT((k <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.k in MmadInstr, MmadParams.k should be no greater than 4095."));
+        ASCENDC_DEBUG_ASSERT((unitFlag == 0 || unitFlag == 2 || unitFlag == 3), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.unitFlag in MmadInstr, supported values are 0, 2, and 3."));
         if constexpr (Std::is_same_v<U, hifloat8_t> && Std::is_same_v<S, hifloat8_t>) {
             SetCtrlForhifloat8();
             asc_mmad(
@@ -95,6 +103,14 @@ private:
             return;
         }
 
+        ASCENDC_DEBUG_ASSERT((m <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.m in MmadBiasInstr, MmadParams.m should be no greater than 4095."));
+        ASCENDC_DEBUG_ASSERT((n <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.n in MmadBiasInstr, MmadParams.n should be no greater than 4095."));
+        ASCENDC_DEBUG_ASSERT((k <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.k in MmadBiasInstr, MmadParams.k should be no greater than 4095."));
+        ASCENDC_DEBUG_ASSERT((unitFlag == 0 || unitFlag == 2 || unitFlag == 3), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.unitFlag in MmadBiasInstr, supported values are 0, 2, and 3."));
         uint64_t xd = ((uint64_t)dst) & 0xffffffffULL | ((bias & 0xffffffffULL) << 32);
         if constexpr (Std::is_same_v<U, hifloat8_t> && Std::is_same_v<S, hifloat8_t>) {
             SetCtrlForhifloat8();
@@ -127,6 +143,14 @@ private:
         if ASCEND_IS_AIV {
             return;
         }
+        ASCENDC_DEBUG_ASSERT((m <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.m in MmadMxInstr, MmadParams.m should be no greater than 4095."));
+        ASCENDC_DEBUG_ASSERT((n <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.n in MmadMxInstr, MmadParams.n should be no greater than 4095."));
+        ASCENDC_DEBUG_ASSERT((k <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.k in MmadMxInstr, MmadParams.k should be no greater than 4095."));
+        ASCENDC_DEBUG_ASSERT((unitFlag == 0 || unitFlag == 2 || unitFlag == 3), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.unitFlag in MmadMxInstr, supported values are 0, 2, and 3."));
         asc_mmad_mx(dst, fm, filter, m, k, n, unitFlag, disableGemv, cmatrixSource, cmatrixInitVal);
     }
 };
@@ -152,6 +176,14 @@ private:
         if ASCEND_IS_AIV {
             return;
         }
+        ASCENDC_DEBUG_ASSERT((m <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.m in MmadMxBiasInstr, MmadParams.m should be no greater than 4095."));
+        ASCENDC_DEBUG_ASSERT((n <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.n in MmadMxBiasInstr, MmadParams.n should be no greater than 4095."));
+        ASCENDC_DEBUG_ASSERT((k <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.k in MmadMxBiasInstr, MmadParams.k should be no greater than 4095."));
+        ASCENDC_DEBUG_ASSERT((unitFlag == 0 || unitFlag == 2 || unitFlag == 3), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check MmadParams.unitFlag in MmadMxBiasInstr, supported values are 0, 2, and 3."));
         uint64_t xd = ((uint64_t)dst) & 0xffffffffULL | ((bias & 0xffffffffULL) << 32);
         asc_mmad_mx((__cc__ T*)xd, fm, filter, m, k, n, unitFlag, disableGemv, cmatrixSource, cmatrixInitVal);
     }

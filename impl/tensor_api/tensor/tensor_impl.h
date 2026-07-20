@@ -203,6 +203,8 @@ __aicore__ inline constexpr auto MakeSingleBatchSubTensor(const Tensor& t, uint3
         LayoutType::depth == THREE_DIM_DATA || LayoutType::depth == FIVE_DIM_DATA,
         "MakeSingleBatchSubTensor only supports batched layouts of depth 3 or 5.");
     auto layout = t.Layout();
+    ASCENDC_DEBUG_ASSERT((batchIdx < Get<0>(layout.Shape())), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+        "Failed to check batchIdx in MakeSingleBatchSubTensor, batchIdx should be less than tensor.Shape()[0]."));
     auto batchStride = Get<0>(layout.Stride());
     auto subEngine = t.Engine() + batchStride * batchIdx;
     auto subLayout = RemoveBatchDim(layout);

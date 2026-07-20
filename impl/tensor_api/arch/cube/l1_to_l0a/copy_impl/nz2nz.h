@@ -65,6 +65,12 @@ private:
         auto kStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
         // Nz -> Nz
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) % STRIDE_UNIT == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src stride in CopyL12L0A NZ2NZ path, source column stride should be divisible by STRIDE_UNIT."));
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) % STRIDE_UNIT == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst stride in CopyL12L0A NZ2NZ path, destination column stride should be divisible by STRIDE_UNIT."));
         auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / STRIDE_UNIT;
         auto dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) / STRIDE_UNIT;
         LoadCbufToCa::LoadData<false>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
@@ -84,6 +90,12 @@ private:
         auto kStep = Get<0>(dstLayout.Shape()) * GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstNoBatchLayout);
         // Nz -> Nz
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcNoBatchLayout) % STRIDE_UNIT == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src stride in CopyL12L0A batch NZ2NZ path, source column stride should be divisible by STRIDE_UNIT."));
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstNoBatchLayout) % STRIDE_UNIT == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst stride in CopyL12L0A batch NZ2NZ path, destination column stride should be divisible by STRIDE_UNIT."));
         auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcNoBatchLayout) / STRIDE_UNIT;
         auto dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstNoBatchLayout) / STRIDE_UNIT;
         LoadCbufToCa::LoadData<false>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);

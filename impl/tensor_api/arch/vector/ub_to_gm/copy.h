@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_GM_COPY_H
 
 #include "impl/tensor_api/atom/copy_traits_impl.h"
+#include "impl/tensor_api/arch/utils/arch_utils.h"
 #include "impl/tensor_api/arch/vector/ub_to_gm/routing.h"
 
 namespace AscendC {
@@ -53,6 +54,50 @@ private:
         using srcTPos = GetMemLocation<U>;
         static_assert(Std::is_same_v<dstTPos, Location::GM>, "When Copy tensor from UB to GM, dst tensor must on GM");
         static_assert(Std::is_same_v<srcTPos, Location::UB>, "When Copy tensor from UB to GM, src tensor must on UB");
+        if constexpr (T::layoutType::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(dst.Layout().Shape()) > 0 && Get<1>(dst.Layout().Shape()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyUB2GM, dst row and column shape should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((Get<0>(dst.Layout().Stride()) > 0 && Get<1>(dst.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyUB2GM, all dst strides should be greater than 0."));
+        } else if constexpr (T::layoutType::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0, 0>(dst.Layout().Shape()) > 0 &&
+                Get<0, 1>(dst.Layout().Shape()) > 0 && Get<1, 0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 1>(dst.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyUB2GM, all dst row and column shapes should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT(((Std::is_same_v<Std::remove_cvref_t<decltype(Get<0, 0>(dst.Layout().Stride()))>,
+                _0> || Get<0, 0>(dst.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<0, 1>(dst.Layout().Stride()))>, _0> ||
+                Get<0, 1>(dst.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 0>(dst.Layout().Stride()))>, _0> ||
+                Get<1, 0>(dst.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 1>(dst.Layout().Stride()))>, _0> ||
+                Get<1, 1>(dst.Layout().Stride()) > 0)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyUB2GM, all runtime dst strides should be greater than 0."));
+        }
+        if constexpr (U::layoutType::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(src.Layout().Shape()) > 0 && Get<1>(src.Layout().Shape()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src shape in CopyUB2GM, source row and column shape should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((Get<0>(src.Layout().Stride()) > 0 && Get<1>(src.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyUB2GM, all source strides should be greater than 0."));
+        } else if constexpr (U::layoutType::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0, 0>(src.Layout().Shape()) > 0 &&
+                Get<0, 1>(src.Layout().Shape()) > 0 && Get<1, 0>(src.Layout().Shape()) > 0 &&
+                Get<1, 1>(src.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src shape in CopyUB2GM, all source row and column shapes should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT(((Std::is_same_v<Std::remove_cvref_t<decltype(Get<0, 0>(src.Layout().Stride()))>,
+                _0> || Get<0, 0>(src.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<0, 1>(src.Layout().Stride()))>, _0> ||
+                Get<0, 1>(src.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 0>(src.Layout().Stride()))>, _0> ||
+                Get<1, 0>(src.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 1>(src.Layout().Stride()))>, _0> ||
+                Get<1, 1>(src.Layout().Stride()) > 0)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyUB2GM, all runtime source strides should be greater than 0."));
+        }
         using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
         using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
         using CopyUB2GMImpl = typename CopyUB2GMRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;

@@ -45,6 +45,14 @@ private:
         if ASCEND_IS_AIV {
             return;
         }
+        ASCENDC_DEBUG_ASSERT((!isChannelSplit), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check isChannelSplit in CopyL0C2L1 instruction, isChannelSplit should be false when dst is L1."));
+        ASCENDC_DEBUG_ASSERT((nSize >= 1 && nSize <= 4095 && nSize % 16 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check nSize in CopyL0C2L1 instruction, nSize should be in range [1, 4095] and divisible by 16."));
+        ASCENDC_DEBUG_ASSERT((mSize >= 1 && mSize <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check mSize in CopyL0C2L1 instruction, mSize should be in range [1, 65535]."));
+        ASCENDC_DEBUG_ASSERT((dstStride > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstStride in CopyL0C2L1 instruction, dstStride should be greater than 0."));
 
         asc_copy_l0c2l1(
             dst, src, static_cast<uint16_t>(nSize), static_cast<uint16_t>(mSize), dstStride,

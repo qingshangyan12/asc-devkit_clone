@@ -45,6 +45,10 @@ public:
         if ASCEND_IS_AIC {
             return;
         }
+        ASCENDC_DEBUG_ASSERT((blockCount > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check blockCount in CopyUB2L1 instruction, blockCount should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((blockLen > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check blockLen in CopyUB2L1 instruction, blockLen should be greater than 0."));
 
         asc_copy_ub2l1(dst, src, blockCount, blockLen, srcStride, dstStride);
     }

@@ -61,6 +61,10 @@ private:
         } else {
             dstRowStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
         }
+        ASCENDC_DEBUG_ASSERT((srcRowStride >= GetTotalColumnShape(srcLayout)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src stride in CopyL12UB ND path, source row stride should be no less than source column shape."));
+        ASCENDC_DEBUG_ASSERT((dstRowStride >= GetTotalColumnShape(srcLayout)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst stride in CopyL12UB ND path, destination row stride should be no less than source column shape."));
         int64_t srcStride = Std::ceil_division(srcRowStride - GetTotalColumnShape(srcLayout), C0_ELEMENT<srcType>);
         int64_t dstStride = Std::ceil_division(dstRowStride - GetTotalColumnShape(srcLayout), C0_ELEMENT<dstType>);
 
@@ -101,6 +105,10 @@ private:
         } else {
             dstColumnStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
         }
+        ASCENDC_DEBUG_ASSERT((srcColumnStride >= GetTotalRowShape(srcLayout)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src stride in CopyL12UB DN path, source column stride should be no less than source row shape."));
+        ASCENDC_DEBUG_ASSERT((dstColumnStride >= GetTotalRowShape(srcLayout)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst stride in CopyL12UB DN path, destination column stride should be no less than source row shape."));
         int64_t srcStride = Std::ceil_division(srcColumnStride - GetTotalRowShape(srcLayout), C0_ELEMENT<srcType>);
         int64_t dstStride = Std::ceil_division(dstColumnStride - GetTotalRowShape(srcLayout), C0_ELEMENT<dstType>);
 
@@ -128,6 +136,14 @@ private:
 
         uint16_t blockCount = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
         uint32_t blockLen = GetTotalRowShape(srcLayout);
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) % C0_ELEMENT<srcType> == 0 &&
+            GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / C0_ELEMENT<srcType> >= blockLen),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src stride in CopyL12UB NZ path, source column stride should be divisible by C0 and no less than blockLen in C0 units."));
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) % C0_ELEMENT<dstType> == 0 &&
+            GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) / C0_ELEMENT<dstType> >= blockLen),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst stride in CopyL12UB NZ path, destination column stride should be divisible by C0 and no less than blockLen in C0 units."));
         int64_t srcStride =
             GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / C0_ELEMENT<srcType> - blockLen;
         int64_t dstStride =

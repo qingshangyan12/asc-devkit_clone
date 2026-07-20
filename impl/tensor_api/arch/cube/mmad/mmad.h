@@ -22,6 +22,7 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_MMAD_MMAD_H
 #define IMPL_TENSOR_API_ARCH_CUBE_MMAD_MMAD_H
 
+#include "impl/tensor_api/arch/utils/arch_utils.h"
 #include "impl/tensor_api/arch/cube/mmad/routing.h"
 
 namespace AscendC {
@@ -64,6 +65,46 @@ private:
         using DstLayoutPtn = GetLayoutPattern<DstLayout>;
         using FmLayoutPtn = GetLayoutPattern<FmLayout>;
         using FilterLayoutPtn = GetLayoutPattern<FilterLayout>;
+        ASCENDC_DEBUG_ASSERT((GetTotalRowShape(dst.Layout()) > 0 && GetTotalColumnShape(dst.Layout()) > 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst shape in Mmad, dst row and column shape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((GetTotalRowShape(fm.Layout()) > 0 && GetTotalColumnShape(fm.Layout()) > 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check fm shape in Mmad, fm row and column shape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((GetTotalRowShape(filter.Layout()) > 0 && GetTotalColumnShape(filter.Layout()) > 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check filter shape in Mmad, filter row and column shape should be greater than 0."));
+        if constexpr (DstLayout::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(dst.Layout().Stride()) > 0 && Get<1>(dst.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in Mmad, all dst strides should be greater than 0."));
+        } else if constexpr (DstLayout::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0, 0>(dst.Layout().Stride()) > 0 && Get<0, 1>(dst.Layout().Stride()) > 0 &&
+                Get<1, 0>(dst.Layout().Stride()) > 0 && Get<1, 1>(dst.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in Mmad, all dst strides should be greater than 0."));
+        }
+        if constexpr (FmLayout::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(fm.Layout().Stride()) > 0 && Get<1>(fm.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check fm stride in Mmad, all fm strides should be greater than 0."));
+        } else if constexpr (FmLayout::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0, 0>(fm.Layout().Stride()) > 0 && Get<0, 1>(fm.Layout().Stride()) > 0 &&
+                Get<1, 0>(fm.Layout().Stride()) > 0 && Get<1, 1>(fm.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check fm stride in Mmad, all fm strides should be greater than 0."));
+        }
+        if constexpr (FilterLayout::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(filter.Layout().Stride()) > 0 && Get<1>(filter.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check filter stride in Mmad, all filter strides should be greater than 0."));
+        } else if constexpr (FilterLayout::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0, 0>(filter.Layout().Stride()) > 0 &&
+                Get<0, 1>(filter.Layout().Stride()) > 0 && Get<1, 0>(filter.Layout().Stride()) > 0 &&
+                Get<1, 1>(filter.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check filter stride in Mmad, all filter strides should be greater than 0."));
+        }
         using MmadImpl = typename MmadRouting<
             CURRENT_ARCH_VERSION, DstLayoutPtn, FmLayoutPtn, FilterLayoutPtn, Location::INVALID>::type;
         MmadImpl::template Run<trait>(dst, fm, filter, params);
@@ -90,6 +131,60 @@ private:
         using DstLayoutPtn = GetLayoutPattern<DstLayout>;
         using FmLayoutPtn = GetLayoutPattern<FmLayout>;
         using FilterLayoutPtn = GetLayoutPattern<FilterLayout>;
+        ASCENDC_DEBUG_ASSERT((GetTotalRowShape(dst.Layout()) > 0 && GetTotalColumnShape(dst.Layout()) > 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst shape in Mmad with bias, dst row and column shape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((GetTotalRowShape(fm.Layout()) > 0 && GetTotalColumnShape(fm.Layout()) > 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check fm shape in Mmad with bias, fm row and column shape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((GetTotalRowShape(filter.Layout()) > 0 && GetTotalColumnShape(filter.Layout()) > 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check filter shape in Mmad with bias, filter row and column shape should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((GetTotalRowShape(bias.Layout()) > 0 && GetTotalColumnShape(bias.Layout()) > 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check bias shape in Mmad with bias, bias row and column shape should be greater than 0."));
+        if constexpr (DstLayout::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(dst.Layout().Stride()) > 0 && Get<1>(dst.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in Mmad with bias, all dst strides should be greater than 0."));
+        } else if constexpr (DstLayout::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0, 0>(dst.Layout().Stride()) > 0 && Get<0, 1>(dst.Layout().Stride()) > 0 &&
+                Get<1, 0>(dst.Layout().Stride()) > 0 && Get<1, 1>(dst.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in Mmad with bias, all dst strides should be greater than 0."));
+        }
+        if constexpr (FmLayout::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(fm.Layout().Stride()) > 0 && Get<1>(fm.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check fm stride in Mmad with bias, all fm strides should be greater than 0."));
+        } else if constexpr (FmLayout::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0, 0>(fm.Layout().Stride()) > 0 && Get<0, 1>(fm.Layout().Stride()) > 0 &&
+                Get<1, 0>(fm.Layout().Stride()) > 0 && Get<1, 1>(fm.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check fm stride in Mmad with bias, all fm strides should be greater than 0."));
+        }
+        if constexpr (FilterLayout::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(filter.Layout().Stride()) > 0 && Get<1>(filter.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check filter stride in Mmad with bias, all filter strides should be greater than 0."));
+        } else if constexpr (FilterLayout::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0, 0>(filter.Layout().Stride()) > 0 &&
+                Get<0, 1>(filter.Layout().Stride()) > 0 && Get<1, 0>(filter.Layout().Stride()) > 0 &&
+                Get<1, 1>(filter.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check filter stride in Mmad with bias, all filter strides should be greater than 0."));
+        }
+        if constexpr (Std::remove_cvref_t<decltype(bias.Layout())>::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(bias.Layout().Stride()) > 0 && Get<1>(bias.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check bias stride in Mmad with bias, all bias strides should be greater than 0."));
+        } else if constexpr (Std::remove_cvref_t<decltype(bias.Layout())>::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0, 0>(bias.Layout().Stride()) > 0 &&
+                Get<0, 1>(bias.Layout().Stride()) > 0 && Get<1, 0>(bias.Layout().Stride()) > 0 &&
+                Get<1, 1>(bias.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check bias stride in Mmad with bias, all bias strides should be greater than 0."));
+        }
         using MmadImpl =
             typename MmadRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, FmLayoutPtn, FilterLayoutPtn, biasPos>::type;
         MmadImpl::template Run<trait>(dst, fm, filter, bias, params);

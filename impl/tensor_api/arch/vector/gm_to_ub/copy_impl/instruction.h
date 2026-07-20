@@ -62,6 +62,15 @@ private:
         if ASCEND_IS_AIC {
             return;
         }
+        ASCENDC_DEBUG_ASSERT((blockCount > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check blockCount in CopyGM2UB instruction, blockCount should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((blockLen > 0 && blockLen <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check blockLen in CopyGM2UB instruction, blockLen should be in range (0, 65535]."));
+        ASCENDC_DEBUG_ASSERT((srcStride >= -static_cast<int64_t>(blockLen) && srcStride <= static_cast<int64_t>((1UL << 40) - 1)),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check srcStride in CopyGM2UB instruction, srcStride should be in range [-blockLen, 2^40 - 1]."));
+        ASCENDC_DEBUG_ASSERT((dstStride >= 0 && dstStride <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dstStride in CopyGM2UB instruction, dstStride should be in range [0, 65535]."));
 
         asc_copy_gm2ub_align(dst, src, blockCount, blockLen, leftPaddingCount, rightPaddingCount, isPad,
                                     cacheMode, srcStride, dstStride);

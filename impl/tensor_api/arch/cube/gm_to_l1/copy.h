@@ -22,6 +22,7 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_GM_TO_L1_COPY_H
 #define IMPL_TENSOR_API_ARCH_CUBE_GM_TO_L1_COPY_H
 
+#include "impl/tensor_api/arch/utils/arch_utils.h"
 #include "impl/tensor_api/arch/cube/gm_to_l1/routing.h"
 
 namespace AscendC {
@@ -56,6 +57,96 @@ private:
         using SrcLayout = typename U::layoutType;
         using DstLayoutPtn = GetLayoutPattern<DstLayout>;
         using SrcLayoutPtn = GetLayoutPattern<SrcLayout>;
+        if constexpr (DstLayout::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(dst.Layout().Shape()) > 0 && Get<1>(dst.Layout().Shape()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyGM2L1, dst row and column shape should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((Get<0>(dst.Layout().Stride()) > 0 && Get<1>(dst.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyGM2L1, all dst strides should be greater than 0."));
+        } else if constexpr (DstLayout::depth == THREE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(dst.Layout().Shape()) > 0 && Get<1, 0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 1>(dst.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyGM2L1, dst batch, row and column shape should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((Get<0>(dst.Layout().Stride()) > 0 && Get<1, 0>(dst.Layout().Stride()) > 0 &&
+                Get<1, 1>(dst.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyGM2L1, all dst strides should be greater than 0."));
+        } else if constexpr (DstLayout::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0, 0>(dst.Layout().Shape()) > 0 &&
+                Get<0, 1>(dst.Layout().Shape()) > 0 && Get<1, 0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 1>(dst.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyGM2L1, all dst row and column shapes should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT(((Std::is_same_v<Std::remove_cvref_t<decltype(Get<0, 0>(dst.Layout().Stride()))>,
+                _0> || Get<0, 0>(dst.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<0, 1>(dst.Layout().Stride()))>, _0> ||
+                Get<0, 1>(dst.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 0>(dst.Layout().Stride()))>, _0> ||
+                Get<1, 0>(dst.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 1>(dst.Layout().Stride()))>, _0> ||
+                Get<1, 1>(dst.Layout().Stride()) > 0)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyGM2L1, all runtime dst strides should be greater than 0."));
+        } else if constexpr (DstLayout::depth == FIVE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(dst.Layout().Shape()) > 0 &&
+                Get<1, 0, 0>(dst.Layout().Shape()) > 0 && Get<1, 0, 1>(dst.Layout().Shape()) > 0 &&
+                Get<1, 1, 0>(dst.Layout().Shape()) > 0 && Get<1, 1, 1>(dst.Layout().Shape()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst shape in CopyGM2L1, dst batch and all dst row and column shapes should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((Get<0>(dst.Layout().Stride()) > 0 &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 0, 0>(dst.Layout().Stride()))>, _0> ||
+                Get<1, 0, 0>(dst.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 0, 1>(dst.Layout().Stride()))>, _0> ||
+                Get<1, 0, 1>(dst.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 1, 0>(dst.Layout().Stride()))>, _0> ||
+                Get<1, 1, 0>(dst.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 1, 1>(dst.Layout().Stride()))>, _0> ||
+                Get<1, 1, 1>(dst.Layout().Stride()) > 0)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check dst stride in CopyGM2L1, all runtime dst strides should be greater than 0."));
+        }
+        if constexpr (SrcLayout::depth == TWO_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(src.Layout().Shape()) > 0 && Get<1>(src.Layout().Shape()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src shape in CopyGM2L1, source row and column shape should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((Get<0>(src.Layout().Stride()) > 0 && Get<1>(src.Layout().Stride()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyGM2L1, all source strides should be greater than 0."));
+        } else if constexpr (SrcLayout::depth == THREE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(src.Layout().Shape()) > 0 && Get<1, 0>(src.Layout().Shape()) > 0 &&
+                Get<1, 1>(src.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src shape in CopyGM2L1, source batch, row and column shape should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((Get<0>(src.Layout().Stride()) > 0 && Get<1, 0>(src.Layout().Stride()) > 0 &&
+                Get<1, 1>(src.Layout().Stride()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyGM2L1, all source strides should be greater than 0."));
+        } else if constexpr (SrcLayout::depth == FOUR_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0, 0>(src.Layout().Shape()) > 0 &&
+                Get<0, 1>(src.Layout().Shape()) > 0 && Get<1, 0>(src.Layout().Shape()) > 0 &&
+                Get<1, 1>(src.Layout().Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src shape in CopyGM2L1, all source row and column shapes should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT(((Std::is_same_v<Std::remove_cvref_t<decltype(Get<0, 0>(src.Layout().Stride()))>,
+                _0> || Get<0, 0>(src.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<0, 1>(src.Layout().Stride()))>, _0> ||
+                Get<0, 1>(src.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 0>(src.Layout().Stride()))>, _0> ||
+                Get<1, 0>(src.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 1>(src.Layout().Stride()))>, _0> ||
+                Get<1, 1>(src.Layout().Stride()) > 0)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyGM2L1, all runtime source strides should be greater than 0."));
+        } else if constexpr (SrcLayout::depth == FIVE_DIM_DATA) {
+            ASCENDC_DEBUG_ASSERT((Get<0>(src.Layout().Shape()) > 0 &&
+                Get<1, 0, 0>(src.Layout().Shape()) > 0 && Get<1, 0, 1>(src.Layout().Shape()) > 0 &&
+                Get<1, 1, 0>(src.Layout().Shape()) > 0 && Get<1, 1, 1>(src.Layout().Shape()) > 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src shape in CopyGM2L1, source batch and all source row and column shapes should be greater than 0."));
+            ASCENDC_DEBUG_ASSERT((Get<0>(src.Layout().Stride()) > 0 &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 0, 0>(src.Layout().Stride()))>, _0> ||
+                Get<1, 0, 0>(src.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 0, 1>(src.Layout().Stride()))>, _0> ||
+                Get<1, 0, 1>(src.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 1, 0>(src.Layout().Stride()))>, _0> ||
+                Get<1, 1, 0>(src.Layout().Stride()) > 0) &&
+                (Std::is_same_v<Std::remove_cvref_t<decltype(Get<1, 1, 1>(src.Layout().Stride()))>, _0> ||
+                Get<1, 1, 1>(src.Layout().Stride()) > 0)), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyGM2L1, all runtime source strides should be greater than 0."));
+        }
         using CopyGM2L1Impl = typename CopyGM2L1Routing<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyGM2L1Impl::template Run<trait, T, U>(dst, src);
     }

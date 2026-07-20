@@ -48,6 +48,10 @@ private:
         if ASCEND_IS_AIV {
             return;
         }
+        ASCENDC_DEBUG_ASSERT((blockCount > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check blockCount in CopyL12UB instruction, blockCount should be greater than 0."));
+        ASCENDC_DEBUG_ASSERT((blockLen > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check blockLen in CopyL12UB instruction, blockLen should be greater than 0."));
 
         asc_copy_l12ub(dst, src, 0, blockCount, blockLen, srcStride, dstStride);
     }

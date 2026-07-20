@@ -63,6 +63,15 @@ private:
     {
         constexpr bool isNdFormat = IsL0COutNDFormatV<T>;
         constexpr bool isDnFormat = IsL0COutDNFormatV<T>;
+        if constexpr (IsL0COutBatchNZ2NZV<T, U>) {
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(RemoveBatchDim(srcLayout)) %
+                FRACTAL_FIXED == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyL0C2GM path, source column stride should be divisible by FRACTAL_FIXED."));
+        } else {
+            ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) % FRACTAL_FIXED == 0),
+                KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                "Failed to check src stride in CopyL0C2GM path, source column stride should be divisible by FRACTAL_FIXED."));
+        }
         auto copyParams = MakeL0COutCopyParams<T, U>(dstLayout, srcLayout);
 
         bool reluEn = trait.enableRelu;
@@ -100,6 +109,8 @@ private:
     {
         auto srcLayout = src.Layout();
         auto dstLayout = dst.Layout();
+        ASCENDC_DEBUG_ASSERT((Get<0>(srcLayout.Shape()) > 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src shape in CopyL0C2GM batch NZ2NZ vector quant path, source batch shape should be greater than 0."));
         for (uint32_t batchIndex = 0; batchIndex < Get<0>(srcLayout.Shape()); ++batchIndex) {
             EmitDataCopy<trait, quantPre>(
                 dst(MakeCoord(batchIndex, MakeCoord(MakeCoord(0, 0), MakeCoord(0, 0)))),
@@ -144,6 +155,9 @@ private:
             }
         }
 
+        ASCENDC_DEBUG_ASSERT((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) % FRACTAL_FIXED == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src stride in CopyL0C2GM vector quant path, source column stride should be divisible by FRACTAL_FIXED."));
         const uint32_t srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / FRACTAL_FIXED;
         uint32_t dstStride = 0;
         if constexpr (isNdFormat) {
