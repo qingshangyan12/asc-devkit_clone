@@ -43,7 +43,7 @@ Use the `SCENARIO_NUM` build parameter to select an input scenario. The meaning 
 
 `SCENARIO_NUM` is passed by CMake as a compile-time macro. The kernel selects the corresponding scenario with `if constexpr`; rerun CMake and rebuild after changing the scenario.
 
-All device-side movement and compute use asynchronous C API calls. `asc_sync_notify` and `asc_sync_wait` establish only the required `MTE2→MTE1→M→FIX` dependencies; scenario 4 also uses `MTE2→FIX` to make the quantization parameters ready, then uses `asc_sync_pipe(PIPE_FIX)` after the L1-to-Fixpipe Buffer transfer before the final Fixpipe writeback. No `PIPE_ALL` synchronization is used.
+All device-side movement and compute use asynchronous C API calls. `asc_sync_notify` and `asc_sync_wait` establish the required `MTE2→MTE1→M→FIX` dependencies; scenario 4 also uses `MTE2→FIX` to make the quantization parameters ready, then uses `asc_sync_pipe(PIPE_FIX)` after the L1-to-Fixpipe Buffer transfer before the final Fixpipe writeback. `asc_sync_pipe(PIPE_ALL)` is called at the end of the kernel to ensure that all pipelines complete.
 
 **Scenario 1: Nz input, half input type**
 
