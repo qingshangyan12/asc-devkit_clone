@@ -2,9 +2,9 @@
 
 ## 概述
 
-本样例介绍如何使用Ascend C C API将输入数据从GM（Global Memory）搬运到L1（L1 Buffer），支持多种输入格式（Nz、ND、DN）和向量量化参数搬入等功能。数据搬入后，样例继续完成L1到L0A和L0B的搬运、矩阵乘计算和L0C到GM的结果写回。
+本样例介绍如何使用Ascend C C API将输入数据从GM（Global Memory）搬运到L1（L1 Buffer），支持多种输入格式（Nz、ND、DN）和向量量化参数搬入等功能。数据搬入后，样例继续完成L1 Buffer到L0A Buffer和L0B Buffer的数据搬运、矩阵乘计算，以及通过Fixpipe将L0C Buffer中的计算结果搬运到GM（Global Memory）。
 
-本样例仅支持Ascend 950PR/Ascend 950DT（`dav-3510`），支持NPU运行和NPU仿真模式，不提供CPU Debug模式。
+本样例仅支持Ascend 950PR/Ascend 950DT（`dav-3510`），支持NPU运行和NPU仿真模式，不提供CPU域调试模式。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -43,7 +43,7 @@
 
 `SCENARIO_NUM`由CMake作为编译期宏传入；Kernel使用`if constexpr`选择对应场景。切换场景后需要重新执行CMake和编译。
 
-设备侧搬运和计算均使用C API异步接口，通过`asc_sync_notify`和`asc_sync_wait`建立`MTE2→MTE1→M→FIX`的必要依赖；场景4还使用`MTE2→FIX`保证量化参数就绪，并在量化参数从L1搬运到Fixpipe Buffer后通过`asc_sync_pipe(PIPE_FIX)`等待该搬运完成，最终执行Fixpipe搬出；不使用`PIPE_ALL`同步。
+设备侧搬运和计算均使用Ascend C C API异步接口，通过`asc_sync_notify`和`asc_sync_wait`建立`MTE2→MTE1→M→FIX`的必要依赖；场景4还使用`MTE2→FIX`保证量化参数就绪，并在量化参数从L1 Buffer搬运到Fixpipe Buffer后通过`asc_sync_pipe(PIPE_FIX)`等待该搬运完成，随后通过Fixpipe将L0C Buffer中的计算结果搬运到GM。核函数结束时调用`asc_sync_pipe(PIPE_ALL)`，确保全部流水完成。
 
 **场景1：输入格式Nz，输入数据类型half**
 
@@ -130,7 +130,7 @@
 
 - 执行结果
 
-  场景1-3的浮点结果满足精度要求，或场景4的int8结果与真值完全一致时，执行结果如下，说明精度对比成功。
+  场景1-3的浮点结果满足精度要求，或场景4的int8_t结果与真值完全一致时，执行结果如下，说明精度对比成功。
 
   ```bash
   test pass!
