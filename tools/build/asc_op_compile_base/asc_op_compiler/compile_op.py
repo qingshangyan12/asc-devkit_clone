@@ -25,10 +25,7 @@ import sys
 import struct
 from asc_op_compile_base.common.ccec import CCECInfo
 from asc_op_compile_base.asc_op_compiler.cce_runtime import tvm_callback_cce_postproc
-from asc_op_compile_base.common.buildcfg import (
-    get_current_build_config,
-    get_current_build_config_int,
-)
+from asc_op_compile_base.common.buildcfg import get_current_build_config
 from asc_op_compile_base.common.platform.platform_info import get_soc_spec, set_soc_spec
 from asc_op_compile_base.common.error_mgr import (
     raise_tbe_python_err,
@@ -298,6 +295,16 @@ def _init_param_value(op_info: OpInfo, tiling_info: TilingInfo, js):
         js["parameters"] = param_of_init_values
 
 
+def _safe_int_conversion(value, default=-1):
+    if value is None:
+        return default
+    clean_value = str(value).strip()
+    try:
+        return int(clean_value)
+    except (ValueError, TypeError):
+        return default
+
+
 def _json_post_process(
     compile_info: CompileInfo,
     op_info: OpInfo,
@@ -363,7 +370,9 @@ the superkernel cannot be integrated with the operator.",
             "vectorCoreCnt": int(vectorcore_num),
         }
         has_platform_info = True
-    deterministic_level = get_current_build_config_int("deterministic_level")
+    deterministic_level = _safe_int_conversion(
+        get_current_build_config("deterministic_level")
+    )
     if deterministic_level != -1:
         if not has_platform_info:
             js["platformInfo"] = {}

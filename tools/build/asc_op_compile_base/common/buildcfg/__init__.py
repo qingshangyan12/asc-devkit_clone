@@ -14,7 +14,6 @@ from .default_buildcfg import cce_default_static_build_config
 from .default_buildcfg import dynamic_build_config_dict
 from .buildcfg import build_config
 from .buildcfg import get_current_build_config
-from .buildcfg import get_current_build_config_int
 from .buildcfg import get_default_build_config
 from .buildcfg import set_current_build_config
 from .global_info import GlobalInfoContainer
