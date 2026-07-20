@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_TENSOR_LAYOUT_PATTERN_H
 
 #include "impl/tensor_api/tensor/layout_method.h"
+#include "kernel_npu_debug.h"
 
 namespace AscendC {
 namespace Te {
@@ -194,6 +195,8 @@ struct MakeNnFrameLayout {
     {
         constexpr auto c0Ele = TraitType::C0_ELEMENT;
         static_assert(c0Ele == 2, "NnLayoutPtn only supports fp8_e8m0_t and ShapeColumn0 as 2.");
+        ASCENDC_DEBUG_ASSERT((row % c0Ele == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check row in MakeNnFrameLayout, row should be divisible by C0_ELEMENT."));
         auto shape = MakeShape(
             MakeShape(c0Ele, row / c0Ele),
             MakeShape(Std::Int<FRACTAL_FIXED>{}, Std::ceil_division(column, FRACTAL_FIXED)));
@@ -235,6 +238,8 @@ struct MakeScaleADNFrameLayout {
     {
         constexpr auto c0Ele = TraitType::C0_ELEMENT;
         static_assert(c0Ele == 2, "ScaleADNLayoutPtn only supports fp8_e8m0_t and ShapeColumn0 as 2.");
+        ASCENDC_DEBUG_ASSERT((column % c0Ele == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check column in MakeScaleADNFrameLayout, column should be divisible by C0_ELEMENT."));
         auto shape = MakeShape(MakeShape(_1{}, row), MakeShape(c0Ele, column / c0Ele));
         auto stride = MakeStride(MakeStride(_0{}, c0Ele), MakeStride(_1{}, c0Ele * row));
         using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<ScaleADNLayoutPtn, TraitType>>;
@@ -254,6 +259,8 @@ struct MakeScaleBNDFrameLayout {
     {
         constexpr auto c0Ele = TraitType::C0_ELEMENT;
         static_assert(c0Ele == 2, "ScaleBNDLayoutPtn only supports fp8_e8m0_t and ShapeColumn0 as 2.");
+        ASCENDC_DEBUG_ASSERT((row % c0Ele == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check row in MakeScaleBNDFrameLayout, row should be divisible by C0_ELEMENT."));
         auto shape = MakeShape(MakeShape(c0Ele, row / c0Ele), MakeShape(_1{}, column));
         auto stride = MakeStride(MakeStride(_1{}, c0Ele * column), MakeStride(_0{}, c0Ele));
         using LayoutT = Layout<decltype(shape), decltype(stride), Std::tuple<ScaleBNDLayoutPtn, TraitType>>;

@@ -47,6 +47,9 @@ __aicore__ inline void RunGmToL1Batched(const T& dst, const U& src)
         uint16_t matrixNum = Get<0>(srcLayout.Shape());
         uint64_t srcMatrixStride = Get<0>(srcLayout.Stride());
         uint32_t dstMatrixStride = Get<0>(dstLayout.Stride());
+        ASCENDC_DEBUG_ASSERT((matrixNum > 0 && matrixNum <= 4095),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check batch shape in CopyGM2L1, source batch shape should be in range (0, 4095]."));
         CopyOp::EmitCopy(
             dst, src, RemoveBatchDim(srcLayout), RemoveBatchDim(dstLayout), matrixNum, srcMatrixStride,
             dstMatrixStride);

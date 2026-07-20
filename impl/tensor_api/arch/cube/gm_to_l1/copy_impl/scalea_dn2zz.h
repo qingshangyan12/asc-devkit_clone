@@ -61,11 +61,23 @@ public:
             srcColShape = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
             srcColStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout);
         }
+        ASCENDC_DEBUG_ASSERT((srcRowShape > 0 && srcRowShape <= 65535 &&
+            srcColShape > 0 && srcColShape <= 16384),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check src shape in CopyGM2L1 ScaleA DN2ZZ, source row shape should be in range (0, 65535] and source column shape should be in range (0, 16384]."));
         uint16_t dstBRowStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
+        ASCENDC_DEBUG_ASSERT((dstBRowStride * sizeof(type) % C0_SIZE<> == 0),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst row stride in CopyGM2L1 ScaleA DN2ZZ, destination row stride in bytes should be divisible by C0_SIZE."));
+        ASCENDC_DEBUG_ASSERT((dstNzMatrixStride * sizeof(type) % C0_SIZE<> == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst batch stride in CopyGM2L1 ScaleA DN2ZZ, destination batch stride in bytes should be divisible by C0_SIZE."));
 
         uint16_t nValue = srcColShape;
         uint32_t dValue = srcRowShape;
         uint16_t dstNzC0Stride = dstBRowStride * sizeof(type) / C0_SIZE<>;
+        ASCENDC_DEBUG_ASSERT((dstNzC0Stride > 0 && dstNzC0Stride <= 16384),
+            KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst row stride in CopyGM2L1 ScaleA DN2ZZ, converted destination C0 stride should be in range (0, 16384]."));
         uint16_t dstNzNStride = 1;
 
         uint64_t loop1SrcStride = srcColStride * sizeof(type);
@@ -74,6 +86,8 @@ public:
         uint16_t loop2DstStride = dstNzNStride;  // loop2_dst_stride = dst_nz_n_stride
         uint16_t loop3DstStride = dstNzC0Stride; // loop3_dst_stride = dst_nz_c0_Stride
         uint16_t loop4DstStride = dstNzMatrixStride * sizeof(type) / C0_SIZE<>;
+        ASCENDC_DEBUG_ASSERT((loop4DstStride <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dst batch stride in CopyGM2L1 ScaleA DN2ZZ, converted destination batch stride should be no greater than 65535."));
         uint8_t cacheMode = src.Engine().GetCacheMode();
         // fp8 scale use b16 for movement
         CopyGmToCbufMultiNd2nzInstr::CopyGmToCbufMultiNd2nz(

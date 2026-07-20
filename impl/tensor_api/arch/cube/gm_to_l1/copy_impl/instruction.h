@@ -25,6 +25,7 @@
 #include "impl/tensor_api/tensor/pointer_pattern.h"
 #include "impl/tensor_api/tensor/tensor_impl.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"
+#include "kernel_npu_debug.h"
 
 namespace AscendC {
 namespace Te {
@@ -63,6 +64,10 @@ public:
         if ASCEND_IS_AIV {
             return;
         }
+        ASCENDC_DEBUG_ASSERT((blockCount > 0 && blockCount <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check blockCount in CopyGM2L1 align instruction, blockCount should be in range (0, 4095]."));
+        ASCENDC_DEBUG_ASSERT((blockLen > 0 && blockLen <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check blockLen in CopyGM2L1 align instruction, blockLen should be in range (0, 65535]."));
 
         asc_copy_gm2l1_align(
             dst, src, blockCount, blockLen, leftPaddingCnt, rightPaddingCnt, true, cacheMode, srcStride, dstStride);
@@ -94,6 +99,16 @@ public:
         if ASCEND_IS_AIV {
             return;
         }
+        ASCENDC_DEBUG_ASSERT((ndNum > 0 && ndNum <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check ndNum in CopyGM2L1 ND2NZ instruction, ndNum should be in range (0, 4095]."));
+        ASCENDC_DEBUG_ASSERT((nValue > 0 && nValue <= 16384), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check nValue in CopyGM2L1 ND2NZ instruction, nValue should be in range (0, 16384]."));
+        ASCENDC_DEBUG_ASSERT((dValue > 0 && dValue <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dValue in CopyGM2L1 ND2NZ instruction, dValue should be in range (0, 65535]."));
+        ASCENDC_DEBUG_ASSERT((loop2DstStride > 0 && loop2DstStride <= 16384), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check loop2DstStride in CopyGM2L1 ND2NZ instruction, loop2DstStride should be in range (0, 16384]."));
+        ASCENDC_DEBUG_ASSERT((loop3DstStride > 0 && loop3DstStride <= 16384), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check loop3DstStride in CopyGM2L1 ND2NZ instruction, loop3DstStride should be in range (0, 16384]."));
         uint64_t mte2NzPara = static_cast<uint64_t>(loop4DstStride) << 48; // MTE2_NZ_PARA[63:48]
         mte2NzPara |= static_cast<uint64_t>(loop3DstStride) << 32;         // MTE2_NZ_PARA[47:32]
         mte2NzPara |= static_cast<uint64_t>(loop2DstStride) << 16;         // MTE2_NZ_PARA[31:16]
@@ -128,6 +143,16 @@ public:
         if ASCEND_IS_AIV {
             return;
         }
+        ASCENDC_DEBUG_ASSERT((dnNum > 0 && dnNum <= 4095), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dnNum in CopyGM2L1 DN2NZ instruction, dnNum should be in range (0, 4095]."));
+        ASCENDC_DEBUG_ASSERT((nValue > 0 && nValue <= 16384), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check nValue in CopyGM2L1 DN2NZ instruction, nValue should be in range (0, 16384]."));
+        ASCENDC_DEBUG_ASSERT((dValue > 0 && dValue <= 65535), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check dValue in CopyGM2L1 DN2NZ instruction, dValue should be in range (0, 65535]."));
+        ASCENDC_DEBUG_ASSERT((loop2DstStride > 0 && loop2DstStride <= 16384), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check loop2DstStride in CopyGM2L1 DN2NZ instruction, loop2DstStride should be in range (0, 16384]."));
+        ASCENDC_DEBUG_ASSERT((loop3DstStride > 0 && loop3DstStride <= 16384), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+            "Failed to check loop3DstStride in CopyGM2L1 DN2NZ instruction, loop3DstStride should be in range (0, 16384]."));
 
         uint64_t mte2NzPara = static_cast<uint64_t>(loop4DstStride) << 48; // MTE2_NZ_PARA[63:48]
         mte2NzPara |= static_cast<uint64_t>(loop3DstStride) << 32;         // MTE2_NZ_PARA[47:32]
