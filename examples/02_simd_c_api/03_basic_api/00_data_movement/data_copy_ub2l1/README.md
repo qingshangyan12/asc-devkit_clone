@@ -48,13 +48,13 @@
 
 - 输入：A [32, 32]，`half`类型，ND格式；B [32, 32]，`half`类型，ND格式
 - 输出：C [32, 32]，`float`类型，ND格式
-- 实现：AIV子核0先将A、B从GM搬入UB；在MTE2到V同步后，`CopyUbNdToNz`按C0列块调用`asc_copy_ub2ub`，将ND数据重排为Nz数据。A和B使用独立的UB临时区，避免两次重排和后续UB到L1搬运之间发生读写覆盖。V到MTE3同步完成后，使用`asc_copy_ub2l1`将Nz数据连续搬运到L1
+- 实现：AIV子核0先将A、B从GM搬入UB；在MTE2到V同步后，`copy_ub_nd_to_nz`按C0列块调用`asc_copy_ub2ub`，将ND数据重排为Nz数据。A和B使用独立的UB临时区，避免两次重排和后续UB到L1搬运之间发生读写覆盖。V到MTE3同步完成后，使用`asc_copy_ub2l1`将Nz数据连续搬运到L1
 
 ### 数据流与同步
 
 1. AIV子核0使用MTE2完成GM到UB的数据搬运。
 2. 场景1建立MTE2到MTE3同步后直接执行UB到L1连续搬运；场景2先建立MTE2到V同步，在UB中完成ND到Nz重排，再建立V到MTE3同步并执行UB到L1连续搬运。
-3. `asc_sync_pipe(PIPE_MTE3)`确保两次UB到L1搬运完成。随后`asc_sync_block_arrive`通知AIC，AIC通过`asc_sync_block_wait`等待L1数据就绪。主机侧使用`aclrtGetHardwareSyncAddr`获取同步地址，核函数使用`asc_set_ffts_base_addr`设置该地址。
+3. `asc_sync_pipe(PIPE_MTE3)`确保两次UB到L1搬运完成。随后`asc_sync_block_arrive`通知AIC，AIC通过`asc_sync_block_wait`等待L1数据就绪。
 4. AIC调用`asc_copy_l12l0a`和`asc_copy_l12l0b_transpose`将L1中的Nz数据分别搬运到L0A和L0B。MTE1到M同步后，调用`asc_mmad`完成矩阵乘。
 5. M到FIX同步后，调用`asc_set_l0c2gm_nz2nd`配置Nz到ND转换，再通过`asc_copy_l0c2gm`将L0C结果写回GM。
 

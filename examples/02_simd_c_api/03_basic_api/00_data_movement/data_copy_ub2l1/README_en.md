@@ -48,13 +48,13 @@ Use the `SCENARIO_NUM` build parameter to select an input scenario. Both scenari
 
 - Input: A [32, 32] in `half` ND format; B [32, 32] in `half` ND format
 - Output: C [32, 32] in `float` ND format
-- Implementation: AIV subcore 0 first moves A and B from GM to UB. After MTE2-to-V synchronization, `CopyUbNdToNz` calls `asc_copy_ub2ub` for each C0 column block to rearrange ND data into Nz data. A and B use separate UB temporary buffers, avoiding read/write overlap between the two rearrangements and the following UB-to-L1 transfers. After V-to-MTE3 synchronization, `asc_copy_ub2l1` copies the Nz data contiguously to L1
+- Implementation: AIV subcore 0 first moves A and B from GM to UB. After MTE2-to-V synchronization, `copy_ub_nd_to_nz` calls `asc_copy_ub2ub` for each C0 column block to rearrange ND data into Nz data. A and B use separate UB temporary buffers, avoiding read/write overlap between the two rearrangements and the following UB-to-L1 transfers. After V-to-MTE3 synchronization, `asc_copy_ub2l1` copies the Nz data contiguously to L1
 
 ### Data Flow and Synchronization
 
 1. AIV subcore 0 uses MTE2 to move data from GM to UB.
 2. Scenario 1 establishes MTE2-to-MTE3 synchronization and performs the contiguous UB-to-L1 copy. Scenario 2 establishes MTE2-to-V synchronization, rearranges ND data into Nz in UB, then establishes V-to-MTE3 synchronization before the contiguous UB-to-L1 copy.
-3. `asc_sync_pipe(PIPE_MTE3)` ensures that both UB-to-L1 transfers finish. `asc_sync_block_arrive` then notifies AIC, and AIC waits for L1 data with `asc_sync_block_wait`. The host obtains the synchronization address with `aclrtGetHardwareSyncAddr`; the kernel configures it with `asc_set_ffts_base_addr`.
+3. `asc_sync_pipe(PIPE_MTE3)` ensures that both UB-to-L1 transfers finish. `asc_sync_block_arrive` then notifies AIC, and AIC waits for L1 data with `asc_sync_block_wait`.
 4. AIC calls `asc_copy_l12l0a` and `asc_copy_l12l0b_transpose` to move Nz data from L1 to L0A and L0B. After MTE1-to-M synchronization, it calls `asc_mmad` for matrix multiplication.
 5. After M-to-FIX synchronization, `asc_set_l0c2gm_nz2nd` configures the Nz-to-ND conversion and `asc_copy_l0c2gm` writes the L0C result back to GM.
 
