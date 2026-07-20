@@ -9,6 +9,7 @@
 # ----------------------------------------------------------------------------------------------------------
 set(OPS_BASE_DIR ${HCCL_CC_DIR})
 option(MC2_CLIENT_ENABLE_CCU "Build CCU algorithm implementations into mc2_client" OFF)
+option(MC2_AICPU_TIMING_ENABLE "Enable AICPU HCCL lifecycle timing" ON)
 
 set(INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}

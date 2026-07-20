@@ -15,6 +15,7 @@ if(TARGET mc2_server)
     target_compile_definitions(mc2_server_kernel_entry PRIVATE
         $<TARGET_PROPERTY:asc_ccl_kernel,INTERFACE_COMPILE_DEFINITIONS>
         MC2_SERVER_ONLY
+        MC2_AICPU_TIMING_ENABLE=$<BOOL:${MC2_AICPU_TIMING_ENABLE}>
     )
     target_compile_options(mc2_server_kernel_entry PRIVATE
         $<TARGET_PROPERTY:asc_ccl_kernel,INTERFACE_COMPILE_OPTIONS>
