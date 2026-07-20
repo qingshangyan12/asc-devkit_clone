@@ -46,6 +46,7 @@ __simd_callee__ inline void asc_relu(vector_float& dst, vector_float src, vector
 
 ## 参数说明
 
+**表 1** 参数说明
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量数据寄存器）。 |
@@ -64,7 +65,16 @@ PIPE_V
 
 ## 约束说明
 
-无
+mask未筛选的元素在输出中置零。
+
+## 理论性能
+
+
+| 输入类型 | 输出类型 | 理论并行度(element/cycle) |
+|---|---|---|
+| half | half | 128 |
+| int32_t | int32_t | 64 |
+| float | float | 64 |
 
 ## 调用示例
 
