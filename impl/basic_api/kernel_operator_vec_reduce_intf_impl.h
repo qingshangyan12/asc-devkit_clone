@@ -379,6 +379,12 @@ __aicore__ inline void BlockReduceSum(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t repeatTime, const int32_t mask,
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using PrimType = PrimT<T>;
+    static_assert(
+        (SupportType<PrimType, half, float>()),
+        "The data type is not supported by BlockReduceSum(deprecated, use ReduceDataBlock instead).");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReduceBlkInfo(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "BlockReduceSum");
@@ -411,6 +417,12 @@ __aicore__ inline void BlockReduceMax(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t repeatTime, const int32_t mask,
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using PrimType = PrimT<T>;
+    static_assert(
+        (SupportType<PrimType, half, float>()),
+        "The data type is not supported by BlockReduceMax(deprecated, use ReduceDataBlock instead).");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReduceBlkInfo(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "BlockReduceMax");
@@ -443,6 +455,12 @@ __aicore__ inline void BlockReduceMin(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t repeatTime, const int32_t mask,
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using PrimType = PrimT<T>;
+    static_assert(
+        (SupportType<PrimType, half, float>()),
+        "The data type is not supported by BlockReduceMin(deprecated, use ReduceDataBlock instead).");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReduceBlkInfo(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "BlockReduceMin");
@@ -475,6 +493,12 @@ __aicore__ inline void PairReduceSum(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t repeatTime, const int32_t mask,
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using PrimType = PrimT<T>;
+    static_assert(
+        (SupportType<PrimType, half, float>()),
+        "The data type is not supported by PairReduceSum(deprecated, use ReducePairElem instead).");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReducePairInfo(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "PairReduceSum");
@@ -496,6 +520,12 @@ __aicore__ inline void BlockReduceSum(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t repeatTime, const uint64_t mask[],
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using PrimType = PrimT<T>;
+    static_assert(
+        (SupportType<PrimType, half, float>()),
+        "The data type is not supported by BlockReduceSum(deprecated, use ReduceDataBlock instead).");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReduceBlkInfo(
         dst, src, mask[0], mask[1], repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "BlockReduceSum");
@@ -517,6 +547,12 @@ __aicore__ inline void BlockReduceMax(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t repeatTime, const uint64_t mask[],
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using PrimType = PrimT<T>;
+    static_assert(
+        (SupportType<PrimType, half, float>()),
+        "The data type is not supported by BlockReduceMax(deprecated, use ReduceDataBlock instead).");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReduceBlkInfo(
         dst, src, mask[0], mask[1], repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "BlockReduceMax");
@@ -538,6 +574,12 @@ __aicore__ inline void BlockReduceMin(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t repeatTime, const uint64_t mask[],
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using PrimType = PrimT<T>;
+    static_assert(
+        (SupportType<PrimType, half, float>()),
+        "The data type is not supported by BlockReduceMin(deprecated, use ReduceDataBlock instead).");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReduceBlkInfo(
         dst, src, mask[0], mask[1], repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "BlockReduceMin");
@@ -559,6 +601,12 @@ __aicore__ inline void PairReduceSum(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t repeatTime, const uint64_t mask[],
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using PrimType = PrimT<T>;
+    static_assert(
+        (SupportType<PrimType, half, float>()),
+        "The data type is not supported by PairReduceSum(deprecated, use ReducePairElem instead).");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReducePairInfo(
         dst, src, mask[0], mask[1], repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "PairReduceSum");
@@ -582,6 +630,16 @@ __aicore__ inline void RepeatReduceSum(
     const LocalTensor<U>& dst, const LocalTensor<T>& src, const int32_t repeatTime, const int32_t mask,
     const int32_t dstBlkStride, const int32_t srcBlkStride, const int32_t dstRepStride, const int32_t srcRepStride)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using SrcPrimType = PrimT<T>;
+    using DstPrimType = PrimT<U>;
+    static_assert(
+        (SupportType<SrcPrimType, int16_t, uint16_t, int32_t, uint32_t, half, float>()),
+        "The source data type is not supported by RepeatReduceSum(deprecated, use ReduceRepeat instead).");
+    static_assert(
+        (SupportType<DstPrimType, int32_t, uint32_t, half, float>()),
+        "The destination data type is not supported by RepeatReduceSum(deprecated, use ReduceRepeat instead).");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReduceInfo(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "RepeatReduceSum");
@@ -640,6 +698,16 @@ __aicore__ inline void WholeReduceSum(
     const LocalTensor<U>& dst, const LocalTensor<T>& src, const uint64_t mask[], const int32_t repeatTime,
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using SrcPrimType = PrimT<T>;
+    using DstPrimType = PrimT<U>;
+    static_assert(
+        (SupportType<SrcPrimType, int16_t, uint16_t, int32_t, uint32_t, half, float>()),
+        "The source data type is not supported by WholeReduceSum(deprecated, use ReduceRepeat instead).");
+    static_assert(
+        (SupportType<DstPrimType, int32_t, uint32_t, half, float>()),
+        "The destination data type is not supported by WholeReduceSum(deprecated, use ReduceRepeat instead).");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReduceInfo(
         dst, src, mask[0], mask[1], repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "WholeReduceSum");
@@ -696,6 +764,12 @@ __aicore__ inline void WholeReduceMax(
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride,
     ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using PrimType = PrimT<T>;
+    static_assert(
+        (SupportType<PrimType, int16_t, uint16_t, int32_t, uint32_t, half, float>()),
+        "The data type is not supported by WholeReduceMax(deprecated, use ReduceRepeat instead.");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReduceInfo(
         dst, src, mask[0], mask[1], repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "WholeReduceMax");
@@ -718,6 +792,12 @@ __aicore__ inline void WholeReduceMin(
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride,
     ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using PrimType = PrimT<T>;
+    static_assert(
+        (SupportType<PrimType, int16_t, uint16_t, int32_t, uint32_t, half, float>()),
+        "The data type is not supported by WholeReduceMin(deprecated, use ReduceRepeat instead).");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReduceInfo(
         dst, src, mask[0], mask[1], repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "WholeReduceMin");
@@ -741,6 +821,16 @@ __aicore__ inline void WholeReduceSum(
     const LocalTensor<U>& dst, const LocalTensor<T>& src, const int32_t mask, const int32_t repeatTime,
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using SrcPrimType = PrimT<T>;
+    using DstPrimType = PrimT<U>;
+    static_assert(
+        (SupportType<SrcPrimType, int16_t, uint16_t, int32_t, uint32_t, half, float>()),
+        "The source data type is not supported by WholeReduceSum(deprecated, use ReduceRepeat instead).");
+    static_assert(
+        (SupportType<DstPrimType, int32_t, uint32_t, half, float>()),
+        "The destination data type is not supported by WholeReduceSum(deprecated, use ReduceRepeat instead).");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReduceInfo(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "WholeReduceSum");
@@ -786,6 +876,12 @@ __aicore__ inline void WholeReduceMax(
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride,
     ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using PrimType = PrimT<T>;
+    static_assert(
+        (SupportType<PrimType, int16_t, uint16_t, int32_t, uint32_t, half, float>()),
+        "The data type is not supported by WholeReduceMax(deprecated, use ReduceRepeat instead).");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReduceInfo(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "WholeReduceMax");
@@ -808,6 +904,12 @@ __aicore__ inline void WholeReduceMin(
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride,
     ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using PrimType = PrimT<T>;
+    static_assert(
+        (SupportType<PrimType, int16_t, uint16_t, int32_t, uint32_t, half, float>()),
+        "The data type is not supported by WholeReduceMin(deprecated, use ReduceRepeat instead.");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReduceInfo(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "WholeReduceMin");
@@ -827,6 +929,10 @@ __aicore__ inline void ReduceDataBlock(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t mask, const int32_t repeatTime,
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using SrcPrimType = PrimT<U>;
+    static_assert((SupportType<SrcPrimType, half, float>()), "The data type is not supported by ReduceDataBlock.");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReduceBlkInfo(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "ReduceDataBlock");
@@ -845,6 +951,10 @@ __aicore__ inline void ReduceDataBlock(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint64_t mask[], const int32_t repeatTime,
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using SrcPrimType = PrimT<U>;
+    static_assert((SupportType<SrcPrimType, half, float>()), "The data type is not supported by ReduceDataBlock.");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReduceBlkInfo(
         dst, src, mask[0], mask[1], repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "ReduceDataBlock");
@@ -863,6 +973,10 @@ __aicore__ inline void ReducePairElem(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t mask, const int32_t repeatTime,
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using SrcPrimType = PrimT<U>;
+    static_assert((SupportType<SrcPrimType, half, float>()), "The data type is not supported by ReducePairElem.");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReducePairInfo(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "ReducePairElem");
@@ -880,6 +994,10 @@ __aicore__ inline void ReducePairElem(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint64_t mask[], const int32_t repeatTime,
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using SrcPrimType = PrimT<U>;
+    static_assert((SupportType<SrcPrimType, half, float>()), "The data type is not supported by ReducePairElem.");
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReducePairInfo(
         dst, src, mask[0], mask[1], repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "ReducePairElem");
@@ -897,6 +1015,22 @@ __aicore__ inline void ReduceRepeat(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t mask, const int32_t repeatTime,
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride, ReduceOrder order)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using DstPrimType = PrimT<T>;
+    using SrcPrimType = PrimT<U>;
+    if constexpr (reduceType == ReduceType::SUM) {
+        static_assert(
+            (SupportType<SrcPrimType, int16_t, uint16_t, int32_t, uint32_t, half, float>()),
+            "The source data type is not supported by ReduceRepeat<SUM>.");
+        static_assert(
+            (SupportType<DstPrimType, int32_t, uint32_t, half, float>()),
+            "The destination data type is not supported by ReduceRepeat<SUM>.");
+    } else if constexpr (reduceType == ReduceType::MAX || reduceType == ReduceType::MIN) {
+        static_assert(
+            (SupportType<SrcPrimType, int16_t, uint16_t, int32_t, uint32_t, half, float>()),
+            "The data type is not supported by ReduceRepeat<MAX/MIN>.");
+    }
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReduceInfo(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "ReduceRepeat");
@@ -915,6 +1049,22 @@ __aicore__ inline void ReduceRepeat(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint64_t mask[], const int32_t repeatTime,
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride, ReduceOrder order)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    using DstPrimType = PrimT<T>;
+    using SrcPrimType = PrimT<U>;
+    if constexpr (reduceType == ReduceType::SUM) {
+        static_assert(
+            (SupportType<SrcPrimType, int16_t, uint16_t, int32_t, uint32_t, half, float>()),
+            "The source data type is not supported by ReduceRepeat<SUM>.");
+        static_assert(
+            (SupportType<DstPrimType, int32_t, uint32_t, half, float>()),
+            "The destination data type is not supported by ReduceRepeat<SUM>.");
+    } else if constexpr (reduceType == ReduceType::MAX || reduceType == ReduceType::MIN) {
+        static_assert(
+            (SupportType<SrcPrimType, int16_t, uint16_t, int32_t, uint32_t, half, float>()),
+            "The data type is not supported by ReduceRepeat<MAX/MIN>.");
+    }
+#endif
 #ifdef __MSTX_DFX_REPORT__
     MstxTensor::GetMstxVecReduceInfo(
         dst, src, mask[0], mask[1], repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "ReduceRepeat");
