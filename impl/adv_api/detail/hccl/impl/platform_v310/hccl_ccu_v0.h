@@ -267,9 +267,15 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         ccuUsedXnNum_ = 11;
         CcuPrepareForAllToAll(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
-        ccuUsedXnNum_ = 10;
+        // 临时：让变长ALLTOALLV走定长ALLTOALL通路（样例满足每卡等长约束）。
+        // AlltoAllV API下发时count=0，真实每卡数据量在allToAllVParam_.sendCounts里，
+        // 定长CcuPrepareForAllToAll读commParam->count，故先用本卡sendCounts回填count。
+        ccuUsedXnNum_ = 11;
         FlushDataCache(&allToAllVParam_[handleId]);
-        CcuPrepareForAllToAllV(&handleParamGM_[handleId], &allToAllVParam_[handleId]);
+        handleParamGM_[handleId].count = allToAllVParam_[handleId].sendCounts[ccuParam_.rankId];
+        handleParamGM_[handleId].strideCount = 0;
+        FlushDataCache(&handleParamGM_[handleId]);
+        CcuPrepareForAllToAll(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_HALF_ALLTOALLV) {
         ccuUsedXnNum_ = 9;
         FlushDataCache(reinterpret_cast<__gm__ uint8_t*>(&handleParamGM_[handleId]) + MAX_DCCI_CNT);
