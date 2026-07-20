@@ -208,7 +208,8 @@ void LoadFuncParamFromMemory(ccu::Variable &paramAddr, ccu::Array<ccu::Variable>
     // 双Die场景Die1需要读后32个参数，其他场景都是读取前32个参数
     ccu::Variable doubleDie;
     doubleDie = CCU_PARAM_NUM_PER_DIE * CCU_ONE_PARAM_SIZE;
-    ccu::Variable addr = paramAddr;
+    ccu::Variable addr;
+    addr = paramAddr;
 
     /*
     // TODO GetDieId()
@@ -267,13 +268,13 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
     ccu::Variable turnEndSig;
     turnEndSig = 1;
 
-    // 载入 结构体 中的寄存器
-    ccu::Variable waitStartAddr = ctx.waitAddr;
-    ccu::Variable recordStartAddr = ctx.recordAddr;
-    ccu::Variable paramStartAddr = ctx.xnAddr;
-    ccu::Variable waitAddr = ctx.waitAddr;
-    ccu::Variable recordAddr = ctx.recordAddr;
-    ccu::Variable paramAddr = ctx.xnAddr;
+    // 使用独立XN保存队列游标，避免Variable拷贝构造与context基址共享handle。
+    ccu::Variable waitAddr;
+    ccu::Variable recordAddr;
+    ccu::Variable paramAddr;
+    waitAddr = ctx.waitAddr;
+    recordAddr = ctx.recordAddr;
+    paramAddr = ctx.xnAddr;
 
     // 其他寄存器
     ccu::Variable ckeSize;
@@ -323,9 +324,9 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
         paramAddr += paramSize;
         queueIdx += one;
         CCU_IF (queueIdx == static_cast<u64>(CCU_TASK_NUM_MAX)) {
-            waitAddr = waitStartAddr;
-            recordAddr = recordStartAddr;
-            paramAddr = paramStartAddr;
+            waitAddr = ctx.waitAddr;
+            recordAddr = ctx.recordAddr;
+            paramAddr = ctx.xnAddr;
             queueIdx = 0;
         }
     }
@@ -340,7 +341,8 @@ void SlaveKfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
     ccu::Variable repeatCond;
     repeatCond = 0;
 
-    ccu::Variable paramAddr = ctx.xnAddr;
+    ccu::Variable paramAddr;
+    paramAddr = ctx.xnAddr;
 
     // 存放<每轮算子参数>的寄存器
     ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE);
