@@ -43,7 +43,7 @@
 
 `SCENARIO_NUM`由CMake作为编译期宏传入；Kernel使用`if constexpr`选择对应场景。切换场景后需要重新执行CMake和编译。
 
-设备侧搬运和计算均使用C API异步接口，通过`asc_sync_notify`和`asc_sync_wait`建立`MTE2→MTE1→M→FIX`的必要依赖；场景4还使用`MTE2→FIX`保证量化参数就绪，并在量化参数从L1搬运到Fixpipe Buffer后通过`asc_sync_pipe(PIPE_FIX)`等待该搬运完成，最终执行Fixpipe搬出；不使用`PIPE_ALL`同步。
+设备侧搬运和计算均使用C API异步接口，通过`asc_sync_notify`和`asc_sync_wait`建立`MTE2→MTE1→M→FIX`的必要依赖；场景4还使用`MTE2→FIX`保证量化参数就绪，并在量化参数从L1搬运到Fixpipe Buffer后通过`asc_sync_pipe(PIPE_FIX)`等待该搬运完成，最终执行Fixpipe搬出。核函数结束时调用`asc_sync_pipe(PIPE_ALL)`，确保全部流水完成。
 
 **场景1：输入格式Nz，输入数据类型half**
 
