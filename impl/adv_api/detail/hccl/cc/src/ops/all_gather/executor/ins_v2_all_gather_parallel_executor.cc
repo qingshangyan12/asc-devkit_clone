@@ -12,11 +12,12 @@
 #include "alg_data_trans_wrapper.h"
 #include "ins_temp_all_gather_mesh_1D.h"
 #include "ins_temp_all_gather_nhr.h"
-#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
-#include "ccu_temp_all_gather_nhr_1D_mem2mem.h"
-#include "ccu_temp_all_gather_mesh_1D_mem2mem.h"
-#include "ccu_temp_all_gather_nhr_1D_multi_jetty_mem2mem.h"
-#endif
+// Non-Mesh1D CCU templates are kept for later recovery. They are not included before KFC Mesh1D is verified.
+// #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+// #include "ccu_temp_all_gather_nhr_1D_mem2mem.h"
+// #include "ccu_temp_all_gather_mesh_1D_mem2mem.h"
+// #include "ccu_temp_all_gather_nhr_1D_multi_jetty_mem2mem.h"
+// #endif
 #include "alg_data_trans_wrapper.h"
 
 #include "topo_match_multilevel.h"
@@ -469,15 +470,15 @@ REGISTER_EXECUTOR_BY_TWO_TEMPS(
 REGISTER_EXECUTOR_BY_TWO_TEMPS(
     HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherParallelMesh1DNHRUBX, InsV2AllGatherParallelExecutor, TopoMatchUBX,
     InsTempAllGatherMesh1D, InsTempAllGatherNHR);
-#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
-REGISTER_EXECUTOR_BY_TWO_TEMPS(
-    HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherParallelMesh1DNHR, InsV2AllGatherParallelExecutor, TopoMatchMultilevel,
-    CcuTempAllGatherMesh1DMem2Mem, CcuTempAllGatherNHR1DMem2Mem);
-
-REGISTER_EXECUTOR_BY_TWO_TEMPS(
-    HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherParallelMesh1DNHRMemUBX, InsV2AllGatherParallelExecutor, TopoMatchUBX,
-    CcuTempAllGatherMesh1DMem2Mem, CcuTempAllGatherNHR1DMultiJettyMem2Mem);
-
-#endif
+// Non-Mesh1D CCU registrations are kept for later recovery. Do not register them before KFC Mesh1D is verified.
+// #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+// REGISTER_EXECUTOR_BY_TWO_TEMPS(
+//     HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherParallelMesh1DNHR, InsV2AllGatherParallelExecutor,
+//     TopoMatchMultilevel, CcuTempAllGatherMesh1DMem2Mem, CcuTempAllGatherNHR1DMem2Mem);
+//
+// REGISTER_EXECUTOR_BY_TWO_TEMPS(
+//     HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherParallelMesh1DNHRMemUBX, InsV2AllGatherParallelExecutor,
+//     TopoMatchUBX, CcuTempAllGatherMesh1DMem2Mem, CcuTempAllGatherNHR1DMultiJettyMem2Mem);
+// #endif
 } // namespace mc2_ops_hccl
 // 算法注册
