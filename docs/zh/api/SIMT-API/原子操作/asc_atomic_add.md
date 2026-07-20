@@ -90,7 +90,11 @@ Unified Buffer或Global Memory上的初始数据。
 
 ## 约束说明
 
-原子操作保证对同一地址的读改写过程具有原子性，但不保证多个线程之间的执行顺序。对于浮点累加顺序敏感场景，结果可能随线程调度变化而不同。
+-   原子操作保证对同一地址的读改写过程具有原子性，但不保证多个线程之间的执行顺序。对于浮点累加顺序敏感场景，结果可能随线程调度变化而不同。
+-   本接口的性能受以下因素影响，相关原理请参见[原子操作机制](原子操作简介.md#原子操作机制)。具体性能对比和优化示例请参见[asc_atomic_add接口性能对比样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/02_features/01_api_features/02_atomic_operation/atomic_add_perf)。
+    -   内存空间：Unified Buffer的访问路径比Global Memory短，通常具有更低的访问开销。当使用的数据类型支持Unified Buffer时，建议优先在Unified Buffer中完成原子操作。
+    -   返回值：是否使用返回值可能影响编译器生成的原子加指令。以`int32_t`为例，不使用返回值时可生成性能更优的指令；业务场景允许时，建议不使用返回值。
+    -   排队请求数：Global Memory原子请求以CacheLine为排队粒度，同一CacheLine中的排队请求越多，等待时间越长。建议降低同一CacheLine的竞争，尽量将相互独立的原子操作目标地址分散到不同CacheLine中。
 
 ## 需要包含的头文件
 
