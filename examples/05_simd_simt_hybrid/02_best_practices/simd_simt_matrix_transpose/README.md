@@ -121,9 +121,9 @@ for (uint32_t tile_base = loop_start; tile_base < loop_end && tile_base < total_
 
     // MTE2搬入完成后，SIMT VF读取UB输入buffer。
     asc_lock(PIPE_V, SINGLE_BUFFER_MUTEX);
-    asc_vf_call<simt_transpose_2tile>(dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1),
-                                      &out_tile[0][0][0], &in_tile[0][0][0],
-                                      tile_base, total_tiles);
+    asc_vf_call<simt_transpose_2tile>(
+        dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1), &out_tile[0][0][0], &in_tile[0][0][0], tile_base,
+        total_tiles);
     asc_unlock(PIPE_V, SINGLE_BUFFER_MUTEX);
 
     // SIMT VF写完输出buffer后，MTE3将结果搬回GM。
@@ -163,9 +163,9 @@ for (uint32_t tile_base = loop_start; tile_base < total_tiles; tile_base += loop
 
     // MTE2搬入完成后，SIMT VF读取UB输入buffer。
     asc_lock(PIPE_V, SINGLE_BUFFER_MUTEX);
-    asc_vf_call<simt_transpose_2tile>(dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1),
-                                      &out_tile[0][0][0], &in_tile[0][0][0],
-                                      tile_base, total_tiles);
+    asc_vf_call<simt_transpose_2tile>(
+        dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1), &out_tile[0][0][0], &in_tile[0][0][0], tile_base,
+        total_tiles);
     asc_unlock(PIPE_V, SINGLE_BUFFER_MUTEX);
 
     // SIMT VF写完输出buffer后，MTE3将结果搬回GM。
@@ -231,7 +231,7 @@ SIMD与SIMT混合编程场景下，UB数据由MTE搬入。MTE搬运带padding的
 <img src="./figures/case3_bank.png">
 
 ```cpp
-constexpr int TILE_PAD = 8;                          // MTE搬运要求32B对齐，使用32×40的UB布局
+constexpr int TILE_PAD = 8; // MTE搬运要求32B对齐，使用32×40的UB布局
 constexpr int TILE_PAD_STRIDE = TILE_DIM + TILE_PAD;
 __ubuf__ float in_tile[TILES_PER_BLOCK][TILE_DIM][TILE_PAD_STRIDE];
 __ubuf__ float out_tile[TILES_PER_BLOCK][TILE_DIM][TILE_DIM];
@@ -246,13 +246,12 @@ for (uint32_t tile_base = loop_start; tile_base < total_tiles; tile_base += loop
 
     // MTE2搬入完成后，SIMT VF按32×40 padded布局读取UB输入buffer。
     asc_lock(PIPE_V, SINGLE_BUFFER_MUTEX);
-    asc_vf_call<simt_transpose_2tile_pad>(dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1),
-                                          &out_tile[0][0][0], &in_tile[0][0][0],
-                                          tile_base, total_tiles);
-    // simt_transpose_2tile_pad内部按32×40物理布局读取输入tile，按32×32连续布局写入输出tile。
-    ...
+    asc_vf_call<simt_transpose_2tile_pad>(
+        dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1), &out_tile[0][0][0], &in_tile[0][0][0], tile_base,
+        total_tiles);
     asc_unlock(PIPE_V, SINGLE_BUFFER_MUTEX);
 
+    // 输出buffer为32×32连续布局，MTE3按输出矩阵行方向搬回GM。
     asc_lock(PIPE_MTE3, SINGLE_BUFFER_MUTEX);
     copy_ub_2tile_to_gm(output, &out_tile[0][0][0], height, tiles_x, tile_base, total_tiles);
     asc_unlock(PIPE_MTE3, SINGLE_BUFFER_MUTEX);
@@ -292,23 +291,20 @@ for (uint32_t tile_base = curr_tile_base; tile_base < total_tiles; tile_base += 
     uint8_t output_mutex = DB_OUTPUT_MUTEX_BASE + static_cast<uint8_t>(curr_buffer);
 
     asc_lock(PIPE_MTE2, input_mutex);
-    copy_gm_2tile_to_padded_ub(&in_tile[curr_buffer][0][0][0], input, width, tiles_x,
-                               tile_base, total_tiles);
+    copy_gm_2tile_to_padded_ub(&in_tile[curr_buffer][0][0][0], input, width, tiles_x, tile_base, total_tiles);
     asc_unlock(PIPE_MTE2, input_mutex);
 
     // SIMT VF等待当前输入buffer搬入完成；复用输出buffer前等待其上一次MTE3搬出完成。
     asc_lock(PIPE_V, input_mutex);
     asc_lock(PIPE_V, output_mutex);
-    asc_vf_call<simt_transpose_2tile_pad>(dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1),
-                                          &out_tile[curr_buffer][0][0][0],
-                                          &in_tile[curr_buffer][0][0][0],
-                                          tile_base, total_tiles);
+    asc_vf_call<simt_transpose_2tile_pad>(
+        dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1), &out_tile[curr_buffer][0][0][0],
+        &in_tile[curr_buffer][0][0][0], tile_base, total_tiles);
     asc_unlock(PIPE_V, input_mutex);
     asc_unlock(PIPE_V, output_mutex);
 
     asc_lock(PIPE_MTE3, output_mutex);
-    copy_ub_2tile_to_gm(output, &out_tile[curr_buffer][0][0][0], height, tiles_x,
-                        tile_base, total_tiles);
+    copy_ub_2tile_to_gm(output, &out_tile[curr_buffer][0][0][0], height, tiles_x, tile_base, total_tiles);
     asc_unlock(PIPE_MTE3, output_mutex);
     ++loop_count;
 }

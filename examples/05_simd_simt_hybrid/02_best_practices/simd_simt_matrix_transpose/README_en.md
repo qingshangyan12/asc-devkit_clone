@@ -122,9 +122,9 @@ for (uint32_t tile_base = loop_start; tile_base < loop_end && tile_base < total_
 
     // After MTE2 load is complete, the SIMT VF reads the UB input buffer.
     asc_lock(PIPE_V, SINGLE_BUFFER_MUTEX);
-    asc_vf_call<simt_transpose_2tile>(dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1),
-                                      &out_tile[0][0][0], &in_tile[0][0][0],
-                                      tile_base, total_tiles);
+    asc_vf_call<simt_transpose_2tile>(
+        dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1), &out_tile[0][0][0], &in_tile[0][0][0], tile_base,
+        total_tiles);
     asc_unlock(PIPE_V, SINGLE_BUFFER_MUTEX);
 
     // After the SIMT VF writes the output buffer, MTE3 stores the result back to GM.
@@ -164,9 +164,9 @@ for (uint32_t tile_base = loop_start; tile_base < total_tiles; tile_base += loop
 
     // After MTE2 load is complete, the SIMT VF reads the UB input buffer.
     asc_lock(PIPE_V, SINGLE_BUFFER_MUTEX);
-    asc_vf_call<simt_transpose_2tile>(dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1),
-                                      &out_tile[0][0][0], &in_tile[0][0][0],
-                                      tile_base, total_tiles);
+    asc_vf_call<simt_transpose_2tile>(
+        dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1), &out_tile[0][0][0], &in_tile[0][0][0], tile_base,
+        total_tiles);
     asc_unlock(PIPE_V, SINGLE_BUFFER_MUTEX);
 
     // After the SIMT VF writes the output buffer, MTE3 stores the result back to GM.
@@ -232,7 +232,7 @@ Note that the 32x40 layout is a tradeoff for SIMD and SIMT hybrid programming af
 <img src="./figures/case3_bank.png">
 
 ```cpp
-constexpr int TILE_PAD = 8;                          // The hybrid MTE movement requires 32B alignment, so a 32x40 UB layout is used.
+constexpr int TILE_PAD = 8; // The hybrid MTE movement requires 32B alignment, so a 32x40 UB layout is used.
 constexpr int TILE_PAD_STRIDE = TILE_DIM + TILE_PAD;
 __ubuf__ float in_tile[TILES_PER_BLOCK][TILE_DIM][TILE_PAD_STRIDE];
 __ubuf__ float out_tile[TILES_PER_BLOCK][TILE_DIM][TILE_DIM];
@@ -247,13 +247,12 @@ for (uint32_t tile_base = loop_start; tile_base < total_tiles; tile_base += loop
 
     // After MTE2 load is complete, the SIMT VF reads the UB input buffer in the 32x40 padded layout.
     asc_lock(PIPE_V, SINGLE_BUFFER_MUTEX);
-    asc_vf_call<simt_transpose_2tile_pad>(dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1),
-                                          &out_tile[0][0][0], &in_tile[0][0][0],
-                                          tile_base, total_tiles);
-    // Inside simt_transpose_2tile_pad, the input tile is read as 32x40 and the output tile is written as 32x32.
-    ...
+    asc_vf_call<simt_transpose_2tile_pad>(
+        dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1), &out_tile[0][0][0], &in_tile[0][0][0], tile_base,
+        total_tiles);
     asc_unlock(PIPE_V, SINGLE_BUFFER_MUTEX);
 
+    // The output buffer uses a contiguous 32x32 layout. MTE3 stores it back to GM along the output matrix row direction.
     asc_lock(PIPE_MTE3, SINGLE_BUFFER_MUTEX);
     copy_ub_2tile_to_gm(output, &out_tile[0][0][0], height, tiles_x, tile_base, total_tiles);
     asc_unlock(PIPE_MTE3, SINGLE_BUFFER_MUTEX);
@@ -293,23 +292,20 @@ for (uint32_t tile_base = curr_tile_base; tile_base < total_tiles; tile_base += 
     uint8_t output_mutex = DB_OUTPUT_MUTEX_BASE + static_cast<uint8_t>(curr_buffer);
 
     asc_lock(PIPE_MTE2, input_mutex);
-    copy_gm_2tile_to_padded_ub(&in_tile[curr_buffer][0][0][0], input, width, tiles_x,
-                               tile_base, total_tiles);
+    copy_gm_2tile_to_padded_ub(&in_tile[curr_buffer][0][0][0], input, width, tiles_x, tile_base, total_tiles);
     asc_unlock(PIPE_MTE2, input_mutex);
 
     // The SIMT VF waits for the current input buffer. It also waits before reusing an output buffer.
     asc_lock(PIPE_V, input_mutex);
     asc_lock(PIPE_V, output_mutex);
-    asc_vf_call<simt_transpose_2tile_pad>(dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1),
-                                          &out_tile[curr_buffer][0][0][0],
-                                          &in_tile[curr_buffer][0][0][0],
-                                          tile_base, total_tiles);
+    asc_vf_call<simt_transpose_2tile_pad>(
+        dim3(TILE_DIM, TILE_DIM * TILES_PER_BLOCK, 1), &out_tile[curr_buffer][0][0][0],
+        &in_tile[curr_buffer][0][0][0], tile_base, total_tiles);
     asc_unlock(PIPE_V, input_mutex);
     asc_unlock(PIPE_V, output_mutex);
 
     asc_lock(PIPE_MTE3, output_mutex);
-    copy_ub_2tile_to_gm(output, &out_tile[curr_buffer][0][0][0], height, tiles_x,
-                        tile_base, total_tiles);
+    copy_ub_2tile_to_gm(output, &out_tile[curr_buffer][0][0][0], height, tiles_x, tile_base, total_tiles);
     asc_unlock(PIPE_MTE3, output_mutex);
     ++loop_count;
 }
