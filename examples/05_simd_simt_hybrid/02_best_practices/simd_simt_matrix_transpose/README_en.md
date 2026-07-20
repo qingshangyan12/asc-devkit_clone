@@ -2,7 +2,7 @@
 
 ## Overview
 
-Based on the [matrix_transpose_practice sample](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice) in SIMT scenarios, this sample further optimizes the custom transpose operator by using SIMD and SIMT hybrid programming. It improves matrix transpose performance by running MTE movement and SIMT computation in parallel in hybrid programming. To show the step-by-step optimization process, this sample starts from direct global memory (GM) transpose. It then introduces Memory Transfer Engine (MTE) movement, Unified Buffer (UB) staging, and 32x32 tiling. It compares two Thread Block mapping methods: launching Thread Blocks by tile groups and fixing the Thread Block count. It reduces bank conflicts by using UB padding. Finally, it uses double buffering to run the MTE2 load, SIMT Vector Function (VF) transpose, and MTE3 store pipelines in parallel. This path shows the tuning process for SIMD and SIMT hybrid matrix transpose.
+Based on the [matrix_transpose_practice sample](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice) in SIMT scenarios, this sample further optimizes the custom transpose operator by using SIMD and SIMT hybrid programming. It improves matrix transpose performance by running MTE movement and SIMT computation in parallel in hybrid programming. To show the step-by-step optimization process, this sample starts from direct global memory (GM) transpose. It then introduces Memory Transfer Engine (MTE) movement, Unified Buffer (UB) staging, and 32x32 tiling. It compares two Thread Block mapping methods: launching Thread Blocks by tile groups and fixing the Thread Block count. It reduces bank conflicts by using UB padding. Finally, it uses double buffering (Double Buffer) to run the MTE2 load, SIMT Vector Function (VF) transpose, and MTE3 store pipelines in parallel. This path shows the tuning process for SIMD and SIMT hybrid matrix transpose.
 
 ## Supported Products
 
@@ -54,8 +54,8 @@ This sample constructs an optimization path through five cases. The kernel, Thre
 | ---- | ------ | ------------------ | ------------------------ | ------------------------------- |
 | 0 | `transpose_naive_kernel` | `core` | 2048 | Directly perform transpose in GM |
 | 1 | `transpose_ub_2tile_static_kernel` | `ceil(tiles / 2)` | 2048 | Introduce MTE movement, UB staging, and 32x32 tiling. Set the Thread Block count by tile groups |
-| 2 | `transpose_ub_2tile_loop_kernel` | `core` | 2048 | Fix the Thread Block count to the hardware vector core count. One Thread Block loops over multiple tile groups |
-| 3 | `transpose_ub_pad_loop_kernel` | `core` | 2048 | Add 8 columns of padding to the UB tile to reduce bank conflicts during the SIMT VF transpose access phase |
+| 2 | `transpose_ub_2tile_loop_kernel` | `core` | 2048 | Limit the launched core count to the physical core count. One Thread Block loops over multiple tile groups |
+| 3 | `transpose_ub_pad_loop_kernel` | `core` | 2048 | Use UB padding to reduce bank conflicts during the SIMT VF transpose access phase |
 | 4 | `transpose_ub_pad_db_kernel` | `core` | 2048 | Use double buffering to run the MTE2 load, SIMT VF transpose, and MTE3 store pipelines in parallel |
 
 Here, `core` is the hardware vector core count. The runtime queries this value by using `aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)`. The performance data in this sample was collected in a test environment where `core=64`. `tiles` is the total tile count `(W/32) x (H/32)`. When processing a 1024x1024 matrix, the matrix is divided into 32x32 tiles, so `tiles=1024`.
@@ -146,7 +146,7 @@ Case 1 uses UB staging to convert non-contiguous GM writes into transpose access
 
 ---
 
-### Case 2: MTE Moves Data to UB Before Transpose Write-Back, with a Fixed Thread Block Count
+### Case 2: Limit the Launched Core Count to the Physical Core Count
 
 **Optimization Goal**: Change the Thread Block count in Case 1 from the tile group count to the hardware vector core count. Each Thread Block loops over multiple tile groups, which reduces Thread Block launch and scheduling overhead.
 
@@ -184,11 +184,13 @@ for (uint32_t tile_base = loop_start; tile_base < total_tiles; tile_base += loop
 
 **Analysis**:
 
-Case 2 fixes the Thread Block count to the hardware vector core count. Compared with Case 1, which launches 512 Thread Blocks by tile groups, Case 2 launches and schedules fewer Thread Blocks. Task Duration decreases from 23.732μs to 18.697μs, a latency reduction of about 21.2%. In SIMD and SIMT hybrid programming scenarios, reducing the Thread Block count does not change the transpose logic inside the SIMT VF, and does not introduce extra SIMT-side compute complexity. Unlike the SIMT scenario, this case does not show register spilling. Later versions continue to use 2048 threads and two tiles per iteration. The optimization focus then moves to UB access overhead.
+Case 2 fixes the Thread Block count to the hardware vector core count. Compared with Case 1, which launches 512 Thread Blocks by tile groups, Case 2 launches and schedules fewer Thread Blocks. Task Duration decreases from 23.732μs to 18.697μs, a latency reduction of about 21.2%.
+
+Compared with the matrix_transpose_practice sample in the SIMT scenario, SIMD and SIMT hybrid programming uses the MTE pipeline to handle data movement between GM and UB, while the SIMT VF only handles transpose access inside UB and writes to the output buffer. This keeps the processing logic inside the SIMT VF more focused. This case uses 2048 threads and two tiles per iteration without observed register spilling. In contrast, the matrix_transpose_practice sample uses the same fixed Thread Block count and 2048 threads in Case 4, but register spilling leads to a Task Duration of 27.113μs. After switching to 1024 threads, Case 5 of that sample is 23.912μs. The Task Duration of this case is 18.697μs, reflecting the advantages of hybrid programming in MTE movement and SIMT thread parallelism. Later versions continue to use 2048 threads and two tiles per iteration. The optimization focus then moves to UB access overhead.
 
 ---
 
-### Case 3: MTE Moves Data to UB Before Transpose Write-Back with Padding
+### Case 3: Add UB Padding to Reduce UB Bank Conflicts
 
 **Optimization Goal**: Reduce bank conflicts during the SIMT VF transpose access phase by adding UB padding on top of Case 2.
 
@@ -271,7 +273,7 @@ Case 3 changes only the physical UB layout based on Case 2. It does not change G
 
 ---
 
-### Case 4: MTE Moves Data to UB Before Transpose Write-Back with Padding and Double Buffer
+### Case 4: Use Double Buffering to Implement Pipeline Parallelism
 
 **Optimization Goal**: Use two UB input/output buffers and multiple mutex IDs on top of Case 3, so that the MTE2 load, SIMT VF transpose, and MTE3 store pipelines run in parallel.
 

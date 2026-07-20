@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于SIMT场景下的[matrix_transpose_practice样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice)，采用SIMD与SIMT混合编程对自定义transpose算子进行进一步优化，通过混合编程中的MTE搬运与SIMT计算并行，提高矩阵转置性能。为了展示逐步优化过程，本样例从直接全局内存转置出发，引入MTE搬运、UB中转与32×32分块，对比按tile分组启动Thread Block与固定Thread Block数两种映射方式，通过UB padding降低bank冲突，最后借助双缓冲使MTE2搬入、SIMT VF转置和MTE3搬出流水并行，呈现SIMD与SIMT混合矩阵转置的调优路径。
+本样例基于SIMT场景下的[matrix_transpose_practice样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice)，采用SIMD与SIMT混合编程对自定义transpose算子进行进一步优化，通过混合编程中的MTE搬运与SIMT计算并行，提高矩阵转置性能。为了展示逐步优化过程，本样例从直接全局内存转置出发，引入MTE搬运、UB中转与32×32分块，对比按tile分组启动Thread Block与固定Thread Block数两种映射方式，增加UB padding降低bank冲突，最后借助双缓冲（Double Buffer）使MTE2搬入、SIMT VF转置和MTE3搬出流水并行，呈现SIMD与SIMT混合矩阵转置的调优路径。
 
 ## 支持的产品
 
@@ -53,9 +53,9 @@
 | ---- | ------------------------------------ | ------------------- | ------------------ | ------------------------------------------------------------------------- |
 | 0    | `transpose_naive_kernel`           | `core`            | 2048               | 直接在GM中完成转置                                                        |
 | 1    | `transpose_ub_2tile_static_kernel` | `ceil(tiles / 2)` | 2048               | 引入MTE搬运、UB中转和32×32分块，按tile分组数量设置Thread Block数         |
-| 2    | `transpose_ub_2tile_loop_kernel`   | `core`            | 2048               | Thread Block数固定为硬件vector core数，单个Thread Block循环处理多个tile组 |
-| 3    | `transpose_ub_pad_loop_kernel`     | `core`            | 2048               | UB tile增加8列padding，降低SIMT VF转置访问阶段的bank冲突                  |
-| 4    | `transpose_ub_pad_db_kernel`       | `core`            | 2048               | 双缓冲轮换，使MTE2搬入、SIMT VF转置和MTE3搬出流水并行                     |
+| 2    | `transpose_ub_2tile_loop_kernel`   | `core`            | 2048               | 限制启动核数不超过物理核，单个Thread Block循环处理多个tile组              |
+| 3    | `transpose_ub_pad_loop_kernel`     | `core`            | 2048               | 增加UB padding缓解SIMT VF转置访问阶段的bank冲突                            |
+| 4    | `transpose_ub_pad_db_kernel`       | `core`            | 2048               | 使用双缓冲使MTE2搬入、SIMT VF转置和MTE3搬出流水并行                       |
 
 其中 `core`为硬件vector core数，通过 `aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)`在运行时查询获得。本样例中的性能数据基于 `core=64` 的测试环境采集得到。`tiles`为总tile数 `(W/32) × (H/32)`；处理1024×1024矩阵时，矩阵会被划分为32×32个tile，因此 `tiles=1024`。
 
@@ -145,7 +145,7 @@ Case 1通过UB中转把非连续GM写转换为UB内转置访问，Task Duration�
 
 ---
 
-### Case 2：MTE搬入UB后转置写回，固定Thread Block数
+### Case 2：限制启动核数不超过物理核
 
 **优化目标**：将Case 1的线程块数量从切分后的tile分组数改为硬件vector core数，每个Thread Block通过循环处理多个tile分组，减少Thread Block启动和调度开销。
 
@@ -183,13 +183,15 @@ for (uint32_t tile_base = loop_start; tile_base < total_tiles; tile_base += loop
 
 **分析**：
 
-Case 2将Thread Block数固定为硬件vector core数。相比Case 1按tile分组启动512个Thread Block的写法，Case 2需要启动和调度的线程块数量更少，Task Duration从23.732μs降低到18.697μs，耗时下降约21.2%。在SIMD与SIMT混合编程场景下，降低Thread Block数不会改变SIMT VF内部的转置逻辑，也不会引入额外的SIMT线程侧计算复杂度；与SIMT场景不同，本Case未观察到寄存器溢出。后续版本继续沿用2048线程、每轮两个tile的路径，把优化重点转向UB访问开销。
+Case 2将Thread Block数固定为硬件vector core数。相比Case 1按tile分组启动512个Thread Block的写法，Case 2需要启动和调度的线程块数量更少，Task Duration从23.732μs降低到18.697μs，耗时下降约21.2%。
+
+相比SIMT场景下的matrix_transpose_practice样例，SIMD与SIMT混合编程由MTE流水负责GM与UB之间的数据搬运，SIMT VF只处理UB内转置访问和输出buffer写入，SIMT VF内的处理逻辑更集中。本Case使用2048线程、每轮两个tile的配置，未观察到寄存器溢出；而matrix_transpose_practice样例在同样固定Thread Block数并使用2048线程时，Case 4因寄存器溢出导致Task Duration为27.113μs，改为1024线程后的Case 5为23.912μs。本Case的Task Duration为18.697μs，体现了混合编程在MTE搬运和SIMT线程并行度上的优势。后续版本继续沿用2048线程、每轮两个tile的路径，把优化重点转向UB访问开销。
 
 ---
 
-### Case 3：MTE搬入UB后转置写回+padding
+### Case 3：增加UB padding缓解UB bank冲突
 
-**优化目标**：在Case 2的基础上，通过UB padding降低SIMT VF转置访问阶段的bank冲突。
+**优化目标**：在Case 2的基础上，增加UB padding降低SIMT VF转置访问阶段的bank冲突。
 
 **核心实现**：
 
@@ -270,7 +272,7 @@ Case 3只在Case 2基础上改变UB物理布局，不改变GM读写坐标和Thre
 
 ---
 
-### Case 4：MTE搬入UB后转置写回+padding+双缓冲
+### Case 4：使用双缓冲实现流水并行
 
 **优化目标**：在Case 3的基础上，通过两份UB输入/输出缓冲区和多组mutex id，使MTE2搬入、SIMT VF转置和MTE3搬出流水并行。
 

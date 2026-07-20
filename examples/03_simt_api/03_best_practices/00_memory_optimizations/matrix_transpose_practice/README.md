@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例以矩阵转置为例，介绍Ascend C SIMT编程方式下的访存优化思路。首先，通过一维连续复制建立GM连续读写的性能基线，并用直接全局内存转置暴露非连续写带来的主要开销；然后，引入UB中转与32×32分块，将非连续GM写转移为UB内转置访问；接着，对比按tile分组启动线程块（Thread Block）与固定线程块数两种配置方式，并结合2048线程配置下的寄存器溢出分析线程数选择；随后，通过UB padding消除转置读阶段的bank冲突；最终，借助双缓冲去除循环尾部同步，完整呈现SIMT矩阵转置的调优路径。
+本样例以矩阵转置为例，介绍Ascend C SIMT编程方式下的访存优化思路。首先，通过一维连续复制建立GM连续读写的性能基线，并用直接全局内存转置暴露非连续写带来的主要开销；然后，引入UB中转与32×32分块，将非连续GM写转移为UB内转置访问；接着，对比按tile分组启动线程块（Thread Block）与固定线程块数两种配置方式，并结合2048线程配置下的寄存器溢出分析线程数选择；随后，增加UB padding消除转置读阶段的bank冲突；最终，借助双缓冲（Double Buffer）去除循环尾部同步，完整呈现SIMT矩阵转置的调优路径。
 
 ## 支持的产品
 
@@ -56,10 +56,10 @@
 | 1    | `copy_kernel`                     | `core`            | 1024               | 仅降低线程数，与Case 5、Case 6、Case 7的启动配置一致                        |
 | 2    | `transpose_naive_kernel`          | `core`            | 2048               | 直接在GM中完成转置                                                          |
 | 3    | `transpose_ub_2tile_naive_kernel` | `ceil(tiles / 2)` | 2048               | 引入UB与32×32的tile分块，按切分后的tile数量设置Thread Block数              |
-| 4    | `transpose_ub_2tile_kernel`       | `core`            | 2048               | Thread Block数固定为硬件vector core数，单个Thread Block循环处理多个tile分组 |
-| 5    | `transpose_ub_kernel`             | `core`            | 1024               | 改为1024线程，单个Thread Block循环处理多个32×32的tile                      |
-| 6    | `transpose_ub_pad_kernel`         | `core`            | 1024               | UB tile增加2列padding，消除转置读阶段的bank冲突                             |
-| 7    | `transpose_ub_pad_db_kernel`      | `core`            | 1024               | 双缓冲轮换，去除循环尾部同步                                                |
+| 4    | `transpose_ub_2tile_kernel`       | `core`            | 2048               | 限制启动核数不超过物理核，单个Thread Block循环处理多个tile分组              |
+| 5    | `transpose_ub_kernel`             | `core`            | 1024               | 降低线程数避免寄存器溢出，单个Thread Block循环处理多个32×32的tile           |
+| 6    | `transpose_ub_pad_kernel`         | `core`            | 1024               | 增加UB padding缓解转置读阶段的bank冲突                                      |
+| 7    | `transpose_ub_pad_db_kernel`      | `core`            | 1024               | 使用双缓冲减少循环尾部同步                                                  |
 
 其中 `core`为硬件vector core数，通过 `aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)`在运行时查询获得。本样例中的性能数据基于 `core=64` 的测试环境采集得到。`tiles`为总tile数 `(W/32) × (H/32)`；处理1024×1024矩阵时，矩阵会被划分为32×32个tile，因此 `tiles=1024`。
 
@@ -216,7 +216,7 @@ Case 3通过UB中转把非连续GM写转换为UB内转置读取，Task Duration�
 
 ---
 
-### Case 4：UB中转转置，固定Thread Block数，每轮处理两个32×32的tile
+### Case 4：限制启动核数不超过物理核
 
 **优化目标**：将Case 3的线程块数量从切分后的tile分组数改为硬件vector core数，每个Thread Block通过循环处理多个tile分组，并观察2048线程配置下的寄存器使用情况。
 
@@ -249,7 +249,7 @@ Case 4将Thread Block数固定为硬件vector core数。相比Case 3启动512个
 
 ---
 
-### Case 5：UB中转转置，固定Thread Block数
+### Case 5：降低线程数避免寄存器溢出
 
 **优化目标**：改为1024线程，将单轮处理粒度调整为一个32×32的tile，确定后续优化的基础配置。
 
@@ -278,9 +278,9 @@ asc_syncthreads();
 
 ---
 
-### Case 6：UB中转转置+padding
+### Case 6：增加UB padding缓解UB bank冲突
 
-**优化目标**：在Case 5的基础上，通过UB padding消除转置读阶段的bank冲突。
+**优化目标**：在Case 5的基础上，增加UB padding消除转置读阶段的bank冲突。
 
 **核心实现**：
 
@@ -339,7 +339,7 @@ asc_syncthreads();
 
 ---
 
-### Case 7：UB中转转置+padding+双缓冲，去除循环尾部同步（1024线程）
+### Case 7：使用双缓冲减少同步开销
 
 **优化目标**：去除Case 6每轮循环末尾的 `asc_syncthreads()`，减少同步开销。
 
