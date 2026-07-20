@@ -52,7 +52,7 @@ public:
     static constexpr auto depth = NestingDepthV<T>;
     static constexpr auto rank = Std::tuple_size_v<T>;
 
-    __aicore__ inline constexpr Layout(const T& shape  = {}, const U& stride = {})
+    ASCENDC_HOST_AICORE inline constexpr Layout(const T& shape  = {}, const U& stride = {})
         : Std::tuple<T, U>(shape, stride)
     {
         static_assert(Std::is_tuple_v<T> && Std::is_tuple_v<U>, "Shape or Stride is not tuple!");
@@ -75,25 +75,25 @@ public:
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Shape()
+    ASCENDC_HOST_AICORE inline constexpr decltype(auto) Shape()
     {
         return GetValue<0, I...>(static_cast<Std::tuple<T, U>&>(*this));
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Shape() const
+    ASCENDC_HOST_AICORE inline constexpr decltype(auto) Shape() const
     {
         return GetValue<0, I...>(static_cast<const Std::tuple<T, U>&>(*this));
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Stride()
+    ASCENDC_HOST_AICORE inline constexpr decltype(auto) Stride()
     {
         return GetValue<1, I...>(static_cast<Std::tuple<T, U>&>(*this));
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Stride() const
+    ASCENDC_HOST_AICORE inline constexpr decltype(auto) Stride() const
     {
         return GetValue<1, I...>(static_cast<const Std::tuple<T, U>&>(*this));
     }
@@ -105,7 +105,7 @@ public:
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Rank() const
+    ASCENDC_HOST_AICORE inline constexpr decltype(auto) Rank() const
     {
         static_assert(Std::tuple_size_v<T> == Std::tuple_size_v<U>, "The dimensions of the Shape and Stride are not the same.");
         return GetRank<I...>(Shape());

@@ -109,7 +109,7 @@ struct Product {
 };
 
 template <size_t I, typename Tuple, typename = Std::enable_if_t<Std::is_tuple_v<Std::remove_cvref_t<Tuple>>>>
-__aicore__ inline constexpr auto Get(Tuple&& t)
+ASCENDC_HOST_AICORE inline constexpr auto Get(Tuple&& t)
 {
     static_assert(Std::is_tuple_v<Std::remove_cvref_t<Tuple>>, "Shape or Stride is not Tuple");
     return Std::get<I>(static_cast<Tuple&&>(t));
@@ -118,21 +118,21 @@ __aicore__ inline constexpr auto Get(Tuple&& t)
 template <
     size_t I0, size_t I1, size_t... Is, typename Tuple,
     typename = Std::enable_if_t<Std::is_tuple_v<Std::remove_cvref_t<Tuple>>>>
-__aicore__ inline constexpr auto Get(Tuple&& t)
+ASCENDC_HOST_AICORE inline constexpr auto Get(Tuple&& t)
 {
     static_assert(Std::is_tuple_v<Std::remove_cvref_t<Tuple>>, "Shape or Stride is not Tuple");
     return Get<I1, Is...>(Get<I0>(static_cast<Tuple&&>(t)));
 }
 
 template <typename Tuple, typename = Std::enable_if_t<Std::is_tuple_v<Std::remove_cvref_t<Tuple>>>>
-__aicore__ inline constexpr auto Get(Tuple&& t)
+ASCENDC_HOST_AICORE inline constexpr auto Get(Tuple&& t)
 {
     static_assert(Std::is_tuple_v<Std::remove_cvref_t<Tuple>>, "Shape or Stride is not Tuple");
     return static_cast<Tuple&&>(t);
 }
 
 template <size_t... Is, typename Tuple>
-__aicore__ inline constexpr auto GetTuple(Tuple&& t)
+ASCENDC_HOST_AICORE inline constexpr auto GetTuple(Tuple&& t)
 {
     auto element = Get<Is...>(static_cast<Tuple&&>(t));
     if constexpr (Std::is_tuple_v<Std::remove_cvref_t<decltype(element)>>) {
@@ -143,7 +143,7 @@ __aicore__ inline constexpr auto GetTuple(Tuple&& t)
 }
 
 template <size_t... Is, typename Tuple>
-__aicore__ inline constexpr auto GetRank(const Tuple& t)
+ASCENDC_HOST_AICORE inline constexpr auto GetRank(const Tuple& t)
 {
     static_assert(Std::is_tuple_v<Std::remove_cvref_t<Tuple>>, "Shape or Stride is not Tuple!");
     if constexpr (sizeof...(Is) == 0) {
@@ -164,7 +164,7 @@ __aicore__ inline constexpr auto TupleSize(const Tuple& t)
 }
 
 template <size_t I, typename Tuple>
-__aicore__ inline constexpr auto SelectTuple(Tuple&& t)
+ASCENDC_HOST_AICORE inline constexpr auto SelectTuple(Tuple&& t)
 {
     static_assert(Std::is_tuple_v<Std::remove_cvref_t<Tuple>>, "Shape or Stride is not Tuple");
     auto&& tt = Std::get<I>(static_cast<Tuple&&>(t));
@@ -176,7 +176,7 @@ __aicore__ inline constexpr auto SelectTuple(Tuple&& t)
 }
 
 template <size_t I0, size_t I1, size_t... Is, typename Tuple>
-__aicore__ inline constexpr auto SelectTuple(Tuple&& t)
+ASCENDC_HOST_AICORE inline constexpr auto SelectTuple(Tuple&& t)
 {
     static_assert(Std::is_tuple_v<Std::remove_cvref_t<Tuple>>, "Shape or Stride is not Tuple");
     return Std::make_tuple(
@@ -185,14 +185,14 @@ __aicore__ inline constexpr auto SelectTuple(Tuple&& t)
 }
 
 template <typename Tuple>
-__aicore__ inline constexpr auto SelectTuple(Tuple&& t)
+ASCENDC_HOST_AICORE inline constexpr auto SelectTuple(Tuple&& t)
 {
     static_assert(Std::is_tuple_v<Std::remove_cvref_t<Tuple>>, "Shape or Stride is not Tuple");
     return static_cast<Tuple&&>(t);
 }
 
 template <size_t index, size_t I, size_t... Is, typename Tuple>
-__aicore__ inline constexpr decltype(auto) GetValue(const Tuple& t)
+ASCENDC_HOST_AICORE inline constexpr decltype(auto) GetValue(const Tuple& t)
 {
     decltype(auto) tupleEle = Std::get<index>(t);
     if constexpr (sizeof...(Is) == 0) {
@@ -203,7 +203,7 @@ __aicore__ inline constexpr decltype(auto) GetValue(const Tuple& t)
 }
 
 template <size_t index, typename Tuple>
-__aicore__ inline constexpr decltype(auto) GetValue(const Tuple& t)
+ASCENDC_HOST_AICORE inline constexpr decltype(auto) GetValue(const Tuple& t)
 {
     return Std::get<index>(t);
 }
