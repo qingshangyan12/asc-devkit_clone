@@ -1235,6 +1235,11 @@ def _get_tiling_struct_without_register_size(compile_info: CompileInfo):
             )
             max_tiling_size = max(max_tiling_size, dec_data)
     compile_info.max_tiling_size = max_tiling_size
+    compile_info.static_compile_tiling_key_data_size = {
+        str(key): value[1]
+        for key, value in tiling_key_struct_size_map.items()
+        if isinstance(value, tuple) and len(value) == 2 and value[1] > 0
+    }
     return tiling_key_struct_size_map
 
 
@@ -1771,15 +1776,19 @@ def _static_resource_bind_source(full_source, normal_symbol, sk_symbol, attribut
     )
 
 
-def _static_resource_bind_argv(compile_option_tuple, source_path, output_path):
+def _static_resource_bind_argv(compile_option_tuple, source_path, output_path, architecture):
     options = [
         option
         for option in compile_option_tuple.compile_options
         if option != "-DCONST_TILING"
         and not option.startswith("-D__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__")
     ]
+    is_c310 = architecture.startswith("dav-c310")
+    bind_architecture = "dav-c310-cube" if is_c310 else "dav-c220-cube"
+    if is_c310 and "-D__DAV_C310__" not in options:
+        options.append("-D__DAV_C310__")
     return ["-c", "-O3"] + options + [
-        "-xcce", source_path, "--cce-aicore-arch=dav-c220-cube",
+        "-xcce", source_path, f"--cce-aicore-arch={bind_architecture}",
         "--cce-aicore-only", "-std=c++17", "-DTILING_KEY_VAR=0",
         "-o", output_path,
     ]
@@ -1810,13 +1819,9 @@ def _emit_static_compile_resources(
     ]
     missing_files = [path for path in required_files if not os.path.isfile(path)]
     if missing_files:
-        CommonUtility.print_compile_log(
-            compile_info.kernel_name,
-            "skip static compile resources because required files are missing: "
-            + ", ".join(missing_files),
-            AscendCLogLevel.LOG_WARNING,
+        raise FileNotFoundError(
+            "static compile resources require files: " + ", ".join(missing_files)
         )
-        return None
     with open(json_path, "r", encoding="utf-8") as file_obj:
         metadata = json.load(file_obj)
     symbols = collect_kernel_symbols(metadata, compile_info.global_kernel_symbols)
@@ -1828,16 +1833,17 @@ def _emit_static_compile_resources(
     if fallback_tiling_size <= 0:
         fallback_tiling_size = compile_info.max_tiling_size
     if fallback_tiling_size <= 0:
-        CommonUtility.print_compile_log(
-            compile_info.kernel_name,
-            "skip static compile resources because exact tiling byte size is unavailable",
-            AscendCLogLevel.LOG_WARNING,
+        raise ValueError(
+            "static compile resources require an exact positive tiling byte size"
         )
-        return None
+    exact_tiling_sizes = dict(
+        getattr(compile_info, "static_compile_tiling_key_data_size", {})
+    )
+    exact_tiling_sizes.update(tiling_info.tiling_key_data_size)
     tiling_sizes = resolve_symbol_tiling_sizes(
         symbols,
         compile_info.tiling_key_list,
-        tiling_info.tiling_key_data_size,
+        exact_tiling_sizes,
         fallback_tiling_size,
     )
 
@@ -1992,6 +1998,7 @@ def _emit_static_compile_resources(
                     sk_compile_option_tuple,
                     "${resource." + bind_logical + "}",
                     "${artifact." + bind_output + "}",
+                    architecture,
                 )
                 build["extensions"] = super_kernel_build_extension(
                     normal_relocatable=relocatable_logical,
@@ -2022,7 +2029,7 @@ def _emit_static_compile_resources(
                         {
                             "input": "tiling_data",
                             "transform": "bytes_to_cpp_uint8_array@1",
-                            "params": {"symbol": "__ascendc_arr_##tiling_data"},
+                            "params": {"symbol": "__ascendc_static_tiling_data"},
                             "placement": {
                                 "mode": "replace_exact",
                                 "file": tiling_logical,

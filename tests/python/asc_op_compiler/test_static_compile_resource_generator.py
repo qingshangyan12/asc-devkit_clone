@@ -95,8 +95,26 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         self.assertIn("InitTilingData<AddTilingData>", result)
         self.assertIn("#ifdef CONST_TILING", result)
         self.assertIn("convert_from_bytes<AddTilingData>", result)
+        self.assertIn("__ascendc_static_tiling_data", result)
+        self.assertIn("#define GET_TILING_DATA_WITH_STRUCT", result)
+        self.assertIn("#define GET_TILING_DATA_MEMBER", result)
         self.assertEqual(result.count("@@STATIC_VALUE_tiling_data@@"), 1)
         self.assertNotIn("\\\n\n", result)
+
+    def test_adapts_struct_and_member_tiling_without_concrete_default_type(self):
+        dynamic_header = """#ifndef TILING_H
+#define TILING_H
+#define GET_TILING_DATA(name, arg)
+#define GET_TILING_DATA_WITH_STRUCT(type, name, arg) InitTilingData<type>(arg, &name)
+#define GET_TILING_DATA_MEMBER(type, member, name, arg) InitTilingData<type>(arg, &name)
+#endif
+"""
+        result = static_tiling_template_text(dynamic_header)
+        self.assertEqual(result.count("@@STATIC_VALUE_tiling_data@@"), 1)
+        self.assertIn("convert_from_bytes<tiling_struct>", result)
+        self.assertIn("convert_from_bytes<tiling_type>", result)
+        self.assertNotIn("static_assert(false", result)
+        self.assertIn("#define GET_TILING_DATA(tiling_data, tiling_arg)", result)
 
     def test_extracts_compile_macros_with_stable_kinds(self):
         self.assertEqual(
@@ -128,17 +146,35 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         }
         self.assertEqual(
             collect_kernel_symbols(metadata, ["linked_actual", "actual_7"]),
-            ["linked_actual", "actual_7", "dispatch_entry", "actual_9", "sk_actual"],
+            ["linked_actual", "actual_7"],
+        )
+        self.assertEqual(
+            collect_kernel_symbols(metadata),
+            ["actual_7", "actual_9"],
+        )
+        self.assertEqual(
+            collect_kernel_symbols({"kernelName": "single_entry"}),
+            ["single_entry"],
         )
 
     def test_resolves_exact_tiling_size_without_using_tiling_key_as_index(self):
         self.assertEqual(
             resolve_symbol_tiling_sizes(
-                ["add_7", "add_9", "dispatch_entry"],
+                ["add_7", "add_9"],
                 ["7", "9"], {"7": 32, "9": 48}, 64,
             ),
-            {"add_7": 32, "add_9": 48, "dispatch_entry": 64},
+            {"add_7": 32, "add_9": 48},
         )
+        self.assertEqual(
+            resolve_symbol_tiling_sizes(["single_entry"], ["7"], {}, 64),
+            {"single_entry": 64},
+        )
+
+    def test_rejects_missing_exact_size_for_multi_tiling_symbol(self):
+        with self.assertRaisesRegex(ValueError, "exact tiling byte size"):
+            resolve_symbol_tiling_sizes(
+                ["add_7", "add_9"], ["7", "9"], {"7": 32}, 64
+            )
 
     def test_generates_symbol_indexed_resource_directory(self):
         with tempfile.TemporaryDirectory() as root:

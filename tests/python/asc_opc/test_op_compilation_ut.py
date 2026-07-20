@@ -1258,6 +1258,10 @@ class TestOpCompilationUt(unittest.TestCase):
             )
             os.makedirs(resource_dir)
             os.makedirs(output)
+            stale_dir = os.path.join(output, "static_compile", "stale_kernel")
+            os.makedirs(stale_dir)
+            with open(os.path.join(stale_dir, "stale.txt"), "w", encoding="utf-8") as file_obj:
+                file_obj.write("stale")
             json_path = os.path.join(kernel_meta, "Add_x.json")
             with open(json_path, "w", encoding="utf-8") as file_obj:
                 json.dump(
@@ -1283,6 +1287,7 @@ class TestOpCompilationUt(unittest.TestCase):
                     os.path.join(output, "static_compile", "Add_x", "op_resource.json")
                 )
             )
+            self.assertFalse(os.path.exists(stale_dir))
             self.assertTrue(
                 os.path.isfile(
                     os.path.join(

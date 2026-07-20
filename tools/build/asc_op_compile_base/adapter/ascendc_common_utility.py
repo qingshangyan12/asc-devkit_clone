@@ -78,6 +78,7 @@ class CompileInfo:
         )
         self.max_tiling_size: int = 0
         self.static_compile_tiling_size: int = 0
+        self.static_compile_tiling_key_data_size: dict = {}
         self.tiling_and_dfx_utils_file: str = (
             ""  # used when tling struct is not register
         )

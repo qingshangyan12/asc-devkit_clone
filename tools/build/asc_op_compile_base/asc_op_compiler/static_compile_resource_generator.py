@@ -62,23 +62,15 @@ def collect_kernel_symbols(metadata, linked_symbols=None):
 
     for symbol in linked_symbols or []:
         add(symbol)
+    if symbols:
+        return symbols
     if not isinstance(metadata, dict):
         return symbols
-    add(metadata.get("kernelName"))
     for item in metadata.get("kernelList", []):
         if isinstance(item, dict):
             add(item.get("kernelName"))
-
-    def collect_function_names(value):
-        if isinstance(value, dict):
-            add(value.get("func_name"))
-            for child in value.values():
-                collect_function_names(child)
-        elif isinstance(value, list):
-            for child in value:
-                collect_function_names(child)
-
-    collect_function_names(metadata.get("sub_operator_kernel_name", {}))
+    if not symbols:
+        add(metadata.get("kernelName"))
     return symbols
 
 
@@ -120,12 +112,22 @@ def resolve_symbol_tiling_sizes(symbols, tiling_keys, tiling_key_data_size, fall
     result = {}
     for symbol in symbols:
         size = fallback_size
+        matched_key = None
         for key in keys:
             if symbol.endswith("_" + key) or ("_" + key + "_") in symbol:
+                matched_key = key
                 candidate = tiling_key_data_size.get(key)
                 if isinstance(candidate, int) and candidate > 0:
                     size = candidate
-                    break
+                break
+        if len(keys) > 1 and (
+            matched_key is None
+            or not isinstance(tiling_key_data_size.get(matched_key), int)
+            or tiling_key_data_size[matched_key] <= 0
+        ):
+            raise ValueError(
+                f"exact tiling byte size is unavailable for kernel symbol {symbol}"
+            )
         result[symbol] = size
     return result
 
@@ -139,26 +141,36 @@ def static_tiling_template_text(dynamic_header):
         for name in re.findall(r"InitTilingData<([A-Za-z_][A-Za-z0-9_:]*)>", dynamic_header)
         if name not in {"T", "tiling_struct", "tiling_type"}
     ]
-    if not class_names:
-        raise ValueError("cannot determine top-level tiling type from dynamic header")
-    class_name = class_names[0]
+    class_names = [name for name in class_names if name not in {"type", "Type"}]
+    class_name = class_names[0] if class_names else None
     marker = "@@STATIC_VALUE_tiling_data@@"
     slash = "\\"
-    override = "\n" + "\n".join(
-        [
-            "#ifdef CONST_TILING",
-            "#ifdef GET_TILING_DATA",
-            "#undef GET_TILING_DATA",
-            "#endif",
+    lines = ["#ifdef CONST_TILING", marker]
+    for macro in ("GET_TILING_DATA", "GET_TILING_DATA_WITH_STRUCT", "GET_TILING_DATA_MEMBER"):
+        lines.extend([f"#ifdef {macro}", f"#undef {macro}", "#endif"])
+    if class_name is None:
+        lines.append("#define GET_TILING_DATA(tiling_data, tiling_arg)")
+    else:
+        lines.extend([
             f"#define GET_TILING_DATA(tiling_data, tiling_arg) {slash}",
             f"    REGISTER_TILINGDATA_SIZE({class_name}, __COUNTER__); {slash}",
-            f"    {marker} {slash}",
             f"    static constexpr {class_name} tiling_data = {slash}",
-            f"        convert_from_bytes<{class_name}>(__ascendc_arr_##tiling_data);",
-            "#endif",
-            "",
-        ]
-    )
+            f"        convert_from_bytes<{class_name}>(__ascendc_static_tiling_data);",
+        ])
+    lines.extend([
+        f"#define GET_TILING_DATA_WITH_STRUCT(tiling_struct, tiling_data, tiling_arg) {slash}",
+        f"    REGISTER_TILINGDATA_SIZE(tiling_struct, __COUNTER__); {slash}",
+        f"    static constexpr tiling_struct tiling_data = {slash}",
+        "        convert_from_bytes<tiling_struct>(__ascendc_static_tiling_data);",
+        f"#define GET_TILING_DATA_MEMBER(tiling_type, member, var, tiling) {slash}",
+        f"    REGISTER_TILINGDATA_SIZE(tiling_type, __COUNTER__); {slash}",
+        f"    static constexpr tiling_type __ascendc_static_full_##var = {slash}",
+        f"        convert_from_bytes<tiling_type>(__ascendc_static_tiling_data); {slash}",
+        "    auto& var = __ascendc_static_full_##var.member;",
+        "#endif",
+        "",
+    ])
+    override = "\n" + "\n".join(lines)
     final_endif = dynamic_header.rfind("#endif")
     if final_endif < 0:
         raise ValueError("dynamic tiling header has no closing #endif")

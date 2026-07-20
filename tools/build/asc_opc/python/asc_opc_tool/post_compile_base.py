@@ -18,6 +18,7 @@ import json
 import os
 import shutil
 import stat
+import tempfile
 
 from shutil import copy as file_copy
 from asc_op_compile_base.common.utils import log as logger
@@ -216,7 +217,22 @@ class PostCompilation:
             return
         destination = os.path.join(output_path, "static_compile")
         os.makedirs(output_path, exist_ok=True)
-        shutil.copytree(source, destination, dirs_exist_ok=True)
+        transaction_dir = tempfile.mkdtemp(prefix=".static_compile.", dir=output_path)
+        staged = os.path.join(transaction_dir, "staged")
+        backup = os.path.join(transaction_dir, "previous")
+        moved_previous = False
+        try:
+            shutil.copytree(source, staged)
+            if os.path.lexists(destination):
+                os.replace(destination, backup)
+                moved_previous = True
+            os.replace(staged, destination)
+        except Exception:
+            if moved_previous and not os.path.lexists(destination):
+                os.replace(backup, destination)
+            raise
+        finally:
+            shutil.rmtree(transaction_dir, ignore_errors=True)
 
     def copy_compile_res_files_to_output(self, json_file_path):
         """

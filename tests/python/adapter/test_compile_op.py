@@ -197,10 +197,11 @@ class TestCompileOp(unittest.TestCase):
             }
             info.global_kernel_symbols = []
             info.static_compile_tiling_size = 64
+            info.static_compile_tiling_key_data_size = {"7": 32}
             tiling = mock.Mock(
                 static_shape_flag=False,
                 tiling_data_file_path=tiling_header,
-                tiling_key_data_size={"7": 32},
+                tiling_key_data_size={},
                 tiling_data_size=0,
             )
             options = mock.Mock(
@@ -263,6 +264,65 @@ class TestCompileOp(unittest.TestCase):
                 if output.startswith("artifacts/")
             ]
             self.assertEqual(artifact_outputs, ["artifacts/actual_7.o"])
+
+    def test_static_resource_bind_argv_uses_c310_architecture(self):
+        options = mock.Mock(compile_options=["-DORIGINAL=1"])
+        argv = compile_op_module._static_resource_bind_argv(
+            options, "bind.cpp", "bind.o", "dav-c310-vec"
+        )
+        self.assertIn("--cce-aicore-arch=dav-c310-cube", argv)
+        self.assertIn("-D__DAV_C310__", argv)
+
+    def test_emit_static_compile_resources_rejects_missing_required_files(self):
+        info = CompileInfo()
+        info.kernel_name = "Missing_x"
+        info.dst_file = "/missing/dynamic.o"
+        info.src_file = "/missing/source.cpp"
+        info.gen_kernel_func_file = "/missing/wrapper.cpp"
+        tiling = mock.Mock(
+            static_shape_flag=False,
+            tiling_data_file_path="/missing/tiling.h",
+        )
+        with self.assertRaises(FileNotFoundError):
+            compile_op_module._emit_static_compile_resources(
+                info,
+                mock.Mock(op_type="Missing"),
+                tiling,
+                mock.Mock(compile_options=[], mllvm_options=[]),
+                4,
+                "/missing",
+            )
+
+    def test_emit_static_compile_resources_rejects_unknown_tiling_size(self):
+        with TemporaryDirectory() as root:
+            info = CompileInfo()
+            info.kernel_name = "UnknownSize_x"
+            info.dst_file = os.path.join(root, "UnknownSize_x.o")
+            info.src_file = os.path.join(root, "source.cpp")
+            info.gen_kernel_func_file = os.path.join(root, "wrapper.cpp")
+            info.global_kernel_symbols = ["unknown_size"]
+            info.static_compile_tiling_size = 0
+            info.max_tiling_size = 0
+            tiling_path = os.path.join(root, "tiling.h")
+            for path in (info.dst_file, info.src_file, info.gen_kernel_func_file, tiling_path):
+                with open(path, "w", encoding="utf-8") as file_obj:
+                    file_obj.write("content")
+            with open(os.path.join(root, "UnknownSize_x.json"), "w", encoding="utf-8") as file_obj:
+                json.dump({"kernelName": "unknown_size"}, file_obj)
+            tiling = mock.Mock(
+                static_shape_flag=False,
+                tiling_data_file_path=tiling_path,
+                tiling_data_size=0,
+            )
+            with self.assertRaises(ValueError):
+                compile_op_module._emit_static_compile_resources(
+                    info,
+                    mock.Mock(op_type="UnknownSize"),
+                    tiling,
+                    mock.Mock(compile_options=[], mllvm_options=[]),
+                    4,
+                    root,
+                )
 
     def test_decode_mode(self):
         mode1 = decode_mode(10)
