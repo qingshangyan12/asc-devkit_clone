@@ -409,7 +409,7 @@ __no_simd_vf_fusion__ __simd_vf__ inline void SoftMaxGenericNDVFImpl(
                 Reg::LoadAlign(tmpVreg, workUb + i * srcK + j * FLOAT_REPEAT_SIZE);
                 Reg::Div(dstVreg, tmpVreg, sumVreg, pregFull);
                 if constexpr (isLog) {
-                    Reg:Log10(dstVreg, dstVreg, pregFull);
+                    Reg::Log10(dstVreg, dstVreg, pregFull);
                 }
                 StoreIfNeedCast<T1>(dstUb + i * srcK + j * FLOAT_REPEAT_SIZE, dstVreg, pregFull);
             }
