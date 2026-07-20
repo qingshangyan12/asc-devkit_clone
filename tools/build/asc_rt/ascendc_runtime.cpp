@@ -651,6 +651,10 @@ typedef struct {
 } AscendCFunMetaKType;
 
 typedef struct {
+    unsigned int crossType;
+} AscendCFunMetaCrossType;
+
+typedef struct {
     unsigned short taskRation0;
     unsigned short taskRation1;
 } AscendCFunMetaMixCoreType;
@@ -677,6 +681,32 @@ uint32_t AscendCFunctionGetMetaInfoKtype(const rtFuncHandle funcHandle, unsigned
     }
     AscendCFunMetaKType* metaKtype = reinterpret_cast<AscendCFunMetaKType*>(data);
     *kernelType = metaKtype->ktype;
+    aclrtFreeHost(data);
+    return 0;
+}
+
+uint32_t AscendCFunctionGetMetaInfoCrossCoreType(const rtFuncHandle funcHandle, unsigned int *crossType)
+{
+    size_t size;
+    rtError_t rtErr = rtFunctionGetMetaInfoSize(funcHandle, RT_FUNCTION_TYPE_CROSS_CORE, &size);
+    if (rtErr != 0) {
+        ASCENDLOGE(" get function meta info cross core type size failed, runtime result = %d\n", rtErr);
+        return rtErr;
+    }
+    void* data = nullptr;
+    aclError res = aclrtMallocHost(&data, size);
+    if (res != ACL_SUCCESS) {
+        ASCENDLOGE("malloc failed, runtime result = %d\n", res);
+        return res;
+    }
+    rtErr = rtFunctionGetMetaInfo(funcHandle, RT_FUNCTION_TYPE_CROSS_CORE, data, size);
+    if (rtErr != 0) {
+        ASCENDLOGW(" get function meta info cross core type failed, runtime result = %d\n", rtErr);
+        aclrtFreeHost(data);
+        return rtErr;
+    }
+    AscendCFunMetaCrossType* metaCrossType = reinterpret_cast<AscendCFunMetaCrossType*>(data);
+    *crossType = metaCrossType->crossType;
     aclrtFreeHost(data);
     return 0;
 }
@@ -719,41 +749,52 @@ uint32_t AscendCGetProfkTypeImpl(const rtFuncHandle funcHandle)
     uint32_t ret = AscendCFunctionGetMetaInfoKtype(funcHandle, &curKernelType);
     if (ret != 0) {
         ASCENDLOGE(" AscendCFunctionGetMetaInfoKtype failure! ret %d \n", ret);
-        return 5; // 5 is KERNEL_TYPE_AIV_ONLY
+        return kernelTaskTypeMap.at(KERNEL_TYPE_AIV_ONLY);
     }
-    if (curKernelType == K_TYPE_MIX_AIC_MAIN || curKernelType == K_TYPE_MIX_AIV_MAIN) {
+    unsigned int curCrossType = 0;
+    ret = AscendCFunctionGetMetaInfoCrossCoreType(funcHandle, &curCrossType);
+    if (ret != 0) {
+        ASCENDLOGW(" AscendCFunctionGetMetaInfoCrossCoreType failure! ret %d, "
+            "using default cross core type value: zero, \n", ret);
+    }
+    if (curKernelType == K_TYPE_AIV || curKernelType == K_TYPE_AIV_ROLLBACK) {
+        if (curCrossType == 1) {
+            return kernelTaskTypeMap.at(KERNEL_TYPE_MIX_AIV_1_0);
+        }
+        if (curCrossType == 0) {
+            return kernelTaskTypeMap.at(KERNEL_TYPE_AIV_ONLY);
+        }
+    }
+    if (curKernelType == K_TYPE_AIC || curKernelType == K_TYPE_AIC_ROLLBACK) {
+        if (curCrossType == 1) {
+            return kernelTaskTypeMap.at(KERNEL_TYPE_MIX_AIC_1_0);
+        }
+        if (curCrossType == 0) {
+            return kernelTaskTypeMap.at(KERNEL_TYPE_AIC_ONLY);
+        }
+    }
+    if (curKernelType == K_TYPE_MIX_AIC_MAIN) {
         unsigned short coreAicRation;
         unsigned short coreAivRation;
         uint32_t res = AscendCFunctionGetMetaInfoCoreRation(funcHandle, &coreAicRation, &coreAivRation);
         if (res != 0) {
             ASCENDLOGE(" AscendCFunctionGetMetaInfoCoreRation failure! ret %d \n", ret);
-            return 5; // 5 is KERNEL_TYPE_AIV_ONLY
+            return kernelTaskTypeMap.at(KERNEL_TYPE_AIV_ONLY);
         }
-        if (curKernelType == K_TYPE_MIX_AIV_MAIN && coreAicRation == 0 && coreAivRation == 1) {
-            return kernelTaskTypeMap.at(KERNEL_TYPE_MIX_AIV_1_0);
+        if (coreAicRation == 1 && coreAivRation == 1) {
+            return kernelTaskTypeMap.at(KERNEL_TYPE_MIX_AIC_1_1);
         }
-        if (curKernelType == K_TYPE_MIX_AIC_MAIN) {
-            if (coreAicRation == 1 && coreAivRation == 0) {
-                return kernelTaskTypeMap.at(KERNEL_TYPE_MIX_AIC_1_0);
-            }
-            if (coreAicRation == 1 && coreAivRation == 1) {
-                return kernelTaskTypeMap.at(KERNEL_TYPE_MIX_AIC_1_1);
-            }
-            if (coreAicRation == 1 && coreAivRation == 2) { // aic num 1, aiv num 2
-                return kernelTaskTypeMap.at(KERNEL_TYPE_MIX_AIC_1_2);
-            }
+        if (coreAicRation == 1 && coreAivRation == 2) { // aic num 1, aiv num 2
+            return kernelTaskTypeMap.at(KERNEL_TYPE_MIX_AIC_1_2);
         }
-    } else if (curKernelType == K_TYPE_AIC || curKernelType == K_TYPE_AIC_ROLLBACK) {
-        return kernelTaskTypeMap.at(KERNEL_TYPE_AIC_ONLY);
-    } else if (curKernelType == K_TYPE_AIV || curKernelType == K_TYPE_AIV_ROLLBACK) {
+        ASCENDLOGE(" Unsupported coreRation, coreAicRation: %d, coreAivRation: %d\n", coreAicRation, coreAivRation);
         return kernelTaskTypeMap.at(KERNEL_TYPE_AIV_ONLY);
-    } else if (curKernelType == K_TYPE_AICORE) {
-        return kernelTaskTypeMap.at(KERNEL_TYPE_AICORE);
-    } else {
-        ASCENDLOGE(" Get unsupported kernel Type %d \n", curKernelType);
-        return 5; // 5 is KERNEL_TYPE_AIV_ONLY
     }
-    return 5; // 5 is KERNEL_TYPE_AIV_ONLY
+    if (curKernelType == K_TYPE_AICORE) {
+        return kernelTaskTypeMap.at(KERNEL_TYPE_AICORE);
+    }
+    ASCENDLOGE(" Get unsupported kernel Type %d \n", curKernelType);
+    return kernelTaskTypeMap.at(KERNEL_TYPE_AIV_ONLY);
 }
 
 #ifdef __cplusplus
