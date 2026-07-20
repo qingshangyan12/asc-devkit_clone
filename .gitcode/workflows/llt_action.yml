@@ -101,7 +101,7 @@ jobs:
             ${{ steps.process_checkout.outputs.path }}/${{ inputs.ut_package }}
           object-prefix: ${{ env.obs_path }}/
     if: "${{ default() }}"
-    runs-on: [dedicate-hosted, '${{ jobs.ut.outputs.host_type }}', xlarge]
+    runs-on: [dedicate-hosted, '${{ jobs.host_type.outputs.host_type }}', xlarge]
     container:
       image: swr.cn-north-4.myhuaweicloud.com/ci_cann/${{ inputs.image_version }}
   JOB_2:
