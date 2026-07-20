@@ -13,7 +13,7 @@
 #include "ins_temp_reduce_scatter_nhr.h"
 #include "alg_data_trans_wrapper.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 constexpr u32 SEQUENCE_EXECUTOR_LEVEL_NUM = 3;
 constexpr u32 OMNIPIPE_LEVEL2_IDX = 2;

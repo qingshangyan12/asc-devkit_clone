@@ -13,7 +13,7 @@
 
 #include "auto_selector_base.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 
 class ReduceScatterAutoSelector : public AutoSelectorBase {
@@ -52,5 +52,5 @@ private:
         std::string &selectAlgName) const override;
 };
 
-} // namespace ops_hccl
+} // namespace mc2_ops_hccl
 #endif

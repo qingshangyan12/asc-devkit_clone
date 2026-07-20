@@ -16,7 +16,7 @@
 #include <cmath>
 #include <algorithm>
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 InsV2ReduceScatterOrderPreservedExecutor<AlgTopoMatch, InsAlgTemplate>::InsV2ReduceScatterOrderPreservedExecutor()

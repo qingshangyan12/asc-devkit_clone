@@ -28,7 +28,7 @@
 #include "alg_data_trans_wrapper.h"
 #include "omnipipe_data_slice_calc.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 template <typename AlgTopoMatch, typename InsAlgTempLevel0, typename InsAlgTempLevel1>
 class InsV2ReduceScatterOmniPipe2dExecutor : public InsCollAlgBase {
 public:

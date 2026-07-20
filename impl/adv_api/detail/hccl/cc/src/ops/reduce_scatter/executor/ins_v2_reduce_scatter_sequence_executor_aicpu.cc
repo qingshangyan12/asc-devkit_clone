@@ -19,7 +19,7 @@
 #endif /* CANN_VERSION_NUM >= CANN_VERSION(9, 0, 0) */
 #endif
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 // 序列执行器需要的层级数
 constexpr u32 SEQUENCE_EXECUTOR_LEVEL_NUM = 2;

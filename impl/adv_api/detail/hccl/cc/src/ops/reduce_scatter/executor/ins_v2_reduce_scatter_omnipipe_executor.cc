@@ -15,7 +15,7 @@
 #include "ins_temp_reduce_scatter_omnipipe_nhr.h"
 #include "topo_match_pcie_mix.h"
 #include "omnipipe_template_utils.h"
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 constexpr uint32_t HIERARCHY_SIZE_3 = 3;
 constexpr uint64_t RANK_SIZE_LEVEL_2 = 2;
 constexpr uint64_t RANK_SIZE_LEVEL_4 = 4;
@@ -553,4 +553,4 @@ REGISTER_EXEC_V2_MULTI(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsV2ReduceScatterO
                        InsV2ReduceScatterOmniPipeExecutor, TopoMatch3Level, InsTempReduceScatterOmniPipeMesh1D,
                        InsTempReduceScatterOmniPipeNHR, InsTempReduceScatterOmniPipeMesh1D);
 
-}  // namespace ops_hccl
+}  // namespace mc2_ops_hccl

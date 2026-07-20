@@ -17,7 +17,7 @@
 #endif /* CANN_VERSION_NUM >= CANN_VERSION(9, 0, 0) */
 #endif
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 constexpr u32 DUAL_TEMPLATE_NUM = 2;
 
 template <typename AlgTopoMatch, typename InsAlgTempLevel0, typename InsAlgTempLevel1>

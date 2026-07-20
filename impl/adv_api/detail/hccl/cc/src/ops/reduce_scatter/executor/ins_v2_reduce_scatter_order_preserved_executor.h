@@ -29,7 +29,7 @@
 #include <algorithm>
 #include <string>
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 struct MemBlockInfo {
     std::vector<u64> size;

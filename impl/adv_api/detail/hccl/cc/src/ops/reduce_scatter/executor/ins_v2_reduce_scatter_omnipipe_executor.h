@@ -27,7 +27,7 @@
 #include "topo_match_ubx.h"
 #include "omnipipe_data_slice_calc.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1, typename InsAlgTemplate2>
 class InsV2ReduceScatterOmniPipeExecutor : public InsCollAlgBase {
 public:

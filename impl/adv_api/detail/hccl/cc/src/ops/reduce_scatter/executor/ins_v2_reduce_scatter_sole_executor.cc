@@ -26,7 +26,7 @@
 #endif /* CANN_VERSION_NUM >= CANN_VERSION(9, 0, 0) */
 #endif
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 InsV2ReduceScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::InsV2ReduceScatterSoleExecutor()

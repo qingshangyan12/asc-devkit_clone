@@ -15,7 +15,7 @@
 #include "topo_match_base.h"
 #include "topo_match_multilevel.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1, typename InsAlgTemplate2>
 class InsV2ReduceScatterSequenceExecutor3Level : public InsCollAlgBase {
 public:

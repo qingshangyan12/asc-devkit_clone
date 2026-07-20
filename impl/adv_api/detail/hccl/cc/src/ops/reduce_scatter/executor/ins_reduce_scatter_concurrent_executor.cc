@@ -28,7 +28,7 @@ constexpr u32 CLOS_BW_MS = 10;
 constexpr u32 MESH_BW_AICPU = 21;
 constexpr u32 CLOS_BW_AICPU = 20;
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 InsReduceScatterConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::InsReduceScatterConcurrentExecutor()
