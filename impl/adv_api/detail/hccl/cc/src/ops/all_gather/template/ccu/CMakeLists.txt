@@ -10,9 +10,10 @@
 add_subdirectory(kernel)
 
 set(src_list
-    # Non-Mesh1D AllGather CCU templates are kept here for later recovery. Do not build them before KFC Mesh1D is verified.
+    # Legacy direct-launch/non-Mem2Mem AllGather templates are kept for recovery; KFC Mem2Mem is the active path.
     # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_gather_mesh_1D_mem2mem.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_gather_mesh_1D.cc
+    # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_gather_mesh_1D.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_kfc_all_gather_mesh_1D_mem2mem.cc
     # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_gather_nhr_1D_mem2mem.cc
     # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_gather_2dies_mesh_1d_mem2mem.cc
     # ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_gather_2dies_mesh_1D.cc
