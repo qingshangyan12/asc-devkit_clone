@@ -17,11 +17,8 @@
 
 #include "../../common/hccl_utils.h"
 #include "../../ccu/hccl_ccu_v0_prepare.h"
-#include "utils/debug/asc_printf.h"
 
 namespace AscendC {
-using __asc_aicore::PRINTF;
-
 template <const auto& config>
 template <bool commit>
 __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::AllReduce(
@@ -184,9 +181,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     }
 
     isInited_ = true;
-    AscendC::PRINTF(
-        "ApiClient InitInner newCcuFlag:%u, rankId:%d, rankNum:%d, xnAddr:0x%llx, ckeAddr:0x%llx, ccuMsgExt:0x%llx/n",
-        static_cast<uint32_t>(newCcuFlag_),
+    KERNEL_LOG(
+        KERNEL_INFO, "ApiClient InitInner rankId:%d, rankNum:%d, xnAddr:0x%llx, ckeAddr:0x%llx, ccuMsgExt:0x%llx/n",
         newCcuFlag_ ? hcclNewContext_->rankId : hcclContext_->rankId,
         newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum,
         xnAddr, ckeAddr, reinterpret_cast<uint64_t>(ccuParam_.ccuMsgExt));
@@ -414,7 +410,6 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     GM_ADDR xnAddr = newCcuFlag_ ? reinterpret_cast<GM_ADDR>(hcclNewContext_->xnAddr) : hcclContext_->xnOffset;
     ccuMsg_.xnAddr = xnAddr + static_cast<uint64_t>(resourceId) * CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE;
     ccuMsg_.commitCKEAddr = GetCommitCkeAddr(resourceId);
-    GM_ADDR waitCKEAddr = GetWaitCkeAddr(resourceId);
 
     for (int i = 0; i < ccuUsedXnNum_; i++) {
         *(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + CCU_XN_DATA_SIZE * i)) = xnData_[i];
@@ -424,14 +419,6 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     for (int i = 0; i < ((ccuUsedXnNum_ + 7) / 8); i++) {
         FlushDataCache(ccuMsg_.xnAddr + MAX_DCCI_CNT * i);
     }
-
-    AscendC::PRINTF(
-        "ApiClient CcuSendMsg meta newCcuFlag:%u, resourceId:%u, repeatIndex:%u, xnBase:0x%llx, "
-        "xnSlot:0x%llx, ckeBase:0x%llx, commitCKEAddr:0x%llx, waitCKEAddr:0x%llx, writeValue:%llu",
-        static_cast<uint32_t>(newCcuFlag_), resourceId, static_cast<uint32_t>(ccuParam_.repeatIndex),
-        xnAddr, ccuMsg_.xnAddr,
-        newCcuFlag_ ? reinterpret_cast<GM_ADDR>(hcclNewContext_->ckeAddr) : hcclContext_->ckeOffset,
-        ccuMsg_.commitCKEAddr, waitCKEAddr, static_cast<uint64_t>(CCU_MSG_CKE_SET_VALUE));
 
     KERNEL_LOG(
         KERNEL_INFO,
