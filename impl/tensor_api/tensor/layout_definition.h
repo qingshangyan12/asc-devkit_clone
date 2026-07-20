@@ -59,7 +59,7 @@ public:
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Capacity() const
+    ASCENDC_HOST_AICORE inline constexpr decltype(auto) Capacity() const
     {
         return GetCapacity(Shape<I...>(), Stride<I...>());
     }
@@ -112,7 +112,7 @@ public:
     }
 
     template <size_t... I>
-    __aicore__ inline constexpr decltype(auto) Size() const
+    ASCENDC_HOST_AICORE inline constexpr decltype(auto) Size() const
     {
         return TupleSize<I...>(Shape());
     }

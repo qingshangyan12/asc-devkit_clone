@@ -76,10 +76,10 @@ template <size_t... Is, typename LayoutType, typename Enable>
 ASCENDC_HOST_AICORE inline constexpr auto Get(const LayoutType& layout);
 
 template <size_t... Is, typename LayoutType, typename Enable>
-__aicore__ inline constexpr auto Size(const LayoutType& layout);
+ASCENDC_HOST_AICORE inline constexpr auto Size(const LayoutType& layout);
 
 template <size_t... Is, typename LayoutType, typename Enable>
-__aicore__ inline constexpr auto Capacity(const LayoutType& layout);
+ASCENDC_HOST_AICORE inline constexpr auto Capacity(const LayoutType& layout);
 
 template <typename Tensor, typename Coord, typename Info>
 __aicore__ inline constexpr decltype(auto) Slice(Tensor&& tensor, const Coord& coord, const Info& info);

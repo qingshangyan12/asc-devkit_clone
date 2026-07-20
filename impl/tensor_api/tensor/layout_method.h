@@ -239,13 +239,13 @@ ASCENDC_HOST_AICORE inline constexpr auto Get(const LayoutType& layout)
 }
 
 template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
-__aicore__ inline constexpr auto Size(const LayoutType& layout)
+ASCENDC_HOST_AICORE inline constexpr auto Size(const LayoutType& layout)
 {
     return layout.template Size<Is...>();
 }
 
 template <size_t... Is, typename LayoutType, typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
-__aicore__ inline constexpr auto Capacity(const LayoutType& layout)
+ASCENDC_HOST_AICORE inline constexpr auto Capacity(const LayoutType& layout)
 {
     return layout.template Capacity<Is...>();
 }

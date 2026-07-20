@@ -42,11 +42,11 @@ using bool_constant = integral_constant<bool, b>;
 template <size_t v>
 using Int = integral_constant<size_t, v>;
 
-#define STD_INT_BINARY_OP(OP)                                             \
-    template <auto t, auto u>                                             \
-    __aicore__ inline constexpr Int<(t OP u)> operator OP(Int<t>, Int<u>) \
-    {                                                                     \
-        return {};                                                        \
+#define STD_INT_BINARY_OP(OP)                                                       \
+    template <auto t, auto u>                                                       \
+    ASCENDC_HOST_AICORE inline constexpr Int<(t OP u)> operator OP(Int<t>, Int<u>) \
+    {                                                                               \
+        return {};                                                                  \
     }
 
 STD_INT_BINARY_OP(+);
