@@ -15,7 +15,7 @@ This example uses vector addition to demonstrate performance tuning methods for 
 
 ## Supported CANN Software Version
 
-- \> CANN 9.0.0
+- \>= CANN 9.1.0
 
 ## Directory Structure
 
@@ -195,7 +195,7 @@ In SIMT programming mode, L2 Cache accesses data in units of Cache Line = 128 by
 
 | Optimization Method | Core Principle              | Applicable Scenarios                                                                                                                                                                                                                                                                                                                                               |
 |:-----|:------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Short vector  | Underlying instructions support computing two data elements at once | 1. half/bfloat16_t type elements performing [basic operations](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMT-BuiltIn关键字.md#运算符), more short vector types see [complete type list](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/SIMT编程简介/扩展语法/内置数据类型-139.md#短向量类型) |
+| Short vector  | Underlying instructions support computing two data elements at once | 1. half/bfloat16_t type elements performing [basic operations](../../../../../docs/zh/guide/编程指南/语言扩展层/SIMT-BuiltIn关键字.md#运算符), more short vector types see [complete type list](../../../../../docs/zh/api/SIMT-API/SIMT编程简介/扩展语法/内置数据类型-139.md#短向量类型) |
 
 ---
 
@@ -203,7 +203,7 @@ In SIMT programming mode, L2 Cache accesses data in units of Cache Line = 128 by
 
 Run the following steps in the root directory of this example to build and execute the example.
 - Configure Environment Variables  
-  Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
 
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -250,10 +250,10 @@ Run the following steps in the root directory of this example to build and execu
 
 ## Performance Data Collection
 
-Use the `msprof` tool to collect performance data on a single component:
+Use the `msOpProf` tool to collect performance data on a single component:
 
 ```bash
-msprof op ./demo   # Analyze case performance
+msopprof ./demo   # Analyze case performance
 ```
 
 After the command completes, a folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The performance data folder structure example is as follows:

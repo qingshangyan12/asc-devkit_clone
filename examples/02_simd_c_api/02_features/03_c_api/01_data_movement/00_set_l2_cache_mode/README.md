@@ -2,7 +2,7 @@
 
 ## 概述
 
-MTE2将数据从Global Memory（GM）搬运到Unified Buffer（UB）时，可通过`asc_copy_gm2ub_align`接口的`l2_cache_mode`参数（本样例使用[基于指针的C语言编程](https://gitcode.com/cann/asc-devkit/tree/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程)）显式配置数据在L2 Cache中的管理策略。本样例说明**复用数据**和**流式数据**两大类场景下，如何选择合适的L2 Cache模式来优化MTE2搬运性能，以及在启用L2 Cache的前提下如何通过分片策略提升L2 Cache命中率。
+MTE2将数据从Global Memory（GM）搬运到Unified Buffer（UB）时，可通过`asc_copy_gm2ub_align`接口的`l2_cache_mode`参数（本样例使用[基于指针的C语言编程](../../../../../../docs/zh/guide/编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程)）显式配置数据在L2 Cache中的管理策略。本样例说明**复用数据**和**流式数据**两大类场景下，如何选择合适的L2 Cache模式来优化MTE2搬运性能，以及在启用L2 Cache的前提下如何通过分片策略提升L2 Cache命中率。
 
 - **复用数据场景（数据需多次读取）**
   Case1: 整块重复搬4次，`l2_cache_mode=0`（NORMAL） → 整块数据远超L2容量，命中率极低，展示未分片时的性能瓶颈。
@@ -34,7 +34,7 @@ MTE2将数据从Global Memory（GM）搬运到Unified Buffer（UB）时，可通
 
 ## 样例描述
 
-C-API的GM→UB搬运接口通过入参`l2_cache_mode`来控制本次搬运数据在L2 Cache中的管理策略，取值及含义详见[asc_copy_gm2ub_align](https://gitcode.com/cann/asc-devkit/tree/master/docs/api/SIMD-API/C-API/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md)接口说明。
+C-API的GM→UB搬运接口通过入参`l2_cache_mode`来控制本次搬运数据在L2 Cache中的管理策略，取值及含义详见[asc_copy_gm2ub_align](../../../../../../docs/zh/api/SIMD-API/C-API/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md)接口说明。
 
 围绕上述两类场景，本样例设计了4个Case进行对比验证：
 - 数据复用场景（Case1-2）
@@ -50,8 +50,8 @@ C-API的GM→UB搬运接口通过入参`l2_cache_mode`来控制本次搬运数�
 
 采用不同的性能采集指令，分别获取不同的性能指标：
 
-- `msprof ./demo` — 采集AI Core指令级耗时及占比（MTE2/MTE3/Vector），对应**表1**。
-- `msprof --ai-core=on --aic-metrics=L2Cache ./demo` — 采集L2 Cache读写命中/缺失计数，对应**表2**。
+- `msopprof ./demo` — 采集AI Core指令级耗时及占比（MTE2/MTE3/Vector），对应**表1**。
+- `msopprof --ai-core=on --aic-metrics=L2Cache ./demo` — 采集L2 Cache读写命中/缺失计数，对应**表2**。
 
 **表1** AI Core性能指标字段说明表
 
@@ -296,29 +296,31 @@ __aicore__ inline void ProcessDoubleBufferImpl(uint8_t l2CacheMode)
 
 - 性能采集
 
-  使用`msprof`工具获取详细性能数据：
+  使用`msopprof`工具获取详细性能数据：
 
   ```bash
-  msprof ./demo                                              # 采集 MTE2/MTE3/Vector 性能数据，字段含义见表1。
-  msprof --ai-core=on --aic-metrics=L2Cache ./demo           # 采集 L2 Cache 性能数据，字段含义见表2。
+  msopprof ./demo                                              # 采集 MTE2/MTE3/Vector 性能数据，字段含义见表1。
+  msopprof --ai-core=on --aic-metrics=L2Cache ./demo           # 采集 L2 Cache 性能数据，字段含义见表2。
   ```
 
-  采集后会在当前目录生成`PROF_`前缀目录，性能汇总文件位于`mindstudio_profiler_output`目录下。
+  采集后会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下。
 
-  ```txt
-  PROF_xxxx_XXXXXX
-  ├── device_{id}
-  ├── host
-  ├── mindstudio_profiler_log
-  └── mindstudio_profiler_output
-      ├── msprof_*.json
-      ├── op_summary_*.csv
-      └── README.txt
+  ```bash
+  ├──dump                       # 原始的性能数据，用户无需关注
+  ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
+  ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+  ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
+  ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
+  ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
+  ├──OpBasicInfo.csv            # 算子基础信息
+  ├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
+  ├──ResourceConflictRatio.csv  # UB上的bank group、bank conflict和资源冲突率在所有指令中的占比
+  └──visualize_data.bin         # MindStudio Insight呈现文件
   ```
 
   查看具体的性能分析结果：
 
   ```bash
   # 查看 Task Duration 以及各项数据
-  cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
+  cat ./PROF_*/PipeUtilization.csv
   ```

@@ -9,7 +9,7 @@
 
 ## 支持的CANN软件版本
 
-- \> CANN 9.0.0
+- \>= CANN 9.1.0
 
 ## 目录结构介绍
 
@@ -76,7 +76,7 @@
 
   PyTorch提供`TORCH_LIBRARY`宏作为自定义算子注册的核心接口，用于创建并初始化自定义算子库，注册后在Python侧可以通过`torch.ops.namespace.op_name`方式进行调用：
 
-  ```c++
+  ```cpp
   TORCH_LIBRARY(ascendc_ops, m) {
       m.def("ascendc_roll(Tensor x, int[] shifts, int[] dims) -> Tensor");
   }
@@ -84,7 +84,7 @@
 
   `TORCH_LIBRARY_IMPL`用于将算子绑定到特定的`DispatchKey`（PyTorch设备调度标识）。针对NPU设备，需要将算子实现注册到`PrivateUse1`这一专属的`DispatchKey`上：
 
-  ```c++
+  ```cpp
   TORCH_LIBRARY_IMPL(ascendc_ops, PrivateUse1, m)
   {
       m.impl("ascendc_roll", TORCH_FN(ascendc_ops::ascendc_roll));
@@ -111,7 +111,7 @@
 
 - 配置环境变量  
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
