@@ -30,11 +30,15 @@ hostCtx.invalidBufferAddr = HCOMM_INVALID_BUFFER_ADDR;
 ```
 
 3. Allocate and copy `CommContext` to device.
-4. Register the exception callback with the same device context pointer:
+4. Register the Runtime exception callback:
 
 ```cpp
-aclrtBinarySetExceptionCallback(binHandle, CustomCallback, devContext);
+aclrtSetExceptionInfoCallback(CustomCallback);
 ```
+
+The callback is intentionally lightweight. It only records Runtime exception fields and the device args pointer reported
+by `aclrtGetArgsFromExceptionInfo`, then sets a pending flag. It does not call `aclrtMemcpy`, does not synchronize a
+stream, and does not call the channel dump interface.
 
 5. Launch one fault kernel:
 
@@ -44,7 +48,8 @@ HcommUrmaTimeoutFaultKernel<<<1, nullptr, stream>>>(devContext);
 HcommCqeErrorFaultKernel<<<1, nullptr, stream>>>(devContext);
 ```
 
-6. Synchronize the stream. Expected result: AIC exception callback is triggered and `HcommChannelInfoDump` is called from `CustomCallback`.
+6. Synchronize the stream and report at the host safe point. Expected result: AIC exception callback is triggered, the
+runner notices the pending flag after `aclrtSynchronizeStream`, and then calls `HcommChannelInfoDump`.
 
 ## Build
 
@@ -80,6 +85,7 @@ Optional environment variables:
 
 - `RANK_SIZE=2`: number of ranks/devices used by the runner.
 - `CMAKE_ASC_ARCHITECTURES=dav-3510`: target NPU architecture.
+- `CMAKE_ASC_COMPILER=/path/to/tools/bisheng_compiler/bin/bisheng`: optional Ascend C compiler override.
 - `HCOMM_CHANNEL_DUMP_SO=/path/to/libhcomm_channel_dump.so`: shim dump library path.
 - `HCOMM_REAL_DUMP_SO=/path/to/libhccl.so`: real library that exports `HcommChannelInfoDump`.
 
@@ -92,10 +98,10 @@ export HCOMM_CHANNEL_DUMP_SO=/path/to/libhcomm_channel_dump.so
 ```
 
 2. Prepare a valid communication `ChannelHandle` and a real pair of device buffers.
-3. Copy `CommContext` to device memory and register the callback:
+3. Copy `CommContext` to device memory and register the Runtime callback:
 
 ```cpp
-aclrtBinarySetExceptionCallback(binHandle, CustomCallback, devContext);
+aclrtSetExceptionInfoCallback(CustomCallback);
 ```
 
 4. Launch one fault kernel:
@@ -106,9 +112,13 @@ HcommUrmaTimeoutFaultKernel<<<1, nullptr, stream>>>(devContext);
 HcommCqeErrorFaultKernel<<<1, nullptr, stream>>>(devContext);
 ```
 
-5. Call `aclrtSynchronizeStream(stream)` and check the logs.
+5. Call `aclrtSynchronizeStream(stream)`, then call the report path and check the logs.
 
 ## Expected Logs
 
-- URMA timeout case: callback is triggered, then `HcommChannelInfoDump` prints channel handle, local/remote buffer addresses, SQ/CQ context and SQ/CQ VA related content.
-- CQE error case: callback is triggered, then `HcommChannelInfoDump` prints the channel dump together with the invalid-memory induced exception context.
+- URMA timeout case: callback is triggered, the host report path prints Runtime exception fields and cached channel
+  context, then `HcommChannelInfoDump` prints channel handle, local/remote buffer addresses, SQ/CQ context and SQ/CQ VA
+  related content if the linked HCCL/HCOMM dump library provides those fields.
+- CQE error case: callback is triggered, the host report path prints Runtime exception fields and cached channel context,
+  then `HcommChannelInfoDump` prints the channel dump together with CQ/SQ/CQE details if the linked HCCL/HCOMM dump
+  library provides those fields.

@@ -25,6 +25,13 @@ add_library(hcomm_exception_fault_kernels SHARED
 set_target_properties(hcomm_exception_fault_kernels PROPERTIES
     LINKER_LANGUAGE ASC
 )
+target_include_directories(hcomm_exception_fault_kernels PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../..
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../include/basic_api
+    $ENV{ASCEND_HOME_PATH}/include
+)
 target_compile_options(hcomm_exception_fault_kernels PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
@@ -70,10 +77,15 @@ target_include_directories(hcomm_exception_fault_runner PRIVATE
 )
 target_link_directories(hcomm_exception_fault_runner PRIVATE
     $ENV{ASCEND_HOME_PATH}/lib64
+    /usr/local/Ascend/driver/lib64/driver
+    $ENV{ASCEND_HOME_PATH}/devlib
 )
 target_link_libraries(hcomm_exception_fault_runner PRIVATE
     hcomm_exception_fault_kernels
     dl
     acl_rt
     hccl
+    hcomm
+    c_sec
+    ascend_hal
 )

@@ -9,6 +9,7 @@
  */
 
 #include <algorithm>
+#include <atomic>
 #include <condition_variable>
 #include <cstdio>
 #include <cstdlib>
@@ -64,6 +65,22 @@ private:
 
 std::mutex g_dumpMutex;
 std::vector<ChannelHandle> g_channels;
+std::vector<CommContext> g_contexts;
+
+struct ExceptionSummary {
+    uint32_t taskId = 0xFFFFFFFFU;
+    uint32_t streamId = 0xFFFFFFFFU;
+    uint32_t threadId = 0xFFFFFFFFU;
+    uint32_t deviceId = 0xFFFFFFFFU;
+    uint32_t errorCode = 0xFFFFFFFFU;
+    void *devArgs = nullptr;
+    uint32_t devArgsLen = 0;
+};
+
+std::mutex g_exceptionMutex;
+std::atomic<bool> g_exceptionPending{false};
+std::atomic<uint64_t> g_exceptionCount{0};
+ExceptionSummary g_lastException;
 
 #define ACL_CHECK(expr)                                                                                  \
     do {                                                                                                 \
@@ -119,38 +136,100 @@ void DumpChannels(const std::vector<ChannelHandle> &channels)
     dumpFunc(static_cast<uint32_t>(channelCopy.size()), channelCopy.data());
 }
 
-bool TryGetCommContext(aclrtExceptionInfo *exceptionInfo, CommContext &hostCtx)
+bool TryCopyCommContext(void *devArgs, uint32_t devArgsLen, CommContext &hostCtx)
 {
-    if (exceptionInfo == nullptr) {
+    if (devArgs == nullptr || devArgsLen < sizeof(CommContext)) {
+        std::printf("[hcomm_fault_runner] exception dev args are unavailable, len=%u\n", devArgsLen);
         return false;
     }
-    auto argAddr = exceptionInfo->expandInfo.aicoreInfo.exceptionArgs.argAddr;
-    if (argAddr == nullptr) {
+    aclError ret = aclrtMemcpy(&hostCtx, sizeof(hostCtx), devArgs, sizeof(CommContext), ACL_MEMCPY_DEVICE_TO_HOST);
+    if (ret != ACL_SUCCESS) {
+        std::printf("[hcomm_fault_runner] copy CommContext failed at report point, ret=%d\n", ret);
         return false;
     }
-    aclError ret = aclrtMemcpy(&hostCtx, sizeof(hostCtx), argAddr, sizeof(CommContext), ACL_MEMCPY_DEVICE_TO_HOST);
-    return ret == ACL_SUCCESS;
+    return true;
 }
 
 void CustomCallback(aclrtExceptionInfo *exceptionInfo)
 {
-    std::lock_guard<std::mutex> lock(g_dumpMutex);
+    if (exceptionInfo == nullptr) {
+        return;
+    }
+
+    ExceptionSummary summary;
+    summary.taskId = aclrtGetTaskIdFromExceptionInfo(exceptionInfo);
+    summary.streamId = aclrtGetStreamIdFromExceptionInfo(exceptionInfo);
+    summary.threadId = aclrtGetThreadIdFromExceptionInfo(exceptionInfo);
+    summary.deviceId = aclrtGetDeviceIdFromExceptionInfo(exceptionInfo);
+    summary.errorCode = aclrtGetErrorCodeFromExceptionInfo(exceptionInfo);
+    (void)aclrtGetArgsFromExceptionInfo(exceptionInfo, &summary.devArgs, &summary.devArgsLen);
+
+    {
+        std::lock_guard<std::mutex> lock(g_exceptionMutex);
+        g_lastException = summary;
+    }
+    g_exceptionCount.fetch_add(1, std::memory_order_relaxed);
+    g_exceptionPending.store(true, std::memory_order_release);
+}
+
+bool TakePendingException(ExceptionSummary &summary, uint64_t &count)
+{
+    if (!g_exceptionPending.exchange(false, std::memory_order_acq_rel)) {
+        return false;
+    }
+    std::lock_guard<std::mutex> lock(g_exceptionMutex);
+    summary = g_lastException;
+    count = g_exceptionCount.load(std::memory_order_relaxed);
+    return true;
+}
+
+void PrintCommContext(const char *prefix, const CommContext &ctx)
+{
+    std::printf("%s rank=%u channel=0x%llx local=0x%llx remote=0x%llx len=%llu\n",
+        prefix,
+        ctx.rankId,
+        static_cast<unsigned long long>(ctx.channelHandle),
+        static_cast<unsigned long long>(ctx.localBufferAddr),
+        static_cast<unsigned long long>(ctx.remoteBufferAddr),
+        static_cast<unsigned long long>(ctx.len));
+}
+
+void ReportPendingException()
+{
+    ExceptionSummary summary;
+    uint64_t count = 0;
+    if (!TakePendingException(summary, count)) {
+        return;
+    }
+
+    std::printf("[hcomm_fault_runner] runtime exception count=%llu task=%u stream=%u thread=%u device=%u error=%u\n",
+        static_cast<unsigned long long>(count),
+        summary.taskId,
+        summary.streamId,
+        summary.threadId,
+        summary.deviceId,
+        summary.errorCode);
+
     CommContext ctx = {};
-    if (TryGetCommContext(exceptionInfo, ctx) && ctx.channelHandle != 0) {
-        std::printf(
-            "[hcomm_fault_runner] exception ctx rank=%u channel=0x%llx local=0x%llx remote=0x%llx len=%llu\n",
-            ctx.rankId,
-            static_cast<unsigned long long>(ctx.channelHandle),
-            static_cast<unsigned long long>(ctx.localBufferAddr),
-            static_cast<unsigned long long>(ctx.remoteBufferAddr),
-            static_cast<unsigned long long>(ctx.len));
+    if (TryCopyCommContext(summary.devArgs, summary.devArgsLen, ctx) && ctx.channelHandle != 0) {
+        PrintCommContext("[hcomm_fault_runner] exception ctx", ctx);
         ChannelHandle channel = static_cast<ChannelHandle>(ctx.channelHandle);
         DumpChannels({channel});
         return;
     }
 
-    std::printf("[hcomm_fault_runner] exception argAddr is unavailable, dump cached channels.\n");
-    DumpChannels(g_channels);
+    std::vector<ChannelHandle> channels;
+    std::vector<CommContext> contexts;
+    {
+        std::lock_guard<std::mutex> lock(g_dumpMutex);
+        channels = g_channels;
+        contexts = g_contexts;
+    }
+    for (const auto &cachedCtx : contexts) {
+        PrintCommContext("[hcomm_fault_runner] cached ctx", cachedCtx);
+    }
+    std::printf("[hcomm_fault_runner] dump cached channels because exception dev args are unavailable.\n");
+    DumpChannels(channels);
 }
 
 bool ParseFaultCase(int argc, char **argv, FaultCase &faultCase)
@@ -197,6 +276,8 @@ HcclResult BuildUbcChannelDesc(HcclComm comm, uint32_t rank, uint32_t remoteRank
         return ret;
     }
 
+    bool hasFallback = false;
+    HcclChannelDesc fallbackDesc;
     for (uint32_t layerIdx = 0; layerIdx < netLayerNum; ++layerIdx) {
         CommLink *linkList = nullptr;
         uint32_t linkNum = 0;
@@ -206,6 +287,23 @@ HcclResult BuildUbcChannelDesc(HcclComm comm, uint32_t rank, uint32_t remoteRank
         }
         for (uint32_t linkIdx = 0; linkIdx < linkNum; ++linkIdx) {
             const CommLink &link = linkList[linkIdx];
+            std::printf("[hcomm_fault_runner] rank=%u remote=%u layer=%u link=%u protocol=%d\n",
+                rank,
+                remoteRank,
+                netLayers[layerIdx],
+                linkIdx,
+                static_cast<int>(link.linkAttr.linkProtocol));
+            if (!hasFallback) {
+                HcclChannelDescInit(&fallbackDesc, 1);
+                fallbackDesc.remoteRank = remoteRank;
+                fallbackDesc.channelProtocol = link.linkAttr.linkProtocol;
+                fallbackDesc.localEndpoint = link.srcEndpointDesc;
+                fallbackDesc.remoteEndpoint = link.dstEndpointDesc;
+                fallbackDesc.notifyNum = 2;
+                fallbackDesc.memHandles = memHandle;
+                fallbackDesc.memHandleNum = 1;
+                hasFallback = true;
+            }
             if (link.linkAttr.linkProtocol != COMM_PROTOCOL_UBC_CTP) {
                 continue;
             }
@@ -219,6 +317,12 @@ HcclResult BuildUbcChannelDesc(HcclComm comm, uint32_t rank, uint32_t remoteRank
             desc.memHandleNum = 1;
             return HCCL_SUCCESS;
         }
+    }
+    if (hasFallback) {
+        desc = fallbackDesc;
+        std::printf("[hcomm_fault_runner] fallback to first graph link, rank=%u remote=%u protocol=%d\n",
+            rank, remoteRank, static_cast<int>(desc.channelProtocol));
+        return HCCL_SUCCESS;
     }
     return HCCL_E_NOT_FOUND;
 }
@@ -269,11 +373,11 @@ int RunRank(RankContext *ctx)
     ACL_CHECK(aclrtSetDevice(static_cast<int32_t>(rank)));
     HCCL_CHECK(HcclCommInitRootInfo(ctx->rankSize, ctx->rootInfo, rank, &comm));
     ACL_CHECK(aclrtCreateStream(&stream));
-    ACL_CHECK(aclrtMalloc(&localBuffer, bufferSize, ACL_MEM_MALLOC_HUGE_ONLY));
+    std::string memTag = "hcomm_exception_fault_rank_" + std::to_string(rank);
+    HCCL_CHECK(HcclEngineCtxCreate(comm, memTag.c_str(), COMM_ENGINE_AIV, bufferSize, &localBuffer));
     ACL_CHECK(aclrtMemset(localBuffer, bufferSize, 0, bufferSize));
 
     CommMem regMem{COMM_MEM_TYPE_DEVICE, localBuffer, bufferSize};
-    std::string memTag = "hcomm_exception_fault_rank_" + std::to_string(rank);
     HCCL_CHECK(HcclCommMemReg(comm, memTag.c_str(), &regMem, &memHandle));
 
     ctx->barrier->Wait();
@@ -296,6 +400,10 @@ int RunRank(RankContext *ctx)
     hostCtx.len = bufferSize;
     hostCtx.invalidBufferAddr = HCOMM_INVALID_BUFFER_ADDR;
     hostCtx.rankId = rank;
+    {
+        std::lock_guard<std::mutex> lock(g_dumpMutex);
+        g_contexts.push_back(hostCtx);
+    }
     ACL_CHECK(aclrtMalloc(reinterpret_cast<void **>(&devContext), sizeof(CommContext), ACL_MEM_MALLOC_HUGE_ONLY));
     ACL_CHECK(aclrtMemcpy(devContext, sizeof(CommContext), &hostCtx, sizeof(hostCtx), ACL_MEMCPY_HOST_TO_DEVICE));
 
@@ -310,14 +418,12 @@ int RunRank(RankContext *ctx)
         }
         aclError syncRet = aclrtSynchronizeStream(stream);
         std::printf("[hcomm_fault_runner] rank=0 aclrtSynchronizeStream ret=%d\n", syncRet);
+        ReportPendingException();
     }
     ctx->barrier->Wait();
 
     if (devContext != nullptr) {
         ACL_CHECK(aclrtFree(devContext));
-    }
-    if (localBuffer != nullptr) {
-        ACL_CHECK(aclrtFree(localBuffer));
     }
     if (stream != nullptr) {
         ACL_CHECK(aclrtDestroyStream(stream));

@@ -19,10 +19,24 @@ if [[ -z "${ASCEND_HOME_PATH:-}" ]]; then
 fi
 
 mkdir -p "${build_dir}"
-cmake -S "${script_dir}" -B "${build_dir}" -DCMAKE_ASC_ARCHITECTURES="${npu_arch}"
+cmake_args=(
+  -S "${script_dir}"
+  -B "${build_dir}"
+  -DCMAKE_ASC_ARCHITECTURES="${npu_arch}"
+)
+if [[ -n "${CMAKE_ASC_COMPILER:-}" ]]; then
+  cmake_args+=("-DCMAKE_ASC_COMPILER=${CMAKE_ASC_COMPILER}")
+fi
+if [[ -n "${ASC_DIR:-}" ]]; then
+  cmake_args+=("-DASC_DIR=${ASC_DIR}")
+fi
+if [[ -n "${CMAKE_PREFIX_PATH:-}" ]]; then
+  cmake_args+=("-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
+fi
+cmake "${cmake_args[@]}"
 cmake --build "${build_dir}" -j
 
-export LD_LIBRARY_PATH="${build_dir}:${ASCEND_HOME_PATH}/lib64:${LD_LIBRARY_PATH:-}"
+export LD_LIBRARY_PATH="${build_dir}:${ASCEND_HOME_PATH}/lib64:/usr/local/Ascend/driver/lib64/driver:${ASCEND_HOME_PATH}/devlib:${LD_LIBRARY_PATH:-}"
 
 if [[ -z "${HCOMM_CHANNEL_DUMP_SO:-}" ]]; then
   export HCOMM_CHANNEL_DUMP_SO="libhcomm_channel_dump.so"

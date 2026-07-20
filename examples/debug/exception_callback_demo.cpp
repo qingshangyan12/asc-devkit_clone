@@ -12,6 +12,8 @@
 #include <cstdint>
 #include <cstdlib>
 #include <dlfcn.h>
+#include <atomic>
+#include <mutex>
 
 #include "acl/acl_rt.h"
 #include "hcomm_exception_fault_cases.h"
@@ -46,31 +48,71 @@ HcommChannelInfoDumpFunc ResolveChannelDumpFunc()
     return dumpFunc;
 }
 
-bool GetCommContext(aclrtExceptionInfo *exceptionInfo, CommContext &hostCtx)
-{
-    if (exceptionInfo == nullptr) {
-        std::printf("[ExceptionCallbackDemo] exceptionInfo is nullptr.\n");
-        return false;
-    }
+struct ExceptionSummary {
+    uint32_t taskId = 0xFFFFFFFFU;
+    uint32_t streamId = 0xFFFFFFFFU;
+    uint32_t threadId = 0xFFFFFFFFU;
+    uint32_t deviceId = 0xFFFFFFFFU;
+    uint32_t errorCode = 0xFFFFFFFFU;
+    void *devArgs = nullptr;
+    uint32_t devArgsLen = 0;
+};
 
-    auto argAddr = exceptionInfo->expandInfo.aicoreInfo.exceptionArgs.argAddr;
-    if (argAddr == nullptr) {
-        std::printf("[ExceptionCallbackDemo] exception argAddr is 0.\n");
-        return false;
-    }
-
-    aclError ret = aclrtMemcpy(&hostCtx, sizeof(hostCtx), argAddr, sizeof(CommContext), ACL_MEMCPY_DEVICE_TO_HOST);
-    if (ret != ACL_SUCCESS) {
-        std::printf("[ExceptionCallbackDemo] copy CommContext failed, ret=%d.\n", ret);
-        return false;
-    }
-    return true;
-}
+std::mutex g_exceptionMutex;
+std::atomic<bool> g_exceptionPending{false};
+ExceptionSummary g_lastException;
 
 void CustomCallback(aclrtExceptionInfo *exceptionInfo)
 {
+    if (exceptionInfo == nullptr) {
+        return;
+    }
+
+    ExceptionSummary summary;
+    summary.taskId = aclrtGetTaskIdFromExceptionInfo(exceptionInfo);
+    summary.streamId = aclrtGetStreamIdFromExceptionInfo(exceptionInfo);
+    summary.threadId = aclrtGetThreadIdFromExceptionInfo(exceptionInfo);
+    summary.deviceId = aclrtGetDeviceIdFromExceptionInfo(exceptionInfo);
+    summary.errorCode = aclrtGetErrorCodeFromExceptionInfo(exceptionInfo);
+    (void)aclrtGetArgsFromExceptionInfo(exceptionInfo, &summary.devArgs, &summary.devArgsLen);
+
+    {
+        std::lock_guard<std::mutex> lock(g_exceptionMutex);
+        g_lastException = summary;
+    }
+    g_exceptionPending.store(true, std::memory_order_release);
+}
+
+bool TryGetPendingException(ExceptionSummary &summary)
+{
+    if (!g_exceptionPending.exchange(false, std::memory_order_acq_rel)) {
+        return false;
+    }
+    std::lock_guard<std::mutex> lock(g_exceptionMutex);
+    summary = g_lastException;
+    return true;
+}
+
+void ReportPendingException()
+{
+    ExceptionSummary summary;
+    if (!TryGetPendingException(summary)) {
+        return;
+    }
+
+    std::printf("[ExceptionCallbackDemo] runtime exception task=%u stream=%u thread=%u device=%u error=%u\n",
+        summary.taskId, summary.streamId, summary.threadId, summary.deviceId, summary.errorCode);
+
+    if (summary.devArgs == nullptr || summary.devArgsLen < sizeof(CommContext)) {
+        std::printf("[ExceptionCallbackDemo] exception dev args are unavailable, len=%u, skip channel dump.\n",
+            summary.devArgsLen);
+        return;
+    }
+
     CommContext ctx = {};
-    if (!GetCommContext(exceptionInfo, ctx)) {
+    aclError ret = aclrtMemcpy(&ctx, sizeof(ctx), summary.devArgs, sizeof(ctx), ACL_MEMCPY_DEVICE_TO_HOST);
+    if (ret != ACL_SUCCESS) {
+        std::printf("[ExceptionCallbackDemo] copy CommContext failed at report point, ret=%d.\n", ret);
         return;
     }
 
@@ -80,14 +122,9 @@ void CustomCallback(aclrtExceptionInfo *exceptionInfo)
         static_cast<unsigned long long>(ctx.localBufferAddr),
         static_cast<unsigned long long>(ctx.remoteBufferAddr));
 
-    if (ctx.channelHandle == 0) {
-        std::printf("[ExceptionCallbackDemo] channel handle is 0, skip channel dump.\n");
-        return;
-    }
-
     ChannelHandle channel = static_cast<ChannelHandle>(ctx.channelHandle);
     auto dumpFunc = ResolveChannelDumpFunc();
-    if (dumpFunc == nullptr) {
+    if (dumpFunc == nullptr || channel == 0) {
         return;
     }
     dumpFunc(1, &channel);
@@ -103,5 +140,6 @@ int main()
     }
 
     std::printf("[ExceptionCallbackDemo] exception callback registered. Launch communication kernel here.\n");
+    ReportPendingException();
     return 0;
 }
