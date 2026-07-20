@@ -12,6 +12,7 @@
 #include "hccl_msg.h"
 
 #include "common/aicpu_kfc_utils.h"
+#include "common/aicpu_timing_recorder.h"
 #include "comm_kfc_aicpu_server.h"
 
 using namespace HcclApi;
@@ -28,6 +29,10 @@ struct AscCommServerInfo {
     AscCommServerInfo(u32 groupIdx) : serverIns(groupIdx) { extMsg = std::make_shared<HcclMsgExt>(); }
 };
 static constexpr u32 MAX_RETRY_CNT = 10U;
+constexpr char FIRST_PREPARE_STAGE[] = "first_prepare";
+constexpr char LAST_EXPAND_END_STAGE[] = "last_expand_end";
+constexpr char LAST_FINALIZE_STAGE[] = "last_finalize";
+constexpr char COMPLETE_STATUS[] = "complete";
 
 HcclResult CreateServerList(void* args[], u32 ctxNum, std::vector<AscCommServerInfo>& serverList)
 {
@@ -84,10 +89,23 @@ HcclResult GetCurrentMsg(AscCommServerInfo& server)
     return ret;
 }
 
-HcclResult FinalizeProcess(AscCommServerInfo& server)
+HcclResult FinalizeProcess(
+    AscCommServerInfo& server, u32 serverNum, u32& finalizeCnt, Hccl::AicpuTimingRecorder* timingRecorder)
 {
+    CHK_PRT_RET(
+        finalizeCnt >= serverNum,
+        HCCL_ERROR("Invalid finalize count %u, expected less than server number %u.", finalizeCnt, serverNum),
+        HCCL_E_INTERNAL);
+    ++finalizeCnt;
+    const bool isLastFinalize = finalizeCnt == serverNum;
+    if (isLastFinalize && timingRecorder != nullptr) {
+        (void)timingRecorder->Record(LAST_FINALIZE_STAGE);
+    }
     CHK_RET(server.serverIns.Finalize(server.msgPos));
     server.finalizeFlag = true;
+    if (isLastFinalize && timingRecorder != nullptr) {
+        timingRecorder->Report(COMPLETE_STATUS);
+    }
     return HCCL_SUCCESS;
 }
 
@@ -117,14 +135,21 @@ HcclResult InterGroupSyncProcess(std::vector<AscCommServerInfo>& serverList, u32
     return HCCL_SUCCESS;
 }
 
-HcclResult PrepareProcess(AscCommServerInfo& server, u32& expectSeqNum)
+HcclResult PrepareProcess(AscCommServerInfo& server, u32& expectSeqNum, Hccl::AicpuTimingRecorder* timingRecorder)
 {
+    if (timingRecorder != nullptr) {
+        (void)timingRecorder->Record(FIRST_PREPARE_STAGE);
+    }
     const u32 seqNum = static_cast<u32>(server.msg.addMsg.v1Msg.seqNum);
     if (expectSeqNum != seqNum) {
         HCCL_INFO("Expect seq id %u but receive %u.", expectSeqNum, seqNum);
         ++(server.retryCnt);
     } else {
-        CHK_RET(server.serverIns.Orchestrate(server.msg, *(server.extMsg), server.msgPos));
+        HcclResult ret = server.serverIns.Orchestrate(server.msg, *(server.extMsg), server.msgPos);
+        CHK_RET(ret);
+        if (timingRecorder != nullptr) {
+            (void)timingRecorder->Record(LAST_EXPAND_END_STAGE, Hccl::AicpuTimingRecorder::RecordPolicy::KEEP_LATEST);
+        }
         server.msgPos = (server.msgPos + 1U) % HCCL_MSG_CNT;
         ++expectSeqNum;
         server.retryCnt = 0;
@@ -132,7 +157,9 @@ HcclResult PrepareProcess(AscCommServerInfo& server, u32& expectSeqNum)
     return HCCL_SUCCESS;
 }
 
-HcclResult GroupServerProcess(std::vector<AscCommServerInfo>& serverList, u32 groupIdx, u32& expectSeq, u32& finishCnt)
+HcclResult GroupServerProcess(
+    std::vector<AscCommServerInfo>& serverList, u32 groupIdx, u32& expectSeq, u32& finalizeCnt, u32& finishCnt,
+    Hccl::AicpuTimingRecorder* timingRecorder)
 {
     auto& server = serverList[groupIdx];
     if (server.finishFlag) {
@@ -171,32 +198,40 @@ HcclResult GroupServerProcess(std::vector<AscCommServerInfo>& serverList, u32 gr
         static_cast<u32>(server.msg.addMsg.v1Msg.seqNum), server.msgPos);
     switch (server.msg.commType.msgType) {
         case ControlMsgType::HCCL_CMD_FINALIZE:
-            CHK_RET(FinalizeProcess(server));
+            CHK_RET(FinalizeProcess(server, static_cast<u32>(serverList.size()), finalizeCnt, timingRecorder));
             break;
         case ControlMsgType::HCCL_CMD_INTER_GROUP_SYNC:
             CHK_RET(InterGroupSyncProcess(serverList, groupIdx));
             break;
         default:
-            CHK_RET(PrepareProcess(server, expectSeq));
+            CHK_RET(PrepareProcess(server, expectSeq, timingRecorder));
             break;
     }
     return HCCL_SUCCESS;
 }
-} // namespace
 
-u32 CommKfcDispatcher::Run(void* args[], u32 ctxNum)
+u32 RunDispatcher(void* args[], u32 ctxNum, Hccl::AicpuTimingRecorder* timingRecorder)
 {
     std::vector<AscCommServerInfo> serverList{};
     CHK_RET(CreateServerList(args, ctxNum, serverList));
 
     u32 finishCnt = 0U;
+    u32 finalizeCnt = 0U;
     u32 expectSeqNum = 0U;
     while (finishCnt != serverList.size()) {
         for (u32 i = 0U; i < serverList.size(); ++i) {
-            HcclResult ret = GroupServerProcess(serverList, i, expectSeqNum, finishCnt);
+            HcclResult ret = GroupServerProcess(serverList, i, expectSeqNum, finalizeCnt, finishCnt, timingRecorder);
             CHK_RET(serverList[i].serverIns.ErrorDfxProcess(ret));
         }
     }
 
     return HCCL_SUCCESS;
+}
+} // namespace
+
+u32 CommKfcDispatcher::Run(void* args[], u32 ctxNum) { return RunDispatcher(args, ctxNum, nullptr); }
+
+u32 CommKfcDispatcher::Run(void* args[], u32 ctxNum, Hccl::AicpuTimingRecorder& timingRecorder)
+{
+    return RunDispatcher(args, ctxNum, &timingRecorder);
 }
