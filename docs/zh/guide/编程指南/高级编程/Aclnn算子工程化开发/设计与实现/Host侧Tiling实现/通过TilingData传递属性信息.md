@@ -173,15 +173,7 @@ y = tmpTensor1 + tmpTensor2
 
 如果某个属性只用于Host侧选择TilingKey，例如根据`algorithm`属性选择不同Kernel分支，则可以直接调用`context->SetTilingKey(...)`，不再额外增加TilingData字段。分支组织方法见[多分支策略](../多分支策略.md)。
 
-## 6. 使用约束
-
-1. `GetAttrPointer(index)`的索引与`OpDef`中的属性声明顺序一致，从0开始。
-2. `GetAttrPointer<T>`的类型必须与属性实际类型一致，使用前检查返回指针。
-3. 只向TilingData写入Kernel需要的数据；字符串、动态容器和大数组不适合作为TilingData字段。
-4. Host侧转换整数类型时检查符号和取值范围。
-5. Host和Kernel侧引用同一份TilingData定义，并保持字段类型和布局一致。
-
-## 7. 相关文档
+## 6. 相关文档
 
 - [算子原型定义](../算子原型定义.md)：声明属性及默认值。
 - [Host侧Tiling实现](./基本流程.md)：定义和写入TilingData。
