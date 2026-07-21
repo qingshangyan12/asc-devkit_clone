@@ -185,7 +185,7 @@ AscendC::LoadData(l0a_buffer, l1_buffer, l12l0Params);
 
 搬运到L0B Buffer采用同样的`LoadData`接口实现，接口参数及实现功能同L12L0A，可参考[矩阵计算的搬入](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵计算的搬入.md)查看更多内容。
 
-当输入A矩阵（GM）是转置排布（K×M）时，搬入到L1 Buffer后为K×M排布的Nz分形。要使L0A Buffer存放M×K的矩阵，需要在L1 Buffer到L0A Buffer的搬运过程中进行转置。针对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)，可使用`LoadDataWithTranspose`接口，调用示例如下。
+当输入A矩阵（GM）是转置排布（K×M）时，搬入到L1 Buffer后为（K×M）排布的Nz分形。要使L0A Buffer存放（M×K）的矩阵，需要在L1 Buffer到L0A Buffer的搬运过程中进行转置。针对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)，可使用`LoadDataWithTranspose`接口，调用示例如下。
 
 ![需要转置的处理场景](../../../../figures/需要转置的处理场景.png)
 
