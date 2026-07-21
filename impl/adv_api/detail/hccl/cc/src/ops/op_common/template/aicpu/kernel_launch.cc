@@ -511,7 +511,6 @@ HcclResult mc2_ops_hccl::RestoreVarDataAlltoAllV(OpParam& param, const AlgResour
             param.varMemSize, ALL_TO_ALL_V_VECTOR_NUM, rankSize, sizeof(u64)),
         HCCL_E_PARA);
 
-    constexpr u32 ALL_TO_ALL_V_OFFSET_SCOUNTS = 0;
     constexpr u32 ALL_TO_ALL_V_OFFSET_RECV_COUNTS = 1;
     constexpr u32 ALL_TO_ALL_V_OFFSET_SDISPLS = 2;
     constexpr u32 ALL_TO_ALL_V_OFFSET_RDISPLS = 3;

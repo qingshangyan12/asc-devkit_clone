@@ -21,11 +21,15 @@ namespace mc2_ops_hccl {
 constexpr uint64_t SMALL_COUNT_512KB = 512 * 1024;   // Byte, UB协议一次传输的最大size
 constexpr uint64_t LARGE_COUNT_1024KB = 1024 * 1024; // Byte, 可掩盖多mission尾块开销
 
-constexpr int RANK_SIZE_EIGHT = 8;
 constexpr u32 CCU_MS_MODE = 2;
 constexpr double DEFAULT_RANK_SIZE = 8.0;
 constexpr u64 RS_2D_SMALL_DATA_SIZE = 1024 * 1024;
 constexpr u64 RS_M2M_1D_MAX_DATA_SIZE = 8 * 1024 * 1024;
+
+// AIV selector 相关常量（对齐 hccl 项目 hccl_aiv_utils.h / auto_selector_base.h）
+constexpr u32 MAX_RANK_SIZE = 512; // 注意要和device侧的一致
+constexpr u32 AIV_MAX_CCL_LOOP_NUM = 16;
+constexpr u64 AIV_MAX_PER_RANK_DATA_SIZE = 8 * 1024 * 1024; // Byte, AIV单卡数据量上限(除alltoallv外)
 
 enum class SelectorStatus { MATCH, NOT_MATCH };
 
@@ -113,4 +117,13 @@ inline bool Is64BitDataType(const HcclDataType dataType)
 }
 
 } // namespace mc2_ops_hccl
+
+// AIV_ONLY 额外打 ERROR（前缀 Failed to select AIV algorithm while configured as AIV_ONLY.，直接报错不回退，原因同 BASE_LOG）
+#define HCCL_AIV_NOT_MATCH_LOG(opParam, BASE_LOG, fmt, ...) do { \
+    BASE_LOG(fmt, ##__VA_ARGS__); \
+    if ((opParam).opExecuteConfig == OpExecuteConfig::AIV_ONLY) { \
+        HCCL_ERROR("Failed to select AIV algorithm while configured as AIV_ONLY. " fmt, ##__VA_ARGS__); \
+    } \
+} while (0)
+
 #endif

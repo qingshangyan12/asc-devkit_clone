@@ -15,20 +15,28 @@
 #include <map>
 #include <set>
 #include <unordered_set>
+#include <memory>
 #include <functional>
+#include <functional>
+#include <memory>
+#include "ccu_datatype_v1.h"
 #include "hccl_comm.h"
 #include "hccl_common.h"
 #include "hccl_types.h"
-#include "../../../common/alg_type.h"
-#include "hccl_res.h"
-#include "../../../common/hcomm_dlsym/hcomm_primitives_dl.h"
-#include "hccl_rank_graph.h"
-#include "../../../common/binary_stream.h"
-#include "hccl_ccu_res.h"
+#include "alg_type.h"
+#include "hccl_res_dl.h"
+#include "hcomm_primitives_dl.h"
+#include "hccl_rank_graph_dl.h"
+#include "hccl_host_comm_dl.h"
+#include "binary_stream.h"
+#include "hccl_ccu_res_dl.h"
+#include "ccu_types.h"
 
 namespace mc2_ops_hccl {
 
-constexpr uint64_t UB_MAX_DATA_SIZE = 256 * 1024 * 1024; // Byte, UB协议一次传输的最大size
+constexpr uint64_t UB_MAX_DATA_SIZE = 256*1024*1024; // Byte, UB协议一次传输的最大size
+
+constexpr u32 MAX_NUM_BLOCKS = 56; // 56-72
 
 constexpr u32 HCCL_LOGIC_TOPO_LEVEL_NUM = 4; // HCCL逻辑拓扑层级最多4级
 
@@ -78,7 +86,18 @@ constexpr u32 ALG_MAX_LENGTH = 128;
 constexpr u64 ALL_TO_ALL_V_VECTOR_NUM = 4;
 constexpr u64 REDUCE_SCATTER_V_VECTOR_NUM = 2;
 constexpr u64 ALL_GATHER_V_VECTOR_NUM = 2;
+
+constexpr uint64_t GE_PARALLEL = 36;
+
+constexpr uint64_t AICPU_ALIGN_SIZE = 4096;
+// Z axis detour 需要
 constexpr u32 MESH_CHANNELS_NUM = 1;
+
+constexpr uint64_t CCU_MAX_RANK_SIZE = 16;
+
+constexpr u32 TOPO_LEVEL_NUM_1 = 1;
+constexpr u32 TOPO_LEVEL_NUM_2 = 2;
+constexpr u32 TOPO_LEVEL_NUM_3 = 3;
 
 enum class TopoType {
     TOPO_TYPE_COMMON = 0,         // 普通拓扑类型 ，default单层拓扑使用
@@ -110,7 +129,10 @@ enum class OpExecuteConfig {
     CCU_FAIL
 };
 
-enum class OpMode { OPBASE = 0, OFFLOAD = 1 };
+enum class OpMode {
+    OFFLOAD = 0,
+    OPBASE = 1
+};
 
 enum class Level0Shape {
     CLOS = 0,
@@ -171,6 +193,7 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
     bool level0PcieMix{false};
     bool level0BigClosRange{false};
     bool level2Uboe{false};
+    bool level2Ubg{false};
     u32 topoInstDetailsOfLayerSize = 0;
     Level0MeshType level0MeshType;
     NetLayerDetails netLayerDetails;
@@ -205,6 +228,7 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream << level0PcieMix;
         binaryStream << level0BigClosRange;
         binaryStream << level2Uboe;
+        binaryStream << level2Ubg;
         binaryStream << topoInstDetailsOfLayerSize;
         binaryStream << level0MeshType;
         binaryStream << netLayerDetails.netLayerNum;
@@ -253,6 +277,7 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream >> level0PcieMix;
         binaryStream >> level0BigClosRange;
         binaryStream >> level2Uboe;
+        binaryStream >> level2Ubg;
         binaryStream >> topoInstDetailsOfLayerSize;
         binaryStream >> level0MeshType;
         binaryStream >> netLayerDetails.netLayerNum;
@@ -274,16 +299,34 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
     }
 };
 
+struct CcuKernelArgBase {
+    // std::vector<ChannelHandle> channels;
+    ChannelHandle channels[CCU_MAX_RANK_SIZE];
+    uint32_t      channelCount;
+};
+
 // ccu kernel register所需信息
 struct CcuKernelInfo {
     // kernel资源组序号，group号不同时，资源复用
     u32 resGroup = 0;
-    // kernel构造函数
-    hcomm::KernelCreator creator;
-    // KernelArg实例
-    std::shared_ptr<hcomm::CcuKernelArg> kernelArg;
+    // kernel名 string？
+    char kernelFuncName[64];
+    // kernel函数
+    void* kernelFunc;
+    // KernelArg实例指针
+    void *kernelArg;
     // kernel所需channel
     std::vector<HcclChannelDesc> channels;
+
+private:
+    std::shared_ptr<CcuKernelArgBase> kernelArgSmartPtr;
+
+public:
+    template<typename T>
+    void setKernelArg(std::shared_ptr<T> arg) {
+        kernelArgSmartPtr = std::static_pointer_cast<CcuKernelArgBase>(arg);
+        kernelArg = static_cast<void*>(arg.get());
+    }
 };
 
 // 算法taskArg入参最大个数，用于快速下发缓存
@@ -297,6 +340,7 @@ struct CcuKernelSubmitInfo {
 // ccu快速下发上下文
 struct CcuFastLaunchCtx {
     char algName[OP_ALG_LENGTH];
+    u32 notifyNumOnMainThread = 0;
     u32 threadNum;
     u32 ccuKernelNum[MAX_TEMP_NUM_IN_ALGO]; // 每次调用template的KernelRun下发的kernel数量
     // 紧接ThreadHandle数组
@@ -324,6 +368,7 @@ struct CcuFastLaunchCtx {
 
 // A5用了cntNotify
 struct AlgResourceRequest {
+    double dieSplitRatio = 0.0;
     u32 notifyNumOnMainThread = 0;
     u32 slaveThreadNum = 0;
     std::vector<u32> notifyNumPerThread;
@@ -407,6 +452,10 @@ struct AlgResourceCtxSerializable {
     std::vector<CcuKernelHandle> ccuKernels;
     u32 topoInfoSeqSize = 0;
     TopoInfoWithNetLayerDetails topoInfo; // 提取的拓扑信息
+    std::vector<uint64_t> kfcServerArgs;   // kfc server算子入参
+    u32 kfcServerArgSize = 0;             // kfc server算子入参个数
+
+    double dieSplitRatio = 0.0;
 
     std::vector<char> Serialize()
     {
@@ -432,6 +481,9 @@ struct AlgResourceCtxSerializable {
 
         binaryStream << ccuKernelNum;
         binaryStream << ccuKernels;
+        binaryStream << kfcServerArgs;
+        binaryStream << kfcServerArgSize;
+        binaryStream << dieSplitRatio;
         std::vector<char> seq = topoInfo.Serialize();
         topoInfoSeqSize = seq.size();
         binaryStream << topoInfoSeqSize;
@@ -442,7 +494,7 @@ struct AlgResourceCtxSerializable {
         return result;
     }
 
-    void DeSerialize(std::vector<char>& data)
+    void DeSerialize(std::vector<char> &data)
     {
         BinaryStream binaryStream(data);
 
@@ -466,6 +518,9 @@ struct AlgResourceCtxSerializable {
 
         binaryStream >> ccuKernelNum;
         binaryStream >> ccuKernels;
+        binaryStream >> kfcServerArgs;
+        binaryStream >> kfcServerArgSize;
+        binaryStream >> dieSplitRatio;
         binaryStream >> topoInfoSeqSize;
         size_t startPos = data.size() - topoInfoSeqSize;
         std::vector<char> tailData(data.begin() + startPos, data.end());
@@ -566,6 +621,8 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     DevAicpuOpConfig opConfig; // 收编算子配置类变量
     u64 varMemSize{0};
     u8 varData[0];
+    u64 ccuKfcArgs[4];          // 测试，ccu-kfc作为通信算子
+    bool isKfc = false;         // 标记是否使用KFC Server kernel
 };
 
 struct AlgDesc {
@@ -607,6 +664,19 @@ struct HcomProInfo {
 // 图模式编译阶段资源计算入参
 struct OpParamGraphMode {
     char opType[64]; // 算子类型
+    u64 dataCount;
+    u32 rankSize;
+    u64 hcclBufferSize;
+    // Aiv参数
+    s64 comm;
+    char group[MAX_LENGTH];
+    u64 count = 0;
+    void* counts = nullptr;
+    HcclDataType dataType = HCCL_DATA_TYPE_RESERVED;
+    HcclReduceOp op = HcclReduceOp::HCCL_REDUCE_RESERVED;
+    HcclCMDType opTypeAiv = HcclCMDType::HCCL_CMD_INVALID;
+    u32 aivCoreLimit = 0;
+    bool ifAiv = false;
 };
 
 // 图模式编译阶段申请资源
@@ -625,5 +695,33 @@ struct ResPackGraphMode {
     u64 scratchMemSize;
 };
 
-} // namespace mc2_ops_hccl
+// 图模式内存注册信息
+struct MemRegInfo {
+    char inputBuffTag[MAX_MEM_TAG_LENGTH];    // 输入缓冲区标签
+    char outputBuffTag[MAX_MEM_TAG_LENGTH];   // 输出缓冲区标签
+    std::vector<HcclMemHandle> memHandles;    // 内存句柄列表
+};
+
+// AIV模式参数存储结构
+struct AivParamStorage {
+    u32 aivCoreLimit = 0;
+    bool aivClearEnable = false;
+};
+
+// 算子参数一致性校验信息
+struct OpExchangeInfo {
+    uint64_t cclBufferSize{0};
+    u32 root = INVALID_VALUE_RANKID;
+    HcclCMDType opType = HcclCMDType::HCCL_CMD_INVALID;
+    CommEngine engine = CommEngine::COMM_ENGINE_RESERVED;
+    OpExecuteConfig opExecuteConfig = OpExecuteConfig::DEFAULT;
+    HcclReduceOp reduceType = HcclReduceOp::HCCL_REDUCE_RESERVED;
+    HcclDataType dataType = HcclDataType::HCCL_DATA_TYPE_RESERVED;
+    u64 count{0};
+    u32 aivCoreLimit = MAX_NUM_BLOCKS;
+    char group[MAX_LENGTH] = {0};
+    char tag[TAG_LENGTH] = {0};
+};
+
+} 
 #endif

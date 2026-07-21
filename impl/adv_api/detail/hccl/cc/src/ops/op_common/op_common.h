@@ -67,7 +67,7 @@ HcclResult GetGraphModeBuffers(
     HcclComm comm, ChannelHandle channelHandle, const char* inputBuffTag, const char* outputBuffTag,
     ChannelInfo& channel);
 HcclResult HcclGetCcuKernel(
-    HcclComm comm, AlgResourceRequest& resRequest, std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost);
+    HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest, std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost);
 
 HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest);
 
@@ -106,7 +106,7 @@ HcclResult HcclMemcpyCtxHostToDevice(
     HcclComm comm, const OpParam& param, std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, void** resCtxSequence,
     uint64_t& ctxSize);
 
-HcclResult SingleRankProc(const OpParam& param);
+HcclResult SingleRankProc(HcclComm comm, OpParam &param);
 
 HcclResult HcclCheckTag(const char* tag);
 
@@ -157,6 +157,13 @@ HcclResult HcclGetRemoteBuff(
 
 HcclResult LogHcclExit(const std::string& opName, const char* tag, HcclUs startut);
 
-} // namespace mc2_ops_hccl
+HcclResult CheckHostDPUOnly(const HcclComm comm, const TopoInfoWithNetLayerDetails* topoInfo, bool &hostDPUOnly);
+
+HcclResult CheckReduceOp(const HcclDataType dataType, const HcclReduceOp op);
+
+std::string GetReduceProdSupportDataType();
+
+HcclResult HcclAivCacheCheckAndReplay(HcclComm comm, OpParam &param, bool &cacheHit);
+}  // namespace mc2_ops_hccl
 
 #endif
