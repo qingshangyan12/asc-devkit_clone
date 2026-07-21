@@ -1151,133 +1151,647 @@ typename std::enable_if_t<
     }
 }
 
+/* ***************************************************************************************
+ * ************************************** CompareScalar Both Tensor****************************************
+ * ************************************************************************************** */
+// CompareScalar::Level 0 - bit mode / continuous mode
+
+template <typename T, typename U, CMPMODE cmpMode, uint8_t scalarIdx, Reg::LoadDist pattern>
+__simd_vf__ inline void CompareScalarBothTensorLevel2(
+    __ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, const uint32_t calCount)
+{
+    constexpr uint32_t repeatElm = GetVecLen() / sizeof(T);
+    uint16_t repeatTime = CeilDivision(calCount, repeatElm);
+    uint32_t sreg = static_cast<uint32_t>(calCount);
+    Reg::MaskReg dstReg, maskReg;
+    Reg::UnalignReg uReg;
+    Reg::RegTensor<T> src0Reg, src1Reg;
+    constexpr uint32_t offset = GetVecLen() / sizeof(T) / CmpSelInternal::maskBitToByte;
+    if constexpr (scalarIdx == 0) {
+        Reg::LoadAlign<T, pattern>(src0Reg, src0);
+    } else {
+        Reg::LoadAlign<T, pattern>(src1Reg, src1);
+    }
+    for (uint16_t i = 0; i < repeatTime; ++i) {
+        maskReg = Reg::UpdateMask<T>(sreg);
+        if constexpr (scalarIdx == 0) {
+            Reg::LoadAlign(src1Reg, src1 + i * repeatElm);
+        } else {
+            Reg::LoadAlign(src0Reg, src0 + i * repeatElm);
+        }
+        Reg::Compare<T, cmpMode>(dstReg, src0Reg, src1Reg, maskReg);
+        if constexpr (sizeof(T) == 1) {
+            Reg::StoreAlign(dst + i * offset, dstReg);
+        } else {
+            Reg::StoreUnAlign((__ubuf__ T*&)dst, dstReg, uReg);
+        }
+    }
+    if constexpr (sizeof(T) > 1) {
+        Reg::StoreUnAlignPost<U, Reg::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+    }
+}
+
+template <typename T, typename U, bool isSetMask = true, uint8_t scalarIdx = 1, Reg::LoadDist pattern>
+__aicore__ inline void VcmpvsImpl(
+    __ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode, const uint32_t calCount)
+{
+    switch (cmpMode) {
+        case CMPMODE::LT: {
+            CompareScalarBothTensorLevel2<T, U, CMPMODE::LT, scalarIdx, pattern>(dst, src0, src1, calCount);
+            break;
+        }
+        case CMPMODE::GT: {
+            CompareScalarBothTensorLevel2<T, U, CMPMODE::GT, scalarIdx, pattern>(dst, src0, src1, calCount);
+            break;
+        }
+        case CMPMODE::EQ: {
+            CompareScalarBothTensorLevel2<T, U, CMPMODE::EQ, scalarIdx, pattern>(dst, src0, src1, calCount);
+            break;
+        }
+        case CMPMODE::LE: {
+            CompareScalarBothTensorLevel2<T, U, CMPMODE::LE, scalarIdx, pattern>(dst, src0, src1, calCount);
+            break;
+        }
+        case CMPMODE::GE: {
+            CompareScalarBothTensorLevel2<T, U, CMPMODE::GE, scalarIdx, pattern>(dst, src0, src1, calCount);
+            break;
+        }
+        case CMPMODE::NE: {
+            CompareScalarBothTensorLevel2<T, U, CMPMODE::NE, scalarIdx, pattern>(dst, src0, src1, calCount);
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+template <typename T, typename U, bool isSetMask = true, uint8_t scalarIdx = 1>
+__aicore__ inline void VcmpvsImpl(
+    __ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode, const uint32_t calCount)
+{
+    static_assert(
+        SupportType<
+            T, uint8_t, int8_t, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
+        "current data type is not supported!");
+    static_assert(SupportType<U, uint8_t>(), "current data type is not supported!");
+
+    if constexpr (sizeof(T) == 1) {
+        VcmpvsImpl<T, U, isSetMask, scalarIdx, Reg::LoadDist::DIST_BRC_B8>(dst, src0, src1, cmpMode, calCount);
+    } else if constexpr (sizeof(T) == 2) {
+        VcmpvsImpl<T, U, isSetMask, scalarIdx, Reg::LoadDist::DIST_BRC_B16>(dst, src0, src1, cmpMode, calCount);
+    } else if constexpr (sizeof(T) == 4) {
+        VcmpvsImpl<T, U, isSetMask, scalarIdx, Reg::LoadDist::DIST_BRC_B32>(dst, src0, src1, cmpMode, calCount);
+    }
+}
+
+// CompareScalar::Level 2 - counter mode
+
+template <typename T, typename U, CMPMODE cmpMode>
+__simd_vf__ inline void CompareSrc0ScalarLevel2(
+    __ubuf__ U* dst, const T src0, __ubuf__ T* src1, const uint32_t calCount)
+{
+    uint32_t repeatElm = GetVecLen() / sizeof(T);
+    uint16_t repeatTime = CeilDivision(calCount, repeatElm);
+    uint32_t sreg = static_cast<uint32_t>(calCount);
+    Reg::MaskReg dstReg, maskReg;
+    Reg::UnalignReg uReg;
+    Reg::RegTensor<T> src0Reg, src1Reg;
+    constexpr uint32_t offset = GetVecLen() / sizeof(T) / CmpSelInternal::maskBitToByte;
+    Reg::Duplicate(src0Reg, src0);
+    for (uint16_t i = 0; i < repeatTime; ++i) {
+        maskReg = Reg::UpdateMask<T>(sreg);
+        Reg::LoadAlign(src1Reg, src1 + i * repeatElm);
+        Reg::Compare<T, cmpMode>(dstReg, src0Reg, src1Reg, maskReg);
+        if constexpr (sizeof(T) == 1) {
+            Reg::StoreAlign(dst + i * offset, dstReg);
+        } else {
+            Reg::StoreUnAlign((__ubuf__ T*&)dst, dstReg, uReg);
+        }
+    }
+    if constexpr (sizeof(T) > 1) {
+        Reg::StoreUnAlignPost<U, Reg::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+    }
+}
+
+template <typename T, typename U, bool isSetMask = true>
+__aicore__ inline void VcmpvsImpl(
+    __ubuf__ U* dst, const T src0, __ubuf__ T* src1, CMPMODE cmpMode, const uint32_t calCount)
+{
+    static_assert(
+        SupportType<
+            T, uint8_t, int8_t, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
+        "current data type is not supported!");
+    static_assert(SupportType<U, uint8_t>(), "current data type is not supported!");
+    switch (cmpMode) {
+        case CMPMODE::LT: {
+            CompareSrc0ScalarLevel2<T, U, CMPMODE::LT>(dst, src0, src1, calCount);
+            break;
+        }
+        case CMPMODE::GT: {
+            CompareSrc0ScalarLevel2<T, U, CMPMODE::GT>(dst, src0, src1, calCount);
+            break;
+        }
+        case CMPMODE::EQ: {
+            CompareSrc0ScalarLevel2<T, U, CMPMODE::EQ>(dst, src0, src1, calCount);
+            break;
+        }
+        case CMPMODE::LE: {
+            CompareSrc0ScalarLevel2<T, U, CMPMODE::LE>(dst, src0, src1, calCount);
+            break;
+        }
+        case CMPMODE::GE: {
+            CompareSrc0ScalarLevel2<T, U, CMPMODE::GE>(dst, src0, src1, calCount);
+            break;
+        }
+        case CMPMODE::NE: {
+            CompareSrc0ScalarLevel2<T, U, CMPMODE::NE>(dst, src0, src1, calCount);
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+// CompareScalar::Level 2 - counter mode
+template <typename T, typename U, CMPMODE cmpMode>
+__simd_vf__ inline void CompareScalarLevel2(__ubuf__ U* dst, __ubuf__ T* src0, const T src1, const uint32_t calCount)
+{
+    Reg::MaskReg dstReg, maskReg;
+    Reg::UnalignReg uReg;
+    uint32_t repeatElm = GetVecLen() / sizeof(T);
+    uint16_t repeatTime = CeilDivision(calCount, repeatElm);
+    uint32_t sreg = static_cast<uint32_t>(calCount);
+    Reg::RegTensor<T> src0Reg;
+    constexpr uint32_t offset = GetVecLen() / sizeof(T) / CmpSelInternal::maskBitToByte;
+    for (uint16_t i = 0; i < repeatTime; ++i) {
+        maskReg = Reg::UpdateMask<T>(sreg);
+        Reg::LoadAlign(src0Reg, src0 + i * repeatElm);
+        Reg::CompareScalar<T, cmpMode>(dstReg, src0Reg, src1, maskReg);
+        if constexpr (sizeof(T) == 1) {
+            Reg::StoreAlign(dst + i * offset, dstReg);
+        } else {
+            Reg::StoreUnAlign((__ubuf__ T*&)dst, dstReg, uReg);
+        }
+    }
+    if constexpr (sizeof(T) > 1) {
+        Reg::StoreUnAlignPost<U, Reg::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+    }
+    
+}
+
+template <
+    typename T, typename U, CMPMODE cmpMode, bool isBitMapMode, uint8_t scalarIdx, Reg::LoadDist pattern,
+    bool isSetMask>
+__simd_vf__ inline void CompareScalarBothTensorLevel0CounterMode(
+    __ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, const uint64_t mask, __ubuf__ uint64_t* tempBuf,
+    const UnaryRepeatParams repeatParams)
+{
+    Reg::MaskReg maskReg;
+    uint32_t countSreg = static_cast<uint32_t>(mask);
+    if constexpr (!isSetMask) {
+        maskReg = Reg::MoveMask<uint16_t>();
+        Reg::StoreAlign<uint64_t, Reg::MaskDist::DIST_PACK>(tempBuf, maskReg);
+        Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::SCALAR_LOAD>();
+        countSreg = static_cast<uint32_t>(tempBuf[0]);
+    }
+    constexpr uint16_t oneRepSize = GetVecLen() / sizeof(T);
+    uint16_t newRepeatTimes = CeilDivision(countSreg, oneRepSize);
+    Reg::RegTensor<T> src0Reg, src1Reg;
+    Reg::MaskReg dstReg;
+    Reg::UnalignReg uReg;
+    if constexpr (scalarIdx == 0) {
+        Reg::LoadAlign<T, pattern>(src0Reg, src0);
+    } else {
+        Reg::LoadAlign<T, pattern>(src1Reg, src1);
+    }
+    for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
+        maskReg = Reg::UpdateMask<T>(countSreg);
+        if constexpr (scalarIdx == 0) {
+            Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
+                src1Reg, src1, static_cast<uint32_t>(repeatParams.srcBlkStride),
+                static_cast<uint32_t>(repeatParams.srcRepStride), maskReg);
+        } else {
+            Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
+                src0Reg, src0, static_cast<uint32_t>(repeatParams.srcBlkStride),
+                static_cast<uint32_t>(repeatParams.srcRepStride), maskReg);
+        }
+        Reg::Compare<T, cmpMode>(dstReg, src0Reg, src1Reg, maskReg);
+        Reg::StoreUnAlign((__ubuf__ T*&)dst, dstReg, uReg);
+    }
+    Reg::StoreUnAlignPost<U, Reg::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+}
+
+template <
+    typename T, typename U, CMPMODE cmpMode, bool isBitMapMode, uint8_t scalarIdx, Reg::LoadDist pattern,
+    bool isSetMask>
+__simd_vf__ inline void CompareScalarBothTensorLevel0NormalMode(
+    __ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, const uint64_t mask, uint8_t repeatTime,
+    const UnaryRepeatParams repeatParams)
+{
+    Reg::MaskReg maskReg;
+    Reg::RegTensor<T> src0Reg, src1Reg;
+    Reg::MaskReg dstReg;
+    Reg::UnalignReg uReg;
+    if constexpr (isBitMapMode) {
+        maskReg = Reg::MoveMask<T>();
+    } else {
+        if constexpr (isSetMask) {
+            uint32_t sreg = static_cast<uint32_t>(mask);
+            maskReg = Reg::UpdateMask<T>(sreg);
+        } else {
+            maskReg = Reg::MoveMask<T>();
+        }
+    }
+    if constexpr (scalarIdx == 0) {
+        Reg::LoadAlign<T, pattern>(src0Reg, src0);
+    } else {
+        Reg::LoadAlign<T, pattern>(src1Reg, src1);
+    }
+    for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
+        if constexpr (scalarIdx == 0) {
+            Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
+                src1Reg, src1, static_cast<uint32_t>(repeatParams.srcBlkStride),
+                static_cast<uint32_t>(repeatParams.srcRepStride), maskReg);
+        } else {
+            Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
+                src0Reg, src0, static_cast<uint32_t>(repeatParams.srcBlkStride),
+                static_cast<uint32_t>(repeatParams.srcRepStride), maskReg);
+        }
+        Reg::Compare<T, cmpMode>(dstReg, src0Reg, src1Reg, maskReg);
+        Reg::StoreUnAlign((__ubuf__ T*&)dst, dstReg, uReg);
+    }
+    Reg::StoreUnAlignPost<U, Reg::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+}
+
+template <typename T, typename U, bool isSetMask = true, bool isBitMapMode, uint8_t scalarIdx, Reg::LoadDist pattern>
+__aicore__ inline void VcmpvsImpl(
+    __ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    bool isCounterMode = Internal::IsCounterMode();
+    if (isCounterMode) {
+        __ubuf__ uint64_t* tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(GetRuntimeUBSize(), 2);
+        switch (cmpMode) {
+            case CMPMODE::LT: {
+                CompareScalarBothTensorLevel0CounterMode<
+                    T, U, CMPMODE::LT, isBitMapMode, scalarIdx, pattern, isSetMask>(
+                    dst, src0, src1, mask, tempBuf, repeatParams);
+                break;
+            }
+            case CMPMODE::GT: {
+                CompareScalarBothTensorLevel0CounterMode<
+                    T, U, CMPMODE::GT, isBitMapMode, scalarIdx, pattern, isSetMask>(
+                    dst, src0, src1, mask, tempBuf, repeatParams);
+                break;
+            }
+            case CMPMODE::EQ: {
+                CompareScalarBothTensorLevel0CounterMode<
+                    T, U, CMPMODE::EQ, isBitMapMode, scalarIdx, pattern, isSetMask>(
+                    dst, src0, src1, mask, tempBuf, repeatParams);
+                break;
+            }
+            case CMPMODE::LE: {
+                CompareScalarBothTensorLevel0CounterMode<
+                    T, U, CMPMODE::LE, isBitMapMode, scalarIdx, pattern, isSetMask>(
+                    dst, src0, src1, mask, tempBuf, repeatParams);
+                break;
+            }
+            case CMPMODE::GE: {
+                CompareScalarBothTensorLevel0CounterMode<
+                    T, U, CMPMODE::GE, isBitMapMode, scalarIdx, pattern, isSetMask>(
+                    dst, src0, src1, mask, tempBuf, repeatParams);
+                break;
+            }
+            case CMPMODE::NE: {
+                CompareScalarBothTensorLevel0CounterMode<
+                    T, U, CMPMODE::NE, isBitMapMode, scalarIdx, pattern, isSetMask>(
+                    dst, src0, src1, mask, tempBuf, repeatParams);
+                break;
+            }
+            default:
+                break;
+        }
+        AscendCUtils::FreeTemporaryBuffer<uint64_t>(tempBuf);
+    } else {
+        switch (cmpMode) {
+            case CMPMODE::LT: {
+                CompareScalarBothTensorLevel0NormalMode<T, U, CMPMODE::LT, isBitMapMode, scalarIdx, pattern, isSetMask>(
+                    dst, src0, src1, mask, repeatTime, repeatParams);
+                break;
+            }
+            case CMPMODE::GT: {
+                CompareScalarBothTensorLevel0NormalMode<T, U, CMPMODE::GT, isBitMapMode, scalarIdx, pattern, isSetMask>(
+                    dst, src0, src1, mask, repeatTime, repeatParams);
+                break;
+            }
+            case CMPMODE::EQ: {
+                CompareScalarBothTensorLevel0NormalMode<T, U, CMPMODE::EQ, isBitMapMode, scalarIdx, pattern, isSetMask>(
+                    dst, src0, src1, mask, repeatTime, repeatParams);
+                break;
+            }
+            case CMPMODE::LE: {
+                CompareScalarBothTensorLevel0NormalMode<T, U, CMPMODE::LE, isBitMapMode, scalarIdx, pattern, isSetMask>(
+                    dst, src0, src1, mask, repeatTime, repeatParams);
+                break;
+            }
+            case CMPMODE::GE: {
+                CompareScalarBothTensorLevel0NormalMode<T, U, CMPMODE::GE, isBitMapMode, scalarIdx, pattern, isSetMask>(
+                    dst, src0, src1, mask, repeatTime, repeatParams);
+                break;
+            }
+            case CMPMODE::NE: {
+                CompareScalarBothTensorLevel0NormalMode<T, U, CMPMODE::NE, isBitMapMode, scalarIdx, pattern, isSetMask>(
+                    dst, src0, src1, mask, repeatTime, repeatParams);
+                break;
+            }
+            default:
+                break;
+        }
+    }
+}
+
+template <typename T, typename U, bool isSetMask = true, uint8_t scalarIdx = 1>
+__aicore__ inline void VcmpvsImpl(
+    __ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode, const uint64_t mask[], uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    static_assert(
+        SupportType<T, uint8_t, int8_t, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
+        "current data type is not supported!");
+    static_assert(SupportType<U, uint8_t>(), "current data type is not supported!");
+    bool isCounterMode = Internal::IsCounterMode();
+    if (isSetMask) {
+        SetVectorMask<T>(mask[1], mask[0]);
+    }
+    if constexpr (sizeof(T) == 2) {
+        VcmpvsImpl<T, U, isSetMask, true, scalarIdx, Reg::LoadDist::DIST_BRC_B16>(
+            dst, src0, src1, cmpMode, mask[0], repeatTime, repeatParams);
+    } else if constexpr (sizeof(T) == 4) {
+        VcmpvsImpl<T, U, isSetMask, true, scalarIdx, Reg::LoadDist::DIST_BRC_B32>(
+            dst, src0, src1, cmpMode, mask[0], repeatTime, repeatParams);
+    }
+}
+
+template <typename T, typename U, bool isSetMask = true, uint8_t scalarIdx = 1>
+__aicore__ inline void VcmpvsImpl(
+    __ubuf__ U* dst, __ubuf__ T* src0, __ubuf__ T* src1, CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    static_assert(
+        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
+        "current data type is not supported!");
+    static_assert(SupportType<U, uint8_t>(), "current data type is not supported!");
+    if constexpr (sizeof(T) == 2) {
+        VcmpvsImpl<T, U, isSetMask, false, scalarIdx, Reg::LoadDist::DIST_BRC_B16>(
+            dst, src0, src1, cmpMode, mask, repeatTime, repeatParams);
+    } else if constexpr (sizeof(T) == 4) {
+        VcmpvsImpl<T, U, isSetMask, false, scalarIdx, Reg::LoadDist::DIST_BRC_B32>(
+            dst, src0, src1, cmpMode, mask, repeatTime, repeatParams);
+    }
+}
+
+
+/* ***************************************************************************************
+ * ************************************** CompareScalar src0 scalar****************************************
+ * ************************************************************************************** */
+// CompareScalar::Level 0 - bit mode / continuous mode
+template <typename T, typename U, CMPMODE cmpMode, bool isSetMask>
+__simd_vf__ inline void CompareSrc0ScalarLevel0CounterMode(
+    __ubuf__ U* dst, const T src0, __ubuf__ T* src1, const uint64_t mask, __ubuf__ uint64_t* tempBuf,
+    const UnaryRepeatParams repeatParams)
+{
+    Reg::MaskReg maskReg;
+    uint32_t sreg = static_cast<uint32_t>(mask);
+    constexpr uint16_t oneRepSize = GetVecLen() / sizeof(T);
+    Reg::RegTensor<T> src0Reg, src1Reg;
+    Reg::MaskReg dstReg;
+    Reg::UnalignReg uReg;
+    Reg::Duplicate(src0Reg, src0);
+    if constexpr (!isSetMask) {
+        maskReg = Reg::MoveMask<uint16_t>();
+        Reg::StoreAlign<uint64_t, Reg::MaskDist::DIST_PACK>(tempBuf, maskReg);
+        Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::SCALAR_LOAD>();
+        sreg = static_cast<uint32_t>(tempBuf[0]);
+    }
+    uint16_t newRepeatTimes = CeilDivision(sreg, oneRepSize);
+    for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
+        maskReg = Reg::UpdateMask<T>(sreg);
+        Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
+            src1Reg, src1, static_cast<uint32_t>(repeatParams.srcBlkStride),
+            static_cast<uint32_t>(repeatParams.srcRepStride), maskReg);
+        Reg::Compare<T, cmpMode>(dstReg, src0Reg, src1Reg, maskReg);
+        Reg::StoreUnAlign((__ubuf__ T*&)dst, dstReg, uReg);
+    }
+    Reg::StoreUnAlignPost<U, Reg::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+}
+
+template <typename T, typename U, CMPMODE cmpMode, bool isBitMapMode, bool isSetMask>
+__simd_vf__ inline void CompareSrc0ScalarLevel0NormalMode(
+    __ubuf__ U* dst, const T src0, __ubuf__ T* src1, const uint64_t mask, uint8_t repeatTime,
+    const UnaryRepeatParams repeatParams)
+{
+    Reg::MaskReg maskReg;
+    Reg::RegTensor<T> src0Reg, src1Reg;
+    Reg::MaskReg dstReg;
+    Reg::UnalignReg uReg;
+    if constexpr (isBitMapMode) {
+        maskReg = Reg::MoveMask<T>();
+    } else {
+        if constexpr (isSetMask) {
+            uint32_t sreg = static_cast<uint32_t>(mask);
+            maskReg = Reg::UpdateMask<T>(sreg);
+        } else {
+            maskReg = Reg::MoveMask<T>();
+        }
+    }
+    Reg::Duplicate(src0Reg, src0);
+    for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
+        Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY, Reg::PostLiteral::POST_MODE_UPDATE>(
+            src1Reg, src1, static_cast<uint32_t>(repeatParams.srcBlkStride),
+            static_cast<uint32_t>(repeatParams.srcRepStride), maskReg);
+        Reg::Compare<T, cmpMode>(dstReg, src0Reg, src1Reg, maskReg);
+        Reg::StoreUnAlign((__ubuf__ T*&)dst, dstReg, uReg);
+    }
+    Reg::StoreUnAlignPost<U, Reg::PostLiteral::POST_MODE_NORMAL>(dst, uReg, 0);
+}
+
+template <typename T, typename U, bool isSetMask = true>
+__aicore__ inline void VcmpvsImpl(
+    __ubuf__ U* dst, const T src0, __ubuf__ T* src1, CMPMODE cmpMode, const uint64_t mask[], uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    static_assert(
+        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
+        "current data type is not supported!");
+    static_assert(SupportType<U, uint8_t>(), "current data type is not supported!");
+    bool isCounterMode = Internal::IsCounterMode();
+    if (isCounterMode) {
+        __ubuf__ uint64_t* tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(GetRuntimeUBSize(), 2);
+        switch (cmpMode) {
+            case CMPMODE::LT: {
+                CompareSrc0ScalarLevel0CounterMode<T, U, CMPMODE::LT, isSetMask>(
+                    dst, src0, src1, mask[0], tempBuf, repeatParams);
+                break;
+            }
+            case CMPMODE::GT: {
+                CompareSrc0ScalarLevel0CounterMode<T, U, CMPMODE::GT, isSetMask>(
+                    dst, src0, src1, mask[0], tempBuf, repeatParams);
+                break;
+            }
+            case CMPMODE::EQ: {
+                CompareSrc0ScalarLevel0CounterMode<T, U, CMPMODE::EQ, isSetMask>(
+                    dst, src0, src1, mask[0], tempBuf, repeatParams);
+                break;
+            }
+            case CMPMODE::LE: {
+                CompareSrc0ScalarLevel0CounterMode<T, U, CMPMODE::LE, isSetMask>(
+                    dst, src0, src1, mask[0], tempBuf, repeatParams);
+                break;
+            }
+            case CMPMODE::GE: {
+                CompareSrc0ScalarLevel0CounterMode<T, U, CMPMODE::GE, isSetMask>(
+                    dst, src0, src1, mask[0], tempBuf, repeatParams);
+                break;
+            }
+            case CMPMODE::NE: {
+                CompareSrc0ScalarLevel0CounterMode<T, U, CMPMODE::NE, isSetMask>(
+                    dst, src0, src1, mask[0], tempBuf, repeatParams);
+                break;
+            }
+            default:
+                break;
+        }
+        AscendCUtils::FreeTemporaryBuffer<uint64_t>(tempBuf);
+    } else {
+        if constexpr (isSetMask) {
+            SetVectorMask<T>(mask[1], mask[0]);
+        }
+        switch (cmpMode) {
+            case CMPMODE::LT: {
+                CompareSrc0ScalarLevel0NormalMode<T, U, CMPMODE::LT, true, isSetMask>(
+                    dst, src0, src1, 0, repeatTime, repeatParams);
+                break;
+            }
+            case CMPMODE::GT: {
+                CompareSrc0ScalarLevel0NormalMode<T, U, CMPMODE::GT, true, isSetMask>(
+                    dst, src0, src1, 0, repeatTime, repeatParams);
+                break;
+            }
+            case CMPMODE::EQ: {
+                CompareSrc0ScalarLevel0NormalMode<T, U, CMPMODE::EQ, true, isSetMask>(
+                    dst, src0, src1, 0, repeatTime, repeatParams);
+                break;
+            }
+            case CMPMODE::LE: {
+                CompareSrc0ScalarLevel0NormalMode<T, U, CMPMODE::LE, true, isSetMask>(
+                    dst, src0, src1, 0, repeatTime, repeatParams);
+                break;
+            }
+            case CMPMODE::GE: {
+                CompareSrc0ScalarLevel0NormalMode<T, U, CMPMODE::GE, true, isSetMask>(
+                    dst, src0, src1, 0, repeatTime, repeatParams);
+                break;
+            }
+            case CMPMODE::NE: {
+                CompareSrc0ScalarLevel0NormalMode<T, U, CMPMODE::NE, true, isSetMask>(
+                    dst, src0, src1, 0, repeatTime, repeatParams);
+                break;
+            }
+            default:
+                break;
+        }
+    }
+}
+
+template <typename T, typename U, bool isSetMask = true>
+__aicore__ inline void VcmpvsImpl(
+    __ubuf__ U* dst, const T src0, __ubuf__ T* src1, CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime,
+    const UnaryRepeatParams& repeatParams)
+{
+    static_assert(
+        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
+        "current data type is not supported!");
+    static_assert(SupportType<U, uint8_t>(), "current data type is not supported!");
+    bool isCounterMode = Internal::IsCounterMode();
+    if (isCounterMode) {
+        __ubuf__ uint64_t* tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(GetRuntimeUBSize(), 2);
+        switch (cmpMode) {
+            case CMPMODE::LT: {
+                CompareSrc0ScalarLevel0CounterMode<T, U, CMPMODE::LT, isSetMask>(
+                    dst, src0, src1, mask, tempBuf, repeatParams);
+                break;
+            }
+            case CMPMODE::GT: {
+                CompareSrc0ScalarLevel0CounterMode<T, U, CMPMODE::GT, isSetMask>(
+                    dst, src0, src1, mask, tempBuf, repeatParams);
+                break;
+            }
+            case CMPMODE::EQ: {
+                CompareSrc0ScalarLevel0CounterMode<T, U, CMPMODE::EQ, isSetMask>(
+                    dst, src0, src1, mask, tempBuf, repeatParams);
+                break;
+            }
+            case CMPMODE::LE: {
+                CompareSrc0ScalarLevel0CounterMode<T, U, CMPMODE::LE, isSetMask>(
+                    dst, src0, src1, mask, tempBuf, repeatParams);
+                break;
+            }
+            case CMPMODE::GE: {
+                CompareSrc0ScalarLevel0CounterMode<T, U, CMPMODE::GE, isSetMask>(
+                    dst, src0, src1, mask, tempBuf, repeatParams);
+                break;
+            }
+            case CMPMODE::NE: {
+                CompareSrc0ScalarLevel0CounterMode<T, U, CMPMODE::NE, isSetMask>(
+                    dst, src0, src1, mask, tempBuf, repeatParams);
+                break;
+            }
+            default:
+                break;
+        }
+        AscendCUtils::FreeTemporaryBuffer<uint64_t>(tempBuf);
+    } else {
+        switch (cmpMode) {
+            case CMPMODE::LT: {
+                CompareSrc0ScalarLevel0NormalMode<T, U, CMPMODE::LT, false, isSetMask>(
+                    dst, src0, src1, mask, repeatTime, repeatParams);
+                break;
+            }
+            case CMPMODE::GT: {
+                CompareSrc0ScalarLevel0NormalMode<T, U, CMPMODE::GT, false, isSetMask>(
+                    dst, src0, src1, mask, repeatTime, repeatParams);
+                break;
+            }
+            case CMPMODE::EQ: {
+                CompareSrc0ScalarLevel0NormalMode<T, U, CMPMODE::EQ, false, isSetMask>(
+                    dst, src0, src1, mask, repeatTime, repeatParams);
+                break;
+            }
+            case CMPMODE::LE: {
+                CompareSrc0ScalarLevel0NormalMode<T, U, CMPMODE::LE, false, isSetMask>(
+                    dst, src0, src1, mask, repeatTime, repeatParams);
+                break;
+            }
+            case CMPMODE::GE: {
+                CompareSrc0ScalarLevel0NormalMode<T, U, CMPMODE::GE, false, isSetMask>(
+                    dst, src0, src1, mask, repeatTime, repeatParams);
+                break;
+            }
+            case CMPMODE::NE: {
+                CompareSrc0ScalarLevel0NormalMode<T, U, CMPMODE::NE, false, isSetMask>(
+                    dst, src0, src1, mask, repeatTime, repeatParams);
+                break;
+            }
+            default:
+                break;
+        }
+    }
+}
+
+
 // /* ***************************************************************************************
 //  * *************************************** Select ****************************************
 //  * ************************************************************************************** */
-// Level 2, select mode: 1
-template <typename T, typename U>
-typename std::enable_if_t<
-    !std::is_same<T, uint8_t>::value && !std::is_same<T, int8_t>::value && !std::is_same<T, uint16_t>::value &&
-    !std::is_same<T, int16_t>::value && !std::is_same<T, half>::value && !std::is_same<T, uint32_t>::value &&
-    !std::is_same<T, int32_t>::value &&
-    !std::is_same<T, float>::
-        value> __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, T src1, SELMODE selMode, uint32_t calCount)
-{
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "current data type is not supported!"); });
-}
-
-template <typename T, typename U>
-typename std::enable_if_t<std::is_same<T, uint8_t>::value || std::is_same<T, int8_t>::value> __aicore__ inline VselImpl(
-    __ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, T src1, SELMODE selMode, uint32_t calCount)
-{
-    __VEC_SCOPE__
-    {
-        RegTensor<T> vSrc0, vSrc1;
-        RegTensor<T> vDst;
-        Duplicate(vSrc1, src1);
-        uint32_t sreg = (uint32_t)calCount;
-        uint32_t sregLower = (uint32_t)(VECTOR_REG_WIDTH / sizeof(T));
-        uint16_t repeatTimes = CeilDivision(calCount, sregLower);
-        uint32_t selMaskOffset = sregLower / ONE_BYTE_BIT_SIZE;
-        for (uint16_t i = 0; i < repeatTimes; ++i) {
-            MaskReg preg;
-            DataCopy<uint32_t, Dist::DIST_NORM>(preg, ((__ubuf__ uint32_t*)sel), i * selMaskOffset);
-            MaskReg dstReg = CreatePredicate<T>(sreg);
-            DataCopy(vSrc0, src0, i * sregLower);
-            Select<T>(vDst, vSrc0, vSrc1, preg);
-            DataCopy(dst, vDst, i * sregLower, dstReg);
-        }
-    }
-}
-
-template <typename T, typename U>
-typename std::enable_if_t<
-    std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value ||
-    std::is_same<T, half>::
-        value> __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, T src1, SELMODE selMode, uint32_t calCount)
-{
-    __VEC_SCOPE__
-    {
-        RegTensor<T> vSrc0, vSrc1;
-        RegTensor<T> vDst;
-        Duplicate(vSrc1, src1);
-        uint32_t sreg = (uint32_t)calCount;
-        uint32_t sregLower = (uint32_t)(VECTOR_REG_WIDTH / sizeof(T));
-        uint16_t repeatTimes = CeilDivision(calCount, sregLower);
-        uint32_t selMaskOffset = sregLower / ONE_BYTE_BIT_SIZE;
-        for (uint16_t i = 0; i < repeatTimes; ++i) {
-            MaskReg preg;
-            DataCopy<uint32_t, Dist::DIST_US>(preg, ((__ubuf__ uint32_t*)sel), i * selMaskOffset);
-            MaskReg dstReg = CreatePredicate<T>(sreg);
-            DataCopy(vSrc0, src0, i * sregLower);
-            Select<T>(vDst, vSrc0, vSrc1, preg);
-            DataCopy(dst, vDst, i * sregLower, dstReg);
-        }
-    }
-}
-
-template <typename T, typename U>
-typename std::enable_if_t<
-    std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value ||
-    std::is_same<T, float>::
-        value> __aicore__ inline VselImpl(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, T src1, SELMODE selMode, uint32_t calCount)
-{
-    uint32_t sreg = (uint32_t)calCount;
-    uint32_t sregLower = VECTOR_REG_WIDTH / sizeof(T);
-    uint16_t repeatTimes = CeilDivision(calCount, sregLower);
-    uint16_t halfRepeatTimes = repeatTimes / 2;
-
-    if (halfRepeatTimes > 0) {
-        __VEC_SCOPE__
-        {
-            RegTensor<T> vSrc1;
-            Duplicate(vSrc1, src1);
-            uint32_t selMaskOffset = 2 * sregLower / ONE_BYTE_BIT_SIZE;
-            for (uint16_t i = 0; i < halfRepeatTimes; ++i) {
-                RegTensor<T> vSrc00, vSrc01;
-                RegTensor<T> vDst0, vDst1;
-                MaskReg preg0;
-                MaskReg preg1 = CreatePredicate<T>();
-                MaskReg preg2 = CreatePredicate<T>();
-                MaskReg preg3 = CreatePredicate<T>();
-                DataCopy<uint32_t, Dist::DIST_US>(preg0, ((__ubuf__ uint32_t*)sel), i * selMaskOffset);
-                MaskReg dstReg = CreatePredicate<T>(sreg);
-                DataCopy(vSrc00, src0, 2 * i * sregLower);
-                DataCopy(vSrc01, src0 + sregLower, 2 * i * sregLower);
-                PredicateInterleave<uint16_t>(preg2, preg3, preg0, preg1);
-                Select<T>(vDst0, vSrc00, vSrc1, preg2);
-                Select<T>(vDst1, vSrc01, vSrc1, preg3);
-                DataCopy(dst, vDst0, 2 * i * sregLower, dstReg);
-                DataCopy(dst + sregLower, vDst1, 2 * i * sregLower, dstReg);
-            }
-        }
-    }
-
-    uint16_t tailTimes = repeatTimes - halfRepeatTimes * 2;
-    if (tailTimes > 0) {
-        __ubuf__ T* src0Tail = src0 + halfRepeatTimes * sregLower * 2;
-        __ubuf__ U* selTail = (__ubuf__ U*)sel + halfRepeatTimes * 2 * sregLower / sizeof(U) / ONE_BYTE_BIT_SIZE;
-        __ubuf__ T* dstTail = dst + halfRepeatTimes * sregLower * 2;
-        __VEC_SCOPE__
-        {
-            RegTensor<T> vSrc1;
-            Duplicate(vSrc1, src1);
-            for (uint16_t i = 0; i < tailTimes; ++i) {
-                RegTensor<T> vSrc0;
-                RegTensor<T> vDst;
-                MaskReg preg0;
-                MaskReg preg1 = CreatePredicate<T>();
-                DataCopy<uint32_t, Dist::DIST_US>(preg0, ((__ubuf__ uint32_t*)selTail), 0);
-                MaskReg dstReg = CreatePredicate<T>(sreg);
-                DataCopy(vSrc0, src0Tail, 0);
-                PredicateUnPack(preg1, preg0);
-                Select<T>(vDst, vSrc0, vSrc1, preg1);
-                DataCopy(dstTail, vDst, 0, dstReg);
-            }
-        }
-    }
-}
-
 // Level 2, select mode: 0/2
 template <typename T, typename U>
 typename std::enable_if_t<
@@ -1973,6 +2487,644 @@ __aicore__ inline void VselImpl(
         VF_CALL<SelectMode1Level0<T, U, true, true>>(dst, sel, src0, src1, mask[0], repeatTime, repeatParams);
     } else {
         VF_CALL<SelectMode1Level0<T, U, true, false>>(dst, sel, src0, src1, mask[0], repeatTime, repeatParams);
+    }
+}
+
+// ===============  Src0 Scalar =====================
+template <typename T, typename U, bool isBitMap, bool isCounterMode>
+__simd_vf__ inline void SelectSrc0ScalarMode1Level0(
+    __ubuf__ T* dst, __ubuf__ U* sel, T src0, __ubuf__ T* src1, const uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams repeatParams)
+{
+    constexpr uint32_t blockElm = GetDataBlockSizeInBytes() / sizeof(T);
+    uint32_t sreg;
+    constexpr uint16_t oneRepSize = GetVecLen() / sizeof(T);
+    uint16_t newRepeatTimes = repeatTime;
+    Reg::MaskReg maskReg;
+    if constexpr (isCounterMode) {
+        sreg = static_cast<uint32_t>(mask);
+        newRepeatTimes = CeilDivision(sreg, oneRepSize);
+    } else {
+        if constexpr (isBitMap) {
+            maskReg = Reg::MoveMask<T>();
+        } else {
+            sreg = static_cast<uint32_t>(mask);
+            maskReg = Reg::UpdateMask<T>(sreg);
+        }
+    }
+    if constexpr (sizeof(T) == 2) {
+        constexpr uint32_t selOffset = GetVecLen() / CmpSelInternal::maskBitToByte / sizeof(T);
+        Reg::RegTensor<T> src0Reg, src1Reg, dstReg;
+        Reg::Duplicate(src0Reg, (const T&)src0);
+        Reg::MaskReg selMask;
+        for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
+            if constexpr (isCounterMode) {
+                maskReg = Reg::UpdateMask<T>(sreg);
+            }
+            Reg::LoadAlign<uint8_t, Reg::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t*)sel + i * selOffset);
+            Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                src1Reg, src1 + i * blockElm * repeatParams.src1RepStride,
+                static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
+            Reg::Select(dstReg, src0Reg, src1Reg, selMask);
+            Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                dst + i * blockElm * repeatParams.dstRepStride, dstReg,
+                static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+        }
+    } else {
+        constexpr uint32_t unRollConstant = 2;
+        constexpr uint32_t selOffset = GetVecLen() / CmpSelInternal::maskBitToByte / sizeof(T) * unRollConstant;
+        Reg::RegTensor<T> scalarReg, src0Reg, src1Reg, dst0Reg, dst1Reg;
+        Reg::MaskReg selMask0, selMask1, tmpMask0;
+        Reg::MaskReg tmpMask1 = Reg::CreateMask<uint8_t, Reg::MaskPattern::ALL>();
+        uint16_t tail = newRepeatTimes % unRollConstant;
+        newRepeatTimes = newRepeatTimes / unRollConstant;
+        Reg::Duplicate(scalarReg, (const T&)src0);
+        for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
+            if constexpr (isCounterMode) {
+                maskReg = Reg::UpdateMask<T>(sreg);
+            }
+            Reg::LoadAlign<uint8_t, Reg::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t*)sel + i * selOffset);
+            Reg::MaskInterleave<uint16_t>(selMask0, selMask1, tmpMask0, tmpMask1);
+            Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                src0Reg, src1 + i * unRollConstant * blockElm * repeatParams.src1RepStride,
+                static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
+            Reg::Select(dst0Reg, scalarReg, src0Reg, selMask0);
+            Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                dst + i * unRollConstant * blockElm * repeatParams.dstRepStride, dst0Reg,
+                static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+            if constexpr (isCounterMode) {
+                maskReg = Reg::UpdateMask<T>(sreg);
+            }
+            Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                src1Reg, src1 + (i * unRollConstant + 1) * blockElm * repeatParams.src1RepStride,
+                static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
+            Reg::Select(dst1Reg, scalarReg, src1Reg, selMask1);
+            Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                dst + (i * unRollConstant + 1) * blockElm * repeatParams.dstRepStride, dst1Reg,
+                static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+        }
+        Reg::RegTensor<T> src2Reg, dst2Reg;
+        Reg::MaskReg selMask2;
+        uint32_t offset0 = newRepeatTimes * unRollConstant * repeatParams.src1RepStride * blockElm;
+        uint32_t offset1 = newRepeatTimes * unRollConstant * repeatParams.dstRepStride * blockElm;
+        uint32_t newSelOffset = newRepeatTimes * selOffset;
+        uint32_t tailSreg = sreg - unRollConstant * newRepeatTimes * oneRepSize;
+        for (uint16_t i = 0; i < static_cast<uint16_t>(tail); ++i) {
+            if constexpr (isCounterMode) {
+                maskReg = Reg::UpdateMask<T>(tailSreg);
+            }
+            Reg::LoadAlign<uint8_t, Reg::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t*)sel + newSelOffset);
+            Reg::MaskUnPack(selMask2, selMask2);
+            Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                src2Reg, src1 + offset0, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
+            Reg::Select(dst2Reg, scalarReg, src2Reg, selMask2);
+            Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                dst + offset1, dst2Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+        }
+    }
+}
+
+template <typename T, typename U>
+__aicore__ inline void VselImpl(
+    __ubuf__ T* dst, __ubuf__ U* sel, T src0, __ubuf__ T* src1, SELMODE selMode, const uint64_t mask,
+    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+{
+    static_assert(
+        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
+        "current data type is not supported!");
+    static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
+    bool isCounterMode = Internal::IsCounterMode();
+    if (isCounterMode) {
+        SelectSrc0ScalarMode1Level0<T, U, false, true>(dst, sel, src0, src1, mask, repeatTime, repeatParams);
+    } else {
+        SelectSrc0ScalarMode1Level0<T, U, false, false>(dst, sel, src0, src1, mask, repeatTime, repeatParams);
+    }
+}
+
+template <typename T, typename U>
+__aicore__ inline void VselImpl(
+    __ubuf__ T* dst, __ubuf__ U* sel, T src0, __ubuf__ T* src1, SELMODE selMode, const uint64_t mask[],
+    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+{
+    static_assert(
+        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
+        "current data type is not supported!");
+    static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
+    SetVectorMask<T>(mask[1], mask[0]);
+    bool isCounterMode = Internal::IsCounterMode();
+    if (isCounterMode) {
+        SelectSrc0ScalarMode1Level0<T, U, true, true>(dst, sel, src0, src1, mask[0], repeatTime, repeatParams);
+    } else {
+        SelectSrc0ScalarMode1Level0<T, U, true, false>(dst, sel, src0, src1, mask[0], repeatTime, repeatParams);
+    }
+}
+
+// both src0 / src1 are tensor
+template <typename T, typename U, bool isBitMap, uint8_t scalarIdx, Reg::LoadDist pattern, bool isCounterMode>
+__simd_vf__ inline void SelectBothTensorMode1Level0(
+    __ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, __ubuf__ T* src1, const uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams repeatParams)
+{
+    constexpr uint32_t blockElm = GetDataBlockSizeInBytes() / sizeof(T);
+    uint16_t newRepeatTimes = repeatTime;
+    constexpr uint16_t oneRepSize = GetVecLen() / sizeof(T);
+    uint32_t sreg;
+    Reg::MaskReg maskReg, selMask;
+    if constexpr (isCounterMode) {
+        sreg = static_cast<uint32_t>(mask);
+        newRepeatTimes = CeilDivision(sreg, oneRepSize);
+    } else {
+        if constexpr (isBitMap) {
+            maskReg = Reg::MoveMask<T>();
+        } else {
+            sreg = static_cast<uint32_t>(mask);
+            maskReg = Reg::UpdateMask<T>(sreg);
+        }
+    }
+    if constexpr (scalarIdx == 0) {
+        if constexpr (sizeof(T) == 2) {
+            constexpr uint32_t selOffset = GetVecLen() / CmpSelInternal::maskBitToByte / sizeof(T);
+            Reg::RegTensor<T> src0Reg, src1Reg, dstReg;
+            Reg::LoadAlign<T, pattern>(src0Reg, src0);
+            for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
+                if constexpr (isCounterMode) {
+                    maskReg = Reg::UpdateMask<T>(sreg);
+                }
+                Reg::LoadAlign<uint8_t, Reg::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t*)sel + i * selOffset);
+                Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                    src1Reg, src1 + i * blockElm * repeatParams.src1RepStride,
+                    static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
+                Reg::Select(dstReg, src0Reg, src1Reg, selMask);
+                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                    dst + i * blockElm * repeatParams.dstRepStride, dstReg,
+                    static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+            }
+        } else {
+            constexpr uint32_t unRollConstant = 2;
+            constexpr uint32_t selOffset = GetVecLen() / CmpSelInternal::maskBitToByte / sizeof(T) * unRollConstant;
+            Reg::RegTensor<T> scalarReg, src0Reg, src1Reg, dst0Reg, dst1Reg;
+            Reg::MaskReg selMask0, selMask1, tmpMask0;
+            Reg::MaskReg tmpMask1 = Reg::CreateMask<uint8_t, Reg::MaskPattern::ALL>();
+            uint16_t tail = newRepeatTimes % unRollConstant;
+            newRepeatTimes = newRepeatTimes / unRollConstant;
+            Reg::LoadAlign<T, pattern>(scalarReg, src0);
+            for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
+                if constexpr (isCounterMode) {
+                    maskReg = Reg::UpdateMask<T>(sreg);
+                }
+                Reg::LoadAlign<uint8_t, Reg::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t*)sel + i * selOffset);
+                Reg::MaskInterleave<uint16_t>(selMask0, selMask1, tmpMask0, tmpMask1);
+                Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                    src0Reg, src1 + i * unRollConstant * blockElm * repeatParams.src1RepStride,
+                    static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
+                Reg::Select(dst0Reg, scalarReg, src0Reg, selMask0);
+                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                    dst + i * unRollConstant * blockElm * repeatParams.dstRepStride, dst0Reg,
+                    static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+                if constexpr (isCounterMode) {
+                    maskReg = Reg::UpdateMask<T>(sreg);
+                }
+                Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                    src1Reg, src1 + (i * unRollConstant + 1) * blockElm * repeatParams.src1RepStride,
+                    static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
+                Reg::Select(dst1Reg, scalarReg, src1Reg, selMask1);
+                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                    dst + (i * unRollConstant + 1) * blockElm * repeatParams.dstRepStride, dst1Reg,
+                    static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+            }
+            Reg::RegTensor<T> src2Reg, dst2Reg;
+            Reg::MaskReg selMask2;
+            uint32_t offset0 = newRepeatTimes * unRollConstant * repeatParams.src0RepStride * blockElm;
+            uint32_t offset1 = newRepeatTimes * unRollConstant * repeatParams.dstRepStride * blockElm;
+            uint32_t newSelOffset = newRepeatTimes * selOffset;
+            uint32_t tailSreg = sreg - unRollConstant * newRepeatTimes * oneRepSize;
+            for (uint16_t i = 0; i < static_cast<uint16_t>(tail); ++i) {
+                if constexpr (isCounterMode) {
+                    maskReg = Reg::UpdateMask<T>(tailSreg);
+                }
+                Reg::LoadAlign<uint8_t, Reg::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t*)sel + newSelOffset);
+                Reg::MaskUnPack(selMask2, selMask2);
+                Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                    src2Reg, src1 + offset0, static_cast<uint32_t>(repeatParams.src1BlkStride), maskReg);
+                Reg::Select(dst2Reg, scalarReg, src2Reg, selMask2);
+                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                    dst + offset1, dst2Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+            }
+        }
+    } else if constexpr (scalarIdx == 1) {
+        if constexpr (sizeof(T) == 2) {
+            constexpr uint32_t selOffset = GetVecLen() / CmpSelInternal::maskBitToByte / sizeof(T);
+            Reg::RegTensor<T> src0Reg, src1Reg, dstReg;
+            Reg::LoadAlign<T, pattern>(src1Reg, src1);
+            for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
+                if constexpr (isCounterMode) {
+                    maskReg = Reg::UpdateMask<T>(sreg);
+                }
+                Reg::LoadAlign<uint8_t, Reg::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t*)sel + i * selOffset);
+                Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                    src0Reg, src0 + i * blockElm * repeatParams.src0RepStride,
+                    static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
+                Reg::Select(dstReg, src0Reg, src1Reg, selMask);
+                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                    dst + i * blockElm * repeatParams.dstRepStride, dstReg,
+                    static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+            }
+        } else {
+            constexpr uint32_t unRollConstant = 2;
+            constexpr uint32_t selOffset = GetVecLen() / CmpSelInternal::maskBitToByte / sizeof(T) * unRollConstant;
+            Reg::RegTensor<T> scalarReg, src0Reg, src1Reg, dst0Reg, dst1Reg;
+            Reg::MaskReg selMask0, selMask1, tmpMask0;
+            Reg::MaskReg tmpMask1 = Reg::CreateMask<uint8_t, Reg::MaskPattern::ALL>();
+            uint16_t tail = newRepeatTimes % unRollConstant;
+            newRepeatTimes = newRepeatTimes / unRollConstant;
+            Reg::LoadAlign<T, pattern>(scalarReg, src1);
+            for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
+                if constexpr (isCounterMode) {
+                    maskReg = Reg::UpdateMask<T>(sreg);
+                }
+                Reg::LoadAlign<uint8_t, Reg::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t*)sel + i * selOffset);
+                Reg::MaskInterleave<uint16_t>(selMask0, selMask1, tmpMask0, tmpMask1);
+                Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                    src0Reg, src0 + i * unRollConstant * blockElm * repeatParams.src0RepStride,
+                    static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
+                Reg::Select(dst0Reg, src0Reg, scalarReg, selMask0);
+                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                    dst + i * unRollConstant * blockElm * repeatParams.dstRepStride, dst0Reg,
+                    static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+                if constexpr (isCounterMode) {
+                    maskReg = Reg::UpdateMask<T>(sreg);
+                }
+                Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                    src1Reg, src0 + (i * unRollConstant + 1) * blockElm * repeatParams.src0RepStride,
+                    static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
+                Reg::Select(dst1Reg, src1Reg, scalarReg, selMask1);
+                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                    dst + (i * unRollConstant + 1) * blockElm * repeatParams.dstRepStride, dst1Reg,
+                    static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+            }
+            Reg::RegTensor<T> src2Reg, dst2Reg;
+            Reg::MaskReg selMask2;
+            uint32_t offset0 = newRepeatTimes * unRollConstant * repeatParams.src0RepStride * blockElm;
+            uint32_t offset1 = newRepeatTimes * unRollConstant * repeatParams.dstRepStride * blockElm;
+            uint32_t newSelOffset = newRepeatTimes * selOffset;
+            uint32_t tailSreg = sreg - unRollConstant * newRepeatTimes * oneRepSize;
+            for (uint16_t i = 0; i < static_cast<uint16_t>(tail); ++i) {
+                if constexpr (isCounterMode) {
+                    maskReg = Reg::UpdateMask<T>(tailSreg);
+                }
+                Reg::LoadAlign<uint8_t, Reg::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t*)sel + newSelOffset);
+                Reg::MaskUnPack(selMask2, selMask2);
+                Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                    src2Reg, src0 + offset0, static_cast<uint32_t>(repeatParams.src0BlkStride), maskReg);
+                Reg::Select(dst2Reg, src2Reg, scalarReg, selMask2);
+                Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+                    dst + offset1, dst2Reg, static_cast<uint32_t>(repeatParams.dstBlkStride), maskReg);
+            }
+        }
+    }
+}
+
+template <typename T, typename U, uint8_t scalarIdx>
+__aicore__ inline void VselImpl(
+    __ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, __ubuf__ T* src1, SELMODE selMode, const uint64_t mask,
+    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+{
+    static_assert(
+        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
+        "current data type is not supported!");
+    static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
+    bool isCounterMode = Internal::IsCounterMode();
+    if (isCounterMode) {
+        if constexpr (sizeof(T) == 2) {
+            SelectBothTensorMode1Level0<T, U, false, scalarIdx, Reg::LoadDist::DIST_BRC_B16, true>(
+                dst, sel, src0, src1, mask, repeatTime, repeatParams);
+        } else if constexpr (sizeof(T) == 4) {
+            SelectBothTensorMode1Level0<T, U, false, scalarIdx, Reg::LoadDist::DIST_BRC_B32, true>(
+                dst, sel, src0, src1, mask, repeatTime, repeatParams);
+        }
+    } else {
+        if constexpr (sizeof(T) == 2) {
+            SelectBothTensorMode1Level0<T, U, false, scalarIdx, Reg::LoadDist::DIST_BRC_B16, false>(
+                dst, sel, src0, src1, mask, repeatTime, repeatParams);
+        } else if constexpr (sizeof(T) == 4) {
+            SelectBothTensorMode1Level0<T, U, false, scalarIdx, Reg::LoadDist::DIST_BRC_B32, false>(
+                dst, sel, src0, src1, mask, repeatTime, repeatParams);
+        }
+    }
+}
+
+template <typename T, typename U, uint8_t scalarIdx>
+__aicore__ inline void VselImpl(
+    __ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, __ubuf__ T* src1, SELMODE selMode, const uint64_t mask[],
+    const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+{
+    static_assert(
+        SupportType<T, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
+        "current data type is not supported!");
+    static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
+    SetVectorMask<T>(mask[1], mask[0]);
+    bool isCounterMode = Internal::IsCounterMode();
+    if (isCounterMode) {
+        if constexpr (sizeof(T) == 2) {
+            SelectBothTensorMode1Level0<T, U, true, scalarIdx, Reg::LoadDist::DIST_BRC_B16, true>(
+                dst, sel, src0, src1, mask[0], repeatTime, repeatParams);
+        } else if constexpr (sizeof(T) == 4) {
+            SelectBothTensorMode1Level0<T, U, true, scalarIdx, Reg::LoadDist::DIST_BRC_B32, true>(
+                dst, sel, src0, src1, mask[0], repeatTime, repeatParams);
+        }
+    } else {
+        if constexpr (sizeof(T) == 2) {
+            SelectBothTensorMode1Level0<T, U, true, scalarIdx, Reg::LoadDist::DIST_BRC_B16, false>(
+                dst, sel, src0, src1, mask[0], repeatTime, repeatParams);
+        } else if constexpr (sizeof(T) == 4) {
+            SelectBothTensorMode1Level0<T, U, true, scalarIdx, Reg::LoadDist::DIST_BRC_B32, false>(
+                dst, sel, src0, src1, mask[0], repeatTime, repeatParams);
+        }
+    }
+}
+
+// ============ select mode: 1 ============
+// =============== LEVEL2 ===================
+template <typename T, typename U, typename RegT>
+__simd_vf__ inline void SelectMode1Level2(__ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, T src1, uint32_t calCount)
+{
+    constexpr uint32_t repeatElm = GetVecLen() / sizeof(T) * RegT::trait.REG_NUM;
+    uint32_t repeatTime = CeilDivision(calCount, repeatElm);
+    uint32_t sreg = static_cast<uint32_t>(calCount);
+    if constexpr (sizeof(T) == 4) {
+        constexpr uint32_t unRollConstant = 2;
+        constexpr uint32_t selOffset = GetVecLen() / CmpSelInternal::maskBitToByte / sizeof(T) * unRollConstant;
+        RegT src0Reg, src1Reg, scalarReg, dst0Reg, dst1Reg;
+        Reg::MaskReg maskReg;
+        Reg::MaskReg selMask0, selMask1, tmpMask0;
+        Reg::MaskReg tmpMask1 = Reg::CreateMask<uint8_t, Reg::MaskPattern::ALL>();
+        uint16_t tail = repeatTime % unRollConstant;
+        uint16_t newRepeatTimes = repeatTime / unRollConstant;
+        Reg::Duplicate(scalarReg, (const T&)src1);
+        for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
+            Reg::LoadAlign<uint8_t, Reg::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t*)sel + i * selOffset);
+            Reg::MaskInterleave<uint16_t>(selMask0, selMask1, tmpMask0, tmpMask1);
+            maskReg = Reg::UpdateMask<T>(sreg);
+            Reg::LoadAlign<T>(src0Reg, src0 + i * unRollConstant * repeatElm);
+            Reg::Select(dst0Reg, src0Reg, scalarReg, selMask0);
+            Reg::StoreAlign<T>(dst + i * unRollConstant * repeatElm, dst0Reg, maskReg);
+            maskReg = Reg::UpdateMask<T>(sreg);
+            Reg::LoadAlign<T>(src1Reg, src0 + (i * unRollConstant + 1) * repeatElm);
+            Reg::Select(dst1Reg, src1Reg, scalarReg, selMask1);
+            Reg::StoreAlign<T>(dst + (i * unRollConstant + 1) * repeatElm, dst1Reg, maskReg);
+        }
+        RegT src2Reg, dst2Reg;
+        Reg::MaskReg selMask2;
+        uint32_t offset = newRepeatTimes * unRollConstant * repeatElm;
+        uint32_t newSelOffset = newRepeatTimes * selOffset;
+        for (uint16_t i = 0; i < static_cast<uint16_t>(tail); ++i) {
+            Reg::LoadAlign<uint8_t, Reg::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t*)sel + newSelOffset);
+            Reg::MaskUnPack(selMask2, selMask2);
+            maskReg = Reg::UpdateMask<T>(sreg);
+            Reg::LoadAlign<T>(src2Reg, src0 + offset);
+            Reg::Select(dst2Reg, src2Reg, scalarReg, selMask2);
+            Reg::StoreAlign<T>(dst + offset, dst2Reg, maskReg);
+        }
+    } else {
+        constexpr uint32_t selOffset = GetVecLen() / CmpSelInternal::maskBitToByte / sizeof(T);
+        RegT src0Reg, src1Reg, dstReg;
+        uint32_t sreg = static_cast<uint32_t>(calCount);
+        Reg::MaskReg maskReg, selMask;
+        Reg::Duplicate(src1Reg, (const T&)src1);
+        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
+            if constexpr (sizeof(T) == 2) {
+                Reg::LoadAlign<uint8_t, Reg::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t*)sel + i * selOffset);
+            } else {
+                Reg::LoadAlign<uint8_t>(selMask, (__ubuf__ uint8_t*)sel + i * selOffset);
+            }
+            maskReg = Reg::UpdateMask<T>(sreg);
+            Reg::LoadAlign<T>(src0Reg, src0 + i * repeatElm);
+            Reg::Select(dstReg, src0Reg, src1Reg, selMask);
+            Reg::StoreAlign<T>(dst + i * repeatElm, dstReg, maskReg);
+        }
+    }
+}
+
+template <typename T, typename U>
+__aicore__ inline void VselImpl(
+    __ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, T src1, SELMODE selMode, uint32_t calCount)
+{
+    static_assert(
+        SupportType<
+            T, uint8_t, int8_t, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
+        "current data type is not supported!");
+    static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
+    SelectMode1Level2<T, U, Reg::RegTensor<T>>(dst, sel, src0, src1, calCount);
+}
+// Src0Scalar
+template <typename T, typename U, typename RegT>
+__simd_vf__ inline void SelectSrc0ScalarMode1Level2(
+    __ubuf__ T* dst, __ubuf__ U* sel, T src0, __ubuf__ T* src1, uint32_t calCount)
+{
+    constexpr uint32_t repeatElm = GetVecLen() / sizeof(T) * RegT::trait.REG_NUM;
+    uint32_t repeatTime = CeilDivision(calCount, repeatElm);
+    uint32_t sreg = static_cast<uint32_t>(calCount);
+    if constexpr (sizeof(T) == 4) {
+        constexpr uint32_t unRollConstant = 2;
+        constexpr uint32_t selOffset = GetVecLen() / CmpSelInternal::maskBitToByte / sizeof(T) * unRollConstant;
+        RegT src0Reg, src1Reg, scalarReg, dst0Reg, dst1Reg;
+        Reg::MaskReg maskReg;
+        Reg::MaskReg selMask0, selMask1, tmpMask0;
+        Reg::MaskReg tmpMask1 = Reg::CreateMask<uint8_t, Reg::MaskPattern::ALL>();
+        uint16_t tail = repeatTime % unRollConstant;
+        uint16_t newRepeatTimes = repeatTime / unRollConstant;
+        Reg::Duplicate(scalarReg, (const T&)src0);
+        for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
+            Reg::LoadAlign<uint8_t, Reg::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t*)sel + i * selOffset);
+            Reg::MaskInterleave<uint16_t>(selMask0, selMask1, tmpMask0, tmpMask1);
+            maskReg = Reg::UpdateMask<T>(sreg);
+            Reg::LoadAlign<T>(src0Reg, src1 + i * unRollConstant * repeatElm);
+            Reg::Select(dst0Reg, scalarReg, src0Reg, selMask0);
+            Reg::StoreAlign<T>(dst + i * unRollConstant * repeatElm, dst0Reg, maskReg);
+            maskReg = Reg::UpdateMask<T>(sreg);
+            Reg::LoadAlign<T>(src1Reg, src1 + (i * unRollConstant + 1) * repeatElm);
+            Reg::Select(dst1Reg, scalarReg, src1Reg, selMask1);
+            Reg::StoreAlign<T>(dst + (i * unRollConstant + 1) * repeatElm, dst1Reg, maskReg);
+        }
+        RegT src2Reg, dst2Reg;
+        Reg::MaskReg selMask2;
+        uint32_t offset = newRepeatTimes * unRollConstant * repeatElm;
+        uint32_t newSelOffset = newRepeatTimes * selOffset;
+        for (uint16_t i = 0; i < static_cast<uint16_t>(tail); ++i) {
+            Reg::LoadAlign<uint8_t, Reg::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t*)sel + newSelOffset);
+            Reg::MaskUnPack(selMask2, selMask2);
+            maskReg = Reg::UpdateMask<T>(sreg);
+            Reg::LoadAlign<T>(src2Reg, src1 + offset);
+            Reg::Select(dst2Reg, scalarReg, src2Reg, selMask2);
+            Reg::StoreAlign<T>(dst + offset, dst2Reg, maskReg);
+        }
+    } else {
+        constexpr uint32_t selOffset = GetVecLen() / CmpSelInternal::maskBitToByte / sizeof(T);
+        RegT src0Reg, src1Reg, dstReg;
+        Reg::MaskReg maskReg, selMask;
+        Reg::Duplicate(src0Reg, (const T&)src0);
+        for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
+            if constexpr (sizeof(T) == 2) {
+                Reg::LoadAlign<uint8_t, Reg::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t*)sel + i * selOffset);
+            } else {
+                Reg::LoadAlign<uint8_t>(selMask, (__ubuf__ uint8_t*)sel + i * selOffset);
+            }
+            maskReg = Reg::UpdateMask<T>(sreg);
+            Reg::LoadAlign<T>(src1Reg, src1 + i * repeatElm);
+            Reg::Select(dstReg, src0Reg, src1Reg, selMask);
+            Reg::StoreAlign<T>(dst + i * repeatElm, dstReg, maskReg);
+        }
+    }
+}
+
+template <typename T, typename U>
+__aicore__ inline void VselImpl(
+    __ubuf__ T* dst, __ubuf__ U* sel, T src0, __ubuf__ T* src1, SELMODE selMode, uint32_t calCount)
+{
+    static_assert(
+        SupportType<
+            T, uint8_t, int8_t, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
+        "current data type is not supported!");
+    static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
+    SelectSrc0ScalarMode1Level2<T, U, Reg::RegTensor<T>>(dst, sel, src0, src1, calCount);
+}
+// both src0 / src1 Tensor
+template <typename T, typename U, typename RegT, uint8_t scalarIdx, Reg::LoadDist pattern = Reg::LoadDist::DIST_BRC_B32>
+__simd_vf__ inline void SelectBothTensorMode1Level2(
+    __ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, __ubuf__ T* src1, uint32_t calCount)
+{
+    constexpr uint32_t repeatElm = GetVecLen() / sizeof(T) * RegT::trait.REG_NUM;
+    uint32_t repeatTime = CeilDivision(calCount, repeatElm);
+    uint32_t sreg = static_cast<uint32_t>(calCount);
+    if constexpr (scalarIdx == 0) {
+        if constexpr (sizeof(T) == 4) {
+            constexpr uint32_t unRollConstant = 2;
+            constexpr uint32_t selOffset = GetVecLen() / CmpSelInternal::maskBitToByte / sizeof(T) * unRollConstant;
+            RegT src0Reg, src1Reg, scalarReg, dst0Reg, dst1Reg;
+            Reg::MaskReg maskReg;
+            Reg::MaskReg selMask0, selMask1, tmpMask0;
+            Reg::MaskReg tmpMask1 = Reg::CreateMask<uint8_t, Reg::MaskPattern::ALL>();
+            uint16_t tail = repeatTime % unRollConstant;
+            uint16_t newRepeatTimes = repeatTime / unRollConstant;
+            Reg::LoadAlign<T, pattern>(scalarReg, src0);
+            for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
+                Reg::LoadAlign<uint8_t, Reg::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t*)sel + i * selOffset);
+                Reg::MaskInterleave<uint16_t>(selMask0, selMask1, tmpMask0, tmpMask1);
+                maskReg = Reg::UpdateMask<T>(sreg);
+                Reg::LoadAlign<T>(src0Reg, src1 + i * unRollConstant * repeatElm);
+                Reg::Select(dst0Reg, scalarReg, src0Reg, selMask0);
+                Reg::StoreAlign<T>(dst + i * unRollConstant * repeatElm, dst0Reg, maskReg);
+                maskReg = Reg::UpdateMask<T>(sreg);
+                Reg::LoadAlign<T>(src1Reg, src1 + (i * unRollConstant + 1) * repeatElm);
+                Reg::Select(dst1Reg, scalarReg, src1Reg, selMask1);
+                Reg::StoreAlign<T>(dst + (i * unRollConstant + 1) * repeatElm, dst1Reg, maskReg);
+            }
+            RegT src2Reg, dst2Reg;
+            Reg::MaskReg selMask2;
+            uint32_t offset = newRepeatTimes * unRollConstant * repeatElm;
+            uint32_t newSelOffset = newRepeatTimes * selOffset;
+            for (uint16_t i = 0; i < static_cast<uint16_t>(tail); ++i) {
+                Reg::LoadAlign<uint8_t, Reg::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t*)sel + newSelOffset);
+                Reg::MaskUnPack(selMask2, selMask2);
+                maskReg = Reg::UpdateMask<T>(sreg);
+                Reg::LoadAlign<T>(src2Reg, src1 + offset);
+                Reg::Select(dst2Reg, scalarReg, src2Reg, selMask2);
+                Reg::StoreAlign<T>(dst + offset, dst2Reg, maskReg);
+            }
+        } else {
+            constexpr uint32_t selOffset = GetVecLen() / CmpSelInternal::maskBitToByte / sizeof(T);
+            RegT src0Reg, src1Reg, dstReg;
+            Reg::MaskReg maskReg, selMask;
+            Reg::LoadAlign<T, pattern>(src0Reg, src0);
+            for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
+                if constexpr (sizeof(T) == 2) {
+                    Reg::LoadAlign<uint8_t, Reg::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t*)sel + i * selOffset);
+                } else {
+                    Reg::LoadAlign<uint8_t>(selMask, (__ubuf__ uint8_t*)sel + i * selOffset);
+                }
+                maskReg = Reg::UpdateMask<T>(sreg);
+                Reg::LoadAlign<T>(src1Reg, src1 + i * repeatElm);
+                Reg::Select(dstReg, src0Reg, src1Reg, selMask);
+                Reg::StoreAlign<T>(dst + i * repeatElm, dstReg, maskReg);
+            }
+        }
+    } else if constexpr (scalarIdx == 1) {
+        if constexpr (sizeof(T) == 4) {
+            constexpr uint32_t unRollConstant = 2;
+            constexpr uint32_t selOffset = GetVecLen() / CmpSelInternal::maskBitToByte / sizeof(T) * unRollConstant;
+            RegT src0Reg, src1Reg, scalarReg, dst0Reg, dst1Reg;
+            Reg::MaskReg maskReg;
+            Reg::MaskReg selMask0, selMask1, tmpMask0;
+            Reg::MaskReg tmpMask1 = Reg::CreateMask<uint8_t, Reg::MaskPattern::ALL>();
+            uint16_t tail = repeatTime % unRollConstant;
+            uint16_t newRepeatTimes = repeatTime / unRollConstant;
+            Reg::LoadAlign<T, pattern>(scalarReg, src1);
+            for (uint16_t i = 0; i < static_cast<uint16_t>(newRepeatTimes); ++i) {
+                Reg::LoadAlign<uint8_t, Reg::MaskDist::DIST_US>(tmpMask0, (__ubuf__ uint8_t*)sel + i * selOffset);
+                Reg::MaskInterleave<uint16_t>(selMask0, selMask1, tmpMask0, tmpMask1);
+                maskReg = Reg::UpdateMask<T>(sreg);
+                Reg::LoadAlign<T>(src0Reg, src0 + i * unRollConstant * repeatElm);
+                Reg::Select(dst0Reg, src0Reg, scalarReg, selMask0);
+                Reg::StoreAlign<T>(dst + i * unRollConstant * repeatElm, dst0Reg, maskReg);
+                maskReg = Reg::UpdateMask<T>(sreg);
+                Reg::LoadAlign<T>(src1Reg, src0 + (i * unRollConstant + 1) * repeatElm);
+                Reg::Select(dst1Reg, src1Reg, scalarReg, selMask1);
+                Reg::StoreAlign<T>(dst + (i * unRollConstant + 1) * repeatElm, dst1Reg, maskReg);
+            }
+            RegT src2Reg, dst2Reg;
+            Reg::MaskReg selMask2;
+            uint32_t offset = newRepeatTimes * unRollConstant * repeatElm;
+            uint32_t newSelOffset = newRepeatTimes * selOffset;
+            for (uint16_t i = 0; i < static_cast<uint16_t>(tail); ++i) {
+                Reg::LoadAlign<uint8_t, Reg::MaskDist::DIST_US>(selMask2, (__ubuf__ uint8_t*)sel + newSelOffset);
+                Reg::MaskUnPack(selMask2, selMask2);
+                maskReg = Reg::UpdateMask<T>(sreg);
+                Reg::LoadAlign<T>(src2Reg, src0 + offset);
+                Reg::Select(dst2Reg, src2Reg, scalarReg, selMask2);
+                Reg::StoreAlign<T>(dst + offset, dst2Reg, maskReg);
+            }
+        } else {
+            constexpr uint32_t selOffset = GetVecLen() / CmpSelInternal::maskBitToByte / sizeof(T);
+            RegT src0Reg, src1Reg, dstReg;
+            Reg::MaskReg maskReg, selMask;
+            Reg::LoadAlign<T, pattern>(src1Reg, src1);
+            for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
+                if constexpr (sizeof(T) == 2) {
+                    Reg::LoadAlign<uint8_t, Reg::MaskDist::DIST_US>(selMask, (__ubuf__ uint8_t*)sel + i * selOffset);
+                } else {
+                    Reg::LoadAlign<uint8_t>(selMask, (__ubuf__ uint8_t*)sel + i * selOffset);
+                }
+                maskReg = Reg::UpdateMask<T>(sreg);
+                Reg::LoadAlign<T>(src0Reg, src0 + i * repeatElm);
+                Reg::Select(dstReg, src0Reg, src1Reg, selMask);
+                Reg::StoreAlign<T>(dst + i * repeatElm, dstReg, maskReg);
+            }
+        }
+    }
+}
+
+template <typename T, typename U, uint8_t scalarIdx>
+__aicore__ inline void VselImpl(
+    __ubuf__ T* dst, __ubuf__ U* sel, __ubuf__ T* src0, __ubuf__ T* src1, SELMODE selMode, uint32_t calCount)
+{
+    static_assert(
+        SupportType<
+            T, uint8_t, int8_t, half, int16_t, uint16_t, int32_t, uint32_t, float>(),
+        "current data type is not supported!");
+    static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
+    if constexpr (sizeof(T) == 1) {
+        SelectBothTensorMode1Level2<T, U, Reg::RegTensor<T>, scalarIdx, Reg::LoadDist::DIST_BRC_B8>(
+            dst, sel, src0, src1, calCount);
+    } else if constexpr (sizeof(T) == 2) {
+        SelectBothTensorMode1Level2<T, U, Reg::RegTensor<T>, scalarIdx, Reg::LoadDist::DIST_BRC_B16>(
+            dst, sel, src0, src1, calCount);
+    } else if constexpr (sizeof(T) == 4) {
+        SelectBothTensorMode1Level2<T, U, Reg::RegTensor<T>, scalarIdx, Reg::LoadDist::DIST_BRC_B32>(
+            dst, sel, src0, src1, calCount);
+    } else {
+        SelectBothTensorMode1Level2<
+            T, U, Reg::RegTensor<T, Reg::RegTraitNumTwo>, scalarIdx, Reg::LoadDist::DIST_BRC_B32>(
+            dst, sel, src0, src1, calCount);
     }
 }
 
