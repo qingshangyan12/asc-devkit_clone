@@ -26,6 +26,8 @@
 #include "coll_comm_aicpu_mgr.h"
 #include "stream_lite.h"
 #include "thread.h"
+#include "profiling_handler_lite.h"
+#include "hcomm_device_profiling_dl.h"
 
 using namespace HcclApi;
 namespace {
@@ -560,6 +562,15 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     LogAicpuOrderDfxCounter(
         "ServerMsg", groupIdx_, msgArea_, msgPos, 0U, 0U, opParamKey, waitAddr, recordAddr, turnNumsAddr_, execCtx);
 
+    // 上报主流和第一个task，在wait之前（对齐 HcclLaunchAicpuKernel 的 profiling hook）。
+    // 注意：acquire/release 作用域仅包裹本次 profiling 上报，不跨越下发循环，避免通信域被长时间占用影响主流程。
+    // 整个过程失败均不致命，仅记录日志后继续执行。
+    HCCL_INFO(
+        "[MC2_PROF][Begin] group %u, commName[%s], resourceType %u, mainThread %#llx, collCommAicpu %p.", groupIdx_,
+        execCtx->commName.c_str(), static_cast<u32>(execCtx->resourceType),
+        static_cast<unsigned long long>(execCtx->mainThread), execCtx->collCommAicpu);
+    ReportProfilingKernelStart(*execCtx);
+
     std::vector<uint8_t> runParam{};
     for (u32 i = 0U; i < repeatCnt; ++i) {
         const u32 turnIdx = i + 1U;
@@ -647,7 +658,168 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     }
     SetMsgPosByHandle(handle, msgPos);
     SetRepeatByHandle(handle, repeatCnt);
+
+    // 上报device侧op信息及主流和最后一个task，在post之后（对齐 HcclLaunchAicpuKernel 的 profiling hook）
+    // 同样收窄 acquire/release 作用域，全过程失败不致命，仅记录日志后继续执行
+    ReportProfilingKernelEnd(*execCtx, msg);
+    HCCL_INFO("[MC2_PROF][End] group %u, commName[%s].", groupIdx_, execCtx->commName.c_str());
+
     return HCCL_SUCCESS;
+}
+
+bool CommKfcAicpuServer::IsProfilingEnabled()
+{
+    auto& handler = Hccl::ProfilingHandlerLite::GetInstance();
+    return handler.GetProfL0State() || handler.GetProfL1State();
+}
+
+void CommKfcAicpuServer::ReportProfilingKernelStart(const ServerExecCtx& execCtx)
+{
+    if (execCtx.resourceType != ServerExecResourceType::NEXT_AICPU) {
+        HCCL_INFO(
+            "[MC2_PROF][StartSkip] group %u, commName[%s], resourceType %u is not NEXT_AICPU.", groupIdx_,
+            execCtx.commName.c_str(), static_cast<u32>(execCtx.resourceType));
+        return;
+    }
+    // profiling 未开启时完全跳过，不做 comm acquire / op 注册 / 上报，避免额外开销
+    if (!IsProfilingEnabled()) {
+        HCCL_INFO(
+            "[MC2_PROF][StartProfOff] group %u, commName[%s], profiling is off, skip.", groupIdx_,
+            execCtx.commName.c_str());
+        return;
+    }
+
+    // acquire 通信域以设置线程局部 g_hcclComm，供 profiling dl 接口使用；失败则跳过本次上报，不影响主流程
+    if (HcommAcquireComm(execCtx.commName.c_str()) != HCCL_SUCCESS) {
+        HCCL_WARNING(
+            "[MC2_PROF][StartAcquireFail] group %u, commName[%s], skip profiling report.", groupIdx_,
+            execCtx.commName.c_str());
+        return;
+    }
+    HCCL_INFO("[MC2_PROF][StartAcquireOk] group %u, commName[%s].", groupIdx_, execCtx.commName.c_str());
+
+    // 注意：op info 的注册（RegisterDfxOpInfo）放在 End 窗口、紧邻 HcommProfilingReportDeviceOp 之前，
+    // 保证注册与读取在同一次 acquire（同一 g_hcclComm / 同一通信域实例）内完成，避免跨窗口读到空 op info。
+
+    // 上报主流和第一个task，在wait之前
+    HcclResult profRet = HcommProfilingReportKernelStartTask(execCtx.mainThread, execCtx.commName.c_str());
+    if (profRet != HCCL_SUCCESS) {
+        HCCL_WARNING(
+            "[MC2_PROF][StartReportFail] group %u, mainThread %#llx, commName[%s], ret %u.", groupIdx_,
+            static_cast<unsigned long long>(execCtx.mainThread), execCtx.commName.c_str(), static_cast<u32>(profRet));
+    } else {
+        HCCL_INFO(
+            "[MC2_PROF][StartReportOk] group %u, mainThread %#llx, commName[%s].", groupIdx_,
+            static_cast<unsigned long long>(execCtx.mainThread), execCtx.commName.c_str());
+    }
+
+    if (HcommReleaseComm(execCtx.commName.c_str()) != HCCL_SUCCESS) {
+        HCCL_WARNING("[MC2_PROF][StartReleaseFail] group %u, commName[%s].", groupIdx_, execCtx.commName.c_str());
+    }
+}
+
+void CommKfcAicpuServer::RegisterDfxOpInfo(const ServerExecCtx& execCtx, const HcclMsg& msg)
+{
+    // 构造稳定 ABI 结构 HcclDfxOpInfo 并通过 HcclDfxRegOpInfoByCommId 注册。注册失败均不致命，仅记录日志。
+    // opType/reduceOp/dataType/dataCount 用 msg（每次下发的真实值，且 opType 已过 IsSupportedOp 校验）；
+    // baseOpParam 里的 opType 为未填充的默认值（曾导致 opType[19] not supported 告警），故不作为这些字段来源。
+    HcclDfxOpInfo dfxOpInfo{};
+    dfxOpInfo.beginTime = ProfGetCurCpuTimestamp();
+    dfxOpInfo.opType = static_cast<u32>(msg.commType.prepareType);
+    dfxOpInfo.reduceOp = static_cast<u32>(msg.opType);
+    dfxOpInfo.dataType = static_cast<u32>(msg.addMsg.v1Msg.hcclDataType);
+    dfxOpInfo.dataCount = static_cast<u64>(msg.dataCnt);
+
+    // opMode/root/engine/algTag 为与算法资源绑定的静态字段，从 baseOpParam 补充（缺失不影响核心上报）
+    if (execCtx.baseOpParam.size() >= sizeof(mc2_ops_hccl::OpParam)) {
+        const auto* param = reinterpret_cast<const mc2_ops_hccl::OpParam*>(execCtx.baseOpParam.data());
+        dfxOpInfo.opMode = static_cast<u32>(param->opMode);
+        dfxOpInfo.root = param->root;
+        dfxOpInfo.engine = param->engine;
+        dfxOpInfo.cpuTsThread = static_cast<uint64_t>(param->opThread);
+        const s32 sRet =
+            strncpy_s(dfxOpInfo.algTag, sizeof(dfxOpInfo.algTag), param->algTag, sizeof(dfxOpInfo.algTag) - 1);
+        if (sRet != EOK) {
+            HCCL_WARNING(
+                "[MC2_PROF][RegOpAlgTag] group %u, commName[%s], strncpy_s algTag failed, ret %d.", groupIdx_,
+                execCtx.commName.c_str(), sRet);
+        }
+    } else {
+        HCCL_WARNING(
+            "[MC2_PROF][RegOpNoBaseParam] group %u, commName[%s], baseOpParam size %zu < OpParam size %zu, "
+            "static fields skipped.",
+            groupIdx_, execCtx.commName.c_str(), execCtx.baseOpParam.size(), sizeof(mc2_ops_hccl::OpParam));
+    }
+
+    HCCL_INFO(
+        "[MC2_PROF][StartDfxMeta] group %u, commName[%s], opMode %u, opType %u, reduceOp %u, dataType %u, "
+        "dataCount %llu, root %u, engine %u, algTag[%s].",
+        groupIdx_, execCtx.commName.c_str(), dfxOpInfo.opMode, dfxOpInfo.opType, dfxOpInfo.reduceOp, dfxOpInfo.dataType,
+        static_cast<unsigned long long>(dfxOpInfo.dataCount), dfxOpInfo.root, static_cast<u32>(dfxOpInfo.engine),
+        dfxOpInfo.algTag);
+
+    if (HcclDfxRegOpInfoByCommId(const_cast<char*>(execCtx.commName.c_str()), static_cast<void*>(&dfxOpInfo)) !=
+        HCCL_SUCCESS) {
+        HCCL_WARNING("[MC2_PROF][RegOpFail] group %u, commName[%s].", groupIdx_, execCtx.commName.c_str());
+    } else {
+        HCCL_INFO("[MC2_PROF][RegOpOk] group %u, commName[%s].", groupIdx_, execCtx.commName.c_str());
+    }
+}
+
+void CommKfcAicpuServer::ReportProfilingKernelEnd(const ServerExecCtx& execCtx, const HcclMsg& msg)
+{
+    if (execCtx.resourceType != ServerExecResourceType::NEXT_AICPU) {
+        HCCL_INFO(
+            "[MC2_PROF][EndSkip] group %u, commName[%s], resourceType %u is not NEXT_AICPU.", groupIdx_,
+            execCtx.commName.c_str(), static_cast<u32>(execCtx.resourceType));
+        return;
+    }
+    // profiling 未开启时完全跳过，与 ReportProfilingKernelStart 保持一致
+    if (!IsProfilingEnabled()) {
+        HCCL_INFO(
+            "[MC2_PROF][EndProfOff] group %u, commName[%s], profiling is off, skip.", groupIdx_,
+            execCtx.commName.c_str());
+        return;
+    }
+
+    if (HcommAcquireComm(execCtx.commName.c_str()) != HCCL_SUCCESS) {
+        HCCL_WARNING(
+            "[MC2_PROF][EndAcquireFail] group %u, commName[%s], skip profiling report.", groupIdx_,
+            execCtx.commName.c_str());
+        return;
+    }
+    HCCL_INFO("[MC2_PROF][EndAcquireOk] group %u, commName[%s].", groupIdx_, execCtx.commName.c_str());
+
+    // mc2 server 是独立 kernel 路径，host 不会为它下发 HcclDfxOpInfo，需在 device 侧自行注册当前 op 信息。
+    // 注册与下面的 HcommProfilingReportDeviceOp 读取必须在同一次 acquire（同一 g_hcclComm / 通信域实例）内完成，
+    // 否则 ProfilingReportDeviceOp 会因 currDfxOpInfo 为空而 skip。用稳定 ABI 结构避免跨 so 字段错位。
+    RegisterDfxOpInfo(execCtx, msg);
+
+    // 上报device侧op信息
+    HcclResult profRet = HcommProfilingReportDeviceOp(execCtx.commName.c_str());
+    if (profRet != HCCL_SUCCESS) {
+        HCCL_WARNING(
+            "[MC2_PROF][EndReportDeviceOpFail] group %u, commName[%s], ret %u.", groupIdx_, execCtx.commName.c_str(),
+            static_cast<u32>(profRet));
+    } else {
+        HCCL_INFO("[MC2_PROF][EndReportDeviceOpOk] group %u, commName[%s].", groupIdx_, execCtx.commName.c_str());
+    }
+
+    // 上报主流和最后一个task，在post之后
+    profRet = HcommProfilingReportKernelEndTask(execCtx.mainThread, execCtx.commName.c_str());
+    if (profRet != HCCL_SUCCESS) {
+        HCCL_WARNING(
+            "[MC2_PROF][EndReportTaskFail] group %u, mainThread %#llx, commName[%s], ret %u.", groupIdx_,
+            static_cast<unsigned long long>(execCtx.mainThread), execCtx.commName.c_str(), static_cast<u32>(profRet));
+    } else {
+        HCCL_INFO(
+            "[MC2_PROF][EndReportTaskOk] group %u, mainThread %#llx, commName[%s].", groupIdx_,
+            static_cast<unsigned long long>(execCtx.mainThread), execCtx.commName.c_str());
+    }
+
+    if (HcommReleaseComm(execCtx.commName.c_str()) != HCCL_SUCCESS) {
+        HCCL_WARNING("[MC2_PROF][EndReleaseFail] group %u, commName[%s].", groupIdx_, execCtx.commName.c_str());
+    }
 }
 
 HcclResult CommKfcAicpuServer::Finalize(u32 msgPos)
