@@ -29,11 +29,11 @@ Mmad和Copy接口设置unitFlag值为2/3后，系统会启动单元标志位。
 
 当开启unitFlag后，Mmad和Fixpipe会对同一块分形的L0C Buffer进行读写操作，因此Mmad计算和Fixpipe保持一致的读写顺序，有助于获得更优的性能表现。
 
-在调用Mmad接口时，需要通过[SetMMColumnMajor/SetMMRowMajor](../../../cube_compute_ISASI/Mmad计算/寄存器配置说明/SetMMColumnMajor-SetMMRowMajor.md)接口设置Mmad的计算方向。当Fixpipe使能了NZ2ND或ChannelMerge等layout变换时，需将Mmad的计算方向设置为N方向优先，即调用`SetMMRowMajor`。反之，若未使用这些特性，则应将计算方向设置为M方向优先，即调用`SetMMColumnMajor`。
+在调用Mmad接口时，需要通过[SetMMColumnMajor/SetMMRowMajor](../../cube_compute_ISASI/Mmad计算/寄存器配置说明/SetMMColumnMajor-SetMMRowMajor.md)接口设置Mmad的计算方向。当Fixpipe使能了NZ2ND或ChannelMerge等layout变换时，需将Mmad的计算方向设置为N方向优先，即调用`SetMMRowMajor`。反之，若未使用这些特性，则应将计算方向设置为M方向优先，即调用`SetMMColumnMajor`。
 
 **图1**  Mmad和Fixpipe同时沿M方向写/读
 
-![Mmad-Fixpipe读写示意图](../../../../../figures/mmad_unitflag.png)
+![Mmad-Fixpipe读写示意图](../../../../figures/mmad_unitflag.png)
 
 ## 特性约束
 
@@ -43,11 +43,11 @@ Mmad和Copy接口设置unitFlag值为2/3后，系统会启动单元标志位。
 
 ## 相关接口
 
-- [Mmad](../Mmad.md)
-- [L0C到GM数据搬运（Copy）](../../矩阵计算的搬出/Copy_L0CToGM.md)
-- [L0C到UB数据搬运（Copy）](../../矩阵计算的搬出/Copy_L0CToUB.md)
-- [SetFixPipeConfig](../../../cube_compute_ISASI/矩阵计算的搬出/寄存器配置说明/SetFixPipeConfig.md)
-- [SetMMColumnMajor/SetMMRowMajor](../../../cube_compute_ISASI/Mmad计算/寄存器配置说明/SetMMColumnMajor-SetMMRowMajor.md)
+- [Mmad](../Mmad计算/Mmad.md)
+- [L0C到GM数据搬运（Copy）](../矩阵计算的搬出/Copy_L0CToGM.md)
+- [L0C到UB数据搬运（Copy）](../矩阵计算的搬出/Copy_L0CToUB.md)
+- [SetFixPipeConfig](../../cube_compute_ISASI/矩阵计算的搬出/寄存器配置说明/SetFixPipeConfig.md)
+- [SetMMColumnMajor/SetMMRowMajor](../../cube_compute_ISASI/Mmad计算/寄存器配置说明/SetMMColumnMajor-SetMMRowMajor.md)
 
 ## 沿K轴迭代循环使用示例片段
 

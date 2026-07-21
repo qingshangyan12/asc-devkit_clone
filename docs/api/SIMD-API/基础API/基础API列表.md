@@ -107,18 +107,18 @@
 
 | 接口名 | 功能描述 |
 | --- | --- |
-| [Global Memory到L1 Buffer数据搬运（Copy）](cube_compute_TensorAPI/矩阵计算的搬入/矩阵数据搬入至L1/Copy_GMToL1.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将Global Memory中的数据搬运到L1 Buffer。`Copy`接口根据源张量和目的张量的存储位置、数据类型和Layout选择具体搬运实现。搬运块数、搬运长度、源/目的侧步长以及格式转换相关信息由Tensor Layout推导，用户不需要在`Copy`调用中额外传入搬运参数。 |
+| [Global Memory到L1 Buffer数据搬运（Copy）](cube_compute_TensorAPI/矩阵计算的搬入/Copy_GMToL1.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将Global Memory中的数据搬运到L1 Buffer。`Copy`接口根据源张量和目的张量的存储位置、数据类型和Layout选择具体搬运实现。搬运块数、搬运长度、源/目的侧步长以及格式转换相关信息由Tensor Layout推导，用户不需要在`Copy`调用中额外传入搬运参数。 |
 
 ### 矩阵数据搬入至L0
 
 | 接口名 | 功能描述 |
 | --- | --- |
-| [L1 Buffer到L0A Buffer数据搬运（Copy）](cube_compute_TensorAPI/矩阵计算的搬入/矩阵数据搬入至L0/Copy_L1ToL0A.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的左矩阵数据搬运到L0A Buffer。 |
-| [L1 Buffer到L0B Buffer数据搬运（Copy）](cube_compute_TensorAPI/矩阵计算的搬入/矩阵数据搬入至L0/Copy_L1ToL0B.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的右矩阵数据搬运到L0B Buffer。 |
-| [L1 Buffer到L0ScaleA Buffer数据搬运（Copy）](cube_compute_TensorAPI/矩阵计算的搬入/矩阵数据搬入至L0/Copy_L1ToL0ScaleA.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的左矩阵缩放数据搬运到L0ScaleA Buffer。左矩阵缩放数据在L0ScaleA Buffer上的首地址由左矩阵在L0A Buffer的首地址的1/16推导出来。 |
-| [L1 Buffer到L0ScaleB Buffer数据搬运（Copy）](cube_compute_TensorAPI/矩阵计算的搬入/矩阵数据搬入至L0/Copy_L1ToL0ScaleB.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的右矩阵缩放数据搬运到L0ScaleB Buffer。右矩阵缩放数据在L0ScaleB Buffer上的首地址由右矩阵在L0B Buffer的首地址的1/16推导出来。 |
-| [L1 Buffer到BiasTable Buffer数据搬运（Copy）](cube_compute_TensorAPI/矩阵计算的搬入/矩阵数据搬入至L0/Copy_L1ToBiasTable.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的bias数据搬运到BiasTable Buffer，作为Mmad计算中的bias输入。 |
-| [L1 Buffer到Fixpipe Buffer数据搬运（Copy）](cube_compute_TensorAPI/矩阵计算的搬入/矩阵数据搬入至L0/Copy_L1ToFixpipe.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的量化数据搬运到Fixpipe Buffer。量化数据可用于L0C输出到GM/UB时做随路量化。 |
+| [L1 Buffer到L0A Buffer数据搬运（Copy）](cube_compute_TensorAPI/矩阵计算的搬入/Copy_L1ToL0A.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的左矩阵数据搬运到L0A Buffer。 |
+| [L1 Buffer到L0B Buffer数据搬运（Copy）](cube_compute_TensorAPI/矩阵计算的搬入/Copy_L1ToL0B.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的右矩阵数据搬运到L0B Buffer。 |
+| [L1 Buffer到L0ScaleA Buffer数据搬运（Copy）](cube_compute_TensorAPI/矩阵计算的搬入/Copy_L1ToL0ScaleA.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的左矩阵缩放数据搬运到L0ScaleA Buffer。左矩阵缩放数据在L0ScaleA Buffer上的首地址由左矩阵在L0A Buffer的首地址的1/16推导出来。 |
+| [L1 Buffer到L0ScaleB Buffer数据搬运（Copy）](cube_compute_TensorAPI/矩阵计算的搬入/Copy_L1ToL0ScaleB.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的右矩阵缩放数据搬运到L0ScaleB Buffer。右矩阵缩放数据在L0ScaleB Buffer上的首地址由右矩阵在L0B Buffer的首地址的1/16推导出来。 |
+| [L1 Buffer到BiasTable Buffer数据搬运（Copy）](cube_compute_TensorAPI/矩阵计算的搬入/Copy_L1ToBiasTable.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的bias数据搬运到BiasTable Buffer，作为Mmad计算中的bias输入。 |
+| [L1 Buffer到Fixpipe Buffer数据搬运（Copy）](cube_compute_TensorAPI/矩阵计算的搬入/Copy_L1ToFixpipe.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的量化数据搬运到Fixpipe Buffer。量化数据可用于L0C输出到GM/UB时做随路量化。 |
 
 ### Mmad计算
 
