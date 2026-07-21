@@ -298,6 +298,7 @@ add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, 
     **表5**  \_\_launch\_bounds\_\_(N)与每个线程可用的寄存器个数的关系
     
     <a name="table1715318510594"></a>
+
     | N | 每个线程可用寄存器个数 |
     | --- | --- |
     | 1025~2048 | 16 |
