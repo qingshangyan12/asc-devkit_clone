@@ -3,7 +3,7 @@ set -euo pipefail
 
 case_name="${1:-urma}"
 rank_size="${RANK_SIZE:-2}"
-npu_arch="${CMAKE_ASC_ARCHITECTURES:-dav-3510}"
+npu_arch="${CMAKE_ASC_ARCHITECTURES:-dav-2201}"
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 build_dir="${script_dir}/build"

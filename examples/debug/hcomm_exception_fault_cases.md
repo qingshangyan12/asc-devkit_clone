@@ -4,8 +4,9 @@ This directory contains two AIV fault kernels for validating exception callback 
 
 ## Kernels
 
-- `HcommUrmaTimeoutFaultKernel`: calls `Hcomm::WriteNbi` with `len > 256MB` and then `Drain`.
-- `HcommCqeErrorFaultKernel`: calls `Hcomm::WriteNbi` with a valid remote GM address and an invalid local GM address, then `Drain`.
+- `HcommUrmaTimeoutFaultKernel`: calls `Hcomm::Write` with `len > 256MB`, then `Commit` and `Wait`.
+- `HcommCqeErrorFaultKernel`: calls `Hcomm::Write` with a valid remote GM address and an invalid local GM address,
+  then `Commit` and `Wait`.
 
 Both kernels take a device pointer to `CommContext`.
 
@@ -57,7 +58,7 @@ runner notices the pending flag after `aclrtSynchronizeStream`, and then calls `
 cd <asc-devkit-repo>/examples/debug
 mkdir -p build
 cd build
-cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510
+cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201
 cmake --build . -j
 ```
 
@@ -84,7 +85,7 @@ bash run_hcomm_exception_fault.sh cqe
 Optional environment variables:
 
 - `RANK_SIZE=2`: number of ranks/devices used by the runner.
-- `CMAKE_ASC_ARCHITECTURES=dav-3510`: target NPU architecture.
+- `CMAKE_ASC_ARCHITECTURES=dav-2201`: target 950 NPU architecture.
 - `CMAKE_ASC_COMPILER=/path/to/tools/bisheng_compiler/bin/bisheng`: optional Ascend C compiler override.
 - `HCOMM_CHANNEL_DUMP_SO=/path/to/libhcomm_channel_dump.so`: shim dump library path.
 - `HCOMM_REAL_DUMP_SO=/path/to/libhccl.so`: real library that exports `HcommChannelInfoDump`.

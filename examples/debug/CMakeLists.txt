@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-2201, dav-3510")
+set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201")
 
 find_package(ASC REQUIRED)
 
@@ -35,7 +35,6 @@ target_include_directories(hcomm_exception_fault_kernels PRIVATE
 target_compile_options(hcomm_exception_fault_kernels PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
-
 add_library(hcomm_channel_dump SHARED
     hcomm_channel_dump_shim.cpp
 )
