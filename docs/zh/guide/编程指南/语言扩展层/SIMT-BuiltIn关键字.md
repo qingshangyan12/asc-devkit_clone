@@ -53,9 +53,17 @@
 
 -   dim3<a name="li1136665405"></a>
 
-    用于指定和获取线程网格（Grid）、线程块（Thread Block）在x、y、z维度上的内置结构体。
+    dim3是内置结构体类型，由3个无符号整数组成，结构体定义为
 
-    dim3由3个无符号整数组成，结构体定义为{dimx, dimy, dimz}，用于指定3个不同维度的大小，三维总数为dimx \* dimy \* dimz。开发者可以通过如下方式创建dim3结构。
+    ```c++
+    struct dim3{
+        unsigned int x, y, z;
+        dim3(unsigned int x, unsigned int y = 1, unsigned int z = 1)
+            :x(x), y(y), z(z) {}
+    };
+    ```
+
+    用于指定3个不同维度的大小，三维总数为dimx \* dimy \* dimz。开发者可以通过如下方式创建dim3结构。
 
     ```
     dim3(x); // 创建一维结构，dimy和dimz为默认值1
@@ -70,8 +78,7 @@
 
 -   gridDim<a name="li20760123812911"></a>
 
-    内置全局变量，只能在核函数中使用，表示整个计算任务在各个维度上分别由多少个线程块构成。各个维度上线程块关系需满足gridDim.x * gridDim.y * gridDim.z <= 65535。
-
+    内置全局变量，只能在核函数中使用，表示整个计算任务在各个维度上分别由多少个线程块构成。
 -   blockDim<a name="li076017381191"></a>
 
     内置全局变量，在核函数中可以直接使用，用于获取线程块中配置的线程的三维层次结构，即启动核函数时配置的dim3结构体实例值。blockDim.x，blockDim.y，blockDim.z分别表示线程块中三个维度的线程数。
@@ -111,7 +118,7 @@
 
 -   warpSize
 
-    运行时变量，表示一个线程束（Warp）中的线程数量，当前为固定值32。
+    const int32_t类型变量，表示一个线程束（Warp）中的线程数量，当前为固定值32。
 
 ## 内置数据类型<a name="section1835494915576"></a>
 
