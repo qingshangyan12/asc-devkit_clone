@@ -16,7 +16,7 @@ GEMV的核心功能体现为：当矩阵A的维度M取值为1时，接口可以�
 
 **图1**  GEMV模式矩阵乘示意图
 
-![GEMV模式矩阵乘示意图](../../../../../figures/mmad_gemv.png)
+![GEMV模式矩阵乘示意图](../../../../figures/mmad_gemv.png)
 
 ## 使用优势
 
@@ -28,7 +28,7 @@ M=1时开启GEMV模式，则矩阵乘法将M方向作为非对齐场景进行处
 
     **图2**  GEMV模式M=1的矩阵乘计算示意图
 
-    ![GEMV模式M=1的矩阵乘计算示意图](../../../../../figures/mmad_gemv_compare.png)
+    ![GEMV模式M=1的矩阵乘计算示意图](../../../../figures/mmad_gemv_compare.png)
 
 - 非GEMV模式
 
@@ -36,7 +36,7 @@ M=1时开启GEMV模式，则矩阵乘法将M方向作为非对齐场景进行处
 
     **图3**  非GEMV模式M不等于1的矩阵乘计算示意图
 
-    ![非GEMV模式M不等于1的矩阵乘计算示意图](../../../../../figures/mmad_nongemv_compare.png)
+    ![非GEMV模式M不等于1的矩阵乘计算示意图](../../../../figures/mmad_nongemv_compare.png)
 
 ## 使用示例
 
@@ -48,7 +48,7 @@ M=1时开启GEMV模式，则矩阵乘法将M方向作为非对齐场景进行处
 | B | 4096×256 | half | NZ |
 | C | 1×256 | float | ND |
 
-通过[Copy](../../矩阵计算的搬入/矩阵数据搬入至L1/GM到L1数据搬运（Copy）.md)接口将输入矩阵A从Global Memory搬运到L1 Buffer上并保持ND格式不变，然后在L1 Buffer上将A矩阵转换为NZ格式，再通过[Copy](../../矩阵计算的搬入/矩阵数据搬入至L0/L1到L0A数据搬运（Copy）.md)接口搬运到L0A Buffer，从而以GEMV模式执行矩阵乘。另外注意GEMV模式默认是关闭的，需要自定义[MmadTrait](../Mmad.md)来开启。
+通过[Copy](../矩阵计算的搬入/GM到L1数据搬运（Copy）.md)接口将输入矩阵A从Global Memory搬运到L1 Buffer上并保持ND格式不变，然后在L1 Buffer上将A矩阵转换为NZ格式，再通过[Copy](../矩阵计算的搬入/L1到L0A数据搬运（Copy）.md)接口搬运到L0A Buffer，从而以GEMV模式执行矩阵乘。另外注意GEMV模式默认是关闭的，需要自定义[MmadTrait](../Mmad计算/Mmad.md)来开启。
 
 ```cpp
 #include "tensor_api/tensor.h"

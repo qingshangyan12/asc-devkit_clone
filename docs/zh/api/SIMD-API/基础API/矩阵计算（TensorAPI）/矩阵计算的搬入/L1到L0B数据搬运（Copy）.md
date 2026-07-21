@@ -1,4 +1,4 @@
-# L1 Buffer到L0A Buffer数据搬运
+# L1 Buffer到L0B Buffer数据搬运
 
 ## 产品支持情况
 
@@ -28,24 +28,24 @@
 
 头文件路径为：`tensor_api/tensor.h`。
 
-Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的左矩阵数据搬运到L0A Buffer。
+Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的右矩阵数据搬运到L0B Buffer。
 
 该通路以512Byte数据分形为基本搬运单位。不同数据类型对应的分形矩阵形态如下：
 
 | 数据位宽 | 分形矩阵形态 |
 | :--- | :--- |
-| b4 | 16 * 64 |
-| b8 | 16 * 32 |
+| b4 | 64 * 16 |
+| b8 | 32 * 16 |
 | b16 | 16 * 16 |
-| b32 | 16 * 8 |
+| b32 | 8 * 16 |
 
 接口支持非转置搬运和转置搬运。源张量和目的张量的Layout需要匹配当前通路支持的格式组合。
 
-接口支持Batch模式。Batch模式下，源张量和目的张量的Layout需要在原有分形Layout最前面增加Batch维，Shape形态为`(B, 单矩阵Shape)`，其中`B`表示Batch数量。用户可使用`MakeFrameLayout<NZLayoutPtn, DataType>(B, m, k)`或`MakeFrameLayout<ZNLayoutPtn, DataType>(B, m, k)`构造带Batch维的Layout。
+接口支持Batch模式。Batch模式下，源张量和目的张量的Layout需要在原有分形Layout最前面增加Batch维，Shape形态为`(B, 单矩阵Shape)`，其中`B`表示Batch数量。用户可使用`MakeFrameLayout<ZNLayoutPtn, DataType>(B, k, n)`或`MakeFrameLayout<NZLayoutPtn, DataType>(B, k, n)`构造带Batch维的Layout。
 
 ## 函数原型
 
-- 执行L1 Buffer到L0A Buffer的数据搬运。
+- 执行L1 Buffer到L0B Buffer的数据搬运。
 
     ```cpp
     template <typename AtomType, typename DstTensor, typename SrcTensor>
@@ -73,16 +73,16 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
-| atomCopy | 输入 | 搬运原子对象。L1 Buffer到L0A Buffer通路可通过`MakeCopy(CopyL12L0A{})`或`MakeCopy(CopyL12L0A{}, CopyL12L0ATraitDefault{})`构造。 |
-| dst | 输出 | 目的张量，存储位置为`Location::L0A`。 |
-| src | 输入 | 源张量，存储位置为`Location::L1`。 |
+| atomCopy | 输入 | 搬运原子对象。L1 Buffer到L0B Buffer通路可通过`MakeCopy(CopyL12L0B{})`或`MakeCopy(CopyL12L0B{}, CopyL12L0BTraitDefault{})`构造。 |
+| dst | 输出 | 目的张量，存储位置必须为`Location::L0B`。 |
+| src | 输入 | 源张量，存储位置必须为`Location::L1`。 |
 
 **表2**  `MakeCopy`接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
-| copyOperation | 输入 | 搬运操作对象。L1 Buffer到L0A Buffer通路使用`CopyL12L0A{}`。 |
-| copyTrait | 输入 | 搬运Trait对象，用于指定搬运特性。L1 Buffer到L0A Buffer默认Trait使用`CopyL12L0ATraitDefault{}`。 |
+| copyOperation | 输入 | 搬运操作对象。L1 Buffer到L0B Buffer通路使用`CopyL12L0B{}`。 |
+| copyTrait | 输入 | 搬运Trait对象，用于指定搬运特性。L1 Buffer到L0B Buffer默认Trait使用`CopyL12L0BTraitDefault{}`。 |
 
 ## 数据类型
 
@@ -98,27 +98,27 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 ## 约束说明
 
-- 目的地址位于L0A Buffer时，起始地址需要满足512Byte对齐要求。
+- 目的地址位于L0B Buffer时，起始地址需要满足512Byte对齐要求。
 - 源地址位于L1 Buffer时，起始地址需要满足32Byte对齐要求。
-- 特殊数据类型约束：L1 Buffer到L0A Buffer通路使能转置时，即`ZN2NZ`，支持的数据类型约束如下：
+- 特殊数据类型约束：L1 Buffer到L0B Buffer通路使能转置时，即`NZ2ZN`，支持的数据类型约束如下：
   - b32数据类型要求源矩阵Shape在K轴方向16对齐。
   - b8数据类型要求源矩阵Shape在M轴方向32对齐。
   - b4数据类型要求源矩阵Shape在M轴方向64对齐。
-- Batch模式要求源张量和目的张量的Batch数量一致，且在L1 Buffer和L0A Buffer上张量数据连续排布。
+- Batch模式要求源张量和目的张量的Batch数量一致，且在L1 Buffer和L0B Buffer上张量数据连续排布。
 
 ## 关键特性说明
 
 ### 非转置搬运
 
-当源张量和目的张量数据格式为`NZ`时，接口按非转置方式从L1 Buffer搬运到L0A Buffer。
+当源张量和目的张量数据格式均为`ZN`时，接口按非转置方式从L1 Buffer搬运到L0B Buffer。
 
 **图1**  非转置搬运示意图
 
-![非转置搬运示意图](../../../../../figures/notranspose.png)
+![非转置搬运示意图](../../../../figures/notranspose.png)
 
 ### 转置搬运
 
-当源张量数据格式为`ZN`、目的张量数据格式为`NZ`时，接口按转置方式搬运。转置搬运会对源张量中每个分形矩阵进行转置。
+当源张量数据格式为`NZ`、目的张量数据格式为`ZN`时，接口按转置方式搬运。转置搬运会对源张量每个分形矩阵执行转置。
 
 不同数据位宽的转置搬运示意如下。
 
@@ -126,29 +126,29 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 **图2**  b4转置搬运示意图
 
-![b4转置搬运示意图](../../../../../figures/transpose_b4.png)
+![b4转置搬运示意图](../../../../figures/transpose_b4.png)
 
 #### b8转置搬运
 
 **图3**  b8转置搬运示意图
 
-![b8转置搬运示意图](../../../../../figures/transpose_b8.png)
+![b8转置搬运示意图](../../../../figures/transpose_b8.png)
 
 #### b16转置搬运
 
 **图4**  b16转置搬运示意图
 
-![b16转置搬运示意图](../../../../../figures/transpose_b16.png)
+![b16转置搬运示意图](../../../../figures/transpose_b16.png)
 
 #### b32转置搬运
 
 **图5**  b32转置搬运示意图
 
-![b32转置搬运示意图](../../../../../figures/transpose_b32.png)
+![b32转置搬运示意图](../../../../figures/transpose_b32.png)
 
 ### Batch搬运
 
-当源张量和目的张量均使用带Batch维的Layout时，`Copy`接口会按照Batch维描述的数据范围完成L1 Buffer到L0A Buffer的数据搬运。非转置搬运时源张量、目的张量均为`NZ`格式，转置搬运时源张量为`ZN`格式，目的张量为`NZ`格式。
+当源张量和目的张量均使用带Batch维的Layout时，`Copy`接口会按照Batch维描述的数据范围完成L1 Buffer到L0B Buffer的数据搬运。非转置搬运时源张量、目的张量均为`ZN`格式，转置搬运时源张量为`NZ`格式，目的张量为`ZN`格式。
 
 ## 调用示例
 
@@ -157,21 +157,21 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 using namespace AscendC::Te;
 
-__aicore__ inline void CopyL1ToL0AExample()
+__aicore__ inline void CopyL1ToL0BExample()
 {
-    using AType = half;
-    constexpr uint32_t m = 16;
+    using BType = half;
     constexpr uint32_t k = 16;
+    constexpr uint32_t n = 16;
 
-    __cbuf__ AType l1Buf[m * k];
-    __ca__ AType l0aBuf[m * k];
+    __cbuf__ BType l1Buf[k * n];
+    __cb__ BType l0bBuf[k * n];
 
-    auto l1Tensor = MakeTensor(MakeMemPtr(l1Buf), MakeFrameLayout<NZLayoutPtn, AType>(m, k));
+    auto l1Tensor = MakeTensor(MakeMemPtr(l1Buf), MakeFrameLayout<ZNLayoutPtn, BType>(k, n));
 
-    auto l0aTensor = MakeTensor(MakeMemPtr(l0aBuf), MakeFrameLayout<NZLayoutPtn, AType>(m, k));
+    auto l0bTensor = MakeTensor(MakeMemPtr(l0bBuf), MakeFrameLayout<ZNLayoutPtn, BType>(k, n));
 
-    auto copyAtom = MakeCopy(CopyL12L0A{}, CopyL12L0ATraitDefault{});
-    Copy(copyAtom, l0aTensor, l1Tensor);
+    auto copyAtom = MakeCopy(CopyL12L0B{}, CopyL12L0BTraitDefault{});
+    Copy(copyAtom, l0bTensor, l1Tensor);
 }
 ```
 
@@ -182,21 +182,21 @@ Batch模式示例如下。
 
 using namespace AscendC::Te;
 
-__aicore__ inline void CopyL1ToL0ABatchExample()
+__aicore__ inline void CopyL1ToL0BBatchExample()
 {
-    using AType = half;
+    using BType = half;
     constexpr uint32_t batch = 2;
-    constexpr uint32_t m = 16;
     constexpr uint32_t k = 16;
+    constexpr uint32_t n = 16;
 
-    __cbuf__ AType l1Buf[batch * m * k];
-    __ca__ AType l0aBuf[batch * m * k];
+    __cbuf__ BType l1Buf[batch * k * n];
+    __cb__ BType l0bBuf[batch * k * n];
 
-    auto layout = MakeFrameLayout<NZLayoutPtn, AType>(batch, m, k);
+    auto layout = MakeFrameLayout<ZNLayoutPtn, BType>(batch, k, n);
     auto l1Tensor = MakeTensor(MakeMemPtr(l1Buf), layout);
-    auto l0aTensor = MakeTensor(MakeMemPtr(l0aBuf), layout);
+    auto l0bTensor = MakeTensor(MakeMemPtr(l0bBuf), layout);
 
-    auto copyAtom = MakeCopy(CopyL12L0A{}, CopyL12L0ATraitDefault{});
-    Copy(copyAtom, l0aTensor, l1Tensor);
+    auto copyAtom = MakeCopy(CopyL12L0B{}, CopyL12L0BTraitDefault{});
+    Copy(copyAtom, l0bTensor, l1Tensor);
 }
 ```
