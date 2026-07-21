@@ -26,9 +26,32 @@
 #include "coll_comm_aicpu_mgr.h"
 #include "stream_lite.h"
 #include "thread.h"
+#include "profiling_handler_lite.h"
+#include "hcomm_device_profiling_dl.h"
 
 using namespace HcclApi;
 namespace {
+// 轻量作用域守卫：析构时执行释放动作，保证 profiling 的 comm acquire 在任意提前返回路径下都能配对释放。
+class ProfCommGuard {
+public:
+    ProfCommGuard(bool acquired, std::string commName, u32 groupIdx)
+        : acquired_(acquired), commName_(std::move(commName)), groupIdx_(groupIdx)
+    {}
+    ~ProfCommGuard()
+    {
+        if (acquired_ && HcommReleaseComm(commName_.c_str()) != HCCL_SUCCESS) {
+            HCCL_WARNING("Group %u: failed to release comm for profiling, commName[%s].", groupIdx_, commName_.c_str());
+        }
+    }
+    ProfCommGuard(const ProfCommGuard&) = delete;
+    ProfCommGuard& operator=(const ProfCommGuard&) = delete;
+
+private:
+    bool acquired_;
+    std::string commName_;
+    u32 groupIdx_;
+};
+
 static constexpr u64 TIMEOUT_ERROR_THRESHOLD = 120UL;
 static constexpr u32 AICPU_ORDER_DFX_INVALID_VALUE = 0xFFFFFFFFU;
 static const std::vector<HcclCMDType> SUPPORT_OP_LIST{
@@ -560,6 +583,51 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     LogAicpuOrderDfxCounter(
         "ServerMsg", groupIdx_, msgArea_, msgPos, 0U, 0U, opParamKey, waitAddr, recordAddr, turnNumsAddr_, execCtx);
 
+    // profiling dl 接口依赖 HcommAcquireComm 设置的线程局部通信域，此处对齐 HcclLaunchAicpuKernel 做 acquire/release
+    // 包裹。 acquire 失败不致命：仅记录日志并跳过本次 profiling 上报，不影响主通信流程。
+    const bool profCommAcquired = (execCtx->resourceType == ServerExecResourceType::NEXT_AICPU) &&
+                                  (HcommAcquireComm(execCtx->commName.c_str()) == HCCL_SUCCESS);
+    if (execCtx->resourceType == ServerExecResourceType::NEXT_AICPU && !profCommAcquired) {
+        HCCL_WARNING(
+            "Group %u: failed to acquire comm for profiling, commName[%s], skip profiling report.", groupIdx_,
+            execCtx->commName.c_str());
+    }
+    // 保证提前返回时也能释放通信域
+    ProfCommGuard profCommGuard(profCommAcquired, execCtx->commName, groupIdx_);
+
+    if (profCommAcquired) {
+        // mc2 server 是独立 kernel 路径，host 不会为它下发 HcclDfxOpInfo，需在 device 侧自行构造并注册当前 op 的
+        // DfxOpInfo， 否则 HcommProfilingReportDeviceOp 会因 GetCurrDfxOpInfo() 为空而跳过上报。填充最小字段。
+        // 注册失败不致命，仅记录日志后继续执行。
+        HcclCommDfxLite* dfxLite =
+            (execCtx->collCommAicpu != nullptr) ? execCtx->collCommAicpu->GetHcclCommDfxLite() : nullptr;
+        if (dfxLite != nullptr) {
+            auto dfxOpInfo = std::make_shared<Hccl::DfxOpInfo>();
+            dfxOpInfo->groupName_ = execCtx->commName;
+            dfxOpInfo->rankSize_ = rankNum_;
+            dfxOpInfo->isIndop_ = true;
+            dfxOpInfo->beginTime_ = ProfGetCurCpuTimestamp();
+            if (dfxLite->SetCurrDfxOpInfo(std::move(dfxOpInfo)) != HCCL_SUCCESS) {
+                HCCL_WARNING(
+                    "Group %u: failed to set curr dfx op info, commName[%s].", groupIdx_, execCtx->commName.c_str());
+            }
+        } else {
+            HCCL_WARNING(
+                "Group %u: dfxLite is null, skip dfx op info register, commName[%s].", groupIdx_,
+                execCtx->commName.c_str());
+        }
+
+        // 上报主流和第一个task，在wait之前（对齐 HcclLaunchAicpuKernel 的 profiling hook）
+        // profiling 失败不致命，仅记录日志后继续执行
+        HcclResult profRet = HcommProfilingReportKernelStartTask(execCtx->mainThread, execCtx->commName.c_str());
+        if (profRet != HCCL_SUCCESS) {
+            HCCL_WARNING(
+                "Group %u: failed to report kernel start task, mainThread %#llx, commName[%s], ret %u.", groupIdx_,
+                static_cast<unsigned long long>(execCtx->mainThread), execCtx->commName.c_str(),
+                static_cast<u32>(profRet));
+        }
+    }
+
     std::vector<uint8_t> runParam{};
     for (u32 i = 0U; i < repeatCnt; ++i) {
         const u32 turnIdx = i + 1U;
@@ -647,6 +715,25 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     }
     SetMsgPosByHandle(handle, msgPos);
     SetRepeatByHandle(handle, repeatCnt);
+
+    // 上报device侧op信息及主流和最后一个task，在post之后（对齐 HcclLaunchAicpuKernel 的 profiling hook）
+    // profiling 失败不致命，仅记录日志后继续执行
+    if (profCommAcquired) {
+        HcclResult profRet = HcommProfilingReportDeviceOp(execCtx->commName.c_str());
+        if (profRet != HCCL_SUCCESS) {
+            HCCL_WARNING(
+                "Group %u: failed to report device op, commName[%s], ret %u.", groupIdx_, execCtx->commName.c_str(),
+                static_cast<u32>(profRet));
+        }
+        profRet = HcommProfilingReportKernelEndTask(execCtx->mainThread, execCtx->commName.c_str());
+        if (profRet != HCCL_SUCCESS) {
+            HCCL_WARNING(
+                "Group %u: failed to report kernel end task, mainThread %#llx, commName[%s], ret %u.", groupIdx_,
+                static_cast<unsigned long long>(execCtx->mainThread), execCtx->commName.c_str(),
+                static_cast<u32>(profRet));
+        }
+    }
+
     return HCCL_SUCCESS;
 }
 
