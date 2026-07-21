@@ -6,11 +6,11 @@ F32 Channel Split是矩阵计算结果搬出过程中的通道拆分能力。当
 
 **图1**  F32 Channel Split示意图1
 
-![F32 Channel Split示意图1](../../../../../figures/Fixpipe_Channel_Split.png)
+![F32 Channel Split示意图1](../../../../figures/Fixpipe_Channel_Split.png)
 
 **图2**  F32 Channel Split示意图2
 
-![F32 Channel Split示意图2](../../../../../figures/Fixpipe_Channel_Split_with_dirty.png)
+![F32 Channel Split示意图2](../../../../figures/Fixpipe_Channel_Split_with_dirty.png)
 
 ## 调用形式
 
