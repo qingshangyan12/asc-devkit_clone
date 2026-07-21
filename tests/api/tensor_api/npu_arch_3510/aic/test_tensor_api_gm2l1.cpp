@@ -148,6 +148,8 @@ template <typename T, typename U>
 void DataCopyGm2L1Sim(const T& dst, const U& src);
 template <typename T, typename U, typename Coord>
 void DataCopyGm2L1Sim(const T& dst, const U& src, const Coord& coord);
+template <typename T, typename U, typename Coord, typename Shape>
+void DataCopyGm2L1Sim(const T& dst, const U& src, const Coord& coord, const Shape& shape);
 
 class TensorApiGm2L1 : public testing::Test {
 protected:
@@ -234,7 +236,29 @@ private:
         DataCopyGm2L1Sim(l1ATensorGolden, gmA, coord);                                                              \
     }
 
+// Drives the real coord/shape atom path (Copy(atom, dst, src, coord, shape)) and verifies the L1
+// result against the slice-based golden. coord/shape apply to the GM source: it copies the
+// shape-sized region starting at coord into the NZ destination.
+#define TEST_GM2L1_COORD_SHAPE_INNER(type, name, gmALayout, l1ALayout, makeCoord, makeShape, counter)                 \
+    TEST_F(TensorApiGm2L1, TEST_GM2L1_CONCAT_(CopyGm2L1OperationCoordShape, name, type, counter))                     \
+    {                                                                                                               \
+        using T = type;                                                                                             \
+        auto gmA = MakeTensor(MakeMemPtr<Location::GM>(reinterpret_cast<T*>(src0Gm)), gmALayout);                   \
+        auto l1ATensor = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABuf)), l1ALayout);             \
+        auto l1ATensorGolden = MakeTensor(MakeMemPtr<Location::L1>(reinterpret_cast<T*>(l1ABufGolden)), l1ALayout); \
+        auto atomCopy = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});                                             \
+        InitializeData<T>();                                                                                        \
+        auto coord = makeCoord;                                                                                     \
+        auto shape = makeShape;                                                                                     \
+        Copy(atomCopy, l1ATensor, gmA, coord, shape);                                                               \
+        DataCopyGm2L1Sim(l1ATensorGolden, gmA, coord, shape);                                                       \
+        EXPECT_GM2L1_EQ();                                                                                          \
+    }
+
 #define TEST_GM2L1(type, name, gmALayout, l1ALayout) TEST_GM2L1_INNER(type, name, gmALayout, l1ALayout, __COUNTER__)
+
+#define TEST_GM2L1_COORD_SHAPE(type, name, gmALayout, l1ALayout, makeCoord, makeShape) \
+    TEST_GM2L1_COORD_SHAPE_INNER(type, name, gmALayout, l1ALayout, makeCoord, makeShape, __COUNTER__)
 
 #define TEST_GM2L1_COORD(type, name, gmALayout, l1ALayout, makeCoord) \
     TEST_GM2L1_COORD_INNER(type, name, gmALayout, l1ALayout, makeCoord, __COUNTER__)
@@ -636,6 +660,18 @@ TEST_GM2L1_COORD(int8_t, ND2Nz, MakeNDExt<T>(28, 28), MakeNZ<T>(28, 28), MakeCoo
 TEST_GM2L1_COORD(int16_t, ND2Nz, MakeNDExt<T>(32, 32), MakeNZ<T>(32, 32), MakeCoord(8, 8))
 TEST_GM2L1_COORD(int32_t, ND2Nz, MakeNDExt<T>(24, 24), MakeNZ<T>(24, 24), MakeCoord(8, 8))
 
+// ND2Nz coord + shape variant: copy a shape-sized region of the GM source starting at coord into
+// the NZ destination, without materializing a slice. Verified against the slice-based golden.
+TEST_GM2L1_COORD_SHAPE(half, ND2Nz, MakeNDExt<T>(64, 64), MakeNZ<T>(32, 32), MakeCoord(0, 0), MakeShape(32, 32))
+TEST_GM2L1_COORD_SHAPE(half, ND2Nz, MakeNDExt<T>(64, 64), MakeNZ<T>(32, 32), MakeCoord(16, 16), MakeShape(32, 32))
+TEST_GM2L1_COORD_SHAPE(half, ND2Nz, MakeNDExt<T>(64, 64), MakeNZ<T>(32, 32), MakeCoord(16, 0), MakeShape(16, 32))
+TEST_GM2L1_COORD_SHAPE(float, ND2Nz, MakeNDExt<T>(64, 64), MakeNZ<T>(32, 32), MakeCoord(0, 0), MakeShape(32, 16))
+TEST_GM2L1_COORD_SHAPE(float, ND2Nz, MakeNDExt<T>(48, 48), MakeNZ<T>(32, 32), MakeCoord(8, 8), MakeShape(16, 16))
+TEST_GM2L1_COORD_SHAPE(uint8_t, ND2Nz, MakeNDExt<T>(64, 64), MakeNZ<T>(32, 32), MakeCoord(0, 0), MakeShape(32, 32))
+TEST_GM2L1_COORD_SHAPE(uint8_t, ND2Nz, MakeNDExt<T>(64, 64), MakeNZ<T>(32, 32), MakeCoord(16, 16), MakeShape(16, 16))
+TEST_GM2L1_COORD_SHAPE(uint16_t, ND2Nz, MakeNDExt<T>(48, 48), MakeNZ<T>(32, 32), MakeCoord(0, 0), MakeShape(24, 24))
+TEST_GM2L1_COORD_SHAPE(uint32_t, ND2Nz, MakeNDExt<T>(64, 64), MakeNZ<T>(32, 32), MakeCoord(16, 16), MakeShape(16, 16))
+
 // ND2Zn
 // test various data types, b8 to b32
 TEST_GM2L1(fp8_e4m3fn_t, ND2Zn, MakeNDExt<T>(18, 9), MakeZN<T>(19, 10))
@@ -729,6 +765,18 @@ TEST_GM2L1_COORD(bfloat16_t, ND2Zn, MakeNDExt<T>(36, 36), MakeZN<T>(36, 36), Mak
 TEST_GM2L1_COORD(int8_t, ND2Zn, MakeNDExt<T>(28, 28), MakeZN<T>(28, 28), MakeCoord(8, 8))
 TEST_GM2L1_COORD(int16_t, ND2Zn, MakeNDExt<T>(32, 32), MakeZN<T>(32, 32), MakeCoord(8, 8))
 TEST_GM2L1_COORD(int32_t, ND2Zn, MakeNDExt<T>(24, 24), MakeZN<T>(24, 24), MakeCoord(8, 8))
+
+// ND2Zn coord + shape variant: copy a shape-sized region of the GM source starting at coord into
+// the ZN destination, without materializing a slice. Verified against the slice-based golden.
+TEST_GM2L1_COORD_SHAPE(half, ND2Zn, MakeNDExt<T>(64, 64), MakeZN<T>(32, 32), MakeCoord(0, 0), MakeShape(32, 32))
+TEST_GM2L1_COORD_SHAPE(half, ND2Zn, MakeNDExt<T>(64, 64), MakeZN<T>(32, 32), MakeCoord(16, 16), MakeShape(32, 32))
+TEST_GM2L1_COORD_SHAPE(half, ND2Zn, MakeNDExt<T>(64, 64), MakeZN<T>(32, 32), MakeCoord(16, 0), MakeShape(16, 32))
+TEST_GM2L1_COORD_SHAPE(float, ND2Zn, MakeNDExt<T>(64, 64), MakeZN<T>(32, 32), MakeCoord(0, 0), MakeShape(32, 16))
+TEST_GM2L1_COORD_SHAPE(float, ND2Zn, MakeNDExt<T>(48, 48), MakeZN<T>(32, 32), MakeCoord(8, 8), MakeShape(16, 16))
+TEST_GM2L1_COORD_SHAPE(uint8_t, ND2Zn, MakeNDExt<T>(64, 64), MakeZN<T>(32, 32), MakeCoord(0, 0), MakeShape(32, 32))
+TEST_GM2L1_COORD_SHAPE(uint8_t, ND2Zn, MakeNDExt<T>(64, 64), MakeZN<T>(32, 32), MakeCoord(16, 16), MakeShape(16, 16))
+TEST_GM2L1_COORD_SHAPE(uint16_t, ND2Zn, MakeNDExt<T>(48, 48), MakeZN<T>(32, 32), MakeCoord(0, 0), MakeShape(24, 24))
+TEST_GM2L1_COORD_SHAPE(uint32_t, ND2Zn, MakeNDExt<T>(64, 64), MakeZN<T>(32, 32), MakeCoord(16, 16), MakeShape(16, 16))
 
 // DN2Nz
 // test various data types, b8 to b32
@@ -2144,6 +2192,17 @@ void DataCopyGm2L1Sim(const T& dst, const U& src, const Coord& coord)
 {
     // auto sliceTensor = src(coord, dst);
     // DataCopyGm2L1Sim(dst, sliceTensor);
+}
+
+// Golden for the coord/shape variant. Unlike the implementation under test (which offsets the
+// source pointer and reuses the layout to avoid materializing a slice), the golden takes the
+// straightforward path: build a real sub-tensor via Slice(coord, shape) and reuse the 2-arg Sim.
+// The two computing along different routes is what makes the check meaningful.
+template <typename T, typename U, typename Coord, typename Shape>
+void DataCopyGm2L1Sim(const T& dst, const U& src, const Coord& coord, const Shape& shape)
+{
+    auto sliceTensor = src.Slice(coord, shape);
+    DataCopyGm2L1Sim(dst, sliceTensor);
 }
 
 // Simulate hardware instruction.

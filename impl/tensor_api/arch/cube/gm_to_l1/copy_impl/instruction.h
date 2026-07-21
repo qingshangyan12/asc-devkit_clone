@@ -74,14 +74,26 @@ public:
     template <typename T, typename U, typename... Params>
     __aicore__ inline static void DataCopy(const T& dst, const U& src, const Params&... params)
     {
+        DataCopyOffsetSrc(dst, src, 0, params...);
+    }
+
+    // Same as DataCopy but adds a (compile-/run-time) element offset to the source pointer. Used by
+    // the coord/shape path so it can copy from src+coord without constructing a sub-tensor: the
+    // element type / dst pointer still come from the original tensors, only the src pointer moves.
+    template <typename T, typename U, typename Offset, typename... Params>
+    __aicore__ inline static void DataCopyOffsetSrc(
+        const T& dst, const U& src, const Offset& srcElemOffset, const Params&... params)
+    {
         using srcType = typename U::elementType;
         if constexpr (sizeof(srcType) == sizeof(int8_t)) {
             CopyGmToCbufMultiNd2nz(
-                (__cbuf__ uint8_t*)(dst.Data().Get()), (__gm__ uint8_t*)(src.Data().Get()), params...);
+                (__cbuf__ uint8_t*)(dst.Data().Get()), (__gm__ uint8_t*)(src.Data().Get()) + srcElemOffset, params...);
         } else if constexpr (sizeof(srcType) == sizeof(half)) {
-            CopyGmToCbufMultiNd2nz((__cbuf__ half*)(dst.Data().Get()), (__gm__ half*)(src.Data().Get()), params...);
+            CopyGmToCbufMultiNd2nz(
+                (__cbuf__ half*)(dst.Data().Get()), (__gm__ half*)(src.Data().Get()) + srcElemOffset, params...);
         } else if constexpr (sizeof(srcType) == sizeof(float)) {
-            CopyGmToCbufMultiNd2nz((__cbuf__ float*)(dst.Data().Get()), (__gm__ float*)(src.Data().Get()), params...);
+            CopyGmToCbufMultiNd2nz(
+                (__cbuf__ float*)(dst.Data().Get()), (__gm__ float*)(src.Data().Get()) + srcElemOffset, params...);
         }
     }
 
@@ -108,14 +120,26 @@ public:
     template <typename T, typename U, typename... Params>
     __aicore__ inline static void DataCopy(const T& dst, const U& src, const Params&... params)
     {
+        DataCopyOffsetSrc(dst, src, 0, params...);
+    }
+
+    // Same as DataCopy but adds a (compile-/run-time) element offset to the source pointer. Used by
+    // the coord/shape path so it can copy from src+coord without constructing a sub-tensor: the
+    // element type / dst pointer still come from the original tensors, only the src pointer moves.
+    template <typename T, typename U, typename Offset, typename... Params>
+    __aicore__ inline static void DataCopyOffsetSrc(
+        const T& dst, const U& src, const Offset& srcElemOffset, const Params&... params)
+    {
         using srcType = typename U::elementType;
         if constexpr (sizeof(srcType) == sizeof(int8_t)) {
             CopyGmToCbufMultiDn2nz(
-                (__cbuf__ uint8_t*)(dst.Data().Get()), (__gm__ uint8_t*)(src.Data().Get()), params...);
+                (__cbuf__ uint8_t*)(dst.Data().Get()), (__gm__ uint8_t*)(src.Data().Get()) + srcElemOffset, params...);
         } else if constexpr (sizeof(srcType) == sizeof(half)) {
-            CopyGmToCbufMultiDn2nz((__cbuf__ half*)(dst.Data().Get()), (__gm__ half*)(src.Data().Get()), params...);
+            CopyGmToCbufMultiDn2nz(
+                (__cbuf__ half*)(dst.Data().Get()), (__gm__ half*)(src.Data().Get()) + srcElemOffset, params...);
         } else if constexpr (sizeof(srcType) == sizeof(float)) {
-            CopyGmToCbufMultiDn2nz((__cbuf__ float*)(dst.Data().Get()), (__gm__ float*)(src.Data().Get()), params...);
+            CopyGmToCbufMultiDn2nz(
+                (__cbuf__ float*)(dst.Data().Get()), (__gm__ float*)(src.Data().Get()) + srcElemOffset, params...);
         }
     }
 
