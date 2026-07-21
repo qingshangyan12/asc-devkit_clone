@@ -1,4 +1,4 @@
-# 简介
+# NumericLimits
 
 NumericLimits工具类，用于查询指定数据类型的最大值/最小值等属性。
 

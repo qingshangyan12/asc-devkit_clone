@@ -8,9 +8,13 @@
 
 - **[MmadWithSparse](MmadWithSparse.md)**
 
-- **[关键特性说明](关键特性说明/关键特性说明.md)**
+- **[关键特性说明](关键特性说明.md)**
 
-- **[寄存器配置说明](寄存器配置说明/寄存器配置说明.md)**
+- **[SetMMColumnMajor/SetMMRowMajor](SetMMColumnMajor-SetMMRowMajor.md)**
+
+- **[SetHF32Mode](SetHF32Mode.md)**
+
+- **[SetHF32TransMode](SetHF32TransMode.md)**
 
 - **[Conv2D（废弃）](Conv2D（废弃）.md)**
 
