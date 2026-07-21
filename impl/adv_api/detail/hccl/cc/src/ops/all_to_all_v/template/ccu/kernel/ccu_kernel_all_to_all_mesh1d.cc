@@ -103,9 +103,10 @@ static void PreSync(AlltoAllMesh1DContext &ctx)
 
     uint32_t allBit = (1 << OUTPUT_XN_ID) | (1 << TOKEN_XN_ID);
     HCCL_INFO("[A2A_DBG] PreSync before NotifyWait, allBit[%u]", allBit);
-    for (uint32_t i = 0; i < arg->channelCount; i++) {
-        ccu::NotifyWait(arg->channels[i], CKE_IDX_0, allBit);
-    }
+    // ==== 实验3：注释 PreSync NotifyWait 定位是否卡在此 ====
+    // for (uint32_t i = 0; i < arg->channelCount; i++) {
+    //     ccu::NotifyWait(arg->channels[i], CKE_IDX_0, allBit);
+    // }
     HCCL_INFO("[A2A_DBG] PreSync after NotifyWait (passed)");
     HCCL_INFO("[CcuKernelAlltoAllMesh1D] AlltoAllMesh1D PreSync end.");
 }
