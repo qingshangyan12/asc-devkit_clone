@@ -13,6 +13,7 @@
 
 import numpy as np
 
+
 def gemm_custom_tiled(m, k, n, A, B, C, k0):
     """
     执行分块矩阵乘加运算: C = A * B^T + C
@@ -57,7 +58,6 @@ def gemm_custom_tiled(m, k, n, A, B, C, k0):
 
             # 4. 写回结果：将累加完成的值更新回 C 矩阵
             C[i, j] = accumulate_sum
-
 
     return C
 

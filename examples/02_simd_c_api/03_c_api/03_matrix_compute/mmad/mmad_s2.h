@@ -38,7 +38,6 @@ __aicore__ inline void s2_copy_matrix_a_to_l1(__cbuf__ bfloat16_t* dst, __gm__ b
     uint64_t config = (static_cast<uint64_t>(0) << 48) | (static_cast<uint64_t>(ceil_align(M, BLOCK_CUBE)) << 32) |
                       (static_cast<uint64_t>(1) << 16) | (static_cast<uint64_t>(1));
 
-
     asc_set_gm2l1_nz_para(config);
 
     uint64_t loop1_src_stride = K * sizeof(bfloat16_t);
@@ -57,7 +56,6 @@ __aicore__ inline void s2_copy_matrix_b_to_l1(__cbuf__ bfloat16_t* dst, __gm__ b
 {
     uint64_t config = (static_cast<uint64_t>(0) << 48) | (static_cast<uint64_t>(ceil_align(N, BLOCK_CUBE)) << 32) |
                       (static_cast<uint64_t>(1) << 16) | (static_cast<uint64_t>(1));
-
 
     asc_set_gm2l1_nz_para(config);
 
@@ -126,8 +124,7 @@ __aicore__ inline void s2_compute_mmad(__cc__ float* c_matrix, __ca__ bfloat16_t
         c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
         c_matrix_init_val);
 
-
-    c_matrix_source   = false;
+    c_matrix_source = false;
     c_matrix_init_val = false;
 
     asc_mmad(

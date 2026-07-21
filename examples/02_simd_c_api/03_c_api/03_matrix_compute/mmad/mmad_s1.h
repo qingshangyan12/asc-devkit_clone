@@ -79,7 +79,6 @@ __aicore__ inline void s1_copy_bias_to_l1(__cbuf__ int32_t* dst, __gm__ int32_t*
     uint64_t config = (static_cast<uint64_t>(0) << 48) | (static_cast<uint64_t>(1) << 32) |
                       (static_cast<uint64_t>(1) << 16) | (static_cast<uint64_t>(1));
 
-
     asc_set_gm2l1_nz_para(config);
 
     uint64_t loop1_src_stride = N * sizeof(int32_t);
@@ -160,13 +159,13 @@ __aicore__ inline void s1_compute_mmad(__cc__ int32_t* c_matrix, __ca__ int8_t* 
     asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID1);
     asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID2);
 
-    uint16_t left_height       = M;
-    uint16_t n_dim             = K;
-    uint16_t right_width       = ceil_align(N, BLOCK_CUBE* S1_FRACTAL_NUM);
-    uint8_t  unit_flag         = 0;
-    bool     disable_gemv      = true;
-    bool     c_matrix_source   = true;
-    bool     c_matrix_init_val = false;
+    uint16_t left_height = M;
+    uint16_t n_dim = K;
+    uint16_t right_width = ceil_align(N, BLOCK_CUBE* S1_FRACTAL_NUM);
+    uint8_t unit_flag = 0;
+    bool disable_gemv = true;
+    bool c_matrix_source = true;
+    bool c_matrix_init_val = false;
 
     asc_mmad(
         c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
