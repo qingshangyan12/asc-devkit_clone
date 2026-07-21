@@ -42,6 +42,8 @@ DumpFunc ResolveRealDumpFunc()
             std::printf("[hcomm_channel_dump_shim] dlsym HcommChannelInfoDump failed: %s\n", error);
             return nullptr;
         }
+        std::printf("[hcomm_channel_dump_shim] resolved real HcommChannelInfoDump from %s\n", soPath);
+        std::fflush(stdout);
         return reinterpret_cast<DumpFunc>(symbol);
     }();
     return dumpFunc;
@@ -54,5 +56,9 @@ extern "C" void HcommChannelInfoDump(uint32_t channelNum, ChannelHandle *channel
     if (dumpFunc == nullptr) {
         return;
     }
+    std::printf("[hcomm_channel_dump_shim] call real HcommChannelInfoDump channelNum=%u\n", channelNum);
+    std::fflush(stdout);
     dumpFunc(channelNum, channels);
+    std::printf("[hcomm_channel_dump_shim] real HcommChannelInfoDump returned\n");
+    std::fflush(stdout);
 }
