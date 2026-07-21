@@ -58,6 +58,18 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[6] = strideSize * ccuParam_.rankId;
     uint64_t loopCount = 8;
     CalcGoSize(sliceSizeAlltoall, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[7]);
+    
+    // [A2A_DBG] host 侧 CcuPrepareForAllToAll 算出的入参真值，与下游 CcuSendMsg 落盘值对比
+    AscendC::PRINTF(
+        "[A2A_DBG] CcuPrepareForAllToAll rankId:%d count:%llu dataSize:%llu strideCount:%llu | "
+        "xn0(opId):0x%llx xn1(send):0x%llx xn2(recv):0x%llx xn3(slice):0x%llx xn4(stride):0x%llx "
+        "xn5(srcOff):0x%llx xn6(dstOff):0x%llx xn7:0x%llx xn8:0x%llx xn9:0x%llx xn10:0x%llx",
+        ccuParam_.rankId, (unsigned long long)commParam->count, (unsigned long long)dataSize,
+        (unsigned long long)commParam->strideCount,
+        (unsigned long long)xnData_[0], (unsigned long long)xnData_[1], (unsigned long long)xnData_[2],
+        (unsigned long long)xnData_[3], (unsigned long long)xnData_[4], (unsigned long long)xnData_[5],
+        (unsigned long long)xnData_[6], (unsigned long long)xnData_[7], (unsigned long long)xnData_[8],
+        (unsigned long long)xnData_[9], (unsigned long long)xnData_[10]);
     return;
 }
 
