@@ -451,6 +451,8 @@ struct AlgResourceCtxSerializable {
     std::vector<uint64_t> kfcServerArgs;   // kfc server算子入参
     u32 kfcServerArgSize = 0;             // kfc server算子入参个数
 
+    double dieSplitRatio = 0.0;
+
     std::vector<char> Serialize()
     {
         BinaryStream binaryStream;
