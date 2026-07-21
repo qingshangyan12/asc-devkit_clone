@@ -13,12 +13,17 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
-#include <string>
 
 namespace Hccl {
 class AicpuTimingRecorder {
 public:
-    static constexpr std::size_t CAPACITY = 32U;
+    enum class Stage : uint8_t {
+        KERNEL_ENTRY = 0,
+        FIRST_PREPARE_ACCEPTED,
+        FIRST_PREPARE_EXPAND_END,
+        LAST_FINALIZE_RECEIVED,
+        COUNT,
+    };
 
     enum class RecordPolicy : uint8_t {
         KEEP_FIRST = 0,
@@ -37,26 +42,31 @@ public:
     AicpuTimingRecorder(AicpuTimingRecorder&&) = delete;
     AicpuTimingRecorder& operator=(AicpuTimingRecorder&&) = delete;
 
-    bool Record(const char* stage, RecordPolicy policy = RecordPolicy::KEEP_FIRST);
+    bool Record(Stage stage, RecordPolicy policy = RecordPolicy::KEEP_FIRST);
     void Report(const char* status);
     void Reset();
 
     std::size_t Size() const;
     bool IsReported() const;
-    bool GetTimestamp(const char* stage, uint64_t& timestampNs) const;
-    bool GetElapsed(const char* beginStage, const char* endStage, uint64_t& elapsedNs) const;
+    bool GetTimestamp(Stage stage, uint64_t& timestampNs) const;
+    bool GetElapsed(Stage beginStage, Stage endStage, uint64_t& elapsedNs) const;
 
 private:
+    static constexpr std::size_t STAGE_COUNT = static_cast<std::size_t>(Stage::COUNT);
+
     struct TimePoint {
-        std::string stage;
         uint64_t timestampNs{0U};
+        bool recorded{false};
     };
 
-    std::size_t FindPoint(const char* stage) const;
+    static std::size_t StageIndex(Stage stage);
+    static const char* StageName(Stage stage);
+    static const char* PhaseName(Stage stage);
+    uint64_t GetElapsedOrZero(Stage beginStage, Stage endStage) const;
 
-    std::string scenario_;
+    const char* scenario_;
     Clock clock_;
-    std::array<TimePoint, CAPACITY> points_{};
+    std::array<TimePoint, STAGE_COUNT> points_{};
     std::size_t pointCount_{0U};
     bool reported_{false};
 };

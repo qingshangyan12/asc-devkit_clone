@@ -18,9 +18,11 @@ namespace {
 constexpr uint64_t NANOSECONDS_PER_SECOND = 1000000000ULL;
 constexpr char UNKNOWN_NAME[] = "unknown";
 constexpr char INCOMPLETE_STATUS[] = "incomplete";
+constexpr char NO_PREVIOUS_STAGE[] = "none";
+constexpr char NO_PHASE[] = "none";
 } // namespace
 
-constexpr std::size_t AicpuTimingRecorder::CAPACITY;
+constexpr std::size_t AicpuTimingRecorder::STAGE_COUNT;
 
 uint64_t AicpuTimingRecorder::MonotonicNow()
 {
@@ -44,31 +46,28 @@ AicpuTimingRecorder::~AicpuTimingRecorder()
     }
 }
 
-bool AicpuTimingRecorder::Record(const char* stage, RecordPolicy policy)
+bool AicpuTimingRecorder::Record(Stage stage, RecordPolicy policy)
 {
-    if (stage == nullptr || stage[0] == '\0') {
-        HCCL_WARNING("[TIMING_STAT] Reject an empty stage in scenario[%s].", scenario_.c_str());
+    const std::size_t index = StageIndex(stage);
+    if (index == STAGE_COUNT) {
+        HCCL_WARNING("[TIMING_STAT] Reject an invalid stage in scenario[%s].", scenario_);
         return false;
     }
     if (reported_) {
-        HCCL_WARNING("[TIMING_STAT] Reject stage[%s] after scenario[%s] was reported.", stage, scenario_.c_str());
+        HCCL_WARNING("[TIMING_STAT] Reject stage[%s] after scenario[%s] was reported.", StageName(stage), scenario_);
         return false;
     }
 
-    const std::size_t index = FindPoint(stage);
-    if (index != CAPACITY) {
+    TimePoint& point = points_[index];
+    if (point.recorded) {
         if (policy == RecordPolicy::KEEP_LATEST) {
-            points_[index].timestampNs = clock_();
+            point.timestampNs = clock_();
         }
         return true;
     }
-    if (pointCount_ == CAPACITY) {
-        HCCL_WARNING("[TIMING_STAT] Scenario[%s] exceeds point capacity[%zu].", scenario_.c_str(), CAPACITY);
-        return false;
-    }
 
-    points_[pointCount_].stage = stage;
-    points_[pointCount_].timestampNs = clock_();
+    point.timestampNs = clock_();
+    point.recorded = true;
     ++pointCount_;
     return true;
 }
@@ -81,27 +80,28 @@ void AicpuTimingRecorder::Report(const char* status)
     reported_ = true;
 
     const char* reportStatus = (status == nullptr || status[0] == '\0') ? UNKNOWN_NAME : status;
-    const uint64_t firstTimestamp = points_[0U].timestampNs;
-    HCCL_RUN_INFO(
-        "[TIMING_STAT] scenario[%s], status[%s], pointCount[%zu].", scenario_.c_str(), reportStatus, pointCount_);
-    for (std::size_t i = 0U; i < pointCount_; ++i) {
-        const uint64_t timestamp = points_[i].timestampNs;
-        const uint64_t previousTimestamp = (i == 0U) ? timestamp : points_[i - 1U].timestampNs;
-        const uint64_t delta = (timestamp >= previousTimestamp) ? timestamp - previousTimestamp : 0U;
-        const uint64_t total = (timestamp >= firstTimestamp) ? timestamp - firstTimestamp : 0U;
+    HCCL_RUN_INFO("[TIMING_STAT] scenario[%s], status[%s], pointCount[%zu].", scenario_, reportStatus, pointCount_);
+    for (std::size_t i = 0U; i < STAGE_COUNT; ++i) {
+        if (!points_[i].recorded) {
+            continue;
+        }
+        const Stage stage = static_cast<Stage>(i);
+        const Stage previousStage = (i == 0U) ? stage : static_cast<Stage>(i - 1U);
+        const char* previousStageName = (i == 0U) ? NO_PREVIOUS_STAGE : StageName(previousStage);
+        const uint64_t elapsed = (i == 0U) ? 0U : GetElapsedOrZero(previousStage, stage);
+        const uint64_t total = GetElapsedOrZero(Stage::KERNEL_ENTRY, stage);
         HCCL_RUN_INFO(
-            "[TIMING_STAT][%zu] scenario[%s], stage[%s], timestampNs[%llu], deltaNs[%llu], totalNs[%llu].", i,
-            scenario_.c_str(), points_[i].stage.c_str(), static_cast<unsigned long long>(timestamp),
-            static_cast<unsigned long long>(delta), static_cast<unsigned long long>(total));
+            "[TIMING_STAT][%zu] scenario[%s], previousStage[%s], stage[%s], phase[%s], timestampNs[%llu], "
+            "elapsedNs[%llu], totalNs[%llu].",
+            i, scenario_, previousStageName, StageName(stage), PhaseName(stage),
+            static_cast<unsigned long long>(points_[i].timestampNs), static_cast<unsigned long long>(elapsed),
+            static_cast<unsigned long long>(total));
     }
 }
 
 void AicpuTimingRecorder::Reset()
 {
-    for (std::size_t i = 0U; i < pointCount_; ++i) {
-        points_[i].stage.clear();
-        points_[i].timestampNs = 0U;
-    }
+    points_ = {};
     pointCount_ = 0U;
     reported_ = false;
 }
@@ -110,20 +110,17 @@ std::size_t AicpuTimingRecorder::Size() const { return pointCount_; }
 
 bool AicpuTimingRecorder::IsReported() const { return reported_; }
 
-bool AicpuTimingRecorder::GetTimestamp(const char* stage, uint64_t& timestampNs) const
+bool AicpuTimingRecorder::GetTimestamp(Stage stage, uint64_t& timestampNs) const
 {
-    if (stage == nullptr || stage[0] == '\0') {
-        return false;
-    }
-    const std::size_t index = FindPoint(stage);
-    if (index == CAPACITY) {
+    const std::size_t index = StageIndex(stage);
+    if (index == STAGE_COUNT || !points_[index].recorded) {
         return false;
     }
     timestampNs = points_[index].timestampNs;
     return true;
 }
 
-bool AicpuTimingRecorder::GetElapsed(const char* beginStage, const char* endStage, uint64_t& elapsedNs) const
+bool AicpuTimingRecorder::GetElapsed(Stage beginStage, Stage endStage, uint64_t& elapsedNs) const
 {
     uint64_t beginTimestamp = 0U;
     uint64_t endTimestamp = 0U;
@@ -135,13 +132,48 @@ bool AicpuTimingRecorder::GetElapsed(const char* beginStage, const char* endStag
     return true;
 }
 
-std::size_t AicpuTimingRecorder::FindPoint(const char* stage) const
+std::size_t AicpuTimingRecorder::StageIndex(Stage stage)
 {
-    for (std::size_t i = 0U; i < pointCount_; ++i) {
-        if (points_[i].stage == stage) {
-            return i;
-        }
+    const std::size_t index = static_cast<std::size_t>(stage);
+    return index < STAGE_COUNT ? index : STAGE_COUNT;
+}
+
+const char* AicpuTimingRecorder::StageName(Stage stage)
+{
+    switch (stage) {
+        case Stage::KERNEL_ENTRY:
+            return "kernel_entry";
+        case Stage::FIRST_PREPARE_ACCEPTED:
+            return "first_prepare_accepted";
+        case Stage::FIRST_PREPARE_EXPAND_END:
+            return "first_prepare_expand_end";
+        case Stage::LAST_FINALIZE_RECEIVED:
+            return "last_finalize_received";
+        default:
+            return UNKNOWN_NAME;
     }
-    return CAPACITY;
+}
+
+const char* AicpuTimingRecorder::PhaseName(Stage stage)
+{
+    switch (stage) {
+        case Stage::KERNEL_ENTRY:
+            return NO_PHASE;
+        case Stage::FIRST_PREPARE_ACCEPTED:
+            return "head_overhead";
+        case Stage::FIRST_PREPARE_EXPAND_END:
+            return "single_prepare_expand";
+        case Stage::LAST_FINALIZE_RECEIVED:
+            return "communication_and_tail";
+        default:
+            return UNKNOWN_NAME;
+    }
+}
+
+uint64_t AicpuTimingRecorder::GetElapsedOrZero(Stage beginStage, Stage endStage) const
+{
+    uint64_t elapsedNs = 0U;
+    (void)GetElapsed(beginStage, endStage, elapsedNs);
+    return elapsedNs;
 }
 } // namespace Hccl

@@ -29,9 +29,6 @@ struct AscCommServerInfo {
     AscCommServerInfo(u32 groupIdx) : serverIns(groupIdx) { extMsg = std::make_shared<HcclMsgExt>(); }
 };
 static constexpr u32 MAX_RETRY_CNT = 10U;
-constexpr char FIRST_PREPARE_STAGE[] = "first_prepare";
-constexpr char LAST_EXPAND_END_STAGE[] = "last_expand_end";
-constexpr char LAST_FINALIZE_STAGE[] = "last_finalize";
 constexpr char COMPLETE_STATUS[] = "complete";
 
 HcclResult CreateServerList(void* args[], u32 ctxNum, std::vector<AscCommServerInfo>& serverList)
@@ -99,13 +96,10 @@ HcclResult FinalizeProcess(
     ++finalizeCnt;
     const bool isLastFinalize = finalizeCnt == serverNum;
     if (isLastFinalize && timingRecorder != nullptr) {
-        (void)timingRecorder->Record(LAST_FINALIZE_STAGE);
+        (void)timingRecorder->Record(Hccl::AicpuTimingRecorder::Stage::LAST_FINALIZE_RECEIVED);
     }
     CHK_RET(server.serverIns.Finalize(server.msgPos));
     server.finalizeFlag = true;
-    if (isLastFinalize && timingRecorder != nullptr) {
-        timingRecorder->Report(COMPLETE_STATUS);
-    }
     return HCCL_SUCCESS;
 }
 
@@ -137,18 +131,18 @@ HcclResult InterGroupSyncProcess(std::vector<AscCommServerInfo>& serverList, u32
 
 HcclResult PrepareProcess(AscCommServerInfo& server, u32& expectSeqNum, Hccl::AicpuTimingRecorder* timingRecorder)
 {
-    if (timingRecorder != nullptr) {
-        (void)timingRecorder->Record(FIRST_PREPARE_STAGE);
-    }
     const u32 seqNum = static_cast<u32>(server.msg.addMsg.v1Msg.seqNum);
     if (expectSeqNum != seqNum) {
         HCCL_INFO("Expect seq id %u but receive %u.", expectSeqNum, seqNum);
         ++(server.retryCnt);
     } else {
+        if (timingRecorder != nullptr) {
+            (void)timingRecorder->Record(Hccl::AicpuTimingRecorder::Stage::FIRST_PREPARE_ACCEPTED);
+        }
         HcclResult ret = server.serverIns.Orchestrate(server.msg, *(server.extMsg), server.msgPos);
         CHK_RET(ret);
         if (timingRecorder != nullptr) {
-            (void)timingRecorder->Record(LAST_EXPAND_END_STAGE, Hccl::AicpuTimingRecorder::RecordPolicy::KEEP_LATEST);
+            (void)timingRecorder->Record(Hccl::AicpuTimingRecorder::Stage::FIRST_PREPARE_EXPAND_END);
         }
         server.msgPos = (server.msgPos + 1U) % HCCL_MSG_CNT;
         ++expectSeqNum;
@@ -203,6 +197,12 @@ HcclResult GroupServerProcess(
         case ControlMsgType::HCCL_CMD_INTER_GROUP_SYNC:
             CHK_RET(InterGroupSyncProcess(serverList, groupIdx));
             break;
+        case ControlMsgType::HCCL_CMD_INIT:
+        case ControlMsgType::HCCL_CMD_BARRIER:
+        case ControlMsgType::HCCL_CMD_MAX:
+            // Keep the existing control-message path without treating it as a communication Prepare.
+            CHK_RET(PrepareProcess(server, expectSeq, nullptr));
+            break;
         default:
             CHK_RET(PrepareProcess(server, expectSeq, timingRecorder));
             break;
@@ -223,6 +223,10 @@ u32 RunDispatcher(void* args[], u32 ctxNum, Hccl::AicpuTimingRecorder* timingRec
             HcclResult ret = GroupServerProcess(serverList, i, expectSeqNum, finalizeCnt, finishCnt, timingRecorder);
             CHK_RET(serverList[i].serverIns.ErrorDfxProcess(ret));
         }
+    }
+
+    if (timingRecorder != nullptr) {
+        timingRecorder->Report(COMPLETE_STATUS);
     }
 
     return HCCL_SUCCESS;

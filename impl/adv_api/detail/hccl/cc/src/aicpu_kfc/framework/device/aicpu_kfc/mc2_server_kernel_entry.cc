@@ -20,13 +20,12 @@ using namespace HcclApi;
 
 namespace {
 constexpr char A5_HCCL_KERNEL_SCENARIO[] = "a5_hccl_kernel";
-constexpr char KERNEL_ENTRY_STAGE[] = "kernel_entry";
 } // namespace
 
 extern "C" __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void* args[])
 {
     Hccl::AicpuTimingRecorder timingRecorder(A5_HCCL_KERNEL_SCENARIO);
-    (void)timingRecorder.Record(KERNEL_ENTRY_STAGE);
+    (void)timingRecorder.Record(Hccl::AicpuTimingRecorder::Stage::KERNEL_ENTRY);
     if (args == nullptr) {
         HCCL_ERROR("args is null.");
         return HCCL_E_PARA;
