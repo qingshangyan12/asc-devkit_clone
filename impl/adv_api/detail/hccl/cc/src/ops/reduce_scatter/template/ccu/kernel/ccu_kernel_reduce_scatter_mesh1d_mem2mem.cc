@@ -167,7 +167,8 @@ static CcuResult DoReduceScatter(KfcReduceScatterMesh1DMem2MemContext &ctx)
 
 static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext &ctx)
 {
-    ccu::Variable scratchOffset = 0;
+    ccu::Variable scratchOffset;
+    scratchOffset = 0;
 
     for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
         if (rankIdx == ctx.rankId) {
@@ -186,7 +187,8 @@ static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext &ctx
         ctx.scratchMem[rankIdx].token = ctx.token[ctx.rankId];
     }
 
-    ccu::Variable repeatNumAdd = 1;
+    ccu::Variable repeatNumAdd;
+    repeatNumAdd = 1;
     ctx.flag = 0;
     CCU_WHILE(ctx.repeatNum != UINT64_MAX)
     {

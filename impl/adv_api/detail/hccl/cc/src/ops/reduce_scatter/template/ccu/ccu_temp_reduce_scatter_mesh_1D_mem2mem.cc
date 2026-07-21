@@ -46,9 +46,6 @@ HcclResult CcuTempReduceScatterMesh1DMem2Mem::CalcRes(
     // 创建每个kernel的ctxArg，放入kernelInfo, 然后将kernelinfo放入resourceRequest.ccuKernelInfos
     CcuKernelInfo kernelInfo;
 
-    kernelInfo.creator = [](const hcomm::CcuKernelArg& arg) {
-        return std::make_unique<CcuKernelReduceScatterMesh1DMem2Mem>(arg);
-    };
     std::vector<HcclChannelDesc> channelDescs;
     if (topoInfo->level0Topo != Level0Shape::MESH_1D_CLOS) {
         CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));
@@ -79,6 +76,7 @@ HcclResult CcuTempReduceScatterMesh1DMem2Mem::FastLaunch(
     const OpParam& param, const TemplateFastLaunchCtx& tempFastLaunchCtx)
 {
     HCCL_DEBUG("[CcuTempReduceScatterMesh1DMem2Mem::FastLaunch] start");
+    /*
     const uint64_t* args = tempFastLaunchCtx.ccuKernelSubmitInfos[0].cachedArgs;
     buffInfo_ = tempFastLaunchCtx.buffInfo;
     CcuTaskArgReduceScatterMesh1DMem2Mem taskArg(
@@ -91,7 +89,7 @@ HcclResult CcuTempReduceScatterMesh1DMem2Mem::FastLaunch(
     CHK_RET(HcclCcuKernelLaunch(
         param.hcclComm, tempFastLaunchCtx.threads[0], tempFastLaunchCtx.ccuKernelSubmitInfos[0].kernelHandle,
         taskArgPtr));
-
+    */
     HCCL_DEBUG("[CcuTempReduceScatterMesh1DMem2Mem::FastLaunch] end");
     return HcclResult::HCCL_SUCCESS;
 }
@@ -119,7 +117,7 @@ HcclResult CcuTempReduceScatterMesh1DMem2Mem::KernelRun(
     uint64_t lastSliceSize = templateDataParams.tailSize;
 
     uint64_t repeatNum = UINT64_MAX - repeatNumTmp;
-
+    /*
     std::unique_ptr<hcomm::CcuTaskArg> taskArg = std::make_unique<CcuTaskArgReduceScatterMesh1DMem2Mem>(
         inputAddr, outputAddr, token, scratchAddr, inputSliceStride, outputSliceStride, inputRepeatStride,
         outputRepeatStride, normalSliceSize, lastSliceSize, repeatNum);
@@ -136,7 +134,7 @@ HcclResult CcuTempReduceScatterMesh1DMem2Mem::KernelRun(
         inputSliceStride, outputSliceStride, inputRepeatStride, outputRepeatStride, normalSliceSize, lastSliceSize,
         repeatNum));
     templateResource.submitInfos.push_back(submitInfo);
-
+    */
     HCCL_DEBUG("[CcuTempReduceScatterMesh1DMem2Mem::KernelRun] end");
 
     return HcclResult::HCCL_SUCCESS;
