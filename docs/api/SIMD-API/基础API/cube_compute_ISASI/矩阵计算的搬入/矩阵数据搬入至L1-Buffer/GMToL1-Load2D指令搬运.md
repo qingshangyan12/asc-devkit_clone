@@ -1,4 +1,4 @@
-# GMToL1 Load2D指令搬运<a id="ZH-CN_TOPIC_0000002538231138"></a>
+﻿# GMToL1 Load2D指令搬运<a id="ZH-CN_TOPIC_0000002538231138"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002567745223_section796754519912"></a>
 
@@ -25,7 +25,7 @@
 <!-- end id7 -->
 ## 功能说明<a id="zh-cn_topic_0000002567745223_section106841136114319"></a>
 
-头文件路径为：basic_api/kernel_operator_mm_intf.h。
+头文件路径为：`"basic_api/kernel_operator_mm_intf.h"`。
 
 负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位从Global Memory搬运至L1 Buffer（TPosition为A1/B1）。
 

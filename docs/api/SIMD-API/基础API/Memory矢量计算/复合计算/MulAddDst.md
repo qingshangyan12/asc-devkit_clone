@@ -1,4 +1,4 @@
-# MulAddDst<a name="ZH-CN_TOPIC_0000001788011396"></a>
+﻿# MulAddDst<a name="ZH-CN_TOPIC_0000001788011396"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -27,7 +27,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为："basic_api/kernel_operator_vec_binary_intf.h"。
+头文件路径为：`"basic_api/kernel_operator_vec_binary_intf.h"`。
 
 按元素将src0和src1相乘并和dst相加，将最终结果存放进dst中。计算公式如下：
 

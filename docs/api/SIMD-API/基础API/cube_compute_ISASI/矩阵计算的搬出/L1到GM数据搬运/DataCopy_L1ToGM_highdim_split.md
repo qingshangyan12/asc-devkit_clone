@@ -1,4 +1,4 @@
-# L1ToGM高维切分数据搬运（DataCopy）<a name="ZH-CN_TOPIC_0000002594407261"></a>
+﻿# L1ToGM高维切分数据搬运（DataCopy）<a name="ZH-CN_TOPIC_0000002594407261"></a>
 
 ## 产品支持情况<a name="zh-cn_topic_0000002540558032_section796754519912"></a>
 
@@ -25,7 +25,7 @@
 <!-- end id7 -->
 ## 功能说明<a name="zh-cn_topic_0000002540558032_section106841136114319"></a>
 
-头文件路径为：basic_api/kernel_operator_data_copy_intf.h。
+头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
 该接口主要实现将矩阵从L1 Buffer搬运至Global Memory，数据搬运时格式和内容保持不变。
 
