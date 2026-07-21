@@ -35,13 +35,6 @@ SelectorStatus ReduceScatterAutoSelector::SelectCcuMsAlgo(const TopoInfoWithNetL
     HCCL_DEBUG("[ReduceScatterAutoSelector][%s] start, topoInfo levelNum[%u]", __func__, topoInfo->topoLevelNums);
     (void)configAlgMap;
     
-    /*
-    // 保序模式不支持CCU_MS，需要回退到AICPU
-    CHK_PRT_RET(IsNeedStrictModeForOrderPreserved(opParam, topoInfo->userRankSize),
-        HCCL_DEBUG("[ReduceScatterAutoSelector] DETERMINISTIC_STRICT mode not supported for CCU_MS, fallback to AICPU."),
-        SelectorStatus::NOT_MATCH);
-    */
-    
     if (topoInfo->topoLevelNums > 1) {
         HCCL_WARNING("[ReduceScatterAutoSelector] layerNum > 1 is not supported yet for ccu_ms mode.");
         return SelectorStatus::NOT_MATCH;

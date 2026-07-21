@@ -9,7 +9,6 @@
  */
 #include "all_gather_auto_selector.h"
 #include "selector_registry.h"
-#include "order_preserved_common.h"
 
 namespace mc2_ops_hccl {
 constexpr u64 AG_2D_SMALL_DATA_SIZE = 1024 * 1024;
