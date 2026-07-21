@@ -51,7 +51,21 @@ private:
 </th>
 </tr>
 </thead>
-<tbody><tr id="zh-cn_topic_0000001656780128_zh-cn_topic_0000001441184464_row8906103284616"><td class="cellrowborder" valign="top" width="16.650000000000002%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000001656780128_p1985231611167"><a name="zh-cn_topic_0000001656780128_p1985231611167"></a><a name="zh-cn_topic_0000001656780128_p1985231611167"></a>AttrType</p>
+<tbody><tr id="row_opattrdef_ctor_name"><td class="cellrowborder" valign="top" width="16.650000000000002%" headers="mcps1.2.4.1.1 "><p id="p_opattrdef_ctor_name"><a name="p_opattrdef_ctor_name"></a><a name="p_opattrdef_ctor_name"></a>OpAttrDef</p>
+</td>
+<td class="cellrowborder" valign="top" width="20.1%" headers="mcps1.2.4.1.2 "><p id="p_opattrdef_ctor_name_param"><a name="p_opattrdef_ctor_name_param"></a><a name="p_opattrdef_ctor_name_param"></a>name: 算子属性名称。</p>
+</td>
+<td class="cellrowborder" valign="top" width="63.24999999999999%" headers="mcps1.2.4.1.3 "><p id="p_opattrdef_ctor_name_desc"><a name="p_opattrdef_ctor_name_desc"></a><a name="p_opattrdef_ctor_name_desc"></a>构造算子属性定义OpAttrDef，并设置属性名称。</p>
+</td>
+</tr>
+<tr id="row_opattrdef_ctor_copy"><td class="cellrowborder" valign="top" width="16.650000000000002%" headers="mcps1.2.4.1.1 "><p id="p_opattrdef_ctor_copy"><a name="p_opattrdef_ctor_copy"></a><a name="p_opattrdef_ctor_copy"></a>OpAttrDef</p>
+</td>
+<td class="cellrowborder" valign="top" width="20.1%" headers="mcps1.2.4.1.2 "><p id="p_opattrdef_ctor_copy_param"><a name="p_opattrdef_ctor_copy_param"></a><a name="p_opattrdef_ctor_copy_param"></a>attr_def: 已构造完成的算子属性OpAttrDef。</p>
+</td>
+<td class="cellrowborder" valign="top" width="63.24999999999999%" headers="mcps1.2.4.1.3 "><p id="p_opattrdef_ctor_copy_desc"><a name="p_opattrdef_ctor_copy_desc"></a><a name="p_opattrdef_ctor_copy_desc"></a>拷贝构造OpAttrDef，复制被拷贝对象的属性名称、属性数据类型、属性类型、默认值、版本号和注释等配置。</p>
+</td>
+</tr>
+<tr id="zh-cn_topic_0000001656780128_zh-cn_topic_0000001441184464_row8906103284616"><td class="cellrowborder" valign="top" width="16.650000000000002%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000001656780128_p1985231611167"><a name="zh-cn_topic_0000001656780128_p1985231611167"></a><a name="zh-cn_topic_0000001656780128_p1985231611167"></a>AttrType</p>
 </td>
 <td class="cellrowborder" valign="top" width="20.1%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000001656780128_zh-cn_topic_0000001526594958_zh-cn_topic_0000001575944081_p318615392613"><a name="zh-cn_topic_0000001656780128_zh-cn_topic_0000001526594958_zh-cn_topic_0000001575944081_p318615392613"></a><a name="zh-cn_topic_0000001656780128_zh-cn_topic_0000001526594958_zh-cn_topic_0000001575944081_p318615392613"></a>attr_type: 属性类型</p>
 </td>
