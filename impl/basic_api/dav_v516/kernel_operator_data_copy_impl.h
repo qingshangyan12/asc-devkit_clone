@@ -188,7 +188,7 @@ __aicore__ inline void CopyCbufToUbuf(
     __ubuf__ T* dst, __cbuf__ T* src, const uint16_t blockCount, const uint16_t blockLen, const uint16_t srcStride,
     const uint16_t dstStride)
 {
-    copy_cbuf_to_ubuf((__ubuf__ void*)dst, (__cbuf__ void*)src, 0, blockCount, blockLen, srcStride, dstStride);
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "CopyCbufToUbuf not support type void*"); });
 }
 
 // only support CubeCore   PIPE_MTE1
