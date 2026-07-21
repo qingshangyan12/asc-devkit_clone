@@ -137,43 +137,43 @@ INSTANTIATE_TEST_CASE_P(
             "Scatter",
             {TPosition::VECIN, TPosition::VECIN, TPosition::A1},
             "dstOffset",
-            "A1",
-            "VECIN / VECOUT / VECCALC"},
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
         OpTestParams{
             ScatterOpTest<float, Scatter>,
             "Scatter",
             {TPosition::VECIN, TPosition::A1, TPosition::VECIN},
             "src",
-            "A1",
-            "VECIN / VECOUT / VECCALC"},
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
         OpTestParams{
             ScatterOpTest<float, Scatter>,
             "Scatter",
             {TPosition::A1, TPosition::VECIN, TPosition::VECIN},
             "dst",
-            "A1",
-            "VECIN / VECOUT / VECCALC"},
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
         OpTestParams{
             ScatterOp2Test<float, Scatter>,
             "Scatter",
             {TPosition::VECIN, TPosition::VECIN, TPosition::A1},
             "dstOffset",
-            "A1",
-            "VECIN / VECOUT / VECCALC"},
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
         OpTestParams{
             ScatterOp2Test<float, Scatter>,
             "Scatter",
             {TPosition::VECIN, TPosition::A1, TPosition::VECIN},
             "src",
-            "A1",
-            "VECIN / VECOUT / VECCALC"},
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"},
         OpTestParams{
             ScatterOp2Test<float, Scatter>,
             "Scatter",
             {TPosition::A1, TPosition::VECIN, TPosition::VECIN},
             "dst",
-            "A1",
-            "VECIN / VECOUT / VECCALC"}));
+            "L1 Buffer(A1)",
+            "UB(VECIN/VECOUT/VECCALC)"}));
 
 TEST_P(VectorOpTestsuite, VectorOpTestCase)
 {

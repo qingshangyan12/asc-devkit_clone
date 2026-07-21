@@ -348,78 +348,93 @@ INSTANTIATE_TEST_CASE_P(
         //***********************************************************
         // Fixpipe
         CubeOpTestParams{
-            FixpipeOpTest<half, float, Fixpipe<half, float>>, "Fixpipe", {TPosition::VECIN}, "src", "VECIN", "CO1"},
+            FixpipeOpTest<half, float, Fixpipe<half, float>>,
+            "Fixpipe",
+            {TPosition::VECIN},
+            "src",
+            "UB(VECIN)",
+            "L0C Buffer(CO1)"},
         CubeOpTestParams{
             FixpipeOpTest2<half, float, Fixpipe<half, float>>,
             "Fixpipe",
             {TPosition::VECIN, TPosition::VECIN},
             "src",
-            "VECIN",
-            "CO1"},
-        // Fixpipe的dst位置,与se确认为A1
+            "UB(VECIN)",
+            "L0C Buffer(CO1)"},
+        // Fixpipe dst物理位置为L1
         CubeOpTestParams{
             FixpipeOpTest2<half, float, Fixpipe<half, float>>,
             "Fixpipe",
             {TPosition::CO2, TPosition::CO1},
             "dst",
-            "CO2",
-            "A1"},
+            "GM(CO2)",
+            "L1 Buffer(C1)"},
         // LoadData
         CubeOpTestParams{
             LoadData2dOpTest<half, LoadData>,
             "LoadData",
             {TPosition::CO2, TPosition::CO1},
             "src",
-            "CO1",
-            "A1 / B1 / GM"},
+            "L0C Buffer(CO1)",
+            "L1 Buffer(A1/B1)/GM"},
         CubeOpTestParams{
-            LoadData2dOpTest<half, LoadData>, "LoadData", {TPosition::CO2, TPosition::A1}, "dst", "CO2", "A2 / B2"},
+            LoadData2dOpTest<half, LoadData>,
+            "LoadData",
+            {TPosition::CO2, TPosition::A1},
+            "dst",
+            "GM(CO2)",
+            "L0A Buffer(A2)/L0B Buffer(B2)"},
         CubeOpTestParams{
-            LoadData2dG2LOpTest<half, LoadData>, "LoadData", {TPosition::CO2}, "dst", "CO2", "A1 / B1 / A2 / B2"},
+            LoadData2dG2LOpTest<half, LoadData>,
+            "LoadData",
+            {TPosition::CO2},
+            "dst",
+            "GM(CO2)",
+            "L1 Buffer(A1/B1)/L0A Buffer(A2)/L0B Buffer(B2)"},
         // LodaData2DV2
         CubeOpTestParams{
             LoadData2dv2L2LOpTest<half, LoadData>,
             "LoadData with LoadData2DParamsV2",
             {TPosition::CO2, TPosition::A1},
             "dst",
-            "CO2",
-            "A2 / B2"},
+            "GM(CO2)",
+            "L0A Buffer(A2)/L0B Buffer(B2)"},
         CubeOpTestParams{
             LoadData2dv2L2LOpTest<half, LoadData>,
             "LoadData with LoadData2DParamsV2",
             {TPosition::CO2, TPosition::CO1},
             "src",
-            "CO1",
-            "A1 / B1"},
+            "L0C Buffer(CO1)",
+            "L1 Buffer(A1/B1)"},
         CubeOpTestParams{
             LoadData2dv2G2LOpTest<half, LoadData>,
             "LoadData with LoadData2DParamsV2",
             {TPosition::CO2},
             "dst",
-            "CO2",
-            "A1 / B1 / A2 / B2"},
+            "GM(CO2)",
+            "L1 Buffer(A1/B1)/L0A Buffer(A2)/L0B Buffer(B2)"},
         // Mmad
         CubeOpTestParams{
             MmadOpTest<half, half, half, Mmad>,
             "Mmad",
             {TPosition::A1, TPosition::A1, TPosition::A1},
             "dstLocal",
-            "A1",
-            "CO1"},
+            "L1 Buffer(A1)",
+            "L0C Buffer(CO1)"},
         CubeOpTestParams{
             MmadOpTest<half, half, half, Mmad>,
             "Mmad",
             {TPosition::CO1, TPosition::A1, TPosition::A1},
             "fmLocal",
-            "A1",
-            "A2"},
+            "L1 Buffer(A1)",
+            "L0A Buffer(A2)"},
         CubeOpTestParams{
             MmadOpTest<half, half, half, Mmad>,
             "Mmad",
             {TPosition::CO1, TPosition::A2, TPosition::A1},
             "filterLocal",
-            "A1",
-            "B2"}));
+            "L1 Buffer(A1)",
+            "L0B Buffer(B2)"}));
 
 TEST_P(CubeOpTestsuite, CubeOpTestCase)
 {
