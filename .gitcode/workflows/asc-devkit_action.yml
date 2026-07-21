@@ -270,7 +270,7 @@ stages:
               workspace: ${{ steps.process_checkout.outputs.path }}
               cov_mode: "report"
               ut_field: "asc-devkit"
-              modules: "ophost opapi kernel opgraph"
+              modules: "adv_test adv_test_two basic_test_one basic_test_two basic_test_three basic_test_four basic_test_five"
               source_branch: ${{ env.SOURCE_BRANCH }}
               target_branch: ${{ env.TARGET_BRANCH }}
               obs_path: ${{ env.obs_path }}
