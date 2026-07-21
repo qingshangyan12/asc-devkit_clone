@@ -21,6 +21,11 @@
 #include "impl/utils/debug/asc_debug_utils.h"
 
 namespace __asc_simd_vf {
+__simd_callee__ inline uint32_t get_reg_dump_u32_count(uint32_t dump_size_bytes)
+{
+    return (dump_size_bytes + sizeof(uint32_t) - 1) / sizeof(uint32_t);
+}
+
 enum class DumpTensorPosition : uint16_t { GM = 0, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, REG, MAX };
 
 template <DumpTensorPosition dumpPosition, typename T, typename U>
@@ -65,10 +70,31 @@ __simd_callee__ inline void set_dump_tlv_data_reg(
 {
     __ubuf__ T* dump_dst_addr = reinterpret_cast<__ubuf__ T*>(dump_tlv + 1);
 
-    uint32_t count = dump_tlv->dumpSize / sizeof(T);
+    const uint32_t count = get_reg_dump_u32_count(dump_tlv->dumpSize);
     vector_align ureg;
-    vstus(ureg, count * 2, (vector_u32&)src, (__ubuf__ uint32_t*&)dump_dst_addr, POST_UPDATE);
-    vstas(ureg, (__ubuf__ uint32_t*&)dump_dst_addr, count * 2, POST_UPDATE);
+    vstus(ureg, count, (vector_u32&)src, (__ubuf__ uint32_t*&)dump_dst_addr, POST_UPDATE);
+    vstas(ureg, (__ubuf__ uint32_t*&)dump_dst_addr, 0, POST_UPDATE);
+}
+
+template <typename T>
+__simd_callee__ inline uint32_t reserve_dump_tlv(__ubuf__ BlockVFBufInfo* block_info, uint32_t dump_size)
+{
+    if (block_info->flag != 0) {
+        return 0;
+    }
+
+    constexpr uint16_t data_block_size = 32;
+    constexpr uint32_t max_dump_data_len = ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE > sizeof(DumpTensorTlv) ?
+                                               ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE - sizeof(DumpTensorTlv) :
+                                               0;
+    if (dump_size > max_dump_data_len / sizeof(T)) {
+        block_info->flag = 1;
+        return 0;
+    }
+
+    const uint32_t align_dump_len = align_up(dump_size * sizeof(T), data_block_size);
+    const uint32_t tlv_len = sizeof(DumpTensorTlv) + align_dump_len;
+    return reserve_debug_tlv(block_info, tlv_len) ? tlv_len : 0;
 }
 
 template <DumpTensorPosition dumpPosition, typename T, typename U>
@@ -76,10 +102,11 @@ __simd_callee__ inline void asc_dump_impl_reg(U& src, uint32_t desc, uint32_t du
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     __ubuf__ BlockVFBufInfo* block_info = get_printf_ubuf_addr(0);
-
-    constexpr uint16_t data_block_size = 32;
-    uint32_t align_dump_len = align_up(dump_size * sizeof(T), data_block_size);
-    uint32_t tlv_len = sizeof(DumpTensorTlv) + align_dump_len;
+    const uint32_t tlv_len = reserve_dump_tlv<T>(block_info, dump_size);
+    if (tlv_len == 0) {
+        return;
+    }
+    const uint32_t align_dump_len = tlv_len - sizeof(DumpTensorTlv);
 
     __ubuf__ DumpTensorTlv* dump_tlv =
         (__ubuf__ DumpTensorTlv*)((__ubuf__ uint8_t*)(block_info->buffer) + block_info->writeLen);
@@ -97,10 +124,11 @@ __simd_callee__ inline void asc_dump_impl(U& src, uint32_t desc, uint32_t dump_s
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     __ubuf__ BlockVFBufInfo* block_info = get_printf_ubuf_addr(0);
-
-    constexpr uint16_t data_block_size = 32;
-    uint32_t align_dump_len = align_up(dump_size * sizeof(T), data_block_size);
-    uint32_t tlv_len = sizeof(DumpTensorTlv) + align_dump_len;
+    const uint32_t tlv_len = reserve_dump_tlv<T>(block_info, dump_size);
+    if (tlv_len == 0) {
+        return;
+    }
+    const uint32_t align_dump_len = tlv_len - sizeof(DumpTensorTlv);
 
     __ubuf__ DumpTensorTlv* dump_tlv =
         (__ubuf__ DumpTensorTlv*)((__ubuf__ uint8_t*)(block_info->buffer) + block_info->writeLen);
@@ -112,7 +140,6 @@ __simd_callee__ inline void asc_dump_impl(U& src, uint32_t desc, uint32_t dump_s
     block_info->pidx += 1;
 #endif
 }
-
 template <typename T, typename U>
 __ASC_USE_RESERVED_UBUF__(
     3510, "asc_dump_reg is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
