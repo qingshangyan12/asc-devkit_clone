@@ -45,7 +45,7 @@ jobs:
             export task_name=${{ inputs.task_name }}
             export GIT_TARGET_BRANCH=${{ env.target_branch }}
             export ASCEND_3RD_LIB_PATH=/home/jenkins/opensource
-            BuildAccelerate bash .gitcode/workflows/x86_compile.sh
+            BuildAccelerate bash .gitcode/scripts/x86_compile.sh
           AC_SERVER_IP: ${{ vars.AC_SERVER_IP }}
       -
         name: api-check

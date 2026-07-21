@@ -49,7 +49,7 @@ jobs:
             export task_name=${{ inputs.task_name }}
             export target_branch=${{ env.target_branch }}
             export ASCEND_3RD_LIB_PATH=/home/jenkins/opensource
-            BuildAccelerate bash .gitcode/workflows/arm_compile.sh
+            BuildAccelerate bash .gitcode/scripts/arm_compile.sh
           AC_SERVER_IP: ${{ vars.AC_SERVER_IP }}
       - name: verify_package
         uses: cann/.gitcode/actions/verify-package@master
