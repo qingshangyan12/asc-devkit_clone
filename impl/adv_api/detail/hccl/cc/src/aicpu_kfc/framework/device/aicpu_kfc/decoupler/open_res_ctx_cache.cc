@@ -16,6 +16,7 @@
 #include <limits>
 #include <map>
 #include <mutex>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
@@ -48,6 +49,8 @@ struct CacheEntry {
     u64 ctxSize{0U};
     uint64_t lastAccess{0U};
     uint64_t publishSerial{0U};
+    bool publishLogged{false};
+    bool firstHitLogged{false};
 };
 
 struct CacheStats {
@@ -62,6 +65,7 @@ struct CacheStats {
 
 std::mutex g_cacheMutex;
 std::map<CacheKey, CacheEntry> g_cache;
+std::set<CacheKey> g_missLoggedKeys;
 uint64_t g_accessSerial{0U};
 uint64_t g_publishSerial{0U};
 CacheStats g_cacheStats;
@@ -156,6 +160,16 @@ bool IsReusable(const CacheEntry& entry, const mc2_ops_hccl::OpParam& param)
     return param.cacheValid && IsEntryForParam(entry, param);
 }
 
+void LogCacheEvent(const char* event, uint64_t opParamKey, const mc2_ops_hccl::OpParam& param)
+{
+    HCCL_DEBUG(
+        "[MC2_RES_CTX_CACHE][%s] opParamKey[%#llx], hcclComm[%p], commName[%s], algTag[%s], opType[%u], "
+        "sourceResCtx[%p], ctxSize[%llu], cacheValid[%d].",
+        event, static_cast<unsigned long long>(opParamKey), param.hcclComm, param.commName, param.algTag,
+        static_cast<u32>(param.opType), param.resCtx, static_cast<unsigned long long>(param.ctxSize),
+        static_cast<int>(param.cacheValid));
+}
+
 void EvictOldestIfNeeded()
 {
     if (g_cache.size() < OPEN_RES_CTX_CACHE_CAPACITY) {
@@ -166,6 +180,7 @@ void EvictOldestIfNeeded()
             return lhs.second.lastAccess < rhs.second.lastAccess;
         });
     if (oldest != g_cache.end()) {
+        g_missLoggedKeys.erase(oldest->first);
         g_cache.erase(oldest);
         g_cacheStats.evictions.fetch_add(1U, std::memory_order_relaxed);
     }
@@ -197,6 +212,9 @@ HcclResult AcquireOpenResCtx(uint64_t opParamKey, const mc2_ops_hccl::OpParam& p
     CacheKey key;
     uint64_t publishSerial = 0U;
     bool cacheReadyForParam = false;
+    bool logMiss = false;
+    bool logPublish = false;
+    bool logFirstHit = false;
     if (cacheable) {
         ret = BuildCacheKey(param, key);
         if (ret != HCCL_SUCCESS) {
@@ -209,15 +227,27 @@ HcclResult AcquireOpenResCtx(uint64_t opParamKey, const mc2_ops_hccl::OpParam& p
             holder = iter->second.holder;
             cacheReadyForParam = true;
             g_cacheStats.hits.fetch_add(1U, std::memory_order_relaxed);
+            if (!iter->second.firstHitLogged) {
+                iter->second.firstHitLogged = true;
+                logFirstHit = true;
+            }
         } else if (iter == g_cache.end()) {
             g_cacheStats.misses.fetch_add(1U, std::memory_order_relaxed);
             publishSerial = ++g_publishSerial;
+            logMiss = g_missLoggedKeys.insert(key).second;
         } else {
             g_cacheStats.stale.fetch_add(1U, std::memory_order_relaxed);
             publishSerial = ++g_publishSerial;
         }
     } else {
         g_cacheStats.bypasses.fetch_add(1U, std::memory_order_relaxed);
+    }
+
+    if (logMiss) {
+        LogCacheEvent("MISS", opParamKey, param);
+    }
+    if (logFirstHit) {
+        LogCacheEvent("FIRST_HIT", opParamKey, param);
     }
 
     if (holder == nullptr) {
@@ -242,14 +272,25 @@ HcclResult AcquireOpenResCtx(uint64_t opParamKey, const mc2_ops_hccl::OpParam& p
                 entry.ctxSize = param.ctxSize;
                 entry.lastAccess = ++g_accessSerial;
                 entry.publishSerial = publishSerial;
+                entry.publishLogged = true;
                 g_cache.emplace(std::move(key), std::move(entry));
                 cacheReadyForParam = true;
+                logPublish = true;
             } else if (shouldPublish) {
+                const bool sourceChanged = !IsEntryForParam(iter->second, param);
                 iter->second.holder = newHolder;
                 iter->second.sourceResCtx = param.resCtx;
                 iter->second.ctxSize = param.ctxSize;
                 iter->second.lastAccess = ++g_accessSerial;
                 iter->second.publishSerial = publishSerial;
+                if (sourceChanged) {
+                    iter->second.publishLogged = false;
+                    iter->second.firstHitLogged = false;
+                }
+                if (!iter->second.publishLogged) {
+                    iter->second.publishLogged = true;
+                    logPublish = true;
+                }
                 cacheReadyForParam = true;
             } else {
                 cacheReadyForParam = IsEntryForParam(iter->second, param);
@@ -257,6 +298,10 @@ HcclResult AcquireOpenResCtx(uint64_t opParamKey, const mc2_ops_hccl::OpParam& p
             }
         }
         holder = std::move(newHolder);
+    }
+
+    if (logPublish) {
+        LogCacheEvent("PUBLISH", opParamKey, param);
     }
 
     // The open path keeps one device OpParam across launches. Promote the first successful cache publication so
