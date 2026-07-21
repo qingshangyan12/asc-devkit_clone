@@ -120,9 +120,10 @@ static void PostSync(AlltoAllMesh1DContext &ctx)
         ccu::NotifyRecord(arg->channels[i], CKE_IDX_1, postBit);
     }
     HCCL_INFO("[A2A_DBG] PostSync before NotifyWait, postBit[%u]", postBit);
-    for (uint32_t i = 0; i < arg->channelCount; i++) {
-        ccu::NotifyWait(arg->channels[i], CKE_IDX_1, postBit);
-    }
+    // ==== 实验1：注释 PostSync NotifyWait 定位是否卡在此 ====
+    // for (uint32_t i = 0; i < arg->channelCount; i++) {
+    //     ccu::NotifyWait(arg->channels[i], CKE_IDX_1, postBit);
+    // }
     HCCL_INFO("[A2A_DBG] PostSync after NotifyWait (passed)");
     HCCL_INFO("[CcuKernelAlltoAllMesh1D] AlltoAllMesh1D PostSync end.");
 }
