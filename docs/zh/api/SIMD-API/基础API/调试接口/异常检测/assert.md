@@ -51,8 +51,8 @@ assert(assertFlag == 10);
 ## 函数原型<a name="section2067518173415"></a>
 
 ```cpp
-#define assert(expr)
-#define assert(expr, __gm__ const char *fmt, Args&&... args)
+define assert(expr)
+define assert(expr, __gm__ const char *fmt, Args&&... args)
 ```
 
 ## 参数说明<a name="section158061867342"></a>
