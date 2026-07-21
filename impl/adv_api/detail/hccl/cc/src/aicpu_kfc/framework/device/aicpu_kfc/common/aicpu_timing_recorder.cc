@@ -9,6 +9,7 @@
  */
 #include "aicpu_timing_recorder.h"
 
+#include <cstdlib>
 #include <ctime>
 
 #include "log.h"
@@ -19,6 +20,7 @@ constexpr uint64_t NANOSECONDS_PER_SECOND = 1000000000ULL;
 constexpr char UNKNOWN_NAME[] = "unknown";
 constexpr char INCOMPLETE_STATUS[] = "incomplete";
 constexpr char NO_PREVIOUS_STAGE[] = "none";
+constexpr char TIMING_LOG_ENABLE_ENV[] = "HCCL_AICPU_TIMING_LOG_ENABLE";
 
 struct PhaseRange {
     const char* name;
@@ -146,6 +148,10 @@ void AicpuTimingRecorder::Report(const char* status)
         return;
     }
     reported_ = true;
+    const char* timingLogEnable = getenv(TIMING_LOG_ENABLE_ENV);
+    if (timingLogEnable == nullptr || timingLogEnable[0] != '1' || timingLogEnable[1] != '\0') {
+        return;
+    }
 
     const char* reportStatus = (status == nullptr || status[0] == '\0') ? UNKNOWN_NAME : status;
     HCCL_RUN_INFO("[TIMING_STAT] scenario[%s], status[%s], pointCount[%zu].", scenario_, reportStatus, pointCount_);

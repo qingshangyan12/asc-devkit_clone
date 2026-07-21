@@ -9,13 +9,16 @@
  */
 #include "aicpu_timing_recorder.h"
 
+#include <cstdlib>
 #include <cstdint>
 
 #include "gtest/gtest.h"
+#include "log.h"
 
 namespace {
 using Recorder = Hccl::AicpuTimingRecorder;
 
+constexpr char TIMING_LOG_ENABLE_ENV[] = "HCCL_AICPU_TIMING_LOG_ENABLE";
 uint64_t g_currentTimestamp = 0U;
 uint64_t g_clockStep = 1U;
 uint32_t g_clockCallCount = 0U;
@@ -35,6 +38,13 @@ protected:
         g_currentTimestamp = 100U;
         g_clockStep = 10U;
         g_clockCallCount = 0U;
+        AicpuTimingRecorderTestLogCount() = 0U;
+        (void)unsetenv(TIMING_LOG_ENABLE_ENV);
+    }
+
+    void TearDown() override
+    {
+        (void)unsetenv(TIMING_LOG_ENABLE_ENV);
     }
 };
 
@@ -166,5 +176,34 @@ TEST_F(AicpuTimingRecorderTest, RecordsCompleteFourPointTimeline)
     EXPECT_TRUE(timingRecorder.GetElapsed(
         Recorder::Stage::FIRST_PREPARE_EXPAND_END, Recorder::Stage::LAST_FINALIZE_RECEIVED, elapsedNs));
     EXPECT_EQ(elapsedNs, 10U);
+}
+
+TEST_F(AicpuTimingRecorderTest, PrintsReportOnlyWhenEnvironmentVariableIsEnabled)
+{
+    {
+        Recorder timingRecorder("unset_env", TestClock);
+        EXPECT_TRUE(timingRecorder.Record(Recorder::Stage::KERNEL_ENTRY));
+        timingRecorder.Report("complete");
+        EXPECT_TRUE(timingRecorder.IsReported());
+        EXPECT_EQ(AicpuTimingRecorderTestLogCount(), 0U);
+    }
+
+    ASSERT_EQ(setenv(TIMING_LOG_ENABLE_ENV, "0", 1), 0);
+    {
+        Recorder timingRecorder("disabled_env", TestClock);
+        EXPECT_TRUE(timingRecorder.Record(Recorder::Stage::KERNEL_ENTRY));
+        timingRecorder.Report("complete");
+        EXPECT_TRUE(timingRecorder.IsReported());
+        EXPECT_EQ(AicpuTimingRecorderTestLogCount(), 0U);
+    }
+
+    ASSERT_EQ(setenv(TIMING_LOG_ENABLE_ENV, "1", 1), 0);
+    {
+        Recorder timingRecorder("enabled_env", TestClock);
+        EXPECT_TRUE(timingRecorder.Record(Recorder::Stage::KERNEL_ENTRY));
+        timingRecorder.Report("complete");
+        EXPECT_TRUE(timingRecorder.IsReported());
+        EXPECT_GT(AicpuTimingRecorderTestLogCount(), 0U);
+    }
 }
 } // namespace

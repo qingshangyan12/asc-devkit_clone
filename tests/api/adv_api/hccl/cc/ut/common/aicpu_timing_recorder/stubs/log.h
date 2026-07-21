@@ -10,9 +10,17 @@
 #ifndef HCCL_AICPU_TIMING_RECORDER_TEST_LOG_STUB_H
 #define HCCL_AICPU_TIMING_RECORDER_TEST_LOG_STUB_H
 
+inline unsigned int& AicpuTimingRecorderTestLogCount()
+{
+    static unsigned int count = 0U;
+    return count;
+}
+
 template <typename... Args>
 inline void AicpuTimingRecorderTestLog(const char*, const Args&...)
-{}
+{
+    ++AicpuTimingRecorderTestLogCount();
+}
 
 #define HCCL_RUN_INFO(...) AicpuTimingRecorderTestLog(__VA_ARGS__)
 #define HCCL_WARNING(...) AicpuTimingRecorderTestLog(__VA_ARGS__)
