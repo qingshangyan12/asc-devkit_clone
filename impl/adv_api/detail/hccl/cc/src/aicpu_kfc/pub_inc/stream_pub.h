@@ -176,6 +176,9 @@ private:
         streamInfo_.sqDepth = streamInfo.sqDepth;
         streamInfo_.sqBaseAddr = streamInfo.sqBaseAddr;
         streamInfo_.logicCqId = streamInfo.logicCqId;
+        // 与hcomm对齐: id()返回的streamId_必须携带真实逻辑streamId(actualStreamId), 否则profiling上报的
+        // stream恒为脏值/65535(0xFFFF)。actualStreamId来自runtime下发的streamIds, 是真实stream。
+        streamId_ = streamInfo.actualStreamId;
     }
 };
 } // namespace hccl

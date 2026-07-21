@@ -189,6 +189,11 @@ HcclResult ProfilingManager::ReportTaskInfo(s32 streamId, void* ctxPtr)
         dfx::ProfilingExtendInfoHelper::InitHcclInfo(taskInfo);
         CommInfo2HcclInfo(profInfo, taskInfo);
         dfx::ProfilingExtendInfoHelper::SqeInfo2MsprofAicpuMC2HcclInfo(sqeInfo, taskInfo);
+        // A5/91095场景下, SQE header的rtStreamId被复用为32位taskId的低16位, taskId字段存高16位(filpNum),
+        // 并非真实stream。此处用上报入参的真实逻辑streamId覆盖, 并按(taskId<<16)|streamId约定还原完整taskId,
+        // 否则所有task都会被上报到streamId=65535(0xFFFF)上。
+        taskInfo.taskId = (static_cast<uint32_t>(sqeInfo.taskId) << 16) | static_cast<uint32_t>(sqeInfo.streamId);
+        taskInfo.streamId = static_cast<uint16_t>(streamId);
         taskInfo.timeStamp = sqeContextBuffer->profTimestap[idx]; // 时间戳
         DumpHcclInfo(taskInfo, batchId, idx);
         // 上报信息
