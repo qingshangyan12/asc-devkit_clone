@@ -1,7 +1,5 @@
 # asc_pack (废弃)
 
-> 该接口已废弃，请使用 [asc_pack_to_low](asc_pack_to_low.md) 和 [asc_pack_to_high](asc_pack_to_high.md) 替代。
-
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
@@ -27,6 +25,8 @@
 <!-- end id7 -->
 
 ## 功能说明
+
+**该接口已废弃，请使用 [asc_pack_to_low](asc_pack_to_low.md) 和 [asc_pack_to_high](asc_pack_to_high.md) 替代。**
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
