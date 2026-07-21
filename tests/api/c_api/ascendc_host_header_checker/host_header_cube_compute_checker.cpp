@@ -12,10 +12,10 @@
 
 static void test_host_c_api_cube_compute_0()
 {
-    // using ::asc_enable_fp8;
+    using ::asc_enable_fp8;
     using ::asc_enable_hf32;
     using ::asc_enable_hf32_trans;
-    // using ::asc_enable_hif8;
+    using ::asc_enable_hif8;
     using ::asc_get_l0c2gm_prequant;
     using ::asc_get_l0c2gm_relu;
     using ::asc_get_l0c2gm_unitflag;
