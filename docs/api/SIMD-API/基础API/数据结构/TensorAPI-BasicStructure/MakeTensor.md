@@ -28,7 +28,7 @@
 
 需要包含的头文件为：#include "tensor_api/tensor.h"。
 
-MakeTensor负责将内存指针（由[MakeMemPtr](MakeMemPtr.md)生成）与布局对象（由[MakeFrameLayout](../layout_structure/MakeFrameLayout.md)/[MakeLayout](../layout_structure/MakeLayout.md)生成）绑定，生成带有完整类型信息的Tensor对象。
+MakeTensor负责将内存指针（由[MakeMemPtr](MakeMemPtr.md)生成）与布局对象（由[MakeFrameLayout](MakeFrameLayout.md)/[MakeLayout](MakeLayout.md)生成）绑定，生成带有完整类型信息的Tensor对象。
 
 MakeTensor会根据内存指针的物理位置标记，自动推导返回GlobalTensor或LocalTensor，当指针物理位置位于Global Memory（外部存储）时，返回GlobalTensor；当指针位置位于AI Core上的Local Memory（内部存储）时，返回LocalTensor。
 

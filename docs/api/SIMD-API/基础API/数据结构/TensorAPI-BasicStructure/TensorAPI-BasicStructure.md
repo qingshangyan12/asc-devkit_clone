@@ -1,40 +1,40 @@
 # Tensor API基础数据结构
 
 - **Layout相关基础数据结构**
-    - **[Layout和层次化表述法](<layout_structure/Layout和层次化表述法.md>)**
-    - **[Layout](layout_structure/Layout.md)**
-    - **[Shape](layout_structure/Shape.md)**
-    - **[Stride](layout_structure/Stride.md)**
-    - **[Coord](layout_structure/Coord.md)**
+    - **[Layout和层次化表述法](<Layout和层次化表述法.md>)**
+    - **[Layout](Layout.md)**
+    - **[Shape](Shape.md)**
+    - **[Stride](Stride.md)**
+    - **[Coord](Coord.md)**
     - **Layout相关接口**
-        - **[MakeLayout](layout_structure/MakeLayout.md)**
-        - **[MakeFrameLayout](layout_structure/MakeFrameLayout.md)**
-        - **[MakeShape](layout_structure/MakeShape.md)**
-        - **[MakeStride](layout_structure/MakeStride.md)**
-        - **[MakeCoord](layout_structure/MakeCoord.md)**
-        - **[GetShape](layout_structure/GetShape.md)**
-        - **[GetStride](layout_structure/GetStride.md)**
-        - **[Get](layout_structure/Get.md)**
-        - **[Select](layout_structure/Select.md)**
-        - **[Capacity](layout_structure/Capacity.md)**
-        - **[Size](layout_structure/Size.md)**
-        - **[Coshape](layout_structure/Coshape.md)**
-        - **[Cosize](layout_structure/Cosize.md)**
-        - **[Rank](layout_structure/Rank.md)**
+        - **[MakeLayout](MakeLayout.md)**
+        - **[MakeFrameLayout](MakeFrameLayout.md)**
+        - **[MakeShape](MakeShape.md)**
+        - **[MakeStride](MakeStride.md)**
+        - **[MakeCoord](MakeCoord.md)**
+        - **[GetShape](GetShape.md)**
+        - **[GetStride](GetStride.md)**
+        - **[Get](Get.md)**
+        - **[Select](Select.md)**
+        - **[Capacity](Capacity.md)**
+        - **[Size](Size.md)**
+        - **[Coshape](Coshape.md)**
+        - **[Cosize](Cosize.md)**
+        - **[Rank](Rank.md)**
 
 - **Tensor相关数据结构**
-    - **[Tensor](tensor_structure/Tensor.md)**
-    - **[Pointer](tensor_structure/Pointer.md)**
-    - **[ViewEngine](tensor_structure/ViewEngine.md)**
+    - **[Tensor](Tensor.md)**
+    - **[Pointer](Pointer.md)**
+    - **[ViewEngine](ViewEngine.md)**
     - **Tensor相关接口**
-        - **[MakeTensor](tensor_structure/MakeTensor.md)**
-        - **[MakeMemPtr](tensor_structure/MakeMemPtr.md)**
-        - **[Slice](tensor_structure/Slice.md)**
+        - **[MakeTensor](MakeTensor.md)**
+        - **[MakeMemPtr](MakeMemPtr.md)**
+        - **[Slice](Slice.md)**
 
 - **工具接口**
-    - **[GetLayoutPattern](utils/GetLayoutPattern.md)**
-    - **[GetLayoutTrait](utils/GetLayoutTrait.md)**
-    - **[IsAttrTensorV](utils/IsAttrTensorV.md)**
-    - **[IsHardwareV](utils/IsHardwareV.md)**
-    - **[IsIntegralConstantV](utils/IsIntegralConstantV.md)**
-    - **[IsLayoutV](utils/IsLayoutV.md)**
+    - **[GetLayoutPattern](GetLayoutPattern.md)**
+    - **[GetLayoutTrait](GetLayoutTrait.md)**
+    - **[IsAttrTensorV](IsAttrTensorV.md)**
+    - **[IsHardwareV](IsHardwareV.md)**
+    - **[IsIntegralConstantV](IsIntegralConstantV.md)**
+    - **[IsLayoutV](IsLayoutV.md)**
