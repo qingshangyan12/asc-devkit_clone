@@ -10,7 +10,6 @@
 
 #include "reduce_scatter_auto_selector.h"
 #include "selector_registry.h"
-#include "hccl_aiv_utils.h"
 #include "ins_v2_reduce_scatter_order_preserved_executor.h"
 #include "order_preserved_common.h"
 
@@ -64,10 +63,8 @@ SelectorStatus ReduceScatterAutoSelector::SelectCcuMsAlgo(const TopoInfoWithNetL
         return SelectorStatus::NOT_MATCH;
     }
 
-    SelectorStatus ret = SelectMeshAlgoCcums(topoInfo, opParam, selectAlgName);
-     if (ret == SelectorStatus::MATCH) {
-        HCCL_INFO("[ReduceScatterAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
-    }
+    selectAlgName = "CcuReduceScatterMesh1DMem2Mem";
+    HCCL_DEBUG("[ReduceScatterAutoSelector][%s] Algo match[%s]", __func__, selectAlgName.c_str());
     return ret;
 }
 

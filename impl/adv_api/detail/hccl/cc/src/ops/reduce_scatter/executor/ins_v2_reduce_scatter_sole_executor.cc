@@ -9,21 +9,8 @@
  */
 
 #include "ins_v2_reduce_scatter_sole_executor.h"
-#include "ins_temp_reduce_scatter_mesh_1D.h"
-#include "aiv_temp_reduce_scatter_mesh_1D.h"
-#include "ins_temp_reduce_scatter_nhr.h"
-#include "ins_temp_reduce_scatter_mesh_1D_meshchunk.h"
-#include "ins_temp_reduce_scatter_aicpu_reduce_nhr.h"
-#include "ins_temp_reduce_scatter_mesh_1D_Z_axis_detour.h"
 #ifndef AICPU_COMPILE
-#if CANN_VERSION_NUM >= CANN_VERSION(9, 0, 0)
 #include "ccu_temp_reduce_scatter_mesh_1D_mem2mem.h"
-#include "ccu_temp_reduce_scatter_mesh_1D.h"
-#include "ccu_temp_reduce_scatter_nhr_1D_mem2mem.h"
-#include "ccu_temp_reduce_scatter_mesh_1D_2die_mem2mem.h"
-#include "ccu_temp_reduce_scatter_mesh2die.h"
-#include "ccu_temp_reduce_scatter_nhr_1D_multi_jetty_mem2mem.h"
-#endif /* CANN_VERSION_NUM >= CANN_VERSION(9, 0, 0) */
 #endif
 
 namespace mc2_ops_hccl {
