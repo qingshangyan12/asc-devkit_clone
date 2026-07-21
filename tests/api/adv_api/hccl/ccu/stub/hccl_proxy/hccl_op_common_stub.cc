@@ -289,7 +289,7 @@ HcclResult SetOpParamAlgTag(OpParam& param, const std::string& algName)
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult SingleRankProc(const OpParam& param)
+HcclResult SingleRankProc(const HcclComm& comm, const OpParam& param)
 {
     return HcclResult::HCCL_SUCCESS;
 }

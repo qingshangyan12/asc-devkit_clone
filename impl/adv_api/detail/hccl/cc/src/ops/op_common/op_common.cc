@@ -1617,8 +1617,13 @@ HcclResult SetCommEngine(OpParam& param)
     return HCCL_E_NOT_SUPPORT;
 }
 
-HcclResult SingleRankProc(const OpParam& param)
+HcclResult SingleRankProc(HcclComm comm, OpParam &param)
 {
+    if (param.commOpExpansionMode == HcclOpExpansionMode::HCCL_OP_EXPANSION_AIV_ONLY) {
+        HCCL_ERROR("[SingleRankProc] opType[%d] currently do not select aiv mode, aiv only not support, "
+            "please ensure rankNum is greater than one", static_cast<int>(param.opType));
+        return HCCL_E_NOT_SUPPORT;
+    }
     if (param.opType == HcclCMDType::HCCL_CMD_SEND || param.opType == HcclCMDType::HCCL_CMD_RECEIVE) {
         HCCL_WARNING("[%s] ranksize == 1 is not support BATCHSENDRECV SEND RECV", __func__);
         return HcclResult::HCCL_SUCCESS;
@@ -1630,30 +1635,39 @@ HcclResult SingleRankProc(const OpParam& param)
     u64 len{0};
     if (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL || param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV ||
         param.opType == HcclCMDType::HCCL_CMD_ALLTOALLVC) {
-        len = DATATYPE_SIZE_TABLE[param.all2AllVDataDes.sendType] *
-              *(static_cast<const u64*>(param.all2AllVDataDes.sendCounts));
+        len = DATATYPE_SIZE_TABLE[param.all2AllVDataDes.sendType] * *(static_cast<const u64 *>(param.all2AllVDataDes.sendCounts));
     } else if (param.opType == HCCL_CMD_ALLGATHER_V || param.opType == HCCL_CMD_REDUCE_SCATTER_V) {
-        len = DATATYPE_SIZE_TABLE[param.vDataDes.dataType] * *(static_cast<const u64*>(param.vDataDes.counts));
+        len = DATATYPE_SIZE_TABLE[param.vDataDes.dataType] * *(static_cast<const u64 *>(param.vDataDes.counts));
     } else {
         len = DATATYPE_SIZE_TABLE[param.DataDes.dataType] * param.DataDes.count;
     }
 
-    HCCL_INFO(
-        "[CommunicatorImpl][%s] sendBuf[%p], recvBuf[%p], len[%llu]", __func__, param.inputPtr, param.outputPtr, len);
+    HCCL_INFO("[%s] sendBuf[%p], recvBuf[%p], len[%llu]", __func__, param.inputPtr, param.outputPtr, len);
     if (len > 0) {
-        HcclResult ret = haclrtMemcpy(param.outputPtr, len, param.inputPtr, len, ACL_MEMCPY_DEVICE_TO_DEVICE);
-        HCCL_DEBUG(
-            "Call haclrtMemcpy, return value[%d], para: dstAddr[%p], destMax[%llu], "
-            "srcAddr[%p], count[%llu], rtKind[%d]",
-            ret, param.outputPtr, len, param.inputPtr, len, ACL_MEMCPY_DEVICE_TO_DEVICE);
-        if (ret != HCCL_SUCCESS) {
-            HCCL_ERROR(
-                "[SingleRankProc][AsyncCopy][Mem]errNo[0x%016llx] rt memory async copy failed, "
-                "return[%d], para: dstAddr[%p], destMax[%llu], srcAddr[%p], count[%llu], kind[%d].",
-                HCCL_ERROR_CODE(HcclResult::HCCL_E_RUNTIME), ret, param.outputPtr, len, param.inputPtr, len,
-                ACL_MEMCPY_DEVICE_TO_DEVICE);
-            return HcclResult::HCCL_E_RUNTIME;
-        }
+        ThreadHandle cpuTsThread{0};
+        CHK_RET(HcclThreadAcquireWithStream(comm, COMM_ENGINE_CPU_TS, param.stream, 1, &cpuTsThread));
+        // Op注册
+        HcclDfxOpInfoCompat hcclDfxOpInfo{};
+        hcclDfxOpInfo.opMode = static_cast<u32>(param.opMode);
+        hcclDfxOpInfo.opType = static_cast<u32>(param.opType);
+        hcclDfxOpInfo.reduceOp = static_cast<u32>(param.reduceType);
+        CHK_RET(GetHcclDfxOpInfoDataType(param, hcclDfxOpInfo.dataType));
+
+        // rankSize获取指定算子的dataCount
+        u32 userRankSize{0};
+        CHK_RET(HcclGetRankSize(comm, &userRankSize));
+        CHK_RET(GetHcclDfxOpInfoDataCount(param, userRankSize, hcclDfxOpInfo.dataCount));
+        hcclDfxOpInfo.root = param.root;
+        hcclDfxOpInfo.engine = param.engine;
+        hcclDfxOpInfo.cpuTsThread = cpuTsThread;
+        hcclDfxOpInfo.cpuWaitAicpuNotifyIdx = HOST_WAIT_AICPU_NOTIFYIDX;
+        CHK_RET(SetOpParamAlgTag(param, "SingleRankProc"));
+        s32 sRet = strncpy_s(hcclDfxOpInfo.algTag, ALG_TAG_LENGTH, param.algTag, ALG_TAG_LENGTH);
+        CHK_PRT_RET(sRet != EOK, HCCL_ERROR("%s call strncpy_s failed, param.algTag %s,  return %d.",
+            __func__, param.algTag, sRet), HCCL_E_MEMORY);
+
+        CHK_RET(HcclDfxRegOpInfoByCommId(param.commName, reinterpret_cast<void*>(&hcclDfxOpInfo)));
+        CHK_RET(static_cast<HcclResult>(HcommLocalCopyOnThread(cpuTsThread, param.outputPtr, param.inputPtr, len)));
     }
     return HcclResult::HCCL_SUCCESS;
 }
@@ -1964,6 +1978,50 @@ HcclResult CheckHostDPUOnly(const HcclComm comm, const TopoInfoWithNetLayerDetai
         HCCL_INFO("Using host dpu trans.");
         hostDPUOnly = true;
     }
+    return HCCL_SUCCESS;
+}
+
+HcclResult CheckReduceOp(const HcclDataType dataType, const HcclReduceOp op)
+{
+    std::vector<HcclDataType> prodSupportList = {HCCL_DATA_TYPE_INT8, HCCL_DATA_TYPE_INT32, HCCL_DATA_TYPE_INT64, HCCL_DATA_TYPE_UINT64,
+                                                 HCCL_DATA_TYPE_FP16, HCCL_DATA_TYPE_FP32, HCCL_DATA_TYPE_FP64};
+    const std::vector<std::string> infoTitle({"ccl_op", "value", "parameter", "expect"});
+    if (op == HcclReduceOp::HCCL_REDUCE_PROD) {
+        if (std::find(prodSupportList.begin(), prodSupportList.end(), dataType) == prodSupportList.end()) {
+            RPT_INPUT_ERR(true, "EI0003", infoTitle, std::vector<std::string>({"CheckReduceDataType", GetDataTypeEnumStr(dataType), "dataType",
+                GetReduceProdSupportDataType()}));
+            HCCL_ERROR("[Check][ReduceOp][DataType]errNo[0x%016llx] reduceop is [%s] data type[%s] not supported, support range=[%s]",
+                        HCCL_ERROR_CODE(HCCL_E_NOT_SUPPORT), GetReduceOpEnumStr(op).c_str(), GetDataTypeEnumStr(dataType).c_str(),
+                        GetReduceProdSupportDataType().c_str());
+            return HCCL_E_NOT_SUPPORT;
+        }
+    }
+    return HCCL_SUCCESS;
+}
+
+std::string GetReduceProdSupportDataType()
+{
+    std::vector<HcclDataType> supportList = {HCCL_DATA_TYPE_INT8, HCCL_DATA_TYPE_INT32, HCCL_DATA_TYPE_INT64, HCCL_DATA_TYPE_UINT64,
+                                             HCCL_DATA_TYPE_FP16, HCCL_DATA_TYPE_FP32, HCCL_DATA_TYPE_FP64};
+    std::string supportInfo = "";
+    for (u32 i = 0; i < supportList.size(); i++) {
+        if (i != 0) {
+            supportInfo += ", ";
+        }
+        supportInfo += GetDataTypeEnumStr(supportList[i]);
+    }
+
+    return supportInfo;
+}
+
+HcclResult HcclAivCacheCheckAndReplay(HcclComm comm, OpParam &param, bool &cacheHit)
+{
+    // asc-devkit 暂未移植 hccl_aiv_utils.h（AIV kernel 注册/cache 上下文/thread-local 录制队列等）
+    // 整套 AIV cache 基础设施，这里直接返回 cacheHit=false，让调用方走正常的算法选择路径。
+    // 后续若启用 AIV cache，需整体移植 hccl_aiv_utils.h/.cc 及其依赖，并恢复 hccl 版函数体。
+    (void)comm;
+    (void)param;
+    cacheHit = false;
     return HCCL_SUCCESS;
 }
 }  // namespace mc2_ops_hccl

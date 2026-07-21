@@ -107,7 +107,7 @@ HcclResult KfcServerOutPlaceCommon(uint64_t xnAddr, uint64_t ckeAddr, uint64_t w
     HCCL_INFO("Selector output algName is: %s", algName.c_str());
     if (rankSize == 1) {
         HCCL_WARNING("[%s] rankSize == 1, enter SingleRankProc", __func__);
-        CHK_RET(SingleRankProc(param));
+        CHK_RET(SingleRankProc(comm, param));
         return HcclResult::HCCL_SUCCESS;
     }
 

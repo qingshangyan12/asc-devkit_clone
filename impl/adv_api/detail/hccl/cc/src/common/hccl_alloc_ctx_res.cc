@@ -650,7 +650,7 @@ HcclResult HandleSingleRankAndCommMode(HcclComm comm, OpParam& opParam, bool& sk
     CHK_RET(HcclGetRankSize(comm, &userRankSize));
     if (userRankSize == 1) {
         HCCL_WARNING("[%s] ranksize == 1, enter SingleRankProc", __func__);
-        CHK_RET(SingleRankProc(opParam));
+        CHK_RET(SingleRankProc(comm, opParam));
         skipGetRes = true;
         return HCCL_SUCCESS;
     }
