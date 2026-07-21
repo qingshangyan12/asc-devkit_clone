@@ -8,18 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "ins_v2_reduce_scatter_sole_executor.h"
-#include "ins_temp_reduce_scatter_mesh_1D.h"
-#include "ins_temp_reduce_scatter_nhr.h"
-#include "ins_temp_reduce_scatter_mesh_1D_meshchunk.h"
-#include "ins_temp_reduce_scatter_aicpu_reduce_nhr.h"
-#include "ins_temp_reduce_scatter_mesh_1D_Z_axis_detour.h"
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 #include "ccu_temp_reduce_scatter_mesh_1D_mem2mem.h"
-#include "ccu_temp_reduce_scatter_mesh_1D.h"
-#include "ccu_temp_reduce_scatter_nhr_1D_mem2mem.h"
-#include "ccu_temp_reduce_scatter_mesh_1D_2die_mem2mem.h"
-#include "ccu_temp_reduce_scatter_mesh2die.h"
-#include "ccu_temp_reduce_scatter_nhr_1D_multi_jetty_mem2mem.h"
 #endif
 
 namespace mc2_ops_hccl {
