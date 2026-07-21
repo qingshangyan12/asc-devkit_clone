@@ -30,7 +30,7 @@
 
 Coshape表示Layout陪域（codomain）区间的标量大小，即逻辑坐标映射到一维索引后，所有可能的索引值构成的区间大小。其计算公式为：
 
-```
+```cpp
 Coshape = Σ( (shape[i] - 1) × stride[i] ) + 1
 ```
 
