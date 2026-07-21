@@ -1,4 +1,4 @@
-# UnPack<a name="ZH-CN_TOPIC_0000001985577793"></a>
+﻿# UnPack<a name="ZH-CN_TOPIC_0000001985577793"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -26,7 +26,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为：basic_api/reg_compute/kernel_reg_compute_maskreg_intf.h。
+头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_maskreg_intf.h"`。
 
 根据所选的低位模式或高位模式，将源操作数src的低半部分或高半部分，展开到目的操作数dst。展开方式为：将每bit展开为2bit，高位置零。
 

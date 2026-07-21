@@ -1,4 +1,4 @@
-# Reduce<a name="ZH-CN_TOPIC_0000001938595870"></a>
+﻿# Reduce<a name="ZH-CN_TOPIC_0000001938595870"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -26,7 +26,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为：basic_api/reg_compute/kernel_reg_compute_vec_reduce_intf.h。
+头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_vec_reduce_intf.h"`。
 
 归约指令根据ReduceType，将数据集合简化为单一值或者更小的集合。
 

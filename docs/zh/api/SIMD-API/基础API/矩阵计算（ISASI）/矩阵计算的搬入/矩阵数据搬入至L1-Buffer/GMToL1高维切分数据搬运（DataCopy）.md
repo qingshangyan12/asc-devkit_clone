@@ -1,4 +1,4 @@
-# GMToL1高维切分数据搬运（DataCopy）<a id="ZH-CN_TOPIC_0000002538231128"></a>
+﻿# GMToL1高维切分数据搬运（DataCopy）<a id="ZH-CN_TOPIC_0000002538231128"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002566658905_section796754519912"></a>
 
@@ -32,7 +32,7 @@
 
 ## 功能说明<a id="zh-cn_topic_0000002566658905_section106841136114319"></a>
 
-头文件路径为：basic_api/kernel_operator_data_copy_intf.h。
+头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
 该接口主要实现将矩阵从Global Memory搬运至L1 Buffer（TPosition为A1/B1），数据搬运时格式和内容保持不变。
 

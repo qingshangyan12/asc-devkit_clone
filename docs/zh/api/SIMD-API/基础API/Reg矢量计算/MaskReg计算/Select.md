@@ -1,4 +1,4 @@
-# Select<a name="ZH-CN_TOPIC_0000001985457929"></a>
+﻿# Select<a name="ZH-CN_TOPIC_0000001985457929"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -26,7 +26,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为：basic_api/reg_compute/kernel_reg_compute_maskreg_intf.h。
+头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_maskreg_intf.h"`。
 
 给定两个源操作数src0和src1，根据mask的比特位值选取元素，得到目的操作数dst。选择的规则为：当mask的比特位是1时，从src0中选取对应位置的数，比特位是0时从src1选取对应位置的数。
 

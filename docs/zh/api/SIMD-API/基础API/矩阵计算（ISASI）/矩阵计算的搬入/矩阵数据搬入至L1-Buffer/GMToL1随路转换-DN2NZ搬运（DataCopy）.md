@@ -32,7 +32,7 @@
 
 ## 功能说明<a id="section474617392321"></a>
 
-头文件路径为：basic_api/kernel_operator_data_copy_intf.h。
+头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
 随路格式转换数据搬运，适用于在搬运时进行DN到NZ格式的转换。数据从Global Memory搬运至L1 Buffer（TPosition为A1/B1），搬运过程中完成DN->NZ格式转换。
 

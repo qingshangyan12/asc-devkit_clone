@@ -1,4 +1,4 @@
-# PairReduceElem<a name="ZH-CN_TOPIC_0000002045329737"></a>
+﻿# PairReduceElem<a name="ZH-CN_TOPIC_0000002045329737"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -26,7 +26,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为：basic_api/kernel_operator_vec_reduce_intf.h。
+头文件路径为：`"basic_api/kernel_operator_vec_reduce_intf.h"`。
 
 将传入的srcReg中相邻两个数值相加，并将产生的结果保存在dstReg中的低位位置。
 
