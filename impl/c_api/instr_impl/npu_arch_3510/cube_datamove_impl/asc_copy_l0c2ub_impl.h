@@ -24,6 +24,370 @@
 __aicore__ inline void asc_copy_l0c2ub_impl(
     __ubuf__ bfloat16_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
     uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_ub(
+            dst_addr, src_addr, 0, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid,
+            clip_relu_pre, unit_flag_ctl, static_cast<QuantMode_t>(quant_pre), relu_pre, split_en, nz2nd_en,
+            static_cast<QuantMode_post>(QuantMode_post::NoConv), 0, false, false, 0, false,
+            false, false, false, false, nz2dn_en);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(
+    __ubuf__ bfloat16_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    asc_copy_l0c2ub_impl(
+        dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+        unit_flag_ctl, quant_pre, relu_pre, split_en, nz2nd_en, nz2dn_en);
+    asc_sync_post_process();
+}
+
+// half  float
+__aicore__ inline void asc_copy_l0c2ub_impl(
+    __ubuf__ half* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_ub(
+            dst_addr, src_addr, 0, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid,
+            clip_relu_pre, unit_flag_ctl, static_cast<QuantMode_t>(quant_pre), relu_pre, split_en, nz2nd_en,
+            static_cast<QuantMode_post>(QuantMode_post::NoConv), 0, false, false, 0, false,
+            false, false, false, false, nz2dn_en);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(
+    __ubuf__ half* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    asc_copy_l0c2ub_impl(
+        dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+        unit_flag_ctl, quant_pre, relu_pre, split_en, nz2nd_en, nz2dn_en);
+    asc_sync_post_process();
+}
+
+// fp8_e4m3fn_t  float
+__aicore__ inline void asc_copy_l0c2ub_impl(
+    __ubuf__ fp8_e4m3fn_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_ub(
+            dst_addr, src_addr, 0, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid,
+            clip_relu_pre, unit_flag_ctl, static_cast<QuantMode_t>(quant_pre), relu_pre, split_en, nz2nd_en,
+            static_cast<QuantMode_post>(QuantMode_post::NoConv), 0, false, false, 0, false,
+            false, false, false, false, nz2dn_en);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(
+    __ubuf__ fp8_e4m3fn_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    asc_copy_l0c2ub_impl(
+        dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+        unit_flag_ctl, quant_pre, relu_pre, split_en, nz2nd_en, nz2dn_en);
+    asc_sync_post_process();
+}
+
+// hifloat8_t  float
+__aicore__ inline void asc_copy_l0c2ub_impl(
+    __ubuf__ hifloat8_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_ub(
+            dst_addr, src_addr, 0, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid,
+            clip_relu_pre, unit_flag_ctl, static_cast<QuantMode_t>(quant_pre), relu_pre, split_en, nz2nd_en,
+            static_cast<QuantMode_post>(QuantMode_post::NoConv), 0, false, false, 0, false,
+            false, false, false, false, nz2dn_en);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(
+    __ubuf__ hifloat8_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    asc_copy_l0c2ub_impl(
+        dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+        unit_flag_ctl, quant_pre, relu_pre, split_en, nz2nd_en, nz2dn_en);
+    asc_sync_post_process();
+}
+
+// int8  float
+__aicore__ inline void asc_copy_l0c2ub_impl(
+    __ubuf__ int8_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_ub(
+            dst_addr, src_addr, 0, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid,
+            clip_relu_pre, unit_flag_ctl, static_cast<QuantMode_t>(quant_pre), relu_pre, split_en, nz2nd_en,
+            static_cast<QuantMode_post>(QuantMode_post::NoConv), 0, false, false, 0, false,
+            false, false, false, false, nz2dn_en);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(
+    __ubuf__ int8_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    asc_copy_l0c2ub_impl(
+        dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+        unit_flag_ctl, quant_pre, relu_pre, split_en, nz2nd_en, nz2dn_en);
+    asc_sync_post_process();
+}
+
+// uint8  float
+__aicore__ inline void asc_copy_l0c2ub_impl(
+    __ubuf__ uint8_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_ub(
+            dst_addr, src_addr, 0, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid,
+            clip_relu_pre, unit_flag_ctl, static_cast<QuantMode_t>(quant_pre), relu_pre, split_en, nz2nd_en,
+            static_cast<QuantMode_post>(QuantMode_post::NoConv), 0, false, false, 0, false,
+            false, false, false, false, nz2dn_en);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(
+    __ubuf__ uint8_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    asc_copy_l0c2ub_impl(
+        dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+        unit_flag_ctl, quant_pre, relu_pre, split_en, nz2nd_en, nz2dn_en);
+    asc_sync_post_process();
+}
+
+// float  float
+__aicore__ inline void asc_copy_l0c2ub_impl(
+    __ubuf__ float* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_ub(
+            dst_addr, src_addr, 0, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid,
+            clip_relu_pre, unit_flag_ctl, static_cast<QuantMode_t>(quant_pre), relu_pre, split_en, nz2nd_en,
+            static_cast<QuantMode_post>(QuantMode_post::NoConv), 0, false, false, 0, false,
+            false, false, false, false, nz2dn_en);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(
+    __ubuf__ float* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    asc_copy_l0c2ub_impl(
+        dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+        unit_flag_ctl, quant_pre, relu_pre, split_en, nz2nd_en, nz2dn_en);
+    asc_sync_post_process();
+}
+
+// bfloat16_t  int32_t
+__aicore__ inline void asc_copy_l0c2ub_impl(
+    __ubuf__ bfloat16_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_ub(
+            dst_addr, src_addr, 0, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid,
+            clip_relu_pre, unit_flag_ctl, static_cast<QuantMode_t>(quant_pre), relu_pre, split_en, nz2nd_en,
+            static_cast<QuantMode_post>(QuantMode_post::NoConv), 0, false, false, 0, false,
+            false, false, false, false, nz2dn_en);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(
+    __ubuf__ bfloat16_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    asc_copy_l0c2ub_impl(
+        dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+        unit_flag_ctl, quant_pre, relu_pre, split_en, nz2nd_en, nz2dn_en);
+    asc_sync_post_process();
+}
+
+// half  int32_t
+__aicore__ inline void asc_copy_l0c2ub_impl(
+    __ubuf__ half* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_ub(
+            dst_addr, src_addr, 0, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid,
+            clip_relu_pre, unit_flag_ctl, static_cast<QuantMode_t>(quant_pre), relu_pre, split_en, nz2nd_en,
+            static_cast<QuantMode_post>(QuantMode_post::NoConv), 0, false, false, 0, false,
+            false, false, false, false, nz2dn_en);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(
+    __ubuf__ half* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    asc_copy_l0c2ub_impl(
+        dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+        unit_flag_ctl, quant_pre, relu_pre, split_en, nz2nd_en, nz2dn_en);
+    asc_sync_post_process();
+}
+
+// int8  int32_t
+__aicore__ inline void asc_copy_l0c2ub_impl(
+    __ubuf__ int8_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_ub(
+            dst_addr, src_addr, 0, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid,
+            clip_relu_pre, unit_flag_ctl, static_cast<QuantMode_t>(quant_pre), relu_pre, split_en, nz2nd_en,
+            static_cast<QuantMode_post>(QuantMode_post::NoConv), 0, false, false, 0, false,
+            false, false, false, false, nz2dn_en);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(
+    __ubuf__ int8_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    asc_copy_l0c2ub_impl(
+        dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+        unit_flag_ctl, quant_pre, relu_pre, split_en, nz2nd_en, nz2dn_en);
+    asc_sync_post_process();
+}
+
+// uint8  int32_t
+__aicore__ inline void asc_copy_l0c2ub_impl(
+    __ubuf__ uint8_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_ub(
+            dst_addr, src_addr, 0, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid,
+            clip_relu_pre, unit_flag_ctl, static_cast<QuantMode_t>(quant_pre), relu_pre, split_en, nz2nd_en,
+            static_cast<QuantMode_post>(QuantMode_post::NoConv), 0, false, false, 0, false,
+            false, false, false, false, nz2dn_en);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(
+    __ubuf__ uint8_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    asc_copy_l0c2ub_impl(
+        dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+        unit_flag_ctl, quant_pre, relu_pre, split_en, nz2nd_en, nz2dn_en);
+    asc_sync_post_process();
+}
+
+// int32_t  int32_t
+__aicore__ inline void asc_copy_l0c2ub_impl(
+    __ubuf__ int32_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_ub(
+            dst_addr, src_addr, 0, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid,
+            clip_relu_pre, unit_flag_ctl, static_cast<QuantMode_t>(quant_pre), relu_pre, split_en, nz2nd_en,
+            static_cast<QuantMode_post>(QuantMode_post::NoConv), 0, false, false, 0, false,
+            false, false, false, false, nz2dn_en);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(
+    __ubuf__ int32_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    asc_copy_l0c2ub_impl(
+        dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+        unit_flag_ctl, quant_pre, relu_pre, split_en, nz2nd_en, nz2dn_en);
+    asc_sync_post_process();
+}
+
+// void  float
+__aicore__ inline void asc_copy_l0c2ub_impl(
+    __ubuf__ int4b_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_ub_s4(
+            (__ubuf__ void*)dst_addr, src_addr, 0, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid,
+            clip_relu_pre, unit_flag_ctl, static_cast<QuantMode_t>(quant_pre), relu_pre, split_en, nz2nd_en,
+            static_cast<QuantMode_post>(QuantMode_post::NoConv), 0, false, false, 0, false,
+            false, false, false, false, nz2dn_en);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(
+    __ubuf__ int4b_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    asc_copy_l0c2ub_impl(
+        dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+        unit_flag_ctl, quant_pre, relu_pre, split_en, nz2nd_en, nz2dn_en);
+    asc_sync_post_process();
+}
+
+// void  int32_t
+__aicore__ inline void asc_copy_l0c2ub_impl(
+    __ubuf__ int4b_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    if ASC_IS_AIC {
+        copy_matrix_cc_to_ub_s4(
+            (__ubuf__ void*)dst_addr, src_addr, 0, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid,
+            clip_relu_pre, unit_flag_ctl, static_cast<QuantMode_t>(quant_pre), relu_pre, split_en, nz2nd_en,
+            static_cast<QuantMode_post>(QuantMode_post::NoConv), 0, false, false, 0, false,
+            false, false, false, false, nz2dn_en);
+    }
+}
+
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(
+    __ubuf__ int4b_t* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
+    uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, bool nz2dn_en)
+{
+    asc_copy_l0c2ub_impl(
+        dst_addr, src_addr, n_size, m_size, loop_dst_stride, loop_src_stride, dual_dst_ctl, sub_blockid, clip_relu_pre,
+        unit_flag_ctl, quant_pre, relu_pre, split_en, nz2nd_en, nz2dn_en);
+    asc_sync_post_process();
+}
+
+// bfloat16_t  float
+__aicore__ inline void asc_copy_l0c2ub_impl(
+    __ubuf__ bfloat16_t* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,
     uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post,
     bool clip_relu_post, uint8_t eltwise_op, bool eltwise_antq_en, bool c0_pad_en, bool broadcast_en, bool nz2dn_en)
 {
