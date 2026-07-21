@@ -161,7 +161,7 @@ __aicore__ inline void s1_compute_mmad(__cc__ int32_t* c_matrix, __ca__ int8_t* 
 
     uint16_t left_height = M;
     uint16_t n_dim = K;
-    uint16_t right_width = ceil_align(N, BLOCK_CUBE* S1_FRACTAL_NUM);
+    uint16_t right_width = ceil_align(N, BLOCK_CUBE * S1_FRACTAL_NUM);
     uint8_t unit_flag = 0;
     bool disable_gemv = true;
     bool c_matrix_source = true;
