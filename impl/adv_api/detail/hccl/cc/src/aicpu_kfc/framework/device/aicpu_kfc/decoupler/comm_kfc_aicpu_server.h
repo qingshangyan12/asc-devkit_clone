@@ -76,6 +76,15 @@ public:
         std::vector<uint8_t>& runParam);
     const ServerExecCtx* MatchExecCtx(u64 opParamKey) const;
 
+    // profiling 上报（对齐 HcclLaunchAicpuKernel）：各自内部完成 comm acquire→上报→release，全过程失败不致命。
+    void ReportProfilingKernelStart(const ServerExecCtx& execCtx, const HcclApi::HcclMsg& msg);
+    void ReportProfilingKernelEnd(const ServerExecCtx& execCtx);
+    // 用稳定 ABI 接口 HcclDfxRegOpInfoByCommId 注册当前 op 信息（供 device op profiling 上报使用）。
+    // op 类型/数据量等关键字段来自 msg（每次下发的真实值），静态字段（opMode/root/engine/algTag）来自 baseOpParam。
+    void RegisterDfxOpInfo(const ServerExecCtx& execCtx, const HcclApi::HcclMsg& msg);
+    // profiling 总开关：L0 或 L1 任一开启才进入 profiling 逻辑（acquire/注册/上报），关闭时完全跳过。
+    static bool IsProfilingEnabled();
+
 private:
 #ifdef CCL_LLT
     static constexpr u64 KFC_NSEC_PER_SEC = 1000000UL;
