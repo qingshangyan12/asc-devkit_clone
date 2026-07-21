@@ -26,6 +26,8 @@
 #include "coll_comm_aicpu_mgr.h"
 #include "stream_lite.h"
 #include "thread.h"
+#include "profiling_handler_lite.h"
+#include "hcomm_device_profiling_dl.h"
 
 using namespace HcclApi;
 namespace {
@@ -560,6 +562,16 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     LogAicpuOrderDfxCounter(
         "ServerMsg", groupIdx_, msgArea_, msgPos, 0U, 0U, opParamKey, waitAddr, recordAddr, turnNumsAddr_, execCtx);
 
+    // 上报主流和第一个task，在wait之前（对齐 HcclLaunchAicpuKernel 的 profiling hook）
+    if (execCtx->resourceType == ServerExecResourceType::NEXT_AICPU) {
+        if (HcommProfilingReportKernelStartTask(execCtx->mainThread, execCtx->commName.c_str()) != HCCL_SUCCESS) {
+            HCCL_ERROR(
+                "Group %u: failed to report kernel start task, mainThread %#llx, commName[%s].", groupIdx_,
+                static_cast<unsigned long long>(execCtx->mainThread), execCtx->commName.c_str());
+            return HCCL_E_INTERNAL;
+        }
+    }
+
     std::vector<uint8_t> runParam{};
     for (u32 i = 0U; i < repeatCnt; ++i) {
         const u32 turnIdx = i + 1U;
@@ -647,6 +659,21 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     }
     SetMsgPosByHandle(handle, msgPos);
     SetRepeatByHandle(handle, repeatCnt);
+
+    // 上报device侧op信息及主流和最后一个task，在post之后（对齐 HcclLaunchAicpuKernel 的 profiling hook）
+    if (execCtx->resourceType == ServerExecResourceType::NEXT_AICPU) {
+        if (HcommProfilingReportDeviceOp(execCtx->commName.c_str()) != HCCL_SUCCESS) {
+            HCCL_ERROR("Group %u: failed to report device op, commName[%s].", groupIdx_, execCtx->commName.c_str());
+            return HCCL_E_INTERNAL;
+        }
+        if (HcommProfilingReportKernelEndTask(execCtx->mainThread, execCtx->commName.c_str()) != HCCL_SUCCESS) {
+            HCCL_ERROR(
+                "Group %u: failed to report kernel end task, mainThread %#llx, commName[%s].", groupIdx_,
+                static_cast<unsigned long long>(execCtx->mainThread), execCtx->commName.c_str());
+            return HCCL_E_INTERNAL;
+        }
+    }
+
     return HCCL_SUCCESS;
 }
 
