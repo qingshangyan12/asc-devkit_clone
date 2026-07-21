@@ -27,6 +27,9 @@ class Stream;
 } // namespace hccl
 class CollCommAicpuMgr;
 class CollCommAicpu;
+namespace Hccl {
+class AicpuTimingRecorder;
+}
 
 enum class ServerExecResourceType { LEGACY, NEXT_AICPU };
 
@@ -61,16 +64,22 @@ public:
     HcclApi::HcclMsgArea* GetMsgAreaAddr() const { return msgArea_; }
     u32 GetRankNum() const { return rankNum_; }
     HcclResult AddOpContext(const HcclApi::OpResCtx* ctx);
-    HcclResult Orchestrate(const HcclApi::HcclMsg& msg, HcclApi::HcclMsgExt& extMsg, u32 msgPos);
+    HcclResult Orchestrate(
+        const HcclApi::HcclMsg& msg, HcclApi::HcclMsgExt& extMsg, u32 msgPos,
+        Hccl::AicpuTimingRecorder* timingRecorder = nullptr);
     HcclResult Finalize(u32 msgPos);
     HcclResult IsAllTaskFinished(u32 msgPos, bool& isFinish);
     HcclResult InterGroupSync(const CommKfcAicpuServer& otherServer, HcclHandle handle);
     HcclResult CheckTimeOut(u32 msgPos);
     HcclResult ErrorDfxProcess(HcclResult errorCode);
-    HcclResult LaunchOpenCcorePost(const ServerExecCtx& execCtx, u64 recordAddr, u32 turnNum, u64 turnNumsAddr);
+    HcclResult LaunchOpenCcorePost(
+        const ServerExecCtx& execCtx, u64 recordAddr, u32 turnNum, u64 turnNumsAddr,
+        Hccl::AicpuTimingRecorder* timingRecorder = nullptr);
     HcclResult LaunchOpenCcoreWait(
-        const ServerExecCtx& execCtx, u64 waitAddr, u32 turnNum, u64 turnNumsAddr, bool isLast);
-    HcclResult LaunchOpenAicpuKernelServer(std::vector<uint8_t>& opParam);
+        const ServerExecCtx& execCtx, u64 waitAddr, u32 turnNum, u64 turnNumsAddr, bool isLast,
+        Hccl::AicpuTimingRecorder* timingRecorder = nullptr);
+    HcclResult LaunchOpenAicpuKernelServer(
+        std::vector<uint8_t>& opParam, Hccl::AicpuTimingRecorder* timingRecorder = nullptr);
     HcclResult FormatOpParamFromMsg(
         const HcclApi::HcclMsg& msg, HcclApi::HcclMsgExt& extMsg, const ServerExecCtx& execCtx, u32 repeat,
         std::vector<uint8_t>& runParam);

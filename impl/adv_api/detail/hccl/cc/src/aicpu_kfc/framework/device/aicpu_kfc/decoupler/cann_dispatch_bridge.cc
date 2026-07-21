@@ -16,9 +16,30 @@
 #include <string>
 #include <vector>
 
+#include "common/aicpu_timing_recorder.h"
 #include "log.h"
 
 namespace mc2_ops_hccl {
+namespace {
+using TimingMetric = Hccl::AicpuTimingRecorder::Metric;
+
+uint64_t StartTiming(Hccl::AicpuTimingRecorder* timingRecorder)
+{
+    return timingRecorder == nullptr ? 0U : timingRecorder->Now();
+}
+
+void AddElapsedMetric(Hccl::AicpuTimingRecorder* timingRecorder, TimingMetric metric, uint64_t beginNs)
+{
+    if (timingRecorder == nullptr) {
+        return;
+    }
+    const uint64_t endNs = timingRecorder->Now();
+    if (endNs >= beginNs) {
+        (void)timingRecorder->AddMetric(metric, endNs - beginNs);
+    }
+}
+} // namespace
+
 namespace cann_abi {
 namespace {
 
@@ -71,10 +92,13 @@ const CannSyms& LoadCannSyms()
 } // namespace
 } // namespace cann_abi
 
-HcclResult LaunchViaCann(const OpParam& ascParam, const AlgResourceCtxSerializable& ascResCtx)
+HcclResult LaunchViaCann(
+    const OpParam& ascParam, const AlgResourceCtxSerializable& ascResCtx, Hccl::AicpuTimingRecorder* timingRecorder)
 {
+    const uint64_t resolveBeginNs = StartTiming(timingRecorder);
     const cann_abi::CannSyms& syms = cann_abi::LoadCannSyms();
     if (!syms.ok) {
+        AddElapsedMetric(timingRecorder, TimingMetric::EXECUTOR_RESOLVE, resolveBeginNs);
         HCCL_ERROR(
             "[CannBridge] CANN kernel lib not ready, cannot dispatch. opType=%u algName[%s]",
             static_cast<u32>(ascParam.opType), ascParam.algName);
@@ -85,6 +109,7 @@ HcclResult LaunchViaCann(const OpParam& ascParam, const AlgResourceCtxSerializab
     void* self = syms.instance();
     std::unique_ptr<cann_abi::InsCollAlgBase> executor =
         syms.getAlgExec(self, ascParam.opType, std::string(ascParam.algName));
+    AddElapsedMetric(timingRecorder, TimingMetric::EXECUTOR_RESOLVE, resolveBeginNs);
     if (executor == nullptr) {
         HCCL_ERROR(
             "[CannBridge] GetAlgExec returned null. opType=%u algName[%s]", static_cast<u32>(ascParam.opType),
@@ -92,7 +117,9 @@ HcclResult LaunchViaCann(const OpParam& ascParam, const AlgResourceCtxSerializab
         return HCCL_E_NOT_SUPPORT;
     }
 
+    const uint64_t orchestrateBeginNs = StartTiming(timingRecorder);
     HcclResult ret = executor->Orchestrate(ascParam, ascResCtx);
+    AddElapsedMetric(timingRecorder, TimingMetric::EXECUTOR_ORCHESTRATE, orchestrateBeginNs);
     if (ret != HCCL_SUCCESS) {
         HCCL_ERROR(
             "[CannBridge] CANN Orchestrate failed, ret=%d. opType=%u algName[%s]", static_cast<int>(ret),

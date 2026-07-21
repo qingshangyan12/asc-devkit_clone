@@ -74,6 +74,8 @@ TEST_F(AicpuTimingRecorderTest, RejectsInvalidAndLateRecords)
 
     EXPECT_TRUE(timingRecorder.IsReported());
     EXPECT_FALSE(timingRecorder.Record(Recorder::Stage::LAST_FINALIZE_RECEIVED));
+    EXPECT_FALSE(timingRecorder.AddMetric(Recorder::Metric::PARAM_FORMAT, 10U));
+    EXPECT_FALSE(timingRecorder.IncrementCounter(Recorder::Counter::PREPARE));
     EXPECT_EQ(timingRecorder.Size(), 1U);
 
     uint64_t value = 0U;
@@ -86,6 +88,8 @@ TEST_F(AicpuTimingRecorderTest, ResetMakesSessionReusable)
 {
     Recorder timingRecorder("test_scenario", TestClock);
     EXPECT_TRUE(timingRecorder.Record(Recorder::Stage::KERNEL_ENTRY));
+    EXPECT_TRUE(timingRecorder.AddMetric(Recorder::Metric::PARAM_FORMAT, 20U));
+    EXPECT_TRUE(timingRecorder.IncrementCounter(Recorder::Counter::PREPARE, 2U));
     timingRecorder.Report("complete");
 
     timingRecorder.Reset();
@@ -93,9 +97,54 @@ TEST_F(AicpuTimingRecorderTest, ResetMakesSessionReusable)
     EXPECT_EQ(timingRecorder.Size(), 0U);
     EXPECT_TRUE(timingRecorder.Record(Recorder::Stage::KERNEL_ENTRY));
 
+    Recorder::MetricStats stats{};
+    EXPECT_FALSE(timingRecorder.GetMetric(Recorder::Metric::PARAM_FORMAT, stats));
+    uint64_t counter = 1U;
+    EXPECT_TRUE(timingRecorder.GetCounter(Recorder::Counter::PREPARE, counter));
+    EXPECT_EQ(counter, 0U);
+
     uint64_t timestamp = 0U;
     EXPECT_TRUE(timingRecorder.GetTimestamp(Recorder::Stage::KERNEL_ENTRY, timestamp));
     EXPECT_EQ(timestamp, 110U);
+}
+
+TEST_F(AicpuTimingRecorderTest, RecordsExplicitTimestampWithoutReadingClock)
+{
+    Recorder timingRecorder("test_scenario", TestClock);
+
+    EXPECT_TRUE(timingRecorder.RecordAt(Recorder::Stage::KERNEL_ENTRY, 200U));
+    EXPECT_TRUE(timingRecorder.RecordAt(Recorder::Stage::KERNEL_ENTRY, 300U));
+    EXPECT_TRUE(timingRecorder.RecordAt(Recorder::Stage::KERNEL_ENTRY, 400U, Recorder::RecordPolicy::KEEP_LATEST));
+
+    uint64_t timestamp = 0U;
+    EXPECT_TRUE(timingRecorder.GetTimestamp(Recorder::Stage::KERNEL_ENTRY, timestamp));
+    EXPECT_EQ(timestamp, 400U);
+    EXPECT_EQ(g_clockCallCount, 0U);
+}
+
+TEST_F(AicpuTimingRecorderTest, AggregatesMetricsAndCounters)
+{
+    Recorder timingRecorder("test_scenario", TestClock);
+    EXPECT_TRUE(timingRecorder.Record(Recorder::Stage::KERNEL_ENTRY));
+
+    EXPECT_TRUE(timingRecorder.AddMetric(Recorder::Metric::PARAM_FORMAT, 30U));
+    EXPECT_TRUE(timingRecorder.AddMetric(Recorder::Metric::PARAM_FORMAT, 10U));
+    EXPECT_TRUE(timingRecorder.AddMetric(Recorder::Metric::PARAM_FORMAT, 20U));
+    Recorder::MetricStats stats{};
+    EXPECT_TRUE(timingRecorder.GetMetric(Recorder::Metric::PARAM_FORMAT, stats));
+    EXPECT_EQ(stats.count, 3U);
+    EXPECT_EQ(stats.totalNs, 60U);
+    EXPECT_EQ(stats.minNs, 10U);
+    EXPECT_EQ(stats.maxNs, 30U);
+    EXPECT_FALSE(timingRecorder.GetMetric(Recorder::Metric::WAIT_SQE_BUILD, stats));
+    EXPECT_FALSE(timingRecorder.AddMetric(static_cast<Recorder::Metric>(UINT8_MAX), 1U));
+
+    EXPECT_TRUE(timingRecorder.IncrementCounter(Recorder::Counter::EMPTY_POLL));
+    EXPECT_TRUE(timingRecorder.IncrementCounter(Recorder::Counter::EMPTY_POLL, 4U));
+    uint64_t counter = 0U;
+    EXPECT_TRUE(timingRecorder.GetCounter(Recorder::Counter::EMPTY_POLL, counter));
+    EXPECT_EQ(counter, 5U);
+    EXPECT_FALSE(timingRecorder.GetCounter(static_cast<Recorder::Counter>(UINT8_MAX), counter));
 }
 
 TEST_F(AicpuTimingRecorderTest, RecordsCompleteFourPointTimeline)

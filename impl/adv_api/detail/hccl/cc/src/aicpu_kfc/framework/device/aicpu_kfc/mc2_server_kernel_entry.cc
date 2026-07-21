@@ -34,6 +34,8 @@ extern "C" __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void*
     constexpr int DESC_POS = 0;
     uint64_t descValue = reinterpret_cast<uint64_t>(args[DESC_POS]);
     auto* desc = reinterpret_cast<CommKfcParamDesc*>(&descValue);
+    (void)timingRecorder.Record(Hccl::AicpuTimingRecorder::Stage::KERNEL_ARGS_PARSED);
     AicpuKfcUtils::PrintHcclCommParamDesc(*desc);
+    (void)timingRecorder.Record(Hccl::AicpuTimingRecorder::Stage::DISPATCHER_ENTER);
     return CommKfcDispatcher::Run(&(args[1]), desc->itemNum, timingRecorder);
 }

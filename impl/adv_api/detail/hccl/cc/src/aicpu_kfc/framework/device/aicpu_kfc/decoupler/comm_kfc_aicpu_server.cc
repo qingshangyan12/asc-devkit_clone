@@ -14,6 +14,7 @@
 #include "alg_param.h"
 #include "log.h"
 #include "common/aicpu_kfc_utils.h"
+#include "common/aicpu_timing_recorder.h"
 #ifndef MC2_SERVER_ONLY
 #include "hccl_mc2_ex.h"
 #include "framework/aicpu_communicator.h"
@@ -33,6 +34,24 @@ static constexpr u64 TIMEOUT_ERROR_THRESHOLD = 120UL;
 static constexpr u32 AICPU_ORDER_DFX_INVALID_VALUE = 0xFFFFFFFFU;
 static const std::vector<HcclCMDType> SUPPORT_OP_LIST{
     HCCL_CMD_ALLREDUCE, HCCL_CMD_ALLGATHER, HCCL_CMD_REDUCE_SCATTER, HCCL_CMD_ALLTOALLV, HCCL_CMD_ALLTOALL};
+
+using TimingMetric = Hccl::AicpuTimingRecorder::Metric;
+
+uint64_t StartTiming(Hccl::AicpuTimingRecorder* timingRecorder)
+{
+    return timingRecorder == nullptr ? 0U : timingRecorder->Now();
+}
+
+void AddElapsedMetric(Hccl::AicpuTimingRecorder* timingRecorder, TimingMetric metric, uint64_t beginNs)
+{
+    if (timingRecorder == nullptr) {
+        return;
+    }
+    const uint64_t endNs = timingRecorder->Now();
+    if (endNs >= beginNs) {
+        (void)timingRecorder->AddMetric(metric, endNs - beginNs);
+    }
+}
 
 #define MC2_TIMEOUT_LOG(isHardTimeout, format, ...) \
     do {                                            \
@@ -331,7 +350,8 @@ const ServerExecCtx* CommKfcAicpuServer::MatchExecCtx(u64 opParamKey) const
 }
 
 HcclResult CommKfcAicpuServer::LaunchOpenCcoreWait(
-    const ServerExecCtx& execCtx, u64 waitAddr, u32 turnNum, u64 turnNumsAddr, bool isLast)
+    const ServerExecCtx& execCtx, u64 waitAddr, u32 turnNum, u64 turnNumsAddr, bool isLast,
+    Hccl::AicpuTimingRecorder* timingRecorder)
 {
     const u64 valueAddr = turnNumsAddr + static_cast<u64>(turnNum) * sizeof(u32);
     HCCL_INFO(
@@ -360,11 +380,15 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcoreWait(
             "waitAddr %#llx, valueAddr %#llx.",
             groupIdx_, thread, streamLite, streamLite->GetRtsq(), static_cast<unsigned long long>(waitAddr),
             static_cast<unsigned long long>(valueAddr));
+        const uint64_t buildBeginNs = StartTiming(timingRecorder);
         EXECEPTION_CATCH(streamLite->GetRtsq()->CCoreNotifyWait(waitAddr, valueAddr, isLast), return HCCL_E_INTERNAL);
+        AddElapsedMetric(timingRecorder, TimingMetric::WAIT_SQE_BUILD, buildBeginNs);
         HCCL_INFO(
             "[MC2_OPEN_DIAG][CcoreWaitSqeDone] group %u, turnNum %u, thread %p, streamLite %p.", groupIdx_, turnNum,
             thread, streamLite);
+        const uint64_t submitBeginNs = StartTiming(timingRecorder);
         EXECEPTION_CATCH(thread->LaunchTask(), return HCCL_E_INTERNAL);
+        AddElapsedMetric(timingRecorder, TimingMetric::WAIT_SQE_SUBMIT, submitBeginNs);
         HCCL_INFO(
             "[AICPU_ORDER_DFX][HcommApi] LaunchTask after CCoreWait group[%u], thread[%p], streamLite[%p], "
             "rtsq[%p], waitAddr[%#llx], waitVal[%u], valueAddr[%#llx], valueVal[%u], turnNum[%u].",
@@ -387,6 +411,7 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcoreWait(
     uint8_t* sqeDfxInfoAddr = nullptr;
     uint16_t taskId16 = 0;
 
+    const uint64_t buildBeginNs = StartTiming(timingRecorder);
     CHK_RET(execCtx.mainStream->GetNextSqeBufferAddr(sqeBuffer, sqeTypeAddr, sqeDfxInfoAddr, taskId16));
 
     auto* sqeCtx = execCtx.mainStream->GetSqeContextPtr();
@@ -402,6 +427,7 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcoreWait(
     *sqeTypeAddr = static_cast<uint8_t>(SqeType::A5_CCORE_NOTIFY_WAIT_SQE);
     sqeCtx->buffer.addInfo[taskId16 % hccl::HCCL_SQE_MAX_CNT] =
         (static_cast<u32>(turnNum) << 16) | static_cast<u32>(isLast);
+    AddElapsedMetric(timingRecorder, TimingMetric::WAIT_SQE_BUILD, buildBeginNs);
     HCCL_INFO(
         "[AICPU_ORDER_DFX][SQE] CCoreNotifyWait legacy group[%u], taskId16[%u], a5TaskId[%u], "
         "sqeType[%u], waitAddr[%#llx], waitVal[%u], valueAddr[%#llx], valueVal[%u], turnNum[%u], isLast[%u].",
@@ -410,14 +436,17 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcoreWait(
         static_cast<unsigned long long>(valueAddr), ReadAicpuOrderDfxValue(valueAddr), turnNum,
         static_cast<u32>(isLast));
 
+    const uint64_t submitBeginNs = StartTiming(timingRecorder);
     HcclResult ret = LaunchTask(execCtx.dispatcher, *execCtx.mainStream);
+    AddElapsedMetric(timingRecorder, TimingMetric::WAIT_SQE_SUBMIT, submitBeginNs);
     HCCL_INFO("[MC2_OPEN_DIAG][CcoreWaitEnd] group %u, turnNum %u, ret %u.", groupIdx_, turnNum, ret);
     return ret;
 #endif
 }
 
 HcclResult CommKfcAicpuServer::LaunchOpenCcorePost(
-    const ServerExecCtx& execCtx, u64 recordAddr, u32 turnNum, u64 turnNumsAddr)
+    const ServerExecCtx& execCtx, u64 recordAddr, u32 turnNum, u64 turnNumsAddr,
+    Hccl::AicpuTimingRecorder* timingRecorder)
 {
     const u64 valueAddr = turnNumsAddr + static_cast<u64>(turnNum) * sizeof(u32);
     HCCL_INFO(
@@ -445,11 +474,15 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcorePost(
             "recordAddr %#llx, valueAddr %#llx.",
             groupIdx_, thread, streamLite, streamLite->GetRtsq(), static_cast<unsigned long long>(recordAddr),
             static_cast<unsigned long long>(valueAddr));
+        const uint64_t buildBeginNs = StartTiming(timingRecorder);
         EXECEPTION_CATCH(streamLite->GetRtsq()->CCoreNotifyRecord(recordAddr, valueAddr), return HCCL_E_INTERNAL);
+        AddElapsedMetric(timingRecorder, TimingMetric::POST_SQE_BUILD, buildBeginNs);
         HCCL_INFO(
             "[MC2_OPEN_DIAG][CcorePostSqeDone] group %u, turnNum %u, thread %p, streamLite %p.", groupIdx_, turnNum,
             thread, streamLite);
+        const uint64_t submitBeginNs = StartTiming(timingRecorder);
         EXECEPTION_CATCH(thread->LaunchTask(), return HCCL_E_INTERNAL);
+        AddElapsedMetric(timingRecorder, TimingMetric::POST_SQE_SUBMIT, submitBeginNs);
         HCCL_INFO(
             "[AICPU_ORDER_DFX][HcommApi] LaunchTask after CCorePost group[%u], thread[%p], streamLite[%p], "
             "rtsq[%p], recordAddr[%#llx], recordVal[%u], valueAddr[%#llx], valueVal[%u], turnNum[%u].",
@@ -472,6 +505,7 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcorePost(
     uint8_t* sqeDfxInfoAddr = nullptr;
     uint16_t taskId16 = 0;
 
+    const uint64_t buildBeginNs = StartTiming(timingRecorder);
     CHK_RET(execCtx.mainStream->GetNextSqeBufferAddr(sqeBuffer, sqeTypeAddr, sqeDfxInfoAddr, taskId16));
 
     auto* sqeCtx = execCtx.mainStream->GetSqeContextPtr();
@@ -486,6 +520,7 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcorePost(
     Hccl::BuildA5SqeCCoreNotifyRecord(0, a5TaskId, recordAddr, valueAddr, sqeBuffer);
     *sqeTypeAddr = static_cast<uint8_t>(SqeType::A5_CCORE_NOTIFY_RECORD_SQE);
     sqeCtx->buffer.addInfo[taskId16 % hccl::HCCL_SQE_MAX_CNT] = turnNum;
+    AddElapsedMetric(timingRecorder, TimingMetric::POST_SQE_BUILD, buildBeginNs);
     HCCL_INFO(
         "[AICPU_ORDER_DFX][SQE] CCoreNotifyRecord legacy group[%u], taskId16[%u], a5TaskId[%u], "
         "sqeType[%u], recordAddr[%#llx], recordVal[%u], valueAddr[%#llx], valueVal[%u], turnNum[%u].",
@@ -493,7 +528,9 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcorePost(
         static_cast<unsigned long long>(recordAddr), ReadAicpuOrderDfxValue(recordAddr),
         static_cast<unsigned long long>(valueAddr), ReadAicpuOrderDfxValue(valueAddr), turnNum);
 
+    const uint64_t submitBeginNs = StartTiming(timingRecorder);
     HcclResult ret = LaunchTask(execCtx.dispatcher, *execCtx.mainStream);
+    AddElapsedMetric(timingRecorder, TimingMetric::POST_SQE_SUBMIT, submitBeginNs);
     HCCL_INFO("[MC2_OPEN_DIAG][CcorePostEnd] group %u, turnNum %u, ret %u.", groupIdx_, turnNum, ret);
     return ret;
 #endif
@@ -520,16 +557,21 @@ HcclResult CommKfcAicpuServer::FormatOpParamFromMsg(
     return FormatOpenOpParamDataFromMsg(execCtx.baseOpParam, msg, extMsg, rankNum_, repeatIdx, stream, opParam);
 }
 
-HcclResult CommKfcAicpuServer::LaunchOpenAicpuKernelServer(std::vector<uint8_t>& opParam)
+HcclResult CommKfcAicpuServer::LaunchOpenAicpuKernelServer(
+    std::vector<uint8_t>& opParam, Hccl::AicpuTimingRecorder* timingRecorder)
 {
     LogOpenOpParamBrief("KernelServerBegin", opParam);
-    HcclResult ret = LaunchOpenOpParamData(opParam);
+    const uint64_t expandBeginNs = StartTiming(timingRecorder);
+    HcclResult ret = LaunchOpenOpParamData(opParam, timingRecorder);
+    AddElapsedMetric(timingRecorder, TimingMetric::ALGORITHM_EXPAND, expandBeginNs);
     HCCL_INFO("[MC2_OPEN_DIAG][KernelServerEnd] ret %u, opParamSize %zu.", ret, opParam.size());
     return ret;
 }
 
-HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMsg, u32 msgPos)
+HcclResult CommKfcAicpuServer::Orchestrate(
+    const HcclMsg& msg, HcclMsgExt& extMsg, u32 msgPos, Hccl::AicpuTimingRecorder* timingRecorder)
 {
+    const uint64_t precheckBeginNs = StartTiming(timingRecorder);
     KeepAlive();
     CHK_PTR_NULL(msgArea_);
     const HcclCMDType opType = static_cast<HcclCMDType>(msg.commType.prepareType);
@@ -546,6 +588,7 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     const u32 repeatCnt = static_cast<u32>(msg.addMsg.v1Msg.repeatCnt);
     const u64 waitAddr = reinterpret_cast<u64>(&(msgArea_->commMsg.singleMsg.commitTurnCnt[msgPos].cnt));
     const u64 recordAddr = reinterpret_cast<u64>(&(msgArea_->commMsg.singleMsg.finishedTurnCnt[msgPos].cnt));
+    AddElapsedMetric(timingRecorder, TimingMetric::ORCHESTRATE_PRECHECK, precheckBeginNs);
     HCCL_INFO(
         "[MC2_OPEN_DIAG][ServerMsg] msgPos %u, handle %d, seqNum %u, repeatCnt %u, opParamKey %#llx, "
         "msgOpType %u, msgReduceType %u, sendBuffer %#llx, recvBuffer %#llx, dataCnt %llu, "
@@ -577,7 +620,9 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         LogAicpuOrderDfxCounter(
             "BeforeFormat", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
             execCtx);
+        const uint64_t formatBeginNs = StartTiming(timingRecorder);
         HcclResult ret = FormatOpParamFromMsg(msg, extMsg, *execCtx, i, runParam);
+        AddElapsedMetric(timingRecorder, TimingMetric::PARAM_FORMAT, formatBeginNs);
         UpdateProgress("AfterFormat", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "AfterFormat", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
@@ -594,7 +639,7 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopBeforeWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i,
             turnIdx);
-        ret = LaunchOpenCcoreWait(*execCtx, waitAddr, turnIdx, turnNumsAddr_, turnIdx == repeatCnt);
+        ret = LaunchOpenCcoreWait(*execCtx, waitAddr, turnIdx, turnNumsAddr_, turnIdx == repeatCnt, timingRecorder);
         UpdateProgress("AfterWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "AfterWait", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
@@ -611,7 +656,7 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopBeforeKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i,
             turnIdx);
-        ret = LaunchOpenAicpuKernelServer(runParam);
+        ret = LaunchOpenAicpuKernelServer(runParam, timingRecorder);
         UpdateProgress("AfterKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "AfterKernel", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
@@ -628,7 +673,7 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopBeforePost] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i,
             turnIdx);
-        ret = LaunchOpenCcorePost(*execCtx, recordAddr, turnIdx, turnNumsAddr_);
+        ret = LaunchOpenCcorePost(*execCtx, recordAddr, turnIdx, turnNumsAddr_, timingRecorder);
         UpdateProgress("AfterPost", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "AfterPost", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
