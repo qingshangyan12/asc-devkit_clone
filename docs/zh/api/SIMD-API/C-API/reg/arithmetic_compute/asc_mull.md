@@ -28,13 +28,13 @@
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
-该接口根据mask对输入数据src0、src1按元素相乘操作，将乘法结果的低位部分写入dst0，溢出（高位）部分写入dst1。计算公式及图示如下：
+该接口根据mask对输入数据src0、src1执行按元素相乘操作，将乘法结果的低位部分写入dst0，高位（溢出）部分写入dst1。计算公式及图示如下：
   
   $$dst0_i = (src0_i \times src1_i) mod 2^{bit}$$
   
   $$dst1_i = (src0_i \times src1_i) / 2^{bit}$$
   
-其中，bit表示操作数的位宽bit数。
+其中，bit表示操作数的位宽。
 
 ![asc_mull示例](../../figures/asc_mull.png)
 
@@ -51,15 +51,11 @@
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst0 | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| dst1 | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| src0 | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| src1 | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| mask | 输入 | 源操作数元素操作的有效指示。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
-
-## 数据类型
-
-目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：int32_t、uint32_t。
+| dst0 | 输出 | 目的操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#矢量数据寄存器)）。 |
+| dst1 | 输出 | 目的操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#矢量数据寄存器)）。 |
+| src0 | 输入 | 源操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#矢量数据寄存器)）。 |
+| src1 | 输入 | 源操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#矢量数据寄存器)）。 |
+| mask | 输入 | 源操作数元素操作的有效指示（[掩码寄存器](../reg_data_types/data_type_definition.md#掩码寄存器)）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
 ## 返回值说明
 

@@ -28,7 +28,13 @@
 
 头文件路径：`"c_api/reg_compute/reg_vector.h"`。
 
-将源操作数src0和src1中的元素交织存入目的操作数dst0和dst1中。操作数为掩码寄存器时，不同数据类型的接口决定了交织的位宽大小，例如对于b32类型，交织时以4bit为一组，对比b16类型，交织时以2bit为一组。以int8_t矢量数据寄存器为例，交织过程如下图所示。
+将源操作数src0和src1中的元素交织存入目的操作数dst0和dst1中。按照操作数类型划分，可以分以下场景：
+
+**操作数为掩码寄存器**
+- 不同数据类型的接口决定了交织的位宽大小，例如对于b32类型，交织时以4bit为一组，对于b16类型，交织时以2bit为一组。
+
+**操作数为矢量数据寄存器**
+- 以元素为单位进行交织。以int8_t矢量数据寄存器为例，交织过程如下图所示。
 
 ![asc_intlv示例](../../figures/asc_intlv.png)
 
@@ -61,16 +67,10 @@
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst0 | 输出 | 目的操作数（矢量数据寄存器或掩码寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)或[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| dst1 | 输出 | 目的操作数（矢量数据寄存器或掩码寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)或[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| src0 | 输入 | 源操作数（矢量数据寄存器或掩码寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)或[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| src1 | 输入 | 源操作数（矢量数据寄存器或掩码寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)或[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-
-## 数据类型
-
-目的操作数与源操作数的数据类型需要保持一致。
-- 操作数为矢量数据寄存器时支持的数据类型为：int8_t、uint8_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
-- 操作数为掩码寄存器时支持的数据类型为：bool。
+| dst0 | 输出 | 目的操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#矢量数据寄存器)或[掩码寄存器](../reg_data_types/data_type_definition.md#掩码寄存器)）。 |
+| dst1 | 输出 | 目的操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#矢量数据寄存器)或[掩码寄存器](../reg_data_types/data_type_definition.md#掩码寄存器)）。 |
+| src0 | 输入 | 源操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#矢量数据寄存器)或[掩码寄存器](../reg_data_types/data_type_definition.md#掩码寄存器)）。 |
+| src1 | 输入 | 源操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#矢量数据寄存器)或[掩码寄存器](../reg_data_types/data_type_definition.md#掩码寄存器)）。 |
 
 ## 返回值说明
 

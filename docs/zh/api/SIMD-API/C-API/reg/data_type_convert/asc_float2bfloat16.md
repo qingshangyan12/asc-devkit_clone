@@ -37,45 +37,45 @@
 ## 函数原型
 
 ```cpp
-// FLOOR舍入模式,非饱和模式，数据写入索引为偶数的位置
+// FLOOR舍入模式，非饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2bfloat16_rd(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// FLOOR舍入模式,饱和模式，数据写入索引为偶数的位置
+// FLOOR舍入模式，饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2bfloat16_rd_sat(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// FLOOR舍入模式,非饱和模式，数据写入索引为奇数的位置
+// FLOOR舍入模式，非饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2bfloat16_rd_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// FLOOR舍入模式,饱和模式，数据写入索引为奇数的位置
+// FLOOR舍入模式，饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2bfloat16_rd_sat_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// RINT舍入模式,非饱和模式，数据写入索引为偶数的位置
+// RINT舍入模式，非饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2bfloat16_rn(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// RINT舍入模式,饱和模式，数据写入索引为偶数的位置
+// RINT舍入模式，饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2bfloat16_rn_sat(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// RINT舍入模式,非饱和模式，数据写入索引为奇数的位置
+// RINT舍入模式，非饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2bfloat16_rn_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// RINT舍入模式,饱和模式，数据写入索引为奇数的位置
+// RINT舍入模式，饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2bfloat16_rn_sat_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// ROUND舍入模式,非饱和模式，数据写入索引为偶数的位置
+// ROUND舍入模式，非饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2bfloat16_rna(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// ROUND舍入模式,饱和模式，数据写入索引为偶数的位置
+// ROUND舍入模式，饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2bfloat16_rna_sat(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// ROUND舍入模式,非饱和模式，数据写入索引为奇数的位置
+// ROUND舍入模式，非饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2bfloat16_rna_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// ROUND舍入模式,饱和模式，数据写入索引为奇数的位置
+// ROUND舍入模式，饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2bfloat16_rna_sat_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// CEIL舍入模式,非饱和模式，数据写入索引为偶数的位置
+// CEIL舍入模式，非饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2bfloat16_ru(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// CEIL舍入模式,饱和模式，数据写入索引为偶数的位置
+// CEIL舍入模式，饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2bfloat16_ru_sat(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// CEIL舍入模式,非饱和模式，数据写入索引为奇数的位置
+// CEIL舍入模式，非饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2bfloat16_ru_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// CEIL舍入模式,饱和模式，数据写入索引为奇数的位置
+// CEIL舍入模式，饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2bfloat16_ru_sat_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// TRUNC舍入模式,非饱和模式，数据写入索引为偶数的位置
+// TRUNC舍入模式，非饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2bfloat16_rz(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// TRUNC舍入模式,饱和模式，数据写入索引为偶数的位置
+// TRUNC舍入模式，饱和模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2bfloat16_rz_sat(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// TRUNC舍入模式,非饱和模式，数据写入索引为奇数的位置
+// TRUNC舍入模式，非饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2bfloat16_rz_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
-// TRUNC舍入模式,饱和模式，数据写入索引为奇数的位置
+// TRUNC舍入模式，饱和模式，数据写入索引为奇数的位置
 __simd_callee__ inline void asc_float2bfloat16_rz_sat_v2(vector_bfloat16_t& dst, vector_float src, vector_bool mask)
 ```
 
@@ -85,17 +85,9 @@ __simd_callee__ inline void asc_float2bfloat16_rz_sat_v2(vector_bfloat16_t& dst,
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| src | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| mask | 输入 | 源操作数元素操作的有效指示。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
-
-## 数据类型
-
-**表2**  数据类型
-
-| src | dst |
-| --- | --- |
-| float | bfloat16_t |
+| dst | 输出 | 目的操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#矢量数据寄存器)）。 |
+| src | 输入 | 源操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#矢量数据寄存器)）。 |
+| mask | 输入 | 源操作数元素操作的有效指示（[掩码寄存器](../reg_data_types/data_type_definition.md#掩码寄存器)）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
 ## 返回值说明
 

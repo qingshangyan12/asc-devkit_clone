@@ -61,17 +61,9 @@
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| src | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector_[data_type]](../reg_data_types/data_type_definition.md#矢量数据寄存器)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-| mask | 输入 | 源操作数元素操作的有效指示。<br>类型为[vector_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。 |
-
-## 数据类型
-
-**表2**  数据类型
-
-| src | dst |
-| --- | --- |
-| uint8_t | uint16_t |
+| dst | 输出 | 目的操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#矢量数据寄存器)）。 |
+| src | 输入 | 源操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#矢量数据寄存器)）。 |
+| mask | 输入 | 源操作数元素操作的有效指示（[掩码寄存器](../reg_data_types/data_type_definition.md#掩码寄存器)）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。 |
 
 ## 返回值说明
 
@@ -85,12 +77,11 @@
 ## 调用示例
 
 ```cpp
-// 示例1：完整的频率统计流程
 vector_uint16_t dst0, dst1;  // dst0用于低位统计，dst1用于高位统计
 vector_uint8_t src;
 vector_bool mask = asc_create_mask_b8(PAT_ALL);
 
-// 初始化dst为0
+// 初始化dst为0，从零开始统计频率
 asc_duplicate_scalar(dst0, (uint16_t)0, mask);
 asc_duplicate_scalar(dst1, (uint16_t)0, mask);
 
@@ -104,7 +95,6 @@ asc_frequency_histogram_bin1(dst1, src, mask);  // 统计[128,255]
 // dst0[0]表示数值0的出现次数，dst0[127]表示数值127的出现次数
 // dst1[0]表示数值128的出现次数，dst1[127]表示数值255的出现次数
 
-// 示例2：多次累加统计
 // 支持对多批数据进行累加统计
 asc_loadalign(src, src_addr2);  // 加载第二批数据, src_addr2是外部输入的UB内存空间地址
 asc_frequency_histogram_bin0(dst0, src, mask);  // 累加到dst0
