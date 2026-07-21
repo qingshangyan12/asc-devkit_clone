@@ -4,9 +4,9 @@ This directory contains two AIV fault kernels for validating exception callback 
 
 ## Kernels
 
-- `HcommUrmaTimeoutFaultKernel`: calls `Hcomm::Write` with `len > 256MB`, then `Commit` and `Wait`.
-- `HcommCqeErrorFaultKernel`: calls `Hcomm::Write` with a valid remote GM address and an invalid local GM address,
-  then `Commit` and `Wait`.
+- `HcommUrmaTimeoutFaultKernel`: calls `Hcomm::WriteNbi` with `len > 256MB` and then `Drain`.
+- `HcommCqeErrorFaultKernel`: calls `Hcomm::WriteNbi` with a valid remote GM address and an invalid local GM address,
+  then `Drain`.
 
 Both kernels take a device pointer to `CommContext`.
 
