@@ -184,12 +184,7 @@ __aicore__ inline void Scatter(
     if (repeatTime > 0) {
         Scatter(dst, src, dstOffset, dstBaseAddr, (uint64_t)elementCountSingleRepeat, repeatTime, repeatStride);
     }
-    if (elementCountTail > 0) {
         const uint32_t offset = count - elementCountTail;
-        Scatter(dst, src[offset], dstOffset[offset], dstBaseAddr, (uint64_t)elementCountTail, 1, repeatStride);
-    }
-#else
-    if (repeatTime > 0) {
         Scatter(
             dst, src, dstOffset, dstBaseAddr, static_cast<uint64_t>(elementCountSingleRepeat), repeatTime,
             DEFAULT_REPEAT_STRIDE);
