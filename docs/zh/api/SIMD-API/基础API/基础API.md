@@ -2,7 +2,7 @@
 
 - **[数据结构](数据结构/数据结构.md)**  
 
-- **[数据结构（Tensor API）](<数据结构（Tensor API）/数据结构（Tensor API）.md>)**  
+- **[数据结构（TensorAPI）](<数据结构（TensorAPI）/数据结构（TensorAPI）.md>)**  
 
 - **[数据搬运导览](数据搬运导览/数据搬运导览.md)**  
 
