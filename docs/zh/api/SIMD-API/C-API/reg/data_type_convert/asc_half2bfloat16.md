@@ -53,17 +53,9 @@ __simd_callee__ inline void asc_half2bfloat16_rz(vector_bfloat16_t& dst, vector_
 
 | 参数名    | 输入/输出 | 描述                |
 | :------ | :----- | :----------------- |
-| dst    | 输出    | 目的操作数（矢量数据寄存器）。<br>类型为[vector\_bfloat16\_t](../reg_data_types/data_type_definition.md#reg数据类型定义)。             |
-| src    | 输入    | 源操作数（矢量数据寄存器）。<br>类型为[vector\_half](../reg_data_types/data_type_definition.md#reg数据类型定义)。              |
-| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。<br>类型为[vector\_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。  |
-
-## 数据类型
-
-**表2** 数据类型
-
-| 目的操作数 | 源操作数 |
-|-----|-----|
-| bfloat16_t | half | 
+| dst    | 输出    | 目的操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#reg数据类型定义)）。             |
+| src    | 输入    | 源操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#reg数据类型定义)）。              |
+| mask | 输入 | 源操作数掩码（[掩码寄存器](../reg_data_types/data_type_definition.md#掩码寄存器)）mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。  |
 
 ## 返回值说明
 

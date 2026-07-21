@@ -85,10 +85,10 @@
 
     | 参数名  | 输入/输出 | 描述 |
     | :----- | :------- | :------- |
-    | dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
+    | dst | 输出 | 目的操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#reg数据类型定义)）。 |
     | src | 输入 | 源操作数（矢量）的起始地址。 |
-    | index | 输入 | 数据索引（矢量数据寄存器），dst中每个元素在UB中相对于src的索引位置。单位是元素个数，每个元素的源地址为index * sizeof(data\_type) + src。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-    | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。<br>类型为[vector\_bool](../reg_data_types/data_type_definition.md#掩码寄存器)。 |
+    | index | 输入 | 数据索引（[矢量数据寄存器](../reg_data_types/data_type_definition.md#reg数据类型定义)）。dst中每个元素在UB中相对于src的索引位置。单位是元素个数，每个元素的源地址为index * sizeof(data\_type) + src。 |
+    | mask | 输入 | 源操作数掩码（[掩码寄存器](../reg_data_types/data_type_definition.md#掩码寄存器)）。mask用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
 - 收集矢量数据寄存器中的元素
 
@@ -96,54 +96,9 @@
 
     | 参数名  | 输入/输出 | 描述 |
     | :----- | :------- | :------- |
-    | dst | 输出 | 目的操作数（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-    | src | 输入 | 源操作数（矢量数据寄存器）。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-    | index | 输入 | 数据索引（矢量数据寄存器）。单位是元素个数，每个元素来源为src[index]。<br>类型为[vector\_\[data\_type\]](../reg_data_types/data_type_definition.md#reg数据类型定义)，data_type的取值范围请参考[数据类型](#数据类型)。 |
-
-## 数据类型
-
-- 收集UB中的元素
-
-    **表3** 数据类型
-
-    | 目的操作数 | 源操作数 | 数据索引 |
-    |-----|-----|-----|
-    | int16_t | int8_t | uint16_t |
-    | uint16_t | uint8_t | uint16_t |
-    | fp8_e4m3fn_t | fp8_e4m3fn_t | uint16_t |
-    | fp8_e5m2_t | fp8_e5m2_t | uint16_t |
-    | fp8_e8m0_t | fp8_e8m0_t | uint16_t |
-    | hifloat8_t | hifloat8_t | uint16_t |
-    | int16_t | int16_t | uint16_t |
-    | uint16_t | uint16_t | uint16_t |
-    | half | half | uint16_t |
-    | bfloat16_t | bfloat16_t | uint16_t |
-    | int32_t | int32_t | uint32_t |
-    | uint32_t | uint32_t | uint32_t |
-    | float | float | uint32_t |
-    | int16_t | int16_t | uint32_t |
-    | uint16_t | uint16_t | uint32_t |
-    | half | half | uint32_t |
-    | bfloat16_t | bfloat16_t | uint32_t |
-
-- 收集矢量数据寄存器中的元素
-
-    **表4** 数据类型
-
-    | 目的操作数 | 源操作数 | 数据索引 |
-    |-----|-----|-----|
-    | int8_t | int8_t | uint8_t |
-    | uint8_t | uint8_t | uint8_t |
-    | fp8_e4m3fn_t | fp8_e4m3fn_t | uint8_t |
-    | fp8_e5m2_t | fp8_e5m2_t | uint8_t |
-    | fp8_e8m0_t | fp8_e8m0_t | uint8_t |
-    | hifloat8_t | hifloat8_t | uint8_t |
-    | int16_t | int16_t | uint16_t |
-    | uint16_t | uint16_t | uint16_t |
-    | half | half | uint16_t |
-    | bfloat16_t | bfloat16_t | uint16_t |
-    | int32_t | int32_t | uint32_t |
-    | uint32_t | uint32_t | uint32_t |
+    | dst | 输出 | 目的操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#reg数据类型定义)）。 |
+    | src | 输入 | 源操作数（[矢量数据寄存器](../reg_data_types/data_type_definition.md#reg数据类型定义)）。 |
+    | index | 输入 | 数据索引（[矢量数据寄存器](../reg_data_types/data_type_definition.md#reg数据类型定义)）。单位是元素个数，每个元素来源为src[index]。 |
 
 ## 返回值说明
 
