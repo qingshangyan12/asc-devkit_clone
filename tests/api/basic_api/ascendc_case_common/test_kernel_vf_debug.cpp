@@ -7,6 +7,11 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+#ifdef ASCENDC_DUMP
+#undef ASCENDC_DUMP
+#endif
+#define ASCENDC_DUMP 1
+
 #include <gtest/gtest.h>
 #include "kernel_operator.h"
 
@@ -31,12 +36,18 @@ TEST_F(TestVFDebug, AscVFDebugInitUb_Callable)
     SUCCEED();
 }
 
-TEST_F(TestVFDebug, AscVFDebugTransferUb_Callable)
+TEST_F(TestVFDebug, AscVFDebugTransferUb_ReturnsFalseWithoutDeviceWorkspace)
 {
-    // Verify AscVFDebugTransferUb() can be called without crash under ASCENDC_CPU_DEBUG or else branch.
-    // AscVFDebugTransferUb is defined in impl/utils/debug/asc_debug_utils.h at global scope.
-    ::AscVFDebugTransferUb();
-    SUCCEED();
+    EXPECT_FALSE(::AscVFDebugTransferUb());
+}
+
+TEST_F(TestVFDebug, PrintSimdVfOverflowWarning_PrintsWarning)
+{
+    testing::internal::CaptureStdout();
+    PrintSimdVfOverflowWarning();
+    EXPECT_EQ(
+        testing::internal::GetCapturedStdout(),
+        "[WARNING]: SIMD VF debug buffer overflow; output was truncated.\n");
 }
 
 TEST_F(TestVFDebug, AscVFCallImpl_CallsTargetFunction)
@@ -44,6 +55,14 @@ TEST_F(TestVFDebug, AscVFCallImpl_CallsTargetFunction)
     // Verify AscVFCallImpl (defined in impl/basic_api/kernel_utils.h) invokes the target
     // function after AscVFDebugInitUb and before AscVFDebugTransferUb.
     AscVFCallImpl<TestTargetFunc>(42);
+    EXPECT_EQ(g_testFlag, 42);
+}
+
+TEST_F(TestVFDebug, AscVFCallImpl_DoesNotWarnWithoutOverflow)
+{
+    testing::internal::CaptureStdout();
+    AscVFCallImpl<TestTargetFunc>(42);
+    EXPECT_TRUE(testing::internal::GetCapturedStdout().empty());
     EXPECT_EQ(g_testFlag, 42);
 }
 
