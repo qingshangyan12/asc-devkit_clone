@@ -58,7 +58,7 @@ SelectorStatus ReduceScatterAutoSelector::SelectCcuMsAlgo(const TopoInfoWithNetL
 
     selectAlgName = "CcuReduceScatterMesh1DMem2Mem";
     HCCL_DEBUG("[ReduceScatterAutoSelector][%s] Algo match[%s]", __func__, selectAlgName.c_str());
-    return ret;
+    return SelectorStatus::MATCH;
 }
 
 SelectorStatus ReduceScatterAutoSelector::SelectMeshAlgoCcums(const TopoInfoWithNetLayerDetails* topoInfo, const OpParam &opParam,
