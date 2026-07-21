@@ -42,7 +42,6 @@ def gemm_custom_tiled(m, k, n, A, B, C, k0):
             # 3. 内层循环：在k维度上分块前进
             # range(start, stop, step) -> 每次跳跃 k0
             for p in range(0, k, k0):
-
                 # 计算当前块的终点，处理剩余长度不足 k0 的边界情况
                 p_end = min(p + k0, k)
 
@@ -56,12 +55,12 @@ def gemm_custom_tiled(m, k, n, A, B, C, k0):
                 # 【核心计算】：计算这k0个数字的内积，并加到累加器上
                 accumulate_sum += np.dot(vec_a_chunk, vec_b_chunk)
 
-                print(p)
-
             # 4. 写回结果：将累加完成的值更新回 C 矩阵
             C[i, j] = accumulate_sum
 
+
     return C
+
 
 # ---测试代码---
 if __name__ == "__main__":
