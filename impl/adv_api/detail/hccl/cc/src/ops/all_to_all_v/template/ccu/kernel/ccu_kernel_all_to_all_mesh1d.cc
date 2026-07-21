@@ -121,10 +121,9 @@ static void PostSync(AlltoAllMesh1DContext &ctx)
         ccu::NotifyRecord(arg->channels[i], CKE_IDX_1, postBit);
     }
     HCCL_INFO("[A2A_DBG] PostSync before NotifyWait, postBit[%u]", postBit);
-    // ==== 实验1：注释 PostSync NotifyWait 定位是否卡在此 ====
-    // for (uint32_t i = 0; i < arg->channelCount; i++) {
-    //     ccu::NotifyWait(arg->channels[i], CKE_IDX_1, postBit);
-    // }
+    for (uint32_t i = 0; i < arg->channelCount; i++) {
+        ccu::NotifyWait(arg->channels[i], CKE_IDX_1, postBit);
+    }
     HCCL_INFO("[A2A_DBG] PostSync after NotifyWait (passed)");
     HCCL_INFO("[CcuKernelAlltoAllMesh1D] AlltoAllMesh1D PostSync end.");
 }
@@ -183,8 +182,7 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
         }
         GroupCopy(ctx, localDst, src[arg->rankId], ctx.goSize);
         HCCL_INFO("[A2A_DBG] branch B before EventWait, allBit[%u]", (unsigned)allBit);
-        // ==== 实验2：注释 DoAlltoAll(branchB) EventWait 定位是否卡在此 ====
-        // ccu::EventWait(ctx.event, allBit);
+        ccu::EventWait(ctx.event, allBit);
         HCCL_INFO("[A2A_DBG] branch B after EventWait (passed)");
     }
 
