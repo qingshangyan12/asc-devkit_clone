@@ -10,8 +10,6 @@
 
 #include "reduce_scatter_auto_selector.h"
 #include "selector_registry.h"
-#include "ins_v2_reduce_scatter_order_preserved_executor.h"
-#include "order_preserved_common.h"
 
 namespace mc2_ops_hccl {
 constexpr u32 MAX_RANK_NUM_FOR_CONCURRENT_ALGO = 4;
