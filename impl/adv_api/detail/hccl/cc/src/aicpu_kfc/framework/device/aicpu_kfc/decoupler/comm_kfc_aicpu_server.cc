@@ -26,6 +26,7 @@
 #include "coll_comm_aicpu_mgr.h"
 #include "stream_lite.h"
 #include "thread.h"
+#include "profiling_handler_lite.h"
 
 using namespace HcclApi;
 namespace {
@@ -560,6 +561,38 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     LogAicpuOrderDfxCounter(
         "ServerMsg", groupIdx_, msgArea_, msgPos, 0U, 0U, opParamKey, waitAddr, recordAddr, turnNumsAddr_, execCtx);
 
+    if (execCtx->resourceType == ServerExecResourceType::NEXT_AICPU) {
+        HCCL_INFO(
+            "[MC2_PROF][Setup] group %u, commName[%s], opParamKey %#llx, L0 %u, L1 %u.", groupIdx_,
+            execCtx->commName.c_str(), static_cast<unsigned long long>(execCtx->opParamKey),
+            static_cast<u32>(Hccl::ProfilingHandlerLite::GetInstance().GetProfL0State()),
+            static_cast<u32>(Hccl::ProfilingHandlerLite::GetInstance().GetProfL1State()));
+        if (UNLIKELY(execCtx->collCommAicpu == nullptr)) {
+            HCCL_ERROR("[MC2_PROF][Setup] group %u: collCommAicpu is null for NEXT_AICPU path.", groupIdx_);
+            return HCCL_E_PTR;
+        }
+        auto* dfxLite = execCtx->collCommAicpu->GetHcclCommDfxLite();
+        if (UNLIKELY(dfxLite == nullptr)) {
+            HCCL_ERROR("[MC2_PROF][Setup] group %u: HcclCommDfxLite is null for NEXT_AICPU path.", groupIdx_);
+            return HCCL_E_PTR;
+        }
+        CHK_RET(dfxLite->UpdateProfStat());
+
+        auto dfxOpInfo = std::make_shared<Hccl::DfxOpInfo>();
+        dfxOpInfo->groupName_ = execCtx->commName;
+        dfxOpInfo->rankSize_ = rankNum_;
+        dfxOpInfo->isIndop_ = true;
+        dfxOpInfo->beginTime_ = ProfGetCurCpuTimestamp();
+        const u64 profBeginTime = dfxOpInfo->beginTime_;
+        CHK_RET(dfxLite->SetCurrDfxOpInfo(std::move(dfxOpInfo)));
+        HCCL_INFO(
+            "[MC2_PROF][SetupDone] group %u, commName[%s], rankSize %u, beginTime %llu, "
+            "L0 %u, L1 %u.",
+            groupIdx_, execCtx->commName.c_str(), rankNum_, profBeginTime,
+            static_cast<u32>(Hccl::ProfilingHandlerLite::GetInstance().GetProfL0State()),
+            static_cast<u32>(Hccl::ProfilingHandlerLite::GetInstance().GetProfL1State()));
+    }
+
     std::vector<uint8_t> runParam{};
     for (u32 i = 0U; i < repeatCnt; ++i) {
         const u32 turnIdx = i + 1U;
@@ -647,6 +680,30 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     }
     SetMsgPosByHandle(handle, msgPos);
     SetRepeatByHandle(handle, repeatCnt);
+
+    if (execCtx->resourceType == ServerExecResourceType::NEXT_AICPU) {
+        auto* dfxLite = execCtx->collCommAicpu->GetHcclCommDfxLite();
+        CHK_PTR_NULL(dfxLite);
+        HCCL_INFO(
+            "[MC2_PROF][ReportBegin] group %u, commName[%s], opParamKey %#llx, "
+            "L0 %u, L1 %u.",
+            groupIdx_, execCtx->commName.c_str(), static_cast<unsigned long long>(execCtx->opParamKey),
+            static_cast<u32>(Hccl::ProfilingHandlerLite::GetInstance().GetProfL0State()),
+            static_cast<u32>(Hccl::ProfilingHandlerLite::GetInstance().GetProfL1State()));
+        CHK_RET(dfxLite->ReportAllTasks());
+        auto* mirrorTaskMgrLite = dfxLite->GetMirrorTaskManagerLite();
+        if (mirrorTaskMgrLite != nullptr && mirrorTaskMgrLite->GetCurrDfxOpInfo() != nullptr) {
+            Hccl::ProfilingHandlerLite::GetInstance().ReportHcclOpInfo(*mirrorTaskMgrLite->GetCurrDfxOpInfo());
+            HCCL_INFO(
+                "[MC2_PROF][ReportDone] group %u, commName[%s], opParamKey %#llx.", groupIdx_,
+                execCtx->commName.c_str(), static_cast<unsigned long long>(execCtx->opParamKey));
+        } else {
+            HCCL_INFO(
+                "[MC2_PROF][ReportSkip] group %u, commName[%s], mirrorTaskMgrLite %p, currDfxOpInfo is null.",
+                groupIdx_, execCtx->commName.c_str(), mirrorTaskMgrLite);
+        }
+    }
+
     return HCCL_SUCCESS;
 }
 
