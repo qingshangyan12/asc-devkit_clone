@@ -89,6 +89,65 @@ public:
             dst, src, ndNum, loop2DstStride, loop3DstStride, loop4DstStride, loop1SrcStride, cacheMode, nValue, dValue,
             loop4SrcStride, false);
     }
+
+    // coord/shape variant: emulates src.Slice(coord, shape) without materializing a sliced tensor.
+    // The source address is offset by coord (pure pointer arithmetic via src.Layout()(coord)); the
+    // sub-tensor reuses the original layout type (no MakeSliceLayout / new layout type), so only the
+    // engine pointer moves. nValue/dValue come straight from the passed-in shape (the slice region),
+    // while the row stride is still read from the (unchanged) source layout. Single-matrix only.
+    template <const CopyGM2L1Trait& trait, typename T, typename U, typename Coord, typename Shape>
+    __aicore__ inline static void Run(const T& dst, const U& src, const Coord& coord, const Shape& shape)
+    {
+        CheckTemplate<trait, T, U>();
+        // Offset the source engine by the coord's linear offset; layout type is preserved.
+        auto subEngine = src.Engine() + src.Layout()(coord);
+        using SubEngine = Std::remove_cvref_t<decltype(subEngine)>;
+        using SubLayout = typename U::layoutType;
+        using SubLoc = GetMemLocation<SubEngine>;
+        using SubTensor = typename MakeTensorResult<SubLoc, SubEngine, SubLayout>::type;
+        SubTensor subSrc{subEngine, src.Layout()};
+        EmitCopyCoord(dst, subSrc, src.Layout(), dst.Layout(), shape);
+    }
+
+    // Single-matrix nd2nz emit that takes the slice region from `shape` instead of the layout. Row
+    // stride / dst nz strides are read from the layouts (a slice does not change strides).
+    template <typename T, typename U, typename SrcLayout, typename DstLayout, typename Shape>
+    __aicore__ inline static void EmitCopyCoord(
+        const T& dst, const U& subSrc, const SrcLayout& srcLayout, const DstLayout& dstLayout, const Shape& shape)
+    {
+        using type = typename U::elementType;
+
+        uint16_t nValue = static_cast<uint16_t>(Get<0>(shape));
+        uint32_t dValue = static_cast<uint32_t>(Get<1>(shape));
+        uint32_t srcRowStride;
+        if constexpr (IsSatisfiedPtnFormatV<U, NDLayoutPtn>) {
+            srcRowStride = GetElement<AttrInfo::Stride, AttrInfo::Row>(srcLayout);
+        } else {
+            srcRowStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
+        }
+        auto dstColumnStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
+        if constexpr (IsB4Type<type>) {
+            // move fp4 as b8, need to be divided by 2
+            dValue = dValue >> 1;
+            srcRowStride = srcRowStride >> 1;
+        }
+
+        uint64_t srcDValue = srcRowStride;
+        uint16_t dstNzC0Stride = dstColumnStride / C0_ELEMENT<type>;
+        uint16_t dstNzNStride = 1;
+
+        uint64_t loop1SrcStride = srcDValue * sizeof(type);
+        uint64_t loop4SrcStride = 0; // single matrix, no batch stride
+
+        uint16_t loop2DstStride = dstNzNStride;
+        uint16_t loop3DstStride = dstNzC0Stride;
+        uint16_t loop4DstStride = 0; // single matrix, no dst matrix stride
+        uint8_t cacheMode = subSrc.Engine().GetCacheMode();
+
+        CopyGmToCbufMultiNd2nzInstr::DataCopy(
+            dst, subSrc, static_cast<uint16_t>(1), loop2DstStride, loop3DstStride, loop4DstStride, loop1SrcStride,
+            cacheMode, nValue, dValue, loop4SrcStride, false);
+    }
 };
 
 } // namespace Te

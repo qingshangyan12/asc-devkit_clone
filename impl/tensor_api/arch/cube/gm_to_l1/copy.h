@@ -59,6 +59,23 @@ private:
         using CopyGM2L1Impl = typename CopyGM2L1Routing<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
         CopyGM2L1Impl::template Run<trait, T, U>(dst, src);
     }
+
+    template <
+        const CopyGM2L1Trait& trait = DEFAULT_COPY_GM_TO_L1_TRAIT, typename T, typename U, typename Coord,
+        typename Shape>
+    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src, const Coord& coord, const Shape& shape)
+    {
+        using DstPos = GetMemLocation<T>;
+        using SrcPos = GetMemLocation<U>;
+        static_assert(Std::is_same_v<DstPos, Location::L1>, "CopyGM2L1 requires destination on L1");
+        static_assert(Std::is_same_v<SrcPos, Location::GM>, "CopyGM2L1 requires source on GM");
+        using DstLayout = typename T::layoutType;
+        using SrcLayout = typename U::layoutType;
+        using DstLayoutPtn = GetLayoutPattern<DstLayout>;
+        using SrcLayoutPtn = GetLayoutPattern<SrcLayout>;
+        using CopyGM2L1Impl = typename CopyGM2L1Routing<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
+        CopyGM2L1Impl::template Run<trait, T, U>(dst, src, coord, shape);
+    }
 };
 
 } // namespace Te
