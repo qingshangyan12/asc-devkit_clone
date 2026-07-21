@@ -60,7 +60,7 @@ kernel_name<<<block_num, dyn_ub_size, stream>>>(args...);
 | 参数 | 类型 | 说明 | 约束 |
 | --- | --- | --- | --- |
 | `block_num` | `uint32_t` | 设置核函数启用的核数 | 取值范围[1, 65535] |
-| `dyn_ub_size` | `uint32_t` | 指定动态内存大小，单位为字节 | 详见内存层级[UB划分](./内存层级.md#ub划分)|
+| `dyn_ub_size` | `uint32_t` | 指定动态内存大小，单位为字节 | 不超过最大可配置值：256KB - 8KB - 静态内存 |
 | `stream` | `aclrtStream` | 用于维护异步操作执行顺序 | 无 |
 
 ## SIMT VF函数<a name="zh-cn_topic_0000002571578013_section1780955884616"></a>
