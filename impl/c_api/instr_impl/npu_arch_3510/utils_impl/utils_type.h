@@ -33,7 +33,6 @@ using vector_load_unalign = vector_align;
 using addr_reg = vector_address;
 // iter_reg has been deprecated, please use addr_reg instead.
 using iter_reg [[deprecated("iter_reg has been deprecated, please use addr_reg instead.")]] = addr_reg;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 using vector_bfloat16_t = vector_bf16;
 using vector_hifloat8_t = vector_hif8;
 using vector_fp8_e4m3fn_t = vector_f8e4m3;
@@ -42,6 +41,5 @@ using vector_fp8_e8m0_t = vector_f8e8m0;
 using vector_int4x2_t = vector_s4x2;
 using vector_fp4x2_e2m1_t = vector_f4e2m1x2;
 using vector_fp4x2_e1m2_t = vector_f4e1m2x2;
-#endif
 
 #endif
