@@ -29,6 +29,7 @@
 #include "utils/kernel_utils_struct_norm_sort.h"
 #include "utils/kernel_utils_struct_param.h"
 #include "../utils/debug/asc_debug_utils.h"
+#include "../utils/debug/asc_aicore_printf_impl.h"
 
 #include "../../include/basic_api/kernel_struct_data_copy.h"
 #include "kernel_scalar_convert.h"
@@ -281,7 +282,9 @@ __aicore__ static inline void AscVFCallImpl(Args&&... args)
     funcPtr(args...);
 
     if constexpr (Internal::SimdVfDebugTraits<DebugTag>::enabled) {
-        AscVFDebugTransferUb();
+        if (AscVFDebugTransferUb()) {
+            __asc_aicore::printf_impl("[WARNING]: SIMD VF debug buffer overflow; output was truncated.\n");
+        }
     }
 }
 } // namespace AscendC
