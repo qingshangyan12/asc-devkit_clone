@@ -9,7 +9,7 @@
  */
 
 /* !
- * \file c_api_mmad_s1.h
+ * \file mmad_s1.h
  * \brief 场景1（int8_t 输入、int32_t 输出、A/B 不转置、带 Bias）的常量与完整流水线函数
  */
 

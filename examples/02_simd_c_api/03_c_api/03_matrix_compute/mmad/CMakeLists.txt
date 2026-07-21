@@ -17,7 +17,7 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    c_api_mmad.asc
+    mmad.asc
 )
 
 set(SCENARIO_NUM "1" CACHE STRING "SCENARIO_NUM, e.g. 1 2")

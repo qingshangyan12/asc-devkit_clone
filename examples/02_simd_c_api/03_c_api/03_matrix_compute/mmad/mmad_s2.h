@@ -9,7 +9,7 @@
  */
 
 /* !
- * \file c_api_mmad_s2.h
+ * \file mmad_s2.h
  * \brief 场景2（bfloat16 输入、float 输出、A 不转置 B 转置、无 Bias、两次 Mmad 累加）的常量与完整流水线函数
  */
 
